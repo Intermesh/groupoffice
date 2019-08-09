@@ -152,11 +152,11 @@ class Link extends Entity {
 		
 		$link = new Link();
 		$link->fromId = $a->id;
-		$link->fromEntity = $a->getType()->getName();
-		$link->fromEntityTypeId = $a->getType()->getId();
+		$link->fromEntity = $a->entityType()->getName();
+		$link->fromEntityTypeId = $a->entityType()->getId();
 		$link->toId = $b->id;
-		$link->toEntity = $b->getType()->getName();
-		$link->toEntityTypeId = $b->getType()->getId();
+		$link->toEntity = $b->entityType()->getName();
+		$link->toEntityTypeId = $b->entityType()->getId();
 		$link->description = $description;		
 		
 		if(!$link->save()) {
@@ -185,9 +185,9 @@ class Link extends Entity {
 	 */
 	public static function findLink($a, $b) {
 		return Link::find()->where([
-				'fromEntityTypeId' => $a->getType()->getId(),
+				'fromEntityTypeId' => $a->entityType()->getId(),
 				'fromId' => $a->id,
-				'toEntityTypeId' => $b->getType()->getId(),
+				'toEntityTypeId' => $b->entityType()->getId(),
 				'toId' => $b->id,
 		])->single();
 	}
@@ -202,7 +202,7 @@ class Link extends Entity {
 	 * @return boolean
 	 */
 	public static function deleteLink($a, $b) {
-		return self::deleteLinkWithIds($a->getType()->getId(), $a->id, $b->id, $b->getType()->getId());
+		return self::deleteLinkWithIds($a->entityType()->getId(), $a->id, $b->id, $b->entityType()->getId());
 	}
 	
 	/**
@@ -263,14 +263,21 @@ class Link extends Entity {
 		$reverse['createdAt'] = $this->createdAt;
 		
 		if($this->isNew()) {			
-			//make sure the description and name are set so they are returned to the client
+			$this->updateDataFromSearch();
+		}
+		
+		return App::get()->getDbConnection()->insertIgnore('core_link', $reverse)->execute();
+	}
+
+	private function updateDataFromSearch() {
+		//make sure the description and name are set so they are returned to the client
+		if(!isset($this->toSearchId) || !isset($this->aclId)) {
 			$search = Search::find()->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
 			$this->toDescription = $search->description;
 			$this->toName = $search->name;
 			$this->toSearchId = $search->id;
+			$this->aclId = $search->findAclId();
 		}
-		
-		return App::get()->getDbConnection()->insertIgnore('core_link', $reverse)->execute();
 	}
 	
 	protected function internalDelete() {		
@@ -288,6 +295,7 @@ class Link extends Entity {
 	}
 	
 	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {
+		$level = Acl::LEVEL_READ;
 		Acl::applyToQuery($query, 's.aclId', $level, $userId);
 		
 		return $query;
@@ -298,18 +306,13 @@ class Link extends Entity {
 	 * @return int
 	 */
 	public function getPermissionLevel() {
-		return Acl::getUserPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId());
+		if($this->isNew()) {			
+			$this->updateDataFromSearch();
+		}
+		//Readable items may be linked!
+		return Acl::getUserPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId()) ?  Acl::LEVEL_DELETE : false;
 	}
 	
-	/**
-	 * Checks if the current user has a given permission level.
-	 * 
-	 * @param int $level
-	 * @return boolean
-	 */
-	public function hasPermissionLevel($level = Acl::LEVEL_READ) {
-		return $this->getPermissionLevel() >= $level;
-	}
 //	
 //	/**
 //	 * The to properties
@@ -326,7 +329,7 @@ class Link extends Entity {
 							$crtiteria->where('fromId', '=', $value);
 						})
 						->add('entity', function (Criteria $criteria, $value){
-							$criteria->where(['eFrom.name' => $value]);		
+							$criteria->where(['eFrom.clientName' => $value]);		
 						})
 						->add('entities', function (Criteria $criteria, $value){
 							// Entity filter consist out of name => "Contact" and an optional "filter" => "isOrganization"
@@ -337,7 +340,7 @@ class Link extends Entity {
 							$sub = (new Criteria);
 
 							foreach($value as $e) {
-								$w = ['eTo.name' => $e['name']];
+								$w = ['eTo.clientName' => $e['name']];
 								if(isset($e['filter'])) {
 									$w['filter'] = $e['filter'];
 								}

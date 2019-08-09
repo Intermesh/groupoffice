@@ -1,7 +1,6 @@
 <?php
 
 use go\core\App;
-use go\core\util\IniFile;
 use go\core\util\ClassFinder;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Expression;
@@ -10,6 +9,8 @@ use go\core\orm\EntityType;
 use GO\Base\Db\ActiveRecord;
 use go\core\model\Search;
 use GO\Base\Model\SearchCacheRecord;
+use go\core\model\Group;
+use go\core\model\Acl;
 
 $updates["201803090847"][] = "ALTER TABLE `go_log` ADD `jsonData` TEXT NULL AFTER `message`;";
 
@@ -545,7 +546,7 @@ $updates['201905201227'][] = function() {
   
   $mods = GO::modules()->getAll();
   foreach($mods as $m) {
-    if($m->package == null) {
+    if($m->package == null && $m->isAvailable()) {
       $classes = array_merge($classes, array_map(function($c){return $c->getName();},$m->moduleManager->getModels()));
     }
   }
@@ -558,7 +559,7 @@ $updates['201905201227'][] = function() {
     }
 
     if(is_subclass_of($cls, AclOwnerEntity::class)) {
-      $type = $cls::getType();
+      $type = $cls::entityType();
       $tables = $cls::getMapping()->getTables();
       $table = array_values($tables)[0]->getName();
       $colName = 'aclId';
@@ -570,7 +571,7 @@ $updates['201905201227'][] = function() {
       if(!$colName || ($cls::model()->isJoinedAclField && $cls != "GO\\Files\\Model\\Folder")) {
         continue;
       }
-      $type = $cls::getType();
+      $type = $cls::entityType();
       $table = $cls::model()->tableName();     
     }
 
@@ -587,4 +588,22 @@ $updates['201905201227'][] = function() {
      throw new \Exception("Could not update ACL");
    }
   }
+};
+
+$updates['201906032000'][] = "ALTER TABLE `core_search` DROP INDEX `keywords`;";
+$updates['201906032000'][] = "ALTER TABLE `core_search` CHANGE `keywords` `keywords` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '';";
+$updates['201906032000'][] = "ALTER TABLE `core_search` DROP INDEX `name`;";
+$updates['201906032000'][] = "ALTER TABLE `core_search` CHANGE `name` `name` VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;";
+$updates['201906032000'][] = "ALTER TABLE `core_search` ADD FULLTEXT( `name`, `keywords`);";
+
+
+$updates['201906032000'][] = "ALTER TABLE `core_acl` DROP FOREIGN KEY `core_acl_ibfk_1`;";
+$updates['201906032000'][] = "ALTER TABLE `core_acl` ADD CONSTRAINT `core_acl_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
+$updates['201906211622'][] = function() {
+	GO()->getDbConnection()->query("ALTER TABLE `core_search` CHANGE `keywords` `keywords` VARCHAR(192) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL;");
+};
+
+$updates['201906211622'][] = function() {
+  EntityType::findByName('FieldSet')->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
 };

@@ -3,6 +3,7 @@ namespace go\core\orm;
 
 use go\core\db\Column;
 use go\core\db\Table;
+use go\core\db\Connection;
 
 class MappedTable extends Table {
 	
@@ -46,8 +47,8 @@ class MappedTable extends Table {
 	 *   the joined table always needs to have a value 
 	 *   ['type' => "foo"] then you can set it with this parameter.
 	 */
-	public function __construct($name, $alias, $keys = null, array $columns = [], array $constantValues = []) {
-		parent::__construct($name);
+	public function __construct($name, $alias, $keys = null, array $columns = [], array $constantValues = [], Connection $conn = null) {
+		parent::__construct($name, $conn ?? GO()->getDbConnection());
 		
 		$this->alias = $alias;
 
@@ -56,13 +57,13 @@ class MappedTable extends Table {
 		}
 
 		$this->keys = $keys;		
-		$this->mappedColumns = array_filter($this->columns, function($c) use ($columns) {
-			return in_array($c->name, $columns);
-		});
-		
-		foreach($this->mappedColumns as $col) {
+		foreach($this->columns as $col) {
 			$col->table = $this;
 		}
+
+		$this->mappedColumns = array_filter($this->columns, function($c) use ($columns) {
+			return in_array($c->name, $columns);
+		});	
 		
 		$this->constantValues = $constantValues;
 	}

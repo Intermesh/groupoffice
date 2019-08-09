@@ -117,6 +117,7 @@ GO.email.SearchDialog = function(config){
 						name: 'searchInGroup',
 						fieldLabel: t("Search in", "email"),
 						itemCls: 'x-check-group-alt',
+						value: "current",
 						columns: 1,
 						items: [
 							{
@@ -197,7 +198,7 @@ GO.email.SearchDialog = function(config){
 			config.store.baseParams['query']=this.buildQuery();
 			config.store.baseParams['searchIn']=this.formPanel.form.findField('searchInGroup').getValue().inputValue;
 			config.store.load();
-
+			
 			this.dialog.hide();					
 		},
 		
@@ -222,44 +223,44 @@ GO.email.SearchDialog = function(config){
 			var seen = form.findField('seen').getValue();
 			var answered = form.findField('answered').getValue();
 			
-			if (subject != '') {
+			if (subject) {
 				query += 'SUBJECT "'+subject+'" ';
 			}
 			
-			if (from != '') {
+			if (from) {
 				query += 'FROM "'+from+'" ';
 			}
 			
-			if (to != '') {
+			if (to) {
 				query += 'TO "'+to+'" ';
 			}
 			
-			if (cc != '') {
+			if (cc) {
 				query += 'CC "'+cc+'" ';
 			}
-			if (body != '') {
+			if (body) {
 				query += 'BODY "'+body+'" ';
 			}
 			
-			if(before!='')
+			if(before)
 			{
 				query += 'BEFORE '+before.format('j')+'-'+months[before.format('n')-1]+'-'+before.format('Y')+' ';
 			}
 			
-			if(since!='')
+			if(since)
 			{
 				query += 'SINCE '+since.format('j')+'-'+months[since.format('n')-1]+'-'+since.format('Y');
 			}
 			
-			if (flagged != '') {
+			if (flagged) {
 				query += ' '+flagged;
 			}
 			
-			if (seen != '') {
+			if (seen) {
 				query += ' '+seen;
 			}
 			
-			if (answered != '') {
+			if (answered) {
 				query += ' '+answered;
 			}
 

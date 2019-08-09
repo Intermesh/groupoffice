@@ -9,6 +9,7 @@ use go\core\orm\EntityType;
 use go\core\orm\Query;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
+use go\core\db\Expression;
 
 class Search extends AclOwnerEntity {
 
@@ -32,6 +33,10 @@ class Search extends AclOwnerEntity {
 	//don't delete acl on search
 	protected function deleteAcl() {
 		
+	}
+
+	public function findAclId() {
+		return $this->aclId;
 	}
 	
 	
@@ -120,8 +125,44 @@ class Search extends AclOwnerEntity {
 
 							$criteria->where($sub);		
 							
-						});
+						})
+						->add('text', function(Criteria $criteria, $value, Query $query) {
+
+							$value = static::convertQuery($value);
+
+							$criteria->where('MATCH (s.name, s.keywords) AGAINST (:keyword1 IN BOOLEAN MODE)')
+							->bind(':keyword1', $value)
+							->bind(':keyword2', $value);
+
+							// Order by relevance
+							$query->orderBy([new Expression('MATCH (s.name, s.keywords) AGAINST (:keyword2 IN BOOLEAN MODE) DESC')]);
+						});					
+	}
+
+	public static function convertQuery($value) {
+
+			//first occuring quote type will be used for tokenizing.
+			$doublepos = strpos($value, '"');
+			$singlepos = strpos($value, "'");							
+			$quote = '"';
+			if($singlepos !== false && $singlepos > $doublepos) {
+				$quote = "'";
+			}
+
+			//https://stackoverflow.com/questions/2202435/php-explode-the-string-but-treat-words-in-quotes-as-a-single-word
+			preg_match_all('/'.$quote.'(?:\\\\.|[^\\\\'.$quote.'])*'.$quote.'|\S+/', $value, $tokens);
+
+			$str = "";
+
+			foreach($tokens[0] as $token) {				
 					
+					if(substr($token, -1,1) !== $quote) {
+						$token = $token .= '*';
+					}
+					$str .= '+' . $token . ' ';
+			}
+
+			return $str;
 	}
 	
 	

@@ -42,15 +42,23 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	initComponent: function () {
 		go.detail.Panel.superclass.initComponent.call(this, arguments);		
 		
-		if (go.Modules.isAvailable("community", "comments")) {
-			this.add(new go.modules.comments.CommentsDetailPanel());
-		}
-		
+
 		this.cls += " go-detail-view-" + this.entityStore.entity.name.toLowerCase();
 		
 		this.on('afterrender', function() {
-			this.reset();			
+			this.reset();
+
+			this.body.on("click", this.onBodyClick, this);
 		}, this);
+	},
+
+	onBodyClick : function (e, target) {
+
+		//prevent navigating away.
+		if(target.tagName == "A" && target.attributes.href && target.attributes.href.value) {
+			window.open(target.attributes.href.value);
+			e.preventDefault();
+		}
 	},
 	
 	onChanges : function(entityStore, added, changed, destroyed) {
@@ -147,6 +155,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			this.getTopToolbar().setDisabled(false);
 		}
 		this.data = data;
+
 		var me = this;
 		
 		if(!this.relations.length) {
@@ -156,11 +165,12 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		}	
 		
 		go.Relations.get(me.entityStore, data, this.relations).then(function(result) {
-			me.watchRelations = result.watch;		
+			me.watchRelations = result.watch;					
+		}).catch(function(result) {
+			console.warn("Failed to fetch relation", result);
+		}).finally(function() {
 			me.onLoad();
 			me.fireEvent('load', me);
-		}).catch(function(result) {
-			throw result;
 		});
 		
 	},
@@ -181,8 +191,8 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	},
 
 	addComments : function() {
-		if (go.Modules.isAvailable("legacy", "comments")) {
-			return this.add(new go.modules.comments.CommentsDetailPanel());
+		if (go.Modules.isAvailable("community", "comments")) {
+			this.add(new go.modules.comments.CommentsDetailPanel());
 		}
 	},
 	addFiles : function() {

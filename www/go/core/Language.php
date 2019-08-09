@@ -30,7 +30,7 @@ class Language {
 	}
 	
 	public function setLanguage($isoCode = null) {
-		
+		$old = $this->getIsoCode();
 		if(!isset($isoCode)) {
 			$isoCode = $this->getBrowserLanguage();
 		}
@@ -43,6 +43,8 @@ class Language {
 			$this->isoCode = $isoCode;
 			$this->data = [];
 		}
+
+		return $old;
 		
 	}
 	
@@ -162,7 +164,12 @@ class Language {
 	
 	private function loadFile($file) {
 		
-		$langData = require($file);
+		try {
+			$langData = require($file);
+		} catch(\ParseError $e) {
+			ErrorHandler::logException($e);
+			$langData = [];
+		}
 		if(!is_array($langData)){
 			throw new \Exception("Invalid language file  " . $file);
 		}

@@ -9,7 +9,7 @@ use go\core\exception\NotFound;
 use go\core\fs\File;
 use go\core\fs\Folder;
 use go\core\model;
-use go\core\orm\Entity;
+use go\core\jmap\Entity;
 use go\core\util\ClassFinder;
 use function GO;
 
@@ -50,6 +50,10 @@ abstract class Module {
 		return false;
 	}
 
+	public function isInstallable() {
+		return $this->isLicensed();
+	}
+
 	/**
 	 * For example "groupoffice-pro"
 	 */
@@ -57,19 +61,34 @@ abstract class Module {
 		return null;
 	}
 
-	public function isInstallable() {
+	public function isLicensed() {
+		
 		$lic = $this->requiredLicense();
-
 		if(!isset($lic)) {
-			return $this->name() != 'core';
+			return true;
 		}
-	 
+
+		$file = GO()->getEnvironment()->getInstallFolder()->getFile('licensechecks/'.$lic. '.php');
+
+		//Check if file is encoded
+		$data = $file->getContents(0, 100);
+		if(strpos($data, '<?php //004fb') === false) {	
+			return true;
+		}
+
 		if(!extension_loaded('ionCube Loader')) {
 			return false;
 		}
 
-		return GO()->getEnvironment()->getInstallFolder()->getFile( $lic . '-' . substr(GO()->getVersion(), 0, 3) .' license.txt')->exists();
+		if(!GO()->getEnvironment()->getInstallFolder()->getFile($lic . '-' . substr(GO()->getVersion(), 0, 3) .'-license.txt')->exists()) {
+			return false;
+		}
+
+		return require($file->getPath());
+		
 	}
+
+
 	
 	/**
 	 * Install the module
@@ -79,10 +98,14 @@ abstract class Module {
 	public final function install() {
 
 		try{
+			GO()->getDbConnection()->pauseTransactions();
 			$this->installDatabase();
+			GO()->getDbConnection()->resumeTransactions();
 					
 			GO()->rebuildCache(true);
+
 			GO()->getDbConnection()->beginTransaction();
+			
 		
 			$model = new model\Module();
 			$model->name = static::getName();
@@ -173,7 +196,7 @@ abstract class Module {
 		
 		$moduleModel = $this->getModel();
 		foreach($entities as $entity) {
-			$type = $entity::getType();
+			$type = $entity::entityType();
 			if(!$type) {
 				throw new \Exception("Could not register entity type for module ". $this->getName() . " with name " . $entity::getClientName());
 			}
@@ -199,11 +222,7 @@ abstract class Module {
 		$sqlFile = $this->getFolder()->getFile('install/install.sql');
 		
 		if ($sqlFile->exists()) {
-			$queries = Utils::getSqlQueries($sqlFile);
-			
-			foreach ($queries as $query) {
-				GO()->getDbConnection()->query($query);
-			}
+			Utils::runSQLFile($sqlFile);			
 		}
 				
 		return true;
@@ -218,15 +237,10 @@ abstract class Module {
 		$sqlFile = $this->getFolder()->getFile('install/uninstall.sql');
 		
 		if ($sqlFile->exists()) {
-			$queries = Utils::getSqlQueries($sqlFile);
-
 			//disable foreign keys
-			array_unshift($queries, "SET FOREIGN_KEY_CHECKS=0;");
-			array_push($queries, "SET FOREIGN_KEY_CHECKS=1;");
-			
-			foreach ($queries as $query) {
-				GO()->getDbConnection()->query($query);
-			}
+			GO()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
+			Utils::runSQLFile($sqlFile);
+			GO()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
 		}
 		
 		return true;

@@ -49,7 +49,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	getValues : function (dirtyOnly) {	
 		var v = {};		
 		for(var name in this.values) {
-			if(!dirtyOnly || this.entity[name] !== this.values[name]) {
+			if(!dirtyOnly || !go.util.isEqual(this.entity[name], this.values[name])) {
 				v[name] = this.values[name];
 			}
 		}
@@ -61,15 +61,17 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	setValues : function(v) {
 		var field, name;
 		
-		this.getForm().setValues(v);
-		
 		//set all non form values.
 		for(name in v) {		
 			field = this.getForm().findField(name);
 			if(!field) {
-				this.values[name] = v[name];
+				//Use clone otherwise dirty check will never work because of the reference
+				this.values[name] = go.util.clone(v[name]);
 			}
 		}
+
+		//Set the form values after. It's important to do this after setting this.values otherwise it will add joined object value names like customFields.name
+		this.getForm().setValues(v);
 		
 		this.fireEvent('setvalues', this, v);
 		return this;
@@ -128,22 +130,40 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 						break;
 
 					default:
-						
 						//mark validation errors
 						for(var name in notSaved[id].validationErrors) {
 							var field = this.getForm().findField(name);
 							if(field) {
 								field.markInvalid(notSaved[id].validationErrors[name].description);
+							} else
+							{
+								console.warn("Could not find form field for server error " + name,notSaved[id].validationErrors[name]);
 							}
 						}
-						
-						Ext.MessageBox.alert(t("Error"), t("Sorry, something went wrong. Please try again."));
+						/**
+						 * 
+						 * You can cancel the error message with this event:
+						 * 
+						 * initComponent: function() {
+						 * 	go.modules.business.wopi.ServiceDialog.superclass.initComponent.call(this);
+						 * 
+						 * 	this.formPanel.on("beforesubmiterror", function(form, success, id, error) {			
+						 * 		if(error.validationErrors.type) {
+						 * 			Ext.MessageBox.alert(t("Error"), t("You can only add one service of the same type"));
+						 * 			return false; //return false to cancel default error message
+						 * 		}
+						 * 	}, this);
+						 * },
+						 */
+						if(this.fireEvent("beforesubmiterror", this, false, null, notSaved[id])) {
+							Ext.MessageBox.alert(t("Error"), t("Sorry, something went wrong. Please try again."));
+						}
 						break;
 				}
 				if(cb) {
 					cb.call(scope, this, false, null);
 				}
-				this.fireEvent("submit", this, true, null);
+				this.fireEvent("submit", this, false, null, notSaved[id]);
 			}
 		}, this);
 

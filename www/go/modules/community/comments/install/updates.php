@@ -49,7 +49,7 @@ ADD COLUMN `modifiedBy` INT NULL AFTER `createdBy`,
 ADD COLUMN `modifiedAt` DATETIME NULL AFTER `modifiedBy`,
 CHANGE COLUMN `model_type_id` `entityTypeId` INT(11) NOT NULL ,
 CHANGE COLUMN `model_id` `entityId` INT(11) NOT NULL ,
-CHANGE COLUMN `user_id` `createdBy` INT(11) NOT NULL ,
+CHANGE COLUMN `user_id` `createdBy` INT(11) NULL ,
 CHANGE COLUMN `comments` `text` MEDIUMTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL ,
 ADD INDEX `fk_comments_comment_core_entity_type_idx` (`entityId` ASC),
 ADD INDEX `fk_comments_comment_core_user1_idx` (`createdBy` ASC),
@@ -59,17 +59,22 @@ DROP INDEX `link_id` ;";
 
 $updates['201811061530'][] = 'SELECT createdAt, modifiedAt FROM comments_comment LIMIT 1;'; // <- ENSURE COLUMNS EXIST
 	
-$updates['201811061530'][] = "ALTER TABLE `comments_comment` 
+$updates['201811061530'][] = function(){
+  GO()->getDbConnection()->exec("update comments_comment set createdBy = null where createdBy not in (select id from core_user)");
+  GO()->getDbConnection()->exec("update comments_comment set modifiedBy = null where modifiedBy not in (select id from core_user)");
+
+  GO()->getDbConnection()->exec("ALTER TABLE `comments_comment` 
 ADD CONSTRAINT `fk_comments_comment_core_user1`
   FOREIGN KEY (`createdBy`)
   REFERENCES `core_user` (`id`)
-  ON DELETE NO ACTION
+  ON DELETE SET NULL
   ON UPDATE NO ACTION,
 ADD CONSTRAINT `fk_comments_comment_core_user2`
   FOREIGN KEY (`modifiedBy`)
   REFERENCES `core_user` (`id`)
-  ON DELETE NO ACTION
-  ON UPDATE NO ACTION;";
+  ON DELETE SET NULL
+  ON UPDATE NO ACTION;");
+};
 
 
 $updates['201811061530'][] = 'UPDATE comments_comment SET createdAt = from_unixtime(ctime), modifiedAt = from_unixtime(mtime);';
@@ -82,3 +87,15 @@ DROP COLUMN `mtime`,
 DROP COLUMN `ctime`;';
 
 $updates['201902051649'][] = "UPDATE comments_comment SET text = REPLACE(text, '\\n', '<br />');";
+
+$updates['201906032000'][] = "ALTER TABLE `comments_comment` CHANGE `createdBy` `createdBy` INT(11) NULL;";
+
+
+$updates['201906032000'][] = "ALTER TABLE `comments_comment` DROP FOREIGN KEY `fk_comments_comment_core_user1`";
+$updates['201906032000'][] = "ALTER TABLE `comments_comment` ADD CONSTRAINT `fk_comments_comment_core_user1` FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION";
+$updates['201906032000'][] = "ALTER TABLE `comments_comment` DROP FOREIGN KEY `fk_comments_comment_core_user2`";
+$updates['201906032000'][] = "ALTER TABLE `comments_comment` ADD CONSTRAINT `fk_comments_comment_core_user2` FOREIGN KEY (`modifiedBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE NO ACTION";
+
+$updates['201907161437'][] = "";// "ALTER TABLE `comments_comment` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;"; Not yet because of unmgrated comments for companies.
+$updates['201907161437'][] = "ALTER TABLE `comments_comment` ADD `section` VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL AFTER `text`;";
+$updates['201907161437'][] = "ALTER TABLE `comments_comment` ADD INDEX(`section`);";

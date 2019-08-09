@@ -26,6 +26,9 @@ use go\core\util\Lock;
 use PDOException;
 use go\modules\community\ldapauthenticator\Module as GoModule;
 use go\core\model\Module as GoCoreModule;
+use GO\Base\Db\ActiveRecord;
+use go\core\orm\EntityType;
+use go\core\model\Acl;
 
 class Installer {
 	
@@ -60,6 +63,8 @@ class Installer {
 
 		self::$isInProgress = true;
 
+		ActiveRecord::$log_enabled = false;
+		
 		jmap\Entity::$trackChanges = false;
 
 		$database = App::get()->getDatabase();
@@ -84,6 +89,10 @@ class Installer {
 		// Fix chicken / egg problem for acl->entityTypeId
 		Group::check();
 		GoCoreModule::check();
+
+		$tempAuthState = new TemporaryState();
+		$tempAuthState->setUserId(1);
+		GO()->setAuthState($tempAuthState);
 		
 		$this->installEmailTemplate();
 
@@ -106,10 +115,12 @@ class Installer {
 		$entities = $classFinder->findByParent(Entity::class);
 
 		foreach ($entities as $entity) {
-			if (!$entity::getType()) {
+			if (!$entity::entityType()) {
 				return false;
 			}
 		}
+
+		EntityType::findByName('FieldSet')->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
 	}
 	
 	private function installCoreModule() {
@@ -134,7 +145,7 @@ class Installer {
 			throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
 		}
 		
-		$acl = model\Acl::findById(Group::getType()->getDefaultAclId());
+		$acl = model\Acl::findById(Group::entityType()->getDefaultAclId());
 		$acl->addGroup(model\Group::ID_EVERYONE);
 		if(!$acl->save()) {
 			throw new \Exception("Could not save default ACL for groups");
@@ -158,9 +169,7 @@ class Installer {
 			$admin->recoveryEmail = $admin->email;
 		}
 
-		$admin->groups[] = (new UserGroup)->setValues(['groupId' => Group::ID_ADMINS]);
-		//$admin->groups[] = (new UserGroup)->setValues(['groupId' => Group::ID_INTERNAL]);
-
+		$admin->groups[] = Group::ID_ADMINS;		
 
 		if (!$admin->save()) {
 			throw new Exception("Failed to create admin user: " . var_export($admin->getValidationErrors(), true));
@@ -274,6 +283,8 @@ class Installer {
 		GO()->getDbConnection()->query("SET sql_mode=''");
 		
 		jmap\Entity::$trackChanges = false;
+
+		ActiveRecord::$log_enabled = false;
 		
 		GO()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
 
@@ -297,7 +308,7 @@ class Installer {
 		GO()->resetSyncState();
 		
 		echo "Registering all entities\n";		
-		$modules = model\Module::find()->all();
+		$modules = model\Module::find()->where(['enabled' => true])->all();
 		foreach($modules as $module) {
 			if(isset($module->package) && $module->isAvailable()) {
 				$module->module()->registerEntities();
@@ -451,9 +462,13 @@ class Installer {
 						Table::destroyInstances();
 						GO()->getCache()->flush(false);
 						
+						$root = GO()->getEnvironment()->getInstallFolder();
 						$updateScript = $root->getFile('modules/' . $module->name . '/install/updatescripts/' . substr($query, 7));
-
+						
 						if (!$updateScript->exists()) {
+							$updateScript = $module->folder()->getFile('/install/updatescripts/' . substr($query, 7));
+						}
+						if (!$updateScript->exists()) {	
 							die($updateScript . ' not found!');
 						}
 

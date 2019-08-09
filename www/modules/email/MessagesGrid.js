@@ -31,7 +31,7 @@ GO.email.MessagesGrid = function(config){
 		{
 			id:'icon',
 			header:"&nbsp;",
-			width:dp(32),
+			width:dp(24),
 			dataIndex: 'icon',
 			renderer: this.renderIcon,
 			hideable:false,
@@ -61,6 +61,7 @@ GO.email.MessagesGrid = function(config){
 			hidden:true,
 			groupable:true,
 			align:'right',
+			width: dp(40),
 			renderer: function(value, metaData, record, rowIndex, colIndex, store){
 				return !store.groupField ? go.util.Format.dateTime(value) : go.util.Format.time(value);
 			},
@@ -73,6 +74,7 @@ GO.email.MessagesGrid = function(config){
 			dataIndex:'udate',
 			groupable:true,
 			align:'right',
+			width: dp(40),
 			renderer: function(value, metaData, record, rowIndex, colIndex, store){
 				return !store.groupField ? go.util.Format.dateTime(value) : go.util.Format.time(value);
 			},
@@ -168,6 +170,8 @@ GO.email.MessagesGrid = function(config){
 	this.searchDialog = new GO.email.SearchDialog({
 		store:config.store
 	});
+
+	
 	
 	this.settingsMenu = new Ext.menu.Menu({
 		items:[{
@@ -209,6 +213,8 @@ GO.email.MessagesGrid = function(config){
 		config.tbar = [];
 	
 	GO.email.MessagesGrid.superclass.constructor.call(this, config);
+
+	var me = this;
 
 	if(!config.hideSearch)
 		this.getTopToolbar().add({
@@ -254,7 +260,13 @@ GO.email.MessagesGrid = function(config){
 					iconCls: 'ic-more',
 					tooltip: t("Search"),
 					handler: function(){
+						var first = !this.searchDialog.dialog;
 						this.searchDialog.show();
+						if(first) {
+							this.searchDialog.dialog.on('hide', function() {
+								this.searchField.updateView();
+							}, this);
+						}
 					},
 					scope: this
 				}
@@ -273,6 +285,9 @@ GO.email.MessagesGrid = function(config){
 					this.store.load({params:{start:0} });
 				},
 				scope:this
+			},
+			hasActiveSearch: function() {		
+				return  me.store.baseParams.search || me.store.baseParams.query;
 			}
 		}),{
 			iconCls: 'ic-more-vert',
@@ -308,10 +323,11 @@ GO.email.MessagesGrid = function(config){
 		}
 
 		if(this.searchField.getValue()) {
-			GO.email.messagesGrid.store.baseParams['search'] = this.searchField.getValue();
-			this.searchField.hasSearch = true;
+			// GO.email.messagesGrid.store.baseParams['search'] = this.searchField.getValue();
+			// this.searchField.hasSearch = true;
 
-			GO.email.messagesGrid.store.reload();
+			// GO.email.messagesGrid.store.reload();
+			this.searchField.search();
 		}
 
 	}, this);
@@ -435,7 +451,7 @@ Ext.extend(GO.email.MessagesGrid, GO.grid.GridPanel,{
 
 		return unseen + icons.map(function(i) {
 			return '<i class="icon em-'+i+'">' + i + '</i>';
-		}).join();
+		}).join("");
 		
 	},
 

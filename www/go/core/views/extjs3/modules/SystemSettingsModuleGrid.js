@@ -149,9 +149,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 			}
 		];
 
-		if(GO.settings.config.debug) {
+		// if(GO.settings.config.debug) {
 			cols.push(actions);
-		}
+		// }
 
 		this.cm = new Ext.grid.ColumnModel(cols);
 		this.sm = new Ext.grid.RowSelectionModel({
@@ -209,10 +209,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 			header: '',
 			hideMode: 'display',
 			keepSelection: true,
-
-			actions: [{
-					iconCls: 'ic-delete',
-					qtip: t("Delete")
+			actions: [				
+				{
+					iconCls: 'ic-more-vert'					
 				}]
 		});
 
@@ -223,45 +222,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 				if(!record.data.id) {
 					return;
 				}
-				
-				Ext.MessageBox.confirm(t("Delete"), t("All data will be lost! Are you sure you want to delete module '{item}'?").replace('{item}', record.data.name), function(cmd) {
-					console.log(cmd);
-					if(cmd != 'yes') {
-						return;
-					}
-					
-					if(record.data.isRefactored) {
-						
-						go.Jmap.request({
-							method: "Module/uninstall",
-							params: {
-								name: record.data.name,
-								package: record.data.package
-							},
-							callback: function() {
-								record.set('enabled', false);
-								record.set('id', null);
-								record.commit();
-							},
-							scope: this
-						});
-					}else
-					{
-						GO.request({
-							url: "modules/module/delete",
-							params: {
-								id: record.data.id
-							},
-							callback: function(){
-								record.set('enabled', false);
-								record.set('id', null);
-								record.commit();
-							},
-							scope: this
-						});
-					}
-					
-				}, this);
+
+				this.showMoreMenu(record, e);
 			}
 		});
 
@@ -344,13 +306,13 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 			params.update = {};
 			params.update[record.data.id] = {
 				enabled: record.data.enabled,
-				sort_order: record.data.sort_order
+				sort_order: record.data.sort_order ? record.data.sort_order : 0
 			};
 			go.Db.store("Module").set(params, function(options, success, response) {
 
 				if(success){
-					if(record.data.enabled && record.isModified("enabled")) {
-						//record.set('aclId', response['created'][record.data.id].aclId);
+					if(record.data.enabled && record.isModified("enabled")) {						
+						// record.set('aclId', response['created'][record.data.id].aclId);
 						this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);
 						this.store.load();				
 					}
@@ -430,5 +392,83 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 		}
 
 		return JSON;
+	},
+
+
+	showMoreMenu : function(record, e) {
+		if(!this.moreMenu) {
+			this.moreMenu = new Ext.menu.Menu({
+				items: [
+					{
+						itemId: "edit",
+						iconCls: 'ic-share',
+						text: t("Permissions"),
+						handler: function() {
+							var record =this.moreMenu.record;
+							this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);					
+						},
+						scope: this						
+					},
+					"-",
+					{
+						itemId: "delete",
+						iconCls: 'ic-delete',
+						text: t("Delete"),
+						handler: function() {
+
+							var record =this.moreMenu.record;
+
+							Ext.MessageBox.confirm(t("Delete"), t("All data will be lost! Are you sure you want to delete module '{item}'?").replace('{item}', record.data.name), function(cmd) {
+								console.log(cmd);
+								if(cmd != 'yes') {
+									return;
+								}
+								
+								if(record.data.isRefactored) {
+									
+									go.Jmap.request({
+										method: "Module/uninstall",
+										params: {
+											name: record.data.name,
+											package: record.data.package
+										},
+										callback: function() {
+											record.set('enabled', false);
+											record.set('id', null);
+											record.commit();
+										},
+										scope: this
+									});
+								}else
+								{
+									GO.request({
+										url: "modules/module/delete",
+										params: {
+											id: record.data.id
+										},
+										callback: function(){
+											record.set('enabled', false);
+											record.set('id', null);
+											record.commit();
+										},
+										scope: this
+									});
+								}
+								
+							}, this);
+
+						},
+						scope: this						
+					}
+				]
+			});
+		}
+		
+		this.moreMenu.getComponent("edit").setDisabled(record.get("permissionLevel") < go.permissionLevels.manage);
+		this.moreMenu.getComponent("delete").setDisabled(record.get("permissionLevel") < go.permissionLevels.manage);
+		
+		this.moreMenu.record = record;
+		
+		this.moreMenu.showAt(e.getXY());
 	}
 });

@@ -55,8 +55,10 @@ class Language{
 	 */
 	public function setLanguage($isoCode = null){		
 		if(!isset($isoCode) || \GO()->getLanguage()->hasLanguage($isoCode)) {
-			\GO()->getLanguage()->setLanguage($isoCode);	
+			return \GO()->getLanguage()->setLanguage($isoCode);	
 		}
+
+		return $this->_langIso;
 		
 	}
 	

@@ -51,7 +51,7 @@ class EmailModule extends \GO\Base\Module{
 	}
 
 	public static function onMap(Mapping $mapping) {
-		$mapping->addRelation('emailSettings', \GO\Email\Model\UserSettings::class, ['id' => 'id'], false);
+		$mapping->addHasOne('emailSettings', \GO\Email\Model\UserSettings::class, ['id' => 'id']);
 	}
 
 	public static function head(){

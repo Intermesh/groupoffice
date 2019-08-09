@@ -117,6 +117,7 @@ class Mapping {
 	}
 
 	/**
+	 * Get all mapped tables
 	 * 
 	 * @return MappedTable[]
 	 */
@@ -125,6 +126,7 @@ class Mapping {
 	}	
 	
 	/**
+	 * Get the table by name
 	 * 
 	 * @param string $name
 	 * @return MappedTable
@@ -132,27 +134,27 @@ class Mapping {
 	public function getTable($name) {
 		return $this->tables[$name];
 	}	
-	
+
 	/**
-	 * Add a relational property
+	 * Check if this mapping has the given table or one of it's property relations has it.
 	 * 
-	 * A relation property is saved in another property model and can be a has one
-	 * or has many type of relation.
-	 * 
-	 * When saving has many relations all properties are removed from the database
-	 * and reinserted because they are often not uniquely identifyable from the
-	 * JMAP API. eg. email addresses of contacts
-	 * 
-	 * @param string $name
-	 * @param string $entityName
-	 * @param array $keys
-	 * @param boolean $many
-	 * @depcreated Use addHasONe() addArray() or addMap()
-	 * @return $this
+	 * @return bool|string path
 	 */
-	public function addRelation($name, $entityName, array $keys, $many = true) {
-		$this->relations[$name] = new Relation($name, $entityName, $keys, $many);
-		return $this;
+	public function hasTable($name, $path = [], &$paths = []) {
+		
+		if(isset($this->tables[$name])) {
+			$paths[] = $path;
+		}
+
+		foreach($this->getRelations() as $r) {
+			if(!isset($r->entityName)) {
+				continue;
+			}
+			$cls = $r->entityName;
+			$cls::getMapping()->hasTable($name, array_merge($path, [$r->name]), $paths);			
+		}
+
+		return $paths;
 	}
 
 	/**
@@ -165,7 +167,8 @@ class Mapping {
 	 * @return $this;
 	 */
 	public function addHasOne($name, $entityName, array $keys) {
-		$this->relations[$name] = new Relation($name, $entityName, $keys, false);
+		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_HAS_ONE);
+		$this->relations[$name]->setEntityName($entityName);
 		return $this;
 	}
 
@@ -179,7 +182,8 @@ class Mapping {
 	 * @return $this;
 	 */
 	public function addArray($name, $entityName, array $keys) {
-		$this->relations[$name] = new Relation($name, $entityName, $keys, true);
+		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_ARRAY);
+		$this->relations[$name]->setEntityName($entityName);
 		return $this;
 	}
 
@@ -193,15 +197,29 @@ class Mapping {
 	 * @return $this;
 	 */
 	public function addMap($name, $entityName, array $keys) {
-		$this->relations[$name] = new Relation($name, $entityName, $keys, true);
-		$this->relations[$name]->mapped = true;
+		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_MAP);
+		$this->relations[$name]->setEntityName($entityName);
+		return $this;
+	}
+
+	/**
+	 * Add a scalar relation. For example an array of ID's.
+	 * 
+	 * @param string $name
+	 * @param string $tableName
+	 * @param array $keys
+	 * 
+	 * @return $this;
+	 */
+	public function addScalar($name, $tableName, array $keys) {
+		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_SCALAR);
+		$this->relations[$name]->setTableName($tableName);
 		return $this;
 	}
 	
 	/**
 	 * Get all relational properties
 	 * 
-	 * @see addRelation();
 	 * @return Relation[]
 	 */
 	public function getRelations() {
@@ -211,7 +229,6 @@ class Mapping {
 	/**
 	 * Get a relational property by name.
 	 * 
-	 * @see addRelation(); 
 	 * @param string $name
 	 * @return Relation|boolean
 	 */

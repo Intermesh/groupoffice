@@ -114,7 +114,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'<div style="clear:both;"></div>'+
 			
 			'<tpl if="links.length">'+
-				'<h5>'+t("Links")+'</h5>'+
+				'<h5 class="em-links-header">'+t("Links")+'</h5>'+
 				'<div class="em-links">'+
 				'<tpl for="links">'+
 					'<div class="go-icon-list"><p><i class="label entity {[this.linkIconCls(values)]}"></i> <a href="#{entity}/{model_id}">{name}</a> <label>{description}</label></p></div>'+
@@ -196,7 +196,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'</div>'+
 			'</tpl>';
 
-		templateStr += '<div id="'+this.bodyId+'" class="message-body go-html-formatted">{htmlbody}'+
+		templateStr += '<div id="'+this.bodyId+'" class="message-body go-html-formatted">{htmlbody:raw}'+
 			'<tpl if="body_truncated">'+
 			'<br /><a href="javascript:GO.email.showMessageDialog({uid},\'{[this.addSlashes(values.mailbox)]}\',{account_id},true);" class="normal-link">'+t("The actual message is larger than can be shown here. Click here to see the entire message.", "email")+'</a>'+
 			'</tpl>'+
@@ -302,6 +302,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			fail: function(response, options, result) {
 				Ext.Msg.alert(t("Error"), result.feedback);
 				this.loading=false;
+				this.el.unmask();
 			}
 		});
 	},
@@ -567,25 +568,18 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 								scope:this
 							});
 						}else{
-							GO.request({
-								url:'core/unlink',
-								params:{
-									model_name1:'GO\\Addressbook\\Model\\Contact',
-									id1:this.data.sender_contact_id,
-									model_name2:'GO\\Savemailas\\Model\\LinkedEmail',
-									id2:this.data.contact_linked_message_id
-								},
-								maskEl:Ext.getBody(),
-								success: function(options, response, result) {
-									if (result.success) {
-										this.data.company_linked_message_id = result.linked_email_id;
-									}
-									this.getEl().unmask();
-									this.reload();
-								},
-								scope:this
+							var me = this;
+
+							Ext.getBody().mask(t("Saving..."));
+							go.Db.store("Link").set({
+								destroy: [this.data.contact_link_id]
+							}).finally(function() {
+								Ext.getBody().unmask();
+								me.reload();
 							});
+							
 						}
+							
 					}
 				}
 			});
@@ -610,18 +604,21 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 									uid:this.uid,
 									company_id:this.data.sender_company_id
 								},
-								maskEl:Ext.getBody()
+								maskEl:Ext.getBody(),
+								success: function(options, response, result) {									
+									this.getEl().unmask();
+									this.reload();
+								},
+								scope: this
 							});
 						}else{
-							GO.request({
-								url:'core/unlink',
-								params:{
-									model_name1:'GO\\Addressbook\\Model\\Company',
-									id1:this.data.sender_company_id,
-									model_name2:'GO\\Savemailas\\Model\\LinkedEmail',
-									id2:this.data.company_linked_message_id
-								},
-								maskEl:Ext.getBody()
+							var me = this;
+							Ext.getBody().mask(t("Saving..."));
+							go.Db.store("Link").set({
+								destroy: [this.data.company_link_id]
+							}).finally(function() {
+								Ext.getBody().unmask();
+								me.reload();
 							});
 						}
 					}

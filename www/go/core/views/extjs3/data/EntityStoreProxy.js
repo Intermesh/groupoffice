@@ -51,33 +51,47 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 //			go.Jmap.abort(this.activeRequest[action]);
 //		}
 //		this.activeRequest[action] = 
+		// if (params.sort && Ext.isString(params.sort)) {
+		// 	var srt = params.sort.split(' ');
+		// 	params.sort = [{property:srt[0]}];
+		// 	if(srt[1] && srt[1] === 'DESC') {
+		// 		params.sort[0].isAscending = false;
+		// 	}
+		// }
 
-		if (params.sort) {
-			params.sort = [params.sort + " " + params.dir];
+		if (params.dir) {
+			params.sort = [{
+				property: params.sort,
+				isAscending: params.dir === "ASC"
+			}];
 			delete params.dir;
 		}
 		
-		this.entityStore.query(params, function (response) {
+		var me = this;
+		this.entityStore.query(params).then(function (response) {
+			return me.entityStore.get(response.ids).then(function(result) {
 
-			this.entityStore.get(response.ids, function (items) {
 				var data = {
 					total: response.total,
-					records: items,
+					records: result.entities,
 					success: true
 				};
-
-				this.activeRequest[action] = undefined;
-
+	
+				me.activeRequest[action] = undefined;
+	
 				if (action === Ext.data.Api.actions.read) {
-					this.onRead(action, o, data);
+					me.onRead(action, o, data);
 				} else {
-					this.onWrite(action, o, data, rs);
+					me.onWrite(action, o, data, rs);
 				}
-			}, this);
-
-		}, this);
-
-
+				
+			});
+		}).catch(function(response) {
+			//hack to pass error message to load callback in Store.js
+			o.request.arg.error = response;
+			me.fireEvent('exception', this, 'remote', action, o, response, null);			
+			o.request.callback.call(o.request.scope, response, o.request.arg, false);
+		});
 	},
 
 //exact copy from httpproxy only it uses o.reader.readRecords instead.

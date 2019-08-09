@@ -20,7 +20,7 @@ class TasksModule extends \GO\Base\Module {
 	}
 
 	public static function onMap(Mapping $mapping) {
-		$mapping->addRelation('taskSettings', \GO\Tasks\Model\UserSettings::class, ['id' => 'user_id'], false);
+		$mapping->addHasOne('taskSettings', \GO\Tasks\Model\UserSettings::class, ['id' => 'user_id']);
 	}
 	
 	public function autoInstall() {

@@ -341,25 +341,11 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 							this.deleteSelected();
 						},
 						scope: this
-					},
-					this.shareMenuItem = new Ext.menu.Item({
-						
-						iconCls: 'ic-share',
-						text: t("Share"),
-						handler: function () {
-							var shareWindow = new go.permissions.ShareWindow({
-								title: t("Share") + ": " + this.moreMenu.record.data.name
-							});
-
-							shareWindow.load(this.moreMenu.record.data.aclId).show();
-						},
-						scope: this
-					})
+					}
 				]
 			});
 		}
 
-		this.shareMenuItem.setVisible(record.data.isFieldSet);
 		this.moreMenu.record = record;
 
 		this.moreMenu.showAt(e.getXY());

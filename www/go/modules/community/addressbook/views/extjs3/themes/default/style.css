@@ -7,6 +7,7 @@
   white-space: nowrap;
   overflow: hidden; }
 
+  
 .go-addressbook-url.homepage:before {
   display: inline-block;
   font-family: 'Material Icons';
@@ -47,6 +48,15 @@
     left: 49px; }
   .go-addressbook-name-panel .go-addressbook-star {
     margin-top: -7px; }
+
+
+    .go-addressbook-name {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+    }
+  
+
 
 .go-addressbook-url-panel {
   text-align: right;

@@ -21,7 +21,7 @@ class Module extends core\Module {
 	
 
 	public static function onMap(Mapping $mapping) {		
-		$mapping->addRelation("googleauthenticator", model\Googleauthenticator::class, ['id' => 'userId'], false);		
+		$mapping->addHasOne("googleauthenticator", model\Googleauthenticator::class, ['id' => 'userId']);		
 		return true;
 	}
 

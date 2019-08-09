@@ -32,6 +32,8 @@ go.grid.GridTrait = {
 			Ext.applyIf(this, go.panels.ScrollLoader);
 			this.initScrollLoader();
 		}
+
+		this.getView().htmlEncode = true;
 	},
 	
 	initHeaderMenu : function() {
@@ -48,6 +50,7 @@ go.grid.GridTrait = {
 					cls: "go-grid-hd-btn",
 					renderTo: this.headerBtnWrap
 				});
+				//this.headerBtnWrap.on('click', function(e){ console.log(e.target) });
 				this.headerBtn.el.on("click", this.onHeaderBtnClick, this);
 			}
 		}, this);
@@ -61,32 +64,6 @@ go.grid.GridTrait = {
 		}
 		
 		this.getView().scrollOffset = dp(24);
-		this.getView().refresh = function(headersToo) {
-			this.fireEvent('beforerefresh', this);
-			this.grid.stopEditing(true);
-
-			var result = this.renderBody();
-			this.mainBody.update(result).setWidth(this.getOffsetWidth());
-			if (headersToo === true) {
-				 this.updateHeaders();
-				 this.updateHeaderSortState();
-			}
-			this.processRows(0, true);
-			this.layout();
-			this.applyEmptyText();
-			this.fireEvent('refresh', this);
-		};
-		this.getView().updateHeaderWidth = function(updateMain) {
-			var innerHdChild = this.innerHd.firstChild,
-				 totalWidth   = this.getTotalWidth();
-
-			innerHdChild.style.width = this.getOffsetWidth();
-			innerHdChild.firstChild.style.width = totalWidth;
-
-			if (updateMain !== false) {
-				 this.mainBody.dom.style.width = this.getOffsetWidth();
-			}
-		};
 		
 	},
 	

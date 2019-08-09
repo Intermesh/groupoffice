@@ -16,6 +16,7 @@ use go\modules\community\addressbook\convert\VCard;
 use function GO;
 use go\core\mail\Message;
 use go\core\TemplateParser;
+use go\core\db\Expression;
 
 /**
  * Contact model
@@ -190,7 +191,7 @@ class Contact extends AclItemEntity {
 	 *
 	 * @var EmailAddress[]
 	 */
-	public $emailAddresses = [];
+	 public $emailAddresses = [];
 	
 	/**
 	 *
@@ -233,9 +234,19 @@ class Contact extends AclItemEntity {
 	/**
 	 * Starred by the current user or not.
 	 * 
-	 * @var boolean
+	 * Should not be false but null for ordering. Records might be missing.
+	 * 
+	 * @var boolean 
 	 */
-	public $starred = false;
+	protected $starred = null;
+
+	public function getStarred() {
+		return !!$this->starred;
+	}
+
+	public function setStarred($starred) {
+		$this->starred = empty($starred) ? null : true;
+	}
 	
 	
 	/**
@@ -245,7 +256,7 @@ class Contact extends AclItemEntity {
 	 * 
 	 * @var string 
 	 */
-	public $uid;
+	protected $uid;
 	
 	/**
 	 * Blob ID of the last generated vcard
@@ -259,7 +270,7 @@ class Contact extends AclItemEntity {
 	 * 
 	 * @var string
 	 */
-	public $uri;
+	protected $uri;
 	
 	
 	protected static function aclEntityClass(): string {
@@ -303,11 +314,11 @@ class Contact extends AclItemEntity {
 	 * @param int $userId
 	 * @return static
 	 */
-	public static function findForUser($userId) {
+	public static function findForUser($userId, $properties = []) {
 		if(empty($userId)) {
 			return false;
 		}
-		return static::find()->where('goUserId', '=', $userId)->single();
+		return static::find($properties)->where('goUserId', '=', $userId)->single();
 	}
 	
 	/**
@@ -354,7 +365,7 @@ class Contact extends AclItemEntity {
 										->add("hasEmailAddresses", function(Criteria $criteria, $value, Query $query) {
 											$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "LEFT")
 											->groupBy(['c.id'])
-											->having('count(e.id) '.($value ? '>' : '=').' 0');
+											->having('count(e.email) '.($value ? '>' : '=').' 0');
 										})
 										->addText("email", function(Criteria $criteria, $comparator, $value, Query $query) {
 											$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "INNER");
@@ -378,6 +389,14 @@ class Contact extends AclItemEntity {
 											}
 											
 											$criteria->where('adr.country', $comparator, $value);
+											
+										})
+										->addText("org", function(Criteria $criteria, $comparator, $value, Query $query) {												
+											if( !$query->isJoined('addressbook_contact', 'org')) {
+												$query->join('core_link', 'l', 'c.id=l.fromId and l.fromEntityTypeId = '.self::entityType()->getId())						
+													->join('addressbook_contact', 'org', 'org.id=l.toId AND l.toEntityTypeId=' . self::entityType()->getId() . ' AND org.isOrganization=true');
+											}
+											$criteria->where('org.name', $comparator, $value);
 											
 										})
 										->addText("city", function(Criteria $criteria, $comparator, $value, Query $query) {
@@ -423,6 +442,21 @@ class Contact extends AclItemEntity {
 													
 										
 	}
+
+	public static function sort(\go\core\orm\Query $query, array $sort)
+	{
+		if(isset($sort['firstName'])) {
+			$sort['name'] = $sort['firstName'];
+			unset($sort['firstName']);
+		}
+		if(isset($sort['lastName'])) {
+			$dir = $sort['lastName'] == 'ASC' ? 'ASC' : 'DESC';
+			$sort[] = new Expression("IF(c.isOrganization, c.name, c.lastName) " . $dir);
+			unset($sort['lastName']);
+		}
+		
+		return parent::sort($query, $sort);
+	}
 	
 	public static function converters() {
 		$arr = parent::converters();
@@ -435,15 +469,38 @@ class Contact extends AclItemEntity {
 		return ['name', 'debtorNumber'];
 	}
 	
-	private function generateUid() {
+	public function getUid() {
 		
-		$url = trim(GO()->getSettings()->URL, '/');
-		$uid = substr($url, strpos($url, '://') + 3);
-		$uid = str_replace('/', '-', $uid );
-		return $this->id . '@' . $uid;
-		
+		if(!isset($this->uid)) {
+			$url = trim(GO()->getSettings()->URL, '/');
+			$uid = substr($url, strpos($url, '://') + 3);
+			$uid = str_replace('/', '-', $uid );
+			$this->uid = $this->id . '@' . $uid;
+		}
+
+		return $this->uid;		
 	}
-	
+
+	public function setUid($uid) {
+		$this->uid = $uid;
+	}
+
+	public function hasUid() {
+		return !empty($this->uid);
+	}
+
+	public function getUri() {
+		if(!isset($this->uri)) {
+			$this->uri = $this->getUid() . '.vcf';
+		}
+
+		return $this->uri;
+	}
+
+	public function setUri($uri) {
+		$this->uri = $uri;
+	}
+		
 	protected function internalSave() {
 		if(!parent::internalSave()) {
 			return false;
@@ -451,10 +508,9 @@ class Contact extends AclItemEntity {
 		
 		if(!isset($this->uid)) {
 			//We need the auto increment ID for the UID so we need to save again if this is a new contact
-			$this->uid = $this->generateUid();
-			if(!isset($this->uri)) {
-				$this->uri = $this->uid . '.vcf';
-			}
+			$this->getUid();
+			$this->getUri();
+
 			if(!GO()->getDbConnection()
 							->update('addressbook_contact', 
 											['uid' => $this->uid, 'uri' => $this->uri], 
@@ -499,9 +555,9 @@ class Contact extends AclItemEntity {
 	 */
 	public function findOrganizations(){
 		return self::find()
-						->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::getType()->getId())
+						->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::entityType()->getId())
 						->where('fromId', '=', $this->id)
-							->andWhere('fromEntityTypeId', '=', self::getType()->getId())
+							->andWhere('fromEntityTypeId', '=', self::entityType()->getId())
 							->andWhere('c.isOrganization', '=', true);
 	}
 	
@@ -534,7 +590,7 @@ class Contact extends AclItemEntity {
 		
 		$remove = array_diff($current, $this->setOrganizationIds);
 		if(count($remove)) {
-			Link::deleteLinkWithIds($remove, Contact::getType()->getId(), $this->id, Contact::getType()->getId());
+			Link::deleteLinkWithIds($remove, Contact::entityType()->getId(), $this->id, Contact::entityType()->getId());
 		}
 		
 		$add = array_diff($this->setOrganizationIds, $current);
@@ -556,10 +612,9 @@ class Contact extends AclItemEntity {
 		$orgStr = "";	
 		
 		if(!$this->isOrganization) {
-			$organizationIds = $this->getOrganizationIds();
-			
-			if(!empty($organizationIds)) {
-				$orgStr = ' - '.implode(', ', Contact::find()->selectSingleValue('name')->where(['id' => $organizationIds])->all());
+			$orgs = $this->findOrganizations()->selectSingleValue('name')->all();
+			if(!empty($orgs)) {
+				$orgStr = ' - '.implode(', ', $orgs);			
 			}
 		}
 		return $addressBook->name . $orgStr;
@@ -571,6 +626,19 @@ class Contact extends AclItemEntity {
 
 	protected function getSearchFilter() {
 		return $this->isOrganization ? 'isOrganization' : 'isContact';
+	}
+
+	protected function getSearchKeywords()
+	{
+		$keywords = [$this->name, $this->debtorNumber];
+		foreach($this->emailAddresses as $e) {
+			$keywords[] = $e->email;
+		}
+		if(!$this->isOrganization) {
+			$keywords = array_merge($keywords, $this->findOrganizations()->selectSingleValue('name')->all());
+		}
+
+		return $keywords;
 	}
 
 	public function getSalutation() 
@@ -605,12 +673,12 @@ class Contact extends AclItemEntity {
 		//Save contact as link to organizations affect the search entities too.
 		if(!$to->isOrganization) {			
 			$to->saveSearch();
-			Contact::getType()->change($to);
+			Contact::entityType()->change($to);
 		}
 		
 		if(!$from->isOrganization) {			
 			$from->saveSearch();
-			Contact::getType()->change($from);
+			Contact::entityType()->change($from);
 		}
 		
 //		$ids = [$link->toId, $link->fromId];
@@ -623,7 +691,7 @@ class Contact extends AclItemEntity {
 //										['id' => $ids]
 //										)->execute();	
 //		
-//		Contact::getType()->changes(
+//		Contact::entityType()->changes(
 //					(new Query2)
 //					->select('c.id AS entityId, a.aclId, "0" AS destroyed')
 //					->from('addressbook_contact', 'c')
@@ -701,7 +769,7 @@ class Contact extends AclItemEntity {
 			return false;
 		}
 		
-		return $this->$propName[0] ?? false;
+		return isset($this->$propName[0]) ? $this->$propName[0] : false;
 	}
 
 	/**
@@ -711,7 +779,8 @@ class Contact extends AclItemEntity {
    * @param \Swift_Message $message
    */
   public function decorateMessage(Message $message) {
-		$message->setTo($this->emailAddresses[0]->email, $this->name);
+	  	if(isset($this->emailAddresses[0]))
+			$message->setTo($this->emailAddresses[0]->email, $this->name);
 	}
 
 	public function toTemplate() {

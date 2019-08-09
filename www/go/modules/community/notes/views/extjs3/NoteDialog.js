@@ -6,6 +6,7 @@ go.modules.community.notes.NoteDialog = Ext.extend(go.form.Dialog, {
 	height: dp(800),
 	maximizable: true,
 	collapsible: true,
+	modal: false,
 	
 	initFormItems: function () {
 		

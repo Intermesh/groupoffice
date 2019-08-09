@@ -63,9 +63,9 @@ class Debugger {
 	public function __construct() {
 		try {
 			$this->enabled = (!empty(GO()->getConfig()['core']['general']['debug']) || jmap\Request::get()->getHeader('X-Debug') == "1") && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug');
-			// if($this->enabled) {
-			// 	$this->logPath = GO()->getDataFolder()->getFile('log/debug.log')->getPath();
-			// }
+			if($this->enabled) {
+				$this->logPath = GO()->getDataFolder()->getFile('log/debug.log')->getPath();
+			}
 		} catch (\go\core\exception\ConfigurationException $e) {
 			//GO is not configured / installed yet.
 			$this->enabled = true;
@@ -79,7 +79,7 @@ class Debugger {
 		if(!$this->enabled) {
 			return;
 		}
-		$this->entries[] = ['group', $name];
+		$this->entries[] = ['groupCollapsed', $name];
 		$this->currentGroup = &$this->entries[count($this->entries)-1][1];
 		$this->groupStartTime = $this->getTimeStamp();
 	}
@@ -189,11 +189,25 @@ class Debugger {
 			if($debugLog->isWritable()) {
 				if (!is_scalar($mixed)) {
 					$print = print_r($mixed, true);
-				} else{
+				} else if(is_bool($mixed)) {
+					$print = $mixed ? "TRUE" : "FALSE";
+				}	else {
 					$print = $mixed;
 				}
 				$debugLog->putContents($print."\n", FILE_APPEND);
 			}
+		}
+
+		if(GO()->getEnvironment()->isCli()) {
+			if (!is_scalar($mixed)) {
+				$print = print_r($mixed, true);
+			} else if(is_bool($mixed)) {
+				$print = $mixed ? "TRUE" : "FALSE";
+			} else {
+				$print = $mixed;
+			}
+
+			echo '['.$level.'] '.$print ."\n";
 		}
 
 		$this->entries[] = [$level, $mixed];
@@ -262,7 +276,7 @@ class Debugger {
 	 * Print all entries
 	 */
 	public function printEntries() {
-		echo implode("\n", array_map(function($e){return $e[1];}, $this->entries));
+		echo implode("\n", array_map(function($e){return is_scalar($e[1]) ? $e[1] : print_r($e[1]);}, $this->entries));
 	}
 	
 	/**

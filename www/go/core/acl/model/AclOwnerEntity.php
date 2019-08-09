@@ -33,6 +33,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	 */
 	private $acl;
 
+
 	protected function internalSave() {
 		
 		if($this->isNew() && !isset($this->aclId)) {
@@ -120,6 +121,13 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * Set the ACL
 	 * 
 	 * @param $acl an array with group ID as key and permission level as value. eg. ["2" => 50, "3" => 10]
+	 * 
+	 * @example
+	 * ```
+	 * $addressBook->setAcl([
+	 * 	Group::ID_INTERNAL => Acl::LEVEL_DELETE
+	 * ]);
+	 * ```
 	 */
 	public function setAcl($acl) {		
 		$this->setAcl = $acl;		
@@ -134,7 +142,7 @@ abstract class AclOwnerEntity extends AclEntity {
 			return true;
 		}
 
-		if(!$this->findAcl()->hasPermissionLevel(self::LEVEL_MANAGE)) {		
+		if(!$this->findAcl()->hasPermissionLevel(Acl::LEVEL_MANAGE)) {		
 			throw new Forbidden("You are not allowed to manage permissions on this ACL");
 		}
 	}
@@ -147,13 +155,16 @@ abstract class AclOwnerEntity extends AclEntity {
 			$this->acl = new Acl();
 		} else
 		{
-			$defaultAcl = Acl::findById(static::getType()->getDefaultAclId());		
+			$defaultAcl = Acl::findById(static::entityType()->getDefaultAclId());		
 			$this->acl = $defaultAcl->copy();
 		}
-		
-		$this->acl->usedIn = $this->getMapping()->getColumn('aclId')->table->getName().'.aclId';
+		$aclColumn = $this->getMapping()->getColumn('aclId');
+		if(!$aclColumn) {
+			throw new \Exception("Column aclId is required for AclOwnerEntity ". static::class);
+		}
+		$this->acl->usedIn = $aclColumn->table->getName().'.aclId';
 		try {
-			$this->acl->entityTypeId = $this->getType()->getId();
+			$this->acl->entityTypeId = $this->entityType()->getId();
 		} catch(\Exception $e) {
 
 			//During install this will throw a module not found error due to chicken / egg problem.
@@ -214,7 +225,16 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @return int
 	 */
 	public function getPermissionLevel() {
-		return Acl::getUserPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId());
+
+		if($this->isNew()) {
+			return parent::getPermissionLevel();
+		}
+
+		if(!isset($this->permissionLevel)) {
+			$this->permissionLevel = Acl::getUserPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId());
+		}
+
+		return $this->permissionLevel;
 	}
 	
 	/**
@@ -284,7 +304,7 @@ abstract class AclOwnerEntity extends AclEntity {
 		$stmt = GO()->getDbConnection()->update(
       'core_acl', 
       [
-        'acl.entityTypeId' => static::getType()->getId(), 
+        'acl.entityTypeId' => static::entityType()->getId(), 
         'acl.entityId' => new Expression('entity.id')],
       (new Query())
         ->tableAlias('acl')

@@ -4,7 +4,12 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 	modal: true,
 	singleSelect:false,
 	stateId: "go-create-link-windows",
-	
+
+	width: dp(800),
+	height: dp(600),
+	title: t("Create link", "links"),
+	layout:"border",
+
 	/**
 	 * Provide the entities to show in the list here
 	 * When not provided, the list will show all entities
@@ -16,13 +21,14 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 		var filter = {};
 		
 		filter.entities = this.entityGrid.getSelectionModel().getSelections().map(function(r){return {name: r.data.entity, filter: r.data.filter};});
-		filter.text = this.searchField.getValue();			
 		
-		this.grid.store.load({
-			params: {
-				filter: filter
-			}
-		});
+		if(this.searchField.getValue() !== "") {
+			filter.text = this.searchField.getValue();			
+		}
+
+		this.grid.store.setFilter('search', filter);
+		
+		this.grid.store.load();
 	},
 
 	initComponent: function () {
@@ -58,9 +64,9 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 				scope: this
 			}
 		});
-		
+
 		this.entityGrid = new go.links.EntityGrid({
-			width: dp(200),
+			width: dp(240),
 			region:"west",
 			savedSelection: "link",
 			entities:this.entities
@@ -71,17 +77,7 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 		}, this, {buffer: 1}); //add buffer because it clears selection first
 
 		Ext.apply(this, {
-			title: t("Create link", "links"),
-			width: dp(700),
-			height: dp(600),
-			layout: 'border',
 			items: [this.entityGrid, search, this.grid],
-			listeners: {
-				render: function () {
-					//this.store.load();
-				},
-				scope: this
-			},
 			buttons: [{
 					text: t("Ok"),
 					handler: function () {
@@ -118,10 +114,19 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 			links['clientId-' + i ] = link;
 		});
 
+		me.getEl().mask(t("Saving..."));
+
 		go.Db.store("Link").set({
 			create: links
-		}, function () {
-			me.close();
+		}).then(function (response) {
+			me.getEl().unmask();
+
+			if(!go.util.empty(response.notCreated)) {
+				Ext.MessageBox.alert(t("Error"), "Could not link the items.");
+			} else{
+				me.close();
+			}
+			
 		});
 	}
 });

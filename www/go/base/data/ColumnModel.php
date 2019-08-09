@@ -360,7 +360,12 @@ class ColumnModel {
 		
 		$formattedRecord = array();
 		if($model instanceof \GO\Base\Db\ActiveRecord)
-		  $formattedRecord = $model->getAttributes($this->_modelFormatType);
+			$formattedRecord = $model->getAttributes($this->_modelFormatType);
+		
+		if(method_exists($model, 'getCustomFields')) {
+			$model->customFields = $model->getCustomFields($this->_modelFormatType == 'formatted');
+		}
+		
 		$columns = $this->getColumns();
 
 		foreach($columns as $column){	

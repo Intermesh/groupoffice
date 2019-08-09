@@ -8,71 +8,42 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 	totalCount: 0,
 	addLink : function(entity, entityId) {	
 		
-		
-					
-		var promise = go.Jmap.request({
-			method: "Search/query",
-			params: {
-				filter: {
-					entities: [{name: entity}],
-					entityId: entityId
-				}
+		var me = this;
+		//We need to query the ID of the search cache so the "to" relation can be resolved.
+		go.Db.store("Search").query({
+			filter: {
+				entities: [{name: entity}],
+				entityId: entityId
 			}
-		});
-		
-		go.Jmap.request({
-			method: "Search/get",
-			params: {
-				"#ids": {
-					resultOf: promise.callId,
-					path: "ids"
-				}
-			},
-			scope: this,
-			callback: function(options, success, result) {
-				
-				if(!result.list[0]) {
-					Ext.MessageBox.alert(t("Error"), t("Could not find item to link in search cache"));
-					return;
-				}
-				
-				this.newLinks.push({						
-						toEntity: entity,
-						toId: entityId
-					});
-					
-				this.linkGrid.store.loadData({"records" :[{
-					"toId": entityId,
-					"toEntity": entity,
-					to: {
-						name: result.list[0].name,
-						description: "" 
-					}
-				}]}, true);
-		
-				this.setCount(++this.totalCount);
-			}
-		});
+		}).then(function(response) {
+			var newLink = {
+				"toId": entityId,
+				"toEntity": entity,
+				"toSearchId": response.ids[0]
+			};
+
+			me.newLinks.push(newLink);
+			me.linkGrid.store.loadData({"records" :[newLink]}, true);
+			me.setCount(++me.totalCount);
+		});		
 		
 	},
 					
 	initComponent: function () {
 
-		this.searchField = new go.search.SearchCombo({
+		this.searchField = new go.search.SearchField({
+			
 			anchor: "100%",
 			hideLabel: true,
 			listeners: {
 				scope: this,
-				select: function (cmb, record, index) {
+				select: function (cmb, record, index) {					
 					this.linkGrid.store.loadData({"records" :[{
 						"toId": record.get('entityId'),
 						"toEntity": record.get('entity'),
-						to: {
-							name: record.data.name,
-							description: "" 
-						}
+						"toSearchId": record.get('id')
 					}]}, true);
-					this.searchField.reset();
+					// this.searchField.reset();
 					
 					this.newLinks.push({						
 						toEntity: record.get('entity'),
@@ -87,6 +58,32 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			}
 		});
 
+		// this.searchField = new go.search.SearchCombo({
+		// 	anchor: "100%",
+		// 	hideLabel: true,
+		// 	listeners: {
+		// 		scope: this,
+		// 		select: function (cmb, record, index) {					
+		// 			this.linkGrid.store.loadData({"records" :[{
+		// 				"toId": record.get('entityId'),
+		// 				"toEntity": record.get('entity'),
+		// 				"toSearchId": record.get('id')
+		// 			}]}, true);
+		// 			this.searchField.reset();
+					
+		// 			this.newLinks.push({						
+		// 				toEntity: record.get('entity'),
+		// 				toId: record.get('entityId')
+		// 			});
+		// 			this.setCount(++this.totalCount);
+		// 		}
+		// 	},
+		// 	getListParent: function () {
+		// 		//this avoids hiding the menu on click in the list
+		// 		return this.el.up('.x-menu');
+		// 	}
+		// });
+
 		this.linkGrid = new go.grid.GridPanel({
 			columns: [
 				{
@@ -94,8 +91,10 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 					header: t('Name'),					
 					sortable: true,
 					dataIndex: 'to',
-					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-						return '<i class="entity ' + record.data.toEntity + '"></i> ' + record.data.to.name;
+					renderer: function (value, metaData, record, rowIndex, colIndex, store) {						
+						var linkIconCls = go.Entities.getLinkIcon(record.data.toEntity, record.data.to.filter);
+
+						return '<i class="entity ' + linkIconCls + '"></i> ' + record.data.to.name;
 					}
 				},
 				{
@@ -114,7 +113,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			autoExpandColumn: 'name',
 			store: new go.data.Store({
 				autoDestroy: true,
-				fields: ['id', 'toId', 'toEntity', 'to', 'description', {name: 'modifiedAt', type: 'date'}],
+				fields: ['id', 'toId', 'toEntity', {name: "to", type: "relation"}, 'description', {name: 'modifiedAt', type: 'date'}],
 				entityStore: "Link",
 				sortInfo: {
 					field: 'modifiedAt',
@@ -156,7 +155,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 					}
 				}
 			},
-			width: dp(500),
+			width: dp(800),
 			height: dp(400)
 		}
 		);
@@ -236,7 +235,8 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			id = "new" + (i++);
 			l.fromEntity = this.linkGrid.store.baseParams.filter.entity;
 			l.fromId = this.linkGrid.store.baseParams.filter.entityId;
-			
+			//comes from store record relation
+			delete l.to;
 			links[id] = l;
 		}, this);
 		
@@ -244,19 +244,29 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 	},
 	
 	save : function() {
+		
 		if(this.newLinks.length === 0) {
 			return;
 		}
+
+		var me = this;
 		
 		go.Db.store("Link").set({
 			create: this.getNewLinks()
-		}, function() {
-			if(!this.isDestroyed) {
-				var e = this.linkGrid.store.baseParams.filter.entity, id = this.linkGrid.store.baseParams.filter.entityId;
-				this.reset();
-				this.setEntity(e, id);
+		})
+		.then(function(result) {
+			if(result.notCreated) {
+				Ext.MessageBox.alert(t("Error"), t("Sorry, the link could not be created."));
 			}
-		}, this);
+		})
+		
+		.finally(function() {
+			if(!me.isDestroyed) {
+				var e = me.linkGrid.store.baseParams.filter.entity, id = me.linkGrid.store.baseParams.filter.entityId;
+				me.reset();
+				me.setEntity(e, id);
+			}
+		});
 	}
 });
 

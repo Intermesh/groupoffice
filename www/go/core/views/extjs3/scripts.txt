@@ -23,10 +23,12 @@ grid/GridPanel.js
 grid/EditorGridPanel.js
 grid/SelectAllCheckBox.js
 grid/DateColumn.js
+grid/ColumnRenderers.js
 
 
 Window.js
 form/EntityPanel.js
+form/MultiEntityDialog.js
 form/Dialog.js
 form/FormFieldSet.js
 form/PasswordGeneratorField.js
@@ -198,6 +200,7 @@ customfields/type/EncryptedText.js
 search/Panel.js
 search/SearchEmailCombo.js
 search/SearchCombo.js
+search/SearchField.js
 
 modules/SystemSettingsModuleGrid.js
 modules/PermissionsWindow.js

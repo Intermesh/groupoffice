@@ -43,73 +43,73 @@ class AccountController extends \GO\Site\Components\Controller {
 	 */
 	public function actionRegister() {
 		
-		\GO::config()->password_validate=false;
+// 		\GO::config()->password_validate=false;
 		
-		$user = new \GO\Base\Model\User();		
-		$contact = new \GO\Addressbook\Model\Contact();
+// 		$user = new \GO\Base\Model\User();		
+// 		$contact = new \GO\Addressbook\Model\Contact();
 				
-//		$user->setValidationRule('passwordConfirm', 'required', true);
-		$company = new \GO\Addressbook\Model\Company();		
+// //		$user->setValidationRule('passwordConfirm', 'required', true);
+// 		$company = new \GO\Addressbook\Model\Company();		
 		
-		//set additional required fields
-		$company->setValidationRule('address', 'required', true);
-		$company->setValidationRule('zip', 'required', true);
-		$company->setValidationRule('city', 'required', true);
-		$company->setValidationRule('country', 'required', true);
+// 		//set additional required fields
+// 		$company->setValidationRule('address', 'required', true);
+// 		$company->setValidationRule('zip', 'required', true);
+// 		$company->setValidationRule('city', 'required', true);
+// 		$company->setValidationRule('country', 'required', true);
 		
-		if(\GO\Base\Util\Http::isPostRequest()  && empty($_POST['User']['url']))
-		{
-			//if username is deleted from form then use the e-mail adres as username
-			if(!isset($_POST['User']['username']))
-				$_POST['User']['username']=$_POST['User']['email'];
+// 		if(\GO\Base\Util\Http::isPostRequest()  && empty($_POST['User']['url']))
+// 		{
+// 			//if username is deleted from form then use the e-mail adres as username
+// 			if(!isset($_POST['User']['username']))
+// 				$_POST['User']['username']=$_POST['User']['email'];
 			
 			
-			$user->setAttributes($_POST['User']);
+// 			$user->setAttributes($_POST['User']);
 			
-			$contact->setAttributes($_POST['Contact']);
+// 			$contact->setAttributes($_POST['Contact']);
 			
-			$company->setAttributes($_POST['Company']);
+// 			$company->setAttributes($_POST['Company']);
 		
-			if(!empty($_POST['Company']['postAddressIsEqual']))
-				$company->setPostAddressFromVisitAddress();
+// 			if(!empty($_POST['Company']['postAddressIsEqual']))
+// 				$company->setPostAddressFromVisitAddress();
 			
-			$contact->addressbook_id=1;//just for validating
-			$company = $contact->company;
-			if($user->validate() && $contact->validate())
-			{				
+// 			$contact->addressbook_id=1;//just for validating
+// 			$company = $contact->company;
+// 			if($user->validate() && $contact->validate())
+// 			{				
 				
-				\GO::setIgnoreAclPermissions(); //allow guest to create user
+// 				\GO::setIgnoreAclPermissions(); //allow guest to create user
 
-				if($user->save())
-				{
-					$contact = $user->createContact();
-					$company->addressbook_id=$contact->addressbook_id;
-					$company->save();
+// 				if($user->save())
+// 				{
+// 					$contact = $user->createContact();
+// 					$company->addressbook_id=$contact->addressbook_id;
+// 					$company->save();
 					
-					$contact->company_id=$company->id;
-					$contact->setAttributes($_POST['Contact']);					
-					$contact->save();
+// 					$contact->company_id=$company->id;
+// 					$contact->setAttributes($_POST['Contact']);					
+// 					$contact->save();
 
-					// Automatically log the newly created user in.
-					if(\GO::session()->login($user->username, $_POST['User']['password']))
-						$this->redirect($this->getReturnUrl());
-					else
-						throw new \Exception('Login after registreation failed.');
-				}
-			}
-			else {
-//				var_dump($user->getValidationErrors());
-//				var_dump($contact->getValidationErrors());
-//				var_dump($company->getValidationErrors());
-			}
-		}
-		else {
-			$user->password="";
-			$user->passwordConfirm="";
-		}
+// 					// Automatically log the newly created user in.
+// 					if(\GO::session()->login($user->username, $_POST['User']['password']))
+// 						$this->redirect($this->getReturnUrl());
+// 					else
+// 						throw new \Exception('Login after registreation failed.');
+// 				}
+// 			}
+// 			else {
+// //				var_dump($user->getValidationErrors());
+// //				var_dump($contact->getValidationErrors());
+// //				var_dump($company->getValidationErrors());
+// 			}
+// 		}
+// 		else {
+// 			$user->password="";
+// 			$user->passwordConfirm="";
+// 		}
 		
 		
-		echo $this->render('register', array('user'=>$user,'contact'=>$contact, 'company'=>$company));
+// 		echo $this->render('register', array('user'=>$user,'contact'=>$contact, 'company'=>$company));
 	}
 	
 	/**
@@ -293,78 +293,78 @@ class AccountController extends \GO\Site\Components\Controller {
 	
 	protected function actionProfile(){
 		
-		$user = \GO::user();
+// 		$user = \GO::user();
 		
-		$contact = $user->contact;
+// 		$contact = $user->contact;
 		
-		//set additional required fields
-		$contact->setValidationRule('address', 'required', true);
-		$contact->setValidationRule('zip', 'required', true);
-		$contact->setValidationRule('city', 'required', true);
+// 		//set additional required fields
+// 		$contact->setValidationRule('address', 'required', true);
+// 		$contact->setValidationRule('zip', 'required', true);
+// 		$contact->setValidationRule('city', 'required', true);
 		
-//		$user->setValidationRule('passwordConfirm', 'required', false);
-		$user->setValidationRule('password', 'required', false);
+// //		$user->setValidationRule('passwordConfirm', 'required', false);
+// 		$user->setValidationRule('password', 'required', false);
 		
-		\GO::config()->password_validate=false;
+// 		\GO::config()->password_validate=false;
 		
-		if($contact->company)
-			$company = $contact->company;
-		else{
-			$company = new \GO\Addressbook\Model\Company();
-			$company->addressbook_id=$contact->addressbook_id;
-		}
+// 		if($contact->company)
+// 			$company = $contact->company;
+// 		else{
+// 			$company = new \GO\Addressbook\Model\Company();
+// 			$company->addressbook_id=$contact->addressbook_id;
+// 		}
 		
-		if (\GO\Base\Util\Http::isPostRequest()) {
+// 		if (\GO\Base\Util\Http::isPostRequest()) {
 			
-			if(!empty($_POST['currentPassword']) && !empty($_POST['User']['password']))
-			{
-				if(!$user->checkPassword($_POST['currentPassword'])){
-					GOS::site()->notifier->setMessage('error', "Huidig wachtwoord onjuist");
-					unset($_POST['User']['password']);
-					unset($_POST['User']['passwordConfirm']);
-				}
-			}else{
-				unset($_POST['User']['password']);
-				unset($_POST['User']['passwordConfirm']);
-			}
+// 			if(!empty($_POST['currentPassword']) && !empty($_POST['User']['password']))
+// 			{
+// 				if(!$user->checkPassword($_POST['currentPassword'])){
+// 					GOS::site()->notifier->setMessage('error', "Huidig wachtwoord onjuist");
+// 					unset($_POST['User']['password']);
+// 					unset($_POST['User']['passwordConfirm']);
+// 				}
+// 			}else{
+// 				unset($_POST['User']['password']);
+// 				unset($_POST['User']['passwordConfirm']);
+// 			}
 			
-			$user->setAttributes($_POST['User']);				
-			$contact->setAttributes($_POST['Contact']);
-			$company->setAttributes($_POST['Company']);
-			$company->checkVatNumber=true;
+// 			$user->setAttributes($_POST['User']);				
+// 			$contact->setAttributes($_POST['Contact']);
+// 			$company->setAttributes($_POST['Company']);
+// 			$company->checkVatNumber=true;
 			
-			if(!empty($_POST['Company']['postAddressIsEqual']))
-				$company->setPostAddressFromVisitAddress();
+// 			if(!empty($_POST['Company']['postAddressIsEqual']))
+// 				$company->setPostAddressFromVisitAddress();
 			
-			if(!GOS::site()->notifier->hasMessage('error') && $user->validate() && $contact->validate() && $company->validate())
-			{	
-				\GO::setIgnoreAclPermissions(); //allow guest to create user
+// 			if(!GOS::site()->notifier->hasMessage('error') && $user->validate() && $contact->validate() && $company->validate())
+// 			{	
+// 				\GO::setIgnoreAclPermissions(); //allow guest to create user
 				
-				$user->save();
-				$company->save();
-				$contact->company_id = $company->id;				
-				$contact->save();
+// 				$user->save();
+// 				$company->save();
+// 				$contact->company_id = $company->id;				
+// 				$contact->save();
 				
-				GOS::site()->notifier->setMessage('success', GOS::t('formEditSuccess'));				
-			}else
-			{
-				GOS::site()->notifier->setMessage('error', "Please check the form for errors");
-			}
-		}
+// 				GOS::site()->notifier->setMessage('success', GOS::t('formEditSuccess'));				
+// 			}else
+// 			{
+// 				GOS::site()->notifier->setMessage('error', "Please check the form for errors");
+// 			}
+// 		}
 
-		$company->post_address_is_address = false;
+// 		$company->post_address_is_address = false;
 	
-		if($company->address==$company->post_address && 
-			 $company->address_no==$company->post_address_no &&
-			 $company->city==$company->post_city
-			){
-			 $company->post_address_is_address = true;
-		}				
+// 		if($company->address==$company->post_address && 
+// 			 $company->address_no==$company->post_address_no &&
+// 			 $company->city==$company->post_city
+// 			){
+// 			 $company->post_address_is_address = true;
+// 		}				
 		
-		//clear values for form	
-		$user->password="";
-		$user->passwordConfirm="";
+// 		//clear values for form	
+// 		$user->password="";
+// 		$user->passwordConfirm="";
 		
-		echo $this->render('profile', array('user'=>$user,'contact'=>$contact, 'company'=>$company));
+// 		echo $this->render('profile', array('user'=>$user,'contact'=>$contact, 'company'=>$company));
 	}
 }

@@ -821,7 +821,15 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 	group_id: 1,
 	
 	route : function(id, entity) {
-		GO.calendar.showEventDialog({event_id: id});
+		GO.calendar.showEventDialog({event_id: id}).on("load", function(dlg) {
+			var date = dlg.startDate.getValue();
+
+			GO.mainLayout.getModulePanel('calendar').show();
+			GO.mainLayout.getModulePanel('calendar').setDisplay({
+				date: date
+			});
+
+		}, this, {single: true});
 	},
 	
 	setCalendarInfo: function(title, comment) {
@@ -2167,9 +2175,7 @@ go.Modules.register("legacy", 'calendar', {
 			name: "Event",
 			links: [{
 				linkWindow: function() {
-					var win = new GO.calendar.EventDialog();
-					win.win.closeAction = "close";
-					return win;
+					return GO.calendar.showEventDialog();
 				},
 				linkDetail: function() {
 					return new GO.calendar.EventPanel();
@@ -2279,6 +2285,8 @@ GO.calendar.showEventDialog = function(config){
 		GO.calendar.eventDialog = new GO.calendar.EventDialog();	
 
 	GO.calendar.eventDialog.show(config);
+
+	return GO.calendar.eventDialog;
 }
 
 

@@ -573,11 +573,13 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 				$acl->delete();
 		}
 
-		$this->notifyUsers(
-			array($this->id, $this->parent->id),
-			FolderNotificationMessage::DELETE_FOLDER,
-			$this->getPath()
-		);
+		if($this->parent){
+			$this->notifyUsers(
+				array($this->id, $this->parent->id),
+				FolderNotificationMessage::DELETE_FOLDER,
+				$this->getPath()
+			);
+		}
 		return parent::afterDelete();
 	}
 
@@ -1455,7 +1457,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			return $folder;
 		}
 		
-		$entityType = $entity->getType();
+		$entityType = $entity->entityType();
 
 		$filesPath = $entityType->getModule()->name. '/'. $entityType->getName() . '/' . $entity->id;
 		$aclId =$entity->findAclId();

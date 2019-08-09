@@ -70,7 +70,7 @@ if(GO::config()->debug) {
 
 //echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
 echo '<script type="text/javascript" src="views/Extjs3/javascript/ext-base-debug.js"></script>';
-echo '<script type="text/javascript" src="views/Extjs3/javascript/ext-all-debug.js"></script>';
+echo '<script type="text/javascript" src="views/Extjs3/javascript/ext-all-debug.js?mtime='.filemtime(__DIR__ . '/javascript/ext-all-debug.js').'"></script>';
 echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?lang='.\GO()->getLanguage()->getIsoCode() . '&v='.GO()->getVersion().'"></script>';
 
 ?>
@@ -105,7 +105,7 @@ GO::router()->getController()->fireEvent('inlinescripts');
 <?php
   
 if ($cacheFile->exists()) {
-	echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v= '. GO()->getVersion() . '"></script>';
+	echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v='. GO()->getVersion() . '"></script>';
 } else {
 
 	$scripts = array();
@@ -215,7 +215,7 @@ if ($cacheFile->exists()) {
 //        $js .= $script->getContents()."\n;\n";
 //        
 //     
-				echo '<script type="text/javascript" src="'.$relPath. '"></script>' . "\n";
+				echo '<script type="text/javascript" src="'.$relPath. '?mtime='.$script->getModifiedAt()->format("U").'"></script>' . "\n";
 			}
 //      else if($script instanceof \go\core\util\Url) {
 //				echo '<script type="text/javascript" src="'.$script.'"></script>' . "\n";

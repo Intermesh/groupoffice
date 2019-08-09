@@ -51,6 +51,15 @@ class Folder extends FileSystemObject {
 //		return $folder;
 //	}
 
+
+	/**
+	 * Check if the file or folder exists
+	 * @return boolean
+	 */
+	public function exists() {
+		return is_dir($this->path) || is_link($this->path);
+	}
+
 	/**
 	 * Get a temporary folder
 	 * 

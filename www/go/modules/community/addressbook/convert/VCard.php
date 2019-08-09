@@ -56,7 +56,7 @@ class VCard extends AbstractConverter {
 			//We have to use 3.0 for the photo property :( See https://github.com/sabre-io/vobject/issues/294#issuecomment-231987064
 			return new VCardComponent([
 					"VERSION" => "3.0",
-					"UID" => $contact->uid
+					"UID" => $contact->getUid()
 			]);
 		}
 	}
@@ -84,7 +84,7 @@ class VCard extends AbstractConverter {
 			$vcard->add('TEL', $phoneNb->number, ['TYPE' => [$phoneNb->type]]);
 		}
 		foreach ($contact->dates as $date) {
-			$type = ($date->type === 'birthday') ? 'BDAY' : 'ANNIVERSARY';
+			$type = ($date->type === Date::TYPE_BIRTHDAY) ? 'BDAY' : 'ANNIVERSARY';
 			$vcard->add($type, $date->date);
 		}
 		foreach ($contact->addresses as $address) {
@@ -218,8 +218,8 @@ class VCard extends AbstractConverter {
 			$entity = new Contact();
 		}
 		
-		if(!isset($entity->uid) && isset($vcardComponent->uid)) {
-			$entity->uid = (string) $vcardComponent->uid;
+		if(!$entity->hasUid() && isset($vcardComponent->uid)) {
+			$entity->setUid((string) $vcardComponent->uid);
 		}
 
 		if(isset($vcardComponent->{"X_GO-GENDER"})) {
@@ -301,6 +301,8 @@ class VCard extends AbstractConverter {
 		$vcardComponent = isset($vcardComponent->PHOTO) ? $vcardComponent->PHOTO->getValue() : null;
 		if ($vcardComponent) {
 			$blob = Blob::fromString($vcardComponent);
+			$blob->type = 'image/jpeg';
+			$blob->name = $entity->getUid() . '.jpg';
 			if ($blob->save()) {
 				$entity->photoBlobId = $blob->id;
 			}

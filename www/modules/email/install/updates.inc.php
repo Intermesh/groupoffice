@@ -170,7 +170,7 @@ $updates['201811181020'][] = function() {
 	$cf = new \go\core\util\ClassFinder();	
 	$cf->addNamespace("go\\modules\\community\\email");			
 	foreach($cf->findByParent(go\core\orm\Entity::class) as $cls) {
-		$cls::getType();
+		$cls::entityType();
 	}
 };
 
@@ -203,3 +203,4 @@ $updates['201811181020'][] = "CREATE TABLE `email_template_attachment` (
 
 $updates['201905111651'][] = "DROP TABLE `email_template_attachment`;";
 $updates['201905111651'][] = "DROP TABLE `email_template`;";
+$updates['201906271420'][] = "DELETE FROM go_state WHERE name='em-pnl-west'";

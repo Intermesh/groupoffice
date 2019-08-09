@@ -1,6 +1,167 @@
-- Email: Changed messages grid to a grouped grid, grouped on date
+19-07-2019 6.4.36
+- Core: small ui enhancements
+- Newsletters: Fixed incorrect parsing of images in email templates
+- Address book: Sanitize phone numbers
+- Email: Fixed reset buttton on search type change
+- Email: Remove links from print
+- Core: Improved create link menu button with filters
+- Core: CSP Allow data: uri for fonts for browser extensions
+- Files: Fixed location bar not set initially and  not visible in popup file browser
+- Core: Fixed export CSV error
+- Calendar: Fixed missing link when creating new Event from item
+- Core: Link show search cache date instead of linking date
+- Core: Link delete button does not show through date anymore.
+- Calendar: Home button when opening link takes you to the date in the calendar too
+- E-mail: Save attachment to item works with folder now too by saving directly in the folder
+- Address book: Sort address books alphabetically
+- Email: Link to item dialog could be destroyed
+- Core/Files: Try to clean invalid UTF8 in file names
+- Address book: Fixed contact ActiveSync problems
+- Core: Custom fields upgrade fix for missing select options (TreeSelect, Select and Multiselect)
+
+18-07-2019 6.4.35
+- Core: upgrade error fixed
+
+18-07-2019 6.4.34
+- Core: Error in duplicate with custom fields of type Notes
+- Core: Readable items may be linked
+- Core: show correct icon in create link button for contact and organization
+- Bookmarks: Handle non existing user id's in bookmarks upgrade
+- Billing: Fix for house numbers from address book
+- Billing: Copy matching custom fields from address book again but by database name
+- Billing: Fixed bug in translating invoice PDF
+- Billing: Fixed unsuable UI in product dialog with custom fields.
+- Comments: Company comments were not migrated correctly. Can be fixed by finding out the old entityTypeId from the comments_comment    table. Then do:
+
+   update comments_comment n set entityTypeId=(select id from core_entity where name='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = <OLD ENTITY TYPE ID>;
+
+
+15-07-2019 6.4.33
+- Core: Exclude composite fields from form posting again because this gave a lot of saving problems.
+
+11-07-2019 6.4.32
+- Email: Fixed unlinking in email message
+- Address book: {contact:cellular2} and {user:cellular2} work
+- Newsletters: Sent items were not showing in newsletters
+- Core: IE 11 support
+- Leavedays: Employees needed aproval were not bold anymore
+
+11-07-2019 6.4.31
+- Core: Bug in template parsing
+
+11-07-2019 6.4.30
+- Billing: Fixed ODF templates
+- Email: Fixed missing email in to field of composer bug
+- Billing: Link message when emailing from edit dialog
+- imapauth / ldapauth: Fixed e-mail account creation
+- address book: Scrolling in user profile
+- Updated Italian
+- Updated Czech
+
+09-07-2019 6.4.29
+- Core: System settings dialog was reachable for non admins
+- Task / Projects and Billing: HTML encoding bugs in description
+
+08-07-2019 6.4.28
+- Email: Fixed attachment encoding error
+- Core: Fixed contact link to maps #438
+- Core: Core / Extjs language was missing
+- Core: Language download button only worked when dev module is installed. This is no longer necessary.
+- Address book: 6.4.27 - Address book - Add organization - cosmetic issues #436
+- Core: Fixed XSS vulnerabilities
+- Email: Print of an email genarate empty pages Fixed #435
+
+02-07-2019 6.4.27
+- Core: Install without ioncube or license failed
+- Custom fields: Fixed custom fields permissions not editable
+- Comments: couldn't be add by non admin users
+- Address book / Notes: added commentedat, createdby, modifiedby filters
+- Notes: Added custom filters component
+
+02-07-2019 6.4.26
+- Address book: Added organization filter for contacts "org"
+- Address book: configure name sorting by last or first name
+- Address book: Create a new organisation when creating a new contact #426
+- Core: Object values were always posted even if they weren't dirty (Problem with acl's)
+
+01-07-2019 6.4.25
+- Core: Simplified search. All words will be used with AND instead of OR. A wildcard will be placed after each word. 
+- Core: Fixed upgrade error can't find module core/groups
+- Comments: Fixed comment permissions and label editing
+- Core: Loading mask could stick sometimes
+- Email: Click on email from list that has just been deleted elsewhere forever show the Loading ... pop-up #425
+- Emailcomposer: Insert inline image in composer through the upload button 
+  opened a file chooser in which you could only choose folders. 
+  This is now changed to be able to choose (image)files.
+- Address book: Fixed "function" and "first_name" in email templates
+- Core: Fixed downloading language translation file from system settings
+- Serverclient: Fixed autoload issue of Controller.
+
+24-06-2019 6.4.24
+- CardDAV: It was not possible to add new carddav accounts. And sync was broken.
+- Comments: Comments cannot be deleted #414
+- Addres book: Icons and address book name were at the same place.
+- Core: Combobox, when pagesize is given the property "calculateTotal" needs to be send to the server.
+- Core: Fixed deleting mapped properties by setting them to null
+- Authentication: Fixed adding groups to LDAP and IMap auth profiles
+
+21-06-2019 6.4.23
+- Custom fields: Implemented the dbToText function for the select customfield so it's value is showed instead of it's id.
+- Email: Improved autocomplete search
+- Address book: Display adressbook of contact #405
+- Address book: Added address book to detail view and fixed default/Last choosen addressbook is not preselected anymore #399
+- Core: Create link button in dialog showed "undefined"
+- Custom fields: Updating filters didn't work always
+- Core: Check if files module is installed. Fixes 6.4.22 SQLSTATE[42S02]: Base table or view not found: 1146 Table 'web36_db9.fs_folders' doesn't exist #406
+- Core: Mask UI improved. Mask will wait for 500ms until it shows.
+- Core: Changed font to Lato on all platform so UI is consistent
+- Core: Fixed horizontal scrollbar issue
+
+18-06-2019 6.4.22
+- Calendar: Fixed ambiguous id error
+- Notes & Comments: Clicking hyperlinks opens new tabs
+- Tasks: Fixed comment in continue task
+- Email: Fixed error when sending email from contact without an email address
+- Core: Fixed upgrade and installation bugs
+- Address Book: Fixed address book sorting issue. Fixes #400.
+- Files: Fixed issue that type is not a property
+- Billing: fixed grouping of items
+
+11-06-2019 6.4.21
+- First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
+
+
+
+11-07-2019 6.3.81
+- Core: Enable / disable Add linked item buttons based on permissions
+- Core: Update Czech translation
+- Email: Fixed attachment encoding error
+- LDAPAuth and IMAP auth: Fixed email account creation
+
+24-06-2019 6.3.80
+- Calendar: Fixed error where appointment dialog wouldn't load
+
+24-06-2019 6.3.79
+- Core: Bug in script loading prevented GO from starting
+
+21-06-2019 6.3.78
+- Address book: Fixed bug where to address in composer was not filled when creating mail from contact
+- Projects: Fixed problem where projects wouldn't load after opening a project from a link
+- Core: Faster boot time due to caching in the browser
+
+18-06-2019 6.3.77
+- Files: Fixed issue that searching files throws an error about an ambiguous column
+- Fix for keyboard navigation in Firefox 67
+
+03-06-2019 6.3.76
+- Fixed some 6.2 upgrade issues.
+
+27-05-2019 6.3.75
 - Tickets: Added missing language in tickets for Brazilian portuges
 - Email: Fixed render issue when pasting multiple recipients in email composer
+- Smime: validate if import is in PEM format. Fixed S/MIME Certificate Import Error #288
+- core: fixed language issue with pt_BR
+- billing: show country in full name
 
 21-05-2019 6.3.74
 - core: Use varchar 190 field for search keywords

@@ -31,7 +31,7 @@ go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 		});
 	
 		// Get default groups from settings
-		this.groupsGrid.setValue(go.Modules.get('core', 'core').settings.defaultGroups.map(function(groupId){return {groupId: groupId};}));
+		this.groupsGrid.setValue(go.Modules.get('core', 'core').settings.defaultGroups);
 		
 	},
 	

@@ -102,7 +102,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 			if(this.titleField) {
 				this.titleField.on("change", this.updateTitle, this);
 				this.formPanel.on("load", this.updateTitle, this);
-			}
+			}			
 		}
 	},
 
@@ -113,7 +113,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		var title = this.origTitle, v = this.titleField.getValue();
 
 		if(v) {
-			title += ": " + v;
+			title += ": " + Ext.util.Format.htmlEncode(v);
 		}
 
 		this.setTitle(title);
@@ -357,6 +357,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		});
 
 		if(!firstFieldWithError) {
+			console.warn('A validation error happend but no field with was error found.');
 			return;
 		}
 		//Check for tab panel to show tab with error.
@@ -372,7 +373,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 			panel.show();
 		}
 
-		firstFieldWithError.focus();
+		// Focus make server side errors dissappear 
+		// firstFieldWithError.focus();
 	},
 
 	initFormItems: function () {

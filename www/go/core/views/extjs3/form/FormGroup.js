@@ -32,10 +32,14 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	
 	hideLabel: true,		
 	
-	addButtonText: t("Add"),
-	addButtonIconCls: "ic-add",
-	
+	addButtonText: null, // deprecated, use btnCfg
+	btnCfg: {}, // @type Ext.Button
+	editable: true, // show delete and add buttons when true
 	layout: "form",
+	// @string name of property, when set getValue will build an object map with this property as key
+	mapKey: null,
+	// When mapKey is set we remember the keys of properties that are going to be deleted here
+	markDeleted: [],
 	
 	defaults: {
 		anchor: "100%"
@@ -49,14 +53,15 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 //		
 //		//to prevent adding to the ExtJS basic form
 //		this.itemCfg.isFormField = false;
-		
+		this.markDeleted = [];
 		this.itemCfg.columnWidth = 1;
 		
 		if(!this.itemCfg.xtype) {
 			this.itemCfg.xtype = "formcontainer";
 		}		
-		
-		this.initBbar();
+		if(this.editable) {
+			this.initBbar();
+		}
 		
 		go.form.FormGroup.superclass.initComponent.call(this);
 		
@@ -69,9 +74,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	
 	initBbar: function() {
 		this.bbar = [
-			{
+			Ext.apply(this.btnCfg,{
 				//iconCls: this.addButtonIconCls,
-				text: this.addButtonText,
+				text: this.addButtonText || this.btnCfg.text || t("Add"),
 				handler: function() {
 					var wrap = this.addPanel();
 					this.doLayout();
@@ -80,7 +85,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 				
 				},
 				scope: this
-			}
+			})
 		];
 	},
 	
@@ -121,28 +126,33 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	},
 	
 	addPanel : function() {
-		var formField = this.createNewItem(), me = this, wrap = new Ext.Container({
-			//xtype: "container",
+		var formField = this.createNewItem(), me = this, items = [formField], delBtn = new Ext.Button({				
+			//disabled: formField.disabled,
+			xtype: "button",
+			iconCls: 'ic-delete',
+			handler: function() {
+				if(this.ownerCt.ownerCt.formField.key) {
+					me.markDeleted.push(this.ownerCt.ownerCt.formField.key);
+				}
+				this.ownerCt.ownerCt.destroy();
+				me.dirty = true;
+			}
+		});
+
+		if(this.editable) {
+			items.unshift({
+				xtype: "container",
+				width: dp(48),		
+				items: [delBtn]
+			});	
+		}
+		var wrap = new Ext.Container({
 			layout: "column",
 			formField: formField,			
 			findBy: false,
 			isFormField: false,
 			style: this.pad ?  "padding-top: " + dp(16) + "px" : "",
-			items: [				
-				{
-					xtype: "container",
-					width: dp(48),		
-					items: [{				
-						xtype: "button",
-						iconCls: 'ic-delete',
-						handler: function() {
-							this.ownerCt.ownerCt.destroy();
-							me.dirty = true;
-						}
-					}]
-				},
-				formField
-			]
+			items: items
 		});
 		this.add(wrap);
 		return wrap;
@@ -177,25 +187,42 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 	setValue: function (records) {	
 		this.removeAll();
-		
+		this.markDeleted = [];
 		var me = this, wrap;
-		records.forEach(function(r) {						
+		function set(r) {
 			wrap = me.addPanel();
+			wrap.formField.key = r.id;
 			wrap.formField.setValue(r);
-		});		
+		}
+		if(this.mapKey) {
+			for(var r in records) {
+				set(records[r]);
+			}
+		} else {
+			records.forEach(set);
+		}
 		
 		this.doLayout();
 	},
 	
 
 	getValue: function () {
-		var v = [];
+		var v = this.mapKey ? {} : [];
 		if(!this.items) {
 			return v;
 		}
 		this.items.each(function(wrap) {
-			v.push(wrap.formField.getValue());
+			if(this.mapKey) {
+				if(wrap.formField.isDirty()) {
+					v[wrap.formField.key || Ext.id()] = wrap.formField.getValue();
+				}
+			} else {
+				v.push(wrap.formField.getValue());
+			}
 		}, this);
+		if(this.mapKey) {
+			this.markDeleted.forEach(function(key) { v[key] = null; });
+		}
 		
 		return v;
 	},

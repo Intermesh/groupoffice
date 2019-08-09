@@ -44,10 +44,10 @@ trait SearchableTrait {
 	}
 	
 	public function saveSearch($checkExisting = true) {
-		$search = $checkExisting ? \go\core\model\Search::find()->where('entityTypeId','=', static::getType()->getId())->andWhere('entityId', '=', $this->id)->single() : false;
+		$search = $checkExisting ? \go\core\model\Search::find()->where('entityTypeId','=', static::entityType()->getId())->andWhere('entityId', '=', $this->id)->single() : false;
 		if(!$search) {
 			$search = new \go\core\model\Search();
-			$search->setEntity(static::getType());
+			$search->setEntity(static::entityType());
 		}
 		
 		if(empty($this->id)) {
@@ -90,21 +90,21 @@ trait SearchableTrait {
 	public function deleteSearchAndLinks() {
 		if(!\GO()->getDbConnection()
 						->delete('core_search', 
-										['entityTypeId' => static::getType()->getId(), 'entityId' => $this->id]
+										['entityTypeId' => static::entityType()->getId(), 'entityId' => $this->id]
 										)->execute()) {
 			return false;
 		}
 		
 		if(!\GO()->getDbConnection()
 						->delete('core_link', 
-										['fromEntityTypeId' => static::getType()->getId(), 'fromId' => $this->id]
+										['fromEntityTypeId' => static::entityType()->getId(), 'fromId' => $this->id]
 										)->execute()) {
 			return false;
 		}
 		
 		if(!\GO()->getDbConnection()
 						->delete('core_link', 
-										['toEntityTypeId' => static::getType()->getId(), 'toId' => $this->id]
+										['toEntityTypeId' => static::entityType()->getId(), 'toId' => $this->id]
 										)->execute()) {
 			return false;
 		}
@@ -124,7 +124,7 @@ trait SearchableTrait {
 			
 		$query = $cls::find();
 		/* @var $query \go\core\db\Query */
-		$query->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . $cls::getType()->getId(), "LEFT");
+		$query->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . $cls::entityType()->getId(), "LEFT");
 		$query->andWhere('search.id IS NULL')
 							->limit($limit)
 							->offset($offset);
@@ -135,6 +135,16 @@ trait SearchableTrait {
 	private static function rebuildSearchForEntity($cls) {
 		echo $cls."\n";
 		
+
+		echo "Deleting old values\n";
+
+		$stmt = GO()->getDbConnection()->delete('core_search', (new Query)
+			->where('entityTypeId', '=', $cls::entityType()->getId())
+			->andWhere('entityId', 'NOT IN', $cls::find()->selectSingleValue('id'))
+		);
+		$stmt->execute();
+
+		echo "Deleted ". $stmt->rowCount() . " entries\n";
 
 		//In small batches to keep memory low
 		$stmt = self::queryMissingSearchCache($cls);			

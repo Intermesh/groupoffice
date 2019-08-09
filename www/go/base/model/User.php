@@ -4,6 +4,7 @@ namespace GO\Base\Model;
 use GO;
 use GO\Base\Mail\Message;
 use GO\Base\Mail\Mailer;
+use go\core\db\Query;
 
 /**
  * The User model
@@ -57,7 +58,6 @@ use GO\Base\Mail\Mailer;
  * @property string $date_format
  * @property string $email
  * @property string $recoveryEmail
- * @property \GO\Addressbook\Model\Contact $contact
  * @property string $digest
  * @property int $last_password_change
  * @property boolean $force_password_change
@@ -67,6 +67,8 @@ use GO\Base\Mail\Mailer;
  * @property Boolean $sort_email_addresses_by_time
  */
 class User extends \GO\Base\Db\ActiveRecord {
+
+	use \go\core\orm\CustomFieldsTrait;
 	
 	/**
 	 * Get the password hash from the new framework
@@ -638,38 +640,40 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 * @return Array 
 	 */
 	public static function getGroupIds($userId) {
-		$user = GO::user();
-		if ($user && $userId == $user->id) {
-			if (!isset(GO::session()->values['user_groups'])) {
-				GO::session()->values['user_groups'] = array();
 
-				$stmt= UserGroup::model()->find(
-								\GO\Base\Db\FindParams::newInstance()
-								->select('t.groupId')
-								->criteria(\GO\Base\Db\FindCriteria::newInstance()
-												->addCondition("userId", $userId))
-								);
-				while ($r = $stmt->fetch()) {
-					GO::session()->values['user_groups'][] = $r->groupId;
-				}
-			}
+		return GO()->getDbConnection()->selectSingleValue('groupId')->from('core_user_group')->where(['userId' => $userId])->all();
+		// $user = GO::user();
+		// if ($user && $userId == $user->id) {
+		// 	if (!isset(GO::session()->values['user_groups'])) {
+		// 		GO::session()->values['user_groups'] = array();
+
+		// 		$stmt= UserGroup::model()->find(
+		// 						\GO\Base\Db\FindParams::newInstance()
+		// 						->select('t.groupId')
+		// 						->criteria(\GO\Base\Db\FindCriteria::newInstance()
+		// 										->addCondition("userId", $userId))
+		// 						);
+		// 		while ($r = $stmt->fetch()) {
+		// 			GO::session()->values['user_groups'][] = $r->groupId;
+		// 		}
+		// 	}
 		
-			return GO::session()->values['user_groups'];
-		} else {
-			$ids = array();
-			$stmt= UserGroup::model()->find(
-								\GO\Base\Db\FindParams::newInstance()
-								->select('t.groupId')
-								->debugSql()
-								->criteria(\GO\Base\Db\FindCriteria::newInstance()
-												->addCondition("userId", $userId))
-								);
+		// 	return GO::session()->values['user_groups'];
+		// } else {
+		// 	$ids = array();
+		// 	$stmt= UserGroup::model()->find(
+		// 						\GO\Base\Db\FindParams::newInstance()
+		// 						->select('t.groupId')
+		// 						->debugSql()
+		// 						->criteria(\GO\Base\Db\FindCriteria::newInstance()
+		// 										->addCondition("userId", $userId))
+		// 						);
 			
-			while ($r = $stmt->fetch()) {
-				$ids[] = $r->groupId;
-			}
-			return $ids;
-		}
+		// 	while ($r = $stmt->fetch()) {
+		// 		$ids[] = $r->groupId;
+		// 	}
+		// 	return $ids;
+		// }
 	}
 	
 	/**
@@ -809,7 +813,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 * Get the contact model of this user. All the user profiles are stored in the
 	 * addressbook.
 	 * 
-	 * @return \GO\Addressbook\Model\Contact 
+
 	 */
 	public function createContact(){
 		throw new \Exception("No longer supported");

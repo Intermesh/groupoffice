@@ -297,6 +297,8 @@ use const GO_CONFIG_FILE;
 									"servermanager" => $config['servermanager'] ?? false
 							],
 							"db" => [
+									"host" => ($config['db_host'] ?? "localhost"),
+									"port" => $config['db_port'] ?? 3306,
 									"name" => $config['db_name'],
 									"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice-com"),
 									"username" => $config['db_user'] ?? "groupoffice",
@@ -393,7 +395,7 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @param string $package Set to null for legacy modules
 		 * @param string $name
-		 * @return boolean
+		 * @return \go\core\model\Module
 		 */
 		public function getModule($package, $name) {
 			$model = \go\core\model\Module::find()->where(['package' => $package, 'name' => $name, 'enabled' => true])->single();
@@ -638,8 +640,8 @@ use const GO_CONFIG_FILE;
 		public function resetSyncState() {		
 			//reset all mod seqs
 			GO()->getDbConnection()->update('core_entity', ['highestModSeq' => 0])->execute();
-			GO()->getDatabase()->getTable('core_change')->truncate();
-			GO()->getDatabase()->getTable('core_acl_group_changes')->truncate();
+			GO()->getDbConnection()->exec("TRUNCATE TABLE core_change");
+			GO()->getDbConnection()->exec("TRUNCATE TABLE core_acl_group_changes");
 			GO()->getDbConnection()->insert('core_acl_group_changes', (new Query())->select("null, aclId, groupId, '0', null")->from("core_acl_group"))->execute();
 		}
 
@@ -678,7 +680,7 @@ namespace {
 
 	use go\core\App;
 	/**
-	 * @return App
+	 * @return go\core\App
 	 */
 	function GO() {
 		return App::get();

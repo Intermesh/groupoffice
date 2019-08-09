@@ -10,33 +10,30 @@ use function GO;
 
 class System extends Controller {
 	
-	public function garbageCollect() {
-		$blobs = Blob::find()->where('staleAt', '<=', new DateTime())->execute();
-
-		foreach($blobs as $blob)
-		{
-			if(!$blob->delete()) {
-				throw new \Exception("Could not delete blob!");
-			}
-		}
-		echo "Deleted ". $blobs->rowCount() . " stale blobs\n";
+	public function runCron($name, $module = "core", $package = "core") {
+		$cls = $package == "core" ?
+			"go\\core\\cron\\".$name : 
+			"go\\modules\\" . $package ."\\".$module."\\cron\\".$name;
+		
+		$o = new $cls;
+		$o->run();
 	}
 	
-	public function checkAllBlobs() {
-		$blobs = Blob::find()->execute();
+	// public function checkAllBlobs() {
+	// 	$blobs = Blob::find()->execute();
 		
-		echo "Processing: ".$blobs->rowCount() ." blobs\n";
-		$staleCount = 0;
-		foreach($blobs as $blob) {
-			if($blob->setStaleIfUnused()) {
-				echo 'D';
-				$staleCount++;
-			}else
-			{
-				echo '.';
-			}
-		}
+	// 	echo "Processing: ".$blobs->rowCount() ." blobs\n";
+	// 	$staleCount = 0;
+	// 	foreach($blobs as $blob) {
+	// 		if($blob->setStaleIfUnused()) {
+	// 			echo 'D';
+	// 			$staleCount++;
+	// 		}else
+	// 		{
+	// 			echo '.';
+	// 		}
+	// 	}
 		
-		echo "\n\nFound " . $staleCount ." stale blobs\n";
-	}
+	// 	echo "\n\nFound " . $staleCount ." stale blobs\n";
+	// }
 }

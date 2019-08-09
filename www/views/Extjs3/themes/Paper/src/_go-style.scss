@@ -252,7 +252,7 @@ a {
 		@extend %font-body1;
 		text-align:right;
 		color:white;
-		margin-top:dp(4);
+		padding-top: dp(4);
 	}
 	input {
 		background-color: inherit;
@@ -260,9 +260,9 @@ a {
 		border:1px solid currentColor;
 	}
 	.x-form-trigger{
-		color:currentColor;
+		color:white;
 		&:before{
-			color:inherit;
+			color:white;
 		}
 	}
 	
@@ -518,6 +518,10 @@ a {
 			height: dp(40);
 			border:0;
 			padding: 0 0 0 dp(8);
+
+			&.x-form-invalid {
+				background-color: color($red,300);
+			}
 		}
 	}
 	
@@ -750,10 +754,18 @@ hr {
 	.x-btn-mc em.x-btn-arrow > button:after {
 		content: '';
 	}
+
 	.badge {
 		@extend %badge;
-		display: inline-block;	
+		float: none;
+		display: inline-block;
 	}
+	
+}
+
+.badge {
+	@extend %badge;
+	float:right;
 }
 
 .x-tab-with-icon {
@@ -1100,6 +1112,9 @@ button.filetype-pdf, button.filetype-doc {
 			.show-on-hover {
 				display:block;
 			}
+			.hide-on-hover {
+				display: none;
+			}
 		}
 		
 		label {
@@ -1110,15 +1125,21 @@ button.filetype-pdf, button.filetype-doc {
 		}
 		
 	}
+
+	.show-on-hover {
+		display: none;		
+	}
+
+	.left {
+		top: dp(12);
+		left: dp(16);
+		position:absolute;
+	}
+
 	.right {
-		top: dp(8);
+		top: dp(12);
 		right: dp(16);
 		position:absolute;
-		
-		&.show-on-hover {
-			display: none;
-			
-		}
 	}
 }
 .go-icon-list > p, .go-icon-list > a {
@@ -1133,7 +1154,7 @@ button.filetype-pdf, button.filetype-doc {
 	&-heading {
 		@extend %font-subheading;
 		/*color: color($fg, 'secondary-text');*/
-		border-top: 1px solid color($fg, 'divider');
+		border-top: 1px solid color($fg, 'line');
 		padding: dp(8) dp(16);
 		height: dp(56);
 	}
@@ -1153,7 +1174,7 @@ button.filetype-pdf, button.filetype-doc {
 		padding: dp(8);
 		vertical-align: middle;
 		height: dp(40);
-		border-bottom: 1px solid color($fg, 'line');
+		border-bottom: 1px solid color($fg, 'divider');
 		background-color: transparent !important;
 	}
 }
@@ -1197,7 +1218,7 @@ table.display-panel {
 .collapsible-display-panel-header {
 	@extend %font-subheading;
 /*	color: color($fg, 'secondary-text');*/
-	border-top: 1px solid color($fg, 'divider');
+	border-top: 1px solid color($fg, 'line');
 	padding: 0 dp(8) 0 dp(16);
 	height: dp(56);
 	line-height: dp(56);
@@ -1392,7 +1413,13 @@ table[id^="comments-ext"] b {
 	a {
 		color: color($fg, 'text');
 	}
-	
+	.icons {
+		p { 
+		  a:not(.right) {			
+				padding-right: dp(64);
+			}
+		}
+	}
 	.count {
 		float: right;
 		@extend %badge;
@@ -1401,7 +1428,15 @@ table[id^="comments-ext"] b {
 	a.show-more {
 		font-style: italic;
 		color: $cAnchor;
+		padding-right: 0;
 	}
+
+	.go-top-right {
+		right: dp(48);
+		top: dp(12);
+		padding-right: 0;
+	}
+	
 }
 
 .go-login-dialog {
@@ -1416,6 +1451,10 @@ table[id^="comments-ext"] b {
 		@extend %icon;
 		float: right;
 	}
+	&.success { background-color: lighten($cSuccess, 55%);  }
+	&.danger { background-color: lighten($cDanger,45%);}
+	&.warning { background-color: lighten($cWarning, 47%);}
+	&.summary { background-color: color($bg, 'background'); }
 }
 
 
@@ -1696,10 +1735,14 @@ table[id^="comments-ext"] b {
 	}
 }
 
-.tags {
+.tags {	
+	margin-left: -2px;
 	padding: 0 dp(16) !important;
-	&.mine {
-		text-align:right;
+	// &.mine {
+	// 	text-align:left;
+	// }
+	> i {
+		margin-top: dp(-16);
 	}
 }
 .x-emoji-menu {
@@ -1765,8 +1808,8 @@ table[id^="comments-ext"] b {
 		@extend .icon;
 		cursor: pointer;
 		display: block;
-		width: dp(20);
-		height: dp(31);
+		width: dp(18);
+		//height: dp(31);
 		position: absolute;
 		top: 0;
 		right:0;
@@ -1792,4 +1835,16 @@ table[id^="comments-ext"] b {
 
 .go-top-right {
 	position:absolute;top: dp(8); right: dp(8);
+}
+
+.x-toolbar.summary{
+	padding:0;
+	.x-toolbar-left , .x-toolbar-right, .x-toolbar-cell {
+		padding:0;
+	}
+	.x-toolbar-cell > div {
+		border-right: 1px solid color($fg,'line');
+		min-height:dp(40);
+    	padding: 0 dp(4) 0 dp(16);
+	}
 }

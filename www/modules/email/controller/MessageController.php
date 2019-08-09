@@ -1532,7 +1532,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$response['allow_quicklink']=$useQL?1:0;
 
 		
-		$contact = \go\modules\community\addressbook\model\Contact::find()->filter(['email' => $response['sender'], 'permissionLevel' => \go\core\model\Acl::LEVEL_READ])->single();
+		$contact = !empty($response['sender']) ? \go\modules\community\addressbook\model\Contact::find()->filter(['email' => $response['sender'], 'permissionLevel' => \go\core\model\Acl::LEVEL_READ])->single() : false;
 		if(!empty($contact)){
 			$response['contact_thumb_url']= GO()->getAuthState()->getDownloadUrl($contact->photoBlobId);
 
@@ -1551,11 +1551,12 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 				if(GO::modules()->savemailas){
 					$contactLinkedMessage = \GO\Savemailas\Model\LinkedEmail::model()->findByImapMessage($imapMessage, $contact);
-					$response['contact_linked_message_id']=$contactLinkedMessage && $contactLinkedMessage->linkExists($contact) ? $contactLinkedMessage->id : 0;
+					
+					$response['contact_linked_message_id']=$contactLinkedMessage && ($response['contact_link_id'] = $contactLinkedMessage->linkExists($contact)) ? $contactLinkedMessage->id : 0;
 
 					if(!empty($company)){
 						$companyLinkedMessage = \GO\Savemailas\Model\LinkedEmail::model()->findByImapMessage($imapMessage, $company);
-						$response['company_linked_message_id']=$companyLinkedMessage && $companyLinkedMessage->linkExists($company) ? $companyLinkedMessage->id : 0;
+						$response['company_linked_message_id']=$companyLinkedMessage && ($response['company_link_id'] = $companyLinkedMessage->linkExists($company)) ? $companyLinkedMessage->id : 0;
 					}
 				}
 			}

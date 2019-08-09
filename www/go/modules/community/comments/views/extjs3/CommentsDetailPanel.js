@@ -1,26 +1,31 @@
 go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	entityId:null, 
 	entity:null,
+	section: null,
 	height: dp(150),
+
+	growMaxHeight: dp(800),
 	title: t("Comments", "comments"),
 	//
 	/// Collapsilbe was turn off because of height recaculation issues in HtmlEditor
 	//
 	//collapsible: true,
 	collapseFirst:false,
-	layout:'border',
-	tools:[{
-		id: "gear",
-		handler: function () {		
-			if(!go.modules.comments.settingsForm) {
-				go.modules.comments.settingsForm = new go.modules.comments.Settings();
-			}
-			go.modules.comments.settingsForm.show(go.User.id);
-		}
-	}],
+	layout:'border',	
 	titleCollapse: true,
 	stateId: "comments-detail",
 	initComponent: function () {
+
+
+		if(go.User.isAdmin && this.header) {
+			this.tools = [{			
+				id: "gear",
+				handler: function () {		
+					var dlg = new go.modules.comments.Settings();					
+					dlg.show(go.User.id);
+				}
+			}];
+		}
 
 		this.store = new go.data.Store({
 			fields: [
@@ -33,7 +38,9 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				'modifiedBy',
 				'createdBy', 
 				{name: "creator", type: "relation"},
-				'text'
+				'text',
+				{name: "permissionLevel", type: "int"},
+				{name: "labels", type: "relation"}
 			],
 			entityStore: "Comment"
 		});
@@ -42,19 +49,23 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			this.updateView(options);
 		}, this);
 
+		this.store.on('remove', function() {
+			this.updateView();
+		}, this);
+
 		this.contextMenu = new Ext.menu.Menu({
 			items:[{
 				iconCls: 'ic-delete',
 				text: t("Delete"),
 				handler: function() {
-					if(confirm(t("Are you sure you want to delete the selected item?"))){
-						//return;
-						this.store.removeById(this.contextMenu.record.id);
-						var _this = this;
-						this.store.save(function(){
-							_this.updateView();
-						});
-					}
+
+					Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
+						if (btn !== "yes") {
+							return;
+						}
+						go.Db.store("Comment").set({destroy: [this.contextMenu.record.id]});
+					}, this);
+				
 				},
 				scope:this
 			},{
@@ -89,16 +100,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				height:60
 			})
 		];
-		
-		
-		
-//		this.composer.on('resize',function(me,w,h){
-//			this.composer.setHeight(h);
-//			this.syncSize();
-//		},this);
-			
+					
 		go.modules.comments.CommentsDetailPanel.superclass.initComponent.call(this);
-
 	},
 
 	onLoad: function (dv) {
@@ -110,17 +113,15 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		
 		this.entityId = id;
 		this.entity = type;
-		this.composer.initEntity(this.entityId, this.entity);
-		
-		this.store.load({
-			params: {
-				filter:{
-					entity: this.entity,
-					entityId: this.entityId
-				}
-				//sort: 'createdAt DESC'
-			}
+		this.composer.initEntity(this.entityId, this.entity, this.section);
+
+		this.store.setFilter('entity', {
+			entity: this.entity,
+			entityId: this.entityId,
+			section: this.section
 		});
+		
+		this.store.load();
 	},
 		
 	updateView : function(o) {
@@ -137,28 +138,31 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			var readMore = new go.detail.ReadMore({
 				cls: mineCls
 			});
+			var creator = r.get("creator");
+			if(!creator) {
+				creator = {
+					displayName: t("Unknown user")
+				};
+			}
 			var avatar = {
 				xtype:'box',
 				autoEl: {tag: 'span','ext:qtip': t('{author} wrote at {date}')
-					.replace('{author}', r.get("creator").displayName)
+					.replace('{author}', creator.displayName)
 					.replace('{date}', Ext.util.Format.date(r.get('createdAt'),go.User.dateTimeFormat))},
 				cls: 'photo '+mineCls
 			};
-			if(r.get("creator").avatarId) { 
-				avatar.style = 'background-image: url('+go.Jmap.downloadUrl(r.get("creator").avatarId)+');';
+			if(creator.avatarId) { 
+				avatar.style = 'background-image: url('+go.Jmap.downloadUrl(creator.avatarId)+');';
 			} else {
-				avatar.html = r.get("creator").displayName.substr(0,1).toUpperCase();
+				avatar.html = creator.displayName.substr(0,1).toUpperCase();
 			}
 
-			if(r.json.labelIds) {
-				go.Db.store('CommentLabel').get(r.json.labelIds, function(items){
-					for(var i = 0; i < items.length; i++){
-						labelText += '<i class="icon" title="'+items[i].name+'" style="color: #'+items[i].color+'">label</i>';
-					}
-				});
-			}
+			for(var i = 0, l = r.data.labels.length; i < l; i++){
+				labelText += '<i class="icon" title="' + r.data.labels[i].name + '" style="color: #' + r.data.labels[i].color + '">label</i>';
+			} 
+			
 			readMore.setText(r.get('text'));
-			readMore.add({xtype:'box',html:labelText, cls: 'tags ' +mineCls});
+			readMore.insert(1, {xtype:'box',html:labelText, cls: 'tags ' +mineCls});
 			this.commentsContainer.add({
 				xtype:"container",
 				cls:'go-messages',
@@ -175,9 +179,11 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			});
 			readMore.on('render',function(me){me.getEl().on("contextmenu", function(e, target, obj){
 				e.stopEvent();		
-				//todo check permission
-				this.contextMenu.record = r;
-				this.contextMenu.showAt(e.xy);
+				
+				if(r.data.permissionLevel > go.permissionLevels.read) {
+					this.contextMenu.record = r;
+					this.contextMenu.showAt(e.xy);
+				}
 
 			}, this);},this);
 			prevStr = go.util.Format.date(r.get('createdAt'));
@@ -192,7 +198,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		setTimeout(function(){
 			
 			var scroll = _this.commentsContainer.getEl();
-			_this.body.setHeight(Math.max(50,Math.min(400,height + _this.composer.getHeight())));
+			_this.body.setHeight(Math.max(50,Math.min(_this.growMaxHeight,height + _this.composer.getHeight())));
 			_this.doLayout();
 			scroll.scroll("b", initScrollTop + (scroll.dom.scrollHeight));
 		});

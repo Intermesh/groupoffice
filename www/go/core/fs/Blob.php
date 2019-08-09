@@ -316,7 +316,7 @@ class Blob extends orm\Entity {
 	 * @return string[] Array of blob ID's
 	 */
 	public static function parseFromHtml($html) {
-		if(!preg_match_all('/<img .*?src=".*?blob=(.*?)".*?>/i', $html, $matches)) {
+		if(!preg_match_all('/<img [^>]*src="[^>]*blob=([^>"]*)"[^>]*>/i', $html, $matches)) {
 			return [];
 		}
 		
@@ -346,7 +346,9 @@ class Blob extends orm\Entity {
 	 * @return string Replaced HTML
 	 */
 	public static function replaceSrcInHtml($html, $blobId, $src) {		
-		return preg_replace('/(<img .*?src=").*?blob='.$blobId.'(".*?>)/i', '$1'.$src.'$2', $html);
+		$replaced =  preg_replace('/(<img [^>]*src=")[^>]*blob='.$blobId.'("[^>]*>)/i', '$1'.$src.'$2', $html);
+
+		return $replaced;
 	}
 	
 	/**

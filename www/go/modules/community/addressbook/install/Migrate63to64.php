@@ -14,6 +14,13 @@ use go\modules\community\addressbook\model\Url;
 use function GO;
 use go\core\db\Table;
 
+/*
+update addressbook_contact n set filesFolderId = (select files_folder_id from ab_contacts o where o.id=n.id);
+update addressbook_contact n set filesFolderId = (select files_folder_id from ab_companies o where n.id = (o.id + (select max(id) from ab_contacts)) );
+
+
+update comments_comment n set entityTypeId=(select id from core_entity where name='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = 3;
+*/
 class Migrate63to64 {
 	
 	private $countries;
@@ -28,7 +35,8 @@ class Migrate63to64 {
 		
 		$db = GO()->getDbConnection();
 		//Start from scratch
-		$db->query("DELETE FROM addressbook_addressbook");
+		// $db->query("DELETE FROM addressbook_contact");
+		// $db->query("DELETE FROM addressbook_addressbook");
 		
 			
 		$this->migrateCustomFields();
@@ -72,6 +80,8 @@ class Migrate63to64 {
 		$m->migrateEntity("Contact");				
 		
 		$this->migrateCustomField();
+
+		GO()->getDbConnection()->exec("update comments_comment n set entityTypeId=(select id from core_entity where name='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = (select id from core_entity where name='Company');");
 
 		GO()->getDbConnection()->delete("core_entity", ['name' => "Company"])->execute();
 		
@@ -158,7 +168,7 @@ class Migrate63to64 {
 			
 			GO()->getDbConnection()
 							->update("core_customfields_field_set", 
-											['entityId' => Contact::getType()->getId()], 
+											['entityId' => Contact::entityType()->getId()], 
 											['entityId' => $companyEntityType->getId()])
 							->execute();
 		}
@@ -178,7 +188,7 @@ class Migrate63to64 {
 //						->delete(
 //										'core_link', 
 //										(new \go\core\db\Query)
-//										->where(['fromEntityTypeId' => Contact::getType()->getId()])
+//										->where(['fromEntityTypeId' => Contact::entityType()->getId()])
 //										->andWhere('fromId', 'NOT IN', Contact::find()->select('id'))
 //										)->execute();
 //		
@@ -186,14 +196,14 @@ class Migrate63to64 {
 //						->delete(
 //										'core_link', 
 //										(new \go\core\db\Query)
-//										->where(['toEntityTypeId' => Contact::getType()->getId()])
+//										->where(['toEntityTypeId' => Contact::entityType()->getId()])
 //										->andWhere('toId', 'NOT IN', Contact::find()->select('id'))
 //										)->execute();
 		
 		GO()->getDbConnection()
 						->update("core_link", 
 										[
-												'fromEntityTypeId' => Contact::getType()->getId(),
+												'fromEntityTypeId' => Contact::entityType()->getId(),
 												'fromId' => new \go\core\db\Expression('fromId + ' . $this->getCompanyIdIncrement())
 										], 
 										['fromEntityTypeId' => $companyEntityType->getId()])
@@ -202,7 +212,7 @@ class Migrate63to64 {
 		GO()->getDbConnection()
 						->update("core_link", 
 										[
-												'toEntityTypeId' => Contact::getType()->getId(),
+												'toEntityTypeId' => Contact::entityType()->getId(),
 												'toId' => new \go\core\db\Expression('toId + ' . $this->getCompanyIdIncrement())
 										], 
 										['toEntityTypeId' => $companyEntityType->getId()])
@@ -211,7 +221,7 @@ class Migrate63to64 {
 //		GO()->getDbConnection()
 //						->update("core_search", 
 //										[
-//												'entityTypeId' => Contact::getType()->getId(),
+//												'entityTypeId' => Contact::entityType()->getId(),
 //												'entityId' => new \go\core\db\Expression('entityId + ' . $this->getCompanyIdIncrement())
 //										], 
 //										['entityTypeId' => $companyEntityType->getId()])
@@ -265,6 +275,7 @@ class Migrate63to64 {
 
 		$contacts = $db->select()->from('ab_contacts')
 						->where(['addressbook_id' => $addressBook->id])
+						->andWhere('id not in (select id from addressbook_contact)')
 						->orderBy(['id' => 'ASC']);
 		
 		//continue where we left last time if failed.
@@ -445,13 +456,13 @@ class Migrate63to64 {
 
 			$contact->notes = $r['comment'];
 
-			//$contact->filesFolderId = $r['files_folder_id'];
+			$contact->filesFolderId = $r['files_folder_id'];
 
 			$contact->createdAt = new DateTime("@" . $r['ctime']);
 			$contact->modifiedAt = new DateTime("@" . $r['mtime']);
 			$contact->createdBy = \go\core\model\User::findById($r['user_id'], ['id']) ? $r['user_id'] : 1;
-			$contact->modifiedBy = \go\core\model\User::findById($r['muser_id'], ['id']) ? $r['muser_id'] : 1;
-			$contact->goUserId = empty($r['go_user_id']) || !\go\core\model\User::findById($r['go_user_id'], ['id']) ? null : $r['go_user_id'];
+			$contact->modifiedBy = \go\core\model\User::findById($r['muser_id'], ['id']) ? $r['muser_id'] : 1;			
+			$contact->goUserId = empty($r['go_user_id']) || !\go\core\model\User::findById($r['go_user_id'], ['id']) || Contact::findForUser($r['go_user_id'], ['id']) ? null : $r['go_user_id'];
 
 			if ($r['photo']) {
 
@@ -470,7 +481,7 @@ class Migrate63to64 {
 
 			if (!$contact->save()) {
 				GO()->debug($r);
-				throw new \Exception("Could not save contact");
+				throw new \Exception("Could not save contact" . var_export($contact->getValidationErrors(), true));
 			}
 			
 			if($r['company_id']) {				
@@ -489,7 +500,10 @@ class Migrate63to64 {
 	private function copyCompanies(AddressBook $addressBook) {
 		$db = GO()->getDbConnection();		
 
-		$contacts = $db->select()->from('ab_companies')->where(['addressbook_id' => $addressBook->id]);
+		$contacts = $db->select()
+		->from('ab_companies')
+		->where(['addressbook_id' => $addressBook->id])
+		->andWhere('id not in (select id + '.$this->getCompanyIdIncrement().' from addressbook_contact)');
 		
 		//continue where we left last time if failed.
 		$max = $db->selectSingleValue('max(id)')->from("addressbook_contact")->andWhere(['addressBookId' => $addressBook->id])->single();
@@ -587,13 +601,12 @@ class Migrate63to64 {
 
 			$contact->notes = $r['comment'];
 
-			//$contact->filesFolderId = $r['files_folder_id'];
+			$contact->filesFolderId = $r['files_folder_id'];
 
 			$contact->createdAt = new DateTime("@" . $r['ctime']);
 			$contact->modifiedAt = new DateTime("@" . $r['mtime']);
 			$contact->createdBy = \go\core\model\User::findById($r['user_id'], ['id']) ? $r['user_id'] : 1;
 			$contact->modifiedBy = \go\core\model\User::findById($r['muser_id'], ['id']) ? $r['muser_id'] : 1;
-			$contact->goUserId = empty($r['go_user_id']) || !\go\core\model\User::findById($r['go_user_id'], ['id']) ? null : $r['go_user_id'];
 			
 			$contact->IBAN = $r['bank_no'];
 			
@@ -622,9 +635,10 @@ class Migrate63to64 {
 				
 				GO()->debug($r);
 				
-				throw new \Exception("Could not save contact");
+				throw new \Exception("Could not save contact" . var_export($contact->getValidationErrors(), true));
 			}
 		}
 	}
 
 }
+

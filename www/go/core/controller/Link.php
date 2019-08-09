@@ -21,7 +21,10 @@ class Link extends EntityController {
 		$p =  parent::paramsQuery($params);
 		
 		if(empty($p['sort'])) {
-			$p['sort'] = ['eTo.name ASC', 'createdAt DESC'];
+			$p['sort'] = [
+			//	["property" => "eTo.name", "isAscending"=> true],
+				["property" => "createdAt", "isAscending"=> false]
+			];
 		}
 		
 		return $p;

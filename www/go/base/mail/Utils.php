@@ -32,12 +32,12 @@ class Utils{
 
 				$string = str_replace($v, $fld, $string);
 			}
-		}	elseif(preg_match('/(iso-.*)\'\'(.*)/', $string, $matches)){ //check pos for not being to great
+		}	elseif(preg_match('/(.*)\'\'(.*)/', $string, $matches)){ //check pos for not being to great
 			//eg. iso-8859-1''%66%6F%73%73%2D%69%74%2D%73%6D%61%6C%6C%2E%67%69%66
-			$charset = $matches[0];
+			$charset = $matches[1];
 			
 //			throw new \Exception($charset.' : '.substr($string, $pos+2));
-			$string = rawurldecode($matches[1]);
+			$string = rawurldecode($matches[2]);
 
 			$string=\GO\Base\Util\StringHelper::clean_utf8($string, $charset);
 		}else

@@ -14,7 +14,8 @@ go.Modules.register("community", "addressbook", {
 			relations: {
 				organizations: {store: "Contact", fk: "organizationIds"},
 				creator: {store: "User", fk: "createdBy"},
-				modifier: {store: "User", fk: "createdBy"}
+				modifier: {store: "User", fk: "createdBy"},
+				addressbook: {store: "AddressBook", fk: "addressBookId"}
 			},
 
 			/**
@@ -33,6 +34,34 @@ go.Modules.register("community", "addressbook", {
 					multiple: false,
 					title: "Query"
 				},
+				{
+					title: t("Commented at"),
+					name: 'commentedat',
+					multiple: false,
+					type: 'date'
+				},{
+					title: t("Modified at"),
+					name: 'modifiedat',
+					multiple: false,
+					type: 'date'
+				},{
+					title: t("Modified by"),
+					name: 'modifiedBy',
+					multiple: true,
+					type: 'string'
+				},{
+					title: t("Created at"),
+					name: 'createdat',
+					multiple: false,
+					type: 'date'
+				},{
+					title: t("Created by"),
+					name: 'createdby',
+					multiple: true,
+					type: 'string'
+				},
+
+				
 				{
 					name: 'name',
 					title: t("Name"),
@@ -60,6 +89,11 @@ go.Modules.register("community", "addressbook", {
 					type: "string",
 					multiple: true
 				}, {
+					name: 'org',
+					title: t("Organization"),
+					type: "string",
+					multiple: true
+				}, {
 					name: 'gender',
 					title: t("Gender"),
 					type: "select",
@@ -74,13 +108,7 @@ go.Modules.register("community", "addressbook", {
 							value: null,
 							title: t("Unknown")
 						}]
-				},
-				{
-					title: t("Modified at"),
-					name: 'modified',
-					multiple: false,
-					type: 'date'
-				},
+				},			
 				{
 					title: t("Age"),
 					name: 'age',

@@ -71,7 +71,7 @@ class Acl extends Entity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable('core_acl')
-						->addRelation('groups', AclGroup::class, ['id' => 'aclId'], true);
+						->addArray('groups', AclGroup::class, ['id' => 'aclId']);
 	}
 	
 	protected function internalValidate() {
@@ -144,7 +144,7 @@ class Acl extends Entity {
 			return true;
 		}
 		
-		$modSeq = Acl::getType()->nextModSeq();
+		$modSeq = Acl::entityType()->nextModSeq();
 		
 		foreach($addedGroupIds as $groupId) {
 			$success = App::get()->getDbConnection()
@@ -265,20 +265,60 @@ class Acl extends Entity {
 	 * @param int $userId If null then the current user is used.
 	 */
 	public static function applyToQuery(Query $query, $column, $level = self::LEVEL_READ, $userId = null) {
-		
+
+		if(!isset($userId)) {
+			$userId = App::get()->getAuthState() ? App::get()->getAuthState()->getUserId() : false;
+
+			if(!$userId) {
+				throw new Forbidden("Authorization required");
+			}
+		}
+
+		// WHERE in
 		$subQuery = (new Query)
 						->select('aclId')
-						->from('core_acl_group', 'acl_g')
-						->where('acl_g.aclId = '.$column)
+						->from('core_acl_group', 'acl_g')						
 						->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
 						->andWhere([
-								'acl_u.userId' => isset($userId) ? $userId : App::get()->getAuthState()->getUserId()						
-										])
-						->andWhere('acl_g.level', '>=', $level);
+								'acl_u.userId' => $userId			
+										]);
+
+		if($level != self::LEVEL_READ) {			
+			$subQuery->andWhere('acl_g.level', '>=', $level);
+		}
 		
-		$query->whereExists(
-						$subQuery
-						);
+		$query->where($column, 'IN', $subQuery);
+
+		//where exists
+		// $subQuery = (new Query)
+		// 				->select('aclId')
+		// 				->from('core_acl_group', 'acl_g')
+		// 				->where('acl_g.aclId = '.$column)
+		// 				->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
+		// 				->andWhere([
+		// 						'acl_u.userId' => $userId 					
+		// 								]);
+
+		// if($level != self::LEVEL_READ) {			
+		// 	$subQuery->andWhere('acl_g.level', '>=', $level);
+		// }
+		
+		// $query->whereExists(
+		// 				$subQuery
+		// 				);
+
+
+		// join
+		// $on =  'acl_g.aclId = ' . $column;
+		// if($level != self::LEVEL_READ) {
+		// 	$on .= ' AND level >= ' .$level;
+		// }
+
+		// $query->join('core_acl_group', 'acl_g',$on)
+		// 	->join('core_user_group', 'acl_u', 'acl_u.groupId = acl_g.groupId AND acl_u.userId=' . $userId)
+		// 	->select('MAX(acl_g.level) as permissionLevel', true)
+		// 	->groupBy(['id']);
+		
 	}
 	
 	private static $permissionLevelCache = [];

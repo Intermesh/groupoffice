@@ -70,7 +70,7 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 					header: t('Name'),
 					width: dp(200),
 					sortable: true,
-					dataIndex: 'displayName',
+					dataIndex: 'name',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 						var user = record.get("user"),
 							style = user && user.avatarId ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("user").avatarId) + ')"' : "";
@@ -83,8 +83,8 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 						
 						return '<div class="user"><div class="avatar" style="'+style+'"></div>' +
 							'<div class="wrap">'+
-								'<div class="displayName">' + record.get('name') + '</div>' +
-								'<small class="username">' + memberStr + '</small>' +
+								'<div class="displayName">' + value+ '</div>' +
+								'<small class="username">' + Ext.util.Format.htmlEncode(memberStr) + '</small>' +
 							'</div>'+
 							'</div>';
 					}
@@ -155,15 +155,7 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 		
 		this._isDirty = false;
 		
-		var me = this;
-		this.selectedGroups =[];
-		groups.forEach(function(group) {
-			
-			if(!group.groupId) {
-				throw "Invalid value given";
-			}
-			me.selectedGroups.push(group.groupId);
-		});		
+		this.selectedGroups = groups;	
 		
 		if(this.rendered) {
 			this.store.load();
@@ -177,14 +169,8 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 		}
 	},
 	
-	getValue: function () {				
-		var groups = [];
-		this.selectedGroups.forEach(function(groupId) {
-			groups.push({
-				groupId: groupId
-			});
-		});
-		return groups;
+	getValue: function () {
+		return this.selectedGroups;
 	},
 
 	markInvalid: function (msg) {

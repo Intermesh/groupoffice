@@ -50,42 +50,37 @@ class Session extends Observable{
 		
 		//In some cases it doesn't make sense to use the session because the client is
 		//not capable. (WebDAV for example).
-		if(!defined("GO_NO_SESSION")){
-			if (session_status() == PHP_SESSION_NONE) {
+		if(!defined("GO_NO_SESSION") && !$this->isActive() && !headers_sent()){		
 				
-				if(!headers_sent()) {
-					//without cookie_httponly the cookie can be accessed by malicious scripts 
-					//injected to the site and its value can be stolen. Any information stored in 
-					//session tokens may be stolen and used later for identity theft or
-					//user impersonation.
-					ini_set("session.cookie_httponly",1);
+			//without cookie_httponly the cookie can be accessed by malicious scripts 
+			//injected to the site and its value can be stolen. Any information stored in 
+			//session tokens may be stolen and used later for identity theft or
+			//user impersonation.
+			ini_set("session.cookie_httponly",1);
 
-					//Avoid session id in url's to prevent session hijacking.
-					ini_set('session.use_only_cookies',1);
+			//Avoid session id in url's to prevent session hijacking.
+			ini_set('session.use_only_cookies',1);
 
-					if(Util\Http::isHttps()) {
-						ini_set('session.cookie_secure',1);
-					}
-
-
-					if(isset($_REQUEST['GOSID'])){
-						session_id($_REQUEST['GOSID']);				
-					}
-			
-					session_name('groupoffice');
-
-					session_start();				
-				}
-			
-				if(isset($_REQUEST['GOSID'])){
-					if(!isset($_REQUEST['security_token']) || $_SESSION['GO_SESSION']['security_token']!=$_REQUEST['security_token']){
-						throw new \Exception\SecurityTokenMismatch();
-					}
-				}		
+			if(Util\Http::isHttps()) {
+				ini_set('session.cookie_secure',1);
 			}
-			//\GO::debug causes endless loop
-			//\GO::debug("Started session");
+
+
+			if(isset($_REQUEST['GOSID'])){
+				session_id($_REQUEST['GOSID']);				
+			}
+	
+			session_name('groupoffice');
+
+			session_start();				
 		}
+	
+		if(isset($_REQUEST['GOSID'])){
+			if(!isset($_REQUEST['security_token']) || $_SESSION['GO_SESSION']['security_token']!=$_REQUEST['security_token']){
+				throw new \Exception\SecurityTokenMismatch();
+			}
+		}		
+		
 		
 		$this->values = &$_SESSION['GO_SESSION'];
 		
@@ -95,6 +90,10 @@ class Session extends Observable{
 			//$this->_log("security_token");
 			$this->values['security_token']=Util\StringHelper::randomPassword(20,'a-z,A-Z,1-9');				
 		}
+	}
+
+	public function isActive() {
+		return session_status() == PHP_SESSION_ACTIVE;
 	}
 	
 	/**
@@ -192,8 +191,9 @@ class Session extends Observable{
 			setcookie(session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]);
 		}
 		
-		if(session_id()!='')
+		if($this->isActive()) {
 			session_destroy();
+		}
 		
 		if(!headers_sent()){
 			$this->_unsetRemindLoginCookies();
@@ -350,8 +350,9 @@ class Session extends Observable{
 			//the application to identify a valid authenticated session. This is possible in PHP by
 			//using the session_regenerate_id() function.
 
-			if(PHP_SAPI!='cli' && !defined('GO_NO_SESSION'))
+			if(PHP_SAPI!='cli' && $this->isActive()) {
 				session_regenerate_id();
+			}
 			
 			if($countLogin)
 				$this->_log(\GO\Log\Model\Log::ACTION_LOGIN);
@@ -395,7 +396,7 @@ class Session extends Observable{
 	 * the user becoming root permanently. So you can't set session variables.
 	 */
 	public function runAs($id){
-		
+
 		\GO::session()->closeWriting();
 		
 		//Close session writing so that the user won't stay root in browser sessions.

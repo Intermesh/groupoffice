@@ -36,3 +36,11 @@ $updates['201905281248'][] = "ALTER TABLE `addressbook_url` DROP PRIMARY KEY;";
 $updates['201905281248'][] = "ALTER TABLE `addressbook_url` DROP `id`;";
 $updates['201905281248'][] = "ALTER TABLE `addressbook_url` ADD FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 $updates['201905281248'][] = "ALTER TABLE `addressbook_address` DROP `id`";
+
+$updates['201905281248'][] = "DELETE FROM core_entity WHERE moduleId = (select id from core_module where name='addressbook' and package='community') and name='Addresslist';";
+
+$updates['201906181248'][] = "update `addressbook_contact_star` set starred = null where starred = 0;";
+
+$updates['201906181248'][] = "ALTER TABLE `addressbook_contact_star` CHANGE `starred` `starred` TINYINT(1) NULL DEFAULT NULL;";
+
+$updates['201907021042'][] = "ALTER TABLE `addressbook_user_settings` ADD `salutationTemplate` TEXT NOT NULL AFTER `defaultAddressBookId`, ADD `sortBy` ENUM('name','lastName') NOT NULL DEFAULT 'name' AFTER `salutationTemplate`;";

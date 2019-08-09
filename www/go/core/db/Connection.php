@@ -48,8 +48,12 @@ class Connection {
 		$this->password = $password;
 		$this->options = [
 				PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
-				PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci',sql_mode='STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION',time_zone = '+00:00',lc_messages = 'en_US'"
+				PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci',sql_mode='STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',time_zone = '+00:00',lc_messages = 'en_US'"
 		];
+	}
+
+	public function getDsn() {
+		return $this->dsn;
 	}
 
 	/**
@@ -119,7 +123,13 @@ class Connection {
 		if($this->debug) {
 			\go\core\App::get()->getDebugger()->debug($sql);
 		}
-		return $this->getPdo()->query($sql);
+		try {
+			return $this->getPdo()->query($sql);
+		}
+		catch(PDOException $e) {
+			GO()->error("SQL FAILED: " . $sql);
+			throw $e;
+		}
 	}
 	
 	/**
@@ -135,7 +145,13 @@ class Connection {
 		if($this->debug) {
 			\go\core\App::get()->getDebugger()->debug($sql);
 		}
-		return $this->getPdo()->exec($sql);
+		try {
+			return $this->getPdo()->exec($sql);
+		}
+		catch(PDOException $e) {
+			GO()->error("SQL FAILED: " . $sql);
+			throw $e;
+		}
 	}
 	
 
@@ -171,6 +187,22 @@ class Connection {
 		
 		$this->transactionSavePointLevel++;		
 		return $ret;
+	}
+
+	private $resumeLevels = 0;
+
+	public function pauseTransactions() {
+		$this->resumeLevels = $this->transactionSavePointLevel;
+		while($this->transactionSavePointLevel > 0) {
+			$this->commit();
+		}
+	}
+
+	public function resumeTransactions() {
+		while($this->resumeLevels > 0) {
+			$this->beginTransaction();
+			$this->resumeLevels--;
+		}
 	}
 
 	/**
@@ -279,7 +311,7 @@ class Connection {
 	public function delete($tableName, $query = null) {
 		$query = Query::normalize($query);
 
-		$queryBuilder = new QueryBuilder();
+		$queryBuilder = new QueryBuilder($this);
 		$build = $queryBuilder->buildDelete($tableName, $query);
 
 		return $this->createStatement($build);
@@ -324,7 +356,7 @@ class Connection {
 	 */
 	public function insert($tableName, $data, $columns = []) {
 
-		$queryBuilder = new QueryBuilder();
+		$queryBuilder = new QueryBuilder($this);
 		$build = $queryBuilder->buildInsert($tableName, $data, $columns);
 
 		return $this->createStatement($build);
@@ -344,7 +376,7 @@ class Connection {
 	 */
 	public function insertIgnore($tableName, $data, $columns = []) {
 
-		$queryBuilder = new QueryBuilder();
+		$queryBuilder = new QueryBuilder($this);
 		$build = $queryBuilder->buildInsert($tableName, $data, $columns, "INSERT IGNORE");
 
 		return $this->createStatement($build);
@@ -355,7 +387,7 @@ class Connection {
 	 * 
 	 * @see insert()
 	 * @param string $tableName
-	 * @param array|Query $data Key value array or select query
+	 * @param array|Query $data Key value array, array of key value arrays for multi insert or select query
 	 * @param string[] $columns If $data is a query object then you can supply the 
 	 *	selected columns with this parameter. If not given all columns must be 
 	 *	selected in the correct order.
@@ -364,7 +396,7 @@ class Connection {
 	 */
 	public function replace($tableName, $data, $columns = []) {
 
-		$queryBuilder = new QueryBuilder();
+		$queryBuilder = new QueryBuilder($this);
 		$build = $queryBuilder->buildInsert($tableName, $data, $columns, "REPLACE");
 
 		return $this->createStatement($build);
@@ -406,7 +438,7 @@ class Connection {
 	public function update($tableName, $data, $query = null) {
 		$query = Query::normalize($query);
 
-		$queryBuilder = new QueryBuilder();
+		$queryBuilder = new QueryBuilder($this);
 		$build = $queryBuilder->buildUpdate($tableName, $data, $query);
 
 		return $this->createStatement($build);
@@ -457,6 +489,7 @@ class Connection {
 	 */
 	public function createStatement($build) {
 		try {
+			$build['start'] = GO()->getDebugger()->getTimeStamp();
 			$stmt = $this->getPDO()->prepare($build['sql']);
 			$stmt->setBuild($build);
 

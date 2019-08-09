@@ -2,8 +2,11 @@ go.customfields.FieldSetDialog = Ext.extend(go.form.Dialog, {
 	stateId: 'custom-field-set-dialog',
 	title: t('Field set'),
 	entityStore: "FieldSet",
-	autoHeight: true,
+	width: dp(1000),
+	height: dp(800),
+	autoScroll: true,
 	initFormItems: function () {
+		this.addPanel(new go.permissions.SharePanel());
 		return [{
 				xtype: 'fieldset',
 				items: [{

@@ -68,15 +68,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			//try to find store if this button it part of a grid.
 			var grid = this.findParentByType('grid');
 			if(grid) {
-				this.store = grid.store;
-				
-				grid.getSelectionModel().on("rowselect", function() {
-					this.back();
-				}, this);
-				
-				grid.on("rowclick", function() {
-					this.back();
-				}, this);
+				this.store = grid.store;			
 			}
 		}	
 	
@@ -95,7 +87,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 						this.store.load();
 					}
 					
-					this.updateView();
+					
 				},
 				reset: function() {
 					if(this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) {
@@ -105,7 +97,6 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 						delete this.store.baseParams.query;
 					}
 					
-					this.updateView();
 					this.store.load();
 				}
 			});
@@ -174,10 +165,10 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	 * 	 
 	 */
 	back : function(){
-		this.backButton.findParentByType('toolbar').setVisible(false);
-		this.fireEvent('close', this);
+		this.backButton.findParentByType('toolbar').setVisible(false);		
+		this.fireEvent('close', this);		
 	},
-	
+
 	onRender : function(ct, position) {
 		var items = this.initialConfig.tools || [];
 		
@@ -205,7 +196,19 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			hidden: true, //default
 			layout: 'hbox',
 			layoutConfig: {align: 'middle'},
-			items: items
+			items: items,
+			listeners: {
+				scope: this,
+
+				render : function(tb) {
+					tb.getEl().set({tabindex: 0});
+					tb.getEl().on("focusout", function(e) {		
+						if(!this.searchToolBar.getEl().dom.contains(e.browserEvent.relatedTarget)) {
+							this.back();
+						}
+					}, this);
+				}
+			}
 		});
 		var toolbar = this.findParentByType('toolbar');
 		this.searchToolBar.render(toolbar.el);
@@ -215,13 +218,22 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		
 		if(this.store && this.store.entityStore) {
 			
-			var names = Object.keys(this.store.entityStore.entity.filters).filter(function(name) {return name != 'text'});
+			var names =  [], f;
+			
+			for ( var name in this.store.entityStore.entity.filters) {
+				f = this.store.entityStore.entity.filters[name];
+				if(f.name != 'text' && !f.customfield) {
+					names.push(name);
+				}
+			}
 			
 			if(names.length) {
 			
 				var msg = t("You can use these keywords:<br /><br />") + names.join(", ") + "<br /><br />";
 
-				msg += t("For example:<br /><br />" + names[0] + ": \"John Doe\" "+ names[0] + ": Foo%");
+				msg += t("And any custom field by 'databaseName'.") + "<br /><br />";
+
+				msg += t("For example:<br /><br />modifiedBy: \"John Doe\" modifiedBy: Foo%");
 
 				if(names.indexOf('modified') > -1) {
 					msg += " modified: >2019-01-31 23:59 modified: <2019-02-01";
@@ -250,6 +262,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	reset : function() {
 		this.triggerField.setValue("");
 		this.fireEvent('reset', this);
+		this.updateView();
 	},
 	
 	search : function() {
@@ -261,6 +274,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		}
 		
 		this.fireEvent('search', this, v, filters);
+		this.updateView();
 		//this.onSearch.call(this.scope || this, v);
 	},
 

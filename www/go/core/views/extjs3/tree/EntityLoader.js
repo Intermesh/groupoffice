@@ -70,12 +70,14 @@ go.tree.EntityLoader = Ext.extend(Ext.tree.TreeLoader, {
 	},
 	
 	convertEntityToNode : function(entityData) {
+
+		var encoded = go.util.Format.htmlEncode(entityData);
 		return {
 			id: this.entityStore.entity.name + "-" + entityData.id,			
 			data: entityData,						
 			entity:  this.entityStore.entity,
-			text: this.textTpl.apply(entityData),
-			secondaryText: this.secondaryTextTpl.apply(entityData),
+			text: this.textTpl.apply(encoded),
+			secondaryText: this.secondaryTextTpl.apply(encoded),
 			nodeType: 'groupoffice',
 			loader: this
 		};
@@ -84,10 +86,10 @@ go.tree.EntityLoader = Ext.extend(Ext.tree.TreeLoader, {
 	doRequest: function (params, callback, scope, options) {
 
 		//transfort sort parameters to jmap style
-		if(params.sort) {
-			params.sort = [params.sort + " " + params.dir];
-			delete params.dir;
-		}
+		// if(params.sort) {
+		// 	params.sort = [params.sort + " " + params.dir];
+		// 	delete params.dir;
+		// }
 		
 		this.result = this.entityStore.query(params, function (response) {
 			this.entityStore.get(response.ids, function (entities) {

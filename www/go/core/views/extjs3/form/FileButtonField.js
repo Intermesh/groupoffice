@@ -156,7 +156,7 @@ go.form.FileButtonField = Ext.extend(Ext.form.CompositeField,{
 		this.clearButton.enable();
 		this.uploadButton.enable();
 		
-		go.form.FileButtonField.superclass.enable.call(this,);
+		go.form.FileButtonField.superclass.enable.call(this);
 	}
 	
 });

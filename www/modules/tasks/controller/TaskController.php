@@ -20,6 +20,7 @@
 
 namespace GO\Tasks\Controller;
 
+use go\modules\community\comments\model\Comment;
 
 class TaskController extends \GO\Base\Controller\AbstractModelController{
 	
@@ -113,15 +114,13 @@ class TaskController extends \GO\Base\Controller\AbstractModelController{
 	protected function afterSubmit(&$response, &$model, &$params, $modifiedAttributes) {		
 		if(!empty($params['comment']) && \GO::modules()->comments){
 				
-			$comment = new \GO\Comments\Model\Comment();
-			// $comment->id 	
-			$comment->model_id = $model->id;
-			$comment->model_type_id = $model->modelTypeId();
-			$comment->user_id = \GO::user()->id;
-			// $comment->ctime 
-			// $comment->mtime 
-			$comment->comments = $params['comment'];
-			$comment->save();
+			$comment = new  Comment();
+			$comment->setEntity('Task');
+			$comment->entityId = $model->id;
+			$comment->text = $params['comment'];
+			if(!$comment->save()) {
+				throw new \Exception('Could not save comment: '. var_export($comment->getValidationErrors(), true));
+			}
 		}
 		
 		if(\GO::modules()->files){
@@ -149,7 +148,6 @@ class TaskController extends \GO\Base\Controller\AbstractModelController{
 
 	
 	protected function beforeStoreStatement(array &$response, array &$params, \GO\Base\Data\AbstractStore &$store, \GO\Base\Db\FindParams $storeParams) {
-		
 		$multiSel = new \GO\Base\Component\MultiSelectGrid(
 						'ta-taskslists', 
 						"GO\Tasks\Model\Tasklist",$store, $params, true);

@@ -63,7 +63,7 @@ CREATE TABLE `addressbook_contact_star` (
   `contactId` int(11) NOT NULL,
   `userId` int(11) NOT NULL,
   `modSeq` int(11) NOT NULL DEFAULT 0,
-  `starred` tinyint(1) DEFAULT 0
+  `starred` tinyint(1) NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 CREATE TABLE `addressbook_date` (
@@ -98,7 +98,9 @@ CREATE TABLE `addressbook_url` (
 
 CREATE TABLE `addressbook_user_settings` (
   `userId` int(11) NOT NULL,
-  `defaultAddressBookId` int(11) DEFAULT NULL
+  `defaultAddressBookId` int(11) DEFAULT NULL,
+  `salutationTemplate` TEXT NOT NULL, 
+  `sortBy` ENUM('name','lastName') NOT NULL DEFAULT 'name'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 

@@ -31,7 +31,7 @@ $lang = GO::language()->getLanguage(); ?>
 
 	<title><?= \GO::config()->title; ?></title>
 
-	<link href="<?= \GO::view()->getTheme()->getUrl();?>style.css?v=<?=\GO()->getVersion(); ?>" media="screen and (min-device-width:1201px)" type="text/css" rel="stylesheet" />
+	<link href="<?= \GO::view()->getTheme()->getUrl();?>style.css?v=<?=\GO()->getVersion(); ?>" media="(min-device-width:1201px)" type="text/css" rel="stylesheet" />
 	<link rel="stylesheet" type="text/css" media="screen and (max-device-width:1200px)" href="<?= \GO::view()->getTheme()->getUrl(); ?>style-mobile.css?v=<?=\GO()->getVersion(); ?>" />
 	<link href="<?= \GO::view()->getUrl()?>css.php?v=<?=\GO()->getVersion(); ?>" type="text/css" rel="stylesheet" />
 
@@ -43,6 +43,22 @@ $lang = GO::language()->getLanguage(); ?>
 	//$this is \GO\Core\Controller\Auth
 	\GO::router()->getController()->fireEvent('head');
 	?>
+	<style>
+		<?php
+		if(GO()->getSettings()->primaryColor) {
+		?>
+		:root {
+				--c-primary: <?= '#'.GO()->getSettings()->primaryColor; ?> !important;
+				--c-primary-tp: <?= GO()->getSettings()->getPrimaryColorTransparent(); ?> !important;
+		}
+		<?php
+			if(GO()->getSettings()->logoId) {
+				//blob id is not used by script but added only for caching.
+				echo ".go-app-logo, #go-logo {background-image: url(" . GO()->getSettings()->URL . "api/logo.php?blob=" . GO()->getSettings()->logoId . ") !important}";
+			}
+		}
+		?>	
+	</style>
 	<meta http-equiv="Content-Security-Policy" content="<?= $csp; ?>">
 </head>
 <body>

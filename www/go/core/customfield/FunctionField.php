@@ -47,4 +47,13 @@ class FunctionField extends Number {
 		eval("\$result = " . $f . ";");		
 		return $result;
 	}
+
+	public function beforeSave($value, &$record)
+	{
+		//remove data because it's not saved to the database
+		unset($record[$this->field->databaseName]);
+
+		return true;
+	}
+
 }

@@ -532,8 +532,8 @@ class TemplateParser {
 					return null;
 				}
 				$model = $model[$pathPart];
-			}else
-			{
+			}else 
+			{				
 				if (!isset($model->$pathPart)) {
 					return null;
 				}

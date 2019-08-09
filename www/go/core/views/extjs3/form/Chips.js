@@ -175,11 +175,15 @@ go.form.Chips = Ext.extend(Ext.Container, {
 				baseParams.filter = {};				
 			}
 			baseParams.filter.exclude = [];
+
 			this.comboStore = new go.data.Store({
 				fields: [this.valueField, this.displayField],
 				entityStore: this.entityStore,
-				baseParams: baseParams
+				baseParams: baseParams				
 			});
+
+			
+
 		} else
 		{
 			//clone the store.
@@ -206,13 +210,27 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			selectOnFocus: true,
 			forceSelection: true,
 			mode: this.entityStore ? 'remote' : 'local',
-			store: this.comboStore
+			store: this.comboStore,
+			value:"",
+			tpl: new Ext.XTemplate(
+				'<tpl for=".">',
+				'<div class="x-combo-list-item"><tpl if="!values.' + this.valueField + '"><b>' + t("Create new") + ':</b> </tpl>{' + this.displayField + '}</div>',
+				'</tpl>')
 		});		
 		
-		this.comboBox.on('select', function(combo, record, index) {
-			this.dataView.store.add([record]);			
+		this.comboBox.on('select', function(combo, record, index) {			
+
+			if(this.entityStore && !record.data[this.valueField]) {
+				this.createNew(record);
+			} else{
+				this.dataView.store.add([record]);			
+			}
 			combo.reset();			
 		}, this);
+
+		if(this.allowNew) {
+			this.comboStore.on("load", this.addCreateNewRecord, this);
+		}
 		
 		return this.comboBox;
 	},
@@ -224,6 +242,46 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	},
 	validate: function () {
 		return true;
+	},
+
+	createNew : function(record) {
+
+		var data = record.data;
+		if(Ext.isObject(this.allowNew)) {
+			Ext.apply(data, this.allowNew);
+		}
+		var create = {"newid" : data}, me = this;
+
+	 this.entityStore.set({
+			create: create
+		}).then(function(response) {
+			record.id = response.created.newid.id;
+			record.set(id, record.id);
+			me.dataView.store.add([record]);	
+			me.comboBox.reset();		
+		});
+	},
+
+	addCreateNewRecord: function() {
+		var text =  this.comboBox.getRawValue();
+		if(!text) {
+			return;
+		}
+		var def = Ext.data.Record.create([{
+			name: this.valueField
+		},{
+			name: this.displayField
+		}]);
+
+		var recordData = {};
+		recordData[this.displayField] = text;						
+		var record = new def(recordData);
+		this.comboStore.insert(0, record);
+		
+		if(this.comboStore.getCount() > 1) {								
+			this.comboBox.select(0);
+		} 
+		
 	}
 
 

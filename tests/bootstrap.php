@@ -41,7 +41,7 @@ if($installDb) {
 //Install fresh DB
 
 try {
-	App::get()->setConfig(["core" => $config])->setAuthState(new State());
+	App::get()->setConfig(["core" => $config]);
 	
 	if($installDb) {
 		$admin = [
@@ -58,6 +58,9 @@ try {
 				new go\modules\community\addressbook\Module(),
 				]);
 	}
+
+	GO()->setAuthState(new State());
+
 } catch (Exception $e) {
 	echo $e;
 	throw $e;

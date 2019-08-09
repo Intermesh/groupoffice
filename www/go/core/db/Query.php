@@ -425,8 +425,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	}
 
 	public function __toString() {
-		$queryBuilder = new QueryBuilder();
-		$queryBuilder->debug = true;
+		$queryBuilder = new QueryBuilder($this->getDbConnection());
 		$build = $queryBuilder->buildSelect($this);
 		
 		return $queryBuilder->debugBuild($build);
@@ -472,7 +471,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 */
 	public function execute() {
 		
-		$queryBuilder = new QueryBuilder();
+		$queryBuilder = new QueryBuilder($this->getDbConnection());
 		$build = $queryBuilder->buildSelect($this);
 		$build['start'] = GO()->getDebugger()->getTimeStamp();
 		
@@ -540,7 +539,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * @return array eg ['sql' => 'select...', 'params' => []]
 	 */
 	public function build() {
-		$queryBuilder = new QueryBuilder();
+		$queryBuilder = new QueryBuilder($this->getDbConnection());
 		return $queryBuilder->buildSelect($this);
 	}
 

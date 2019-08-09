@@ -77,7 +77,7 @@ go.smtp.AccountDialog = Ext.extend(go.form.Dialog, {
 				value: 'tls',
 				listeners: {
 					change: function (combo, newVal, oldVal) {
-						this.getForm().findField('verifyCertificate').setDisabled(newVal == null);
+						this.formPanel.getForm().findField('verifyCertificate').setDisabled(newVal == null);
 					},
 					scope: this
 				}

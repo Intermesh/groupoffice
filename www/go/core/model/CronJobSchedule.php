@@ -8,6 +8,7 @@ use go\core\jmap\Entity;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
+use Exception;
 
 class CronJobSchedule extends Entity {
 
@@ -71,9 +72,7 @@ class CronJobSchedule extends Entity {
 				$seconds = 60 - $this->nextRunAt->format('s');
 				$this->nextRunAt->modify("+$seconds second");
 			}
-		}
-
-		if (($this->isModified('expression') || (!isset($this->nextRunAt)) && $this->enabled)) {
+		} else if (($this->isModified('expression') || (!isset($this->nextRunAt)) && $this->enabled)) {
 			$this->nextRunAt = $this->getNextRunDate();
 		}
 

@@ -92,8 +92,8 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 						
 						return '<div class="user"><div class="avatar" style="' + style + '"></div>' +
 							'<div class="wrap">'+
-								'<div class="displayName">' + record.get('displayName') + '</div>' +
-								'<small class="username">' + record.get('username') + '</small>' +
+								'<div class="displayName">' + value + '</div>' +
+								'<small class="username">' + Ext.util.Format.htmlEncode(record.get('username')) + '</small>' +
 							'</div>'+
 							'</div>';
 					}
@@ -140,7 +140,7 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 	setValue: function (users) {
 		
 		this._isDirty = false;
-		this.selectedUsers = users.column("userId");
+		this.selectedUsers = users;
 		this.store.load().catch(function(){});
 	},
 	
@@ -172,14 +172,8 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 //		this.store.sortData();
 //	},
 	
-	getValue: function () {				
-		var users = [];
-		this.selectedUsers.forEach(function(userId) {
-			users.push({
-				userId: userId
-			});
-		});
-		return users;
+	getValue: function () {
+		return this.selectedUsers;
 	},
 
 	markInvalid: function (msg) {

@@ -1,6 +1,6 @@
 <?php
 use go\core\ErrorHandler;
-
+use go\core\db\Table;
 
 try {
 	
@@ -18,7 +18,7 @@ try {
 	
 	GO()->getInstaller()->isValidDb();
 	GO()->setCache(new \go\core\cache\None());	
-	\go\core\db\Table::destroyInstances();
+	Table::destroyInstances();
 	
 	$unavailable = GO()->getInstaller()->getUnavailableModules();
 	

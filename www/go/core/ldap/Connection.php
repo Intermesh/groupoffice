@@ -2,6 +2,8 @@
 
 namespace go\core\ldap;
 
+use go\core\Environment;
+
 /**
  * LDAP connection
  * 
@@ -26,10 +28,24 @@ class Connection {
 		
 		$this->link = ldap_connect($uri);
 
-		ldap_set_option($this->link, LDAP_OPT_PROTOCOL_VERSION, 3);
-		ldap_set_option($this->link, LDAP_OPT_REFERRALS, 0);
+		$this->setOption(LDAP_OPT_PROTOCOL_VERSION, 3);
+		$this->setOption(LDAP_OPT_REFERRALS, 0);
 
 		return $this->link != false;
+	}
+
+	/**
+	 * Set LDAP option
+	 * 
+	 * @see https://www.php.net/manual/en/function.ldap-set-option.php
+	 * 
+	 * @param int $name
+	 * @param mixed $value
+	 * 
+	 * @return bool
+	 */
+	public function setOption($name, $value) {
+		return ldap_set_option($this->link, $name, $value);
 	}
 
 	/**
@@ -39,8 +55,8 @@ class Connection {
 	 */
 	public function startTLS() {
 		try {
-			return ldap_start_tls($this->link);
-		} catch (\ErrorException $e) {
+			return ldap_start_tls($this->link);		
+		} catch(\ErrorException $e) {
 			return false;
 		}
 	}

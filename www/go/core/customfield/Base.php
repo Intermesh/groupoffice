@@ -56,6 +56,16 @@ abstract class Base extends Model {
 	protected function getFieldSQL() {
 		return "VARCHAR(".($this->field->getOption('maxLength') ?? 190).") DEFAULT " . GO()->getDbConnection()->getPDO()->quote($this->field->getDefault() ?? "NULL");
 	}
+
+	/**
+	 * 
+	 * Check if this custom field has a column in the custom field record table.
+	 * 
+	 * @return bool
+	 */
+	public function hasColumn() {
+		return $this->getFieldSQL() != false;
+	}
 	
 	public function onFieldValidate() {
 		$fieldSql = $this->getFieldSQL();
@@ -110,7 +120,7 @@ abstract class Base extends Model {
 			}
 		}
 		
-		Table::getInstance($table)->clearCache();
+		Table::destroyInstance($table);
 		
 		return true;
 	}
@@ -136,7 +146,7 @@ abstract class Base extends Model {
 			ErrorHandler::logException($e);
 		}
 		
-		Table::getInstance($table)->clearCache();
+		Table::destroyInstance($table);
 		
 		return true;
 	}
@@ -168,17 +178,40 @@ abstract class Base extends Model {
 	public function dbToApi($value, &$values) {
 		return $value;
 	}
+
+	/**
+	 * Get the data as string
+	 * Used for templates or export
+	 * 
+	 * @param mixed $value The value for this field
+	 * @param array $values The values inserted in the database
+	 * @return string
+	 */
+	public function dbToText($value, &$values) {
+		return $this->dbToApi($value, $values);
+	}
 	
 	/**
 	 * Called after the data is saved to API.
 	 * 
 	 * @see MultiSelect for an advaced example
 	 * @param mixed $value The value for this field
-	 * @param array $values The values inserted in the database
+	 * @param array $customFieldData The custom fields data
 	 * @return boolean
 	 */
-	public function afterSave($value, &$values) {
+	public function afterSave($value, &$customFieldData) {
 		
+		return true;
+	}
+
+	/**
+	 * Validate the input on the model. 
+	 * 
+	 * Use setValidationError if data is invalid:
+	 * 
+	 * 
+	 */
+	public function validate($value, Field $field,  Entity $model) {		
 		return true;
 	}
 	
@@ -187,10 +220,10 @@ abstract class Base extends Model {
 	 * 
 	 * @see MultiSelect for an advaced example
 	 * @param mixed $value The value for this field
-	 * @param array $values The values inserted in the database
+	 * @param array $record The values inserted in the database
 	 * @return boolean
 	 */
-	public function beforeSave($value, &$values) {
+	public function beforeSave($value, &$record) {
 		
 		return true;
 	}

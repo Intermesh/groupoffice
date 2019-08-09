@@ -188,7 +188,7 @@ class MaintenanceController extends AbstractController {
 	
 	protected function actionRemoveDuplicates($params){
 				
-		if(!\GO::modules()->tools)
+		if(!\GO::user()->isAdmin())
 			throw new \GO\Base\Exception\AccessDenied();
 		
 		\GO::session()->runAsRoot();
@@ -316,7 +316,7 @@ class MaintenanceController extends AbstractController {
 	 */
 	protected function actionBuildSearchCache($params) {
 		
-		if(!$this->isCli() && !\GO::modules()->tools && \GO::router()->getControllerAction()!='upgrade')
+		if(!$this->isCli() && !GO::user()->isAdmin() && \GO::router()->getControllerAction()!='upgrade')
 			throw new \GO\Base\Exception\AccessDenied();
 		
 		GO::setIgnoreAclPermissions(true);
@@ -701,7 +701,7 @@ class MaintenanceController extends AbstractController {
 	
 	protected function actionRemoveOldLangKeys($params){
 		
-		if(!$this->isCli() && !GO::modules()->tools)
+		if(!$this->isCli() && !GO::user()->isAdmin())
 			throw new \GO\Base\Exception\AccessDenied();
 		
 		$files = $this->_getAllLanguageFiles();
@@ -811,7 +811,7 @@ class MaintenanceController extends AbstractController {
 	
 	protected function actionCheckDefaultModels(){
 		
-		if(!$this->isCli() && !GO::modules()->tools)
+		if(!$this->isCli() && !GO::user()->isAdmin())
 			throw new \GO\Base\Exception\AccessDenied();
 		
 		GO::session()->closeWriting();
@@ -841,7 +841,7 @@ class MaintenanceController extends AbstractController {
 	
 	protected function actionRemoveEmptyStuff($params){
 		
-		if(!$this->isCli() && !GO::modules()->tools)
+		if(!$this->isCli() && !GO::user()->isAdmin())
 			throw new \GO\Base\Exception\AccessDenied();
 		
 		GO::session()->closeWriting();

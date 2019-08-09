@@ -6953,8 +6953,7 @@ Ext.apply(Ext.EventManager, function(){
                resizeTask = new Ext.util.DelayedTask(this.doResizeEvent);
                Ext.EventManager.on(window, "resize", this.fireWindowResize, this);
 							 Ext.EventManager.on(window, "orientationchange", function() {
-								 console.log("orientationchange");
-								 this.doResizeEvent();
+								this.doResizeEvent();
 							 }, this, {delay: 500});
            }
            resizeEvent.addListener(fn, scope, options);
@@ -8234,12 +8233,25 @@ Ext.Element.addMethods(
 
             
             mask : function(msg, msgCls) {
+                if(this.masking) {
+                    clearTimeout(this.masking);
+                }
+                var me = this;
+                this.masking = setTimeout(function() {
+                    me.doMask(msg, msgCls);
+                }, 500);
+
+            },
+            
+            doMask : function(msg, msgCls) {
                 var me  = this,
                     dom = me.dom,
                     dh  = Ext.DomHelper,
                     EXTELMASKMSG = "ext-el-mask-msg",
                     el,
                     mask;
+
+                this.masking = false;
 
                 if (!/^body/i.test(dom.tagName) && me.getStyle('position') == 'static') {
                     me.addClass(XMASKEDRELATIVE);
@@ -8275,7 +8287,11 @@ Ext.Element.addMethods(
             },
 
             
-            unmask : function() {
+            unmask : function() {                
+                if(this.masking) {
+                    clearTimeout(this.masking);
+                    this.masking = false;                    
+                }
                 var me      = this,
                     dom     = me.dom,
                     mask    = data(dom, 'mask'),
@@ -8295,6 +8311,9 @@ Ext.Element.addMethods(
 
             
             isMasked : function() {
+                if(this.masking) {
+                    return true;
+                }
                 var m = data(this.dom, 'mask');
                 return m && m.isVisible();
             },
@@ -10058,6 +10077,9 @@ Ext.util.Format = function() {
             return value;
         },
 
+        raw : function(value) {
+            return this.undef(value);
+        },
         
         undef : function(value) {
             return value !== undefined ? value : "";
@@ -10353,6 +10375,7 @@ Ext.extend(Ext.XTemplate, Ext.Template, {
     
     codeRe : /\{\[((?:\\\]|.|\n)*?)\]\}/g,
 
+    defaultFormatFunc: "htmlEncode",
     
     applySubTemplate : function(id, values, parent, xindex, xcount){
         var me = this,
@@ -10381,7 +10404,7 @@ Ext.extend(Ext.XTemplate, Ext.Template, {
         var fm = Ext.util.Format,
             useF = this.disableFormats !== true,
             sep = Ext.isGecko ? "+" : ",",
-            body;
+            body, defaultFormatFunc = this.defaultFormatFunc;
 
         function fn(m, name, format, args, math){
             if(name.substr(0, 4) == 'xtpl'){
@@ -10399,6 +10422,9 @@ Ext.extend(Ext.XTemplate, Ext.Template, {
             }
             if(math){
                 v = '(' + v + math + ')';
+            }
+            if(!format) {
+                format = defaultFormatFunc;
             }
             if (format && useF) {
                 args = args ? ',' + args : "";
@@ -39816,8 +39842,8 @@ Ext.menu.Item = Ext.extend(Ext.menu.BaseItem, {
                         ' target="{hrefTarget}"',
                     '</tpl>',
                  '>',
-                     '<img alt="{altText}" src="{icon}" class="x-menu-item-icon {iconCls}"/>',
-                     '<span class="x-menu-item-text">{text}</span>',
+                     '<img alt="{altText}" src="{icon:raw}" class="x-menu-item-icon {iconCls}"/>',
+                     '<span class="x-menu-item-text">{text:raw}</span>',
                  '</a>'
              );
         }
@@ -42063,7 +42089,7 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
 
             if(!this.tpl){
                 
-                this.tpl = '<tpl for="."><div class="'+cls+'-item">{' + this.displayField + '}</div></tpl>';
+                this.tpl = '<tpl for="."><div class="'+cls+'-item">{[fm.htmlEncode(values["' + this.displayField + '"] || "" )]}</div></tpl>';
                 
             }
 
@@ -47187,7 +47213,7 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
                     '<div {tooltip} {attr} class="x-grid3-hd-inner x-grid3-hd-{id}" unselectable="on" style="{istyle}">', 
                         this.grid.enableHdMenu ? '<a class="x-grid3-hd-btn" ></a>' : '',
                         '{value}',
-                        '<img alt="" class="x-grid3-sort-icon" src="', Ext.BLANK_IMAGE_URL, '" />',
+                        '<span alt="" class="x-grid3-sort-icon"></span>',
                     '</div>',
                 '</td>'
             ),
@@ -47548,6 +47574,26 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
         this.layout();
     },
 
+    htmlEncode: false,
+
+    encodeGridValue : function(store, column, record) {
+        if(!this.htmlEncode) {
+            return record.data[column.name];
+        }
+        //Merijn: htmlEncode string types en relations to prevent XSS.
+        var col = store.fields.item(column.name), v = record.data[column.name];
+        if(col) {
+            var dataType = col.type.type, v;
+            if((dataType == "auto" || dataType == "string") && Ext.isString(v)) {    
+                v = Ext.util.Format.htmlEncode(v);
+            } else if(col.type.isRelation) {
+                                        
+                v = go.util.Format.htmlEncode(v);                                    
+            }
+        }
+
+        return v;
+    },
     
     doRender : function(columns, records, store, startRow, colCount, stripe) {
         var templates = this.templates,
@@ -47572,7 +47618,6 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
 
             rowIndex = j + startRow;
 
-            
             for (i = 0; i < colCount; i++) {
                 column = columns[i];
                 
@@ -47580,7 +47625,10 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
                 meta.css   = i === 0 ? 'x-grid3-cell-first ' : (i == last ? 'x-grid3-cell-last ' : '');
                 meta.attr  = meta.cellAttr = '';
                 meta.style = column.style;
-                meta.value = column.renderer.call(column.scope, record.data[column.name], meta, record, rowIndex, i, store);
+
+                var v = this.encodeGridValue(store, column, record);
+                
+                meta.value = column.renderer.call(column.scope, v, meta, record, rowIndex, i, store);
 
                 if (Ext.isEmpty(meta.value)) {
                     meta.value = '&#160;';
@@ -48385,8 +48433,10 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
                 attr    : "",
                 cellAttr: ""
             };
+
+            var v = this.encodeGridValue(store, column, record);
             
-            meta.value = column.renderer.call(column.scope, record.data[column.name], meta, record, rowIndex, i, store);
+            meta.value = column.renderer.call(column.scope, v, meta, record, rowIndex, i, store);
             
             if (Ext.isEmpty(meta.value)) {
                 meta.value = '&#160;';
@@ -50294,7 +50344,9 @@ Ext.grid.ColumnModel = Ext.extend(Ext.util.Observable, {
 
     
     setState : function(col, state) {
+        var groupable = this.config[col].groupable;
         state = Ext.applyIf(state, this.defaults);
+        state.groupable = groupable;
         Ext.apply(this.config[col], state);
     }
 });

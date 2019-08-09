@@ -70,6 +70,7 @@ abstract class EntityController extends Controller {
 		$cls = $this->entityClass();
 
 		$query = $cls::find($cls::getPrimaryKey(false))
+						->select($cls::getPrimaryKey(true)) //only select primary key
 						->limit($params['limit'])
 						->offset($params['position'])
 						->debug();
@@ -77,6 +78,16 @@ abstract class EntityController extends Controller {
 		/* @var $query Query */
 
 		$sort = $this->transformSort($params['sort']);		
+
+		if(!empty($query->getGroupBy())) {
+			//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)		
+			$keys = $cls::getPrimaryKey();
+			foreach($keys as $key) {
+				if(!isset($sort[$key])) {
+					$sort[$key] = 'ASC';
+				}
+			}
+		}
 		
 		$cls::sort($query, $sort);
 
@@ -262,16 +273,11 @@ abstract class EntityController extends Controller {
 		$transformed = [];
 
 		foreach ($sort as $s) {
-			list($column, $direction) = explode(' ', $s);
-			$transformed[$column] = $direction;
-		}
-
-		//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)		
-		$cls = $this->entityClass();
-		$keys = $cls::getPrimaryKey();
-		foreach($keys as $key) {
-			if(!isset($transformed[$key])) {
-				$transformed[$key] = 'ASC';
+			if(is_array($s) && isset($s['property'])) {
+				$transformed[$s['property']] = (isset($s['isAscending']) && $s['isAscending']===false) ? 'DESC' : 'ASC';
+			} else { // for backward compatibility
+				$parts = explode(' ', $s);
+				$transformed[$parts[0]] = $parts[1] ?? 'ASC';
 			}
 		}
 		
@@ -472,13 +478,13 @@ abstract class EntityController extends Controller {
 
 	private function createEntitites($create, &$result) {
 		foreach ($create as $clientId => $properties) {
+
+			$entity = $this->create($properties);
 			
-			if(!$this->canCreate()) {
+			if(!$this->canCreate($entity)) {
 				$result['notCreated'][$clientId] = new SetError("forbidden");
 				continue;
 			}
-			
-			$entity = $this->create($properties);
 
 			if ($entity->save()) {
 				$entityProps = new ArrayObject($entity->toArray());
@@ -499,9 +505,8 @@ abstract class EntityController extends Controller {
 	 * 
 	 * @return boolean
 	 */
-	protected function canCreate() {
-		$cls = $this->entityClass();
-		return $cls::canCreate();
+	protected function canCreate(Entity $entity) {		
+		return $entity->hasPermissionLevel(Acl::LEVEL_CREATE);
 	}
 	
 	/**
@@ -755,7 +760,7 @@ abstract class EntityController extends Controller {
 		$entities = $this->getGetQuery($params);
 		
 		$cls = $this->entityClass();
-		$name = $cls::getType()->getName();
+		$name = $cls::entityType()->getName();
 		
 		$blob = $convertor->exportToBlob($name, $entities);
 		

@@ -46,7 +46,7 @@
 }
 
 .cal-display-panel * {
-	box-sizing: content-box;
+	/* box-sizing: content-box; */
 }
 
 #availability_date{
@@ -251,7 +251,7 @@ background-color: #F1F1F1 !important;
 }
 .x-calGrid-blankRow,.x-calGrid-hourRow{
 	/*new theme fix */
-	box-sizing: content-box;
+	/* box-sizing: content-box; */
 }
 .x-calGrid-blankRow{
 	border-top:1px solid transparent;

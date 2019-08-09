@@ -214,8 +214,6 @@ GO.tasks.TasksPanel = function(config)
 		},this)
 
 		config.view=new Ext.grid.GroupingView({
-			scrollOffset: 2,
-			//forceFit:true,
 			hideGroupedColumn:true,
 			
 			emptyText: t("No Tasks to display", "tasks"),

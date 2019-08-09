@@ -149,6 +149,9 @@ $app-icons: (
 .ml-unseen-from {
 	font-weight: bold;
 }
+.ml-unseen-subject {
+	font-weight: normal;
+}
 
 .ml-seen-subject, .ml-unseen-subject {
 	@extend %font-body2;

@@ -251,6 +251,7 @@ class Field extends AclItemEntity {
 		}
 		
 		try {
+			GO()->getDbConnection()->pauseTransactions();
 			$this->getDataType()->onFieldSave();
 		} catch(\Exception $e) {
 			GO()->warn($e);
@@ -261,6 +262,8 @@ class Field extends AclItemEntity {
 			}
 			
 			return false;
+		} finally {
+			GO()->getDbConnection()->resumeTransactions();
 		}
 		
 		return true;
@@ -270,8 +273,19 @@ class Field extends AclItemEntity {
 		if(!parent::internalDelete()) {
 			return false;
 		}
-		return $this->getDataType()->onFieldDelete();
-	}
+
+		try {
+			GO()->getDbConnection()->pauseTransactions();
+			$success = $this->getDataType()->onFieldDelete();
+		} catch(\Exception $e) {
+			GO()->warn($e);
+			return false;
+		} finally {
+			GO()->getDbConnection()->resumeTransactions();
+		}
+		
+		return true;
+}
 
 	/**
 	 * Get the table name this field is stored in.
@@ -298,11 +312,56 @@ class Field extends AclItemEntity {
 	/**
 	 * Find all fields for an entity
 	 * 
-	 * @param int $entityTypeId
+	 * @param int|string $entityTypeId
 	 * @return Query
 	 */
 	public static function findByEntity($entityTypeId) {
+		if(is_string($entityTypeId)) {
+			$entityTypeId = EntityType::findByName($entityTypeId)->getId();
+		}
 		return static::find()->where(['fs.entityId' => $entityTypeId])->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId');
+	}
+
+
+	/**
+	 * Find or create custom field
+	 * 
+	 * @param string $entity eg. "User"
+	 * @param string $fieldSetName eg. "Forum"
+	 * @param string $databaseName eg. "numberOfPosts"
+	 * @param string $name eg "Number of posts"
+	 * @param string $type Type of custom field eg. Type
+	 * @param array $values extra values to set on the field.
+	 * 
+	 * @return static
+	 */
+	public static function create($entity, $fieldSetName, $databaseName, $name, $type = 'Text', $values = []) {
+		$field = Field::findByEntity($entity)->where(['databaseName' => $databaseName])->single();
+
+		if($field) {
+			return $field;
+		}
+
+		$fieldSet = FieldSet::findByEntity($entity)->where(['name' => $fieldSetName])->single();
+		if(!$fieldSet) {
+			$fieldSet = new FieldSet();		
+			$fieldSet->name = $fieldSetName;
+			$fieldSet->setEntity($entity);
+			if(!$fieldSet->save()) {
+				throw new \Exception("Could not save fieldset");
+			}
+		}
+
+		$field = new Field();
+		$field->databaseName = $databaseName;
+		$field->name = $name;
+		$field->type = $type;
+		$field->fieldSetId = $fieldSet->id;
+		$field->setValues($values);
+		if(!$field->save()) {
+			throw new \Exception("Could not save field");
+		}
+		return $field;
 	}
 
 }

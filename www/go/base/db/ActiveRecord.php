@@ -42,7 +42,7 @@ namespace GO\Base\Db;
 
 use GO\Base\Db\PDO;
 use GO;
-
+use go\core\util\DateTime;
 
 abstract class ActiveRecord extends \GO\Base\Model{
 
@@ -189,7 +189,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * For compatibility with new framework
 	 * @return type
 	 */
-	public static function getType() {
+	public static function entityType() {
 		return \go\core\orm\EntityType::findByClassName(static::class);
 	}
 
@@ -1349,11 +1349,14 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$joinCf = !empty($params['joinCustomFields']) && $this->hasCustomFields();
 
 		if($joinCf) {
-			$cfFieldModels = array_filter(\go\core\model\Field::findByEntity($this->getType()->getId())->all(), function($f) {
-				return $f->type != 'MultiSelect'; //temporary hack
+			$cfFieldModels = array_filter(static::getCustomFieldModels(), function($f) {
+				return $f->getDataType()->hasColumn();
 			});
 			
 			$names = array_map(function($f) {
+				if(empty($f->databaseName)) {
+					throw new Exception("Custom field ". $f->id ." has no databaseName");
+				}
 				return "cf." . $f->databaseName;
 			}, $cfFieldModels);
 			
@@ -2543,6 +2546,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		return $this->getPermissionLevel()>=$level;
 	}
 
+	public function hasPermissionLevel($level) {
+		return $this->checkPermissionLevel($level);
+	}
+
 	/**
 	 * Check when the permissions level was before moving the object to a differend
 	 * related ACL object eg. moving contact to different addressbook
@@ -3071,7 +3078,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 					$acl = new \GO\Base\Model\Acl();
 					$acl->usedIn=$this->tableName().'.'.$this->aclOverwrite();
 					$acl->ownedBy=$oldAcl->ownedBy;
-					$acl->entityTypeId = $this->getType()->getId();
+					$acl->entityTypeId = $this->entityType()->getId();
 					$acl->entityId = $this->id;
 					$acl->save();
 					
@@ -3344,6 +3351,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		
 		return array();
 	}
+
+	public static $log_enabled = true;
 	
 	/**
 	 * Will all a log record in go_log
@@ -3354,7 +3363,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	protected function log($action, $save=true, $modifiedCustomfieldAttrs=false){
 		// jsonData field in go_log might not exist yet during upgrade
-		if(\GO::router()->getControllerRoute() == 'maintenance/upgrade') {
+		if(!self::$log_enabled) {
 			return true;
 		}
 		$message = $this->getLogMessage($action);
@@ -3459,7 +3468,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$acl = new \GO\Base\Model\Acl();
 		$acl->usedIn = $this->tableName().'.'.$this->aclField();
 		$acl->ownedBy=$user_id;
-		$acl->entityTypeId = $this->getType()->getId();
+		$acl->entityTypeId = $this->entityType()->getId();
 		$acl->entityId = $this->id;
 		if(!$acl->save()) {
 			throw new \Exception("Could not save ACL: ".var_export($this->getValidationErrors(), true));
@@ -3554,30 +3563,31 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			return false;
 		}
 		
-		$search = \go\core\model\Search::find()->where('entityTypeId','=', static::getType()->getId())->andWhere('entityId', '=', $this->id)->single();
+		$search = \go\core\model\Search::find()->where('entityTypeId','=', static::entityType()->getId())->andWhere('entityId', '=', $this->id)->single();
 		if(!$search) {
 			$search = new \go\core\model\Search();
-			$search->setEntity(static::getType());
-		}
-		// GO 6.3 backwards compatible
-		if(!empty($attr['mtime'])) {
-			$attr['modifiedAt'] = '@'.$attr['mtime'];			
+			$search->setEntity(static::entityType());
 		}
 		
-		unset($attr['mtime']);
+		if(isset($attr['mtime'])) {
+			$attr['modifiedAt'] = \DateTime::createFromFormat("U", $attr['mtime']);
+			unset($attr['mtime']);
+		} else {
+			$attr['modifiedAt'] = \DateTime::createFromFormat("U", $this->mtime);
+		}
 
 		// Always unset ctime, we don't use it anymore in the searchcache table
 		unset($attr['ctime']);
+		unset($attr['type']);
 
 		if(!isset($attr['description'])) {
 			$attr['description'] = '';
-		}
-		// end GO 6.3 compat
+		}		
 		$search->setValues($attr);
+		unset($attr['modifiedAt']);
 		
 		$search->entityId = $this->id;
-		$search->setAclId(!empty($attr['acl_id']) ? $attr['acl_id'] : $this->findAclId());
-		$search->modifiedAt = \DateTime::createFromFormat("U", $this->mtime);	
+		$search->setAclId(!empty($attr['acl_id']) ? $attr['acl_id'] : $this->findAclId());			
 		//$search->createdAt = \DateTime::createFromFormat("U", $this->mtime);		
 		$search->setKeywords($this->getSearchCacheKeywords($this->localizedName.','.implode(',', $attr)));
 		
@@ -4415,7 +4425,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}else
 		{
 			$to_model_id = $model->id;
-			$to_model_type_id = $model->getType()->getId();
+			$to_model_type_id = $model->entityType()->getId();
 		}
 		
 		
@@ -4488,7 +4498,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}else
 		{
 			$to_model_id = $model->id;
-			$to_model_type_id = $model->getType()->getId();
+			$to_model_type_id = $model->entityType()->getId();
 		}
 		
 		if(!$to_model_id)
@@ -4501,7 +4511,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			"`fromId`=".intval($from_id)." AND fromEntityTypeId=".$from_model_type_id." AND toEntityTypeId=".$to_model_type_id." AND `toId`=".intval($to_model_id);
 		
 		$stmt = $this->getDbConnection()->query($sql);
-		return $stmt->fetch() !== false;
+		return $stmt->fetchColumn(0);
 	}
 //
 //	/**
@@ -4549,7 +4559,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}else
 		{
 			$to_model_id = $model->id;
-			$to_model_type_id = $model->getType()->getId();
+			$to_model_type_id = $model->entityType()->getId();
 		}
 		
 		
@@ -4753,7 +4763,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			
 			echo "Processing ".static::class ."\n";
 			
-			$entityTypeId = static::getType()->getId();
+			$entityTypeId = static::entityType()->getId();
 		
 			$start = 0;
 			$limit = 100;
@@ -5145,7 +5155,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			return false;		
 
 		$comment = new \go\modules\community\comments\model\Comment();
-		$comment->setEntity($this->getType());
+		$comment->setEntity($this->entityType());
 		$comment->entityId = $this->id;
 		$comment->text=$text;
 		if(!$comment->save()) {			

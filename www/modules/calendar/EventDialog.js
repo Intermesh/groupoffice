@@ -363,6 +363,9 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					else
 						this.tabPanel.unhideTabStripItem(this.participantsPanel);
 
+
+					this.fireEvent('load', this);
+
 				},
 				failure : function(form, action) {
 					Ext.Msg.alert(t("Error"), action.result.feedback)
@@ -873,6 +876,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				{
 				xtype: 'compositefield',
 				items: [this.selectCalendar = new GO.calendar.SelectCalendar({
+					dontQueryCalendar :  true,
 					valueField : 'id',
 					displayField : 'name',
 					flex:1,
@@ -938,7 +942,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				xtype:'textarea',
 				fieldLabel:t("Description"),
 				name : 'description',
-				anchor:'0 -300'
+				grow: true
 			}]
 
 		});

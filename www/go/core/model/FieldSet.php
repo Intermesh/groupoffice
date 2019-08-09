@@ -12,6 +12,17 @@ use go\core\orm\Query;
  * ```
  * $fieldsets = \go\core\model\FieldSet::find()->filter(['entities' => ['Event']]);
  * ```
+ * 
+ * Create:
+ * ````
+ * 
+ *		$fieldSet = new FieldSet();
+ *		$fieldSet->name = "Forum";
+ *		$fieldSet->setEntity('User');
+ *		if(!$fieldSet->save()) {
+ *			throw new \Exception("Could not save fieldset");
+ *		}
+ *	```
  */
 class FieldSet extends AclOwnerEntity {
 /**
@@ -58,6 +69,11 @@ class FieldSet extends AclOwnerEntity {
 	public function getFilter() {
 		return empty($this->filter) || $this->filter == '[]'  ? new \stdClass() : json_decode($this->filter, true);
 	}
+
+	protected function canCreate()
+	{
+		return GO()->getAuthState()->getUser()->isAdmin();
+	}
 	
 	public function setFilter($filter) {
 		$this->filter = json_encode($filter);
@@ -98,13 +114,26 @@ class FieldSet extends AclOwnerEntity {
 		return parent::internalDelete();
 	}
 	
-	protected function internalSave() {
-		if(!parent::internalSave()) {
-			return false;
-		}
+	// protected function internalSave() {
+	// 	if(!parent::internalSave()) {
+	// 		return false;
+	// 	}
 		
-		return !$this->isNew() || $this->findAcl()->addGroup(\go\core\model\Group::ID_EVERYONE, \go\core\model\Acl::LEVEL_WRITE)->save();
+	// 	return !$this->isNew() || $this->findAcl()->addGroup(\go\core\model\Group::ID_EVERYONE, \go\core\model\Acl::LEVEL_WRITE)->save();
 		
+	// }
+
+		/**
+	 * Find all fields for an entity
+	 * 
+	 * @param string $name
+	 * @return Query
+	 */
+	public static function findByEntity($name) {
+		$e = \go\core\orm\EntityType::findByName($name);
+		$entityTypeId = $e->getId();
+		return static::find()->where(['entityId' => $entityTypeId]);
 	}
+
 
 }

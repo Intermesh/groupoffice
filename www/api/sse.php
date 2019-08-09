@@ -64,7 +64,7 @@ function checkChanges() {
 	
 	$state = [];
 	foreach ($map as $name => $cls) {		
-		$cls::getType()->clearCache();
+		$cls::entityType()->clearCache();
 		$state[$name] = $cls::getState();
 	}
 	// sendMessage('ping', $state);

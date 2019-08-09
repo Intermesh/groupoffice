@@ -48,7 +48,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	private $_lineBreak;
 	
 	
-	public $attributesFormat = 'formatted';
+	public static $attributesFormat = 'formatted';
 	
 		/**
 	 * Returns a static model of itself
@@ -103,7 +103,8 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		return 'go_templates';
 	}
 	
-	private function _addTagPrefixAndRemoveEmptyValues($attributes, $tagPrefix){
+	private static function _addTagPrefixAndRemoveEmptyValues($attributes, $tagPrefix){
+		$newAttributes = [];
 		if(!empty($tagPrefix)){
 			foreach($attributes as $key=>$value){
 				if(!empty($value))
@@ -114,7 +115,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		return $attributes;
 	}
 	
-	private function getCompanyAttributes(\go\modules\community\addressbook\model\Contact $company, $tagPrefix = 'company:'){
+	public static function getCompanyAttributes(\go\modules\community\addressbook\model\Contact $company, $tagPrefix = 'company:'){
 		$attributes[$tagPrefix . 'salutation'] = GO()->t("Dear sir/madam");
 		
 		$attributes[$tagPrefix . 'crn'] = $company->registrationNumber;
@@ -164,11 +165,11 @@ class Template extends \GO\Base\Db\ActiveRecord{
 			return $attributes;
 	} 
 	
-	private function getContactAttributes($contact, $tagPrefix = 'contact:'){
+	public static function getContactAttributes($contact, $tagPrefix = 'contact:', $companyTagPrefix = 'company:'){
 		$attributes[$tagPrefix . 'salutation'] = GO()->t("Hi")." ".$contact->firstName;
 		$attributes[$tagPrefix . 'sirmadam']=$contact->gender=="M" ? \GO::t('sir') : \GO::t('madam');
 		
-		$attributes[$tagPrefix . 'fist_name'] = $contact->firstName;
+		$attributes[$tagPrefix . 'first_name'] = $contact->firstName;
 		$attributes[$tagPrefix . 'middle_name'] = $contact->middleName;
 		$attributes[$tagPrefix . 'last_name'] = $contact->lastName;
 
@@ -192,6 +193,8 @@ class Template extends \GO\Base\Db\ActiveRecord{
 			$attributes[$tagPrefix . 'email2'] = $contact->emailAddresses[2] ?? "";
 			$attributes[$tagPrefix . 'email3'] = $contact->emailAddresses[3] ?? "";
 
+			$attributes[$tagPrefix . 'function'] = $contact->jobTitle;
+
 			foreach($contact->phoneNumbers as $p) {
 				switch($p->type) {
 					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_HOME:
@@ -205,6 +208,14 @@ class Template extends \GO\Base\Db\ActiveRecord{
 					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_FAX:
 						$attributes[$tagPrefix . 'fax'] = $p->number;
 					break;
+
+					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_MOBILE:
+						if(isset($attributes[$tagPrefix . 'cellular'])) {
+							$attributes[$tagPrefix . 'cellular2'] = $p->number;
+						} else {
+							$attributes[$tagPrefix . 'cellular'] = $p->number;
+						}
+					break;
 				}
 			}
 
@@ -212,7 +223,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 			$orgs = $contact->getOrganizationIds();
 			if(count($orgs) && ($company = \go\modules\community\addressbook\model\Contact::findById($orgs[0])))
 			{
-				$attributes = array_merge($attributes, $this->_getModelAttributes($company, 'company:'));
+				$attributes = array_merge($attributes, static::_getModelAttributes($company, $companyTagPrefix));
 			}
 			
 			return $attributes;
@@ -220,31 +231,24 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	
 	
 	
-	private function _getModelAttributes($model, $tagPrefix=''){
-		$attributes = $model instanceof \GO\Base\Db\ActiveRecord ? $model->getAttributes($this->attributesFormat) : $model->toArray();		
+	private static function _getModelAttributes($model, $tagPrefix=''){
+		$attributes = $model instanceof \GO\Base\Db\ActiveRecord ? $model->getAttributes(static::$attributesFormat) : $model->toArray();		
 		
 		if(method_exists($model, "getCustomFields")){
-			$attributes = array_merge($attributes, $model->getCustomFields());
-			
-			
-			
-		
-			$attributes = array_map(function($a) {
-				return $a instanceof \DateTime ? $a->format(GO()->getAuthState()->getUser()->getDateTimeFormat()) : $a;
-			}, $attributes);
+			$attributes = array_merge($attributes, $model->getCustomFields(true));
 		}
 
-		$attributes = $this->_addTagPrefixAndRemoveEmptyValues($attributes, $tagPrefix);
+		$attributes = static::_addTagPrefixAndRemoveEmptyValues($attributes, $tagPrefix);
 		
 		$cls = get_class($model);
 		
 		switch($cls) {
 			case \go\modules\community\addressbook\model\Contact::class:
 				if($model->isOrganization) {
-					$attributes = array_merge($attributes, $this->getCompanyAttributes($model, $tagPrefix));
+					$attributes = array_merge($attributes, static::getCompanyAttributes($model, $tagPrefix));
 				} else
 				{
-					$attributes = array_merge($attributes, $this->getContactAttributes($model, $tagPrefix));
+					$attributes = array_merge($attributes, static::getContactAttributes($model, $tagPrefix));
 				}
 				
 				break;			
@@ -261,7 +265,10 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		
 		
 		if(\GO::user() && ($contact = \go\modules\community\addressbook\model\Contact::findForUser(\GO::user()->id))){
-			$attributes = array_merge($attributes, $this->_getModelAttributes($contact,'user:'));
+			$attributes = array_merge($attributes, $contact->getCustomFields(true));			
+			$attributes = $this->_addTagPrefixAndRemoveEmptyValues($attributes, 'user:');
+			$attributes = array_merge($attributes, $this->getContactAttributes($contact, 'user:', 'usercompany:'));			
+
 			$attributes['user:sirmadam']=$contact->gender=="M" ? \GO::t('Sir','addressbook', 'community') : \GO::t('Madam', 'addressbook', 'community');
 			
 			$company = false;

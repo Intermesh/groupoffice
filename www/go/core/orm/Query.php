@@ -65,9 +65,9 @@ class Query extends DbQuery {
 		
 		$c = new \go\core\db\Criteria();
 		$cls = $this->model;
-		$c->where(['link.fromEntityTypeId' => $entity->getType()->getId(),
+		$c->where(['link.fromEntityTypeId' => $entity->entityType()->getId(),
 				'link.fromId' => $entity->id,
-				'link.toEntityTypeId' => $cls::getType()->getId()
+				'link.toEntityTypeId' => $cls::entityType()->getId()
 				])->andWhere('link.toId = '.$this->getTableAlias().'.id');
 						
 		return $this->join('core_link', 'link', $c);
@@ -87,6 +87,49 @@ class Query extends DbQuery {
 		}
 		GO()->getDbConnection()->commit();
 		return true;
+	}
+
+	/**
+	 * Join the custom fields table
+	 * 
+	 * @param string $alias The table alias to use.
+	 * @return $this
+	 */
+	public function joinCustomFields($alias = 'customFields') {
+		$cls = $this->model;
+		$this->join($cls::customFieldsTableName(), $alias, $alias . '.id = '.$this->getTableAlias().'.id', 'LEFT');
+
+		return $this;
+	}
+
+	/**
+	 * Join properties on the main model
+	 * 
+	 * @param string[] $path eg. ['emailAddreses']
+	 * @return $this;
+	 */
+	public function joinProperties(array $path) {
+		$cls = $this->model;
+		$alias = $this->getTableAlias();
+
+		foreach($path as $part) {
+			$relation = $cls::getMapping()->getRelation($part);
+			/** @var Relation $relation */
+
+			$cls = $relation->entityName;
+			
+			//TODO: What if the property has more than one table in the mapping? Also might be a problem in Entity::changeReferencedEntities()
+			$table = array_values($cls::getMapping()->getTables())[0]->getName();
+			$on = [];
+			foreach($relation->keys as $from => $to) {
+				$on[] = $alias . '.' .$from . ' = ' . $part . '.' . $to;
+			}
+			$this->join($table, $part, implode(' AND ', $on));
+
+			$alias = $part;
+		}
+
+		return $this;
 	}
 
 }

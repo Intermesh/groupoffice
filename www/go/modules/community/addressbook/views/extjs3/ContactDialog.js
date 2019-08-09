@@ -33,7 +33,24 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 			if(Ext.isDefined(v.isOrganization)) {
 				this.setOrganization(!!v.isOrganization);
 			}
+
+			if(v.addressBookId) {
+				this.organizationsField.allowNew.addressBookId = v.addressBookId;
+			}
 		}, this);
+	},
+
+	updateTitle : function() {
+		if(!this.origTitle) {
+			this.origTitle = this.title;
+		}
+		var title = this.getValues().isOrganization ? t("Organization") : t("Contact"), v = this.titleField.getValue();
+
+		if(v) {
+			title += ": " + Ext.util.Format.htmlEncode(v);
+		}
+
+		this.setTitle(title);
 	},
 
 	initFormItems: function () {
@@ -145,6 +162,10 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						entityStore: "Contact",
 						displayField: "name",
 						valueField: 'id',
+						allowNew: {
+							isOrganization: true,
+							addressBookId: go.User.addressBookSettings.defaultAddressBookId 
+						},
 						storeBaseParams: {
 							filter: {
 								isOrganization: true
@@ -160,8 +181,9 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						allowBlank: false,
 						listeners: {
 							scope: this,
-							change: function() {
+							change: function(cmp, id) {
 								go.customfields.CustomFields.filterFieldSets(this.formPanel);
+								this.organizationsField.allowNew.addressBookId = id;
 							}
 						}
 					})
@@ -227,11 +249,15 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 
 		if (isOrganization) {
 			this.tabPanel.unhideTabStripItem(this.businessPanel);
+			this.jobTitle.setFieldLabel(t("LOB"));
 		} else
 		{
 			this.tabPanel.hideTabStripItem(this.businessPanel);
+			this.jobTitle.setFieldLabel(t("Job title"));
 		}
 
 		this.nameField.nameMenuEnabled = !isOrganization;
+		
+		this.updateTitle();
 	}
 });

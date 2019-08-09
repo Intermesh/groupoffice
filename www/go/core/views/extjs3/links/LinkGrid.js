@@ -50,8 +50,10 @@ go.links.LinkGrid = Ext.extend(go.grid.GridPanel, {
 					p.body = '<small>' +record.data.description + '</small>';
 					return 'x-grid3-row-expanded';				
 			  },
-			  grid: this,
-			  emptyText: t("No items to display")
+				grid: this,
+				emptyText: t("No items to display")
+			  // emptyText: '<span class="go-hrml-formatted">' + t('Use "*" for wildcards and prefix words with "-" to omit results with that word when searching.') + '<br /><br /><a target="_blank" href="https://groupoffice.readthedocs.io/en/latest/using/search.html">' + t('Click here for more information') + '</a></span>',
+				// deferEmptyText: false
 		   }),
 							 
 		this.autoExpandColumn = 'name';
@@ -61,9 +63,6 @@ go.links.LinkGrid = Ext.extend(go.grid.GridPanel, {
 			sortInfo: {
 				field: 'modifiedAt',
 				direction: 'DESC'
-			},
-			baseParams: {
-				filter: {}
 			}
 		});
 		

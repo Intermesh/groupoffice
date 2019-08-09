@@ -13,6 +13,19 @@ use go\core\orm\Relation;
  * Imports a CSV file to entities.
  * 
  * A mapping can be supplied to the JMAP controller or importFile() function. {@see importFile()}
+ * 
+ * The key is the CSV record index and value the 
+ * 	property path. "propName" or "prop.name" if it's a relation.
+ * 	If the relation is a has many values can be separated with " ::: ".
+ * 
+ * For example pass to the options:
+ * 
+ * [
+ * 		"mapping" => [
+ * 			"firstName",
+ * 			"emailAddresses.email"
+ * 	]
+ * ]
  */
 class Csv extends AbstractConverter {
 	
@@ -179,7 +192,7 @@ class Csv extends AbstractConverter {
 			$headers = $this->addSubHeaders($headers, $name, $value);
 		}
 		if(method_exists($entityCls, 'getCustomFields')) {
-			$fields = Field::findByEntity($entityCls::getType()->getId());
+			$fields = Field::findByEntity($entityCls::entityType()->getId());
 			foreach($fields as $field) {
 				$headers[] = ['name' => 'customFields.' . $field->databaseName, 'label' => $field->name, 'many' => $field->getDataType()->hasMany()];
 			}
@@ -214,7 +227,7 @@ class Csv extends AbstractConverter {
 			}
 			
 			$subheader = $header . '.'. $name;
-			$headers =  $this->addSubHeaders($headers, $subheader, $value, $prop->many);
+			$headers =  $this->addSubHeaders($headers, $subheader, $value, $prop->type != Relation::TYPE_HAS_ONE);
 		}	
 		
 		return $headers;
@@ -223,7 +236,7 @@ class Csv extends AbstractConverter {
 	protected function exportEntity(Entity $entity, $fp, $index, $total) {
 
 		if ($index == 0) {
-			fputcsv($fp, array_column($this->getHeaders($entity), 'label'));
+			fputcsv($fp, array_column($this->getHeaders($entity), 'name'));
 		}
 
 		$record = $this->export($entity);

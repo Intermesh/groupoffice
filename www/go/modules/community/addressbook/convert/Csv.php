@@ -66,6 +66,10 @@ class Csv extends convert\Csv {
 			unset($values['organizations']);
 		}
 	}
+
+	public function exportIsOrganization(Contact $contact) {
+		return $contact->isOrganization;
+	}
 	
 	protected function importOrganizations(Contact $contact, $organizationNames) {
 		if(!isset($organizationNames)) {

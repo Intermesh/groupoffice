@@ -3,17 +3,13 @@
 namespace go\core\orm;
 
 use Exception;
-use GO;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
 use go\core\orm\Query;
-use go\core\jmap\EntityController;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
-use GO\Base\Util\TemplateParser;
-use go\core\data\ModelHelper;
 use go\core\data\exception\NotArrayable;
 
 /**
@@ -28,7 +24,7 @@ use go\core\data\exception\NotArrayable;
  * 	$cf = new \go\core\util\ClassFinder();	
  * 	$cf->addNamespace("go\\modules\\community\\email");			
  * 	foreach($cf->findByParent(go\core\orm\Entity::class) as $cls) {
- * 		$cls::getType();
+ * 		$cls::entityType();
  * 	}
  * };
  * 
@@ -193,7 +189,7 @@ abstract class Entity extends Property {
 	 * 
 	 * @return boolean
 	 */
-	public final function save() {	
+	public function save() {	
 
 		$this->isSaving = true;
 
@@ -206,6 +202,7 @@ abstract class Entity extends Property {
 		}
 		
 		if (!$this->internalSave()) {
+			GO()->warn(static::class .'::internalSave() returned false');
 			$this->rollback();
 			return false;
 		}		
@@ -227,6 +224,16 @@ abstract class Entity extends Property {
 	 */
 	public function isSaving() {
 		return $this->isSaving;
+	}
+
+	protected function internalValidate()
+	{
+		if(method_exists($this, 'validateCustomFields')) {
+			if(!$this->validateCustomFields()) {				
+				return false;
+			}
+		}
+		return parent::internalValidate();
 	}
 	
 	/**
@@ -339,7 +346,7 @@ abstract class Entity extends Property {
 	 * @param int $level
 	 * @return boolean
 	 */
-	public function hasPermissionLevel($level = Acl::LEVEL_READ) {
+	public final function hasPermissionLevel($level = Acl::LEVEL_READ) {
 		return $level <= $this->getPermissionLevel();
 	}
 	
@@ -349,15 +356,19 @@ abstract class Entity extends Property {
 	 * @return int
 	 */
 	public function getPermissionLevel() {
+		if($this->isNew()) {
+			return $this->canCreate() ? Acl::LEVEL_CREATE : false;
+		}
 		return GO()->getAuthState() && GO()->getAuthState()->getUser() && GO()->getAuthState()->getUser()->isAdmin() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
 	}
 	
 	/**
 	 * Check if the current user is allowed to create new entities
 	 * 
+	 * @param array $values The values that will be applied to the new model
 	 * @return boolean
 	 */
-	public static function canCreate() {
+	protected function canCreate() {
 		return true;
 	}
 
@@ -395,7 +406,7 @@ abstract class Entity extends Property {
 	 * @return int
 	 */
 	public function findAclId() {
-		$moduleId = static::getType()->getModuleId();
+		$moduleId = static::entityType()->getModuleId();
 		
 		return Module::findById($moduleId)->findAclId();
 	}
@@ -406,7 +417,7 @@ abstract class Entity extends Property {
 	 * 
 	 * @return EntityType
 	 */
-	public static function getType() {		
+	public static function entityType() {		
 
 		$cls = static::class;
 
@@ -480,20 +491,51 @@ abstract class Entity extends Property {
 						});
 						
 		if (static::getMapping()->getColumn('modifiedAt')) {
-			$filters->addDate("modified", function(Criteria $criteria, $comparator, $value) {				
+			$filters->addDate("modifiedAt", function(Criteria $criteria, $comparator, $value) {				
 				$criteria->where('modifiedAt', $comparator, $value);								
+			});
+		}
+
+
+		if (static::getMapping()->getColumn('modifiedBy')) {
+			$filters->addText("modifiedBy", function(Criteria $criteria, $comparator, $value, Query $query) {				
+				if(!$query->isJoined('core_user', 'modifier')) {
+					$query->join('core_user','modifier', 'modifier.id = '. $query->getTableAlias() .'.modifiedBy');
+				}
+	
+				$criteria->where('modifier.displayName', $comparator, $value);					
 			});
 		}
 		
 		if (static::getMapping()->getColumn('createdAt')) {
-			$filters->addDate("created", function(Criteria $criteria, $comparator, $value) {				
+			$filters->addDate("createdAt", function(Criteria $criteria, $comparator, $value) {				
 				$criteria->where('createdAt', $comparator, $value);								
 			});
 		}
+
+
+		if (static::getMapping()->getColumn('createdBy')) {
+			$filters->addText("createdBy", function(Criteria $criteria, $comparator, $value, Query $query) {				
+				if(!$query->isJoined('core_user', 'creator')) {
+					$query->join('core_user','creator', 'creator.id = '. $query->getTableAlias() .'.createdBy');
+				}
+	
+				$criteria->where('creator.displayName', $comparator, $value);					
+			});
+		}
+
 		
 		if(method_exists(static::class, 'defineCustomFieldFilters')) {
 			static::defineCustomFieldFilters($filters);
 		}
+		
+		$filters->addDate('commentedAt', function(Criteria $criteria, $comparator, $value, Query $query) {
+			if(!$query->isJoined('comments_comment', 'comment')) {
+				$query->join('comments_comment','comment', 'comment.entityId = '. $query->getTableAlias() .'.id AND comment.entityTypeId=' . static::entityType()->getId());
+			}
+
+			$criteria->where('comment.modifiedAt', $comparator, $value);					
+		});
 
 		static::fireEvent(self::EVENT_FILTER, $filters);
 		
@@ -546,7 +588,7 @@ abstract class Entity extends Property {
 		$columns = static::textFilterColumns();
 		
 		if(empty($columns)) {
-			GO()->warn(static::class . ' entity has no searchColumns() defined. The q filter will not work.');
+			GO()->warn(static::class . ' entity has no textFilterColumns() defined. The q filter will not work.');
 		}
 		
 		//Explode string into tokens and wrap in wildcard signs to search within the texts.
@@ -626,7 +668,7 @@ abstract class Entity extends Property {
 		//Enable sorting on customfields with ['customFields.fieldName' => 'DESC']
 		foreach($sort as $field => $dir) {
 			if(substr($field, 0, 13) == "customFields.") {
-				$query->join(static::customFieldsTableName(), 'customFields', 'customFields.id = '.$query->getTableAlias().'.id', 'LEFT');
+				$query->joinCustomFields();				
 				break;
 			}
 		}
@@ -680,7 +722,7 @@ abstract class Entity extends Property {
 	 * @return array
 	 */
 	public function toTemplate() {
-		// return [lcfirst(self::getType()->getName()) => $this];
+		// return [lcfirst(self::entityType()->getName()) => $this];
 
 		$arr = [];
 		
@@ -690,7 +732,7 @@ abstract class Entity extends Property {
 
 		foreach ($properties as $propName) {
 			try {
-				$value = ModelHelper::getValue($this, $propName);
+				$value = $this->getValue($propName);
 				$arr[$propName] = method_exists($value, 'toTemplate') ? $value->toTemplate() : $value;
 			} catch (NotArrayable $e) {
 				
@@ -706,7 +748,7 @@ abstract class Entity extends Property {
 	 */
 	public static function check() {
 		echo "Checking ".static::class."\n";
-		if(property_exists(static::class, 'filesFolderId')) {
+		if(property_exists(static::class, 'filesFolderId') && Module::isInstalled('legacy', 'files')) {
 			echo "Fixing files folder ID's\n";
 			$tables = static::getMapping()->getTables();
 			$table = array_values($tables)[0]->getName();

@@ -35,11 +35,11 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 		var tpl = new Ext.XTemplate('<div class="icons"><tpl for=".">\
 				<p data-id="{id}">\
 				<tpl if="xindex === 1">\
-					<i class="label ' + this.link.iconCls + '" ext:qtip="{toEntity}"></i>\
+					<i class="label ' + this.link.iconCls + ' hide-on-hover" ext:qtip="{toEntity}"></i>\
 				</tpl>\
 				<tpl for="to">\
 				<a>{name}</a>\
-				<small class="go-top-right">{[go.util.Format.shortDateTime(parent.createdAt)]}</small>\
+				<small class="go-top-right">{[go.util.Format.shortDateTime(values.modifiedAt)]}</small>\
 				<label>{description}</label>\
 				<a class="right show-on-hover"><i class="icon">delete</i></a>\
 				</tpl>\
@@ -99,9 +99,14 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 						if(e.target.tagName === "I" && e.target.innerHTML === 'delete') {							
 							//this.delete(record);
 							
-							go.Db.store("Link").set({
-								destroy: [record.id]
-							});
+							Ext.MessageBox.confirm(t("Delete"), t("Are you sure you want to delete this item?"), function(btn){
+								if(btn == "yes") {
+									go.Db.store("Link").set({
+										destroy: [record.id]
+									});
+								}
+							}, this);
+							
 						} else 
 						{
 							var record = this.store.getById(node.getAttribute('data-id'));

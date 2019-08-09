@@ -142,8 +142,7 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 				fields: ['name', 'icon', 'inputValue'], //icon and iconCls are supported.
 				data: [					
 					[t("Organization"), 'business', true],
-					[t("Contact"), 'person', false],
-					['-']
+					[t("Contact"), 'person', false]					
 				]
 			}),
 			simpleSelect: true,
@@ -186,6 +185,9 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 			],
 			items: [
 				orgFilter,
+				
+				{xtype: "box", autoEl: "hr"},
+
 				this.filterGrid = new go.filter.FilterGrid({
 					filterStore: this.grid.store,
 					entity: "Contact"

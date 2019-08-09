@@ -20,7 +20,7 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 		this.plugins = this.plugins || [];
 		this.plugins.push(actions);
 		
-		this.bbar = ['->', {
+		this.bbar = ['->', this.addButton = new Ext.Button({
 			iconCls: 'ic-add',
 			handler: function () {
 				// access the Record constructor through the grid's store
@@ -33,7 +33,7 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 				this.startEditing(this.getStore().getCount() - 1, 0);
 			},
 			scope: this
-		}];
+		})];
 
 		go.form.GridField.superclass.initComponent.call(this);
 		
@@ -103,6 +103,10 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 	reset : function() {
 		this.setValue([]);
 		this.dirty = false;
+	},
+
+	focus : function() {
+		this.addButton.focus();
 	},
 
 	initRowActions: function () {

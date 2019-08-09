@@ -30,7 +30,7 @@ go.panels.ScrollLoader = {
 			}, this, {single: true});
 
 			this.store.on("load", function(store, records, o){
-				this.allRecordsLoaded = records.length < this.pageSize;
+				this.allRecordsLoaded = records.length != this.pageSize;
 				//If this element or any parent is hidden then  this.el.dom.offsetParent == null
 				if(this.rendered && this.el.dom.offsetParent) {
 					this.loadMore();			

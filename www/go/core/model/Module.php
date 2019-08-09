@@ -19,6 +19,20 @@ class Module extends AclOwnerEntity {
 	public $admin_menu;
 	public $version;
 	public $enabled;
+
+
+	/**
+	 * This is here for compatibility with old modules management page that's not refactored yet. Remove when refactored.
+	 * @deprecated
+	 */
+	public function getAclId() {
+		return $this->aclId;
+	}
+
+	protected function canCreate()
+	{
+		return GO()->getAuthState()->getUser()->isAdmin();
+	}
 	
 	protected static function textFilterColumns()
 	{
@@ -47,7 +61,7 @@ class Module extends AclOwnerEntity {
 		//When module groups change the groups change too. Because the have a "modules" property.
 		$aclChanges = $this->getAclChanges();
 		if(!empty($aclChanges)) {
-			Group::getType()
+			Group::entityType()
 				->changes(
 					GO()->getDbConnection()
 						->select('id as entityId, aclId, "0" as destroyed')
@@ -103,6 +117,11 @@ class Module extends AclOwnerEntity {
 	
 	private function getModuleClass() {		
 		return "\\go\\modules\\" . $this->package ."\\" . $this->name ."\\Module";
+	}
+
+	public function folder() {
+		$root = GO()->getEnvironment()->getInstallFolder();
+		return $root->getFolder("/go/modules/" . $this->package ."/" . $this->name ."/");
 	}	
 	
 	public function isAvailable() {
@@ -125,7 +144,7 @@ class Module extends AclOwnerEntity {
 		
 		//todo, how to handle licenses for future packages?
 		$cls = $this->getModuleClass();
-		return class_exists($cls);
+		return class_exists($cls) && (new $cls)->isLicensed();
 	}
 
 	/**
@@ -229,7 +248,12 @@ class Module extends AclOwnerEntity {
 	 * @return boolean
 	 */
 	public static function isAvailableFor($package, $name, $userId = null, $level = Acl::LEVEL_READ) {
-		$query = static::find()->where(['package' => $package, 'name' => $name]);
+
+		if($package == "legacy") {
+			$package = null;
+		}
+
+		$query = static::find()->where(['package' => $package, 'name' => $name, 'enabled' => true]);
 		static::applyAclToQuery($query, $level, $userId);
 		
 		return $query->single() !== false;
@@ -240,10 +264,25 @@ class Module extends AclOwnerEntity {
 	 * 
 	 * @param string $package
 	 * @param string $name
+	 * @param bool $enabled
 	 * @return self
 	 */
-	public static function findByName($package, $name) {
-		return static::find()->where(['package' => $package, 'name' => $name])->single();
+	public static function findByName($package, $name, $enabled = true) {
+		if($package == "legacy") {
+			$package = null;
+		}
+		return static::find()->where(['package' => $package, 'name' => $name, 'enabled' => $enabled])->single();
+	}
+
+	/**
+	 * Check if a module is installed
+	 *
+	 * @param string $package
+	 * @param string $name
+	 * @return bool
+	 */
+	public static function isInstalled($package, $name) {
+		return static::findByName($package, $name) != false;
 	}
 	
 	/**
@@ -255,9 +294,9 @@ class Module extends AclOwnerEntity {
 		if(!isset($this->package)) {
 			return null;
 		}
-		
-		if($this->name == "core") {
-			
+
+		if(!$this->isAvailable()) {
+			return null;
 		}
 		
 		return $this->module()->getSettings();

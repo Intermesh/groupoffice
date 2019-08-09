@@ -1,5 +1,5 @@
 @media print {
- .go-warning-msg,.message-move,.em-autolink-message,.em-contact-link-container,.em-link-message{ display: none !important; }
+ .go-warning-msg,.message-move,.em-autolink-message,.em-contact-link-container,.em-links,.em-link-message, .em-links-header{ display: none !important; }
 }
 
 .em-autolink-message{

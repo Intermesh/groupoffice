@@ -1,3 +1,12 @@
+go.print = function(tmpl, data) {
+	var paper = document.getElementById('paper');
+	if(!paper) {
+		document.body.insertAdjacentHTML('beforeend', '<div id="paper"></div>');
+		paper = document.getElementById('paper');
+	}
+	paper.innerHTML = tmpl.apply(data);
+	window.print();
+};
 go.util =  (function () {
 	return {
 
@@ -26,6 +35,18 @@ go.util =  (function () {
 					++u;
 				} while(Math.abs(bytes) >= thresh && u < units.length - 1);
 				return bytes.toFixed(1)+' '+units[u];
+		},
+		
+		isEqual : function(a, b) {
+			if(a === b) {
+				return true;
+			}
+			
+			if(Ext.isObject(a) && Ext.isObject(b) && JSON.stringify(a) === JSON.stringify(b) ) {
+				return true;
+			}
+			
+			return false;
 		},
 
 		empty: function (v) {
@@ -100,26 +121,36 @@ go.util =  (function () {
 		 * @param {Object} config {name: "Merijn" email: "mschering@intermesh.nl", subject: "Hello", body: "Just saying hello!"}
 		 * @return {undefined}
 		 */
-		mailto: function (config) {
-			var email = config.email;
+		mailto: function (config, event) {
+			// event.preventDefault();
+			// var email = config.email;
 
-			if (config.name) {
-				email = '"' + config.name.replace(/"/g, '\"') + '" <' + config.email + '>';
-			}
+			// if (config.name) {
+			// 	email = '"' + config.name.replace(/"/g, '\\"') + '" <' + config.email + '>';
+			// }
 
-			document.location = "mailto:" + email;
+			// document.location = "mailto:" + email;
 		},
 
-		callto: function (config) {
-			document.location = "tel:" + config.number;
+		callto: function (config, event) {
+			// event.preventDefault();
+			// document.location = "tel://" + config.number;
 		},
 
 		streetAddress: function (config) {
 
+			var adr = config.street + " " + config.street2;			
+			if(config.zipCode) {
+				adr += ", " + config.zipCode.replace(/ /g, ''); 
+			}
+			if(config.country) {
+				adr += ", " + config.country;
+			}
+
 			if(Ext.isSafari || Ext.isMac) {
-				document.location = "http://maps.apple.com/?address=" + encodeURIComponent(config.street + ", " + config.zipCode.replace(/ /g, '') + ", " + config.country);
+				document.location = "http://maps.apple.com/?address=" + encodeURIComponent(adr);
 			} else {
-				window.open("https://www.google.com/maps/place/" + encodeURIComponent(config.street + ", " + config.zipCode.replace(/ /g, '') + ", " + config.country));	
+				window.open("https://www.google.com/maps/place/" + encodeURIComponent(adr));	
 			}
 
 			//window.open("https://www.openstreetmap.org/search?query=" + encodeURIComponent(config.street + ", " + config.zipCode.replace(/ /g, '') + ", " + config.country));
@@ -344,8 +375,8 @@ go.util =  (function () {
 			});
 		},
 
-		parseEmail : function(emails) {
-			var re  = /(?:"?([A-Z][^<"]+)"?\s*)?<?([^>\s,]+)/g;
+		parseEmail : function(emails) {			
+			var re  = /(?:"?([A-Z]?[^<"]*)"?\s*)?<?([^>\s,]+)/g;
 			var a = [];
 			while (m = re.exec(emails)) {
 				if(m[1]) { m[1] = m[1].trim(); }

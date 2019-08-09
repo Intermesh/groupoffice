@@ -160,7 +160,8 @@ class Bookmark extends EntityController {
 	 */
 	public static function updateLogos() {
 
-		$results = GO()->getDbConnection()->select("*")->from("bm_bookmarks");
+		$results = GO()->getDbConnection()->select("*")->from("bm_bookmarks")->where('category_id IN (select id from bookmarks_category)');
+
 		foreach($results as $result) {
 			$data = [];
 			$data['id'] = $result["id"];
@@ -189,7 +190,7 @@ class Bookmark extends EntityController {
 			} else{
 				unset($data['logo']);
 			}
-			GO()->getDbConnection()->insert('bookmarks_bookmark', $data)->execute();
+			GO()->getDbConnection()->replace('bookmarks_bookmark', $data)->execute();
 		}
 	}
 }

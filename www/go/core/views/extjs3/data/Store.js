@@ -26,6 +26,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	
 	enableCustomFields: true,
 	
+	
 	constructor: function (config) {
 		
 		config = config || {};
@@ -45,7 +46,9 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 				sort: 'sort', // The parameter name which specifies the column to sort on
 				dir: 'dir'       // The parameter name which specifies the sort direction
 			},
-			proxy: config.entityStore ? new go.data.EntityStoreProxy(config) : new go.data.JmapProxy(config)
+			proxy: config.entityStore ? 
+				new go.data.EntityStoreProxy({entityStore: config.entityStore, fields: config.fields}) :
+				new go.data.JmapProxy({method: config.method, fields: config.fields})
 		}));        
 		
 		this.setup();		
@@ -114,17 +117,17 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 				queue[r.phantom?'create':'update'][r.id] = change;
 			}
 		}
-		if(hasChanges) {
-			if(this.fireEvent('beforesave', this, queue) !== false){
-				//console.log(queue);
-				this.entityStore.set(queue, function(options, success, queue){
-					this.commitChanges();
-					if(cb) {
-						cb(success);
-					}
-				},this);
-			}
+		if(!hasChanges || this.fireEvent('beforesave', this, queue) === false) {
+			return Promise.resolve();
 		}
+		//console.log(queue);
+		return this.entityStore.set(queue, function(options, success, queue){
+			this.commitChanges();
+			if(cb) {
+				cb(success);
+			}
+		},this);	
+
 	},
 
 	load: function(o) {
@@ -141,7 +144,8 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 				if(success) {
 					resolve(records);
 				} else{
-					reject();
+					//hack to pass error message from EntityStoreProxy to load callback
+					reject(options.error);
 				}				
 			};
 

@@ -34,6 +34,23 @@
 	};
 	
 	go.util.Format = {
+
+		htmlEncode  : function(v) {
+
+			if(Ext.isArray(v)) {
+				for(var i = 0, l = v.length; i < l; i++) {
+					v[i] = this.htmlEncode(v[i]);
+				}		
+			} else if(Ext.isObject(v)) {
+				for(var key in v) {
+					v[key] = this.htmlEncode(v[key]);
+				}
+			} else if(Ext.isString(v)){
+				v = Ext.util.Format.htmlEncode(v);
+			}
+
+			return v;
+		},
 		
 		dateFormats: new Ext.data.ArrayStore({
 						fields: ['format', 'label'],
@@ -66,11 +83,12 @@
 			return Math.abs(ageDate.getUTCFullYear() - 1970);
 		},
 		
-		duration : function(minutes) {
+		duration : function(minutes, pad) {
 			var time = parseInt(minutes);
 			var hours = Math.floor( time / 60);          
 			var minutes = time % 60;
 			minutes = (minutes < 10) ? "0"+minutes : minutes;
+			hours = (pad && hours < 10) ? "0"+hours : hours;
 			return hours+':'+minutes;
 		},
 		//valid str format is 2:04, 08:00, (19:61 == 20:01)

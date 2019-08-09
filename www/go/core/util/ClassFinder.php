@@ -149,30 +149,17 @@ class ClassFinder {
 	}
 
 	private function hasLicense(File $file, $namespace) {
-		
-		//TODO read license from Module.php
 
 		//check for pro license on business package
-		if(!strstr($namespace, "go\\modules\\business")) {
+		if(!strstr($namespace, "go\\modules") || $file->getName() == 'Module.php') {
 			return true;
 		}
 
-		//check data for presence of ionCube in code.
-		// $data = $file->getContents(0, 100);
-		$data = file_get_contents($file->getPath(), false, null, 0, 100);
-		if(strpos($data, 'ionCube') === false) {			
-			return true;
-		}
+		$parts = explode("\\", $namespace);
 
-		if(!extension_loaded('ionCube Loader')) {
-			return false;
-		}
-		
-		if(!GO()->getEnvironment()->getInstallFolder()->getFile('groupoffice-pro-' . substr(GO()->getVersion(), 0, 3) .' license.txt')->exists()) {
-			return false;
-		}
+		$moduleCls= "go\\modules\\". $parts[2]."\\".$parts[3]."\\Module";
 
-		return true;
+		return !class_exists($moduleCls) || (new $moduleCls)->isLicensed();
 	}
 
 	private function folderToClassNames(Folder $folder, $namespace) {	

@@ -3,19 +3,23 @@
 go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 	entityStore: "Contact",
 	stateId: 'addressbook-contact-detail',
-	
+	relations: ["addressbook"],
 	initComponent: function () {
 		
 		this.tbar = this.initToolbar();
 		
 		Ext.apply(this, {
-			items: [{
+			items: [	
+			
+				
+				{
 					xtype: 'container',
 					layout: "hbox",
 					cls: "go-addressbook-name-panel",
 					items: [						
+					
 						this.namePanel = new Ext.BoxComponent({
-							tpl: "<h3>{name}</h3><h4>{jobTitle}</h4>"
+							tpl: "<h3>{name}</h3><h4>{jobTitle}</h4>" 							
 						}),						
 						this.urlPanel = new Ext.BoxComponent({
 							flex: 1,
@@ -34,10 +38,10 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 				
 				{
 					tpl: new Ext.XTemplate('<div class="go-detail-view-avatar">\
-<div class="avatar {[values.isOrganization ? \'organization\' : \'\']}" style="{[this.getStyle(values.photoBlobId)]}">{[this.getHtml(values.isOrganization)]}</div></div>', 
+<div class="avatar {[values.isOrganization && !values.photoBlobId ? \'organization\' : \'\']}" style="{[this.getStyle(values.photoBlobId)]}">{[this.getHtml(values.isOrganization, values.photoBlobId)]}</div></div>', 
 					{
-						getHtml: function (isOrganization) {
-							return isOrganization ? '<i class="icon">business</i>' : "";
+						getHtml: function (isOrganization, photoBlobId) {
+							return isOrganization && !photoBlobId ? '<i class="icon">business</i>' : "";
 						},
 						getStyle: function (photoBlobId) {
 							return photoBlobId ? 'background-image: url(' + go.Jmap.downloadUrl(photoBlobId) + ')"' : "";
@@ -50,13 +54,19 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					onLoad: function(dv) {
 						dv.emailButton.menu.removeAll();						
 						dv.data.emailAddresses.forEach(function(a) {
+
+							
+							var	mailto = '"' + dv.data.name.replace(/"/g, '\\"') + '" <' + a.email + '>';
+							
+
 							dv.emailButton.menu.addMenuItem({
 								text: "<div>" + a.email + "</div><small>" + (t("emailTypes")[a.type] || a.type) + "</small>",
-								handler: function() {
+								href: "mailto:" + mailto,
+								handler: function(btn, e) {
 									go.util.mailto({
 										email: a.email,
-										name: dv.name
-									});
+										name: dv.data.name
+									}, e);
 								}
 							});
 						});
@@ -65,13 +75,16 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						
 						dv.callButton.menu.removeAll();						
 						dv.data.phoneNumbers.forEach(function(a) {
+							var sanitized = a.number.replace(/[^0-9+]/g, "");
+
 							dv.callButton.menu.addMenuItem({
 								text: "<div>" + a.number + "</div><small>" + (t("phoneTypes")[a.type] || a.type)  + "</small>",
-								handler: function() {
+								href: "tel://" + sanitized,
+								handler: function(btn, e) {									
 									go.util.callto({
-										number: a.number,
+										number: sanitized,
 										name: dv.name
-									});
+									}, e);
 								}
 							});
 						});
@@ -146,6 +159,9 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 							<label>{[t("dateTypes")[values.type] || values.type]}</label>\
 						</a></tpl>\
 					</div>	</tpl>'
+				},	{
+					xtype: "box",
+					tpl: '<div class="icons"><hr class="indent"><tpl for="addressbook"><p><i class="icon label">import_contacts</i><span>{name}</span>	<label>{[t("Address book")]}</label>\</p></tpl></div>'
 				},
 				{
 					xtype: 'panel',

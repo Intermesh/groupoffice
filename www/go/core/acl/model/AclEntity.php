@@ -9,6 +9,11 @@ use function GO;
 use go\core\model\Acl;
 
 abstract class AclEntity extends Entity {
+
+
+
+	protected $permissionLevel;
+	
 	/**
 	 * Get the current state of this entity
 	 * 
@@ -16,7 +21,7 @@ abstract class AclEntity extends Entity {
 	 * @return string
 	 */
 	public static function getState($entityState = null) {
-		return parent::getState($entityState) . ':' . Acl::getType()->getHighestModSeq();
+		return parent::getState($entityState) . ':' . Acl::entityType()->getHighestModSeq();
 	}
 	
 	
@@ -59,7 +64,7 @@ abstract class AclEntity extends Entity {
 			return $result;
 		}
 			
-		$entityType = static::getType();		
+		$entityType = static::entityType();		
 
 		$isAclItem = is_a(static::class, AclItemEntity::class, true);			
 
@@ -119,9 +124,13 @@ abstract class AclEntity extends Entity {
 	}
 	
 	protected static function defineFilters() {
-		return parent::defineFilters()->add("permissionLevel", function(Criteria $criteria, $value, Query $query) {
+		return parent::defineFilters()
+						->add("permissionLevelUserId", function() {
+							//dummy used in permissionLevel filter.
+						})
+						->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filter) {
 			//Permission level is always added to the main query so that it's always applied with AND
-			static::applyAclToQuery($query, $value);
+			static::applyAclToQuery($query, $value, $filter['permissionLevelUserId'] ?? null);
 		});
 	}
 

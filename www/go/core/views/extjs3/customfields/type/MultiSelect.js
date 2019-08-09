@@ -29,8 +29,7 @@ go.customfields.type.MultiSelect = Ext.extend(go.customfields.type.Text, {
 		if(!values) {
 			return "";
 		}
-		
-		var options = []
+		var options = [];
 		values.forEach(function(value){
 			var opt = customfield.dataType.options.find(function(o) {
 				return o.id == value;
@@ -39,7 +38,7 @@ go.customfields.type.MultiSelect = Ext.extend(go.customfields.type.Text, {
 			if(opt) {
 				options.push(opt.text);
 			}
-		})
+		});
 		
 		return options.join(", ");
 	},

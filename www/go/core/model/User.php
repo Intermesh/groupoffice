@@ -23,17 +23,7 @@ use go\core\validate\ErrorCode;
 use go\core\model\Group;
 use go\core\model\Settings;
 
-/**
- * todo
- * 
- * $qs[] = "ALTER TABLE `core_user` CHANGE `lastlogin` `_lastlogin` INT(11) NOT NULL DEFAULT '0';";
-$qs[] = "ALTER TABLE `core_user` ADD `lastLogin` DATETIME NULL DEFAULT NULL AFTER `force_password_change`, ADD `modifiedAt` DATETIME NULL DEFAULT NULL AFTER `lastLogin`, ADD `createdAt` DATETIME NULL DEFAULT NULL AFTER `modifiedAt`;";
-$qs[] = "update `core_user` set modifiedAt=from_unixtime(mtime), createdAt =from_unixtime(ctime), lastLogin = from_unixtime(_lastlogin);";
-$qs[] = "ALTER TABLE `core_user`
-  DROP `_lastlogin`,
-  DROP `ctime`,
-  DROP `mtime`;";
- */
+
 class User extends Entity {
 	
 	use CustomFieldsTrait;
@@ -217,9 +207,9 @@ class User extends Entity {
 	protected $password;
 
 	/**
-	 * The groups of the user
+	 * The group ID's of the user
 	 * 
-	 * @var UserGroup[]
+	 * @var int[]
 	 */
 	public $groups = [];
 	
@@ -240,8 +230,8 @@ class User extends Entity {
 		return parent::defineMapping()
 			->addTable('core_user', 'u')
 			->addTable('core_auth_password', 'p', ['id' => 'userId'])
-			->addRelation("groups", UserGroup::class, ['id' => 'userId'])
-			->addRelation('workingWeek', WorkingWeek::class, ['id' => 'user_id'], false);
+			->addScalar('groups', 'core_user_group', ['id' => 'userId'])
+			->addHasOne('workingWeek', WorkingWeek::class, ['id' => 'user_id']);
 	}
 	
 	/**
@@ -256,6 +246,11 @@ class User extends Entity {
 	public function setValues(array $values) {
 		$this->passwordVerified = false;
 		return parent::setValues($values);
+	}
+
+	protected function canCreate()
+	{
+		return GO()->getAuthState()->getUser(['id'])->isAdmin();
 	}
 	
 	protected function init() {
@@ -273,12 +268,16 @@ class User extends Entity {
 			$this->listSeparator = $s->defaultListSeparator;
 			$this->textSeparator = $s->defaultTextSeparator;
 			$this->thousandsSeparator = $s->defaultThousandSeparator;
-			$this->decimalSeparator = $s->defaultDecimalSeparator;			
-			foreach($s->getDefaultGroups() as $groupId) {
-				$this->groups[] = (new UserGroup)->setValues(['groupId' => $groupId]);
+			$this->decimalSeparator = $s->defaultDecimalSeparator;
+			
+			$this->groups = array_merge($this->groups, $s->getDefaultGroups());
+			if(!in_array(Group::ID_EVERYONE, $this->groups)) { 			
+				$this->groups[] = Group::ID_EVERYONE;
 			}
 		}
 	}
+
+	private $currentPassword;
 	
 	public function setCurrentPassword($currentPassword){
 		$this->currentPassword = $currentPassword;
@@ -326,6 +325,10 @@ class User extends Entity {
 		$this->plainPassword = $password;
 	}
 
+	public function getPassword() {
+		return null;
+	}
+
 	/**
 	 * Make sure to call this when changing the password with a recovery hash
 	 * @param string $hash
@@ -366,15 +369,22 @@ class User extends Entity {
 	
 	protected function internalValidate() {
 		
-		if(!$this->isNew() && $this->isModified('groups')) {
-			$groupIds = array_column($this->groups, 'groupId');
+		if(!$this->isNew() && $this->isModified('groups')) {	
 			
-			if(!in_array(Group::ID_EVERYONE, $groupIds)) {
-				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove group everyone");
+			if($this->getPermissionLevel() < Acl::LEVEL_MANAGE) {
+				throw new Forbidden("You're not allowed to change groups");
 			}
 			
-			if(!in_array($this->getPersonalGroup()->id, $groupIds)) {
-				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "You can't remove the user's personal group");
+			if(!in_array(Group::ID_EVERYONE, $this->groups)) {
+				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, GO()->t("You can't remove group everyone"));
+			}
+			
+			if(!in_array($this->getPersonalGroup()->id, $this->groups)) {
+				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, GO()->t("You can't remove the user's personal group"));
+			}
+
+			if($this->id == 1 && !in_array(Group::ID_ADMINS, $this->groups)) {
+				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, GO()->t("You can't remove group Admins from the primary admin user"));
 			}
 		}
 		
@@ -397,6 +407,14 @@ class User extends Entity {
 				throw new Forbidden("The maximum number of users have been reached");
 			}
 		}
+
+		if($this->isModified(['email'])) {
+			$id = \go\core\model\User::find()->selectSingleValue('id')->where(['email' => $this->email])->single();
+			
+			if($id && $id != $this->id){
+				$this->setValidationError('email', ErrorCode::UNIQUE, 'The e-mail address must be unique in the system');
+			}
+		}
 		
 		return parent::internalValidate();
 	}
@@ -409,10 +427,14 @@ class User extends Entity {
 						->single();
 	}
 
-	
 
-	public function hasPermissionLevel($level = Acl::LEVEL_READ) {
-		return $this->id == App::get()->getAuthState()->getUserId() || App::get()->getAuthState()->getUser()->isAdmin();
+	public function getPermissionLevel()
+	{
+		if($this->id == App::get()->getAuthState()->getUserId()) {
+			return Acl::LEVEL_WRITE;
+		}
+
+		return parent::getPermissionLevel();
 	}
 	
 	protected static function textFilterColumns() {
@@ -505,15 +527,19 @@ class User extends Entity {
 		
 		if(isset($this->plainPassword)) {
 			$this->password = $this->passwordHash($this->plainPassword);
-		}		
+		}
 		
 		if(!parent::internalSave()) {
 			return false;
-		}
-		
-		$this->addSystemGroups();
+		}	
 		
 		$this->saveContact();
+
+		$this->createPersonalGroup();
+
+		if($this->isNew()) {
+			$this->legacyOnSave();	
+		}
 		
 		return true;		
 	}
@@ -571,14 +597,14 @@ class User extends Entity {
 		return null;
 	}
 	
-	private function addSystemGroups() {
-		if($this->isNew() || $this->isModified('groups')) {						
-			$groupIds = array_column($this->groups, 'groupId');
-			
+	private function createPersonalGroup() {
+		if($this->isNew() || $this->isModified('groups')) {				
 			if($this->isNew()){// !in_array($this->getPersonalGroup()->id, $groupIds)) {
 				$personalGroup = new Group();
 				$personalGroup->name = $this->username;
 				$personalGroup->isUserGroupFor = $this->id;
+				$personalGroup->users[] = $this->id;
+				
 				if(!$personalGroup->save()) {
 					throw new Exception("Could not create home group");
 				}
@@ -587,24 +613,9 @@ class User extends Entity {
 				$personalGroup = $this->getPersonalGroup();
 			}
 			
-			if(!in_array($personalGroup->id, $groupIds)) { 
-				$personalUserGroup = (new UserGroup)->setValues(['groupId' => $personalGroup->id, 'userId' => $this->id]);
-				if(!$personalUserGroup->internalSave()) {
-					throw new Exception("Couldn't add user to group");
-				}
-				$this->groups[] = $personalUserGroup;
-			}
-			
-			if(!in_array(Group::ID_EVERYONE, $groupIds)) { 
-				$everyoneUserGroup = (new UserGroup)->setValues(['groupId' => Group::ID_EVERYONE, 'userId' => $this->id]);
-				if(!$everyoneUserGroup->internalSave()) {
-					throw new Exception("Couldn't add user to group");
-				}
-				$this->groups[] = $everyoneUserGroup;
-			}
-			
-			$this->legacyOnSave();			
-			
+			if(!in_array($personalGroup->id, $this->groups)) {			
+				$this->groups[] = $personalGroup->id;
+			}			
 		}
 	}
 	
@@ -629,13 +640,10 @@ class User extends Entity {
 	 * @return $this
 	 */
 	public function addGroup($groupId) {
-		foreach($this->groups as $group) {
-			if($group->groupId == $groupId) {
-				return $this;
-			}
-		}
 		
-		$this->groups[] = (new UserGroup)->setValues(['groupId' => $groupId]);
+		if(!in_array($groupId, $this->groups)) {
+			$this->groups[] = $groupId;
+		}
 		
 		return $this;
 	}
@@ -644,20 +652,13 @@ class User extends Entity {
 	/**
 	 * Check if this user has a module
 	 * 
+	 * @param string $package
 	 * @param string $name
+	 * 
 	 * @return boolean
 	 */
-	public function hasModule($name) {
-		$module = Module::find()->where(['name' => $name])->single();
-		if(!$module) {
-			return false;
-		}
-		
-		if(!Acl::getUserPermissionLevel($module->aclId, $this->id)) {
-			return false;
-		}
-		
-		return true;		
+	public function hasModule($package, $name) {
+		return Module::isAvailableFor($package, $name, $this->id);		
 	}
 	
 	
@@ -768,5 +769,4 @@ class User extends Entity {
 	
 		$this->displayName = $this->contact->name;
 	}
-
 }

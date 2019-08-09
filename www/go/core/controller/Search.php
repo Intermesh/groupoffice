@@ -26,8 +26,8 @@ class Search extends EntityController {
 
 		if (!empty($q)) {
 			$query
-							->where('email', 'LIKE', $q . '%')
-							->orWhere('displayName', 'LIKE', $q . '%');
+							->where('email', 'LIKE', '%' . $q . '%')
+							->orWhere('displayName', 'LIKE', '%' . $q . '%');
 		}
 
 		Acl::applyToQuery($query, 'g.aclId');
@@ -45,17 +45,20 @@ class Search extends EntityController {
 
 			if (!empty($q)) {
 				$contactsQuery
-								->where('e.email', 'LIKE', $q . '%')
-								->orWhere('c.name', 'LIKE', $q . '%');
+								->where('e.email', 'LIKE', '%' . $q . '%')
+								->orWhere('c.name', 'LIKE', '%' . $q . '%');
 			}
 
-			$query->union($contactsQuery)
-							->offset($params['position'] ?? 0)
-							->limit(20);
+			$query->union($contactsQuery);							
 		}
+
+		$query->offset($params['position'] ?? 0)
+			->limit(20);
+
+		GO()->debug($query);
 		
 		\go\core\jmap\Response::get()->addResponse([
-				'list' => array_map(function($r) {$r['entityId'] = (int) $r['entityId']; return $r;}, $query->toArray())
+				'list' => $query->toArray()
 				]);
 	}
 	

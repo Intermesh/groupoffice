@@ -40,31 +40,36 @@
 }
 
 .x-mask-loading {
-	border:0;
-	display: block;
-   height: dp(3);
-	padding: 0;
-   overflow: hidden;
-   position: absolute;
-	top:0 !important; //override element style
-   width: 100%;
-	background-color: rgba($cAccent,.3);
-	div{ // bar
-		  border:0;
-		  padding:0;
-		  height:dp(5);
-		  background-color: $cAccent;
-		  animation-name: indeterminate1;
-		  animation-duration: 2s;
-		  animation-iteration-count: infinite;
-		  animation-timing-function: linear;
-		  display: block;
-		  position: absolute;
-		  top: 0;
-		  bottom: 0;
-		  width: 0%;
-		  transition: width .2s cubic-bezier(.4,0,.2,1);
-		  text-indent: -9999px;
+
+	&:after {			
+		content: "";
+		border:0;
+		padding:0;
+		height:dp(5);
+		background-color: $cAccent;
+		animation-name: indeterminate1;
+		animation-duration: 2s;
+		animation-iteration-count: infinite;
+		animation-timing-function: linear;
+		display: block;
+		position: absolute;
+		top: dp(5);
+		bottom: 0;
+		width: 0%;
+		transition: width .2s cubic-bezier(.4,0,.2,1);
+		text-indent: -9999px;
+	}
+	
+	div { 
+		position: relative;
+		margin: 0 auto;
+		top: dp(5);			
+		background-color: white;
+		padding: dp(20) dp(40);
+		font-size: dp(18);
+		@extend .z12;
+		text-align: center;
+
 	}
 }
 
@@ -570,7 +575,7 @@
 .x-form-label-left label.x-form-item-label{
 	@extend %font-label;
 	line-height: dp(16);
-	padding: dp(8) 0 dp(4) 0;
+	padding: dp(8) dp(8) dp(4) 0;
 }
 
 
@@ -1109,7 +1114,7 @@
 			@extend %font-caption;
 			border-left:0;
 			border-right: 1px solid;
-			border-image: linear-gradient(to bottom, transparent, color($fg, 'divider')) 1 100%;
+			border-image: linear-gradient(to bottom, transparent, color($fg, 'line')) 1 100%;
 			height: dp(32);
 			
 			&.x-grid3-cell-last {
@@ -1133,8 +1138,8 @@
 	}
 	&-cell-inner, &-hd-inner {
 		@extend .ellipsis;
-		min-height: dp(40);
-		padding: dp(6) dp(4) dp(6) dp(16); // 10 top = middle of row line-height 20dp
+		// min-height: dp(40); //Seems to cause slightly off positioning in grid cells
+		padding: dp(6) dp(8) dp(6) dp(16); // 10 top = middle of row line-height 20dp
 		.ux-row-action-cell & {
 			padding: dp(8) 0;
 		}
@@ -1230,7 +1235,7 @@
 	}
 	&-hd-inner {
 		min-height: dp(20);
-		padding: 0 0 0 dp(16);
+		padding: 0 dp(8) 0 dp(16);
 	}
 	&-dirty-cell > div {
 		border-radius: $borderRadius;
@@ -1316,31 +1321,44 @@ td.x-grid3-hd-over .x-grid3-hd-inner, td.sort-desc .x-grid3-hd-inner, td.sort-as
 	//background-image:url(../images/default/grid/grid3-hrow-over.gif);
 
 }
-.sort-asc, .sort-desc {
-	position: relative;
+// .sort-asc, .sort-desc {
+// 	position: relative;
+// 	&:after{
+// 		@extend %icon;
+// 		color: color($fg, 'hint-text');
+// 		left: dp(14);
+// 		top: dp(10); 
+// 		font-size: sp(13);
+// 		position:absolute;
+// 	}
+	
+// 	.x-grid3-hd-inner {
+// 		padding-left: dp(32);
+// 	}
+// }
+// .sort-asc:after { //}.x-grid3-sort-icon {
+// 	content: 'arrow_upward';
+// 	//background-image: url(../images/default/grid/sort_asc.gif);
+// }
+// .sort-desc:after {
+// 	content: 'arrow_downward';
+// }
+
+.x-grid3-sort-icon {
+	background: none;
 	&:after{
 		@extend %icon;
 		color: color($fg, 'hint-text');
 		left: dp(14);
 		top: dp(10); 
 		font-size: sp(13);
-		position:absolute;
+		margin: 0 dp(4);		
+		content: 'arrow_downward';
 	}
-	
-	.x-grid3-hd-inner {
-		padding-left: dp(32);
-	}
-}
-.sort-asc:after { //}.x-grid3-sort-icon {
-	content: 'arrow_upward';
-	//background-image: url(../images/default/grid/sort_asc.gif);
-}
-.sort-desc:after {
-	content: 'arrow_downward';
 }
 
-.sort-desc .x-grid3-sort-icon {
-	//background-image: url(../images/default/grid/sort_desc.gif);
+.sort-desc .x-grid3-sort-icon:after {
+	content: 'arrow_upward';
 }
 
 .col-move-top, .col-move-bottom{
@@ -1413,7 +1431,12 @@ td.grid-hd-group-cell {
 }
 
 .x-grid-group-hd {
-	border-bottom: 1px solid color($fg, 'divider');
+	// MS: Removed this becauise email view digressed
+	// border-bottom: 1px solid color($fg, 'line');
+	// border-top: 1px solid color($fg, 'line');
+	
+	border-bottom: 2px solid color($fg, 'divider');
+
 	div.x-grid-group-title {
 		@extend %font-caption;
 		/*@include var(color, c-primary);*/

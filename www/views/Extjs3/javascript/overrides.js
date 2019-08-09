@@ -117,7 +117,8 @@ Ext.override(Ext.form.TextArea,{
 		this.el.focus();
 		text_field.setSelectionRange(endPos+v.length, endPos+v.length);
 	},
-	growMin : dp(32)
+	growMin : dp(48),
+	height: dp(48)
 });
 
 Ext.override(Ext.form.TextField,{
@@ -610,6 +611,7 @@ var noBoxAdjust = Ext.isStrict ? {
 } : {
     input:1, select:1, textarea:1
 };
+Ext.isBorderBox = true;
 Ext.override(Ext.Element, {
 	/**
      * @cfg {string} printCSS The file path of a CSS file for printout.
@@ -642,8 +644,8 @@ Ext.override(Ext.Element, {
 		Ext.apply(this, config);
         
 		var el = Ext.get(this.id).dom;
-		var c = document.getElementById('printcontainer');
-		var iFrame = document.getElementById('printframe');
+		// var c = document.getElementById('printcontainer');
+		// var iFrame = document.getElementById('printframe');
         
 		var strTemplate = '<HTML><HEAD>{0}<TITLE>{1}</TITLE></HEAD><BODY onload="{2}" style="background-color:white;"><div style="position:fixed; top:0; left:0; right:0; bottom:0; z-index:99;"></div>{3}</BODY></HTML>';
 		var strAttr = '';
@@ -652,8 +654,8 @@ Ext.override(Ext.Element, {
         
 		//Get rid of the old crap so we don't copy it
 		//to our iframe
-		if (iFrame != null) c.removeChild(iFrame);
-		if (c != null) el.removeChild(c);
+		// if (iFrame != null) c.removeChild(iFrame);
+		// if (c != null) el.removeChild(c);
         
 		//Copy attributes from this element.
 		for (var i = 0; i < el.attributes.length; i++) {
@@ -790,11 +792,11 @@ Ext.override(Ext.grid.GridView,{
             };
             
 						//disable padding right in GO theme because it looks ugly
-            if (GO.settings.theme!='Group-Office' && colModel.config[i].align == 'right') {
-                properties.istyle = 'padding-right: 16px;';
-            } else {
+            // if (GO.settings.theme!='Group-Office' && colModel.config[i].align == 'right') {
+            //     properties.istyle = 'padding-right: 16px;';
+            // } else {
                 delete properties.istyle;
-            }
+            // }
             
             cells[i] = headerTpl.apply(properties);
         }
@@ -944,7 +946,7 @@ Ext.menu.Item.prototype.itemTpl = new Ext.XTemplate(
 		 '</tpl>',
 	 '>',
 		  '<span style="{iconStyle}" class="x-menu-item-icon {iconCls}"></span>',
-		  '<span class="x-menu-item-text">{text}</span>',
+		  '<span class="x-menu-item-text">{text:raw}</span>',
 	 '</a>'
 );
 Ext.layout.MenuLayout.prototype.itemTpl = new Ext.XTemplate(
@@ -1000,7 +1002,7 @@ Ext.override(Ext.form.Field, {
 		if(this.rendered){
 			this.label.update(label+':');
 		} else {
-			this.label = label;
+			this.fieldLabel = label;
 		}
 	}		
 });
@@ -1049,4 +1051,8 @@ Ext.override(Ext.TabPanel, {
 			this.origUnhideTabStripItem(item);
 		}
 	},
+});
+
+Ext.override(Ext.KeyNav, {
+	forceKeyDown: true // Required for Firefox 67	
 });

@@ -52,7 +52,9 @@ $server->on('exception', function($e){
 /* Server Plugins */
 $server->addPlugin(new AuthPlugin($authBackend));
 $server->addPlugin(new CardDAVPlugin());
-$server->addPlugin(new AclPlugin());
+$aclPlugin = new AclPlugin();
+$aclPlugin->allowUnauthenticatedAccess = false;
+$server->addPlugin($aclPlugin);
 
 //baseUri can also be /carddav/ with:
 //Alias /carddav/ /path/to/addressbook.php

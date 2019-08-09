@@ -120,7 +120,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			changed: {},
 			destroyed: []
 		};
-		
+
 		this.changedIds = [];
 	},
 	
@@ -141,13 +141,12 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	},
 	
 	_add : function(entity, fireChanges) {
-		
 		if(!entity.id) {
 			console.error(entity);
 			throw "Entity doesn't have an 'id' property";
 		}		
 		
-		//ChangedIds is set by a /changes request. If this item is added because of 
+		// this.changedIds is set by a /changes request. If this item is added because of 
 		// a changes request we must fire a changes event. Not if we're loading by request.
 		if(!Ext.isDefined(fireChanges)) {
 			fireChanges = this.changedIds.indexOf(entity.id) > -1;
@@ -197,8 +196,8 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		}
 		
 		//delay fireevent one event loop cycle
-		me.timeout = setTimeout(function () {				
-			// console.log('changes', me.entity.name, me.changes.added, me.changes.changed, me.changes.destroyed);
+		me.timeout = setTimeout(function () {
+			// console.warn('changes', me.entity.name, me.changes.added, me.changes.changed, me.changes.destroyed);
 			me.fireEvent('changes', me, me.changes.added, me.changes.changed, me.changes.destroyed);			
 			me.initChanges();
 			me.timeout = null;
@@ -254,6 +253,12 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 					me.setState(action.payload.response.state);
 					break;
+				case me.entity.name + "/changes" :
+					//keep me array for the Foo/get response to check if an event must be fired.
+					//We will only fire added and changed in _add if me came from a /changes 
+					//request and not when we are loading data ourselves.
+					me.changedIds = action.payload.response.changed || [];
+					break;
 
 				case me.entity.name + "/query":
 //					console.log("Query state: " + state + " - " + action.payload.state);
@@ -278,14 +283,13 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		
 		return me.getState().then(function(state){
 			
-//			console.log("Get updates for state: " + state);
+			console.log("getUpdates", me.entity.name, state);
 		
 			if(!state) {
 				console.info("No state yet so won't fetch updates");
 				if(cb) {
 					cb.call(scope || me, me, false);
 				}
-				debugger;
 				return Promise.reject("No state yet");
 			}
 			
@@ -297,12 +301,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				}
 			});
 			
-			promise.then(function(response) {					
-				//keep me array for the Foo/get response to check if an event must be fired.
-				//We will only fire added and changed in _add if me came from a /changes 
-				//request and not when we are loading data ourselves.
-				me.changedIds = response.changed || [];
-				
+			promise.then(function(response) {
 				if(response.removed) {
 					for(var i = 0, l = response.removed.length; i < l; i++) {
 						me._destroy(response.removed[i]);
@@ -444,7 +443,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 	_getSingleFromServer : function(id) {
 
-		if(this.pending[id]) {
+		if(this.pending[id]) {			
 			return this.pending[id];
 		}
 
@@ -469,7 +468,6 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					{
 						//this.data is filled with flux in the recieve() function.
 						if(!me.data[id]) {
-							debugger;
 							return Promise.reject("Data not available ???");
 						}
 						return go.util.clone(me.data[id]);
@@ -680,23 +678,15 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 */
 	query : function(params, cb, scope) {
 		var me = this;
-		return new Promise(function(resolve, reject) {
-			go.Jmap.request({
+		return go.Jmap.request({
 				method: me.entity.name + "/query",
-				params: params,
-				callback: function(options, success, response) {
+				params: params				
+		}).then(function(response) {
+			if(cb) {
+				cb.call(scope || me, response);
+			}
 
-					if(!success) {
-						throw me.entity.name + "/query failed!";
-					}
-
-					resolve(response);
-					if(cb) {
-						cb.call(scope || me, response);
-					}
-				},
-				scope: me
-			});
+			return response;
 		});
 	}
 });

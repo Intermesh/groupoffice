@@ -170,6 +170,10 @@ class Settings extends core\Settings {
 	 * @return string
 	 */
 	public function getLocale() {
+
+		if(GO()->getInstaller()->isInProgress()) {
+			return 'C.UTF-8';
+		}
 		
 		if(isset($this->locale)) {
 			return $this->locale;
@@ -181,8 +185,8 @@ class Settings extends core\Settings {
 			if(isset($output) && is_array($output)){
 				foreach($output as $locale){
 					if(stripos($locale,'utf')!==false){
-						$this->locale = $locale;
-						$this->save();
+						$this->locale = $locale;						
+						$this->save();						
 						return $this->locale;
 					}
 				}
@@ -193,7 +197,7 @@ class Settings extends core\Settings {
 
 		//This locale is often installed so try to fallback on C.UTF8
 		$this->locale = "C.UTF8";
-		$this->save();
+		$this->save();		
 		
 		return $this->locale;
 	}
@@ -447,7 +451,8 @@ class Settings extends core\Settings {
 	 * @param array eg [['groupId' => 1]]
 	 */
 	public function setDefaultGroups($groups) {	
-		core\db\Table::getInstance("core_group_default_group")->truncate();
+		
+		GO()->getDbConnection()->exec("TRUNCATE TABLE core_group_default_group");
 		
 		foreach($groups as $groupId) {
 			if(!GO()->getDbConnection()->insert("core_group_default_group", ['groupId' => $groupId])->execute()) {

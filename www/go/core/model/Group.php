@@ -49,14 +49,14 @@ class Group extends AclOwnerEntity {
 	/**
 	 * The users in this group
 	 * 
-	 * @var UserGroup[]
+	 * @var int[]
 	 */
 	public $users;	
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable('core_group', 'g')
-						->addRelation('users', UserGroup::class, ['id' => 'groupId']);
+						->addScalar('users', 'core_user_group', ['id' => 'groupId']);
 	}
 	
 	protected static function defineFilters() {
@@ -90,7 +90,21 @@ class Group extends AclOwnerEntity {
 	protected static function textFilterColumns() {
 		return ['name'];
 	}
-	
+
+	protected function internalValidate()
+	{
+		if($this->id === self::ID_ADMINS && !in_array(1, $this->users)) {
+			$this->setValidationError('users', ErrorCode::FORBIDDEN, GO()->t("You can't remove the admin user from the administrators group"));
+		}
+
+		if($this->isUserGroupFor && !in_array($this->isUserGroupFor, $this->users))
+		{
+			$this->setValidationError('users', ErrorCode::FORBIDDEN, GO()->t("You can't remove the group owner from the group"));
+		}
+
+		return parent::internalValidate();
+	}
+
 	protected function internalSave() {
 		
 		if(!parent::internalSave()) {
@@ -105,6 +119,11 @@ class Group extends AclOwnerEntity {
 
 		return $this->setDefaultPermissions();		
 	}
+
+	protected function canCreate()
+	{
+		return GO()->getAuthState()->getUser(['id'])->isAdmin();
+	}
 	
 	private function setDefaultPermissions() {
 		$acl = $this->findAcl();
@@ -113,7 +132,7 @@ class Group extends AclOwnerEntity {
 			$acl->addGroup($this->id, Acl::LEVEL_READ);
 		}
 		
-		return $acl->internalSave();
+		return $acl->save();
 	}
 	
 	protected function internalDelete() {

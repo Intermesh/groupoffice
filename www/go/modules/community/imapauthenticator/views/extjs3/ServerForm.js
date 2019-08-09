@@ -161,7 +161,7 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						entityStore: "Group",						
 						fieldLabel: t("Groups"),
 						storeBaseParams:{
-							filter: {"includeUsers" : false}
+							filter: {"hideUsers" : true}
 						}
 					})
 				]

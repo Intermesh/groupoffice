@@ -261,7 +261,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				//legacy scripts loaded from scripts.inc.php
 			var script = document.createElement('script');
 			script.type = 'text/javascript';
-			script.setAttribute('src', BaseHref + "views/Extjs3/modulescripts.php");
+			script.setAttribute('src', BaseHref + "views/Extjs3/modulescripts.php?mtime=" + go.User.modifiedAt);
 			script.charset = 'utf-8';
 			script.id = 'testing';
 			script.defer = true;
@@ -365,7 +365,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		}).catch(function(error){
 			console.error(error);
 			Ext.getBody().unmask();
-			Ext.MessageBox.alert(t("Error"), t("An error occurred. MOre details can be found in the console."));
+			Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console."));
 		});
 		
 		
@@ -374,9 +374,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	addDefaultRoutes : function() {
 		var me = this;
 
-		go.Router.add(/systemsettings\/?([a-z0-9-_]*)?/i, function(tabId) {		
-			me.openSystemSettings().setActiveItem(tabId);
-		});
+		if(go.User.isAdmin) {
+			go.Router.add(/systemsettings\/?([a-z0-9-_]*)?/i, function(tabId) {		
+				me.openSystemSettings().setActiveItem(tabId);
+			});
+		}
 
 		//Add these default routes on boot so they are added as last options for sure.
 		//
@@ -580,7 +582,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						items: [
 							{
 								xtype: 'menutextitem',
-								text: go.User.displayName,
+								text: Ext.util.Format.htmlEncode(go.User.displayName),
 								cls: 'go-display-name'
 							}, '-', {
 								text: t("My account"),

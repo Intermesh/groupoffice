@@ -141,16 +141,25 @@ go.Jmap = {
 			var source = new EventSource(url), me = this;
 			
 			source.addEventListener('state', function(e) {
-				for(var entity in JSON.parse(e.data)) {
-					var store =go.Db.store(entity);
+
+				var data = JSON.parse(e.data);
+				console.group("SSE state");
+				console.log(data);
+				console.groupEnd();
+
+				for(var entity in data) {
+					var store = go.Db.store(entity);
 					if(store) {
-						store.getState().then(function(state) {
-							if(!state) {
-								//don't fetch updates if there's no state yet because it never was used in that case.
-								return;
-							}
-							store.getUpdates();
-						});
+						(function(store) {
+							store.getState().then(function(state) {
+								if(!state || state == data[store.entity.name]) {
+									//don't fetch updates if there's no state yet because it never was used in that case.
+									return;
+								}
+								
+								store.getUpdates();
+							});
+						})(store);
 					}
 				}
 			}, false);
@@ -185,7 +194,7 @@ go.Jmap = {
 	 * scope: callback function scope
 	 * dispatchAfterCallback: dispatch the response after the callback. Defaults to false.
 	 * 
-	 * @returns {String} Client call ID.
+	 * @returns {Promise} resolved with response
 	 */
 	request: function (options) {
 		if(!options.method) {

@@ -195,7 +195,11 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 		}
 		
 		$blob = \go\core\fs\Blob::findById($params['blobId']);
-		$success = $this->_savePublicCertificate(file_get_contents($blob->path()), array($params['email']));
+
+		
+		$content = file_get_contents($blob->path());
+		
+		$success = $this->_savePublicCertificate($content, array($params['email']));
 		return ['success' => $success];
 	}
 	
@@ -212,6 +216,12 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 	}
 
 	private function _savePublicCertificate($certData, $emails) {
+
+		$test = "-BEGIN CERTIFICATE-";
+		if(strpos($certData, $test) === false) {
+			throw new \Exception(GO()->t("The certificate must be in PEM format", "legacy", "smime"));
+		}
+
 		$success = true;
 		foreach($emails as $email) {
 			$findParams = \GO\Base\Db\FindParams::newInstance()->single();

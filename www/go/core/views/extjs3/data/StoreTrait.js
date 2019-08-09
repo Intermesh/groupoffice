@@ -38,7 +38,19 @@ go.data.StoreTrait = {
     }, this);
     
 		this.initFilters();
+
+		this.trackRemoved();
 	},	
+
+	trackRemoved : function() {
+		this.removed = [];
+		this.on("remove", function(store, record) {
+			this.removed.push(record);
+		}, this);
+		this.on("load", function() {
+			this.removed = [];
+		}, this);
+	},
 	
 	initFilters : function() {
 		//JMAP remote filters. Used by setFilter()
@@ -129,7 +141,9 @@ go.data.StoreTrait = {
 				var o = go.util.clone(this.lastOptions);
 				o.params = o.params || {};
 				o.params.position = 0;
-				o.params.limit = this.getCount();
+				if(this.lastOptions.params && this.lastOptions.params.position) {				
+					o.params.limit = this.lastOptions.params.position + (this.lastOptions.limit || this.baseParams.limit || 20);
+				}
 
 				this.load(o);
 				return;
@@ -137,8 +151,7 @@ go.data.StoreTrait = {
 		}		
 	},
 
-	onChanges : function(entityStore, added, changed, destroyed) {		
-
+	onChanges : function(entityStore, added, changed, destroyed) {
 		if(!this.loaded || this.loading) {
 			return;
 		}		
@@ -148,8 +161,11 @@ go.data.StoreTrait = {
 			var o = go.util.clone(this.lastOptions);
 			o.params = o.params || {};
 			o.params.position = 0;
-			o.params.limit = this.getCount();
-			this.load(this.lastOptions);
+
+			if(this.lastOptions.params && this.lastOptions.params.position) {				
+				o.params.limit = this.lastOptions.params.position + (this.lastOptions.limit || this.baseParams.limit || 20);
+			}
+			this.load(o);
 		}
 		
 		for(var i = 0, l = destroyed.length; i < l; i++) {

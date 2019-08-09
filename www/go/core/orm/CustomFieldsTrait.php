@@ -30,7 +30,19 @@ trait CustomFieldsTrait {
 	 * 
 	 * @return array
 	 */
-	public function getCustomFields() {
+	public function getCustomFields($asText = false) {
+		$fn = $asText ? 'dbToText' : 'dbToApi';
+		$record = $this->internalGetCustomFields();
+		foreach(self::getCustomFieldModels() as $field) {
+			if(empty($field->databaseName)) {
+				continue; //For type Notes which doesn't store any data
+			}
+			$record[$field->databaseName] = $field->getDataType()->$fn(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record);			
+		}
+		return $record;	
+	}
+
+	protected function internalGetCustomFields() {
 		if(!isset($this->customFieldsData)) {
 			$record = (new Query())
 							->select('*')
@@ -44,11 +56,7 @@ trait CustomFieldsTrait {
 				$columns = Table::getInstance(static::customFieldsTableName())->getColumns();		
 				foreach($columns as $name => $column) {					
 					$record[$name] = $column->castFromDb($record[$name]);					
-				}				
-				
-				foreach(self::getCustomFieldModels() as $field) {
-					$record[$field->databaseName] = $field->getDataType()->dbToApi(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record);			
-				}
+				}			
 				
 				$this->customFieldsData = $record;
 				
@@ -58,8 +66,10 @@ trait CustomFieldsTrait {
 			}
 		}
 		
-		return array_filter($this->customFieldsData, function($key) {return $key != 'id';}, ARRAY_FILTER_USE_KEY);
+		return $this->customFieldsData;//array_filter($this->customFieldsData, function($key) {return $key != 'id';}, ARRAY_FILTER_USE_KEY);
 	}
+
+
 	
 	//for legacy modules
 	public function setCustomFieldsJSON($json) {
@@ -74,11 +84,14 @@ trait CustomFieldsTrait {
 	 * data.
 	 * 
 	 * @param array $data
+	 * @return $this
 	 */
 	public function setCustomFields(array $data) {			
-		$this->customFieldsData = array_merge($this->getCustomFields(), $this->normalizeCustomFieldsInput($data));		
+		$this->customFieldsData = array_merge($this->internalGetCustomFields(), $this->normalizeCustomFieldsInput($data));		
 		
 		$this->customFieldsModified = true;
+
+		return $this;
 	}
 	
 	/**
@@ -86,9 +99,10 @@ trait CustomFieldsTrait {
 	 * 
 	 * @param string $name
 	 * @param mixed $value
+	 * @return $this
 	 */
 	public function setCustomField($name, $value) {
-		$this->setCustomFields([$name => $value]);
+		return $this->setCustomFields([$name => $value]);
 	}
 	
 	private static $customFields;
@@ -111,7 +125,7 @@ trait CustomFieldsTrait {
 		if(!isset(self::$customFields)) {
 			self::$customFields = Field::find()
 						->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId')
-						->where(['fs.entityId' => static::getType()->getId()])->all();
+						->where(['fs.entityId' => static::customFieldsEntityType()->getId()])->all();
 		}
 		
 		return self::$customFields;
@@ -134,6 +148,18 @@ trait CustomFieldsTrait {
 		}
 		
 		return $data;
+	}
+
+	protected function validateCustomFields() {
+		if(!$this->customFieldsModified) {
+			return true;
+		}
+		foreach(self::getCustomFieldModels() as $field) {
+			if(!$field->getDataType()->validate(isset($this->customFieldsData[$field->databaseName]) ? $this->customFieldsData[$field->databaseName] : null, $field, $this)) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	/**
@@ -204,18 +230,41 @@ trait CustomFieldsTrait {
 	 * @return string
 	 */
 	public static function customFieldsTableName() {
+
+		$cls = static::customFieldsEntityType()->getClassName();
 		
-		if(is_a(static::class, Entity::class, true)) {
+		if(is_a($cls, Entity::class, true)) {
 		
-			$tables = static::getMapping()->getTables();		
+			$tables = $cls::getMapping()->getTables();		
 			$mainTableName = array_keys($tables)[0];
 		} else
 		{
 			//ActiveRecord
-			$mainTableName = static::model()->tableName();
+			$mainTableName = $cls::model()->tableName();
 		}
 		
 		return $mainTableName.'_custom_fields';
+	}
+
+	/**
+	 * The entity type the custom fields are for.
+	 * 
+	 * Usually this is the static::entityType() but sometimes a model extends another like with filesearch. Then you can override this function:
+	 * 
+	 * ```php
+	 * use CustomFieldsTrait {
+	 * 		customFieldsEntityType as origCustomFieldsEntityType;
+	 * }
+	 * 
+	 * public static function customFieldsEntityType() {
+	 * 		return File2::entityType();
+	 * }
+	 * ```
+	 * 
+	 * @return EntityType
+	 */
+	public static function customFieldsEntityType() {
+		return static::entityType();
 	}
 	
 	/**

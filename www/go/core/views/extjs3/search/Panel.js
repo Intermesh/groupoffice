@@ -16,6 +16,7 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 			}
 		});
 
+		
 		this.entityGrid = new go.links.EntityGrid({
 			width: dp(200),
 			region: "east",
@@ -53,12 +54,14 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 			return;
 		}
 		
-		go.Entities.get(record.data.entity).goto(record.data.entityId);
+		this.searchField.fireEvent("select", this.searchField, record);
 		this.collapse();
 		
 	},
 	
 	search: function (q) {
+
+		this.expand();
 		
 //
 //		
@@ -71,6 +74,8 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 //		
 		this.lastQ = q;
 		var filter = {}, entities = [];
+
+		// this.getEl().mask(t("Loading..."));
 		
 		Ext.each(this.entityGrid.getSelectionModel().getSelections(), function (r) {
 			entities.push({
@@ -86,19 +91,29 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 		filter.text = q;
 		this.grid.store.baseParams.limit = 20;
 		this.grid.store.removeAll();
+
+		var me = this;
 		
 		this.grid.store.load({
 			params: {
 				filter: filter
 			}
+		}).finally(function() {
+			// me.getEl().unmask();
+			// me.expand();
+		}).catch(function(response) {			
+			me.fireEvent("searchexception", this, response);
+			//me.collapse();
+		}).then(function() {
+			
 		});
 		
 		//this.setHeight(dp(600));
-		this.expand();
+		
 	},
 	// private
 	collapseIf : function(e){
-		if(!e.within(this.getEl()) && !e.within(this.searchContainer.getEl())){
+		if(!e.within(this.getEl()) && !e.within(this.searchField.getEl())){
 				this.collapse();
 		}
 	}
