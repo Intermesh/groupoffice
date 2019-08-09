@@ -60,7 +60,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		
 		go.form.FormGroup.superclass.initComponent.call(this);
 		
-		this.on("add",function(e) {			
+		this.on("add",function(e) {	
 			//to prevent adding to Ext.form.BasicForm with add event.
 			//Cancels event bubbling
 			return false;
