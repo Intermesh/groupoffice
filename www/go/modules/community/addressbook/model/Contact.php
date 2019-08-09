@@ -779,7 +779,8 @@ class Contact extends AclItemEntity {
    * @param \Swift_Message $message
    */
   public function decorateMessage(Message $message) {
-		$message->setTo($this->emailAddresses[0]->email, $this->name);
+	  	if(isset($this->emailAddresses[0]))
+			$message->setTo($this->emailAddresses[0]->email, $this->name);
 	}
 
 	public function toTemplate() {

@@ -23,6 +23,7 @@ grid/GridPanel.js
 grid/EditorGridPanel.js
 grid/SelectAllCheckBox.js
 grid/DateColumn.js
+grid/ColumnRenderers.js
 
 
 Window.js
