@@ -353,10 +353,10 @@ class User extends \GO\Base\Db\ActiveRecord {
 				$prefixTable.".username"
 				);
 		
-		if($withCustomFields && $this->customfieldsRecord)
-		{
-			$fields = array_merge($fields, $this->customfieldsRecord->getFindSearchQueryParamFields('cf'));
-		}
+		// if($withCustomFields && $this->customfieldsRecord)
+		// {
+		// 	$fields = array_merge($fields, $this->customfieldsRecord->getFindSearchQueryParamFields('cf'));
+		// }
 		
 		return $fields;
 	}

@@ -1,3 +1,10 @@
+12-08-2019 6.4.37
+- Calendar: Fixed Error in 
+  /usr/share/groupoffice/modules/calendar/model/Participant.php at line 408: 
+  Call to undefined method go\\modules\\community\\addressbook\\model\\Contact::link()
+- Core: Custom fields migration fixes
+- Core: Fixed upload screen missing style
+
 19-07-2019 6.4.36
 - Core: small ui enhancements
 - Newsletters: Fixed incorrect parsing of images in email templates

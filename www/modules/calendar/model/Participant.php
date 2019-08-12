@@ -36,6 +36,7 @@
 
 namespace GO\Calendar\Model;
 
+use go\core\model\Link;
 
 class Participant extends \GO\Base\Db\ActiveRecord {
 
@@ -405,7 +406,7 @@ class Participant extends \GO\Base\Db\ActiveRecord {
 			if(!$this->is_organizer && $this->contact_id && \GO::config()->calendar_autolink_participants){
 				$contact = \go\modules\community\addressbook\model\Contact::findById($this->contact_id);
 				if(!empty($contact)) {
-					$contact->link($this->event);
+					Link::create($contact, $this->event);
 				}
 			}
 		}
