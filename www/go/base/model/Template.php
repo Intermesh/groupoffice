@@ -118,6 +118,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	public static function getCompanyAttributes(\go\modules\community\addressbook\model\Contact $company, $tagPrefix = 'company:'){
 		$attributes[$tagPrefix . 'salutation'] = GO()->t("Dear sir/madam");
 		
+		$attributes[$tagPrefix . 'comment'] = $company->notes;
 		$attributes[$tagPrefix . 'crn'] = $company->registrationNumber;
 		$attributes[$tagPrefix . 'vat_no'] = $company->vatNo;
 		$attributes[$tagPrefix . 'iban'] = $company->IBAN;
@@ -172,6 +173,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		$attributes[$tagPrefix . 'first_name'] = $contact->firstName;
 		$attributes[$tagPrefix . 'middle_name'] = $contact->middleName;
 		$attributes[$tagPrefix . 'last_name'] = $contact->lastName;
+		$attributes[$tagPrefix . 'comment'] = $contact->notes;
 
 			//$attributes = array_merge($attributes, $this->_getModelAttributes($contact, $tagPrefix . ''));
 
