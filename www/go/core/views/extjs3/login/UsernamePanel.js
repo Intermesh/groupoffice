@@ -44,6 +44,7 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 
 		if (GO.authenticationDomains.length) {
 			this.domainCombo = new go.login.DomainCombo({			
+				id: "go-login-domain",
 				value: localStorage.getItem("authentication-domain") || GO.authenticationDomainDefault				
 			});
 			
@@ -56,6 +57,7 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 			id: 'usernameCheck',
 			bbar: [
 				this.forgotBtn = new Ext.Button({
+					id: "go-login-forgot-username",
 					text: t("Forgot username?"),
 					handler: this.showForgot,
 					scope: this
