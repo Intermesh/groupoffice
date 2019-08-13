@@ -190,6 +190,7 @@ class QueryBuilder {
 		$this->setTableName($tableName);
 
 		$this->query = $query;
+		$this->buildBindParameters = $query->getBindParameters();
 		$this->tableAlias = $this->query->getTableAlias();
 		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName, $this->conn);
 
@@ -235,6 +236,7 @@ class QueryBuilder {
 		$this->setTableName($tableName);
 		$this->reset();
 		$this->query = $query;
+		$this->buildBindParameters = $query->getBindParameters();
 		$this->tableAlias = $this->query->getTableAlias();
 		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName, $this->conn);
 
