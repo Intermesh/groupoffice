@@ -3,7 +3,7 @@
 namespace GO\Zpushadmin\Controller;
 
 
-class SettingsController extends \GO\Professional\Controller\AbstractController{
+class SettingsController extends \GO\Base\Controller\AbstractModelController {
 	
 	protected function actionLoad($params) {
 		

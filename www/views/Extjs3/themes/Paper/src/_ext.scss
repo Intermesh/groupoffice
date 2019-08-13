@@ -1674,7 +1674,7 @@ td.grid-hd-group-cell {
 			border:0;
 		}
 		.x-date-today a {
-			border:0;
+			border: 1px solid currentColor;
 			padding:0;
 			font-weight: 700;
 			@include var(color, c-primary);

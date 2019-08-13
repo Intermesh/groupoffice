@@ -1,5 +1,6 @@
 - Billing: Force select of book in duplicate dialog
 - Core: Clear old framework cache on upgrade
+- Project: create invoice without grouping time entries by employees. are time record will be group into 1 group
 
 11-07-2019 6.3.81
 - Core: Enable / disable Add linked item buttons based on permissions

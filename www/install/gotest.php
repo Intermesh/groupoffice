@@ -271,7 +271,7 @@ function test_system(){
 	$test['name']='MultiByte string functions';
 	$test['pass']=function_exists('mb_detect_encoding');
 	$test['feedback']='Warning: php-mbstring is not installed. Problems with non-ascii characters in e-mails and filenames might occur.';
-	$test['fatal']=false;
+	$test['fatal']=true;
 
 	$tests[]=$test;
 	$test['name']='TAR Compression';
