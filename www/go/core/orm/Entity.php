@@ -195,24 +195,30 @@ abstract class Entity extends Property {
 
 //		GO()->debug(static::class.'::save()' . $this->id());
 		App::get()->getDbConnection()->beginTransaction();
-			
-		if (!$this->fireEvent(self::EVENT_BEFORESAVE, $this)) {
-			$this->rollback();
-			return false;
-		}
-		
-		if (!$this->internalSave()) {
-			GO()->warn(static::class .'::internalSave() returned false');
-			$this->rollback();
-			return false;
-		}		
-		
-		if (!$this->fireEvent(self::EVENT_SAVE, $this)) {
-			$this->rollback();
-			return false;
-		}
 
-		return $this->commit() && !$this->hasValidationErrors();
+		try {
+			
+			if (!$this->fireEvent(self::EVENT_BEFORESAVE, $this)) {
+				$this->rollback();
+				return false;
+			}
+			
+			if (!$this->internalSave()) {
+				GO()->warn(static::class .'::internalSave() returned false');
+				$this->rollback();
+				return false;
+			}		
+			
+			if (!$this->fireEvent(self::EVENT_SAVE, $this)) {
+				$this->rollback();
+				return false;
+			}
+
+			return $this->commit() && !$this->hasValidationErrors();
+		} catch(Exception $e) {
+			$this->rollback();
+			throw $e;
+		}
 	}
 
 	private $isSaving = false;
