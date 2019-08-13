@@ -1,3 +1,5 @@
+- Core: Fixed multiselect custom field migration
+
 12-08-2019 6.4.37
 - Calendar: Fixed Error in 
   /usr/share/groupoffice/modules/calendar/model/Participant.php at line 408: 
