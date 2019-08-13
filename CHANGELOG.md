@@ -1,4 +1,5 @@
 - Core: Fixed multiselect custom field migration
+- Email: Fixed invalid autocomplete query returning too many results
 
 12-08-2019 6.4.37
 - Calendar: Fixed Error in 
