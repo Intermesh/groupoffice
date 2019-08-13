@@ -480,17 +480,19 @@ abstract class Entity extends Property {
 	protected static function defineFilters() {
 		$filters = new Filters();
 
-		$filters->add('text', function(Criteria $criteria, $value) {
+		$filters->add('text', function(Criteria $criteria, $value, Query $query) {
 							if(!is_array($value)) {
 								$value = [$value];
 							}
 							
 							foreach($value as $q) {
 								if (!empty($q)) {								
-									static::search($criteria, $q);
+									static::search($criteria, $q, $query);
 								}
 							}
-						})->add('exclude', function(Criteria $criteria, $value) {
+						})
+						
+						->add('exclude', function(Criteria $criteria, $value) {
 							if (!empty($value)) {
 								$criteria->andWhere('id', 'NOT IN', $value);
 							}
@@ -589,7 +591,7 @@ abstract class Entity extends Property {
 	 * @param string $expression
 	 * @return Query
 	 */
-	protected static function search(Criteria $criteria, $expression) {
+	protected static function search(Criteria $criteria, $expression, Query $query) {
 		
 		$columns = static::textFilterColumns();
 		

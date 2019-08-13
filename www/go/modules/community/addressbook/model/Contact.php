@@ -466,7 +466,15 @@ class Contact extends AclItemEntity {
 	}
 
 	protected static function textFilterColumns() {
-		return ['name', 'debtorNumber', 'notes'];
+		return ['name', 'debtorNumber', 'notes', 'emailAddresses.email'];
+	}
+
+	protected static function search(\go\core\db\Criteria $criteria, $expression, \go\core\orm\Query $query)
+	{
+		if(!$query->isJoined('addressbook_email_address', 'emailAddresses')) {
+			$query->join('addressbook_email_address', 'emailAddresses', 'emailAddresses.contactId = c.id')->groupBy(['c.id']);
+		}
+		return parent::search($criteria, $expression, $query);
 	}
 	
 	public function getUid() {
