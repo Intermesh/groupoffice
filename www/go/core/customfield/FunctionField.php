@@ -37,7 +37,7 @@ class FunctionField extends Number {
 		}
 		$f = preg_replace('/\{[^}]*\}/', '0', $f);
 		
-		GO()->debug("Function field formula: \$result = " .  $f. ";");
+		// GO()->debug("Function field formula: \$result = " .  $f. ";");
 		
 		if(empty($f)) {
 			return null;
