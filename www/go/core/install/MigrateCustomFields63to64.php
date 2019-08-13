@@ -179,7 +179,7 @@ class MigrateCustomFields63to64 {
 	private function updateMultiSelect(Field $field) {
 		$field->type = "MultiSelect";		
 		
-		$this->insertMissingOptions($field);
+		$this->insertMissingOptions($field, true);
 		try{
 			$field->getDataType()->createMultiSelectTable();
 		}catch(\PDOException $e) {
@@ -375,7 +375,7 @@ class MigrateCustomFields63to64 {
 	
 	
 	
-	private function insertMissingOptions(Field $field) {
+	private function insertMissingOptions(Field $field, $multiselect = false) {
 		//set invalid options to null
 		$optionTexts = GO()->getDbConnection()
 						->selectSingleValue('text')
@@ -388,10 +388,22 @@ class MigrateCustomFields63to64 {
 						->where($field->databaseName, 'NOT IN', $optionTexts);
 
 		$missing = $missingQuery->all();
+
+		if($multiselect) {
+			$m = [];
+			foreach($missing as $msv) {
+				if(!empty($msv)) {
+					$m = array_merge($m,explode('|', $msv));
+				}
+			}
+			$missing = $m;
+		}
+
+		$optionTexts = $optionTexts->all();
 		
-		$missing = array_filter($missing, function($text) {
+		$missing = array_filter($missing, function($text) use ($optionTexts) {
 			$text = trim($text);
-			return !empty($text);
+			return !empty($text) && !in_array($text, $optionTexts);
 		});
 		
 		$data = array_map(function($text) use ($field) {
