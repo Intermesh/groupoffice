@@ -1,5 +1,8 @@
+13-08-2019 6.4.38
+- Core: Adding select option destroyed all data
 - Core: Fixed multiselect custom field migration
 - Email: Fixed invalid autocomplete query returning too many results
+- Address book: Search in email by default too
 
 12-08-2019 6.4.37
 - Calendar: Fixed Error in 
