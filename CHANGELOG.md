@@ -1,3 +1,6 @@
+- Billing: Force select of book in duplicate dialog
+- Core: Clear old framework cache on upgrade
+
 11-07-2019 6.3.81
 - Core: Enable / disable Add linked item buttons based on permissions
 - Core: Update Czech translation

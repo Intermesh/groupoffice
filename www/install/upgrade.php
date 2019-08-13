@@ -133,6 +133,7 @@ try {
 	}
 	
 	GO()->getCache()->flush(false);
+	GO::cache()->flush();
 	GO()->setCache(new \go\core\cache\None());
 	$dbValid = isValidDb();
 	
