@@ -1,4 +1,6 @@
 - Address Book: Create files path like in 6.2 for address book files
+- Files: Removed UTF8 to CP850 conversion when creating ZIP files as it works in Windows 10 now
+- Core: Added English / Philippines language and holidays
 
 13-08-2019 6.4.38
 - Core: Adding select option destroyed all data
