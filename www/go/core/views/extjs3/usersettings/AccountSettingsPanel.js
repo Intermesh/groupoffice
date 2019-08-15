@@ -32,24 +32,9 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				{
 					width: 150,					
 					items: [
-						this.avatarComp = new go.form.FileField({
-							buttonOnly: true,
-							name: 'avatarId',
-							height:120,
-							cls: "avatar",
-							autoUpload: true,
-							buttonCfg: {
-								text: '',
-								width: 120
-							},
-							setValue: function(val) {
-								if(this.rendered && !Ext.isEmpty(val)) {
-									this.wrap.setStyle('background-image', 'url('+go.Jmap.downloadUrl(val)+')');
-								}
-								go.form.FileField.prototype.setValue.call(this,val);
-							},
-							accept: 'image/*'
-						})
+						this.avatarComp = new go.form.ImageField({			
+							name: 'avatarId'										
+						})						
 					]
 				},{
 					flex:1,

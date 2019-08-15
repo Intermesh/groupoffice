@@ -1,6 +1,8 @@
 <?php
 namespace go\core\http;
 
+use go\core\fs\File;
+
 class Client {
 
   private $curl;
@@ -30,7 +32,7 @@ class Client {
     $this->setOption(CURLOPT_RETURNTRANSFER, true);
     $this->setOption(CURLOPT_HEADERFUNCTION, function($curl, $header) {
       if(preg_match('/([\w-]+): (.*)/i', $header, $matches)) {
-        $this->lastHeaders[$matches[1]] = trim($matches[2]);
+        $this->lastHeaders[strtolower($matches[1])] = trim($matches[2]);
       }
 		
 		  return strlen($header);
@@ -73,6 +75,35 @@ class Client {
       'headers' => $this->lastHeaders,
       'body' => $body
     ];
+  }
+
+
+  public function download($url, File $file) {
+    $fp = $file->open('w');
+
+    $this->initRequest($url);
+    $this->setOption(CURLOPT_FILE, $fp);
+
+    curl_exec($this->getCurl());
+    fclose($fp);
+
+    $error = curl_error($this->getCurl());
+		if(!empty($error)) {
+      throw new \Exception($error);
+    }
+
+    // var_dump($this->lastHeaders);
+
+    if(isset($this->lastHeaders['content-disposition'])) {
+      preg_match('/filename="(.*)"/', $this->lastHeaders['content-disposition'], $matches);
+      return [
+        "name" => $matches[1] ?? "unknown",
+        "type" => $this->lastHeaders['content-type'] ?? "application/octet-stream"
+      ];
+    } else{
+      return ["name"=> "unknown", "type" => $this->lastHeaders['content-type'] ?? "application/octet-stream"];
+    }
+
   }
 
   public function close() 
