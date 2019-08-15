@@ -17,6 +17,11 @@ use function GO;
 use go\core\mail\Message;
 use go\core\TemplateParser;
 use go\core\db\Expression;
+use go\core\fs\File;
+use go\core\mail\Recipient;
+use go\core\util\StringUtil;
+use GO\Files\Model\Folder;
+use GO\Files\Model\FolderNotificationMessage;
 
 /**
  * Contact model
@@ -246,6 +251,34 @@ class Contact extends AclItemEntity {
 
 	public function setStarred($starred) {
 		$this->starred = empty($starred) ? null : true;
+	}
+
+	public function buildFilesPath() {
+		$new_folder_name = File::stripInvalidChars($this->name).' ('.$this->id.')';
+		$last_part = empty($this->name) ? '' : strtoupper(mb_substr($new_folder_name,0,1,'UTF-8'));
+
+		$addressBook = AddressBook::findById($this->addressBookId);		
+
+		$folder = Folder::model()->findForEntity($addressBook);
+
+		$addressBookPath = $folder->path;
+
+		$new_path = $addressBookPath . '/';
+
+		if($this->isOrganization) {
+			$new_path .= 'companies';
+		} else{
+			$new_path .= 'contacts';
+		}
+
+		if(!empty($last_part)) {
+			$new_path .= '/'.$last_part;
+		}else {
+			$new_path .= '/0 no last name';
+		}
+					
+		$new_path .= '/'.$new_folder_name;
+		return $new_path;
 	}
 	
 	

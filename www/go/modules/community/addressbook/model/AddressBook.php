@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\addressbook\model;
-						
+
+use go\core\fs\File;
 use go\core\orm\Property;
 						
 /**
@@ -36,10 +37,21 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 	 * @var int
 	 */							
 	public $createdBy;
+
+	/**
+	 * 
+	 * @var int
+	 */
+	public $filesFolderId;
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable("addressbook_addressbook", "a");
+	}
+
+
+	public function buildFilesPath() {
+		return "addressbook/" . File::stripInvalidChars($this->name);
 	}
 	
 	/**

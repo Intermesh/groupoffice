@@ -60,6 +60,8 @@ class Migrate63to64 {
 				$addressBook->createdBy = $abRecord['user_id'];
 				$addressBook->aclId = $abRecord['acl_id'];
 				$addressBook->name = $abRecord['name'];
+				$addressBook->filesFolderId = $abRecord['files_folder_id'];
+				
 				if (!$addressBook->save()) {
 					throw new Exception("Could not save addressbook");
 				}
