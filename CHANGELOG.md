@@ -1,3 +1,5 @@
+- Address Book: Create files path like in 6.2 for address book files
+
 13-08-2019 6.4.38
 - Core: Adding select option destroyed all data
 - Core: Fixed multiselect custom field migration
