@@ -37,6 +37,8 @@ class Installer {
 	const MIN_UPGRADABLE_VERSION = "6.3.58";
 	
 	private static $isInProgress = false;
+	private static $isInstalling = false;
+	private static $isUpgrading = false;
 
 	/**
 	 * Check if it's installing or upgrading
@@ -45,6 +47,24 @@ class Installer {
 	 */
 	public static function isInProgress() {
 		return self::$isInProgress;
+	}
+
+	/**
+	 * Check if it's installing
+	 * 
+	 * @return bool
+	 */
+	public static function isInstalling() {
+		return self::$isInstalling;
+	}
+
+	/**
+	 * Check if it's upgrading
+	 * 
+	 * @return bool
+	 */
+	public static function isUpgrading() {
+		return self::$isUpgrading;
 	}
 
 	/**
@@ -62,6 +82,7 @@ class Installer {
 		App::get()->setCache(new None());
 
 		self::$isInProgress = true;
+		self::$isInstalling = true;
 
 		ActiveRecord::$log_enabled = false;
 		
@@ -259,6 +280,7 @@ class Installer {
 
 	public function upgrade() {
 		self::$isInProgress = true;
+		self::$isUpgrading = true;
 
 		GO()->setAuthState((new TemporaryState())->setUserId(1));
 		
