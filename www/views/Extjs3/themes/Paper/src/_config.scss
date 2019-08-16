@@ -69,11 +69,7 @@ $vars: (
 	@include var(color, c-primary);
 }
 
-.ellipsis {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-}
+
 
 %hidden {
     visibility: hidden;

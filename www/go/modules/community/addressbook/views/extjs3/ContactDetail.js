@@ -136,12 +136,15 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 
 						this.items.each(function(i) {
 							i.update(detailView.data);
-						});						
+						});					
+						
+						detailView.phoneNumbers.setVisible(detailView.data.phoneNumbers.length > 0);
+						detailView.emailAddresses.setVisible(detailView.data.emailAddresses.length > 0);
 					},
 
 					items: [
 				
-					{
+					this.emailAddresses = new Ext.BoxComponent({
 						xtype: "box",
 						listeners: {
 							scope: this,
@@ -168,10 +171,10 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 								</a>\
 							</tpl>\
 						</div>'
-					}, 
+					}), 
 
 
-					{
+					this.phoneNumbers = new Ext.BoxComponent({
 						xtype: "box",
 						listeners: {
 							scope: this,
@@ -198,7 +201,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 								</a>\
 							</tpl>\
 						</div>'
-					}]
+					})]
 				},
 				
 				{
