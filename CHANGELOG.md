@@ -1,3 +1,5 @@
+- Address book: Changed detail view layout so that email addresses and phonenumbers can be clicked directly and smaller image
+- Address Book: Contact salutation template tag fixed and configurable in the address book settings
 - Address Book / Core: New image field with upload from URL support
 - Address Book: Create files path like in 6.2 for address book files
 - Files: Removed UTF8 to CP850 conversion when creating ZIP files as it works in Windows 10 now
