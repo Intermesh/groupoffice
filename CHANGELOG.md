@@ -1,3 +1,4 @@
+- Core: Fixed saving module permission in group dialog
 - Address book: Changed detail view layout so that email addresses and phonenumbers can be clicked directly and smaller image
 - Address Book: Contact salutation template tag fixed and configurable in the address book settings
 - Address Book / Core: New image field with upload from URL support
