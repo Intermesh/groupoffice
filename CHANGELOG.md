@@ -1,3 +1,5 @@
+- Core: Upgrading cleared module settings (Only affected one custom module)
+
 16-08-2019 6.4.39
 - Core: Fixed saving module permission in group dialog
 - Address book: Changed detail view layout so that email addresses and phonenumbers can be clicked directly and smaller image
