@@ -49,7 +49,7 @@ class Comment extends Entity {
 			->addScalar('labels', 'comments_comment_label', ['id' => 'commentId'])
 			->setQuery(
 				(new Query())
-					->select("e.name AS entity")
+					->select("e.clientName AS entity")
 					->join('core_entity', 'e', 'e.id = c.entityTypeId')
 		);
 	}
@@ -75,7 +75,7 @@ class Comment extends Entity {
 			})
 			
 			->add('entity', function(Criteria $criteria, $value) {
-				$criteria->where(['e.name' => $value]);	
+				$criteria->where(['e.clientName' => $value]);	
 			})
 
 			->add('section', function(Criteria $criteria, $value){
