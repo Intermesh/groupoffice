@@ -116,7 +116,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	}
 	
 	public static function getCompanyAttributes(\go\modules\community\addressbook\model\Contact $company, $tagPrefix = 'company:'){
-		$attributes[$tagPrefix . 'salutation'] = GO()->t("Dear sir/madam");
+		$attributes[$tagPrefix . 'salutation'] = $company->getSalutation();
 		
 		$attributes[$tagPrefix . 'comment'] = $company->notes;
 		$attributes[$tagPrefix . 'crn'] = $company->registrationNumber;
@@ -167,7 +167,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	} 
 	
 	public static function getContactAttributes($contact, $tagPrefix = 'contact:', $companyTagPrefix = 'company:'){
-		$attributes[$tagPrefix . 'salutation'] = GO()->t("Hi")." ".$contact->firstName;
+		$attributes[$tagPrefix . 'salutation'] = $contact->getSalutation();
 		$attributes[$tagPrefix . 'sirmadam']=$contact->gender=="M" ? \GO::t('sir') : \GO::t('madam');
 		
 		$attributes[$tagPrefix . 'first_name'] = $contact->firstName;

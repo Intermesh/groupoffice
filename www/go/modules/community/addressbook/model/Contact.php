@@ -572,7 +572,7 @@ class Contact extends AclItemEntity {
 		}		
 		
 		if($this->isNew() && !isset($this->addressBookId)) {
-			$this->addressBookId = GO()->getAuthState()->getUser()->addressBookSettings->defaultAddressBookId;
+			$this->addressBookId = GO()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->defaultAddressBookId;
 		}
 		
 		if($this->isModified('addressBookId') || $this->isModified('groups')) {
@@ -684,16 +684,16 @@ class Contact extends AclItemEntity {
 
 	public function getSalutation() 
 	{
+		if($this->isOrganization) {
+			return GO()->t("Dear sir/madam");
+		}
+
 		$tpl = new TemplateParser();
 		$tpl->addModel('contact', $this->toArray(['firstName', 'lastName', 'middleName', 'name', 'gender', 'prefixes', 'suffixes', 'language']));
 
-		$user = GO()->getAuthState()->getUser(['addressBookSettings']);
+		$addressBook = AddressBook::findById($this->addressBookId, ['salutationTemplate']);
 
-		if(!isset($user->addressBookSettings)){
-			$user->addressBookSettings = new UserSettings();
-		}
-
-		return $tpl->parse($user->addressBookSettings->salutationTemplate);
+		return $tpl->parse($addressBook->salutationTemplate);
 	}
 	
 	/**

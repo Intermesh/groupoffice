@@ -43,6 +43,23 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 	 * @var int
 	 */
 	public $filesFolderId;
+
+
+	/**
+	 * 
+	 * @var string
+	 */
+	public $salutationTemplate;
+
+	protected function init()
+	{
+		
+		if(empty($this->salutationTemplate)) {
+			$this->salutationTemplate = GO()->t("salutationTemplate");
+		}
+
+		parent::init();
+	}
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()

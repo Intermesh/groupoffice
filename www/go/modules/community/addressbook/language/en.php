@@ -31,5 +31,7 @@ return [
 				"facebook" => "Facebook",
 				"twitter" => "Twitter",
 				"linkedin" => "LinkedIn"
-		]
+		],
+
+		"salutationTemplate" => 'Dear [if {{contact.prefixes}}]{{contact.prefixes}}[else][if !{{contact.gender}}]Ms./Mr.[else][if {{contact.gender}}=="M"]Mr.[else]Ms.[/if][/if][/if] {{contact.lastName}}'
 ];
