@@ -36,6 +36,7 @@ form/DateField.js
 form/DateTimeField.js
 form/TimeField.js
 form/FileField.js
+form/ImageField.js
 form/FileButtonField.js
 form/ComboBox.js
 form/ComboBoxReset.js
