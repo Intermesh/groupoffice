@@ -2,7 +2,9 @@
 use go\core\jmap\Response;
 use go\core\jmap\Request;
 use go\core\webclient\CSP;
+use go\core\webclient\Extjs3;
 
+$webclient = new Extjs3();
 $lang = GO::language()->getLanguage(); ?>
 <!DOCTYPE html>
 <html lang="<?= $lang; ?>">
@@ -30,10 +32,12 @@ $lang = GO::language()->getLanguage(); ?>
 	<meta name="theme-color" content="#ffffff">
 
 	<title><?= \GO::config()->title; ?></title>
-
-	<link href="<?= \GO::view()->getTheme()->getUrl();?>style.css?v=<?=\GO()->getVersion(); ?>" media="(min-device-width:1201px)" type="text/css" rel="stylesheet" />
-	<link rel="stylesheet" type="text/css" media="screen and (max-device-width:1200px)" href="<?= \GO::view()->getTheme()->getUrl(); ?>style-mobile.css?v=<?=\GO()->getVersion(); ?>" />
-	<link href="<?= \GO::view()->getUrl()?>css.php?v=<?=\GO()->getVersion(); ?>" type="text/css" rel="stylesheet" />
+	<?php
+	$cssMtime = filemtime(__DIR__ . "/style.css");
+	?>
+	<link href="<?= \GO::view()->getTheme()->getUrl();?>style.css?v=<?=$cssMtime ?>" media="(min-device-width:1201px)" type="text/css" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" media="screen and (max-device-width:1200px)" href="<?= \GO::view()->getTheme()->getUrl(); ?>style-mobile.css?v=<?=$cssMtime;?>" />
+	<link href="<?= \GO::view()->getUrl()?>css.php?v=<?=$webclient->getCSSFile()->getModifiedAt()->format("U"); ?>" type="text/css" rel="stylesheet" />
 
 	<?php
 	if(!empty(\GO::config()->custom_css_url))
