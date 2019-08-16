@@ -1,3 +1,4 @@
+- Address Book / Core: New image field with upload from URL support
 - Address Book: Create files path like in 6.2 for address book files
 - Files: Removed UTF8 to CP850 conversion when creating ZIP files as it works in Windows 10 now
 - Core: Added English / Philippines language and holidays
