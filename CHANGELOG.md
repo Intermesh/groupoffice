@@ -1,6 +1,7 @@
 - Core: Upgrading cleared module settings (Only affected one custom module)
 
 16-08-2019 6.4.39
+- Core: 6.4.36 E-Mail created from task with wrong address #443
 - Core: Fixed saving module permission in group dialog
 - Address book: Changed detail view layout so that email addresses and phonenumbers can be clicked directly and smaller image
 - Address Book: Contact salutation template tag fixed and configurable in the address book settings

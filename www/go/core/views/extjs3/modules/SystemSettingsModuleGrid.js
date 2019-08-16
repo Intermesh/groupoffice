@@ -142,10 +142,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 			},{
 				header: "Package",
 				dataIndex: 'localizedPackage',
-				id: 'localizedPackage',
-				renderer: function(v) {
-					return v.ucFirst();
-				}
+				id: 'localizedPackage'				
 			}
 		];
 
