@@ -4,6 +4,12 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 	cls: 'x-grid3-no-row-borders',
 	initComponent: function () {
 
+		if(!go.User.addressBookSettings) {
+			go.User.addressBookSettings = {
+				sortBy: "firstName"
+			};
+		}
+
 		this.store = new go.data.Store({
 			fields: [
 				'id',
