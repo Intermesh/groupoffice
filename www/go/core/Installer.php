@@ -465,9 +465,6 @@ class Installer {
 						$root = GO()->getEnvironment()->getInstallFolder();
 						$updateScript = $root->getFile('modules/' . $module->name . '/install/updatescripts/' . substr($query, 7));
 						
-						if (!$updateScript->exists()) {
-							$updateScript = $module->folder()->getFile('/install/updatescripts/' . substr($query, 7));
-						}
 						if (!$updateScript->exists()) {	
 							die($updateScript . ' not found!');
 						}
