@@ -1,6 +1,7 @@
+16-08-2019 6.4.40
 - Core: Upgrading cleared module settings (Only affected one custom module)
 - Core: Module sorting (two community groups)
-
+- Address book: Search only showed contact with email
 
 16-08-2019 6.4.39
 - Core: 6.4.36 E-Mail created from task with wrong address #443
