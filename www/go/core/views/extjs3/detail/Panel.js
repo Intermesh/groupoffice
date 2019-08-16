@@ -40,8 +40,9 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	entityStore: null,
 
 	initComponent: function () {
-		go.detail.Panel.superclass.initComponent.call(this, arguments);		
-		
+		go.detail.Panel.superclass.initComponent.call(this, arguments);			
+
+		this.watchRelations = {};
 
 		this.cls += " go-detail-view-" + this.entityStore.entity.name.toLowerCase();
 		
