@@ -392,7 +392,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			
 			var module = entityObj.module; 
 			var mainPanel = GO.mainLayout.openModule(module);
-			var detailViewName = entity + "Detail";
+			var detailViewName = entity.charAt(0).toLowerCase() + entity.slice(1) + "Detail";
 
 			if (mainPanel.route) {
 				mainPanel.route(id, entityObj);
