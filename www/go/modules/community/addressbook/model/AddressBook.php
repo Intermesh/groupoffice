@@ -55,7 +55,7 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 	{
 		
 		if(empty($this->salutationTemplate)) {
-			$this->salutationTemplate = GO()->t("salutationTemplate");
+			$this->salutationTemplate = GO()->t("salutationTemplate", "community", "addressbook");
 		}
 
 		parent::init();
