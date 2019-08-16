@@ -7,6 +7,7 @@ use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\model\UserGroup;
 use go\core\orm\Query;
+use go\core\util\ArrayObject;
 use go\core\validate\ErrorCode;
 
 /**
@@ -147,7 +148,8 @@ class Group extends AclOwnerEntity {
 
 
 	public function getModules() {
-		$modules = [];
+		$modules = new ArrayObject();
+		$modules->serializeJsonAsObject = true;
 
 		$mods = Module::find()
 							->select('id,level')
