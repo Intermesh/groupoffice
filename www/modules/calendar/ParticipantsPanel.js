@@ -344,9 +344,9 @@ Ext.extend(GO.calendar.ParticipantsPanel, Ext.Panel, {
 			return false;
 		}*/
 		
-		var select = new go.modules.community.addressbook.SelectDialog ({
+		var select = new go.util.SelectDialog ({
 			scope: this,
-			selectSingleEmail: function(name, email, id) {
+			selectSingleEmail: function(name, email, id, entityName) {
 				GO.request({
 					url:"calendar/participant/getContacts",
 					params:{
@@ -360,7 +360,7 @@ Ext.extend(GO.calendar.ParticipantsPanel, Ext.Panel, {
 					scope:this
 				});	
 			},
-			selectMultiple: function(ids) {
+			selectMultiple: function(ids, entityName) {
 				GO.request({
 					url:"calendar/participant/getContacts",
 					params:{

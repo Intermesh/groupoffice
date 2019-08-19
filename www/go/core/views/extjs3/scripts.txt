@@ -94,6 +94,7 @@ util.js
 util/Format.js
 util/Filters.js
 util/Cookies.js
+util/SelectDialog.js
 
 User.js
 String.js

@@ -362,9 +362,9 @@ go.util =  (function () {
 										Ext.MessageBox.alert(t("Success"), t("Imported {count} items").replace('{count}', response.count));
 									}
 
-									if (callback) {
-										callback.call(scope || this, response);
-									}
+									// if (callback) {
+									// 	callback.call(scope || this, response);
+									// }
 								},
 								scope: this
 							});

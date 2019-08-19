@@ -209,6 +209,10 @@ go.Modules.register("community", "addressbook", {
 	userSettingsPanels: [
 		"go.modules.community.addressbook.SettingsPanel",
 		"go.modules.community.addressbook.SettingsProfilePanel"
+	],
+
+	selectDialogPanels: [
+		"go.modules.community.addressbook.SelectDialogPanel",
 	]
 });
 
@@ -235,7 +239,8 @@ Ext.onReady(function () {
 		grid: go.modules.community.addressbook.ContactGrid,
 		add: function () {		
 			return new Promise(function (resolve, reject) {
-				var select = new go.modules.community.addressbook.SelectDialog({
+				var select = new go.util.SelectDialog({
+					entities: ['Contact'],
 					mode: 'id',
 					scope: this,					
 					selectMultiple: function (ids) {
