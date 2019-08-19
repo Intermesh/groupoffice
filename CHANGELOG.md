@@ -1,3 +1,4 @@
+17-08-2019 6.4.41
 - Core: Added users and user groups to select dialog (Composer, Calendar)
 - Calendar: 6.4.24 - Calendar - Error when accepting invite from other GO user #424
 - Document templates: Fixed Can't get not existing property 'photoFile' in 'go\modules\community\addressbook\model\Contact' error with ODT files
