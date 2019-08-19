@@ -1,3 +1,6 @@
+17-08-2019 6.4.42
+- Core: Icon's didn't render on non standard port.
+
 17-08-2019 6.4.41
 - Core: Added users and user groups to select dialog (Composer, Calendar)
 - Calendar: 6.4.24 - Calendar - Error when accepting invite from other GO user #424
