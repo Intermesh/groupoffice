@@ -257,9 +257,10 @@ class Field extends AclItemEntity {
 			GO()->warn($e);
 			
 			if($this->isNew()) {
-				parent::internalDelete();
-				$this->setValidationError('id', \go\core\validate\ErrorCode::GENERAL, $e->getMessage());
+				parent::internalDelete();				
 			}
+
+			$this->setValidationError('id', \go\core\validate\ErrorCode::GENERAL, $e->getMessage());
 			
 			return false;
 		} finally {
