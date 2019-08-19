@@ -1,3 +1,6 @@
+- Core: Added users and user groups to select dialog (Composer, Calendar)
+- Calendar: 6.4.24 - Calendar - Error when accepting invite from other GO user #424
+
 16-08-2019 6.4.40
 - Core: Upgrading cleared module settings (Only affected one custom module)
 - Core: Module sorting (two community groups)
