@@ -163,6 +163,11 @@
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
 
+- Billing: Force select of book in duplicate dialog
+- Core: Clear old framework cache on upgrade
+- Project: create invoice without grouping time entries by employees. are time record will be group into 1 group
+- Comments: Removed 10 comment limit
+- Projects: Don't reset travel distance on existing time entries
 
 11-07-2019 6.3.81
 - Core: Enable / disable Add linked item buttons based on permissions
