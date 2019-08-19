@@ -346,33 +346,74 @@ Ext.extend(GO.calendar.ParticipantsPanel, Ext.Panel, {
 		
 		var select = new go.util.SelectDialog ({
 			scope: this,
+			entities: ["Contact", "User"],
 			selectSingleEmail: function(name, email, id, entityName) {
-				GO.request({
-					url:"calendar/participant/getContacts",
-					params:{
-						contacts: Ext.encode([{entityId: id, name: name, email: email}]),
-						start_time : this.eventDialog.getStartDate().format('U'),
-						end_time : this.eventDialog.getEndDate().format('U')
-					},
-					success:function(response, options, result){
-						this.addParticipants(result);
-					},
-					scope:this
-				});	
+
+				switch(entityName) {
+					case "User":
+							GO.request({
+								url:"calendar/participant/getUsers",
+								params:{
+									users: Ext.encode([id]),
+									start_time : this.eventDialog.getStartDate().format('U'),
+									end_time : this.eventDialog.getEndDate().format('U')
+								},
+								success:function(response, options, result){
+									this.addParticipants(result);
+								},
+								scope:this
+							});					
+					break;
+
+					case "Contact":
+							GO.request({
+								url:"calendar/participant/getContacts",
+								params:{
+									contacts: Ext.encode([{entityId: id, name: name, email: email}]),
+									start_time : this.eventDialog.getStartDate().format('U'),
+									end_time : this.eventDialog.getEndDate().format('U')
+								},
+								success:function(response, options, result){
+									this.addParticipants(result);
+								},
+								scope:this
+							});	
+					break;
+				}
+				
 			},
 			selectMultiple: function(ids, entityName) {
-				GO.request({
-					url:"calendar/participant/getContacts",
-					params:{
-						contacts: Ext.encode(ids.map(function(id){return {entityId: id};})),
-						start_time : this.eventDialog.getStartDate().format('U'),
-						end_time : this.eventDialog.getEndDate().format('U')
-					},
-					success:function(response, options, result){
-						this.addParticipants(result);
-					},
-					scope:this
-				});		
+				switch(entityName) {
+					case "User":
+							GO.request({
+								url:"calendar/participant/getUsers",
+								params:{
+									users: Ext.encode(ids),
+									start_time : this.eventDialog.getStartDate().format('U'),
+									end_time : this.eventDialog.getEndDate().format('U')
+								},
+								success:function(response, options, result){
+									this.addParticipants(result);
+								},
+								scope:this
+							});			
+					break;
+
+					case "Contact":
+						GO.request({
+							url:"calendar/participant/getContacts",
+							params:{
+								contacts: Ext.encode(ids.map(function(id){return {entityId: id};})),
+								start_time : this.eventDialog.getStartDate().format('U'),
+								end_time : this.eventDialog.getEndDate().format('U')
+							},
+							success:function(response, options, result){
+								this.addParticipants(result);
+							},
+							scope:this
+						});		
+						break;
+					}
 			}
 		});
 		select.show();

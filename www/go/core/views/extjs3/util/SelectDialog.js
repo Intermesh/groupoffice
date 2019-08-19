@@ -77,9 +77,13 @@
 					autoScroll: true,
 					hideMode: "offsets"
 				},
-				activeTab: 0,
+				activeTab: Ext.state.Manager.get('select-dialog-tab') || 0,
 				enableTabScroll: true
 			});
+
+			this.tabPanel.on('tabchange', function(tabpanel, tab) {
+				Ext.state.Manager.set('select-dialog-tab', tabpanel.items.indexOf(tab));
+			},this);
 
 			this.loadModulePanels();
 
@@ -108,7 +112,7 @@
 					pnl = eval(config.selectDialogPanels[i1]);				
 					var p = new pnl;
 
-					if(this.entitiies && this.entities.indexOf(p.entityName) == -1) {
+					if(this.entities && this.entities.indexOf(p.entityName) == -1) {
 						continue;
 					}
 

@@ -146,24 +146,50 @@ GO.email.EmailComposer = function(config) {
 
 		me.getEl().mask(t("Loading..."));
 
-		go.Jmap.request({
-			method: "Contact/get",
-			params: {
-				properties: ["name", "emailAddresses"],
-				ids: ids
-			}
-		}).then(function(result) {										
+		switch(entityName) {
+			case "Contact":
+					go.Jmap.request({
+						method: "Contact/get",
+						params: {
+							properties: ["name", "emailAddresses"],
+							ids: ids
+						}
+					}).then(function(result) {										
+			
+						result.list.forEach(function(contact) {
+							if(!go.util.empty(v)) {
+								v += ", ";
+							}							
+							v += '"' + contact.name.replace(/"/g, '\\"') + '" <' + contact.emailAddresses[0].email + '>';							
+							combo.setValue(v);
+						});
+					}).finally(function(){
+						me.getEl().unmask();
+					});		
+			break;
 
-			result.list.forEach(function(contact) {
-				if(!go.util.empty(v)) {
-					v += ", ";
-				}							
-				v += '"' + contact.name.replace(/"/g, '\\"') + '" <' + contact.emailAddresses[0].email + '>';							
-				combo.setValue(v);
-			});
-		}).finally(function(){
-			me.getEl().unmask();
-		});		
+			case "User":
+					go.Jmap.request({
+						method: "User/get",
+						params: {
+							properties: ["displayName", "email"],
+							ids: ids
+						}
+					}).then(function(result) {										
+			
+						result.list.forEach(function(user) {
+							if(!go.util.empty(v)) {
+								v += ", ";
+							}							
+							v += '"' + user.displayName.replace(/"/g, '\\"') + '" <' + user.email + '>';							
+							combo.setValue(v);
+						});
+					}).finally(function(){
+						me.getEl().unmask();
+					});		
+			break;
+		}
+		
 
 		// go.Db.store("Contact").get(ids).then(function(result) {										
 
@@ -219,6 +245,8 @@ GO.email.EmailComposer = function(config) {
 				iconCls : 'ic-add',
 				handler: function() {
 					var select = new go.util.SelectDialog({
+						entities: ["Contact", "User"],
+
 						scope: this,
 						
 						selectSingleEmail: function(name, email, id, entityName) {
@@ -248,6 +276,9 @@ GO.email.EmailComposer = function(config) {
 				iconCls : 'ic-add',
 				handler: function() {
 					var select = new go.util.SelectDialog ({
+
+						entities: ["Contact", "User"],
+						
 						scope: this,
 						
 						selectSingleEmail: function(name, email, id, entityName) {
@@ -278,6 +309,9 @@ GO.email.EmailComposer = function(config) {
 				iconCls : 'ic-add',
 				handler: function() {
 					var select = new go.util.SelectDialog ({
+
+						entities: ["Contact", "User"],
+
 						scope: this,
 						
 						selectSingleEmail: function(name, email, id, entityName) {

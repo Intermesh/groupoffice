@@ -158,6 +158,7 @@ users/CreateUserWizard.js
 users/UserGroupGrid.js
 users/UserCombo.js
 users/UserSettingsWorkingWeek.js
+users/SelectDialogPanel.js
 
 customfields/FormFieldSet.js
 customfields/FieldDialog.js
