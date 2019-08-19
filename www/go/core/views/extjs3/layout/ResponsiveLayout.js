@@ -61,7 +61,7 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 	},
 	
 	isNarrow : function() {
-		return window.innerWidth <= this.triggerWidth
+		return window.innerWidth <= this.triggerWidth;
 	},
 	
 	getItemWidth : function(i, modeSwitched) {
