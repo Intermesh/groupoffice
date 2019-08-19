@@ -494,6 +494,7 @@ class Contact extends AclItemEntity {
 	public static function converters() {
 		$arr = parent::converters();
 		$arr['text/vcard'] = VCard::class;		
+		$arr['text/x-vcard'] = VCard::class;
 		$arr['text/csv'] = Csv::class;
 		return $arr;
 	}
