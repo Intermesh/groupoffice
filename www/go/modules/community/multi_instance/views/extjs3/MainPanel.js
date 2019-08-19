@@ -29,15 +29,28 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 				'enabled',
 				'loginCount',
 				'usersMax',
+				'version',
 				{name: 'storageUsage', type: "int"},
 				{name: 'storageQuota', type: "int"}
 			],
-			entityStore: "Instance"
+			entityStore: "Instance",
+			filters: {
+				enabled: {enabled: true}
+			}
 		});
 
 		Ext.apply(this, {		
 			plugins: [actions],
-			tbar: [ '->', {					
+			tbar: [{
+				iconCls: 'ic-block',
+				text: t('Show disabled'),
+				enableToggle:true,				
+				toggleHandler: function(btn, state) {					
+					this.store.setFilter('enabled', state ? {} : {enabled: true});
+					this.store.load();
+				},
+				scope:this
+		}, '->', {					
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
@@ -45,6 +58,8 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 						dlg.show();
 					}
 				}, {
+					xtype: "tbsearch"
+				},{
 					iconCls: 'ic-more-vert',
 					menu: [{
 							iconCls: 'ic-email', 
@@ -155,6 +170,11 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'storageUsage',					
 					renderer: GO.util.format.fileSize,
 					align: "right"
+				},{
+					header: t('Version'),
+					width: 160,
+					sortable: true,
+					dataIndex: 'version'
 				},
 				actions
 				

@@ -2,6 +2,7 @@
 namespace go\modules\community\multi_instance\model;
 
 use Exception;
+use go\core\db\Criteria;
 use go\core\fs\File;
 use go\core\jmap\Entity;
 use go\core\validate\ErrorCode;
@@ -34,6 +35,8 @@ class Instance extends Entity {
 	public $adminEmail; 	
 	public $loginCount;	
 	public $modifiedAt;
+
+	public $version;
 	
 	public $enabled;
 	
@@ -65,16 +68,30 @@ class Instance extends Entity {
 		return parent::defineMapping()
 						->addTable('multi_instance_instance');
 	}
+
+	protected static function textFilterColumns()
+	{
+		return ['hostname', 'adminEmail', 'adminDisplayName'];
+	}
+
+	protected static function defineFilters() {
+		return parent::defineFilters()
+			->add('enabled', function(Criteria $c, $value){
+				$c->andWhere(['enabled' => $value]);
+			});
+	}
+
+	
 	
 	protected function init() {
 		parent::init();
 		
 		if(!$this->isNew()) {
 			//update model from instance db once a day
-			if(!isset($this->modifiedAt) || $this->modifiedAt <= new \DateTime("-1 day")) {
+			if(!isset($this->modifiedAt) || $this->modifiedAt <= new \DateTime("-10 minute")) {
 				$this->getInstanceDbData();
 				
-				if($this->isModified() && !$this->internalSave()) {
+				if($this->isModified() && !$this->save()) {
 					throw new \Exception("Could not save instance data! ". var_export($this->getValidationErrors(), true));
 				}
 			}
@@ -449,6 +466,13 @@ class Instance extends Entity {
 						->selectSingleValue('value')
 						->from('go_settings')
 						->where('name', '=', "file_storage_usage")
+						->single();
+
+			$this->version = (new \go\core\db\Query())
+						->setDbConnection($this->getInstanceDbConnection())
+						->selectSingleValue('value')
+						->from('core_setting')
+						->where('name', '=', "databaseVersion")
 						->single();
 			
 			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
