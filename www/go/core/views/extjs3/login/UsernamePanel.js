@@ -28,10 +28,10 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 			this.usernameField,
 			this.passwordField,
 			{
-				itemCls: 'go-login-remind',
+				itemCls: 'go-login-remember',
 				hideLabel: true,
 				xtype: "xcheckbox",
-				name: "remind",
+				name: "remember",
 				value: false,
 				boxLabel: t("Remember my login on this computer until I press logout"),
 				listeners: {
@@ -58,7 +58,7 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 			id: 'usernameCheck',
 			bbar: [
 				this.forgotBtn = new Ext.Button({
-					itemCls: "go-login-forgot-username",
+					cls: "go-login-forgot-username",
 					text: t("Forgot username?"),
 					handler: this.showForgot,
 					scope: this
