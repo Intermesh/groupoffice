@@ -1,4 +1,7 @@
-17-08-2019 6.4.42
+19-08-2019 6.4.43
+- Address book: Install failed
+
+19-08-2019 6.4.42
 - Core: Icon's didn't render on non standard port.
 
 17-08-2019 6.4.41
