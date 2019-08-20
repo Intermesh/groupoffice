@@ -16,6 +16,7 @@
 namespace GO\Files\Model;
 
 use GO;
+use go\core\fs\Folder as GoFolder;
 
 /**
  * The Folder model
@@ -1445,6 +1446,30 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$file->delete();
 		}
 	}
+
+
+	private function mergeEntityFolders($folder, $existingPath, $newPath) {
+
+		$existingFS = new GoFolder($existingPath);
+		$newFS = new GoFolder($newPath);
+
+		//rename it if we need to move it into it's own children.
+		if($newFS->isDescendantOf($existingFS)) {
+			$folder->name=uniqid();
+			$folder->systemSave=true;
+			$folder->save(true);
+		}
+
+		$newFolder = Folder::model()->findByPath($newPath, true);
+		$newFolder->moveContentsFrom($folder, true);
+
+		$folder->systemSave = true;
+		//delete empty folder.
+		$folder->readonly = 1; //makes sure acl is not deleted
+		$folder->delete(true);
+		return $newFolder;
+	}
+
 	/**
 	 * 
 	 * @param \go\core\orm\Entity $entity
@@ -1452,14 +1477,34 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @throws \Exception
 	 */
 	public function findForEntity(\go\core\orm\Entity $entity) {
+
+		if(method_exists($entity, 'buildFilesPath')) {
+			$filesPath = $entity->buildFilesPath();
+		} else{
+			$entityType = $entity->entityType();
+			$filesPath = $entityType->getModule()->name. '/'. $entityType->getName() . '/' . $entity->id;
+		}
+
 		$folder = empty($entity->filesFolderId) ? null : $this->findByPk($entity->filesFolderId);
 		if($folder) {
+
+			$existingPath = $folder->getPath();
+			if($existingPath != $filesPath) {
+				$newFolder = $this->mergeEntityFolders($folder, $existingPath, $filesPath);
+
+				$newFolder->acl_id = $entity->findAclId();
+				$newFolder->save();
+
+				$entity->filesFolderId = $newFolder->id;
+				$entity->save();
+
+				return $newFolder;
+			}
+
 			return $folder;
 		}
-		
-		$entityType = $entity->entityType();
 
-		$filesPath = $entityType->getModule()->name. '/'. $entityType->getName() . '/' . $entity->id;
+		
 		$aclId =$entity->findAclId();
 		$folder = \GO\Files\Model\Folder::model()->findByPath($filesPath,true, array('acl_id'=>$aclId,'readonly'=>1));
 

@@ -1,3 +1,42 @@
+19-08-2019 6.4.43
+- Address book: Install failed
+
+19-08-2019 6.4.42
+- Core: Icon's didn't render on non standard port.
+
+17-08-2019 6.4.41
+- Core: Added users and user groups to select dialog (Composer, Calendar)
+- Calendar: 6.4.24 - Calendar - Error when accepting invite from other GO user #424
+- Document templates: Fixed Can't get not existing property 'photoFile' in 'go\modules\community\addressbook\model\Contact' error with ODT files
+
+16-08-2019 6.4.40
+- Core: Upgrading cleared module settings (Only affected one custom module)
+- Core: Module sorting (two community groups)
+- Address book: Search only showed contact with email
+
+16-08-2019 6.4.39
+- Core: 6.4.36 E-Mail created from task with wrong address #443
+- Core: Fixed saving module permission in group dialog
+- Address book: Changed detail view layout so that email addresses and phonenumbers can be clicked directly and smaller image
+- Address Book: Contact salutation template tag fixed and configurable in the address book settings
+- Address Book / Core: New image field with upload from URL support
+- Address Book: Create files path like in 6.2 for address book files
+- Files: Removed UTF8 to CP850 conversion when creating ZIP files as it works in Windows 10 now
+- Core: Added English / Philippines language and holidays
+
+13-08-2019 6.4.38
+- Core: Adding select option destroyed all data
+- Core: Fixed multiselect custom field migration
+- Email: Fixed invalid autocomplete query returning too many results
+- Address book: Search in email by default too
+
+12-08-2019 6.4.37
+- Calendar: Fixed Error in 
+  /usr/share/groupoffice/modules/calendar/model/Participant.php at line 408: 
+  Call to undefined method go\\modules\\community\\addressbook\\model\\Contact::link()
+- Core: Custom fields migration fixes
+- Core: Fixed upload screen missing style
+
 19-07-2019 6.4.36
 - Core: small ui enhancements
 - Newsletters: Fixed incorrect parsing of images in email templates
@@ -131,6 +170,11 @@
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
 
+- Billing: Force select of book in duplicate dialog
+- Core: Clear old framework cache on upgrade
+- Project: create invoice without grouping time entries by employees. are time record will be group into 1 group
+- Comments: Removed 10 comment limit
+- Projects: Don't reset travel distance on existing time entries
 
 11-07-2019 6.3.81
 - Core: Enable / disable Add linked item buttons based on permissions

@@ -141,19 +141,70 @@ GO.email.EmailComposer = function(config) {
 	});
 
 
-	var fillMultipleRecipients = function(combo, ids) {
+	var fillMultipleRecipients = function(combo, ids, entityName) {
 		var me = this, v = combo.getValue();
-							
-		go.Db.store("Contact").get(ids).then(function(result) {										
-			result.entities.forEach(function(contact) {
-				if(!go.util.empty(v)) {
-					v += ", ";
-				}							
-				v += '"' + contact.name.replace(/"/g, '\\"') + '" <' + contact.emailAddresses[0].email + '>';							
-				combo.setValue(v);
-			});
-		});	
-	}, fillSingleRecipient = function(combo, name, email, id) {
+
+		me.getEl().mask(t("Loading..."));
+
+		switch(entityName) {
+			case "Contact":
+					go.Jmap.request({
+						method: "Contact/get",
+						params: {
+							properties: ["name", "emailAddresses"],
+							ids: ids
+						}
+					}).then(function(result) {										
+			
+						result.list.forEach(function(contact) {
+							if(!go.util.empty(v)) {
+								v += ", ";
+							}							
+							v += '"' + contact.name.replace(/"/g, '\\"') + '" <' + contact.emailAddresses[0].email + '>';							
+							combo.setValue(v);
+						});
+					}).finally(function(){
+						me.getEl().unmask();
+					});		
+			break;
+
+			case "User":
+					go.Jmap.request({
+						method: "User/get",
+						params: {
+							properties: ["displayName", "email"],
+							ids: ids
+						}
+					}).then(function(result) {										
+			
+						result.list.forEach(function(user) {
+							if(!go.util.empty(v)) {
+								v += ", ";
+							}							
+							v += '"' + user.displayName.replace(/"/g, '\\"') + '" <' + user.email + '>';							
+							combo.setValue(v);
+						});
+					}).finally(function(){
+						me.getEl().unmask();
+					});		
+			break;
+		}
+		
+
+		// go.Db.store("Contact").get(ids).then(function(result) {										
+
+		// 	result.entities.forEach(function(contact) {
+		// 		if(!go.util.empty(v)) {
+		// 			v += ", ";
+		// 		}							
+		// 		v += '"' + contact.name.replace(/"/g, '\\"') + '" <' + contact.emailAddresses[0].email + '>';							
+		// 		combo.setValue(v);
+		// 	});
+		// }).finally(function(){
+		// 	me.getEl().unmask();
+		// });
+
+	}, fillSingleRecipient = function(combo, name, email, id, entityName) {
 		var v = combo.getValue();
 		if(!go.util.empty(v)) {
 			v += ", ";
@@ -193,15 +244,17 @@ GO.email.EmailComposer = function(config) {
 			new Ext.Button({				
 				iconCls : 'ic-add',
 				handler: function() {
-					var select = new go.modules.community.addressbook.SelectDialog ({
+					var select = new go.util.SelectDialog({
+						entities: ["Contact", "User"],
+
 						scope: this,
 						
-						selectSingleEmail: function(name, email, id) {
-							fillSingleRecipient(this.toCombo, name, email, id);							
+						selectSingleEmail: function(name, email, id, entityName) {
+							fillSingleRecipient.call(this, this.toCombo, name, email, id, entityName);							
 						},
 
-						selectMultiple: function(ids) {
-							fillMultipleRecipients(this.toCombo, ids);
+						selectMultiple: function(ids, entityName) {
+							fillMultipleRecipients.call(this, this.toCombo, ids, entityName);
 						}
 					});
 					select.show();
@@ -222,15 +275,18 @@ GO.email.EmailComposer = function(config) {
 		new Ext.Button({				
 				iconCls : 'ic-add',
 				handler: function() {
-					var select = new go.modules.community.addressbook.SelectDialog ({
+					var select = new go.util.SelectDialog ({
+
+						entities: ["Contact", "User"],
+						
 						scope: this,
 						
-						selectSingleEmail: function(name, email, id) {
-							fillSingleRecipient(this.ccCombo, name, email, id);							
+						selectSingleEmail: function(name, email, id, entityName) {
+							fillSingleRecipient.call(this, this.toCombo, name, email, id, entityName);							
 						},
 
-						selectMultiple: function(ids) {
-							fillMultipleRecipients(this.ccCombo, ids);
+						selectMultiple: function(ids, entityName) {
+							fillMultipleRecipients.call(this, this.toCombo, ids, entityName);
 						}
 					});
 					select.show();
@@ -252,15 +308,18 @@ GO.email.EmailComposer = function(config) {
 			new Ext.Button({				
 				iconCls : 'ic-add',
 				handler: function() {
-					var select = new go.modules.community.addressbook.SelectDialog ({
+					var select = new go.util.SelectDialog ({
+
+						entities: ["Contact", "User"],
+
 						scope: this,
 						
-						selectSingleEmail: function(name, email, id) {
-							fillSingleRecipient(this.bccCombo, name, email, id);							
+						selectSingleEmail: function(name, email, id, entityName) {
+							fillSingleRecipient.call(this, this.toCombo, name, email, id, entityName);							
 						},
 
-						selectMultiple: function(ids) {
-							fillMultipleRecipients(this.bccCombo, ids);
+						selectMultiple: function(ids, entityName) {
+							fillMultipleRecipients.call(this, this.toCombo, ids, entityName);
 						}
 					});
 					select.show();

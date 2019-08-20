@@ -86,7 +86,7 @@ class ModuleController extends AbstractJsonController{
 			$model = GO::modules()->isInstalled($module->getName(), false);
 			
 			
-			$availableModules[$module->getName()] = array(		
+			$availableModules[ucfirst($module->getPackage()) . $module->getName()] = array(		
 					'id' => $model ? $model->id : null,
 					'name'=>$module->getName(),
 					'localizedName' => $module->getTitle(),
@@ -97,7 +97,7 @@ class ModuleController extends AbstractJsonController{
 //					'buyEnabled'=>!GO::scriptCanBeDecoded() || 
 //							($module->appCenter() && (\GO\Professional\License::isTrial() || \GO\Professional\License::moduleIsRestricted($module->name())!==false)),
 				
-					'localizedPackage'=>$module->getPackage(),
+					'localizedPackage'=>ucfirst($module->getPackage()),
 					'package'=>$module->getPackage(),
 					'enabled'=>$model && $model->enabled,
 					'isRefactored' => true,
@@ -109,7 +109,7 @@ class ModuleController extends AbstractJsonController{
 				
 				$model = GO::modules()->isInstalled($module->name(), false);
 				
-				$availableModules[$module->name()] = array(					
+				$availableModules[$module->package().$module->name()] = array(					
 						'id' => $model ? $model->id : null,
 					'name'=>$module->name(),
 					'localizedName' => $module->localizedName(),

@@ -16,3 +16,5 @@ $updates["201811081350"][] = "INSERT INTO `core_cron_job` (`moduleId`, `descript
 ((select id from core_module where name='multi_instance' and package='community'), 'Deactivate trials', 'DeactivateTrials', '0 10 * * *', 1, now(), now(), NULL, NULL);";
 
 $updates["201811081350"][] = "ALTER TABLE `multi_instance_instance` ADD `welcomeMessage` TEXT NULL DEFAULT NULL AFTER `enabled`;";
+
+$updates["201908191634"][] = "ALTER TABLE `multi_instance_instance` ADD `version` VARCHAR(50) NULL DEFAULT NULL AFTER `welcomeMessage`;";

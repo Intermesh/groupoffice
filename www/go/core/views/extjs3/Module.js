@@ -36,6 +36,9 @@ go.Modules.register("core", 'core', {
 	userSettingsPanels: [
 		"go.users.UserGroupGrid",
 		"go.users.UserSettingsWorkingWeek"
+	],
+	selectDialogPanels: [
+		"go.users.SelectDialogPanel",
 	]
 });
 

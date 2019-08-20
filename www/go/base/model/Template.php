@@ -116,8 +116,9 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	}
 	
 	public static function getCompanyAttributes(\go\modules\community\addressbook\model\Contact $company, $tagPrefix = 'company:'){
-		$attributes[$tagPrefix . 'salutation'] = GO()->t("Dear sir/madam");
+		$attributes[$tagPrefix . 'salutation'] = $company->getSalutation();
 		
+		$attributes[$tagPrefix . 'comment'] = $company->notes;
 		$attributes[$tagPrefix . 'crn'] = $company->registrationNumber;
 		$attributes[$tagPrefix . 'vat_no'] = $company->vatNo;
 		$attributes[$tagPrefix . 'iban'] = $company->IBAN;
@@ -166,12 +167,13 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	} 
 	
 	public static function getContactAttributes($contact, $tagPrefix = 'contact:', $companyTagPrefix = 'company:'){
-		$attributes[$tagPrefix . 'salutation'] = GO()->t("Hi")." ".$contact->firstName;
+		$attributes[$tagPrefix . 'salutation'] = $contact->getSalutation();
 		$attributes[$tagPrefix . 'sirmadam']=$contact->gender=="M" ? \GO::t('sir') : \GO::t('madam');
 		
 		$attributes[$tagPrefix . 'first_name'] = $contact->firstName;
 		$attributes[$tagPrefix . 'middle_name'] = $contact->middleName;
 		$attributes[$tagPrefix . 'last_name'] = $contact->lastName;
+		$attributes[$tagPrefix . 'comment'] = $contact->notes;
 
 			//$attributes = array_merge($attributes, $this->_getModelAttributes($contact, $tagPrefix . ''));
 

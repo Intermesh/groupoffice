@@ -152,7 +152,7 @@ class MigrateCustomFields63to64 {
 		
 		foreach($selectOptions as $o) {
 			$updateFilter = new Query();
-			$updateFilter->where($field->databaseName, '=' , trim($o['text']));
+			$updateFilter->where("trim(`".$field->databaseName."`) = :text")->bind(":text", trim($o['text']));
 			
 			if(substr($o['text'], 0, strlen(self::MISSING_PREFIX)) == self::MISSING_PREFIX) {
 				$strWithoutMissing = substr($o['text'], strlen(self::MISSING_PREFIX));
@@ -179,7 +179,7 @@ class MigrateCustomFields63to64 {
 	private function updateMultiSelect(Field $field) {
 		$field->type = "MultiSelect";		
 		
-		$this->insertMissingOptions($field);
+		$this->insertMissingOptions($field, true);
 		try{
 			$field->getDataType()->createMultiSelectTable();
 		}catch(\PDOException $e) {
@@ -202,14 +202,17 @@ class MigrateCustomFields63to64 {
 			$values = explode("|", $record[$field->databaseName]);
 			
 			foreach($values as $value) {
-				if(empty(trim($value))) {
+				$value = trim($value);
+				if(empty($value)) {
 					continue;
 				}
-				if(!isset($optionMap[trim($value)]) && !isset($optionMap[trim(self::MISSING_PREFIX.$value)])) {
-					throw new \Exception("Invalid select option " . $value . " for field ". $field->id);
+
+				if(!isset($optionMap[$value]) && !isset($optionMap[self::MISSING_PREFIX.$value])) {					
+					echo "ERROR: Invalid select option '" . $value . "' for field ". $field->id .' record ID: '. $record['id'];
+					continue;
 				}
 				
-				$valueToSet = isset($optionMap[trim($value)])?$optionMap[trim($value)]:$optionMap[trim(self::MISSING_PREFIX.$value)];
+				$valueToSet = isset($optionMap[$value]) ? $optionMap[$value] : $optionMap[self::MISSING_PREFIX.$value];					
 				
 				GO()->getDbConnection()
 								->replace(
@@ -375,7 +378,7 @@ class MigrateCustomFields63to64 {
 	
 	
 	
-	private function insertMissingOptions(Field $field) {
+	private function insertMissingOptions(Field $field, $multiselect = false) {
 		//set invalid options to null
 		$optionTexts = GO()->getDbConnection()
 						->selectSingleValue('text')
@@ -388,15 +391,28 @@ class MigrateCustomFields63to64 {
 						->where($field->databaseName, 'NOT IN', $optionTexts);
 
 		$missing = $missingQuery->all();
+
+		if($multiselect) {
+			$m = [];
+			foreach($missing as $msv) {
+				if(!empty($msv)) {
+					$m = array_merge($m,explode('|', $msv));
+				}
+			}
+			$missing = $m;
+		}
+
+		$missing = array_unique(array_map('trim', $missing));
+
+		$optionTexts = array_map('trim', $optionTexts->all());
 		
-		$missing = array_filter($missing, function($text) {
-			$text = trim($text);
-			return !empty($text);
+		$missing = array_filter($missing, function($text) use ($optionTexts) {
+			return !empty($text) && !in_array($text, $optionTexts);
 		});
 		
 		$data = array_map(function($text) use ($field) {
 			return [
-					"text" => trim(self::MISSING_PREFIX.$text),
+					"text" => self::MISSING_PREFIX.$text,
 					"fieldId" => $field->id
 			];
 		}, $missing);

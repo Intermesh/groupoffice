@@ -413,10 +413,14 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 		foreach($record as $r){
-		   if($this->tableName()===$r->tableName() && $this->getPk()===$r->getPk())
-			 {
-				 return true;
-			 }
+			if(get_class($r) != get_class($this)) {
+				return false;
+			}
+			
+			if($this->tableName()===$r->tableName() && $this->getPk()===$r->getPk())
+			{
+				return true;
+			}
 		}
 		return false;
 	}

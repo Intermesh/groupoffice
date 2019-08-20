@@ -70,10 +70,14 @@ class Extjs3 {
 		
 		$baseurl = str_replace(Environment::get()->getInstallFolder()->getPath() . '/', Settings::get()->URL, $file->getFolder()->getPath()).'/';
 		
-		return preg_replace_callback('/url[\s]*\(([^\)]*)\)/iU', 
+		$css = preg_replace_callback('/url[\s]*\(([^\)]*)\)/iU', 
 			function($matches) use($baseurl) { 
 				return 'url('.$baseurl.trim(stripslashes($matches[1]),'\'" ').')';
 			}, $css);
+
+		$css = str_replace("sourceMappingURL=", "sourceMappingURL=".$baseurl, $css);
+
+		return $css;
 		 //return preg_replace('/url[\s]*\(([^\)]*)\)/ieU', "GO\Base\View\Extjs3::_replaceUrlCallback('$1', \$baseurl)", $css);
 	}
 	

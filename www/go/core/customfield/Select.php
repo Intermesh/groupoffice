@@ -106,12 +106,17 @@ class Select extends Base {
 			
 			$children = $o['children'] ?? [];
 			unset($o['children']);
-			if (!GO()->getDbConnection()->replace('core_customfields_select_option', $o)->execute()) {
-				throw new Exception("could not save select option");
-			}
+			
 			
 			if(empty($o['id'])) {
+				if (!GO()->getDbConnection()->insert('core_customfields_select_option', $o)->execute()) {
+					throw new Exception("could not save select option");
+				}
 				$o['id'] = GO()->getDbConnection()->getPDO()->lastInsertId();
+			} else{
+				if (!GO()->getDbConnection()->update('core_customfields_select_option', $o, ['id' => $o['id']])->execute()) {
+					throw new Exception("could not save select option");
+				}
 			}
 			
 			$this->savedOptionIds[] = $o['id'];

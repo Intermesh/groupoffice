@@ -44,3 +44,9 @@ $updates['201906181248'][] = "update `addressbook_contact_star` set starred = nu
 $updates['201906181248'][] = "ALTER TABLE `addressbook_contact_star` CHANGE `starred` `starred` TINYINT(1) NULL DEFAULT NULL;";
 
 $updates['201907021042'][] = "ALTER TABLE `addressbook_user_settings` ADD `salutationTemplate` TEXT NOT NULL AFTER `defaultAddressBookId`, ADD `sortBy` ENUM('name','lastName') NOT NULL DEFAULT 'name' AFTER `salutationTemplate`;";
+
+$updates['201908141101'][] = "ALTER TABLE `addressbook_addressbook` ADD `filesFolderId` INT NULL DEFAULT NULL AFTER `createdBy`;";
+
+$updates['201908141101'][] = "ALTER TABLE `addressbook_addressbook` ADD `salutationTemplate` TEXT NULL AFTER `filesFolderId`;";
+$updates['201908141101'][] = "ALTER TABLE `addressbook_user_settings` DROP `salutationTemplate`;";
+

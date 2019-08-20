@@ -71,6 +71,13 @@ class ErrorHandler {
 	}
 
 	/**
+	 * Send a messaqe to the error log
+	 */
+	public static function log($str) {
+		return error_log($str, 0);
+	}
+
+	/**
 	 * PHP7 has new throwable interface. We can't use type hinting if we want to 
 	 * support php 5.6 as well.
 	 * @param Throwable $e

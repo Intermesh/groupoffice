@@ -5,6 +5,7 @@ use go\core\fs\File;
 use go\core\fs\Folder;
 use go\core\Module;
 use go\core\jmap\Response;
+use go\core\webclient\Extjs3;
 
 /**
  * Copyright Intermesh
@@ -18,6 +19,10 @@ use go\core\jmap\Response;
  * @version $Id: default_scripts.inc.php 22455 2018-03-06 15:17:33Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  */
+
+$webclient = new Extjs3();
+
+
 $settings['max_rows_list'] = 50;
 
 $settings['config']['theme'] = GO::config()->theme;
@@ -71,7 +76,7 @@ if(GO::config()->debug) {
 //echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
 echo '<script type="text/javascript" src="views/Extjs3/javascript/ext-base-debug.js"></script>';
 echo '<script type="text/javascript" src="views/Extjs3/javascript/ext-all-debug.js?mtime='.filemtime(__DIR__ . '/javascript/ext-all-debug.js').'"></script>';
-echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?lang='.\GO()->getLanguage()->getIsoCode() . '&v='.GO()->getVersion().'"></script>';
+echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?lang='.\GO()->getLanguage()->getIsoCode() . '&v='.$webclient->getLanguageJS()->getModifiedAt()->format("U").'"></script>';
 
 ?>
 
@@ -105,7 +110,7 @@ GO::router()->getController()->fireEvent('inlinescripts');
 <?php
   
 if ($cacheFile->exists()) {
-	echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v='. GO()->getVersion() . '"></script>';
+	echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v='.$cacheFile->getModifiedAt()->format("U"). '"></script>';
 } else {
 
 	$scripts = array();
@@ -247,7 +252,7 @@ if ($cacheFile->exists()) {
 	
 	if (!GO::config()->debug) {
 		$minify->gzip($cacheFile->getPath());		
-		echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v= '. GO()->getVersion() . '"></script>';
+		echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v= '. $cacheFile->getModifiedAt()->format("U") . '"></script>';
 	} else
   {
 //    $fp = $cacheFile->open('w');

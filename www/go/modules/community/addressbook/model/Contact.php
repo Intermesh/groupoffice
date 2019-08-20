@@ -17,6 +17,11 @@ use function GO;
 use go\core\mail\Message;
 use go\core\TemplateParser;
 use go\core\db\Expression;
+use go\core\fs\File;
+use go\core\mail\Recipient;
+use go\core\util\StringUtil;
+use GO\Files\Model\Folder;
+use GO\Files\Model\FolderNotificationMessage;
 
 /**
  * Contact model
@@ -247,6 +252,34 @@ class Contact extends AclItemEntity {
 	public function setStarred($starred) {
 		$this->starred = empty($starred) ? null : true;
 	}
+
+	public function buildFilesPath() {
+		$new_folder_name = File::stripInvalidChars($this->name).' ('.$this->id.')';
+		$last_part = empty($this->name) ? '' : strtoupper(mb_substr($new_folder_name,0,1,'UTF-8'));
+
+		$addressBook = AddressBook::findById($this->addressBookId);		
+
+		$folder = Folder::model()->findForEntity($addressBook);
+
+		$addressBookPath = $folder->path;
+
+		$new_path = $addressBookPath . '/';
+
+		if($this->isOrganization) {
+			$new_path .= 'companies';
+		} else{
+			$new_path .= 'contacts';
+		}
+
+		if(!empty($last_part)) {
+			$new_path .= '/'.$last_part;
+		}else {
+			$new_path .= '/0 no last name';
+		}
+					
+		$new_path .= '/'.$new_folder_name;
+		return $new_path;
+	}
 	
 	
 	/**
@@ -461,12 +494,21 @@ class Contact extends AclItemEntity {
 	public static function converters() {
 		$arr = parent::converters();
 		$arr['text/vcard'] = VCard::class;		
+		$arr['text/x-vcard'] = VCard::class;
 		$arr['text/csv'] = Csv::class;
 		return $arr;
 	}
 
 	protected static function textFilterColumns() {
-		return ['name', 'debtorNumber'];
+		return ['name', 'debtorNumber', 'notes', 'emailAddresses.email'];
+	}
+
+	protected static function search(\go\core\db\Criteria $criteria, $expression, \go\core\orm\Query $query)
+	{
+		if(!$query->isJoined('addressbook_email_address', 'emailAddresses')) {
+			$query->join('addressbook_email_address', 'emailAddresses', 'emailAddresses.contactId = c.id', 'LEFT')->groupBy(['c.id']);
+		}
+		return parent::search($criteria, $expression, $query);
 	}
 	
 	public function getUid() {
@@ -531,7 +573,7 @@ class Contact extends AclItemEntity {
 		}		
 		
 		if($this->isNew() && !isset($this->addressBookId)) {
-			$this->addressBookId = GO()->getAuthState()->getUser()->addressBookSettings->defaultAddressBookId;
+			$this->addressBookId = GO()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->defaultAddressBookId;
 		}
 		
 		if($this->isModified('addressBookId') || $this->isModified('groups')) {
@@ -643,16 +685,16 @@ class Contact extends AclItemEntity {
 
 	public function getSalutation() 
 	{
+		if($this->isOrganization) {
+			return GO()->t("Dear sir/madam");
+		}
+
 		$tpl = new TemplateParser();
 		$tpl->addModel('contact', $this->toArray(['firstName', 'lastName', 'middleName', 'name', 'gender', 'prefixes', 'suffixes', 'language']));
 
-		$user = GO()->getAuthState()->getUser(['addressBookSettings']);
+		$addressBook = AddressBook::findById($this->addressBookId, ['salutationTemplate']);
 
-		if(!isset($user->addressBookSettings)){
-			$user->addressBookSettings = new UserSettings();
-		}
-
-		return $tpl->parse($user->addressBookSettings->salutationTemplate);
+		return $tpl->parse($addressBook->salutationTemplate);
 	}
 	
 	/**
@@ -773,14 +815,16 @@ class Contact extends AclItemEntity {
 	}
 
 	/**
-   * Decorate the message for newsletter sending.
-   * This function should at least add the to address.
-   * 
-   * @param \Swift_Message $message
-   */
-  public function decorateMessage(Message $message) {
-	  	if(isset($this->emailAddresses[0]))
-			$message->setTo($this->emailAddresses[0]->email, $this->name);
+	 * Decorate the message for newsletter sending.
+	 * This function should at least add the to address.
+	 * 
+	 * @param \Swift_Message $message
+	 */
+	public function decorateMessage(Message $message) {
+		if(!isset($this->emailAddresses[0])) {
+			return false;
+		}
+		$message->setTo($this->emailAddresses[0]->email, $this->name);
 	}
 
 	public function toTemplate() {

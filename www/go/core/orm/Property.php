@@ -21,8 +21,7 @@ use function GO;
 use go\core\db\Query as GoQuery;
 use go\core\db\Table;
 use go\core\util\ArrayObject;
-use Symfony\Component\HttpKernel\Debug\ErrorHandler;
-use go\core\ErrorHandler as GoErrorHandler;
+use go\core\ErrorHandler;
 
 /**
  * Property model
@@ -195,8 +194,8 @@ abstract class Property extends Model {
 				case Relation::TYPE_MAP:
 					$values = $this->isNew() ? [] : $cls::internalFind()->andWhere($where)->all();
 					if(!count($values)) {
-						$this->{$relation->name} = new ArrayObject();
-						$this->{$relation->name}->serializeJsonAsObject = true;
+						$this->{$relation->name} = [];
+						//$this->{$relation->name}->serializeJsonAsObject = true;
 					} else{
 						$o = [];
 						foreach($values as $v) {
@@ -1058,9 +1057,7 @@ abstract class Property extends Model {
 		
 		$this->removeRelated($relation, $models);		
 		
-		$this->{$relation->name} = new ArrayObject();
-		$this->{$relation->name}->serializeJsonAsObject = true;
-
+		$this->{$relation->name} = [];
 		foreach ($models as $newProp) {
 			
 			if($newProp === null) {
@@ -1216,7 +1213,7 @@ abstract class Property extends Model {
 //				}				
 			}
 		} catch (PDOException $e) {
-			GoErrorHandler::logException($e);
+			ErrorHandler::logException($e);
 			$uniqueKey = \go\core\db\Utils::isUniqueKeyException($e);
 			
 			if ($uniqueKey) {				
@@ -1461,6 +1458,22 @@ abstract class Property extends Model {
 		return parent::toArray($properties);
 	}
 
+
+	protected function propToArray($name) {
+
+		$value = $this->getValue($name);
+
+		if(is_array($value) && empty($value)) {
+			$relation = $this->getMapping()->getRelation($name);
+
+			if($relation && $relation->type == Relation::TYPE_MAP) {
+				$value = new ArrayObject();
+				$value->serializeJsonAsObject = true;
+			}
+		}		
+		return $this->convertValue($value);
+	}
+
 	/**
 	 * Normalizes API input for this model.
 	 * 
@@ -1483,13 +1496,14 @@ abstract class Property extends Model {
 					}	
 				break;
 
-				case Relation::TYPE_ARRAY:
-					foreach($value as $key => $item) {
-						$value[$key] = $this->internalNormalizeRelation($relation, $item);
-					}
-					return $value;
-				break;
+				// case Relation::TYPE_ARRAY:
+				// 	foreach($value as $key => $item) {
+				// 		$value[$key] = $this->internalNormalizeRelation($relation, $item);
+				// 	}
+				// 	return $value;
+				// break;
 
+				case Relation::TYPE_ARRAY:
 				case Relation::TYPE_MAP:
 					return $this->patch($relation, $propName, $value);
 				break;

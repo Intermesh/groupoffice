@@ -2,6 +2,7 @@
 
 namespace go\core\controller;
 
+use go\core\db\Criteria;
 use go\core\model\Acl;
 use go\core\orm\Query;
 use go\core\jmap\EntityController;
@@ -25,9 +26,11 @@ class Search extends EntityController {
 						->join('core_group', 'g', 'u.id = g.isUserGroupFor');
 
 		if (!empty($q)) {
-			$query
+			$query->where(
+				(new Criteria)
 							->where('email', 'LIKE', '%' . $q . '%')
-							->orWhere('displayName', 'LIKE', '%' . $q . '%');
+							->orWhere('displayName', 'LIKE', '%' . $q . '%')
+						);
 		}
 
 		Acl::applyToQuery($query, 'g.aclId');
@@ -44,9 +47,11 @@ class Search extends EntityController {
 			$contactsQuery->groupBy(['e.email']);
 
 			if (!empty($q)) {
-				$contactsQuery
+				$contactsQuery->where(
+						(new Criteria)
 								->where('e.email', 'LIKE', '%' . $q . '%')
-								->orWhere('c.name', 'LIKE', '%' . $q . '%');
+								->orWhere('c.name', 'LIKE', '%' . $q . '%')
+				);
 			}
 
 			$query->union($contactsQuery);							

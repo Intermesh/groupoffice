@@ -6,6 +6,9 @@ GO.Window = Ext.extend(Ext.Window,{
 //this breaks some functionality that do stuff on render.
 	temporaryListeners : [],
 	
+	resizable : !GO.util.isMobileOrTablet(),
+	draggable: !GO.util.isMobileOrTablet(),
+	maximized: GO.util.isMobileOrTablet(),
 	
 	initComponent : function(){
 		

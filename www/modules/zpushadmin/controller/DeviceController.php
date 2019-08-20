@@ -22,7 +22,7 @@
 namespace GO\Zpushadmin\Controller;
 
 
-class DeviceController extends \GO\Professional\Controller\AbstractModelController{
+class DeviceController extends \GO\Base\Controller\AbstractModelController {
 	
 	protected $model = 'GO\Zpushadmin\Model\Device';
 	

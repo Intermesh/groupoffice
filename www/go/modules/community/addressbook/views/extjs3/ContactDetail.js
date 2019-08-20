@@ -7,6 +7,8 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 	initComponent: function () {
 		
 		this.tbar = this.initToolbar();
+
+		var me = this;
 		
 		Ext.apply(this, {
 			items: [	
@@ -16,7 +18,31 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					xtype: 'container',
 					layout: "hbox",
 					cls: "go-addressbook-name-panel",
-					items: [						
+					items: [
+						
+						this.avatar = new Ext.BoxComponent({
+							xtype: "box",
+							cls: "go-detail-view-avatar",
+							style: "cursor: pointer",
+							listeners: {
+								render: function() {
+									this.getEl().on("click", function() {
+										if(me.data.photoBlobId) {
+											window.open(go.Jmap.downloadUrl(me.data.photoBlobId, true));
+										}
+									});
+								}
+							},
+							tpl: new Ext.XTemplate('<div class="avatar {[values.isOrganization && !values.photoBlobId ? \'organization\' : \'\']}" style="{[this.getStyle(values.photoBlobId)]}">{[this.getHtml(values.isOrganization, values.photoBlobId)]}</div>', 
+							{
+								getHtml: function (isOrganization, photoBlobId) {
+									return isOrganization && !photoBlobId ? '<i class="icon">business</i>' : "";
+								},
+								getStyle: function (photoBlobId) {
+									return photoBlobId ? 'background-image: url(' + go.Jmap.downloadUrl(photoBlobId) + ')"' : "";
+								}
+							})
+						}),
 					
 						this.namePanel = new Ext.BoxComponent({
 							tpl: "<h3>{name}</h3><h4>{jobTitle}</h4>" 							
@@ -32,84 +58,153 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						detailView.data.jobTitle = detailView.data.jobTitle || "";						
 						detailView.namePanel.update(detailView.data);
 						detailView.urlPanel.update(detailView.data.urls);
+						detailView.avatar.update(detailView.data);
 					}
 					
-				}, 
-				
-				{
-					tpl: new Ext.XTemplate('<div class="go-detail-view-avatar">\
-<div class="avatar {[values.isOrganization && !values.photoBlobId ? \'organization\' : \'\']}" style="{[this.getStyle(values.photoBlobId)]}">{[this.getHtml(values.isOrganization, values.photoBlobId)]}</div></div>', 
-					{
-						getHtml: function (isOrganization, photoBlobId) {
-							return isOrganization && !photoBlobId ? '<i class="icon">business</i>' : "";
-						},
-						getStyle: function (photoBlobId) {
-							return photoBlobId ? 'background-image: url(' + go.Jmap.downloadUrl(photoBlobId) + ')"' : "";
-						}
-					})
-				},
+				}, 				
 				
 				
-				{
-					onLoad: function(dv) {
-						dv.emailButton.menu.removeAll();						
-						dv.data.emailAddresses.forEach(function(a) {
+				
+				// {
+				// 	onLoad: function(dv) {
+				// 		dv.emailButton.menu.removeAll();						
+				// 		dv.data.emailAddresses.forEach(function(a) {
 
 							
-							var	mailto = '"' + dv.data.name.replace(/"/g, '\\"') + '" <' + a.email + '>';
+				// 			var	mailto = '"' + dv.data.name.replace(/"/g, '\\"') + '" <' + a.email + '>';
 							
 
-							dv.emailButton.menu.addMenuItem({
-								text: "<div>" + a.email + "</div><small>" + (t("emailTypes")[a.type] || a.type) + "</small>",
-								href: "mailto:" + mailto,
-								handler: function(btn, e) {
+				// 			dv.emailButton.menu.addMenuItem({
+				// 				text: "<div>" + a.email + "</div><small>" + (t("emailTypes")[a.type] || a.type) + "</small>",
+				// 				href: "mailto:" + mailto,
+				// 				handler: function(btn, e) {
+				// 					go.util.mailto({
+				// 						email: a.email,
+				// 						name: dv.data.name
+				// 					}, e);
+				// 				}
+				// 			});
+				// 		});
+				// 		dv.emailButton.setDisabled(dv.data.emailAddresses.length === 0);
+						
+						
+				// 		dv.callButton.menu.removeAll();						
+				// 		dv.data.phoneNumbers.forEach(function(a) {
+				// 			var sanitized = a.number.replace(/[^0-9+]/g, "");
+
+				// 			dv.callButton.menu.addMenuItem({
+				// 				text: "<div>" + a.number + "</div><small>" + (t("phoneTypes")[a.type] || a.type)  + "</small>",
+				// 				href: "tel://" + sanitized,
+				// 				handler: function(btn, e) {									
+				// 					go.util.callto({
+				// 						number: sanitized,
+				// 						name: dv.name
+				// 					}, e);
+				// 				}
+				// 			});
+				// 		});
+				// 		dv.callButton.setDisabled(dv.data.phoneNumbers.length === 0);
+						
+				// 	},
+				// 	xtype: "toolbar",
+				// 	cls: "actions",
+				// 	buttonAlign: "center",
+				// 	items: [
+				// 		this.emailButton = new Ext.Button({
+				// 			menu: {cls: "x-menu-no-icons", items: []},
+				// 			text: t("E-mail"),
+				// 			iconCls: 'ic-email',
+				// 			disabled: true
+				// 		}),
+						
+				// 		this.callButton = new Ext.Button({
+				// 			menu: {cls: "x-menu-no-icons", items: []},
+				// 			text: t("Call"),
+				// 			iconCls: 'ic-phone',
+				// 			disabled: true
+				// 		})
+				// 	]
+				// },
+
+
+				{
+					xtype: 'panel',
+					title: t("Communication"),
+					layout: "hbox",				
+					
+					onLoad: function (detailView) {
+
+						this.items.each(function(i) {
+							i.update(detailView.data);
+						});					
+						
+						detailView.phoneNumbers.setVisible(detailView.data.phoneNumbers.length > 0);
+						detailView.emailAddresses.setVisible(detailView.data.emailAddresses.length > 0);
+					},
+
+					items: [
+				
+					this.emailAddresses = new Ext.BoxComponent({
+						xtype: "box",
+						listeners: {
+							scope: this,
+							afterrender: function(box) {
+								
+								box.getEl().on('click', function(e){								
+									var container = box.getEl().dom.firstChild, 
+									item = e.getTarget("a", box.getEl()),
+									i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);						
+								
 									go.util.mailto({
-										email: a.email,
-										name: dv.data.name
+										email: this.data.emailAddresses[i].email,
+										name: this.data.name
 									}, e);
-								}
-							});
-						});
-						dv.emailButton.setDisabled(dv.data.emailAddresses.length === 0);
-						
-						
-						dv.callButton.menu.removeAll();						
-						dv.data.phoneNumbers.forEach(function(a) {
-							var sanitized = a.number.replace(/[^0-9+]/g, "");
 
-							dv.callButton.menu.addMenuItem({
-								text: "<div>" + a.number + "</div><small>" + (t("phoneTypes")[a.type] || a.type)  + "</small>",
-								href: "tel://" + sanitized,
-								handler: function(btn, e) {									
+								}, this);
+							}
+						},
+						tpl: '<div class="icons">\
+							<tpl for="emailAddresses">\
+								<a class="s6" href="mailto:{email}"><tpl if="xindex == 1"><i class="icon label">email</i></tpl>\
+								<span>{email}</span>\
+								<label>{[t("emailTypes")[values.type] || values.type]}</label>\
+								</a>\
+							</tpl>\
+						</div>'
+					}), 
+
+
+					this.phoneNumbers = new Ext.BoxComponent({
+						xtype: "box",
+						listeners: {
+							scope: this,
+							afterrender: function(box) {
+								
+								box.getEl().on('click', function(e){								
+									var container = box.getEl().dom.firstChild, 
+									item = e.getTarget("a", box.getEl()),
+									i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);						
+								
 									go.util.callto({
-										number: sanitized,
+										number: this.data.phoneNumbers[i].number.replace(/[^0-9+]/g, ""),
 										name: dv.name
 									}, e);
-								}
-							});
-						});
-						dv.callButton.setDisabled(dv.data.phoneNumbers.length === 0);
-						
-					},
-					xtype: "toolbar",
-					cls: "actions",
-					buttonAlign: "center",
-					items: [
-						this.emailButton = new Ext.Button({
-							menu: {cls: "x-menu-no-icons", items: []},
-							text: t("E-mail"),
-							iconCls: 'ic-email',
-							disabled: true
-						}),
-						
-						this.callButton = new Ext.Button({
-							menu: {cls: "x-menu-no-icons", items: []},
-							text: t("Call"),
-							iconCls: 'ic-phone',
-							disabled: true
-						})
-					]
-				},{
+
+								}, this);
+							}
+						},
+						tpl: '<div class="icons">\
+							<tpl for="phoneNumbers">\
+								<a class="s6" href="tel://{[values.number.replace(/[^0-9+]/g, "")]}"><tpl if="xindex == 1"><i class="icon label">phone</i></tpl>\
+								<span>{number}</span>\
+								<label>{[t("phoneTypes")[values.type] || values.type]}</label>\
+								</a>\
+							</tpl>\
+						</div>'
+					})]
+				},
+				
+				{
 					xtype: "box",
 					listeners: {
 						scope: this,

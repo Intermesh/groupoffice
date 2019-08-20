@@ -362,9 +362,9 @@ go.util =  (function () {
 										Ext.MessageBox.alert(t("Success"), t("Imported {count} items").replace('{count}', response.count));
 									}
 
-									if (callback) {
-										callback.call(scope || this, response);
-									}
+									// if (callback) {
+									// 	callback.call(scope || this, response);
+									// }
 								},
 								scope: this
 							});
@@ -376,6 +376,14 @@ go.util =  (function () {
 		},
 
 		parseEmail : function(emails) {			
+			
+			if(Ext.form.VTypes.emailAddress(emails)) {
+				return [{
+						name: "",
+						email: emails
+				}];
+			}
+
 			var re  = /(?:"?([A-Z]?[^<"]*)"?\s*)?<?([^>\s,]+)/g;
 			var a = [];
 			while (m = re.exec(emails)) {

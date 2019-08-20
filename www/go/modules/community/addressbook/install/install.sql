@@ -16,7 +16,9 @@ CREATE TABLE `addressbook_addressbook` (
   `id` int(11) NOT NULL,
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `aclId` int(11) NOT NULL,
-  `createdBy` int(11) NOT NULL
+  `createdBy` int(11) NOT NULL,
+  `filesFolderId` int(11) DEFAULT NULL,
+  `salutationTemplate` text COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `addressbook_contact` (
@@ -98,8 +100,7 @@ CREATE TABLE `addressbook_url` (
 
 CREATE TABLE `addressbook_user_settings` (
   `userId` int(11) NOT NULL,
-  `defaultAddressBookId` int(11) DEFAULT NULL,
-  `salutationTemplate` TEXT NOT NULL, 
+  `defaultAddressBookId` int(11) DEFAULT NULL,  
   `sortBy` ENUM('name','lastName') NOT NULL DEFAULT 'name'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 

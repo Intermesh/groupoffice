@@ -56,7 +56,7 @@ abstract class Settings extends Model {
 	 */
 	protected function __construct() {
 		
-		if(GO()->getInstaller()->isInProgress()) {
+		if(GO()->getInstaller()->isInstalling()) {
 			$this->oldData = [];
 			return;
 		}
@@ -150,6 +150,7 @@ abstract class Settings extends Model {
 	}
 	
 	private function update($name, $value) {
+		
 		$moduleId = $this->getModuleId();
 
 		if(!$moduleId) {
