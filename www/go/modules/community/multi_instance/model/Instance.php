@@ -157,6 +157,10 @@ class Instance extends Entity {
 		return GO()->getDataFolder()->getFolder('multi_instance/' . $this->hostname);
 	}
 	
+	private function getTrashFolder() {
+		return GO()->getDataFolder()->getFolder('multi_instance/_trash_')->create();
+	}
+	
 	private function getTempFolder() {
 		return GO()->getTmpFolder()->getFolder('multi_instance/' . $this->hostname);
 	}
@@ -485,10 +489,47 @@ class Instance extends Entity {
 		}
 	}	
 	
+	
+	/**
+	 * Create a mysql dump of the installation database.
+	 * 
+	 * @param StringHelper $outputDir
+	 * @param StringHelper $filename Optional filename. If omitted then $config['db_name'] will be used.
+	 * @return boolean
+	 * @throws Exception
+	 */
+	private function mysqldump(){
+		
+		$c = $this->getInstanceConfig();
+		
+		$file = $this->getDataFolder()->getFile('database.sql');
+		$file->delete();
+			
+	
+		$cmd = "mysqldump --force --opt --host=" . ($c['db_host'] ?? "localhost") . " --port=" . ($c['db_port'] ?? 3306) . " --user=" . $c['db_user'] . " --password=" . $c['db_pass'] . " " . $c['db_name'] . " > \"" . $file->getPath() . "\"";
+		GO()->debug($cmd);
+		exec($cmd, $output, $retVar);
+		
+		if($retVar != 0) {
+			throw new Exception("Mysqldump error: " .$retVar ." : ". implode("\n", $output));
+		}
+		
+		if(!$file->exists()) {
+			throw new Exception("Could not create MySQL dump");
+		}
+		
+		return true;
+	}
+	
 	protected function internalDelete() {
 		$this->getTempFolder()->delete();
-		$this->getDataFolder()->delete();
+		
+		$this->mysqldump();
+		
+		$this->getConfigFile()->move($this->getDataFolder()->getFile('config.php'));
 		$this->getConfigFile()->getFolder()->delete();
+		
+		$this->getDataFolder()->move($this->getTrashFolder()->getFolder($this->getDataFolder()->getName()));
 		
 		$this->dropDatabaseUser($this->getDbUser());
 		$this->dropDatabase($this->getDbName());
