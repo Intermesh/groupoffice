@@ -78,6 +78,9 @@ class Instance extends Entity {
 		return parent::defineFilters()
 			->add('enabled', function(Criteria $c, $value){
 				$c->andWhere(['enabled' => $value]);
+			})
+			->add('isTrial', function(Criteria $c, $value) {
+				$c->andWhere('isTrial', '=', $value);
 			});
 	}
 
