@@ -344,6 +344,7 @@ abstract class Entity  extends OrmEntity {
 
 			$dbName = GO()->getDatabase()->getName();
 			GO()->getDbConnection()->exec("USE information_schema");
+			GO()->getDbConnection()->exec("SET innodb_stats_on_metadata = 0");
 			//somehow bindvalue didn't work here
 			$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where ".
 				"constraint_schema=" . GO()->getDbConnection()->getPDO()->quote($dbName) . 
