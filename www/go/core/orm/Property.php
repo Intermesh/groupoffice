@@ -21,8 +21,7 @@ use function GO;
 use go\core\db\Query as GoQuery;
 use go\core\db\Table;
 use go\core\util\ArrayObject;
-use Symfony\Component\HttpKernel\Debug\ErrorHandler;
-use go\core\ErrorHandler as GoErrorHandler;
+use go\core\ErrorHandler;
 
 /**
  * Property model
@@ -1214,7 +1213,7 @@ abstract class Property extends Model {
 //				}				
 			}
 		} catch (PDOException $e) {
-			GoErrorHandler::logException($e);
+			ErrorHandler::logException($e);
 			$uniqueKey = \go\core\db\Utils::isUniqueKeyException($e);
 			
 			if ($uniqueKey) {				
