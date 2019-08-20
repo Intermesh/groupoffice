@@ -108,7 +108,7 @@ class Blob extends orm\Entity {
 			GO()->getDbConnection()->exec("USE information_schema");
 			
 			//somehow bindvalue didn't work here
-			$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where constraint_schema=" . GO()->getDbConnection()->getPDO()->quote($dbName) . " and referenced_table_name='core_blob' and referenced_column_name = 'id'";
+			$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where table_schema=" . GO()->getDbConnection()->getPDO()->quote($dbName) . " and referenced_table_name='core_blob' and referenced_column_name = 'id'";
 			$stmt = GO()->getDbConnection()->getPDO()->query($sql);
 			$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);		
 			GO()->getDbConnection()->exec("USE `" . $dbName . "`");			
