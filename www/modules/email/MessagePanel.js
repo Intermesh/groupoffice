@@ -203,7 +203,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'</div>';
 
 		this.template = new Ext.XTemplate(templateStr,{
-
+			defaultFormatFunc : false,
 			linkIconCls : function(link) {				
 				
 				return go.Entities.getLinkIcon(link.entity, link.filter);
@@ -231,6 +231,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			}
 
 		});
+		
 		this.template.compile();
 	},
 
