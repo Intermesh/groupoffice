@@ -270,14 +270,10 @@ if (file_exists(GO::view()->getTheme()->getPath() . 'MainLayout.js')) {
 <script type="text/javascript" nonce="<?= Response::get()->getCspNonce(); ?>">
 <?php
 
-// AUTO LOGIN NOT WORKING IN 6.4???
-
-
 //direct login with token
 if(isset($_POST['accessToken'])) { //defined in index.php
-
-	if(preg_match('/[^0-9az]/i', $_POST['accessToken'])) {
-    throw new \Exception("Invalid acccess token format");
+	if(preg_match('/[^0-9a-z]/i', $_POST['accessToken'], $matches)) {
+    throw new \Exception("Invalid acccess token format: " .$_POST['accessToken']);
 	}
 	
 	?>	
