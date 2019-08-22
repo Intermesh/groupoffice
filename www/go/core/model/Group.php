@@ -177,6 +177,9 @@ class Group extends AclOwnerEntity {
 
 		foreach($this->setModules as $moduleId => $level) {
 			$module = Module::findById($moduleId);
+			if(!$module) {
+				throw new \Exception("Module with ID " . $moduleId . " not found");
+			}
 			$module->setAcl([
 				$this->id => $level
 			]);
