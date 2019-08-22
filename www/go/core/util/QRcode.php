@@ -2029,7 +2029,7 @@ namespace go\core\util;
         //----------------------------------------------------------------------
         public function eatNum()
         {
-            $ln = QRspec::lengthIndicator(QR_MODE_NUM, $this->input->getUpdateCount());
+            $ln = QRspec::lengthIndicator(QR_MODE_NUM, $this->input->getVersion());
 
             $p = 0;
             while(self::isdigitat($this->dataStr, $p)) {
@@ -2066,8 +2066,8 @@ namespace go\core\util;
         //----------------------------------------------------------------------
         public function eatAn()
         {
-            $la = QRspec::lengthIndicator(QR_MODE_AN,  $this->input->getUpdateCount());
-            $ln = QRspec::lengthIndicator(QR_MODE_NUM, $this->input->getUpdateCount());
+            $la = QRspec::lengthIndicator(QR_MODE_AN,  $this->input->getVersion());
+            $ln = QRspec::lengthIndicator(QR_MODE_NUM, $this->input->getVersion());
 
             $p = 0;
             
@@ -2129,8 +2129,8 @@ namespace go\core\util;
         //----------------------------------------------------------------------
         public function eat8()
         {
-            $la = QRspec::lengthIndicator(QR_MODE_AN, $this->input->getUpdateCount());
-            $ln = QRspec::lengthIndicator(QR_MODE_NUM, $this->input->getUpdateCount());
+            $la = QRspec::lengthIndicator(QR_MODE_AN, $this->input->getVersion());
+            $ln = QRspec::lengthIndicator(QR_MODE_NUM, $this->input->getVersion());
 
             $p = 1;
             $dataStrLen = strlen($this->dataStr);

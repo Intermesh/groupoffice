@@ -16,6 +16,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	currentId: null,
 	buttonAlign: 'left',
 	layout: "fit",
+	showCustomfields:true,
 
 	/**
 	 * If set then the title bar will be appended with ": "+ value of the field.
@@ -124,7 +125,9 @@ go.form.Dialog = Ext.extend(go.Window, {
 		var items = this.initFormItems() || [];
 		var layout = this.formPanelLayout;
 		
-		this.addCustomFields(items);
+		if(this.showCustomfields){
+			this.addCustomFields(items);
+		}
 		
 		var count = this.panels.length;
 		
