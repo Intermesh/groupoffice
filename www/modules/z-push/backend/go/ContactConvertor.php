@@ -38,22 +38,28 @@ class ContactConvertor {
 	public function __construct() {
 
 		$this->phoneMapping = [
-				PhoneNumber::TYPE_WORK => [
-						["number" => "businessphonenumber"],
-						["number" => "business2phonenumber"],
-						["number" => "companymainphone"]
-				],
-				PhoneNumber::TYPE_FAX => [
-						["number" => "businessfaxnumber"]
-				],
-				PhoneNumber::TYPE_MOBILE => [
-						["number" => "mobilephonenumber"],
-						["number" => "carphonenumber"]
-				],
-				PhoneNumber::TYPE_HOME => [
-						["number" => "homephonenumber"],
-						["number" => "home2phonenumber"]
-				],
+			PhoneNumber::TYPE_WORK => [
+				["number" => "businessphonenumber"],
+				["number" => "companymainphone"]
+			],
+			PhoneNumber::TYPE_WORK_MOBILE => [
+				["number" => "business2phonenumber"],
+				["number" => "businessphonenumber"]
+			],
+			PhoneNumber::TYPE_FAX => [
+				["number" => "homefaxnumber"]
+			],
+			PhoneNumber::TYPE_WORK_FAX => [
+				["number" => "businessfaxnumber"]
+			],
+			PhoneNumber::TYPE_MOBILE => [
+				["number" => "mobilephonenumber"],
+				["number" => "carphonenumber"]
+			],
+			PhoneNumber::TYPE_HOME => [
+				["number" => "homephonenumber"],
+				["number" => "home2phonenumber"]
+			],
 		];
 
 		$this->dateMapping = [
@@ -248,7 +254,7 @@ class ContactConvertor {
 	 * Uses the mapping to convert AS properties to has many array values.
 	 * 
 	 * eg. "homephone" -> ['type' => 'home', 'number' => 1234']
-	 * @param type $m
+	 * @param array $m
 	 * @param type $message
 	 * @return boolean
 	 */
