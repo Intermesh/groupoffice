@@ -29,12 +29,5 @@ go.groups.GroupDialog = Ext.extend(go.form.Dialog, {
 			})
 		];
 	}
-	
-//	load : function(id) {
-//		
-//		this.groupUserGrid.load(id);
-//		
-//		return go.groups.GroupDialog.superclass.load.call(this, id);
-//	}
 });
 
