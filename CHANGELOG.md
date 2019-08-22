@@ -1,3 +1,5 @@
+- Core / Calendar: Search button can be in bottom toolbar (Calendar search)
+
 19-08-2019 6.4.43
 - Address book: Install failed
 
