@@ -254,7 +254,11 @@ class Contact extends AclItemEntity {
 	}
 
 	public function buildFilesPath() {
-		$new_folder_name = File::stripInvalidChars($this->name).' ('.$this->id.')';
+		if($this->isOrganization) {
+			$new_folder_name = File::stripInvalidChars($this->name).' ('.$this->id.')';
+		} else{
+			$new_folder_name = File::stripInvalidChars($this->lastName .", ". $this->firstName).' ('.$this->id.')';
+		}
 		$last_part = empty($this->name) ? '' : strtoupper(mb_substr($new_folder_name,0,1,'UTF-8'));
 
 		$addressBook = AddressBook::findById($this->addressBookId);		

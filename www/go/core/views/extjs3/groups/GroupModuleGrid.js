@@ -252,7 +252,10 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 		if(!form) {
 			return;
 		}
-		this.value = form.entityStore.entity.defaultAcl;
+
+		if(!this.store.loaded) {
+			this.store.load();
+		}		
 
 		form.on("load", function(f, v) {
 			this.setDisabled(v.permissionLevel < go.permissionLevels.manage);
@@ -327,7 +330,7 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 		return false;
 	},	
 	
-	getValue: function () {				
+	getValue: function () {			
 		return this.value;
 	},
 

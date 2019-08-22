@@ -346,7 +346,7 @@ abstract class Entity  extends OrmEntity {
 			GO()->getDbConnection()->exec("USE information_schema");
 			//somehow bindvalue didn't work here
 			$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where ".
-				"constraint_schema=" . GO()->getDbConnection()->getPDO()->quote($dbName) . 
+				"table_schema=" . GO()->getDbConnection()->getPDO()->quote($dbName) . 
 				" and referenced_table_name=".GO()->getDbConnection()->getPDO()->quote($tableName)." and referenced_column_name = 'id'";
 
 			$stmt = GO()->getDbConnection()->getPDO()->query($sql);

@@ -213,12 +213,10 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 
 		var me = this;
 
-		this.avatarComp.menu.items.item(1).setHandler( this.avatarComp.menu.items.item(1).handler.createSequence(function() {
-			console.warn("HUH");
-			window.open("https://www.google.com/search?q=" + encodeURIComponent(me.getValues()['name']) + "&tbm=isch");
-		}), this.avatarComp);
+		// this.avatarComp.menu.items.item(1).setHandler( this.avatarComp.menu.items.item(1).handler.createSequence(function() {
+		// 	window.open("https://www.google.com/search?q=" + encodeURIComponent(me.getValues()['name']) + "&tbm=isch");
+		// }), this.avatarComp);
 
-		console.warn(this.avatarComp.menu.items.item(1));
 
 		this.addPanel(new Ext.Panel({
 			layout: 'fit',

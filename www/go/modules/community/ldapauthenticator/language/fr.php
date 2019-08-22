@@ -2,7 +2,7 @@
 return array (
   'LDAP Authenticator' => 'Authentification LDAP',
   'Server profile' => 'Profil de serveur',
-  'Enter the domains this ldap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used.' => 'Entrez les domaines que ce serveur LDAP doit utiliser pour sauthentifier. Les utilisateurs doivent se connecter avec leur adresse email. Si le domaine correspond à ce profil, il sera utilisé.',
+  'Enter the domains this ldap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used.' => 'Entrez les domaines que ce serveur LDAP doit utiliser pour s\'authentifier. Les utilisateurs doivent se connecter avec leur adresse email. Si le domaine correspond à ce profil, il sera utilisé.',
   'Use authentication' => 'Utiliser l\'authentification',
   'Enable this if the LDAP server requires autentication to lookup users or groups' => 'Utiliser cette option si le serveur LDAP nécessite une authentification pour parcourir les groupes et les utilisateurs',
   'Username attribute' => 'Attribut nom d\'utilisateur',
@@ -14,4 +14,11 @@ return array (
   'Enable this if the SMTP server credentials are identical to the IMAP server.' => 'Activer cette option si les identifiants SMTP sont identiques à ceux de l\'IMAP',
   'User options' => 'Options utilisateur',
   'Users will automatically be added to these groups' => 'Les utilisateurs seront automatiquement ajoutés à ce groupe',
+  'Verify SSL certicate' => 'Vérifier certificat SSL',
+  'Login with e-mail address' => 'Se connecter avec adresse courriel',
+  'Synchronization' => 'Synchronisation',
+  'Synchronize users' => 'Synchroniser les utilisateurs',
+  'User query' => 'Requête utilisateur',
+  'Synchronize groups' => 'Synchroniser les groupes',
+  'Group query' => 'Requête groupe',
 );

@@ -14,11 +14,12 @@ class DeactivateTrials extends CronJob {
 						->andWhere('createdAt', '<', new DateTime("-30 days"));
 		
 		foreach($expiredTrials as $trial) {
-			$trial->enabled = false;
-			$trial->isTrial = false;
-			if(!$trial->save()) {
-				throw new \Exception("Could not deactivate trial");
-			}
+//			$trial->enabled = false;
+//			$trial->isTrial = false;
+//			if(!$trial->save()) {
+//				throw new \Exception("Could not deactivate trial");
+//			}
+			$trial->delete();
 		}
 	}
 }

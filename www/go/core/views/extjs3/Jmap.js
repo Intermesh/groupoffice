@@ -320,6 +320,9 @@ go.Jmap = {
 			},
 			failure: function (response, opts) {
 				console.log('server-side failure with status code ' + response.status);
+
+				Ext.MessageBox.alert(t("Error"), t("Sorry, an unexpected error occurred: ") + response.responseText);
+				
 			}
 		});
 
