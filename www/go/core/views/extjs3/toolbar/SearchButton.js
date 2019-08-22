@@ -212,9 +212,10 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		});
 		var toolbar = this.findParentByType('toolbar');
 		this.searchToolBar.render(toolbar.el);
-		toolbar.ownerCt.on('resize', function (tb, adjWidth) {
-			this.searchToolBar.setWidth(adjWidth);
-		}, this);
+		
+		// toolbar.ownerCt.on('resize', function (tb, adjWidth) {
+		// 	this.searchToolBar.setWidth(adjWidth);
+		// }, this);
 		
 		if(this.store && this.store.entityStore) {
 			
@@ -280,6 +281,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 
 	// search button handler
 	handler: function () {
+		this.searchToolBar.setWidth(this.ownerCt.getWidth());
 		this.searchToolBar.setVisible(true);
 		this.searchToolBar.items.get(1).focus();
 	}

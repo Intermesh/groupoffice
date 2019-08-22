@@ -925,12 +925,25 @@
 	}
 }
 
+.x-panel-bbar
+{
+	.x-searchbar {
+		input {
+			min-height:dp(40);
+			+ .x-form-search-trigger {
+				min-height:dp(40);
+			
+			}
+		}
+	}
+}
+
 .x-toolbar{
 	height: dp(56);
 	padding:0 dp(8) 0 0;
 	
-	&.go-paging-tb {
-		height: dp(48);
+	&.go-paging-tb, .go-paging-tb & {
+		height: dp(40);
 	}
 	&-ct {
 		height: 100%;

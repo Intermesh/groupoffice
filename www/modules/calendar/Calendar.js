@@ -255,6 +255,12 @@ GO.calendar.MainPanel = function(config){
 		})
 	});
 
+	this.calendarList.getBottomToolbar().add('->');
+	this.calendarList.getBottomToolbar().add({
+		xtype: 'tbsearch',
+		store: this.calendarsStore
+	});
+
 	this.viewsList = new GO.grid.GridPanel({
 		border: false,
 		layout:'fit',
