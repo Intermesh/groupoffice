@@ -3,6 +3,7 @@
 - Address book: Use lastname first when creating files folder
 - Core: Fixed pluload UI
 - Core: Updated French translation
+- Email: Fixed html encoding in header bug
 
 19-08-2019 6.4.43
 - Address book: Install failed
