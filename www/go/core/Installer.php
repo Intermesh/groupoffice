@@ -251,20 +251,31 @@ class Installer {
 		$unavailable = [];
 		foreach ($modules as $module) {
 
+			if($module['package'] == $module['name'] && $module['name'] == "core") {
+				continue;
+			}
+
 			if (isset($module['package']) && $module['package'] != 'legacy') {
-				//SKIP for now as there no encoded refactored moules yet.
-				continue;
-			}
+				$moduleCls = "go\\modules\\" . $module['package'] . "\\" . $module['name'] . "\\Module";
 
-			$moduleCls = "GO\\" . ucfirst($module['name']) . "\\" . ucfirst($module['name']) . "Module";
+				if (!class_exists($moduleCls)) {
+					$unavailable[] = ["package" => $module['package'], "name" => $module['name']];
+					continue;
+				}
 
-			if (is_dir(__DIR__ . '/../go/modules/core/' . $module['name']) || is_dir(__DIR__ . '/../go/modules/community/' . $module['name'])) {
-				continue;
-			}
+			} else
+			{
 
-			if (!class_exists($moduleCls)) {
-				$unavailable[] = ["package" => $module['package'], "name" => $module['name']];
-				continue;
+				$moduleCls = "GO\\" . ucfirst($module['name']) . "\\" . ucfirst($module['name']) . "Module";
+
+				// if (is_dir(__DIR__ . '/../go/modules/core/' . $module['name']) || is_dir(__DIR__ . '/../go/modules/community/' . $module['name'])) {
+				// 	continue;
+				// }
+
+				if (!class_exists($moduleCls)) {
+					$unavailable[] = ["package" => $module['package'], "name" => $module['name']];
+					continue;
+				}			
 			}
 
 			$mod = new $moduleCls();

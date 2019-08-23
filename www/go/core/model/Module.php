@@ -124,6 +124,11 @@ class Module extends AclOwnerEntity {
 		return $root->getFolder("/go/modules/" . $this->package ."/" . $this->name ."/");
 	}	
 	
+	/**
+	 * Check if this module is installed, available and licensed
+	 * 
+	 * @return bool
+	 */
 	public function isAvailable() {
 		
 		

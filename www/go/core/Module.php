@@ -464,6 +464,21 @@ abstract class Module {
 	public function getModel() {
 		return model\Module::findByName($this->getPackage(), $this->getName());
 	}
+
+	/**
+	 * Check if this module is installed, available and licensed
+	 * 
+	 * @return bool
+	 */
+	public function isAvailable() {
+
+		$model = $this->getModel();
+		if(!$model) {
+			return false;
+		}
+
+		return $model->isAvailable();
+	}
 	
 	/**
 	 * Get the module settings
