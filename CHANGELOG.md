@@ -1,4 +1,5 @@
 - Core: Backup & Confirm before upgrade
+- Core: Upgrade on command line
 - Core: Upload pictures select bug
 - Core: Auto detect CSV delimiter and fixed import of multiple properties
 - Core: Saving quota in user dialog didn't work because of broken compositefield
