@@ -190,7 +190,7 @@ Ext.override(Ext.form.BasicForm,{
 		var fn = function (f) {
 			if (dirtyOnly !== true || f.isDirty()) {
 			
-				if (f.getXType() == 'checkboxgroup') {
+				if (f.getXType() == 'compositefield' || f.getXType() == 'checkboxgroup') {
 					f.items.each(fn);
 					return true;
 				}
@@ -367,7 +367,6 @@ Ext.override(Ext.data.GroupingStore,{
 
 Ext.override(Ext.form.CompositeField, {
 	origFocus : Ext.form.CompositeField.prototype.focus,
-	cascade : Ext.Container.prototype.cascade,
 	focus : function() {
 		var first = this.items.find(function(item) {
 			return item.isFormField && !item.disabled && item.isVisible();
