@@ -47,6 +47,7 @@ class Csv extends convert\Csv {
 	public static $excludeHeaders = ['addressBookId', 'goUserId', 'vcardBlobId', 'uri'];
 	
 	protected function init() {
+		parent::init();
 		$this->addColumn('isOrganization', GO()->t("Is organization", "community", "addressbook"), false);
 		$this->addColumn('organizations', GO()->t("Organizations", "community", "addressbook"), true);		
 	}
