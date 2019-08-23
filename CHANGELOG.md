@@ -1,6 +1,7 @@
 - Core: Backup & Confirm before upgrade
 - Core: Upload pictures select bug
 - Core: Auto detect CSV delimiter and fixed import of multiple properties
+- Core: Saving quota in user dialog didn't work because of broken compositefield
 
 22-08-2019 6.4.44
 - Core / Calendar: Search button can be in bottom toolbar (Calendar search)
