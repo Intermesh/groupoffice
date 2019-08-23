@@ -67,9 +67,9 @@ go.form.ImageField = Ext.extend(Ext.BoxComponent, {
 				text: t("Upload"),
 				handler: function () {
 					go.util.openFileDialog({
-						multiple: true,
+						multiple: false,
 						accept: "image/*",
-						directory: true,
+						directory: false,
 						autoUpload: true,
 						listeners: {
 							upload: function (response) {

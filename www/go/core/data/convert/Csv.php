@@ -41,12 +41,25 @@ class Csv extends AbstractConverter {
 	 * @var string
 	 */
 	protected $multipleDelimiter = ' ::: ';
+
+	protected $delimiter = ',';
+
+	protected $enclosure = '"';
 	
 	/**
 	 * List headers to exclude
 	 * @var string[]
 	 */
 	public static $excludeHeaders = [];
+
+	protected function init()
+	{
+		parent::init();
+
+		$user = GO()->getAuthState()->getUser(['listSeparator', 'textSeparator']);
+		$this->delimiter = $user->listSeparator;
+		$this->enclosure = $user->textSeparator;
+	}
 
 	public function export(Entity $entity) {
 		
@@ -236,12 +249,12 @@ class Csv extends AbstractConverter {
 	protected function exportEntity(Entity $entity, $fp, $index, $total) {
 
 		if ($index == 0) {
-			fputcsv($fp, array_column($this->getHeaders($entity), 'name'));
+			fputcsv($fp, array_column($this->getHeaders($entity), 'name'), $this->delimiter, $this->enclosure);
 		}
 
 		$record = $this->export($entity);
 		
-		fputcsv($fp, $record);
+		fputcsv($fp, $record, $this->delimiter, $this->enclosure);
 	}
 
 	public function getFileExtension(): string {
@@ -255,6 +268,13 @@ class Csv extends AbstractConverter {
 			}
 		}
 		return true;
+	}
+
+	public function importFile(\go\core\fs\File $file, $entityClass, $params = array())
+	{
+		$this->sniffDelimiter($file);
+
+		return parent::importFile($file, $entityClass, $params);
 	}
 	
 	/**
@@ -272,10 +292,10 @@ class Csv extends AbstractConverter {
 	protected function importEntity(Entity $entity, $fp, $index, array $params) {
 		
 		if($index == 0) {
-			$headers = fgetcsv($fp);
+			$headers = fgetcsv($fp, 0, $this->delimiter, $this->enclosure);
 		}
 		
-		$record = fgetcsv($fp);
+		$record = fgetcsv($fp, 0, $this->delimiter, $this->enclosure);
 		
 		if(!$record || $this->recordIsEmpty($record)) {
 			return false;
@@ -343,7 +363,7 @@ class Csv extends AbstractConverter {
 				$sub = &$sub[$part];					
 			}
 			
-			$multiple = ($relation && $relation->many) || !empty($headers[$path]['many']);
+			$multiple = ($relation && ($relation->type == Relation::TYPE_ARRAY || $relation->type == Relation::TYPE_MAP)) || !empty($headers[$path]['many']);
 			
 			if($multiple) {
 				if(isset($v[$propName])) {
@@ -363,7 +383,7 @@ class Csv extends AbstractConverter {
 		//second pass for multiple values
 		foreach($v as $prop => $value) {
 			$relation = $entityClass::getMapping()->getRelation($prop);
-			if(!$relation || !$relation->many) {
+			if(!$relation || !($relation->type == Relation::TYPE_ARRAY || $relation->type == Relation::TYPE_MAP)) {
 				continue;
 			}
 			
@@ -385,6 +405,18 @@ class Csv extends AbstractConverter {
 		
 		return $v;
 	}
+
+	private function sniffDelimiter(File $file) {
+		$fp = $file->open('r');
+
+		$headers = fgetcsv($fp, 0, $this->delimiter, $this->enclosure);
+		
+		if(!$headers || count($headers) == 1) {
+			$this->delimiter = $this->delimiter == ',' ? ';' : ',';
+		}
+
+		fclose($fp);
+	}
 	
 	/**
 	 * Get headers from CSV
@@ -394,8 +426,12 @@ class Csv extends AbstractConverter {
 	 * @throws \Exception
 	 */
 	public function getCsvHeaders(File $file) {
+
+		$this->sniffDelimiter($file);
+
 		$fp = $file->open('r');
-		$headers = fgetcsv($fp);
+
+		$headers = fgetcsv($fp, 0, $this->delimiter, $this->enclosure);
 		
 		if(!$headers) {
 			throw new \Exception("Could not read CSV file");
