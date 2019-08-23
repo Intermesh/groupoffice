@@ -1,3 +1,6 @@
+- Core: Upload pictures select bug
+- Core: Auto detect CSV delimiter and fixed import of multiple properties
+
 22-08-2019 6.4.44
 - Core / Calendar: Search button can be in bottom toolbar (Calendar search)
 - Core: Fixed group dialog when default permissions for group was set
