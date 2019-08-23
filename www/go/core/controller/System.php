@@ -3,6 +3,7 @@ namespace go\core\controller;
 
 use go\core\Controller;
 use go\core\db\Query;
+use go\core\db\Table;
 use go\core\fs\Blob;
 use go\core\util\DateTime;
 use function GO;
@@ -18,6 +19,17 @@ class System extends Controller {
 		$o = new $cls;
 		$o->run();
 	}
+
+	public function upgrade() {
+		GO()->getInstaller()->isValidDb();
+		GO()->setCache(new \go\core\cache\None());	
+		Table::destroyInstances();
+		\GO::session()->runAsRoot();	
+		GO()->getInstaller()->upgrade();
+		
+		echo "Done!\n";
+	}
+
 	
 	// public function checkAllBlobs() {
 	// 	$blobs = Blob::find()->execute();

@@ -125,5 +125,6 @@ code {
   color: black;
   padding: 12px;
   display: block;
-  margin-top: 12px;
-  white-space: pre; }
+  margin: 12px 0;
+  white-space: pre; 
+}

@@ -25,8 +25,15 @@ try {
 	
 		echo "<section><div class=\"card\"><h2>Backup before uprade</h2><p>";
 
-		echo "Please <b>BACKUP</b> your database before proceeding. You're database is going to be upgraded and all caches will be cleared.<br />This operation can't be undone!<br />";
+		echo "Please <b>BACKUP</b> your database and files before proceeding. You're database is going to be upgraded and all caches will be cleared.<br />This operation can only be undone by restoring a backup.<br />";
 		
+		echo "Note: You can also upgrade on the command line by running: <br />
+
+			<code>cli.php core/System/upgrade</code>
+
+			";
+
+
 		echo '<a class="button" href="?confirmed=1">Upgrade database</a>';
 		echo "</p></div></section>";
 	} elseif (!isset($_GET['ignore']) && count($unavailable)) {
@@ -59,8 +66,7 @@ try {
 
 		\GO::session()->runAsRoot();
 	
-		GO()->getInstaller()->upgrade();		
-		//GO()->getInstaller()->checkVersions();		
+		GO()->getInstaller()->upgrade();	
 
 		echo "</pre></div>";
 
