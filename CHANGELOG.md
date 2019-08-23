@@ -1,3 +1,4 @@
+- Core: Backup & Confirm before upgrade
 - Core: Upload pictures select bug
 - Core: Auto detect CSV delimiter and fixed import of multiple properties
 
