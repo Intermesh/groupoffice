@@ -6,6 +6,7 @@ use Exception;
 use go\core\App;
 use go\core\orm\Property;
 
+require_once __DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'core'.DIRECTORY_SEPARATOR.'util'.DIRECTORY_SEPARATOR.'QRcode.php';
 
 class Googleauthenticator extends Property {
 		
@@ -203,7 +204,7 @@ class Googleauthenticator extends Property {
 		
 		$name = empty($name)?App::get()->getSettings()->title:$name;
 		$secret = empty($secret)?$this->secret:$secret;
-		
+
 		$level = QR_ECLEVEL_M;
 		
 		if(!empty($params['level']) && array_search($params['level'], array('L', 'M', 'Q', 'H')) !== false){
@@ -233,7 +234,7 @@ class Googleauthenticator extends Property {
 		
 		\go\core\util\QRcode::png($otpUrl, $tmpFile->getPath(),QR_ECLEVEL_M,8);
 				
-		$qrBlob = \go\core\fs\Blob::fromTmp($tmpFile->getPath());
+		$qrBlob = \go\core\fs\Blob::fromTmp($tmpFile);
 		$qrBlob->setValues(array(
 				'name'=>$name,
 				'modified'=>time(),
