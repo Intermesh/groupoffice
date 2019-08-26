@@ -122,7 +122,8 @@ class Csv extends AbstractConverter {
 				
 		$path = explode('.', $header);
 		
-		$v = $entity;
+		$v = $entity->toTemplate();
+		
 		foreach($path as $seg) {
 			
 			if(is_array($v)) {
