@@ -315,15 +315,33 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	 * 
 	 * It writes the changes into the 'core_change' table.
 	 * 	 
-	 * @param Query $changedEntities A query object that provides "entityId", "aclId" and "destroyed" in this order!.
+	 * @param Query|array $changedEntities A query object that provides "entityId", "aclId" and "destroyed" in this order!.
 	 */
-	public function changes(Query $changedEntities) {		
+	public function changes($changedEntities) {		
 		
 		GO()->getDbConnection()->beginTransaction();
 		
 		$this->highestModSeq = $this->nextModSeq();		
 		
-		$changedEntities->select('"' . $this->getId() . '", "'. $this->highestModSeq .'", NOW()', true);		
+		if(!is_array($changedEntities)) {
+			$changedEntities->select('"' . $this->getId() . '", "'. $this->highestModSeq .'", NOW()', true);		
+		} else {
+
+			if(empty($changedEntities)) {
+				return;
+			}
+
+			if(!is_array($changedEntities[0])) {
+				$changedEntities = array_map(function($entityId) {
+					return [$entityId, null, 0, $this->getId(), $this->highestModSeq, new DateTime()];
+				}, $changedEntities);
+			} else{
+				$changedEntities = array_map(function($r) {
+					return array_merge($r, [$this->getId(), $this->highestModSeq, new DateTime()]);
+				}, $changedEntities);
+			}
+		}
+		
 		
 		try {
 			$stmt = GO()->getDbConnection()->insert('core_change', $changedEntities, ['entityId', 'aclId', 'destroyed', 'entityTypeId', 'modSeq', 'createdAt']);
