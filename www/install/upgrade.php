@@ -23,10 +23,11 @@ try {
 
 	if (!isset($_GET['confirmed'])) {
 	
-		echo "<section><div class=\"card\"><h2>Backup before uprade</h2><p>";
-
+		echo "<section><div class=\"card\"><h2>Backup before upgrade</h2><p>";
 		echo "Please <b>BACKUP</b> your database and files before proceeding. You're database is going to be upgraded and all caches will be cleared.<br />This operation can only be undone by restoring a backup.<br />";
 		
+		echo 'More details about this upgrade can be found in the <a target="_blank" href="https://github.com/Intermesh/groupoffice/blob/master/CHANGELOG.md">change log</a>.<br /><br />';
+
 		echo "Note: You can also upgrade on the command line by running: <br />
 
 			<code>cli.php core/System/upgrade</code>
@@ -34,8 +35,10 @@ try {
 			";
 
 
+		
+		echo "</p></div>";
 		echo '<a class="button" href="?confirmed=1">Upgrade database</a>';
-		echo "</p></div></section>";
+		echo "</section>";
 	} elseif (!isset($_GET['ignore']) && count($unavailable)) {
 	
 		echo "<section><div class=\"card\"><h2>Upgrading Group-Office</h2><pre>";
@@ -46,8 +49,10 @@ try {
 		. "Please install the license file(s) and refresh this page or disable these modules.\n"
 		. "If you continue the incompatible modules will be disabled.\n\n";
 		
+		
+		echo "</pre></div>";
 		echo '<a class="button" href="?ignore=modules&confirmed=1">Disable &amp; Continue</a>';
-		echo "</pre></div></section>";
+		echo "</section>";
 	} else
 	{
 			
