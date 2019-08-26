@@ -315,7 +315,10 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	 * 
 	 * It writes the changes into the 'core_change' table.
 	 * 	 
-	 * @param Query|array $changedEntities A query object that provides "entityId", "aclId" and "destroyed" in this order!.
+	 * @param Query|array $changedEntities A query object or an array that provides "entityId", "aclId" and "destroyed" 
+	 * in this order. When using an array you may also provide a list of entity ID's. In that case it's assumed that these 
+	 * entites have no ACL and are not destroyed but modified.
+	 * 
 	 */
 	public function changes($changedEntities) {		
 		
