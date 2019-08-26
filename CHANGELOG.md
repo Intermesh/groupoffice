@@ -1,3 +1,5 @@
+- Core: added boolean to be able to show/hide customfields inside a dialog.
+- Google authenticator: Fixed issues when setting up new authenticator.
 - Core: Backup & Confirm before upgrade
 - Core: Upgrade on command line
 - Core: Upload pictures select bug
