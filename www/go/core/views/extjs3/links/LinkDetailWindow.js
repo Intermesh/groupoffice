@@ -35,6 +35,10 @@ go.links.LinkDetailWindow = Ext.extend(go.Window, {
   currentId: null,
 
   load: function(id) {
+    
+    if(!this.isVisible()) {
+      this.show();
+    }
     this.currentId = id;
     this.detailView.load(id);
 

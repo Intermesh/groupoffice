@@ -198,7 +198,7 @@ Ext.extend(GO.email.AddressContextMenu, Ext.menu.Menu,{
 						entity: "Contact"
 					});
 
-					win.load(this.contactId).show();
+					win.load(this.contactId);
 
 				}
 			});

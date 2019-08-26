@@ -114,7 +114,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 								entity: record.data.toEntity
 							});
 							
-							win.load(record.data.toId).show();
+							win.load(record.data.toId);
 
 //								var lb = new go.links.LinkBrowser({
 //									entity: this.store.baseParams.filter.entity,
