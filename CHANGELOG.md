@@ -1,3 +1,5 @@
+26-08-2019 6.4.45
+- E-mail: Open contact detail menu from email address instead of edit dialog
 - Core: added boolean to be able to show/hide customfields inside a dialog.
 - Google authenticator: Fixed issues when setting up new authenticator.
 - Core: Backup & Confirm before upgrade
