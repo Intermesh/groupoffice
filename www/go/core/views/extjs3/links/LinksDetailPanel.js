@@ -110,32 +110,11 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 						} else 
 						{
 							var record = this.store.getById(node.getAttribute('data-id'));
-							
-							var entity = go.Entities.get(record.data.toEntity);
-							if (!entity) {
-								throw record.data.toEntity + " is not a registered entity";
-							}
-//							entity.goto(record.data.toId);
-							
-							var previewPanel = entity.links[0].linkDetail(), win = new go.Window({
-								tools: [{
-									id: 'home',
-									handler: function() {
-										entity.goto(record.data.toId);
-										win.close();
-									}
-								}],
-								title: entity.title,
-								layout: "fit",
-								width: previewPanel.width || dp("600"),
-								height: previewPanel.height || dp("700"),
-								items: [
-									previewPanel
-								]
+							var win = new go.links.LinkDetailWindow({
+								entity: record.data.toEntity
 							});
 							
-							win.show();
-							previewPanel.load(record.data.toId);
+							win.load(record.data.toId);
 
 //								var lb = new go.links.LinkBrowser({
 //									entity: this.store.baseParams.filter.entity,
