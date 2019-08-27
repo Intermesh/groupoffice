@@ -1,4 +1,6 @@
-- Core: Changed ctCls of the forgot password button so it can be hidden with customcss: .go-login-forgot-username { display:none; }
+- Core: Custom fields were blank in CSV export.
+- Core: IMAP auth was broken when groups were modified. Removed permission check in user model that is executed in controller
+- Bookmarks: Fixed always reloading of website data
 
 26-08-2019 6.4.45
 - E-mail: Open contact detail menu from email address instead of edit dialog

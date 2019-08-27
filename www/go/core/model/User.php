@@ -371,10 +371,6 @@ class User extends Entity {
 		
 		if(!$this->isNew() && $this->isModified('groups')) {	
 			
-			if($this->getPermissionLevel() < Acl::LEVEL_MANAGE) {
-				throw new Forbidden("You're not allowed to change groups");
-			}
-			
 			if(!in_array(Group::ID_EVERYONE, $this->groups)) {
 				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, GO()->t("You can't remove group everyone"));
 			}
