@@ -124,6 +124,16 @@ class Column {
 	 */
 	public $table;
 
+
+	/**
+	 * MySQL Data type
+	 * 
+	 * eg. VARCHAR(100)
+	 * 
+	 * @var string
+	 */
+	public $dataType = "";
+
 	/**
 	 * The MySQL database datetime format.
 	 */
@@ -155,11 +165,7 @@ class Column {
 	 * @return string
 	 */
 	public function getCreateSQL() {
-		$sql = $this->dbType;
-		
-		if(!empty($this->length)) {
-			$sql .= '(' . $this->length . ')';
-		}
+		$sql = $this->dataType;		
 		
 		if(!$this->nullAllowed) {
 			$sql .= ' NOT NULL';
