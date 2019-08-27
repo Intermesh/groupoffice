@@ -2,17 +2,17 @@ go.form.TimeField = Ext.extend(Ext.form.TextField, {
 	width: dp(72),
 	defaultAutoCreate : {tag: 'input', type: 'time', size: '20', autocomplete: 'off'},
 
-	initComponent: function() {
-		go.form.TimeField.superclass.initComponent.call(this);
+
+	onBlur: function() {
 
 		if(Ext.isSafari) {
-			this.on("blur", function() {
-				var v = this.getRawValue();
-				if(v.indexOf(':') === -1) {
-					this.setValue(v + ':00');
-				}
-			}, this);
+			var v = this.getRawValue();
+			if(!Ext.isEmpty(v) && v.indexOf(':') === -1) {
+				this.setRawValue(v + ':00');
+			}
 		}
+
+		go.form.TimeField.superclass.onBlur.call(this);
 	},
 
 	setMinutes: function(minutes) {
