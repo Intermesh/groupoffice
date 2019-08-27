@@ -14,9 +14,6 @@
 go.modules.community.bookmarks.BookmarksDialog = Ext.extend(go.form.Dialog,{
 	entityStore: "Bookmark",
 	title: t("Bookmark"),
-	focus: function() {
-		this.formPanel.form.findField("content").focus();
-	},
 	initFormItems: function () {
 		var thumbExample = null;
 		var items = [{
@@ -34,8 +31,9 @@ go.modules.community.bookmarks.BookmarksDialog = Ext.extend(go.form.Dialog,{
 					return urlRegexp.test(value);
 				},
 				listeners:{
-					change: function(field,newValue){
+					change: function(field,newValue, oldValue){
 						this.el.mask(t("Loading..."));
+
 						go.Jmap.request({
 							method: "community/bookmarks/Bookmark/description",
 							params: {
@@ -60,11 +58,11 @@ go.modules.community.bookmarks.BookmarksDialog = Ext.extend(go.form.Dialog,{
 				anchor: '100%',
 				allowBlank: false
 			}),
-			this.websiteDescription = new Ext.form.TextField({
+			this.websiteDescription = new Ext.form.TextArea({
 				name: 'description',
 				fieldLabel: t("Description"),
 				anchor: '100%',
-				height:65
+				grow: true
 			}),
 			this.thumbField = new Ext.form.Hidden({
 				name: 'logo',
