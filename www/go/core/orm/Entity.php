@@ -739,13 +739,17 @@ abstract class Entity extends Property {
 		}
 
 		foreach ($properties as $propName) {
-			try {
-				$value = $this->getValue($propName);
-				$arr[$propName] = method_exists($value, 'toTemplate') ? $value->toTemplate() : $value;
-			} catch (NotArrayable $e) {
-				
-				App::get()->debug("Skipped prop " . static::class . "::" . $propName . " because type '" . gettype($value) . "' not scalar or ArrayConvertable.");
-			}
+			if($propName == 'customFields') {
+				$arr['customFields'] = $this->getCustomFields(true);
+			} else{
+				try {
+					$value = $this->getValue($propName);
+					$arr[$propName] = method_exists($value, 'toTemplate') ? $value->toTemplate() : $value;
+				} catch (NotArrayable $e) {
+					
+					App::get()->debug("Skipped prop " . static::class . "::" . $propName . " because type '" . gettype($value) . "' not scalar or ArrayConvertable.");
+				}
+			}			
 		}
 		
 		return $arr;

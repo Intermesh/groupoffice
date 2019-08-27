@@ -707,6 +707,9 @@ abstract class EntityController extends Controller {
 	 * @throws Exception
 	 */
 	protected function defaultImportCSVMapping($params) {
+
+		ini_set('max_execution_time', 10 * 60);
+		
 		$blob = Blob::findById($params['blobId']);	
 		
 		$converter = $this->findConverter($blob->type);
@@ -752,6 +755,8 @@ abstract class EntityController extends Controller {
 	 * @throws Exception
 	 */
 	protected function defaultExport($params) {
+
+		ini_set('max_execution_time', 10 * 60);
 		
 		$params = $this->paramsExport($params);
 		
