@@ -251,7 +251,7 @@ class Installer {
 		$unavailable = [];
 		foreach ($modules as $module) {
 
-			if($module['package'] == $module['name'] && $module['name'] == "core") {
+			if($module['package'] == "core") {
 				continue;
 			}
 
