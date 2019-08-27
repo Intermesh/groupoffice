@@ -516,23 +516,22 @@ class Installer {
 								GO()->getDbConnection()->query($query);
 						} catch (PDOException $e) {
 							//var_dump($e);		
-
-
-							$errorsOccurred = true;
-
-							echo $e->getMessage() . "\n";
-							echo "Query: " . $query . "\n";
-							echo "Package: " . ($module->package ?? "legacy") . "\n";
-							echo "Module: " . $module->name . "\n";
-							echo "Module installed version: " . $module->version . "\n";
-							echo "Module source version: " . $counts[$moduleId] . "\n";
+							$errorsOccurred = true;						
 
 							if ($e->getCode() == 42000 || $e->getCode() == '42S21' || $e->getCode() == '42S01' || $e->getCode() == '42S22') {
 								//duplicate and drop errors. Ignore those on updates
 								
-								echo "\n\nIGNORING: ". $e->getMessage()." from query: ".$query."\n\n";
+								GO()->debug("IGNORING: ". $e->getMessage()." from query: ".$query);
 								
 							} else {
+
+								echo $e->getMessage() . "\n";
+								echo "Query: " . $query . "\n";
+								echo "Package: " . ($module->package ?? "legacy") . "\n";
+								echo "Module: " . $module->name . "\n";
+								echo "Module installed version: " . $module->version . "\n";
+								echo "Module source version: " . $counts[$moduleId] . "\n";
+								
 								die("ABORTING: Please contact support");
 							}
 						}
