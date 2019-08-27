@@ -251,6 +251,7 @@ class Installer {
 		$unavailable = [];
 		foreach ($modules as $module) {
 
+			//core modules from 6.3 are removed. Only core/core remains but is not at the usual location.
 			if($module['package'] == "core") {
 				continue;
 			}
