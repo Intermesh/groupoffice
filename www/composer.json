@@ -5,7 +5,7 @@
         "fkooman/php-oauth-client": "*",
         "fkooman/guzzle-bearer-auth-plugin": "*",
         "sabre/dav": "3.1.*",
-        "swiftmailer/swiftmailer": "@stable",
+        "swiftmailer/swiftmailer": "<6.0.0",
         "defuse/php-encryption": "^2.1"
         
     },
