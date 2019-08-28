@@ -92,10 +92,10 @@ class Router {
 		$parts = explode('/', $path);
 
 		if($parts[0] == 'core') {
-			$controllerCls = 'go\\core\\controller\\' . $parts[1];
+			$controllerCls = 'go\\core\\cli\\controller\\' . $parts[1];
 			$method = $parts[2];
 		} else{
-			$controllerCls = 'go\\modules\\' . $parts[0] . '\\' . $parts[1] . '\\controller\\' . $parts[2];
+			$controllerCls = 'go\\modules\\' . $parts[0] . '\\' . $parts[1] . '\\cli\\controller\\' . $parts[2];
 			$method = $parts[3];
 		}
 

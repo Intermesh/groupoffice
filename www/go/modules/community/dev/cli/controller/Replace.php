@@ -1,5 +1,5 @@
 <?php
-namespace go\modules\community\dev\controller;
+namespace go\modules\community\dev\cli\controller;
 
 class Replace extends \go\core\Controller {
 	
