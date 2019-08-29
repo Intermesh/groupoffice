@@ -5,6 +5,8 @@ use go\core\jmap\Entity;
 use go\core\orm\SearchableTrait;
 use go\core\db\Criteria;
 use go\core\orm\Query;
+use go\modules\community\task\model\Alert;
+use GO\Base\Util\Icalendar\RRuleIterator;
 
 /**
  * Task model
@@ -116,7 +118,7 @@ class Task extends Entity {
 
 	/**
 	 * 
-	 * @var int
+	 * @var int[]
 	 */							
 	public $categories;
 
@@ -138,13 +140,20 @@ class Task extends Entity {
 	 */							
 	public $projectId = 0;
 
+	/**
+	 * 
+	 * @var string
+	 */							
+	protected $byDay = '';
+
 
 	
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable("task_task", "task")
-						->addArray('alerts', Alert::class, ['id' => 'taskId']);
+						->addArray('alerts', Alert::class, ['id' => 'taskId'])
+						->addScalar('categories', 'task_task_category', ['id' => 'taskId']);
 	}
 
 	public static function getClientName() {
@@ -152,12 +161,14 @@ class Task extends Entity {
 	}
 
 	public function getRecurrenceRule() {
-		$value = empty($this->recurrenceRule) ? [] : json_decode($this->recurrenceRule, true);
-		return $value;
+		return empty($this->recurrenceRule) ? null : json_decode($this->recurrenceRule, true);
 	}
 
 	public function setRecurrenceRule($rrule) {
-		$this->recurrenceRule = json_encode(array_merge($this->getRecurrenceRule(), $rrule));
+		if($rrule !== null) {
+			$rrule = json_encode($rrule);
+		}
+		$this->recurrenceRule = $rrule;
 	}
 
 	protected static function textFilterColumns() {
@@ -188,9 +199,10 @@ class Task extends Entity {
 							if(!empty($value)) {
 								$criteria->where(['tasklistId' => $value]);
 							}
-						})->add('categories', function(Criteria $criteria, $value) {
+						})->add('categories', function(Criteria $criteria, $value, Query $query) {
 							if(!empty($value)) {
-								$criteria->where(['categories' => $value]);
+								$query->join("task_task_category","categories","task.id = categories.taskId")
+								->where(['categories.categoryId' => $value]);
 							}
 						})->addDate("start", function(Criteria $criteria, $comparator, $value) {	
 								$criteria->where(['start' => $value]);
@@ -207,25 +219,73 @@ class Task extends Entity {
 						});
 	}
 
-		/**
-	 * Sort by database columns or creator and modifier
-	 * 
-	 * @param Query $query
-	 * @param array $sort
-	 * @return Query
-	 */
-	public static function sort(Query $query, array $sort) {
-		
-		if(isset($sort['creator'])) {			
-			$query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT')->orderBy(['u.displayName' => $sort['creator']]);			
-		} 
-		
-		if(isset($sort['modifier'])) {			
-			$query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT')->orderBy(['u.displayName' => $sort['modifier']]);						
-		} 
-		
-		return parent::sort($query, $sort);
-		
+	protected function internalSave() {
+		$rrule = $this->getRecurrenceRule();
+
+		if(!empty($rrule['FREQ']) && $this->percentageComplete == 100) {
+			$this->saveOccurence();
+		}
+
+		if(!parent::internalSave()) {
+			return false;
+		}
+
+		return true;
 	}
 
+	protected function getRecurrencePattern(){
+
+		$rrule = $this->getRecurrenceRule();
+		$startTime = $this->start;
+		//$startDate = $rrule['start'];
+		//$startDateTime = new \DateTime('@'.$this->start_time, new \DateTimeZone($this->timezone));
+		//$startDateTime->setTimezone(new \DateTimeZone($this->timezone)); //iterate in local timezone for DST issues
+		$rRule = new \GO\Base\Util\Icalendar\RRuleIterator($rrule, $startTime);
+
+		//$rRule->fastForward(new \DateTime('@'.$lastReminderTime));
+		$nextTime = $rRule->current();
+		// && $this->hasException($nextTime->getTimeStamp())
+		while($nextTime){
+			$rRule->next();
+			$nextTime = $rRule->current();
+			//break;
+		}
+		return "";
+		//return $rRule;
+	}
+
+	// protected function getRecurrencePattern(){
+
+	// }
+
+	protected function saveOccurence() {
+		$this->getRecurrencePattern();
+
+
+		// $nextTask = new Task();
+		// $values = $this->toArray();
+		// $nextTask->setValues($values);
+		// $rrule = $this->getRecurrenceRule();
+		// $this->recurrenceRule = "";
+		// $nextTask->percentageComplete = 0;
+		// $nextTask->id = NULL;
+
+		// if(isset($rrule['repeatUntilDate']) && $rrule['repeatUntilDate']) {
+		// 	$conf = new \GO\Base\Config();
+		// 	$default = $conf->getdefault_timezone();
+		// 	date_default_timezone_set($default);
+		// 	$today = new \DateTime();
+		// 	$today->settime(0,0);
+		// 	$until = new \DateTime($rrule['until']);
+		// 	if($today <= $until) {
+		// 		$nextTask->save();
+		// 	}
+		// 	//$nextTask->start = $newdate;
+		// } else if(isset($rrule['count'])) {
+		// 	$count = $rrule['count'];
+		// }
+
+
+		
+	}
 }

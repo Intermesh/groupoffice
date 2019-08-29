@@ -27,12 +27,6 @@ class Alert extends Property {
 
 	/**
 	 * 
-	 * @var int
-	 */							
-	public $checkbox;
-
-	/**
-	 * 
 	 * @var \go\core\util\DateTime
 	 */							
 	public $remindDate;

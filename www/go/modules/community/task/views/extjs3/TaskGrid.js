@@ -16,12 +16,28 @@ go.modules.community.task.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			this.store.reload({
 				callback:function(){
 					var update = {}, id = record.data.id;
+					// task completed
 					if(checked) {
 						update[id] = {percentageComplete: 100};
+						// check for another task
+						// go.Jmap.request({
+						// 	method: "community/task/Task/repeatTask",
+						// 	params: {
+						// 		id: id
+						// 	},
+						// 	callback: function(options, success, result) {
+						// 		// this.websiteTitle.setValue(result.title);
+						// 		// this.websiteDescription.setValue(result.description);
+						// 		// thumbExample.getEl().dom.style.backgroundImage = 'url(' + go.Jmap.downloadUrl(result.logo) + ')';
+						// 		// this.thumbField.setValue(result.logo);
+						// 		// this.el.unmask();								
+						// 	},
+						// 	scope: this
+						// });
 					} else {
 						update[id] = {percentageComplete: 0};
 					}
-
+					// update task
 					go.Db.store("TasksTask").set({update: update});
 				},
 				scope:this

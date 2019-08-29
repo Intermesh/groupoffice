@@ -13,3 +13,4 @@ TaskDetail.js
 TasklistDialog.js
 TaskDialog.js
 RecurrencePanel.js
+AlertFields.js

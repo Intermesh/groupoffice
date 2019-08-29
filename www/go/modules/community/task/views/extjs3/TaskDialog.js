@@ -5,10 +5,10 @@ go.modules.community.task.TaskDialog = Ext.extend(go.form.Dialog, {
 	height: dp(800),
 	
 	onLoad: function (values) {
-		this.recurrencePanel.setStartDate(values.start);
-		this.recurrencePanel.changeRepeat(values.recurrenceRule.freq);
-		this.recurrencePanel.setDaysButtons(values.recurrenceRule);
-
+		
+		this.recurrencePanel.onLoad(values.start, values.recurrenceRule);
+		
+		//this.recurrencePanel.setRadioButton(values.recurrenceRule);
 		go.modules.community.task.TaskDialog.superclass.onLoad.call(this,values);
 	},
 
@@ -153,24 +153,8 @@ go.modules.community.task.TaskDialog = Ext.extend(go.form.Dialog, {
 			]
 		});
 
-		this.recurrencePanel = new go.form.RecurrencePanel();
+		this.recurrencePanel = new go.modules.community.task.RecurrencePanel();
 
-		// this.recurrencePanel.setStartDate(start.getValue());
-		// console.error(this.values);
-		// go.Db.store("TasksTask").get().then(function(result) {
-		// 	console.log(result);
-		// 	this.recurrencePanel.setthis.recurrencePanel.setStartDate(start.getValue());
-		// console.error(this.values);DaysButtons(result);
-		// 	//alert(result);this.recurrencePanel.setStartDate(start.getValue());
-		// console.error(this.values);
-		// 	//console.log(result.entthis.recurrencePanel.setStartDate(start.getValue());
-		// console.error(this.values);ities);
-		// });
-		// var store = go.Db.store("TasksTask");
-		// //this.recurrencePanel.changeRepeat(action.result.data.freq);
-		// this.recurrencePanel.setDaysButtons(store.data);
-
-		//var remindDate = now.add(Date.DAY, -GO.tasks.reminderDaysBefore);
 		var remindDate = now;
 		// start other options tab
 		this.optionsPanel = new Ext.Panel({
@@ -184,62 +168,18 @@ go.modules.community.task.TaskDialog = Ext.extend(go.form.Dialog, {
 			hideMode : 'offsets',
 			autoScroll : true,
 
-			items: [{
-						//For relational properties we can use the "go.form.FormGroup" component.
-						//It's a sub form for the "alerts" array property.
-
-						xtype: "formgroup",
-						name: "alerts",
-						hideLabel: true,
-
-						// this will add dp(16) padding between rows.
-						pad: true,
-
-						//the itemCfg is used to create a component for each "album" in the array.
-						itemCfg: {
-								layout: "form",
-								defaults: {
-										anchor: "100%"
-								},
-								items: [{
-											xtype : 'xcheckbox',
-											boxLabel : t("Remind me", "tasks"),
-											hideLabel : true,
-											name : 'checkbox',
-											listeners : {
-												'check' : function(field, checked) {
-													var nextDate = field.nextSibling();
-													nextDate.setDisabled(!checked);
-													nextDate.nextSibling().setDisabled(!checked);
-												},
-												scope : this
-											}
-										},
-										{
-											xtype : 'datefield',
-											name : 'remindDate',
-											format : GO.settings.date_format,
-											value : remindDate.format(GO.settings['date_format']),
-											fieldLabel : t("Date"),
-											disabled : true
-										},
-
-										{
-											xtype : 'timefield',
-											name : 'remindTime',
-											format : GO.settings.time_format,
-											value : "02:01 AM",
-											fieldLabel : t("Time"),
-											disabled : true
-										}
-								]
-						}
-				}
+			items: [
+				new go.modules.community.task.AlertFields()
 			],
 		});
 
 		var items = [
-			propertiesPanel,this.recurrencePanel,this.optionsPanel
+			propertiesPanel,{
+				hideMode : 'offsets',
+				cls:"go-form-panel",
+				title: t("Recurrence"),
+				items:[this.recurrencePanel]
+			},this.optionsPanel
 		];
 
 		this.tabPanel = new Ext.TabPanel({

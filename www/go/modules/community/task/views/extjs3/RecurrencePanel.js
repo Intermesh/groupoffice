@@ -22,7 +22,7 @@
  * 
  * @type {Ext.extend.cls}
  */
-go.form.RecurrencePanel = Ext.extend(Ext.form.FieldSet, {
+go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 	
 	/**
 	 * The start date of the event/task/etc.
@@ -31,26 +31,37 @@ go.form.RecurrencePanel = Ext.extend(Ext.form.FieldSet, {
 	 * {Date} The startDate
 	 */
 	startDate: null,
-		
+
+	getName: function () {
+		return 'recurrenceRule';
+	},
+
+	getValue: function() {
+		if(Ext.isEmpty(this.repeatType.getValue())) {
+			return null;
+		}
+		return go.modules.community.task.RecurrencePanel.superclass.getValue.call(this);	
+	},
+
 	initComponent : function(){
 				
 		this.repeatEvery = new GO.form.NumberField({
 			decimals:0,
-			name : 'recurrenceRule.interval',
+			name : 'interval',
 			minValue:1,
 			width : 50,
 			value : '1'
 		});
 
 		this.repeatType = new Ext.form.ComboBox({
-			hiddenName : 'recurrenceRule.freq',
+			hiddenName : 'freq',
 			triggerAction : 'all',
 			editable : false,
 			selectOnFocus : true,
 			width : 200,
 			forceSelection : true,
 			mode : 'local',
-			value : '',
+			value: '',
 			valueField : 'value',
 			displayField : 'text',
 			store : new Ext.data.SimpleStore({
@@ -72,7 +83,7 @@ go.form.RecurrencePanel = Ext.extend(Ext.form.FieldSet, {
 		}, this);
 
 		this.monthTime = new Ext.form.ComboBox({
-			hiddenName : 'recurrenceRule.bySetPos',
+			hiddenName : 'bySetPos',
 			triggerAction : 'all',
 			selectOnFocus : true,
 			disabled : true,
@@ -93,15 +104,16 @@ go.form.RecurrencePanel = Ext.extend(Ext.form.FieldSet, {
 			})
 		});
 
-		var days = ['recurrenceRule.SU','recurrenceRule.MO','recurrenceRule.TU','recurrenceRule.WE','recurrenceRule.TH','recurrenceRule.FR','recurrenceRule.SA'];
+		var days = ['SU','MO','TU','WE','TH','FR','SA'];
 
-		this.cb = [];
 		this.dayButtons = [];
+		this.bySetDays = "";
+
+		this.byDay = new Ext.form.Hidden({
+			name : 'byDay'
+		});
+
 		for (var day = 0; day < 7; day++) {
-			this.cb[day] = new Ext.form.Hidden({
-				name : days[day],
-				value : 0
-			});
 			this.dayButtons[day] = new Ext.Button({
 				text : t("short_days")[day],
 				day:day,
@@ -109,7 +121,17 @@ go.form.RecurrencePanel = Ext.extend(Ext.form.FieldSet, {
 				pressed : false,
 				listeners: {
 					toggle:function(btn,pressed) {
-						this.cb[btn.day].setValue(pressed?1:0);
+						if(pressed) {
+							if(this.bySetDays == "") {
+								this.bySetDays += days[btn.day];
+							} else {
+								this.bySetDays += "|" + days[btn.day];
+							}
+						} else {
+							this.bySetDays = this.bySetDays.replace("|" + days[btn.day],"");
+							this.bySetDays = this.bySetDays.replace(days[btn.day],"");
+						}
+						this.byDay.setValue(this.bySetDays);
 					},
 					scope:this
 				}
@@ -117,7 +139,7 @@ go.form.RecurrencePanel = Ext.extend(Ext.form.FieldSet, {
 		}
 
 		this.repeatEndDate = new Ext.form.DateField({
-			name : 'recurrenceRule.until',
+			name : 'until',
 			width : 120,
 			disabled : true,
 			format : GO.settings['date_format'],
@@ -129,91 +151,43 @@ go.form.RecurrencePanel = Ext.extend(Ext.form.FieldSet, {
 				}
 			}
 		});
-
-		this.repeatForeverXCheckbox = new Ext.ux.form.XCheckbox({
-			boxLabel : t("Repeat forever"),
-			name : 'recurrenceRule.repeatForever',
-			checked: true,
-			width : 'auto',
-			hideLabel : true,
-			listeners : {
-				check : {
-				fn : function(cb, checked){
-					
-						if(!checked && !this.repeatUntilDateXCheckbox.getValue() && !this.repeatCountXCheckbox.getValue()) {
-							this.repeatForeverXCheckbox.setValue(true);
-						} else {
-							this.repeatUntilDateXCheckbox.setValue(false);
-							this.repeatCountXCheckbox.setValue(false);
-						}
-					},
-					scope : this
-				}
-			}
-		});
-		
-		this.repeatUntilDateXCheckbox = new Ext.ux.form.XCheckbox({
-			boxLabel : t("Repeat until"),
-			name : 'recurrenceRule.repeatUntilDate',
-			width: 100,
-			hideLabel : true,
-			listeners : {
-				check : {
-					fn : function(cb, checked){
-					if(!checked && !this.repeatForeverXCheckbox.getValue() && !this.repeatCountXCheckbox.getValue()) {
-							this.repeatUntilDateXCheckbox.setValue(true);
-							return;
-						} else {
-							this.repeatForeverXCheckbox.setValue(false);
-							this.repeatCountXCheckbox.setValue(false);
-
-							this.repeatEndDate.setDisabled(!checked);
-						}
-					},
-					scope : this
-				}
-			}
-		});
 		
 		this.repeatNumber = new Ext.form.NumberField({
-			name: 'recurrenceRule.count',
-			disabled : true,
+			name: 'count',
 			maxLength: 1000,
 			width : 50,
-			allowBlank:false,
-			value: 1,
-			minValue: 1,
 			decimals:0
 		});
-		
-		this.repeatCountXCheckbox = new Ext.ux.form.XCheckbox({
-			boxLabel : t("Repeat"),
-			name : 'recurrenceRule.repeatCount',
-			width: 100,
-			hideLabel : true,
-			listeners : {
-				check : {
-					fn : function(cb, checked) {
-						if(!checked && !this.repeatForeverXCheckbox.getValue() && !this.repeatUntilDateXCheckbox.getValue()) {
-							this.repeatCountXCheckbox.setValue(true);
-							return;
-						} else {
-							this.repeatForeverXCheckbox.setValue(false);
-							this.repeatUntilDateXCheckbox.setValue(false);
 
-							this.repeatNumber.setDisabled(!checked);
-						}
-					},
-					scope : this
+		this.recurrenceGroup = new go.form.RadioGroup({
+			xtype: 'radiogroup',
+			fieldLabel: t("Repeat"),
+			name: "radiogroup",
+			submit: false,
+			width:160,
+			columns: 1,
+			items: [
+				{ boxLabel: t("Repeat forever"), inputValue: 'forever'},
+				{ boxLabel: t("Repeat"), inputValue: 'count'},
+				{ boxLabel: t("Repeat until"), inputValue: 'until' }
+			],
+			listeners: {
+				scope: this,
+				change: function(group, checked) {
+					this.repeatNumber.setDisabled(true);
+					this.repeatEndDate.setDisabled(true);
+					if(checked.inputValue == 'count') {
+						this.repeatNumber.setDisabled(false);
+					} else if(checked.inputValue == 'until') {
+						this.repeatEndDate.setDisabled(false);
+					}
 				}
 			}
 		});
-		
+
 		Ext.apply(this, {
-			title : t("Recurrence"),
-			cls:'go-form-panel',
 			layout : 'form',
-			hideMode : 'offsets',
+			
 			defaults:{
 				forceLayout:true,
 				border:false
@@ -227,23 +201,43 @@ go.form.RecurrencePanel = Ext.extend(Ext.form.FieldSet, {
 				disabled:true,
 				fieldLabel : t("At days"),
 				items : [
-					this.cb[1],this.cb[2],this.cb[3],this.cb[4],this.cb[5],this.cb[6],this.cb[0],
 					this.dayButtons[1],this.dayButtons[2],this.dayButtons[3],this.dayButtons[4],this.dayButtons[5],this.dayButtons[6],this.dayButtons[0]
 				]
 			}),
-			this.repeatForeverXCheckbox, 
+			this.byDay,
 			{
-				hideLabel: true,
-				xtype : 'compositefield',
-				items : [this.repeatCountXCheckbox, this.repeatNumber,{xtype:'plainfield', value: t("times")}]
-			}, {
-				hideLabel: true,
-				xtype : 'compositefield',
-				items : [this.repeatUntilDateXCheckbox, this.repeatEndDate]
-			}]
+				xtype:'container',
+				layout:'hbox',
+				items:[{
+					xtype:'container',
+					layout:'form',
+					items: [this.recurrenceGroup]
+				},this.rightContainer = new Ext.Container({
+					disabled: true,
+					xtype:'container',
+					layout:'form',
+					defaults:{hideLabel:true},
+					items:[
+						{ xtype:'displayfield', value: t('times')},
+						this.repeatNumber,
+						this.repeatEndDate
+					]
+				})]
+			}
+		]
 		});
 		
-		go.form.RecurrenceFieldset.superclass.initComponent.call(this);	
+		go.modules.community.task.RecurrencePanel.superclass.initComponent.call(this);	
+	},
+
+	onLoad: function(start, recurrenceRule) {
+		this.setStartDate(start);
+		if(recurrenceRule) {
+			this.changeRepeat(recurrenceRule.freq);
+			this.setDaysButtons(recurrenceRule);
+		} else {
+			this.changeRepeat('');
+		}
 	},
 	
 	/**
@@ -275,8 +269,8 @@ go.form.RecurrencePanel = Ext.extend(Ext.form.FieldSet, {
 	setDaysButtons : function(responseData){
 		var days = ['SU','MO','TU','WE','TH','FR','SA'];
 		Ext.each(this.dayButtons, function(btn) {
-			var isEnabled = parseInt(responseData[days[btn.day]], 10);
-			btn.toggle(!!isEnabled);
+			var isEnabled = (responseData.byDay.indexOf(days[btn.day]) !== -1);
+			btn.toggle(isEnabled);
 		});
 	},
 
@@ -293,78 +287,53 @@ go.form.RecurrencePanel = Ext.extend(Ext.form.FieldSet, {
 	 * @param String value	"" / "DAILY" / "WEEKLY" / "MONTHLY_DATE" / "MONTHLY" / "YEARLY"
 	 */
 	changeRepeat : function(value) {
-			
-		var repeatForever = this.repeatForeverXCheckbox.getValue();
-
 		switch (value) {
+			
 			default :
 				this.disableDays(true);
+				this.recurrenceGroup.setDisabled(true);
 				this.monthTime.setDisabled(true);
-				this.repeatForeverXCheckbox.setDisabled(true);
-				this.repeatCountXCheckbox.setDisabled(true);
-				this.repeatUntilDateXCheckbox.setDisabled(true);
-				this.repeatNumber.setDisabled(true);
-				this.repeatEndDate.setDisabled(true);
-				this.repeatEvery.setDisabled(true);
-				break;
-
+				this.rightContainer.setDisabled(true);
+			break;
 			case 'DAILY' :
 				this.disableDays(true);
+				this.recurrenceGroup.setDisabled(false);
 				this.monthTime.setDisabled(true);
-				this.repeatForeverXCheckbox.setDisabled(false);
-				this.repeatCountXCheckbox.setDisabled(false);
-				this.repeatUntilDateXCheckbox.setDisabled(false);
-				this.repeatNumber.setDisabled(false);
-				this.repeatEndDate.setDisabled(repeatForever);
 				this.repeatEvery.setDisabled(false);
-
-				break;
+				this.rightContainer.setDisabled(false);
+			break;
 
 			case 'WEEKLY' :
 				this.disableDays(false);
+				this.recurrenceGroup.setDisabled(false);
 				this.monthTime.setDisabled(true);
-				this.repeatForeverXCheckbox.setDisabled(false);
-				this.repeatCountXCheckbox.setDisabled(false);
-				this.repeatUntilDateXCheckbox.setDisabled(false);
-				this.repeatNumber.setDisabled(false);
-				this.repeatEndDate.setDisabled(repeatForever);
 				this.repeatEvery.setDisabled(false);
-
-				break;
+				this.rightContainer.setDisabled(false);
+			break;
 
 			case 'MONTHLY_DATE' :
 				this.disableDays(true);
+				this.recurrenceGroup.setDisabled(false);
 				this.monthTime.setDisabled(true);
-				this.repeatForeverXCheckbox.setDisabled(false);
-				this.repeatCountXCheckbox.setDisabled(false);
-				this.repeatUntilDateXCheckbox.setDisabled(false);
-				this.repeatNumber.setDisabled(false);
-				this.repeatEndDate.setDisabled(repeatForever);
 				this.repeatEvery.setDisabled(false);
-
-				break;
+				this.rightContainer.setDisabled(false);
+			break;
 
 			case 'MONTHLY' :
 				this.disableDays(false);
+				this.recurrenceGroup.setDisabled(false);
 				this.monthTime.setDisabled(false);
-				this.repeatForeverXCheckbox.setDisabled(false);
-				this.repeatCountXCheckbox.setDisabled(false);
-				this.repeatUntilDateXCheckbox.setDisabled(false);
-				this.repeatNumber.setDisabled(false);
-				this.repeatEndDate.setDisabled(repeatForever);
 				this.repeatEvery.setDisabled(false);
-				break;
+				this.rightContainer.setDisabled(false);
+			break;
 
 			case 'YEARLY' :
 				this.disableDays(true);
+				this.recurrenceGroup.setDisabled(false);
 				this.monthTime.setDisabled(true);
-				this.repeatForeverXCheckbox.setDisabled(false);
-				this.repeatCountXCheckbox.setDisabled(false);
-				this.repeatUntilDateXCheckbox.setDisabled(false);
-				this.repeatNumber.setDisabled(false);
-				this.repeatEndDate.setDisabled(repeatForever);
 				this.repeatEvery.setDisabled(false);
-				break;
+				this.rightContainer.setDisabled(false);
+			break;
 		}
 	},
 	
@@ -378,9 +347,9 @@ go.form.RecurrencePanel = Ext.extend(Ext.form.FieldSet, {
 		if(!this.startDate){
 			console.warn("Cannot check validity. No startDate given. Please set the startDate with the setStartDate() function.");
 		}
-		
+
 		if (this.repeatType.getValue() != "" && GO.util.empty(this.repeatEndDate.getValue())) {
-			this.repeatForeverXCheckbox.setValue(true);
+			//this.repeatForeverXCheckbox.setValue(true);
 		} else if(this.startDate && this.repeatEndDate.getValue() < this.startDate ){
 			this.repeatEndDate.setValue(this.startDate.add(Date.DAY, 1));
 		}

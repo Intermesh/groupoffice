@@ -272,80 +272,158 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.taskGrid = new go.modules.community.task.TaskGrid({
 			layout:'fit',
 			region: 'center',
-			tbar: [
-				{
-					cls: 'go-narrow',
-					iconCls: "ic-menu",
-					handler: function () {
-//						this.westPanel.getLayout().setActiveItem(this.noteBookGrid);
-						this.TasklistsGrid.show();
-					},
-					scope: this
-				},
-				'->',
-				{
-					xtype: 'tbsearch',
-					filters: [
-						'text',
-						'title', 
-						'content',
-						{name: 'modified', multiple: false},
-						{name: 'created', multiple: false}						
-					]
-				},
-				this.addButton = new Ext.Button({
-					disabled: true,
-					iconCls: 'ic-add',
-					tooltip: t('Add'),
-					handler: function (btn) {
-						var dlg = new go.modules.community.task.TaskDialog();
-						dlg.show();
-						dlg.setValues({
-								tasklistId: this.addTasklistId
-						});
-					},
-					scope: this
-				}),
-				{
-					iconCls: 'ic-more-vert',
-					menu: [
+			tbar: {                        // configured using the anchor layout
+				xtype : 'container',
+				items :[ 
+					new Ext.Toolbar({items:[
 						{
-							itemId: "delete",
-							iconCls: 'ic-delete',
-							text: t("Delete"),
+							cls: 'go-narrow',
+							iconCls: "ic-menu",
 							handler: function () {
-								this.taskGrid.deleteSelected();
+		//						this.westPanel.getLayout().setActiveItem(this.noteBookGrid);
+								this.TasklistsGrid.show();
 							},
 							scope: this
 						},
+						'->',
 						{
-							iconCls: 'ic-refresh',
-							tooltip: t("Refresh"),
-							text: t("Refresh"),
-							handler: function(){
-								this.taskGrid.store.load();
-								this.categoriesGrid.store.load();
+							xtype: 'tbsearch',
+							filters: [
+								'text',
+								'title', 
+								'content',
+								{name: 'modified', multiple: false},
+								{name: 'created', multiple: false}						
+							]
+						},
+						this.addButton = new Ext.Button({
+							disabled: true,
+							iconCls: 'ic-add',
+							tooltip: t('Add'),
+							handler: function (btn) {
+								var dlg = new go.modules.community.task.TaskDialog();
+								dlg.show();
+								dlg.setValues({
+										tasklistId: this.addTasklistId
+								});
 							},
 							scope: this
+						}),
+						{
+							iconCls: 'ic-more-vert',
+							menu: [
+								{
+									itemId: "delete",
+									iconCls: 'ic-delete',
+									text: t("Delete"),
+									handler: function () {
+										this.taskGrid.deleteSelected();
+									},
+									scope: this
+								},
+								{
+									iconCls: 'ic-refresh',
+									tooltip: t("Refresh"),
+									text: t("Refresh"),
+									handler: function(){
+										this.taskGrid.store.load();
+										this.categoriesGrid.store.load();
+									},
+									scope: this
+								}
+							]
 						}
-					]
-				}
-				
-			],
+						
+					]}),
+					new Ext.Toolbar({
+						layout:'hbox',
+						layoutConfig: {
+							align: 'middle',
+							defaultMargins: {left: dp(4), right: dp(4),bottom:0,top:0}
+						},
+						items:[this.taskNameTextField = new Ext.form.TextField({
+							disabled: true,
+							enableKeyEvents: true,
+							emptyText: t("Add a task...", "tasks"),
+
+							flex:1,
+							listeners: {
+								scope: this,
+								keyup: function(text, t) {
+									// TODO - dateField change
+									if(this.taskDateField.getValue() != null && this.taskNameTextField.getValue() != "") {
+										this.addTaskButton.setDisabled(false);
+									} else {
+										this.addTaskButton.setDisabled(true);
+									}
+								}
+							}
+						}),this.quickAddTaskListCombo = new go.form.ComboBoxReset({
+								hiddenName:'tasklistId',
+								fieldLabel:t("Tasklist"),
+								valueField:'id',
+								displayField:'name',			
+								store: new go.data.Store({
+									fields:['id','name','user_name'],
+									entityStore: "TasksTasklist",
+									displayField: "name",
+								}),
+								mode:'local',
+								triggerAction:'all',
+								emptyText:t("Select tasklist"),
+								editable:false,
+								selectOnFocus:true,
+								forceSelection:true,
+								pageSize: parseInt(GO.settings['max_rows_list']),
+								listeners:{
+									scope: this,
+									clear:function(){
+										this.addTaskButton.setDisabled(true);
+										this.taskNameTextField.setDisabled(true);
+										this.taskDateField.setDisabled(true);
+									},
+									select: function(combo,record) {
+										this.taskNameTextField.setDisabled(false);
+										this.taskDateField.setDisabled(false);
+										console.log(combo);
+										console.log(record);
+									}
+								}
+							}),
+							this.taskDateField = new go.form.DateField({
+								disabled: true,
+								value: new Date(),
+								fieldLabel:t("Due date", "tasks")
+							}),
+							this.addTaskButton = new Ext.Button({
+								disabled: true,
+								iconCls: 'ic-add',
+								handler:function(){
+									var dlg = new go.modules.community.task.TaskDialog();
+									dlg.show();
+									dlg.setValues({
+											tasklistId: this.addTasklistId
+									});
+								},
+								scope: this
+							})
+						]
+					})
+				]
+			},
 			listeners: {				
 				rowdblclick: this.onTaskGridDblClick,
 				scope: this,				
 				keypress: this.onTaskGridKeyPress
 			}
 		});
-
+		this.quickAddTaskListCombo.store.load();
 		this.taskGrid.on('navigate', function (grid, rowIndex, record) {
 			go.Router.goto("taskstask/" + record.id);
 		}, this);
 		
 	
 	},
-	
 	onTasklistSelectionChange : function (sm) {
 		var ids = [];
 
@@ -378,7 +456,6 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				this.categoryId = r.id;
 			}
 		}, this);
-
 		this.taskGrid.store.setFilter("categories", {categories: ids});
 		this.taskGrid.store.load();
 		this.categoriesGrid.store.load();
