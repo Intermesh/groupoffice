@@ -1018,6 +1018,10 @@ Ext.override(Ext.form.CompositeField, {
 	submit: false //don't submit with form.getFieldValue()
 });
 
+Ext.override(Ext.form.DisplayField, {
+	submit: false //don't submit with form.getFieldValue()
+});
+
 Ext.override(Ext.form.DateField, {
 	getValue : function(){
         return this.parseDate(Ext.form.DateField.superclass.getValue.call(this)) || null;

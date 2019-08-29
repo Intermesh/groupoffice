@@ -13,18 +13,15 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 
 	isFormField: true,
 
-	origValue: null,
-
 	initComponent: function () {
-		this.origValue = {};
 		this.additionalFields = [];
 		go.form.FormContainer.superclass.initComponent.call(this);
 
-		this.on("add", function (e) {
-			//to prevent adding to Ext.form.BasicForm with add event.
-			//Cancels event bubbling
-			return false;
-		});
+		// this.on("add", function (e) {
+		// 	//to prevent adding to Ext.form.BasicForm with add event.
+		// 	//Cancels event bubbling
+		// 	return false;
+		// });
 
 
 	},
@@ -93,23 +90,32 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 	},
 
 	setValue: function (v) {
-		this.origValue = v;
 
 		for (var name in v) {
 			var field = this.findField(name);
 			if (field) {
 				field.setValue(v[name]);
+				field.originalValue = field.getValue();
 			}
 		}
 
 	},
 
 	getValue: function (dirtyOnly) {
-		var v = dirtyOnly ? {} : this.origValue, val;
+		var v = {}, val;
 
 		var fn = function (f) {
 
-			if ((!dirtyOnly || f.isDirty())) {
+			if (f.getXType() == 'checkboxgroup') {
+				f.items.each(fn);
+				return true;
+			}
+
+			if(f.submit === false || f.disabled === true) {
+				return true;
+			}
+
+			if ((!dirtyOnly || f.isDirty())) {				
 
 				if (f.getXType() == 'numberfield') {
 					f.serverFormats = false; // this will post number as number
