@@ -31,7 +31,6 @@ form/EntityPanel.js
 form/MultiEntityDialog.js
 form/Dialog.js
 form/CheckboxGroup.js
-form/FormFieldSet.js
 form/PasswordGeneratorField.js
 form/DateField.js
 form/DateTimeField.js
