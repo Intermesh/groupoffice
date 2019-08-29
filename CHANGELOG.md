@@ -1,4 +1,5 @@
 - Multi instance: upgrades all instances automatically
+- Core: Ability to extend content security policy in modules
 
 27-08-2019 6.4.46
 - Core: Custom fields were blank in CSV export.
