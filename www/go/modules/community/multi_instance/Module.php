@@ -1,6 +1,9 @@
 <?php
 namespace go\modules\community\multi_instance;
 
+use go\core\Installer;
+use go\modules\community\multi_instance\model\Instance;
+
 class Module extends \go\core\Module {
 	
 	public function getAuthor() {
@@ -31,5 +34,29 @@ class Module extends \go\core\Module {
 		}
 		
 		return parent::afterInstall($model);
+	}
+
+	public function defineListeners()
+	{
+		parent::defineListeners();
+
+		GO()->getInstaller()->on(Installer::EVENT_UPGRADE, static::class, 'upgradeInstances');
+	}
+
+	public static function upgradeInstances() {
+
+		echo "\nUpgrading all instances\n";
+		echo "-------------------------------\n\n";
+
+		foreach(Instance::find() as $instance) {
+			echo "Upgrading instance: " . $instance->hostname . ": ";
+			flush();
+			$success = $instance->upgrade();
+
+			echo $success ? "SUCCESS" : "FAILED";
+
+			echo "\n";
+			
+		}
 	}
 }

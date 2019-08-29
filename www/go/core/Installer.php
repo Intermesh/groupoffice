@@ -36,6 +36,8 @@ class Installer {
 	
 	const MIN_UPGRADABLE_VERSION = "6.3.58";
 	
+	const EVENT_UPGRADE = 'upgrade';
+
 	private static $isInProgress = false;
 	private static $isInstalling = false;
 	private static $isUpgrading = false;
@@ -357,7 +359,7 @@ class Installer {
 			$acl->save();
 		}
 
-		$this->fireEvent('upgrade');
+		$this->fireEvent(static::EVENT_UPGRADE);
 
 		echo "Done!\n";
 	}

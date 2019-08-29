@@ -4,6 +4,8 @@ namespace go\modules\community\multi_instance\model;
 use Exception;
 use go\core\db\Criteria;
 use go\core\fs\File;
+use go\core\http\Client;
+use go\core\http\Request;
 use go\core\jmap\Entity;
 use go\core\validate\ErrorCode;
 use go\modules\community\multi_instance\Module;
@@ -544,5 +546,21 @@ class Instance extends Entity {
 		
 	public function setWelcomeMessage($html) {
 		$this->welcomeMessage = $html;
+	}
+
+
+	public function upgrade() {
+		$http = new Client();
+
+		$proto = Request::get()->isHttps() ? 'https://' : 'http://';
+
+		$http->setOption(CURLOPT_SSL_VERIFYHOST, false);
+		$http->setOption(CURLOPT_SSL_VERIFYPEER, false);
+
+		$response = $http->get($proto . $this->hostname . '/install/upgrade.php?confirmed=1&ignore=modules');
+
+		//echo $response['body'];
+
+		return $response['status'] == 200;
 	}
 }

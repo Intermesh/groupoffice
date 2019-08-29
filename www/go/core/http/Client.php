@@ -40,6 +40,11 @@ class Client {
 
   }
 
+  /**
+   * Perform GET request
+   * 
+   * @return array ['status' => 200, 'body' => string, 'headers' => []]
+   */
   public function get($url) { 
     $this->initRequest($url);
 		
@@ -51,6 +56,7 @@ class Client {
     }
 
     return [
+      'status' => curl_getinfo($this->getCurl(), CURLINFO_HTTP_CODE),
       'headers' => $this->lastHeaders,
       'body' => $body
     ];
