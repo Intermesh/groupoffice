@@ -12,7 +12,8 @@ use go\core\db\Connection;
 use go\core\db\Database;
 use go\core\db\Query;
 use go\core\db\Table;
-use go\core\event\Listeners;
+    use go\core\event\EventEmitterTrait;
+    use go\core\event\Listeners;
 use go\core\exception\ConfigurationException;
 use go\core\fs\Folder;
 use go\core\jmap\State;
@@ -37,6 +38,15 @@ use const GO_CONFIG_FILE;
 	class App extends Module {
 		
 		use SingletonTrait;
+
+		use EventEmitterTrait;
+
+
+		/**
+		 * Fires when the application is loaded in the <head></head> section of the webclient.
+		 * Can also be used to adjust the Content Security Policy
+		 */
+		const EVENT_HEAD = 'head';
 
 		/**
 		 *
@@ -433,7 +443,7 @@ use const GO_CONFIG_FILE;
 				GO()->getCache()->flush(false);
 				Table::destroyInstances();
 
-				$webclient = new Extjs3();
+				$webclient = Extjs3::get();
 				$webclient->flushCache();
 
 				Observable::cacheListeners();

@@ -20,7 +20,7 @@ use go\core\webclient\Extjs3;
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
-$webclient = new Extjs3();
+$webclient = Extjs3::get();
 
 
 $settings['max_rows_list'] = 50;
