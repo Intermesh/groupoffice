@@ -304,7 +304,9 @@ use const GO_CONFIG_FILE;
 									"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
 									"debug" => $config['debug'] ?? null,
 									
-									"servermanager" => $config['servermanager'] ?? false
+									"servermanager" => $config['servermanager'] ?? false,
+
+									"sseEnabled" => $config['sseEnabled'] ?? true
 							],
 							"db" => [
 									"host" => ($config['db_host'] ?? "localhost"),

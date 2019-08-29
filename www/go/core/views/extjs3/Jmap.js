@@ -143,9 +143,6 @@ go.Jmap = {
 			source.addEventListener('state', function(e) {
 
 				var data = JSON.parse(e.data);
-				console.group("SSE state");
-				console.log(data);
-				console.groupEnd();
 
 				for(var entity in data) {
 					var store = go.Db.store(entity);
@@ -170,8 +167,7 @@ go.Jmap = {
 
 			source.addEventListener('error', function(e) {
 				if (e.readyState == EventSource.CLOSED) {
-					// Connection was closed.
-					
+					// Connection was closed.					
 					me.sse();
 				}
 			}, false);

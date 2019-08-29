@@ -6,6 +6,7 @@
  * 
  * @link https://jmap.io/spec-core.html#event-source
  */
+
 use go\core\App;
 use go\core\db\Query;
 use go\core\jmap\State;
@@ -16,13 +17,23 @@ require("../vendor/autoload.php");
 //Create the app with the database connection
 App::get()->setAuthState(new State());
 
+//Check availability
+if(!GO()->getConfig()['core']['general']['sseEnabled'] || (function_exists("xdebug_is_debugger_active") && xdebug_is_debugger_active())) {
+	// Service Unavailable
+	http_response_code(503);
+	echo "Server Sent Events not available";
+	exit();
+}
+
 //Hard code debug to false to prevent spamming of log.
 App::get()->getDebugger()->enabled = false;
 
 header('Cache-Control: no-cache');
 header('Pragma: no-cache');
-//header('Connection: keep-alive');
 header("Content-Type: text/event-stream");
+header('Cache-Control: no-cache');
+header('Connection: keep-alive');
+header('X-Accel-Buffering: no');
 
 ini_set('zlib.output_compression', 0);
 ini_set('implicit_flush', 1);
@@ -39,8 +50,8 @@ function sendMessage($type, $data) {
 	echo 'data: ' . json_encode($data);
 	echo "\n\n";
 	
-	if(ob_get_level() > 0) {
-		ob_flush();
+	while(ob_get_level() > 0) {
+		ob_end_flush();
 	}
 	
 	flush();	
@@ -89,6 +100,11 @@ function diff($old, $new) {
 	
 	//sendMessage('ping', []);
 for($i = 0; $i < MAX_LIFE_TIME; $i += CHECK_INTERVAL) {
+
+	// break the loop if the client aborted the connection (closed the page)
+	if(connection_aborted()) {
+		break;
+	}
 
 //	sendMessage('test', [$sleeping, $ping]);
 	if ($sleeping >= $ping) {

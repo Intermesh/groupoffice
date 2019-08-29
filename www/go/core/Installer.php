@@ -78,6 +78,9 @@ class Installer {
 	 */
 	public function install(array $adminValues = [], $installModules = []) {
 
+		ini_set("max_execution_time", 0);
+		ini_set('zlib.output_compression', 0);
+		ini_set('implicit_flush', 1);
 
 		//don't cache on install
 		App::get()->getCache()->flush(false);
@@ -314,6 +317,8 @@ class Installer {
 		}
 		
 		ini_set("max_execution_time", 0);
+		ini_set('zlib.output_compression', 0);
+		ini_set('implicit_flush', 1);
 
 
 		GO()->getDbConnection()->query("SET sql_mode=''");
