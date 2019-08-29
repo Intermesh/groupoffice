@@ -1,3 +1,5 @@
+- Multi instance: upgrades all instances automatically
+
 27-08-2019 6.4.46
 - Core: Custom fields were blank in CSV export.
 - Core: IMAP auth was broken when groups were modified. Removed permission check in user model that is executed in controller
