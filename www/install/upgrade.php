@@ -5,7 +5,7 @@ use go\core\Environment;
 use go\modules\core\modules\model\Module;
 use go\core\util\Lock;
 use GO\Base\Db\ActiveRecord;
-
+use go\core\jmap\Entity;
 
 /**
  * 
@@ -145,6 +145,8 @@ try {
 	
 	function upgrade() {
 		$u = [];
+
+		Entity::$trackChanges = false;
 
 		$modules = Module::find()->all();
 
