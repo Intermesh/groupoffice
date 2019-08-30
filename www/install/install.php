@@ -1,6 +1,10 @@
 <?php
 require('../vendor/autoload.php');
 
+ini_set('zlib.output_compression', 0);
+ini_set('implicit_flush', 1);
+
+
 require("gotest.php");
 if(!systemIsOk()) {
 	header("Location: test.php");

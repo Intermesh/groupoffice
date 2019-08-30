@@ -3,6 +3,9 @@ use go\core\ErrorHandler;
 use go\core\db\Table;
 use go\core\orm\Query;
 
+ini_set('zlib.output_compression', 0);
+ini_set('implicit_flush', 1);
+
 try {
 	
 	require('../vendor/autoload.php');
