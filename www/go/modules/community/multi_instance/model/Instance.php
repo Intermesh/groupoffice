@@ -4,6 +4,8 @@ namespace go\modules\community\multi_instance\model;
 use Exception;
 use go\core\db\Criteria;
 use go\core\fs\File;
+use go\core\http\Client;
+use go\core\http\Request;
 use go\core\jmap\Entity;
 use go\core\validate\ErrorCode;
 use go\modules\community\multi_instance\Module;
@@ -82,6 +84,14 @@ class Instance extends Entity {
 			->add('isTrial', function(Criteria $c, $value) {
 				$c->andWhere('isTrial', '=', $value);
 			});
+	}
+
+
+	public function getMajorVersion() {
+		if(!$this->version) {
+			return null;
+		}
+		return substr($this->version, 0, strrpos($this->version, '.'));
 	}
 
 	
@@ -447,6 +457,10 @@ class Instance extends Entity {
 	
 	private function getInstanceDbData(){
 		try {
+
+			//Correct old bug
+			$this->getInstanceDbConnection()->exec("DELETE FROM core_setting WHERE moduleId=0");
+
 			$record = (new \go\core\db\Query())
 						->setDbConnection($this->getInstanceDbConnection())
 						->select('count(*) as userCount, max(lastLogin) as lastLogin, sum(loginCount) as loginCount')
@@ -531,8 +545,12 @@ class Instance extends Entity {
 		
 		$this->getConfigFile()->move($this->getDataFolder()->getFile('config.php'));
 		$this->getConfigFile()->getFolder()->delete();
-		
-		$this->getDataFolder()->move($this->getTrashFolder()->getFolder($this->getDataFolder()->getName()));
+
+		$dest =	$this->getTrashFolder()->getFolder($this->getDataFolder()->getName());
+		if($dest->exists()) {
+			$dest = $dest->getParent()->getFolder($this->getDataFolder()->getName() . '-' . uniqid());
+		}
+		$this->getDataFolder()->move($dest);
 		
 		$this->dropDatabaseUser($this->getDbUser());
 		$this->dropDatabase($this->getDbName());
@@ -544,5 +562,21 @@ class Instance extends Entity {
 		
 	public function setWelcomeMessage($html) {
 		$this->welcomeMessage = $html;
+	}
+
+
+	public function upgrade() {
+		$http = new Client();
+
+		$proto = Request::get()->isHttps() ? 'https://' : 'http://';
+
+		$http->setOption(CURLOPT_SSL_VERIFYHOST, false);
+		$http->setOption(CURLOPT_SSL_VERIFYPEER, false);
+
+		$response = $http->get($proto . $this->hostname . '/install/upgrade.php?confirmed=1&ignore=modules');
+
+		//echo $response['body'];
+
+		return $response['status'] == 200;
 	}
 }

@@ -2,6 +2,24 @@
 
 namespace GO\Demodata\Controller;
 
+use GO\Base\Model\User as GOUser;
+use go\core\model\Module;
+use go\core\fs\Blob;
+use go\core\fs\File;
+use go\core\fs\Folder;
+use go\core\model\Acl;
+use go\core\model\Group;
+use go\core\model\Link;
+use go\core\model\User;
+use go\modules\community\addressbook\model\Address;
+use go\modules\community\addressbook\model\Contact;
+use go\modules\community\addressbook\model\AddressBook;
+use go\modules\community\addressbook\model\EmailAddress;
+use go\modules\community\addressbook\model\PhoneNumber;
+use go\modules\community\addressbook\model\Url;
+use go\modules\community\bookmarks\model\Bookmark;
+use go\modules\community\bookmarks\model\Category;
+use go\modules\community\comments\model\Comment;
 
 class DemodataController extends \GO\Base\Controller\AbstractController {
 	
@@ -19,252 +37,317 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			throw new \GO\Base\Exception\AccessDenied();
 		}
 	
+		$addressBook = AddressBook::find()->where(['name' => go()->t('Customers', 'community', 'addressbook')])->single();
+		if (!$addressBook) {
+			$addressBook = new AddressBook();
+			$addressBook->name = go()->t('Customers', 'community', 'addressbook');
+			$addressBook->setAcl([
+				Group::ID_INTERNAL => Acl::LEVEL_WRITE
+			]);
+			$addressBook->save();
+			
+		}
+
+		$addressBookFolder = new Folder(dirname(__DIR__) .'/addressbook');
+		$blob = Blob::fromFile($addressBookFolder->getFile('wecoyote.png'));
+		$blob->save();
+		$male = Blob::fromFile($addressBookFolder->getFile('male.png'));
+		$male->save();
+
+
+		$female = Blob::fromFile($addressBookFolder->getFile('female.png'));
+		$female->save();
+
+
+		GO()->getSettings()->passwordMinLength = 4;	
+
 		
-		if(\GO::modules()->customfields){
-			$customfieldModels = \GO\Customfields\CustomfieldsModule::getCustomfieldModels();
-
-			
-			$types = \GO\Customfields\CustomfieldsModule::getCustomfieldTypes();
-			
-			foreach($customfieldModels as $model){
-			
-//				echo $model->getName(),'<br />';
-				$category = \GO\Customfields\Model\Category::model()->createIfNotExists(\GO::getModel($model->getName())->extendsModel(), "Demo Custom fields");
-				$category->acl->addGroup(\GO::config()->group_internal, \GO\Base\Model\Acl::WRITE_PERMISSION);
-				
-				if(strpos(\GO::getModel($model->getName())->extendsModel(), 'Addressbook\\')){
-					foreach($types as $t){
-						\GO\Customfields\Model\Field::model()->createIfNotExists($category->id, $t['type'],array(
-								'datatype'=>$t['className'],
-								'helptext'=>($t['className']=="GO\Customfields\Customfieldtype\Text" ? "Some help text for this field" : "")
-								));
-					}
-				}else
-				{
-					\GO\Customfields\Model\Field::model()->createIfNotExists($category->id, "Custom",array(
-								'datatype'=>"GO\Customfields\Customfieldtype\Text",
-								'helptext'=>"Some help text for this field"
-								));
-				}
-			}
-		}
-		
-
-
-		$addressbook = \GO\Addressbook\Model\Addressbook::model()->findSingleByAttribute('name', \GO::t("Customers", "addressbook"));
-		if (!$addressbook) {
-			$addressbook = new \GO\Addressbook\Model\Addressbook();
-			$addressbook->setAttributes(array(
-					'user_id' => 1,
-					'name' => \GO::t("Prospects", "addressbook"),
-					//				'default_iso_address_format' => $default_language,
-					'default_salutation' => \GO::t("Default salutation", "addressbook")
-			));
-			$addressbook->save();
-			$addressbook->acl->addGroup(\GO::config()->group_internal, \GO\Base\Model\Acl::WRITE_PERMISSION);
-		}
-	
-		$company = \GO\Addressbook\Model\Company::model()->findSingleByAttribute('email', 'info@smith.demo');
-		if (!$company) {
-			$company = new \GO\Addressbook\Model\Company();
-			$company->setAttributes(array(
-					'addressbook_id' => $addressbook->id,
-					'name' => 'Smith Inc',
-					'address' => 'Kalverstraat',
-					'address_no' => '1',
-					'zip' => '1012 NX',
-					'city' => 'Amsterdam',
-					'state' => 'Noord-Holland',
-					'country' => 'NL',
-					'post_address' => 'Kalverstraat',
-					'post_address_no' => '1',
-					'post_zip' => '1012 NX',
-					'post_city' => 'Amsterdam',
-					'post_state' => 'Noord-Brabant',
-					'post_country' => 'NL',
-					'phone' => '+31 (0) 10 - 1234567',
-					'fax' => '+31 (0) 1234567',
-					'email' => 'info@smith.demo',
-					'homepage' => 'http://www.smith.demo',
-					'bank_no' => '',
-					'vat_no' => 'NL 1234.56.789.B01',
-					'user_id' => 1,
-					'comment' => 'Just a demo company'
-			));
-			$company->save();
-		}
-
-		$john = \GO\Addressbook\Model\Contact::model()->findSingleByAttribute('email', 'john@smith.demo');
-		if (!$john) {
-			$john = new \GO\Addressbook\Model\Contact();
-			$john->addressbook_id = $addressbook->id;
-			$john->company_id = $company->id;
-			$john->salutation = 'Dear Mr. Smith';
-			$john->first_name = 'John';
-			$john->last_name = 'Smith';
-			$john->function = 'CEO';
-			$john->cellular = '06-12345678';
-			$john->email = 'john@smith.demo';
-			$john->address = 'Kalverstraat';
-			$john->address_no = '1';
-			$john->zip = '1012 NX';
-			$john->city = 'Amsterdam';
-			$john->state = 'Noord-Holland';
-			$john->country = 'NL';
-			
-			$john->url_facebook='http://www.facebook.com';
-			$john->url_linkedin='http://www.linkedin.com';
-			$john->url_twitter='http://www.twitter.com';
-			$john->skype_name='echo123';
-			
-			$john->save();
-			$john->setPhoto(new \GO\Base\Fs\File(\GO::modules()->addressbook->path . 'install/noperson.jpg'));
-			$john->save();
-		}
-
-		$acme = \GO\Addressbook\Model\Company::model()->findSingleByAttribute('email', 'info@acme.demo');
-		if (!$acme) {
-			$acme = new \GO\Addressbook\Model\Company();
-			$acme->setAttributes(array(
-					'addressbook_id' => $addressbook->id,
-					'name' => 'ACME Corporation',
-					'address' => '1111 Broadway',
-					'address_no' => '',
-					'zip' => '10019',
-					'city' => 'New York',
-					'state' => 'NY',
-					'country' => 'US',
-					'post_address' => '1111 Broadway',
-					'post_address_no' => '',
-					'post_zip' => '10019',
-					'post_city' => 'New York',
-					'post_state' => 'NY',
-					'post_country' => 'US',
-					'phone' => '(555) 123-4567',
-					'fax' => '(555) 123-4567',
-					'email' => 'info@acme.demo',
-					'homepage' => 'http://www.acme.demo',
-					'bank_no' => '',
-					'vat_no' => 'US 1234.56.789.B01',
-					'user_id' => 1,
-					'comment' => 'The name Acme became popular for businesses by the 1920s, when alphabetized business telephone directories such as the Yellow Pages began to be widespread. There were a flood of businesses named Acme (some of these still survive[1]). For example, early Sears catalogues contained a number of products with the "Acme" trademark, including anvils, which are frequently used in Warner Bros. cartoons.[2]'
-			));
-			$acme->save();
-
-			$acme->addComment("The company is never clearly defined in Road Runner cartoons but appears to be a conglomerate which produces every product type imaginable, no matter how elaborate or extravagant - none of which ever work as desired or expected. In the Road Runner cartoon Beep, Beep, it was referred to as \"Acme Rocket-Powered Products, Inc.\" based in Fairfield, New Jersey. Many of its products appear to be produced specifically for Wile E. Coyote; for example, the Acme Giant Rubber Band, subtitled \"(For Tripping Road Runners)\".");
-			$acme->addComment("Sometimes, Acme can also send living creatures through the mail, though that isn't done very often. Two examples of this are the Acme Wild-Cat, which had been used on Elmer Fudd and Sam Sheepdog (which doesn't maul its intended victim); and Acme Bumblebees in one-fifth bottles (which sting Wile E. Coyote). The Wild Cat was used in the shorts Don't Give Up the Sheep and A Mutt in a Rut, while the bees were used in the short Zoom and Bored.");
-		}
-		$wile = \GO\Addressbook\Model\Contact::model()->findSingleByAttribute('email', 'wile@acme.demo');
-		if (!$wile) {
-			$wile = new \GO\Addressbook\Model\Contact();
-			$wile->addressbook_id = $addressbook->id;
-			$wile->company_id = $acme->id;
-			$wile->salutation = 'Dear Mr. Coyote';
-			$wile->first_name = 'Wile';
-			$wile->middle_name = 'E.';
-			$wile->last_name = 'Coyote';
-			$wile->function = 'CEO';
-			$wile->cellular = '06-12345678';
-			$wile->email = 'wile@acme.demo';
-			$wile->address = '1111 Broadway';
-			$wile->address_no = '';
-			$wile->zip = '10019';
-			$wile->city = 'New York';
-			$wile->state = 'NY';
-			$wile->country = 'US';
-			
-			$wile->url_facebook='http://www.facebook.com';
-			$wile->url_linkedin='http://www.linkedin.com';
-			$wile->url_twitter='http://www.twitter.com';
-			$wile->skype_name='test';
-
-			$wile->save();
-			$wile->setPhoto(new \GO\Base\Fs\File(\GO::modules()->addressbook->path . 'install/wecoyote.png'));
-			$wile->save();
-
-			$wile->addComment("Wile E. Coyote (also known simply as \"The Coyote\") and The Road Runner are a duo of cartoon characters from a series of Looney Tunes and Merrie Melodies cartoons. The characters (a coyote and Greater Roadrunner) were created by animation director Chuck Jones in 1948 for Warner Bros., while the template for their adventures was the work of writer Michael Maltese. The characters star in a long-running series of theatrical cartoon shorts (the first 16 of which were written by Maltese) and occasional made-for-television cartoons.");
-
-			$wile->addComment("In each episode, instead of animal senses and cunning, Wile E. Coyote uses absurdly complex contraptions (sometimes in the manner of Rube Goldberg) and elaborate plans to pursue his quarry. It was originally meant to parody chase cartoons like Tom and Jerry, but became popular in its own right, much to Jones' chagrin.");
-
-			$file = new \GO\Base\Fs\File(\GO::modules()->addressbook->path . 'install/Demo letter.docx');
-			$copy = $file->copy($wile->filesFolder->fsFolder);
-
-			$wile->filesFolder->addFile($copy->name());
-		}
-
-
-		$internalUserGroup = \GO\Base\Model\Group::model()->findByPk(\GO::config()->group_internal);
-		
-
-		\GO::config()->password_validate=false;
-
-		$elmer = \GO\Base\Model\User::model()->findSingleByAttribute('username', 'elmer');
+		$elmer = User::find()->where(['username' => 'elmer'])->single();		
 		if (!$elmer) {
-			$elmer = new \GO\Base\Model\User();
+
+			$blob = Blob::fromFile($addressBookFolder->getFile('elmer.jpg'));
+			$blob->save();
+
+			$elmer = new User();
+			$elmer->avatarId = $blob->id;
 			$elmer->username = 'elmer';
 			$elmer->displayName = 'Elmer Fudd';
-			$elmer->email = 'elmer@acmerpp.demo';
-			$elmer->password='demopass';
-			if ($elmer->save(true)) {
-				
-				//make sure he's member of the internal group.
-				$internalUserGroup->addUser($elmer->id);
-				
-				$this->_setUserContact($elmer);
-				$elmer->checkDefaultModels();
-			}else
+			$elmer->email = $elmer->recoveryEmail = 'elmer@acmerpp.demo';
+			$elmer->setPassword('demo');
+			$elmer->groups[] = Group::ID_INTERNAL;
+
+			if (!$elmer->save()) 
 			{
 				var_dump($elmer->getValidationErrors());
 				exit();
 			}
 		}
-		
 
 
-
-		$demo = \GO\Base\Model\User::model()->findSingleByAttribute('username', 'demo');
+		$demo = User::find()->where(['username' => 'demo'])->single();		
 		if (!$demo) {
-			$demo = new \GO\Base\Model\User();
+
+			$male = Blob::fromFile($addressBookFolder->getFile('male.png'));
+			$male->save();
+
+			$demo = new User();
+			$demo->avatarId = $male->id;
 			$demo->username = 'demo';
 			$demo->displayName = 'Demo User';
-			$demo->email = 'demo@acmerpp.demo';
-			$demo->password='demopass';
-			if ($demo->save(true)) {
-				
-				//make sure he's member of the internal group.
-				$internalUserGroup->addUser($demo->id);
-				
-				$this->_setUserContact($demo);
-				$demo->checkDefaultModels();
-			}else
+			$demo->email = $demo->recoveryEmail = 'demo@acmerpp.demo';
+			$demo->setPassword('demo');
+			$demo->groups[] = Group::ID_INTERNAL;
+
+			if (!$demo->save()) 
 			{
 				var_dump($demo->getValidationErrors());
 				exit();
 			}
-		}
+		}		
 
-
-		$linda = \GO\Base\Model\User::model()->findSingleByAttribute('username', 'linda');
+		$linda = User::find()->where(['username' => 'linda'])->single();		
 		if (!$linda) {
-			$linda = new \GO\Base\Model\User();
+			$linda = new User();
+			$linda->avatarId = $female->id;
 			$linda->username = 'linda';
-      $linda->displayName = 'Linda Smith';
-			$linda->email = 'linda@acmerpp.demo';
-			$linda->password='demopass';
-							
-			if ($linda->save(true)) {
-				
-				//make sure she's member of the internal group.
-				$internalUserGroup->addUser($linda->id);
-				
-				$this->_setUserContact($linda);
-				$linda->checkDefaultModels();
-			}else
+			$linda->displayName = 'Linda Smith';
+			$linda->email = $linda->recoveryEmail = 'linda@acmerpp.linda';
+			$linda->setPassword('demo');
+			$linda->groups[] = Group::ID_INTERNAL;
+
+			if (!$linda->save())
 			{
 				var_dump($linda->getValidationErrors());
 				exit();
 			}
+		}		
+
+
+
+
+	
+		$company = Contact::find()->where('name', '=', 'Smith Inc.')->single();
+		if (!$company) {
+			$company = new Contact();
+			$company->setValues([
+					'isOrganization' => true,
+					'addressBookId' => $addressBook->id,
+					'name' => 'Smith Inc.',
+					'addresses' => [[
+						'type' => Address::TYPE_POSTAL,
+						'street' => 'Kalverstraat',
+						'street2' => '1',
+						'zipCode' => '1012 NX',
+						'city' => 'Amsterdam',
+						'state' => 'Noord-Holland',
+						'countryCode' => 'NL',
+					]],
+					'phoneNumbers' => [[
+						'type' => PhoneNumber::TYPE_WORK,
+						'number' => '+31 (0) 10 - 1234567',
+					],[
+						'type' => PhoneNumber::TYPE_MOBILE,
+						'number' => '+31 (0) 6 - 1234567',
+					]],
+					'emailAddresses' => [[
+						'type' => EmailAddress::TYPE_WORK,
+						'email' => 'info@smith.demo',
+					]],
+
+					'urls' => [
+						[
+							"type"=> Url::TYPE_HOMEPAGE,
+							"url" => 'http://www.smith.demo',
+						]
+					],					
+					
+					'IBAN' => 'NL 00 ABCD 0123 34 1234',
+					'vatNo' => 'NL 1234.56.789.B01',					
+					'notes' => 'Just a demo company'
+			]);
+			$company->save();
 		}
+
+
+		$john = Contact::find()->where('name', '=', 'John Smith')->single();
+		if (!$john) {
+			$john = new Contact();
+			$john->goUserId = $demo->id;
+			$john->setValues([
+					'photoBlobId' => $male->id,
+					'addressBookId' => $addressBook->id,
+					'organizationIds' => [$company->id],
+					'firstName' => 'John',
+					'lastName' => 'Smith',
+					'jobTitle' => 'CEO',
+					'addresses' => [[
+						'type' => Address::TYPE_POSTAL,
+						'street' => 'Kalverstraat',
+						'street2' => '1',
+						'zipCode' => '1012 NX',
+						'city' => 'Amsterdam',
+						'state' => 'Noord-Holland',
+						'countryCode' => 'NL',
+					]],
+					'phoneNumbers' => [[
+						'type' => PhoneNumber::TYPE_WORK,
+						'number' => '+31 (0) 10 - 1234567',
+					],[
+						'type' => PhoneNumber::TYPE_MOBILE,
+						'number' => '+31 (0) 6 - 1234567',
+					]],
+					'emailAddresses' => [[
+						'type' => EmailAddress::TYPE_WORK,
+						'email' => 'john@smith.demo',
+					]],
+
+					'urls' => [
+						[
+							"type"=> Url::TYPE_HOMEPAGE,
+							"url" => 'http://www.smith.demo',
+						]
+					],					
+					
+					'IBAN' => 'NL 00 ABCD 0123 34 1234',
+					'vatNo' => 'NL 1234.56.789.B01',					
+					'notes' => 'Just a demo john'
+			]);
+			$john->save();
+
+			$comment = new Comment();
+			$comment->createdBy = $demo->id;
+			$comment->setEntity($john);
+			$comment->text = "Wile E. Coyote (also known simply as \"The Coyote\") and The Road Runner are a duo of cartoon characters from a series of Looney Tunes and Merrie Melodies cartoons. The characters (a coyote and Greater Roadrunner) were created by animation director Chuck Jones in 1948 for Warner Bros., while the template for their adventures was the work of writer Michael Maltese. The characters star in a long-running series of theatrical cartoon shorts (the first 16 of which were written by Maltese) and occasional made-for-television cartoons.";
+			$comment->save();
+
+			$comment = new Comment();
+			$comment->createdBy = $elmer->id;
+			$comment->setEntity($john);
+			$comment->text = "In each episode, instead of animal senses and cunning, Wile E. Coyote uses absurdly complex contraptions (sometimes in the manner of Rube Goldberg) and elaborate plans to pursue his quarry. It was originally meant to parody chase cartoons like Tom and Jerry, but became popular in its own right, much to Jones' chagrin.";
+			$comment->save();
+		}
+
+
+
+		$acme = Contact::find()->where('name', '=', 'ACME Corporation')->single();
+		if (!$acme) {
+			$acme = new Contact();
+			$acme->setValues([
+					'isOrganization' => true,
+					'addressBookId' => $addressBook->id,
+					'name' => 'ACME Corporation',
+					'addresses' => [[
+						'type' => Address::TYPE_POSTAL,
+						'street' => 'Kalverstraat',
+						'street2' => '1',
+						'zipCode' => '1012 NX',
+						'city' => 'Amsterdam',
+						'state' => 'Noord-Holland',
+						'countryCode' => 'NL',
+					]],
+					'phoneNumbers' => [[
+						'type' => PhoneNumber::TYPE_WORK,
+						'number' => '+31 (0) 10 - 1234567',
+					],[
+						'type' => PhoneNumber::TYPE_MOBILE,
+						'number' => '+31 (0) 6 - 1234567',
+					]],
+					'emailAddresses' => [[
+						'type' => EmailAddress::TYPE_WORK,
+						'email' => 'info@acme.demo',
+					]],
+
+					'urls' => [
+						[
+							"type"=> Url::TYPE_HOMEPAGE,
+							"url" => 'http://www.acme.demo',
+						]
+					],					
+					
+					'IBAN' => 'NL 00 ABCD 0123 34 1234',
+					'vatNo' => 'NL 1234.56.789.B01',					
+					'notes' => 'Just a demo acme'
+			]);
+			$acme->save();
+		}
+		
+
+
+		$wile = Contact::find()->where('name', '=', 'Wile E. Coyote')->single();
+		if (!$wile) {
+			$wile = new Contact();
+			$wile->setValues([
+					'photoBlobId' => $blob->id,
+					'addressBookId' => $addressBook->id,
+					'organizationIds' => [$acme->id],
+					'firstName' => 'Wile',
+					'middleName' => 'E.',
+					'lastName' => 'Coyote',
+					'jobTitle' => 'CEO',
+					'addresses' => [[
+						'type' => Address::TYPE_POSTAL,
+						'street' => 'Kalverstraat',
+						'street2' => '1',
+						'zipCode' => '1012 NX',
+						'city' => 'Amsterdam',
+						'state' => 'Noord-Holland',
+						'countryCode' => 'NL',
+					]],
+					'phoneNumbers' => [[
+						'type' => PhoneNumber::TYPE_WORK,
+						'number' => '+31 (0) 10 - 1234567',
+					],[
+						'type' => PhoneNumber::TYPE_MOBILE,
+						'number' => '+31 (0) 6 - 1234567',
+					]],
+					'emailAddresses' => [[
+						'type' => EmailAddress::TYPE_WORK,
+						'email' => 'wile@smith.demo',
+					]],
+
+					'urls' => [
+						[
+							"type"=> Url::TYPE_HOMEPAGE,
+							"url" => 'http://www.smith.demo',
+						]
+					],					
+					
+					'IBAN' => 'NL 00 ABCD 0123 34 1234',
+					'vatNo' => 'NL 1234.56.789.B01',					
+					'notes' => 'Just a demo wile'
+			]);
+			$wile->save();
+
+			$comment = new Comment();
+			$comment->createdBy = $demo->id;
+			$comment->setEntity($wile);
+			$comment->text = "Wile E. Coyote (also known simply as \"The Coyote\") and The Road Runner are a duo of cartoon characters from a series of Looney Tunes and Merrie Melodies cartoons. The characters (a coyote and Greater Roadrunner) were created by animation director Chuck Jones in 1948 for Warner Bros., while the template for their adventures was the work of writer Michael Maltese. The characters star in a long-running series of theatrical cartoon shorts (the first 16 of which were written by Maltese) and occasional made-for-television cartoons.";
+			$comment->save();
+
+			$comment = new Comment();
+			$comment->createdBy = $elmer->id;
+			$comment->setEntity($wile);
+			$comment->text = "In each episode, instead of animal senses and cunning, Wile E. Coyote uses absurdly complex contraptions (sometimes in the manner of Rube Goldberg) and elaborate plans to pursue his quarry. It was originally meant to parody chase cartoons like Tom and Jerry, but became popular in its own right, much to Jones' chagrin.";
+			$comment->save();
+		}
+
+		// 	$wile->addComment("Wile E. Coyote (also known simply as \"The Coyote\") and The Road Runner are a duo of cartoon characters from a series of Looney Tunes and Merrie Melodies cartoons. The characters (a coyote and Greater Roadrunner) were created by animation director Chuck Jones in 1948 for Warner Bros., while the template for their adventures was the work of writer Michael Maltese. The characters star in a long-running series of theatrical cartoon shorts (the first 16 of which were written by Maltese) and occasional made-for-television cartoons.");
+
+		// 	$wile->addComment("In each episode, instead of animal senses and cunning, Wile E. Coyote uses absurdly complex contraptions (sometimes in the manner of Rube Goldberg) and elaborate plans to pursue his quarry. It was originally meant to parody chase cartoons like Tom and Jerry, but became popular in its own right, much to Jones' chagrin.");
+
+		// 	$file = new \GO\Base\Fs\File(\GO::modules()->addressbook->path . 'install/Demo letter.docx');
+		// 	$copy = $file->copy($wile->filesFolder->fsFolder);
+
+		// 	$wile->filesFolder->addFile($copy->name());
+		// }
+
+
+		
+
+		$elmer = GOUser::model()->findSingleByAttribute('username', 'elmer');
+		$demo = GOUser::model()->findSingleByAttribute('username', 'demo');
+		$linda = GOUser::model()->findSingleByAttribute('username', 'linda');
+
 
 		if (\GO::modules()->calendar) {
 			
@@ -294,23 +377,26 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 
 				$participant = new \GO\Calendar\Model\Participant();
 				$participant->is_organizer = true;
-				$participant->setContact($demo->createContact());
+				$participant->email = $demo->email;
+				$participant->name = $demo->displayName;
+				$participant->user_id = $demo->id;
 				$event->addParticipant($participant);
 
 				$participant = new \GO\Calendar\Model\Participant();
-				$participant->setContact($linda->createContact());
+				$participant->email = $john->emailAddresses[0]->email;
+				$participant->name = $john->name;
 				$event->addParticipant($participant);
 
 				$participant = new \GO\Calendar\Model\Participant();
-				$participant->setContact($elmer->createContact());
+				$participant->email = $linda->email;
+				$participant->name = $linda->displayName;
+				$participant->user_id = $linda->id;
 				$event->addParticipant($participant);
 
+				Link::create($event, $wile);
+				Link::create($event, $john);
 
-				$participant = new \GO\Calendar\Model\Participant();
-				$participant->setContact($wile);
-				$event->addParticipant($participant);
 
-				$wile->link($event);
 			}
 
 			
@@ -333,20 +419,24 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 
 				$participant = new \GO\Calendar\Model\Participant();
 				$participant->is_organizer = true;
-				$participant->setContact($linda->createContact());
+				$participant->email = $demo->email;
+				$participant->name = $demo->displayName;
+				$participant->user_id = $demo->id;
 				$event->addParticipant($participant);
-
 
 				$participant = new \GO\Calendar\Model\Participant();
-				$participant->setContact($demo->createContact());
+				$participant->email = $john->emailAddresses[0]->email;
+				$participant->name = $john->name;
 				$event->addParticipant($participant);
-
 
 				$participant = new \GO\Calendar\Model\Participant();
-				$participant->setContact($john);
+				$participant->email = $linda->email;
+				$participant->name = $linda->displayName;
+				$participant->user_id = $linda->id;
 				$event->addParticipant($participant);
 
-				$john->link($event);
+				Link::create($event, $wile);
+				Link::create($event, $john);
 			}
 			
 			
@@ -369,20 +459,24 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 
 				$participant = new \GO\Calendar\Model\Participant();
 				$participant->is_organizer = true;
-				$participant->setContact($linda->createContact());
+				$participant->email = $demo->email;
+				$participant->name = $demo->displayName;
+				$participant->user_id = $demo->id;
 				$event->addParticipant($participant);
-
 
 				$participant = new \GO\Calendar\Model\Participant();
-				$participant->setContact($demo->createContact());
+				$participant->email = $john->emailAddresses[0]->email;
+				$participant->name = $john->name;
 				$event->addParticipant($participant);
-
 
 				$participant = new \GO\Calendar\Model\Participant();
-				$participant->setContact($john);
+				$participant->email = $linda->email;
+				$participant->name = $linda->displayName;
+				$participant->user_id = $linda->id;
 				$event->addParticipant($participant);
 
-				$john->link($event);
+				Link::create($event, $wile);
+				Link::create($event, $john);
 			}
 			
 			
@@ -795,14 +889,14 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			$copy = $file->copy($demoHome->fsFolder);
 			
 			
-			$file = new \GO\Base\Fs\File(\GO::modules()->addressbook->path . 'install/Demo letter.docx');
+			$file = new \GO\Base\Fs\File(\GO::modules()->demodata->path . 'addressbook/Demo letter.docx');
 			$copy = $file->copy($demoHome->fsFolder);
 			
 			
-			$file = new \GO\Base\Fs\File(\GO::modules()->addressbook->path . 'install/wecoyote.png');
+			$file = new \GO\Base\Fs\File(\GO::modules()->demodata->path . 'addressbook/wecoyote.png');
 			$copy = $file->copy($demoHome->fsFolder);
 			
-			$file = new \GO\Base\Fs\File(\GO::modules()->addressbook->path . 'install/noperson.jpg');
+			$file = new \GO\Base\Fs\File(\GO::modules()->demodata->path . 'addressbook/noperson.jpg');
 			$copy = $file->copy($demoHome->fsFolder);
 			
 			//add files to db.
@@ -1132,42 +1226,35 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 		}
 		
 		
-		
-		
-		if(\GO::modules()->bookmarks){
-			$category = \GO\Bookmarks\Model\Category::model()->findSingleByAttribute('name', \GO::t("General", "bookmarks"));
-			
+		if(Module::isInstalled('community', 'bookmarks')) {
+			$category = Category::find()->where(['name' => go()->t('General', 'community', 'bookmarks')])->single();
+	
 			if(!$category){
-				$category = new \GO\Bookmarks\Model\Category();
-				$category->name=\GO::t("General", "bookmarks");		
-				$category->save();
-				$category->acl->addGroup(\GO::config()->group_internal, \GO\Base\Model\Acl::READ_PERMISSION);
+				$category = new Category();
+				$category->name = go()->t('General', 'community', 'bookmarks');	
+				$category->setAcl([Group::ID_INTERNAL => Acl::LEVEL_READ]);
+				$category->save();				
 			}
-			$bookmark = \GO\Bookmarks\Model\Bookmark::model()->findSingleByAttribute('name', 'Google Search');
+
+			$bookmark = Bookmark::find()->where(['name' => 'Group-Office'])->single();
 
 			if(!$bookmark){
-				$bookmark = new \GO\Bookmarks\Model\Bookmark();
-				$bookmark->category_id=$category->id;
-				$bookmark->name='Google Search';
-				$bookmark->content='http://www.google.com';
-				$bookmark->logo='icons/viewmag.png';
-				$bookmark->public_icon=true;
-				$bookmark->description='Search the web';
-				$bookmark->open_extern=true;
+				$bookmark = new Bookmark();
+				$bookmark->categoryId =$category->id;
+				$bookmark->name='Group-Office';
+				$bookmark->content='https://www.group-office.com';
+				$bookmark->loadMetaData();
 				$bookmark->save();
 			}
 			
-			$bookmark = \GO\Bookmarks\Model\Bookmark::model()->findSingleByAttribute('name', 'Wikipedia');
+			$bookmark = Bookmark::find()->where(['name' => 'Intermesh'])->single();
 
 			if(!$bookmark){
-				$bookmark = new \GO\Bookmarks\Model\Bookmark();
-				$bookmark->category_id=$category->id;
-				$bookmark->name='Wikipedia';
-				$bookmark->content='http://www.wikipedia.com';
-				$bookmark->logo='icons/agt_web.png';
-				$bookmark->public_icon=true;
-				$bookmark->description='The Free Encyclopedia';
-				$bookmark->behave_as_module=true;
+				$bookmark = new Bookmark();
+				$bookmark->categoryId =$category->id;
+				$bookmark->name='Intermesh';
+				$bookmark->content='https://www.intermesh.nl';
+				$bookmark->loadMetaData();
 				$bookmark->save();
 			}
 		}

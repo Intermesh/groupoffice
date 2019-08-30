@@ -1,10 +1,12 @@
 <?php
+
+use go\core\App;
 use go\core\jmap\Response;
 use go\core\jmap\Request;
 use go\core\webclient\CSP;
 use go\core\webclient\Extjs3;
 
-$webclient = new Extjs3();
+$webclient = Extjs3::get();
 $lang = GO::language()->getLanguage(); ?>
 <!DOCTYPE html>
 <html lang="<?= $lang; ?>">
@@ -43,9 +45,9 @@ $lang = GO::language()->getLanguage(); ?>
 	if(!empty(\GO::config()->custom_css_url))
 		echo '<link href="'.\GO::config()->custom_css_url.'" type="text/css" rel="stylesheet" />';
 
-	$csp = new CSP();
 	//$this is \GO\Core\Controller\Auth
 	\GO::router()->getController()->fireEvent('head');
+	GO()->fireEvent(App::EVENT_HEAD);
 	?>
 	<style>
 		<?php
@@ -63,7 +65,7 @@ $lang = GO::language()->getLanguage(); ?>
 		}
 		?>	
 	</style>
-	<meta http-equiv="Content-Security-Policy" content="<?= $csp; ?>">
+	<meta http-equiv="Content-Security-Policy" content="<?= CSP::get(); ?>">
 </head>
 <body>
 	<div id="sound"></div>

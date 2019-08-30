@@ -4,6 +4,7 @@ namespace go\modules\community\bookmarks\model;
 use go\core\jmap\Entity;
 use go\core\db\Criteria;
 use go\core\orm\Query;
+use go\modules\community\bookmarks\controller\Bookmark as GoBookmark;
 
 /**
  * Bookmark model
@@ -82,5 +83,18 @@ class Bookmark extends Entity {
 
 	protected static function textFilterColumns() {
 		return ['name', 'description'];
+	}
+
+	public function loadMetaData() {
+		$c = new GoBookmark();
+		$response = $c->description(['url' => $this->content]);
+
+		if(!empty($response['title'])) {
+			$this->description = $response['description'];
+		}
+
+		if(!empty($response['logo'])) {
+			$this->logo = $response['logo'];
+		}
 	}
 }

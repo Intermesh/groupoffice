@@ -9,12 +9,18 @@ use go\core\fs\File;
 use go\core\Language;
 use go\core\model\Settings;
 use go\core\model\Module;
+use go\core\SingletonTrait;
 
 class Extjs3 {
+
+	use SingletonTrait;
+
+
 	
 	public function flushCache() {
 		return App::get()->getDataFolder()->getFolder('clientscripts')->delete();
 	}
+
 
 	/**
 	 * 

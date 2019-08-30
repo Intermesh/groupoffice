@@ -12,7 +12,8 @@ use go\core\db\Connection;
 use go\core\db\Database;
 use go\core\db\Query;
 use go\core\db\Table;
-use go\core\event\Listeners;
+    use go\core\event\EventEmitterTrait;
+    use go\core\event\Listeners;
 use go\core\exception\ConfigurationException;
 use go\core\fs\Folder;
 use go\core\jmap\State;
@@ -37,6 +38,15 @@ use const GO_CONFIG_FILE;
 	class App extends Module {
 		
 		use SingletonTrait;
+
+		use EventEmitterTrait;
+
+
+		/**
+		 * Fires when the application is loaded in the <head></head> section of the webclient.
+		 * Can also be used to adjust the Content Security Policy
+		 */
+		const EVENT_HEAD = 'head';
 
 		/**
 		 *
@@ -107,6 +117,16 @@ use const GO_CONFIG_FILE;
 				$this->version = require(Environment::get()->getInstallFolder()->getPath() . '/version.php');
 			}
 			return $this->version;
+		}
+
+		/**
+		 * Major version
+		 * 
+		 * @return string eg. 6.4
+		 */
+		public function getMajorVersion() {
+			
+			return substr($this->getVersion(), 0, strrpos($this->getVersion(), '.') );
 		}
 
 		private function initCompatibility() {
@@ -294,7 +314,9 @@ use const GO_CONFIG_FILE;
 									"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
 									"debug" => $config['debug'] ?? null,
 									
-									"servermanager" => $config['servermanager'] ?? false
+									"servermanager" => $config['servermanager'] ?? false,
+
+									"sseEnabled" => $config['sseEnabled'] ?? true
 							],
 							"db" => [
 									"host" => ($config['db_host'] ?? "localhost"),
@@ -433,7 +455,7 @@ use const GO_CONFIG_FILE;
 				GO()->getCache()->flush(false);
 				Table::destroyInstances();
 
-				$webclient = new Extjs3();
+				$webclient = Extjs3::get();
 				$webclient->flushCache();
 
 				Observable::cacheListeners();

@@ -125,7 +125,7 @@ class Module extends AclOwnerEntity {
 	}	
 	
 	/**
-	 * Check if this module is installed, available and licensed
+	 * Check if this module is available and licensed
 	 * 
 	 * @return bool
 	 */

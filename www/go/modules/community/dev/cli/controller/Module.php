@@ -1,6 +1,6 @@
 <?php
 
-namespace go\modules\community\dev\controller;
+namespace go\modules\community\dev\cli\controller;
 
 use Exception;
 use GO;

@@ -387,9 +387,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 				'createdAt' => new DateTime()
 						];
 
-		if(!GO()->getDbConnection()->insert('core_change', $record)->execute()) {
-			throw new \Exception("Could not save change");
-		}
+		GO()->getDbConnection()->insert('core_change', $record)->execute();
 	}
 		
 	/**

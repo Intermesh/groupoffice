@@ -127,82 +127,85 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 				// },
 
 
-				{
-					xtype: 'panel',
-					title: t("Communication"),
-					layout: "hbox",				
+				// {
+				// 	xtype: 'panel',
+				// 	title: t("Communication"),
+				// 	layout: "hbox",				
 					
-					onLoad: function (detailView) {
+				// 	onLoad: function (detailView) {
 
-						this.items.each(function(i) {
-							i.update(detailView.data);
-						});					
+				// 		this.items.each(function(i) {
+				// 			i.update(detailView.data);
+				// 		});					
 						
-						detailView.phoneNumbers.setVisible(detailView.data.phoneNumbers.length > 0);
-						detailView.emailAddresses.setVisible(detailView.data.emailAddresses.length > 0);
-					},
+				// 		detailView.phoneNumbers.setVisible(detailView.data.phoneNumbers.length > 0);
+				// 		detailView.emailAddresses.setVisible(detailView.data.emailAddresses.length > 0);
+				// 	},
 
-					items: [
+				// 	items: [
 				
-					this.emailAddresses = new Ext.BoxComponent({
-						xtype: "box",
-						listeners: {
-							scope: this,
-							afterrender: function(box) {
-								
-								box.getEl().on('click', function(e){								
-									var container = box.getEl().dom.firstChild, 
-									item = e.getTarget("a", box.getEl()),
-									i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);						
-								
-									go.util.mailto({
-										email: this.data.emailAddresses[i].email,
-										name: this.data.name
-									}, e);
-
-								}, this);
-							}
-						},
-						tpl: '<div class="icons">\
-							<tpl for="emailAddresses">\
-								<a class="s6" href="mailto:{email}"><tpl if="xindex == 1"><i class="icon label">email</i></tpl>\
-								<span>{email}</span>\
-								<label>{[t("emailTypes")[values.type] || values.type]}</label>\
-								</a>\
-							</tpl>\
-						</div>'
-					}), 
+				// 	]
+				// },
 
 
-					this.phoneNumbers = new Ext.BoxComponent({
-						xtype: "box",
-						listeners: {
-							scope: this,
-							afterrender: function(box) {
-								
-								box.getEl().on('click', function(e){								
-									var container = box.getEl().dom.firstChild, 
-									item = e.getTarget("a", box.getEl()),
-									i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);						
-								
-									go.util.callto({
-										number: this.data.phoneNumbers[i].number.replace(/[^0-9+]/g, ""),
-										name: dv.name
-									}, e);
+				this.emailAddresses = new Ext.BoxComponent({
+					xtype: "box",
+					listeners: {
+						scope: this,
+						afterrender: function(box) {
+							
+							box.getEl().on('click', function(e){								
+								var container = box.getEl().dom.firstChild, 
+								item = e.getTarget("a", box.getEl()),
+								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);						
+							
+								go.util.mailto({
+									email: this.data.emailAddresses[i].email,
+									name: this.data.name
+								}, e);
 
-								}, this);
-							}
-						},
-						tpl: '<div class="icons">\
-							<tpl for="phoneNumbers">\
-								<a class="s6" href="tel://{[values.number.replace(/[^0-9+]/g, "")]}"><tpl if="xindex == 1"><i class="icon label">phone</i></tpl>\
-								<span>{number}</span>\
-								<label>{[t("phoneTypes")[values.type] || values.type]}</label>\
-								</a>\
-							</tpl>\
-						</div>'
-					})]
-				},
+							}, this);
+						}
+					},
+					tpl: '<div class="icons">\
+						<tpl for="emailAddresses">\
+							<a class="s6" href="mailto:{email}"><tpl if="xindex == 1"><i class="icon label">email</i></tpl>\
+							<span>{email}</span>\
+							<label>{[t("emailTypes")[values.type] || values.type]}</label>\
+							</a>\
+						</tpl>\
+					</div>'
+				}), 
+
+
+				this.phoneNumbers = new Ext.BoxComponent({
+					xtype: "box",
+					listeners: {
+						scope: this,
+						afterrender: function(box) {
+							
+							box.getEl().on('click', function(e){								
+								var container = box.getEl().dom.firstChild, 
+								item = e.getTarget("a", box.getEl()),
+								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);						
+							
+								go.util.callto({
+									number: this.data.phoneNumbers[i].number.replace(/[^0-9+]/g, ""),
+									name: dv.name
+								}, e);
+
+							}, this);
+						}
+					},
+					tpl: '<div class="icons">\
+						<tpl for="phoneNumbers">\
+							<a class="s6" href="tel://{[values.number.replace(/[^0-9+]/g, "")]}"><tpl if="xindex == 1"><i class="icon label">phone</i></tpl>\
+							<span>{number}</span>\
+							<label>{[t("phoneTypes")[values.type] || values.type]}</label>\
+							</a>\
+						</tpl>\
+					</div>'
+				}),
 				
 				{
 					xtype: "box",
@@ -267,7 +270,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					}],
 					onLoad: function (detailView) {						
 						this.setVisible(!!detailView.data.notes);
-						this.items.first().setText('<div style="white-space: pre-wrap">' + detailView.data.notes + "</div>");
+						this.items.first().setText('<div style="white-space: pre-wrap">' + Ext.util.Format.htmlEncode(detailView.data.notes) + "</div>");
 					}
 				}
 			]

@@ -116,7 +116,7 @@ class State extends AbstractState {
 	}
 	
 	public function getEventSourceUrl() {
-		return function_exists("xdebug_is_debugger_active") && xdebug_is_debugger_active() ? null : Settings::get()->URL.'api/sse.php';
+		return Settings::get()->URL.'api/sse.php';
 	}
 
 

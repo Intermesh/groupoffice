@@ -7,3 +7,6 @@ $config['db_port'] = 3306;
 $config['file_storage_path'] = "/var/lib/groupoffice";
 $config['tmpdir'] = "/tmp/groupoffice";
 $config['debug'] = false;
+
+// Some servers don't support simultanous connections. Then SSE has to be disabled.
+$config['sseEnabled'] = true;

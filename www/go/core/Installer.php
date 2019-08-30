@@ -36,6 +36,8 @@ class Installer {
 	
 	const MIN_UPGRADABLE_VERSION = "6.3.58";
 	
+	const EVENT_UPGRADE = 'upgrade';
+
 	private static $isInProgress = false;
 	private static $isInstalling = false;
 	private static $isUpgrading = false;
@@ -76,6 +78,8 @@ class Installer {
 	 */
 	public function install(array $adminValues = [], $installModules = []) {
 
+		ini_set("max_execution_time", 0);
+		
 
 		//don't cache on install
 		App::get()->getCache()->flush(false);
@@ -312,6 +316,7 @@ class Installer {
 		}
 		
 		ini_set("max_execution_time", 0);
+		
 
 
 		GO()->getDbConnection()->query("SET sql_mode=''");
@@ -357,7 +362,7 @@ class Installer {
 			$acl->save();
 		}
 
-		$this->fireEvent('upgrade');
+		$this->fireEvent(static::EVENT_UPGRADE);
 
 		echo "Done!\n";
 	}

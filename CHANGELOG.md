@@ -1,3 +1,14 @@
+30-08-2019 6.4.48
+- Core: Install comments and bookmarks by default
+- Core: Fixed demo data
+
+30-08-2019 6.4.47
+- Multi instance: upgrades all instances automatically
+- Core: Ability to extend content security policy in modules
+- Core: SSE improvements and option to disable it
+- Demodata: updated for new modules
+
+27-08-2019 6.4.46
 - Core: Custom fields were blank in CSV export.
 - Core: IMAP auth was broken when groups were modified. Removed permission check in user model that is executed in controller
 - Bookmarks: Fixed always reloading of website data
