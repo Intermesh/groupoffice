@@ -300,7 +300,8 @@ class Migrate63to64 {
 			$contact = new Contact();
 			$contact->id = $r['id'];
 			$contact->addressBookId = $addressBook->id;
-			$contact->firstName = empty($r['first_name']) ? $r['initials'] : $r['first_name'];
+			$contact->initials = $r['initials'];
+			$contact->firstName = $r['first_name'];
 			$contact->middleName = $r['middle_name'];
 			$contact->lastName = $r['last_name'];
 
@@ -640,6 +641,20 @@ class Migrate63to64 {
 				throw new \Exception("Could not save contact" . var_export($contact->getValidationErrors(), true));
 			}
 		}
+	}
+	
+	public function addInitials() {
+		$db = GO()->getDbConnection();
+		$contacts = $db->select()->from('ab_contacts')
+			->where('id in (select id from addressbook_contact)')
+			->orderBy(['id' => 'ASC']);
+		
+		foreach ($contacts as $contact) {
+			$newContact = Contact::findById($contact['id']);
+			$newContact->initials = $contact['initials'];
+			$newContact->save();
+		}
+		
 	}
 
 }
