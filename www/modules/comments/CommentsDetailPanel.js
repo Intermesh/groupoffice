@@ -13,7 +13,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			url: GO.url('comments/comment/store'),
 			baseParams: {
 				task: 'comments',
-				limit: 10
+				limit: 0
 			},
 			fields: ['id', 'model_id', 'category_id', 'category_name', 'model_name', 'user_name', 'ctime', 'mtime', 'comments'],
 			remoteSort: true
