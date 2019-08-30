@@ -57,9 +57,16 @@ class Comment extends Entity {
 	/**
 	 * Set the entity type
 	 * 
-	 * @param string|EntityType $entity "note" or entitytype instance
+	 * @param string|EntityType|Entity $entity "note" or entitytype instance
 	 */
 	public function setEntity($entity) {
+
+		if($entity instanceof Entity) {
+			$this->entityTypeId = $entity->entityType()->getId();
+			$this->entity = $entity->entityType()->getName();
+			$this->entityId = $entity->id;
+			return;
+		}
 		
 		if(!($entity instanceof EntityType)) {
 			$entity = EntityType::findByName($entity);

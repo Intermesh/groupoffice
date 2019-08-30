@@ -3,11 +3,8 @@ namespace go\modules\community\bookmarks\controller;
 
 use go\core\jmap\EntityController;
 use go\modules\community\bookmarks\model;
-use go\core\App;
-use go\core\jmap\State;
 use go\core\fs\Blob;
-use go\core\http\Response;
-use go\core\http\Request;
+use go\core\util\StringUtil;
 
 /**
  * The controller for the Bookmark entity
@@ -149,8 +146,8 @@ class Bookmark extends EntityController {
 			}
 		}
 		
-		$response['title']=\GO\Base\Util\StringHelper::cut_string($response['title'], 64, true, "");
-		$response['description']=\GO\Base\Util\StringHelper::cut_string($response['description'], 255, true, "");
+		$response['title'] = StringUtil::cutString($response['title'], 64, true, "");
+		$response['description'] = StringUtil::cutString($response['description'], 255, true, "");
 		return $response;
 	}
 
