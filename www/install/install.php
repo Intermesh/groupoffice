@@ -15,8 +15,8 @@ if(!systemIsOk()) {
 use GO\Base\Cron\CronJob;
 use GO\Base\Model\Module;
 use GO\Base\Observable;
-use GO\Bookmarks\BookmarksModule;
-use GO\Comments\CommentsModule;
+use go\modules\community\bookmarks\Module as BookmarksModule;
+use go\modules\community\comments\Module as CommentsModule;
 use go\core\App;
 use go\core\jmap\State;
 use go\core;
