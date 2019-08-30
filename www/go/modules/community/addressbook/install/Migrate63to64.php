@@ -131,7 +131,7 @@ class Migrate63to64 {
 			}
 			$renameMap[$col->name] = $name;
 			
-			$alterSQL .= 'ADD `' . $name . '` ' . $col->getCreateSQL() . ",\n";
+			$alterSQL .= 'ADD `' . $name . '` ' . str_replace('varchar(255)','varchar(191)',$col->getCreateSQL()) . ",\n";
 		}
 		
 		$alterSQL = substr($alterSQL, 0, -2) . ';';

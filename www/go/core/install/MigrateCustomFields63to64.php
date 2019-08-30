@@ -282,8 +282,7 @@ class MigrateCustomFields63to64 {
 		$existsQ = GO()->getDbConnection()
 				->selectSingleValue('id')
 				->from("core_customfields_select_option")
-				->where('id', '=', $id + self::TREE_SELECT_OPTION_INCREMENT)
-				->andWhere(['text'=>$parts[1]]);
+				->where('id', '=', $id + self::TREE_SELECT_OPTION_INCREMENT);
 
 		$exists = $existsQ->single();
 		
