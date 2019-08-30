@@ -1,3 +1,7 @@
+30-08-2019 6.4.48
+- Core: Install comments and bookmarks by default
+- Core: Fixed demo data
+
 30-08-2019 6.4.47
 - Multi instance: upgrades all instances automatically
 - Core: Ability to extend content security policy in modules
