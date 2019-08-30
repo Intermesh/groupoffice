@@ -86,6 +86,14 @@ class Instance extends Entity {
 			});
 	}
 
+
+	public function getMajorVersion() {
+		if(!$this->version) {
+			return null;
+		}
+		return substr($this->version, 0, strrpos($this->version, '.') - 1);
+	}
+
 	
 	
 	protected function init() {

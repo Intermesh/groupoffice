@@ -93,6 +93,13 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 								Ext.MessageBox.alert("E-mail addresses", str);
 							},
 							scope: this
+						},{
+							iconCls: 'ic-download',
+							text: t("Download site config"),
+							handler: function () {
+								window.open(go.Jmap.downloadUrl('community/multi_instance/siteConfig'));
+							},
+							scope: this
 						}]
 				}
 

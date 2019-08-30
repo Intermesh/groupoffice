@@ -119,6 +119,16 @@ use const GO_CONFIG_FILE;
 			return $this->version;
 		}
 
+		/**
+		 * Major version
+		 * 
+		 * @return string eg. 6.4
+		 */
+		public function getMajorVersion() {
+			
+			return substr($this->getVersion(), 0, strrpos($this->getVersion(), '.') - 1);
+		}
+
 		private function initCompatibility() {
 			require(Environment::get()->getInstallPath() . "/go/GO.php");
 			spl_autoload_register(array('GO', 'autoload'));
