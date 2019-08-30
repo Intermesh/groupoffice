@@ -77,6 +77,9 @@ class Statement extends \PDOStatement implements \JsonSerializable {
 				$duration  =  GO()->getDebugger()->getTimeStamp() - $this->build['start'];
 				GO()->debug(QueryBuilder::debugBuild($this->build).' ('.$duration.'ms)');			
 			}
+			if(!$ret) {
+				GO()->error("SQL FAILURE: " . $this);
+			}
 			return $ret;
 		}
 		catch(\Exception $e) {
