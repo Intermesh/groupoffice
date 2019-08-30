@@ -11,6 +11,7 @@ use go\core\model\Search;
 use GO\Base\Model\SearchCacheRecord;
 use go\core\model\Group;
 use go\core\model\Acl;
+use go\core\model\Field;
 
 $updates["201803090847"][] = "ALTER TABLE `go_log` ADD `jsonData` TEXT NULL AFTER `message`;";
 
@@ -606,4 +607,13 @@ $updates['201906211622'][] = function() {
 
 $updates['201906211622'][] = function() {
   EntityType::findByName('FieldSet')->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
+};
+
+
+$updates['201908300937'][] = function() {
+  //Ensure all custom fields are correcty created in the databaase
+  foreach(Field::find() as $field) {
+    echo "Checking custom field " . $field->id ."\n";
+    $field->save();
+  }
 };
