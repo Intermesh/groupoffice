@@ -125,6 +125,10 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 									xtype: 'textfield',
 									name: 'prefixes',
 									fieldLabel: t("Prefix")
+								}, {
+									xtype: 'textfield',
+									name: 'initials',
+									fieldLabel: t("Initials")
 								}, this.firstName = new Ext.form.TextField({
 									xtype: 'textfield',
 									name: 'firstName',
