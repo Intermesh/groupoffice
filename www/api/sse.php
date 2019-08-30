@@ -17,6 +17,9 @@ require("../vendor/autoload.php");
 //Create the app with the database connection
 App::get()->setAuthState(new State());
 
+//for servers with session.autostart
+@session_write_close();
+
 //Check availability
 if(!GO()->getConfig()['core']['general']['sseEnabled'] || (function_exists("xdebug_is_debugger_active") && xdebug_is_debugger_active())) {
 	// Service Unavailable
@@ -119,6 +122,8 @@ for($i = 0; $i < MAX_LIFE_TIME; $i += CHECK_INTERVAL) {
 		sendMessage('state', $diff);
 		$changes = $new;
 	}
+
+	GO()->getDbConnection()->disconnect();
 	$sleeping += CHECK_INTERVAL;
 	sleep(CHECK_INTERVAL);
 }
