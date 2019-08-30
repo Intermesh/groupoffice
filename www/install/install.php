@@ -15,6 +15,8 @@ if(!systemIsOk()) {
 use GO\Base\Cron\CronJob;
 use GO\Base\Model\Module;
 use GO\Base\Observable;
+use GO\Bookmarks\BookmarksModule;
+use GO\Comments\CommentsModule;
 use go\core\App;
 use go\core\jmap\State;
 use go\core;
@@ -63,7 +65,9 @@ if (!empty($_POST)) {
 		App::get()->getInstaller()->install($admin, [
 				new AddressBookModule(), 
 				new NotesModule(),
-				new GAModule()
+				new GAModule(),
+				new CommentsModule(),
+				new BookmarksModule()
 				]);
 
 		//install not yet refactored modules
