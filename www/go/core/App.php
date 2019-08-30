@@ -126,7 +126,7 @@ use const GO_CONFIG_FILE;
 		 */
 		public function getMajorVersion() {
 			
-			return substr($this->getVersion(), 0, strrpos($this->getVersion(), '.') - 1);
+			return substr($this->getVersion(), 0, strrpos($this->getVersion(), '.') );
 		}
 
 		private function initCompatibility() {

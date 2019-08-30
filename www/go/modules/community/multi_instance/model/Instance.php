@@ -91,7 +91,7 @@ class Instance extends Entity {
 		if(!$this->version) {
 			return null;
 		}
-		return substr($this->version, 0, strrpos($this->version, '.') - 1);
+		return substr($this->version, 0, strrpos($this->version, '.'));
 	}
 
 	
