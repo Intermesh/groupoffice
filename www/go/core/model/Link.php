@@ -357,5 +357,21 @@ class Link extends Entity {
 	protected static function textFilterColumns() {
 		return ['s.keywords'];
 	}
+
+	public static function sort(\go\core\orm\Query $query, array $sort)
+	{
+		if(isset($sort['modifiedAt'])) {
+			$sort['s.modifiedAt'] = $sort['modifiedAt'];
+			unset($sort['modifiedAt']);
+		}
+
+		if(isset($sort['toEntity'])) {
+			$sort['eTo.name'] = $sort['toEntity'];
+			unset($sort['toEntity']);
+		}
+		return parent::sort($query, $sort);
+	}
+
+	
 	
 }
