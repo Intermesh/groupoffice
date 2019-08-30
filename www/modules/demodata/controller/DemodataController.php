@@ -42,7 +42,7 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			$addressBook = new AddressBook();
 			$addressBook->name = go()->t('Customers', 'community', 'addressbook');
 			$addressBook->setAcl([
-				Acl::LEVEL_WRITE => Group::ID_INTERNAL
+				Group::ID_INTERNAL => Acl::LEVEL_WRITE
 			]);
 			$addressBook->save();
 			
