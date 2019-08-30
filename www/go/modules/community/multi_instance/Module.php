@@ -81,7 +81,7 @@ class Module extends \go\core\Module {
 			$i[$version][] = $instance->hostname;
 		}
 
-		$i['6.5'] = ['test.65', 'test2.65', 'test.65', 'test2.65', 'test.65', 'test2.65'];
+	//	$i['6.5'] = ['test.65', 'test2.65', 'test.65', 'test2.65', 'test.65', 'test2.65'];
 
 		$tpl = file_get_contents(__DIR__ . '/site-conf.tpl');
 
@@ -102,7 +102,7 @@ class Module extends \go\core\Module {
 
 		$replacements = [
 			'{docroot}' => $version == 'DEFAULT' ? GO()->getEnvironment()->getInstallFolder()->getPath() : '/usr/local/share/groupoffice-' . $version,
-			'{aliases}' => $version == 'DEFAULT' ? '*.' . $tld : $this->implode($hostnames),
+			'{aliases}' => $version == 'DEFAULT' ? '*.' . $tld .' ' .$this->implode($hostnames) : $this->implode($hostnames),
 			'{tld}' => $tld,
 			'{servername}' => strtolower(str_replace('.', '', $version)) . '.' . $tld,
 			'{version}' => str_replace('.', '', $version)
