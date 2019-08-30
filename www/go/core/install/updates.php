@@ -617,3 +617,6 @@ $updates['201908300937'][] = function() {
     $field->save();
   }
 };
+
+
+$updates['201908300937'][] = "DELETE FROM core_setting WHERE moduleId=0";

@@ -457,6 +457,10 @@ class Instance extends Entity {
 	
 	private function getInstanceDbData(){
 		try {
+
+			//Correct old bug
+			$this->getInstanceDbConnection()->exec("DELETE FROM core_setting WHERE moduleId=0");
+
 			$record = (new \go\core\db\Query())
 						->setDbConnection($this->getInstanceDbConnection())
 						->select('count(*) as userCount, max(lastLogin) as lastLogin, sum(loginCount) as loginCount')
