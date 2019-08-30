@@ -79,6 +79,12 @@ class Module extends core\Module {
 		]);
 		$addressBook->save();
 
+		if(!$model->findAcl()
+						->addGroup(Group::ID_INTERNAL)
+						->save()) {
+			return false;
+		}
+
 		return parent::afterInstall($model);
 	}
 							
