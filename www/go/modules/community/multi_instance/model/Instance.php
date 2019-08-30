@@ -545,8 +545,12 @@ class Instance extends Entity {
 		
 		$this->getConfigFile()->move($this->getDataFolder()->getFile('config.php'));
 		$this->getConfigFile()->getFolder()->delete();
-		
-		$this->getDataFolder()->move($this->getTrashFolder()->getFolder($this->getDataFolder()->getName()));
+
+		$dest =	$this->getTrashFolder()->getFolder($this->getDataFolder()->getName());
+		if($dest->exists()) {
+			$dest = $dest->getParent()->getFolder($this->getDataFolder()->getName() . '-' . uniqid());
+		}
+		$this->getDataFolder()->move($dest);
 		
 		$this->dropDatabaseUser($this->getDbUser());
 		$this->dropDatabase($this->getDbName());
