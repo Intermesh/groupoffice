@@ -1,3 +1,5 @@
+- Core: Fixed link date not displaying in link browser
+
 30-08-2019 6.4.48
 - Core: Install comments and bookmarks by default
 - Core: Fixed demo data

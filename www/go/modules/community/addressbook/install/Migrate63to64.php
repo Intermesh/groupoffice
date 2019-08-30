@@ -3,6 +3,8 @@
 namespace go\modules\community\addressbook\install;
 
 use Exception;
+use go\core\db\Database;
+use go\core\db\Query;
 use go\core\util\DateTime;
 use go\modules\community\addressbook\model\Address;
 use go\modules\community\addressbook\model\AddressBook;
@@ -644,17 +646,19 @@ class Migrate63to64 {
 	}
 	
 	public function addInitials() {
-		$db = GO()->getDbConnection();
-		$contacts = $db->select()->from('ab_contacts')
-			->where('id in (select id from addressbook_contact)')
-			->orderBy(['id' => 'ASC']);
-		
-		foreach ($contacts as $contact) {
-			$newContact = Contact::findById($contact['id']);
-			$newContact->initials = $contact['initials'];
-			$newContact->save();
+
+		if(!go()->getDatabase()->hasTable('ab_contacts')) {
+			return;
 		}
-		
+
+		go()->getDbConnection()
+			->update("addressbook_contact", 
+				[
+					"initials" => (new Query)
+						->select("initials")
+						->from('ab_contacts', 'old')
+						->where("old.id = t.id")
+				])->execute();		
 	}
 
 }
