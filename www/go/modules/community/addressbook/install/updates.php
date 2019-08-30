@@ -50,3 +50,8 @@ $updates['201908141101'][] = "ALTER TABLE `addressbook_addressbook` ADD `filesFo
 $updates['201908141101'][] = "ALTER TABLE `addressbook_addressbook` ADD `salutationTemplate` TEXT NULL AFTER `filesFolderId`;";
 $updates['201908141101'][] = "ALTER TABLE `addressbook_user_settings` DROP `salutationTemplate`;";
 
+$updates['201908301421'][] = "ALTER TABLE `addresbook_contact` ADD `initials` VARCHAR(50) DEFAULT NULL AFTER `prefixes`;";
+$updates['201908301421'][] = function() {
+	$m = new go\modules\community\addressbook\install\Migrate63to64();
+	$m->addInitials();
+};

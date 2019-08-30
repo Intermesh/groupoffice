@@ -30,6 +30,7 @@ CREATE TABLE `addressbook_contact` (
   `modifiedBy` int(11) DEFAULT NULL,
   `goUserId` int(11) DEFAULT NULL,
   `prefixes` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Prefixes like ''Sir''',
+  `initials` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `firstName` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `middleName` varchar(55) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `lastName` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
