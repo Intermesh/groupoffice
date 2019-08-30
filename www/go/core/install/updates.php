@@ -612,9 +612,11 @@ $updates['201906211622'][] = function() {
 
 $updates['201908300937'][] = function() {
   //Ensure all custom fields are correcty created in the databaase
+  
   foreach(Field::find() as $field) {
     echo "Checking custom field " . $field->id ."\n";
-    $field->save();
+    try{$field->save();}
+    catch(\Exception $e) { echo "failed to save field: ".$e->getMessage(); }
   }
 };
 
