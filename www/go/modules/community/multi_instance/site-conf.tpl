@@ -1,5 +1,5 @@
 <VirtualHost *:443>
-  Define DOC_ROOT_{version} = {docroot}
+  Define DOC_ROOT_{version} {docroot}
   ServerName {servername}
   ServerAlias {aliases}
   DocumentRoot ${DOC_ROOT_{version}}
