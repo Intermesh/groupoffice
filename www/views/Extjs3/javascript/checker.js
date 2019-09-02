@@ -72,7 +72,7 @@ GO.CheckerWindow = function(config){
 		scope: this
 	},
 	{
-		iconCls:'btn-dismiss',
+		iconCls:'ic-timer',
 		text:t("Snooze"),
 		menu:snoozeMenu
 	},'-',
@@ -158,7 +158,7 @@ GO.CheckerPanel = Ext.extend(function(config){
 		autoWidth:true,
 		align : 'center',
 		actions : [{
-			iconCls : 'btn-dismiss',
+			iconCls : 'ic-timer',
 			qtip: t("Snooze")
 		},{
 			iconCls : 'btn-delete',
@@ -173,7 +173,7 @@ GO.CheckerPanel = Ext.extend(function(config){
 			grid.getSelectionModel().selectRow(row);
 
 			switch(action){
-				case 'btn-dismiss':
+				case 'ic-timer':
 					this.doTask('snooze_reminders', record.get('snooze_time'));
 					break;
 				case 'btn-delete':
