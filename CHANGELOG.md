@@ -1,5 +1,6 @@
 - Core: Fixed link date not displaying in link browser
 - Address book: Added initials field
+- Core: Dismiss icon missing in reminders
 
 30-08-2019 6.4.48
 - Core: Install comments and bookmarks by default
