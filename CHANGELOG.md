@@ -1,6 +1,8 @@
 - Core: Fixed link date not displaying in link browser
 - Address book: Added initials field
 - Core: Dismiss icon missing in reminders
+- Core: order global search by modified date
+- Address book: System setting to automatically link e-mail to contacts
 
 30-08-2019 6.4.48
 - Core: Install comments and bookmarks by default

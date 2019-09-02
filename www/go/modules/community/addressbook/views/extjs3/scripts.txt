@@ -22,3 +22,4 @@ AddressesField.js
 PhoneNumbersField.js
 DatesField.js
 UrlsField.js
+SystemSettingsPanel.js
