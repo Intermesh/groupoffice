@@ -26,13 +26,7 @@ go.Modules.register("core", 'core', {
 		'SmtpAccount',
 		'EmailTemplate'
 	],
-	systemSettingsPanels: [
-		"go.users.SystemSettingsUserGrid",
-		"go.groups.SystemSettingsGroupGrid",
-		"go.modules.SystemSettingsModuleGrid",		
-		"go.tools.SystemSettingsTools",
-		"go.cron.SystemSettingsCronGrid"
-	],
+
 	userSettingsPanels: [
 		"go.users.UserGroupGrid",
 		"go.users.UserSettingsWorkingWeek"

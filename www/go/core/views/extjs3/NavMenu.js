@@ -7,7 +7,7 @@
  * var filterPanel = new go.NavMenu({
  * 		region:'north',
  * 		store: new Ext.data.ArrayStore({
- * 			fields: ['name', 'icon', 'inputValue'], //icon and iconCls are supported.
+ * 			fields: ['name', 'icon', 'inputValue'], //icon, iconCls and cls are supported.
  * 			data: [
  * 				[t("Active", "tasks"), 'content_paste', 'active'],
  * 				[t("Due in seven days", "tasks"), 'filter_7', 'sevendays'],
@@ -42,7 +42,7 @@ go.NavMenu = Ext.extend(Ext.DataView,{
 			overClass:'x-view-over',
 			itemSelector:'div',
 			tpl:'<tpl for=".">\
-					<div><i class="icon {iconCls}">{icon}</i>\
+					<div class="{cls}"><i class="icon {iconCls}">{icon}</i>\
 					<span>{name}</span></div>\
 					</tpl>\
 				</tpl>',
