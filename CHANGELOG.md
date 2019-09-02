@@ -1,3 +1,4 @@
+02-09-2019 6.4.49
 - Core: Fixed link date not displaying in link browser
 - Address book: Added initials field
 - Core: Dismiss icon missing in reminders
