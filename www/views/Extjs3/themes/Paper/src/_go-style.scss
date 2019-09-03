@@ -1101,7 +1101,7 @@ button.filetype-pdf, button.filetype-doc {
 		margin: 0;
 		width: 100%;
 		span, a {
-			display: block;
+			display: inline-block;
 			min-height: dp(24);
 		}
 		
