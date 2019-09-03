@@ -191,7 +191,9 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 							
 								go.util.callto({
 									number: this.data.phoneNumbers[i].number.replace(/[^0-9+]/g, ""),
-									name: dv.name
+									name: dv.name,
+									entity: "Contact",
+									entityId: this.data.id
 								}, e);
 
 							}, this);
