@@ -1532,7 +1532,8 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 								{
 									images.push({
 										name: r.name,
-										src: r.url+'&inline=0'
+										src: r.url+'&inline=1',
+										download_path: r.url+'&inline=0'
 									});
 								}
 								if(r.name==attachment.name)
