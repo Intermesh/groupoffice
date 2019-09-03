@@ -1,3 +1,4 @@
+03-09-2019 6.4.50
 - Address Book: Unable to unstar
 - Address book: Change in telephone links so you can select the text
 - Core: Link browser didn't paginate. It loaded all links which could be very slow.
@@ -5,6 +6,8 @@
 - Core: Image viewer has print and open in browser button
 - E-mail: In print small part of subject could be missing
 - Core: Keep scroll position on delete in grids but move to top when paging
+- Email: Address book dialog works for cc and bcc
+- Email: Select newsletter lists in composer address book
 
 02-09-2019 6.4.49
 - Core: Fixed link date not displaying in link browser
