@@ -1059,3 +1059,22 @@ Ext.override(Ext.TabPanel, {
 Ext.override(Ext.KeyNav, {
 	forceKeyDown: true // Required for Firefox 67	
 });
+
+
+//USed by old gridpanel deleteselected to keep scroll position
+Ext.override(Ext.grid.GridView, {
+	scrollToTopOnLoad: true,
+	onLoad : function(){
+			if (this.scrollToTopOnLoad){
+				if (Ext.isGecko) {
+						if (!this.scrollToTopTask) {
+								this.scrollToTopTask = new Ext.util.DelayedTask(this.scrollToTop, this);
+						}
+						this.scrollToTopTask.delay(1);
+				} else {
+						this.scrollToTop();
+				}
+			}
+			this.scrollToTopOnLoad=true;
+	}
+});

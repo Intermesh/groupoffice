@@ -104,19 +104,12 @@ GO.email.MessagesGrid = function(config){
 
 	config.view = new Ext.grid.GroupingView({
 		autoFill: true,
-		holdPosition: true,
 		forceFit: true,
 		groupTextTpl:'{group}',
 		emptyText: t("No items to display"),
 		getRowClass:function(row, index) {
 			return (row.data.seen == '0') ? 'ml-unseen-row' : 'ml-seen-row';
-		},
-		onLoad : function(){
-			if (!this.holdPosition) { 
-				this.scrollToTop();
-			}
-			this.holdPosition = false;
-		}
+		}		
 	}),
 
 	config.sm=new Ext.grid.RowSelectionModel();

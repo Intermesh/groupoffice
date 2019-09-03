@@ -3,6 +3,8 @@
 - Core: Link browser didn't paginate. It loaded all links which could be very slow.
 - Email: Template variables work_fax and work_mobile didn't work
 - Core: Image viewer has print and open in browser button
+- E-mail: In print small part of subject could be missing
+- Core: Keep scroll position on delete in grids but move to top when paging
 
 02-09-2019 6.4.49
 - Core: Fixed link date not displaying in link browser
