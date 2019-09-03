@@ -211,6 +211,12 @@ $app-icons: (
 	}
 }
 
+.message-header-table{
+	float:left;
+	margin-right: dp(72);
+	margin-bottom: dp(8);
+}
+
 .message-header {
 	position: relative;
 	background-color: color($bg, "background");

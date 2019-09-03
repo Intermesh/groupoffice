@@ -2,6 +2,7 @@
 - Address book: Change in telephone links so you can select the text
 - Core: Link browser didn't paginate. It loaded all links which could be very slow.
 - Email: Template variables work_fax and work_mobile didn't work
+- Core: Image viewer has print and open in browser button
 
 02-09-2019 6.4.49
 - Core: Fixed link date not displaying in link browser
