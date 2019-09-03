@@ -211,12 +211,16 @@ class Template extends \GO\Base\Db\ActiveRecord{
 						$attributes[$tagPrefix . 'fax'] = $p->number;
 					break;
 
+					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_WORK_FAX:
+						$attributes[$tagPrefix . 'work_fax'] = $p->number;
+					break;
+
+					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_WORK_MOBILE:
+						$attributes[$tagPrefix . 'cellular2'] = $p->number;
+					break;
+
 					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_MOBILE:
-						if(isset($attributes[$tagPrefix . 'cellular'])) {
-							$attributes[$tagPrefix . 'cellular2'] = $p->number;
-						} else {
-							$attributes[$tagPrefix . 'cellular'] = $p->number;
-						}
+						$attributes[$tagPrefix . 'cellular'] = $p->number;						
 					break;
 				}
 			}
