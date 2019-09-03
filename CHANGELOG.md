@@ -1,3 +1,7 @@
+- Address Book: Unable to unstar
+- Address book: Change in telephone links so you can select the text
+- Core: Link browser didn't paginate. It loaded all links which could be very slow.
+
 02-09-2019 6.4.49
 - Core: Fixed link date not displaying in link browser
 - Address book: Added initials field
