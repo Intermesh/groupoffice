@@ -81,7 +81,7 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 	public function getHolidaysInPeriod($startDate,$endDate,$locale=false,$check=true,$force=false){
 		
 		if(empty($locale)){		
-			$locale = GO()->getAuthState()->getUser()->holidayset;
+			$locale = GO()->getAuthState()->getUser(['holidayset'])->holidayset;
 			if(!$locale)
 				return false;
 		}

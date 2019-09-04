@@ -120,7 +120,7 @@ class Comment extends Entity {
 	 */
 	public function getPermissionLevel() {
 
-		if(GO()->getAuthState()->getUser()->isAdmin()) {
+		if(GO()->getAuthState()->isAdmin()) {
 			return Acl::LEVEL_MANAGE;
 		}
 

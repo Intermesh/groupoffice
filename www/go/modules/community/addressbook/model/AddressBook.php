@@ -95,7 +95,7 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 	public static function getDefault(\go\core\model\User $user = null) {
 		
 		if(!isset($user)) {
-			$user = GO()->getAuthState()->getUser();
+			$user = GO()->getAuthState()->getUser(['addressBookSettings']);
 		}
 			
 		if(!isset($user->addressBookSettings)) {

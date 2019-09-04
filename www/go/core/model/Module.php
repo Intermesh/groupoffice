@@ -31,7 +31,7 @@ class Module extends AclOwnerEntity {
 
 	protected function canCreate()
 	{
-		return GO()->getAuthState()->getUser()->isAdmin();
+		return GO()->getAuthState()->isAdmin();
 	}
 	
 	protected static function textFilterColumns()

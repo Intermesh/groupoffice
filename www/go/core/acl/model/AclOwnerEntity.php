@@ -107,9 +107,13 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @return array eg. ["2" => 50, "3" => 10]
 	 */
 	public function getAcl() {
+		$a = $this->findAcl();
+		
 		$acl = [];
-		foreach($this->findAcl()->groups as $group) {
-			$acl[$group->groupId] = $group->level;
+		if($a) {
+			foreach($a->groups as $group) {
+				$acl[$group->groupId] = $group->level;
+			}
 		}
 
 		return $acl;

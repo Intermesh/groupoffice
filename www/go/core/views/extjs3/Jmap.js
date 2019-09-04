@@ -10,6 +10,11 @@ go.Jmap = {
 
 	paused: 0,
 
+	/**
+	 * Enable for XDEBUG profiling
+	 */
+	profile: false,
+
 	nextCallId: function () {
 		this.callId++;
 
@@ -58,7 +63,12 @@ go.Jmap = {
 	},
 	
 	getApiUrl : function() {
-		return BaseHref + 'api/jmap.php';
+		var url = BaseHref + 'api/jmap.php';
+
+		if(this.profile) {
+			url += '?XDEBUG_PROFILE=1';
+		}
+		return url;
 	},
 	
 	get: function(cb, scope) {

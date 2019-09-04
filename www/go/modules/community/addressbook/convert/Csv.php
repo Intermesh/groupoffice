@@ -96,11 +96,11 @@ class Csv extends convert\Csv {
 		$contact->setOrganizationIds($orgIds);
 	}
 	
-	protected function exportOrganizations(Contact $contact) {
+	protected function exportOrganizations(Contact $contact, $templateValues) {
 		if($contact->isOrganization) {
 			return "";
 		}
 
-		return implode($this->multipleDelimiter, $contact->findOrganizations()->selectSingleValue('name')->all());
+		return implode($this->multipleDelimiter, array_column($templateValues['organizations'], 'name'));
 	}
 }
