@@ -8,6 +8,9 @@
 - Core: Keep scroll position on delete in grids but move to top when paging
 - Email: Address book dialog works for cc and bcc
 - Email: Select newsletter lists in composer address book
+- Core: Updated NL and IT translations
+- Core: CSV export was very inefficient. Speed improved dramatically.
+- Newsletters: Removed CAST() function from query to support older MySQL versions
 
 02-09-2019 6.4.49
 - Core: Fixed link date not displaying in link browser
