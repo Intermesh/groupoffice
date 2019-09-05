@@ -17,6 +17,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	maximizable:true,
 	iconCls: 'ic-settings',
 	title: t("My account"),
+	width: dp(1000),
 	currentUserId:null,
 
 	initComponent: function () {		
@@ -64,7 +65,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		this.navMenu = new go.NavMenu({
 			region:'west',
-			width:dp(216),
+			width:dp(300),
 			store:this.tabStore,
 			listeners: {
 				selectionchange: function(view, nodes) {					
