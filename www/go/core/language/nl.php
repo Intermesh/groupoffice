@@ -1071,4 +1071,8 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Failed to reset permissions' => 'Fout bij herstellen van rechten',
   'Reset all' => 'Alle herstellen',
   'Are you sure you want to reset all permissions? WARNING: This can\'t be undone.' => 'Weet u zeker dat u alle rechten wilt herstellen? Waarschuwing: Dit kan niet ongedaan gemaakt worden.',
+  'Select people' => 'Personen selecteren',
+  'Add all results' => "Alle resultaten toevoegen",
+  'Add selection' => "Selectie toevoegen",
+
 );
