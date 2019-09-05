@@ -1,4 +1,5 @@
 03-09-2019 6.4.50
+- Projects: Sub project link does not navigate to the start page anymore
 - Address Book: Unable to unstar
 - Address book: Change in telephone links so you can select the text
 - Core: Link browser didn't paginate. It loaded all links which could be very slow.
