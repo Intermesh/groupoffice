@@ -14,6 +14,7 @@
 - Newsletters: Removed CAST() function from query to support older MySQL versions
 - Address book: Shrink to fit data when migrating custom fields and row size is too large during migration
 - Billing: fixed missing company name in recipient
+- E-mail: Fixed ICS parsing error. Fixed #440
 
 02-09-2019 6.4.49
 - Core: Fixed link date not displaying in link browser
