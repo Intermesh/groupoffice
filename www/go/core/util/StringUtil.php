@@ -28,7 +28,7 @@ class StringUtil {
 			return $text;
 		}
 
-		return preg_replace("/\r\n|\r|\n/", $crlf, $text);
+		return preg_replace("/\R/", $crlf, $text);
 		
 		//This caused problems with invalid UTF8.
 		// $normalized =  preg_replace('/\R/u', $crlf, $text);
