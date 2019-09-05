@@ -11,6 +11,7 @@
 - Core: Updated NL and IT translations
 - Core: CSV export was very inefficient. Speed improved dramatically.
 - Newsletters: Removed CAST() function from query to support older MySQL versions
+- Address book: Shrink to fit data when migrating custom fields and row size is too large during migration
 
 02-09-2019 6.4.49
 - Core: Fixed link date not displaying in link browser
