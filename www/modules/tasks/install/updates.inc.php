@@ -114,3 +114,29 @@ $updates['201903291350'][] = function() {
 	$m = new \go\core\install\MigrateCustomFields63to64();
 	$m->migrateEntity("Task");
 };
+
+$updates['201909041130'][] = function() {
+	\go\core\db\Utils::runSQLFile(\GO()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/task/install/install.sql"));
+};
+
+
+
+// $updates['201905241053'][] = function() {
+// 	\go\modules\community\bookmarks\controller\Bookmark::updateLogos();
+// };
+
+$updates['201905241125'][] = 'update core_module set package=\'community\', version=0, sort_order = sort_order + 100 where name=\'tasks\'';
+
+$updates['201909041130'][] = function(){
+
+	// GO()->getDbConnection()->exec('ALTER TABLE `bm_categories` CHANGE `user_id` `user_id` INT(11) NULL;');
+
+	// GO()->getDbConnection()->exec('update bm_categories set user_id = null where user_id not in (select id from core_user);');
+
+	// GO()->getDbConnection()->exec("ALTER TABLE `bm_bookmarks` CHANGE `user_id` `user_id` INT(11) NULL DEFAULT '0';");
+
+	// GO()->getDbConnection()->exec('update bm_bookmarks set user_id = null where user_id not in (select id from core_user);');
+
+	GO()->getDbConnection()->exec('INSERT INTO task_portlet_tasklist (createdBy,tasklistId) 
+	SELECT user_id, tasklist_id FROM ta_portlet_tasklists');
+};

@@ -3,15 +3,11 @@ go.modules.community.task.TaskDialog = Ext.extend(go.form.Dialog, {
 	entityStore: "TasksTask",
 	width: dp(800),
 	height: dp(800),
-	
+
 	onLoad: function (values) {
-		
 		this.recurrencePanel.onLoad(values.start, values.recurrenceRule);
-		
-		//this.recurrencePanel.setRadioButton(values.recurrenceRule);
 		go.modules.community.task.TaskDialog.superclass.onLoad.call(this,values);
 	},
-
 	initFormItems: function () {
 		var formFieldSets = go.customfields.CustomFields.getFormFieldSets("Task").filter(function(fs) {
 			return !fs.fieldSet.isTab;
@@ -63,25 +59,6 @@ go.modules.community.task.TaskDialog = Ext.extend(go.form.Dialog, {
 			}
 		});
 
-		// this.selectCategory = new go.form.ComboBoxReset({
-		// 	hiddenName:'categories',
-		// 	fieldLabel:t("Category", "tasks"),
-		// 	valueField:'id',
-		// 	displayField:'name',			
-		// 	store: new go.data.Store({
-		// 		fields: ['id', 'name'],
-		// 		entityStore: "TasksCategory",
-		// 		displayField: 'name'
-		// 	}),
-		// 	mode:'local',
-		// 	triggerAction:'all',
-		// 	emptyText:t("Select category"),
-		// 	editable:false,
-		// 	selectOnFocus:true,
-		// 	forceSelection:true,
-		// 	pageSize: parseInt(GO.settings['max_rows_list'])
-		// });
-
 		this.selectCategory = new go.form.Chips({
 			anchor: '-20',
 			xtype: "chips",
@@ -106,9 +83,6 @@ go.modules.community.task.TaskDialog = Ext.extend(go.form.Dialog, {
 				fields:['id','name','user_name'],
 				entityStore: "TasksTasklist",
 				displayField: "name",
-				// baseParams:{
-				// 	//permissionLevel: GO.permissionLevels.create
-				// },
 			}),
 			mode:'local',
 			triggerAction:'all',
@@ -154,8 +128,6 @@ go.modules.community.task.TaskDialog = Ext.extend(go.form.Dialog, {
 		});
 
 		this.recurrencePanel = new go.modules.community.task.RecurrencePanel();
-
-		var remindDate = now;
 		// start other options tab
 		this.optionsPanel = new Ext.Panel({
 
@@ -191,7 +163,6 @@ go.modules.community.task.TaskDialog = Ext.extend(go.form.Dialog, {
 			items : items
 		});
 		
-		//this.selectCategory.store.load();
 		this.selectTasklist.store.load();
 		return this.tabPanel;
 	}

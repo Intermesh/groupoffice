@@ -4,16 +4,9 @@
  * 
  * This component needs the following (form)data to work correctly:
  * 						
- * MO											1 / 0
- * TU											1 / 0
- * WE											1 / 0
- * TH											1 / 0
- * FR											1 / 0
- * SA											1 / 0
- * SU											1 / 0
  * interval								int
- * freq										"" / "DAILY" / "WEEKLY" / "MONTHLY_DATE" / "MONTHLY" / "YEARLY"
- * bysetpos								1 / 2 / 3 / 4 / -1
+ * frequency										"" / "DAILY" / "WEEKLY" / "MONTHLY_DATE" / "MONTHLY" / "YEARLY"
+ * bysetposition								1 / 2 / 3 / 4 / -1
  * until										date ( example: 23-11-2018 )
  * repeat_forever					1 / 0
  * repeat_UntilDate				1 / 0
@@ -54,7 +47,7 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 		});
 
 		this.repeatType = new Ext.form.ComboBox({
-			hiddenName : 'freq',
+			submit: false,
 			triggerAction : 'all',
 			editable : false,
 			selectOnFocus : true,
@@ -69,12 +62,16 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 				data : [['', t("No recurrence")],
 				['DAILY', t("Days")],
 				['WEEKLY', t("Weeks")],
-				['MONTHLY_DATE', t("Months by date")],
-				['MONTHLY', t("Months by day")],
+				['MONTHLY', t("Months by date")],
+				['MONTHLY_DAY', t("Months by day")],
 				['YEARLY', t("Years")]]
 			}),
 			hideLabel : true
 
+		});
+
+		this.frequency = new Ext.form.Hidden({
+			name : 'frequency'
 		});
 
 		
@@ -83,7 +80,7 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 		}, this);
 
 		this.monthTime = new Ext.form.ComboBox({
-			hiddenName : 'bySetPos',
+			hiddenName : 'bySetPosition',
 			triggerAction : 'all',
 			selectOnFocus : true,
 			disabled : true,
@@ -153,6 +150,7 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 		});
 		
 		this.repeatNumber = new Ext.form.NumberField({
+			disabled: true,
 			name: 'count',
 			maxLength: 1000,
 			width : 50,
@@ -162,6 +160,7 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 		this.recurrenceGroup = new go.form.RadioGroup({
 			xtype: 'radiogroup',
 			fieldLabel: t("Repeat"),
+			disabled: true,
 			name: "radiogroup",
 			submit: false,
 			width:160,
@@ -205,6 +204,7 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 				]
 			}),
 			this.byDay,
+			this.frequency,
 			{
 				xtype:'container',
 				layout:'hbox',
@@ -233,10 +233,31 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 	onLoad: function(start, recurrenceRule) {
 		this.setStartDate(start);
 		if(recurrenceRule) {
-			this.changeRepeat(recurrenceRule.freq);
+			if(recurrenceRule.bySetPosition) {
+				this.repeatType.setValue("MONTHLY_DAY");
+				this.changeRepeat("MONTHLY_DAY");
+			} else {
+				this.repeatType.setValue(recurrenceRule.frequency);
+				this.changeRepeat(recurrenceRule.frequency);
+			}
+			
 			this.setDaysButtons(recurrenceRule);
+			this.setRadioButtonCheck();
 		} else {
 			this.changeRepeat('');
+		}
+	},
+	setRadioButtonCheck: function() {
+		var isNumberEmpty = Ext.isEmpty(this.repeatNumber.getValue());
+		var isDateEmpty = Ext.isEmpty(this.repeatEndDate.getValue());
+
+		var items = this.recurrenceGroup.items.items;
+		if(!isNumberEmpty) {
+			items[1].setValue(true);
+		} else if(!isDateEmpty) {
+			items[2].setValue(true);
+		} else {
+			items[0].setValue(true);
 		}
 	},
 	
@@ -267,11 +288,14 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 	 * @param Array responseData
 	 */
 	setDaysButtons : function(responseData){
-		var days = ['SU','MO','TU','WE','TH','FR','SA'];
-		Ext.each(this.dayButtons, function(btn) {
-			var isEnabled = (responseData.byDay.indexOf(days[btn.day]) !== -1);
-			btn.toggle(isEnabled);
-		});
+		if(responseData.byDay) {
+			var days = ['SU','MO','TU','WE','TH','FR','SA'];
+			Ext.each(this.dayButtons, function(btn) {
+				var isEnabled = (responseData.byDay.indexOf(days[btn.day]) !== -1);
+				btn.toggle(isEnabled);
+			});
+		}
+
 	},
 
 	/**
@@ -282,11 +306,12 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 	},
 
 	/**
-	 * Enable and disable the correct fields based on the "freq" parameter
+	 * Enable and disable the correct fields based on the "frequency" parameter
 	 * 
 	 * @param String value	"" / "DAILY" / "WEEKLY" / "MONTHLY_DATE" / "MONTHLY" / "YEARLY"
 	 */
 	changeRepeat : function(value) {
+		this.frequency.setValue(value);
 		switch (value) {
 			
 			default :
@@ -311,7 +336,7 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 				this.rightContainer.setDisabled(false);
 			break;
 
-			case 'MONTHLY_DATE' :
+			case 'MONTHLY' :
 				this.disableDays(true);
 				this.recurrenceGroup.setDisabled(false);
 				this.monthTime.setDisabled(true);
@@ -319,7 +344,8 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 				this.rightContainer.setDisabled(false);
 			break;
 
-			case 'MONTHLY' :
+			case 'MONTHLY_DAY' :
+				this.frequency.setValue("MONTHLY");
 				this.disableDays(false);
 				this.recurrenceGroup.setDisabled(false);
 				this.monthTime.setDisabled(false);

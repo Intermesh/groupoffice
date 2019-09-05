@@ -1,12 +1,15 @@
 <?php
 namespace go\modules\community\task\model;
-						
+
+use DateInterval;
 use go\core\jmap\Entity;
 use go\core\orm\SearchableTrait;
 use go\core\db\Criteria;
 use go\core\orm\Query;
 use go\modules\community\task\model\Alert;
 use GO\Base\Util\Icalendar\RRuleIterator;
+use go\core\util\DateTime;
+use Sabre\VObject\Recur\RRuleIterator as SabreRRuleIterator;
 
 /**
  * Task model
@@ -52,13 +55,13 @@ class Task extends Entity {
 
 	/**
 	 * 
-	 * @var int
+	 * @var DateTime
 	 */							
 	public $createdAt;
 
 	/**
 	 * 
-	 * @var int
+	 * @var DateTime
 	 */							
 	public $modifiedAt;
 
@@ -70,19 +73,19 @@ class Task extends Entity {
 
 	/**
 	 * 
-	 * @var int
+	 * @var DateTime
 	 */							
 	public $start;
 
 	/**
 	 * 
-	 * @var int
+	 * @var DateTime
 	 */							
 	public $due;
 
 	/**
 	 * 
-	 * @var int
+	 * @var DateTime
 	 */							
 	public $completed;
 
@@ -146,8 +149,6 @@ class Task extends Entity {
 	 */							
 	protected $byDay = '';
 
-
-	
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
@@ -220,11 +221,14 @@ class Task extends Entity {
 	}
 
 	protected function internalSave() {
-		$rrule = $this->getRecurrenceRule();
-
-		if(!empty($rrule['FREQ']) && $this->percentageComplete == 100) {
-			$this->saveOccurence();
-		}
+		if(!empty($this->recurrenceRule) && $this->percentageComplete == 100) {
+			$next = $this->getNextRecurrence($this->getRecurrenceRule());
+			if($next) {
+				$this->createNewTask($next);
+			} else {
+				$this->recurrenceRule = null;
+			}
+		} 
 
 		if(!parent::internalSave()) {
 			return false;
@@ -233,59 +237,64 @@ class Task extends Entity {
 		return true;
 	}
 
-	protected function getRecurrencePattern(){
-
+	protected function createNewTask(\DateTime $next) {
+		$nextTask = new Task();
+		$values = $this->toArray();
+		$nextTask->setValues($values);
 		$rrule = $this->getRecurrenceRule();
-		$startTime = $this->start;
-		//$startDate = $rrule['start'];
-		//$startDateTime = new \DateTime('@'.$this->start_time, new \DateTimeZone($this->timezone));
-		//$startDateTime->setTimezone(new \DateTimeZone($this->timezone)); //iterate in local timezone for DST issues
-		$rRule = new \GO\Base\Util\Icalendar\RRuleIterator($rrule, $startTime);
-
-		//$rRule->fastForward(new \DateTime('@'.$lastReminderTime));
-		$nextTime = $rRule->current();
-		// && $this->hasException($nextTime->getTimeStamp())
-		while($nextTime){
-			$rRule->next();
-			$nextTime = $rRule->current();
-			//break;
+			
+		if(!empty($rrule['count'])) {
+			$rrule['count']--;
+			if($rrule['count'] > 0) {
+				$nextTask->setRecurrenceRule($rrule);
+			} else{
+				$nextTask->recurrenceRule = null;
+			}
+		} else{
+			$nextTask->setRecurrenceRule($rrule);
 		}
-		return "";
-		//return $rRule;
+
+		$this->recurrenceRule = "";
+		
+		$nextTask->percentageComplete = 0;
+		$nextTask->id = NULL;
+		$diff = $this->start->diff($next);
+		$nextTask->start = $next;
+		$nextTask->due->add($diff);
+
+		if(!$nextTask->save()) {
+			throw new \Exception("Could not save next task: ". var_export($nextTask->getValidationErrors(), true));
+		}
 	}
 
-	// protected function getRecurrencePattern(){
+	protected function parseToRRULE($recurrenceRule) {
 
-	// }
+		if(isset($recurrenceRule['until'])) {
+			$recurrenceRule['until'] = str_replace(['-',':'], ['',''], $recurrenceRule['until']);
+		}
 
-	protected function saveOccurence() {
-		$this->getRecurrencePattern();
+		if(isset($recurrenceRule['bySetPosition'])) {
+			$recurrenceRule['bySetPos'] = $recurrenceRule['bySetPosition'];
+		}
 
+		if(empty($recurrenceRule['byDay'])) {
+			unset($recurrenceRule['byDay']);
+		}
+		$recurrenceRule['FREQ'] = $recurrenceRule['frequency'];
 
-		// $nextTask = new Task();
-		// $values = $this->toArray();
-		// $nextTask->setValues($values);
-		// $rrule = $this->getRecurrenceRule();
-		// $this->recurrenceRule = "";
-		// $nextTask->percentageComplete = 0;
-		// $nextTask->id = NULL;
+		unset($recurrenceRule['bySetPosition']);
+		unset($recurrenceRule['frequency']);
+		return $recurrenceRule;
+	}
 
-		// if(isset($rrule['repeatUntilDate']) && $rrule['repeatUntilDate']) {
-		// 	$conf = new \GO\Base\Config();
-		// 	$default = $conf->getdefault_timezone();
-		// 	date_default_timezone_set($default);
-		// 	$today = new \DateTime();
-		// 	$today->settime(0,0);
-		// 	$until = new \DateTime($rrule['until']);
-		// 	if($today <= $until) {
-		// 		$nextTask->save();
-		// 	}
-		// 	//$nextTask->start = $newdate;
-		// } else if(isset($rrule['count'])) {
-		// 	$count = $rrule['count'];
-		// }
-
-
-		
+	/**
+	 * @return \DateTime
+	 */
+	protected function getNextRecurrence($rrule){
+		$rrule = $this->parseToRRULE($rrule);
+		$rRule = new \GO\Base\Util\Icalendar\RRuleIterator($rrule, $this->start);
+		$rRule->next();
+		$nextTime = $rRule->current();
+		return $nextTime;
 	}
 }

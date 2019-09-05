@@ -266,7 +266,13 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		this.TasklistsGrid.getSelectionModel().on('selectionchange', this.onTasklistSelectionChange, this, {buffer: 1}); //add buffer because it clears selection first
 	},
-	
+	checkValues: function() {
+		if(this.taskDateField.getValue() != null && this.taskNameTextField.getValue() != "") {
+			this.addTaskButton.setDisabled(false);
+		} else {
+			this.addTaskButton.setDisabled(true);
+		}
+	},
 	
 	createTaskGrid : function() {
 		this.taskGrid = new go.modules.community.task.TaskGrid({
@@ -350,7 +356,6 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 							listeners: {
 								scope: this,
 								keyup: function(text, t) {
-									// TODO - dateField change
 									if(this.taskDateField.getValue() != null && this.taskNameTextField.getValue() != "") {
 										this.addTaskButton.setDisabled(false);
 									} else {
@@ -385,25 +390,42 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 									select: function(combo,record) {
 										this.taskNameTextField.setDisabled(false);
 										this.taskDateField.setDisabled(false);
-										console.log(combo);
-										console.log(record);
+										this.quickTasklistId = record.id;
 									}
 								}
 							}),
 							this.taskDateField = new go.form.DateField({
 								disabled: true,
 								value: new Date(),
-								fieldLabel:t("Due date", "tasks")
+								fieldLabel:t("Due date", "tasks"),
+								enableKeyEvents: true,
+								listeners: {
+									scope: this,
+									keyup: function(field, e) {
+										this.checkValues();
+									},
+									select: function(field,date) {
+										this.checkValues();
+									}
+
+								}
 							}),
 							this.addTaskButton = new Ext.Button({
 								disabled: true,
 								iconCls: 'ic-add',
 								handler:function(){
-									var dlg = new go.modules.community.task.TaskDialog();
-									dlg.show();
-									dlg.setValues({
-											tasklistId: this.addTasklistId
+									go.Db.store("TasksTask").set({
+										create: {"client-id-1" : {
+											title: this.taskNameTextField.getValue(),
+											tasklistId: this.quickTasklistId,
+											start: this.taskDateField.getValue(),
+											due: this.taskDateField.getValue()
+
+										}}
+									}).then(function(response){
+										alert(response);
 									});
+
 								},
 								scope: this
 							})
