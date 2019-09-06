@@ -1,4 +1,6 @@
 03-09-2019 6.4.50
+- Bookmarks: Languages readded
+- Bookmarks: Possible to set permissions on category
 - Projects: Sub project link does not navigate to the start page anymore
 - Address Book: Unable to unstar
 - Address book: Change in telephone links so you can select the text
