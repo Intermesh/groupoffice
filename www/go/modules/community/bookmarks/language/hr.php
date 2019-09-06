@@ -1,0 +1,22 @@
+<?php
+return array (
+  'General' => 'Opći',
+  'Search the web' => 'Traži na web-u',
+  'Bookmark' => 'Zabilješka',
+  'Category' => 'Kategorija',
+  'Title' => 'Naslov',
+  'Open in new browser tab' => 'Otvori u novoj kartici',
+  'Administrate categories' => 'Uređuj kategorije',
+  'Thumbnails' => 'Sličice',
+  'Choose icon for bookmark' => 'Izaberite ikonu za zabilješku',
+  'Clear Logo' => 'Izbriši logo',
+  'Upload Logo' => 'Prenesi logo',
+  'Show all' => 'Pokaži sve',
+  'Shared category' => 'Dijeljena kategorija',
+  'Behave as a module (Browser reload required)' => 'Ponašaj se kao modul (potrebno ponovno učitati stranicu)',
+  'Are you sure you want to delete this bookmark?' => 'Da li ste sigurni da želite izbrisati ovu zabilješku?',
+  'name' => 'Zabilješke',
+  'description' => 'Opis',
+  'Bookmarks' => 'Zabilješke',
+  'Logo' => 'Logo',
+);

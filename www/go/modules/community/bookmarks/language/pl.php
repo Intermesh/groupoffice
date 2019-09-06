@@ -1,0 +1,22 @@
+<?php
+return array (
+  'Bookmark' => 'Zakładka',
+  'Category' => 'Kategoria',
+  'Title' => 'Tytuł',
+  'Open in new browser tab' => 'Otwórz w nowej zakładce',
+  'Administrate categories' => 'Zarządzaj kategoriami',
+  'Thumbnails' => 'Miniatury',
+  'Choose icon for bookmark' => 'Wybierz ikonę dla zakładki',
+  'Clear Logo' => 'Wyczyść logo',
+  'Upload Logo' => 'Wyślij logo',
+  'Show all' => 'Pokaż wszystkie',
+  'Shared category' => 'Udostępnij kategorię',
+  'Behave as a module (Browser reload required)' => 'Zachowuj się jako moduł (wymagany restart przeglądarki)',
+  'Are you sure you want to delete this bookmark?' => 'Czy jesteś pewien, że chcesz usunąć zakładkę?',
+  'General' => 'Ogólne',
+  'Search the web' => 'Wyszukaj w sieci',
+  'name' => 'Zakładki',
+  'description' => 'Opis strony',
+  'Bookmarks' => 'Zakładki',
+  'Logo' => 'Logo',
+);
