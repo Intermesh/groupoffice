@@ -1,3 +1,6 @@
+- Billing: Fixed tax percentage decimals in PDF
+- Billing: Fixed translation for Quantity / Amount in order items
+
 30-08-2019 6.4.48
 - Core: Install comments and bookmarks by default
 - Core: Fixed demo data
