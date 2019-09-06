@@ -274,8 +274,7 @@ class MaintenanceController extends AbstractController {
 
 						if(!$first){							
 							if(!empty($params['delete'])){
-
-								if($model->hasLinks() && $model->countLinks()){
+								if(empty($params['ignore_links']) && $model->hasLinks() && $model->countLinks()){
 									echo '<tr><td colspan="99">Skipped delete because model has links</td></tr>';
 								}elseif(($filesFolder = $model->getFilesFolder(false)) && ($filesFolder->hasFileChildren() || $filesFolder->hasFolderChildren())){
 									echo '<tr><td colspan="99">Skipped delete because model has folder or files</td></tr>';
@@ -300,10 +299,13 @@ class MaintenanceController extends AbstractController {
 			}
 		}
 		
-		if(empty($params['model']))
+		if(empty($params['model'])) {
 			echo '<br /><br /><a href="'.\GO::url('maintenance/removeDuplicates', array('delete'=>true)).'">Click here to delete the newest duplicates marked in red.</a>';
-		else
+
+			echo '<br /><br /><a href="'.\GO::url('maintenance/removeDuplicates', array('delete'=>true, 'ignore_links' => true)).'">Click here to delete the newest duplicates marked in red also when they have links.</a>';
+		} else {
 			echo '<br /><br /><a href="'.\GO::url('maintenance/removeDuplicates').'">Show all models.</a>';
+		}
 	}
 	
 	/**

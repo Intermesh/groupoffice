@@ -13,6 +13,7 @@ use go\core\model\User;
 use go\modules\community\addressbook\model\AddressBook;
 use go\core\model\Group;
 use go\core\model\Acl;
+use go\modules\community\addressbook\model\Settings;
 
 /**						
  * @copyright (c) 2018, Intermesh BV http://www.intermesh.nl
@@ -86,6 +87,11 @@ class Module extends core\Module {
 		}
 
 		return parent::afterInstall($model);
+	}
+
+	public function getSettings()
+	{
+		return Settings::get();
 	}
 							
 }

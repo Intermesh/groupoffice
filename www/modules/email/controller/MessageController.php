@@ -12,7 +12,11 @@ use GO\Email\Model\Label;
 use GO\Base\Model\Acl;
 
 use GO\Base\Mail\Imap;
-
+use go\core\model\Acl as GoAcl;
+use go\core\util\ArrayObject;
+use go\modules\community\addressbook\model\Contact;
+use go\modules\community\addressbook\model\Settings;
+use go\modules\community\addressbook\Module;
 
 class MessageController extends \GO\Base\Controller\AbstractController {
 
@@ -448,7 +452,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 
 	private function _link($params, \GO\Base\Mail\Message $message, $tags=array()) {
-		$autoLinkContacts = false;// GO::modules()->addressbook && GO::modules()->savemailas && !empty(GO::config()->email_autolink_contacts);
+
+		$autoLinkContacts = \go\core\model\Module::isInstalled('community','addressbook') &&  Settings::get()->autoLinkEmail;
 		
 
 		if (!empty($params['link']) || $autoLinkContacts || count($tags)) {
@@ -532,12 +537,10 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 //					var_dump($to);
 
 					foreach($to as $email=>$name){
-						//$contact = \GO\Addressbook\Model\Contact::model()->findByEmail($email, \GO\Base\Db\FindParams::newInstance()->permissionLevel(Acl::WRITE_PERMISSION)->single());
-						$stmt = \GO\Addressbook\Model\Contact::model()->findByEmail($email, \GO\Base\Db\FindParams::newInstance()->permissionLevel(Acl::WRITE_PERMISSION)->limit(1));
-						$contact = $stmt->fetch();
+						
+						$contact = Contact::findByEmail($email)->filter(['permissionLevel' => GoAcl::LEVEL_WRITE])->single();
 
-
-						if($contact && !$contact->equals($linkedModels)){						
+						if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){						
 
 							$attributes['acl_id']= $contact->findAclId();
 							
@@ -554,12 +557,12 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 							$linkedEmail->link($contact);
 							
 							// Also link the company to the email if the contact has a company attached to it.
-							if(!empty(GO::config()->email_autolink_companies) && !empty($contact->company_id)){
-								$company = $contact->company;
-								if($company && !$company->equals($linkedModels)){
-									$linkedEmail->link($company);
-								}
-							}
+						// 	if(!empty(GO::config()->email_autolink_companies) && !empty($contact->company_id)){
+						// 		$company = $contact->company;
+						// 		if($company && !$company->equals($linkedModels)){
+						// 			$linkedEmail->link($company);
+						// 		}
+						// 	}
 						}
 					}
 				}
@@ -1759,27 +1762,27 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 * @return StringHelper
 	 */
 	private function _handleAutoContactLinkFromSender(\GO\Email\Model\ImapMessage $imapMessage, $linkedModels) {
-
-		if(false && GO::modules()->addressbook && GO::modules()->savemailas && !empty(GO::config()->email_autolink_contacts)){
+//todo system setting
+		if(GO::modules()->addressbook && GO::modules()->savemailas && Settings::get()->autoLinkEmail){
 
 			$from = $imapMessage->from->getAddress();
 
-			$stmt = \GO\Addressbook\Model\Contact::model()->findByEmail($from['email'], \GO\Base\Db\FindParams::newInstance()->permissionLevel(Acl::WRITE_PERMISSION)->limit(1));
-			$contact = $stmt->fetch();
+			
+			$contact = Contact::findByEmail($from['email'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE])->single();
 
-			if($contact && !$contact->equals($linkedModels)){
+			if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){						
 				\GO\Savemailas\Model\LinkedEmail::model()->createFromImapMessage($imapMessage, $contact);
 
 				$linkedModels[]=$contact;
 				
 				// Also link the company to the email if the contact has a company attached to it.
-				if(!empty(GO::config()->email_autolink_companies) && !empty($contact->company_id)){
-					$company = $contact->company;
-					if($company && !$company->equals($linkedModels)){
-						\GO\Savemailas\Model\LinkedEmail::model()->createFromImapMessage($imapMessage, $company);
-						$linkedModels[] = $company;
-					}
-				}
+				// if(!empty(GO::config()->email_autolink_companies) && !empty($contact->company_id)){
+				// 	$company = $contact->company;
+				// 	if($company && !$company->equals($linkedModels)){
+				// 		\GO\Savemailas\Model\LinkedEmail::model()->createFromImapMessage($imapMessage, $company);
+				// 		$linkedModels[] = $company;
+				// 	}
+				// }
 				
 			}
 		}

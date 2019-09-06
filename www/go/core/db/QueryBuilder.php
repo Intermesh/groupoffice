@@ -207,6 +207,12 @@ class QueryBuilder {
 				$colName = '`' . $tableAndCol[0] .'`.`'.$tableAndCol[1].'`';
 				if($value instanceof Expression) {
 					$updates[] = $colName . ' = ' . $value;
+				} elseif($value instanceof Query) {
+					$build = $value->build();
+
+					$updates[] = $colName . ' = (' . $build['sql'] .')';
+					
+					$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
 				} else
 				{				
 					$paramTag = $this->getParamTag();

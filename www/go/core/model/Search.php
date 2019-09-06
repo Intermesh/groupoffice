@@ -131,12 +131,21 @@ class Search extends AclOwnerEntity {
 							$value = static::convertQuery($value);
 
 							$criteria->where('MATCH (s.name, s.keywords) AGAINST (:keyword1 IN BOOLEAN MODE)')
-							->bind(':keyword1', $value)
-							->bind(':keyword2', $value);
+							->bind(':keyword1', $value);
+							//->bind(':keyword2', $value);
 
 							// Order by relevance
-							$query->orderBy([new Expression('MATCH (s.name, s.keywords) AGAINST (:keyword2 IN BOOLEAN MODE) DESC')]);
+							//$query->orderBy([new Expression('MATCH (s.name, s.keywords) AGAINST (:keyword2 IN BOOLEAN MODE) DESC')]);
 						});					
+	}
+
+	public static function sort(\go\core\orm\Query $query, array $sort)
+	{
+		if(empty($sort)) {
+			$sort['s.modifiedAt'] = 'DESC';
+		}
+
+		return parent::sort($query, $sort);
 	}
 
 	public static function convertQuery($value) {

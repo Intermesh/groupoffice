@@ -123,7 +123,7 @@ class Group extends AclOwnerEntity {
 
 	protected function canCreate()
 	{
-		return GO()->getAuthState()->getUser(['id'])->isAdmin();
+		return GO()->getAuthState()->isAdmin();
 	}
 	
 	private function setDefaultPermissions() {

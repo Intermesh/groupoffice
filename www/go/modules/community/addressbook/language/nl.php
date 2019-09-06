@@ -1,6 +1,6 @@
 <?php
 return array (
-  "salutationTemplate" => 'Geachte [if {{contact.prefixes}}]{{contact.prefixes}}[else][if !{{contact.gender}}]heer/mevrouw[else][if {{contact.gender}}=="M"]heer[else]mevrouw[/if][/if][/if] {{contact.lastName}}',
+  'salutationTemplate' => 'Geachte [if {{contact.prefixes}}]{{contact.prefixes}}[else][if !{{contact.gender}}]heer/mevrouw[else][if {{contact.gender}}=="M"]heer[else]mevrouw[/if][/if][/if] {{contact.lastName}}',
   'Contact' => 'Contactpersoon',
   'Job title' => 'Titel',
   'Gender' => 'Geslacht',
@@ -40,6 +40,7 @@ return array (
     'home' => 'Thuis',
     'mobile' => 'Mobiel',
     'workmobile' => 'Werk mobiel',
+    'fax' => 'Fax',
     'workfax' => 'Werk fax',
   ),
   'Call' => 'Bellen',
@@ -90,4 +91,11 @@ return array (
   'Add all results' => 'Alle resultaten toevoegen',
   'Add selection' => 'Selectie toevoegen',
   'Are you sure you want to select all {count} results?' => 'Weet u zeker dat u alle {count} resultaten wilt selecteren?',
+  'LOB' => 'Branche',
+  'Commented at' => 'Bericht toegevoegd op',
+  'Advanced' => 'Geavanceerd',
+  'Salutation template' => 'Aanhef sjabloon',
+  'Address Book' => 'Adresboek',
+  'E-mail addresses' => 'E-mail adressen',
+  'Sort name by' => 'Sorteer namen op',
 );

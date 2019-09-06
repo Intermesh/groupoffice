@@ -6,7 +6,7 @@ go.Db = (function() {
 		 * Get EntityStore by entity name
 		 * 
 		 * @param {string} entityName eg. "Contact"
-		 * @returns {Boolean|EntityManagerL#1.stores|stores}
+		 * @returns {Boolean|go.data.EntityStore}
 		 */
 		store: function (entityName) {
 			

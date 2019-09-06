@@ -301,28 +301,31 @@ abstract class Property extends Model {
 		return new Mapping(static::class);
 	}
 
+	private static $mapping;
+
 	/**
 	 * Returns the mapping object that is defined in defineMapping()
 	 * 
 	 * @return Mapping;
 	 */
-	public final static function getMapping() {
-
+	public final static function getMapping() {		
 		$cls = static::class;
-		
+		if(isset(self::$mapping[$cls])) {
+			return self::$mapping[$cls];
+		}		
 		$cacheKey = 'mapping-' . str_replace('\\', '-', $cls);
 		
-		$mapping = GO()->getCache()->get($cacheKey);
-		if(!$mapping) {			
-			$mapping = static::defineMapping();			
-			if(!static::fireEvent(self::EVENT_MAPPING, $mapping)) {
+		self::$mapping[$cls] = GO()->getCache()->get($cacheKey);
+		if(!self::$mapping[$cls]) {			
+			self::$mapping[$cls] = static::defineMapping();			
+			if(!static::fireEvent(self::EVENT_MAPPING, self::$mapping[$cls])) {
 				throw new \Exception("Mapping event failed!");
 			}
 			
-			GO()->getCache()->set($cacheKey, $mapping);
+			GO()->getCache()->set($cacheKey, self::$mapping[$cls]);
 		}
 
-		return $mapping;
+		return self::$mapping[$cls];
 	}
 
 	/**
@@ -334,10 +337,15 @@ abstract class Property extends Model {
 		$keys = $this->primaryKeyValues();
 		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
 	}
+
+	static $c;
 	
 	public static function getApiProperties() {		
 		$cacheKey = 'property-getApiProperties-' . str_replace('\\', '-', static::class);
 		
+		if(isset(self::$c[$cacheKey])) {
+			return self::$c[$cacheKey];
+		}
 		$props = GO()->getCache()->get($cacheKey);
 		
 		if(!$props) {
@@ -358,6 +366,7 @@ abstract class Property extends Model {
 			
 			GO()->getCache()->set($cacheKey, $props);
 		}
+		self::$c[$cacheKey] = $props;
 		return $props;
 	}
 	
@@ -532,6 +541,7 @@ abstract class Property extends Model {
 	 */
 	private static function buildSelect(Query $query, array $fetchProperties) {
 
+		$select = [];
 		foreach (self::getMapping()->getTables() as $table) {
 			
 			if($table->isUserTable && !GO()->getUserId()) {
@@ -540,20 +550,23 @@ abstract class Property extends Model {
 			
 			foreach($table->getMappedColumns() as $column) {		
 				if($column->primary || in_array($column->name, $fetchProperties) || static::isProtectedProperty($column->name)) {
-					$query->select($table->getAlias() . "." . $column->name, true);				
+					$select[] = $table->getAlias() . "." . $column->name;
+								
 				}
 			}
 			
 			//also select primary key values separately to check if tables were new when saving. They are stored in $this->primaryKeys when they go through the __set function.
 			foreach($table->getPrimaryKey() as $pk) {				
 				//$query->select("alias.id AS `alias.userId`");
-				$query->select($table->getAlias() . "." . $pk . " AS `" . $table->getAlias() . "." . $pk ."`", true);				
+				$select[] = $table->getAlias() . "." . $pk . " AS `" . $table->getAlias() . "." . $pk ."`";				
 			}
 
 			if(!empty($table->getConstantValues())) {
 				$query->andWhere($table->getConstantValues());
 			}
 		}
+
+		$query->select($select, true);	
 
 		$mappedQuery = static::getMapping()->getQuery();
 		if (isset($mappedQuery)) {

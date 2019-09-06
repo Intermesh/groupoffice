@@ -127,7 +127,7 @@ Le seguenti modifiche sono state effettuate da %s:
   'You can\'t edit this folder' => 'Non puoi modificare questa cartella',
   'File info' => 'Informazioni file',
   'Show folder' => 'Mostra cartella',
-  'Select application to open this file...' => 'Seleziona unâapplicazione per aprire il file',
+  'Select application to open this file...' => 'Seleziona un\'applicazione per aprire il file',
   'Remember my decision for this file type' => 'Ricorda la mia scelta per questo tipo di file',
   'Browse {total} files' => 'Sfoglia {total} files',
   'Browse files' => 'Sfoglia files ',

@@ -250,7 +250,7 @@ class User extends Entity {
 
 	protected function canCreate()
 	{
-		return GO()->getAuthState()->getUser(['id'])->isAdmin();
+		return GO()->getAuthState()->isAdmin();
 	}
 	
 	protected function init() {
@@ -364,7 +364,7 @@ class User extends Entity {
 			return false;
 		}						
 		
-		return App::get()->getAuthState()->getUser()->isAdmin();		
+		return App::get()->getAuthState()->isAdmin();		
 	}
 	
 	protected function internalValidate() {

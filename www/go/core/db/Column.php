@@ -77,7 +77,9 @@ class Column {
 	public $autoIncrement = false;
 
 	/**
-	 * Field type in the database
+	 * Field type in the database without length in lowercase.
+	 * 
+	 * eg. "varchar";
 	 * 
 	 * @var string 
 	 */
@@ -126,7 +128,7 @@ class Column {
 
 
 	/**
-	 * MySQL Data type
+	 * MySQL Data type in uppercase with length
 	 * 
 	 * eg. VARCHAR(100)
 	 * 

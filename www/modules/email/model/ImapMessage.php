@@ -2,6 +2,8 @@
 
 namespace GO\Email\Model;
 
+use go\core\util\StringUtil;
+
 /**
  * A message from the imap server
  * 
@@ -656,8 +658,7 @@ class ImapMessage extends ComposerMessage {
 		
 		return $this->attachments;
 	}
-	
-	
+
 	public function getZipOfAttachmentsUrl(){
 //		return \GO::config()->host.'modules/email/'.
 //		'zip_attachments.php?account_id='.$this->account->id.
@@ -696,10 +697,15 @@ class ImapMessage extends ComposerMessage {
 		foreach($attachments as $attachment){			
 			if($attachment->isVcalendar()){
 				$data = $this->getImapConnection()->get_message_part_decoded($this->uid, $attachment->number, $attachment->encoding);
-				
-				$vcalendar = \GO\Base\VObject\Reader::read($data);
-				if($vcalendar && isset($vcalendar->vevent[0]))
-					return $vcalendar;
+				$data = trim(StringUtil::normalizeCrlf($data));
+				try {
+					$vcalendar = \GO\Base\VObject\Reader::read($data);
+					if($vcalendar && isset($vcalendar->vevent[0]))
+						return $vcalendar;
+				}
+				catch(\Exception $e) {
+					\GO::debug("VObject parser error: ". $e->getMessage());	
+				}
 			}
 		}
 		return false;

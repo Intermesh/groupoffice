@@ -64,9 +64,10 @@ class Csv extends AbstractConverter {
 	public function export(Entity $entity) {
 		
 		$headers = $this->getHeaders($entity);
+		$templateValues = $entity->toTemplate();
 		$record = [];
 		foreach($headers as $header) {
-			$record[$header['name']] = $this->getValue($entity, $header['name']);
+			$record[$header['name']] = $this->getValue($entity, $templateValues, $header['name']);
 		}
 		
 		return $record;
@@ -87,7 +88,7 @@ class Csv extends AbstractConverter {
 	 * @param string $name Column name
 	 * @param string $label Column label
 	 * @param string $many True if this field value should be converted to an array when importing
-	 * @param string $exportFunction Defaults to "export" . ucfirst($name) The function is called with Entity $entity, $columnName
+	 * @param string $exportFunction Defaults to "export" . ucfirst($name) The function is called with Entity $entity, array $templateValues $columnName
 	 * @param string $importFunction Defaults to "import" . ucfirst($name) The import function is called with Entity $entity, $value, array $values
 	 */
 	protected function addColumn($name, $label, $many = false, $exportFunction = null, $importFunction = null) {
@@ -110,30 +111,29 @@ class Csv extends AbstractConverter {
 	/**
 	 * Get a value for a header
 	 * 
-	 * @param Entity $values
+	 * @param Entity $entity
+	 * @param Array $templateValues
 	 * @param string $header Header name delimited with a . for sub properties. eg. "emailAddresses.email"
 	 * @return string
 	 */
-	protected function getValue(Entity $entity, $header) {
+	protected function getValue(Entity $entity, $templateValues, $header) {
 		
 		if(isset($this->customColumns[$header])) {
-			return $this->getCustomColumnValue($entity,$header);
+			return $this->getCustomColumnValue($entity, $templateValues, $header);
 		}
 				
 		$path = explode('.', $header);
 		
-		$v = $entity->toTemplate();
-		
 		foreach($path as $seg) {
 			
-			if(is_array($v)) {
-				if(!isset($v[0])) {		
-					$v = $v[$seg] ?? "";
+			if(is_array($templateValues)) {
+				if(!isset($templateValues[0])) {		
+					$templateValues = $templateValues[$seg] ?? "";
 				} else
 				{
 					$a = [];
 				
-					foreach($v as $i) {
+					foreach($templateValues as $i) {
 						if(is_array($i)) {
 							$a[] = $i[$seg] ?? "";
 						} else
@@ -142,19 +142,19 @@ class Csv extends AbstractConverter {
 						}
 					}
 
-					$v = $a;
+					$templateValues = $a;
 				}
 			}else
 			{
-				$v = $v->$seg ?? "";
+				$templateValues = $templateValues->$seg ?? "";
 			}
 		}
 		
-		return is_array($v) ? implode($this->multipleDelimiter, $v) : $v;
+		return is_array($templateValues) ? implode($this->multipleDelimiter, $templateValues) : $templateValues;
 	}
 	
-	private function getCustomColumnValue(Entity $entity, $header) {
-		return call_user_func([$this, $this->customColumns[$header]['exportFunction']], $entity, $header);
+	private function getCustomColumnValue(Entity $entity, $templateValues, $header) {
+		return call_user_func([$this, $this->customColumns[$header]['exportFunction']], $entity, $templateValues, $header);
 	}
 	
 	private function exportSubFields($record, $v) {

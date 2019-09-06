@@ -365,7 +365,7 @@ abstract class Entity extends Property {
 		if($this->isNew()) {
 			return $this->canCreate() ? Acl::LEVEL_CREATE : false;
 		}
-		return GO()->getAuthState() && GO()->getAuthState()->getUser() && GO()->getAuthState()->getUser()->isAdmin() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
+		return GO()->getAuthState() && GO()->getAuthState()->isAdmin() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
 	}
 	
 	/**
@@ -735,7 +735,9 @@ abstract class Entity extends Property {
 		$arr = [];
 		
 		if(empty($properties)) {
-			$properties = $this->getReadableProperties();
+			$properties = array_filter($this->getReadableProperties(), function($propName) {
+				return !in_array($propName, ['acl', 'permissionLevel']);
+			});
 		}
 
 		foreach ($properties as $propName) {

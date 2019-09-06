@@ -16,7 +16,7 @@ class User extends EntityController {
 	
 	protected function canUpdate(Entity $entity) {
 		
-		if(!GO()->getAuthState()->getUser()->isAdmin()) {
+		if(!GO()->getAuthState()->isAdmin()) {
 			if($entity->isModified('groups')) {
 				return false;
 			}
@@ -40,7 +40,7 @@ class User extends EntityController {
 			throw new InvalidArguments("Missing parameter userId");
 		}
 		
-		if(!GO()->getAuthState()->getUser()->isAdmin()) {
+		if(!GO()->getAuthState()->isAdmin()) {
 			throw new Forbidden();
 		}
 		

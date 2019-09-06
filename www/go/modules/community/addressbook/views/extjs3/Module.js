@@ -211,6 +211,10 @@ go.Modules.register("community", "addressbook", {
 		"go.modules.community.addressbook.SettingsProfilePanel"
 	],
 
+	systemSettingsPanels: [
+		"go.modules.community.addressbook.SystemSettingsPanel",		
+	],
+
 	selectDialogPanels: [
 		"go.modules.community.addressbook.SelectDialogPanel",
 	]

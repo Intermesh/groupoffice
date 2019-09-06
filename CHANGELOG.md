@@ -1,6 +1,34 @@
 - Billing: Fixed tax percentage decimals in PDF
 - Billing: Fixed translation for Quantity / Amount in order items
 
+03-09-2019 6.4.50
+- Bookmarks: Languages readded
+- Bookmarks: Possible to set permissions on category
+- Projects: Sub project link does not navigate to the start page anymore
+- Address Book: Unable to unstar
+- Address book: Change in telephone links so you can select the text
+- Core: Link browser didn't paginate. It loaded all links which could be very slow.
+- Email: Template variables work_fax and work_mobile didn't work
+- Core: Image viewer has print and open in browser button
+- E-mail: In print small part of subject could be missing
+- Core: Keep scroll position on delete in grids but move to top when paging
+- Email: Address book dialog works for cc and bcc
+- Email: Select newsletter lists in composer address book
+- Core: Updated NL and IT translations
+- Core: CSV export was very inefficient. Speed improved dramatically.
+- Newsletters: Removed CAST() function from query to support older MySQL versions
+- Address book: Shrink to fit data when migrating custom fields and row size is too large during migration
+- Billing: fixed missing company name in recipient
+- E-mail: Fixed ICS parsing error. Fixed #440
+- Projects: Added permission type to detail view
+
+02-09-2019 6.4.49
+- Core: Fixed link date not displaying in link browser
+- Address book: Added initials field
+- Core: Dismiss icon missing in reminders
+- Core: order global search by modified date
+- Address book: System setting to automatically link e-mail to contacts
+
 30-08-2019 6.4.48
 - Core: Install comments and bookmarks by default
 - Core: Fixed demo data

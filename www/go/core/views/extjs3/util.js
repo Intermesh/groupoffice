@@ -114,7 +114,7 @@ go.util =  (function () {
 				console.error('Async: Could not copy text: ', err);
 			});
 		},
-
+		
 		/**
 		 * Launch email composer
 		 * 
@@ -122,19 +122,19 @@ go.util =  (function () {
 		 * @return {undefined}
 		 */
 		mailto: function (config, event) {
-			// event.preventDefault();
-			// var email = config.email;
+			event.preventDefault();
+			var email = config.email;
 
-			// if (config.name) {
-			// 	email = '"' + config.name.replace(/"/g, '\\"') + '" <' + config.email + '>';
-			// }
+			if (config.name) {
+				email = '"' + config.name.replace(/"/g, '\\"') + '" <' + config.email + '>';
+			}
 
-			// document.location = "mailto:" + email;
+			document.location = "mailto:" + email;
 		},
 
 		callto: function (config, event) {
-			// event.preventDefault();
-			// document.location = "tel://" + config.number;
+			event.preventDefault();
+			document.location = "tel://" + config.number;
 		},
 
 		streetAddress: function (config) {

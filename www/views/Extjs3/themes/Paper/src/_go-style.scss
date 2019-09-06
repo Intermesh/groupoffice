@@ -360,8 +360,8 @@ a {
 		min-height: dp(40);
 		padding: dp(8) 0;
 		padding-left: dp(16);
-		border:0;
-		margin:0;
+		// border:0;
+		// margin:0;
 		cursor:pointer;
 		&.x-view-selected i {
 			@include var(color, c-primary);
@@ -386,8 +386,16 @@ a {
 			}
 		}
 
+		&.divider {
+			border-bottom: 1px solid color($fg, 'line');
+			padding-bottom: dp(16);
+			margin-bottom: dp(8);
+		}
   }
 }
+
+
+
 
 #mainNorthPanel {
 	height: dp(56);
@@ -1093,7 +1101,7 @@ button.filetype-pdf, button.filetype-doc {
 		margin: 0;
 		width: 100%;
 		span, a {
-			display: block;
+			display: inline-block;
 			min-height: dp(24);
 		}
 		
@@ -1894,3 +1902,5 @@ table[id^="comments-ext"] b {
 .silk-cross { background-image: url(/img/icons/silk/cross.png) !important; background-repeat: no-repeat; }
 .silk-stop { background-image: url(/img/icons/silk/stop.png) !important; background-repeat: no-repeat; }
 .silk-arrow-up { background-image: url(/img/icons/silk/arrow_up.png) !important; background-repeat: no-repeat; }
+
+

@@ -42,13 +42,48 @@ GO.files.ImageViewer = Ext.extend(GO.Window, {
 			iconCls: 'btn-download',
 			text: t("Download"),
 			handler: function(){
-				window.open(this.viewerImages[this.currentImgIndex].download_path);
+				document.location = this.viewerImages[this.currentImgIndex].download_path;
 			},
 			scope: this
-		},'-',
+		},{
+			iconCls: 'ic-open-in-browser',
+			text: t("Open in browser"),
+			handler: function(){
+				window.open(this.viewerImages[this.currentImgIndex].src);
+			},
+			scope: this
+		},{
+			iconCls: 'ic-print',
+			text: t("Print"),
+			handler: function() {
+				function PrintHtml(source, title) {
+					return "<html><head><title>" + Ext.encode(title) + "</title><script>function step1(){\n" +
+									"setTimeout('step2()', 10);}\n" +
+									"function step2(){window.print();window.close()}\n" +
+									"</scri" + "pt></head><body onload='step1()'>\n" +
+									"<img src='" + source + "' /></body></html>";
+				}
+				
+				function closePrint () {
+					if ( win ) {
+						win.close();
+					}
+				}
+				
+				var win = window.open('about:blank', "_new");
+				win.document.open();
+				win.document.write(PrintHtml(this.viewerImages[this.currentImgIndex].src, this.viewerImages[this.currentImgIndex].name));
+				win.document.close();
+				win.onbeforeunload = closePrint;
+				win.onafterprint = closePrint;
+			
+			},
+			scope: this
+
+		}, '-',
 		this.normalSizeBtn=new Ext.Button({
 			text: t("Normal size", "files"),
-			iconCls: 'zoom-in',
+			iconCls: 'ic-zoom-in',
 			handler: function(){
 				this.loadImage(this.currentImgIndex, true);
 			},
@@ -56,7 +91,7 @@ GO.files.ImageViewer = Ext.extend(GO.Window, {
 		}),
 		this.fitImageBtn=new Ext.Button({
 			text: t("Fit image", "files"),
-			iconCls: 'zoom-out',
+			iconCls: 'ic-zoom-out-map',
 			handler: function(){
 				this.syncImgSize();
 			},

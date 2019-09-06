@@ -153,11 +153,16 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					listeners: {
 						scope: this,
 						afterrender: function(box) {
-							
-							box.getEl().on('click', function(e){								
+							box.getEl().on('click', function(e) {		
+								
+								//don't execute when user selects text
+								if(window.getSelection().toString().length > 0) {
+									return;
+								}
+								
 								var container = box.getEl().dom.firstChild, 
-								item = e.getTarget("a", box.getEl()),
-								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);						
+								item = e.getTarget("a"),								
+									i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);									
 							
 								go.util.mailto({
 									email: this.data.emailAddresses[i].email,
@@ -169,7 +174,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					},
 					tpl: '<div class="icons">\
 						<tpl for="emailAddresses">\
-							<a class="s6" href="mailto:{email}"><tpl if="xindex == 1"><i class="icon label">email</i></tpl>\
+							<a><tpl if="xindex == 1"><i class="icon label">email</i></tpl>\
 							<span>{email}</span>\
 							<label>{[t("emailTypes")[values.type] || values.type]}</label>\
 							</a>\
@@ -184,14 +189,22 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						scope: this,
 						afterrender: function(box) {
 							
-							box.getEl().on('click', function(e){								
+							box.getEl().on('click', function(e){				
+								
+								//don't execute when user selects text
+								if(window.getSelection().toString().length > 0) {
+									return;
+								}
+
 								var container = box.getEl().dom.firstChild, 
-								item = e.getTarget("a", box.getEl()),
+								item = e.getTarget("a"),
 								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);						
 							
 								go.util.callto({
 									number: this.data.phoneNumbers[i].number.replace(/[^0-9+]/g, ""),
-									name: dv.name
+									name: this.data.name,
+									entity: "Contact",
+									entityId: this.data.id
 								}, e);
 
 							}, this);
@@ -199,7 +212,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					},
 					tpl: '<div class="icons">\
 						<tpl for="phoneNumbers">\
-							<a class="s6" href="tel://{[values.number.replace(/[^0-9+]/g, "")]}"><tpl if="xindex == 1"><i class="icon label">phone</i></tpl>\
+							<a><tpl if="xindex == 1"><i class="icon label">phone</i></tpl>\
 							<span>{number}</span>\
 							<label>{[t("phoneTypes")[values.type] || values.type]}</label>\
 							</a>\
@@ -388,3 +401,5 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 
 	}
 });
+
+

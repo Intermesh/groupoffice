@@ -282,11 +282,11 @@ GO.email.EmailComposer = function(config) {
 						scope: this,
 						
 						selectSingleEmail: function(name, email, id, entityName) {
-							fillSingleRecipient.call(this, this.toCombo, name, email, id, entityName);							
+							fillSingleRecipient.call(this, this.ccCombo, name, email, id, entityName);							
 						},
 
 						selectMultiple: function(ids, entityName) {
-							fillMultipleRecipients.call(this, this.toCombo, ids, entityName);
+							fillMultipleRecipients.call(this, this.ccCombo, ids, entityName);
 						}
 					});
 					select.show();
@@ -315,11 +315,11 @@ GO.email.EmailComposer = function(config) {
 						scope: this,
 						
 						selectSingleEmail: function(name, email, id, entityName) {
-							fillSingleRecipient.call(this, this.toCombo, name, email, id, entityName);							
+							fillSingleRecipient.call(this, this.bccCombo, name, email, id, entityName);							
 						},
 
 						selectMultiple: function(ids, entityName) {
-							fillMultipleRecipients.call(this, this.toCombo, ids, entityName);
+							fillMultipleRecipients.call(this, this.bccCombo, ids, entityName);
 						}
 					});
 					select.show();

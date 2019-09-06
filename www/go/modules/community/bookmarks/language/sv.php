@@ -1,0 +1,22 @@
+<?php
+return array (
+  'Bookmark' => 'Bokmärke',
+  'Category' => 'Kategori',
+  'Title' => 'Titel',
+  'Logo' => 'Logotyp',
+  'Open in new browser tab' => 'Öppna i ny webläsartab',
+  'Administrate categories' => 'Administrera kategorier',
+  'Thumbnails' => 'Miniatyrer',
+  'Choose icon for bookmark' => 'Välj ikon för bokmärke',
+  'Clear Logo' => 'Töm logotyp',
+  'Upload Logo' => 'Ladda upp logotyp',
+  'Show all' => 'Visa alla',
+  'Shared category' => 'Delad kategori',
+  'Behave as a module (Browser reload required)' => 'Uppträd som en modul (Kräver omläsning av sidan)',
+  'Are you sure you want to delete this bookmark?' => 'Är du säker på att du vill radera detta bokmärke?',
+  'General' => 'Allmänt',
+  'Search the web' => 'Sök på webben',
+  'name' => 'Bokmärken',
+  'description' => 'Beskrivning av webplats.',
+  'Bookmarks' => 'Bokmärken',
+);

@@ -38,6 +38,6 @@ class DateTime extends Base {
 
 	public function dbToText($value, &$values)
 	{
-		return $value instanceof \DateTime ? $value->format(GO()->getAuthState()->getUser()->getDateTimeFormat()) : $value;
+		return $value instanceof \DateTime ? $value->format(GO()->getAuthState()->getUser(['dateFormat','timeformat'])->getDateTimeFormat()) : $value;
 	}
 }

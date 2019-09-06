@@ -173,7 +173,7 @@ class Table {
 		$c->nullAllowed = strtoupper($field['Null']) == 'YES';
 		$c->autoIncrement = strpos($field['Extra'], 'auto_increment') !== false;
 		$c->trimInput = false;
-		$c->dataType = $field['Type'];
+		$c->dataType = strtoupper($field['Type']);
 
 		preg_match('/(.*)\(([1-9].*)\)/', $field['Type'], $matches);		
 		if ($matches) {

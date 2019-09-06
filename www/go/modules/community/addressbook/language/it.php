@@ -52,4 +52,5 @@ return array (
   'URL type' => 'Tipo url',
   'URL number' => 'Url',
   'Add phone number' => 'Aggiungo numero telefono',
+  'salutationTemplate' => 'Dear [if {{contact.prefixes}}]{{contact.prefixes}}[else][if !{{contact.gender}}]Ms./Mr.[else][if {{contact.gender}}=="M"]Mr.[else]Ms.[/if][/if][/if] {{contact.lastName}}',
 );

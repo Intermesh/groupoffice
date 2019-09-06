@@ -32,6 +32,15 @@
 		 * @param {Ext.Panel} pnl 
 		 */
 		
+		addSelection : function(pnl) {
+			var me = this;
+			pnl.addSelection().then(function (ids) {
+				me.selectMultiple.call(me.scope, ids, me.tabPanel.getActiveTab().entityName);
+				me.close();
+			}).catch(function() {
+				me.close();
+			});
+		},
 
 		initComponent: function () {
 
@@ -59,13 +68,7 @@
 				this.addSelectionButton = new Ext.Button({
 					text: t("Add selection"),
 					handler: function () {
-						var me = this;
-						this.tabPanel.getActiveTab().addSelection().then(function (ids) {
-							me.selectMultiple.call(me.scope, ids, me.tabPanel.getActiveTab().entityName);
-							me.close();
-						}).catch(function() {
-							me.close();
-						});
+						this.addSelection(this.tabPanel.getActiveTab());
 					},
 					scope: this
 					// disabled: true
@@ -111,6 +114,7 @@
 				for(i1 = 0, l2 = config.selectDialogPanels.length; i1 < l2; i1++) {
 					pnl = eval(config.selectDialogPanels[i1]);				
 					var p = new pnl;
+					p.dialog = this;
 
 					if(this.entities && this.entities.indexOf(p.entityName) == -1) {
 						continue;

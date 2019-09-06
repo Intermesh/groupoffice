@@ -438,26 +438,23 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	
 	private function userChange(Entity $entity) {
 		$data = [
-				'modSeq' => $this->nextUserModSeq()			
-						];
-
-		$where = [
+				'modSeq' => $this->nextUserModSeq(),						
 				'entityTypeId' => $this->id,
 				'entityId' => $entity->id(),
 				'userId' => GO()->getUserId()
 						];
 
-		$stmt = GO()->getDbConnection()->update('core_change_user', $data, $where);
+		$stmt = GO()->getDbConnection()->replace('core_change_user', $data);
 		if(!$stmt->execute()) {
 			throw new \Exception("Could not save user change");
 		}
 
-		if(!$stmt->rowCount()) {
-			$where['modSeq'] = 1;
-			if(!GO()->getDbConnection()->insert('core_change_user', $where)->execute()) {
-				throw new \Exception("Could not save user change");
-			}
-		}
+		// if(!$stmt->rowCount()) {
+		// 	$where['modSeq'] = 1;
+		// 	if(!GO()->getDbConnection()->insert('core_change_user', $where)->execute()) {
+		// 		throw new \Exception("Could not save user change");
+		// 	}
+		// }
 	}
 	
 	/**
