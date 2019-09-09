@@ -1,3 +1,5 @@
+- Core: Normalizing strings could corrupt UTF8
+
 03-09-2019 6.4.50
 - Bookmarks: Languages readded
 - Bookmarks: Possible to set permissions on category

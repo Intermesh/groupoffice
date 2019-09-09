@@ -33,7 +33,11 @@ go.filter.Conditions = Ext.extend(go.form.FormGroup, {
 		var v = [];
 		
 		for(var i = 0, l = conditions.length; i < l; i++) {
-			var condition = conditions[i];
+			var condition = conditions[i];			
+			if(!Ext.isObject(condition)) {
+				//invalid filter
+				continue;
+			}
 			for(var name in condition) {
 				v.push({
 					name: name,
