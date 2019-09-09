@@ -1,4 +1,6 @@
+09-09-2019 6.4.51
 - Core: Normalizing strings could corrupt UTF8
+- Address book: Filters were broken
 
 03-09-2019 6.4.50
 - Bookmarks: Languages readded
