@@ -181,7 +181,7 @@ EOD;
 					'model' => $modelName
 			];
 
-			$controllerTpl = file_get_contents(__DIR__ . '/../Controller.tpl');
+			$controllerTpl = file_get_contents(__DIR__ . '/../../Controller.tpl');
 
 			foreach ($replacements as $key => $value) {
 				$controllerTpl = str_replace('{' . $key . '}', $value, $controllerTpl);
