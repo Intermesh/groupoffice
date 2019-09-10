@@ -134,12 +134,18 @@ abstract class AclItemEntity extends AclEntity {
 			$keys[$to] = $this->{$from};
 		}
 
-		return $cls::find()->where($keys)->single();	
+		$aclEntity = $cls::find()->where($keys)->single();	
+
+		if(!$aclEntity) {
+			throw new \Exception("Can't find related ACL entity. The keys must be invalid: " . var_export($keys, true));
+		}
+	
+		return $aclEntity;
 	}
 
 	public function getPermissionLevel() {
 		$aclEntity = $this->getAclEntity();
-
+		
 		return $aclEntity->getPermissionLevel(); 
 	}
 

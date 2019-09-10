@@ -264,7 +264,7 @@ class MigrateCustomFields63to64 {
 		//Value is string <id>:<Text>
 		$parts = explode(':', $v);
 		
-		if(count($parts) < 1){
+		if(count($parts) < 2){
 			return null;
 		}
 		

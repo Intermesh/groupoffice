@@ -63,11 +63,11 @@ class PrincipalBackend extends AbstractBackend {
 		GO()->debug('GO\DAV\Auth\Backend::getUsers()');
 
 		if (!isset($this->users)) {
-			$this->users = [];
-			$users = User::find(['id', 'username', 'displayName', 'email']);//->filter(['permissionLevel' => \go\core\model\Acl::LEVEL_READ]);
-			foreach($users as $user) {
-				$this->users[] = $this->modelToDAVUser($user);
-			}
+			//$this->users = [];
+			// $users = User::find(['id', 'username', 'displayName', 'email']);
+			// foreach($users as $user) {
+				$this->users = [$this->modelToDAVUser(go()->getAuthState()->getUser(['id', 'username', 'displayName', 'email']))];
+			// }
 		}
 		return $this->users;
 	}

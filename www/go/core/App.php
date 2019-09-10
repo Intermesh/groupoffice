@@ -49,6 +49,11 @@ use const GO_CONFIG_FILE;
 		const EVENT_HEAD = 'head';
 
 		/**
+		 * Fires after all scripts have been loaded
+		 */
+		const EVENT_SCRIPTS = 'scripts';
+
+		/**
 		 *
 		 * @var Connection
 		 */
