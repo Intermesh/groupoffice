@@ -101,4 +101,16 @@ class User extends EntityController {
 	public function changes($params) {
 		return $this->defaultChanges($params);
 	}
+
+	public function export($params) {
+		return $this->defaultExport($params);
+	}
+
+	public function import($params) {
+		return $this->defaultImport($params);
+	}
+
+	public function importCsvMapping($params) {
+		return $this->defaultImportCSVMapping($params);
+	}
 }

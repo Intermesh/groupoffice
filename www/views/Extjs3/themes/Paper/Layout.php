@@ -71,7 +71,12 @@ $lang = GO::language()->getLanguage(); ?>
 	<div id="sound"></div>
 	<!--Putting scripts in div will speed up developer tools because they don't have to show all those nodes-->
 	<div id="scripts-container">
-		<?php require(\GO::config()->root_path.'views/Extjs3/default_scripts.inc.php'); ?>
+		<?php 
+		
+		require(\GO::config()->root_path.'views/Extjs3/default_scripts.inc.php'); 
+		
+		GO()->fireEvent(App::EVENT_SCRIPTS);
+		?>
 	</div>
 </body>
 </html>

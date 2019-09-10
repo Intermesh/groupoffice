@@ -108,14 +108,24 @@ abstract class AbstractConverter {
 					continue;
 				}
 
+				go()->getDbConnection()->beginTransaction();
+
 				$entity->save();
 
-				if($entity->hasValidationErrors()) {
-					$response['errors'][] = $entity->getValidationErrors();				
-				} else
-				{
-					$response['count']++;
-				}
+				if($this->afterSave($entity)) {
+					go()->getDbConnection()->commit();	
+
+					if($entity->hasValidationErrors()) {
+						$response['errors'][] = $entity->getValidationErrors();				
+					} else
+					{
+						$response['count']++;
+					}
+
+				} else{
+					go()->getDbConnection()->rollBack();
+					$response['errors'][] = "Import afterSave returned false";				
+				}				
 			}
 			catch(Exception $e) {
 				ErrorHandler::logException($e);
@@ -125,6 +135,12 @@ abstract class AbstractConverter {
 		
 		return $response;
 	}
+
+
+	protected function afterSave(Entity $entity) {
+		return true;
+	}
+
 	/**
 	 * Handle's the import. 
 	 * 
@@ -136,7 +152,7 @@ abstract class AbstractConverter {
 	 * @param resource $fp
 	 * @param int $index
 	 * @param array $params
-	 * @return $entity|false
+	 * @return Entity|false
 	 */
 	abstract protected function importEntity(Entity $entity, $fp, $index, array $params);
 	
