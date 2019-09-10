@@ -1,8 +1,12 @@
+10-09-2019 6.4.52
 - Caldav: events with status needs-action were not synced. Change status to needs-action to tentative as needs-action is not a valid vevent status. 
 - Carddav: Create with vcard 4.0 format was broken (davdroid)
 - Core: Added user import with ability to create mailbox on mailserver too
 - Serverclient: Fixed missing domain checkboxes in user dialog
 - Core: Fixed bug in custom fields migration
+- E-mail: Set pasted image filename
+- Address book: contact:city tag was not parsed
+- ActiveSync: Fixed timezone issue with all day events
 
 09-09-2019 6.4.51
 - Core: Normalizing strings could corrupt UTF8
