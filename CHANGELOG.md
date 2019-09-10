@@ -1,3 +1,5 @@
+- Billing: Fixed group summary gross total in PDF.
+
 09-09-2019 6.4.51
 - Core: Normalizing strings could corrupt UTF8
 - Address book: Filters were broken
