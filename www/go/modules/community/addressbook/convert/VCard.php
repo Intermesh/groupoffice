@@ -183,7 +183,7 @@ class VCard extends AbstractConverter {
 
 	private function importDate(Contact $contact, $type, $date) {
 			
-		$bday = $contact->findDateByType($type);
+		$bday = $contact->findDateByType($type, false);
 
 		if (!empty($date)) {
 			if (!$bday) {
