@@ -332,7 +332,7 @@ class Contact extends AclItemEntity {
 						->addArray('emailAddresses', EmailAddress::class, ['id' => 'contactId'])
 						->addArray('addresses', Address::class, ['id' => 'contactId'])
 						->addArray('urls', Url::class, ['id' => 'contactId'])
-						->addArray('groups', ContactGroup::class, ['id' => 'contactId']);						
+						->addScalar('groups', 'addressbook_contact_group', ['id' => 'contactId']);						
 	}
 	
 	public function setNameFromParts() {
@@ -574,6 +574,11 @@ class Contact extends AclItemEntity {
 		return $this->saveOriganizationIds();
 		
 	}
+
+	protected function internalDelete()
+	{
+		return parent::internalDelete();
+	}
 	
 	protected function internalValidate() {		
 		
@@ -588,8 +593,8 @@ class Contact extends AclItemEntity {
 		if($this->isModified('addressBookId') || $this->isModified('groups')) {
 			//verify groups and address book match
 			
-			foreach($this->groups as $group) {
-				$group = Group::findById($group->groupId);
+			foreach($this->groups as $groupId) {
+				$group = Group::findById($groupId);
 				if($group->addressBookId != $this->addressBookId) {
 					$this->setValidationError('groups', ErrorCode::INVALID_INPUT, "The contact groups must match with the addressBookId. Group ID: ".$group->id." belongs to ".$group->addressBookId." and the contact belongs to ". $this->addressBookId);
 				}

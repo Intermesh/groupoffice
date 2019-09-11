@@ -264,11 +264,13 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 
 	//when filtering on a group then offer to delete contacts from a group when delting.
 	deleteSelected: function () {
-		if (!this.store.baseParams.filter.groupId) {
+
+		var filter = this.store.getFilter('addressbooks');
+		if (!filter.groupId) {
 			return go.grid.GridTrait.deleteSelected.call(this);
 		}
 
-		var groupId = this.store.baseParams.filter.groupId;
+		var groupId = filter.groupId;
 
 		var selectedRecords = this.getSelectionModel().getSelections(), ids = selectedRecords.column('id'), strConfirm;
 
@@ -302,7 +304,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 
 
 					selectedRecords.forEach(function (r) {
-						var groupIndex = r.json.groups.column("groupId").indexOf(groupId);
+						var groupIndex = r.json.groups.indexOf(groupId);
 //							console.log(groupIndex, groupId, r.json.groups);
 						updates[r.id] = {
 							groups: GO.util.clone(r.json.groups)
