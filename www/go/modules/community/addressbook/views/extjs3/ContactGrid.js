@@ -65,7 +65,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 							}
 
 							var sortState = store.getSortState();
-							if(sortState.field != "name" && sortState.field != "firstName") {
+							if(sortState.field != "name" && sortState.field != "firstName"  && sortState.field != "lastName") {
 								return "";
 							}
 							
