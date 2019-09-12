@@ -359,7 +359,13 @@ go.util =  (function () {
 										Ext.MessageBox.alert(t("Error"), response.errors.join("<br />"));
 									} else
 									{
-										Ext.MessageBox.alert(t("Success"), t("Imported {count} items").replace('{count}', response.count));
+										var msg = t("Imported {count} items").replace('{count}', response.count) + ". ";;
+
+										if(response.errors && response.errors.length) {
+											msg += t("{count} items failed to import. A log follows: <br /><br />").replace('{count}', response.errors.length) + response.errors.join("<br />");
+										}
+										
+										Ext.MessageBox.alert(t("Success"), msg);
 									}
 
 									// if (callback) {
