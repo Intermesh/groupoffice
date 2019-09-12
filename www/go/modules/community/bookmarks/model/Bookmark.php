@@ -1,7 +1,7 @@
 <?php
 namespace go\modules\community\bookmarks\model;
-						
-use go\core\jmap\Entity;
+
+use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
 use go\core\orm\Query;
 use go\modules\community\bookmarks\controller\Bookmark as GoBookmark;
@@ -14,7 +14,7 @@ use go\modules\community\bookmarks\controller\Bookmark as GoBookmark;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 
-class Bookmark extends Entity {
+class Bookmark extends AclItemEntity {
 	
 	/**
 	 * 
@@ -96,5 +96,18 @@ class Bookmark extends Entity {
 		if(!empty($response['logo'])) {
 			$this->logo = $response['logo'];
 		}
+	}
+
+	protected static function aclEntityClass() {
+		return Category::class;
+	}
+
+	/**
+	 * Get the keys for joining the aclEntityClass table.
+	 * 
+	 * @return array eg. ['folderId' => 'id']
+	 */
+	protected static function aclEntityKeys() {
+		return ['categoryId' => 'id'];
 	}
 }

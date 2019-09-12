@@ -1,3 +1,6 @@
+- Billing: Fixed tax percentage decimals in PDF
+- Billing: Fixed translation for Quantity / Amount in order items
+
 10-09-2019 6.4.52
 - Caldav: events with status needs-action were not synced. Change status to needs-action to tentative as needs-action is not a valid vevent status. 
 - Carddav: Create with vcard 4.0 format was broken (davdroid)
