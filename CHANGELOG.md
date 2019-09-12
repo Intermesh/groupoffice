@@ -1,6 +1,8 @@
+12-09-2019 6.4.53
 - Billing: Fixed tax percentage decimals in PDF
 - Billing: Fixed translation for Quantity / Amount in order items
 - Carddav: Fixed Birthdays on carddav not synced #410
+- Core: Import function shows error messages per line
 
 10-09-2019 6.4.52
 - Caldav: events with status needs-action were not synced. Change status to needs-action to tentative as needs-action is not a valid vevent status. 
