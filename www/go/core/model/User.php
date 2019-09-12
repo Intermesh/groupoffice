@@ -326,6 +326,28 @@ class User extends Entity {
 		$this->plainPassword = $password;
 	}
 
+	/**
+	 * Check if this user has a password stored in the database.
+	 * 
+	 * Used by authenticators (IMAP or LDAP) so they can clear it if it's not needed.
+	 * 
+	 * @return bool
+	 */
+	public function hasPassword() {
+		return !empty($this->password);
+	}
+
+	/**
+	 * Clear the password stored in the database.
+	 * 
+	 * Used by authenticators (IMAP or LDAP) so they can clear it if it's not needed.
+	 * 
+	 * @return bool
+	 */
+	public function clearPassword() {
+		return go()->getDbConnection()->delete('core_auth_password', ['userId' => $this->id])->execute();
+	}
+
 	public function getPassword() {
 		return null;
 	}

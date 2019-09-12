@@ -57,6 +57,8 @@ class Authenticator extends PrimaryAuthenticator {
 		$user = User::find()->where(['username' => $username])->single();
 		if(!$user) {
 			$user = $this->createUser($username);
+		} else if($user->hasPassword()){
+			$user->clearPassword();
 		}
 		
 		foreach($server->groups as $group) {

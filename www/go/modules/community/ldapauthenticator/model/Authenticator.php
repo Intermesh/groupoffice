@@ -79,6 +79,8 @@ class Authenticator extends PrimaryAuthenticator {
 		$user = User::find()->where(['username' => $username])->single();
 		if(!$user) {
 			$user = new User();
+		}else if($user->hasPassword()){
+			$user->clearPassword();
 		}
 
 		Module::ldapRecordToUser($username, $record, $user);

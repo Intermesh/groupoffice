@@ -102,7 +102,7 @@ try {
 	 */
 	function getToken($data) {		
 		//loop through all auth methods
-		$authMethods = Method::find()->orderBy(['sortOrder' => 'ASC']);
+		$authMethods = Method::find()->orderBy(['sortOrder' => 'DESC']);
 		foreach ($authMethods as $method) {
 			$authenticator = $method->getAuthenticator();
 			if (!($authenticator instanceof PrimaryAuthenticator)) {
@@ -111,9 +111,14 @@ try {
 			if (!$authenticator->isAvailableFor($data['username'])) {
 				continue;
 			}
+
+			go()->log("Trying: " . get_class($authenticator));
 			if (!$user = $authenticator->authenticate($data['username'], $data['password'])) {
+				go()->log("failed");
 				return false;
 			}
+
+			go()->log("success");
 			
 			if(!$user->enabled) {				
 				output([], 403, GO()->t("You're account has been disabled."));
