@@ -684,6 +684,9 @@ abstract class EntityController extends Controller {
 	 * @throws Exception
 	 */
 	protected function defaultImport($params) {
+
+		ini_set('max_execution_time', 10 * 60);
+		
 		$params = $this->paramsImport($params);
 		
 		$blob = Blob::findById($params['blobId']);	
@@ -707,8 +710,6 @@ abstract class EntityController extends Controller {
 	 * @throws Exception
 	 */
 	protected function defaultImportCSVMapping($params) {
-
-		ini_set('max_execution_time', 10 * 60);
 		
 		$blob = Blob::findById($params['blobId']);	
 		

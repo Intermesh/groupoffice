@@ -25,6 +25,7 @@ class System extends Controller {
 		GO()->setCache(new \go\core\cache\None());	
 		Table::destroyInstances();
 		\GO::session()->runAsRoot();	
+		date_default_timezone_set("UTC");
 		GO()->getInstaller()->upgrade();
 		
 		echo "Done!\n";

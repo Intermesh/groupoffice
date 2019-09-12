@@ -51,6 +51,8 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 	 */
 	public $salutationTemplate;
 
+	public $groups;
+
 	protected function init()
 	{
 		
@@ -63,7 +65,8 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable("addressbook_addressbook", "a");
+						->addTable("addressbook_addressbook", "a")
+						->addScalar('groups', 'addressbook_group', ['id' => 'addressBookId']);
 	}
 
 
@@ -71,19 +74,19 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 		return "addressbook/" . File::stripInvalidChars($this->name);
 	}
 	
-	/**
-	 * Get the group ID's
-	 * 
-	 * @return int[]
-	 */
-	public function getGroups() {
-		return (new \go\core\db\Query)
-						->selectSingleValue('id')
-						->from("addressbook_group")
-						->where(['addressBookId' => $this->id])
-						->all();
+	// /**
+	//  * Get the group ID's
+	//  * 
+	//  * @return int[]
+	//  */
+	// public function getGroups() {
+	// 	return (new \go\core\db\Query)
+	// 					->selectSingleValue('id')
+	// 					->from("addressbook_group")
+	// 					->where(['addressBookId' => $this->id])
+	// 					->all();
 						
-	}
+	// }
 	
 	/**
 	 * Find or create a default address book for the user

@@ -337,7 +337,7 @@ class GO{
 	/**
 	 * Get the logged in user
 	 *
-	 * @return \GO\Base\Model_User The logged in user model
+	 * @return \GO\Base\Model\User The logged in user model
 	 */
 	public static function user(){
 		return self::session()->user();
