@@ -273,6 +273,9 @@ class Link extends Entity {
 		//make sure the description and name are set so they are returned to the client
 		if(!isset($this->toSearchId) || !isset($this->aclId)) {
 			$search = Search::find()->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
+			if(!$search) {
+				throw new \Exception("Could not find entity from search cache. Please run System settings -> Tools -> Update search index")
+			}
 			$this->toDescription = $search->description;
 			$this->toName = $search->name;
 			$this->toSearchId = $search->id;
