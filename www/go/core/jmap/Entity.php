@@ -80,7 +80,7 @@ abstract class Entity  extends OrmEntity {
 	protected function internalDelete() {
 		
 		if(self::$trackChanges) {
-			$this->changeReferencedEntities();
+			$this->changeReferencedEntities([$this->id]);
 		}
 
 		if(!parent::internalDelete()) {
@@ -97,12 +97,17 @@ abstract class Entity  extends OrmEntity {
 		return true;
 	}	
 
+	// public static function markChangesForDelete(array $ids, $aclId = null) {
+	// 	static::changeReferencedEntities($ids);
+	// 	static::entityType()->changes(array_map(function($id) { return ['entityId' => $id, 'aclId' => $aclId, 'destroyed' => true];}, $ids));
+	// }
+
 	/**
 	 * This function finds all entities that might change because of this delete. 
 	 * This happens when they have a foreign key constraint with SET NULL
 	 */
-	private function changeReferencedEntities() {
-		foreach($this->getEntityReferences() as $r) {
+	private static function changeReferencedEntities($ids) {
+		foreach(static::getEntityReferences() as $r) {
 			$cls = $r['cls'];			
 
 			$isAclOwnerEntity = is_a($cls, AclOwnerEntity::class, true);
@@ -114,9 +119,9 @@ abstract class Entity  extends OrmEntity {
 				if(!empty($path)) {
 					//TODO joinProperites only joins the first table.
 					$query->joinProperties($path);
-					$query->where(array_pop($path) . '.' .$r['column'], '=', $this->id);
+					$query->where(array_pop($path) . '.' .$r['column'], 'IN', $ids);
 				} else{
-					$query->where($r['column'], '=', $this->id);					
+					$query->where($r['column'], 'IN', $ids);					
 				}
 
 				$query->select($query->getTableAlias() . '.id AS entityId');

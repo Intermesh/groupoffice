@@ -266,7 +266,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 	deleteSelected: function () {
 
 		var filter = this.store.getFilter('addressbooks');
-		if (!filter.groupId) {
+		if (!filter || !filter.groupId) {
 			return go.grid.GridTrait.deleteSelected.call(this);
 		}
 
