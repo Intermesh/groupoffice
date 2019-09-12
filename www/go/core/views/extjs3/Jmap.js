@@ -101,9 +101,6 @@ go.Jmap = {
 		if(Ext.isEmpty(file))
 			return;
 
-		var fileType = file.type;
-		if(fileType = 'application/vnd.ms-excel') fileType = 'text/csv'; // bug when MSExcel is installed
-
 		Ext.Ajax.request({url: go.User.uploadUrl,
 			success: function(response) {
 				if(cfg.success && response.responseText) {
@@ -119,7 +116,7 @@ go.Jmap = {
 			},
 			headers: {
 				'X-File-Name': file.name,
-				'Content-Type': fileType,
+				'Content-Type': file.type,
 				'X-File-LastModifed': Math.round(file['lastModified'] / 1000).toString()
 			},
 			xmlData: file // just "data" wasn't available in ext
