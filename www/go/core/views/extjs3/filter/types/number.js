@@ -15,7 +15,7 @@ go.filter.types.number = Ext.extend(Ext.Panel, {
 	initComponent: function () {
 		
 		this.operatorCombo = new go.form.ComboBox({
-				submit: false,
+				
 				hideLabel: true,
 				name: "operator",
 				value: 'equals',
@@ -54,7 +54,6 @@ go.filter.types.number = Ext.extend(Ext.Panel, {
 		return new GO.form.NumberField({
 			serverFormats: false,
 			flex: 1,
-			submit: false,
 			name: 'value'
 		});
 	},
@@ -63,7 +62,6 @@ go.filter.types.number = Ext.extend(Ext.Panel, {
 	
 	name: 'value',
 	
-	submit : false,
 	
 	getName : function() {
 		return this.name;

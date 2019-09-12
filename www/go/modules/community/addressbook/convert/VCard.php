@@ -183,7 +183,7 @@ class VCard extends AbstractConverter {
 
 	private function importDate(Contact $contact, $type, $date) {
 			
-		$bday = $contact->findDateByType($type);
+		$bday = $contact->findDateByType($type, false);
 
 		if (!empty($date)) {
 			if (!$bday) {
@@ -209,9 +209,8 @@ class VCard extends AbstractConverter {
 	 * @return Contact[]
 	 */
 	public function import(VCardComponent $vcardComponent, Entity $entity = null) {
-
 		if ($vcardComponent->VERSION != "3.0") {
-			$vcardComponent->convert("3.0");
+			$vcardComponent->convert(\Sabre\VObject\Document::VCARD30);
 		}
 		
 		if (!isset($entity)) {

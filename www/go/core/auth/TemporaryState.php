@@ -36,6 +36,8 @@ class TemporaryState extends AbstractState {
 		$this->userId = $userId;
 		if(!isset(\GO::session()->values['user_id']) || \GO::session()->values['user_id'] != $userId) {
 			\GO::session()->runAs($userId);
+			//runas in old framework changes to user timezone.
+			date_default_timezone_set("UTC");
 		}
 		
 		return $this;

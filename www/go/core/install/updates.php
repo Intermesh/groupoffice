@@ -615,8 +615,11 @@ $updates['201908300937'][] = function() {
   
   foreach(Field::find() as $field) {
     echo "Checking custom field " . $field->id ."\n";
-    try{$field->save();}
-    catch(\Exception $e) { echo "failed to save field: ".$e->getMessage(); }
+    try {
+      $field->save();
+    } catch(\Exception $e) {
+      echo "WARNING: Checking custom field failed: ". $e->getMessage() . "\n";
+    }
   }
 };
 

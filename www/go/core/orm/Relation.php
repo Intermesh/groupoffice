@@ -45,6 +45,11 @@ class Relation {
 	public $tableName;
 
 	/**
+	 * Type of relation. See TYPE_* constants.
+	 */
+	public $type;
+
+	/**
 	 * Constructor
 	 * 
 	 * @param string $name The name of the relation

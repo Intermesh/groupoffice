@@ -132,6 +132,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 				$attributes[$tagPrefix . 'zip'] = $a->zipCode;
 				$attributes[$tagPrefix . 'country'] = $a->country;
 				$attributes[$tagPrefix . 'state'] = $a->state;
+				$attributes[$tagPrefix . 'city'] = $a->city;
 				
 				$attributes[$tagPrefix . 'formatted_address'] = $a->getFormatted();
 			}
@@ -143,6 +144,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 				$attributes[$tagPrefix . 'post_zip'] = $a->zipCode;
 				$attributes[$tagPrefix . 'post_country'] = $a->country;
 				$attributes[$tagPrefix . 'post_state'] = $a->state;
+				$attributes[$tagPrefix . 'post_city'] = $a->city;
 				
 				$attributes[$tagPrefix . 'formatted_post_address'] = $a->getFormatted();
 			}

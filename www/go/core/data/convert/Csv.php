@@ -228,8 +228,14 @@ class Csv extends AbstractConverter {
 			}
 			return $headers;
 		}
+
+		if($prop->type == Relation::TYPE_SCALAR) {
+			$headers[] = ['name' => $header, 'label' => null, 'many' => true];			
+			return $headers;
+		}
 		
 		$cls = $prop->entityName;
+
 
 		$properties = $cls::getMapping()->getProperties();
 		

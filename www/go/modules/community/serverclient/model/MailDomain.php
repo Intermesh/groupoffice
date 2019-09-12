@@ -36,7 +36,12 @@ class MailDomain {
 
 		\GO::debug($response);
 
+
 		$result = json_decode($response);
+
+		if(!$result) {
+			throw new Exception("Could not create mailbox on postfixadmin module. " . $response);
+		}
 
 		if (!$result->success)
 			throw new Exception("Could not create mailbox on postfixadmin module. " . $result->feedback);
@@ -60,6 +65,10 @@ class MailDomain {
 		\GO::debug($response);
 
 		$result=json_decode($response);
+
+		if(!$result) {
+			throw new Exception("Could not create mailbox on postfixadmin module. " . $response);
+		}
 
 		if(!$result->success)
 			throw new Exception("Could not set mailbox password on postfixadmin module. ".$result->feedback);

@@ -12,6 +12,7 @@ use go\core\App;
 use go\core\auth\Method;
 use go\core\auth\Password;
 use go\core\auth\PrimaryAuthenticator;
+use go\core\convert\UserCsv;
 use go\core\db\Criteria;
 use go\core\orm\Query;
 use go\core\exception\Forbidden;
@@ -764,5 +765,13 @@ class User extends Entity {
 		$this->contact->setValues($values);		
 	
 		$this->displayName = $this->contact->name;
+	}
+
+
+	public static function converters()
+	{
+		$arr = parent::converters();
+		$arr['text/csv'] = UserCsv::class;
+		return $arr;
 	}
 }

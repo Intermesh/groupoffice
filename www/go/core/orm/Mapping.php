@@ -148,6 +148,10 @@ class Mapping {
 
 		foreach($this->getRelations() as $r) {
 			if(!isset($r->entityName)) {
+				//for scalar
+				if($r->tableName == $name) {
+					$paths[] = array_merge($path, [$r->name]);
+				}
 				continue;
 			}
 			$cls = $r->entityName;

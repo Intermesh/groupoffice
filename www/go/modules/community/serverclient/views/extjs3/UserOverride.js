@@ -6,11 +6,12 @@ Ext.onReady(function(){
 
 				for(var i=0;i<GO.serverclient.domains.length;i++)
 				{
-					this.serverclientDomainCheckboxes[i]=new Ext.form.Checkbox({						
+					this.serverclientDomainCheckboxes[i]=new Ext.ux.form.XCheckbox({						
 						checked:(i==0),
 						//name: 'serverDomains',
 						name: 'serverDomains',
-						autoCreate: {tag: "input", type: "checkbox", value: GO.serverclient.domains[i]},						
+						submitOnValue: GO.serverclient.domains[i],
+						submitOffValue: null,						
 						hideLabel:true,
 						boxLabel: GO.serverclient.domains[i]
 					});

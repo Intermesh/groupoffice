@@ -495,7 +495,8 @@ abstract class Property extends Model {
 		
 		$query = static::internalFind($properties);		
 		
-		$ids = explode('-', $id);
+		//Used count check here because a customer managed to get negative ID's in the database.
+		$ids = count($keys) == 1 ? [$id] : explode('-', $id);
 		$keys = array_combine($keys, $ids);
 		$query->where($keys);
 		

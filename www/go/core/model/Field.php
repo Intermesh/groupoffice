@@ -317,7 +317,7 @@ class Field extends AclItemEntity {
 	 * @return Query
 	 */
 	public static function findByEntity($entityTypeId) {
-		if(is_string($entityTypeId)) {
+		if(!is_numeric($entityTypeId)) {
 			$entityTypeId = EntityType::findByName($entityTypeId)->getId();
 		}
 		return static::find()->where(['fs.entityId' => $entityTypeId])->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId');

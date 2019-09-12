@@ -338,7 +338,22 @@ class goCalendar extends GoBaseBackendDiff {
 		}
 	}
 	
-	
+	private $timezone;
+	private function getDefaultTimeZone() {
+		if(!isset($this->timezone)) {
+			$this->timezone = go()->getAuthState()->getUser(['timezone'])->timezone;
+		}
+		return $this->timezone;
+	}
+
+	private function importAllDayTime($time) {
+		$dt = new \DateTime('@'.$time, new \DateTimeZone("UTC"));		
+		$dt->setTimezone(new \DateTimeZone($this->getDefaultTimeZone()));
+		$dt->setTime(0, 0);
+		$newTime = $dt->format("U");
+
+		return $newTime;
+	}
 	
 	/**
 	 * 
@@ -374,10 +389,18 @@ class goCalendar extends GoBaseBackendDiff {
 		
 		if (isset($message->uid))
 			$event->uuid = $message->uid;
-		if (isset($message->starttime))
+		if (isset($message->starttime)) {
 			$event->start_time = $message->starttime;
-		if (isset($message->endtime))
+			if($message->alldayevent) {
+				$event->start_time = $this->importAllDayTime($event->start_time);
+			}
+		}
+		if (isset($message->endtime)){
 			$event->end_time = $message->endtime;
+			if($message->alldayevent) {
+				$event->end_time = $this->importAllDayTime($event->end_time);
+			}
+		}
 		if (isset($message->location))
 			$event->location = $message->location;
 		if (isset($message->reminder))
