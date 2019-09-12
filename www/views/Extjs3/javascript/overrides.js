@@ -437,7 +437,6 @@ Ext.override(Ext.FormPanel,{
 	
 	// prevents adding form fields that are part of custom form field components like the combobox of go.form.Chips for example.
 	processAdd : function(c){
-        
 			if(this.isField(c)){
 					this.form.add(c);
 
