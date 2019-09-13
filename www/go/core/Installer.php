@@ -158,7 +158,8 @@ class Installer {
 			throw new \Exception("Could not save core module: " . var_export($module->getValidationErrors(), true));
 		}
 
-		$module->findAcl()->addGroup(Group::ID_EVERYONE);
+		//Share core with everyone
+		$module->findAcl()->addGroup(Group::ID_EVERYONE)->save();
 		
 		$cron = new model\CronJobSchedule();
 		$cron->moduleId = $module->id;
