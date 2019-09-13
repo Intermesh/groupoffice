@@ -5,6 +5,7 @@
 - Core: fixed scroll to top in infinite grids
 - Carddav: carddav ignores sync-settings #460
 - Email: Fixed Search in Email with 2 strings #444
+- Sync: Default sync settings when creating a new user
 
 12-09-2019 6.4.53
 - Billing: Fixed tax percentage decimals in PDF
