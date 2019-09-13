@@ -74,7 +74,7 @@ class Module extends core\Module {
 	protected function afterInstall(\go\core\model\Module $model)
 	{
 		$addressBook = new AddressBook();
-		$addressBook->name = GO()->t("Shared", 'community', 'addressbook');
+		$addressBook->name = GO()->t("Shared");
 		$addressBook->setAcl([
 			Group::ID_INTERNAL => Acl::LEVEL_DELETE
 		]);

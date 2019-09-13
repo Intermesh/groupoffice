@@ -4,6 +4,7 @@ namespace go\modules\community\notes;
 use go\core;
 use go\core\model\Group;
 use go\core\model\Module as ModuleModel;
+use go\modules\community\notes\controller\NoteBook;
 
 class Module extends core\Module {	
 
@@ -11,13 +12,21 @@ class Module extends core\Module {
 		return "Intermesh BV";
 	}
 	
-	protected function afterInstall(ModuleModel $model): bool {
+	protected function afterInstall(ModuleModel $model) {	
 		
+		$noteBook = new NoteBook();
+		$noteBook->name = GO()->t("Shared");
+		$noteBook->setAcl([
+			Group::ID_INTERNAL => Acl::LEVEL_DELETE
+		]);
+		$noteBook->save();
+
 		if(!$model->findAcl()
 						->addGroup(Group::ID_INTERNAL)
 						->save()) {
 			return false;
 		}
+
 		
 		return parent::afterInstall($model);
 	}
