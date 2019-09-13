@@ -400,8 +400,9 @@ class Module extends Observable {
 				\GO::getDbConnection ()->query($query);
 		}
 		
-		\GO::clearCache();
-		Observable::cacheListeners();
+		// \GO::clearCache();
+		// Observable::cacheListeners();
+		go()->rebuildCache();
 		
 		\GO::setIgnoreAclPermissions($oldIgnore);
 		
