@@ -2,9 +2,10 @@
 namespace go\modules\community\notes;
 
 use go\core;
+use go\core\model\Acl;
 use go\core\model\Group;
 use go\core\model\Module as ModuleModel;
-use go\modules\community\notes\controller\NoteBook;
+use go\modules\community\notes\model\NoteBook;
 
 class Module extends core\Module {	
 
