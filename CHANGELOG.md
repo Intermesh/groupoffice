@@ -1,7 +1,9 @@
+13-09-2019 6.4.54
 - IMAP / LDAP auth:  Clear database password when logging in with IMAP or LDAP authenticator
 - Core: raised default max upload size to 1GB
 - Core: fixed scroll to top in infinite grids
 - Carddav: carddav ignores sync-settings #460
+- Email: Fixed Search in Email with 2 strings #444
 
 12-09-2019 6.4.53
 - Billing: Fixed tax percentage decimals in PDF
