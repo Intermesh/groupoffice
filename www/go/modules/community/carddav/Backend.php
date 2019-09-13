@@ -104,7 +104,9 @@ class Backend extends AbstractBackend {
 		
 		$r = [];
 		$addressBooks = AddressBook::find()
-						->filter(['permissionLevel' => Acl::LEVEL_READ]);
+						->join("sync_addressbook_user", "u", "u.addressBookId = a.id")						
+						->filter(['permissionLevel' => Acl::LEVEL_READ])
+						->andWhere('u.userId', '=', go()->getAuthState()->getUserId());
 						
 		foreach($addressBooks as $a) {
 			$r[] = $this->addressBookToDAV($a, $principalUri);

@@ -1,5 +1,6 @@
 - IMAP / LDAP auth:  Clear database password when logging in with IMAP or LDAP authenticator
 - Core: raised default max upload size to 1GB
+- Core: fixed scroll to top in infinite grids
 
 12-09-2019 6.4.53
 - Billing: Fixed tax percentage decimals in PDF
