@@ -1,3 +1,5 @@
+- IMAP / LDAP auth:  Clear database password when logging in with IMAP or LDAP authenticator
+
 12-09-2019 6.4.53
 - Billing: Fixed tax percentage decimals in PDF
 - Billing: Fixed translation for Quantity / Amount in order items
