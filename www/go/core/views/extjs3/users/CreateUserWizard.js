@@ -6,7 +6,7 @@ go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 		//store all form data here
 		this.user = {};
 
-		var groups = go.Modules.get('core', 'core').settings.defaultGroups;
+		var groups = go.util.clone(go.Modules.get('core', 'core').settings.defaultGroups);
 		if(groups.indexOf(2) === -1) {
 			groups.push(2); //add everyone
 		}

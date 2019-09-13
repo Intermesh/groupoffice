@@ -1,4 +1,5 @@
 13-09-2019 6.4.54
+- Core: Sometimes a user was not in group everyone
 - IMAP / LDAP auth:  Clear database password when logging in with IMAP or LDAP authenticator
 - Core: raised default max upload size to 1GB
 - Core: fixed scroll to top in infinite grids

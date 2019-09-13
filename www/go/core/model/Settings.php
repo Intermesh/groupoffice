@@ -363,12 +363,12 @@ class Settings extends core\Settings {
 	 * The default address book for new users
 	 * @var int 
 	 */
-	protected $userAddressBookId = null;
+	public $userAddressBookId = null;
 	
 	/**
 	 * @return AddressBook
 	 */
-	public function getUserAddressBook() {
+	public function userAddressBook() {
 		if(!Module::findByName('community', 'addressbook')) {
 			return null;
 		}
@@ -381,11 +381,15 @@ class Settings extends core\Settings {
 
 		if(!$addressBook) {
 			$addressBook = new AddressBook();	
-			$addressBook->name = GO()->t("Users");
+			$addressBook->name = GO()->t("Users");		
+
 			if(!$addressBook->save()) {
 				throw new \Exception("Could not save address book");
 			}
 			$this->userAddressBookId = $addressBook->id;
+
+			//Share users address book with internal
+			$addressBook->findAcl()->addGroup(Group::ID_INTERNAL)->save();
 			if(!$this->save()) {
 				throw new \Exception("Could not save core settings");
 			}
@@ -393,10 +397,7 @@ class Settings extends core\Settings {
 
 		return $addressBook;		
 	}
-	
-	public function setUserAddressBookId($id) {
-		$this->userAddressBookId = $id;
-	}
+
 	
 	
 	/**
