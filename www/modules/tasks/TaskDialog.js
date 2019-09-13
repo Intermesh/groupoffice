@@ -62,6 +62,20 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 	isVisible : function() {
 		return this.win.isVisible();
 	},
+
+	setLinkEntity : function(cfg) {
+		
+		switch(cfg.entity) {
+			case 'Project':
+			case "Contact":				
+				this.formPanel.getForm().findField("name").setValue(cfg.data.name);
+			break;
+
+			case 'Order':
+				this.formPanel.getForm().findField("name").setValue(cfg.data.order_id);
+			break;
+		} 
+	},
 	
 	show : function(config) {
 
