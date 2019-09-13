@@ -15,7 +15,7 @@
 go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 	title: t("Groups"),
 	iconCls: 'ic-group',
-	selectedGroups: null,
+	value: null,
 	name: 'groups',
 	initComponent: function () {	
 		
@@ -39,7 +39,7 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 					name: 'selected', 
 					type: {
 						convert: function (v, data) {
-							return me.selectedGroups.indexOf(data.id) > -1;
+							return me.value.indexOf(data.id) > -1;
 						}
 					}
 				}
@@ -104,14 +104,20 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 		go.users.UserGroupGrid.superclass.initComponent.call(this);		
 
 		this.setDisabled(!go.User.isAdmin);
+
+		this.on('render', function() {
+			if(!this.store.loaded && !this.store.loading) {
+				this.store.load();
+			}
+		}, this, {single: true});
 	},	
 	
 	onCheckChange : function(record, newValue) {
 		if(newValue) {
-			this.selectedGroups.push(record.id);
+			this.value.push(record.id);
 		} else
 		{
-			this.selectedGroups.splice(this.selectedGroups.indexOf(record.id), 1);
+			this.value.splice(this.value.indexOf(record.id), 1);
 		}
 		this._isDirty = true;
 	},
@@ -120,9 +126,9 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 //		this.user = user;
 //		
 //		var me = this;
-//		this.selectedGroups =[];
+//		this.value =[];
 //		this.user.groups.forEach(function(group) {
-//			me.selectedGroups.push(group.groupId);
+//			me.value.push(group.groupId);
 //		});
 //		
 //		
@@ -151,26 +157,18 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 		return this._isDirty || this.store.getModifiedRecords().length > 0;
 	},
 
-	setValue: function (groups) {
+	setValue: function (groups) {		
+		this._isDirty = false;		
 		
-		this._isDirty = false;
-		
-		this.selectedGroups = groups;	
+		this.value = groups;	
 		
 		if(this.rendered) {
 			this.store.load();
-		} else if(!this.loading)
-		{
-			this.loading = true;
-			this.on('render', function() {
-				this.loading = false; 
-				this.store.load();
-			}, this, {single: true});
 		}
 	},
 	
-	getValue: function () {
-		return this.selectedGroups;
+	getValue: function () {		
+		return this.value;
 	},
 
 	markInvalid: function (msg) {
