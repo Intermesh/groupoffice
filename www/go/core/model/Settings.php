@@ -449,7 +449,7 @@ class Settings extends core\Settings {
 	/**
 	 * Set default groups for new groups
 	 * 
-	 * @param array eg [['groupId' => 1]]
+	 * @param array $groups eg [['groupId' => 1]]
 	 */
 	public function setDefaultGroups($groups) {	
 		

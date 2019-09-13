@@ -126,7 +126,10 @@ class Installer {
 		}
 
 		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
+		App::get()->getSettings()->setDefaultGroups([Group::ID_INTERNAL]);
 		App::get()->getSettings()->save();
+
+
 
 		App::get()->setCache(new Disk());
 		Listeners::get()->init();
