@@ -260,12 +260,14 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * 
 	 * @param Query $query
 	 * @param int $level
+	 * @param int $userId
+	 * @param int[] $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
 	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {			
+	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {			
 		$tables = static::getMapping()->getTables();
 		$firstTable = array_shift($tables);
 		$tableAlias = $firstTable->getAlias();
-		Acl::applyToQuery($query, $tableAlias . '.aclId', $level, $userId);
+		Acl::applyToQuery($query, $tableAlias . '.aclId', $level, $userId, $groups);
 		
 		return $query;
 	}

@@ -384,9 +384,10 @@ abstract class Entity extends Property {
 	 * @param Query $query
 	 * @param int $level
 	 * @param int $userId Leave to null for the current user
+	 * @param int[] $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
 	 * @return Query $query;
 	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {
+	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
 		
 		return $query;
 	}

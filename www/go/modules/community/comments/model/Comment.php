@@ -144,7 +144,7 @@ class Comment extends Entity {
 	 * @param int $userId Leave to null for the current user
 	 * @return Query $query;
 	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {
+	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
 		
 		return $query;
 	}

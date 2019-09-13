@@ -263,8 +263,9 @@ class Acl extends Entity {
 	 * @param string $column eg. t.aclId
 	 * @param int $level The required permission level
 	 * @param int $userId If null then the current user is used.
+	 * @param int[] $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
 	 */
-	public static function applyToQuery(Query $query, $column, $level = self::LEVEL_READ, $userId = null) {
+	public static function applyToQuery(Query $query, $column, $level = self::LEVEL_READ, $userId = null, $groups = null) {
 
 		if(!isset($userId)) {
 			$userId = App::get()->getAuthState() ? App::get()->getAuthState()->getUserId() : false;
@@ -277,11 +278,17 @@ class Acl extends Entity {
 		// WHERE in
 		$subQuery = (new Query)
 						->select('aclId')
-						->from('core_acl_group', 'acl_g')						
-						->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
-						->andWhere([
-								'acl_u.userId' => $userId			
-										]);
+						->from('core_acl_group', 'acl_g');
+						
+						
+		if(isset($groups)) {
+			$subQuery->andWhere('acl_g.groupId', 'IN', $groups);
+		} else {
+			$subQuery->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
+				->andWhere([
+					'acl_u.userId' => $userId			
+							]);
+			}
 
 		if($level != self::LEVEL_READ) {			
 			$subQuery->andWhere('acl_g.level', '>=', $level);
