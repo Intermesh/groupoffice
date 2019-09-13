@@ -77,6 +77,10 @@ go.panels.ScrollLoader = {
 				o.params.position = o.params.position || 0;
 				o.params.position += this.pageSize;
 				o.paging = true;
+
+				if(this.isGridPanel()) {
+					this.getView().scrollToTopOnLoad = false;
+				}
 				store.load(o);
 			}
 		} else {
@@ -90,6 +94,9 @@ go.panels.ScrollLoader = {
 				o.params.position += this.pageSize;
 				o.paging = true;
 
+				if(this.isGridPanel()) {
+					this.getView().scrollToTopOnLoad = false;
+				}
 				store.load(o);
 
 			}
