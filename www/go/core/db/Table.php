@@ -116,6 +116,7 @@ class Table {
 		if (($cache = App::get()->getCache()->get($cacheKey))) {
 			$this->columns = $cache['columns'];
 			$this->pk = $cache['pk'];
+			$this->indexes = $cache['indexes'] ?? null;
 			$this->conn = null;
 			return;
 		}	
@@ -134,7 +135,7 @@ class Table {
 		//Not needed anymore when we serialize
 		$this->conn = null;
 
-		App::get()->getCache()->set($cacheKey, ['columns' => $this->columns, 'pk' => $this->pk]);
+		App::get()->getCache()->set($cacheKey, ['columns' => $this->columns, 'pk' => $this->pk, 'indexes' => $this->indexes]);
 
 
 		return;
