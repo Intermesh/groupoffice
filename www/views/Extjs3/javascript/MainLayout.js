@@ -184,6 +184,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			deferedRender:true
 		});
 
+		this.tabPanel.setActiveTab(null);
+
 
 		//blur active form fields on tab change. Otherwise auto complete combo boxes
 		//will remain focussed but the autocomplete functionality fails.
