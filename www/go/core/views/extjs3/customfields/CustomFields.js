@@ -12,9 +12,7 @@
 			
 			var me = this, scope = scope || me;
 
-			go.Modules.init().then(function() {
-				me.loadModuleTypes();
-			});
+			me.loadModuleTypes();
 			
 			return new Promise(function(resolve, reject){
 			
