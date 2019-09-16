@@ -28220,8 +28220,28 @@ Ext.Window = Ext.extend(Ext.Panel, {
             this.hidden = true;
             this.show();
         }
+
+        this.autoRestoreFocus();
     },
 
+	/**
+	 * Restore focus to active element before opening the window.	 
+	 */
+	autoRestoreFocus :  function() {		
+		this.on("beforeshow", function() {            
+            this.activeEl = document.activeElement;
+		}, this);
+		
+		this.on("close", function() {	
+            if(this.activeEl)		
+			    this.activeEl.focus();
+		}, this);
+		
+		this.on("hide", function() {
+            if(this.activeEl)				
+			    this.activeEl.focus();
+		}, this);
+	},
     
     getState : function(){
         return Ext.apply(Ext.Window.superclass.getState.call(this) || {}, this.getBox(true));

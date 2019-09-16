@@ -88,6 +88,7 @@ go.util =  (function () {
 		 * @param {string} text 
 		 */
 		copyTextToClipboard: function (text) {
+			var al = document.activeElement;
 			if (!navigator.clipboard) {				
 				//fallback on workaround with textarea element
 				var textArea = document.createElement("textarea");
@@ -104,12 +105,18 @@ go.util =  (function () {
 					console.error('Fallback: Oops, unable to copy', err);
 				}
 		
-				document.body.removeChild(textArea);				
+				document.body.removeChild(textArea);		
+				if(al) {
+					al.focus();
+				}		
 				return;
 			}
 
 			navigator.clipboard.writeText(text).then(function () {
 				console.log('Async: Copying to clipboard was successful!');
+				if(al) {
+					al.focus();
+				}
 			}, function (err) {
 				console.error('Async: Could not copy text: ', err);
 			});

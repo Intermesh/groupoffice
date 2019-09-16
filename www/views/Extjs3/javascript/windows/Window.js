@@ -29,27 +29,7 @@ GO.Window = Ext.extend(Ext.Window,{
 			//to fix combobox autocomplete failure after move or hide window			
 			document.activeElement.blur();
 		});
-		
-		
-		this.autoRestoreFocus();
-	},	
 	
-	/**
-	 * Restore focus to active element before opening the window.	 
-	 */
-	autoRestoreFocus :  function() {
-		
-		this.on("beforeshow", function() {
-			this.activeEl = document.activeElement;
-		}, this);
-		
-		this.on("close", function() {	
-			this.activeEl.focus();
-		}, this);
-		
-		this.on("hide", function() {			
-			this.activeEl.focus();
-		}, this);
 	},
 	
 	addListenerTillHide : function(eventName, fn, scope){

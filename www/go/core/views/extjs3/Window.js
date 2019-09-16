@@ -32,24 +32,6 @@ go.Window = Ext.extend(Ext.Window, {
 		
 		this.on('show', this.autoSize, this);
 		
-		this.autoRestoreFocus();
-	},	
-	
-	/**
-	 * Restore focus to active element before opening the window.	 
-	 */
-	autoRestoreFocus :  function() {		
-		this.on("beforeshow", function() {
-			this.activeEl = document.activeElement;
-		}, this);
-		
-		this.on("close", function() {			
-			this.activeEl.focus();
-		}, this);
-		
-		this.on("hide", function() {			
-			this.activeEl.focus();
-		}, this);
 	},
 	
 	// private, we don't want to store the window position remote because
