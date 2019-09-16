@@ -15,6 +15,7 @@
 - Core: Import function shows error messages per line
 
 10-09-2019 6.4.52
+- Billing: Fixed group summary gross total in PDF.
 - Caldav: events with status needs-action were not synced. Change status to needs-action to tentative as needs-action is not a valid vevent status. 
 - Carddav: Create with vcard 4.0 format was broken (davdroid)
 - Core: Added user import with ability to create mailbox on mailserver too
