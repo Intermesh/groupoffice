@@ -396,7 +396,8 @@ class User extends Entity {
 			
 			
 			if(!in_array(Group::ID_EVERYONE, $this->groups)) {
-				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, GO()->t("You can't remove group everyone"));
+				$this->groups[] = Group::ID_EVERYONE;
+				// $this->setValidationError('groups', ErrorCode::INVALID_INPUT, GO()->t("You can't remove group everyone"));
 			}
 			
 			if(!$this->isNew()) {
