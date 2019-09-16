@@ -5,7 +5,7 @@ go.form.PasswordGeneratorField = Ext.extend(Ext.form.TriggerField, {
 	triggerConfig: {
 		tag: "button",
 		type: "button",
-		tabindex: -1,
+		//tabindex: -1,
 		cls: "x-form-trigger ic-refresh",
 		'ext:qtip': t("Generate password")
 	},
