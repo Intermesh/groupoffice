@@ -193,4 +193,4 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	
 });
 
-go.customfields.CustomFields.registerType(new go.customfields.type.Text());
+// go.customfields.CustomFields.registerType(new go.customfields.type.Text());

@@ -217,6 +217,10 @@ go.Modules.register("community", "addressbook", {
 
 	selectDialogPanels: [
 		"go.modules.community.addressbook.SelectDialogPanel",
+	],
+
+	customFieldTypes: [
+		"go.modules.community.addressbook.customfield.Contact"
 	]
 });
 

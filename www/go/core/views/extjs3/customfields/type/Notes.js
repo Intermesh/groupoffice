@@ -58,5 +58,5 @@ go.customfields.type.Notes = Ext.extend(go.customfields.type.Text, {
 
 });
 
-go.customfields.CustomFields.registerType(new go.customfields.type.Notes());
+// go.customfields.CustomFields.registerType(new go.customfields.type.Notes());
 

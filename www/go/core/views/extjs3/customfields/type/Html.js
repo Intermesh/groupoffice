@@ -49,4 +49,4 @@ go.customfields.type.Html = Ext.extend(go.customfields.type.Text, {
 
 });
 
-go.customfields.CustomFields.registerType(new go.customfields.type.Html());
+// go.customfields.CustomFields.registerType(new go.customfields.type.Html());

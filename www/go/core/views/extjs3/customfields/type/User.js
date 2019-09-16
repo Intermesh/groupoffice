@@ -94,4 +94,4 @@ go.customfields.type.User = Ext.extend(go.customfields.type.Text, {
 	
 });
 
-go.customfields.CustomFields.registerType(new go.customfields.type.User());
+// go.customfields.CustomFields.registerType(new go.customfields.type.User());

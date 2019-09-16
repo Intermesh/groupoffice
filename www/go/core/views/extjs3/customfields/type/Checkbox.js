@@ -84,5 +84,5 @@ go.customfields.type.Checkbox = Ext.extend(go.customfields.type.Text, {
 
 });
 
-go.customfields.CustomFields.registerType(new go.customfields.type.Checkbox());
+// go.customfields.CustomFields.registerType(new go.customfields.type.Checkbox());
 
