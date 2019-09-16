@@ -5,6 +5,8 @@ use go\core\model\Log;
 use go\core\model\Module;
 
 trait LoggingTrait {
+
+	public static $enabled = true;
 	
 	/**
 	 * Get the message for the log module. Returns the contents of the first text column by default.
@@ -90,6 +92,10 @@ trait LoggingTrait {
 	 * @return boolean returns the created log or succuss status when save is true
 	 */
 	protected function log($action) {
+
+		if(!self::$enabled) {
+			return true;
+		}
 	
 		$message = $this->getLogMessage($action);
 		if ($message && Module::findByName(null, 'log')) {

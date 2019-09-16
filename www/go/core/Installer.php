@@ -29,6 +29,7 @@ use go\core\model\Module as GoCoreModule;
 use GO\Base\Db\ActiveRecord;
 use go\core\orm\EntityType;
 use go\core\model\Acl;
+use go\core\orm\LoggingTrait;
 
 class Installer {
 	
@@ -84,6 +85,8 @@ class Installer {
 		//don't cache on install
 		App::get()->getCache()->flush(false);
 		App::get()->setCache(new None());
+
+		LoggingTrait::$enabled = false;
 
 		self::$isInProgress = true;
 		self::$isInstalling = true;
@@ -301,6 +304,8 @@ class Installer {
 	public function upgrade() {
 		self::$isInProgress = true;
 		self::$isUpgrading = true;
+
+		LoggingTrait::$enabled = false;
 
 		GO()->setAuthState((new TemporaryState())->setUserId(1));
 		
