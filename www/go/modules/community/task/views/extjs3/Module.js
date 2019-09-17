@@ -1,6 +1,6 @@
 go.Modules.register("community", "task", {
 	mainPanel: "go.modules.community.task.MainPanel",
-	title: t("Task"),
+	title: t("Tasks"),
 	entities: ["TasksCategory","TasksPortletTasklist","TasksSettings","TasksTasklist",{
 		name: "TasksTask",
 		links: [{

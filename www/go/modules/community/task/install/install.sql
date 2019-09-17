@@ -18,10 +18,17 @@ CREATE TABLE `task_tasklist` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 ALTER TABLE `task_tasklist`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fkCreatedBy` (`createdBy`),
+  ADD KEY `fkAcl` (`aclId`),
+  ADD KEY `fkFilesFolder` (`filesFolderId`);
 
 ALTER TABLE `task_tasklist`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+ALTER TABLE `task_tasklist`
+  ADD CONSTRAINT `fkAcl` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`),
+  ADD CONSTRAINT `fkCreatedBy` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`);
 
 -- create task category table
 CREATE TABLE `task_category` (
@@ -35,7 +42,10 @@ ALTER TABLE `task_category`
   ADD KEY `user_id` (`createdBy`);
 
 ALTER TABLE `task_category`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+ALTER TABLE `task_category`
+  ADD CONSTRAINT `task_category_ibfk_1` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`);
 
 -- create task table
 CREATE TABLE `task_task` (
@@ -52,7 +62,7 @@ CREATE TABLE `task_task` (
   `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `description` text COLLATE utf8mb4_unicode_ci,
   `status` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `recurrenceRule` varchar(280) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `recurrenceRule` varchar(400) COLLATE utf8mb4_unicode_ci DEFAULT '',
   `filesFolderId` int(11) NOT NULL DEFAULT '0',
   `priority` int(11) NOT NULL DEFAULT '1',
   `percentageComplete` tinyint(4) NOT NULL DEFAULT '0',
@@ -63,13 +73,19 @@ ALTER TABLE `task_task`
   ADD PRIMARY KEY (`id`),
   ADD KEY `list_id` (`tasklistId`),
   ADD KEY `rrule` (`recurrenceRule`(191)),
-  ADD KEY `uuid` (`uid`);
+  ADD KEY `uuid` (`uid`),
+  ADD KEY `fkModifiedBy` (`modifiedBy`),
+  ADD KEY `fkProject` (`projectId`),
+  ADD KEY `createdBy` (`createdBy`),
+  ADD KEY `filesFolderId` (`filesFolderId`);
 
 ALTER TABLE `task_task`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=124;
 
 ALTER TABLE `task_task`
-  ADD CONSTRAINT `task_task_ibfk_1` FOREIGN KEY (`tasklistId`) REFERENCES `task_tasklist` (`id`);
+  ADD CONSTRAINT `fkModifiedBy` FOREIGN KEY (`modifiedBy`) REFERENCES `core_user` (`id`),
+  ADD CONSTRAINT `task_task_ibfk_1` FOREIGN KEY (`tasklistId`) REFERENCES `task_tasklist` (`id`),
+  ADD CONSTRAINT `task_task_ibfk_2` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`);
 
 -- create category / task lookup table
 CREATE TABLE `task_task_category` (
@@ -98,7 +114,7 @@ ALTER TABLE `task_alert`
   ADD KEY `fkTaskId` (`taskId`);
 
 ALTER TABLE `task_alert`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 ALTER TABLE `task_alert`
   ADD CONSTRAINT `fkTaskId` FOREIGN KEY (`taskId`) REFERENCES `task_task` (`id`) ON DELETE CASCADE;
@@ -110,7 +126,12 @@ CREATE TABLE `task_portlet_tasklist` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 ALTER TABLE `task_portlet_tasklist`
-  ADD PRIMARY KEY (`createdBy`,`tasklistId`);
+  ADD PRIMARY KEY (`createdBy`,`tasklistId`),
+  ADD KEY `tasklistId` (`tasklistId`);
+
+ALTER TABLE `task_portlet_tasklist`
+  ADD CONSTRAINT `task_portlet_tasklist_ibfk_1` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`),
+  ADD CONSTRAINT `task_portlet_tasklist_ibfk_2` FOREIGN KEY (`tasklistId`) REFERENCES `task_tasklist` (`id`);
 
 -- create task settings table
 CREATE TABLE `task_settings` (
@@ -122,9 +143,12 @@ CREATE TABLE `task_settings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 ALTER TABLE `task_settings`
-  ADD PRIMARY KEY (`createdBy`);
+  ADD PRIMARY KEY (`createdBy`),
+  ADD KEY `defaultTasklistId` (`defaultTasklistId`);
 
-
+ALTER TABLE `task_settings`
+  ADD CONSTRAINT `task_settings_ibfk_1` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`),
+  ADD CONSTRAINT `task_settings_ibfk_2` FOREIGN KEY (`defaultTasklistId`) REFERENCES `ta_tasklists` (`id`);
 -- create task custom field table
 CREATE TABLE `task_tasks_custom_field` (
   `id` int(11) NOT NULL

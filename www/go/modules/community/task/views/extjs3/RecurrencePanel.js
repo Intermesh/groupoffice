@@ -24,7 +24,7 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 	 * {Date} The startDate
 	 */
 	startDate: null,
-
+	days: ['MO','TU','WE','TH','FR','SA','SU'],
 	getName: function () {
 		return 'recurrenceRule';
 	},
@@ -33,7 +33,17 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 		if(Ext.isEmpty(this.repeatType.getValue())) {
 			return null;
 		}
-		return go.modules.community.task.RecurrencePanel.superclass.getValue.call(this);	
+		var v = go.modules.community.task.RecurrencePanel.superclass.getValue.call(this);
+		if(this.bySetDays) {
+			v.byDay = [];
+			for(var i = 0; i < this.days.length;i++) {
+				if(this.bySetDays[this.days[i]]) {
+					v.byDay.push(this.bySetDays[this.days[i]]);
+				}
+				
+			}
+		}
+		return v;	
 	},
 
 	initComponent : function(){
@@ -90,6 +100,14 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 			value : '1',
 			valueField : 'value',
 			displayField : 'text',
+			listeners: {
+				select:function(me,value) {
+					for(var i = 0; i < this.bySetDays.length; i++) {
+						this.bySetDays[i].position = value.data.value;
+					}
+				},
+				scope:this
+			},
 			store : new Ext.data.SimpleStore({
 				fields : ['value', 'text'],
 				data : [['1', t("First")],
@@ -101,34 +119,29 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 			})
 		});
 
-		var days = ['SU','MO','TU','WE','TH','FR','SA'];
-
-		this.dayButtons = [];
-		this.bySetDays = "";
-
-		this.byDay = new Ext.form.Hidden({
-			name : 'byDay'
-		});
-
+		
+		this.dayButtons = {};
+		this.bySetDays = {};
+		
 		for (var day = 0; day < 7; day++) {
-			this.dayButtons[day] = new Ext.Button({
-				text : t("short_days")[day],
+			this.dayButtons[this.days[day]] = new Ext.Button({
+				text : t("short_days")[(day + 1) % 7],
 				day:day,
 				enableToggle: true,
 				pressed : false,
 				listeners: {
 					toggle:function(btn,pressed) {
+						var key = this.days[btn.day];
 						if(pressed) {
-							if(this.bySetDays == "") {
-								this.bySetDays += days[btn.day];
-							} else {
-								this.bySetDays += "|" + days[btn.day];
+							var nDay = {day: key},
+							position = this.monthTime.getValue();
+							if(position) {
+								nDay.position = position;
 							}
+							this.bySetDays[key] = nDay;
 						} else {
-							this.bySetDays = this.bySetDays.replace("|" + days[btn.day],"");
-							this.bySetDays = this.bySetDays.replace(days[btn.day],"");
+							delete this.bySetDays[key];
 						}
-						this.byDay.setValue(this.bySetDays);
 					},
 					scope:this
 				}
@@ -200,10 +213,10 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 				disabled:true,
 				fieldLabel : t("At days"),
 				items : [
-					this.dayButtons[1],this.dayButtons[2],this.dayButtons[3],this.dayButtons[4],this.dayButtons[5],this.dayButtons[6],this.dayButtons[0]
+					this.dayButtons['MO'],this.dayButtons['TU'],this.dayButtons['WE'],this.dayButtons['TH'],
+					this.dayButtons['FR'],this.dayButtons['SA'],this.dayButtons['SU']
 				]
 			}),
-			this.byDay,
 			this.frequency,
 			{
 				xtype:'container',
@@ -232,6 +245,7 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 
 	onLoad: function(start, recurrenceRule) {
 		this.setStartDate(start);
+		this.rrule = recurrenceRule;
 		if(recurrenceRule) {
 			if(recurrenceRule.bySetPosition) {
 				this.repeatType.setValue("MONTHLY_DAY");
@@ -289,11 +303,12 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 	 */
 	setDaysButtons : function(responseData){
 		if(responseData.byDay) {
-			var days = ['SU','MO','TU','WE','TH','FR','SA'];
-			Ext.each(this.dayButtons, function(btn) {
-				var isEnabled = (responseData.byDay.indexOf(days[btn.day]) !== -1);
-				btn.toggle(isEnabled);
-			});
+			//this.bySetDays = responseData.byDay;
+			
+			for(var i = 0;i < responseData.byDay.length;i++) {
+				var day = responseData.byDay[i].day;
+				this.dayButtons[day].toggle(true);
+			}
 		}
 
 	},

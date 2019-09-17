@@ -215,7 +215,9 @@ class Task extends Entity {
 								$criteria->where('due', '<', $value);
 						})->addDate("future", function(Criteria $criteria, $comparator, $value) {	
 								$criteria->where('start', '>', $value);
-						})->addDate("nextweek", function(Criteria $criteria, $comparator, $value) {	
+						})->addDate("nextWeekStart", function(Criteria $criteria, $comparator, $value) {	
+							$criteria->where('due', '>=', $value);
+						})->addDate("nextWeekEnd", function(Criteria $criteria, $comparator, $value) {	
 							$criteria->where('due', '<=', $value);
 						});
 	}
@@ -279,7 +281,13 @@ class Task extends Entity {
 
 		if(empty($recurrenceRule['byDay'])) {
 			unset($recurrenceRule['byDay']);
+		} else {
+			foreach($recurrenceRule["byDay"] as $key => $value) {
+				$position = isset($value['position']) ? $value['position'] : '';
+				$recurrenceRule["byDay"][$key] = $position.$value['day'];
+			}
 		}
+
 		$recurrenceRule['FREQ'] = $recurrenceRule['frequency'];
 
 		unset($recurrenceRule['bySetPosition']);

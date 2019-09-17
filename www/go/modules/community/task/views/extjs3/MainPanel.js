@@ -78,19 +78,11 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 						nowYmd = now.format("Y-m-d");
 						nextWeekYmd = nextWeek.format("Y-m-d");
-
 						this.taskGrid.store.setFilter("tasklists", {
-							nextweek: nextWeekYmd, 
+							nextWeekStart: now,
+							nextWeekEnd: nextWeekYmd, 
 							percentageComplete: 0
 						});
-
-						// this.taskGrid.store.setFilter('tasklists',{
-						// 	operator:'AND',
-						// 	conditions:[
-						// 	//{start:'> '+ nowYmd },
-						// 	//{start:'< '+ nowYmd }
-						// 	{due: nowYmd}
-						// ]});
 
 						break;
 						// tasks too late
@@ -114,6 +106,7 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 							percentageComplete: 100
 						});
 						break;
+						// future tasks
 						case 5:
 						var now = new Date(),
 						nowYmd = now.format("Y-m-d");
@@ -422,10 +415,7 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 											due: this.taskDateField.getValue()
 
 										}}
-									}).then(function(response){
-										alert(response);
 									});
-
 								},
 								scope: this
 							})
