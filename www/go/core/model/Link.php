@@ -143,9 +143,9 @@ class Link extends Entity {
 	 * @param string $description
 	 * @return Link
 	 */
-	public static function create($a, $b, $description = null) {
+	public static function create($a, $b, $description = null, $checkExisting = true) {
 		
-		$existingLink = static::findLink($a, $b);
+		$existingLink = $checkExisting ? static::findLink($a, $b) : false;
 		if($existingLink) {
 			return $existingLink;
 		}

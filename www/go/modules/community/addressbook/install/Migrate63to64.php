@@ -22,6 +22,7 @@ update addressbook_contact n set filesFolderId = (select files_folder_id from ab
 
 
 update comments_comment n set entityTypeId=(select id from core_entity where name='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = 3;
+
 */
 class Migrate63to64 {
 	
@@ -47,9 +48,11 @@ class Migrate63to64 {
 
 		$addressBooks = $db->select('a.*')->from('ab_addressbooks', 'a')
 						->join("ab_contacts", 'c', 'c.addressbook_id = a.id', 'left')
-						->join("ab_companies", 'o', 'c.addressbook_id = a.id', 'left')
+						->join("ab_companies", 'o', 'o.addressbook_id = a.id', 'left')
 						->groupBy(['a.id'])
 						->having("count(c.id)>0 or count(o.id)>0");		
+
+		// echo $addressBooks ."\n";		
 
 		foreach ($addressBooks as $abRecord) {
 			echo "Migrating addressbook ". $abRecord['name'] . "\n";
@@ -83,10 +86,7 @@ class Migrate63to64 {
 		$m = new \go\core\install\MigrateCustomFields63to64();
 		$m->migrateEntity("Contact");				
 		
-		$this->migrateCustomField();
-
-		
-		
+		$this->migrateCustomField();		
 	}
 	
 	private function addCustomFieldKeys() {
@@ -104,7 +104,9 @@ class Migrate63to64 {
 		$c->query("INSERT addressbook_contact_custom_fields SELECT * FROM cf_ab_contacts;");
 		$c->query("ALTER TABLE `addressbook_contact_custom_fields` CHANGE `model_id` `id` INT(11) NOT NULL;");
 
-		
+		$delete = go()->getDbConnection()->delete('addressbook_contact_custom_fields', 'id not in (select id from ab_contacts)');		
+		echo $delete ."\n";
+		$delete->execute();		
 		
 		try{
 			$this->mergeCompanyCustomFields();
@@ -126,10 +128,17 @@ class Migrate63to64 {
 			if($c->dbType == 'varchar' || $c->dbType == 'char') {
 				$length = go()->getDbConnection()->selectSingleValue("max(length(`" . $c->name . "`))")->from($tableName)->single();
 
+				if(!$length) {
+					$length = 10;
+				}
+
 				$c->dataType = $c->dbType . '(' . $length . ')';
 				$colDef = $c->getCreateSQL();
 
-				go()->getDbConnection()->exec("ALTER TABLE `" . $tableName . "` CHANGE `".$c->name."` `".$c->name."` " . $colDef);
+				$sql = "ALTER TABLE `" . $tableName . "` CHANGE `".$c->name."` `".$c->name."` " . $colDef;
+
+				echo $sql ."\n";
+				go()->getDbConnection()->exec($sql);
 			}
 		}
 	}
@@ -169,15 +178,20 @@ class Migrate63to64 {
 		
 		echo $alterSQL."\n\n";
 		
-		GO()->getDbConnection()->query($alterSQL);
-		
+		GO()->getDbConnection()->query($alterSQL);		
 				
 		$data = GO()->getDbConnection()
 						->select('(`model_id` + '. $this->getCompanyIdIncrement().') as id')
 						->select(array_map([\go\core\db\Utils::class, "quoteColumnName"],array_keys($renameMap)), true)
-						->from('cf_ab_companies');
+						->from('cf_ab_companies', 'cf')
+						->join('ab_companies', 'c', 'c.id=cf.model_id')
+						->where('model_id in (select id from ab_companies)');
+
 		
-		GO()->getDbConnection()->insert('addressbook_contact_custom_fields', $data, array_merge(['id'], array_values($renameMap)))->execute();
+		
+		$insert = GO()->getDbConnection()->insertIgnore('addressbook_contact_custom_fields', $data, array_merge(['id'], array_values($renameMap)));
+		echo $insert ."\n";
+		$insert->execute();
 		
 		$companyEntityType = \go\core\orm\EntityType::findByName("Company");
 		
@@ -331,9 +345,16 @@ class Migrate63to64 {
 		}
 						
 
+		$count = 0;
 		foreach ($contacts as $r) {
 			$r = array_map("trim", $r);
-			echo ".";
+			echo ".";			
+
+			$count++;
+			if($count == 50) {
+				echo "\n";
+				$count = 0;
+			}
 			flush();
 		
 			$contact = new Contact();
@@ -531,7 +552,7 @@ class Migrate63to64 {
 				
 				$org = Contact::findById($orgId);
 				if($org) {
-					\go\core\model\Link::create($contact, $org);
+					\go\core\model\Link::create($contact, $org, null, false);
 				}
 			}
 		}
@@ -553,10 +574,18 @@ class Migrate63to64 {
 			$contacts->andWhere('id', '>', $max - $this->getCompanyIdIncrement());
 		}
 
+		$count = 0;
+
 		foreach ($contacts as $r) {
 			$r = array_map("trim", $r);
 			
 			echo ".";
+			
+			$count++;
+			if($count == 50) {
+				echo "\n";
+				$count = 0;
+			}
 			flush();
 			
 			$contact = new Contact();

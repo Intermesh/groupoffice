@@ -14,8 +14,14 @@ use function GO;
 class MigrateCustomFields63to64 {	
 	
 	const MISSING_PREFIX = '** Missing ** ';
+
+	const TREE_SELECT_OPTION_INCREMENT = 100000;
+
+	private static $newIds = 0;
 	
 	public function migrateEntity($entityName) {
+
+		self::$newIds = self::TREE_SELECT_OPTION_INCREMENT * 2;
 		
 		echo "Migrating custom fields for entity: " . $entityName ."\n";
 		
@@ -31,6 +37,7 @@ class MigrateCustomFields63to64 {
 		foreach ($fields as $field) {
 			
 			echo $field->id . ' - '.$field->type ."\n";
+			flush();
 			
 			switch ($field->type) {
 				case "Select":
@@ -80,8 +87,18 @@ class MigrateCustomFields63to64 {
 	
 	public function updateSelectEntity(Field $field, $entityCls, $incrementID = 0) {		
 		
+		$count = 0;
 		$query = $this->findRecords($field);		
 		foreach($query as $record) {
+
+			echo ".";
+			$count++;
+			if($count == 50) {
+				echo "\n";
+				$count = 0;
+			}
+			flush();
+
 			//Value is string <id>:<Text>
 			$id = explode(':', $record[$field->databaseName])[0];
 			
@@ -198,7 +215,17 @@ class MigrateCustomFields63to64 {
 		
 		$query = $this->findRecords($field);
 		
+		$count = 0;
 		foreach($query as $record){
+
+			echo ".";
+			$count++;
+			if($count == 50) {
+				echo "\n";
+				$count = 0;
+			}
+			flush();
+
 			$values = explode("|", $record[$field->databaseName]);
 			
 			foreach($values as $value) {
@@ -237,7 +264,11 @@ class MigrateCustomFields63to64 {
 		
 		$fields[0] = $field;		
 		foreach($treeSlaves as $slave) {
-			$fields[$slave->getOption("nestingLevel")] = $slave;
+			$nestingLevel = $slave->getOption("nestingLevel");
+			if(isset($fields[$nestingLevel])) {
+				throw new \Exception("Invalid tree select field. Nesting level already set! " . $slave->id . " ". $field->id);
+			}
+			$fields[$nestingLevel] = $slave;
 		}
 		ksort($fields);
 		
@@ -245,7 +276,7 @@ class MigrateCustomFields63to64 {
 	}
 	
 	
-	const TREE_SELECT_OPTION_INCREMENT = 100000;
+	
 	
 	/**
 	 * 
@@ -286,19 +317,37 @@ class MigrateCustomFields63to64 {
 
 		$exists = $existsQ->single();
 		
-		if(!$exists){
-			$data = [
-				'id'=>$id + self::TREE_SELECT_OPTION_INCREMENT,
-				'fieldId'=>$fields[0]->id,
-				'parentId'=>NULL,
-				'text'=>self::MISSING_PREFIX.$text
-			];
-			
-			$insertQ = GO()->getDbConnection()->insert("core_customfields_select_option", $data);
-			$insertQ->execute();
+		if($exists){
+			return $id + self::TREE_SELECT_OPTION_INCREMENT;
 		}
+
+		//find previously missing
+		$existsQ = GO()->getDbConnection()
+			->selectSingleValue('id')
+			->from("core_customfields_select_option")
+			->where(['fieldId' => $fields[0]->id])
+			->where('text', '=', self::MISSING_PREFIX.$text);
+		$exists = $existsQ->single();
+		if($exists){
+			return $exists;
+		}
+
+		//create new
+		$newId = self::$newIds++;
+		$data = [
+			'id'=> $newId,
+			'fieldId'=>$fields[0]->id,
+			'parentId'=>NULL,
+			'text'=>self::MISSING_PREFIX.$text
+		];
 		
-		return $id + self::TREE_SELECT_OPTION_INCREMENT;
+		$insertQ = GO()->getDbConnection()->insert("core_customfields_select_option", $data);
+		$insertQ->execute();
+
+		return $newId;
+		
+		
+		
 	}
 	
 	private function findTreeSelectRecords(Field $field, array $fields) {
@@ -338,13 +387,20 @@ class MigrateCustomFields63to64 {
 		$this->convertTreeSelectOptions($field);
 		
 		$fields = $this->findSlaveFields($field);
+		$count = 0;
 		foreach($this->findTreeSelectRecords($field, $fields) as $record) {			
 			
-			GO()->debug($record);
+			echo ".";
+			$count++;
+			if($count == 50) {
+				echo "\n";
+				$count = 0;
+			}
+			flush();
+			
 			
 			$id = $this->findSelectOptionId($record, $fields);			
 			
-			GO()->debug($id);
 			
 			GO()->getDbConnection()
 							->update(

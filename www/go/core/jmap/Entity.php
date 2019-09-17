@@ -64,10 +64,7 @@ abstract class Entity  extends OrmEntity {
 		
 		if(self::$trackChanges) {
 			$this->entityType()->checkChange($this);
-		} else
-		{
-			GO()->warn('Track changes was disabled during save of '. static::class);
-		}
+		} 
 		
 		return true;
 	}
@@ -89,10 +86,7 @@ abstract class Entity  extends OrmEntity {
 		
 		if(self::$trackChanges) {
 			$this->entityType()->checkChange($this);
-		} else
-		{
-			GO()->warn('Track changes was disabled during delete of '. static::class);
-		}	
+		}
 		
 		return true;
 	}	

@@ -1,4 +1,6 @@
-13-09-2019 6.4.54
+- Core: Disable logging during upgrade for performance
+- Core: fixed custom fields upgrade problem
+
 16-09-2019 6.4.55
 - Problem with start module
 
