@@ -149,32 +149,32 @@ class Calendar extends \GO\Base\Model\AbstractUserDefaultModel {
 	}
 	
 	
-
-	protected function beforeDelete() {
-		$findParams = \GO\Base\Db\FindParams::newInstance()
-			->select('t.id, s.user_id')
-			->join("cal_settings", \GO\Base\Db\FindCriteria::newInstance()
-				->addCondition('id', 's.calendar_id','=','t',true,true)
-				,'s', 'LEFT')
-				->group('s.user_id');
-		$findParams->getCriteria()
-				->addCondition('id', $this->id)
-				->addCondition('user_id', null,'IS NOT','s');
+// removed for ticket #201919367
+// 	protected function beforeDelete() {
+// 		$findParams = \GO\Base\Db\FindParams::newInstance()
+// 			->select('t.id, s.user_id')
+// 			->join("cal_settings", \GO\Base\Db\FindCriteria::newInstance()
+// 				->addCondition('id', 's.calendar_id','=','t',true,true)
+// 				,'s', 'LEFT')
+// 				->group('s.user_id');
+// 		$findParams->getCriteria()
+// 				->addCondition('id', $this->id)
+// 				->addCondition('user_id', null,'IS NOT','s');
 		
-		$defaultUserNames = array();
-		$defaultUsers = $this->find($findParams);
-		foreach($defaultUsers as $default) {
-			if(!empty($default->user)) {
-				$defaultUserNames[] = $default->user->username;
-			}
-		}
-		if(!empty($defaultUserNames)) {
-			// This is someones default calendar
-			throw new \Exception(strtr(\GO::t("Not deleted!
-This is the default calendar of user :username", "calendar"), array(':username'=>"<br> - ".implode('<br> - ',$defaultUserNames))));
-		}
-		return parent::beforeDelete();
-	}
+// 		$defaultUserNames = array();
+// 		$defaultUsers = $this->find($findParams);
+// 		foreach($defaultUsers as $default) {
+// 			if(!empty($default->user)) {
+// 				$defaultUserNames[] = $default->user->username;
+// 			}
+// 		}
+// 		if(!empty($defaultUserNames)) {
+// 			// This is someones default calendar
+// 			throw new \Exception(strtr(\GO::t("Not deleted!
+// This is the default calendar of user :username", "calendar"), array(':username'=>"<br> - ".implode('<br> - ',$defaultUserNames))));
+// 		}
+// 		return parent::beforeDelete();
+// 	}
 	
 	protected function afterSave($wasNew) {
 		
