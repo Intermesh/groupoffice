@@ -1155,6 +1155,15 @@ button.filetype-pdf, button.filetype-doc {
 }
 
 // old detail view compatibility
+.display-panel-heading {
+	@extend %font-subheading;
+	/*color: color($fg, 'secondary-text');*/
+	border-top: 1px solid color($fg, 'line');
+	padding: dp(8) dp(16);
+	height: dp(56);
+}
+
+
 .go-display-panel {
 	width: 100%;
 	&-heading {
