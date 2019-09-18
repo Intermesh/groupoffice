@@ -417,6 +417,9 @@ class Contact extends AclItemEntity {
 										->addText("name", function(Criteria $criteria, $comparator, $value) {											
 											$criteria->where('name', $comparator, $value);
 										})
+										->addText("notes", function(Criteria $criteria, $comparator, $value) {											
+											$criteria->where('notes', $comparator, $value);
+										})
 										->addText("phone", function(Criteria $criteria, $comparator, $value, Query $query) {												
 											if(!$query->isJoined('addressbook_phone')) {
 												$query->join('addressbook_phone_number', 'phone', 'phone.contactId = c.id', "INNER");
