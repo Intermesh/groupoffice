@@ -108,6 +108,14 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 												'text/csv');									
 							},
 							scope: this	
+						}, '-',
+						{
+							iconCls: 'ic-delete',
+							scope: this,
+							text: t("Delete"),
+							handler: function() {
+								this.deleteSelected();
+							}
 						}
 					]
 				},
