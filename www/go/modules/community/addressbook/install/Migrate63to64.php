@@ -4,6 +4,7 @@ namespace go\modules\community\addressbook\install;
 
 use Exception;
 use go\core\db\Database;
+use go\core\db\Expression;
 use go\core\db\Query;
 use go\core\util\DateTime;
 use go\modules\community\addressbook\model\Address;
@@ -717,14 +718,35 @@ class Migrate63to64 {
 			return;
 		}
 
-		go()->getDbConnection()
+		$stmt = go()->getDbConnection()
 			->update("addressbook_contact", 
 				[
-					"initials" => (new Query)
-						->select("initials")
-						->from('ab_contacts', 'old')
-						->where("old.id = t.id")
-				])->execute();		
+					"initials" => new Expression('old.initials')
+				],
+					(new Query)
+						->join('ab_contacts','old','old.id = t.id')
+				);
+				
+		echo $stmt . "\n";
+		$stmt->execute();
+	}
+
+	public function addSalutation() {
+
+		if(!go()->getDatabase()->hasTable('ab_contacts')) {
+			return;
+		}
+
+		$stmt = go()->getDbConnection()
+			->update("addressbook_contact", 
+				[
+					"salutation" => new Expression('old.salutation')
+				],
+					(new Query)
+						->join('ab_contacts','old','old.id = t.id')
+				);		
+		echo $stmt . "\n";
+		$stmt->execute();
 	}
 
 }

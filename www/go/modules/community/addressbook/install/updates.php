@@ -55,3 +55,9 @@ $updates['201908301421'][] = function() {
 	$m = new go\modules\community\addressbook\install\Migrate63to64();
 	$m->addInitials();
 };
+
+$updates['201909181300'][] = "ALTER TABLE `addressbook_contact` ADD `salutation` VARCHAR(100) NULL DEFAULT NULL AFTER `suffixes`;";
+$updates['201909181300'][] = function() {
+	$m = new go\modules\community\addressbook\install\Migrate63to64();
+	$m->addSalutation();
+};

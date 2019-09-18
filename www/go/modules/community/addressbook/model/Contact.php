@@ -697,8 +697,14 @@ class Contact extends AclItemEntity {
 		return $keywords;
 	}
 
+	protected $salutation;
+
 	public function getSalutation() 
 	{
+		if(isset($this->salutation)) {
+			return $this->salutation;
+		}
+
 		if($this->isOrganization) {
 			return GO()->t("Dear sir/madam");
 		}
@@ -708,9 +714,17 @@ class Contact extends AclItemEntity {
 
 		$addressBook = AddressBook::findById($this->addressBookId, ['salutationTemplate']);
 
-		return $tpl->parse($addressBook->salutationTemplate);
+		$this->salutation = $tpl->parse($addressBook->salutationTemplate);
+		$this->saveTables();
+
+		return $this->salutation;
+
+
 	}
 	
+	public function setSalutation($v) {
+		$this->salutation = $v;
+	}
 	/**
 	 * Because we've implemented the getter method "getOrganizationIds" the contact 
 	 * modSeq must be incremented when a link between two contacts is deleted or 
