@@ -1,3 +1,5 @@
+- Users: Problem with deleting users because of default calendar
+
 17-09-2019 6.4.56
 - Core: Disable logging during upgrade for performance
 - Core: fixed custom fields upgrade problem
