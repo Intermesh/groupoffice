@@ -1,5 +1,6 @@
 - Users: Problem with deleting users because of default calendar
 - Address Book: Brought back salutation field
+- Address book: Added notes filter
 
 17-09-2019 6.4.56
 - Core: Disable logging during upgrade for performance
