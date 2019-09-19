@@ -4,6 +4,8 @@
 - Address book: Added notes filter
 - Projects: Extended project report with comments
 - Files: File wouldn't open by default when WOPI was installed
+- Core: Missing link button in new dialogs.
+- Billing: Fixed problem where amounts got multiplied by 100 when editing numbers with decimals
 
 17-09-2019 6.4.56
 - Core: Disable logging during upgrade for performance
