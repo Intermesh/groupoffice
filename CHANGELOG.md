@@ -280,6 +280,8 @@
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
 
+19-09-2019 6.3.82
+- Projects larger expense budget dialog and resizable
 - Billing: Force select of book in duplicate dialog
 - Core: Clear old framework cache on upgrade
 - Project: create invoice without grouping time entries by employees. are time record will be group into 1 group
