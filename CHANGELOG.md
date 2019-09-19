@@ -1,3 +1,4 @@
+- Custom fields: Query language works with text for select and multiselect
 - Users: Problem with deleting users because of default calendar
 - Address Book: Brought back salutation field
 - Address book: Added notes filter

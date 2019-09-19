@@ -29,8 +29,9 @@
 		{
 			date = v;
 		}
-		
-		return date;
+		//convert date to local timezone
+		var local = date.toLocaleString("en-US", {timeZone: go.User.timezone});		
+		return new Date(local);
 	};
 	
 	go.util.Format = {
