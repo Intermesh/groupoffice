@@ -1,3 +1,4 @@
+19-09-2019 6.4.57
 - Custom fields: Query language works with text for select and multiselect
 - Users: Problem with deleting users because of default calendar
 - Address Book: Brought back salutation field
@@ -8,6 +9,7 @@
 - Billing: Fixed problem where amounts got multiplied by 100 when editing numbers with decimals
 - Workflow: Fixed workflow delete button
 - Files: Fixed file access to address book access denied
+- Projects: Time entries are searchable
 
 17-09-2019 6.4.56
 - Core: Disable logging during upgrade for performance
