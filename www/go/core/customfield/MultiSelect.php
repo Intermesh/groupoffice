@@ -144,15 +144,23 @@ class MultiSelect extends Select {
 	public function defineFilter(Filters $filters) {
 		
 		
-		$filters->add($this->field->databaseName, function(Criteria $criteria, $value, Query $query, array $filter){
+		$filters->addText($this->field->databaseName, function(Criteria $criteria, $comparator, $value, Query $query, array $filter){
 			
-			//if(!$query->isJoined($this->getMultiSelectTableName())){
-				$cls = $query->getModel();
-				$primaryTableAlias = array_values($cls::getMapping()->getTables())[0]->getAlias();
-				$joinAlias = $this->getJoinAlias();
-				$query->join($this->getMultiSelectTableName(), $joinAlias, $joinAlias.'.id = '.$primaryTableAlias.'.id');
-			//}
-			$criteria->where($joinAlias. '.optionId', '=', $value);
+			$cls = $query->getModel();
+			$primaryTableAlias = array_values($cls::getMapping()->getTables())[0]->getAlias();
+			$joinAlias = $this->getJoinAlias();
+			$query->join($this->getMultiSelectTableName(), $joinAlias, $joinAlias.'.id = '.$primaryTableAlias.'.id');
+
+			if(isset($value[0]) && is_numeric($value[0])) {
+				//When field option ID is passed by a saved filter
+				$criteria->where($joinAlias. '.optionId', '=', $value);
+			} else{
+				//for text queries we must join the options.
+				$alias = 'opt_' . uniqid();
+				$query->join('core_customfields_select_option', $alias, $alias . '.id = '.$joinAlias. '.optionId');
+				$criteria->where($alias . '.text', $comparator, $value);
+			}	
+			
 		});
 	}
 
