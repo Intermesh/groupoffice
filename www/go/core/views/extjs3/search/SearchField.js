@@ -59,8 +59,11 @@ go.search.SearchField = Ext.extend(Ext.form.TriggerField,{
       },
 
       destroy : function() {
-        this.panel.destroy();
+        if(this.panel) {
+          this.panel.destroy();
+        }
       },
+      
       focus : function() {
         if(this.getValue()) {
           this.syncPanelSize();

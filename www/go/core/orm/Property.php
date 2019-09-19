@@ -757,6 +757,23 @@ abstract class Property extends Model {
 			return false;
 		}
 		
+		if(!$this->saveTables()) {
+			return false;
+		}
+		
+		$this->checkBlobs();
+
+		if (!$this->saveRelatedProperties()) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Saves all modified properties to the database.
+	 */
+	protected function saveTables() {
 		$modified = $this->getModified();				
 		
 		// make sure auto incremented values come first
@@ -780,12 +797,6 @@ abstract class Property extends Model {
 			if (!$this->saveTable($table, $modified)) {				
 				return false;
 			}
-		}
-		
-		$this->checkBlobs();
-
-		if (!$this->saveRelatedProperties()) {
-			return false;
 		}
 
 		return true;

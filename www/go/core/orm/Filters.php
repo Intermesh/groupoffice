@@ -30,7 +30,7 @@ class Filters {
 	 * @return $this
 	 */
 	public function add($name, $fn, $default = self::NO_DEFAULT) {
-		$this->filters[strtolower($name)] = ['type' => 'generic', 'fn' => $fn, 'default' => $default];
+		$this->filters[strtolower($name)] = ['type' => 'generic', 'fn' => $fn, 'default' => $default, 'name' => $name];
 		
 		return $this;
 	}
@@ -46,16 +46,16 @@ class Filters {
 
 		$f = [];
 		foreach($filter as $k => $v) {
-			$f[strtolower($k)] = $v;
+			$f[$this->filters[strtolower($k)]['name']] = $v;
 		}
 
-		foreach($this->filters as $name => $value) {
+		foreach($this->filters as $value) {
 			if($value['default'] === self::NO_DEFAULT) {
 				continue;
 			}
 
-			if(!array_key_exists($name, $f)) {
-				$f[$name] = $value['default'];
+			if(!array_key_exists($value['name'], $f)) {
+				$f[$value['name']] = $value['default'];
 			}
 		}
 
@@ -74,7 +74,7 @@ class Filters {
 
 		$this->validate($query, $filter);		
 		foreach($filter as $name => $value) {
-			$filterConfig = $this->filters[$name];
+			$filterConfig = $this->filters[strtolower($name)];
 			
 			switch($filterConfig['type']) {
 				
@@ -134,7 +134,7 @@ class Filters {
 	 * @return $this
 	 */
 	public function addNumber($name, $fn, $default = self::NO_DEFAULT) {
-		$this->filters[strtolower($name)] = ['type' => 'number', 'fn' => $fn, 'default' => $default];
+		$this->filters[strtolower($name)] = ['type' => 'number', 'fn' => $fn, 'default' => $default, 'name' => $name];
 		
 		return $this;
 	}	
@@ -153,7 +153,7 @@ class Filters {
 	 * @return $this
 	 */
 	public function addDate($name, $fn, $default = self::NO_DEFAULT) {
-		$this->filters[strtolower($name)] = ['type' => 'date', 'fn' => $fn, 'default' => $default];
+		$this->filters[strtolower($name)] = ['type' => 'date', 'fn' => $fn, 'default' => $default, 'name' => $name];
 		
 		return $this;
 	}	
@@ -170,7 +170,7 @@ class Filters {
 	 * @return $this
 	 */
 	public function addText($name, $fn, $default = self::NO_DEFAULT) {
-		$this->filters[strtolower($name)] = ['type' => 'text', 'fn' => $fn, 'default' => $default];
+		$this->filters[strtolower($name)] = ['type' => 'text', 'fn' => $fn, 'default' => $default, 'name' => $name];
 		
 		return $this;
 	}

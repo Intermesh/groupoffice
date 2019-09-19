@@ -417,6 +417,9 @@ class Contact extends AclItemEntity {
 										->addText("name", function(Criteria $criteria, $comparator, $value) {											
 											$criteria->where('name', $comparator, $value);
 										})
+										->addText("notes", function(Criteria $criteria, $comparator, $value) {											
+											$criteria->where('notes', $comparator, $value);
+										})
 										->addText("phone", function(Criteria $criteria, $comparator, $value, Query $query) {												
 											if(!$query->isJoined('addressbook_phone')) {
 												$query->join('addressbook_phone_number', 'phone', 'phone.contactId = c.id', "INNER");
@@ -697,8 +700,14 @@ class Contact extends AclItemEntity {
 		return $keywords;
 	}
 
+	protected $salutation;
+
 	public function getSalutation() 
 	{
+		if(isset($this->salutation)) {
+			return $this->salutation;
+		}
+
 		if($this->isOrganization) {
 			return GO()->t("Dear sir/madam");
 		}
@@ -708,9 +717,17 @@ class Contact extends AclItemEntity {
 
 		$addressBook = AddressBook::findById($this->addressBookId, ['salutationTemplate']);
 
-		return $tpl->parse($addressBook->salutationTemplate);
+		$this->salutation = $tpl->parse($addressBook->salutationTemplate);
+		$this->saveTables();
+
+		return $this->salutation;
+
+
 	}
 	
+	public function setSalutation($v) {
+		$this->salutation = $v;
+	}
 	/**
 	 * Because we've implemented the getter method "getOrganizationIds" the contact 
 	 * modSeq must be incremented when a link between two contacts is deleted or 
