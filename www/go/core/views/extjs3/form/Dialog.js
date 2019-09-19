@@ -68,7 +68,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 
 		go.form.Dialog.superclass.initComponent.call(this);		
 		
-		if(this.entityStore.entity.links) {
+		if(this.entityStore.entity.links && this.entityStore.entity.links.length) {
 			this.addCreateLinkButton();
 		}
 
