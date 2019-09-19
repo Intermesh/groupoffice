@@ -23,9 +23,12 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	initComponent: function () {
 
 		this.createNoteGrid();
-		
 
 		this.sidePanel = new Ext.Panel({
+			layout: 'anchor',
+			defaults: {
+				anchor: '100%'
+			},
 			width: dp(300),
 			cls: 'go-sidenav',
 			region: "west",
@@ -169,7 +172,8 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					iconCls: "ic-menu",
 					handler: function () {
 //						this.westPanel.getLayout().setActiveItem(this.noteBookGrid);
-						this.noteBookGrid.show();
+						//this.noteBookGrid.show();
+						this.sidePanel.show();
 					},
 					scope: this
 				},
