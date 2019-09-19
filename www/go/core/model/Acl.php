@@ -454,4 +454,27 @@ class Acl extends Entity {
 		
 		return $query;
 	}
+
+
+	/**
+	 * Get the ACL that can be used to make things read only for everyone.
+	 * 
+	 * @return static
+	 */
+	public static function getReadOnlyAcl(){
+		
+		$acl = static::find()->where(['usedIn' => 'readonly'])->single();
+		
+		if(!$acl){
+			$acl = new static();
+			$acl->ownedBy = 1;
+			$acl->usedIn='readonly';
+			$acl->addGroup(Group::ID_EVERYONE);
+			if(!$acl->save()) {
+				throw new \Exception("Couldn't save read only acl: " . var_export($acl->getValidationErrors(), true));
+			}
+		}
+		
+		return $acl;
+	}
 }

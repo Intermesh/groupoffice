@@ -2,8 +2,11 @@
 namespace go\modules\community\addressbook\model;
 
 use go\core\fs\File;
+use go\core\model\Acl;
 use go\core\orm\Property;
-						
+use GO\Files\Model\Folder;
+use go\modules\community\addressbook\Module;
+
 /**
  * Address book model
  *
@@ -71,6 +74,9 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 
 
 	public function buildFilesPath() {
+
+		Module::checkRootFolder();
+
 		return "addressbook/" . File::stripInvalidChars($this->name);
 	}
 	

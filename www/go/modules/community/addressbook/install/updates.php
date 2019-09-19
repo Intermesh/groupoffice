@@ -1,4 +1,6 @@
 <?php
+use go\modules\community\addressbook\Module;
+
 $updates = [];
 
 $updates['201811272011'][] = function() {
@@ -60,4 +62,9 @@ $updates['201909181300'][] = "ALTER TABLE `addressbook_contact` ADD `salutation`
 $updates['201909181300'][] = function() {
 	$m = new go\modules\community\addressbook\install\Migrate63to64();
 	$m->addSalutation();
+};
+
+
+$updates['201909181300'][] = function() {
+	Module::checkRootFolder();
 };

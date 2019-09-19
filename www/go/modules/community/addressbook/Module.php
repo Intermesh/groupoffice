@@ -13,6 +13,7 @@ use go\core\model\User;
 use go\modules\community\addressbook\model\AddressBook;
 use go\core\model\Group;
 use go\core\model\Acl;
+use GO\Files\Model\Folder;
 use go\modules\community\addressbook\model\Settings;
 
 /**						
@@ -21,18 +22,8 @@ use go\modules\community\addressbook\model\Settings;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  * 
  * @todo 
- * filters
  * Merge
- * Batch edit
- * Export
- * Import
- * Carddav
- * Document templates
- * ActiveSync
- * Migration
- * Send newsletter
- * 
- * 
+ * Deduplicate
  * 
  */
 class Module extends core\Module {
@@ -92,6 +83,20 @@ class Module extends core\Module {
 	public function getSettings()
 	{
 		return Settings::get();
+	}
+
+	/**
+	 * Create and check permission on the "addressbook" root folder.
+	 */
+	public static function checkRootFolder() {
+		$roAcl = Acl::getReadOnlyAcl();
+		$folder = Folder::model()->findByPath('addressbook', true, ['acl_id' => $roAcl->id]);
+		if($folder->acl_id != $roAcl->id) {
+			$folder->acl_id = $roAcl->id;
+			$folder->save(true);
+		}
+
+		return $folder;
 	}
 							
 }
