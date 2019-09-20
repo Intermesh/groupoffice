@@ -210,6 +210,10 @@ class State extends AbstractState {
 	 * @return bool
 	 */
 	public function isAdmin() {
+		if($this->getUserId() == User::ID_SUPER_ADMIN) {
+			return true;
+		}
+
 		$user = $this->getUser(['id']);
 		if(!$user) {
 			return false;
