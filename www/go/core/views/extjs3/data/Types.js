@@ -14,3 +14,45 @@ Ext.data.Types.RELATION = {
 	},
 	sortType: Ext.data.SortTypes.none // You can sort on propery name for example with sortType: function(entity) {return entity.name;}
 };
+
+
+/**
+ * Promise field will be resolved before render
+ * 
+ * {
+					name: "promiseTest",
+					type:"promise",
+					promise:function(data) {
+						return go.Db.store("Search").query({
+							filter: {
+								entities: ["Event"],
+								link: {
+									entity: "Contact",
+									id: data.id
+								}
+							}
+						}).then(function(result) {
+							if(result.ids.length === 0) {
+								return "-";
+							}
+
+							return go.Db.store("Search").single(result.ids[0]).then(function(data) {
+								return go.util.Format.dateTime(data.modifiedAt);
+							});
+
+						});
+					}
+				}
+ * 
+ */
+
+Ext.data.Types.PROMISE = {
+	isRelation: true,	
+	promise: function(data) {
+		return Promise.resolve();
+	},
+	convert: function(v, data) {
+		return v;
+	},
+	sortType: Ext.data.SortTypes.none // You can sort on propery name for example with sortType: function(entity) {return entity.name;}
+};

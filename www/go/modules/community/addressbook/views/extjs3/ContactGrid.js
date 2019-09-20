@@ -226,7 +226,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function (emailAddresses, meta, record) {
 						return emailAddresses.column("email").join(", ");
 					}
-				},
+				}
 			],
 			viewConfig: {
 				emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
