@@ -60,7 +60,7 @@ class Search extends EntityController {
 		$query->offset($params['position'] ?? 0)
 			->limit(20);
 
-		GO()->debug($query);
+		go()->debug($query);
 		
 		\go\core\jmap\Response::get()->addResponse([
 				'list' => $query->toArray()

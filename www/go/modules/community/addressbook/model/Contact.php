@@ -526,7 +526,7 @@ class Contact extends AclItemEntity {
 	public function getUid() {
 		
 		if(!isset($this->uid)) {
-			$url = trim(GO()->getSettings()->URL, '/');
+			$url = trim(go()->getSettings()->URL, '/');
 			$uid = substr($url, strpos($url, '://') + 3);
 			$uid = str_replace('/', '-', $uid );
 			$this->uid = $this->id . '@' . $uid;
@@ -565,7 +565,7 @@ class Contact extends AclItemEntity {
 			$this->getUid();
 			$this->getUri();
 
-			if(!GO()->getDbConnection()
+			if(!go()->getDbConnection()
 							->update('addressbook_contact', 
 											['uid' => $this->uid, 'uri' => $this->uri], 
 											['id' => $this->id])
@@ -590,7 +590,7 @@ class Contact extends AclItemEntity {
 		}		
 		
 		if($this->isNew() && !isset($this->addressBookId)) {
-			$this->addressBookId = GO()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->defaultAddressBookId;
+			$this->addressBookId = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->defaultAddressBookId;
 		}
 		
 		if($this->isModified('addressBookId') || $this->isModified('groups')) {
@@ -709,7 +709,7 @@ class Contact extends AclItemEntity {
 		}
 
 		if($this->isOrganization) {
-			return GO()->t("Dear sir/madam");
+			return go()->t("Dear sir/madam");
 		}
 
 		$tpl = new TemplateParser();
@@ -757,7 +757,7 @@ class Contact extends AclItemEntity {
 //		$ids = [$link->toId, $link->fromId];
 //		
 //		//Update modifiedAt dates for Z-Push and carddav
-//		GO()->getDbConnection()
+//		go()->getDbConnection()
 //						->update(
 //										'addressbook_contact',
 //										['modifiedAt' => new DateTime()], 

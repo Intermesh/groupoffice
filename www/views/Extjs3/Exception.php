@@ -25,7 +25,7 @@ if(Http::isAjaxRequest()){
 
 		echo "\n\n-----\n\n";
 
-		GO()->getDebugger()->printEntries();
+		go()->getDebugger()->printEntries();
 		echo '</pre>';
 
 		

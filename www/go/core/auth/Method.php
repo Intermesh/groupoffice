@@ -48,7 +48,7 @@ class Method extends Entity {
 	 */
 	public static function findAllAuthenticators() {
 		
-		$authenticators = GO()->getCache()->get("authenticators");
+		$authenticators = go()->getCache()->get("authenticators");
 		
 		if(!$authenticators) {
 			$classFinder = new \go\core\util\ClassFinder();
@@ -60,7 +60,7 @@ class Method extends Entity {
 				$arr[$a::id()] = $a;
 			}
 			
-			GO()->getCache()->set("authenticators", $arr);
+			go()->getCache()->set("authenticators", $arr);
 			return $arr;
 		}
 		

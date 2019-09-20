@@ -76,7 +76,7 @@ if(GO::config()->debug) {
 //echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
 echo '<script type="text/javascript" src="views/Extjs3/javascript/ext-base-debug.js"></script>';
 echo '<script type="text/javascript" src="views/Extjs3/javascript/ext-all-debug.js?mtime='.filemtime(__DIR__ . '/javascript/ext-all-debug.js').'"></script>';
-echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?lang='.\GO()->getLanguage()->getIsoCode() . '&v='.$webclient->getLanguageJS()->getModifiedAt()->format("U").'"></script>';
+echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?lang='.\go()->getLanguage()->getIsoCode() . '&v='.$webclient->getLanguageJS()->getModifiedAt()->format("U").'"></script>';
 
 ?>
 
@@ -90,7 +90,7 @@ echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?l
 	GO.calltoOpenWindow = <?php echo GO::config()->callto_open_window ? "true" : "false"; ?>;
 	
 	GO.authenticationDomains = <?php echo json_encode(go\core\model\User::getAuthenticationDomains()); ?>;
-	GO.authenticationDomainDefault = "<?php echo GO()->getSettings()->defaultAuthenticationDomain; ?>";
+	GO.authenticationDomainDefault = "<?php echo go()->getSettings()->defaultAuthenticationDomain; ?>";
 <?php
 if (isset(GO::session()->values['security_token'])) {
 	echo 'GO.securityToken="' . GO::session()->values['security_token'] . '";';

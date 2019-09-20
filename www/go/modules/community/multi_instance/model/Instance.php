@@ -120,7 +120,7 @@ class Instance extends Entity {
 				$this->setValidationError('hostname', ErrorCode::MALFORMED, 'The hostname was malformed');
 			}
 
-			if($this->getDbName() == GO()->getDatabase()->getName()) {
+			if($this->getDbName() == go()->getDatabase()->getName()) {
 				$this->setValidationError('hostname', ErrorCode::UNIQUE, 'This hostname is not available (Database exists).');
 			}
 
@@ -167,15 +167,15 @@ class Instance extends Entity {
 	}
 	
 	private function getDataFolder() {
-		return GO()->getDataFolder()->getFolder('multi_instance/' . $this->hostname);
+		return go()->getDataFolder()->getFolder('multi_instance/' . $this->hostname);
 	}
 	
 	private function getTrashFolder() {
-		return GO()->getDataFolder()->getFolder('multi_instance/_trash_')->create();
+		return go()->getDataFolder()->getFolder('multi_instance/_trash_')->create();
 	}
 	
 	private function getTempFolder() {
-		return GO()->getTmpFolder()->getFolder('multi_instance/' . $this->hostname);
+		return go()->getTmpFolder()->getFolder('multi_instance/' . $this->hostname);
 	}
 	
 	private function getDbName() {
@@ -219,7 +219,7 @@ class Instance extends Entity {
 	}
 	
 	private function copySystemSettings() {
-		$core = GO()->getSettings()->toArray();
+		$core = go()->getSettings()->toArray();
 		$groups = \go\core\model\Settings::get()->toArray();
 		$users = \go\core\model\Settings::get()->toArray();
 		
@@ -272,7 +272,7 @@ class Instance extends Entity {
 									'due_time' => 0,
 									'ctime' => time(),
 									'mtime' => time(),
-									'title' => GO()->t("Welcome to Group-Office"),
+									'title' => go()->t("Welcome to Group-Office"),
 									"content" => $this->welcomeMessage
 							])->execute();
 		}
@@ -329,15 +329,15 @@ class Instance extends Entity {
 	}
 	
 	private function dropDatabase($dbName) {		
-		return GO()->getDbConnection()->query("DROP DATABASE IF EXISTS `".$dbName."`");
+		return go()->getDbConnection()->query("DROP DATABASE IF EXISTS `".$dbName."`");
 	}
 	
 	private function createDatabase($dbName) {		
-		return GO()->getDbConnection()->query("CREATE DATABASE IF NOT EXISTS `".$dbName."`");
+		return go()->getDbConnection()->query("CREATE DATABASE IF NOT EXISTS `".$dbName."`");
 	}
 	
 	private function dropDatabaseUser($dbUser) {
-		GO()->getDbConnection()->query("DROP USER '" . $dbUser . "'@'%'");
+		go()->getDbConnection()->query("DROP USER '" . $dbUser . "'@'%'");
 	}
 	
 	private function createDatabaseUser($dbName, $dbUsername, $dbPassword) {
@@ -345,15 +345,15 @@ class Instance extends Entity {
 								"'".$dbUsername."'@'%' ".
 								"IDENTIFIED BY '" . $dbPassword . "' WITH GRANT OPTION";			
 
-		GO()->getDbConnection()->query($sql);
-		GO()->getDbConnection()->query('FLUSH PRIVILEGES');		
+		go()->getDbConnection()->query($sql);
+		go()->getDbConnection()->query('FLUSH PRIVILEGES');		
 	}
 	
 	private function createConfigFile($dbName, $dbUsername, $dbPassword, $tmpPath, $dataPath) {
 		
 		$tpl = Module::getFolder()->getFile('config.php.tpl');
 		
-		$dsn = \go\core\db\Utils::parseDSN(GO()->getConfig()['core']['db']['dsn']);
+		$dsn = \go\core\db\Utils::parseDSN(go()->getConfig()['core']['db']['dsn']);
 
 		
 		return str_replace([
@@ -371,7 +371,7 @@ class Instance extends Entity {
 				$dbPassword,
 				$tmpPath,
 				$dataPath,
-				GO()->findConfigFile()
+				go()->findConfigFile()
 		],
 		$tpl->getContents());		
 	}
@@ -524,7 +524,7 @@ class Instance extends Entity {
 			
 	
 		$cmd = "mysqldump --force --opt --host=" . ($c['db_host'] ?? "localhost") . " --port=" . ($c['db_port'] ?? 3306) . " --user=" . $c['db_user'] . " --password=" . $c['db_pass'] . " " . $c['db_name'] . " > \"" . $file->getPath() . "\"";
-		GO()->debug($cmd);
+		go()->debug($cmd);
 		exec($cmd, $output, $retVar);
 		
 		if($retVar != 0) {

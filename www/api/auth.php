@@ -15,7 +15,7 @@ function output($data = [], $status = 200, $statusMsg = null) {
 	Response::get()->setStatus($status, $statusMsg);
 	Response::get()->sendHeaders();
 
-	$data['debug'] = GO()->getDebugger()->getEntries();
+	$data['debug'] = go()->getDebugger()->getEntries();
 	
 	//var_dump($data);
 	
@@ -56,12 +56,12 @@ try {
 
 		$user = User::find()->where(['email' => $data['email']])->orWhere(['recoveryEmail' => $data['email']])->single();
 		if (empty($user)) {
-			GO()->debug("User not found");
+			go()->debug("User not found");
 			output([], 200, "Recovery mail sent");	//Don't show if user was found or not for security
 		}
 		
 		if(!($user->getPrimaryAuthenticator() instanceof \go\core\auth\Password)) {
-			GO()->debug("Authenticator doesn't support recovery");
+			go()->debug("Authenticator doesn't support recovery");
 			output([], 200, "Recovery mail sent");	
 		}
 		
@@ -121,10 +121,10 @@ try {
 			go()->log("success");
 			
 			if(!$user->enabled) {				
-				output([], 403, GO()->t("You're account has been disabled."));
+				output([], 403, go()->t("You're account has been disabled."));
 			}
 			
-			if(GO()->getSettings()->maintenanceMode && !$user->isAdmin()) {
+			if(go()->getSettings()->maintenanceMode && !$user->isAdmin()) {
 				output([], 503, "Service unavailable. Maintenance mode is enabled");
 			}
 
@@ -190,7 +190,7 @@ try {
 	if ($token->isAuthenticated()) {
     $authState = new \go\core\jmap\State();
     $authState->setToken($token);
-		GO()->setAuthState($authState);
+		go()->setAuthState($authState);
     $response = $authState->getSession();
     
 		$response['accessToken'] = $token->accessToken;

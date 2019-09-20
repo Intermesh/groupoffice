@@ -21,7 +21,7 @@ class GarbageCollector {
 				// wont remove blobs that are referrenced
 			}
 		}
-		//$this->removeEmptyDirs(\GO()->getDataFolder()->getPath() .'/data/');
+		//$this->removeEmptyDirs(\go()->getDataFolder()->getPath() .'/data/');
 	}
 	
 	private function removeEmptyDirs($path) {

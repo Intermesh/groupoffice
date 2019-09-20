@@ -10,7 +10,7 @@ use go\core\SingletonTrait;
  * 
  * You can extend this with {@see App::EVENT_HEAD}:
  * 
- * GO()->on(App::EVENT_HEAD, Example::class, 'onHead');
+ * go()->on(App::EVENT_HEAD, Example::class, 'onHead');
  * 
  * public static function onHead() {
  *  CSP::get()->add(...)

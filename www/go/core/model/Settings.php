@@ -171,7 +171,7 @@ class Settings extends core\Settings {
 	 */
 	public function getLocale() {
 
-		if(GO()->getInstaller()->isInProgress()) {
+		if(go()->getInstaller()->isInProgress()) {
 			return 'C.UTF-8';
 		}
 		
@@ -192,7 +192,7 @@ class Settings extends core\Settings {
 				}
 			}
 		} catch(Exception $e) {
-			GO()->debug("Could not determine locale");
+			go()->debug("Could not determine locale");
 		}
 
 		//This locale is often installed so try to fallback on C.UTF8
@@ -381,7 +381,7 @@ class Settings extends core\Settings {
 
 		if(!$addressBook) {
 			$addressBook = new AddressBook();	
-			$addressBook->name = GO()->t("Users");		
+			$addressBook->name = go()->t("Users");		
 
 			if(!$addressBook->save()) {
 				throw new \Exception("Could not save address book");
@@ -453,10 +453,10 @@ class Settings extends core\Settings {
 	 */
 	public function setDefaultGroups($groups) {	
 		
-		GO()->getDbConnection()->exec("TRUNCATE TABLE core_group_default_group");
+		go()->getDbConnection()->exec("TRUNCATE TABLE core_group_default_group");
 		
 		foreach($groups as $groupId) {
-			if(!GO()->getDbConnection()->insert("core_group_default_group", ['groupId' => $groupId])->execute()) {
+			if(!go()->getDbConnection()->insert("core_group_default_group", ['groupId' => $groupId])->execute()) {
 				throw new Exception("Could not save group id ".$groupId);
 			}
 		}

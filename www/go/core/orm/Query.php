@@ -78,14 +78,14 @@ class Query extends DbQuery {
 	 * @return bool
 	 */
 	public function delete() {
-		GO()->getDbConnection()->beginTransaction();
+		go()->getDbConnection()->beginTransaction();
 		foreach($this->getIterator() as $entity) {
 			if(!$entity->delete()) {
-				GO()->getDbConnection()->rollBack();
+				go()->getDbConnection()->rollBack();
 				return false;
 			}
 		}
-		GO()->getDbConnection()->commit();
+		go()->getDbConnection()->commit();
 		return true;
 	}
 

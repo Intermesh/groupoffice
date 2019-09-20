@@ -60,7 +60,7 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 	{
 		
 		if(empty($this->salutationTemplate)) {
-			$this->salutationTemplate = GO()->t("salutationTemplate", "community", "addressbook");
+			$this->salutationTemplate = go()->t("salutationTemplate", "community", "addressbook");
 		}
 
 		parent::init();
@@ -104,7 +104,7 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 	public static function getDefault(\go\core\model\User $user = null) {
 		
 		if(!isset($user)) {
-			$user = GO()->getAuthState()->getUser(['addressBookSettings']);
+			$user = go()->getAuthState()->getUser(['addressBookSettings']);
 		}
 			
 		if(!isset($user->addressBookSettings)) {
@@ -115,22 +115,22 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 			return static::findById($user->addressBookSettings->defaultAddressBookId);
 		}
 		
-		GO()->getDbConnection()->beginTransaction();
+		go()->getDbConnection()->beginTransaction();
 		
 		$addressBook = new \go\modules\community\addressbook\model\AddressBook();
 		$addressBook->name = $user->displayName;
 		if(!$addressBook->save()) {
-			GO()->getDbConnection()->rollBack();
+			go()->getDbConnection()->rollBack();
 			throw new \Exception("Could not create address book");
 		}
 		
 		$user->addressBookSettings->defaultAddressBookId = $addressBook->id;
 		if(!$user->save()) {
-			GO()->getDbConnection()->rollBack();
+			go()->getDbConnection()->rollBack();
 			throw new \Exception("Failed to save user");
 		}		
 		
-		GO()->getDbConnection()->commit();
+		go()->getDbConnection()->commit();
 		
 		return $addressBook;
 	}

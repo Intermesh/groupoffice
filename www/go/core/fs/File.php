@@ -34,7 +34,7 @@ class File extends FileSystemObject {
 	 * @return static
 	 */
 	public static function tempFile($extension) {
-		 return GO()->getTmpFolder()->getFile(uniqid(time()) . '.' . $extension);
+		 return go()->getTmpFolder()->getFile(uniqid(time()) . '.' . $extension);
 	}
 
 	

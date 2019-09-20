@@ -20,13 +20,13 @@ class Language extends Controller {
 	const ENCLOSURE = '"';
 
 	protected function authenticate() {  
-    if (!GO()->getAuthState()->isAuthenticated()) {			
+    if (!go()->getAuthState()->isAuthenticated()) {			
       throw new Exception(401, "Unauthorized");
 		}  	
 	}
 
 	public function export($params) {
-		GO()->getLanguage()->setLanguage($params['language']);
+		go()->getLanguage()->setLanguage($params['language']);
 
 //for checking arrays() in english translation
 		$this->en = new LangModel();
@@ -49,7 +49,7 @@ class Language extends Controller {
 				"package",
 				"module",
 				"EN",
-				GO()->getLanguage()->getIsoCode(),
+				go()->getLanguage()->getIsoCode(),
 				"source"
 		], self::DELIMITER, self::ENCLOSURE);
 
@@ -124,7 +124,7 @@ class Language extends Controller {
 		foreach ($strings as $string) {
 			$enTranslation = $this->en->t($string, $package, $module);
 
-			$translated = GO()->t($string, $package, $module);
+			$translated = go()->t($string, $package, $module);
 			if (is_array($enTranslation)) {
 				foreach ($enTranslation as $key => $stringItem) {
 					$translatedItem = $translated[$key] ?? "";

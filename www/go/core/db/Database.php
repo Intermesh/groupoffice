@@ -11,7 +11,7 @@ class Database {
 	private $conn;
 
 	public function __construct(Connection $conn = null) {
-		$this->conn = $conn ?? GO()->getDbConnection();
+		$this->conn = $conn ?? go()->getDbConnection();
 	}
 	
 	/**

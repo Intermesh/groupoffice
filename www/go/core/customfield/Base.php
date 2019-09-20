@@ -54,7 +54,7 @@ abstract class Base extends Model {
 	 * @return string|boolean
 	 */
 	protected function getFieldSQL() {
-		return "VARCHAR(".($this->field->getOption('maxLength') ?? 190).") DEFAULT " . GO()->getDbConnection()->getPDO()->quote($this->field->getDefault() ?? "NULL");
+		return "VARCHAR(".($this->field->getOption('maxLength') ?? 190).") DEFAULT " . go()->getDbConnection()->getPDO()->quote($this->field->getDefault() ?? "NULL");
 	}
 
 	/**
@@ -74,7 +74,7 @@ abstract class Base extends Model {
 		}
 		
 		if($this->field->isModified("databaseName") && preg_match('/[^a-zA-Z_0-9]/', $this->field->databaseName)) {
-			$this->field->setValidationError('databaseName', ErrorCode::INVALID_INPUT, GO()->t("Invalid database name. Only use alpha numeric chars and underscores.", 'core','customfields'));
+			$this->field->setValidationError('databaseName', ErrorCode::INVALID_INPUT, go()->t("Invalid database name. Only use alpha numeric chars and underscores.", 'core','customfields'));
 		}		
 	}
 	
@@ -97,10 +97,10 @@ abstract class Base extends Model {
 	
 		if ($this->field->isNew()) {
 			$sql = "ALTER TABLE `" . $table . "` ADD " . $quotedDbName . " " . $fieldSql . ";";
-			GO()->getDbConnection()->query($sql);
+			go()->getDbConnection()->query($sql);
 			if($this->field->getUnique()) {
 				$sql = "ALTER TABLE `" . $table . "` ADD UNIQUE(". $quotedDbName  . ");";
-				GO()->getDbConnection()->query($sql);
+				go()->getDbConnection()->query($sql);
 			}			
 		} else {
 			
@@ -109,14 +109,14 @@ abstract class Base extends Model {
 			$col = Table::getInstance($table)->getColumn($oldName);
 			
 			$sql = "ALTER TABLE `" . $table . "` CHANGE " . Utils::quoteColumnName($oldName) . " " . $quotedDbName . " " . $fieldSql;
-			GO()->getDbConnection()->query($sql);
+			go()->getDbConnection()->query($sql);
 			
 			if($this->field->getUnique() && !$col->unique) {
 				$sql = "ALTER TABLE `" . $table . "` ADD UNIQUE(". $quotedDbName  . ");";
-				GO()->getDbConnection()->query($sql);
+				go()->getDbConnection()->query($sql);
 			} else if(!$this->field->getUnique() && $col->unique) {
 				$sql = "ALTER TABLE `" . $table . "` DROP INDEX " . $quotedDbName;
-				GO()->getDbConnection()->query($sql);
+				go()->getDbConnection()->query($sql);
 			}
 		}
 		
@@ -141,7 +141,7 @@ abstract class Base extends Model {
 		$sql = "ALTER TABLE `" . $table . "` DROP " . Utils::quoteColumnName($this->field->databaseName) ;
 
 		try {
-			GO()->getDbConnection()->query($sql);
+			go()->getDbConnection()->query($sql);
 		} catch (Exception $e) {
 			ErrorHandler::logException($e);
 		}
@@ -245,7 +245,7 @@ abstract class Base extends Model {
 	 */
 	public static function findAll() {
 		
-		$types = GO()->getCache()->get("customfield-types");
+		$types = go()->getCache()->get("customfield-types");
 		
 		if(!$types) {
 			$classFinder = new ClassFinder();
@@ -257,11 +257,11 @@ abstract class Base extends Model {
 				$types[$class::getName()] = $class;
 			}
 			
-			if(GO()->getModule(null, "files")) {
+			if(go()->getModule(null, "files")) {
 				$types['File'] = \GO\Files\Customfield\File::class;
 			}
 			
-			GO()->getCache()->set("customfield-types", $types);
+			go()->getCache()->set("customfield-types", $types);
 		}
 		
 		return $types;		
@@ -284,7 +284,7 @@ abstract class Base extends Model {
 		$all = static::findAll();
 
 		if(!isset($all[$name])) {
-			GO()->debug("WARNING: Custom field type '$name' not found");			
+			go()->debug("WARNING: Custom field type '$name' not found");			
 			return Text::class;
 		}
 		

@@ -1537,7 +1537,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		
 		$contact = !empty($response['sender']) ? \go\modules\community\addressbook\model\Contact::find()->filter(['email' => $response['sender'], 'permissionLevel' => \go\core\model\Acl::LEVEL_READ])->single() : false;
 		if(!empty($contact)){
-			$response['contact_thumb_url']= GO()->getAuthState()->getDownloadUrl($contact->photoBlobId);
+			$response['contact_thumb_url']= go()->getAuthState()->getDownloadUrl($contact->photoBlobId);
 
 			if($useQL){
 				$response['sender_contact_id']=$contact->id;

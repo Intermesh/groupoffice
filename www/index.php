@@ -72,7 +72,7 @@ try {
 			exit();
 		}
 		
-		if(GO()->getSettings()->databaseVersion != GO()->getVersion()) {
+		if(go()->getSettings()->databaseVersion != go()->getVersion()) {
 			header('Location: '.GO::config()->host.'install/upgrade.php');				
 			exit();
 		}

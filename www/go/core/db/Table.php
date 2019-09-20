@@ -28,7 +28,7 @@ class Table {
 	public static function getInstance($name, Connection $conn = null) {
 		
 		if(!isset($conn)) {
-			$conn = GO()->getDbConnection();
+			$conn = go()->getDbConnection();
 		}
 
 		$cacheKey = $conn->getDsn() . '-' . $name;
@@ -41,7 +41,7 @@ class Table {
 
 	public static function destroyInstance($name, Connection $conn = null) {
 		if(!isset($conn)) {
-			$conn = GO()->getDbConnection();
+			$conn = go()->getDbConnection();
 		}
 
 		$cacheKey = $conn->getDsn() . '-' . $name;

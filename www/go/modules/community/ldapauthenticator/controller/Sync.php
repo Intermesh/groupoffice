@@ -68,7 +68,7 @@ class Sync extends Controller {
           continue;
         }
 
-        GO()->getDbConnection()
+        go()->getDbConnection()
           ->replace('ldapauth_server_user_sync', ['serverId' => $id, 'userId' => $user->id])->execute();
       }      
 
@@ -174,7 +174,7 @@ class Sync extends Controller {
           throw new \Excpetion("Could not save group");
         }
 
-        GO()->getDbConnection()
+        go()->getDbConnection()
           ->replace('ldapauth_server_group_sync', ['serverId' => $id, 'groupId' => $group->id])->execute();
 
       }
@@ -190,7 +190,7 @@ class Sync extends Controller {
 
     echo "Done\n\n";
     
-    // GO()->getDebugger()->printEntries();
+    // go()->getDebugger()->printEntries();
 
 		//var_dump($attr);
   }

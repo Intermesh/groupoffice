@@ -11,7 +11,7 @@ class Group extends EntityController {
 	
 	protected function canUpdate(\go\core\orm\Entity $entity) {
 		
-		if(!GO()->getAuthState()->isAdmin()) {
+		if(!go()->getAuthState()->isAdmin()) {
 			if($entity->isModified('groups')) {
 				return false;
 			}

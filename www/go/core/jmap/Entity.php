@@ -133,7 +133,7 @@ abstract class Entity  extends OrmEntity {
 
 				$type = $cls::entityType();
 
-				//GO()->warn($query);
+				//go()->warn($query);
 
 				/** @var EntityType $type */
 				$type->changes($query);
@@ -305,7 +305,7 @@ abstract class Entity  extends OrmEntity {
 						->select('entityId, "0" AS destroyed')
 						->from("core_change_user", "change_user")
 						->where([
-								"userId" => GO()->getUserId(),
+								"userId" => go()->getUserId(),
 								"entityTypeId" => static::entityType()->getId()
 						])
 						->andWhere('modSeq', '>', $sinceModSeq);
@@ -336,28 +336,28 @@ abstract class Entity  extends OrmEntity {
 	 */
 	private static function getEntityReferences() {
 		$cacheKey = "refs-" . static::class;
-		$entityClasses = GO()->getCache()->get($cacheKey);
+		$entityClasses = go()->getCache()->get($cacheKey);
 		if($entityClasses === null) {
 
 			$tableName = array_values(static::getMapping()->getTables())[0]->getName();
 
-			$dbName = GO()->getDatabase()->getName();
-			GO()->getDbConnection()->exec("USE information_schema");
+			$dbName = go()->getDatabase()->getName();
+			go()->getDbConnection()->exec("USE information_schema");
 			//somehow bindvalue didn't work here
 			$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where ".
-				"table_schema=" . GO()->getDbConnection()->getPDO()->quote($dbName) . 
-				" and referenced_table_name=".GO()->getDbConnection()->getPDO()->quote($tableName)." and referenced_column_name = 'id'";
+				"table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . 
+				" and referenced_table_name=".go()->getDbConnection()->getPDO()->quote($tableName)." and referenced_column_name = 'id'";
 
-			$stmt = GO()->getDbConnection()->getPDO()->query($sql);
+			$stmt = go()->getDbConnection()->getPDO()->query($sql);
 			$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);					
-			GO()->getDbConnection()->exec("USE `" . $dbName . "`");		
+			go()->getDbConnection()->exec("USE `" . $dbName . "`");		
 
 			$entityClasses = [];
 			foreach($refs as $r) {
 				$entityClasses = array_merge($entityClasses, static::findEntitiesByTable($r['table'], $r['column']));
 			}	
 			
-			GO()->getCache()->set($cacheKey, $entityClasses);			
+			go()->getCache()->set($cacheKey, $entityClasses);			
 		}		
 		
 		return $entityClasses;

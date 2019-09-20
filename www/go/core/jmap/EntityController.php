@@ -97,7 +97,7 @@ abstract class EntityController extends Controller {
 			$query->filter(["permissionLevel" => Acl::LEVEL_READ]);
 		}
 		
-		//GO()->info($query);
+		//go()->info($query);
 		
 		return $query;
 	}
@@ -646,7 +646,7 @@ abstract class EntityController extends Controller {
 			$result = $cls::getChanges($p['sinceState'], $p['maxChanges']);		
 		} catch (CannotCalculateChanges $e) {
 			$result["message"] = $e->getMessage();
-			GO()->warn($e->getMessage());
+			go()->warn($e->getMessage());
 		}
 		
 		$result['accountId'] = $p['accountId'];

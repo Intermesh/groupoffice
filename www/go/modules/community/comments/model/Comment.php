@@ -120,7 +120,7 @@ class Comment extends Entity {
 	 */
 	public function getPermissionLevel() {
 
-		if(GO()->getAuthState()->isAdmin()) {
+		if(go()->getAuthState()->isAdmin()) {
 			return Acl::LEVEL_MANAGE;
 		}
 
@@ -128,7 +128,7 @@ class Comment extends Entity {
 			return $this->findEntity()->getPermissionLevel();
 		}
 
-		if($this->createdBy == GO()->getAuthState()->getUserId()) {
+		if($this->createdBy == go()->getAuthState()->getUserId()) {
 			return Acl::LEVEL_MANAGE;
 		}
 

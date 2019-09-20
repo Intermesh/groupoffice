@@ -268,7 +268,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 			}
 			
 			if(!$this->getIsNew()) {
-				 GO()->getDbConnection()->update('fs_files',['name' => $name], ['id' => $this->id])->execute();
+				 go()->getDbConnection()->update('fs_files',['name' => $name], ['id' => $this->id])->execute();
 			}
 			$this->name = $name;
 		}

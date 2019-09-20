@@ -53,5 +53,5 @@ if ($blob->save()) {
 } else {
 	echo 'Could not save '.$blob->id;
 	
-	var_dump(GO()->getDebugger()->getEntries());
+	var_dump(go()->getDebugger()->getEntries());
 }

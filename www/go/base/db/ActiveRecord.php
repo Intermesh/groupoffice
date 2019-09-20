@@ -1280,7 +1280,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if(empty($params['fields']))
 			$params['fields']=$this->getDefaultFindSelectFields(isset($params['limit']) && $params['limit']==1);
 		else
-			GO()->debug($params['fields']);
+			go()->debug($params['fields']);
 
 
 		$fields = $params['fields'].' ';

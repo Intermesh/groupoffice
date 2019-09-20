@@ -59,7 +59,7 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 		$female->save();
 
 
-		GO()->getSettings()->passwordMinLength = 4;	
+		go()->getSettings()->passwordMinLength = 4;	
 
 		
 		$elmer = User::find()->where(['username' => 'elmer'])->single();		
@@ -1301,7 +1301,7 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 		if(\GO::modules()->demodata) {
 			\GO::modules()->demodata->delete();
 			
-			GO()->rebuildCache();
+			go()->rebuildCache();
 		}
 		
 		if(!$this->isCli()){
@@ -1309,7 +1309,7 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			\GO::session()->restart();
 			\GO::session()->setCurrentUser($demo->id);
 			
-			header('Location: ' .GO()->getSettings()->URL);
+			header('Location: ' .go()->getSettings()->URL);
 			exit();
 		}		
 	}

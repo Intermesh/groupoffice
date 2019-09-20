@@ -217,7 +217,7 @@ class Link extends Entity {
 	 * @return boolean
 	 */
 	public static function deleteLinkWithIds($aId, $aTypeId, $bId, $bTypeId) {
-			if(!GO()->getDbConnection()
+			if(!go()->getDbConnection()
 						->delete('core_link',[
 				'fromEntityTypeId' => $aTypeId,
 				'fromId' => $aId,
@@ -227,7 +227,7 @@ class Link extends Entity {
 			return false;
 		}
 		
-		if(!GO()->getDbConnection()
+		if(!go()->getDbConnection()
 						->delete('core_link',[
 				'fromEntityTypeId' => $bTypeId,
 				'fromId' => $bId,
@@ -294,7 +294,7 @@ class Link extends Entity {
 		$reverse['toId'] = $this->fromId;
 		$reverse['fromId'] = $this->toId;
 		
-		return GO()->getDbConnection()->delete('core_link', $reverse)->execute();
+		return go()->getDbConnection()->delete('core_link', $reverse)->execute();
 	}
 	
 	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {

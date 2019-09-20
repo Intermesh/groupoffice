@@ -194,14 +194,14 @@ class Language extends Controller {
 			$key = trim($matches[1], '"\'');
 			$str = $commonLang[$key] ?? $key;
 
-			return 'GO()->t("' . str_replace('"', '\"', $str) . '")';
+			return 'go()->t("' . str_replace('"', '\"', $str) . '")';
 		}, $content);	
 		
 		$content = preg_replace_callback('/GO::t\(([\'"a-zA-Z0-9_]+)\s*,\s*([\'"a-zA-Z0-9_]+)\)/', function($matches) use ($modLang) {				
 			$key = trim($matches[1], '"\'');
 			$str = $modLang[$key] ?? $key;
 
-			return 'GO()->t("' . str_replace('"', '\"', $str) . '", "legacy", "' . trim($matches[2], '"\'') . '")';			
+			return 'go()->t("' . str_replace('"', '\"', $str) . '", "legacy", "' . trim($matches[2], '"\'') . '")';			
 		}, $content);	
 		
 		$file->putContents($content);

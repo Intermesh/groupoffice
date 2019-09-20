@@ -60,10 +60,10 @@ DROP INDEX `link_id` ;";
 $updates['201811061530'][] = 'SELECT createdAt, modifiedAt FROM comments_comment LIMIT 1;'; // <- ENSURE COLUMNS EXIST
 	
 $updates['201811061530'][] = function(){
-  GO()->getDbConnection()->exec("update comments_comment set createdBy = null where createdBy not in (select id from core_user)");
-  GO()->getDbConnection()->exec("update comments_comment set modifiedBy = null where modifiedBy not in (select id from core_user)");
+  go()->getDbConnection()->exec("update comments_comment set createdBy = null where createdBy not in (select id from core_user)");
+  go()->getDbConnection()->exec("update comments_comment set modifiedBy = null where modifiedBy not in (select id from core_user)");
 
-  GO()->getDbConnection()->exec("ALTER TABLE `comments_comment` 
+  go()->getDbConnection()->exec("ALTER TABLE `comments_comment` 
 ADD CONSTRAINT `fk_comments_comment_core_user1`
   FOREIGN KEY (`createdBy`)
   REFERENCES `core_user` (`id`)

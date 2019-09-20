@@ -219,7 +219,7 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 
 		$test = "-BEGIN CERTIFICATE-";
 		if(strpos($certData, $test) === false) {
-			throw new \Exception(GO()->t("The certificate must be in PEM format", "legacy", "smime"));
+			throw new \Exception(go()->t("The certificate must be in PEM format", "legacy", "smime"));
 		}
 
 		$success = true;

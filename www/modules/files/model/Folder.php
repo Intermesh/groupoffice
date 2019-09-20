@@ -370,7 +370,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			}
 			
 			if(!$this->getIsNew()) {
-				GO()->getDbConnection()->update('fs_folders',['name' => $name], ['id' => $this->id])->execute();
+				go()->getDbConnection()->update('fs_folders',['name' => $name], ['id' => $this->id])->execute();
 			}
 			$this->name = $name;
 			$this->_path = null;

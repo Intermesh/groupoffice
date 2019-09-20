@@ -59,7 +59,7 @@ class Select extends Base {
 	//Is public for migration. Can be made private in 6.5
 	public function addConstraint() {
 		$sql = "ALTER TABLE `" . $this->field->tableName() . "` ADD CONSTRAINT `" . $this->getConstraintName() . "` FOREIGN KEY (" . Utils::quoteColumnName($this->field->databaseName) . ") REFERENCES `core_customfields_select_option`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";			
-		GO()->getDbConnection()->query($sql);
+		go()->getDbConnection()->query($sql);
 	}
 	
 	private function getConstraintName() {
@@ -92,7 +92,7 @@ class Select extends Base {
 		if (!empty($this->savedOptionIds)) {	 
 			 $query->andWhere('id', 'not in', $this->savedOptionIds);
 		}
-		$deleteCmd = GO()->getDbConnection()->delete('core_customfields_select_option', $query)->execute();
+		$deleteCmd = go()->getDbConnection()->delete('core_customfields_select_option', $query)->execute();
 		
 		$this->options = null;
 	}
@@ -111,12 +111,12 @@ class Select extends Base {
 			
 			
 			if(empty($o['id'])) {
-				if (!GO()->getDbConnection()->insert('core_customfields_select_option', $o)->execute()) {
+				if (!go()->getDbConnection()->insert('core_customfields_select_option', $o)->execute()) {
 					throw new Exception("could not save select option");
 				}
-				$o['id'] = GO()->getDbConnection()->getPDO()->lastInsertId();
+				$o['id'] = go()->getDbConnection()->getPDO()->lastInsertId();
 			} else{
-				if (!GO()->getDbConnection()->update('core_customfields_select_option', $o, ['id' => $o['id']])->execute()) {
+				if (!go()->getDbConnection()->update('core_customfields_select_option', $o, ['id' => $o['id']])->execute()) {
 					throw new Exception("could not save select option");
 				}
 			}
@@ -129,7 +129,7 @@ class Select extends Base {
 	
 	public function onFieldDelete() {		
 		$sql = "ALTER TABLE `" . $this->field->tableName() . "` DROP FOREIGN KEY " . $this->getConstraintName();
-		if(!GO()->getDbConnection()->query($sql)) {
+		if(!go()->getDbConnection()->query($sql)) {
 			throw new \Exception("Couldn't drop foreign key");
 		}
 			

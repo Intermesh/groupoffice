@@ -60,7 +60,7 @@ class ModuleController extends AbstractJsonController{
 		$module->save();
 		
 		
-		GO()->rebuildCache(true);
+		go()->rebuildCache(true);
 		
 		echo $this->renderSubmit($module);
 	}

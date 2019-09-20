@@ -332,7 +332,7 @@ class Session extends Observable{
 			}
 			
 			//Set authentication for new framework
-			\GO()->setAuthState((new \go\core\auth\TemporaryState())->setUserId($user->id));
+			\go()->setAuthState((new \go\core\auth\TemporaryState())->setUserId($user->id));
 
 			$this->fireEvent('login', array($username, $password, $user, $countLogin));
 			

@@ -120,7 +120,7 @@ EOD;
 
 		$this->createModuleFile($folder, $namespace);
 
-		$result = GO()->getDbConnection()->query("SHOW TABLES");
+		$result = go()->getDbConnection()->query("SHOW TABLES");
 
 		while ($record = $result->fetch(PDO::FETCH_NUM)) {			
 			if (strpos($record[0], $tablePrefix . '_') === 0) {

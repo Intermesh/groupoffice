@@ -16,7 +16,7 @@ class Module extends core\Module {
 	protected function afterInstall(ModuleModel $model) {	
 		
 		$noteBook = new NoteBook();
-		$noteBook->name = GO()->t("Shared");
+		$noteBook->name = go()->t("Shared");
 		$noteBook->setAcl([
 			Group::ID_INTERNAL => Acl::LEVEL_DELETE
 		]);

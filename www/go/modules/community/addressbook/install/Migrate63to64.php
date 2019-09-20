@@ -32,12 +32,12 @@ class Migrate63to64 {
 	public function run() {
 		
 		//clear cache for ClassFinder fail in custom field type somehow.
-		GO()->getCache()->flush();
+		go()->getCache()->flush();
 		Table::destroyInstances();
 		
-		$this->countries = GO()->t('countries');
+		$this->countries = go()->t('countries');
 		
-		$db = GO()->getDbConnection();
+		$db = go()->getDbConnection();
 		//Start from scratch
 		// $db->query("DELETE FROM addressbook_contact");
 		// $db->query("DELETE FROM addressbook_addressbook");
@@ -91,7 +91,7 @@ class Migrate63to64 {
 	}
 	
 	private function addCustomFieldKeys() {
-		$c = GO()->getDbConnection();
+		$c = go()->getDbConnection();
 		$c->query("delete from addressbook_contact_custom_fields where id not in (select id from addressbook_contact);");	
 		$c->query("ALTER TABLE `addressbook_contact_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `addressbook_contact`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;");
 
@@ -99,7 +99,7 @@ class Migrate63to64 {
 	public function migrateCustomFields() {
 		echo "Migrating custom fields\n";
 		flush();
-		$c = GO()->getDbConnection();
+		$c = go()->getDbConnection();
 		$c->query("DROP TABLE IF EXISTS addressbook_contact_custom_fields");
 		$c->query("CREATE TABLE addressbook_contact_custom_fields LIKE cf_ab_contacts;");		
 		$c->query("INSERT addressbook_contact_custom_fields SELECT * FROM cf_ab_contacts;");
@@ -179,9 +179,9 @@ class Migrate63to64 {
 		
 		echo $alterSQL."\n\n";
 		
-		GO()->getDbConnection()->query($alterSQL);		
+		go()->getDbConnection()->query($alterSQL);		
 				
-		$data = GO()->getDbConnection()
+		$data = go()->getDbConnection()
 						->select('(`model_id` + '. $this->getCompanyIdIncrement().') as id')
 						->select(array_map([\go\core\db\Utils::class, "quoteColumnName"],array_keys($renameMap)), true)
 						->from('cf_ab_companies', 'cf')
@@ -190,7 +190,7 @@ class Migrate63to64 {
 
 		
 		
-		$insert = GO()->getDbConnection()->insertIgnore('addressbook_contact_custom_fields', $data, array_merge(['id'], array_values($renameMap)));
+		$insert = go()->getDbConnection()->insertIgnore('addressbook_contact_custom_fields', $data, array_merge(['id'], array_values($renameMap)));
 		echo $insert ."\n";
 		$insert->execute();
 		
@@ -199,7 +199,7 @@ class Migrate63to64 {
 		if($companyEntityType) {
 			
 			foreach($renameMap as $old => $new) {
-				GO()->getDbConnection()
+				go()->getDbConnection()
 							->update("core_customfields_field", 
 											['databaseName' => $new],
 											(new \go\core\orm\Query)
@@ -214,7 +214,7 @@ class Migrate63to64 {
 							->execute();
 			}
 			
-			GO()->getDbConnection()
+			go()->getDbConnection()
 							->update("core_customfields_field_set", 
 											['entityId' => Contact::entityType()->getId()], 
 											['entityId' => $companyEntityType->getId()])
@@ -232,7 +232,7 @@ class Migrate63to64 {
 			return;
 		}
 		
-//		GO()->getDbConnection()
+//		go()->getDbConnection()
 //						->delete(
 //										'core_link', 
 //										(new \go\core\db\Query)
@@ -240,7 +240,7 @@ class Migrate63to64 {
 //										->andWhere('fromId', 'NOT IN', Contact::find()->select('id'))
 //										)->execute();
 //		
-//		GO()->getDbConnection()
+//		go()->getDbConnection()
 //						->delete(
 //										'core_link', 
 //										(new \go\core\db\Query)
@@ -249,7 +249,7 @@ class Migrate63to64 {
 //										)->execute();
 		
 		go()->getDbConnection()->beginTransaction();
-		GO()->getDbConnection()
+		go()->getDbConnection()
 						->update("core_link", 
 										[
 												'fromEntityTypeId' => Contact::entityType()->getId(),
@@ -258,7 +258,7 @@ class Migrate63to64 {
 										['fromEntityTypeId' => $companyEntityType->getId()])
 						->execute();
 		
-		GO()->getDbConnection()
+		go()->getDbConnection()
 						->update("core_link", 
 										[
 												'toEntityTypeId' => Contact::entityType()->getId(),
@@ -268,13 +268,13 @@ class Migrate63to64 {
 						->execute();
 
 
-		GO()->getDbConnection()->exec("update comments_comment n set entityTypeId=(select id from core_entity where name='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = (select id from core_entity where name='Company');");
+		go()->getDbConnection()->exec("update comments_comment n set entityTypeId=(select id from core_entity where name='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = (select id from core_entity where name='Company');");
 
-		GO()->getDbConnection()->delete("core_entity", ['name' => "Company"])->execute();
+		go()->getDbConnection()->delete("core_entity", ['name' => "Company"])->execute();
 
 		go()->getDbConnection()->commit();
 		
-//		GO()->getDbConnection()
+//		go()->getDbConnection()
 //						->update("core_search", 
 //										[
 //												'entityTypeId' => Contact::entityType()->getId(),
@@ -318,7 +318,7 @@ class Migrate63to64 {
 	
 	public function getCompanyIdIncrement() {
 		if(!isset($this->companyIdIncrement)) {
-			$this->companyIdIncrement = (int) GO()->getDbConnection()->selectSingleValue('max(id)')->from('ab_contacts')->execute()->fetch();
+			$this->companyIdIncrement = (int) go()->getDbConnection()->selectSingleValue('max(id)')->from('ab_contacts')->execute()->fetch();
 		}
 		return $this->companyIdIncrement;
 	}
@@ -327,7 +327,7 @@ class Migrate63to64 {
 	private function copyContacts(AddressBook $addressBook) {
 		
 		
-		$db = GO()->getDbConnection();
+		$db = go()->getDbConnection();
 
 		$contacts = $db->select()->from('ab_contacts')
 						->where(['addressbook_id' => $addressBook->id])
@@ -530,7 +530,7 @@ class Migrate63to64 {
 
 			if ($r['photo']) {
 
-				$file = GO()->getDataFolder()->getFile($r['photo']);
+				$file = go()->getDataFolder()->getFile($r['photo']);
 				if ($file->exists()) {
 					$tmpFile = \go\core\fs\File::tempFile($file->getExtension());
 					$file->copy($tmpFile);
@@ -544,7 +544,7 @@ class Migrate63to64 {
 			}
 
 			if (!$contact->save()) {
-				GO()->debug($r);
+				go()->debug($r);
 				throw new \Exception("Could not save contact" . var_export($contact->getValidationErrors(), true));
 			}
 			
@@ -562,7 +562,7 @@ class Migrate63to64 {
 	
 	
 	private function copyCompanies(AddressBook $addressBook) {
-		$db = GO()->getDbConnection();		
+		$db = go()->getDbConnection();		
 
 		$contacts = $db->select()
 		->from('ab_companies')
@@ -690,7 +690,7 @@ class Migrate63to64 {
 
 			if ($r['photo']) {
 
-				$file = GO()->getDataFolder()->getFile($r['photo']);
+				$file = go()->getDataFolder()->getFile($r['photo']);
 				if ($file->exists()) {
 					$tmpFile = \go\core\fs\File::tempFile($file->getExtension());
 					$file->copy($tmpFile);
@@ -705,7 +705,7 @@ class Migrate63to64 {
 
 			if (!$contact->save()) {
 				
-				GO()->debug($r);
+				go()->debug($r);
 				
 				throw new \Exception("Could not save contact" . var_export($contact->getValidationErrors(), true));
 			}
