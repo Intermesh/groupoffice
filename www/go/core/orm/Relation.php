@@ -49,6 +49,14 @@ class Relation {
 	 */
 	public $type;
 
+
+	/**
+	 * Only for has one relations. Auto create it when not yet in the database.
+	 * 
+	 * @var bool
+	 */
+	public $autoCreate = false;
+
 	/**
 	 * Constructor
 	 * 

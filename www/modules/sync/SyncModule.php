@@ -38,13 +38,10 @@ class SyncModule extends Module{
 	}
 
 	public static function onUserBeforeSave(User $user) {
-		if($user->isNew()) {
-			
-			
+		if($user->isNew()) {			
 			if(empty($user->syncAddressBooks)) {
-				$addressBook = AddressBook::find(['id'])->filter(['permissionLevel' => Acl::LEVEL_WRITE, 'permissionLevelGroups' => $user->groups])->single();
-				if($addressBook) {
-					$user->syncAddressBooks[] = (new UserAddressBook())->setValues(['addressBookId' => $addressBook->id, 'isDefault' => true]);
+				if(isset($user->addressBookSettings) && ($addressBookId = $user->addressBookSettings->getDefaultAddressBookId())) {
+					$user->syncAddressBooks[] = (new UserAddressBook())->setValues(['addressBookId' => $addressBookId, 'isDefault' => true]);
 				}
 			}
 

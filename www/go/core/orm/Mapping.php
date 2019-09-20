@@ -167,12 +167,14 @@ class Mapping {
 	 * @param string $name
 	 * @param string $entityName
 	 * @param array $keys
+	 * @param bool $autoCreate If not found then automatically create an empty object
 	 * 
 	 * @return $this;
 	 */
-	public function addHasOne($name, $entityName, array $keys) {
+	public function addHasOne($name, $entityName, array $keys, $autoCreate = true) {
 		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_HAS_ONE);
 		$this->relations[$name]->setEntityName($entityName);
+		$this->relations[$name]->autoCreate = true;
 		return $this;
 	}
 

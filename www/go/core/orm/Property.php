@@ -183,6 +183,10 @@ abstract class Property extends Model {
 
 				case Relation::TYPE_HAS_ONE:
 					$prop = $this->isNew() ? null : $cls::internalFind()->andWhere($where)->single();				
+					if(!$prop && $relation->autoCreate) {
+						$prop = new $cls;
+						$this->applyRelationKeys($relation, $prop);
+					}
 					$this->{$relation->name} = $prop ? $prop : null;
 				break;
 
