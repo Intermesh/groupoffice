@@ -1061,6 +1061,7 @@ Ext.override(Ext.KeyNav, {
 
 
 //USed by old gridpanel deleteselected to keep scroll position
+// Also used by scrollloader in new framework
 Ext.override(Ext.grid.GridView, {
 	scrollToTopOnLoad: true,
 	onLoad : function(){

@@ -68,7 +68,7 @@ abstract class Module {
 			return true;
 		}
 
-		$file = GO()->getEnvironment()->getInstallFolder()->getFile('licensechecks/'.$lic. '.php');
+		$file = go()->getEnvironment()->getInstallFolder()->getFile('licensechecks/'.$lic. '.php');
 
 		//Check if file is encoded
 		$data = $file->getContents(0, 100);
@@ -80,7 +80,7 @@ abstract class Module {
 			return false;
 		}
 
-		if(!GO()->getEnvironment()->getInstallFolder()->getFile($lic . '-' . substr(GO()->getVersion(), 0, 3) .'-license.txt')->exists()) {
+		if(!go()->getEnvironment()->getInstallFolder()->getFile($lic . '-' . substr(go()->getVersion(), 0, 3) .'-license.txt')->exists()) {
 			return false;
 		}
 
@@ -98,13 +98,13 @@ abstract class Module {
 	public final function install() {
 
 		try{
-			GO()->getDbConnection()->pauseTransactions();
+			go()->getDbConnection()->pauseTransactions();
 			$this->installDatabase();
-			GO()->getDbConnection()->resumeTransactions();
+			go()->getDbConnection()->resumeTransactions();
 					
-			GO()->rebuildCache(true);
+			go()->rebuildCache(true);
 
-			GO()->getDbConnection()->beginTransaction();
+			go()->getDbConnection()->beginTransaction();
 			
 		
 			$model = new model\Module();
@@ -123,12 +123,12 @@ abstract class Module {
 			}
 
 			if(!$this->afterInstall($model)) {
-				GO()->warn(static::class .'::afterInstall returned false');
+				go()->warn(static::class .'::afterInstall returned false');
 				$this->rollBack();				
 				return false;
 			}		
 
-			if(!GO()->getDbConnection()->commit()) {
+			if(!go()->getDbConnection()->commit()) {
 				$this->rollBack();
 				$this->uninstallDatabase();
 				return false;
@@ -144,8 +144,8 @@ abstract class Module {
 	private function rollBack() {
 
 		// Transaction is probably aborted by the install.sql file of the module. Any structure change will automatically abort the transaction.			
-		if(GO()->getDbConnection()->inTransaction()) {
-			GO()->getDbConnection()->rollBack();
+		if(go()->getDbConnection()->inTransaction()) {
+			go()->getDbConnection()->rollBack();
 		}
 		$this->uninstallDatabase();
 	}	
@@ -175,7 +175,7 @@ abstract class Module {
 			return false;
 		}
 		
-		GO()->rebuildCache(true);
+		go()->rebuildCache(true);
 		
 		return true;
 	}
@@ -238,9 +238,9 @@ abstract class Module {
 		
 		if ($sqlFile->exists()) {
 			//disable foreign keys
-			GO()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
+			go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
 			Utils::runSQLFile($sqlFile);
-			GO()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
+			go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
 		}
 		
 		return true;
@@ -414,11 +414,11 @@ abstract class Module {
 		$pkg = static::getPackage();
 		$name = static::getName();
 		
-		if(!GO()->getLanguage()->translationExists("name", $pkg, $name)) {
+		if(!go()->getLanguage()->translationExists("name", $pkg, $name)) {
 			return $name;
 		}
 		
-		return GO()->t("name", $pkg, $name);
+		return go()->t("name", $pkg, $name);
 	
 	}
 	
@@ -433,11 +433,11 @@ abstract class Module {
 		$pkg = static::getPackage();
 		$name = static::getName();
 		
-		if(!GO()->getLanguage()->translationExists("name", $pkg, $name)) {
+		if(!go()->getLanguage()->translationExists("name", $pkg, $name)) {
 			return "No description";
 		}
 		
-		return GO()->t("description", static::getPackage(), static::getName());		
+		return go()->t("description", static::getPackage(), static::getName());		
 	
 	}
 	

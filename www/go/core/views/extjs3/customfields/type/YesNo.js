@@ -95,5 +95,5 @@ go.customfields.type.YesNo = Ext.extend(go.customfields.type.Text, {
 
 });
 
-go.customfields.CustomFields.registerType(new go.customfields.type.YesNo());
+// go.customfields.CustomFields.registerType(new go.customfields.type.YesNo());
 

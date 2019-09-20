@@ -193,7 +193,7 @@ class Field extends AclItemEntity {
 		$c = Table::getInstance($this->tableName())->getColumn($this->databaseName);
 		
 		if(!$c) {
-			GO()->debug("Column for custom field ".$this->databaseName." not found in ". $this->tableName());
+			go()->debug("Column for custom field ".$this->databaseName." not found in ". $this->tableName());
 			return null;
 		}
 		
@@ -214,7 +214,7 @@ class Field extends AclItemEntity {
 		$c = Table::getInstance($this->tableName())->getColumn($this->databaseName);
 		
 		if(!$c) {
-			GO()->debug("Column for custom field ".$this->databaseName." not found in ". $this->tableName());
+			go()->debug("Column for custom field ".$this->databaseName." not found in ". $this->tableName());
 			return null;
 		}
 		
@@ -251,10 +251,10 @@ class Field extends AclItemEntity {
 		}
 		
 		try {
-			GO()->getDbConnection()->pauseTransactions();
+			go()->getDbConnection()->pauseTransactions();
 			$this->getDataType()->onFieldSave();
 		} catch(\Exception $e) {
-			GO()->warn($e);
+			go()->warn($e);
 			
 			if($this->isNew()) {
 				parent::internalDelete();				
@@ -264,7 +264,7 @@ class Field extends AclItemEntity {
 			
 			return false;
 		} finally {
-			GO()->getDbConnection()->resumeTransactions();
+			go()->getDbConnection()->resumeTransactions();
 		}
 		
 		return true;
@@ -276,13 +276,13 @@ class Field extends AclItemEntity {
 		}
 
 		try {
-			GO()->getDbConnection()->pauseTransactions();
+			go()->getDbConnection()->pauseTransactions();
 			$success = $this->getDataType()->onFieldDelete();
 		} catch(\Exception $e) {
-			GO()->warn($e);
+			go()->warn($e);
 			return false;
 		} finally {
-			GO()->getDbConnection()->resumeTransactions();
+			go()->getDbConnection()->resumeTransactions();
 		}
 		
 		return true;

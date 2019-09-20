@@ -88,21 +88,21 @@ trait SearchableTrait {
 	}
 	
 	public function deleteSearchAndLinks() {
-		if(!\GO()->getDbConnection()
+		if(!\go()->getDbConnection()
 						->delete('core_search', 
 										['entityTypeId' => static::entityType()->getId(), 'entityId' => $this->id]
 										)->execute()) {
 			return false;
 		}
 		
-		if(!\GO()->getDbConnection()
+		if(!\go()->getDbConnection()
 						->delete('core_link', 
 										['fromEntityTypeId' => static::entityType()->getId(), 'fromId' => $this->id]
 										)->execute()) {
 			return false;
 		}
 		
-		if(!\GO()->getDbConnection()
+		if(!\go()->getDbConnection()
 						->delete('core_link', 
 										['toEntityTypeId' => static::entityType()->getId(), 'toId' => $this->id]
 										)->execute()) {
@@ -138,7 +138,7 @@ trait SearchableTrait {
 
 		echo "Deleting old values\n";
 
-		$stmt = GO()->getDbConnection()->delete('core_search', (new Query)
+		$stmt = go()->getDbConnection()->delete('core_search', (new Query)
 			->where('entityTypeId', '=', $cls::entityType()->getId())
 			->andWhere('entityId', 'NOT IN', $cls::find()->selectSingleValue('id'))
 		);

@@ -50,9 +50,9 @@ class BasicBackend extends AbstractBasic {
 		
 		$state = new TemporaryState();
 		$state->setUserId($user->id);		
-		GO()->setAuthState($state);
+		go()->setAuthState($state);
 
-		GO()->debug("Authentication success: ". $user->username);
+		go()->debug("Authentication success: ". $user->username);
 
 		$this->user = $user;		
 

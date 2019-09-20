@@ -17,7 +17,7 @@ class GoSyncUtils {
 	}
 	
 //	public static function getEntityModSeq($entity) {
-//		$entityModSeq = GO()->getDbConnection()
+//		$entityModSeq = go()->getDbConnection()
 //						->selectSingleValue("MAX(modSeq)")
 //						->from("core_change")
 //						->where([
@@ -30,13 +30,13 @@ class GoSyncUtils {
 //			return false;
 //		}
 //		
-//		$userModSeq = GO()->getDbConnection()
+//		$userModSeq = go()->getDbConnection()
 //						->selectSingleValue("MAX(modSeq)")
 //						->from("core_change_user")
 //						->where([
 //								"entityTypeId" => $entity->getType()->getId(), 
 //								"entityId" => $entity->id,  
-//								"userId" => GO()->getUserId()
+//								"userId" => go()->getUserId()
 //										])
 //						->single();
 //		

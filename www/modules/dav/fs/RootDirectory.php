@@ -134,7 +134,7 @@ class RootDirectory extends Sabre\DAV\FS\Directory{
 	 * @return array
 	 */
 	public function getQuotaInfo() {
-		$user = GO()->getAuthState()->getUser();
+		$user = go()->getAuthState()->getUser();
 		$free = $user->getStorageFreeSpace();
 		
 		return array(

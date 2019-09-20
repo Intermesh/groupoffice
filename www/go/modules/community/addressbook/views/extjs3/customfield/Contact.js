@@ -95,5 +95,5 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.customfield
 	
 });
 
-go.customfields.CustomFields.registerType(new go.modules.community.addressbook.customfield.Contact());
+// go.customfields.CustomFields.registerType(new go.modules.community.addressbook.customfield.Contact());
 

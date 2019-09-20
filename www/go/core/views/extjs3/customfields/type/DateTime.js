@@ -70,5 +70,4 @@ go.customfields.type.DateTime = Ext.extend(go.customfields.type.Text, {
 
 });
 
-go.customfields.CustomFields.registerType(new go.customfields.type.DateTime());
 

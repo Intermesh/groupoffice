@@ -5,10 +5,16 @@ go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 		
 		//store all form data here
 		this.user = {};
+
+		var groups = go.util.clone(go.Modules.get('core', 'core').settings.defaultGroups);
+		if(groups.indexOf(2) === -1) {
+			groups.push(2); //add everyone
+		}
 		
 		this.groupsGrid = new go.users.UserGroupGrid({
 				title: null,
-				iconCls: null
+				iconCls: null,
+				value: groups
 			});
 			
 		this.groupsGrid.getTopToolbar().insert(0, {
@@ -31,7 +37,7 @@ go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 		});
 	
 		// Get default groups from settings
-		this.groupsGrid.setValue(go.Modules.get('core', 'core').settings.defaultGroups);
+		// this.groupsGrid.setValue();
 		
 	},
 	
@@ -120,7 +126,7 @@ go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 		var field, pnl;
 		for(var i = 0, l = this.items.getCount(); i < l; i++) {
 			pnl = this.items.itemAt(i);
-			field = pnl.getForm().findField(name);
+			field = pnl.getForm() ? pnl.getForm().findField(name) : false;
 			if(field) {
 				return [field, pnl];
 			}

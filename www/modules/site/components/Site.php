@@ -171,10 +171,10 @@ class Site {
 		\GO::session()->loginWithCookies();
 		
 		//Login for new framework
-		GO()->setAuthState(new \go\core\auth\TemporaryState());
-//		GO()->getAuthState()->setUserId(1);
+		go()->setAuthState(new \go\core\auth\TemporaryState());
+//		go()->getAuthState()->setUserId(1);
 		if(GO::user()) {
-			GO()->getAuthState()->setUserId(GO::user()->id);
+			go()->getAuthState()->setUserId(GO::user()->id);
 		}
 						
 	

@@ -97,18 +97,18 @@ class Connection {
 		$remote = $ssl ? 'ssl://' : '';			
 		$remote .=  $server.":".$port;
 
-		GO()->debug("Connection to ".$remote);
+		go()->debug("Connection to ".$remote);
 
 		try{
 			$this->handle = stream_socket_client($remote, $this->connectErrorNo, $this->connectError, $timeout, STREAM_CLIENT_CONNECT, $streamContext);
 		}catch(ErrorException $e) {
-			GO()->debug($e->getMessage());
+			go()->debug($e->getMessage());
 		}
 
 		if (!is_resource($this->handle)) {	
 			
 			$this->handle = null;
-			GO()->debug("Connection to ".$remote." failed ".$this->connectError);
+			go()->debug("Connection to ".$remote." failed ".$this->connectError);
 			
 			return false;
 		}		
@@ -135,7 +135,7 @@ class Connection {
 			return false;
 		}else
 		{
-			GO()->debug("TLS Crypto enabled");
+			go()->debug("TLS Crypto enabled");
 		}
 					
 		$this->starttls = true;
@@ -248,7 +248,7 @@ class Connection {
 		
 		$command = 'A' . $this->commandNumber() . ' ' . $command . "\r\n";
 
-		GO()->debug('> ' . $command);
+		go()->debug('> ' . $command);
 		
 		return $this->fputs($command);
 	}
@@ -286,7 +286,7 @@ class Connection {
 		$line = fgets($this->handle, $length);
 
 		if($debug){
-			GO()->debug('< ' . $line);	
+			go()->debug('< ' . $line);	
 		}
 		
 		
@@ -416,7 +416,7 @@ class Connection {
 		$data = "";
 		
 
-		GO()->debug('< .. DATA OMITTED FROM LOG ...', 'imap');	
+		go()->debug('< .. DATA OMITTED FROM LOG ...', 'imap');	
 		
 		
 		$leftOver = $size;
@@ -433,7 +433,7 @@ class Connection {
 			
 			$line = $this->readLine($newMax, false);			
 			
-			//GO()->debug($line, 'imap');	
+			//go()->debug($line, 'imap');	
 			
 			$readLength += strlen($line);
 			

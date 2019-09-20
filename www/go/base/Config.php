@@ -666,7 +666,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $max_file_size = 100 * 1024 * 1024;
+	var $max_file_size = 1000 * 1024 * 1024;
 
 	/**
 	 * The maximum file size of an image to be allowed for thumbnailing in MBs
@@ -1522,63 +1522,63 @@ var $billing_clear_payment_method_on_duplicate = true;
 	}
 	
 	public function getVersion() {
-		return GO()->getVersion();
+		return go()->getVersion();
 	}
 	
 	public function getMtime() {
-		return GO()->getVersion();
+		return go()->getVersion();
 	}
 	
 	public function getTitle() {
-		return GO()->getSettings()->title;
+		return go()->getSettings()->title;
 	}
 	
 	public function getlanguage() {
-		return GO()->getSettings()->language;
+		return go()->getSettings()->language;
 	}
 	
 	public function getwebmaster_email() {
-		return GO()->getSettings()->systemEmail;
+		return go()->getSettings()->systemEmail;
 	}
 	
 	public function getsmtp_server() {
-		return GO()->getSettings()->smtpHost;
+		return go()->getSettings()->smtpHost;
 	}
 	
 	public function getsmtp_port() {
-		return GO()->getSettings()->smtpPort;
+		return go()->getSettings()->smtpPort;
 	}
 	
 	public function getsmtp_username() {
-		return GO()->getSettings()->smtpUsername;
+		return go()->getSettings()->smtpUsername;
 	}
 	
 	public function getsmtp_password() {
-		return GO()->getSettings()->getSmtpPassword();
+		return go()->getSettings()->getSmtpPassword();
 	}
 	
 	public function getsmtp_encryption() {
-		return GO()->getSettings()->smtpEncryption;
+		return go()->getSettings()->smtpEncryption;
 	}
 	
 	public function getdebug_email() {
-		return GO()->getSettings()->debugEmail;
+		return go()->getSettings()->debugEmail;
 	}
 	
 	public function gepassword_min_length() {
-		return GO()->getSettings()->passwordMinLength;
+		return go()->getSettings()->passwordMinLength;
 	}
 	
 	public function getlogin_message() {
-		return GO()->getSettings()->loginMessageEnabled ? GO()->getSettings()->loginMessage : null;
+		return go()->getSettings()->loginMessageEnabled ? go()->getSettings()->loginMessage : null;
 	}
 	
 	public function getfull_url() {
-		return rtrim(GO()->getSettings()->URL, '/') . '/';
+		return rtrim(go()->getSettings()->URL, '/') . '/';
 	}
 	
 	public function getorig_full_url() {
-		return rtrim(GO()->getSettings()->URL, '/') . '/';
+		return rtrim(go()->getSettings()->URL, '/') . '/';
 	}
 
 	public function getMajorVersion(){

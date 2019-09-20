@@ -14,7 +14,7 @@ GO.tasks.TaskListsGrid = function(config){
 	Ext.apply(config, {
 		allowNoSelection:true,
 		bbar: new GO.SmallPagingToolbar({
-			store:config.store,
+			store:config.store,			
 			pageSize:GO.settings.config.nav_page_size
 		})
 	});

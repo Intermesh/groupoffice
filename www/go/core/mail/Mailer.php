@@ -10,7 +10,7 @@ use go\core\model\SmtpAccount;
  * 
  * @example
  * ````
- * $message = GO()->getMailer()->compose();
+ * $message = go()->getMailer()->compose();
  * $message->setTo()->setFrom()->setBody()->send();
  * ```
  */
@@ -47,11 +47,11 @@ class Mailer {
 	
 	public function send($message) {
 		
-		if(!empty(GO()->getSettings()->debugEmail)){
-			$message->setTo(GO()->getSettings()->debugEmail);
+		if(!empty(go()->getSettings()->debugEmail)){
+			$message->setTo(go()->getSettings()->debugEmail);
 			$message->setBcc(array());
 			$message->setCc(array());
-			GO()->warn("E-mail debugging is enabled in the Group-Office configuration. All emails are send to: ".GO()->getSettings()->debugEmail);
+			go()->warn("E-mail debugging is enabled in the Group-Office configuration. All emails are send to: ".go()->getSettings()->debugEmail);
 		}
 		
 		return $this->swift()->send($message);
@@ -85,16 +85,16 @@ class Mailer {
 		}
 
 		$o = new \Swift_SmtpTransport(
-			GO()->getSettings()->smtpHost, 
-			GO()->getSettings()->smtpPort, 
-			GO()->getSettings()->smtpEncryption
+			go()->getSettings()->smtpHost, 
+			go()->getSettings()->smtpPort, 
+			go()->getSettings()->smtpEncryption
 		);
-		if(!empty(GO()->getSettings()->smtpUsername)){
-			$o->setUsername(GO()->getSettings()->smtpUsername)
-				->setPassword(GO()->getSettings()->getSmtpPassword());
+		if(!empty(go()->getSettings()->smtpUsername)){
+			$o->setUsername(go()->getSettings()->smtpUsername)
+				->setPassword(go()->getSettings()->getSmtpPassword());
 		}		
 		
-		if(!GO()->getSettings()->smtpEncryptionVerifyCertificate) {
+		if(!go()->getSettings()->smtpEncryptionVerifyCertificate) {
 			$o->setStreamOptions(array('ssl' => array('allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name'  => false)));
 		}
 		

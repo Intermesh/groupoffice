@@ -26,7 +26,7 @@ class ClassFinder {
 	 * @return string[]
 	 */
 	public static function getDefaultNamespaces() {		
-		$ns = GO()->getCache()->get("class-finder-default-namespaces");
+		$ns = go()->getCache()->get("class-finder-default-namespaces");
 		
 		if(!$ns) {
 			$ns = ['go\\core'];		
@@ -40,7 +40,7 @@ class ClassFinder {
 				$ns[] = $namespace;
 			}
 			
-			GO()->getCache()->set("class-finder-default-namespaces", $ns);
+			go()->getCache()->set("class-finder-default-namespaces", $ns);
 		}
 		
 		return $ns;
@@ -81,7 +81,7 @@ class ClassFinder {
 	 */
 	public function find() {
 		
-		GO()->debug("ClassFinder find() used.");
+		go()->debug("ClassFinder find() used.");
 		
 		$this->allClasses = [];
 		foreach ($this->namespaces as $namespace => $folder) {

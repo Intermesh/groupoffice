@@ -59,13 +59,13 @@ class SmtpAccount extends EntityController {
 		$smtpAccount = new model\SmtpAccount();
 		$smtpAccount->setValues($params);
 		
-		$message = GO()->getMailer()
+		$message = go()->getMailer()
 						->setSmtpAccount($smtpAccount)
 						->compose()
 						->setFrom($smtpAccount->fromEmail, $smtpAccount->fromName)
 						->setTo($smtpAccount->fromEmail)
-						->setSubject(GO()->t('Test message'))
-						->setBody(GO()->t("You're settings are correct.\n\nBest regards,\n\nGroup-Office"));
+						->setSubject(go()->t('Test message'))
+						->setBody(go()->t("You're settings are correct.\n\nBest regards,\n\nGroup-Office"));
 
 		$success = $message->send();
 		

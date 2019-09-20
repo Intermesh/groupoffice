@@ -72,4 +72,4 @@ go.customfields.type.Number = Ext.extend(go.customfields.type.Text, {
 
 });
 
-go.customfields.CustomFields.registerType(new go.customfields.type.Number());
+// go.customfields.CustomFields.registerType(new go.customfields.type.Number());

@@ -122,8 +122,8 @@ class eventAndTaskPdf extends \GO\Base\Util\Pdf {
 	private $_nameFontSize = '12';
 	private $_timeFontSize = '12';
 	private $_descriptionFontSize = '12';
-	protected $font = 'dejavusans';
-	protected $font_size=10;
+	public $font = 'dejavusans';
+	public $font_size=10;
 	
 	/**
 	 * Set the title that will be printed in the header of the PDF document

@@ -3,8 +3,12 @@
 
 namespace GO\Calendar;
 
+use GO\Calendar\Model\Calendar;
 use GO\Calendar\Model\UserSettings;
+use go\core\model\Acl;
+use go\core\model\Group;
 use go\core\model\User;
+use go\core\orm\EntityType;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 
@@ -86,6 +90,9 @@ class CalendarModule extends \GO\Base\Module{
 		$cron->job = 'GO\Calendar\Cron\CalendarPublisher';
 
 		$cron->save();
+
+		//Share calendars with internal by default
+		Calendar::entityType()->setDefaultAcl([Group::ID_INTERNAL => Acl::LEVEL_WRITE]);		
 		
 	}
 }

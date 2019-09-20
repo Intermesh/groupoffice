@@ -143,9 +143,9 @@ class Link extends Entity {
 	 * @param string $description
 	 * @return Link
 	 */
-	public static function create($a, $b, $description = null) {
+	public static function create($a, $b, $description = null, $checkExisting = true) {
 		
-		$existingLink = static::findLink($a, $b);
+		$existingLink = $checkExisting ? static::findLink($a, $b) : false;
 		if($existingLink) {
 			return $existingLink;
 		}
@@ -217,7 +217,7 @@ class Link extends Entity {
 	 * @return boolean
 	 */
 	public static function deleteLinkWithIds($aId, $aTypeId, $bId, $bTypeId) {
-			if(!GO()->getDbConnection()
+			if(!go()->getDbConnection()
 						->delete('core_link',[
 				'fromEntityTypeId' => $aTypeId,
 				'fromId' => $aId,
@@ -227,7 +227,7 @@ class Link extends Entity {
 			return false;
 		}
 		
-		if(!GO()->getDbConnection()
+		if(!go()->getDbConnection()
 						->delete('core_link',[
 				'fromEntityTypeId' => $bTypeId,
 				'fromId' => $bId,
@@ -273,6 +273,9 @@ class Link extends Entity {
 		//make sure the description and name are set so they are returned to the client
 		if(!isset($this->toSearchId) || !isset($this->aclId)) {
 			$search = Search::find()->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
+			if(!$search) {
+				throw new \Exception("Could not find entity from search cache. Please run System settings -> Tools -> Update search index");
+			}
 			$this->toDescription = $search->description;
 			$this->toName = $search->name;
 			$this->toSearchId = $search->id;
@@ -291,12 +294,12 @@ class Link extends Entity {
 		$reverse['toId'] = $this->fromId;
 		$reverse['fromId'] = $this->toId;
 		
-		return GO()->getDbConnection()->delete('core_link', $reverse)->execute();
+		return go()->getDbConnection()->delete('core_link', $reverse)->execute();
 	}
 	
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {
+	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
 		$level = Acl::LEVEL_READ;
-		Acl::applyToQuery($query, 's.aclId', $level, $userId);
+		Acl::applyToQuery($query, 's.aclId', $level, $userId, $groups);
 		
 		return $query;
 	}

@@ -17,7 +17,7 @@ class Date extends Base {
 	 */
 	protected function getFieldSQL() {
 		$d = $this->field->getDefault();
-		$d = isset($d) && $d != "" ? GO()->getDbConnection()->getPDO()->quote($d) : "NULL";
+		$d = isset($d) && $d != "" ? go()->getDbConnection()->getPDO()->quote($d) : "NULL";
 		return "DATE DEFAULT " . $d;
 	}
 	
@@ -37,6 +37,6 @@ class Date extends Base {
 
 	public function dbToText($value, &$values)
 	{
-		return $value instanceof \DateTime ? $value->format(GO()->getAuthState()->getUser(['dateFormat','timeformat'])->dateFormat) : $value;
+		return $value instanceof \DateTime ? $value->format(go()->getAuthState()->getUser(['dateFormat','timeformat'])->dateFormat) : $value;
 	}
 }

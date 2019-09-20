@@ -15,7 +15,7 @@ class CountryCode {
 			throw new \Exception("Country codes must be upper case");
 		}
 		
-		$countries = GO()->t('countries');
+		$countries = go()->t('countries');
 		return isset($countries[$isoCode]);
 	}
 }

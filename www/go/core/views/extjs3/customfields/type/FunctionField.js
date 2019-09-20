@@ -36,5 +36,5 @@ go.customfields.type.FunctionField = Ext.extend(go.customfields.type.Number, {
 
 });
 
-go.customfields.CustomFields.registerType(new go.customfields.type.FunctionField());
+// go.customfields.CustomFields.registerType(new go.customfields.type.FunctionField());
 

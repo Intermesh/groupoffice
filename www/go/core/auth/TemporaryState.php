@@ -47,5 +47,22 @@ class TemporaryState extends AbstractState {
 		$this->user = $user;
 		return $this->setUserId($user->id);
 	}
+
+	/**
+	 * Check if logged in user is admin
+	 * 
+	 * @return bool
+	 */
+	public function isAdmin() {
+		if($this->userId == User::ID_SUPER_ADMIN) {
+			return true;
+		}
+
+		$user = $this->getUser(['id']);
+		if(!$user) {
+			return false;
+		}
+		return $user->isAdmin();
+	}
 }
 

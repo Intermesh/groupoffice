@@ -142,7 +142,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * This permission is not checked in the controller as usal but checked on save here.
 	 */
 	protected function checkManagePermission() {
-		if($this->findAcl()->ownedBy == GO()->getUserId()) {
+		if($this->findAcl()->ownedBy == go()->getUserId()) {
 			return true;
 		}
 
@@ -155,7 +155,7 @@ abstract class AclOwnerEntity extends AclEntity {
 		
 		// Copy the default one. When installing the default one can't be accessed yet.
 		// When ACL has been provided by the client don't copy the default.
-		if(isset($this->setAcl) || GO()->getInstaller()->isInProgress()) {
+		if(isset($this->setAcl) || go()->getInstaller()->isInProgress()) {
 			$this->acl = new Acl();
 		} else
 		{
@@ -173,7 +173,7 @@ abstract class AclOwnerEntity extends AclEntity {
 
 			//During install this will throw a module not found error due to chicken / egg problem.
 			//We'll fix the data with the Group::check() function in the installer.
-			if(!GO()->getInstaller()->isInProgress()) {
+			if(!go()->getInstaller()->isInProgress()) {
 				throw $e;
 			}
 			$this->acl->entityTypeId = null;
@@ -260,12 +260,14 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * 
 	 * @param Query $query
 	 * @param int $level
+	 * @param int $userId
+	 * @param int[] $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
 	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {			
+	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {			
 		$tables = static::getMapping()->getTables();
 		$firstTable = array_shift($tables);
 		$tableAlias = $firstTable->getAlias();
-		Acl::applyToQuery($query, $tableAlias . '.aclId', $level, $userId);
+		Acl::applyToQuery($query, $tableAlias . '.aclId', $level, $userId, $groups);
 		
 		return $query;
 	}
@@ -305,7 +307,7 @@ abstract class AclOwnerEntity extends AclEntity {
 		$tables = static::getMapping()->getTables();
 		$table = array_values($tables)[0]->getName();
 		
-		$stmt = GO()->getDbConnection()->update(
+		$stmt = go()->getDbConnection()->update(
       'core_acl', 
       [
         'acl.entityTypeId' => static::entityType()->getId(), 

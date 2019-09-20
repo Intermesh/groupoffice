@@ -251,7 +251,7 @@ class User extends Entity {
 
 	protected function canCreate()
 	{
-		return GO()->getAuthState()->isAdmin();
+		return go()->getAuthState()->isAdmin();
 	}
 	
 	protected function init() {
@@ -326,6 +326,28 @@ class User extends Entity {
 		$this->plainPassword = $password;
 	}
 
+	/**
+	 * Check if this user has a password stored in the database.
+	 * 
+	 * Used by authenticators (IMAP or LDAP) so they can clear it if it's not needed.
+	 * 
+	 * @return bool
+	 */
+	public function hasPassword() {
+		return !empty($this->password);
+	}
+
+	/**
+	 * Clear the password stored in the database.
+	 * 
+	 * Used by authenticators (IMAP or LDAP) so they can clear it if it's not needed.
+	 * 
+	 * @return bool
+	 */
+	public function clearPassword() {
+		return go()->getDbConnection()->delete('core_auth_password', ['userId' => $this->id])->execute();
+	}
+
 	public function getPassword() {
 		return null;
 	}
@@ -370,18 +392,22 @@ class User extends Entity {
 	
 	protected function internalValidate() {
 		
-		if(!$this->isNew() && $this->isModified('groups')) {	
+		if($this->isModified('groups')) {	
+			
 			
 			if(!in_array(Group::ID_EVERYONE, $this->groups)) {
-				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, GO()->t("You can't remove group everyone"));
+				$this->groups[] = Group::ID_EVERYONE;
+				// $this->setValidationError('groups', ErrorCode::INVALID_INPUT, go()->t("You can't remove group everyone"));
 			}
 			
-			if(!in_array($this->getPersonalGroup()->id, $this->groups)) {
-				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, GO()->t("You can't remove the user's personal group"));
+			if(!$this->isNew()) {
+				if(!in_array($this->getPersonalGroup()->id, $this->groups)) {
+					$this->setValidationError('groups', ErrorCode::INVALID_INPUT, go()->t("You can't remove the user's personal group"));
+				}
 			}
 
 			if($this->id == 1 && !in_array(Group::ID_ADMINS, $this->groups)) {
-				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, GO()->t("You can't remove group Admins from the primary admin user"));
+				$this->setValidationError('groups', ErrorCode::INVALID_INPUT, go()->t("You can't remove group Admins from the primary admin user"));
 			}
 		}
 		
@@ -392,13 +418,13 @@ class User extends Entity {
 		}
 		
 		if(isset($this->plainPassword) && $this->validatePassword) {
-			if(strlen($this->plainPassword) < GO()->getSettings()->passwordMinLength) {
-				$this->setValidationError('password', ErrorCode::INVALID_INPUT, "Minimum password length is ".GO()->getSettings()->passwordMinLength." chars");
+			if(strlen($this->plainPassword) < go()->getSettings()->passwordMinLength) {
+				$this->setValidationError('password', ErrorCode::INVALID_INPUT, "Minimum password length is ".go()->getSettings()->passwordMinLength." chars");
 			}
 		}
 		
 		if($this->isNew()) {
-			$config = GO()->getConfig();
+			$config = go()->getConfig();
 			
 			if(!empty($config['limits']['userCount']) && $config['limits']['userCount'] <= self::count()) {
 				throw new Forbidden("The maximum number of users have been reached");
@@ -505,16 +531,16 @@ class User extends Entity {
 		$this->recoveryHash = bin2hex(random_bytes(20));
 		$this->recoverySendAt = new DateTime();
 		
-		$siteTitle=GO()->getSettings()->title;
-		$url = GO()->getSettings()->URL.'#recover/'.$this->recoveryHash . '-' . urlencode($redirectUrl);
-		$emailBody = GO()->t('recoveryMailBody');
+		$siteTitle=go()->getSettings()->title;
+		$url = go()->getSettings()->URL.'#recover/'.$this->recoveryHash . '-' . urlencode($redirectUrl);
+		$emailBody = go()->t('recoveryMailBody');
 		$emailBody = sprintf($emailBody,$this->displayName, $siteTitle, $this->username, $url);
 		$emailBody = str_replace('{ip_address}', Http::getClientIp() , $emailBody);
 		
-		$message = GO()->getMailer()->compose()	  
-			->setFrom(GO()->getSettings()->systemEmail, $siteTitle)
+		$message = go()->getMailer()->compose()	  
+			->setFrom(go()->getSettings()->systemEmail, $siteTitle)
 			->setTo(!empty($to) ? $to : $this->recoveryEmail, $this->displayName)
-			->setSubject(GO()->t('Lost password'))
+			->setSubject(go()->t('Lost password'))
 			->setBody($emailBody);
 		
 		return $this->save() && $message->send();
@@ -668,7 +694,7 @@ class User extends Entity {
 			return $this->disk_quota*1024*1024;
 		} else 
 		{
-			return GO()->getStorageQuota();
+			return go()->getStorageQuota();
 		}
 	}
 	
@@ -677,7 +703,7 @@ class User extends Entity {
 			return $this->disk_quota*1024*1024 - $this->disk_usage;
 		} else
 		{
-			return GO()->getStorageFreeSpace();
+			return go()->getStorageFreeSpace();
 		}
 	}
 	
@@ -717,7 +743,7 @@ class User extends Entity {
 	 */
 	public static function getAuthenticationDomains() {
 		
-		$domains = GO()->getCache()->get("authentication-domains");
+		$domains = go()->getCache()->get("authentication-domains");
 		if(is_array($domains)) {
 			return $domains;
 		}
@@ -731,7 +757,7 @@ class User extends Entity {
 			$domains = array_merge($domains, $cls::getDomainNames());
 		}
 		
-		GO()->getCache()->set("authentication-domains", $domains);
+		go()->getCache()->set("authentication-domains", $domains);
 		
 		return $domains;		
 	}
@@ -750,7 +776,7 @@ class User extends Entity {
 		$contact = \go\modules\community\addressbook\model\Contact::findForUser($this->id);
 		if(!$contact) {
 			$contact = new \go\modules\community\addressbook\model\Contact();
-			$contact->addressBookId = GO()->getSettings()->getUserAddressBook()->id;				
+			$contact->addressBookId = go()->getSettings()->userAddressBook()->id;				
 		}
 		
 		return $contact;

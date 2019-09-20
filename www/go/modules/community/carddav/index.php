@@ -43,9 +43,9 @@ $nodes = array(
 
 /* Initializing server */
 $server = new Server($nodes);
-$server->debugExceptions = GO()->getDebugger()->enabled;
+$server->debugExceptions = go()->getDebugger()->enabled;
 $server->on('exception', function($e){
-	GO()->debug((string) $e);
+	go()->debug((string) $e);
 });
 
 
@@ -59,7 +59,7 @@ $server->addPlugin($aclPlugin);
 //baseUri can also be /carddav/ with:
 //Alias /carddav/ /path/to/addressbook.php
 if(strpos($_SERVER['REQUEST_URI'], 'index.php')) {
-	$path = parse_url(GO()->getSettings()->URL, PHP_URL_PATH);
+	$path = parse_url(go()->getSettings()->URL, PHP_URL_PATH);
 	$baseUri =  $path . 'go/modules/community/carddav/index.php/';
 } else
 {

@@ -333,7 +333,7 @@ class MaintenanceController extends AbstractController {
 		
 		if(!empty($params['reset'])) {
 			echo "Resetting cache!\n";
-			GO()->getDbConnection()->query("truncate core_search");
+			go()->getDbConnection()->query("truncate core_search");
 		}
 		
 		echo "Checking search cache\n\n";
@@ -376,7 +376,7 @@ class MaintenanceController extends AbstractController {
 	}
 	
 	private function checkCollations() {		
-		$stmt = GO()->getDbConnection()->query("SHOW TABLE STATUS");	
+		$stmt = go()->getDbConnection()->query("SHOW TABLE STATUS");	
 
 		foreach($stmt as $record){
 
@@ -384,7 +384,7 @@ class MaintenanceController extends AbstractController {
 				echo "Converting ". $record["Name"] . " to InnoDB\n";
 				flush();
 				$sql = "ALTER TABLE `".$record["Name"]."` ENGINE=InnoDB;";
-				GO()->getDbConnection()->query($sql);	
+				go()->getDbConnection()->query($sql);	
 			}
 
 			if($record["Collation"] != "utf8mb4_unicode_ci" ) {
@@ -392,14 +392,14 @@ class MaintenanceController extends AbstractController {
 				flush();
 
 				if($record['Name'] === 'em_links') {
-					GO()->getDbConnection()->query("ALTER TABLE `em_links` DROP INDEX `uid`");
+					go()->getDbConnection()->query("ALTER TABLE `em_links` DROP INDEX `uid`");
 				}			
 				$sql = "ALTER TABLE `".$record["Name"]."` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
-				GO()->getDbConnection()->query($sql);	
+				go()->getDbConnection()->query($sql);	
 
 				if($record['Name'] === 'em_links') {
-					GO()->getDbConnection()->query("ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';");
-					GO()->getDbConnection()->query("ALTER TABLE `em_links` ADD INDEX(`uid`);");
+					go()->getDbConnection()->query("ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';");
+					go()->getDbConnection()->query("ALTER TABLE `em_links` ADD INDEX(`uid`);");
 				}
 
 			}	
@@ -431,7 +431,7 @@ class MaintenanceController extends AbstractController {
 				echo '<pre>';
 		}
 
-		GO()->getInstaller()->fixCollations();
+		go()->getInstaller()->fixCollations();
 		
 		$this->checkCollations();
 	

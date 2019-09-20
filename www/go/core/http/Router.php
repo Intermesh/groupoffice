@@ -67,8 +67,8 @@ class Router {
 
     try {
       $c = new $route['controller'];
-      GO()->debug("Router: ". $route['controller']."::".$route['method']);
-      GO()->debug($route['params']);
+      go()->debug("Router: ". $route['controller']."::".$route['method']);
+      go()->debug($route['params']);
 
       $response = call_user_func_array([$c, $route['method']], $route['params']);		
       
@@ -105,7 +105,7 @@ class Router {
       }
     }
 
-    GO()->debug("ROUTE NOT FOUND: " . $path . '['.$method.']');
+    go()->debug("ROUTE NOT FOUND: " . $path . '['.$method.']');
 
     return false;
   }

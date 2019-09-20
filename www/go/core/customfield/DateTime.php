@@ -18,7 +18,7 @@ class DateTime extends Base {
 	 */
 	protected function getFieldSQL() {
 		$d = $this->field->getDefault();
-		$d = isset($d) && $d != "" ? GO()->getDbConnection()->getPDO()->quote((new util\DateTime($d))->format('Y-m-d H:i')) : "NULL";
+		$d = isset($d) && $d != "" ? go()->getDbConnection()->getPDO()->quote((new util\DateTime($d))->format('Y-m-d H:i')) : "NULL";
 		return "DATETIME DEFAULT " . $d;
 	}
 	
@@ -38,6 +38,6 @@ class DateTime extends Base {
 
 	public function dbToText($value, &$values)
 	{
-		return $value instanceof \DateTime ? $value->format(GO()->getAuthState()->getUser(['dateFormat','timeformat'])->getDateTimeFormat()) : $value;
+		return $value instanceof \DateTime ? $value->format(go()->getAuthState()->getUser(['dateFormat','timeformat'])->getDateTimeFormat()) : $value;
 	}
 }

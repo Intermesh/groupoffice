@@ -79,11 +79,11 @@ class Module extends Observable {
 		$pkg = 'legacy';
 		$name = $this->name();
 		
-		if(!GO()->getLanguage()->translationExists("name", $pkg, $name)) {
+		if(!go()->getLanguage()->translationExists("name", $pkg, $name)) {
 			return $name;
 		}
 		
-		return GO()->t("name", $pkg, $name);	
+		return go()->t("name", $pkg, $name);	
 	}
 	
 	/**
@@ -127,11 +127,11 @@ class Module extends Observable {
 		$pkg = 'legacy';
 		$name = $this->name();
 		
-		if(!GO()->getLanguage()->translationExists("description", $pkg, $name)) {
+		if(!go()->getLanguage()->translationExists("description", $pkg, $name)) {
 			return "No description";
 		}
 		
-		return GO()->t("description", $pkg, $name);	
+		return go()->t("description", $pkg, $name);	
 	}
 	
 	/**
@@ -400,8 +400,9 @@ class Module extends Observable {
 				\GO::getDbConnection ()->query($query);
 		}
 		
-		\GO::clearCache();
-		Observable::cacheListeners();
+		// \GO::clearCache();
+		// Observable::cacheListeners();
+		go()->rebuildCache();
 		
 		\GO::setIgnoreAclPermissions($oldIgnore);
 		

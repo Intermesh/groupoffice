@@ -197,7 +197,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 					'</tr>'+
 					
 					'<tr>'+
-						'<td>URL:</td>'+
+						'<td>URL (Authenticated):</td>'+
 						'<td><a target="_blank" href="{url}">'+t("Right click to copy", "files")+'</a></td>'+
 					'</tr>'+
 										

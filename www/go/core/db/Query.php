@@ -473,10 +473,10 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		
 		$queryBuilder = new QueryBuilder($this->getDbConnection());
 		$build = $queryBuilder->buildSelect($this);
-		$build['start'] = GO()->getDebugger()->getTimeStamp();
+		$build['start'] = go()->getDebugger()->getTimeStamp();
 		
 		if($this->debug && !$this->getDbConnection()->debug) {
-			GO()->debug(QueryBuilder::debugBuild($build));
+			go()->debug(QueryBuilder::debugBuild($build));
 		}
 
 		$stmt = $this->getDbConnection()->createStatement($build);
@@ -486,12 +486,12 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		try {
 			$ret = $stmt->execute();
 			if (!$ret) {
-				GO()->error(var_export($ret, true));
-				GO()->error($stmt->errorInfo());
+				go()->error(var_export($ret, true));
+				go()->error($stmt->errorInfo());
 				throw new \Exception("Could not execute statement. Error code: ". $stmt->errorCode());
 			}
 		} catch(\Exception $e) {				
-			GO()->error("SQL FAILED: " . $queryBuilder->debugBuild($build));
+			go()->error("SQL FAILED: " . $queryBuilder->debugBuild($build));
 			
 			throw $e;
 		}

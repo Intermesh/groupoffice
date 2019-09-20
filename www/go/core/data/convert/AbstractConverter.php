@@ -112,24 +112,21 @@ abstract class AbstractConverter {
 
 				$entity->save();
 
-				if($this->afterSave($entity)) {
-					go()->getDbConnection()->commit();	
-
-					if($entity->hasValidationErrors()) {
-						$response['errors'][] = $entity->getValidationErrors();				
-					} else
-					{
-						$response['count']++;
-					}
-
+				if($entity->hasValidationErrors()) {
+					go()->getDbConnection()->rollBack();
+					$response['errors'][] = "Item ". $index . ": ". var_export($entity->getValidationErrors(), true);				
+				} elseif($this->afterSave($entity)) {
+					go()->getDbConnection()->commit();
+					$response['count']++;
 				} else{
 					go()->getDbConnection()->rollBack();
-					$response['errors'][] = "Import afterSave returned false";				
+					$response['errors'][] = "Item ". $index . ": Import afterSave returned false";				
 				}				
 			}
 			catch(Exception $e) {
+				go()->getDbConnection()->rollBack();
 				ErrorHandler::logException($e);
-				$response['errors'][] = $e->getMessage();
+				$response['errors'][] = "Item ". $index . ": ".$e->getMessage();
 			}
 		}
 		

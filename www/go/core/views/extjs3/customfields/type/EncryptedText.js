@@ -35,5 +35,5 @@ go.customfields.type.EncryptedText = Ext.extend(go.customfields.type.Text, {
 	
 });
 
-go.customfields.CustomFields.registerType(new go.customfields.type.EncryptedText());
+// go.customfields.CustomFields.registerType(new go.customfields.type.EncryptedText());
 

@@ -1,8 +1,10 @@
 <?php
+use go\modules\community\addressbook\Module;
+
 $updates = [];
 
 $updates['201811272011'][] = function() {
-	\go\core\db\Utils::runSQLFile(\GO()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/addressbook/install/install.sql"));
+	\go\core\db\Utils::runSQLFile(\go()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/addressbook/install/install.sql"));
 };
 $updates['201811272011'][] = "DROP TABLE addressbook_contact_custom_fields";
 
@@ -54,4 +56,15 @@ $updates['201908301421'][] = "ALTER TABLE `addressbook_contact` ADD `initials` V
 $updates['201908301421'][] = function() {
 	$m = new go\modules\community\addressbook\install\Migrate63to64();
 	$m->addInitials();
+};
+
+$updates['201909181300'][] = "ALTER TABLE `addressbook_contact` ADD `salutation` VARCHAR(100) NULL DEFAULT NULL AFTER `suffixes`;";
+$updates['201909181300'][] = function() {
+	$m = new go\modules\community\addressbook\install\Migrate63to64();
+	$m->addSalutation();
+};
+
+
+$updates['201909181300'][] = function() {
+	Module::checkRootFolder();
 };

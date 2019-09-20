@@ -66,14 +66,14 @@ class Server extends Entity {
 	
 	protected function internalSave() {
 		if($this->isModified("domains")) {
-			GO()->getCache()->delete("authentication-domains");
+			go()->getCache()->delete("authentication-domains");
 		}
 		
 		return parent::internalSave();
 	}
 	
 	protected function internalDelete() {
-		GO()->getCache()->delete("authentication-domains");
+		go()->getCache()->delete("authentication-domains");
 		return parent::internalDelete();
 	}
 }

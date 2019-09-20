@@ -33,6 +33,24 @@ go.Modules.register("core", 'core', {
 	],
 	selectDialogPanels: [
 		"go.users.SelectDialogPanel",
+	],
+
+	customFieldTypes: [
+		"go.customfields.type.Checkbox",
+		"go.customfields.type.Date",
+		"go.customfields.type.DateTime",
+		"go.customfields.type.EncryptedText",
+		"go.customfields.type.FunctionField",
+		"go.customfields.type.Group",
+		"go.customfields.type.Html",
+		"go.customfields.type.MultiSelect",
+		"go.customfields.type.Notes",
+		"go.customfields.type.Number",
+		"go.customfields.type.Select",
+		"go.customfields.type.Text",
+		"go.customfields.type.TextArea",
+		"go.customfields.type.User",
+		"go.customfields.type.YesNo"
 	]
 });
 

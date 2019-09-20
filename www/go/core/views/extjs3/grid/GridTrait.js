@@ -147,8 +147,14 @@ go.grid.GridTrait = {
 	},
 	
 	doDelete : function(selectedRecords) {
+
+		var me = this;
+		this.getEl().mask(t("Deleting..."));
+
 		this.getStore().entityStore.set({
 			destroy:  selectedRecords.column("id")
+		}).finally(function() {
+			me.getEl().unmask();
 		});
 	},
 	

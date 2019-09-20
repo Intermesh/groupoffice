@@ -6,7 +6,7 @@ require(__DIR__ . "/../../vendor/autoload.php");
 App::get();
 
 if(isset($_GET['lang'])) {
-	GO()->getLanguage()->setLanguage($_GET['lang']);
+	go()->getLanguage()->setLanguage($_GET['lang']);
 }
 
 header('Content-Type: application/javascript; charset=utf8');

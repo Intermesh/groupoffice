@@ -171,7 +171,7 @@ class Settings extends core\Settings {
 	 */
 	public function getLocale() {
 
-		if(GO()->getInstaller()->isInProgress()) {
+		if(go()->getInstaller()->isInProgress()) {
 			return 'C.UTF-8';
 		}
 		
@@ -192,7 +192,7 @@ class Settings extends core\Settings {
 				}
 			}
 		} catch(Exception $e) {
-			GO()->debug("Could not determine locale");
+			go()->debug("Could not determine locale");
 		}
 
 		//This locale is often installed so try to fallback on C.UTF8
@@ -363,12 +363,12 @@ class Settings extends core\Settings {
 	 * The default address book for new users
 	 * @var int 
 	 */
-	protected $userAddressBookId = null;
+	public $userAddressBookId = null;
 	
 	/**
 	 * @return AddressBook
 	 */
-	public function getUserAddressBook() {
+	public function userAddressBook() {
 		if(!Module::findByName('community', 'addressbook')) {
 			return null;
 		}
@@ -381,11 +381,15 @@ class Settings extends core\Settings {
 
 		if(!$addressBook) {
 			$addressBook = new AddressBook();	
-			$addressBook->name = GO()->t("Users");
+			$addressBook->name = go()->t("Users");		
+
 			if(!$addressBook->save()) {
 				throw new \Exception("Could not save address book");
 			}
 			$this->userAddressBookId = $addressBook->id;
+
+			//Share users address book with internal
+			$addressBook->findAcl()->addGroup(Group::ID_INTERNAL)->save();
 			if(!$this->save()) {
 				throw new \Exception("Could not save core settings");
 			}
@@ -393,10 +397,7 @@ class Settings extends core\Settings {
 
 		return $addressBook;		
 	}
-	
-	public function setUserAddressBookId($id) {
-		$this->userAddressBookId = $id;
-	}
+
 	
 	
 	/**
@@ -448,14 +449,14 @@ class Settings extends core\Settings {
 	/**
 	 * Set default groups for new groups
 	 * 
-	 * @param array eg [['groupId' => 1]]
+	 * @param array $groups eg [['groupId' => 1]]
 	 */
 	public function setDefaultGroups($groups) {	
 		
-		GO()->getDbConnection()->exec("TRUNCATE TABLE core_group_default_group");
+		go()->getDbConnection()->exec("TRUNCATE TABLE core_group_default_group");
 		
 		foreach($groups as $groupId) {
-			if(!GO()->getDbConnection()->insert("core_group_default_group", ['groupId' => $groupId])->execute()) {
+			if(!go()->getDbConnection()->insert("core_group_default_group", ['groupId' => $groupId])->execute()) {
 				throw new Exception("Could not save group id ".$groupId);
 			}
 		}

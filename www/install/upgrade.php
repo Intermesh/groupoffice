@@ -18,11 +18,11 @@ try {
 	
 	require('header.php');
 	
-	GO()->getInstaller()->isValidDb();
-	GO()->setCache(new \go\core\cache\None());	
+	go()->getInstaller()->isValidDb();
+	go()->setCache(new \go\core\cache\None());	
 	Table::destroyInstances();
 	
-	$unavailable = GO()->getInstaller()->getUnavailableModules();
+	$unavailable = go()->getInstaller()->getUnavailableModules();
 
 	if (!isset($_GET['confirmed'])) {
 	
@@ -68,21 +68,21 @@ try {
 			foreach($unavailable as $m) {
 				$where->orWhere($m);
 			}
-			$stmt = GO()->getDbConnection()->update("core_module", ['enabled' => false], $where);
+			$stmt = go()->getDbConnection()->update("core_module", ['enabled' => false], $where);
 			$stmt->execute();
 		}	
 
 		\GO::session()->runAsRoot();
 	
-		GO()->getInstaller()->upgrade();	
+		go()->getInstaller()->upgrade();	
 
 		echo "</pre></div>";
 
 		echo '<a class="button" href="../">Continue</a>';
 
-		if(GO()->getDebugger()->enabled) {
+		if(go()->getDebugger()->enabled) {
 			echo "<div style=\"clear:both;margin-bottom:20px;\"></div><div class=\"card\"><h2>Debugger output</h2><pre>" ;
-			GO()->getDebugger()->printEntries();
+			go()->getDebugger()->printEntries();
 			echo "</pre></div>";
 		}
 
@@ -96,10 +96,10 @@ try {
 	
 	echo "</pre></div>";
 	
-	if(GO()->getDebugger()->enabled) {
+	if(go()->getDebugger()->enabled) {
 		echo "<div style=\"clear:both;margin-bottom:20px;\"></div><div class=\"card\"><h2>Debugger output</h2><pre>";
 		
-		GO()->getDebugger()->printEntries();
+		go()->getDebugger()->printEntries();
 		
 		echo "</pre></div>";
 	}

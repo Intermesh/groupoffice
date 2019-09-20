@@ -72,8 +72,8 @@ class VCard extends AbstractConverter {
 		
 		$vcard = $this->getVCard($contact);
 
-		$vcard->LANGUAGE = GO()->getSettings()->language;
-		$vcard->PRODID = '-//Intermesh//NONSGML Group-Office ' . GO()->getVersion() . '//EN';
+		$vcard->LANGUAGE = go()->getSettings()->language;
+		$vcard->PRODID = '-//Intermesh//NONSGML Group-Office ' . go()->getVersion() . '//EN';
 		
 		$vcard->N = $contact->isOrganization ? [$contact->name] : [$contact->lastName, $contact->firstName, $contact->middleName, $contact->prefixes, $contact->suffixes];
 		$vcard->FN = $contact->name;
@@ -360,7 +360,7 @@ class VCard extends AbstractConverter {
 		
 		$vcardOrganizationNames = $this->getVCardOrganizations($vcard);
 		
-		GO()->debug($vcardOrganizationNames);
+		go()->debug($vcardOrganizationNames);
 
 		//compare with existing.
 		$goOrganizations = $contact->isNew() ? [] : Contact::find()
@@ -377,13 +377,13 @@ class VCard extends AbstractConverter {
 			}
 		}
 		
-		GO()->debug($goOrganizationsNames);
+		go()->debug($goOrganizationsNames);
 
 		$newVcardOrgNames = array_diff($vcardOrganizationNames, $goOrganizationsNames);
 		foreach ($newVcardOrgNames as $name) {
 			$org = Contact::find()->where(['isOrganization' => true])->andWhere('name', 'LIKE', $name)->single();
 			if (!$org) {
-				GO()->debug("Create org: " . $name);
+				go()->debug("Create org: " . $name);
 				$org = new Contact();
 				$org->name = $name;
 				$org->isOrganization = true;
@@ -393,7 +393,7 @@ class VCard extends AbstractConverter {
 				}
 			}
 			
-			GO()->debug("Link org: " . $org->name);
+			go()->debug("Link org: " . $org->name);
 			$link = Link::create($contact, $org);
 			if (!$link) {
 				throw new Exception("Could not link organization");
@@ -431,7 +431,7 @@ class VCard extends AbstractConverter {
 		$values = $params['values'] ?? [];
 		
 		if(!isset($values['addressBookId'])) {
-			$values['addressBookId'] = GO()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->defaultAddressBookId;
+			$values['addressBookId'] = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->defaultAddressBookId;
 		}
 
 		$splitter = new VCardSplitter(StringUtil::cleanUtf8($file->getContents()), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);

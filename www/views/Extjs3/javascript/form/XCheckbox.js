@@ -64,10 +64,6 @@ Ext.ux.form.XCheckbox = Ext.extend(Ext.form.Checkbox, {
 		this.updateHidden();
 	},
 
-	getValue : function() {
-		return this.checked ? this.submitOnValue : this.submitOffValue;
-	},
-
 	/**
 	 * Updates hiddenField
 	 * @private

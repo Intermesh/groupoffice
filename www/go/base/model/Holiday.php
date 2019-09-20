@@ -81,7 +81,7 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 	public function getHolidaysInPeriod($startDate,$endDate,$locale=false,$check=true,$force=false){
 		
 		if(empty($locale)){		
-			$locale = GO()->getAuthState()->getUser(['holidayset'])->holidayset;
+			$locale = go()->getAuthState()->getUser(['holidayset'])->holidayset;
 			if(!$locale)
 				return false;
 		}
@@ -177,7 +177,7 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 	public static function getAvailableHolidayFiles(){
 		$holidays = array();
 		
-		$lang = GO()->getLanguage()->getLanguages();
+		$lang = go()->getLanguage()->getLanguages();
 		
 		$folderPath = \GO::config()->root_path.'language/holidays/';
 		$folder = new \GO\Base\Fs\Folder($folderPath);

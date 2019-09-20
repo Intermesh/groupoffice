@@ -1,8 +1,42 @@
+19-09-2019 6.4.57
+- Custom fields: Query language works with text for select and multiselect
+- Users: Problem with deleting users because of default calendar
+- Address Book: Brought back salutation field
+- Address book: Added notes filter
+- Projects: Extended project report with comments
+- Files: File wouldn't open by default when WOPI was installed
+- Core: Missing link button in new dialogs.
+- Billing: Fixed problem where amounts got multiplied by 100 when editing numbers with decimals
+- Workflow: Fixed workflow delete button
+- Files: Fixed file access to address book access denied
+- Projects: Time entries are searchable
+
+17-09-2019 6.4.56
+- Core: Disable logging during upgrade for performance
+- Core: fixed custom fields upgrade problem
+
+16-09-2019 6.4.55
+- Problem with start module
+
+13-09-2019 6.4.54
+- Core: Sometimes a user was not in group everyone
+- IMAP / LDAP auth:  Clear database password when logging in with IMAP or LDAP authenticator
+- Core: raised default max upload size to 1GB
+- Core: fixed scroll to top in infinite grids
+- Carddav: carddav ignores sync-settings #460
+- Email: Fixed Search in Email with 2 strings #444
+- Sync: Default sync settings when creating a new user
+- Core: Mask grid when deleting
+- Core: Serveral issues with forms including a checkbox
+
+12-09-2019 6.4.53
 - Billing: Fixed tax percentage decimals in PDF
 - Billing: Fixed translation for Quantity / Amount in order items
 - Carddav: Fixed Birthdays on carddav not synced #410
+- Core: Import function shows error messages per line
 
 10-09-2019 6.4.52
+- Billing: Fixed group summary gross total in PDF.
 - Caldav: events with status needs-action were not synced. Change status to needs-action to tentative as needs-action is not a valid vevent status. 
 - Carddav: Create with vcard 4.0 format was broken (davdroid)
 - Core: Added user import with ability to create mailbox on mailserver too
@@ -249,6 +283,8 @@
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
 
+19-09-2019 6.3.82
+- Projects larger expense budget dialog and resizable
 - Billing: Force select of book in duplicate dialog
 - Core: Clear old framework cache on upgrade
 - Project: create invoice without grouping time entries by employees. are time record will be group into 1 group

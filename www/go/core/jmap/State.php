@@ -127,7 +127,7 @@ class State extends AbstractState {
 		$user = $this->getToken()->getUser();
 		
 		$response = [
-			'version' => GO()->getVersion(),
+			'version' => go()->getVersion(),
 			'username' => $user->username,
 			'accounts' => ['1'=> [
 				'name'=>'Virtual',
@@ -210,6 +210,10 @@ class State extends AbstractState {
 	 * @return bool
 	 */
 	public function isAdmin() {
+		if($this->getUserId() == User::ID_SUPER_ADMIN) {
+			return true;
+		}
+
 		$user = $this->getUser(['id']);
 		if(!$user) {
 			return false;

@@ -69,7 +69,7 @@ class Acl extends Controller {
 		// $table = array_values($cls::getMapping()->getTables())[0];
 		// $defaultAcl = model\Acl::findById($entityType->getDefaultAclId());
 		
-		// $aclIds = GO()->getDbConnection()->select('aclId')->from($table->getName());
+		// $aclIds = go()->getDbConnection()->select('aclId')->from($table->getName());
 		// $acls = model\Acl::find()->where('id', 'IN', $aclIds);
 		
 		// foreach($acls as $acl) {

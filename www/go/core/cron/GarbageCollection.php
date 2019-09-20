@@ -35,7 +35,7 @@ class GarbageCollection extends CronJob {
 	}
 
 	private function blobs() {
-		GO()->debug("Cleaning up BLOB's");
+		go()->debug("Cleaning up BLOB's");
 		$blobs = Blob::find()->where('staleAt', '<=', new DateTime())->execute();
 
 		foreach($blobs as $blob)
@@ -45,22 +45,22 @@ class GarbageCollection extends CronJob {
 			}
 		}		
 			
-		GO()->debug("Deleted ". $blobs->rowCount() . " stale blobs");
+		go()->debug("Deleted ". $blobs->rowCount() . " stale blobs");
 	}
 
 	private function change() {
 
-		GO()->debug("Cleaning up changes");
+		go()->debug("Cleaning up changes");
 		$date = new DateTime();
-		$date->modify('-' .GO()->getSettings()->syncChangesMaxAge.' days');
+		$date->modify('-' .go()->getSettings()->syncChangesMaxAge.' days');
 
-		GO()->getDbConnection()->delete('core_change', (new Query)->where('createdAt', '<', $date))->execute();
-		GO()->debug("Done");
+		go()->getDbConnection()->delete('core_change', (new Query)->where('createdAt', '<', $date))->execute();
+		go()->debug("Done");
 	}
 
 	private function links() {
 
-		GO()->debug("Cleaning up links");
+		go()->debug("Cleaning up links");
 		// $classFinder = new ClassFinder();
 		// $entities = $classFinder->findByTrait(SearchableTrait::class);
 		$types = EntityType::findAll();
@@ -70,7 +70,7 @@ class GarbageCollection extends CronJob {
 				continue;
 			}
 
-			GO()->debug("Cleaning ". $type->getName());
+			go()->debug("Cleaning ". $type->getName());
 
 			$cls = $type->getClassName();
 
@@ -82,29 +82,29 @@ class GarbageCollection extends CronJob {
 
 			$query = (new Query)->select('sub.id')->from($tableName);
 
-			$stmt = GO()->getDbConnection()->delete('core_search', (new Query)
+			$stmt = go()->getDbConnection()->delete('core_search', (new Query)
 				->where('entityTypeId', '=', $cls::entityType()->getId())
 				->andWhere('entityId', 'NOT IN', $query)
 			);
 			$stmt->execute();
 
-			GO()->debug("Deleted ". $stmt->rowCount() . " cached search results for $cls");
+			go()->debug("Deleted ". $stmt->rowCount() . " cached search results for $cls");
 
-			$stmt = GO()->getDbConnection()->delete('core_link', (new Query)
+			$stmt = go()->getDbConnection()->delete('core_link', (new Query)
 				->where('fromEntityTypeId', '=', $cls::entityType()->getId())
 				->andWhere('fromId', 'NOT IN', $query)
 			);
 			$stmt->execute();
 
-			GO()->debug("Deleted ". $stmt->rowCount() . " links from $cls");
+			go()->debug("Deleted ". $stmt->rowCount() . " links from $cls");
 
-			$stmt = GO()->getDbConnection()->delete('core_link', (new Query)
+			$stmt = go()->getDbConnection()->delete('core_link', (new Query)
 				->where('toEntityTypeId', '=', $cls::entityType()->getId())
 				->andWhere('toId', 'NOT IN', $query)
 			);
 			$stmt->execute();
 
-			GO()->debug("Deleted ". $stmt->rowCount() . " links to $cls");
+			go()->debug("Deleted ". $stmt->rowCount() . " links to $cls");
 
 		}
 	}

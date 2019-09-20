@@ -27,7 +27,7 @@ class Contact extends Base {
 	
 	public function addConstraint() {
 		$sql = "ALTER TABLE `" . $this->field->tableName() . "` ADD CONSTRAINT `" . $this->getConstraintName() . "` FOREIGN KEY (" . Utils::quoteColumnName($this->field->databaseName) . ") REFERENCES `addressbook_contact`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";			
-		GO()->getDbConnection()->query($sql);
+		go()->getDbConnection()->query($sql);
 	}
 	
 	private function getConstraintName() {
@@ -36,7 +36,7 @@ class Contact extends Base {
 	
 	public function onFieldDelete() {		
 		$sql = "ALTER TABLE `" . $this->field->tableName() . "` DROP FOREIGN KEY " . $this->getConstraintName();
-		if(!GO()->getDbConnection()->query($sql)) {
+		if(!go()->getDbConnection()->query($sql)) {
 			throw new \Exception("Couldn't drop foreign key");
 		}
 			
