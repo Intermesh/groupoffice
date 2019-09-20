@@ -103,6 +103,15 @@ class Search extends AclOwnerEntity {
 	
 	protected static function defineFilters() {
 		return parent::defineFilters()
+						->add("link", function(Criteria $criteria, $value, Query $query) {
+							
+							$on = 's.entityId = link.toId AND s.entityTypeId = link . toEntityTypeId';							
+								
+							$query->join('core_link', 'link', $on); 
+
+							$criteria->where('fromId', '=', $value['id'])
+											->andWhere('fromEntityTypeId', '=', EntityType::findByName($value['entity'])->getId());							
+						})
 						->add('entityId', function (Criteria $criteria, $value){
 							$criteria->where(['entityId' => $value]);		
 						})
@@ -115,6 +124,9 @@ class Search extends AclOwnerEntity {
 							$sub = (new Criteria);
 
 							foreach($value as $e) {
+								if(is_string($e)) {
+									$e = ['name' => $e];
+								}
 								$w = ['e.name' => $e['name']];
 								if(isset($e['filter'])) {
 									$w['filter'] = $e['filter'];

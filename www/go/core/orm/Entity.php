@@ -546,6 +546,26 @@ abstract class Entity extends Property {
 			$criteria->where('comment.modifiedAt', $comparator, $value);					
 		});
 
+
+		/* 
+			find all items with link to:
+
+		link : {
+			entity: "Contact",
+			id: 1
+		}
+		*/
+		$filters->add("link", function(Criteria $criteria, $value, Query $query) {
+			$linkAlias = 'link_' . uniqid();
+			$on = $query->getTableAlias() . '.id =  '.$linkAlias.'.toId  AND '.$linkAlias.'.toEntityTypeId = ' . static::entityType()->getId();
+			
+				
+			$query->join('core_link', $linkAlias, $on); 
+
+			$criteria->where('fromId', '=', $value['id'])
+							->andWhere('fromEntityTypeId', '=', EntityType::findByName($value['entity'])->getId());							
+		});
+
 		static::fireEvent(self::EVENT_FILTER, $filters);
 		
 		return $filters;
