@@ -12,8 +12,6 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 		
 		Ext.apply(this, {
 			items: [	
-			
-				
 				{
 					xtype: 'container',
 					layout: "hbox",
@@ -62,91 +60,6 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					}
 					
 				}, 				
-				
-				
-				
-				// {
-				// 	onLoad: function(dv) {
-				// 		dv.emailButton.menu.removeAll();						
-				// 		dv.data.emailAddresses.forEach(function(a) {
-
-							
-				// 			var	mailto = '"' + dv.data.name.replace(/"/g, '\\"') + '" <' + a.email + '>';
-							
-
-				// 			dv.emailButton.menu.addMenuItem({
-				// 				text: "<div>" + a.email + "</div><small>" + (t("emailTypes")[a.type] || a.type) + "</small>",
-				// 				href: "mailto:" + mailto,
-				// 				handler: function(btn, e) {
-				// 					go.util.mailto({
-				// 						email: a.email,
-				// 						name: dv.data.name
-				// 					}, e);
-				// 				}
-				// 			});
-				// 		});
-				// 		dv.emailButton.setDisabled(dv.data.emailAddresses.length === 0);
-						
-						
-				// 		dv.callButton.menu.removeAll();						
-				// 		dv.data.phoneNumbers.forEach(function(a) {
-				// 			var sanitized = a.number.replace(/[^0-9+]/g, "");
-
-				// 			dv.callButton.menu.addMenuItem({
-				// 				text: "<div>" + a.number + "</div><small>" + (t("phoneTypes")[a.type] || a.type)  + "</small>",
-				// 				href: "tel://" + sanitized,
-				// 				handler: function(btn, e) {									
-				// 					go.util.callto({
-				// 						number: sanitized,
-				// 						name: dv.name
-				// 					}, e);
-				// 				}
-				// 			});
-				// 		});
-				// 		dv.callButton.setDisabled(dv.data.phoneNumbers.length === 0);
-						
-				// 	},
-				// 	xtype: "toolbar",
-				// 	cls: "actions",
-				// 	buttonAlign: "center",
-				// 	items: [
-				// 		this.emailButton = new Ext.Button({
-				// 			menu: {cls: "x-menu-no-icons", items: []},
-				// 			text: t("E-mail"),
-				// 			iconCls: 'ic-email',
-				// 			disabled: true
-				// 		}),
-						
-				// 		this.callButton = new Ext.Button({
-				// 			menu: {cls: "x-menu-no-icons", items: []},
-				// 			text: t("Call"),
-				// 			iconCls: 'ic-phone',
-				// 			disabled: true
-				// 		})
-				// 	]
-				// },
-
-
-				// {
-				// 	xtype: 'panel',
-				// 	title: t("Communication"),
-				// 	layout: "hbox",				
-					
-				// 	onLoad: function (detailView) {
-
-				// 		this.items.each(function(i) {
-				// 			i.update(detailView.data);
-				// 		});					
-						
-				// 		detailView.phoneNumbers.setVisible(detailView.data.phoneNumbers.length > 0);
-				// 		detailView.emailAddresses.setVisible(detailView.data.emailAddresses.length > 0);
-				// 	},
-
-				// 	items: [
-				
-				// 	]
-				// },
-
 
 				this.emailAddresses = new Ext.BoxComponent({
 					xtype: "box",
@@ -273,8 +186,23 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 				},	{
 					xtype: "box",
 					tpl: '<div class="icons"><hr class="indent"><tpl for="addressbook"><p><i class="icon label">import_contacts</i><span>{name}</span>	<label>{[t("Address book")]}</label>\</p></tpl></div>'
-				},
-				{
+				},{
+					title: t('Company'),
+					onLoad: function (dv) {
+						console.log(dv.data);
+						this.setVisible(dv.data.IBAN || dv.data.vatNo || dv.data.vatReverseCharge || dv.data.registrationNumber || dv.data.debtorNumber);
+					},
+					collapsible:true,
+					tpl: '<p class="s6 pad">\
+						<tpl if="values.IBAN"><label>IBAN</label>\<span>{IBAN}</span><br><br></tpl>\
+						<tpl if="values.vatNo"><label>{[t("VAT number")]}</label><span>{vatNo}</span><br><br></tpl>\
+						<label>{[t("Reverse charge VAT")]}</label><span>{[values.vatReverseCharge? t("Yes") : t("No") ]}</span>\
+					</p>\
+					<p class="s6 pad">\
+						<tpl if="values.registrationNumber"><label>{[t("Registration number")]}</label><span>{registrationNumber}</span><br><br></tpl>\
+						<tpl if="values.debtorNumber"><label>{[t("Debtor number")]}</label><span>{debtorNumber}</span></tpl>\
+					</p>'
+				},{
 					xtype: 'panel',
 					title: t("Notes"),
 					autoHeight: true,
@@ -389,17 +317,12 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 			});
 		}
 
-
 		var tbarCfg = {
 			disabled: true,
 			items: items
 		};
 
-
 		return new Ext.Toolbar(tbarCfg);
-
 
 	}
 });
-
-

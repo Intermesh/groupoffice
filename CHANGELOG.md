@@ -1,3 +1,5 @@
+- Address book: added business fields in detail panel of orginisation
+
 19-09-2019 6.4.57
 - Custom fields: Query language works with text for select and multiselect
 - Users: Problem with deleting users because of default calendar
