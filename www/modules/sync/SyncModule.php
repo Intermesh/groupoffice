@@ -14,7 +14,7 @@ use GO\Sync\Model\Settings;
 use GO\Sync\Model\UserAddressBook;
 use GO\Sync\Model\UserNoteBook;
 use GO\Sync\Model\UserSettings;
-
+use go\core\model;
 
 class SyncModule extends Module{
 
@@ -25,40 +25,26 @@ class SyncModule extends Module{
 	public static function defineListeners() {
 
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
-		User::on(User::EVENT_SAVE, static::class, 'onUserSave');
-		User::on(User::EVENT_BEFORESAVE, static::class, 'onUserBeforeSave');
+		// User::on(User::EVENT_SAVE, static::class, 'onUserSave');
+		// User::on(User::EVENT_BEFORESAVE, static::class, 'onUserBeforeSave');
 	}
 	
 
 	public static function onMap(Mapping $mapping) {
-		$mapping->addHasOne('syncSettings', UserSettings::class, ['id' => 'user_id'])
-						->addArray('syncNoteBooks', UserNoteBook::class, ['id' => 'userId'])
-						->addArray('syncAddressBooks', UserAddressBook::class, ['id' => 'userId']);
+		$mapping->addHasOne('syncSettings', UserSettings::class, ['id' => 'user_id']);
 		
 	}
 
-	public static function onUserBeforeSave(User $user) {
-		if($user->isNew()) {			
-			if(empty($user->syncAddressBooks)) {
-				if(isset($user->addressBookSettings) && ($addressBookId = $user->addressBookSettings->getDefaultAddressBookId())) {
-					$user->syncAddressBooks[] = (new UserAddressBook())->setValues(['addressBookId' => $addressBookId, 'isDefault' => true]);
-				}
-			}
+	
+	// public static function onUserSave(User $user) {
+	// 	if($user->isNew()) {
 
-			if(empty($user->syncNoteBooks)) {
-				$noteBook = NoteBook::find(['id'])->filter(['permissionLevel' => Acl::LEVEL_WRITE, 'permissionLevelGroups' => $user->groups])->single();
-				if($noteBook) {
-					$user->syncNoteBooks[] = (new UserNoteBook())->setValues(['noteBookId' => $noteBook->id, 'isDefault' => true]);
-				}
-			}
-		}
-	}
+	// 		if(!model\Module::isAvailableFor('community', 'sync', $user->id)) {
+	// 			return true;
+	// 		}
 
-	public static function onUserSave(User $user) {
-		if($user->isNew()) {
-
-			$legacyUser = GOUser::model()->findByPk($user->id);
-			Settings::model()->findForUser($legacyUser);
-		}
-	}
+	// 		$legacyUser = GOUser::model()->findByPk($user->id);
+	// 		Settings::model()->findForUser($legacyUser);
+	// 	}
+	// }
 }

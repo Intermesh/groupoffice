@@ -130,6 +130,10 @@ class Settings extends \GO\Base\Db\ActiveRecord{
 				}
 			}
 
+
+			//$newUser = User::findById($user->id, ['syncSettings', 'addressBookSettings', 'notesSettings']);
+			
+
 //			if (\GO::modules()->addressbook) {
 //				$stmt = $this->addressbooks();
 //				if (!$stmt->rowCount()) {

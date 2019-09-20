@@ -540,7 +540,7 @@ class Installer {
 								
 							} else {
 
-								echo $e->getMessage() . "\n";
+								echo $e->getCode() . ': '.$e->getMessage() . "\n";
 								echo "Query: " . $query . "\n";
 								echo "Package: " . ($module->package ?? "legacy") . "\n";
 								echo "Module: " . $module->name . "\n";

@@ -94,10 +94,7 @@ class Acl extends Entity {
 		
 		if($this->ownedBy != User::ID_SUPER_ADMIN) {
 
-			$groupId = Group::find()
-							->where(['isUserGroupFor' => $this->ownedBy])
-							->selectSingleValue('id')
-							->single();
+			$groupId = Group::findPersonalGroupID($this->ownedBy);
 			$ownerLevel = $this->hasGroup($groupId);
 			if($ownerLevel < self::LEVEL_MANAGE) {
 				$this->removeGroup($groupId);

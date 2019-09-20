@@ -82,7 +82,12 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		//load note books and select the first
 		this.noteBookGrid.getStore().load({
 			callback: function (store) {
-				this.noteBookGrid.getSelectionModel().selectRow(0);
+				var index = this.noteBookGrid.store.indexOfId(go.User.notesSettings.defaultNoteBookId);
+				if(index == -1) {
+					index = 0;
+				}
+
+				this.noteBookGrid.getSelectionModel().selectRow(index);
 			},
 			scope: this
 		});

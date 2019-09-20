@@ -2,16 +2,21 @@
 namespace go\modules\community\notes;
 
 use go\core;
+use go\core\model\User;
 use go\core\model\Acl;
 use go\core\model\Group;
 use go\core\model\Module as ModuleModel;
+use go\core\orm\Mapping;
+use go\core\orm\Property;
 use go\modules\community\notes\model\NoteBook;
+use go\modules\community\notes\model\UserSettings;
 
 class Module extends core\Module {	
 
 	public function getAuthor() {
 		return "Intermesh BV";
 	}
+
 	
 	protected function afterInstall(ModuleModel $model) {	
 		
@@ -35,14 +40,12 @@ class Module extends core\Module {
 
 	
 	
-//	public function defineListeners() {
-//		model\Note::on(model\Note::EVENT_SAVE, static::class, 'onSave');
-//	}
-//	
-//	public static function onSave(model\Note $note) {
-//		
-//		\go\core\App::get()->debug("A note has been saved :)");
-//		
-//		return true;
-//	}
+	public function defineListeners() {
+		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
+	}
+	
+	public static function onMap(Mapping $mapping) {
+		$mapping->addHasOne('notesSettings', UserSettings::class, ['id' => 'userId']);
+	}
+
 }

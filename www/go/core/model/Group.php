@@ -187,4 +187,26 @@ class Group extends AclOwnerEntity {
 		}
 	}
 
+	public static function findPersonalGroupID($userId) {
+		$groupId = Group::find()
+							->where(['isUserGroupFor' => $userId])
+							->selectSingleValue('id')
+							->single();
+		if($groupId) {
+			return $groupId;
+		}
+		$user = User::findById($userId, ['username']);
+		$personalGroup = new Group();
+		$personalGroup->name = $user->username;
+		$personalGroup->isUserGroupFor = $userId;
+		$personalGroup->users[] = $userId;
+		
+		if(!$personalGroup->save()) {
+			throw new \Exception("Could not create personal group");
+		}
+
+		return $personalGroup->id;
+		
+	}
+
 }
