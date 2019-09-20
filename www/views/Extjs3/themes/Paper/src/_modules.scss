@@ -256,26 +256,6 @@ $app-icons: (
 	float:right;
 }
 
-/* hide selection */
-.cal-date-picker .x-date-inner .x-date-selected {
-
-	> a {
-	background-color: transparent;
-	color: color($fg, 'text');
-	font-weight: normal;
-	}
-	span {
-		font-weight: normal;
-	}
-
-	&.x-date-today {
-		> a {
-			@include var(color, c-primary);
-		}
-	}
-}
-
-
 .go-attachments {
 	span {
 		cursor: pointer;
