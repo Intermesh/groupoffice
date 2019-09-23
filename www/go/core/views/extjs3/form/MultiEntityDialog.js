@@ -4,6 +4,11 @@ go.form.MultiEntityDialog = Ext.extend(go.Window, {
 
 	title: "",
 	entityStore: null,
+	/**
+	 * string[] relation names defined in entity store
+	 * When specified the Detailview will listen to these store and fetch the related entities
+	 */
+	relations: [],
 	itemCfg: null, // {xtype:'entityform',...} to be repeated in FormGroup
 	btnCfg: {
 		text: t("Add another"),
@@ -78,25 +83,46 @@ go.form.MultiEntityDialog = Ext.extend(go.Window, {
 			}
 		}, this);
 	},
+
+	internalLoad : function(entityPanel, entity, wrap) {
+		this.watchRelations = {};
+		var me = this;
+		
+		if(!this.relations.length) {
+			this.onLoadEntity(entityPanel, entity, wrap);
+			return;
+		}
+
+		go.Relations.get(this.entityStore, entity, this.relations).then(function(result) {
+			me.watchRelations = result.watch;
+			me.onLoadEntity(entityPanel, entity, wrap);
+		}).catch(function(result) {
+			console.warn("Failed to fetch relation", result);
+		});
+		
+	},
 	
 	load: function(ids) {
 		this.entityStore.get(ids, function(entries) {
-			entries.forEach(function(entry) {
+			entries.forEach(function(entity) {
 				var wrap = this.formGroup.addPanel(),
 					ff = wrap.formField, 
 					entityPanel = ff.items.get(0);
 
+				
+
 				this.formGroup.doLayout();
 				this.formGroup.markDeleted = [];
-				entityPanel.currentId = ff.key = entry.id;
-				entityPanel.setValues(entry);
-				entityPanel.entity = entry;
-				this.loadEntity(entityPanel, entry, wrap);
+				entityPanel.currentId = ff.key = entity.id;
+				entityPanel.setValues(entity);
+				entityPanel.entity = entity;
+				
+				this.internalLoad(entityPanel, entity, wrap);
 			}, this)
 		}, this);
 	},
 
-	loadEntity: function(entityPanel, entity, wrap) {
+	onLoadEntity: function(entityPanel, entity, wrap) {
 		// overwrite todo something when entity is loaded
 		// method is called once for each entity
 	}

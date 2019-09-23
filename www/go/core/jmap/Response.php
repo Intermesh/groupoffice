@@ -29,8 +29,8 @@ class Response extends \go\core\http\Response {
 	public function addResponse($responseData = null) {		
 		$this->data[] = [$this->methodName,  $responseData, $this->clientCallId];
 
-		GO()->getDebugger()->debug("response:");
-		GO()->getDebugger()->debug($responseData);			
+		go()->getDebugger()->debug("response:");
+		go()->getDebugger()->debug($responseData);			
 	}
 	
 	/**

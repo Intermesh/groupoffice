@@ -18,7 +18,8 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 		this.entityGrid = new go.links.EntityGrid({
 			width: dp(200),
 			region: "west",
-			split: true
+			split: true,
+			stateId: "go-link-browser-entity-grid"
 		});
 
 		this.entityGrid.getSelectionModel().on('selectionchange', function (sm) {
@@ -35,11 +36,22 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 		this.store = new go.data.GroupingStore({
 			autoDestroy: true,
 			remoteGroup: true,
-			fields: ['id', 'toId', 'toEntity', {name: "to", type: "relation"}, 'description', {name: 'modifiedAt', type: 'date'}],
+			fields: [
+				'id', 
+				'toId', 
+				'toEntity', 
+				{name: "to", type: "relation"}, 
+				'description', 
+				{
+					name: 'modifiedAt',
+					mapping: "to.modifiedAt",
+					type: "date"
+				}
+				],
 			entityStore: "Link",
-			sortInfo: {field: 'toEntity', direction: 'DESC'},
+			sortInfo: {field: 'modifiedAt', direction: 'DESC'},
 			autoLoad: true,
-			groupOnSort: true,
+			remoteSort: true,
 			groupField: 'toEntity'
 		});
 
@@ -50,6 +62,7 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 
 		this.grid = new go.grid.GridPanel({
 			cls: "go-link-grid",
+			stateId: "go-link-browser-grid",
 			region: "center",
 			plugins: [actions],
 			tbar: [		
@@ -69,7 +82,6 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 				{
 					id: 'name',
 					header: t('Name'),
-					width: 75,
 					sortable: true,
 					dataIndex: 'name',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
@@ -98,12 +110,11 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 				},
 				{
 					id: 'modifiedAt',
-					header: t('Modified at'),
-					width: 160,
-					hidden: true,
+					header: t('Modified at'),					
+					hidden: false,
 					sortable: true,
 					dataIndex: 'modifiedAt',
-					renderer: Ext.util.Format.dateRenderer(go.User.dateTimeFormat)
+					xtype:"datecolumn"
 				},
 				actions
 			],
@@ -202,5 +213,3 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 
 	}
 });
-
-

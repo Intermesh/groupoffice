@@ -190,7 +190,7 @@ Ext.override(Ext.form.BasicForm,{
 		var fn = function (f) {
 			if (dirtyOnly !== true || f.isDirty()) {
 			
-				if (f.getXType() == 'checkboxgroup') {
+				if (f.getXType() == 'compositefield' || f.getXType() == 'checkboxgroup') {
 					f.items.each(fn);
 					return true;
 				}
@@ -367,7 +367,6 @@ Ext.override(Ext.data.GroupingStore,{
 
 Ext.override(Ext.form.CompositeField, {
 	origFocus : Ext.form.CompositeField.prototype.focus,
-	cascade : Ext.Container.prototype.cascade,
 	focus : function() {
 		var first = this.items.find(function(item) {
 			return item.isFormField && !item.disabled && item.isVisible();
@@ -438,7 +437,6 @@ Ext.override(Ext.FormPanel,{
 	
 	// prevents adding form fields that are part of custom form field components like the combobox of go.form.Chips for example.
 	processAdd : function(c){
-        
 			if(this.isField(c)){
 					this.form.add(c);
 
@@ -1059,4 +1057,24 @@ Ext.override(Ext.TabPanel, {
 
 Ext.override(Ext.KeyNav, {
 	forceKeyDown: true // Required for Firefox 67	
+});
+
+
+//USed by old gridpanel deleteselected to keep scroll position
+// Also used by scrollloader in new framework
+Ext.override(Ext.grid.GridView, {
+	scrollToTopOnLoad: true,
+	onLoad : function(){
+			if (this.scrollToTopOnLoad){
+				if (Ext.isGecko) {
+						if (!this.scrollToTopTask) {
+								this.scrollToTopTask = new Ext.util.DelayedTask(this.scrollToTop, this);
+						}
+						this.scrollToTopTask.delay(1);
+				} else {
+						this.scrollToTop();
+				}
+			}
+			this.scrollToTopOnLoad=true;
+	}
 });

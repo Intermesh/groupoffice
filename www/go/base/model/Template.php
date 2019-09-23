@@ -116,8 +116,9 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	}
 	
 	public static function getCompanyAttributes(\go\modules\community\addressbook\model\Contact $company, $tagPrefix = 'company:'){
-		$attributes[$tagPrefix . 'salutation'] = GO()->t("Dear sir/madam");
+		$attributes[$tagPrefix . 'salutation'] = $company->getSalutation();
 		
+		$attributes[$tagPrefix . 'comment'] = $company->notes;
 		$attributes[$tagPrefix . 'crn'] = $company->registrationNumber;
 		$attributes[$tagPrefix . 'vat_no'] = $company->vatNo;
 		$attributes[$tagPrefix . 'iban'] = $company->IBAN;
@@ -131,6 +132,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 				$attributes[$tagPrefix . 'zip'] = $a->zipCode;
 				$attributes[$tagPrefix . 'country'] = $a->country;
 				$attributes[$tagPrefix . 'state'] = $a->state;
+				$attributes[$tagPrefix . 'city'] = $a->city;
 				
 				$attributes[$tagPrefix . 'formatted_address'] = $a->getFormatted();
 			}
@@ -142,6 +144,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 				$attributes[$tagPrefix . 'post_zip'] = $a->zipCode;
 				$attributes[$tagPrefix . 'post_country'] = $a->country;
 				$attributes[$tagPrefix . 'post_state'] = $a->state;
+				$attributes[$tagPrefix . 'post_city'] = $a->city;
 				
 				$attributes[$tagPrefix . 'formatted_post_address'] = $a->getFormatted();
 			}
@@ -166,12 +169,13 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	} 
 	
 	public static function getContactAttributes($contact, $tagPrefix = 'contact:', $companyTagPrefix = 'company:'){
-		$attributes[$tagPrefix . 'salutation'] = GO()->t("Hi")." ".$contact->firstName;
+		$attributes[$tagPrefix . 'salutation'] = $contact->getSalutation();
 		$attributes[$tagPrefix . 'sirmadam']=$contact->gender=="M" ? \GO::t('sir') : \GO::t('madam');
 		
 		$attributes[$tagPrefix . 'first_name'] = $contact->firstName;
 		$attributes[$tagPrefix . 'middle_name'] = $contact->middleName;
 		$attributes[$tagPrefix . 'last_name'] = $contact->lastName;
+		$attributes[$tagPrefix . 'comment'] = $contact->notes;
 
 			//$attributes = array_merge($attributes, $this->_getModelAttributes($contact, $tagPrefix . ''));
 
@@ -209,12 +213,16 @@ class Template extends \GO\Base\Db\ActiveRecord{
 						$attributes[$tagPrefix . 'fax'] = $p->number;
 					break;
 
+					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_WORK_FAX:
+						$attributes[$tagPrefix . 'work_fax'] = $p->number;
+					break;
+
+					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_WORK_MOBILE:
+						$attributes[$tagPrefix . 'cellular2'] = $p->number;
+					break;
+
 					case \go\modules\community\addressbook\model\PhoneNumber::TYPE_MOBILE:
-						if(isset($attributes[$tagPrefix . 'cellular'])) {
-							$attributes[$tagPrefix . 'cellular2'] = $p->number;
-						} else {
-							$attributes[$tagPrefix . 'cellular'] = $p->number;
-						}
+						$attributes[$tagPrefix . 'cellular'] = $p->number;						
 					break;
 				}
 			}

@@ -116,7 +116,7 @@ class State extends AbstractState {
 	}
 	
 	public function getEventSourceUrl() {
-		return function_exists("xdebug_is_debugger_active") && xdebug_is_debugger_active() ? null : Settings::get()->URL.'api/sse.php';
+		return Settings::get()->URL.'api/sse.php';
 	}
 
 
@@ -127,7 +127,7 @@ class State extends AbstractState {
 		$user = $this->getToken()->getUser();
 		
 		$response = [
-			'version' => GO()->getVersion(),
+			'version' => go()->getVersion(),
 			'username' => $user->username,
 			'accounts' => ['1'=> [
 				'name'=>'Virtual',
@@ -201,6 +201,24 @@ class State extends AbstractState {
 	 */
 	public function getUser(array $properties = []) {		
 		return $this->getToken() ? $this->getToken()->getUser($properties) : null;
+	}
+
+
+	/**
+	 * Check if logged in user is admin
+	 * 
+	 * @return bool
+	 */
+	public function isAdmin() {
+		if($this->getUserId() == User::ID_SUPER_ADMIN) {
+			return true;
+		}
+
+		$user = $this->getUser(['id']);
+		if(!$user) {
+			return false;
+		}
+		return $user->isAdmin();
 	}
 
 }

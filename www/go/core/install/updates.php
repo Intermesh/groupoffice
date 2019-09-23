@@ -11,6 +11,7 @@ use go\core\model\Search;
 use GO\Base\Model\SearchCacheRecord;
 use go\core\model\Group;
 use go\core\model\Acl;
+use go\core\model\Field;
 
 $updates["201803090847"][] = "ALTER TABLE `go_log` ADD `jsonData` TEXT NULL AFTER `message`;";
 
@@ -54,7 +55,7 @@ $updates["201803161130"][] = function() {
 			continue;
 		}
 		$sql = "replace into core_setting select id as moduleId, '" . $new . "' as name, :value as value from core_module where name='core'";
-		$stmt = GO()->getDbConnection()->getPDO()->prepare($sql);
+		$stmt = go()->getDbConnection()->getPDO()->prepare($sql);
 		$stmt->bindValue(":value", $config[$old]);
 		$stmt->execute();
 	}
@@ -76,7 +77,7 @@ $updates["201803161130"][] = function() {
 			continue;
 		}
 		$sql = "replace into core_setting select id as moduleId, '" . $new . "' as name, :value as value from core_module where name='users'";
-		$stmt = GO()->getDbConnection()->getPDO()->prepare($sql);
+		$stmt = go()->getDbConnection()->getPDO()->prepare($sql);
 		$stmt->bindValue(":value", $config[$old]);
 		$stmt->execute();
 	}
@@ -89,7 +90,7 @@ $updates["201803161130"][] = function() {
 						$config['default_date_format'][2];
 
 		$sql = "replace into core_setting select id as moduleId, 'defaultDateFormat' as name, :value as value from core_module where name='users'";
-		$stmt = GO()->getDbConnection()->getPDO()->prepare($sql);
+		$stmt = go()->getDbConnection()->getPDO()->prepare($sql);
 		$stmt->bindValue(":value", $f);
 		$stmt->execute();
 	}
@@ -385,18 +386,18 @@ $updates['201902141322'][] = "CREATE TABLE IF NOT EXISTS `go_templates` (
 
 $updates['201902141322'][] = function() {
 	
-	$duplicates = GO()->getDbConnection()->selectSingleValue('name')->from('core_group')->groupBy(["name"])->having('count(*) > 1');
+	$duplicates = go()->getDbConnection()->selectSingleValue('name')->from('core_group')->groupBy(["name"])->having('count(*) > 1');
 	$count = -1;
 	foreach($duplicates as $name) {		
-		foreach(GO()->getDbConnection()->select("id, name")->from('core_group')->where('name', '=', $name) as $record) {
+		foreach(go()->getDbConnection()->select("id, name")->from('core_group')->where('name', '=', $name) as $record) {
 			$count++;
 			if($count > 0) {
-				GO()->getDbConnection()->update('core_group', ['name' => $record['name'] .' '.$count], ['id'=>$record['id']])->execute();
+				go()->getDbConnection()->update('core_group', ['name' => $record['name'] .' '.$count], ['id'=>$record['id']])->execute();
 			}
 		}		
 	}
 	
-	GO()->getDbConnection()->exec("ALTER TABLE `core_group` ADD UNIQUE(`name`);");	
+	go()->getDbConnection()->exec("ALTER TABLE `core_group` ADD UNIQUE(`name`);");	
 };
 
 
@@ -449,8 +450,8 @@ $updates['201903151726'][] = "ALTER TABLE `core_entity_filter`
 	ADD CONSTRAINT `core_entity_filter_ibfk_2` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;";
 	
 $updates['201901251344'][] = function() {
-	GO()->getDbConnection()->query("ALTER TABLE `core_search` CHANGE `keywords` `keywords` VARCHAR(192) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '';");
-	GO()->getDbConnection()->query("ALTER TABLE `core_search` ADD INDEX(`keywords`);");
+	go()->getDbConnection()->query("ALTER TABLE `core_search` CHANGE `keywords` `keywords` VARCHAR(192) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '';");
+	go()->getDbConnection()->query("ALTER TABLE `core_search` ADD INDEX(`keywords`);");
 };
 
 $updates['201903221350'][] = "ALTER TABLE `core_customfields_field_set` ADD `isTab` BOOLEAN NOT NULL DEFAULT FALSE AFTER `filter`;";
@@ -575,7 +576,7 @@ $updates['201905201227'][] = function() {
       $table = $cls::model()->tableName();     
     }
 
-    $stmt = GO()->getDbConnection()->update(
+    $stmt = go()->getDbConnection()->update(
       'core_acl', 
       [
         'acl.entityTypeId' => $type->getId(), 
@@ -601,9 +602,26 @@ $updates['201906032000'][] = "ALTER TABLE `core_acl` DROP FOREIGN KEY `core_acl_
 $updates['201906032000'][] = "ALTER TABLE `core_acl` ADD CONSTRAINT `core_acl_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 
 $updates['201906211622'][] = function() {
-	GO()->getDbConnection()->query("ALTER TABLE `core_search` CHANGE `keywords` `keywords` VARCHAR(192) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL;");
+	go()->getDbConnection()->query("ALTER TABLE `core_search` CHANGE `keywords` `keywords` VARCHAR(192) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL;");
 };
 
 $updates['201906211622'][] = function() {
   EntityType::findByName('FieldSet')->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
 };
+
+
+$updates['201908300937'][] = function() {
+  //Ensure all custom fields are correcty created in the databaase
+  
+  foreach(Field::find() as $field) {
+    echo "Checking custom field " . $field->id ."\n";
+    try {
+      $field->save();
+    } catch(\Exception $e) {
+      echo "WARNING: Checking custom field failed: ". $e->getMessage() . "\n";
+    }
+  }
+};
+
+
+$updates['201908300937'][] = "DELETE FROM core_setting WHERE moduleId=0";

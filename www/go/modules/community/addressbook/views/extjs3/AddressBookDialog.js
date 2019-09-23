@@ -9,17 +9,32 @@ go.modules.community.addressbook.AddressBookDialog = Ext.extend(go.form.Dialog, 
 
 		this.addPanel(new go.permissions.SharePanel());
 
-		return [{
+		this.addPanel({
+			title: t("Advanced"),
+			items: [{
 				xtype: 'fieldset',
-				items: [
-					{
-						xtype: 'textfield',
-						name: 'name',
-						fieldLabel: t("Name"),
-						anchor: '100%',
-						allowBlank: false
-					}]
-			}
+				items: [{
+					xtype: 'textarea',
+					name: 'salutationTemplate',
+					fieldLabel: t("Salutation template"),
+					anchor: '100%',
+					grow: true,
+					value: t("salutationTemplate")
+				}]
+			}]
+		});
+
+		return [{
+			xtype: 'fieldset',
+			items: [
+				{
+					xtype: 'textfield',
+					name: 'name',
+					fieldLabel: t("Name"),
+					anchor: '100%',
+					allowBlank: false
+				}]
+		}
 		];
 	}
 });

@@ -11,10 +11,14 @@
 		init : function(cb, scope) {
 			
 			var me = this, scope = scope || me;
+
+			me.loadModuleTypes();
 			
 			return new Promise(function(resolve, reject){
 			
 				scope = scope || me;
+
+				
 
 				go.Db.store("Field").all(function (success, fields) {
 					me.fields = fields;
@@ -40,11 +44,30 @@
 			
 			});
 		},
+
 		
-		registerType : function(type) {
-			types[type.name] = type;
+
+		loadModuleTypes : function() {
+    
+			var available = go.Modules.getAvailable(), pnl, config, i, i1;
+			
+			for(i = 0, l = available.length; i < l; i++) {
+				
+				config = go.Modules.getConfig(available[i].package, available[i].name);
+				
+				if(!config.customFieldTypes) {
+					continue;
+				}
+				
+				for(i1 = 0, l2 = config.customFieldTypes.length; i1 < l2; i1++) {
+					pnl = eval(config.customFieldTypes[i1]);				
+					var type = new pnl;
+					types[type.name] = type;
+				}
+			}
 		},
 		
+	
 		getType : function(name) {
 			return types[name] || null;
 		},

@@ -60,14 +60,14 @@ class PrincipalBackend extends AbstractBackend {
 	 */
 	public function getPrincipalsByPrefix($prefixPath) {
 
-		GO()->debug('GO\DAV\Auth\Backend::getUsers()');
+		go()->debug('GO\DAV\Auth\Backend::getUsers()');
 
 		if (!isset($this->users)) {
-			$this->users = [];
-			$users = User::find(['id', 'username', 'displayName', 'email']);//->filter(['permissionLevel' => \go\core\model\Acl::LEVEL_READ]);
-			foreach($users as $user) {
-				$this->users[] = $this->modelToDAVUser($user);
-			}
+			//$this->users = [];
+			// $users = User::find(['id', 'username', 'displayName', 'email']);
+			// foreach($users as $user) {
+				$this->users = [$this->modelToDAVUser(go()->getAuthState()->getUser(['id', 'username', 'displayName', 'email']))];
+			// }
 		}
 		return $this->users;
 	}
@@ -93,7 +93,7 @@ class PrincipalBackend extends AbstractBackend {
 
 		$username = $pathParts[1];
 
-		GO()->debug("getPrincipalByPath($path)");
+		go()->debug("getPrincipalByPath($path)");
 
 		$user = User::find(['id', 'username', 'displayName', 'email'])->where('username', '=', $username)->single();
 		if (!$user) {
@@ -116,7 +116,7 @@ class PrincipalBackend extends AbstractBackend {
 	 */
 	public function getGroupMemberSet($principal) {
 
-		GO()->debug("getGroupMemberSet($principal)");
+		go()->debug("getGroupMemberSet($principal)");
 //        $principal = $this->getPrincipalByPath($principal);
 //        if (!$principal) throw new Sabre\DAV\Exception('Principal not found');
 //
@@ -139,7 +139,7 @@ class PrincipalBackend extends AbstractBackend {
 	 * @return array 
 	 */
 	public function getGroupMembership($principal) {
-		GO()->debug("getGroupMemberSet($principal)");
+		go()->debug("getGroupMemberSet($principal)");
 
 		return array();
 	}
@@ -154,7 +154,7 @@ class PrincipalBackend extends AbstractBackend {
 	 * @return void
 	 */
 	public function setGroupMemberSet($principal, array $members) {
-		GO()->debug("setGroupMemberSet($principal)");
+		go()->debug("setGroupMemberSet($principal)");
 	}
 
 	function updatePrincipal($path, PropPatch $mutations) {
@@ -163,9 +163,9 @@ class PrincipalBackend extends AbstractBackend {
 
 	function searchPrincipals($prefixPath, array $searchProperties, $test = 'allof') {
 
-		GO()->debug("searchPrincipals");
+		go()->debug("searchPrincipals");
 		
-		$query = GO()->getDbConnection()
+		$query = go()->getDbConnection()
 						->selectSingleValue('username')
 						->from('core_user');
 

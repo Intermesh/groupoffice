@@ -68,6 +68,14 @@ go.Modules.register("community", "addressbook", {
 					type: "string",
 					multiple: true
 				},
+
+				{
+					title: t("Notes"),
+					name: 'notes',
+					multiple: true,
+					type: 'string'
+				},
+
 				{
 					name: 'email',
 					title: t("E-mail"),
@@ -209,6 +217,18 @@ go.Modules.register("community", "addressbook", {
 	userSettingsPanels: [
 		"go.modules.community.addressbook.SettingsPanel",
 		"go.modules.community.addressbook.SettingsProfilePanel"
+	],
+
+	systemSettingsPanels: [
+		"go.modules.community.addressbook.SystemSettingsPanel",		
+	],
+
+	selectDialogPanels: [
+		"go.modules.community.addressbook.SelectDialogPanel",
+	],
+
+	customFieldTypes: [
+		"go.modules.community.addressbook.customfield.Contact"
 	]
 });
 
@@ -235,7 +255,8 @@ Ext.onReady(function () {
 		grid: go.modules.community.addressbook.ContactGrid,
 		add: function () {		
 			return new Promise(function (resolve, reject) {
-				var select = new go.modules.community.addressbook.SelectDialog({
+				var select = new go.util.SelectDialog({
+					entities: ['Contact'],
 					mode: 'id',
 					scope: this,					
 					selectMultiple: function (ids) {

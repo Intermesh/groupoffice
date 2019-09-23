@@ -189,30 +189,36 @@ abstract class Entity extends Property {
 	 * 
 	 * @return boolean
 	 */
-	public function save() {	
+	public final function save() {	
 
 		$this->isSaving = true;
 
-//		GO()->debug(static::class.'::save()' . $this->id());
+//		go()->debug(static::class.'::save()' . $this->id());
 		App::get()->getDbConnection()->beginTransaction();
-			
-		if (!$this->fireEvent(self::EVENT_BEFORESAVE, $this)) {
-			$this->rollback();
-			return false;
-		}
-		
-		if (!$this->internalSave()) {
-			GO()->warn(static::class .'::internalSave() returned false');
-			$this->rollback();
-			return false;
-		}		
-		
-		if (!$this->fireEvent(self::EVENT_SAVE, $this)) {
-			$this->rollback();
-			return false;
-		}
 
-		return $this->commit() && !$this->hasValidationErrors();
+		try {
+			
+			if (!$this->fireEvent(self::EVENT_BEFORESAVE, $this)) {
+				$this->rollback();
+				return false;
+			}
+			
+			if (!$this->internalSave()) {
+				go()->warn(static::class .'::internalSave() returned false');
+				$this->rollback();
+				return false;
+			}		
+			
+			if (!$this->fireEvent(self::EVENT_SAVE, $this)) {
+				$this->rollback();
+				return false;
+			}
+
+			return $this->commit() && !$this->hasValidationErrors();
+		} catch(Exception $e) {
+			$this->rollback();
+			throw $e;
+		}
 	}
 
 	private $isSaving = false;
@@ -297,7 +303,7 @@ abstract class Entity extends Property {
 
 		$this->isDeleting = true;
 		
-		//GO()->debug(static::class.'::delete() ' . $this->id());
+		//go()->debug(static::class.'::delete() ' . $this->id());
 
 		App::get()->getDbConnection()->beginTransaction();
 
@@ -359,7 +365,7 @@ abstract class Entity extends Property {
 		if($this->isNew()) {
 			return $this->canCreate() ? Acl::LEVEL_CREATE : false;
 		}
-		return GO()->getAuthState() && GO()->getAuthState()->getUser() && GO()->getAuthState()->getUser()->isAdmin() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
+		return go()->getAuthState() && go()->getAuthState()->isAdmin() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
 	}
 	
 	/**
@@ -378,9 +384,10 @@ abstract class Entity extends Property {
 	 * @param Query $query
 	 * @param int $level
 	 * @param int $userId Leave to null for the current user
+	 * @param int[] $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
 	 * @return Query $query;
 	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {
+	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
 		
 		return $query;
 	}
@@ -421,10 +428,10 @@ abstract class Entity extends Property {
 
 		$cls = static::class;
 
-		$type = GO()->getCache()->get('type-' . $cls);
+		$type = go()->getCache()->get('type-' . $cls);
 		if(!$type) {
 			$type = EntityType::findByClassName(static::class);
-			GO()->getCache()->set('type-' . $cls, $type, false);
+			go()->getCache()->set('type-' . $cls, $type, false);
 		}
 		return $type;
 	}
@@ -474,17 +481,19 @@ abstract class Entity extends Property {
 	protected static function defineFilters() {
 		$filters = new Filters();
 
-		$filters->add('text', function(Criteria $criteria, $value) {
+		$filters->add('text', function(Criteria $criteria, $value, Query $query) {
 							if(!is_array($value)) {
 								$value = [$value];
 							}
 							
 							foreach($value as $q) {
 								if (!empty($q)) {								
-									static::search($criteria, $q);
+									static::search($criteria, $q, $query);
 								}
 							}
-						})->add('exclude', function(Criteria $criteria, $value) {
+						})
+						
+						->add('exclude', function(Criteria $criteria, $value) {
 							if (!empty($value)) {
 								$criteria->andWhere('id', 'NOT IN', $value);
 							}
@@ -537,6 +546,26 @@ abstract class Entity extends Property {
 			$criteria->where('comment.modifiedAt', $comparator, $value);					
 		});
 
+
+		/* 
+			find all items with link to:
+
+		link : {
+			entity: "Contact",
+			id: 1
+		}
+		*/
+		$filters->add("link", function(Criteria $criteria, $value, Query $query) {
+			$linkAlias = 'link_' . uniqid();
+			$on = $query->getTableAlias() . '.id =  '.$linkAlias.'.toId  AND '.$linkAlias.'.toEntityTypeId = ' . static::entityType()->getId();
+			
+				
+			$query->join('core_link', $linkAlias, $on); 
+
+			$criteria->where('fromId', '=', $value['id'])
+							->andWhere('fromEntityTypeId', '=', EntityType::findByName($value['entity'])->getId());							
+		});
+
 		static::fireEvent(self::EVENT_FILTER, $filters);
 		
 		return $filters;
@@ -583,12 +612,12 @@ abstract class Entity extends Property {
 	 * @param string $expression
 	 * @return Query
 	 */
-	protected static function search(Criteria $criteria, $expression) {
+	protected static function search(Criteria $criteria, $expression, Query $query) {
 		
 		$columns = static::textFilterColumns();
 		
 		if(empty($columns)) {
-			GO()->warn(static::class . ' entity has no textFilterColumns() defined. The q filter will not work.');
+			go()->warn(static::class . ' entity has no textFilterColumns() defined. The "text" filter will not work.');
 		}
 		
 		//Explode string into tokens and wrap in wildcard signs to search within the texts.
@@ -727,17 +756,23 @@ abstract class Entity extends Property {
 		$arr = [];
 		
 		if(empty($properties)) {
-			$properties = $this->getReadableProperties();
+			$properties = array_filter($this->getReadableProperties(), function($propName) {
+				return !in_array($propName, ['acl', 'permissionLevel']);
+			});
 		}
 
 		foreach ($properties as $propName) {
-			try {
-				$value = $this->getValue($propName);
-				$arr[$propName] = method_exists($value, 'toTemplate') ? $value->toTemplate() : $value;
-			} catch (NotArrayable $e) {
-				
-				App::get()->debug("Skipped prop " . static::class . "::" . $propName . " because type '" . gettype($value) . "' not scalar or ArrayConvertable.");
-			}
+			if($propName == 'customFields') {
+				$arr['customFields'] = $this->getCustomFields(true);
+			} else{
+				try {
+					$value = $this->getValue($propName);
+					$arr[$propName] = method_exists($value, 'toTemplate') ? $value->toTemplate() : $value;
+				} catch (NotArrayable $e) {
+					
+					App::get()->debug("Skipped prop " . static::class . "::" . $propName . " because type '" . gettype($value) . "' not scalar or ArrayConvertable.");
+				}
+			}			
 		}
 		
 		return $arr;
@@ -752,7 +787,7 @@ abstract class Entity extends Property {
 			echo "Fixing files folder ID's\n";
 			$tables = static::getMapping()->getTables();
 			$table = array_values($tables)[0]->getName();
-			GO()->getDbConnection()->update(
+			go()->getDbConnection()->update(
 				$table, 
 				['filesFolderId' => null], 
 				(new Query)

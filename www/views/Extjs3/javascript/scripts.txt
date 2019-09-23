@@ -143,7 +143,9 @@ views/Extjs3/javascript/windows/DateDialog.js
 
 
 views/Extjs3/javascript/plupload/DataView-more.js
-views/Extjs3/javascript/plupload/plupload/js/plupload.full.js
+views/Extjs3/javascript/plupload/plupload/js/plupload.js
+views/Extjs3/javascript/plupload/plupload/js/plupload.html5.js
+views/Extjs3/javascript/plupload/plupload/js/plupload.html4.js
 views/Extjs3/javascript/plupload/ext.ux.plupload.js
 
 views/Extjs3/javascript/panels/Ext.ux.tot2ivn.VrTabPanel.js

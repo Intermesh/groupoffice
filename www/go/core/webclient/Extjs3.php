@@ -9,12 +9,18 @@ use go\core\fs\File;
 use go\core\Language;
 use go\core\model\Settings;
 use go\core\model\Module;
+use go\core\SingletonTrait;
 
 class Extjs3 {
+
+	use SingletonTrait;
+
+
 	
 	public function flushCache() {
 		return App::get()->getDataFolder()->getFolder('clientscripts')->delete();
 	}
+
 
 	/**
 	 * 
@@ -23,10 +29,10 @@ class Extjs3 {
 	 */
 	public function getCSSFile($theme = 'Paper') {
 
-		$cacheFile = GO()->getDataFolder()->getFile('clientscripts/' . $theme . '/style.css');
+		$cacheFile = go()->getDataFolder()->getFile('clientscripts/' . $theme . '/style.css');
 		
 		
-		if (GO()->getDebugger()->enabled || !$cacheFile->exists()) {
+		if (go()->getDebugger()->enabled || !$cacheFile->exists()) {
 			if ($cacheFile->exists()) {
 				$cacheFile->delete();
 			}
@@ -70,10 +76,14 @@ class Extjs3 {
 		
 		$baseurl = str_replace(Environment::get()->getInstallFolder()->getPath() . '/', Settings::get()->URL, $file->getFolder()->getPath()).'/';
 		
-		return preg_replace_callback('/url[\s]*\(([^\)]*)\)/iU', 
+		$css = preg_replace_callback('/url[\s]*\(([^\)]*)\)/iU', 
 			function($matches) use($baseurl) { 
 				return 'url('.$baseurl.trim(stripslashes($matches[1]),'\'" ').')';
 			}, $css);
+
+		$css = str_replace("sourceMappingURL=", "sourceMappingURL=".$baseurl, $css);
+
+		return $css;
 		 //return preg_replace('/url[\s]*\(([^\)]*)\)/ieU', "GO\Base\View\Extjs3::_replaceUrlCallback('$1', \$baseurl)", $css);
 	}
 	
@@ -84,17 +94,17 @@ class Extjs3 {
 	 */
 	public function getLanguageJS() {
 		
-		$iso = \GO()->getLanguage()->getIsoCode();
+		$iso = \go()->getLanguage()->getIsoCode();
 	
 		
-		$cacheFile = GO()->getDataFolder()->getFile('clientscripts/lang_'.$iso.'.js');
+		$cacheFile = go()->getDataFolder()->getFile('clientscripts/lang_'.$iso.'.js');
 
-		if (GO()->getDebugger()->enabled || !$cacheFile->exists()) {
+		if (go()->getDebugger()->enabled || !$cacheFile->exists()) {
 //		if (!$cacheFile->exists()) {
 
 			$str = "var GO = GO || {};\n";
 
-			$extjsLang = \GO()->getLanguage()->t("extjs_lang");
+			$extjsLang = \go()->getLanguage()->t("extjs_lang");
 			if ($extjsLang == 'extjs_lang')
 				$extjsLang = $iso;
 
@@ -113,7 +123,7 @@ class Extjs3 {
 			}
 
 			//Put all lang vars in js		
-			$l = \GO()->getLanguage()->getAllLanguage();
+			$l = \go()->getLanguage()->getAllLanguage();
 			$l['iso'] = $iso;
 
 			$str .= 'GO.lang = ' . json_encode($l) . ";\n";

@@ -109,7 +109,7 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 				});
 				
 			this.noteBookSelect = new go.form.multiselect.Field({
-				name: "syncNoteBooks",
+				name: "syncSettings.noteBooks",
 				idField: "noteBookId",
 				displayField: "name",
 				entityStore: "NoteBook",
@@ -132,7 +132,7 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 				});
 				
 			this.addressBookSelect = new go.form.multiselect.Field({
-				name: "syncAddressBooks",
+				name: "syncSettings.addressBooks",
 				idField: "addressBookId",
 				displayField: "name",
 				entityStore: "AddressBook",
@@ -160,15 +160,6 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 		},this);
 		
 		GO.sync.SettingsPanel.superclass.initComponent.call(this);
-	},
-	
-	onLoadComplete : function(user) {
-	
-//		if(this.noteBookSelect) {
-//			
-//			this.noteBookSelect.setRecords(user.syncNoteBooks);
-//		}
-		
 	},
 	
 	checkDefaultSelected : function(){

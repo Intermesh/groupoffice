@@ -8,9 +8,8 @@ Ext.onReady(function(){
 				{
 					this.serverclientDomainCheckboxes[i]=new Ext.form.Checkbox({						
 						checked:(i==0),
-						//name: 'serverDomains',
 						name: 'serverDomains',
-						autoCreate: {tag: "input", type: "checkbox", value: GO.serverclient.domains[i]},						
+						value: GO.serverclient.domains[i],				
 						hideLabel:true,
 						boxLabel: GO.serverclient.domains[i]
 					});
@@ -26,7 +25,13 @@ Ext.onReady(function(){
 				this.serverclientFieldSet = new Ext.form.FieldSet({
 					title: t('Mailboxes'), 
 					autoHeight:true,
-					items:items
+					items: [
+						new go.form.CheckboxGroup({
+							hideLabel:true,
+							items: items,
+							name: "serverDomains"
+						})
+					]
 				});
 				
 
@@ -86,7 +91,7 @@ Ext.onReady(function(){
 
 						if(emailField)
 							this.form.findField('email').setValue(username+'@'+GO.serverclient.domains[i]);
-
+							this.form.findField('recoveryEmail').setValue(username+'@'+GO.serverclient.domains[i]);
 						break;
 					}
 				}

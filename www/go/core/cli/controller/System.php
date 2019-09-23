@@ -1,8 +1,9 @@
 <?php
-namespace go\core\controller;
+namespace go\core\cli\controller;
 
 use go\core\Controller;
 use go\core\db\Query;
+use go\core\db\Table;
 use go\core\fs\Blob;
 use go\core\util\DateTime;
 use function GO;
@@ -18,6 +19,18 @@ class System extends Controller {
 		$o = new $cls;
 		$o->run();
 	}
+
+	public function upgrade() {
+		go()->getInstaller()->isValidDb();
+		go()->setCache(new \go\core\cache\None());	
+		Table::destroyInstances();
+		\GO::session()->runAsRoot();	
+		date_default_timezone_set("UTC");
+		go()->getInstaller()->upgrade();
+		
+		echo "Done!\n";
+	}
+
 	
 	// public function checkAllBlobs() {
 	// 	$blobs = Blob::find()->execute();

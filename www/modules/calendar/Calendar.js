@@ -108,9 +108,19 @@ GO.calendar.MainPanel = function(config){
 		cls:'cal-date-picker',
 		showToday:false,
 		internalRender:true,
-		showNextMonth : function(e){
-			this.update(this.activeDate.add('mo', 1));
+		showPrevMonth : function() {
+			this.update(this.activeDate.add('mo', -1));
+			// Do not show a selection when calendar updates
+			for(var i = 0; i < 42; i++) {
+				this.cells.elements[i].classList.remove('x-date-selected');
+			}
 		},
+		showNextMonth: function() {
+			this.update(this.activeDate.add('mo', 1));
+			for(var i = 0; i < 42; i++) {
+				this.cells.elements[i].classList.remove('x-date-selected');
+			}
+		}
 	});
 	
 	this.datePicker.on("select", function(datePicker, DateObj){
@@ -243,6 +253,12 @@ GO.calendar.MainPanel = function(config){
 			store:this.calendarsStore,
 			pageSize:GO.settings.config.nav_page_size
 		})
+	});
+
+	this.calendarList.getBottomToolbar().add('->');
+	this.calendarList.getBottomToolbar().add({
+		xtype: 'tbsearch',
+		store: this.calendarsStore
 	});
 
 	this.viewsList = new GO.grid.GridPanel({

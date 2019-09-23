@@ -1,8 +1,12 @@
 <?php
 namespace go\modules\community\addressbook\model;
-						
+
+use go\core\fs\File;
+use go\core\model\Acl;
 use go\core\orm\Property;
-						
+use GO\Files\Model\Folder;
+use go\modules\community\addressbook\Module;
+
 /**
  * Address book model
  *
@@ -36,25 +40,59 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 	 * @var int
 	 */							
 	public $createdBy;
+
+	/**
+	 * 
+	 * @var int
+	 */
+	public $filesFolderId;
+
+
+	/**
+	 * 
+	 * @var string
+	 */
+	public $salutationTemplate;
+
+	public $groups;
+
+	protected function init()
+	{
+		
+		if(empty($this->salutationTemplate)) {
+			$this->salutationTemplate = go()->t("salutationTemplate", "community", "addressbook");
+		}
+
+		parent::init();
+	}
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable("addressbook_addressbook", "a");
+						->addTable("addressbook_addressbook", "a")
+						->addScalar('groups', 'addressbook_group', ['id' => 'addressBookId']);
+	}
+
+
+	public function buildFilesPath() {
+
+		Module::checkRootFolder();
+
+		return "addressbook/" . File::stripInvalidChars($this->name);
 	}
 	
-	/**
-	 * Get the group ID's
-	 * 
-	 * @return int[]
-	 */
-	public function getGroups() {
-		return (new \go\core\db\Query)
-						->selectSingleValue('id')
-						->from("addressbook_group")
-						->where(['addressBookId' => $this->id])
-						->all();
+	// /**
+	//  * Get the group ID's
+	//  * 
+	//  * @return int[]
+	//  */
+	// public function getGroups() {
+	// 	return (new \go\core\db\Query)
+	// 					->selectSingleValue('id')
+	// 					->from("addressbook_group")
+	// 					->where(['addressBookId' => $this->id])
+	// 					->all();
 						
-	}
+	// }
 	
 	/**
 	 * Find or create a default address book for the user
@@ -66,7 +104,7 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 	public static function getDefault(\go\core\model\User $user = null) {
 		
 		if(!isset($user)) {
-			$user = GO()->getAuthState()->getUser();
+			$user = go()->getAuthState()->getUser(['addressBookSettings']);
 		}
 			
 		if(!isset($user->addressBookSettings)) {
@@ -77,22 +115,22 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 			return static::findById($user->addressBookSettings->defaultAddressBookId);
 		}
 		
-		GO()->getDbConnection()->beginTransaction();
+		go()->getDbConnection()->beginTransaction();
 		
 		$addressBook = new \go\modules\community\addressbook\model\AddressBook();
 		$addressBook->name = $user->displayName;
 		if(!$addressBook->save()) {
-			GO()->getDbConnection()->rollBack();
+			go()->getDbConnection()->rollBack();
 			throw new \Exception("Could not create address book");
 		}
 		
 		$user->addressBookSettings->defaultAddressBookId = $addressBook->id;
 		if(!$user->save()) {
-			GO()->getDbConnection()->rollBack();
+			go()->getDbConnection()->rollBack();
 			throw new \Exception("Failed to save user");
 		}		
 		
-		GO()->getDbConnection()->commit();
+		go()->getDbConnection()->commit();
 		
 		return $addressBook;
 	}

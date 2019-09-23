@@ -88,6 +88,7 @@ go.util =  (function () {
 		 * @param {string} text 
 		 */
 		copyTextToClipboard: function (text) {
+			var al = document.activeElement;
 			if (!navigator.clipboard) {				
 				//fallback on workaround with textarea element
 				var textArea = document.createElement("textarea");
@@ -104,17 +105,23 @@ go.util =  (function () {
 					console.error('Fallback: Oops, unable to copy', err);
 				}
 		
-				document.body.removeChild(textArea);				
+				document.body.removeChild(textArea);		
+				if(al) {
+					al.focus();
+				}		
 				return;
 			}
 
 			navigator.clipboard.writeText(text).then(function () {
 				console.log('Async: Copying to clipboard was successful!');
+				if(al) {
+					al.focus();
+				}
 			}, function (err) {
 				console.error('Async: Could not copy text: ', err);
 			});
 		},
-
+		
 		/**
 		 * Launch email composer
 		 * 
@@ -122,19 +129,19 @@ go.util =  (function () {
 		 * @return {undefined}
 		 */
 		mailto: function (config, event) {
-			// event.preventDefault();
-			// var email = config.email;
+			event.preventDefault();
+			var email = config.email;
 
-			// if (config.name) {
-			// 	email = '"' + config.name.replace(/"/g, '\\"') + '" <' + config.email + '>';
-			// }
+			if (config.name) {
+				email = '"' + config.name.replace(/"/g, '\\"') + '" <' + config.email + '>';
+			}
 
-			// document.location = "mailto:" + email;
+			document.location = "mailto:" + email;
 		},
 
 		callto: function (config, event) {
-			// event.preventDefault();
-			// document.location = "tel://" + config.number;
+			event.preventDefault();
+			document.location = "tel://" + config.number;
 		},
 
 		streetAddress: function (config) {
@@ -359,12 +366,18 @@ go.util =  (function () {
 										Ext.MessageBox.alert(t("Error"), response.errors.join("<br />"));
 									} else
 									{
-										Ext.MessageBox.alert(t("Success"), t("Imported {count} items").replace('{count}', response.count));
+										var msg = t("Imported {count} items").replace('{count}', response.count) + ". ";;
+
+										if(response.errors && response.errors.length) {
+											msg += t("{count} items failed to import. A log follows: <br /><br />").replace('{count}', response.errors.length) + response.errors.join("<br />");
+										}
+										
+										Ext.MessageBox.alert(t("Success"), msg);
 									}
 
-									if (callback) {
-										callback.call(scope || this, response);
-									}
+									// if (callback) {
+									// 	callback.call(scope || this, response);
+									// }
 								},
 								scope: this
 							});
@@ -376,6 +389,14 @@ go.util =  (function () {
 		},
 
 		parseEmail : function(emails) {			
+			
+			if(Ext.form.VTypes.emailAddress(emails)) {
+				return [{
+						name: "",
+						email: emails
+				}];
+			}
+
 			var re  = /(?:"?([A-Z]?[^<"]*)"?\s*)?<?([^>\s,]+)/g;
 			var a = [];
 			while (m = re.exec(emails)) {

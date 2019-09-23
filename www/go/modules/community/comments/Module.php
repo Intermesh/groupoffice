@@ -1,15 +1,13 @@
 <?php
 namespace go\modules\community\comments;
 
-use go\core\model\User;
 use go\core;
-use go\core\orm\Mapping;
-use go\core\orm\Property;
-use go\modules\community\comments\model\Settings;
 use go\core\cron\GarbageCollection;
 use go\core\orm\EntityType;
 use go\core\orm\Query;
 use GO\Base\Db\ActiveRecord;
+use go\core\model\Group;
+use go\core\model\Module as GoModule;
 
 class Module extends core\Module {	
 
@@ -20,11 +18,22 @@ class Module extends core\Module {
 	public function defineListeners() {
 		GarbageCollection::on(GarbageCollection::EVENT_RUN, static::class, 'garbageCollection');
 	}
+
+	protected function afterInstall(GoModule $model) {
+		
+		if(!$model->findAcl()
+						->addGroup(Group::ID_INTERNAL)
+						->save()) {
+			return false;
+		}
+		
+		return parent::afterInstall($model);
+	}
 	
 	public static function garbageCollection() {
 		$types = EntityType::findAll();
 
-		GO()->debug("Cleaning up comments");
+		go()->debug("Cleaning up comments");
 		foreach($types as $type) {
 			if($type->getName() == "Link" || $type->getName() == "Search") {
 				continue;
@@ -39,13 +48,13 @@ class Module extends core\Module {
 			}
 			$query = (new Query)->select('sub.id')->from($tableName);
 
-			$stmt = GO()->getDbConnection()->delete('core_search', (new Query)
+			$stmt = go()->getDbConnection()->delete('core_search', (new Query)
 				->where('entityId', '=', $type->getId())
 				->andWhere('entityId', 'NOT IN', $query)
 			);
 			$stmt->execute();
 
-			GO()->debug("Deleted ". $stmt->rowCount() . " comments for $cls");
+			go()->debug("Deleted ". $stmt->rowCount() . " comments for $cls");
 		}
 	}
 }

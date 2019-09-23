@@ -1,6 +1,8 @@
 <?php
 namespace go\core\http;
 
+use go\core\fs\File;
+
 class Client {
 
   private $curl;
@@ -14,7 +16,7 @@ class Client {
       $this->curl = curl_init();
       $this->setOption(CURLOPT_FOLLOWLOCATION, true);
       $this->setOption(CURLOPT_ENCODING, "UTF-8");
-      $this->setOption(CURLOPT_USERAGENT, "Group-Office HttpClient " . GO()->getVersion() . " (curl)");
+      $this->setOption(CURLOPT_USERAGENT, "Group-Office HttpClient " . go()->getVersion() . " (curl)");
 	
     }
     return $this->curl;
@@ -30,7 +32,7 @@ class Client {
     $this->setOption(CURLOPT_RETURNTRANSFER, true);
     $this->setOption(CURLOPT_HEADERFUNCTION, function($curl, $header) {
       if(preg_match('/([\w-]+): (.*)/i', $header, $matches)) {
-        $this->lastHeaders[$matches[1]] = trim($matches[2]);
+        $this->lastHeaders[strtolower($matches[1])] = trim($matches[2]);
       }
 		
 		  return strlen($header);
@@ -38,6 +40,11 @@ class Client {
 
   }
 
+  /**
+   * Perform GET request
+   * 
+   * @return array ['status' => 200, 'body' => string, 'headers' => []]
+   */
   public function get($url) { 
     $this->initRequest($url);
 		
@@ -49,6 +56,7 @@ class Client {
     }
 
     return [
+      'status' => curl_getinfo($this->getCurl(), CURLINFO_HTTP_CODE),
       'headers' => $this->lastHeaders,
       'body' => $body
     ];
@@ -73,6 +81,35 @@ class Client {
       'headers' => $this->lastHeaders,
       'body' => $body
     ];
+  }
+
+
+  public function download($url, File $file) {
+    $fp = $file->open('w');
+
+    $this->initRequest($url);
+    $this->setOption(CURLOPT_FILE, $fp);
+
+    curl_exec($this->getCurl());
+    fclose($fp);
+
+    $error = curl_error($this->getCurl());
+		if(!empty($error)) {
+      throw new \Exception($error);
+    }
+
+    // var_dump($this->lastHeaders);
+
+    if(isset($this->lastHeaders['content-disposition'])) {
+      preg_match('/filename="(.*)"/', $this->lastHeaders['content-disposition'], $matches);
+      return [
+        "name" => $matches[1] ?? "unknown",
+        "type" => $this->lastHeaders['content-type'] ?? "application/octet-stream"
+      ];
+    } else{
+      return ["name"=> "unknown", "type" => $this->lastHeaders['content-type'] ?? "application/octet-stream"];
+    }
+
   }
 
   public function close() 

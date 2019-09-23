@@ -16,7 +16,9 @@ CREATE TABLE `addressbook_addressbook` (
   `id` int(11) NOT NULL,
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `aclId` int(11) NOT NULL,
-  `createdBy` int(11) NOT NULL
+  `createdBy` int(11) NOT NULL,
+  `filesFolderId` int(11) DEFAULT NULL,
+  `salutationTemplate` text COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `addressbook_contact` (
@@ -28,10 +30,12 @@ CREATE TABLE `addressbook_contact` (
   `modifiedBy` int(11) DEFAULT NULL,
   `goUserId` int(11) DEFAULT NULL,
   `prefixes` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Prefixes like ''Sir''',
+  `initials` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `firstName` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `middleName` varchar(55) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `lastName` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `suffixes` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Suffixes like ''Msc.''',
+  `salutation` VARCHAR(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `gender` enum('M','F') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'M for Male, F for Female or null for unknown',
   `notes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `isOrganization` tinyint(1) NOT NULL DEFAULT 0,
@@ -98,8 +102,7 @@ CREATE TABLE `addressbook_url` (
 
 CREATE TABLE `addressbook_user_settings` (
   `userId` int(11) NOT NULL,
-  `defaultAddressBookId` int(11) DEFAULT NULL,
-  `salutationTemplate` TEXT NOT NULL, 
+  `defaultAddressBookId` int(11) DEFAULT NULL,  
   `sortBy` ENUM('name','lastName') NOT NULL DEFAULT 'name'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 

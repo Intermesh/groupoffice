@@ -2,7 +2,7 @@ go.grid.ColumnRenderers = {
 	
 	check: function(v, meta) {
 		if(v) {
-			meta.style = 'text-align:center';
+			meta.style += 'text-align:center;';
 			return '<i class="icon">check</i>';
 		}
 	},

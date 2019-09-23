@@ -13,7 +13,7 @@ CustomFieldSetDialog.js
 customfield/Contact.js
 customfield/ContactDialog.js
 Utils.js
-SelectDialog.js
+SelectDialogPanel.js
 SettingsPanel.js
 NameField.js
 SettingsProfilePanel.js
@@ -22,3 +22,4 @@ AddressesField.js
 PhoneNumbersField.js
 DatesField.js
 UrlsField.js
+SystemSettingsPanel.js

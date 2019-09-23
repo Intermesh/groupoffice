@@ -111,6 +111,12 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 
 		go.groups.GroupUserGrid.superclass.initComponent.call(this);
 
+		this.on("render", function() {
+			if(!this.store.loaded) {
+				this.store.load();
+			}
+		}, this);
+
 	},
 
 	

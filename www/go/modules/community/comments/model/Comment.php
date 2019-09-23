@@ -49,7 +49,7 @@ class Comment extends Entity {
 			->addScalar('labels', 'comments_comment_label', ['id' => 'commentId'])
 			->setQuery(
 				(new Query())
-					->select("e.name AS entity")
+					->select("e.clientName AS entity")
 					->join('core_entity', 'e', 'e.id = c.entityTypeId')
 		);
 	}
@@ -57,9 +57,16 @@ class Comment extends Entity {
 	/**
 	 * Set the entity type
 	 * 
-	 * @param string|EntityType $entity "note" or entitytype instance
+	 * @param string|EntityType|Entity $entity "note" or entitytype instance
 	 */
 	public function setEntity($entity) {
+
+		if($entity instanceof Entity) {
+			$this->entityTypeId = $entity->entityType()->getId();
+			$this->entity = $entity->entityType()->getName();
+			$this->entityId = $entity->id;
+			return;
+		}
 		
 		if(!($entity instanceof EntityType)) {
 			$entity = EntityType::findByName($entity);
@@ -75,7 +82,7 @@ class Comment extends Entity {
 			})
 			
 			->add('entity', function(Criteria $criteria, $value) {
-				$criteria->where(['e.name' => $value]);	
+				$criteria->where(['e.clientName' => $value]);	
 			})
 
 			->add('section', function(Criteria $criteria, $value){
@@ -113,7 +120,7 @@ class Comment extends Entity {
 	 */
 	public function getPermissionLevel() {
 
-		if(GO()->getAuthState()->getUser()->isAdmin()) {
+		if(go()->getAuthState()->isAdmin()) {
 			return Acl::LEVEL_MANAGE;
 		}
 
@@ -121,7 +128,7 @@ class Comment extends Entity {
 			return $this->findEntity()->getPermissionLevel();
 		}
 
-		if($this->createdBy == GO()->getAuthState()->getUserId()) {
+		if($this->createdBy == go()->getAuthState()->getUserId()) {
 			return Acl::LEVEL_MANAGE;
 		}
 
@@ -137,7 +144,7 @@ class Comment extends Entity {
 	 * @param int $userId Leave to null for the current user
 	 * @return Query $query;
 	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {
+	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
 		
 		return $query;
 	}

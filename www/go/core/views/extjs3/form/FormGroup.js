@@ -213,9 +213,10 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}
 		this.items.each(function(wrap) {
 			if(this.mapKey) {
-				if(wrap.formField.isDirty()) {
+				// TODO make minimal PatchObject
+				//if(wrap.formField.isDirty()) {
 					v[wrap.formField.key || Ext.id()] = wrap.formField.getValue();
-				}
+				//}
 			} else {
 				v.push(wrap.formField.getValue());
 			}

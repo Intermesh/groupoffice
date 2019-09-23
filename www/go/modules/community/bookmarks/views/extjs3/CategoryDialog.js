@@ -15,10 +15,12 @@ go.modules.community.bookmarks.CategoryDialog = Ext.extend(go.form.Dialog, {
 
 	title:t("Category"),
 	entityStore: "BookmarksCategory",
-	height:150,
+	height:450,
 	width: 500,
 
 	initFormItems : function () {
+        this.addPanel(new go.permissions.SharePanel());
+
 		return [{
 			xtype: 'fieldset',
 			items: [

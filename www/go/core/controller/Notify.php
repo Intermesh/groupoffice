@@ -12,9 +12,9 @@ class Notify extends Controller {
 
 	public function mail($params) {		
 		
-		$settings = GO()->getSettings();
+		$settings = go()->getSettings();
 		
-		$message = GO()->getMailer()->compose()
+		$message = go()->getMailer()->compose()
 						->setFrom($settings->systemEmail, $settings->title)
 						->setTo($params['to'] ?? $settings->systemEmail)
 						->setSubject($params['subject'] ?? "")

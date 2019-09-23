@@ -4,6 +4,12 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 	cls: 'x-grid3-no-row-borders',
 	initComponent: function () {
 
+		if(!go.User.addressBookSettings) {
+			go.User.addressBookSettings = {
+				sortBy: "firstName"
+			};
+		}
+
 		this.store = new go.data.Store({
 			fields: [
 				'id',
@@ -59,7 +65,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 							}
 
 							var sortState = store.getSortState();
-							if(sortState.field != "name" && sortState.field != "firstName") {
+							if(sortState.field != "name" && sortState.field != "firstName"  && sortState.field != "lastName") {
 								return "";
 							}
 							
@@ -209,6 +215,17 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'vatNo'
+				},
+				{
+					id: 'emailAddresses',
+					header: t('E-mail addresses'),
+					sortable: false,
+					dataIndex: "emailAddresses",
+					width: dp(300),
+					hidden: true,
+					renderer: function (emailAddresses, meta, record) {
+						return emailAddresses.column("email").join(", ");
+					}
 				}
 			],
 			viewConfig: {
@@ -247,11 +264,13 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 
 	//when filtering on a group then offer to delete contacts from a group when delting.
 	deleteSelected: function () {
-		if (!this.store.baseParams.filter.groupId) {
+
+		var filter = this.store.getFilter('addressbooks');
+		if (!filter || !filter.groupId) {
 			return go.grid.GridTrait.deleteSelected.call(this);
 		}
 
-		var groupId = this.store.baseParams.filter.groupId;
+		var groupId = filter.groupId;
 
 		var selectedRecords = this.getSelectionModel().getSelections(), ids = selectedRecords.column('id'), strConfirm;
 
@@ -285,7 +304,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 
 
 					selectedRecords.forEach(function (r) {
-						var groupIndex = r.json.groups.column("groupId").indexOf(groupId);
+						var groupIndex = r.json.groups.indexOf(groupId);
 //							console.log(groupIndex, groupId, r.json.groups);
 						updates[r.id] = {
 							groups: GO.util.clone(r.json.groups)

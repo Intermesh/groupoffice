@@ -413,10 +413,14 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 		foreach($record as $r){
-		   if($this->tableName()===$r->tableName() && $this->getPk()===$r->getPk())
-			 {
-				 return true;
-			 }
+			if(get_class($r) != get_class($this)) {
+				return false;
+			}
+			
+			if($this->tableName()===$r->tableName() && $this->getPk()===$r->getPk())
+			{
+				return true;
+			}
 		}
 		return false;
 	}
@@ -1276,7 +1280,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if(empty($params['fields']))
 			$params['fields']=$this->getDefaultFindSelectFields(isset($params['limit']) && $params['limit']==1);
 		else
-			GO()->debug($params['fields']);
+			go()->debug($params['fields']);
 
 
 		$fields = $params['fields'].' ';

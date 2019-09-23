@@ -10,7 +10,7 @@ class TableTest extends TestCase {
 		$table = Table::getInstance('core_user');
 		
 		foreach($table->getColumns() as $col) {
-			$this->assertStringStartsWith($col->dbType, $col->getCreateSQL());
+			$this->assertStringStartsWith($col->dataType, $col->getCreateSQL());
 		}
 	}
 

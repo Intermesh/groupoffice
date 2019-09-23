@@ -2,6 +2,7 @@
 use go\core\App;
 use go\core\jmap\State;
 use go\core\fs\Blob;
+use go\core\http\Client;
 use go\core\http\Response;
 use go\core\http\Request;
 
@@ -13,24 +14,34 @@ if (!App::get()->getAuthState()->isAuthenticated()) {
 	throw new \go\core\http\Exception(401);
 }
 
-$input = fopen('php://input', "r");
+if(isset($_GET['url'])) {
+	$tmpFile = \go\core\fs\File::tempFile('tmp');
+	$httpClient = new Client();
+	$response = $httpClient->download($_GET['url'], $tmpFile);
 
-$tmpFile = \go\core\fs\File::tempFile('tmp');
+	$blob = Blob::fromTmp($tmpFile);
+	$blob->name = $response['name'];
+	$blob->type = $response['type'];
 
-$fp = $tmpFile->open("w+");
+} else {
+	$filename = Request::get()->getHeader('X-File-Name');
+	$tmpFile = \go\core\fs\File::tempFile($filename);
+	
+	$input = fopen('php://input', "r");
+	$fp = $tmpFile->open("w+");
+	while ($data = fread($input, 4096)) { // 4kb at the time
+		fwrite($fp, $data);
+	}
+	fclose($fp);
+	fclose($input);
 
-while ($data = fread($input, 4096)) { // 4kb at the time
-	fwrite($fp, $data);
+	$blob = Blob::fromTmp($tmpFile);
+	$blob->name = $filename;
+	$blob->modifiedAt = new \go\core\util\DateTime('@' . Request::get()->getHeader('X-File-LastModifed'));
+	//$blob->type = Request::get()->getContentType(); cant be trusted use extension instead
 }
-fclose($fp);
-fclose($input);
 
-$blob = Blob::fromTmp($tmpFile);
-$blob->name = Request::get()->getHeader('X-File-Name');
 
-// Local modified at?
-$blob->modifiedAt = new \go\core\util\DateTime('@' . Request::get()->getHeader('X-File-LastModifed'));
-$blob->type = Request::get()->getContentType();
 if ($blob->save()) {
 	Response::get()->setStatus(201, 'Created');
 	Response::get()->output([
@@ -42,5 +53,5 @@ if ($blob->save()) {
 } else {
 	echo 'Could not save '.$blob->id;
 	
-	var_dump(GO()->getDebugger()->getEntries());
+	var_dump(go()->getDebugger()->getEntries());
 }

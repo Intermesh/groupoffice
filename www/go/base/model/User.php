@@ -353,10 +353,10 @@ class User extends \GO\Base\Db\ActiveRecord {
 				$prefixTable.".username"
 				);
 		
-		if($withCustomFields && $this->customfieldsRecord)
-		{
-			$fields = array_merge($fields, $this->customfieldsRecord->getFindSearchQueryParamFields('cf'));
-		}
+		// if($withCustomFields && $this->customfieldsRecord)
+		// {
+		// 	$fields = array_merge($fields, $this->customfieldsRecord->getFindSearchQueryParamFields('cf'));
+		// }
 		
 		return $fields;
 	}
@@ -641,7 +641,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 */
 	public static function getGroupIds($userId) {
 
-		return GO()->getDbConnection()->selectSingleValue('groupId')->from('core_user_group')->where(['userId' => $userId])->all();
+		return go()->getDbConnection()->selectSingleValue('groupId')->from('core_user_group')->where(['userId' => $userId])->all();
 		// $user = GO::user();
 		// if ($user && $userId == $user->id) {
 		// 	if (!isset(GO::session()->values['user_groups'])) {
@@ -789,7 +789,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 		$s = \go\core\model\Settings::get();
 
 		
-		$attr['language']=GO()->getSettings()->language;		
+		$attr['language']=go()->getSettings()->language;		
 		$attr['date_format']=$s->defaultDateFormat;		
 		$attr['date_separator']=GO::config()->default_date_separator;
 		$attr['theme']=GO::config()->theme;

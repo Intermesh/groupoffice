@@ -31,7 +31,7 @@ class Module extends AclOwnerEntity {
 
 	protected function canCreate()
 	{
-		return GO()->getAuthState()->getUser()->isAdmin();
+		return go()->getAuthState()->isAdmin();
 	}
 	
 	protected static function textFilterColumns()
@@ -55,7 +55,7 @@ class Module extends AclOwnerEntity {
 		}
 
 		if($this->isModified(['enabled'])) {
-			GO()->rebuildCache();
+			go()->rebuildCache();
 		}
 
 		//When module groups change the groups change too. Because the have a "modules" property.
@@ -63,7 +63,7 @@ class Module extends AclOwnerEntity {
 		if(!empty($aclChanges)) {
 			Group::entityType()
 				->changes(
-					GO()->getDbConnection()
+					go()->getDbConnection()
 						->select('id as entityId, aclId, "0" as destroyed')
 						->from('core_group')
 						->where('id', 'IN', array_keys($aclChanges)
@@ -120,10 +120,15 @@ class Module extends AclOwnerEntity {
 	}
 
 	public function folder() {
-		$root = GO()->getEnvironment()->getInstallFolder();
+		$root = go()->getEnvironment()->getInstallFolder();
 		return $root->getFolder("/go/modules/" . $this->package ."/" . $this->name ."/");
 	}	
 	
+	/**
+	 * Check if this module is available and licensed
+	 * 
+	 * @return bool
+	 */
 	public function isAvailable() {
 		
 		

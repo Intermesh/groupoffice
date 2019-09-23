@@ -22,3 +22,4 @@ go.modules.community.notes.NoteBookCombo = Ext.extend(go.form.ComboBox, {
 		}
 	}
 });
+Ext.reg('notebookcombo', go.modules.community.notes.NoteBookCombo );

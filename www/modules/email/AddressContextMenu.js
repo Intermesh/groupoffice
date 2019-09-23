@@ -191,8 +191,15 @@ Ext.extend(GO.email.AddressContextMenu, Ext.menu.Menu,{
 				text: t("Open") + ": " + records[i].data.name,
 				contactId: records[i].data.id,
 				handler: function() {
-					var dlg = new go.modules.community.addressbook.ContactDialog();
-					dlg.load(this.contactId).show();
+					// var dlg = new go.modules.community.addressbook.ContactDialog();
+					// dlg.load(this.contactId).show();
+
+					var win = new go.links.LinkDetailWindow({
+						entity: "Contact"
+					});
+
+					win.load(this.contactId);
+
 				}
 			});
 		}

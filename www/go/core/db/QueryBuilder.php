@@ -156,13 +156,18 @@ class QueryBuilder {
 			if(!isset($data[0])) {
 				$data = [$data];
 			}
-
-			$sql .= " (\n\t`" . implode("`,\n\t`", array_keys($data[0])) . "`\n)\n" .
+			if(empty($columns)) {
+				$columns = array_keys($data[0]);
+			}
+			$sql .= " (\n\t`" . implode("`,\n\t`", $columns) . "`\n)\n" .
 				"VALUES \n";
 
 			foreach($data as $record) {
 				$tags = [];
 				foreach ($record as $colName => $value) {
+					if(is_int($colName)) {
+						$colName = $columns[$colName];
+					}
 					
 					if($value instanceof Expression) {
 						$tags[] = (string) $value;
@@ -190,6 +195,7 @@ class QueryBuilder {
 		$this->setTableName($tableName);
 
 		$this->query = $query;
+		$this->buildBindParameters = $query->getBindParameters();
 		$this->tableAlias = $this->query->getTableAlias();
 		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName, $this->conn);
 
@@ -201,6 +207,12 @@ class QueryBuilder {
 				$colName = '`' . $tableAndCol[0] .'`.`'.$tableAndCol[1].'`';
 				if($value instanceof Expression) {
 					$updates[] = $colName . ' = ' . $value;
+				} elseif($value instanceof Query) {
+					$build = $value->build();
+
+					$updates[] = $colName . ' = (' . $build['sql'] .')';
+					
+					$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
 				} else
 				{				
 					$paramTag = $this->getParamTag();
@@ -235,6 +247,7 @@ class QueryBuilder {
 		$this->setTableName($tableName);
 		$this->reset();
 		$this->query = $query;
+		$this->buildBindParameters = $query->getBindParameters();
 		$this->tableAlias = $this->query->getTableAlias();
 		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName, $this->conn);
 

@@ -142,7 +142,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			if(search_type == 'any'){
 				query = 'OR OR OR FROM "' + GO.email.search_query + '" SUBJECT "' + GO.email.search_query + '" TO "' + GO.email.search_query + '" CC "' + GO.email.search_query + '"';
 			} else if(search_type=='fts') {
-				query = 'TEXT ' + GO.email.search_query;
+				query = 'TEXT "' + GO.email.search_query + '"';
 			} else {
 				query = search_type.toUpperCase() + ' "' + GO.email.search_query + '"';
 			}
@@ -1532,7 +1532,8 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 								{
 									images.push({
 										name: r.name,
-										src: r.url+'&inline=0'
+										src: r.url+'&inline=1',
+										download_path: r.url+'&inline=0'
 									});
 								}
 								if(r.name==attachment.name)

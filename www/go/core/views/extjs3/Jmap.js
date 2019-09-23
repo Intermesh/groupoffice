@@ -10,6 +10,11 @@ go.Jmap = {
 
 	paused: 0,
 
+	/**
+	 * Enable for XDEBUG profiling
+	 */
+	profile: false,
+
 	nextCallId: function () {
 		this.callId++;
 
@@ -58,7 +63,12 @@ go.Jmap = {
 	},
 	
 	getApiUrl : function() {
-		return BaseHref + 'api/jmap.php';
+		var url = BaseHref + 'api/jmap.php';
+
+		if(this.profile) {
+			url += '?XDEBUG_PROFILE=1';
+		}
+		return url;
 	},
 	
 	get: function(cb, scope) {
@@ -143,9 +153,6 @@ go.Jmap = {
 			source.addEventListener('state', function(e) {
 
 				var data = JSON.parse(e.data);
-				console.group("SSE state");
-				console.log(data);
-				console.groupEnd();
 
 				for(var entity in data) {
 					var store = go.Db.store(entity);
@@ -170,8 +177,7 @@ go.Jmap = {
 
 			source.addEventListener('error', function(e) {
 				if (e.readyState == EventSource.CLOSED) {
-					// Connection was closed.
-					
+					// Connection was closed.					
 					me.sse();
 				}
 			}, false);
@@ -320,6 +326,9 @@ go.Jmap = {
 			},
 			failure: function (response, opts) {
 				console.log('server-side failure with status code ' + response.status);
+
+				Ext.MessageBox.alert(t("Error"), t("Sorry, an unexpected error occurred: ") + response.responseText);
+				
 			}
 		});
 

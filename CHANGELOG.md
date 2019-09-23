@@ -1,3 +1,161 @@
+- Address book: added business fields in detail panel of orginisation
+- Address book: Create personal address books for each user
+- Users: Only show module tabs in user dialog where this user has access to
+- Notes: Default note book setting and every user gets a personal note book
+- Sync: settings use default notebook and address book by default
+
+19-09-2019 6.4.57
+- Custom fields: Query language works with text for select and multiselect
+- Users: Problem with deleting users because of default calendar
+- Address Book: Brought back salutation field
+- Address book: Added notes filter
+- Projects: Extended project report with comments
+- Files: File wouldn't open by default when WOPI was installed
+- Core: Missing link button in new dialogs.
+- Billing: Fixed problem where amounts got multiplied by 100 when editing numbers with decimals
+- Workflow: Fixed workflow delete button
+- Files: Fixed file access to address book access denied
+- Projects: Time entries are searchable
+
+17-09-2019 6.4.56
+- Core: Disable logging during upgrade for performance
+- Core: fixed custom fields upgrade problem
+
+16-09-2019 6.4.55
+- Problem with start module
+
+13-09-2019 6.4.54
+- Core: Sometimes a user was not in group everyone
+- IMAP / LDAP auth:  Clear database password when logging in with IMAP or LDAP authenticator
+- Core: raised default max upload size to 1GB
+- Core: fixed scroll to top in infinite grids
+- Carddav: carddav ignores sync-settings #460
+- Email: Fixed Search in Email with 2 strings #444
+- Sync: Default sync settings when creating a new user
+- Core: Mask grid when deleting
+- Core: Serveral issues with forms including a checkbox
+
+12-09-2019 6.4.53
+- Billing: Fixed tax percentage decimals in PDF
+- Billing: Fixed translation for Quantity / Amount in order items
+- Carddav: Fixed Birthdays on carddav not synced #410
+- Core: Import function shows error messages per line
+
+10-09-2019 6.4.52
+- Billing: Fixed group summary gross total in PDF.
+- Caldav: events with status needs-action were not synced. Change status to needs-action to tentative as needs-action is not a valid vevent status. 
+- Carddav: Create with vcard 4.0 format was broken (davdroid)
+- Core: Added user import with ability to create mailbox on mailserver too
+- Serverclient: Fixed missing domain checkboxes in user dialog
+- Core: Fixed bug in custom fields migration
+- E-mail: Set pasted image filename
+- Address book: contact:city tag was not parsed
+- ActiveSync: Fixed timezone issue with all day events
+
+09-09-2019 6.4.51
+- Core: Normalizing strings could corrupt UTF8
+- Address book: Filters were broken
+
+03-09-2019 6.4.50
+- Bookmarks: Languages readded
+- Bookmarks: Possible to set permissions on category
+- Projects: Sub project link does not navigate to the start page anymore
+- Address Book: Unable to unstar
+- Address book: Change in telephone links so you can select the text
+- Core: Link browser didn't paginate. It loaded all links which could be very slow.
+- Email: Template variables work_fax and work_mobile didn't work
+- Core: Image viewer has print and open in browser button
+- E-mail: In print small part of subject could be missing
+- Core: Keep scroll position on delete in grids but move to top when paging
+- Email: Address book dialog works for cc and bcc
+- Email: Select newsletter lists in composer address book
+- Core: Updated NL and IT translations
+- Core: CSV export was very inefficient. Speed improved dramatically.
+- Newsletters: Removed CAST() function from query to support older MySQL versions
+- Address book: Shrink to fit data when migrating custom fields and row size is too large during migration
+- Billing: fixed missing company name in recipient
+- E-mail: Fixed ICS parsing error. Fixed #440
+- Projects: Added permission type to detail view
+
+02-09-2019 6.4.49
+- Core: Fixed link date not displaying in link browser
+- Address book: Added initials field
+- Core: Dismiss icon missing in reminders
+- Core: order global search by modified date
+- Address book: System setting to automatically link e-mail to contacts
+
+30-08-2019 6.4.48
+- Core: Install comments and bookmarks by default
+- Core: Fixed demo data
+
+30-08-2019 6.4.47
+- Multi instance: upgrades all instances automatically
+- Core: Ability to extend content security policy in modules
+- Core: SSE improvements and option to disable it
+- Demodata: updated for new modules
+
+27-08-2019 6.4.46
+- Core: Custom fields were blank in CSV export.
+- Core: IMAP auth was broken when groups were modified. Removed permission check in user model that is executed in controller
+- Bookmarks: Fixed always reloading of website data
+
+26-08-2019 6.4.45
+- E-mail: Open contact detail menu from email address instead of edit dialog
+- Core: added boolean to be able to show/hide customfields inside a dialog.
+- Google authenticator: Fixed issues when setting up new authenticator.
+- Core: Backup & Confirm before upgrade
+- Core: Upgrade on command line
+- Core: Upload pictures select bug
+- Core: Auto detect CSV delimiter and fixed import of multiple properties
+- Core: Saving quota in user dialog didn't work because of broken compositefield
+
+22-08-2019 6.4.44
+- Core / Calendar: Search button can be in bottom toolbar (Calendar search)
+- Core: Fixed group dialog when default permissions for group was set
+- Address book: Use lastname first when creating files folder
+- Core: Fixed pluload UI
+- Core: Updated French translation
+- Email: Fixed html encoding in header bug
+
+19-08-2019 6.4.43
+- Address book: Install failed
+
+19-08-2019 6.4.42
+- Core: Icon's didn't render on non standard port.
+
+17-08-2019 6.4.41
+- Core: Added users and user groups to select dialog (Composer, Calendar)
+- Calendar: 6.4.24 - Calendar - Error when accepting invite from other GO user #424
+- Document templates: Fixed Can't get not existing property 'photoFile' in 'go\modules\community\addressbook\model\Contact' error with ODT files
+
+16-08-2019 6.4.40
+- Core: Upgrading cleared module settings (Only affected one custom module)
+- Core: Module sorting (two community groups)
+- Address book: Search only showed contact with email
+
+16-08-2019 6.4.39
+- Core: 6.4.36 E-Mail created from task with wrong address #443
+- Core: Fixed saving module permission in group dialog
+- Address book: Changed detail view layout so that email addresses and phonenumbers can be clicked directly and smaller image
+- Address Book: Contact salutation template tag fixed and configurable in the address book settings
+- Address Book / Core: New image field with upload from URL support
+- Address Book: Create files path like in 6.2 for address book files
+- Files: Removed UTF8 to CP850 conversion when creating ZIP files as it works in Windows 10 now
+- Core: Added English / Philippines language and holidays
+
+13-08-2019 6.4.38
+- Core: Adding select option destroyed all data
+- Core: Fixed multiselect custom field migration
+- Email: Fixed invalid autocomplete query returning too many results
+- Address book: Search in email by default too
+
+12-08-2019 6.4.37
+- Calendar: Fixed Error in 
+  /usr/share/groupoffice/modules/calendar/model/Participant.php at line 408: 
+  Call to undefined method go\\modules\\community\\addressbook\\model\\Contact::link()
+- Core: Custom fields migration fixes
+- Core: Fixed upload screen missing style
+
 19-07-2019 6.4.36
 - Core: small ui enhancements
 - Newsletters: Fixed incorrect parsing of images in email templates
@@ -131,6 +289,13 @@
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
 
+19-09-2019 6.3.82
+- Projects larger expense budget dialog and resizable
+- Billing: Force select of book in duplicate dialog
+- Core: Clear old framework cache on upgrade
+- Project: create invoice without grouping time entries by employees. are time record will be group into 1 group
+- Comments: Removed 10 comment limit
+- Projects: Don't reset travel distance on existing time entries
 
 11-07-2019 6.3.81
 - Core: Enable / disable Add linked item buttons based on permissions

@@ -104,7 +104,9 @@ class Backend extends AbstractBackend {
 		
 		$r = [];
 		$addressBooks = AddressBook::find()
-						->filter(['permissionLevel' => Acl::LEVEL_READ]);
+						->join("sync_addressbook_user", "u", "u.addressBookId = a.id")						
+						->filter(['permissionLevel' => Acl::LEVEL_READ])
+						->andWhere('u.userId', '=', go()->getAuthState()->getUserId());
 						
 		foreach($addressBooks as $a) {
 			$r[] = $this->addressBookToDAV($a, $principalUri);
@@ -187,7 +189,7 @@ class Backend extends AbstractBackend {
 		
 		$this->generateCards($addressbookId);		
 		
-		return GO()->getDbConnection()->select('c.uri, UNIX_TIMESTAMP(c.modifiedAt) as lastmodified, vcardBlobId AS etag, b.size')
+		return go()->getDbConnection()->select('c.uri, UNIX_TIMESTAMP(c.modifiedAt) as lastmodified, vcardBlobId AS etag, b.size')
 						->from('addressbook_contact', 'c')
 						->join('core_blob', 'b', 'c.vcardBlobId = b.id')
 						->where('c.addressBookId', '=', $addressbookId)->all();
@@ -211,7 +213,7 @@ class Backend extends AbstractBackend {
 		$blob = $this->createBlob($contact, $cardData);	
 		
 		try {
-			GO()->debug($cardData);
+			go()->debug($cardData);
 			$c = new VCard();			
 			$vcardComponent = Reader::read($cardData, Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 			$c->import($vcardComponent, $contact);

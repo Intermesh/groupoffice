@@ -1,8 +1,10 @@
 <?php
+use go\modules\community\addressbook\Module;
+
 $updates = [];
 
 $updates['201811272011'][] = function() {
-	\go\core\db\Utils::runSQLFile(\GO()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/addressbook/install/install.sql"));
+	\go\core\db\Utils::runSQLFile(\go()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/addressbook/install/install.sql"));
 };
 $updates['201811272011'][] = "DROP TABLE addressbook_contact_custom_fields";
 
@@ -44,3 +46,25 @@ $updates['201906181248'][] = "update `addressbook_contact_star` set starred = nu
 $updates['201906181248'][] = "ALTER TABLE `addressbook_contact_star` CHANGE `starred` `starred` TINYINT(1) NULL DEFAULT NULL;";
 
 $updates['201907021042'][] = "ALTER TABLE `addressbook_user_settings` ADD `salutationTemplate` TEXT NOT NULL AFTER `defaultAddressBookId`, ADD `sortBy` ENUM('name','lastName') NOT NULL DEFAULT 'name' AFTER `salutationTemplate`;";
+
+$updates['201908141101'][] = "ALTER TABLE `addressbook_addressbook` ADD `filesFolderId` INT NULL DEFAULT NULL AFTER `createdBy`;";
+
+$updates['201908141101'][] = "ALTER TABLE `addressbook_addressbook` ADD `salutationTemplate` TEXT NULL AFTER `filesFolderId`;";
+$updates['201908141101'][] = "ALTER TABLE `addressbook_user_settings` DROP `salutationTemplate`;";
+
+$updates['201908301421'][] = "ALTER TABLE `addressbook_contact` ADD `initials` VARCHAR(50) DEFAULT NULL AFTER `prefixes`;";
+$updates['201908301421'][] = function() {
+	$m = new go\modules\community\addressbook\install\Migrate63to64();
+	$m->addInitials();
+};
+
+$updates['201909181300'][] = "ALTER TABLE `addressbook_contact` ADD `salutation` VARCHAR(100) NULL DEFAULT NULL AFTER `suffixes`;";
+$updates['201909181300'][] = function() {
+	$m = new go\modules\community\addressbook\install\Migrate63to64();
+	$m->addSalutation();
+};
+
+
+$updates['201909181300'][] = function() {
+	Module::checkRootFolder();
+};

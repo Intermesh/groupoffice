@@ -2,6 +2,7 @@
 
 namespace go\core\controller;
 
+use GO\Base\Db\ActiveRecord;
 use go\core\model;
 use function GO;
 use go\core\jmap\exception\InvalidArguments;
@@ -27,21 +28,38 @@ class Acl extends Controller {
 		$defaultAcl = $entityType->getDefaultAcl();
 		$cls = $entityType->getClassName();
 
-		$entities = $cls::find();
+		if(is_a($cls, ActiveRecord::class, true) ) {
+			$entities = $cls::model()->find();
 
-		foreach($entities as $entity) {
-			if(!$params['add']) {
-				$entity->findAcl()->groups = [];
+			foreach($entities as $entity) {
+				
+				/** @var ActiveRecord $entity */
+				$acl = $entity->getAcl();
+				if(!$params['add']) {
+					$acl->clear();
+				}
 
-				if($entityType->getName() == "Group") {
-		 			// Groups have a special situtation. They must be shared with the group itself so they can see it.
-					$entity->findAcl()->addGroup($entity->id, model\Acl::LEVEL_READ);					
-				}			
+				foreach($defaultAcl as $groupId => $level) {
+					$acl->addGroup($groupId, $level);
+				}
 			}
-			
-			$entity->setAcl($defaultAcl);
-			if(!$entity->save()) {
-				throw new \Exception("Could not save default ACL for entity");
+		} else {			
+			$entities = $cls::find();
+
+			foreach($entities as $entity) {
+				if(!$params['add']) {
+					$entity->findAcl()->groups = [];
+
+					if($entityType->getName() == "Group") {
+						// Groups have a special situtation. They must be shared with the group itself so they can see it.
+						$entity->findAcl()->addGroup($entity->id, model\Acl::LEVEL_READ);					
+					}			
+				}
+				
+				$entity->setAcl($defaultAcl);
+				if(!$entity->save()) {
+					throw new \Exception("Could not save default ACL for entity");
+				}
 			}
 		}
 
@@ -51,7 +69,7 @@ class Acl extends Controller {
 		// $table = array_values($cls::getMapping()->getTables())[0];
 		// $defaultAcl = model\Acl::findById($entityType->getDefaultAclId());
 		
-		// $aclIds = GO()->getDbConnection()->select('aclId')->from($table->getName());
+		// $aclIds = go()->getDbConnection()->select('aclId')->from($table->getName());
 		// $acls = model\Acl::find()->where('id', 'IN', $aclIds);
 		
 		// foreach($acls as $acl) {

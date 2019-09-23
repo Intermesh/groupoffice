@@ -97,7 +97,7 @@ abstract class EntityController extends Controller {
 			$query->filter(["permissionLevel" => Acl::LEVEL_READ]);
 		}
 		
-		//GO()->info($query);
+		//go()->info($query);
 		
 		return $query;
 	}
@@ -646,7 +646,7 @@ abstract class EntityController extends Controller {
 			$result = $cls::getChanges($p['sinceState'], $p['maxChanges']);		
 		} catch (CannotCalculateChanges $e) {
 			$result["message"] = $e->getMessage();
-			GO()->warn($e->getMessage());
+			go()->warn($e->getMessage());
 		}
 		
 		$result['accountId'] = $p['accountId'];
@@ -684,6 +684,9 @@ abstract class EntityController extends Controller {
 	 * @throws Exception
 	 */
 	protected function defaultImport($params) {
+
+		ini_set('max_execution_time', 10 * 60);
+		
 		$params = $this->paramsImport($params);
 		
 		$blob = Blob::findById($params['blobId']);	
@@ -707,6 +710,7 @@ abstract class EntityController extends Controller {
 	 * @throws Exception
 	 */
 	protected function defaultImportCSVMapping($params) {
+		
 		$blob = Blob::findById($params['blobId']);	
 		
 		$converter = $this->findConverter($blob->type);
@@ -752,6 +756,8 @@ abstract class EntityController extends Controller {
 	 * @throws Exception
 	 */
 	protected function defaultExport($params) {
+
+		ini_set('max_execution_time', 10 * 60);
 		
 		$params = $this->paramsExport($params);
 		

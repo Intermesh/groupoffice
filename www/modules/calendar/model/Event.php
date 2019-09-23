@@ -1543,19 +1543,11 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	
     $e->summary = (string) $this->name;
 		
-//		switch($this->owner_status){
-//			case Participant::STATUS_ACCEPTED:
-//				$e->status = "CONFIRMED";
-//				break;
-//			case Participant::STATUS_DECLINED:
-//				$e->status = "CANCELLED";
-//				break;
-//			default:
-//				$e->status = "TENTATIVE";
-//				break;			
-//		}
-		
-		$e->status = $this->status;
+		if($this->status == "NEEDS-ACTION"){
+			$e->status = "TENTATIVE";
+		}else{
+			$e->status = $this->status;
+		}	
 		
 		
 		$dateType = $this->all_day_event ? "DATE" : "DATETIME";
@@ -1867,20 +1859,26 @@ $sub = $offset>0;
 //				\GO::debug("WARNING: Ignoring unsupported reminder value of type: ".$type);			
 //			}
 //	
-		if($vobject->valarm && $vobject->valarm->trigger) {
-			$date = $vobject->valarm->getEffectiveTriggerTime();
-			if($date) {
-				if($this->all_day_event)
-					$this->_utcToLocal($date);
-				$this->reminder = $this->start_time-$date->format('U');
-			}
-		}elseif($vobject->aalarm){ //funambol sends old vcalendar 1.0 format
-			$aalarm = explode(';', (string) $vobject->aalarm);
-			if(!empty($aalarm[0])) {				
-				$p = Sabre\VObject\DateTimeParser::parse($aalarm[0]);
-				$this->reminder = $this->start_time-$p->format('U');
-			}		
-		}
+		// if($vobject->valarm && $vobject->valarm->trigger) {
+		// 	$date = false;
+		// 	try {
+		// 		$date = $vobject->valarm->getEffectiveTriggerTime();
+		// 	}
+		// 	catch(\Exception $e) {
+		// 		//invalid trigger.
+		// 	}
+		// 	if($date) {
+		// 		if($this->all_day_event)
+		// 			$this->_utcToLocal($date);
+		// 		$this->reminder = $this->start_time-$date->format('U');
+		// 	}
+		// }elseif($vobject->aalarm){ //funambol sends old vcalendar 1.0 format
+		// 	$aalarm = explode(';', (string) $vobject->aalarm);
+		// 	if(!empty($aalarm[0])) {				
+		// 		$p = Sabre\VObject\DateTimeParser::parse($aalarm[0]);
+		// 		$this->reminder = $this->start_time-$p->format('U');
+		// 	}		
+		// }
 		
 		$this->setAttributes($attributes, false);
 		
@@ -1945,14 +1943,31 @@ $sub = $offset>0;
 		}
 		
 		if($vobject->valarm && $vobject->valarm->trigger){
-			$reminderTime = $vobject->valarm->getEffectiveTriggerTime();
-			//echo $reminderTime->format('c');
-			if($this->all_day_event)
-				$this->_utcToLocal($reminderTime);
-			$seconds = $reminderTime->format('U');
-			$this->reminder = $this->start_time-$seconds;
-			if($this->reminder<0)
-				$this->reminder=0;
+			
+			$reminderTime = false;
+			try {
+				$reminderTime = $vobject->valarm->getEffectiveTriggerTime();
+			}
+			catch(\Exception $e) {
+				//invalid trigger.
+			}
+
+			if($reminderTime) {
+				//echo $reminderTime->format('c');
+				if($this->all_day_event)
+					$this->_utcToLocal($reminderTime);
+				$seconds = $reminderTime->format('U');
+				$this->reminder = $this->start_time-$seconds;
+				if($this->reminder<0)
+					$this->reminder=0;
+
+			}
+		}elseif($vobject->aalarm){ //funambol sends old vcalendar 1.0 format
+			$aalarm = explode(';', (string) $vobject->aalarm);
+			if(!empty($aalarm[0])) {				
+				$p = Sabre\VObject\DateTimeParser::parse($aalarm[0]);
+				$this->reminder = $this->start_time-$p->format('U');
+			}		
 		}
 		
 		if($withCategories) {

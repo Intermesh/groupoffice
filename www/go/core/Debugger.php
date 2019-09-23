@@ -62,9 +62,9 @@ class Debugger {
 	
 	public function __construct() {
 		try {
-			$this->enabled = (!empty(GO()->getConfig()['core']['general']['debug']) || jmap\Request::get()->getHeader('X-Debug') == "1") && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug');
+			$this->enabled = (!empty(go()->getConfig()['core']['general']['debug']) || jmap\Request::get()->getHeader('X-Debug') == "1") && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug');
 			if($this->enabled) {
-				$this->logPath = GO()->getDataFolder()->getFile('log/debug.log')->getPath();
+				$this->logPath = go()->getDataFolder()->getFile('log/debug.log')->getPath();
 			}
 		} catch (\go\core\exception\ConfigurationException $e) {
 			//GO is not configured / installed yet.
@@ -198,7 +198,7 @@ class Debugger {
 			}
 		}
 
-		if(GO()->getEnvironment()->isCli()) {
+		if(go()->getEnvironment()->isCli()) {
 			if (!is_scalar($mixed)) {
 				$print = print_r($mixed, true);
 			} else if(is_bool($mixed)) {

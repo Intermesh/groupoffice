@@ -74,7 +74,7 @@ class Language {
 			}
 		}
 		
-		return GO()->getSettings()->language; // from settings if we cant determine
+		return go()->getSettings()->language; // from settings if we cant determine
 	}
 
 	/**
@@ -117,7 +117,7 @@ class Language {
 			if ($file->exists()) {
 				$langData = new util\ArrayObject($this->loadFile($file));
 			} else {
-				GO()->warn('No default(en) language file for module "'.$package.'/'.$module.'" defined.');
+				go()->warn('No default(en) language file for module "'.$package.'/'.$module.'" defined.');
 			}
 
 			//overwirte english with actual language
@@ -133,7 +133,7 @@ class Language {
 				$langData->mergeRecursive($this->loadFile($file));
 			}
 			
-			$productName = GO()->getConfig()['core']['branding']['name'];
+			$productName = go()->getConfig()['core']['branding']['name'];
 
 			foreach ($langData as $key => $translation) {
 				
@@ -212,7 +212,7 @@ class Language {
 	 */
 	private function findLangOverride($lang, $package, $module) {
 
-		$folder = GO()->getDataFolder()->getFolder('users/admin/language/' . $package . '/' .$module);
+		$folder = go()->getDataFolder()->getFolder('users/admin/language/' . $package . '/' .$module);
 		
 		return $folder->getFile($lang . '.php');
 	}

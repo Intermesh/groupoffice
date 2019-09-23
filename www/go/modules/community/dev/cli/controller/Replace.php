@@ -1,15 +1,15 @@
 <?php
-namespace go\modules\community\dev\controller;
+namespace go\modules\community\dev\cli\controller;
 
 class Replace extends \go\core\Controller {
 	
 //	public function ns() {
 //		
 //		
-//		$allJSFiles = GO()->getEnvironment()->getInstallFolder()->find("/^.*\.js$/", false, true);
+//		$allJSFiles = go()->getEnvironment()->getInstallFolder()->find("/^.*\.js$/", false, true);
 //		
 //		
-//		$folder = GO()->getEnvironment()->getInstallFolder()->getFolder("go/core/views/extjs3");
+//		$folder = go()->getEnvironment()->getInstallFolder()->getFolder("go/core/views/extjs3");
 //		$modFolders = $folder->getChildren(false);
 //		
 //		foreach($modFolders as $f) {

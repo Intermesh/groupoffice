@@ -47,8 +47,9 @@ class Csv extends convert\Csv {
 	public static $excludeHeaders = ['addressBookId', 'goUserId', 'vcardBlobId', 'uri'];
 	
 	protected function init() {
-		$this->addColumn('isOrganization', GO()->t("Is organization", "community", "addressbook"), false);
-		$this->addColumn('organizations', GO()->t("Organizations", "community", "addressbook"), true);		
+		parent::init();
+		$this->addColumn('isOrganization', go()->t("Is organization", "community", "addressbook"), false);
+		$this->addColumn('organizations', go()->t("Organizations", "community", "addressbook"), true);		
 	}
 
 	protected function importIsOrganization(Contact $contact, $isOrganization, array &$values) {
@@ -95,11 +96,11 @@ class Csv extends convert\Csv {
 		$contact->setOrganizationIds($orgIds);
 	}
 	
-	protected function exportOrganizations(Contact $contact) {
+	protected function exportOrganizations(Contact $contact, $templateValues) {
 		if($contact->isOrganization) {
 			return "";
 		}
 
-		return implode($this->multipleDelimiter, $contact->findOrganizations()->selectSingleValue('name')->all());
+		return implode($this->multipleDelimiter, array_column($templateValues['organizations'], 'name'));
 	}
 }

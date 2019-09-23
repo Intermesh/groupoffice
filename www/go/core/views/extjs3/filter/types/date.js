@@ -15,7 +15,7 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 	initComponent: function () {
 		
 		this.operatorCombo = new go.form.ComboBox({
-				submit: false,
+
 				hideLabel: true,
 				name: "operator",
 				value: 'before',
@@ -37,7 +37,7 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 			});
 			
 		this.periodCombo = new go.form.ComboBox({
-				submit: false,
+
 				hideLabel: true,
 				name: "period",
 				value: 'days',
@@ -76,7 +76,6 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 			serverFormats: false,
 			flex: 1,
 			decimals: 0,
-			submit: false,
 			name: 'value'
 		});
 	},
@@ -85,7 +84,6 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 	
 	name: 'value',
 	
-	submit : false,
 	
 	getName : function() {
 		return this.name;

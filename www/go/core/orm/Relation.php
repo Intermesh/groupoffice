@@ -45,6 +45,19 @@ class Relation {
 	public $tableName;
 
 	/**
+	 * Type of relation. See TYPE_* constants.
+	 */
+	public $type;
+
+
+	/**
+	 * Only for has one relations. Auto create it when not yet in the database.
+	 * 
+	 * @var bool
+	 */
+	public $autoCreate = false;
+
+	/**
 	 * Constructor
 	 * 
 	 * @param string $name The name of the relation

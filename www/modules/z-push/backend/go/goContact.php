@@ -137,7 +137,7 @@ class goContact extends GoBaseBackendDiff {
 		$list = Contact::find()
 						->select('c.id, UNIX_TIMESTAMP(c.modifiedAt) AS `mod`, "1" AS flags')
 						->join("sync_addressbook_user", "u", "u.addressBookId = c.addressBookId")
-						->andWhere('u.userId', '=', GO()->getAuthState()->getUserId())						
+						->andWhere('u.userId', '=', go()->getAuthState()->getUserId())						
 						->fetchMode(PDO::FETCH_ASSOC)
 						->filter([
 								"permissionLevel" => Acl::LEVEL_READ

@@ -66,13 +66,60 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				},
 				
 				{
-					iconCls: 'ic-settings',
-					tooltip: t("User defaults"),
-					handler: function() {
-						var dlg = new go.users.UserDefaultsWindow();
-						dlg.show();
-					}
-				}
+					iconCls: 'ic-more-vert',
+					menu: [
+						{
+							iconCls: 'ic-settings',
+							text: t("User defaults"),
+							handler: function() {
+								var dlg = new go.users.UserDefaultsWindow();
+								dlg.show();
+							}
+						},
+
+						'-',
+						{
+							iconCls: 'ic-cloud-upload',
+							text: t("Import"),
+							handler: function() {
+								go.util.importFile(
+												'User', 
+												"text/csv",
+												{},
+												{
+													labels: {
+														username: t("Username"),
+														displayName: t("Display name"),
+														password: t("Password"),
+														email: t("E-mail"),
+														recoveryEmail: t("Recovery e-mail"),
+														groups: t("Groups")
+													}
+												});
+							},
+							scope: this
+						}, {
+							iconCls: 'ic-cloud-download',
+							text: t("Export"),					
+							handler: function() {
+								go.util.exportToFile(
+												'User', 
+												Ext.apply(this.store.baseParams, this.store.lastOptions.params, {limit: 0, start: 0}),
+												'text/csv');									
+							},
+							scope: this	
+						}, '-',
+						{
+							iconCls: 'ic-delete',
+							scope: this,
+							text: t("Delete"),
+							handler: function() {
+								this.deleteSelected();
+							}
+						}
+					]
+				},
+				
 				
 			],
 			columns: [

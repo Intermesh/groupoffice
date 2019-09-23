@@ -45,7 +45,7 @@ class Disk implements CacheInterface {
 	 */
 	public function set($key, $value, $persist = true) {
 
-		//GO()->debug("CACHE: ". $key);
+		//go()->debug("CACHE: ". $key);
 		//don't set false values because unserialize returns false on failure.
 		if ($key === false) {
 			return true;
@@ -129,7 +129,7 @@ class Disk implements CacheInterface {
 			return true;
 		}
 		
-		GO()->debug("Flushing cache");
+		go()->debug("Flushing cache");
 		
 		$this->cache = [];
 	

@@ -1,6 +1,10 @@
 <?php
 require('../vendor/autoload.php');
 
+ini_set('zlib.output_compression', 0);
+ini_set('implicit_flush', 1);
+
+
 require("gotest.php");
 if(!systemIsOk()) {
 	header("Location: test.php");
@@ -11,6 +15,8 @@ if(!systemIsOk()) {
 use GO\Base\Cron\CronJob;
 use GO\Base\Model\Module;
 use GO\Base\Observable;
+use go\modules\community\bookmarks\Module as BookmarksModule;
+use go\modules\community\comments\Module as CommentsModule;
 use go\core\App;
 use go\core\jmap\State;
 use go\core;
@@ -43,9 +49,9 @@ if (!empty($_POST)) {
 
 	if ($_POST['password'] == $_POST['passwordConfirm']) {
 		
-//		GO()->getDbConnection()->exec("DROP DATABASE test");
-//		GO()->getDbConnection()->exec("CREATE DATABASE test");
-//		GO()->getDbConnection()->exec("USE test");
+//		go()->getDbConnection()->exec("DROP DATABASE test");
+//		go()->getDbConnection()->exec("CREATE DATABASE test");
+//		go()->getDbConnection()->exec("USE test");
 
 		App::get()->setAuthState(new core\auth\TemporaryState());
 
@@ -59,7 +65,9 @@ if (!empty($_POST)) {
 		App::get()->getInstaller()->install($admin, [
 				new AddressBookModule(), 
 				new NotesModule(),
-				new GAModule()
+				new GAModule(),
+				new CommentsModule(),
+				new BookmarksModule()
 				]);
 
 		//install not yet refactored modules
@@ -117,8 +125,8 @@ if (!empty($_POST)) {
 		\go\core\model\User::findById(1)->legacyOnSave();
 		
 		
-		if(GO()->getConfig()['core']['general']['servermanager']) {
-			exec("php ".\go\core\Environment::get()->getInstallFolder() .'/go/modules/community/multi_instance/oninstall.php '.GO()->getConfig()['core']['general']['servermanager']. ' '.explode(':',$_SERVER['HTTP_HOST'])[0], $output, $ret);
+		if(go()->getConfig()['core']['general']['servermanager']) {
+			exec("php ".\go\core\Environment::get()->getInstallFolder() .'/go/modules/community/multi_instance/oninstall.php '.go()->getConfig()['core']['general']['servermanager']. ' '.explode(':',$_SERVER['HTTP_HOST'])[0], $output, $ret);
 		}		
 
 		header("Location: finished.php");

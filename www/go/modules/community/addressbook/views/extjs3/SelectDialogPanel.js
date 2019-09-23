@@ -1,40 +1,13 @@
 /* global go, Ext, GO */
 
-go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
+go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 	
 	layout: "responsive",
-	width: dp(1000),
-	height: dp(800),
-	modal: true,
-	mode: "email", // or "id" in the future "phone" or "address"
-	title: t("Select from address book"),
-	selectMultiple: function(contactIds) {
-		
-	},
-	selectSingleEmail: function(name, email, id) { 
-	
-	},
-	scope: null,
+	mode: "email", // or "id" in the future "phone" or "address"	
+	entityName:  "Contact",
+	title: t("Address Book"),
+
 	initComponent : function() {
-		
-		if(!this.scope) {
-			this.scope = this;
-		}
-		
-		this.bbar = [
-			'->',
-			{
-				text: t("Add all results"),
-				handler: this.selectAll,
-				scope: this
-			},
-			this.addSelectionButton = new Ext.Button({
-				text: t("Add selection"),
-				handler: this.selectSelection,
-				scope: this,
-				disabled: true
-			})
-		];		
 		
 		this.createGrid();
 		
@@ -54,7 +27,7 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 		
 		this.items = [this.grid, this.sidePanel];
 		
-		go.modules.community.addressbook.SelectDialog.superclass.initComponent.call(this);
+		go.modules.community.addressbook.SelectDialogPanel.superclass.initComponent.call(this);
 		
 		
 	},
@@ -67,7 +40,7 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 					cls: 'go-narrow',
 					iconCls: "ic-menu",
 					handler: function () {
-						this.addressBookTree.show();
+						this.sidePanel.show();
 					},
 					scope: this
 				},
@@ -94,20 +67,35 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 			hasEmailAddresses: true
 		});
 
-		this.grid.getSelectionModel().on("selectionchange", function(sm) {
-			this.addSelectionButton.setDisabled(sm.getSelections().length == 0);
-		}, this);
+		// this.grid.getSelectionModel().on("selectionchange", function(sm) {
+		// 	this.addSelectionButton.setDisabled(sm.getSelections().length == 0);
+		// }, this);
 		
 		return this.grid;
 	},
 	
 	createAddressBookTree : function() {
 		this.addressBookTree = new go.modules.community.addressbook.AddressBookTree({
-			width: dp(300),
 			region: "west",
 			split: true,
 			readOnly: true,
-			scope: this
+			scope: this,
+			tbar: [{
+				xtype: "tbtitle",
+				text: t("Address books")
+			}, '->', 
+			//add back button for smaller screens
+			{
+				//this class will hide it on larger screens
+				cls: 'go-narrow',
+				iconCls: "ic-arrow-forward",
+				tooltip: t("Contacts"),
+				handler: function () {
+					this.grid.show();
+				},
+				scope: this
+
+			}]
 		});	
 		
 		//because the root node is not visible it will auto expand on render.
@@ -210,35 +198,34 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 		});
 		
 		this.grid.store.load();
-	},
-	
-	select : function(contactIds) {
-		this.handler.call(this.scope, contactIds);
-		this.close();
-	},
-	
-	selectAll : function() {
-		var s = go.Db.store("Contact");
-		this.getEl().mask(t("Loading..."));
-		s.query({
-			filter: this.grid.store.baseParams.filter
-		}, function(response) {			
-			this.getEl().unmask();
-			Ext.MessageBox.confirm(t("Confirm"), t("Are you sure you want to select all {count} results?").replace('{count}', response.ids.length), function(btn) {
-				if(btn != 'yes') {
-					return;
-				}
-				this.selectMultiple.call(this.scope, response.ids);				
-				this.close();
-			}, this);
-			
-		}, this);
+	},	
+
+	addAll : function() {
+		var me = this;
+		var promise = new Promise(function(resolve, reject) {
+		
+			var s = go.Db.store("Contact");
+			me.getEl().mask(t("Loading..."));
+			s.query({
+				filter: me.grid.store.baseParams.filter
+			}, function(response) {			
+				me.getEl().unmask();
+				Ext.MessageBox.confirm(t("Confirm"), t("Are you sure you want to select all {count} results?").replace('{count}', response.ids.length), function(btn) {
+					if(btn != 'yes') {
+						reject();
+					}
+					resolve(response.ids);
+				}, me);
+				
+			}, me);
+		});
+
+		return promise;
 	},
 
-	selectSelection : function() {
-		var records = this.grid.getSelectionModel().getSelections();		
-		this.selectMultiple.call(this.scope, records.column('id'));
-		this.close();
+	addSelection : function() {
+		var records = this.grid.getSelectionModel().getSelections();				
+		return Promise.resolve(records.column('id'));
 	},
 	
 	
@@ -254,8 +241,7 @@ go.modules.community.addressbook.SelectDialog = Ext.extend(go.Window, {
 				},
 				text: "<div>" + a.email + "</div><small>" +  this.labels[a.type] + "</div>",
 				handler: function() {
-					me.selectSingleEmail.call(me.scope, this.data.name, this.data.email, this.data.id);
-					me.close();
+					me.fireEvent('selectsingle', me, this.data.name, this.data.email, this.data.id);
 				}
 			};
 		}, this);

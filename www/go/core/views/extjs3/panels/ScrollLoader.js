@@ -16,7 +16,7 @@ go.panels.ScrollLoader = {
 	
 	initScrollLoader :function() {
 		//setup auto load more for go.data.Store's only
-		if(this.store instanceof go.data.Store && this.store.entityStore) {
+		if((this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) && this.store.entityStore) {
 			
 			this.on('afterrender', this.onRenderScrollLoader, this);
 
@@ -77,6 +77,10 @@ go.panels.ScrollLoader = {
 				o.params.position = o.params.position || 0;
 				o.params.position += this.pageSize;
 				o.paging = true;
+
+				if(this.isGridPanel()) {
+					this.getView().scrollToTopOnLoad = false;
+				}
 				store.load(o);
 			}
 		} else {
@@ -90,6 +94,9 @@ go.panels.ScrollLoader = {
 				o.params.position += this.pageSize;
 				o.paging = true;
 
+				if(this.isGridPanel()) {
+					this.getView().scrollToTopOnLoad = false;
+				}
 				store.load(o);
 
 			}

@@ -129,7 +129,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 
 			$state = new go\core\auth\TemporaryState();
 			$state->setUser($user);		
-			\GO()->setAuthState($state);		
+			\go()->setAuthState($state);		
 
 			$this->oldLogin($user);		
 

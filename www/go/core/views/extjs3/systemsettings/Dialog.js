@@ -96,6 +96,11 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		this.addPanel(go.systemsettings.AuthenticationPanel);
 		this.addPanel(go.defaultpermissions.SystemSettingsPanel);
 		this.addPanel(go.customfields.SystemSettingsPanel);
+		this.addPanel(go.users.SystemSettingsUserGrid);
+		this.addPanel(go.groups.SystemSettingsGroupGrid);
+		this.addPanel(go.modules.SystemSettingsModuleGrid);
+		this.addPanel(go.tools.SystemSettingsTools);
+		this.addPanel(go.cron.SystemSettingsCronGrid, null, 'divider');
 		
 		this.loadModulePanels();
 		
@@ -188,7 +193,9 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	 * @param int position
 	 * @param boolean passwordProtected
 	 */
-	addPanel : function(panelClass, position){
+	addPanel : function(panelClass, position,cls){
+
+		
 		var cfg = {
 			header: false,
 			loaded:false,
@@ -200,7 +207,8 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		var menuRec = new Ext.data.Record({
 			itemId: pnl.itemId,
 			name: pnl.title,
-			iconCls: pnl.iconCls
+			iconCls: pnl.iconCls,
+			cls: cls
 		});
 		
 		if(Ext.isEmpty(position)){

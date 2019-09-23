@@ -20,6 +20,9 @@ class Serverclient extends \go\core\Controller {
 		if($user->hasPermissionLevel(\go\core\model\Acl::LEVEL_WRITE)) {
 			$postfixAdmin = new MailDomain($params['password']);
 			foreach ($params['domains'] as $domain) {
+				if(empty($domain)) {
+					continue;
+				}
 				$postfixAdmin->addMailbox($user,$domain);
 				$postfixAdmin->addAccount($user,$domain);
 			}

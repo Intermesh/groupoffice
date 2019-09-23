@@ -139,8 +139,9 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 	preFetchEntities: function (records, cb, scope) {
 		
 
-		var fields = this.getEntityFields();
-		if (!fields.length) {
+		var fields = this.getEntityFields(), hasFields = fields.length;
+		var promiseFields = this.getPromiseFields();
+		if (!hasFields && !promiseFields.length) {
 			cb.call(scope);
 			return;
 		}
@@ -148,16 +149,26 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		var promises = [], me = this;
 
 		records.forEach(function (record) {
-			promises.push(go.Relations.get(this.entityStore, record, fields).then(function(result) {
-				for(var store in result.watch) {
-					result.watch[store].forEach(function(key) {
-							me._watchRelation(store, key);
-					});
-				}
-			}).catch(function(error) {
-				console.error(error);
-			}));
-		}, this);
+
+			if(hasFields) {
+				promises.push(go.Relations.get(this.entityStore, record, fields).then(function(result) {
+					for(var store in result.watch) {
+						result.watch[store].forEach(function(key) {
+								me._watchRelation(store, key);
+						});
+					}
+				}).catch(function(error) {
+					console.error(error);
+				}));
+			}
+
+			promiseFields.forEach(function(f) {
+				promises.push(f.promise(record).then(function(data){
+					record[f.name] = data;
+				}));
+			});
+
+		}, this);		
 		
 		Promise.all(promises).then(function() {
 			cb.call(scope);
@@ -179,6 +190,24 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		if(this.watchRelations[entity].indexOf(key) === -1) {
 			this.watchRelations[entity].push(key);
 		}
+	},
+
+	/**
+	 * Get all fields that should resolve a related entity
+	 */
+	getPromiseFields: function () {
+		var f = [];
+
+		this.fields.forEach(function (field) {
+			if(Ext.isString(field.type)) {
+				field.type = Ext.data.Types[field.type.toUpperCase()];
+			}
+			if (field.type && field.type.promise) {
+				f.push(field);
+			}
+		});
+
+		return f;
 	},
 
 	/**

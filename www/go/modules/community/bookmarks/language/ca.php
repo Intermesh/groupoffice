@@ -1,0 +1,20 @@
+<?php
+return array (
+  'Search the web' => 'Cercar en la Web',
+  'Bookmark' => 'Marcador',
+  'Category' => 'Categoria',
+  'Title' => 'Títol',
+  'Open in new browser tab' => 'Obrir en una nova pestanya del navegador',
+  'Administrate categories' => 'Administrar categories',
+  'Thumbnails' => 'Miniatures',
+  'Choose icon for bookmark' => 'Triar icona pel marcador',
+  'Clear Logo' => 'Netejar Logo',
+  'Upload Logo' => 'Pujar Logo',
+  'Show all' => 'Mostrar tot',
+  'Shared category' => 'Categoria compartida',
+  'name' => 'Marcadors',
+  'description' => 'Descripció',
+  'General' => 'General',
+  'Bookmarks' => 'Marcadors',
+  'Logo' => 'Logo',
+);

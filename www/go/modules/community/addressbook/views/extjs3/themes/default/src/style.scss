@@ -15,7 +15,7 @@
 }
 
 .go-addressbook-name-panel {
-	padding: dp(16);	
+	padding: dp(16);
 	h4 {
 		top: dp(-16);
 		left: dp(56);
@@ -81,12 +81,17 @@
 	}
 }
 
-.go-detail-view-contact {
-	.avatar {
-		float: none;
-		
-		.icon {
-			line-height: 100%;
-		}
-	}
-}
+// .go-detail-view-contact {
+// 	.avatar {
+
+// 		// position: absolute;
+// 		// top: dp(8);
+// 		// right: 0;//dp(16);
+// 		// height: dp(56);
+// 		// width: dp(56);
+
+// 		.icon {
+// 			line-height: 100%;
+// 		}
+// 	}
+// }

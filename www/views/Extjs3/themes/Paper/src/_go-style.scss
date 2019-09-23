@@ -360,8 +360,8 @@ a {
 		min-height: dp(40);
 		padding: dp(8) 0;
 		padding-left: dp(16);
-		border:0;
-		margin:0;
+		// border:0;
+		// margin:0;
 		cursor:pointer;
 		&.x-view-selected i {
 			@include var(color, c-primary);
@@ -386,8 +386,16 @@ a {
 			}
 		}
 
+		&.divider {
+			border-bottom: 1px solid color($fg, 'line');
+			padding-bottom: dp(16);
+			margin-bottom: dp(8);
+		}
   }
 }
+
+
+
 
 #mainNorthPanel {
 	height: dp(56);
@@ -587,9 +595,7 @@ a {
 	}
 }*/
 
-.go-paging-tb input {
-	min-height: dp(16);
-}
+
 button {
 	border:0;
 	outline:0;
@@ -916,16 +922,16 @@ button.filetype-pdf, button.filetype-doc {
 .go-detail-view {
 	
 	
-	.go-detail-view-avatar {
-		text-align: center;
-		.avatar {
-			font-size: dp(154);
-			line-height: dp(200);
+	// .go-detail-view-avatar {
+	// 	text-align: center;
+	// 	.avatar {
+	// 		font-size: dp(154);
+	// 		line-height: dp(120);
 
-			height: dp(200);
-			width: dp(200);
-		}
-	}
+	// 		height: dp(120);
+	// 		width: dp(120);
+	// 	}
+	// }
 	
 	.content {
 		padding: dp(16);
@@ -1095,7 +1101,7 @@ button.filetype-pdf, button.filetype-doc {
 		margin: 0;
 		width: 100%;
 		span, a {
-			display: block;
+			display: inline-block;
 			min-height: dp(24);
 		}
 		
@@ -1149,6 +1155,15 @@ button.filetype-pdf, button.filetype-doc {
 }
 
 // old detail view compatibility
+.display-panel-heading {
+	@extend %font-subheading;
+	/*color: color($fg, 'secondary-text');*/
+	border-top: 1px solid color($fg, 'line');
+	padding: dp(8) dp(16);
+	height: dp(56);
+}
+
+
 .go-display-panel {
 	width: 100%;
 	&-heading {
@@ -1848,3 +1863,53 @@ table[id^="comments-ext"] b {
     	padding: 0 dp(4) 0 dp(16);
 	}
 }
+
+
+
+
+
+.x-plupload-body {
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.x-plupload-body dl {
+	padding: 5px;     
+	border-bottom: 1px solid #D0D0D0;
+	font: normal 11px arial,tahoma,verdana,helvetica;
+	width: 100%;
+}
+
+.x-plupload-body dt {
+	float: left;
+	cursor: pointer;
+	display: block;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.plupload_over {
+	background-color: #EFF5FB;
+}
+
+.plupload_selected {
+	background-color: #EFF5FB;
+}
+
+.plupload_emptytext {
+	font: 11px Arial,Helvetica,sans-serif; 
+	vertical-align: middle; 
+	text-align: center;
+}
+
+.plupload_emptytext span {
+	line-height: 100px;
+}
+
+.silk-accept { background-image: url(/img/icons/silk/accept.png) !important; background-repeat: no-repeat; }
+.silk-add { background-image: url(/img/icons/silk/add.png) !important; background-repeat: no-repeat; }
+.silk-cross { background-image: url(/img/icons/silk/cross.png) !important; background-repeat: no-repeat; }
+.silk-stop { background-image: url(/img/icons/silk/stop.png) !important; background-repeat: no-repeat; }
+.silk-arrow-up { background-image: url(/img/icons/silk/arrow_up.png) !important; background-repeat: no-repeat; }
+
+

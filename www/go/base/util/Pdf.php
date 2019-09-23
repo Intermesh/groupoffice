@@ -10,8 +10,8 @@ class Pdf extends Fpdi  {
 		$this->init();
 	}
 	
-	protected $font = 'freesans';
-	protected $font_size=10;
+	public $font = 'freesans';
+	public $font_size=10;
 	
 	public $title="";
 	public $subtitle="";

@@ -52,8 +52,8 @@ abstract class AclEntity extends Entity {
 		//Detect permission changes for AclItemEntities. For example notes that depend on notebook permissions.		
 		$acls = static::findAcls();	
 		if($acls) {
-			$oldAclIds = Acl::wereGranted(GO()->getUserId(), $states[2]['modSeq'], $acls)->all();
-			$currentAclIds = Acl::areGranted(GO()->getUserId(), $acls)->all();
+			$oldAclIds = Acl::wereGranted(go()->getUserId(), $states[2]['modSeq'], $acls)->all();
+			$currentAclIds = Acl::areGranted(go()->getUserId(), $acls)->all();
 			$changedAcls = array_merge(array_diff($oldAclIds, $currentAclIds), array_diff($currentAclIds, $oldAclIds));	
 		}
 		
@@ -128,9 +128,12 @@ abstract class AclEntity extends Entity {
 						->add("permissionLevelUserId", function() {
 							//dummy used in permissionLevel filter.
 						})
+						->add("permissionLevelGroups", function() {
+							//dummy used in permissionLevel filter.
+						})
 						->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filter) {
 			//Permission level is always added to the main query so that it's always applied with AND
-			static::applyAclToQuery($query, $value, $filter['permissionLevelUserId'] ?? null);
+			static::applyAclToQuery($query, $value, $filter['permissionLevelUserId'] ?? null, $filter['permissionLevelGroups'] ?? null);
 		});
 	}
 

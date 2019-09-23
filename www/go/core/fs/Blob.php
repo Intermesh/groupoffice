@@ -102,17 +102,18 @@ class Blob extends orm\Entity {
 	 */
 	public static function getReferences() {
 		
-		$refs = GO()->getCache()->get("blob-refs");
+		$refs = go()->getCache()->get("blob-refs");
 		if(!$refs) {
-			$dbName = GO()->getDatabase()->getName();
-			GO()->getDbConnection()->exec("USE information_schema");
-			//somehow bindvalue didn't work here
-			$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where constraint_schema=" . GO()->getDbConnection()->getPDO()->quote($dbName) . " and referenced_table_name='core_blob' and referenced_column_name = 'id'";
-			$stmt = GO()->getDbConnection()->getPDO()->query($sql);
-			$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);		
-			GO()->getDbConnection()->exec("USE `" . $dbName . "`");			
+			$dbName = go()->getDatabase()->getName();
+			go()->getDbConnection()->exec("USE information_schema");
 			
-			GO()->getCache()->set("blob-refs", $refs);			
+			//somehow bindvalue didn't work here
+			$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . " and referenced_table_name='core_blob' and referenced_column_name = 'id'";
+			$stmt = go()->getDbConnection()->getPDO()->query($sql);
+			$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);		
+			go()->getDbConnection()->exec("USE `" . $dbName . "`");			
+			
+			go()->getCache()->set("blob-refs", $refs);			
 		}		
 		
 		return $refs;
@@ -254,7 +255,7 @@ class Blob extends orm\Entity {
 		
 		//Check if blob is in use.
 		if(!$this->deleteHard && $this->isUsed()) {
-			GO()->debug("Not deleting blob because it's in use");
+			go()->debug("Not deleting blob because it's in use");
 			return true;
 		}
 		
@@ -287,7 +288,7 @@ class Blob extends orm\Entity {
 	 */
 	public function path() {
 		$dir = substr($this->id,0,2) . '/' .substr($this->id,2,2). '/';
-		return GO()->getDataFolder()->getPath() . '/data/'.$dir.$this->id;
+		return go()->getDataFolder()->getPath() . '/data/'.$dir.$this->id;
 	}
 	
 	/**
@@ -306,7 +307,7 @@ class Blob extends orm\Entity {
 	 * @return string
 	 */
 	public static function url($blobId) {
-		return GO()->getSettings()->URL . 'api/download.php?blob=' . $blobId;
+		return go()->getSettings()->URL . 'api/download.php?blob=' . $blobId;
 	}
 	
 	/**
@@ -316,7 +317,7 @@ class Blob extends orm\Entity {
 	 * @return string[] Array of blob ID's
 	 */
 	public static function parseFromHtml($html) {
-		if(!preg_match_all('/<img [^>]*src="[^>]*blob=([^>"]*)"[^>]*>/i', $html, $matches)) {
+		if(!preg_match_all('/<img [^>]*src="[^>]*\?blob=([^>"]*)"[^>]*>/i', $html, $matches)) {
 			return [];
 		}
 		

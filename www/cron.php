@@ -15,7 +15,7 @@ GO::session()->runAsRoot();
 \go\core\model\CronJobSchedule::runNext();
 
 
-GO()->debug("Running cron for legacy framework");
+go()->debug("Running cron for legacy framework");
 
 //old framework
 function findNextCron(){

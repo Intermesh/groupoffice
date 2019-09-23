@@ -210,11 +210,11 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 								create: {clientId : link}
 							}, function (options, success, result) {
 								if (result.notCreated 
-										&& !(result.notCreated.newlink 
-										&& result.notCreated.newlink.validationErrors 
-										&& result.notCreated.newlink.validationErrors.fromEntityId
-										&& result.notCreated.newlink.validationErrors.fromEntityId.code
-										&& result.notCreated.newlink.validationErrors.fromEntityId.code === 11)) {
+										&& !(result.notCreated.clientId 
+										&& result.notCreated.clientId.validationErrors 
+										&& result.notCreated.clientId.validationErrors.toId
+										&& result.notCreated.clientId.validationErrors.toId.code
+										&& result.notCreated.clientId.validationErrors.toId.code === 11)) { //already exists
 									throw "Could not create link";
 								}
 							});

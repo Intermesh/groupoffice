@@ -155,15 +155,19 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 
 		foreach ($properties as $propName) {
 			try {
-				$value = $this->getValue($propName);
-				$arr[$propName] = $this->convertValue($value);
+				$arr[$propName] = $this->propToArray($propName);
 			} catch (NotArrayable $e) {
 				
-				App::get()->debug("Skipped prop " . static::class . "::" . $propName . " because type '" . gettype($value) . "' not scalar or ArrayConvertable.");
+				App::get()->debug("Skipped prop " . static::class . "::" . $propName . " because type it's not scalar or ArrayConvertable.");
 			}
 		}
 		
 		return $arr;
+	}
+
+	protected function propToArray($name) {
+		$value = $this->getValue($name);
+		return $this->convertValue($value);
 	}
 
 	/**
@@ -250,7 +254,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 		} else if($props[$propName]['access'] == \ReflectionProperty::IS_PUBLIC){
 			$this->{$propName} = $this->normalizeValue($propName, $value);
 		}	else if($props[$propName]['getter']) {
-			GO()->warn("Ignoring setting of read only property ". $propName ." for " . static::class);
+			go()->warn("Ignoring setting of read only property ". $propName ." for " . static::class);
 		} else{
 			throw new \Exception("Invalid property ". $propName ." for " . static::class);
 		}

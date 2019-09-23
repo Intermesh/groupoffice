@@ -34,7 +34,7 @@ class File extends FileSystemObject {
 	 * @return static
 	 */
 	public static function tempFile($extension) {
-		 return GO()->getTmpFolder()->getFile(uniqid(time()) . '.' . $extension);
+		 return go()->getTmpFolder()->getFile(uniqid(time()) . '.' . $extension);
 	}
 
 	
@@ -236,14 +236,14 @@ class File extends FileSystemObject {
 		
 		//sometimes these fail and are important to always be right
 		switch($this->getExtension()) {
-			case 'css':
-				return 'text/css';
-			case 'js':
-				return 'application/javascript';
-			case 'json':
-				return 'application/json';
-			default:
-				return mime_content_type($this->getPath());
+			case 'css': 	return 'text/css';
+			case 'js': 		return 'application/javascript';
+			case 'json': 	return 'application/json';
+			case 'csv': 	return 'text/csv';
+			//case 'vcf':		return 'text/vcard';
+			//case 'ics':		return 'text/calendar';
+			case 'eml':		return 'message/rfc822';
+			default: 		return mime_content_type($this->getPath());
 		}		
 		
 	}

@@ -102,3 +102,17 @@ ALTER TABLE `notes_note_book`
 ALTER TABLE `notes_note_custom_fields`
   ADD CONSTRAINT `notes_note_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `notes_note` (`id`) ON DELETE CASCADE;
 
+CREATE TABLE `notes_user_settings` (
+  `userId` int(11) NOT NULL,
+  `defaultNoteBookId` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE `notes_user_settings`
+  ADD PRIMARY KEY (`userId`),
+  ADD KEY `defaultNoteBookId` (`defaultNoteBookId`);
+
+
+ALTER TABLE `notes_user_settings`
+  ADD CONSTRAINT `notes_user_settings_ibfk_1` FOREIGN KEY (`defaultNoteBookId`) REFERENCES `notes_note_book` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `notes_user_settings_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;

@@ -2181,6 +2181,9 @@ go.Modules.register("legacy", 'files', {
 	mainPanel: GO.files.FileBrowser,
 	title: t("Files", "files"),
 	iconCls: 'go-tab-icon-files',
+	customFieldTypes: [
+		"go.modules.community.files.customfield.File"
+	],
 	entities: [{
 			name: "File",
 			links: [

@@ -72,7 +72,7 @@ go.util.Filters = {
 
 			//Last word is the next filter name
 			if (i !== l - 1) {
-				var filterName = words.pop();
+				var filterName = words.pop().toLowerCase();
 			}
 
 			// Not allowed filter name

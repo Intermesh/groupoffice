@@ -216,7 +216,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			$type = static::fromRecord($record);
 			$cls = $type->getClassName();
 			if(!class_exists($cls)) {
-				GO()->warn($cls .' not found!');
+				go()->warn($cls .' not found!');
 				continue;
 			}
 			$i[] = $type;
@@ -315,30 +315,51 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	 * 
 	 * It writes the changes into the 'core_change' table.
 	 * 	 
-	 * @param Query $changedEntities A query object that provides "entityId", "aclId" and "destroyed" in this order!.
+	 * @param Query|array $changedEntities A query object or an array that provides "entityId", "aclId" and "destroyed" 
+	 * in this order. When using an array you may also provide a list of entity ID's. In that case it's assumed that these 
+	 * entites have no ACL and are not destroyed but modified.
+	 * 
 	 */
-	public function changes(Query $changedEntities) {		
+	public function changes($changedEntities) {		
 		
-		GO()->getDbConnection()->beginTransaction();
+		go()->getDbConnection()->beginTransaction();
 		
 		$this->highestModSeq = $this->nextModSeq();		
 		
-		$changedEntities->select('"' . $this->getId() . '", "'. $this->highestModSeq .'", NOW()', true);		
+		if(!is_array($changedEntities)) {
+			$changedEntities->select('"' . $this->getId() . '", "'. $this->highestModSeq .'", NOW()', true);		
+		} else {
+
+			if(empty($changedEntities)) {
+				return;
+			}
+
+			if(!is_array($changedEntities[0])) {
+				$changedEntities = array_map(function($entityId) {
+					return [$entityId, null, 0, $this->getId(), $this->highestModSeq, new DateTime()];
+				}, $changedEntities);
+			} else{
+				$changedEntities = array_map(function($r) {
+					return array_merge($r, [$this->getId(), $this->highestModSeq, new DateTime()]);
+				}, $changedEntities);
+			}
+		}
+		
 		
 		try {
-			$stmt = GO()->getDbConnection()->insert('core_change', $changedEntities, ['entityId', 'aclId', 'destroyed', 'entityTypeId', 'modSeq', 'createdAt']);
+			$stmt = go()->getDbConnection()->insert('core_change', $changedEntities, ['entityId', 'aclId', 'destroyed', 'entityTypeId', 'modSeq', 'createdAt']);
 			$stmt->execute();
 		} catch(\Exception $e) {
-			GO()->getDbConnection()->rollBack();
+			go()->getDbConnection()->rollBack();
 			throw $e;
 		}
 		
 		if(!$stmt->rowCount()) {
 			//if no changes were written then rollback the modSeq increment.
-			GO()->getDbConnection()->rollBack();
+			go()->getDbConnection()->rollBack();
 		} else
 		{
-			GO()->getDbConnection()->commit();
+			go()->getDbConnection()->commit();
 		}				
 	}
 
@@ -366,9 +387,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 				'createdAt' => new DateTime()
 						];
 
-		if(!GO()->getDbConnection()->insert('core_change', $record)->execute()) {
-			throw new \Exception("Could not save change");
-		}
+		go()->getDbConnection()->insert('core_change', $record)->execute();
 	}
 		
 	/**
@@ -379,7 +398,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	 */
 	public function checkChange(Entity $entity) {
 		
-//		GO()->debug($entity->getClientName(). ' checkChange() ' . $entity->getId() . 'mod: '.implode(', ', array_keys($entity->getModified())));
+//		go()->debug($entity->getClientName(). ' checkChange() ' . $entity->getId() . 'mod: '.implode(', ', array_keys($entity->getModified())));
 		
 		if(!$entity->isDeleted()) {
 			$modifiedPropnames = array_keys($entity->getModified());		
@@ -407,10 +426,10 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			$where = [
 					'entityTypeId' => $this->id,
 					'entityId' => $entity->id(),
-					'userId' => GO()->getUserId()
+					'userId' => go()->getUserId()
 							];
 			
-			$stmt = GO()->getDbConnection()->delete('core_change_user', $where);
+			$stmt = go()->getDbConnection()->delete('core_change_user', $where);
 			if(!$stmt->execute()) {
 				throw new \Exception("Could not delete user change");
 			}
@@ -419,26 +438,23 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	
 	private function userChange(Entity $entity) {
 		$data = [
-				'modSeq' => $this->nextUserModSeq()			
-						];
-
-		$where = [
+				'modSeq' => $this->nextUserModSeq(),						
 				'entityTypeId' => $this->id,
 				'entityId' => $entity->id(),
-				'userId' => GO()->getUserId()
+				'userId' => go()->getUserId()
 						];
 
-		$stmt = GO()->getDbConnection()->update('core_change_user', $data, $where);
+		$stmt = go()->getDbConnection()->replace('core_change_user', $data);
 		if(!$stmt->execute()) {
 			throw new \Exception("Could not save user change");
 		}
 
-		if(!$stmt->rowCount()) {
-			$where['modSeq'] = 1;
-			if(!GO()->getDbConnection()->insert('core_change_user', $where)->execute()) {
-				throw new \Exception("Could not save user change");
-			}
-		}
+		// if(!$stmt->rowCount()) {
+		// 	$where['modSeq'] = 1;
+		// 	if(!go()->getDbConnection()->insert('core_change_user', $where)->execute()) {
+		// 		throw new \Exception("Could not save user change");
+		// 	}
+		// }
 	}
 	
 	/**
@@ -451,7 +467,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			$this->highestUserModSeq = (int) (new Query())
 						->selectSingleValue("highestModSeq")
 						->from("core_change_user_modseq")
-						->where(["entityTypeId" => $this->id, "userId" => GO()->getUserId()])
+						->where(["entityTypeId" => $this->id, "userId" => go()->getUserId()])
 						->single();					
 		}
 		return $this->highestUserModSeq;
@@ -512,7 +528,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		$modSeq = (new Query())
 			->selectSingleValue("highestModSeq")
 			->from("core_change_user_modseq")
-			->where(["entityTypeId" => $this->id, "userId" => GO()->getUserId()])
+			->where(["entityTypeId" => $this->id, "userId" => go()->getUserId()])
 			->forUpdate()
 			->single();
 
@@ -524,7 +540,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 										[
 												'highestModSeq' => $modSeq,
 												"entityTypeId" => $this->id,
-												"userId" => GO()->getUserId()
+												"userId" => go()->getUserId()
 										]
 						)->execute(); //mod seq is a global integer that is incremented on any entity update
 	
@@ -554,16 +570,16 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		
 		if(!isset($this->defaultAclId)) {
 			
-			GO()->getDbConnection()->beginTransaction();
+			go()->getDbConnection()->beginTransaction();
 			
 			$acl = $this->createAcl();
 			
-			if(!GO()->getDbConnection()->update('core_entity', ['defaultAclId' => $acl->id], ['id' => $this->getId()])->execute()) {
-				GO()->getDbConnection()->rollBack();
+			if(!go()->getDbConnection()->update('core_entity', ['defaultAclId' => $acl->id], ['id' => $this->getId()])->execute()) {
+				go()->getDbConnection()->rollBack();
 				throw new \Exception("Could not save defaultAclId");
 			}
 			
-			GO()->getDbConnection()->commit();
+			go()->getDbConnection()->commit();
 			
 			$this->defaultAclId = $acl->id;
 		}

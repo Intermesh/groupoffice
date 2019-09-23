@@ -17,7 +17,9 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	maximizable:true,
 	iconCls: 'ic-settings',
 	title: t("My account"),
+	width: dp(1000),
 	currentUserId:null,
+	user: null,
 
 	initComponent: function () {		
 		
@@ -64,7 +66,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		this.navMenu = new go.NavMenu({
 			region:'west',
-			width:dp(216),
+			width:dp(300),
 			store:this.tabStore,
 			listeners: {
 				selectionchange: function(view, nodes) {					
@@ -104,7 +106,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		this.addPanel(go.usersettings.AccountSettingsPanel);
 		this.addPanel(go.usersettings.LookAndFeelPanel);
 		
-		this.loadModulePanels();
+		// this.loadModulePanels();
 		
 		var customFieldSets = go.customfields.CustomFields.getFormFieldSets("User").filter(function(fs){return fs.fieldSet.isTab;})
 		customFieldSets.forEach(function(fs){
@@ -136,6 +138,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			config = go.Modules.getConfig(available[i].package, available[i].name);
 			
 			if(!config.userSettingsPanels) {
+				continue;			
+			}
+
+			if(!go.Modules.isAvailable(available[i].package, available[i].name, go.permissionLevels.read, this.user)) {
 				continue;
 			}
 			
@@ -144,6 +150,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 				this.addPanel(pnl);
 			}
 		}
+
+		this.doLayout();
 	},
 	
 	/**
@@ -331,8 +339,11 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			me.fireEvent('loadstart',me, me.currentUserId);
 
 			go.Db.store("User").get([me.currentUserId], function(users){
-				me.formPanel.getForm().setValues(users[0]);
+				me.user = users[0];
+				me.loadModulePanels();
 
+				me.formPanel.getForm().setValues(users[0]);
+				
 				me.findBy(function(cmp,cont){
 					if(typeof cmp.onLoad === 'function') {
 						cmp.onLoad(users[0]);
@@ -359,6 +370,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 
 		return this;
 	},
+
 	
 	/**
 	 * call this function when loading of all tabs is completed

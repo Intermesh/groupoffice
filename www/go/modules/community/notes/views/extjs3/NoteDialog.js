@@ -16,7 +16,9 @@ go.modules.community.notes.NoteDialog = Ext.extend(go.form.Dialog, {
 		var items = [{
 				xtype: 'fieldset',
 				anchor: fieldSetAnchor,
-				items: [new go.modules.community.notes.NoteBookCombo(),
+				items: [new go.modules.community.notes.NoteBookCombo({
+					value: go.User.notesSettings.defaultNoteBookId 
+				}),
 					{
 						xtype: 'textfield',
 						name: 'name',

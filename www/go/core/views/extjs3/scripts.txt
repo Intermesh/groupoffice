@@ -30,11 +30,16 @@ Window.js
 form/EntityPanel.js
 form/MultiEntityDialog.js
 form/Dialog.js
+<<<<<<< HEAD
+=======
+form/CheckboxGroup.js
+>>>>>>> origin/master
 form/PasswordGeneratorField.js
 form/DateField.js
 form/DateTimeField.js
 form/TimeField.js
 form/FileField.js
+form/ImageField.js
 form/FileButtonField.js
 form/ComboBox.js
 form/ComboBoxReset.js
@@ -71,6 +76,7 @@ login/UsernamePanel.js
 login/LoginPanel.js
 login/RecoveryDialog.js
 
+links/LinkDetailWindow.js
 links/LinkBrowserMenuItem.js
 links/CreateLinkButton.js
 links/EntityGrid.js
@@ -92,6 +98,7 @@ util.js
 util/Format.js
 util/Filters.js
 util/Cookies.js
+util/SelectDialog.js
 
 User.js
 String.js
@@ -155,6 +162,7 @@ users/CreateUserWizard.js
 users/UserGroupGrid.js
 users/UserCombo.js
 users/UserSettingsWorkingWeek.js
+users/SelectDialogPanel.js
 
 customfields/FormFieldSet.js
 customfields/FieldDialog.js

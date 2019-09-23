@@ -68,7 +68,7 @@ return array (
     'NEEDS-ACTION' => 'Occorre intervento',
     'ACCEPTED' => 'Accettato',
     'DECLINED' => 'Rifiutato',
-    'TENTATIVE' => 'Cercherà  dâesserci',
+    'TENTATIVE' => 'Cercherà  d\'esserci',
     'DELEGATED' => 'Delegato',
     'COMPLETED' => 'Completato',
     'IN-PROCESS' => 'In elaborazione',

@@ -15,7 +15,7 @@ go.tools.SystemSettingsTools = Ext.extend(Ext.Panel,{
 	
 	initComponent: function() {
 
-		this.title = t("Admin tools", "tools")
+		this.title = t("Tools")
 
 		this.runPanel = new Ext.ux.IFrameComponent();
 		this.runWindow = new Ext.Window({
@@ -38,7 +38,7 @@ go.tools.SystemSettingsTools = Ext.extend(Ext.Panel,{
 		var tools = [
 			[t('System check'),'', 'install/gotest.php'],
 			[t('Database check'),'', GO.url('maintenance/checkDatabase') ],
-			[t('Create search index'),'', GO.url('maintenance/buildSearchCache') ],
+			[t('Update search index'),'', GO.url('maintenance/buildSearchCache') ],
 			[t('Remove duplicate contacts and events'),'', GO.url('maintenance/removeDuplicates') ]
 		];
 		if(go.Modules.isAvailable(null,'files')) {

@@ -630,6 +630,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				
 				if(!success) {
 					this.fireEvent("error", options, response);
+					if(cb) {
+						cb.call(scope || this, options, success, response);
+					}
 					return;
 				}
 				

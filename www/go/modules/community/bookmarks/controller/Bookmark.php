@@ -3,11 +3,8 @@ namespace go\modules\community\bookmarks\controller;
 
 use go\core\jmap\EntityController;
 use go\modules\community\bookmarks\model;
-use go\core\App;
-use go\core\jmap\State;
 use go\core\fs\Blob;
-use go\core\http\Response;
-use go\core\http\Request;
+use go\core\util\StringUtil;
 
 /**
  * The controller for the Bookmark entity
@@ -149,8 +146,8 @@ class Bookmark extends EntityController {
 			}
 		}
 		
-		$response['title']=\GO\Base\Util\StringHelper::cut_string($response['title'], 64, true, "");
-		$response['description']=\GO\Base\Util\StringHelper::cut_string($response['description'], 255, true, "");
+		$response['title'] = StringUtil::cutString($response['title'], 64, true, "");
+		$response['description'] = StringUtil::cutString($response['description'], 255, true, "");
 		return $response;
 	}
 
@@ -160,7 +157,7 @@ class Bookmark extends EntityController {
 	 */
 	public static function updateLogos() {
 
-		$results = GO()->getDbConnection()->select("*")->from("bm_bookmarks")->where('category_id IN (select id from bookmarks_category)');
+		$results = go()->getDbConnection()->select("*")->from("bm_bookmarks")->where('category_id IN (select id from bookmarks_category)');
 
 		foreach($results as $result) {
 			$data = [];
@@ -176,9 +173,9 @@ class Bookmark extends EntityController {
 			$publicIcon = $result["public_icon"];
 
 			if($publicIcon == 0) {
-				$file = \GO()->getDataFolder()->getFile($data['logo']);
+				$file = \go()->getDataFolder()->getFile($data['logo']);
 			} else {
-				$file = \GO()->getEnvironment()->getInstallFolder()->getFile("modules/bookmarks/" . $data['logo']);
+				$file = \go()->getEnvironment()->getInstallFolder()->getFile("modules/bookmarks/" . $data['logo']);
 			}
 
 			if($file->exists()) {
@@ -190,7 +187,7 @@ class Bookmark extends EntityController {
 			} else{
 				unset($data['logo']);
 			}
-			GO()->getDbConnection()->replace('bookmarks_bookmark', $data)->execute();
+			go()->getDbConnection()->replace('bookmarks_bookmark', $data)->execute();
 		}
 	}
 }

@@ -47,7 +47,7 @@ class MultiSelect extends Select {
 			KEY `optionId` (`optionId`)
 		) ENGINE=InnoDB;";
 
-		if(!GO()->getDbConnection()->query($sql)) {
+		if(!go()->getDbConnection()->query($sql)) {
 			return false;
 		}
 
@@ -55,7 +55,7 @@ class MultiSelect extends Select {
 			ADD CONSTRAINT `" . $this->getMultiSelectTableName() . "_ibfk_1` FOREIGN KEY (`id`) REFERENCES `" . $this->field->tableName() . "` (`id`) ON DELETE CASCADE,
 		  ADD CONSTRAINT `" . $this->getMultiSelectTableName() . "_ibfk_2` FOREIGN KEY (`optionId`) REFERENCES `core_customfields_select_option` (`id`) ON DELETE CASCADE;";
 
-		return GO()->getDbConnection()->query($sql);
+		return go()->getDbConnection()->query($sql);
 	}
 	
 	
@@ -74,7 +74,7 @@ class MultiSelect extends Select {
 		}
 		
 		foreach($this->optionsToSave as $optionId) {
-			if(!GO()->getDbConnection()->replace($this->getMultiSelectTableName(), ['id' => $customFieldData['id'], 'optionId' => $optionId])->execute()) {
+			if(!go()->getDbConnection()->replace($this->getMultiSelectTableName(), ['id' => $customFieldData['id'], 'optionId' => $optionId])->execute()) {
 				return false;
 			}
 		}
@@ -85,7 +85,7 @@ class MultiSelect extends Select {
 			 $query	->andWhere('optionId', 'not in', $this->optionsToSave);
 		}
 		
-		if(!GO()->getDbConnection()->delete($this->getMultiSelectTableName(), $query)->execute()) {
+		if(!go()->getDbConnection()->delete($this->getMultiSelectTableName(), $query)->execute()) {
 			return false;
 		}
 		
@@ -124,7 +124,7 @@ class MultiSelect extends Select {
 	}
 
 	public function onFieldDelete() {
-		return GO()->getDbConnection()->query("DROP TABLE IF EXISTS `" . $this->getMultiSelectTableName() . "`;");
+		return go()->getDbConnection()->query("DROP TABLE IF EXISTS `" . $this->getMultiSelectTableName() . "`;");
 	}
 	
 	private static $joinCount = 0;
@@ -144,15 +144,23 @@ class MultiSelect extends Select {
 	public function defineFilter(Filters $filters) {
 		
 		
-		$filters->add($this->field->databaseName, function(Criteria $criteria, $value, Query $query, array $filter){
+		$filters->addText($this->field->databaseName, function(Criteria $criteria, $comparator, $value, Query $query, array $filter){
 			
-			//if(!$query->isJoined($this->getMultiSelectTableName())){
-				$cls = $query->getModel();
-				$primaryTableAlias = array_values($cls::getMapping()->getTables())[0]->getAlias();
-				$joinAlias = $this->getJoinAlias();
-				$query->join($this->getMultiSelectTableName(), $joinAlias, $joinAlias.'.id = '.$primaryTableAlias.'.id');
-			//}
-			$criteria->where($joinAlias. '.optionId', '=', $value);
+			$cls = $query->getModel();
+			$primaryTableAlias = array_values($cls::getMapping()->getTables())[0]->getAlias();
+			$joinAlias = $this->getJoinAlias();
+			$query->join($this->getMultiSelectTableName(), $joinAlias, $joinAlias.'.id = '.$primaryTableAlias.'.id');
+
+			if(isset($value[0]) && is_numeric($value[0])) {
+				//When field option ID is passed by a saved filter
+				$criteria->where($joinAlias. '.optionId', '=', $value);
+			} else{
+				//for text queries we must join the options.
+				$alias = 'opt_' . uniqid();
+				$query->join('core_customfields_select_option', $alias, $alias . '.id = '.$joinAlias. '.optionId');
+				$criteria->where($alias . '.text', $comparator, $value);
+			}	
+			
 		});
 	}
 

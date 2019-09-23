@@ -7,6 +7,7 @@ use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\model\UserGroup;
 use go\core\orm\Query;
+use go\core\util\ArrayObject;
 use go\core\validate\ErrorCode;
 
 /**
@@ -94,12 +95,12 @@ class Group extends AclOwnerEntity {
 	protected function internalValidate()
 	{
 		if($this->id === self::ID_ADMINS && !in_array(1, $this->users)) {
-			$this->setValidationError('users', ErrorCode::FORBIDDEN, GO()->t("You can't remove the admin user from the administrators group"));
+			$this->setValidationError('users', ErrorCode::FORBIDDEN, go()->t("You can't remove the admin user from the administrators group"));
 		}
 
 		if($this->isUserGroupFor && !in_array($this->isUserGroupFor, $this->users))
 		{
-			$this->setValidationError('users', ErrorCode::FORBIDDEN, GO()->t("You can't remove the group owner from the group"));
+			$this->setValidationError('users', ErrorCode::FORBIDDEN, go()->t("You can't remove the group owner from the group"));
 		}
 
 		return parent::internalValidate();
@@ -122,7 +123,7 @@ class Group extends AclOwnerEntity {
 
 	protected function canCreate()
 	{
-		return GO()->getAuthState()->getUser(['id'])->isAdmin();
+		return go()->getAuthState()->isAdmin();
 	}
 	
 	private function setDefaultPermissions() {
@@ -147,7 +148,8 @@ class Group extends AclOwnerEntity {
 
 
 	public function getModules() {
-		$modules = [];
+		$modules = new ArrayObject();
+		$modules->serializeJsonAsObject = true;
 
 		$mods = Module::find()
 							->select('id,level')
@@ -175,11 +177,36 @@ class Group extends AclOwnerEntity {
 
 		foreach($this->setModules as $moduleId => $level) {
 			$module = Module::findById($moduleId);
+			if(!$module) {
+				throw new \Exception("Module with ID " . $moduleId . " not found");
+			}
 			$module->setAcl([
 				$this->id => $level
 			]);
 			$module->save();
 		}
+	}
+
+	public static function findPersonalGroupID($userId) {
+		$groupId = Group::find()
+							->where(['isUserGroupFor' => $userId])
+							->selectSingleValue('id')
+							->single();
+		if($groupId) {
+			return $groupId;
+		}
+		$user = User::findById($userId, ['username']);
+		$personalGroup = new Group();
+		$personalGroup->name = $user->username;
+		$personalGroup->isUserGroupFor = $userId;
+		$personalGroup->users[] = $userId;
+		
+		if(!$personalGroup->save()) {
+			throw new \Exception("Could not create personal group");
+		}
+
+		return $personalGroup->id;
+		
 	}
 
 }

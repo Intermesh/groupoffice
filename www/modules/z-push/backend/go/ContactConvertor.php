@@ -38,22 +38,28 @@ class ContactConvertor {
 	public function __construct() {
 
 		$this->phoneMapping = [
-				PhoneNumber::TYPE_WORK => [
-						["number" => "businessphonenumber"],
-						["number" => "business2phonenumber"],
-						["number" => "companymainphone"]
-				],
-				PhoneNumber::TYPE_FAX => [
-						["number" => "businessfaxnumber"]
-				],
-				PhoneNumber::TYPE_MOBILE => [
-						["number" => "mobilephonenumber"],
-						["number" => "carphonenumber"]
-				],
-				PhoneNumber::TYPE_HOME => [
-						["number" => "homephonenumber"],
-						["number" => "home2phonenumber"]
-				],
+			PhoneNumber::TYPE_WORK => [
+				["number" => "businessphonenumber"],
+				["number" => "companymainphone"]
+			],
+			PhoneNumber::TYPE_WORK_MOBILE => [
+				["number" => "business2phonenumber"],
+				["number" => "businessphonenumber"]
+			],
+			PhoneNumber::TYPE_FAX => [
+				["number" => "homefaxnumber"]
+			],
+			PhoneNumber::TYPE_WORK_FAX => [
+				["number" => "businessfaxnumber"]
+			],
+			PhoneNumber::TYPE_MOBILE => [
+				["number" => "mobilephonenumber"],
+				["number" => "carphonenumber"]
+			],
+			PhoneNumber::TYPE_HOME => [
+				["number" => "homephonenumber"],
+				["number" => "home2phonenumber"]
+			],
 		];
 
 		$this->dateMapping = [
@@ -248,7 +254,7 @@ class ContactConvertor {
 	 * Uses the mapping to convert AS properties to has many array values.
 	 * 
 	 * eg. "homephone" -> ['type' => 'home', 'number' => 1234']
-	 * @param type $m
+	 * @param array $m
 	 * @param type $message
 	 * @return boolean
 	 */
@@ -321,7 +327,7 @@ class ContactConvertor {
 	public function AS2GO(SyncContact $message, Contact $contact, $contentParameters) {
 		
 		try {
-			GO()->getDbConnection()->beginTransaction();
+			go()->getDbConnection()->beginTransaction();
 			
 			foreach($this->simpleMapping as $goProp => $asProp) {
 				$contact->$goProp = $message->$asProp;
@@ -366,15 +372,15 @@ class ContactConvertor {
 			
 			$this->setOrganizations( $message, $contact);
 			
-			GO()->getDbConnection()->commit();
+			go()->getDbConnection()->commit();
 			
 			return $contact;
 			
 		} catch(Exception $e) {
-			ZLog::Write(LOGLEVEL_ERROR, "Failed to save contact: ".var_export(GO()->getDebugger()->getEntries(), true));
+			ZLog::Write(LOGLEVEL_ERROR, "Failed to save contact: ".var_export(go()->getDebugger()->getEntries(), true));
 			ZLog::Write(LOGLEVEL_DEBUG, $e->getTraceAsString());
 			
-			GO()->getDbConnection()->rollBack();
+			go()->getDbConnection()->rollBack();
 		}
 		
 		return false;
@@ -438,7 +444,7 @@ class ContactConvertor {
 		$addressbook = AddressBook::find()
 						->join('sync_addressbook_user', 'su', 'su.addressBookId = a.id')
 						->filter(['permissionLevel' => Acl::LEVEL_WRITE])
-						->where('su.userId', '=', GO()->getAuthState()->getUserId())
+						->where('su.userId', '=', go()->getAuthState()->getUserId())
 						->single();
 
 		if (!$addressbook)

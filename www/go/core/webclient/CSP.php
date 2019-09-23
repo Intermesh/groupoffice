@@ -3,11 +3,22 @@ namespace go\core\webclient;
 
 use go\core\jmap\Request;
 use go\core\jmap\Response;
+use go\core\SingletonTrait;
 
-/*
- groupoffices: groupoffice:"
-*/
+/**
+ * Content Security Policy for webclients
+ * 
+ * You can extend this with {@see App::EVENT_HEAD}:
+ * 
+ * go()->on(App::EVENT_HEAD, Example::class, 'onHead');
+ * 
+ * public static function onHead() {
+ *  CSP::get()->add(...)
+ * }
+ */
 class CSP {
+
+  use SingletonTrait;
 
   private $data = [];
 
@@ -15,6 +26,7 @@ class CSP {
   {
     $this->add("default-src", Request::get()->getHost())
     ->add("default-src", "'self'")
+    ->add("font-src", "'self'")
     ->add('font-src', Request::get()->getHost())
     ->add('font-src', "data:")
     ->add("script-src", Request::get()->getHost())

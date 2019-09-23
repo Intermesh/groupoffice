@@ -19,7 +19,7 @@ Ext.ux.PluploadPanel = Ext.extend(Ext.Panel, {
                 '<dl id="{id}">',
                     '<dt style="width: 50%">{name}</dt>',
                     '<dt style="width: 15%">{size:fileSize}</dt>',
-                    '<tpl exec="this.statusValue(status, percent, msg)"></tpl><dt style="width: 35%">{this.statusText}</dt>',
+                    '<tpl exec="this.statusValue(status, percent, msg)"></tpl><dt style="width: 35%">{this.statusText:raw}</dt>',
                     '<div class="x-clear"></div>',
                 '</dl>',
             '</tpl>',

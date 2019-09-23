@@ -12,7 +12,8 @@ use go\core\db\Connection;
 use go\core\db\Database;
 use go\core\db\Query;
 use go\core\db\Table;
-use go\core\event\Listeners;
+    use go\core\event\EventEmitterTrait;
+    use go\core\event\Listeners;
 use go\core\exception\ConfigurationException;
 use go\core\fs\Folder;
 use go\core\jmap\State;
@@ -37,6 +38,20 @@ use const GO_CONFIG_FILE;
 	class App extends Module {
 		
 		use SingletonTrait;
+
+		use EventEmitterTrait;
+
+
+		/**
+		 * Fires when the application is loaded in the <head></head> section of the webclient.
+		 * Can also be used to adjust the Content Security Policy
+		 */
+		const EVENT_HEAD = 'head';
+
+		/**
+		 * Fires after all scripts have been loaded
+		 */
+		const EVENT_SCRIPTS = 'scripts';
 
 		/**
 		 *
@@ -107,6 +122,16 @@ use const GO_CONFIG_FILE;
 				$this->version = require(Environment::get()->getInstallFolder()->getPath() . '/version.php');
 			}
 			return $this->version;
+		}
+
+		/**
+		 * Major version
+		 * 
+		 * @return string eg. 6.4
+		 */
+		public function getMajorVersion() {
+			
+			return substr($this->getVersion(), 0, strrpos($this->getVersion(), '.') );
 		}
 
 		private function initCompatibility() {
@@ -294,7 +319,9 @@ use const GO_CONFIG_FILE;
 									"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
 									"debug" => $config['debug'] ?? null,
 									
-									"servermanager" => $config['servermanager'] ?? false
+									"servermanager" => $config['servermanager'] ?? false,
+
+									"sseEnabled" => $config['sseEnabled'] ?? true
 							],
 							"db" => [
 									"host" => ($config['db_host'] ?? "localhost"),
@@ -430,10 +457,10 @@ use const GO_CONFIG_FILE;
 			if($lock->lock()) {
 				\GO::clearCache(); //legacy
 
-				GO()->getCache()->flush(false);
+				go()->getCache()->flush(false);
 				Table::destroyInstances();
 
-				$webclient = new Extjs3();
+				$webclient = Extjs3::get();
 				$webclient->flushCache();
 
 				Observable::cacheListeners();
@@ -528,7 +555,7 @@ use const GO_CONFIG_FILE;
 		 * If you need to get the full user use:
 		 * 
 		 * ```
-		 * GO()->getAuthState()->getUser();
+		 * go()->getAuthState()->getUser();
 		 * ```
 		 * @return int
 		 */
@@ -639,10 +666,10 @@ use const GO_CONFIG_FILE;
 		 */
 		public function resetSyncState() {		
 			//reset all mod seqs
-			GO()->getDbConnection()->update('core_entity', ['highestModSeq' => 0])->execute();
-			GO()->getDbConnection()->exec("TRUNCATE TABLE core_change");
-			GO()->getDbConnection()->exec("TRUNCATE TABLE core_acl_group_changes");
-			GO()->getDbConnection()->insert('core_acl_group_changes', (new Query())->select("null, aclId, groupId, '0', null")->from("core_acl_group"))->execute();
+			go()->getDbConnection()->update('core_entity', ['highestModSeq' => 0])->execute();
+			go()->getDbConnection()->exec("TRUNCATE TABLE core_change");
+			go()->getDbConnection()->exec("TRUNCATE TABLE core_acl_group_changes");
+			go()->getDbConnection()->insert('core_acl_group_changes', (new Query())->select("null, aclId, groupId, '0', null")->from("core_acl_group"))->execute();
 		}
 
 		/**
@@ -653,23 +680,23 @@ use const GO_CONFIG_FILE;
 		public function downloadModuleIcon($package, $name) {
 
 			if($package == "legacy") {
-				$file = GO()->getEnvironment()->getInstallFolder()->getFile('modules/' . $name .'/themes/Default/images/'.$name.'.png');
+				$file = go()->getEnvironment()->getInstallFolder()->getFile('modules/' . $name .'/themes/Default/images/'.$name.'.png');
 				if(!$file->exists()) {
-					$file = GO()->getEnvironment()->getInstallFolder()->getFile('modules/' . $name .'/views/Extjs3/themes/Default/images/'.$name.'.png');
+					$file = go()->getEnvironment()->getInstallFolder()->getFile('modules/' . $name .'/views/Extjs3/themes/Default/images/'.$name.'.png');
 				}	
 
 				if(!$file->exists()) {
-					$file = GO()->getEnvironment()->getInstallFolder()->getFile('modules/' . $name .'/themes/Default/'.$name.'.png');
+					$file = go()->getEnvironment()->getInstallFolder()->getFile('modules/' . $name .'/themes/Default/'.$name.'.png');
 				}	
 
 				
 
 			} else {
-				$file = GO()->getEnvironment()->getInstallFolder()->getFile('go/modules/' . $package . '/' . $name .'/icon.png');	
+				$file = go()->getEnvironment()->getInstallFolder()->getFile('go/modules/' . $package . '/' . $name .'/icon.png');	
 			}
 
 			if(!$file->exists()) {
-				$file = GO()->getEnvironment()->getInstallFolder()->getFile('views/Extjs3/themes/Paper/img/default-avatar.svg');
+				$file = go()->getEnvironment()->getInstallFolder()->getFile('views/Extjs3/themes/Paper/img/default-avatar.svg');
 			}
 			$file->output(true, true, ['Content-Disposition' => 'inline; filename="module.svg"']);
 		}

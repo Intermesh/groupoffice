@@ -1,0 +1,22 @@
+<?php
+return array (
+  'Bookmark' => 'Отметка',
+  'Category' => 'Категория',
+  'Title' => 'Наименование',
+  'Logo' => 'Лого',
+  'Open in new browser tab' => 'Отваряне в нов раздел на браузъра',
+  'Administrate categories' => 'Административни категории',
+  'Thumbnails' => 'Миниатюри',
+  'Choose icon for bookmark' => 'Избор на икона за отметката',
+  'Clear Logo' => 'Премахни лого',
+  'Upload Logo' => 'Качи лого',
+  'Show all' => 'Покажи всички',
+  'Shared category' => 'Споделена категория',
+  'Behave as a module (Browser reload required)' => 'Да се изпълни, като модул (Изисква се рефреш на браузъра)',
+  'Are you sure you want to delete this bookmark?' => 'Сигурни ли сте, че искате да изтриете тази отметка?',
+  'General' => 'Общи',
+  'Search the web' => 'Търсене в глобалната мрежа',
+  'name' => 'Отметки',
+  'description' => 'Пояснение за уебсайта.',
+  'Bookmarks' => 'Отметки',
+);

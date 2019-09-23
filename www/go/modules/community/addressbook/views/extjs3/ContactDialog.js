@@ -132,24 +132,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 								style: "padding-left: " + dp(16) + "px",
 								layout: "form",
 								items: [
-									this.avatarComp = new go.form.FileField({
-										hideLabel: true,
-										buttonOnly: true,
-										name: 'photoBlobId',
-										height: dp(120),
-										cls: "avatar",
-										autoUpload: true,
-										buttonCfg: {
-											text: '',
-											width: dp(120)
-										},
-										setValue: function (val) {
-											if (this.rendered && !Ext.isEmpty(val)) {
-												this.wrap.setStyle('background-image', 'url(' + go.Jmap.downloadUrl(val) + ')');
-											}
-											go.form.FileField.prototype.setValue.call(this, val);
-										},
-										accept: 'image/*'
+									this.avatarComp = new go.form.ImageField({			
+										name: 'photoBlobId'										
 									})
 								]
 							}
@@ -226,6 +210,13 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 				]
 			}
 		];
+
+		var me = this;
+
+		// this.avatarComp.menu.items.item(1).setHandler( this.avatarComp.menu.items.item(1).handler.createSequence(function() {
+		// 	window.open("https://www.google.com/search?q=" + encodeURIComponent(me.getValues()['name']) + "&tbm=isch");
+		// }), this.avatarComp);
+
 
 		this.addPanel(new Ext.Panel({
 			layout: 'fit',

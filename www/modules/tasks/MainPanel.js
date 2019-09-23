@@ -251,7 +251,7 @@ Ext.extend(GO.tasks.MainPanel, Ext.Panel,{
 		},this);
 
 		var requests = {
-			tasklists:{r:"tasks/tasklist/store"},				
+			tasklists:{r:"tasks/tasklist/store", limit: GO.settings.config.nav_page_size},				
 			categories:{r:"tasks/category/store"}
 		}
 
