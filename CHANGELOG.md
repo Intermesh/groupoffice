@@ -3,6 +3,8 @@
 - Users: Only show module tabs in user dialog where this user has access to
 - Notes: Default note book setting and every user gets a personal note book
 - Sync: settings use default notebook and address book by default
+- Newsletters: Create filter based on address lists in address book
+- Newsletters: Add contact to address list in edit dialog of contact
 
 19-09-2019 6.4.57
 - Custom fields: Query language works with text for select and multiselect
