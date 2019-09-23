@@ -2195,7 +2195,32 @@ go.Modules.register("legacy", 'calendar', {
 				},
 				linkDetail: function() {
 					return new GO.calendar.EventPanel();
-				}					
+				},
+				linkDetailCards: function() {
+					var forth = new go.links.DetailPanel({
+						link: {
+							title: t("Forthcoming events"),
+							iconCls: 'icon ic-event',
+							entity: "Event",
+							filter: null
+						}
+					});
+
+					forth.store.setFilter('forthcomming', {forthComingEvents: true});
+
+					var past = new go.links.DetailPanel({						
+						link: {
+							title: t("Past events"),
+							iconCls: 'icon ic-event',
+							entity: "Event",
+							filter: null
+						}
+					});
+
+					past.store.setFilter('past', {pastEvents: true});
+
+					return [forth, past];
+				}				
 		}],
 		customFields: {
 			fieldSetDialog: "GO.calendar.CustomFieldSetDialog"

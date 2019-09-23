@@ -35,7 +35,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 		var tpl = new Ext.XTemplate('<div class="icons"><tpl for=".">\
 				<p data-id="{id}">\
 				<tpl if="xindex === 1">\
-					<i class="label ' + this.link.iconCls + ' hide-on-hover" ext:qtip="{toEntity}"></i>\
+					<i class="label ' + this.link.iconCls + '" ext:qtip="{toEntity}"></i>\
 				</tpl>\
 				<tpl for="to">\
 				<a>{name}</a>\
@@ -150,10 +150,18 @@ go.links.getDetailPanels = function() {
 	
 	var panels = [];
 	
-	go.Entities.getLinkConfigs().forEach(function (e) {		
-		panels.push(new go.links.DetailPanel({
-			link: e
-		}));
+	go.Entities.getLinkConfigs().forEach(function (e) {
+		if(e.linkDetailCards) {
+			var clss = e.linkDetailCards();
+			if(!Ext.isArray(clss)) {
+				clss = [clss];
+			}
+			panels = panels.concat(clss);
+		} else {
+			panels.push(new go.links.DetailPanel({
+				link: e
+			}));
+		}
 	});
 	
 	return panels;
