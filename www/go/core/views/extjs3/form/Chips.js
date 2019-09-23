@@ -41,6 +41,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	name: null,
 	displayField: "name",
 	valueField: "id",
+	map: false,
 	entityStore: null,
 	comboStore: null,
 	store: null,
@@ -127,7 +128,11 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	setValue: function (values) {
 		
 		if(this.entityStore) {	
-				this.entityStore.get(values, function (entities) {				
+			var ids = this.map ? Object.keys(values) : values;
+
+			this.mapValues = values;
+
+			this.entityStore.get(ids, function (entities) {				
 					this.dataView.store.loadData({records: entities}, true);
 					this._isDirty = false;
 			}, this);
@@ -147,10 +152,21 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		
 	},
 	getValue: function () {		
-		var records = this.dataView.store.getRange(), me = this, v = [];
-		records.forEach(function(r) {
-			v.push(r.get(me.valueField));
-		});
+		var records = this.dataView.store.getRange(), me = this;
+
+		if(this.map) {
+			var v = {}, id;
+			records.forEach(function(r) {
+				id = r.get(me.valueField);
+				v[id] = me.mapValues[id] || true;
+			});
+		} else{
+			var v = [];
+			records.forEach(function(r) {
+				v.push(r.get(me.valueField));
+			});
+		}
+		
 		
 		return v;
 		
@@ -199,6 +215,12 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		}
 		
 		this.comboBox = new go.form.ComboBox({
+			listeners: {
+				focus: function(combo){
+						combo.onTriggerClick();
+				}
+			},
+			lazyInit: false,
 			hideLabel: true,
 			anchor: '100%',
 			emptyText: t("Please select..."),
