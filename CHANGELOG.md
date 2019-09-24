@@ -1,4 +1,5 @@
 24-09-2019 6.4.59
+- Google Authenticator: Fixed problem where it would enable when saving user
 - Calendar: brought back forthcoming and past events
 - Tasks: incomplete and completed tasks separate
 - Address book: Users address book was filled with empty contacts
