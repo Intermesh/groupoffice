@@ -101,14 +101,14 @@ abstract class AbstractConverter {
 					$entity->setValues($params['values']);
 				}
 
+				go()->getDbConnection()->beginTransaction();
+
 				$entity = $this->importEntity($entity, $fp, $index++, $params);
 				
 				//ignore when false is returned. This is not an error. But intentional. Like CSV skipping a blank line for example.
 				if($entity === false) {
 					continue;
-				}
-
-				go()->getDbConnection()->beginTransaction();
+				}			
 
 				$entity->save();
 
