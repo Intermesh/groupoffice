@@ -59,7 +59,7 @@ class Module extends core\Module {
 	
 	
 	public static function onMap(Mapping $mapping) {
-		$mapping->addHasOne('addressBookSettings', UserSettings::class, ['id' => 'userId']);
+		$mapping->addHasOne('addressBookSettings', UserSettings::class, ['id' => 'userId'], true);
 	}
 
 	protected function afterInstall(\go\core\model\Module $model)

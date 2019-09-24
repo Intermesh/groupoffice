@@ -23,7 +23,7 @@ class FreebusypermissionsModule extends \GO\Base\Module{
 	}
 	
 	public static function onMap(orm\Mapping $mapping) {
-		$mapping->addHasOne('freebusySettings', model\UserSettings::class, ['id' => 'id']);
+		$mapping->addHasOne('freebusySettings', model\UserSettings::class, ['id' => 'id'], true);
 		return true;
 	}
 	

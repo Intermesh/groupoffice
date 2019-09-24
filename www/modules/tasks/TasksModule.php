@@ -25,7 +25,7 @@ class TasksModule extends \GO\Base\Module {
 	}
 
 	public static function onMap(Mapping $mapping) {
-		$mapping->addHasOne('taskSettings', \GO\Tasks\Model\UserSettings::class, ['id' => 'user_id']);
+		$mapping->addHasOne('taskSettings', \GO\Tasks\Model\UserSettings::class, ['id' => 'user_id'], true);
 	}
 
 	public static function onLinkFilter(Filters $filters) {

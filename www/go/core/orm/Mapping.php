@@ -171,7 +171,7 @@ class Mapping {
 	 * 
 	 * @return $this;
 	 */
-	public function addHasOne($name, $entityName, array $keys, $autoCreate = true) {
+	public function addHasOne($name, $entityName, array $keys, $autoCreate = false) {
 		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_HAS_ONE);
 		$this->relations[$name]->setEntityName($entityName);
 		$this->relations[$name]->autoCreate = $autoCreate;

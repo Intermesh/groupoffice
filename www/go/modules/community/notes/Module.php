@@ -45,7 +45,7 @@ class Module extends core\Module {
 	}
 	
 	public static function onMap(Mapping $mapping) {
-		$mapping->addHasOne('notesSettings', UserSettings::class, ['id' => 'userId']);
+		$mapping->addHasOne('notesSettings', UserSettings::class, ['id' => 'userId'], true);
 	}
 
 }
