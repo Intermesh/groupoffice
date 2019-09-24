@@ -168,6 +168,10 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				scope : this
 			}]
 		});
+
+		this.win.on("hide", function() {
+			this.createLinkButton.reset();
+		}, this);
 	},
 
 	files_folder_id : 0,
@@ -184,11 +188,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 
 		config = config || {};
 
-		GO.dialogListeners.apply(this);
-		
-		this.on("hide", function() {
-			this.createLinkButton.reset();
-		}, this);
+		GO.dialogListeners.apply(this);		
 		
 		this.win.show();
 

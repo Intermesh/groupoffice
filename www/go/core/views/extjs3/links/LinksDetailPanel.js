@@ -9,10 +9,10 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 			baseParams: {
 				limit: this.limit,
 				position: 0,
-				calculateTotal:true,
-				filter: {
-					entities: [{name: this.link.entity, filter: this.link.filter}]
-				}
+				calculateTotal:true,				
+			},
+			filters: {
+				toEntity: {entities: [{name: this.link.entity, filter: this.link.filter}]}
 			},
 			fields: [
 				'id', 
@@ -139,8 +139,11 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 		
 		this.hide();
 		
-		this.store.baseParams.filter.entity = dv.entity ? dv.entity : dv.entityStore.entity.name, //dv.entity exists on old DetailView or display panels
-		this.store.baseParams.filter.entityId = dv.model_id ? dv.model_id : dv.currentId; //model_id is from old display panel
+		this.store.setFilter('fromEntity', {
+			entity: dv.entity ? dv.entity : dv.entityStore.entity.name, //dv.entity exists on old DetailView or display panels
+			entityId: dv.model_id ? dv.model_id : dv.currentId //model_id is from old display panel
+		});
+
 		this.store.baseParams.position = 0;
 		this.store.load();
 	}

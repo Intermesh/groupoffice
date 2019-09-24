@@ -215,7 +215,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 										&& result.notCreated.clientId.validationErrors.toId
 										&& result.notCreated.clientId.validationErrors.toId.code
 										&& result.notCreated.clientId.validationErrors.toId.code === 11)) { //already exists
-									throw "Could not create link";
+									Ext.MessageBox.alert(t("Error"), t("Could not create link"));
 								}
 							});
 

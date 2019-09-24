@@ -535,6 +535,31 @@ go.Modules.register("legacy", 'tasks', {
 					},
 					linkDetail: function() {
 						return new GO.tasks.TaskPanel();
+					},
+					linkDetailCards: function() {
+						var forth = new go.links.DetailPanel({
+							link: {
+								title: t("Incomplete tasks"),
+								iconCls: 'icon ic-check',
+								entity: "Task",
+								filter: null
+							}
+						});
+	
+						forth.store.setFilter('incomplete', {incompleteTasks: true});
+	
+						var past = new go.links.DetailPanel({						
+							link: {
+								title: t("Completed tasks"),
+								iconCls: 'icon ic-check',
+								entity: "Task",
+								filter: null
+							}
+						});
+	
+						past.store.setFilter('completed', {completedTasks: true});
+	
+						return [forth, past];
 					}	
 			}]
 	}],
