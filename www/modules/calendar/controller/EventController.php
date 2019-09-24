@@ -20,6 +20,10 @@
 
 namespace GO\Calendar\Controller;
 
+use GO\Base\Db\ActiveRecord;
+use GO\Base\Db\FindCriteria;
+use GO\Calendar\Model\Event;
+use go\core\orm\EntityType;
 
 class EventController extends \GO\Base\Controller\AbstractModelController {
 
@@ -1897,5 +1901,77 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		echo "END:VCALENDAR\r\n";
 		
 	}
+
+
+
+
+
+	public function actionLinks($params){
+
+		$response = ['data'=> [], 'success' => true];
+
+		$entityType = EntityType::findByName($params['entity']);
+		
+
+		$startOfDay = \GO\Base\Util\Date::clear_time(time());
+			
+		// Process future events
+		$findParams = \GO\Base\Db\FindParams::newInstance()->order('start_time','DESC');
+		$findParams->getCriteria()->addCondition('start_time', $startOfDay, '>=');			
+		
+		$joinCriteria = FindCriteria::newInstance()
+						->addCondition('fromId', $params['id'], '=','l')
+						->addCondition('fromEntityTypeId', $entityType->getId(),'=','l')
+						->addRawCondition("t.id", "l.toId")
+						->addCondition('toEntityTypeId', Event::model()->modelTypeId(),'=','l');
+
+		$findParams->join("core_link", $joinCriteria, 'l');
+
+		$stmt = \GO\Calendar\Model\Event::model()->find($findParams);		
+
+		$store = \GO\Base\Data\Store::newInstance(\GO\Calendar\Model\Event::model());
+		$store->setStatement($stmt);
+
+		$columnModel = $store->getColumnModel();			
+		$columnModel->formatColumn('calendar_name','$model->calendar->name');
+		//$columnModel->formatColumn('link_count','$model->countLinks()');
+		//$columnModel->formatColumn('link_description','$model->link_description');
+		$columnModel->formatColumn('start_time','date("c", $model->start_time)');
+
+		
+		$columnModel->formatColumn('description','GO\Base\Util\StringHelper::cut_string($model->description,500)');
+
+		$data = $store->getData();
+		$response['data']['events']=$data['results'];
+		
+		// Process past events
+		$findParams = \GO\Base\Db\FindParams::newInstance()->order('start_time','DESC');
+		$findParams->getCriteria()->addCondition('start_time', $startOfDay, '<');						
+
+		$joinCriteria = FindCriteria::newInstance()
+						->addCondition('fromId', $params['id'], '=','l')
+						->addCondition('fromEntityTypeId', $entityType->getId(),'=','l')
+						->addRawCondition("t.id", "l.toId")
+						->addCondition('toEntityTypeId', Event::model()->modelTypeId(),'=','l');
+
+		$findParams->join("core_link", $joinCriteria, 'l');
+		$stmt = \GO\Calendar\Model\Event::model()->find($findParams);		
+		
+
+		$store = \GO\Base\Data\Store::newInstance(\GO\Calendar\Model\Event::model());
+		$store->setStatement($stmt);
+
+		$columnModel = $store->getColumnModel();			
+		$columnModel->formatColumn('calendar_name','$model->calendar->name');
+		// $columnModel->formatColumn('link_count','$model->countLinks()');
+		// $columnModel->formatColumn('link_description','$model->link_description');
+		// $columnModel->formatColumn('description','GO\Base\Util\StringHelper::cut_string($model->description,500)');
+		$columnModel->formatColumn('start_time','date("c", $model->start_time)');
+
+		$data = $store->getData();
+		$response['data']['past_events']=$data['results'];
+		
+		return $response;
+	}	
 	
 }

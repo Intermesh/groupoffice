@@ -183,7 +183,13 @@ use const GO_CONFIG_FILE;
 		public function getStorageQuota() {
 			$quota = $this->getConfig()['core']['limits']['storageQuota'];
 			if(empty($quota)) {
-				$quota = disk_total_space($this->getConfig()['core']['general']['dataPath']);
+				try {
+					$quota = disk_total_space($this->getConfig()['core']['general']['dataPath']);
+				}
+				catch(\Exception $e) {
+					go()->warn("Could not determine total disk space: ". $e->getMessage());
+					return 0;
+				}
 			}
 			
 			return $quota;
@@ -197,7 +203,13 @@ use const GO_CONFIG_FILE;
 		public function getStorageFreeSpace() {
 			$quota = $this->getConfig()['core']['limits']['storageQuota'];
 			if(empty($quota)) {
-				return disk_free_space($this->getConfig()['core']['general']['dataPath']);
+				try {
+					return disk_free_space($this->getConfig()['core']['general']['dataPath']);
+				}
+				catch(\Exception $e) {
+					go()->warn("Could not determine free disk space: ". $e->getMessage());
+					return 0;
+				}
 			} else
 			{
 				 $usage = \GO::config()->get_setting('file_storage_usage');				 

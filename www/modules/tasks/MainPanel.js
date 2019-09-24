@@ -528,6 +528,7 @@ go.Modules.register("legacy", 'tasks', {
 	entities: [{
 			name: 'Task',
 			links: [{
+					iconCls: "entity Task blue",
 					linkWindow: function() {
 						var win = new GO.tasks.TaskDialog();
 						win.win.closeAction = "close";
@@ -535,6 +536,31 @@ go.Modules.register("legacy", 'tasks', {
 					},
 					linkDetail: function() {
 						return new GO.tasks.TaskPanel();
+					},
+					linkDetailCards: function() {
+						var forth = new go.links.DetailPanel({
+							link: {
+								title: t("Incomplete tasks"),
+								iconCls: 'icon ic-check blue',
+								entity: "Task",
+								filter: null
+							}
+						});
+	
+						forth.store.setFilter('incomplete', {incompleteTasks: true});
+	
+						var past = new go.links.DetailPanel({						
+							link: {
+								title: t("Completed tasks"),
+								iconCls: 'icon ic-check blue',
+								entity: "Task",
+								filter: null
+							}
+						});
+	
+						past.store.setFilter('completed', {completedTasks: true});
+	
+						return [forth, past];
 					}	
 			}]
 	}],

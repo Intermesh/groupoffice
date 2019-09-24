@@ -123,7 +123,6 @@ go.form.Dialog = Ext.extend(go.Window, {
 	createFormPanel : function() {
 		
 		var items = this.initFormItems() || [];
-		var layout = this.formPanelLayout;
 		
 		if(this.showCustomfields){
 			this.addCustomFields(items);
@@ -137,14 +136,15 @@ go.form.Dialog = Ext.extend(go.Window, {
 		}
 		
 		if(count > 1) {
-			var layout = 'fit';
 			items = [this.createTabPanel(items)];
+		} else{
+			items = [this.mainPanel = new Ext.Panel({layout: this.formPanelLayout, autoScroll: true, items: items})];
 		}
 		
 		return new go.form.EntityPanel({
 			entityStore: this.entityStore,
 			items: items,
-			layout: layout
+			layout: 'fit'
 		});
 	},
 	
@@ -174,7 +174,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	createTabPanel : function(items) {
 		
 		if(items.length) {
-			this.panels.unshift(new Ext.Panel({
+			this.panels.unshift(this.mainPanel = new Ext.Panel({
 				title: t("General"),
 				layout: this.formPanelLayout,
 				autoScroll: true,

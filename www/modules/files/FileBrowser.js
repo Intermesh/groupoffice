@@ -2187,7 +2187,9 @@ go.Modules.register("legacy", 'files', {
 	entities: [{
 			name: "File",
 			links: [
+				
 				{
+					iconCls: 'entity File pink',
 					entity: "File",
 					linkDetail: function () {
 						return new GO.files.FilePanel();
@@ -2197,8 +2199,10 @@ go.Modules.register("legacy", 'files', {
 			]
 		}, {
 			name: "Folder",
+
 			links: [
 				{
+					iconCls: 'entity Folder pink',
 					entity: "Folder",
 					linkDetail: function () {
 						return new GO.files.FolderPanel();

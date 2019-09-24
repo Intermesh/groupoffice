@@ -1598,6 +1598,9 @@ abstract class Property extends Model {
 		$id = [];
 		foreach($diff as $field) {
 			$id[$field] = array_shift($values);
+			if(is_numeric($id[$field])) {
+				$id[$field] = (int) $id[$field];
+			}
 		}
 		return $id;
 	}

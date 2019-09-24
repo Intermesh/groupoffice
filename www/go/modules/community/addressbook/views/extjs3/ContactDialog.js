@@ -175,7 +175,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 				]
 			},
 
-			{
+			this.communicationFieldSet = new Ext.form.FieldSet({
 				xtype: 'fieldset',
 				title: t("Communication"),
 				layout: 'column',
@@ -187,7 +187,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					new go.modules.community.addressbook.EmailAddressesField(),
 					new go.modules.community.addressbook.PhoneNumbersField()
 				]
-			},
+			}),
 			{
 				xtype: "fieldset",
 				defaults: {

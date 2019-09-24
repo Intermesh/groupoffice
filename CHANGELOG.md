@@ -1,8 +1,19 @@
+24-09-2019 6.4.59
+- Google Authenticator: Fixed problem where it would enable when saving user
+- Calendar: brought back forthcoming and past events
+- Tasks: incomplete and completed tasks separate
+- Address book: Users address book was filled with empty contacts
+- Calendar: Fixed more... positioned over day number
+
+23-09-2019 6.4.58
 - Address book: added business fields in detail panel of orginisation
 - Address book: Create personal address books for each user
 - Users: Only show module tabs in user dialog where this user has access to
 - Notes: Default note book setting and every user gets a personal note book
 - Sync: settings use default notebook and address book by default
+- Newsletters: Create filter based on address lists in address book
+- Newsletters: Add contact to address list in edit dialog of contact
+- Billing: Fixed issue with number field not loading in product dialog
 
 19-09-2019 6.4.57
 - Custom fields: Query language works with text for select and multiselect

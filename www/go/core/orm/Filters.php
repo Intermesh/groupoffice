@@ -35,18 +35,25 @@ class Filters {
 		return $this;
 	}
 	
-	private function validate(Query $query, array $filter) {
-		$invalidFilters = array_diff(array_map('strtolower',array_keys($filter)), array_keys($this->filters));
-		if(!empty($invalidFilters)) {
-			throw new Exception("Invalid filters supplied for '".$query->getModel()."': '". implode("', '", $invalidFilters) ."'");
-		}
-	}
+	// private function validate(Query $query, array $filter) {
+	// 	$invalidFilters = array_diff(array_map('strtolower',array_keys($filter)), array_keys($this->filters));
+	// 	if(!empty($invalidFilters)) {
+	// 		throw new Exception("Invalid filters supplied for '".$query->getModel()."': '". implode("', '", $invalidFilters) ."'");
+	// 	}
+	// }
 
 	private function applyDefaults(array $filter) {
 
 		$f = [];
 		foreach($filter as $k => $v) {
-			$f[$this->filters[strtolower($k)]['name']] = $v;
+
+			$index = strtolower($k);
+
+			if(!isset($this->filters[$index])) {
+				throw new Exception("Filter '". $k."' is invalid");
+			}
+
+			$f[$this->filters[$index]['name']] = $v;
 		}
 
 		foreach($this->filters as $value) {
@@ -72,7 +79,7 @@ class Filters {
 
 		$filter = $this->applyDefaults($filter);
 
-		$this->validate($query, $filter);		
+		//$this->validate($query, $filter);		
 		foreach($filter as $name => $value) {
 			$filterConfig = $this->filters[strtolower($name)];
 			

@@ -448,6 +448,14 @@ function test_system(){
 	$test['fatal']=false;
 	
 	$tests[]=$test;
+
+	$test['name']='Floating point precision';
+	$test['showSuccessFeedback'] = false;
+	$test['pass']= ini_get("precision") >= 14 || ini_get("precision") == -1;
+	$test['feedback']= "'precision' is set too low in php.ini. Please set it to 14 or higher";
+	$test['fatal']=false;
+	
+	$tests[]=$test;
 	
 	
 	

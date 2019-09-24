@@ -68,3 +68,6 @@ $updates['201909181300'][] = function() {
 $updates['201909181300'][] = function() {
 	Module::checkRootFolder();
 };
+
+
+$updates['201909241006'][] = 'delete from `addressbook_contact` WHERE addressBookId = (select value from core_setting where name="userAddressBookId") and firstName = "" and lastName = "" and name = "" and isOrganization = 0 and goUserId is null';

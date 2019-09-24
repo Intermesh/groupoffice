@@ -55,6 +55,10 @@ GO.tasks.TaskDialog = function() {
 	this.win.render(Ext.getBody());
 
 	GO.tasks.TaskDialog.superclass.constructor.call(this);
+
+	this.win.on("hide", function() {
+		this.createLinkButton.reset();
+	}, this);
 }
 
 Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
@@ -83,9 +87,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			config = {};
 		}		
 		
-		this.on("hide", function() {
-			this.createLinkButton.reset();
-		}, this);
+		
 		
 		this.showConfig=config;
 
@@ -222,10 +224,9 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 	},
 	setTaskId : function(task_id) {
 		this.formPanel.form.baseParams['id'] = task_id;
-		this.task_id = task_id;
-		if(task_id) {
-			this.createLinkButton.setEntity("Task", task_id);
-		}
+		this.task_id = task_id;		
+		this.createLinkButton.setEntity("Task", task_id);
+		
 	},
 
 	setCurrentDate : function() {

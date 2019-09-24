@@ -202,9 +202,13 @@ Ext.override(Ext.form.BasicForm,{
 				n = f.getName();
 				key = o[n];
 				if (f.getXType() == 'numberfield') {
+					var oldServerFormats = f.serverFormats;
 					f.serverFormats = false; // this will post number as number
+					val = f.getValue();
+					f.serverFormats = oldServerFormats;
+				} else {
+					val = f.getValue();
 				} 
-				val = f.getValue();
 				
 				
 				if(Ext.isDate(val)) {

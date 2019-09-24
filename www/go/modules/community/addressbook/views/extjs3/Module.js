@@ -154,7 +154,7 @@ go.Modules.register("community", "addressbook", {
 
 					filter: "isContact",
 
-					iconCls: "entity ic-person",
+					iconCls: "entity ic-person blue",
 
 					/**
 					 * Opens a dialog to create a new linked item
@@ -181,7 +181,7 @@ go.Modules.register("community", "addressbook", {
 					 */
 					title: t("Organization"),
 
-					iconCls: "entity ic-business",
+					iconCls: "entity ic-business purple",
 
 					filter: "isOrganization",
 
