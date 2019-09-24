@@ -1,3 +1,5 @@
+- Calendar: brought back forthcoming and past events
+
 23-09-2019 6.4.58
 - Address book: added business fields in detail panel of orginisation
 - Address book: Create personal address books for each user

@@ -708,6 +708,10 @@ class Contact extends AclItemEntity {
 			return $this->salutation;
 		}
 
+		if($this->isNew()) {
+			return null;
+		}
+
 		if($this->isOrganization) {
 			return go()->t("Dear sir/madam");
 		}
