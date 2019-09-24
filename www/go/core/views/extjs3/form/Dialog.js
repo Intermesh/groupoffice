@@ -137,11 +137,13 @@ go.form.Dialog = Ext.extend(go.Window, {
 		
 		if(count > 1) {
 			items = [this.createTabPanel(items)];
+		} else{
+			items = [this.mainPanel = new Ext.Panel({layout: this.formPanelLayout, autoScroll: true, items: items})];
 		}
 		
 		return new go.form.EntityPanel({
 			entityStore: this.entityStore,
-			items: this.mainPanel = new Ext.Panel({layout: this.formPanelLayout, autoScroll: true, items: items}),
+			items: items,
 			layout: 'fit'
 		});
 	},
