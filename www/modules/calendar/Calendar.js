@@ -2189,7 +2189,10 @@ go.Modules.register("legacy", 'calendar', {
 	iconCls : 'go-tab-icon-calendar',
 	entities: [{
 			name: "Event",
+			
 			links: [{
+				iconCls: 'entity Event orange',
+
 				linkWindow: function() {
 					return GO.calendar.showEventDialog();
 				},
@@ -2200,7 +2203,7 @@ go.Modules.register("legacy", 'calendar', {
 					var forth = new go.links.DetailPanel({
 						link: {
 							title: t("Forthcoming events"),
-							iconCls: 'icon ic-event',
+							iconCls: 'icon ic-event orange',
 							entity: "Event",
 							filter: null
 						}
@@ -2211,7 +2214,7 @@ go.Modules.register("legacy", 'calendar', {
 					var past = new go.links.DetailPanel({						
 						link: {
 							title: t("Past events"),
-							iconCls: 'icon ic-event',
+							iconCls: 'icon ic-event orange',
 							entity: "Event",
 							filter: null
 						}

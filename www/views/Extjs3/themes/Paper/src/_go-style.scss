@@ -1111,7 +1111,7 @@ button.filetype-pdf, button.filetype-doc {
 			width:  dp(24);
 			height: dp(24);
 			position: absolute;
-			color: color($fg, 'icon') !important;		
+			color: color($fg, 'icon');		
 		}
 		
 		&:hover {
@@ -1911,5 +1911,4 @@ table[id^="comments-ext"] b {
 .silk-cross { background-image: url(/img/icons/silk/cross.png) !important; background-repeat: no-repeat; }
 .silk-stop { background-image: url(/img/icons/silk/stop.png) !important; background-repeat: no-repeat; }
 .silk-arrow-up { background-image: url(/img/icons/silk/arrow_up.png) !important; background-repeat: no-repeat; }
-
 

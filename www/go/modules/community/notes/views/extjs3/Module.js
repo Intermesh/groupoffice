@@ -48,6 +48,7 @@ go.Modules.register("community", 'notes', {
 			}
 		],
 		links: [{
+			iconCls: 'entity ic-note yellow',
 			/**
 			 * Opens a dialog to create a new linked item
 			 * 
