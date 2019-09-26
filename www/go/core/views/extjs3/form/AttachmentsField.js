@@ -10,11 +10,11 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 
     this.store = new go.data.Store({
       fields: [
-        {
-          name: "id",
-          type: "int",
-          useNull: true
-        },
+        // {
+        //   name: "id",
+        //   type: "int",
+        //   useNull: true
+        // },
         "blobId",
         "name",
         {
