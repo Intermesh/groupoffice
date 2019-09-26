@@ -82,6 +82,8 @@ class Debugger {
 		$this->entries[] = ['groupCollapsed', $name];
 		$this->currentGroup = &$this->entries[count($this->entries)-1][1];
 		$this->groupStartTime = $this->getTimeStamp();
+
+		$this->writeLog('start', $name . ' '. date('Y-m-d H:i:s'));
 	}
 
 	public function groupEnd(){
@@ -92,6 +94,8 @@ class Debugger {
 		$this->currentGroup .= ', time: '.$time.'ms';
 
 		$this->entries[] = ['groupEnd', null];
+
+		$this->writeLog('end', $this->currentGroup);
 	}
 
 	/**
@@ -183,35 +187,33 @@ class Debugger {
 		
 		//$entry = "[" . $this->getTimeStamp() . "][" . $caller['class'] . ":".$lastCaller['line']."] " . $mixed;
 
-		if(!empty($this->logPath)) {
-			$debugLog = new Fs\File($this->logPath);
-
-			if($debugLog->isWritable()) {
-				if (!is_scalar($mixed)) {
-					$print = print_r($mixed, true);
-				} else if(is_bool($mixed)) {
-					$print = $mixed ? "TRUE" : "FALSE";
-				}	else {
-					$print = $mixed;
-				}
-				$debugLog->putContents($print."\n", FILE_APPEND);
-			}
-		}
-
-		if(go()->getEnvironment()->isCli()) {
-			if (!is_scalar($mixed)) {
-				$print = print_r($mixed, true);
-			} else if(is_bool($mixed)) {
-				$print = $mixed ? "TRUE" : "FALSE";
-			} else {
-				$print = $mixed;
-			}
-
-			echo '['.$level.'] '.$print ."\n";
-		}
-
+		$this->writeLog($level, $mixed);
+		
 		$this->entries[] = [$level, $mixed];
 		
+	}
+
+	protected function writeLog($level, $mixed) {
+
+		if (!is_scalar($mixed)) {
+			$print = print_r($mixed, true);
+		} else if(is_bool($mixed)) {
+			$print = $mixed ? "TRUE" : "FALSE";
+		}	else {
+			$print = $mixed;
+		}
+		$line = '[' . $level . '] ' . $print . "\n";
+
+		if(go()->getEnvironment()->isCli()) {
+			echo $line;
+		}
+
+		if(!empty($this->logPath)) {
+			$debugLog = new Fs\File($this->logPath);
+			if($debugLog->isWritable()) {				
+				$debugLog->putContents($line, FILE_APPEND);
+			}
+		}
 	}
 
 	/**

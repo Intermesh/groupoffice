@@ -84,7 +84,7 @@ class Router {
 		
 		if($method != "community/dev/Debugger/get") {
 			//App::get()->debug("Processing method " . $method . ", call ID: " . $clientCallId);
-			go()->getDebugger()->group($method .',  ID: '. $clientCallId );			
+			go()->getDebugger()->group($method .',  ID: '. $clientCallId );				
 			go()->getDebugger()->debug("request:");
 			go()->getDebugger()->debug($params);			
 		}
@@ -98,6 +98,12 @@ class Router {
 			
 		} catch(InvalidResultReference $e) {
 			$error = ["message" => $e->getMessage()];
+
+			if(go()->getDebugger()->enabled) {
+				//only in debug mode, may contain sensitive information
+				$error["debugMessage"] = ErrorHandler::logException($e);
+				$error["trace"] = explode("\n", $e->getTraceAsString());
+			}
 		
 			Response::get()->addResponse([
 					'error', $error

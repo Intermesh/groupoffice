@@ -5,6 +5,7 @@ Core: Enhance select people dialog
 Newsletters: Fixed problem with newsletter attachments
 Core: sort on "creator" and "modifier"
 Fixed: e-mail-settings #461
+Serverclient: Improved server client error reporting
 
 24-09-2019 6.4.59
 - Google Authenticator: Fixed problem where it would enable when saving user
