@@ -95,7 +95,7 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 			var field = this.findField(name);
 			if (field) {
 				field.setValue(v[name]);
-				field.originalValue = field.getValue();
+				// field.originalValue = field.getValue();
 			}
 		}
 

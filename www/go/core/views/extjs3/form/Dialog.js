@@ -222,8 +222,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 	
 	},
 	
-	setValues : function(v) {
-		this.formPanel.setValues(v);
+	setValues : function(v, trackReset) {
+		this.formPanel.setValues(v, trackReset);
 		
 		return this;
 	},

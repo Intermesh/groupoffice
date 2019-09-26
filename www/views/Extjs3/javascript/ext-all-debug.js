@@ -44026,6 +44026,7 @@ Ext.form.BasicForm = Ext.extend(Ext.util.Observable, {
                     f.setValue(v.value);
                     if(this.trackResetOnLoad){
                         f.originalValue = f.getValue();
+                        f.dirty = false; //MS: for form group and possibly other components
                     }
                 }
             }
@@ -44036,6 +44037,7 @@ Ext.form.BasicForm = Ext.extend(Ext.util.Observable, {
                     field.setValue(values[id]);
                     if(this.trackResetOnLoad){
                         field.originalValue = field.getValue();
+                        field.dirty = false; //MS: for form group and possibly other components
                     }
                 }
             }
