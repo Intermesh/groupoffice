@@ -78,7 +78,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 							var lastSortBy = !lastRecord || !lastRecord.data.isOrganization ? go.User.addressBookSettings.sortBy : "name" ;						
 
 							var char = record.data[sortBy].substr(0, 1).toUpperCase();
-							if(!lastRecord || lastRecord.data[lastSortBy].substr(0, 1).toUpperCase() !== char) {
+							if(!lastRecord || !lastRecord.data[lastSortBy] || lastRecord.data[lastSortBy].substr(0, 1).toUpperCase() !== char) {
 								return "<h3>" + char + "</h3>";
 							}
 						}
