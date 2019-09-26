@@ -1,4 +1,5 @@
 Address book: Added "Add to contact" when clicking on an email address
+26-09-2019 6.4.60
 Core: proper error message when delete fails
 Address book: Add "Add to contact" option when clicking e-mail address
 Core: Enhance select people dialog
