@@ -49,11 +49,12 @@ class MailDomain {
 			"domain" => $domain
 		));
 
+		go()->debug($response);
+
 		if($response['status'] != 200) {
 			throw new Exception("Unexpected HTTP status " .$response['status'] ." from ". $url);
 		}
-
-		$result = json_decode($response['body']);
+		$result = json_decode($response['body']);	
 
 		if(!$result) {
 			throw new Exception("Could not create mailbox on postfixadmin module. " . $response);
@@ -78,6 +79,9 @@ class MailDomain {
 			"username"=>$username,
 			"password"=>$this->password,
 		));
+
+
+		go()->debug($response);
 		
 		if($response['status'] != 200) {
 			throw new Exception("Unexpected HTTP status " .$response['status'] ." from ". $url);

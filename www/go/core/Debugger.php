@@ -202,7 +202,11 @@ class Debugger {
 		}	else {
 			$print = $mixed;
 		}
-		$line = '[' . $level . '] ' . $print . "\n";
+		$line = '[' . str_pad($level, 5, ' ') . '] ' . str_replace("\n", "\n        ", $print) . "\n";
+
+		if($level == 'start') {
+			$line = "\n" . $line;
+		}
 
 		if(go()->getEnvironment()->isCli()) {
 			echo $line;

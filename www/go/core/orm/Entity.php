@@ -479,6 +479,11 @@ abstract class Entity extends Property {
 	 * @return Filters
 	 */
 	protected static function defineFilters() {
+
+		$cls = static::class;
+
+		$filters = go()->getCache()->get('filters-' . $cls);
+
 		$filters = new Filters();
 
 		$filters->add('text', function(Criteria $criteria, $value, Query $query) {
