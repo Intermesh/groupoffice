@@ -713,23 +713,34 @@ class User extends Entity {
 			$this->setValidationError("id", ErrorCode::FORBIDDEN, "You can't delete the primary administrator");
 			return false;
 		}
-		$this->legacyOnDelete();
-		return parent::internalDelete();
+
+		go()->getDbConnection()->beginTransaction();
+
+		if(!$this->legacyOnDelete() || !parent::internalDelete()) {
+			go()->getDbConnection()->rollBack();
+			return false;
+		}
+
+		return go()->getDbConnection()->commit();
 	}
 	
 	
 	public function legacyOnDelete() {
-		$user = LegacyUser::model()->findByPk($this->id, false, true);
-		LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
-		//delete all acl records		
-		$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
+		try {
+			$user = LegacyUser::model()->findByPk($this->id, false, true);
+			LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
+			//delete all acl records		
+			$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
 
-		foreach($defaultModels as $model){
-			$model->deleteByAttribute('user_id',$this->id);
+			foreach($defaultModels as $model){
+				$model->deleteByAttribute('user_id',$this->id);
+			}
+
+
+			LegacyUser::model()->fireEvent("delete", [$user, true]);
+		} catch(\Exception $e) {
+			$this->setValidationError('id', ErrorCode::GENERAL, $e->getMessage());
 		}
-
-
-		LegacyUser::model()->fireEvent("delete", [$user, true]);
 	}
 	
 	/**

@@ -106,7 +106,11 @@ class ActiveStatement implements \IteratorAggregate {
 					}
 					$m->$function();
 				} catch (\Exception $e) {
-					echo (string) $e;
+					if($verbose) {
+						echo (string) $e;
+					} else{
+						throw $e;
+					}
 				}
 		}
 	}
