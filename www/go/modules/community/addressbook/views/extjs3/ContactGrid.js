@@ -182,15 +182,6 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function (v) {
 						return v ? v.displayName : "-";
 					}
-				},{
-					hidden: true,
-					header: t('Modified by'),
-					width: dp(160),
-					sortable: true,
-					dataIndex: 'modifier',
-					renderer: function (v) {
-						return v ? v.displayName : "-";
-					}
 				}, {
 					hidden: true,
 					header: t('Job title'),
