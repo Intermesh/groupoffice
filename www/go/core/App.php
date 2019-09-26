@@ -322,7 +322,9 @@ use const GO_CONFIG_FILE;
 			
 			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
 			
-			
+			if(!isset($config['debug_log'])) {
+				$config['debug_log'] = !empty($config['debug']);
+			}
 			
 			$this->config = (new util\ArrayObject([					
 					"core" => [
@@ -330,7 +332,7 @@ use const GO_CONFIG_FILE;
 									"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
 									"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
 									"debug" => $config['debug'] ?? null,
-									"debugLog" => isset($config['debug_log']) ? $config['debug_log'] : $config['debug'],
+									"debugLog" => $config['debug_log'],
 									
 									"servermanager" => $config['servermanager'] ?? false,
 
