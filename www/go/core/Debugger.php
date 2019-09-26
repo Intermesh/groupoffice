@@ -63,7 +63,7 @@ class Debugger {
 	public function __construct() {
 		try {
 			$this->enabled = (!empty(go()->getConfig()['core']['general']['debug']) || jmap\Request::get()->getHeader('X-Debug') == "1") && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug');
-			if($this->enabled) {
+			if(go()->getConfig()['core']['general']['debugLog']) {
 				$this->logPath = go()->getDataFolder()->getFile('log/debug.log')->getPath();
 			}
 		} catch (\go\core\exception\ConfigurationException $e) {

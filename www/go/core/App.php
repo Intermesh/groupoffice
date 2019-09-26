@@ -330,6 +330,7 @@ use const GO_CONFIG_FILE;
 									"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
 									"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
 									"debug" => $config['debug'] ?? null,
+									"debugLog" => isset($config['debug_log']) ? $config['debug_log'] : $config['debug'],
 									
 									"servermanager" => $config['servermanager'] ?? false,
 
