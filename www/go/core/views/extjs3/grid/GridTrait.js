@@ -153,7 +153,19 @@ go.grid.GridTrait = {
 
 		this.getStore().entityStore.set({
 			destroy:  selectedRecords.column("id")
-		}).finally(function() {
+		}).then(function(result){
+			if(!result.notDestroyed) {
+				return;
+			}
+
+			var msg = "";
+			for(var id in result.notDestroyed) {
+				msg += id + ": " + result.notDestroyed[id].description + "<br />";
+			}
+
+			Ext.MessageBox.alert(t("Error"), t("Could not delete some items: <br /><br />" + msg));
+		})
+		.finally(function() {
 			me.getEl().unmask();
 		});
 	},

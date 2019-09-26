@@ -597,7 +597,9 @@ abstract class EntityController extends Controller {
 			if ($success) {
 				$result['destroyed'][] = $id;
 			} else {
-				$result['notDestroyed'][] = $entity->getValidationErrors();
+				$errors = $entity->getValidationErrors();
+				$first = array_shift($errors);
+				$result['notDestroyed'][$id] = ['type' => $first['code'], 'description' => $first['description']];
 			}
 		}
 	}
