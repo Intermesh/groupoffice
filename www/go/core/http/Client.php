@@ -78,6 +78,7 @@ class Client {
     }
 
     return [
+      'status' => curl_getinfo($this->getCurl(), CURLINFO_HTTP_CODE),
       'headers' => $this->lastHeaders,
       'body' => $body
     ];

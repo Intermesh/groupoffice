@@ -1,8 +1,10 @@
 Address book: Added "Add to contact" when clicking on an email address
+Core: proper error message when delete fails
 Address book: Add "Add to contact" option when clicking e-mail address
 Core: Enhance select people dialog
 Newsletters: Fixed problem with newsletter attachments
 Core: sort on "creator" and "modifier"
+Fixed: e-mail-settings #461
 
 24-09-2019 6.4.59
 - Google Authenticator: Fixed problem where it would enable when saving user

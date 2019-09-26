@@ -66,8 +66,9 @@ Ext.onReady(function(){
 						password: this.lastPassword
 					},
 					callback: function(o,success,response) {
+						console.error(response);
 						if(!success) {
-							alert('Could not create mailbox');
+							Ext.MessageBox.alert(t("Error"), t("The mailbox couldn't be created") + ': ' + response.message);
 						}
 					}
 				});
