@@ -1,12 +1,13 @@
-Address book: Added "Add to contact" when clicking on an email address
+- Filters: Contact filter did not respect isOrganization setting of custom field
+
 26-09-2019 6.4.60
-Core: proper error message when delete fails
-Address book: Add "Add to contact" option when clicking e-mail address
-Core: Enhance select people dialog
-Newsletters: Fixed problem with newsletter attachments
-Core: sort on "creator" and "modifier"
-Fixed: e-mail-settings #461
-Serverclient: Improved server client error reporting
+- Core: proper error message when delete fails
+- Address book: Add "Add to contact" option when clicking e-mail address
+- Core: Enhance select people dialog
+- Newsletters: Fixed problem with newsletter attachments
+- Core: sort on "creator" and "modifier"
+- Fixed: e-mail-settings #461
+- Serverclient: Improved server client error reporting
 
 24-09-2019 6.4.59
 - Google Authenticator: Fixed problem where it would enable when saving user
