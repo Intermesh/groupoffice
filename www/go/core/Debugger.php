@@ -176,24 +176,23 @@ class Debugger {
 			$traceBackSteps--;			
 		}
 		
-		if(empty($caller['class'])) {
-			
-			$caller['class'] = 'closure';
+		if(empty($caller['class'])) {			
+			$caller['class'] = $lastCaller['class'];
 		}
 		
-		if(!isset($caller['line'])) {
-			$caller['line'] = '[unknown line]';
-		}
+		// if(!isset($caller['line'])) {
+		// 	$caller['line'] = '[unknown line]';
+		// }
 		
 		//$entry = "[" . $this->getTimeStamp() . "][" . $caller['class'] . ":".$lastCaller['line']."] " . $mixed;
 
-		$this->writeLog($level, $mixed);
+		$this->writeLog($level, $mixed, $caller['class'], $lastCaller['line']);
 		
-		$this->entries[] = [$level, $mixed];
+		$this->entries[] = [$level, $mixed, $caller['class'], $lastCaller['line']];
 		
 	}
 
-	protected function writeLog($level, $mixed) {
+	protected function writeLog($level, $mixed, $cls = null, $lineNo = null) {
 
 		if (!is_scalar($mixed)) {
 			$print = print_r($mixed, true);
@@ -202,7 +201,19 @@ class Debugger {
 		}	else {
 			$print = $mixed;
 		}
-		$line = '[' . str_pad($level, 5, ' ') . '] ' . str_replace("\n", "\n        ", $print) . "\n";
+		$line = '[' . $level . ']';
+		
+		if(isset($cls)) {
+			$line .= '[' . $cls .':'. $lineNo.']';
+		}
+
+		$line .=  ' ';
+
+		if(strstr($print, "\n")) {
+			$print = "\n        " . str_replace("\n", "\n        ", $print);
+		}
+		
+		$line .=   $print . "\n";
 
 		if($level == 'start') {
 			$line = "\n" . $line;
