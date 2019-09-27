@@ -740,7 +740,10 @@ class User extends Entity {
 			LegacyUser::model()->fireEvent("delete", [$user, true]);
 		} catch(\Exception $e) {
 			$this->setValidationError('id', ErrorCode::GENERAL, $e->getMessage());
+			return false;
 		}
+
+		return true;
 	}
 	
 	/**
