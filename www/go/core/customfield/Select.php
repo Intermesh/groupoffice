@@ -153,7 +153,7 @@ class Select extends Base {
 				$criteria->where('customFields.' . $this->field->databaseName, '=', $value);
 			} else{
 				//for text queries we must join the options.
-				$alias = 'opt_' . uniqid();
+				$alias = 'opt_' . $this->field->id;
 				$query->join('core_customfields_select_option', $alias, $alias . '.id = customFields.' . $this->field->databaseName);
 				$criteria->where($alias . '.text', $comparator, $value);
 			}

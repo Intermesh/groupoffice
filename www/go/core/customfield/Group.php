@@ -3,7 +3,10 @@
 namespace go\core\customfield;
 
 use GO;
+use go\core\db\Criteria;
 use go\core\db\Utils;
+use go\core\orm\Filters;
+use go\core\orm\Query;
 
 class Group extends Base {
 
@@ -41,5 +44,29 @@ class Group extends Base {
 		}
 			
 		return parent::onFieldDelete();
+	}
+
+
+	/**
+	 * Defines an entity filter for this field.
+	 * 
+	 * @see Entity::defineFilters()
+	 * @param Filters $filter
+	 */
+	public function defineFilter(Filters $filters) {		
+		
+		$filters->addText($this->field->databaseName, function(Criteria $criteria, $comparator, $value, Query $query, array $filter){
+			$this->joinCustomFieldsTable($query);	
+			
+			if(isset($value[0]) && is_numeric($value[0])) {
+				//When field option ID is passed by a saved filter
+				$criteria->where('customFields.' . $this->field->databaseName, '=', $value);
+			} else{
+				//for text queries we must join the options.
+				$alias = 'opt_' . $this->field->id;
+				$query->join('core_group', $alias, $alias . '.id = customFields.' . $this->field->databaseName);
+				$criteria->where($alias . '.name', $comparator, $value);
+			}
+		});
 	}
 }
