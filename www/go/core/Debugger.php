@@ -180,9 +180,9 @@ class Debugger {
 			$caller['class'] = $lastCaller['class'];
 		}
 		
-		// if(!isset($caller['line'])) {
-		// 	$caller['line'] = '[unknown line]';
-		// }
+		if(!isset($lastCaller['line'])) {
+			$lastCaller['line'] = '[unknown line]';
+		}
 		
 		//$entry = "[" . $this->getTimeStamp() . "][" . $caller['class'] . ":".$lastCaller['line']."] " . $mixed;
 
