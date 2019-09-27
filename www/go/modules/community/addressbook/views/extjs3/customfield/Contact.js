@@ -87,6 +87,7 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.customfield
 		return {
 			name: field.databaseName,
 			type: "go.modules.community.addressbook.ContactCombo",
+			typeConfig: this.createFormFieldConfig(field),
 			multiple: true,
 			title: field.name
 		};
