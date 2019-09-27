@@ -1,3 +1,4 @@
+27-09-2019 6.4.61
 - Filters: Contact filter did not respect isOrganization setting of custom field
 - Advanced Search: Search contact, users and group custom fields by text too. And text are wrapped with wildcards.
 - Core: Debug log file more sensible and include line and class number.
