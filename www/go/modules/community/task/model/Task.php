@@ -1,15 +1,17 @@
 <?php
 namespace go\modules\community\task\model;
 
-use DateInterval;
+use GO\Base\Util\Date\RecurrencePattern;
+use GO\Base\Util\Icalendar\Rrule;
 use go\core\jmap\Entity;
 use go\core\orm\SearchableTrait;
 use go\core\db\Criteria;
 use go\core\orm\Query;
 use go\modules\community\task\model\Alert;
-use GO\Base\Util\Icalendar\RRuleIterator;
 use go\core\util\DateTime;
-use Sabre\VObject\Recur\RRuleIterator as SabreRRuleIterator;
+use go\modules\community\task\convert\Csv;
+//use go\modules\community\addressbook\convert\VCard;
+
 
 /**
  * Task model
@@ -161,6 +163,17 @@ class Task extends Entity {
 		return "TasksTask";
 	}
 
+	public static function converters() {
+		$arr = parent::converters();
+		//$arr['text/vcard'] = VCard::class;		
+		$arr['text/csv'] = Csv::class;
+		return $arr;
+	}
+
+	public function getRrule() {
+		return $this->recurrenceRule;
+	}
+
 	public function getRecurrenceRule() {
 		return empty($this->recurrenceRule) ? null : json_decode($this->recurrenceRule, true);
 	}
@@ -293,6 +306,12 @@ class Task extends Entity {
 		unset($recurrenceRule['bySetPosition']);
 		unset($recurrenceRule['frequency']);
 		return $recurrenceRule;
+	}
+
+	public function createRRULE() {
+		$rrule = $this->parseToRRULE($this->getRecurrenceRule());
+		$rruleObj = new Rrule($rrule);
+		return $rruleObj->createRrule();
 	}
 
 	/**

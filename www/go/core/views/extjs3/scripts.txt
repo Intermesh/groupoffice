@@ -30,10 +30,7 @@ Window.js
 form/EntityPanel.js
 form/MultiEntityDialog.js
 form/Dialog.js
-<<<<<<< HEAD
-=======
 form/CheckboxGroup.js
->>>>>>> origin/master
 form/PasswordGeneratorField.js
 form/DateField.js
 form/DateTimeField.js

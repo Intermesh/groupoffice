@@ -312,6 +312,61 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 							iconCls: 'ic-more-vert',
 							menu: [
 								{
+									iconCls: 'ic-cloud-upload',
+									text: t("Import"),
+									handler: function() {
+										go.util.importFile(
+														'TasksTask', 
+														"text/vcard,text/csv",
+														//{taskId: 126},
+														{},
+														{
+															labels: {
+																start: t("start"),
+																due: t("due"),
+																completed: t("completed"),
+																title: t("title"),
+																description: t("description"),
+																status: t("status"),
+																priority: t("priority"),
+																percentageComplete: t("percentage completed"),
+																"alerts.remindDate": t("remind date"),
+																"alerts.remindTime": t("remind time"),
+																categories: t("categories")
+
+															}
+														});
+									},
+									scope: this
+								},
+								{
+									iconCls: 'ic-cloud-download',
+									text: t("Export"),
+									menu: [
+										{
+											text: 'vCard',
+											iconCls: 'ic-contacts',
+											handler: function() {
+												go.util.exportToFile(
+																'Contact', 
+																Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
+																'text/vcard');									
+											},
+											scope: this
+										},{
+											text: 'CSV',
+											iconCls: 'ic-description',
+											handler: function() {
+												go.util.exportToFile(
+																'TasksTask', 
+																Ext.apply(this.taskGrid.store.baseParams, this.taskGrid.store.lastOptions.params, {limit: 0, start: 0}),
+																'text/csv');									
+											},
+											scope: this
+										}
+									]							
+								},
+								{
 									itemId: "delete",
 									iconCls: 'ic-delete',
 									text: t("Delete"),
