@@ -2,6 +2,7 @@
 - Advanced Search: Search contact, users and group custom fields by text too. And text are wrapped with wildcards.
 - Core: Debug log file more sensible and include line and class number.
 - Users: Delete broken
+- Core: Switch user didn't work when logging in from multi instance environment
 
 26-09-2019 6.4.60
 - Core: proper error message when delete fails

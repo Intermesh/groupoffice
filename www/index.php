@@ -59,6 +59,8 @@ try {
 			unset($_POST['accessToken']);
 		}
 
+		setcookie('accessToken', $token->accessToken, null, "/", Request::get()->getHost(), false, false);
+
 		date_default_timezone_set($old);
 	}
 
