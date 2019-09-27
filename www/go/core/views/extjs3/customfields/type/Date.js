@@ -61,6 +61,7 @@ go.customfields.type.Date = Ext.extend(go.customfields.type.Text, {
 	getFilter : function(field) {
 		return {
 			name: field.databaseName,
+			wildcards: false,
 			type: "date",
 			multiple: false,
 			title: field.name

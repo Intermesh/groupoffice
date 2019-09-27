@@ -1,5 +1,6 @@
 - Filters: Contact filter did not respect isOrganization setting of custom field
-- Advacned Search: Search contact, users and group custom fields by text too
+- Advanced Search: Search contact, users and group custom fields by text too
+- Core: Debug log file more sensible and include line and class number.
 
 26-09-2019 6.4.60
 - Core: proper error message when delete fails
