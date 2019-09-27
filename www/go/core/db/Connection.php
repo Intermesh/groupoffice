@@ -176,7 +176,7 @@ class Connection {
 			//$ret = null;
 			//if (!$this->inTransaction())
 			if($this->debug) {
-				go()->debug("START DB TRANSACTION");
+				go()->debug("START DB TRANSACTION", 1);
 			}
 			$ret = $this->getPdo()->beginTransaction();
 
@@ -220,7 +220,7 @@ class Connection {
 		
 		$this->transactionSavePointLevel--;	
 		if($this->transactionSavePointLevel == 0) {			
-			go()->warn("ROLLBACK DB TRANSACTION");
+			go()->warn("ROLLBACK DB TRANSACTION", 1);
 			return $this->getPdo()->rollBack();
 		}else
 		{

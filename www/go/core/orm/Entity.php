@@ -339,7 +339,7 @@ abstract class Entity extends Property {
 	}
 
 	protected function rollback() {
-		App::get()->debug("Rolling back save operation for ".static::class);
+		App::get()->debug("Rolling back save operation for " . static::class, 1);
 		parent::rollBack();
 		$this->isDeleting = false;
 		$this->isSaving = false;

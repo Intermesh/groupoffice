@@ -171,7 +171,7 @@ class Debugger {
 		$traceBackSteps = min([$count, $traceBackSteps]);
 		
 		while($traceBackSteps > 0) {			
-
+			$lastCaller = $caller;
 			$caller = array_shift($bt);
 			$traceBackSteps--;			
 		}
