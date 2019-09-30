@@ -677,6 +677,8 @@ button {
 		}
 		> * {
 			display:block;
+			text-overflow: ellipsis;
+			overflow: hidden;
 		}
 	}
 	.avatar {
@@ -1091,6 +1093,18 @@ button.filetype-pdf, button.filetype-doc {
 	}
 }
 
+
+.show-on-hover {
+	display: none;		
+}
+
+.x-grid3-row-over {
+	.show-on-hover {
+		display:block;
+	}
+}
+
+
 .go-icon-list {
 	p, > a {		
 		min-height: dp(40);
@@ -1132,9 +1146,7 @@ button.filetype-pdf, button.filetype-doc {
 		
 	}
 
-	.show-on-hover {
-		display: none;		
-	}
+	
 
 	.left {
 		top: dp(12);
@@ -1701,6 +1713,7 @@ table[id^="comments-ext"] b {
 .normal-link {
 	text-decoration:underline;
 	color: $cAnchor;
+	cursor: pointer;
 }
 
 .go-chip {

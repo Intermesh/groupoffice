@@ -1162,6 +1162,10 @@
 			position: absolute;
 			right: dp(14);
 		}
+
+		a {
+			cursor: pointer;
+		}
 	}
 	&-row-checker, .x-grid3-hd-checker &-hd-checker {
 		height:dp(20); // same as line-height of text
