@@ -1,3 +1,5 @@
+- Core: Working week didn't accept half hours
+
 19-09-2019 6.3.82
 - Projects larger expense budget dialog and resizable
 - Billing: Force select of book in duplicate dialog
