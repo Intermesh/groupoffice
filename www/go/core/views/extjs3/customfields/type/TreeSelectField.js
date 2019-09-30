@@ -6,13 +6,16 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 	name: "options",
 	findBy: false,
 	customfield: null,
+	allowBlank: true,
 	//height: dp(36),
 	getName : function() {
 		return this.name;
 	},
 	initComponent: function () {	
-		go.customfields.type.TreeSelectField.superclass.initComponent.call(this);		
-		this.add(this.createCombo(this.customfield.dataType.options));
+		go.customfields.type.TreeSelectField.superclass.initComponent.call(this);	
+		first = this.createCombo(this.customfield.dataType.options);
+		first.allowBlank = this.allowBlank;	
+		this.add(first);
 		
 		this.pathMap = {};
 		this.buildPathMap(this.customfield.dataType.options);
@@ -118,16 +121,29 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 		
 		return go.util.empty(v) ? null : v;
 	},
-	markInvalid: function () {
-
+	markInvalid: function (msg) {
+		this.items.each(function(i) {			
+			i.markInvalid(msg);
+		});
 	},
 	clearInvalid: function () {
-
+		this.items.each(function(i) {
+			i.clearInvalid();
+		});
 	},
 
 	validate: function () {
-		return true;
-	}
+		var valid = true, fn = function (i) {
+			if (i.isFormField && !i.validate()) {
+				valid = false;
+				//stops iteration
+				return false;
+			}
+		};
+		this.items.each(fn, this);
+
+		return valid;
+	},
 });
 
 

@@ -1,3 +1,5 @@
+- Email: Search in all or subfolders didn't work
+
 30-09-2019 6.4.62
 - Core: Each entity type has it's own color in the system
 - Core: New group member dialog. Fixes serverclient group controller permission issue #472
