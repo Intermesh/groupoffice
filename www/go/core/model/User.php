@@ -591,7 +591,7 @@ class User extends Entity {
 		if(!isset($this->contact->emailAddresses[0])) {
 			$this->contact->emailAddresses = [(new \go\modules\community\addressbook\model\EmailAddress())->setValues(['email' => $this->email])];
 		}
-		if(!isset($this->contact->name) || $this->isModified(['displayName'])) {
+		if(empty($this->contact->name) || $this->isModified(['displayName'])) {
 			$this->contact->name = $this->displayName;
 			$parts = explode(' ', $this->displayName);
 			$this->contact->firstName = array_shift($parts);
@@ -804,7 +804,9 @@ class User extends Entity {
 		$this->contact = $this->getProfile();		
 		$this->contact->setValues($values);		
 	
-		$this->displayName = $this->contact->name;
+		if(!empty($this->contact->name)) {
+			$this->displayName = $this->contact->name;
+		}
 	}
 
 

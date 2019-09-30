@@ -17,7 +17,6 @@ go.modules.community.addressbook.SettingsProfilePanel = Ext.extend(Ext.Panel, {
 				items: [
 					{
 						xtype: 'fieldset',
-						title: t("Communication"),
 						items: [
 							this.nameField = new go.modules.community.addressbook.NameField({
 								name: "name",
