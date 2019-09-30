@@ -1,4 +1,6 @@
 - Core: New group member dialog. Fixes serverclient group controller permission issue #472
+- Core: Fixed user display name set to empty
+- Core: Half hours in working week didn't validate
 
 27-09-2019 6.4.61
 - Filters: Contact filter did not respect isOrganization setting of custom field
