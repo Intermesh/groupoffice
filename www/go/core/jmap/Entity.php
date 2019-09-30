@@ -75,45 +75,51 @@ abstract class Entity  extends OrmEntity {
 
 	private function checkChangeForRelations() {
 		foreach($this->getMapping()->getRelations() as $r) {
-			if($r->type == GoRelation::TYPE_SCALAR) {
-				$entities = $this->findEntitiesByTable($r->tableName);
-				foreach($entities as $e) {
-					$cls = $e['cls'];
 
-					$isAclOwnerEntity = is_a($cls, AclOwnerEntity::class, true);
-					$isAclItemEntity = is_a($cls, AclItemEntity::class, true);
-
-					foreach($e['paths'] as $path) {
-						$query = $cls::find();
-
-						//TODO joinProperites only joins the first table.
-						$query->joinProperties($path);
-						foreach($r->keys as $from => $to) {
-							$query->andWhere(array_pop($path) . '.' .$to, '=', $this->$from);
-						}		
-
-						$query->select($query->getTableAlias() . '.id AS entityId');
-
-						if($isAclItemEntity) {
-							$aclAlias = $cls::joinAclEntity($query);
-							$query->select($aclAlias .'.aclId', true);
-						} else if($isAclOwnerEntity) {
-							$query->select('aclId', true);
-						} else{
-							$query->select('NULL AS aclId', true);
-						}
-
-						$query->select('"0" AS destroyed', true);
-
-						$type = $cls::entityType();
-
-						//go()->warn($query);
-
-						/** @var EntityType $type */
-						$type->changes($query);
-					}
-				}
+			if($r->type != GoRelation::TYPE_SCALAR) {
+				continue;
 			}
+			$modified = $this->getModified([$r->name]);
+			if(empty($modified)) {
+				continue;
+			}
+
+			$ids = array_merge(array_diff($modified[$r->name][0], $modified[$r->name][1]), array_diff($modified[$r->name][1], $modified[$r->name][0]));
+
+			$entities = $this->findEntitiesByTable($r->tableName);
+			foreach($entities as $e) {
+				$cls = $e['cls'];
+
+				$isAclOwnerEntity = is_a($cls, AclOwnerEntity::class, true);
+				$isAclItemEntity = is_a($cls, AclItemEntity::class, true);
+
+				foreach($e['paths'] as $path) {
+					$query = $cls::find();
+
+					$query->where('id', 'IN', $ids);
+					
+
+					$query->select($query->getTableAlias() . '.id AS entityId');
+
+					if($isAclItemEntity) {
+						$aclAlias = $cls::joinAclEntity($query);
+						$query->select($aclAlias .'.aclId', true);
+					} else if($isAclOwnerEntity) {
+						$query->select('aclId', true);
+					} else{
+						$query->select('NULL AS aclId', true);
+					}
+
+					$query->select('"0" AS destroyed', true);
+
+					$type = $cls::entityType();
+
+					//go()->warn($query);
+
+					/** @var EntityType $type */
+					$type->changes($query);
+				}
+			}			
 		}
 	}
 	
@@ -126,6 +132,7 @@ abstract class Entity  extends OrmEntity {
 		
 		if(self::$trackChanges) {
 			$this->changeReferencedEntities([$this->id]);
+			$this->checkChangeForRelations();
 		}
 
 		if(!parent::internalDelete()) {
