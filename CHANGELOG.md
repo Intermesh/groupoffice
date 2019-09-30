@@ -1,4 +1,6 @@
 - Email: Search in all or subfolders didn't work
+- Custom fields: Validate chips and treeselect field so required flag for cusotm fields of type select and multiselect work
+- Newsletters: Open sent item doesn't show template.
 
 30-09-2019 6.4.62
 - Core: Each entity type has it's own color in the system
