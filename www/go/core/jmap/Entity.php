@@ -10,6 +10,8 @@ use go\core\util\ClassFinder;
 use go\core\orm\EntityType;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\acl\model\AclItemEntity;
+use go\core\orm\Relation as GoRelation;
+use go\modules\sony\abrelations\model\Relation;
 
 /**
  * Entity model
@@ -64,9 +66,55 @@ abstract class Entity  extends OrmEntity {
 		
 		if(self::$trackChanges) {
 			$this->entityType()->checkChange($this);
+
+			$this->checkChangeForRelations();
 		} 
 		
 		return true;
+	}
+
+	private function checkChangeForRelations() {
+		foreach($this->getMapping()->getRelations() as $r) {
+			if($r->type == GoRelation::TYPE_SCALAR) {
+				$entities = $this->findEntitiesByTable($r->tableName);
+				foreach($entities as $e) {
+					$cls = $e['cls'];
+
+					$isAclOwnerEntity = is_a($cls, AclOwnerEntity::class, true);
+					$isAclItemEntity = is_a($cls, AclItemEntity::class, true);
+
+					foreach($e['paths'] as $path) {
+						$query = $cls::find();
+
+						//TODO joinProperites only joins the first table.
+						$query->joinProperties($path);
+						foreach($r->keys as $from => $to) {
+							$query->andWhere(array_pop($path) . '.' .$to, '=', $this->$from);
+						}		
+
+						$query->select($query->getTableAlias() . '.id AS entityId');
+
+						if($isAclItemEntity) {
+							$aclAlias = $cls::joinAclEntity($query);
+							$query->select($aclAlias .'.aclId', true);
+						} else if($isAclOwnerEntity) {
+							$query->select('aclId', true);
+						} else{
+							$query->select('NULL AS aclId', true);
+						}
+
+						$query->select('"0" AS destroyed', true);
+
+						$type = $cls::entityType();
+
+						//go()->warn($query);
+
+						/** @var EntityType $type */
+						$type->changes($query);
+					}
+				}
+			}
+		}
 	}
 	
 	/**
@@ -354,7 +402,13 @@ abstract class Entity  extends OrmEntity {
 
 			$entityClasses = [];
 			foreach($refs as $r) {
-				$entityClasses = array_merge($entityClasses, static::findEntitiesByTable($r['table'], $r['column']));
+				$entities = static::findEntitiesByTable($r['table']);
+				$eWithCol = array_map(function($i) use($r) {
+					$i['column'] = $r['column'];
+					return $i;
+				}, $entities);
+
+				$entityClasses = array_merge($entityClasses, $eWithCol);
 			}	
 			
 			go()->getCache()->set($cacheKey, $entityClasses);			
@@ -367,9 +421,9 @@ abstract class Entity  extends OrmEntity {
 	/**
 	 * Find's entities that have the given table name mapped
 	 * 
-	 * @return string[]
+	 * @return Array[] [['cls'=>'', 'paths' => 'contactId']]
 	 */
-	private static function findEntitiesByTable($tableName, $col) {
+	private static function findEntitiesByTable($tableName) {
 		$cf = new ClassFinder();
 		$allEntitites = $cf->findByParent(self::class);
 
@@ -378,12 +432,11 @@ abstract class Entity  extends OrmEntity {
 			return $e != static::class;
 		});
 
-		$mapped = array_map(function($e) use ($tableName, $col) {
+		$mapped = array_map(function($e) use ($tableName) {
 			$paths = $e::getMapping()->hasTable($tableName);
 			return [
 				'cls' => $e,
-				'paths' => $paths,
-				'column' => $col
+				'paths' => $paths
 			];
 
 		}, $allEntitites);
