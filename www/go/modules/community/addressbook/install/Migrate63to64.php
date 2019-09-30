@@ -553,7 +553,7 @@ class Migrate63to64 {
 				
 				$org = Contact::findById($orgId);
 				if($org) {
-					\go\core\model\Link::create($contact, $org, null, false);
+					\go\core\model\Link::create($contact, $org);
 				}
 			}
 		}
