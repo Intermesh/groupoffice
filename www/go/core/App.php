@@ -16,7 +16,8 @@ use go\core\db\Table;
     use go\core\event\Listeners;
 use go\core\exception\ConfigurationException;
 use go\core\fs\Folder;
-use go\core\jmap\State;
+    use go\core\http\Request;
+    use go\core\jmap\State;
 use go\core\mail\Mailer;
 use go\core\util\Lock;
 use go\core\webclient\Extjs3;
@@ -321,6 +322,10 @@ use const GO_CONFIG_FILE;
 			}
 			
 			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
+
+			if(Request::get()->getHeader('X-Debug') == "1") {
+				$config['debug'] = true;
+			}
 			
 			if(!isset($config['debug_log'])) {
 				$config['debug_log'] = !empty($config['debug']);

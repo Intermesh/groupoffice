@@ -62,7 +62,8 @@ class Debugger {
 	
 	public function __construct() {
 		try {
-			$this->enabled = (!empty(go()->getConfig()['core']['general']['debug']) || jmap\Request::get()->getHeader('X-Debug') == "1") && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug');
+			$this->enabled = !empty(go()->getConfig()['core']['general']['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug');
+			
 			if(go()->getConfig()['core']['general']['debugLog']) {
 				$this->logPath = go()->getDataFolder()->getFile('log/debug.log')->getPath();
 			}
