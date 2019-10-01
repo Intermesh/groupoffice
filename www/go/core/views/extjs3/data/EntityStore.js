@@ -484,9 +484,6 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		go.Jmap.pause();
 		return me.initState().then(function() {			
 			return me.stateStore.getItem(id + "").then(function(entity) {		
-
-				//Continue JMAP
-				go.Jmap.continue();
 				if(!entity) {
 					return null;
 				}				
@@ -494,6 +491,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				me.data[id] = entity;
 				return go.util.clone(entity);
 			});
+		}).finally(function(){			
+			//Continue JMAP
+			go.Jmap.continue();
 		});
 	},
 
@@ -530,8 +530,6 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 		var entities = [], notFound = [], promises = [], order = {};
 
-		go.Jmap.pause();
-
 		ids.forEach(function(id, index) {
 			//keep order for sorting later
 			order[id] = index;
@@ -541,9 +539,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				}).catch(function() {
 					notFound.push(id);
 				}));
-		}, this);
-
-		go.Jmap.continue();
+		}, this);	
 
 		return Promise.all(promises).then(function() {
 			entities.sort(function (a, b) {
