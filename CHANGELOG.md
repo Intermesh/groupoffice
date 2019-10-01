@@ -1,3 +1,5 @@
+- Core: Comboboxes take 3 chars to start searching instead of 4.
+- Core: ctrl + f7 enables debug log for new framework
 - Email: Search in all or subfolders didn't work
 - Custom fields: Validate chips and treeselect field so required flag for cusotm fields of type select and multiselect work
 - Newsletters: Open sent item doesn't show template.

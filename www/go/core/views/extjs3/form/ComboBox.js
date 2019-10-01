@@ -8,6 +8,8 @@
  */
 go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	value: null,
+
+	minChars : 3,
 	
 	resolveEntity : function(value) {
 		return this.store.entityStore.get([value]).then(function (result) {
