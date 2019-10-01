@@ -75,10 +75,13 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 	},
 
 	onSelect : function(field, record) {
-		
-		var index = this.items.indexOf(field) + 1;
-		for(var i = index; i < this.items.getCount(); i++) {
-			this.remove(this.items.item(i));
+		var index = this.items.indexOf(field), nextIndex = index + 1;
+
+		if(this.items.getCount() > nextIndex) {
+			var remove = this.items.getRange(nextIndex);
+			remove.forEach(function(r) {
+				r.destroy();
+			});
 		}
 		
 		if(!go.util.empty(record.json.children)) {			
@@ -101,10 +104,13 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 		var path = this.pathMap[optionId], field;
 		
 		for(var i = 0, l = path.length; i < l; i++) {
-			field = this.items.itemAt(i);
+			field = this.items.itemAt(i);			
 			field.setValue(path[i]);
 			var record = field.store.getById(path[i]);
-		
+			if(!record) {
+				console.error("Record not found for " + path[i], field);
+				return;
+			}
 			this.onSelect(field, record);
 		}		
 	},
