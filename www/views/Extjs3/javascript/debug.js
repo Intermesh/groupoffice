@@ -36,7 +36,7 @@ GO.DebugWindow = Ext.extend(GO.Window, {
 			width:600,
 			height:1200,
 			layout:'fit',
-			items:{
+			items: this.tabPanel = new Ext.TabPanel({
 				xtype:'tabpanel',
 				items:[
 					this.outputPanel = new GO.LogPanel({
@@ -62,13 +62,19 @@ GO.DebugWindow = Ext.extend(GO.Window, {
 									}
 								},
 								scope:this
-						}]
-					}),
-					this.errorPanel = new GO.LogPanel({title:'Errors'}),
+						},{					
+						
+						text: t("Copy"),
+						handler: function() {
+							go.util.copyTextToClipboard(this.tabPanel.getActiveTab().raw);
+						},
+						scope:this
+				}]
+					}),					
 					this.infoPanel = new Ext.Panel({title:'Info',autoScroll:true, listeners:{show:this.loadInfo, scope:this}})
 				],
 				activeTab:0
-			},
+			}),
 			listeners:{
 				show:function(){					
 					Ext.TaskMgr.start(this.taskConfig);
@@ -100,12 +106,9 @@ GO.DebugWindow = Ext.extend(GO.Window, {
 		GO.request({
 			url:'core/debug',
 			params:this.baseParams,
-			success:function(response, options, result){
+			success:function(response, options, result){			
 				
-				
-				this.outputPanel.setLog(result.debugLog);
-				this.errorPanel.setLog(result.errorLog);
-				
+				this.outputPanel.setLog(result.debugLog);				
 	
 			},
 			fail: function(response, options, result) {
@@ -133,8 +136,8 @@ GO.LogPanel = Ext.extend(Ext.Panel,{
 				
 			var isAtBottom = d.scrollTop >= d.scrollHeight - d.offsetHeight;
 		
-
-			this.update(str);
+			this.raw = str;
+			this.update("<pre>" + str + "</pre>");
 
 	
 			//scroll to bottom
