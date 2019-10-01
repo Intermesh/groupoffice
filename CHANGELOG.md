@@ -1,3 +1,5 @@
+01-10-2019 6.4.63
+- Core: Attempt to solve very rare loading hang problem
 - Core: Comboboxes take 3 chars to start searching instead of 4.
 - Core: ctrl + f7 enables debug log for new framework
 - Email: Search in all or subfolders didn't work
