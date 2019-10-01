@@ -513,6 +513,7 @@ class Migrate63to64 {
 			$address->street2 = $r['address_no'] ?? null;
 			$address->latitude = $r['latitude'] ?? null;
 			$address->longitude = $r['longitude'] ?? null;
+			$address->cutPropertiesToColumnLength();
 
 			if ($address->isModified()) {
 				$contact->addresses[] = $address;
@@ -543,6 +544,7 @@ class Migrate63to64 {
 				}
 			}
 
+			$contact->cutPropertiesToColumnLength();
 			if (!$contact->save()) {
 				go()->debug($r);
 				throw new \Exception("Could not save contact" . var_export($contact->getValidationErrors(), true));
@@ -651,6 +653,7 @@ class Migrate63to64 {
 			$address->street2 = $r['address_no'] ?? null;
 			$address->latitude = $r['latitude'] ?? null;
 			$address->longitude = $r['longitude'] ?? null;
+			$address->cutPropertiesToColumnLength();
 
 			if ($address->isModified()) {				
 				$contact->addresses[] = $address;
@@ -666,6 +669,7 @@ class Migrate63to64 {
 			$address->street2 = $r['post_address_no'] ?? null;
 			$address->latitude = $r['post_latitude'] ?? null;
 			$address->longitude = $r['post_longitude'] ?? null;
+			$address->cutPropertiesToColumnLength();
 
 			if ($address->isModified()) {
 				$contact->addresses[] = $address;
@@ -702,6 +706,8 @@ class Migrate63to64 {
 					$contact->photoBlobId = $blob->id;
 				}
 			}
+
+			$contact->cutPropertiesToColumnLength();
 
 			if (!$contact->save()) {
 				
