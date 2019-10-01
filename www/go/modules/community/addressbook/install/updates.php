@@ -71,3 +71,16 @@ $updates['201909181300'][] = function() {
 
 
 $updates['201909241006'][] = 'delete from `addressbook_contact` WHERE addressBookId = (select value from core_setting where name="userAddressBookId") and firstName = "" and lastName = "" and name = "" and isOrganization = 0 and goUserId is null';
+
+$updates['201910012019'][] = 'ALTER TABLE `addressbook_contact` DROP FOREIGN KEY `addressbook_contact_ibfk_3`;';
+$updates['201910012019'][] = 'ALTER TABLE `addressbook_contact` ADD CONSTRAINT `addressbook_contact_ibfk_3` FOREIGN KEY (`modifiedBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;';
+
+$updates['201910012019'][] = 'ALTER TABLE `addressbook_contact` CHANGE `createdBy` `createdBy` INT(11) NULL DEFAULT NULL;';
+
+$updates['201910012019'][] = 'ALTER TABLE `addressbook_addressbook` CHANGE `createdBy` `createdBy` INT(11) NULL DEFAULT NULL;';
+
+$updates['201910012019'][] = 'UPDATE addressbook_addressbook set createdBy=null where createdBy not in (select id from core_user);';
+$updates['201910012019'][] = 'ALTER TABLE `addressbook_addressbook` ADD FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;';
+$updates['201910012019'][] = 'ALTER TABLE `addressbook_contact` DROP FOREIGN KEY `addressbook_contact_ibfk_4`; ';
+$updates['201910012019'][] = 'ALTER TABLE `addressbook_contact` ADD CONSTRAINT `addressbook_contact_ibfk_4` FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;';
+
