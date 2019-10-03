@@ -625,3 +625,5 @@ $updates['201908300937'][] = function() {
 
 
 $updates['201908300937'][] = "DELETE FROM core_setting WHERE moduleId=0";
+
+$updates['2019010031702'][] = 'insert ignore into core_group (id, name) values (3, "Internal");';
