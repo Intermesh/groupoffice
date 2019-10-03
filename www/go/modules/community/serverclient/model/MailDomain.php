@@ -76,13 +76,17 @@ class MailDomain {
 		if(empty(\GO::config()->serverclient_dont_add_domain_to_imap_username))
 			$username.='@'.$domain;
 		
-		$url = $this->getBaseUrl("postfixadmin/mailbox/submit");
+		$url = $this->getBaseUrl("postfixadmin/mailbox/setPassword");
 
-		$response = $this->http->post($url, array(			
+		$params = array(			
 			"username"=>$username,
 			"password"=>$this->password,
-		));
+		);
 
+		go()->debug($url);
+		go()->debug($params);
+
+		$response = $this->http->post($url, $params);
 
 		go()->debug($response);
 		
