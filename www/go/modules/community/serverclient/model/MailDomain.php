@@ -34,20 +34,23 @@ class MailDomain {
 		//strip domain from username if it's present.
 		$username = str_replace('@'.$domain, '', $user->username);
 
-		go()->debug("SERVERCLIENT: Adding mailbox for " . $username . '@' . $domain);
 		
 		$alias = strpos($user->email,'@'.$domain) ? $user->email : '';
 
 		$url = $this->getBaseUrl("postfixadmin/mailbox/submit");
-		//domain is, for example "intermesh .dev ".
-		$response = $this->http->post($url, array(
+		$params = array(
 			"name" => $user->displayName,
 			"username" => $username,
 			"alias"=>$alias,
 			"password" => $this->password,
 			"password2" => $this->password,
 			"domain" => $domain
-		));
+		);
+
+		go()->debug($url);
+		go()->debug($params);
+		//domain is, for example "intermesh .dev ".
+		$response = $this->http->post($url, $params);
 
 		go()->debug($response);
 
