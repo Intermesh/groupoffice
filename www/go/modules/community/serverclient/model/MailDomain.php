@@ -20,12 +20,12 @@ class MailDomain {
 		if(empty(\GO::config()->serverclient_server_url)){
 			\GO::config()->serverclient_server_url=\GO::config()->full_url;
 		}
-		
-		$url = \GO::config()->serverclient_server_url.'?r='.$url;
-		
+
 		if(empty(\GO::config()->serverclient_token)){
 			throw new \Exception("Could not connect to mailserver. Please set a strong password in /etc/groupoffice/globalconfig.inc.php.\n\nPlease remove serverclient_username and serverclient_password.\n\nPlease add:\n\n \$config['serverclient_token']='aStrongPasswordOfYourChoice';");
 		}
+
+		$url = \GO::config()->serverclient_server_url.'?r='.$url.'&serverclient_token='.\GO::config()->serverclient_token;
 
 		return $url;
 	}
@@ -34,7 +34,7 @@ class MailDomain {
 		//strip domain from username if it's present.
 		$username = str_replace('@'.$domain, '', $user->username);
 
-		\GO::debug("SERVERCLIENT: Adding mailbox for " . $username . '@' . $domain);
+		go()->debug("SERVERCLIENT: Adding mailbox for " . $username . '@' . $domain);
 		
 		$alias = strpos($user->email,'@'.$domain) ? $user->email : '';
 
@@ -67,7 +67,7 @@ class MailDomain {
 	
 	public function setMailboxPassword($user, $domain){
 		
-		\GO::debug("SERVERCLIENT: Updating password for mailbox ".$user->username.'@'.$domain);
+		go()->debug("SERVERCLIENT: Updating password for mailbox ".$user->username.'@'.$domain);
 		
 		$username = $user->username;
 		if(empty(\GO::config()->serverclient_dont_add_domain_to_imap_username))
@@ -115,7 +115,7 @@ class MailDomain {
 			return;
 		}
 		
-		\GO::debug("SERVERCLIENT: Adding e-mail account for ".$user->username.'@'.$domain);
+		go()->debug("SERVERCLIENT: Adding e-mail account for ".$user->username.'@'.$domain);
 
 		$account = new Account();
 		$account->user_id = $user->id;
