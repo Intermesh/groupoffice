@@ -317,7 +317,7 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 									handler: function() {
 										go.util.importFile(
 														'TasksTask', 
-														"text/vcard,text/csv",
+														"text/vcalendar,text/csv",
 														//{taskId: 126},
 														{},
 														{
@@ -344,13 +344,13 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 									text: t("Export"),
 									menu: [
 										{
-											text: 'vCard',
+											text: 'vCalendar',
 											iconCls: 'ic-contacts',
 											handler: function() {
 												go.util.exportToFile(
-																'Contact', 
-																Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
-																'text/vcard');									
+																'TasksTask', 
+																Ext.apply(this.taskGrid.store.baseParams, this.taskGrid.store.lastOptions.params, {limit: 0, start: 0}),
+																'text/vcalendar');									
 											},
 											scope: this
 										},{

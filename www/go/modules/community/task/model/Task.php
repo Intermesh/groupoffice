@@ -1,7 +1,6 @@
 <?php
 namespace go\modules\community\task\model;
 
-use GO\Base\Util\Date\RecurrencePattern;
 use GO\Base\Util\Icalendar\Rrule;
 use go\core\jmap\Entity;
 use go\core\orm\SearchableTrait;
@@ -10,8 +9,7 @@ use go\core\orm\Query;
 use go\modules\community\task\model\Alert;
 use go\core\util\DateTime;
 use go\modules\community\task\convert\Csv;
-//use go\modules\community\addressbook\convert\VCard;
-
+use go\modules\community\task\convert\Sabre2\VObject\Component\Sabre2\VObject\Component\VCalendar;
 
 /**
  * Task model
@@ -41,7 +39,7 @@ class Task extends Entity {
 	 * 
 	 * @var string
 	 */							
-	public $uid = '';
+	protected $uid = '';
 
 	/**
 	 * 
@@ -151,6 +149,10 @@ class Task extends Entity {
 	 */							
 	protected $byDay = '';
 
+	public $vcalendarBlobId;
+
+	protected $uri;
+
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
@@ -165,7 +167,8 @@ class Task extends Entity {
 
 	public static function converters() {
 		$arr = parent::converters();
-		//$arr['text/vcard'] = VCard::class;		
+		$arr['text/calendar'] = \go\modules\community\task\convert\VCalendar::class;	
+		$arr['text/vcalendar'] = \go\modules\community\task\convert\VCalendar::class;		
 		$arr['text/csv'] = Csv::class;
 		return $arr;
 	}
@@ -323,5 +326,38 @@ class Task extends Entity {
 		$rRule->next();
 		$nextTime = $rRule->current();
 		return $nextTime;
+	}
+
+
+	public function getUid() {
+		
+		if(empty($this->uid)) {
+			$url = trim(go()->getSettings()->URL, '/');
+			$uid = substr($url, strpos($url, '://') + 3);
+			$uid = str_replace('/', '-', $uid );
+			$this->uid = $this->id . '@' . $uid;
+		}
+
+		return $this->uid;		
+	}
+
+	public function setUid($uid) {
+		$this->uid = $uid;
+	}
+
+	public function hasUid() {
+		return !empty($this->uid);
+	}
+
+	public function getUri() {
+		if(!isset($this->uri)) {
+			$this->uri = $this->getUid() . '.vcf';
+		}
+
+		return $this->uri;
+	}
+
+	public function setUri($uri) {
+		$this->uri = $uri;
 	}
 }
