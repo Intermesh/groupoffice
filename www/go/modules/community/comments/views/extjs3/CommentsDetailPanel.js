@@ -162,8 +162,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				labelText += '<i class="icon" title="' + r.data.labels[i].name + '" style="color: #' + r.data.labels[i].color + '">label</i>';
 			} 
 			
-			readMore.setText("<div class='speech-bubble'>" + r.get('text') + "</div>");
-			// readMore.insert(1, {xtype:'box',html:labelText, cls: 'tags ' +mineCls});
+			readMore.setText(r.get('text'));
+			readMore.insert(1, {xtype:'box',html:labelText, cls: 'tags ' +mineCls});
 			this.commentsContainer.add({
 				xtype:"container",
 				cls:'go-messages',
