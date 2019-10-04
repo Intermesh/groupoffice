@@ -154,15 +154,16 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			if(creator.avatarId) { 
 				avatar.style = 'background-image: url('+go.Jmap.downloadUrl(creator.avatarId)+');';
 			} else {
-				avatar.html = creator.displayName.substr(0,1).toUpperCase();
+				avatar.html = creator.displayName.split(" ").map(function(name){return name.substr(0,1).toUpperCase()}).join("");
+				avatar.style = 'background-image: none';
 			}
 
 			for(var i = 0, l = r.data.labels.length; i < l; i++){
 				labelText += '<i class="icon" title="' + r.data.labels[i].name + '" style="color: #' + r.data.labels[i].color + '">label</i>';
 			} 
 			
-			readMore.setText(r.get('text'));
-			readMore.insert(1, {xtype:'box',html:labelText, cls: 'tags ' +mineCls});
+			readMore.setText("<div class='speech-bubble'>" + r.get('text') + "</div>");
+			// readMore.insert(1, {xtype:'box',html:labelText, cls: 'tags ' +mineCls});
 			this.commentsContainer.add({
 				xtype:"container",
 				cls:'go-messages',

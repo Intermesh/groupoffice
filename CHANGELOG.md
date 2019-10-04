@@ -1,4 +1,5 @@
 - Address book: Organizations field was not hidden when newsletters module was installed
+- Core: Clear legacy cache before upgrade
 
 01-10-2019 6.4.63
 - Custom fields: Fixed problem in loading tree select fields for the second time

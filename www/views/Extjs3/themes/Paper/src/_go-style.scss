@@ -632,11 +632,13 @@ button {
 	display:inline-block;
 	padding:0;
 	background: url('img/default-avatar.svg') no-repeat center center;
+	background-color: $cPrimary;
+	color: white;
 	background-size:cover;	
 	border-radius: 50%;
 	width:dp(40);
 	height: dp(40);
-	font-size: dp(28);	
+	font-size: dp(16);	
 	text-align: center;	
 	
 	.icon {
@@ -1733,7 +1735,7 @@ table[id^="comments-ext"] b {
 		padding: dp(8) 0;
 	}
 	> div { 
-		overflow:hidden;
+		// overflow:hidden;
 		padding-bottom:dp(8);
 		span.photo {
 			@extend .avatar;
@@ -1747,9 +1749,7 @@ table[id^="comments-ext"] b {
 				float:right;
 			}
 		}
-		> div {// message
-			background-color: color($bg, 'status-bar');
-			border-radius: dp(16);
+		> div {// message		
 			display:inline-block;
 			max-width: calc(100% - 80px);
 			.content {
@@ -1760,7 +1760,32 @@ table[id^="comments-ext"] b {
 				float:right;
 			}
 		}
+		
 	}
+}
+
+
+.speech-bubble {
+	position: relative;
+	background-color: color($bg, 'status-bar');
+	border-radius: dp(8);
+	padding: dp(8) dp(16);
+}
+
+.speech-bubble:after {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: dp(16);
+	width: 0;
+	height: 0;
+	border: dp(16) solid transparent;
+	border-right-color: color($bg, 'status-bar');
+	border-left: 0;
+	// border-bottom: 0;
+	border-top: 0;
+	margin-top: dp(-10);
+	margin-left: dp(-16);
 }
 
 .tags {	
