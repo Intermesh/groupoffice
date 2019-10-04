@@ -40204,6 +40204,8 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
     
     defaultAutoCreate : {tag: 'input', type: 'text', size: '20', autocomplete: 'off'},
     
+    autocomplete: "off",
+
     fieldClass : 'x-form-field',
     
     msgTarget : 'qtip',
@@ -40260,6 +40262,9 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
             if(this.inputType){
                 cfg.type = this.inputType;
             }
+
+            cfg.autocomplete = this.autocomplete;
+            
             this.autoEl = cfg;
         }
         Ext.form.Field.superclass.onRender.call(this, ct, position);

@@ -2,6 +2,7 @@ go.form.PasswordGeneratorField = Ext.extend(Ext.form.TriggerField, {
 	inputType: 'password',
 	fieldLabel: t("Password"),
 	name: 'password',
+	autocomplete: 'new-password',
 	triggerConfig: {
 		tag: "button",
 		type: "button",
@@ -10,7 +11,6 @@ go.form.PasswordGeneratorField = Ext.extend(Ext.form.TriggerField, {
 		'ext:qtip': t("Generate password")
 	},
 	initComponent: function() {
-		this.defaultAutoCreate.autocomplete = "new-password"; //prevent autocomplete in chrome
 		go.form.PasswordGeneratorField.superclass.initComponent.call(this);
 
 		this.addEvents({generated: true});
