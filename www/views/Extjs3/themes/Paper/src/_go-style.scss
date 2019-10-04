@@ -632,11 +632,13 @@ button {
 	display:inline-block;
 	padding:0;
 	background: url('img/default-avatar.svg') no-repeat center center;
+	background-color: $cPrimary;
+	color: white;
 	background-size:cover;	
 	border-radius: 50%;
 	width:dp(40);
 	height: dp(40);
-	font-size: dp(28);	
+	font-size: dp(16);	
 	text-align: center;	
 	
 	.icon {
@@ -677,6 +679,8 @@ button {
 		}
 		> * {
 			display:block;
+			text-overflow: ellipsis;
+			overflow: hidden;
 		}
 	}
 	.avatar {
@@ -1091,6 +1095,18 @@ button.filetype-pdf, button.filetype-doc {
 	}
 }
 
+
+.show-on-hover {
+	display: none !important;		
+}
+
+.x-grid3-row-over {
+	.show-on-hover {
+		display: block  !important;
+	}
+}
+
+
 .go-icon-list {
 	p, > a {		
 		min-height: dp(40);
@@ -1111,12 +1127,12 @@ button.filetype-pdf, button.filetype-doc {
 			width:  dp(24);
 			height: dp(24);
 			position: absolute;
-			color: color($fg, 'icon') !important;		
+			color: color($fg, 'icon');		
 		}
 		
 		&:hover {
 			.show-on-hover {
-				display:block;
+				display:block !important;
 			}
 			.hide-on-hover {
 				display: none;
@@ -1132,9 +1148,7 @@ button.filetype-pdf, button.filetype-doc {
 		
 	}
 
-	.show-on-hover {
-		display: none;		
-	}
+	
 
 	.left {
 		top: dp(12);
@@ -1155,6 +1169,15 @@ button.filetype-pdf, button.filetype-doc {
 }
 
 // old detail view compatibility
+.display-panel-heading {
+	@extend %font-subheading;
+	/*color: color($fg, 'secondary-text');*/
+	border-top: 1px solid color($fg, 'line');
+	padding: dp(8) dp(16);
+	height: dp(56);
+}
+
+
 .go-display-panel {
 	width: 100%;
 	&-heading {
@@ -1692,6 +1715,7 @@ table[id^="comments-ext"] b {
 .normal-link {
 	text-decoration:underline;
 	color: $cAnchor;
+	cursor: pointer;
 }
 
 .go-chip {
@@ -1711,33 +1735,57 @@ table[id^="comments-ext"] b {
 		padding: dp(8) 0;
 	}
 	> div { 
+		position:relative;
 		overflow:hidden;
+		width: 100%;
 		padding-bottom:dp(8);
 		span.photo {
 			@extend .avatar;
+			position:absolute;
+			top: 0;
 			margin-top:0 !important;
 			margin-right: dp(8);
 			line-height: 35px;
 			text-align: center;
+			&:after {
+				content: '';
+				position: absolute;
+				right: dp(-16);
+				top: dp(8);
+				width: 0; height: 0;
+				border: 0;
+				border-right: dp(16) solid color($bg, 'status-bar');
+				border-bottom: dp(16) solid transparent;
+			}
 			&.mine {
 				margin-right:0;
 				margin-left: dp(8);
-				float:right;
+				right:0;
+				&:after {
+					left: dp(-16);
+					border: 0;
+					border-left: dp(16) solid $cPrimaryTp;
+					border-bottom: dp(16) solid transparent;
+				}
 			}
 		}
-		> div {// message
-			background-color: color($bg, 'status-bar');
-			border-radius: dp(16);
+		> div { // message		
+			border-radius: dp(8);
 			display:inline-block;
-			max-width: calc(100% - 80px);
+			margin-left: dp(56);
+			max-width: 100%;
+			background-color: color($bg, 'status-bar');
 			.content {
 				padding: dp(8) dp(16);
 			}
 			&.mine {
+				margin-right: dp(56);
+				margin-left: 0; // reset
 				background-color: $cPrimaryTp;
 				float:right;
 			}
 		}
+		
 	}
 }
 
@@ -1902,5 +1950,4 @@ table[id^="comments-ext"] b {
 .silk-cross { background-image: url(/img/icons/silk/cross.png) !important; background-repeat: no-repeat; }
 .silk-stop { background-image: url(/img/icons/silk/stop.png) !important; background-repeat: no-repeat; }
 .silk-arrow-up { background-image: url(/img/icons/silk/arrow_up.png) !important; background-repeat: no-repeat; }
-
 

@@ -7,6 +7,18 @@ go.form.CheckboxGroup = Ext.extend(Ext.Container, {
 	cls: "go-form-checkboxgroup",
 	dirty: false,
 
+	initComponent: function () {
+		go.form.CheckboxGroup.superclass.initComponent.call(this);
+
+		this.on("add", function (e) {
+			//to prevent adding to Ext.form.BasicForm with add event.
+			//Cancels event bubbling
+			return false;
+		});
+
+
+	},
+
 	getName: function() {
 		return this.name;
 	},

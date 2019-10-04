@@ -78,6 +78,7 @@ go.customfields.type.YesNo = Ext.extend(go.customfields.type.Text, {
 			name: field.databaseName,
 			type: "select",
 			multiple: true,
+			wildcards: false,
 			title: field.name,
 			options: [{
 					value: null,
@@ -95,5 +96,5 @@ go.customfields.type.YesNo = Ext.extend(go.customfields.type.Text, {
 
 });
 
-go.customfields.CustomFields.registerType(new go.customfields.type.YesNo());
+// go.customfields.CustomFields.registerType(new go.customfields.type.YesNo());
 

@@ -11,4 +11,7 @@ class Settings extends core\Settings {
 	 * @var bool
 	 */
 	public $autoLinkEmail = false;
+
+
+	public $createPersonalAddressBooks = true;
 }

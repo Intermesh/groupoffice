@@ -65,14 +65,20 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 							}
 
 							var sortState = store.getSortState();
-							if(sortState.field != "name" && sortState.field != "firstName") {
+							if(sortState.field != "name" && sortState.field != "firstName"  && sortState.field != "lastName") {
+								return "";
+							}
+
+							//sometimes the field is null.
+							if(!Ext.isString(record.data[sortBy])) {
 								return "";
 							}
 							
 							var lastRecord = rowIndex > 0 ? grid.store.getAt(rowIndex - 1) : false;
-							var lastSortBy = !lastRecord || !lastRecord.data.isOrganization ? go.User.addressBookSettings.sortBy : "name" ;
+							var lastSortBy = !lastRecord || !lastRecord.data.isOrganization ? go.User.addressBookSettings.sortBy : "name" ;						
+
 							var char = record.data[sortBy].substr(0, 1).toUpperCase();
-							if(!lastRecord || lastRecord.data[lastSortBy].substr(0, 1).toUpperCase() !== char) {
+							if(!lastRecord || !lastRecord.data[lastSortBy] || lastRecord.data[lastSortBy].substr(0, 1).toUpperCase() !== char) {
 								return "<h3>" + char + "</h3>";
 							}
 						}
@@ -176,15 +182,6 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function (v) {
 						return v ? v.displayName : "-";
 					}
-				},{
-					hidden: true,
-					header: t('Modified by'),
-					width: dp(160),
-					sortable: true,
-					dataIndex: 'modifier',
-					renderer: function (v) {
-						return v ? v.displayName : "-";
-					}
 				}, {
 					hidden: true,
 					header: t('Job title'),
@@ -226,7 +223,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function (emailAddresses, meta, record) {
 						return emailAddresses.column("email").join(", ");
 					}
-				},
+				}
 			],
 			viewConfig: {
 				emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
@@ -264,11 +261,13 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 
 	//when filtering on a group then offer to delete contacts from a group when delting.
 	deleteSelected: function () {
-		if (!this.store.baseParams.filter.groupId) {
+
+		var filter = this.store.getFilter('addressbooks');
+		if (!filter || !filter.groupId) {
 			return go.grid.GridTrait.deleteSelected.call(this);
 		}
 
-		var groupId = this.store.baseParams.filter.groupId;
+		var groupId = filter.groupId;
 
 		var selectedRecords = this.getSelectionModel().getSelections(), ids = selectedRecords.column('id'), strConfirm;
 
@@ -302,7 +301,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 
 
 					selectedRecords.forEach(function (r) {
-						var groupIndex = r.json.groups.column("groupId").indexOf(groupId);
+						var groupIndex = r.json.groups.indexOf(groupId);
 //							console.log(groupIndex, groupId, r.json.groups);
 						updates[r.id] = {
 							groups: GO.util.clone(r.json.groups)

@@ -2,25 +2,47 @@
 
 namespace GO\Tasks;
 
+use go\core\db\Criteria;
+use go\core\jmap\Entity;
+use go\core\model\Link;
 use go\core\model\User;
+use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
+use go\core\orm\Query;
+use GO\Tasks\Model\Task;
 
 class TasksModule extends \GO\Base\Module {
 	
 	public static function defineListeners() {
 
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
+		Link::on(Entity::EVENT_FILTER, static::class, 'onLinkFilter');
 	}
 	
-	public static function initListeners() {
-		
-		\GO\Base\Model\User::model()->addListener('delete', "GO\Tasks\TasksModule", "deleteUser"); // TODO: remove and put relation in the database
-
+	public static function initListeners() {		
+		\GO\Base\Model\User::model()->addListener('delete', "GO\Tasks\TasksModule", "deleteUser"); // TODO: remove and put relation in the database		
 	}
 
 	public static function onMap(Mapping $mapping) {
-		$mapping->addHasOne('taskSettings', \GO\Tasks\Model\UserSettings::class, ['id' => 'user_id']);
+		$mapping->addHasOne('taskSettings', \GO\Tasks\Model\UserSettings::class, ['id' => 'user_id'], true);
+	}
+
+	public static function onLinkFilter(Filters $filters) {
+		$filters->add('completedTasks', function(Criteria $criteria, $value, Query $query, array $filter){
+			$query->join('ta_tasks', 'task', 's.entityId = task.id');
+			$criteria
+				->where('s.entityTypeId', '=', Task::model()->modelTypeId())
+				->andWhere('task.completion_time','>', 0);
+		});
+
+		$filters->add('incompleteTasks', function(Criteria $criteria, $value, Query $query, array $filter){
+			$query->join('ta_tasks', 'task', 's.entityId = task.id');
+			$criteria
+				->where('s.entityTypeId', '=', Task::model()->modelTypeId())
+				->andWhere('task.completion_time','=', 0);
+		});
+		return true;
 	}
 	
 	public function autoInstall() {

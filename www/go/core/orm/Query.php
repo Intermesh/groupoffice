@@ -78,14 +78,14 @@ class Query extends DbQuery {
 	 * @return bool
 	 */
 	public function delete() {
-		GO()->getDbConnection()->beginTransaction();
+		go()->getDbConnection()->beginTransaction();
 		foreach($this->getIterator() as $entity) {
 			if(!$entity->delete()) {
-				GO()->getDbConnection()->rollBack();
+				go()->getDbConnection()->rollBack();
 				return false;
 			}
 		}
-		GO()->getDbConnection()->commit();
+		go()->getDbConnection()->commit();
 		return true;
 	}
 
@@ -116,10 +116,14 @@ class Query extends DbQuery {
 			$relation = $cls::getMapping()->getRelation($part);
 			/** @var Relation $relation */
 
-			$cls = $relation->entityName;
-			
-			//TODO: What if the property has more than one table in the mapping? Also might be a problem in Entity::changeReferencedEntities()
-			$table = array_values($cls::getMapping()->getTables())[0]->getName();
+			if(isset($relation->entityName)) {
+				$cls = $relation->entityName;
+				
+				//TODO: What if the property has more than one table in the mapping? Also might be a problem in Entity::changeReferencedEntities()
+				$table = array_values($cls::getMapping()->getTables())[0]->getName();
+			} else {
+				$table = $relation->tableName;
+			}
 			$on = [];
 			foreach($relation->keys as $from => $to) {
 				$on[] = $alias . '.' .$from . ' = ' . $part . '.' . $to;

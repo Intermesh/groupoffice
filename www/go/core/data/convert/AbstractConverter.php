@@ -101,30 +101,43 @@ abstract class AbstractConverter {
 					$entity->setValues($params['values']);
 				}
 
+				go()->getDbConnection()->beginTransaction();
+
 				$entity = $this->importEntity($entity, $fp, $index++, $params);
 				
 				//ignore when false is returned. This is not an error. But intentional. Like CSV skipping a blank line for example.
 				if($entity === false) {
 					continue;
-				}
+				}			
 
 				$entity->save();
 
 				if($entity->hasValidationErrors()) {
-					$response['errors'][] = $entity->getValidationErrors();				
-				} else
-				{
+					go()->getDbConnection()->rollBack();
+					$response['errors'][] = "Item ". $index . ": ". var_export($entity->getValidationErrors(), true);				
+				} elseif($this->afterSave($entity)) {
+					go()->getDbConnection()->commit();
 					$response['count']++;
-				}
+				} else{
+					go()->getDbConnection()->rollBack();
+					$response['errors'][] = "Item ". $index . ": Import afterSave returned false";				
+				}				
 			}
 			catch(Exception $e) {
+				go()->getDbConnection()->rollBack();
 				ErrorHandler::logException($e);
-				$response['errors'][] = $e->getMessage();
+				$response['errors'][] = "Item ". $index . ": ".$e->getMessage();
 			}
 		}
 		
 		return $response;
 	}
+
+
+	protected function afterSave(Entity $entity) {
+		return true;
+	}
+
 	/**
 	 * Handle's the import. 
 	 * 
@@ -136,7 +149,7 @@ abstract class AbstractConverter {
 	 * @param resource $fp
 	 * @param int $index
 	 * @param array $params
-	 * @return $entity|false
+	 * @return Entity|false
 	 */
 	abstract protected function importEntity(Entity $entity, $fp, $index, array $params);
 	

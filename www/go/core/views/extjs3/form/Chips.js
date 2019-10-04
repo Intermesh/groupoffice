@@ -41,11 +41,13 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	name: null,
 	displayField: "name",
 	valueField: "id",
+	map: false,
 	entityStore: null,
 	comboStore: null,
 	store: null,
 	autoHeight: true,
 	storeBaseParams: null,
+	allowBlank: true,
 	
 	initComponent: function () {
 
@@ -127,7 +129,11 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	setValue: function (values) {
 		
 		if(this.entityStore) {	
-				this.entityStore.get(values, function (entities) {				
+			var ids = this.map ? Object.keys(values) : values;
+
+			this.mapValues = values;
+
+			this.entityStore.get(ids, function (entities) {				
 					this.dataView.store.loadData({records: entities}, true);
 					this._isDirty = false;
 			}, this);
@@ -147,21 +153,36 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		
 	},
 	getValue: function () {		
-		var records = this.dataView.store.getRange(), me = this, v = [];
-		records.forEach(function(r) {
-			v.push(r.get(me.valueField));
-		});
+		var records = this.dataView.store.getRange(), me = this;
+
+		if(this.map) {
+			var v = {}, id;
+			records.forEach(function(r) {
+				id = r.get(me.valueField);
+				v[id] = me.mapValues[id] || true;
+			});
+		} else{
+			var v = [];
+			records.forEach(function(r) {
+				v.push(r.get(me.valueField));
+			});
+		}
+		
 		
 		return v;
 		
 	},
-	markInvalid: function (msg) {
-		this.getEl().addClass('x-form-invalid');
-		Ext.form.MessageTargets.qtip.mark(this, msg);
+	markInvalid: function (msg) {		
+		if(this.comboBox) {
+			this.comboBox.getEl().addClass('x-form-invalid');
+		}
+		Ext.form.MessageTargets.qtip.mark(	this.comboBox, msg);
 	},
 	clearInvalid: function () {
-		this.getEl().removeClass('x-form-invalid');
-		Ext.form.MessageTargets.qtip.clear(this);
+		if(this.comboBox) {
+			this.comboBox.getEl().removeClass('x-form-invalid');
+		}
+		Ext.form.MessageTargets.qtip.clear(this.comboBox);
 	},
 	createComboBox: function () {
 		if(this.store) {
@@ -199,6 +220,12 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		}
 		
 		this.comboBox = new go.form.ComboBox({
+			listeners: {
+				focus: function(combo){
+						combo.onTriggerClick();
+				}
+			},
+			lazyInit: false,
 			hideLabel: true,
 			anchor: '100%',
 			emptyText: t("Please select..."),
@@ -240,7 +267,13 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			this.dataView.store.removeAt(index);
 		}
 	},
+	
 	validate: function () {
+
+		if(!this.allowBlank && go.util.empty(this.getValue())) {
+			this.markInvalid(Ext.form.TextField.prototype.blankText);
+			return false;
+		}
 		return true;
 	},
 

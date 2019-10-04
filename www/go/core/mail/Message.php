@@ -9,7 +9,7 @@ namespace go\core\mail;
  * 
  * @example
  * ````
- * $message = GO()->getMailer()->compose();
+ * $message = go()->getMailer()->compose();
  * $message->setTo()->setFrom()->setBody()->send();
  * ```
  */
@@ -20,7 +20,7 @@ class Message extends \Swift_Message {
 	public function __construct(Mailer $mailer) {
 		$this->mailer = $mailer;
 		parent::__construct();
-		$this->setFrom(GO()->getSettings()->systemEmail,GO()->getSettings()->title);
+		$this->setFrom(go()->getSettings()->systemEmail,go()->getSettings()->title);
 	}
 
 	/**

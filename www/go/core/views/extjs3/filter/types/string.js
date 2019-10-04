@@ -22,8 +22,7 @@ go.filter.types.string = Ext.extend(Ext.Panel, {
 	name: 'value',
 	initComponent: function () {
 		
-		this.operatorCombo = new go.form.ComboBox({
-				submit: false,
+		this.operatorCombo = new go.form.ComboBox({				
 				hideLabel: true,
 				name: "operator",
 				value: 'contains',
@@ -60,14 +59,12 @@ go.filter.types.string = Ext.extend(Ext.Panel, {
 	createValueField: function() {
 		return new Ext.form.TextField({
 			flex: 1,
-			submit: false,
 			name: 'value'
 		});
 	},
 	
 	isFormField: true,
 	
-	submit : false,
 	
 	getName : function() {
 		return this.name;

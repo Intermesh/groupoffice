@@ -12,13 +12,13 @@ class Settings extends Controller {
 
 	public function sendTestMessage($params) {
 		
-		$settings = GO()->getSettings()->setValues($params);
+		$settings = go()->getSettings()->setValues($params);
 	
-		$message = GO()->getMailer()->compose()
+		$message = go()->getMailer()->compose()
 						->setFrom($settings->systemEmail, $settings->title)
 						->setTo($settings->systemEmail)
-						->setSubject(GO()->t('Test message'))
-						->setBody(GO()->t("You're settings are correct.\n\nBest regards,\n\nGroup-Office"));
+						->setSubject(go()->t('Test message'))
+						->setBody(go()->t("You're settings are correct.\n\nBest regards,\n\nGroup-Office"));
 
 		$success = $message->send();
 		

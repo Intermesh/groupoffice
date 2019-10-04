@@ -15,7 +15,6 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 		this.filterCombo = new go.form.ComboBox({
 			width: dp(300),
 			hideLabel: true,
-			submit: false,
 			name: "name",
 			store: new Ext.data.JsonStore({
 				fields: ['name', 'title'],
@@ -79,14 +78,20 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 		{
 			cls = eval(filter.type);
 		}
-		
-		this.add(new cls({
+
+		if(!filter.typeConfig) {
+			filter.typeConfig = {};
+		}
+
+		Ext.apply(filter.typeConfig, {
 			columnWidth: 1,
 			filter: filter,
 			name: 'value',
 			hiddenName: 'value',
 			customfield: filter.customfield //Might be null if this is a standard filter.
-		}));				
+		});
+		
+		this.add(new cls(filter.typeConfig));				
 	}
 	
 });

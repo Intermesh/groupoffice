@@ -104,6 +104,7 @@ go.customfields.type.MultiSelect = Ext.extend(go.customfields.type.Text, {
 			name: field.databaseName,
 			type: "select",
 			multiple: true,
+			wildcards: true,
 			title: field.name,
 			options: field.dataType.options.map(function(o) {
 				return {
@@ -117,4 +118,4 @@ go.customfields.type.MultiSelect = Ext.extend(go.customfields.type.Text, {
 	
 });
 
-go.customfields.CustomFields.registerType(new go.customfields.type.MultiSelect());
+// go.customfields.CustomFields.registerType(new go.customfields.type.MultiSelect());

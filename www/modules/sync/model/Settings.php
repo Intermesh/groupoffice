@@ -34,6 +34,10 @@
 
 namespace GO\Sync\Model;
 
+use go\core\model\Acl;
+use go\core\model\User;
+use go\modules\community\addressbook\model\AddressBook;
+use go\modules\community\notes\model\NoteBook;
 
 class Settings extends \GO\Base\Db\ActiveRecord{
 	
@@ -125,6 +129,10 @@ class Settings extends \GO\Base\Db\ActiveRecord{
 					}
 				}
 			}
+
+
+			//$newUser = User::findById($user->id, ['syncSettings', 'addressBookSettings', 'notesSettings']);
+			
 
 //			if (\GO::modules()->addressbook) {
 //				$stmt = $this->addressbooks();

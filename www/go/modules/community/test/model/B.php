@@ -2,7 +2,7 @@
 namespace go\modules\community\test\model;
 
 use go\core\orm\Query;
-
+use go\core\validate\ErrorCode;
 
 /**
  * Extends model A and demonstrates usage of a second table
@@ -24,11 +24,14 @@ class B extends A {
 	 * @var int
 	 */
 	protected $sumOfTableBIds;
+
+
+	public $testSaveOtherModel = false;
 	
 	
 	protected static function defineMapping() {
 		$mapping = parent::defineMapping()
-			->addTable('test_b', 'b', ['id' => 'id'], null, ['userId' => GO()->getUserId()])
+			->addTable('test_b', 'b', ['id' => 'id'], null, ['userId' => go()->getUserId()])
 			->setQuery((new Query())->select("SUM(b.id) AS sumOfTableBIds")->join('test_b', 'bc', 'bc.id=a.id')->groupBy(['a.id']));
 		
 		return $mapping;
@@ -63,6 +66,20 @@ class B extends A {
 
 							$query->andWhere('hasMany.propOfHasManyA', "LIKE", "%" . $filter['hasHasMany'] . "%");
 						});
+	}
+
+	protected function internalSave() {
+
+		if($this->testSaveOtherModel) {
+			$other = new self;
+			$other->propA = 'other';
+			$other->propB = 'other';
+			if(!$other->save()) {
+				$this->setValidationError('testSaveOtherModel', ErrorCode::GENERAL, 'Could not save other model: '. var_export($other->getValidationErrors(), true));
+			}
+		}
+
+		return parent::internalSave();
 	}
 	
 }

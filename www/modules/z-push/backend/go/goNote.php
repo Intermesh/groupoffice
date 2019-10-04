@@ -100,7 +100,7 @@ class goNote extends GoBaseBackendDiff {
 
 		if(!$note) {
 			$note = new Note ();
-			$note->noteBookId = (new \go\core\db\Query)->selectSingleValue('noteBookId')->from('sync_user_note_book')->where(['userId' => GO()->getUserId()])->orderBy(['isDefault' => 'DESC'])->single();
+			$note->noteBookId = (new \go\core\db\Query)->selectSingleValue('noteBookId')->from('sync_user_note_book')->where(['userId' => go()->getUserId()])->orderBy(['isDefault' => 'DESC'])->single();
 		}
 
 		if(!$note->hasPermissionLevel(Acl::LEVEL_WRITE)) {
@@ -156,7 +156,7 @@ class goNote extends GoBaseBackendDiff {
 	 */
 	public function GetMessageList($folderid, $cutoffdate) {		
 		ZLog::Write(LOGLEVEL_DEBUG, 'goNote->GetMessageList('.$folderid.','.$cutoffdate.')');
-		//if(!GO()->getUser()->hasModule('notes')) {
+		//if(!go()->getUser()->hasModule('notes')) {
 		//TODO refactor
 		if (!\GO::modules()->notes) {
 			return [];
@@ -165,7 +165,7 @@ class goNote extends GoBaseBackendDiff {
 						->select('id,unix_timestamp(modifiedAt) AS `mod`, "1" AS `flags`')
 						->fetchMode(PDO::FETCH_ASSOC)
 						->join("sync_user_note_book", 's', 'n.noteBookId = s.noteBookId')
-						->where(['s.userId' => GO()->getUserId(), 'password' => ""]);
+						->where(['s.userId' => go()->getUserId(), 'password' => ""]);
 //		ZLog::Write(LOGLEVEL_DEBUG, $query->debugQueryString);
 		$notes = $query->all();	
 		
@@ -213,7 +213,7 @@ class goNote extends GoBaseBackendDiff {
 						->fetchMode(PDO::FETCH_ASSOC)
 						->select('COALESCE(count(*), 0) AS count, COALESCE(max(modifiedAt), 0) AS modifiedAt')
 						->join("sync_user_note_book", 's', 'n.noteBookId = s.noteBookId')
-						->where(['s.userId' => GO()->getUserId()])
+						->where(['s.userId' => go()->getUserId()])
 						->single();
 		
 		$newstate = 'M'.$record['modifiedAt'].':C'.$record['count'];

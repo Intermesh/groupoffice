@@ -40,7 +40,7 @@ class Connection {
 	 * 
 	 * @var bool 
 	 */
-	public $debug = false;
+	public $debug = true;
 	
 	public function __construct($dsn, $username, $password) {
 		$this->dsn = $dsn;
@@ -127,7 +127,7 @@ class Connection {
 			return $this->getPdo()->query($sql);
 		}
 		catch(PDOException $e) {
-			GO()->error("SQL FAILED: " . $sql);
+			go()->error("SQL FAILED: " . $sql);
 			throw $e;
 		}
 	}
@@ -149,7 +149,7 @@ class Connection {
 			return $this->getPdo()->exec($sql);
 		}
 		catch(PDOException $e) {
-			GO()->error("SQL FAILED: " . $sql);
+			go()->error("SQL FAILED: " . $sql);
 			throw $e;
 		}
 	}
@@ -176,7 +176,7 @@ class Connection {
 			//$ret = null;
 			//if (!$this->inTransaction())
 			if($this->debug) {
-				GO()->debug("START DB TRANSACTION");
+				go()->debug("START DB TRANSACTION", 1);
 			}
 			$ret = $this->getPdo()->beginTransaction();
 
@@ -220,7 +220,7 @@ class Connection {
 		
 		$this->transactionSavePointLevel--;	
 		if($this->transactionSavePointLevel == 0) {			
-			GO()->warn("ROLLBACK DB TRANSACTION");
+			go()->warn("ROLLBACK DB TRANSACTION", 1);
 			return $this->getPdo()->rollBack();
 		}else
 		{
@@ -245,7 +245,7 @@ class Connection {
 		$this->transactionSavePointLevel--;
 		if($this->transactionSavePointLevel == 0) {
 			if($this->debug) {
-				GO()->debug("COMMIT DB TRANSACTION");				
+				go()->debug("COMMIT DB TRANSACTION");				
 			}
 			return $this->getPdo()->commit();
 		}else
@@ -418,7 +418,7 @@ class Connection {
 	 * 
 	 * @example with join
 	 * ```
-	 * GO()->getDbConnection()->update(
+	 * go()->getDbConnection()->update(
 	 *     'core_acl', 
 	 *     [
 	 *       'acl.entityTypeId' => $entityTypeId, 
@@ -450,7 +450,7 @@ class Connection {
 	 * 
 	 * @example 
 	 * ```
-	 * $query = GO()->getDbConnection()
+	 * $query = go()->getDbConnection()
 	 * 						->select('*')
 	 * 						->from('test_a')
 	 * 						->where('id', '=', 1);
@@ -489,7 +489,7 @@ class Connection {
 	 */
 	public function createStatement($build) {
 		try {
-			$build['start'] = GO()->getDebugger()->getTimeStamp();
+			$build['start'] = go()->getDebugger()->getTimeStamp();
 			$stmt = $this->getPDO()->prepare($build['sql']);
 			$stmt->setBuild($build);
 
@@ -501,7 +501,7 @@ class Connection {
 			}
 			return $stmt;
 		}catch(\PDOException $e) {
-			GO()->error("Failed SQL: ". QueryBuilder::debugBuild($build));
+			go()->error("Failed SQL: ". QueryBuilder::debugBuild($build));
 			throw $e;
 		}
 	}

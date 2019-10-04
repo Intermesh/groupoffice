@@ -129,9 +129,13 @@ go.Relations = {
 	 * @param {*} data 
 	 */
 	resolveKey : function(key, data) {
-		var parts = key.split(".");
+		if(!data) {
+			return null;
+		}
+		var parts = key.split("."), part;
 						
-		parts.forEach(function(p) {
+		for(var i = 0, l = parts.length; i < l; i++) {
+			p = parts[i];
 			if(Ext.isArray(data)) {
 				var arr = [];
 				data.forEach(function(i) {
@@ -141,16 +145,14 @@ go.Relations = {
 			} else
 			{
 				if(!Ext.isDefined(data[p])) {
-					data = null;
-     			return false;
+					return null;
 				}
 				data = data[p];
 			}
 			if(!data) {
-				data = null;
-				return false;
+				return null;
 			}
-		});
+		}
 		
 		return data;
 	}

@@ -16,7 +16,7 @@ CREATE TABLE `addressbook_addressbook` (
   `id` int(11) NOT NULL,
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `aclId` int(11) NOT NULL,
-  `createdBy` int(11) NOT NULL,
+  `createdBy` int(11) DEFAULT NULL,
   `filesFolderId` int(11) DEFAULT NULL,
   `salutationTemplate` text COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -24,7 +24,7 @@ CREATE TABLE `addressbook_addressbook` (
 CREATE TABLE `addressbook_contact` (
   `id` int(11) NOT NULL,
   `addressBookId` int(11) NOT NULL,
-  `createdBy` int(11) NOT NULL,
+  `createdBy` int(11) DEFAULT NULL,
   `createdAt` datetime NOT NULL,
   `modifiedAt` datetime NOT NULL,
   `modifiedBy` int(11) DEFAULT NULL,
@@ -35,6 +35,7 @@ CREATE TABLE `addressbook_contact` (
   `middleName` varchar(55) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `lastName` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `suffixes` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Suffixes like ''Msc.''',
+  `salutation` VARCHAR(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `gender` enum('M','F') COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'M for Male, F for Female or null for unknown',
   `notes` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `isOrganization` tinyint(1) NOT NULL DEFAULT 0,
@@ -174,8 +175,8 @@ ALTER TABLE `addressbook_addressbook`
 ALTER TABLE `addressbook_contact`
   ADD CONSTRAINT `addressbook_contact_ibfk_1` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`),
   ADD CONSTRAINT `addressbook_contact_ibfk_2` FOREIGN KEY (`photoBlobId`) REFERENCES `core_blob` (`id`),
-  ADD CONSTRAINT `addressbook_contact_ibfk_3` FOREIGN KEY (`modifiedBy`) REFERENCES `core_user` (`id`),
-  ADD CONSTRAINT `addressbook_contact_ibfk_4` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`),
+  ADD CONSTRAINT `addressbook_contact_ibfk_3` FOREIGN KEY (`modifiedBy`) REFERENCES `core_user` (`id`) ON DELETE SET NULL,
+  ADD CONSTRAINT `addressbook_contact_ibfk_4` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `addressbook_contact_ibfk_5` FOREIGN KEY (`goUserId`) REFERENCES `core_user` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `addressbook_contact_ibfk_6` FOREIGN KEY (`vcardBlobId`) REFERENCES `core_blob` (`id`);
 
@@ -208,3 +209,5 @@ ALTER TABLE `addressbook_url`
 ALTER TABLE `addressbook_user_settings`
   ADD CONSTRAINT `addressbook_user_settings_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `addressbook_user_settings_ibfk_2` FOREIGN KEY (`defaultAddressBookId`) REFERENCES `addressbook_addressbook` (`id`) ON DELETE SET NULL;
+
+ALTER TABLE `addressbook_addressbook` ADD FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;

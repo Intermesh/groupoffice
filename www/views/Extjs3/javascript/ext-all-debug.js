@@ -28220,8 +28220,28 @@ Ext.Window = Ext.extend(Ext.Panel, {
             this.hidden = true;
             this.show();
         }
+
+        this.autoRestoreFocus();
     },
 
+	/**
+	 * Restore focus to active element before opening the window.	 
+	 */
+	autoRestoreFocus :  function() {		
+		this.on("beforeshow", function() {            
+            this.activeEl = document.activeElement;
+		}, this);
+		
+		this.on("close", function() {	
+            if(this.activeEl)		
+			    this.activeEl.focus();
+		}, this);
+		
+		this.on("hide", function() {
+            if(this.activeEl)				
+			    this.activeEl.focus();
+		}, this);
+	},
     
     getState : function(){
         return Ext.apply(Ext.Window.superclass.getState.call(this) || {}, this.getBox(true));
@@ -40184,6 +40204,8 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
     
     defaultAutoCreate : {tag: 'input', type: 'text', size: '20', autocomplete: 'off'},
     
+    autocomplete: "off",
+
     fieldClass : 'x-form-field',
     
     msgTarget : 'qtip',
@@ -40240,6 +40262,9 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
             if(this.inputType){
                 cfg.type = this.inputType;
             }
+
+            cfg.autocomplete = this.autocomplete;
+            
             this.autoEl = cfg;
         }
         Ext.form.Field.superclass.onRender.call(this, ct, position);
@@ -44006,6 +44031,10 @@ Ext.form.BasicForm = Ext.extend(Ext.util.Observable, {
                     f.setValue(v.value);
                     if(this.trackResetOnLoad){
                         f.originalValue = f.getValue();
+                        f.dirty = false; //MS: for form group and possibly other components
+                        if(f.setNotDirty) {
+                            f.setNotDirty(false);
+                        }
                     }
                 }
             }
@@ -44016,6 +44045,10 @@ Ext.form.BasicForm = Ext.extend(Ext.util.Observable, {
                     field.setValue(values[id]);
                     if(this.trackResetOnLoad){
                         field.originalValue = field.getValue();
+                        field.dirty = false; //MS: for form group and possibly other components
+                        if(field.setNotDirty) {
+                            field.setNotDirty(false);
+                        }
                     }
                 }
             }

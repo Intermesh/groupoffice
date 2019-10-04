@@ -16,7 +16,7 @@ class User extends EntityController {
 	
 	protected function canUpdate(Entity $entity) {
 		
-		if(!GO()->getAuthState()->isAdmin()) {
+		if(!go()->getAuthState()->isAdmin()) {
 			if($entity->isModified('groups')) {
 				return false;
 			}
@@ -40,7 +40,7 @@ class User extends EntityController {
 			throw new InvalidArguments("Missing parameter userId");
 		}
 		
-		if(!GO()->getAuthState()->isAdmin()) {
+		if(!go()->getAuthState()->isAdmin()) {
 			throw new Forbidden();
 		}
 		
@@ -50,7 +50,7 @@ class User extends EntityController {
 			throw new Exception("This user is disabled");
 		}
 		
-		$token = GO()->getAuthState()->getToken();
+		$token = go()->getAuthState()->getToken();
 		$token->userId = $params['userId'];
 		$success = $token->setAuthenticated();
 		
@@ -100,5 +100,17 @@ class User extends EntityController {
 	 */
 	public function changes($params) {
 		return $this->defaultChanges($params);
+	}
+
+	public function export($params) {
+		return $this->defaultExport($params);
+	}
+
+	public function import($params) {
+		return $this->defaultImport($params);
+	}
+
+	public function importCsvMapping($params) {
+		return $this->defaultImportCSVMapping($params);
 	}
 }

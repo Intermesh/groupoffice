@@ -62,6 +62,7 @@ go.customfields.type.Number = Ext.extend(go.customfields.type.Text, {
 	getFilter : function(field) {
 		return {
 			name: field.databaseName,
+			wildcards: false,
 			type: "number",
 			multiple: false,
 			title: field.name,
@@ -72,4 +73,4 @@ go.customfields.type.Number = Ext.extend(go.customfields.type.Text, {
 
 });
 
-go.customfields.CustomFields.registerType(new go.customfields.type.Number());
+// go.customfields.CustomFields.registerType(new go.customfields.type.Number());

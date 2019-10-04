@@ -36,8 +36,9 @@ trait EventEmitterTrait {
 	/**
 	 * Add a persistent static event listener
 	 * 
-	 * This listener will be stored and will be used on every request. If you don't
-	 * need that then use {@see attach()}
+	 * You can use this in two different ways:
+	 * - When this is called in Module::defineListeners() the listener will be stored and will be used on every request. 
+	 * - When attaching it in any other place it will only be kept within the current request.
 	 * 
 	 * @param int $event Defined in constants prefixed by EVENT_
 	 * @param callable $fn 

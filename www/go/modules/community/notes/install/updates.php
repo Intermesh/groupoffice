@@ -89,3 +89,18 @@ $updates['201903291350'][] = function() {
 
 $updates['201905201417'][] = "ALTER TABLE `notes_note` DROP FOREIGN KEY `notes_note_ibfk_1`;";
 $updates['201905201417'][] = "ALTER TABLE `notes_note` ADD CONSTRAINT `notes_note_ibfk_1` FOREIGN KEY (`noteBookId`) REFERENCES `notes_note_book`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;";
+
+
+$updates['201909201327'][] = "CREATE TABLE `notes_user_settings` (
+  `userId` int(11) NOT NULL,
+  `defaultNoteBookId` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
+$updates['201909201327'][] = "ALTER TABLE `notes_user_settings`
+  ADD PRIMARY KEY (`userId`),
+  ADD KEY `defaultNoteBookId` (`defaultNoteBookId`);";
+
+$updates['201909201327'][] = "ALTER TABLE `notes_user_settings`
+  ADD CONSTRAINT `notes_user_settings_ibfk_1` FOREIGN KEY (`defaultNoteBookId`) REFERENCES `notes_note_book` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `notes_user_settings_ibfk_2` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE;";

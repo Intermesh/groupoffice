@@ -233,7 +233,7 @@ class Response extends Singleton{
 	public function sendHeaders() {		
 		foreach ($this->headers as $name => $h) {			
 			foreach ($h[1] as $v) {
-				// GO()->debug($h[0] . ': '. $v);
+				// go()->debug($h[0] . ': '. $v);
 				header($h[0] . ': ' . $v);
 			}
 		}		

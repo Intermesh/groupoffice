@@ -72,8 +72,7 @@ abstract class EntityController extends Controller {
 		$query = $cls::find($cls::getPrimaryKey(false))
 						->select($cls::getPrimaryKey(true)) //only select primary key
 						->limit($params['limit'])
-						->offset($params['position'])
-						->debug();
+						->offset($params['position']);
 		
 		/* @var $query Query */
 
@@ -97,7 +96,7 @@ abstract class EntityController extends Controller {
 			$query->filter(["permissionLevel" => Acl::LEVEL_READ]);
 		}
 		
-		//GO()->info($query);
+		//go()->info($query);
 		
 		return $query;
 	}
@@ -440,6 +439,61 @@ abstract class EntityController extends Controller {
 		return $params;
 	}
 
+
+	/**
+	 * When doing a set we update and create models. But sometimes the models itself create or update other models. When this happen
+	 * we must also return those in the client or it won't sync them because the chage occurred in the same modseq.
+	 */
+	private function trackSaves() {
+		$cls = $this->entityClass();
+		$cls::on(Entity::EVENT_SAVE, static::class, 'onEntitySave');		
+	}
+
+	public static $createdEntitities = [];
+	public static $updatedEntitities = [];
+
+	public static function onEntitySave(Entity $entity) {
+
+		$mod = array_map(function($mod) { return $mod[0];}, $entity->getModified()); //Get only modified values
+		if($entity->isNew()) {
+			static::$createdEntitities[$entity->id()] = $mod;
+		} else {
+			static::$updatedEntitities[$entity->id()] = $mod;
+		}
+	}
+
+
+	/**
+	 * Put all modified entities tracked by trackSave into the result array
+	 */
+	private function mergeOtherSaves(&$result) {
+
+		//build a list of ID's of entities that were created/ updated in the set requests. We can filter them out to avoid duplicates in the response.
+		$setIds = [];
+		if(isset($result['updated'])) {
+			$setIds = array_keys($result['updated']);
+		}
+		if(isset($result['created'])) {
+			$setIds = array_merge(array_map(function($mod) {return $mod['id'];}, $result['created']));
+		}
+
+		if(count(static::$updatedEntitities) > 1) {						
+			static::$updatedEntitities = array_filter(static::$updatedEntitities, function($id) use($setIds) {
+				return !in_array($id, $setIds);
+			}, ARRAY_FILTER_USE_KEY);
+
+			$result['updated'] = isset($result['updated']) ? array_replace($result['updated'], static::$updatedEntitities) : static::$updatedEntitities;
+		}
+		if(count(static::$createdEntitities) > 1) {
+
+			static::$createdEntitities = array_filter(static::$createdEntitities, function($id) use($setIds) {
+				return !in_array($id, $setIds);
+			}, ARRAY_FILTER_USE_KEY);
+
+			$result['created'] = isset($result['created']) ? array_replace($result['created'], static::$createdEntitities) : static::$createdEntitities;
+		}
+	}
+
 	/**
 	 * Handles the Foo entity setFoos command
 	 * 
@@ -447,7 +501,9 @@ abstract class EntityController extends Controller {
 	 * @throws StateMismatch
 	 */
 	protected function defaultSet($params) {
-		
+
+		$this->trackSaves();
+
 		$p = $this->paramsSet($params);
 
 		$oldState = $this->getState();
@@ -469,6 +525,8 @@ abstract class EntityController extends Controller {
 		$this->createEntitites($p['create'], $result);
 		$this->updateEntities($p['update'], $result);
 		$this->destroyEntities($p['destroy'], $result);
+
+		$this->mergeOtherSaves($result);
 
 		$result['oldState'] = $oldState;
 		$result['newState'] = $this->getState();
@@ -513,7 +571,7 @@ abstract class EntityController extends Controller {
 	 * @todo Check permissions
 	 * 
 	 * @param array $properties
-	 * @return \go\core\jmap\cls
+	 * @return Entity
 	 */
 	protected function create(array $properties) {
 		
@@ -597,7 +655,9 @@ abstract class EntityController extends Controller {
 			if ($success) {
 				$result['destroyed'][] = $id;
 			} else {
-				$result['notDestroyed'][] = $entity->getValidationErrors();
+				$errors = $entity->getValidationErrors();
+				$first = array_shift($errors);
+				$result['notDestroyed'][$id] = ['type' => $first['code'], 'description' => $first['description']];
 			}
 		}
 	}
@@ -646,7 +706,7 @@ abstract class EntityController extends Controller {
 			$result = $cls::getChanges($p['sinceState'], $p['maxChanges']);		
 		} catch (CannotCalculateChanges $e) {
 			$result["message"] = $e->getMessage();
-			GO()->warn($e->getMessage());
+			go()->warn($e->getMessage());
 		}
 		
 		$result['accountId'] = $p['accountId'];
@@ -684,6 +744,9 @@ abstract class EntityController extends Controller {
 	 * @throws Exception
 	 */
 	protected function defaultImport($params) {
+
+		ini_set('max_execution_time', 10 * 60);
+		
 		$params = $this->paramsImport($params);
 		
 		$blob = Blob::findById($params['blobId']);	
@@ -707,8 +770,6 @@ abstract class EntityController extends Controller {
 	 * @throws Exception
 	 */
 	protected function defaultImportCSVMapping($params) {
-
-		ini_set('max_execution_time', 10 * 60);
 		
 		$blob = Blob::findById($params['blobId']);	
 		

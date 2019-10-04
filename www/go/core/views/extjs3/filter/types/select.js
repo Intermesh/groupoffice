@@ -34,8 +34,7 @@ go.filter.types.select = Ext.extend(go.form.ComboBox, {
 	hiddenName: 'value',
 	initComponent: function () {
 		
-		Ext.apply(this, {
-				submit: false,
+		Ext.apply(this, {				
 				hideLabel: true,				
 				store: new Ext.data.JsonStore({
 					fields: ['value', 'title'],		

@@ -88,7 +88,7 @@ class Address extends Property {
 	private function validateCountry() {
 		if($this->isModified('countryCode')) {			
 			if(isset($this->countryCode)) {
-				$countries = GO()->t('countries');
+				$countries = go()->t('countries');
 				if(!isset($countries[$this->countryCode])) {
 					$this->setValidationError('countryCode', \go\core\validate\ErrorCode::INVALID_INPUT, "Unknown ISO 3601 2 char country code provided: " . $this->countryCode);
 					return false;
@@ -96,7 +96,7 @@ class Address extends Property {
 				$this->country = $countries[$this->countryCode];
 			}
 		} elseif($this->isModified('country')) {
-			$countryCodes = array_flip(GO()->t('countries'));
+			$countryCodes = array_flip(go()->t('countries'));
 			if(isset($countryCodes[$this->country])) {
 				$this->countryCode = $countryCodes[$this->country] ?? null;
 			}

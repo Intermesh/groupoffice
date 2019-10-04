@@ -457,10 +457,10 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				contact.addressBookId = e.target.attributes.data.addressBookId;
 
 				var groupId = e.target.attributes.data.id;
-				if (contact.groups.column("groupId").indexOf(groupId) > -1) {
+				if (contact.groups.indexOf(groupId) > -1) {
 					return; //already in the groups
 				}
-				contact.groups.push({groupId: groupId});
+				contact.groups.push(groupId);
 			}
 
 			updates[r.id] = contact;

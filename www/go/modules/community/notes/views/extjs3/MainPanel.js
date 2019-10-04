@@ -23,9 +23,12 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	initComponent: function () {
 
 		this.createNoteGrid();
-		
 
 		this.sidePanel = new Ext.Panel({
+			layout: 'anchor',
+			defaults: {
+				anchor: '100%'
+			},
 			width: dp(300),
 			cls: 'go-sidenav',
 			region: "west",
@@ -79,7 +82,12 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		//load note books and select the first
 		this.noteBookGrid.getStore().load({
 			callback: function (store) {
-				this.noteBookGrid.getSelectionModel().selectRow(0);
+				var index = this.noteBookGrid.store.indexOfId(go.User.notesSettings.defaultNoteBookId);
+				if(index == -1) {
+					index = 0;
+				}
+
+				this.noteBookGrid.getSelectionModel().selectRow(index);
 			},
 			scope: this
 		});
@@ -169,7 +177,8 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					iconCls: "ic-menu",
 					handler: function () {
 //						this.westPanel.getLayout().setActiveItem(this.noteBookGrid);
-						this.noteBookGrid.show();
+						//this.noteBookGrid.show();
+						this.sidePanel.show();
 					},
 					scope: this
 				},

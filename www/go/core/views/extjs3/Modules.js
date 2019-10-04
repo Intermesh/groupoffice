@@ -114,10 +114,10 @@ go.Modules = (function () {
 		 * @param {string} package
 		 * @param {string} name
 		 * @param {int} Required permission level
-		 * 
+		 * @param {User} User entity
 		 * @returns {boolean}
 		 */
-		isAvailable: function (package, name, permissionLevel) {
+		isAvailable: function (package, name, permissionLevel, user) {
 			
 			if(!Ext.isDefined(permissionLevel)) {
 				permissionLevel = go.permissionLevels.read;
@@ -135,7 +135,20 @@ go.Modules = (function () {
 			if (!module) {
 				return false;
 			}
-			return module.permissionLevel >= permissionLevel;
+
+			//for the logged in user we can simply check permissionLevel
+			if(!user) {
+				return module.permissionLevel >= permissionLevel;
+			}
+
+			//if a user is given we must check the groups			
+			for(groupId in module.acl) {
+				if(module.acl[groupId] >= permissionLevel && user.groups.indexOf(parseInt(groupId)) != -1) {
+					return true;
+				}
+			}
+
+			return false;
 		},
 
 		/**

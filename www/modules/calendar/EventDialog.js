@@ -109,6 +109,14 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 	setLinkEntity: function(config) {
 		this.linkEntity = config.entity;
 		this.linkEntityId = config.entityId;
+
+		//for project and contacts
+		if(config.data.name) {
+			this.on('load', function() {
+				this.subjectField.setValue(config.data.name);
+			}, this, {single: true});
+			
+		}
 	},
 
 	initWindow : function() {
@@ -168,6 +176,10 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				scope : this
 			}]
 		});
+
+		this.win.on("hide", function() {
+			this.createLinkButton.reset();
+		}, this);
 	},
 
 	files_folder_id : 0,
@@ -184,11 +196,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 
 		config = config || {};
 
-		GO.dialogListeners.apply(this);
-		
-		this.on("hide", function() {
-			this.createLinkButton.reset();
-		}, this);
+		GO.dialogListeners.apply(this);		
 		
 		this.win.show();
 

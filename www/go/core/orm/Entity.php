@@ -193,7 +193,7 @@ abstract class Entity extends Property {
 
 		$this->isSaving = true;
 
-//		GO()->debug(static::class.'::save()' . $this->id());
+//		go()->debug(static::class.'::save()' . $this->id());
 		App::get()->getDbConnection()->beginTransaction();
 
 		try {
@@ -204,7 +204,7 @@ abstract class Entity extends Property {
 			}
 			
 			if (!$this->internalSave()) {
-				GO()->warn(static::class .'::internalSave() returned false');
+				go()->warn(static::class .'::internalSave() returned false');
 				$this->rollback();
 				return false;
 			}		
@@ -303,7 +303,7 @@ abstract class Entity extends Property {
 
 		$this->isDeleting = true;
 		
-		//GO()->debug(static::class.'::delete() ' . $this->id());
+		//go()->debug(static::class.'::delete() ' . $this->id());
 
 		App::get()->getDbConnection()->beginTransaction();
 
@@ -339,7 +339,7 @@ abstract class Entity extends Property {
 	}
 
 	protected function rollback() {
-		App::get()->debug("Rolling back save operation for ".static::class);
+		App::get()->debug("Rolling back save operation for " . static::class, 1);
 		parent::rollBack();
 		$this->isDeleting = false;
 		$this->isSaving = false;
@@ -365,7 +365,7 @@ abstract class Entity extends Property {
 		if($this->isNew()) {
 			return $this->canCreate() ? Acl::LEVEL_CREATE : false;
 		}
-		return GO()->getAuthState() && GO()->getAuthState()->isAdmin() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
+		return go()->getAuthState() && go()->getAuthState()->isAdmin() ? Acl::LEVEL_MANAGE : Acl::LEVEL_READ;
 	}
 	
 	/**
@@ -384,9 +384,10 @@ abstract class Entity extends Property {
 	 * @param Query $query
 	 * @param int $level
 	 * @param int $userId Leave to null for the current user
+	 * @param int[] $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
 	 * @return Query $query;
 	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null) {
+	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
 		
 		return $query;
 	}
@@ -427,10 +428,10 @@ abstract class Entity extends Property {
 
 		$cls = static::class;
 
-		$type = GO()->getCache()->get('type-' . $cls);
+		$type = go()->getCache()->get('type-' . $cls);
 		if(!$type) {
 			$type = EntityType::findByClassName(static::class);
-			GO()->getCache()->set('type-' . $cls, $type, false);
+			go()->getCache()->set('type-' . $cls, $type, false);
 		}
 		return $type;
 	}
@@ -478,6 +479,11 @@ abstract class Entity extends Property {
 	 * @return Filters
 	 */
 	protected static function defineFilters() {
+
+		$cls = static::class;
+
+		$filters = go()->getCache()->get('filters-' . $cls);
+
 		$filters = new Filters();
 
 		$filters->add('text', function(Criteria $criteria, $value, Query $query) {
@@ -545,6 +551,26 @@ abstract class Entity extends Property {
 			$criteria->where('comment.modifiedAt', $comparator, $value);					
 		});
 
+
+		/* 
+			find all items with link to:
+
+		link : {
+			entity: "Contact",
+			id: 1
+		}
+		*/
+		$filters->add("link", function(Criteria $criteria, $value, Query $query) {
+			$linkAlias = 'link_' . uniqid();
+			$on = $query->getTableAlias() . '.id =  '.$linkAlias.'.toId  AND '.$linkAlias.'.toEntityTypeId = ' . static::entityType()->getId();
+			
+				
+			$query->join('core_link', $linkAlias, $on); 
+
+			$criteria->where('fromId', '=', $value['id'])
+							->andWhere('fromEntityTypeId', '=', EntityType::findByName($value['entity'])->getId());							
+		});
+
 		static::fireEvent(self::EVENT_FILTER, $filters);
 		
 		return $filters;
@@ -596,7 +622,7 @@ abstract class Entity extends Property {
 		$columns = static::textFilterColumns();
 		
 		if(empty($columns)) {
-			GO()->warn(static::class . ' entity has no textFilterColumns() defined. The q filter will not work.');
+			go()->warn(static::class . ' entity has no textFilterColumns() defined. The "text" filter will not work.');
 		}
 		
 		//Explode string into tokens and wrap in wildcard signs to search within the texts.
@@ -641,15 +667,22 @@ abstract class Entity extends Property {
 	/**
 	 * Sort entities.
 	 * 
-	 * By default you can sort on all database columns. But you can override this
-	 * to implement custom logic.
+	 * By default you can sort on 
+	 * 
+	 * - all database columns
+	 * - All Customfields with "customField.<databasName>"
+	 * - creator Will join core_user.displayName on createdBy
+	 * - modifier Will join core_user.displayName on modifiedBy
+	 * 
+	 *  You can override this to implement custom logic.
 	 * 
 	 * @example
 	 * ```
 	 * public static function sort(Query $query, array $sort) {
 	 * 		
-	 * 		if(isset($sort['creator'])) {			
-	 * 			$query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT')->orderBy(['u.displayName' => $sort['creator']]);			
+	 * 		if(isset($sort['special'])) {			
+	 * 			$query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT')->orderBy(['u.displayName' => $sort['creator']]);	
+	 * 			unset($sort['special']);		
 	 * 		} 
 	 * 
 	 * 		
@@ -672,6 +705,19 @@ abstract class Entity extends Property {
 //							, true
 //		);
 		
+		//
+
+		if(isset($sort['modifier'])) {
+			$query->join('core_user', 'modifier', 'modifier.id = '.$query->getTableAlias() . '.modifiedBy');
+			$query->orderBy(['modifier.displayName' => $sort['modifier']], true);
+			unset($sort['modifier']);
+		}
+
+		if(isset($sort['creator'])) {
+			$query->join('core_user', 'creator', 'creator.id = '.$query->getTableAlias() . '.modifiedBy');
+			$query->orderBy(['creator.displayName' => $sort['creator']], true);
+			unset($sort['creator']);
+		}
 		
 		//Enable sorting on customfields with ['customFields.fieldName' => 'DESC']
 		foreach($sort as $field => $dir) {
@@ -766,7 +812,7 @@ abstract class Entity extends Property {
 			echo "Fixing files folder ID's\n";
 			$tables = static::getMapping()->getTables();
 			$table = array_values($tables)[0]->getName();
-			GO()->getDbConnection()->update(
+			go()->getDbConnection()->update(
 				$table, 
 				['filesFolderId' => null], 
 				(new Query)

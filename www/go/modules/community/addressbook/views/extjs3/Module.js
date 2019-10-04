@@ -60,7 +60,12 @@ go.Modules.register("community", "addressbook", {
 					multiple: true,
 					type: 'string'
 				},
-
+				{
+					title: t("Address book"),
+					name: 'addressBookId',
+					multiple: false,
+					type: "go.modules.community.addressbook.AddresBookCombo"
+				},
 				
 				{
 					name: 'name',
@@ -68,6 +73,14 @@ go.Modules.register("community", "addressbook", {
 					type: "string",
 					multiple: true
 				},
+
+				{
+					title: t("Notes"),
+					name: 'notes',
+					multiple: true,
+					type: 'string'
+				},
+
 				{
 					name: 'email',
 					title: t("E-mail"),
@@ -146,7 +159,7 @@ go.Modules.register("community", "addressbook", {
 
 					filter: "isContact",
 
-					iconCls: "entity ic-person",
+					iconCls: "entity ic-person blue",
 
 					/**
 					 * Opens a dialog to create a new linked item
@@ -173,7 +186,7 @@ go.Modules.register("community", "addressbook", {
 					 */
 					title: t("Organization"),
 
-					iconCls: "entity ic-business",
+					iconCls: "entity ic-business purple",
 
 					filter: "isOrganization",
 
@@ -217,6 +230,10 @@ go.Modules.register("community", "addressbook", {
 
 	selectDialogPanels: [
 		"go.modules.community.addressbook.SelectDialogPanel",
+	],
+
+	customFieldTypes: [
+		"go.modules.community.addressbook.customfield.Contact"
 	]
 });
 

@@ -184,6 +184,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			deferedRender:true
 		});
 
+		this.tabPanel.setActiveTab(null);
+
 
 		//blur active form fields on tab change. Otherwise auto complete combo boxes
 		//will remain focussed but the autocomplete functionality fails.
@@ -351,22 +353,24 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		Ext.getBody().mask(t("Loading..."));
 	
-		Promise.all([
-			go.customfields.CustomFields.init(),
-			go.Modules.init(),
-			this.loadLegacyModuleScripts()
-		]).then(function(){
-			go.Entities.init();
-			me.addDefaultRoutes();
-			me.renderUI();
-			go.Router.check();
-			Ext.getBody().unmask();
-			
-		}).catch(function(error){
-			console.error(error);
-			Ext.getBody().unmask();
-			Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console."));
+		go.Modules.init().then(function() {
+			Promise.all([
+				go.customfields.CustomFields.init(),				
+				me.loadLegacyModuleScripts()
+			]).then(function(){
+				go.Entities.init();
+				me.addDefaultRoutes();
+				me.renderUI();
+				go.Router.check();
+				Ext.getBody().unmask();
+				
+			}).catch(function(error){
+				console.error(error);
+				Ext.getBody().unmask();
+				Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console."));
+			});
 		});
+		
 		
 		
 	},

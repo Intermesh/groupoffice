@@ -7,7 +7,7 @@ use go\modules\community\ldapauthenticator\controller\Sync as SyncCtrl;
 class Sync extends CronJob {
 	
 	public function run() {
-    $records = GO()->getDbConnection()
+    $records = go()->getDbConnection()
     ->select('id,syncGroups,syncUsers')
     ->from('ldapauth_server')
     ->where('syncUsers = true OR syncGroups = true');

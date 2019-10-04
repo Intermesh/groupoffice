@@ -5,7 +5,7 @@ namespace GO\Files\Filehandler;
 
 class Inline implements FilehandlerInterface{
 
-	private $defaultExtensions = array('pdf','html','htm','txt','xml','log');
+	private $defaultExtensions = array('pdf','html','htm','txt','xml','log', 'webm', 'mov', 'mp4', 'avi', 'ogv', 'wav','mp3', 'ogg');
 	
 	public function isDefault(\GO\Files\Model\File $file) {
 		return in_array(strtolower($file->extension), $this->defaultExtensions);

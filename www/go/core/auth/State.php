@@ -25,5 +25,12 @@ abstract class State {
 	 */
 	abstract function isAuthenticated();
 
+	/**
+	 * Check if the logged in user is an admin
+	 * 
+	 * @return bool
+	 */
+	abstract public function isAdmin();
+
 }
 

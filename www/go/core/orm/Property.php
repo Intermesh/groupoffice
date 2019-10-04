@@ -183,6 +183,10 @@ abstract class Property extends Model {
 
 				case Relation::TYPE_HAS_ONE:
 					$prop = $this->isNew() ? null : $cls::internalFind()->andWhere($where)->single();				
+					if(!$prop && $relation->autoCreate) {
+						$prop = new $cls;
+						$this->applyRelationKeys($relation, $prop);
+					}
 					$this->{$relation->name} = $prop ? $prop : null;
 				break;
 
@@ -223,7 +227,7 @@ abstract class Property extends Model {
 		return $where;
 	}
 	private function getScalarKey(Relation $relation) {
-		$table = Table::getInstance($relation->tableName, GO()->getDbConnection());
+		$table = Table::getInstance($relation->tableName, go()->getDbConnection());
 		$diff = array_diff($table->getPrimaryKey(), $relation->keys);
 
 		return array_shift($diff);
@@ -315,14 +319,14 @@ abstract class Property extends Model {
 		}		
 		$cacheKey = 'mapping-' . str_replace('\\', '-', $cls);
 		
-		self::$mapping[$cls] = GO()->getCache()->get($cacheKey);
+		self::$mapping[$cls] = go()->getCache()->get($cacheKey);
 		if(!self::$mapping[$cls]) {			
 			self::$mapping[$cls] = static::defineMapping();			
 			if(!static::fireEvent(self::EVENT_MAPPING, self::$mapping[$cls])) {
 				throw new \Exception("Mapping event failed!");
 			}
 			
-			GO()->getCache()->set($cacheKey, self::$mapping[$cls]);
+			go()->getCache()->set($cacheKey, self::$mapping[$cls]);
 		}
 
 		return self::$mapping[$cls];
@@ -346,7 +350,7 @@ abstract class Property extends Model {
 		if(isset(self::$c[$cacheKey])) {
 			return self::$c[$cacheKey];
 		}
-		$props = GO()->getCache()->get($cacheKey);
+		$props = go()->getCache()->get($cacheKey);
 		
 		if(!$props) {
 		
@@ -364,7 +368,7 @@ abstract class Property extends Model {
 				$props['customFields'] = ['setter' => true, 'getter' => true, 'access' => null];
 			}
 			
-			GO()->getCache()->set($cacheKey, $props);
+			go()->getCache()->set($cacheKey, $props);
 		}
 		self::$c[$cacheKey] = $props;
 		return $props;
@@ -429,14 +433,14 @@ abstract class Property extends Model {
 		
 		$cacheKey = 'property-getDefaultFetchProperties-' . str_replace('\\', '-', static::class);
 		
-		$props = GO()->getCache()->get($cacheKey);
+		$props = go()->getCache()->get($cacheKey);
 		
 		if(!$props) {
 			$props = array_filter(static::getReadableProperties(), function($propName) {
 				return !in_array($propName, ['modified', 'oldValues', 'validationErrors']);
 			});
 
-			GO()->getCache()->set($cacheKey, $props);
+			go()->getCache()->set($cacheKey, $props);
 		}
 		return $props;
 	}	
@@ -495,7 +499,8 @@ abstract class Property extends Model {
 		
 		$query = static::internalFind($properties);		
 		
-		$ids = explode('-', $id);
+		//Used count check here because a customer managed to get negative ID's in the database.
+		$ids = count($keys) == 1 ? [$id] : explode('-', $id);
 		$keys = array_combine($keys, $ids);
 		$query->where($keys);
 		
@@ -508,7 +513,7 @@ abstract class Property extends Model {
 		$cls = static::class;
 		$cacheKey = $cls . '-getPropNames';
 
-		$propNames = GO()->getCache()->get($cacheKey);
+		$propNames = go()->getCache()->get($cacheKey);
 
 		if (!$propNames) {
 			$reflectionClass = new ReflectionClass($cls);
@@ -527,7 +532,7 @@ abstract class Property extends Model {
 				}
 			}
 
-			GO()->getCache()->set($cacheKey, $propNames);
+			go()->getCache()->set($cacheKey, $propNames);
 		}
 
 		return $propNames;
@@ -544,7 +549,7 @@ abstract class Property extends Model {
 		$select = [];
 		foreach (self::getMapping()->getTables() as $table) {
 			
-			if($table->isUserTable && !GO()->getUserId()) {
+			if($table->isUserTable && !go()->getUserId()) {
 				continue;
 			}		
 			
@@ -611,12 +616,12 @@ abstract class Property extends Model {
 		}
 
 		if($joinedTable->isUserTable) {
-			if(!GO()->getUserId()) {
+			if(!go()->getUserId()) {
 				//throw new \Exception("Can't join user table when not authenticated");
-				GO()->debug("Can't join user table when not authenticated");
+				go()->debug("Can't join user table when not authenticated");
 				return;
 			}
-			$on .= " AND " . $joinedTable->getAlias() . ".userId = " . GO()->getUserId();
+			$on .= " AND " . $joinedTable->getAlias() . ".userId = " . go()->getUserId();
 		}
 
 		if(!empty($joinedTable->getConstantValues())) {
@@ -756,6 +761,23 @@ abstract class Property extends Model {
 			return false;
 		}
 		
+		if(!$this->saveTables()) {
+			return false;
+		}
+		
+		$this->checkBlobs();
+
+		if (!$this->saveRelatedProperties()) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Saves all modified properties to the database.
+	 */
+	protected function saveTables() {
 		$modified = $this->getModified();				
 		
 		// make sure auto incremented values come first
@@ -779,12 +801,6 @@ abstract class Property extends Model {
 			if (!$this->saveTable($table, $modified)) {				
 				return false;
 			}
-		}
-		
-		$this->checkBlobs();
-
-		if (!$this->saveRelatedProperties()) {
-			return false;
 		}
 
 		return true;
@@ -927,6 +943,15 @@ abstract class Property extends Model {
 
 		if (isset($this->{$relation->name})) {			
 			$prop = $this->{$relation->name};
+
+			if(go()->getDebugger()->enabled) {
+				$tables = $prop->getMapping()->getTables();
+				$firstTable = array_shift($tables);
+				if(!$firstTable->getPrimaryKey()) {
+					throw new \Exception("No primary key defined for ". $firstTable->getName());
+				}
+			}
+
 			$this->applyRelationKeys($relation, $prop);
 			if (!$prop->internalSave()) {
 				$this->relatedValidationErrors = $prop->getValidationErrors();
@@ -1023,7 +1048,7 @@ abstract class Property extends Model {
 				$query->andWhereNot($keepKeys);
 			}
 		}
-		\GO()->getDbConnection()->delete($first->getName(), $query)->execute();	
+		\go()->getDbConnection()->delete($first->getName(), $query)->execute();	
 	}
 
 	private function saveRelatedScalar(Relation $relation) {
@@ -1043,14 +1068,14 @@ abstract class Property extends Model {
 			$query->andWhere($key, 'NOT IN', $keepIds);
 		}
 
-		GO()->getDbConnection()->delete($relation->tableName, $query)->execute();
+		go()->getDbConnection()->delete($relation->tableName, $query)->execute();
 
 		if(!empty($keepIds)) {
 			$data = array_map(function($v) use($key, $where) {
 				return array_merge($where, [$key => $v]);
 			}, $keepIds);
 
-			GO()->getDbConnection()->insertIgnore($relation->tableName, $data)->execute();
+			go()->getDbConnection()->insertIgnore($relation->tableName, $data)->execute();
 		}
 
 		return true;
@@ -1149,7 +1174,7 @@ abstract class Property extends Model {
 	 */
 	private function saveTable(MappedTable $table, array &$modified) {
 
-		if($table->isUserTable && !GO()->getAuthState()->isAuthenticated()) {
+		if($table->isUserTable && !go()->getAuthState()->isAuthenticated()) {
 			//ignore user tables when not logged in.
 			return true;
 		}	
@@ -1188,7 +1213,7 @@ abstract class Property extends Model {
 				}
 
 				if($table->isUserTable) {
-					$modifiedForTable["userId"] = GO()->getUserId();
+					$modifiedForTable["userId"] = go()->getUserId();
 				}
 				
 				$stmt = App::get()->getDbConnection()->insert($table->getName(), $modifiedForTable);
@@ -1204,7 +1229,7 @@ abstract class Property extends Model {
 					$this->primaryKeys[$table->getAlias()][$to] = $this->$from;
 				}
 				if($table->isUserTable) {
-					$this->primaryKeys[$table->getAlias()]['userId'] = GO()->getUserId();
+					$this->primaryKeys[$table->getAlias()]['userId'] = go()->getUserId();
 				}
 			} else {	
 				if (empty($modifiedForTable)) {
@@ -1213,7 +1238,7 @@ abstract class Property extends Model {
 				
 				$keys = $this->primaryKeys[$table->getAlias()];
 				if($table->isUserTable) {
-					$keys['userId'] = GO()->getUserId();
+					$keys['userId'] = go()->getUserId();
 				}
 				
 				$stmt = App::get()->getDbConnection()->update($table->getName(), $modifiedForTable, $keys);
@@ -1236,7 +1261,7 @@ abstract class Property extends Model {
 				return false;
 			} else {
 				if(isset($stmt)) {
-					GO()->error("Failed SQL: " . $stmt);
+					go()->error("Failed SQL: " . $stmt);
 				}
 				throw $e;
 			}
@@ -1541,7 +1566,7 @@ abstract class Property extends Model {
 		foreach($value as $id => $patch) {
 			if(!isset($patch) || $patch === false) {
 				if(!array_key_exists($id, $old)) {
-					GO()->warn("Key $id does not exist in ". static::class .'->'.$propName);
+					go()->warn("Key $id does not exist in ". static::class .'->'.$propName);
 				}				
 				continue;
 			}
@@ -1582,6 +1607,9 @@ abstract class Property extends Model {
 		$id = [];
 		foreach($diff as $field) {
 			$id[$field] = array_shift($values);
+			if(is_numeric($id[$field])) {
+				$id[$field] = (int) $id[$field];
+			}
 		}
 		return $id;
 	}

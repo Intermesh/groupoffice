@@ -30,32 +30,39 @@ class Filters {
 	 * @return $this
 	 */
 	public function add($name, $fn, $default = self::NO_DEFAULT) {
-		$this->filters[strtolower($name)] = ['type' => 'generic', 'fn' => $fn, 'default' => $default];
+		$this->filters[strtolower($name)] = ['type' => 'generic', 'fn' => $fn, 'default' => $default, 'name' => $name];
 		
 		return $this;
 	}
 	
-	private function validate(Query $query, array $filter) {
-		$invalidFilters = array_diff(array_map('strtolower',array_keys($filter)), array_keys($this->filters));
-		if(!empty($invalidFilters)) {
-			throw new Exception("Invalid filters supplied for '".$query->getModel()."': '". implode("', '", $invalidFilters) ."'");
-		}
-	}
+	// private function validate(Query $query, array $filter) {
+	// 	$invalidFilters = array_diff(array_map('strtolower',array_keys($filter)), array_keys($this->filters));
+	// 	if(!empty($invalidFilters)) {
+	// 		throw new Exception("Invalid filters supplied for '".$query->getModel()."': '". implode("', '", $invalidFilters) ."'");
+	// 	}
+	// }
 
 	private function applyDefaults(array $filter) {
 
 		$f = [];
 		foreach($filter as $k => $v) {
-			$f[strtolower($k)] = $v;
+
+			$index = strtolower($k);
+
+			if(!isset($this->filters[$index])) {
+				throw new Exception("Filter '". $k."' is invalid");
+			}
+
+			$f[$this->filters[$index]['name']] = $v;
 		}
 
-		foreach($this->filters as $name => $value) {
+		foreach($this->filters as $value) {
 			if($value['default'] === self::NO_DEFAULT) {
 				continue;
 			}
 
-			if(!array_key_exists($name, $f)) {
-				$f[$name] = $value['default'];
+			if(!array_key_exists($value['name'], $f)) {
+				$f[$value['name']] = $value['default'];
 			}
 		}
 
@@ -72,9 +79,9 @@ class Filters {
 
 		$filter = $this->applyDefaults($filter);
 
-		$this->validate($query, $filter);		
+		//$this->validate($query, $filter);		
 		foreach($filter as $name => $value) {
-			$filterConfig = $this->filters[$name];
+			$filterConfig = $this->filters[strtolower($name)];
 			
 			switch($filterConfig['type']) {
 				
@@ -110,7 +117,6 @@ class Filters {
 					if(!is_array($value)){
 						$value = [$value];
 					}
-					//$v = array_map(function($v) {return '%'.$v.'%';}, $value);//self::parseStringValue($value);
 					call_user_func($filterConfig['fn'], $criteria, "LIKE", $value, $query, $filter);
 					break;
 				
@@ -134,7 +140,7 @@ class Filters {
 	 * @return $this
 	 */
 	public function addNumber($name, $fn, $default = self::NO_DEFAULT) {
-		$this->filters[strtolower($name)] = ['type' => 'number', 'fn' => $fn, 'default' => $default];
+		$this->filters[strtolower($name)] = ['type' => 'number', 'fn' => $fn, 'default' => $default, 'name' => $name];
 		
 		return $this;
 	}	
@@ -153,7 +159,7 @@ class Filters {
 	 * @return $this
 	 */
 	public function addDate($name, $fn, $default = self::NO_DEFAULT) {
-		$this->filters[strtolower($name)] = ['type' => 'date', 'fn' => $fn, 'default' => $default];
+		$this->filters[strtolower($name)] = ['type' => 'date', 'fn' => $fn, 'default' => $default, 'name' => $name];
 		
 		return $this;
 	}	
@@ -170,7 +176,7 @@ class Filters {
 	 * @return $this
 	 */
 	public function addText($name, $fn, $default = self::NO_DEFAULT) {
-		$this->filters[strtolower($name)] = ['type' => 'text', 'fn' => $fn, 'default' => $default];
+		$this->filters[strtolower($name)] = ['type' => 'text', 'fn' => $fn, 'default' => $default, 'name' => $name];
 		
 		return $this;
 	}
@@ -188,24 +194,24 @@ class Filters {
 		return ['comparator' => $comparator, 'query' => $v];
 	}
 	
-	public static function parseStringValue($value) {
-		if(!is_array($value)) {
-			$value = [$value];
-		}
+	// public static function parseStringValue($value) {
+	// 	if(!is_array($value)) {
+	// 		$value = [$value];
+	// 	}
 		
-		$regex = '/\s*(!=|=)?\s*(.*)/';
-		if(preg_match($regex, $value, $matches)) {
-			list(,$comparator, $v) = $matches;
-		} else
-		{
-			$comparator = '=';
-			$v = '%'.$value.'%';
-		}
+	// 	$regex = '/\s*(!=|=)?\s*(.*)/';
+	// 	if(preg_match($regex, $value, $matches)) {
+	// 		list(,$comparator, $v) = $matches;
+	// 	} else
+	// 	{
+	// 		$comparator = '=';
+	// 		$v = '%'.$value.'%';
+	// 	}
 		
-		return [
-				['comparator' => $comparator == '=' ? 'LIKE' : 'NOT LIKE', 'query' => $v]
-		];
-	}
+	// 	return [
+	// 			['comparator' => $comparator == '=' ? 'LIKE' : 'NOT LIKE', 'query' => $v]
+	// 	];
+	// }
 	
 	private function checkRange($value) {
 		//Operators >, <, =, !=,

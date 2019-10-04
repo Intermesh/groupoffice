@@ -2503,6 +2503,7 @@ body.ext-ie6.x-body-masked .x-window select {
 .x-window-dlg .x-window-body {
     border:0 none !important;
     padding:5px 10px;
+    padding: dp(8) dp(16);
     overflow:hidden !important;
 }
 

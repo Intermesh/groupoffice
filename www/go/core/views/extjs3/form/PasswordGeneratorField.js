@@ -2,16 +2,18 @@ go.form.PasswordGeneratorField = Ext.extend(Ext.form.TriggerField, {
 	inputType: 'password',
 	fieldLabel: t("Password"),
 	name: 'password',
+	autocomplete: 'new-password',
 	triggerConfig: {
 		tag: "button",
 		type: "button",
-		tabindex: -1,
+		//tabindex: -1,
 		cls: "x-form-trigger ic-refresh",
 		'ext:qtip': t("Generate password")
 	},
 	initComponent: function() {
-		this.defaultAutoCreate.autocomplete = "new-password"; //prevent autocomplete in chrome
 		go.form.PasswordGeneratorField.superclass.initComponent.call(this);
+
+		this.addEvents({generated: true});
 		
 		this.on("afterrender", function(field) {
 			//clear browser autofill from firefox
@@ -23,12 +25,13 @@ go.form.PasswordGeneratorField = Ext.extend(Ext.form.TriggerField, {
 	onTriggerClick: function () {
 		var pass = this.generatePassword(8);
 		this.setValue(pass);
+		this.fireEvent('generated', this, pass);
 		
 		go.util.copyTextToClipboard(pass);
 		
 		Ext.MessageBox.alert(t("Password", "users"), t("The generated password has been copied to your clipboard.")); // + ": " + Ext.util.Format.htmlEncode(pass)
 
-		this.fireEvent('generated', this, pass);
+		
 	},
 
 	generatePassword: function (length) {

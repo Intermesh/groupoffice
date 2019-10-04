@@ -254,7 +254,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 		} else if($props[$propName]['access'] == \ReflectionProperty::IS_PUBLIC){
 			$this->{$propName} = $this->normalizeValue($propName, $value);
 		}	else if($props[$propName]['getter']) {
-			GO()->warn("Ignoring setting of read only property ". $propName ." for " . static::class);
+			go()->warn("Ignoring setting of read only property ". $propName ." for " . static::class);
 		} else{
 			throw new \Exception("Invalid property ". $propName ." for " . static::class);
 		}

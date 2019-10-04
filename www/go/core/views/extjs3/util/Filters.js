@@ -12,15 +12,19 @@ go.util.Filters = {
 			if (Ext.isObject(f)) {
 				f.name = f.name.toLowerCase();
 				normalized[f.name] = f;
+				if(!Ext.isDefined(normalized[f.name].wildcards)){
+					normalized[f.name].wildcards = normalized[f.name] == "string";
+				}
 			} else
 			{
 				var name = f.toLowerCase();
 				normalized[name] = {
 					name: name,
 					multiple: true,
-					type: "text",
-					title: t(name)
-				}
+					type: "string",
+					title: t(name),
+					wildcards: true
+				};
 			}
 		});
 		
@@ -41,12 +45,8 @@ go.util.Filters = {
 	
 		//Simple text check
 		if(string.indexOf(':') === -1) {
-			var data = {};
-			
-			data[defaultFilter] = [];
-			data[defaultFilter].push(string);
-			return data;
-		}
+			string = defaultFilter + ": " + string;
+		}	
 
 		var stripBackSlash = function (val) {
 			// Strip backslashes respecting escapes
@@ -72,7 +72,7 @@ go.util.Filters = {
 
 			//Last word is the next filter name
 			if (i !== l - 1) {
-				var filterName = words.pop();
+				var filterName = words.pop().toLowerCase();
 			}
 
 			// Not allowed filter name
@@ -81,7 +81,7 @@ go.util.Filters = {
 			}
 
 			//After the next filter name has been taken off make it a string again,
-			var f = {}, str = words.join(' ').trim();
+			var f = {}, str = words.join(' ').trim(), orig;
 
 			//Empty string can be ignored
 			if (str) {
@@ -89,9 +89,10 @@ go.util.Filters = {
 					//Values will be split into array values
 					f[currentFilterName] = str.splitCSV().map(function (v) {
 						//strip backslash and remove quotes
+						orig = v;
 						v = stripBackSlash(v.trim().replace(/^\"|\"$|^\'|\'$/g, ''));
 						
-						if(filters[currentFilterName].type === "string") {
+						if(filters[currentFilterName].wildcards && v == orig) {
 							v = "%" + v + "%";
 						}
 						
@@ -100,9 +101,10 @@ go.util.Filters = {
 				} else
 				{
 					//strip backslash and remove quotes
+					orig = str;
 					f[currentFilterName] = stripBackSlash(str.trim().replace(/^\"|\"$|^\'|\'$/g, ''));
 					
-					if(filters[currentFilterName].type === "string") {
+					if(filters[currentFilterName].wildcards && f[currentFilterName] == orig) {
 						f[currentFilterName] = "%" + f[currentFilterName] + "%";
 					}
 				}

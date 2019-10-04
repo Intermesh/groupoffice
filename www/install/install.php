@@ -49,9 +49,9 @@ if (!empty($_POST)) {
 
 	if ($_POST['password'] == $_POST['passwordConfirm']) {
 		
-//		GO()->getDbConnection()->exec("DROP DATABASE test");
-//		GO()->getDbConnection()->exec("CREATE DATABASE test");
-//		GO()->getDbConnection()->exec("USE test");
+//		go()->getDbConnection()->exec("DROP DATABASE test");
+//		go()->getDbConnection()->exec("CREATE DATABASE test");
+//		go()->getDbConnection()->exec("USE test");
 
 		App::get()->setAuthState(new core\auth\TemporaryState());
 
@@ -125,8 +125,8 @@ if (!empty($_POST)) {
 		\go\core\model\User::findById(1)->legacyOnSave();
 		
 		
-		if(GO()->getConfig()['core']['general']['servermanager']) {
-			exec("php ".\go\core\Environment::get()->getInstallFolder() .'/go/modules/community/multi_instance/oninstall.php '.GO()->getConfig()['core']['general']['servermanager']. ' '.explode(':',$_SERVER['HTTP_HOST'])[0], $output, $ret);
+		if(go()->getConfig()['core']['general']['servermanager']) {
+			exec("php ".\go\core\Environment::get()->getInstallFolder() .'/go/modules/community/multi_instance/oninstall.php '.go()->getConfig()['core']['general']['servermanager']. ' '.explode(':',$_SERVER['HTTP_HOST'])[0], $output, $ret);
 		}		
 
 		header("Location: finished.php");

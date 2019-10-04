@@ -54,8 +54,8 @@ class Language{
 	 * @return StringHelper Old ISO code that was set.
 	 */
 	public function setLanguage($isoCode = null){		
-		if(!isset($isoCode) || \GO()->getLanguage()->hasLanguage($isoCode)) {
-			return \GO()->getLanguage()->setLanguage($isoCode);	
+		if(!isset($isoCode) || \go()->getLanguage()->hasLanguage($isoCode)) {
+			return \go()->getLanguage()->setLanguage($isoCode);	
 		}
 
 		return $this->_langIso;
@@ -68,7 +68,7 @@ class Language{
 	 * @return StringHelper Language ISO code. eg. en,nl or en_UK
 	 */
 	public function getLanguage(){
-		return 	\GO()->getLanguage()->getIsoCode();
+		return 	\go()->getLanguage()->getIsoCode();
 	}
 	
 	
@@ -79,7 +79,7 @@ class Language{
 	 * @return boolean 
 	 */
 	public function hasLanguage($langIso){
-		return 	\GO()->getLanguage()->hasLanguage($langIso);
+		return 	\go()->getLanguage()->hasLanguage($langIso);
 	}
 	
 	/**
@@ -93,7 +93,7 @@ class Language{
 	 * @param boolean $found Pass by reference to determine if the language variable was found in the language file.
 	 */
 	public function getTranslation($name, $module='core',$package = 'core', &$found=false) {		
-		return GO()->t($name, $package, $module);
+		return go()->t($name, $package, $module);
 	}
 		
 	/**
@@ -102,7 +102,7 @@ class Language{
 	 * @return array array('en'=>'English');
 	 */
 	public function getLanguages(){
-		return \GO()->getLanguage()->getLanguages();
+		return \go()->getLanguage()->getLanguages();
 	}
 	
 	/**
@@ -111,7 +111,7 @@ class Language{
 	 * @return array array('nl'=>'The Netherlands');
 	 */
 	public function getCountries(){
-		return GO()->t('countries');
+		return go()->t('countries');
 	}
 	
 }

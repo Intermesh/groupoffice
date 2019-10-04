@@ -14,8 +14,14 @@ use function GO;
 class MigrateCustomFields63to64 {	
 	
 	const MISSING_PREFIX = '** Missing ** ';
+
+	const TREE_SELECT_OPTION_INCREMENT = 100000;
+
+	private static $newIds = 0;
 	
 	public function migrateEntity($entityName) {
+
+		self::$newIds = self::TREE_SELECT_OPTION_INCREMENT * 2;
 		
 		echo "Migrating custom fields for entity: " . $entityName ."\n";
 		
@@ -31,6 +37,7 @@ class MigrateCustomFields63to64 {
 		foreach ($fields as $field) {
 			
 			echo $field->id . ' - '.$field->type ."\n";
+			flush();
 			
 			switch ($field->type) {
 				case "Select":
@@ -80,12 +87,22 @@ class MigrateCustomFields63to64 {
 	
 	public function updateSelectEntity(Field $field, $entityCls, $incrementID = 0) {		
 		
+		$count = 0;
 		$query = $this->findRecords($field);		
 		foreach($query as $record) {
+
+			echo ".";
+			$count++;
+			if($count == 50) {
+				echo "\n";
+				$count = 0;
+			}
+			flush();
+
 			//Value is string <id>:<Text>
 			$id = explode(':', $record[$field->databaseName])[0];
 			
-			GO()->getDbConnection()
+			go()->getDbConnection()
 								->update(
 												$field->tableName(), 
 												[$field->databaseName => $id + $incrementID],
@@ -102,7 +119,7 @@ class MigrateCustomFields63to64 {
 		}
 		
 		//nullify invalid records
-		GO()->getDbConnection()->update(
+		go()->getDbConnection()->update(
 						$field->tableName(), 
 						[$field->databaseName => null],
 						(new Query)->where($field->databaseName, 'NOT IN', $validIds)
@@ -116,7 +133,7 @@ class MigrateCustomFields63to64 {
 	}
 	
 	private function findRecords(Field $field) {
-		return GO()->getDbConnection()->select("id, `" . $field->databaseName . "`")
+		return go()->getDbConnection()->select("id, `" . $field->databaseName . "`")
 						->from($field->tableName())
 						->where($field->databaseName, '!=', "")
 						->andWhere($field->databaseName, 'IS NOT', null);
@@ -136,7 +153,7 @@ class MigrateCustomFields63to64 {
 			}
 			
 			//Use DBAL because entity will alter database and we don't need that here.
-			GO()->getDbConnection()
+			go()->getDbConnection()
 							->update(
 											'core_customfields_field', 
 											['type' => $type], 
@@ -158,7 +175,7 @@ class MigrateCustomFields63to64 {
 				$strWithoutMissing = substr($o['text'], strlen(self::MISSING_PREFIX));
 				$updateFilter->orWhere($field->databaseName,'=' ,trim($strWithoutMissing));
 			}
-			$updateQ = GO()->getDbConnection()
+			$updateQ = go()->getDbConnection()
 				->update($field->tableName(), [$field->databaseName => $o['id']], $updateFilter);
 
 			$updateQ->execute();
@@ -187,7 +204,7 @@ class MigrateCustomFields63to64 {
 		}
 		
 		
-		$options = GO()->getDbConnection()
+		$options = go()->getDbConnection()
 						->select("*")
 						->from("core_customfields_select_option")
 						->where('fieldId', '=', $field->id)->all();
@@ -198,7 +215,17 @@ class MigrateCustomFields63to64 {
 		
 		$query = $this->findRecords($field);
 		
+		$count = 0;
 		foreach($query as $record){
+
+			echo ".";
+			$count++;
+			if($count == 50) {
+				echo "\n";
+				$count = 0;
+			}
+			flush();
+
 			$values = explode("|", $record[$field->databaseName]);
 			
 			foreach($values as $value) {
@@ -214,7 +241,7 @@ class MigrateCustomFields63to64 {
 				
 				$valueToSet = isset($optionMap[$value]) ? $optionMap[$value] : $optionMap[self::MISSING_PREFIX.$value];					
 				
-				GO()->getDbConnection()
+				go()->getDbConnection()
 								->replace(
 												$field->getDataType()->getMultiSelectTableName(), 
 												['id' => $record['id'], 'optionId' => $valueToSet]
@@ -225,7 +252,7 @@ class MigrateCustomFields63to64 {
 		
 		//remove column because it's stored in linking table
 		$sql = "ALTER TABLE `" . $field->tableName() . "` DROP " . Utils::quoteColumnName($field->databaseName) ;
-		GO()->getDbConnection()->query($sql);
+		go()->getDbConnection()->query($sql);
 	}
 	
 	
@@ -237,7 +264,11 @@ class MigrateCustomFields63to64 {
 		
 		$fields[0] = $field;		
 		foreach($treeSlaves as $slave) {
-			$fields[$slave->getOption("nestingLevel")] = $slave;
+			$nestingLevel = $slave->getOption("nestingLevel");
+			if(isset($fields[$nestingLevel])) {
+				throw new \Exception("Invalid tree select field. Nesting level already set! " . $slave->id . " ". $field->id);
+			}
+			$fields[$nestingLevel] = $slave;
 		}
 		ksort($fields);
 		
@@ -245,7 +276,7 @@ class MigrateCustomFields63to64 {
 	}
 	
 	
-	const TREE_SELECT_OPTION_INCREMENT = 100000;
+	
 	
 	/**
 	 * 
@@ -264,7 +295,7 @@ class MigrateCustomFields63to64 {
 		//Value is string <id>:<Text>
 		$parts = explode(':', $v);
 		
-		if(count($parts) < 1){
+		if(count($parts) < 2){
 			return null;
 		}
 		
@@ -279,30 +310,48 @@ class MigrateCustomFields63to64 {
 		}
 
 		//Check if text exists in 
-		$existsQ = GO()->getDbConnection()
+		$existsQ = go()->getDbConnection()
 				->selectSingleValue('id')
 				->from("core_customfields_select_option")
 				->where('id', '=', $id + self::TREE_SELECT_OPTION_INCREMENT);
 
 		$exists = $existsQ->single();
 		
-		if(!$exists){
-			$data = [
-				'id'=>$id + self::TREE_SELECT_OPTION_INCREMENT,
-				'fieldId'=>$fields[0]->id,
-				'parentId'=>NULL,
-				'text'=>self::MISSING_PREFIX.$text
-			];
-			
-			$insertQ = GO()->getDbConnection()->insert("core_customfields_select_option", $data);
-			$insertQ->execute();
+		if($exists){
+			return $id + self::TREE_SELECT_OPTION_INCREMENT;
 		}
+
+		//find previously missing
+		$existsQ = go()->getDbConnection()
+			->selectSingleValue('id')
+			->from("core_customfields_select_option")
+			->where(['fieldId' => $fields[0]->id])
+			->where('text', '=', self::MISSING_PREFIX.$text);
+		$exists = $existsQ->single();
+		if($exists){
+			return $exists;
+		}
+
+		//create new
+		$newId = self::$newIds++;
+		$data = [
+			'id'=> $newId,
+			'fieldId'=>$fields[0]->id,
+			'parentId'=>NULL,
+			'text'=>self::MISSING_PREFIX.$text
+		];
 		
-		return $id + self::TREE_SELECT_OPTION_INCREMENT;
+		$insertQ = go()->getDbConnection()->insert("core_customfields_select_option", $data);
+		$insertQ->execute();
+
+		return $newId;
+		
+		
+		
 	}
 	
 	private function findTreeSelectRecords(Field $field, array $fields) {
-		$query = GO()->getDbConnection()->select()
+		$query = go()->getDbConnection()->select()
 						->from($field->tableName());		
 		foreach($fields as $field) {
 			$query->orWhere($field->databaseName, '!=', "");
@@ -312,10 +361,10 @@ class MigrateCustomFields63to64 {
 	}
 	
 	private function convertTreeSelectOptions(Field $field) {
-		$ids = GO()->getDbConnection()->selectSingleValue('id')->from("cf_tree_select_options")->all();
+		$ids = go()->getDbConnection()->selectSingleValue('id')->from("cf_tree_select_options")->all();
 		$ids[] = "0";
 		
-		$oldOptions = GO()->getDbConnection()
+		$oldOptions = go()->getDbConnection()
 						->select()
 						->from('cf_tree_select_options')
 						->where('field_id', '=', $field->id)
@@ -323,7 +372,7 @@ class MigrateCustomFields63to64 {
 						->orderBy(['parent_id'=>'ASC']);
 
 		foreach($oldOptions as $o) {
-			GO()->getDbConnection()
+			go()->getDbConnection()
 							->insertIgnore("core_customfields_select_option", [
 									'id' => $o['id'] + self::TREE_SELECT_OPTION_INCREMENT,
 									'fieldId' => $field->id,
@@ -338,15 +387,22 @@ class MigrateCustomFields63to64 {
 		$this->convertTreeSelectOptions($field);
 		
 		$fields = $this->findSlaveFields($field);
+		$count = 0;
 		foreach($this->findTreeSelectRecords($field, $fields) as $record) {			
 			
-			GO()->debug($record);
+			echo ".";
+			$count++;
+			if($count == 50) {
+				echo "\n";
+				$count = 0;
+			}
+			flush();
+			
 			
 			$id = $this->findSelectOptionId($record, $fields);			
 			
-			GO()->debug($id);
 			
-			GO()->getDbConnection()
+			go()->getDbConnection()
 							->update(
 											$field->tableName(),
 											[$field->databaseName => $id], 
@@ -379,12 +435,12 @@ class MigrateCustomFields63to64 {
 	
 	private function insertMissingOptions(Field $field, $multiselect = false) {
 		//set invalid options to null
-		$optionTexts = GO()->getDbConnection()
+		$optionTexts = go()->getDbConnection()
 						->selectSingleValue('text')
 						->from("core_customfields_select_option")
 						->where('fieldId', '=', $field->id);
 		
-		$missingQuery = GO()->getDbConnection()
+		$missingQuery = go()->getDbConnection()
 						->selectSingleValue('`'.$field->databaseName.'`')->distinct()
 						->from($field->tableName())						
 						->where($field->databaseName, 'NOT IN', $optionTexts);
@@ -421,33 +477,33 @@ class MigrateCustomFields63to64 {
 		}
 		
 		foreach($data as $insertRecord){
-			$insertQ = GO()->getDbConnection()->insert("core_customfields_select_option", $insertRecord);
+			$insertQ = go()->getDbConnection()->insert("core_customfields_select_option", $insertRecord);
 			$insertQ->execute();
 		}				
 	}
 	
 	private function nullifyInvalidOptions(Field $field) {
 		//set invalid options to null
-		$optionIds = GO()->getDbConnection()
+		$optionIds = go()->getDbConnection()
 						->selectSingleValue('id')
 						->from("core_customfields_select_option")
 						->where('fieldId', '=', $field->id);
 		
-//		GO()->getDbConnection()->update(
+//		go()->getDbConnection()->update(
 //						$field->tableName(), 
 //						[$field->databaseName => null], 
 //						(new Query)
 //						->where($field->databaseName, 'NOT IN', $optionIds)
 //						)->execute();
 		
-				GO()->getDbConnection()->update(
+				go()->getDbConnection()->update(
 						$field->tableName(), 
 						[$field->databaseName => null], 
 						(new Query)
 						->where($field->databaseName, '=' , "")
 						)->execute();
 				
-		$query = GO()->getDbConnection()
+		$query = go()->getDbConnection()
 						->selectSingleValue('`'.$field->databaseName.'`')
 						->from($field->tableName())
 						->where($field->databaseName, 'NOT IN', $optionIds)->andWhereNot([$field->databaseName => null]);

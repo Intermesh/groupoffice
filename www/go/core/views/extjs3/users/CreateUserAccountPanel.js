@@ -9,6 +9,17 @@ go.users.CreateUserAccountPanel = Ext.extend(Ext.form.FormPanel, {
 		this.items = [{
 				xtype: 'fieldset',
 				items: [
+					//Add a hidden submit button so the form will submit on enter
+					{
+						xtype: "button",
+						hidden: true,
+						hideMode: "offsets",
+						type: "submit",
+						handler: function() {
+							this.ownerCt.continue();
+						},
+						scope: this
+					},
 					{
 						xtype: 'textfield',
 						name: 'username',

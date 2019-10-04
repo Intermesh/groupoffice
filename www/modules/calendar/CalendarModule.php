@@ -3,20 +3,49 @@
 
 namespace GO\Calendar;
 
+use GO\Calendar\Model\Calendar;
+use GO\Calendar\Model\Event;
 use GO\Calendar\Model\UserSettings;
+use go\core\db\Criteria;
+use go\core\db\Query;
+use go\core\jmap\Entity;
+use go\core\model\Acl;
+use go\core\model\Group;
+use go\core\model\Link;
 use go\core\model\User;
+use go\core\orm\EntityType;
+use go\core\orm\Filters;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
+use go\core\util\DateTime;
 
 class CalendarModule extends \GO\Base\Module{
 	
 	
 	public static function defineListeners() {
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
+		Link::on(Entity::EVENT_FILTER, static::class, 'onLinkFilter');
 	}
 	
 	public static function onMap(Mapping $mapping) {
-		$mapping->addHasOne('calendarSettings', UserSettings::class, ['id' => 'user_id']);
+		$mapping->addHasOne('calendarSettings', UserSettings::class, ['id' => 'user_id'], true);
+		return true;
+	}
+
+	public static function onLinkFilter(Filters $filters) {
+		$filters->add('pastEvents', function(Criteria $criteria, $value, Query $query, array $filter){
+			$query->join('cal_events', 'e', 's.entityId = e.id');
+			$criteria
+				->where('s.entityTypeId', '=', Event::model()->modelTypeId())
+				->andWhere('e.start_time','<', time());
+		});
+
+		$filters->add('forthComingEvents', function(Criteria $criteria, $value, Query $query, array $filter){
+			$query->join('cal_events', 'e', 's.entityId = e.id');
+			$criteria
+				->where('s.entityTypeId', '=', Event::model()->modelTypeId())
+				->andWhere('e.start_time','>=', time());
+		});
 		return true;
 	}
 	
@@ -86,6 +115,9 @@ class CalendarModule extends \GO\Base\Module{
 		$cron->job = 'GO\Calendar\Cron\CalendarPublisher';
 
 		$cron->save();
+
+		//Share calendars with internal by default
+		Calendar::entityType()->setDefaultAcl([Group::ID_INTERNAL => Acl::LEVEL_WRITE]);		
 		
 	}
 }

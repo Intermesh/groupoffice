@@ -47,20 +47,20 @@ $lang = GO::language()->getLanguage(); ?>
 
 	//$this is \GO\Core\Controller\Auth
 	\GO::router()->getController()->fireEvent('head');
-	GO()->fireEvent(App::EVENT_HEAD);
+	go()->fireEvent(App::EVENT_HEAD);
 	?>
 	<style>
 		<?php
-		if(GO()->getSettings()->primaryColor) {
+		if(go()->getSettings()->primaryColor) {
 		?>
 		:root {
-				--c-primary: <?= '#'.GO()->getSettings()->primaryColor; ?> !important;
-				--c-primary-tp: <?= GO()->getSettings()->getPrimaryColorTransparent(); ?> !important;
+				--c-primary: <?= '#'.go()->getSettings()->primaryColor; ?> !important;
+				--c-primary-tp: <?= go()->getSettings()->getPrimaryColorTransparent(); ?> !important;
 		}
 		<?php
-			if(GO()->getSettings()->logoId) {
+			if(go()->getSettings()->logoId) {
 				//blob id is not used by script but added only for caching.
-				echo ".go-app-logo, #go-logo {background-image: url(" . GO()->getSettings()->URL . "api/logo.php?blob=" . GO()->getSettings()->logoId . ") !important}";
+				echo ".go-app-logo, #go-logo {background-image: url(" . go()->getSettings()->URL . "api/logo.php?blob=" . go()->getSettings()->logoId . ") !important}";
 			}
 		}
 		?>	
@@ -71,7 +71,12 @@ $lang = GO::language()->getLanguage(); ?>
 	<div id="sound"></div>
 	<!--Putting scripts in div will speed up developer tools because they don't have to show all those nodes-->
 	<div id="scripts-container">
-		<?php require(\GO::config()->root_path.'views/Extjs3/default_scripts.inc.php'); ?>
+		<?php 
+		
+		require(\GO::config()->root_path.'views/Extjs3/default_scripts.inc.php'); 
+		
+		go()->fireEvent(App::EVENT_SCRIPTS);
+		?>
 	</div>
 </body>
 </html>

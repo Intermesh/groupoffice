@@ -1,3 +1,110 @@
+04-10-2019 6.4.64
+- Core: Track changes in other models in entity controller when doing a set request so it can return all modified entities
+- Address book: Organizations field was not hidden when newsletters module was installed
+- Core: Clear legacy cache before upgrade
+- Core: Workaround for hidden custom fields
+- Comments: Visually improved
+
+01-10-2019 6.4.63
+- Custom fields: Fixed problem in loading tree select fields for the second time
+- Core: Attempt to solve very rare loading hang problem
+- Core: Comboboxes take 3 chars to start searching instead of 4.
+- Core: ctrl + f7 enables debug log for new framework
+- Email: Search in all or subfolders didn't work
+- Custom fields: Validate chips and treeselect field so required flag for cusotm fields of type select and multiselect work
+- Newsletters: Open sent item doesn't show template.
+
+30-09-2019 6.4.62
+- Core: Each entity type has it's own color in the system
+- Core: New group member dialog. Fixes serverclient group controller permission issue #472
+- Core: Fixed user display name set to empty
+- Core: Half hours in working week didn't validate
+
+27-09-2019 6.4.61
+- Filters: Contact filter did not respect isOrganization setting of custom field
+- Advanced Search: Search contact, users and group custom fields by text too. And text are wrapped with wildcards.
+- Core: Debug log file more sensible and include line and class number.
+- Users: Delete broken
+- Core: Switch user didn't work when logging in from multi instance environment
+
+26-09-2019 6.4.60
+- Core: proper error message when delete fails
+- Address book: Add "Add to contact" option when clicking e-mail address
+- Core: Enhance select people dialog
+- Newsletters: Fixed problem with newsletter attachments
+- Core: sort on "creator" and "modifier"
+- Fixed: e-mail-settings #461
+- Serverclient: Improved server client error reporting
+
+24-09-2019 6.4.59
+- Google Authenticator: Fixed problem where it would enable when saving user
+- Calendar: brought back forthcoming and past events
+- Tasks: incomplete and completed tasks separate
+- Address book: Users address book was filled with empty contacts
+- Calendar: Fixed more... positioned over day number
+
+23-09-2019 6.4.58
+- Address book: added business fields in detail panel of orginisation
+- Address book: Create personal address books for each user
+- Users: Only show module tabs in user dialog where this user has access to
+- Notes: Default note book setting and every user gets a personal note book
+- Sync: settings use default notebook and address book by default
+- Newsletters: Create filter based on address lists in address book
+- Newsletters: Add contact to address list in edit dialog of contact
+- Billing: Fixed issue with number field not loading in product dialog
+
+19-09-2019 6.4.57
+- Custom fields: Query language works with text for select and multiselect
+- Users: Problem with deleting users because of default calendar
+- Address Book: Brought back salutation field
+- Address book: Added notes filter
+- Projects: Extended project report with comments
+- Files: File wouldn't open by default when WOPI was installed
+- Core: Missing link button in new dialogs.
+- Billing: Fixed problem where amounts got multiplied by 100 when editing numbers with decimals
+- Workflow: Fixed workflow delete button
+- Files: Fixed file access to address book access denied
+- Projects: Time entries are searchable
+
+17-09-2019 6.4.56
+- Core: Disable logging during upgrade for performance
+- Core: fixed custom fields upgrade problem
+
+16-09-2019 6.4.55
+- Problem with start module
+
+13-09-2019 6.4.54
+- Core: Sometimes a user was not in group everyone
+- IMAP / LDAP auth:  Clear database password when logging in with IMAP or LDAP authenticator
+- Core: raised default max upload size to 1GB
+- Core: fixed scroll to top in infinite grids
+- Carddav: carddav ignores sync-settings #460
+- Email: Fixed Search in Email with 2 strings #444
+- Sync: Default sync settings when creating a new user
+- Core: Mask grid when deleting
+- Core: Serveral issues with forms including a checkbox
+
+12-09-2019 6.4.53
+- Billing: Fixed tax percentage decimals in PDF
+- Billing: Fixed translation for Quantity / Amount in order items
+- Carddav: Fixed Birthdays on carddav not synced #410
+- Core: Import function shows error messages per line
+
+10-09-2019 6.4.52
+- Billing: Fixed group summary gross total in PDF.
+- Caldav: events with status needs-action were not synced. Change status to needs-action to tentative as needs-action is not a valid vevent status. 
+- Carddav: Create with vcard 4.0 format was broken (davdroid)
+- Core: Added user import with ability to create mailbox on mailserver too
+- Serverclient: Fixed missing domain checkboxes in user dialog
+- Core: Fixed bug in custom fields migration
+- E-mail: Set pasted image filename
+- Address book: contact:city tag was not parsed
+- ActiveSync: Fixed timezone issue with all day events
+
+09-09-2019 6.4.51
+- Core: Normalizing strings could corrupt UTF8
+- Address book: Filters were broken
+
 03-09-2019 6.4.50
 - Bookmarks: Languages readded
 - Bookmarks: Possible to set permissions on category
@@ -231,6 +338,8 @@
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
 
+19-09-2019 6.3.82
+- Projects larger expense budget dialog and resizable
 - Billing: Force select of book in duplicate dialog
 - Core: Clear old framework cache on upgrade
 - Project: create invoice without grouping time entries by employees. are time record will be group into 1 group

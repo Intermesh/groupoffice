@@ -1162,6 +1162,10 @@
 			position: absolute;
 			right: dp(14);
 		}
+
+		a {
+			cursor: pointer;
+		}
 	}
 	&-row-checker, .x-grid3-hd-checker &-hd-checker {
 		height:dp(20); // same as line-height of text
@@ -2658,6 +2662,12 @@ input[value="0"] + .x-slider .x-slider-thumb {
 .x-window-dlg .ext-mb-text,
 .x-window-dlg .x-window-header-text {
 	//@extend %font-title;
+}
+
+.ext-mb-text {
+	max-height: dp(600);
+	overflow: auto;
+	display: block;
 }
 
 .x-window-dlg .ext-mb-textarea {

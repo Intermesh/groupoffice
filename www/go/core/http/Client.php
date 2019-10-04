@@ -16,7 +16,7 @@ class Client {
       $this->curl = curl_init();
       $this->setOption(CURLOPT_FOLLOWLOCATION, true);
       $this->setOption(CURLOPT_ENCODING, "UTF-8");
-      $this->setOption(CURLOPT_USERAGENT, "Group-Office HttpClient " . GO()->getVersion() . " (curl)");
+      $this->setOption(CURLOPT_USERAGENT, "Group-Office HttpClient " . go()->getVersion() . " (curl)");
 	
     }
     return $this->curl;
@@ -78,6 +78,7 @@ class Client {
     }
 
     return [
+      'status' => curl_getinfo($this->getCurl(), CURLINFO_HTTP_CODE),
       'headers' => $this->lastHeaders,
       'body' => $body
     ];

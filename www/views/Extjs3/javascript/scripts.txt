@@ -128,7 +128,6 @@ views/Extjs3/javascript/query/QueryPanel.js
 
 views/Extjs3/javascript/query/CriteriaFormPanel.js
 
-views/Extjs3/javascript/windows/UsersInGroup.js
 
 views/Extjs3/javascript/windows/SummaryDialog.js
 views/Extjs3/javascript/windows/TabbedFormDialog.js

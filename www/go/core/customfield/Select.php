@@ -4,8 +4,10 @@ namespace go\core\customfield;
 
 use Exception;
 use GO;
+use go\core\db\Criteria;
 use go\core\db\Query;
 use go\core\db\Utils;
+use go\core\orm\Filters;
 use PDOException;
 
 class Select extends Base {
@@ -57,7 +59,7 @@ class Select extends Base {
 	//Is public for migration. Can be made private in 6.5
 	public function addConstraint() {
 		$sql = "ALTER TABLE `" . $this->field->tableName() . "` ADD CONSTRAINT `" . $this->getConstraintName() . "` FOREIGN KEY (" . Utils::quoteColumnName($this->field->databaseName) . ") REFERENCES `core_customfields_select_option`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";			
-		GO()->getDbConnection()->query($sql);
+		go()->getDbConnection()->query($sql);
 	}
 	
 	private function getConstraintName() {
@@ -90,7 +92,7 @@ class Select extends Base {
 		if (!empty($this->savedOptionIds)) {	 
 			 $query->andWhere('id', 'not in', $this->savedOptionIds);
 		}
-		$deleteCmd = GO()->getDbConnection()->delete('core_customfields_select_option', $query)->execute();
+		$deleteCmd = go()->getDbConnection()->delete('core_customfields_select_option', $query)->execute();
 		
 		$this->options = null;
 	}
@@ -109,12 +111,12 @@ class Select extends Base {
 			
 			
 			if(empty($o['id'])) {
-				if (!GO()->getDbConnection()->insert('core_customfields_select_option', $o)->execute()) {
+				if (!go()->getDbConnection()->insert('core_customfields_select_option', $o)->execute()) {
 					throw new Exception("could not save select option");
 				}
-				$o['id'] = GO()->getDbConnection()->getPDO()->lastInsertId();
+				$o['id'] = go()->getDbConnection()->getPDO()->lastInsertId();
 			} else{
-				if (!GO()->getDbConnection()->update('core_customfields_select_option', $o, ['id' => $o['id']])->execute()) {
+				if (!go()->getDbConnection()->update('core_customfields_select_option', $o, ['id' => $o['id']])->execute()) {
 					throw new Exception("could not save select option");
 				}
 			}
@@ -127,11 +129,35 @@ class Select extends Base {
 	
 	public function onFieldDelete() {		
 		$sql = "ALTER TABLE `" . $this->field->tableName() . "` DROP FOREIGN KEY " . $this->getConstraintName();
-		if(!GO()->getDbConnection()->query($sql)) {
+		if(!go()->getDbConnection()->query($sql)) {
 			throw new \Exception("Couldn't drop foreign key");
 		}
 			
 		return parent::onFieldDelete();
+	}
+
+	/**
+	 * Defines an entity filter for this field.
+	 * 
+	 * @see Entity::defineFilters()
+	 * @param Filters $filter
+	 */
+	public function defineFilter(Filters $filters) {
+		
+		
+		$filters->addText($this->field->databaseName, function(Criteria $criteria, $comparator, $value, Query $query, array $filter){
+			$this->joinCustomFieldsTable($query);	
+			
+			if(isset($value[0]) && is_numeric($value[0])) {
+				//When field option ID is passed by a saved filter
+				$criteria->where('customFields.' . $this->field->databaseName, '=', $value);
+			} else{
+				//for text queries we must join the options.
+				$alias = 'opt_' . $this->field->id;
+				$query->join('core_customfields_select_option', $alias, $alias . '.id = customFields.' . $this->field->databaseName);
+				$criteria->where($alias . '.text', $comparator, $value);
+			}
+		});
 	}
 
 }

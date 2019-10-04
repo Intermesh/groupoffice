@@ -147,8 +147,26 @@ go.grid.GridTrait = {
 	},
 	
 	doDelete : function(selectedRecords) {
+
+		var me = this;
+		this.getEl().mask(t("Deleting..."));
+
 		this.getStore().entityStore.set({
 			destroy:  selectedRecords.column("id")
+		}).then(function(result){
+			if(!result.notDestroyed) {
+				return;
+			}
+
+			var msg = "";
+			for(var id in result.notDestroyed) {
+				msg += id + ": " + result.notDestroyed[id].description + "<br />";
+			}
+
+			Ext.MessageBox.alert(t("Error"), t("Could not delete some items: <br /><br />" + msg));
+		})
+		.finally(function() {
+			me.getEl().unmask();
 		});
 	},
 	

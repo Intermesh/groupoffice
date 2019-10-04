@@ -56,7 +56,7 @@ abstract class Settings extends Model {
 	 */
 	protected function __construct() {
 		
-		if(GO()->getInstaller()->isInstalling()) {
+		if(go()->getInstaller()->isInstalling()) {
 			$this->oldData = [];
 			return;
 		}
@@ -89,7 +89,7 @@ abstract class Settings extends Model {
 	}
 	
 	private function loadFromConfigFile() {
-		$config = GO()->getConfig();
+		$config = go()->getConfig();
 		
 		$pkgName = $this->getModulePackageName();
 		

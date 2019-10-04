@@ -50,6 +50,8 @@ class VCard extends AbstractConverter {
 			$vcard->remove('ADR');
 			$vcard->remove('ORG');
 			$vcard->remove('PHOTO');
+			$vcard->remove('BDAY');
+			$vcard->remove('ANNIVERSARY');
 
 			return $vcard;
 		} else {
@@ -70,8 +72,8 @@ class VCard extends AbstractConverter {
 		
 		$vcard = $this->getVCard($contact);
 
-		$vcard->LANGUAGE = GO()->getSettings()->language;
-		$vcard->PRODID = '-//Intermesh//NONSGML Group-Office ' . GO()->getVersion() . '//EN';
+		$vcard->LANGUAGE = go()->getSettings()->language;
+		$vcard->PRODID = '-//Intermesh//NONSGML Group-Office ' . go()->getVersion() . '//EN';
 		
 		$vcard->N = $contact->isOrganization ? [$contact->name] : [$contact->lastName, $contact->firstName, $contact->middleName, $contact->prefixes, $contact->suffixes];
 		$vcard->FN = $contact->name;
@@ -83,9 +85,23 @@ class VCard extends AbstractConverter {
 		foreach ($contact->phoneNumbers as $phoneNb) {
 			$vcard->add('TEL', $phoneNb->number, ['TYPE' => [$phoneNb->type]]);
 		}
+		$bdayAdded = false;
+		$anniversaryAdded = false;
 		foreach ($contact->dates as $date) {
-			$type = ($date->type === Date::TYPE_BIRTHDAY) ? 'BDAY' : 'ANNIVERSARY';
-			$vcard->add($type, $date->date);
+			if($date->type === Date::TYPE_BIRTHDAY){
+				if($bdayAdded) {
+					continue;
+				}
+				$type = 'BDAY';
+				$bdayAdded = true;
+			} else {
+				if($anniversaryAdded) {
+					continue;
+				}
+				$type = 'ANNIVERSARY';
+				$anniversaryAdded = true;
+			} 
+			$vcard->add($type, $date->date->format('Y-m-d'));
 		}
 		foreach ($contact->addresses as $address) {
 			//ADR: [post-office-box, apartment, street, locality, region, postal, country]
@@ -183,7 +199,7 @@ class VCard extends AbstractConverter {
 
 	private function importDate(Contact $contact, $type, $date) {
 			
-		$bday = $contact->findDateByType($type);
+		$bday = $contact->findDateByType($type, false);
 
 		if (!empty($date)) {
 			if (!$bday) {
@@ -209,9 +225,8 @@ class VCard extends AbstractConverter {
 	 * @return Contact[]
 	 */
 	public function import(VCardComponent $vcardComponent, Entity $entity = null) {
-
 		if ($vcardComponent->VERSION != "3.0") {
-			$vcardComponent->convert("3.0");
+			$vcardComponent->convert(\Sabre\VObject\Document::VCARD30);
 		}
 		
 		if (!isset($entity)) {
@@ -345,7 +360,7 @@ class VCard extends AbstractConverter {
 		
 		$vcardOrganizationNames = $this->getVCardOrganizations($vcard);
 		
-		GO()->debug($vcardOrganizationNames);
+		go()->debug($vcardOrganizationNames);
 
 		//compare with existing.
 		$goOrganizations = $contact->isNew() ? [] : Contact::find()
@@ -362,13 +377,13 @@ class VCard extends AbstractConverter {
 			}
 		}
 		
-		GO()->debug($goOrganizationsNames);
+		go()->debug($goOrganizationsNames);
 
 		$newVcardOrgNames = array_diff($vcardOrganizationNames, $goOrganizationsNames);
 		foreach ($newVcardOrgNames as $name) {
 			$org = Contact::find()->where(['isOrganization' => true])->andWhere('name', 'LIKE', $name)->single();
 			if (!$org) {
-				GO()->debug("Create org: " . $name);
+				go()->debug("Create org: " . $name);
 				$org = new Contact();
 				$org->name = $name;
 				$org->isOrganization = true;
@@ -378,7 +393,7 @@ class VCard extends AbstractConverter {
 				}
 			}
 			
-			GO()->debug("Link org: " . $org->name);
+			go()->debug("Link org: " . $org->name);
 			$link = Link::create($contact, $org);
 			if (!$link) {
 				throw new Exception("Could not link organization");
@@ -416,7 +431,7 @@ class VCard extends AbstractConverter {
 		$values = $params['values'] ?? [];
 		
 		if(!isset($values['addressBookId'])) {
-			$values['addressBookId'] = GO()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->defaultAddressBookId;
+			$values['addressBookId'] = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->defaultAddressBookId;
 		}
 
 		$splitter = new VCardSplitter(StringUtil::cleanUtf8($file->getContents()), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);

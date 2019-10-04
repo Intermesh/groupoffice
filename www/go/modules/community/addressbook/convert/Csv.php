@@ -48,8 +48,8 @@ class Csv extends convert\Csv {
 	
 	protected function init() {
 		parent::init();
-		$this->addColumn('isOrganization', GO()->t("Is organization", "community", "addressbook"), false);
-		$this->addColumn('organizations', GO()->t("Organizations", "community", "addressbook"), true);		
+		$this->addColumn('isOrganization', go()->t("Is organization", "community", "addressbook"), false);
+		$this->addColumn('organizations', go()->t("Organizations", "community", "addressbook"), true);		
 	}
 
 	protected function importIsOrganization(Contact $contact, $isOrganization, array &$values) {

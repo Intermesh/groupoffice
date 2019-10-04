@@ -48,7 +48,7 @@ class MappedTable extends Table {
 	 *   ['type' => "foo"] then you can set it with this parameter.
 	 */
 	public function __construct($name, $alias, $keys = null, array $columns = [], array $constantValues = [], Connection $conn = null) {
-		parent::__construct($name, $conn ?? GO()->getDbConnection());
+		parent::__construct($name, $conn ?? go()->getDbConnection());
 		
 		$this->alias = $alias;
 

@@ -73,17 +73,17 @@ class Statement extends \PDOStatement implements \JsonSerializable {
 		try {
 			
 			$ret = parent::execute($input_parameters);
-			if(GO()->getDbConnection()->debug && isset($this->build)) {
-				$duration  =  GO()->getDebugger()->getTimeStamp() - $this->build['start'];
-				GO()->debug(QueryBuilder::debugBuild($this->build).' ('.$duration.'ms)');			
+			if(go()->getDbConnection()->debug && isset($this->build)) {
+				$duration  =  go()->getDebugger()->getTimeStamp() - $this->build['start'];
+				go()->debug(QueryBuilder::debugBuild($this->build).' ('.$duration.'ms)', 3);			
 			}
 			if(!$ret) {
-				GO()->error("SQL FAILURE: " . $this);
+				go()->error("SQL FAILURE: " . $this);
 			}
 			return $ret;
 		}
 		catch(\Exception $e) {
-			GO()->error("SQL FAILURE: " . $this);
+			go()->error("SQL FAILURE: " . $this);
 			throw $e;
 		}
 	}

@@ -56,7 +56,7 @@ class Csv extends AbstractConverter {
 	{
 		parent::init();
 
-		$user = GO()->getAuthState()->getUser(['listSeparator', 'textSeparator']);
+		$user = go()->getAuthState()->getUser(['listSeparator', 'textSeparator']);
 		$this->delimiter = $user->listSeparator;
 		$this->enclosure = $user->textSeparator;
 	}
@@ -82,7 +82,7 @@ class Csv extends AbstractConverter {
 	 * 
 	 *	//override init
 	 * 	protected function init() {
-	 *		$this->addColumn('status', GO()->t("Status", 'sony', 'assets'));
+	 *		$this->addColumn('status', go()->t("Status", 'sony', 'assets'));
 	 *	}
 	 * 
 	 * @param string $name Column name
@@ -228,8 +228,14 @@ class Csv extends AbstractConverter {
 			}
 			return $headers;
 		}
+
+		if($prop->type == Relation::TYPE_SCALAR) {
+			$headers[] = ['name' => $header, 'label' => null, 'many' => true];			
+			return $headers;
+		}
 		
 		$cls = $prop->entityName;
+
 
 		$properties = $cls::getMapping()->getProperties();
 		
@@ -399,7 +405,7 @@ class Csv extends AbstractConverter {
 					}
 				}
 			}
-//			GO()->warn($new);
+//			go()->warn($new);
 			$v[$prop] = $new;
 		}
 		

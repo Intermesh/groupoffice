@@ -57,5 +57,5 @@ go.modules.community.files.customfield.File = Ext.extend(go.customfields.type.Te
 	
 });
 
-go.customfields.CustomFields.registerType(new go.modules.community.files.customfield.File());
+// go.customfields.CustomFields.registerType(new go.modules.community.files.customfield.File());
 

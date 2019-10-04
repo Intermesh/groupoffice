@@ -71,7 +71,7 @@ class Crypt {
 	private static function getKey() {
 
 		if (!isset(self::$key)) {
-			$file = GO()->getDataFolder()->getFile('defuse-crypto.txt');
+			$file = go()->getDataFolder()->getFile('defuse-crypto.txt');
 
 			if (!$file->exists()) {
 				self::$key = Key::createNewRandomKey();
@@ -181,7 +181,7 @@ class Crypt {
 
 	private static function getKey1() {
 
-		$key_file = GO()->getDataFolder()->getFile('key.txt');
+		$key_file = go()->getDataFolder()->getFile('key.txt');
 
 		if ($key_file->exists()) {
 			$key = $key_file->getContents();

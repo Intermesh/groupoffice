@@ -68,7 +68,7 @@ class CronJobSchedule extends Entity {
 		
 		if ($this->isModified('nextRunAt') && isset($this->nextRunAt)) {
 			//round to next minute
-			if (!GO()->getDebugger()->enabled) {
+			if (!go()->getDebugger()->enabled) {
 				$seconds = 60 - $this->nextRunAt->format('s');
 				$this->nextRunAt->modify("+$seconds second");
 			}
@@ -123,7 +123,7 @@ class CronJobSchedule extends Entity {
 		
 		$cls = $this->getCronClass();
 
-		GO()->debug("Running CRON method: " . $cls);
+		go()->debug("Running CRON method: " . $cls);
 		
 		try {
 			$cron = new $cls;			

@@ -66,6 +66,7 @@ go.customfields.type.Checkbox = Ext.extend(go.customfields.type.Text, {
 		return {
 			name: field.databaseName,
 			type: "select",
+			wildcards: false,
 			multiple: true,
 			title: field.name,
 			options: [
@@ -84,5 +85,5 @@ go.customfields.type.Checkbox = Ext.extend(go.customfields.type.Text, {
 
 });
 
-go.customfields.CustomFields.registerType(new go.customfields.type.Checkbox());
+// go.customfields.CustomFields.registerType(new go.customfields.type.Checkbox());
 

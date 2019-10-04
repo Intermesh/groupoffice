@@ -41,7 +41,7 @@ class Module extends \go\core\Module {
 	{
 		parent::defineListeners();
 
-		GO()->getInstaller()->on(Installer::EVENT_UPGRADE, static::class, 'upgradeInstances');
+		go()->getInstaller()->on(Installer::EVENT_UPGRADE, static::class, 'upgradeInstances');
 	}
 
 	public static function upgradeInstances() {
@@ -71,7 +71,7 @@ class Module extends \go\core\Module {
 
 		foreach(Instance::find() as $instance) {
 			$version = $instance->getMajorVersion();
-			if(!$version || $version == GO()->getMajorVersion()) {
+			if(!$version || $version == go()->getMajorVersion()) {
 				$version = 'DEFAULT';
 			}
 			if(!isset($i[$version])) {
@@ -101,7 +101,7 @@ class Module extends \go\core\Module {
 		$tld = substr($_SERVER['HTTP_HOST'], strpos($_SERVER['HTTP_HOST'], '.') + 1);
 
 		$replacements = [
-			'{docroot}' => $version == 'DEFAULT' ? GO()->getEnvironment()->getInstallFolder()->getPath() : '/usr/local/share/groupoffice-' . $version,
+			'{docroot}' => $version == 'DEFAULT' ? go()->getEnvironment()->getInstallFolder()->getPath() : '/usr/local/share/groupoffice-' . $version,
 			'{aliases}' => $version == 'DEFAULT' ? '*.' . $tld .' ' .$this->implode($hostnames) : $this->implode($hostnames),
 			'{tld}' => $tld,
 			'{servername}' => strtolower(str_replace('.', '', $version)) . '.' . $tld,

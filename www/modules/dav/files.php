@@ -85,7 +85,7 @@ $server->addPlugin($tempFF);
 
 // And off we go!
 
-if(GO()->getDebugger()->enabled) {
+if(go()->getDebugger()->enabled) {
 	$server->on("exception", function($e) {
 		\go\core\ErrorHandler::logException($e);
 	});

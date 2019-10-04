@@ -129,8 +129,8 @@ class Mailbox extends \GO\Base\Db\ActiveRecord {
 	public function validate() {
 
         
-    if($this->isModified('password') && strlen($this->password) < GO()->getSettings()->passwordMinLength) {
-      $this->setValidationError("password", "Password is to short. Minimal length is ".GO()->getSettings()->passwordMinLength." characters");
+    if($this->isModified('password') && strlen($this->password) < go()->getSettings()->passwordMinLength) {
+      $this->setValidationError("password", "Password is to short. Minimal length is ".go()->getSettings()->passwordMinLength." characters");
     }
 
 		$this->_checkQuota();

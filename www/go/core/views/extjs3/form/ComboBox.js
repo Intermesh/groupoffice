@@ -8,6 +8,8 @@
  */
 go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	value: null,
+
+	minChars : 3,
 	
 	resolveEntity : function(value) {
 		return this.store.entityStore.get([value]).then(function (result) {
@@ -15,7 +17,7 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 				return result.entities[0];
 			}else
 			{
-				return Promise.reject();
+				return Promise.reject("Not found");
 			}
 		});
 	},

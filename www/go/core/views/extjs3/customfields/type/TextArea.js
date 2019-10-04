@@ -53,4 +53,4 @@ go.customfields.type.TextArea = Ext.extend(go.customfields.type.Text, {
 
 });
 
-go.customfields.CustomFields.registerType(new go.customfields.type.TextArea());
+// go.customfields.CustomFields.registerType(new go.customfields.type.TextArea());

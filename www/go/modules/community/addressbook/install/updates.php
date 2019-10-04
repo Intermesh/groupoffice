@@ -1,8 +1,10 @@
 <?php
+use go\modules\community\addressbook\Module;
+
 $updates = [];
 
 $updates['201811272011'][] = function() {
-	\go\core\db\Utils::runSQLFile(\GO()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/addressbook/install/install.sql"));
+	\go\core\db\Utils::runSQLFile(\go()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/addressbook/install/install.sql"));
 };
 $updates['201811272011'][] = "DROP TABLE addressbook_contact_custom_fields";
 
@@ -55,3 +57,30 @@ $updates['201908301421'][] = function() {
 	$m = new go\modules\community\addressbook\install\Migrate63to64();
 	$m->addInitials();
 };
+
+$updates['201909181300'][] = "ALTER TABLE `addressbook_contact` ADD `salutation` VARCHAR(100) NULL DEFAULT NULL AFTER `suffixes`;";
+$updates['201909181300'][] = function() {
+	$m = new go\modules\community\addressbook\install\Migrate63to64();
+	$m->addSalutation();
+};
+
+
+$updates['201909181300'][] = function() {
+	Module::checkRootFolder();
+};
+
+
+$updates['201909241006'][] = 'delete from `addressbook_contact` WHERE addressBookId = (select value from core_setting where name="userAddressBookId") and firstName = "" and lastName = "" and name = "" and isOrganization = 0 and goUserId is null';
+
+$updates['201910012019'][] = 'ALTER TABLE `addressbook_contact` DROP FOREIGN KEY `addressbook_contact_ibfk_3`;';
+$updates['201910012019'][] = 'ALTER TABLE `addressbook_contact` ADD CONSTRAINT `addressbook_contact_ibfk_3` FOREIGN KEY (`modifiedBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;';
+
+$updates['201910012019'][] = 'ALTER TABLE `addressbook_contact` CHANGE `createdBy` `createdBy` INT(11) NULL DEFAULT NULL;';
+
+$updates['201910012019'][] = 'ALTER TABLE `addressbook_addressbook` CHANGE `createdBy` `createdBy` INT(11) NULL DEFAULT NULL;';
+
+$updates['201910012019'][] = 'UPDATE addressbook_addressbook set createdBy=null where createdBy not in (select id from core_user);';
+$updates['201910012019'][] = 'ALTER TABLE `addressbook_addressbook` ADD FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;';
+$updates['201910012019'][] = 'ALTER TABLE `addressbook_contact` DROP FOREIGN KEY `addressbook_contact_ibfk_4`; ';
+$updates['201910012019'][] = 'ALTER TABLE `addressbook_contact` ADD CONSTRAINT `addressbook_contact_ibfk_4` FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;';
+

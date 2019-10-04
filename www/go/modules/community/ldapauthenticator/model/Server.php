@@ -114,7 +114,7 @@ class Server extends Entity {
 	
 	protected function internalSave() {
 		if($this->isModified("domains")) {
-			GO()->getCache()->delete("authentication-domains");
+			go()->getCache()->delete("authentication-domains");
 		}
 
 		if($this->isModified(['syncUsers', 'syncGroups'])) {
@@ -127,7 +127,7 @@ class Server extends Entity {
 	}
 	
 	protected function internalDelete() {
-		GO()->getCache()->delete("authentication-domains");
+		go()->getCache()->delete("authentication-domains");
 		
 		return parent::internalDelete();
 	}
@@ -159,7 +159,7 @@ class Server extends Entity {
 				throw new \Exception("Invalid password given for '".$this->username."'");
 			} else
 			{
-				GO()->debug("Authenticated with user '" . $this->username . '"');
+				go()->debug("Authenticated with user '" . $this->username . '"');
 			}
 		}
 

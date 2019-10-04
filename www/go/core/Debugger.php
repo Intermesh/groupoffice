@@ -62,9 +62,10 @@ class Debugger {
 	
 	public function __construct() {
 		try {
-			$this->enabled = (!empty(GO()->getConfig()['core']['general']['debug']) || jmap\Request::get()->getHeader('X-Debug') == "1") && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug');
-			if($this->enabled) {
-				$this->logPath = GO()->getDataFolder()->getFile('log/debug.log')->getPath();
+			$this->enabled = !empty(go()->getConfig()['core']['general']['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug');
+			
+			if(go()->getConfig()['core']['general']['debugLog']) {
+				$this->logPath = go()->getDataFolder()->getFile('log/debug.log')->getPath();
 			}
 		} catch (\go\core\exception\ConfigurationException $e) {
 			//GO is not configured / installed yet.
@@ -82,6 +83,8 @@ class Debugger {
 		$this->entries[] = ['groupCollapsed', $name];
 		$this->currentGroup = &$this->entries[count($this->entries)-1][1];
 		$this->groupStartTime = $this->getTimeStamp();
+
+		$this->writeLog('start', $name . ' '. date('Y-m-d H:i:s'));
 	}
 
 	public function groupEnd(){
@@ -92,6 +95,8 @@ class Debugger {
 		$this->currentGroup .= ', time: '.$time.'ms';
 
 		$this->entries[] = ['groupEnd', null];
+
+		$this->writeLog('end', $this->currentGroup);
 	}
 
 	/**
@@ -167,51 +172,64 @@ class Debugger {
 		$traceBackSteps = min([$count, $traceBackSteps]);
 		
 		while($traceBackSteps > 0) {			
-
+			$lastCaller = $caller;
 			$caller = array_shift($bt);
 			$traceBackSteps--;			
 		}
 		
-		if(empty($caller['class'])) {
-			
-			$caller['class'] = 'closure';
+		if(empty($caller['class'])) {			
+			$caller['class'] = $lastCaller['class'];
 		}
 		
-		if(!isset($caller['line'])) {
-			$caller['line'] = '[unknown line]';
+		if(!isset($lastCaller['line'])) {
+			$lastCaller['line'] = '[unknown line]';
 		}
 		
 		//$entry = "[" . $this->getTimeStamp() . "][" . $caller['class'] . ":".$lastCaller['line']."] " . $mixed;
 
+		$this->writeLog($level, $mixed, $caller['class'], $lastCaller['line']);
+		
+		$this->entries[] = [$level, $mixed, $caller['class'], $lastCaller['line']];
+		
+	}
+
+	protected function writeLog($level, $mixed, $cls = null, $lineNo = null) {
+
+		if (!is_scalar($mixed)) {
+			$print = print_r($mixed, true);
+		} else if(is_bool($mixed)) {
+			$print = $mixed ? "TRUE" : "FALSE";
+		}	else {
+			$print = $mixed;
+		}
+		$line = '[' . $level . ']';
+		
+		if(isset($cls)) {
+			$line .= '[' . $cls .':'. $lineNo.']';
+		}
+
+		$line .=  ' ';
+
+		if(strstr($print, "\n")) {
+			$print = "\n        " . str_replace("\n", "\n        ", $print);
+		}
+		
+		$line .=   $print . "\n";
+
+		if($level == 'start') {
+			$line = "\n" . $line;
+		}
+
+		if(go()->getEnvironment()->isCli()) {
+			echo $line;
+		}
+
 		if(!empty($this->logPath)) {
 			$debugLog = new Fs\File($this->logPath);
-
-			if($debugLog->isWritable()) {
-				if (!is_scalar($mixed)) {
-					$print = print_r($mixed, true);
-				} else if(is_bool($mixed)) {
-					$print = $mixed ? "TRUE" : "FALSE";
-				}	else {
-					$print = $mixed;
-				}
-				$debugLog->putContents($print."\n", FILE_APPEND);
+			if($debugLog->isWritable()) {				
+				$debugLog->putContents($line, FILE_APPEND);
 			}
 		}
-
-		if(GO()->getEnvironment()->isCli()) {
-			if (!is_scalar($mixed)) {
-				$print = print_r($mixed, true);
-			} else if(is_bool($mixed)) {
-				$print = $mixed ? "TRUE" : "FALSE";
-			} else {
-				$print = $mixed;
-			}
-
-			echo '['.$level.'] '.$print ."\n";
-		}
-
-		$this->entries[] = [$level, $mixed];
-		
 	}
 
 	/**

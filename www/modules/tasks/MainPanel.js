@@ -251,7 +251,7 @@ Ext.extend(GO.tasks.MainPanel, Ext.Panel,{
 		},this);
 
 		var requests = {
-			tasklists:{r:"tasks/tasklist/store"},				
+			tasklists:{r:"tasks/tasklist/store", limit: GO.settings.config.nav_page_size},				
 			categories:{r:"tasks/category/store"}
 		}
 
@@ -528,6 +528,7 @@ go.Modules.register("legacy", 'tasks', {
 	entities: [{
 			name: 'Task',
 			links: [{
+					iconCls: "entity Task blue",
 					linkWindow: function() {
 						var win = new GO.tasks.TaskDialog();
 						win.win.closeAction = "close";
@@ -535,6 +536,31 @@ go.Modules.register("legacy", 'tasks', {
 					},
 					linkDetail: function() {
 						return new GO.tasks.TaskPanel();
+					},
+					linkDetailCards: function() {
+						var forth = new go.links.DetailPanel({
+							link: {
+								title: t("Incomplete tasks"),
+								iconCls: 'icon ic-check blue',
+								entity: "Task",
+								filter: null
+							}
+						});
+	
+						forth.store.setFilter('incomplete', {incompleteTasks: true});
+	
+						var past = new go.links.DetailPanel({						
+							link: {
+								title: t("Completed tasks"),
+								iconCls: 'icon ic-check blue',
+								entity: "Task",
+								filter: null
+							}
+						});
+	
+						past.store.setFilter('completed', {completedTasks: true});
+	
+						return [forth, past];
 					}	
 			}]
 	}],

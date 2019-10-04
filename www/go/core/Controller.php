@@ -17,7 +17,7 @@ abstract class Controller {
 	}
 
 	protected function authenticate() {  
-    if (!GO()->getAuthState()->isAuthenticated()) {			
+    if (!go()->getAuthState()->isAuthenticated()) {			
       throw new Exception(401, "Unauthorized");
 		}  
 	

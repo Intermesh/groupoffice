@@ -13,6 +13,8 @@ use go\core\model\User;
 use go\modules\community\addressbook\model\AddressBook;
 use go\core\model\Group;
 use go\core\model\Acl;
+use go\core\model\Module as GoModule;
+use GO\Files\Model\Folder;
 use go\modules\community\addressbook\model\Settings;
 
 /**						
@@ -21,18 +23,8 @@ use go\modules\community\addressbook\model\Settings;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  * 
  * @todo 
- * filters
  * Merge
- * Batch edit
- * Export
- * Import
- * Carddav
- * Document templates
- * ActiveSync
- * Migration
- * Send newsletter
- * 
- * 
+ * Deduplicate
  * 
  */
 class Module extends core\Module {
@@ -68,13 +60,13 @@ class Module extends core\Module {
 	
 	
 	public static function onMap(Mapping $mapping) {
-		$mapping->addHasOne('addressBookSettings', UserSettings::class, ['id' => 'userId']);
+		$mapping->addHasOne('addressBookSettings', UserSettings::class, ['id' => 'userId'], true);
 	}
 
 	protected function afterInstall(\go\core\model\Module $model)
 	{
 		$addressBook = new AddressBook();
-		$addressBook->name = GO()->t("Shared", 'community', 'addressbook');
+		$addressBook->name = go()->t("Shared");
 		$addressBook->setAcl([
 			Group::ID_INTERNAL => Acl::LEVEL_DELETE
 		]);
@@ -92,6 +84,25 @@ class Module extends core\Module {
 	public function getSettings()
 	{
 		return Settings::get();
+	}
+
+	/**
+	 * Create and check permission on the "addressbook" root folder.
+	 */
+	public static function checkRootFolder() {
+
+		if(!GoModule::isInstalled('legacy', 'files')) {
+			return false;
+		}
+
+		$roAcl = Acl::getReadOnlyAcl();
+		$folder = Folder::model()->findByPath('addressbook', true, ['acl_id' => $roAcl->id]);
+		if($folder->acl_id != $roAcl->id) {
+			$folder->acl_id = $roAcl->id;
+			$folder->save(true);
+		}
+
+		return $folder;
 	}
 							
 }

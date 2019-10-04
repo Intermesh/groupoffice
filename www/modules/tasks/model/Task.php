@@ -135,7 +135,15 @@ class Task extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	protected function getCacheAttributes() {
-		return array('name'=>$this->name, 'description'=>$this->description);
+		$tasklist = empty($this->tasklist) ? '' :$this->tasklist->name;
+
+		$description = $tasklist;
+
+		 if(!empty($this->description) ){
+			$description .= ', ' . $this->description;
+		 }
+
+		return array('name'=>$this->name, 'description'=>$description, 'mtime'=>$this->due_time);
 	}
 		
 	public function beforeSave() {		

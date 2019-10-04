@@ -138,7 +138,7 @@ class Mapping {
 	/**
 	 * Check if this mapping has the given table or one of it's property relations has it.
 	 * 
-	 * @return bool|string path
+	 * @return bool|string[] path
 	 */
 	public function hasTable($name, $path = [], &$paths = []) {
 		
@@ -148,6 +148,10 @@ class Mapping {
 
 		foreach($this->getRelations() as $r) {
 			if(!isset($r->entityName)) {
+				//for scalar
+				if($r->tableName == $name) {
+					$paths[] = array_merge($path, [$r->name]);
+				}
 				continue;
 			}
 			$cls = $r->entityName;
@@ -163,12 +167,14 @@ class Mapping {
 	 * @param string $name
 	 * @param string $entityName
 	 * @param array $keys
+	 * @param bool $autoCreate If not found then automatically create an empty object
 	 * 
 	 * @return $this;
 	 */
-	public function addHasOne($name, $entityName, array $keys) {
+	public function addHasOne($name, $entityName, array $keys, $autoCreate = false) {
 		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_HAS_ONE);
 		$this->relations[$name]->setEntityName($entityName);
+		$this->relations[$name]->autoCreate = $autoCreate;
 		return $this;
 	}
 
@@ -204,6 +210,10 @@ class Mapping {
 
 	/**
 	 * Add a scalar relation. For example an array of ID's.
+	 * 
+	 * Note: When an entity with scalar relations is saved it automatically looks for other entities referencing the same scalar relation for trracking changes.
+	 * 
+	 * eg. When a group's users[] change. It will mark all users as changed too because they have a scalar groups[] property.
 	 * 
 	 * @param string $name
 	 * @param string $tableName

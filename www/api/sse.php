@@ -21,7 +21,7 @@ App::get()->setAuthState(new State());
 @session_write_close();
 
 //Check availability
-if(!GO()->getConfig()['core']['general']['sseEnabled'] || (function_exists("xdebug_is_debugger_active") && xdebug_is_debugger_active())) {
+if(!go()->getConfig()['core']['general']['sseEnabled'] || (function_exists("xdebug_is_debugger_active") && xdebug_is_debugger_active())) {
 	// Service Unavailable
 	http_response_code(503);
 	echo "Server Sent Events not available";
@@ -123,7 +123,7 @@ for($i = 0; $i < MAX_LIFE_TIME; $i += CHECK_INTERVAL) {
 		$changes = $new;
 	}
 
-	GO()->getDbConnection()->disconnect();
+	go()->getDbConnection()->disconnect();
 	$sleeping += CHECK_INTERVAL;
 	sleep(CHECK_INTERVAL);
 }

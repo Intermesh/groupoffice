@@ -14,6 +14,18 @@ go.users.CreateUserPasswordPanel = Ext.extend(Ext.form.FormPanel, {
 				xtype: 'fieldset',
 				title: t('Password'),
 				items: [
+					//Add a hidden submit button so the form will submit on enter
+					{
+						xtype: "button",
+						hidden: true,
+						hideMode: "offsets",
+						type: "submit",
+						handler: function() {
+							this.ownerCt.continue();
+						},
+						scope: this
+					},
+
 					this.passwordField1 = new go.form.PasswordGeneratorField({						
 						allowBlank: false,
 						minLength: go.Modules.get("core","core").settings.passwordMinLength,

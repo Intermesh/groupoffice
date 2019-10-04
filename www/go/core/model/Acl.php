@@ -94,10 +94,7 @@ class Acl extends Entity {
 		
 		if($this->ownedBy != User::ID_SUPER_ADMIN) {
 
-			$groupId = Group::find()
-							->where(['isUserGroupFor' => $this->ownedBy])
-							->selectSingleValue('id')
-							->single();
+			$groupId = Group::findPersonalGroupID($this->ownedBy);
 			$ownerLevel = $this->hasGroup($groupId);
 			if($ownerLevel < self::LEVEL_MANAGE) {
 				$this->removeGroup($groupId);
@@ -263,8 +260,9 @@ class Acl extends Entity {
 	 * @param string $column eg. t.aclId
 	 * @param int $level The required permission level
 	 * @param int $userId If null then the current user is used.
+	 * @param int[] $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
 	 */
-	public static function applyToQuery(Query $query, $column, $level = self::LEVEL_READ, $userId = null) {
+	public static function applyToQuery(Query $query, $column, $level = self::LEVEL_READ, $userId = null, $groups = null) {
 
 		if(!isset($userId)) {
 			$userId = App::get()->getAuthState() ? App::get()->getAuthState()->getUserId() : false;
@@ -277,11 +275,17 @@ class Acl extends Entity {
 		// WHERE in
 		$subQuery = (new Query)
 						->select('aclId')
-						->from('core_acl_group', 'acl_g')						
-						->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
-						->andWhere([
-								'acl_u.userId' => $userId			
-										]);
+						->from('core_acl_group', 'acl_g');
+						
+						
+		if(isset($groups)) {
+			$subQuery->andWhere('acl_g.groupId', 'IN', $groups);
+		} else {
+			$subQuery->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
+				->andWhere([
+					'acl_u.userId' => $userId			
+							]);
+			}
 
 		if($level != self::LEVEL_READ) {			
 			$subQuery->andWhere('acl_g.level', '>=', $level);
@@ -446,5 +450,28 @@ class Acl extends Entity {
 		}
 		
 		return $query;
+	}
+
+
+	/**
+	 * Get the ACL that can be used to make things read only for everyone.
+	 * 
+	 * @return static
+	 */
+	public static function getReadOnlyAcl(){
+		
+		$acl = static::find()->where(['usedIn' => 'readonly'])->single();
+		
+		if(!$acl){
+			$acl = new static();
+			$acl->ownedBy = 1;
+			$acl->usedIn='readonly';
+			$acl->addGroup(Group::ID_EVERYONE);
+			if(!$acl->save()) {
+				throw new \Exception("Couldn't save read only acl: " . var_export($acl->getValidationErrors(), true));
+			}
+		}
+		
+		return $acl;
 	}
 }

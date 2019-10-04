@@ -202,9 +202,13 @@ Ext.override(Ext.form.BasicForm,{
 				n = f.getName();
 				key = o[n];
 				if (f.getXType() == 'numberfield') {
+					var oldServerFormats = f.serverFormats;
 					f.serverFormats = false; // this will post number as number
+					val = f.getValue();
+					f.serverFormats = oldServerFormats;
+				} else {
+					val = f.getValue();
 				} 
-				val = f.getValue();
 				
 				
 				if(Ext.isDate(val)) {
@@ -437,7 +441,6 @@ Ext.override(Ext.FormPanel,{
 	
 	// prevents adding form fields that are part of custom form field components like the combobox of go.form.Chips for example.
 	processAdd : function(c){
-        
 			if(this.isField(c)){
 					this.form.add(c);
 
@@ -1062,6 +1065,7 @@ Ext.override(Ext.KeyNav, {
 
 
 //USed by old gridpanel deleteselected to keep scroll position
+// Also used by scrollloader in new framework
 Ext.override(Ext.grid.GridView, {
 	scrollToTopOnLoad: true,
 	onLoad : function(){

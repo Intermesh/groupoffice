@@ -41,7 +41,7 @@ class Authenticator extends PrimaryAuthenticator {
 	public function authenticate($username, $password) {
 		$server = $this->findServer($username);
 		
-		GO()->debug("Attempting IMAP authentication on ".$server->imapHostname);
+		go()->debug("Attempting IMAP authentication on ".$server->imapHostname);
 		
 		$connection = new Connection();
 		if(!$connection->connect($server->imapHostname, $server->imapPort, $server->imapEncryption == 'ssl')) {
@@ -57,6 +57,8 @@ class Authenticator extends PrimaryAuthenticator {
 		$user = User::find()->where(['username' => $username])->single();
 		if(!$user) {
 			$user = $this->createUser($username);
+		} else if($user->hasPassword()){
+			$user->clearPassword();
 		}
 		
 		foreach($server->groups as $group) {

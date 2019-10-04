@@ -95,12 +95,12 @@ class Group extends AclOwnerEntity {
 	protected function internalValidate()
 	{
 		if($this->id === self::ID_ADMINS && !in_array(1, $this->users)) {
-			$this->setValidationError('users', ErrorCode::FORBIDDEN, GO()->t("You can't remove the admin user from the administrators group"));
+			$this->setValidationError('users', ErrorCode::FORBIDDEN, go()->t("You can't remove the admin user from the administrators group"));
 		}
 
 		if($this->isUserGroupFor && !in_array($this->isUserGroupFor, $this->users))
 		{
-			$this->setValidationError('users', ErrorCode::FORBIDDEN, GO()->t("You can't remove the group owner from the group"));
+			$this->setValidationError('users', ErrorCode::FORBIDDEN, go()->t("You can't remove the group owner from the group"));
 		}
 
 		return parent::internalValidate();
@@ -123,7 +123,7 @@ class Group extends AclOwnerEntity {
 
 	protected function canCreate()
 	{
-		return GO()->getAuthState()->isAdmin();
+		return go()->getAuthState()->isAdmin();
 	}
 	
 	private function setDefaultPermissions() {
@@ -137,6 +137,15 @@ class Group extends AclOwnerEntity {
 	}
 	
 	protected function internalDelete() {
+
+
+		if($this->id == self::ID_ADMINS) {
+			$this->setValidationError('id', ErrorCode::FORBIDDEN, "You can't delete the administrators group");
+		}
+
+		if($this->id == self::ID_INTERNAL) {
+			$this->setValidationError('id', ErrorCode::FORBIDDEN, "You can't delete the internal group");
+		}
 		
 		if(isset($this->isUserGroupFor)) {
 			$this->setValidationError('isUserGroupFor', ErrorCode::FORBIDDEN, "You can't delete a user's personal group");
@@ -185,6 +194,28 @@ class Group extends AclOwnerEntity {
 			]);
 			$module->save();
 		}
+	}
+
+	public static function findPersonalGroupID($userId) {
+		$groupId = Group::find()
+							->where(['isUserGroupFor' => $userId])
+							->selectSingleValue('id')
+							->single();
+		if($groupId) {
+			return $groupId;
+		}
+		$user = User::findById($userId, ['username']);
+		$personalGroup = new Group();
+		$personalGroup->name = $user->username;
+		$personalGroup->isUserGroupFor = $userId;
+		$personalGroup->users[] = $userId;
+		
+		if(!$personalGroup->save()) {
+			throw new \Exception("Could not create personal group");
+		}
+
+		return $personalGroup->id;
+		
 	}
 
 }

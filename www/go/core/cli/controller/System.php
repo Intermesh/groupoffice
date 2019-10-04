@@ -21,11 +21,12 @@ class System extends Controller {
 	}
 
 	public function upgrade() {
-		GO()->getInstaller()->isValidDb();
-		GO()->setCache(new \go\core\cache\None());	
+		go()->getInstaller()->isValidDb();
+		go()->setCache(new \go\core\cache\None());	
 		Table::destroyInstances();
 		\GO::session()->runAsRoot();	
-		GO()->getInstaller()->upgrade();
+		date_default_timezone_set("UTC");
+		go()->getInstaller()->upgrade();
 		
 		echo "Done!\n";
 	}

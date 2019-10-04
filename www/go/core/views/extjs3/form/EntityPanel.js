@@ -35,7 +35,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		this.currentId = id;
 
 		this.entityStore.get([id], function(entities) {
-			this.setValues(entities[0]);
+			this.setValues(entities[0], true);
 			this.entity = entities[0];
 			
 			if(callback) {
@@ -58,7 +58,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		return v;
 	},
 	
-	setValues : function(v) {
+	setValues : function(v, trackReset) {
 		var field, name;
 		
 		//set all non form values.
@@ -71,7 +71,10 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		}
 
 		//Set the form values after. It's important to do this after setting this.values otherwise it will add joined object value names like customFields.name
+		var oldReset = this.getForm().trackResetOnLoad;
+		this.getForm().trackResetOnLoad = trackReset;
 		this.getForm().setValues(v);
+		this.getForm().trackResetOnLoad = oldReset;
 		
 		this.fireEvent('setvalues', this, v);
 		return this;

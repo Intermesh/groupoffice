@@ -114,36 +114,22 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			items:[
 				this.passwordField1 = new go.form.PasswordGeneratorField({
 					minLength: go.Modules.get("core","core").settings.passwordMinLength,
+					needPasswordForChange: true,
 					listeners: {						
 						generated : function(field, pass) {
 							this.passwordField2.setValue(pass);
 						},
 						scope: this
-					},
-					needPasswordForChange: true,
-					listeners: {
-						afterrender: function(cmp) {
-							cmp.el.set({
-								autocomplete: "new-password"
-							});
-						}
 					}
 
 				}),
 		
 				this.passwordField2 = new Ext.form.TextField({
-					inputType: 'password',
-					
+					inputType: 'password',					
 					fieldLabel: t("Confirm password", "users"),
 					submit: false,
 					minLength: go.Modules.get("core","core").settings.passwordMinLength,
-					listeners: {
-						afterrender: function(cmp) {
-							cmp.el.set({
-								autocomplete: "new-password"
-							});
-						}
-					}
+					autocomplete: 'new-password'					
 				})
 			]
 		});

@@ -17,11 +17,11 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 		this.additionalFields = [];
 		go.form.FormContainer.superclass.initComponent.call(this);
 
-		// this.on("add", function (e) {
-		// 	//to prevent adding to Ext.form.BasicForm with add event.
-		// 	//Cancels event bubbling
-		// 	return false;
-		// });
+		this.on("add", function (e) {
+			//to prevent adding to Ext.form.BasicForm with add event.
+			//Cancels event bubbling
+			return false;
+		});
 
 
 	},
@@ -85,6 +85,17 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 		return dirty;
 	},
 
+	setNotDirty : function() {
+		var dirty = false, fn = function (i) {
+			i.originalValue = i.getValue();
+			i.dirty = false;
+			if(i.setNotDirty) {
+				i.setNotDirty(false);
+			}
+		};
+		this.getAllFormFields().forEach(fn, this);
+	},
+
 	reset: function () {
 		this.setValue({});
 	},
@@ -95,7 +106,7 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 			var field = this.findField(name);
 			if (field) {
 				field.setValue(v[name]);
-				field.originalValue = field.getValue();
+				// field.originalValue = field.getValue();
 			}
 		}
 

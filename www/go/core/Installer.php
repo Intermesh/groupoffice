@@ -29,6 +29,7 @@ use go\core\model\Module as GoCoreModule;
 use GO\Base\Db\ActiveRecord;
 use go\core\orm\EntityType;
 use go\core\model\Acl;
+use go\core\orm\LoggingTrait;
 
 class Installer {
 	
@@ -85,6 +86,8 @@ class Installer {
 		App::get()->getCache()->flush(false);
 		App::get()->setCache(new None());
 
+		LoggingTrait::$enabled = false;
+
 		self::$isInProgress = true;
 		self::$isInstalling = true;
 
@@ -117,7 +120,7 @@ class Installer {
 
 		$tempAuthState = new TemporaryState();
 		$tempAuthState->setUserId(1);
-		GO()->setAuthState($tempAuthState);
+		go()->setAuthState($tempAuthState);
 		
 		$this->installEmailTemplate();
 
@@ -126,10 +129,17 @@ class Installer {
 		}
 
 		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
+		App::get()->getSettings()->setDefaultGroups([Group::ID_INTERNAL]);
 		App::get()->getSettings()->save();
+
+
 
 		App::get()->setCache(new Disk());
 		Listeners::get()->init();
+
+		//phpunit tests will use change tracking after install
+		jmap\Entity::$trackChanges = true;
+		LoggingTrait::$enabled = true;
 	}
 	
 	
@@ -158,7 +168,8 @@ class Installer {
 			throw new \Exception("Could not save core module: " . var_export($module->getValidationErrors(), true));
 		}
 
-		$module->findAcl()->addGroup(Group::ID_EVERYONE);
+		//Share core with everyone
+		$module->findAcl()->addGroup(Group::ID_EVERYONE)->save();
 		
 		$cron = new model\CronJobSchedule();
 		$cron->moduleId = $module->id;
@@ -217,7 +228,7 @@ class Installer {
 <br />
 {body}<br />
 <br />
-'.\GO()->t("Best regards").'<br />
+'.\go()->t("Best regards").'<br />
 <br />
 <br />
 {user:displayName}<br />');
@@ -225,7 +236,7 @@ class Installer {
 		$template = new \GO\Base\Model\Template();
 		$template->setAttributes(array(
 			'content' => $message->toString(),
-			'name' => GO()->t("Default"),
+			'name' => go()->t("Default"),
 			'type' => \GO\Base\Model\Template::TYPE_EMAIL,
 			'user_id' => 1
 		));
@@ -235,12 +246,12 @@ class Installer {
 
 
 	public function isValidDb() {
-		if (!GO()->getDatabase()->hasTable("core_module")) {
+		if (!go()->getDatabase()->hasTable("core_module")) {
 			throw new \Exception("This is not a Group-Office 6.3+ database. Please upgrade to " . self::MIN_UPGRADABLE_VERSION . " first.");
 		}
 
-		if (version_compare(GO()->getSettings()->databaseVersion, self::MIN_UPGRADABLE_VERSION) === -1) {
-			throw new \Exception("Your version is " . GO()->getSettings()->databaseVersion . ". Please upgrade to " . self::MIN_UPGRADABLE_VERSION . " first.");
+		if (version_compare(go()->getSettings()->databaseVersion, self::MIN_UPGRADABLE_VERSION) === -1) {
+			throw new \Exception("Your version is " . go()->getSettings()->databaseVersion . ". Please upgrade to " . self::MIN_UPGRADABLE_VERSION . " first.");
 		}
 	}
 
@@ -298,14 +309,17 @@ class Installer {
 		self::$isInProgress = true;
 		self::$isUpgrading = true;
 
-		GO()->setAuthState((new TemporaryState())->setUserId(1));
+		LoggingTrait::$enabled = false;
+
+		go()->setAuthState((new TemporaryState())->setUserId(1));
 		
 
 		$this->isValidDb();
-		GO()->getCache()->flush(false);
-		GO()->setCache(new None());
+		go()->getCache()->flush(false);
+		\GO::clearCache(); //legacy framework
+		go()->setCache(new None());
 		
-		$unavailable = GO()->getInstaller()->getUnavailableModules();
+		$unavailable = go()->getInstaller()->getUnavailableModules();
 		if(!empty($unavailable)) {
 			throw new \Exception("There are unavailable modules");
 		}
@@ -316,16 +330,17 @@ class Installer {
 		}
 		
 		ini_set("max_execution_time", 0);
+		ini_set("memory_limit", -1);
 		
 
 
-		GO()->getDbConnection()->query("SET sql_mode=''");
+		go()->getDbConnection()->query("SET sql_mode=''");
 		
 		jmap\Entity::$trackChanges = false;
 
 		ActiveRecord::$log_enabled = false;
 		
-		GO()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
+		go()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
 
 		
 		while (!$this->upgradeModules()) {
@@ -335,16 +350,16 @@ class Installer {
 		echo "Rebuilding cache\n";
 
 		//reset new cache
-		$cls = GO()->getConfig()['core']['general']['cache'];
-		GO()->setCache(new $cls);
+		$cls = go()->getConfig()['core']['general']['cache'];
+		go()->setCache(new $cls);
 
-		GO()->rebuildCache();
+		go()->rebuildCache();
 		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
 		App::get()->getSettings()->save();
 		
 		echo "Resetting state\n";
 		
-		GO()->resetSyncState();
+		go()->resetSyncState();
 		
 		echo "Registering all entities\n";		
 		$modules = model\Module::find()->where(['enabled' => true])->all();
@@ -364,6 +379,10 @@ class Installer {
 
 		$this->fireEvent(static::EVENT_UPGRADE);
 
+
+		//phpunit tests will use change tracking after install
+		jmap\Entity::$trackChanges = true;
+		LoggingTrait::$enabled = true;
 		echo "Done!\n";
 	}
 	
@@ -410,7 +429,7 @@ class Installer {
 	
 	private function getUpdatesFile(model\Module $module) {
 		if ($module->package == null) {
-			$root = GO()->getEnvironment()->getInstallFolder();
+			$root = go()->getEnvironment()->getInstallFolder();
 			//old not refactored yet
 			$file = $root->getFile('modules/' . $module->name . '/install/updates.php');
 			if (!$file->exists()) {
@@ -491,7 +510,7 @@ class Installer {
 						
 						//upgrades may have modified tables so rebuild model and table cache
 						Table::destroyInstances();
-						GO()->getCache()->flush(false);
+						go()->getCache()->flush(false);
 										
 						echo $modStr . "Running callable function\n";
 						call_user_func($query);
@@ -499,9 +518,9 @@ class Installer {
 						
 						//upgrades may have modified tables so rebuild model and table cache
 						Table::destroyInstances();
-						GO()->getCache()->flush(false);
+						go()->getCache()->flush(false);
 						
-						$root = GO()->getEnvironment()->getInstallFolder();
+						$root = go()->getEnvironment()->getInstallFolder();
 						$updateScript = $root->getFile('modules/' . $module->name . '/install/updatescripts/' . substr($query, 7));
 						
 						if (!$updateScript->exists()) {	
@@ -518,7 +537,7 @@ class Installer {
 						flush();
 						try {
 							if (!empty($query))
-								GO()->getDbConnection()->query($query);
+								go()->getDbConnection()->query($query);
 						} catch (PDOException $e) {
 							//var_dump($e);		
 							$errorsOccurred = true;						
@@ -526,11 +545,11 @@ class Installer {
 							if ($e->getCode() == 42000 || $e->getCode() == '42S21' || $e->getCode() == '42S01' || $e->getCode() == '42S22') {
 								//duplicate and drop errors. Ignore those on updates
 								
-								GO()->debug("IGNORING: ". $e->getMessage()." from query: ".$query);
+								go()->debug("IGNORING: ". $e->getMessage()." from query: ".$query);
 								
 							} else {
 
-								echo $e->getMessage() . "\n";
+								echo $e->getCode() . ': '.$e->getMessage() . "\n";
 								echo "Query: " . $query . "\n";
 								echo "Package: " . ($module->package ?? "legacy") . "\n";
 								echo "Module: " . $module->name . "\n";
@@ -579,7 +598,7 @@ class Installer {
 	}
 
 	public static function fixCollations() {
-		$stmt = GO()->getDbConnection()->query("SHOW TABLE STATUS");	
+		$stmt = go()->getDbConnection()->query("SHOW TABLE STATUS");	
 		
 		foreach($stmt as $record){
 			
@@ -587,7 +606,7 @@ class Installer {
 				echo "Converting ". $record["Name"] . " to InnoDB\n";
 				flush();
 				$sql = "ALTER TABLE `".$record["Name"]."` ENGINE=InnoDB;";
-				GO()->getDbConnection()->query($sql);	
+				go()->getDbConnection()->query($sql);	
 			}
 			
 			if($record["Collation"] != "utf8mb4_unicode_ci" ) {
@@ -595,22 +614,22 @@ class Installer {
 				flush();
 				
 				if($record['Name'] === 'em_links') {
-					GO()->getDbConnection()->query("ALTER TABLE `em_links` DROP INDEX `uid`");
+					go()->getDbConnection()->query("ALTER TABLE `em_links` DROP INDEX `uid`");
 				}			
 				$sql = "ALTER TABLE `".$record["Name"]."` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
-				GO()->getDbConnection()->query($sql);	
+				go()->getDbConnection()->query($sql);	
 				
 				if($record['Name'] === 'em_links') {
-					GO()->getDbConnection()->query("ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';");
-					GO()->getDbConnection()->query("ALTER TABLE `em_links` ADD INDEX(`uid`);");
+					go()->getDbConnection()->query("ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';");
+					go()->getDbConnection()->query("ALTER TABLE `em_links` ADD INDEX(`uid`);");
 				}
 
 				if($record['Name'] == 'fs_files') {
-					GO()->getDbConnection()->query("ALTER TABLE `fs_files` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;");
+					go()->getDbConnection()->query("ALTER TABLE `fs_files` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;");
 				}
 
 				if($record['Name'] == 'fs_folders') {
-					GO()->getDbConnection()->query("ALTER TABLE `fs_folders` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;");
+					go()->getDbConnection()->query("ALTER TABLE `fs_folders` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;");
 				}
 	
 			}	

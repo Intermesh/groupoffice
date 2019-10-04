@@ -28,7 +28,7 @@ use go\core\App;
 require(__DIR__ . "/vendor/autoload.php");
 App::get();
 
-$file = GO()->getDataFolder()->getFile(rawurldecode($_SERVER['REQUEST_URI']));
+$file = go()->getDataFolder()->getFile(rawurldecode($_SERVER['REQUEST_URI']));
 
 if (!$file->exists()) {
 	header('HTTP/1.0 404 Not found');

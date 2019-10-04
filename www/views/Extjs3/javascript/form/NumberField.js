@@ -48,7 +48,7 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 	/**
 	 * @cfg {Number} decimals The maximum precision to display after the decimal separator (defaults to 2)
 	 */
-	decimalPercision: 2,
+	decimalPrecision: 2,
 	
 	/**
 	 * Old framework wants it formatted. The new framework wants it unformatted.
@@ -66,7 +66,7 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 		this.style="text-align:right";
 		
 		if(this.decimals !== false) { // backwards compatible
-			this.decimalPercision = this.decimals
+			this.decimalPrecision = this.decimals;
 		}
 		
 		this.on('focus',function(input){
@@ -80,6 +80,7 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 	},
 	fixPrecision : function(){
 //		console.log(this.getValue());
+
 		if(this.getValue()!=""){
 			var number = this.getValue();
 			if(this.serverFormats) {
@@ -89,7 +90,7 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 				number = this.minValue;
 			}
 			if(this.serverFormats) {
-				number = GO.util.numberFormat(number, this.decimalPercision);
+				number = GO.util.numberFormat(number, this.decimalPrecision);
 			}
 			this.setValue(number);
 		}
@@ -110,7 +111,7 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 		
 		if(!this.serverFormats) {			
 			v = v * this.multiplier;
-			formatted = GO.util.numberFormat(v, this.decimalPercision);
+			var formatted = GO.util.numberFormat(v, this.decimalPrecision);
 			this.setRawValue(formatted);
 		}
 	},
@@ -126,7 +127,7 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 	getErrors: function(value) {
 		var errors = GO.form.NumberField.superclass.getErrors.apply(this, arguments);
 		
-		value = GO.util.unlocalizeNumber(this.getRawValue())
+		value = !this.serverFormats ? this.getRawValue() : GO.util.unlocalizeNumber(this.getRawValue());
 
 		if (value.length < 1) { // if it's blank and textfield didn't flag it then it's valid
 			return errors;
@@ -137,7 +138,7 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 			errors.push(String.format(this.minText, this.minValue));
 		}
         
-		if (value > this.maxValue) {
+		if (value > this.maxValue) {			
 			errors.push(String.format(this.maxText, this.maxValue));
 		}
         

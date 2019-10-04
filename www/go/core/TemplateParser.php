@@ -20,7 +20,7 @@ use function GO;
  * ``````````````````````````````````````````````````````````````````````
  * 
  * $body = new \go\core\TemplateParser();
- * $body->addModel('user', GO()->getAuthState()->getUser());
+ * $body->addModel('user', go()->getAuthState()->getUser());
  * 		
  * echo $body->parse("Hello {{user.username}}, It's {{now | date:l}} today");
  * 
@@ -44,7 +44,7 @@ use function GO;
  *		
  *		$tplParser = new \go\core\TemplateParser();
  *		$tplParser->addModel('test', ['foo' => 'bar'])
- *						->addModel('user', GO()->getAuth()->user());
+ *						->addModel('user', go()->getAuth()->user());
  *		
  *		echo $tplParser->parse($tpl);
  *``````````````````````````````````````````````````````````````````````````````		
@@ -107,7 +107,7 @@ class TemplateParser {
 
 	protected function getUser() {
 		if(!isset($this->user)) {
-			$this->user = GO()->getAuthState()->getUser(['dateFormat', 'timezone']);	
+			$this->user = go()->getAuthState()->getUser(['dateFormat', 'timezone']);	
 		}
 		return $this->user;
 	}
@@ -381,9 +381,9 @@ class TemplateParser {
 		try {
 			$ret = eval($expression);	
 		} catch(\ParseError $e) {
-			GO()->warn('eval() failed '. $e->getMessage());
-			GO()->warn($tag['expression']);
-			GO()->warn($expression);
+			go()->warn('eval() failed '. $e->getMessage());
+			go()->warn($tag['expression']);
+			go()->warn($expression);
 			$ret = false;
 		}
 		if($ret){

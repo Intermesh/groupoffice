@@ -10,6 +10,8 @@ use go\core\util\ClassFinder;
 use go\core\orm\EntityType;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\acl\model\AclItemEntity;
+use go\core\orm\Relation as GoRelation;
+use go\modules\sony\abrelations\model\Relation;
 
 /**
  * Entity model
@@ -64,12 +66,61 @@ abstract class Entity  extends OrmEntity {
 		
 		if(self::$trackChanges) {
 			$this->entityType()->checkChange($this);
-		} else
-		{
-			GO()->warn('Track changes was disabled during save of '. static::class);
-		}
+
+			$this->checkChangeForRelations();
+		} 
 		
 		return true;
+	}
+
+	private function checkChangeForRelations() {
+		foreach($this->getMapping()->getRelations() as $r) {
+
+			if($r->type != GoRelation::TYPE_SCALAR) {
+				continue;
+			}
+			$modified = $this->getModified([$r->name]);
+			if(empty($modified)) {
+				continue;
+			}
+
+			$ids = array_merge(array_diff($modified[$r->name][0], $modified[$r->name][1]), array_diff($modified[$r->name][1], $modified[$r->name][0]));
+
+			$entities = $this->findEntitiesByTable($r->tableName);
+			foreach($entities as $e) {
+				$cls = $e['cls'];
+
+				$isAclOwnerEntity = is_a($cls, AclOwnerEntity::class, true);
+				$isAclItemEntity = is_a($cls, AclItemEntity::class, true);
+
+				foreach($e['paths'] as $path) {
+					$query = $cls::find();
+
+					$query->where('id', 'IN', $ids);
+					
+
+					$query->select($query->getTableAlias() . '.id AS entityId');
+
+					if($isAclItemEntity) {
+						$aclAlias = $cls::joinAclEntity($query);
+						$query->select($aclAlias .'.aclId', true);
+					} else if($isAclOwnerEntity) {
+						$query->select('aclId', true);
+					} else{
+						$query->select('NULL AS aclId', true);
+					}
+
+					$query->select('"0" AS destroyed', true);
+
+					$type = $cls::entityType();
+
+					//go()->warn($query);
+
+					/** @var EntityType $type */
+					$type->changes($query);
+				}
+			}			
+		}
 	}
 	
 	/**
@@ -80,7 +131,8 @@ abstract class Entity  extends OrmEntity {
 	protected function internalDelete() {
 		
 		if(self::$trackChanges) {
-			$this->changeReferencedEntities();
+			$this->changeReferencedEntities([$this->id]);
+			$this->checkChangeForRelations();
 		}
 
 		if(!parent::internalDelete()) {
@@ -89,20 +141,22 @@ abstract class Entity  extends OrmEntity {
 		
 		if(self::$trackChanges) {
 			$this->entityType()->checkChange($this);
-		} else
-		{
-			GO()->warn('Track changes was disabled during delete of '. static::class);
-		}	
+		}
 		
 		return true;
 	}	
+
+	// public static function markChangesForDelete(array $ids, $aclId = null) {
+	// 	static::changeReferencedEntities($ids);
+	// 	static::entityType()->changes(array_map(function($id) { return ['entityId' => $id, 'aclId' => $aclId, 'destroyed' => true];}, $ids));
+	// }
 
 	/**
 	 * This function finds all entities that might change because of this delete. 
 	 * This happens when they have a foreign key constraint with SET NULL
 	 */
-	private function changeReferencedEntities() {
-		foreach($this->getEntityReferences() as $r) {
+	private static function changeReferencedEntities($ids) {
+		foreach(static::getEntityReferences() as $r) {
 			$cls = $r['cls'];			
 
 			$isAclOwnerEntity = is_a($cls, AclOwnerEntity::class, true);
@@ -114,9 +168,9 @@ abstract class Entity  extends OrmEntity {
 				if(!empty($path)) {
 					//TODO joinProperites only joins the first table.
 					$query->joinProperties($path);
-					$query->where(array_pop($path) . '.' .$r['column'], '=', $this->id);
+					$query->where(array_pop($path) . '.' .$r['column'], 'IN', $ids);
 				} else{
-					$query->where($r['column'], '=', $this->id);					
+					$query->where($r['column'], 'IN', $ids);					
 				}
 
 				$query->select($query->getTableAlias() . '.id AS entityId');
@@ -134,7 +188,7 @@ abstract class Entity  extends OrmEntity {
 
 				$type = $cls::entityType();
 
-				//GO()->warn($query);
+				//go()->warn($query);
 
 				/** @var EntityType $type */
 				$type->changes($query);
@@ -306,7 +360,7 @@ abstract class Entity  extends OrmEntity {
 						->select('entityId, "0" AS destroyed')
 						->from("core_change_user", "change_user")
 						->where([
-								"userId" => GO()->getUserId(),
+								"userId" => go()->getUserId(),
 								"entityTypeId" => static::entityType()->getId()
 						])
 						->andWhere('modSeq', '>', $sinceModSeq);
@@ -337,28 +391,34 @@ abstract class Entity  extends OrmEntity {
 	 */
 	private static function getEntityReferences() {
 		$cacheKey = "refs-" . static::class;
-		$entityClasses = GO()->getCache()->get($cacheKey);
+		$entityClasses = go()->getCache()->get($cacheKey);
 		if($entityClasses === null) {
 
 			$tableName = array_values(static::getMapping()->getTables())[0]->getName();
 
-			$dbName = GO()->getDatabase()->getName();
-			GO()->getDbConnection()->exec("USE information_schema");
+			$dbName = go()->getDatabase()->getName();
+			go()->getDbConnection()->exec("USE information_schema");
 			//somehow bindvalue didn't work here
 			$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where ".
-				"table_schema=" . GO()->getDbConnection()->getPDO()->quote($dbName) . 
-				" and referenced_table_name=".GO()->getDbConnection()->getPDO()->quote($tableName)." and referenced_column_name = 'id'";
+				"table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . 
+				" and referenced_table_name=".go()->getDbConnection()->getPDO()->quote($tableName)." and referenced_column_name = 'id'";
 
-			$stmt = GO()->getDbConnection()->getPDO()->query($sql);
+			$stmt = go()->getDbConnection()->getPDO()->query($sql);
 			$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);					
-			GO()->getDbConnection()->exec("USE `" . $dbName . "`");		
+			go()->getDbConnection()->exec("USE `" . $dbName . "`");		
 
 			$entityClasses = [];
 			foreach($refs as $r) {
-				$entityClasses = array_merge($entityClasses, static::findEntitiesByTable($r['table'], $r['column']));
+				$entities = static::findEntitiesByTable($r['table']);
+				$eWithCol = array_map(function($i) use($r) {
+					$i['column'] = $r['column'];
+					return $i;
+				}, $entities);
+
+				$entityClasses = array_merge($entityClasses, $eWithCol);
 			}	
 			
-			GO()->getCache()->set($cacheKey, $entityClasses);			
+			go()->getCache()->set($cacheKey, $entityClasses);			
 		}		
 		
 		return $entityClasses;
@@ -368,9 +428,9 @@ abstract class Entity  extends OrmEntity {
 	/**
 	 * Find's entities that have the given table name mapped
 	 * 
-	 * @return string[]
+	 * @return Array[] [['cls'=>'', 'paths' => 'contactId']]
 	 */
-	private static function findEntitiesByTable($tableName, $col) {
+	private static function findEntitiesByTable($tableName) {
 		$cf = new ClassFinder();
 		$allEntitites = $cf->findByParent(self::class);
 
@@ -379,12 +439,11 @@ abstract class Entity  extends OrmEntity {
 			return $e != static::class;
 		});
 
-		$mapped = array_map(function($e) use ($tableName, $col) {
+		$mapped = array_map(function($e) use ($tableName) {
 			$paths = $e::getMapping()->hasTable($tableName);
 			return [
 				'cls' => $e,
-				'paths' => $paths,
-				'column' => $col
+				'paths' => $paths
 			];
 
 		}, $allEntitites);

@@ -61,11 +61,12 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 						enter: function (e) {
 							e.preventDefault();
 							this.nameMenu.hide();
+							this.focusNextEl();
 						},
 						scope: this
 					});
 
-					this.suffixField.on('specialkey', function (field, e) {
+					this.salutationField.on('specialkey', function (field, e) {
 
 						// e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,
 						// e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN
@@ -145,6 +146,10 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 									xtype: 'textfield',
 									name: 'suffixes',
 									fieldLabel: t("Suffix")
+								}), this.salutationField = new Ext.form.TextField({
+									xtype: 'textfield',
+									name: 'salutation',
+									fieldLabel: t("Salutation")
 								})
 							]
 						});

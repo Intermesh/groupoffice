@@ -66,7 +66,7 @@ class Folder extends FileSystemObject {
 	 * @return static
 	 */
 	public static function tempFolder() {
-		return GO()->getTmpFolder()->getFolder(uniqid(time()));
+		return go()->getTmpFolder()->getFolder(uniqid(time()));
 	}
 
 	/**
@@ -241,7 +241,7 @@ class Folder extends FileSystemObject {
 			$success = rename($this->getPath(), $newPath);
 		} catch(\Exception $e) {
 			//rename fails accross partitions. Ignore and retry with copy delete.
-			GO()->warn("Rename failed. Falling back on copy, delete");
+			go()->warn("Rename failed. Falling back on copy, delete");
 		}
 
 		if (!$success) { // Notice suppressed by @
