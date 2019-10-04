@@ -17,7 +17,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	initComponent: function () {
 
 
-		if(go.User.isAdmin && this.header) {
+		if(go.User.isAdmin && this.title) {
 			this.tools = [{			
 				id: "gear",
 				handler: function () {		
