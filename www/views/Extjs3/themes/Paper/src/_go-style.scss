@@ -1735,57 +1735,58 @@ table[id^="comments-ext"] b {
 		padding: dp(8) 0;
 	}
 	> div { 
-		// overflow:hidden;
+		position:relative;
+		overflow:hidden;
+		width: 100%;
 		padding-bottom:dp(8);
 		span.photo {
 			@extend .avatar;
+			position:absolute;
+			top: 0;
 			margin-top:0 !important;
 			margin-right: dp(8);
 			line-height: 35px;
 			text-align: center;
+			&:after {
+				content: '';
+				position: absolute;
+				right: dp(-16);
+				top: dp(8);
+				width: 0; height: 0;
+				border: 0;
+				border-right: dp(16) solid color($bg, 'status-bar');
+				border-bottom: dp(16) solid transparent;
+			}
 			&.mine {
 				margin-right:0;
 				margin-left: dp(8);
-				float:right;
+				right:0;
+				&:after {
+					left: dp(-16);
+					border: 0;
+					border-left: dp(16) solid $cPrimaryTp;
+					border-bottom: dp(16) solid transparent;
+				}
 			}
 		}
-		> div {// message		
+		> div { // message		
+			border-radius: dp(8);
 			display:inline-block;
-			max-width: calc(100% - 80px);
+			margin-left: dp(56);
+			max-width: 100%;
+			background-color: color($bg, 'status-bar');
 			.content {
 				padding: dp(8) dp(16);
 			}
 			&.mine {
+				margin-right: dp(56);
+				margin-left: 0; // reset
 				background-color: $cPrimaryTp;
 				float:right;
 			}
 		}
 		
 	}
-}
-
-
-.speech-bubble {
-	position: relative;
-	background-color: color($bg, 'status-bar');
-	border-radius: dp(8);
-	padding: dp(8) dp(16);
-}
-
-.speech-bubble:after {
-	content: '';
-	position: absolute;
-	left: 0;
-	top: dp(16);
-	width: 0;
-	height: 0;
-	border: dp(16) solid transparent;
-	border-right-color: color($bg, 'status-bar');
-	border-left: 0;
-	// border-bottom: 0;
-	border-top: 0;
-	margin-top: dp(-10);
-	margin-left: dp(-16);
 }
 
 .tags {	
