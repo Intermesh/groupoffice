@@ -312,6 +312,7 @@ class Installer {
 
 		$this->isValidDb();
 		go()->getCache()->flush(false);
+		\GO::clearCache(); //legacy framework
 		go()->setCache(new None());
 		
 		$unavailable = go()->getInstaller()->getUnavailableModules();
