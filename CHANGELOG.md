@@ -1,3 +1,4 @@
+- Core: Track changes in other models in entity controller when doing a set request so it can return all modified entities
 - Address book: Organizations field was not hidden when newsletters module was installed
 - Core: Clear legacy cache before upgrade
 
