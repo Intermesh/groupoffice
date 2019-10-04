@@ -10,7 +10,9 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 			fieldLabel: t("Username"),
 			name: 'username',
 			allowBlank: false,
-			anchor: '100%'
+			anchor: '100%',
+			autocomplete: "username"
+			
 		});
 
 		this.passwordField = new Ext.form.TextField({
@@ -19,9 +21,9 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 			name: 'password',
 			inputType: 'password',
 			allowBlank: false,
-			anchor: '100%'
+			anchor: '100%',
+			autocomplete: 'current-password'
 		});
-
 
 		var items = [
 

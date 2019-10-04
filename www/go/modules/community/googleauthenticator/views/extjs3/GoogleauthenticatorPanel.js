@@ -12,7 +12,8 @@ go.googleauthenticator.GoogleauthenticatorPanel = Ext.extend(go.login.BaseLoginP
 			fieldLabel: t('Code', 'googleauthenticator'),
 			name: 'googleauthenticator_code',
 			allowBlank: false,
-			anchor: '100%'
+			anchor: '100%',
+			autocomplete: "one-time-code"
 		});
 
 		//nested panel is required so that submit button is inside form. 
