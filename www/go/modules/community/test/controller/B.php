@@ -7,7 +7,7 @@ use go\modules\community\test\model;
 class B extends EntityController {
 
 	protected function entityClass() {
-		return model\B;
+		return model\B::class;
 	}
 
 	/**

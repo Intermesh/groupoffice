@@ -1,7 +1,7 @@
 <?php
 namespace go\modules\community\test\model;
 
-use go\core\orm\Entity;
+use go\core\jmap\Entity;
 use go\core\orm\Mapping;
 use go\core\util\DateTime;
 
