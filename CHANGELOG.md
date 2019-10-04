@@ -1,6 +1,7 @@
 - Core: Track changes in other models in entity controller when doing a set request so it can return all modified entities
 - Address book: Organizations field was not hidden when newsletters module was installed
 - Core: Clear legacy cache before upgrade
+- Core: Workaround for hidden custom fields
 
 01-10-2019 6.4.63
 - Custom fields: Fixed problem in loading tree select fields for the second time
