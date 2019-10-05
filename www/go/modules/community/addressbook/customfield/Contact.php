@@ -8,9 +8,16 @@ use go\core\customfield\Base;
 use go\core\db\Criteria;
 use go\core\orm\Filters;
 use go\core\orm\Query;
+use go\modules\community\addressbook\model;
 
 class Contact extends Base {
 
+	
+	public function getModelClass()
+	{
+		return model\Contact::class;
+	}
+	
 	protected function getFieldSQL() {
 		$d = $this->field->getDefault();
 		$d = isset($d) ? (int) $d : "NULL";
