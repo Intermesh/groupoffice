@@ -632,7 +632,7 @@ button {
 	display:inline-block;
 	padding:0;
 	background: url('img/default-avatar.svg') no-repeat center center;
-	background-color: $cPrimary;
+	@include var('background-color', 'c-primary');
 	color: white;
 	background-size:cover;	
 	border-radius: 50%;
@@ -1751,7 +1751,7 @@ table[id^="comments-ext"] b {
 				content: '';
 				position: absolute;
 				right: dp(-16);
-				top: dp(8);
+				top: dp(12);
 				width: 0; height: 0;
 				border: 0;
 				border-right: dp(16) solid color($bg, 'status-bar');
