@@ -1,4 +1,5 @@
 - Core: Working week didn't accept half hours
+- Time Tracking: Sort time tracking activities by name
 
 19-09-2019 6.3.82
 - Projects larger expense budget dialog and resizable
