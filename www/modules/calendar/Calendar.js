@@ -999,7 +999,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			if(this.state.displayType=='view')
 				this.state.displayType='days';
 
-			if(go.util.empty(this.state.calendars)) {
+			if(GO.util.empty(this.state.calendars)) {
 				this.state.calendars=[GO.calendar.defaultCalendar.id];
 			}
 			
