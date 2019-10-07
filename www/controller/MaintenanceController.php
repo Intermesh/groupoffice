@@ -333,6 +333,10 @@ class MaintenanceController extends AbstractController {
 		.    "==============================================================================\n\n";
 		
 		\GO::session()->closeWriting(); //close writing otherwise concurrent requests are blocked.
+
+		if(!empty($params['truncate'])) {
+			go()->getDbConnection()->exec("TRUNCATE TABLE `core_search`");
+		}
 		
 		$response = array();
 				
