@@ -729,7 +729,7 @@ namespace {
 	/**
 	 * @return go\core\App
 	 */
-	function GO() {
+	function go() {
 		return App::get();
 	}
 

@@ -1097,12 +1097,12 @@ button.filetype-pdf, button.filetype-doc {
 
 
 .show-on-hover {
-	display: none;		
+	display: none !important;		
 }
 
 .x-grid3-row-over {
 	.show-on-hover {
-		display:block;
+		display: block  !important;
 	}
 }
 
@@ -1132,7 +1132,7 @@ button.filetype-pdf, button.filetype-doc {
 		
 		&:hover {
 			.show-on-hover {
-				display:block;
+				display:block !important;
 			}
 			.hide-on-hover {
 				display: none;
