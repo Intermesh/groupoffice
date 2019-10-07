@@ -1,3 +1,5 @@
+- GOTA: GOTA listed for users without permission becuase of missing permissions check in old framework module check
+
 04-10-2019 6.4.64
 - Core: Track changes in other models in entity controller when doing a set request so it can return all modified entities
 - Address book: Organizations field was not hidden when newsletters module was installed
