@@ -128,10 +128,10 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 
 			$this->oldLogin($user);	
 			
-			if(!GO::modules()->sync) {
-				ZLog::Write(LOGLEVEL_INFO, 'User '. $user->username .' logged on but has no access to the sync module');
-				return false;
-			}
+//			if(!GO::modules()->sync) {
+//				ZLog::Write(LOGLEVEL_INFO, 'User '. $user->username .' logged on but has no access to the sync module');
+//				return false;
+//			}
 
 			if (!$user) {
 				ZLog::Write(LOGLEVEL_INFO, 'ZPUSH2::ERROR::Username and/or password incorrect.');
