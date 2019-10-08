@@ -38,7 +38,7 @@ GO.moduleManager.onModuleReady('calendar',function(){
 		}),
 		
 		onLoadComplete : GO.calendar.SettingsPanel.prototype.onLoadComplete.createSequence(function(action){
-			this.freebusyPermissionsPanel.setAcl(action.freebusySettings.fbAclId);
+			this.freebusyPermissionsPanel.setAcl(action.freebusySettings.acl_id);
 		})
 		
 	});
