@@ -92,7 +92,9 @@ try {
 } catch (Exception $e) {
 	echo "<b>Error:</b> ". ErrorHandler::logException($e)."\n\n";
 	
-	echo $e->getTraceAsString();
+	if(go()->getDebugger()->enabled) {
+		echo $e->getTraceAsString();
+	}
 	
 	echo "</pre></div>";
 	
