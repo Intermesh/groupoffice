@@ -262,7 +262,9 @@ class GoSyncUtils {
 	public static function getTimeZoneForClient() {
 
 		if (!isset(\GO::session()->values['activesync_timezone'])) {
-			$old = date_default_timezone_set(\GO::user()->timezone);
+			$old = date_default_timezone_get();
+			date_default_timezone_set(\GO::user()->timezone);
+			
 			$tz = new DateTimeZone(\GO::user()->timezone);
 			$transitions = $tz->getTransitions();
 			$start_of_year = mktime(0, 0, 0, 1, 1);
@@ -385,7 +387,8 @@ class GoSyncUtils {
 
 	public static function exportRecurrence($model) {
 
-		$old = date_default_timezone_set($model->timezone);
+		$old = date_default_timezone_get();
+		date_default_timezone_set($model->timezone);
 
 		if ($model instanceof \GO\Tasks\Model\Task)
 			$recur = new SyncTaskRecurrence();
