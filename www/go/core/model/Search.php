@@ -140,14 +140,19 @@ class Search extends AclOwnerEntity {
 						})
 						->add('text', function(Criteria $criteria, $value, Query $query) {
 
-							$value = static::convertQuery($value);
+							$criteria->andWhere(
+								(new Criteria())
+								->orWhere('keywords','like', '%' . preg_replace('\s', '%', $value) . '%')
+							);
 
-							$criteria->where('MATCH (s.name, s.keywords) AGAINST (:keyword1 IN BOOLEAN MODE)')
-							->bind(':keyword1', $value);
-							//->bind(':keyword2', $value);
+							// $value = static::convertQuery($value);
 
-							// Order by relevance
-							//$query->orderBy([new Expression('MATCH (s.name, s.keywords) AGAINST (:keyword2 IN BOOLEAN MODE) DESC')]);
+							// $criteria->where('MATCH (s.name, s.keywords) AGAINST (:keyword1 IN BOOLEAN MODE)')
+							// ->bind(':keyword1', $value);
+							// //->bind(':keyword2', $value);
+
+							// // Order by relevance
+							// //$query->orderBy([new Expression('MATCH (s.name, s.keywords) AGAINST (:keyword2 IN BOOLEAN MODE) DESC')]);
 						});					
 	}
 
@@ -160,35 +165,35 @@ class Search extends AclOwnerEntity {
 		return parent::sort($query, $sort);
 	}
 
-	public static function convertQuery($value) {
+	// public static function convertQuery($value) {
 
-			//first occuring quote type will be used for tokenizing.
-			$doublepos = strpos($value, '"');
-			$singlepos = strpos($value, "'");							
-			$quote = '"';
-			if($singlepos !== false && $singlepos > $doublepos) {
-				$quote = "'";
-			}
+	// 		//first occuring quote type will be used for tokenizing.
+	// 		$doublepos = strpos($value, '"');
+	// 		$singlepos = strpos($value, "'");							
+	// 		$quote = '"';
+	// 		if($singlepos !== false && $singlepos > $doublepos) {
+	// 			$quote = "'";
+	// 		}
 
-			//https://stackoverflow.com/questions/2202435/php-explode-the-string-but-treat-words-in-quotes-as-a-single-word
-			preg_match_all('/'.$quote.'(?:\\\\.|[^\\\\'.$quote.'])*'.$quote.'|\S+/', $value, $tokens);
+	// 		//https://stackoverflow.com/questions/2202435/php-explode-the-string-but-treat-words-in-quotes-as-a-single-word
+	// 		preg_match_all('/'.$quote.'(?:\\\\.|[^\\\\'.$quote.'])*'.$quote.'|\S+/', $value, $tokens);
 
-			$str = "";
+	// 		$str = "";
 
-			foreach($tokens[0] as $token) {				
+	// 		foreach($tokens[0] as $token) {				
 					
-					if(substr($token, -1,1) !== $quote) {
-						$token = $token .= '*';
-					}
-					$str .= '+' . $token . ' ';
-			}
+	// 				if(substr($token, -1,1) !== $quote) {
+	// 					$token = $token .= '*';
+	// 				}
+	// 				$str .= '+' . $token . ' ';
+	// 		}
 
-			return $str;
-	}
+	// 		return $str;
+	// }
 	
 	
-	protected static function textFilterColumns() {
-		return ['keywords'];
-	}
+	// protected static function textFilterColumns() {
+	// 	return ['keywords'];
+	// }
 	
 }

@@ -868,6 +868,5 @@ ALTER TABLE `core_email_template_attachment`
   ADD CONSTRAINT `core_email_template_attachment_ibfk_2` FOREIGN KEY (`emailTemplateId`) REFERENCES `core_email_template` (`id`) ON DELETE CASCADE;
 
 
-ALTER TABLE `core_search` ADD FULLTEXT( `name`, `keywords`);
-
+ALTER TABLE `core_search` ADD INDEX(`keywords`);
 ALTER TABLE `core_change` ADD INDEX(`entityId`);
