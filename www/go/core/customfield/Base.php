@@ -229,6 +229,15 @@ abstract class Base extends Model {
 	}
 	
 	/**
+	 *
+	 * Get the modelClass for this customfield, only needed if an id of a related record is stored
+	 *
+	 * @return bool | string
+	 */
+	public function getModelClass() {
+		return false;
+	}
+	/**
 	 * Get the name of this data type
 	 * 
 	 * @return string
