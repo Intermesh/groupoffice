@@ -114,7 +114,7 @@ class GoSyncUtils {
 		ZLog::Write(LOGLEVEL_DEBUG, 'SYNCUTILS END');
 
 		$sbBody->estimatedDataSize = strlen($asBodyData);
-		$sbBody->data = version_compare(ZPUSH_VERSION, '2.3', '<') ? $asBodyData : StringStreamWrapper::Open($asBodyData);
+		$sbBody->data = StringStreamWrapper::Open($asBodyData);
 		$sbBody->truncated = 0;
 
 		return $sbBody;
