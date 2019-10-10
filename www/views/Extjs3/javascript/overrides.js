@@ -697,9 +697,6 @@ Ext.override(Ext.Element, {
 });
 
 Ext.override(Ext.Component, {
-	callParent: function(args) {
-		return this.supr()[this.callParent.caller.name].apply(this, args || []);
-	},
 	printEl: function(config) {
 		this.el.print(Ext.isEmpty(config)? this.initialConfig: config);
 	}
