@@ -282,7 +282,7 @@ class Settings extends core\Settings {
 	 * 
 	 * @var int
 	 */
-	public $syncChangesMaxAge = 90;
+	public $syncChangesMaxAge = 30;
 	
 	/**
 	 * This variable is checked against the code version.

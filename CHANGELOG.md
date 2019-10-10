@@ -1,3 +1,8 @@
+- Freebusy permissions: Could not add new users when installed
+- GOTA: GOTA listed for users without permission becuase of missing permissions check in old framework module check
+- Calendar: Fixed error in calendar when you didn't have permissions for the favorites module
+- Calendar: Start in calendar / view where you were last
+
 04-10-2019 6.4.64
 - Core: Track changes in other models in entity controller when doing a set request so it can return all modified entities
 - Address book: Organizations field was not hidden when newsletters module was installed
@@ -337,6 +342,9 @@
 11-06-2019 6.4.21
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
+- Core: Working week didn't accept half hours
+- Time Tracking: Sort time tracking activities by name
+- Calendar: Calendar remember state
 
 19-09-2019 6.3.82
 - Projects larger expense budget dialog and resizable

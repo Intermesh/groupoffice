@@ -1239,6 +1239,10 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 //		if($defaultCalendar->id != $calendar->id){
 //			return $response;
 //		}
+
+		if(!$calendar->user) {
+			return $response;
+		}
 		
 		// Ignore the display of leavedays when the calendar is not the default calendar of the user of the calendar you are currently viewing
 		$defaultCalendar = \GO\Calendar\CalendarModule::getDefaultCalendar($calendar->user->id);
