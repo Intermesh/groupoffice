@@ -14,6 +14,7 @@ go.form.MultiEntityDialog = Ext.extend(go.Window, {
 		text: t("Add another"),
 		iconCls: 'ic-add'
 	},
+	autoScroll: true,
 	editable: true,
 	constantValues: {}, //values to be set on every entity before save
 	
@@ -119,6 +120,7 @@ go.form.MultiEntityDialog = Ext.extend(go.Window, {
 				
 				this.internalLoad(entityPanel, entity, wrap);
 			}, this)
+			this.doLayout();
 		}, this);
 	},
 
