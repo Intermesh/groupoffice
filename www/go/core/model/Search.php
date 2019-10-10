@@ -142,7 +142,7 @@ class Search extends AclOwnerEntity {
 
 							$criteria->andWhere(
 								(new Criteria())
-								->orWhere('keywords','like', '%' . preg_replace('\s', '%', $value) . '%')
+								->orWhere('keywords','like', '%' . preg_replace('/\\s/', '%', $value) . '%')
 							);
 
 							// $value = static::convertQuery($value);
