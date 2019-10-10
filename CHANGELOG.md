@@ -1,3 +1,4 @@
+- Core: Updated Brasilian Portugese and Italian translations
 - Freebusy permissions: Could not add new users when installed
 - GOTA: GOTA listed for users without permission becuase of missing permissions check in old framework module check
 - Calendar: Fixed error in calendar when you didn't have permissions for the favorites module
