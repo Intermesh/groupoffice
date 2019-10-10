@@ -107,12 +107,14 @@ class ContactConvertor {
 				
 		$bpReturnType = GoSyncUtils::getBodyPreferenceMatch($contentParameters->GetBodyPreference());
 
-		if (Request::GetProtocolVersion() >= 12.0) {
-			$message->asbody = GoSyncUtils::createASBodyForMessage($contact,'notes',$bpReturnType);
-		} else {
-			$message->body = StringHelper::normalizeCrlf($contact->comment);
-			$message->bodysize = strlen($message->body);
-			$message->bodytruncated = 0;
+		if(!empty($contact->notes)) {
+			if (Request::GetProtocolVersion() >= 12.0) {
+				$message->asbody = GoSyncUtils::createASBodyForMessage($contact,'notes',$bpReturnType);
+			} else {
+				$message->body = StringHelper::normalizeCrlf($contact->notes);
+				$message->bodysize = strlen($message->body);
+				$message->bodytruncated = 0;
+			}
 		}
 		
 		foreach($this->simpleMapping as $goProp => $asProp) {
