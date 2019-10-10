@@ -870,3 +870,4 @@ ALTER TABLE `core_email_template_attachment`
 
 ALTER TABLE `core_search` ADD FULLTEXT( `name`, `keywords`);
 
+ALTER TABLE `core_change` ADD INDEX(`entityId`);
