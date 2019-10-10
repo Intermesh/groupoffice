@@ -964,6 +964,16 @@ Ext.layout.MenuLayout.prototype.itemTpl = new Ext.XTemplate(
 //	dateFormat: "c" //from server
 //});
 
+Ext.override(Ext.DatePicker, {
+	origHandleMouseWheel : Ext.DatePicker.prototype.handleMouseWheel,
+	handleMouseWheel: function(e) {
+		e.stopEvent();
+		if(!Ext.isMac) {
+			this.origHandleMouseWheel(e);
+		}
+	}
+});
+
 Ext.override(Ext.Panel, {
 	panelInitComponent : Ext.Panel.prototype.initComponent,
 	
