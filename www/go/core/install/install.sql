@@ -188,7 +188,7 @@ CREATE TABLE `core_search` (
   `name` varchar(100) DEFAULT NULL,
   `description` varchar(190) NOT NULL DEFAULT '',
   `entityTypeId` int(11) NOT NULL,
-  `keywords` TEXT NULL,
+  `keywords` VARCHAR(190) NULL,
   `filter` VARCHAR(50) NULL DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
   `aclId` int(11) NOT NULL

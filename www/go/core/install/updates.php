@@ -631,5 +631,7 @@ $updates['201910031702'][] = 'insert ignore into core_group (id, name) values (3
 
 $updates['201910101025'][] = "ALTER TABLE `core_change` ADD INDEX(`entityId`);";
 
+$updates['201910101025'][] = "ALTER TABLE `core_search` CHANGE `keywords` `keywords` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;";
+
 $updates['201910101025'][] = "ALTER TABLE `core_search` DROP INDEX `name`;";
 $updates['201910101025'][] = "ALTER TABLE `core_search` ADD INDEX(`keywords`);";
