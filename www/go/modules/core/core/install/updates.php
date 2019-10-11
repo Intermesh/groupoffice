@@ -40,10 +40,42 @@ $updates["201803161130"][] = function() {
 			'password_min_length' => 'passwordMinLength'
 	];
 
+	if(!isset($config['title'])) {
+		$config['title'] = 'Group-Office';
+	}
+
+	if(!isset($config['language'])) {
+		$config['language'] = 'en';
+	}
+
+	if(!isset($config['smtp_host'])) {
+		$config['smtp_host'] = 'localhost';
+	}
+
+	if(!isset($config['smtp_port'])) {
+		$config['smtp_port'] = '25';
+	}
+
+	if(!isset($config['smtp_username'])) {
+		$config['smtp_username'] = '';
+	}
+
+	if(!isset($config['smtp_password'])) {
+		$config['smtp_password'] = '';
+	}
+
+	if(!isset($config['smtp_encryption'])) {
+		$config['smtp_encryption'] = '';
+	}
+
+	if(!isset($config['password_min_length'])) {
+		$config['password_min_length'] = 6;
+	}	
+
 	foreach ($values as $old => $new) {
-		if (empty($config[$old])) {
-			continue;
-		}
+		// if (empty($config[$old])) {
+		// 	continue;
+		// }
 		$sql = "replace into core_setting select id as moduleId, '" . $new . "' as name, :value as value from core_module where name='core'";
 		$stmt = GO()->getDbConnection()->getPDO()->prepare($sql);
 		$stmt->bindValue(":value", $config[$old]);
