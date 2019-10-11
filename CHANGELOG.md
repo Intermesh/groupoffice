@@ -1,3 +1,5 @@
+- Email: Create links when replying to linked messages and from message dialog
+
 11-10-2019 6.4.65
 - Contacts: Fixed problem with duplicating phone number and possibly unlinking company
 - Newsletters: NIce error message when testing without recpipients
