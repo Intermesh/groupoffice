@@ -52,6 +52,12 @@ class Connection {
 		];
 	}
 
+	public function __destruct()
+	{
+		if($this->inTransaction()) {
+			throw new \Exception("DB Transaction not closed properly");
+		}
+	}
 	public function getDsn() {
 		return $this->dsn;
 	}

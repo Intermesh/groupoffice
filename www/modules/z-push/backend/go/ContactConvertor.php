@@ -44,7 +44,7 @@ class ContactConvertor {
 			],
 			PhoneNumber::TYPE_WORK_MOBILE => [
 				["number" => "business2phonenumber"],
-				["number" => "businessphonenumber"]
+				//["number" => "businessphonenumber"]
 			],
 			PhoneNumber::TYPE_FAX => [
 				["number" => "homefaxnumber"]
@@ -403,7 +403,9 @@ class ContactConvertor {
 		$goOrganizationsNames = [];
 		foreach($goOrganizations as $o) {
 			if(!in_array($o->name, $asOrganizationNames)) {
-				Link::deleteLink($o, $contact);
+				if(!Link::deleteLink($o, $contact)) {
+					throw new \Exception("Could not unlink organization " . $o->name);
+				}
 				ZLog::Write(LOGLEVEL_DEBUG, "Unlink: ".$o->name);
 			} else
 			{
