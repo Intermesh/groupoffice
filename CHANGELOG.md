@@ -1,3 +1,5 @@
+11-10-2019 6.4.65
+- Contacts: Fixed problem with duplicating phone number and possibly unlinking company
 - Newsletters: NIce error message when testing without recpipients
 - Core: Updated Brasilian Portugese and Italian translations
 - Freebusy permissions: Could not add new users when installed
