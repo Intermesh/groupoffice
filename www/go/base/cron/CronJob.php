@@ -120,15 +120,16 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 		$query = "SELECT * FROM `core_user` as `t`
 							WHERE `id` IN (
 								SELECT `id` FROM `go_cron_users` cu 
-								WHERE user_id=`t`.`id` AND `cu`.`cronjob_id`=:cronjob_id
+								WHERE user_id=`t`.`id` AND `cu`.`cronjob_id`=:cronjob_id1
 							)
 							OR `id` IN (
 								SELECT `ug`.`userId` FROM `go_cron_groups` cg 
 								INNER JOIN `core_user_group` ug ON `ug`.`groupId`=`cg`.`group_id`
-								WHERE `cg`.`cronjob_id`=:cronjob_id
+								WHERE `cg`.`cronjob_id`=:cronjob_id2
 							);";
 		$stmnt = GO::getDbConnection()->prepare($query);
-		$stmnt->bindParam("cronjob_id", $id, PDO::PARAM_INT);
+		$stmnt->bindParam("cronjob_id1", $id, PDO::PARAM_INT);
+		$stmnt->bindParam("cronjob_id2", $id, PDO::PARAM_INT);
 		$stmnt->execute();
 
 		$stmnt->setFetchMode(PDO::FETCH_CLASS, "GO\Base\Model\User",array(false));
