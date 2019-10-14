@@ -3,6 +3,7 @@
 - Calendar: Events and tasks report mailer was broken
 - E-mail: Autolink all contacts with matching email address
 - Address book: Add suffix and prefix to detail view title
+- Core: CSV import would not import anything in some cases
 
 11-10-2019 6.4.65
 - Contacts: Fixed problem with duplicating phone number and possibly unlinking company
