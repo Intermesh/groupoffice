@@ -2,7 +2,7 @@
 
 namespace go\core\auth;
 
-use go\modules\core\users\model\User;
+use go\core\model\User;
 
 abstract class PrimaryAuthenticator extends BaseAuthenticator {
 		

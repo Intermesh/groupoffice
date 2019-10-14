@@ -164,7 +164,7 @@ class DbStore extends AbstractStore {
 	 */
 	private function _readRequestParams() {
 		if (isset($this->_requestParams['sort']))
-			$this->sort = $this->_requestParams['sort'];
+			$this->sort = str_replace('customFields.', '', $this->_requestParams['sort']);
 		else
 			$this->sort=$this->defaultSort;
 

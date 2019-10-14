@@ -13,6 +13,8 @@ use GO\Base\Controller\AbstractController;
 use GO\Base\Db\PDO;
 use PDOException;
 use ReflectionClass;
+use go\core\util\ClassFinder;
+use go\core\orm\Entity;
 
 class MaintenanceController extends AbstractController {
 	
@@ -186,7 +188,7 @@ class MaintenanceController extends AbstractController {
 	
 	protected function actionRemoveDuplicates($params){
 				
-		if(!\GO::modules()->tools)
+		if(!\GO::user()->isAdmin())
 			throw new \GO\Base\Exception\AccessDenied();
 		
 		\GO::session()->runAsRoot();
@@ -204,7 +206,6 @@ class MaintenanceController extends AbstractController {
 		$checkModels = array(
 				"GO\Calendar\Model\Event"=>array('name', 'start_time', 'end_time', 'calendar_id', 'rrule'),
 				"GO\Tasks\Model\Task"=>array('name', 'start_time', 'due_time', 'tasklist_id', 'rrule', 'user_id'),
-				"GO\Addressbook\Model\Contact"=>array('first_name', 'middle_name', 'last_name', 'addressbook_id', 'company_id', 'email'),
 				"GO\Files\Model\Folder"=>array('name', 'parent_id'),
 //				"GO\Calendar\Model\Participant"=>array('event_id', 'email'),
 				//"GO\Billing\Model\Order"=>array('order_id','book_id','btime')
@@ -273,8 +274,7 @@ class MaintenanceController extends AbstractController {
 
 						if(!$first){							
 							if(!empty($params['delete'])){
-
-								if($model->hasLinks() && $model->countLinks()){
+								if(empty($params['ignore_links']) && $model->hasLinks() && $model->countLinks()){
 									echo '<tr><td colspan="99">Skipped delete because model has links</td></tr>';
 								}elseif(($filesFolder = $model->getFilesFolder(false)) && ($filesFolder->hasFileChildren() || $filesFolder->hasFolderChildren())){
 									echo '<tr><td colspan="99">Skipped delete because model has folder or files</td></tr>';
@@ -299,10 +299,13 @@ class MaintenanceController extends AbstractController {
 			}
 		}
 		
-		if(empty($params['model']))
+		if(empty($params['model'])) {
 			echo '<br /><br /><a href="'.\GO::url('maintenance/removeDuplicates', array('delete'=>true)).'">Click here to delete the newest duplicates marked in red.</a>';
-		else
+
+			echo '<br /><br /><a href="'.\GO::url('maintenance/removeDuplicates', array('delete'=>true, 'ignore_links' => true)).'">Click here to delete the newest duplicates marked in red also when they have links.</a>';
+		} else {
 			echo '<br /><br /><a href="'.\GO::url('maintenance/removeDuplicates').'">Show all models.</a>';
+		}
 	}
 	
 	/**
@@ -315,7 +318,7 @@ class MaintenanceController extends AbstractController {
 	 */
 	protected function actionBuildSearchCache($params) {
 		
-		if(!$this->isCli() && !\GO::modules()->tools && \GO::router()->getControllerAction()!='upgrade')
+		if(!$this->isCli() && !GO::user()->isAdmin() && \GO::router()->getControllerAction()!='upgrade')
 			throw new \GO\Base\Exception\AccessDenied();
 		
 		GO::setIgnoreAclPermissions(true);
@@ -326,6 +329,11 @@ class MaintenanceController extends AbstractController {
 		
 		if(!$this->isCli()){
 			echo '<pre>';
+		}
+		
+		if(!empty($params['reset'])) {
+			echo "Resetting cache!\n";
+			go()->getDbConnection()->query("truncate core_search");
 		}
 		
 		echo "Checking search cache\n\n";
@@ -372,7 +380,7 @@ class MaintenanceController extends AbstractController {
 	}
 	
 	private function checkCollations() {		
-		$stmt = GO()->getDbConnection()->query("SHOW TABLE STATUS");	
+		$stmt = go()->getDbConnection()->query("SHOW TABLE STATUS");	
 
 		foreach($stmt as $record){
 
@@ -380,7 +388,7 @@ class MaintenanceController extends AbstractController {
 				echo "Converting ". $record["Name"] . " to InnoDB\n";
 				flush();
 				$sql = "ALTER TABLE `".$record["Name"]."` ENGINE=InnoDB;";
-				GO()->getDbConnection()->query($sql);	
+				go()->getDbConnection()->query($sql);	
 			}
 
 			if($record["Collation"] != "utf8mb4_unicode_ci" ) {
@@ -388,14 +396,14 @@ class MaintenanceController extends AbstractController {
 				flush();
 
 				if($record['Name'] === 'em_links') {
-					GO()->getDbConnection()->query("ALTER TABLE `em_links` DROP INDEX `uid`");
+					go()->getDbConnection()->query("ALTER TABLE `em_links` DROP INDEX `uid`");
 				}			
 				$sql = "ALTER TABLE `".$record["Name"]."` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
-				GO()->getDbConnection()->query($sql);	
+				go()->getDbConnection()->query($sql);	
 
 				if($record['Name'] === 'em_links') {
-					GO()->getDbConnection()->query("ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';");
-					GO()->getDbConnection()->query("ALTER TABLE `em_links` ADD INDEX(`uid`);");
+					go()->getDbConnection()->query("ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';");
+					go()->getDbConnection()->query("ALTER TABLE `em_links` ADD INDEX(`uid`);");
 				}
 
 			}	
@@ -409,14 +417,11 @@ class MaintenanceController extends AbstractController {
 	protected function actionCheckDatabase($params) {
 		
 
-		if(!$this->isCli() && !\GO::modules()->tools)
-			throw new \GO\Base\Exception\AccessDenied();
-		
-		 
+		if(!$this->isCli() && !\GO::user()->isAdmin())
+			throw new \GO\Base\Exception\AccessDenied();		 
 		
 		GO::setIgnoreAclPermissions(true);
-		GO::session()->runAsRoot();
-	
+		GO::session()->runAsRoot();	
 		
 		//$this->run("upgrade",$params);		
 		
@@ -429,6 +434,8 @@ class MaintenanceController extends AbstractController {
 		if(!$this->isCli()){
 				echo '<pre>';
 		}
+
+		go()->getInstaller()->fixCollations();
 		
 		$this->checkCollations();
 	
@@ -447,6 +454,16 @@ class MaintenanceController extends AbstractController {
 			$this->_checkCoreModels();
 			\GO::modules()->callModuleMethod('checkDatabase', array(&$response));
 		}
+
+
+		$cf = new ClassFinder();
+		$entities = $cf->findByParent(Entity::class);
+
+		foreach($entities as $entity) {
+			echo "Checking ". $entity."\n";
+			$entity::check();
+		}
+
 		
 		echo "All Done!\n";
 		
@@ -690,7 +707,7 @@ class MaintenanceController extends AbstractController {
 	
 	protected function actionRemoveOldLangKeys($params){
 		
-		if(!$this->isCli() && !GO::modules()->tools)
+		if(!$this->isCli() && !GO::user()->isAdmin())
 			throw new \GO\Base\Exception\AccessDenied();
 		
 		$files = $this->_getAllLanguageFiles();
@@ -800,7 +817,7 @@ class MaintenanceController extends AbstractController {
 	
 	protected function actionCheckDefaultModels(){
 		
-		if(!$this->isCli() && !GO::modules()->tools)
+		if(!$this->isCli() && !GO::user()->isAdmin())
 			throw new \GO\Base\Exception\AccessDenied();
 		
 		GO::session()->closeWriting();
@@ -830,7 +847,7 @@ class MaintenanceController extends AbstractController {
 	
 	protected function actionRemoveEmptyStuff($params){
 		
-		if(!$this->isCli() && !GO::modules()->tools)
+		if(!$this->isCli() && !GO::user()->isAdmin())
 			throw new \GO\Base\Exception\AccessDenied();
 		
 		GO::session()->closeWriting();
@@ -840,21 +857,7 @@ class MaintenanceController extends AbstractController {
 		if(!$this->isCli())			
 			echo '<pre>';
 		
-		if(\GO::modules()->isInstalled("addressbook")){
-			echo "\n\nProcessing addressbook\n";
-			flush();
-			$stmt = \GO\Addressbook\Model\Addressbook::model()->find();
-			while($addressbook = $stmt->fetch()){
-				$contactStmt = $addressbook->contacts();
-				$companiesStmt = $addressbook->companies();
-				
-				if(!$contactStmt->rowCount() && !$companiesStmt->rowCount()){
-					echo "Removing ".$addressbook->name."\n";
-					$addressbook->delete();
-					flush();
-				}
-			}
-		}
+	
 		
 		if(\GO::modules()->isInstalled("calendar")){
 			echo "\n\nProcessing calendar\n";

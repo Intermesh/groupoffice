@@ -36,6 +36,7 @@
 
 namespace GO\Calendar\Model;
 
+use go\core\model\Link;
 
 class Participant extends \GO\Base\Db\ActiveRecord {
 
@@ -91,8 +92,7 @@ class Participant extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function relations() {
 		return array(
-				'event' => array('type' => self::BELONGS_TO, 'model' => 'GO\Calendar\Model\Event', 'field' => 'event_id'),
-				'contact' => array('type' => self::BELONGS_TO, 'model' => 'GO\Addressbook\Model\Contact', 'field' => 'contact_id'),
+				'event' => array('type' => self::BELONGS_TO, 'model' => 'GO\Calendar\Model\Event', 'field' => 'event_id')
 		);
 	}
 
@@ -385,7 +385,7 @@ class Participant extends \GO\Base\Db\ActiveRecord {
 			$stmt = $this->event->getRelatedParticipantEvents();
 
 			foreach($stmt as $event){
-				if(!isset($newEvent) || $event->id!=$newEvent->id){
+				if(!isset($newEvent) || !$newEvent || $event->id!=$newEvent->id){
 
 					$p = Participant::model()->findSingleByAttributes(array(
 							'event_id'=>$event->id,
@@ -404,7 +404,10 @@ class Participant extends \GO\Base\Db\ActiveRecord {
 			
 			
 			if(!$this->is_organizer && $this->contact_id && \GO::config()->calendar_autolink_participants){
-				$this->contact->link($this->event);
+				$contact = \go\modules\community\addressbook\model\Contact::findById($this->contact_id);
+				if(!empty($contact)) {
+					Link::create($contact, $this->event);
+				}
 			}
 		}
 		
@@ -528,17 +531,5 @@ class Participant extends \GO\Base\Db\ActiveRecord {
 			$this->status=self::STATUS_ACCEPTED;
 		
 		return parent::beforeSave();
-	}
-	
-	/**
-	 * Set properties from contact
-	 * 
-	 * @param \GO\Addressbook\Model\Contact $contact
-	 */
-	public function setContact(\GO\Addressbook\Model\Contact $contact){
-		$this->user_id=$contact->go_user_id;
-		$this->contact_id=$contact->id;
-		$this->email=$contact->email;
-		$this->name=$contact->name;		
 	}
 }

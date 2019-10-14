@@ -25,7 +25,7 @@ GO.DetailView = Ext.extend(Ext.Panel,{
 	entityStore : null,
 	
 	initComponent : function() {
-		go.panels.DetailView.superclass.initComponent.call(this,arguments);
+		go.detail.Panel.superclass.initComponent.call(this,arguments);
 
 		this.on('render', function() {
 			this.reset();

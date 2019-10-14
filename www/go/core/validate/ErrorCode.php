@@ -93,6 +93,10 @@ class ErrorCode {
 	 */
 	const FORBIDDEN = 12;
 	
+	/**
+	 * In case of an unexpectede exception
+	 */
+	const GENERAL = 13;
 	
 	private static $descriptions = [
 			self::REQUIRED => 'Property is required',

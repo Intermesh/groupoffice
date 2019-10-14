@@ -239,6 +239,8 @@ class Store extends AbstractStore {
 		
 		$sort = !empty($requestParams['sort']) ? $requestParams['sort'] : $this->_defaultSortOrder;
 		$dir = !empty($requestParams['dir']) ? $requestParams['dir'] : $this->_defaultSortDirection;
+
+		$sort= str_replace('customFields', 'cf', $sort);
 		
 		if (!is_array($sort))
 			$sort=empty($sort) ? array() : array($sort);

@@ -252,7 +252,7 @@ class File extends Base{
 	 */
 	public function mimeType()
 	{
-		$types = file_get_contents(\GO::config()->root_path.'mime.types');
+		$types = file_get_contents(__DIR__ . '/mime.types');
 
 		if($this->extension()!='')
 		{			

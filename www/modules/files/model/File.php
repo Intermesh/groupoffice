@@ -50,6 +50,7 @@ use GO;
  */
 class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttachableInterface {
 
+	use \go\core\orm\CustomFieldsTrait;
 
 	public static $deleteInDatabaseOnly=false;
 
@@ -198,8 +199,9 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 					'thumb_url' => $this->getThumbURL()
 				);
 
-			if($this->customfieldsRecord)
-				$data = array_merge($data, $this->customfieldsRecord->getAttributes('html'));
+			if(method_exists($this, "getCustomFields")) {
+				$data['customFields'] = $this->getCustomFields();
+			}
 			return $data;
 	}
 
@@ -266,7 +268,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 			}
 			
 			if(!$this->getIsNew()) {
-				 GO()->getDbConnection()->update('fs_files',['name' => $name], ['id' => $this->id])->execute();
+				 go()->getDbConnection()->update('fs_files',['name' => $name], ['id' => $this->id])->execute();
 			}
 			$this->name = $name;
 		}
@@ -648,7 +650,11 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 		}
 		$fsFile->setDefaultPermissions();
 
-		$this->mtime=$fsFile->mtime();
+		$old = $this->mtime;
+		$this->mtime = $this->fsFile->mtime();
+		if($this->mtime == $old) {
+			$this->mtime++; //mtime must change for WOPI!
+		}
 		$this->save();
 		
 		$this->fireEvent('replace', array($this, $isUploadedFile));
@@ -662,7 +668,11 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 //			throw new \GO\Base\Exception\InsufficientDiskSpace();
 
 		$this->fsFile->putContents($data);
-		$this->mtime=$this->fsFile->mtime();
+		$old = $this->mtime;
+		$this->mtime = $this->fsFile->mtime();
+		if($this->mtime == $old) {
+			$this->mtime++; //mtime must change for WOPI!
+		}
 		$this->save();
 	}
 
@@ -687,15 +697,14 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	 * @param StringHelper $relpath Relative path from \GO::config()->file_storage_path
 	 * @return File
 	 */
-	public function findByPath($relpath,$caseSensitive=true){
-		$folder = Folder::model()->findByPath(dirname($relpath),false,array(),$caseSensitive);
+	public function findByPath($relpath){
+		$folder = Folder::model()->findByPath(dirname($relpath),false,array());
 		if(!$folder)
 			return false;
 		else
 		{
-			return $folder->hasFile(\GO\Base\Fs\File::utf8Basename($relpath),$caseSensitive);
+			return $folder->hasFile(\GO\Base\Fs\File::utf8Basename($relpath));
 		}
-
 	}
 
 	/**

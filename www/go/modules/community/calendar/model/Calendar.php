@@ -1,9 +1,9 @@
 <?php
 namespace go\modules\community\calendar\model;
 
-use go\core\acl\model\AclEntity;
+use go\core\acl\model\AclOwnerEntity;
 
-class Calendar extends AclEntity {
+class Calendar extends AclOwnerEntity {
 	
 	public $id;
 	public $name;

@@ -40,13 +40,9 @@ GO.calendar.EventDialog = function(calendar) {
 	this.resourcesPanel
 	];
 
-	if(go.Modules.isAvailable("core", "customfields") && GO.customfields.types["GO\\Calendar\\Model\\Event"])
-	{
-		for(var i=0;i<GO.customfields.types["GO\\Calendar\\Model\\Event"].panels.length;i++)
-		{
-			items.push(GO.customfields.types["GO\\Calendar\\Model\\Event"].panels[i]);
-		}
-	}
+	//This field is added for filtering the custom field panels. It needs the group_id to be in the form values to filter on this value.
+	this.propertiesPanel.add(new Ext.form.Hidden({name: "group_id"})); 
+	
 	
 	if(go.Modules.isAvailable("legacy", "comments")){
 		this.commentsGrid = new GO.comments.CommentsGrid({title:t("Comments", "comments")});
@@ -65,6 +61,25 @@ GO.calendar.EventDialog = function(calendar) {
 			forceLayout:true
 		}
 	});
+	
+	
+	go.customfields.CustomFields.getFormFieldSets("Event").forEach(function(fs) {
+		//console.log(fs);
+		if(fs.fieldSet.isTab) {
+			fs.title = null;
+			fs.collapsible = false;
+			var pnl = new Ext.Panel({
+				autoScroll: true,
+				hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.
+				title: fs.fieldSet.name,
+				items: [fs]
+			});
+			this.tabPanel.add(pnl);
+		}else
+		{			
+			this.propertiesPanel.add(fs);
+		}
+	}, this);
 
 	this.formPanel = new Ext.form.FormPanel({
 		waitMsgTarget : true,
@@ -94,6 +109,14 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 	setLinkEntity: function(config) {
 		this.linkEntity = config.entity;
 		this.linkEntityId = config.entityId;
+
+		//for project and contacts
+		if(config.data.name) {
+			this.on('load', function() {
+				this.subjectField.setValue(config.data.name);
+			}, this, {single: true});
+			
+		}
 	},
 
 	initWindow : function() {
@@ -132,7 +155,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			focus : focusSubject.createDelegate(this),
 			buttonAlign:'left',
 			buttons : [
-			this.createLinkButton = new go.modules.core.links.CreateLinkButton(),
+			this.createLinkButton = new go.links.CreateLinkButton(),
 			this.fileBrowseButton,
 			'->',{
 				text : t("Apply"),
@@ -153,6 +176,10 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				scope : this
 			}]
 		});
+
+		this.win.on("hide", function() {
+			this.createLinkButton.reset();
+		}, this);
 	},
 
 	files_folder_id : 0,
@@ -169,11 +196,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 
 		config = config || {};
 
-		GO.dialogListeners.apply(this);
-		
-		this.on("hide", function() {
-			this.createLinkButton.reset();
-		}, this);
+		GO.dialogListeners.apply(this);		
 		
 		this.win.show();
 
@@ -310,8 +333,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					
 					this.setPermissionLevel(action.result.data.permission_level);
 					
-					if(go.Modules.isAvailable("core", "customfields"))
-						GO.customfields.disableTabs(this.tabPanel, action.result);	
+				
 
 					if(action.result.group_id == 1)
 					{
@@ -348,6 +370,9 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 						this.tabPanel.hideTabStripItem(this.participantsPanel);
 					else
 						this.tabPanel.unhideTabStripItem(this.participantsPanel);
+
+
+					this.fireEvent('load', this);
 
 				},
 				failure : function(form, action) {
@@ -480,7 +505,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 //		{
 		var gridData = this.participantsPanel.getGridData();
 		params.participants=Ext.encode(gridData);
-			
+		
 		this.formPanel.form.submit({
 			url : GO.url('calendar/event/submit'),
 			params : params,
@@ -925,7 +950,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				xtype:'textarea',
 				fieldLabel:t("Description"),
 				name : 'description',
-				anchor:'0 -300'
+				grow: true
 			}]
 
 		});
@@ -1063,76 +1088,68 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 
 					if(go.Modules.isAvailable("core", "customfields"))
 					{
-						var enabled_categories = record.customfields.enabled_categories;
-						var disable_categories = record.customfields.disable_categories;
-					
-						if (GO.customfields.types["GO\\Calendar\\Model\\Calendar"]) {
-							for(var l=0; l<GO.customfields.types["GO\\Calendar\\Model\\Calendar"].panels.length; l++)
-							{
-									var cf = GO.customfields.types["GO\\Calendar\\Model\\Calendar"].panels[l].customfields;
-									var formFields = [new GO.form.PlainField({
-											hideLabel: true,
-											value: '<b>'+GO.customfields.types["GO\\Calendar\\Model\\Calendar"].panels[l].title+'</b>'
-										})];
-									for(var m=0; m<cf.length; m++)
-									{
-										if (typeof(resources[j][cf[m].dataname])!='undefined') {
-											if (cf[m].datatype=='checkbox' && resources[j][cf[m].dataname]==t("No")) {
-												continue;
-											}
-											if (cf[m].datatype=='html' && resources[j][cf[m].dataname]=='<br>') {
-												continue;
-											}
-											newFormField = new GO.form.PlainField({
-												fieldLabel: cf[m].name,
-												value: resources[j][cf[m].dataname]
-											});
-											formFields.push(newFormField);
-										}
-									}
-									if (formFields.length>1) {
-										for (var n=0; n<formFields.length; n++) {
-											resourceOptions.push(formFields[n]);
-										}
-									}
-							}
-						}
-						if (GO.customfields.types["GO\\Calendar\\Model\\Event"]) {
-//							resourceOptions.push({
-//								xtype: 'plainfield',
-//								value: '<br />'
-//							});
-							var panels = GO.customfields.types["GO\\Calendar\\Model\\Event"].panels;
-							for(var l=0; l<panels.length; l++)
-							{
-								var category_id = GO.customfields.types["GO\\Calendar\\Model\\Event"].panels[l].category_id;
-								
-									
-									
-								if(!disable_categories || enabled_categories.indexOf(category_id)>-1){									
-		
-									var cf = panels[l].customfields;
-									for(var m=0; m<cf.length; m++)
-									{
-										
-										newFormField = GO.customfields.getFormField(cf[m],{
-											name:'resource_options['+resources[j].id+']['+cf[m].dataname+']',
-											id:'resource_options['+resources[j].id+']['+cf[m].dataname+']'
+						var fieldSets = go.customfields.CustomFields.getFormFieldSets("Calendar");
+			
+						for(var l=0; l < fieldSets.length; l++)
+						{
+								var cf = go.customfields.CustomFields.getFormFields(fieldSets[l].fieldSet.id);
+								var formFields = [new GO.form.PlainField({
+										hideLabel: true,
+										value: '<b>'+fieldSets[l].fieldSet.name+'</b>'
+									})];
+								for(var m=0; m<cf.length; m++)
+								{
+									if (typeof(resources[j][cf[m].field.databaseName]) != 'undefined') {
+//										if (cf[m].type == 'checkbox' && resources[j][cf[m].dataname]==t("No")) {
+//											continue;
+//										}
+//										if (cf[m].type == 'html' && resources[j][cf[m].dataname]=='<br>') {
+//											continue;
+//										}
+										newFormField = new GO.form.PlainField({
+											fieldLabel: cf[m].field.name,
+											value: resources[j][cf[m].field.databaseName]
 										});
-
-
-										/*
-										 * Customfields might return a simple object instead of an Ext.component.
-										 * So check if it has events otherwise create the Ext component.
-										 */
-										if(!newFormField.events){
-											newFormField=Ext.ComponentMgr.create(newFormField, 'textfield');
-										}
-
-										resourceOptions.push(newFormField);
-										this.formPanel.form.add(newFormField);
+										formFields.push(newFormField);
 									}
 								}
+								if (formFields.length>1) {
+									for (var n=0; n<formFields.length; n++) {
+										resourceOptions.push(formFields[n]);
+									}
+								}
+						}
+						
+						
+						var fieldSets = go.customfields.CustomFields.getFormFieldSets("Event"), length = fieldSets.length;
+						
+						if(length) {
+							for(var l=0; l<length; l++)
+							{		
+								var cf = go.customfields.CustomFields.getFormFields(fieldSets[l].fieldSet.id);
+								resourceOptions.push(new GO.form.PlainField({
+										hideLabel: true,
+										value: '<b>'+fieldSets[l].fieldSet.name+'</b>'
+									}));
+								for(var m=0; m<cf.length; m++)
+								{
+
+									cf[m].name = 'resource_options['+resources[j].id+']['+cf[m].field.databaseName+']';
+									cf[m].id ='resource_options['+resources[j].id+']['+cf[m].field.databaseName+']';
+
+
+									/*
+									 * Customfields might return a simple object instead of an Ext.component.
+									 * So check if it has events otherwise create the Ext component.
+									 */
+									if(!cf[m].events){
+										cf[m] = Ext.ComponentMgr.create(cf[m], 'textfield');
+									}
+
+									resourceOptions.push(cf[m]);
+									this.formPanel.form.add(cf[m]);
+								}
+								
 							}
 						}
 					}
@@ -1159,6 +1176,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					bodyStyle: 'padding-left: 20px'
 				});
 			}
+			
 			
 			var resourcePanel = new Ext.Panel({
 				cls:'go-form-panel',

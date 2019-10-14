@@ -44,11 +44,11 @@ GO.calendar.EventPanel = Ext.extend(GO.DisplayPanel,{
 //						'<td colspan="2"><table><tr><td>'+t("Calendar", "calendar")+': </td><td>{calendar_name}</td></tr></table></td>'+
 //					'</tr>'+
 					'<tr>'+
-						'<td colspan="2">{event_html}</td>'+
+						'<td colspan="2">{event_html:raw}</td>'+
 					'</tr>'+					
 				'</table>';
 
-		this.template +=GO.customfields.displayPanelTemplate;
+		this.add(go.customfields.CustomFields.getDetailPanels("Event"));
 		
 		if(go.Modules.isAvailable("legacy", "workflow")){
 			this.template +=GO.workflow.WorkflowTemplate;

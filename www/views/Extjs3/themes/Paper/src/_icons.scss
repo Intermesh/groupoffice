@@ -3,45 +3,23 @@
 	font-family: 'Material Icons';
 	font-style: normal;
 	font-weight: 400;
-	src: url(./fonts/MaterialIcons-Regular.eot);// IE9 compat modes
+	src: url(#{$resourcePath}fonts/MaterialIcons-Regular.eot);// IE9 compat modes
 	src: local("Material Icons"), 
 		local("MaterialIcons-Regular"), 
-		url(./fonts/MaterialIcons-Regular.woff2) format("woff2"), // Super Modern
-		url(./fonts/MaterialIcons-Regular.woff) format("woff"),  // Pretty Modern
-		url(./fonts/MaterialIcons-Regular.ttf) format("truetype"); // Android, Safari, iOS
+		url(#{$resourcePath}fonts/MaterialIcons-Regular.woff2) format("woff2"), // Super Modern
+		url(#{$resourcePath}fonts/MaterialIcons-Regular.woff) format("woff"),  // Pretty Modern
+		url(#{$resourcePath}fonts/MaterialIcons-Regular.ttf) format("truetype"); // Android, Safari, iOS
 }
 // #################
 // ##### ICONS #####
 // #################
-%icon {
-	display: inline-block;
-  font-family: 'Material Icons';
-  font-weight: normal;
-  font-style: normal;
-  font-size: dp(24);  /* Preferred icon size */
-/*	max-width: dp(24);
-	max-height: dp(24);*/
-	color:inherit;
-  width: auto;
-  height: auto;
-  line-height: 1;
-  text-transform: none;
-  letter-spacing: normal;
-  vertical-align:middle;
-  word-wrap: normal;
-  white-space: nowrap;
-  direction: ltr;
-  -webkit-font-smoothing: antialiased; // Support for all WebKit browsers.
-  text-rendering: optimizeLegibility; // Support for Safari and Chrome.
-  -moz-osx-font-smoothing: grayscale; // Support for Firefox.
-  font-feature-settings: 'liga'; // Support for IE
-}
 i.icon {
 	@extend %icon;
 	background-size: contain;
 	width:dp(24);
 	height: dp(24);
 }
+
 .email-grid-icon {
 	@extend %icon;
 	background-position: -100px;
@@ -61,6 +39,11 @@ i.icon {
 	  font-size: 6em;
 	  max-height: dp(6*24);
 	  max-width: dp(6*24);
+  }
+  &.small {
+	  font-size: dp(16);
+	  max-height: dp(16);
+	  max-width: dp(16);
   }
 }
 
@@ -324,29 +307,29 @@ $filetype: (
 	@if type-of($extensions) == 'list' {
 		@each $extension in $extensions {
 			.filetype-#{$extension} {
-				background-image:url('img/filetype/#{$img}.svg') !important;
+				background-image:url('#{$resourcePath}img/filetype/#{$img}.svg') !important;
 			}
 		}
 	} @else {
 		.filetype-#{$extensions} {
-			background-image:url('img/filetype/#{$img}.svg') !important;
+			background-image:url('#{$resourcePath}img/filetype/#{$img}.svg') !important;
 		}
 	}
 }
 
 .filetype {
-	background-size: contain;
-	background-image:url(img/filetype/unknown.svg);
+	background-size: dp(24) dp(24);
+	background-position: dp(8) dp(8);
+	background-image:url(#{$resourcePath}img/filetype/unknown.svg);
 	background-repeat: no-repeat;
 	&-link {
-		background-size: contain;
-		background-image:url(img/filetype/unknown.svg);
+		background-size: dp(24) dp(24);
+		background-position: dp(8) dp(8);
+		background-image:url(#{$resourcePath}img/filetype/unknown.svg);
 		background-repeat: no-repeat;
-		background-position: top left;
 		white-space: nowrap;		
-		padding-left: dp(24);
 		line-height: dp(24);
-		margin: dp(8) 0;
+		padding: dp(8) dp(16) dp(8) dp(40);
 		display: inline-block;
 	}
 }
@@ -1291,15 +1274,6 @@ $material-icons : (
 		content: '#{$icon}' !important;
 	}
 }
-
-
-
-
-
-
-
-
-
 
 .go-icon-ok .x-grid3-cell-inner{
 	&:before {

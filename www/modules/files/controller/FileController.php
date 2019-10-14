@@ -3,6 +3,10 @@
 
 namespace GO\Files\Controller;
 
+use GO\Files\Model\File;
+use go\core\fs\Blob;
+use go\core\fs\File as GoFile;
+use go\core\fs\Folder;
 
 class FileController extends \GO\Base\Controller\AbstractModelController {
 
@@ -27,6 +31,22 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		$md = new \go\core\fs\MetaData($this);
 		$exif = $md->extractExif(__DIR__.'/test.jpg');
 		
+	}
+
+	public function actionCreateBlob($ids) {
+		$ids = explode(',', $ids);
+		$blobs = [];
+		foreach($ids as $id) {
+			$file = File::model()->findByPk($id);
+
+			$fsFile = new GOFile($file->fsFile->path());
+			$blob = Blob::fromFile($fsFile);
+			$blob->save();			
+
+			$blobs[] = ['name' => $file->name, 'blobId' => $blob->id];
+		}
+
+		return array_merge(['success' => true, 'blobs' => $blobs], $blob->toArray());
 	}
 	
 	
@@ -215,8 +235,6 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			$response['data']['musername'] = $model->mUser->name;
 		$response['data']['locked_user_name']=$model->lockedByUser ? $model->lockedByUser->name : '';
 		
-		if (\GO::modules()->customfields)
-			$response['customfields'] = \GO\Customfields\Controller\CategoryController::getEnabledCategoryData("GO\Files\Model\File", $model->folder_id);
 		
 		
 		$fh = \GO\Files\Model\FileHandler::model()->findByPk(
@@ -319,6 +337,28 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		$fh->extension=strtolower($params['extension']);
 		$fh->cls=$params['cls'];
 		return array('success'=>empty($params['cls']) ? $fh->delete() : $fh->save());
+	}
+	
+	
+	protected function actionOpen($params) {
+		if(!empty($params['path'])) {
+			$file = \GO\Files\Model\File::model()->findByPath($params['path']);
+		} else
+		{
+			$file = \GO\Files\Model\File::model()->findByPath($params['id']);
+		}
+
+		if(!$file){
+			throw new \Exception("File not found");
+		}
+		
+		$response = [
+				'success' => true,
+				'file' => $file->getAttributes(),
+				'handler' => 'startjs:function(){'.$file->getDefaultHandler()->getHandler($file).'}:endjs'
+		];
+		
+		return $response;
 	}
 	
 
@@ -427,26 +467,8 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		$text .= ' ('.\GO::t("possible until", "files").' '.\GO\Base\Util\Date::get_timestamp(\GO\Base\Util\Date::date_add($file->expire_time,-1), false).')'.$lb;
 		$text .= $linktext;
 		
-		if($params['template_id'] && ($template = \GO\Addressbook\Model\Template::model()->findByPk($params['template_id']))){
-			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($template->content);
-	
-			$response['data']=$message->toOutputArray($html, true);
-			
-			if(strpos($response['data'][$bodyindex],'{body}')){
-				$response['data'][$bodyindex] = \GO\Addressbook\Model\Template::model()->replaceUserTags($response['data'][$bodyindex], true);
-				
-				\GO\Addressbook\Model\Template::model()->htmlSpecialChars=false;
-				$response['data'][$bodyindex] = \GO\Addressbook\Model\Template::model()->replaceCustomTags($response['data'][$bodyindex], array('body'=>$text));			
-			}else{
-				$response['data'][$bodyindex] = \GO\Addressbook\Model\Template::model()->replaceUserTags($response['data'][$bodyindex], false);
-				$response['data'][$bodyindex] = $text.$response['data'][$bodyindex];
-			}
-				
-			
-		}else
-		{
-			$response['data'][$bodyindex]=$text;	
-		}
+		
+		$response['data'][$bodyindex]=$text;
 				
 		$response['data']['subject'] = \GO::t("Download link", "files"); //.' '.$file->name;
 		$response['success']=true;

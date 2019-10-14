@@ -316,3 +316,21 @@ $updates['201809171650'][] = 'ALTER TABLE `cal_events_declined` CHANGE `uid` `ui
 
 $updates['201810191230'][] = "ALTER TABLE `cal_settings` CHANGE `reminder` `reminder` INT(11) NULL DEFAULT NULL;";
 $updates['201811011333'][] = "ALTER TABLE `cal_calendars` ADD INDEX(`user_id`);";
+
+$updates['201811270837'][] = "ALTER TABLE `cf_cal_events` CHANGE `model_id` `id` INT(11) NOT NULL;";
+$updates['201811270837'][] = "RENAME TABLE `cf_cal_events` TO `cal_events_custom_fields`;";
+$updates['201811270837'][] = "delete from cal_events_custom_fields where id not in (select id from cal_events);";
+$updates['201811270837'][] = "ALTER TABLE `cal_events_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `cal_events`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
+
+$updates['201811270837'][] = "ALTER TABLE `cf_cal_calendars` CHANGE `model_id` `id` INT(11) NOT NULL;";
+$updates['201811270837'][] = "RENAME TABLE `cf_cal_calendars` TO `cal_calendars_custom_fields`;";
+$updates['201811270837'][] = "delete from cal_calendars_custom_fields where id not in (select id from cal_calendars);";
+$updates['201811270837'][] = "ALTER TABLE `cal_calendars_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `cal_calendars`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
+
+$updates['201903291350'][] = function() {	
+	$m = new \go\core\install\MigrateCustomFields63to64();
+	$m->migrateEntity("Event");	
+	$m->migrateEntity("Calendar");	
+};

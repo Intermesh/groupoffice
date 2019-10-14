@@ -105,12 +105,16 @@ GO.ModuleManager = Ext.extend(function(){
 			panelConfig.inSubmenu = false;
 			panelConfig.moduleName = moduleName;
 			if(!panelConfig.iconCls) {
-				panelConfig.iconCls = "go-tab-icon-"+moduleName;
+				panelConfig.iconCls = panelClass.prototype.iconCls || "go-tab-icon-"+moduleName;
 			}
 			panelConfig.id='go-module-panel-'+panelConfig.moduleName;
 
 			if(!panelConfig.cls)
 				panelConfig.cls = 'go-module-panel';
+			
+			if(!panelConfig.title && panelClass.prototype.title) {
+				panelConfig.title = panelClass.prototype.title;
+			}
 			
 			this.modulePanels[moduleName] = panelClass;
 			
@@ -158,7 +162,7 @@ GO.ModuleManager = Ext.extend(function(){
 				fn:fn,
 				scope: scope				
 			});
-		}else{
+		} else {
 			fn.call(scope, module, this);
 		}
 	},
@@ -196,7 +200,7 @@ GO.ModuleManager = Ext.extend(function(){
 	},
 	
 	userHasModule : function(module){
-		return go.Modules.isAvailable("community", module);
+		return go.Modules.isAvailable("legacy", module);
 	},
 	
 	getAllSubmenus : function(){

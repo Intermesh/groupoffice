@@ -45,14 +45,47 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 		GO.form.HtmlEditor.superclass.initEditor.call(this);
 		
+		this.addEvents({attach: true});
+		
 		//Following is needed when using animateTarget in windows. But since that doesn't perform well we should look at using css transitions instead of js animations
 		//this.getToolbar().doLayout();
 		var doc = this.getEditorBody();
 		doc.addEventListener('paste', this.onPaste.createDelegate(this));
+		doc.addEventListener('drop', this.onDrop.createDelegate(this));
+
+		//Fix for Tooltips in the way of email #276
+		doc.addEventListener("mouseenter", function() {
+			setTimeout(function() {
+				Ext.QuickTips.getQuickTip().hide();
+			}, 500);
+			
+		});
+		
+	},
+	
+	onDrop: function(e) {
+		if(!e.dataTransfer.files) {
+			return;
+		}
+		Array.from(e.dataTransfer.files).forEach(function(file) {   
+			go.Jmap.upload(file, {
+				scope: this,
+				success: function(response) {
+					var imgEl = null;
+					if (file.type.match(/^image\//)) {
+						domId = Ext.id(), img = '<img id="' + domId + '" src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="' + file.name + '" />';
+						this.insertAtCursor(img);
+						imgEl = this.getDoc().getElementById(domId);
+					} 
+
+					this.fireEvent('attach', this, response.blobId, file, imgEl);
+				}
+			});
+		}, this);
+		
 	},
 
 	onPaste: function (e) {		
-		
 		var clipboardData = e.clipboardData;
 		if (clipboardData.items) {
 			//Chrome has clibBoardData.items
@@ -62,14 +95,109 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 					
 					e.preventDefault();
 					var reader = new FileReader();
-					reader.onload = function (event) {
-						var img = '<img src="' + event.target.result + '" alt="pasted image" />';
-						this.insertAtCursor(img);
+					reader.onload = function (event) {						
+						return this.handleImage(event.target.result);
 					}.bind(this);
 					reader.readAsDataURL(item.getAsFile());
 				}
 			}
+		} else
+		{
+			//Firefox
+			if (-1 === Array.prototype.indexOf.call(clipboardData.types, 'text/plain')) {					
+				this.findImageInEditor();
+			}
 		}
+	},
+	
+	findImageInEditor: function () {
+		var el = this.getDoc();
+
+		var images = el.getElementsByTagName('img');
+		var timespan = Math.floor(1000 * Math.random());
+		for (var i = 0, len = images.length; i < len; i++) {
+			images[i]["_paste_marked_" + timespan] = true;
+		}
+		setTimeout(function () {
+			var newImages = el.getElementsByTagName('img');
+			for (var i = 0, len = newImages.length; i < len; i++) {
+				if (!newImages[i]["_paste_marked_" + timespan]) {
+					this._handleImage(newImages[i].src);
+					newImages[i].remove();
+				}
+			}
+
+		}, 1);
+	},
+	
+	insertImage : function(src) {
+		var domId = Ext.id(), img = '<img id="' + domId + '" src="' + src + '" alt="pasted image" />';
+		this.insertAtCursor(img);
+		
+		return  this.getDoc().getElementById(domId);		
+	},
+
+	handleImage: function (src) {
+
+		var imgEl = this.insertImage(src);		
+
+		var dataURLtoBlob = function (dataURL, sliceSize) {
+			var b64Data, byteArray, byteArrays, byteCharacters, byteNumbers, contentType, i, m, offset, slice, _ref;
+			if (sliceSize == null) {
+				sliceSize = 512;
+			}
+			if (!(m = dataURL.match(/^data\:([^\;]+)\;base64\,(.+)$/))) {
+				return null;
+			}
+			_ref = m, m = _ref[0], contentType = _ref[1], b64Data = _ref[2];
+			byteCharacters = atob(b64Data);
+			byteArrays = [];
+			offset = 0;
+			while (offset < byteCharacters.length) {
+				slice = byteCharacters.slice(offset, offset + sliceSize);
+				byteNumbers = new Array(slice.length);
+				i = 0;
+				while (i < slice.length) {
+					byteNumbers[i] = slice.charCodeAt(i);
+					i++;
+				}
+				byteArray = new Uint8Array(byteNumbers);
+				byteArrays.push(byteArray);
+				offset += sliceSize;
+			}
+			return new Blob(byteArrays, {
+				type: contentType
+			});
+		};
+
+		var loader, me = this;
+		loader = new Image();
+		loader.onload = function () {
+			var blob, canvas, ctx, dataURL;
+			canvas = document.createElement('canvas');
+			canvas.width = loader.width;
+			canvas.height = loader.height;
+			ctx = canvas.getContext('2d');
+			ctx.drawImage(loader, 0, 0, canvas.width, canvas.height);
+			dataURL = null;
+			try {
+				dataURL = canvas.toDataURL('image/png');
+				blob = dataURLtoBlob(dataURL);
+			} catch (_error) {
+			}
+			if (dataURL) {				
+				var file = new File([blob], "pasted-image." + blob.type.substring(6),{type: blob.type});
+				go.Jmap.upload(file, {
+					success: function(response) {
+						imgEl.setAttribute("src", go.Jmap.downloadUrl(response.blobId));						
+						me.fireEvent('attach', me, response.blobId, file, imgEl);
+					}
+				});
+				
+			}
+		};
+
+		return loader.src = src;
 	},
 
 	/**

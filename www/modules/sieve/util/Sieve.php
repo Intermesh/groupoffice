@@ -170,7 +170,7 @@ class Sieve {
 		// De out of office rule altijd als laatste.
 			foreach($this->script->content as $key => $val) {
 				
-				if($val['name'] == 'Out of office') {
+				if(isset($val['name']) && $val['name'] == 'Out of office') {
 					$item = $this->script->content[$key];
 					unset($this->script->content[$key]);
 					array_push($this->script->content, $item); 

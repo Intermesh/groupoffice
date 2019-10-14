@@ -3,7 +3,7 @@ namespace go\core\cli;
 
 use go\core\auth\TemporaryState;
 use go\core\Environment;
-use go\modules\core\users\model\User;
+use go\core\model\User;
 
 class State extends TemporaryState {
 

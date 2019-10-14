@@ -17,4 +17,5 @@ return array (
   'Deactivate' => 'Desativar',
   'Deactivate instance' => 'Desativar instância',
   'Activate instance' => 'Ativar instância',
+  'Version' => 'Versão',
 );

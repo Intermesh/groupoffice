@@ -55,7 +55,6 @@ $server->setBaseUri($baseUri);
 
 
 $tmpDir = \GO::config()->getTempFolder()->parent()->createChild('dav',false);
-
 $locksDir = $tmpDir->createChild('locksdb', false);
 $locksDir->create();
 
@@ -86,7 +85,7 @@ $server->addPlugin($tempFF);
 
 // And off we go!
 
-if(GO()->getDebugger()->enabled) {
+if(go()->getDebugger()->enabled) {
 	$server->on("exception", function($e) {
 		\go\core\ErrorHandler::logException($e);
 	});

@@ -11,6 +11,7 @@ return array (
   'General' => 'Generale',
   'You don\'t have permission to delete all selected notes' => 'Non hai i permessi per eliminare le note selezionate',
   'Multiple note books selected' => 'Note multiple selezionate',
-  'Add test' => 'Aggiungi test',
+  'Add test' => 'Aggiungi testo',
   'Invalid password' => 'Password non valida',
+  'Filters' => 'Filtri',
 );

@@ -60,7 +60,7 @@ class ModuleController extends AbstractJsonController{
 		$module->save();
 		
 		
-		GO()->rebuildCache(true);
+		go()->rebuildCache(true);
 		
 		echo $this->renderSubmit($module);
 	}
@@ -81,12 +81,12 @@ class ModuleController extends AbstractJsonController{
 			
 			
 			
-			if($module instanceof \go\core\module\Base) {
+			if($module instanceof \go\core\Module) {
 			
 			$model = GO::modules()->isInstalled($module->getName(), false);
 			
 			
-			$availableModules[$module->getName()] = array(		
+			$availableModules[ucfirst($module->getPackage()) . $module->getName()] = array(		
 					'id' => $model ? $model->id : null,
 					'name'=>$module->getName(),
 					'localizedName' => $module->getTitle(),
@@ -97,10 +97,11 @@ class ModuleController extends AbstractJsonController{
 //					'buyEnabled'=>!GO::scriptCanBeDecoded() || 
 //							($module->appCenter() && (\GO\Professional\License::isTrial() || \GO\Professional\License::moduleIsRestricted($module->name())!==false)),
 				
+					'localizedPackage'=>ucfirst($module->getPackage()),
 					'package'=>$module->getPackage(),
 					'enabled'=>$model && $model->enabled,
 					'isRefactored' => true,
-					'not_installable'=> $model && $model->package == "core",
+					'not_installable'=> !$module->isInstallable(),
 					'sort_order' => ($model && $model->sort_order)?$model->sort_order:''
 			);
 			} else
@@ -108,7 +109,7 @@ class ModuleController extends AbstractJsonController{
 				
 				$model = GO::modules()->isInstalled($module->name(), false);
 				
-				$availableModules[$module->name()] = array(					
+				$availableModules[$module->package().$module->name()] = array(					
 						'id' => $model ? $model->id : null,
 					'name'=>$module->name(),
 					'localizedName' => $module->localizedName(),
@@ -118,8 +119,8 @@ class ModuleController extends AbstractJsonController{
 					'aclId'=>$model ? $model->aclId : 0,
 //					'buyEnabled'=>!GO::scriptCanBeDecoded() || 
 //							($module->appCenter() && (\GO\Professional\License::isTrial() || \GO\Professional\License::moduleIsRestricted($module->name())!==false)),
-				
-					'package'=>$module->package(),
+					'package' => 'legacy',
+					'localizedPackage'=>$module->package(),
 					'enabled'=>$model && $model->enabled,
 					'not_installable'=> !$module->isInstallable(),
 					'sort_order' => ($model && $model->sort_order)?$model->sort_order:''
@@ -151,7 +152,7 @@ class ModuleController extends AbstractJsonController{
 			
 			$module = new $moduleClass;//call_user_func($moduleClase();			
 			
-			if($module instanceof \go\core\module\Base) {
+			if($module instanceof \go\core\Module) {
 				$availableModules[$module->name()] = array(						
 						'name'=>$module->getName(),
 						'package'=>$module->getPackage()						

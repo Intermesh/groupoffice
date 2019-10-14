@@ -62,3 +62,14 @@ $updates['201802031500'][] = 'ALTER TABLE `sync_user_note_book` CHANGE `default_
 $updates['201802031500'][] = 'delete FROM `sync_user_note_book` WHERE userId not in (select id from core_user);';
 $updates['201802031500'][] = 'ALTER TABLE `sync_user_note_book` ADD  CONSTRAINT `sync_user_note_book_user` FOREIGN KEY (`userId`) REFERENCES `core_user`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;';
 
+
+$updates['201901191547'][] = "ALTER TABLE `sync_addressbook_user` DROP INDEX `user_id`;";
+
+$updates['201901191547'][] = "ALTER TABLE `sync_addressbook_user` CHANGE `default_addressbook` `isDefault` BOOLEAN NOT NULL DEFAULT FALSE;";
+$updates['201901191547'][] = "ALTER TABLE `sync_addressbook_user` CHANGE `user_id` `userId` INT(11) NOT NULL;";
+$updates['201901191547'][] = "ALTER TABLE `sync_addressbook_user` CHANGE `addressbook_id` `addressBookId` INT(11) NOT NULL;";
+//$updates['201901191547'][] = "DELETE FROM `sync_addressbook_user` where addressBookId not in (select id from addressbook_addressbook);";
+$updates['201901191547'][] = "DELETE FROM `sync_addressbook_user` where userId not in (select id from core_user);";
+
+//$updates['201901191547'][] = "ALTER TABLE `sync_addressbook_user` ADD FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+$updates['201901191547'][] = "ALTER TABLE `sync_addressbook_user` ADD FOREIGN KEY (`userId`) REFERENCES `core_user`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";

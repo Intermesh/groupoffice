@@ -1,10 +1,9 @@
-/* main: yourtheme.scss*/
-
 //--------------------------------------------------------------
 // 0. Density independent pixels
 //--------------------------------------------------------------
 $density: 140 !default; // LARGE SCREEN
 $font-scale: 1 !default;
+$resourcePath: './' !default;
 
 @function dp($width) {
   @return (($width * $density) / 160) *1px;
@@ -20,7 +19,7 @@ $layout-lg:     1920px !default;
 
 $borderRadius: dp(4) !default;
 
-/* Bezier easing curve */
+// Bezier easing curve 
 $curve-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
 $curve-deceleration: cubic-bezier(0.0, 0.0, 0.2, 1);
 $curve-acceleration: cubic-bezier(0.4, 0.0, 1, 1);
@@ -34,10 +33,7 @@ $vars: (
   c-primary: $cPrimary,
   c-primary-tp: $cPrimaryTp,
 );
-:root {
-  --c-primary: #{map-get($vars, c-primary)};
-  --c-primary-tp: #{map-get($vars, c-primary-tp)};
-}
+
 
 @mixin var($property, $varName) {
   #{$property}: map-get($vars, $varName);
@@ -47,12 +43,6 @@ $vars: (
 //------------------------------------------------
 // Layouts and backgrounds
 //------------------------------------------------
-%card {
-  @extend .z1;
-  border: 0;
-  background-color:color($bg,'card');
-  border-radius: $borderRadius;
-}
 
 %badge {
 	font-size: sp(13);
@@ -79,17 +69,37 @@ $vars: (
 	@include var(color, c-primary);
 }
 
-.ellipsis {
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-}
+
 
 %hidden {
     visibility: hidden;
     position: absolute;
     opacity:0;
     overflow:hidden;
+}
+
+%icon {
+	display: inline-block;
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: dp(24);  /* Preferred icon size */
+/*	max-width: dp(24);
+	max-height: dp(24);*/
+	color:inherit;
+  width: auto;
+  height: auto;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  vertical-align:middle;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased; // Support for all WebKit browsers.
+  text-rendering: optimizeLegibility; // Support for Safari and Chrome.
+  -moz-osx-font-smoothing: grayscale; // Support for Firefox.
+  font-feature-settings: 'liga'; // Support for IE
 }
  
 @function str-replace($string, $search, $replace: '') {

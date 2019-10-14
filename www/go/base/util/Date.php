@@ -225,6 +225,20 @@ class Date {
 		$date_format = $with_time ? 'Y-m-d H:i' : 'Y-m-d';
 		return date($date_format, $time);
 	}
+	
+	/**
+	 * Convert user formatted date to DateTime object
+	 * 
+	 * @param string $date_string
+	 * @return \go\core\util\DateTime
+	 */
+	public static function to_datetime($date_string) {
+		try{
+			return new \go\core\util\DateTime(Date::to_input_format($date_string));
+		}catch(\Exception $e){
+			return false;
+		}
+	}
 
 	/**
 	 * Add a period to a unix timestamp

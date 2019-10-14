@@ -9,8 +9,8 @@ go.modules.community.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 				'excerpt', 
 				{name: 'createdAt', type: 'date'}, 
 				{name: 'modifiedAt', type: 'date'}, 
-				{name: 'creator', type: go.data.types.User, key: 'createdBy'},
-				{name: 'modifier', type: go.data.types.User, key: 'modifiedBy'},
+				{name: 'creator', type: "relation"},
+				{name: 'modifier', type: "relation"},
 				'permissionLevel'
 			],
 			entityStore: "Note"

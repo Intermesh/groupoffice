@@ -12,7 +12,11 @@ use GO\Email\Model\Label;
 use GO\Base\Model\Acl;
 
 use GO\Base\Mail\Imap;
-
+use go\core\model\Acl as GoAcl;
+use go\core\util\ArrayObject;
+use go\modules\community\addressbook\model\Contact;
+use go\modules\community\addressbook\model\Settings;
+use go\modules\community\addressbook\Module;
 
 class MessageController extends \GO\Base\Controller\AbstractController {
 
@@ -447,48 +451,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	}
 
 
-	private function _findUnknownRecipients($params) {
-
-		$unknown = array();
-
-		if (GO::modules()->addressbook && !GO::config()->get_setting('email_skip_unknown_recipients', GO::user()->id)) {
-
-			$recipients = new \GO\Base\Mail\EmailRecipients($params['to']);
-			$recipients->addString($params['cc']);
-			$recipients->addString($params['bcc']);
-
-			foreach ($recipients->getAddresses() as $email => $personal) {
-				$contacts = \GO\Addressbook\Model\Contact::model()->findByEmail($email, GO\Base\Db\FindParams::newInstance()->ignoreAcl());
-				foreach($contacts as $contact){
-					
-					if($contact->checkPermissionLevel(Acl::READ_PERMISSION) || $contact->goUser && $contact->goUser->checkPermissionLevel(Acl::READ_PERMISSION)){
-						continue 2;
-					}
-				}
-
-				$company = \GO\Addressbook\Model\Company::model()->findSingleByAttribute('email', $email);
-				if ($company)
-					continue;
-				
-
-				$recipient = \GO\Base\Util\StringHelper::split_name($personal);
-				if ($recipient['first_name'] == '' && $recipient['last_name'] == '') {
-					$recipient['first_name'] = $email;
-				}
-				$recipient['email'] = $email;
-				$recipient['name'] = (string) \GO\Base\Mail\EmailRecipients::createSingle($email, $personal);
-
-				$unknown[] = $recipient;
-			}
-		}
-
-		return $unknown;
-	}
-	
-
-
 	private function _link($params, \GO\Base\Mail\Message $message, $tags=array()) {
-			$autoLinkContacts = GO::modules()->addressbook && GO::modules()->savemailas && !empty(GO::config()->email_autolink_contacts);
+
+		$autoLinkContacts = \go\core\model\Module::isInstalled('community','addressbook') &&  Settings::get()->autoLinkEmail;
 		
 
 		if (!empty($params['link']) || $autoLinkContacts || count($tags)) {
@@ -572,12 +537,12 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 //					var_dump($to);
 
 					foreach($to as $email=>$name){
-						//$contact = \GO\Addressbook\Model\Contact::model()->findByEmail($email, \GO\Base\Db\FindParams::newInstance()->permissionLevel(Acl::WRITE_PERMISSION)->single());
-						$stmt = \GO\Addressbook\Model\Contact::model()->findByEmail($email, \GO\Base\Db\FindParams::newInstance()->permissionLevel(Acl::WRITE_PERMISSION)->limit(1));
-						$contact = $stmt->fetch();
+						
+						$contacts = Contact::findByEmail($email)->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]);
 
+						foreach($contacts as $contact){
 
-						if($contact && !$contact->equals($linkedModels)){						
+						if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){						
 
 							$attributes['acl_id']= $contact->findAclId();
 							
@@ -592,14 +557,15 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 							}
 
 							$linkedEmail->link($contact);
+						}
 							
 							// Also link the company to the email if the contact has a company attached to it.
-							if(!empty(GO::config()->email_autolink_companies) && !empty($contact->company_id)){
-								$company = $contact->company;
-								if($company && !$company->equals($linkedModels)){
-									$linkedEmail->link($company);
-								}
-							}
+						// 	if(!empty(GO::config()->email_autolink_companies) && !empty($contact->company_id)){
+						// 		$company = $contact->company;
+						// 		if($company && !$company->equals($linkedModels)){
+						// 			$linkedEmail->link($company);
+						// 		}
+						// 	}
 						}
 					}
 				}
@@ -744,51 +710,51 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		
 		$success = $mailer->send($message, $failedRecipients);		
 
-		// Update "last mailed" time of the emailed contacts.
-		if ($success && GO::modules()->addressbook) {
-
-			$toAddresses = $message->getTo();
-			if (empty($toAddresses))
-				$toAddresses = array();
-			$ccAddresses = $message->getCc();
-			if (empty($ccAddresses))
-				$ccAddresses = array();
-			$bccAddresses = $message->getBcc();
-			if (empty($bccAddresses))
-				$bccAddresses = array();
-			$emailAddresses = array_merge($toAddresses,$ccAddresses);
-			$emailAddresses = array_merge($emailAddresses,$bccAddresses);
-
-			foreach ($emailAddresses as $emailAddress => $fullName) {
-				$findCriteria = \GO\Base\Db\FindCriteria::newInstance()
-						->addCondition('email',$emailAddress,'=','t',false)
-						->addCondition('email2',$emailAddress,'=','t',false)
-						->addCondition('email3',$emailAddress,'=','t',false);
-
-				$findParams = \GO\Base\Db\FindParams::newInstance()
-					->criteria($findCriteria);
-				$contactsStmt = \GO\Addressbook\Model\Contact::model()->find($findParams);
-				if ($contactsStmt) {
-					foreach ($contactsStmt as $contactModel) {
-						if ($contactModel->name == $fullName) {
-
-							$contactLastMailTimeModel = \GO\Email\Model\ContactMailTime::model()->findSingleByAttributes(array(
-								'contact_id' => $contactModel->id,
-								'user_id' => GO::user()->id
-							));
-							if (!$contactLastMailTimeModel) {
-								$contactLastMailTimeModel = new \GO\Email\Model\ContactMailTime();
-								$contactLastMailTimeModel->contact_id = $contactModel->id;
-								$contactLastMailTimeModel->user_id = GO::user()->id;
-							}
-
-							$contactLastMailTimeModel->last_mail_time = time();
-							$contactLastMailTimeModel->save();
-						}
-					}
-				}
-			}
-		}
+//		// Update "last mailed" time of the emailed contacts.
+//		if ($success && GO::modules()->addressbook) {
+//
+//			$toAddresses = $message->getTo();
+//			if (empty($toAddresses))
+//				$toAddresses = array();
+//			$ccAddresses = $message->getCc();
+//			if (empty($ccAddresses))
+//				$ccAddresses = array();
+//			$bccAddresses = $message->getBcc();
+//			if (empty($bccAddresses))
+//				$bccAddresses = array();
+//			$emailAddresses = array_merge($toAddresses,$ccAddresses);
+//			$emailAddresses = array_merge($emailAddresses,$bccAddresses);
+//
+//			foreach ($emailAddresses as $emailAddress => $fullName) {
+//				$findCriteria = \GO\Base\Db\FindCriteria::newInstance()
+//						->addCondition('email',$emailAddress,'=','t',false)
+//						->addCondition('email2',$emailAddress,'=','t',false)
+//						->addCondition('email3',$emailAddress,'=','t',false);
+//
+//				$findParams = \GO\Base\Db\FindParams::newInstance()
+//					->criteria($findCriteria);
+//				$contactsStmt = \GO\Addressbook\Model\Contact::model()->find($findParams);
+//				if ($contactsStmt) {
+//					foreach ($contactsStmt as $contactModel) {
+//						if ($contactModel->name == $fullName) {
+//
+//							$contactLastMailTimeModel = \GO\Email\Model\ContactMailTime::model()->findSingleByAttributes(array(
+//								'contact_id' => $contactModel->id,
+//								'user_id' => GO::user()->id
+//							));
+//							if (!$contactLastMailTimeModel) {
+//								$contactLastMailTimeModel = new \GO\Email\Model\ContactMailTime();
+//								$contactLastMailTimeModel->contact_id = $contactModel->id;
+//								$contactLastMailTimeModel->user_id = GO::user()->id;
+//							}
+//
+//							$contactLastMailTimeModel->last_mail_time = time();
+//							$contactLastMailTimeModel->save();
+//						}
+//					}
+//				}
+//			}
+//		}
 
 		if (!empty($params['reply_uid'])) {
 			//set \Answered flag on IMAP message
@@ -850,7 +816,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		
 		$this->_link($params, $message, $tags);
 
-		$response['unknown_recipients'] = $this->_findUnknownRecipients($params);
+		//$response['unknown_recipients'] = $this->_findUnknownRecipients($params);
 
 
 		return $response;
@@ -886,9 +852,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		
 		$unsetSubject = true;
 		
-		if (GO::modules()->addressbook && !empty($params['template_id'])) {
+		if (!empty($params['template_id'])) {
 			try {
-				$template = \GO\Addressbook\Model\Template::model()->findByPk($params['template_id']);
+				$template = \GO\Base\Model\Template::model()->findByPk($params['template_id']);
 				$templateContent = $template ? $template->content : '';
 			} catch (\GO\Base\Exception\AccessDenied $e) {
 				$templateContent = "";
@@ -919,7 +885,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			);
 			
 			// Parse the link tag
-			$response['data']['htmlbody'] = \GO\Addressbook\Model\Template::model()->replaceLinkTag($response['data']['htmlbody'], $message);
+			$response['data']['htmlbody'] = \GO\Base\Model\Template::model()->replaceLinkTag($response['data']['htmlbody'], $message);
 			
 			//keep template tags for mailings to addresslists
 			if (empty($params['addresslist_id'])) {
@@ -927,46 +893,49 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				if (!empty($params['to']) || !empty($params['contact_id']) || !empty($params['company_id'])) {
 
 					if (!empty($params['contact_id'])) {
-						$contact = \GO\Addressbook\Model\Contact::model()->findByPk($params['contact_id']);
+						$contact = \go\modules\community\addressbook\model\Contact::findById($params['contact_id']);
 					} else {
-						$email = \GO\Base\Util\StringHelper::get_email_from_string($params['to']);
-						$contact = \GO\Addressbook\Model\Contact::model()->findSingleByEmail($email);
+						$email = \GO\Base\Util\StringHelper::get_email_from_string($params['to']);		
+						
+						$contact = \go\modules\community\addressbook\model\Contact::find()
+										->filter(['email' => $email, 'permissionLevel' => \go\core\model\Acl::LEVEL_READ])
+										->single();
 					}
 
-					$company = false;
-					if(!empty($params['company_id']))
-						$company = \GO\Addressbook\Model\Company::model()->findByPk($params['company_id']);
-
-					if($company){
-						$response['data']['htmlbody'] = \GO\Addressbook\Model\Template::model()->replaceModelTags($response['data']['htmlbody'], $company,'company:',true);
-					}
+//					$company = false;
+//					if(!empty($params['company_id']))
+//						$company = \GO\Addressbook\Model\Company::model()->findByPk($params['company_id']);
+//
+//					if($company){
+//						$response['data']['htmlbody'] = \GO\Base\Model\Template::model()->replaceModelTags($response['data']['htmlbody'], $company,'company:',true);
+//					}
 
 					if ($contact) {
-						$response['data']['htmlbody'] = \GO\Addressbook\Model\Template::model()->replaceContactTags($response['data']['htmlbody'], $contact, true);
+						$response['data']['htmlbody'] = \GO\Base\Model\Template::model()->replaceContactTags($response['data']['htmlbody'], $contact, true);
 					} else {
 
-						$response['data']['htmlbody'] = \GO\Addressbook\Model\Template::model()->replaceCustomTags($response['data']['htmlbody'],$defaultTags, true);
-						$response['data']['htmlbody'] = \GO\Addressbook\Model\Template::model()->replaceUserTags($response['data']['htmlbody'], true);
+						$response['data']['htmlbody'] = \GO\Base\Model\Template::model()->replaceCustomTags($response['data']['htmlbody'],$defaultTags, true);
+						$response['data']['htmlbody'] = \GO\Base\Model\Template::model()->replaceUserTags($response['data']['htmlbody'], true);
 					}
 				} else {
-					$response['data']['htmlbody'] = \GO\Addressbook\Model\Template::model()->replaceCustomTags($response['data']['htmlbody'],$defaultTags, true);
-					$response['data']['htmlbody'] = \GO\Addressbook\Model\Template::model()->replaceUserTags($response['data']['htmlbody'],true);
+					$response['data']['htmlbody'] = \GO\Base\Model\Template::model()->replaceCustomTags($response['data']['htmlbody'],$defaultTags, true);
+					$response['data']['htmlbody'] = \GO\Base\Model\Template::model()->replaceUserTags($response['data']['htmlbody'],true);
 				}
 				
 				if(!empty($params['alias_id']) && ($alias = GO\Email\Model\Alias::model()->findByPk($params['alias_id']))) {				
 //					var_dump($response['data']['htmlbody']);
 					
-					$response['data']['htmlbody'] = \GO\Addressbook\Model\Template::model()->replaceModelTags($response['data']['htmlbody'], $alias, 'alias:', true);
+					$response['data']['htmlbody'] = \GO\Base\Model\Template::model()->replaceModelTags($response['data']['htmlbody'], $alias, 'alias:', true);
 				}
 				
 //				if(!empty($params['account_id']) && ($alias = Account::model()->findByPk($params['account_id']))) {				
 ////					var_dump($response['data']['htmlbody']);
 //					
-//					$response['data']['htmlbody'] = \GO\Addressbook\Model\Template::model()->replaceModelTags($response['data']['htmlbody'], $account, 'account:', true);
+//					$response['data']['htmlbody'] = \GO\Base\Model\Template::model()->replaceModelTags($response['data']['htmlbody'], $account, 'account:', true);
 //				}
 				
 				//cleanup empty tags
-				$response['data']['htmlbody'] = \GO\Addressbook\Model\Template::model()->replaceCustomTags($response['data']['htmlbody'],array(), false);
+				$response['data']['htmlbody'] = \GO\Base\Model\Template::model()->replaceCustomTags($response['data']['htmlbody'],array(), false);
 			}
 
 			if ($params['content_type'] == 'plain') {
@@ -1121,9 +1090,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$alias = $this->_findAliasFromRecipients($account, $recipients, $params['alias_id']);	
 		
 		if(empty($params['account_id']) || $alias->account_id != $params['account_id']){
-			$templateModel = \GO\Addressbook\Model\DefaultTemplateForAccount::model()->findByPk($alias->account->id);
+			$templateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($alias->account->id);
 			if (!$templateModel)
-				$templateModel = \GO\Addressbook\Model\DefaultTemplate::model()->findByPk(\GO::user()->id);
+				$templateModel = \GO\Email\Model\DefaultTemplate::model()->findByPk(\GO::user()->id);
 
 			if($templateModel) {
 				$params['template_id'] = $templateModel->template_id;
@@ -1270,7 +1239,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 			//We need to link the contact if a manual link was made of the message to the sender.
 			//Otherwise the new sent message may not be linked if an autolink tag is not present.
-			if(GO::modules()->savemailas){
+			if(false && GO::modules()->savemailas){
 
 				$from = $message->from->getAddress();
 
@@ -1502,27 +1471,14 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if(!$plaintext){
 			$linkedModels = $imapMessage->getLinks();
 			$response['links'] = array();
-			$linkHtml = '';
 			foreach($linkedModels as $linkedModel){
 				$link = $linkedModel->getAttributes();				
 				$entityType = \go\core\orm\EntityType::findById($linkedModel->entityTypeId);
-				$link['entity'] = $entityType->getName();
-				$response['links'][] = $link;				
-				
-				$entityType = \go\core\orm\EntityType::findById($linkedModel->entityTypeId);
-//				$modelCssClass = 'go-model-icon-'.$entityType->getName().' entity '.$entityType->getName();
-				$route = strtolower($entityType->getName()) .'/'.$linkedModel->entityId;
-				
-				$linkHtml .= '<a class="em-link-link" href="#'.$route.'"><i class="entity '.$entityType->getName().'"></i> <span>'.$linkedModel->name.'</span></a>,';
-			}
-			$count = count($response['links']);
-
-			if($count > 0){
-				$linkHtml = trim($linkHtml,' ,');
-				$response['htmlbody']='<div class="em-link-message">'.
-					sprintf(GO::t("This mail is linked to %s item(s): %s", "email"),$count,$linkHtml).'</div>'.
-					$response['htmlbody'];
-			}
+				if($entityType) {
+					$link['entity'] = $entityType->getName();
+					$response['links'][] = $link;				
+				}
+			}			
 		}
 		// END OF Handle the links div in the email display panel
 		
@@ -1581,28 +1537,32 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$useQL = GO::config()->allow_quicklink;
 		$response['allow_quicklink']=$useQL?1:0;
 
-		$contact = \GO\Addressbook\Model\Contact::model()->findSingleByEmail($response['sender']);
+		
+		$contact = !empty($response['sender']) ? \go\modules\community\addressbook\model\Contact::find()->filter(['email' => $response['sender'], 'permissionLevel' => \go\core\model\Acl::LEVEL_READ])->single() : false;
 		if(!empty($contact)){
-			$response['contact_thumb_url']=$contact->getPhotoThumbURL();
+			$response['contact_thumb_url']= go()->getAuthState()->getDownloadUrl($contact->photoBlobId);
 
 			if($useQL){
 				$response['sender_contact_id']=$contact->id;
-				$response['contact_name']=$contact->name.' ('.$contact->addressbook->name.')';
+				$response['contact_name']=$contact->name;
 
+				$orgIds = $contact->getOrganizationIds();
+				
 
-				$company = $contact->company;
-				if(!empty($company) && Acl::getUserPermissionLevel($company->addressbook->acl_id)>=Acl::WRITE_PERMISSION){
+				$company = isset($orgIds[0]) ? \go\modules\community\addressbook\model\Contact::findById($orgIds[0]) : null;
+				if(!empty($company) && $company->getPermissionLevel() >= \go\core\model\Acl::LEVEL_WRITE){
 					$response['sender_company_id']=$company->id;
-					$response['company_name']=$company->name.' ('.$company->addressbook->name.')';
+					$response['company_name']=$company->name;
 				}
 
 				if(GO::modules()->savemailas){
 					$contactLinkedMessage = \GO\Savemailas\Model\LinkedEmail::model()->findByImapMessage($imapMessage, $contact);
-					$response['contact_linked_message_id']=$contactLinkedMessage && $contactLinkedMessage->linkExists($contact) ? $contactLinkedMessage->id : 0;
+					
+					$response['contact_linked_message_id']=$contactLinkedMessage && ($response['contact_link_id'] = $contactLinkedMessage->linkExists($contact)) ? $contactLinkedMessage->id : 0;
 
 					if(!empty($company)){
 						$companyLinkedMessage = \GO\Savemailas\Model\LinkedEmail::model()->findByImapMessage($imapMessage, $company);
-						$response['company_linked_message_id']=$companyLinkedMessage && $companyLinkedMessage->linkExists($company) ? $companyLinkedMessage->id : 0;
+						$response['company_linked_message_id']=$companyLinkedMessage && ($response['company_link_id'] = $companyLinkedMessage->linkExists($company)) ? $companyLinkedMessage->id : 0;
 					}
 				}
 			}
@@ -1805,28 +1765,19 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 * @return StringHelper
 	 */
 	private function _handleAutoContactLinkFromSender(\GO\Email\Model\ImapMessage $imapMessage, $linkedModels) {
-
-		if(GO::modules()->addressbook && GO::modules()->savemailas && !empty(GO::config()->email_autolink_contacts)){
+//todo system setting
+		if(GO::modules()->addressbook && GO::modules()->savemailas && Settings::get()->autoLinkEmail){
 
 			$from = $imapMessage->from->getAddress();
 
-			$stmt = \GO\Addressbook\Model\Contact::model()->findByEmail($from['email'], \GO\Base\Db\FindParams::newInstance()->permissionLevel(Acl::WRITE_PERMISSION)->limit(1));
-			$contact = $stmt->fetch();
+			
+			$contacts = Contact::findByEmail($from['email'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]);
 
-			if($contact && !$contact->equals($linkedModels)){
-				\GO\Savemailas\Model\LinkedEmail::model()->createFromImapMessage($imapMessage, $contact);
-
-				$linkedModels[]=$contact;
-				
-				// Also link the company to the email if the contact has a company attached to it.
-				if(!empty(GO::config()->email_autolink_companies) && !empty($contact->company_id)){
-					$company = $contact->company;
-					if($company && !$company->equals($linkedModels)){
-						\GO\Savemailas\Model\LinkedEmail::model()->createFromImapMessage($imapMessage, $company);
-						$linkedModels[] = $company;
-					}
+			foreach($contacts as $contact) {
+				if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){						
+					\GO\Savemailas\Model\LinkedEmail::model()->createFromImapMessage($imapMessage, $contact);
+					$linkedModels[]=$contact;					
 				}
-				
 			}
 		}
 
@@ -1842,7 +1793,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 	 * @return type
 	 */
 	private function _blockImages($params, $response) {
-		if (empty($params['unblock']) && !\GO\Addressbook\Model\Contact::model()->findSingleByEmail($response['sender'])) {
+		if (empty($params['unblock'])){// && !\GO\Addressbook\Model\Contact::model()->findSingleByEmail($response['sender'])) {
 			$blockUrl = 'about:blank';
 			$response['htmlbody'] = preg_replace("/<([^a]{1})([^>]*)(https?:[^>'\"]*)/iu", "<$1$2" . $blockUrl, $response['htmlbody'], -1, $response['blocked_images']);
 		}

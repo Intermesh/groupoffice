@@ -18,6 +18,7 @@ class UserSettings extends Property {
 	public $always_respond_to_notifications;
 	public $font_size;
 	public $sort_email_addresses_by_time;
+	public $defaultTemplateId;
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable('core_user');
@@ -26,6 +27,13 @@ class UserSettings extends Property {
 	protected function init() {
 		parent::init();
 		
+		$this->defaultTemplateId = \GO::config()->get_setting("email_defaultTemplateId", $this->id);
+		if(!$this->defaultTemplateId) {
+			$this->defaultTemplateId = null;
+		} else
+		{
+			$this->defaultTemplateId = (int) $this->defaultTemplateId;
+		}
 		$this->use_html_markup = !\GO::config()->get_setting("email_use_plain_text_markup", $this->id);
 		$this->show_cc = !!\GO::config()->get_setting("email_show_cc", $this->id);
 		$this->show_bcc = !!\GO::config()->get_setting("email_show_bcc", $this->id);
@@ -43,6 +51,7 @@ class UserSettings extends Property {
 	
 	
 	protected function internalSave() {
+		\GO::config()->save_setting('email_defaultTemplateId', $this->defaultTemplateId, $this->id);
 		\GO::config()->save_setting('email_use_plain_text_markup', !empty($this->use_html_markup) ? '0' : '1', $this->id);
 		\GO::config()->save_setting('email_show_cc', !empty($this->show_cc) ? 1 : 0, $this->id);
 		\GO::config()->save_setting('email_show_bcc', !empty($this->show_bcc) ? 1 : 0, $this->id);

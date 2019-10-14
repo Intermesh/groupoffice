@@ -15,9 +15,12 @@ class Utils {
 
 		try {
 			for ($i = 0, $c = count($queries); $i < $c; $i++) {
-				App::get()->getDbConnection()->query($queries[$i]);
+				if(!empty($queries[$i])) {
+					App::get()->getDbConnection()->exec($queries[$i]);
+				}
 			}
 		} catch (PDOException $e) {
+			//var_dump($queries);
 			throw new Exception($e->getMessage() . ' on query (' . $i . ') ' . $queries[$i]);
 		}
 	}
@@ -79,6 +82,7 @@ class Utils {
 		$stmt = App::get()->getDbConnection()->query('SHOW DATABASES');
 		while ($r = $stmt->fetch()) {
 			if ($r[0] == $databaseName) {
+				$stmt->closeCursor();
 				return true;
 			}
 		}
@@ -159,5 +163,37 @@ class Utils {
         'options' => $options
     ];
   }
+	
+	
+	public static function quoteTableName($name) {
+		//disallow \ ` and \00  : http://stackoverflow.com/questions/1542627/escaping-field-names-in-pdo-statements
+		if (preg_match("/[`\\\\\\000,]/", $name)) {
+			throw new Exception("Invalid characters found in column name: " . $name);
+		}
+
+		return '`' . str_replace('`', '``', $name) . '`';
+	}
+	
+	public static function quoteColumnName($name) {
+		return self::quoteTableName($name);
+	}
+	
+	
+	public static function isUniqueKeyException(\PDOException $e) {
+		//Unique index error = 23000
+		if ($e->getCode() != 23000) {
+			return false;
+		}
+
+		$msg = $e->getMessage();
+		//App::get()->debug($msg);
+
+		if(preg_match("/key '(.*)'/", $msg, $matches)) {
+			$key = $matches[1];
+			return $key;
+		}
+
+		return false;
+	}
 
 }

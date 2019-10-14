@@ -2,11 +2,13 @@
 namespace go\modules\community\ldapauthenticator\model;
 
 use Exception;
-use go\modules\core\users\model\User;
+use go\core\model\User;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\ldap\Connection;
 use go\core\ldap\Record;
 use GO\Email\Model\Account;
+
+use go\modules\community\ldapauthenticator\Module;
 
 /**
  * LDAP Authenticator
@@ -61,28 +63,8 @@ class Authenticator extends PrimaryAuthenticator {
 		if($server->loginWithEmail) {
 			$ldapUsername = $username;
 		}
-		$connection = new Connection();
-		if(!$connection->connect($server->getUri())) {
-			throw new \Exception("Could not connect to LDAP server");
-		}
-		if(!$server->ldapVerifyCertificate) {
-			$connection->setOption(LDAP_OPT_X_TLS_REQUIRE_CERT, LDAP_OPT_X_TLS_NEVER);
-		}
-		if($server->encryption == 'tls') {
-			if(!$connection->startTLS()) {
-				throw new \Exception("Couldn't enable TLS: " . $connection->getError());
-			}			
-		}
 		
-		if (!empty($server->username)) {			
-			
-			if (!$connection->bind($server->username, $server->password)) {				
-				throw new \Exception("Invalid password given for '".$server->username."'");
-			} else
-			{
-				GO()->debug("Authenticated with user '" . $server->username . '"');
-			}
-		}
+		$connection = $server->connect();
 		
 		$record = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . $ldapUsername)->fetch();
 		
@@ -96,8 +78,12 @@ class Authenticator extends PrimaryAuthenticator {
 		
 		$user = User::find()->where(['username' => $username])->single();
 		if(!$user) {
-			$user = $this->createUser($username, $record);
+			$user = new User();
+		}else if($user->hasPassword()){
+			$user->clearPassword();
 		}
+
+		Module::ldapRecordToUser($username, $record, $user);
 		
 		foreach($server->groups as $group) {
 			$user->addGroup($group->groupId);
@@ -114,22 +100,7 @@ class Authenticator extends PrimaryAuthenticator {
 		
 		return $user;
 	
-	}	
-	
-	private function createUser($username, Record $record) {
-		$user = new User();
-		$user->displayName = $record->cn[0];
-		$user->username = $username;
-		$user->email = $record->mail[0];
-		$user->recoveryEmail = isset($record->mail[1]) ? $record->mail[1] : $record->mail[0];		
-		
-		if(!$user->save()) {
-			throw new Exception("Could not save user after succesful IMAP login");
-		}
-		
-		return $user;
-	}
-	
+	}		
 	
 	private function setEmailAccount($username, $password, $email, Server $server, User $user) {
 		

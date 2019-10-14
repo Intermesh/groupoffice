@@ -52,10 +52,12 @@ use GO\Base\Util\TagParser;
 use GO\Site\Model\Site As SiteModel;
 
 class Content extends \GO\Base\Db\ActiveRecord{
-
-	private $_cf=array();	
 	
-	private static $fields;
+	use \go\core\orm\CustomFieldsTrait;
+
+//	private $_cf=array();	
+	
+//	private static $fields;
 	
 //	public $parentslug;
 //	public $baseslug;
@@ -111,55 +113,55 @@ class Content extends \GO\Base\Db\ActiveRecord{
 		$this->slug = $this->parentslug.$slug;
 	}
 	
-	private function _loadCf(){
-			//load cf
-		if(!isset(self::$fields)){
-			$fields = \GO\Customfields\Model\Field::model()->findByModel('GO\Site\Model\Content', false);
-			self::$fields=array();
-			foreach($fields as $field){
-				self::$fields[$field->name]= $field;
-			}
-		}		
-	}
+//	private function _loadCf(){
+//			//load cf
+//		if(!isset(self::$fields)){
+//			$fields = \GO\Customfields\Model\Field::model()->findByModel('GO\Site\Model\Content', false);
+//			self::$fields=array();
+//			foreach($fields as $field){
+//				self::$fields[$field->name]= $field;
+//			}
+//		}		
+//	}
 	
-	public function __get($name) {
-		
-		$isAttr = isset($this->columns[$name]);
-		
-		if(!$isAttr)
-			$this->_loadCf();
-		
-		if(!$isAttr && isset(self::$fields[$name])){
-			return $this->getCustomFieldValueByName($name);
-		}  else {
-			return parent::__get($name);
-		}
-
-	}
+//	public function __get($name) {
+//		
+//		$isAttr = isset($this->columns[$name]);
+//		
+//		if(!$isAttr)
+//			$this->_loadCf();
+//		
+//		if(!$isAttr && isset(self::$fields[$name])){
+//			return $this->getCustomFieldValueByName($name);
+//		}  else {
+//			return parent::__get($name);
+//		}
+//
+//	}
 	
-	public function __isset($name) {
-		
-		$isAttr = isset($this->columns[$name]);
-		
-		if(!$isAttr)
-			$this->_loadCf();
-		
-		if(!$isAttr && isset(self::$fields[$name])){
-			$var= $this->getCustomFieldValueByName($name);
-			return isset($var);
-		}  else {
-			return parent::__get($name);
-		}
-	}
+//	public function __isset($name) {
+//		
+//		$isAttr = isset($this->columns[$name]);
+//		
+//		if(!$isAttr)
+//			$this->_loadCf();
+//		
+//		if(!$isAttr && isset(self::$fields[$name])){
+//			$var= $this->getCustomFieldValueByName($name);
+//			return isset($var);
+//		}  else {
+//			return parent::__get($name);
+//		}
+//	}
 	
-	
-	/*
-	 * Attach the customfield model to this model.
-	 */
-	public function customfieldsModel() {
-		return 'GO\Site\Customfields\Model\Content';
-	}
-	
+//	
+//	/*
+//	 * Attach the customfield model to this model.
+//	 */
+//	public function customfieldsModel() {
+//		return 'GO\Site\Customfields\Model\Content';
+//	}
+//	
 	protected function init() {
 		$this->columns['slug']['unique'] = array('site_id');
 		parent::init();
@@ -318,22 +320,22 @@ class Content extends \GO\Base\Db\ActiveRecord{
 		 return $tree;
 	 }
 	 
-	 public function getCustomFieldValueByName($cfName){
-		 
-		if(!key_exists($cfName, $this->_cf)){
-			
-//			$column = $this->getCustomfieldsRecord()->getColumn(self::$fields[$cfName]->columnName());
-//			if(!$column)
-//				return null;
-
-			$value = $this->getCustomfieldsRecord()->{self::$fields[$cfName]->columnName()};
-
-			$this->_cf[$cfName]=$value;
-
-		}
-
-		return $this->_cf[$cfName];
-	 }
+//	 public function getCustomFieldValueByName($cfName){
+//		 
+//		if(!key_exists($cfName, $this->_cf)){
+//			
+////			$column = $this->getCustomfieldsRecord()->getColumn(self::$fields[$cfName]->columnName());
+////			if(!$column)
+////				return null;
+//
+//			$value = $this->getCustomfieldsRecord()->{self::$fields[$cfName]->columnName()};
+//
+//			$this->_cf[$cfName]=$value;
+//
+//		}
+//
+//		return $this->_cf[$cfName];
+//	 }
 	 
 	 public function beforeValidate() {
 		 parent::beforeValidate();

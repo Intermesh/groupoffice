@@ -50,11 +50,9 @@ GO.email.AttachmentContextMenu = function(config)
 			text: t("Save to item", "email"),
 			handler: function(){
 
-				if(!GO.email.linkAttachmentDialog){
-					GO.email.linkAttachmentDialog = new GO.email.LinkAttachmentDialog();
-				}
+				var dlg = new GO.email.LinkAttachmentDialog();				
 
-				GO.email.linkAttachmentDialog.show(this.attachment,this.messagePanel);
+				dlg.show(this.attachment,this.messagePanel);
 			},
 			scope: this
 		});

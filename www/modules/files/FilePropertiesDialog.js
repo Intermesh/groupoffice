@@ -41,6 +41,7 @@ GO.files.FilePropertiesDialog = function(config){
 		waitMsgTarget:true,
 		labelWidth: dp(128),
 		defaultType: 'textfield',
+		autoScroll: true,
 		items: [
 			{xtype:'fieldset', 
 				items:[
@@ -154,16 +155,7 @@ GO.files.FilePropertiesDialog = function(config){
 	this.versionsGrid = new GO.files.VersionsGrid();
 	
 	var items = [this.propertiesPanel, this.commentsPanel, this.versionsGrid];
-
-	if(go.Modules.isAvailable("core", "customfields") && GO.customfields.types["GO\\Files\\Model\\File"])
-	{
-		for(var i=0;i<GO.customfields.types["GO\\Files\\Model\\File"].panels.length;i++)
-		{
-			items.push(GO.customfields.types["GO\\Files\\Model\\File"].panels[i]);
-		}
-	}
 	
-
 	
 	this.tabPanel =new Ext.TabPanel({
 		activeTab: 0,
@@ -175,6 +167,24 @@ GO.files.FilePropertiesDialog = function(config){
 		hideLabel:true,
 		items:items
 	});
+	
+	go.customfields.CustomFields.getFormFieldSets("File").forEach(function(fs) {
+		//console.log(fs);
+		if(fs.fieldSet.isTab) {
+			fs.title = null;
+			fs.collapsible = false;
+			var pnl = new Ext.Panel({
+				autoScroll: true,
+				hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.
+				title: fs.fieldSet.name,
+				items: [fs]
+			});
+			this.tabPanel.add(pnl);
+		}else
+		{			
+			this.propertiesPanel.add(fs);
+		}
+	}, this);
 		
 	this.formPanel = new Ext.form.FormPanel(
 	{
@@ -188,8 +198,8 @@ GO.files.FilePropertiesDialog = function(config){
 	GO.files.FilePropertiesDialog.superclass.constructor.call(this,{
 		title:t("Properties"),
 		layout:'fit',
-		width:650,
-		height:550,
+		width:dp(700),
+		height:dp(700),
 		closeAction:'hide',
 		items:this.formPanel,
 		maximizable:true,
@@ -256,10 +266,7 @@ Ext.extend(GO.files.FilePropertiesDialog, GO.Window, {
 				}
 				
 				this.folder_id=action.result.data.folder_id;
-				
-				if(go.Modules.isAvailable("core", "customfields"))
-					GO.customfields.disableTabs(this.tabPanel, action.result);	
-				
+			
 				
 				this.selectHandler.store.baseParams.id=action.result.data.id;
 				this.selectHandler.clearLastSearch();

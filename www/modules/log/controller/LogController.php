@@ -56,6 +56,40 @@ class LogController extends AbstractModelController {
 		echo "Done\n";
 	}
 	
+	/**
+	 * 
+	 * http://sony.localhost/?r=log/log/recordsForEntity&entityType=Asset&entityId=7&security_token=7uDs5HkaIVyn26pghe48
+	 * 
+	 * @param type $params
+	 * @return type
+	 * @throws Exception
+	 */
+	public function actionRecordsForEntity($params){
+		if(!isset($params['entityType'])){
+			throw new Exception("Please provide the \"entityType\" property.");
+		}
+		
+		if(!isset($params['entityId'])){
+			throw new Exception("Please provide the \"entityId\" property.");
+		}
+		
+		$entityType = \go\core\orm\EntityType::findByName($params['entityType']);
+		
+		if(!$entityType){
+			throw new Exception("Unknown entityType ".$params['entityType']);
+		}
+		
+		$columnModel = new ColumnModel(Log::model());
+		$findParams = FindParams::newInstance()->select()->order('ctime','DESC');
+		$findParams->getCriteria()
+						->addCondition('model', $entityType->getName())
+						->addCondition('model_id', $params['entityId']);
+		
+		//Create store
+		$store = new DbStore('GO\Log\Model\Log', $columnModel, $params, $findParams);
+		
+		return $store->getData();
+	}
 	
 	/**
 	 * 

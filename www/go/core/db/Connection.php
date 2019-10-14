@@ -23,9 +23,7 @@ use PDOStatement;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 class Connection {
-
-	const SQL_MODE = "STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"; // "ONLY_FULL_GROUP_BY,STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION";
-
+	
 	private $dsn;
 	private $username;
 	private $password;
@@ -36,12 +34,32 @@ class Connection {
 	 * @var PDO
 	 */
 	private $pdo;
-
-	public function __construct($dsn, $username, $password, $options = []) {
+	
+	/**
+	 * Output all SQL to the debugger
+	 * 
+	 * @var bool 
+	 */
+	public $debug = true;
+	
+	public function __construct($dsn, $username, $password) {
 		$this->dsn = $dsn;
 		$this->username = $username;
 		$this->password = $password;
-		$this->options = $options;
+		$this->options = [
+				PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
+				PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci',sql_mode='STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',time_zone = '+00:00',lc_messages = 'en_US'"
+		];
+	}
+
+	public function __destruct()
+	{
+		if($this->inTransaction()) {
+			throw new \Exception("DB Transaction not closed properly");
+		}
+	}
+	public function getDsn() {
+		return $this->dsn;
 	}
 
 	/**
@@ -90,16 +108,12 @@ class Connection {
 	 */
 	private function setPDO() {
 		$this->pdo = null;
-		$this->pdo = new PDO($this->dsn, $this->username, $this->password, $this->options);
+		$this->pdo = new PDO($this->dsn, $this->username, $this->password, $this->options);		
 		$this->getPdo()->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		$this->getPdo()->setAttribute(PDO::ATTR_PERSISTENT, true);
-//		$this->getPdo()->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); //for native data types int, bool etc. We can't use this because we need fetch_class
-		$this->getPdo()->query("SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'");
-		$this->getPdo()->query("SET sql_mode='" . self::SQL_MODE . "'");
-		$this->getPdo()->query("SET time_zone = '+00:00'");
-		$this->getPdo()->query("SET lc_messages = 'en_US';"); //unique key error is caught and parsed and relies on english
-		
 		$this->getPdo()->setAttribute(PDO::ATTR_STATEMENT_CLASS, [Statement::class]);
+		$this->getPdo()->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); //for native data types int, bool etc.
+		$this->getPdo()->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
 	}
 
 	/**
@@ -112,15 +126,46 @@ class Connection {
 	 * @return PDOStatement
 	 */
 	public function query($sql) {
-		\go\core\App::get()->getDebugger()->debug($sql, Debugger::TYPE_SQL);
-		return $this->getPdo()->query($sql);
+		if($this->debug) {
+			\go\core\App::get()->getDebugger()->debug($sql);
+		}
+		try {
+			return $this->getPdo()->query($sql);
+		}
+		catch(PDOException $e) {
+			go()->error("SQL FAILED: " . $sql);
+			throw $e;
+		}
 	}
+	
+	/**
+	 * Execute an SQL statement and return the number of affected rows
+	 * <p><b>PDO::exec()</b> executes an SQL statement in a single function call, returning the number of rows affected by the statement.</p><p><b>PDO::exec()</b> does not return results from a SELECT statement. For a SELECT statement that you only need to issue once during your program, consider issuing <code>PDO::query()</code>. For a statement that you need to issue multiple times, prepare a PDOStatement object with <code>PDO::prepare()</code> and issue the statement with <code>PDOStatement::execute()</code>.</p>
+	 * @param string $statement <p>The SQL statement to prepare and execute.</p> <p>Data inside the query should be properly escaped.</p>
+	 * @return int <p><b>PDO::exec()</b> returns the number of rows that were modified or deleted by the SQL statement you issued. If no rows were affected, <b>PDO::exec()</b> returns <i>0</i>.</p><p><b>Warning</b></p><p>This function may return Boolean <b><code>FALSE</code></b>, but may also return a non-Boolean value which evaluates to <b><code>FALSE</code></b>. Please read the section on Booleans for more information. Use the === operator for testing the return value of this function.</p><p>The following example incorrectly relies on the return value of <b>PDO::exec()</b>, wherein a statement that affected 0 rows results in a call to <code>die()</code>:</p> <code> &lt;&#63;php<br>$db-&gt;exec()&nbsp;or&nbsp;die(print_r($db-&gt;errorInfo(),&nbsp;true));&nbsp;//&nbsp;incorrect<br>&#63;&gt;  </code>
+	 * @link http://php.net/manual/en/pdo.exec.php
+	 * @see PDO::prepare(), PDO::query(), PDOStatement::execute()
+	 * @since PHP 5 >= 5.1.0, PHP 7, PECL pdo >= 0.1.0
+	 */
+	public function exec($sql) {
+		if($this->debug) {
+			\go\core\App::get()->getDebugger()->debug($sql, 1);
+		}
+		try {
+			return $this->getPdo()->exec($sql);
+		}
+		catch(PDOException $e) {
+			go()->error("SQL FAILED: " . $sql);
+			throw $e;
+		}
+	}
+	
 
 	/**
 	 * UNLOCK TABLES explicitly releases any table locks held by the current session
 	 */
 	public function unlockTables() {
-		return $this->getPdo()->query("UNLOCK TABLES");
+		return $this->getPdo()->exec("UNLOCK TABLES")  !== false;
 	}
 
 	private $transactionSavePointLevel = 0;
@@ -136,16 +181,38 @@ class Connection {
 		if($this->transactionSavePointLevel == 0) {
 			//$ret = null;
 			//if (!$this->inTransaction())
-			GO()->debug("START TRANSACTION", Debugger::TYPE_SQL);
+			if($this->debug) {
+				go()->debug("START DB TRANSACTION", 1);
+			}
 			$ret = $this->getPdo()->beginTransaction();
 
 		}else
 		{
-			$ret = $this->query("SAVEPOINT LEVEL".$this->transactionSavePointLevel);			
+			$sql = "SAVEPOINT LEVEL".$this->transactionSavePointLevel;
+			if($this->debug) {
+				go()->debug($sql, 1);
+			}
+			$ret = $this->exec($sql) !== false;			
 		}		
 		
 		$this->transactionSavePointLevel++;		
 		return $ret;
+	}
+
+	private $resumeLevels = 0;
+
+	public function pauseTransactions() {
+		$this->resumeLevels = $this->transactionSavePointLevel;
+		while($this->transactionSavePointLevel > 0) {
+			$this->commit();
+		}
+	}
+
+	public function resumeTransactions() {
+		while($this->resumeLevels > 0) {
+			$this->beginTransaction();
+			$this->resumeLevels--;
+		}
 	}
 
 	/**
@@ -162,12 +229,14 @@ class Connection {
 		}
 		
 		$this->transactionSavePointLevel--;	
-		if($this->transactionSavePointLevel == 0) {
-			GO()->debug("ROLLBACK TRANSACTION", Debugger::TYPE_SQL);
+		if($this->transactionSavePointLevel == 0) {			
+			go()->warn("ROLLBACK DB TRANSACTION", 1);
 			return $this->getPdo()->rollBack();
 		}else
 		{
-			return $this->query("ROLLBACK TO SAVEPOINT LEVEL".$this->transactionSavePointLevel);						
+			$sql = "ROLLBACK TO SAVEPOINT LEVEL".$this->transactionSavePointLevel;
+			go()->warn($sql, 1);
+			return $this->exec($sql) !== false;						
 		}
 	}
 
@@ -187,11 +256,17 @@ class Connection {
 		
 		$this->transactionSavePointLevel--;
 		if($this->transactionSavePointLevel == 0) {
-			GO()->debug("COMMIT TRANSACTION", Debugger::TYPE_SQL);
+			if($this->debug) {
+				go()->debug("COMMIT DB TRANSACTION", 1);				
+			}
 			return $this->getPdo()->commit();
 		}else
 		{
-			return $this->query("RELEASE SAVEPOINT LEVEL".$this->transactionSavePointLevel);			
+			$sql = "RELEASE SAVEPOINT LEVEL".$this->transactionSavePointLevel;
+			if($this->debug) {
+				go()->debug($sql, 1);				
+			}
+			return $this->exec($sql) !== false;			
 		}
 	}
 
@@ -210,7 +285,7 @@ class Connection {
 	 * The locks array should be indexed by model name and the value is an array with two optional values.
 	 * THe first is a boolean that enables a write lock and the second is a table alias.
 	 * 
-	 * @param array $locks eg. [GO\Core\Modules\Users\Model\User::tableName() => [true, 't']]
+	 * @param array $locks eg. [go\cores\Users\Model\User::tableName() => [true, 't']]
 	 *
 	 * @return boolean
 	 */
@@ -232,7 +307,7 @@ class Connection {
 		$sql = rtrim($sql, ', ');
 
 		App::get()->debug($sql);
-		return App::get()->getDbConnection()->query($sql);
+		return App::get()->getDbConnection()->exec($sql) !== false;
 	}
 
 	/**
@@ -252,7 +327,7 @@ class Connection {
 	public function delete($tableName, $query = null) {
 		$query = Query::normalize($query);
 
-		$queryBuilder = new QueryBuilder();
+		$queryBuilder = new QueryBuilder($this);
 		$build = $queryBuilder->buildDelete($tableName, $query);
 
 		return $this->createStatement($build);
@@ -289,54 +364,97 @@ class Connection {
 	 * 
 	 * @param string $tableName
 	 * @param array|Query $data Key value array or select query
+	 * @param string[] $columns If $data is a query object then you can supply the 
+	 *	selected columns with this parameter. If not given all columns must be 
+	 *	selected in the correct order.
+	 * 
 	 * @return Statement
 	 */
-	public function insert($tableName, $data) {
+	public function insert($tableName, $data, $columns = []) {
 
-		$queryBuilder = new QueryBuilder();
-		$build = $queryBuilder->buildInsert($tableName, $data);
-
-		return $this->createStatement($build);
-	}
-	
-	public function insertIgnore($tableName, $data) {
-
-		$queryBuilder = new QueryBuilder();
-		$build = $queryBuilder->buildInsert($tableName, $data, "INSERT IGNORE");
+		$queryBuilder = new QueryBuilder($this);
+		$build = $queryBuilder->buildInsert($tableName, $data, $columns);
 
 		return $this->createStatement($build);
 	}
 	
-	public function replace($tableName, $data) {
+	/**
+	 * Insert data in the database and ignore if the records exist
+	 * 
+	 * @see insert()
+	 * @param string $tableName
+	 * @param array|Query $data Key value array or select query
+	 * @param string[] $columns If $data is a query object then you can supply the 
+	 *	selected columns with this parameter. If not given all columns must be 
+	 *	selected in the correct order.
+	 * 
+	 * @return Statement
+	 */
+	public function insertIgnore($tableName, $data, $columns = []) {
 
-		$queryBuilder = new QueryBuilder();
-		$build = $queryBuilder->buildInsert($tableName, $data, "REPLACE");
+		$queryBuilder = new QueryBuilder($this);
+		$build = $queryBuilder->buildInsert($tableName, $data, $columns, "INSERT IGNORE");
+
+		return $this->createStatement($build);
+	}
+	
+	/**
+	 * Replace data in the database
+	 * 
+	 * @see insert()
+	 * @param string $tableName
+	 * @param array|Query $data Key value array, array of key value arrays for multi insert or select query
+	 * @param string[] $columns If $data is a query object then you can supply the 
+	 *	selected columns with this parameter. If not given all columns must be 
+	 *	selected in the correct order.
+	 * 
+	 * @return Statement
+	 */
+	public function replace($tableName, $data, $columns = []) {
+
+		$queryBuilder = new QueryBuilder($this);
+		$build = $queryBuilder->buildInsert($tableName, $data, $columns, "REPLACE");
 
 		return $this->createStatement($build);
 	}
 
 	/**
-	 * Create an update command
+	 * Create an update statement
 	 * 
 	 * @example
 	 * ```
 	 * $data = [
-	 * 		"propA" => "string 3"
+	 * 		"propA" => "string 3",
+	 *		"count" => new \go\core\db\Expression('count + 1'),		//Example for expression
 	 * ];
 	 * 
 	 * $stmt = App::get()->getDbConnection()->update("test_a", $data, ['id' => 1]);
 	 * $stmt->execute();
 	 * ````
 	 * 
+	 * @example with join
+	 * ```
+	 * go()->getDbConnection()->update(
+	 *     'core_acl', 
+	 *     [
+	 *       'acl.entityTypeId' => $entityTypeId, 
+	 *       'acl.entityId' => new Expression('ab.id')], // Use go\core\db\Expression for references to tables
+	 *     (new Query())
+	 *       ->tableAlias('acl') // set alias for core_acl table
+	 *       ->join('addressbook_addressbook, 'ab', 'ab.aclId = acl.id'))
+	 *   ->execute();  
+	 * ``` 
+	 *
+	 * 
 	 * @param string $tableName
 	 * @param array|Expression
-	 * @param Criteria $query
+	 * @param Query|string|array $query {@see Query::normalize()}
 	 * @return Statement
 	 */
 	public function update($tableName, $data, $query = null) {
 		$query = Query::normalize($query);
 
-		$queryBuilder = new QueryBuilder();
+		$queryBuilder = new QueryBuilder($this);
 		$build = $queryBuilder->buildUpdate($tableName, $data, $query);
 
 		return $this->createStatement($build);
@@ -344,13 +462,11 @@ class Connection {
 	
 
 	/**
-	 * Create a select statement. 
-	 * 
-	 * You don't need to use this function directly. You can select like this:
+	 * Create a select statement.
 	 * 
 	 * @example 
 	 * ```
-	 * $query = (new Query())
+	 * $query = go()->getDbConnection()
 	 * 						->select('*')
 	 * 						->from('test_a')
 	 * 						->where('id', '=', 1);
@@ -360,73 +476,49 @@ class Connection {
 	 * ```
 	 * 
 	 * @see Query
-	 * 
-	 * @param Query $query
-	 * @return Statement
+	 * @return Query
 	 */
-	public function select(Query $query) {
-		$queryBuilder = new QueryBuilder();
-		$build = $queryBuilder->buildSelect($query);
-
-		$stmt = $this->createStatement($build);
-		call_user_func_array([$stmt, 'setFetchMode'], $query->getFetchMode());
-
-		$stmt->setQuery($query);
-		return $stmt;
+	public function select($select = "*") {
+		$query = new Query();
+		return $query->setDbConnection($this)->select($select);
+	}
+	
+	/**
+	 * Select a single column or count(*) for example.
+	 * 
+	 * Shortcut for:
+	 * $query->fetchMode(\PDO::FETCH_COLUMN,0)->select($select)
+	 * 
+	 * @param string $select
+	 * @return Query
+	 */
+	public function selectSingleValue($select) {
+		$query = new Query();
+		return $query->setDbConnection($this)->selectSingleValue($select);
 	}
 
 	/**
-	 * Execute the command
+	 * Create a statement from a QueryBuilder result
 	 * 
 	 * @return Statement
 	 * @throws PDOException
 	 */
-	private function createStatement($build) {
-	
-		$debugQueryString = $this->replaceBindParameters($build['sql'], $build['params']);
-		
-//		Code is useful to find where a query was made.
-//		if(strpos($debugQueryString, "SELECT t.userId, t.secret, t.createdAt, t.userId AS `t.userId") === 0 ) {
-//			GO()->getDebugger()->debugCalledFrom();
-//		}
-		//App::get()->debug($debugQueryString, Debugger::TYPE_SQL);
+	public function createStatement($build) {
+		try {
+			$build['start'] = go()->getDebugger()->getTimeStamp();
+			$stmt = $this->getPDO()->prepare($build['sql']);
+			$stmt->setBuild($build);
 
-		$stmt = $this->getPDO()->prepare($build['sql']);
-		$stmt->debugQueryString = $debugQueryString;
-		foreach ($build['params'] as $p) {
-
-			if (isset($p['value']) && !is_scalar($p['value'])) {
-				throw new Exception("Invalid value " . var_export($p['value'], true));
+			foreach ($build['params'] as $p) {
+				if (isset($p['value']) && !is_scalar($p['value'])) {
+					throw new Exception("Invalid value " . var_export($p['value'], true));
+				}
+				$stmt->bindValue($p['paramTag'], $p['value'], $p['pdoType']);
 			}
-			$stmt->bindValue($p['paramTag'], $p['value'], $p['pdoType']);
+			return $stmt;
+		}catch(\PDOException $e) {
+			go()->error("Failed SQL: ". QueryBuilder::debugBuild($build));
+			throw $e;
 		}
-		return $stmt;
-	}
-
-	/**
-	 * Will replace all :paramName tags with the values. Used for debugging the SQL string.
-	 *
-	 * @param string $sql
-	 * @param string
-	 */
-	private function replaceBindParameters($sql, $bindParams) {
-		$binds = [];
-		foreach ($bindParams as $p) {
-			if (is_string($p['value']) && !mb_check_encoding($p['value'], 'utf8')) {
-				$queryValue = "[NON UTF8 VALUE]";
-			} else {
-				$queryValue = var_export($p['value'], true);
-			}
-			$binds[$p['paramTag']] = $queryValue;
-		}
-
-		//sort so $binds :param1 does not replace :param11 first.
-		krsort($binds);
-
-		foreach ($binds as $tag => $value) {
-			$sql = str_replace($tag, $value, $sql);
-		}
-
-		return $sql;
 	}
 }

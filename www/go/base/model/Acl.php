@@ -56,7 +56,7 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 	
 	protected function defaultAttributes() {
 		$attr = parent::defaultAttributes();
-		$attr['ownedBy'] = \go\modules\core\groups\model\Group::ID_ADMINS;
+		$attr['ownedBy'] = \go\core\model\Group::ID_ADMINS;
 		
 		return $attr;
 	}

@@ -3,6 +3,7 @@
 namespace go\modules\community\serverclient\model;
 
 use Exception;
+use go\core\http\Client;
 use GO\Email\Model\Account;
 
 class MailDomain {
@@ -12,31 +13,55 @@ class MailDomain {
 	
 	public function __construct($password) {
 		$this->password = $password;
-		$this->http = new HttpClient();
+		$this->http = new Client();
+	}
+
+	private function getBaseUrl($url) {
+		if(empty(\GO::config()->serverclient_server_url)){
+			\GO::config()->serverclient_server_url=\GO::config()->full_url;
+		}
+
+		if(empty(\GO::config()->serverclient_token)){
+			throw new \Exception("Could not connect to mailserver. Please set a strong password in /etc/groupoffice/globalconfig.inc.php.\n\nPlease remove serverclient_username and serverclient_password.\n\nPlease add:\n\n \$config['serverclient_token']='aStrongPasswordOfYourChoice';");
+		}
+
+		$url = \GO::config()->serverclient_server_url.'?r='.$url.'&serverclient_token='.\GO::config()->serverclient_token;
+
+		return $url;
 	}
 	
 	public function addMailbox($user, $domain) {
 		//strip domain from username if it's present.
 		$username = str_replace('@'.$domain, '', $user->username);
 
-		\GO::debug("SERVERCLIENT: Adding mailbox for " . $username . '@' . $domain);
 		
 		$alias = strpos($user->email,'@'.$domain) ? $user->email : '';
 
-		//domain is, for example "intermesh .dev ".
-		$response = $this->http->request("postfixadmin/mailbox/submit", array(
-			"r" => "postfixadmin/mailbox/submit",
+		$url = $this->getBaseUrl("postfixadmin/mailbox/submit");
+		$params = array(
 			"name" => $user->displayName,
 			"username" => $username,
 			"alias"=>$alias,
 			"password" => $this->password,
 			"password2" => $this->password,
 			"domain" => $domain
-		));
+		);
 
-		\GO::debug($response);
+		go()->debug($url);
+		go()->debug($params);
+		//domain is, for example "intermesh .dev ".
+		$response = $this->http->post($url, $params);
 
-		$result = json_decode($response);
+		go()->debug($response);
+
+		if($response['status'] != 200) {
+			throw new Exception("Unexpected HTTP status " .$response['status'] ." from ". $url);
+		}
+		$result = json_decode($response['body']);	
+
+		if(!$result) {
+			throw new Exception("Could not create mailbox on postfixadmin module. " . $response);
+		}
 
 		if (!$result->success)
 			throw new Exception("Could not create mailbox on postfixadmin module. " . $result->feedback);
@@ -45,21 +70,35 @@ class MailDomain {
 	
 	public function setMailboxPassword($user, $domain){
 		
-		\GO::debug("SERVERCLIENT: Updating password for mailbox ".$user->username.'@'.$domain);
+		go()->debug("SERVERCLIENT: Updating password for mailbox ".$user->username.'@'.$domain);
 		
 		$username = $user->username;
 		if(empty(\GO::config()->serverclient_dont_add_domain_to_imap_username))
 			$username.='@'.$domain;
 		
-		$response = $this->http->request("postfixadmin/mailbox/submit", array(
-			"r"=>"postfixadmin/mailbox/setPassword",
+		$url = $this->getBaseUrl("postfixadmin/mailbox/setPassword");
+
+		$params = array(			
 			"username"=>$username,
 			"password"=>$this->password,
-		));
-		
-		\GO::debug($response);
+		);
 
-		$result=json_decode($response);
+		go()->debug($url);
+		go()->debug($params);
+
+		$response = $this->http->post($url, $params);
+
+		go()->debug($response);
+		
+		if($response['status'] != 200) {
+			throw new Exception("Unexpected HTTP status " .$response['status'] ." from ". $url);
+		}
+
+		$result = json_decode($response['body']);
+
+		if(!$result) {
+			throw new Exception("Could not create mailbox on postfixadmin module. " . $response);
+		}
 
 		if(!$result->success)
 			throw new Exception("Could not set mailbox password on postfixadmin module. ".$result->feedback);
@@ -83,7 +122,7 @@ class MailDomain {
 			return;
 		}
 		
-		\GO::debug("SERVERCLIENT: Adding e-mail account for ".$user->username.'@'.$domain);
+		go()->debug("SERVERCLIENT: Adding e-mail account for ".$user->username.'@'.$domain);
 
 		$account = new Account();
 		$account->user_id = $user->id;

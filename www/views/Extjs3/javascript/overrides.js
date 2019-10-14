@@ -13,6 +13,10 @@
 
 /**
  * Density Independend pixel calculation
+ * 
+ * This function returns precise numbers. When using with ext it's sometimes 
+ * necessary to round them. For example in HBox and VBox layouts.
+ * 
  * @type Number
  */
 GO.util.density = 160; // set in Theme
@@ -40,8 +44,9 @@ function dp(size) {
 })();
 
 
+
 (function() {
-	
+
 	var componentInitComponent = Ext.Component.prototype.initComponent;
 
 	Ext.override(Ext.Component, {  
@@ -57,7 +62,7 @@ function dp(size) {
 		
 		initEntityStore : function() {
 			if(Ext.isString(this.entityStore)) {
-				this.entityStore = go.Stores.get(this.entityStore);
+				this.entityStore = go.Db.store(this.entityStore);
 				if(!this.entityStore) {
 					throw "Invalid 'entityStore' property given to component"; 
 				}
@@ -112,27 +117,171 @@ Ext.override(Ext.form.TextArea,{
 		this.el.focus();
 		text_field.setSelectionRange(endPos+v.length, endPos+v.length);
 	},
-	growMin : dp(32)
+	growMin : dp(48),
+	height: dp(48)
 });
+
+Ext.override(Ext.form.TextField,{
+	
+	//Added check for ENTER key. Becuase this code prevented form submission
+	filterKeys : function(e){
+
+		if(e.ctrlKey){
+				return;
+		}
+		var k = e.getKey();
+
+		if(k == e.ENTER) {
+			return;
+		}
+
+		if(Ext.isGecko && (e.isNavKeyPress() || k == e.BACKSPACE || (k == e.DELETE && e.button == -1))){
+				return;
+		}
+		var cc = String.fromCharCode(e.getCharCode());
+		if(!Ext.isGecko && e.isSpecialKey() && !cc){
+				return;
+		}
+		if(!this.maskRe.test(cc)){
+				e.stopEvent();
+		}
+	}
+
+});
+
+
 
 Ext.override(Ext.form.BasicForm,{
 	submit : function(options){
-        options = options || {};
-        if(this.standardSubmit){
-            var v = options.clientValidation === false || this.isValid();
-            if(v){
-                var el = this.el.dom;
-                if(this.url){
-                    el.action = this.url;
-                }
-                el.submit();
-            }
-            return v;
-        }
-        var submitAction = String.format('{0}submit', this.api ? 'direct' : '');
-        this.doAction(submitAction, options);
-        return this;
-    }
+			options = options || {};
+			if(this.standardSubmit){
+					var v = options.clientValidation === false || this.isValid();
+					if(v){
+							var el = this.el.dom;
+							if(this.url){
+									el.action = this.url;
+							}
+							el.submit();
+					}
+					return v;
+			}
+			var submitAction = String.format('{0}submit', this.api ? 'direct' : '');
+			this.doAction(submitAction, options);
+			return this;
+	},
+	
+	setValuesOrig: Ext.form.BasicForm.prototype.setValues,
+	/**
+	 * Retrieves the fields in the form as a set of key/value pairs, using the {@link Ext.form.Field#getValue getValue()} method.
+	 * If multiple fields exist with the same name they are returned as an array.
+	 * 
+	 * Use submit: false on fields you don't wish to include here.
+	 * 
+	 * @param {Boolean} dirtyOnly (optional) True to return only fields that are dirty.
+	 * @return {Object} The values in the form
+	 */
+	getFieldValues: function (dirtyOnly) {
+		var o = {},
+						n,
+						key,
+						val,
+						me = this;
+
+		var fn = function (f) {
+			if (dirtyOnly !== true || f.isDirty()) {
+			
+				if (f.getXType() == 'compositefield' || f.getXType() == 'checkboxgroup') {
+					f.items.each(fn);
+					return true;
+				}
+
+				if(f.submit === false || f.disabled === true) {
+					return true;
+				}
+
+				n = f.getName();
+				key = o[n];
+				if (f.getXType() == 'numberfield') {
+					var oldServerFormats = f.serverFormats;
+					f.serverFormats = false; // this will post number as number
+					val = f.getValue();
+					f.serverFormats = oldServerFormats;
+				} else {
+					val = f.getValue();
+				} 
+				
+				
+				if(Ext.isDate(val)) {
+					val = val.serialize();
+				}				
+
+				if (Ext.isDefined(key)) {
+					if (Ext.isArray(key)) {
+						o[n].push(val);
+					} else {
+						o[n] = [key, val];
+					}
+				} else {
+					o[n] = val;
+				}
+			}
+		};
+		
+		this.items.each(fn);
+  
+
+		var keys, converted = {}, currentJSONlevel;
+
+		for (var key in o) {
+
+			keys = key.split('.');
+
+			currentJSONlevel = converted;
+
+			for (var i = 0; i < keys.length; i++) {
+				if (i === (keys.length - 1)) {
+					currentJSONlevel[keys[i]] = o[key];
+				} else
+				{
+					currentJSONlevel[keys[i]] = currentJSONlevel[keys[i]] || {};
+					currentJSONlevel = currentJSONlevel[keys[i]];
+				}
+			}
+
+		}
+				
+		return converted;
+	},
+	
+	setValues: function (values) {		
+		values = this.joinValues(values);		
+	  return this.setValuesOrig(values);		
+	},
+	
+	joinValues : function(root, v, prefix) {
+		if(!Ext.isDefined(v)) {
+			v = root;
+		}
+		if(!Ext.isObject(v) || Ext.isDate(v[name])){
+			return v;
+		}
+
+		if(!prefix) {
+			prefix = "";
+		}
+
+		for(var name in v) {
+			root[prefix + name] = this.joinValues(root, Ext.isDefined(v[name]) ? v[name] : null, prefix + name + ".");		
+		}		
+		return v;		
+	}
+
+});
+
+Ext.override(Ext.grid.ColumnModel,{
+	getOrgColumnHeader:function(b){
+		return this.config[b].orgHeader||this.config[b].header;
+	}	
 });
 
 Ext.override(Ext.grid.Column,{
@@ -145,6 +294,22 @@ Ext.override(Ext.grid.Column,{
 });
 
 Ext.override(Ext.form.TriggerField,{
+	
+	origUpdateEditState : Ext.form.TriggerField.prototype.updateEditState,
+	
+	updateEditState: function(){
+		
+		this.origUpdateEditState();
+		
+		if(this.rendered){
+			if(!this.readOnly && !this.editable) {
+				this.el.addClass('x-triggerfield-selectonly');
+			} else {
+				this.el.removeClass('x-triggerfield-selectonly');
+			}
+		}
+	},
+	
 	 onRender : function(ct, position){
         this.doc = Ext.isIE ? Ext.getBody() : Ext.getDoc();
         Ext.form.TriggerField.superclass.onRender.call(this, ct, position);
@@ -204,6 +369,20 @@ Ext.override(Ext.data.GroupingStore,{
 });
 
 
+Ext.override(Ext.form.CompositeField, {
+	origFocus : Ext.form.CompositeField.prototype.focus,
+	focus : function() {
+		var first = this.items.find(function(item) {
+			return item.isFormField && !item.disabled && item.isVisible();
+		});
+		if(first) {
+			first.focus();
+		} else {
+			this.origFocus();
+		}
+	}
+});
+
 /*testing
 Ext.TaskMgr.start({
 	run: function(){
@@ -235,15 +414,52 @@ Ext.override(Ext.FormPanel,{
 			}
 		});
 	}),
+	
+	origFocus : Ext.FormPanel.prototype.focus,
 	focus : function() {
-		var firstField = this.getForm().items.find(function (item) {
-			if (!item.disabled && item.isVisible() && item.getValue() == "")
-				return true;
-		});
+		var focFn = function() {
+			if(!GO.util.isMobileOrTablet()) {
+				var firstField = this.getForm().items.find(function (item) {
+					if (!item.disabled && item.isVisible())
+						return true;
+				});
 
-		if (firstField) {
-			firstField.focus();
-		}
+
+				//Don't focus on an invalid field or it will loose the invalide state on blur
+				if(firstField && !firstField.activeError) {// && firstField.isValid && firstField.isValid()) {
+					firstField.focus();
+					return;
+				} 
+			}
+
+			this.origFocus();
+		};
+		
+		focFn.defer(200, this);
+		
+	},
+	
+	// prevents adding form fields that are part of custom form field components like the combobox of go.form.Chips for example.
+	processAdd : function(c){
+			if(this.isField(c)){
+					this.form.add(c);
+
+			}else if(c.findBy){
+					this.applySettings(c);
+					this.form.add.apply(this.form, this.findFieldsInComponent(c));
+			}
+	},
+	
+	findFieldsInComponent : function(comp) {
+		var m = [];
+		comp.cascade(function(c){
+				if(this.isField(c)) {
+						m.push(c);
+						//don't cascade into form fields.
+						return (c.getXType() == 'compositefield' || c.getXType() == 'checkboxgroup' || c.getXType() == "radiogroup"); //don't cascade into form fields
+				}
+		}, this);
+		return m;
 	}
 });
 
@@ -397,6 +613,7 @@ var noBoxAdjust = Ext.isStrict ? {
 } : {
     input:1, select:1, textarea:1
 };
+Ext.isBorderBox = true;
 Ext.override(Ext.Element, {
 	/**
      * @cfg {string} printCSS The file path of a CSS file for printout.
@@ -429,8 +646,8 @@ Ext.override(Ext.Element, {
 		Ext.apply(this, config);
         
 		var el = Ext.get(this.id).dom;
-		var c = document.getElementById('printcontainer');
-		var iFrame = document.getElementById('printframe');
+		// var c = document.getElementById('printcontainer');
+		// var iFrame = document.getElementById('printframe');
         
 		var strTemplate = '<HTML><HEAD>{0}<TITLE>{1}</TITLE></HEAD><BODY onload="{2}" style="background-color:white;"><div style="position:fixed; top:0; left:0; right:0; bottom:0; z-index:99;"></div>{3}</BODY></HTML>';
 		var strAttr = '';
@@ -439,8 +656,8 @@ Ext.override(Ext.Element, {
         
 		//Get rid of the old crap so we don't copy it
 		//to our iframe
-		if (iFrame != null) c.removeChild(iFrame);
-		if (c != null) el.removeChild(c);
+		// if (iFrame != null) c.removeChild(iFrame);
+		// if (c != null) el.removeChild(c);
         
 		//Copy attributes from this element.
 		for (var i = 0; i < el.attributes.length; i++) {
@@ -487,7 +704,11 @@ Ext.override(Ext.Component, {
 	printBody: function(config) {
 		this.body.print(Ext.isEmpty(config)? this.initialConfig: config);
 	}
-}); 
+});
+
+Ext.override(Ext.Container, {
+	bufferResize: 500
+});
 
 
 Ext.encode = Ext.util.JSON.encode = function(json){
@@ -512,7 +733,7 @@ Ext.decode = Ext.util.JSON.decode = function(jsonStr){
 	catch (e)
 	{
 
-		switch(json.trim())
+		switch(jsonStr.trim())
 		{
 			case 'NOTLOGGEDIN':
 				//document.location=BaseHref;
@@ -523,8 +744,9 @@ Ext.decode = Ext.util.JSON.decode = function(jsonStr){
 			break;
 
 			default:	
-				json += '<br /><br />Ext.decode exception occurred';
-				GO.errorDialog.show(t("An error occurred on the webserver. Contact your system administrator and supply the detailed error.")+'<br /><br />'+jsonStr);
+				console.error(jsonStr);
+				jsonStr += '<br /><br />Ext.decode exception occurred';
+				GO.errorDialog.show(t("An error occurred on the webserver. Contact your system administrator and supply the detailed error from the server log."));
 				break;
 		}
 	}
@@ -572,11 +794,11 @@ Ext.override(Ext.grid.GridView,{
             };
             
 						//disable padding right in GO theme because it looks ugly
-            if (GO.settings.theme!='Group-Office' && colModel.config[i].align == 'right') {
-                properties.istyle = 'padding-right: 16px;';
-            } else {
+            // if (GO.settings.theme!='Group-Office' && colModel.config[i].align == 'right') {
+            //     properties.istyle = 'padding-right: 16px;';
+            // } else {
                 delete properties.istyle;
-            }
+            // }
             
             cells[i] = headerTpl.apply(properties);
         }
@@ -695,20 +917,44 @@ Ext.override(Ext.layout.ToolbarLayout ,{
 	}
 );
 
+Ext.override(Ext.menu.Item ,{
+	getTemplateArgs: function() {
+        return {
+            id: this.id,
+            cls: this.itemCls + (this.menu ?  ' x-menu-item-arrow' : '') + (this.cls ?  ' ' + this.cls : ''),
+            href: this.href || '#',
+            hrefTarget: this.hrefTarget,
+            icon: this.icon || Ext.BLANK_IMAGE_URL,
+            iconCls: this.iconCls || '',
+            text: this.itemText||this.text||'&#160;',
+            altText: this.altText || '',
+            iconStyle: this.iconStyle || ''
+        };
+    },
+		origOnRender: Ext.menu.Item.prototype.onRender,
+		onRender : function(container, position){
+			this.origOnRender.call(this, container, position);
+		
+			//tpl has been overridden and there's no img tag anymore. Without this setIconCls doesn't work.
+			this.iconEl = this.iconEl = this.el.child('span.x-menu-item-icon');
+		}		
+		
+ });
+
 Ext.menu.Item.prototype.itemTpl = new Ext.XTemplate(
 	'<a id="{id}" class="{cls} x-unselectable" hidefocus="true" unselectable="on" href="{href}"',
 		 '<tpl if="hrefTarget">',
 			  ' target="{hrefTarget}"',
 		 '</tpl>',
 	 '>',
-		  '<span class="x-menu-item-icon {iconCls}"></span>',
-		  '<span class="x-menu-item-text">{text}</span>',
+		  '<span style="{iconStyle}" class="x-menu-item-icon {iconCls}"></span>',
+		  '<span class="x-menu-item-text">{text:raw}</span>',
 	 '</a>'
 );
 Ext.layout.MenuLayout.prototype.itemTpl = new Ext.XTemplate(
 	'<li id="{itemId}" class="{itemCls}">',
 		 '<tpl if="needsIcon">',
-			  '<span class="{iconCls}"><tpl if="icon"><img alt="{altText}" src="{icon}" /></tpl></span>',
+			  '<span style="{iconStyle}" class="{iconCls}"><tpl if="icon"><img alt="{altText}" src="{icon}" /></tpl></span>',
 		 '</tpl>',
 	'</li>'
 );
@@ -717,6 +963,16 @@ Ext.layout.MenuLayout.prototype.itemTpl = new Ext.XTemplate(
 //Ext.override(Ext.data.Field, {
 //	dateFormat: "c" //from server
 //});
+
+Ext.override(Ext.DatePicker, {
+	origHandleMouseWheel : Ext.DatePicker.prototype.handleMouseWheel,
+	handleMouseWheel: function(e) {
+		e.stopEvent();
+		if(!Ext.isMac) {
+			this.origHandleMouseWheel(e);
+		}
+	}
+});
 
 Ext.override(Ext.Panel, {
 	panelInitComponent : Ext.Panel.prototype.initComponent,
@@ -728,7 +984,15 @@ Ext.override(Ext.Panel, {
 		}
 		
 		this.panelInitComponent.call(this);
+	},
+	
+	stateEvents: ['collapse', 'expand'],
+	getState: function () {
+		return {
+			collapsed: this.collapsed
+		};
 	}
+
 });
 
 Ext.override(Ext.form.Field, {
@@ -750,7 +1014,7 @@ Ext.override(Ext.form.Field, {
 		if(this.rendered){
 			this.label.update(label+':');
 		} else {
-			this.label = label;
+			this.fieldLabel = label;
 		}
 	}		
 });
@@ -765,6 +1029,66 @@ Ext.util.Format.dateRenderer = function(format) {
 Ext.override(Ext.form.CompositeField, {
 	submit: false //don't submit with form.getFieldValue()
 });
+
+Ext.override(Ext.form.DisplayField, {
+	submit: false //don't submit with form.getFieldValue()
+});
+
+Ext.override(Ext.form.DateField, {
+	getValue : function(){
+        return this.parseDate(Ext.form.DateField.superclass.getValue.call(this)) || null;
+    }
+});
+
+Ext.override(Ext.TabPanel, {
+	
+	origHideTabStripItem: Ext.TabPanel.prototype.hideTabStripItem,
+	origUnhideTabStripItem: Ext.TabPanel.prototype.unhideTabStripItem,
+	
+	hideTabStripItem : function(item){
+		if(!this.rendered) {
+			this.on('afterrender', function() {
+				this.origHideTabStripItem(item);
+			}, this, {single: true});
+		} else
+		{
+			this.origHideTabStripItem(item);
+		}
+	},
+
+
+	unhideTabStripItem : function(item){
+		if(!this.rendered) {
+			this.on('afterrender', function() {
+				this.origUnhideTabStripItem(item);
+			}, this, {single: true});
+		} else
+		{
+			this.origUnhideTabStripItem(item);
+		}
+	},
+});
+
 Ext.override(Ext.KeyNav, {
 	forceKeyDown: true // Required for Firefox 67	
+});
+
+
+//USed by old gridpanel deleteselected to keep scroll position
+// Also used by scrollloader in new framework
+Ext.override(Ext.grid.GridView, {
+	scrollToTopOnLoad: true,
+	onLoad : function(){
+			if (this.scrollToTopOnLoad){
+				if (Ext.isGecko) {
+						if (!this.scrollToTopTask) {
+								this.scrollToTopTask = new Ext.util.DelayedTask(this.scrollToTop, this);
+						}
+						this.scrollToTopTask.delay(1);
+				} else {
+						this.scrollToTop();
+				}
+			}
+			this.scrollToTopOnLoad=true;
+	}
 });

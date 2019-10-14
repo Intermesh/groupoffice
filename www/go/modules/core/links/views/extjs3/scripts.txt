@@ -1,3 +1,0 @@
-Module.js
-LinkBrowserMenuItem.js
-CreateLinkButton.js

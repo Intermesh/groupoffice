@@ -17,7 +17,7 @@ abstract class AbstractView{
 			return;
 		
 		//iframe hack for file uploads fails with application/json				
-		if(!GO::request()->isJson()){
+		if(!\GO\Base\Util\Http::isAjaxRequest(false) || \GO\Base\Util\Http::isMultipartRequest()){
 			header('Content-Type: text/html; charset=UTF-8');
 		}else
 		{

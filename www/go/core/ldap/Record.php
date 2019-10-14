@@ -89,11 +89,11 @@ class Record {
 	 * @param \go\core\ldap\Connection $connection
 	 * @param string $dn
 	 * @param string $query
-	 * @return \go\core\ldap\Result
+	 * @return static[]
 	 */
 	public static function find(Connection $connection, $dn, $query) {
 		
-		GO()->debug('Find DN: "'.$dn.'", Query: "' . $query . '"');
+		go()->debug('Find DN: "'.$dn.'", Query: "' . $query . '"');
 		
 		$searchId = ldap_search($connection->getLink(), $dn, $query);
 		
@@ -116,7 +116,7 @@ class Record {
 	public function __get($name) {
 		$this->getAttributes();
 		$name = strtolower($name);
-		return $this->attributes[$name];
+		return $this->attributes[$name] ?? null;
 	}
 
 	public function __isset($name) {

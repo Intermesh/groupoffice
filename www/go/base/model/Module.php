@@ -46,6 +46,22 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		return parent::model($className);
 	}
 	
+	protected function nextSortOrder() {
+		$query = new \go\core\db\Query();			
+		$query->from("core_module");
+
+		if($this->package == "core") {
+			$query->selectSingleValue("COALESCE(MAX(sort_order), 0) + 1")
+				->where(['package' => "core"]);
+		} else
+		{
+			$query->selectSingleValue("COALESCE(MAX(sort_order), 100) + 1")
+				->where('package', '!=', "core");
+		}
+
+		return $query->single();
+	}
+	
 	/**
 	 * Install's a module with all it's dependencies
 	 * 
@@ -108,7 +124,12 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	protected function getPath(){
 		
 		if(!empty($this->package)) {
-			return \GO::config()->root_path . 'go/modules/'.$this->package. '/' . $this->name . '/';
+			if($this->package == "core") {
+				return \GO::config()->root_path . 'go/core/';
+			} else
+			{
+				return \GO::config()->root_path . 'go/modules/'.$this->package. '/' . $this->name . '/';
+			}
 		} else {		
 			return \GO::config()->root_path . 'modules/' . $this->name . '/';
 		}
@@ -119,7 +140,9 @@ class Module extends \GO\Base\Db\ActiveRecord {
 			
 			if(!isset($this->package)) {
 				$this->_moduleManager = \GO\Base\Module::findByModuleName ($this->name);
-			} else {
+			} else if($this->package == "core" && $this->name == "core") {
+				$this->_moduleManager = \go\core\App::get();
+			}else{
 				$cls = "go\\modules\\" . $this->package ."\\" . $this->name . "\\Module";
 				$this->_moduleManager = new $cls;
 			}
@@ -225,7 +248,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		$modules = \GO::modules()->getAllModules(true);
 		foreach ($modules as $module) {
 			
-			if($module->moduleManager instanceof \go\core\module\Base) {
+			if($module->moduleManager instanceof \go\core\Module) {
 				continue;
 			}
 			
@@ -283,11 +306,11 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		return is_dir($this->getPath());
 	}
 	
-	public function isAllowed(){
+	public function isAllowed() {
 		if(empty(\GO::config()->allowed_modules)) {
 			return true;
 		}
-		$allowedModules=explode(',', \GO::config()->allowed_modules);		
+		$allowedModules = explode(',', \GO::config()->allowed_modules);		
 		$allowedModules = array_merge($allowedModules, ['core', 'links', 'search', 'users', 'modules', 'groups', 'customfields']);
 		
 		return in_array($this->name, $allowedModules);

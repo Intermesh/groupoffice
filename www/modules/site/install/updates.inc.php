@@ -35,3 +35,15 @@ $updates['201610281650'][] = 'ALTER TABLE `cf_site_sites` ENGINE=InnoDB;';
 $updates['201610281650'][] = 'ALTER TABLE `cf_site_sites` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;';
 
 $updates['201610281659'][] = 'SET foreign_key_checks = 1;';
+
+
+$updates['201810161450'][] = "ALTER TABLE `cf_site_content` CHANGE `model_id` `id` INT(11) NOT NULL;";
+$updates['201810161450'][] = "RENAME TABLE `cf_site_content` TO `site_content_custom_fields`;";
+$updates['201810161450'][] = "delete from site_content_custom_fields where id not in (select id from site_content);";
+$updates['201810161450'][] = "ALTER TABLE `site_content_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `site_content`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
+
+$updates['201810161450'][] = "ALTER TABLE `cf_site_sites` CHANGE `model_id` `id` INT(11) NOT NULL;";
+$updates['201810161450'][] = "RENAME TABLE `cf_site_sites` TO `site_sites_custom_fields`;";
+$updates['201810161450'][] = "delete from site_sites_custom_fields where id not in (select id from site_sites);";
+$updates['201810161450'][] = "ALTER TABLE `site_sites_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `site_sites`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";

@@ -25,18 +25,24 @@ GO.email.PortletPanel = Ext.extend(Ext.Panel, {
 			remoteSort: true
 		});
 		
-		this.messageStore = new GO.data.JsonStore({
-			url:GO.url('email/message/store'),
-//			baseParams: {
-//				task: 'messages'
-//			},
+		this.messageStore = new GO.data.GroupingStore({
+			url: GO.url("email/message/store"),
 			root: 'results',
 			totalProperty: 'total',
-			id: 'uid',
-			fields:['uid','icon','flagged','attachments','seen','subject','from','sender','size','udate','internal_udate','x_priority','answered','forwarded','arrival','arrival_time','date_time','labels'],
-			remoteSort: true
+			remoteSort: true,
+			reader: new Ext.data.JsonReader({
+				root: 'results',
+				totalProperty: 'total',
+				fields:['uid','icon','deleted','flagged','labels','has_attachments','seen','subject','from','to','sender','size','udate','internal_udate', 'x_priority','answered','forwarded','account_id','mailbox','mailboxname'],
+				id: 'uid'
+			}),
+			sortInfo: {
+				field: 'udate',
+				direction: 'DESC'
+			},
+			groupField: 'udate'
 		});
-		
+
 		this.messagesGrid = new GO.email.MessagesGrid({
 			id:'emp-messagesgrid',
 			store:this.messageStore,

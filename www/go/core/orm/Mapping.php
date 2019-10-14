@@ -6,26 +6,45 @@ use go\core\db\Column;
 use go\core\db\Query;
 use ReflectionClass;
 
-class Mapping {
+/**
+ * Mapping object 
+ * 
+ * It maps tables to objects properties.
+ * The mapping object is cached. So when you make changes you need to run /install/upgrade.php
+ */
+class Mapping {	
 	
-	
-	
+	/**
+	 * Property class name this mapping is for
+	 * 
+	 * @var string 
+	 */
 	private $for;
 
 	/**
 	 *
 	 * @var MappedTable[] 
 	 */
-	private $tables = [];
-	
+	private $tables = [];	
 	
 	private $relations = [];
 	
-//	private $selectAliases = [];
-	
-	
 	private $query;
+
+	/**
+	 * Mapping has a table per user. 
+	 * 
+	 * @see addUserTable();
+	 * 
+	 * @bool
+	 */
+	public $hasUserTable = false;
 	
+	/**
+	 * Constructor
+	 * 
+	 * @param string $for Property class name this mapping is for
+	 */
 	public function __construct($for) {
 		$this->for = $for;
 	}
@@ -44,13 +63,47 @@ class Mapping {
 	 * @params array $constantValues If the table that is joined needs to have 
 	 *   constant values. For example the keys are ['folderId' => 'folderId'] but 
 	 *   the joined table always needs to have a value 
-	 *   ['userId' => GO()->getUserId()] then you can set it with this parameter.
+	 *   ['type' => "foo"] then you can set it with this parameter.
 	 * @return $this
 	 */
-	public function addTable($name, $alias = 't', array $keys = null, array $columns = null, array $constantValues = []) {
+	public function addTable($name, $alias = null, array $keys = null, array $columns = null, array $constantValues = []) {
+		
+		if(!$alias) {
+			$alias = $name;
+		}
 		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
 		return $this;
 	}	
+	
+	/**
+	 * Add a user table to the model
+	 * 
+	 * A user table will be joined with AND userId = <CURRENTUSER>
+	 * 
+	 * A user table must have an userId (int) and modSeq (int) column.
+	 * 
+	 * The modSeq value will be used in the Entity::getState().
+	 * 
+	 * @param string $name
+	 * @param string $alias
+	 * @param string[] $keys
+	 * @param string[] $columns
+	 * @param string[] $constantValues
+	 */
+	public function addUserTable($name, $alias, array $keys = null, array $columns = null, array $constantValues = []) {
+		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
+		$this->tables[$name]->isUserTable = true;
+		$this->hasUserTable = true;
+		if(!\go\core\db\Table::getInstance($name)->getColumn('modSeq')) {
+			throw new \Exception("The table ".$name." must have a 'modSeq' column of type INT");
+		}
+		
+		if(!\go\core\db\Table::getInstance($name)->getColumn('userId')) {
+			throw new \Exception("The table ".$name." must have a 'userId' column of type INT");
+		}
+		
+		return $this;
+	}
 	
 	private function buildColumns() {
 		$reflectionClass = new ReflectionClass($this->for);
@@ -58,12 +111,13 @@ class Mapping {
 		$props = [];
 		foreach ($rProps as $prop) {
 			$props[] = $prop->getName();
-		}
+		}		
 		
 		return $props;
 	}
 
 	/**
+	 * Get all mapped tables
 	 * 
 	 * @return MappedTable[]
 	 */
@@ -72,6 +126,7 @@ class Mapping {
 	}	
 	
 	/**
+	 * Get the table by name
 	 * 
 	 * @param string $name
 	 * @return MappedTable
@@ -79,21 +134,101 @@ class Mapping {
 	public function getTable($name) {
 		return $this->tables[$name];
 	}	
-	
+
 	/**
+	 * Check if this mapping has the given table or one of it's property relations has it.
 	 * 
-	 * @param type $name
-	 * @param type $entityName
-	 * @param array $keys
-	 * @param type $many
-	 * @return $this
+	 * @return bool|string[] path
 	 */
-	public function addRelation($name, $entityName, array $keys, $many = true) {
-		$this->relations[$name] = new Relation($name, $entityName, $keys, $many);
+	public function hasTable($name, $path = [], &$paths = []) {
+		
+		if(isset($this->tables[$name])) {
+			$paths[] = $path;
+		}
+
+		foreach($this->getRelations() as $r) {
+			if(!isset($r->entityName)) {
+				//for scalar
+				if($r->tableName == $name) {
+					$paths[] = array_merge($path, [$r->name]);
+				}
+				continue;
+			}
+			$cls = $r->entityName;
+			$cls::getMapping()->hasTable($name, array_merge($path, [$r->name]), $paths);			
+		}
+
+		return $paths;
+	}
+
+	/**
+	 * Add has one relation
+	 * 
+	 * @param string $name
+	 * @param string $entityName
+	 * @param array $keys
+	 * @param bool $autoCreate If not found then automatically create an empty object
+	 * 
+	 * @return $this;
+	 */
+	public function addHasOne($name, $entityName, array $keys, $autoCreate = false) {
+		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_HAS_ONE);
+		$this->relations[$name]->setEntityName($entityName);
+		$this->relations[$name]->autoCreate = $autoCreate;
+		return $this;
+	}
+
+	/**
+	 * Add an array relation.
+	 * 
+	 * @param string $name
+	 * @param string $entityName
+	 * @param array $keys
+	 * 
+	 * @return $this;
+	 */
+	public function addArray($name, $entityName, array $keys) {
+		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_ARRAY);
+		$this->relations[$name]->setEntityName($entityName);
+		return $this;
+	}
+
+	/**
+	 * Add a mapped relation. Index is the ID.
+	 * 
+	 * @param string $name
+	 * @param string $entityName
+	 * @param array $keys
+	 * 
+	 * @return $this;
+	 */
+	public function addMap($name, $entityName, array $keys) {
+		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_MAP);
+		$this->relations[$name]->setEntityName($entityName);
+		return $this;
+	}
+
+	/**
+	 * Add a scalar relation. For example an array of ID's.
+	 * 
+	 * Note: When an entity with scalar relations is saved it automatically looks for other entities referencing the same scalar relation for trracking changes.
+	 * 
+	 * eg. When a group's users[] change. It will mark all users as changed too because they have a scalar groups[] property.
+	 * 
+	 * @param string $name
+	 * @param string $tableName
+	 * @param array $keys
+	 * 
+	 * @return $this;
+	 */
+	public function addScalar($name, $tableName, array $keys) {
+		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_SCALAR);
+		$this->relations[$name]->setTableName($tableName);
 		return $this;
 	}
 	
 	/**
+	 * Get all relational properties
 	 * 
 	 * @return Relation[]
 	 */
@@ -102,8 +237,9 @@ class Mapping {
 	}
 	
 	/**
+	 * Get a relational property by name.
 	 * 
-	 * @param stgring $name
+	 * @param string $name
 	 * @return Relation|boolean
 	 */
 	public function getRelation($name) {
@@ -143,8 +279,10 @@ class Mapping {
 	}
 	
 	/**
+	 * Get a column by property name. Returns false if not found in any of the 
+	 * mapped tables.
 	 * 
-	 * @param type $propName
+	 * @param string $propName
 	 * @return boolean|Column
 	 */
 	public function getColumn($propName) {
@@ -158,13 +296,21 @@ class Mapping {
 		return false;
 	}
 	
+	/**
+	 * Check if a property name is mapped
+	 * 
+	 * @param string $name
+	 * @return boolean
+	 */
 	public function hasProperty($name) {
 		return $this->getRelation($name) != false || $this->getColumn($name) != false;
 	}
 	
 	/**
+	 * Get all mapped property objects in a key value array. This is a mix of columns 
+	 * and relations.
 	 * 
-	 * @return array
+	 * @return Column | Relation
 	 */
 	public function getProperties() {
 		$props = [];

@@ -36,7 +36,7 @@ GO.form.SelectUser = function(config){
 			root: 'results',
 			totalProperty: 'total',
 			id: 'id',
-			fields:['id','name','email','username','company','first_name', 'middle_name', 'last_name', 'address', 'address_no', 'zip', 'city', 'state', 'country','cf'],
+			fields:['id','name','email','username', 'displayName', 'avatarId', 'company','first_name', 'middle_name', 'last_name', 'address', 'address_no', 'zip', 'city', 'state', 'country','cf'],
 			remoteSort: true
 		});
 		this.store.setDefaultSort('name', 'asc');
@@ -62,6 +62,19 @@ GO.form.SelectUser = function(config){
 		this.setRemoteValue(GO.settings.user_id, GO.settings.displayName);
 		this.value=GO.settings.user_id;
 	}
+
+	this.tpl = new Ext.XTemplate(
+			'<tpl for=".">',
+			'<div class="x-combo-list-item"><div class="user">\
+				 <tpl if="!avatarId"><div class="avatar"></div></tpl>\\n\
+				 <tpl if="avatarId"><div class="avatar" style="background-image:url({[go.Jmap.downloadUrl(values.avatarId)]})"></div></tpl>\
+				 <div class="wrap">\
+					 <div>{displayName}</div><small style="color:#333;">{username}</small>\
+				 </div>\
+			 </div></div>',
+			'</tpl>'
+		 );
+
 }
 
 Ext.extend(GO.form.SelectUser, GO.form.ComboBoxReset,{

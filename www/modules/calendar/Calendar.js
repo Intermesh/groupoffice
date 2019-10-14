@@ -255,6 +255,12 @@ GO.calendar.MainPanel = function(config){
 		})
 	});
 
+	this.calendarList.getBottomToolbar().add('->');
+	this.calendarList.getBottomToolbar().add({
+		xtype: 'tbsearch',
+		store: this.calendarsStore
+	});
+
 	this.viewsList = new GO.grid.GridPanel({
 		border: false,
 		layout:'fit',
@@ -831,7 +837,15 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 	group_id: 1,
 	
 	route : function(id, entity) {
-		GO.calendar.showEventDialog({event_id: id});
+		GO.calendar.showEventDialog({event_id: id}).on("load", function(dlg) {
+			var date = dlg.startDate.getValue();
+
+			GO.mainLayout.getModulePanel('calendar').show();
+			GO.mainLayout.getModulePanel('calendar').setDisplay({
+				date: date
+			});
+
+		}, this, {single: true});
 	},
 	
 	setCalendarInfo: function(title, comment) {
@@ -999,7 +1013,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			if(this.state.displayType=='view')
 				this.state.displayType='days';
 
-			if(GO.util.empty(this.state.calendars)) {
+			if(go.util.empty(this.state.calendars)) {
 				this.state.calendars=[GO.calendar.defaultCalendar.id];
 			}
 			
@@ -1973,19 +1987,16 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 				scope:this
 			},'-']
 
-			if(go.Modules.isAvailable("core", "customfields"))
-			{
-				tbar.push(new Ext.Button({
-					iconCls: 'ic-settings',
-					disabled: !GO.settings.modules.calendar.write_permission,
-					text: t("Custom fields", "customfields"),
-					handler: function()
-					{
-						GO.calendar.groupDialog.show(1);
-					},
-					scope: this
-				}));
-			}
+			tbar.push(new Ext.Button({
+				iconCls: 'ic-settings',
+				disabled: !GO.settings.modules.calendar.write_permission,
+				text: t("Custom fields", "customfields"),
+				handler: function()
+				{
+					GO.calendar.groupDialog.show(1);
+				},
+				scope: this
+			}));
 
 			tbar.push('->');
 			tbar.push(new go.toolbar.SearchButton({
@@ -2183,17 +2194,52 @@ go.Modules.register("legacy", 'calendar', {
 	title : t("Calendar", "calendar"),
 	iconCls : 'go-tab-icon-calendar',
 	entities: [{
-			name: "Event",			
-			linkWindow: function() {
-				// var win = new GO.calendar.EventDialog();
-				// win.win.closeAction = "close";
-				// return win;
+			name: "Event",
+			
+			links: [{
+				iconCls: 'entity Event orange',
 
-				return GO.calendar.showEventDialog();
-			},
-			linkDetail: function() {
-				return new GO.calendar.EventPanel();
-			}	
+				linkWindow: function() {
+					return GO.calendar.showEventDialog();
+				},
+				linkDetail: function() {
+					return new GO.calendar.EventPanel();
+				},
+				linkDetailCards: function() {
+					var forth = new go.links.DetailPanel({
+						link: {
+							title: t("Forthcoming events"),
+							iconCls: 'icon ic-event orange',
+							entity: "Event",
+							filter: null
+						}
+					});
+
+					forth.store.setFilter('forthcomming', {forthComingEvents: true});
+
+					var past = new go.links.DetailPanel({						
+						link: {
+							title: t("Past events"),
+							iconCls: 'icon ic-event orange',
+							entity: "Event",
+							filter: null
+						}
+					});
+
+					past.store.setFilter('past', {pastEvents: true});
+
+					return [forth, past];
+				}				
+		}],
+		customFields: {
+			fieldSetDialog: "GO.calendar.CustomFieldSetDialog"
+		}
+	}, {
+		name: "Calendar",
+		customFields: {
+			fieldSetDialog: "GO.calendar.CustomFieldSetDialog"
+		}
+		
 	}],
 	userSettingsPanels: ["GO.calendar.SettingsPanel"]
 	

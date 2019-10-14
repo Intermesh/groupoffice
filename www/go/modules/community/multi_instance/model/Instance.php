@@ -2,7 +2,10 @@
 namespace go\modules\community\multi_instance\model;
 
 use Exception;
+use go\core\db\Criteria;
 use go\core\fs\File;
+use go\core\http\Client;
+use go\core\http\Request;
 use go\core\jmap\Entity;
 use go\core\validate\ErrorCode;
 use go\modules\community\multi_instance\Module;
@@ -34,6 +37,8 @@ class Instance extends Entity {
 	public $adminEmail; 	
 	public $loginCount;	
 	public $modifiedAt;
+
+	public $version;
 	
 	public $enabled;
 	
@@ -65,16 +70,41 @@ class Instance extends Entity {
 		return parent::defineMapping()
 						->addTable('multi_instance_instance');
 	}
+
+	protected static function textFilterColumns()
+	{
+		return ['hostname', 'adminEmail', 'adminDisplayName'];
+	}
+
+	protected static function defineFilters() {
+		return parent::defineFilters()
+			->add('enabled', function(Criteria $c, $value){
+				$c->andWhere(['enabled' => $value]);
+			})
+			->add('isTrial', function(Criteria $c, $value) {
+				$c->andWhere('isTrial', '=', $value);
+			});
+	}
+
+
+	public function getMajorVersion() {
+		if(!$this->version) {
+			return null;
+		}
+		return substr($this->version, 0, strrpos($this->version, '.'));
+	}
+
+	
 	
 	protected function init() {
 		parent::init();
 		
 		if(!$this->isNew()) {
 			//update model from instance db once a day
-			if(!isset($this->modifiedAt) || $this->modifiedAt <= new \DateTime("-1 day")) {
+			if(!isset($this->modifiedAt) || $this->modifiedAt <= new \DateTime("-10 minute")) {
 				$this->getInstanceDbData();
 				
-				if($this->isModified() && !$this->internalSave()) {
+				if($this->isModified() && !$this->save()) {
 					throw new \Exception("Could not save instance data! ". var_export($this->getValidationErrors(), true));
 				}
 			}
@@ -90,7 +120,7 @@ class Instance extends Entity {
 				$this->setValidationError('hostname', ErrorCode::MALFORMED, 'The hostname was malformed');
 			}
 
-			if($this->getDbName() == GO()->getDatabase()->getName()) {
+			if($this->getDbName() == go()->getDatabase()->getName()) {
 				$this->setValidationError('hostname', ErrorCode::UNIQUE, 'This hostname is not available (Database exists).');
 			}
 
@@ -137,11 +167,15 @@ class Instance extends Entity {
 	}
 	
 	private function getDataFolder() {
-		return GO()->getDataFolder()->getFolder('multi_instance/' . $this->hostname);
+		return go()->getDataFolder()->getFolder('multi_instance/' . $this->hostname);
+	}
+	
+	private function getTrashFolder() {
+		return go()->getDataFolder()->getFolder('multi_instance/_trash_')->create();
 	}
 	
 	private function getTempFolder() {
-		return GO()->getTmpFolder()->getFolder('multi_instance/' . $this->hostname);
+		return go()->getTmpFolder()->getFolder('multi_instance/' . $this->hostname);
 	}
 	
 	private function getDbName() {
@@ -185,9 +219,9 @@ class Instance extends Entity {
 	}
 	
 	private function copySystemSettings() {
-		$core = GO()->getSettings()->toArray();
-		$groups = \go\modules\core\groups\model\Settings::get()->toArray();
-		$users = \go\modules\core\users\model\Settings::get()->toArray();
+		$core = go()->getSettings()->toArray();
+		$groups = \go\core\model\Settings::get()->toArray();
+		$users = \go\core\model\Settings::get()->toArray();
 		
 		$coreModuleId = (new \go\core\db\Query)
 						->setDbConnection($this->getInstanceDbConnection())
@@ -203,35 +237,7 @@ class Instance extends Entity {
 			$this->getInstanceDbConnection()
 							->replace('core_setting', ['name' => $name, 'value' => $value, "moduleId" => $coreModuleId])->execute();
 		}
-		
-		$usersModuleId = (new \go\core\db\Query)
-						->setDbConnection($this->getInstanceDbConnection())
-						->selectSingleValue('id')
-						->from('core_module')
-						->where(['package'=>'core', 'name'=>'users'])->single();
-		
-		foreach($users as $name => $value) {
-			$this->getInstanceDbConnection()
-							->replace('core_setting', ['name' => $name, 'value' => $value, "moduleId" => $usersModuleId])->execute();
-		}
-		
-		$groupsModuleId = (new \go\core\db\Query)
-						->setDbConnection($this->getInstanceDbConnection())
-						->selectSingleValue('id')
-						->from('core_module')
-						->where(['package'=>'core', 'name'=>'groups'])->single();
-		
-		foreach($groups as $name => $value) {
-			$this->getInstanceDbConnection()
-							->replace('core_setting', ['name' => $name, 'value' => $value, "moduleId" => $groupsModuleId])->execute();
-		}
-		
-		
-		
-						
-						
-	}
-	
+	}	
 	
 	private function createWelcomeMessage() {
 		
@@ -266,7 +272,7 @@ class Instance extends Entity {
 									'due_time' => 0,
 									'ctime' => time(),
 									'mtime' => time(),
-									'title' => GO()->t("Welcome to Group-Office"),
+									'title' => go()->t("Welcome to Group-Office"),
 									"content" => $this->welcomeMessage
 							])->execute();
 		}
@@ -279,7 +285,7 @@ class Instance extends Entity {
 	private function createInstance() {
 		$dbName =  $this->getDbName();
 		$dbUsername = $this->getDbUser();	
-		$dbPassword = bin2hex(openssl_random_pseudo_bytes(8));
+		$dbPassword = bin2hex(random_bytes(8));
 		$dataFolder = $this->getDataFolder();
 		$tmpFolder = $this->getTempFolder();	
 		$configFile = $this->getConfigFile();
@@ -323,15 +329,15 @@ class Instance extends Entity {
 	}
 	
 	private function dropDatabase($dbName) {		
-		return GO()->getDbConnection()->query("DROP DATABASE IF EXISTS `".$dbName."`");
+		return go()->getDbConnection()->query("DROP DATABASE IF EXISTS `".$dbName."`");
 	}
 	
 	private function createDatabase($dbName) {		
-		return GO()->getDbConnection()->query("CREATE DATABASE IF NOT EXISTS `".$dbName."`");
+		return go()->getDbConnection()->query("CREATE DATABASE IF NOT EXISTS `".$dbName."`");
 	}
 	
 	private function dropDatabaseUser($dbUser) {
-		GO()->getDbConnection()->query("DROP USER '" . $dbUser . "'@'%'");
+		go()->getDbConnection()->query("DROP USER '" . $dbUser . "'@'%'");
 	}
 	
 	private function createDatabaseUser($dbName, $dbUsername, $dbPassword) {
@@ -339,15 +345,15 @@ class Instance extends Entity {
 								"'".$dbUsername."'@'%' ".
 								"IDENTIFIED BY '" . $dbPassword . "' WITH GRANT OPTION";			
 
-		GO()->getDbConnection()->query($sql);
-		GO()->getDbConnection()->query('FLUSH PRIVILEGES');		
+		go()->getDbConnection()->query($sql);
+		go()->getDbConnection()->query('FLUSH PRIVILEGES');		
 	}
 	
 	private function createConfigFile($dbName, $dbUsername, $dbPassword, $tmpPath, $dataPath) {
 		
 		$tpl = Module::getFolder()->getFile('config.php.tpl');
 		
-		$dsn = \go\core\db\Utils::parseDSN(GO()->getConfig()['db']['dsn']);
+		$dsn = \go\core\db\Utils::parseDSN(go()->getConfig()['core']['db']['dsn']);
 
 		
 		return str_replace([
@@ -365,7 +371,7 @@ class Instance extends Entity {
 				$dbPassword,
 				$tmpPath,
 				$dataPath,
-				GO()->findConfigFile()
+				go()->findConfigFile()
 		],
 		$tpl->getContents());		
 	}
@@ -432,8 +438,8 @@ class Instance extends Entity {
 		$expiresAt = new DateTime("+1 hour");
 		
 		$data = [
-				"loginToken" => uniqid().bin2hex(openssl_random_pseudo_bytes(16)),
-				"accessToken" => uniqid().bin2hex(openssl_random_pseudo_bytes(16)),
+				"loginToken" => uniqid().bin2hex(random_bytes(16)),
+				"accessToken" => uniqid().bin2hex(random_bytes(16)),
 				"expiresAt" => $expiresAt,
 				"userAgent" => "Multi Instance Module",
 				"userId" => 1,
@@ -451,6 +457,10 @@ class Instance extends Entity {
 	
 	private function getInstanceDbData(){
 		try {
+
+			//Correct old bug
+			$this->getInstanceDbConnection()->exec("DELETE FROM core_setting WHERE moduleId=0");
+
 			$record = (new \go\core\db\Query())
 						->setDbConnection($this->getInstanceDbConnection())
 						->select('count(*) as userCount, max(lastLogin) as lastLogin, sum(loginCount) as loginCount')
@@ -478,6 +488,13 @@ class Instance extends Entity {
 						->from('go_settings')
 						->where('name', '=', "file_storage_usage")
 						->single();
+
+			$this->version = (new \go\core\db\Query())
+						->setDbConnection($this->getInstanceDbConnection())
+						->selectSingleValue('value')
+						->from('core_setting')
+						->where('name', '=', "databaseVersion")
+						->single();
 			
 			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
 			
@@ -489,10 +506,51 @@ class Instance extends Entity {
 		}
 	}	
 	
+	
+	/**
+	 * Create a mysql dump of the installation database.
+	 * 
+	 * @param StringHelper $outputDir
+	 * @param StringHelper $filename Optional filename. If omitted then $config['db_name'] will be used.
+	 * @return boolean
+	 * @throws Exception
+	 */
+	private function mysqldump(){
+		
+		$c = $this->getInstanceConfig();
+		
+		$file = $this->getDataFolder()->getFile('database.sql');
+		$file->delete();
+			
+	
+		$cmd = "mysqldump --force --opt --host=" . ($c['db_host'] ?? "localhost") . " --port=" . ($c['db_port'] ?? 3306) . " --user=" . $c['db_user'] . " --password=" . $c['db_pass'] . " " . $c['db_name'] . " > \"" . $file->getPath() . "\"";
+		go()->debug($cmd);
+		exec($cmd, $output, $retVar);
+		
+		if($retVar != 0) {
+			throw new Exception("Mysqldump error: " .$retVar ." : ". implode("\n", $output));
+		}
+		
+		if(!$file->exists()) {
+			throw new Exception("Could not create MySQL dump");
+		}
+		
+		return true;
+	}
+	
 	protected function internalDelete() {
 		$this->getTempFolder()->delete();
-		$this->getDataFolder()->delete();
+		
+		$this->mysqldump();
+		
+		$this->getConfigFile()->move($this->getDataFolder()->getFile('config.php'));
 		$this->getConfigFile()->getFolder()->delete();
+
+		$dest =	$this->getTrashFolder()->getFolder($this->getDataFolder()->getName());
+		if($dest->exists()) {
+			$dest = $dest->getParent()->getFolder($this->getDataFolder()->getName() . '-' . uniqid());
+		}
+		$this->getDataFolder()->move($dest);
 		
 		$this->dropDatabaseUser($this->getDbUser());
 		$this->dropDatabase($this->getDbName());
@@ -504,5 +562,21 @@ class Instance extends Entity {
 		
 	public function setWelcomeMessage($html) {
 		$this->welcomeMessage = $html;
+	}
+
+
+	public function upgrade() {
+		$http = new Client();
+
+		$proto = Request::get()->isHttps() ? 'https://' : 'http://';
+
+		$http->setOption(CURLOPT_SSL_VERIFYHOST, false);
+		$http->setOption(CURLOPT_SSL_VERIFYPEER, false);
+
+		$response = $http->get($proto . $this->hostname . '/install/upgrade.php?confirmed=1&ignore=modules');
+
+		//echo $response['body'];
+
+		return $response['status'] == 200;
 	}
 }

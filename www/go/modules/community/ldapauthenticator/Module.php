@@ -3,11 +3,14 @@ namespace go\modules\community\ldapauthenticator;
 
 use go\core\auth\DomainProvider;
 use go\core\db\Query;
-use go\core\module\Base;
+use go\core;
 use go\modules\community\ldapauthenticator\model\Authenticator;
-use go\modules\core\modules\model\Module as CoreModule;
+use go\core\model\Module as CoreModule;
+use go\core\ldap\Record;
+use go\core\model\User;
+use go\core\fs\Blob;
 
-class Module extends Base implements DomainProvider {
+class Module extends core\Module implements DomainProvider {
 
 	public function getAuthor() {
 		return "Intermesh BV";
@@ -27,6 +30,28 @@ class Module extends Base implements DomainProvider {
 						->selectSingleValue('name')
 						->from('ldapauth_server_domain')
 						->all();
+	}
+
+
+	public static function ldapRecordToUser($username, Record $record, User $user) {
+		
+		$user->username = $username;
+
+		if(!empty($record->jpegPhoto[0])) {
+			$blob = Blob::fromString($record->jpegPhoto[0]);
+			$blob->type = 'image/jpeg';
+			$blob->name = $username . '.jpg';
+			if(!$blob->save()) {
+				throw new \Exception("Could not save blob");
+			}
+			$user->avatarId = $blob->id;
+		}
+
+		$user->displayName = $record->cn[0];		
+		$user->email = $record->mail[0];
+		$user->recoveryEmail = isset($record->mail[1]) ? $record->mail[1] : $record->mail[0];		
+
+		return $user;
 	}
 
 }

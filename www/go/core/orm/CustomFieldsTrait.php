@@ -3,6 +3,11 @@ namespace go\core\orm;
 
 use go\core\App;
 use go\core\db\Query;
+use go\core\db\Table;
+use go\core\db\Utils;
+use go\core\validate\ErrorCode;
+use go\core\model\Field;
+use PDOException;
 
 /**
  * Entities can use this trait to enable a customFields property that can be 
@@ -18,67 +23,261 @@ trait CustomFieldsTrait {
 	 */
 	private $customFieldsData;
 	private $customFieldsModified = false;
+	private $customFieldsIsNew;
 	
-	public function getCustomFields() {
+	/**
+	 * Get all custom fields data for an entity
+	 * 
+	 * @return array
+	 */
+	public function getCustomFields($asText = false) {
+		$fn = $asText ? 'dbToText' : 'dbToApi';
+		$record = $this->internalGetCustomFields();
+		foreach(self::getCustomFieldModels() as $field) {
+			if(empty($field->databaseName)) {
+				continue; //For type Notes which doesn't store any data
+			}
+			$record[$field->databaseName] = $field->getDataType()->$fn(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record);			
+		}
+		return $record;	
+	}
+
+	protected function internalGetCustomFields() {
 		if(!isset($this->customFieldsData)) {
 			$record = (new Query())
 							->select('*')
 							->from($this->customFieldsTableName(), 'cf')
-							->where(['id' => $this->id])->execute()->fetch();
+							->where(['id' => $this->id])->single();
+			
+			$this->customFieldsIsNew = !$record;
 							
-			if($record) {
+			if($record) {			
+				
+				$columns = Table::getInstance(static::customFieldsTableName())->getColumns();		
+				foreach($columns as $name => $column) {					
+					$record[$name] = $column->castFromDb($record[$name]);					
+				}			
+				
 				$this->customFieldsData = $record;
+				
 			} else
 			{
 				$this->customFieldsData = [];
 			}
 		}
 		
-		return $this->customFieldsData;
+		return $this->customFieldsData;//array_filter($this->customFieldsData, function($key) {return $key != 'id';}, ARRAY_FILTER_USE_KEY);
+	}
+
+
+	
+	//for legacy modules
+	public function setCustomFieldsJSON($json) {
+		$data = json_decode($json, true);
+		$this->setCustomFields($data);
 	}
 	
-	public function setCustomFields($data) {		
-		$this->customFieldsData = $this->normalizeCustomFieldsInput($data);
+	/**
+	 * Set custom field data
+	 * 
+	 * The data array may hold partial data. It will be merged into the existing
+	 * data.
+	 * 
+	 * @param array $data
+	 * @return $this
+	 */
+	public function setCustomFields(array $data) {			
+		$this->customFieldsData = array_merge($this->internalGetCustomFields(), $this->normalizeCustomFieldsInput($data));		
+		
 		$this->customFieldsModified = true;
+
+		return $this;
+	}
+	
+	/**
+	 * Set a custom field value
+	 * 
+	 * @param string $name
+	 * @param mixed $value
+	 * @return $this
+	 */
+	public function setCustomField($name, $value) {
+		return $this->setCustomFields([$name => $value]);
+	}
+	
+	private static $customFields;
+	
+	/**
+	 * Check if custom fields are modified
+	 * 
+	 * @return bool
+	 */
+	protected function isCustomFieldsModified() {
+		return $this->customFieldsModified;
+	}
+	
+	/**
+	 * Get all custom fields for this entity
+	 * 
+	 * @return Field
+	 */
+	public static function getCustomFieldModels() {
+		if(!isset(self::$customFields)) {
+			self::$customFields = Field::find()
+						->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId')
+						->where(['fs.entityId' => static::customFieldsEntityType()->getId()])->all();
+		}
+		
+		return self::$customFields;
 	}
 	
 	
 	private function normalizeCustomFieldsInput($data) {
-		$columns = \go\core\db\Table::getInstance(static::customFieldsTableName())->getColumns();		
+		$columns = Table::getInstance(static::customFieldsTableName())->getColumns();		
 		foreach($columns as $name => $column) {
-			if(isset($data[$name])) {
+			if(array_key_exists($name, $data)) {
 				$data[$name] = $column->normalizeInput($data[$name]);
 			}
 		}
-		
-		$fields = \go\modules\core\customfields\model\Field::find()
-						->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId')
-						->where(['fs.entityId' => static::getType()->getId()]);
-		
-		foreach($fields as $field) {	
-
-			$data[$field->databaseName] = $field->apiToDb(isset($data[$field->databaseName]) ? $data[$field->databaseName] : null, $data);			
+			
+		foreach(self::getCustomFieldModels() as $field) {	
+			//if client didn't post value then skip it
+			if(array_key_exists($field->databaseName, $data)) {
+				$data[$field->databaseName] = $field->getDataType()->apiToDb(isset($data[$field->databaseName]) ? $data[$field->databaseName] : null,  $data);			
+			}
 		}
+		
 		return $data;
 	}
+
+	protected function validateCustomFields() {
+		if(!$this->customFieldsModified) {
+			return true;
+		}
+		foreach(self::getCustomFieldModels() as $field) {
+			if(!$field->getDataType()->validate(isset($this->customFieldsData[$field->databaseName]) ? $this->customFieldsData[$field->databaseName] : null, $field, $this)) {
+				return false;
+			}
+		}
+		return true;
+	}
 	
+	/**
+	 * Saves custom fields to the database. Is called by Entity::internalSave()
+	 * 
+	 * @return boolean
+	 * @throws PDOException
+	 */
 	protected function saveCustomFields() {
 		if(!$this->customFieldsModified) {
 			return true;
 		}
 		
-		$this->customFieldsData['id'] = $this->id;
+		try {			
+			$record = $this->customFieldsData;			
+			
+			foreach(self::getCustomFieldModels() as $field) {
+				if(!$field->getDataType()->beforeSave(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record)) {
+					return false;
+				}
+			}			
+			
+			if($this->customFieldsIsNew) {
+				if(!empty($record)) {								
+					$record['id'] = $this->id;	
+					if(!App::get()
+									->getDbConnection()
+									->insert($this->customFieldsTableName(), $record)->execute()){
+									return false;
+					}
+					$this->customFieldsIsNew = false;
+				}
+			} else
+			{
+				unset($record['id']);
+				if(!empty($record) && !App::get()
+								->getDbConnection()
+								->update($this->customFieldsTableName(), $record, ['id' => $this->id])->execute()) {
+					return false;
+				}
+			}
+			
+			//After save might need this.
+			$this->customFieldsData['id'] = $this->id;
 		
-		return App::get()
-						->getDbConnection()
-						->replace($this->customFieldsTableName(), $this->customFieldsData)->execute();
+			
+			foreach(self::getCustomFieldModels() as $field) {
+				if(!$field->getDataType()->afterSave(isset($this->customFieldsData[$field->databaseName]) ? $this->customFieldsData[$field->databaseName] : null, $this->customFieldsData)) {
+					return false;
+				}
+			}
+			
+			return true;
+		} catch(PDOException $e) {
+			$uniqueKey = Utils::isUniqueKeyException($e);
+			if ($uniqueKey) {				
+				$this->setValidationError('customFields.' . $uniqueKey, ErrorCode::UNIQUE);				
+				return false;
+			} else {
+				throw $e;
+			}
+		}
 	}
 
-
+	/**
+	 * Get table name for custom fields data
+	 * 
+	 * @return string
+	 */
 	public static function customFieldsTableName() {
-		$tables = static::getMapping()->getTables();		
-		$mainTableName = array_keys($tables)[0];
+
+		$cls = static::customFieldsEntityType()->getClassName();
+		
+		if(is_a($cls, Entity::class, true)) {
+		
+			$tables = $cls::getMapping()->getTables();		
+			$mainTableName = array_keys($tables)[0];
+		} else
+		{
+			//ActiveRecord
+			$mainTableName = $cls::model()->tableName();
+		}
 		
 		return $mainTableName.'_custom_fields';
+	}
+
+	/**
+	 * The entity type the custom fields are for.
+	 * 
+	 * Usually this is the static::entityType() but sometimes a model extends another like with filesearch. Then you can override this function:
+	 * 
+	 * ```php
+	 * use CustomFieldsTrait {
+	 * 		customFieldsEntityType as origCustomFieldsEntityType;
+	 * }
+	 * 
+	 * public static function customFieldsEntityType() {
+	 * 		return File2::entityType();
+	 * }
+	 * ```
+	 * 
+	 * @return EntityType
+	 */
+	public static function customFieldsEntityType() {
+		return static::entityType();
+	}
+	
+	/**
+	 * Defines filters for all custom fields
+	 * 
+	 * @param \go\core\orm\Filters $filters
+	 */
+	protected static function defineCustomFieldFilters(Filters $filters) {
+		
+		$fields = static::getCustomFieldModels();		
+		
+		foreach($fields as $field) {
+			$field->getDataType()->defineFilter($filters);
+		}		
 	}
 }

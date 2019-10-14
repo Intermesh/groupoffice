@@ -41,7 +41,7 @@ Ext.extend(GO.plugins.HtmlEditorImageInsert, Ext.util.Observable, {
 		var element={};
 
 		element.itemId='htmlEditorImage';
-		element.cls='x-btn-icon go-edit-insertimage';
+		element.iconCls='ic-image';
 		element.enableToggle=false;
 		element.scope=this;
 		element.clickEvent='mousedown';
@@ -51,22 +51,36 @@ Ext.extend(GO.plugins.HtmlEditorImageInsert, Ext.util.Observable, {
 			text:t("Insert image in the text")
 		}
 		element.overflowText=t("Insert image in the text");
-		
-							
-		this.uploadForm = new GO.UploadPCForm();
-
-		this.uploadForm.on('upload', function(e, files)
-		{
-			this.selectTempImage(files[0]);
-		},this);
 
 		var menuItems = [
-		this.uploadForm
+		//this.uploadForm
+		{
+			iconCls: 'ic-computer',
+			text: t("Upload"),
+			handler: function() {
+				go.util.openFileDialog({
+					multiple: true,
+					accept: "image/*",
+					directory: false,
+					autoUpload: true,
+					listeners: {
+						upload: function(response) {
+							var img = '<img src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="'+response.name+'" />';
+							
+							this.editor.focus();
+							this.editor.insertAtCursor(img);
+						},
+						scope: this
+					}
+				});
+			},
+			scope: this
+		}
 		];
 
 		if(go.Modules.isAvailable("legacy", "files")){
 			menuItems.push({
-				iconCls:'btn-groupoffice',
+				iconCls:'ic-folder',
 				text : t("Add from Group-Office", "email").replace('{product_name}', GO.settings.config.product_name),
 				handler : function()
 				{
@@ -89,7 +103,8 @@ Ext.extend(GO.plugins.HtmlEditorImageInsert, Ext.util.Observable, {
 
 		GO.files.createSelectFileBrowser();
 
-		GO.selectFileBrowser.setFileClickHandler(this.selectImage, this);
+		GO.selectFileBrowser.setFileClickHandler(this.selectImage, this, true);
+		GO.selectFileBrowser.createBlobs = true;
 
 		GO.selectFileBrowser.setFilesFilter(this.filesFilter);
 		GO.selectFileBrowser.setRootID(this.root_folder_id, this.files_folder_id);
@@ -97,45 +112,30 @@ Ext.extend(GO.plugins.HtmlEditorImageInsert, Ext.util.Observable, {
 
 		GO.selectFileBrowserWindow.show.defer(200, GO.selectFileBrowserWindow);
 	},
-
-	selectTempImage : function(path)
-	{
-		
-		var token = GO.base.util.MD5(path);
-		
-		this.selectedUrl = GO.url("core/downloadTempFile", {path:path, token: token});
-
-		this.selectedPath = path;	
-		
-
-		var html = '<img src="'+this.selectedUrl+'" border="0" />';
-
-		this.fireEvent('insert', this,  this.selectedPath, true, token);
-		
-		this.menu.hide();
-
-		this.editor.focus();
-		this.editor.insertAtCursor(html);		
-	},
 	
-	selectImage : function(r){	
-		
+	selectImage : function(blobs){	
 
-		this.selectedRecord = r;
-		this.selectedPath = r.data.path;
-		
-		var token = GO.base.util.MD5(r.data.name);
-		
-		//filename is added as parameter. This is only for matching the url in the body of the html in GO\\Base\\Mail\\Message::handleEmailFormInput with preg_match.
-		this.selectedUrl = GO.url("files/file/download",{id:r.data.id,token:token});
-						
-		var html = '<img src="'+this.selectedUrl+'" border="0" />';
-								
-		this.fireEvent('insert', this, this.selectedPath, false, token);
-
+		var img = '<img src="' + go.Jmap.downloadUrl(blobs[0].blobId) + '" alt="'+blobs[0].name+'" />';
+							
 		this.editor.focus();
+		this.editor.insertAtCursor(img);
+		
+
+		// this.selectedRecord = r;
+		// this.selectedPath = r.data.path;
+		
+		// var token = GO.base.util.MD5(r.data.name);
+		
+		// //filename is added as parameter. This is only for matching the url in the body of the html in GO\\Base\\Mail\\Message::handleEmailFormInput with preg_match.
+		// this.selectedUrl = GO.url("files/file/download",{id:r.data.id,token:token});
+						
+		// var html = '<img src="'+this.selectedUrl+'" border="0" />';
+								
+		// this.fireEvent('insert', this, this.selectedPath, false, token);
+
+		// this.editor.focus();
 			
-		this.editor.insertAtCursor(html);
+		// this.editor.insertAtCursor(html);
 		
 		GO.selectFileBrowserWindow.hide();
 	}

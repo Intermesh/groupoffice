@@ -239,11 +239,11 @@ class Account extends \GO\Base\Db\ActiveRecord {
 		}
 		
 		if($wasNew) {
-			$user = \go\modules\core\users\model\User::findById($this->user_id);
+			$user = \go\core\model\User::findById($this->user_id);
 			if($user->isAdmin()) {
 				//add admin group
-				$group = \go\modules\core\groups\model\Group::find()->where(['isUserGroupFor' => $user->id])->single();
-				$this->getAcl()->addGroup($group->id, \go\core\acl\model\Acl::LEVEL_MANAGE);
+				$group = \go\core\model\Group::find()->where(['isUserGroupFor' => $user->id])->single();
+				$this->getAcl()->addGroup($group->id, \go\core\model\Acl::LEVEL_MANAGE);
 			}
 		}
 
@@ -321,6 +321,9 @@ class Account extends \GO\Base\Db\ActiveRecord {
 				$decrypted = Request::GetAuthPassword();
 			}else
 			{			
+				if(empty($this->password)) {
+					return "";
+				}
 				$decrypted = \GO\Base\Util\Crypt::decrypt($this->password);
 			}
 		}
@@ -575,10 +578,10 @@ class Account extends \GO\Base\Db\ActiveRecord {
 	}
 
 	public function getDefaultTemplate() {
-		if (\GO::modules()->addressbook) {
-			$defaultAccountTemplateModel = \GO\Addressbook\Model\DefaultTemplateForAccount::model()->findByPk($this->id);
+//		if (\GO::modules()->addressbook) {
+			$defaultAccountTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($this->id);
 			if (!$defaultAccountTemplateModel) {
-				$defaultUserTemplateModel = \GO\Addressbook\Model\DefaultTemplate::model()->findByPk(\GO::user()->id);
+				$defaultUserTemplateModel = \GO\Email\Model\DefaultTemplate::model()->findByPk(\GO::user()->id);
 				if (!$defaultUserTemplateModel)
 					return false;
 				else
@@ -586,9 +589,7 @@ class Account extends \GO\Base\Db\ActiveRecord {
 			} else {
 				return $defaultAccountTemplateModel;
 			}
-		} else {
-			return false;
-		}
+
 	}
 	
 }

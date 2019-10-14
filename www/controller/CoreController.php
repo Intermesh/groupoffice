@@ -52,18 +52,11 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 		$debugFile = new \GO\Base\Fs\File(GO::config()->file_storage_path.'log/debug.log');
 		if(!$debugFile->exists())
 			$debugFile->touch(true);
-		
-		$errorFile = new \GO\Base\Fs\File(GO::config()->file_storage_path.'log/error.log');
-		if(!$errorFile->exists())
-			$errorFile->touch(true);
-		
-		$debugLog = nl2br(str_replace('['.GO::user()->username.'] ','',  htmlspecialchars($debugFile->tail($length))));
-		$debugLog = str_replace('--------------------','<hr />', $debugLog);
+
 		
 		return array(
 				'success'=>true, 
-				'debugLog'=>$debugLog,
-				'errorLog'=>str_replace('----------------','<hr />', nl2br(htmlspecialchars($errorFile->tail($length))))
+				'debugLog'=>$debugFile->tail($length)
 				);
 	}
 	

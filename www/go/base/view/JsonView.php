@@ -81,12 +81,6 @@ class JsonView extends AbstractView{
 					}
 				}
 
-
-				//Add the customerfields to the data array
-				if (\GO::user()->getModulePermissionLevel('customfields') && $model->customfieldsRecord){
-					$response['data'][$modelName]['attributes'] = array_merge($response['data'][$modelName]['attributes'], $model->customfieldsRecord->getAttributes());
-					$response['data'][$modelName]['customfields']=$this->_getCustomFieldDefinitions($model);
-				}
 			} else {
 				$response[$modelName] = $model;
 			}
@@ -106,57 +100,6 @@ class JsonView extends AbstractView{
 		return new \GO\Base\Data\JsonResponse($response);
 	}
 	
-	
-	private function _getCustomFieldDefinitions($model) {
-		
-		//Get all field models and build an array of categories with their
-		//fields for display.
-		
-		
-		$cls = $model->customfieldsRecord->extendsModel();
-		$entityId = $cls::getType()->getId();
-
-
-		$findParams = \GO\Base\Db\FindParams::newInstance()
-						->order(array('category.sort_index', 't.sort_index'), array('ASC', 'ASC'));
-		$findParams->getCriteria()
-						->addCondition('entityId', $entityId, '=', 'category');
-
-		$stmt = \GO\Customfields\Model\Field::model()->find($findParams);
-
-		$categories = array();
-
-		while ($field = $stmt->fetch()) {
-			if (!isset($categories[$field->category_id])) {
-				$categories[$field->category->id]['id'] = $field->category->id;
-				$categories[$field->category->id]['name'] = $field->category->name;
-				$categories[$field->category->id]['fields'] = array();
-			}
-			
-			if ($field->datatype == "GO\Customfields\Customfieldtype\Heading") {
-				$header = array('name' => $field->name, 'value' => $customAttributes[$field->columnName()]);
-			}
-			if (!empty($header)) {
-				$categories[$field->category->id]['fields'][] = $header;
-				$header = null;
-			}
-			$categories[$field->category->id]['fields'][] = array_merge($field->getAttributes(), array('dataname'=>$field->databaseName));
-
-		}
-		
-		$r=array();
-
-		foreach ($categories as $category) {
-			if (count($category['fields']))
-				$r[] = $category;
-		}
-
-		
-
-		
-
-		return $r;
-	}
 	
 	/**
 	 * Render JSON response for forms
@@ -213,10 +156,10 @@ class JsonView extends AbstractView{
 
 
 				//Add the customerfields to the data array
-				if (\GO::user()->getModulePermissionLevel('customfields') && $model->customfieldsRecord){
-					$response['data'][$modelName]['attributes'] = array_merge($response['data'][$modelName]['attributes'], $model->customfieldsRecord->getAttributes());
-					$response['data'][$modelName]['customfields']['categories']=$this->_getCustomFieldDefinitions($model);
-				}
+//				if (\GO::user()->getModulePermissionLevel('customfields') && $model->customfieldsRecord){
+//					$response['data'][$modelName]['attributes'] = array_merge($response['data'][$modelName]['attributes'], $model->customfieldsRecord->getAttributes());
+//					$response['data'][$modelName]['customfields']['categories']=$this->_getCustomFieldDefinitions($model);
+//				}
 			} else {
 				$response[$modelName] = $model;
 			}
@@ -493,64 +436,6 @@ class JsonView extends AbstractView{
 			}
 
 			$response['data']['workflow'][] = $workflowResponse;
-		}
-
-		return $response;
-	}
-
-	private function _processCustomFieldsDisplay($model, $response) {
-		$customAttributes = $model->customfieldsRecord->getAttributes('html');
-
-		//Get all field models and build an array of categories with their
-		//fields for display.
-
-		$findParams = \GO\Base\Db\FindParams::newInstance()
-						->order(array('category.sort_index', 't.sort_index'), array('ASC', 'ASC'));
-		$findParams->getCriteria()
-						->addCondition('extendsModel', $model->customfieldsRecord->extendsModel(), '=', 'category');
-
-		$stmt = \GO\Customfields\Model\Field::model()->find($findParams);
-
-		$categories = array();
-
-		while ($field = $stmt->fetch()) {
-			if (!isset($categories[$field->category_id])) {
-				$categories[$field->category->id]['id'] = $field->category->id;
-				$categories[$field->category->id]['name'] = $field->category->name;
-				$categories[$field->category->id]['fields'] = array();
-			}
-			if (!empty($customAttributes[$field->columnName()])) {
-				if ($field->datatype == "GO\Customfields\Customfieldtype\Heading") {
-					$header = array('name' => $field->name, 'value' => $customAttributes[$field->columnName()]);
-				}
-				if (!empty($header)) {
-					$categories[$field->category->id]['fields'][] = $header;
-					$header = null;
-				}
-				$categories[$field->category->id]['fields'][] = array(
-						'name' => $field->name,
-						'datatype'=>$field->datatype,
-						'value' => $customAttributes[$field->columnName()]
-				);
-			}
-		}
-
-		foreach ($categories as $category) {
-			if (count($category['fields']))
-				$response['data']['customfields'][] = $category;
-		}
-
-		if(isset($response['data']['customfields']) && method_exists($model, 'getDisabledCustomFieldsCategoriesField') && \GO\Customfields\Model\DisableCategories::isEnabled($model->className(), $model->disabledCustomFieldsCategoriesField)){
-			$ids = \GO\Customfields\Model\EnabledCategory::model()->getEnabledIds($model->className(), $model->getDisabledCustomFieldsCategoriesField());
-			
-			$enabled = array();
-			foreach($response['data']['customfields'] as $cat){
-				if(in_array($cat['id'], $ids)){
-					$enabled[]=$cat;
-				}
-			}
-			$response['data']['customfields']=$enabled;
-
 		}
 
 		return $response;

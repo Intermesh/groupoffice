@@ -9,4 +9,6 @@ return array (
   'Notes' => 'Notities',
   'Content' => 'Text',
   'Invalid password' => 'Ongeldig wachtwoord',
+  'Note book' => 'Notitieblok',
+  'Commented at' => 'Nieuw bericht op',
 );

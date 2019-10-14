@@ -71,7 +71,7 @@ html,body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,p,bloc
     -moz-user-select: -moz-none;
     -webkit-user-select: none;
     
-    cursor:default;
+    cursor:inherit;
 }
 
 .x-repaint {
@@ -85,6 +85,7 @@ html,body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,p,bloc
     opacity: .6;
     -moz-opacity: .6;
     filter: alpha(opacity=60);
+		pointer-events: none;
 }
 
 .x-item-disabled * {
@@ -485,7 +486,7 @@ ul.x-tab-strip li.x-tab-edge {
 	}
 }
 
-.ext-webkit *:focus{
+*:focus{
     outline: none !important;
 }
 
@@ -624,27 +625,15 @@ textarea {
 
 /* Editor small font for grid, toolbar and tree */
 .x-small-editor .x-form-text {
-   height:20px; //todo
-   line-height:16px;
    vertical-align:middle;
 }
-
-.ext-border-box .x-small-editor .x-form-text {
-    height:20px;
-}
-
 .x-small-editor .x-form-select-one {
-   height:20px; // todo
    line-height:16px;
    vertical-align:middle;
 }
 
 .x-small-editor .x-form-num-field {
     text-align:right;
-}
-
-.x-small-editor .x-form-field-wrap .x-form-trigger{
-    height:19px; //todo
 }
 
 
@@ -756,12 +745,17 @@ fieldset.x-panel-collapsed .x-fieldset-bwrap {
     margin-left:-3px;
 }
 
-.x-hide-label .x-form-element {
+//MS: Added > for nested form fields in formgroup
+.x-hide-label > label.x-form-item-label {
+     display:none;
+}
+
+.x-hide-label > .x-form-element {
     padding-left: 0 !important;
 }
 
-.x-hide-label label.x-form-item-label,
-.x-form-label-top .x-hide-label label.x-form-item-label{
+.x-hide-label > label.x-form-item-label,
+.x-form-label-top .x-hide-label > label.x-form-item-label{
     display: none;
 }
 
@@ -1048,8 +1042,8 @@ div.x-toolbar-no-items {
 }
 
 .x-grid3-resize-proxy {
-	width:1px;
-   left:0;
+	width:3px;
+    left:0;
 	cursor: e-resize;
 	cursor: col-resize;
 	position:absolute;
@@ -1109,7 +1103,6 @@ div.x-toolbar-no-items {
 }
 
 .x-grid3-header-offset {
-    padding-left:1px;
     text-align: left;
 }
 
@@ -1421,7 +1414,7 @@ div.x-toolbar-no-items {
 }
 
 .x-dd-drop-icon{
-   position:absolute;
+  position:absolute;
 	top:0;
 	left:3px;
 	display:block;
@@ -2510,6 +2503,7 @@ body.ext-ie6.x-body-masked .x-window select {
 .x-window-dlg .x-window-body {
     border:0 none !important;
     padding:5px 10px;
+    padding: dp(8) dp(16);
     overflow:hidden !important;
 }
 

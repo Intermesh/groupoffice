@@ -1,15 +1,15 @@
 <?php
 namespace go\modules\community\googleauthenticator;
 
-use go\core\module\Base;
+use go\core;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\modules\community\googleauthenticator\model;
-use go\modules\core\groups\model\Group;
-use go\modules\core\modules\model\Module as ModuleModel;
-use go\modules\core\users\model\User;
+use go\core\model\Group;
+use go\core\model\Module as ModuleModel;
+use go\core\model\User;
 
-class Module extends Base {
+class Module extends core\Module {
 
 	public function getAuthor() {
 		return "Intermesh BV";
@@ -19,6 +19,12 @@ class Module extends Base {
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 	}
 	
+
+	public static function onMap(Mapping $mapping) {		
+		$mapping->addHasOne("googleauthenticator", model\Googleauthenticator::class, ['id' => 'userId'], false);		
+		return true;
+	}
+
 	protected function afterInstall(ModuleModel $model) {
 		
 		if(!Googleauthenticator::register()) {
@@ -33,10 +39,4 @@ class Module extends Base {
 		
 		return parent::afterInstall($model);
 	}
-	
-	public static function onMap(Mapping $mapping) {		
-		$mapping->addRelation("googleauthenticator", model\Googleauthenticator::class, ['id' => 'userId'], false);		
-		return true;
-	}
-
 }

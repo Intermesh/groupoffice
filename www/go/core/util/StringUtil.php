@@ -30,14 +30,27 @@ class StringUtil {
 		
 		$normalized =  preg_replace('/\R/u', $crlf, $text);
 		if(empty($normalized)) {
-			throw new \Exception(array_flip(get_defined_constants(true)['pcre'])[preg_last_error()]);
-		}
+			//fallback on str_replace in case of bad utf8
+			return preg_replace("/\r\n|\r|\n/", $crlf, $text);
+			//throw new \Exception(array_flip(get_defined_constants(true)['pcre'])[preg_last_error()]. ': while normalizing crlf for: '. $text);
+	}
 		return $normalized;
 	}
 	
 	
 	public static function normalize($text) {
-		return \Normalizer::normalize($text, \Normalizer::FORM_C);
+		if(empty($text)) {
+			return $text;
+		}
+
+		$normalized = \Normalizer::normalize($text, \Normalizer::FORM_C);
+		if($normalized === false) {
+
+			//try to clean the string
+			$normalized = static::cleanUtf8($text);
+		}
+
+		return $normalized;
 	}
 	
 	public static function isNormalized($text) {
@@ -601,5 +614,15 @@ END;
 		}
 		
 		return $ord;
+	}
+
+	/**
+	 * Generate random string
+	 * 
+	 * @param int $length
+	 * @return string
+	 */
+	public static function random($length) {
+		return bin2hex(random_bytes($length));
 	}
 }

@@ -3,11 +3,11 @@ namespace go\modules\community\imapauthenticator;
 
 use go\core\auth\DomainProvider;
 use go\core\db\Query;
-use go\core\module\Base;
+use go\core;
 use go\modules\community\imapauthenticator\model\Authenticator;
-use go\modules\core\modules\model\Module as CoreModule;
+use go\core\model\Module as CoreModule;
 
-class Module extends Base implements DomainProvider {
+class Module extends core\Module implements DomainProvider {
 
 	public function getAuthor() {
 		return "Intermesh BV";

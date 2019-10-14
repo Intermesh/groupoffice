@@ -124,6 +124,7 @@ class XlsFile extends File{
 	}
 	
 	protected function init($readSheetNr=0) {
+
 		if (is_file($this->path)) {
 			$this->filetype = \PHPExcel_IOFactory::identify($this->path);
 			$xlsReader = \PHPExcel_IOFactory::createReader($this->filetype);

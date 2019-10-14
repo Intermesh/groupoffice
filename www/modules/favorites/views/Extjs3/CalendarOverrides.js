@@ -133,7 +133,12 @@ GO.moduleManager.onModuleReady('calendar',function(){
 				//clearGrids[i].allowNoSelection=false;
 			}
 		},
-	
+		
+		/**
+		 * Helper function to call the setCalendarBackgroundColors function of the parent
+		 */
+		setOriginalCalendarBackgroundColors: GO.calendar.MainPanel.prototype.setCalendarBackgroundColors,
+
 	 /**
 	  * Set the background colors of the selected rows in the Grid.
 		* When only one record is selected, then there is no background color needed.
@@ -141,6 +146,10 @@ GO.moduleManager.onModuleReady('calendar',function(){
 	  * @returns {undefined}
 	  */
 		setCalendarBackgroundColors : function(){
+
+			if(!go.Modules.isAvailable("legacy", "favorites")) {
+				return this.setOriginalCalendarBackgroundColors();
+			}
 
 			var activeItem = this.calendarListPanel.getLayout().activeItem;
 
@@ -152,12 +161,7 @@ GO.moduleManager.onModuleReady('calendar',function(){
 				this.setOriginalCalendarBackgroundColors();
 				this.clearBackgroundColors(this.calendarFavoritesList);
 			}
-		},
-		
-		/**
-		 * Helper function to call the setCalendarBackgroundColors function of the parent
-		 */
-		setOriginalCalendarBackgroundColors: GO.calendar.MainPanel.prototype.setCalendarBackgroundColors,
+		},	
 		
 		/**
 		 * Clear the background color of each row in the given Grid.

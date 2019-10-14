@@ -68,6 +68,7 @@ abstract class AbstractExport {
 		
 		if(!$columns){
 			$this->_columns = array_keys($this->_model->getColumns());
+	
 		} else {
 			if(is_array($columns)){		
 				$this->_columns = $columns;
@@ -92,13 +93,18 @@ abstract class AbstractExport {
 	 */
 	public function getLabel($column){
 		
+		
 		if(in_array($column, array_keys($this->labels))){
 			return $this->getCustomLabel($column, $this->labels[$column]);
 		}
 
 		$model = $this->getModel();
 		
-		if(strpos($column,'.')){
+		if(substr($column, 0, 13) === 'customFields.') {
+			$entityTypeId = $this->_model->entityType()->getId();
+			$field = \go\core\model\Field::findByEntity($entityTypeId)->andWhere('databaseName', '=', substr($column, 13))->single();
+			return $field->name;
+		} else if(strpos($column,'.')){
 			
 			$relationNames = explode('.',$column);
 			$relationName = $relationNames[0];
@@ -139,7 +145,6 @@ abstract class AbstractExport {
 		foreach($columns as $col){
 			
 //			$format = '$model->'.str_replace('.','->', $col);
-			
 			
 			
 			$format = '$model->resolveAttribute("'.$col.'","formatted");';
@@ -259,6 +264,17 @@ abstract class AbstractExport {
 		}
 		
 		$availableColumns = array_merge($availableColumns,  array_values($relatedColumns));		
+		
+		
+		if(method_exists($this->_model, 'getCustomFields')) {
+			$entityTypeId = $this->_model->entityType()->getId();
+			$fields = \go\core\model\Field::findByEntity($entityTypeId);
+			
+			foreach($fields as $field) {
+				
+				$availableColumns[] = ['id'=> "customFields.".$field->databaseName, 'name' => "customFields.".$field->databaseName, 'label' => $field->name];
+			}
+		}
 		
 		// Get the columnModel columns and the columns that are added through the formatColumns function.
 		$cm = $this->getColumnModel();

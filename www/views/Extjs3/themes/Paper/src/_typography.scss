@@ -1,50 +1,20 @@
 
 
-$font-family:  -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-//Lato, sans-serif !default;
-$font-weight-r: 400;
-$font-weight-m: 600;
+// $font-family:  -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+$font-family: Lato, sans-serif !default;
+
+$font-weight-r: normal;
+$font-weight-m: bold;
 $font-weight-l: 100;
 
-
-html {
-   font-size: 100%;
-	letter-spacing: normal;
-	-moz-osx-font-smoothing: grayscale;
-   -webkit-font-smoothing: antialiased;
-	-ms-text-size-adjust: 100%;
-   -webkit-text-size-adjust: 100%;
+@function letter-space($space, $font-size) {
+	@return (($space / $font-size)  * $density / 160) * 1em;
 }
-button, html, input, select, textarea {
-    font-family: $font-family;
-}
-body, html {
-	@extend %font-body1;
-	color: color($fg, 'text');
-	text-rendering: optimizeLegibility;
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-}
-h1,h2,h3,h4,h5,h6 {
-	font-family: inherit;
-	color: color($fg, 'text');
-	font-weight: bold;
-	line-height: 1;
-}
-h1 { @extend %font-display1; }
-h2 { @extend %font-headline; }
-h3 { @extend %font-title; }
-h4 { @extend %font-subheading; }
-h5 { @extend %font-subheading-dense; }
-h6 { @extend %font-data-head; }
-
-strong { color: color($grey, 700); font-weight: $font-weight-m; }
-small, label { @extend %font-caption }
 
 %font-button {
 	font-size: sp(14);
 	font-weight: $font-weight-m;
-	/*letter-spacing: 0.04em;*/
+	letter-spacing: 0.015em;
 	text-decoration: none;
 }
 

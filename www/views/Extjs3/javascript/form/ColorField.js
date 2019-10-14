@@ -29,7 +29,7 @@ var cf = new Ext.form.ColorField({
 
 GO.form.ColorField =  Ext.extend(function(config){
 
-	config.colors = config.colors || [
+	config = config || {color: [
 		'B71C1C','C62828','D32F2F','E53935','F44336','EF5350','E57373','EF9A9A','FFCDD2', // Red
 		'880E4F','AD1457','C2185B','D81B60','E91E63','EC407A','F06292','F48FB1','F8BBD0', // Pink
 		'4A148C','6A1B9A','7B1FA2','8E24AA','9C27B0','AB47BC','BA68C8','CE93D8','E1BEE7', // Purple
@@ -46,7 +46,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 		'FF6F00','FF8F00','FFA000','FFB300','FFC107','FFCA28','FFD54F','FFE082','FFECB3', // Amber
 		'E65100','EF6C00','F57C00','FB8C00','FF9800','FFA726','FFB74D','FFCC80','FFE0B2', // Orange
 		'212121','424242','616161','757575','BDBDBD','E0E0E0','EEEEEE','F5F5F5','FFFFFF' // Grey
-	];
+	]};
 
 	GO.form.ColorField.superclass.constructor.call(this, config);
 

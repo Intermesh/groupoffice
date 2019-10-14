@@ -7,10 +7,11 @@ use Exception;
 use GO;
 use go\core\App;
 use go\core\db\Query;
+use go\core\model\Module;
 use go\core\ErrorHandler;
 use go\core\jmap;
-use go\modules\core\modules\model\Module;
 use PDOException;
+use go\core\model\Acl;
 
 /**
  * The EntityType class
@@ -25,15 +26,27 @@ use PDOException;
  * It's also used for routing short routes like "Note/get" instead of "community/notes/Note/get"
  * 
  */
-class EntityType {
+class EntityType implements \go\core\data\ArrayableInterface {
 
 	private $className;	
 	private $id;
 	private $name;
 	private $moduleId;	
   private $clientName;
+	private $defaultAclId;
 	
-	public $highestModSeq;
+	/**
+	 * The highest mod sequence used for JMAP data sync
+	 * 
+	 * @var int
+	 */
+	protected $highestModSeq;
+	
+	private $highestUserModSeq;
+	
+	private $modSeqIncremented = false;
+	
+	private $userModSeqIncremented = false;
 	
 	/**
 	 * The name of the entity for the JMAP client API
@@ -115,7 +128,8 @@ class EntityType {
 			$record['id'] = App::get()->getDbConnection()->getPDO()->lastInsertId();
 		} else
 		{
-			$e->highestModSeq = isset($record['highestModSeq']) ? (int) $record['highestModSeq'] : null;
+			$e->defaultAclId = $record['defaultAclId'] ?? null; // in the upgrade situation this column is not there yet.
+			$e->highestModSeq = (int) $record['highestModSeq'];//) ? (int) $record['highestModSeq'] : null;
 		}
 
 		$e->id = $record['id'];
@@ -126,6 +140,45 @@ class EntityType {
 		
 		return $e;
 	}
+
+	/**
+	 * The highest mod sequence used for JMAP data sync
+	 * 
+	 * @return int
+	 */
+	public function getHighestModSeq() {
+		if(isset($this->highestModSeq)) {
+			return $this->highestModSeq;
+		}
+
+		$this->highestModSeq = (new Query())
+			->selectSingleValue("highestModSeq")
+			->from("core_entity")
+			->where(["id" => $this->id])			
+			->single();
+
+		return $this->highestModSeq;
+	}
+
+	/**
+	 * Clear cached modseqs.
+	 * 
+	 * Calling this function is needed when the request is running for a long time and multiple increments are possible.
+	 * For example when sending newsletters on a CLI script.
+	 * 
+	 * @return $this
+	 */
+	public function clearCache() {
+
+		$this->modSeqIncremented = false;
+		$this->userModSeqIncremented = false;
+		$this->highestModSeq = null;
+		$this->highestUserModSeq = null;
+
+		return $this;
+	}
+
+
 	
 	/**
 	 * Creates a short name based on the class name.
@@ -145,16 +198,28 @@ class EntityType {
 	 * 
 	 * @return static[]
 	 */
-	public static function findAll() {
-		$records = (new Query)
+	public static function findAll(Query $query = null) {
+		
+		if(!isset($query)) {
+			$query = new Query();
+		}
+		
+		$records = $query
 						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
 						->from('core_entity', 'e')
-						->join('core_module', 'm', 'm.id = e.moduleId')						
+						->join('core_module', 'm', 'm.id = e.moduleId')
+						->where(['m.enabled' => true])
 						->all();
 		
 		$i = [];
 		foreach($records as $record) {
-			$i[] = static::fromRecord($record);
+			$type = static::fromRecord($record);
+			$cls = $type->getClassName();
+			if(!class_exists($cls)) {
+				go()->warn($cls .' not found!');
+				continue;
+			}
+			$i[] = $type;
 		}
 		
 		return $i;
@@ -171,7 +236,7 @@ class EntityType {
 						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
 						->from('core_entity', 'e')
 						->join('core_module', 'm', 'm.id = e.moduleId')
-						->where('id', '=', $id)
+						->where('id', '=', $id)->where(['m.enabled' => true])
 						->single();
 		
 		if(!$record) {
@@ -192,7 +257,7 @@ class EntityType {
 						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
 						->from('core_entity', 'e')
 						->join('core_module', 'm', 'm.id = e.moduleId')
-						->where('clientName', '=', $name)
+						->where('clientName', '=', $name)->where(['m.enabled' => true])
 						->single();
 		
 		if(!$record) {
@@ -200,6 +265,22 @@ class EntityType {
 		}
 		
 		return static::fromRecord($record);
+	}
+	
+	/**
+	 * Convert array of entity names to ids
+	 * 
+	 * @param string[] $names eg ['Contact', 'Note']
+	 * @return int[] eg. [1,2]
+	 */
+	public static function namesToIds($names) {
+		return array_map(function($name) {
+			$e = static::findByName($name);
+			if(!$e) {
+				throw new \Exception("Entity '$name'  not found");
+			}
+			return $e->getId();
+		}, $names);	
 	}
   
 
@@ -210,9 +291,15 @@ class EntityType {
     $e->clientName = $record['clientName'];
 		$e->moduleId = $record['moduleId'];
 		$e->highestModSeq = (int) $record['highestModSeq'];
+		$e->defaultAclId = $record['defaultAclId'] ?? null; // in the upgrade situation this column is not there yet.
 
 		if (isset($record['modulePackage'])) {
-			$e->className = 'go\\modules\\' . $record['modulePackage'] . '\\' . $record['moduleName'] . '\\model\\' . ucfirst($e->name);
+			if($record['modulePackage'] == 'core') {
+				$e->className = 'go\\core\\model\\' . ucfirst($e->name);	
+			} else
+			{
+				$e->className = 'go\\modules\\' . $record['modulePackage'] . '\\' . $record['moduleName'] . '\\model\\' . ucfirst($e->name);
+			}
 		} else {			
 			$e->className = 'GO\\' . ucfirst($record['moduleName']) . '\\Model\\' . ucfirst($e->name);			
 		}
@@ -220,32 +307,196 @@ class EntityType {
 		return $e;
 	}
 	
-	protected $changed = [];
-	
+	/**
+	 * Register multiple changes for JMAP
+	 * 
+	 * This function increments the entity type's modSeq so the JMAP sync API 
+	 * can detect this change for clients.
+	 * 
+	 * It writes the changes into the 'core_change' table.
+	 * 	 
+	 * @param Query|array $changedEntities A query object or an array that provides "entityId", "aclId" and "destroyed" 
+	 * in this order. When using an array you may also provide a list of entity ID's. In that case it's assumed that these 
+	 * entites have no ACL and are not destroyed but modified.
+	 * 
+	 */
+	public function changes($changedEntities) {		
+		
+		go()->getDbConnection()->beginTransaction();
+		
+		$this->highestModSeq = $this->nextModSeq();		
+		
+		if(!is_array($changedEntities)) {
+			$changedEntities->select('"' . $this->getId() . '", "'. $this->highestModSeq .'", NOW()', true);		
+		} else {
+
+			if(empty($changedEntities)) {
+				return;
+			}
+
+			if(!is_array($changedEntities[0])) {
+				$changedEntities = array_map(function($entityId) {
+					return [$entityId, null, 0, $this->getId(), $this->highestModSeq, new DateTime()];
+				}, $changedEntities);
+			} else{
+				$changedEntities = array_map(function($r) {
+					return array_merge($r, [$this->getId(), $this->highestModSeq, new DateTime()]);
+				}, $changedEntities);
+			}
+		}
+		
+		
+		try {
+			$stmt = go()->getDbConnection()->insert('core_change', $changedEntities, ['entityId', 'aclId', 'destroyed', 'entityTypeId', 'modSeq', 'createdAt']);
+			$stmt->execute();
+		} catch(\Exception $e) {
+			go()->getDbConnection()->rollBack();
+			throw $e;
+		}
+		
+		if(!$stmt->rowCount()) {
+			//if no changes were written then rollback the modSeq increment.
+			go()->getDbConnection()->rollBack();
+		} else
+		{
+			go()->getDbConnection()->commit();
+		}				
+	}
+
+	/**
+	 * Register a change for JMAP
+	 * 
+	 * This function increments the entity type's modSeq so the JMAP sync API 
+	 * can detect this change for clients.
+	 * 
+	 * It writes the changes into the 'core_change' table.
+	 * 
+	 * It also writes user specific changes 'core_user_change' table ({@see \go\core\orm\Mapping::addUserTable()). 
+	 * 
+	 * @param jmap\Entity $entity
+	 */
 	public function change(jmap\Entity $entity) {
-		$this->changed[] = $entity;		
+		$this->highestModSeq = $this->nextModSeq();
+
+		$record = [
+				'modSeq' => $this->highestModSeq,
+				'entityTypeId' => $this->id,
+				'entityId' => $entity->id(),
+				'aclId' => $entity->findAclId(),
+				'destroyed' => $entity->isDeleted(),
+				'createdAt' => new DateTime()
+						];
+
+		go()->getDbConnection()->insert('core_change', $record)->execute();
+	}
+		
+	/**
+	 * Checks if a saved entity needs changes for the JMAP API with change() and userChange()
+	 * 
+	 * @param Entity $entity
+	 * @throws Exception
+	 */
+	public function checkChange(Entity $entity) {
+		
+//		go()->debug($entity->getClientName(). ' checkChange() ' . $entity->getId() . 'mod: '.implode(', ', array_keys($entity->getModified())));
+		
+		if(!$entity->isDeleted()) {
+			$modifiedPropnames = array_keys($entity->getModified());		
+			$userPropNames = $entity->getUserProperties();
+
+			$entityModified = !empty(array_diff($modifiedPropnames, $userPropNames));
+			$userPropsModified = !empty(array_intersect($userPropNames, $modifiedPropnames));
+		} else
+		{
+			$entityModified = true;
+			$userPropsModified = false;
+		}
+		
+	
+		if($entityModified) {			
+			$this->change($entity);
+		}
+		
+		if($userPropsModified) {
+			$this->userChange($entity);
+		}
+		
+		if($entity->isDeleted()) {
+			
+			$where = [
+					'entityTypeId' => $this->id,
+					'entityId' => $entity->id(),
+					'userId' => go()->getUserId()
+							];
+			
+			$stmt = go()->getDbConnection()->delete('core_change_user', $where);
+			if(!$stmt->execute()) {
+				throw new \Exception("Could not delete user change");
+			}
+		}
+	}
+	
+	private function userChange(Entity $entity) {
+		$data = [
+				'modSeq' => $this->nextUserModSeq(),						
+				'entityTypeId' => $this->id,
+				'entityId' => $entity->id(),
+				'userId' => go()->getUserId()
+						];
+
+		$stmt = go()->getDbConnection()->replace('core_change_user', $data);
+		if(!$stmt->execute()) {
+			throw new \Exception("Could not save user change");
+		}
+
+		// if(!$stmt->rowCount()) {
+		// 	$where['modSeq'] = 1;
+		// 	if(!go()->getDbConnection()->insert('core_change_user', $where)->execute()) {
+		// 		throw new \Exception("Could not save user change");
+		// 	}
+		// }
 	}
 	
 	/**
-	 * Get the next state
+	 * Get the modSeq for the user specific properties.
+	 * 
+	 * @return string
+	 */
+	public function getHighestUserModSeq() {
+		if(!isset($this->highestUserModSeq)) {
+			$this->highestUserModSeq = (int) (new Query())
+						->selectSingleValue("highestModSeq")
+						->from("core_change_user_modseq")
+						->where(["entityTypeId" => $this->id, "userId" => go()->getUserId()])
+						->single();					
+		}
+		return $this->highestUserModSeq;
+	}
+	
+	
+	/**
+	 * Get the modification sequence
+	 * 
 	 * @param string $entityClass
 	 * @return int
 	 */
-	private function nextModSeq() {
+	public function nextModSeq() {
+		
+		if($this->modSeqIncremented) {
+			return $this->highestModSeq;
+		}
 		/*
 		 * START TRANSACTION
 		 * SELECT counter_field FROM child_codes FOR UPDATE;
 		  UPDATE child_codes SET counter_field = counter_field + 1;
 		 * COMMIT
 		 */
-
-
-		$query = (new Query())
+		$modSeq = (new Query())
 						->selectSingleValue("highestModSeq")
 						->from("core_entity")
 						->where(["id" => $this->id])
-						->forUpdate();
-		$modSeq = (int) $query->execute()->fetch();
+						->forUpdate()
+						->single();
 		$modSeq++;
 
 		App::get()->getDbConnection()
@@ -255,37 +506,158 @@ class EntityType {
 										["id" => $this->id]
 						)->execute(); //mod seq is a global integer that is incremented on any entity update
 	
+		$this->modSeqIncremented = true;
+		
+		$this->highestModSeq = $modSeq;
+		
 		return $modSeq;
 	}	
 	
-	public function __destruct() {	
+	/**
+	 * Get the modification sequence
+	 * 
+	 * @param string $entityClass
+	 * @return int
+	 */
+	public function nextUserModSeq() {
 		
-		
-		if(!empty($this->changed)) {
-			
-			$this->highestModSeq = $this->nextModSeq();
-			
-			foreach($this->changed as $change) {
-				$record = [
-						'modSeq' => $this->highestModSeq,
-						'entityTypeId' => $this->id,
-						'entityId' => $change->id,
-						'aclId' => $change->findAclId(),
-						'destroyed' => $change->isDeleted(),
-						'createdAt' => new DateTime()
-								];
-				
-				try {
-					GO()->getDbConnection()->replace('core_change', $record)->execute();
-				} catch(PDOException $e) {
-					error_log("Failed to save change for ". var_export($record, true));
-					ErrorHandler::logException($e);
-				}
-			}
-			
+		if($this->userModSeqIncremented) {
+			return $this->getHighestUserModSeq();
 		}
+		
+		$modSeq = (new Query())
+			->selectSingleValue("highestModSeq")
+			->from("core_change_user_modseq")
+			->where(["entityTypeId" => $this->id, "userId" => go()->getUserId()])
+			->forUpdate()
+			->single();
+
+		$modSeq++;
+
+		App::get()->getDbConnection()
+						->replace(
+										"core_change_user_modseq", 
+										[
+												'highestModSeq' => $modSeq,
+												"entityTypeId" => $this->id,
+												"userId" => go()->getUserId()
+										]
+						)->execute(); //mod seq is a global integer that is incremented on any entity update
+	
+		$this->userModSeqIncremented = true;
+		
+		$this->highestUserModSeq = $modSeq;
+		
+		return $modSeq;
 	}
 	
+	private function createAcl() {
+		$acl = new \go\core\model\Acl();
+		$acl->usedIn = 'core_entity.defaultAclId';
+		$acl->ownedBy = 1;
+		//$acl->addGroup(\go\core\model\Group::ID_INTERNAL, \go\core\model\Acl::LEVEL_WRITE);
+		if(!$acl->save()) {
+			throw new \Exception('Could not save default ACL');
+		}
+		
+		return $acl;
+	}
 	
+	public function getDefaultAclId() {
+		if(!$this->isAclOwner()) {
+			return null;
+		}
+		
+		if(!isset($this->defaultAclId)) {
+			
+			go()->getDbConnection()->beginTransaction();
+			
+			$acl = $this->createAcl();
+			
+			if(!go()->getDbConnection()->update('core_entity', ['defaultAclId' => $acl->id], ['id' => $this->getId()])->execute()) {
+				go()->getDbConnection()->rollBack();
+				throw new \Exception("Could not save defaultAclId");
+			}
+			
+			go()->getDbConnection()->commit();
+			
+			$this->defaultAclId = $acl->id;
+		}
+		
+		return $this->defaultAclId;
+	}
+	
+	/**
+	 * Returns true when this entity type holds an ACL id for permissions.
+	 * 
+	 * @return bool
+	 */
+	public function isAclOwner() {
+		$cls = $this->getClassName();
+		return $cls != \go\core\model\Search::class && 
+						(
+							is_subclass_of($cls, \go\core\acl\model\AclOwnerEntity::class) || 
+							(is_subclass_of($cls, \GO\Base\Db\ActiveRecord::class) && $cls::model()->aclField() && !$cls::model()->isJoinedAclField)
+						);
+	}
+	
+	/**
+	 * Returns true if this entity supports custom fields
+	 * 
+	 * @return bool
+	 */
+	public function supportsCustomFields() {
+		return method_exists($this->getClassName(), "getCustomFields");
+	}
+	
+	/**
+	 * Returns true if the entity supports a files folder.
+	 * 
+	 * @return bool
+	 */
+	public function supportsFiles() {
+		return property_exists($this->getClassName(), 'filesFolderId') || property_exists($this->getClassName(), 'files_folder_id');
+	}
 
+	/**
+	 * Returns an array with group ID as key and permission level as value.
+	 * 
+	 * @return array eg. ["2" => 50, "3" => 10]
+	 */
+	public function getDefaultAcl() {
+
+		$defaultAclId = $this->getDefaultAclId();
+		if(!$defaultAclId) {
+			return null;
+		}
+		$a = Acl::findById($defaultAclId);
+		$acl = [];
+		foreach($a->groups as $group) {
+			$acl[$group->groupId] = $group->level;
+		}
+
+		return $acl;
+	}
+
+	public function setDefaultAcl($acl) {
+		$defaultAclId = $this->getDefaultAclId();
+		if(!$defaultAclId) {
+			throw new \Exception("Entity '".$this->name."' does not support a default ACL");
+		}
+		$a = Acl::findById($defaultAclId);
+		foreach($acl as $groupId => $level) {
+			$a->addGroup($groupId, $level);
+		}
+		return $a->save();
+	}
+
+	public function toArray($properties = null) {
+		return [
+				"name" => $this->getName(),
+				"isAclOwner" => $this->isAclOwner(),
+				"defaultAcl" => $this->getDefaultAcl(),
+				"supportsCustomFields" => $this->supportsCustomFields(),
+				"supportsFiles" => $this->supportsFiles()
+		];
+	}
 }

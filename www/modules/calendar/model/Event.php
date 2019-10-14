@@ -61,6 +61,8 @@ use Swift_Attachment;
 use Swift_Mime_ContentEncoder_PlainContentEncoder;
 
 class Event extends \GO\Base\Db\ActiveRecord {
+	
+	use \go\core\orm\CustomFieldsTrait;
 
 	const STATUS_TENTATIVE = 'TENTATIVE';
 //	const STATUS_DECLINED = 'DECLINED';
@@ -233,10 +235,17 @@ class Event extends \GO\Base\Db\ActiveRecord {
 			return false;
 		}
 		
-		$calendarName = empty($this->calendar) ? '' : ', '.$this->calendar->name;
+		$calendarName = empty($this->calendar) ? '' :$this->calendar->name;
+
+		$description = $calendarName;
+
+		 if(!$this->private && !empty($this->description) ){
+			$description .= ', ' . $this->description;
+		 }
+
 		return array(
-				'name' => $this->private ?  \GO::t("Private", "calendar") : $this->name.' ('.\GO\Base\Util\Date::get_timestamp($this->start_time, false).$calendarName.')',
-				'description' => $this->private ?  "" : $this->description,
+				'name' => $this->private ?  \GO::t("Private", "calendar") : $this->name,
+				'description' =>  $description,
 				'mtime'=>$this->start_time
 		);
 	}
@@ -1434,22 +1443,28 @@ class Event extends \GO\Base\Db\ActiveRecord {
 
 		//$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 
-		$cfRecord = $this->getCustomfieldsRecord();
-		if (!empty($cfRecord)) {
-			$columns = $cfRecord->getColumns();
-			foreach ($columns as $column) {
-				if (isset($column['customfield'])) {
-					$colId = $column['customfield']->databaseName;
-					$recordAttributes = $cfRecord->getAttributes();
-					if (!empty($recordAttributes[$colId])) {
-						$colValue = $cfRecord->getAttribute($column['customfield']->name);
-						$html .= '<tr><td style="vertical-align:top">'.($column['customfield']->name).'</td>'.
-										'<td>'.$recordAttributes[$colId].'</td></tr>';
-					}
-				}
-			}
-		}
+		$cfRecord = $this->getCustomFields();
 		
+		if (!empty($cfRecord)) {
+		$fieldsets = \go\core\model\FieldSet::find()->filter(['entities' => ['Event']]);
+		
+			foreach($fieldsets as $fieldset) {
+				$html .= '<tr><td colspan="2"><b>'.($fieldset->name).'</td></tr>';
+
+				$fields = \go\core\model\Field::find()->where(['fieldSetId' => $fieldset->id]);
+				
+				foreach($fields as $field) {
+					
+					if(empty($cfRecord[$field->databaseName])) {
+						continue;
+					}
+					
+					$html .= '<tr><td style="vertical-align:top">'.($field->name).'</td>'.
+										'<td>'.$cfRecord[$field->databaseName].'</td></tr>';
+				}				
+			}
+		}		
+	
 		$html .= '</table>';
 		
 		$stmt = $this->participants();
@@ -1528,19 +1543,11 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	
     $e->summary = (string) $this->name;
 		
-//		switch($this->owner_status){
-//			case Participant::STATUS_ACCEPTED:
-//				$e->status = "CONFIRMED";
-//				break;
-//			case Participant::STATUS_DECLINED:
-//				$e->status = "CANCELLED";
-//				break;
-//			default:
-//				$e->status = "TENTATIVE";
-//				break;			
-//		}
-		
-		$e->status = $this->status;
+		if($this->status == "NEEDS-ACTION"){
+			$e->status = "TENTATIVE";
+		}else{
+			$e->status = $this->status;
+		}	
 		
 		
 		$dateType = $this->all_day_event ? "DATE" : "DATETIME";
@@ -1852,20 +1859,26 @@ $sub = $offset>0;
 //				\GO::debug("WARNING: Ignoring unsupported reminder value of type: ".$type);			
 //			}
 //	
-		if($vobject->valarm && $vobject->valarm->trigger) {
-			$date = $vobject->valarm->getEffectiveTriggerTime();
-			if($date) {
-				if($this->all_day_event)
-					$this->_utcToLocal($date);
-				$this->reminder = $this->start_time-$date->format('U');
-			}
-		}elseif($vobject->aalarm){ //funambol sends old vcalendar 1.0 format
-			$aalarm = explode(';', (string) $vobject->aalarm);
-			if(!empty($aalarm[0])) {				
-				$p = Sabre\VObject\DateTimeParser::parse($aalarm[0]);
-				$this->reminder = $this->start_time-$p->format('U');
-			}		
-		}
+		// if($vobject->valarm && $vobject->valarm->trigger) {
+		// 	$date = false;
+		// 	try {
+		// 		$date = $vobject->valarm->getEffectiveTriggerTime();
+		// 	}
+		// 	catch(\Exception $e) {
+		// 		//invalid trigger.
+		// 	}
+		// 	if($date) {
+		// 		if($this->all_day_event)
+		// 			$this->_utcToLocal($date);
+		// 		$this->reminder = $this->start_time-$date->format('U');
+		// 	}
+		// }elseif($vobject->aalarm){ //funambol sends old vcalendar 1.0 format
+		// 	$aalarm = explode(';', (string) $vobject->aalarm);
+		// 	if(!empty($aalarm[0])) {				
+		// 		$p = Sabre\VObject\DateTimeParser::parse($aalarm[0]);
+		// 		$this->reminder = $this->start_time-$p->format('U');
+		// 	}		
+		// }
 		
 		$this->setAttributes($attributes, false);
 		
@@ -1930,14 +1943,31 @@ $sub = $offset>0;
 		}
 		
 		if($vobject->valarm && $vobject->valarm->trigger){
-			$reminderTime = $vobject->valarm->getEffectiveTriggerTime();
-			//echo $reminderTime->format('c');
-			if($this->all_day_event)
-				$this->_utcToLocal($reminderTime);
-			$seconds = $reminderTime->format('U');
-			$this->reminder = $this->start_time-$seconds;
-			if($this->reminder<0)
-				$this->reminder=0;
+			
+			$reminderTime = false;
+			try {
+				$reminderTime = $vobject->valarm->getEffectiveTriggerTime();
+			}
+			catch(\Exception $e) {
+				//invalid trigger.
+			}
+
+			if($reminderTime) {
+				//echo $reminderTime->format('c');
+				if($this->all_day_event)
+					$this->_utcToLocal($reminderTime);
+				$seconds = $reminderTime->format('U');
+				$this->reminder = $this->start_time-$seconds;
+				if($this->reminder<0)
+					$this->reminder=0;
+
+			}
+		}elseif($vobject->aalarm){ //funambol sends old vcalendar 1.0 format
+			$aalarm = explode(';', (string) $vobject->aalarm);
+			if(!empty($aalarm[0])) {				
+				$p = Sabre\VObject\DateTimeParser::parse($aalarm[0]);
+				$this->reminder = $this->start_time-$p->format('U');
+			}		
 		}
 		
 		if($withCategories) {
@@ -2318,16 +2348,11 @@ The following is the error message:
 	public function getDefaultOrganizerParticipant(){
 		$calendar = $this->calendar;
 		
-		$user = $calendar->user_id==1 ? \GO::user() : $calendar->user;
+		$user = $calendar->user_id==1 || !$calendar->user ? \GO::user() : $calendar->user;
 		
 		$participant = new Participant();
 		$participant->event_id=$this->id;
-		$participant->user_id=$user->id;
-		
-		$contact = $user->createContact();
-		
-		if($contact)
-			$participant->contact_id=$contact->id;
+		$participant->user_id=$user->id;		
 		
 		$participant->name=$user->name;
 		$participant->email=$user->email;

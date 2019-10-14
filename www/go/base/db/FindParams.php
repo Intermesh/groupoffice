@@ -225,6 +225,15 @@ class FindParams{
 	/**
 	 * Insert a plain join SQL string
 	 * 
+	 * 
+	 * @example
+	 * 
+	 * ```
+	 * $findParams = FindParams::newInstance()
+							->join('core_search', FindCriteria::newInstance()->addRawCondition('search.entityId', 't.id')->addRawCondition("search.entityTypeId", $entityTypeId), 'search', 'LEFT');
+			
+	 * ```
+	 * 
 	 * @param StringHelper $tableName
 	 * @param FindCriteria $criteria
 	 * @param String $tableAlias

@@ -1,5 +1,5 @@
 @media print {
- .go-warning-msg,.message-move,.em-autolink-message,.em-contact-link-container,.em-link-message{ display: none !important; }
+ .go-warning-msg,.message-move,.em-autolink-message,.em-contact-link-container,.em-links,.em-link-message, .em-links-header{ display: none !important; }
 }
 
 .em-autolink-message{
@@ -30,6 +30,12 @@
 	background-color:#f1f1f1;
 	margin-bottom:20px;
 }
+
+.em-links .go-icon-list{
+	display: inline-block;	
+	margin-left: -15px;
+}
+
 
 .em-spam-move-block {
 	float:right;
@@ -135,11 +141,7 @@ margin:5px 2px;
 
 
 
-.message-header-table{
-	float:left;
-	margin-right: 10px;
-	margin-bottom: 5px;
-}
+
 
 .message-header-table td{
 	vertical-align:top;

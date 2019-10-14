@@ -29,3 +29,4 @@ modules/calendar/Calendar.js
 modules/calendar/MonthGrid.js
 modules/calendar/ViewGrid.js
 modules/calendar/TaskContextMenu.js
+modules/calendar/CustomFieldSetDialog.js

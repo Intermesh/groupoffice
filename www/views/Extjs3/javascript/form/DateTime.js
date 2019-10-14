@@ -80,6 +80,8 @@ Ext.ux.form.DateTime = Ext.extend(Ext.form.Field, {
      * @cfg {Number} timeWidth Width of time field in pixels (defaults to 100)
      */
     ,timeWidth:100
+		
+		,dateWidth: dp(140)
     /**
      * @cfg {String} dateFormat Format of DateField. Can be localized. (defaults to 'm/y/d')
      */
@@ -108,7 +110,7 @@ Ext.ux.form.DateTime = Ext.extend(Ext.form.Field, {
         var dateConfig = Ext.apply({}, {
              id:this.id + '-date'
             ,format:this.dateFormat || Ext.form.DateField.prototype.format
-            ,width:this.timeWidth
+            ,width:this.dateWidth
             ,selectOnFocus:this.selectOnFocus
             ,validator:this.dateValidator
 						,allowBlank:this.allowBlank
@@ -117,7 +119,7 @@ Ext.ux.form.DateTime = Ext.extend(Ext.form.Field, {
                  ,focus:{scope:this, fn:this.onFocus}
             }
         }, this.dateConfig);
-        this.df = new Ext.form.DateField(dateConfig);
+        this.df = new go.form.DateField(dateConfig);
         this.df.ownerCt = this;
         delete(this.dateFormat);
 

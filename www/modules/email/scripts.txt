@@ -9,11 +9,8 @@ modules/email/AccountsDialog.js
 modules/email/AccountsGrid.js
 modules/email/MessagesGrid.js
 modules/email/AccountsTree.js
-modules/email/UnknownRecipientsDialog.js
 modules/email/AddressbookDialog.js
 modules/email/SelectAccount.js
-modules/email/views/Extjs3/TemplateGridPanel.js
-modules/email/views/Extjs3/TemplateSelectionDialog.js
 
 modules/email/EmailComposer.js
 modules/email/AddressContextMenu.js
@@ -25,7 +22,6 @@ modules/email/LinkAttachmentDialog.js
 modules/email/EmailClient.js
 modules/email/ContactsGrid.js
 modules/email/FindContactDialog.js
-modules/email/ReplaceEmailDialog.js
 modules/email/MessageDialog.js
 modules/email/ImapAclDialog.js
 modules/email/ImapAclUserDialog.js
@@ -40,6 +36,11 @@ modules/email/PortletPanel.js
 modules/email/PortletSettingsDialog.js
 modules/email/Portlet.js
 modules/email/CopyMailToDialog.js
+modules/email/RecipientCombo.js
 modules/email/views/Extjs3/LabelDialog.js
+modules/email/views/Extjs3/TemplateGridPanel.js
+modules/email/views/Extjs3/TemplateSelectionDialog.js
+modules/email/TemplatesGrid.js
+modules/email/EmailTemplateDialog.js
 
 

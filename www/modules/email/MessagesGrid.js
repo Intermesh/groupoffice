@@ -20,85 +20,18 @@ GO.email.MessagesGrid = function(config){
 
 	config.hideMode='offsets';
 
-	if(config.region=='north')
-	{
-		config.cm = new Ext.grid.ColumnModel({
-			defaults:{
-				sortable:true
-			},
-			columns:[
-			{
-				header:"&nbsp;",
-				width:dp(32),
-				dataIndex: 'icon',
-				renderer: this.renderIcon,
-				hideable:false,
-				sortable:false
-			},{
-				id: 'labels',
-				header: t("Labels", "email"),
-				width:50,
-				xtype: 'templatecolumn',
-				tpl: new Ext.XTemplate('<div class="em-messages-grid-labels-container"><tpl for="labels"><div ext:qtip="{name}" style="background-color: #{color}">&nbsp;</div></tpl></div>'),
-				hidden:true,
-				sortable:false
-			},{
-				header: t("From", "email"),
-				dataIndex: 'from',
-				renderer:{
-					fn: this.renderNorthMessageRow,
-					scope: this
-				},
-				id:'from',
-				width:200
-			},{
-				header: t("To", "email"),
-				dataIndex: 'to',
-				renderer:{
-					fn: this.renderNorthMessageRow,
-					scope: this
-				},
-				id:'to',
-				width:200,
-				hidden: true
-			},{
-				header: t("Subject", "email"),
-				dataIndex: 'subject',
-				renderer:{
-					fn: this.renderNorthMessageRow,
-					scope: this
-				},
-				width:200
-			},{
-				xtype: "datecolumn",
-				header: t("Date"),
-				dataIndex: 'internal_udate',
-					hidden:true
-			},{
-				xtype: "datecolumn",
-				header: t("Date sent", "email"),
-				dataIndex: 'udate',
-			},{
-				header: t("Size"),
-				dataIndex: 'size',
-				width:65,
-				align:'right',
-				hidden:true,
-				renderer:Ext.util.Format.fileSize
-			}]
-		});
 
-	} else {
 		
 		config.cm =  new Ext.grid.ColumnModel({
 		defaults:{
-			sortable:true
+			sortable:true,
+			groupable:false
 		},
 		columns:[
 		{
 			id:'icon',
 			header:"&nbsp;",
-			width:dp(32),
+			width:dp(24),
 			dataIndex: 'icon',
 			renderer: this.renderIcon,
 			hideable:false,
@@ -125,13 +58,29 @@ GO.email.MessagesGrid = function(config){
 			id:'arrival',
 			header: t("Date"),
 			dataIndex:'internal_udate',
-			xtype: "datecolumn",
-			hidden:true
+			hidden:true,
+			groupable:true,
+			align:'right',
+			width: dp(40),
+			renderer: function(value, metaData, record, rowIndex, colIndex, store){
+				return !store.groupField ? go.util.Format.dateTime(value) : go.util.Format.time(value);
+			},
+			groupRenderer : function(value){
+				return go.util.Format.shortDateTime(value,false,true);
+			}
 		},{
 			id:'date',
 			header: t("Date sent", "email"),
 			dataIndex:'udate',
-			xtype: "datecolumn"
+			groupable:true,
+			align:'right',
+			width: dp(40),
+			renderer: function(value, metaData, record, rowIndex, colIndex, store){
+				return !store.groupField ? go.util.Format.dateTime(value) : go.util.Format.time(value);
+			},
+			groupRenderer : function(value){
+				return go.util.Format.shortDateTime(value,false,true);
+			}
 		},{
 			id:'size',
 			header: t("Size"),
@@ -152,21 +101,16 @@ GO.email.MessagesGrid = function(config){
 		});
 		
 		config.autoExpandColumn='message';
-	}
 
-	config.view=new Ext.grid.GridView({
-		holdPosition: true,
+	config.view = new Ext.grid.GroupingView({
+		autoFill: true,
+		forceFit: true,
+		groupTextTpl:'{group}',
 		emptyText: t("No items to display"),
 		getRowClass:function(row, index) {
 			return (row.data.seen == '0') ? 'ml-unseen-row' : 'ml-seen-row';
-		},
-		onLoad : function(){
-			if (!this.holdPosition) { 
-				this.scrollToTop();
-			}
-			this.holdPosition = false;
-		}
-	});
+		}		
+	}),
 
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;
@@ -219,6 +163,8 @@ GO.email.MessagesGrid = function(config){
 	this.searchDialog = new GO.email.SearchDialog({
 		store:config.store
 	});
+
+	
 	
 	this.settingsMenu = new Ext.menu.Menu({
 		items:[{
@@ -260,6 +206,8 @@ GO.email.MessagesGrid = function(config){
 		config.tbar = [];
 	
 	GO.email.MessagesGrid.superclass.constructor.call(this, config);
+
+	var me = this;
 
 	if(!config.hideSearch)
 		this.getTopToolbar().add({
@@ -305,7 +253,13 @@ GO.email.MessagesGrid = function(config){
 					iconCls: 'ic-more',
 					tooltip: t("Search"),
 					handler: function(){
+						var first = !this.searchDialog.dialog;
 						this.searchDialog.show();
+						if(first) {
+							this.searchDialog.dialog.on('hide', function() {
+								this.searchField.updateView();
+							}, this);
+						}
 					},
 					scope: this
 				}
@@ -324,6 +278,9 @@ GO.email.MessagesGrid = function(config){
 					this.store.load({params:{start:0} });
 				},
 				scope:this
+			},
+			hasActiveSearch: function() {		
+				return  me.store.baseParams.search || me.store.baseParams.query;
 			}
 		}),{
 			iconCls: 'ic-more-vert',
@@ -359,15 +316,16 @@ GO.email.MessagesGrid = function(config){
 		}
 
 		if(this.searchField.getValue()) {
-			GO.email.messagesGrid.store.baseParams['search'] = this.searchField.getValue();
-			this.searchField.hasSearch = true;
+			// GO.email.messagesGrid.store.baseParams['search'] = this.searchField.getValue();
+			// this.searchField.hasSearch = true;
 
-			GO.email.messagesGrid.store.reload();
+			// GO.email.messagesGrid.store.reload();
+			this.searchField.search();
 		}
 
 	}, this);
 
-};
+}
 
 Ext.extend(GO.email.MessagesGrid, GO.grid.GridPanel,{
 	

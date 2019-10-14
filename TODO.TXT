@@ -1,17 +1,55 @@
 6.4
 
-Template parsing for entities
+- Billing: Copy matching custom fields in order dialog
 
-Demo data
+Merge contacts
+Batch edit custom fields not possible
+Disabled categories for:  folder dialog Folder::deriveCustomfieldSettings
+custom fields billign items dropped ?!
+Calendar birthdays
+Demodata
+ticket groups
 
-Enabled / disabled custom fields
+
+DG::
+
+Income contracts als maatwerk:
+modules/projects2/views/Extjs3/AddressbookOverrides.js
+
+Affected customer modules:
+favorites (greifswald)
+  blocks module
+	bestgroen
+	relations
+	AMD
+	calendarcompany
+	comments report (Houtwerf?)
+	disableformfields (Elite)
+	efront
+	elite
+	employee gallery
+	exactonline (dg)
+	fivehundredwords
+	forms ?
+	kassanova
+	maranga
+	nuwbackup
+	nuwleadreport
+	orderplanning (weap)
+	radius search (nltechniek)
+	reservations
+	sendletter
+	unit4export
+	voip
+	werkplaatsplanning (WEAP)
+	xero
+advancedsearch projects (nuw)
 
 
-Later
 
--	customcss
--	dokuwiki
--	sonylostpassword
+
+
+
 
 
 TICKETS:

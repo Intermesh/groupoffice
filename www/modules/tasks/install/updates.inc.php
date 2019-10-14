@@ -103,3 +103,14 @@ $updates['201610281650'][] = 'ALTER TABLE `ta_tasks` CONVERT TO CHARACTER SET ut
 
 
 $updates['201610281659'][] = 'SET foreign_key_checks = 1;';
+
+
+
+$updates['201810161450'][] = "ALTER TABLE `cf_ta_tasks` CHANGE `model_id` `id` INT(11) NOT NULL;";
+$updates['201810161450'][] = "RENAME TABLE `cf_ta_tasks` TO `ta_tasks_custom_fields`;";
+$updates['201810161450'][] = "delete from ta_tasks_custom_fields where id not in (select id from ta_tasks);";
+$updates['201810161450'][] = "ALTER TABLE `ta_tasks_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `ta_tasks`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+$updates['201903291350'][] = function() {	
+	$m = new \go\core\install\MigrateCustomFields63to64();
+	$m->migrateEntity("Task");
+};

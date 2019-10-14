@@ -27,6 +27,7 @@
 
 namespace GO\Base;
 
+use GO\Base\Model\Acl;
 
 class ModuleCollection extends Model\ModelCollection{
 	
@@ -45,7 +46,7 @@ class ModuleCollection extends Model\ModelCollection{
 		
 		if(!isset($this->_allowedModules)) {
 			if(!empty(\GO::config()->allowed_modules)) {
-				$this->_allowedModules=  explode(',', \GO::config()->allowed_modules);		
+				$this->_allowedModules = explode(',', \GO::config()->allowed_modules);		
 				$this->_allowedModules = array_merge($this->_allowedModules, ['core', 'links', 'search', 'users', 'modules', 'groups', 'customfields']);
 				
 			} else
@@ -94,7 +95,7 @@ class ModuleCollection extends Model\ModelCollection{
 		//for new framework
 		$classFinder = new \go\core\util\ClassFinder(false);
 		$classFinder->addNamespace("go\\modules");
-		$mods = $classFinder->findByParent(\go\core\module\Base::class);
+		$mods = $classFinder->findByParent(\go\core\Module::class);
 		$mods = array_filter($mods, function($mod) {
 			return $this->_isAllowed($mod::getName());
 		});
@@ -179,18 +180,10 @@ class ModuleCollection extends Model\ModelCollection{
 	
 	public function __get($name) {
 		
-		if(!isset($this->_modules[$name])){		
-//			if(!$this->isAvailable($name)){			
-//				return false;
-//			}
-
-			try {
-				$model = $this->model->findSingleByAttribute('name', $name);
-			} catch (\GO\Base\Exception\AccessDenied $e) {
-				$model = false;
-			}
+		if(!isset($this->_modules[$name])) {	
+			$model = $this->model->findSingleByAttribute('name', $name);
 			
-			if($model && !$model->isAvailable()) {
+			if($model && (!$model->isAvailable() || !$model->checkPermissionLevel(Acl::READ_PERMISSION))) {
 				$model = false;
 			}
 			

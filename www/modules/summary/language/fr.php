@@ -24,4 +24,5 @@ return array (
   'Notes' => 'Notes',
   'Type' => 'Type',
   'webfeeds' => 'WebFeeds',
+  'Today' => 'Aujourd\'hui',
 );

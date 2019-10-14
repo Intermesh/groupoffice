@@ -33,7 +33,7 @@ class Transport extends \Swift_SmtpTransport{
 				->setPassword(\GO::config()->smtp_password);
 		}
 		
-		if(!GO()->getSettings()->smtpEncryptionVerifyCertificate) {
+		if(!go()->getSettings()->smtpEncryptionVerifyCertificate) {
 			$o->setStreamOptions(array('ssl' => array('allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name'  => false)));
 		}
 		return $o;

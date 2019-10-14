@@ -6,7 +6,7 @@ namespace go\core;
  * Debugger class. All entries are stored and the view can render them eventually.
  * The JSON view returns them all.
  * 
- * The client can enable by sending an HTTP header X-Debug=1
+ * The client can enable by sending an HTTP header X-Debug=1 (Use CTRL + F7 in webclient)
  * 
  * Example:
  * 
@@ -34,11 +34,13 @@ class Debugger {
 	
 	const SECTION_VIEW = 'view';
 	
-	const TYPE_GENERAL = 'general';
+	const LEVEL_LOG = 'log';
 	
-	const TYPE_SQL = 'sql';
+	const LEVEL_WARN = 'warn';
 	
-	private $section = self::SECTION_INIT;
+	const LEVEL_INFO = 'info';
+	
+	const LEVEL_ERROR = 'error';
 
 	/**
 	 * Sets the debugger on or off
@@ -51,41 +53,6 @@ class Debugger {
 	 * @var string Full path on FS
 	 */
 	public $logPath;
-	
-	/**
-	 * List of enabled debug sections.
-	 * 
-	 * This controls the output of the debugger so you don't get too much debug 
-	 * info. In most cases developers need just self::SECTION_CONTROLLER
-	 * 
-	 * By default there are:
-	 * 
-	 * `````````````````````````````````````````````````````````````````````
-	 * [self::SECTION_INIT, self::SECTION_ROUTER, self::SECTION_CONTROLLER, self::SECTION_VIEW];
-	 * `````````````````````````````````````````````````````````````````````
-	 * 
-	 * But developers can use any arbitrary string as section
-	 * 
-	 * @var array 
-	 */
-	public $enabledSections = [self::SECTION_INIT, self::SECTION_ROUTER, self::SECTION_CONTROLLER];
-	
-	/**
-	 * List of enabled debug types.
-	 * 
-	 * This controls the output of the debugger so you don't get too much debug 
-	 * info.
-	 * 
-	 * By default there are:
-	 * 
-	 * `````````````````````````````````````````````````````````````````````
-	 * [self::TYPE_GENERAL, self::TYPE_SQL];
-	 * `````````````````````````````````````````````````````````````````````
-	 * 
-	 * But developers can use any arbitrary string as type
-	 * @var type 
-	 */
-	public $enabledTypes = [self::TYPE_GENERAL, self::TYPE_SQL];
 
 	/**
 	 * The debug entries as strings
@@ -95,14 +62,41 @@ class Debugger {
 	
 	public function __construct() {
 		try {
-			$this->enabled = !empty(GO()->getConfig()['general']['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug');
-			if($this->enabled) {
-				$this->logPath = GO()->getDataFolder()->getFile('log/debug.log')->getPath();
+			$this->enabled = !empty(go()->getConfig()['core']['general']['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug');
+			
+			if(go()->getConfig()['core']['general']['debugLog']) {
+				$this->logPath = go()->getDataFolder()->getFile('log/debug.log')->getPath();
 			}
 		} catch (\go\core\exception\ConfigurationException $e) {
 			//GO is not configured / installed yet.
 			$this->enabled = true;
 		}
+	}
+
+	protected $currentGroup;
+	protected $groupStartTime;
+
+	public function group($name) {		
+		if(!$this->enabled) {
+			return;
+		}
+		$this->entries[] = ['groupCollapsed', $name];
+		$this->currentGroup = &$this->entries[count($this->entries)-1][1];
+		$this->groupStartTime = $this->getTimeStamp();
+
+		$this->writeLog('start', $name . ' '. date('Y-m-d H:i:s'));
+	}
+
+	public function groupEnd(){
+		if(!$this->enabled) {
+			return;
+		}
+		$time = $this->getTimeStamp() - $this->groupStartTime;
+		$this->currentGroup .= ', time: '.$time.'ms';
+
+		$this->entries[] = ['groupEnd', null];
+
+		$this->writeLog('end', $this->currentGroup);
 	}
 
 	/**
@@ -111,21 +105,31 @@ class Debugger {
 	 * @return float Milliseconds
 	 */
 	public function getMicroTime() {
-		list ($usec, $sec) = explode(" ", microtime());
-		return ((float) $usec + (float) $sec);
+		// list ($usec, $sec) = explode(" ", microtime());
+		// return ((float) $usec + (float) $sec);
+		return microtime(true);
+	}	
+	
+	public function warn($mixed, $traceBackSteps = 0) {
+		$this->internalLog($mixed, self::LEVEL_WARN, $traceBackSteps);
 	}
 	
-	/**
-	 * Change the section the debugger is in
-	 * 
-	 * {@see self::$enabledSections}
-	 * 
-	 * @param string $section
-	 */
-	public function setSection($section) {
-		$this->section = $section;
-		$this->debug("Start section '" . $section . "'");
+	public function error($mixed, $traceBackSteps = 0) {
+		$this->internalLog($mixed, self::LEVEL_ERROR, $traceBackSteps);
 	}
+	
+	public function info($mixed, $traceBackSteps = 0) {
+		$this->internalLog($mixed, self::LEVEL_INFO, $traceBackSteps);
+	}
+	
+	public function debug($mixed, $traceBackSteps = 0) {
+		$this->log($mixed, $traceBackSteps);
+	}
+	
+	public function log($mixed, $traceBackSteps = 0) {
+		$this->internalLog($mixed, self::LEVEL_LOG, $traceBackSteps);
+	}
+	
 
 	/**
 	 * Add a debug entry. Objects will be converted to strings with var_export();
@@ -135,27 +139,30 @@ class Debugger {
 	 *
 	 * @todo if for some reason an error occurs here then an infinite loop is created
 	 * @param callable|string|object $mixed
-	 * @param string $type The type of message. Types can be arbitrary and can be enabled and disabled for output. {@see self::$enabledTypes}
+	 * @param string $level The type of message. Types can be arbitrary and can be enabled and disabled for output. {@see self::$enabledTypes}
 	 */
-	public function debug($mixed, $type = self::TYPE_GENERAL, $traceBackSteps = 0) {
+	private function internalLog($mixed, $level = self::LEVEL_LOG, $traceBackSteps = 0) {
 
-		if(!$this->enabled ) {// || !in_array($this->section, $this->enabledSections) || !in_array($type, $this->enabledTypes)) {
+		if(!$this->enabled) {
 			return;
 		}		
 		
 		if($mixed instanceof \Closure) {
 			$mixed = call_user_func($mixed);
-		}elseif (!is_scalar($mixed)) {
-			$mixed = print_r($mixed, true);
+		}elseif(is_object($mixed) && method_exists($mixed, '__toString')) {
+			$mixed = (string) $mixed;
 		}
+		// elseif (!is_scalar($mixed)) {
+		// 	$mixed = print_r($mixed, true);
+		// }
 		
-		$bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 6 + $traceBackSteps);
+		$bt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 7 + $traceBackSteps);
 		
 //		var_dump($bt);
 		$lastCaller = null;
 		$caller = array_shift($bt);
 		//can be called with \go\core\App::get()->debug(). We need to go one step back (no class for closure)
-		while(isset($caller['class']) && ($caller['function'] == 'debug' || $caller['class'] == self::class)) {
+		while(isset($caller['class']) && ($caller['function'] == 'debug' || $caller['function'] == 'warn' || $caller['function'] == 'error' || $caller['function'] == 'info' || $caller['class'] == self::class)) {
 			$lastCaller = $caller;
 			$caller = array_shift($bt);
 		}
@@ -165,36 +172,64 @@ class Debugger {
 		$traceBackSteps = min([$count, $traceBackSteps]);
 		
 		while($traceBackSteps > 0) {			
-
+			$lastCaller = $caller;
 			$caller = array_shift($bt);
 			$traceBackSteps--;			
 		}
 		
-		if(empty($caller['class'])) {
-			
-			$caller['class'] = 'closure';
+		if(empty($caller['class'])) {			
+			$caller['class'] = $lastCaller['class'];
 		}
 		
-		if(!isset($caller['line'])) {
-			$caller['line'] = '[unknown line]';
+		if(!isset($lastCaller['line'])) {
+			$lastCaller['line'] = '[unknown line]';
 		}
 		
-		$entry = "[" . $this->getTimeStamp() . "][" . $caller['class'] . ":".$lastCaller['line']."] " . $mixed;
+		//$entry = "[" . $this->getTimeStamp() . "][" . $caller['class'] . ":".$lastCaller['line']."] " . $mixed;
+
+		$this->writeLog($level, $mixed, $caller['class'], $lastCaller['line']);
+		
+		$this->entries[] = [$level, $mixed, $caller['class'], $lastCaller['line']];
+		
+	}
+
+	protected function writeLog($level, $mixed, $cls = null, $lineNo = null) {
+
+		if (!is_scalar($mixed)) {
+			$print = print_r($mixed, true);
+		} else if(is_bool($mixed)) {
+			$print = $mixed ? "TRUE" : "FALSE";
+		}	else {
+			$print = $mixed;
+		}
+		$line = '[' . $level . ']';
+		
+		if(isset($cls)) {
+			$line .= '[' . $cls .':'. $lineNo.']';
+		}
+
+		$line .=  ' ';
+
+		if(strstr($print, "\n")) {
+			$print = "\n        " . str_replace("\n", "\n        ", $print);
+		}
+		
+		$line .=   $print . "\n";
+
+		if($level == 'start') {
+			$line = "\n" . $line;
+		}
+
+		// if(go()->getEnvironment()->isCli()) {
+		// 	echo $line;
+		// }
 
 		if(!empty($this->logPath)) {
 			$debugLog = new Fs\File($this->logPath);
-
-			if($debugLog->isWritable()) {
-				$debugLog->putContents($entry."\n", FILE_APPEND);
+			if($debugLog->isWritable()) {				
+				$debugLog->putContents($line, FILE_APPEND);
 			}
 		}
-		
-		if(Environment::get()->isCli()) {
-			echo $entry . "\n";
-		}
-		
-		$this->entries[] = $entry;
-		
 	}
 
 	/**
@@ -203,11 +238,16 @@ class Debugger {
 	 * @param string $message
 	 */
 	public function debugTiming($message) {
-		$this->debug($this->getTimeStamp() . ' ' . $message, 'timing');
+		$this->debug($this->getTimeStamp() . 'ms ' . $message);
 	}
 
-	private function getTimeStamp() {
-		return intval(($this->getMicroTime() - $_SERVER["REQUEST_TIME_FLOAT"])*1000) . 'ms';
+	/**
+	 * Get the ellapsed time since the start of the request in milliseconds
+	 * 
+	 * @return int milliseconds
+	 */
+	public function getTimeStamp() {
+		return intval(($this->getMicroTime() - $_SERVER["REQUEST_TIME_FLOAT"])*1000);
 	}
 
 	public function debugCalledFrom($limit = 10) {
@@ -248,6 +288,13 @@ class Debugger {
 	 */
 	public function getEntries() {
 		return $this->entries;
+	}
+	
+	/**
+	 * Print all entries
+	 */
+	public function printEntries() {
+		echo implode("\n", array_map(function($e){return is_scalar($e[1]) ? $e[1] : print_r($e[1]);}, $this->entries));
 	}
 	
 	/**

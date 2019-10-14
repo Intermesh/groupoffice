@@ -85,6 +85,8 @@ class Utils {
 	 * @param string
 	 */
 	public static function utf7Decode($str) {
+
+		return mb_convert_encoding($str, "UTF-8", "UTF7-IMAP");
 		$Index_64 = array(
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 			-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -176,6 +178,9 @@ class Utils {
 	 * @param string
 	 */
 	public static function utf7Encode($str) {
+
+		return mb_convert_encoding($str, "UTF7-IMAP", "UTF-8");
+
 		$B64Chars = array(
 			'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
 			'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd',

@@ -20,6 +20,10 @@
 
 namespace GO\Calendar\Controller;
 
+use GO\Base\Db\ActiveRecord;
+use GO\Base\Db\FindCriteria;
+use GO\Calendar\Model\Event;
+use go\core\orm\EntityType;
 
 class EventController extends \GO\Base\Controller\AbstractModelController {
 
@@ -374,8 +378,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 					$resourceEvent->busy = !$resourceEvent->calendar->group->show_not_as_busy;
 
 
-					if (\GO::modules()->customfields && isset($params['resource_options'][$resource_calendar_id]))
-						$resourceEvent->customfieldsRecord->setAttributes($params['resource_options'][$resource_calendar_id]);
+					if (isset($params['resource_options'][$resource_calendar_id]))
+						$resourceEvent->setCustomFields($params['resource_options'][$resource_calendar_id]);
 
 					$resourceEvent->save(true);
 
@@ -651,10 +655,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		$response['data']['start_date'] = \GO\Base\Util\Date::get_timestamp($model->start_time, false);
 		$response['data']['end_date'] = \GO\Base\Util\Date::get_timestamp($model->end_time, false);
 
-		if (\GO::modules()->customfields)
-			$response['customfields'] = \GO\Customfields\Controller\CategoryController::getEnabledCategoryData("GO\Calendar\Model\Event", $model->calendar->group_id);
 
-		$response['group_id'] = $model->calendar->group_id;
+		$response['group_id'] = $response['data']['group_id'] = intval($model->calendar->group_id);
 		
 		
 		if(!$model->id){
@@ -691,21 +693,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 
 			$response['participants']=array('results'=>array($participantModel->toJsonArray($model->start_time, $model->end_time)),'total'=>1,'success'=>true);
 			
-			if(!empty($params['linkModelNameAndId'])){
-				$arr = explode(':', $params['linkModelNameAndId']);
-				
-				if($arr[0]=='GO\Addressbook\Model\Contact'){
-					$contact = \GO\Addressbook\Model\Contact::model()->findByPk($arr[1]);
-					
-					if($contact){
-						$participantModel = new \GO\Calendar\Model\Participant();
-						$participantModel->setContact($contact);
-						
-						$response['participants']['results'][]=$participantModel->toJsonArray($model->start_time, $model->end_time);
-						$response['participants']['total']=2;
-					}
-				}
-			}
+		
 		}else
 		{
 			$particsStmt = \GO\Calendar\Model\Participant::model()->findByAttribute('event_id',$params['id']);
@@ -759,7 +747,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			
 			if(\GO::modules()->customfields){
 				
-				$attr = $resourceEvent->customfieldsRecord->getAttributes('html');
+				$attr = $resourceEvent->getCustomFields();
 				foreach($attr as $key=>$value){
 					$resource_options = 'resource_options['.$resourceEvent->calendar->id.']['.$key.']';
 					$response['data'][$resource_options] = $value;
@@ -1251,6 +1239,10 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 //		if($defaultCalendar->id != $calendar->id){
 //			return $response;
 //		}
+
+		if(!$calendar->user) {
+			return $response;
+		}
 		
 		// Ignore the display of leavedays when the calendar is not the default calendar of the user of the calendar you are currently viewing
 		$defaultCalendar = \GO\Calendar\CalendarModule::getDefaultCalendar($calendar->user->id);
@@ -1297,42 +1289,58 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	 * @return array 
 	 */
 	private function _getBirthdayResponseForPeriod($response,$calendar,$startTime,$endTime){
-		$adressbooks = \GO\Addressbook\Model\Addressbook::model()->find(
-						\GO\Base\Db\FindParams::newInstance()->permissionLevel(\GO\Base\Model\Acl::READ_PERMISSION, $calendar->user_id)
-						);
+
+		$start = date('Y-m-d',strtotime($startTime));
+		$end = date('Y-m-d',strtotime($endTime));
 		
+		$addressbookIds = \go\modules\community\addressbook\model\AddressBook::find()->selectSingleValue('id')->filter(["permissionLevel" => \go\core\model\Acl::LEVEL_READ,'permissionLevelUserId' => $calendar->user_id])->all();
+		
+		if(empty($addressbookIds)){
+			$response['count_birthdays_only'] = 0;
+			return $response;
+		}
+		
+		$contactsArray = \go\modules\community\addressbook\model\Contact::find()
+						->select(
+							"dates.date as dateDate, dates.type as dateType, IF (STR_TO_DATE(CONCAT(YEAR('$start'),'/',MONTH(dates.date),'/',DAY(dates.date)),'%Y/%c/%e') >= '$start', "
+							."STR_TO_DATE(CONCAT(YEAR('$start'),'/',MONTH(dates.date),'/',DAY(dates.date)),'%Y/%c/%e') , "
+							."STR_TO_DATE(CONCAT(YEAR('$start')+1,'/',MONTH(dates.date),'/',DAY(dates.date)),'%Y/%c/%e')) "
+							."as upcoming ",true)
+						->joinProperties(['dates'])
+						->where('dates.date','IS NOT',NULL)
+						->where('dates.type','=', \go\modules\community\addressbook\model\Date::TYPE_BIRTHDAY)
+						->andWhere('addressBookId','IN',$addressbookIds)
+						->having("upcoming BETWEEN '$start' AND '$end'")
+						->orderBy(['upcoming'=>'asc'])
+						->fetchMode(\PDO::FETCH_ASSOC)
+						->all();
+
 		$resultCount = 0;
 		$dayString = \GO::t("full_days");
-		$addressbookKeys = array();
-
-		while($addressbook = $adressbooks->fetch()){
-			$addressbookKeys[] = $addressbook->id;
-		}
-
 		$alreadyProcessed = array();
-		$contacts = $this->_getBirthdays($startTime,$endTime,$addressbookKeys);
-
-		foreach ($contacts as $contact){
-
-			if(!in_array($contact->id, $alreadyProcessed)){
-				$alreadyProcessed[] = $contact->id;
-
-				$name = \GO\Base\Util\StringHelper::format_name($contact->last_name, $contact->first_name, $contact->middle_name);
-				$start_arr = explode('-',$contact->upcoming);
-
+		foreach($contactsArray as $contact){
+			
+			if(!in_array($contact['id'], $alreadyProcessed)){
+				$alreadyProcessed[] = $contact['id'];
+				
+				$name = $contact['name'];
+				$start_arr = explode('-',$contact['upcoming']);
 				$start_unixtime = mktime(0,0,0,$start_arr[1],$start_arr[2],$start_arr[0]);
 				
 				$resultCount++;
 				
-				$age = (new \DateTime($contact->upcoming))->diff(new \DateTime($contact->birthday));
+				$age = (new \DateTime($contact['upcoming']))->diff(new \DateTime($contact['dateDate']));
 				
-				$response['results'][$this->_getIndex($response['results'],strtotime($contact->upcoming.' 00:00'))] = array(
+				$displayName = htmlspecialchars(str_replace('{NAME}',$name,\GO::t("Birthday: {NAME}", "calendar")), ENT_COMPAT, 'UTF-8');
+				$displayDescription = htmlspecialchars(str_replace(array('{NAME}','{AGE}'), array($name,$age->y), \GO::t("{NAME} has turned {AGE} today", "calendar")), ENT_COMPAT, 'UTF-8');
+				
+				$response['results'][$this->_getIndex($response['results'],strtotime($contact['upcoming'].' 00:00'))] = array(
 					'id'=>$response['count']++,
-					'name'=>htmlspecialchars(str_replace('{NAME}',$name,\GO::t("Birthday: {NAME}", "calendar")), ENT_COMPAT, 'UTF-8'),
-					'description'=>htmlspecialchars(str_replace(array('{NAME}','{AGE}'), array($name,$age->y), \GO::t("{NAME} has turned {AGE} today", "calendar")), ENT_COMPAT, 'UTF-8'),
+					'name'=>$displayName,
+					'description'=>$displayDescription,
 					'time'=>date(\GO::user()->time_format, $start_unixtime),												
-					'start_time'=>$contact->upcoming.' 00:00',
-					'end_time'=>$contact->upcoming.' 23:59',
+					'start_time'=>$contact['upcoming'].' 00:00',
+					'end_time'=>$contact['upcoming'].' 23:59',
 					'model_name'=>'GO\Adressbook\Model\Contact',
 //					'background'=>$calendar->displayColor,
 					'background'=>'EBF1E2',
@@ -1341,15 +1349,16 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 					'day'=>$dayString[date('w', $start_unixtime)].' '.\GO\Base\Util\Date::get_timestamp($start_unixtime,false),
 					'read_only'=>true,
 					'is_virtual'=>true,
-					'contact_id'=>$contact->id
+					'contact_id'=>$contact['id']
 				);
 			}
+
 		}
 		
 		// Set the count of the birthdays
 		$response['count_birthdays_only'] = $resultCount;
 		
-			return $response;
+		return $response;
 	}
 	
 	/**
@@ -1786,49 +1795,6 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	}
 	
 	/**
-	 * Get the birthdays of the contacts in the given addressbooks between 
-	 * the given start and end time.
-	 * 
-	 * @param StringHelper $start_time
-	 * @param StringHelper $end_time
-	 * @param array $abooks
-	 * @return \GO\Base\Db\ActiveStatement 
-	 */
-	private function _getBirthdays($start_time,$end_time,$abooks=array()) {
-
-		$start = date('Y-m-d',strtotime($start_time));
-		$end = date('Y-m-d',strtotime($end_time));
-
-		$select = "t.id, birthday, first_name, middle_name, last_name, "
-			."IF (STR_TO_DATE(CONCAT(YEAR('$start'),'/',MONTH(birthday),'/',DAY(birthday)),'%Y/%c/%e') >= '$start', "
-			."STR_TO_DATE(CONCAT(YEAR('$start'),'/',MONTH(birthday),'/',DAY(birthday)),'%Y/%c/%e') , "
-			."STR_TO_DATE(CONCAT(YEAR('$start')+1,'/',MONTH(birthday),'/',DAY(birthday)),'%Y/%c/%e')) "
-			."as upcoming ";
-		
-		$findCriteria = \GO\Base\Db\FindCriteria::newInstance()
-						->addCondition('birthday', '0000-00-00', '!=')
-						->addRawCondition('birthday', 'NULL', 'IS NOT');
-		
-		if(count($abooks)) {
-			$abooks=array_map('intval', $abooks);
-			$findCriteria->addInCondition('addressbook_id', $abooks);
-		}
-		
-		$having = "upcoming BETWEEN '$start' AND '$end'";
-		
-		$findParams = \GO\Base\Db\FindParams::newInstance()
-						->distinct()
-						->select($select)
-						->criteria($findCriteria)
-						->having($having)
-						->order('upcoming');
-
-		$contacts = \GO\Addressbook\Model\Contact::model()->find($findParams);
-		
-		return $contacts;
-	}
-
-	/**
 	 * Create a PDF file from the response that is also send to the view.
 	 *  
 	 * @param array $response 
@@ -1838,8 +1804,6 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		$pdf->setParams($response, $view);
 		$pdf->Output(\GO\Base\Fs\File::stripInvalidChars($response['title']).'.pdf');
 	}
-	
-	
 	
 	public function actionParticipantEmailRecipients($params){
 		$event = \GO\Calendar\Model\Event::model()->findByPk($params['event_id']);
@@ -1941,5 +1905,77 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		echo "END:VCALENDAR\r\n";
 		
 	}
+
+
+
+
+
+	public function actionLinks($params){
+
+		$response = ['data'=> [], 'success' => true];
+
+		$entityType = EntityType::findByName($params['entity']);
+		
+
+		$startOfDay = \GO\Base\Util\Date::clear_time(time());
+			
+		// Process future events
+		$findParams = \GO\Base\Db\FindParams::newInstance()->order('start_time','DESC');
+		$findParams->getCriteria()->addCondition('start_time', $startOfDay, '>=');			
+		
+		$joinCriteria = FindCriteria::newInstance()
+						->addCondition('fromId', $params['id'], '=','l')
+						->addCondition('fromEntityTypeId', $entityType->getId(),'=','l')
+						->addRawCondition("t.id", "l.toId")
+						->addCondition('toEntityTypeId', Event::model()->modelTypeId(),'=','l');
+
+		$findParams->join("core_link", $joinCriteria, 'l');
+
+		$stmt = \GO\Calendar\Model\Event::model()->find($findParams);		
+
+		$store = \GO\Base\Data\Store::newInstance(\GO\Calendar\Model\Event::model());
+		$store->setStatement($stmt);
+
+		$columnModel = $store->getColumnModel();			
+		$columnModel->formatColumn('calendar_name','$model->calendar->name');
+		//$columnModel->formatColumn('link_count','$model->countLinks()');
+		//$columnModel->formatColumn('link_description','$model->link_description');
+		$columnModel->formatColumn('start_time','date("c", $model->start_time)');
+
+		
+		$columnModel->formatColumn('description','GO\Base\Util\StringHelper::cut_string($model->description,500)');
+
+		$data = $store->getData();
+		$response['data']['events']=$data['results'];
+		
+		// Process past events
+		$findParams = \GO\Base\Db\FindParams::newInstance()->order('start_time','DESC');
+		$findParams->getCriteria()->addCondition('start_time', $startOfDay, '<');						
+
+		$joinCriteria = FindCriteria::newInstance()
+						->addCondition('fromId', $params['id'], '=','l')
+						->addCondition('fromEntityTypeId', $entityType->getId(),'=','l')
+						->addRawCondition("t.id", "l.toId")
+						->addCondition('toEntityTypeId', Event::model()->modelTypeId(),'=','l');
+
+		$findParams->join("core_link", $joinCriteria, 'l');
+		$stmt = \GO\Calendar\Model\Event::model()->find($findParams);		
+		
+
+		$store = \GO\Base\Data\Store::newInstance(\GO\Calendar\Model\Event::model());
+		$store->setStatement($stmt);
+
+		$columnModel = $store->getColumnModel();			
+		$columnModel->formatColumn('calendar_name','$model->calendar->name');
+		// $columnModel->formatColumn('link_count','$model->countLinks()');
+		// $columnModel->formatColumn('link_description','$model->link_description');
+		// $columnModel->formatColumn('description','GO\Base\Util\StringHelper::cut_string($model->description,500)');
+		$columnModel->formatColumn('start_time','date("c", $model->start_time)');
+
+		$data = $store->getData();
+		$response['data']['past_events']=$data['results'];
+		
+		return $response;
+	}	
 	
 }

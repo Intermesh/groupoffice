@@ -91,27 +91,13 @@ GO.tasks.ScheduleCallDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 //			anchor: '100%',
 //			tpl:'<tpl for="."><div class="x-combo-list-item">{name} ({ab_name}) <tpl if="email">({email})</tpl></div></tpl>'
 //		});
-		
-		this.selectContact = new GO.form.ComboBoxReset({
+
+		this.selectContact = new go.modules.community.addressbook.ContactCombo({					
+			hiddenName:'contact_id',
 			name: 'contact_name',
 			fieldLabel:t("Contact", "addressbook"),
 			anchor: '100%',
-			allowBlank:false,
-			mode:'remote',
-			triggerAction:'all',
-			enableKeyEvents : true,
-			selectOnFocus:true,
-			displayField:'name',
-			valueField: 'id',
-			tpl:'<tpl for="."><div class="x-combo-list-item">{name} ({ab_name}) <tpl if="email">({email})</tpl></div></tpl>',
-			store: new GO.data.JsonStore({
-				url: GO.url('addressbook/contact/store'),
-				root: 'results',
-				id: 'id',
-				totalProperty:'total',
-				fields: ['id','name','email','ab_name','work_phone','home_phone','cellular','cellular2'],
-				remoteSort: true
-			})
+			allowBlank:false
 		});
 		//copied from GO.addressbook.SelectContact
 		this.selectContact.selectContactById = function(contact_id, callback, scope){

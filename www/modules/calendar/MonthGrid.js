@@ -369,6 +369,7 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 				el.on('click', this.onMoreClick, this);
 
 				var pos = this.gridCells[i].getXY();
+				pos[0] += this.gridCells[i].getWidth() - el.getWidth() - 4;
 				el.setXY(pos);
 				this.overflowIndicators.push(el);
 			}

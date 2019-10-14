@@ -43,14 +43,13 @@ GO.email.AccountDialog = function(config) {
 		);
 	}
 
-	if(go.Modules.isAvailable("legacy", "addressbook")){
 				
 		this.templatesCombo = new GO.form.ComboBox({
 			fieldLabel : t("Default e-mail template", "email"),
 			hiddenName : 'default_account_template_id',
 			width: 300,
 			store : new GO.data.JsonStore({
-				url : GO.url("addressbook/template/accountTemplatesStore"),
+				url : GO.url("email/template/accountTemplatesStore"),
 				baseParams : {
 					'type':"0"
 				},
@@ -71,7 +70,7 @@ GO.email.AccountDialog = function(config) {
 			forceSelection : true
 		});
 		
-	}
+	
 
 	this.imapAllowSelfSignedCheck = new Ext.ux.form.XCheckbox({
 		boxLabel: t("Allow self signed certificate when using SSL or TLS", "email"),
@@ -196,8 +195,7 @@ GO.email.AccountDialog = function(config) {
 	}
 	];
 
-	if(go.Modules.isAvailable("legacy", "addressbook"))
-		properties_items.push(this.templatesCombo);
+	properties_items.push(this.templatesCombo);
 
 	this.smtpAllowSelfSignedCheck = new Ext.ux.form.XCheckbox({
 		boxLabel: t("Allow self signed certificate when using SSL or TLS", "email"),
@@ -638,6 +636,10 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 	show : function(account_id) {
 		GO.email.AccountDialog.superclass.show.call(this);
 
+		if(!this.templatesCombo.store.loaded) {
+			this.templatesCombo.store.load();
+		}
+
 		this.tabPanel.setActiveTab(0);
 
 		this.aliasesButton.setDisabled(true);
@@ -696,10 +698,10 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 
 				this.permissionsTab.setAcl(action.result.data.acl_id);
 				
-				if (this.templatesCombo) {
-					this.templatesCombo.store.load();
-					this.templatesCombo.setRemoteText(action.result.remoteComboTexts['default_template_id']);
-				}
+//				if (this.templatesCombo) {
+//					this.templatesCombo.store.load();
+//					this.templatesCombo.setRemoteText(action.result.remoteComboTexts['default_template_id']);
+//				}
 			},
 			scope : this
 		});

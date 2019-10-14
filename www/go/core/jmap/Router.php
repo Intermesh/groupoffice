@@ -3,13 +3,14 @@
 namespace go\core\jmap;
 
 use Exception as CoreException;
+use GO;
 use go\core\App;
-use go\core\Debugger;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
+use go\core\jmap\exception\InvalidResultReference;
 use go\core\orm\EntityType;
-use go\core\RouterInterface;
 use JsonSerializable;
+use go\core\http;
 
 /**
  * JMAP compatible router
@@ -22,14 +23,27 @@ use JsonSerializable;
  * 
  * community/notes/Note/get
  * 
+ * core/Notify/mail
+ * 
  * http://jmap.io/spec-core.html#making-an-api-request
  */
-class Router implements RouterInterface {
+class Router {
 
 	private $clientCallId;
 
 	public function getClientCallId() {
 		return $this->clientCallId;
+	}
+
+	public function error($type, $status, $detail) {	
+		$r = http\Response::get();
+		$r->setStatus($status, $detail);
+		$r->sendHeaders();
+		$r->output([
+			"type" => $type,
+			"status" => $status,
+			"detail" => $detail
+		]);
 	}
 
 	/**
@@ -42,45 +56,74 @@ class Router implements RouterInterface {
 	 */
 	public function run() {
 
-		App::get()->getDebugger()->setSection(Debugger::SECTION_ROUTER);
+		
 
 		$body = Request::get()->getBody();
 		
 		if(!is_array($body)) {
+			return $this->error("urn:ietf:params:jmap:error:notRequest", 400, "The request parsed as JSON but did not match the type signature of the Request object.");
 			throw new Exception(400, 'Bad request');
 		}
 
-		App::get()->debug("Body fetched");
-
-		for ($i = 0, $c = count($body); $i < $c; $i++) {
-
-			if (count($body[$i]) != 3) {
-				throw new Exception(400, 'Bad request');
-			}
-
-			list($method, $params, $clientCallId) = $body[$i];
-
-			Response::get()->setClientCall($method, $clientCallId);
-			App::get()->debug("Processing method " . $method . ", call ID: " . $clientCallId);
-			try {
-				$this->callAction($method, $params);
-			} catch (CoreException $e) {
-				$error = ["message" => $e->getMessage()];
-				
-				if(GO()->getDebugger()->enabled) {
-					//only in debug mode, may contain sensitive information
-					$error["debugMessage"] = ErrorHandler::logException($e);
-					$error["trace"] = explode("\n", $e->getTraceAsString());
-				}
-				
-				Response::get()->addResponse([
-						'error', $error
-				]);
-			}
+		while($method = array_shift($body)) {
+			$this->callMethod($method);
 		}
 
 		Response::get()->sendHeaders();
 		Response::get()->output();
+	}
+
+	private function callMethod(array $body) {
+		if (count($body) != 3) {
+			throw new Exception(400, 'Bad request');
+		}
+
+		list($method, $params, $clientCallId) = $body;
+
+		Response::get()->setClientCall($method, $clientCallId);
+		
+		if($method != "community/dev/Debugger/get") {
+			//App::get()->debug("Processing method " . $method . ", call ID: " . $clientCallId);
+			go()->getDebugger()->group($method .',  ID: '. $clientCallId );				
+			go()->getDebugger()->debug("request:");
+			go()->getDebugger()->debug($params);			
+		}
+		
+		try {
+			$response = $this->callAction($method, $params);
+			
+			if(isset($response)) {
+				Response::get()->addResponse($response);
+			}
+			
+		} catch(InvalidResultReference $e) {
+			$error = ["message" => $e->getMessage()];
+
+			if(go()->getDebugger()->enabled) {
+				//only in debug mode, may contain sensitive information
+				$error["debugMessage"] = ErrorHandler::logException($e);
+				$error["trace"] = explode("\n", $e->getTraceAsString());
+			}
+		
+			Response::get()->addResponse([
+					'error', $error
+			]);
+		} catch (CoreException $e) {
+			$error = ["message" => $e->getMessage()];
+			
+			if(go()->getDebugger()->enabled) {
+				//only in debug mode, may contain sensitive information
+				$error["debugMessage"] = ErrorHandler::logException($e);
+				$error["trace"] = explode("\n", $e->getTraceAsString());
+			}
+			
+			Response::get()->addError($error);
+		} finally{
+			
+			if($method != "community/dev/Debugger/get") {			
+				go()->getDebugger()->groupEnd();
+			}
+		}
 	}
 
 	private function findControllerAction($method) {
@@ -92,8 +135,14 @@ class Router implements RouterInterface {
 			if (!$entityType) {
 				throw new Exception(400, 'Bad request. Entity type "' . $parts[0] . '"  not found');
 			}
-			$controllerClass = str_replace("model", "controller", $entityType->getClassName());
+			$controllerClass = str_ireplace("model", "controller", $entityType->getClassName());
 			$controllerMethod = $parts[1];
+		} else if($parts[0] == "core") {
+			$controllerMethod = array_pop($parts);
+			array_splice($parts, -1, 0, 'controller');
+
+			$controllerClass = 'go\\' . implode('\\', $parts);
+			
 		} else {
 			// With namespace: community/notes/Note/query
 			$controllerMethod = array_pop($parts);
@@ -139,12 +188,15 @@ class Router implements RouterInterface {
 	 */
 	protected function callAction($method, $params) {
 
+		// Special testing method that echoes the params
+		if($method == "Core/echo") {
+			return $params;
+		}
+
 		$controllerMethod = $this->findControllerAction($method);
 		$controller = new $controllerMethod[0];
 
 		$params = $this->resolveResultReferences($params);
-
-		App::get()->getDebugger()->setSection(Debugger::SECTION_CONTROLLER);
 
 		return call_user_func([$controller, $controllerMethod[1]], $params);
 	}
@@ -168,14 +220,19 @@ class Router implements RouterInterface {
 
 	private function findResultOf($resultOf) {
 		$results = Response::get()->getData();
-
+		
 		foreach ($results as $result) {
 			if ($resultOf == $result[2]) {
+				
+				if(!empty($result['error'])){
+					throw new InvalidResultReference("The method you are referring to returned an error. (". $resultOf .")");
+				}
+				
 				return $result;
 			}
 		}
 
-		throw new \Exception("ResultReference error: Could not find resultOf: " . $resultOf);
+		throw new InvalidResultReference("Client call id ".$resultOf." does not exist.");
 	}
 
 	private function resolvePath($pathParts, $result) {
@@ -193,7 +250,7 @@ class Router implements RouterInterface {
 			}
 			
 			if (!isset($result[$part])) {
-				throw new \Exception("ResultReference error: Could not resolve path part " . $part);
+				throw new InvalidResultReference("Could not resolve path part " . $part);
 			}
 
 			$result = $result[$part];

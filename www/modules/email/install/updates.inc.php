@@ -165,3 +165,42 @@ $updates['201801221524'][] = "ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(
 $updates['201805011020'][] = "ALTER TABLE `em_accounts` 
 CHANGE COLUMN `password` `password` VARCHAR(512) NULL DEFAULT NULL ,
 CHANGE COLUMN `smtp_password` `smtp_password` VARCHAR(512) NOT NULL DEFAULT '';";
+
+$updates['201811181020'][] = function() {
+	$cf = new \go\core\util\ClassFinder();	
+	$cf->addNamespace("go\\modules\\community\\email");			
+	foreach($cf->findByParent(go\core\orm\Entity::class) as $cls) {
+		$cls::entityType();
+	}
+};
+
+
+$updates['201811181020'][] = "CREATE TABLE `email_template` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `ownedBy` int(11) DEFAULT NULL,
+ `aclId` int(11) NOT NULL,
+ `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+ `subject` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+ `body` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `name` (`name`),
+ KEY `ownedBy` (`ownedBy`),
+ KEY `aclId` (`aclId`),
+ CONSTRAINT `email_template_ibfk_1` FOREIGN KEY (`ownedBy`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+ CONSTRAINT `email_template_ibfk_2` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT";
+
+$updates['201811181020'][] = "CREATE TABLE `email_template_attachment` (
+ `id` int(11) NOT NULL AUTO_INCREMENT,
+ `templateId` int(11) NOT NULL,
+ `blobId` binary(40) NOT NULL,
+ PRIMARY KEY (`id`),
+ KEY `templateId` (`templateId`),
+ KEY `blobId` (`blobId`),
+ CONSTRAINT `email_template_attachment_ibfk_1` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`),
+ CONSTRAINT `email_template_attachment_ibfk_2` FOREIGN KEY (`templateId`) REFERENCES `email_template` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT";
+
+$updates['201905111651'][] = "DROP TABLE `email_template_attachment`;";
+$updates['201905111651'][] = "DROP TABLE `email_template`;";
+$updates['201906271420'][] = "DELETE FROM go_state WHERE name='em-pnl-west'";

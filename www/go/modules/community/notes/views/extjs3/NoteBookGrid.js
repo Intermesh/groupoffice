@@ -1,10 +1,11 @@
 go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 	viewConfig: {
+		scrollOffset: 0,
 		forceFit: true,
 		autoFill: true
 	},
-
-	constructor: function (config) {
+	hideHeaders: true,
+	initComponent: function () {
 
 		var actions = this.initRowActions();
 
@@ -14,7 +15,7 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 			xtype: "container",
 			items:[
 				{
-					items: config.tbar, 
+					items: this.tbar, 
 					xtype: 'toolbar'
 				},
 				new Ext.Toolbar({
@@ -23,7 +24,7 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 			]
 		};
 
-		Ext.apply(config, {
+		Ext.apply(this, {
 			
 			tbar: tbar,
 			
@@ -47,11 +48,11 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 				actions
 			],
 
-//			stateful: true,
+			stateful: true,
 			stateId: 'note-books-grid'
 		});
 
-		go.modules.community.notes.NoteBookGrid.superclass.constructor.call(this, config);
+		go.modules.community.notes.NoteBookGrid.superclass.initComponent.call(this);
 	},
 
 	initRowActions: function () {
@@ -91,8 +92,8 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 						iconCls: 'ic-edit',
 						text: t("Edit"),
 						handler: function() {
-							var noteBookForm = new go.modules.community.notes.NoteBookForm();
-							noteBookForm.load(this.moreMenu.record.id).show();
+							var dlg = new go.modules.community.notes.NoteBookDialog();
+							dlg.load(this.moreMenu.record.id).show();
 						},
 						scope: this						
 					},{
@@ -104,31 +105,17 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 								if (btn != "yes") {
 									return;
 								}
-								go.Stores.get("NoteBook").set({destroy: [this.moreMenu.record.id]});
+								go.Db.store("NoteBook").set({destroy: [this.moreMenu.record.id]});
 							}, this);
 						},
 						scope: this						
-					},{
-						itemId:"share",
-						iconCls: 'ic-share',
-						text: t("Share"),
-						handler: function() {
-							var shareWindow = new go.acl.ShareWindow({
-								animateTarget: e.target,
-								title: this.moreMenu.record.get('name')
-							});
-							
-							shareWindow.load(this.moreMenu.record.get('aclId')).show();
-						},
-						scope: this						
-					},
+					}
 				]
-			})
+			});
 		}
 		
-		this.moreMenu.getComponent("edit").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
-		this.moreMenu.getComponent("share").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
-		this.moreMenu.getComponent("delete").setDisabled(record.get("permissionLevel") < GO.permissionLevels.manage);
+		this.moreMenu.getComponent("edit").setDisabled(record.get("permissionLevel") < go.permissionLevels.manage);
+		this.moreMenu.getComponent("delete").setDisabled(record.get("permissionLevel") < go.permissionLevels.manage);
 		
 		this.moreMenu.record = record;
 		

@@ -3,23 +3,40 @@
 namespace go\core;
 
 use Exception;
+use GO;
+use go\core\data\Model;
 use go\core\db\Query;
+use go\core\exception\Forbidden;
+use go\core\Module;
 
 /**
- * Settings model that can be used for the core and modules to store any string 
- * setting.
+ * Settings model 
+ * 
+ * Any module can implement getSettings() and return a model that extends this
+ * abstract class to store settings. All properties are automatically saved and
+ * loaded from the "core_setting" table.
+ * 
+ * @see Module::getSettings()
  */
-abstract class Settings extends data\Model {
+abstract class Settings extends Model {
 	
 	use SingletonTrait;
 
 	protected function getModuleId() {
-		return (new Query)
+		$moduleId = (new Query)
 			->selectSingleValue('id')
 			->from('core_module')
-			->where(['name' => $this->getModuleName(), 'package' => $this->getModulePackageName()])
+			->where([
+					'name' => $this->getModuleName(), 
+					'package' => $this->getModulePackageName()])
 			->execute()
 			->fetch();
+		
+		if(!$moduleId) {
+			throw new \Exception ("Could not find module " .  $this->getModuleName() . "/" . $this->getModulePackageName());
+		}
+		
+		return $moduleId;
 	}
 	
 	protected function getModuleName() {
@@ -39,28 +56,68 @@ abstract class Settings extends data\Model {
 	 */
 	protected function __construct() {
 		
-		if(GO()->getInstaller()->isInProgress()) {
+		if(go()->getInstaller()->isInstalling()) {
 			$this->oldData = [];
 			return;
 		}
 		
-		$props = array_keys($this->getSettingProperties());
-		if(!empty($props)) {
+		$props = array_keys($this->getSettingProperties());	
+		
+		$record = array_filter($this->loadFromConfigFile(), function($key) use ($props) { return in_array($key, $props);}, ARRAY_FILTER_USE_KEY);
+		$this->readOnlyKeys = array_keys($record);
+		
+		$this->setValues($record);
+		
+		$selectProps = array_diff($props, $this->readOnlyKeys);
+		
+		if(!empty($selectProps)) {
 			$stmt = (new Query)
 							->select('name, value')
 							->from('core_setting')
 							->where([
 									'moduleId' => $this->getModuleId(), 
-									'name' => $props
+									'name' => $selectProps
 									])
 							->execute();
 			
 			while($record = $stmt->fetch()) {
 				$this->{$record['name']} = $record['value'];
 			}
-		}
+		}		
 		
 		$this->oldData = (array) $this;
+	}
+	
+	private function loadFromConfigFile() {
+		$config = go()->getConfig();
+		
+		$pkgName = $this->getModulePackageName();
+		
+		
+		if(!isset($config[$pkgName])) {
+			return [];
+		}
+		
+		if($pkgName == "core") {
+			$c = $config[$pkgName];
+		} else
+		{
+			$modName = $this->getModuleName();
+
+			if(!isset($config[$pkgName][$modName])) {
+				return [];
+			}
+			$c = $config[$pkgName][$modName];
+		}
+		
+		return $c;		
+	}
+	
+	
+	private $readOnlyKeys = [];
+	
+	public function getReadOnlyKeys() {
+		return $this->readOnlyKeys;
 	}
 	
 //	public function __destruct() {
@@ -69,7 +126,7 @@ abstract class Settings extends data\Model {
 	
 	private function getSettingProperties() {
 		$props =  array_filter(get_object_vars($this), function($key) {
-			return $key !== 'oldData';
+			return $key !== 'oldData' && $key !== 'readOnlyKeys';
 		}, ARRAY_FILTER_USE_KEY);		
 		
 		return $props;
@@ -81,6 +138,10 @@ abstract class Settings extends data\Model {
 		foreach($this->getSettingProperties() as $name => $value) {
 			
 			if(!array_key_exists($name, $this->oldData) || $value != $this->oldData[$name]) {
+				if(in_array($name, $this->readOnlyKeys)) {
+					throw new Forbidden("This key can't be changed because it's defined in the configuration file on the server.");
+				}
+				
 				$this->update($name, $value);
 			}
 		}
@@ -89,6 +150,7 @@ abstract class Settings extends data\Model {
 	}
 	
 	private function update($name, $value) {
+		
 		$moduleId = $this->getModuleId();
 
 		if(!$moduleId) {

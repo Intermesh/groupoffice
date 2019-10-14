@@ -5,4 +5,5 @@ return array (
   'description' => 'Inserisci qui una descrizione',
   'Synchronization' => 'Sincronizzazione',
   'Maximum days old' => 'Maximum days old',
+  'Address books' => 'Rubriche',
 );

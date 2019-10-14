@@ -5,6 +5,9 @@ namespace go\core\event;
 /**
  * Enable events for an object
  * 
+ * Note: When adding / removing event listeners you need to run 
+ * install/upgrade.php to rebuild the cache.
+ * 
  * All objects that implement {@see EventListenerInterface} within the 
  *  application are searched for a static method called 
  * "defineEvents()". In this function you can call
@@ -33,8 +36,9 @@ trait EventEmitterTrait {
 	/**
 	 * Add a persistent static event listener
 	 * 
-	 * This listener will be stored and will be used on every request. If you don't
-	 * need that then use {@see attach()}
+	 * You can use this in two different ways:
+	 * - When this is called in Module::defineListeners() the listener will be stored and will be used on every request. 
+	 * - When attaching it in any other place it will only be kept within the current request.
 	 * 
 	 * @param int $event Defined in constants prefixed by EVENT_
 	 * @param callable $fn 

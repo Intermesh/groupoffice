@@ -4,7 +4,7 @@
 body {
   padding: 0;
   margin: 0;
-  font-family: Roboto, Helvetica, Arial, sans-serif;
+  font-family: Helvetica, Arial, sans-serif;
   line-height: 1.6;
   background-color: rgba(0, 0, 0, 0.05); }
 
@@ -18,7 +18,7 @@ header {
 }
 
 pre {
-	font-family: Roboto, Helvetica, Arial, sans-serif;
+	font-family: Helvetica, Arial, sans-serif;
 	overflow: auto;
 	font-size: 12px;
 }
@@ -91,7 +91,7 @@ button, a.button {
   transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
   will-change: box-shadow;
   min-width: 88px;
-  font-family: Roboto, sans-serif;
+  font-family: Helvetica, sans-serif;
   font-size: 0.875rem;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -125,5 +125,6 @@ code {
   color: black;
   padding: 12px;
   display: block;
-  margin-top: 12px;
-  white-space: pre; }
+  margin: 12px 0;
+  white-space: pre; 
+}

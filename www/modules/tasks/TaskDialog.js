@@ -36,7 +36,7 @@ GO.tasks.TaskDialog = function() {
 		items : this.formPanel,
 		focus : focusName.createDelegate(this),
 		bbar : [
-			this.createLinkButton = new go.modules.core.links.CreateLinkButton(),		
+			this.createLinkButton = new go.links.CreateLinkButton(),		
 			"->",
 			{
 				text : t("Save"),
@@ -55,12 +55,30 @@ GO.tasks.TaskDialog = function() {
 	this.win.render(Ext.getBody());
 
 	GO.tasks.TaskDialog.superclass.constructor.call(this);
+
+	this.win.on("hide", function() {
+		this.createLinkButton.reset();
+	}, this);
 }
 
 Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 
 	isVisible : function() {
 		return this.win.isVisible();
+	},
+
+	setLinkEntity : function(cfg) {
+		
+		switch(cfg.entity) {
+			case 'Project':
+			case "Contact":				
+				this.formPanel.getForm().findField("name").setValue(cfg.data.name);
+			break;
+
+			case 'Order':
+				this.formPanel.getForm().findField("name").setValue(cfg.data.order_id);
+			break;
+		} 
 	},
 	
 	show : function(config) {
@@ -69,9 +87,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			config = {};
 		}		
 		
-		this.on("hide", function() {
-			this.createLinkButton.reset();
-		}, this);
+		
 		
 		this.showConfig=config;
 
@@ -208,10 +224,9 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 	},
 	setTaskId : function(task_id) {
 		this.formPanel.form.baseParams['id'] = task_id;
-		this.task_id = task_id;
-		if(task_id) {
-			this.createLinkButton.setEntity("Task", task_id);
-		}
+		this.task_id = task_id;		
+		this.createLinkButton.setEntity("Task", task_id);
+		
 	},
 
 	setCurrentDate : function() {
@@ -376,15 +391,19 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		var propertiesPanel = new Ext.Panel({
 			hideMode : 'offsets',
 			title : t("Properties"),
-			defaults : {
-				anchor : '100%'
-			},
-			labelWidth:120,
-			cls:'go-form-panel',
+			
+			//cls:'go-form-panel',
 			//waitMsgTarget:true,
 			layout : 'form',
 			autoScroll : true,
-			items : [
+			items : [{
+					xtype: "fieldset",
+					defaults : {
+				anchor : '100%'
+			},
+			labelWidth:120,
+					items:[
+			
 				this.nameField, 
 				startDate,
 				dueDate,
@@ -392,6 +411,8 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 				this.selectTaskList,
 				this.selectCategory,
 				this.selectPriority	
+				]
+			}
 			]
 
 		});
@@ -399,14 +420,14 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		if(GO.moduleManager.userHasModule("projects2")){
 			descAnchor-=40;
 			this.selectProject = new GO.projects2.SelectProject();
-			propertiesPanel.add(this.selectProject);
+			propertiesPanel.items.first().add(this.selectProject);
 		} else if(GO.moduleManager.userHasModule("projects")) {
 			descAnchor-=40;
 			this.selectProject = new GO.projects.SelectProject();
-			propertiesPanel.add(this.selectProject);
+			propertiesPanel.items.first().add(this.selectProject);
 		}
 		
-		propertiesPanel.add({
+		propertiesPanel.items.first().add({
 				xtype:'textarea',
 				fieldLabel:t("Description"),
 				name : 'description',
@@ -414,8 +435,9 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 				grow: true,
 				preventScrollbars: true
 			});
-				
-
+			
+	
+		
 		// Start of recurrence tab
 		this.recurrencePanel = new go.form.RecurrenceFieldset();
 
@@ -464,15 +486,6 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 
 		var items = [propertiesPanel, this.recurrencePanel, optionsPanel];
 
-
-		if(go.Modules.isAvailable("core", "customfields") && GO.customfields.types["GO\\Tasks\\Model\\Task"])
-		{
-			for(var i=0;i<GO.customfields.types["GO\\Tasks\\Model\\Task"].panels.length;i++)
-			{
-				items.push(GO.customfields.types["GO\\Tasks\\Model\\Task"].panels[i]);
-			}
-		}
-	
 		this.tabPanel = new Ext.TabPanel({
 			activeTab : 0,
 			deferredRender : false,
@@ -482,6 +495,25 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			hideLabel : true,
 			items : items
 		});
+		
+		
+		go.customfields.CustomFields.getFormFieldSets("Task").forEach(function(fs) {
+			//console.log(fs);
+			if(fs.fieldSet.isTab) {
+				fs.title = null;
+				fs.collapsible = false;
+				var pnl = new Ext.Panel({
+					autoScroll: true,
+					hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.
+					title: fs.fieldSet.name,
+					items: [fs]
+				});
+				this.tabPanel.add(pnl);
+			}else
+			{			
+				propertiesPanel.add(fs);
+			}
+		}, this);
 
 		var formPanel = this.formPanel = new Ext.form.FormPanel({
 			waitMsgTarget : true,
@@ -492,5 +524,6 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			},
 			items : this.tabPanel
 		});
+
 	}
 });

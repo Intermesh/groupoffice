@@ -6,7 +6,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
-use go\core\util\DateTime as DateTime2;
+use go\core\util\DateTime as GoDateTime;
 
 /**
  * Represents a Record database column attribute.
@@ -77,7 +77,9 @@ class Column {
 	public $autoIncrement = false;
 
 	/**
-	 * Field type in the database
+	 * Field type in the database without length in lowercase.
+	 * 
+	 * eg. "varchar";
 	 * 
 	 * @var string 
 	 */
@@ -124,6 +126,16 @@ class Column {
 	 */
 	public $table;
 
+
+	/**
+	 * MySQL Data type in uppercase with length
+	 * 
+	 * eg. VARCHAR(100)
+	 * 
+	 * @var string
+	 */
+	public $dataType = "";
+
 	/**
 	 * The MySQL database datetime format.
 	 */
@@ -146,6 +158,40 @@ class Column {
 			}
 		}
 	}
+	
+	/**
+	 * Get the SQL string to add / alter this field.
+	 * 
+	 * eg. "tinyint(1) NOT NULL DEFAULT '0'"
+	 * 
+	 * @return string
+	 */
+	public function getCreateSQL() {
+		$sql = $this->dataType;		
+		
+		if(!$this->nullAllowed) {
+			$sql .= ' NOT NULL';
+		} else
+		{
+			$sql .= ' NULL';
+		}
+		
+		if($this->autoIncrement) {
+			$sql .= ' AUTO_INCREMENT';
+		} else if(isset($this->default)) {
+			
+			if(is_bool($this->default)) {
+				$default = $this->default ? "TRUE" : "FALSE";
+			} else
+			{
+				$default = '\'' . str_replace('\'', '\\\'', $this->default). '\'';
+			}
+			
+			$sql .= ' DEFAULT '.$default;
+		}
+		
+		return $sql;
+	}
 
 	/**
 	 * Input formatting for the database.
@@ -164,8 +210,8 @@ class Column {
 				if ($value instanceof DateTime || $value instanceof DateTimeImmutable) {
 					return $value;
 				} else {
-					$dt = new DateTime2($value);
-					$dt->setTimezone(new DateTimeZone(date_default_timezone_get())); //UTC
+					$dt = new GoDateTime($value);
+					$dt->setTimezone(new DateTimeZone("UTC")); //UTC
 					return $dt;
 				}
 
@@ -174,7 +220,7 @@ class Column {
 				if ($value instanceof DateTime || $value instanceof DateTimeImmutable) {
 					return $value;
 				} else {
-					return new DateTime2($value);
+					return new GoDateTime($value);
 				}
 				
 			default:
@@ -240,7 +286,7 @@ class Column {
 
 			case 'date':
 			case 'datetime':
-				return $value instanceof DateTime2 ? $value: new DateTime2($value);
+				return $value instanceof GoDateTime ? $value: new GoDateTime($value, new DateTimeZone("UTC"));
 				
 			default:
 				return $value;

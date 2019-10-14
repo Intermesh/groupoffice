@@ -11,20 +11,15 @@ go.modules.community.notes.NoteBookCombo = Ext.extend(go.form.ComboBox, {
 	selectOnFocus: true,
 	forceSelection: true,
 	allowBlank: false,
-	initComponent: function () {
-		Ext.applyIf(this, {
-			store: new go.data.Store({
-				fields: ['id', 'name'],
-				entityStore: "NoteBook",
-				baseParams: {
-					filter: {
-							permissionLevel: GO.permissionLevels.write
-					}
-				}
-			})
-		});
-		
-		go.modules.community.notes.NoteBookCombo.superclass.initComponent.call(this);
-
+	store: {
+		xtype: "gostore",
+		fields: ['id', 'name'],
+		entityStore: "NoteBook",
+		baseParams: {
+			filter: {
+					permissionLevel: go.permissionLevels.write
+			}
+		}
 	}
 });
+Ext.reg('notebookcombo', go.modules.community.notes.NoteBookCombo );

@@ -6,7 +6,7 @@ use go\core\auth\model\Token;
 use go\core\auth\SecondaryAuthenticator;
 use go\core\db\Query;
 use go\core\validate\ErrorCode;
-use go\modules\core\users\model\User;
+use go\core\model\User;
 
 class Googleauthenticator extends SecondaryAuthenticator {
 

@@ -58,7 +58,6 @@ use go\core\db\Query;
  * @property string $date_format
  * @property string $email
  * @property string $recoveryEmail
- * @property \GO\Addressbook\Model\Contact $contact
  * @property string $digest
  * @property int $last_password_change
  * @property boolean $force_password_change
@@ -68,6 +67,8 @@ use go\core\db\Query;
  * @property Boolean $sort_email_addresses_by_time
  */
 class User extends \GO\Base\Db\ActiveRecord {
+
+	use \go\core\orm\CustomFieldsTrait;
 	
 	/**
 	 * Get the password hash from the new framework
@@ -79,7 +80,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 			return null;
 		}
 		
-		$user = \go\modules\core\users\model\User::findById($this->id);
+		$user = \go\core\model\User::findById($this->id);
 		
 		return $user->password;
 	}
@@ -151,7 +152,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 * @deprecated since version 6.3
 	 */
 	public function getDigest(){
-		$user = \go\modules\core\users\model\User::findById($this->id);
+		$user = \go\core\model\User::findById($this->id);
 		
 		return $user->getDigest();
 	}
@@ -271,7 +272,6 @@ class User extends \GO\Base\Db\ActiveRecord {
 	public function relations() {
 		return array(
 			'group' => array('type' => self::HAS_ONE, 'model' => 'GO\Base\Model\Group', 'field' => 'isUserGroupFor'),
-			'contact' => array('type' => self::HAS_ONE, 'model' => 'GO\Addressbook\Model\Contact', 'field' => 'go_user_id'),
 			'reminders' => array('type'=>self::MANY_MANY, 'model'=>'GO\Base\Model\Reminder', 'field'=>'user_id', 'linkModel' => 'GO\Base\Model\ReminderUser'),
 			'groups' => array('type'=>self::MANY_MANY, 'model'=>'GO\Base\Model\Group', 'field'=>'userId', 'linkModel' => 'GO\Base\Model\UserGroup'),
 			'_workingWeek' => array('type' => self::HAS_ONE, 'model' => 'GO\Base\Model\WorkingWeek', 'field' => 'user_id')
@@ -353,10 +353,10 @@ class User extends \GO\Base\Db\ActiveRecord {
 				$prefixTable.".username"
 				);
 		
-		if($withCustomFields && $this->customfieldsRecord)
-		{
-			$fields = array_merge($fields, $this->customfieldsRecord->getFindSearchQueryParamFields('cf'));
-		}
+		// if($withCustomFields && $this->customfieldsRecord)
+		// {
+		// 	$fields = array_merge($fields, $this->customfieldsRecord->getFindSearchQueryParamFields('cf'));
+		// }
 		
 		return $fields;
 	}
@@ -482,12 +482,6 @@ class User extends \GO\Base\Db\ActiveRecord {
 				$this->holidayset = $holiday; 
 		}
 		
-		if(!$this->isNew && empty($this->holidayset) && ($contact = $this->createContact())){
-			$holiday = Holiday::localeFromCountry($contact->country);
-
-			if($holiday !== false)
-				$this->holidayset = $holiday; 
-		}
 		
 		$pwd = $this->getAttribute('password');
 		if($this->isModified('password') && !empty($pwd)){
@@ -558,7 +552,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 		}
 		
 		if(isset($this->password)) {
-			$user = \go\modules\core\users\model\User::findById($this->id);		
+			$user = \go\core\model\User::findById($this->id);		
 			$user->setPassword($this->password);		
 			if(!$user->save()) {
 				throw new \Exception("Could not set password: ".var_export($user->getValidationErrors(), true));
@@ -647,7 +641,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 */
 	public static function getGroupIds($userId) {
 
-		return (new Query)->selectSingleValue('groupId')->from('core_user_group')->where(['userId' => $userId])->all();
+		return go()->getDbConnection()->selectSingleValue('groupId')->from('core_user_group')->where(['userId' => $userId])->all();
 		// $user = GO::user();
 		// if ($user && $userId == $user->id) {
 		// 	if (!isset(GO::session()->values['user_groups'])) {
@@ -690,7 +684,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	public static function getDefaultGroupIds(){
 		
 		$groups = [];
-		$s = \go\modules\core\users\model\Settings::get();			
+		$s = \go\core\model\Settings::get();			
 		foreach($s->getDefaultGroups() as $v) {
 			$groups[] = $v['groupId'];
 		}
@@ -759,7 +753,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function checkPassword($password){
 		
-		$user = \go\modules\core\users\model\User::findById($this->id);
+		$user = \go\core\model\User::findById($this->id);
 		return $user->checkPassword($password);
 	}	
 	
@@ -792,10 +786,10 @@ class User extends \GO\Base\Db\ActiveRecord {
 	public function defaultAttributes() {
 		$attr = parent::defaultAttributes();
 		
-		$s = \go\modules\core\users\model\Settings::get();
+		$s = \go\core\model\Settings::get();
 
 		
-		$attr['language']=GO()->getSettings()->language;		
+		$attr['language']=go()->getSettings()->language;		
 		$attr['date_format']=$s->defaultDateFormat;		
 		$attr['date_separator']=GO::config()->default_date_separator;
 		$attr['theme']=GO::config()->theme;
@@ -819,56 +813,10 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 * Get the contact model of this user. All the user profiles are stored in the
 	 * addressbook.
 	 * 
-	 * @return \GO\Addressbook\Model\Contact 
+
 	 */
 	public function createContact(){
-		if (GO::modules()->isInstalled("addressbook")) {
-			
-			if(!empty($this->contact_id)){
-				//this is for old databases
-				$contact = \GO\Addressbook\Model\Contact::model()->findByPk($this->contact_id);
-				if($contact){
-					$contact->go_user_id=$this->id;
-					
-					$name = GO\Base\Util\StringHelper::split_name($this->displayName);
-					$contact->first_name = $name['first_name'];
-					$contact->middle_name =$name['middle_name'];
-					$contact->last_name = $name['last_name'];
-					$contact->email = $this->email;
-					
-					if($contact->isModified())
-						$contact->save(true);
-					
-					return $contact;
-				}
-			}
-			
-			$contact = $this->contact();
-			if (!$contact) {
-				$contact = new \GO\Addressbook\Model\Contact();
-				$addressbook = \GO\Addressbook\Model\Addressbook::model()->getUsersAddressbook();
-				$contact->go_user_id = $this->id;
-				$contact->addressbook_id = $addressbook->id;			
-					
-				$name = GO\Base\Util\StringHelper::split_name($this->displayName);
-				$contact->first_name = $name['first_name'];
-				$contact->middle_name =$name['middle_name'];
-				$contact->last_name = $name['last_name'];
-			}			
-			
-		
-			$contact->email = $this->email;
-
-			if($contact->isNew || $contact->isModified()){
-				$contact->skip_user_update=true;
-				$contact->save(true);
-			}
-			
-			return $contact;
-		}else
-		{
-			return false;
-		}
+		throw new \Exception("No longer supported");
 	}
 
 	protected function remoteComboFields() {

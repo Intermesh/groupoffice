@@ -5,7 +5,7 @@ namespace go\core;
 use Exception;
 use go\core\fs\File;
 use go\core\jmap\Request;
-use go\modules\core\modules\model\Module;
+use go\core\model\Module;
 
 class Language {
 
@@ -30,7 +30,7 @@ class Language {
 	}
 	
 	public function setLanguage($isoCode = null) {
-		
+		$old = $this->getIsoCode();
 		if(!isset($isoCode)) {
 			$isoCode = $this->getBrowserLanguage();
 		}
@@ -43,6 +43,8 @@ class Language {
 			$this->isoCode = $isoCode;
 			$this->data = [];
 		}
+
+		return $old;
 		
 	}
 	
@@ -72,7 +74,7 @@ class Language {
 			}
 		}
 		
-		return GO()->getSettings()->language; // from settings if we cant determine
+		return go()->getSettings()->language; // from settings if we cant determine
 	}
 
 	/**
@@ -115,7 +117,7 @@ class Language {
 			if ($file->exists()) {
 				$langData = new util\ArrayObject($this->loadFile($file));
 			} else {
-				GO()->debug('No default(en) language file for module "'.$package.'/'.$module.'" defined.', 'Language');
+				go()->warn('No default(en) language file for module "'.$package.'/'.$module.'" defined.');
 			}
 
 			//overwirte english with actual language
@@ -131,7 +133,7 @@ class Language {
 				$langData->mergeRecursive($this->loadFile($file));
 			}
 			
-			$productName = GO()->getConfig()['branding']['name'];
+			$productName = go()->getConfig()['core']['branding']['name'];
 
 			foreach ($langData as $key => $translation) {
 				
@@ -162,7 +164,12 @@ class Language {
 	
 	private function loadFile($file) {
 		
-		$langData = require($file);
+		try {
+			$langData = require($file);
+		} catch(\ParseError $e) {
+			ErrorHandler::logException($e);
+			$langData = [];
+		}
 		if(!is_array($langData)){
 			throw new \Exception("Invalid language file  " . $file);
 		}
@@ -186,6 +193,8 @@ class Language {
 		
 		if($package == "legacy") {
 			$folder = Environment::get()->getInstallFolder()->getFolder('modules/' . $module .'/language');
+		} else if($package == "core" && $module == "core") {
+			$folder = Environment::get()->getInstallFolder()->getFolder('go/core/language');
 		} else
 		{
 			$folder = Environment::get()->getInstallFolder()->getFolder('go/modules/' . $package . '/' . $module .'/language');
@@ -203,7 +212,7 @@ class Language {
 	 */
 	private function findLangOverride($lang, $package, $module) {
 
-		$folder = GO()->getDataFolder()->getFolder('users/admin/language/' . $package . '/' .$module);
+		$folder = go()->getDataFolder()->getFolder('users/admin/language/' . $package . '/' .$module);
 		
 		return $folder->getFile($lang . '.php');
 	}

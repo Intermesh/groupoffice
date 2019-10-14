@@ -47,7 +47,7 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 			]})
 		];
 
-		var syncComponents = {calendar: 'Calendar',addressbook: 'Addressbook',tasks: 'Tasklist'};
+		var syncComponents = {calendar: 'Calendar',tasks: 'Tasklist'};
 		
 		for(var i in syncComponents) {
 			var module = i,
@@ -100,7 +100,7 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 		}
 
 
-		if(go.Modules.isAvailable("legacy", module))
+		if(go.Modules.isAvailable("community", "notes"))
 		{
 			var defaultCol = new GO.grid.RadioColumn({
 					header: t("Default", "sync"),
@@ -109,18 +109,41 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 				});
 				
 			this.noteBookSelect = new go.form.multiselect.Field({
-				name: "syncNoteBooks",
+				name: "syncSettings.noteBooks",
 				idField: "noteBookId",
 				displayField: "name",
 				entityStore: "NoteBook",
 				hideLabel: true,
-				title: t("Notebooks", "notes"),
+				title: t("Notebooks", "community", "notes"),
 				extraColumns: [defaultCol],
 				extraFields: [{name: "isDefault", type: "boolean"}],
 				plugins: [defaultCol]
 			});
 			
 			this.items.push(this.noteBookSelect);
+		}
+		
+		if(go.Modules.isAvailable("community", "addressbook"))
+		{
+			var defaultCol = new GO.grid.RadioColumn({
+					header: t("Default", "sync"),
+					dataIndex: 'isDefault',
+					width: dp(104)
+				});
+				
+			this.addressBookSelect = new go.form.multiselect.Field({
+				name: "syncSettings.addressBooks",
+				idField: "addressBookId",
+				displayField: "name",
+				entityStore: "AddressBook",
+				hideLabel: true,
+				title: t("Address books", "community", "addressbook"),
+				extraColumns: [defaultCol],
+				extraFields: [{name: "isDefault", type: "boolean"}],
+				plugins: [defaultCol]
+			});
+			
+			this.items.push(this.addressBookSelect);
 		}
 	
 		this.on('show',function(){
@@ -137,15 +160,6 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 		},this);
 		
 		GO.sync.SettingsPanel.superclass.initComponent.call(this);
-	},
-	
-	onLoadComplete : function(user) {
-	
-//		if(this.noteBookSelect) {
-//			
-//			this.noteBookSelect.setRecords(user.syncNoteBooks);
-//		}
-		
 	},
 	
 	checkDefaultSelected : function(){

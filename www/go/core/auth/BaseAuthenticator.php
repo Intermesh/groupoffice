@@ -4,7 +4,7 @@ namespace go\core\auth;
 
 use Exception;
 use go\core\db\Query;
-use go\modules\core\modules\model\Module;
+use go\core\model\Module;
 use go\core\validate\ValidationTrait;
 
 abstract class BaseAuthenticator {

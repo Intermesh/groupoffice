@@ -162,18 +162,19 @@ $fg: (
   text:					rgba(black, 0.87)
 );
 $bg: (
-  status-bar: color($grey, 200),
-  app-bar:    color($grey, 100),
-  form:			color($grey, 50),
-  background: color($grey, 50),
-  hover:      rgba(black, 0.04),
-  pressed:	rgba(black, .08),
+	status-bar: color($grey, 200),
+	app-bar:    color($grey, 100),
+	form:			color($grey, 50),
+	background: color($grey, 50), 
+	hover:      rgba(black, .04),
+	pressed:		rgba(black, .08),
 	selected:	rgba(black, .08),
-  box:		  white,
-  tbar:       white,
-  card:       white,
-  dialog:     color($grey, 50),
-  disabled-button:   rgba(black, 0.12)
+	readonly:	rgba(black, .08),
+	box:		  white,
+	tbar:       white,
+	card:       white, 
+	dialog:     color($grey, 50),
+	disabled-button:   rgba(black, 0.12)
 );
 
 // DARK 
@@ -205,12 +206,11 @@ $dbackground: (
 );
 
 // Colors that have meaning (eg. success/failure)
-/*
- GO 6.2 color:
-$cPrimary:		rgb(0, 155, 201);
-$cPrimaryTp:	rgba(0, 155, 201, 0.16);*/
+// GO 6.2 color:
+// $cPrimary:		rgb(0, 155, 201);
+// $cPrimaryTp:	rgba(0, 155, 201, 0.16);
 
-/* Intermesh blue */
+//Intermesh blue 
 $cPrimary:		rgb(36, 58, 128);
 $cPrimaryTp:	rgba(36, 58, 128, 0.16);
 
@@ -226,6 +226,48 @@ $cHover: color($bg, 'hover');
 $cActive: color($grey, 200); // focussed
 $cAnchor: rgb(36, 58, 128);
 
-.success { color: $cSuccess !important; }
-.danger { color: $cDanger !important; }
-.warning { color: $cWarning !important; }
+
+
+.blue {
+	color: #039BE5 !important;
+}
+
+.red {
+	color: #E53935 !important;
+}
+
+.pink {
+  color: #D81B60 !important;
+}
+
+.purple {
+  color: #8E24AA !important;
+}
+
+.cyan {
+  color: #00ACC1 !important;
+}
+
+
+
+.green {
+  color: #43A047 !important;
+}
+
+.orange {
+  color: #FB8C00 !important;
+}
+
+.brown {
+  color: #6D4C41 !important;
+}
+
+
+.yellow {
+  color: #FDD835 !important;
+}
+
+.bluegrey {
+  color: #607D8B !important;
+
+}

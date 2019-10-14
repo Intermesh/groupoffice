@@ -131,9 +131,7 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 	public function formatStoreRecord($record, $model, $store) {
 		
 		$record['group_name']= !empty($model->group) ? $model->group->name : '';
-		if(\GO::modules()->customfields)
-			$record['customfields']=\GO\Customfields\Controller\CategoryController::getEnabledCategoryData("GO\Calendar\Model\Event", $model->group_id);
-		
+	
 		
 		return $record;
 	}	
@@ -249,7 +247,7 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 						->join(\GO\Calendar\Model\CalendarUserColor::model()->tableName(), \GO\Base\Db\FindCriteria::newInstance()
 										->addCondition('id', 'col.calendar_id', '=', 't', true, true)->addCondition('user_id', \GO::user()->id, '=','col'),'col','LEFT')
 						->order(array('t.name'))	
-						->select('col.*,name,id');
+						->select('col.*,name,t.id');
 		
 		$findParams->getCriteria()->addCondition('group_id', 1);
 		

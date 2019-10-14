@@ -261,3 +261,27 @@ CREATE TABLE IF NOT EXISTS `em_labels` (
   `default` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
+
+
+
+DROP TABLE IF EXISTS `email_default_email_templates`;
+CREATE TABLE IF NOT EXISTS `email_default_email_templates` (
+  `user_id` int(11) NOT NULL,
+  `template_id` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`user_id`),
+  KEY `template_id` (`template_id`)
+) ENGINE=InnoDB;
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `ab_default_email_templates`
+--
+
+DROP TABLE IF EXISTS `email_default_email_account_templates`;
+CREATE TABLE IF NOT EXISTS `email_default_email_account_templates` (
+  `account_id` int(11) NOT NULL,
+  `template_id` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`account_id`),
+  KEY `template_id` (`template_id`)
+) ENGINE=InnoDB;
