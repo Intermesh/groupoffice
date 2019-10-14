@@ -1,6 +1,7 @@
-@import 'base';
-@import 'lato';
+@import 'colors';
+@import 'config';
 @import 'shadows';
+@import 'typography';
 @import "icons";
 @import 'ext-base';
 @import 'modules';
@@ -8,5 +9,3 @@
 @import 'go-style';
 @import 'tools';
 @import 'calendar';
-@import 'chartist';
-@import 'print';

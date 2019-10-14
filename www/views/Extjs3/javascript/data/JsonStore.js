@@ -92,8 +92,6 @@ GO.data.JsonStore = function(config) {
 	this.on('exception',		
 		function( store, type, action, options, response, arg){
 
-			console.error(arg);
-
 			if(response.isTimeout){
 				GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
 			}else	if(response.status==0)

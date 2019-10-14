@@ -34,10 +34,6 @@
 
 namespace GO\Sync\Model;
 
-use go\core\model\Acl;
-use go\core\model\User;
-use go\modules\community\addressbook\model\AddressBook;
-use go\modules\community\notes\model\NoteBook;
 
 class Settings extends \GO\Base\Db\ActiveRecord{
 	
@@ -130,19 +126,15 @@ class Settings extends \GO\Base\Db\ActiveRecord{
 				}
 			}
 
-
-			//$newUser = User::findById($user->id, ['syncSettings', 'addressBookSettings', 'notesSettings']);
-			
-
-//			if (\GO::modules()->addressbook) {
-//				$stmt = $this->addressbooks();
-//				if (!$stmt->rowCount()) {
-//					$addressbook = \GO\Addressbook\Model\Addressbook::model()->findSingleByAttribute('user_id', $user->id);
-//					if ($addressbook) {
-//						$settings->addManyMany('addressbooks', $addressbook->id, array('default_addressbook' => 1));
-//					}
-//				}
-//			}
+			if (\GO::modules()->addressbook) {
+				$stmt = $this->addressbooks();
+				if (!$stmt->rowCount()) {
+					$addressbook = \GO\Addressbook\Model\Addressbook::model()->findSingleByAttribute('user_id', $user->id);
+					if ($addressbook) {
+						$settings->addManyMany('addressbooks', $addressbook->id, array('default_addressbook' => 1));
+					}
+				}
+			}
 // KAPOT MET 6.3 notes
 //			if (\GO::modules()->notes) {
 //				$stmt = $this->noteCategories();

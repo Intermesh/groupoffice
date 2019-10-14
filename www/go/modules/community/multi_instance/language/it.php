@@ -16,7 +16,4 @@ return array (
   'Instance' => 'istanza',
   'Size in GB' => 'dimensione in GB',
   'Maximum number of users' => 'numero massimo di utenti',
-  'E-mail selected' => 'E-mail selezionate',
-  'Download site config' => 'Scarica la configurazione del sito',
-  'Version' => 'Versione',
 );

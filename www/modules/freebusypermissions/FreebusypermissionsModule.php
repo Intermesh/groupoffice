@@ -2,7 +2,7 @@
 
 namespace GO\Freebusypermissions;
 
-use go\core\model\User;
+use go\modules\core\users\model\User;
 use go\core\orm;
 
 class FreebusypermissionsModule extends \GO\Base\Module{
@@ -23,7 +23,7 @@ class FreebusypermissionsModule extends \GO\Base\Module{
 	}
 	
 	public static function onMap(orm\Mapping $mapping) {
-		$mapping->addHasOne('freebusySettings', model\UserSettings::class, ['id' => 'user_id'], true);
+		$mapping->addRelation('freebusySettings', model\UserSettings::class, ['id' => 'id'], false);
 		return true;
 	}
 	

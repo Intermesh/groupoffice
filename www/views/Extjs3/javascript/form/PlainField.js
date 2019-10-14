@@ -29,8 +29,6 @@ GO.form.PlainField = Ext.extend(Ext.form.Field, {
 		tag: 'div',
 		cls: 'x-form-plainfield'
 	},
-	
-	submit: false,
 
 	// private
 	initComponent: function() {

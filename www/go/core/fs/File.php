@@ -17,24 +17,15 @@ use go\core\util\StringUtil;
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
 class File extends FileSystemObject {
-
-	/**
-	 * Check if the file or folder exists
-	 * @return boolean
-	 */
-	public function exists() {
-		return is_file($this->path);
-	}
-
-
+	
 	/**
 	 * Get a temporary file
 	 * 
 	 * @param string $extension
-	 * @return static
+	 * @return statuc
 	 */
 	public static function tempFile($extension) {
-		 return go()->getTmpFolder()->getFile(uniqid(time()) . '.' . $extension);
+		 return GO()->getTmpFolder()->getFile(uniqid(time()) . '.' . $extension);
 	}
 
 	
@@ -192,38 +183,13 @@ class File extends FileSystemObject {
 	 *
 	 * @param string
 	 */
-	public function getContents($offset = 0, $maxlen = null) {		
-		if(isset($maxlen)) {
-			return file_get_contents($this->getPath(), false, null, $offset, $maxlen);	
-		} else{
-			return file_get_contents($this->getPath(), false, null, $offset);
-		}
+	public function getContents() {
 		
+		return file_get_contents($this->getPath());
 	}
 
-	/**
-	 * Alias for getContentType()
-	 * 
-	 * @see getContentType()
-	 */
 	public function getMimeType() {
-		return $this->getContentType();
-	}
-	
-	/**
-	 * Find and replace text in a text file
-	 * 
-	 * @param string $search
-	 * @param string $replace
-	 * @return bool
-	 */
-	public function replace($search, $replace) {
-		$contents = $this->getContents();
-		$replaced = str_replace($search, $replace, $contents);
-		if($replaced === $contents) {
-			return true;
-		}
-		return $this->putContents($replaced);		
+		return mime_content_type($this->getPath());
 	}
 
 	/**
@@ -236,14 +202,12 @@ class File extends FileSystemObject {
 		
 		//sometimes these fail and are important to always be right
 		switch($this->getExtension()) {
-			case 'css': 	return 'text/css';
-			case 'js': 		return 'application/javascript';
-			case 'json': 	return 'application/json';
-			case 'csv': 	return 'text/csv';
-			//case 'vcf':		return 'text/vcard';
-			//case 'ics':		return 'text/calendar';
-			case 'eml':		return 'message/rfc822';
-			default: 		return mime_content_type($this->getPath());
+			case 'css':
+				return 'text/css';
+			case 'js':
+				return 'application/javascript';				
+			default:
+				return mime_content_type($this->getPath());
 		}		
 		
 	}
@@ -252,48 +216,38 @@ class File extends FileSystemObject {
 	 * Send download headers and output the contents of this file to standard out (browser).
 	 * @param boolean $sendHeaders
 	 * @param boolean $useCache
-	 * @param array $headers key value array of http headers to send
 	 */
-	public function output($sendHeaders = true, $useCache = true, array $headers = []) {		
+	public function output($sendHeaders = true, $useCache = true) {		
 		$r = \go\core\http\Response::get();
 	
 		if($sendHeaders) {
 			$r->setHeader('Content-Type', $this->getContentType());
-			$r->setHeader('Content-Disposition', 'attachment; filename="' . $this->getName() . '"');
+			$r->setHeader('Content-Disposition', 'inline; filename="' . $this->getName() . '"');
 			$r->setHeader('Content-Transfer-Encoding', 'binary');
 
-			if ($useCache) {				
-				$r->setHeader('Cache-Control', 'PRIVATE');
-				$r->removeHeader('Pragma');
-
-				$r->setModifiedAt($this->getModifiedAt());
+			if ($useCache) {			
+				$r->setModifiedAt(new DateTime('@'.$this->getModifiedAt()));
 				$r->setETag($this->getMd5Hash());
 				$r->abortIfCached();
-			}		
-			
-			foreach($headers as $name => $value) {
-				$r->setHeader($name, $value);
-			}
+			}				
 		}		
 		
 		if(ob_get_contents() != '') {			
 			throw new \Exception("Could not output file because output has already been sent. Turn off output buffering to find out where output has been started.");
 		}
 
-		// $handle = fopen($this->getPath(), "rb");
+		$handle = fopen($this->getPath(), "rb");
 
-		// if (!is_resource($handle)) {
-		// 	throw new Exception("Could not read file");
-		// }
+		if (!is_resource($handle)) {
+			throw new Exception("Could not read file");
+		}
 		
 		$r->sendHeaders();
 
-		readfile($this->getPath());
-
-		// while (!feof($handle)) {
-		// 	echo fread($handle, 1024);
-		// 	// flush();
-		// }
+		while (!feof($handle)) {
+			echo fread($handle, 1024);
+			flush();
+		}
 	}
 	
 	/**
@@ -323,22 +277,7 @@ class File extends FileSystemObject {
 			throw new Exception("File exists in move!");
 		}
 
-		if($destination->getPath() == $this->getPath()) {
-			return true;
-		}
-
-		$success = false;
-		try {
-			$success = rename($this->path, $destination->getPath());
-		} catch(\Exception $e) {
-			//renaming accross partitions doesn't work
-			$success = $this->copy($destination);
-			if($success) {
-				$this->delete();
-			}
-		}
-
-		if ($success) {
+		if (rename($this->path, $destination->getPath())) {
 			$this->path = $destination->getPath();
 			return true;
 		} else {
@@ -370,8 +309,6 @@ class File extends FileSystemObject {
 		if($destinationFile->exists()) {
 			throw new \Exception("The destination '".$destinationFile->getPath()."' already exists!");
 		}
-		
-		$destinationFile->getFolder()->create();
 	
 		if (!copy($this->path, $destinationFile->getPath())) {
 			return false;

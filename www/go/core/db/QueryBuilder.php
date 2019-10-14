@@ -17,8 +17,6 @@ use go\core\db\Criteria;
  */
 class QueryBuilder {
 
-	
-
 	/**
 	 *
 	 * @var Query
@@ -46,7 +44,7 @@ class QueryBuilder {
 	 *
 	 * @var array[]
 	 */
-	private $buildBindParameters = [];
+	private $buildBindParameters;
 
 	/**
 	 * To generate unique param tags for binding
@@ -75,30 +73,14 @@ class QueryBuilder {
 	 */
 	private $table;
 
-
-	/**
-	 * @var Connection
-	 */
-	private $conn;
-
-	public function __construct(Connection $conn) {
-		$this->conn = $conn;
-	}
-	
-
 	/**
 	 * Constructor
 	 *
 	 * @param string $tableName The table to operate on
 	 */
 	public function setTableName($tableName) {
-		
-		if(!isset($tableName)) {
-			throw new \Exception("No from() table set for the select query");
-			
-		}
 		$this->tableName = $tableName;
-		$this->table = Table::getInstance($tableName, $this->conn);
+		$this->table = Table::getInstance($tableName);
 	}
 
 	/**
@@ -132,59 +114,44 @@ class QueryBuilder {
 	/**
 	 * @return bool
 	 */
-	public function buildInsert($tableName, $data, $columns = [], $command = "INSERT") {
+	public function buildInsert($tableName, $data, $command = "INSERT") {
 
 		$this->reset();
 		$this->setTableName($tableName);
-		$this->aliasMap[$tableName] = Table::getInstance($this->tableName, $this->conn);
+		$this->aliasMap[$tableName] = Table::getInstance($this->tableName);
 
 		$sql = $command . " ";
 
 		$sql .= "INTO `{$this->tableName}` ";
 
-		if ($data instanceof \go\core\db\Query) {			
-			if(!empty($columns)) {
-				$sql .= " (`" . implode("`, `", $columns ) . "`)\n";
-			}
-			
+		if ($data instanceof \go\core\db\Query) {
 			$build = $data->build();
 
 			$sql .= ' ' . $build['sql'];
-			$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
+			$this->buildBindParameters = array_merge($this->buildBindParameters, $data->getBindParameters());
+		} else if ($data instanceof \go\core\orm\Store) { //TODO
+			$builder = $data->getQuery()->getBuilder($data->getRecordClassName());
+			$builder->mergeAliasMap($this->aliasMap);
+
+			$build = $builder->buildSelect($data->getQuery());
+
+			$sql .= ' ' . $build['sql'];
+			//import subquery bind params
+			foreach ($build['params'] as $v) {
+				$this->buildBindParameters[] = $v;
+			}
 		} else {
 
-			if(!isset($data[0])) {
-				$data = [$data];
-			}
-			if(empty($columns)) {
-				$columns = array_keys($data[0]);
-			}
-			$sql .= " (\n\t`" . implode("`,\n\t`", $columns) . "`\n)\n" .
-				"VALUES \n";
-
-			foreach($data as $record) {
-				$tags = [];
-				foreach ($record as $colName => $value) {
-					if(is_int($colName)) {
-						$colName = $columns[$colName];
-					}
-					
-					if($value instanceof Expression) {
-						$tags[] = (string) $value;
-					} else
-					{				
-						$paramTag = $this->getParamTag();
-						$tags[] = $paramTag;
-						$this->addBuildBindParameter($paramTag, $value, $this->tableName, $colName);
-					}
-				}
-
-				$sql .= "(\n\t" . implode(",\n\t", $tags) . "\n), ";
+			$tags = [];
+			foreach ($data as $colName => $value) {
+				$paramTag = $this->getParamTag();
+				$tags[] = $paramTag;
+				$this->addBuildBindParameter($paramTag, $value, $this->tableName, $colName);
 			}
 
-			$sql = substr($sql, 0, -2); //strip off last ', '
+			$sql .= " (\n\t`" . implode("`,\n\t`", array_keys($data)) . "`\n)\n" .
+							"VALUES (\n\t" . implode(",\n\t", $tags) . "\n)";
 		}
-		
 		return ['sql' => $sql, 'params' => $this->buildBindParameters];
 	}
 
@@ -195,43 +162,23 @@ class QueryBuilder {
 		$this->setTableName($tableName);
 
 		$this->query = $query;
-		$this->buildBindParameters = $query->getBindParameters();
 		$this->tableAlias = $this->query->getTableAlias();
-		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName, $this->conn);
+		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName);
 
 		if (is_array($data)) {
 			$updates = [];
 			foreach ($data as $colName => $value) {
+				$paramTag = $this->getParamTag();
+				$updates[] = '`' . $colName . '` = ' . $paramTag;
 
-				$tableAndCol = $this->splitTableAndColumn($colName);
-				$colName = '`' . $tableAndCol[0] .'`.`'.$tableAndCol[1].'`';
-				if($value instanceof Expression) {
-					$updates[] = $colName . ' = ' . $value;
-				} elseif($value instanceof Query) {
-					$build = $value->build();
-
-					$updates[] = $colName . ' = (' . $build['sql'] .')';
-					
-					$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
-				} else
-				{				
-					$paramTag = $this->getParamTag();
-					$updates[] = $colName . ' = ' . $paramTag;
-					$this->addBuildBindParameter($paramTag, $value, $tableAndCol[0], $tableAndCol[1]);
-				}
+				$this->addBuildBindParameter($paramTag, $value, $this->tableAlias, $colName);
 			}
 			$set = implode(",\n\t", $updates);
 		} else if ($data instanceof Expression) {
 			$set = (string) $data;
 		}
 		
-		$sql = "UPDATE `{$this->tableName}` `" . $this->tableAlias . "`";
-		
-		foreach ($this->query->getJoins() as $join) {
-			$sql .= "\n" . $this->join($join, "");
-		}
-		
-		$sql .= "\nSET\n\t" . $set;
+		$sql = "UPDATE `{$this->tableName}` `" . $this->tableAlias . "` SET\n\t" . $set;
 
 		$where = $this->buildWhere($this->getQuery()->getWhere());
 
@@ -242,22 +189,17 @@ class QueryBuilder {
 		return ['sql' => $sql, 'params' => $this->buildBindParameters];
 	}
 
-	public function buildDelete($tableName, Query $query) {
+	public function buildDelete($tableName, Criteria $query) {
 
 		$this->setTableName($tableName);
 		$this->reset();
 		$this->query = $query;
-		$this->buildBindParameters = $query->getBindParameters();
 		$this->tableAlias = $this->query->getTableAlias();
-		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName, $this->conn);
+		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName);
 
 		$sql = "DELETE FROM `" . $this->tableAlias . "` USING `" . $this->tableName . "` AS `" . $this->tableAlias . "` ";
 
-		foreach ($this->query->getJoins() as $join) {
-			$sql .= "\n" . $this->join($join, "");
-		}
-
-		$where = $this->buildWhere($this->getQuery()->getWhere());	
+		$where = $this->buildWhere($this->getQuery()->getWhere());
 
 		if (!empty($where)) {
 			$sql .= "\nWHERE " . $where;
@@ -273,122 +215,50 @@ class QueryBuilder {
 	}
 
 	/**
-	 * Build the select SQL and params
+	 * Build the SQL string
+	 *
+	 * @param boolean $replaceBindParameters Will replace all :paramName tags with the values. Used for debugging the SQL string.
+	 * @return string
 	 */
-	public function buildSelect(Query $query = null, $prefix = "") {
+	public function buildSelect(Query $query = null, $prefix = '') {
 
-		$unions = $query->getUnions();
-		
-		$r = $this->internalBuildSelect($query, empty($unions) ? $prefix : $prefix . "\t");
-		
-		$unions = $query->getUnions();
-		if(empty($unions)) {
-			return $r;
-		}
-		
-		$r['sql'] = "(\n" . $r['sql'];
-		
-		foreach($unions as $q) {
-			$u = $this->internalBuildSelect($q, "\t");
-			$r['sql'] .=  "\n) UNION (\n" . $u['sql'];
-			$r['params'] = array_merge($r['params'], $u['params']);
-		}
-		
-		$r['sql'] .= "\n)";		
-		
-		$orderBy = $this->buildOrderBy(true);
-		if(!empty($orderBy)) {
-			$r['sql'] .= "\n" . $orderBy;
-		}
-		
-		if ($query->getUnionLimit() > 0) {
-			$r['sql'] .= "\nLIMIT " . $query->getUnionOffset() . ',' . $query->getUnionLimit();
-		}
-		
-		return $r;
-		
-	}
-	
-	protected function internalBuildSelect(Query $query, $prefix = '') {
+		$this->setTableName($query->getFrom());
 		$this->reset();
-		$this->setTableName($query->getFrom());		
 		$this->tableAlias = $query->getTableAlias();
 		$this->query = $query;
 		$this->buildBindParameters = $query->getBindParameters();
 
-		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName, $this->conn);
+		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName);
 
 		$joins = "";
 		foreach ($this->query->getJoins() as $join) {
 			$joins .= "\n" . $prefix . $this->join($join, $prefix);
 		}
 
-		$select = $prefix . $this->buildSelectFields();
-		$select .= "\n" . $prefix . "FROM `" . $this->tableName . '`';
-		
-		if(isset($this->tableAlias) && $this->tableAlias != $this->tableName) {
-			$select .= ' `' . $this->tableAlias . "`";
-		}
+		$select = "\n" . $prefix . $this->buildSelectFields();
+		$select .= "\n" . $prefix . "FROM `" . $this->tableName . '` `' . $this->tableAlias . "`";
 
 		$where = $this->buildWhere($this->query->getWhere(), $prefix);
 
 		if (!empty($where)) {
 			$where = "\n" . $prefix . "WHERE " . $where;
 		}
-		$group = $this->buildGroupBy();		
-		if(!empty($group)) {
-			$group = "\n" . $prefix . $group;
-		}
-		
-		$having = $this->buildHaving();
-		if(!empty($having)) {
-			$having = "\n" . $prefix . $having;
-		}
-		$orderBy = $this->buildOrderBy();
-		if(!empty($orderBy)) {
-			$orderBy = "\n" . $prefix . $orderBy;
-		}
+		$group = "\n" . $prefix . $this->buildGroupBy();
+		$having = "\n" . $prefix . $this->buildHaving();
+		$orderBy = "\n" . $prefix . $this->buildOrderBy();
 
 		$limit = "";
 		if ($this->query->getLimit() > 0) {
 			$limit .= "\n" . $prefix . "LIMIT " . $this->query->getOffset() . ',' . $this->query->getLimit();
 		}
 
-		$sql = $select . $joins . $where . $group . $having . $orderBy . $limit;
+		$sql = trim($prefix . $select . $joins . $where . $group . $having . $orderBy . $limit);
 
 		if ($this->query->getForUpdate()) {
 			$sql .= "\n" . $prefix . "FOR UPDATE";
 		}
 
 		return ['sql' => $sql, 'params' => $this->buildBindParameters];
-	}
-	
-	/**
-	 * Will replace all :paramName tags with the values. Used for debugging the SQL string.
-	 *
-	 * @param array $build
-	 * @param string
-	 */
-	public static function debugBuild($build) {
-		$sql = $build['sql'];
-		$binds = [];
-		foreach ($build['params'] as $p) {
-			if (is_string($p['value']) && !mb_check_encoding($p['value'], 'utf8')) {
-				$queryValue = "[NON UTF8 VALUE]";
-			} else {
-				$queryValue = var_export($p['value'], true);
-			}
-			$binds[$p['paramTag']] = $queryValue;
-		}
-
-		//sort so $binds :param1 does not replace :param11 first.
-		krsort($binds);
-
-		foreach ($binds as $tag => $value) {
-			$sql = str_replace($tag, $value, $sql);
-		}
-
-		return $sql;
 	}
 
 	protected function buildSelectFields() {
@@ -451,8 +321,6 @@ class QueryBuilder {
 
 		return $groupBy . "\n";
 	}
-	//Clear first AND or OR. Other wise WHERE AND ... will be generated
-	private $firstWhereCondition = true;
 
 	/**
 	 * Build the where part of the SQL string
@@ -462,15 +330,19 @@ class QueryBuilder {
 	 * @param string
 	 */
 	protected function buildWhere(array $conditions, $prefix = "") {
-		$this->firstWhereCondition = true;	
+
+
+
+		if (isset($conditions[0])) {
+			$conditions[0][1] = "";
+		}
 
 		$where = "";
 		foreach ($conditions as $condition) {
-			$str = $this->buildCondition($condition, $prefix);
-			$where .= "\n" . $prefix . $str;
+			$where .= $prefix . $this->buildCondition($condition, $prefix) . "\n";
 		}
 
-		return rtrim($where);
+		return trim($where);
 	}
 
 	/**
@@ -495,30 +367,9 @@ class QueryBuilder {
 		}
 	}
 
-	/**
-	 * Tokens is always:
-	 * 
-	 * return ["tokens", AND/OR, string/expression/query/criteria];		
-	 * 
-	 * @param type $tokens
-	 * @param type $prefix
-	 * @return string
-	 */
 	private function buildTokens($tokens, $prefix) {
 		$str = "";
-		
-		if(stripos($tokens[0], "NOT_OR_NULL") !== false) {
-			$tokens[0] = str_replace('NOT_OR_NULL', 'NOT IFNULL(', $tokens[0]);
-			$tokens[] = ', false)';
-		}
-		
-		if($this->firstWhereCondition) {
-			//clear first AND/OR to avoid WHERE AND to be generated
-			$tokens[0] = str_ireplace(['AND', 'OR'], '', $tokens[0]);
-			$this->firstWhereCondition = false;
-		}
-		
-		foreach ($tokens as $token) {			
+		foreach ($tokens as $token) {
 			$str .= $this->buildToken($token, $prefix) . " ";
 		}
 
@@ -529,68 +380,23 @@ class QueryBuilder {
 		if (is_string($token)) {
 			return $token;
 		} else {
-			if($token instanceof Expression) {
-				return (string) $token;
+			switch (get_class($token)) {
+				case Expression::class:
+					return (string) $token;
+
+				case Query::class:
+					return $this->buildSubQuery($token, $prefix);
+
+				case Criteria::class:
+					$this->buildBindParameters = array_merge($this->buildBindParameters, $token->getBindParameters());
+					return "(\n" . $prefix . "\t" . $this->buildWhere($token->getWhere(), $prefix . "\t") . $prefix . "\n)";
 			}
-			
-			if($token instanceof Query) {
-				return $this->buildSubQuery($token, $prefix);
-			}
-			
-			if($token instanceof Criteria) {
-				$this->buildBindParameters = array_merge($this->buildBindParameters, $token->getBindParameters());
-				$where = $this->buildWhere($token->getWhere(), $prefix . "\t");
-				
-				return "(" . $where  . "\n" . $prefix . ")";
-			}
-			
-			throw new \Exception("Invalid token?");
 		}
-	}
-	
-	private function buildColumnArrayValue($logicalOperator, $columnName, $comparisonOperator, $value) {
-		//If the value is an array and it's not an IN query we do:		
-		// (foo like array1 OR foo like array2)
-
-		if(empty($value)) {
-			return "";
-		}
-
-		if ($this->firstWhereCondition) {
-			//Clear first AND or OR. Other wise WHERE AND ... will be generated
-			$this->firstWhereCondition = false;				
-			$logicalOperator = stripos($logicalOperator, "NOT") !== false ? "NOT" : "";
-		}
-
-		$str = $logicalOperator . " (";
-
-		for($i = 0, $c = count($value); $i < $c; $i++) {
-			$str .= $this->buildColumn([null, $i == 0 ? "" : "OR", $columnName, $comparisonOperator, $value[$i]], "");
-		}
-
-		return $str .= ")";
 	}
 
 	private function buildColumn($condition, $prefix) {
 
 		list(, $logicalOperator, $columnName, $comparisonOperator, $value) = $condition;
-		
-		
-		if(is_array($value) && $comparisonOperator != "=" && stripos($comparisonOperator, 'IN') === false) {
-			//single array value can be simplified and handled like non array value
-			if(count($value) == 1) {
-				$value = $value[0];
-			} else
-			{
-				return $prefix . $this->buildColumnArrayValue($logicalOperator, $columnName, $comparisonOperator, $value);				
-			}
-		}
-		
-		if ($this->firstWhereCondition) {
-			//Clear first AND or OR. Other wise WHERE AND ... will be generated
-			$this->firstWhereCondition = false;
-			$logicalOperator = stripos($logicalOperator, "NOT") !== false ? "NOT" : "";		
-		}
 
 		$tokens = [$logicalOperator]; //AND / OR
 
@@ -605,17 +411,17 @@ class QueryBuilder {
 		}
 
 		$tokens[] = $this->quoteTableName($columnParts[0]) . '.' . $this->quoteColumnName($columnParts[1]); //column name
-		
+
 		if (!isset($value)) {
 			if ($comparisonOperator == '=' || $comparisonOperator == 'IS') {
 				$tokens[] = "IS NULL";
-			} elseif ($comparisonOperator == '!=' || $comparisonOperator == 'IS NOT') {
+			} elseif ($comparisonOperator == '!=' || $comparisonOperator == 'NOT IS') {
 				$tokens[] = "IS NOT NULL";
 			} else {
-				throw new Exception('Null value not possible with comparator: ' . $comparisonOperator);
+				throw new Exception('Null value not possible with comparator ' . $tokens[3]);
 			}
 		} else if (is_array($value)) {
-			$tokens[] = $comparisonOperator == "=" ? "IN" : $comparisonOperator;
+			$tokens[] = $comparisonOperator;
 			$tokens[] = $this->buildInValues($columnParts, $value);
 		} else if ($value instanceof \go\core\db\Query) {
 			$tokens[] = $comparisonOperator;
@@ -639,12 +445,12 @@ class QueryBuilder {
 			$query->tableAlias('sub');
 		}
 
-		$builder = new QueryBuilder($this->conn);
+		$builder = new QueryBuilder();
 		$builder->aliasMap = $this->aliasMap;
 
 		$build = $builder->buildSelect($query, $prefix . "\t");
 
-		$str = "(\n" . $prefix . $build['sql'] . "\n" . $prefix . ")";
+		$str = "(\n" . $prefix . "\t" . $build['sql'] . "\n" . $prefix . ")";
 
 		$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
 
@@ -686,7 +492,13 @@ class QueryBuilder {
 	 * @throws Exception
 	 */
 	protected function quoteTableName($tableName) {
-		return Utils::quoteTableName($tableName);
+
+		//disallow \ ` and \00  : http://stackoverflow.com/questions/1542627/escaping-field-names-in-pdo-statements
+		if (preg_match("/[`\\\\\\000\(\),]/", $tableName)) {
+			throw new Exception("Invalid characters found in column name: " . $tableName);
+		}
+
+		return '`' . str_replace('`', '``', $tableName) . '`';
 	}
 
 	/**
@@ -739,8 +551,8 @@ class QueryBuilder {
 		return $str;
 	}
 
-	private function buildOrderBy($forUnion = false) {
-		$oBy = $forUnion ? $this->query->getUnionOrderBy() : $this->query->getOrderBy();
+	private function buildOrderBy() {
+		$oBy = $this->query->getOrderBy();
 		if (empty($oBy)) {
 			return '';
 		}
@@ -777,7 +589,7 @@ class QueryBuilder {
 				'paramTag' => $paramTag,
 				'value' => $columnObj->castToDb($value),
 				'pdoType' => $columnObj->pdoType
-		];		
+		];
 	}
 
 	/**
@@ -794,7 +606,7 @@ class QueryBuilder {
 		$join = "";
 
 		if ($config['src'] instanceof \go\core\db\Query) {
-			$builder = new QueryBuilder($this->conn);
+			$builder = new QueryBuilder();
 			$builder->aliasMap = $this->aliasMap;
 
 			$build = $builder->buildSelect($config['src'], $prefix . "\t");
@@ -802,7 +614,7 @@ class QueryBuilder {
 
 			$this->buildBindParameters = array_merge($build['params']);
 		} else {
-			$this->aliasMap[$config['joinTableAlias']] = Table::getInstance($config['src'], $this->query->getDbConnection());
+			$this->aliasMap[$config['joinTableAlias']] = Table::getInstance($config['src']);
 			$joinTableName = '`' . $config['src'] . '`';
 		}
 

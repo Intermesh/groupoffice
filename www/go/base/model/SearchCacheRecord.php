@@ -77,13 +77,13 @@ class SearchCacheRecord extends \GO\Base\Db\ActiveRecord {
 		} else
 		{
 			$entityId = $model->id;
-			$entityTypeId = $model->entityType()->getId();
+			$entityTypeId = $model->getType()->getId();
 		}
 		
 		
 		$params = \GO\Base\Db\FindParams::newInstance()
 						->select("t.*,l.description AS link_description")
-						->order('modifiedAt','DESC')						
+						->order('modifiedAt','DESC')
 						->join('core_link',  \GO\Base\Db\FindCriteria::newInstance()
 										->ignoreUnknownColumns() //we don't have models for go_links_* tables
 										->addCondition('fromId', $entityId,'=','l')
@@ -118,11 +118,7 @@ class SearchCacheRecord extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function getModel_name() {
-		$e = \go\core\orm\EntityType::findById($this->entityTypeId);
-		if(!$e){
-			return null;
-		}
-		return $e->getClassName();
+		return \go\core\orm\EntityType::findById($this->entityTypeId)->getClassName();
 	}
 	
 	public function getModel_id() {

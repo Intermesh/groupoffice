@@ -15,10 +15,6 @@ use go\core\cache\CacheInterface;
 class None implements CacheInterface {
 
 	private $cache = [];
-	
-	public function __construct() {
-		go()->warn("Not using cache. This will be slow!");
-	}
 
 	/**
 	 * Store any value in the cache

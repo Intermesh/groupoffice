@@ -164,8 +164,7 @@ cursor:pointer;
 .fs-handler-icon{
 	background-repeat:no-repeat;
 	padding-left:24px !important;	
-	background-position: 4px 10px;
-	background-size: 16px 16px;
+	background-position: 0px 4px;
 }
 
 .content-expired {

@@ -152,7 +152,7 @@ return array (
   'Template' => 'Modelo',
   'Rename all existing' => 'Renomear todos',
   'Are you sure you want to rename all default user calendars?' => 'Tem certeza que deseja renomear todos os calendários padrão de usuário?',
-  'Publish iCalendar file of last month and future events. Caution! The calendar will be readable to everyone.' => 'Publicar arquivo iCalendar do último mês e eventos futuros. Cuidado! O calendário poderá ser lido por todos.',
+  'Publish iCalendar file of last month and future events. Caution! The calendar will be readable to everyone.' => 'Publicar arquivo iCalendar com todos os eventos deste mês e eventos futuros? Cuidado! Este arquivo pode ser lido por qualquer pessoa que tenha este link.',
   'Import into timeregistration' => 'Importar no apontamento de horas',
   'Don\'t show new reservations as busy' => 'Não mostrar novas reservas como ocupado',
   'Create email for participants' => 'Criar e-mail para os participantes',
@@ -264,9 +264,4 @@ legacy;calendar;Tasklist;Lista de tarefas;modules/calendar/AvailabilityCheckWind
 legacy;calendar;Publish iCalendar file of last month and future events. Caution! The calendar will be readable to everyone."',
   'Remove duplicates' => 'Remover duplicados',
   'Export as ICS' => 'Exportar como ICS',
-  'Only show this field set for selected calendar groups' => 'Mostrar apenas este conjunto de campos para grupos de agendas selecionados',
-  'Forthcoming events' => 'Próximos eventos',
-  'Past events' => 'Eventos passados',
-  'Visible tasklists' => 'Listas de tarefas visíveis',
-  'Tasklist' => 'Lista de tarefas',
 );

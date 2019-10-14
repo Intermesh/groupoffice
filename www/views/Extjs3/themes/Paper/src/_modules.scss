@@ -149,9 +149,6 @@ $app-icons: (
 .ml-unseen-from {
 	font-weight: bold;
 }
-.ml-unseen-subject {
-	font-weight: normal;
-}
 
 .ml-seen-subject, .ml-unseen-subject {
 	@extend %font-body2;
@@ -211,12 +208,6 @@ $app-icons: (
 	}
 }
 
-.message-header-table{
-	float:left;
-	margin-right: dp(72);
-	margin-bottom: dp(8);
-}
-
 .message-header {
 	position: relative;
 	background-color: color($bg, "background");
@@ -240,6 +231,14 @@ $app-icons: (
 	}
 }
 
+
+
+
+//TASK filter
+.x-form-radio-group.x-column-layout-ct {
+	margin-top:dp(16);
+}
+
 .mo-description {
 	padding-left: dp(40);
 }
@@ -254,68 +253,4 @@ $app-icons: (
 		content: "link";
 	}
 	float:right;
-}
-
-.go-attachments {
-	span {
-		cursor: pointer;
-
-		&.x-view-selected {
-			background-color: color($bg, 'selected');
-		}
-		&.x-view-over {
-			background-color: color($bg, 'hover');
-		}
-
-		i {
-			cursor: pointer;
-			display: none;
-		}
-		&.x-view-selected, &.x-view-over {
-			i {
-				display: inline-block;
-			}
-		}
-	}
-}
-
-//Bookmarks
-.chooseIcon {
-	margin-top:10px;
-	margin-left:50%;
-	position:relative;
-	display:inline-block;
-	padding:0;
-	background: url('img/default-avatar.svg') no-repeat center center;
-	background-size:cover;	
-	border-radius: 50%;
-	width:dp(40);
-	height: dp(40);
-	font-size: dp(28);	
-	text-align: center;	
-	
-	.icon {
-		color: red;
-		line-height: dp(40);
-		font-size: inherit;			
-		height: 100%;
-		width: 100%;
-	}
-
-	.go-detail-view & {
-		//float:left; ?? why?
-		margin-top:dp(4);
-		margin-right: dp(16);
-	}
-	
-	.x-btn {
-		border: 0;
-	}
-	
-	&.group {
-		&::before {
-			content: "group";			
-		}
-		background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));	
-	}
 }

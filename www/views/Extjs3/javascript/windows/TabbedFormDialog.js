@@ -321,41 +321,24 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 		tb.addButton(button);
 	},
 
-	/**
-	 * Change where custom field sets are added
-	 */
-	customFieldsContainer : null,
-
 	addCustomFields : function(){
-		if(!this.customFieldType) {
-			return;
-		}
-
-		if(!this.customFieldsContainer) {
-			this.customFieldsContainer = this._panels[0];
-		}
-	
-		if(go.Entities.get(this.customFieldType).customFields) {
-			var fieldsets = go.customfields.CustomFields.getFormFieldSets(this.customFieldType);
-			fieldsets.forEach(function(fs) {
-				//console.log(fs);
-				if(fs.fieldSet.isTab) {
-					fs.title = null;
-					fs.collapsible = false;
-					var pnl = new Ext.Panel({
-						autoScroll: true,
-						hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.
-						title: fs.fieldSet.name,
-						items: [fs]
-					});
-					this.addPanel(pnl);
-				}else
-				{			
-					this.customFieldsContainer.add(fs);
+		if(this.customFieldType && GO.customfields && GO.customfields.types[this.customFieldType])
+		{			
+			var classParts = this.customFieldType.split('\\');
+			var shortModelName = classParts[3].toLowerCase();
+			
+			for(var i=0;i<GO.customfields.types[this.customFieldType].panels.length;i++)
+			{				
+				if(this.jsonPost){
+					var customfields = GO.customfields.types[this.customFieldType].panels[i].customfields;
+					for(var n=0;n<customfields.length;n++){
+						customfields[n].dataname = shortModelName+"."+customfields[n].dataname;
+					};
 				}
-			}, this);
+				
+				this.addPanel(GO.customfields.types[this.customFieldType].panels[i]);
+			}
 		}
-
 	},
 	
 

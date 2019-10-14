@@ -24,7 +24,6 @@ GO.calendar.CalendarDialog = function(config)
 		anchor: '100% 100%',		
 		cls:'go-form-panel',
 		labelWidth: 120,
-		autoScroll: true,
 		items: [
 		this.selectUser = new GO.form.SelectUser({
 			fieldLabel: t("User"),
@@ -258,7 +257,7 @@ GO.calendar.CalendarDialog = function(config)
 		})],
 		cls: 'go-form-panel'
 	});
-	
+
 
 	var items = [this.propertiesTab];
 	
@@ -271,7 +270,15 @@ GO.calendar.CalendarDialog = function(config)
 	items.push(this.readPermissionsTab);
 	items.push(this.importTab);
 
-
+	if(go.Modules.isAvailable("core", "customfields") && GO.customfields.types["GO\\Calendar\\Model\\Calendar"])
+	{
+		for(var i=0;i<GO.customfields.types["GO\\Calendar\\Model\\Calendar"].panels.length;i++)
+		{
+			var panel = GO.customfields.types["GO\\Calendar\\Model\\Calendar"].panels[i];
+			panel.autoScroll = true;
+			items.push(panel);
+		}
+	}
 
 	this.tabPanel = new Ext.TabPanel({
 		hideLabel:true,
@@ -283,25 +290,6 @@ GO.calendar.CalendarDialog = function(config)
 		enableTabScroll: true,
 		items:items
 	});
-	
-	
-	go.customfields.CustomFields.getFormFieldSets("Calendar").forEach(function(fs) {
-			//console.log(fs);
-			if(fs.fieldSet.isTab) {
-				fs.title = null;
-				fs.collapsible = false;
-				var pnl = new Ext.Panel({
-					autoScroll: true,
-					hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.
-					title: fs.fieldSet.name,
-					items: [fs]
-				});
-				this.tabPanel.add(pnl);
-			}else
-			{			
-				this.propertiesTab.add(fs);
-			}
-		}, this);
 
 	this.formPanel = new Ext.FormPanel({
 		fileUpload:true,

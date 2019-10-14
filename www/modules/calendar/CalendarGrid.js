@@ -123,7 +123,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 
 	scale : 96,
 
-	hourHeight : 44,
+	hourHeight : 40,
 
 	loaded : false,
 
@@ -440,7 +440,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 
 		var timeformat;
 
-		var timeColHeight = (((this.rowHeight)*this.rowsPerHour));
+		var timeColHeight = (((this.rowHeight+1)*this.rowsPerHour)-1);
 
 		for (var i = 0;i<this.scale;i+=this.rowsPerHour)
 		{

@@ -58,7 +58,7 @@ trait ValidationTrait {
 	 * @param string $description Override the default description. Pure info for the API developer. Clients shouldn't use this.
 	 * @param array $data Arbitrary data for output to the client
 	 */
-	public function setValidationError($key, $code, $description = null, $data = []) {
+	protected function setValidationError($key, $code, $description = null, $data = []) {
 
 		if (!isset($description)) {
 			$description = ErrorCode::getDescription($code);

@@ -45,10 +45,8 @@
 //
 //	});
 
-go.Modules.register('cron', {	
+GO.moduleManager.addModule('cron', GO.cron.CronGrid, {
 	title : t("Manage system tasks", "cron"),
 	iconCls : 'go-tab-icon-cron',
-	systemSettingsPanels: [
-		"go.cron.SystemSettingsCronGrid"
-	]
+	admin :true
 });

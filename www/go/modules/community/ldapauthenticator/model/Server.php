@@ -2,8 +2,6 @@
 namespace go\modules\community\ldapauthenticator\model;
 
 use go\core\jmap\Entity;
-use go\core\ldap\Connection;
-use go\core\util\DateTime;
 
 class Server extends Entity {
 	
@@ -34,12 +32,6 @@ class Server extends Entity {
 	public $smtpUseUserCredentials= false;
 	public $smtpValidateCertificate = true;
 	public $smtpEncryption;
-
-	public $syncUsers = false;
-	public $syncUsersQuery;
-	public $syncGroups = false;
-	public $syncGroupsQuery;
-
 	
 	
 	/**
@@ -84,8 +76,8 @@ class Server extends Entity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable('ldapauth_server', 's')
-						->addArray("domains", Domain::class, ['id' => "serverId"])
-						->addArray("groups", Group::class, ['id' => "serverId"]);
+						->addRelation("domains", Domain::class, ['id' => "serverId"])
+						->addRelation("groups", Group::class, ['id' => "serverId"]);
 	}
 	
 	/**
@@ -114,66 +106,15 @@ class Server extends Entity {
 	
 	protected function internalSave() {
 		if($this->isModified("domains")) {
-			go()->getCache()->delete("authentication-domains");
-		}
-
-		if($this->isModified(['syncUsers', 'syncGroups'])) {
-			if($this->syncGroups || $this->syncUsers){
-				$this->runCronJob();
-			}
+			GO()->getCache()->delete("authentication-domains");
 		}
 		
 		return parent::internalSave();
 	}
 	
 	protected function internalDelete() {
-		go()->getCache()->delete("authentication-domains");
+		GO()->getCache()->delete("authentication-domains");
 		
 		return parent::internalDelete();
-	}
-
-	private $connection;
-
-	/**
-	 * Connect to LDAP server
-	 * 
-	 * @return Connection
-	 */
-	public function connect() {
-		$this->connection = new Connection();
-		if(!$this->connection->connect($this->getUri())) {
-			throw new \Exception("Could not connect to LDAP server");
-		}
-		if(!$this->ldapVerifyCertificate) {
-			$this->connection->setOption(LDAP_OPT_X_TLS_REQUIRE_CERT, LDAP_OPT_X_TLS_NEVER);
-		}
-		if($this->encryption == 'tls') {
-			if(!$this->connection->startTLS()) {
-				throw new \Exception("Couldn't enable TLS: " . $this->connection->getError());
-			}			
-		}	
-
-		return $this->connection;
-	}
-
-	private function runCronJob() {
-
-		$module = \go\core\model\Module::findByName('community', 'ldapauthenticator');
-
-		$cron = \go\core\model\CronJobSchedule::find()->where(['moduleId' => $module->id, 'name' => 'Sync'])->single();
-
-		if(!$cron) {
-			$cron = new \go\core\model\CronJobSchedule();
-			$cron->moduleId = $module->id;
-			$cron->name = "Sync";
-			$cron->expression = "0 0 * * *";
-			$cron->description = "Synchronize LDAP Authenication server";
-		}
-		$cron->enabled = true;
-		$cron->nextRunAt = new DateTime();
-		
-		if(!$cron->save()) {
-			throw new \Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
-		}
 	}
 }

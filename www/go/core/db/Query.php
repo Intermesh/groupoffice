@@ -20,12 +20,9 @@ use ReflectionClass;
  * 					->offset(0)
  * 					->orderBy(['id' => 'ASC']);
  * 
- * // Query objects can be stringified for debugging:
- * echo $query;
+ * 	$stmt = $query->execute();
  * 
- * $stmt = $query->execute();
- * 
- * $record = $stmt->fetch();
+ * 	$record = $stmt->fetch();
  * ```
  * 
  * @copyright (c) 2014, Intermesh BV http://www.intermesh.nl
@@ -38,13 +35,10 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	private $distinct;
 	private $select = [];
 	private $orderBy = [];
-	private $unionOrderBy = [];
 	private $groupBy = [];
 	private $having = [];
 	private $limit;
-	private $unionLimit;
 	private $offset = 0;
-	private $unionOffset = 0;
 	protected $joins = [];
 	private $fetchMode;
 	private $forUpdate;
@@ -87,22 +81,6 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 
 	public function getJoins() {
 		return $this->joins;
-	}
-	
-	public function getUnions() {
-		return $this->unions;
-	}
-	
-	public function getUnionOffset() {
-		return $this->unionOffset;
-	}
-	
-	public function getUnionLimit() {
-		return $this->unionLimit;
-	}
-	
-	public function getUnionOrderBy() {
-		return $this->unionOrderBy;
 	}
 
 	public function getFetchMode() {
@@ -157,7 +135,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 
 		return $this;
 	}
-	
+
 	/**
 	 * Select a single column or count(*) for example.
 	 * 
@@ -229,23 +207,6 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 
 		return $this;
 	}
-	
-	private $unions = [];
-	
-	/**
-	 * Create a union query
-	 * 
-	 * Calling limit(), offset() and orderBy() after the union will apply to the 
-	 * global union scope and not the individual query.
-	 * 
-	 * @param \go\core\db\Query $query
-	 * @return $this
-	 */
-	public function union(Query $query) {
-		$this->unions[] = $query;
-		
-		return $this;
-	}
 
 	/**
 	 * Set the main table alias.
@@ -266,12 +227,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * @return static
 	 */
 	public function orderBy(array $by, $append = false) {
-		if(empty($this->unions)) {
-			$this->orderBy = $append ? array_merge($this->orderBy, $by) : $by;
-		} else
-		{
-			$this->unionOrderBy = $append ? array_merge($this->unionOrderBy, $by) : $by;
-		}
+		$this->orderBy = $append ? array_merge($this->orderBy, $by) : $by;
 		return $this;
 	}
 
@@ -292,8 +248,9 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * @param Criteria|array|string $condition {@see Criteria::normalize()}
 	 * @return static
 	 */
-	public function having($condition, $operator = null, $value = null) {
-		return $this->andHaving($condition, $operator, $value);
+	public function having($condition, $operator = 'AND') {
+		$this->having[] = [$operator, $this->normalizeCondition($condition)];
+		return $this;
 	}
 
 	/**
@@ -304,9 +261,8 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * @param Criteria|array|string $condition {@see Criteria::normalize()}
 	 * @return static
 	 */
-	public function andHaving($condition, $operator = null, $value = null) {
-		$this->having[] = $this->internalWhere($condition, $operator, $value, 'AND');
-		return $this;
+	public function andHaving($condition) {
+		return $this->having($condition);
 	}
 
 	/**
@@ -317,9 +273,8 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * @param Criteria|array|string $condition {@see Criteria::normalize()}
 	 * @return static
 	 */
-	public function orHaving($condition, $operator = null, $value = null) {
-		$this->having[] = $this->internalWhere($condition, $operator, $value, 'OR');
-		return $this;
+	public function orHaving($condition) {
+		return $this->having($condition, 'OR');
 	}
 
 	/**
@@ -366,31 +321,6 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 
 		return $this;
 	}
-	
-	/**
-	 * Check if table is joined
-	 * 
-	 * @param string $tableName
-	 * @param string $joinTableAlias If given the alias of the existing join must match too.
-	 * @return boolean
-	 */
-	public function isJoined($tableName, $joinTableAlias = null) {
-		foreach($this->joins as $join) {
-			if($join['src'] != $tableName) {
-				continue;
-			}
-			
-			if(!isset($joinTableAlias)) {
-				return true;
-			}
-			
-			if($joinTableAlias == $join['joinTableAlias']) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
 
 	/**
 	 * Skip this number of records
@@ -399,12 +329,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * @return static
 	 */
 	public function offset($offset = 0) {
-		if(empty($this->unions)) {
-			$this->offset = (int) $offset;
-		} else
-		{
-			$this->unionOffset = (int) $offset;
-		}
+		$this->offset = (int) $offset;
 		return $this;
 	}
 
@@ -415,20 +340,13 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * @return static
 	 */
 	public function limit($limit = 0) {
-		if(empty($this->unions)) {
-			$this->limit = (int) $limit;
-		} else
-		{			
-			$this->unionLimit = (int) $limit;	
-		}
+		$this->limit = (int) $limit;
 		return $this;
 	}
 
 	public function __toString() {
-		$queryBuilder = new QueryBuilder($this->getDbConnection());
-		$build = $queryBuilder->buildSelect($this);
-		
-		return $queryBuilder->debugBuild($build);
+		//todo
+		//return $this->createCommand()->toString();
 	}
 	
 	/**
@@ -451,12 +369,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		return $this;
 	}
 	
-	/**
-	 * Get the database connection
-	 * 
-	 * @return \go\core\db\Connection
-	 */
-	public function getDbConnection() {
+	private function getDbConnection() {
 		if(!isset($this->dbConn)) {
 			$this->dbConn = App::get()->getDbConnection();
 		}
@@ -467,55 +380,20 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	/**
 	 * Executes the query and returns the statement
 	 * 
-	 * @return Statement Returns false on failure.
+	 * @return Statement
 	 */
 	public function execute() {
-		
-		$queryBuilder = new QueryBuilder($this->getDbConnection());
-		$build = $queryBuilder->buildSelect($this);
-		$build['start'] = go()->getDebugger()->getTimeStamp();
-		
-		if($this->debug && !$this->getDbConnection()->debug) {
-			go()->debug(QueryBuilder::debugBuild($build));
+		$statement = $this->getDbConnection()->select($this);
+		if (!$statement->execute()) {
+			return false;
 		}
-
-		$stmt = $this->getDbConnection()->createStatement($build);
-		call_user_func_array([$stmt, 'setFetchMode'], $this->getFetchMode());
-
-		$stmt->setQuery($this);		
-		try {
-			$ret = $stmt->execute();
-			if (!$ret) {
-				go()->error(var_export($ret, true));
-				go()->error($stmt->errorInfo());
-				throw new \Exception("Could not execute statement. Error code: ". $stmt->errorCode());
-			}
-		} catch(\Exception $e) {				
-			go()->error("SQL FAILED: " . $queryBuilder->debugBuild($build));
-			
-			throw $e;
-		}
-		return $stmt;
-	}
-	
-	private $debug = false;
-
-	/**
-	 * Output query to debugger
-	 * 
-	 * @return $this
-	 */
-	public function debug() {
-		$this->debug = true;
-		
-		return $this;
+		return $statement;
 	}
 	
 	/**
 	 * Executes the query and returns a single object
 	 * 
-	 * @return mixed|boolean The queries record, column or object. Returns false 
-	 *   when nothing is found
+	 * @return mixed
 	 */
 	public function single() {		
 		return $this->offset(0)
@@ -539,7 +417,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * @return array eg ['sql' => 'select...', 'params' => []]
 	 */
 	public function build() {
-		$queryBuilder = new QueryBuilder($this->getDbConnection());
+		$queryBuilder = new QueryBuilder();
 		return $queryBuilder->buildSelect($this);
 	}
 

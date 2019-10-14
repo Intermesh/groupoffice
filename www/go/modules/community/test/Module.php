@@ -2,13 +2,13 @@
 namespace go\modules\community\test;
 
 use go\core\App;
-use go\core;
+use go\core\module\Base;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\modules\community\test\model\A;
 use go\modules\community\test\model\ADynamic;
 
-class Module extends core\Module {	
+class Module extends Base {	
 
 	public function getAuthor() {
 		return "Intermesh BV";
@@ -19,7 +19,7 @@ class Module extends core\Module {
 	}
 	
 	public static function onMap(Mapping $mapping) {		
-		$mapping->addHasOne("dynamic", ADynamic::class, ['id' => 'aId']);		
+		$mapping->addRelation("dynamic", ADynamic::class, ['id' => 'aId'], false);		
 		$mapping->addTable('test_d', 'd', ['id' => 'id'], ['propD']);
 		return true;
 	}

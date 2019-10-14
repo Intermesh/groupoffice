@@ -3,26 +3,21 @@
 namespace go\core {
 
 use Exception;
-use GO;
 use GO\Base\Observable;
 use go\core\auth\State as AuthState;
 use go\core\cache\CacheInterface;
 use go\core\cache\Disk;
 use go\core\db\Connection;
 use go\core\db\Database;
-use go\core\db\Query;
 use go\core\db\Table;
-    use go\core\event\EventEmitterTrait;
-    use go\core\event\Listeners;
+use go\core\event\Listeners;
 use go\core\exception\ConfigurationException;
 use go\core\fs\Folder;
-    use go\core\http\Request;
-    use go\core\jmap\State;
+use go\core\jmap\State;
 use go\core\mail\Mailer;
 use go\core\util\Lock;
 use go\core\webclient\Extjs3;
-use go\core\model\Settings;
-use const GO_CONFIG_FILE;
+use go\modules\core\core\model\Settings;
 
 	/**
 	 * Application class.
@@ -36,23 +31,7 @@ use const GO_CONFIG_FILE;
 	 * 
 	 * 
 	 */
-	class App extends Module {
-		
-		use SingletonTrait;
-
-		use EventEmitterTrait;
-
-
-		/**
-		 * Fires when the application is loaded in the <head></head> section of the webclient.
-		 * Can also be used to adjust the Content Security Policy
-		 */
-		const EVENT_HEAD = 'head';
-
-		/**
-		 * Fires after all scripts have been loaded
-		 */
-		const EVENT_SCRIPTS = 'scripts';
+	class App extends Singleton {
 
 		/**
 		 *
@@ -84,55 +63,15 @@ use const GO_CONFIG_FILE;
 
 			$this->errorHandler = new ErrorHandler();
 			$this->initCompatibility();
+
+			parent::__construct();
 		}
 		
-		/**
-		 * Required for app being a go\core extend
-		 * 
-		 * @return string
-		 */
-		public function getAuthor() {
-			return "Intermesh BV";
-		}
-
-		/**
-		 * Required for app being a go\core extend
-		 * 
-		 * @return string
-		 */
-		public static function getName() {
-			return "core";
-		}
-
-		/**
-		 * Required for app being a go\core extend
-		 * 
-		 * @return string
-		 */
-		public static function getPackage() {
-			return "core";
-		}
-
-		/**
-		 * Get version number
-		 * 
-		 * @return string eg. 6.4.1
-		 */
 		public function getVersion() {
 			if(!isset($this->version)) {
 				$this->version = require(Environment::get()->getInstallFolder()->getPath() . '/version.php');
 			}
 			return $this->version;
-		}
-
-		/**
-		 * Major version
-		 * 
-		 * @return string eg. 6.4
-		 */
-		public function getMajorVersion() {
-			
-			return substr($this->getVersion(), 0, strrpos($this->getVersion(), '.') );
 		}
 
 		private function initCompatibility() {
@@ -173,7 +112,7 @@ use const GO_CONFIG_FILE;
 		 * @return Folder
 		 */
 		public function getDataFolder() {
-			return new Folder($this->getConfig()['core']['general']['dataPath']);
+			return new Folder($this->getConfig()['general']['dataPath']);
 		}
 		
 		/**
@@ -182,15 +121,9 @@ use const GO_CONFIG_FILE;
 		 * @return float
 		 */
 		public function getStorageQuota() {
-			$quota = $this->getConfig()['core']['limits']['storageQuota'];
+			$quota = $this->getConfig()['limits']['storageQuota'];
 			if(empty($quota)) {
-				try {
-					$quota = disk_total_space($this->getConfig()['core']['general']['dataPath']);
-				}
-				catch(\Exception $e) {
-					go()->warn("Could not determine total disk space: ". $e->getMessage());
-					return 0;
-				}
+				$quota = disk_total_space($this->getConfig()['general']['dataPath']);
 			}
 			
 			return $quota;
@@ -202,15 +135,9 @@ use const GO_CONFIG_FILE;
 		 * @return float
 		 */
 		public function getStorageFreeSpace() {
-			$quota = $this->getConfig()['core']['limits']['storageQuota'];
+			$quota = $this->getConfig()['limits']['storageQuota'];
 			if(empty($quota)) {
-				try {
-					return disk_free_space($this->getConfig()['core']['general']['dataPath']);
-				}
-				catch(\Exception $e) {
-					go()->warn("Could not determine free disk space: ". $e->getMessage());
-					return 0;
-				}
+				return disk_free_space($this->getConfig()['general']['dataPath']);
 			} else
 			{
 				 $usage = \GO::config()->get_setting('file_storage_usage');				 
@@ -224,7 +151,7 @@ use const GO_CONFIG_FILE;
 		 * @return Folder
 		 */
 		public function getTmpFolder() {
-			return new Folder($this->getConfig()['core']['general']['tmpPath']);
+			return new Folder($this->getConfig()['general']['tmpPath']);
 		}
 
 		private $config;
@@ -278,11 +205,13 @@ use const GO_CONFIG_FILE;
 			$configFile = $this->findConfigFile();
 			if(!$configFile) {
 				
-				$host = isset($_SERVER['HTTP_HOST']) ? explode(':', $_SERVER['HTTP_HOST'])[0] : '<HOSTNAME>';
+				$msg = "No config.php was found. Possible locations: \n\n";
 				
-				$msg = "No config.php was found. Possible locations: \n\n".
-								"/etc/groupoffice/multi_instance/" .$host . "/config.php\n\n".				
-								 dirname(dirname(__DIR__)) . "/config.php\n\n".
+				if(isset($_SERVER['HTTP_HOST'])) {
+								$msg .= '/etc/groupoffice/multi_instance/' . explode(':', $_SERVER['HTTP_HOST'])[0] . "/config.php\n\n";
+				}
+				
+				$msg .= dirname(dirname(__DIR__)) . "/config.php\n\n".
 								"/etc/groupoffice/config.php";
 				
 				throw new Exception($msg);
@@ -322,60 +251,37 @@ use const GO_CONFIG_FILE;
 			}
 			
 			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
-
-			if(Request::get()->getHeader('X-Debug') == "1") {
-				$config['debug'] = true;
+			
+			if(cache\Apcu::isSupported()) {
+				$cacheCls = cache\Apcu::class;				
+			} else
+			{
+				$cacheCls = cache\Disk::class;
 			}
 			
-			if(!isset($config['debug_log'])) {
-				$config['debug_log'] = !empty($config['debug']);
-			}
-			
-			$this->config = (new util\ArrayObject([					
-					"core" => [
-							"general" => [
-									"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
-									"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
-									"debug" => $config['debug'] ?? null,
-									"debugLog" => $config['debug_log'],
-									
-									"servermanager" => $config['servermanager'] ?? false,
-
-									"sseEnabled" => $config['sseEnabled'] ?? true
-							],
-							"db" => [
-									"host" => ($config['db_host'] ?? "localhost"),
-									"port" => $config['db_port'] ?? 3306,
-									"name" => $config['db_name'],
-									"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice-com"),
-									"username" => $config['db_user'] ?? "groupoffice",
-									"password" => $config['db_pass'] ?? ""
-							],
-							"limits" => [
-									"maxUsers" => $config['max_users'] ?? 0,
-									"storageQuota" => $config['quota'] ?? 0,
-									"allowedModules" => $config['allowed_modules'] ?? ""
-							],
-							"branding" => [
-								"name" => $config['product_name'] ?? "GroupOffice"
-							],						
+			$this->config = [
+					"general" => [
+							"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
+							"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
+							"debug" => $config['debug'] ?? false,
+							"cache" => $cacheCls,
+							"servermanager" => $config['servermanager'] ?? false
 					],
-					
-//					"package" => [
-//							"name" => [
-//									"foo" => 'bar'
-//							]
-//					]
-			]))->mergeRecursive($config)->getArray();
-			
-			if(!isset($this->config['core']['general']['cache'])) {
-				if(cache\Apcu::isSupported()) {
-					$this->config['core']['general']['cache'] = cache\Apcu::class;				
-				} else
-				{
-					$this->config['core']['general']['cache'] = cache\Disk::class;
-				}
-			}
+					"db" => [
+							"name" => $config['db_name'],
+							"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice-com"),
+							"username" => $config['db_user'] ?? "groupoffice",
+							"password" => $config['db_pass'] ?? ""
+					],
+					"limits" => [
+							"maxUsers" => $config['max_users'] ?? 0,
+							"storageQuota" => $config['quota'] ?? 0,
+							"allowedModules" => $config['allowed_modules'] ?? ""
+					],
+					"branding" => [
+						"name" => $config['product_name'] ?? "GroupOffice"
+					]
+			];
 			
 			return $this->config;
 		}
@@ -388,7 +294,7 @@ use const GO_CONFIG_FILE;
 		public function getDbConnection() {
 
 			if (!isset($this->dbConnection)) {
-				$db = $this->getConfig()['core']['db'];
+				$db = $this->getConfig()['db'];
 				$this->dbConnection = new Connection(
 								$db['dsn'], $db['username'], $db['password']
 				);
@@ -428,29 +334,10 @@ use const GO_CONFIG_FILE;
 		 */
 		public function getCache() {
 			if (!isset($this->cache)) {
-				$cls = $this->getConfig()['core']['general']['cache'];
+				$cls = $this->getConfig()['general']['cache'];
 				$this->cache = new $cls;
 			}
 			return $this->cache;
-		}
-		
-		
-		/**
-		 * Get a module
-		 * 
-		 * return the module if it's installed and available.
-		 * 
-		 * @param string $package Set to null for legacy modules
-		 * @param string $name
-		 * @return \go\core\model\Module
-		 */
-		public function getModule($package, $name) {
-			$model = \go\core\model\Module::find()->where(['package' => $package, 'name' => $name, 'enabled' => true])->single();
-			if(!$model || !$model->isAvailable()) {
-				return false;
-			}
-			
-			return $model;
 		}
 		
 		/**
@@ -477,14 +364,13 @@ use const GO_CONFIG_FILE;
 			if($lock->lock()) {
 				\GO::clearCache(); //legacy
 
-				go()->getCache()->flush(false);
+				GO()->getCache()->flush(false);
 				Table::destroyInstances();
 
-				$webclient = Extjs3::get();
+				$webclient = new Extjs3();
 				$webclient->flushCache();
 
 				Observable::cacheListeners();
-
 				Listeners::get()->init();
 			}
 		}
@@ -517,24 +403,8 @@ use const GO_CONFIG_FILE;
 		 * 
 		 * @param string|callable|array|object $msg
 		 */
-		public function debug($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->log($msg, $traceBackSteps);
-		}
-		
-		public function log($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->log($msg, $traceBackSteps);
-		}
-		
-		public function warn($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->warn($msg, $traceBackSteps);
-		}
-		
-		public function error($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->error($msg, $traceBackSteps);
-		}
-		
-		public function info($msg, $traceBackSteps = 0) {
-			$this->getDebugger()->info($msg, $traceBackSteps);
+		public function debug($msg, $type = 'general', $traceBackSteps = 0) {
+			$this->getDebugger()->debug($msg, $type, $traceBackSteps);
 		}
 
 		private $authState;
@@ -559,25 +429,23 @@ use const GO_CONFIG_FILE;
 		public function getAuthState() {
 			return $this->authState;
 		}
+
+//		/**
+//		 * Get the authenticated user
+//		 * 
+//		 * @return auth\model\User
+//		 */
+//		public function getUser() {
+//			if ($this->getAuthState() instanceof \go\core\auth\State) {
+//				return $this->authState->getUser();
+//			}
+//			return null;
+//		}
 		
 		/**
-		 * Get the server environment
+		 * Get the authenticated user
 		 * 
-		 * @return Environment
-		 */
-		public function getEnvironment() {
-			return Environment::get();
-		}
-
-		/**
-		 * Get the authenticated user ID
-		 * 
-		 * If you need to get the full user use:
-		 * 
-		 * ```
-		 * go()->getAuthState()->getUser();
-		 * ```
-		 * @return int
+		 * @return auth\model\User
 		 */
 		public function getUserId() {
 			if ($this->getAuthState() instanceof AuthState) {
@@ -620,19 +488,6 @@ use const GO_CONFIG_FILE;
 			return $this->language;
 		}
 
-		/**
-		 * Find the config.php file location.
-		 * 
-		 * It will search for:
-		 * 
-		 * - 'GO_CONFIG_FILE' constant or environment variable ($_SERVER['GO_CONFIG_FILE']).
-		 * - /etc/groupoffice/multi_instance/<HOSTNAME>/config.php
-		 * - <GROUPOFFICEDIR>/config.php
-		 * - /etc/groupoffice/config.php
-		 * 
-		 * @param string $name
-		 * @return boolean|string
-		 */
 		public static function findConfigFile($name = 'config.php') {
 			
 			if(defined("GO_CONFIG_FILE")) {
@@ -678,58 +533,19 @@ use const GO_CONFIG_FILE;
 			
 			return false;
 		}
-		
-		/**
-		 * Resets all entity state so all clients must resync data.
-		 * 
-		 * @todo resync per entity
-		 */
-		public function resetSyncState() {		
-			//reset all mod seqs
-			go()->getDbConnection()->update('core_entity', ['highestModSeq' => 0])->execute();
-			go()->getDbConnection()->exec("TRUNCATE TABLE core_change");
-			go()->getDbConnection()->exec("TRUNCATE TABLE core_acl_group_changes");
-			go()->getDbConnection()->insert('core_acl_group_changes', (new Query())->select("null, aclId, groupId, '0', null")->from("core_acl_group"))->execute();
-		}
 
-		/**
-		 * Download method for module icons
-		 * 
-		 * /api/download.php?blob=core/moduleIcon/community/addressbook
-		 */
-		public function downloadModuleIcon($package, $name) {
-
-			if($package == "legacy") {
-				$file = go()->getEnvironment()->getInstallFolder()->getFile('modules/' . $name .'/themes/Default/images/'.$name.'.png');
-				if(!$file->exists()) {
-					$file = go()->getEnvironment()->getInstallFolder()->getFile('modules/' . $name .'/views/Extjs3/themes/Default/images/'.$name.'.png');
-				}	
-
-				if(!$file->exists()) {
-					$file = go()->getEnvironment()->getInstallFolder()->getFile('modules/' . $name .'/themes/Default/'.$name.'.png');
-				}	
-
-				
-
-			} else {
-				$file = go()->getEnvironment()->getInstallFolder()->getFile('go/modules/' . $package . '/' . $name .'/icon.png');	
-			}
-
-			if(!$file->exists()) {
-				$file = go()->getEnvironment()->getInstallFolder()->getFile('views/Extjs3/themes/Paper/img/default-avatar.svg');
-			}
-			$file->output(true, true, ['Content-Disposition' => 'inline; filename="module.svg"']);
-		}
 	}
+
 }
 
 namespace {
 
 	use go\core\App;
+
 	/**
-	 * @return go\core\App
+	 * @return App
 	 */
-	function go() {
+	function GO() {
 		return App::get();
 	}
 

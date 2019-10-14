@@ -11,8 +11,6 @@ GO.mainLayout.onReady(function(){
 
 				GO.debugWindow.show();
 				GO.debug = true;
-				
-				Ext.Ajax.defaultHeaders['X-Debug'] = "1";
 			}
 		});
 });
@@ -36,7 +34,7 @@ GO.DebugWindow = Ext.extend(GO.Window, {
 			width:600,
 			height:1200,
 			layout:'fit',
-			items: this.tabPanel = new Ext.TabPanel({
+			items:{
 				xtype:'tabpanel',
 				items:[
 					this.outputPanel = new GO.LogPanel({
@@ -62,19 +60,13 @@ GO.DebugWindow = Ext.extend(GO.Window, {
 									}
 								},
 								scope:this
-						},{					
-						
-						text: t("Copy"),
-						handler: function() {
-							go.util.copyTextToClipboard(this.tabPanel.getActiveTab().raw);
-						},
-						scope:this
-				}]
-					}),					
+						}]
+					}),
+					this.errorPanel = new GO.LogPanel({title:'Errors'}),
 					this.infoPanel = new Ext.Panel({title:'Info',autoScroll:true, listeners:{show:this.loadInfo, scope:this}})
 				],
 				activeTab:0
-			}),
+			},
 			listeners:{
 				show:function(){					
 					Ext.TaskMgr.start(this.taskConfig);
@@ -106,9 +98,12 @@ GO.DebugWindow = Ext.extend(GO.Window, {
 		GO.request({
 			url:'core/debug',
 			params:this.baseParams,
-			success:function(response, options, result){			
+			success:function(response, options, result){
 				
-				this.outputPanel.setLog(result.debugLog);				
+				
+				this.outputPanel.setLog(result.debugLog);
+				this.errorPanel.setLog(result.errorLog);
+				
 	
 			},
 			fail: function(response, options, result) {
@@ -136,8 +131,8 @@ GO.LogPanel = Ext.extend(Ext.Panel,{
 				
 			var isAtBottom = d.scrollTop >= d.scrollHeight - d.offsetHeight;
 		
-			this.raw = str;
-			this.update("<pre>" + str + "</pre>");
+
+			this.update(str);
 
 	
 			//scroll to bottom

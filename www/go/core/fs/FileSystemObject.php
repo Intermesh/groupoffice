@@ -4,7 +4,6 @@ namespace go\core\fs;
 
 use Exception;
 use go\core\App;
-use go\core\util\DateTime;
 
 /**
  * Base class for files and folders on the filesystem
@@ -72,19 +71,19 @@ abstract class FileSystemObject {
 	/**
 	 * Return the modification unix timestamp
 	 *
-	 * @return DateTime
+	 * @return int Unix timestamp
 	 */
 	public function getModifiedAt() {
-		return new DateTime('@' . filemtime($this->path));
+		return filemtime($this->path);
 	}
 
 	/**
 	 * Return the creation unix timestamp
 	 *
-	 * @return DateTime 
+	 * @return int Unix timestamp
 	 */
 	public function getCreatedAt() {
-		return new DateTime('@' . filectime($this->path));
+		return filectime($this->path);
 	}
 
 	/**
@@ -257,7 +256,7 @@ abstract class FileSystemObject {
 
 		return $filename;
 	}
-	
+
 	/**
 	 * Check if this object is a folder.
 	 *

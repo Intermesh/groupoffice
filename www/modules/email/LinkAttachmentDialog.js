@@ -21,16 +21,6 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 		
 		this.getEl().mask();
 
-		if(record.data.entity == "Folder") {
-			if(GO.util.empty(this.attachmentItem)){
-				this.saveAllToItem(record, record.data.entityId);
-			} else {
-				this.saveToItem(record, record.data.entityId);
-			}
-
-			return;
-		}
-
 		GO.request({
 			url:'files/folder/checkModelFolder',
 			params:{								
@@ -92,7 +82,7 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 					{
 						
 						dialog.hide();
-						this.close();
+						this.hide();
 					},
 					scope:this
 				});
@@ -115,7 +105,7 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 			success: function(options, response, result){
 				// Successfully saved all attachments
 				this.getEl().unmask();
-				this.close();
+				this.hide();
 			},
 			scope:this
 		});

@@ -25,61 +25,25 @@ class Table {
 	 * @param string $name
 	 * @return self
 	 */
-	public static function getInstance($name, Connection $conn = null) {
-		
-		if(!isset($conn)) {
-			$conn = go()->getDbConnection();
-		}
-
-		$cacheKey = $conn->getDsn() . '-' . $name;
-		if(!isset(self::$cache[$cacheKey])) {
-			self::$cache[$cacheKey] = new Table($name, $conn);
+	public static function getInstance($name) {
+		if(!isset(self::$cache[$name])) {
+			self::$cache[$name] = new Table($name);
 		}
 		
-		return self::$cache[$cacheKey];	
-	}
-
-	public static function destroyInstance($name, Connection $conn = null) {
-		if(!isset($conn)) {
-			$conn = go()->getDbConnection();
-		}
-
-		$cacheKey = $conn->getDsn() . '-' . $name;
-		if(isset(self::$cache[$cacheKey])) {
-			self::$cache[$cacheKey]->clearCache();
-			unset(self::$cache[$cacheKey]);
-		}
-
-		App::get()->getCache()->delete('dbColumns_' . $name);
-		
+		return self::$cache[$name];	
 	}
 	
 	public static function destroyInstances() {
-		foreach(self::$cache as $i) {
-			$i->clearCache();
-		}
 		self::$cache = [];
 	}
 	
 	private $name;
 	protected $columns;	
-	protected $indexes;
-
-	private $pk = [];
-
-	/**
-	 * @var Connection
-	 */
-	private $conn;
-	public function __construct($name, Connection $conn) {
+	
+	public function __construct($name) {
 		$this->name = $name;
-		$this->conn = $conn;
+		
 		$this->init();
-
-		// $this->columns = array_map(function($c) {
-		// 	$c->table = $this; //is cleared in __sleep()
-		// 	return $c;
-		// }, $this->columns);
 	}	
 	
 	/**
@@ -97,12 +61,8 @@ class Table {
 	/**
 	 * Clear the columns cache
 	 */
-	private function clearCache() {
+	public function clearCache() {
 		App::get()->getCache()->delete($this->getCacheKey());
-		// $this->columns = null;
-		// $this->pk = [];
-		
-		// $this->init();
 	}
 
 	private function init() {
@@ -116,26 +76,22 @@ class Table {
 		if (($cache = App::get()->getCache()->get($cacheKey))) {
 			$this->columns = $cache['columns'];
 			$this->pk = $cache['pk'];
-			$this->indexes = $cache['indexes'] ?? null;
-			$this->conn = null;
 			return;
 		}	
 		
 		$this->columns = [];
 
 		$sql = "SHOW FULL COLUMNS FROM `" . $this->name . "`;";
+//		\go\core\App::get()->debug($sql, 'sql');
 		
-		$stmt = $this->conn->query($sql);
+		$stmt = App::get()->getDbConnection()->getPDO()->query($sql);
 		while ($field = $stmt->fetch()) {
 			$this->columns[$field['Field']] = $this->createColumn($field);
 		}
 
 		$this->processIndexes($this->name);
 
-		//Not needed anymore when we serialize
-		$this->conn = null;
-
-		App::get()->getCache()->set($cacheKey, ['columns' => $this->columns, 'pk' => $this->pk, 'indexes' => $this->indexes]);
+		App::get()->getCache()->set($cacheKey, ['columns' => $this->columns, 'pk' => $this->pk]);
 
 
 		return;
@@ -157,7 +113,7 @@ class Table {
 		}
 	}
 	
-	
+	private $pk = [];
 
 	private function createColumn($field) {
 		
@@ -174,15 +130,14 @@ class Table {
 		$c->nullAllowed = strtoupper($field['Null']) == 'YES';
 		$c->autoIncrement = strpos($field['Extra'], 'auto_increment') !== false;
 		$c->trimInput = false;
-		$c->dataType = strtoupper($field['Type']);
-
+		
 		preg_match('/(.*)\(([1-9].*)\)/', $field['Type'], $matches);		
 		if ($matches) {
 			$c->length  = intval($matches[2]);
-			$c->dbType = strtolower($matches[1]);			
+			$c->dbType = strtolower($matches[1]);
 		} else {
 			$c->dbType = strtolower($field['Type']);
-			$c->length = null;
+			$c->length = 0;
 		}
 		
 		if($c->default == 'CURRENT_TIMESTAMP') {
@@ -194,8 +149,7 @@ class Table {
 			case 'tinyint':
 			case 'bigint':
 				if ($c->length == 1 && $c->dbType == 'tinyint') {
-					//$c->pdoType = PDO::PARAM_BOOL; MySQL native doesn't understand PARAM_BOOL. Doesn't work with ATTR_EMULATE_PREPARES = false.
-					$c->pdoType = PDO::PARAM_INT;
+					$c->pdoType = PDO::PARAM_BOOL;
 					$c->default = !isset($field['Default']) ? null : (bool) $c->default;
 				} else {
 					$c->pdoType = PDO::PARAM_INT;
@@ -222,30 +176,9 @@ class Table {
 					$c->default = date(Column::DATE_FORMAT);
 				}				
 				break;
-				
-			case 'varbinary':
 			case 'binary':
 				$c->pdoType = PDO::PARAM_LOB;
 				break;
-			
-			case 'text':
-				$c->length = 65535;
-				$c->trimInput = true;
-				break;
-			case 'longtext':
-				$c->length = 4294967296;
-				$c->trimInput = true;
-				break;
-			case 'mediumtext':
-				$c->length = 16777216;
-				$c->trimInput = true;
-				break;
-
-			case 'tinytext':
-				$c->length = 255;
-				$c->trimInput = true;
-				break;
-			
 			default:				
 				$c->trimInput = true;
 				break;			
@@ -264,16 +197,13 @@ class Table {
 	private function processIndexes($tableName) {
 		$query = "SHOW INDEXES FROM `" . $tableName . "`";
 
-		$stmt = $this->conn->query($query);
 		$unique = [];
 
 		//group keys;
 		// ['keyName' => ['col1', 'col2']];
 
-		$stmt = $this->conn->query($query);
+		$stmt = App::get()->getDbConnection()->getPDO()->query($query);
 		while ($index = $stmt->fetch()) {
-
-			$this->indexes[strtolower($index['Key_name'])] = $index;
 
 			if ($index['Key_name'] === 'PRIMARY') {
 
@@ -297,17 +227,6 @@ class Table {
 				$this->columns[$colName]->unique = $cols;
 			}
 		}
-	}
-
-
-	/**
-	 * Get index information by name
-	 * 
-	 * @link https://dev.mysql.com/doc/refman/8.0/en/show-index.html
-	 * @return array
-	 */
-	public function getIndex($name) {
-		return $this->indexes[strtolower($name)];
 	}
 
 	
@@ -356,7 +275,7 @@ class Table {
 	 */
 	public function getColumns() {
 		return $this->columns;
-	}	
+	}
 	
 	/**
 	 * Get the auto incrementing column
@@ -384,13 +303,13 @@ class Table {
 		return $this->pk;
 	}
 	
-	// /**
-	//  * Truncate the table
-	//  * 
-	//  * @return boolean
-	//  */
-	// public function truncate() {
-	// 	return $this->conn->query("TRUNCATE TABLE ".$this->getName())->execute();
-	// }
+	/**
+	 * Truncate the table
+	 * 
+	 * @return boolean
+	 */
+	public function truncate() {
+		return GO()->getDbConnection()->query("TRUNCATE TABLE ".$this->getName())->execute();
+	}
 
 }

@@ -169,14 +169,6 @@ class Site {
 			throw new \GO\Base\Exception\NotFound('Website for domain '.$_SERVER["SERVER_NAME"].' not found in database');
 		
 		\GO::session()->loginWithCookies();
-		
-		//Login for new framework
-		go()->setAuthState(new \go\core\auth\TemporaryState());
-//		go()->getAuthState()->setUserId(1);
-		if(GO::user()) {
-			go()->getAuthState()->setUserId(GO::user()->id);
-		}
-						
 	
 		if(!empty(self::model()->language))
 			\GO::language()->setLanguage(self::model()->language);

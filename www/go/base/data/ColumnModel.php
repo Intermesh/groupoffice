@@ -103,27 +103,20 @@ class ColumnModel {
 				}
 			}
 
-			if ($model->hasCustomFields()) {
-				$column = new Column('customFields', 'CF');
-				$column->setFormat(function($model) {
-					return $model->getCustomFields();
-				});
-				$this->addColumn($column);
-				
-				
-//				$cfAttributes = array_keys($model->customfieldsRecord->columns);
-//				array_shift($cfAttributes); //remove model_id column
-//
-//				foreach ($cfAttributes as $colName) {
-//					if(!in_array($colName, $excludeColumns)){
-//					
-//						$sortIndex = empty($includeColumns) ? 0 : array_search($colName, $includeColumns);				
-//						if($sortIndex!==false){
-//							$column = new Column($colName, $model->customfieldsRecord->getAttributeLabel($colName), $sortIndex);
-//							$this->addColumn($column);
-//						}
-//					}
-//				}
+			if (\GO::modules()->customfields && $model->customfieldsRecord) {
+				$cfAttributes = array_keys($model->customfieldsRecord->columns);
+				array_shift($cfAttributes); //remove model_id column
+
+				foreach ($cfAttributes as $colName) {
+					if(!in_array($colName, $excludeColumns)){
+					
+						$sortIndex = empty($includeColumns) ? 0 : array_search($colName, $includeColumns);				
+						if($sortIndex!==false){
+							$column = new Column($colName, $model->customfieldsRecord->getAttributeLabel($colName), $sortIndex);
+							$this->addColumn($column);
+						}
+					}
+				}
 			}
 	}
 
@@ -360,12 +353,7 @@ class ColumnModel {
 		
 		$formattedRecord = array();
 		if($model instanceof \GO\Base\Db\ActiveRecord)
-			$formattedRecord = $model->getAttributes($this->_modelFormatType);
-		
-		if(method_exists($model, 'getCustomFields')) {
-			$model->customFields = $model->getCustomFields($this->_modelFormatType == 'formatted');
-		}
-		
+		  $formattedRecord = $model->getAttributes($this->_modelFormatType);
 		$columns = $this->getColumns();
 
 		foreach($columns as $column){	
@@ -377,9 +365,11 @@ class ColumnModel {
 			try {
 				$formattedRecord[$column->getDataIndex()]=$column->render($model);			
 			} catch(\Exception $e) {
-				go()->getDebugger()->debug($e->getMessage());
+				GO()->getDebugger()->debug($e->getMessage());
 			}
 		}
+			
+		//restore_error_handler();
 		
 		if (isset($this->_formatRecordFunction)){
 			$formattedRecord = call_user_func($this->_formatRecordFunction, $formattedRecord, $model, $this);

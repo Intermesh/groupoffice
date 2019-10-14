@@ -10,19 +10,16 @@ use go\modules\community\serverclient\model\MailDomain;
  * and open the template in the editor.
  */
 
-class Serverclient extends \go\core\Controller {
+class Serverclient extends \go\core\jmap\Controller {
 	
 	//save mailbox on server when the user is saved
 	// password is sync in user save event
 	public function setMailbox($params) {
 		
-		$user = \go\core\model\User::findById($params['userId']);
-		if($user->hasPermissionLevel(\go\core\model\Acl::LEVEL_WRITE)) {
+		$user = \go\modules\core\users\model\User::findById($params['userId']);
+		if($user->hasPermissionLevel(\go\core\acl\model\Acl::LEVEL_WRITE)) {
 			$postfixAdmin = new MailDomain($params['password']);
 			foreach ($params['domains'] as $domain) {
-				if(empty($domain)) {
-					continue;
-				}
 				$postfixAdmin->addMailbox($user,$domain);
 				$postfixAdmin->addAccount($user,$domain);
 			}

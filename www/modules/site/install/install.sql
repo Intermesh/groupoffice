@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `site_content` (
 
 DROP TABLE IF EXISTS `cf_site_sites`;
 CREATE TABLE IF NOT EXISTS `cf_site_sites` (
-  `model_id` int(11) NOT NULL,
+  `model_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`model_id`)
 ) ENGINE=InnoDB;
 
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS `cf_site_sites` (
 
 DROP TABLE IF EXISTS `cf_site_content`;
 CREATE TABLE IF NOT EXISTS `cf_site_content` (
-  `model_id` int(11) NOT NULL,
+  `model_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`model_id`)
 ) ENGINE=InnoDB;
 

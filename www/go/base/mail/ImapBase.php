@@ -370,12 +370,7 @@ abstract class ImapBase {
 				$result = true;
 			}
 			if(!$result && $trackErrors){
-				
-				// Strip command count
-				$line = preg_replace("/^A".$this->command_count." NO( \[.*?\])? /i", "", $line);
-				$line = preg_replace("/ \(.*\)?/i", "", $line);
-				$this->errors[] = $line;
-//				$this->errors[]=$line."\n\nLast command: ".$this->lastCommand;
+				$this->errors[]=$line."\n\nLast command: ".$this->lastCommand;
 			}
 		}	
 		

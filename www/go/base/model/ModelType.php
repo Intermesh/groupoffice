@@ -50,10 +50,19 @@ class ModelType extends \GO\Base\Db\ActiveRecord {
 		if($model)
 			return $model->id;
 		
-		//Use new framework EntityType
-		$modelName::entityType();
+		$module = Module::model()->findByName($modelName::getModule());
 		
-		return $this->findByModelName($modelName);
+		if(!$module) {
+			throw new \Exception("No module found for $modelName");
+		}
+		
+		$model = new ModelType();
+		$model->name=$shortName;
+		$model->clientName=$shortName;
+		$model->moduleId = $module->id;
+		$model->save();
+		
+		return $model->id;
 	}
 	
 	private static function getShortName($cls) {		

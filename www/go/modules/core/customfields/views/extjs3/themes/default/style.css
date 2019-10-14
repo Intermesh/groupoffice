@@ -1,0 +1,15 @@
+.go-module-icon-customfields , .go-menu-icon-customfields {
+	background-image: url('images/customfields.png') !important;
+}
+
+.go-tab-icon-customfields {
+	background-image: none !important;
+}
+
+.cf-btn-categories{
+	background-image: url('images/categories.png') !important;
+}
+
+.cf-heading{
+	margin-top:10px;
+}

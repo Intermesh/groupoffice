@@ -75,16 +75,16 @@ GO.files.FileBrowser = function(config){
 	}, this, {single:true});
 	
 	
-	// this.treePanel.getLoader().on('load', function()
-	// {		
+	this.treePanel.getLoader().on('load', function()
+	{		
 		
-	// 	if(!this.folder_id)
-	// 	{
-	// 		this.folder_id=this.treePanel.getRootNode().childNodes[0].id;
-	// 	}
-	// 	this.setFolderID(this.folder_id);
+		if(!this.folder_id)
+		{
+			this.folder_id=this.treePanel.getRootNode().childNodes[0].id;
+		}
+		this.setFolderID(this.folder_id);
 		
-	// }, this);
+	}, this);
 	
 
 	this.treePanel.on('click', function(node)	{
@@ -167,7 +167,7 @@ GO.files.FileBrowser = function(config){
 
 
 	var fields ={
-		fields:['type_id', 'id','name','type', 'size', 'mtime', 'extension', 'timestamp', 'thumb_url','path','acl_id','locked_user_id','locked','folder_id','permission_level','readonly','unlock_allowed','handler', 'content_expire_date'].concat(go.customfields.CustomFields.getFieldDefinitions("File")),
+		fields:['type_id', 'id','name','type', 'size', 'mtime', 'extension', 'timestamp', 'thumb_url','path','acl_id','locked_user_id','locked','folder_id','permission_level','readonly','unlock_allowed','handler', 'content_expire_date'],
 		columns:[{
 			id:'name',
 			header:t("Name"),
@@ -205,9 +205,13 @@ GO.files.FileBrowser = function(config){
 			header: 'ID',
 			dataIndex: 'id',
 			hidden: true
-		}].concat(go.customfields.CustomFields.getColumns("File"))
+		}]
 	};
 
+	if(go.Modules.isAvailable("core", "customfields"))
+	{
+		GO.customfields.addColumns("GO\\Files\\Model\\File", fields);
+	}
 
 	this.gridStore = new GO.data.JsonStore({
 //		url: GO.settings.modules.files.url+'json.php',
@@ -223,10 +227,6 @@ GO.files.FileBrowser = function(config){
 		id: 'type_id',
 		fields:fields.fields,
 		remoteSort:true
-		// load: function() {
-		// 	debugger;
-		// 	GO.data.JsonStore.prototype.load.apply(this, arguments);
-		// }
 	});
 
 	this.gridStore.on('load', this.onStoreLoad, this);
@@ -639,8 +639,8 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		}else
 		{
 			if(this.fileClickHandler)
-			{				
-				this.callFileClickHandler(record);
+			{
+				this.fileClickHandler.call(this.scope, record);
 			}else
 			{
 				//GO.files.openFile({id:record.data.id});
@@ -757,14 +757,14 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	this.on('fileselected',function(grid, r){
 		if(r.data.extension!='folder'){
 //			this.folderPanel.setVisible(false);
-			this.filePanel.show();
+//			this.filePanel.show()
 			this.eastPanel.getLayout().setActiveItem(this.filePanel);
 
 			this.filePanel.load(r.id.substr(2));
 		}else
 		{
 //			this.filePanel.setVisible(false);
-			this.folderPanel.show();
+//			this.folderPanel.show();
 			this.eastPanel.getLayout().setActiveItem(this.folderPanel);
 
 			this.folderPanel.load(r.id.substr(2));
@@ -778,10 +778,8 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
         
     this.on('beforeFolderIdSet',function(){
 
-			if(this.gridStore.baseParams.query) {
-				this.searchField.reset();
-				delete this.gridStore.baseParams['query'];
-			}
+      this.searchField.reset();
+      delete this.gridStore.baseParams['query'];
 
       // turn on buttons
       if (!GO.util.empty(this.gridStore.reader.jsonData))
@@ -854,30 +852,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
                 this.filesContextMenu.emailFilesButton.setDisabled(!enable);
 							
 			this.filesContextMenu.downloadSelectedFilesButton.setDisabled(!enable);
-				},
-				
-	callFileClickHandler : function(record) {
-		if(!this.createBlobs) {
-			GO.selectFileBrowser.fileClickHandler.call(GO.selectFileBrowser.scope, record);
-		} else{
-
-			var records = this.getSelectedGridRecords(), ids = [];
-
-			records.forEach(function(r) {
-				ids.push(r.data.id);
-			});
-
-			GO.request({
-				url: "files/file/createBlob",
-				params: {
-					ids: ids.join(',')
-				},
-				success: function(response, options, result) {
-					GO.selectFileBrowser.fileClickHandler.call(GO.selectFileBrowser.scope, result.blobs);
-				}
-			});
-		}
-	},
+        },
 
 	saveCMState: function(state) {
 		GO.request({
@@ -1054,10 +1029,9 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 	},*/
 
-	setFileClickHandler : function(handler, scope, createBlobs)
+	setFileClickHandler : function(handler, scope)
 	{
 		this.fileClickHandler = handler;
-		this.createBlobs = createBlobs;
 		this.scope = scope;
 	},
 
@@ -1121,7 +1095,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 	setRootID : function(rootID, folder_id)
 	{
 		
-		this.searchField.setDisabled(!!rootID);
+		rootID ? this.searchField.hide() : this.searchField.show();
 		rootID ? this.bookmarksGrid.hide() : this.bookmarksGrid.show();
 		
 		this.doLayout();		
@@ -1134,8 +1108,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 				
 				this.treePanel.setExpandFolderId(folder_id);
 				
-				if(folder_id || folder_id==0)
-					this.setFolderID(this.folder_id);
+//				if(folder_id || folder_id==0)
+//					this.setFolderID(this.folder_id);
 					//this.refresh();
 		}
                 
@@ -1836,8 +1810,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 		}else
 		{
 			if(this.fileClickHandler)
-			{				
-				this.callFileClickHandler(record);
+			{
+				this.fileClickHandler.call(this.scope, record);
 			}else
 			{
 				//browsers don't like loading a json request and download dialog at the same time.'
@@ -1874,12 +1848,11 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 	setFolderID : function(id, expand)
 	{
     this.expandTree=expand;
-		this.fireEvent('beforeFolderIdSet');
-		  
+    this.fireEvent('beforeFolderIdSet');
+      
 		this.folder_id = id;
 		//this.gridStore.baseParams['id']=this.thumbsStore.baseParams['id']=id;
 		if(this.getActiveGridStore().baseParams['folder_id'] != id) {
-			
 			this.getActiveGridStore().baseParams['folder_id']=id;
 
 			this.getActiveGridStore().load({
@@ -1891,7 +1864,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 						if(activeNode){
 							activeNode.expand();
-							//this.updateLocation();
+							this.updateLocation();
 						}else{						
 							this.treePanel.setExpandFolderId(id);
 							this.treePanel.getRootNode().reload();	
@@ -1957,7 +1930,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 	
 	route: function(id, entity) {
 		
-		var detailViewName = entity.name.toLowerCase() + "Detail";
+		var detailViewName = entity + "Detail";
 		
 		this[detailViewName].on("load", function(dv){
 			this.setFolderID(dv.data.folder_id || dv.data.parent_id, true);
@@ -2085,7 +2058,7 @@ GO.files.showFolder = function(folder_id){
 	}, this);
 	
 	return fb;
-};
+}
 
 GO.files.openFolder = function(id, folder_id)
 {
@@ -2143,8 +2116,7 @@ GO.files.createSelectFileBrowser = function(){
 				text: t("Ok"),
 				handler: function(){
 					var records = GO.selectFileBrowser.getSelectedGridRecords();
-
-					GO.selectFileBrowser.callFileClickHandler(records[0]);
+					GO.selectFileBrowser.fileClickHandler.call(GO.selectFileBrowser.scope, records[0]);
 				},
 				scope: this
 			},{
@@ -2181,49 +2153,35 @@ go.Modules.register("legacy", 'files', {
 	mainPanel: GO.files.FileBrowser,
 	title: t("Files", "files"),
 	iconCls: 'go-tab-icon-files',
-	customFieldTypes: [
-		"go.modules.community.files.customfield.File"
-	],
 	entities: [{
 			name: "File",
-			links: [
+			linkable: true,
 				
-				{
-					iconCls: 'entity File pink',
-					entity: "File",
-					linkDetail: function () {
-						return new GO.files.FilePanel();
-					}
-				}
-
-			]
-		}, {
-			name: "Folder",
-
-			links: [
-				{
-					iconCls: 'entity Folder pink',
-					entity: "Folder",
-					linkDetail: function () {
-						return new GO.files.FolderPanel();
-					}
-				}
-			]
-		}]
-
+			/**
+			 * Return component for the detail view
+			 * 
+			 * @returns {go.panels.DetailView}
+			 */
+			linkDetail: function() {
+				return new GO.files.FilePanel();
+			}	
+	}, {
+		name: "Folder",
+		linkable: true,
+			
+			/**
+			 * Return component for the detail view
+			 * 
+			 * @returns {go.panels.DetailView}
+			 */
+			linkDetail: function() {
+				return new GO.files.FolderPanel();
+			}	
+	}],
+	initModule: function () {	
+		
+	}
 });
 
 GO.files.pasteSelections = new Array();
 GO.files.pasteMode = 'copy';
-
-
-GO.files.launchFile = function(config) {
-	GO.request({
-		url: 'files/file/open',
-		params: config,
-		success: function(response, options, result) {
-			result.handler.call();
-		},
-		scope: this
-	})
-};

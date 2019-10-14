@@ -1,0 +1,3 @@
+modules/groups/MainPanel.js
+modules/groups/GroupDialog.js
+modules/groups/UsersGrid.js

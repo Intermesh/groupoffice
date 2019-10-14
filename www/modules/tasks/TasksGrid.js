@@ -36,9 +36,7 @@ GO.tasks.TasksPanel = function(config)
 		}, this);
 
 		var fields ={
-			fields:[
-				'id', 'icon', 'name','completed','due_time','is_active', 'late', 'description', 'status', 'ctime', 'mtime', 'start_time', 'completion_time','disabled','tasklist_name','category_name','priority','project_name','percentage_complete','user_name'
-			].concat(go.customfields.CustomFields.getFieldDefinitions("Task")),
+			fields:['id', 'icon', 'name','completed','due_time','is_active', 'late', 'description', 'status', 'ctime', 'mtime', 'start_time', 'completion_time','disabled','tasklist_name','category_name','priority','project_name','percentage_complete','user_name'],
 			columns:[this.checkColumn,{
 				id:'icon',
 				header:"&nbsp;",
@@ -155,7 +153,7 @@ GO.tasks.TasksPanel = function(config)
 				header: 'ID',
 				dataIndex: 'id',
 				hidden: true
-			}].concat(go.customfields.CustomFields.getColumns("Task"))
+			}]
 		};
 
 		if(go.Modules.isAvailable("legacy", "projects2")){
@@ -172,6 +170,11 @@ GO.tasks.TasksPanel = function(config)
 				hidden:true,
 				width:150
 			});
+		}
+
+		if(go.Modules.isAvailable("core", "customfields"))
+		{
+			GO.customfields.addColumns("GO\\Tasks\\Model\\Task", fields);
 		}
 
 		var reader = new Ext.data.JsonReader({
@@ -214,6 +217,8 @@ GO.tasks.TasksPanel = function(config)
 		},this)
 
 		config.view=new Ext.grid.GroupingView({
+			scrollOffset: 2,
+			//forceFit:true,
 			hideGroupedColumn:true,
 			
 			emptyText: t("No Tasks to display", "tasks"),

@@ -1,9 +1,9 @@
 <?php
 namespace go\modules\community\notes\model;
 
-use go\core\acl\model\AclOwnerEntity;
+use go\core\acl\model\AclEntity;
 
-class NoteBook extends AclOwnerEntity {
+class NoteBook extends AclEntity {
 	
 	public $id;
 	public $createdBy;
@@ -13,12 +13,5 @@ class NoteBook extends AclOwnerEntity {
 		return parent::defineMapping()
 						->addTable("notes_note_book");
 	}
-
-	protected function internalDelete() {
-		if(!Note::find()->where(['noteBookId' => $this->id])->delete()) {
-			return false;
-		}
-
-		return parent::internalDelete();
-	}
+	
 }

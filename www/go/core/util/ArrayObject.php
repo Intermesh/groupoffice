@@ -1,11 +1,7 @@
 <?php
 namespace go\core\util;
 
-use JsonSerializable;
-
-class ArrayObject extends \ArrayObject implements JsonSerializable {
-
-	public $serializeJsonAsObject = false;
+class ArrayObject extends \ArrayObject {
 	
 	/**
 	 * Find the key in an array by a callable function.
@@ -74,44 +70,6 @@ class ArrayObject extends \ArrayObject implements JsonSerializable {
 				$this[$key] = $value;
 			}
 		}
-
-		return $this;
-	}
-	
-	/**
-	 * Compare this array with a given array and return all values that are not present or different in the given array.
-	 * 
-	 * @param array $arr
-	 * @return array
-	 */
-	public function diff(array $arr) {
-		$diff = [];
-		foreach ($this as $key => $value) {
-			if (!array_key_exists($key, $arr) || !$this->equals($arr[$key],  $value)) {
-				$diff[$key] = $value;
-			}
-		}
-		
-		return $diff;
-	}
-	
-	private function equals($a, $b) {
-		if(is_array($a) && is_array($b)) {
-			$aObj = new static($a);
-			$bObj = new static($b);
-			return empty($aObj->diff($b)) && empty($bObj->diff($a));
-		} else
-		{
-			return $a === $b;
-		}
-	}
-
-	public function jsonSerialize()
-	{
-		if($this->serializeJsonAsObject && empty($this)) 
-		{
-			return new \stdClass;	
-		} 
 
 		return $this;
 	}

@@ -97,18 +97,18 @@ class Connection {
 		$remote = $ssl ? 'ssl://' : '';			
 		$remote .=  $server.":".$port;
 
-		go()->debug("Connection to ".$remote);
+		GO()->debug("Connection to ".$remote, self::DEBUG_TYPE_IMAP);
 
 		try{
 			$this->handle = stream_socket_client($remote, $this->connectErrorNo, $this->connectError, $timeout, STREAM_CLIENT_CONNECT, $streamContext);
 		}catch(ErrorException $e) {
-			go()->debug($e->getMessage());
+			GO()->debug($e->getMessage());
 		}
 
 		if (!is_resource($this->handle)) {	
 			
 			$this->handle = null;
-			go()->debug("Connection to ".$remote." failed ".$this->connectError);
+			GO()->debug("Connection to ".$remote." failed ".$this->connectError, self::DEBUG_TYPE_IMAP);
 			
 			return false;
 		}		
@@ -135,7 +135,7 @@ class Connection {
 			return false;
 		}else
 		{
-			go()->debug("TLS Crypto enabled");
+			GO()->debug("TLS Crypto enabled", self::DEBUG_TYPE_IMAP);
 		}
 					
 		$this->starttls = true;
@@ -193,7 +193,7 @@ class Connection {
 			$lastLine = array_pop($response['data'][0]);
 		
 			if(($startpos = strpos($lastLine, 'CAPABILITY'))!==false){
-		
+				//GO()->debug("Use capability from login", "imap");					
 				$endpos=  strpos($lastLine, ']', $startpos);
 				if($endpos){
 					$this->capability = substr($lastLine, $startpos, $endpos-$startpos);					
@@ -248,7 +248,7 @@ class Connection {
 		
 		$command = 'A' . $this->commandNumber() . ' ' . $command . "\r\n";
 
-		go()->debug('> ' . $command);
+		GO()->debug('> ' . $command, self::DEBUG_TYPE_IMAP);
 		
 		return $this->fputs($command);
 	}
@@ -286,7 +286,7 @@ class Connection {
 		$line = fgets($this->handle, $length);
 
 		if($debug){
-			go()->debug('< ' . $line);	
+			GO()->debug('< ' . $line, self::DEBUG_TYPE_IMAP);	
 		}
 		
 		
@@ -416,7 +416,7 @@ class Connection {
 		$data = "";
 		
 
-		go()->debug('< .. DATA OMITTED FROM LOG ...', 'imap');	
+		GO()->debug('< .. DATA OMITTED FROM LOG ...', 'imap');	
 		
 		
 		$leftOver = $size;
@@ -433,7 +433,7 @@ class Connection {
 			
 			$line = $this->readLine($newMax, false);			
 			
-			//go()->debug($line, 'imap');	
+			//GO()->debug($line, 'imap');	
 			
 			$readLength += strlen($line);
 			

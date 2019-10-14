@@ -3,7 +3,6 @@ namespace go\core\orm;
 
 use go\core\db\Column;
 use go\core\db\Table;
-use go\core\db\Connection;
 
 class MappedTable extends Table {
 	
@@ -18,18 +17,11 @@ class MappedTable extends Table {
 	 * @var array eg ['id' => 'userId']
 	 */
 	private $keys;
-		
 	
 	private $mappedColumns = [];
 	
-	private $constantValues = [];
 	
-	/**
-	 * When set to true this table will be joined with AND userId = <CURRENTUSERID>
-	 * 
-	 * @var boolean 
-	 */
-	public $isUserTable = false;
+	private $constantValues = [];
 	
 	/**
 	 * Mapped table constructor
@@ -45,10 +37,10 @@ class MappedTable extends Table {
 	 * @params array $constantValues If the table that is joined needs to have 
 	 *   constant values. For example the keys are ['folderId' => 'folderId'] but 
 	 *   the joined table always needs to have a value 
-	 *   ['type' => "foo"] then you can set it with this parameter.
+	 *   ['userId' => GO()->getUserId()] then you can set it with this parameter.
 	 */
-	public function __construct($name, $alias, $keys = null, array $columns = [], array $constantValues = [], Connection $conn = null) {
-		parent::__construct($name, $conn ?? go()->getDbConnection());
+	public function __construct($name, $alias, $keys = null, array $columns = [], array $constantValues = []) {
+		parent::__construct($name);
 		
 		$this->alias = $alias;
 
@@ -57,25 +49,20 @@ class MappedTable extends Table {
 		}
 
 		$this->keys = $keys;		
-		foreach($this->columns as $col) {
-			$col->table = $this;
-		}
-
-		$this->mappedColumns = array_filter($this->columns, function($c) use ($columns) {
-			return in_array($c->name, $columns);
-		});	
-		
+		$this->mappedColumns = $columns;
 		$this->constantValues = $constantValues;
 	}
 	
 	
 	/**
-	 * Get the columns that are mapped.	 
+	 * Get the columns that are mapped
 	 * 
 	 * @return Column[]
 	 */
 	public function getMappedColumns() {
-		return $this->mappedColumns;
+		return array_filter($this->columns, function($c) {
+			return in_array($c->name, $this->mappedColumns);
+		});
 	}
 	
 	public function getColumn($name) {

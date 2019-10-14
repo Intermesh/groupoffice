@@ -43,8 +43,6 @@ use Sabre;
  */
 class Task extends \GO\Base\Db\ActiveRecord {
 	
-	use \go\core\orm\CustomFieldsTrait;
-	
 	const STATUS_NEEDS_ACTION = "NEEDS-ACTION";
 	const STATUS_COMPLETED = "COMPLETED";
 	const STATUS_ACCEPTED = "ACCEPTED";
@@ -135,15 +133,7 @@ class Task extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	protected function getCacheAttributes() {
-		$tasklist = empty($this->tasklist) ? '' :$this->tasklist->name;
-
-		$description = $tasklist;
-
-		 if(!empty($this->description) ){
-			$description .= ', ' . $this->description;
-		 }
-
-		return array('name'=>$this->name, 'description'=>$description, 'mtime'=>$this->due_time);
+		return array('name'=>$this->name, 'description'=>$this->description);
 	}
 		
 	public function beforeSave() {		

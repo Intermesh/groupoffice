@@ -19,7 +19,6 @@ $config = parse_ini_file(__DIR__ . '/config.ini', true);
 $config['general']['dataPath'] = $dataFolder->getPath();
 $config['general']['tmpPath'] = $dataFolder->getFolder('tmp')->getPath();
 $config['general']["cache"] = \go\core\cache\Disk::class;
-$config['branding']['name'] = 'Group-Office';
 
 if($installDb) {
 	$dataFolder->delete();
@@ -30,24 +29,19 @@ if($installDb) {
 	$pdo = new PDO('mysql:host='. $dsn['options']['host'], $config['db']['username'], $config['db']['password']);
 
 	try {
-		echo "Dropping database 'groupoffice-phpunit'\n";
 		$pdo->query("DROP DATABASE groupoffice_phpunit");
 	}catch(\Exception $e) {
 
 	}
-
-	echo "Installing database 'groupoffice-phpunit'\n";
 	$pdo->query("CREATE DATABASE groupoffice_phpunit");
-	$pdo = null;
 }
 
 //Install fresh DB
 
 try {
-	App::get()->setConfig(["core" => $config]);
+	App::get()->setConfig($config)->setAuthState(new State());
 	
 	if($installDb) {
-
 		$admin = [
 				'displayName' => "System Administrator",
 				'username' => "admin",
@@ -58,15 +52,9 @@ try {
 		$installer = new \go\core\Installer();	
 		$installer->install($admin, [
 				new go\modules\community\notes\Module(),
-				new go\modules\community\test\Module(),
-				new go\modules\community\addressbook\Module(),
+				new go\modules\community\test\Module()
 				]);
-
-		echo "Done\n\n";
 	}
-
-	GO()->setAuthState(new State());
-
 } catch (Exception $e) {
 	echo $e;
 	throw $e;

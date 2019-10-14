@@ -1,7 +1,7 @@
 <?php
 namespace go\core\auth;
 
-use go\core\model\User;
+use go\modules\core\users\model\User;
 
 class Password extends PrimaryAuthenticator {	
 	

@@ -13,8 +13,4 @@ return array (
   'Multiple note books selected' => 'Várias categorias selecionadas',
   'Invalid password' => 'Senha inválida',
   'Add test' => 'Adicionar teste',
-  'Default note book' => 'Categoria de notas padrão',
-  'Commented at' => 'Comentado em',
-  'Note book' => 'Categoria',
-  'Filters' => 'Filtros',
 );

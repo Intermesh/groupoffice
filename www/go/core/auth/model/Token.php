@@ -147,7 +147,7 @@ class Token extends Entity {
 	}
 	
 	private static function generateToken(){
-		return uniqid().bin2hex(random_bytes(16));
+		return uniqid().bin2hex(openssl_random_pseudo_bytes(16));
 	}
 
 	/**
@@ -202,16 +202,11 @@ class Token extends Entity {
 	/**
 	 * Get the user this token belongs to
 	 * 
-	 * @param array $properties the properties to fetch
 	 * @return User
 	 */
-	public function getUser(array $properties = []) {
-		if(!empty($properties)) {
-			return $this->user ?? \go\core\model\User::findById($this->userId, $properties);
-		}
-
+	public function getUser() {
 		if(!$this->user) {
-			$this->user = \go\core\model\User::findById($this->userId);
+			$this->user = \go\modules\core\users\model\User::findById($this->userId);
 		}
 		return $this->user;
 	}
@@ -226,7 +221,7 @@ class Token extends Entity {
 		$user = $this->getUser();
 		$user->lastLogin = new DateTime();
 		$user->loginCount++;
-		$user->language = go()->getLanguage()->getIsoCode();
+		$user->language = GO()->getLanguage()->getIsoCode();
 		if(!$user->save()) {
 			return false;
 		}
@@ -259,7 +254,7 @@ class Token extends Entity {
 	 */
 	private function oldLogin(){
 		
-		if(\go\core\Environment::get()->isCli() || basename($_SERVER['PHP_SELF']) == 'index.php') {
+		if(\go\core\Environment::get()->isCli()) {
 			return;
 		}		
 		
@@ -276,8 +271,8 @@ class Token extends Entity {
       if(\go\core\http\Request::get()->isHttps()) {
         ini_set('session.cookie_secure',1);
       }
-    
-			session_name('groupoffice');
+
+      session_name('groupoffice');
       session_start();
     }
 		

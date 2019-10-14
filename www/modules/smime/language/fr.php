@@ -29,7 +29,7 @@ return array (
   'Valid from' => 'Valide de',
   'name' => 'Support SMIME',
   'description' => '<i style="color: green">*** Module Admin *** </i>Ajouter le chiffrement et la signature SMIME au module e-mail.',
-  'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'Pour télécharger un nouveau certificat PKCS12, vous devez entrer votre mot de passe GroupOffice. Le mot de passe de GroupOffice doit être différent de votre certificat PCSK12 pour des raisons de sécurité. Le mot de passe vide est également interdit.',
+  'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'Pour télécharger un nouveau certificat PKCS12, vous devez entrer votre mot de passe Group-Office. Le mot de passe de Group-Office doit être différent de votre certificat PCSK12 pour des raisons de sécurité. Le mot de passe vide est également interdit.',
   'The Group-Office password was incorrect.' => 'Le mot de passe {product_name} est incorrecte.',
   'Your SMIME key password matches your Group-Office password. This is prohibited for security reasons!' => 'Votre mot de passe SMIME correspond à votre mot de passe {product_name}. Pour des raisons de sécurité, il doit être différent !',
   'E-mail' => 'E-mail',

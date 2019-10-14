@@ -27,11 +27,7 @@ CREATE TABLE `ldapauth_server` (
   `smtpPassword` varchar(512) COLLATE ascii_bin DEFAULT NULL,
   `smtpUseUserCredentials` tinyint(1) NOT NULL DEFAULT '0',
   `smtpEncryption` enum('tls','ssl') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `smtpValidateCertificate` tinyint(1) NOT NULL DEFAULT '1',
-  `syncUsers` BOOLEAN NOT NULL DEFAULT FALSE,
-  `syncUsersQuery` VARCHAR(190) NOT NULL DEFAULT '(objectClass=inetOrgPerson)',
-  `syncGroups` BOOLEAN NOT NULL DEFAULT FALSE, 
-  `syncGroupsQuery` VARCHAR(190) NOT NULL DEFAULT '(objectClass=Group)'
+  `smtpValidateCertificate` tinyint(1) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB;
 
 --
@@ -126,22 +122,3 @@ ALTER TABLE `ldapauth_server_domain`
 ALTER TABLE `ldapauth_server_group`
   ADD CONSTRAINT `ldapauth_server_group_ibfk_1` FOREIGN KEY (`serverId`) REFERENCES `ldapauth_server` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `ldapauth_server_group_ibfk_2` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;
-
-
-CREATE TABLE `ldapauth_server_group_sync` (
-  `serverId` int(11) NOT NULL,
-  `groupId` int(11) NOT NULL,
-  PRIMARY KEY (`serverId`,`groupId`),
-  KEY `groupId` (`groupId`),
-  CONSTRAINT `ldapauth_server_group_sync_ibfk_1` FOREIGN KEY (`serverId`) REFERENCES `ldapauth_server` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `ldapauth_server_group_sync_ibfk_2` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE
- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE `ldapauth_server_user_sync` (
- `serverId` int(11) NOT NULL,
- `userId` int(11) NOT NULL,
- PRIMARY KEY (`serverId`,`userId`),
- KEY `ldapauth_server_user_sync_ibfk_1` (`userId`),
- CONSTRAINT `ldapauth_server_user_sync_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
- CONSTRAINT `ldapauth_server_user_sync_ibfk_2` FOREIGN KEY (`serverId`) REFERENCES `ldapauth_server` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci

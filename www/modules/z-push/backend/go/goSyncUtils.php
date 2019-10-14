@@ -15,38 +15,6 @@ class GoSyncUtils {
 
 		return \GO\Sync\Model\Settings::model()->findForUser($user);
 	}
-	
-//	public static function getEntityModSeq($entity) {
-//		$entityModSeq = go()->getDbConnection()
-//						->selectSingleValue("MAX(modSeq)")
-//						->from("core_change")
-//						->where([
-//								"entityTypeId" => $entity->getType()->getId(), 
-//								"entityId" => $entity->id
-//										])
-//						->single();
-//		
-//		if(empty($entityModSeq)) {
-//			return false;
-//		}
-//		
-//		$userModSeq = go()->getDbConnection()
-//						->selectSingleValue("MAX(modSeq)")
-//						->from("core_change_user")
-//						->where([
-//								"entityTypeId" => $entity->getType()->getId(), 
-//								"entityId" => $entity->id,  
-//								"userId" => go()->getUserId()
-//										])
-//						->single();
-//		
-//		if(empty($entityModSeq)) {
-//			return false;
-//		}
-//		
-//		return $entityModSeq.':'.$userModSeq;	
-//		
-//	}
 
 	/**
 	 * Returns the best match of preferred body preference types.
@@ -93,10 +61,6 @@ class GoSyncUtils {
 		
 		$asBodyData = \GO\Base\Util\StringHelper::normalizeCrlf($model->$attribute);
 
-		if(!isset($asBodyData)) {
-			$asBodyData = "";
-		}
-
 		if ($sbReturnType == SYNC_BODYPREFERENCE_HTML) {
 
 			ZLog::Write(LOGLEVEL_DEBUG, 'SYNCUTILS HTML');
@@ -114,7 +78,7 @@ class GoSyncUtils {
 		ZLog::Write(LOGLEVEL_DEBUG, 'SYNCUTILS END');
 
 		$sbBody->estimatedDataSize = strlen($asBodyData);
-		$sbBody->data = StringStreamWrapper::Open($asBodyData);
+		$sbBody->data = version_compare(ZPUSH_VERSION, '2.3', '<') ? $asBodyData : StringStreamWrapper::Open($asBodyData);
 		$sbBody->truncated = 0;
 
 		return $sbBody;
@@ -262,9 +226,6 @@ class GoSyncUtils {
 	public static function getTimeZoneForClient() {
 
 		if (!isset(\GO::session()->values['activesync_timezone'])) {
-			$old = date_default_timezone_get();
-			date_default_timezone_set(\GO::user()->timezone);
-			
 			$tz = new DateTimeZone(\GO::user()->timezone);
 			$transitions = $tz->getTransitions();
 			$start_of_year = mktime(0, 0, 0, 1, 1);
@@ -336,7 +297,6 @@ class GoSyncUtils {
 				$astz['dstdmillis'] = 0;
 				$astz['dstbias'] = ($dst_end['offset'] / -60) - $astz['bias'];
 			}
-			date_default_timezone_set($old);
 			\GO::session()->values['activesync_timezone'] = base64_encode(call_user_func_array('pack', $astz));
 		}
 
@@ -387,9 +347,6 @@ class GoSyncUtils {
 
 	public static function exportRecurrence($model) {
 
-		$old = date_default_timezone_get();
-		date_default_timezone_set($model->timezone);
-
 		if ($model instanceof \GO\Tasks\Model\Task)
 			$recur = new SyncTaskRecurrence();
 		else
@@ -430,8 +387,6 @@ class GoSyncUtils {
 				$recur->dayofmonth = date('j', $model->start_time);
 				break;
 		}
-
-		date_default_timezone_set($old);
 
 		return $recur;
 	}

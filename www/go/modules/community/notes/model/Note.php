@@ -3,21 +3,14 @@ namespace go\modules\community\notes\model;
 
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
-use go\core\orm\Query;
+use go\core\db\Query;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
-use go\core\validate\ErrorCode;
+
 
 class Note extends AclItemEntity {
-
-	/**
-	 * The Entity ID
-	 * 
-	 * @var int
-	 */
-	public $id;
 
 	public $name;
 	public $content;
@@ -71,37 +64,41 @@ class Note extends AclItemEntity {
 	
 	
 	/**
-	 * Return columns to search on with the 'text' filter. {@see filter()}
+	 * Return columns to search on with the "q" filter. {@see filter()}
 	 * 
 	 * @return string[]
 	 */
-	protected static function textFilterColumns() {
+	protected static function searchColumns() {
 		return ['name', 'content'];
 	}
 	
-	protected static function defineFilters() {
-		return parent::defineFilters()
-						->add('noteBookId', function(Criteria $criteria, $value) {
-							if(!empty($value)) {
-								$criteria->where(['noteBookId' => $value]);
-							}
-						})
-						->addText('name', function(Criteria $criteria, $comparator, $value, Query $query) {
-							$criteria->andWhere('name', $comparator, $value);
-						})
-						->addText('content', function(Criteria $criteria, $comparator, $value, Query $query) {
-							$criteria->andWhere('content', $comparator, $value);
-						});
-	}
-
-	
-
-	protected function internalValidate()
-	{
-		if($this->isModified(['content']) && StringUtil::detectXSS($this->content)) {
-			$this->setValidationError('content', ErrorCode::INVALID_INPUT, "You're not allowed to use scripts in the content");
+	public static function filter(Query $query, array $filter) {		
+		if(!empty($filter['noteBookId'])) {
+			$query->where(['noteBookId' => $filter['noteBookId']]);
 		}
-		return parent::internalValidate();
+		
+		return parent::filter($query, $filter);		
+	}
+	
+	/**
+	 * Sort by database columns or creator and modifier
+	 * 
+	 * @param Query $query
+	 * @param array $sort
+	 * @return Query
+	 */
+	public static function sort(Query $query, array $sort) {
+		
+		if(isset($sort['creator'])) {			
+			$query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT')->orderBy(['u.displayName' => $sort['creator']]);			
+		} 
+		
+		if(isset($sort['modifier'])) {			
+			$query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT')->orderBy(['u.displayName' => $sort['modifier']]);						
+		} 
+		
+		return parent::sort($query, $sort);
+		
 	}
 
 }

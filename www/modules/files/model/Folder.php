@@ -16,7 +16,6 @@
 namespace GO\Files\Model;
 
 use GO;
-use go\core\fs\Folder as GoFolder;
 
 /**
  * The Folder model
@@ -47,8 +46,6 @@ use go\core\fs\Folder as GoFolder;
  * @property int $acl_write
  */
 class Folder extends \GO\Base\Db\ActiveRecord {
-	
-	use \go\core\orm\CustomFieldsTrait;
 
 	private $_path;
 	
@@ -76,6 +73,9 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		return parent::init();
 	}
 
+	public function customfieldsModel() {
+		return "GO\Files\Customfields\Model\Folder";
+	}
 
 	protected function getCacheAttributes() {
 
@@ -121,70 +121,67 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @see customfields/CategoryController::actionSetAnabled
 	 */
 	public function deriveCustomfieldSettings(Folder $from) {
-		return true;
 		
-//		if(!\GO::modules()->isInstalled('customfields')) {
-//			return true;
-//		}
-//		
-//		$success = true;
-//		//cleanup
-//		$enabledCategories = \GO\Customfields\Model\EnabledCategory::model()->findByAttributes(array(
-//			'model_name'=>'GO\Files\model\File',
-//			'model_id'=>$this->id
-//		));
-//		$enabledCategories->callOnEach('delete');
-//		//find
-//		$disableCategories = \GO\Customfields\Model\DisableCategories::model()->findByPk(array(
-//			'model_id'=>$this->id,
-//			'model_name'=>'GO\Files\model\File'
-//		));
-//		
-//		if(!\GO\Customfields\Model\DisableCategories::isEnabled('GO\Files\model\File', $from->id)) {
-//			
-//			if(!empty($disableCategories)) { //clean me when $from is not active
-//				
-//				$success = $disableCategories->delete();
-//			}
-//			return $success;
-//		} 
-//		
-//		if(empty($disableCategories)) {
-//			$disableCategories = new \GO\Customfields\Model\DisableCategories();
-//			$disableCategories->model_name='GO\Files\model\File';
-//			$disableCategories->model_id=$this->id;
-//			$success = $disableCategories->save() && $success;
-//		}
-//		$parentCategories = \GO\Customfields\Model\EnabledCategory::model()->findByAttributes(array(
-//			'model_name'=>'GO\Files\model\File',
-//			'model_id'=>$from->id
-//		));
-//		//create
-//		foreach($parentCategories as $category){
-//			$enabled = $category->duplicate(array('model_id'=>$this->id));
-//			$success = $enabled->save() && $success;
-//		}
-//		return $success;
+		if(!\GO::modules()->isInstalled('customfields')) {
+			return true;
+		}
+		
+		$success = true;
+		//cleanup
+		$enabledCategories = \GO\Customfields\Model\EnabledCategory::model()->findByAttributes(array(
+			'model_name'=>'GO\Files\model\File',
+			'model_id'=>$this->id
+		));
+		$enabledCategories->callOnEach('delete');
+		//find
+		$disableCategories = \GO\Customfields\Model\DisableCategories::model()->findByPk(array(
+			'model_id'=>$this->id,
+			'model_name'=>'GO\Files\model\File'
+		));
+		
+		if(!\GO\Customfields\Model\DisableCategories::isEnabled('GO\Files\model\File', $from->id)) {
+			
+			if(!empty($disableCategories)) { //clean me when $from is not active
+				
+				$success = $disableCategories->delete();
+			}
+			return $success;
+		} 
+		
+		if(empty($disableCategories)) {
+			$disableCategories = new \GO\Customfields\Model\DisableCategories();
+			$disableCategories->model_name='GO\Files\model\File';
+			$disableCategories->model_id=$this->id;
+			$success = $disableCategories->save() && $success;
+		}
+		$parentCategories = \GO\Customfields\Model\EnabledCategory::model()->findByAttributes(array(
+			'model_name'=>'GO\Files\model\File',
+			'model_id'=>$from->id
+		));
+		//create
+		foreach($parentCategories as $category){
+			$enabled = $category->duplicate(array('model_id'=>$this->id));
+			$success = $enabled->save() && $success;
+		}
+		return $success;
 	}
 	
 	public function recursivlyApplyCustomfieldSettings() {
 		
-		return true;
+		if(!\GO::modules()->isInstalled('customfields')) {
+			return true;
+		}
 		
-//		if(!\GO::modules()->isInstalled('customfields')) {
-//			return true;
-//		}
-//		
-//		$ids = $this->getSubFolderIds();
-//		foreach($ids as $subfolder_id) {
-//			if($subfolder_id==$this->id) {
-//				continue; //skip
-//			}
-//			$subfolder = Folder::model()->findByPk($subfolder_id);
-//			$subfolder->deriveCustomfieldSettings($this);
-//			$subfolder->recursiveApplyCustomFieldCategories = true;
-//			$subfolder->save();
-//		}
+		$ids = $this->getSubFolderIds();
+		foreach($ids as $subfolder_id) {
+			if($subfolder_id==$this->id) {
+				continue; //skip
+			}
+			$subfolder = Folder::model()->findByPk($subfolder_id);
+			$subfolder->deriveCustomfieldSettings($this);
+			$subfolder->recursiveApplyCustomFieldCategories = true;
+			$subfolder->save();
+		}
 	}
 
 	/**
@@ -370,7 +367,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			}
 			
 			if(!$this->getIsNew()) {
-				go()->getDbConnection()->update('fs_folders',['name' => $name], ['id' => $this->id])->execute();
+				GO()->getDbConnection()->update('fs_folders',['name' => $name], ['id' => $this->id])->execute();
 			}
 			$this->name = $name;
 			$this->_path = null;
@@ -574,13 +571,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 				$acl->delete();
 		}
 
-		if($this->parent){
-			$this->notifyUsers(
-				array($this->id, $this->parent->id),
-				FolderNotificationMessage::DELETE_FOLDER,
-				$this->getPath()
-			);
-		}
+		$this->notifyUsers(
+			array($this->id, $this->parent->id),
+			FolderNotificationMessage::DELETE_FOLDER,
+			$this->getPath()
+		);
 		return parent::afterDelete();
 	}
 
@@ -588,8 +583,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	private $_folderCache=array();
 
 	public function save($ignoreAcl = false) {
-		
-		if(!$this->isModified() && !$this->isCustomFieldsModified() ){ // this will make it possible to set the "notify" in a folder see afterSubmit
+		if(!$this->isModified() && (empty($this->getCustomfieldsRecord()) || !$this->getCustomfieldsRecord()->isModified())) { // this will make it possible to set the "notify" in a folder see afterSubmit
 			return true;
 		}
 		return parent::save($ignoreAcl);
@@ -605,7 +599,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @param boolean $autoCreate True to auto create the folders. ACL's will be ignored.
 	 * @return Folder
 	 */
-	public function findByPath($relpath, $autoCreate=false, $autoCreateAttributes=array()) {
+	public function findByPath($relpath, $autoCreate=false, $autoCreateAttributes=array(), $caseSensitive=true) {
 
 
 		$oldIgnoreAcl = \GO::$ignoreAclPermissions;
@@ -625,7 +619,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 			if(!isset($this->_folderCache[$cacheKey])){
 
-				$col = 't.name';
+				$col = $caseSensitive ? 'BINARY t.name' : 't.name';
 
 				$findParams = \GO\Base\Db\FindParams::newInstance();
 				$findParams->getCriteria()
@@ -1021,8 +1015,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @param String $filename
 	 * @return File
 	 */
-	public function hasFile($filename){
-		$col = 't.name';
+	public function hasFile($filename, $caseSensitive=true){
+		$col = $caseSensitive ? 'BINARY t.name' : 't.name';
 		$findParams = \GO\Base\Db\FindParams::newInstance()
 						->single();
 		$findParams->getCriteria()
@@ -1044,7 +1038,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 						->single();
 		$findParams->getCriteria()
 							->addBindParameter(':name', $filename)
-							->addRawCondition('t.name', ':name');
+							->addRawCondition('BINARY t.name', ':name'); //use utf8_bin for case sensivitiy and special characters.
 
 		return $this->folders($findParams);
 	}
@@ -1387,7 +1381,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$findParams->getCriteria()
 						->addCondition('user_id', \GO::user()->id,'=','sharedRootFolders')
 						->addBindParameter(':name', $folderName)
-						->addRawCondition('t.name', ':name');
+						->addRawCondition('BINARY t.name', ':name'); //use utf8_bin for case sensivitiy and special characters.
 
 			$folder=$this->find($findParams);
 			
@@ -1445,88 +1439,5 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		while($file = $stmt->fetch()){
 			$file->delete();
 		}
-	}
-
-
-	private function mergeEntityFolders($folder, $existingPath, $newPath) {
-
-		$existingFS = new GoFolder($existingPath);
-		$newFS = new GoFolder($newPath);
-
-		//rename it if we need to move it into it's own children.
-		if($newFS->isDescendantOf($existingFS)) {
-			$folder->name=uniqid();
-			$folder->systemSave=true;
-			$folder->save(true);
-		}
-
-		$newFolder = Folder::model()->findByPath($newPath, true);
-		$newFolder->moveContentsFrom($folder, true);
-
-		$folder->systemSave = true;
-		//delete empty folder.
-		$folder->readonly = 1; //makes sure acl is not deleted
-		$folder->delete(true);
-		return $newFolder;
-	}
-
-	/**
-	 * 
-	 * @param \go\core\orm\Entity $entity
-	 * @return self
-	 * @throws \Exception
-	 */
-	public function findForEntity(\go\core\orm\Entity $entity) {
-
-		if(method_exists($entity, 'buildFilesPath')) {
-			$filesPath = $entity->buildFilesPath();
-		} else{
-			$entityType = $entity->entityType();
-			$filesPath = $entityType->getModule()->name. '/'. $entityType->getName() . '/' . $entity->id;
-		}
-
-		$folder = empty($entity->filesFolderId) ? null : $this->findByPk($entity->filesFolderId);
-		if($folder) {
-
-			$existingPath = $folder->getPath();
-			if($existingPath != $filesPath) {
-				$newFolder = $this->mergeEntityFolders($folder, $existingPath, $filesPath);
-
-				$newFolder->acl_id = $entity->findAclId();
-				$newFolder->save();
-
-				$entity->filesFolderId = $newFolder->id;
-				$entity->save();
-
-				return $newFolder;
-			}
-
-			return $folder;
-		}
-
-		
-		$aclId =$entity->findAclId();
-		$folder = \GO\Files\Model\Folder::model()->findByPath($filesPath,true, array('acl_id'=>$aclId,'readonly'=>1));
-
-		if(!$folder){
-			throw new \Exception("Failed to create folder ".$filesPath);
-		}
-//      if (!empty($model->acl_id))
-//          $folder->acl_id = $model->acl_id;
-
-		$folder->acl_id=$aclId;
-
-		$folder->visible = 0;
-		$folder->readonly = 1;
-		$folder->systemSave = true;
-		$folder->save(true);
-
-		$entity->filesFolderId = $folder->id;
-		if(!$entity->save()) {
-			throw new \Exception("Could not save entity!");
-		}
-		
-		return $folder;
-		
 	}
 }

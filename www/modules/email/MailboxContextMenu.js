@@ -44,8 +44,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 							{								
 								this.treePanel.refresh(node);
 							},
-							fail : function(response, options, result){
-								Ext.Msg.alert(t("Error"), result.feedback);
+							fail : function(){
 								this.treePanel.refresh();
 							},
 							scope: this
@@ -106,10 +105,9 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 										
 									
 								},
-								fail : function(response, options, result){
-									Ext.Msg.alert(t("Error"), result.feedback);
-									this.treePanel.refresh();
-								},
+								fail : function(){
+								this.treePanel.refresh();
+							},
 								scope: this
 							});
 						}

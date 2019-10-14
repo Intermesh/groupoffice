@@ -1,19 +1,15 @@
 <?php
 namespace go\modules\community\multi_instance;
 
-use go\core\http\Response;
-use go\core\Installer;
-use go\modules\community\multi_instance\model\Instance;
-
-class Module extends \go\core\Module {
+class Module extends \go\core\module\Base {
 	
 	public function getAuthor() {
 		return "Intermesh BV";
 	}
 
-	protected function afterInstall(\go\core\model\Module $model) {
+	protected function afterInstall(\go\modules\core\modules\model\Module $model) {
 		
-		$cron = new \go\core\model\CronJobSchedule();
+		$cron = new \go\modules\core\core\model\CronJobSchedule();
 		$cron->moduleId = $model->id;
 		$cron->name = "InstanceCron";
 		$cron->expression = "* * * * *";
@@ -24,7 +20,7 @@ class Module extends \go\core\Module {
 		}
 		
 		
-		$cron = new \go\core\model\CronJobSchedule();
+		$cron = new \go\modules\core\core\model\CronJobSchedule();
 		$cron->moduleId = $model->id;
 		$cron->name = "DeactivateTrials";
 		$cron->expression = "0 10 * * *";
@@ -35,103 +31,5 @@ class Module extends \go\core\Module {
 		}
 		
 		return parent::afterInstall($model);
-	}
-
-	public function defineListeners()
-	{
-		parent::defineListeners();
-
-		go()->getInstaller()->on(Installer::EVENT_UPGRADE, static::class, 'upgradeInstances');
-	}
-
-	public static function upgradeInstances() {
-
-		echo "\nUpgrading all instances\n";
-		echo "-------------------------------\n\n";
-
-		foreach(Instance::find() as $instance) {
-			echo "Upgrading instance: " . $instance->hostname . ": ";
-			flush();
-			$success = $instance->upgrade();
-
-			echo $success ? "SUCCESS" : "FAILED";
-
-			echo "\n";
-			
-		}
-	}
-
-
-	public function downloadSiteConfig() {
-
-		Response::get()->setContentType('text/plain');
-		Response::get()->sendHeaders();
-
-		$i = [];
-
-		foreach(Instance::find() as $instance) {
-			$version = $instance->getMajorVersion();
-			if(!$version || $version == go()->getMajorVersion()) {
-				$version = 'DEFAULT';
-			}
-			if(!isset($i[$version])) {
-				$i[$version] = [];
-			}
-
-			$i[$version][] = $instance->hostname;
-		}
-
-	//	$i['6.5'] = ['test.65', 'test2.65', 'test.65', 'test2.65', 'test.65', 'test2.65'];
-
-		$tpl = file_get_contents(__DIR__ . '/site-conf.tpl');
-
-		foreach($i as $version => $hostnames) {
-			if($version == 'DEFAULT') {
-				continue;
-			}
-
-			echo $this->parseTemplate($tpl, $version, $hostnames);
-		}
-
-		echo $this->parseTemplate($tpl, "DEFAULT", $i['DEFAULT']);
-	}
-
-	private function parseTemplate($tpl, $version, $hostnames) {
-
-		$tld = substr($_SERVER['HTTP_HOST'], strpos($_SERVER['HTTP_HOST'], '.') + 1);
-
-		$replacements = [
-			'{docroot}' => $version == 'DEFAULT' ? go()->getEnvironment()->getInstallFolder()->getPath() : '/usr/local/share/groupoffice-' . $version,
-			'{aliases}' => $version == 'DEFAULT' ? '*.' . $tld .' ' .$this->implode($hostnames) : $this->implode($hostnames),
-			'{tld}' => $tld,
-			'{servername}' => strtolower(str_replace('.', '', $version)) . '.' . $tld,
-			'{version}' => str_replace('.', '', $version)
-		];
-
-		return str_replace(array_keys($replacements), array_values($replacements), $tpl);
-
-
-	}
-
-	private function implode($aliases) {
-
-		$str = "";
-		$i = 0;
-
-		foreach($aliases as $a) {
-			$str .= $a;
-			$i++;
-
-			if($i == 4) {
-				$i = 0;
-
-				$str .= " \\\n    ";
-
-			} else{
-				$str .= ' ';
-			}
-		}
-
-		return trim($str);
 	}
 }

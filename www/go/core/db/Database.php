@@ -7,12 +7,6 @@ use PDO;
 class Database {
 		
 	private $tableNames;	
-
-	private $conn;
-
-	public function __construct(Connection $conn = null) {
-		$this->conn = $conn ?? go()->getDbConnection();
-	}
 	
 	/**
 	 * Check if the current database has a table
@@ -27,7 +21,7 @@ class Database {
 	
 	private function getTableNames() {
 		if(!isset($this->tableNames)) {
-			$stmt = $this->conn->query('SHOW TABLES');
+			$stmt = App::get()->getDbConnection()->query('SHOW TABLES');
 			$stmt->setFetchMode(PDO::FETCH_COLUMN, 0);
 			$this->tableNames = $stmt->fetchAll();
 		}
@@ -44,21 +38,11 @@ class Database {
 		$t = [];
 		
 		foreach($this->getTableNames() as $tableName) {
-			$t[] = Table::getInstance($tableName, $this->conn);
+			$t[] = Table::getInstance($tableName);
 		}
 		
 		return $t;
 	}
-
-	/**
-	 * Get a database table
-	 * 
-	 * @param string $name
-	 * @return Table
-	 */
-	public function getTable($name) {
-		return Table::getInstance($name, $this->conn);
-	}	
 	
 	/**
 	 * Get database name
@@ -81,7 +65,7 @@ class Database {
 		$sql = "SELECT DATABASE();";
 		$stmt = App::get()->getDbConnection()->query($sql);
 		$stmt->setFetchMode(PDO::FETCH_COLUMN, 0);
-		return $stmt->fetch();				
+		return  $stmt->fetch();		
 	}
 	
 	/**
@@ -92,7 +76,7 @@ class Database {
 	public function setUtf8() {
 		//Set utf8 as collation default
 		$sql = "ALTER DATABASE `" .$this->getName() . "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";		
-		return App::get()->getDbConnection()->exec($sql) !== false;
+		return App::get()->getDbConnection()->query($sql);
 	}
 }
 

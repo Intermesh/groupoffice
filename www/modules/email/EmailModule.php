@@ -22,7 +22,7 @@
 namespace GO\Email;
 
 use GO;
-use go\core\model\User;
+use go\modules\core\users\model\User;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
 use GO\Email\Model\Account;
@@ -51,7 +51,7 @@ class EmailModule extends \GO\Base\Module{
 	}
 
 	public static function onMap(Mapping $mapping) {
-		$mapping->addHasOne('emailSettings', \GO\Email\Model\UserSettings::class, ['id' => 'id'], true);
+		$mapping->addRelation('emailSettings', \GO\Email\Model\UserSettings::class, ['id' => 'id'], false);
 	}
 
 	public static function head(){

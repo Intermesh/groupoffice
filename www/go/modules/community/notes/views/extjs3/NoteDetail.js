@@ -1,10 +1,10 @@
 /* global go, Ext, GO, mcrypt */
 
-go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
-	
+go.modules.community.notes.NoteDetail = Ext.extend(go.panels.DetailView, {
 	entityStore: "Note",
-
 	stateId: 'no-notes-detail',
+
+	//model_name: "go\\modules\\community\\notes\\model\\Note", //only for backwards compatibility with older panels.
 
 	initComponent: function () {
 
@@ -15,19 +15,28 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 			items: [{
 					xtype: 'readmore',
 					onLoad: function (detailView) {
-						this.setText("<h3>" + Ext.util.Format.htmlEncode(detailView.data.name) + "</h3><div class='go-html-formatted'>" + detailView.data.content + "</div>");
+						this.setText("<h3>" + detailView.data.name + "</h3><div class='go-html-formatted'>" + detailView.data.content + "</div>");
 					}
 				}
 			]
 		});
-		
+
 
 		go.modules.community.notes.NoteDetail.superclass.initComponent.call(this);
 
-		this.addCustomFields();
-		this.addLinks();
-		this.addComments();
-		this.addFiles();
+		go.CustomFields.addDetailPanels(this);
+		
+		this.add(go.links.getDetailPanels());
+
+		//this.add(new go.links.LinksDetailPanel());
+		
+		if (go.Modules.isAvailable("legacy", "comments")) {
+			this.add(new go.modules.comments.CommentsDetailPanel());
+		}
+
+		if (go.Modules.isAvailable("legacy", "files")) {
+			this.add(new go.modules.files.FilesDetailPanel());
+		}
 	},
 
 	decrypt: function () {
@@ -86,8 +95,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 
 		this.decrypt();
 
-		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < go.permissionLevels.write);
-		this.deleteItem.setDisabled(this.data.permissionLevel < go.permissionLevels.writeAndDelete);
+		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < GO.permissionLevels.write);
 
 		go.modules.community.notes.NoteDetail.superclass.onLoad.call(this);
 	},
@@ -103,7 +111,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 				iconCls: 'ic-edit',
 				tooltip: t("Edit"),
 				handler: function (btn, e) {
-					var noteEdit = new go.modules.community.notes.NoteDialog();
+					var noteEdit = new go.modules.community.notes.NoteForm();
 					noteEdit.load(this.data.id).show();
 				},
 				scope: this
@@ -128,7 +136,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 						},
 						scope: this
 					}, "-",
-					this.deleteItem = new Ext.menu.Item({
+					{
 						itemId: "delete",
 						iconCls: 'ic-delete',
 						text: t("Delete"),
@@ -137,11 +145,11 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 								if (btn !== "yes") {
 									return;
 								}
-								this.entityStore.set({destroy: [this.currentId]});
+								go.Stores.get("Note").set({destroy: [this.currentId]});
 							}, this);
 						},
 						scope: this
-					})
+					}
 				]
 			}]);
 		

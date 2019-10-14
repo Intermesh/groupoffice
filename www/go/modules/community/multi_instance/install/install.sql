@@ -15,7 +15,6 @@ CREATE TABLE IF NOT EXISTS `multi_instance_instance` (
   `isTrial` tinyint(1) NOT NULL DEFAULT 0,
   `enabled` BOOLEAN NOT NULL DEFAULT TRUE,
   `welcomeMessage` TEXT NULL DEFAULT NULL ,
-  `version` VARCHAR(50) NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `hostname` (`hostname`)
 ) ENGINE=InnoDB;

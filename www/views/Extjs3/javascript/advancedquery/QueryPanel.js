@@ -78,9 +78,7 @@ GO.advancedquery.SearchQueryPanel = function(config)
 									combobox.setValue(record.data.id+':'+record.data.name);
 								}
 						}
-					}),this.criteriumContactField = new go.modules.community.addressbook.ContactCombo({		
-						isOrganization: false,
-						hiddenName:'contact_id',
+					}),this.criteriumContactField = new GO.addressbook.SelectContact({
 						width: 295,
 						hidden: true,
 						listeners: {

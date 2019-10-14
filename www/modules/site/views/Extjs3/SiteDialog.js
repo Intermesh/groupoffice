@@ -12,7 +12,7 @@
  */
 
 GO.site.SiteDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
-	customFieldType: "Site",
+	customFieldType: "GO\\Site\\Model\\Site",
 	initComponent: function() {
 		Ext.apply(this, {
 			goDialogId: 'site',

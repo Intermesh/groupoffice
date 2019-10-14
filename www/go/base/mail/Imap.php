@@ -277,9 +277,6 @@ class Imap extends ImapBodyStruct {
 	private function _escape($str){
 		return str_replace(array('\\','"'), array('\\\\','\"'), $str);
 	}
-	private function _unescape($str){
-		return str_replace(array('\\\\','\"'), array('\\','"'), $str);
-	}
 	/**
 	 * Get's the capabilities of the IMAP server. Useful to determine if the
 	 * IMAP server supports server side sorting.
@@ -517,7 +514,7 @@ class Imap extends ImapBodyStruct {
 							$flags .= ' '.$v;
 						}
 						if ($delim_flag && !$delim) {
-							$delim = $this->_unescape($v);
+							$delim = $v;
 							$delim_flag = false;
 						}elseif($delim && !$folder){
 								$folder = $v;
@@ -578,7 +575,6 @@ class Imap extends ImapBodyStruct {
 
 
 				if (!isset($folders[$folder]) && $folder) {
-					$folder = $this->_unescape($folder);
 					$folders[$folder] = array(
 									'delimiter' => $delim,
 									'name' => $this->utf7_decode($folder),
@@ -2668,12 +2664,6 @@ class Imap extends ImapBodyStruct {
 	}
 
 	private function addslashes($mailbox){
-		
-		// For mailserver with \ as folder delimiter
-		if($this->delimiter == '\\') {
-			return str_replace('"', '\"', $mailbox);
-		}
-		
 		return $this->_escape( $mailbox);
 	}
 

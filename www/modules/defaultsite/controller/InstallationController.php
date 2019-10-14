@@ -21,10 +21,10 @@ class InstallationController extends \GO\Base\Controller\AbstractJsonController 
 		}
 
 		$siteModule = new \GO\Base\Model\Module();
-		$siteModule->name='site';
+		$siteModule->id='site';
 		if(\GO::modules()->isInstalled('site') || $siteModule->save()){
 			$defaultSiteModule = new \GO\Base\Model\Module();
-			$defaultSiteModule->name='defaultsite';
+			$defaultSiteModule->id='defaultsite';
 			if(!$defaultSiteModule->save()){
 				$response['success'] = false;
 				$response['feedback'] = \GO::t("Could not install the \"defaultsite\" module.", "defaultsite");

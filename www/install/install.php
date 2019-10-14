@@ -1,10 +1,6 @@
 <?php
 require('../vendor/autoload.php');
 
-ini_set('zlib.output_compression', 0);
-ini_set('implicit_flush', 1);
-
-
 require("gotest.php");
 if(!systemIsOk()) {
 	header("Location: test.php");
@@ -13,16 +9,13 @@ if(!systemIsOk()) {
 
 
 use GO\Base\Cron\CronJob;
-use GO\Base\Model\Module;
+use GO\Base\Model\Module as Module2;
 use GO\Base\Observable;
-use go\modules\community\bookmarks\Module as BookmarksModule;
-use go\modules\community\comments\Module as CommentsModule;
 use go\core\App;
 use go\core\jmap\State;
-use go\core;
-use go\modules\community\googleauthenticator\Module as GAModule;
-use go\modules\community\notes\Module as NotesModule;
-use go\modules\community\addressbook\Module as AddressBookModule;
+use go\core\module\Base;
+use go\modules\community\googleauthenticator\Module as Module3;
+use go\modules\community\notes\Module;
 
 
 function dbIsEmpty() {
@@ -32,10 +25,7 @@ function dbIsEmpty() {
 	$stmt = App::get()->getDbConnection()->query("SHOW TABLES");
 	$stmt->execute();
 	
-	$empty = !$stmt->fetch();
-	$stmt->closeCursor();
-	
-	return $empty;
+	return $stmt->rowCount() == 0;
 }
 
 if(!dbIsEmpty()) {
@@ -48,12 +38,8 @@ $passwordMatch = true;
 if (!empty($_POST)) {
 
 	if ($_POST['password'] == $_POST['passwordConfirm']) {
-		
-//		go()->getDbConnection()->exec("DROP DATABASE test");
-//		go()->getDbConnection()->exec("CREATE DATABASE test");
-//		go()->getDbConnection()->exec("USE test");
 
-		App::get()->setAuthState(new core\auth\TemporaryState());
+		App::get()->setAuthState(new State());
 
 		$admin = [
 				'displayName' => "System Administrator",
@@ -62,13 +48,8 @@ if (!empty($_POST)) {
 				'email' => $_POST['email']
 		];
 
-		App::get()->getInstaller()->install($admin, [
-				new AddressBookModule(), 
-				new NotesModule(),
-				new GAModule(),
-				new CommentsModule(),
-				new BookmarksModule()
-				]);
+		App::get()->getInstaller()->install($admin, [new Module(), new Module3()]);
+
 
 		//install not yet refactored modules
 		GO::$ignoreAclPermissions = true;
@@ -77,11 +58,11 @@ if (!empty($_POST)) {
 		foreach ($modules as $moduleClass) {
 
 			$moduleController = new $moduleClass;
-			if ($moduleController instanceof core\Module) {
+			if ($moduleController instanceof Base) {
 				continue;
 			}
 			if ($moduleController->autoInstall() && $moduleController->isInstallable()) {
-				$module = new Module();
+				$module = new Module2();
 				$module->name = $moduleController->name();
 				if (!$module->save()) {
 					throw new Exception("Could not save module " . $module->name);
@@ -122,11 +103,11 @@ if (!empty($_POST)) {
 		Observable::cacheListeners();			
 	
 				
-		\go\core\model\User::findById(1)->legacyOnSave();
+		\go\modules\core\users\model\User::findById(1)->legacyOnSave();
 		
 		
-		if(go()->getConfig()['core']['general']['servermanager']) {
-			exec("php ".\go\core\Environment::get()->getInstallFolder() .'/go/modules/community/multi_instance/oninstall.php '.go()->getConfig()['core']['general']['servermanager']. ' '.explode(':',$_SERVER['HTTP_HOST'])[0], $output, $ret);
+		if(GO()->getConfig()['general']['servermanager']) {
+			exec("php ".\go\core\Environment::get()->getInstallFolder() .'/go/modules/community/multi_instance/oninstall.php '.GO()->getConfig()['general']['servermanager']. ' '.explode(':',$_SERVER['HTTP_HOST'])[0], $output, $ret);
 		}		
 
 		header("Location: finished.php");

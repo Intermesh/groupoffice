@@ -11,24 +11,32 @@ use function GO;
  */
 class UserSettings extends Property {
 	
-	public $user_id;
-	public $acl_id;
+	public $id;
+	public $fbAclId;
 	
 	protected static function defineMapping() {
-		return parent::defineMapping()->addTable('fb_acl');
-	}	
+		return parent::defineMapping()->addTable('core_user');
+	}
 	
-	protected function internalSave() {
+	protected function init() {
+		parent::init();
+
+		$fbAcl = FreeBusyAcl::model()->findSingleByAttribute('user_id', $this->id);
 		
-		if(!isset($this->acl_id)) {
+		if(!$fbAcl){
+			
 			$acl = new \GO\Base\Model\Acl();
-			$acl->ownedBy = $this->user_id;
+			$acl->ownedBy = $this->id;
 			$acl->usedIn = FreeBusyAcl::model()->tableName();
 			$acl->save();
-			$this->acl_id = $acl->id;
-		}
 		
-		return parent::internalSave();
+			$fbAcl = new FreeBusyAcl();
+			$fbAcl->user_id = $this->id;
+			$fbAcl->acl_id = $acl->id;
+			$fbAcl->save();
+		}
+		$this->fbAclId = $fbAcl->acl_id;
+	
 	}
 
 }

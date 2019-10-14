@@ -1,0 +1,18 @@
+.go-module-icon-tools , .go-menu-icon-tools , .go-tab-icon-tools {
+	background-image: url('images/tools.png') !important;
+}
+
+.tools-panel .x-panel-body{
+	padding:5px;
+}
+
+.tools-panel a:visited,.tools-panel a:link,.tools-panel a:active{
+	text-decoration:underline;
+}
+
+.tools-panel ul{
+list-style-image:none;
+list-style-position:outside;
+list-style-type:disc;
+padding:10px;
+}

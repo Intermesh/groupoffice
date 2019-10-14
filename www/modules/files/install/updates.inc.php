@@ -228,8 +228,8 @@ $updates['201610281659'][] = 'SET foreign_key_checks = 1;';
 
 
 
-
 $updates['201706121115'][] = "ALTER TABLE `fs_folders` CHANGE `parent_id` `parent_id` INT(11) NOT NULL DEFAULT '0';";
+
 
 $updates['201901281546'][] = "delete from go_settings where name ='files_shared_cache_ctime';";
 
@@ -241,23 +241,3 @@ $updates['201903070922'][] = "ALTER TABLE `fs_folders` CHANGE `name` `name` VARC
 $updates['201903070922'][] = "ALTER IGNORE TABLE `fs_folders` ADD UNIQUE( `parent_id`, `name`);";
 
 $updates['201903070922'][] = "ALTER TABLE `fs_folders` DROP INDEX `parent_id_2`;";
-
-//master
-
-
-$updates['201903070922'][] = "ALTER TABLE `cf_fs_folders` CHANGE `model_id` `id` INT(11) NOT NULL;";
-$updates['201903070922'][] = "RENAME TABLE `cf_fs_folders` TO `fs_folders_custom_fields`;";
-$updates['201903070922'][] = "delete from fs_folders_custom_fields where id not in (select id from fs_folders);";
-$updates['201903070922'][] = "ALTER TABLE `fs_folders_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `fs_folders`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
-
-$updates['201903070922'][] = "ALTER TABLE `cf_fs_files` CHANGE `model_id` `id` INT(11) NOT NULL;";
-$updates['201903070922'][] = "RENAME TABLE `cf_fs_files` TO `fs_files_custom_fields`;";
-$updates['201903070922'][] = "delete from fs_files_custom_fields where id not in (select id from fs_files);";
-$updates['201903070922'][] = "ALTER TABLE `fs_files_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `fs_files`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
-
-
-$updates['201903291350'][] = function() {	
-	$m = new \go\core\install\MigrateCustomFields63to64();
-	$m->migrateEntity("File");	
-	$m->migrateEntity("Folder");	
-};

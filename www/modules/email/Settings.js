@@ -1,23 +1,17 @@
 GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 	title : t("E-mail"),
 	iconCls: 'ic-email',
-	autoScroll: true,
 	initComponent: function() {
 		
 		this.items=[{
 			xtype:'fieldset',
 			title:t("Options"),
 			items:[
-//			this.sortBySendMailTime = new Ext.form.Checkbox({
-//				boxLabel:t("Sort recipient addresses by time of last email sending (requires Address Book module)", "email"),
-//				hideLabel:true,				
-//				name:'emailSettings.sort_email_addresses_by_time'
-//			}),
-
-//			this.templateCombo = new GO.email.TemplateCombo({
-//				hiddenName: "emailSettings.defaultTemplateId",
-//				fieldLabel: t("Default template")				
-//			}),
+			this.sortBySendMailTime = new Ext.form.Checkbox({
+				boxLabel:t("Sort recipient addresses by time of last email sending (requires Address Book module)", "email"),
+				hideLabel:true,				
+				name:'emailSettings.sort_email_addresses_by_time'
+			}),
 			this.useHtml = new Ext.form.Checkbox({
 				boxLabel:t("Use HTML markup", "email"),
 				hideLabel:true,				
@@ -61,20 +55,15 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 				editable : false,
 				selectOnFocus : true,
 				forceSelection : true
-			})]
-			},
-//			this.templateGrid = new GO.email.TemplateGrid({
-//				ownedBy: null
-//			}),
-			this.templatesGrid = new GO.email.TemplatesGrid()
+			})]}
 		];
 		
 		GO.email.SettingsPanel.superclass.initComponent.call(this);
 	},
 	
 	
-	onLoadComplete : function(user) {
-		//this.templateGrid.setOwnedBy(user.id);
+	onLoadComplete : function(action) {
+
 	},
 
 	onSubmitComplete : function() {

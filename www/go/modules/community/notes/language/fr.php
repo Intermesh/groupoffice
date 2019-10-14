@@ -14,7 +14,4 @@ return array (
   'Notes' => 'Notes',
   'Add test' => 'Ajouter un test',
   'Note' => 'Note',
-  'Filters' => 'Filtres',
-  'Commented at' => 'Commenté à',
-  'Note book' => 'Carnet de notes',
 );

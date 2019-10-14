@@ -1,9 +1,9 @@
 <?php
 namespace go\modules\community\tasks\model;
 
-use go\core\acl\model\AclOwnerEntity;
+use go\core\acl\model\AclEntity;
 
-class TaskList extends AclOwnerEntity {
+class TaskList extends AclEntity {
 	
 	public $id;
 	public $name;

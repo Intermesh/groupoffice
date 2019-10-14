@@ -6,7 +6,6 @@ use DateTime;
 use go\core\http;
 use go\core\Singleton;
 use go\core\util\StringUtil;
-use Defuse\Crypto\Crypto;
 
 /**
  * Response Object
@@ -79,16 +78,6 @@ class Response extends Singleton{
 		$this->setHeader('Content-Type', $contentType);
 	}
 
-	private $cspNonce;
-
-	public function getCspNonce() {
-		if(!isset($this->cspNonce)) {
-			$this->cspNonce = hash("sha256", random_bytes(16));
-		}
-
-		return $this->cspNonce;
-	}
-
 	/**
 	 * Updates a HTTP header.
 	 *
@@ -98,36 +87,29 @@ class Response extends Singleton{
 	 *
 	 * @param string $name
 	 * @param string|StringUtil[] $value
-	 * @return $this
+	 * @return void
 	 */
 	public function setHeader($name, $value) {
-		$lcname = strtolower($name);
+		$name = strtolower($name);
 
 		if (!is_array($value)) {
 			$value = [$value];
 		}
 
-		$this->headers[$lcname] = [$name, $value];	
-		
-		return $this;
+		$this->headers[$name] = $value;	
 	}
 
 	/**
 	 * Remove an HTTP header
 	 * 
 	 * @param string $name
-	 * @return $this;
 	 */
 	public function removeHeader($name) {
-
-		$name = strtolower($name);
-
 		if (!headers_sent()) {
 			header_remove($name);
 		}
 
 		unset($this->headers[$name]);
-		return $this;
 	}
 
 	/**
@@ -142,7 +124,7 @@ class Response extends Singleton{
 		if (!isset($this->headers[$name])) {
 			return null;
 		} else {
-			return $this->headers[$name][1];
+			return $this->headers[$name];
 		}
 	}
 
@@ -156,9 +138,8 @@ class Response extends Singleton{
 		if (!isset($text)) {
 			$text = http\Exception::$codes[$httpCode];
 		}
-
-		$status = "HTTP/" . $this->httpVersion . " " . $httpCode . " " . $text;
-		header($status);
+		
+		header("HTTP/" . $this->httpVersion . " " . $httpCode . " " . $text);
 	}
 
 	/**
@@ -228,13 +209,13 @@ class Response extends Singleton{
 			$this->setStatus(304);
 			exit();
 		}
-	}	
+	}
 	
-	public function sendHeaders() {		
-		foreach ($this->headers as $name => $h) {			
-			foreach ($h[1] as $v) {
-				// go()->debug($h[0] . ': '. $v);
-				header($h[0] . ': ' . $v);
+	
+	public function sendHeaders() {
+		foreach ($this->headers as $name => $headerSet) {
+			foreach ($headerSet as $v) {
+				header($name . ': ' . $v);
 			}
 		}		
 	}
@@ -245,6 +226,7 @@ class Response extends Singleton{
 	 * @param string $data
 	 */
 	public function output($data = null) {
+		
 		if (isset($data)) {
 			if(is_array($data)) {
 				$data = json_encode($data);
@@ -255,9 +237,8 @@ class Response extends Singleton{
 			} 
 			$this->sendHeaders();
 			echo $data;
-		} else if(!headers_sent()){
-			$this->sendHeaders();
 		}
 	}
+	
 
 }

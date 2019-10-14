@@ -75,15 +75,10 @@ class Module extends Observable {
 	 * @return String 
 	 */
 	public function localizedName() {
-		
-		$pkg = 'legacy';
-		$name = $this->name();
-		
-		if(!go()->getLanguage()->translationExists("name", $pkg, $name)) {
-			return $name;
-		}
-		
-		return go()->t("name", $pkg, $name);	
+		$name = \GO::t('name', $this->name());
+		if($name=='name')
+			$name = $this->name();
+		return $name;
 	}
 	
 	/**
@@ -124,14 +119,7 @@ class Module extends Observable {
 	 * @return String 
 	 */
 	public function description() {
-		$pkg = 'legacy';
-		$name = $this->name();
-		
-		if(!go()->getLanguage()->translationExists("description", $pkg, $name)) {
-			return "No description";
-		}
-		
-		return go()->t("description", $pkg, $name);	
+		return \GO::t('description', $this->name());
 	}
 	
 	/**
@@ -318,30 +306,6 @@ class Module extends Observable {
 //			call_user_func(array(get_class($this),'saveUser'), $user, true);
 //		}
 		
-		$this->registerEntities();
-		
-		return true;
-	}
-	
-	/**
-	 * Registers all entity in the core_entity table. This happens after the 
-	 * core_module entry has been inserted.
-	 * 
-	 * De-registration is not necessary when the module is uninstalled because they 
-	 * will be deleted by Mysql because of a cascading relation.
-	 */
-	public function registerEntities() {
-		$records = $this->getModels();
-		
-		foreach($records as $ar) {
-			$cls = $ar->getName();
-			if(is_a($cls, Db\ActiveRecord::class, true) && $cls::model()->hasLinks()) {
-				if(!$cls::entityType()) {
-					return false;
-				}
-			}
-		}		
-		
 		return true;
 	}
 	
@@ -400,9 +364,8 @@ class Module extends Observable {
 				\GO::getDbConnection ()->query($query);
 		}
 		
-		// \GO::clearCache();
-		// Observable::cacheListeners();
-		go()->rebuildCache();
+		\GO::clearCache();
+		Observable::cacheListeners();
 		
 		\GO::setIgnoreAclPermissions($oldIgnore);
 		

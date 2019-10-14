@@ -268,11 +268,47 @@ CREATE  TABLE IF NOT EXISTS `cal_views_groups` (
   PRIMARY KEY (`view_id`, `group_id`) )
 ENGINE = InnoDB;
 
+--
+-- Tabelstructuur voor tabel `cf_cal_calendars`
+--
+
+DROP TABLE IF EXISTS `cf_cal_calendars`;
+CREATE TABLE IF NOT EXISTS `cf_cal_calendars` (
+  `model_id` int(11) NOT NULL,
+  PRIMARY KEY (`model_id`)
+) ENGINE=InnoDB;
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `cf_cal_events`
+--
+
+DROP TABLE IF EXISTS `cf_cal_events`;
+CREATE TABLE IF NOT EXISTS `cf_cal_events` (
+  `model_id` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`model_id`)
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
 
+--
+-- Tabelstructuur voor tabel `go_links_cal_events`
+--
 
+DROP TABLE IF EXISTS `go_links_cal_events`;
+CREATE TABLE IF NOT EXISTS `go_links_cal_events` (
+  `id` int(11) NOT NULL,
+  `folder_id` int(11) NOT NULL,
+  `model_id` int(11) NOT NULL,
+  `model_type_id` int(11) NOT NULL,
+  `description` varchar(100) DEFAULT NULL,
+  `ctime` int(11) NOT NULL,
+  PRIMARY KEY `model_id` (`id`,`model_id`,`model_type_id`),
+  KEY `id` (`id`,`folder_id`),
+  KEY `ctime` (`ctime`)
+) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
 
@@ -295,19 +331,3 @@ CREATE TABLE IF NOT EXISTS `su_visible_calendars` (
 ) ENGINE=InnoDB;
 
 ALTER TABLE `cal_calendars` ADD INDEX(`user_id`);
-
-
-
-
-CREATE TABLE `cal_calendars_custom_fields` (
- `id` int(11) NOT NULL,
- PRIMARY KEY (`id`),
- CONSTRAINT `cal_calendars_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `cal_calendars` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-
-CREATE TABLE `cal_events_custom_fields` (
- `id` int(11) NOT NULL,
- PRIMARY KEY (`id`),
- CONSTRAINT `cal_events_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `cal_events` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;

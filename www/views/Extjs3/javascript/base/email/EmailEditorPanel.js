@@ -469,7 +469,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			);
 		
 			uploadItems.push({
-				iconCls:'ic-folder',
+				iconCls:'btn-groupoffice',
 				text : t("Add from Group-Office", "email").replace('{product_name}', GO.settings.config.product_name),
 				handler : function()
 				{

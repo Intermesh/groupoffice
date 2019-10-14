@@ -17,27 +17,18 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 	initComponent : function() {
 
-		this.messagesStore = new GO.data.GroupingStore({
-			url: GO.url("email/message/store"),
-			root: 'results',
-			totalProperty: 'total',
-			remoteSort: true,
-			reader: new Ext.data.JsonReader({
-				root: 'results',
-				totalProperty: 'total',
-				fields:['uid','icon','deleted','flagged','labels','has_attachments','seen','subject','from','to','sender','size','udate','internal_udate', 'x_priority','answered','forwarded','account_id','mailbox','mailboxname'],
-				id: 'uid'
-			}),
-			sortInfo: {
-				field: 'udate',
-				direction: 'DESC'
-			},
-			groupField: 'udate'
-		});
+	this.messagesStore = new GO.data.JsonStore({
+		url: GO.url("email/message/store"),
+		root: 'results',
+		totalProperty: 'total',
+		id: 'uid',
+		fields:['uid','icon','deleted','flagged','labels','has_attachments','seen','subject','from','to','sender','size','udate','internal_udate', 'x_priority','answered','forwarded','account_id','mailbox','mailboxname'],
+		remoteSort: true
+	});
 
-//		this.messagesStore.setDefaultSort('udate', 'DESC');
-
-		this.messagesStore.on('load', function(){
+	this.messagesStore.setDefaultSort('arrival', 'DESC');
+	
+	this.messagesStore.on('load', function(){
 
 			this.isManager = this.messagesGrid.store.reader.jsonData.permission_level == GO.permissionLevels.manage;
 
@@ -142,7 +133,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			if(search_type == 'any'){
 				query = 'OR OR OR FROM "' + GO.email.search_query + '" SUBJECT "' + GO.email.search_query + '" TO "' + GO.email.search_query + '" CC "' + GO.email.search_query + '"';
 			} else if(search_type=='fts') {
-				query = 'TEXT "' + GO.email.search_query + '"';
+				query = 'TEXT ' + GO.email.search_query;
 			} else {
 				query = search_type.toUpperCase() + ' "' + GO.email.search_query + '"';
 			}
@@ -179,59 +170,59 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		scope:this
 	}];
 
-//	if(go.Modules.isAvailable("legacy", "addressbook")) {
-//		addSendersItems.push({
-//			text: t("Address list", "addressbook"),
-//			menu: this.addresslistsMenu = new GO.menu.JsonMenu({
-//				store: new GO.data.JsonStore({
-//					url: GO.url("addressbook/addresslist/store"),
-//					baseParams: {
-//						permissionLevel: GO.permissionLevels.write,
-//						forContextMenu: true
-//					},
-//					fields: ['addresslist_id', 'text'],
-//					remoteSort: true
-//				}),
-//				listeners:{
-//					scope:this,
-//					itemclick : function(item, e ) {
-//						this.addSendersToAddresslist(item.addresslist_id);
-//						return false;
-//					}
-//				}
-//			}),
-//			multiple:true,
-//			scope: this
-//		});
-//	}
+	if(go.Modules.isAvailable("legacy", "addressbook")) {
+		addSendersItems.push({
+			text: t("Address list", "addressbook"),
+			menu: this.addresslistsMenu = new GO.menu.JsonMenu({
+				store: new GO.data.JsonStore({
+					url: GO.url("addressbook/addresslist/store"),
+					baseParams: {
+						permissionLevel: GO.permissionLevels.write,
+						forContextMenu: true
+					},
+					fields: ['addresslist_id', 'text'],
+					remoteSort: true
+				}),
+				listeners:{
+					scope:this,
+					itemclick : function(item, e ) {
+						this.addSendersToAddresslist(item.addresslist_id);
+						return false;
+					}
+				}
+			}),
+			multiple:true,
+			scope: this
+		});
+	}
 
 	var deleteSendersItems = [];
 
-//	if(go.Modules.isAvailable("legacy", "addressbook")) {
-//		deleteSendersItems.push({
-//			text: t("Address list", "addressbook"),
-//			menu: this.addresslistsMenu = new GO.menu.JsonMenu({
-//				store: new GO.data.JsonStore({
-//					url: GO.url("addressbook/addresslist/store"),
-//					baseParams: {
-//						permissionLevel: GO.permissionLevels.write,
-//						forContextMenu: true
-//					},
-//					fields: ['addresslist_id', 'text'],
-//					remoteSort: true
-//				}),
-//				listeners:{
-//					scope:this,
-//					itemclick : function(item, e ) {
-//						this.deleteSendersFromAddresslist(item.addresslist_id);
-//						return false;
-//					}
-//				}
-//			}),
-//			multiple:true,
-//			scope: this
-//		});
-//	}
+	if(go.Modules.isAvailable("legacy", "addressbook")) {
+		deleteSendersItems.push({
+			text: t("Address list", "addressbook"),
+			menu: this.addresslistsMenu = new GO.menu.JsonMenu({
+				store: new GO.data.JsonStore({
+					url: GO.url("addressbook/addresslist/store"),
+					baseParams: {
+						permissionLevel: GO.permissionLevels.write,
+						forContextMenu: true
+					},
+					fields: ['addresslist_id', 'text'],
+					remoteSort: true
+				}),
+				listeners:{
+					scope:this,
+					itemclick : function(item, e ) {
+						this.deleteSendersFromAddresslist(item.addresslist_id);
+						return false;
+					}
+				}
+			}),
+			multiple:true,
+			scope: this
+		});
+	}
 	
 	var contextItems = [
 	this.contextMenuMarkAsRead = new Ext.menu.Item({
@@ -1221,94 +1212,94 @@ this.messagePanel.show();
 		}
 	},
 
-//	addSendersToAddresslist : function(addresslistId) {
-//		var records = this.messagesGrid.getSelectionModel().getSelections();
-//		var senderNames = new Array();
-//		var senderEmails = new Array();
-//		for (var i=0;i<records.length;i++) {
-//			senderNames.push(records[i].data.from);
-//			senderEmails.push(records[i].data.sender);
-//		}
-//
-//		Ext.Ajax.request({
-//			url: GO.url('addressbook/addresslist/addContactsToAddresslist'),
-//			params: {
-//				senderNames: Ext.encode(senderNames),
-//				senderEmails: Ext.encode(senderEmails),
-//				addresslistId: addresslistId
-//			},
-//			callback: function(options, success, response)
-//			{
-//				if(!success)
-//				{
-//					Ext.MessageBox.alert(t("Error"), response.result.errors);
-//				}else
-//				{
-//					var responseParams = Ext.decode(response.responseText);
-//					if(responseParams.success)
-//					{
-//						Ext.MessageBox.alert(t("Success"),t("%i contacts have been succesfully added to the address list.", "addressbook").replace('%i',responseParams['addedSenders']));
-//					}else
-//					{
-//						if (!GO.util.empty(responseParams.unknownSenders)) {
-//
-//							if (!this.unknownRecipientsDialogForAddresslist) {
-//								this.unknownRecipientsDialogForAddresslist = new GO.email.UnknownRecipientsDialog();
-//								this.unknownRecipientsDialogForAddresslist.on('hide',function(){
-//									if (!GO.util.empty(this.unknownRecipientsDialogForAddresslist.addresslistId))
-//										delete this.unknownRecipientsDialogForAddresslist.addresslistId;
-//								},this);
-//							}
-//
-//							this.unknownRecipientsDialogForAddresslist.store.loadData({
-//								recipients : Ext.decode(responseParams.unknownSenders)
-//							});
-//
-//							this.unknownRecipientsDialogForAddresslist.addresslistId = addresslistId;
-//
-//							this.unknownRecipientsDialogForAddresslist.show({
-//								title : t("Add unknown senders", "email"),
-//								descriptionText : t("You are adding selected email senders to an addresslist. First, the following selected senders must be added to a Group-Office address book. Click on a name if you want to add that person or close this window.", "email"),
-//								disableSkipUnknownCheckbox : true
-//							});
-//
-//						} else {
-//							Ext.MessageBox.alert(t("Error"),responseParams.feedback);
-//						}
-//					}
-//				}
-//			},
-//			scope: this
-//		});
-//	},
-//
-//	deleteSendersFromAddresslist : function(addresslistId) {
-//		if(go.Modules.isAvailable("legacy", "addressbook")) {
-//			var records = this.messagesGrid.getSelectionModel().getSelections();
-//			var senderEmails = new Array();
-//			for (var i=0;i<records.length;i++) {
-//				senderEmails.push(records[i].data.sender);
-//			}
-//
-//			Ext.Ajax.request({
-//				url: GO.url('addressbook/addresslist/deleteContactsFromAddresslist'),
-//				params: {
-//					senderEmails: Ext.encode(senderEmails),
-//					addresslistId: addresslistId
-//				},
-//				callback: function(options, success, response)
-//				{
-//					var responseData = Ext.decode(response.responseText);
-//					if(!success) {
-//						Ext.MessageBox.alert(t("Error"), responseData.feedback);
-//					} else {
-//						Ext.MessageBox.alert(t("Success"), t("%n contacts have been identified and removed from the selected address list.", "addressbook").replace('%n',responseData.nRemoved));
-//					}
-//				},
-//				scope: this
-//			});
-//		}
-//	}
+	addSendersToAddresslist : function(addresslistId) {
+		var records = this.messagesGrid.getSelectionModel().getSelections();
+		var senderNames = new Array();
+		var senderEmails = new Array();
+		for (var i=0;i<records.length;i++) {
+			senderNames.push(records[i].data.from);
+			senderEmails.push(records[i].data.sender);
+		}
+
+		Ext.Ajax.request({
+			url: GO.url('addressbook/addresslist/addContactsToAddresslist'),
+			params: {
+				senderNames: Ext.encode(senderNames),
+				senderEmails: Ext.encode(senderEmails),
+				addresslistId: addresslistId
+			},
+			callback: function(options, success, response)
+			{
+				if(!success)
+				{
+					Ext.MessageBox.alert(t("Error"), response.result.errors);
+				}else
+				{
+					var responseParams = Ext.decode(response.responseText);
+					if(responseParams.success)
+					{
+						Ext.MessageBox.alert(t("Success"),t("%i contacts have been succesfully added to the address list.", "addressbook").replace('%i',responseParams['addedSenders']));
+					}else
+					{
+						if (!GO.util.empty(responseParams.unknownSenders)) {
+
+							if (!this.unknownRecipientsDialogForAddresslist) {
+								this.unknownRecipientsDialogForAddresslist = new GO.email.UnknownRecipientsDialog();
+								this.unknownRecipientsDialogForAddresslist.on('hide',function(){
+									if (!GO.util.empty(this.unknownRecipientsDialogForAddresslist.addresslistId))
+										delete this.unknownRecipientsDialogForAddresslist.addresslistId;
+								},this);
+							}
+
+							this.unknownRecipientsDialogForAddresslist.store.loadData({
+								recipients : Ext.decode(responseParams.unknownSenders)
+							});
+
+							this.unknownRecipientsDialogForAddresslist.addresslistId = addresslistId;
+
+							this.unknownRecipientsDialogForAddresslist.show({
+								title : t("Add unknown senders", "email"),
+								descriptionText : t("You are adding selected email senders to an addresslist. First, the following selected senders must be added to a Group-Office address book. Click on a name if you want to add that person or close this window.", "email"),
+								disableSkipUnknownCheckbox : true
+							});
+
+						} else {
+							Ext.MessageBox.alert(t("Error"),responseParams.feedback);
+						}
+					}
+				}
+			},
+			scope: this
+		});
+	},
+
+	deleteSendersFromAddresslist : function(addresslistId) {
+		if(go.Modules.isAvailable("legacy", "addressbook")) {
+			var records = this.messagesGrid.getSelectionModel().getSelections();
+			var senderEmails = new Array();
+			for (var i=0;i<records.length;i++) {
+				senderEmails.push(records[i].data.sender);
+			}
+
+			Ext.Ajax.request({
+				url: GO.url('addressbook/addresslist/deleteContactsFromAddresslist'),
+				params: {
+					senderEmails: Ext.encode(senderEmails),
+					addresslistId: addresslistId
+				},
+				callback: function(options, success, response)
+				{
+					var responseData = Ext.decode(response.responseText);
+					if(!success) {
+						Ext.MessageBox.alert(t("Error"), responseData.feedback);
+					} else {
+						Ext.MessageBox.alert(t("Success"), t("%n contacts have been identified and removed from the selected address list.", "addressbook").replace('%n',responseData.nRemoved));
+					}
+				},
+				scope: this
+			});
+		}
+	}
 });
 
 GO.mainLayout.onReady(function(){
@@ -1532,8 +1523,7 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 								{
 									images.push({
 										name: r.name,
-										src: r.url+'&inline=1',
-										download_path: r.url+'&inline=0'
+										src: r.url+'&inline=0'
 									});
 								}
 								if(r.name==attachment.name)
@@ -1561,10 +1551,6 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 
 /**
  * Function that will open an email composer. If a composer is already open it will create a new one. Otherwise it will reuse an already created one.
- * 
- * {
- *	values: {to: "merijn@intermesh.nl"}
- * }
  */
 GO.email.showComposer = function(config){
 
@@ -1637,7 +1623,6 @@ go.Modules.register("legacy", 'email', {
 	mainPanel: GO.email.EmailClient,
 	title: t("E-mail"),
 	userSettingsPanels: ["GO.email.SettingsPanel"]
-//	systemSettingsPanels: ["GO.email.SystemSettingsPanel"]
 });
 
 //GO.quickAddPanel.addButton(new Ext.Button({
@@ -1651,56 +1636,12 @@ go.Modules.register("legacy", 'email', {
 //	}),0);
 
 
-// GO.email.showAddressMenu = function(e, email, name)
-// {
-// 	var e = Ext.EventObject.setEvent(e);
-// 	e.preventDefault();
-// 	GO.email.addressContextMenu.showAt(e.getXY(), email, name);
-// }
-
-(function() {
-
-	function launchAddressContextMenu(e, href){
-		var queryString = '';
-		var email = '';
-		var indexOf = href.indexOf('?');
-		if(indexOf>-1)
-		{
-			email = href.substr(7, indexOf-7);
-			queryString = href.substr(indexOf+1);
-		}else
-		{
-			email = href.substr(7);
-		}
-
-		e.preventDefault();
-
-		var addresses = go.util.parseEmail(email);
-
-		GO.email.addressContextMenu.showAt(e.getXY(), addresses[0].email, addresses[0].name, queryString);
-	}
-
-	function checkForMailto(e, target) {
-		// if(target.tagName!='A')
-		// {
-		// 	target = Ext.get(target).findParent('A', 10);
-		// 	if(!target)
-		// 		return false;
-		// }
-
-		if(target.tagName=='A' && target.attributes.href)
-		{
-			var href=target.attributes.href.value;
-
-			if(href.substr(0,6)=='mailto')
-			{
-				launchAddressContextMenu(e, href);
-			}
-		}
-	}
-
-	Ext.getBody().on('click', checkForMailto);
-})();
+GO.email.showAddressMenu = function(e, email, name)
+{
+	var e = Ext.EventObject.setEvent(e);
+	e.preventDefault();
+	GO.email.addressContextMenu.showAt(e.getXY(), email, name);
+}
 
 GO.newMenuItems.push(
 //				{
@@ -1983,26 +1924,3 @@ GO.email.moveToInbox = function(mailUid,fromAccountId) {
 		scope : this
 	});
 }
-
-
-
-/**
-		 * Launch email composer
-		 * 
-		 * @param {Object} config {name: "Merijn" email: "mschering@intermesh.nl", subject: "Hello", body: "Just saying hello!"}
-		 * @return {undefined}
-		 */
-go.util.mailto = function (config, event) {
-
-	event.preventDefault();
-
-	config.values = {to: config.email};
-
-	if (config.name) {
-		config.values.to = '"' + config.name.replace(/"/g, '\"') + '" <' + config.email + '>';
-	}
-	
-	GO.email.showComposer(config);
-
-	
-};

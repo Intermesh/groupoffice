@@ -57,49 +57,9 @@ GO.calendar.ParticipantsPanel = function(eventDialog, config) {
 		fields : ['id', 'name', 'email', 'available','status', 'user_id', 'contact_id','is_organizer','create_permission']
 	});
 		
-	var tbar = [
-		{
-			width: dp(300),
-			xtype: "searchemailcombo",
-			listeners: {
-				select: function(c, record) {
-					if(record.data.entity == "User") {
-						GO.request({
-							url: "calendar/participant/getUsers",
-							params: {
-								users: Ext.encode([record.data.entityId]),
-								start_time: this.eventDialog.getStartDate().format('U'),
-								end_time: this.eventDialog.getEndDate().format('U')
-							},
-							success: function (response, options, result) {
-								this.addParticipants(result);
-							},
-							scope: this
-						});
-					} else
-					{
-						GO.request({
-							url: "calendar/participant/getContacts",
-							params: {
-								contacts: Ext.encode([record.data]),
-								start_time: this.eventDialog.getStartDate().format('U'),
-								end_time: this.eventDialog.getEndDate().format('U')
-							},
-							success: function (response, options, result) {
-								this.addParticipants(result);
-							},
-							scope: this
-						});
-					}
-					c.reset();
-				},
-				scope: this
-			}
-		},
-		"->",
-	{
+	var tbar = [{
 		iconCls : 'btn-add',
-		tooltip : t("Add"),
+		text : t("Add"),
 		cls : 'x-btn-text-icon',
 		handler : function() {
 			this.showAddParticipantsDialog();
@@ -107,7 +67,7 @@ GO.calendar.ParticipantsPanel = function(eventDialog, config) {
 		scope : this
 	}, {
 		iconCls : 'btn-delete',
-		tooltip : t("Delete"),
+		text : t("Delete"),
 		cls : 'x-btn-text-icon',
 		handler : function() {
 			this.gridPanel.deleteSelected();
@@ -115,57 +75,57 @@ GO.calendar.ParticipantsPanel = function(eventDialog, config) {
 		scope : this
 	}];
 
-//	if(go.Modules.isAvailable("legacy", "addressbook")){
-//		this.selectContact = new GO.addressbook.SelectContact ({
-//			name: 'quick_add_contact',
-//			anchor: '100%',
-//			fieldLabel:t("Add"),
-//			remoteSort: true,
-//			requireEmail:true
-//		});
-//
-//		this.selectContact.on('select', function(combo, record)
-//		{
-//			if(record.data.go_user_id){
-//				GO.request({
-//						url:"calendar/participant/getUsers",
-//						params:{
-//							users: Ext.encode([record.data.go_user_id]),
-//							start_time : this.eventDialog.getStartDate().format('U'),
-//							end_time : this.eventDialog.getEndDate().format('U')
-//						},
-//						success:function(response, options, result){
-//							this.addParticipants(result);
-//						},
-//						scope:this
-//					});					
-//			}else
-//			{
-//				GO.request({
-//					url:"calendar/participant/getContacts",
-//					params:{
-//						contacts: Ext.encode([record.data.id]),
-//						start_time : this.eventDialog.getStartDate().format('U'),
-//						end_time : this.eventDialog.getEndDate().format('U')
-//					},
-//					success:function(response, options, result){
-//						this.addParticipants(result);
-//					},
-//					scope:this
-//				});	
-//			}
-//			combo.reset();
-//		}, this);
-//
-//		this.selectContactPanel = new Ext.Panel({
-//			border : true,
-//			region:'north',
-//			autoHeight: true,
-//			cls:'go-form-panel',
-//			layout:'form',
-//			items:[this.selectContact]
-//		});
-//	}
+	if(go.Modules.isAvailable("legacy", "addressbook")){
+		this.selectContact = new GO.addressbook.SelectContact ({
+			name: 'quick_add_contact',
+			anchor: '100%',
+			fieldLabel:t("Add"),
+			remoteSort: true,
+			requireEmail:true
+		});
+
+		this.selectContact.on('select', function(combo, record)
+		{
+			if(record.data.go_user_id){
+				GO.request({
+						url:"calendar/participant/getUsers",
+						params:{
+							users: Ext.encode([record.data.go_user_id]),
+							start_time : this.eventDialog.getStartDate().format('U'),
+							end_time : this.eventDialog.getEndDate().format('U')
+						},
+						success:function(response, options, result){
+							this.addParticipants(result);
+						},
+						scope:this
+					});					
+			}else
+			{
+				GO.request({
+					url:"calendar/participant/getContacts",
+					params:{
+						contacts: Ext.encode([record.data.id]),
+						start_time : this.eventDialog.getStartDate().format('U'),
+						end_time : this.eventDialog.getEndDate().format('U')
+					},
+					success:function(response, options, result){
+						this.addParticipants(result);
+					},
+					scope:this
+				});	
+			}
+			combo.reset();
+		}, this);
+
+		this.selectContactPanel = new Ext.Panel({
+			border : true,
+			region:'north',
+			autoHeight: true,
+			cls:'go-form-panel',
+			layout:'form',
+			items:[this.selectContact]
+		});
+	}
 	
 	this.gridPanel = new GO.grid.GridPanel(
 	{
@@ -259,8 +219,8 @@ GO.calendar.ParticipantsPanel = function(eventDialog, config) {
 		title : t("Participants", "calendar"),
 		border : false,
 		tbar:tbar,
-		layout : 'fit',
-		items: [this.gridPanel]
+		layout : GO.addressbook ? 'border' : 'fit',
+		items: GO.addressbook ? [this.selectContactPanel, this.gridPanel] : [this.gridPanel]
 	});
 
 	config.store.setDefaultSort('name', 'ASC');
@@ -343,169 +303,106 @@ Ext.extend(GO.calendar.ParticipantsPanel, Ext.Panel, {
 			}));
 			return false;
 		}*/
-		
-		var select = new go.util.SelectDialog ({
-			scope: this,
-			entities: ["Contact", "User"],
-			selectSingleEmail: function(name, email, id, entityName) {
-
-				switch(entityName) {
-					case "User":
-							GO.request({
-								url:"calendar/participant/getUsers",
-								params:{
-									users: Ext.encode([id]),
-									start_time : this.eventDialog.getStartDate().format('U'),
-									end_time : this.eventDialog.getEndDate().format('U')
-								},
-								success:function(response, options, result){
-									this.addParticipants(result);
-								},
-								scope:this
-							});					
-					break;
-
-					case "Contact":
-							GO.request({
-								url:"calendar/participant/getContacts",
-								params:{
-									contacts: Ext.encode([{entityId: id, name: name, email: email}]),
-									start_time : this.eventDialog.getStartDate().format('U'),
-									end_time : this.eventDialog.getEndDate().format('U')
-								},
-								success:function(response, options, result){
-									this.addParticipants(result);
-								},
-								scope:this
-							});	
-					break;
-				}
+		if (!this.addParticipantsDialog) {
+			this.addParticipantsDialog = new GO.dialog.SelectEmail({
+				handler : function(grid, type) {
 				
-			},
-			selectMultiple: function(ids, entityName) {
-				switch(entityName) {
-					case "User":
-							GO.request({
-								url:"calendar/participant/getUsers",
-								params:{
-									users: Ext.encode(ids),
-									start_time : this.eventDialog.getStartDate().format('U'),
-									end_time : this.eventDialog.getEndDate().format('U')
-								},
-								success:function(response, options, result){
-									this.addParticipants(result);
-								},
-								scope:this
-							});			
-					break;
+					if (grid.selModel.selections.keys.length > 0) {
 
-					case "Contact":
-						GO.request({
-							url:"calendar/participant/getContacts",
-							params:{
-								contacts: Ext.encode(ids.map(function(id){return {entityId: id};})),
-								start_time : this.eventDialog.getStartDate().format('U'),
-								end_time : this.eventDialog.getEndDate().format('U')
-							},
-							success:function(response, options, result){
-								this.addParticipants(result);
-							},
-							scope:this
-						});		
-						break;
+						var selections = grid.selModel.getSelections();			
+						
+						var ids=[];
+						for (var i=0; i<selections.length; i++) {
+							ids.push(selections[i].data.id);
+						}
+						switch(type){
+							
+							case 'users':								
+								
+
+								GO.request({
+									url:"calendar/participant/getUsers",
+									params:{
+										users: Ext.encode(ids),
+										start_time : this.eventDialog.getStartDate().format('U'),
+										end_time : this.eventDialog.getEndDate().format('U')
+									},
+									success:function(response, options, result){
+										this.addParticipants(result);
+									},
+									scope:this
+								});								
+							break;
+							
+							case 'contacts':
+								GO.request({
+									url:"calendar/participant/getContacts",
+									params:{
+										contacts: Ext.encode(ids),
+										start_time : this.eventDialog.getStartDate().format('U'),
+										end_time : this.eventDialog.getEndDate().format('U')
+									},
+									success:function(response, options, result){
+										this.addParticipants(result);
+									},
+									scope:this
+								});	
+								break;
+								
+							case 'companies':
+								GO.request({
+									url:"calendar/participant/getCompanies",
+									params:{
+										companies: Ext.encode(ids),
+										start_time : this.eventDialog.getStartDate().format('U'),
+										end_time : this.eventDialog.getEndDate().format('U')
+									},
+									success:function(response, options, result){
+										this.addParticipants(result);
+									},
+									scope:this
+								});	
+								break;
+								
+							case 'mailings':
+								GO.request({
+									url:"calendar/participant/getAddresslists",
+									params:{
+										addresslists: Ext.encode(ids),
+										start_time : this.eventDialog.getStartDate().format('U'),
+										end_time : this.eventDialog.getEndDate().format('U')
+									},
+									success:function(response, options, result){
+										this.addParticipants(result);
+									},
+									scope:this
+								});	
+								break;							
+								
+							case 'usergroups':
+								GO.request({
+									url:"calendar/participant/getUserGroups",
+									params:{
+										groups: Ext.encode(ids),
+										start_time : this.eventDialog.getStartDate().format('U'),
+										end_time : this.eventDialog.getEndDate().format('U')
+									},
+									success:function(response, options, result){
+										this.addParticipants(result);
+									},
+									scope:this
+								});				
+								
+								break;
+							
+						}
+					
 					}
-			}
-		});
-		select.show();
-					
-					
-//		if (!this.addParticipantsDialog) {
-//			this.addParticipantsDialog = new GO.dialog.SelectEmail({
-//				handler : function(grid, type) {
-//				
-//					if (grid.selModel.selections.keys.length > 0) {
-//
-//						var selections = grid.selModel.getSelections();			
-//						
-//						var ids=[];
-//						for (var i=0; i<selections.length; i++) {
-//							ids.push(selections[i].data.id);
-//						}
-//						switch(type){
-//							
-//							case 'users':								
-//								
-//
-//								GO.request({
-//									url:"calendar/participant/getUsers",
-//									params:{
-//										users: Ext.encode(ids),
-//										start_time : this.eventDialog.getStartDate().format('U'),
-//										end_time : this.eventDialog.getEndDate().format('U')
-//									},
-//									success:function(response, options, result){
-//										this.addParticipants(result);
-//									},
-//									scope:this
-//								});								
-//							break;
-//							
-//							case 'contacts':
-//								GO.request({
-//									url:"calendar/participant/getContacts",
-//									params:{
-//										contacts: Ext.encode(ids),
-//										start_time : this.eventDialog.getStartDate().format('U'),
-//										end_time : this.eventDialog.getEndDate().format('U')
-//									},
-//									success:function(response, options, result){
-//										this.addParticipants(result);
-//									},
-//									scope:this
-//								});	
-//								break;
-//								
-//							case 'companies':
-//								GO.request({
-//									url:"calendar/participant/getCompanies",
-//									params:{
-//										companies: Ext.encode(selections.map(function(r){return r.data})),
-//										start_time : this.eventDialog.getStartDate().format('U'),
-//										end_time : this.eventDialog.getEndDate().format('U')
-//									},
-//									success:function(response, options, result){
-//										this.addParticipants(result);
-//									},
-//									scope:this
-//								});	
-//								break;
-//								
-//					
-//								
-//							case 'usergroups':
-//								GO.request({
-//									url:"calendar/participant/getUserGroups",
-//									params:{
-//										groups: Ext.encode(ids),
-//										start_time : this.eventDialog.getStartDate().format('U'),
-//										end_time : this.eventDialog.getEndDate().format('U')
-//									},
-//									success:function(response, options, result){
-//										this.addParticipants(result);
-//									},
-//									scope:this
-//								});				
-//								
-//								break;
-//							
-//						}
-//					
-//					}
-//				},
-//				scope : this
-//			});
-//		}
-//		this.addParticipantsDialog.show();
+				},
+				scope : this
+			});
+		}
+		this.addParticipantsDialog.show();
 	},
 	
 	

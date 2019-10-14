@@ -7,13 +7,9 @@
  *
  * If you have questions write an e-mail to info@intermesh.nl
  */
-
 namespace GO\Sync\Model;
 
 use go\core\orm\Property;
-use GO\Base\Model\User as GOUser;
-use go\core\model\User;
-
 /**
  * The Settings model
  *
@@ -24,8 +20,7 @@ use go\core\model\User;
  *
  * @property int $user_id
  */
-class UserSettings extends Property
-{
+class UserSettings extends Property {
 
 	public $user_id;
 	/**
@@ -34,45 +29,8 @@ class UserSettings extends Property
 	 */
 	public $account_id;
 
-	public $noteBooks = [];
-
-	public $addressBooks = [];
-
-	protected static function defineMapping()
-	{
-		return parent::defineMapping()
-			->addTable("sync_settings", "syncs")
-			->addArray('noteBooks', UserNoteBook::class, ['user_id' => 'userId'])
-			->addArray('addressBooks', UserAddressBook::class, ['user_id' => 'userId']);
+	protected static function defineMapping() {
+		return parent::defineMapping()->addTable("sync_settings", "syncs");
 	}
 
-
-	protected function setup() {
-		if (empty($this->addressBooks) || empty($this->noteBooks)) {
-			$user = User::findById($this->user_id, ['addressBookSettings', 'notesSettings']);
-
-			if (empty($this->addressBooks)) {
-				if (isset($user->addressBookSettings) && ($addressBookId = $user->addressBookSettings->getDefaultAddressBookId())) {
-					$this->addressBooks[] = (new UserAddressBook())->setValues(['addressBookId' => $addressBookId, 'isDefault' => true]);
-				}
-			}
-
-			if (empty($this->noteBooks)) {
-				if (isset($user->notesSettings) && ($noteBookId = $user->notesSettings->getDefaultNoteBookId())) {
-					$this->noteBooks[] = (new UserNoteBook())->setValues(['noteBookId' => $noteBookId, 'isDefault' => true]);
-				}
-			}
-
-			if ($user->isModified()) {
-				$user->save();
-			}
-		}
-	}
-
-	public function toArray($properties = [])
-	{
-		$this->setup();
-
-		return parent::toArray($properties);
-	}
 }

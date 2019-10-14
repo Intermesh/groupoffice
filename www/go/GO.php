@@ -276,8 +276,11 @@ class GO{
 		if($dbport===false)
 			$dbport=\GO::config()->db_port;
 		
+
+		\GO::debug("Connect: mysql:host=$dbhost;dbname=$dbname, $dbuser, ***",$options);
+
 		
-		self::$db = go()->getDbConnection()->getPDO();//new \GO\Base\Db\PDO("mysql:host=$dbhost;dbname=$dbname;port=$dbport", $dbuser, $dbpass, $options);
+		self::$db = GO()->getDbConnection()->getPDO();//new \GO\Base\Db\PDO("mysql:host=$dbhost;dbname=$dbname;port=$dbport", $dbuser, $dbpass, $options);
 	}
 
 	/**
@@ -337,7 +340,7 @@ class GO{
 	/**
 	 * Get the logged in user
 	 *
-	 * @return \GO\Base\Model\User The logged in user model
+	 * @return \GO\Base\Model_User The logged in user model
 	 */
 	public static function user(){
 		return self::session()->user();
@@ -622,7 +625,7 @@ class GO{
 		
 		date_default_timezone_set(\GO::user() ? \GO::user()->timezone : \GO::config()->default_timezone);
 		
-		setlocale(LC_CTYPE, go()->getSettings()->getLocale());
+		setlocale(LC_CTYPE, GO()->getSettings()->getLocale());
 		
 //		}else{
 //			//for escape shell arg
@@ -931,7 +934,7 @@ class GO{
 	 */
 	public static function debug($text, $config=false) {
 		
-		return go()->debug($text, 1);
+		return GO()->debug($text, 'general', 1);
 
 		if (   self::config()->debug
 			|| self::config()->debug_log

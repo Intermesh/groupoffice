@@ -31,6 +31,7 @@
  * @property int/array $pk Primary key value(s) for the model
  * @property string $module Name of the module this model belongs to
  * @property boolean $isNew Is the model new and not inserted in the database yet.
+ * @property \GO\Customfields\Model\AbstractCustomFieldsRecord $customfieldsRecord The custom fields model with all custom attributes.
  * @property String $localizedName The localized human friendly name of this model.
  * @property int $permissionLevel @see \GO\Base\Model\Acl for available levels. Returns -1 if no aclField() is set in the model.
  *
@@ -42,7 +43,7 @@ namespace GO\Base\Db;
 
 use GO\Base\Db\PDO;
 use GO;
-use go\core\util\DateTime;
+
 
 abstract class ActiveRecord extends \GO\Base\Model{
 
@@ -152,6 +153,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	private static $_addedRelations=array();
 
 
+	private $_customfieldsRecord;
 
 	/**
 	 *
@@ -189,7 +191,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * For compatibility with new framework
 	 * @return type
 	 */
-	public static function entityType() {
+	public static function getType() {
 		return \go\core\orm\EntityType::findByClassName(static::class);
 	}
 
@@ -393,6 +395,14 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 	/**
+	 * Set to a model to enabled custom fields. A relation customfieldsRecord will be
+	 * created automatically and saving and deleting custom fields will be handled.
+	 *
+	 * @return bool
+	 */
+	public function customfieldsModel(){return false;}
+
+	/**
 	 *
 	 * @return boolean Call $model->isJoinedAclField to check if the aclfield is joined.
 	 */
@@ -413,14 +423,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 		foreach($record as $r){
-			if(get_class($r) != get_class($this)) {
-				return false;
-			}
-			
-			if($this->tableName()===$r->tableName() && $this->getPk()===$r->getPk())
-			{
-				return true;
-			}
+		   if($this->tableName()===$r->tableName() && $this->getPk()===$r->getPk())
+			 {
+				 return true;
+			 }
 		}
 		return false;
 	}
@@ -444,6 +450,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * 'unique'=>false //true|array to enforce a unique value value can me array of related attributes
 	 * 'greater'=>'start_time' //this column must be greater than column start time
 	 * 'greaterorequal'=>'start_time' //this column must be greater or equal to column start time
+	 * 'customfield'=> 'If this is a custom field this is the custom field model \GO\Customfields\Model\Field
 	 * The validator looks like this:
 	 *
 	 * function validate ($value){
@@ -1274,13 +1281,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 //		$select .= "SQL_NO_CACHE ";
-		
-		
 
 		if(empty($params['fields']))
 			$params['fields']=$this->getDefaultFindSelectFields(isset($params['limit']) && $params['limit']==1);
-		else
-			go()->debug($params['fields']);
 
 
 		$fields = $params['fields'].' ';
@@ -1349,24 +1352,15 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 		}
 
-		
-		$joinCf = !empty($params['joinCustomFields']) && $this->hasCustomFields();
+		$joinCf = !empty($params['joinCustomFields']) && $this->customfieldsModel();
 
-		if($joinCf) {
-			$cfFieldModels = array_filter(static::getCustomFieldModels(), function($f) {
-				return $f->getDataType()->hasColumn();
-			});
-			
-			$names = array_map(function($f) {
-				if(empty($f->databaseName)) {
-					throw new Exception("Custom field ". $f->id ." has no databaseName");
-				}
-				return "cf." . $f->databaseName;
-			}, $cfFieldModels);
-			
-			if(!empty($names)) {
-				$fields .= ", " .implode(', ', $names);
-			}
+		if($joinCf){
+
+			$cfModel = GO::getModel($this->customfieldsModel());
+
+			$selectFields = $cfModel->getDefaultFindSelectFields(isset($params['limit']) && $params['limit']==1, 'cf');
+			if(!empty($selectFields))
+				$fields .= ", ".$selectFields;
 		}
 
 		$fields .= $joinRelationSelectFields;
@@ -1391,7 +1385,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 
 		if($joinCf)
-			$joins .= "\nLEFT JOIN `".$this->customFieldsTableName()."` cf ON cf.id=t.id ";
+			$joins .= "\nLEFT JOIN `".$cfModel->tableName()."` cf ON cf.".$cfModel->primaryKey()."=t.id ";
 
 		if(isset($aclJoinProps) && empty($params['ignoreAcl']))
 			$joins .= $this->_appendAclJoin($params, $aclJoinProps);
@@ -1684,10 +1678,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
     return $AS;
 	}
 
-	public function hasCustomFields() {
-		return method_exists($this, 'customFieldsTableName');
-	}
-	
 	private function _debugSql($params, $sql){
 		
 		
@@ -1819,10 +1809,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 		}
 
-//		if($withCustomFields && GO::modules()->customfields && $this->customfieldsRecord  && GO::modules()->customfields->permissionLevel)
-//		{
-//			$fields = array_merge($fields, $this->customfieldsRecord->getFindSearchQueryParamFields('cf'));
-//		}
+		if($withCustomFields && GO::modules()->customfields && $this->customfieldsRecord  && GO::modules()->customfields->permissionLevel)
+		{
+			$fields = array_merge($fields, $this->customfieldsRecord->getFindSearchQueryParamFields('cf'));
+		}
 		return $fields;
 	}
 
@@ -1976,13 +1966,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		
 		
 //\GO::debug($cfMod);
-//		if($this->customfieldsModel()){
-//			$r['customfields']=array(
-//					'type'=>self::BELONGS_TO,
-//					'model'=>$this->customfieldsModel(),
-//					'field'=>'id'
-//					);
-//		}
+		if($this->customfieldsModel()){
+			$r['customfields']=array(
+					'type'=>self::BELONGS_TO,
+					'model'=>$this->customfieldsModel(),
+					'field'=>'id'
+					);
+		}
 
 		return $r;
 	}
@@ -2297,7 +2287,16 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 	public function formatAttribute($attributeName, $value, $html=false){
 		if(!isset($this->columns[$attributeName]['gotype'])){
-			return $value;			
+			
+			//TODO
+			if($this->customfieldsModel() && substr($attributeName,0,4)=='col_'){
+				//if it's a custom field then we create a dummy customfields model.
+				$cfModel = $this->_createCustomFieldsRecordFromAttributes();
+			//	debug_print_backtrace();
+				return $cfModel->formatAttribute($attributeName, $value, $html);
+			}else	{
+				return $value;
+			}
 		}
 
 		switch($this->columns[$attributeName]['gotype']){
@@ -2378,6 +2377,20 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 	}
 
+
+	private function _extractCustomfieldValues($attributes){
+		$v = [];
+		foreach($attributes as $key=>$value)
+		{
+			if(substr($key,0,13)=='customFields_' || substr($key,0,13)=='customFields.'){
+				$v[substr($key,13)] = $attributes[$key];
+				unset($attributes[$key]);
+			}
+		}
+		return $v;
+	}
+	
+	
 	/**
 	 * This function is used to set attributes of this model from a controller.
 	 * Input may be in regional format and the model will translate it to the
@@ -2398,7 +2411,12 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if(!isset($format)){
 			$format = ActiveRecord::$formatAttributesByDefault;
 		}
-		
+
+		//GO::debug($this->className().'::setAttributes(); '.$this->pk);
+		$v = $this->_extractCustomfieldValues($attributes);
+		if(!empty($v) && $this->customfieldsRecord)
+			$this->customfieldsRecord->setAttributes($v, $format);
+			
 		if($format)
 			$attributes = $this->formatInputValues($attributes);
 
@@ -2462,6 +2480,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				$att[$attName]=$this->getAttribute($attName, $outputType);
 			}elseif($this->hasAttribute($attName)){
 				$att[$attName]=$this->$attName;
+			}elseif($this->customfieldsRecord)
+			{
+				$att[$attName]=$this->customfieldsRecord->getAttribute($attName, $outputType);
 			}else
 			{
 				$att[$attName]=null;
@@ -2548,10 +2569,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			return true;
 
 		return $this->getPermissionLevel()>=$level;
-	}
-
-	public function hasPermissionLevel($level) {
-		return $this->checkPermissionLevel($level);
 	}
 
 	/**
@@ -2803,6 +2820,23 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 	}
 
+	/**
+	 * Return all validation errors of this model
+	 *
+	 * @return array
+	 */
+	public function getValidationErrors(){
+
+		$validationErrors = parent::getValidationErrors();
+		if($this->_customfieldsRecord){
+			$validationErrors = array_merge($validationErrors, $this->_customfieldsRecord->getValidationErrors());
+		}
+
+		return $validationErrors;
+	}
+
+
+
 
 //	public function getFilesFolder(){
 //		if(!$this->hasFiles())
@@ -3015,7 +3049,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 		//use private customfields record so it's accessed only when accessed before
-		if(!$this->validate()){
+		if(!$this->validate() || (isset($this->_customfieldsRecord) && !$this->_customfieldsRecord->validate())){
 			return false;
 		}
 
@@ -3025,7 +3059,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		*/
 //GO::debug($this->mtime);
 
-		if($this->dbUpdateRequired()){
+		if($this->dbUpdateRequired() || ($this->_customfieldsRecord && $this->_customfieldsRecord->isModified())){
 			if(isset($this->columns['mtime']) && (!$this->isModified('mtime') || empty($this->mtime)))//Don't update if mtime was manually set.
 				$this->mtime=time();
 			if(isset($this->columns['ctime']) && empty($this->ctime)){
@@ -3082,8 +3116,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 					$acl = new \GO\Base\Model\Acl();
 					$acl->usedIn=$this->tableName().'.'.$this->aclOverwrite();
 					$acl->ownedBy=$oldAcl->ownedBy;
-					$acl->entityTypeId = $this->entityType()->getId();
-					$acl->entityId = $this->id;
 					$acl->save();
 					
 					$oldAcl->copyPermissions($acl);
@@ -3107,16 +3139,16 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 			//automatically set sort order column
 			if($this->getSortOrderColumn())
-				$this->{$this->getSortOrderColumn()}=$this->nextSortOrder();
+				$this->{$this->getSortOrderColumn()}=$this->count();
 
 			$wasNew=true;
 
 			if($this->aclField() && !$this->isJoinedAclField && empty($this->{$this->aclField()})){
 				//generate acl id
 				if(!empty($this->user_id))
-					$newAcl = $this->setNewAcl($this->user_id);
+					$this->setNewAcl($this->user_id);
 				else
-					$newAcl = $this->setNewAcl(GO::user() ? GO::user()->id : 1);
+					$this->setNewAcl(GO::user() ? GO::user()->id : 1);
 			}
 
 			
@@ -3132,11 +3164,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 			$this->_dbInsert();
 			$lastInsertId = $this->getDbConnection()->lastInsertId();
-
-			if(isset($newAcl)) {
-				$newAcl->entityId = $lastInsertId;
-				$newAcl->save();
-			}
 			
 			if(!is_array($this->primaryKey())){				
 				if(empty($this->{$this->primaryKey()})){
@@ -3159,6 +3186,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 
 			$this->setIsNew(false);		
+			//make sure custom field record is created on new records
+			$this->getCustomfieldsRecord();
 
 			$changed  = $this->_processFileColumns($fileColumns);
 			if($changed || $this->afterDbInsert() || $this->isModified('files_folder_id')){
@@ -3194,13 +3223,31 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				return false;
 		}
 
-		//TODO modified custom fields attr?
-		
-		$this->log($wasNew ? \GO\Log\Model\Log::ACTION_ADD : \GO\Log\Model\Log::ACTION_UPDATE,true, false);
+		//use private customfields record so it's accessed only when accessed before
 
-		if($this->hasCustomFields() && !$this->saveCustomFields()) {
-			return false;
+
+
+		if (isset($this->_customfieldsRecord)){
+			//id is not set if this is a new record so we make sure it's set here.
+			$this->_customfieldsRecord->{$this->_customfieldsRecord->primaryKey()}=$this->id;
+
+			//check if other fields than model_id were modified.
+			$modified = $this->_customfieldsRecord->getModifiedAttributes();
+			unset($modified['model_id']);
+			
+			if(count($modified) || $this->_customfieldsRecord->isNew) {
+				if(!$this->_customfieldsRecord->save()) {
+					throw new \Exception("Could not save custom fields ". var_export($this->_customfieldsRecord->getValidationErrors(), true));
+				}
+			}
+
+//			if($this->customfieldsRecord->save())
+//				$this->touch(); // If the customfieldsRecord is saved then set the mtime of this record.
 		}
+
+		$this->log($wasNew ? \GO\Log\Model\Log::ACTION_ADD : \GO\Log\Model\Log::ACTION_UPDATE,true,isset($this->_customfieldsRecord) ? $modified : false);
+
+
 
 		if(!$this->afterSave($wasNew)){
 			GO::debug("WARNING: ".$this->className()."::afterSave returned false or no value");
@@ -3222,10 +3269,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$this->_modifiedAttributes = array();
 
 		return true;
-	}
-	
-	protected function nextSortOrder() {
-		return $this->count();
 	}
 	
 	protected function checkModelFolder() {
@@ -3304,27 +3347,27 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				}
 				
 				// Also track customfieldsrecord changes
-//				if($this->customfieldsRecord && $modifiedCustomfieldAttrs){
-//										
-//					foreach($modifiedCustomfieldAttrs as  $key=>$oldVal){
-//						$newVal = $this->customfieldsRecord->getAttribute($key);
-//						if(empty($newVal) && empty($oldVal)){
-//						continue;
-//					}
-//
-//					if(strlen($newVal) > $cutoffLength){
-//						$newVal = substr($newVal,0,$cutoffLength).$cutoffString;
-//					}
-//					
-//					if(strlen($oldVal) > $cutoffLength){
-//						$oldVal = substr($oldVal,0,$cutoffLength).$cutoffString;
-//					}
-//					
-//					$attrLabel = $this->getCustomfieldsRecord()->getAttributeLabelWithoutCategoryName($key);
-//					
-//					$modifications[$attrLabel.' ('.$key.')']=array($oldVal,$newVal);	
-//					}
-//				}
+				if($this->customfieldsRecord && $modifiedCustomfieldAttrs){
+										
+					foreach($modifiedCustomfieldAttrs as  $key=>$oldVal){
+						$newVal = $this->customfieldsRecord->getAttribute($key);
+						if(empty($newVal) && empty($oldVal)){
+						continue;
+					}
+
+					if(strlen($newVal) > $cutoffLength){
+						$newVal = substr($newVal,0,$cutoffLength).$cutoffString;
+					}
+					
+					if(strlen($oldVal) > $cutoffLength){
+						$oldVal = substr($oldVal,0,$cutoffLength).$cutoffString;
+					}
+					
+					$attrLabel = $this->getCustomfieldsRecord()->getAttributeLabelWithoutCategoryName($key);
+					
+					$modifications[$attrLabel.' ('.$key.')']=array($oldVal,$newVal);	
+					}
+				}
 				
 				
 				return $modifications;
@@ -3472,8 +3515,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$acl = new \GO\Base\Model\Acl();
 		$acl->usedIn = $this->tableName().'.'.$this->aclField();
 		$acl->ownedBy=$user_id;
-		$acl->entityTypeId = $this->entityType()->getId();
-		$acl->entityId = $this->id;
 		if(!$acl->save()) {
 			throw new \Exception("Could not save ACL: ".var_export($this->getValidationErrors(), true));
 		}
@@ -3567,31 +3608,30 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			return false;
 		}
 		
-		$search = \go\core\model\Search::find()->where('entityTypeId','=', static::entityType()->getId())->andWhere('entityId', '=', $this->id)->single();
+		$search = \go\modules\core\search\model\Search::find()->where('entityTypeId','=', static::getType()->getId())->andWhere('entityId', '=', $this->id)->single();
 		if(!$search) {
-			$search = new \go\core\model\Search();
-			$search->setEntity(static::entityType());
+			$search = new \go\modules\core\search\model\Search();
+			$search->setEntity(static::getType());
+		}
+		// GO 6.3 backwards compatible
+		if(!empty($attr['mtime'])) {
+			$attr['modifiedAt'] = '@'.$attr['mtime'];			
 		}
 		
-		if(isset($attr['mtime'])) {
-			$attr['modifiedAt'] = \DateTime::createFromFormat("U", $attr['mtime']);
-			unset($attr['mtime']);
-		} else {
-			$attr['modifiedAt'] = \DateTime::createFromFormat("U", $this->mtime);
-		}
+		unset($attr['mtime']);
 
 		// Always unset ctime, we don't use it anymore in the searchcache table
 		unset($attr['ctime']);
-		unset($attr['type']);
 
 		if(!isset($attr['description'])) {
 			$attr['description'] = '';
-		}		
+		}
+		// end GO 6.3 compat
 		$search->setValues($attr);
-		unset($attr['modifiedAt']);
 		
 		$search->entityId = $this->id;
-		$search->setAclId(!empty($attr['acl_id']) ? $attr['acl_id'] : $this->findAclId());			
+		$search->setAclId(!empty($attr['acl_id']) ? $attr['acl_id'] : $this->findAclId());
+		$search->modifiedAt = \DateTime::createFromFormat("U", $this->mtime);	
 		//$search->createdAt = \DateTime::createFromFormat("U", $this->mtime);		
 		$search->setKeywords($this->getSearchCacheKeywords($this->localizedName.','.implode(',', $attr)));
 		
@@ -3731,19 +3771,14 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 		}
 
-		if($this->hasCustomFields()) {
-			foreach($this->getCustomFields() as $col => $v) {
-				if(!empty($v) && is_string($v)) {
-					$keywords[] = $v;
-				}
-			}
-		}
+
+
 
 		$keywords = $prepend.','.implode(',',$keywords);
 
-//		if($this->customfieldsRecord){
-//			$keywords .= ','.$this->customfieldsRecord->getSearchCacheKeywords();
-//		}
+		if($this->customfieldsRecord){
+			$keywords .= ','.$this->customfieldsRecord->getSearchCacheKeywords();
+		}
 		
 		// Remove duplicate and empty entries
 		$arr = explode(',', $keywords);
@@ -3844,23 +3879,22 @@ abstract class ActiveRecord extends \GO\Base\Model{
 //		}
 //
 		$i = 0;
-		$paramMap = [];		
-		$bindParams=array();
+		$paramMap = [];
 		foreach($this->_modifiedAttributes as $field=>$oldValue) {
-			$i++;
-			$tag = ":upd".$i;
-			$bindParams[$tag]=$field;
+			$p[$field] = "upd".$i;
+			$updates[] = "`$field` = :".$p[$field];
 			
-			$updates[] = "`$field` = ".$tag;
-
 			$i++;
 		}
+
 
 		if(!count($updates))
 			return true;
 
 		$sql = "UPDATE `{$this->tableName()}` SET ".implode(',',$updates)." WHERE ";
 
+
+		$bindParams=array();
 
 		$pk = $this->primaryKey();
 		if(!is_array($pk)){
@@ -3874,22 +3908,29 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			else
 				$first=false;
 			
-			$i++;
-			$tag = ":upd".$i;
-			$bindParams[$tag]=$field;
-			$sql .= "`".$field."` = ".$tag;
-			
+			if(!isset($p[$field])) {
+				$p[$field] = "upd".$i;
+				$i++;
+			}
+
+			$sql .= "`".$field."`=:".$p[$field];
 		}
+
+		$bindParams[$field]=$this->_attributes[$field];
+
 
 
 		try{
 			$stmt = $this->getDbConnection()->prepare($sql);
 
-			//$pks = is_array($this->primaryKey()) ? $this->primaryKey() : array($this->primaryKey());
+			$pks = is_array($this->primaryKey()) ? $this->primaryKey() : array($this->primaryKey());
 
-			foreach($bindParams as $tag => $field){
-				$attr = $this->getColumn($field);
-				$stmt->bindParam($tag, $this->_attributes[$field], $attr['type'], empty($attr['length']) ? null : $attr['length']);
+			foreach($this->columns as $field => $attr){
+
+				if($this->isModified($field) || in_array($field, $pks)){
+					$bindParams[$field]=$this->_attributes[$field];
+					$stmt->bindParam(':'.$p[$field], $this->_attributes[$field], $attr['type'], empty($attr['length']) ? null : $attr['length']);
+				}
 			}
 
 			if($this->_debugSql)
@@ -3903,7 +3944,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$msg = $e->getMessage();
 
 			if(GO::config()->debug){
-				$msg .= "\n\nFull SQL Query: ".$sql."\n\nParams:\n".var_export($bindParams, true);
+				$msg .= "\n\nFull SQL Query: ".$sql."\n\nParams:\n".var_export($this->_attributes, true);
 
 				$msg .= "\n\n".$e->getTraceAsString();
 
@@ -4062,7 +4103,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$attr = $this->getCacheAttributes();
 
 		if($attr){
-			$model = \go\core\model\Search::find()->where(['entityId' => $this->pk, 'entityTypeId'=>$this->modelTypeId()])->single();
+			$model = \go\modules\core\search\model\Search::find()->where(['entityId' => $this->pk, 'entityTypeId'=>$this->modelTypeId()])->single();
 //			$model = \GO\Base\Model\SearchCacheRecord::model()->findByPk(array('model_id'=>$this->pk, 'model_type_id'=>$this->modelTypeId()),false,true);
 			if($model)
 				$model->delete();
@@ -4085,6 +4126,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 		}
 
+		if ($this->customfieldsRecord)
+			$this->customfieldsRecord->delete();		
 		
 		$this->_deleteLinks();	
 		
@@ -4184,19 +4227,19 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 	public function resolveAttribute($path, $outputType='raw'){
-		
-		if(substr($path, 0, 13) === 'customFields.') { 
-			$cf = $this->getCustomFields();
-			return $cf[substr($path, 13)] ?? null;
-		}
-		
 		$parts = explode('.', $path);
 
 		$model = $this;
 		if(count($parts)>1){
 			$last = array_pop($parts);
 
-			while($part = array_shift($parts)){				
+			while($part = array_shift($parts)){
+				
+				// Solved when customfields is refactored in GO6.4
+				if($part == 'customFields') {
+					$part = 'customfields';
+				}
+				
 				$model = $model->$part;
 				if(!$model){
 					return null;
@@ -4429,7 +4472,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}else
 		{
 			$to_model_id = $model->id;
-			$to_model_type_id = $model->entityType()->getId();
+			$to_model_type_id = $model->getType()->getId();
 		}
 		
 		
@@ -4502,7 +4545,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}else
 		{
 			$to_model_id = $model->id;
-			$to_model_type_id = $model->entityType()->getId();
+			$to_model_type_id = $model->getType()->getId();
 		}
 		
 		if(!$to_model_id)
@@ -4515,7 +4558,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			"`fromId`=".intval($from_id)." AND fromEntityTypeId=".$from_model_type_id." AND toEntityTypeId=".$to_model_type_id." AND `toId`=".intval($to_model_id);
 		
 		$stmt = $this->getDbConnection()->query($sql);
-		return $stmt->fetchColumn(0);
+		return $stmt->fetch() !== false;
 	}
 //
 //	/**
@@ -4563,7 +4606,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}else
 		{
 			$to_model_id = $model->id;
-			$to_model_type_id = $model->entityType()->getId();
+			$to_model_type_id = $model->getType()->getId();
 		}
 		
 		
@@ -4668,6 +4711,55 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 
 	/**
+	 *
+	 * @return \GO\Customfields\Model\AbstractCustomFieldsRecord
+	 */
+	private function _createCustomFieldsRecordFromAttributes(){
+		$model = $this->customfieldsModel();
+
+		if(!isset($this->_customfieldsRecord)){
+
+			$customattr = $this->_attributes;
+			$customattr['model_id']=$this->id;
+
+			$this->_customfieldsRecord = new $model(false);
+			$this->_customfieldsRecord->setAttributes($customattr,false);
+			$this->_customfieldsRecord->clearModifiedAttributes();
+		}
+
+
+		return $this->_customfieldsRecord;
+	}
+
+	/**
+	 * Returns the customfields record if module is installed and this model
+	 * supports it (See ActiveRecord::customFieldsModel())
+	 *
+	 * @return \GO\Customfields\Model\AbstractCustomFieldsRecord
+	 */
+	public function getCustomfieldsRecord($createIfNotExists=true){
+
+//		GO::debug($this->className().'::getCustomfieldsRecord');
+
+		if($this->customfieldsModel()){
+			if(!isset($this->_customfieldsRecord)){// && !empty($this->pk)){
+				$customFieldModelName=$this->customfieldsModel();
+				$this->_customfieldsRecord = GO::getModel($customFieldModelName)->findByPk($this->pk);
+				if(!$this->_customfieldsRecord){
+					//doesn't exist yet. Return a new one
+					$this->_customfieldsRecord = new $customFieldModelName;
+					$this->_customfieldsRecord->{$customFieldModelName::model()->primaryKey()}=$this->pk;
+					$this->_customfieldsRecord->clearModifiedAttributes();
+				}
+			}
+			return $this->_customfieldsRecord;
+		}else
+		{
+			return false;
+		}
+	}
+
+	/**
 	 * Get's the Acces Control List for this model if it has one.
 	 *
 	 * @return \GO\Base\Model\Acl
@@ -4767,7 +4859,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			
 			echo "Processing ".static::class ."\n";
 			
-			$entityTypeId = static::entityType()->getId();
+			$entityTypeId = static::getType()->getId();
 		
 			$start = 0;
 			$limit = 100;
@@ -4859,8 +4951,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$copy->setNewAcl($user_id);
 		}
 
-		if(!$ignoreCustomFields && $this->hasCustomFields()){
-			$copy->setCustomFields($this->getCustomFields());
+		if(!$ignoreCustomFields && $this->customFieldsRecord){
+			$cfAtt = $this->customFieldsRecord->getAttributes('raw');
+			unset($cfAtt['model_id']);
+			$copy->customFieldsRecord->setAttributes($cfAtt, false);
 		}
 
 		$this->_duplicateFileColumns($copy);
@@ -5156,17 +5250,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public function addComment($text){
 		if(!GO::modules()->isInstalled('comments') || !GO::modules()->isInstalled('comments') && !$this->hasLinks())
-			return false;		
+			return false;
 
-		$comment = new \go\modules\community\comments\model\Comment();
-		$comment->setEntity($this->entityType());
-		$comment->entityId = $this->id;
-		$comment->text=$text;
-		if(!$comment->save()) {			
-			throw new \Exception("Failed to save comment");
-		}
-		
-		return $comment;
+		$comment = new \GO\Comments\Model\Comment();
+		$comment->model_id=$this->id;
+		$comment->model_type_id=$this->modelTypeId();
+		$comment->comments=$text;
+		return $comment->save();
 
 	}
 
@@ -5181,7 +5271,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public function mergeWith(ActiveRecord $model, $mergeAttributes=true, $deleteModel=true){
 
-		if($model->id==$this->id && $this->className()==$model->className())
+		if(!($this instanceof \GO\Customfields\Model\AbstractCustomFieldsRecord) && $model->id==$this->id && $this->className()==$model->className())
 			return false;
 
 		//copy attributes if models are of the same type.
@@ -5210,12 +5300,11 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 				}
 			}
-			
-			if($this->hasCustomFields()) {
-				$this->setCustomFields($model->getCustomFields());
-			}
-			
 			$this->save();
+
+			//copy custom fields
+			if($model->customfieldsRecord)
+				$this->customfieldsRecord->mergeWith($model->customfieldsRecord, $mergeAttributes, $deleteModel);
 		}
 
 		$model->copyLinks($this);

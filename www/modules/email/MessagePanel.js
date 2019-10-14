@@ -24,7 +24,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 		GO.email.MessagePanel.superclass.initComponent.call(this);
 
-
 		this.attachmentContextMenu = new GO.email.AttachmentContextMenu();
 		this.allAttachmentContextMenu = new GO.email.AllAttachmentContextMenu();
 		
@@ -54,7 +53,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 			'<td style="width:70px"><b>'+t("From", "email")+'</b></td>'+
 
-			'<td>: {from} &lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.from, \'ENT_QUOTES\')]}&quot; &lt;{sender}&gt;">{sender}</a>&gt;</td>'+
+			'<td>: {from} &lt;<a onclick="GO.email.showAddressMenu(event, \'{sender}\', \'{[this.addSlashes(values.from)]}\');">{sender}</a>&gt;</td>'+
 //			'<td rowspan="99"><span id="'+this.linkMessageId+'" class="em-contact-link"></span></td>'+
 
 			'</tr>'+
@@ -63,20 +62,20 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			//'<tr><td><b>'+t("Size")+'</b></td><td>: {size}</td></tr>'+
 			'<tr><td><b>'+t("To", "email")+'</b></td><td>: '+
 			'<tpl for="to">'+
-			'{personal} <tpl if="email.length">&lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.personal, \'ENT_QUOTES\')]}&quot; &lt;{email}&gt;">{email}</a>&gt;; </tpl>'+
+			'{personal} <tpl if="email.length">&lt;<a onclick="GO.email.showAddressMenu(event, \'{email}\', \'{[this.addSlashes(values.personal)]}\');">{email}</a>&gt;; </tpl>'+
 			'</tpl>'+
 			'</td></tr>'+
 			'<tpl if="cc.length">'+
 			'<tr><td><b>'+t("CC", "email")+'</b></td><td>: '+
 			'<tpl for="cc">'+
-			'{personal} <tpl if="email.length">&lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.personal, \'ENT_QUOTES\')]}&quot; &lt;{email}&gt;">{email}</a>&gt;; </tpl>'+
+			'{personal} <tpl if="email.length">&lt;<a onclick="GO.email.showAddressMenu(event, \'{email}\', \'{[this.addSlashes(values.personal)]}\');">{email}</a>&gt;; </tpl>'+
 			'</tpl>'+
 			'</td></tr>'+
 			'</tpl>'+
 			'<tpl if="bcc.length">'+
 			'<tr><td><b>'+t("BCC", "email")+'</b></td><td>: '+
 			'<tpl for="bcc">'+
-			'{personal} <tpl if="email.length">&lt;<a href="mailto:&quot;{[GO.util.html_entity_decode(values.personal, \'ENT_QUOTES\')]}&quot; &lt;{email}&gt;">{email}</a>&gt;; </tpl>'+
+			'{personal} <tpl if="email.length">&lt;<a onclick="GO.email.showAddressMenu(event, \'{email}\', \'{[this.addSlashes(values.name)]}\');">{email}</a>&gt;; </tpl>'+
 			'</tpl>'+
 			'</td></tr>'+
 			'</tpl>'+
@@ -85,10 +84,13 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'<tpl if="attachments.length">'+
 			'<div style="clear:both;"></div>'+
 			'<table>'+
-			'<tr><td><h5>'+t("Attachments", "email")+'</h5></td></tr><tr><td id="'+this.attachmentsId+'">'+
+			'<tr><td><b>'+t("Attachments", "email")+':</b></td></tr><tr><td id="'+this.attachmentsId+'">'+
 			'<tpl for="attachments">'+
 				'<tpl if="extension==\'vcf\'">';
-				templateStr += '<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> ';
+				if(go.Modules.isAvailable("legacy", "addressbook"))
+					templateStr += '<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}" onclick="GO.email.readVCard(\'{url}&importVCard=1\');">{name:htmlEncode} ({human_size})</a> ';
+				else
+					templateStr += '<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> ';
 				templateStr += '</tpl>'+
 				'<tpl if="extension!=\'vcf\'">'+
 				'<a class="filetype-link filetype-{extension}" id="'+this.attachmentsId+'_{[xindex-1]}">{name:htmlEncode} ({human_size})</a> '+
@@ -104,24 +106,11 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<i class="icon ic-more-vert" id="downloadAllMenu-'+this.downloadAllMenuId +'"></i>'+
 //				'<a class="filetype-link btn-expand-more" id="downloadAllMenu" ></a>'+
 			'</tpl>'+
-							
-							
-			
 			
 			'</td></tr>'+
 			'</table>'+
-			'</tpl>'+			
+			'</tpl>'+
 			'<div style="clear:both;"></div>'+
-			
-			'<tpl if="links.length">'+
-				'<h5 class="em-links-header">'+t("Links")+'</h5>'+
-				'<div class="em-links">'+
-				'<tpl for="links">'+
-					'<div class="go-icon-list"><p><i class="label entity {[this.linkIconCls(values)]}"></i> <a href="#{entity}/{model_id}">{name}</a> <label>{description}</label></p></div>'+
-				'</tpl>'+
-			'</div></tpl>'+
-			
-			
 			'<tpl if="blocked_images&gt;0">'+
 			'<div class="go-warning-msg em-blocked">'+t("{blocked_images} external images were blocked for your security.", "email")+' <a id="em-unblock-'+this.bodyId+'" class="normal-link">'+t("Click here to unblock them", "email")+'</a></div>'+
 			'</tpl>'+
@@ -187,42 +176,23 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 		templateStr += '<tpl if="values.isInSpamFolder==\'1\';">'+
 				'<div class="message-move">'+
-					t("This message has been identified as spam. Click", "email")+' <a id="em-move-mail-link-'+this.bodyId+'" class="normal-link" style="background-repeat:no-repeat;" onclick="GO.email.moveToInbox(\'{values.uid}\',\'{values.account_id}\');" >'+t("here", "email")+'</a> '+t("if you think this message is NOT spam.", "email")+
+					t("This message has been identified as spam. Click", "email")+' <a id="em-move-mail-link-'+this.bodyId+'" class="normal-link" style="background-repeat:no-repeat;" href="javascript:GO.email.moveToInbox(\'{values.uid}\',\'{values.account_id}\');" >'+t("here", "email")+'</a> '+t("if you think this message is NOT spam.", "email")+
 				'</div>'+
 			'</tpl>'+
 			'<tpl if="values.isInSpamFolder==\'0\';">'+
 				'<div class="message-move">'+
-					t("Click", "email")+' <a id="em-move-mail-link-'+this.bodyId+'" class="normal-link" style="background-repeat:no-repeat;" onclick="GO.email.moveToSpam(\'{values.uid}\',\'{values.mailbox}\',\'{values.account_id}\');" >'+t("here", "email")+'</a> '+t("if you think this message is spam.", "email")+
+					t("Click", "email")+' <a id="em-move-mail-link-'+this.bodyId+'" class="normal-link" style="background-repeat:no-repeat;" href="javascript:GO.email.moveToSpam(\'{values.uid}\',\'{values.mailbox}\',\'{values.account_id}\');" >'+t("here", "email")+'</a> '+t("if you think this message is spam.", "email")+
 				'</div>'+
 			'</tpl>';
 
-		templateStr += '<div id="'+this.bodyId+'" class="message-body go-html-formatted">{htmlbody:raw}'+
+		templateStr += '<div id="'+this.bodyId+'" class="message-body go-html-formatted">{htmlbody}'+
 			'<tpl if="body_truncated">'+
 			'<br /><a href="javascript:GO.email.showMessageDialog({uid},\'{[this.addSlashes(values.mailbox)]}\',{account_id},true);" class="normal-link">'+t("The actual message is larger than can be shown here. Click here to see the entire message.", "email")+'</a>'+
 			'</tpl>'+
 			'</div>';
 
 		this.template = new Ext.XTemplate(templateStr,{
-			defaultFormatFunc : false,
-			linkIconCls : function(link) {				
-				
-				return go.Entities.getLinkIcon(link.entity, link.filter);
-				
-//				var linkConfig = go.Entities.getLinkConfigs().find(function(cfg) {
-//					
-//					if(link.entity != cfg.entity) {
-//						return false;
-//					}
-//					
-//					if(link.filter != cfg.filter) {
-//						return false;
-//					}
-//					
-//					return true;
-//				});
-//				
-//				return linkConfig ? linkConfig.iconCls : "";
-			},
+
 			addSlashes : function(str)
 			{
 				str = GO.util.html_entity_decode(str, 'ENT_QUOTES');
@@ -231,7 +201,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			}
 
 		});
-		
 		this.template.compile();
 	},
 
@@ -303,7 +272,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			fail: function(response, options, result) {
 				Ext.Msg.alert(t("Error"), result.feedback);
 				this.loading=false;
-				this.el.unmask();
 			}
 		});
 	},
@@ -512,8 +480,9 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			}, this);
 		}
 
-		// this.messageBodyEl = Ext.get(this.bodyId);
-		
+		this.messageBodyEl = Ext.get(this.bodyId);
+		this.messageBodyEl.on('click', this.onMessageBodyClick, this);
+		this.messageBodyEl.on('contextmenu', this.onMessageBodyContextMenu, this);
 
 		if(data.attachments.length)
 		{
@@ -569,18 +538,25 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 								scope:this
 							});
 						}else{
-							var me = this;
-
-							Ext.getBody().mask(t("Saving..."));
-							go.Db.store("Link").set({
-								destroy: [this.data.contact_link_id]
-							}).finally(function() {
-								Ext.getBody().unmask();
-								me.reload();
+							GO.request({
+								url:'core/unlink',
+								params:{
+									model_name1:'GO\\Addressbook\\Model\\Contact',
+									id1:this.data.sender_contact_id,
+									model_name2:'GO\\Savemailas\\Model\\LinkedEmail',
+									id2:this.data.contact_linked_message_id
+								},
+								maskEl:Ext.getBody(),
+								success: function(options, response, result) {
+									if (result.success) {
+										this.data.company_linked_message_id = result.linked_email_id;
+									}
+									this.getEl().unmask();
+									this.reload();
+								},
+								scope:this
 							});
-							
 						}
-							
 					}
 				}
 			});
@@ -605,21 +581,18 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 									uid:this.uid,
 									company_id:this.data.sender_company_id
 								},
-								maskEl:Ext.getBody(),
-								success: function(options, response, result) {									
-									this.getEl().unmask();
-									this.reload();
-								},
-								scope: this
+								maskEl:Ext.getBody()
 							});
 						}else{
-							var me = this;
-							Ext.getBody().mask(t("Saving..."));
-							go.Db.store("Link").set({
-								destroy: [this.data.company_link_id]
-							}).finally(function() {
-								Ext.getBody().unmask();
-								me.reload();
+							GO.request({
+								url:'core/unlink',
+								params:{
+									model_name1:'GO\\Addressbook\\Model\\Company',
+									id1:this.data.sender_company_id,
+									model_name2:'GO\\Savemailas\\Model\\LinkedEmail',
+									id2:this.data.company_linked_message_id
+								},
+								maskEl:Ext.getBody()
 							});
 						}
 					}
@@ -659,7 +632,79 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		}
 	},
 
+	launchAddressContextMenu : function(e, href){
+		var queryString = '';
+		var email = '';
+		var indexOf = href.indexOf('?');
+		if(indexOf>-1)
+		{
+			email = href.substr(7, indexOf-7);
+			queryString = href.substr(indexOf+1);
+		}else
+		{
+			email = href.substr(7);
+		}
 
+		e.preventDefault();
+
+		GO.email.addressContextMenu.showAt(e.getXY(), email, '', queryString);
+	},
+
+	onMessageBodyContextMenu :  function(e, target){
+
+		if(target.tagName!='A')
+		{
+			target = Ext.get(target).findParent('A', 10);
+			if(!target)
+				return false;
+		}
+
+		if(target.tagName=='A')
+		{
+			var href=target.attributes['href'].value;
+
+			if(href.substr(0,6)=='mailto')
+			{
+				this.launchAddressContextMenu(e, href);
+			}
+		}
+	},
+
+	onMessageBodyClick :  function(e, target){
+		if(target.tagName!='A')
+		{
+			target = Ext.get(target).findParent('A', 10);
+			if(!target)
+				return false;
+		}
+
+		if(target.tagName=='A')
+		{
+
+			var href=target.attributes['href'].value;
+
+			if(href.substr(0,6)=='mailto')
+			{
+				this.launchAddressContextMenu(e, href);
+			}else if(href.substr(0,3)=='go:')
+			{
+				e.preventDefault();
+
+				var cmd = 'GO.mailFunctions.'+href.substr(3);
+				eval(cmd);
+			}else
+			{
+//				if (target.href && target.href.indexOf('#') != -1 && target.pathname == document.location.pathname){
+//				//internal link, do default
+//
+//				}else
+//				{
+//					e.preventDefault();
+//					this.fireEvent('linkClicked', href);
+//				}
+			}
+		}
+	},
 
 	cal_id:0,
 	status_id:0,

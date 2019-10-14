@@ -69,8 +69,6 @@ class QueryTest extends TestCase {
 
 		$record = $stmt->fetch();
 
-		//Query should return typed data because of PDO::ATTR_EMULATE_PREPARES
-		$this->assertInternalType("int", $record['id']);
 		$this->assertEquals(1, $record['id']);
 
 

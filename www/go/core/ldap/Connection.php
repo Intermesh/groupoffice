@@ -24,7 +24,7 @@ class Connection {
 	 */
 	public function connect($uri) {
 		
-		go()->debug('Connect to '.$uri);
+		GO()->debug('Connect to '.$uri, 'ldap');
 		
 		$this->link = ldap_connect($uri);
 

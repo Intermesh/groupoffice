@@ -51,7 +51,7 @@ class Zip {
 					self::_zipDir($sources[$i], $zip, str_replace($workingFolder->path() . '/', '', $sources[$i]->path()) . '/');
 				} else {
 					$name = str_replace($workingFolder->path() . '/', '', $sources[$i]->path());
-				//$name = @iconv('UTF-8', 'CP850//TRANSLIT//IGNORE', $name);
+					$name = @iconv('UTF-8', 'CP850//TRANSLIT', $name);
 
 					\GO::debug("Add file: ".$sources[$i]->path());
 					$zip->addFile($sources[$i]->path(), $name);
@@ -95,7 +95,8 @@ class Zip {
 			foreach($items as $item){
 				if ($item->isFile()) {
 					$name = $relative_path . $item->name();
-					//$name = @iconv('UTF-8', 'CP850//TRANSLIT//IGNORE', $name);					
+					$name = @iconv('UTF-8', 'CP850//TRANSLIT', $name);
+					
 					
 					\GO::debug("Add file: ".$name);
 					

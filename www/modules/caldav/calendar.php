@@ -84,7 +84,6 @@ $server->addPlugin($caldavPlugin);
 
 // ACL plugin
 $aclPlugin = new Sabre\DAVACL\Plugin();
-$aclPlugin->allowUnauthenticatedAccess = false;
 $server->addPlugin($aclPlugin);
 
 $server->addPlugin(

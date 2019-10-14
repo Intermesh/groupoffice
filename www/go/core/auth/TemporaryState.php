@@ -2,7 +2,7 @@
 namespace go\core\auth;
 
 use go\core\auth\State as AbstractState;
-use go\core\model\User;
+use go\modules\core\users\model\User;
 
 /**
  * TemporaryState class
@@ -34,35 +34,11 @@ class TemporaryState extends AbstractState {
 	
 	public function setUserId($userId) {
 		$this->userId = $userId;
-		if(!isset(\GO::session()->values['user_id']) || \GO::session()->values['user_id'] != $userId) {
-			\GO::session()->runAs($userId);
-			//runas in old framework changes to user timezone.
-			date_default_timezone_set("UTC");
-		}
-		
-		return $this;
 	}
 
 	public function setUser(User $user) {
 		$this->user = $user;
-		return $this->setUserId($user->id);
-	}
-
-	/**
-	 * Check if logged in user is admin
-	 * 
-	 * @return bool
-	 */
-	public function isAdmin() {
-		if($this->userId == User::ID_SUPER_ADMIN) {
-			return true;
-		}
-
-		$user = $this->getUser(['id']);
-		if(!$user) {
-			return false;
-		}
-		return $user->isAdmin();
+		$this->userId = $user->id;
 	}
 }
 

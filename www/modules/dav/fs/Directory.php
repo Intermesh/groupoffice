@@ -287,7 +287,7 @@ class Directory extends \Sabre\DAV\FS\Directory{
 	 */
 	public function getQuotaInfo() {		
 	
-		$user = go()->getAuthState()->getUser();
+		$user = GO()->getAuthState()->getUser();
 		$free = $user->getStorageFreeSpace();
 		
 		return array(

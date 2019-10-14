@@ -1,15 +1,5 @@
-views/Extjs3/javascript/vendor/chartist.js
-views/Extjs3/javascript/vendor/chartist-plugin-zoom.js
-views/Extjs3/javascript/vendor/chartist-plugin-tooltip.js
-views/Extjs3/javascript/vendor/chartist-plugin-threshold.js
-views/Extjs3/javascript/vendor/chartist-plugin-pointlabels.js
-views/Extjs3/javascript/vendor/chartist-plugin-fill-donut.js
-views/Extjs3/javascript/vendor/chartist-plugin-accessibility.js
-views/Extjs3/javascript/vendor/promise-polyfill.js
-views/Extjs3/javascript/vendor/localforage.js
-
-go/core/views/extjs3/go.js
-go/core/views/extjs3/Translate.js
+views/Extjs3/javascript/go/go.js
+views/Extjs3/javascript/go/Translate.js
 
 views/Extjs3/javascript/common.js
 
@@ -35,8 +25,9 @@ views/Extjs3/javascript/buttons/QuickEditButton.js
 
 views/Extjs3/javascript/WeekPicker.js
 
-go/core/views/extjs3/TimeZones.js
+views/Extjs3/javascript/go/TimeZones.js
 
+views/Extjs3/javascript/windows/LoginDialog.js
 
 views/Extjs3/javascript/data/JsonStore.js
 views/Extjs3/javascript/data/GroupingStore.js
@@ -128,6 +119,7 @@ views/Extjs3/javascript/query/QueryPanel.js
 
 views/Extjs3/javascript/query/CriteriaFormPanel.js
 
+views/Extjs3/javascript/windows/UsersInGroup.js
 
 views/Extjs3/javascript/windows/SummaryDialog.js
 views/Extjs3/javascript/windows/TabbedFormDialog.js
@@ -142,9 +134,7 @@ views/Extjs3/javascript/windows/DateDialog.js
 
 
 views/Extjs3/javascript/plupload/DataView-more.js
-views/Extjs3/javascript/plupload/plupload/js/plupload.js
-views/Extjs3/javascript/plupload/plupload/js/plupload.html5.js
-views/Extjs3/javascript/plupload/plupload/js/plupload.html4.js
+views/Extjs3/javascript/plupload/plupload/js/plupload.full.js
 views/Extjs3/javascript/plupload/ext.ux.plupload.js
 
 views/Extjs3/javascript/panels/Ext.ux.tot2ivn.VrTabPanel.js
@@ -206,6 +196,8 @@ views/Extjs3/javascript/treegrid/TreeGridLoader.js
 views/Extjs3/javascript/treegrid/TreeGridNodeUI.js
 views/Extjs3/javascript/treegrid/TreeGridSorter.js
 
+views/Extjs3/javascript/windows/OtherLoginLocationDetectedDialog.js
+
 
 views/Extjs3/javascript/calendar/Calendar.js
 views/Extjs3/javascript/calendar/templates/DayHeaderTemplate.js
@@ -236,3 +228,96 @@ views/Extjs3/javascript/calendar/WeekEventRenderer.js
 
 
 
+views/Extjs3/javascript/go/flux/Dispatcher.js
+views/Extjs3/javascript/go/flux/Store.js
+views/Extjs3/javascript/go/Jmap.js
+
+views/Extjs3/javascript/go/data/JmapProxy.js
+views/Extjs3/javascript/go/data/Store.js
+views/Extjs3/javascript/go/data/GroupingStore.js
+
+views/Extjs3/javascript/go/data/EntityStore.js
+views/Extjs3/javascript/go/EntityManager.js
+views/Extjs3/javascript/go/ModuleManager.js
+
+views/Extjs3/javascript/go/grid/GridTrait.js
+views/Extjs3/javascript/go/grid/GridPanel.js
+views/Extjs3/javascript/go/grid/SelectAllCheckBox.js
+views/Extjs3/javascript/go/grid/DateColumn.js
+
+
+views/Extjs3/javascript/go/Window.js
+views/Extjs3/javascript/go/form/EntityPanel.js
+views/Extjs3/javascript/go/form/Dialog.js
+views/Extjs3/javascript/go/form/FormFieldSet.js
+views/Extjs3/javascript/go/form/PasswordGeneratorField.js
+views/Extjs3/javascript/go/form/BasicForm.js
+views/Extjs3/javascript/go/form/DateField.js
+views/Extjs3/javascript/go/form/FileField.js
+views/Extjs3/javascript/go/form/ComboBox.js
+views/Extjs3/javascript/go/form/multiselect/Field.js
+views/Extjs3/javascript/go/form/multiselect/Window.js
+views/Extjs3/javascript/go/form/GridField.js
+views/Extjs3/javascript/go/form/RadioGroup.js
+views/Extjs3/javascript/go/form/RecurrenceFieldset.js
+
+views/Extjs3/javascript/go/panels/CreateModifyTpl.js
+views/Extjs3/javascript/go/panels/LinksTpl.js
+views/Extjs3/javascript/go/panels/DetailView.js
+views/Extjs3/javascript/go/panels/Panel.js
+views/Extjs3/javascript/go/Toolbar.js
+views/Extjs3/javascript/go/SearchField.js
+views/Extjs3/javascript/go/NavMenu.js
+views/Extjs3/javascript/go/Notifier.js
+
+views/Extjs3/javascript/go/layout/ResponsiveLayout.js
+
+
+views/Extjs3/javascript/go/AuthenticationManager.js
+views/Extjs3/javascript/go/login/LanguageCombobox.js
+views/Extjs3/javascript/go/login/DomainCombo.js
+views/Extjs3/javascript/go/login/LoginDialog.js
+views/Extjs3/javascript/go/login/BaseLoginPanel.js
+views/Extjs3/javascript/go/login/ForgotDialog.js
+views/Extjs3/javascript/go/login/UsernamePanel.js
+views/Extjs3/javascript/go/login/LoginPanel.js
+views/Extjs3/javascript/go/login/RecoveryDialog.js
+
+views/Extjs3/javascript/go/CustomFields.js
+views/Extjs3/javascript/go/Links.js
+views/Extjs3/javascript/go/links/EntityGrid.js
+views/Extjs3/javascript/go/links/LinkGrid.js
+views/Extjs3/javascript/go/links/CreateLinkWindow.js
+views/Extjs3/javascript/go/links/LinkBrowser.js
+views/Extjs3/javascript/go/links/LinksDetailPanel.js
+
+views/Extjs3/javascript/go/usersettings/AccountSettingsPanel.js
+views/Extjs3/javascript/go/usersettings/LookAndFeelPanel.js
+views/Extjs3/javascript/go/usersettings/UserSettingsDialog.js
+
+views/Extjs3/javascript/go/Router.js
+views/Extjs3/javascript/go/PasswordPrompt.js
+
+views/Extjs3/javascript/go/QRCodeComponent.js
+
+views/Extjs3/javascript/go/util.js
+views/Extjs3/javascript/go/util/Format.js
+views/Extjs3/javascript/go/util/Cookies.js
+
+
+views/Extjs3/javascript/go/User.js
+views/Extjs3/javascript/go/String.js
+
+views/Extjs3/javascript/go/detail/ReadMore.js
+views/Extjs3/javascript/go/detail/AddButton.js
+
+views/Extjs3/javascript/go/acl/ShareWindow.js
+
+views/Extjs3/javascript/go/systemsettings/GeneralPanel.js
+views/Extjs3/javascript/go/systemsettings/AppearancePanel.js
+views/Extjs3/javascript/go/systemsettings/NotificationsPanel.js
+views/Extjs3/javascript/go/systemsettings/AuthenticationPanel.js
+views/Extjs3/javascript/go/systemsettings/Dialog.js
+
+views/Extjs3/javascript/go/Wizard.js
+views/Extjs3/javascript/go/Array.js

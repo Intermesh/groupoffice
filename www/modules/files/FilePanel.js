@@ -197,7 +197,7 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 					'</tr>'+
 					
 					'<tr>'+
-						'<td>URL (Authenticated):</td>'+
+						'<td>URL:</td>'+
 						'<td><a target="_blank" href="{url}">'+t("Right click to copy", "files")+'</a></td>'+
 					'</tr>'+
 										
@@ -262,13 +262,11 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 				
 				'</table>';
 
-	
+		this.template +=GO.customfields.displayPanelTemplate;
 		
 		if(go.Modules.isAvailable("legacy", "workflow"))
 			this.template +=GO.workflow.WorkflowTemplate;
 
 		GO.files.FilePanel.superclass.initComponent.call(this);
-		
-		this.add(go.customfields.CustomFields.getDetailPanels("File"));
 	}
 });

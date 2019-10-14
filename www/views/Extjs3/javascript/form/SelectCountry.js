@@ -54,29 +54,18 @@ GO.form.SelectCountry = function(config){
 
 	GO.form.SelectCountry.superclass.constructor.call(this,{
    store: GO.countriesStore,
-	 value: null,
 		valueField: 'iso',
 		displayField: 'name',
 		triggerAction: 'all',
 		editable: true,
-		mode:'local',		
+		mode:'local',
+		selectOnFocus:true,
+		forceSelection: true,
 		emptyText: t("No country selected")
 	});
 
 }
  
-Ext.extend(GO.form.SelectCountry, Ext.form.ComboBox, {
-	selectOnFocus:true,
-	forceSelection: true,
-	getValue: function() {
-		var v = GO.form.SelectCountry.superclass.getValue.call(this);
-		
-		if(GO.util.empty(v)) {
-			return null;
-		}
-		
-		return v;
-	}
-});
+Ext.extend(GO.form.SelectCountry, Ext.form.ComboBox);
 
 Ext.reg("selectcountry", GO.form.SelectCountry);

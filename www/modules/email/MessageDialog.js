@@ -18,15 +18,11 @@ GO.email.MessageDialog = function(config){
 		cls: 'x-btn-text-icon',
 		handler: function(){
 
-			var comp = GO.email.showComposer({
+			GO.email.showComposer({
 				uid: this.messagePanel.uid,
 				task: 'reply',
 				mailbox: this.messagePanel.mailbox,
 				account_id: this.messagePanel.account_id
-			});
-
-			this.messagePanel.data.links.forEach(function(link) {
-				comp.createLinkButton.addLink(link.entity, link.entityId);
 			});
 		},
 		scope: this
@@ -36,15 +32,12 @@ GO.email.MessageDialog = function(config){
 		text: t("Reply all", "email"),
 		cls: 'x-btn-text-icon',
 		handler: function(){
-			var comp = GO.email.showComposer({
+			GO.email.showComposer({
 				uid: this.messagePanel.uid,
 				task: 'reply_all',
 				mailbox: this.messagePanel.mailbox,
 				account_id: this.messagePanel.account_id
-			});
 
-			this.messagePanel.data.links.forEach(function(link) {
-				comp.createLinkButton.addLink(link.entity, link.entityId);
 			});
 		},
 		scope: this

@@ -2,19 +2,18 @@
 
 namespace go\modules\community\serverclient;
 
-use go\core\model\User;
-use go\modules\community\serverclient\model\MailDomain;
-use go\core;
-use go\core\App;
+use go\modules\core\users\model\User;
+use \go\modules\community\serverclient\model\MailDomain;
+use go\core\module\Base;
 
-class Module extends core\Module {
+
+class Module extends Base {
 	public function getAuthor(){
 		return 'Intermesh BV';
 	}
 
 	public function defineListeners() {
 		User::on(\go\core\orm\Entity::EVENT_SAVE, static::class, 'onSaveUser');
-		go()->on(App::EVENT_SCRIPTS, static::class, 'onLoad');
 	}
 	
 	public static function getDomains(){
@@ -25,12 +24,6 @@ class Module extends core\Module {
 			return \GO::config()->serverclient_domains;
 		}
 		return array_map('trim',explode(",", \GO::config()->serverclient_domains));
-	}
-
-	public static function onLoad() {
-		
-		echo '<script type="text/javascript">GO.serverclient = {}; GO.serverclient.domains=["'.implode('","', static::getDomains()).'"];</script>';
-		
 	}
 
 	public static function onSaveUser(User $user) {

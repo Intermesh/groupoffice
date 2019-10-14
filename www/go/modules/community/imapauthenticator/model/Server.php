@@ -56,8 +56,8 @@ class Server extends Entity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable('imapauth_server', 's')
-						->addArray("domains", Domain::class, ['id' => "serverId"])
-						->addArray("groups", Group::class, ['id' => "serverId"]);
+						->addRelation("domains", Domain::class, ['id' => "serverId"])
+						->addRelation("groups", Group::class, ['id' => "serverId"]);
 	}
   
   public static function getClientName() {
@@ -66,14 +66,14 @@ class Server extends Entity {
 	
 	protected function internalSave() {
 		if($this->isModified("domains")) {
-			go()->getCache()->delete("authentication-domains");
+			GO()->getCache()->delete("authentication-domains");
 		}
 		
 		return parent::internalSave();
 	}
 	
 	protected function internalDelete() {
-		go()->getCache()->delete("authentication-domains");
+		GO()->getCache()->delete("authentication-domains");
 		return parent::internalDelete();
 	}
 }

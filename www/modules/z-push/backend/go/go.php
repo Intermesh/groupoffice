@@ -111,7 +111,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 
 			//attempt login using security class inherited from index.php
 			
-			$user = \go\core\model\User::find()->where(['username' => $username])->single();
+			$user = \go\modules\core\users\model\User::find()->where(['username' => $username])->single();
 			/* @var $user User */
 
 			if(!$user || !$user->enabled) {
@@ -120,18 +120,18 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 
 			if(!$user->checkPassword($password)) {
 				return false;
-			}			
-
-			$state = new go\core\auth\TemporaryState();
-			$state->setUser($user);		
-			\go()->setAuthState($state);		
-
-			$this->oldLogin($user);	
+			}
 			
 			if(!GO::modules()->sync) {
 				ZLog::Write(LOGLEVEL_INFO, 'User '. $user->username .' logged on but has no access to the sync module');
 				return false;
 			}
+
+			$state = new go\core\auth\TemporaryState();
+			$state->setUser($user);		
+			\GO()->setAuthState($state);		
+
+			$this->oldLogin($user);		
 
 			if (!$user) {
 				ZLog::Write(LOGLEVEL_INFO, 'ZPUSH2::ERROR::Username and/or password incorrect.');
@@ -179,7 +179,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	 * 
 	 * @param \GO\Dav\Auth\User $user
 	 */
-	private function oldLogin(\go\core\model\User $user) {
+	private function oldLogin(\go\modules\core\users\model\User $user) {
 		if(!defined('GO_NO_SESSION')) {
 			define("GO_NO_SESSION", true);
 		}

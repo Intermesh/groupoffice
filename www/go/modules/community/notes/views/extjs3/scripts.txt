@@ -4,7 +4,6 @@ NoteBookGrid.js
 NoteGrid.js
 NoteDetail.js
 NoteBookCombo.js
-NoteBookDialog.js
-NoteDialog.js
+NoteBookForm.js
+NoteForm.js
 Decrypt.js
-SettingsPanel.js

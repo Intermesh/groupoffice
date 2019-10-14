@@ -21,86 +21,82 @@ GO.files.FolderPropertiesDialog = function(config){
 	this.propertiesPanel = new Ext.Panel({
 		layout:'form',
 		title:t("Properties"),
-		waitMsgTarget:true,		
-		autoScroll: true,
+		cls:'go-form-panel',
+		waitMsgTarget:true,
+		defaultType: 'textfield',
 		labelWidth:100, 
-		border:false, 
-		items: [{
-				xtype:"fieldset",
-				defaultType: 'textfield',
-				labelWidth:100, 
-				items: [
-				{
-					fieldLabel: t("Name"),
-					name: 'name',
-					anchor: '100%',
-					validator:function(v){
-						return !v.match(/[&\/:\*\?"<>|\\]/);
-					}
-				},{
-					xtype: 'plainfield',
-					fieldLabel: t("Location"),
-					name: 'path'
+		border:false,   
+		items: [
+		{
+			fieldLabel: t("Name"),
+			name: 'name',
+			anchor: '100%',
+			validator:function(v){
+				return !v.match(/[&\/:\*\?"<>|\\]/);
+			}
+		},{
+			xtype: 'plainfield',
+			fieldLabel: t("Location"),
+			name: 'path'
+		},
+		{
+			xtype: 'plainfield',
+			fieldLabel: "URL",
+			name: 'url'
+		},
+		new GO.form.HtmlComponent({
+			html:'<hr />'
+		}),
+		{
+			xtype: 'plainfield',
+			fieldLabel: t("Created at"),
+			name: 'ctime'
+		},
+		{
+			xtype: 'plainfield',
+			fieldLabel: t("Modified at"),
+			name: 'mtime'
+		},
+		{
+			xtype: 'plainfield',
+			fieldLabel: t("Created by"),
+			name: 'username'
+		},
+		{
+			xtype: 'plainfield',
+			fieldLabel: t("Modified by"),
+			name: 'musername'
+		},
+		{
+			xtype: 'htmlcomponent',
+			html:'<hr />'
+		},
+		{
+			xtype:'xcheckbox',
+			boxLabel: t("Activate sharing", "files"),
+			name: 'share',
+			listeners: {
+				check: function(cb, checked) {
+					this.save(false);
 				},
-				{
-					xtype: 'plainfield',
-					fieldLabel: "URL",
-					name: 'url'
-				},
-				new GO.form.HtmlComponent({
-					html:'<hr />'
-				}),
-				{
-					xtype: 'plainfield',
-					fieldLabel: t("Created at"),
-					name: 'ctime'
-				},
-				{
-					xtype: 'plainfield',
-					fieldLabel: t("Modified at"),
-					name: 'mtime'
-				},
-				{
-					xtype: 'plainfield',
-					fieldLabel: t("Created by"),
-					name: 'username'
-				},
-				{
-					xtype: 'plainfield',
-					fieldLabel: t("Modified by"),
-					name: 'musername'
-				},
-				{
-					xtype: 'htmlcomponent',
-					html:'<hr />'
-				},
-				{
-					xtype:'xcheckbox',
-					boxLabel: t("Activate sharing", "files"),
-					name: 'share',
-					listeners: {
-						check: function(cb, checked) {
-							this.save(false);
-						},
-						scope:this
-					},
-					checked: false,
-					hideLabel:true
-				},
-				this.notifyCheckBox = new Ext.ux.form.XCheckbox({
-					boxLabel: t("Notify me about changes in this folder", "files"),
-					name: 'notify',
-					checked: false,
-					hideLabel:true
-				}),
-				this.applyStateCheckbox = new Ext.ux.form.XCheckbox({
-					boxLabel: t("Apply the folder's display settings for everyone.", "files"),
-					name: 'apply_state',
-					checked: false,
-					hideLabel:true
-				})
-				]
-			}]
+				scope:this
+			},
+			checked: false,
+			hideLabel:true
+		},
+		this.notifyCheckBox = new Ext.ux.form.XCheckbox({
+			boxLabel: t("Notify me about changes in this folder", "files"),
+			name: 'notify',
+			checked: false,
+			hideLabel:true
+		}),
+		this.applyStateCheckbox = new Ext.ux.form.XCheckbox({
+			boxLabel: t("Apply the folder's display settings for everyone.", "files"),
+			name: 'apply_state',
+			checked: false,
+			hideLabel:true
+		})
+		]
 	});
 
 	this.readPermissionsTab = new GO.grid.PermissionsPanel({
@@ -131,63 +127,45 @@ GO.files.FolderPropertiesDialog = function(config){
 		items:[this.propertiesPanel, this.commentsPanel, this.readPermissionsTab]
 	});
 	
-	go.customfields.CustomFields.getFormFieldSets("Folder").forEach(function(fs) {
-		//console.log(fs);
-		if(fs.fieldSet.isTab) {
-			fs.title = null;
-			fs.collapsible = false;
-			var pnl = new Ext.Panel({
-				autoScroll: true,
-				hideMode: 'offsets', //Other wise some form elements like date pickers render incorrectly.
-				title: fs.fieldSet.name,
-				items: [fs]
-			});
-			this.tabPanel.add(pnl);
-		}else
-		{			
-			this.propertiesPanel.add(fs);
-		}
-	}, this);
+	if(go.Modules.isAvailable("core", "customfields")){
+		this.disableCategoriesPanel = new GO.customfields.DisableCategoriesPanel();
+		
+		this.recursivePanel = new Ext.Panel({
+			region:'south',
+			items: [
+				{
+					xtype: 'button',
+					name: 'recursiveApplyCustomFieldCategories',
+					text: 'Apply',
+					listeners: {
+						click: function() {
+							this.formPanel.baseParams.recursiveApplyCustomFieldCategories = true;
+							this.save();
+							//this.formPanel.baseParams.recursiveApplyCustomFieldCategories = false;
+						},
+						scope:this
+					}
+				},{
+					type:'displayfield',
+					html: t("Apply these custom field settings to current folder and it's sub folders recursively", "files")
+				}
+			]
+		});
 
-//	if(go.Modules.isAvailable("core", "customfields")){
-//		this.disableCategoriesPanel = new GO.customfields.DisableCategoriesPanel();
-//		
-//		this.recursivePanel = new Ext.Panel({
-//			region:'south',
-//			items: [
-//				{
-//					xtype: 'button',
-//					name: 'recursiveApplyCustomFieldCategories',
-//					text: 'Apply',
-//					listeners: {
-//						click: function() {
-//							this.formPanel.baseParams.recursiveApplyCustomFieldCategories = true;
-//							this.save();
-//							//this.formPanel.baseParams.recursiveApplyCustomFieldCategories = false;
-//						},
-//						scope:this
-//					}
-//				},{
-//					type:'displayfield',
-//					html: t("Apply these custom field settings to current folder and it's sub folders recursively", "files")
-//				}
-//			]
-//		});
-//
-//		this.disableCategoriesPanel.add(this.recursivePanel);
-//		
-//		
-//		this.tabPanel.add(this.disableCategoriesPanel);
-//		
-//		
-//		if(GO.customfields && GO.customfields.types["GO\\Files\\Model\\Folder"])
-//		{
-//			for(var i=0;i<GO.customfields.types["GO\\Files\\Model\\Folder"].panels.length;i++)
-//			{
-//				this.tabPanel.add(GO.customfields.types["GO\\Files\\Model\\Folder"].panels[i]);
-//			}
-//		}
-//	}
+		this.disableCategoriesPanel.add(this.recursivePanel);
+		
+		
+		this.tabPanel.add(this.disableCategoriesPanel);
+		
+		
+		if(go.Modules.isAvailable("core", "customfields") && GO.customfields.types["GO\\Files\\Model\\Folder"])
+		{
+			for(var i=0;i<GO.customfields.types["GO\\Files\\Model\\Folder"].panels.length;i++)
+			{
+				this.tabPanel.add(GO.customfields.types["GO\\Files\\Model\\Folder"].panels[i]);
+			}
+		}
+	}
 
 //	if(go.Modules.isAvailable("legacy", "workflow"))
 //	{
@@ -266,8 +244,8 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 				this.setPermission(action.result.data.is_someones_home_dir, action.result.data.permission_level, action.result.data.readonly);
 
 				this.tabPanel.setActiveTab(0);
-//				if(go.Modules.isAvailable("core", "customfields"))
-//					this.disableCategoriesPanel.setModel(folder_id,"GO\\Files\\model\\File");
+				if(go.Modules.isAvailable("core", "customfields"))
+					this.disableCategoriesPanel.setModel(folder_id,"GO\\Files\\model\\File");
 				
 				this.notifyCheckBox.addListener('check',this.onNotifyChecked,this);
 				

@@ -25,9 +25,6 @@ namespace GO\Tasks\Customfields\Model;
 
 
 class Task extends \GO\Customfields\Model\AbstractCustomFieldsRecord{
-	
-	
-	
 	/**
 	 * Returns a static model of itself
 	 * 

@@ -170,7 +170,10 @@ class Extjs3{
 			$arr[$module->name]['read_permission']=$module->permissionLevel>=\GO\Base\Model\Acl::READ_PERMISSION;
 			$arr[$module->name]['write_permission']=$module->permissionLevel>=\GO\Base\Model\Acl::WRITE_PERMISSION;
 
-		}		
+		}
+
+		GO()->getCache()->set("export-modules", $arr);
+		
 
 		return $arr;
 	}

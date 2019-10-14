@@ -164,26 +164,51 @@ class Criteria {
 		return $this->andWhere($condition, $comparisonOperator, $value);
 	}
 	
-	protected function internalWhere($condition, $comparisonOperator, $value, $logicalOperator) {			
-		
-		if(is_array($condition)) {
-			$sub = new Criteria();
-			foreach($condition as $colName => $value) {
-				$sub->andWhere($colName, '=', $value);				
-			}			
-			$condition = $sub;			
-		} 
-		
+	protected function internalWhere($condition, $comparisonOperator, $value, $logicalOperator) {				
 		if(!isset($comparisonOperator) && (is_string($condition) || $condition instanceof Criteria)) {
 			//condition is raw string
-			return ["tokens", $logicalOperator, $condition];			
-		}
+			$this->where[] = ["tokens", $logicalOperator, $condition];
+			return $this;
+		}		
 		
-		if(!isset($comparisonOperator)) {
+		if(isset($comparisonOperator)) {
+			$comparisonOperator = preg_replace("/[\s]+/",' ',strtoupper($comparisonOperator));
+		} else
+		{
 			$comparisonOperator = '=';
 		}
-		return ["column", $logicalOperator, $condition, $comparisonOperator, $value];			
 		
+		if(is_array($condition)) {
+			foreach($condition as $colName => $value) {
+				if(is_array($value)) {
+					$comparisonOperator = $this->convertComparisonOperatorForArray($value, $comparisonOperator);
+				}
+				$this->where[] = ["column", $logicalOperator, $colName, $comparisonOperator, $value];
+			}			
+		} else {
+			if(is_array($value)) {
+				$comparisonOperator = $this->convertComparisonOperatorForArray($value, $comparisonOperator);
+			}
+			$this->where[] = ["column", $logicalOperator, $condition, $comparisonOperator, $value];
+		}
+		
+		return $this;
+	}
+	
+	private function convertComparisonOperatorForArray($value, $comparisonOperator) {
+		switch($comparisonOperator) {
+			case 'IN':
+			case '=':
+				return 'IN';
+			
+			case 'NOT IN':
+			case '!=':
+				return 'NOT IN';
+			
+			default:
+				throw new Exception("Illegal comparison operator '" . $comparisonOperator . "' for array value");
+				
+		}
 	}
 	
 	protected function internalWhereExists(Query $subQuery, $not = false, $logicalOperator = "AND") {
@@ -204,99 +229,15 @@ class Criteria {
 	}
 
 	/**
-	 * Add where condition with AND (..)
+	 * Concatenate where condition with AND
 	 * 
 	 * {@see where()}
 	 * 
 	 * @param String|array|Criteria $column
-	 * @param string $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
-	 * @param mixed $value
-	 * @return $this
+	 * @return static
 	 */
 	public function andWhere($column, $operator = null, $value = null) {
-		$this->where[] = $this->internalWhere($column, $operator, $value, 'AND');
-		return $this;
-	}
-	
-	/**
-	 * Add where condition with AND NOT(..)
-	 * 
-	 * {@see where()}
-	 * 
-	 * @param String|array|Criteria $column
-	 * @param string $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
-	 * @param mixed $value
-	 * @return $this
-	 */
-	public function andWhereNot($column, $operator = null, $value = null) {
-		$this->where[] = $this->internalWhere($column, $operator, $value, 'AND NOT');
-		return $this;
-	}
-	
-	/**
-	 * Add where condition with AND NOT IFNULL(.., false))
-	 * 
-	 * WHERE NOT does not match NULL values. This is often not wanted so you can use this to wrap IFNULL so null values.
-	 * 
-	 * For example:
-	 * 
-	 * select * from contact left join address where NOT (address.country LIKE 'netherlands');
-	 * 
-	 * will not return contacts without an address. With this function it will do:
-	 * 
-	 * select * from contact left join address where NOT IFNULL(address.country NOT LIKE 'netherlands', false);
-	 * 
-	 * {@see where()}
-	 * 
-	 * @param String|array|Criteria $column
-	 * @param string $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
-	 * @param mixed $value
-	 * @return $this
-	 */
-	public function andWhereNotOrNull($column, $operator = null, $value = null) {
-		//NOT_OR_NULL will wrap an IFNULL(..., false) around it so it will also match NULL values
-		$this->where[] = $this->internalWhere($column, $operator, $value, 'AND NOT_OR_NULL');
-		return $this;
-	}
-	
-	/**
-	 * Add where condition with OR NOT(..)
-	 * 
-	 * {@see where()}
-	 * 
-	 * @param String|array|Criteria $column
-	 * @param string $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
-	 * @param mixed $value
-	 * @return $this
-	 */
-	public function orWhereNot($column, $operator = null, $value = null) {
-		$this->where[] = $this->internalWhere($column, $operator, $value, 'OR NOT');
-		return $this;
-	}
-	
-	/**
-	 * Add where condition with OR NOT IFNULL(.., false))
-	 * 
-	 * WHERE NOT does not match NULL values. This is often not wanted so you can use this to wrap IFNULL so null values.
-	 * 
-	 * For example:
-	 * 
-	 * select * from contact left join address where NOT (address.country LIKE 'netherlands');
-	 * 
-	 * will not return contacts without an address. With this function it will do:
-	 * 
-	 * select * from contact left join address where NOT IFNULL(address.country NOT LIKE 'netherlands', false);
-	 * 
-	 * {@see where()}
-	 * 
-	 * @param String|array|Criteria $column
-	 * @param string $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
-	 * @param mixed $value
-	 * @return $this
-	 */
-	public function orWhereNotOrNull($column, $operator = null, $value = null) {
-		$this->where[] = $this->internalWhere($column, $operator, $value, 'OR NOT_OR_NULL');
-		return $this;
+		return $this->internalWhere($column, $operator, $value, 'AND');
 	}
 	
 	/**
@@ -308,8 +249,7 @@ class Criteria {
 	 * @return static
 	 */
 	public function orWhere($column, $operator = null, $value = null) {
-		$this->where[] = $this->internalWhere($column, $operator, $value, 'OR');
-		return $this;
+		return $this->internalWhere($column, $operator, $value, 'OR');
 	}
 
 	/**
@@ -348,14 +288,5 @@ class Criteria {
 		$this->bindParameters[] = ['paramTag' => $tag, 'value' => $value, 'pdoType' => $pdoType];
 		
 		return $this;
-	}
-	
-	/**
-	 * Check if the criteria object holds conditions
-	 * 
-	 * @return bool
-	 */
-	public function hasConditions() {
-		return !empty($this->where);
 	}
 }

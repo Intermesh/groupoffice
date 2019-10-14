@@ -1,6 +1,6 @@
 Ext.onReady(function(){
-	Ext.override(go.users.CreateUserAccountPanel, {
-		initComponent : go.users.CreateUserAccountPanel.prototype.initComponent.createSequence(function(){
+	Ext.override(go.modules.core.users.CreateUserAccountPanel, {
+		initComponent : go.modules.core.users.CreateUserAccountPanel.prototype.initComponent.createSequence(function(){
 			if(GO.serverclient && GO.serverclient.domains) {				
 				
 
@@ -8,8 +8,9 @@ Ext.onReady(function(){
 				{
 					this.serverclientDomainCheckboxes[i]=new Ext.form.Checkbox({						
 						checked:(i==0),
+						//name: 'serverDomains',
 						name: 'serverDomains',
-						value: GO.serverclient.domains[i],				
+						autoCreate: {tag: "input", type: "checkbox", value: GO.serverclient.domains[i]},						
 						hideLabel:true,
 						boxLabel: GO.serverclient.domains[i]
 					});
@@ -25,13 +26,7 @@ Ext.onReady(function(){
 				this.serverclientFieldSet = new Ext.form.FieldSet({
 					title: t('Mailboxes'), 
 					autoHeight:true,
-					items: [
-						new go.form.CheckboxGroup({
-							hideLabel:true,
-							items: items,
-							name: "serverDomains"
-						})
-					]
+					items:items
 				});
 				
 
@@ -66,9 +61,8 @@ Ext.onReady(function(){
 						password: this.lastPassword
 					},
 					callback: function(o,success,response) {
-						console.error(response);
 						if(!success) {
-							Ext.MessageBox.alert(t("Error"), t("The mailbox couldn't be created") + ': ' + response.message);
+							alert('Could not create mailbox');
 						}
 					}
 				});
@@ -92,7 +86,7 @@ Ext.onReady(function(){
 
 						if(emailField)
 							this.form.findField('email').setValue(username+'@'+GO.serverclient.domains[i]);
-							this.form.findField('recoveryEmail').setValue(username+'@'+GO.serverclient.domains[i]);
+
 						break;
 					}
 				}

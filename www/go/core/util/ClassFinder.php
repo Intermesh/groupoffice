@@ -6,41 +6,33 @@ use Closure;
 use go\core\App;
 use go\core\Environment;
 use go\core\fs\Folder;
-use go\core\model\Module;
+use go\modules\core\modules\model\Module;
 use ReflectionClass;
-use go\core\fs\File;
 
 /**
- * Finds classes within Group-Office.
- * 
- * This only finds classes in the new framwwork under "go/*".
- * 
- * Warning: Using this is expensive. Caching the results is recommended.
+ * Finds classes within Group-Office
  * 
  */
-class ClassFinder {	
+class ClassFinder {
 	
-	/**
-	 * Get all the Group-Office namespaces to search in.
-	 * 
-	 * @return string[]
-	 */
-	public static function getDefaultNamespaces() {		
-		$ns = go()->getCache()->get("class-finder-default-namespaces");
+	
+	public static function getDefaultNamespaces() {
+		
+		$ns = GO()->getCache()->get("class-finder-default-namespaces");
 		
 		if(!$ns) {
 			$ns = ['go\\core'];		
 			
-			$modules = Module::find()->where(['enabled' => true]);
+			$modules = Module::find();
 			foreach ($modules as $module) {
-				if(!isset($module->package) || $module->package == "core" ||  !$module->isAvailable()) {
+				if(!isset($module->package) || !$module->isAvailable()) {
 					continue;
 				}
 				$namespace = "go\\modules\\" . $module->package . "\\" . $module->name;
 				$ns[] = $namespace;
 			}
 			
-			go()->getCache()->set("class-finder-default-namespaces", $ns);
+			GO()->getCache()->set("class-finder-default-namespaces", $ns);
 		}
 		
 		return $ns;
@@ -80,9 +72,6 @@ class ClassFinder {
 	 * @param string[] Full class name without leading "\" eg. ["IFW\App"]
 	 */
 	public function find() {
-		
-		go()->debug("ClassFinder find() used.");
-		
 		$this->allClasses = [];
 		foreach ($this->namespaces as $namespace => $folder) {
 
@@ -148,21 +137,7 @@ class ClassFinder {
 		return $r;
 	}
 
-	private function hasLicense(File $file, $namespace) {
-
-		//check for pro license on business package
-		if(!strstr($namespace, "go\\modules") || $file->getName() == 'Module.php') {
-			return true;
-		}
-
-		$parts = explode("\\", $namespace);
-
-		$moduleCls= "go\\modules\\". $parts[2]."\\".$parts[3]."\\Module";
-
-		return !class_exists($moduleCls) || (new $moduleCls)->isLicensed();
-	}
-
-	private function folderToClassNames(Folder $folder, $namespace) {	
+	private function folderToClassNames(Folder $folder, $namespace) {
 
 		$classes = [];
 		foreach ($folder->getFiles() as $file) {
@@ -170,15 +145,6 @@ class ClassFinder {
 			if ($file->getExtension() == 'php') {
 
 				$name = $file->getNameWithoutExtension();
-				$firstChar = substr($name, 0, 1);
-				if($firstChar !== strtoupper($firstChar)) {
-					//skip filenames that start with a lower case char
-					continue;
-				}
-
-				if(!$this->hasLicense($file, $namespace)) {
-					continue;
-				}
 
 				$className = $namespace . '\\'. $name;
 

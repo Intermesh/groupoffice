@@ -41,7 +41,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 	protected function actionSyncFilesystem($params){	
 		
-		if(!$this->isCli() && !\GO::user()->isAdmin())
+		if(!$this->isCli() && !\GO::modules()->tools)
 			throw new \GO\Base\Exception\AccessDenied();
 		
 		$oldAllowDeletes = \GO\Base\Fs\File::setAllowDeletes(false);
@@ -759,7 +759,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		
 		//sorting on custom fields doesn't work for folders
 		//TODO
-		if(!isset($params['sort']) || substr($params['sort'],0,13)=='customFields.' || $params['sort'] == 'name') {
+		if(!isset($params['sort']) || substr($params['sort'],0,4)=='col_' || $params['sort'] == 'name') {
 			$findParams->order(new \go\core\db\Expression('name COLLATE utf8mb4_unicode_ci ' . (!isset($params['dir']) || $params['dir'] == 'ASC' ? 'ASC' : 'DESC')));
 		}
 
@@ -880,7 +880,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id), "a", false);
 
 			$findParams = \GO\Base\Db\FindParams::newInstance()
-					->select('t.*')
+					->select('t.*,cf.*')
 					->ignoreAcl()
 					->joinCustomFields()
 					->joinModel(array(
@@ -908,8 +908,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					 $findParams->order(new \go\core\db\Expression('t.name COLLATE utf8mb4_unicode_ci ' . (!isset($params['dir']) || $params['dir'] == 'ASC' ? 'ASC' : 'DESC')));
 				}else
 				{				
-					$params['sort'] = str_replace('customFields', 'cf', $params['sort']);
-					$findParams->order($params['sort'], $params['dir']);
+					$findParams->order("t.".$params['sort'], $params['dir']);
 				}
 			}
 			
@@ -1130,10 +1129,33 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		
 		$entity = $cls::findById($params['id']);
 		
-		$folder = \GO\Files\Model\Folder::model()->findForEntity($entity);
+		if(empty($entity->filesFolderId)) {
+			$filesPath = $entityType->getModule()->name. '/'. $entityType->getName() . '/' . $entity->id;
+			$aclId =$entity->findAclId();
+			$folder = \GO\Files\Model\Folder::model()->findByPath($filesPath,true, array('acl_id'=>$aclId,'readonly'=>1));
+
+			if(!$folder){
+				throw new \Exception("Failed to create folder ".$filesPath);
+			}
+	//      if (!empty($model->acl_id))
+	//          $folder->acl_id = $model->acl_id;
+
+			$folder->acl_id=$aclId;
+
+			$folder->visible = 0;
+			$folder->readonly = 1;
+			$folder->systemSave = true;
+			$folder->save(true);
+
+			$entity->filesFolderId = $folder->id;
+			if(!$entity->save()) {
+				throw new \Exception("Could not save entity!");
+			}
+		}
+		
 		return [
 				"success" => true,
-				"files_folder_id" => $folder->id
+				"files_folder_id" => $entity->filesFolderId
 		];
 	}
 

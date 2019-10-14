@@ -3,7 +3,7 @@
 namespace go\core\event;
 
 use go\core\App;
-use go\core\model\Module;
+use go\modules\core\modules\model\Module;
 use go\core\Singleton;
 
 /**
@@ -22,8 +22,6 @@ use go\core\Singleton;
  */
 class Listeners extends Singleton {
 
-	protected $listeners;
-
 
 	/**
 	 * Add an event listener
@@ -36,35 +34,18 @@ class Listeners extends Singleton {
 		
 //		App::get()->debug(func_get_args());
 
-		$this->checkInit();
-
 		if (!isset($this->listeners[$firingClass][$event])) {
 			$this->listeners[$firingClass][$event] = [];
 		}
 		$this->listeners[$firingClass][$event][] = [$listenerClass, $method];		
 	}
 
-
-	private function checkInit() {
-		if(isset($this->listeners)) {
-			return;
-		}
-
-		$this->listeners = App::get()->getCache()->get('listeners-2');
-
-		if($this->listeners) {
-			return;
-		}		
-
-		$this->init();
-	}
-
 	/**
-	 * Runs through all Module.php files and calls {@see \go\core\Base::defineListeners()}
+	 * Runs through all Module.php files and calls {@see \go\core\module\Base::defineListeners()}
 	 * 
 	 * Then stores all these listeners in the cache.
 	 */
-	public function init() {		
+	public function init() {
 
 		$this->listeners = [];
 
@@ -115,14 +96,18 @@ class Listeners extends Singleton {
 	 */
 	public function fireEvent($calledClass, $traitUser, $event, $args) {	
 		
-		$this->checkInit();
+		if(!isset($this->listeners)) {
+			$this->listeners = App::get()->getCache()->get('listeners-2');
 
+			if(!$this->listeners) {
+				$this->init();
+			}
+		}
 		if (isset($this->listeners[$calledClass][$event])) {
 			foreach ($this->listeners[$calledClass][$event] as $listener) {	
-				App::get()->log("Event '$calledClass::$event' calls listener $listener[0]::$listener[1]");
 				$return = call_user_func_array($listener, $args);
 				if ($return === false) {
-					App::get()->warn("Listener returned false for event " . $event . " " . var_export($listener, true));
+					App::get()->debug("Listener returned false for event " . $event . " " . var_export($listener, true));
 					return false;
 				}
 			}

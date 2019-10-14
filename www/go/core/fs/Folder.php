@@ -51,24 +51,6 @@ class Folder extends FileSystemObject {
 //		return $folder;
 //	}
 
-
-	/**
-	 * Check if the file or folder exists
-	 * @return boolean
-	 */
-	public function exists() {
-		return is_dir($this->path) || is_link($this->path);
-	}
-
-	/**
-	 * Get a temporary folder
-	 * 
-	 * @return static
-	 */
-	public static function tempFolder() {
-		return go()->getTmpFolder()->getFolder(uniqid(time()));
-	}
-
 	/**
 	 * Get folder directory listing.
 	 *
@@ -127,7 +109,7 @@ class Folder extends FileSystemObject {
 	 * 
 	 * This function does not check if the folder exists.
 	 * 
-	 * @return File
+	 * @return \go\core\fs\File
 	 */
 	public function getFile($relativePath) {
 		$childPath = $this->path . '/' . $relativePath;
@@ -141,7 +123,7 @@ class Folder extends FileSystemObject {
 	 * 
 	 * This function does not check if the folder exists.
 	 * 
-	 * @return Folder
+	 * @return \go\core\fs\Folder
 	 */
 	public function getFolder($relativePath) {
 		$childPath = $this->path . '/' . $relativePath;		
@@ -241,7 +223,7 @@ class Folder extends FileSystemObject {
 			$success = rename($this->getPath(), $newPath);
 		} catch(\Exception $e) {
 			//rename fails accross partitions. Ignore and retry with copy delete.
-			go()->warn("Rename failed. Falling back on copy, delete");
+			GO()->debug("Rename failed. Falling back on copy, delete");
 		}
 
 		if (!$success) { // Notice suppressed by @
@@ -419,7 +401,7 @@ class Folder extends FileSystemObject {
 			if(($findFolders || !$isFolder) && preg_match($regex, $child->getName())) {
 				$result[] = $child;
 			}
-			if($isFolder && $child->exists()) { //Do exists check for broken links
+			if($isFolder) {
 				$result = array_merge($result, $child->find($regex, $findFolders, $findFiles));
 			}
 		}

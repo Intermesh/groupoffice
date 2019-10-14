@@ -426,9 +426,6 @@ abstract class Message extends \GO\Base\Model {
 		$response['xssDetected']=false;
 		
 		
-		$response['links'] = [];
-		
-		
 		$this->fireEvent('tooutputarray', array(&$response, $this));
 
 		return $response;

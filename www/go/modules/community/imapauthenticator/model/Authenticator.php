@@ -2,7 +2,7 @@
 namespace go\modules\community\imapauthenticator\model;
 
 use Exception;
-use go\core\model\User;
+use go\modules\core\users\model\User;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\imap\Connection;
 use GO\Email\Model\Account;
@@ -41,7 +41,7 @@ class Authenticator extends PrimaryAuthenticator {
 	public function authenticate($username, $password) {
 		$server = $this->findServer($username);
 		
-		go()->debug("Attempting IMAP authentication on ".$server->imapHostname);
+		GO()->debug("Attempting IMAP authentication on ".$server->imapHostname);
 		
 		$connection = new Connection();
 		if(!$connection->connect($server->imapHostname, $server->imapPort, $server->imapEncryption == 'ssl')) {
@@ -57,8 +57,6 @@ class Authenticator extends PrimaryAuthenticator {
 		$user = User::find()->where(['username' => $username])->single();
 		if(!$user) {
 			$user = $this->createUser($username);
-		} else if($user->hasPassword()){
-			$user->clearPassword();
 		}
 		
 		foreach($server->groups as $group) {
@@ -122,7 +120,7 @@ class Authenticator extends PrimaryAuthenticator {
 			$account->imap_allow_self_signed = !$server->imapValidateCertificate;
 			$account->smtp_allow_self_signed = !$server->imapValidateCertificate;
 			$account->smtp_username = $server->smtpUsername;
-			$account->smtp_password = $server->getSmtpPassword();
+			$account->smtp_password = $server->smtpPassword;
 			$account->smtp_host = $server->smtpHostname;
 			$account->smtp_port = $server->smtpPort;
 			$account->smtp_encryption = $server->smtpEncryption ?? "";

@@ -1,54 +1,14 @@
 /* global go */
 
 go.Modules.register("community", 'notes', {
+	mainPanel: "go.modules.community.notes.MainPanel",
 	title: t("Notes"),
-	initModule: function () {
-		this.addPanel(go.modules.community.notes.MainPanel);
-	},
-
 	entities: [{
-		name: "Note",
-		hasFiles: true,
-		relations: {
-			creator: { store: "User", fk: "createdBy" },
-			modifier: { store: "User", fk: "createdBy" }
-		},
-		filters: [
-			{
-				name: 'text',
-				type: "string",
-				multiple: false,
-				title: "Query"
-			},
-			{
-				title: t("Commented at"),
-				name: 'commentedat',
-				multiple: false,
-				type: 'date'
-			}, {
-				title: t("Modified at"),
-				name: 'modifiedat',
-				multiple: false,
-				type: 'date'
-			}, {
-				title: t("Modified by"),
-				name: 'modifiedBy',
-				multiple: true,
-				type: 'string'
-			}, {
-				title: t("Created at"),
-				name: 'createdat',
-				multiple: false,
-				type: 'date'
-			}, {
-				title: t("Created by"),
-				name: 'createdby',
-				multiple: true,
-				type: 'string'
-			}
-		],
-		links: [{
-			iconCls: 'entity ic-note yellow',
+			/**
+			 * Entity name
+			 */
+			name: "Note",
+			
 			/**
 			 * Opens a dialog to create a new linked item
 			 * 
@@ -56,24 +16,19 @@ go.Modules.register("community", 'notes', {
 			 * @param {string|int} entityId
 			 * @returns {go.form.Dialog}
 			 */
-			linkWindow: function (entity, entityId) {
-				return new go.modules.community.notes.NoteDialog();
+			linkWindow: function(entity, entityId) {
+				return new go.modules.community.notes.NoteForm();
 			},
-
+			
 			/**
 			 * Return component for the detail view
 			 * 
-			 * @returns {go.detail.Panel}
+			 * @returns {go.panels.DetailView}
 			 */
-			linkDetail: function () {
+			linkDetail: function() {
 				return new go.modules.community.notes.NoteDetail();
-			}
-		}]
-	}, { name: "NoteBook", title: t("Note book") }],
-
-	userSettingsPanels: [
-		"go.modules.community.notes.SettingsPanel"
-	]
+			}	
+		}, "NoteBook"]
 });
 
 

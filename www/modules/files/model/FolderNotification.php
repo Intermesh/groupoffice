@@ -59,7 +59,7 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 	 */
 	public static function getUsersToNotify($folder_id) {
 
-		$folder = Folder::model()->findByPk($folder_id, false, true);
+		$folder = Folder::model()->findByPk($folder_id);
 		if(!$folder) {
 			$stmt = self::model()->findByAttribute('folder_id', $folder_id);
 			$stmt->callOnEach('delete');

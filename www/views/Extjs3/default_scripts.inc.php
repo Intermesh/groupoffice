@@ -3,9 +3,7 @@
 use GO\Base\Util\Crypt;
 use go\core\fs\File;
 use go\core\fs\Folder;
-use go\core\Module;
-use go\core\jmap\Response;
-use go\core\webclient\Extjs3;
+use go\core\module\Base;
 
 /**
  * Copyright Intermesh
@@ -19,10 +17,6 @@ use go\core\webclient\Extjs3;
  * @version $Id: default_scripts.inc.php 22455 2018-03-06 15:17:33Z mschering $
  * @author Merijn Schering <mschering@intermesh.nl>
  */
-
-$webclient = Extjs3::get();
-
-
 $settings['max_rows_list'] = 50;
 
 $settings['config']['theme'] = GO::config()->theme;
@@ -55,6 +49,27 @@ $settings['language'] = GO::language()->getLanguage();
 $settings['show_contact_cf_tabs'] = array();
 $settings['modules'] = GO::view()->exportModules();
 
+
+//if (GO::modules()->addressbook) {
+//	// Add the addresslist tab to the global settings panel
+//	$settings['show_addresslist_tab'] = GO::config()->get_setting('globalsettings_show_tab_addresslist');
+//
+//	if (GO::modules()->customfields) {
+//		$settings['show_contact_cf_tabs'] = array();
+//
+//		$tabsEnabledStmt = CfSettingTab::model()->find();
+//		$tabsEnabled = $tabsEnabledStmt->fetchAll(PDO::FETCH_COLUMN);
+//
+//		// Add the contact customfield tabs to the global settings panel
+//		$contactClassName = Contact::model()->className();
+//		$customfieldsCategories = Category::model()->findByModel($contactClassName);
+//		foreach ($customfieldsCategories as $cfc) {
+//			if (in_array($cfc->id, $tabsEnabled))
+//				$settings['show_contact_cf_tabs'][$cfc->id] = true;
+//		}
+//	}
+//}
+
 $settings['upload_quickselect'] = GO::config()->upload_quickselect;
 $settings['html_editor_font'] = GO::config()->html_editor_font;
 
@@ -74,14 +89,25 @@ if(GO::config()->debug) {
 }
 
 //echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
-echo '<script type="text/javascript" src="views/Extjs3/javascript/ext-base-debug.js"></script>';
-echo '<script type="text/javascript" src="views/Extjs3/javascript/ext-all-debug.js?mtime='.filemtime(__DIR__ . '/javascript/ext-all-debug.js').'"></script>';
-echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?lang='.\go()->getLanguage()->getIsoCode() . '&v='.$webclient->getLanguageJS()->getModifiedAt()->format("U").'"></script>';
+echo '<script type="text/javascript" src="views/Extjs3/ext/adapter/ext/ext-base-debug.js"></script>';
+echo '<script type="text/javascript" src="views/Extjs3/ext/ext-all-debug.js"></script>';
+echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?lang='.\GO()->getLanguage()->getIsoCode() . '&v='.GO()->getVersion().'"></script>';
 
 ?>
 
-<script type="text/javascript" nonce="<?= Response::get()->getCspNonce(); ?>">
+<script type="text/javascript">
 
+	//hide mask after 10s to display errors is necessary.
+//	setTimeout(function () {
+//		var loadMask = document.getElementById('loading-mask');
+//		var loading = document.getElementById('loading');
+//		if (loadMask)
+//			loadMask.style.display = 'none';
+//
+//		if (loading)
+//			loading.style.display = 'none';
+//
+//	}, 10000);
 	Ext.namespace("GO");
 
 	GO.settings = <?php echo json_encode($settings); ?>;
@@ -89,8 +115,8 @@ echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?l
 	GO.calltoTemplate = '<?php echo GO::config()->callto_template; ?>';
 	GO.calltoOpenWindow = <?php echo GO::config()->callto_open_window ? "true" : "false"; ?>;
 	
-	GO.authenticationDomains = <?php echo json_encode(go\core\model\User::getAuthenticationDomains()); ?>;
-	GO.authenticationDomainDefault = "<?php echo go()->getSettings()->defaultAuthenticationDomain; ?>";
+	GO.authenticationDomains = <?php echo json_encode(go\modules\core\users\model\User::getAuthenticationDomains()); ?>;
+	GO.authenticationDomainDefault = "<?php echo GO()->getSettings()->defaultAuthenticationDomain; ?>";
 <?php
 if (isset(GO::session()->values['security_token'])) {
 	echo 'GO.securityToken="' . GO::session()->values['security_token'] . '";';
@@ -110,7 +136,7 @@ GO::router()->getController()->fireEvent('inlinescripts');
 <?php
   
 if ($cacheFile->exists()) {
-	echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v='.$cacheFile->getModifiedAt()->format("U"). '"></script>';
+	echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v='. GO()->getVersion() . '"></script>';
 } else {
 
 	$scripts = array();
@@ -134,7 +160,7 @@ if ($cacheFile->exists()) {
 	if (count($load_modules)) {
 		$modules = array();
 		foreach ($load_modules as $module) {
-			if ($module->moduleManager instanceof Module) {
+			if ($module->moduleManager instanceof Base) {
 				$prefix = dirname(str_replace("\\", "/", get_class($module->moduleManager))) . "/views/extjs3/";
 				$scriptsFile = $module->moduleManager->path() . 'views/extjs3/scripts.txt';
 
@@ -171,8 +197,6 @@ if ($cacheFile->exists()) {
 		}
 	}
 
-	$scripts[] = "GO.util.density = GO.util.isMobileOrTablet() ? 160 : 140;";
-
 	//two modules may include the same script
 	//$scripts = array_map('trim', $scripts);
 	//	$scripts = array_unique($scripts);
@@ -186,17 +210,18 @@ if ($cacheFile->exists()) {
   }
 
 	$rootFolder = new Folder(GO::config()->root_path);
+	
 	foreach ($scripts as $script) {
 
 		if (GO::config()->debug) {
 			if (is_string($script)) {
 //        $js .=  $script ."\n;\n";
-				echo '<script type="text/javascript" nonce="'.Response::get()->getCspNonce().'">' . $script . '</script>' . "\n";
+				echo '<script type="text/javascript">' . $script . '</script>' . "\n";
 			} else if ($script instanceof File) {
         $relPath = $script->getRelativePath($rootFolder);
         $parts = explode('/', $relPath);
 //        $js .= "\n//source: ".$relPath ."\n";
-				
+				echo '<script type="text/javascript">';
 				$js = "";
         if($parts[0] == 'go' && $parts[1] == 'modules') {
 					//for t() function to auto detect module package and name
@@ -209,18 +234,14 @@ if ($cacheFile->exists()) {
           $js .= "go.module = '".$parts[1]."';";
           $js .= "go.package = 'legacy';";
           $js .= "go.Translate.setModule('legacy', '" .$parts[1]. "');";   
-				}
+        }
+				echo $js;
 				
-
-				if(!empty($js)) {
-					echo '<script type="text/javascript" nonce="'.Response::get()->getCspNonce().'">';
-					echo $js;				
-					echo "</script>\n";
-				}
+				echo "</script>";
 //        $js .= $script->getContents()."\n;\n";
 //        
 //     
-				echo '<script type="text/javascript" src="'.$relPath. '?mtime='.$script->getModifiedAt()->format("U").'"></script>' . "\n";
+				echo '<script type="text/javascript" src="'.$relPath. '?mtime='.$script->getModifiedAt().'"></script>' . "\n";
 			}
 //      else if($script instanceof \go\core\util\Url) {
 //				echo '<script type="text/javascript" src="'.$script.'"></script>' . "\n";
@@ -252,7 +273,7 @@ if ($cacheFile->exists()) {
 	
 	if (!GO::config()->debug) {
 		$minify->gzip($cacheFile->getPath());		
-		echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v= '. $cacheFile->getModifiedAt()->format("U") . '"></script>';
+		echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'script.php?v= '. GO()->getVersion() . '"></script>';
 	} else
   {
 //    $fp = $cacheFile->open('w');
@@ -267,15 +288,11 @@ if (file_exists(GO::view()->getTheme()->getPath() . 'MainLayout.js')) {
 	echo "\n";
 }
 ?>
-<script type="text/javascript" nonce="<?= Response::get()->getCspNonce(); ?>">
+<script type="text/javascript">
 <?php
 
 //direct login with token
 if(isset($_POST['accessToken'])) { //defined in index.php
-	if(preg_match('/[^0-9a-z]/i', $_POST['accessToken'], $matches)) {
-    throw new \Exception("Invalid acccess token format: " .$_POST['accessToken']);
-	}
-	
 	?>	
 	go.User.setAccessToken('<?= $_POST['accessToken']; ?>', false);
 	<?php
@@ -303,5 +320,5 @@ if (isset($_REQUEST['f'])) {
 }
 ?>
 
-Ext.onReady(GO.mainLayout.boot, GO.mainLayout);
+	Ext.onReady(GO.mainLayout.boot, GO.mainLayout);
 </script>

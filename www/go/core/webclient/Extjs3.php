@@ -7,20 +7,14 @@ use go\core\App;
 use go\core\Environment;
 use go\core\fs\File;
 use go\core\Language;
-use go\core\model\Settings;
-use go\core\model\Module;
-use go\core\SingletonTrait;
+use go\modules\core\core\model\Settings;
+use go\modules\core\modules\model\Module;
 
 class Extjs3 {
-
-	use SingletonTrait;
-
-
 	
 	public function flushCache() {
 		return App::get()->getDataFolder()->getFolder('clientscripts')->delete();
 	}
-
 
 	/**
 	 * 
@@ -29,13 +23,11 @@ class Extjs3 {
 	 */
 	public function getCSSFile($theme = 'Paper') {
 
-		$cacheFile = go()->getDataFolder()->getFile('clientscripts/' . $theme . '/style.css');
+		$cacheFile = GO()->getDataFolder()->getFile('clientscripts/' . $theme . '/style.css');
 		
 		
-		if (go()->getDebugger()->enabled || !$cacheFile->exists()) {
-			if ($cacheFile->exists()) {
-				$cacheFile->delete();
-			}
+		if (GO()->getDebugger()->enabled || !$cacheFile->exists()) {
+//		if (!$cacheFile->exists()) {
 			$modules = Module::getInstalled();
 			$css = "";
 			foreach ($modules as $module) {
@@ -76,14 +68,10 @@ class Extjs3 {
 		
 		$baseurl = str_replace(Environment::get()->getInstallFolder()->getPath() . '/', Settings::get()->URL, $file->getFolder()->getPath()).'/';
 		
-		$css = preg_replace_callback('/url[\s]*\(([^\)]*)\)/iU', 
+		return preg_replace_callback('/url[\s]*\(([^\)]*)\)/iU', 
 			function($matches) use($baseurl) { 
 				return 'url('.$baseurl.trim(stripslashes($matches[1]),'\'" ').')';
 			}, $css);
-
-		$css = str_replace("sourceMappingURL=", "sourceMappingURL=".$baseurl, $css);
-
-		return $css;
 		 //return preg_replace('/url[\s]*\(([^\)]*)\)/ieU', "GO\Base\View\Extjs3::_replaceUrlCallback('$1', \$baseurl)", $css);
 	}
 	
@@ -94,23 +82,23 @@ class Extjs3 {
 	 */
 	public function getLanguageJS() {
 		
-		$iso = \go()->getLanguage()->getIsoCode();
+		$iso = \GO()->getLanguage()->getIsoCode();
 	
 		
-		$cacheFile = go()->getDataFolder()->getFile('clientscripts/lang_'.$iso.'.js');
+		$cacheFile = GO()->getDataFolder()->getFile('clientscripts/lang_'.$iso.'.js');
 
-		if (go()->getDebugger()->enabled || !$cacheFile->exists()) {
+		if (GO()->getDebugger()->enabled || !$cacheFile->exists()) {
 //		if (!$cacheFile->exists()) {
 
 			$str = "var GO = GO || {};\n";
 
-			$extjsLang = \go()->getLanguage()->t("extjs_lang");
+			$extjsLang = \GO()->getLanguage()->t("extjs_lang");
 			if ($extjsLang == 'extjs_lang')
 				$extjsLang = $iso;
 
 			$viewRoot = Environment::get()->getInstallFolder()->getFolder('views/Extjs3');
 
-			$extLang = $viewRoot->getFile('javascript/ext-locale/ext-lang-' . $extjsLang . '.js');
+			$extLang = $viewRoot->getFile('ext/src/locale/ext-lang-' . $extjsLang . '.js');
 			if ($extLang->exists()) {
 				$str .= $extLang->getContents();
 			}
@@ -123,7 +111,7 @@ class Extjs3 {
 			}
 
 			//Put all lang vars in js		
-			$l = \go()->getLanguage()->getAllLanguage();
+			$l = \GO()->getLanguage()->getAllLanguage();
 			$l['iso'] = $iso;
 
 			$str .= 'GO.lang = ' . json_encode($l) . ";\n";

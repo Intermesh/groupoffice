@@ -960,7 +960,7 @@ Content-type: multipart/mixed; boundary="Boundary_(ID_OF/cBsTfVK4gbVsbFd1O1Q)"
 					$i++;
 					
 					if(!isset($arr[$i])) {
-						go()->debug("Abnormal structure encountered: ".$response);
+						GO()->debug("Abnormal structure encountered: ".$response);
 						break;
 					}
 
@@ -1012,7 +1012,7 @@ Content-type: multipart/mixed; boundary="Boundary_(ID_OF/cBsTfVK4gbVsbFd1O1Q)"
 					$attr['date'] = new \IFW\Util\DateTime($attr['date']);
 					$attr['date']->setTimezone(new DateTimeZone("UTC"));
 				} catch(\Exception $e) {
-					go()->debug("Failed to parse date: ".$e->getMessage());
+					GO()->debug("Failed to parse date: ".$e->getMessage());
 					
 					unset($attr['date']); //we'll use internaldate later instead
 				}
@@ -1402,7 +1402,7 @@ Content-type: multipart/mixed; boundary="Boundary_(ID_OF/cBsTfVK4gbVsbFd1O1Q)"
 	private function appendEnd() {
 		$result = $this->connection->getResponse();
 		
-//		\go()->debug($result);
+//		\GO()->debug($result);
 		
 		//A96 OK [APPENDUID 1291728129 165] Append completed.
 		

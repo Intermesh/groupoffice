@@ -22,13 +22,7 @@ if(Http::isAjaxRequest()){
 		echo '<h2>Debug info:</h2>';
 		echo '<pre>';
 		echo StringHelper::encodeHtml(var_export($data['response'], true));
-
-		echo "\n\n-----\n\n";
-
-		go()->getDebugger()->printEntries();
 		echo '</pre>';
-
-		
 	}
 	
 	require("externalFooter.php");

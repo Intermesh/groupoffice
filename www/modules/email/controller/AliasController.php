@@ -50,20 +50,21 @@ class AliasController extends \GO\Base\Controller\AbstractModelController {
 		$record['signature_below_reply'] = $model->account->signature_below_reply;
 		$record['template_id']=0;
 		
-		unset($record['signature']);
-		
-		$defaultAccountTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->account_id);
+		if(\GO::modules()->addressbook){
+			$defaultAccountTemplateModel = \GO\Addressbook\Model\DefaultTemplateForAccount::model()->findByPk($model->account_id);
 			if($defaultAccountTemplateModel){
 				$record['template_id']=$defaultAccountTemplateModel->template_id;
 			}else{
-				$defaultUserTemplateModel = \GO\Email\Model\DefaultTemplate::model()->findByPk(\GO::user()->id);
+				$defaultUserTemplateModel = \GO\Addressbook\Model\DefaultTemplate::model()->findByPk(\GO::user()->id);
 				if(!$defaultUserTemplateModel){
-					$defaultUserTemplateModel= new \GO\Email\Model\DefaultTemplateForAccount();
+					$defaultUserTemplateModel= new \GO\Addressbook\Model\DefaultTemplateForAccount();
 					$defaultUserTemplateModel->account_id = $model->account_id;
 					$defaultUserTemplateModel->save();
 				}
 				$record['template_id']=$defaultUserTemplateModel->template_id;
 			}
+		}
+		unset($record['signature']);
 		
 
 		return parent::formatStoreRecord($record, $model, $store);

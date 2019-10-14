@@ -276,12 +276,11 @@ GO.grid.PermissionsPanel = Ext.extend(Ext.Panel, {
 
 	// private
 	showUsersInGroupDialog : function(groupId) {
-
-
-				var win = new go.groups.GroupMemberWindow();
-				win.load(groupId).show();
-			
-
+		if (!this.usersInGroupDialog) {
+			this.usersInGroupDialog = new GO.dialog.UsersInGroup();
+		}
+		this.usersInGroupDialog.setGroupId(groupId);
+		this.usersInGroupDialog.show();
 	}
 
 });

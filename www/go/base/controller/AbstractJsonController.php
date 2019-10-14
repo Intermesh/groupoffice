@@ -66,9 +66,12 @@ abstract class AbstractJsonController extends AbstractController {
 		$response['data']['permission_level'] = $model->getPermissionLevel();
 		$response['data']['write_permission'] = true;
 
-		if($model->hasCustomfields())
+		//Add the customerfields to the data array
+		if(\GO::user()->getModulePermissionLevel('customfields') && $model->customfieldsRecord)
 		{
-			$response['data']['customFields'] = $model->getCustomFields();
+			foreach($model->customfieldsRecord->getAttributes() as $key => $value) {
+				$response['data']['customFields.'.$key] = $value;
+			}
 		}
 
 		if (!empty($remoteComboFields))
@@ -105,13 +108,15 @@ abstract class AbstractJsonController extends AbstractController {
 		$response['data']['write_permission'] = \GO\Base\Model\Acl::hasPermission($response['data']['permission_level'], \GO\Base\Model\Acl::WRITE_PERMISSION);
 
 
-		if($model->hasCustomfields())
-		{
-			$response['data']['customFields'] = $model->getCustomFields();
-		}
+		$response['data']['customfields'] = array();
 
 		if (!isset($response['data']['workflow']) && \GO::modules()->workflow)
 			$response = $this->_processWorkflowDisplay($model, $response);
+
+		if ($model->customfieldsRecord)
+			$response = $this->_processCustomFieldsDisplay($model, $response);
+
+
 		
 		if (\GO::modules()->lists)
 			$response = \GO\Lists\ListsModule::displayResponse($model, $response);
@@ -226,7 +231,9 @@ abstract class AbstractJsonController extends AbstractController {
 	protected function renderExport(\GO\Base\Data\AbstractStore $store, $params) {
 		//define('EXPORTING', true);
 		//used by custom fields to format diffently
-
+		if(\GO::modules()->customfields)
+			\GO\Customfields\Model\AbstractCustomFieldsRecord::$formatForExport=true;
+		
 		$checkboxSettings = array(
 			'export_include_headers'=>!empty($params['includeHeaders']),
 			'export_human_headers'=>empty($params['humanHeaders']),
@@ -416,6 +423,65 @@ abstract class AbstractJsonController extends AbstractController {
 		return $response;
 	}
 
+	private function _processCustomFieldsDisplay($model, $response) {
+		$customAttributes = $model->customfieldsRecord->getAttributes('html');
 
+		//Get all field models and build an array of categories with their
+		//fields for display.
+		$cls = $model->customfieldsRecord->extendsModel();
+		$entityId = $cls::getType()->getId();;
+
+		$findParams = \GO\Base\Db\FindParams::newInstance()
+						->joinRelation('category')
+						->order(array('category.sortOrder', 't.sortOrder'), array('ASC', 'ASC'));
+		$findParams->getCriteria()
+						->addCondition('entityId', $entityId, '=', 'category');
+
+		$stmt = \GO\Customfields\Model\Field::model()->find($findParams);
+
+		$categories = array();
+
+		while ($field = $stmt->fetch()) {
+			if (!isset($categories[$field->fieldSetId])) {
+				$categories[$field->category->id]['id'] = $field->category->id;
+				$categories[$field->category->id]['name'] = $field->category->name;
+				$categories[$field->category->id]['fields'] = array();
+			}
+			if (!empty($customAttributes[$field->columnName()])) {
+				if ($field->datatype == "GO\Customfields\Customfieldtype\Heading") {
+					$header = array('name' => $field->name, 'value' => $customAttributes[$field->columnName()]);
+				}
+				if (!empty($header)) {
+					$categories[$field->category->id]['fields'][] = $header;
+					$header = null;
+				}
+				$categories[$field->category->id]['fields'][] = array(
+						'name' => $field->name,
+						'datatype'=>$field->datatype,
+						'value' => $customAttributes[$field->columnName()]
+				);
+			}
+		}
+
+		foreach ($categories as $category) {
+			if (count($category['fields']))
+				$response['data']['customfields'][] = $category;
+		}
+
+		if(isset($response['data']['customfields']) && method_exists($model, 'getDisabledCustomFieldsCategoriesField') && \GO\Customfields\Model\DisableCategories::isEnabled($model->className(), $model->disabledCustomFieldsCategoriesField)){
+			$ids = \GO\Customfields\Model\EnabledCategory::model()->getEnabledIds($model->className(), $model->getDisabledCustomFieldsCategoriesField());
+			
+			$enabled = array();
+			foreach($response['data']['customfields'] as $cat){
+				if(in_array($cat['id'], $ids)){
+					$enabled[]=$cat;
+				}
+			}
+			$response['data']['customfields']=$enabled;
+
+		}
+
+		return $response;
+	}
 
 }

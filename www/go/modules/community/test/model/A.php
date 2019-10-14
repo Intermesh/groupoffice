@@ -1,7 +1,7 @@
 <?php
 namespace go\modules\community\test\model;
 
-use go\core\jmap\Entity;
+use go\core\orm\Entity;
 use go\core\orm\Mapping;
 use go\core\util\DateTime;
 
@@ -52,8 +52,8 @@ class A extends Entity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable('test_a', 'a')						
-						->addArray('hasMany', AHasMany::class, ['id' => 'aId'])
-						->addHasOne('hasOne', AHasOne::class, ['id' => 'aId']);
+						->addRelation('hasMany', AHasMany::class, ['id' => 'aId'], true)
+						->addRelation('hasOne', AHasOne::class, ['id' => 'aId'], false);
 	}
 
 }

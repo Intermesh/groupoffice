@@ -131,7 +131,7 @@ this.gridPanel.store.on('load', function(store, records, options)
 			region:'west',
 			autoScroll:false,
 			closeOnTab: true,
-			width: 200,
+			width: dp(224),
 			resizable:true,
 			cls: 'go-sidenav',
 			layout:'border',
@@ -169,14 +169,14 @@ this.gridPanel.store.on('load', function(store, records, options)
 						},
 						scope: this
 					},{
-						iconCls: 'ic-settings',
+						iconCls: 'btn-settings',
 						tooltip: t("Administration"),
 						handler: function(){
 							this.showAdminDialog();
 						},
 						scope: this
 					},{
-						iconCls: 'ic-refresh',
+						iconCls: 'btn-refresh',
 						tooltip: t("Refresh"),
 						handler: function(){
 							this.taskListsStore.load();
@@ -251,7 +251,7 @@ Ext.extend(GO.tasks.MainPanel, Ext.Panel,{
 		},this);
 
 		var requests = {
-			tasklists:{r:"tasks/tasklist/store", limit: GO.settings.config.nav_page_size},				
+			tasklists:{r:"tasks/tasklist/store"},				
 			categories:{r:"tasks/category/store"}
 		}
 
@@ -526,44 +526,15 @@ go.Modules.register("legacy", 'tasks', {
 	title: t("Tasks", "tasks"),
 	iconCls: 'go-tab-icon-tasks',
 	entities: [{
-			name: 'Task',
-			links: [{
-					iconCls: "entity Task blue",
-					linkWindow: function() {
-						var win = new GO.tasks.TaskDialog();
-						win.win.closeAction = "close";
-						return win;
-					},
-					linkDetail: function() {
-						return new GO.tasks.TaskPanel();
-					},
-					linkDetailCards: function() {
-						var forth = new go.links.DetailPanel({
-							link: {
-								title: t("Incomplete tasks"),
-								iconCls: 'icon ic-check blue',
-								entity: "Task",
-								filter: null
-							}
-						});
-	
-						forth.store.setFilter('incomplete', {incompleteTasks: true});
-	
-						var past = new go.links.DetailPanel({						
-							link: {
-								title: t("Completed tasks"),
-								iconCls: 'icon ic-check blue',
-								entity: "Task",
-								filter: null
-							}
-						});
-	
-						past.store.setFilter('completed', {completedTasks: true});
-	
-						return [forth, past];
-					}	
-			}]
+			name: "Task",			
+			linkWindow: function() {
+				var win = new GO.tasks.TaskDialog();
+				win.win.closeAction = "close";
+				return win;
+			},
+			linkDetail: function() {
+				return new GO.tasks.TaskPanel();
+			}	
 	}],
-	
 	userSettingsPanels: ["GO.tasks.SettingsPanel"]
 });

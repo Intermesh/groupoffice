@@ -101,3 +101,5 @@ abstract class FormModel extends \GO\Base\Model {
 	}
 
 }
+
+?>
