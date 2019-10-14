@@ -1,3 +1,5 @@
+14-10-2019 6.4.66
+- Core: added total number of rows in new grid panels
 - Email: Create links when replying to linked messages and from message dialog
 - LDAP Auth: Fixed Sync usernames and authentication on sync
 - Calendar: Events and tasks report mailer was broken
