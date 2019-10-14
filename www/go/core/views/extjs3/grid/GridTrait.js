@@ -39,6 +39,9 @@ go.grid.GridTrait = {
 	initTotalDisplay: function() {
 
 		this.store.on("beforeload", function(store, options) {
+			if(!this.getView().totalDisplay) {
+				return;
+			}
 			if((options.params.limit || store.baseParams && store.baseParams.limit) && go.util.empty(options.params.position)) {
 				//only calculate total on first load.
 				options.params.calculateTotal = true;
@@ -46,7 +49,7 @@ go.grid.GridTrait = {
 		}, this);
 
 		this.store.on("load", function(store, records, o){
-			if(this.getView().totalDisplay && o.params && !go.util.empty(o.params.position)) {
+			if(!this.getView().totalDisplay || (o.params && !go.util.empty(o.params.position))) {
 				return;
 			}
 			if(store.getTotalCount()) {
