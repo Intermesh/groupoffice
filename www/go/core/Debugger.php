@@ -220,9 +220,9 @@ class Debugger {
 			$line = "\n" . $line;
 		}
 
-		if(go()->getEnvironment()->isCli()) {
-			echo $line;
-		}
+		// if(go()->getEnvironment()->isCli()) {
+		// 	echo $line;
+		// }
 
 		if(!empty($this->logPath)) {
 			$debugLog = new Fs\File($this->logPath);

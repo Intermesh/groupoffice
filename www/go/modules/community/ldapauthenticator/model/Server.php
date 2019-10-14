@@ -151,17 +151,7 @@ class Server extends Entity {
 			if(!$this->connection->startTLS()) {
 				throw new \Exception("Couldn't enable TLS: " . $this->connection->getError());
 			}			
-		}
-		
-		if (!empty($this->username)) {			
-			
-			if (!$this->connection->bind($this->username, $this->getPassword())) {				
-				throw new \Exception("Invalid password given for '".$this->username."'");
-			} else
-			{
-				go()->debug("Authenticated with user '" . $this->username . '"');
-			}
-		}
+		}	
 
 		return $this->connection;
 	}

@@ -1,5 +1,5 @@
 <?php
-namespace go\modules\community\ldapauthenticator\controller;
+namespace go\modules\community\ldapauthenticator\cli\controller;
 
 use go\core\Controller;
 use go\modules\community\ldapauthenticator\model\Server;
@@ -34,21 +34,37 @@ class Sync extends Controller {
 
     $connection = $server->connect();
 
+    if (!empty($server->username)) {
+			if (!$connection->bind($server->username, $server->getPassword())) {				
+				throw new \Exception("Invalid password given for '".$server->username."'");
+			} else
+			{
+				go()->debug("Authenticated with user '" . $server->username . '"');
+			}
+		}
+
     $usersInLDAP = [1];
+
+    $domains  = array_map(function($d) {return $d->name;}, $server->domains);
 		
 		$records = Record::find($connection, $server->peopleDN, $server->syncUsersQuery);
     
     $i = 0;
     foreach($records as $record) {
       $i++;
-      $username = $record->uid[0] ?? $record->SAMAccountName[0];
-
+      $username = $this->getGOUserName($record, $domains);
+      
       if (empty($username)) {
         throw new \Exception("Empty group name in LDAP record!");
       }
-      $user = User::find()->where(['username' => $username])->single();
-      if (!$user) {
+      $user = User::find()->where(['username' => $username]);
+      
+      if(!empty($record->mail[0])) {
+        $user->orWhere(['email' => $record->mail[0]]);
+      }      
+      $user = $user->single();
 
+      if (!$user) {
         echo "Creating user '" . $username . "'\n";
 
         $user = new User();
@@ -64,7 +80,7 @@ class Sync extends Controller {
 
       if (!$dryRun) {
         if($user->isModified() && !$user->save()) {
-          echo "Error saving user: " . implode("\n", $user->getValidationErrors());
+          echo "Error saving user: " . var_export($user->getValidationErrors(), true);
           continue;
         }
 
@@ -82,6 +98,47 @@ class Sync extends Controller {
 		}
 
     echo "Done\n\n";
+  }
+
+  private function getGOUserName(Record $record, array $domains) {
+    $username = $record->uid[0] ?? $record->SAMAccountName[0];
+
+    $dn = ldap_explode_dn($record->getDn(), 0);
+
+    /*
+      array(5) {
+      ["count"]=>
+      int(4)
+      [0]=>
+      string(19) "cn=John A. Zoidberg"
+      [1]=>
+      string(9) "ou=people"
+      [2]=>
+      string(16) "dc=planetexpress"
+      [3]=>
+      string(6) "dc=com"
+    }*/
+
+    $domain = "";
+    foreach($dn as $v) {
+      if(substr($v, 0, 3) == 'dc=') {
+        if($domain != "") {
+          $domain .= '.';
+        }
+        $domain .= substr($v, 3);
+      }
+    }
+
+    if(empty($domain)) {
+      throw new \Exception("Domain can't be determined for user " . $username);
+    }
+
+    if(!in_array($domain, $domains)) {
+      throw new \Exception("Domain '$domain' from '$username' is not listed in the authenticator domains: " . implode(', ', $domains));
+    }    
+
+    return $username . '@' . $domain;
+
   }
 
 
@@ -123,6 +180,15 @@ class Sync extends Controller {
     $this->serverId = $id;
 
     $connection = $server->connect();
+
+    if (!empty($server->username)) {
+			if (!$connection->bind($server->username, $server->getPassword())) {				
+				throw new \Exception("Invalid password given for '".$server->username."'");
+			} else
+			{
+				go()->debug("Authenticated with user '" . $server->username . '"');
+			}
+		}
 
     $groupsInLDAP = [Group::ID_ADMINS, Group::ID_EVERYONE, Group::ID_INTERNAL];
 		
