@@ -1,6 +1,8 @@
 - Email: Create links when replying to linked messages and from message dialog
-- LDAP Auth: Authentication with admin didn't work because password wasn't decrypted
+- LDAP Auth: Fixed Sync usernames and authentication on sync
 - Calendar: Events and tasks report mailer was broken
+- E-mail: Autolink all contacts with matching email address
+- Address book: Add suffix and prefix to detail view title
 
 11-10-2019 6.4.65
 - Contacts: Fixed problem with duplicating phone number and possibly unlinking company
