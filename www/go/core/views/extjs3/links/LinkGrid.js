@@ -43,7 +43,7 @@ go.links.LinkGrid = Ext.extend(go.grid.GridPanel, {
 		];
 		
 		
-		this.view = new Ext.grid.GridView({
+		this.view = new go.grid.GridView({
 			  enableRowBody:true,
 			  showPreview:true,
 			  getRowClass : function(record, rowIndex, p, ds) {

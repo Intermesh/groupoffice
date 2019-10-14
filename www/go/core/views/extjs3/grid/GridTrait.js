@@ -32,8 +32,30 @@ go.grid.GridTrait = {
 			Ext.applyIf(this, go.panels.ScrollLoader);
 			this.initScrollLoader();
 		}
+		
+		this.initTotalDisplay();
+	},	
 
-		this.getView().htmlEncode = true;
+	initTotalDisplay: function() {
+
+		this.store.on("beforeload", function(store, options) {
+			if((options.params.limit || store.baseParams && store.baseParams.limit) && go.util.empty(options.params.position)) {
+				//only calculate total on first load.
+				options.params.calculateTotal = true;
+			}
+		}, this);
+
+		this.store.on("load", function(store, records, o){
+			if(this.getView().totalDisplay && o.params && !go.util.empty(o.params.position)) {
+				return;
+			}
+			if(store.getTotalCount()) {
+				this.getView().totalDisplay.update(store.getTotalCount() + " " +t("items"));
+				this.getView().totalDisplay.show();
+			} else {
+				this.getView().totalDisplay.hide();
+			}
+		}, this);
 	},
 	
 	initHeaderMenu : function() {
@@ -63,7 +85,7 @@ go.grid.GridTrait = {
 			return;
 		}
 		
-		this.getView().scrollOffset = dp(24);
+		this.getView().scrollOffset = Ext.getScrollBarWidth();
 		
 	},
 	

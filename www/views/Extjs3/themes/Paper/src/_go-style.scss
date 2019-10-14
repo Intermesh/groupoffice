@@ -1951,3 +1951,16 @@ table[id^="comments-ext"] b {
 .silk-stop { background-image: url(/img/icons/silk/stop.png) !important; background-repeat: no-repeat; }
 .silk-arrow-up { background-image: url(/img/icons/silk/arrow_up.png) !important; background-repeat: no-repeat; }
 
+.go-grid-total {
+	position: absolute;
+	bottom: 0;
+	right:0;
+	text-align: right;
+	padding: dp(4) dp(16);
+	border: 1px solid color($fg, 'line');
+	border-bottom:0;
+	border-right: 0;
+	border-top-left-radius: dp(8);
+	background-color: color($bg, 'box');
+	cursor: pointer;
+}

@@ -17,6 +17,7 @@ Stores.js
 Modules.js
 
 panels/ScrollLoader.js
+grid/GridView.js
 grid/GridTrait.js
 grid/plugin/Sortable.js
 grid/GridPanel.js
