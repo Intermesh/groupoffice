@@ -232,10 +232,13 @@ class Blob extends orm\Entity {
 		}
 		if (!file_exists($this->path())) { 
 			if (!empty($this->tmpFile)) {
+
+				$tempFile = new File($this->tmpFile);
+
 				if($this->removeFile) {
-					rename($this->tmpFile, $this->path());
+					$tempFile->move(new File($this->path()));
 				} else{
-					copy($this->tmpFile, $this->path());
+					$tempFile->copy(new File($this->path()));					
 				}
 			} else if (!empty($this->strContent)) {
 				file_put_contents($this->path(), $this->strContent);
