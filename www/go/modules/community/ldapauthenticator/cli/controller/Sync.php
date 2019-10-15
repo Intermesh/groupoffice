@@ -278,7 +278,7 @@ class Sync extends Controller {
 		echo "Groups in Group-Office: " . $totalInGO . "\n";
     echo "Groups in LDAP: " . $totalInLDAP . "\n";
     
-    $percentageToDelete = round((1 - $totalInLDAP / $totalInGO) * 100);		
+    $percentageToDelete = $totalInGO > 0 ? round((1 - $totalInLDAP / $totalInGO) * 100) : 0;		
     if ($percentageToDelete > $maxDeletePercentage)
       throw new \Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
 
