@@ -359,9 +359,15 @@
 11-06-2019 6.4.21
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
+- Projects: Fixed activity sort in time tracking
+- Billing: Fixed total not always updating in expense dialog
+
+11-10-2019 6.3.83
 - Core: Working week didn't accept half hours
 - Time Tracking: Sort time tracking activities by name
 - Calendar: Calendar remember state
+- Assistant: Didn't work with @ in username
+- Core: fixed 6.2 email settings upgrade
 
 19-09-2019 6.3.82
 - Projects larger expense budget dialog and resizable
