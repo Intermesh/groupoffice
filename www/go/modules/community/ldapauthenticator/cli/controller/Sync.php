@@ -18,7 +18,9 @@ class Sync extends Controller {
 
   const EVENT_SYNC_GROUP = 'syncuser';
 
-	use EventEmitterTrait;
+  use EventEmitterTrait;
+  
+  private $domains;
 
   /**
    * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php community/ldapauthenticator/Sync/users --id=2 --dryRun=1 --delete=1 --maxDeletePercentage=50
@@ -45,14 +47,14 @@ class Sync extends Controller {
 
     $usersInLDAP = [1];
 
-    $domains  = array_map(function($d) {return $d->name;}, $server->domains);
+    $this->domains  = array_map(function($d) {return $d->name;}, $server->domains);
 		
 		$records = Record::find($connection, $server->peopleDN, $server->syncUsersQuery);
     
     $i = 0;
     foreach($records as $record) {
       $i++;
-      $username = $this->getGOUserName($record, $domains);
+      $username = $this->getGOUserName($record);
       
       if (empty($username)) {
         throw new \Exception("Empty group name in LDAP record!");
@@ -100,7 +102,7 @@ class Sync extends Controller {
     echo "Done\n\n";
   }
 
-  private function getGOUserName(Record $record, array $domains) {
+  private function getGOUserName(Record $record) {
     $username = $record->uid[0] ?? $record->SAMAccountName[0];
 
     $dn = ldap_explode_dn($record->getDn(), 0);
@@ -131,7 +133,7 @@ class Sync extends Controller {
 
     $mailDomain = isset($record->mail[0]) ? explode('@', $record->mail[0])[1] : null;
 
-    if(empty($domain) || !in_array($domain, $domains)) {    
+    if(empty($domain) || !in_array($domain, $this->domains)) {    
       if(empty($mailDomain)) {
         go()->info("Using domain from mail property for " . $username);
         throw new \Exception("Domain can't be determined for user " . $username);
@@ -139,8 +141,8 @@ class Sync extends Controller {
       $domain = $mailDomain;
     }
 
-    if(!in_array($domain, $domains)) {
-      throw new \Exception("Domain '$domain' from '$username' is not listed in the authenticator domains: " . implode(', ', $domains));
+    if(!in_array($domain, $this->domains)) {
+      throw new \Exception("Domain '$domain' from '$username' is not listed in the authenticator domains: " . implode(', ', $this->domains));
     }
 
     return $username . '@' . $domain;
@@ -157,16 +159,21 @@ class Sync extends Controller {
 
 		echo "Groups in Group-Office: " . $totalInGO . "\n";
     echo "Groups in LDAP: " . $totalInLDAP . "\n";
-    
-    $percentageToDelete = round((1 - $totalInLDAP / $totalInGO) * 100);		
-    if ($percentageToDelete > $maxDeletePercentage)
-      throw new \Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
 
-    foreach($users as $user) {
-      if (!in_array($user->id, $usersInLDAP)) {
-        echo "Deleting " . $user->username . "\n";
-        if (!$dryRun)
-          $user->delete();
+    $percentageToDelete = $totalInGO > 0 ? round((1 - $totalInLDAP / $totalInGO) * 100) : 0;		
+
+    if($percentageToDelete > 0) {
+      echo "Delete percentage: " . $percentageToDelete . "%\n";
+
+      if ($percentageToDelete > $maxDeletePercentage)
+        throw new \Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
+
+      foreach($users as $user) {
+        if (!in_array($user->id, $usersInLDAP)) {
+          echo "Deleting " . $user->username . "\n";
+          if (!$dryRun)
+            $user->delete();
+        }
       }
     }
   }
@@ -186,6 +193,8 @@ class Sync extends Controller {
     $this->serverId = $id;
 
     $connection = $server->connect();
+
+    $this->domains  = array_map(function($d) {return $d->name;}, $server->domains);
 
     if (!empty($server->username)) {
 			if (!$connection->bind($server->username, $server->getPassword())) {				
@@ -279,14 +288,20 @@ class Sync extends Controller {
     echo "Groups in LDAP: " . $totalInLDAP . "\n";
     
     $percentageToDelete = $totalInGO > 0 ? round((1 - $totalInLDAP / $totalInGO) * 100) : 0;		
-    if ($percentageToDelete > $maxDeletePercentage)
-      throw new \Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
 
-    foreach($groups as $group) {
-      if (!in_array($group->id, $groupsInLDAP)) {
-        echo "Deleting " . $group->name . "\n";
-        if (!$dryRun)
-          $group->delete();
+    if($percentageToDelete > 0) {
+      echo "Delete percentage: " . $percentageToDelete . "%\n";
+
+      if ($percentageToDelete > $maxDeletePercentage)
+        throw new \Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
+
+      
+      foreach($groups as $group) {
+        if (!in_array($group->id, $groupsInLDAP)) {
+          echo "Deleting " . $group->name . "\n";
+          if (!$dryRun)
+            $group->delete();
+        }
       }
     }
   }
@@ -324,6 +339,6 @@ class Sync extends Controller {
 		$accountResult = Record::find($ldapConn, $searchDn, $query);
     $record = $accountResult->fetch();
     
-		return $record->SAMAccountName[0] ?? $record->uid[0];
+		return $this->getGOUserName($record);
 	}
 }
