@@ -1,3 +1,6 @@
+- Projects: Fixed activity sort in time tracking
+- Billing: Fixed total not always updating in expense dialog
+
 11-10-2019 6.3.83
 - Core: Working week didn't accept half hours
 - Time Tracking: Sort time tracking activities by name
