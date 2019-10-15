@@ -1,6 +1,7 @@
 Ext.define('go.grid.GridView', {
   extend: 'Ext.grid.GridView',
-  htmlEncode: true,
+	htmlEncode: true,
+	totalDisplay: true,
 	masterTpl: new Ext.Template(
 		'<div class="x-grid3" hidefocus="true">',
 				'<div class="x-grid3-viewport">',
@@ -23,11 +24,18 @@ Ext.define('go.grid.GridView', {
 		initElements: function() {
 			this.callParent(arguments);
 
-      this.totalDisplay = this.el.child('div.go-grid-total');
-      this.totalDisplay.setRight(this.scrollOffset);
-			this.totalDisplay.on("click", function() {
-				this.totalDisplay.hide();
-			}, this);
+			if(this.totalDisplay) {
+				this.totalDisplay = this.el.child('div.go-grid-total');
+				this.totalDisplay.setRight(this.scrollOffset);
+				this.totalDisplay.on("click", function() {
+					this.totalDisplay.hide();
+				}, this);
+			} else{
+				var td = this.el.child('div.go-grid-total');
+				if(td) {
+					td.remove();
+				}
+			}
 			
 		}
 });
