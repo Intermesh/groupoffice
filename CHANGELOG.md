@@ -1,5 +1,10 @@
+15-10-2019 6.4.67
 - Addressbook and notes: Hide totals in nav bars
 - Core: Fixed import CSV for custom fields values that are exported as text (Select, Multiselect)
+- Projects: Fixed activity sort in time tracking
+- Billing: Fixed total not always updating in expense dialog
+- Core: new total display of grids also showed in nav bars. Removed now.
+- LDAPAuth: Fixed users and group sync
 
 14-10-2019 6.4.66
 - Core: added total number of rows in new grid panels
@@ -9,6 +14,7 @@
 - E-mail: Autolink all contacts with matching email address
 - Address book: Add suffix and prefix to detail view title
 - Core: CSV import would not import anything in some cases
+- Assistant: Didn't work with @ in username
 
 11-10-2019 6.4.65
 - Contacts: Fixed problem with duplicating phone number and possibly unlinking company
