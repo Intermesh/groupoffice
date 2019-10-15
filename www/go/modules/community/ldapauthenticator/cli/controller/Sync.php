@@ -129,13 +129,19 @@ class Sync extends Controller {
       }
     }
 
-    if(empty($domain)) {
-      throw new \Exception("Domain can't be determined for user " . $username);
+    $mailDomain = isset($record->mail[0]) ? explode('@', $record->mail[0])[1] : null;
+
+    if(empty($domain) || !in_array($domain, $domains)) {    
+      if(empty($mailDomain)) {
+        go()->info("Using domain from mail property for " . $username);
+        throw new \Exception("Domain can't be determined for user " . $username);
+      } 
+      $domain = $mailDomain;
     }
 
     if(!in_array($domain, $domains)) {
       throw new \Exception("Domain '$domain' from '$username' is not listed in the authenticator domains: " . implode(', ', $domains));
-    }    
+    }
 
     return $username . '@' . $domain;
 
