@@ -9,7 +9,6 @@ use go\core\orm\Query;
 use go\modules\community\task\model\Alert;
 use go\core\util\DateTime;
 use go\modules\community\task\convert\Csv;
-use go\modules\community\task\convert\Sabre2\VObject\Component\Sabre2\VObject\Component\VCalendar;
 
 /**
  * Task model
@@ -149,7 +148,7 @@ class Task extends Entity {
 	 */							
 	protected $byDay = '';
 
-	public $vcalendarBlobId;
+	protected $vcalendarBlobId;
 
 	protected $uri;
 
