@@ -1,4 +1,5 @@
 - Addressbook and notes: Hide totals in nav bars
+- Core: Fixed import CSV for custom fields values that are exported as text (Select, Multiselect)
 
 14-10-2019 6.4.66
 - Core: added total number of rows in new grid panels
