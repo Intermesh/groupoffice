@@ -16,9 +16,7 @@ class MultiSelect extends Select {
 		return false;
 	}
 	
-	public function hasMany() {
-		return true;
-	}
+
 
 	public function onFieldSave() {
 
@@ -121,6 +119,27 @@ class MultiSelect extends Select {
 							->from($this->getMultiSelectTableName(), 'ms')
 							->where(['id' => $values['id']])
 							->all());
+	}
+
+	public function textToDb($value, &$values)
+	{	
+		if(empty($value)) {
+			return [];
+		}
+
+		$texts = array_map('trim', explode(',', $value));
+
+		$ids = (new Query())
+							->selectSingleValue("id")							
+							->from("core_customfields_select_option")
+							->where(['text' => $texts])
+							->andWhere(['fieldId' => $this->field->id])
+							->all();
+
+		if(count($ids) != count($texts)) {
+			throw new \Exception("Invalid value(s) for multi select field '". $this->field->databaseName . "': ".implode(', ', $texts));
+		}
+		return $ids;
 	}
 
 	public function onFieldDelete() {

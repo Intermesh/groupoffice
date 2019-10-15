@@ -36,8 +36,8 @@ class DateTime extends Base {
 		});
 	}
 
-	public function dbToText($value, &$values)
-	{
-		return $value instanceof \DateTime ? $value->format(go()->getAuthState()->getUser(['dateFormat','timeformat'])->getDateTimeFormat()) : $value;
-	}
+	// public function dbToText($value, &$values)
+	// {
+	// 	return $value instanceof \DateTime ? $value->format(go()->getAuthState()->getUser(['dateFormat','timeformat'])->getDateTimeFormat()) : $value;
+	// }
 }

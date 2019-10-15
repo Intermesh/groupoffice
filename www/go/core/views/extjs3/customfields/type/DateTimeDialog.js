@@ -3,10 +3,11 @@
 		 var items =  go.customfields.type.DateTimeDialog.superclass.initFormItems.call(this);
 		 
 		 items[0].items  = items[0].items.concat([{
-				xtype: "datetime",
+				xtype: "datetimefield",
 				name: "default",
 				fieldLabel: t("Default value"),
-				width: dp(340)
+				width: dp(340),
+				allowBlank: true
 			}]);
 		
 		 return items;
