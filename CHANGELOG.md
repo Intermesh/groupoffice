@@ -1,3 +1,5 @@
+- Addressbook and notes: Hide totals in nav bars
+
 14-10-2019 6.4.66
 - Core: added total number of rows in new grid panels
 - Email: Create links when replying to linked messages and from message dialog

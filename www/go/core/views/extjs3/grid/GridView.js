@@ -30,12 +30,27 @@ Ext.define('go.grid.GridView', {
 				this.totalDisplay.on("click", function() {
 					this.totalDisplay.hide();
 				}, this);
+
+				this.setTotalCount(this.totalCount);
 			} else{
 				var td = this.el.child('div.go-grid-total');
 				if(td) {
 					td.remove();
 				}
+			}			
+		},
+
+		totalCount: 0,
+		setTotalCount: function(c) {
+			this.totalCount = c;
+			if(Ext.isBoolean(this.totalDisplay)){
+				return; //not rendered
 			}
-			
+			if(c) {
+				this.totalDisplay.update(c + " " +t("items"));
+				this.totalDisplay.show();
+			} else {
+				this.totalDisplay.hide();
+			}
 		}
 });
