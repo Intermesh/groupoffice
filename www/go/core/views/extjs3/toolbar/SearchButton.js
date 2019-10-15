@@ -32,6 +32,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	store: null,
 	tooltip: t('Search'),
 	searchToolBar: null,	
+	query: "",
 	
 	//Specify all the remote jmap filters that can be used in the search box as an 
 	//array. eg.
@@ -64,6 +65,47 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			
 		//this.filters = go.util.Filters.normalize(config.filters || ['text']);
 		
+		if(this.onwnerCt) {
+			this.lookupStore();
+		} else{
+			this.on('added', function() {
+				this.lookupStore();
+			}, this);
+		}
+
+		this.on('destroy', function() {
+			if(this.searchToolBar) {
+				this.searchToolBar.destroy();
+			}
+		}, this);
+
+
+		var me = this;
+
+		this.triggerField = new Ext.form.TriggerField({
+			xtype: 'trigger',
+			validationEvent: false,
+			validateOnBlur: false,
+			triggerClass: 'x-form-search-trigger',
+			value: this.query,
+			listeners: {				
+				specialkey: function (field, e) {					
+					if (e.getKey() == Ext.EventObject.ENTER) {
+						e.preventDefault(); //to prevent form submission
+						this.search();
+					}
+				},
+				scope: this
+			},
+			onTriggerClick: function () {
+				me.search();
+			},
+			flex: 1
+		});
+	},
+	
+
+	lookupStore : function() {
 		if(!this.store) {			
 			//try to find store if this button it part of a grid.
 			var grid = this.findParentByType('grid');
@@ -101,32 +143,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 				}
 			});
 		}
-
-
-		var me = this;
-
-		this.triggerField = new Ext.form.TriggerField({
-			xtype: 'trigger',
-			emptyText: t('Search'),
-			validationEvent: false,
-			validateOnBlur: false,
-			triggerClass: 'x-form-search-trigger',
-			listeners: {				
-				specialkey: function (field, e) {					
-					if (e.getKey() == Ext.EventObject.ENTER) {
-						e.preventDefault(); //to prevent form submission
-						this.search();
-					}
-				},
-				scope: this
-			},
-			onTriggerClick: function () {
-				me.search();
-			},
-			flex: 1
-		});
 	},
-	
 	
 	
 	/**
@@ -248,9 +265,16 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 				});
 			}
 		}
+
+		
 		
 		
 		go.toolbar.SearchButton.superclass.onRender.call(this, ct, position);
+
+		if(this.query) {
+			this.search();
+			this.showSearchBar();
+		}
 	},
 	
 	getValue: function(){
@@ -268,7 +292,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	
 	search : function() {
 		var v = this.triggerField.getValue(), filters = null;
-		this.resetButton.setDisabled(GO.util.empty(v));
+		this.resetButton.setDisabled(!v);
 		
 		if(this.store &&this.store.entityStore) {
 			filters = go.util.Filters.parseQueryString(v, this.store.entityStore.entity.filters);	
@@ -280,10 +304,14 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	},
 
 	// search button handler
-	handler: function () {
+	showSearchBar: function () {
 		this.searchToolBar.setWidth(this.ownerCt.getWidth());
-		this.searchToolBar.setVisible(true);
-		this.searchToolBar.items.get(1).focus();
+		this.searchToolBar.setVisible(true);		
+		this.searchToolBar.items.get(1).focus(); 
+	},
+
+	handler: function() {
+		this.showSearchBar();
 	}
 });
 Ext.reg('tbsearch', go.toolbar.SearchButton);

@@ -25,6 +25,14 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 		go.grid.GridPanel.superclass.initComponent.call(this);	
 		
 		this.initGridTrait();		
+	},
+
+	getView : function() {
+		if (!this.view) {
+				this.view = new go.grid.GridView(this.viewConfig);
+		}
+			
+		return this.view;
 	}
 
 });
@@ -52,3 +60,4 @@ Ext.reg("gogrid", go.grid.GridPanel);
 	});
 
 })();
+

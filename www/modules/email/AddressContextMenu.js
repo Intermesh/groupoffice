@@ -85,7 +85,7 @@ GO.email.AddressContextMenu = function(config)
 		
 		this.store = new go.data.Store({
 			entityStore: "Contact",
-			fields: ["id", "name"]
+			fields: ["id", "name", 'isOrganization']
 		});
 		
 		this.addEvents({change: true, beforechange: true});
@@ -94,9 +94,9 @@ GO.email.AddressContextMenu = function(config)
 		
 		
 		
-		this.addButton = new Ext.menu.Item({
+		this.createItem = new Ext.menu.Item({
 			iconCls: 'ic-add',
-			text: t("Add to address book"),
+			text: t("Create contact"),
 			handler: function() {
 				
 				var nameParts = this.personal.split(" "), v = {
@@ -116,8 +116,43 @@ GO.email.AddressContextMenu = function(config)
 			},
 			scope: this
 		});
+
+		this.updateItem = new Ext.menu.Item({
+			iconCls: 'ic-add',
+			text: t("Add to contact"),
+			handler: function() {
+
+				var me = this;
+				
+				var select = new go.util.SelectDialog({
+					entities: ['Contact'],
+					query: me.personal,
+					mode: 'id',				
+					singleSelect: true,
+					selectMultiple: function (ids) {
+						var dlg = new go.modules.community.addressbook.ContactDialog();
+						dlg.on("load", function() {
+							var a = dlg.formPanel.entity.emailAddresses;
+							a.push({
+								type: "work",
+								email: me.address
+							});
+							dlg.setValues({
+								emailAddresses: a
+							});
+						});
+						dlg.load(ids[0]).show();
+
+						
+					}					
+				});
+				select.show();
+				
+			},
+			scope: this
+		});
 		
-		config.items.push("-", this.addButton);
+		config.items.push("-", this.createItem, this.updateItem);
 		
 	
 		
@@ -187,7 +222,7 @@ Ext.extend(GO.email.AddressContextMenu, Ext.menu.Menu,{
 		
 		for (var i = 0; i < len; i++) {
 			this.insert(4 + i, {
-				iconCls: 'ic-account-box',
+				iconCls: records[i].data.isOrganization ? "entity ic-business purple" : 'entity ic-person blue',
 				text: t("Open") + ": " + records[i].data.name,
 				contactId: records[i].data.id,
 				handler: function() {
@@ -203,5 +238,10 @@ Ext.extend(GO.email.AddressContextMenu, Ext.menu.Menu,{
 				}
 			});
 		}
+
+		if(len) {
+			this.insert(4+i, "-");	
+		}
+		
 	}
 });

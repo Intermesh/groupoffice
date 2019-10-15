@@ -12,6 +12,8 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 
 	title: t("Permissions"),
 	
+	trackMouseOver: true,
+
 	initComponent: function () {
 		
 		if(!this.value) {
@@ -44,7 +46,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 				'id', 
 				'name', 
 				{name: 'user', type: "relation"}, //fetches entity from store
-				{name: 'users', type: "relation", limit: 5},
+				{name: 'users', type: "relation", limit: 3},
 				{
 					name: 'level', 
 					type: {
@@ -130,7 +132,14 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 					},
 					sortable: true
 				},
-				checkColumn
+				checkColumn,
+				{
+					width: dp(64),
+					dataIndex: "id",
+					renderer: function() {
+						return '<a class="show-on-hover" title="' + Ext.util.Format.htmlEncode(t("View members")) + '"><i class="icon">people</i></a>';
+					}
+				}
 			],
 			viewConfig: {
 				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',		
@@ -152,6 +161,17 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		
 		this.on("beforeedit", function(e) {
 			return e.record.data.id !== 1; //cancel edit for admins group
+		}, this);
+
+
+		this.on("cellclick", function(grid, rowIndex, columnIndex, e) {
+			var record = grid.getStore().getAt(rowIndex);  // Get the Record
+			var fieldName = grid.getColumnModel().getDataIndex(columnIndex); // Get field name
+			if(fieldName == "id") {
+				var win = new go.groups.GroupMemberWindow();
+				win.load(record.data.id).show();
+			}
+			
 		}, this);
 
 	},

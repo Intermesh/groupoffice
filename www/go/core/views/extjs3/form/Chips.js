@@ -47,6 +47,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	store: null,
 	autoHeight: true,
 	storeBaseParams: null,
+	allowBlank: true,
 	
 	initComponent: function () {
 
@@ -171,13 +172,17 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		return v;
 		
 	},
-	markInvalid: function (msg) {
-		this.getEl().addClass('x-form-invalid');
-		Ext.form.MessageTargets.qtip.mark(this, msg);
+	markInvalid: function (msg) {		
+		if(this.comboBox) {
+			this.comboBox.getEl().addClass('x-form-invalid');
+		}
+		Ext.form.MessageTargets.qtip.mark(	this.comboBox, msg);
 	},
 	clearInvalid: function () {
-		this.getEl().removeClass('x-form-invalid');
-		Ext.form.MessageTargets.qtip.clear(this);
+		if(this.comboBox) {
+			this.comboBox.getEl().removeClass('x-form-invalid');
+		}
+		Ext.form.MessageTargets.qtip.clear(this.comboBox);
 	},
 	createComboBox: function () {
 		if(this.store) {
@@ -262,7 +267,13 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			this.dataView.store.removeAt(index);
 		}
 	},
+	
 	validate: function () {
+
+		if(!this.allowBlank && go.util.empty(this.getValue())) {
+			this.markInvalid(Ext.form.TextField.prototype.blankText);
+			return false;
+		}
 		return true;
 	},
 

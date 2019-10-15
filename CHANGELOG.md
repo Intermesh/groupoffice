@@ -1,3 +1,60 @@
+14-10-2019 6.4.66
+- Core: added total number of rows in new grid panels
+- Email: Create links when replying to linked messages and from message dialog
+- LDAP Auth: Fixed Sync usernames and authentication on sync
+- Calendar: Events and tasks report mailer was broken
+- E-mail: Autolink all contacts with matching email address
+- Address book: Add suffix and prefix to detail view title
+- Core: CSV import would not import anything in some cases
+
+11-10-2019 6.4.65
+- Contacts: Fixed problem with duplicating phone number and possibly unlinking company
+- Newsletters: NIce error message when testing without recpipients
+- Core: Updated Brasilian Portugese and Italian translations
+- Freebusy permissions: Could not add new users when installed
+- GOTA: GOTA listed for users without permission becuase of missing permissions check in old framework module check
+- Calendar: Fixed error in calendar when you didn't have permissions for the favorites module
+- Calendar: Start in calendar / view where you were last
+- Core: changed global search into normal index with wildcards
+
+04-10-2019 6.4.64
+- Core: Track changes in other models in entity controller when doing a set request so it can return all modified entities
+- Address book: Organizations field was not hidden when newsletters module was installed
+- Core: Clear legacy cache before upgrade
+- Core: Workaround for hidden custom fields
+- Comments: Visually improved
+
+01-10-2019 6.4.63
+- Custom fields: Fixed problem in loading tree select fields for the second time
+- Core: Attempt to solve very rare loading hang problem
+- Core: Comboboxes take 3 chars to start searching instead of 4.
+- Core: ctrl + f7 enables debug log for new framework
+- Email: Search in all or subfolders didn't work
+- Custom fields: Validate chips and treeselect field so required flag for cusotm fields of type select and multiselect work
+- Newsletters: Open sent item doesn't show template.
+
+30-09-2019 6.4.62
+- Core: Each entity type has it's own color in the system
+- Core: New group member dialog. Fixes serverclient group controller permission issue #472
+- Core: Fixed user display name set to empty
+- Core: Half hours in working week didn't validate
+
+27-09-2019 6.4.61
+- Filters: Contact filter did not respect isOrganization setting of custom field
+- Advanced Search: Search contact, users and group custom fields by text too. And text are wrapped with wildcards.
+- Core: Debug log file more sensible and include line and class number.
+- Users: Delete broken
+- Core: Switch user didn't work when logging in from multi instance environment
+
+26-09-2019 6.4.60
+- Core: proper error message when delete fails
+- Address book: Add "Add to contact" option when clicking e-mail address
+- Core: Enhance select people dialog
+- Newsletters: Fixed problem with newsletter attachments
+- Core: sort on "creator" and "modifier"
+- Fixed: e-mail-settings #461
+- Serverclient: Improved server client error reporting
+
 24-09-2019 6.4.59
 - Google Authenticator: Fixed problem where it would enable when saving user
 - Calendar: brought back forthcoming and past events
@@ -299,6 +356,9 @@
 11-06-2019 6.4.21
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
+- Core: Working week didn't accept half hours
+- Time Tracking: Sort time tracking activities by name
+- Calendar: Calendar remember state
 
 19-09-2019 6.3.82
 - Projects larger expense budget dialog and resizable

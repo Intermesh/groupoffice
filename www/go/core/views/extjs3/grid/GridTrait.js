@@ -32,8 +32,33 @@ go.grid.GridTrait = {
 			Ext.applyIf(this, go.panels.ScrollLoader);
 			this.initScrollLoader();
 		}
+		
+		this.initTotalDisplay();
+	},	
 
-		this.getView().htmlEncode = true;
+	initTotalDisplay: function() {
+
+		this.store.on("beforeload", function(store, options) {
+			if(!this.getView().totalDisplay) {
+				return;
+			}
+			if((options.params.limit || store.baseParams && store.baseParams.limit) && go.util.empty(options.params.position)) {
+				//only calculate total on first load.
+				options.params.calculateTotal = true;
+			}
+		}, this);
+
+		this.store.on("load", function(store, records, o){
+			if(!this.getView().totalDisplay || (o.params && !go.util.empty(o.params.position))) {
+				return;
+			}
+			if(store.getTotalCount()) {
+				this.getView().totalDisplay.update(store.getTotalCount() + " " +t("items"));
+				this.getView().totalDisplay.show();
+			} else {
+				this.getView().totalDisplay.hide();
+			}
+		}, this);
 	},
 	
 	initHeaderMenu : function() {
@@ -63,7 +88,7 @@ go.grid.GridTrait = {
 			return;
 		}
 		
-		this.getView().scrollOffset = dp(24);
+		this.getView().scrollOffset = Ext.getScrollBarWidth();
 		
 	},
 	
@@ -153,7 +178,19 @@ go.grid.GridTrait = {
 
 		this.getStore().entityStore.set({
 			destroy:  selectedRecords.column("id")
-		}).finally(function() {
+		}).then(function(result){
+			if(!result.notDestroyed) {
+				return;
+			}
+
+			var msg = "";
+			for(var id in result.notDestroyed) {
+				msg += id + ": " + result.notDestroyed[id].description + "<br />";
+			}
+
+			Ext.MessageBox.alert(t("Error"), t("Could not delete some items: <br /><br />" + msg));
+		})
+		.finally(function() {
 			me.getEl().unmask();
 		});
 	},

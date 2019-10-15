@@ -103,26 +103,5 @@ class Note extends AclItemEntity {
 		}
 		return parent::internalValidate();
 	}
-	
-	/**
-	 * Sort by database columns or creator and modifier
-	 * 
-	 * @param Query $query
-	 * @param array $sort
-	 * @return Query
-	 */
-	public static function sort(Query $query, array $sort) {
-		
-		if(isset($sort['creator'])) {			
-			$query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT')->orderBy(['u.displayName' => $sort['creator']]);			
-		} 
-		
-		if(isset($sort['modifier'])) {			
-			$query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT')->orderBy(['u.displayName' => $sort['modifier']]);						
-		} 
-		
-		return parent::sort($query, $sort);
-		
-	}
 
 }

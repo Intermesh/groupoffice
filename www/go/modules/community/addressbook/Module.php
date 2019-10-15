@@ -13,6 +13,7 @@ use go\core\model\User;
 use go\modules\community\addressbook\model\AddressBook;
 use go\core\model\Group;
 use go\core\model\Acl;
+use go\core\model\Module as GoModule;
 use GO\Files\Model\Folder;
 use go\modules\community\addressbook\model\Settings;
 
@@ -59,7 +60,7 @@ class Module extends core\Module {
 	
 	
 	public static function onMap(Mapping $mapping) {
-		$mapping->addHasOne('addressBookSettings', UserSettings::class, ['id' => 'userId']);
+		$mapping->addHasOne('addressBookSettings', UserSettings::class, ['id' => 'userId'], true);
 	}
 
 	protected function afterInstall(\go\core\model\Module $model)
@@ -89,6 +90,11 @@ class Module extends core\Module {
 	 * Create and check permission on the "addressbook" root folder.
 	 */
 	public static function checkRootFolder() {
+
+		if(!GoModule::isInstalled('legacy', 'files')) {
+			return false;
+		}
+
 		$roAcl = Acl::getReadOnlyAcl();
 		$folder = Folder::model()->findByPath('addressbook', true, ['acl_id' => $roAcl->id]);
 		if($folder->acl_id != $roAcl->id) {

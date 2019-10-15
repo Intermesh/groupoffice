@@ -60,7 +60,12 @@ go.Modules.register("community", "addressbook", {
 					multiple: true,
 					type: 'string'
 				},
-
+				{
+					title: t("Address book"),
+					name: 'addressBookId',
+					multiple: false,
+					type: "go.modules.community.addressbook.AddresBookCombo"
+				},
 				
 				{
 					name: 'name',

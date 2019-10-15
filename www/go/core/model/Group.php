@@ -137,6 +137,15 @@ class Group extends AclOwnerEntity {
 	}
 	
 	protected function internalDelete() {
+
+
+		if($this->id == self::ID_ADMINS) {
+			$this->setValidationError('id', ErrorCode::FORBIDDEN, "You can't delete the administrators group");
+		}
+
+		if($this->id == self::ID_INTERNAL) {
+			$this->setValidationError('id', ErrorCode::FORBIDDEN, "You can't delete the internal group");
+		}
 		
 		if(isset($this->isUserGroupFor)) {
 			$this->setValidationError('isUserGroupFor', ErrorCode::FORBIDDEN, "You can't delete a user's personal group");

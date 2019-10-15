@@ -6,7 +6,8 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 	mode: "email", // or "id" in the future "phone" or "address"	
 	entityName:  "Contact",
 	title: t("Address Book"),
-
+	query: "",
+	selectSingle: false,
 	initComponent : function() {
 		
 		this.createGrid();
@@ -24,31 +25,55 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 		});
 		
 		this.labels = t("emailTypes");
+
+
+		this.searchField = new go.SearchField({
+			anchor: "100%",
+			handler: function(field, v){
+				this.search(v);
+			},
+			emptyText: null,
+			scope: this,
+			value: this.query
+		});
+
+		var search = new Ext.Panel({
+			layout: "form",
+			region: "north",
+			autoHeight: true,
+			items: [{
+					xtype: "fieldset",
+					items: [this.searchField]
+				}]
+		});	
 		
-		this.items = [this.grid, this.sidePanel];
+		this.items = [search, this.grid, this.sidePanel];
+		
+		this.grid.getSelectionModel().singleSelect = this.singleSelect;		
 		
 		go.modules.community.addressbook.SelectDialogPanel.superclass.initComponent.call(this);
+
+
+	
+
+
+		this.on("show", function() {
+			this.searchField.focus();			
+		}, this);		
 		
-		
+	},
+
+	search : function(v) {
+		this.grid.store.setFilter("search", {text: v});
+		this.grid.store.load();
+		this.searchField.focus();
 	},
 	
 	createGrid : function() {
+
 		this.grid = new go.modules.community.addressbook.ContactGrid({
 			region: 'center',
-			tbar: [
-				{
-					cls: 'go-narrow',
-					iconCls: "ic-menu",
-					handler: function () {
-						this.sidePanel.show();
-					},
-					scope: this
-				},
-				'->',
-				{
-					xtype: 'tbsearch'
-				}
-			],
+
 			listeners: {
 				rowclick: function (grid, rowIndex, e) {
 					if(e.ctrlKey || e.shiftKey) {
@@ -70,6 +95,11 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 		// this.grid.getSelectionModel().on("selectionchange", function(sm) {
 		// 	this.addSelectionButton.setDisabled(sm.getSelections().length == 0);
 		// }, this);
+
+		// this.grid.on('rowdblclick', function(grid, rowIndex, e){
+    //   var r = grid.store.getAt(rowIndex);
+    //   this.fireEvent('selectsingle', this, r.data.displayName, r.data.email, r.data.id);
+    // }, this);
 		
 		return this.grid;
 	},
@@ -189,7 +219,8 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 			addressBookId: addressBookId
 		} : null);
 		
-		this.grid.store.load();
+
+		this.search(this.searchField.getValue());				
 	},
 
 	setGroupId: function (groupId, addressBookId) {

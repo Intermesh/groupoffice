@@ -10,6 +10,8 @@
 		width: dp(1000),
 		height: dp(800),
 		modal: true,
+		query: "",
+		singleSelect: false,
 		mode: "email", // or "id" in the future "phone" or "address"
 		title: t("Select people"),
 		selectMultiple: function (ids, entityName) {
@@ -48,32 +50,48 @@
 				this.scope = this;
 			}
 
-			this.bbar = [
-				'->',
-				{
-					text: t("Add all results"),
-					handler: function () {
-						var me = this;
-						this.tabPanel.getActiveTab().addAll().then(function (ids) {
+			if(!this.singleSelect) {
+				this.bbar = [
+					'->',
+					{
+						text: t("Add all results"),
+						handler: function () {
+							var me = this;
+							this.tabPanel.getActiveTab().addAll().then(function (ids) {
 
-							me.selectMultiple.call(me.scope, ids, me.tabPanel.getActiveTab().entityName);
-							me.close();
-						}).catch(function(reason) {
-							debugger;
-							me.close();
-						});
+								me.selectMultiple.call(me.scope, ids, me.tabPanel.getActiveTab().entityName);
+								me.close();
+							}).catch(function(reason) {
+								debugger;
+								me.close();
+							});
+						},
+						scope: this
 					},
-					scope: this
-				},
-				this.addSelectionButton = new Ext.Button({
-					text: t("Add selection"),
-					handler: function () {
-						this.addSelection(this.tabPanel.getActiveTab());
-					},
-					scope: this
-					// disabled: true
-				})
-			];
+					this.addSelectionButton = new Ext.Button({
+						text: t("Add selection"),
+						handler: function () {
+							this.addSelection(this.tabPanel.getActiveTab());
+						},
+						scope: this
+						// disabled: true
+					})
+				];
+			} else
+			{
+				this.bbar = [
+					'->',
+					
+					this.addSelectionButton = new Ext.Button({
+						text: t("Select"),
+						handler: function () {
+							this.addSelection(this.tabPanel.getActiveTab());
+						},
+						scope: this
+						// disabled: true
+					})
+				];
+			}
 
 			this.tabPanel = new Ext.TabPanel({
 				defaults: {
@@ -89,6 +107,10 @@
 			},this);
 
 			this.loadModulePanels();
+
+			if(!this.tabPanel.getActiveTab()) {
+				this.tabPanel.setActiveTab(0);
+			}
 
 			this.items = [this.tabPanel];
 
@@ -113,7 +135,10 @@
 				
 				for(i1 = 0, l2 = config.selectDialogPanels.length; i1 < l2; i1++) {
 					pnl = eval(config.selectDialogPanels[i1]);				
-					var p = new pnl;
+					var p = new pnl({
+						singleSelect: this.singleSelect,
+						query: this.query
+					});
 					p.dialog = this;
 
 					if(this.entities && this.entities.indexOf(p.entityName) == -1) {

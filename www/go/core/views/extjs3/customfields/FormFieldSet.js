@@ -115,16 +115,18 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	
 	setFilterVisible : function(v) {
 		
-		this.setVisible(v);
-		
-		if(this.formTabPanel && this.fieldSet.isTab) {
+		if(!this.fieldSet.isTab) {
+			this.setVisible(v);
+			this.setDisabled(!v);
+		} else{
 			if(v) {
-				this.formTabPanel.unhideTabStripItem(this.ownerCt);
+			 	this.formTabPanel.unhideTabStripItem(this.ownerCt);
 			} else
 			{
-				this.formTabPanel.hideTabStripItem(this.ownerCt);
-			}
-		}
+			 	this.formTabPanel.hideTabStripItem(this.ownerCt);
+			}		
+		}		
+	
 	}
 });
 	

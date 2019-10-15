@@ -235,8 +235,11 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	},
 
 	setOrganization: function (isOrganization) {
+		
 		this.organizationsField.setVisible(!isOrganization);
+		this.organizationsField.setDisabled(isOrganization);
 		this.genderField.setVisible(!isOrganization);
+		this.genderField.setDisabled(isOrganization);
 
 		if (isOrganization) {
 			this.tabPanel.unhideTabStripItem(this.businessPanel);

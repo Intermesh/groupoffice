@@ -109,6 +109,14 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 	setLinkEntity: function(config) {
 		this.linkEntity = config.entity;
 		this.linkEntityId = config.entityId;
+
+		//for project and contacts
+		if(config.data.name) {
+			this.on('load', function() {
+				this.subjectField.setValue(config.data.name);
+			}, this, {single: true});
+			
+		}
 	},
 
 	initWindow : function() {

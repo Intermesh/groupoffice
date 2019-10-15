@@ -54,6 +54,10 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 	 */
 	public $salutationTemplate;
 
+	/**
+	 * 
+	 * @var int[]
+	 */
 	public $groups;
 
 	protected function init()

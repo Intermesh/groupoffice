@@ -339,7 +339,7 @@ abstract class Entity extends Property {
 	}
 
 	protected function rollback() {
-		App::get()->debug("Rolling back save operation for ".static::class);
+		App::get()->debug("Rolling back save operation for " . static::class, 1);
 		parent::rollBack();
 		$this->isDeleting = false;
 		$this->isSaving = false;
@@ -479,6 +479,11 @@ abstract class Entity extends Property {
 	 * @return Filters
 	 */
 	protected static function defineFilters() {
+
+		$cls = static::class;
+
+		$filters = go()->getCache()->get('filters-' . $cls);
+
 		$filters = new Filters();
 
 		$filters->add('text', function(Criteria $criteria, $value, Query $query) {
@@ -662,15 +667,22 @@ abstract class Entity extends Property {
 	/**
 	 * Sort entities.
 	 * 
-	 * By default you can sort on all database columns. But you can override this
-	 * to implement custom logic.
+	 * By default you can sort on 
+	 * 
+	 * - all database columns
+	 * - All Customfields with "customField.<databasName>"
+	 * - creator Will join core_user.displayName on createdBy
+	 * - modifier Will join core_user.displayName on modifiedBy
+	 * 
+	 *  You can override this to implement custom logic.
 	 * 
 	 * @example
 	 * ```
 	 * public static function sort(Query $query, array $sort) {
 	 * 		
-	 * 		if(isset($sort['creator'])) {			
-	 * 			$query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT')->orderBy(['u.displayName' => $sort['creator']]);			
+	 * 		if(isset($sort['special'])) {			
+	 * 			$query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT')->orderBy(['u.displayName' => $sort['creator']]);	
+	 * 			unset($sort['special']);		
 	 * 		} 
 	 * 
 	 * 		
@@ -693,6 +705,19 @@ abstract class Entity extends Property {
 //							, true
 //		);
 		
+		//
+
+		if(isset($sort['modifier'])) {
+			$query->join('core_user', 'modifier', 'modifier.id = '.$query->getTableAlias() . '.modifiedBy');
+			$query->orderBy(['modifier.displayName' => $sort['modifier']], true);
+			unset($sort['modifier']);
+		}
+
+		if(isset($sort['creator'])) {
+			$query->join('core_user', 'creator', 'creator.id = '.$query->getTableAlias() . '.modifiedBy');
+			$query->orderBy(['creator.displayName' => $sort['creator']], true);
+			unset($sort['creator']);
+		}
 		
 		//Enable sorting on customfields with ['customFields.fieldName' => 'DESC']
 		foreach($sort as $field => $dir) {

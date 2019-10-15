@@ -31,7 +31,7 @@ class SyncModule extends Module{
 	
 
 	public static function onMap(Mapping $mapping) {
-		$mapping->addHasOne('syncSettings', UserSettings::class, ['id' => 'user_id']);
+		$mapping->addHasOne('syncSettings', UserSettings::class, ['id' => 'user_id'], true);
 		
 	}
 

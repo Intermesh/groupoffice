@@ -40,7 +40,7 @@ class Connection {
 	 * 
 	 * @var bool 
 	 */
-	public $debug = false;
+	public $debug = true;
 	
 	public function __construct($dsn, $username, $password) {
 		$this->dsn = $dsn;
@@ -52,6 +52,12 @@ class Connection {
 		];
 	}
 
+	public function __destruct()
+	{
+		if($this->inTransaction()) {
+			throw new \Exception("DB Transaction not closed properly");
+		}
+	}
 	public function getDsn() {
 		return $this->dsn;
 	}
@@ -143,7 +149,7 @@ class Connection {
 	 */
 	public function exec($sql) {
 		if($this->debug) {
-			\go\core\App::get()->getDebugger()->debug($sql);
+			\go\core\App::get()->getDebugger()->debug($sql, 1);
 		}
 		try {
 			return $this->getPdo()->exec($sql);
@@ -176,13 +182,17 @@ class Connection {
 			//$ret = null;
 			//if (!$this->inTransaction())
 			if($this->debug) {
-				go()->debug("START DB TRANSACTION");
+				go()->debug("START DB TRANSACTION", 1);
 			}
 			$ret = $this->getPdo()->beginTransaction();
 
 		}else
 		{
-			$ret = $this->exec("SAVEPOINT LEVEL".$this->transactionSavePointLevel) !== false;			
+			$sql = "SAVEPOINT LEVEL".$this->transactionSavePointLevel;
+			if($this->debug) {
+				go()->debug($sql, 1);
+			}
+			$ret = $this->exec($sql) !== false;			
 		}		
 		
 		$this->transactionSavePointLevel++;		
@@ -220,11 +230,13 @@ class Connection {
 		
 		$this->transactionSavePointLevel--;	
 		if($this->transactionSavePointLevel == 0) {			
-			go()->warn("ROLLBACK DB TRANSACTION");
+			go()->warn("ROLLBACK DB TRANSACTION", 1);
 			return $this->getPdo()->rollBack();
 		}else
 		{
-			return $this->exec("ROLLBACK TO SAVEPOINT LEVEL".$this->transactionSavePointLevel) !== false;						
+			$sql = "ROLLBACK TO SAVEPOINT LEVEL".$this->transactionSavePointLevel;
+			go()->warn($sql, 1);
+			return $this->exec($sql) !== false;						
 		}
 	}
 
@@ -245,12 +257,16 @@ class Connection {
 		$this->transactionSavePointLevel--;
 		if($this->transactionSavePointLevel == 0) {
 			if($this->debug) {
-				go()->debug("COMMIT DB TRANSACTION");				
+				go()->debug("COMMIT DB TRANSACTION", 1);				
 			}
 			return $this->getPdo()->commit();
 		}else
 		{
-			return $this->exec("RELEASE SAVEPOINT LEVEL".$this->transactionSavePointLevel) !== false;			
+			$sql = "RELEASE SAVEPOINT LEVEL".$this->transactionSavePointLevel;
+			if($this->debug) {
+				go()->debug($sql, 1);				
+			}
+			return $this->exec($sql) !== false;			
 		}
 	}
 

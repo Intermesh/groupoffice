@@ -117,7 +117,6 @@ class Filters {
 					if(!is_array($value)){
 						$value = [$value];
 					}
-					//$v = array_map(function($v) {return '%'.$v.'%';}, $value);//self::parseStringValue($value);
 					call_user_func($filterConfig['fn'], $criteria, "LIKE", $value, $query, $filter);
 					break;
 				
@@ -195,24 +194,24 @@ class Filters {
 		return ['comparator' => $comparator, 'query' => $v];
 	}
 	
-	public static function parseStringValue($value) {
-		if(!is_array($value)) {
-			$value = [$value];
-		}
+	// public static function parseStringValue($value) {
+	// 	if(!is_array($value)) {
+	// 		$value = [$value];
+	// 	}
 		
-		$regex = '/\s*(!=|=)?\s*(.*)/';
-		if(preg_match($regex, $value, $matches)) {
-			list(,$comparator, $v) = $matches;
-		} else
-		{
-			$comparator = '=';
-			$v = '%'.$value.'%';
-		}
+	// 	$regex = '/\s*(!=|=)?\s*(.*)/';
+	// 	if(preg_match($regex, $value, $matches)) {
+	// 		list(,$comparator, $v) = $matches;
+	// 	} else
+	// 	{
+	// 		$comparator = '=';
+	// 		$v = '%'.$value.'%';
+	// 	}
 		
-		return [
-				['comparator' => $comparator == '=' ? 'LIKE' : 'NOT LIKE', 'query' => $v]
-		];
-	}
+	// 	return [
+	// 			['comparator' => $comparator == '=' ? 'LIKE' : 'NOT LIKE', 'query' => $v]
+	// 	];
+	// }
 	
 	private function checkRange($value) {
 		//Operators >, <, =, !=,

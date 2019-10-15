@@ -5,9 +5,19 @@ namespace go\modules\community\addressbook\customfield;
 use GO;
 use go\core\db\Utils;
 use go\core\customfield\Base;
+use go\core\db\Criteria;
+use go\core\orm\Filters;
+use go\core\orm\Query;
+use go\modules\community\addressbook\model;
 
 class Contact extends Base {
 
+	
+	public function getModelClass()
+	{
+		return model\Contact::class;
+	}
+	
 	protected function getFieldSQL() {
 		$d = $this->field->getDefault();
 		$d = isset($d) ? (int) $d : "NULL";
@@ -41,6 +51,30 @@ class Contact extends Base {
 		}
 			
 		return parent::onFieldDelete();
+	}
+
+	/**
+	 * Defines an entity filter for this field.
+	 * 
+	 * @see Entity::defineFilters()
+	 * @param Filters $filter
+	 */
+	public function defineFilter(Filters $filters) {
+		
+		
+		$filters->addText($this->field->databaseName, function(Criteria $criteria, $comparator, $value, Query $query, array $filter){
+			$this->joinCustomFieldsTable($query);	
+			
+			if(isset($value[0]) && is_numeric($value[0])) {
+				//When field option ID is passed by a saved filter
+				$criteria->where('customFields.' . $this->field->databaseName, '=', $value);
+			} else{
+				//for text queries we must join the options.
+				$alias = 'opt_' . $this->field->id;
+				$query->join('addressbook_contact', $alias, $alias . '.id = customFields.' . $this->field->databaseName);
+				$criteria->where($alias . '.name', $comparator, $value);
+			}
+		});
 	}
 }
 

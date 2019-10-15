@@ -136,6 +136,10 @@ class Installer {
 
 		App::get()->setCache(new Disk());
 		Listeners::get()->init();
+
+		//phpunit tests will use change tracking after install
+		jmap\Entity::$trackChanges = true;
+		LoggingTrait::$enabled = true;
 	}
 	
 	
@@ -312,6 +316,7 @@ class Installer {
 
 		$this->isValidDb();
 		go()->getCache()->flush(false);
+		\GO::clearCache(); //legacy framework
 		go()->setCache(new None());
 		
 		$unavailable = go()->getInstaller()->getUnavailableModules();
@@ -374,6 +379,10 @@ class Installer {
 
 		$this->fireEvent(static::EVENT_UPGRADE);
 
+
+		//phpunit tests will use change tracking after install
+		jmap\Entity::$trackChanges = true;
+		LoggingTrait::$enabled = true;
 		echo "Done!\n";
 	}
 	

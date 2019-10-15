@@ -943,6 +943,15 @@ abstract class Property extends Model {
 
 		if (isset($this->{$relation->name})) {			
 			$prop = $this->{$relation->name};
+
+			if(go()->getDebugger()->enabled) {
+				$tables = $prop->getMapping()->getTables();
+				$firstTable = array_shift($tables);
+				if(!$firstTable->getPrimaryKey()) {
+					throw new \Exception("No primary key defined for ". $firstTable->getName());
+				}
+			}
+
 			$this->applyRelationKeys($relation, $prop);
 			if (!$prop->internalSave()) {
 				$this->relatedValidationErrors = $prop->getValidationErrors();

@@ -17,7 +17,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	initComponent: function () {
 
 
-		if(go.User.isAdmin && this.header) {
+		if(go.User.isAdmin && this.title) {
 			this.tools = [{			
 				id: "gear",
 				handler: function () {		
@@ -154,7 +154,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			if(creator.avatarId) { 
 				avatar.style = 'background-image: url('+go.Jmap.downloadUrl(creator.avatarId)+');';
 			} else {
-				avatar.html = creator.displayName.substr(0,1).toUpperCase();
+				avatar.html = creator.displayName.split(" ").map(function(name){return name.substr(0,1).toUpperCase()}).join("");
+				avatar.style = 'background-image: none';
 			}
 
 			for(var i = 0, l = r.data.labels.length; i < l; i++){

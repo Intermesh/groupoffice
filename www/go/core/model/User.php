@@ -591,7 +591,7 @@ class User extends Entity {
 		if(!isset($this->contact->emailAddresses[0])) {
 			$this->contact->emailAddresses = [(new \go\modules\community\addressbook\model\EmailAddress())->setValues(['email' => $this->email])];
 		}
-		if(!isset($this->contact->name) || $this->isModified(['displayName'])) {
+		if(empty($this->contact->name) || $this->isModified(['displayName'])) {
 			$this->contact->name = $this->displayName;
 			$parts = explode(' ', $this->displayName);
 			$this->contact->firstName = array_shift($parts);
@@ -713,23 +713,37 @@ class User extends Entity {
 			$this->setValidationError("id", ErrorCode::FORBIDDEN, "You can't delete the primary administrator");
 			return false;
 		}
-		$this->legacyOnDelete();
-		return parent::internalDelete();
+
+		go()->getDbConnection()->beginTransaction();
+
+		if(!$this->legacyOnDelete() || !parent::internalDelete()) {
+			go()->getDbConnection()->rollBack();
+			return false;
+		}
+
+		return go()->getDbConnection()->commit();
 	}
 	
 	
 	public function legacyOnDelete() {
-		$user = LegacyUser::model()->findByPk($this->id, false, true);
-		LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
-		//delete all acl records		
-		$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
+		try {
+			$user = LegacyUser::model()->findByPk($this->id, false, true);
+			LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
+			//delete all acl records		
+			$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
 
-		foreach($defaultModels as $model){
-			$model->deleteByAttribute('user_id',$this->id);
+			foreach($defaultModels as $model){
+				$model->deleteByAttribute('user_id',$this->id);
+			}
+
+
+			LegacyUser::model()->fireEvent("delete", [$user, true]);
+		} catch(\Exception $e) {
+			$this->setValidationError('id', ErrorCode::GENERAL, $e->getMessage());
+			return false;
 		}
 
-
-		LegacyUser::model()->fireEvent("delete", [$user, true]);
+		return true;
 	}
 	
 	/**
@@ -790,7 +804,9 @@ class User extends Entity {
 		$this->contact = $this->getProfile();		
 		$this->contact->setValues($values);		
 	
-		$this->displayName = $this->contact->name;
+		if(!empty($this->contact->name)) {
+			$this->displayName = $this->contact->name;
+		}
 	}
 
 

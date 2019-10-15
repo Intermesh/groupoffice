@@ -184,6 +184,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 		return {
 			name: field.databaseName,
 			type: "string",
+			wildcards: true,
 			multiple: true,
 			title: field.name,
 			customfield: field

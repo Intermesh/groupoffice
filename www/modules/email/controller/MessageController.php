@@ -1771,22 +1771,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$from = $imapMessage->from->getAddress();
 
 			
-			$contact = Contact::findByEmail($from['email'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE])->single();
+			$contacts = Contact::findByEmail($from['email'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]);
 
-			if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){						
-				\GO\Savemailas\Model\LinkedEmail::model()->createFromImapMessage($imapMessage, $contact);
-
-				$linkedModels[]=$contact;
-				
-				// Also link the company to the email if the contact has a company attached to it.
-				// if(!empty(GO::config()->email_autolink_companies) && !empty($contact->company_id)){
-				// 	$company = $contact->company;
-				// 	if($company && !$company->equals($linkedModels)){
-				// 		\GO\Savemailas\Model\LinkedEmail::model()->createFromImapMessage($imapMessage, $company);
-				// 		$linkedModels[] = $company;
-				// 	}
-				// }
-				
+			foreach($contacts as $contact) {
+				if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){						
+					\GO\Savemailas\Model\LinkedEmail::model()->createFromImapMessage($imapMessage, $contact);
+					$linkedModels[]=$contact;					
+				}
 			}
 		}
 

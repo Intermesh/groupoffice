@@ -4967,7 +4967,7 @@ Ext.EventManager = function(){
         WINDOW = window,
         DOMCONTENTLOADED = "DOMContentLoaded",
         COMPLETE = 'complete',
-        propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate)$/,
+        propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate|callParent)$/,
         
         specialElCache = [];
 
@@ -6917,7 +6917,7 @@ Ext.apply(Ext.EventManager, function(){
        textEvent,
        textSize,
        D = Ext.lib.Dom,
-       propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate)$/,
+       propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate|callParent)$/,
        unload = Ext.EventManager._unload,
        curWidth = 0,
        curHeight = 0,
@@ -11339,7 +11339,10 @@ Ext.Component = function(config){
 Ext.Component.AUTO_ID = 1000;
 
 Ext.extend(Ext.Component, Ext.util.Observable, {
-    
+    // GO override
+    callParent: function(args) {
+		return this.supr()[this.callParent.caller.name].apply(this, args || []);
+	},
 		//GO override
     setTranslationModule : function() {
 			if(this.module) {
@@ -11978,7 +11981,7 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
     mon : function(item, ename, fn, scope, opt){
         this.createMons();
         if(Ext.isObject(ename)){
-            var propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate)$/;
+            var propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate|callParent)$/;
 
             var o = ename;
             for(var e in o){
@@ -40204,6 +40207,8 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
     
     defaultAutoCreate : {tag: 'input', type: 'text', size: '20', autocomplete: 'off'},
     
+    autocomplete: "off",
+
     fieldClass : 'x-form-field',
     
     msgTarget : 'qtip',
@@ -40260,6 +40265,9 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
             if(this.inputType){
                 cfg.type = this.inputType;
             }
+
+            cfg.autocomplete = this.autocomplete;
+            
             this.autoEl = cfg;
         }
         Ext.form.Field.superclass.onRender.call(this, ct, position);
@@ -44026,6 +44034,10 @@ Ext.form.BasicForm = Ext.extend(Ext.util.Observable, {
                     f.setValue(v.value);
                     if(this.trackResetOnLoad){
                         f.originalValue = f.getValue();
+                        f.dirty = false; //MS: for form group and possibly other components
+                        if(f.setNotDirty) {
+                            f.setNotDirty(false);
+                        }
                     }
                 }
             }
@@ -44036,6 +44048,10 @@ Ext.form.BasicForm = Ext.extend(Ext.util.Observable, {
                     field.setValue(values[id]);
                     if(this.trackResetOnLoad){
                         field.originalValue = field.getValue();
+                        field.dirty = false; //MS: for form group and possibly other components
+                        if(field.setNotDirty) {
+                            field.setNotDirty(false);
+                        }
                     }
                 }
             }

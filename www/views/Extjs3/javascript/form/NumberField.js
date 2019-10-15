@@ -127,7 +127,7 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 	getErrors: function(value) {
 		var errors = GO.form.NumberField.superclass.getErrors.apply(this, arguments);
 		
-		value = GO.util.unlocalizeNumber(this.getRawValue())
+		value = !this.serverFormats ? this.getRawValue() : GO.util.unlocalizeNumber(this.getRawValue());
 
 		if (value.length < 1) { // if it's blank and textfield didn't flag it then it's valid
 			return errors;
@@ -138,7 +138,7 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 			errors.push(String.format(this.minText, this.minValue));
 		}
         
-		if (value > this.maxValue) {
+		if (value > this.maxValue) {			
 			errors.push(String.format(this.maxText, this.maxValue));
 		}
         

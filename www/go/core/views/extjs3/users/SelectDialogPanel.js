@@ -6,25 +6,59 @@ go.users.SelectDialogPanel = Ext.extend(Ext.Panel, {
 	mode: "email", // or "id" in the future "phone" or "address"	
 	entityName:  "User",
 	title: t("Users"),
+	singleSelect: false,
+	query: "",
 
 	initComponent : function() {
 		
-		this.createGrid();
-		
-		
+		this.createGrid();		
 		
 		this.labels = t("emailTypes");
+
+
+		this.searchField = new go.SearchField({
+			anchor: "100%",
+			handler: function(field, v){
+				this.search(v);
+			},
+			emptyText: null,
+			scope: this,
+			value: this.query
+		});
+
+		var search = new Ext.Panel({
+			layout: "form",
+			region: "north",
+			autoHeight: true,
+			items: [{
+					xtype: "fieldset",
+					items: [this.searchField]
+				}]
+		});	
+
 		
-		this.items = [this.grid, this.createGroupFilter()];
+		this.items = [search, this.grid, this.createGroupFilter()];
+
+		this.grid.getSelectionModel().singleSelect = this.singleSelect;		
 		
-    go.users.SelectDialogPanel.superclass.initComponent.call(this);
+		go.users.SelectDialogPanel.superclass.initComponent.call(this);
     
-    this.on("render", function() {
-      this.grid.store.load();
-      this.groupGrid.store.load();
-    }, this);
+    this.grid.on("afterrender", function() {
+			this.groupGrid.store.load();		
+			this.search();			
+		}, this);
+
+		this.on("show", function() {
+			this.searchField.focus.defer(100, this.searchField);			
+		}, this);
+		
   },
-  
+	
+	search : function(v) {
+		this.grid.store.setFilter("search", {text: v});
+		this.grid.store.load();
+		this.searchField.focus();
+	},
 
   createGroupFilter: function() {
 
@@ -45,7 +79,7 @@ go.users.SelectDialogPanel = Ext.extend(Ext.Panel, {
 				//this class will hide it on larger screens
 				cls: 'go-narrow',
 				iconCls: "ic-arrow-forward",
-				tooltip: t("Contacts"),
+				tooltip: t("Users"),
 				handler: function () {
 					this.grid.show();
 				},
@@ -103,21 +137,7 @@ go.users.SelectDialogPanel = Ext.extend(Ext.Panel, {
 	createGrid : function() {
 
 		this.grid = new go.grid.GridPanel({
-      region: "center",
-      tbar: [
-				{
-					cls: 'go-narrow',
-					iconCls: "ic-menu",
-					handler: function () {
-						this.groupGrid.show();
-					},
-					scope: this
-				},
-				'->',
-				{
-					xtype: 'tbsearch'
-				}
-			],
+      region: "center",   
       store: new go.data.Store({
         fields: [
           'id', 

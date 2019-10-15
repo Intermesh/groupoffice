@@ -16,7 +16,8 @@ use go\core\db\Table;
     use go\core\event\Listeners;
 use go\core\exception\ConfigurationException;
 use go\core\fs\Folder;
-use go\core\jmap\State;
+    use go\core\http\Request;
+    use go\core\jmap\State;
 use go\core\mail\Mailer;
 use go\core\util\Lock;
 use go\core\webclient\Extjs3;
@@ -321,8 +322,14 @@ use const GO_CONFIG_FILE;
 			}
 			
 			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
+
+			if(Request::get()->getHeader('X-Debug') == "1") {
+				$config['debug'] = true;
+			}
 			
-			
+			if(!isset($config['debug_log'])) {
+				$config['debug_log'] = !empty($config['debug']);
+			}
 			
 			$this->config = (new util\ArrayObject([					
 					"core" => [
@@ -330,6 +337,7 @@ use const GO_CONFIG_FILE;
 									"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
 									"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
 									"debug" => $config['debug'] ?? null,
+									"debugLog" => $config['debug_log'],
 									
 									"servermanager" => $config['servermanager'] ?? false,
 
@@ -721,7 +729,7 @@ namespace {
 	/**
 	 * @return go\core\App
 	 */
-	function GO() {
+	function go() {
 		return App::get();
 	}
 

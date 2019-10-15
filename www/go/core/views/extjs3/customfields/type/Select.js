@@ -93,6 +93,7 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 			name: field.databaseName,
 			type: "go.customfields.type.TreeSelectField",
 			multiple: true,
+			wildcards: true,
 			title: field.name,
 			customfield: field
 		};

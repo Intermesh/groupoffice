@@ -222,8 +222,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 	
 	},
 	
-	setValues : function(v) {
-		this.formPanel.setValues(v);
+	setValues : function(v, trackReset) {
+		this.formPanel.setValues(v, trackReset);
 		
 		return this;
 	},
@@ -372,8 +372,11 @@ go.form.Dialog = Ext.extend(go.Window, {
 				panel = c;
 		});
 
-		if(tabPanel) {
+		if(tabPanel) {			
 			panel.show();
+
+			// Not elegant but if a user marked a field as required and it's not visible it will magically appear this way
+			tabPanel.unhideTabStripItem(panel);
 		}
 
 		// Focus make server side errors dissappear 

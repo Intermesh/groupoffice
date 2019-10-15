@@ -27,6 +27,7 @@
 
 namespace GO\Base;
 
+use GO\Base\Model\Acl;
 
 class ModuleCollection extends Model\ModelCollection{
 	
@@ -179,18 +180,10 @@ class ModuleCollection extends Model\ModelCollection{
 	
 	public function __get($name) {
 		
-		if(!isset($this->_modules[$name])){		
-//			if(!$this->isAvailable($name)){			
-//				return false;
-//			}
-
-			try {
-				$model = $this->model->findSingleByAttribute('name', $name);
-			} catch (\GO\Base\Exception\AccessDenied $e) {
-				$model = false;
-			}
+		if(!isset($this->_modules[$name])) {	
+			$model = $this->model->findSingleByAttribute('name', $name);
 			
-			if($model && !$model->isAvailable()) {
+			if($model && (!$model->isAvailable() || !$model->checkPermissionLevel(Acl::READ_PERMISSION))) {
 				$model = false;
 			}
 			

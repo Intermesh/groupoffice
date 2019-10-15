@@ -30,10 +30,13 @@ if($installDb) {
 	$pdo = new PDO('mysql:host='. $dsn['options']['host'], $config['db']['username'], $config['db']['password']);
 
 	try {
+		echo "Dropping database 'groupoffice-phpunit'\n";
 		$pdo->query("DROP DATABASE groupoffice_phpunit");
 	}catch(\Exception $e) {
 
 	}
+
+	echo "Installing database 'groupoffice-phpunit'\n";
 	$pdo->query("CREATE DATABASE groupoffice_phpunit");
 	$pdo = null;
 }
@@ -44,6 +47,7 @@ try {
 	App::get()->setConfig(["core" => $config]);
 	
 	if($installDb) {
+
 		$admin = [
 				'displayName' => "System Administrator",
 				'username' => "admin",
@@ -57,6 +61,8 @@ try {
 				new go\modules\community\test\Module(),
 				new go\modules\community\addressbook\Module(),
 				]);
+
+		echo "Done\n\n";
 	}
 
 	GO()->setAuthState(new State());

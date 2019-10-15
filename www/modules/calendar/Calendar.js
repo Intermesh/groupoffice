@@ -1013,15 +1013,19 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			if(this.state.displayType=='view')
 				this.state.displayType='days';
 
-//			if(!this.state.calendars)
-			this.state.calendars=[GO.calendar.defaultCalendar.id];
+			if(go.util.empty(this.state.calendars)) {
+				this.state.calendars=[GO.calendar.defaultCalendar.id];
+			}
 			
-			this.state.view_id=0;
-			this.state.group_id=1;
+			//this.state.view_id=0;
+			//this.state.group_id=1;
 //		}
 
 		if(GO.calendar.openState)
 			this.state = Ext.apply(this.state, GO.calendar.openState);
+
+
+			console.warn(this.state);
 
 		/*this.state.applyFilter=true;
 		this.calendarsStore.on('load', function(){
@@ -1359,8 +1363,7 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 				this.displayType=this.lastCalendarDisplayType;
 		}
 	
-		var saveState = config.days && config.days!=this.state.days || config.displayType && config.displayType!=this.state.displayType;
-
+		
 		this.state.displayType=this.displayType;
 			
 		if(this.displayType!='view')
@@ -1504,10 +1507,9 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			owncolor:this.owncolor
 		};
 
-		if(saveState)
-		{
-			this.saveState();
-		}		
+
+		this.saveState();
+			
 		
 		this.clearGrids(config);
 	},
@@ -1568,13 +1570,17 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 	{
 		var state = {
 			displayType: this.displayType,
-			days: this.days
-//			calendars:this.calendars
+			days: this.days,
+			calendars: this.calendars,
+			view_id: this.view_id,
+			group_id: this.group_id
 		};
 		
-//		console.log(state);
-
-		Ext.state.Manager.set('calendar-state', Ext.encode(state));
+		var old = Ext.state.Manager.get('calendar-state'), newState = Ext.encode(state);
+		
+		if(old != newState) {
+			Ext.state.Manager.set('calendar-state', newState);
+		}
 	},
 	
 	refresh : function() {

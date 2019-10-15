@@ -86,6 +86,7 @@ go.customfields.type.Group = Ext.extend(go.customfields.type.Text, {
 		return {
 			name: field.databaseName,
 			type: "go.groups.GroupCombo",
+			wildcards: true,
 			multiple: true,
 			title: field.name,
 			customfield: field

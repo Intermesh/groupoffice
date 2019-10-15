@@ -85,12 +85,12 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 		$response['data']['signature'] = $alias->signature;
 
 //		if (\GO::modules()->isInstalled('addressbook')) {
-//			$defaultTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
-//			if ($defaultTemplateModel) {
-//				$response['data']['default_account_template_id'] = $defaultTemplateModel->template_id;
-//			} else {
-//				$response['data']['default_account_template_id'] = '';
-//			}
+			$defaultTemplateModel = \GO\Email\Model\DefaultTemplateForAccount::model()->findByPk($model->id);
+			if ($defaultTemplateModel) {
+				$response['data']['default_account_template_id'] = $defaultTemplateModel->template_id;
+			} else {
+				$response['data']['default_account_template_id'] = '';
+			}
 //		}
 
 		return parent::afterLoad($response, $model, $params);
