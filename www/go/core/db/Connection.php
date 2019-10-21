@@ -189,11 +189,12 @@ class Connection {
 
 		}else
 		{
-			$sql = "SAVEPOINT LEVEL".$this->transactionSavePointLevel;
-			if($this->debug) {
-				go()->debug($sql, 1);
-			}
-			$ret = $this->exec($sql) !== false;			
+			// $sql = "SAVEPOINT LEVEL".$this->transactionSavePointLevel;
+			// if($this->debug) {
+			// 	go()->debug($sql, 1);
+			// }
+			// $ret = $this->exec($sql) !== false;	
+			$ret = true;		
 		}		
 		
 		$this->transactionSavePointLevel++;		
@@ -235,9 +236,11 @@ class Connection {
 			return $this->getPdo()->rollBack();
 		}else
 		{
-			$sql = "ROLLBACK TO SAVEPOINT LEVEL".$this->transactionSavePointLevel;
-			go()->warn($sql, 1);
-			return $this->exec($sql) !== false;						
+			return true;
+
+			// $sql = "ROLLBACK TO SAVEPOINT LEVEL".$this->transactionSavePointLevel;
+			// go()->warn($sql, 1);
+			// return $this->exec($sql) !== false;						
 		}
 	}
 
@@ -263,11 +266,12 @@ class Connection {
 			return $this->getPdo()->commit();
 		}else
 		{
-			$sql = "RELEASE SAVEPOINT LEVEL".$this->transactionSavePointLevel;
-			if($this->debug) {
-				go()->debug($sql, 1);				
-			}
-			return $this->exec($sql) !== false;			
+			// $sql = "RELEASE SAVEPOINT LEVEL".$this->transactionSavePointLevel;
+			// if($this->debug) {
+			// 	go()->debug($sql, 1);				
+			// }
+			// return $this->exec($sql) !== false;			
+			return true;
 		}
 	}
 
