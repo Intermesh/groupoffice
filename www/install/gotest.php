@@ -274,7 +274,7 @@ function test_system(){
 	$test['fatal']=true;
 
 	$tests[]=$test;
-	$test['name']='curl';
+	$test['name']='CURL extension';
 	$test['pass']=extension_loaded('curl');
 	$test['feedback']='Warning: php-curl extension is required';
 	$test['fatal']=true;
