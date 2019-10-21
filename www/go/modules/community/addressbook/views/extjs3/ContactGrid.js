@@ -226,6 +226,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				}
 			],
 			viewConfig: {
+				totalDisplay: true,
 				emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
 //				enableRowBody: true,
 //				showPreview: true,
