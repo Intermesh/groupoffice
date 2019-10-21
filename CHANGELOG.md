@@ -1,4 +1,5 @@
 - Core: Updated Norwegian translation
+- LDAP Auth: Bind to ldap before authentication
 
 15-10-2019 6.4.67
 - Addressbook and notes: Hide totals in nav bars
