@@ -71,6 +71,15 @@ class Connection {
 	}
 
 	/**
+	 * Get the last error number
+	 * 
+	 * @return string
+	 */
+	public function getErrorNo() {
+		return ldap_errno($this->link);
+	}
+
+	/**
 	 * Disconnect
 	 * 
 	 * @return boolean
@@ -88,9 +97,16 @@ class Connection {
 	 */
 	public function bind($bindRdn, $password) {
 		try {
+			go()->debug("bind: " . $bindRdn);
 			return ldap_bind($this->link, $bindRdn, $password);
 		} catch (\ErrorException $e) {
+
+			if($this->getErrorNo() == -1) {
+				throw $e;
+			}
+			go()->debug($this->getErrorNo());
 			//throws notice when failed
+			go()->debug($e->getMessage());
 			return false;
 		}
 	}
