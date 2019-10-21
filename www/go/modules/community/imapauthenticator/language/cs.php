@@ -10,5 +10,5 @@ return array (
   'Use authentication' => 'Použít ověřování',
   'Enable this if the SMTP server credentials are identical to the IMAP server.' => 'SMTP přihlašovací údaje jsou stejné jako pro IMAP',
   'User options' => 'Uživatelská nastavení',
-  'IMAP Authenticator' => 'IMAP Authenticator',
+  'IMAP Authenticator' => 'Ověření IMAP',
 );

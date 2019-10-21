@@ -1,4 +1,20 @@
 <?php
 return array (
   'Not found' => 'Nenalezeno',
+  'Get the code from the google authenticator app on your mobile device and fill it in below' => 'Získejte kód z Google Authenticator aplikace na Vašem mobilním zařízení a napište ho zde',
+  'Code' => 'Kód',
+  'Code is required' => 'Je požadován kód',
+  'Invalid code' => 'Nesprávný kód',
+  'Google authenticator' => 'Google authenticator',
+  'Enable google authenticator' => 'Povolit Google Authenticator',
+  'Disable google authenticator' => 'Zakázat Google Authenticator',
+  'When disabling Google autenticator this step will be removed from the login process.' => 'Pokud zakážete Google Authenticator, bude dále odstraněm i z přihlašování',
+  'Provide your current password to disable Google authenticator.' => 'Napište Vaše heslo pro zakázání aplikace Google Authenticator',
+  'Disable Google authenticator' => 'Zakázat Googel Authenticator',
+  'Provide your current password before you can enable Google authenticator.' => 'Napište Vaše heslo pro povolení aplikace Google Authenticator',
+  'Enable Google authenticator' => 'Povolit Google Authenticator',
+  'Secret' => 'Tajný',
+  'Secret key for manual input' => 'Tajný klíč pro manuální vstup',
+  'Verify' => 'Ověřit',
+  'Scan the QR code below with the Google authenticator app on your mobile device, after that fill in the field below with the code generated in the app.' => 'Naskenujte kód pomocí Google Authenticator na Vašem mobilním zařízení, poté vyplňte Váš vygenerovaný kód',
 );
