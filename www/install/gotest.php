@@ -274,6 +274,12 @@ function test_system(){
 	$test['fatal']=true;
 
 	$tests[]=$test;
+	$test['name']='curl';
+	$test['pass']=extension_loaded('curl');
+	$test['feedback']='Warning: php-curl extension is required';
+	$test['fatal']=true;
+
+	$tests[]=$test;
 	$test['name']='TAR Compression';
 	$test['showSuccessFeedback'] = false;
 	if(class_exists('GO'))

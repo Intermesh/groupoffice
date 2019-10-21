@@ -1,4 +1,4 @@
-- Core: Updated Norwegian translation
+- Core: Updated Norwegian and Czech translation
 - LDAP Auth: Bind to ldap before authentication
 
 15-10-2019 6.4.67
