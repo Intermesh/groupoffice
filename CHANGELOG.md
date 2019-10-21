@@ -1,3 +1,5 @@
+- Core: Updated Norwegian translation
+
 15-10-2019 6.4.67
 - Addressbook and notes: Hide totals in nav bars
 - Core: Fixed import CSV for custom fields values that are exported as text (Select, Multiselect)

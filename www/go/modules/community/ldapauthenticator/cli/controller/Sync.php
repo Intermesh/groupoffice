@@ -57,8 +57,10 @@ class Sync extends Controller {
       $username = $this->getGOUserName($record);
       
       if (empty($username)) {
-        throw new \Exception("Empty group name in LDAP record!");
+        echo "Skipping record. Could not determine username.";
+        continue;
       }
+
       $user = User::find()->where(['username' => $username]);
       
       if(!empty($record->mail[0])) {
@@ -105,6 +107,12 @@ class Sync extends Controller {
   private function getGOUserName(Record $record) {
     $username = $record->uid[0] ?? $record->SAMAccountName[0];
 
+    if(!$username) {
+      go()->debug("No username found in record: ");
+      go()->debug($record->getAttributes());
+      return false;
+    }
+
     $dn = ldap_explode_dn($record->getDn(), 0);
 
     /*
@@ -136,13 +144,16 @@ class Sync extends Controller {
     if(empty($domain) || !in_array($domain, $this->domains)) {    
       if(empty($mailDomain)) {
         go()->info("Using domain from mail property for " . $username);
-        throw new \Exception("Domain can't be determined for user " . $username);
+        return false;
       } 
       $domain = $mailDomain;
     }
 
     if(!in_array($domain, $this->domains)) {
-      throw new \Exception("Domain '$domain' from '$username' is not listed in the authenticator domains: " . implode(', ', $this->domains));
+      $err = "Domain '$domain' from '$username' is not listed in the authenticator domains: " . implode(', ', $this->domains);
+      echo "Error: ". $err ."\n";
+      go()->debug($err);
+      return false;
     }
 
     return $username . '@' . $domain;
@@ -207,7 +218,7 @@ class Sync extends Controller {
 
     $groupsInLDAP = [Group::ID_ADMINS, Group::ID_EVERYONE, Group::ID_INTERNAL];
 		
-		$records = Record::find($connection, $server->peopleDN, $server->syncGroupsQuery);
+		$records = Record::find($connection, $server->groupsDN, $server->syncGroupsQuery);
     
     $i = 0;
     foreach($records as $record) {
@@ -313,9 +324,11 @@ class Sync extends Controller {
       return $record->memberuid;
     } else if (isset($record->member)) {
       //for Active Directory
-      foreach ($record->member as $username) {      
+      foreach ($record->member as $username) {    
+        go()->debug("Member: " . $username);  
         $username = $this->queryActiveDirectoryUser($ldapConn, $username);
         if (!$username) {
+          echo "Skipping. Could not find GO user\n";
           continue;
         }
         $members[] = $username;
