@@ -1,3 +1,6 @@
+22-10-2019 6.4.69
+- Core: Revert to older italian translation because it was corrupt
+
 22-10-2019 6.4.68
 - Core: Updated Norwegian and Czech translation
 - LDAP Auth: Bind to ldap before authentication
