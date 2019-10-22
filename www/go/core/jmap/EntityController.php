@@ -9,6 +9,7 @@ use go\core\App;
 use go\core\Controller;
 use go\core\data\convert\AbstractConverter;
 use go\core\db\Criteria;
+use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\jmap\exception\InvalidArguments;
@@ -844,9 +845,51 @@ abstract class EntityController extends Controller {
 		
 		return ['blobId' => $blob->id];		
 	}
-	
-	
-	
-	
 
+	/**
+	 * Merge entities into one
+	 * 
+	 * The first ID in the list will be kept after the merge.
+	 */
+	protected function defaultMerge($params) {
+		if(empty($params['ids'])) {
+			throw new InvalidArguments('ids is required');
+		}
+
+		if(count($params['ids']) < 2) {
+			throw new InvalidArguments('At least 2 id\'s are required');
+
+		}
+		$primaryId = array_shift($params['ids']);
+
+		$cls = $this->entityClass();
+
+		$entity = $cls::findById($primaryId);
+
+		if(!$this->canUpdate($entity)) {
+			throw new Forbidden();
+		}
+
+		$oldState = $this->getState();
+
+		go()->getDbConnection()->beginTransaction();
+		foreach($params['ids'] as $id) {
+			$other = $cls::findById($id);
+			if(!$this->canDestroy($other)) {
+				throw new Forbidden();
+			}
+			if(!$entity->merge($other)) {
+				throw new \Exception("Failed to merge ID: ".$id);
+			}
+		}
+
+		go()->getDbConnection()->commit();
+
+		return [
+			"updated" => [$primaryId],
+			"destroyed" => $params['ids'],
+			'oldState' => $oldState,
+			'newState' => $this->getState()
+		];
+	}
 }

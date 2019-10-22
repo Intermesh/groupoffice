@@ -465,6 +465,18 @@ class Connection {
 		return $this->createStatement($build);
 	}
 	
+	/**
+	 * Update but with ignore
+	 * @see update()
+	 */
+	public function updateIgnore($tableName, $data, $query = null) {
+		$query = Query::normalize($query);
+
+		$queryBuilder = new QueryBuilder($this);
+		$build = $queryBuilder->buildUpdate($tableName, $data, $query, "UPDATE IGNORE");
+
+		return $this->createStatement($build);
+	}
 
 	/**
 	 * Create a select statement.

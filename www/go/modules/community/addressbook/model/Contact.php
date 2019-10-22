@@ -490,7 +490,7 @@ class Contact extends AclItemEntity {
 											$props = [];
 											foreach($value as $property) {
 												switch($property) {
-													case 'emailAdresses':
+													case 'emailAddresses':
 													if(!$query->isJoined('addressbook_email_address', 'e')) {
 														$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', 'LEFT');
 														$dupQuery->join('addressbook_email_address', 'dup_e', 'dup_e.contactId = dup_c.id', 'LEFT');
