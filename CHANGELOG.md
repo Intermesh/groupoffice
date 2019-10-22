@@ -1,3 +1,4 @@
+- Address book: Implemented Duplicate and merge function
 - Ldapauth: Fixed missing ldapauth_server_user_sync table
 - Core: JSON util for detecting invalid UTF-8
 
