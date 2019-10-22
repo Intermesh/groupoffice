@@ -1,4 +1,5 @@
 - Ldapauth: Fixed missing ldapauth_server_user_sync table
+- Core: JSON util for detecting invalid UTF-8
 
 22-10-2019 6.4.69
 - Core: Revert to older italian translation because it was corrupt
