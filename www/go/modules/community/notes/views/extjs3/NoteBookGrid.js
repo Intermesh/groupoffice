@@ -2,7 +2,8 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 	viewConfig: {
 		scrollOffset: 0,
 		forceFit: true,
-		autoFill: true
+		autoFill: true,
+		totalDisplay: false
 	},
 	hideHeaders: true,
 	initComponent: function () {

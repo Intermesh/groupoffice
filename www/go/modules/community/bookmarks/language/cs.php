@@ -24,4 +24,5 @@ return array (
   'items' => 'položky',
   'item' => 'položka',
   'Ok' => 'OK',
+  'noEmployeesToDisplay' => 'Žádní zaměstnanci k zobrazení',
 );

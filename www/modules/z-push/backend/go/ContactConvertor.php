@@ -44,7 +44,7 @@ class ContactConvertor {
 			],
 			PhoneNumber::TYPE_WORK_MOBILE => [
 				["number" => "business2phonenumber"],
-				["number" => "businessphonenumber"]
+				//["number" => "businessphonenumber"]
 			],
 			PhoneNumber::TYPE_FAX => [
 				["number" => "homefaxnumber"]
@@ -107,12 +107,14 @@ class ContactConvertor {
 				
 		$bpReturnType = GoSyncUtils::getBodyPreferenceMatch($contentParameters->GetBodyPreference());
 
-		if (Request::GetProtocolVersion() >= 12.0) {
-			$message->asbody = GoSyncUtils::createASBodyForMessage($contact,'notes',$bpReturnType);
-		} else {
-			$message->body = StringHelper::normalizeCrlf($contact->comment);
-			$message->bodysize = strlen($message->body);
-			$message->bodytruncated = 0;
+		if(!empty($contact->notes)) {
+			if (Request::GetProtocolVersion() >= 12.0) {
+				$message->asbody = GoSyncUtils::createASBodyForMessage($contact,'notes',$bpReturnType);
+			} else {
+				$message->body = StringHelper::normalizeCrlf($contact->notes);
+				$message->bodysize = strlen($message->body);
+				$message->bodytruncated = 0;
+			}
 		}
 		
 		foreach($this->simpleMapping as $goProp => $asProp) {
@@ -401,7 +403,9 @@ class ContactConvertor {
 		$goOrganizationsNames = [];
 		foreach($goOrganizations as $o) {
 			if(!in_array($o->name, $asOrganizationNames)) {
-				Link::deleteLink($o, $contact);
+				if(!Link::deleteLink($o, $contact)) {
+					throw new \Exception("Could not unlink organization " . $o->name);
+				}
 				ZLog::Write(LOGLEVEL_DEBUG, "Unlink: ".$o->name);
 			} else
 			{

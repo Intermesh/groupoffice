@@ -21,6 +21,14 @@ go.grid.EditorGridPanel = Ext.extend(Ext.grid.EditorGridPanel, {
 		
 		Ext.applyIf(this, go.grid.GridTrait);
 		this.initGridTrait();
+	},
+
+	getView : function() {
+		if (!this.view) {
+				this.view = new go.grid.GridView(this.viewConfig);
+		}
+			
+		return this.view;
 	}
 
 });

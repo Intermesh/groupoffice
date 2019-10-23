@@ -11,6 +11,9 @@ use function GO;
 
 class System extends Controller {
 	
+	/**
+	 * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php core/System/runCron --module=ldapauthenticatior --package=community --name=Sync
+	 */
 	public function runCron($name, $module = "core", $package = "core") {
 		$cls = $package == "core" ?
 			"go\\core\\cron\\".$name : 
@@ -20,6 +23,9 @@ class System extends Controller {
 		$o->run();
 	}
 
+	/**
+	 * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php core/System/upgrade
+	 */
 	public function upgrade() {
 		go()->getInstaller()->isValidDb();
 		go()->setCache(new \go\core\cache\None());	

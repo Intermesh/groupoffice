@@ -37,14 +37,7 @@ abstract class Base extends Model {
 	public function __construct(Field $field) {
 		$this->field = $field;
 	}
-	
-	/**
-	 * True if this value is an array. Used by CSV import
-	 * @return bool
-	 */
-	public function hasMany() {
-		return false;
-	}
+
 	
 	/**
 	 * Get column definition for SQL.
@@ -190,6 +183,18 @@ abstract class Base extends Model {
 	public function dbToText($value, &$values) {
 		return $this->dbToApi($value, $values);
 	}
+
+	/**
+	 * Set the data as string
+	 * Used for templates or export
+	 * 
+	 * @param mixed $value The value for this field
+	 * @param array $values The values inserted in the database
+	 * @return string
+	 */
+	public function textToDb($value, &$values) {
+		return $this->apiToDb($value, $values);
+	}
 	
 	/**
 	 * Called after the data is saved to API.
@@ -228,6 +233,15 @@ abstract class Base extends Model {
 		return true;
 	}
 	
+	/**
+	 *
+	 * Get the modelClass for this customfield, only needed if an id of a related record is stored
+	 *
+	 * @return bool | string
+	 */
+	public function getModelClass() {
+		return false;
+	}
 	/**
 	 * Get the name of this data type
 	 * 

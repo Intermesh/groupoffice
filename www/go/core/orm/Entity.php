@@ -11,6 +11,7 @@ use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
 use go\core\data\exception\NotArrayable;
+use GO\Files\Controller\FolderController;
 
 /**
  * Entity model
@@ -822,6 +823,103 @@ abstract class Entity extends Property {
 		}
 
 		echo "Done\n";
+	}
+
+
+	public function merge(self $entity) {
+
+		if($this->equals($entity)) {
+			throw new \Exception("Can't merge with myself!");
+		}
+
+		//copy public and protected columns except for auto increments.
+		$props = $this->getApiProperties();
+		foreach($props as $name => $p) {
+			$col = static::getMapping()->getColumn($name);
+			if(isset($p['access']) && (!$col || $col->autoIncrement == false)) {
+				if(!empty($entity->$name)) {
+					if(is_array($this->$name)) {
+						$this->$name = array_merge($this->$name, $entity->$name);
+					} else{
+						$this->$name = $entity->$name;
+					}					
+				}
+			}
+		}
+
+		if(method_exists($this, 'getCustomFields')) {
+			$cf = $entity->getCustomFields();
+			foreach($cf as $name => $v) {
+				if(empty($v)) {
+					unset($cf[$name]);
+				}
+			}
+			$this->setCustomFields($cf);
+		}
+
+		go()->getDbConnection()->beginTransaction();
+
+		if(!$this->save()) {
+			go()->getDbConnection()->rollBack();
+			return false;
+		}
+
+		//move links
+		if(!\go()->getDbConnection()
+						->updateIgnore('core_link', 
+										['fromId' => $this->id],
+										['fromEntityTypeId' => static::entityType()->getId(), 'fromId' => $entity->id]
+										)->execute()) {
+			go()->getDbConnection()->rollBack();
+			return false;
+		}
+		
+		if(!\go()->getDbConnection()
+						->updateIgnore('core_link', 
+										['toId' => $this->id],
+										['toEntityTypeId' => static::entityType()->getId(), 'toId' => $entity->id]
+										)->execute()) {
+			go()->getDbConnection()->rollBack();
+			return false;
+		}
+
+		//move comments
+
+		if(Module::isInstalled('community', 'comments')) {
+			if(!\go()->getDbConnection()
+						->update('comments_comment', 
+										['entityId' => $this->id],
+										['entityTypeId' => static::entityType()->getId(), 'entityId' => $entity->id]
+										)->execute()) {
+				go()->getDbConnection()->rollBack();
+				return false;
+			}
+		}
+
+
+		//move files
+		$this->mergeFiles($entity);
+
+		if(!$entity->delete()) {
+			go()->getDbConnection()->rollBack();
+				return false;
+		}
+		return go()->getDbConnection()->commit();
+	}
+
+
+	private function mergeFiles(self $entity) {
+		if(!Module::isInstalled('legacy', 'files') && $entity->getMapping()->getColumn('filesFolderId')) {
+			return;
+		}
+		$sourceFolder = \GO\Files\Model\Folder::model()->findByPk($entity->filesFolderId);
+		if (!$sourceFolder) {
+			return;
+		}
+		$folder = \GO\Files\Model\Folder::model()->findForEntity($entity);
+	
+		$folder->moveContentsFrom($sourceFolder);
+		
 	}
 
 }

@@ -54,6 +54,7 @@ class Debugger {
 	 */
 	public $logPath;
 
+	private $logFp;
 	/**
 	 * The debug entries as strings
 	 * @var array
@@ -64,8 +65,12 @@ class Debugger {
 		try {
 			$this->enabled = !empty(go()->getConfig()['core']['general']['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug');
 			
-			if(go()->getConfig()['core']['general']['debugLog']) {
-				$this->logPath = go()->getDataFolder()->getFile('log/debug.log')->getPath();
+			if($this->enabled && go()->getConfig()['core']['general']['debugLog']) {
+				$logFile = go()->getDataFolder()->getFile('log/debug.log');
+				if($logFile->isWritable()) {
+					$this->logPath = $logFile->getPath();				
+					$this->logFp = $logFile->open('a+');
+				}
 			}
 		} catch (\go\core\exception\ConfigurationException $e) {
 			//GO is not configured / installed yet.
@@ -220,15 +225,12 @@ class Debugger {
 			$line = "\n" . $line;
 		}
 
-		if(go()->getEnvironment()->isCli()) {
-			echo $line;
-		}
+		// if(go()->getEnvironment()->isCli()) {
+		// 	echo $line;
+		// }
 
-		if(!empty($this->logPath)) {
-			$debugLog = new Fs\File($this->logPath);
-			if($debugLog->isWritable()) {				
-				$debugLog->putContents($line, FILE_APPEND);
-			}
+		if(is_resource($this->logFp)) {
+			fputs($this->logFp, $line);
 		}
 	}
 

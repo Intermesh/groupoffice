@@ -25,3 +25,13 @@ $updates['201906011900'][] = "CREATE TABLE `ldapauth_server_user_sync` (
   CONSTRAINT `ldapauth_server_user_sync_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
   CONSTRAINT `ldapauth_server_user_sync_ibfk_2` FOREIGN KEY (`serverId`) REFERENCES `ldapauth_server` (`id`) ON DELETE CASCADE
  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
+$updates['201910220909'][] = "CREATE TABLE IF NOT EXISTS `ldapauth_server_user_sync` (
+  `serverId` int(11) NOT NULL,
+  `userId` int(11) NOT NULL,
+  PRIMARY KEY (`serverId`,`userId`),
+  KEY `ldapauth_server_user_sync_ibfk_1` (`userId`),
+  CONSTRAINT `ldapauth_server_user_sync_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ldapauth_server_user_sync_ibfk_2` FOREIGN KEY (`serverId`) REFERENCES `ldapauth_server` (`id`) ON DELETE CASCADE
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";

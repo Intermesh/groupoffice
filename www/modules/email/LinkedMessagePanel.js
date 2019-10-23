@@ -15,12 +15,16 @@ GO.email.LinkedMessagePanel = Ext.extend(GO.email.MessagePanel,{
 					text: t("Reply", "email"),
 					cls: 'x-btn-text-icon',
 					handler: function(){
-						GO.email.showComposer({
+						var comp = GO.email.showComposer({
 							task:'reply',
 							loadParams : {
 								is_tmp_file:this.data.is_tmp_file,
 								path:this.data.path
 							}
+						});
+
+						this.data.links.forEach(function(link) {
+							comp.createLinkButton.addLink(link.entity, link.entityId);
 						});
 					},
 					scope: this
@@ -30,12 +34,16 @@ GO.email.LinkedMessagePanel = Ext.extend(GO.email.MessagePanel,{
 					text: t("Reply all", "email"),
 					cls: 'x-btn-text-icon',
 					handler: function(){
-						GO.email.showComposer({
+						var comp = GO.email.showComposer({
 							task:'reply_all',
 							loadParams : {
 								is_tmp_file:this.data.is_tmp_file,
 								path:this.data.path
 							}
+						});
+
+						this.data.links.forEach(function(link) {
+							comp.createLinkButton.addLink(link.entity, link.entityId);
 						});
 					},
 					scope: this

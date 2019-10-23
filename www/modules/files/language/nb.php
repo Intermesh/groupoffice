@@ -135,4 +135,7 @@ Følgende endringer er foretatt av %s:
   '-' => '-',
   'Ver.' => 'Ver.',
   'ID' => 'ID',
+  'Ok' => 'Ok',
+  'Create folder' => 'Opprett mappe',
+  'File info' => 'Filinformasjon',
 );

@@ -43,7 +43,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						}),
 					
 						this.namePanel = new Ext.BoxComponent({
-							tpl: "<h3>{name}</h3><h4>{jobTitle}</h4>" 							
+							tpl: '<h3><tpl if="prefixes">{prefixes} </tpl>{name}<tpl if="suffixes"> {suffixes}</tpl></h3><h4>{jobTitle}</h4>'							
 						}),						
 						this.urlPanel = new Ext.BoxComponent({
 							flex: 1,

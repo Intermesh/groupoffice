@@ -1,8 +1,41 @@
+- Address book: Implemented Duplicate and merge function
+- Ldapauth: Fixed missing ldapauth_server_user_sync table
+- Core: JSON util for detecting invalid UTF-8
+
+22-10-2019 6.4.69
+- Core: Revert to older italian translation because it was corrupt
+
+22-10-2019 6.4.68
+- Core: Updated Norwegian and Czech translation
+- LDAP Auth: Bind to ldap before authentication
+
+15-10-2019 6.4.67
+- Addressbook and notes: Hide totals in nav bars
+- Core: Fixed import CSV for custom fields values that are exported as text (Select, Multiselect)
+- Projects: Fixed activity sort in time tracking
+- Billing: Fixed total not always updating in expense dialog
+- Core: new total display of grids also showed in nav bars. Removed now.
+- LDAPAuth: Fixed users and group sync
+
+14-10-2019 6.4.66
+- Core: added total number of rows in new grid panels
+- Email: Create links when replying to linked messages and from message dialog
+- LDAP Auth: Fixed Sync usernames and authentication on sync
+- Calendar: Events and tasks report mailer was broken
+- E-mail: Autolink all contacts with matching email address
+- Address book: Add suffix and prefix to detail view title
+- Core: CSV import would not import anything in some cases
+- Assistant: Didn't work with @ in username
+
+11-10-2019 6.4.65
+- Contacts: Fixed problem with duplicating phone number and possibly unlinking company
+- Newsletters: NIce error message when testing without recpipients
 - Core: Updated Brasilian Portugese and Italian translations
 - Freebusy permissions: Could not add new users when installed
 - GOTA: GOTA listed for users without permission becuase of missing permissions check in old framework module check
 - Calendar: Fixed error in calendar when you didn't have permissions for the favorites module
 - Calendar: Start in calendar / view where you were last
+- Core: changed global search into normal index with wildcards
 
 04-10-2019 6.4.64
 - Core: Track changes in other models in entity controller when doing a set request so it can return all modified entities
@@ -343,9 +376,15 @@
 11-06-2019 6.4.21
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
+- Projects: Fixed activity sort in time tracking
+- Billing: Fixed total not always updating in expense dialog
+
+11-10-2019 6.3.83
 - Core: Working week didn't accept half hours
 - Time Tracking: Sort time tracking activities by name
 - Calendar: Calendar remember state
+- Assistant: Didn't work with @ in username
+- Core: fixed 6.2 email settings upgrade
 
 19-09-2019 6.3.82
 - Projects larger expense budget dialog and resizable

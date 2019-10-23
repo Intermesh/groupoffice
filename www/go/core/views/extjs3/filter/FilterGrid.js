@@ -1,7 +1,8 @@
 go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 	viewConfig: {
 		forceFit: true,
-		autoFill: true
+		autoFill: true,
+		totalDisplay: false
 	},
 	autoHeight: true,
 	

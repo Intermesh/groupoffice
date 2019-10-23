@@ -235,7 +235,7 @@ class SavedMessage extends ComposerMessage {
 					
 					//$tmp_file = new \GO\Base\Fs\File($this->_getTempDir().$filename);
 					if(!empty($part->body)){
-						$tmp_file = new \GO\Base\Fs\File($this->_getTempDir().$filename);
+						$tmp_file = new \GO\Base\Fs\File($this->_getTempDir(). \GO\Base\Fs\File::stripInvalidChars($filename));
 						$tmp_file->appendNumberToNameIfExists();						
 						$tmp_file->putContents($part->body);
 						

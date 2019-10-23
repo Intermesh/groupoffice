@@ -26,7 +26,7 @@ go.customfields.type.Date = Ext.extend(go.customfields.type.Text, {
 	 * @returns {unresolved}
 	 */
 	renderDetailView: function (value, data, customfield) {
-		return GO.util.dateFormat(value);
+		return go.util.Format.date(value);
 	},
 
 	/**

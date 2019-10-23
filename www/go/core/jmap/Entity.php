@@ -86,6 +86,11 @@ abstract class Entity  extends OrmEntity {
 
 			$ids = array_merge(array_diff($modified[$r->name][0], $modified[$r->name][1]), array_diff($modified[$r->name][1], $modified[$r->name][0]));
 
+			if(empty($ids)) {
+				//Just the order of id's has changed.
+				continue;
+			}
+
 			$entities = $this->findEntitiesByTable($r->tableName);
 			foreach($entities as $e) {
 				$cls = $e['cls'];

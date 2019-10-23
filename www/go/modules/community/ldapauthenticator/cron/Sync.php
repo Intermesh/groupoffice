@@ -2,10 +2,10 @@
 namespace go\modules\community\ldapauthenticator\cron;
 
 use go\core\model\CronJob;
-use go\modules\community\ldapauthenticator\controller\Sync as SyncCtrl;
+use go\modules\community\ldapauthenticator\cli\controller\Sync as SyncCtrl;
 
 class Sync extends CronJob {
-	
+  
 	public function run() {
     $records = go()->getDbConnection()
     ->select('id,syncGroups,syncUsers')

@@ -371,7 +371,9 @@ class VCard extends AbstractConverter {
 		$goOrganizationsNames = [];
 		foreach ($goOrganizations as $o) {
 			if (!in_array($o->name, $vcardOrganizationNames)) {
-				Link::deleteLink($o, $contact);
+				if(!Link::deleteLink($o, $contact)) {
+					throw new \Exception("Could not unlink organization " . $o->name);
+				}
 			} else {
 				$goOrganizationsNames[] = $o->name;
 			}

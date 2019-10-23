@@ -323,7 +323,22 @@ class File extends FileSystemObject {
 			throw new Exception("File exists in move!");
 		}
 
-		if (rename($this->path, $destination->getPath())) {
+		if($destination->getPath() == $this->getPath()) {
+			return true;
+		}
+
+		$success = false;
+		try {
+			$success = rename($this->path, $destination->getPath());
+		} catch(\Exception $e) {
+			//renaming accross partitions doesn't work
+			$success = $this->copy($destination);
+			if($success) {
+				$this->delete();
+			}
+		}
+
+		if ($success) {
 			$this->path = $destination->getPath();
 			return true;
 		} else {

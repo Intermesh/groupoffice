@@ -37,6 +37,6 @@ class Date extends Base {
 
 	public function dbToText($value, &$values)
 	{
-		return $value instanceof \DateTime ? $value->format(go()->getAuthState()->getUser(['dateFormat','timeformat'])->dateFormat) : $value;
+		return $value instanceof \DateTime ? $value->format('Y-m-d') : $value;
 	}
 }

@@ -1,5 +1,5 @@
 <?php
-namespace go\modules\community\ldapauthenticator\controller;
+namespace go\modules\community\ldapauthenticator\cli\controller;
 
 use go\core\Controller;
 use go\modules\community\ldapauthenticator\model\Server;
@@ -18,7 +18,9 @@ class Sync extends Controller {
 
   const EVENT_SYNC_GROUP = 'syncuser';
 
-	use EventEmitterTrait;
+  use EventEmitterTrait;
+  
+  private $domains;
 
   /**
    * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php community/ldapauthenticator/Sync/users --id=2 --dryRun=1 --delete=1 --maxDeletePercentage=50
@@ -34,21 +36,39 @@ class Sync extends Controller {
 
     $connection = $server->connect();
 
+    if (!empty($server->username)) {
+			if (!$connection->bind($server->username, $server->getPassword())) {				
+				throw new \Exception("Invalid password given for '".$server->username."'");
+			} else
+			{
+				go()->debug("Authenticated with user '" . $server->username . '"');
+			}
+		}
+
     $usersInLDAP = [1];
+
+    $this->domains  = array_map(function($d) {return $d->name;}, $server->domains);
 		
 		$records = Record::find($connection, $server->peopleDN, $server->syncUsersQuery);
     
     $i = 0;
     foreach($records as $record) {
       $i++;
-      $username = $record->uid[0] ?? $record->SAMAccountName[0];
-
+      $username = $this->getGOUserName($record);
+      
       if (empty($username)) {
-        throw new \Exception("Empty group name in LDAP record!");
+        echo "Skipping record. Could not determine username.";
+        continue;
       }
-      $user = User::find()->where(['username' => $username])->single();
-      if (!$user) {
 
+      $user = User::find()->where(['username' => $username]);
+      
+      if(!empty($record->mail[0])) {
+        $user->orWhere(['email' => $record->mail[0]]);
+      }      
+      $user = $user->single();
+
+      if (!$user) {
         echo "Creating user '" . $username . "'\n";
 
         $user = new User();
@@ -64,7 +84,7 @@ class Sync extends Controller {
 
       if (!$dryRun) {
         if($user->isModified() && !$user->save()) {
-          echo "Error saving user: " . implode("\n", $user->getValidationErrors());
+          echo "Error saving user: " . var_export($user->getValidationErrors(), true);
           continue;
         }
 
@@ -84,6 +104,62 @@ class Sync extends Controller {
     echo "Done\n\n";
   }
 
+  private function getGOUserName(Record $record) {
+    $username = $record->uid[0] ?? $record->SAMAccountName[0];
+
+    if(!$username) {
+      go()->debug("No username found in record: ");
+      go()->debug($record->getAttributes());
+      return false;
+    }
+
+    $dn = ldap_explode_dn($record->getDn(), 0);
+
+    /*
+      array(5) {
+      ["count"]=>
+      int(4)
+      [0]=>
+      string(19) "cn=John A. Zoidberg"
+      [1]=>
+      string(9) "ou=people"
+      [2]=>
+      string(16) "dc=planetexpress"
+      [3]=>
+      string(6) "dc=com"
+    }*/
+
+    $domain = "";
+    foreach($dn as $v) {
+      if(substr($v, 0, 3) == 'dc=') {
+        if($domain != "") {
+          $domain .= '.';
+        }
+        $domain .= substr($v, 3);
+      }
+    }
+
+    $mailDomain = isset($record->mail[0]) ? explode('@', $record->mail[0])[1] : null;
+
+    if(empty($domain) || !in_array($domain, $this->domains)) {    
+      if(empty($mailDomain)) {
+        go()->info("Using domain from mail property for " . $username);
+        return false;
+      } 
+      $domain = $mailDomain;
+    }
+
+    if(!in_array($domain, $this->domains)) {
+      $err = "Domain '$domain' from '$username' is not listed in the authenticator domains: " . implode(', ', $this->domains);
+      echo "Error: ". $err ."\n";
+      go()->debug($err);
+      return false;
+    }
+
+    return $username . '@' . $domain;
+
+  }
+
 
   private function deleteUsers($usersInLDAP, $maxDeletePercentage, $dryRun) {
     $users = User::find()
@@ -94,16 +170,21 @@ class Sync extends Controller {
 
 		echo "Groups in Group-Office: " . $totalInGO . "\n";
     echo "Groups in LDAP: " . $totalInLDAP . "\n";
-    
-    $percentageToDelete = round((1 - $totalInLDAP / $totalInGO) * 100);		
-    if ($percentageToDelete > $maxDeletePercentage)
-      throw new \Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
 
-    foreach($users as $user) {
-      if (!in_array($user->id, $usersInLDAP)) {
-        echo "Deleting " . $user->username . "\n";
-        if (!$dryRun)
-          $user->delete();
+    $percentageToDelete = $totalInGO > 0 ? round((1 - $totalInLDAP / $totalInGO) * 100) : 0;		
+
+    if($percentageToDelete > 0) {
+      echo "Delete percentage: " . $percentageToDelete . "%\n";
+
+      if ($percentageToDelete > $maxDeletePercentage)
+        throw new \Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
+
+      foreach($users as $user) {
+        if (!in_array($user->id, $usersInLDAP)) {
+          echo "Deleting " . $user->username . "\n";
+          if (!$dryRun)
+            $user->delete();
+        }
       }
     }
   }
@@ -124,9 +205,20 @@ class Sync extends Controller {
 
     $connection = $server->connect();
 
+    $this->domains  = array_map(function($d) {return $d->name;}, $server->domains);
+
+    if (!empty($server->username)) {
+			if (!$connection->bind($server->username, $server->getPassword())) {				
+				throw new \Exception("Invalid password given for '".$server->username."'");
+			} else
+			{
+				go()->debug("Authenticated with user '" . $server->username . '"');
+			}
+		}
+
     $groupsInLDAP = [Group::ID_ADMINS, Group::ID_EVERYONE, Group::ID_INTERNAL];
 		
-		$records = Record::find($connection, $server->peopleDN, $server->syncGroupsQuery);
+		$records = Record::find($connection, $server->groupsDN, $server->syncGroupsQuery);
     
     $i = 0;
     foreach($records as $record) {
@@ -206,15 +298,21 @@ class Sync extends Controller {
 		echo "Groups in Group-Office: " . $totalInGO . "\n";
     echo "Groups in LDAP: " . $totalInLDAP . "\n";
     
-    $percentageToDelete = round((1 - $totalInLDAP / $totalInGO) * 100);		
-    if ($percentageToDelete > $maxDeletePercentage)
-      throw new \Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
+    $percentageToDelete = $totalInGO > 0 ? round((1 - $totalInLDAP / $totalInGO) * 100) : 0;		
 
-    foreach($groups as $group) {
-      if (!in_array($group->id, $groupsInLDAP)) {
-        echo "Deleting " . $group->name . "\n";
-        if (!$dryRun)
-          $group->delete();
+    if($percentageToDelete > 0) {
+      echo "Delete percentage: " . $percentageToDelete . "%\n";
+
+      if ($percentageToDelete > $maxDeletePercentage)
+        throw new \Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
+
+      
+      foreach($groups as $group) {
+        if (!in_array($group->id, $groupsInLDAP)) {
+          echo "Deleting " . $group->name . "\n";
+          if (!$dryRun)
+            $group->delete();
+        }
       }
     }
   }
@@ -226,9 +324,11 @@ class Sync extends Controller {
       return $record->memberuid;
     } else if (isset($record->member)) {
       //for Active Directory
-      foreach ($record->member as $username) {      
+      foreach ($record->member as $username) {    
+        go()->debug("Member: " . $username);  
         $username = $this->queryActiveDirectoryUser($ldapConn, $username);
         if (!$username) {
+          echo "Skipping. Could not find GO user\n";
           continue;
         }
         $members[] = $username;
@@ -252,6 +352,6 @@ class Sync extends Controller {
 		$accountResult = Record::find($ldapConn, $searchDn, $query);
     $record = $accountResult->fetch();
     
-		return $record->SAMAccountName[0] ?? $record->uid[0];
+		return $this->getGOUserName($record);
 	}
 }

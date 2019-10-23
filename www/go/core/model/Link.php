@@ -202,7 +202,7 @@ class Link extends Entity {
 	 * @return boolean
 	 */
 	public static function deleteLink($a, $b) {
-		return self::deleteLinkWithIds($a->entityType()->getId(), $a->id, $b->id, $b->entityType()->getId());
+		return self::deleteLinkWithIds($a->id, $a->entityType()->getId(), $b->id, $b->entityType()->getId());
 	}
 	
 	/**

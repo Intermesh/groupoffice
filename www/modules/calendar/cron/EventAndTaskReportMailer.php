@@ -49,23 +49,14 @@ class EventAndTaskReportMailer extends \GO\Base\Cron\AbstractCron {
 	 */
 	public function run(\GO\Base\Cron\CronJob $cronJob){
 		
-		foreach ($cronJob->getAllUsers() as $user) {
-			
-			\GO::debug('CRONJOB ('.$this->name.') START FOR '.$user->username.' : '.date('d-m-Y H:i:s'));
-
+		foreach ($cronJob->getAllUsers() as $user) {			
 			\GO::language()->setLanguage($user->language); // Set the users language
 			\GO::session()->runAsRoot();
 			
 			$pdf = $this->_getUserPdf($user);
-			if($this->_sendEmail($user,$pdf))
-				\GO::debug("CRON MAIL IS SEND!");
-			else
-				\GO::debug("CRON MAIL HAS NOT BEEN SEND!");		
+			$this->_sendEmail($user,$pdf);
 			
 			\GO::language()->setLanguage(); // Set the admin language
-			
-			\GO::debug('CRONJOB ('.$this->name.') FINSIHED FOR '.$user->username.' : '.date('d-m-Y H:i:s'));
-						
 		}
 		
 	}

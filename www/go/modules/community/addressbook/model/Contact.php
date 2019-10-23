@@ -483,6 +483,56 @@ class Contact extends AclItemEntity {
 										})->add('isUser', function(Criteria $criteria, $value, Query $query) {
 											$criteria->where('c.goUserId', empty($value) ? '=' : '!=', null);
 											
+										})->add('duplicate', function(Criteria $criteria, $value, Query $query) {
+
+											$dupQuery = new Query();
+
+											$props = [];
+											foreach($value as $property) {
+												switch($property) {
+													case 'emailAddresses':
+													if(!$query->isJoined('addressbook_email_address', 'e')) {
+														$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', 'LEFT');
+														$dupQuery->join('addressbook_email_address', 'dup_e', 'dup_e.contactId = dup_c.id', 'LEFT');
+													}
+													$props[] = 'e.email';
+													break;
+
+													case 'phoneNumbers':
+													if(!$query->isJoined('addressbook_phone_number', 'p')) {
+														$query->join('addressbook_phone_number', 'p', 'p.contactId = c.id', 'LEFT');
+														$dupQuery->join('addressbook_phone_number', 'dup_p', 'dup_p.contactId = dup_c.id', 'LEFT');
+													}
+													$props[] = 'p.number';
+													break;
+
+													default:
+														$props[] = 'c.' . $property;
+													break;
+												}
+											}
+
+											$on = implode(' AND ', array_map(function($prop){
+												return $prop . ' <=> dup.' . substr($prop, strpos($prop, '.') + 1);
+											}, $props));
+
+											$dupProps = array_map(function($prop){return 'dup_'.$prop;}, $props);
+
+											$query->join(
+												$dupQuery
+												->select($dupProps)
+												->select('count(DISTINCT dup_c.id) as n', true)
+												->from('addressbook_contact', 'dup_c')
+												->groupBy($dupProps)
+												->having('n > 1')
+												,
+												'dup',
+												$on
+											);
+
+
+											// echo $query;
+											
 										});
 													
 										

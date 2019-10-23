@@ -67,10 +67,9 @@ class Select extends Base {
 	}
 	
 	public function dbToText($value, &$values) {
-	
-		//new model
+
 		if(empty($value)) {
-			return [];
+			return "";
 		}
 
 		return (new Query())
@@ -78,6 +77,26 @@ class Select extends Base {
 						->from('core_customfields_select_option')
 						->where(['id' => $value])
 						->single();
+	}
+
+	public function textToDb($value, &$values) {
+
+		if(empty($value)) {
+			return null;
+		}
+
+		$id = (new Query())
+						->selectSingleValue("id")
+						->from('core_customfields_select_option')
+						->where(['text' => $value])
+						->andWhere(['fieldId' => $this->field->id])
+						->single();
+
+		if(!$id) {
+			throw new \Exception("Invalid select option text for field '".$this->field->databaseName."': ". $value);
+		}
+
+		return $id;
 	}
 	
 	protected function saveOptions() {
