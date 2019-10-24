@@ -726,7 +726,12 @@ class Contact extends AclItemEntity {
 				$orgStr = ' - '.implode(', ', $orgs);			
 			}
 		}
-		return $addressBook->name . $orgStr;
+
+		$jobTitle = "";
+		if(!empty($this->jobTitle)) {
+			$jobTitle = ' - ' . $this->jobTitle;
+		}
+		return $addressBook->name . $jobTitle . $orgStr;
 	}
 
 	protected function getSearchName() {
