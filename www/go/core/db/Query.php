@@ -125,9 +125,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 */
 	public function from($tableName, $tableAlias = null) {
 		$this->tableName = $tableName;
-		$this->tableAlias = $tableAlias;
-
-		return $this;
+		return $this->tableAlias($tableAlias);
 	}
 
 	/**

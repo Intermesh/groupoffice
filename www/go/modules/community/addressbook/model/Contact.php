@@ -486,7 +486,7 @@ class Contact extends AclItemEntity {
 											
 										})->add('duplicate', function(Criteria $criteria, $value, Query $query) {
 
-											$dupQuery = new Query();
+											$dupQuery = static::find();
 
 											$props = [];
 											foreach($value as $property) {
@@ -494,7 +494,7 @@ class Contact extends AclItemEntity {
 													case 'emailAddresses':
 													if(!$query->isJoined('addressbook_email_address', 'e')) {
 														$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', 'LEFT');
-														$dupQuery->join('addressbook_email_address', 'dup_e', 'dup_e.contactId = dup_c.id', 'LEFT');
+														$dupQuery->join('addressbook_email_address', 'e', 'e.contactId = c.id', 'LEFT');
 													}
 													$props[] = 'e.email';
 													break;
@@ -502,7 +502,7 @@ class Contact extends AclItemEntity {
 													case 'phoneNumbers':
 													if(!$query->isJoined('addressbook_phone_number', 'p')) {
 														$query->join('addressbook_phone_number', 'p', 'p.contactId = c.id', 'LEFT');
-														$dupQuery->join('addressbook_phone_number', 'dup_p', 'dup_p.contactId = dup_c.id', 'LEFT');
+														$dupQuery->join('addressbook_phone_number', 'p', 'p.contactId = c.id', 'LEFT');
 													}
 													$props[] = 'p.number';
 													break;
@@ -517,15 +517,12 @@ class Contact extends AclItemEntity {
 												return $prop . ' <=> dup.' . substr($prop, strpos($prop, '.') + 1);
 											}, $props));
 
-											$dupProps = array_map(function($prop){return 'dup_'.$prop;}, $props);
-
 											$query->join(
 												$dupQuery
-												->select($dupProps)
-												->select('count(DISTINCT dup_c.id) as n', true)
-												->from('addressbook_contact', 'dup_c')
+												->select($props)
+												->select('count(DISTINCT c.id) as n', true)												
 												->filter(['permissionLevel' => Acl::LEVEL_DELETE])
-												->groupBy($dupProps)
+												->groupBy($props)
 												->having('n > 1')
 												,
 												'dup',

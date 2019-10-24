@@ -310,7 +310,7 @@ abstract class Property extends Model {
 	/**
 	 * Returns the mapping object that is defined in defineMapping()
 	 * 
-	 * @return Mapping;
+	 * @return Mapping
 	 */
 	public final static function getMapping() {		
 		$cls = static::class;
