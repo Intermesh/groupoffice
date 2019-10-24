@@ -11,7 +11,7 @@ use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
 use go\core\data\exception\NotArrayable;
-use GO\Files\Controller\FolderController;
+use go\core\util\ClassFinder;
 
 /**
  * Entity model
@@ -859,11 +859,6 @@ abstract class Entity extends Property {
 
 		go()->getDbConnection()->beginTransaction();
 
-		if(!$this->save()) {
-			go()->getDbConnection()->rollBack();
-			return false;
-		}
-
 		//move links
 		if(!\go()->getDbConnection()
 						->updateIgnore('core_link', 
@@ -900,10 +895,18 @@ abstract class Entity extends Property {
 		//move files
 		$this->mergeFiles($entity);
 
+		$this->mergeRelated($entity);
+
 		if(!$entity->delete()) {
 			go()->getDbConnection()->rollBack();
 				return false;
 		}
+
+		if(!$this->save()) {
+			go()->getDbConnection()->rollBack();
+			return false;
+		}
+
 		return go()->getDbConnection()->commit();
 	}
 
@@ -918,8 +921,118 @@ abstract class Entity extends Property {
 		}
 		$folder = \GO\Files\Model\Folder::model()->findForEntity($entity);
 	
-		$folder->moveContentsFrom($sourceFolder);
+		$folder->moveContentsFrom($sourceFolder);		
+	}
+
+	private function mergeRelated(Entity $entity) {
+
+		$refs = static::getTableReferences();
+
+		$cfTable = method_exists($this, 'customFieldsTableName') ? $this->customFieldsTableName() : null;
+
+		foreach($refs as $r) {
+			if($r['table'] == $cfTable) {
+				continue;
+			}
+
+			go()->getDbConnection()
+				->update(
+					$r['table'], 
+					[$r['column'] => $this->id], 
+					[$r['column'] => $entity->id])
+				->execute();
+		}
+	}
+
+	/**
+	 * Get all table columns referencing the id column of the entity's main table.
+	 * 
+	 * It uses the 'information_schema' to read all foreign key relations.
+	 * 
+	 * @return array [['cls'=>'Contact', 'column' => 'id', 'paths' => []]]
+	 */
+	protected static function getEntityReferences() {
+		$cacheKey = "refs-entity-" . static::class;
+		$entityClasses = go()->getCache()->get($cacheKey);
+		if($entityClasses === null) {
+
+			$refs = static::getTableReferences();
+
+			$entityClasses = [];
+			foreach($refs as $r) {
+				$entities = static::findEntitiesByTable($r['table']);
+				$eWithCol = array_map(function($i) use($r) {
+					$i['column'] = $r['column'];
+					return $i;
+				}, $entities);
+
+				$entityClasses = array_merge($entityClasses, $eWithCol);
+			}	
+			
+			go()->getCache()->set($cacheKey, $entityClasses);			
+		}		
 		
+		return $entityClasses;
+	}
+
+	/**
+	 * @return array [['column'=>'contactId', 'table'=>'foo']]
+	 */
+	protected static function getTableReferences() {
+		$cacheKey = "refs-table-" . static::class;;
+		$refs = go()->getCache()->get($cacheKey);
+		if($refs === null) {
+			$tableName = array_values(static::getMapping()->getTables())[0]->getName();
+			$dbName = go()->getDatabase()->getName();
+			go()->getDbConnection()->exec("USE information_schema");
+			//somehow bindvalue didn't work here
+			$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where ".
+				"table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . 
+				" and referenced_table_name=".go()->getDbConnection()->getPDO()->quote($tableName)." and referenced_column_name = 'id'";
+
+			$stmt = go()->getDbConnection()->getPDO()->query($sql);
+			$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);					
+
+			//don't find the entity itself
+			$refs = array_filter($refs, function($r) {
+				return !static::getMapping()->hasTable($r['table']);
+			});
+
+			go()->getDbConnection()->exec("USE `" . $dbName . "`");		
+
+			go()->getCache()->set($cacheKey, $refs);			
+		}
+
+		return $refs;
+	}
+
+
+	/**
+	 * Find's entities that have the given table name mapped
+	 * 
+	 * @return Array[] [['cls'=>'', 'paths' => 'contactId']]
+	 */
+	protected static function findEntitiesByTable($tableName) {
+		$cf = new ClassFinder();
+		$allEntitites = $cf->findByParent(self::class);
+
+		//don't find the entity itself
+		$allEntitites = array_filter($allEntitites, function($e) {
+			return $e != static::class;
+		});
+
+		$mapped = array_map(function($e) use ($tableName) {
+			$paths = $e::getMapping()->hasTable($tableName);
+			return [
+				'cls' => $e,
+				'paths' => $paths
+			];
+
+		}, $allEntitites);
+
+		return array_filter($mapped, function($m) {
+			return !empty($m['paths']);
+		});
 	}
 
 }
