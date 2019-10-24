@@ -4,8 +4,10 @@ ini_set('error_reporting', E_ALL);
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 
+use go\core;
 use go\core\App;
 use go\core\cli\State;
+use GO\Base\Model\Module;
 
 $installDb = true;
 
@@ -61,6 +63,27 @@ try {
 				new go\modules\community\test\Module(),
 				new go\modules\community\addressbook\Module(),
 				]);
+
+
+		//install not yet refactored modules
+		GO::$ignoreAclPermissions = true;
+		$modules = GO::modules()->getAvailableModules();
+
+		foreach ($modules as $moduleClass) {
+
+			$moduleController = new $moduleClass;
+			if ($moduleController instanceof core\Module) {
+				continue;
+			}
+			if ($moduleController->autoInstall() && $moduleController->isInstallable()) {
+				$module = new Module();
+				$module->name = $moduleController->name();
+				if (!$module->save()) {
+					throw new \Exception("Could not save module " . $module->name);
+				}
+			}
+		}
+		GO::$ignoreAclPermissions = false;
 
 		echo "Done\n\n";
 	}
