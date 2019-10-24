@@ -52,12 +52,8 @@ go.grid.GridTrait = {
 			if(!this.getView().totalDisplay || (o.params && !go.util.empty(o.params.position))) {
 				return;
 			}
-			if(store.getTotalCount()) {
-				this.getView().totalDisplay.update(store.getTotalCount() + " " +t("items"));
-				this.getView().totalDisplay.show();
-			} else {
-				this.getView().totalDisplay.hide();
-			}
+			this.getView().setTotalCount(store.getTotalCount());
+		
 		}, this);
 	},
 	

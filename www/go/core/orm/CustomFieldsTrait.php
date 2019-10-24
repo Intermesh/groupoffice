@@ -86,8 +86,8 @@ trait CustomFieldsTrait {
 	 * @param array $data
 	 * @return $this
 	 */
-	public function setCustomFields(array $data) {			
-		$this->customFieldsData = array_merge($this->internalGetCustomFields(), $this->normalizeCustomFieldsInput($data));		
+	public function setCustomFields(array $data, $asText = false) {			
+		$this->customFieldsData = array_merge($this->internalGetCustomFields(), $this->normalizeCustomFieldsInput($data, $asText));		
 		
 		$this->customFieldsModified = true;
 
@@ -101,8 +101,8 @@ trait CustomFieldsTrait {
 	 * @param mixed $value
 	 * @return $this
 	 */
-	public function setCustomField($name, $value) {
-		return $this->setCustomFields([$name => $value]);
+	public function setCustomField($name, $value, $asText = false) {
+		return $this->setCustomFields([$name => $value], $asText);
 	}
 	
 	private static $customFields;
@@ -132,7 +132,7 @@ trait CustomFieldsTrait {
 	}
 	
 	
-	private function normalizeCustomFieldsInput($data) {
+	private function normalizeCustomFieldsInput($data, $asText = false) {
 		$columns = Table::getInstance(static::customFieldsTableName())->getColumns();		
 		foreach($columns as $name => $column) {
 			if(array_key_exists($name, $data)) {
@@ -141,9 +141,10 @@ trait CustomFieldsTrait {
 		}
 			
 		foreach(self::getCustomFieldModels() as $field) {	
+			$fn = $asText ? 'textToDb' : 'apiToDb';
 			//if client didn't post value then skip it
 			if(array_key_exists($field->databaseName, $data)) {
-				$data[$field->databaseName] = $field->getDataType()->apiToDb(isset($data[$field->databaseName]) ? $data[$field->databaseName] : null,  $data);			
+				$data[$field->databaseName] = $field->getDataType()->$fn(isset($data[$field->databaseName]) ? $data[$field->databaseName] : null,  $data);			
 			}
 		}
 		

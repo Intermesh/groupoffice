@@ -74,6 +74,7 @@ go.modules.community.notes.NoteGrid = Ext.extend(go.grid.GridPanel, {
 				}
 			],
 			viewConfig: {
+				totalDisplay: true,
 				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>'
 //				enableRowBody: true,
 //				showPreview: true,

@@ -153,6 +153,16 @@ class Server extends Entity {
 			}			
 		}	
 
+		if (!empty($this->username)) {			
+			
+			if (!$this->connection->bind($this->username, $this->getPassword())) {				
+				throw new \Exception("Invalid password given for '".$this->username."' " . $this->getPassword());
+			} else
+			{
+				go()->debug("Authenticated with user '" . $this->username . '"');
+			}
+		}
+
 		return $this->connection;
 	}
 

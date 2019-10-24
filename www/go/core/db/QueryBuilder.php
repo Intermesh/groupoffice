@@ -188,7 +188,7 @@ class QueryBuilder {
 		return ['sql' => $sql, 'params' => $this->buildBindParameters];
 	}
 
-	public function buildUpdate($tableName, $data, Query $query) {
+	public function buildUpdate($tableName, $data, Query $query, $command = "UPDATE") {
 
 		$this->reset();
 
@@ -225,7 +225,7 @@ class QueryBuilder {
 			$set = (string) $data;
 		}
 		
-		$sql = "UPDATE `{$this->tableName}` `" . $this->tableAlias . "`";
+		$sql = $command . " `{$this->tableName}` `" . $this->tableAlias . "`";
 		
 		foreach ($this->query->getJoins() as $join) {
 			$sql .= "\n" . $this->join($join, "");

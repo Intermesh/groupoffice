@@ -7,6 +7,7 @@ use go\core\http;
 use go\core\Singleton;
 use go\core\util\StringUtil;
 use Defuse\Crypto\Crypto;
+use go\core\util\JSON;
 
 /**
  * Response Object
@@ -247,10 +248,7 @@ class Response extends Singleton{
 	public function output($data = null) {
 		if (isset($data)) {
 			if(is_array($data)) {
-				$data = json_encode($data);
-				if(empty($data)){
-					throw new Exception("JSON encoding error: '".json_last_error_msg()."'.\n\nArray data from server:\n\n" . var_export($data, true));
-				}
+				$data = JSON::encode($data);
 				$this->setContentType('application/json; charset=UTF-8');
 			} 
 			$this->sendHeaders();

@@ -52,12 +52,13 @@ class Connection {
 		];
 	}
 
-	public function __destruct()
-	{
-		if($this->inTransaction()) {
-			throw new \Exception("DB Transaction not closed properly");
-		}
-	}
+	// public function __destruct()
+	// {
+	// 	if($this->inTransaction()) {
+	// 		throw new \Exception("DB Transaction not closed properly");
+	// 	}
+	// }
+	
 	public function getDsn() {
 		return $this->dsn;
 	}
@@ -188,11 +189,12 @@ class Connection {
 
 		}else
 		{
-			$sql = "SAVEPOINT LEVEL".$this->transactionSavePointLevel;
-			if($this->debug) {
-				go()->debug($sql, 1);
-			}
-			$ret = $this->exec($sql) !== false;			
+			// $sql = "SAVEPOINT LEVEL".$this->transactionSavePointLevel;
+			// if($this->debug) {
+			// 	go()->debug($sql, 1);
+			// }
+			// $ret = $this->exec($sql) !== false;	
+			$ret = true;		
 		}		
 		
 		$this->transactionSavePointLevel++;		
@@ -234,9 +236,11 @@ class Connection {
 			return $this->getPdo()->rollBack();
 		}else
 		{
-			$sql = "ROLLBACK TO SAVEPOINT LEVEL".$this->transactionSavePointLevel;
-			go()->warn($sql, 1);
-			return $this->exec($sql) !== false;						
+			return true;
+
+			// $sql = "ROLLBACK TO SAVEPOINT LEVEL".$this->transactionSavePointLevel;
+			// go()->warn($sql, 1);
+			// return $this->exec($sql) !== false;						
 		}
 	}
 
@@ -262,11 +266,12 @@ class Connection {
 			return $this->getPdo()->commit();
 		}else
 		{
-			$sql = "RELEASE SAVEPOINT LEVEL".$this->transactionSavePointLevel;
-			if($this->debug) {
-				go()->debug($sql, 1);				
-			}
-			return $this->exec($sql) !== false;			
+			// $sql = "RELEASE SAVEPOINT LEVEL".$this->transactionSavePointLevel;
+			// if($this->debug) {
+			// 	go()->debug($sql, 1);				
+			// }
+			// return $this->exec($sql) !== false;			
+			return true;
 		}
 	}
 
@@ -460,6 +465,18 @@ class Connection {
 		return $this->createStatement($build);
 	}
 	
+	/**
+	 * Update but with ignore
+	 * @see update()
+	 */
+	public function updateIgnore($tableName, $data, $query = null) {
+		$query = Query::normalize($query);
+
+		$queryBuilder = new QueryBuilder($this);
+		$build = $queryBuilder->buildUpdate($tableName, $data, $query, "UPDATE IGNORE");
+
+		return $this->createStatement($build);
+	}
 
 	/**
 	 * Create a select statement.

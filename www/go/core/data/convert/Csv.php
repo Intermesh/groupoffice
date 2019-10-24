@@ -6,6 +6,8 @@ use go\core\fs\File;
 use go\core\model\Field;
 use go\core\orm\Entity;
 use go\core\orm\Relation;
+use go\core\util\DateTime as GoDateTime;
+use Sabre\VObject\Property\VCard\DateTime;
 
 /**
  * CSV converter.
@@ -208,7 +210,7 @@ class Csv extends AbstractConverter {
 		if(method_exists($entityCls, 'getCustomFields')) {
 			$fields = Field::findByEntity($entityCls::entityType()->getId());
 			foreach($fields as $field) {
-				$headers[] = ['name' => 'customFields.' . $field->databaseName, 'label' => $field->name, 'many' => $field->getDataType()->hasMany()];
+				$headers[] = ['name' => 'customFields.' . $field->databaseName, 'label' => $field->name, 'many' => false];
 			}
 		}	
 		
@@ -328,7 +330,13 @@ class Csv extends AbstractConverter {
 	}
 	
 	protected function setValues(Entity $entity, array $values) {
+		$cf = $values['customFields'] ?? null;
+		unset($values['customFields']);
 		$entity->setValues($values);
+		//Set custom fields as text. for example select fields not by id but with option text.
+		if(isset($cf) && method_exists($entity, 'setCustomFields')) {
+			$entity->setCustomFields($cf, true);
+		}
 	}
 	
 	/**

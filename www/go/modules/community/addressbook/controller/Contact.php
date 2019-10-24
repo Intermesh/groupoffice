@@ -2,6 +2,7 @@
 namespace go\modules\community\addressbook\controller;
 
 use go\core\jmap\EntityController;
+use go\core\jmap\exception\InvalidArguments;
 use go\modules\community\addressbook\model;
 
 /**
@@ -82,6 +83,11 @@ class Contact extends EntityController {
 	
 	public function importCSVMapping($params) {
 		return $this->defaultImportCSVMapping($params);
+	}
+
+
+	public function merge($params) {
+		return $this->defaultMerge($params);
 	}
 }
 

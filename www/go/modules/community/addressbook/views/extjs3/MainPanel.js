@@ -268,6 +268,18 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 							]							
 						},
 						"-",
+
+						{
+							iconCls: 'ic-content-copy',
+							text: t("Look for duplicates"),
+							handler: function() {
+								var win = new go.modules.community.addressbook.DuplicateDialog();
+								win.show();
+							}
+						},
+
+						"-",
+
 						{
 							itemId: "delete",
 							iconCls: 'ic-delete',

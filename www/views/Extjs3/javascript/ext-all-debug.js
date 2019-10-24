@@ -4967,7 +4967,7 @@ Ext.EventManager = function(){
         WINDOW = window,
         DOMCONTENTLOADED = "DOMContentLoaded",
         COMPLETE = 'complete',
-        propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate|callParent)$/,
+        propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate)$/,
         
         specialElCache = [];
 
@@ -5348,10 +5348,9 @@ Ext.EventManager = function(){
         },
         
         removeFromSpecialCache: function(o) {
-            var i = 0,
-                len = specialElCache.length;
+            var i = 0;
                 
-            for (; i < len; ++i) {
+            for (; i < specialElCache.length; ++i) {
                 if (specialElCache[i].el == o) {
                     specialElCache.splice(i, 1); 
                 }
@@ -6917,7 +6916,7 @@ Ext.apply(Ext.EventManager, function(){
        textEvent,
        textSize,
        D = Ext.lib.Dom,
-       propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate|callParent)$/,
+       propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate)$/,
        unload = Ext.EventManager._unload,
        curWidth = 0,
        curHeight = 0,
@@ -11339,10 +11338,6 @@ Ext.Component = function(config){
 Ext.Component.AUTO_ID = 1000;
 
 Ext.extend(Ext.Component, Ext.util.Observable, {
-    // GO override
-    callParent: function(args) {
-		return this.supr()[this.callParent.caller.name].apply(this, args || []);
-	},
 		//GO override
     setTranslationModule : function() {
 			if(this.module) {
@@ -11981,7 +11976,7 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
     mon : function(item, ename, fn, scope, opt){
         this.createMons();
         if(Ext.isObject(ename)){
-            var propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate|callParent)$/;
+            var propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate)$/;
 
             var o = ename;
             for(var e in o){

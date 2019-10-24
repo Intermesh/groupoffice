@@ -41,7 +41,7 @@ class Module extends AclOwnerEntity {
 	
 	protected function internalSave() {
 		
-		if($this->isNew()) {
+		if($this->isNew() || $this->sort_order < 1) {
 			$this->sort_order = $this->nextSortOrder();			
 		}
 		
@@ -83,8 +83,7 @@ class Module extends AclOwnerEntity {
 		$query->from("core_module");
 
 		if($this->package == "core") {
-			$query->selectSingleValue("COALESCE(MAX(sort_order), 0) + 1")
-				->where(['package' => "core"]);
+			return 0;
 		} else
 		{
 			$query->selectSingleValue("COALESCE(MAX(sort_order), 100) + 1")
