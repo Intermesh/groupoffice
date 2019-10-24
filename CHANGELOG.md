@@ -1,6 +1,7 @@
 - Address book: Implemented Duplicate and merge function
 - Ldapauth: Fixed missing ldapauth_server_user_sync table
 - Core: JSON util for detecting invalid UTF-8
+- Core: Don't add full text index to core_search on update because it's removed later anyway.
 
 22-10-2019 6.4.69
 - Core: Revert to older italian translation because it was corrupt
