@@ -115,6 +115,8 @@ class Sync extends Controller {
 
     $dn = ldap_explode_dn($record->getDn(), 0);
 
+    go()->debug($dn);
+
     /*
       array(5) {
       ["count"]=>
