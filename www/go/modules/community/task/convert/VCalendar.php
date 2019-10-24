@@ -62,27 +62,22 @@ class VCalendar extends AbstractConverter {
 	 */
 	
 	public function export(Task $task) {
-		
 		$vtodo = $this->getVTodo($task);
-
 		$vtodo->UID = $task->getUid();
-		$vtodo->STATUS = $task->status;
-		$vtodo->PRIORITY = $task->priority;
-		$vtodo->CATEGORIES = $task->categories;
 		$vtodo->SUMMARY = $task->title;
-		$vtodo->START = $task->start;
-		$vtodo->DUE = $task->due;
-		$vtodo->DESCRIPTION = $task->description;
+
+		$vtodo->STATUS = $task->status;
 		$vtodo->RECURRENCERULE = $task->getRrule();
-		$vtodo->CREATED = $task->createdAt;
+		$vtodo->PRIORITY = $task->priority;
+
+		$vtodo->DTSTART = $task->start;
+		$vtodo->DUE = $task->due;
+		$vtodo->CATEGORIES = $task->categories;
+		$vtodo->DESCRIPTION = $task->description;
 //-----------------------------------------------------
-		$vtodo->TASKLISTID = $task->tasklistId;
+		//$vtodo->CREATED = $task->createdAt;
 		// $vtodo->CREATEDBY = $task->createdBy;
 		// $vtodo->CREATEDAT = $task->createdAt;
-		// $vtodo->TITLE = $task->title;
-		// $vtodo->DESCRIPTION = $task->description;
-		// $vtodo->STATUS = $task->status;
-		// $vtodo->RECURRENCERULE = $task->getRrule();
 		return $vtodo->serialize();
 	}
 	
