@@ -40,7 +40,7 @@ try {
 			output([], 404);
 		}
 		$token->oldLogout();
-		$token->delete([$token->getId()]);
+		$token->delete($token->primaryKeyValues());
 		
 		output();		
 	}
