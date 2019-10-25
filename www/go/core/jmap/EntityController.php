@@ -651,6 +651,8 @@ abstract class EntityController extends Controller {
 	}
 
 	private function destroyEntities($destroy, &$result) {
+
+		$doDestroy = [];
 		foreach ($destroy as $id) {
 			$entity = $this->getEntity($id);
 			if (!$entity) {
@@ -663,15 +665,20 @@ abstract class EntityController extends Controller {
 				continue;
 			}
 
-			$success = $entity->delete($entity->parseId($id));
+			$doDestroy[] = $id;
+		}
+		$cls = $this->entityClass();
+
+		$query = new Query();
+		foreach($doDestroy as $id) {
+			$query->orWhere($cls::parseId($id));
+		}
+		$success = $cls::delete($query);
 			
-			if ($success) {
-				$result['destroyed'][] = $id;
-			} else {
-				$errors = $entity->getValidationErrors();
-				$first = array_shift($errors);
-				$result['notDestroyed'][$id] = ['type' => $first['code'], 'description' => $first['description']];
-			}
+		if ($success) {
+			$result['destroyed'] = $doDestroy;
+		} else {
+			throw Exception("Delete error");
 		}
 	}
 	

@@ -1,3 +1,5 @@
+- Core: Improved delete performance
+
 26-10-2019 6.4.70
 - Address book: Implemented Duplicate and merge function
 - Ldapauth: Fixed missing ldapauth_server_user_sync table
