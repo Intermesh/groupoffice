@@ -409,7 +409,7 @@ abstract class EntityController extends Controller {
 				}
 			}
 		} else {
-			$result['list'][] = array_values($unsorted);
+			$result['list'] = array_values($unsorted);
 		}
 
 
@@ -663,7 +663,7 @@ abstract class EntityController extends Controller {
 				continue;
 			}
 
-			$success = $entity->delete();
+			$success = $entity->delete($entity->parseId($id));
 			
 			if ($success) {
 				$result['destroyed'][] = $id;

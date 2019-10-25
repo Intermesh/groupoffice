@@ -6,7 +6,6 @@ use go\core\App;
 use go\core\db\Criteria;
 use PDO;
 use ReflectionClass;
-
 /**
  * The Query class to select database records
  * 
@@ -188,12 +187,34 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 */
 	public function mergeWith(Query $query) {
 
-		$reflection = new ReflectionClass(Query::class);
+		//Used to generate propnames
+		// $reflection = new ReflectionClass(Query::class);
+		// $props = $reflection->getProperties();
+		// $propNames = array_map(function($p){return $p->getName();}, $props);
+		// var_export($propNames);
+		// exit();
 
-		$props = $reflection->getProperties();
+		$propNames = array ( 
+			'bindParameters',
+			'where',
+			'tableAlias', 
+			'distinct',
+			'select', 
+			'orderBy', 
+			'unionOrderBy',
+			'groupBy', 
+			'having', 
+			'limit', 
+			'unionLimit', 
+			'offset', 
+			'unionOffset', 
+			'joins', 
+			'forUpdate', 
+			'tableName', 
+			'unions',  
+			'debug' );
 
-		foreach ($props as $prop) {
-			$key = $prop->getName();
+		foreach ($propNames as $key) {
 			$value = $query->$key;
 
 			if (!isset($value)) {

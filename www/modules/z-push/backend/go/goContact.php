@@ -23,7 +23,7 @@ class goContact extends GoBaseBackendDiff {
 		} else if(!$contact->getPermissionLevel() >= Acl::LEVEL_DELETE){
 			return true;
 		} else {
-			return $contact->delete(); // This throws an error when the contact is read only
+			return $contact->delete($contact->primaryKeyValues()); // This throws an error when the contact is read only
 		}
 	}
 	

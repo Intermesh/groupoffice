@@ -120,7 +120,9 @@ go.data.StoreTrait = {
 	},
 	
 	onError : function() {
-		this.reload();
+		if(this.loaded) {
+			this.reload();
+		}
 	},
 
 	/**

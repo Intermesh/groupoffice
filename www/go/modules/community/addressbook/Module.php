@@ -37,8 +37,8 @@ class Module extends core\Module {
 	public function defineListeners() {
 		parent::defineListeners();
 		
-		Link::on(Link::EVENT_DELETE, Contact::class, 'onLinkSaveOrDelete');
-		Link::on(Link::EVENT_SAVE, Contact::class, 'onLinkSaveOrDelete');
+		Link::on(Link::EVENT_DELETE, Contact::class, 'onLinkDelete');
+		Link::on(Link::EVENT_SAVE, Contact::class, 'onLinkSave');
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 	}
 	

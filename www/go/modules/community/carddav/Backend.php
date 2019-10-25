@@ -69,7 +69,7 @@ class Backend extends AbstractBackend {
 		
 		if(isset($contact->vcardBlobId)) {
 			$old = \go\core\fs\Blob::findById($contact->vcardBlobId);
-			$old->delete();
+			$old->setStaleIfUnused();
 		}
 		
 		$contact->vcardBlobId = $blob->id;
@@ -85,7 +85,7 @@ class Backend extends AbstractBackend {
 		if($contact->getPermissionLevel() < Acl::LEVEL_DELETE) {
 			throw new Forbidden();
 		}
-		return $contact->delete();
+		return Contact::delete($contact->primaryKeyValues());
 	}
 	
 	private function addressBookToDAV(AddressBook $addressBook, $principalUri) {
@@ -136,7 +136,7 @@ class Backend extends AbstractBackend {
 		
 		if($blob->modifiedAt < $contact->modifiedAt) {
 			//blob won't be deleted if still used
-			$blob->delete();
+			$blob->setStaleIfUnused();
 			$c = new VCard();
 			$cardData = $c->export($contact);			
 			$blob = $this->createBlob($contact, $cardData);
@@ -171,7 +171,7 @@ class Backend extends AbstractBackend {
 			$blob = $this->createBlob($contact, $cardData);
 			
 			if(!$contact->save()) {
-				$blob->delete();
+				$blob->setStaleIfUnused();
 				throw new \Exception("Could not save contact");
 			}
 		}
@@ -221,7 +221,7 @@ class Backend extends AbstractBackend {
 		} catch(Exception $e) {
 			ErrorHandler::logException($e);		
 			
-			$blob->delete();			
+			$blob->setStaleIfUnused();			
 			
 			return false;
 		}

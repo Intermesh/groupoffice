@@ -626,11 +626,6 @@ class Contact extends AclItemEntity {
 		return $this->saveOriganizationIds();
 		
 	}
-
-	protected function internalDelete()
-	{
-		return parent::internalDelete();
-	}
 	
 	protected function internalValidate() {		
 		
@@ -793,7 +788,7 @@ class Contact extends AclItemEntity {
 	 * 
 	 * @param Link $link
 	 */
-	public static function onLinkSaveOrDelete(Link $link) {
+	public static function onLinkSave(Link $link) {
 		if($link->getToEntity() !== "Contact" || $link->getFromEntity() !== "Contact") {
 			return;
 		}
@@ -811,24 +806,37 @@ class Contact extends AclItemEntity {
 			$from->saveSearch();
 			Contact::entityType()->change($from);
 		}
+
 		
-//		$ids = [$link->toId, $link->fromId];
-//		
-//		//Update modifiedAt dates for Z-Push and carddav
-//		go()->getDbConnection()
-//						->update(
-//										'addressbook_contact',
-//										['modifiedAt' => new DateTime()], 
-//										['id' => $ids]
-//										)->execute();	
-//		
-//		Contact::entityType()->changes(
-//					(new Query2)
-//					->select('c.id AS entityId, a.aclId, "0" AS destroyed')
-//					->from('addressbook_contact', 'c')
-//					->join('addressbook_addressbook', 'a', 'a.id = c.addressBookId')					
-//					->where('c.id', 'IN', $ids)
-//					);
+	}
+
+
+	/**
+	 * Because we've implemented the getter method "getOrganizationIds" the contact 
+	 * modSeq must be incremented when a link between two contacts is deleted or 
+	 * created.
+	 * 
+	 * @param Link $link
+	 */
+	public static function onLinkDelete(Query $links) {
+		
+		$links = Link::find()->where($links->andWhere('(toEntityTypeId = :e1 OR fromEntityTypeId = :e2)'))->bind([':e1'=> static::entityType()->getId(), ':e2'=> static::entityType()->getId()]);
+
+		foreach($links as $link) {			
+			$to = Contact::findById($link->toId);
+			$from = Contact::findById($link->fromId);
+			
+			//Save contact as link to organizations affect the search entities too.
+			if(!$to->isOrganization) {			
+				$to->saveSearch();
+				Contact::entityType()->change($to);
+			}
+			
+			if(!$from->isOrganization) {			
+				$from->saveSearch();
+				Contact::entityType()->change($from);
+			}
+		}
 		
 	}
 	

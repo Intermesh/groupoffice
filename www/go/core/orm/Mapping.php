@@ -135,6 +135,16 @@ class Mapping {
 		return $this->tables[$name];
 	}	
 
+
+	/**
+	 * Get the first table from the mapping
+	 * 
+	 * @return MappedTable
+	 */
+	public function getPrimaryTable() {
+		return array_values($this->tables)[0];
+	}
+
 	/**
 	 * Check if this mapping has the given table or one of it's property relations has it.
 	 * 
@@ -310,7 +320,7 @@ class Mapping {
 	 * Get all mapped property objects in a key value array. This is a mix of columns 
 	 * and relations.
 	 * 
-	 * @return Column | Relation
+	 * @return Column[] | Relation
 	 */
 	public function getProperties() {
 		$props = [];
