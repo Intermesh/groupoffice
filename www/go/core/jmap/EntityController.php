@@ -669,11 +669,15 @@ abstract class EntityController extends Controller {
 		}
 		$cls = $this->entityClass();
 
-		$query = new Query();
-		foreach($doDestroy as $id) {
-			$query->orWhere($cls::parseId($id));
+		if(!empty($doDestroy)) {
+			$query = new Query();
+			foreach($doDestroy as $id) {
+				$query->orWhere($cls::parseId($id));
+			}
+			$success = $cls::delete($query);
+		} else {
+			$success = true;
 		}
-		$success = $cls::delete($query);
 			
 		if ($success) {
 			$result['destroyed'] = $doDestroy;
