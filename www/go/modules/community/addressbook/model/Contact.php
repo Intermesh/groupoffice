@@ -721,7 +721,7 @@ class Contact extends AclItemEntity {
 		if(!$this->isOrganization) {
 			$orgs = $this->findOrganizations()->selectSingleValue('name')->all();
 			if(!empty($orgs)) {
-				$orgStr = ' - '.implofe(', ', $orgs);			
+				$orgStr = ' - '.implode(', ', $orgs);			
 			}
 		}
 
