@@ -60,7 +60,7 @@ $lang = GO::language()->getLanguage(); ?>
 		<?php
 			if(go()->getSettings()->logoId) {
 				//blob id is not used by script but added only for caching.
-				echo ".go-app-logo, #go-logo {background-image: url(" . go()->getSettings()->URL . "api/logo.php?blob=" . go()->getSettings()->logoId . ") !important}";
+				echo ".go-app-logo, #go-logo {background-image: url(" . go()->getSettings()->URL . "api/page.php?blob=" . go()->getSettings()->logoId . ") !important}";
 			}
 		}
 		?>	

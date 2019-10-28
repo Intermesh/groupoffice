@@ -106,6 +106,10 @@ class State extends AbstractState {
 	public function getDownloadUrl($blobId) {
 		return Settings::get()->URL . "api/download.php?blob=".$blobId;
 	}
+
+	public function getPageUrl($blobId) {
+		return Settings::get()->URL . "api/page.php?blob=".$blobId;
+	}
 	
 	public function getApiUrl() {
 		return Settings::get()->URL . 'api/jmap.php';
