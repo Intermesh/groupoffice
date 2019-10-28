@@ -631,7 +631,11 @@ class Contact extends AclItemEntity {
 		
 		if(empty($this->name)) {
 			$this->setNameFromParts();
-		}		
+		}
+
+		if($this->isOrganization) {
+			$this->firstName = $this->lastName = $this->middleName = $this->prefixes = $this->suffixes = null;
+		}
 		
 		if($this->isNew() && !isset($this->addressBookId)) {
 			$this->addressBookId = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->defaultAddressBookId;
@@ -717,7 +721,7 @@ class Contact extends AclItemEntity {
 		if(!$this->isOrganization) {
 			$orgs = $this->findOrganizations()->selectSingleValue('name')->all();
 			if(!empty($orgs)) {
-				$orgStr = ' - '.implode(', ', $orgs);			
+				$orgStr = ' - '.implofe(', ', $orgs);			
 			}
 		}
 
