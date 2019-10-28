@@ -1,4 +1,5 @@
 - Core: Improved delete performance
+- Don't sync organizations with ActiveSync as it caused problems on ios not shoin either the contact or the company
 
 26-10-2019 6.4.70
 - Address book: Implemented Duplicate and merge function
