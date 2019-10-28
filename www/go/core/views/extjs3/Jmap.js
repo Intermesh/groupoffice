@@ -26,11 +26,13 @@ go.Jmap = {
 			method: 'community/dev/Debugger/get',
 			params: {},
 			callback: function(options, success, response, clientCallId) {		
-				response.forEach(function(r) {					
-					var method = r.shift();								
-					console[method].apply(null, r);
-				});
+				for(var i = 0, l = response.length; i < l; i ++) {			
+					var method = response[i].shift();				
+					console[method].apply(null, response[i]);				
+				}
 			}
+		}).catch(function() {
+			//ignore error
 		});
 	},
 
@@ -279,13 +281,13 @@ go.Jmap = {
 			jsonData: this.requests,
 			scope: this,
 			success: function (response, opts) {
-				try {
+				// try {
 					var responses = JSON.parse(response.responseText);
 
 					responses.forEach(function (response) {
 
 						//lookup request options by client ID
-						var o = this.requestOptions[response[2]];
+						var o = this.requestOptions[response[2]], me = this;
 						if (!o) {
 							//aborted
 							console.debug("Aborted");
@@ -315,18 +317,27 @@ go.Jmap = {
 							} else{
 								o.reject(response[1]);
 							}
+
+							delete me.requestOptions[response[2]];
 						}, 0);
 					}, this);
 
-				} catch(e) {
-					console.error(e,"server reponse:", response.responseText);
+				// } catch(e) {					
+				// 	console.error(e,"server reponse:", response.responseText);
 
-					Ext.MessageBox.alert(t("Error"), t("An error occured on the server. The console shows details."))
-				}
+				// 	Ext.MessageBox.alert(t("Error"), t("An error occured on the server. The console shows details."))
+				// }
 			},
 			failure: function (response, opts) {
-				console.log('server-side failure with status code ' + response.status);
+				console.error('server-side failure with status code ' + response.status);
+				console.error(response.responseText);
 
+				for(var i = 0, l = opts.jsonData.length; i < l; i++) {
+					var clientCallId = opts.jsonData[i][2];
+					this.requestOptions[clientCallId].reject({message: response.responseText});
+					delete this.requestOptions[clientCallId];
+				}
+				
 				Ext.MessageBox.alert(t("Error"), t("Sorry, an unexpected error occurred: ") + response.responseText);
 				
 			}

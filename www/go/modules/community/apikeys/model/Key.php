@@ -1,6 +1,8 @@
 <?php
 namespace go\modules\community\apikeys\model;
 
+use go\core\orm\Query;
+
 class Key extends \go\core\jmap\Entity {
 	public $id;
 	public $name;	
@@ -28,12 +30,15 @@ class Key extends \go\core\jmap\Entity {
 		return parent::internalSave();
 	}
 	
-	protected function internalDelete() {
-		$token = \go\core\auth\model\Token::find()->where(['accessToken' => $this->accessToken])->single();
-		if($token) {
-			$token->delete();
+	protected static function internalDelete(Query $query) {
+		$q = clone $query;
+		$q->select('accessToken');
+
+		if(!Token::delete(['accessToken' => $q])) {
+			throw new \Exception("Could not delete access token");
 		}
-		return parent::internalDelete();
+
+		return parent::internalDelete($query);
 	}
 }
 

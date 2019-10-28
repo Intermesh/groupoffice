@@ -3,7 +3,8 @@ namespace go\core\model;
 
 use go\core\App;
 use go\core\db\Criteria;
-use go\core\jmap\Entity;
+use go\core\orm\Entity;
+use go\core\jmap\Entity as JmapEntity;
 use go\core\model\Group;
 use go\core\model\User;
 use go\core\orm\Query;
@@ -121,7 +122,7 @@ class Acl extends Entity {
 	
 	private function logChanges() {
 		
-		if(!Entity::$trackChanges) {
+		if(!JmapEntity::$trackChanges) {
 			return true;
 		}
 		

@@ -187,24 +187,53 @@ abstract class AclOwnerEntity extends AclEntity {
 
 		$this->aclId = $this->acl->id;		
 	}
+
+	/**
+	 * Log's deleted entities for JMAP sync
+	 * 
+	 * @param Query $query The query to select entities in the delete statement
+	 * @return boolean
+	 */
+	protected static function logDeleteChanges(Query $query) {
+
+		$changes = clone $query;
+
+		$changes->select('id as entityId, aclId, "1" as destroyed');
+
+		// $aclIds = array_map(function($change) {return $change['entityId'];}, $changes);
+		// if(!Acl::delete(['id' => $aclIds])) {
+		// 	return false;
+		// }
+		
+		return static::entityType()->changes($changes);
+	}
 	
-	protected function internalDelete() {
-		if(!parent::internalDelete()) {
+	protected static function internalDelete(Query $query) {
+
+		if(!method_exists(static::class, 'aclEntityClass')) {
+			$aclsToDelete = static::getAclsToDelete($query);
+		}
+
+		if(!parent::internalDelete($query)) {
 			return false;
 		}
 		
-		if(!method_exists($this, 'aclEntityClass')) {
-			$this->deleteAcl();
+		if(!empty($aclsToDelete)) {
+			if(!Acl::delete((new Query)->where('id', 'IN', $aclsToDelete))) {
+				throw new Exception("Could not delete ACL");
+			}
 		}
 		
 		return true;
 	}
 	
-	protected function deleteAcl() {		
-		$acl = Acl::find()->where(['id' => $this->aclId])->single();
-		if(!$acl->delete()) {
-			throw new \Exception("Could not delete ACL ".$this->aclId);
-		}
+	protected static function getAclsToDelete(Query $query) {
+		
+		$q = clone $query;
+		$q->select('aclId');
+		return $q->all();
+	
+		
 	}
 	
 	/**

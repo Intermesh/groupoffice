@@ -47658,8 +47658,11 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
                 meta.style = column.style;
 
                 var v = this.encodeGridValue(store, column, record);
-                
-                meta.value = column.renderer.call(column.scope, v, meta, record, rowIndex, i, store);
+                try {
+                    meta.value = column.renderer.call(column.scope, v, meta, record, rowIndex, i, store);
+                } catch(e) {
+                    console.error(e);
+                }
 
                 if (Ext.isEmpty(meta.value)) {
                     meta.value = '&#160;';

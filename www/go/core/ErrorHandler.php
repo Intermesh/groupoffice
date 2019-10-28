@@ -63,7 +63,8 @@ class ErrorHandler {
 		}
 		
 		App::get()->getDebugger()->error($errorString);
-		foreach(explode("\n", $e->getTraceAsString()) as $line) {
+		$lines = explode("\n", $e->getTraceAsString());
+		foreach($lines as $line) {
 			App::get()->getDebugger()->error($line);
 		}
 		

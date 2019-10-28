@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\imapauthenticator\model;
 
+use go\core\orm\Query;
 use go\core\jmap\Entity;
 
 class Server extends Entity {
@@ -72,8 +73,8 @@ class Server extends Entity {
 		return parent::internalSave();
 	}
 	
-	protected function internalDelete() {
+	protected static function internalDelete(Query $query) {
 		go()->getCache()->delete("authentication-domains");
-		return parent::internalDelete();
+		return parent::internalDelete($query);
 	}
 }

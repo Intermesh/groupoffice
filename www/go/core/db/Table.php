@@ -163,6 +163,9 @@ class Table {
 		
 		$this->checkReservedName($field['Field']);
 		
+		if($field['Default'] == "NULL") {
+			$field['Default'] = null;
+		}
 			
 		$c = new Column();
 		$c->table = $this;

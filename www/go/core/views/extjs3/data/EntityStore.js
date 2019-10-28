@@ -677,6 +677,11 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 */
 	query : function(params, cb, scope) {
 		var me = this;
+
+		if(!params || !params.limit) {
+			console.warn(me.entity.name + "/query call without limit");
+		}
+
 		return go.Jmap.request({
 				method: me.entity.name + "/query",
 				params: params				

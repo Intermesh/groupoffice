@@ -6,8 +6,7 @@ use go\core;
 use go\core\model\Acl;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\App;
-use go\core\db\Query;
-use go\core\orm\Entity;
+use go\core\orm\Query;
 use go\core\Settings;
 use go\core\validate\ErrorCode;
 
@@ -215,14 +214,11 @@ class Module extends AclOwnerEntity {
 		return parent::internalValidate();
 	}
 	
-	protected function internalDelete() {
+	protected static function internalDelete(Query $query) {
+
+		$query->andWhere('package != "core"');
 		
-		if($this->package == "core") {
-			throw new \Exception("You can't delete core modules");
-		}
-	
-		//hard delete!
-		return Entity::internalDelete();
+		return parent::internalDelete($query);
 	}
 	
 	/**

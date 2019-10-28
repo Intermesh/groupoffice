@@ -31,8 +31,8 @@ class Search extends AclOwnerEntity {
 	}
 	
 	//don't delete acl on search
-	protected function deleteAcl() {
-		
+	protected static function getAclsToDelete(Query $query) {
+		return [];
 	}
 
 	public function findAclId() {

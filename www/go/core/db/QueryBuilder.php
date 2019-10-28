@@ -771,6 +771,7 @@ class QueryBuilder {
 	}
 
 	private function addBuildBindParameter($paramTag, $value, $tableAlias, $columnName) {
+
 		$columnObj = $this->findColumn($tableAlias, $columnName);
 
 		$this->buildBindParameters[] = [
