@@ -288,9 +288,9 @@ class Column {
 			case 'datetime':
 				//Work around date problem
 				if($value == "0000-00-00") {
-					$value = null;
+					return null;
 				}
-				
+
 				return $value instanceof GoDateTime ? $value: new GoDateTime($value, new DateTimeZone("UTC"));
 				
 			default:
