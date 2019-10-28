@@ -890,7 +890,7 @@ abstract class EntityController extends Controller {
 				throw new Forbidden();
 			}
 			if(!$entity->merge($other)) {
-				throw new \Exception("Failed to merge ID: ".$id);
+				throw new \Exception("Failed to merge ID: ".$id . ", Validation errors: ". var_export($entity->getValidationErrors(), true));
 			}
 		}
 

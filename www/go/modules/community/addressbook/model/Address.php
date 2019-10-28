@@ -86,6 +86,11 @@ class Address extends Property {
 	}
 	
 	private function validateCountry() {
+
+		if(isset($this->countryCode) && empty($this->countryCode)) {
+			$this->countryCode = null;
+		}
+		
 		if($this->isModified('countryCode')) {			
 			if(isset($this->countryCode)) {
 				$countries = go()->t('countries');
