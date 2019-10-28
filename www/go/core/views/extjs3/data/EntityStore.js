@@ -28,6 +28,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	
 	changes : null,
 	
+	paused: 0,
 	/**
 	 * changedIds is set by a /changes request. If this item is added because of 
 	 * a changes request we must fire a changes event. Not if we're loading by request.
@@ -47,6 +48,9 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		this.state = null;
 
 		this.pending = {};
+
+		this.scheduledPromises = {};
+		this.scheduled = [];
 		
 		this.initChanges();		
 	},
@@ -414,6 +418,21 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	 */
 	single: function(id) {
 
+		var me = this;
+
+		// return me._getSingleFromServer(id);
+
+		return this._getSingleFromBrowserStorage(id).then(function(entity) {
+			if(entity) {
+				return entity;
+			} else{
+				return me._getSingleFromServer(id);
+			}			
+		});
+
+	},
+
+	_getSingleFromLocalCache : function(id) {
 		if(this.data[id]) {
 			return Promise.resolve(go.util.clone(this.data[id]));
 		}
@@ -433,33 +452,86 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		// return me._getSingleFromServer(id);
 		
 		return this._getSingleFromBrowserStorage(id).then(function(entity) {
-			if(entity) {
-				return entity;
-			}
-
-			return me._getSingleFromServer(id);
+			return entity;
 		});
 	},
 
 	_getSingleFromServer : function(id) {
 
+		if(Ext.isObject(id)) {
+			throw "object given";
+			
+		}
 		if(this.pending[id]) {			
 			return this.pending[id];
 		}
 
 		var me = this;
+
+		if(me.timeout) {
+			clearTimeout(me.timeout);
+		}
 		
-		me.pending[id] = go.Jmap.request({
+		me.scheduled.push(id);
+		me.scheduledPromises[id] = {};
+		me.pending[id] = new Promise(function(resolve, reject){
+			me.scheduledPromises[id].reject = reject;
+			me.scheduledPromises[id].resolve = resolve;
+		});
+
+		if(!me.paused) {
+			me.continue();
+		}
+		
+		
+		return this.pending[id];
+	},
+
+	pause : function() {
+		if(this.timeout) {
+			clearTimeout(this.timeout);			
+		}
+
+		this.paused++;
+	},
+
+	continue: function() {
+		var me = this;
+
+		if(this.paused>0) {
+			this.paused--;
+		}
+
+		if(this.paused > 0)
+		{
+			return;
+		}
+
+		me.timeout = setTimeout(function() {
+
+			if(!me.scheduled.length) {
+				return;
+			}
+			
+			go.Jmap.request({
 				method: me.entity.name + "/get",
 				params: {
-					ids: [id]
+					ids: me.scheduled
 				}
 			}).then(function(response) {
+
+				if(!go.util.empty(response.notFound)) {
+					me.notFound = me.notFound.concat(response.notFound);
+					me.metaStore.setItem("notfound", me.notFound);									
+				}
+
+				for(var i = 0, l = response.list.length; i < l; i++) {
+					var id = response.list[i].id;
+
 					delete me.pending[id];
-					if(!go.util.empty(response.notFound)) {
-						me.notFound = me.notFound.concat(response.notFound);
-						me.metaStore.setItem("notfound", me.notFound);										
-						return Promise.reject({
+					if(response.notFound.indexOf(id) > -1) {
+						
+						me.scheduledPromises[id].reject({
 							id: id,
 							entity: me.entity.name,
 							error: "Not found"
@@ -468,13 +540,19 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					{
 						//this.data is filled with flux in the recieve() function.
 						if(!me.data[id]) {
-							return Promise.reject("Data not available ???");
+							//return Promise.reject("Data not available ???");
+							me.scheduledPromises[id].reject("Data not available ???");
 						}
-						return go.util.clone(me.data[id]);
+						me.scheduledPromises[id].resolve(go.util.clone(me.data[id]));
 					}
+
+					delete me.scheduledPromises[id];					
 				}
-			);
-		return this.pending[id];
+			});
+
+			me.scheduled = [];
+			me.timeout = null;
+		});
 	},
 
 	_getSingleFromBrowserStorage : function(id) {
@@ -482,6 +560,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		
 		//Pause JMAP requests because indexeddb events will trigger the queue
 		go.Jmap.pause();
+		this.pause();
 		return me.initState().then(function() {			
 			return me.stateStore.getItem(id + "").then(function(entity) {		
 				if(!entity) {
@@ -494,6 +573,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		}).finally(function(){			
 			//Continue JMAP
 			go.Jmap.continue();
+			me.continue();
 		});
 	},
 
@@ -526,6 +606,11 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 		if(!Ext.isArray(ids)) {
 			throw "ids must be an array";
+			
+		} else{
+			if(Ext.isObject(ids[0])) {
+				throw "Object given";
+			}
 		}
 
 		var entities = [], notFound = [], promises = [], order = {};
@@ -554,6 +639,81 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		});
 		
 	},
+
+
+
+
+	// get: function (ids, cb, scope) {
+
+	// 	if(go.util.empty(ids)) {
+	// 		if(cb) {		
+	// 			cb.call(scope || this, [], []);			
+	// 		}
+	// 		return Promise.resolve({entities: [], notFound: []});
+	// 	}
+
+	// 	if(!Ext.isArray(ids)) {
+	// 		throw "ids must be an array";
+			
+	// 	} else{
+	// 		if(Ext.isObject(ids[0])) {
+	// 			throw "Object given";
+	// 		}
+	// 	}
+
+	// 	var entities = [], notFound = [], promises = [], order = {}, fetchFromServer = [], me = this;
+
+	// 	ids.forEach(function(id, index) {
+	// 		//keep order for sorting later
+	// 		order[id] = index;
+	// 		promises.push(this._getSingleFromLocalCache(id).then(function(entity) {
+	// 				//Make sure array is sorted the same as ids
+	// 				if(entity) {
+	// 					entities.push(entity);					
+	// 				} else{
+	// 					fetchFromServer.push(id);
+	// 				}
+	// 			}));
+	// 	}, this);	
+
+	// 	function ret() {
+	// 		entities.sort(function (a, b) {
+	// 				return order[a.id] - order[b.id];
+	// 		});
+
+	// 		if(cb) {
+	// 					cb.call(scope, entities, notFound);
+	// 		}
+		
+	// 		return {entities: entities, notFound: notFound};
+	// 	}
+
+	// 	return Promise.all(promises).then(function() {
+
+	// 		if(fetchFromServer.length == 0) {
+	// 			return ret();
+	// 		}
+
+	// 		return go.Jmap.request({
+	// 			method: me.entity.name + "/get",
+	// 			params: {
+	// 				ids: fetchFromServer
+	// 			}
+	// 		}).then(function(response) {
+	// 				if(!go.util.empty(response.notFound)) {
+	// 					me.notFound = me.notFound.concat(response.notFound);
+	// 					notFound = response.notFound;
+	// 					me.metaStore.setItem("notfound", me.notFound);							
+	// 				}
+					
+	// 				entities = entities.concat(response.list);
+	// 				return ret();
+	// 			}
+	// 		);
+	// 	});
+
+		
+	// },
 	
 	findBy : function(fn, scope, startIndex) {
 		startIndex = startIndex || 0;
