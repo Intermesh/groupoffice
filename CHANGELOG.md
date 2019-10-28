@@ -1,5 +1,7 @@
+28-10-2019 6.4.71
 - Core: Improved delete performance
-- Don't sync organizations with ActiveSync as it caused problems on ios not shoin either the contact or the company
+- ActiveSync: Don't sync organizations with ActiveSync as it caused problems on ios not shoin either the contact or the company
+- Core: custom fields were missing in forms
 
 26-10-2019 6.4.70
 - Address book: Implemented Duplicate and merge function
