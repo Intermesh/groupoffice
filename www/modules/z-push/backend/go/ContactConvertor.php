@@ -146,7 +146,7 @@ class ContactConvertor {
 		} else
 		{
 			$message->companyname = $contact->name;
-			$message->firstname = $message->middlename = $message->lastname = null;			
+			$message->firstname = $message->middlename = $message->lastname = "";			
 		}
 		
 		$this->hasManyToFlat($contact->addresses, $message, $this->addressMapping);		
