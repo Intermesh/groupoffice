@@ -8,7 +8,7 @@ go.panels.ScrollLoader = {
 	
 	scrollBoundary: 300,
 	
-	pageSize: 20,
+	pageSize: 40,
 	
 	scrollUp: false,  // set to true when you need to loadMore when scrolling up
 	
