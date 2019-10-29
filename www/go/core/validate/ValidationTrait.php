@@ -63,10 +63,8 @@ trait ValidationTrait {
 		if (!isset($description)) {
 			$description = ErrorCode::getDescription($code);
 		}
-
-		App::get()->debug("Validation error in " . get_class($this) . '::' . $key . ': ' . $code .' = '.$description);
-
-//		\go\core\App::get()->getDebugger()->debugCalledFrom();
+		
+		go()->warn("Validation error in " . get_class($this) . '::' . $key . ': ' . $code .' = '.$description);
 
 		$this->validationErrors[$key] = array_merge($data, ['code' => $code, 'description' => $description]);
 	}
