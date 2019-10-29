@@ -1,3 +1,6 @@
+- Core: bundle Foo/get requests to improve performance.
+- Core: Performance improvements in ACL queries
+
 28-10-2019 6.4.71
 - Core: Improved delete performance
 - ActiveSync: Don't sync organizations with ActiveSync as it caused problems on ios not shoin either the contact or the company

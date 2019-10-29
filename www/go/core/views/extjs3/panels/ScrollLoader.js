@@ -8,7 +8,7 @@ go.panels.ScrollLoader = {
 	
 	scrollBoundary: 300,
 	
-	pageSize: 40,
+	pageSize: 30,
 	
 	scrollUp: false,  // set to true when you need to loadMore when scrolling up
 	
@@ -41,13 +41,13 @@ go.panels.ScrollLoader = {
 	
 	onRenderScrollLoader : function() {
 		if(this.isGridPanel()) {
-			this.on("bodyscroll", this.loadMore, this, {buffer: 10});
+			this.on("bodyscroll", this.loadMore, this);
 			
 			this.slScroller = this.getView().scroller.dom;
 			this.slBody = this.getView().mainBody.dom;
 
 		} else {
-			this.el.on('scroll', this.loadMore, this, {buffer: 10});
+			this.el.on('scroll', this.loadMore, this);
 			this.slScroller = this.el.dom;
 			this.slBody = this.el.dom;
 		}
@@ -85,7 +85,11 @@ go.panels.ScrollLoader = {
 			}
 		} else {
 
-			if ((this.slScroller.offsetHeight + this.slScroller.scrollTop + this.scrollBoundary) >= this.slBody.offsetHeight) {
+			var scrollBoundary = this.slScroller.offsetHeight / 2;
+
+			var shouldLoad = (this.slScroller.offsetHeight + this.slScroller.scrollTop + scrollBoundary) >= this.slBody.offsetHeight;
+		
+			if (shouldLoad) {
 				var o = store.lastOptions ? GO.util.clone(store.lastOptions) : {};
 				o.add = true;
 				o.params = o.params || {};

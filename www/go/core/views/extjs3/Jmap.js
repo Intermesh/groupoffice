@@ -273,7 +273,7 @@ go.Jmap = {
 			return;
 		}
 
-		if(GO.debug) {
+		if(GO.debug || GO.settings.config.debug) {
 			this.debug();
 		}
 

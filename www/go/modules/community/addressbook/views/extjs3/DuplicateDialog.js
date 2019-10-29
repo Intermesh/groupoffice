@@ -21,7 +21,6 @@ go.modules.community.addressbook.DuplicateDialog = Ext.extend(go.Window, {
         handler: function() {
 
           Ext.MessageBox.confirm(t("Confirm"), t("Are you sure you want to merge the selected items? This can't be undone."), function(btn) {
-console.warn(btn);
             if(btn != 'yes') {
               return;
             }
@@ -118,6 +117,7 @@ console.warn(btn);
 
   createGrid: function () {
     this.grid = new go.modules.community.addressbook.ContactGrid({
+      stateId: 'contact-duplicate',
       region: 'center',
       tbar: [
         '->',
