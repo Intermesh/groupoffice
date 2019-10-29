@@ -23,6 +23,7 @@ use go\core\db\Table;
 use go\core\util\ArrayObject;
 use go\core\ErrorHandler;
 use go\core\jmap\exception\InvalidArguments;
+use ReflectionProperty;
 
 /**
  * Property model
@@ -129,9 +130,12 @@ abstract class Property extends Model {
 	 * @param boolean $loadDefault
 	 */
 	private function initDatabaseColumns($loadDefault) {
+
+		$selected = array_unique(array_merge($this->getRequiredProperties(), $this->fetchProperties));
+
 		foreach ($this->getMapping()->getTables() as $table) {
-			foreach ($table->getColumns() as $colName => $column) {
-				if (in_array($colName, $this->fetchProperties) || static::isProtectedProperty($colName)) {
+			foreach ($table->getMappedColumns() as $colName => $column) {
+				if (in_array($colName, $selected)) {
 					if($loadDefault) {
 
 						if(isset($this->$colName)) {
@@ -318,7 +322,7 @@ abstract class Property extends Model {
 		if(isset(self::$mapping[$cls])) {
 			return self::$mapping[$cls];
 		}		
-		$cacheKey = 'mapping-' . str_replace('\\', '-', $cls);
+		$cacheKey = 'mapping-' . $cls;
 		
 		self::$mapping[$cls] = go()->getCache()->get($cacheKey);
 		if(!self::$mapping[$cls]) {			
@@ -346,7 +350,7 @@ abstract class Property extends Model {
 	static $c;
 	
 	public static function getApiProperties() {		
-		$cacheKey = 'property-getApiProperties-' . str_replace('\\', '-', static::class);
+		$cacheKey = 'property-getApiProperties-' . static::class;
 		
 		if(isset(self::$c[$cacheKey])) {
 			return self::$c[$cacheKey];
@@ -432,7 +436,7 @@ abstract class Property extends Model {
 	 */
 	protected static function getDefaultFetchProperties() {
 		
-		$cacheKey = 'property-getDefaultFetchProperties-' . str_replace('\\', '-', static::class);
+		$cacheKey = 'property-getDefaultFetchProperties-' . static::class;
 		
 		$props = go()->getCache()->get($cacheKey);
 		
@@ -539,6 +543,33 @@ abstract class Property extends Model {
 		return $propNames;
 	}
 
+	private static function getRequiredProperties() {
+
+		$cls = static::class;
+		$cacheKey = $cls . '-required-props';
+
+		$required = go()->getCache()->get($cacheKey);
+
+		if($required) {
+			return $required;
+		}
+
+		$props = static::getApiProperties();
+
+		$required = static::getPrimaryKey();
+		foreach($props as $name => $meta) {
+			if($meta['access'] === ReflectionProperty::IS_PROTECTED) {
+				$required[] = $name;
+			}
+		}
+
+		$required = array_unique($required);
+
+		go()->getCache()->set($cacheKey, $required);
+		
+		return $required;
+	}
+
 	/**
 	 * Evaluates the given fetchProperties and configures the query object to fetch them.
 	 * 
@@ -553,11 +584,12 @@ abstract class Property extends Model {
 			if($table->isUserTable && !go()->getUserId()) {
 				continue;
 			}		
+
+			$selectProps = array_unique(array_merge(static::getRequiredProperties(), $fetchProperties));
 			
 			foreach($table->getMappedColumns() as $column) {		
-				if($column->primary || in_array($column->name, $fetchProperties) || static::isProtectedProperty($column->name)) {
-					$select[] = $table->getAlias() . "." . $column->name;
-								
+				if(in_array($column->name, $selectProps)) {
+					$select[] = $table->getAlias() . "." . $column->name;								
 				}
 			}
 			

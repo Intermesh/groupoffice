@@ -273,7 +273,9 @@ go.Jmap = {
 			return;
 		}
 
-		this.debug();
+		if(GO.debug) {
+			this.debug();
+		}
 
 		Ext.Ajax.request({
 			url: this.getApiUrl(),

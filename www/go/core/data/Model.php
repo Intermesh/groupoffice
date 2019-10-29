@@ -39,7 +39,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	 * @return array
 	 */
 	public static function getApiProperties() {
-		$cacheKey = 'api-props-' . str_replace('\\', '-', static::class);
+		$cacheKey = 'api-props-' . static::class;
 		
 		$ret = App::get()->getCache()->get($cacheKey);
 		if ($ret) {
