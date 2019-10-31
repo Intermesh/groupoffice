@@ -419,6 +419,8 @@ abstract class Entity extends Property {
 		
 		return Module::findById($moduleId)->findAclId();
 	}
+
+	private static $entityType = [];
 	
 	/**
 	 * Gets an ID from the database for this class used in database relations and 
@@ -430,12 +432,13 @@ abstract class Entity extends Property {
 
 		$cls = static::class;
 
-		$type = go()->getCache()->get('type-' . $cls);
-		if(!$type) {
-			$type = EntityType::findByClassName(static::class);
-			go()->getCache()->set('type-' . $cls, $type, false);
+		if(isset(self::$entityType[$cls])) {
+			return self::$entityType[$cls];
 		}
-		return $type;
+
+		self::$entityType[$cls] = EntityType::findByClassName(static::class);			
+		
+		return self::$entityType[$cls];
 	}
   
   /**
@@ -483,8 +486,6 @@ abstract class Entity extends Property {
 	protected static function defineFilters() {
 
 		$cls = static::class;
-
-		$filters = go()->getCache()->get('filters-' . $cls);
 
 		$filters = new Filters();
 
