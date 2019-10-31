@@ -79,7 +79,9 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 							
 								go.util.mailto({
 									email: this.data.emailAddresses[i].email,
-									name: this.data.name
+									name: this.data.name,
+									entity: "Contact",
+									entityId: this.data.id
 								}, e);
 
 							}, this);

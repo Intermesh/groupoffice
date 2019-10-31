@@ -5,6 +5,10 @@
 - Core: Performance improvements in ACL queries
 - Address book: City missing from contact in templates
 - LDAP Authenticator: Also match users based on e-mail address
+- Address book: Put organizations on top in contact detail view
+- Hoilidays: removed "From" boxLabel 
+- Projects: Fixed undefined index contact_id error when creating project from mail
+- E-mail: Pass contact ID and don't search by email for e-mail templates
 
 28-10-2019 6.4.71
 - Core: Improved delete performance

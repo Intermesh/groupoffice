@@ -984,7 +984,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		Ext.getBody().mask(t("Loading..."));
 
 		this.createLinkButton.reset();
-		
+
 		this.showConfig=config;
 		
 		if (!this.rendered) {
@@ -1121,6 +1121,10 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 			//for directly loading a contact in a template
 			if(config.contact_id)
 				params.contact_id=config.contact_id;
+
+			if(config.entity && config.entity == "Contact") {
+				params.contact_id = config.entityId;
+			}
 			
 			//for directly loading a company in a template
 			if(config.company_id)
@@ -1313,6 +1317,10 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 			this.toCombo.focus();
 		} else {
 			this.emailEditor.focus();
+		}
+
+		if(this.showConfig.entity && this.showConfig.entityId) {
+			this.setLinkEntity(config);
 		}
 		
 		this.fireEvent('afterShowAndLoad',this);
