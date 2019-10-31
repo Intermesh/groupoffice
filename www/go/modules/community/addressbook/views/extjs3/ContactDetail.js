@@ -221,7 +221,14 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 		go.modules.community.addressbook.ContactDetail.superclass.initComponent.call(this);
 
 		this.addCustomFields();
-		this.addLinks();
+		//Sort contact types to top
+		this.addLinks(function(a, b) {
+
+			if(a.link.entity == "Contact" && b.link.entity != "Contact") {
+				return -1;
+			}
+			return 0;
+		});
 		this.addComments();
 		this.addFiles();
 	},
