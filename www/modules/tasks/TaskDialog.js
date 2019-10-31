@@ -54,6 +54,10 @@ GO.tasks.TaskDialog = function() {
 
 	this.win.render(Ext.getBody());
 
+	this.win.on("hide", function() {
+		this.createLinkButton.reset();
+	}, this);
+
 	GO.tasks.TaskDialog.superclass.constructor.call(this);
 
 	this.win.on("hide", function() {
