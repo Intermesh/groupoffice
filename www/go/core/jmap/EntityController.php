@@ -18,6 +18,7 @@ use go\core\jmap\SetError;
 use go\core\orm\Entity;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
+use PDO;
 
 abstract class EntityController extends Controller {	
 	
@@ -74,6 +75,10 @@ abstract class EntityController extends Controller {
 						->select($cls::getPrimaryKey(true)) //only select primary key
 						->limit($params['limit'])
 						->offset($params['position']);
+
+		if($params['calculateTotal']) {
+			$query->calcFoundRows();
+		}
 		
 		/* @var $query Query */
 
@@ -237,16 +242,16 @@ abstract class EntityController extends Controller {
 		];
 		
 		if($p['calculateTotal']) {
-			$totalQuery = clone $idsQuery;
-			$total = (int) $totalQuery
-											->selectSingleValue("count(*)")
-											->orderBy([], false)
-											->limit(1)
-											->offset(0)
-											->execute()
-											->fetch();
+			// $totalQuery = clone $idsQuery;
+			// $response['total'] = $totalQuery
+			// 								->selectSingleValue("count(distinct " . $totalQuery->getTableAlias() . ".id)")
+			// 								->orderBy([], false)
+			// 								->groupBy([])
+			// 								->limit(1)
+			// 								->offset(0)
+			// 								->single();
 
-			$response['total'] = $total;
+			$response['total'] = go()->getDbConnection()->query("SELECT FOUND_ROWS()")->fetch(PDO::FETCH_COLUMN, 0);
 		}
 		
 		return $response;
