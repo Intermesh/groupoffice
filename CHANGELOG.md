@@ -1,3 +1,4 @@
+31-10-2019 6.4.72
 - Core: Use SQL_CALC_FOUND_ROWS to calculate total
 - Core: Updated Spanish translation
 - Core: bundle Foo/get requests to improve performance.
