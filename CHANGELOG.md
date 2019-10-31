@@ -1,5 +1,6 @@
 - Projects: Fixed activity sort in time tracking
 - Billing: Fixed total not always updating in expense dialog
+- Projects: Send contact ID when creating project from e-mail
 
 11-10-2019 6.3.83
 - Core: Working week didn't accept half hours

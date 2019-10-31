@@ -3,7 +3,6 @@
 go.modules.core.links.CreateLinkButton = Ext.extend(Ext.Button, {
 	//iconCls: 'ic-link',
 	text: t("Links"),
-	newLinks : [],
 	cls: "go-create-link-btn",
 	totalCount: 0,
 	addLink : function(entity, entityId) {	
@@ -57,6 +56,8 @@ go.modules.core.links.CreateLinkButton = Ext.extend(Ext.Button, {
 	},
 					
 	initComponent: function () {
+
+		this.newLinks = [];
 
 		this.searchField = new go.modules.core.search.SearchCombo({
 			anchor: "100%",

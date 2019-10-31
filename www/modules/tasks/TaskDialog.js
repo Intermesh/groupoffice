@@ -54,6 +54,10 @@ GO.tasks.TaskDialog = function() {
 
 	this.win.render(Ext.getBody());
 
+	this.win.on("hide", function() {
+		this.createLinkButton.reset();
+	}, this);
+
 	GO.tasks.TaskDialog.superclass.constructor.call(this);
 }
 
@@ -69,9 +73,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			config = {};
 		}		
 		
-		this.on("hide", function() {
-			this.createLinkButton.reset();
-		}, this);
+		
 		
 		this.showConfig=config;
 
