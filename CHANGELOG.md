@@ -1,3 +1,4 @@
+- Core: Use SQL_CALC_FOUND_ROWS to calculate total
 - Core: Updated Spanish translation
 - Core: bundle Foo/get requests to improve performance.
 - Core: Use disk cache for CLI as Acpu is not enabled on CLI.
