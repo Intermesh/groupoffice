@@ -1,4 +1,5 @@
 - Core: bundle Foo/get requests to improve performance.
+- Core: Use disk cache for CLI as Acpu is not enabled on CLI.
 - Core: Performance improvements in ACL queries
 - Address book: City missing from contact in templates
 - LDAP Authenticator: Also match users based on e-mail address
