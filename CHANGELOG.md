@@ -1,5 +1,7 @@
 - Core: bundle Foo/get requests to improve performance.
 - Core: Performance improvements in ACL queries
+- Address book: City missing from contact in templates
+- LDAP Authenticator: Also match users based on e-mail address
 
 28-10-2019 6.4.71
 - Core: Improved delete performance
