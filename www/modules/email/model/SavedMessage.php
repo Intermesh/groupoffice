@@ -174,8 +174,8 @@ class SavedMessage extends ComposerMessage {
 			//$part_number=0;
 			foreach ($structure->parts as $part_number => $part) {
 			
-				$part->ctype_primary = $part->ctype_primary ? strtolower($part->ctype_primary) : "text";
-				$part->ctype_secondary = $part->ctype_secondary ? strtolower($part->ctype_secondary) : "plain";
+				$part->ctype_primary = !empty($part->ctype_primary) ? strtolower($part->ctype_primary) : "text";
+				$part->ctype_secondary = !empty($part->ctype_secondary) ? strtolower($part->ctype_secondary) : "plain";
 				
 				//text part and no attachment so it must be the body
 				if ($structure->ctype_primary == 'multipart' && $structure->ctype_secondary == 'alternative' &&
