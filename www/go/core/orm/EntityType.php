@@ -12,6 +12,7 @@ use go\core\ErrorHandler;
 use go\core\jmap;
 use PDOException;
 use go\core\model\Acl;
+use InvalidArgumentException;
 
 /**
  * The EntityType class
@@ -339,8 +340,11 @@ class EntityType implements \go\core\data\ArrayableInterface {
 					return [$entityId, null, 0, $this->getId(), $this->highestModSeq, new DateTime()];
 				}, $changedEntities);
 			} else{
+				if(count($changedEntities[0]) != 3) {
+					throw new InvalidArgumentException("Invalid array given");
+				}
 				$changedEntities = array_map(function($r) {
-					return array_merge($r, [$this->getId(), $this->highestModSeq, new DateTime()]);
+					return array_merge(array_values($r), [$this->getId(), $this->highestModSeq, new DateTime()]);
 				}, $changedEntities);
 			}
 		}
@@ -354,13 +358,15 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			throw $e;
 		}
 		
-		if(!$stmt->rowCount()) {
-			//if no changes were written then rollback the modSeq increment.
-			go()->getDbConnection()->rollBack();
-		} else
-		{
-			go()->getDbConnection()->commit();
-		}				
+		// Will not work without savepoints
+		// if(!$stmt->rowCount()) {
+		// 	//if no changes were written then rollback the modSeq increment.
+		// 	go()->getDbConnection()->rollBack();
+		// } else
+		// {
+			go()->getDbConnection()->commit();			
+		// }				
+		return true;
 	}
 
 	/**
@@ -375,7 +381,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	 * 
 	 * @param jmap\Entity $entity
 	 */
-	public function change(jmap\Entity $entity) {
+	public function change(jmap\Entity $entity, $isDeleted = false) {
 		$this->highestModSeq = $this->nextModSeq();
 
 		$record = [
@@ -383,7 +389,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 				'entityTypeId' => $this->id,
 				'entityId' => $entity->id(),
 				'aclId' => $entity->findAclId(),
-				'destroyed' => $entity->isDeleted(),
+				'destroyed' => $isDeleted,
 				'createdAt' => new DateTime()
 						];
 
@@ -400,17 +406,17 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		
 //		go()->debug($entity->getClientName(). ' checkChange() ' . $entity->getId() . 'mod: '.implode(', ', array_keys($entity->getModified())));
 		
-		if(!$entity->isDeleted()) {
+		// if(!$entity->isDeleted()) {
 			$modifiedPropnames = array_keys($entity->getModified());		
 			$userPropNames = $entity->getUserProperties();
 
 			$entityModified = !empty(array_diff($modifiedPropnames, $userPropNames));
 			$userPropsModified = !empty(array_intersect($userPropNames, $modifiedPropnames));
-		} else
-		{
-			$entityModified = true;
-			$userPropsModified = false;
-		}
+		// } else
+		// {
+		// 	$entityModified = true;
+		// 	$userPropsModified = false;
+		// }
 		
 	
 		if($entityModified) {			
@@ -421,19 +427,19 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			$this->userChange($entity);
 		}
 		
-		if($entity->isDeleted()) {
+		// if($entity->isDeleted()) {
 			
-			$where = [
-					'entityTypeId' => $this->id,
-					'entityId' => $entity->id(),
-					'userId' => go()->getUserId()
-							];
+		// 	$where = [
+		// 			'entityTypeId' => $this->id,
+		// 			'entityId' => $entity->id(),
+		// 			'userId' => go()->getUserId()
+		// 					];
 			
-			$stmt = go()->getDbConnection()->delete('core_change_user', $where);
-			if(!$stmt->execute()) {
-				throw new \Exception("Could not delete user change");
-			}
-		}
+		// 	$stmt = go()->getDbConnection()->delete('core_change_user', $where);
+		// 	if(!$stmt->execute()) {
+		// 		throw new \Exception("Could not delete user change");
+		// 	}
+		// }
 	}
 	
 	private function userChange(Entity $entity) {

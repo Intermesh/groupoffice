@@ -14,13 +14,12 @@ use function json_encode;
 class EntityTest extends TestCase {	
 		
 	public function testDelete() {
-		$entities = B::find();
+
+		$success = B::delete((new Query()));
+		$this->assertEquals(true, $success);
 		
-		foreach($entities as $entity) {
-			$success = $entity->delete();
-			
-			$this->assertEquals(true, $success);
-		}
+		$stmt = B::find()->execute();
+		$this->assertEquals(0, $stmt->rowCount());
 	}
 
 	public function testCreate() {

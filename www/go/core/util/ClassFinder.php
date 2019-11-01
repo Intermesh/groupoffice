@@ -191,7 +191,9 @@ class ClassFinder {
 		}
 
 		foreach ($folder->getFolders() as $folder) {
-			$classes = array_merge($classes, $this->folderToClassNames($folder, $namespace . '\\' . $folder->getName()));
+			if($folder->getName() !== 'vendor') {
+				$classes = array_merge($classes, $this->folderToClassNames($folder, $namespace . '\\' . $folder->getName()));
+			}
 		}
 
 		return $classes;

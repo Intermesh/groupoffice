@@ -11,6 +11,7 @@ use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
 use go\core\data\exception\NotArrayable;
+use go\core\ErrorHandler;
 use go\core\util\ClassFinder;
 
 /**
@@ -284,56 +285,62 @@ abstract class Entity extends Property {
 		return true;
 	}
 
-	private $isDeleting = false;
+	// private $isDeleting = false;
 
-	/**
-	 * Check if this entity is being deleted.
-	 * 
-	 * @return bool
-	 */
-	public function isDeleting() {
-		return $this->isDeleting;
-	}
+	// /**
+	//  * Check if this entity is being deleted.
+	//  * 
+	//  * @return bool
+	//  */
+	// public function isDeleting() {
+	// 	return $this->isDeleting;
+	// }
 
 	/**
 	 * Delete the entity
 	 * 
 	 * @return boolean
 	 */
-	public final function delete() {
+	public static final function delete($query) {
 
-		$this->isDeleting = true;
-		
-		//go()->debug(static::class.'::delete() ' . $this->id());
+		$query = Query::normalize($query);
+		//Set select for overrides.
+		$primaryTable = static::getMapping()->getPrimaryTable();
+		$query->selectSingleValue('id')->from($primaryTable->getName(), $primaryTable->getAlias());
+
 
 		App::get()->getDbConnection()->beginTransaction();
 
-		if (!$this->internalDelete()) {
-			$this->rollback();
-			return false;
-		}
-		
-		//See \go\core\orm\SearchableTrait;
-		if(method_exists($this, 'deleteSearchAndLinks')) {
-			if(!$this->deleteSearchAndLinks()) {				
-				$this->setValidationError("search", ErrorCode::INVALID_INPUT, "Could not delete core_search entry");		
-				$this->rollback();
+		try{
+			if (!static::internalDelete($query)) {
+				go()->getDbConnection()->rollBack();
 				return false;
 			}
-		}	
+			
+			//See \go\core\orm\SearchableTrait;
+			if(method_exists(static::class, 'deleteSearchAndLinks')) {
+				if(!static::deleteSearchAndLinks($query)) {				
+					go()->getDbConnection()->rollBack();
+					return false;
+				}
+			}	
 
-		if (!$this->fireEvent(self::EVENT_DELETE, $this)) {
-			$this->rollback();
-			return false;
+			if(!static::fireEvent(static::EVENT_DELETE, $query)) {
+				go()->getDbConnection()->rollBack();
+				return false;			
+			}
+
+			return go()->getDbConnection()->commit();
+		} catch(Exception $e) {			
+			go()->getDbConnection()->rollBack();
+			throw $e;
 		}
-
-		return $this->commit();		
 	}
 	
 	protected function commit() {
 		parent::commit();
 
-		$this->isDeleting = false;
+		//$this->isDeleting = false;
 		$this->isSaving = false;
 
 		return App::get()->getDbConnection()->commit();
@@ -342,7 +349,7 @@ abstract class Entity extends Property {
 	protected function rollback() {
 		App::get()->debug("Rolling back save operation for " . static::class, 1);
 		parent::rollBack();
-		$this->isDeleting = false;
+		// $this->isDeleting = false;
 		$this->isSaving = false;
 		return App::get()->getDbConnection()->rollBack();
 	}
@@ -418,6 +425,8 @@ abstract class Entity extends Property {
 		
 		return Module::findById($moduleId)->findAclId();
 	}
+
+	private static $entityType = [];
 	
 	/**
 	 * Gets an ID from the database for this class used in database relations and 
@@ -429,12 +438,13 @@ abstract class Entity extends Property {
 
 		$cls = static::class;
 
-		$type = go()->getCache()->get('type-' . $cls);
-		if(!$type) {
-			$type = EntityType::findByClassName(static::class);
-			go()->getCache()->set('type-' . $cls, $type, false);
+		if(isset(self::$entityType[$cls])) {
+			return self::$entityType[$cls];
 		}
-		return $type;
+
+		self::$entityType[$cls] = EntityType::findByClassName(static::class);			
+		
+		return self::$entityType[$cls];
 	}
   
   /**
@@ -482,8 +492,6 @@ abstract class Entity extends Property {
 	protected static function defineFilters() {
 
 		$cls = static::class;
-
-		$filters = go()->getCache()->get('filters-' . $cls);
 
 		$filters = new Filters();
 
@@ -897,7 +905,7 @@ abstract class Entity extends Property {
 
 		$this->mergeRelated($entity);
 
-		if(!$entity->delete()) {
+		if(!$entity->delete(['id' => $entity->id])) {
 			go()->getDbConnection()->rollBack();
 				return false;
 		}
@@ -984,21 +992,27 @@ abstract class Entity extends Property {
 		if($refs === null) {
 			$tableName = array_values(static::getMapping()->getTables())[0]->getName();
 			$dbName = go()->getDatabase()->getName();
-			go()->getDbConnection()->exec("USE information_schema");
-			//somehow bindvalue didn't work here
-			$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where ".
-				"table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . 
-				" and referenced_table_name=".go()->getDbConnection()->getPDO()->quote($tableName)." and referenced_column_name = 'id'";
+			try {
+				go()->getDbConnection()->exec("USE information_schema");
+				//somehow bindvalue didn't work here
+				$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where ".
+					"table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . 
+					" and referenced_table_name=".go()->getDbConnection()->getPDO()->quote($tableName)." and referenced_column_name = 'id'";
 
-			$stmt = go()->getDbConnection()->getPDO()->query($sql);
-			$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);					
+				$stmt = go()->getDbConnection()->getPDO()->query($sql);
+				$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);					
 
-			//don't find the entity itself
-			$refs = array_filter($refs, function($r) {
-				return !static::getMapping()->hasTable($r['table']);
-			});
-
-			go()->getDbConnection()->exec("USE `" . $dbName . "`");		
+				//don't find the entity itself
+				$refs = array_filter($refs, function($r) {
+					return !static::getMapping()->hasTable($r['table']);
+				});
+			}
+			finally{
+				if($dbName == 'information_schema') {
+					throw new \Exception("HUH");
+				}
+				go()->getDbConnection()->exec("USE `" . $dbName . "`");	
+			}	
 
 			go()->getCache()->set($cacheKey, $refs);			
 		}

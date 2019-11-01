@@ -2,6 +2,7 @@
 namespace go\modules\community\notes\model;
 
 use go\core\acl\model\AclOwnerEntity;
+use go\core\orm\Query;
 
 class NoteBook extends AclOwnerEntity {
 	
@@ -14,11 +15,12 @@ class NoteBook extends AclOwnerEntity {
 						->addTable("notes_note_book");
 	}
 
-	protected function internalDelete() {
-		if(!Note::find()->where(['noteBookId' => $this->id])->delete()) {
+	protected static function internalDelete(Query $query) {
+
+		if(!Note::delete(['noteBookId' => $query])) {
 			return false;
 		}
 
-		return parent::internalDelete();
+		return parent::internalDelete($query);
 	}
 }

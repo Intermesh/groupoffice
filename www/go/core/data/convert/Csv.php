@@ -281,7 +281,7 @@ class Csv extends AbstractConverter {
 
 	public function importFile(\go\core\fs\File $file, $entityClass, $params = array())
 	{
-		$this->sniffDelimiter($file);
+		$this->delimiter = static::sniffDelimiter($file);
 
 		return parent::importFile($file, $entityClass, $params);
 	}
@@ -421,16 +421,27 @@ class Csv extends AbstractConverter {
 		return $v;
 	}
 
-	private function sniffDelimiter(File $file) {
+	public static function sniffDelimiter(File $file) {
 		$fp = $file->open('r');
 
-		$headers = fgetcsv($fp, 0, $this->delimiter, $this->enclosure);
+		$delimiter = ',';
+		$enclosure = '"';
+
+		$headers = fgetcsv($fp, 0, $delimiter, $enclosure);
 		
 		if(!$headers || count($headers) == 1) {
-			$this->delimiter = $this->delimiter == ',' ? ';' : ',';
+			$delimiter = ';' ;
+
+			$headers = fgetcsv($fp, 0, $delimiter, $enclosure);
+			fclose($fp);
+			if(!$headers || count($headers) == 1) {
+				throw new \Exception("Unable to detect delimiter");
+			}
+		} else{
+			fclose($fp);
 		}
 
-		fclose($fp);
+		return $delimiter;		
 	}
 	
 	/**
@@ -442,7 +453,7 @@ class Csv extends AbstractConverter {
 	 */
 	public function getCsvHeaders(File $file) {
 
-		$this->sniffDelimiter($file);
+		$this->delimiter = static::sniffDelimiter($file);
 
 		$fp = $file->open('r');
 

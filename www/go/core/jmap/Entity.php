@@ -127,27 +127,35 @@ abstract class Entity  extends OrmEntity {
 	}
 	
 	/**
-	 * Implements soft delete
+	 * Delete's the entitiy. Implements change logging for sync.
 	 * 
+	 * @param Query $query  The query to select entities in the delete statement
 	 * @return boolean
 	 */
-	protected function internalDelete() {
+	protected static function internalDelete(Query $query) {
 		
 		if(self::$trackChanges) {
-			$this->changeReferencedEntities([$this->id]);
-			$this->checkChangeForRelations();
+			static::changeReferencedEntities($query);
+			static::logDeleteChanges($query);
 		}
 
-		if(!parent::internalDelete()) {
+		if(!parent::internalDelete($query)) {
 			return false;
-		}
-		
-		if(self::$trackChanges) {
-			$this->entityType()->checkChange($this);
-		}
-		
+		}		
 		return true;
 	}	
+
+	/**
+	 * Log's deleted entities for JMAP sync
+	 * 
+	 * @param Query $query The query to select entities in the delete statement
+	 * @return boolean
+	 */
+	protected static function logDeleteChanges(Query $query) {
+		$ids = clone $query;
+		$ids->select($query->getTableAlias() . '.id as entityId, null as aclId, "1" as destroyed');
+		return static::entityType()->changes($ids);
+	}
 
 	// public static function markChangesForDelete(array $ids, $aclId = null) {
 	// 	static::changeReferencedEntities($ids);

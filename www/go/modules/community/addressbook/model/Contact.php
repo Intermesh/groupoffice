@@ -486,7 +486,7 @@ class Contact extends AclItemEntity {
 											
 										})->add('duplicate', function(Criteria $criteria, $value, Query $query) {
 
-											$dupQuery = new Query();
+											$dupQuery = static::find();
 
 											$props = [];
 											foreach($value as $property) {
@@ -494,7 +494,7 @@ class Contact extends AclItemEntity {
 													case 'emailAddresses':
 													if(!$query->isJoined('addressbook_email_address', 'e')) {
 														$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', 'LEFT');
-														$dupQuery->join('addressbook_email_address', 'dup_e', 'dup_e.contactId = dup_c.id', 'LEFT');
+														$dupQuery->join('addressbook_email_address', 'e', 'e.contactId = c.id', 'LEFT');
 													}
 													$props[] = 'e.email';
 													break;
@@ -502,7 +502,7 @@ class Contact extends AclItemEntity {
 													case 'phoneNumbers':
 													if(!$query->isJoined('addressbook_phone_number', 'p')) {
 														$query->join('addressbook_phone_number', 'p', 'p.contactId = c.id', 'LEFT');
-														$dupQuery->join('addressbook_phone_number', 'dup_p', 'dup_p.contactId = dup_c.id', 'LEFT');
+														$dupQuery->join('addressbook_phone_number', 'p', 'p.contactId = c.id', 'LEFT');
 													}
 													$props[] = 'p.number';
 													break;
@@ -517,15 +517,12 @@ class Contact extends AclItemEntity {
 												return $prop . ' <=> dup.' . substr($prop, strpos($prop, '.') + 1);
 											}, $props));
 
-											$dupProps = array_map(function($prop){return 'dup_'.$prop;}, $props);
-
 											$query->join(
 												$dupQuery
-												->select($dupProps)
-												->select('count(DISTINCT dup_c.id) as n', true)
-												->from('addressbook_contact', 'dup_c')
+												->select($props)
+												->select('count(DISTINCT c.id) as n', true)												
 												->filter(['permissionLevel' => Acl::LEVEL_DELETE])
-												->groupBy($dupProps)
+												->groupBy($props)
 												->having('n > 1')
 												,
 												'dup',
@@ -629,17 +626,16 @@ class Contact extends AclItemEntity {
 		return $this->saveOriganizationIds();
 		
 	}
-
-	protected function internalDelete()
-	{
-		return parent::internalDelete();
-	}
 	
 	protected function internalValidate() {		
 		
 		if(empty($this->name)) {
 			$this->setNameFromParts();
-		}		
+		}
+
+		if($this->isOrganization) {
+			$this->firstName = $this->lastName = $this->middleName = $this->prefixes = $this->suffixes = null;
+		}
 		
 		if($this->isNew() && !isset($this->addressBookId)) {
 			$this->addressBookId = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->defaultAddressBookId;
@@ -796,7 +792,7 @@ class Contact extends AclItemEntity {
 	 * 
 	 * @param Link $link
 	 */
-	public static function onLinkSaveOrDelete(Link $link) {
+	public static function onLinkSave(Link $link) {
 		if($link->getToEntity() !== "Contact" || $link->getFromEntity() !== "Contact") {
 			return;
 		}
@@ -814,24 +810,37 @@ class Contact extends AclItemEntity {
 			$from->saveSearch();
 			Contact::entityType()->change($from);
 		}
+
 		
-//		$ids = [$link->toId, $link->fromId];
-//		
-//		//Update modifiedAt dates for Z-Push and carddav
-//		go()->getDbConnection()
-//						->update(
-//										'addressbook_contact',
-//										['modifiedAt' => new DateTime()], 
-//										['id' => $ids]
-//										)->execute();	
-//		
-//		Contact::entityType()->changes(
-//					(new Query2)
-//					->select('c.id AS entityId, a.aclId, "0" AS destroyed')
-//					->from('addressbook_contact', 'c')
-//					->join('addressbook_addressbook', 'a', 'a.id = c.addressBookId')					
-//					->where('c.id', 'IN', $ids)
-//					);
+	}
+
+
+	/**
+	 * Because we've implemented the getter method "getOrganizationIds" the contact 
+	 * modSeq must be incremented when a link between two contacts is deleted or 
+	 * created.
+	 * 
+	 * @param Link $link
+	 */
+	public static function onLinkDelete(Query $links) {
+		
+		$links = Link::find()->where($links->andWhere('(toEntityTypeId = :e1 OR fromEntityTypeId = :e2)'))->bind([':e1'=> static::entityType()->getId(), ':e2'=> static::entityType()->getId()]);
+
+		foreach($links as $link) {			
+			$to = Contact::findById($link->toId);
+			$from = Contact::findById($link->fromId);
+			
+			//Save contact as link to organizations affect the search entities too.
+			if(!$to->isOrganization) {			
+				$to->saveSearch();
+				Contact::entityType()->change($to);
+			}
+			
+			if(!$from->isOrganization) {			
+				$from->saveSearch();
+				Contact::entityType()->change($from);
+			}
+		}
 		
 	}
 	

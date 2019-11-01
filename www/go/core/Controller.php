@@ -35,11 +35,8 @@ abstract class Controller {
 	 */
 	protected function getModulePermissionLevel() {
 		if(!isset($this->modulePermissionLevel)) {
-			$mod = Module::findByClass(static::class);
-			$this->modulePermissionLevel = $mod->getPermissionLevel();
-			if(!$this->modulePermissionLevel && $mod->name == "core" && $mod->package == "core") {
-				$this->modulePermissionLevel = Acl::LEVEL_READ;
-			}
+			$mod = Module::findByClass(static::class, ['aclId', 'permissionLevel']);
+			$this->modulePermissionLevel = $mod->getPermissionLevel();			
 		}
 
 		return $this->modulePermissionLevel;

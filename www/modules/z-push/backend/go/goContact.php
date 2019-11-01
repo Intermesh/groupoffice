@@ -23,7 +23,7 @@ class goContact extends GoBaseBackendDiff {
 		} else if(!$contact->getPermissionLevel() >= Acl::LEVEL_DELETE){
 			return true;
 		} else {
-			return $contact->delete(); // This throws an error when the contact is read only
+			return $contact->delete($contact->primaryKeyValues()); // This throws an error when the contact is read only
 		}
 	}
 	
@@ -138,7 +138,7 @@ class goContact extends GoBaseBackendDiff {
 						->select('c.id, UNIX_TIMESTAMP(c.modifiedAt) AS `mod`, "1" AS flags')
 						->join("sync_addressbook_user", "u", "u.addressBookId = c.addressBookId")
 						->andWhere('u.userId', '=', go()->getAuthState()->getUserId())
-						// ->andWhere(['c.isOrganization' => false])					
+						->andWhere(['c.isOrganization' => false])	 //Does not work reliably on ios
 						->fetchMode(PDO::FETCH_ASSOC)
 						->filter([
 								"permissionLevel" => Acl::LEVEL_READ

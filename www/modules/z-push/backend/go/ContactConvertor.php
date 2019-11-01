@@ -146,6 +146,7 @@ class ContactConvertor {
 		} else
 		{
 			$message->companyname = $contact->name;
+			$message->firstname = $message->middlename = $message->lastname = "";			
 		}
 		
 		$this->hasManyToFlat($contact->addresses, $message, $this->addressMapping);		
@@ -369,7 +370,7 @@ class ContactConvertor {
 			
 
 			if(!$contact->save()) {
-				throw new Exception("Failed to save contact");
+				throw new Exception("Failed to save contact: " . var_export($contact->getValidationErrors(), true));
 			}
 			
 			$this->setOrganizations( $message, $contact);

@@ -255,29 +255,28 @@ class Field extends AclItemEntity {
 			$this->getDataType()->onFieldSave();
 		} catch(\Exception $e) {
 			go()->warn($e);
-			
+			go()->getDbConnection()->resumeTransactions();
 			if($this->isNew()) {
-				parent::internalDelete();				
+				static::delete($this->primaryKeyValues());				
 			}
 
 			$this->setValidationError('id', \go\core\validate\ErrorCode::GENERAL, $e->getMessage());
 			
 			return false;
-		} finally {
-			go()->getDbConnection()->resumeTransactions();
-		}
+		} 
+		go()->getDbConnection()->resumeTransactions();
+		
 		
 		return true;
 	}
 
-	protected function internalDelete() {
-		if(!parent::internalDelete()) {
-			return false;
-		}
-
+	protected static function internalDelete(Query $query) {
 		try {
 			go()->getDbConnection()->pauseTransactions();
-			$success = $this->getDataType()->onFieldDelete();
+			$fields = Field::find()->mergeWith($query);
+			foreach($fields as $field) {
+				$field->getDataType()->onFieldDelete();
+			}
 		} catch(\Exception $e) {
 			go()->warn($e);
 			return false;
@@ -285,7 +284,7 @@ class Field extends AclItemEntity {
 			go()->getDbConnection()->resumeTransactions();
 		}
 		
-		return true;
+		return parent::internalDelete($query);
 }
 
 	/**

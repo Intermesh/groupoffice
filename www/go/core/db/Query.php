@@ -6,7 +6,6 @@ use go\core\App;
 use go\core\db\Criteria;
 use PDO;
 use ReflectionClass;
-
 /**
  * The Query class to select database records
  * 
@@ -49,6 +48,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	private $fetchMode;
 	private $forUpdate;
 	private $tableName;
+	private $calcFoundRows;
 
 	public function getTableAlias() {
 		return isset($this->tableAlias) ? $this->tableAlias : 't';
@@ -105,6 +105,10 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		return $this->unionOrderBy;
 	}
 
+	public function getCalcFoundRows() {
+		return $this->calcFoundRows;
+	}
+
 	public function getFetchMode() {
 		if (!isset($this->fetchMode)) {
 			return [PDO::FETCH_ASSOC];
@@ -125,9 +129,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 */
 	public function from($tableName, $tableAlias = null) {
 		$this->tableName = $tableName;
-		$this->tableAlias = $tableAlias;
-
-		return $this;
+		return $this->tableAlias($tableAlias);
 	}
 
 	/**
@@ -190,12 +192,34 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 */
 	public function mergeWith(Query $query) {
 
-		$reflection = new ReflectionClass(Query::class);
+		//Used to generate propnames
+		// $reflection = new ReflectionClass(Query::class);
+		// $props = $reflection->getProperties();
+		// $propNames = array_map(function($p){return $p->getName();}, $props);
+		// var_export($propNames);
+		// exit();
 
-		$props = $reflection->getProperties();
+		$propNames = array ( 
+			'bindParameters',
+			'where',
+			'tableAlias', 
+			'distinct',
+			'select', 
+			'orderBy', 
+			'unionOrderBy',
+			'groupBy', 
+			'having', 
+			'limit', 
+			'unionLimit', 
+			'offset', 
+			'unionOffset', 
+			'joins', 
+			'forUpdate', 
+			'tableName', 
+			'unions',  
+			'debug' );
 
-		foreach ($props as $prop) {
-			$key = $prop->getName();
+		foreach ($propNames as $key) {
 			$value = $query->$key;
 
 			if (!isset($value)) {
@@ -226,6 +250,19 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		}
 
 		$this->select = $append ? array_merge($this->select, $select) : $select;
+
+		return $this;
+	}
+
+	/**
+	 * Use SQL_CALC_FOUND_ROWS
+	 * 
+	 * @param bool $v
+	 * 
+	 * @return static
+	 */
+	public function calcFoundRows($v = true) {
+		$this->calcFoundRows = $v;
 
 		return $this;
 	}

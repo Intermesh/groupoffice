@@ -3,6 +3,7 @@ namespace go\modules\community\ldapauthenticator\model;
 
 use go\core\jmap\Entity;
 use go\core\ldap\Connection;
+use go\core\orm\Query;
 use go\core\util\DateTime;
 
 class Server extends Entity {
@@ -126,10 +127,10 @@ class Server extends Entity {
 		return parent::internalSave();
 	}
 	
-	protected function internalDelete() {
+	protected static function internalDelete(Query $query) {
 		go()->getCache()->delete("authentication-domains");
 		
-		return parent::internalDelete();
+		return parent::internalDelete($query);
 	}
 
 	private $connection;

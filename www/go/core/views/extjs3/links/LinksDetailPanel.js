@@ -149,7 +149,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 	}
 });
 
-go.links.getDetailPanels = function() {
+go.links.getDetailPanels = function(sortFn) {
 	
 	var panels = [];
 	
@@ -166,6 +166,10 @@ go.links.getDetailPanels = function() {
 			}));
 		}
 	});
+
+	if(sortFn) {		
+		panels.sort(sortFn);
+	}
 	
 	return panels;
 };

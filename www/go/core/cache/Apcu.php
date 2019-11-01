@@ -106,6 +106,6 @@ class Apcu implements CacheInterface {
 	}
 
 	public static function isSupported() {
-		return extension_loaded('apcu');
+		return extension_loaded('apcu') && !go()->getEnvironment()->isCli();
 	}
 }

@@ -707,16 +707,13 @@ class User extends Entity {
 		}
 	}
 	
-	protected function internalDelete() {
-		
-		if($this->id == 1) {
-			$this->setValidationError("id", ErrorCode::FORBIDDEN, "You can't delete the primary administrator");
-			return false;
-		}
+	protected static function internalDelete(Query $query) {
 
+		$query->andWhere('id != 1');
+				
 		go()->getDbConnection()->beginTransaction();
 
-		if(!$this->legacyOnDelete() || !parent::internalDelete()) {
+		if(!static::legacyOnDelete($query) || !parent::internalDelete($query)) {
 			go()->getDbConnection()->rollBack();
 			return false;
 		}
@@ -725,23 +722,21 @@ class User extends Entity {
 	}
 	
 	
-	public function legacyOnDelete() {
-		try {
-			$user = LegacyUser::model()->findByPk($this->id, false, true);
-			LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
-			//delete all acl records		
-			$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
+	public static function legacyOnDelete(Query $query) {
 
-			foreach($defaultModels as $model){
-				$model->deleteByAttribute('user_id',$this->id);
+			foreach($query as $id) {
+				$user = LegacyUser::model()->findByPk($id, false, true);
+				LegacyUser::model()->fireEvent("beforedelete", [$user, true]);
+				//delete all acl records		
+				$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
+
+				foreach($defaultModels as $model){
+					$model->deleteByAttribute('user_id',$id);
+				}
+
+				LegacyUser::model()->fireEvent("delete", [$user, true]);
 			}
-
-
-			LegacyUser::model()->fireEvent("delete", [$user, true]);
-		} catch(\Exception $e) {
-			$this->setValidationError('id', ErrorCode::GENERAL, $e->getMessage());
-			return false;
-		}
+	
 
 		return true;
 	}

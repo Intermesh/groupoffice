@@ -4,6 +4,7 @@ namespace go\core\acl\model;
 
 use go\core\model\Acl;
 use go\core\orm\Query;
+use go\core\db\Query as DbQuery;
 use go\core\jmap\EntityController;
 use go\core\jmap\Entity;
 
@@ -54,8 +55,26 @@ abstract class AclItemEntity extends AclEntity {
 		
 		return $query;
 	}
+
+		/**
+	 * Log's deleted entities for JMAP sync
+	 * 
+	 * @param Query $query The query to select entities in the delete statement
+	 * @return boolean
+	 */
+	protected static function logDeleteChanges(Query $query) {
+
+		$table = self::getMapping()->getPrimaryTable();
+		$changes = clone $query;
+		$changes->select($table->getAlias() . '.id as entityId');
+
+		$alias = static::joinAclEntity($changes);
+		$changes->select($alias . '.aclId, "1" as destroyed', true);
 	
-	public static function joinAclEntity(Query $query, $fromAlias = null) {
+		return static::entityType()->changes($changes);
+	}
+	
+	public static function joinAclEntity(DbQuery $query, $fromAlias = null) {
 		$cls = static::aclEntityClass();
 
 		/* @var $cls Entity */
@@ -145,9 +164,14 @@ abstract class AclItemEntity extends AclEntity {
 	}
 
 	public function getPermissionLevel() {
-		$aclEntity = $this->getAclEntity();
+
+		if(!isset($this->permissionLevel)) {
+			$aclEntity = $this->getAclEntity();
 		
-		return $aclEntity->getPermissionLevel(); 
+			$this->permissionLevel = $aclEntity->getPermissionLevel(); 
+		}
+
+		return $this->permissionLevel;		
 	}
 
 	/**

@@ -22,6 +22,8 @@ use go\core\db\Query as GoQuery;
 use go\core\db\Table;
 use go\core\util\ArrayObject;
 use go\core\ErrorHandler;
+use go\core\jmap\exception\InvalidArguments;
+use ReflectionProperty;
 
 /**
  * Property model
@@ -128,9 +130,12 @@ abstract class Property extends Model {
 	 * @param boolean $loadDefault
 	 */
 	private function initDatabaseColumns($loadDefault) {
+
+		$selected = array_unique(array_merge($this->getRequiredProperties(), $this->fetchProperties));
+
 		foreach ($this->getMapping()->getTables() as $table) {
-			foreach ($table->getColumns() as $colName => $column) {
-				if (in_array($colName, $this->fetchProperties) || static::isProtectedProperty($colName)) {
+			foreach ($table->getMappedColumns() as $colName => $column) {
+				if (in_array($colName, $selected)) {
 					if($loadDefault) {
 
 						if(isset($this->$colName)) {
@@ -310,14 +315,14 @@ abstract class Property extends Model {
 	/**
 	 * Returns the mapping object that is defined in defineMapping()
 	 * 
-	 * @return Mapping;
+	 * @return Mapping
 	 */
 	public final static function getMapping() {		
 		$cls = static::class;
 		if(isset(self::$mapping[$cls])) {
 			return self::$mapping[$cls];
 		}		
-		$cacheKey = 'mapping-' . str_replace('\\', '-', $cls);
+		$cacheKey = 'mapping-' . $cls;
 		
 		self::$mapping[$cls] = go()->getCache()->get($cacheKey);
 		if(!self::$mapping[$cls]) {			
@@ -345,7 +350,7 @@ abstract class Property extends Model {
 	static $c;
 	
 	public static function getApiProperties() {		
-		$cacheKey = 'property-getApiProperties-' . str_replace('\\', '-', static::class);
+		$cacheKey = 'property-getApiProperties-' . static::class;
 		
 		if(isset(self::$c[$cacheKey])) {
 			return self::$c[$cacheKey];
@@ -431,7 +436,7 @@ abstract class Property extends Model {
 	 */
 	protected static function getDefaultFetchProperties() {
 		
-		$cacheKey = 'property-getDefaultFetchProperties-' . str_replace('\\', '-', static::class);
+		$cacheKey = 'property-getDefaultFetchProperties-' . static::class;
 		
 		$props = go()->getCache()->get($cacheKey);
 		
@@ -538,6 +543,33 @@ abstract class Property extends Model {
 		return $propNames;
 	}
 
+	private static function getRequiredProperties() {
+
+		$cls = static::class;
+		$cacheKey = $cls . '-required-props';
+
+		$required = go()->getCache()->get($cacheKey);
+
+		if($required) {
+			return $required;
+		}
+
+		$props = static::getApiProperties();
+
+		$required = static::getPrimaryKey();
+		foreach($props as $name => $meta) {
+			if($meta['access'] === ReflectionProperty::IS_PROTECTED) {
+				$required[] = $name;
+			}
+		}
+
+		$required = array_unique($required);
+
+		go()->getCache()->set($cacheKey, $required);
+		
+		return $required;
+	}
+
 	/**
 	 * Evaluates the given fetchProperties and configures the query object to fetch them.
 	 * 
@@ -552,11 +584,12 @@ abstract class Property extends Model {
 			if($table->isUserTable && !go()->getUserId()) {
 				continue;
 			}		
+
+			$selectProps = array_unique(array_merge(static::getRequiredProperties(), $fetchProperties));
 			
 			foreach($table->getMappedColumns() as $column) {		
-				if($column->primary || in_array($column->name, $fetchProperties) || static::isProtectedProperty($column->name)) {
-					$select[] = $table->getAlias() . "." . $column->name;
-								
+				if(in_array($column->name, $selectProps)) {
+					$select[] = $table->getAlias() . "." . $column->name;								
 				}
 			}
 			
@@ -811,11 +844,11 @@ abstract class Property extends Model {
 	 * 
 	 * @return Column[]
 	 */
-	private function getBlobColumns() {
+	private static function getBlobColumns() {
 		
 		$refs = Blob::getReferences();
 		$cols = [];
-		foreach($this->getMapping()->getTables() as $table) {
+		foreach(static::getMapping()->getTables() as $table) {
 			foreach($table->getMappedColumns() as $col) {
 				foreach($refs as $r) {
 					if($r['table'] == $table->getName() && $r['column'] == $col->name) {
@@ -831,15 +864,7 @@ abstract class Property extends Model {
 	private function checkBlobs() {
 		$blobs = [];
 		foreach($this->getBlobColumns() as $col) {
-			if($this->isDeleted) {
-				$blobId = $this->{$col->name};
-				
-				if(isset($blobId)) {
-					$blobs[] = $blobId;
-				}
-				
-			} else if($this->isModified([$col->name])) {				
-				
+			if($this->isModified([$col->name])) {				
 				$mod = array_values($this->getModified([$col->name]))[0];
 				
 				if(isset($mod[0])) {
@@ -935,7 +960,7 @@ abstract class Property extends Model {
 		//remove old model if it's replaced
 		$modified = $this->getModified([$relation->name]);
 		if (isset($modified[$relation->name][1])) {
-			if (!$modified[$relation->name][1]->internalDelete()) {
+			if (!$modified[$relation->name][1]->internalDelete((new Query)->where($modified[$relation->name][1]->primaryKeyValues()))) {
 				$this->relatedValidationErrors = $modified[$relation->name][1]->getValidationErrors();
 				return false;
 			}
@@ -1344,15 +1369,40 @@ abstract class Property extends Model {
 		return true;
 	}
 	
-	private $isDeleted = false;
+	// private $isDeleted = false;
 	
+	// /**
+	//  * Check if this property was just deleted.
+	//  * 
+	//  * @var bool
+	//  */
+	// public function isDeleted() {
+	// 	return $this->isDeleted;
+	// }
+
 	/**
-	 * Check if this property was just deleted.
+	 * Parses ID into query
 	 * 
-	 * @var bool
+	 * eg. "1-1" into ['col1=>1, 'col2'=>1];
+	 * 
+	 * @param string $id
+	 * @return array
 	 */
-	public function isDeleted() {
-		return $this->isDeleted;
+	public static function parseId($id) {
+		$primaryTable = static::getMapping()->getPrimaryTable();
+		$pk = $primaryTable->getPrimaryKey();
+
+		$props = [];
+		$keys = explode('-', $id);	
+		
+		if(count($keys)  != count($pk)) {
+			throw new InvalidArguments("Invalid ID given for " . static::class.' : '.$id);
+		}
+		foreach ($pk as $key) {
+			$props[$key] = array_shift($keys);
+		}
+
+		return $props;
 	}
 
 	/**
@@ -1360,22 +1410,47 @@ abstract class Property extends Model {
 	 * 
 	 * @return boolean
 	 */
-	protected function internalDelete() {
-		$tables = $this->getMapping()->getTables();
-		$primaryTable = array_shift($tables);
-		$pk = [];
-		foreach ($primaryTable->getPrimaryKey() as $key) {
-			$pk[$key] = $this->{$key};
-		}
-		if(!App::get()->getDbConnection()->delete($primaryTable->getName(), $pk)->execute()) {			
+	protected static function internalDelete(Query $query) {
+
+		$primaryTable = static::getMapping()->getPrimaryTable();
+
+		$blobIds = static::getBlobsToCheckAfterDelete($query);
+		
+		$stmt = go()->getDbConnection()->delete($primaryTable->getName(), $query);
+		if(!$stmt->execute()) {			
 			return false;
+		}	
+
+		if(count($blobIds)) {			
+			$blobs = Blob::find()->where('id', '=', $blobIds);
+			foreach($blobs as $blob) {
+				$blob->setStaleIfUnused();
+			}
 		}
-		
-		$this->isDeleted = true;
-		
-		$this->checkBlobs();
-		
 		return true;
+	}
+
+	private static function getBlobsToCheckAfterDelete(Query $query) {
+		
+		$blobCols = static::getBlobColumns();
+		if(!count($blobCols)) {
+			return [];
+		}
+
+		$blobCols = array_map(function($col) {return $col->name;}, $blobCols);
+
+		$entities = static::internalFind($blobCols)->mergeWith($query);
+
+		$blobIds = [];
+		foreach($entities as $entity) {
+			foreach($blobCols as $c) {
+				if(isset($entity->$c) && !in_array($entity->$c, $blobIds)) {
+					$blobIds[] = $entity->$c;
+				}
+			}
+		}
+
+		return $blobIds;		
 	}
 
 	private function validateTable(MappedTable $table) {		
@@ -1663,6 +1738,8 @@ abstract class Property extends Model {
 	
 	/**
 	 * Get the primary key column names.
+	 * 
+	 * If you need the values {@see primaryKeyValues()}
 	 * 
 	 * @param boolean $withTableAlias 
 	 * @return string[]

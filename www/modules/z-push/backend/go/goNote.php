@@ -13,7 +13,7 @@ class goNote extends GoBaseBackendDiff {
 		$note = Note::findById($id);
 		
 		if($note && $note->hasPermissionLevel(Acl::LEVEL_DELETE)) {
-			return $note->delete();
+			return $note->delete($note->primaryKeyValues());
 		} else {
 			return true;
 		}

@@ -103,7 +103,7 @@ class Query extends DbQuery {
 	}
 
 	/**
-	 * Join properties on the main model
+	 * Join properties on the main model. The table will be aliased as the property name
 	 * 
 	 * @param string[] $path eg. ['emailAddreses']
 	 * @return $this;

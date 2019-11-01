@@ -286,6 +286,11 @@ class Column {
 
 			case 'date':
 			case 'datetime':
+				//Work around date problem
+				if($value == "0000-00-00") {
+					return null;
+				}
+
 				return $value instanceof GoDateTime ? $value: new GoDateTime($value, new DateTimeZone("UTC"));
 				
 			default:

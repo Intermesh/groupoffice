@@ -18,6 +18,7 @@ use go\core\jmap\SetError;
 use go\core\orm\Entity;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
+use PDO;
 
 abstract class EntityController extends Controller {	
 	
@@ -74,6 +75,10 @@ abstract class EntityController extends Controller {
 						->select($cls::getPrimaryKey(true)) //only select primary key
 						->limit($params['limit'])
 						->offset($params['position']);
+
+		if($params['calculateTotal']) {
+			$query->calcFoundRows();
+		}
 		
 		/* @var $query Query */
 
@@ -237,16 +242,16 @@ abstract class EntityController extends Controller {
 		];
 		
 		if($p['calculateTotal']) {
-			$totalQuery = clone $idsQuery;
-			$total = (int) $totalQuery
-											->selectSingleValue("count(*)")
-											->orderBy([], false)
-											->limit(1)
-											->offset(0)
-											->execute()
-											->fetch();
+			// $totalQuery = clone $idsQuery;
+			// $response['total'] = $totalQuery
+			// 								->selectSingleValue("count(distinct " . $totalQuery->getTableAlias() . ".id)")
+			// 								->orderBy([], false)
+			// 								->groupBy([])
+			// 								->limit(1)
+			// 								->offset(0)
+			// 								->single();
 
-			$response['total'] = $total;
+			$response['total'] = go()->getDbConnection()->query("SELECT FOUND_ROWS()")->fetch(PDO::FETCH_COLUMN, 0);
 		}
 		
 		return $response;
@@ -409,7 +414,7 @@ abstract class EntityController extends Controller {
 				}
 			}
 		} else {
-			$result['list'][] = array_values($unsorted);
+			$result['list'] = array_values($unsorted);
 		}
 
 
@@ -651,6 +656,8 @@ abstract class EntityController extends Controller {
 	}
 
 	private function destroyEntities($destroy, &$result) {
+
+		$doDestroy = [];
 		foreach ($destroy as $id) {
 			$entity = $this->getEntity($id);
 			if (!$entity) {
@@ -663,15 +670,24 @@ abstract class EntityController extends Controller {
 				continue;
 			}
 
-			$success = $entity->delete();
-			
-			if ($success) {
-				$result['destroyed'][] = $id;
-			} else {
-				$errors = $entity->getValidationErrors();
-				$first = array_shift($errors);
-				$result['notDestroyed'][$id] = ['type' => $first['code'], 'description' => $first['description']];
+			$doDestroy[] = $id;
+		}
+		$cls = $this->entityClass();
+
+		if(!empty($doDestroy)) {
+			$query = new Query();
+			foreach($doDestroy as $id) {
+				$query->orWhere($cls::parseId($id));
 			}
+			$success = $cls::delete($query);
+		} else {
+			$success = true;
+		}
+			
+		if ($success) {
+			$result['destroyed'] = $doDestroy;
+		} else {
+			throw Exception("Delete error");
 		}
 	}
 	
@@ -879,7 +895,7 @@ abstract class EntityController extends Controller {
 				throw new Forbidden();
 			}
 			if(!$entity->merge($other)) {
-				throw new \Exception("Failed to merge ID: ".$id);
+				throw new \Exception("Failed to merge ID: ".$id . ", Validation errors: ". var_export($entity->getValidationErrors(), true));
 			}
 		}
 
