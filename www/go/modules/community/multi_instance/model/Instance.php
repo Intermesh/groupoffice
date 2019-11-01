@@ -323,7 +323,7 @@ class Instance extends Entity {
 				$this->dropDatabaseUser($dbUsername);
 			}
 			
-			parent::internalDelete((new Query())->where([$this->id]));
+			parent::internalDelete((new Query())->where(['id' => $this->id]));
 			
 			throw $e;
 		}
@@ -541,7 +541,7 @@ class Instance extends Entity {
 	
 	protected static function internalDelete(Query $query) {
 
-		$instances = Instance::find()->where($query);
+		$instances = Instance::find()->mergeWith($query);
 
 		foreach($instances as $instance) {
 			$instance->getTempFolder()->delete();
