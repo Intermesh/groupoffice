@@ -48,6 +48,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	private $fetchMode;
 	private $forUpdate;
 	private $tableName;
+	private $calcFoundRows;
 
 	public function getTableAlias() {
 		return isset($this->tableAlias) ? $this->tableAlias : 't';
@@ -102,6 +103,10 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	
 	public function getUnionOrderBy() {
 		return $this->unionOrderBy;
+	}
+
+	public function getCalcFoundRows() {
+		return $this->calcFoundRows;
 	}
 
 	public function getFetchMode() {
@@ -245,6 +250,19 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		}
 
 		$this->select = $append ? array_merge($this->select, $select) : $select;
+
+		return $this;
+	}
+
+	/**
+	 * Use SQL_CALC_FOUND_ROWS
+	 * 
+	 * @param bool $v
+	 * 
+	 * @return static
+	 */
+	public function calcFoundRows($v = true) {
+		$this->calcFoundRows = $v;
 
 		return $this;
 	}

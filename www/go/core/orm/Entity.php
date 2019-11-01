@@ -11,6 +11,7 @@ use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
 use go\core\data\exception\NotArrayable;
+use go\core\ErrorHandler;
 use go\core\util\ClassFinder;
 
 /**
@@ -310,25 +311,30 @@ abstract class Entity extends Property {
 
 		App::get()->getDbConnection()->beginTransaction();
 
-		if (!static::internalDelete($query)) {
-			go()->getDbConnection()->rollBack();
-			return false;
-		}
-		
-		//See \go\core\orm\SearchableTrait;
-		if(method_exists(static::class, 'deleteSearchAndLinks')) {
-			if(!static::deleteSearchAndLinks($query)) {				
+		try{
+			if (!static::internalDelete($query)) {
 				go()->getDbConnection()->rollBack();
 				return false;
 			}
-		}	
+			
+			//See \go\core\orm\SearchableTrait;
+			if(method_exists(static::class, 'deleteSearchAndLinks')) {
+				if(!static::deleteSearchAndLinks($query)) {				
+					go()->getDbConnection()->rollBack();
+					return false;
+				}
+			}	
 
-		if(!static::fireEvent(static::EVENT_DELETE, $query)) {
+			if(!static::fireEvent(static::EVENT_DELETE, $query)) {
+				go()->getDbConnection()->rollBack();
+				return false;			
+			}
+
+			return go()->getDbConnection()->commit();
+		} catch(Exception $e) {			
 			go()->getDbConnection()->rollBack();
-			return false;			
+			throw $e;
 		}
-
-		return go()->getDbConnection()->commit();
 	}
 	
 	protected function commit() {
@@ -419,6 +425,8 @@ abstract class Entity extends Property {
 		
 		return Module::findById($moduleId)->findAclId();
 	}
+
+	private static $entityType = [];
 	
 	/**
 	 * Gets an ID from the database for this class used in database relations and 
@@ -430,12 +438,13 @@ abstract class Entity extends Property {
 
 		$cls = static::class;
 
-		$type = go()->getCache()->get('type-' . $cls);
-		if(!$type) {
-			$type = EntityType::findByClassName(static::class);
-			go()->getCache()->set('type-' . $cls, $type, false);
+		if(isset(self::$entityType[$cls])) {
+			return self::$entityType[$cls];
 		}
-		return $type;
+
+		self::$entityType[$cls] = EntityType::findByClassName(static::class);			
+		
+		return self::$entityType[$cls];
 	}
   
   /**
@@ -483,8 +492,6 @@ abstract class Entity extends Property {
 	protected static function defineFilters() {
 
 		$cls = static::class;
-
-		$filters = go()->getCache()->get('filters-' . $cls);
 
 		$filters = new Filters();
 

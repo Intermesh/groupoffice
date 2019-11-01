@@ -1,5 +1,15 @@
+31-10-2019 6.4.72
+- Core: Use SQL_CALC_FOUND_ROWS to calculate total
+- Core: Updated Spanish translation
 - Core: bundle Foo/get requests to improve performance.
+- Core: Use disk cache for CLI as Acpu is not enabled on CLI.
 - Core: Performance improvements in ACL queries
+- Address book: City missing from contact in templates
+- LDAP Authenticator: Also match users based on e-mail address
+- Address book: Put organizations on top in contact detail view
+- Hoilidays: removed "From" boxLabel 
+- Projects: Fixed undefined index contact_id error when creating project from mail
+- E-mail: Pass contact ID and don't search by email for e-mail templates
 
 28-10-2019 6.4.71
 - Core: Improved delete performance
@@ -389,6 +399,8 @@
 
 - Projects: Fixed activity sort in time tracking
 - Billing: Fixed total not always updating in expense dialog
+- Projects: Send contact ID when creating project from e-mail
+- Tasks: Fixed link to project after cancel
 
 11-10-2019 6.3.83
 - Core: Working week didn't accept half hours

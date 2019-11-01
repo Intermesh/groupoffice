@@ -394,6 +394,10 @@ class QueryBuilder {
 	protected function buildSelectFields() {
 		$select = "SELECT ";
 
+		if ($this->query->getCalcFoundRows()) {
+			$select .= "SQL_CALC_FOUND_ROWS ";
+		}
+
 		if ($this->query->getDistinct()) {
 			$select .= "DISTINCT ";
 		}

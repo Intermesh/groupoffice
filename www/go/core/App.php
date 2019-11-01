@@ -424,7 +424,7 @@ use const GO_CONFIG_FILE;
 		/**
 		 * Get a simple key value caching object
 		 * 
-		 * @return Disk
+		 * @return Cache\Apcu
 		 */
 		public function getCache() {
 			if (!isset($this->cache)) {
