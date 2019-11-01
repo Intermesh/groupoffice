@@ -1,7 +1,7 @@
 <?php
 namespace go\modules\community\multi_instance\cron;
 
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\util\DateTime;
 use go\modules\community\multi_instance\model\Instance;
 use go\core\model\CronJob;
