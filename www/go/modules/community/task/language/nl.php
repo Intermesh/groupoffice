@@ -15,5 +15,6 @@ return array (
   'percentage completed' => 'percentage voltooid',
   'remind date' => 'herinnering (datum)',
   'remind time' => 'herinnering (tijd)',
-  'categories' => 'categorieën'
+  'categories' => 'categorieën',
+  'Priority' => 'Prioriteit'
 );

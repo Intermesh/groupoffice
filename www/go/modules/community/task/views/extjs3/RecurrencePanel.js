@@ -97,14 +97,15 @@ go.modules.community.task.RecurrencePanel = Ext.extend(go.form.FormContainer, {
 			width : 80,
 			forceSelection : true,
 			mode : 'local',
-			value : '1',
+			value : '-1',
 			valueField : 'value',
 			displayField : 'text',
 			listeners: {
 				select:function(me,value) {
-					for(var i = 0; i < this.bySetDays.length; i++) {
+					for(var i in this.bySetDays) {
 						this.bySetDays[i].position = value.data.value;
 					}
+					
 				},
 				scope:this
 			},

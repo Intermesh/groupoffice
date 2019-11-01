@@ -104,12 +104,6 @@ class Task extends Entity {
 	 * 
 	 * @var string
 	 */							
-	public $status;
-
-	/**
-	 * 
-	 * @var string
-	 */							
 	protected $recurrenceRule = '';
 
 	/**

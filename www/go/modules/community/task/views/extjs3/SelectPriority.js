@@ -5,7 +5,7 @@ go.modules.community.task.SelectPriority = Ext.extend(go.form.ComboBox, {
 	editable : false,
 	selectOnFocus : true,
 	forceSelection : true,
-	fieldLabel : t("Status"),
+	fieldLabel : t("Priority"),
 	mode : 'local',
 	value : 1,
 	valueField : 'value',
@@ -13,9 +13,9 @@ go.modules.community.task.SelectPriority = Ext.extend(go.form.ComboBox, {
 	store : new Ext.data.SimpleStore({
 		fields : ['value', 'text'],
         data : [
-			[0, t("Low")],
-			[1, t("Normal")],
-			[2, t("High")]]
+			[1, t("Low")],
+			[5, t("Normal")],
+			[8, t("High")]]
 	}),
     initComponent: function() {
         go.modules.community.task.SelectPriority.superclass.initComponent.call(this);

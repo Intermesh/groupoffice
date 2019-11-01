@@ -38,14 +38,6 @@ class VCalendar extends AbstractConverter {
 			$blob = Blob::findById($task->vcalendarBlobId);
 			$VCalendar = Reader::read($blob->getFile()->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);			
 			
-			//remove all supported properties
-			// $VCalendar->remove('EMAIL');
-			// $VCalendar->remove('TEL');
-			// $VCalendar->remove('ADR');
-			// $VCalendar->remove('ORG');
-			// $VCalendar->remove('PHOTO');
-			// $VCalendar->remove('BDAY');
-			// $VCalendar->remove('ANNIVERSARY');
 			if($VCalendar->VTODO) {
 				return $VCalendar->VTODO;
 			}
@@ -60,24 +52,71 @@ class VCalendar extends AbstractConverter {
 	 * Parse an Event object to a VObject
 	 * @param task $task
 	 */
-	
 	public function export(Task $task) {
+		$rrule = $task->getRecurrenceRule();
+		$newrrule = "";
+
+		if(is_array($rrule)) {
+			foreach($rrule as $key => $value) {
+				switch($key) {
+					case "frequency":
+						$newrrule .= "FREQ=" . $value . ";";
+					break;
+					case "interval":
+					case "until":
+					case "count":
+						$newrrule .= strtoupper($key) . "=" . $value . ";";
+					break;
+					case "byDay":
+						$allDays = "";
+						if(is_array($value)) {
+							$itemCount = count($value);
+							$count = 0;
+							foreach($value as $days) {
+								$day = $days["day"];
+								$position = $days["position"];
+
+								if($position != -1) {
+									$day = $position . $day;
+								}
+
+								if(++$count === $itemCount) {
+									$allDays .= $day;
+								} else {
+									$allDays .= $day . ",";
+								}
+								
+							}
+						}
+
+						$newrrule .= "BYDAY=" . $allDays . ";";
+
+					break;
+				}
+			}
+		}
+
 		$vtodo = $this->getVTodo($task);
+		$vtodo->RRULE = $newrrule;
 		$vtodo->UID = $task->getUid();
 		$vtodo->SUMMARY = $task->title;
-
-		$vtodo->STATUS = $task->status;
-		$vtodo->RECURRENCERULE = $task->getRrule();
 		$vtodo->PRIORITY = $task->priority;
-
 		$vtodo->DTSTART = $task->start;
 		$vtodo->DUE = $task->due;
-		$vtodo->CATEGORIES = $task->categories;
+
+		if(is_array($task->categories)) {
+			$data = [];
+			foreach($task->categories as $category) {
+				$results = go()->getDbConnection()->select("name")->from("task_category")->where('id=' . $category);
+
+				foreach($results as $result) {
+					$data[] = $result["name"];
+				}
+			}
+			$vtodo->CATEGORIES = $data;
+		}
+
 		$vtodo->DESCRIPTION = $task->description;
-//-----------------------------------------------------
-		//$vtodo->CREATED = $task->createdAt;
-		// $vtodo->CREATEDBY = $task->createdBy;
-		// $vtodo->CREATEDAT = $task->createdAt;
 		return $vtodo->serialize();
 	}
 	
@@ -101,7 +140,6 @@ class VCalendar extends AbstractConverter {
 
 		fputs($fp, "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Intermesh//NONSGML Group-Office ".go()->getVersion()."//EN\r\n");
 
-		//TODO move to new framework
 		$t = new \GO\Base\VObject\VTimezone();
 		fputs($fp, $t->serialize());
 
@@ -211,7 +249,7 @@ class VCalendar extends AbstractConverter {
 	}
 
 	public function getFileExtension() {
-		return 'vcf';
+		return 'ics';
 	}
 
 	public function importFile(File $file, $entityClass, $params = []) {
@@ -234,10 +272,8 @@ class VCalendar extends AbstractConverter {
 
 		while ($VCalendarComponent = $splitter->getNext()) {
 			
-			$vtodo = $VCalendarComponent->VTODO;
 			$dtstamp = $VCalendarComponent->VTODO->DTSTAMP;
 			$uid = $VCalendarComponent->VTODO->UID;
-			$status = $VCalendarComponent->VTODO->STATUS;
 			$priority = $VCalendarComponent->VTODO->PRIORITY;
 			$categories = $VCalendarComponent->VTODO->CATEGORIES;
 			$summary = $VCalendarComponent->VTODO->SUMMARY;
@@ -246,22 +282,20 @@ class VCalendar extends AbstractConverter {
 			$description = $VCalendarComponent->VTODO->DESCRIPTION;
 			$recurrenceRule = $VCalendarComponent->VTODO->RECURRENCERULE;
 			$created = $VCalendarComponent->VTODO->CREATED;
-			$taskListId = $VCalendarComponent->VTODO->tasklistid;
 			$response['errors'][] = "test " . $categories;
-			$t = "";
-			// try {
-			// 	$task = $this->findOrCreatetask($VCalendarComponent, $values['taskId']);
-			// 	$task->setValues($values);
-			// 	$this->import($VCalendarComponent, $task);
-			// 	$response['ids'][] = $task->id;
-			// }
-			// catch(\Exception $e) {
-			// 	ErrorHandler::logException($e);
-			// 	$response['errors'][] = "Failed to import vcalendar: ". $e->getMessage();
-			// }			
-			// $response['count']++;
-		}
 
+			try {
+				$task = $this->findOrCreatetask($VCalendarComponent, $values['taskId']);
+				$task->setValues($values);
+				$this->import($VCalendarComponent, $task);
+				$response['ids'][] = $task->id;
+			}
+			catch(\Exception $e) {
+				ErrorHandler::logException($e);
+				$response['errors'][] = "Failed to import vcalendar: ". $e->getMessage();
+			}			
+			$response['count']++;
+		}
 		return $response;
 	}
 	
@@ -297,7 +331,7 @@ class VCalendar extends AbstractConverter {
 	private function saveBlob(VCalendarComponent $VCalendarComponent){
 		$blob = Blob::fromString($VCalendarComponent->serialize());
 		$blob->type = 'text/VCalendar';
-		$blob->name = ($VCalendarComponent->uid ?? 'nouid' ) . '.vcf';
+		$blob->name = ($VCalendarComponent->uid ?? 'nouid' ) . '.ics';
 		if(!$blob->save()) {
 			throw new \Exception("could not save VCalendar blob");
 		}

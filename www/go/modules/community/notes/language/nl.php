@@ -10,5 +10,5 @@ return array (
   'Content' => 'Text',
   'Invalid password' => 'Ongeldig wachtwoord',
   'Note book' => 'Notitieblok',
-  'Commented at' => 'Nieuw bericht op',
+  'Commented at' => 'Nieuw bericht op'
 );
