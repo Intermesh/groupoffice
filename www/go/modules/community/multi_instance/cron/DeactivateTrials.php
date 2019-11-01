@@ -9,11 +9,12 @@ use go\core\model\CronJob;
 class DeactivateTrials extends CronJob {
 	
 	public function run() {
-		$expiredTrials = Instance::find()
+		$expiredTrials = Instance::find()		
 						->selectSingleValue('id')
 						->where('isTrial', '=', true)
 						->andWhere('enabled', '=', true)
-						->andWhere('createdAt', '<', new DateTime("-30 days"));
+						->andWhere('createdAt', '<', new DateTime("-30 days"))
+						->all();
 
 		Instance::delete((new Query())->where('id', 'IN', $expiredTrials));
 	}
