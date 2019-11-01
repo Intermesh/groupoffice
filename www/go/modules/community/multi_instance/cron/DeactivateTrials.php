@@ -16,6 +16,10 @@ class DeactivateTrials extends CronJob {
 						->andWhere('createdAt', '<', new DateTime("-30 days"))
 						->all();
 
+		if(empty($expiredTrials)) {
+			return true;
+		}
+
 		Instance::delete((new Query())->where('id', 'IN', $expiredTrials));
 	}
 }
