@@ -9,18 +9,12 @@ class DeactivateTrials extends CronJob {
 	
 	public function run() {
 		$expiredTrials = Instance::find()
+						->selectSingleValue('id')
 						->where('isTrial', '=', true)
 						->andWhere('enabled', '=', true)
 						->andWhere('createdAt', '<', new DateTime("-30 days"));
-		
-		foreach($expiredTrials as $trial) {
-//			$trial->enabled = false;
-//			$trial->isTrial = false;
-//			if(!$trial->save()) {
-//				throw new \Exception("Could not deactivate trial");
-//			}
-			$trial->delete();
-		}
+
+		Instance::delete(['id' => $expiredTrials]);
 	}
 }
 
