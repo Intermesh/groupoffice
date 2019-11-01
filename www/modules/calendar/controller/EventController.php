@@ -1265,7 +1265,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 //		
 //		$leavedays = \GO\Leavedays\Model\Leaveday::model()
 		//$holidays = \GO\Base\Model\Holiday::model()->getHolidaysInPeriod($startTime, $endTime, $calendar->user->language);
-		$leavedaysStmt = \GO\Leavedays\Model\Leaveday::model()->getLeavedaysInPeriod($calendar->user->id,$startTime, $endTime);
+		$leavedaysStmt = \GO\Leavedays\Model\Leaveday::model()->getLeavedaysInPeriod($calendar->user->id,$startTime, $endTime, null);
 		
 		if($leavedaysStmt){
 			while($leavedayModel = $leavedaysStmt->fetch()){ 
