@@ -11,6 +11,7 @@ use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
 use go\core\data\exception\NotArrayable;
+use go\core\ErrorHandler;
 use go\core\util\ClassFinder;
 
 /**
@@ -310,25 +311,30 @@ abstract class Entity extends Property {
 
 		App::get()->getDbConnection()->beginTransaction();
 
-		if (!static::internalDelete($query)) {
-			go()->getDbConnection()->rollBack();
-			return false;
-		}
-		
-		//See \go\core\orm\SearchableTrait;
-		if(method_exists(static::class, 'deleteSearchAndLinks')) {
-			if(!static::deleteSearchAndLinks($query)) {				
+		try{
+			if (!static::internalDelete($query)) {
 				go()->getDbConnection()->rollBack();
 				return false;
 			}
-		}	
+			
+			//See \go\core\orm\SearchableTrait;
+			if(method_exists(static::class, 'deleteSearchAndLinks')) {
+				if(!static::deleteSearchAndLinks($query)) {				
+					go()->getDbConnection()->rollBack();
+					return false;
+				}
+			}	
 
-		if(!static::fireEvent(static::EVENT_DELETE, $query)) {
+			if(!static::fireEvent(static::EVENT_DELETE, $query)) {
+				go()->getDbConnection()->rollBack();
+				return false;			
+			}
+
+			return go()->getDbConnection()->commit();
+		} catch(Exception $e) {			
 			go()->getDbConnection()->rollBack();
-			return false;			
+			throw $e;
 		}
-
-		return go()->getDbConnection()->commit();
 	}
 	
 	protected function commit() {
