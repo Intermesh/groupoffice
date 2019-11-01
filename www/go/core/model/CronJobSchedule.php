@@ -132,6 +132,7 @@ class CronJobSchedule extends Entity {
 			
 		} catch (Exception $ex) {			
 			$errorString = \go\core\ErrorHandler::logException($ex);		
+			echo $errorString . "\n";
 			$this->lastError = $errorString;
 		}
 
