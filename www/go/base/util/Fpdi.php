@@ -1,7 +1,7 @@
 <?php
 namespace GO\Base\Util;
 
-class Fpdi extends \FPDI {
+class Fpdi extends \setasign\Fpdi\Tcpdf\Fpdi { // change for FPDI v2.2
 	
 	/**
 	 * Pass error message in Exception
