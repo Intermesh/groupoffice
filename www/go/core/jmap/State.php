@@ -68,7 +68,7 @@ class State extends AbstractState {
 			}		
 
 			if($this->token->isExpired()) {				
-				$this->token->delete();				
+				$this->token->delete($this->token->primaryKeyValues());				
 				$this->token = false;
 			}
 		}
