@@ -241,10 +241,16 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 *
 	 * Remember the default table alias is 't'.
 	 *
-	 * @param string|array $select
+	 * @param string|array $select Pass null to reset.
 	 * @return static
 	 */
 	public function select($select = '*', $append = false) {
+
+		if(!isset($select)) {
+			$this->select = [];
+			return $this;
+		}
+
 		if (!is_array($select)) {
 			$select = [$select];
 		}
