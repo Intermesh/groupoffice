@@ -319,10 +319,17 @@ class Acl extends Entity {
 			$on .= ' AND level >= ' .$level;
 		}
 
-		$query->join('core_acl_group', 'acl_g',$on)
-			->join('core_user_group', 'acl_u', 'acl_u.groupId = acl_g.groupId AND acl_u.userId=' . $userId)
+		if(isset($groups)) {
+			$on = (new Criteria)->where($on)->andWhere('acl_g.groups', 'IN', $groups);
+		}
+
+		$query->join('core_acl_group', 'acl_g', $on)
 			->select('MAX(acl_g.level) as permissionLevel', true)
 			->groupBy(['id']);
+
+		if(!isset($groups)) {
+			$query->join('core_user_group', 'acl_u', 'acl_u.groupId = acl_g.groupId AND acl_u.userId=' . $userId);
+		}
 		
 	}
 	
