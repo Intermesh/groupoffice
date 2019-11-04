@@ -2,6 +2,7 @@
 
 namespace go\core\orm;
 
+use Exception;
 use go\core\db\Column;
 use go\core\db\Query;
 use ReflectionClass;
@@ -142,6 +143,9 @@ class Mapping {
 	 * @return MappedTable
 	 */
 	public function getPrimaryTable() {
+		if(empty($this->tables)) {
+			throw new Exception("No table mapped");
+		}
 		return array_values($this->tables)[0];
 	}
 

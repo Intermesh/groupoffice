@@ -10,6 +10,7 @@ use go\core\db\Query;
 use go\core\model\Module;
 use go\core\ErrorHandler;
 use go\core\jmap;
+use go\core\jmap\Entity;
 use PDOException;
 use go\core\model\Acl;
 use InvalidArgumentException;
@@ -216,7 +217,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		foreach($records as $record) {
 			$type = static::fromRecord($record);
 			$cls = $type->getClassName();
-			if(!class_exists($cls)) {
+			if(!class_exists($cls) || !is_a($cls, Entity::class)) {
 				go()->warn($cls .' not found!');
 				continue;
 			}
