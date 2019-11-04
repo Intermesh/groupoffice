@@ -613,6 +613,25 @@ class Installer {
 			if($record["Collation"] != "utf8mb4_unicode_ci" ) {
 				echo "Converting ". $record["Name"] . " to utf8mb4\n";
 				flush();
+
+				if($record['Name'] == 'fs_files') {
+					go()->getDbConnection()->exec("ALTER TABLE `fs_files` DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;");
+					go()->getDbConnection()->query("ALTER TABLE `fs_files` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;");
+					go()->getDbConnection()->query("ALTER TABLE `fs_files` CHANGE `comment` `comment` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;");
+					go()->getDbConnection()->query("ALTER TABLE `fs_files` CHANGE `extension` `extension` VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;");
+					go()->getDbConnection()->query("ALTER TABLE `fs_files` CHANGE `random_code` `random_code` CHAR(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;");
+
+					continue;
+				}
+
+				if($record['Name'] == 'fs_folders') {
+					go()->getDbConnection()->exec("ALTER TABLE `fs_folders` DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;");					
+					go()->getDbConnection()->query("ALTER TABLE `fs_folders` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;");
+					go()->getDbConnection()->query("ALTER TABLE `fs_folders` CHANGE `comment` `comment` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;");
+					go()->getDbConnection()->query("ALTER TABLE `fs_folders` CHANGE `cm_state` `cm_state` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;");
+					
+					continue;
+				}
 				
 				if($record['Name'] === 'em_links') {
 					go()->getDbConnection()->query("ALTER TABLE `em_links` DROP INDEX `uid`");
@@ -624,15 +643,6 @@ class Installer {
 					go()->getDbConnection()->query("ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';");
 					go()->getDbConnection()->query("ALTER TABLE `em_links` ADD INDEX(`uid`);");
 				}
-
-				if($record['Name'] == 'fs_files') {
-					go()->getDbConnection()->query("ALTER TABLE `fs_files` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;");
-				}
-
-				if($record['Name'] == 'fs_folders') {
-					go()->getDbConnection()->query("ALTER TABLE `fs_folders` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;");
-				}
-	
 			}	
 		}
 		go()->getDbConnection()->exec("SET foreign_key_checks = 1");
