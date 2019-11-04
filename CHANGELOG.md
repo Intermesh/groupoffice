@@ -1,3 +1,6 @@
+- Core: Updated Spanish translation
+- LDAP: Group sync failed on some servers that returned "memberuid".
+
 31-10-2019 6.4.72
 - Core: Use SQL_CALC_FOUND_ROWS to calculate total
 - Core: Updated Spanish translation

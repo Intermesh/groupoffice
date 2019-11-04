@@ -28,7 +28,7 @@ return array (
   'Time' => 'Tiempo',
   'Cron Settings' => 'Configuraciones de Cron',
   'Period' => 'Período',
-  'Upcoming Cron-Jobs' => 'Próximos trabajos de Cron',
+  'Upcoming Cron-Jobs' => 'Siguientes trabajos de Cron',
   'Last run' => 'Última ejecución',
   'Next run' => 'Próxima ejecución',
   'Completed at' => 'Completado en',

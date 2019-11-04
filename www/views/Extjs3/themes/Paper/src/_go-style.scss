@@ -492,47 +492,49 @@ a {
 #search_query {
 	float:left;
 	display:block;
-	padding-top: dp(16);
-	.search-field-wrap {
-		position:fixed;
-		display: block !important;
-		top: dp(12);
-		left:dp(240);
-		right:dp(240);
-		height: dp(40);
-		background-color: color($bg, 'disabled-button');
-		border-radius: $borderRadius;
-		transition: opacity 280ms $curve-standard;
-		opacity:1;
-		.x-form-trigger {
-			height: dp(40);
-			color: white;
-		}
-		&.x-hide-display {
-			opacity:0;
-			pointer-events: none;
-		}
-		.x-btn {
-			position:absolute;
-			top: 0;
-			right: 0;
-			padding: 0;
-			margin: 0;
-		}
-		input {
-			width: 100%;
-			color:white;
-			background: none;
-			height: dp(40);
-			border:0;
-			padding: 0 0 0 dp(8);
+	padding-top: dp(16);	
+}
 
-			&.x-form-invalid {
-				background-color: color($red,300);
-			}
+.search-field-wrap {
+	position:absolute;
+	z-index: 20;
+	display: block !important;
+	top: 0;
+	left:0;
+	right:0;
+	height: dp(56);
+	background-color: white;
+	// border-radius: $borderRadius;
+	// transition: opacity 280ms $curve-standard;
+	// opacity:1;
+	.x-form-trigger {
+		height: dp(56);
+		&.x-form-clear-trigger::before {
+			font-size: dp(24);
 		}
 	}
-	
+	&.x-hide-display {
+		opacity:0;
+		pointer-events: none;
+	}
+	.x-btn {
+		position:absolute;
+		top: 0;
+		right: 0;
+		padding: 0;
+		margin: 0;
+	}
+	input {
+		width: 100%;
+		background: none;
+		height: dp(56);
+		border:0;
+		padding: 0 0 0 dp(8);
+		
+		&.x-form-invalid {
+			background-color: color($red,300);
+		}
+	}
 }
 
 
