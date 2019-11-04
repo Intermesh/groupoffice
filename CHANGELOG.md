@@ -1,5 +1,7 @@
+05-11-2019 6.4.73
 - Core: Updated Spanish translation
 - LDAP: Group sync failed on some servers that returned "memberuid".
+- Sieve: Don't autocreate missing mailboxes
 
 31-10-2019 6.4.72
 - Core: Use SQL_CALC_FOUND_ROWS to calculate total
@@ -400,6 +402,9 @@
 11-06-2019 6.4.21
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
+- Calendasr: Show unconfirmed holidays
+
+01-11-2019 6.3.84
 - Projects: Fixed activity sort in time tracking
 - Billing: Fixed total not always updating in expense dialog
 - Projects: Send contact ID when creating project from e-mail
