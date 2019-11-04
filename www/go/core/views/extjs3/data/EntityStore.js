@@ -525,17 +525,21 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					me.metaStore.setItem("notfound", me.notFound);									
 				}
 
-				for(var i = 0, l = response.list.length; i < l; i++) {
-					var id = response.list[i].id;
+				for(var i = 0, l = response.options.params.ids.length; i < l; i++) {
+					var id = response.options.params.ids[i];
 
 					delete me.pending[id];
 					if(response.notFound.indexOf(id) > -1) {
-						
-						me.scheduledPromises[id].reject({
+
+						var err = {
 							id: id,
 							entity: me.entity.name,
 							error: "Not found"
-						});	
+						};
+
+						console.warn(err);
+						
+						me.scheduledPromises[id].reject(err);	
 					} else
 					{
 						//this.data is filled with flux in the recieve() function.
