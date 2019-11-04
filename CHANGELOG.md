@@ -1,4 +1,5 @@
 05-11-2019 6.4.73
+- Core: Fixed error where grid would not load
 - Core: Updated Spanish translation
 - LDAP: Group sync failed on some servers that returned "memberuid".
 - Sieve: Don't autocreate missing mailboxes
