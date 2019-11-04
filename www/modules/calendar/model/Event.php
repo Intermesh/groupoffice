@@ -1528,19 +1528,11 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	
     $e->summary = (string) $this->name;
 		
-//		switch($this->owner_status){
-//			case Participant::STATUS_ACCEPTED:
-//				$e->status = "CONFIRMED";
-//				break;
-//			case Participant::STATUS_DECLINED:
-//				$e->status = "CANCELLED";
-//				break;
-//			default:
-//				$e->status = "TENTATIVE";
-//				break;			
-//		}
-		
-		$e->status = $this->status;
+		if($this->status == "NEEDS-ACTION"){
+			$e->status = "TENTATIVE";
+		}else{
+			$e->status = $this->status;
+		}	
 		
 		
 		$dateType = $this->all_day_event ? "DATE" : "DATETIME";
