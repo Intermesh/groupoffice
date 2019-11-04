@@ -255,8 +255,8 @@ class Sync extends Controller {
       $group->users = [];
     
 
-      $members = $this->getGroupMembers($record, $connection);      
-
+      $members = $this->getGroupMembers($record, $connection);    
+      
       foreach ($members as $u) {
         $user = \go\core\model\User::find(['id'])->where(['username' => $u['username']])->orWhere(['email' => $u['email']])->single();
         if (!$user) {
@@ -327,10 +327,12 @@ class Sync extends Controller {
   
   private function getGroupMembers(Record $record, Connection $ldapConn) {
     $members = [];
-    if (isset($record->memberuid)) {
-      //for openldap
-      return $record->memberuid;
-    } else if (isset($record->member)) {
+    // if (isset($record->memberuid)) {
+    //   //for openldap
+    //   return $record->memberuid;
+    // } else 
+    
+    if (isset($record->member)) {
       //for Active Directory
       foreach ($record->member as $username) {    
         go()->debug("Member: " . $username);  
