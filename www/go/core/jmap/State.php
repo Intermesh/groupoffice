@@ -37,7 +37,7 @@ class State extends AbstractState {
 		return $_COOKIE['accessToken'];
 	}
 	
-	/**
+	/**	
 	 *
 	 * @var Token 
 	 */
