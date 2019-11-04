@@ -598,6 +598,7 @@ class Installer {
 	}
 
 	public static function fixCollations() {
+		go()->getDbConnection()->exec("SET foreign_key_checks = 0");
 		$stmt = go()->getDbConnection()->query("SHOW TABLE STATUS");	
 		
 		foreach($stmt as $record){
@@ -634,6 +635,7 @@ class Installer {
 	
 			}	
 		}
+		go()->getDbConnection()->exec("SET foreign_key_checks = 1");
 	}
 
 }
