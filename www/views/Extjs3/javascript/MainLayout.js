@@ -429,6 +429,14 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			hideOnClick: true
 		});
 
+		if(GO.util.isMobileOrTablet()) {
+			this.startMenu.on("show", function() {
+				this.startMenu.setPosition(0,0);
+				this.startMenu.setWidth(Ext.getBody().getWidth());
+				this.startMenu.setHeight(Ext.getBody().getHeight());
+			}, this);
+		}
+
 		if (allPanels.length == 0) {
 			items = new Ext.Panel({
 				id: 'go-module-panel-' + GO.settings.start_module,

@@ -1,3 +1,7 @@
+- Core: System settings and My Account work on mobile
+- Address book: Edit form works on mobile
+- Core: Global search works on mobile
+
 05-11-2019 6.4.73
 - Core: Fixed error where grid would not load
 - Core: Updated Spanish translation
