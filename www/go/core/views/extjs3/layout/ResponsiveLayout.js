@@ -65,7 +65,7 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 	},
 	
 	getItemWidth : function(i, modeSwitched) {
-		if(typeof i.getLayout().isNarrow == "function" && i.getLayout().isNarrow()) {
+		if(i.getLayout && typeof i.getLayout().isNarrow == "function" && i.getLayout().isNarrow()) {
 			return i.initialConfig.narrowWidth || i.initialConfig.width;
 		} else
 		{			
@@ -123,7 +123,7 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 	
 	setChildWidths : function(ct, modeSwitched) {
 		ct.items.each(function (i) {			
-			if(i.rendered && typeof i.getLayout().isNarrow == "function" && i.getLayout().mode == "wide") {
+			if(i.rendered && i.getLayout && typeof i.getLayout().isNarrow == "function" && i.getLayout().mode == "wide") {
 				i.wideWidth = i.getWidth();
 			} else if(!i.wideWidth)
 			{
@@ -145,7 +145,9 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 		this.setItemSize(panel, this.getLayoutTargetSize());
 
 		this.setActiveItem(panel);
-		panel.doLayout();
+		if(panel.doLayout) {
+			panel.doLayout();
+		}
 	},
 	
 	
