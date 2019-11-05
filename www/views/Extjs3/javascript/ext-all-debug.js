@@ -40204,6 +40204,8 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
     
     autocomplete: "off",
 
+    placeholder: "",
+
     fieldClass : 'x-form-field',
     
     msgTarget : 'qtip',
@@ -40262,6 +40264,7 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
             }
 
             cfg.autocomplete = this.autocomplete;
+            cfg.placeholder = this.placeholder;
             
             this.autoEl = cfg;
         }

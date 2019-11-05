@@ -502,17 +502,19 @@ a {
 	top: 0;
 	left:0;
 	right:0;
-	height: dp(56);
-	background-color: white;
+	height: dp(64);
+	padding: dp(8);
+	@include var(background-color, c-primary);
 	// border-radius: $borderRadius;
 	// transition: opacity 280ms $curve-standard;
 	// opacity:1;
 	.x-form-trigger {
-		height: dp(56);
+		height: dp(48);
 		&.x-form-clear-trigger::before {
 			font-size: dp(24);
+			color: white;
 		}
-	}
+	}	
 	&.x-hide-display {
 		opacity:0;
 		pointer-events: none;
@@ -524,12 +526,18 @@ a {
 		padding: 0;
 		margin: 0;
 	}
+	.x-form-field-wrap {
+		margin: 0 auto;		
+	}
 	input {
 		width: 100%;
+		max-width: dp(800);
 		background: none;
-		height: dp(56);
+		height: dp(48);
 		border:0;
 		padding: 0 0 0 dp(8);
+		background-color: rgba(255,255,255,0.1);
+		color: white;
 		
 		&.x-form-invalid {
 			background-color: color($red,300);
