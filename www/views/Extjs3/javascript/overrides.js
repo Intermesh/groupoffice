@@ -680,19 +680,20 @@ Ext.override(Ext.Element, {
 			html = '<h1 style="margin-left:5px;font-size:16px;margin:10px 5px;">'+config.title+'</h1>'+html;
         
 		//Build our HTML document for the iframe
-		strHTML = String.format(
-			strTemplate
-			, Ext.isEmpty(this.printCSS)? '#': this.printCSS
-			, this.printTitle
-			, Ext.isIE? 'document.execCommand(\'print\');': 'window.print();'
-			, html
-			);
-        
-		var popup = window.open('about:blank');
-		if (!popup.opener) popup.opener = self
-		popup.document.write(strHTML);
-		popup.document.close();
-		popup.focus();
+		// strHTML = String.format(
+		// 	strTemplate
+		// 	, Ext.isEmpty(this.printCSS)? '#': this.printCSS
+		// 	, this.printTitle
+		// 	, Ext.isIE? 'document.execCommand(\'print\');': 'window.print();'
+		// 	, html
+		// 	);
+
+      go.print(html);
+		// var popup = window.open('about:blank');
+		// if (!popup.opener) popup.opener = self
+		// popup.document.write(strHTML);
+		// popup.document.close();
+		// popup.focus();
 	}
 });
 

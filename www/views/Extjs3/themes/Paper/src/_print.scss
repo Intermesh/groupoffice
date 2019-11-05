@@ -1,49 +1,52 @@
 // TODO: Breaks email print
-
-//  @media print {
-// 	@page {
-// 		margin: 10mm;
-// 		size: A4 landscape;
-// 	}
-// 	@page landscape {
-// 		size: A4 landscape;
-// 	}
-// 	body,html {
-// 		background-color:transparent;
-// 		margin:0;
-// 		padding:0;
-// 		max-height: 297mm;
-// 	}
-//   body *, html body * > * {
-// 		visibility: hidden !important;
-		
-// 		//max-width: 210mm;
-// 		box-sizing: border-box;
-// 		//max-height: 297mm;
-//   	}
-//   	#paper, #paper *, html body #paper * {
-// 		page-break-after: always;
-// 		page-break-inside: avoid;
-// 		visibility: visible !important;
-//   	}
-//   	#paper {
-// 		position:absolute !important;
-// 		box-shadow: none !important;
-// 		top:0;
-// 		left:0;
-// 		bottom:0;
-// 		right:0;
-// 		padding:0 !important;
-// 		margin: 0 !important;
-// 		-webkit-print-color-adjust: exact;
-// 	}
-// 	table {
-// 		border-collapse: collapse;
-// 	}
-// 	td,th {
-// 		padding: 0 dp(8);
-// 	}
-// 	th {
-// 		font-weight: bold;
-// 	}
-// }
+#paper { display:none;} 
+ @media print {
+	@page {
+		margin: 10mm;
+		size: A4;// portrait;
+	}
+	@page landscape {
+		size: A4 landscape;
+	}
+	body,html {
+		background-color:transparent;
+		font-size: 100%;
+		margin:0;
+		padding:0;
+		//overflow:visible !important;
+		//max-height: 297mm;
+		//max-width: 210mm;
+	}
+	body *, html body * > * {
+		visibility: hidden !important;
+		box-sizing: border-box;
+		//max-height: 297mm;
+  	}
+  	#paper, #paper *, html body #paper * {
+		page-break-after: always;
+		page-break-inside: avoid;
+		visibility: visible !important;
+  	}
+  	#paper {
+		display:block;
+		overflow:visible !important;
+		position:absolute !important;
+		box-shadow: none !important;
+		top:0;
+		left:0;
+		bottom:0;
+		right:0;
+		padding:0 !important;
+		margin: 0 !important;
+		//-webkit-print-color-adjust: exact; // turn this on to print background-color as well
+	}
+	table {
+		border-collapse: collapse;
+	}
+	td,th {
+		padding: 0 dp(8);
+	}
+	th {
+		font-weight: bold;
+	}
+}
