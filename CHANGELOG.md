@@ -2,6 +2,8 @@
 - Address book: Edit form works on mobile
 - Core: Global search works on mobile
 - Core: Start Menu full screen on mobile
+- Core: Fixed responsive issue where grid would become smaller then configured
+- Tickets: Works on mobile
 
 05-11-2019 6.4.73
 - Core: Fixed error where grid would not load

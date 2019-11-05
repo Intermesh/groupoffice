@@ -23,16 +23,21 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	},
 	
 	
-	setValue: function (value) {
+	setValue: function (value) {		
 
-		if(!this.hiddenName) {
+		//hack for old framework where relations are "0" instead of null.
+		if(value == "0" && this.store.entityStore) {
+			value = null;			
+		}
+		
+		if(!this.hiddenName || !value) {
 			return go.form.ComboBox.superclass.setValue.call(this, value);
 		}
 		
 		var me = this;
 
 		//create record from entity store if not exists
-		if (value && this.store.entityStore && this.store.entityStore.entity && !this.findRecord(me.valueField, value)) {
+		if (this.store.entityStore && this.store.entityStore.entity && !this.findRecord(me.valueField, value)) {
 
 			this.value = value;
 			
