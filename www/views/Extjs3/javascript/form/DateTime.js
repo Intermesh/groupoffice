@@ -353,7 +353,9 @@ Ext.ux.form.DateTime = Ext.extend(Ext.form.Field, {
      */
     ,getValue:function() {
         // create new instance of date
-        return this.dateValue ? new Date(this.dateValue) : '';
+        
+        var v = this.dateValue ? go.util.Format.dateToBrowserTZ(new Date(this.dateValue)) : null;
+        return v;
     } // eo function getValue
     // }}}
     // {{{
@@ -520,6 +522,7 @@ Ext.ux.form.DateTime = Ext.extend(Ext.form.Field, {
      * Sets the value of this field
      */
     ,setValue:function(val) {
+
         if(!val && true === this.emptyToNow) {
             this.setValue(new Date());
             return;
@@ -534,8 +537,9 @@ Ext.ux.form.DateTime = Ext.extend(Ext.form.Field, {
           val = new Date(val);
         }
         else if('string' === typeof val && this.hiddenFormat) {
-            val = Date.parseDate(val, this.hiddenFormat);
-        }
+
+            val = go.util.Format.parseDateUserTZ(val, this.hiddenFormat);
+        }            
         val = val ? val : new Date(1970, 0 ,1, 0, 0, 0);
         var da;
         if(val instanceof Date) {

@@ -4,6 +4,7 @@
 - Core: Start Menu full screen on mobile
 - Core: Fixed responsive issue where grid would become smaller then configured
 - Tickets: Works on mobile
+- Core: Sort custom filters alphabetically
 
 05-11-2019 6.4.73
 - Core: Fixed error where grid would not load
