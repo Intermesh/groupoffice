@@ -85,7 +85,8 @@ GO.mainLayout.on('render', function () {
 		items: [searchButton = new Ext.Button({
 				xtype: 'button',
 				iconCls: 'ic-search',
-				tooltip: t("Search"),
+				tooltip: t("Search") + " (" + (Ext.isMac ? '⌘' : 'CTRL') + ' + F)',
+				
 				handler: function () {
 					enableSearch();
 				},
@@ -100,6 +101,7 @@ GO.mainLayout.on('render', function () {
 		cls: 'search-field-wrap',
 		items: [
 			searchField = new go.search.SearchField({
+				
 				listeners: {
 					select: function(field, record) {
 						go.Entities.get(record.data.entity).goto(record.data.entityId);

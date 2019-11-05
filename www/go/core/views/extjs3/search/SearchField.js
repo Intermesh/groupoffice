@@ -1,8 +1,8 @@
 
-go.search.SearchField = Ext.extend(Ext.form.TriggerField,{
-  emptyText: t("Search"),
+go.search.SearchField = Ext.extend(Ext.form.TriggerField,{  
   hideLabel: true,
   anchor: "100%",
+  placeholder: t("Search"),
   validationEvent: false,
   validateOnBlur: false,
   triggerClass: 'x-form-clear-trigger',
@@ -25,7 +25,7 @@ go.search.SearchField = Ext.extend(Ext.form.TriggerField,{
 
   syncPanelSize : function() 
   {
-    this.panel.setWidth(this.getWidth());
+    this.panel.setWidth(this.getEl().getWidth());
     this.panel.setHeight(dp(500));
     this.panel.getEl().alignTo(this.getEl(), "tl-bl");
   },
