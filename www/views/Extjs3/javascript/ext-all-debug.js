@@ -15271,6 +15271,10 @@ Ext.extend(Ext.layout.BorderLayout.SplitRegion, Ext.layout.BorderLayout.Region, 
 
     
     onSplitMove : function(split, newSize){
+
+        //MS: for responsive layout
+        this.panel.wideWidth = newSize.width;
+
         var s = this.panel.getSize();
         this.lastSplitSize = newSize;
         if(this.position == 'north' || this.position == 'south'){

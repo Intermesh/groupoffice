@@ -212,7 +212,7 @@ GO.email.MessagesGrid = function(config){
 	if(!config.hideSearch)
 		this.getTopToolbar().add({
 				cls: 'go-narrow',
-				iconCls: "ic-arrow-back",
+				iconCls: "ic-menu",
 				handler: function () {
 					this.emailClient.treePanel.show();
 				},
