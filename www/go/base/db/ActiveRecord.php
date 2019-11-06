@@ -4441,7 +4441,17 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 		$isSearchCacheModel = ($this instanceof \GO\Base\Model\SearchCacheRecord);
 
-		if(!$this->hasLinks() && !$isSearchCacheModel)
+		$disableLinksFor = GO::config()->disable_links_for ? GO::config()->disable_links_for : array();
+		if (!is_array($disableLinksFor)) {
+			$disableLinksFor = [$disableLinksFor];
+		}
+
+		$linksDisabled = false;
+		if (in_array(self::className(), $disableLinksFor, true) || in_array(get_class($model), $disableLinksFor, true)) {
+			$linksDisabled = true;
+		}
+
+		if((!$this->hasLinks() && !$isSearchCacheModel) || $linksDisabled)
 			throw new \Exception("Links not supported by ".$this->className ());
 
 		if($this->linkExists($model))
