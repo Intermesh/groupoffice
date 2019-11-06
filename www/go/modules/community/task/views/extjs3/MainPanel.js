@@ -315,27 +315,8 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 									iconCls: 'ic-cloud-upload',
 									text: t("Import"),
 									handler: function() {
-										go.util.importFile(
-														'TasksTask', 
-														"text/vcalendar,text/csv",
-														//{taskId: 126},
-														{},
-														{
-															labels: {
-																start: t("start"),
-																due: t("due"),
-																completed: t("completed"),
-																title: t("title"),
-																description: t("description"),
-																status: t("status"),
-																priority: t("priority"),
-																percentageComplete: t("percentage completed"),
-																"alerts.remindDate": t("remind date"),
-																"alerts.remindTime": t("remind time"),
-																categories: t("categories")
-
-															}
-														});
+										var dlg = new go.modules.community.task.ChooseTasklistDialog();
+										dlg.show();
 									},
 									scope: this
 								},

@@ -142,9 +142,13 @@ class Task extends Entity {
 	 */							
 	protected $byDay = '';
 
-	protected $vcalendarBlobId;
-
 	protected $uri;
+
+	/**
+	 * 
+	 * @var int
+	 */	
+	public $vcalendarBlobId;
 
 
 	protected static function defineMapping() {
@@ -178,6 +182,10 @@ class Task extends Entity {
 		if($rrule !== null) {
 			$rrule = json_encode($rrule);
 		}
+		$this->recurrenceRule = $rrule;
+	}
+
+	public function setRecurrenceRuleEncoded($rrule) {
 		$this->recurrenceRule = $rrule;
 	}
 

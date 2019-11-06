@@ -16,5 +16,9 @@ return array (
   'remind date' => 'herinnering (datum)',
   'remind time' => 'herinnering (tijd)',
   'categories' => 'categorieën',
-  'Priority' => 'Prioriteit'
+  'Priority' => 'Prioriteit',
+  'Open file' => 'Open bestand',
+  'Tasklist not selected' => 'Takenlijst niet geselecteerd',
+  'You have not selected any tasklist. Select a tasklist before proceeding.' => 'Er is geen takenlijst geselecteerd. Selecteer een takenlijst om verder te gaan.',
+  'Choose a tasklist' => 'Kies een takenlijst'
 );

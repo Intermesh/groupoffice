@@ -14,6 +14,8 @@ use Sabre\VObject\Component\VCalendar as VCalendarComponent;
 use Sabre\VObject\Reader;
 use Sabre\VObject\Splitter\ICalendar as VCalendarSplitter;
 
+use function GuzzleHttp\json_encode;
+
 /**
  * VCalendar converter
  * 
@@ -88,8 +90,10 @@ class VCalendar extends AbstractConverter {
 								
 							}
 						}
+						if(!empty($allDays)) {
+							$newrrule .= "BYDAY=" . $allDays . ";";
+						}
 
-						$newrrule .= "BYDAY=" . $allDays . ";";
 
 					break;
 				}
@@ -152,102 +156,6 @@ class VCalendar extends AbstractConverter {
 		fputs($fp, "END:VCALENDAR\r\n");
 	}
 
-	/**
-	 * Parse a VObject to an task object
-	 * @param VCalendarComponent $VCalendarComponent
-	 * @param task $entity
-	 * @return task[]
-	 */
-	public function import(VCalendarComponent $VCalendarComponent, Task $task) {
-		$vtodo = $this->getVTodo($task);
-		$t = "";
-		// if ($VCalendarComponent->VERSION != "3.0") {
-		// 	$VCalendarComponent->convert(\Sabre\VObject\Document::VCalendar30);
-		// }
-		
-		// if (!isset($entity)) {
-		// 	$entity = new task();
-		// }
-		
-		// if(!$entity->hasUid() && isset($VCalendarComponent->uid)) {
-		// 	$entity->setUid((string) $VCalendarComponent->uid);
-		// }
-
-		// if(isset($VCalendarComponent->{"X_GO-GENDER"})) {
-		// 	$gender = (string) $VCalendarComponent->{"X_GO-GENDER"};
-		// 	switch ($gender) {
-		// 		case 'M':
-		// 		case 'F':
-		// 			$entity->gender = $gender;
-		// 			break;
-		// 		default:
-		// 			$entity->gender = null;
-		// 	}
-		// }
-
-		// if(isset($VCalendarComponent->{"X-ABShowAs"})) {
-		// 	$entity->isOrganization = $VCalendarComponent->{"X-ABShowAs"} == "COMPANY";
-		// }
-		
-		// if(isset($VCalendarComponent->{"X-GO-IS-ORGANIZATION"})) {
-		// 	$entity->isOrganization = !empty($VCalendarComponent->{"X-GO-IS-ORGANIZATION"});
-		// }
-
-		// $n = $VCalendarComponent->N->getParts();
-		// $entity->lastName = $n[0] ?? null;
-		// $entity->firstName = $n[1] ?? null;
-		// $entity->middleName = $n[2] ?? null;
-		// $entity->prefixes = $n[3] ?? null;
-		// $entity->suffixes = $n[4] ?? null;
-		// $entity->name = (string) $VCalendarComponent->FN ?? self::EMPTY_NAME;
-
-		// $this->importDate($entity, Date::TYPE_BIRTHDAY, $VCalendarComponent->BDAY);
-		// $this->importDate($entity, Date::TYPE_ANNIVERSARY, $VCalendarComponent->ANNIVERSARY);
-
-		// empty($VCalendarComponent->NOTE) ?: $entity->notes = (string) $VCalendarComponent->NOTE;
-		// $entity->emailAddresses = $this->importHasMany($entity->emailAddresses, $VCalendarComponent->EMAIL, EmailAddress::class, function($value) {
-		// 	return ['email' => (string) $value];
-		// });
-
-		// $entity->phoneNumbers = $this->importHasMany($entity->phoneNumbers, $VCalendarComponent->TEL, PhoneNumber::class, function($value) {
-		// 	return ['number' => (string) $value];
-		// });
-
-		// $entity->addresses = $this->importHasMany($entity->addresses, $VCalendarComponent->ADR, Address::class, function($value) {
-		// 	$a = $value->getParts();
-		// 	$addr = [];
-			
-		// 	//iOS Accepts street2 but sends back {street}\n{street2} in the street value :(
-		// 	if(empty($a[1])){
-		// 		$parts = explode("\n", $a[2]);
-		// 		if(count($parts) > 1) {
-		// 			$a[1] = array_pop($parts);
-		// 			$a[2] = implode("\n", $parts);
-		// 		}
-		// 	}			
-			
-		// 	$addr['street2'] = $a[1] ?? null;
-		// 	$addr['street'] = $a[2] ?? null;
-		// 	$addr['city'] = $a[3] ?? null;
-		// 	$addr['state'] = $a[4] ?? null;
-		// 	$addr['zipCode'] = $a[5] ?? null;
-		// 	$addr['country'] = $a[6] ?? null;
-		// 	return $addr;
-		// });
-
-		// $this->importPhoto($entity, $VCalendarComponent);
-
-		// if (!$entity->save()) {
-		// 	throw new Exception("Could not save task");
-		// }
-
-		// if(!$entity->isOrganization) {
-		// 	$this->importOrganizations($entity, $VCalendarComponent);
-		// }
-		
-		// return $entity;
-	}
-
 	public function getFileExtension() {
 		return 'ics';
 	}
@@ -261,34 +169,103 @@ class VCalendar extends AbstractConverter {
 		];
 		
 		$values = $params['values'] ?? [];
-		
-		if(!isset($values['taskId'])) {
-			$values['taskId'] = go()->getAuthState()->getUser(['taskSettings'])->taskSettings->default_tasklist_id;
-		}
-
+		$tasklistId = $values['tasklistId'];
 		$contents = $file->getContents();
 		
-		$splitter = new VCalendarSplitter(StringUtil::cleanUtf8($file->getContents()), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
+		$splitter = new VCalendarSplitter(StringUtil::cleanUtf8($contents), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 
 		while ($VCalendarComponent = $splitter->getNext()) {
 			
-			$dtstamp = $VCalendarComponent->VTODO->DTSTAMP;
-			$uid = $VCalendarComponent->VTODO->UID;
-			$priority = $VCalendarComponent->VTODO->PRIORITY;
-			$categories = $VCalendarComponent->VTODO->CATEGORIES;
-			$summary = $VCalendarComponent->VTODO->SUMMARY;
-			$start = $VCalendarComponent->VTODO->START;
+			$uid = (string)$VCalendarComponent->VTODO->UID;
+			$priority = (string)$VCalendarComponent->VTODO->PRIORITY;
+			$summary = (string)$VCalendarComponent->VTODO->SUMMARY;
+			$start = $VCalendarComponent->VTODO->DTSTART;
 			$due = $VCalendarComponent->VTODO->DUE;
-			$description = $VCalendarComponent->VTODO->DESCRIPTION;
-			$recurrenceRule = $VCalendarComponent->VTODO->RECURRENCERULE;
-			$created = $VCalendarComponent->VTODO->CREATED;
-			$response['errors'][] = "test " . $categories;
+			$description = (string)$VCalendarComponent->VTODO->DESCRIPTION;
+			$categories = (string)$VCalendarComponent->VTODO->CATEGORIES;
+			$rrule = (string)$VCalendarComponent->VTODO->RRULE;
+			$kvArr = [];
+			$rruleSplit = explode(";",$rrule);
+			if(is_array($rruleSplit)) {
+				foreach($rruleSplit as $keyValues) {
+					$rruleKeyValues = explode("=",$keyValues);
+					$key = $rruleKeyValues[0];
+					$value = $rruleKeyValues[1];
+					switch($key) {
+						case "FREQ":
+							$kvArr["frequency"] = $value;
+						break;
+						case "INTERVAL":
+						case "COUNT":
+							$kvArr[strtolower($key)] = (int)$value;
+						break;
+						case "UNTIL":
+							$kvArr[strtolower($key)] = $value;
+						break;
+						case "BYDAY":
+							$allDays = [];
+							$daysArr = explode(",",$value);
 
+							if(is_array($daysArr)) {
+								foreach($daysArr as $day) {
+									// contains the day and position
+									if(strlen($day) > 2) {
+										$allDays["day"] = substr($day,1,2);
+										$allDays["position"] = substr($day,0,1);
+									} else {
+										$allDays["day"] = substr($day,0,2);
+										$allDays["position"] = -1;
+									}
+									
+									$byDaysArr[] = $allDays;
+
+									if(!empty($allDays)) {
+										$kvArr["byDay"] = $byDaysArr;
+										$kvArr["bySetPosition"] = $allDays["position"];
+									}
+								}
+							}
+
+						break;
+					}
+				}
+			}
+			
+			$taskValues = [
+				"uid" => $uid,
+				"tasklistId" => $tasklistId,
+				"start" => $start,
+				"due" => $due,
+				"title" => $summary,
+				"description" => $description,
+				"priority" => $priority
+			];
+			
 			try {
-				$task = $this->findOrCreatetask($VCalendarComponent, $values['taskId']);
-				$task->setValues($values);
-				$this->import($VCalendarComponent, $task);
-				$response['ids'][] = $task->id;
+				$task = $this->findTask($VCalendarComponent, $tasklistId);
+				// no task found
+				if(!$task) {
+					$task = new Task();
+					$encodedRrule = json_encode($kvArr);
+					$task->setRecurrenceRuleEncoded($encodedRrule);
+					$task->setValues($taskValues);
+					$task->save();
+					$taskId = $task->id;
+					$categoryNames = explode(",",$categories);
+					foreach($categoryNames as $categoryName) {
+						$categoryId = (int) go()->getDbConnection()->selectSingleValue('id')->from('task_category')->where(['name' => $categoryName])->execute()->fetch();
+						if($categoryId > 0) {
+							$data = [
+								'taskId'=> $taskId,
+								'categoryId'=>$categoryId
+							];
+							go()->getDbConnection()->insert("task_task_category", $data)->execute();
+						}
+					}
+				} else {
+					continue;
+				}
+
 			}
 			catch(\Exception $e) {
 				ErrorHandler::logException($e);
@@ -305,20 +282,16 @@ class VCalendar extends AbstractConverter {
 	 * @param int $taskId
 	 * @return Task
 	 */
-	private function findOrCreatetask(VCalendarComponent $VCalendarComponent, $taskId) {
+	private function findtask(VCalendarComponent $VCalendarComponent, $tasklistId) {
 			$task = false;
 
 			if(isset($VCalendarComponent->VTODO->uid)) {
-				$task = Task::find()->where(['tasklistId' => $taskId, 'uid' => (string) $VCalendarComponent->VTODO->uid])->single();
-			}
-			
-			if(!$task) {
-				$task = new Task();				
+				$task = Task::find()->where(['tasklistId' => $tasklistId, 'uid' => (string) $VCalendarComponent->VTODO->uid])->single();
 			}
 			
 			//Serialize data to store VCalendar
-			$blob = $this->saveBlob($VCalendarComponent);			
-			$task->VCalendarBlobId = $blob->id;
+			// $blob = $this->saveBlob($VCalendarComponent);			
+			// $task->VCalendarBlobId = $blob->id;
 			
 			return $task;
 	}
@@ -328,15 +301,15 @@ class VCalendar extends AbstractConverter {
 	 * @return Blob
 	 * @throws Exception
 	 */
-	private function saveBlob(VCalendarComponent $VCalendarComponent){
-		$blob = Blob::fromString($VCalendarComponent->serialize());
-		$blob->type = 'text/VCalendar';
-		$blob->name = ($VCalendarComponent->uid ?? 'nouid' ) . '.ics';
-		if(!$blob->save()) {
-			throw new \Exception("could not save VCalendar blob");
-		}
+	// private function saveBlob(VCalendarComponent $VCalendarComponent){
+	// 	$blob = Blob::fromString($VCalendarComponent->serialize());
+	// 	$blob->type = 'text/VCalendar';
+	// 	$blob->name = ($VCalendarComponent->uid ?? 'nouid' ) . '.ics';
+	// 	if(!$blob->save()) {
+	// 		throw new \Exception("could not save VCalendar blob");
+	// 	}
 		
-		return $blob;
-	}
+	// 	return $blob;
+	// }
 
 }

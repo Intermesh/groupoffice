@@ -1,8 +1,6 @@
 <?php
 
 use GO\Base\Util\Icalendar\Rrule;
-use go\core\db\Column;
-
 
 $updates = [];
 
