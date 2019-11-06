@@ -11263,6 +11263,12 @@ Ext.Component = function(config){
     this.initialConfig = config;
 
     Ext.apply(this, config);
+
+
+    if(config.mobile && GO.util.isMobileOrTablet()) {
+        Ext.apply(this, config.mobile);
+    }
+
     this.addEvents(
         
         'added',
@@ -15265,6 +15271,10 @@ Ext.extend(Ext.layout.BorderLayout.SplitRegion, Ext.layout.BorderLayout.Region, 
 
     
     onSplitMove : function(split, newSize){
+
+        //MS: for responsive layout
+        this.panel.wideWidth = newSize.width;
+
         var s = this.panel.getSize();
         this.lastSplitSize = newSize;
         if(this.position == 'north' || this.position == 'south'){
@@ -40204,6 +40214,8 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
     
     autocomplete: "off",
 
+    placeholder: "",
+
     fieldClass : 'x-form-field',
     
     msgTarget : 'qtip',
@@ -40262,6 +40274,7 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
             }
 
             cfg.autocomplete = this.autocomplete;
+            cfg.placeholder = this.placeholder;
             
             this.autoEl = cfg;
         }

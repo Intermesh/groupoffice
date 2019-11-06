@@ -1,7 +1,7 @@
 go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 	type: 'responsive',
 
-	monitorResize: true,
+	monitorResize: !GO.util.isMobileOrTablet(),
 
 /**
  * Defaults to the first added item. Only used in narrow mode
@@ -15,7 +15,7 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 	 */
 	triggerWidth: 1200,
 
-	wideWidth: null,
+	// wideWidth: null,
 	
 	/**
 	 * If narrow width is supplied the container will be resized to it when switching to narrow mode
@@ -34,29 +34,28 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 			this.initialized = true;
 
 			//make sure activeitem is normalized to a component
-			this.activeItem = this.container.getComponent(this.activeItem);
+			this.activeItem = this.container.getComponent(this.activeItem);			
 			
-			
+			//make sure border layout is initialized
+			go.layout.ResponsiveLayout.superclass.onLayout.call(this, ct, target);		
+
+			//Needed to make modification in Ext.layout.BorderLayout.SplitRegion.onSplitMove too.
 			ct.items.each(function (i) {
 				i.on('beforeshow', this.onBeforeShow, this);
+				i.on('show', this.onPanelShow, this);
+				i.wideWidth = i.width;		
 			}, this);
-			//make sure border layout is initialized
-			go.layout.ResponsiveLayout.superclass.onLayout.call(this, ct, target);
 		}
 		
-		var willBeWide =window.innerWidth > this.triggerWidth;
-		var isWide = this.mode == 'wide';
+		var willBeWide = window.innerWidth > this.triggerWidth;
+		this.setChildWidths(ct);
 		
-		this.setChildWidths(ct, willBeWide != isWide);
-
 		if (willBeWide) {
 			this.setWideLayout(ct, target);
 		} else
 		{
 			this.setNarrowLayout(ct, target);
 		}
-		
-		
 
 	},
 	
@@ -64,15 +63,13 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 		return window.innerWidth <= this.triggerWidth;
 	},
 	
-	getItemWidth : function(i, modeSwitched) {
-		if(typeof i.getLayout().isNarrow == "function" && i.getLayout().isNarrow()) {
-			return i.initialConfig.narrowWidth || i.initialConfig.width;
+	getItemWidth : function(i) {
+		
+		if(i.getLayout && typeof i.getLayout().isNarrow == "function" && i.getLayout().isNarrow()) {
+			return i.initialConfig.narrowWidth || i.wideWith;
 		} else
-		{			
-			if(!i.rendered) {
-				return i.initialConfig.width;
-			}	
-			return modeSwitched ? i.wideWidth : i.getWidth();
+		{
+			return i.wideWidth;
 		}
 			
 	},
@@ -86,12 +83,21 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 				if (i.hidden) {
 					i.show();
 				}
-				i.stateful = true;
+				// i.stateful = true;
 			}, this);		
+
+			ct.cascade(function(i) {	
+				
+				if(i.origStateFul) {
+					i.stateful = i.origStateful;
+				}	
+				return true;
+			}, this);
+			
 			ct.stateful = true;
 		}		
 		
-		go.layout.ResponsiveLayout.superclass.onLayout.call(this, ct, target);
+		go.layout.ResponsiveLayout.superclass.onLayout.call(this, ct, target);		
 
 	},
 
@@ -99,37 +105,38 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 		
 //		console.log(ct.getId(), "narrow");
 		//turn into cards
-		ct.stateful = false;
+		ct.stateful = false;		
 	
 		if (this.mode != 'narrow') {
 			this.mode = 'narrow';
-			//ct.setWidth(this.narrowWidth);
+
+			ct.cascade(function(i) {
+				i.origStateFul = i.stateful;
+				i.stateful = false;
+				return true;
+			}, this);
+
 			ct.addClass('go-narrow');
 			
-			ct.items.each(function (i) {			
-				//disable state
-				i.stateful = false;
-			//	i.hideMode = "offsets";					
-				
+			ct.items.each(function (i) {
 				if(!i.hidden) {
 					i.hide();
 				}
-			}, this);			
+			}, this);					
+			
 		}
 		
 		this.activeItem.show();
 		
 	},
 	
-	setChildWidths : function(ct, modeSwitched) {
+	setChildWidths : function(ct) {
 		ct.items.each(function (i) {			
-			if(i.rendered && typeof i.getLayout().isNarrow == "function" && i.getLayout().mode == "wide") {
-				i.wideWidth = i.getWidth();
-			} else if(!i.wideWidth)
-			{
-				i.wideWidth = i.initialConfig.width;
-			}
-			i.setWidth(this.getItemWidth(i, modeSwitched));
+			var w = this.getItemWidth(i);							
+			i.setWidth(w);
+			
+			i.setHeight(ct.getHeight());
+			
 		}, this);
 	},
 
@@ -145,7 +152,13 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 		this.setItemSize(panel, this.getLayoutTargetSize());
 
 		this.setActiveItem(panel);
-		panel.doLayout();
+		
+	},
+
+	onPanelShow: function(panel) {
+		if(panel.doLayout) {
+			panel.doLayout();
+		}
 	},
 	
 	

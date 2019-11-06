@@ -32,6 +32,9 @@
 						valueField: 'value',
 						displayField: 'display',
 						width: dp(140),
+						mobile: {
+							width: dp(100)
+						},
 						value: "work"
 					},
 					{

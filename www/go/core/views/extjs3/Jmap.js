@@ -314,6 +314,8 @@ go.Jmap = {
 								o.callback.call(o.scope, o, success, response[1], response[2]);
 							}
 
+							response[1].options = o;
+
 							if(success) {							
 								o.resolve(response[1]);
 							} else{

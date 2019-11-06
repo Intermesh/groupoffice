@@ -36,6 +36,28 @@
 	
 	go.util.Format = {
 
+		parseDateUserTZ: function(v, format) {
+			var date = Date.parseDate(v, format);
+			if(!date) {
+				return false;
+			}
+
+			var local = date.toLocaleString("en-US", {timeZone: go.User.timezone});					
+			return new Date(local);			
+		},
+
+		dateToBrowserTZ : function(v) {			
+
+			var local = v.toLocaleString("en-US", {timeZone: go.User.timezone});					
+			var time = v.getTime();
+			 
+			var diff = time - new Date(local).getTime();
+
+			var browsertz = new Date(time + diff);
+
+			return browsertz;
+		},
+
 		htmlEncode  : function(v) {
 
 			if(Ext.isArray(v)) {
@@ -118,7 +140,7 @@
 		 * @returns {String}
 		 */
 		date : function(v) {
-			v = checkDate(v);
+			//v = checkDate(v);
 			if(!v) {
 				return "-";
 			}

@@ -397,6 +397,7 @@ Ext.TaskMgr.start({
  */
 Ext.override(Ext.FormPanel,{
 	initComponent : Ext.FormPanel.prototype.initComponent.createSequence(function(){
+
 		this.on('actioncomplete', function(form, action){
 			if(action.type=='load'){
 				form.items.each(function(field){
@@ -1093,3 +1094,11 @@ Ext.override(Ext.grid.GridView, {
 			this.scrollToTopOnLoad=true;
 	}
 });
+
+
+
+if(GO.util.isMobileOrTablet()) {
+	Ext.override(Ext.Container, {
+		labelAlign: "top"
+	});
+}

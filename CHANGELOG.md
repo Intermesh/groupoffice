@@ -1,4 +1,13 @@
+- Core: System settings and My Account work on mobile
+- Address book: Edit form works on mobile
+- Core: Global search works on mobile
+- Core: Start Menu full screen on mobile
+- Core: Fixed responsive issue where grid would become smaller then configured
+- Tickets: Works on mobile
+- Core: Sort custom filters alphabetically
+
 05-11-2019 6.4.73
+- Core: Fixed error where grid would not load
 - Core: Updated Spanish translation
 - LDAP: Group sync failed on some servers that returned "memberuid".
 - Sieve: Don't autocreate missing mailboxes
