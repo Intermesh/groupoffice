@@ -20,8 +20,7 @@ CREATE TABLE `task_tasklist` (
 ALTER TABLE `task_tasklist`
   ADD PRIMARY KEY (`id`),
   ADD KEY `fkCreatedBy` (`createdBy`),
-  ADD KEY `fkAcl` (`aclId`),
-  ADD KEY `fkFilesFolder` (`filesFolderId`);
+  ADD KEY `fkAcl` (`aclId`);
 
 ALTER TABLE `task_tasklist`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
@@ -61,12 +60,12 @@ CREATE TABLE `task_task` (
   `completed` datetime DEFAULT NULL,
   `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `description` text COLLATE utf8mb4_unicode_ci,
-  `status` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `recurrenceRule` varchar(400) COLLATE utf8mb4_unicode_ci DEFAULT '',
   `filesFolderId` int(11) NOT NULL DEFAULT '0',
   `priority` int(11) NOT NULL DEFAULT '1',
   `percentageComplete` tinyint(4) NOT NULL DEFAULT '0',
-  `projectId` int(11) NOT NULL DEFAULT '0'
+  `projectId` int(11) NOT NULL DEFAULT '0',
+  `uri` varchar(190) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 ALTER TABLE `task_task`
@@ -114,7 +113,7 @@ ALTER TABLE `task_alert`
   ADD KEY `fkTaskId` (`taskId`);
 
 ALTER TABLE `task_alert`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `task_alert`
   ADD CONSTRAINT `fkTaskId` FOREIGN KEY (`taskId`) REFERENCES `task_task` (`id`) ON DELETE CASCADE;
@@ -143,12 +142,11 @@ CREATE TABLE `task_settings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 ALTER TABLE `task_settings`
-  ADD PRIMARY KEY (`createdBy`),
-  ADD KEY `defaultTasklistId` (`defaultTasklistId`);
+  ADD PRIMARY KEY (`createdBy`);
 
 ALTER TABLE `task_settings`
-  ADD CONSTRAINT `task_settings_ibfk_1` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`),
-  ADD CONSTRAINT `task_settings_ibfk_2` FOREIGN KEY (`defaultTasklistId`) REFERENCES `ta_tasklists` (`id`);
+  ADD CONSTRAINT `task_settings_ibfk_1` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`);
+
 -- create task custom field table
 CREATE TABLE `task_tasks_custom_field` (
   `id` int(11) NOT NULL

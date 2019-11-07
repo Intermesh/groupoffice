@@ -4,24 +4,12 @@ use GO\Base\Util\Icalendar\Rrule;
 
 $updates = [];
 
-$updates['201909041130'][] = function() {
+$updates['201911061630'][] = function() {
 	\go\core\db\Utils::runSQLFile(\GO()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/task/install/install.sql"));
 };
 
 // insert function
-$updates['201909041130'][] = function(){
-
-	$stmt =\GO::getDbConnection()->query("SELECT * FROM ta_settings");
-
-	while($row = $stmt->fetch()){
-		$data = [];
-		$data['createdBy'] = $row["user_id"];
-		$data['reminderDays'] = $row["reminder_days"];
-		$data['reminderTime'] = $row["reminder_time"];
-		$data['remind'] = $row["remind"];
-		$data['defaultTasklistId'] = $row["default_tasklist_id"];
-		GO()->getDbConnection()->insert('task_settings', $data)->execute();
-	}
+$updates['201911061630'][] = function(){
 
 	$stmt =\GO::getDbConnection()->query("SELECT * FROM ta_portlet_tasklists");
 
@@ -53,6 +41,18 @@ $updates['201909041130'][] = function(){
 		GO()->getDbConnection()->insert('task_tasklist', $data)->execute();
 	}
 
+	$stmt =\GO::getDbConnection()->query("SELECT * FROM ta_settings");
+
+	while($row = $stmt->fetch()){
+		$data = [];
+		$data['createdBy'] = $row["user_id"];
+		$data['reminderDays'] = $row["reminder_days"];
+		$data['reminderTime'] = $row["reminder_time"];
+		$data['remind'] = $row["remind"];
+		$data['defaultTasklistId'] = $row["default_tasklist_id"];
+		GO()->getDbConnection()->insert('task_settings', $data)->execute();
+	}
+
 	$stmt =\GO::getDbConnection()->query("SELECT * FROM ta_categories");
 
 	while($row = $stmt->fetch()){
@@ -81,7 +81,6 @@ $updates['201909041130'][] = function(){
 		$data['completed'] = DateTime::createFromFormat( 'U', $row["completion_time"]);
 		$data['title'] = $row["name"];
 		$data['description'] = $row["description"];
-		$data['status'] = $row["status"];
 		$data['recurrenceRule'] = str_replace($needles,$haystack,$row["rrule"]);
 		$data['filesFolderId'] = $row["files_folder_id"];
 		$data['priority'] = $row["priority"];
