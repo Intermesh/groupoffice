@@ -5,6 +5,7 @@ namespace go\core\db;
 use Exception;
 use go\core\db\Column;
 use go\core\db\Criteria;
+use go\core\util\ArrayUtil;
 
 /**
  * QueryBuilder
@@ -152,12 +153,12 @@ class QueryBuilder {
 			$sql .= ' ' . $build['sql'];
 			$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
 		} else {
-
-			if(!isset($data[0])) {
+			if(ArrayUtil::isAssociative($data)) {
 				$data = [$data];
 			}
 			if(empty($columns)) {
-				$columns = array_keys($data[0]);
+				reset($data);
+				$columns = array_keys(current($data));
 			}
 			$sql .= " (\n\t`" . implode("`,\n\t`", $columns) . "`\n)\n" .
 				"VALUES \n";

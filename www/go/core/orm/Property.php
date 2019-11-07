@@ -1015,7 +1015,7 @@ abstract class Property extends Model {
 		$this->relatedValidationErrorIndex = 0;
 
 
-		$this->removeRelated($relation, $models);
+		$this->removeRelated($relation, $models, $modified[$relation->name][1]);
 		
 		//set state to new for all models. Models could have been saved if save() is called multiple times.
 		$models = array_map(function($model) {
@@ -1045,7 +1045,7 @@ abstract class Property extends Model {
 		return true;
 	}
 
-	private function removeRelated(Relation $relation, $models) {
+	private function removeRelated(Relation $relation, $models, $oldModels) {
 		$cls = $relation->entityName;
 		$tables = $cls::getMapping()->getTables();
 		$first = array_shift($tables);
@@ -1053,27 +1053,54 @@ abstract class Property extends Model {
 		$where = $this->buildRelationWhere($relation);
 
 		$query = new GoQuery();
-		$query->where($where)->debug();
+		$query->where($where);
 
 		if($relation->type == Relation::TYPE_MAP) {
 		
-			$keepKeys = new Criteria();
-			foreach ($models as $keep) {
+			// $keepKeys = new Criteria();
+			// foreach ($models as $keep) {
 
-				if($keep === null) {
-					//deleted model
+			// 	if($keep === null) {
+			// 		//deleted model
+			// 		continue;
+			// 	}
+
+			// 	if(!$keep->isNew()) {
+			// 		$keepKeys->orWhere($keep->primaryKeyValues());
+			// 	}
+			// }
+			// if($keepKeys->hasConditions()) {
+			// 	$query->andWhereNot($keepKeys);
+			// }
+
+			$keepKeys = array_map(function($model){return isset($model) ? $model->id() : '-';}, $models);
+			$removeKeys = new Criteria();
+			$pk = $cls::getPrimaryKey();
+			foreach($oldModels as $model) {
+				$id = $model->id();
+				if(in_array($id, $keepKeys)) {
 					continue;
 				}
 
-				if(!$keep->isNew()) {
-					$keepKeys->orWhere($keep->primaryKeyValues());
+				$diff = array_diff($pk, array_values($relation->keys));
+				$where = [];
+				foreach($diff as $key) {
+					$where[$key] = $model->$key;
 				}
+				$removeKeys->orWhere($where);
 			}
-			if($keepKeys->hasConditions()) {
-				$query->andWhereNot($keepKeys);
+
+			if(!$removeKeys->hasConditions()) {
+				return true;
 			}
+
+			$query->andWhere($removeKeys);
+
+			
 		}
-		\go()->getDbConnection()->delete($first->getName(), $query)->execute();	
+		$stmt = \go()->getDbConnection()->delete($first->getName(), $query);	
+
+		return $stmt->execute();
 	}
 
 	private function saveRelatedScalar(Relation $relation) {
@@ -1081,26 +1108,32 @@ abstract class Property extends Model {
 		if(empty($modified)) {
 			return true;
 		}
-
+	
 		$where = $this->buildRelationWhere($relation);
 
 		$key = $this->getScalarKey($relation);
-
-		$query = (new GoQuery())->where($where);
-		
-		$keepIds = $this->{$relation->name};
-		if(!empty($keepIds)) {
-			$query->andWhere($key, 'NOT IN', $keepIds);
+		$old = $modified[$relation->name][1] ?? [];
+		$new = $modified[$relation->name][0] ?? [];
+		$removeIds = array_diff($old, $new);
+		if(!empty($removeIds)) {
+			
+			$query = (new GoQuery())->where($where);
+			$query->andWhere($key, 'IN', $removeIds);
+			if(!go()->getDbConnection()->delete($relation->tableName, $query)->execute()) {
+				throw new \Exception("Could not delete scalar relation ids");
+			}
 		}
 
-		go()->getDbConnection()->delete($relation->tableName, $query)->execute();
+		$insertIds = array_diff($new, $old);
 
-		if(!empty($keepIds)) {
+		if(!empty($insertIds)) {
 			$data = array_map(function($v) use($key, $where) {
 				return array_merge($where, [$key => $v]);
-			}, $keepIds);
+			}, $insertIds);	
 
-			go()->getDbConnection()->insertIgnore($relation->tableName, $data)->execute();
+			if(!go()->getDbConnection()->insert($relation->tableName, $data)->execute()) {
+				throw new \Exception("Could not insert scalar relation ids");
+			}
 		}
 
 		return true;
@@ -1118,7 +1151,7 @@ abstract class Property extends Model {
 		$models = $this->{$relation->name} ?? [];		
 		$this->relatedValidationErrorIndex = 0;
 		
-		$this->removeRelated($relation, $models);		
+		$this->removeRelated($relation, $models, $modified[$relation->name][1]);		
 		
 		$this->{$relation->name} = [];
 		foreach ($models as $newProp) {
@@ -1654,7 +1687,8 @@ abstract class Property extends Model {
 
 				$this->$propName[$id] = $this->internalNormalizeRelation($relation, $patch);	
 
-				if(is_bool($patch)) {
+				// if(is_bool($patch)) {
+				if($relation->type == Relation::TYPE_MAP) {
 					//Only change key to values when using booleans. Key can also be made up by the client.
 					foreach($this->mapKeyToValues($id, $relation) as $key => $value) {
 						$this->$propName[$id]->$key = $value;
