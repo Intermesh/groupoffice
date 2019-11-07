@@ -274,6 +274,13 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 			var record = grid.getStore().getAt(rowIndex);			
 			this.dblClick(grid, record, rowIndex)		
 		}, this);
+
+		if(GO.util.isMobileOrTablet()) {
+			this.on('rowclick', function(grid, rowIndex){
+				var record = grid.getStore().getAt(rowIndex);			
+				this.dblClick(grid, record, rowIndex)		
+			}, this);
+		}
 	
 	},
 
