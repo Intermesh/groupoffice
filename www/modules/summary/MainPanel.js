@@ -50,11 +50,17 @@
 	  	},*/
 	  	{
 				columnWidth:.5,
+				mobile: {
+					columnWidth: 1,
+				},
 	      style:'padding:10px 0 10px 10px',
 	      border:false
 	  	},
 	  	{
 				columnWidth:.5,
+				mobile: {
+					columnWidth: 1,
+				},
 	      style:'padding:10px 10px 10px 10px',
 	      border:false
 	  	}];
