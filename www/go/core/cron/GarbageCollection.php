@@ -12,6 +12,7 @@ use go\core\db\Query;
 use go\core\event\EventEmitterTrait;
 use go\core\orm\EntityType;
 use GO\Base\Db\ActiveRecord;
+use go\core\auth\model\Token;
 use go\core\jmap\Entity;
 use go\core\orm\Query as GoQuery;
 use Throwable;
@@ -35,6 +36,8 @@ class GarbageCollection extends CronJob {
 		$this->blobs();
 		$this->change();
 		$this->links();
+
+		Token::collectGarbage();
 
 		$this->fireEvent(self::EVENT_RUN);
 	}

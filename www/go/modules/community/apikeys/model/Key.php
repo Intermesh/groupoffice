@@ -19,6 +19,7 @@ class Key extends \go\core\jmap\Entity {
 		if($this->isNew()) {
 			$token = new \go\core\auth\model\Token();
 			$token->userId = 1; //TODO make configurable
+			$token->expiresAt = null;
 			if(!$token->refresh()) {
 				$this->setValidationError('accessToken', \go\core\validate\ErrorCode::RELATIONAL, 'Could not save token');
 				return false;

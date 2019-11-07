@@ -27,3 +27,7 @@ ALTER TABLE `apikeys_key`
 --
 ALTER TABLE `apikeys_key`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+
+ALTER TABLE `apikeys_key` ADD FOREIGN KEY (`accessToken`) REFERENCES `core_auth_token`(`accessToken`) ON DELETE RESTRICT ON UPDATE RESTRICT;
+

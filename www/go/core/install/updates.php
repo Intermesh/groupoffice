@@ -635,3 +635,5 @@ $updates['201910101025'][] = "ALTER TABLE `core_search` CHANGE `keywords` `keywo
 
 $updates['201910101025'][] = "ALTER TABLE `core_search` DROP INDEX `name`;";
 $updates['201910101025'][] = "ALTER TABLE `core_search` ADD INDEX(`keywords`);";
+
+$updates['201911071025'][] = "ALTER TABLE `core_auth_token` CHANGE `expiresAt` `expiresAt` DATETIME NULL DEFAULT NULL;";
