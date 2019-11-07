@@ -9,6 +9,7 @@
 - Address book: Added street to filter options
 - Newsletters: Improved performance
 - Email: Save all attachements to items worked only one time
+- Core: Fixed AccesToken created from API-Key will expire after 1 week of inactivity #292
 
 05-11-2019 6.4.73
 - Core: Fixed error where grid would not load
