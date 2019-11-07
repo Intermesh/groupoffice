@@ -452,6 +452,13 @@ class Contact extends AclItemEntity {
 											
 											$criteria->where('adr.city', $comparator, $value);
 										})
+										->addText("street", function(Criteria $criteria, $comparator, $value, Query $query) {
+											if(!$query->isJoined('addressbook_address')) {
+												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
+											}
+											
+											$criteria->where('adr.street', $comparator, $value);
+										})
 										->addNumber("age", function(Criteria $criteria, $comparator, $value, Query $query) {
 											
 											if(!$query->isJoined('addressbook_date')) {

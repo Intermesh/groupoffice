@@ -5,6 +5,8 @@
 - Core: Fixed responsive issue where grid would become smaller then configured
 - Tickets: Works on mobile
 - Core: Sort custom filters alphabetically
+- Core: Fix for user timezones different then client OS
+- Address book: Added street to filter options
 
 05-11-2019 6.4.73
 - Core: Fixed error where grid would not load
