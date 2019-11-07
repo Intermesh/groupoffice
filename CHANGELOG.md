@@ -7,6 +7,7 @@
 - Core: Sort custom filters alphabetically
 - Core: Fix for user timezones different then client OS
 - Address book: Added street to filter options
+- Newsletters: Improved performance
 
 05-11-2019 6.4.73
 - Core: Fixed error where grid would not load
