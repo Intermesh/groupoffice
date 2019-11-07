@@ -9,7 +9,7 @@ use go\core\App;
 use go\core\cli\State;
 use GO\Base\Model\Module;
 
-$installDb = false;
+$installDb = true;
 
 $autoLoader = require(__DIR__ . "/../www/vendor/autoload.php");
 $autoLoader->add('go\\', __DIR__);
