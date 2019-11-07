@@ -403,43 +403,42 @@ a {
 	position: relative;
 	color: white;
 	@include var(background-color, c-primary);
-	+ .x-tab-panel {
-		> .x-tab-panel-header {
-			position: relative;
-			border-width: 0 0 0 0;
-			@include var(background-color, c-primary);
-			.x-tab-strip {
-				
-				&-active {
-					border-bottom-color: $cAccent;
-					color:white;
-					.x-tab-strip-text{ color:white;}
-				}
-				&-wrap { border: 0; }
+}
+.go-main-tab-panel.x-tab-panel {
+	> .x-tab-panel-header {
+		position: relative;
+		border-width: 0 0 0 0;
+		@include var(background-color, c-primary);
+		.x-tab-strip {
+			
+			&-active {
+				border-bottom-color: $cAccent;
+				color:white;
+				.x-tab-strip-text{ color:white;}
 			}
-			.x-tab-scroller-right, .x-tab-scroller-left {
-				color: white;
-			}
-			.x-tab-scroller-right-over, .x-tab-scroller-left-over {
-				color: white;
-			}
-			.x-tab-right { padding-left:0;}
-			.x-tab-strip {	border: 0; }
-			.x-tab-strip-text{
-				color:rgba(white, .5);
-				padding-left:0;
-			}
+			&-wrap { border: 0; }
 		}
-		.x-tab-panel-body{
-			background-color: color($bg, "background");
-			> .x-hide-display {
-				display:none !important;
-			}
+		.x-tab-scroller-right, .x-tab-scroller-left {
+			color: white;
+		}
+		.x-tab-scroller-right-over, .x-tab-scroller-left-over {
+			color: white;
+		}
+		.x-tab-right { padding-left:0;}
+		.x-tab-strip {	border: 0; }
+		.x-tab-strip-text{
+			color:rgba(white, .5);
+			padding-left:0;
 		}
 	}
-
-	
+	.x-tab-panel-body{
+		background-color: color($bg, "background");
+		> .x-hide-display {
+			display:none !important;
+		}
+	}
 }
+
 .go-grid3-hide-headers {
 	.x-panel-tbar {
 		border-bottom: dp(1) solid color($fg, "divider");

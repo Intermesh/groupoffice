@@ -104,7 +104,7 @@ echo 'window.name="' . GO::getId() . '";';
 if (isset(GO::session()->values['security_token']))
 	echo 'Ext.Ajax.extraParams={security_token:"' . GO::session()->values['security_token'] . '"};';
 
-GO::router()->getController()->fireEvent('inlinescripts');
+//GO::router()->getController()->fireEvent('inlinescripts');
 ?>
 </script>
 <?php
@@ -123,11 +123,16 @@ if ($cacheFile->exists()) {
 	//for t() function to auto detect module package and name
 	$scripts[] = "go.module='core';go.package='core';";
 	
-	$data = file_get_contents(GO::config()->root_path . 'views/Extjs3/javascript/scripts.txt');
-	$lines = array_map('trim', explode("\n", $data));
-	foreach ($lines as $line) {
-		if (!empty($line)) {
-			$scripts[] = new File(GO::config()->root_path . $line);
+	$bundleFile = new File(GO::config()->root_path . 'views/Extjs3/javascript/scripts.js');
+	if ($bundleFile->exists()) {
+		$scripts[] = $bundleFile;
+	} else {
+		$data = file_get_contents(GO::config()->root_path . 'views/Extjs3/javascript/scripts.txt');
+		$lines = array_map('trim', explode("\n", $data));
+		foreach ($lines as $line) {
+			if (!empty($line)) {
+				$scripts[] = new File(GO::config()->root_path . $line);
+			}
 		}
 	}
 
@@ -149,22 +154,26 @@ if ($cacheFile->exists()) {
 			
 			$scripts[] = 'Ext.ns("GO.' . $module->name  . '");';
 
-			if (!$scriptsFile || !file_exists($scriptsFile)) {
-				$scriptsFile = $modulePath . 'scripts.txt';
-				if (!file_exists($scriptsFile))
-					$scriptsFile = $modulePath . 'views/Extjs3/scripts.txt';
+			$bundleFile = new File($module->moduleManager->path() . 'views/extjs3/scripts.js');
+			if($bundleFile->exists()) {
+				$scripts[] = $bundleFile;
+			} else {
 
-				$prefix = "";
-			}
-			
-			
+				if (!$scriptsFile || !file_exists($scriptsFile)) {
+					$scriptsFile = $modulePath . 'scripts.txt';
+					if (!file_exists($scriptsFile))
+						$scriptsFile = $modulePath . 'views/Extjs3/scripts.txt';
 
-			if (file_exists($scriptsFile)) {
-				$data = file_get_contents($scriptsFile);
-				$lines = array_map('trim', explode("\n", $data));
-				foreach ($lines as $line) {
-					if (!empty($line)) {
-						$scripts[] = new File(GO::config()->root_path . $prefix . trim($line));
+					$prefix = "";
+				}
+				
+				if (file_exists($scriptsFile)) {
+					$data = file_get_contents($scriptsFile);
+					$lines = array_map('trim', explode("\n", $data));
+					foreach ($lines as $line) {
+						if (!empty($line)) {
+							$scripts[] = new File(GO::config()->root_path . $prefix . trim($line));
+						}
 					}
 				}
 			}
