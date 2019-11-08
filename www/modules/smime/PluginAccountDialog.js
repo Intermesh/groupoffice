@@ -86,7 +86,7 @@ GO.moduleManager.onModuleReady('email',function(){
 			}, this);
 								
 			this.propertiesPanel.form.on("actioncomplete", function(form, action){
-				console.log(action.result);
+				//console.log(action.result);
 				if(action.type=='submit'){
 					this.uploadFile.clearQueue();
 					
