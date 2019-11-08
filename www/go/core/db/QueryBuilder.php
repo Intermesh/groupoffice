@@ -54,13 +54,13 @@ class QueryBuilder {
 	 * 
 	 * @var int
 	 */
-	private static $paramCount = 0;
+	private $paramCount = 0;
 
 	/**
 	 * Prefix of the bind parameter tag
 	 * @var type
 	 */
-	private static $paramPrefix = ':go';
+	private $paramPrefix = ':go';
 
 	/**
 	 * Key value array with [tableAlias => Table()]
@@ -791,8 +791,8 @@ class QueryBuilder {
 	 * @param string The next available parameter prefix.
 	 */
 	private function getParamTag() {
-		self::$paramCount++;
-		return self::$paramPrefix . self::$paramCount;
+		$this->paramCount++;
+		return $this->paramPrefix . $this->paramCount;
 	}
 
 	private function join($config, $prefix) {

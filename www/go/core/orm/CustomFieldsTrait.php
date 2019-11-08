@@ -42,12 +42,23 @@ trait CustomFieldsTrait {
 		return $record;	
 	}
 
+	private static $preparedCustomFieldStmt = [];
+
 	protected function internalGetCustomFields() {
 		if(!isset($this->customFieldsData)) {
-			$record = (new Query())
+
+			if(!isset(self::$preparedCustomFieldStmt[$this->customFieldsTableName()])) {
+				self::$preparedCustomFieldStmt[$this->customFieldsTableName()] = (new Query())
 							->select('*')
 							->from($this->customFieldsTableName(), 'cf')
-							->where(['id' => $this->id])->single();
+							->where('cf.id = :id')
+							->createStatement();
+			}
+
+			$stmt = self::$preparedCustomFieldStmt[$this->customFieldsTableName()];
+			$stmt->bindValue(':id', $this->id);
+
+			$record = $stmt->fetch();
 			
 			$this->customFieldsIsNew = !$record;
 							

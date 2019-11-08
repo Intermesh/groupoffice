@@ -586,6 +586,7 @@ class Contact extends AclItemEntity {
 			$uid = substr($url, strpos($url, '://') + 3);
 			$uid = str_replace('/', '-', $uid );
 			$this->uid = $this->id . '@' . $uid;
+			$this->saveTables();
 		}
 
 		return $this->uid;		
@@ -669,10 +670,25 @@ class Contact extends AclItemEntity {
 	 */
 	public function findOrganizations(){
 		return self::find()
-						->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::entityType()->getId())
-						->where('fromId', '=', $this->id)
-							->andWhere('fromEntityTypeId', '=', self::entityType()->getId())
-							->andWhere('c.isOrganization', '=', true);
+			->where('fromId', '='. $this->id)
+			->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::entityType()->getId())		
+			->andWhere('fromEntityTypeId = '. self::entityType()->getId())
+			->andWhere('c.isOrganization = true');
+	}
+
+	private static $organizationIdsStmt;
+
+	private static function prepareFindOrganizations() {
+		if(!isset(self::$organizationIdsStmt)) {
+			self::$organizationIdsStmt = self::find()
+			->selectSingleValue('c.id')
+			->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::entityType()->getId())
+			->where('fromId = :contactId')
+				->andWhere('fromEntityTypeId = '. self::entityType()->getId())
+				->andWhere('c.isOrganization = true')
+				->createStatement();
+		}
+		return self::$organizationIdsStmt;
 	}
 	
 	private $organizationIds;
@@ -684,8 +700,9 @@ class Contact extends AclItemEntity {
 			if($this->isNew()) {
 				$this->organizationIds = [];
 			} else {
-				$query = $this->findOrganizations()->selectSingleValue('c.id');			
-				$this->organizationIds = $query->all();
+				$stmt = $this->prepareFindOrganizations();
+				$stmt->bindValue(':contactId', $this->id);	
+				$this->organizationIds = $stmt->fetchAll();
 			}
 		}		
 		

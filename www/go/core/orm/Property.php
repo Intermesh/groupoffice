@@ -187,7 +187,7 @@ abstract class Property extends Model {
 			switch($relation->type) {
 
 				case Relation::TYPE_HAS_ONE:
-					$prop = $this->isNew() ? null : $cls::internalFind()->andWhere($where)->single();				
+					$prop = $this->isNew() ? null : $this->queryRelation($cls, $where, $relation->name)->fetch();				
 					if(!$prop && $relation->autoCreate) {
 						$prop = new $cls;
 						$this->applyRelationKeys($relation, $prop);
@@ -196,12 +196,12 @@ abstract class Property extends Model {
 				break;
 
 				case Relation::TYPE_ARRAY:
-					$props = $this->isNew() ? [] : $cls::internalFind()->andWhere($where)->all();
+					$props = $this->isNew() ? [] : $this->queryRelation($cls, $where, $relation->name)->fetchAll();
 					$this->{$relation->name} = $props;
 				break;
 
 				case Relation::TYPE_MAP:
-					$values = $this->isNew() ? [] : $cls::internalFind()->andWhere($where)->all();
+					$values = $this->isNew() ? [] : $this->queryRelation($cls, $where, $relation->name)->fetchAll();
 					if(!count($values)) {
 						$this->{$relation->name} = [];
 						//$this->{$relation->name}->serializeJsonAsObject = true;
@@ -215,13 +215,64 @@ abstract class Property extends Model {
 					}
 				break;
 
-				case Relation::TYPE_SCALAR:
-					$key = $this->getScalarKey($relation);
-					$scalar = (new GoQuery)->selectSingleValue($key)->from($relation->tableName)->where($where)->all();
+				case Relation::TYPE_SCALAR:					
+					$scalar = $this->queryScalar($where, $relation)->fetchAll();
 					$this->{$relation->name} = $scalar;
 				break;
 			}
 		}
+	}
+
+	private static function queryScalar($where, $relation) {
+		$cacheKey = static::class.':'.$relation->name;
+
+		if(!isset(self::$cachedRelations[$cacheKey])) {
+			$key = self::getScalarKey($relation);
+			$query = (new GoQuery)->selectSingleValue($key)->from($relation->tableName);
+			foreach($where as $field => $value) {
+				$query->andWhere($field . '= :'.$field);
+			}
+			$stmt = $query->createStatement();
+			self::$cachedRelations[$cacheKey] = $stmt;
+		} else
+		{
+			$stmt = self::$cachedRelations[$cacheKey] ;
+		}
+
+		foreach($where as $field => $value) {
+			$stmt->bindValue(':'.$field, $value);
+		}
+
+		return $stmt;
+	}
+
+	/**
+	 * For reusing prepared statements
+	 */
+	private static $cachedRelations = [];
+
+	private static function queryRelation($cls, $where, $relationName) {
+
+		$cacheKey = static::class.':'.$relationName;
+
+		if(!isset(self::$cachedRelations[$cacheKey])) {
+			$query = $cls::internalFind();
+			foreach($where as $field => $value) {
+				$query->andWhere($field . '= :'.$field);
+			}
+			$stmt = $query->createStatement();
+			self::$cachedRelations[$cacheKey] = $stmt;
+		} else
+		{
+			$stmt = self::$cachedRelations[$cacheKey] ;
+		}
+
+		foreach($where as $field => $value) {
+			$stmt->bindValue(':'.$field, $value);
+		}
+
+		return $stmt;
+
 	}
 
 	private function buildRelationWhere(Relation $relation) {
@@ -231,7 +282,7 @@ abstract class Property extends Model {
 		}
 		return $where;
 	}
-	private function getScalarKey(Relation $relation) {
+	private static function getScalarKey(Relation $relation) {
 		$table = Table::getInstance($relation->tableName, go()->getDbConnection());
 		$diff = array_diff($table->getPrimaryKey(), $relation->keys);
 

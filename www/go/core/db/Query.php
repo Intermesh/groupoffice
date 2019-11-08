@@ -507,13 +507,8 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		return $this->dbConn;
 	}
 
-	/**
-	 * Executes the query and returns the statement
-	 * 
-	 * @return Statement Returns false on failure.
-	 */
-	public function execute() {
-		
+	public function createStatement() {
+
 		$queryBuilder = new QueryBuilder($this->getDbConnection());
 		$build = $queryBuilder->buildSelect($this);
 		$build['start'] = go()->getDebugger()->getTimeStamp();
@@ -524,8 +519,20 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 
 		$stmt = $this->getDbConnection()->createStatement($build);
 		call_user_func_array([$stmt, 'setFetchMode'], $this->getFetchMode());
-
 		$stmt->setQuery($this);		
+
+		return $stmt;
+	}
+
+	/**
+	 * Executes the query and returns the statement
+	 * 
+	 * @return Statement Returns false on failure.
+	 */
+	public function execute() {
+		
+		$stmt = $this->createStatement();	
+	
 		try {
 			$ret = $stmt->execute();
 			if (!$ret) {
