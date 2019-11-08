@@ -39,7 +39,7 @@ go.panels.ScrollLoader = {
 	
 	onRenderScrollLoader : function() {
 		if(this.isGridPanel()) {
-			this.on("bodyscroll", this.loadMore, this);
+			this.on("bodyscroll", this.loadMore, this, {buffer: 10});
 			
 			this.slScroller = this.getView().scroller.dom;
 			this.slBody = this.getView().mainBody.dom;
@@ -54,6 +54,14 @@ go.panels.ScrollLoader = {
 	isGridPanel : function() {
 		return this.getView && this.getView().scroller;
 	},
+
+	toggleLoadMask : function() {
+		// only show loadmask when 
+		console.warn((this.slScroller.offsetHeight + this.slScroller.scrollTop + 10), this.slBody.offsetHeight, (this.slScroller.offsetHeight + this.slScroller.scrollTop + 10) >= this.slBody.offsetHeight)
+		if(this.loadMask && (this.slScroller.offsetHeight + this.slScroller.scrollTop + 10) < this.slBody.offsetHeight) {
+			this.loadmask.disable();
+		}
+	},
 	
 	/**
 	 * Loads more data if the end off the scroll area is reached
@@ -64,8 +72,11 @@ go.panels.ScrollLoader = {
 		var store = this.store;
 		if (this.allRecordsLoaded || this.store.loading){
 			return;
-		}		
+		}	
 
+		var me = this;
+
+		
 		var scrollBoundary = this.slScroller.offsetHeight + 300;
 
 		if(this.scrollUp) {
@@ -80,12 +91,17 @@ go.panels.ScrollLoader = {
 
 				if(this.isGridPanel()) {
 					this.getView().scrollToTopOnLoad = false;
+					//this.toggleLoadMask();
 				}
-				store.load(o);
+				store.load(o).then(function() {
+					// if(me.loadMask) {
+					// 	me.loadMask.enable();
+					// }
+				});
 			}
 		} else {
 
-		
+			
 
 			var shouldLoad = (this.slScroller.offsetHeight + this.slScroller.scrollTop + scrollBoundary) >= this.slBody.offsetHeight;
 		
@@ -100,8 +116,13 @@ go.panels.ScrollLoader = {
 
 				if(this.isGridPanel()) {
 					this.getView().scrollToTopOnLoad = false;
+					// this.toggleLoadMask();
 				}
-				store.load(o);
+				store.load(o).then(function() {
+					// if(me.loadMask) {
+					// 	me.loadMask.enable();
+					// }
+				});
 
 			}
 		}
