@@ -157,9 +157,18 @@ class SearchController extends \GO\Base\Controller\AbstractModelController{
 		
 		$typesString = \GO::config()->get_setting('link_type_filter',\GO::user()->id);
 		$typesArr = explode(',',$typesString);
-		
+
+		$disableLinksFor = GO::config()->disable_links_for ? GO::config()->disable_links_for : array();
+		if (!is_array($disableLinksFor)) {
+			$disableLinksFor = [$disableLinksFor];
+		}
+
 		$types=array();
 		while($modelType = $stmt->fetch()){
+			if (count($disableLinksFor) && in_array($modelType->model_name, $disableLinksFor, true)) {
+				continue;
+			}
+
 			if(class_exists($modelType->model_name)){
 				$model = \GO::getModel($modelType->model_name);
 
