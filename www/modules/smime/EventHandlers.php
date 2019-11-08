@@ -50,7 +50,7 @@ class EventHandlers {
 
 		if (isset($certData))
 			$cert->cert = $certData;
-		if (!empty($params['delete_cert'])) {
+		if (!empty($params['delete_cert']) || empty($cert->cert)) {
 			//$cert->cert = null;
 			$cert->delete();
 		} else {
