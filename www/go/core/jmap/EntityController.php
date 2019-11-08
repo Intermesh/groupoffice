@@ -389,8 +389,10 @@ abstract class EntityController extends Controller {
 		if(isset($p['ids']) && !count($p['ids'])) {
 			return $result;
 		}
-		
+		go()->getDebugger()->debugTiming('before query');
 		$query = $this->getGetQuery($p);		
+
+		go()->getDebugger()->debugTiming('after query');
 			
 		$foundIds = [];
 		$result['list'] = [];
@@ -400,6 +402,8 @@ abstract class EntityController extends Controller {
 			$arr['id'] = $e->id();
 			$unsorted[$arr['id']] = $arr; 
 			$foundIds[] = $arr['id'];
+
+			go()->getDebugger()->debugTiming('item to array');
 		}
 
 		

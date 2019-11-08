@@ -685,7 +685,7 @@ class Contact extends AclItemEntity {
 				$this->organizationIds = [];
 			} else {
 				$query = $this->findOrganizations()->selectSingleValue('c.id');			
-				$this->organizationIds = array_map("intval", $query->all());
+				$this->organizationIds = $query->all();
 			}
 		}		
 		

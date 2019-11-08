@@ -450,12 +450,21 @@ abstract class Property extends Model {
 		return $props;
 	}	
 
+	private static $findCache = [];
+
 	/**
 	 * Find entities
 	 * 
 	 * @return static|Query
 	 */
 	protected static function internalFind(array $fetchProperties = []) {
+
+		$cacheKey = static::class . '-' . implode("-", $fetchProperties);
+
+		if(isset(self::$findCache[$cacheKey])) {
+			return clone self::$findCache[$cacheKey];
+		}
+
 		$tables = self::getMapping()->getTables();
 
 		if(empty($tables)) {
@@ -476,7 +485,10 @@ abstract class Property extends Model {
 		self::joinAdditionalTables($tables, $query);
 		self::buildSelect($query, $fetchProperties);
 
-		return $query;
+
+		self::$findCache[$cacheKey] = $query;
+
+		return clone $query;
 	}
 
 	/**
@@ -543,14 +555,15 @@ abstract class Property extends Model {
 		return $propNames;
 	}
 
-	private static function getRequiredProperties() {
+	private static function getRequiredProperties() {	
 
 		$cls = static::class;
+
 		$cacheKey = $cls . '-required-props';
 
 		$required = go()->getCache()->get($cacheKey);
 
-		if($required) {
+		if($required != false) {
 			return $required;
 		}
 

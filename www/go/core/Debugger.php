@@ -96,7 +96,7 @@ class Debugger {
 		if(!$this->enabled) {
 			return;
 		}
-		$time = $this->getTimeStamp() - $this->groupStartTime;
+		$time = (int) ($this->getTimeStamp() - $this->groupStartTime);
 		$this->currentGroup .= ', time: '.$time.'ms';
 
 		$this->entries[] = ['groupEnd', null];
@@ -105,9 +105,9 @@ class Debugger {
 	}
 
 	/**
-	 * Get time in milliseconds
+	 * Get time in seconds with microseconds
 	 * 
-	 * @return float Milliseconds
+	 * @return float seconds
 	 */
 	public function getMicroTime() {
 		// list ($usec, $sec) = explode(" ", microtime());
@@ -240,16 +240,16 @@ class Debugger {
 	 * @param string $message
 	 */
 	public function debugTiming($message) {
-		$this->debug($this->getTimeStamp() . 'ms ' . $message);
+		$this->debug((int) ($this->getTimeStamp()) . "ms ". $message);
 	}
 
 	/**
 	 * Get the ellapsed time since the start of the request in milliseconds
 	 * 
-	 * @return int milliseconds
+	 * @return float milliseconds
 	 */
 	public function getTimeStamp() {
-		return intval(($this->getMicroTime() - $_SERVER["REQUEST_TIME_FLOAT"])*1000);
+		return ($this->getMicroTime() * 1000) - ($_SERVER["REQUEST_TIME_FLOAT"] * 1000);
 	}
 
 	public function debugCalledFrom($limit = 10) {

@@ -11,6 +11,7 @@
 - Email: Save all attachements to items worked only one time
 - Core: Fixed AccesToken created from API-Key will expire after 1 week of inactivity #292
 - Time tracking: Works on mobile
+- Core: Smoother scrolling by preloading more.
 
 05-11-2019 6.4.73
 - Core: Fixed error where grid would not load

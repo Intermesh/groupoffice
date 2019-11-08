@@ -147,19 +147,6 @@ class Column {
 	const DATE_FORMAT = "Y-m-d";
 
 	/**
-	 * Default value of dates are stored as times. We must refresh them
-	 */
-	public function __wakeup() {
-		if (isset($this->default)) {
-			if ($this->dbType == 'date') {
-				$this->default = date(Column::DATE_FORMAT);
-			} else if ($this->dbType == 'datetime') {
-				$this->default = date(Column::DATETIME_FORMAT);
-			}
-		}
-	}
-	
-	/**
 	 * Get the SQL string to add / alter this field.
 	 * 
 	 * eg. "tinyint(1) NOT NULL DEFAULT '0'"
