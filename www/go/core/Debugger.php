@@ -110,6 +110,9 @@ class Debugger {
 	 * @return float seconds
 	 */
 	public function getMicroTime() {
+		if(!$this->enabled) {
+			return;
+		}
 		// list ($usec, $sec) = explode(" ", microtime());
 		// return ((float) $usec + (float) $sec);
 		return microtime(true);
@@ -240,6 +243,9 @@ class Debugger {
 	 * @param string $message
 	 */
 	public function debugTiming($message) {
+		if(!$this->enabled) {
+			return;
+		}
 		$this->debug((int) ($this->getTimeStamp()) . "ms ". $message);
 	}
 
@@ -249,10 +255,16 @@ class Debugger {
 	 * @return float milliseconds
 	 */
 	public function getTimeStamp() {
+		if(!$this->enabled) {
+			return;
+		}
 		return ($this->getMicroTime() * 1000) - ($_SERVER["REQUEST_TIME_FLOAT"] * 1000);
 	}
 
 	public function debugCalledFrom($limit = 10) {
+		if(!$this->enabled) {
+			return;
+		}
 
 		$this->debug("START BACKTRACE");
 		$trace = debug_backtrace();

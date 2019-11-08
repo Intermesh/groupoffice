@@ -77,6 +77,17 @@ class Language {
 		return go()->getSettings()->language; // from settings if we cant determine
 	}
 
+	private $af;
+	public function getAddressFormat($isoCode) {
+
+		if(!isset($this->af)) {
+			require(\go\core\Environment::get()->getInstallFolder() . '/language/addressformats.php');
+			$this->af = $af;
+		}
+
+		return isset($this->af[$isoCode]) ? $this->af[$isoCode] : $this->af['default'];
+	}
+
 	/**
 	 * Translates a language variable name into the local language.
 	 * 
@@ -109,6 +120,13 @@ class Language {
 		} 
 		
 		if(!isset($this->data[$package][$module])) {
+
+			$cacheKey = $this->isoCode .'-'.$package.'-'.$module;
+
+			$this->data[$package][$module] = go()->getCache()->get($cacheKey);
+			if($this->data[$package][$module]) {
+				return;
+			}
 			
 			$langData = new util\ArrayObject();
 			
@@ -158,7 +176,8 @@ class Language {
 								], $langData[$key]);
 			}
 
-			$this->data[$package][$module] = $langData->getArray();			
+			$this->data[$package][$module] = $langData->getArray();	
+			go()->getCache()->set($cacheKey, $this->data[$package][$module]);		
 		}
 	}
 	

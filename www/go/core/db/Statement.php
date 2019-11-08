@@ -73,7 +73,7 @@ class Statement extends \PDOStatement implements \JsonSerializable {
 		try {
 			
 			$ret = parent::execute($input_parameters);
-			if(go()->getDbConnection()->debug && isset($this->build)) {
+			if(go()->getDebugger()->enabled && go()->getDbConnection()->debug && isset($this->build)) {
 				$duration  = number_format((go()->getDebugger()->getMicrotime() * 1000) - ($this->build['start'] * 1000), 2);
 				go()->debug(QueryBuilder::debugBuild($this->build).' ('.$duration.'ms)', 3);			
 			}

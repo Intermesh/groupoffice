@@ -656,17 +656,16 @@ class QueryBuilder {
 		return $str;
 	}
 
-	private function splitTableAndColumn($column) {
-		$parts = explode('.', $column);
-
-		$c = count($parts);
-		if ($c > 1) {
-			$column = array_pop($parts);
-			$alias = array_pop($parts);
+	private function splitTableAndColumn($tableAndCol) {
+		$dot = strpos($tableAndCol, '.');
+		
+		if ($dot !== false) {
+			$column = substr($tableAndCol, $dot + 1);
+			$alias = substr($tableAndCol, 0, $dot);
 			return [trim($alias, ' `'), trim($column, ' `')];
 		} else {
-			$colName = trim($column, ' `');
-			
+			$colName = trim($tableAndCol, ' `');
+						
 			//if column not found then don'use an alias. It could be an alias defined in the select part or a function.
 			$alias = null;
 			

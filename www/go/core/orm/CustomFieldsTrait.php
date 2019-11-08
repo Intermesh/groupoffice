@@ -225,6 +225,8 @@ trait CustomFieldsTrait {
 		}
 	}
 
+	private static $customFieldsTableName;
+
 	/**
 	 * Get table name for custom fields data
 	 * 
@@ -232,19 +234,22 @@ trait CustomFieldsTrait {
 	 */
 	public static function customFieldsTableName() {
 
+		if(isset(self::$customFieldsTableName)) {
+			return self::$customFieldsTableName;
+		}
 		$cls = static::customFieldsEntityType()->getClassName();
 		
-		if(is_a($cls, Entity::class, true)) {
-		
-			$tables = $cls::getMapping()->getTables();		
-			$mainTableName = array_keys($tables)[0];
+		if(is_a($cls, Entity::class, true)) {		
+			$mainTableName = $cls::getMapping()->getPrimaryTable()->getName();				
 		} else
 		{
 			//ActiveRecord
 			$mainTableName = $cls::model()->tableName();
 		}
 		
-		return $mainTableName.'_custom_fields';
+		self::$customFieldsTableName = $mainTableName.'_custom_fields';
+
+		return self::$customFieldsTableName;
 	}
 
 	/**
