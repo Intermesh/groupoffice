@@ -237,6 +237,7 @@ abstract class Property extends Model {
 		} else
 		{
 			$stmt = self::$cachedRelations[$cacheKey] ;
+			$stmt->execute();
 		}
 
 		foreach($where as $field => $value) {
@@ -264,12 +265,13 @@ abstract class Property extends Model {
 			self::$cachedRelations[$cacheKey] = $stmt;
 		} else
 		{
-			$stmt = self::$cachedRelations[$cacheKey] ;
+			$stmt = self::$cachedRelations[$cacheKey];			
 		}
 
 		foreach($where as $field => $value) {
 			$stmt->bindValue(':'.$field, $value);
 		}
+		$stmt->execute();
 
 		return $stmt;
 

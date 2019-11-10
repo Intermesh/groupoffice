@@ -670,7 +670,7 @@ class Contact extends AclItemEntity {
 	 */
 	public function findOrganizations(){
 		return self::find()
-			->where('fromId', '='. $this->id)
+			->where('fromId', '=', $this->id)
 			->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::entityType()->getId())		
 			->andWhere('fromEntityTypeId = '. self::entityType()->getId())
 			->andWhere('c.isOrganization = true');

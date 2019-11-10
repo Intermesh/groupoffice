@@ -512,10 +512,6 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		$queryBuilder = new QueryBuilder($this->getDbConnection());
 		$build = $queryBuilder->buildSelect($this);
 		$build['start'] = go()->getDebugger()->getTimeStamp();
-		
-		if($this->debug && !$this->getDbConnection()->debug) {
-			go()->debug(QueryBuilder::debugBuild($build));
-		}
 
 		$stmt = $this->getDbConnection()->createStatement($build);
 		call_user_func_array([$stmt, 'setFetchMode'], $this->getFetchMode());
