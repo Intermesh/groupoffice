@@ -58,6 +58,8 @@ trait CustomFieldsTrait {
 			$stmt = self::$preparedCustomFieldStmt[$this->customFieldsTableName()];
 			$stmt->bindValue(':id', $this->id);
 
+			$stmt->execute();
+
 			$record = $stmt->fetch();
 			
 			$this->customFieldsIsNew = !$record;

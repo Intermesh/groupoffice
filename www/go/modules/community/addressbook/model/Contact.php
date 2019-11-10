@@ -702,6 +702,7 @@ class Contact extends AclItemEntity {
 			} else {
 				$stmt = $this->prepareFindOrganizations();
 				$stmt->bindValue(':contactId', $this->id);	
+				$stmt->execute();
 				$this->organizationIds = $stmt->fetchAll();
 			}
 		}		
