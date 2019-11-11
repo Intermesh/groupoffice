@@ -562,7 +562,7 @@ abstract class EntityController extends Controller {
 			$entity = $this->create($properties);
 			
 			if(!$this->canCreate($entity)) {
-				$result['notCreated'][$clientId] = new SetError("forbidden");
+				$result['notCreated'][$clientId] = new SetError("forbidden", go()->t("Permission denied"));
 				continue;
 			}
 
@@ -624,7 +624,7 @@ abstract class EntityController extends Controller {
 		foreach ($update as $id => $properties) {
 			$entity = $this->getEntity($id);			
 			if (!$entity) {
-				$result['notUpdated'][$id] = new SetError('notFound');
+				$result['notUpdated'][$id] = new SetError('notFound', go()->t("Item not found"));
 				continue;
 			}
 			
@@ -636,7 +636,7 @@ abstract class EntityController extends Controller {
 			
 			
 			if(!$this->canUpdate($entity)) {
-				$result['notUpdated'][$id] = new SetError("forbidden");
+				$result['notUpdated'][$id] = new SetError("forbidden", go()->t("Permission denied"));
 				continue;
 			}
 			
@@ -665,12 +665,12 @@ abstract class EntityController extends Controller {
 		foreach ($destroy as $id) {
 			$entity = $this->getEntity($id);
 			if (!$entity) {
-				$result['notDestroyed'][$id] = new SetError('notFound');
+				$result['notDestroyed'][$id] = new SetError('notFound', go()->t("Item not found"));
 				continue;
 			}
 			
 			if(!$this->canDestroy($entity)) {
-				$result['notDestroyed'][$id] = new SetError("forbidden");
+				$result['notDestroyed'][$id] = new SetError("forbidden", go()->t("Permission denied"));
 				continue;
 			}
 
