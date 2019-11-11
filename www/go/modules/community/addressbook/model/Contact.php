@@ -582,12 +582,11 @@ class Contact extends AclItemEntity {
 	
 	public function getUid() {
 		
-		if(!isset($this->uid)) {
+		if(!$this->isNew() && !isset($this->uid)) {
 			$url = trim(go()->getSettings()->URL, '/');
 			$uid = substr($url, strpos($url, '://') + 3);
 			$uid = str_replace('/', '-', $uid );
 			$this->uid = $this->id . '@' . $uid;
-			$this->saveTables();
 		}
 
 		return $this->uid;		
