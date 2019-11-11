@@ -640,7 +640,7 @@ abstract class Property extends Model {
 
 		$required = static::getPrimaryKey();
 		foreach($props as $name => $meta) {
-			if($meta['access'] === ReflectionProperty::IS_PROTECTED) {
+			if($meta['access'] === self::PROP_PROTECTED) {
 				$required[] = $name;
 			}
 		}
@@ -661,13 +661,12 @@ abstract class Property extends Model {
 	private static function buildSelect(Query $query, array $fetchProperties) {
 
 		$select = [];
+		$selectProps = array_unique(array_merge(static::getRequiredProperties(), $fetchProperties));
 		foreach (self::getMapping()->getTables() as $table) {
 			
 			if($table->isUserTable && !go()->getUserId()) {
 				continue;
-			}		
-
-			$selectProps = array_unique(array_merge(static::getRequiredProperties(), $fetchProperties));
+			}	
 			
 			foreach($table->getMappedColumns() as $column) {		
 				if(in_array($column->name, $selectProps)) {
