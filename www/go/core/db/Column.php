@@ -260,16 +260,14 @@ class Column {
 				if ($this->length === 1) {
 					//Boolean fields in mysql are listed at tinyint(1);
 					return (bool) $value;
-				} else {
-					// Use floatval because of ints greater then 32 bit? Problem with floatval that ints will set as modified attribute when saving.
-					return (int) $value;
 				}
+				return $value;
 
-			case 'float':
-			case 'double':
-			case 'decimal':
-			case 'real':
-				return doubleval($value);
+			// case 'float':
+			// case 'double':
+			// case 'decimal':
+			// case 'real':
+			// 	return doubleval($value);
 
 			case 'date':
 			case 'datetime':

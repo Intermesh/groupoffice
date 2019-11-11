@@ -27,6 +27,9 @@ class Mapping {
 	 * @var MappedTable[] 
 	 */
 	private $tables = [];	
+
+
+	private $columns = [];
 	
 	private $relations = [];
 	
@@ -73,6 +76,9 @@ class Mapping {
 			$alias = $name;
 		}
 		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
+		foreach($this->tables[$name]->getMappedColumns() as $col) {
+			$this->columns[$col->name] = $col;
+		}
 		return $this;
 	}	
 	
@@ -300,14 +306,7 @@ class Mapping {
 	 * @return boolean|Column
 	 */
 	public function getColumn($propName) {
-		foreach($this->getTables() as $table) {
-			$column = $table->getColumn($propName);
-			if($column) {
-				return $column;
-			}
-		}
-		
-		return false;
+		return $this->columns[$propName] ?? false;
 	}
 	
 	/**

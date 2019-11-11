@@ -138,7 +138,19 @@ abstract class Property extends Model {
 
 		$selected = array_unique(array_merge($this->getRequiredProperties(), $this->fetchProperties));
 
-		foreach ($this->getMapping()->getTables() as $table) {
+		// $m = static::getMapping();
+		// foreach($selected as $propName) {
+		// 	$col = $m->getColumn($propName);
+		// 	if($col) {
+		// 		if($loadDefault) {
+		// 			$this->defaults[$propName] = $this->$propName;
+		// 			$this->$propName = $col->castFromDb($col->default);
+		// 		} else{
+		// 			$this->$propName = $col->castFromDb($this->$propName);
+		// 		}				
+		// 	}
+		// }
+		foreach ($m->getTables() as $table) {
 			foreach ($table->getMappedColumns() as $colName => $column) {
 				if (in_array($colName, $selected)) {
 					if($loadDefault) {
@@ -154,9 +166,9 @@ abstract class Property extends Model {
 				}
 			}
 			foreach($table->getConstantValues() as $colName => $value) {
-				if (in_array($colName, $this->fetchProperties)) {
+				// if (in_array($colName, $selected)) {
 					$this->$colName  = $value;
-				}
+				// }
 			}
 		}
 	}
