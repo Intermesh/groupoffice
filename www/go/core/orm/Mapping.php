@@ -27,6 +27,9 @@ class Mapping {
 	 * @var MappedTable[] 
 	 */
 	private $tables = [];	
+
+
+	private $columns = [];
 	
 	private $relations = [];
 	
@@ -57,11 +60,11 @@ class Mapping {
 	 * @param sring $alias The table alias to use in the queries
 	 * @param array $keys If null then it's assumed the key name is identical in 
 	 *   this and the last added table. eg. ['id' => 'id']
-	 * @params array $columns Leave this null if you want to automatically build 
+	 * @param array $columns Leave this null if you want to automatically build 
 	 *   this based on the properties the model has. If you're extending a model 
 	 *   then this is not possinble and you must supply all columns you do want to 
 	 *   make available in the model.
-	 * @params array $constantValues If the table that is joined needs to have 
+	 * @param array $constantValues If the table that is joined needs to have 
 	 *   constant values. For example the keys are ['folderId' => 'folderId'] but 
 	 *   the joined table always needs to have a value 
 	 *   ['type' => "foo"] then you can set it with this parameter.
@@ -73,6 +76,11 @@ class Mapping {
 			$alias = $name;
 		}
 		$this->tables[$name] = new MappedTable($name, $alias, $keys, empty($columns) ? $this->buildColumns() : $columns, $constantValues);
+		foreach($this->tables[$name]->getMappedColumns() as $col) {
+			if(!isset($this->columns[$col->name] )) { //if two identical columns are mapped the first one will be used. Can happen with "id" when A extends B.
+				$this->columns[$col->name] = $col;
+			}
+		}
 		return $this;
 	}	
 	
@@ -300,14 +308,7 @@ class Mapping {
 	 * @return boolean|Column
 	 */
 	public function getColumn($propName) {
-		foreach($this->getTables() as $table) {
-			$column = $table->getColumn($propName);
-			if($column) {
-				return $column;
-			}
-		}
-		
-		return false;
+		return $this->columns[$propName] ?? false;
 	}
 	
 	/**

@@ -214,17 +214,6 @@ class Table {
 				$c->length = 0;
 				$c->default = $c->default == null ? null : floatval($c->default);
 				break;
-			
-			case 'datetime':
-				if($c->default == 'CURRENT_TIMESTAMP') {
-					$c->default = date(Column::DATETIME_FORMAT);
-				}
-				break;
-			case 'date':
-				if($c->default == 'CURRENT_TIMESTAMP') {
-					$c->default = date(Column::DATE_FORMAT);
-				}				
-				break;
 				
 			case 'varbinary':
 			case 'binary':

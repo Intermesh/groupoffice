@@ -2,11 +2,10 @@
 namespace go\core\auth\model;
 
 use DateInterval;
-use go\core\App;
 use go\core\Environment;
 use go\core\auth\Method;
+use go\core\orm\Query;
 use go\core\orm\Entity;
-use go\core\orm\Mapping;
 use go\core\util\DateTime;
 
 class Token extends Entity {
@@ -94,11 +93,12 @@ class Token extends Entity {
 		parent::init();
 		
 		if($this->isNew()) {	
+			$this->setExpiryDate();
 			$this->lastActiveAt = new \DateTime();
 			$this->setClient();
 			$this->setLoginToken();
 //			$this->internalRefresh();
-		}else if($this->isAuthenticated ()){
+		}else if($this->isAuthenticated ()) {
 			
 			$this->oldLogin();
 			
@@ -106,7 +106,9 @@ class Token extends Entity {
 				$this->lastActiveAt = new \DateTime();				
 				
 				//also refresh token
-				$this->setExpiryDate();
+				if(isset($this->expiresAt)) {
+					$this->setExpiryDate();
+				}
 				$this->internalSave();
 			}
 		}
@@ -156,6 +158,10 @@ class Token extends Entity {
 	 * @return boolean
 	 */
 	public function isExpired(){
+
+		if(!isset($this->expiresAt)) {
+			return false;
+		}
 		
 		return $this->expiresAt < new DateTime();
 	}
@@ -164,8 +170,9 @@ class Token extends Entity {
 		if(!isset($this->accessToken)) {
 			$this->accessToken = $this->generateToken();
 		}
-		
-		$this->setExpiryDate();
+		if(isset($this->expiresAt)) {
+			$this->setExpiryDate();
+		}
 	}
 	
 	public function setLoginToken() {
@@ -381,6 +388,10 @@ class Token extends Entity {
 		}
 
 		return $authenticators;
+	}
+
+	public static function collectGarbage() {
+		return static::delete((new Query)->where('expiresAt', '!=', null)->andWhere('expiresAt', '<', new DateTime()));
 	}
 	
 }

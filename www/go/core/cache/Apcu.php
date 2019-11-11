@@ -45,7 +45,7 @@ class Apcu implements CacheInterface {
 	 */
 	public function set($key, $value, $persist = true) {
 
-		if(php_sapi_name() == 'cli') {
+		if(PHP_SAPI === 'cli') {
 			return $this->getDiskCache()->set($key, $value, $persist);
 		}
 
@@ -70,7 +70,7 @@ class Apcu implements CacheInterface {
 	 */
 	public function get($key) {
 
-		if(php_sapi_name() == 'cli') {
+		if(PHP_SAPI === 'cli') {
 			return $this->getDiskCache()->get($key);
 		}
 
@@ -96,7 +96,7 @@ class Apcu implements CacheInterface {
 	 */
 	public function delete($key) {
 		
-		if(php_sapi_name() == 'cli') {
+		if(PHP_SAPI === 'cli') {
 			return $this->getDiskCache()->delete($key);
 		}
 

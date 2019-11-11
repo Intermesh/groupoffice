@@ -222,12 +222,6 @@ class Contact extends AclItemEntity {
 	 */
 	public $urls = [];	
 	
-	/**
-	 *
-	 * @var ContactOrganization[]
-	 */
-	public $employees = [];
-	
 	
 	/**
 	 *
@@ -257,6 +251,13 @@ class Contact extends AclItemEntity {
 
 	public function setStarred($starred) {
 		$this->starred = empty($starred) ? null : true;
+	}
+
+	protected static function getRequiredProperties() {	
+		$p = parent::getRequiredProperties();
+		$p[] = 'isOrganization';
+
+		return $p;
 	}
 
 	public function buildFilesPath() {
@@ -452,6 +453,13 @@ class Contact extends AclItemEntity {
 											
 											$criteria->where('adr.city', $comparator, $value);
 										})
+										->addText("street", function(Criteria $criteria, $comparator, $value, Query $query) {
+											if(!$query->isJoined('addressbook_address')) {
+												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
+											}
+											
+											$criteria->where('adr.street', $comparator, $value);
+										})
 										->addNumber("age", function(Criteria $criteria, $comparator, $value, Query $query) {
 											
 											if(!$query->isJoined('addressbook_date')) {
@@ -574,7 +582,7 @@ class Contact extends AclItemEntity {
 	
 	public function getUid() {
 		
-		if(!isset($this->uid)) {
+		if(!$this->isNew() && !isset($this->uid)) {
 			$url = trim(go()->getSettings()->URL, '/');
 			$uid = substr($url, strpos($url, '://') + 3);
 			$uid = str_replace('/', '-', $uid );
@@ -662,10 +670,25 @@ class Contact extends AclItemEntity {
 	 */
 	public function findOrganizations(){
 		return self::find()
-						->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::entityType()->getId())
-						->where('fromId', '=', $this->id)
-							->andWhere('fromEntityTypeId', '=', self::entityType()->getId())
-							->andWhere('c.isOrganization', '=', true);
+			->where('fromId', '=', $this->id)
+			->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::entityType()->getId())		
+			->andWhere('fromEntityTypeId = '. self::entityType()->getId())
+			->andWhere('c.isOrganization = true');
+	}
+
+	private static $organizationIdsStmt;
+
+	private static function prepareFindOrganizations() {
+		if(!isset(self::$organizationIdsStmt)) {
+			self::$organizationIdsStmt = self::find()
+			->selectSingleValue('c.id')
+			->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::entityType()->getId())
+			->where('fromId = :contactId')
+				->andWhere('fromEntityTypeId = '. self::entityType()->getId())
+				->andWhere('c.isOrganization = true')
+				->createStatement();
+		}
+		return self::$organizationIdsStmt;
 	}
 	
 	private $organizationIds;
@@ -677,8 +700,10 @@ class Contact extends AclItemEntity {
 			if($this->isNew()) {
 				$this->organizationIds = [];
 			} else {
-				$query = $this->findOrganizations()->selectSingleValue('c.id');			
-				$this->organizationIds = array_map("intval", $query->all());
+				$stmt = $this->prepareFindOrganizations();
+				$stmt->bindValue(':contactId', $this->id);	
+				$stmt->execute();
+				$this->organizationIds = $stmt->fetchAll();
 			}
 		}		
 		
@@ -769,12 +794,17 @@ class Contact extends AclItemEntity {
 			return go()->t("Dear sir/madam");
 		}
 
+		//re fetch in case this object is not complete
+		$contact= Contact::findById($this->id, ['firstName', 'lastName', 'middleName', 'name', 'gender', 'prefixes', 'suffixes', 'language']);
 		$tpl = new TemplateParser();
-		$tpl->addModel('contact', $this->toArray(['firstName', 'lastName', 'middleName', 'name', 'gender', 'prefixes', 'suffixes', 'language']));
+		$tpl->addModel('contact', $contact->toArray());
 
 		$addressBook = AddressBook::findById($this->addressBookId, ['salutationTemplate']);
 
 		$this->salutation = $tpl->parse($addressBook->salutationTemplate);
+		if(empty($this->salutation)) {
+			$this->salutation = go()->t("Dear sir/madam");
+		}
 		$this->saveTables();
 
 		return $this->salutation;

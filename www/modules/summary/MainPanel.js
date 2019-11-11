@@ -50,11 +50,17 @@
 	  	},*/
 	  	{
 				columnWidth:.5,
+				mobile: {
+					columnWidth: 1,
+				},
 	      style:'padding:10px 0 10px 10px',
 	      border:false
 	  	},
 	  	{
 				columnWidth:.5,
+				mobile: {
+					columnWidth: 1,
+				},
 	      style:'padding:10px 10px 10px 10px',
 	      border:false
 	  	}];
@@ -162,7 +168,7 @@
 	  		if(!this.manageAnnouncementsWindow)
 	  		{
 	  			
-	  			this.manageAnnouncementsWindow = new Ext.Window({
+	  			this.manageAnnouncementsWindow = new go.Window({
 	  				layout:'fit',
 	  				items:this.announcementsGrid =  new GO.summary.AnnouncementsGrid(),
 	  				width:700,
@@ -274,7 +280,7 @@ Ext.extend(GO.summary.MainPanel, GO.summary.Portal, {
 								
 			}, this);
 			
-			this.portletsWindow = new Ext.Window({
+			this.portletsWindow = new go.Window({
 				title: t("Select portlet", "summary"),
 				layout:'fit',
 				modal:false,

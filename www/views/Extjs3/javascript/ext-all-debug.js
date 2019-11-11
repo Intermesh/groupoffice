@@ -11263,6 +11263,12 @@ Ext.Component = function(config){
     this.initialConfig = config;
 
     Ext.apply(this, config);
+
+
+    if(config.mobile && GO.util.isMobileOrTablet()) {
+        Ext.apply(this, config.mobile);
+    }
+
     this.addEvents(
         
         'added',
@@ -15265,6 +15271,10 @@ Ext.extend(Ext.layout.BorderLayout.SplitRegion, Ext.layout.BorderLayout.Region, 
 
     
     onSplitMove : function(split, newSize){
+
+        //MS: for responsive layout
+        this.panel.wideWidth = newSize.width;
+
         var s = this.panel.getSize();
         this.lastSplitSize = newSize;
         if(this.position == 'north' || this.position == 'south'){
@@ -50702,6 +50712,7 @@ Ext.grid.RowSelectionModel = Ext.extend(Ext.grid.AbstractSelectionModel,  {
         return (this.selections.key(id) ? true : false);
     },
 
+    simpleSelect : false,
     
     handleMouseDown : function(g, rowIndex, e){
         if(e.button !== 0 || this.isLocked()){
@@ -50715,10 +50726,10 @@ Ext.grid.RowSelectionModel = Ext.extend(Ext.grid.AbstractSelectionModel,  {
             view.focusRow(rowIndex);
         }else{
             var isSelected = this.isSelected(rowIndex);
-            if(e.ctrlKey && isSelected){
+            if((e.ctrlKey || this.simpleSelect) && isSelected){
                 this.deselectRow(rowIndex);
             }else if(!isSelected || this.getCount() > 1){
-                this.selectRow(rowIndex, e.ctrlKey || e.shiftKey);
+                this.selectRow(rowIndex, e.ctrlKey || e.shiftKey || this.simpleSelect);
                 view.focusRow(rowIndex);
             }
         }

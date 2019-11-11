@@ -11,10 +11,9 @@
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
 go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
-	
 	modal:true,
-	resizable:true,
-	maximizable:true,
+	resizable: !GO.util.isMobileOrTablet(),
+	maximizable: !GO.util.isMobileOrTablet(),
 	iconCls: 'ic-settings',
 	title: t("My account"),
 	width: dp(1000),
@@ -32,8 +31,9 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		this.formPanel = new Ext.form.FormPanel({
 			waitMsgTarget:true,
 			region:'center',
+			hideMode: "offsets",
 			fileUpload: true,
-			baseParams : {}
+			baseParams : {}			
 		});
 		
 		//Add a hidden submit button so the form will submit on enter
@@ -63,12 +63,13 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			fields: ['name', 'icon'],
 			data: []
 		});
-		
+
 		this.navMenu = new go.NavMenu({
 			region:'west',
 			width:dp(300),
 			store:this.tabStore,
-			listeners: {
+			listeners: {				
+				
 				selectionchange: function(view, nodes) {					
 					if(nodes.length) {
 						this.tabPanel.setActiveTab(nodes[0].viewIndex);
@@ -76,6 +77,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 						//restore selection if user clicked outside of view
 						view.select(this.tabPanel.items.indexOf(this.tabPanel.getActiveTab()));
 					}
+
+					this.formPanel.show();
 				},
 				scope: this
 			}
@@ -84,7 +87,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		Ext.apply(this,{
 			width:dp(1100),
 			height:dp(800),
-			layout:'border',
+			layout:'responsive',
 			closeAction:'hide',
 			items: [
 				this.navMenu,
@@ -121,7 +124,27 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			});
 			this._addPanelCmp(pnl);
 		}, this);
-		
+
+
+		if(GO.util.isMobileOrTablet()) {
+			this.tools = [{
+				id: "left",
+				handler: function () {
+					this.navMenu.show();
+				},
+				scope: this
+			}];			
+
+			this.navMenu.on("show", function() {
+				var tool = this.getTool("left");
+				tool.hide();
+			},this);
+
+			this.formPanel.on("show", function() {			
+				var tool = this.getTool("left");
+				tool.show();				
+			}, this)
+		}
 		
 		go.usersettings.UserSettingsDialog.superclass.initComponent.call(this);
 		
@@ -160,7 +183,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 */
 	show: function(){
 		go.usersettings.UserSettingsDialog.superclass.show.call(this);
-		this.navMenu.select(this.tabStore.getAt(0));
+
+		if(!GO.util.isMobileOrTablet()) {
+			this.navMenu.select(this.tabStore.getAt(0));
+		}
 	},
 	
 	/**
@@ -455,6 +481,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			submitted:false
 		};
 
+		
 		
 		var pnl = new panelClass(cfg);
 		this._addPanelCmp(pnl, position);

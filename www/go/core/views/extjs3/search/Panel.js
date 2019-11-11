@@ -22,7 +22,10 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 
 		
 		this.entityGrid = new go.links.EntityGrid({
-			width: dp(200),
+			width: dp(160),
+			mobile:{
+				width: dp(120),
+			},
 			region: "east",
 			split: true,
 			savedSelection: "search"

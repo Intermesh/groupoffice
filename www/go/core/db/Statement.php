@@ -1,6 +1,7 @@
 <?php
 namespace go\core\db;
 use go\core\ErrorHandler;
+use PDO;
 
 /**
  * PDO Statement
@@ -71,10 +72,22 @@ class Statement extends \PDOStatement implements \JsonSerializable {
 	public function execute($input_parameters = null)
 	{
 		try {
+
+			if(isset($input_parameters) && isset($this->build['params'])) {
+				$keys = array_keys($this->build['params']);
+				foreach($input_parameters as $v) {
+					$key = array_shit($keys);
+					$this->build[$key] = $v;
+				}
+			}
+
+			if(isset($this->build) && go()->getDebugger()->enabled) {
+				go()->debug(QueryBuilder::debugBuild($this->build));
+			}
 			
 			$ret = parent::execute($input_parameters);
-			if(go()->getDbConnection()->debug && isset($this->build)) {
-				$duration  =  go()->getDebugger()->getTimeStamp() - $this->build['start'];
+			if(go()->getDebugger()->enabled && go()->getDbConnection()->debug && isset($this->build)) {
+				$duration  = number_format((go()->getDebugger()->getMicrotime() * 1000) - ($this->build['start'] * 1000), 2);
 				go()->debug(QueryBuilder::debugBuild($this->build).' ('.$duration.'ms)', 3);			
 			}
 			if(!$ret) {
@@ -86,6 +99,24 @@ class Statement extends \PDOStatement implements \JsonSerializable {
 			go()->error("SQL FAILURE: " . $this);
 			throw $e;
 		}
+	}
+
+	public function bindValue($parameter, $value, $data_type = PDO::PARAM_STR)
+	{
+		if(isset($this->build)) {
+			$this->build[$parameter] = $value;
+		}
+
+		return parent::bindValue($parameter, $value, $data_type);
+	}
+
+	public function bindParam($parameter, &$variable, $data_type = PDO::PARAM_STR, $length = null, $driver_options = null)
+	{
+		if(isset($this->build)) {
+			$this->build[$parameter] = $variable;
+		}
+
+		return parent::bindParam($parameter, $variable, $data_type, $length, $driver_options);
 	}
 	
 }

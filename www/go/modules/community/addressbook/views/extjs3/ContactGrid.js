@@ -105,7 +105,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 						var style = "margin-right:16px;", cls = "", content = '<i class="icon"></i>';
 
 						if (record.data.photoBlobId) {
-							style += 'background-image: url(' + go.Jmap.downloadUrl(record.data.photoBlobId) + ')';
+							style += 'background-image: url(' + go.Jmap.downloadUrl(record.data.photoBlobId) + '); background-color: transparent;';
 						} else
 						{
 							cls = record.data.isOrganization ? "organization" : "";

@@ -9,7 +9,6 @@ use go\core\util\DateTime;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionMethod;
-use ReflectionProperty;
 use go\core\util\ArrayObject;
 
 /**
@@ -24,6 +23,10 @@ use go\core\util\ArrayObject;
  */
 abstract class Model implements ArrayableInterface, JsonSerializable {
 
+	const PROP_PROTECTED = 1;
+
+	const PROP_PUBLIC = 2;
+
 	/**
 	 * Get all properties exposed to the API
 	 * 
@@ -33,7 +36,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	 * 	"propName" => [
 	 * 		'setter' => true, //Set with setPropName
 	 * 		'getter'=> true', //Get with getPropName
-	 * 		'access' => ReflectionProperty::IS_PROTECTED // is a protected property
+	 * 		'access' => self::PROP_PROTECTED // is a protected property
 	 * ]
 	 * 
 	 * @return array
@@ -94,12 +97,12 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 				}
 
 				if($prop->isPublic()) {	
-					$arr[$propName]['access'] = ReflectionProperty::IS_PUBLIC;					
+					$arr[$propName]['access'] = self::PROP_PUBLIC;					
 					$arr[$propName]['setter'] = false;
 					$arr[$propName]['getter'] = false;
 				}				
 				if($prop->isProtected()) {
-					$arr[$propName]['access'] = ReflectionProperty::IS_PROTECTED;					
+					$arr[$propName]['access'] = self::PROP_PROTECTED;					
 				}
 			}
 		}
@@ -115,7 +118,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	 */
 	protected static function getReadableProperties() {
 		return array_keys(array_filter(static::getApiProperties(), function($props){
-			return $props['getter'] || $props['access'] == ReflectionProperty::IS_PUBLIC;
+			return $props['getter'] || $props['access'] == self::PROP_PUBLIC;
 		}));
 	}
 	
@@ -126,7 +129,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	 */
 	protected static function getWritableProperties() {
 		return array_keys(array_filter(static::getApiProperties(), function($props){
-			return $props['setter'] || $props['access'] == ReflectionProperty::IS_PUBLIC;
+			return $props['setter'] || $props['access'] == self::PROP_PUBLIC;
 		}));
 	}
 
@@ -137,7 +140,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 			return false;
 		}
 
-		return $props[$name]['access'] === ReflectionProperty::IS_PROTECTED;
+		return $props[$name]['access'] === self::PROP_PROTECTED;
 	}	
 	/**
 	 * Convert model into array for API output.
@@ -251,7 +254,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 		if($props[$propName]['setter']) {
 			$setter = 'set' . $propName;	
 			$this->$setter($value);
-		} else if($props[$propName]['access'] == \ReflectionProperty::IS_PUBLIC){
+		} else if($props[$propName]['access'] == self::PROP_PUBLIC){
 			$this->{$propName} = $this->normalizeValue($propName, $value);
 		}	else if($props[$propName]['getter']) {
 			go()->warn("Ignoring setting of read only property ". $propName ." for " . static::class);
@@ -290,7 +293,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 		if($props[$propName]['getter']) {
 			$getter = 'get' . $propName;	
 			return $this->$getter();
-		} elseif($props[$propName]['access'] === \ReflectionProperty::IS_PUBLIC){
+		} elseif($props[$propName]['access'] === self::PROP_PUBLIC){
 			return $this->{$propName};
 		}	else{
 			throw new \Exception("Can't get write only property ". $propName . " in " . static::class);

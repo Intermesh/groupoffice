@@ -27,6 +27,8 @@ class B extends A {
 
 
 	public $testSaveOtherModel = false;
+
+	public $userId;
 	
 	
 	protected static function defineMapping() {

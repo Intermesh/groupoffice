@@ -104,7 +104,7 @@ abstract class EntityController extends Controller {
 		
 		//go()->info($query);
 		
-		return $query;
+		return $query->readOnly();
 	}
 	
 	private $permissionLevelFoundInFilters = false;
@@ -365,7 +365,7 @@ abstract class EntityController extends Controller {
 		//filter permissions
 		$cls::applyAclToQuery($query, Acl::LEVEL_READ);
 		
-		return $query;	
+		return $query->readOnly();	
 	}
 
 	
@@ -389,8 +389,10 @@ abstract class EntityController extends Controller {
 		if(isset($p['ids']) && !count($p['ids'])) {
 			return $result;
 		}
-		
+		go()->getDebugger()->debugTiming('before query');
 		$query = $this->getGetQuery($p);		
+
+		go()->getDebugger()->debugTiming('after query');
 			
 		$foundIds = [];
 		$result['list'] = [];
@@ -400,6 +402,8 @@ abstract class EntityController extends Controller {
 			$arr['id'] = $e->id();
 			$unsorted[$arr['id']] = $arr; 
 			$foundIds[] = $arr['id'];
+
+			go()->getDebugger()->debugTiming('item to array');
 		}
 
 		
@@ -558,7 +562,7 @@ abstract class EntityController extends Controller {
 			$entity = $this->create($properties);
 			
 			if(!$this->canCreate($entity)) {
-				$result['notCreated'][$clientId] = new SetError("forbidden");
+				$result['notCreated'][$clientId] = new SetError("forbidden", go()->t("Permission denied"));
 				continue;
 			}
 
@@ -620,7 +624,7 @@ abstract class EntityController extends Controller {
 		foreach ($update as $id => $properties) {
 			$entity = $this->getEntity($id);			
 			if (!$entity) {
-				$result['notUpdated'][$id] = new SetError('notFound');
+				$result['notUpdated'][$id] = new SetError('notFound', go()->t("Item not found"));
 				continue;
 			}
 			
@@ -632,7 +636,7 @@ abstract class EntityController extends Controller {
 			
 			
 			if(!$this->canUpdate($entity)) {
-				$result['notUpdated'][$id] = new SetError("forbidden");
+				$result['notUpdated'][$id] = new SetError("forbidden", go()->t("Permission denied"));
 				continue;
 			}
 			
@@ -661,12 +665,12 @@ abstract class EntityController extends Controller {
 		foreach ($destroy as $id) {
 			$entity = $this->getEntity($id);
 			if (!$entity) {
-				$result['notDestroyed'][$id] = new SetError('notFound');
+				$result['notDestroyed'][$id] = new SetError('notFound', go()->t("Item not found"));
 				continue;
 			}
 			
 			if(!$this->canDestroy($entity)) {
-				$result['notDestroyed'][$id] = new SetError("forbidden");
+				$result['notDestroyed'][$id] = new SetError("forbidden", go()->t("Permission denied"));
 				continue;
 			}
 

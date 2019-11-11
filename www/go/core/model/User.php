@@ -497,6 +497,15 @@ class User extends Entity {
 		return $this->isAdmin();
 	}
 
+	private static $authMethods;
+
+	public static function findAuthMethods() {
+		if(!isset(self::$authMethods)) {
+			self::$authMethods = Method::find()->orderBy(['sortOrder' => 'DESC']);
+		}
+		return self::$authMethods;
+	}
+
 	/**
 	 * Get available authentication methods
 	 * 
@@ -506,7 +515,7 @@ class User extends Entity {
 
 		$methods = [];
 
-		$authMethods = Method::find()->orderBy(['sortOrder' => 'DESC']);
+		$authMethods = self::findAuthMethods();
 
 		foreach ($authMethods as $authMethod) {
 			$authenticator = $authMethod->getAuthenticator();

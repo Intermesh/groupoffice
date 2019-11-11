@@ -403,43 +403,42 @@ a {
 	position: relative;
 	color: white;
 	@include var(background-color, c-primary);
-	+ .x-tab-panel {
-		> .x-tab-panel-header {
-			position: relative;
-			border-width: 0 0 0 0;
-			@include var(background-color, c-primary);
-			.x-tab-strip {
-				
-				&-active {
-					border-bottom-color: $cAccent;
-					color:white;
-					.x-tab-strip-text{ color:white;}
-				}
-				&-wrap { border: 0; }
+}
+.go-main-tab-panel.x-tab-panel {
+	> .x-tab-panel-header {
+		position: relative;
+		border-width: 0 0 0 0;
+		@include var(background-color, c-primary);
+		.x-tab-strip {
+			
+			&-active {
+				border-bottom-color: $cAccent;
+				color:white;
+				.x-tab-strip-text{ color:white;}
 			}
-			.x-tab-scroller-right, .x-tab-scroller-left {
-				color: white;
-			}
-			.x-tab-scroller-right-over, .x-tab-scroller-left-over {
-				color: white;
-			}
-			.x-tab-right { padding-left:0;}
-			.x-tab-strip {	border: 0; }
-			.x-tab-strip-text{
-				color:rgba(white, .5);
-				padding-left:0;
-			}
+			&-wrap { border: 0; }
 		}
-		.x-tab-panel-body{
-			background-color: color($bg, "background");
-			> .x-hide-display {
-				display:none !important;
-			}
+		.x-tab-scroller-right, .x-tab-scroller-left {
+			color: white;
+		}
+		.x-tab-scroller-right-over, .x-tab-scroller-left-over {
+			color: white;
+		}
+		.x-tab-right { padding-left:0;}
+		.x-tab-strip {	border: 0; }
+		.x-tab-strip-text{
+			color:rgba(white, .5);
+			padding-left:0;
 		}
 	}
-
-	
+	.x-tab-panel-body{
+		background-color: color($bg, "background");
+		> .x-hide-display {
+			display:none !important;
+		}
+	}
 }
+
 .go-grid3-hide-headers {
 	.x-panel-tbar {
 		border-bottom: dp(1) solid color($fg, "divider");
@@ -648,6 +647,7 @@ button {
 	border-radius: 50%;
 	width:dp(40);
 	height: dp(40);
+	line-height: dp(40);
 	font-size: dp(16);	
 	text-align: center;	
 	
@@ -1133,12 +1133,20 @@ button.filetype-pdf, button.filetype-doc {
 		
 		i.label {			
 			left: dp(16);
-			top:dp(12);
+			top: dp(12);
 			width:  dp(24);
 			height: dp(24);
 			position: absolute;
-			color: color($fg, 'icon');		
+			color: color($fg, 'icon');	
 		}
+
+		.avatar {			
+			left: 0;
+			top:dp(4);
+			position: absolute;
+			color: white;	
+		}
+
 		
 		&:hover {
 			.show-on-hover {
@@ -1337,6 +1345,11 @@ table[id^="comments-ext"] b {
 	}
 }
 
+.go-links-link-grid {
+	.x-grid3-col-name {
+		padding-right: dp(56);
+	}
+}
 
 .go-sidenav {
 	//margin-top: dp(8);
@@ -1755,7 +1768,7 @@ table[id^="comments-ext"] b {
 			top: 0;
 			margin-top:0 !important;
 			margin-right: dp(8);
-			line-height: 35px;
+			
 			text-align: center;
 			&:after {
 				content: '';

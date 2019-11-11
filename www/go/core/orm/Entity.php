@@ -1000,19 +1000,16 @@ abstract class Entity extends Property {
 					" and referenced_table_name=".go()->getDbConnection()->getPDO()->quote($tableName)." and referenced_column_name = 'id'";
 
 				$stmt = go()->getDbConnection()->getPDO()->query($sql);
-				$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);					
-
-				//don't find the entity itself
-				$refs = array_filter($refs, function($r) {
-					return !static::getMapping()->hasTable($r['table']);
-				});
+				$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 			}
 			finally{
-				if($dbName == 'information_schema') {
-					throw new \Exception("HUH");
-				}
 				go()->getDbConnection()->exec("USE `" . $dbName . "`");	
 			}	
+
+			//don't find the entity itself
+			$refs = array_filter($refs, function($r) {
+				return !static::getMapping()->hasTable($r['table']);
+			});
 
 			go()->getCache()->set($cacheKey, $refs);			
 		}

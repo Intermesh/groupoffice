@@ -63,4 +63,13 @@ class EntityFilter extends AclOwnerEntity {
 							$criteria->where(['e.name' => $value]);		
 						});
 	}
+
+	public static function sort(\go\core\orm\Query $query, array $sort)
+	{
+		if(empty($sort)) {
+			$sort['name'] = 'ASC';
+		}
+
+		return parent::sort($query, $sort);
+	}
 }

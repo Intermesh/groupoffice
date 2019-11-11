@@ -513,7 +513,7 @@ class Connection {
 		$query = new Query();
 		return $query->setDbConnection($this)->selectSingleValue($select);
 	}
-
+	
 	/**
 	 * Create a statement from a QueryBuilder result
 	 * 
@@ -522,9 +522,9 @@ class Connection {
 	 */
 	public function createStatement($build) {
 		try {
-			$build['start'] = go()->getDebugger()->getTimeStamp();
+			$build['start'] = go()->getDebugger()->getMicroTime();			
 			$stmt = $this->getPDO()->prepare($build['sql']);
-			$stmt->setBuild($build);
+			$stmt->setBuild($build);						
 
 			foreach ($build['params'] as $p) {
 				if (isset($p['value']) && !is_scalar($p['value'])) {

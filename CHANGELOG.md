@@ -1,3 +1,21 @@
+11-11-2019 6.4.74
+- Core: System settings and My Account work on mobile
+- Address book: Edit form works on mobile
+- Core: Global search works on mobile
+- Core: Start Menu full screen on mobile
+- Core: Fixed responsive issue where grid would become smaller then configured
+- Tickets: Works on mobile
+- Core: Sort custom filters alphabetically
+- Core: Fix for user timezones different then client OS
+- Address book: Added street to filter options
+- Newsletters: Improved performance
+- Email: Save all attachements to items worked only one time
+- Core: Fixed AccesToken created from API-Key will expire after 1 week of inactivity #292
+- Time tracking: Works on mobile
+- Core: Smoother scrolling by preloading more.
+- Address book: Show who modified and created in detail
+- Notes: Show who modified and created in detail
+
 05-11-2019 6.4.73
 - Core: Fixed error where grid would not load
 - Core: Updated Spanish translation

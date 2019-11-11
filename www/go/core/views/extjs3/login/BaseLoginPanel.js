@@ -46,6 +46,7 @@ go.login.BaseLoginPanel = Ext.extend(Ext.FormPanel, {
 			return;
 		}
 		this.submitting = true;
+		this.getEl().mask(t("loading..."));
 		go.AuthenticationManager.doAuthentication(this.getPostData(),function(authMan, success, result){
 			this.submitting = false;
 			if(result.errors && result.errors[this.getId()]){
@@ -54,6 +55,7 @@ go.login.BaseLoginPanel = Ext.extend(Ext.FormPanel, {
 			}
 
 			this.onSuccess();
+			this.getEl().unmask();
 
 		},this);
 	},

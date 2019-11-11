@@ -507,6 +507,19 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		return $this->dbConn;
 	}
 
+	public function createStatement() {
+
+		$queryBuilder = new QueryBuilder($this->getDbConnection());
+		$build = $queryBuilder->buildSelect($this);
+		$build['start'] = go()->getDebugger()->getTimeStamp();
+
+		$stmt = $this->getDbConnection()->createStatement($build);
+		call_user_func_array([$stmt, 'setFetchMode'], $this->getFetchMode());
+		$stmt->setQuery($this);		
+
+		return $stmt;
+	}
+
 	/**
 	 * Executes the query and returns the statement
 	 * 
@@ -514,18 +527,8 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 */
 	public function execute() {
 		
-		$queryBuilder = new QueryBuilder($this->getDbConnection());
-		$build = $queryBuilder->buildSelect($this);
-		$build['start'] = go()->getDebugger()->getTimeStamp();
-		
-		if($this->debug && !$this->getDbConnection()->debug) {
-			go()->debug(QueryBuilder::debugBuild($build));
-		}
-
-		$stmt = $this->getDbConnection()->createStatement($build);
-		call_user_func_array([$stmt, 'setFetchMode'], $this->getFetchMode());
-
-		$stmt->setQuery($this);		
+		$stmt = $this->createStatement();	
+	
 		try {
 			$ret = $stmt->execute();
 			if (!$ret) {

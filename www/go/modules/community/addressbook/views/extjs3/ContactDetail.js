@@ -233,6 +233,8 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 		});
 		this.addComments();
 		this.addFiles();
+
+		this.add(new go.detail.CreateModifyPanel());
 	},
 
 	onLoad: function () {

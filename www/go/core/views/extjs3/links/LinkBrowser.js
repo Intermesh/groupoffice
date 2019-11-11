@@ -7,19 +7,33 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 	
 	stateId: "go-link-browser",
 	
-	layout: "border",
-	maximizable: true,
+	layout: "responsive",
+	maximizable: !GO.util.isMobileOrTablet(),
 	
-
 	initComponent: function () {
 
 		var actions = this.initRowActions();
 		
 		this.entityGrid = new go.links.EntityGrid({
-			width: dp(200),
+			
+			width: dp(160),
+			mobile:{
+				width: dp(120),
+			},
 			region: "west",
 			split: true,
 			stateId: "go-link-browser-entity-grid"
+		});
+
+		this.entityGrid.getTopToolbar().add('->');
+		this.entityGrid.getTopToolbar().add({
+			cls: 'go-narrow',
+			iconCls: "ic-arrow-forward",
+			tooltip: t("Links"),
+			handler: function () {
+				this.grid.show();
+			},
+			scope: this
 		});
 
 		this.entityGrid.getSelectionModel().on('selectionchange', function (sm) {
@@ -66,6 +80,14 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 			region: "center",
 			plugins: [actions],
 			tbar: [		
+				{
+					cls: 'go-narrow', //Shows on mobile only
+					iconCls: "ic-menu",
+					handler: function () {
+						this.entityGrid.show();
+					},
+					scope: this
+				},
 				'->',
 				{
 					xtype: 'tbsearch'
@@ -120,7 +142,8 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 			],
 			listeners: {
 				navigate: function(grid, index, record) {				
-					this.load(record.data.toEntity, record.data.toId);						
+					this.load(record.data.toEntity, record.data.toId);		
+									
 				},
 				
 //				dblclick: function () {
@@ -144,9 +167,38 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 			title: t("Links"),
 			width: dp(1200),
 			height: dp(600),
-			layout: 'border',
-			items: [this.entityGrid , this.grid, this.getPreviewPanel()]
+			layout: 'responsive',
+			items: [this.centerPanel = new Ext.Panel({
+				region: "center",
+				layout:"responsive",
+				layoutConfig: {
+					triggerWidth: 1000
+				},
+				items: [this.grid, this.entityGrid]
+			}), 
+			this.getPreviewPanel()]
 		});
+
+		if(GO.util.isMobileOrTablet()) {
+			this.tools = [{
+				id: "left",
+				handler: function () {
+					this.centerPanel.show();
+				},
+				scope: this
+			}];			
+
+			this.centerPanel.on("show", function() {
+				var tool = this.getTool("left");
+				tool.hide();
+			},this);
+
+			this.previewPanel.on("show", function() {			
+				var tool = this.getTool("left");
+				tool.show();				
+			}, this)
+		}
+
 
 		go.links.CreateLinkWindow.superclass.initComponent.call(this);
 	},
@@ -157,6 +209,7 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 			pnl.load(id);
 
 			this.previewPanel.getLayout().setActiveItem(pnl);
+			this.previewPanel.show();
 		}
 	},
 	

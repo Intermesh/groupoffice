@@ -602,6 +602,11 @@ class Installer {
 		$stmt = go()->getDbConnection()->query("SHOW TABLE STATUS");	
 		
 		foreach($stmt as $record){
+
+			if(!isset($record['Engine'])) {
+				//Skip views.
+				continue;
+			}
 			
 			if($record['Engine'] != 'InnoDB' && $record["Name"] != 'fs_filesearch' && $record["Name"] != 'cms_files') {
 				echo "Converting ". $record["Name"] . " to InnoDB\n";

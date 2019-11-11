@@ -42,12 +42,26 @@ trait CustomFieldsTrait {
 		return $record;	
 	}
 
+	private static $preparedCustomFieldStmt = [];
+
 	protected function internalGetCustomFields() {
 		if(!isset($this->customFieldsData)) {
-			$record = (new Query())
+
+			if(!isset(self::$preparedCustomFieldStmt[$this->customFieldsTableName()])) {
+				$query = (new Query())
 							->select('*')
 							->from($this->customFieldsTableName(), 'cf')
-							->where(['id' => $this->id])->single();
+							->where('cf.id = :id');
+
+				self::$preparedCustomFieldStmt[$this->customFieldsTableName()] = $query->createStatement();
+			}
+
+			$stmt = self::$preparedCustomFieldStmt[$this->customFieldsTableName()];
+			$stmt->bindValue(':id', $this->id);
+
+			$stmt->execute();
+
+			$record = $stmt->fetch();
 			
 			$this->customFieldsIsNew = !$record;
 							
@@ -124,6 +138,7 @@ trait CustomFieldsTrait {
 	public static function getCustomFieldModels() {
 		if(!isset(self::$customFields)) {
 			self::$customFields = Field::find()
+						->readOnly()
 						->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId')
 						->where(['fs.entityId' => static::customFieldsEntityType()->getId()])->all();
 		}
@@ -225,6 +240,8 @@ trait CustomFieldsTrait {
 		}
 	}
 
+	private static $customFieldsTableName;
+
 	/**
 	 * Get table name for custom fields data
 	 * 
@@ -232,19 +249,22 @@ trait CustomFieldsTrait {
 	 */
 	public static function customFieldsTableName() {
 
+		if(isset(self::$customFieldsTableName)) {
+			return self::$customFieldsTableName;
+		}
 		$cls = static::customFieldsEntityType()->getClassName();
 		
-		if(is_a($cls, Entity::class, true)) {
-		
-			$tables = $cls::getMapping()->getTables();		
-			$mainTableName = array_keys($tables)[0];
+		if(is_a($cls, Entity::class, true)) {		
+			$mainTableName = $cls::getMapping()->getPrimaryTable()->getName();				
 		} else
 		{
 			//ActiveRecord
 			$mainTableName = $cls::model()->tableName();
 		}
 		
-		return $mainTableName.'_custom_fields';
+		self::$customFieldsTableName = $mainTableName.'_custom_fields';
+
+		return self::$customFieldsTableName;
 	}
 
 	/**

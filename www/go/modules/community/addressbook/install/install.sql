@@ -211,3 +211,5 @@ ALTER TABLE `addressbook_user_settings`
   ADD CONSTRAINT `addressbook_user_settings_ibfk_2` FOREIGN KEY (`defaultAddressBookId`) REFERENCES `addressbook_addressbook` (`id`) ON DELETE SET NULL;
 
 ALTER TABLE `addressbook_addressbook` ADD FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
+
+ALTER TABLE `addressbook_contact` ADD INDEX(`isOrganization`)
