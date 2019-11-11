@@ -1080,18 +1080,19 @@ Ext.override(Ext.KeyNav, {
 // Also used by scrollloader in new framework
 Ext.override(Ext.grid.GridView, {
 	scrollToTopOnLoad: true,
-	onLoad : function(){
-			if (this.scrollToTopOnLoad){
+	onLoad : function(store, records, o){
+
+			if (this.scrollToTopOnLoad && !o.keepScrollPosition){
 				if (Ext.isGecko) {
 						if (!this.scrollToTopTask) {
 								this.scrollToTopTask = new Ext.util.DelayedTask(this.scrollToTop, this);
 						}
 						this.scrollToTopTask.delay(1);
-				} else {
+				} else {				
 						this.scrollToTop();
 				}
 			}
-			this.scrollToTopOnLoad=true;
+			this.scrollToTopOnLoad=true;			
 	}
 });
 

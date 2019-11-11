@@ -31,7 +31,11 @@ go.panels.ScrollLoader = {
 				this.allRecordsLoaded = records.length != this.pageSize;
 				//If this element or any parent is hidden then  this.el.dom.offsetParent == null
 				if(this.rendered && this.el.dom.offsetParent) {
-					this.loadMore();			
+					var me = this;
+					setTimeout(function() {
+						me.loadMore();	
+					})
+						
 				}
 			}, this);
 		}
@@ -39,7 +43,7 @@ go.panels.ScrollLoader = {
 	
 	onRenderScrollLoader : function() {
 		if(this.isGridPanel()) {
-			this.on("bodyscroll", this.loadMore, this, {buffer: 10});
+			this.on("bodyscroll", this.loadMore, this);// {buffer: 10});
 			
 			this.slScroller = this.getView().scroller.dom;
 			this.slBody = this.getView().mainBody.dom;
@@ -56,11 +60,16 @@ go.panels.ScrollLoader = {
 	},
 
 	toggleLoadMask : function() {
-		// only show loadmask when 
-		console.warn((this.slScroller.offsetHeight + this.slScroller.scrollTop + 10), this.slBody.offsetHeight, (this.slScroller.offsetHeight + this.slScroller.scrollTop + 10) >= this.slBody.offsetHeight)
-		if(this.loadMask && (this.slScroller.offsetHeight + this.slScroller.scrollTop + 10) < this.slBody.offsetHeight) {
-			this.loadmask.disable();
-		}
+		// only show loadmask when 		
+		var pixelsLeft = this.slScroller.scrollHeight - this.slScroller.scrollTop - this.slScroller.offsetHeight;
+		if(this.loadMask) {
+			// if(Ext.isObject(this.loadMask))
+			if(pixelsLeft > 100) {
+				this.loadMask.disable();
+			}else{
+				this.loadMask.enable();
+			}
+		} 
 	},
 	
 	/**
@@ -68,16 +77,15 @@ go.panels.ScrollLoader = {
 	 * @returns {undefined}
 	 */
 	loadMore: function () {
-		
+		this.toggleLoadMask();
 		var store = this.store;
 		if (this.allRecordsLoaded || this.store.loading){
 			return;
 		}	
 
 		var me = this;
-
 		
-		var scrollBoundary = this.slScroller.offsetHeight + 300;
+		var scrollBoundary = (this.slScroller.offsetHeight * 4) + 600;
 
 		if(this.scrollUp) {
 			
@@ -99,11 +107,11 @@ go.panels.ScrollLoader = {
 					// }
 				});
 			}
-		} else {
+		} else {			
 
-			
-
-			var shouldLoad = (this.slScroller.offsetHeight + this.slScroller.scrollTop + scrollBoundary) >= this.slBody.offsetHeight;
+			var pixelsLeft = this.slScroller.scrollHeight - this.slScroller.scrollTop - this.slScroller.offsetHeight;
+		
+			var shouldLoad = (pixelsLeft < scrollBoundary);
 		
 			if (shouldLoad) {
 				var o = store.lastOptions ? GO.util.clone(store.lastOptions) : {};
@@ -113,15 +121,13 @@ go.panels.ScrollLoader = {
 				o.params.position = o.params.position || 0;
 				o.params.position += this.pageSize;
 				o.paging = true;
+				o.keepScrollPosition = true;
 
-				if(this.isGridPanel()) {
-					this.getView().scrollToTopOnLoad = false;
-					// this.toggleLoadMask();
-				}
+				
 				store.load(o).then(function() {
-					// if(me.loadMask) {
-					// 	me.loadMask.enable();
-					// }
+					if(me.loadMask) {
+						me.loadMask.enable();
+					}
 				});
 
 			}
