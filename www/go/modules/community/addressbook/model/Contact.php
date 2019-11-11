@@ -222,12 +222,6 @@ class Contact extends AclItemEntity {
 	 */
 	public $urls = [];	
 	
-	/**
-	 *
-	 * @var ContactOrganization[]
-	 */
-	public $employees = [];
-	
 	
 	/**
 	 *
@@ -257,6 +251,13 @@ class Contact extends AclItemEntity {
 
 	public function setStarred($starred) {
 		$this->starred = empty($starred) ? null : true;
+	}
+
+	protected static function getRequiredProperties() {	
+		$p = parent::getRequiredProperties();
+		$p[] = 'isOrganization';
+
+		return $p;
 	}
 
 	public function buildFilesPath() {
@@ -794,12 +795,17 @@ class Contact extends AclItemEntity {
 			return go()->t("Dear sir/madam");
 		}
 
+		//re fetch in case this object is not complete
+		$contact= Contact::findById($this->id, ['firstName', 'lastName', 'middleName', 'name', 'gender', 'prefixes', 'suffixes', 'language']);
 		$tpl = new TemplateParser();
-		$tpl->addModel('contact', $this->toArray(['firstName', 'lastName', 'middleName', 'name', 'gender', 'prefixes', 'suffixes', 'language']));
+		$tpl->addModel('contact', $contact->toArray());
 
 		$addressBook = AddressBook::findById($this->addressBookId, ['salutationTemplate']);
 
 		$this->salutation = $tpl->parse($addressBook->salutationTemplate);
+		if(empty($this->salutation)) {
+			$this->salutation = go()->t("Dear sir/madam");
+		}
 		$this->saveTables();
 
 		return $this->salutation;

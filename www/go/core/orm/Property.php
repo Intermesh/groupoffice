@@ -95,7 +95,7 @@ abstract class Property extends Model {
 	 */
 	private $dynamicProperties = [];
 
-	private $readOnly = false;
+	protected $readOnly = false;
 
 	/**
 	 * Constructor
@@ -204,7 +204,7 @@ abstract class Property extends Model {
 			switch($relation->type) {
 
 				case Relation::TYPE_HAS_ONE:
-					$prop = $this->isNew() ? null : $this->queryRelation($cls, $where, $relation->name)->fetch();				
+					$prop = $this->isNew() ? null : $this->queryRelation($cls, $where, $relation->name, $this->readOnly)->fetch();				
 					if(!$prop && $relation->autoCreate) {
 						$prop = new $cls;
 						$this->applyRelationKeys($relation, $prop);
@@ -213,12 +213,12 @@ abstract class Property extends Model {
 				break;
 
 				case Relation::TYPE_ARRAY:
-					$props = $this->isNew() ? [] : $this->queryRelation($cls, $where, $relation->name)->fetchAll();
+					$props = $this->isNew() ? [] : $this->queryRelation($cls, $where, $relation->name, $this->readOnly)->fetchAll();
 					$this->{$relation->name} = $props;
 				break;
 
 				case Relation::TYPE_MAP:
-					$values = $this->isNew() ? [] : $this->queryRelation($cls, $where, $relation->name)->fetchAll();
+					$values = $this->isNew() ? [] : $this->queryRelation($cls, $where, $relation->name, $this->readOnly)->fetchAll();
 					if(!count($values)) {
 						$this->{$relation->name} = [];
 						//$this->{$relation->name}->serializeJsonAsObject = true;
@@ -269,12 +269,15 @@ abstract class Property extends Model {
 	 */
 	private static $cachedRelations = [];
 
-	private static function queryRelation($cls, $where, $relationName) {
+	private static function queryRelation($cls, $where, $relationName, $readOnly) {
 
 		$cacheKey = static::class.':'.$relationName;
 
 		if(!isset(self::$cachedRelations[$cacheKey])) {
 			$query = $cls::internalFind();
+			if($readOnly) {
+				$query->readOnly();
+			}
 			foreach($where as $field => $value) {
 				$query->andWhere($field . '= :'.$field);
 			}
@@ -624,7 +627,7 @@ abstract class Property extends Model {
 		return $propNames;
 	}
 
-	private static function getRequiredProperties() {	
+	protected static function getRequiredProperties() {	
 
 		$cls = static::class;
 

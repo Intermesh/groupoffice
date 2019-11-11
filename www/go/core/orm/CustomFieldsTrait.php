@@ -48,11 +48,12 @@ trait CustomFieldsTrait {
 		if(!isset($this->customFieldsData)) {
 
 			if(!isset(self::$preparedCustomFieldStmt[$this->customFieldsTableName()])) {
-				self::$preparedCustomFieldStmt[$this->customFieldsTableName()] = (new Query())
+				$query = (new Query())
 							->select('*')
 							->from($this->customFieldsTableName(), 'cf')
-							->where('cf.id = :id')
-							->createStatement();
+							->where('cf.id = :id');
+
+				self::$preparedCustomFieldStmt[$this->customFieldsTableName()] = $query->createStatement();
 			}
 
 			$stmt = self::$preparedCustomFieldStmt[$this->customFieldsTableName()];
@@ -137,6 +138,7 @@ trait CustomFieldsTrait {
 	public static function getCustomFieldModels() {
 		if(!isset(self::$customFields)) {
 			self::$customFields = Field::find()
+						->readOnly()
 						->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId')
 						->where(['fs.entityId' => static::customFieldsEntityType()->getId()])->all();
 		}
