@@ -437,6 +437,17 @@ function test_system(){
 	$tests[]=$test;	
 	
 	*/
+
+	$test['name']='MySQLnd driver';
+	$test['showSuccessFeedback'] = false;
+	$test['pass']= extension_loaded('mysqlnd');
+	$test['feedback']= "PHP is not using the mysqlnd driver. Please install MySQLi.";
+	$test['fatal']=true;
+	
+
+	$tests[]=$test;
+	
+	
 	
 	$test['name']='Shared Memory Functions';
 	$test['showSuccessFeedback'] = false;
