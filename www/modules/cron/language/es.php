@@ -9,7 +9,7 @@ return array (
   'Week days' => 'Días de la semana',
   'Years' => 'Años',
   'Enabled' => 'Activar',
-  'Run only once' => 'Corre solo una vez',
+  'Run only once' => 'Correr sólo una vez',
   'Job' => 'Trabajo',
   'Minutes does not match the required format.' => 'Los minutos no se ajustan al formato requerido.',
   'Hours does not match the required format.' => 'Las horas no se ajustan al formato requerido.',

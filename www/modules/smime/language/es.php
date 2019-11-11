@@ -34,4 +34,5 @@ return array (
   'The Group-Office password was incorrect.' => 'La contraseña de {product_name} es incorrecta.',
   'Your SMIME key password matches your Group-Office password. This is prohibited for security reasons!' => 'Tu contraseña de la clave SMIME coincide con tu contraseña de {product_name}. Esto está prohibido por razones de seguridad.',
   'E-mail' => 'E-mail',
+  'This message is encrypted.' => 'Este mensaje está encriptado',
 );
