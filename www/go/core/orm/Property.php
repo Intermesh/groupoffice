@@ -111,12 +111,9 @@ abstract class Property extends Model {
 		}
 
 		$this->fetchProperties = $fetchProperties;
-
 		$this->readOnly = $readOnly;
 		
-		if(!$readOnly) {
-			$this->initDatabaseColumns($this->isNew);
-		}
+		$this->initDatabaseColumns($this->isNew);
 		$this->initRelations();
 		if(!$readOnly) {
 			$this->trackModifications();
