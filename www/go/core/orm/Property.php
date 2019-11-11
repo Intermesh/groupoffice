@@ -112,7 +112,7 @@ abstract class Property extends Model {
 
 		$this->fetchProperties = $fetchProperties;
 		$this->readOnly = $readOnly;
-		
+
 		$this->initDatabaseColumns($this->isNew);
 		$this->initRelations();
 		if(!$readOnly) {
@@ -423,7 +423,7 @@ abstract class Property extends Model {
 			foreach(static::getMapping()->getProperties() as $propName => $type) {
 				//do property_exists because otherwise it will add protected properties too.
 				if(!isset($props[$propName])) {
-					$props[$propName] = ['setter' => false, 'getter' => false, 'access' => \ReflectionProperty::IS_PUBLIC, 'dynamic' => true];
+					$props[$propName] = ['setter' => false, 'getter' => false, 'access' => self::PROP_PUBLIC, 'dynamic' => true];
 				}
 			}
 
