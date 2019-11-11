@@ -1,3 +1,4 @@
+11-11-2019 6.4.74
 - Core: System settings and My Account work on mobile
 - Address book: Edit form works on mobile
 - Core: Global search works on mobile
@@ -12,6 +13,8 @@
 - Core: Fixed AccesToken created from API-Key will expire after 1 week of inactivity #292
 - Time tracking: Works on mobile
 - Core: Smoother scrolling by preloading more.
+- Address book: Show who modified and created in detail
+- Notes: Show who modified and created in detail
 
 05-11-2019 6.4.73
 - Core: Fixed error where grid would not load
