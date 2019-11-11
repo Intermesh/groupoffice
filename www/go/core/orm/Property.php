@@ -253,13 +253,13 @@ abstract class Property extends Model {
 			self::$cachedRelations[$cacheKey] = $stmt;
 		} else
 		{
-			$stmt = self::$cachedRelations[$cacheKey] ;
-			$stmt->execute();
+			$stmt = self::$cachedRelations[$cacheKey] ;			
 		}
 
 		foreach($where as $field => $value) {
 			$stmt->bindValue(':'.$field, $value);
 		}
+		$stmt->execute();
 
 		return $stmt;
 	}

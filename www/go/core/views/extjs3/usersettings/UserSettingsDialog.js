@@ -155,7 +155,6 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	loadModulePanels : function() {
     
 		var available = go.Modules.getAvailable(), pnl, config, i, i1;
-		
 		for(i = 0, l = available.length; i < l; i++) {
 			
 			config = go.Modules.getConfig(available[i].package, available[i].name);
