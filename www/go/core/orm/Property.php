@@ -138,7 +138,7 @@ abstract class Property extends Model {
 
 		$selected = array_unique(array_merge($this->getRequiredProperties(), $this->fetchProperties));
 
-		// $m = static::getMapping();
+		$m = static::getMapping();
 		// foreach($selected as $propName) {
 		// 	$col = $m->getColumn($propName);
 		// 	if($col) {
