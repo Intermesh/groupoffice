@@ -29,9 +29,7 @@
 		{
 			date = v;
 		}
-		//convert date to local timezone
-		var local = date.toLocaleString("en-US", {timeZone: go.User.timezone});		
-		return new Date(local);
+		return date;
 	};
 	
 	go.util.Format = {
@@ -42,8 +40,13 @@
 				return false;
 			}
 
+			return this.dateToUserTZ(date);
+				
+		},
+
+		dateToUserTZ : function(date) {
 			var local = date.toLocaleString("en-US", {timeZone: go.User.timezone});					
-			return new Date(local);			
+			return new Date(local);		
 		},
 
 		dateToBrowserTZ : function(v) {			
@@ -140,7 +143,7 @@
 		 * @returns {String}
 		 */
 		date : function(v) {
-			//v = checkDate(v);
+			v = checkDate(v);
 			if(!v) {
 				return "-";
 			}
@@ -156,6 +159,7 @@
 			if(!v) {
 				return "-";
 			}
+			v = this.dateToUserTZ(v);
 			return Ext.util.Format.date(v, GO.settings.time_format);
 		},
 		
@@ -174,6 +178,8 @@
 			if(!v) {
 				return "-";
 			}
+
+			v = this.dateToUserTZ(v);
 			
 			return Ext.util.Format.date(v, GO.settings.date_format + " " + GO.settings.time_format);
 		},
@@ -187,6 +193,8 @@
 			if(!v) {
 				return "-";
 			}
+
+			v = this.dateToUserTZ(v);
 
 			var now = new Date(),
 							nowYmd = parseInt(now.format("Ymd")),

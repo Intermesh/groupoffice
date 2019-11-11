@@ -5,6 +5,7 @@ namespace go\core\orm;
 use DateTime;
 use Exception;
 use GO;
+use GO\Base\Db\ActiveRecord;
 use go\core\App;
 use go\core\db\Query;
 use go\core\model\Module;
@@ -217,7 +218,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		foreach($records as $record) {
 			$type = static::fromRecord($record);
 			$cls = $type->getClassName();
-			if(!class_exists($cls) || !is_a($cls, Entity::class)) {
+			if(!class_exists($cls) || (!is_a($cls, Entity::class, true) && !is_a($cls, ActiveRecord::class, true))) {
 				go()->warn($cls .' not found!');
 				continue;
 			}

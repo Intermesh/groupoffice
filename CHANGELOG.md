@@ -15,6 +15,7 @@
 - Core: Smoother scrolling by preloading more.
 - Address book: Show who modified and created in detail
 - Notes: Show who modified and created in detail
+- ActiveSync: Fixed GroupOffice isn't respecting addressbook permissions - CRITICAL (#492
 
 05-11-2019 6.4.73
 - Core: Fixed error where grid would not load
