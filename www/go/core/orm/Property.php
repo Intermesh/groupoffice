@@ -95,13 +95,15 @@ abstract class Property extends Model {
 	 */
 	private $dynamicProperties = [];
 
+	private $readOnly = false;
+
 	/**
 	 * Constructor
 	 * 
 	 * @param boolean $isNew Indicates if this model is saved to the database.
 	 * @param string[] $fetchProperties The properties that were fetched by find. If empty then all properties are fetched
 	 */
-	public function __construct($isNew = true, $fetchProperties = []) {
+	public function __construct($isNew = true, $fetchProperties = [], $readOnly = false) {
 		$this->isNew = $isNew;
 
 		if (empty($fetchProperties)) {
@@ -109,10 +111,16 @@ abstract class Property extends Model {
 		}
 
 		$this->fetchProperties = $fetchProperties;
+
+		$this->readOnly = $readOnly;
 		
-		$this->initDatabaseColumns($this->isNew);
+		if(!$readOnly) {
+			$this->initDatabaseColumns($this->isNew);
+		}
 		$this->initRelations();
-		$this->trackModifications();
+		if(!$readOnly) {
+			$this->trackModifications();
+		}
 
 		// When properties have default values in the model they are overwritten by the database defaults. We change them back here so the
 		// modification is tracked and it will be saved.
@@ -531,9 +539,8 @@ abstract class Property extends Model {
 		}
 
 		$query = (new Query())
-						->from($tables[$mainTableName]->getName(), $tables[$mainTableName]->getAlias())
-						->fetchMode(PDO::FETCH_CLASS, static::class, [false, $fetchProperties])
-						->setModel(static::class);
+						->from($tables[$mainTableName]->getName(), $tables[$mainTableName]->getAlias())						
+						->setModel(static::class, $fetchProperties);
 
 		self::joinAdditionalTables($tables, $query);
 		self::buildSelect($query, $fetchProperties);
@@ -855,6 +862,10 @@ abstract class Property extends Model {
 	 * @return boolean
 	 */
 	protected function internalSave() {
+
+		if($this->readOnly) {
+			throw new \Exception("Models are fetched read only");
+		}
 		
 		if (!$this->validate()) {
 			return false;

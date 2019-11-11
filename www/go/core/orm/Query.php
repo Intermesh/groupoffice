@@ -4,9 +4,11 @@ namespace go\core\orm;
 use Exception;
 use go\core\model\Acl;
 use go\core\db\Query as DbQuery;
+use PDO;
 
 class Query extends DbQuery {
 	private $model;
+	private $fetchProperties;
 	
 	/**
 	 * Set's the entity or property model this query is for.
@@ -16,9 +18,11 @@ class Query extends DbQuery {
 	 * @param string $cls
 	 * @return $this
 	 */
-	public function setModel($cls) {
+	public function setModel($cls, $fetchProperties = []) {
 		$this->model = $cls;
-		return $this;
+		$this->fetchProperties = $fetchProperties;
+
+		return $this->fetchMode(PDO::FETCH_CLASS, $this->model, [false, $this->fetchProperties, false]);
 	}
 	
 	/**
@@ -134,6 +138,15 @@ class Query extends DbQuery {
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Set models read only. This improves performance too.
+	 * 
+	 * @return self
+	 */
+	public function readOnly () {
+		return $this->fetchMode(PDO::FETCH_CLASS, $this->model, [false, $this->fetchProperties, true]);
 	}
 
 }

@@ -104,7 +104,7 @@ abstract class EntityController extends Controller {
 		
 		//go()->info($query);
 		
-		return $query;
+		return $query->readOnly();
 	}
 	
 	private $permissionLevelFoundInFilters = false;
@@ -365,7 +365,7 @@ abstract class EntityController extends Controller {
 		//filter permissions
 		$cls::applyAclToQuery($query, Acl::LEVEL_READ);
 		
-		return $query;	
+		return $query->readOnly();	
 	}
 
 	
