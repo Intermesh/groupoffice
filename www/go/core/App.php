@@ -7,7 +7,6 @@ use GO;
 use GO\Base\Observable;
 use go\core\auth\State as AuthState;
 use go\core\cache\CacheInterface;
-use go\core\cache\Disk;
 use go\core\db\Connection;
 use go\core\db\Database;
 use go\core\db\Query;
