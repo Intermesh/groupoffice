@@ -1,24 +1,38 @@
 go.detail.CreateModifyPanel = Ext.extend(Ext.Panel, {
+	title: t("Info"),
+	collapsible: true,
 	entityStore: "User",
 	cUserId: null,
 	mUserId: null,
-	tpl: new Ext.XTemplate('<p class="s6 pad">\
-	<label>'+t("Created")+'</label>\
-	<span class="avatar" style="{[this.avatar(this.cUser)]}"></span>\
-	<span><tpl if="values.createdAt">{[go.util.Format.date(values.createdAt)]}</tpl>{ctime}</span><br>\
-	<small>'+t("by")+' <span>{[this.cUser.displayName]}</span></small>\
+	tpl: new Ext.XTemplate('<div class="s6 pad"><div class="icons">\
+	<p>\
+		<span class="avatar" style="{[this.avatar(this.cUser)]}" title="{this.cUser.displayName}">{[this.initials(this.cUser)]}</span>\
+		<span><tpl if="values.createdAt">{[go.util.Format.dateTime(values.createdAt)]}</tpl>{ctime}</span>\
+		<label>'+t("Created")+'<label>\
 	</p>\
-	<p class="s6">\
-	<label>'+t("Modified")+'</label>\
-	<span class="avatar" style="{[this.avatar(this.mUser)]}"></span>\
-	<span><tpl if="values.modifiedAt">{[go.util.Format.date(values.modifiedAt)]}</tpl>{mtime}</span><br>\
-	<small>'+t("by")+' <span>{[this.mUser.displayName]}</span></small>\
-	</p>',{
-		avatar: function(user) {
-			if(!user || !user.avatarId) {
-				return '';
+	</div>\
+	</div>\
+	<div class="s6 pad"><div class="icons">\
+	<p>\
+		<span class="avatar" style="{[this.avatar(this.mUser)]}" title="{this.mUser.displayName}">{[this.initials(this.mUser)]}</span>\
+		<span><tpl if="values.modifiedAt">{[go.util.Format.dateTime(values.modifiedAt)]}</tpl>{ctime}</span>\
+		<label>'+t("Modified")+'<label>\
+	</p>\
+	</div>\
+	</div>',{
+		initials: function(user) {
+			if(!user) {
+				return '?';
 			}
-			return 'background-image: url('+go.Jmap.downloadUrl(user.avatarId)+')';
+			return user.avatarId ? "" :user.displayName.split(" ").map(function(name){return name.substr(0,1).toUpperCase()}).join("");
+		},
+		avatar: function(user) {
+
+
+			if(!user || !user.avatarId) {
+				return 'background-image:none';
+			}
+			return 'background-image: url('+go.Jmap.downloadUrl(user.avatarId)+');background-color:transparent;';
 		},
 		cUser: null,
 		mUser: null

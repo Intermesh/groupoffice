@@ -152,7 +152,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				cls: 'photo '+mineCls
 			};
 			if(creator.avatarId) { 
-				avatar.style = 'background-image: url('+go.Jmap.downloadUrl(creator.avatarId)+');';
+				avatar.style = 'background-image: url('+go.Jmap.downloadUrl(creator.avatarId)+');background-color: transparent;';
 			} else {
 				avatar.html = creator.displayName.split(" ").map(function(name){return name.substr(0,1).toUpperCase()}).join("");
 				avatar.style = 'background-image: none';
