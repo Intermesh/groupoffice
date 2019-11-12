@@ -48,7 +48,12 @@ class Connection {
 		$this->password = $password;
 		$this->options = [
 				PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
-				PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci',sql_mode='STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',time_zone = '+00:00',lc_messages = 'en_US'"
+				PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci',sql_mode='STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',time_zone = '+00:00',lc_messages = 'en_US'",
+				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+				PDO::ATTR_PERSISTENT => false, //doesn't work with ATTR_STATEMENT_CLASS but should not have much benefits eanyway
+				PDO::ATTR_STATEMENT_CLASS => [Statement::class],
+				PDO::ATTR_EMULATE_PREPARES => false, //for native data types int, bool etc.
+				PDO::ATTR_STRINGIFY_FETCHES => false
 		];
 	}
 
@@ -109,12 +114,11 @@ class Connection {
 	 */
 	private function setPDO() {
 		$this->pdo = null;
-		$this->pdo = new PDO($this->dsn, $this->username, $this->password, $this->options);		
-		$this->getPdo()->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$this->getPdo()->setAttribute(PDO::ATTR_PERSISTENT, true);
-		$this->getPdo()->setAttribute(PDO::ATTR_STATEMENT_CLASS, [Statement::class]);
-		$this->getPdo()->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); //for native data types int, bool etc.
-		$this->getPdo()->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
+		$this->pdo = new PDO($this->dsn, $this->username, $this->password, $this->options);	
+		// go()->debug("PDO Driver: " . $this->pdo->getAttribute(PDO::ATTR_CLIENT_VERSION));
+		// if (strpos($this->pdo->getAttribute(PDO::ATTR_CLIENT_VERSION), 'mysqlnd') !== false) {
+		// 	echo 'PDO MySQLnd enabled!';
+		// }
 	}
 
 	/**
@@ -527,9 +531,9 @@ class Connection {
 			$stmt->setBuild($build);						
 
 			foreach ($build['params'] as $p) {
-				if (isset($p['value']) && !is_scalar($p['value'])) {
-					throw new Exception("Invalid value " . var_export($p['value'], true));
-				}
+				// if (go()->getDebugger()->enabled && isset($p['value']) && !is_scalar($p['value'])) {
+				// 	throw new Exception("Invalid value " . var_export($p['value'], true));
+				// }
 				$stmt->bindValue($p['paramTag'], $p['value'], $p['pdoType']);
 			}
 			return $stmt;

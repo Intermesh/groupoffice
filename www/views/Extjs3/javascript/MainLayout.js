@@ -368,6 +368,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				console.error(error);
 				Ext.getBody().unmask();
 				Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console."));
+
+				
 			});
 		});
 		

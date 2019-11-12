@@ -1,3 +1,6 @@
+- Billing: add total_outstanding
+- Core: Added check for mysqlnd driver for system requirements
+
 11-11-2019 6.4.74
 - Core: System settings and My Account work on mobile
 - Address book: Edit form works on mobile

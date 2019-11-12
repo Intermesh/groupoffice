@@ -70,6 +70,8 @@ abstract class Property extends Model {
 	 */
 	protected $fetchProperties;
 
+	protected $selectedProperties;
+
 	/**
 	 * Keeps record of all the saved properties so we can commit or rollback after save.
 	 * @var Property[]
@@ -112,6 +114,7 @@ abstract class Property extends Model {
 
 		$this->fetchProperties = $fetchProperties;
 		$this->readOnly = $readOnly;
+		$this->selectedProperties = array_unique(array_merge($this->getRequiredProperties(), $this->fetchProperties));
 
 		$this->initDatabaseColumns($this->isNew);
 		$this->initRelations();
@@ -121,8 +124,10 @@ abstract class Property extends Model {
 
 		// When properties have default values in the model they are overwritten by the database defaults. We change them back here so the
 		// modification is tracked and it will be saved.
-		foreach($this->defaults as $key => $value) {
-			$this->$key = $value;
+		if($this->isNew) {
+			foreach($this->defaults as $key => $value) {
+				$this->$key = $value;
+			}
 		}
 		$this->init();
 	}
@@ -134,41 +139,22 @@ abstract class Property extends Model {
 	 * 
 	 * @param boolean $loadDefault
 	 */
-	private function initDatabaseColumns($loadDefault) {
-
-		$selected = array_unique(array_merge($this->getRequiredProperties(), $this->fetchProperties));
-
+	private function initDatabaseColumns($loadDefault) {	
 		$m = static::getMapping();
-		// foreach($selected as $propName) {
-		// 	$col = $m->getColumn($propName);
-		// 	if($col) {
-		// 		if($loadDefault) {
-		// 			$this->defaults[$propName] = $this->$propName;
-		// 			$this->$propName = $col->castFromDb($col->default);
-		// 		} else{
-		// 			$this->$propName = $col->castFromDb($this->$propName);
-		// 		}				
-		// 	}
-		// }
-		foreach ($m->getTables() as $table) {
-			foreach ($table->getMappedColumns() as $colName => $column) {
-				if (in_array($colName, $selected)) {
-					if($loadDefault) {
-
-						if(isset($this->$colName)) {
-							$this->defaults[$colName] = $this->$colName;
-						}
-
-						$this->$colName = $column->castFromDb($column->default);
-					} else {
-						$this->$colName = $column->castFromDb($this->$colName);
-					}
-				}
+		foreach($this->selectedProperties as $propName) {
+			$col = $m->getColumn($propName);
+			if($col) {
+				if($loadDefault) {
+					$this->defaults[$propName] = $this->$propName;
+					$this->$propName = $col->castFromDb($col->default);
+				} else{
+					$this->$propName = $col->castFromDb($this->$propName);
+				}				
 			}
+		}
+		foreach ($m->getTables() as $table) {
 			foreach($table->getConstantValues() as $colName => $value) {
-				// if (in_array($colName, $selected)) {
-					$this->$colName  = $value;
-				// }
+				$this->$colName  = $value;
 			}
 		}
 	}
@@ -184,7 +170,7 @@ abstract class Property extends Model {
 
 		$relations = $this->getMapping()->getRelations();		
 		foreach ($relations as $relation) {
-			if (in_array($relation->name, $this->fetchProperties) || static::isProtectedProperty($relation->name)) {
+			if (in_array($relation->name, $this->selectedProperties)) {
 				$fetchedRelations[] = $relation;
 			}
 		}
@@ -219,9 +205,8 @@ abstract class Property extends Model {
 
 				case Relation::TYPE_MAP:
 					$values = $this->isNew() ? [] : $this->queryRelation($cls, $where, $relation->name, $this->readOnly)->fetchAll();
-					if(!count($values)) {
-						$this->{$relation->name} = [];
-						//$this->{$relation->name}->serializeJsonAsObject = true;
+					if(empty($values)) {
+						$this->{$relation->name} = null; //Set to null. Otherwise JSON will be serialized as [] instead of {}
 					} else{
 						$o = [];
 						foreach($values as $v) {
@@ -487,15 +472,17 @@ abstract class Property extends Model {
 	}
 	
 	private function setPrimaryKey($name, $value) {
-		if(strpos($name, ".") === false) {
+		$pos = strpos($name, ".");
+		if($pos === false) {
 			return false;
 		}
 		//this is a primary key value. See buildSelect()
-		$parts = explode(".", $name);
-		if(!isset($this->primaryKeys[$parts[0]])) {
-			$this->primaryKeys[$parts[0]] = [];
+		$alias = substr($name, 0, $pos);
+		$col = substr($name, $pos + 1);
+		if(!isset($this->primaryKeys[$alias])) {
+			$this->primaryKeys[$alias] = [];
 		}
-		$this->primaryKeys[$parts[0]][$parts[1]] = $value;
+		$this->primaryKeys[$alias][$col] = $value;
 
 		return true;
 	}
@@ -1693,20 +1680,20 @@ abstract class Property extends Model {
 	}
 
 
-	protected function propToArray($name) {
+	// protected function propToArray($name) {
 
-		$value = $this->getValue($name);
+	// 	$value = $this->getValue($name);
 
-		if(is_array($value) && empty($value)) {
-			$relation = $this->getMapping()->getRelation($name);
+	// 	if(is_array($value) && empty($value)) {
+	// 		$relation = $this->getMapping()->getRelation($name);
 
-			if($relation && $relation->type == Relation::TYPE_MAP) {
-				$value = new ArrayObject();
-				$value->serializeJsonAsObject = true;
-			}
-		}		
-		return $this->convertValue($value);
-	}
+	// 		if($relation && $relation->type == Relation::TYPE_MAP) {
+	// 			$value = new ArrayObject();
+	// 			$value->serializeJsonAsObject = true;
+	// 		}
+	// 	}		
+	// 	return $this->convertValue($value);
+	// }
 
 	/**
 	 * Normalizes API input for this model.
@@ -1775,8 +1762,8 @@ abstract class Property extends Model {
 
 				$this->$propName[$id] = $this->internalNormalizeRelation($relation, $patch);	
 
-				// if(is_bool($patch)) {
-				if($relation->type == Relation::TYPE_MAP) {
+				if(is_bool($patch)) {
+				// if($relation->type == Relation::TYPE_MAP) {
 					//Only change key to values when using booleans. Key can also be made up by the client.
 					foreach($this->mapKeyToValues($id, $relation) as $key => $value) {
 						$this->$propName[$id]->$key = $value;

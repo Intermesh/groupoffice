@@ -157,12 +157,12 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 		}
 
 		foreach ($properties as $propName) {
-			try {
+			// try {
 				$arr[$propName] = $this->propToArray($propName);
-			} catch (NotArrayable $e) {
+			// } catch (NotArrayable $e) {
 				
-				App::get()->debug("Skipped prop " . static::class . "::" . $propName . " because type it's not scalar or ArrayConvertable.");
-			}
+			// 	App::get()->debug("Skipped prop " . static::class . "::" . $propName . " because type it's not scalar or ArrayConvertable.");
+			// }
 		}
 		
 		return $arr;
@@ -191,18 +191,21 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 			}
 			return $value;
 		} else if($value instanceof ArrayObject) {
-			$arr = clone $value;
+
+			if(empty($value)) {
+				return $value;
+			}
+			$arr = $value->getArray();
 			foreach ($arr as $key => $v) {
 				$arr[$key] = $this->convertValue($v);
 			}
 			return $arr;
-		} else if (is_scalar($value) || is_null($value)) {
+		} else { //if (is_null($value) || is_scalar($value) || $value instanceof \StdClass) {
 			return $value;
-		} else if ($value instanceof \StdClass) {
-			return $value;
-		} else {
-			throw new NotArrayable();
-		}
+		} 
+		// else {
+		// 	throw new NotArrayable();
+		// }
 	}
 
 

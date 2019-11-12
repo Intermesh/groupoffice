@@ -527,9 +527,8 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 */
 	public function execute() {
 		
-		$stmt = $this->createStatement();	
-	
 		try {
+			$stmt = $this->createStatement();	
 			$ret = $stmt->execute();
 			if (!$ret) {
 				go()->error(var_export($ret, true));
@@ -537,7 +536,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 				throw new \Exception("Could not execute statement. Error code: ". $stmt->errorCode());
 			}
 		} catch(\Exception $e) {				
-			go()->error("SQL FAILED: " . $queryBuilder->debugBuild($build));
+			go()->error("SQL FAILED: " . $this);
 			
 			throw $e;
 		}

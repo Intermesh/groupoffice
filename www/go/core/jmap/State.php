@@ -60,6 +60,11 @@ class State extends AbstractState {
 			if(!$tokenStr) {
 				return false;
 			}
+
+			$this->token = go()->getCache()->get('token-' . $tokenStr);
+			if($this->token) {
+				return $this->token;
+			}
 		
 			$this->token = Token::find()->where(['accessToken' => $tokenStr])->single();
 			
@@ -70,7 +75,9 @@ class State extends AbstractState {
 			if($this->token->isExpired()) {				
 				$this->token->delete($this->token->primaryKeyValues());				
 				$this->token = false;
-			}
+			} else{
+				go()->getCache()->set('token-' . $tokenStr, $this->token);
+			}			
 		}
 		
 		return $this->token;
