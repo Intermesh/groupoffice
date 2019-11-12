@@ -7,7 +7,7 @@ go.detail.CreateModifyPanel = Ext.extend(Ext.Panel, {
 	tpl: new Ext.XTemplate('<div class="s6 pad"><div class="icons">\
 	<p>\
 		<span class="avatar" style="{[this.avatar(this.cUser)]}" title="{this.cUser.displayName}">{[this.initials(this.cUser)]}</span>\
-		<span><tpl if="values.createdAt">{[go.util.Format.dateTime(values.createdAt)]}</tpl>{ctime}</span>\
+		<span><tpl if="values.createdAt">{[go.util.Format.dateTime(values.createdAt)]}</tpl><tpl if="values.ctime">{ctime}</tpl></span>\
 		<label>'+t("Created")+'<label>\
 	</p>\
 	</div>\
@@ -15,7 +15,7 @@ go.detail.CreateModifyPanel = Ext.extend(Ext.Panel, {
 	<div class="s6 pad"><div class="icons">\
 	<p>\
 		<span class="avatar" style="{[this.avatar(this.mUser)]}" title="{this.mUser.displayName}">{[this.initials(this.mUser)]}</span>\
-		<span><tpl if="values.modifiedAt">{[go.util.Format.dateTime(values.modifiedAt)]}</tpl>{ctime}</span>\
+		<span><tpl if="values.modifiedAt">{[go.util.Format.dateTime(values.modifiedAt)]}</tpl><tpl if="values.mtime">{mtime}</tpl></span>\
 		<label>'+t("Modified")+'<label>\
 	</p>\
 	</div>\
