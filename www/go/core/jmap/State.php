@@ -82,7 +82,7 @@ class State extends AbstractState {
 		
 		return $this->token;
 	}
-  
+
 	public function setToken(Token $token) {
 		$this->token = $token;
 	}
@@ -230,6 +230,16 @@ class State extends AbstractState {
 			return false;
 		}
 		return $user->isAdmin();
+	}
+
+
+	/**
+	 * Get the permission level of the module this controller belongs to.
+	 * 
+	 * @return int
+	 */
+	public function getClassPermissionLevel($cls) {
+		return $this->getToken()->getClassPermissionLevel($cls);
 	}
 
 }

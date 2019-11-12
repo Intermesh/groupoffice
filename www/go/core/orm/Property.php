@@ -81,6 +81,7 @@ abstract class Property extends Model {
 	
 	/**
 	 * Holds primary keys per table alias. Used to track new state of records.
+	 * Only set when not fetched as readonly
 	 * 
 	 * @example
 	 * ```
@@ -145,7 +146,9 @@ abstract class Property extends Model {
 			$col = $m->getColumn($propName);
 			if($col) {
 				if($loadDefault) {
-					$this->defaults[$propName] = $this->$propName;
+					if(isset($this->$propName)) {
+						$this->defaults[$propName] = $this->$propName;
+					}
 					$this->$propName = $col->castFromDb($col->default);
 				} else{
 					$this->$propName = $col->castFromDb($this->$propName);
@@ -259,10 +262,7 @@ abstract class Property extends Model {
 		$cacheKey = static::class.':'.$relationName;
 
 		if(!isset(self::$cachedRelations[$cacheKey])) {
-			$query = $cls::internalFind();
-			if($readOnly) {
-				$query->readOnly();
-			}
+			$query = $cls::internalFind([], $readOnly);
 			foreach($where as $field => $value) {
 				$query->andWhere($field . '= :'.$field);
 			}
@@ -457,7 +457,7 @@ abstract class Property extends Model {
 	}
 	
 	public function __set($name, $value) {		
-		if($this->setPrimaryKey($name, $value)) {
+		if(!$this->readOnly && $this->setPrimaryKey($name, $value)) {
 			return ;
 		}
 
@@ -517,7 +517,7 @@ abstract class Property extends Model {
 	 * 
 	 * @return static|Query
 	 */
-	protected static function internalFind(array $fetchProperties = []) {
+	protected static function internalFind(array $fetchProperties = [], $readOnly = false) {
 
 		$cacheKey = static::class . '-' . implode("-", $fetchProperties);
 
@@ -539,10 +539,10 @@ abstract class Property extends Model {
 
 		$query = (new Query())
 						->from($tables[$mainTableName]->getName(), $tables[$mainTableName]->getAlias())						
-						->setModel(static::class, $fetchProperties);
+						->setModel(static::class, $fetchProperties, $readOnly);
 
 		self::joinAdditionalTables($tables, $query);
-		self::buildSelect($query, $fetchProperties);
+		self::buildSelect($query, $fetchProperties, $readOnly);
 
 
 		self::$findCache[$cacheKey] = $query;
@@ -568,12 +568,12 @@ abstract class Property extends Model {
 	 * @return static
 	 * @throws Exception
 	 */
-	protected static function internalFindById($id, array $properties = []) {
+	protected static function internalFindById($id, array $properties = [], $readOnly = false) {
 		$tables = static::getMapping()->getTables();
 		$primaryTable = array_shift($tables);
 		$keys = $primaryTable->getPrimaryKey();
 		
-		$query = static::internalFind($properties);		
+		$query = static::internalFind($properties, $readOnly);		
 		
 		//Used count check here because a customer managed to get negative ID's in the database.
 		$ids = count($keys) == 1 ? [$id] : explode('-', $id);
@@ -648,7 +648,7 @@ abstract class Property extends Model {
 	 * @param Query $query
 	 * @param array $fetchProperties
 	 */
-	private static function buildSelect(Query $query, array $fetchProperties) {
+	private static function buildSelect(Query $query, array $fetchProperties, $readOnly) {
 
 		$select = [];
 		$selectProps = array_unique(array_merge(static::getRequiredProperties(), $fetchProperties));
@@ -665,9 +665,11 @@ abstract class Property extends Model {
 			}
 			
 			//also select primary key values separately to check if tables were new when saving. They are stored in $this->primaryKeys when they go through the __set function.
-			foreach($table->getPrimaryKey() as $pk) {				
-				//$query->select("alias.id AS `alias.userId`");
-				$select[] = $table->getAlias() . "." . $pk . " AS `" . $table->getAlias() . "." . $pk ."`";				
+			if(!$readOnly) {
+				foreach($table->getPrimaryKey() as $pk) {				
+					//$query->select("alias.id AS `alias.userId`");
+					$select[] = $table->getAlias() . "." . $pk . " AS `" . $table->getAlias() . "." . $pk ."`";				
+				}
 			}
 
 			if(!empty($table->getConstantValues())) {
@@ -1148,9 +1150,15 @@ abstract class Property extends Model {
 			// 	$query->andWhereNot($keepKeys);
 			// }
 
+			if(!isset($oldModels)) {
+				return true;
+			}
+			
+			
 			$keepKeys = array_map(function($model){return isset($model) ? $model->id() : '-';}, $models);
 			$removeKeys = new Criteria();
 			$pk = $cls::getPrimaryKey();
+			
 			foreach($oldModels as $model) {
 				$id = $model->id();
 				if(in_array($id, $keepKeys)) {
@@ -1515,6 +1523,10 @@ abstract class Property extends Model {
 
 	/**
 	 * Delete this model
+	 * 
+	 * When finding the models to delete in an override use mergeWith():
+	 * 
+	 * self::find()->mergeWith($query);
 	 * 
 	 * @return boolean
 	 */

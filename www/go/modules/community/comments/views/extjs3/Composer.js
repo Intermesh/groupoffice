@@ -44,7 +44,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			enableAlignments: false,
 			enableSourceEdit: false,
 			hideToolbar: true,
-			emptyText: t('Add comment')+'...',
+			// emptyText: t('Add comment')+'...',
 			allowBlank: false,
 			plugins: [go.form.HtmlEditor.emojiPlugin],
 			height: 35,
@@ -53,6 +53,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			boxMinHeight:35
 		});
 		this.textField.on('sync', this.onSync,this);	
+		this.textField.on('render', this.onSync,this);	
 		
 		this.sendBtn = new Ext.Button({
 			tooltip: t('Send'),

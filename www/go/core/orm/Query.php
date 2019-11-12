@@ -18,11 +18,12 @@ class Query extends DbQuery {
 	 * @param string $cls
 	 * @return $this
 	 */
-	public function setModel($cls, $fetchProperties = []) {
+	public function setModel($cls, $fetchProperties = [], $readOnly = false) {
 		$this->model = $cls;
 		$this->fetchProperties = $fetchProperties;
+		$this->readOnly = $readOnly;
 
-		return $this->fetchMode(PDO::FETCH_CLASS, $this->model, [false, $this->fetchProperties, false]);
+		return $this->fetchMode(PDO::FETCH_CLASS, $this->model, [false, $this->fetchProperties, $this->readOnly]);
 	}
 	
 	/**
@@ -140,13 +141,20 @@ class Query extends DbQuery {
 		return $this;
 	}
 
-	/**
-	 * Set models read only. This improves performance too.
-	 * 
-	 * @return self
-	 */
-	public function readOnly () {
-		return $this->fetchMode(PDO::FETCH_CLASS, $this->model, [false, $this->fetchProperties, true]);
+	private $readOnly = false;
+
+	// /**
+	//  * Set models read only. This improves performance too.
+	//  * 
+	//  * @return self
+	//  */
+	// public function readOnly ($readOnly = true) {
+	// 	$this->readOnly = $readOnly;
+	// 	return $this->fetchMode(PDO::FETCH_CLASS, $this->model, [false, $this->fetchProperties, $this->readOnly]);
+	// }
+
+	public function getReadOnly() {
+		return $this->readOnly;
 	}
 
 }

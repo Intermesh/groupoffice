@@ -1,5 +1,8 @@
+12-11-2019 6.4.75
 - Billing: add total_outstanding
 - Core: Added check for mysqlnd driver for system requirements
+- Core: Lot's of performance optimizations
+- Fixed: Addressbook - Create and Modified date shows "undefined" next to the time #496
 
 11-11-2019 6.4.74
 - Core: System settings and My Account work on mobile

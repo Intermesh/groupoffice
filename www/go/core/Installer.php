@@ -104,7 +104,7 @@ class Installer {
 		$database->setUtf8();
 
 		Utils::runSQLFile(Environment::get()->getInstallFolder()->getFile("go/core/install/install.sql"));
-		App::get()->getDbConnection()->query("SET FOREIGN_KEY_CHECKS=0;");
+		App::get()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
 		
 		$this->installGroups();
 

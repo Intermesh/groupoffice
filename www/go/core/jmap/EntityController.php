@@ -71,7 +71,7 @@ abstract class EntityController extends Controller {
 	protected function getQueryQuery($params) {
 		$cls = $this->entityClass();
 
-		$query = $cls::find($cls::getPrimaryKey(false))
+		$query = $cls::find($cls::getPrimaryKey(false), true)
 						->select($cls::getPrimaryKey(true)) //only select primary key
 						->limit($params['limit'])
 						->offset($params['position']);
@@ -104,7 +104,7 @@ abstract class EntityController extends Controller {
 		
 		//go()->info($query);
 		
-		return $query->readOnly();
+		return $query;
 	}
 	
 	private $permissionLevelFoundInFilters = false;
@@ -356,16 +356,16 @@ abstract class EntityController extends Controller {
 		$cls = $this->entityClass();
 		
 		if(!isset($params['ids'])) {
-			$query = $cls::find($params['properties']);
+			$query = $cls::find($params['properties'], true);
 		} else
 		{
-			$query = $cls::findByIds($params['ids'], $params['properties']);
+			$query = $cls::findByIds($params['ids'], $params['properties'], true);
 		}
 		
 		//filter permissions
 		$cls::applyAclToQuery($query, Acl::LEVEL_READ);
 		
-		return $query->readOnly();	
+		return $query;	
 	}
 
 	
