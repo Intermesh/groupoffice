@@ -4,9 +4,9 @@ namespace go\modules\community\test\model;
 
 class AMap extends \go\core\orm\Property {
 	
-	protected $aId;
+	public $aId;
 	
-	protected $anotherAId;
+	public $anotherAId;
 	
 	public $description;
 	

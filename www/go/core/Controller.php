@@ -19,27 +19,10 @@ abstract class Controller {
 	protected function authenticate() {  
     if (!go()->getAuthState()->isAuthenticated()) {			
       throw new Exception(401, "Unauthorized");
-		}  
-	
-		if(!$this->getModulePermissionLevel()) {
+		}
+
+		if(!go()->getAuthState()->getClassPermissionLevel(static::class)) {
 			throw new Exception(403, "Forbidden");
 		}
 	}
-
-	private $modulePermissionLevel;
-
-	/**
-	 * Get the permission level of the module this controller belongs to.
-	 * 
-	 * @return int
-	 */
-	protected function getModulePermissionLevel() {
-		if(!isset($this->modulePermissionLevel)) {
-			$mod = Module::findByClass(static::class, ['aclId', 'permissionLevel']);
-			$this->modulePermissionLevel = $mod->getPermissionLevel();			
-		}
-
-		return $this->modulePermissionLevel;
-	}
-
 }

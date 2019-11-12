@@ -94,12 +94,12 @@ abstract class Entity extends Property {
 	 * @see Criteria::where()
 	 * @return static[]|Query
 	 */
-	public static final function find(array $properties = []) {
+	public static final function find(array $properties = [], $readOnly = false) {
 		
 		if(count($properties) && !isset($properties[0])) {
 			throw new \Exception("Invalid properties given to Entity::find()");
 		}
-		return static::internalFind($properties);
+		return static::internalFind($properties, $readOnly);
 	}
 
 	/**
@@ -120,9 +120,9 @@ abstract class Entity extends Property {
 	 * @return static
 	 * @throws Exception
 	 */
-	public static final function findById($id, array $properties = []) {
+	public static final function findById($id, array $properties = [], $readOnly = false) {
 
-		return static::internalFindById($id, $properties);
+		return static::internalFindById($id, $properties, $readOnly);
 	}
 	
 	/**
@@ -140,13 +140,13 @@ abstract class Entity extends Property {
 	 * @param array $properties
 	 * @throws Exception
 	 */
-	public static final function findByIds(array $ids, array $properties = []) {
+	public static final function findByIds(array $ids, array $properties = [], $readOnly = false) {
 		$tables = static::getMapping()->getTables();
 		$primaryTable = array_shift($tables);
 		$keys = $primaryTable->getPrimaryKey();
 		$keyCount = count($keys);
 		
-		$query = static::internalFind($properties);
+		$query = static::internalFind($properties, $readOnly);
 		
 		$idArr = [];
 		for($i = 0; $i < $keyCount; $i++) {			
