@@ -1,3 +1,4 @@
+12-11-2019 6.4.75
 - Billing: add total_outstanding
 - Core: Added check for mysqlnd driver for system requirements
 - Core: Lot's of performance optimizations
