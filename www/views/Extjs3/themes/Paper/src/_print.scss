@@ -13,7 +13,7 @@
 		font-size: 100%;
 		margin:0;
 		padding:0;
-		//overflow:visible !important;
+		overflow:visible !important;
 		//max-height: 297mm;
 		//max-width: 210mm;
 	}
@@ -24,7 +24,7 @@
   	}
   	#paper, #paper *, html body #paper * {
 		page-break-after: always;
-		page-break-inside: avoid;
+		//page-break-inside: avoid;
 		visibility: visible !important;
   	}
   	#paper {
@@ -34,7 +34,7 @@
 		box-shadow: none !important;
 		top:0;
 		left:0;
-		bottom:0;
+		// bottom:0;
 		right:0;
 		padding:0 !important;
 		margin: 0 !important;
