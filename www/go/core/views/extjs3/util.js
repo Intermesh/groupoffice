@@ -5,7 +5,6 @@ go.print = function(tmpl, data) {
 		paper = document.getElementById('paper');
 	}
 	paper.innerHTML = Ext.isEmpty(data) ? tmpl : tmpl.apply(data);
-	document.execCommand('print');
 	Ext.isIE || Ext.isSafari ? document.execCommand('print') : window.print();
 };
 go.util =  (function () {
