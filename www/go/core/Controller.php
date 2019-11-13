@@ -25,4 +25,24 @@ abstract class Controller {
 			throw new Exception(403, "Forbidden");
 		}
 	}
+
+
+	private $modulePermissionLevel;
+
+	/**
+	 * Get the permission level of the module this controller belongs to.
+	 * 
+	 * @return int
+	 */
+	protected function getModulePermissionLevel() {
+		if(!isset($this->modulePermissionLevel)) {
+			$mod = Module::findByClass(static::class);
+			$this->modulePermissionLevel = $mod->getPermissionLevel();
+			if(!$this->modulePermissionLevel && $mod->name == "core" && $mod->package == "core") {
+				$this->modulePermissionLevel = Acl::LEVEL_READ;
+			}
+		}
+
+		return $this->modulePermissionLevel;
+	}
 }
