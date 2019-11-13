@@ -1,6 +1,6 @@
 go.modules.community.task.TasklistDialog = Ext.extend(go.form.Dialog, {
 	title: t("Tasklists", "tasks"),
-	entityStore: "TasksTasklist",
+	entityStore: "Tasklist",
 	titleField: "name",
 	width: dp(800),
 	height: dp(600),

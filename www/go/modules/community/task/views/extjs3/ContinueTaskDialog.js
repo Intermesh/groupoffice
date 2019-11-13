@@ -12,7 +12,7 @@
  */
 
 go.modules.community.task.ContinueTaskDialog = Ext.extend(go.form.Dialog, {
-	entityStore: "TasksTask",
+	entityStore: "Task",
 	initComponent: function () {
 
 		Ext.apply(this, {
@@ -58,7 +58,7 @@ go.modules.community.task.ContinueTaskDialog = Ext.extend(go.form.Dialog, {
 			displayField:'name',			
 			store: new go.data.Store({
 				fields:['id','name','user_name'],
-				entityStore: "TasksTasklist",
+				entityStore: "Tasklist",
 				displayField: "name",
 				// baseParams:{
 				// 	//permissionLevel: GO.permissionLevels.create

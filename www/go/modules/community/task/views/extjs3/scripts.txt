@@ -1,7 +1,6 @@
 Module.js
 MainPanel.js
 TaskPanel.js
-SelectTaskStatus.js
 SelectPriority.js
 TasklistsGrid.js
 TaskCombo.js

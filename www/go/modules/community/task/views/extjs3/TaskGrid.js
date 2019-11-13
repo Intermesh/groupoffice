@@ -38,7 +38,7 @@ go.modules.community.task.TaskGrid = Ext.extend(go.grid.GridPanel, {
 						update[id] = {percentageComplete: 0};
 					}
 					// update task
-					go.Db.store("TasksTask").set({update: update});
+					go.Db.store("Task").set({update: update});
 				},
 				scope:this
 			});
@@ -53,7 +53,7 @@ go.modules.community.task.TaskGrid = Ext.extend(go.grid.GridPanel, {
 		// 		update[id] = {percentageComplete: 0};
 		// 	}
 
-		// 	go.Db.store("TasksTask").set({update: update});
+		// 	go.Db.store("Task").set({update: update});
 		// }, this);
 
 
@@ -70,7 +70,7 @@ go.modules.community.task.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'modifier', type: "relation"},
 				'percentageComplete'
 			],
-			entityStore: "TasksTask"
+			entityStore: "Task"
 		});
 
 		Ext.apply(this, {		

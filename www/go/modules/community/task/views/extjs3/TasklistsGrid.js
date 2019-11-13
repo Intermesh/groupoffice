@@ -30,7 +30,7 @@ go.modules.community.task.TasklistsGrid = Ext.extend(go.grid.GridPanel, {
 			
 			store: new go.data.Store({
 				fields: ['id', 'name'],
-				entityStore: "TasksTasklist"
+				entityStore: "Tasklist"
 			}),
 			selModel: selModel,
 			plugins: [actions],
@@ -105,7 +105,7 @@ go.modules.community.task.TasklistsGrid = Ext.extend(go.grid.GridPanel, {
 								if (btn != "yes") {
 									return;
 								}
-								go.Db.store("TasksTasklist").set({destroy: [this.moreMenu.record.id]});
+								go.Db.store("Tasklist").set({destroy: [this.moreMenu.record.id]});
 							}, this);
 						},
 						scope: this						

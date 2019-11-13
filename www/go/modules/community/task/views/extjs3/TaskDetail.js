@@ -2,7 +2,7 @@
 
 go.modules.community.task.TaskDetail = Ext.extend(go.detail.Panel, {
 	
-	entityStore: "TasksTask",
+	entityStore: "Task",
 
 	stateId: 'ta-tasks-detail',
 

@@ -37,7 +37,7 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					iconCls: "ic-arrow-back",
 					handler: function () {
 						//this.westPanel.show();
-						go.Router.goto("taskstask");
+						go.Router.goto("task");
 					},
 					scope: this
 				}]
@@ -329,7 +329,7 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 											iconCls: 'ic-contacts',
 											handler: function() {
 												go.util.exportToFile(
-																'TasksTask', 
+																'Task', 
 																Ext.apply(this.taskGrid.store.baseParams, this.taskGrid.store.lastOptions.params, {limit: 0, start: 0}),
 																'text/vcalendar');									
 											},
@@ -339,7 +339,7 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 											iconCls: 'ic-description',
 											handler: function() {
 												go.util.exportToFile(
-																'TasksTask', 
+																'Task', 
 																Ext.apply(this.taskGrid.store.baseParams, this.taskGrid.store.lastOptions.params, {limit: 0, start: 0}),
 																'text/csv');									
 											},
@@ -399,7 +399,7 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 								displayField:'name',			
 								store: new go.data.Store({
 									fields:['id','name','user_name'],
-									entityStore: "TasksTasklist",
+									entityStore: "Tasklist",
 									displayField: "name",
 								}),
 								mode:'local',
@@ -443,7 +443,7 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 								disabled: true,
 								iconCls: 'ic-add',
 								handler:function(){
-									go.Db.store("TasksTask").set({
+									go.Db.store("Task").set({
 										create: {"client-id-1" : {
 											title: this.taskNameTextField.getValue(),
 											tasklistId: this.quickTasklistId,
@@ -467,7 +467,7 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		});
 		this.quickAddTaskListCombo.store.load();
 		this.taskGrid.on('navigate', function (grid, rowIndex, record) {
-			go.Router.goto("taskstask/" + record.id);
+			go.Router.goto("task/" + record.id);
 		}, this);
 		
 	

@@ -31,7 +31,7 @@ class PortletTasklist extends Entity {
 	}
 
 	public static function getClientName() {
-		return "TasksPortletTasklist";
+		return "PortletTasklist";
 	}
 
 }

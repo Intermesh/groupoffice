@@ -1,10 +1,21 @@
 <?php
 
 use GO\Base\Util\Icalendar\Rrule;
+use go\core\orm\Query;
 
 $updates = [];
 
 $updates['201911061630'][] = function() {
+
+	$query  = (new Query)->where(['clientName' => 'Task']);
+	go()->getDbConnection()->delete('core_entity', $query)->execute();
+
+	$query  = (new Query)->where(['clientName' => 'Tasklist']);
+	go()->getDbConnection()->delete('core_entity', $query)->execute();
+
+	$query  = (new Query)->where(['name' => 'tasks']);
+	go()->getDbConnection()->delete('core_module', $query)->execute();
+
 	\go\core\db\Utils::runSQLFile(\GO()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/task/install/install.sql"));
 };
 

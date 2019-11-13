@@ -159,7 +159,7 @@ class Task extends Entity {
 	}
 
 	public static function getClientName() {
-		return "TasksTask";
+		return "Task";
 	}
 
 	public static function converters() {

@@ -1,6 +1,6 @@
 go.modules.community.task.ChooseTasklistDialog = Ext.extend(Ext.Window, {
 	title: t("Choose a tasklist"),
-    entityStore: "TasksTask",
+    entityStore: "Task",
     layout: 'fit',
 	width: dp(800),
 	height: dp(800),
@@ -24,7 +24,7 @@ go.modules.community.task.ChooseTasklistDialog = Ext.extend(Ext.Window, {
                      });
                 } else {
                     go.util.importFile(
-                        'TasksTask', 
+                        'Task', 
                         "text/vcalendar,text/csv",
                         { tasklistId: this.chooseTasklistGrid.selectedId },
                         {},

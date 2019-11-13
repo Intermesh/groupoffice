@@ -2,7 +2,7 @@
 return array (
   'Select tasklist' => 'Selecteer takenlijst',
   'Select category' => 'Selecteer categorie',
-  'TasksTask' => 'Taak',
+  'Task' => 'Taak',
   'Tasks' => 'Taken',
   'Tasklist' => 'Takenlijst',
   'start' => 'begin',

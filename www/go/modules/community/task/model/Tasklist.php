@@ -55,7 +55,7 @@ class Tasklist extends AclOwnerEntity {
 	}
 
 	public static function getClientName() {
-		return "TasksTasklist";
+		return "Tasklist";
 	}
 
 }

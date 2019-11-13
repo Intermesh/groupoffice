@@ -1,8 +1,8 @@
 go.Modules.register("community", "task", {
 	mainPanel: "go.modules.community.task.MainPanel",
 	title: t("Tasks"),
-	entities: ["TasksCategory","TasksPortletTasklist","TasksSettings",{
-		name: "TasksTask",
+	entities: ["TasksCategory","PortletTasklist","Settings",{
+		name: "Task",
 		links: [{
 
 			iconCls: "entity ic-check",
@@ -23,7 +23,7 @@ go.Modules.register("community", "task", {
 		},
 	},
 	{
-		name: "TasksTasklist",
+		name: "Tasklist",
 		relations: {
 			creator: {store: "User", fk: "createdBy"}
 		}

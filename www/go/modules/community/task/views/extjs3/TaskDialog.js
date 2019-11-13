@@ -1,6 +1,6 @@
 go.modules.community.task.TaskDialog = Ext.extend(go.form.Dialog, {
 	title: t("Task"),
-	entityStore: "TasksTask",
+	entityStore: "Task",
 	width: dp(800),
 	height: dp(800),
 
@@ -81,7 +81,7 @@ go.modules.community.task.TaskDialog = Ext.extend(go.form.Dialog, {
 			displayField:'name',			
 			store: new go.data.Store({
 				fields:['id','name','user_name'],
-				entityStore: "TasksTasklist",
+				entityStore: "Tasklist",
 				displayField: "name",
 			}),
 			mode:'local',
