@@ -1,4 +1,3 @@
-// TODO: Breaks email print
 #paper { display:none;} 
  @media print {
 	@page {
@@ -23,8 +22,9 @@
 		//max-height: 297mm;
   	}
   	#paper, #paper *, html body #paper * {
-		page-break-after: always;
-		//page-break-inside: avoid;
+		page-break-after: auto;
+		// page-break-after: always;
+		// page-break-inside: avoid;
 		visibility: visible !important;
   	}
   	#paper {
