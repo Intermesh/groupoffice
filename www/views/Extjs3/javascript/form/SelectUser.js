@@ -67,7 +67,7 @@ GO.form.SelectUser = function(config){
 			'<tpl for=".">',
 			'<div class="x-combo-list-item"><div class="user">\
 				 <tpl if="!avatarId"><div class="avatar"></div></tpl>\\n\
-				 <tpl if="avatarId"><div class="avatar" style="background-image:url({[go.Jmap.downloadUrl(values.avatarId)]})"></div></tpl>\
+				 <tpl if="avatarId"><div class="avatar" style="background-image:url({[go.Jmap.thumbUrl(values.avatarId, {w: 40, h: 40, zc: 1})]})"></div></tpl>\
 				 <div class="wrap">\
 					 <div>{displayName}</div><small style="color:#333;">{username}</small>\
 				 </div>\

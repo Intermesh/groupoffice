@@ -53,7 +53,8 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			boxMinHeight:35
 		});
 		this.textField.on('sync', this.onSync,this);	
-		this.textField.on('render', this.onSync,this);	
+		this.textField.on("initialize", this.onSync, this);
+		// this.textField.on('render', this.onSync,this);	
 		
 		this.sendBtn = new Ext.Button({
 			tooltip: t('Send'),

@@ -98,6 +98,20 @@ go.Jmap = {
 
 		return url;
 	},
+
+	thumbUrl: function(blobId, params) {
+		if (!blobId) {
+			return '';
+		}
+		var url = BaseHref + 'api/thumb.php?blob=' + blobId;
+
+		for(var name in params) {
+			url += '&' + name + '=' + encodeURIComponent(params[name]);
+		}
+
+		return url;
+
+	},
 	
 	upload : function(file, cfg) {
 		if(Ext.isEmpty(file))

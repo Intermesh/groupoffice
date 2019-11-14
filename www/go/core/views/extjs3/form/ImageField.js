@@ -150,7 +150,7 @@ go.form.ImageField = Ext.extend(Ext.BoxComponent, {
 
 		if (this.rendered) {
 			if (!Ext.isEmpty(value)) {
-				this.el.setStyle('background-image', 'url(' + go.Jmap.downloadUrl(value) + ')');
+				this.el.setStyle('background-image', 'url(' + go.Jmap.thumbUrl(value, {w: 120, h: 120, zc: 1})  + ')');
 			} else {
 				this.el.setStyle('background-image', null);
 			}

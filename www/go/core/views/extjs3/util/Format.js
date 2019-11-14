@@ -57,7 +57,7 @@
 			
 			if(Ext.isIE) {
 				//sigh
-				return date;
+				return v;
 			}
 
 			var local = v.toLocaleString("en-US", {timeZone: go.User.timezone});					

@@ -42,7 +42,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 				'<tpl for=".">',
 				'<div class="x-combo-list-item"><div class="user">\
 					 <tpl if="!photoBlobId"><div class="avatar"></div></tpl>\\n\
-					 <tpl if="photoBlobId"><div class="avatar" style="background-image:url({[go.Jmap.downloadUrl(values.photoBlobId)]})"></div></tpl>\
+					 <tpl if="photoBlobId"><div class="avatar" style="background-image:url({[go.Jmap.thumbUrl(values.photoBlobId, {w: 40, h: 40, zc: 1}) ]})"></div></tpl>\
 					 <div class="wrap">\
 						 <div>{name}</div><small style="color:#333;">{[values.organizations ? values.organizations.column("name").join(", ") : ""]}</small>\
 					 </div>\

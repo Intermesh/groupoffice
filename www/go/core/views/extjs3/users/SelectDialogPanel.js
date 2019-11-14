@@ -157,7 +157,7 @@ go.users.SelectDialogPanel = Ext.extend(Ext.Panel, {
 					sortable: true,
 					dataIndex: 'displayName',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-						var style = record.get('avatarId') ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("avatarId")) + ')"' : "";
+						var style = record.get('avatarId') ?  'background-image: url(' + go.Jmap.thumbUrl(record.get("avatarId"), {w: 40, h: 40, zc: 1}) + ')"' : "";
 						
 						return '<div class="user"><div class="avatar" style="'+style+'"></div>' +
 							'<div class="wrap">'+

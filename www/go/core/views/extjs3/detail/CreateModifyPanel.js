@@ -32,7 +32,7 @@ go.detail.CreateModifyPanel = Ext.extend(Ext.Panel, {
 			if(!user || !user.avatarId) {
 				return 'background-image:none';
 			}
-			return 'background-image: url('+go.Jmap.downloadUrl(user.avatarId)+');background-color:transparent;';
+			return 'background-image: url('+go.Jmap.thumbUrl(user.avatarId, {w: 40, h: 40, zc: 1}) +');background-color:transparent;';
 		},
 		cUser: null,
 		mUser: null
