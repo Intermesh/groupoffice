@@ -805,13 +805,10 @@ class Contact extends AclItemEntity {
 		if(empty($this->salutation)) {
 			$this->salutation = go()->t("Dear sir/madam");
 		}
-		$contact->salutation = $this->salutation;
-		$contact->save();
 		
-
+		go()->getDbConnection()->update('addressbook_contact', ['salutation' => $this->salutation], ['id' => $this->id])->execute();
+		
 		return $this->salutation;
-
-
 	}
 	
 	public function setSalutation($v) {
