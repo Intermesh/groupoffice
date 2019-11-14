@@ -795,7 +795,7 @@ class Contact extends AclItemEntity {
 		}
 
 		//re fetch in case this object is not complete
-		$contact= Contact::findById($this->id, ['firstName', 'lastName', 'middleName', 'name', 'gender', 'prefixes', 'suffixes', 'language']);
+		$contact= Contact::findById($this->id, ['salutation', 'firstName', 'lastName', 'middleName', 'name', 'gender', 'prefixes', 'suffixes', 'language']);
 		$tpl = new TemplateParser();
 		$tpl->addModel('contact', $contact->toArray());
 
@@ -805,7 +805,9 @@ class Contact extends AclItemEntity {
 		if(empty($this->salutation)) {
 			$this->salutation = go()->t("Dear sir/madam");
 		}
-		$this->saveTables();
+		$contact->salutation = $this->salutation;
+		$contact->save();
+		
 
 		return $this->salutation;
 

@@ -1,16 +1,22 @@
 <?php
 
+use go\core\auth\model\Token;
 use go\modules\community\apikeys\model\Key;
 
 $updates['201911071216'][] = function() {
   foreach(Key::find() as $key) {
-    $token = new \go\core\auth\model\Token();
-    $token->accessToken = $key->accessToken;
-		$token->userId = 1;
-		$token->expiresAt = null;
+
+    $token = Token::find()->where(['accessToken' => $key->accessToken])->single();
+    if($token == false) {
+      $token = new \go\core\auth\model\Token();
+      $token->accessToken = $key->accessToken;
+      $token->userId = 1;
+    }
+     
+    $token->expiresAt = null;
     if(!$token->refresh()) {
       throw new \Exception("Could not create token for API key");      
-    }		
+    }
   }
 };
 
