@@ -888,6 +888,9 @@ abstract class Property extends Model {
 	 * Saves all modified properties to the database.
 	 */
 	protected function saveTables() {
+		if($this->readOnly) {
+			throw new \Exception("Can't save in read only mode");
+		}
 		$modified = $this->getModified();				
 		
 		// make sure auto incremented values come first

@@ -53,7 +53,7 @@ class UserSettings extends Property {
 
 		if($noteBook) {
 			$this->defaultNoteBookId = $noteBook->id;
-			$this->saveTables();
+			go()->getDbConnection()->update("notes_user_settings", ['defaultNoteBookId' => $this->defaultNoteBookId], ['userId' => $this->userId])->execute();
 		}
 
 		return $this->defaultNoteBookId;
