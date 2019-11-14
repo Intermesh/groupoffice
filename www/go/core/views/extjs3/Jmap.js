@@ -114,6 +114,9 @@ go.Jmap = {
 				if(cfg.failure && response.responseText) {
 					data = Ext.decode(response.responseText);
 					cfg.failure.call(cfg.scope || this,data);
+				} else
+				{
+					Ext.MessageBox.alert(t("Error"), t("Upload failed. Please check if the system is using the correct URL at System settings -> General -> URL."));
 				}
 			},
 			headers: {
