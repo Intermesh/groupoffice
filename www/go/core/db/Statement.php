@@ -80,10 +80,6 @@ class Statement extends \PDOStatement implements \JsonSerializable {
 					$this->build[$key] = $v;
 				}
 			}
-
-			if(isset($this->build) && go()->getDebugger()->enabled) {
-				go()->debug(QueryBuilder::debugBuild($this->build));
-			}
 			
 			$ret = parent::execute($input_parameters);
 			if(go()->getDebugger()->enabled && go()->getDbConnection()->debug && isset($this->build)) {

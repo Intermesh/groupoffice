@@ -98,6 +98,20 @@ go.Jmap = {
 
 		return url;
 	},
+
+	thumbUrl: function(blobId, params) {
+		if (!blobId) {
+			return '';
+		}
+		var url = BaseHref + 'api/thumb.php?blob=' + blobId;
+
+		for(var name in params) {
+			url += '&' + name + '=' + encodeURIComponent(params[name]);
+		}
+
+		return url;
+
+	},
 	
 	upload : function(file, cfg) {
 		if(Ext.isEmpty(file))
@@ -114,6 +128,9 @@ go.Jmap = {
 				if(cfg.failure && response.responseText) {
 					data = Ext.decode(response.responseText);
 					cfg.failure.call(cfg.scope || this,data);
+				} else
+				{
+					Ext.MessageBox.alert(t("Error"), t("Upload failed. Please check if the system is using the correct URL at System settings -> General -> URL."));
 				}
 			},
 			headers: {

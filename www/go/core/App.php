@@ -436,8 +436,9 @@ use const GO_CONFIG_FILE;
 		 * @return Cache\Apcu
 		 */
 		public function getCache() {
-			if (!isset($this->cache)) {
+			if (!isset($this->cache)) {				
 				$cls = $this->getConfig()['core']['general']['cache'];
+				go()->log("Using cache: " . $cls);
 				$this->cache = new $cls;
 			}
 			return $this->cache;

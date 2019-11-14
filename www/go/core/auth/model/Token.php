@@ -7,6 +7,7 @@ use go\core\auth\Method;
 use go\core\orm\Query;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
+use go\core\model\Module;
 
 class Token extends Entity {
 	
@@ -393,5 +394,36 @@ class Token extends Entity {
 	public static function collectGarbage() {
 		return static::delete((new Query)->where('expiresAt', '!=', null)->andWhere('expiresAt', '<', new DateTime()));
 	}
+
+	protected static function internalDelete(\go\core\orm\Query $query)
+	{
+		foreach(self::find()->mergeWith($query)->selectSingleValue('accessToken') as $accessToken) {
+			go()->getCache()->delete('token-' . $accessToken);
+		}
+
+		return parent::internalDelete($query);
+	}
+
+
+
+	private $classPermissionLevels = [];
+
+	/**
+	 * Get the permission level of the module this controller belongs to.
+	 * 
+	 * @return int
+	 */
+	public function getClassPermissionLevel($cls) {
+		if(!isset($this->classPermissionLevels[$cls])) {
+			$mod = Module::findByClass($cls, ['aclId', 'permissionLevel']);
+			$this->classPermissionLevels[$cls]= $mod->getPermissionLevel();	
+			go()->getCache()->set('token-'.$this->accessToken,$this);		
+		}
+
+		return $this->classPermissionLevels[$cls];
+	}
+  
+
+	
 	
 }

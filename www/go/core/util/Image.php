@@ -19,10 +19,12 @@ class Image {
 	private $_originalFilename;
 
 	private $jpegCompression = 85;
+
+	public $loadSuccess = false;
 	
 	
 	public function __construct($filename) {
-		$this->load($filename);
+		$this->loadSuccess = $this->load($filename);
 	}
 
 	/**

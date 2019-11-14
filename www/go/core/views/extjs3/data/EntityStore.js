@@ -1,5 +1,163 @@
 
-/* global Ext, go, localforage */
+// /* global Ext, go, localforage */
+
+
+// var idbKeyval = function(storeName, dbName) {
+
+// 	this.storeName = storeName;
+// 	this.dbName = dbName || "go";
+
+// };
+
+// var dbp, dbInfo;
+
+// idbKeyval.prototype.checkStore = function() {
+
+// }
+
+// idbKeyval.prototype.connect = function(version) {
+// 	if(dbp) {			
+// 			return new Promise(function(resolve, reject) {
+// 				setTimeout(function() {
+// 					resolve( dbp);
+// 				})
+// 			});		
+// 	}
+// 	var me = this;
+// 	dbp = new Promise(function(resolve, reject) {		
+// 		console.warn("Connecting" , version);
+// 			var	openreq = indexedDB.open(me.dbName, version);
+// 			openreq.onerror = function() { reject(openreq.error);};
+// 			openreq.onsuccess = function() {
+// 					console.warn('connect success');			
+
+// 					dbInfo = {
+// 						version: openreq.result.version,
+// 						objectStoreNames: openreq.result.objectStoreNames
+// 					};
+					
+			
+// 				openreq.result.onversionchange = function(e) {
+// 					console.warn("Version change");
+// 					openreq.result.close();
+// 					dbp = null;
+// 				}
+// 				resolve(openreq.result); 
+// 			}
+// 		// } else {
+// 		// 	if(!openreq.result.objectStoreNames.contains(me.storeName)) {
+// 		// 		openreq.result.close();
+// 		// 		return me.connect(openreq.result.version + 1)
+// 		// 	}		
+// 		// 	resolve(openreq.result); 	
+// 		// }
+
+// 		openreq.onblocked = function() {
+// 			console.warn("blocked" + me.storeName);
+
+// 			reject("blocked");
+// 		}
+
+// 		openreq.onupgradeneeded = function(e) {
+
+// 			console.warn("Creating: " + me.storeName);
+// 			var upgradeDb = e.target.result;
+// 			upgradeDb.createObjectStore(me.storeName);					
+// 		};
+// 	});
+
+// 	return dbp;
+	
+// }
+
+// idbKeyval.prototype._withIDBStore = function (type, callback) {
+// 	var me = this;
+// 	console.warn("Using " + me.storeName);
+	
+// 	return this.connect().then(function(db) {  
+
+// 		console.warn("Connected " + me.storeName);
+
+// 			if(!db.objectStoreNames.contains(me.storeName)) {
+// 				console.warn(me.storeName + " does not exist. Reconnecting to create it in version " + (dbInfo.version + 1));
+// 				db.close();
+// 				dbp = null;
+// 				return me.connect(++dbInfo.version).then(function(upgradedDb) {
+// 					console.warn(upgradedDb.objectStoreNames);
+// 					return me.createTransaction(upgradedDb, type, callback);
+// 				});
+// 			}
+			
+// 			return me.createTransaction(db, type, callback);			 
+// 	});
+// }
+
+// idbKeyval.prototype.createTransaction = function(db, type, callback) {
+// 	var me = this;
+// 	return new Promise( function(resolve, reject) {
+// 		var transaction = db.transaction(me.storeName, type);
+// 		transaction.oncomplete = function() {
+// 				resolve();
+// 		}
+// 		transaction.onabort = transaction.onerror = function() {
+// 				reject(transaction.error);
+// 		} 
+
+// 		callback(transaction.objectStore(me.storeName));
+
+// 	});
+// }
+
+// idbKeyval.prototype.getItem = function(key) {
+// 	var req;
+// 	return this._withIDBStore('readonly', function(store) {
+// 		req = store.get(key);
+// 	}).then(function() { 
+// 			return req.result;
+// 	});
+// }
+
+// idbKeyval.prototype.setItem = function(key, value) {
+// 	return this._withIDBStore('readwrite',function(store) { 
+// 			store.put(value, key);
+// 	});
+// }
+
+// idbKeyval.prototype.removeItem = function(key) {
+// 	return this._withIDBStore('readwrite', function(store) { 
+// 			return store.delete(key);
+// 	});
+// }
+
+// idbKeyval.prototype.clear = function() {
+// 	return this._withIDBStore('readwrite', function(store) { 
+// 			return store.clear();
+// 	});
+// }
+
+// idbKeyval.prototype.deleteDatabase = function () {
+// 	return new Promise(function(resolve, reject) {
+// 			var openreq = indexedDB.deleteDatabase(dbName);
+// 			openreq.onerror = function() { reject(openreq.error);};
+// 			openreq.onsuccess = function() { resolve(openreq.result); };
+// 	});
+// }
+
+// idbKeyval.prototype.keys = function() {
+// 	var keys = [];
+// 	return this._withIDBStore('readonly',function(store) {
+// 			// This would be store.getAllKeys(), but it isn't supported by Edge or Safari.
+// 			// And openKeyCursor isn't supported by Safari.
+// 			(store.openKeyCursor || store.openCursor).call(store).onsuccess = function () {
+// 					if (!this.result)
+// 							return;
+// 					keys.push(this.result.key);
+// 					this.result.continue();
+// 			};
+// 	}).then(function() { return keys;});
+// }
+
+
 
 /**
  * Entity store

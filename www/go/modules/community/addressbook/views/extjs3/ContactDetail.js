@@ -37,7 +37,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 									return isOrganization && !photoBlobId ? '<i class="icon">business</i>' : "";
 								},
 								getStyle: function (photoBlobId) {
-									return photoBlobId ? 'background-image: url(' + go.Jmap.downloadUrl(photoBlobId) + ')"' : "";
+									return photoBlobId ? 'background-image: url(' + go.Jmap.thumbUrl(photoBlobId, {w: 40, h: 40, zc: 1})  + ')"' : "";
 								}
 							})
 						}),

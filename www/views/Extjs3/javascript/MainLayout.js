@@ -368,6 +368,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				console.error(error);
 				Ext.getBody().unmask();
 				Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console."));
+
+				
 			});
 		});
 		
@@ -544,7 +546,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			if(!go.User.avatarId) {
 				return "";
 			}
-			return 'background-image:url('+go.Jmap.downloadUrl(go.User.avatarId)+');'
+			return 'background-image:url('+go.Jmap.thumbUrl(go.User.avatarId, {w: 40, h: 40, zc: 1})+');'
 		}
 
 				var topPanel = new Ext.Panel({

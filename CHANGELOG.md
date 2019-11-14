@@ -1,3 +1,16 @@
+14-11-2019 6.4.76
+- Activesync: fixed Can't get not existing property 'timezone' in 'GO\Tasks\Model\Task'
+- E-mail: E-mail printing blank pages fixed
+- Custom fields: Fixed adding unique indexes
+- Demo data: Fixed install
+- Core: Use thumbnailer for photo's an avatars
+
+12-11-2019 6.4.75
+- Billing: add total_outstanding
+- Core: Added check for mysqlnd driver for system requirements
+- Core: Lot's of performance optimizations
+- Fixed: Addressbook - Create and Modified date shows "undefined" next to the time #496
+
 11-11-2019 6.4.74
 - Core: System settings and My Account work on mobile
 - Address book: Edit form works on mobile

@@ -388,7 +388,7 @@ class GoSyncUtils {
 	public static function exportRecurrence($model) {
 
 		$old = date_default_timezone_get();
-		date_default_timezone_set($model->timezone);
+		date_default_timezone_set($model->timezone ?? \GO::user()->timezone);
 
 		if ($model instanceof \GO\Tasks\Model\Task)
 			$recur = new SyncTaskRecurrence();

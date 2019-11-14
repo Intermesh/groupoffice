@@ -8,6 +8,7 @@ use go\core;
 use go\core\App;
 use go\core\cli\State;
 use GO\Base\Model\Module;
+use GO\Demodata\Controller\DemodataController;
 
 $installDb = true;
 
@@ -62,6 +63,7 @@ try {
 				new go\modules\community\notes\Module(),
 				new go\modules\community\test\Module(),
 				new go\modules\community\addressbook\Module(),
+				new go\modules\community\comments\Module(),
 				]);
 
 
@@ -84,6 +86,11 @@ try {
 			}
 		}
 		GO::$ignoreAclPermissions = false;
+
+		echo "Installing demo data\n";
+
+		$c = new DemodataController();
+		$c->run('create');
 
 		echo "Done\n\n";
 	}

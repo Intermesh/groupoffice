@@ -4,15 +4,11 @@ namespace go\core\orm;
 
 use DateTime;
 use Exception;
-use GO;
 use GO\Base\Db\ActiveRecord;
 use go\core\App;
 use go\core\db\Query;
 use go\core\model\Module;
-use go\core\ErrorHandler;
 use go\core\jmap;
-use go\core\jmap\Entity;
-use PDOException;
 use go\core\model\Acl;
 use InvalidArgumentException;
 
@@ -37,6 +33,8 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	private $moduleId;	
   private $clientName;
 	private $defaultAclId;
+
+	private static $cache;
 	
 	/**
 	 * The highest mod sequence used for JMAP data sync
@@ -106,16 +104,31 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	 */
 	public static function findByClassName($className) {
 
-		$e = new static;
-		$e->className = $className;
+		// $e = new static;
+		// $e->className = $className;
 		
-		$record = (new Query)
-						->select('*')
-						->from('core_entity')
-						->where('clientName', '=', $className::getClientName())
-						->single();
+		// $record = (new Query)
+		// 				->select('*')
+		// 				->from('core_entity')
+		// 				->where('clientName', '=', $className::getClientName())
+		// 				->single();
 
-		if (!$record) {
+		// if (!$record) {
+		// 	
+		// } else
+		// {
+		// 	$e->defaultAclId = $record['defaultAclId'] ?? null; // in the upgrade situation this column is not there yet.
+		// 	$e->highestModSeq = (int) $record['highestModSeq'];//) ? (int) $record['highestModSeq'] : null;
+		// }
+
+		
+		
+		
+		// return $e;
+		$clientName = $className::getClientName();
+		$c = self::getCache();	
+		
+		if(!isset($c['name'][$clientName])) {
 			$module = Module::findByClass($className);
 		
 			if(!$module) {
@@ -125,23 +138,20 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			$record = [];
 			$record['moduleId'] = isset($module) ? $module->id : null;
 			$record['name'] = self::classNameToShortName($className);
-      $record['clientName'] = $className::getClientName();
+      $record['clientName'] = $clientName;
 			App::get()->getDbConnection()->insert('core_entity', $record)->execute();
-
 			$record['id'] = App::get()->getDbConnection()->getPDO()->lastInsertId();
-		} else
-		{
-			$e->defaultAclId = $record['defaultAclId'] ?? null; // in the upgrade situation this column is not there yet.
-			$e->highestModSeq = (int) $record['highestModSeq'];//) ? (int) $record['highestModSeq'] : null;
-		}
 
-		$e->id = $record['id'];
-		$e->moduleId = $record['moduleId'];
-		$e->clientName = $record['clientName'];
-		$e->name = $record['name'];
-		
-		
-		return $e;
+			$e = new static;
+			$e->className = $className;
+			$e->id = $record['id'];
+			$e->moduleId = $record['moduleId'];
+			$e->clientName = $record['clientName'];
+			$e->name = $record['name'];
+
+			return $e;
+		}
+		return $c['models'][$c['name'][$clientName]] ?? false;
 	}
 
 	/**
@@ -204,7 +214,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	public static function findAll(Query $query = null) {
 		
 		if(!isset($query)) {
-			$query = new Query();
+			return array_values($this->getCache()['id']);		
 		}
 		
 		$records = $query
@@ -228,6 +238,31 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		return $i;
 	}
 
+
+	private static function getCache() {
+		$cache = go()->getCache()->get('entity-types');
+
+		if(!$cache) {
+			$cache= [
+				'id' => [],
+				'name' => [],
+				'models' => self::findAll(new Query)
+			];
+
+			for($i = 0, $c = count($cache['models']); $i < $c; $i++) {
+				$t = $cache['models'][$i];
+				$cache['id'][$t->getId()] = $i;
+				$cache['name'][$t->getName()] = $i;
+			}
+			if(!go()->getInstaller()->isInProgress()) {
+				go()->getCache()->set('entity-types', $cache);
+			}
+		}
+
+		return $cache;
+	}
+
+
 	/**
 	 * Find by db id
 	 * 
@@ -235,18 +270,24 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	 * @return static
 	 */
 	public static function findById($id) {
-		$record = (new Query)
-						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
-						->from('core_entity', 'e')
-						->join('core_module', 'm', 'm.id = e.moduleId')
-						->where('id', '=', $id)->where(['m.enabled' => true])
-						->single();
+		// $record = (new Query)
+		// 				->select('e.*, m.name AS moduleName, m.package AS modulePackage')
+		// 				->from('core_entity', 'e')
+		// 				->join('core_module', 'm', 'm.id = e.moduleId')
+		// 				->where('id', '=', $id)->where(['m.enabled' => true])
+		// 				->single();
 		
-		if(!$record) {
+		// if(!$record) {
+		// 	return false;
+		// }
+		
+		// return static::fromRecord($record);
+
+		$c = self::getCache();
+		if(!isset($c['id'][$id])) {
 			return false;
 		}
-		
-		return static::fromRecord($record);
+		return $c['models'][$c['id'][$id]] ?? false;
 	}
 	
 	/**
@@ -256,18 +297,24 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	 * @return static
 	 */
 	public static function findByName($name) {
-		$record = (new Query)
-						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
-						->from('core_entity', 'e')
-						->join('core_module', 'm', 'm.id = e.moduleId')
-						->where('clientName', '=', $name)->where(['m.enabled' => true])
-						->single();
+		// $record = (new Query)
+		// 				->select('e.*, m.name AS moduleName, m.package AS modulePackage')
+		// 				->from('core_entity', 'e')
+		// 				->join('core_module', 'm', 'm.id = e.moduleId')
+		// 				->where('clientName', '=', $name)->where(['m.enabled' => true])
+		// 				->single();
 		
-		if(!$record) {
+		// if(!$record) {
+		// 	return false;
+		// }
+		
+		// return static::fromRecord($record);
+
+		$c = self::getCache();
+		if(!isset($c['name'][$name])) {
 			return false;
 		}
-		
-		return static::fromRecord($record);
+		return $c['models'][$c['name'][$name]] ?? false;
 	}
 	
 	/**
@@ -299,6 +346,9 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		if (isset($record['modulePackage'])) {
 			if($record['modulePackage'] == 'core') {
 				$e->className = 'go\\core\\model\\' . ucfirst($e->name);	
+				if(!class_exists($e->className)) {
+					$e->className = 'GO\\Base\\Model\\' . ucfirst($e->name);	
+				}
 			} else
 			{
 				$e->className = 'go\\modules\\' . $record['modulePackage'] . '\\' . $record['moduleName'] . '\\model\\' . ucfirst($e->name);

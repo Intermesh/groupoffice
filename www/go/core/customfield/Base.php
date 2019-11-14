@@ -47,7 +47,13 @@ abstract class Base extends Model {
 	 * @return string|boolean
 	 */
 	protected function getFieldSQL() {
-		return "VARCHAR(".($this->field->getOption('maxLength') ?? 190).") DEFAULT " . go()->getDbConnection()->getPDO()->quote($this->field->getDefault() ?? "NULL");
+		$def = $this->field->getDefault();
+		if(!empty($def)) {
+			$def = go()->getDbConnection()->getPDO()->quote($def);
+		} else{
+			$def = "NULL";
+		}
+		return "VARCHAR(".($this->field->getOption('maxLength') ?? 190).") DEFAULT " . $def;
 	}
 
 	/**
@@ -87,13 +93,13 @@ abstract class Base extends Model {
 		
 		
 		$quotedDbName = Utils::quoteColumnName($this->field->databaseName);
-	
+		
 		if ($this->field->isNew()) {
 			$sql = "ALTER TABLE `" . $table . "` ADD " . $quotedDbName . " " . $fieldSql . ";";
-			go()->getDbConnection()->query($sql);
+			go()->getDbConnection()->exec($sql);
 			if($this->field->getUnique()) {
 				$sql = "ALTER TABLE `" . $table . "` ADD UNIQUE(". $quotedDbName  . ");";
-				go()->getDbConnection()->query($sql);
+				go()->getDbConnection()->exec($sql);
 			}			
 		} else {
 			
@@ -102,14 +108,27 @@ abstract class Base extends Model {
 			$col = Table::getInstance($table)->getColumn($oldName);
 			
 			$sql = "ALTER TABLE `" . $table . "` CHANGE " . Utils::quoteColumnName($oldName) . " " . $quotedDbName . " " . $fieldSql;
-			go()->getDbConnection()->query($sql);
+			go()->getDbConnection()->exec($sql);
 			
 			if($this->field->getUnique() && !$col->unique) {
-				$sql = "ALTER TABLE `" . $table . "` ADD UNIQUE(". $quotedDbName  . ");";
-				go()->getDbConnection()->query($sql);
+				try {
+					$sql = "ALTER TABLE `" . $table . "` ADD UNIQUE ".$quotedDbName." (". $quotedDbName  . ");";
+					go()->getDbConnection()->exec($sql);
+				} catch(\Exception $e) {
+					//key is needed for contraint in select field
+					$sql = "ALTER TABLE `" . $table . "` DROP INDEX " . $quotedDbName .", ADD UNIQUE ".$quotedDbName." (". $quotedDbName  . ");";
+					go()->getDbConnection()->exec($sql);					
+				}
 			} else if(!$this->field->getUnique() && $col->unique) {
-				$sql = "ALTER TABLE `" . $table . "` DROP INDEX " . $quotedDbName;
-				go()->getDbConnection()->query($sql);
+				try {
+					$sql = "ALTER TABLE `" . $table . "` DROP INDEX " . $quotedDbName;
+					go()->getDbConnection()->exec($sql);
+
+				} catch(\Exception $e) {
+					//key is needed for contraint in select field
+					$sql = "ALTER TABLE `" . $table . "` DROP INDEX " . $quotedDbName .", ADD INDEX ".$quotedDbName." (". $quotedDbName  . ");";
+					go()->getDbConnection()->exec($sql);					
+				}
 			}
 		}
 		

@@ -17,12 +17,11 @@ go.form.HtmlEditor = Ext.extend(Ext.form.HtmlEditor, {
 			if(Ext.isEmpty(this.emptyText)) {
 				return;
 			}
-			Ext.EventManager.on(this.getEditorBody(),{
-				focus:this.handleEmptyText,
-				blur:this.applyEmptyText,
-				scope:this
-			});
-			//this.applyEmptyText();
+			// Ext.EventManager.on(this.getEditorBody(),{
+			// 	focus:this.handleEmptyText,
+			// 	blur:this.applyEmptyText,
+			// 	scope:this
+			// });
 			
 		},this);
 	},
@@ -31,25 +30,25 @@ go.form.HtmlEditor = Ext.extend(Ext.form.HtmlEditor, {
 		this.tb.enableOverflow = true;
 	}),
 
-	applyEmptyText: function() {
-		var value = this.getValue();
-		if(Ext.isEmpty(value)) {
-			var emptyText = go.util.Format.string(this.emptyTextTpl,this.emptyText);
-			go.form.HtmlEditor.superclass.setValue.apply(this, [emptyText]);
-		}
-	},
-	handleEmptyText: function() {
-		var value = this.getValue(),
-			regex = new RegExp(go.util.Format.string( this.emptyTextRegex,this.emptyText ) );
-		if(!Ext.isEmpty(value) && regex.test(value)) {
-			go.form.HtmlEditor.superclass.setValue.apply(this, ['']);
-		}
-	},
-	setValue : function(v){
-		go.form.HtmlEditor.superclass.setValue.apply(this, arguments);
-		this.applyEmptyText();
-		return this;
-   },
+	// applyEmptyText: function() {
+	// 	var value = this.getValue();
+	// 	if(Ext.isEmpty(value)) {
+	// 		var emptyText = go.util.Format.string(this.emptyTextTpl,this.emptyText);
+	// 		go.form.HtmlEditor.superclass.setValue.apply(this, [emptyText]);
+	// 	}
+	// },
+	// handleEmptyText: function() {
+	// 	var value = this.getValue(),
+	// 		regex = new RegExp(go.util.Format.string( this.emptyTextRegex,this.emptyText ) );
+	// 	if(!Ext.isEmpty(value) && regex.test(value)) {
+	// 		go.form.HtmlEditor.superclass.setValue.apply(this, ['']);
+	// 	}
+	// },
+	// setValue : function(v){
+	// 	go.form.HtmlEditor.superclass.setValue.apply(this, arguments);
+	// 	//this.applyEmptyText();
+	// 	return this;
+  //  },
 
 	setDesignMode : function(readOnly){
 		this.getEditorBody().contentEditable = readOnly;
