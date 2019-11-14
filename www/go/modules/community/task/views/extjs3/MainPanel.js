@@ -64,7 +64,7 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						case 0:
 						var now = new Date(),
 						nowYmd = now.format("Y-m-d");
-						this.taskGrid.store.setFilter("tasklists", {
+						this.taskGrid.store.setFilter("tasklist", {
 							due: nowYmd,
 							percentageComplete: 0
 						});
@@ -78,7 +78,7 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 						nowYmd = now.format("Y-m-d");
 						nextWeekYmd = nextWeek.format("Y-m-d");
-						this.taskGrid.store.setFilter("tasklists", {
+						this.taskGrid.store.setFilter("tasklist", {
 							nextWeekStart: now,
 							nextWeekEnd: nextWeekYmd, 
 							percentageComplete: 0
@@ -89,20 +89,20 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						case 2:
 						var now = new Date(),
 						nowYmd = now.format("Y-m-d");
-						this.taskGrid.store.setFilter('tasklists',{
+						this.taskGrid.store.setFilter('tasklist',{
 							late: nowYmd,
 							percentageComplete: 0
 						});
 						break;
 						// non completed tasks
 						case 3:
-						this.taskGrid.store.setFilter("tasklists", {
+						this.taskGrid.store.setFilter("tasklist", {
 							percentageComplete: 0
 						});
 						break;
 						// completed tasks
 						case 4:
-						this.taskGrid.store.setFilter("tasklists", {
+						this.taskGrid.store.setFilter("tasklist", {
 							percentageComplete: 100
 						});
 						break;
@@ -110,13 +110,13 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						case 5:
 						var now = new Date(),
 						nowYmd = now.format("Y-m-d");
-						this.taskGrid.store.setFilter('tasklists',{
+						this.taskGrid.store.setFilter('tasklist',{
 							future: nowYmd,
 							percentageComplete: 0
 						});
 						break;
 						case 6:
-						this.taskGrid.store.setFilter("tasklists", null);
+						this.taskGrid.store.setFilter("tasklist", null);
 						break;
 					}
 					this.taskGrid.store.load();
@@ -268,7 +268,24 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	},
 	
 	createTaskGrid : function() {
+
+		var store = new go.data.Store({
+			fields: [
+				'id', 
+				'title', 
+				'description', 
+				'repeatEndTime', 
+				{name: 'createdAt', type: 'date'}, 
+				{name: 'modifiedAt', type: 'date'}, 
+				{name: 'creator', type: "relation"},
+				{name: 'modifier', type: "relation"},
+				'percentageComplete'
+			],
+			entityStore: "Task"
+		});
+
 		this.taskGrid = new go.modules.community.task.TaskGrid({
+			store: store,
 			layout:'fit',
 			region: 'center',
 			tbar: {                        // configured using the anchor layout
@@ -287,14 +304,47 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						'->',
 						{
 							xtype: 'tbsearch',
+							store: store,
 							filters: [
 								'text',
-								'title', 
+								'name', 
 								'content',
 								{name: 'modified', multiple: false},
 								{name: 'created', multiple: false}						
-							]
+							],
+							listeners: {
+								scope: this,
+								search: function(btn, query, filters) {
+									//this.taskGrid.store.baseParams
+									debugger;
+									var filters =  [
+										'text',
+										'name', 
+										'content',
+										{name: 'modified', multiple: false},
+										{name: 'created', multiple: false}						
+									];
+									
+									
+									this.taskGrid.store.setFilter("tbsearch", filters);
+									this.taskGrid.store.load();
+								},
+								reset: function() {
+									this.taskGrid.store.setFilter("tbsearch", null);
+									this.taskGrid.store.load();
+								}
+							}
 						},
+						// {
+						// 	xtype: 'tbsearch',
+						// 	filters: [
+						// 		// 'text',
+						// 		'title'
+						// 		// 'content',
+						// 		// {name: 'modified', multiple: false},
+						// 		// {name: 'created', multiple: false}						
+						// 	]
+						// },
 						this.addButton = new Ext.Button({
 							disabled: true,
 							iconCls: 'ic-add',
@@ -487,7 +537,7 @@ go.modules.community.task.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		}, this);
 
 		this.addButton.setDisabled(!this.addTasklistId);
-		this.taskGrid.store.setFilter("tasklists", {tasklistId: ids});
+		this.taskGrid.store.setFilter("tasklist", {tasklistId: ids});
 		this.taskGrid.store.load();
 		this.categoriesGrid.store.load();
 	},

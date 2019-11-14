@@ -56,23 +56,6 @@ go.modules.community.task.TaskGrid = Ext.extend(go.grid.GridPanel, {
 		// 	go.Db.store("Task").set({update: update});
 		// }, this);
 
-
-
-		this.store = new go.data.Store({
-			fields: [
-				'id', 
-				'title', 
-				'description', 
-				'repeatEndTime', 
-				{name: 'createdAt', type: 'date'}, 
-				{name: 'modifiedAt', type: 'date'}, 
-				{name: 'creator', type: "relation"},
-				{name: 'modifier', type: "relation"},
-				'percentageComplete'
-			],
-			entityStore: "Task"
-		});
-
 		Ext.apply(this, {		
 			columns: [
 				this.checkColumn,
