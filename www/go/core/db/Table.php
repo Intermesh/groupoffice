@@ -275,7 +275,7 @@ class Table {
 				continue;
 			}
 
-			if ($index['Non_unique'] === "0") {
+			if ($index['Non_unique'] == 0) {
 				if (!isset($unique[$index['Key_name']])) {
 					$unique[$index['Key_name']] = [];
 				}
