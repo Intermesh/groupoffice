@@ -45,11 +45,20 @@
 		},
 
 		dateToUserTZ : function(date) {
+			if(Ext.isIE) {
+				//sigh
+				return date;
+			}
 			var local = date.toLocaleString("en-US", {timeZone: go.User.timezone});					
 			return new Date(local);		
 		},
 
-		dateToBrowserTZ : function(v) {			
+		dateToBrowserTZ : function(v) {		
+			
+			if(Ext.isIE) {
+				//sigh
+				return date;
+			}
 
 			var local = v.toLocaleString("en-US", {timeZone: go.User.timezone});					
 			var time = v.getTime();
