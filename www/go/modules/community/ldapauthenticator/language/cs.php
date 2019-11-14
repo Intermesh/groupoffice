@@ -13,5 +13,10 @@ return array (
   'Use user credentials' => 'Použít přihlašovací údaje uživatele',
   'Enable this if the SMTP server credentials are identical to the IMAP server.' => 'SMTP přihlašovací údaje jsou stejné jako pro IMAP',
   'User options' => 'Uživatelská nastavení',
-  'LDAP Authenticator' => 'LDAP Authenticator',
+  'LDAP Authenticator' => 'LDAP ověření',
+  'Synchronization' => 'Synchronizace',
+  'Synchronize users' => 'Synchronizovat uživatele',
+  'User query' => 'Pořadník uživatelů',
+  'Synchronize groups' => 'Synchronizovat skupiny',
+  'Group query' => 'Skupinový dotaz',
 );

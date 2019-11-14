@@ -22,10 +22,10 @@ class ErrorHandler {
 
 	public function __construct() {		
 		
-		//error_reporting(E_ALL);
+		//error_reporting(E_ALL)
 		
 		set_error_handler([$this, 'errorHandler']);
-		register_shutdown_function([$this, 'shutdown']);
+		// register_shutdown_function([$this, 'shutdown']);
 		set_exception_handler([$this, 'exceptionHandler']);		
 	}
 
@@ -33,7 +33,7 @@ class ErrorHandler {
 	 * Called when PHP exits.
 	 */
 	public function shutdown() {
-		
+		go()->debug("ErrorHandler::shutdown() called");
 		$error = error_get_last();
 		if ($error) {
 			//Log only fatal errors because other errors should have been logged by the normal error handler
@@ -63,7 +63,8 @@ class ErrorHandler {
 		}
 		
 		App::get()->getDebugger()->error($errorString);
-		foreach(explode("\n", $e->getTraceAsString()) as $line) {
+		$lines = explode("\n", $e->getTraceAsString());
+		foreach($lines as $line) {
 			App::get()->getDebugger()->error($line);
 		}
 		
@@ -82,7 +83,9 @@ class ErrorHandler {
 	 * support php 5.6 as well.
 	 * @param Throwable $e
 	 */
-	public function exceptionHandler($e) {				
+	public function exceptionHandler($e) {	
+		go()->debug("ErrorHandler::exceptionHandler() called with " . get_class($e));
+
 		$errorString = self::logException($e);
 		
 		if(!headers_sent()) {
@@ -112,9 +115,10 @@ class ErrorHandler {
 	 * @return boolean
 	 */
 	public static function errorHandler($errno, $errstr, $errfile, $errline) {
-		if (!(error_reporting() & $errno)) {
-			return false;
-		}
+		go()->debug("ErrorHandler:errorHandler called $errno");
+		// if (!(error_reporting() & $errno)) {
+		// 	return false;
+		// }
 		throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 	}
 }

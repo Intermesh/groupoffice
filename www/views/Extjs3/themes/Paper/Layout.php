@@ -37,7 +37,7 @@ $lang = GO::language()->getLanguage(); ?>
 	<?php
 	$cssMtime = filemtime(__DIR__ . "/style.css");
 	?>
-	<link href="<?= \GO::view()->getTheme()->getUrl();?>style.css?v=<?=$cssMtime ?>" media="(min-device-width:1201px)" type="text/css" rel="stylesheet" />
+	<link href="<?= \GO::view()->getTheme()->getUrl();?>style.css?v=<?=$cssMtime ?>" media="print, (min-device-width:1201px)" type="text/css" rel="stylesheet" />
 	<link rel="stylesheet" type="text/css" media="screen and (max-device-width:1200px)" href="<?= \GO::view()->getTheme()->getUrl(); ?>style-mobile.css?v=<?=$cssMtime;?>" />
 	<link href="<?= \GO::view()->getUrl()?>css.php?v=<?=$webclient->getCSSFile()->getModifiedAt()->format("U"); ?>" type="text/css" rel="stylesheet" />
 
@@ -60,7 +60,7 @@ $lang = GO::language()->getLanguage(); ?>
 		<?php
 			if(go()->getSettings()->logoId) {
 				//blob id is not used by script but added only for caching.
-				echo ".go-app-logo, #go-logo {background-image: url(" . go()->getSettings()->URL . "api/logo.php?blob=" . go()->getSettings()->logoId . ") !important}";
+				echo ".go-app-logo, #go-logo {background-image: url(" . go()->getSettings()->URL . "api/page.php?blob=" . go()->getSettings()->logoId . ") !important}";
 			}
 		}
 		?>	

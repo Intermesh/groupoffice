@@ -3,6 +3,7 @@ namespace go\modules\community\ldapauthenticator\model;
 
 use go\core\jmap\Entity;
 use go\core\ldap\Connection;
+use go\core\orm\Query;
 use go\core\util\DateTime;
 
 class Server extends Entity {
@@ -126,10 +127,10 @@ class Server extends Entity {
 		return parent::internalSave();
 	}
 	
-	protected function internalDelete() {
+	protected static function internalDelete(Query $query) {
 		go()->getCache()->delete("authentication-domains");
 		
-		return parent::internalDelete();
+		return parent::internalDelete($query);
 	}
 
 	private $connection;
@@ -152,6 +153,16 @@ class Server extends Entity {
 				throw new \Exception("Couldn't enable TLS: " . $this->connection->getError());
 			}			
 		}	
+
+		if (!empty($this->username)) {			
+			
+			if (!$this->connection->bind($this->username, $this->getPassword())) {				
+				throw new \Exception("Invalid password given for '".$this->username."' " . $this->getPassword());
+			} else
+			{
+				go()->debug("Authenticated with user '" . $this->username . '"');
+			}
+		}
 
 		return $this->connection;
 	}

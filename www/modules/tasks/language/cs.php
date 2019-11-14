@@ -91,4 +91,8 @@ return array (
   'project' => 'Projekt',
   'ID' => 'ID',
   'Add Contact' => 'Přidat kontakt',
+  'contact\'+this.capitalize(order' => 
+  array (
+    'i' => 'kontakt+toto.kapitalizovat(objednat[i]),  "adresář',
+  ),
 );

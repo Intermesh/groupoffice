@@ -101,6 +101,11 @@ go.Modules.register("community", "addressbook", {
 					title: t("City"),
 					type: "string",
 					multiple: true
+				},  {
+					name: 'street',
+					title: t("Street"),
+					type: "string",
+					multiple: true
 				}, {
 					name: 'org',
 					title: t("Organization"),

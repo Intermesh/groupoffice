@@ -261,4 +261,7 @@ Toto je výchozí kalendář uživatele :username',
   'This and future' => 'Tato a budoucí',
   'Visible tasklists' => 'Viditelné seznamy úkolů',
   'Tasklist' => 'Seznam úkolů',
+  'Only show this field set for selected calendar groups' => 'Zobrazit toto pole pro vybrané skupinové kalendáře',
+  'Forthcoming events' => 'Příští události',
+  'Past events' => 'Události minulosti',
 );

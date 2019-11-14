@@ -4,9 +4,11 @@ namespace go\core\orm;
 use Exception;
 use go\core\model\Acl;
 use go\core\db\Query as DbQuery;
+use PDO;
 
 class Query extends DbQuery {
 	private $model;
+	private $fetchProperties;
 	
 	/**
 	 * Set's the entity or property model this query is for.
@@ -16,9 +18,12 @@ class Query extends DbQuery {
 	 * @param string $cls
 	 * @return $this
 	 */
-	public function setModel($cls) {
+	public function setModel($cls, $fetchProperties = [], $readOnly = false) {
 		$this->model = $cls;
-		return $this;
+		$this->fetchProperties = $fetchProperties;
+		$this->readOnly = $readOnly;
+
+		return $this->fetchMode(PDO::FETCH_CLASS, $this->model, [false, $this->fetchProperties, $this->readOnly]);
 	}
 	
 	/**
@@ -103,7 +108,7 @@ class Query extends DbQuery {
 	}
 
 	/**
-	 * Join properties on the main model
+	 * Join properties on the main model. The table will be aliased as the property name
 	 * 
 	 * @param string[] $path eg. ['emailAddreses']
 	 * @return $this;
@@ -134,6 +139,22 @@ class Query extends DbQuery {
 		}
 
 		return $this;
+	}
+
+	private $readOnly = false;
+
+	// /**
+	//  * Set models read only. This improves performance too.
+	//  * 
+	//  * @return self
+	//  */
+	// public function readOnly ($readOnly = true) {
+	// 	$this->readOnly = $readOnly;
+	// 	return $this->fetchMode(PDO::FETCH_CLASS, $this->model, [false, $this->fetchProperties, $this->readOnly]);
+	// }
+
+	public function getReadOnly() {
+		return $this->readOnly;
 	}
 
 }

@@ -1,7 +1,7 @@
 Ext.define('go.grid.GridView', {
   extend: 'Ext.grid.GridView',
 	htmlEncode: true,
-	totalDisplay: true,
+	totalDisplay: false,
 	masterTpl: new Ext.Template(
 		'<div class="x-grid3" hidefocus="true">',
 				'<div class="x-grid3-viewport">',

@@ -14,4 +14,8 @@ return array (
   'Content is encrypted' => 'Obsah je šifrován',
   'Invalid password' => 'Neplatné heslo',
   'Add test' => 'Přidat test',
+  'Commented at' => 'Okomentoval v',
+  'Note book' => 'Poznámkový blok',
+  'Default note book' => 'Základní poznámkový blok',
+  'Filters' => 'Filtry',
 );

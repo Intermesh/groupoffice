@@ -4062,10 +4062,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$attr = $this->getCacheAttributes();
 
 		if($attr){
-			$model = \go\core\model\Search::find()->where(['entityId' => $this->pk, 'entityTypeId'=>$this->modelTypeId()])->single();
-//			$model = \GO\Base\Model\SearchCacheRecord::model()->findByPk(array('model_id'=>$this->pk, 'model_type_id'=>$this->modelTypeId()),false,true);
-			if($model)
-				$model->delete();
+			\go\core\model\Search::delete(['entityId' => $this->pk, 'entityTypeId'=>$this->modelTypeId()]);
 		}		
 
 		if($this->hasFiles() && $this->files_folder_id > 0 && GO::modules()->isInstalled('files')){

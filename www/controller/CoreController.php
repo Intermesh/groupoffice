@@ -35,8 +35,8 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 	protected function actionDebug($params){
 		
 		if(empty(GO::session()->values['debug'])){
-			if(!GO::user()->isAdmin())
-				throw new \GO\Base\Exception\AccessDenied("Debugging can only be enabled by an admin. Tip: You can enable it as admin and switch to any user with the 'Switch user' module.");
+			// if(!GO::user()->isAdmin())
+			// 	throw new \GO\Base\Exception\AccessDenied("Debugging can only be enabled by an admin. Tip: You can enable it as admin and switch to any user with the 'Switch user' module.");
 		
 			GO::session()->values['debug']=true;
 		}

@@ -3,3 +3,4 @@ DROP TABLE IF EXISTS test_b;
 DROP TABLE IF EXISTS test_c;
 DROP TABLE IF EXISTS test_a_has_many;
 DROP TABLE IF EXISTS test_a_has_one;
+DROP TABLE if EXISTS test_a_map;

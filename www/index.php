@@ -27,7 +27,12 @@ use go\core\ErrorHandler;
 function errorHander($e) {
 	if(!Request::get()->isXHR() && (empty($_REQUEST['r']) || $_REQUEST['r'] != 'maintenance/upgrade')) {
 		
-		ErrorHandler::logException($e);
+		$msg = ErrorHandler::logException($e);
+
+		if(go()->getDebugger()->enabled) {
+			echo $msg;
+			exit();
+		}
 
     header('Location: install/');				
     exit();

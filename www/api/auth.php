@@ -39,7 +39,8 @@ try {
 		if(!$token) {
 			output([], 404);
 		}
-		$token->delete();
+		$token->oldLogout();
+		$token->delete($token->primaryKeyValues());
 		
 		output();		
 	}

@@ -31,7 +31,7 @@ GO.email.MessagesGrid = function(config){
 		{
 			id:'icon',
 			header:"&nbsp;",
-			width:dp(24),
+			width:dp(40),
 			dataIndex: 'icon',
 			renderer: this.renderIcon,
 			hideable:false,
@@ -61,7 +61,7 @@ GO.email.MessagesGrid = function(config){
 			hidden:true,
 			groupable:true,
 			align:'right',
-			width: dp(40),
+			width: dp(80),
 			renderer: function(value, metaData, record, rowIndex, colIndex, store){
 				return !store.groupField ? go.util.Format.dateTime(value) : go.util.Format.time(value);
 			},
@@ -74,7 +74,7 @@ GO.email.MessagesGrid = function(config){
 			dataIndex:'udate',
 			groupable:true,
 			align:'right',
-			width: dp(40),
+			width: dp(80),
 			renderer: function(value, metaData, record, rowIndex, colIndex, store){
 				return !store.groupField ? go.util.Format.dateTime(value) : go.util.Format.time(value);
 			},
@@ -85,7 +85,7 @@ GO.email.MessagesGrid = function(config){
 			id:'size',
 			header: t("Size"),
 			dataIndex: 'size',
-			width:80,
+			width:dp(80),
 			align:'right',
 			hidden:true,
 			renderer:Ext.util.Format.fileSize
@@ -100,17 +100,15 @@ GO.email.MessagesGrid = function(config){
 			emptyMsg: t("No items to display")
 		});
 		
-		config.autoExpandColumn='message';
+	config.autoExpandColumn='message';
 
 	config.view = new Ext.grid.GroupingView({
-		autoFill: true,
-		forceFit: true,
 		groupTextTpl:'{group}',
 		emptyText: t("No items to display"),
 		getRowClass:function(row, index) {
 			return (row.data.seen == '0') ? 'ml-unseen-row' : 'ml-seen-row';
 		}		
-	}),
+	});
 
 	config.sm=new Ext.grid.RowSelectionModel();
 	config.loadMask=true;
@@ -212,7 +210,7 @@ GO.email.MessagesGrid = function(config){
 	if(!config.hideSearch)
 		this.getTopToolbar().add({
 				cls: 'go-narrow',
-				iconCls: "ic-arrow-back",
+				iconCls: "ic-menu",
 				handler: function () {
 					this.emailClient.treePanel.show();
 				},

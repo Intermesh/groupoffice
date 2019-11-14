@@ -163,6 +163,9 @@ class Table {
 		
 		$this->checkReservedName($field['Field']);
 		
+		if($field['Default'] == "NULL") {
+			$field['Default'] = null;
+		}
 			
 		$c = new Column();
 		$c->table = $this;
@@ -210,17 +213,6 @@ class Table {
 				$c->pdoType = PDO::PARAM_STR;
 				$c->length = 0;
 				$c->default = $c->default == null ? null : floatval($c->default);
-				break;
-			
-			case 'datetime':
-				if($c->default == 'CURRENT_TIMESTAMP') {
-					$c->default = date(Column::DATETIME_FORMAT);
-				}
-				break;
-			case 'date':
-				if($c->default == 'CURRENT_TIMESTAMP') {
-					$c->default = date(Column::DATE_FORMAT);
-				}				
 				break;
 				
 			case 'varbinary':
@@ -283,7 +275,7 @@ class Table {
 				continue;
 			}
 
-			if ($index['Non_unique'] === "0") {
+			if ($index['Non_unique'] == 0) {
 				if (!isset($unique[$index['Key_name']])) {
 					$unique[$index['Key_name']] = [];
 				}

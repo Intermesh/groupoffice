@@ -10,14 +10,14 @@ namespace go\core\db;
  */
 class Criteria {
 	
-	private $where = [];	
+	protected $where = [];	
 	
 	/**
 	 * Key value array of bind parameters.
 	 * 
 	 * @var array eg. ['paramTag' => ':someTag', 'value' => 'Some value', 'pdoType' => PDO::PARAM_STR]
 	 */
-	private $bindParameters = [];
+	protected $bindParameters = [];
 	
 	/**
 	 * Creates a new Criteria or Query object from different input:
@@ -27,8 +27,8 @@ class Criteria {
 	 * * String: "col=:val" = (new Criteria())->where("col=:val"); 
 	 * * A Query object is returned as is.
 	 * 
-	 * @param \go\core\db\Criteria $criteria
-	 * @return \go\core\db\Criteria
+	 * @param array|string|static $criteria
+	 * @return static
 	 * @throws \Exception
 	 */
 	public static function normalize($criteria = null) {
@@ -309,6 +309,19 @@ class Criteria {
 	 */
 	public function orWhere($column, $operator = null, $value = null) {
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'OR');
+		return $this;
+	}
+
+
+	/**
+	 * Cleare where conditions
+	 * 
+	 * @return self
+	 */
+
+	public function clearWhere() {
+		$this->where = [];
+
 		return $this;
 	}
 

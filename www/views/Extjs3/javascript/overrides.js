@@ -397,6 +397,7 @@ Ext.TaskMgr.start({
  */
 Ext.override(Ext.FormPanel,{
 	initComponent : Ext.FormPanel.prototype.initComponent.createSequence(function(){
+
 		this.on('actioncomplete', function(form, action){
 			if(action.type=='load'){
 				form.items.each(function(field){
@@ -680,19 +681,20 @@ Ext.override(Ext.Element, {
 			html = '<h1 style="margin-left:5px;font-size:16px;margin:10px 5px;">'+config.title+'</h1>'+html;
         
 		//Build our HTML document for the iframe
-		strHTML = String.format(
-			strTemplate
-			, Ext.isEmpty(this.printCSS)? '#': this.printCSS
-			, this.printTitle
-			, Ext.isIE? 'document.execCommand(\'print\');': 'window.print();'
-			, html
-			);
-        
-		var popup = window.open('about:blank');
-		if (!popup.opener) popup.opener = self
-		popup.document.write(strHTML);
-		popup.document.close();
-		popup.focus();
+		// strHTML = String.format(
+		// 	strTemplate
+		// 	, Ext.isEmpty(this.printCSS)? '#': this.printCSS
+		// 	, this.printTitle
+		// 	, Ext.isIE? 'document.execCommand(\'print\');': 'window.print();'
+		// 	, html
+		// 	);
+
+      go.print(html);
+		// var popup = window.open('about:blank');
+		// if (!popup.opener) popup.opener = self
+		// popup.document.write(strHTML);
+		// popup.document.close();
+		// popup.focus();
 	}
 });
 
@@ -1078,17 +1080,26 @@ Ext.override(Ext.KeyNav, {
 // Also used by scrollloader in new framework
 Ext.override(Ext.grid.GridView, {
 	scrollToTopOnLoad: true,
-	onLoad : function(){
-			if (this.scrollToTopOnLoad){
+	onLoad : function(store, records, o){
+
+			if (this.scrollToTopOnLoad && !o.keepScrollPosition){
 				if (Ext.isGecko) {
 						if (!this.scrollToTopTask) {
 								this.scrollToTopTask = new Ext.util.DelayedTask(this.scrollToTop, this);
 						}
 						this.scrollToTopTask.delay(1);
-				} else {
+				} else {				
 						this.scrollToTop();
 				}
 			}
-			this.scrollToTopOnLoad=true;
+			this.scrollToTopOnLoad=true;			
 	}
 });
+
+
+
+if(GO.util.isMobileOrTablet()) {
+	Ext.override(Ext.Container, {
+		labelAlign: "top"
+	});
+}

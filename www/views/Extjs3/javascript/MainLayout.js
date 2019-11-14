@@ -368,6 +368,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				console.error(error);
 				Ext.getBody().unmask();
 				Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console."));
+
+				
 			});
 		});
 		
@@ -428,6 +430,14 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			id: 'startMenu',
 			hideOnClick: true
 		});
+
+		if(GO.util.isMobileOrTablet()) {
+			this.startMenu.on("show", function() {
+				this.startMenu.setPosition(0,0);
+				this.startMenu.setWidth(Ext.getBody().getWidth());
+				this.startMenu.setHeight(Ext.getBody().getHeight());
+			}, this);
+		}
 
 		if (allPanels.length == 0) {
 			items = new Ext.Panel({
@@ -536,7 +546,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			if(!go.User.avatarId) {
 				return "";
 			}
-			return 'background-image:url('+go.Jmap.downloadUrl(go.User.avatarId)+');'
+			return 'background-image:url('+go.Jmap.thumbUrl(go.User.avatarId, {w: 40, h: 40, zc: 1})+');'
 		}
 
 				var topPanel = new Ext.Panel({

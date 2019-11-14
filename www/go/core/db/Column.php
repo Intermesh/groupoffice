@@ -147,19 +147,6 @@ class Column {
 	const DATE_FORMAT = "Y-m-d";
 
 	/**
-	 * Default value of dates are stored as times. We must refresh them
-	 */
-	public function __wakeup() {
-		if (isset($this->default)) {
-			if ($this->dbType == 'date') {
-				$this->default = date(Column::DATE_FORMAT);
-			} else if ($this->dbType == 'datetime') {
-				$this->default = date(Column::DATETIME_FORMAT);
-			}
-		}
-	}
-	
-	/**
 	 * Get the SQL string to add / alter this field.
 	 * 
 	 * eg. "tinyint(1) NOT NULL DEFAULT '0'"
@@ -273,19 +260,22 @@ class Column {
 				if ($this->length === 1) {
 					//Boolean fields in mysql are listed at tinyint(1);
 					return (bool) $value;
-				} else {
-					// Use floatval because of ints greater then 32 bit? Problem with floatval that ints will set as modified attribute when saving.
-					return (int) $value;
 				}
+				return $value;
 
-			case 'float':
-			case 'double':
-			case 'decimal':
-			case 'real':
-				return doubleval($value);
+			// case 'float':
+			// case 'double':
+			// case 'decimal':
+			// case 'real':
+			// 	return doubleval($value);
 
 			case 'date':
 			case 'datetime':
+				//Work around date problem
+				if($value == "0000-00-00") {
+					return null;
+				}
+
 				return $value instanceof GoDateTime ? $value: new GoDateTime($value, new DateTimeZone("UTC"));
 				
 			default:

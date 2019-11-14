@@ -19,6 +19,7 @@ use go\core\TemplateParser;
 use go\core\db\Expression;
 use go\core\fs\File;
 use go\core\mail\Recipient;
+use go\core\model\Acl;
 use go\core\util\StringUtil;
 use GO\Files\Model\Folder;
 use GO\Files\Model\FolderNotificationMessage;
@@ -221,12 +222,6 @@ class Contact extends AclItemEntity {
 	 */
 	public $urls = [];	
 	
-	/**
-	 *
-	 * @var ContactOrganization[]
-	 */
-	public $employees = [];
-	
 	
 	/**
 	 *
@@ -256,6 +251,13 @@ class Contact extends AclItemEntity {
 
 	public function setStarred($starred) {
 		$this->starred = empty($starred) ? null : true;
+	}
+
+	protected static function getRequiredProperties() {	
+		$p = parent::getRequiredProperties();
+		$p[] = 'isOrganization';
+
+		return $p;
 	}
 
 	public function buildFilesPath() {
@@ -451,6 +453,13 @@ class Contact extends AclItemEntity {
 											
 											$criteria->where('adr.city', $comparator, $value);
 										})
+										->addText("street", function(Criteria $criteria, $comparator, $value, Query $query) {
+											if(!$query->isJoined('addressbook_address')) {
+												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
+											}
+											
+											$criteria->where('adr.street', $comparator, $value);
+										})
 										->addNumber("age", function(Criteria $criteria, $comparator, $value, Query $query) {
 											
 											if(!$query->isJoined('addressbook_date')) {
@@ -482,6 +491,54 @@ class Contact extends AclItemEntity {
 											$criteria->where(['ug.groupId' => $value]);
 										})->add('isUser', function(Criteria $criteria, $value, Query $query) {
 											$criteria->where('c.goUserId', empty($value) ? '=' : '!=', null);
+											
+										})->add('duplicate', function(Criteria $criteria, $value, Query $query) {
+
+											$dupQuery = static::find();
+
+											$props = [];
+											foreach($value as $property) {
+												switch($property) {
+													case 'emailAddresses':
+													if(!$query->isJoined('addressbook_email_address', 'e')) {
+														$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', 'LEFT');
+														$dupQuery->join('addressbook_email_address', 'e', 'e.contactId = c.id', 'LEFT');
+													}
+													$props[] = 'e.email';
+													break;
+
+													case 'phoneNumbers':
+													if(!$query->isJoined('addressbook_phone_number', 'p')) {
+														$query->join('addressbook_phone_number', 'p', 'p.contactId = c.id', 'LEFT');
+														$dupQuery->join('addressbook_phone_number', 'p', 'p.contactId = c.id', 'LEFT');
+													}
+													$props[] = 'p.number';
+													break;
+
+													default:
+														$props[] = 'c.' . $property;
+													break;
+												}
+											}
+
+											$on = implode(' AND ', array_map(function($prop){
+												return $prop . ' <=> dup.' . substr($prop, strpos($prop, '.') + 1);
+											}, $props));
+
+											$query->join(
+												$dupQuery
+												->select($props)
+												->select('count(DISTINCT c.id) as n', true)												
+												->filter(['permissionLevel' => Acl::LEVEL_DELETE])
+												->groupBy($props)
+												->having('n > 1')
+												,
+												'dup',
+												$on
+											);
+
+
+											// echo $query;
 											
 										});
 													
@@ -525,7 +582,7 @@ class Contact extends AclItemEntity {
 	
 	public function getUid() {
 		
-		if(!isset($this->uid)) {
+		if(!$this->isNew() && !isset($this->uid)) {
 			$url = trim(go()->getSettings()->URL, '/');
 			$uid = substr($url, strpos($url, '://') + 3);
 			$uid = str_replace('/', '-', $uid );
@@ -577,17 +634,16 @@ class Contact extends AclItemEntity {
 		return $this->saveOriganizationIds();
 		
 	}
-
-	protected function internalDelete()
-	{
-		return parent::internalDelete();
-	}
 	
 	protected function internalValidate() {		
 		
 		if(empty($this->name)) {
 			$this->setNameFromParts();
-		}		
+		}
+
+		if($this->isOrganization) {
+			$this->firstName = $this->lastName = $this->middleName = $this->prefixes = $this->suffixes = null;
+		}
 		
 		if($this->isNew() && !isset($this->addressBookId)) {
 			$this->addressBookId = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->defaultAddressBookId;
@@ -614,10 +670,25 @@ class Contact extends AclItemEntity {
 	 */
 	public function findOrganizations(){
 		return self::find()
-						->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::entityType()->getId())
-						->where('fromId', '=', $this->id)
-							->andWhere('fromEntityTypeId', '=', self::entityType()->getId())
-							->andWhere('c.isOrganization', '=', true);
+			->where('fromId', '=', $this->id)
+			->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::entityType()->getId())		
+			->andWhere('fromEntityTypeId = '. self::entityType()->getId())
+			->andWhere('c.isOrganization = true');
+	}
+
+	private static $organizationIdsStmt;
+
+	private static function prepareFindOrganizations() {
+		if(!isset(self::$organizationIdsStmt)) {
+			self::$organizationIdsStmt = self::find()
+			->selectSingleValue('c.id')
+			->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::entityType()->getId())
+			->where('fromId = :contactId')
+				->andWhere('fromEntityTypeId = '. self::entityType()->getId())
+				->andWhere('c.isOrganization = true')
+				->createStatement();
+		}
+		return self::$organizationIdsStmt;
 	}
 	
 	private $organizationIds;
@@ -629,8 +700,10 @@ class Contact extends AclItemEntity {
 			if($this->isNew()) {
 				$this->organizationIds = [];
 			} else {
-				$query = $this->findOrganizations()->selectSingleValue('c.id');			
-				$this->organizationIds = array_map("intval", $query->all());
+				$stmt = $this->prepareFindOrganizations();
+				$stmt->bindValue(':contactId', $this->id);	
+				$stmt->execute();
+				$this->organizationIds = $stmt->fetchAll();
 			}
 		}		
 		
@@ -676,7 +749,12 @@ class Contact extends AclItemEntity {
 				$orgStr = ' - '.implode(', ', $orgs);			
 			}
 		}
-		return $addressBook->name . $orgStr;
+
+		$jobTitle = "";
+		if(!empty($this->jobTitle)) {
+			$jobTitle = ' - ' . $this->jobTitle;
+		}
+		return $addressBook->name . $jobTitle . $orgStr;
 	}
 
 	protected function getSearchName() {
@@ -716,12 +794,17 @@ class Contact extends AclItemEntity {
 			return go()->t("Dear sir/madam");
 		}
 
+		//re fetch in case this object is not complete
+		$contact= Contact::findById($this->id, ['firstName', 'lastName', 'middleName', 'name', 'gender', 'prefixes', 'suffixes', 'language']);
 		$tpl = new TemplateParser();
-		$tpl->addModel('contact', $this->toArray(['firstName', 'lastName', 'middleName', 'name', 'gender', 'prefixes', 'suffixes', 'language']));
+		$tpl->addModel('contact', $contact->toArray());
 
 		$addressBook = AddressBook::findById($this->addressBookId, ['salutationTemplate']);
 
 		$this->salutation = $tpl->parse($addressBook->salutationTemplate);
+		if(empty($this->salutation)) {
+			$this->salutation = go()->t("Dear sir/madam");
+		}
 		$this->saveTables();
 
 		return $this->salutation;
@@ -739,7 +822,7 @@ class Contact extends AclItemEntity {
 	 * 
 	 * @param Link $link
 	 */
-	public static function onLinkSaveOrDelete(Link $link) {
+	public static function onLinkSave(Link $link) {
 		if($link->getToEntity() !== "Contact" || $link->getFromEntity() !== "Contact") {
 			return;
 		}
@@ -757,24 +840,37 @@ class Contact extends AclItemEntity {
 			$from->saveSearch();
 			Contact::entityType()->change($from);
 		}
+
 		
-//		$ids = [$link->toId, $link->fromId];
-//		
-//		//Update modifiedAt dates for Z-Push and carddav
-//		go()->getDbConnection()
-//						->update(
-//										'addressbook_contact',
-//										['modifiedAt' => new DateTime()], 
-//										['id' => $ids]
-//										)->execute();	
-//		
-//		Contact::entityType()->changes(
-//					(new Query2)
-//					->select('c.id AS entityId, a.aclId, "0" AS destroyed')
-//					->from('addressbook_contact', 'c')
-//					->join('addressbook_addressbook', 'a', 'a.id = c.addressBookId')					
-//					->where('c.id', 'IN', $ids)
-//					);
+	}
+
+
+	/**
+	 * Because we've implemented the getter method "getOrganizationIds" the contact 
+	 * modSeq must be incremented when a link between two contacts is deleted or 
+	 * created.
+	 * 
+	 * @param Link $link
+	 */
+	public static function onLinkDelete(Query $links) {
+		
+		$links = Link::find()->where($links->andWhere('(toEntityTypeId = :e1 OR fromEntityTypeId = :e2)'))->bind([':e1'=> static::entityType()->getId(), ':e2'=> static::entityType()->getId()]);
+
+		foreach($links as $link) {			
+			$to = Contact::findById($link->toId);
+			$from = Contact::findById($link->fromId);
+			
+			//Save contact as link to organizations affect the search entities too.
+			if(!$to->isOrganization) {			
+				$to->saveSearch();
+				Contact::entityType()->change($to);
+			}
+			
+			if(!$from->isOrganization) {			
+				$from->saveSearch();
+				Contact::entityType()->change($from);
+			}
+		}
 		
 	}
 	

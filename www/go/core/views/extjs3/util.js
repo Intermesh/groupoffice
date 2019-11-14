@@ -4,8 +4,8 @@ go.print = function(tmpl, data) {
 		document.body.insertAdjacentHTML('beforeend', '<div id="paper"></div>');
 		paper = document.getElementById('paper');
 	}
-	paper.innerHTML = tmpl.apply(data);
-	window.print();
+	paper.innerHTML = Ext.isEmpty(data) ? tmpl : tmpl.apply(data);
+	Ext.isIE || Ext.isSafari ? document.execCommand('print') : window.print();
 };
 go.util =  (function () {
 	return {

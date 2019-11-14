@@ -9,6 +9,7 @@ use go\core\App;
 use go\core\Controller;
 use go\core\data\convert\AbstractConverter;
 use go\core\db\Criteria;
+use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\jmap\exception\InvalidArguments;
@@ -17,6 +18,7 @@ use go\core\jmap\SetError;
 use go\core\orm\Entity;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
+use PDO;
 
 abstract class EntityController extends Controller {	
 	
@@ -69,10 +71,14 @@ abstract class EntityController extends Controller {
 	protected function getQueryQuery($params) {
 		$cls = $this->entityClass();
 
-		$query = $cls::find($cls::getPrimaryKey(false))
+		$query = $cls::find($cls::getPrimaryKey(false), true)
 						->select($cls::getPrimaryKey(true)) //only select primary key
 						->limit($params['limit'])
 						->offset($params['position']);
+
+		if($params['calculateTotal']) {
+			$query->calcFoundRows();
+		}
 		
 		/* @var $query Query */
 
@@ -236,16 +242,16 @@ abstract class EntityController extends Controller {
 		];
 		
 		if($p['calculateTotal']) {
-			$totalQuery = clone $idsQuery;
-			$total = (int) $totalQuery
-											->selectSingleValue("count(*)")
-											->orderBy([], false)
-											->limit(1)
-											->offset(0)
-											->execute()
-											->fetch();
+			// $totalQuery = clone $idsQuery;
+			// $response['total'] = $totalQuery
+			// 								->selectSingleValue("count(distinct " . $totalQuery->getTableAlias() . ".id)")
+			// 								->orderBy([], false)
+			// 								->groupBy([])
+			// 								->limit(1)
+			// 								->offset(0)
+			// 								->single();
 
-			$response['total'] = $total;
+			$response['total'] = go()->getDbConnection()->query("SELECT FOUND_ROWS()")->fetch(PDO::FETCH_COLUMN, 0);
 		}
 		
 		return $response;
@@ -350,10 +356,10 @@ abstract class EntityController extends Controller {
 		$cls = $this->entityClass();
 		
 		if(!isset($params['ids'])) {
-			$query = $cls::find($params['properties']);
+			$query = $cls::find($params['properties'], true);
 		} else
 		{
-			$query = $cls::findByIds($params['ids'], $params['properties']);
+			$query = $cls::findByIds($params['ids'], $params['properties'], true);
 		}
 		
 		//filter permissions
@@ -383,22 +389,38 @@ abstract class EntityController extends Controller {
 		if(isset($p['ids']) && !count($p['ids'])) {
 			return $result;
 		}
-		
+		go()->getDebugger()->debugTiming('before query');
 		$query = $this->getGetQuery($p);		
+
+		go()->getDebugger()->debugTiming('after query');
 			
 		$foundIds = [];
 		$result['list'] = [];
-
+		$unsorted = [];
 		foreach($query as $e) {
 			$arr = $e->toArray();
 			$arr['id'] = $e->id();
-			$result['list'][] = $arr; 
+			$unsorted[$arr['id']] = $arr; 
 			$foundIds[] = $arr['id'];
+
+			go()->getDebugger()->debugTiming('item to array');
 		}
+
 		
+		$result['notFound'] = [];
 		if(isset($p['ids'])) {
-			$result['notFound'] = array_values(array_diff($p['ids'], $foundIds));			
+			
+			foreach($p['ids'] as $id) {
+				if(isset($unsorted[$id])) {
+					$result['list'][] = $unsorted[$id];
+				}else{
+					$result['notFound'][] = $id;
+				}
+			}
+		} else {
+			$result['list'] = array_values($unsorted);
 		}
+
 
 		return $result;
 	}
@@ -540,7 +562,7 @@ abstract class EntityController extends Controller {
 			$entity = $this->create($properties);
 			
 			if(!$this->canCreate($entity)) {
-				$result['notCreated'][$clientId] = new SetError("forbidden");
+				$result['notCreated'][$clientId] = new SetError("forbidden", go()->t("Permission denied"));
 				continue;
 			}
 
@@ -602,7 +624,7 @@ abstract class EntityController extends Controller {
 		foreach ($update as $id => $properties) {
 			$entity = $this->getEntity($id);			
 			if (!$entity) {
-				$result['notUpdated'][$id] = new SetError('notFound');
+				$result['notUpdated'][$id] = new SetError('notFound', go()->t("Item not found"));
 				continue;
 			}
 			
@@ -614,7 +636,7 @@ abstract class EntityController extends Controller {
 			
 			
 			if(!$this->canUpdate($entity)) {
-				$result['notUpdated'][$id] = new SetError("forbidden");
+				$result['notUpdated'][$id] = new SetError("forbidden", go()->t("Permission denied"));
 				continue;
 			}
 			
@@ -638,27 +660,38 @@ abstract class EntityController extends Controller {
 	}
 
 	private function destroyEntities($destroy, &$result) {
+
+		$doDestroy = [];
 		foreach ($destroy as $id) {
 			$entity = $this->getEntity($id);
 			if (!$entity) {
-				$result['notDestroyed'][$id] = new SetError('notFound');
+				$result['notDestroyed'][$id] = new SetError('notFound', go()->t("Item not found"));
 				continue;
 			}
 			
 			if(!$this->canDestroy($entity)) {
-				$result['notDestroyed'][$id] = new SetError("forbidden");
+				$result['notDestroyed'][$id] = new SetError("forbidden", go()->t("Permission denied"));
 				continue;
 			}
 
-			$success = $entity->delete();
-			
-			if ($success) {
-				$result['destroyed'][] = $id;
-			} else {
-				$errors = $entity->getValidationErrors();
-				$first = array_shift($errors);
-				$result['notDestroyed'][$id] = ['type' => $first['code'], 'description' => $first['description']];
+			$doDestroy[] = $id;
+		}
+		$cls = $this->entityClass();
+
+		if(!empty($doDestroy)) {
+			$query = new Query();
+			foreach($doDestroy as $id) {
+				$query->orWhere($cls::parseId($id));
 			}
+			$success = $cls::delete($query);
+		} else {
+			$success = true;
+		}
+			
+		if ($success) {
+			$result['destroyed'] = $doDestroy;
+		} else {
+			throw Exception("Delete error");
 		}
 	}
 	
@@ -832,9 +865,51 @@ abstract class EntityController extends Controller {
 		
 		return ['blobId' => $blob->id];		
 	}
-	
-	
-	
-	
 
+	/**
+	 * Merge entities into one
+	 * 
+	 * The first ID in the list will be kept after the merge.
+	 */
+	protected function defaultMerge($params) {
+		if(empty($params['ids'])) {
+			throw new InvalidArguments('ids is required');
+		}
+
+		if(count($params['ids']) < 2) {
+			throw new InvalidArguments('At least 2 id\'s are required');
+
+		}
+		$primaryId = array_shift($params['ids']);
+
+		$cls = $this->entityClass();
+
+		$entity = $cls::findById($primaryId);
+
+		if(!$this->canUpdate($entity)) {
+			throw new Forbidden();
+		}
+
+		$oldState = $this->getState();
+
+		go()->getDbConnection()->beginTransaction();
+		foreach($params['ids'] as $id) {
+			$other = $cls::findById($id);
+			if(!$this->canDestroy($other)) {
+				throw new Forbidden();
+			}
+			if(!$entity->merge($other)) {
+				throw new \Exception("Failed to merge ID: ".$id . ", Validation errors: ". var_export($entity->getValidationErrors(), true));
+			}
+		}
+
+		go()->getDbConnection()->commit();
+
+		return [
+			"updated" => [$primaryId],
+			"destroyed" => $params['ids'],
+			'oldState' => $oldState,
+			'newState' => $this->getState()
+		];
+	}
 }

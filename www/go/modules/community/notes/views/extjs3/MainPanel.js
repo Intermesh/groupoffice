@@ -44,7 +44,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			region: 'center',
 			split: true,
 			tbar: [{
-					cls: 'go-narrow',
+					cls: 'go-narrow', //will only show on small devices
 					iconCls: "ic-arrow-back",
 					handler: function () {
 						//this.westPanel.show();
@@ -134,7 +134,6 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					xtype: 'tbtitle',
 					text: t('Notebooks')
 				}, '->', {
-					//disabled: go.Modules.get("community", 'notes').permissionLevel < go.permissionLevels.write,
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
@@ -173,11 +172,9 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			region: 'center',
 			tbar: [
 				{
-					cls: 'go-narrow',
+					cls: 'go-narrow', //Shows on mobile only
 					iconCls: "ic-menu",
 					handler: function () {
-//						this.westPanel.getLayout().setActiveItem(this.noteBookGrid);
-						//this.noteBookGrid.show();
 						this.sidePanel.show();
 					},
 					scope: this

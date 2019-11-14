@@ -15,14 +15,20 @@ class Csv extends convert\Csv {
 	 */
 	public function importFile(\go\core\fs\File $file, $entityClass, $params = array())
 	{
-		
-		if(!parent::importFile($file, $entityClass, $params)) {
+		$contacts = parent::importFile($file, $entityClass, $params);
+		if(!$contacts['success']) {
 			return false;
 		}
 
 		$this->organizations = false;
 
-		return parent::importFile($file, $entityClass, $params);
+		$orgs = parent::importFile($file, $entityClass, $params);
+
+		return [
+			'count' => ($contacts['count'] + $orgs['count']), 
+			'errors' => array_merge($contacts['errors'], $orgs['errors']), 
+			'success' => ($orgs['success'] && $contacts['success'])
+		];
 	}
 
 	/**

@@ -11,6 +11,8 @@ use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
 use go\core\data\exception\NotArrayable;
+use go\core\ErrorHandler;
+use go\core\util\ClassFinder;
 
 /**
  * Entity model
@@ -92,12 +94,12 @@ abstract class Entity extends Property {
 	 * @see Criteria::where()
 	 * @return static[]|Query
 	 */
-	public static final function find(array $properties = []) {
+	public static final function find(array $properties = [], $readOnly = false) {
 		
 		if(count($properties) && !isset($properties[0])) {
 			throw new \Exception("Invalid properties given to Entity::find()");
 		}
-		return static::internalFind($properties);
+		return static::internalFind($properties, $readOnly);
 	}
 
 	/**
@@ -118,9 +120,9 @@ abstract class Entity extends Property {
 	 * @return static
 	 * @throws Exception
 	 */
-	public static final function findById($id, array $properties = []) {
+	public static final function findById($id, array $properties = [], $readOnly = false) {
 
-		return static::internalFindById($id, $properties);
+		return static::internalFindById($id, $properties, $readOnly);
 	}
 	
 	/**
@@ -138,13 +140,13 @@ abstract class Entity extends Property {
 	 * @param array $properties
 	 * @throws Exception
 	 */
-	public static final function findByIds(array $ids, array $properties = []) {
+	public static final function findByIds(array $ids, array $properties = [], $readOnly = false) {
 		$tables = static::getMapping()->getTables();
 		$primaryTable = array_shift($tables);
 		$keys = $primaryTable->getPrimaryKey();
 		$keyCount = count($keys);
 		
-		$query = static::internalFind($properties);
+		$query = static::internalFind($properties, $readOnly);
 		
 		$idArr = [];
 		for($i = 0; $i < $keyCount; $i++) {			
@@ -283,56 +285,62 @@ abstract class Entity extends Property {
 		return true;
 	}
 
-	private $isDeleting = false;
+	// private $isDeleting = false;
 
-	/**
-	 * Check if this entity is being deleted.
-	 * 
-	 * @return bool
-	 */
-	public function isDeleting() {
-		return $this->isDeleting;
-	}
+	// /**
+	//  * Check if this entity is being deleted.
+	//  * 
+	//  * @return bool
+	//  */
+	// public function isDeleting() {
+	// 	return $this->isDeleting;
+	// }
 
 	/**
 	 * Delete the entity
 	 * 
 	 * @return boolean
 	 */
-	public final function delete() {
+	public static final function delete($query) {
 
-		$this->isDeleting = true;
-		
-		//go()->debug(static::class.'::delete() ' . $this->id());
+		$query = Query::normalize($query);
+		//Set select for overrides.
+		$primaryTable = static::getMapping()->getPrimaryTable();
+		$query->selectSingleValue('id')->from($primaryTable->getName(), $primaryTable->getAlias());
+
 
 		App::get()->getDbConnection()->beginTransaction();
 
-		if (!$this->internalDelete()) {
-			$this->rollback();
-			return false;
-		}
-		
-		//See \go\core\orm\SearchableTrait;
-		if(method_exists($this, 'deleteSearchAndLinks')) {
-			if(!$this->deleteSearchAndLinks()) {				
-				$this->setValidationError("search", ErrorCode::INVALID_INPUT, "Could not delete core_search entry");		
-				$this->rollback();
+		try{
+			if (!static::internalDelete($query)) {
+				go()->getDbConnection()->rollBack();
 				return false;
 			}
-		}	
+			
+			//See \go\core\orm\SearchableTrait;
+			if(method_exists(static::class, 'deleteSearchAndLinks')) {
+				if(!static::deleteSearchAndLinks($query)) {				
+					go()->getDbConnection()->rollBack();
+					return false;
+				}
+			}	
 
-		if (!$this->fireEvent(self::EVENT_DELETE, $this)) {
-			$this->rollback();
-			return false;
+			if(!static::fireEvent(static::EVENT_DELETE, $query)) {
+				go()->getDbConnection()->rollBack();
+				return false;			
+			}
+
+			return go()->getDbConnection()->commit();
+		} catch(Exception $e) {			
+			go()->getDbConnection()->rollBack();
+			throw $e;
 		}
-
-		return $this->commit();		
 	}
 	
 	protected function commit() {
 		parent::commit();
 
-		$this->isDeleting = false;
+		//$this->isDeleting = false;
 		$this->isSaving = false;
 
 		return App::get()->getDbConnection()->commit();
@@ -341,7 +349,7 @@ abstract class Entity extends Property {
 	protected function rollback() {
 		App::get()->debug("Rolling back save operation for " . static::class, 1);
 		parent::rollBack();
-		$this->isDeleting = false;
+		// $this->isDeleting = false;
 		$this->isSaving = false;
 		return App::get()->getDbConnection()->rollBack();
 	}
@@ -417,6 +425,8 @@ abstract class Entity extends Property {
 		
 		return Module::findById($moduleId)->findAclId();
 	}
+
+	private static $entityType = [];
 	
 	/**
 	 * Gets an ID from the database for this class used in database relations and 
@@ -428,12 +438,13 @@ abstract class Entity extends Property {
 
 		$cls = static::class;
 
-		$type = go()->getCache()->get('type-' . $cls);
-		if(!$type) {
-			$type = EntityType::findByClassName(static::class);
-			go()->getCache()->set('type-' . $cls, $type, false);
+		if(isset(self::$entityType[$cls])) {
+			return self::$entityType[$cls];
 		}
-		return $type;
+
+		self::$entityType[$cls] = EntityType::findByClassName(static::class);			
+		
+		return self::$entityType[$cls];
 	}
   
   /**
@@ -481,8 +492,6 @@ abstract class Entity extends Property {
 	protected static function defineFilters() {
 
 		$cls = static::class;
-
-		$filters = go()->getCache()->get('filters-' . $cls);
 
 		$filters = new Filters();
 
@@ -822,6 +831,219 @@ abstract class Entity extends Property {
 		}
 
 		echo "Done\n";
+	}
+
+
+	public function merge(self $entity) {
+
+		if($this->equals($entity)) {
+			throw new \Exception("Can't merge with myself!");
+		}
+
+		//copy public and protected columns except for auto increments.
+		$props = $this->getApiProperties();
+		foreach($props as $name => $p) {
+			$col = static::getMapping()->getColumn($name);
+			if(isset($p['access']) && (!$col || $col->autoIncrement == false)) {
+				if(!empty($entity->$name)) {
+					if(is_array($this->$name)) {
+						$this->$name = array_merge($this->$name, $entity->$name);
+					} else{
+						$this->$name = $entity->$name;
+					}					
+				}
+			}
+		}
+
+		if(method_exists($this, 'getCustomFields')) {
+			$cf = $entity->getCustomFields();
+			foreach($cf as $name => $v) {
+				if(empty($v)) {
+					unset($cf[$name]);
+				}
+			}
+			$this->setCustomFields($cf);
+		}
+
+		go()->getDbConnection()->beginTransaction();
+
+		//move links
+		if(!\go()->getDbConnection()
+						->updateIgnore('core_link', 
+										['fromId' => $this->id],
+										['fromEntityTypeId' => static::entityType()->getId(), 'fromId' => $entity->id]
+										)->execute()) {
+			go()->getDbConnection()->rollBack();
+			return false;
+		}
+		
+		if(!\go()->getDbConnection()
+						->updateIgnore('core_link', 
+										['toId' => $this->id],
+										['toEntityTypeId' => static::entityType()->getId(), 'toId' => $entity->id]
+										)->execute()) {
+			go()->getDbConnection()->rollBack();
+			return false;
+		}
+
+		//move comments
+
+		if(Module::isInstalled('community', 'comments')) {
+			if(!\go()->getDbConnection()
+						->update('comments_comment', 
+										['entityId' => $this->id],
+										['entityTypeId' => static::entityType()->getId(), 'entityId' => $entity->id]
+										)->execute()) {
+				go()->getDbConnection()->rollBack();
+				return false;
+			}
+		}
+
+
+		//move files
+		$this->mergeFiles($entity);
+
+		$this->mergeRelated($entity);
+
+		if(!$entity->delete(['id' => $entity->id])) {
+			go()->getDbConnection()->rollBack();
+				return false;
+		}
+
+		if(!$this->save()) {
+			go()->getDbConnection()->rollBack();
+			return false;
+		}
+
+		return go()->getDbConnection()->commit();
+	}
+
+
+	private function mergeFiles(self $entity) {
+		if(!Module::isInstalled('legacy', 'files') && $entity->getMapping()->getColumn('filesFolderId')) {
+			return;
+		}
+		$sourceFolder = \GO\Files\Model\Folder::model()->findByPk($entity->filesFolderId);
+		if (!$sourceFolder) {
+			return;
+		}
+		$folder = \GO\Files\Model\Folder::model()->findForEntity($entity);
+	
+		$folder->moveContentsFrom($sourceFolder);		
+	}
+
+	private function mergeRelated(Entity $entity) {
+
+		$refs = static::getTableReferences();
+
+		$cfTable = method_exists($this, 'customFieldsTableName') ? $this->customFieldsTableName() : null;
+
+		foreach($refs as $r) {
+			if($r['table'] == $cfTable) {
+				continue;
+			}
+
+			go()->getDbConnection()
+				->update(
+					$r['table'], 
+					[$r['column'] => $this->id], 
+					[$r['column'] => $entity->id])
+				->execute();
+		}
+	}
+
+	/**
+	 * Get all table columns referencing the id column of the entity's main table.
+	 * 
+	 * It uses the 'information_schema' to read all foreign key relations.
+	 * 
+	 * @return array [['cls'=>'Contact', 'column' => 'id', 'paths' => []]]
+	 */
+	protected static function getEntityReferences() {
+		$cacheKey = "refs-entity-" . static::class;
+		$entityClasses = go()->getCache()->get($cacheKey);
+		if($entityClasses === null) {
+
+			$refs = static::getTableReferences();
+
+			$entityClasses = [];
+			foreach($refs as $r) {
+				$entities = static::findEntitiesByTable($r['table']);
+				$eWithCol = array_map(function($i) use($r) {
+					$i['column'] = $r['column'];
+					return $i;
+				}, $entities);
+
+				$entityClasses = array_merge($entityClasses, $eWithCol);
+			}	
+			
+			go()->getCache()->set($cacheKey, $entityClasses);			
+		}		
+		
+		return $entityClasses;
+	}
+
+	/**
+	 * @return array [['column'=>'contactId', 'table'=>'foo']]
+	 */
+	protected static function getTableReferences() {
+		$cacheKey = "refs-table-" . static::class;;
+		$refs = go()->getCache()->get($cacheKey);
+		if($refs === null) {
+			$tableName = array_values(static::getMapping()->getTables())[0]->getName();
+			$dbName = go()->getDatabase()->getName();
+			try {
+				go()->getDbConnection()->exec("USE information_schema");
+				//somehow bindvalue didn't work here
+				$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where ".
+					"table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . 
+					" and referenced_table_name=".go()->getDbConnection()->getPDO()->quote($tableName)." and referenced_column_name = 'id'";
+
+				$stmt = go()->getDbConnection()->getPDO()->query($sql);
+				$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+			}
+			finally{
+				go()->getDbConnection()->exec("USE `" . $dbName . "`");	
+			}	
+
+			//don't find the entity itself
+			$refs = array_filter($refs, function($r) {
+				return !static::getMapping()->hasTable($r['table']);
+			});
+
+			go()->getCache()->set($cacheKey, $refs);			
+		}
+
+		return $refs;
+	}
+
+
+	/**
+	 * Find's entities that have the given table name mapped
+	 * 
+	 * @return Array[] [['cls'=>'', 'paths' => 'contactId']]
+	 */
+	protected static function findEntitiesByTable($tableName) {
+		$cf = new ClassFinder();
+		$allEntitites = $cf->findByParent(self::class);
+
+		//don't find the entity itself
+		$allEntitites = array_filter($allEntitites, function($e) {
+			return $e != static::class;
+		});
+
+		$mapped = array_map(function($e) use ($tableName) {
+			$paths = $e::getMapping()->hasTable($tableName);
+			return [
+				'cls' => $e,
+				'paths' => $paths
+			];
+
+		}, $allEntitites);
+
+		return array_filter($mapped, function($m) {
+			return !empty($m['paths']);
+		});
 	}
 
 }

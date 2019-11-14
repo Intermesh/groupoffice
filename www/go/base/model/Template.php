@@ -189,6 +189,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 				$attributes[$tagPrefix . 'address_no'] = $a->street2;
 				$attributes[$tagPrefix . 'zip'] = $a->zipCode;
 				$attributes[$tagPrefix . 'country'] = $a->country;
+				$attributes[$tagPrefix . 'city'] = $a->city;
 				$attributes[$tagPrefix . 'state'] = $a->state;
 				$attributes[$tagPrefix . 'formatted_address'] = $a->getFormatted();
 			}

@@ -3,12 +3,12 @@ return array (
   'Scheduled call at %s' => 'Avtalt samtale den %s',
   'statuses' => 
   array (
-    'NEEDS-ACTION' => 'Trenger oppfølging',
     'ACCEPTED' => 'Akseptert',
     'DECLINED' => 'Avvist',
-    'TENTATIVE' => 'Tentativ',
     'DELEGATED' => 'Delegert',
     'COMPLETED' => 'Fullført',
+    'TENTATIVE' => 'Tentativ',
+    'NEEDS-ACTION' => 'Trenger oppfølging',
     'IN-PROCESS' => 'Under behandling',
   ),
   '%s tasks were imported' => '%s oppgaver er importert',
@@ -85,4 +85,6 @@ return array (
   'Tasks' => 'Oppgaver',
   'Filter' => 'Filter',
   'Status' => 'Status',
+  'Contact' => 'Person',
+  'Remove duplicates' => 'Slette duplikater',
 );

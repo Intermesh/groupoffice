@@ -5,6 +5,7 @@ namespace go\core\model;
 use go\core\model\Acl;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
+use go\core\exception\Forbidden;
 use go\core\model\UserGroup;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
@@ -136,23 +137,26 @@ class Group extends AclOwnerEntity {
 		return $acl->save();
 	}
 	
-	protected function internalDelete() {
+	protected static function internalDelete(Query $query) {
 
+		$query->andWhere(['isUserGroupFor' => null]);
 
-		if($this->id == self::ID_ADMINS) {
-			$this->setValidationError('id', ErrorCode::FORBIDDEN, "You can't delete the administrators group");
+		$ids = $query->all();
+
+		if(in_array(self::ID_ADMINS, $ids)) {
+			throw new Forbidden("You can't delete the administrators group");
 		}
 
-		if($this->id == self::ID_INTERNAL) {
-			$this->setValidationError('id', ErrorCode::FORBIDDEN, "You can't delete the internal group");
-		}
-		
-		if(isset($this->isUserGroupFor)) {
-			$this->setValidationError('isUserGroupFor', ErrorCode::FORBIDDEN, "You can't delete a user's personal group");
-			return false;
+		if(in_array(self::ID_INTERNAL, $ids)) {
+			throw new Forbidden("You can't delete the internal group");
 		}
 		
-		return parent::internalDelete();
+		// if(isset($this->isUserGroupFor)) {
+		// 	$this->setValidationError('isUserGroupFor', ErrorCode::FORBIDDEN, "You can't delete a user's personal group");
+		// 	return false;
+		// }
+		
+		return parent::internalDelete($query);
 	}
 
 

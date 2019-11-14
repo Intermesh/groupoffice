@@ -22,7 +22,7 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 			this.entities = config.entities;
 		}
 
-		var selModel = new Ext.grid.CheckboxSelectionModel();
+		var selModel = new Ext.grid.RowSelectionModel({simpleSelect: true});
 
 		var data = [], allEntities = this.entitiies ? this.entities : go.Entities.getLinkConfigs(), id;
 		
@@ -36,8 +36,6 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 			}
 			data.push([id, link.entity, link.title, link.filter, link.iconCls]);
 		});
-		
-		console.log(data);
 
 		Ext.apply(config, {
 			tbar: [{xtype: "selectallcheckbox"}],
@@ -48,7 +46,6 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 			}),
 			selModel: selModel,
 			columns: [
-				selModel,
 				{
 					id: 'name',
 					header: t('Name'),
@@ -88,11 +85,9 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 
 	loadSelection: function (name) {
 		var ids = Ext.state.Manager.get("entity-grid-selected-" + name);
-		console.log(ids);
 		if (!ids) {
 			return;
 		}
-
 
 		var me = this, records = [], record;
 		ids.forEach(function (id) {
@@ -101,8 +96,6 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 				records.push(record);
 			}
 		});
-		
-		console.log(records);
 		
 		this.getSelectionModel().suspendEvents(false);
 		this.getSelectionModel().selectRecords(records, true);

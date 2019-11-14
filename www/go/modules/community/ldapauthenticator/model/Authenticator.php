@@ -2,8 +2,10 @@
 namespace go\modules\community\ldapauthenticator\model;
 
 use Exception;
+use GO\Base\Mail\ImapAuthenticationFailedException;
 use go\core\model\User;
 use go\core\auth\PrimaryAuthenticator;
+use go\core\ErrorHandler;
 use go\core\ldap\Connection;
 use go\core\ldap\Record;
 use GO\Email\Model\Account;
@@ -76,7 +78,7 @@ class Authenticator extends PrimaryAuthenticator {
 			return false;
 		}
 		
-		$user = User::find()->where(['username' => $username])->single();
+		$user = User::find()->where(['username' => $username])->orWhere('email', '=', $record->mail[0])->single();
 		if(!$user) {
 			$user = new User();
 		}else if($user->hasPassword()){
@@ -95,7 +97,14 @@ class Authenticator extends PrimaryAuthenticator {
 		}
 		
 		if($server->hasEmailAccount()) {
-			$this->setEmailAccount($ldapUsername, $password, $record->mail[0], $server, $user);
+			try {
+				$this->setEmailAccount($ldapUsername, $password, $record->mail[0], $server, $user);
+			} catch(ImapAuthenticationFailedException $e) {
+
+				//ignore imap failure.
+				ErrorHandler::logException($e);
+
+			}
 		}
 		
 		return $user;

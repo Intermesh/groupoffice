@@ -84,3 +84,6 @@ $updates['201910012019'][] = 'ALTER TABLE `addressbook_addressbook` ADD FOREIGN 
 $updates['201910012019'][] = 'ALTER TABLE `addressbook_contact` DROP FOREIGN KEY `addressbook_contact_ibfk_4`; ';
 $updates['201910012019'][] = 'ALTER TABLE `addressbook_contact` ADD CONSTRAINT `addressbook_contact_ibfk_4` FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;';
 
+$updates['201910281039'][] = 'update `addressbook_contact` set lastName = null, firstName = null, middleName = null, suffixes = null, prefixes = null, modifiedAt = now() where isOrganization = true;';
+
+$updates['201911111041'][] = 'ALTER TABLE `addressbook_contact` ADD INDEX(`isOrganization`)';

@@ -10,5 +10,5 @@ return array (
   'ID' => 'ID',
   'User agent' => 'User agent',
   'Controller' => 'Controller',
-  'Activity log' => 'Log attivitÃ Â ',
+  'Activity log' => 'Log attività ',
 );

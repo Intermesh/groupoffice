@@ -4,7 +4,7 @@ return array (
   'Contact' => 'Contactpersoon',
   'Job title' => 'Titel',
   'Gender' => 'Geslacht',
-  'Organizations' => 'Bedrijven',
+  'Organizations' => 'Organisaties',
   'Communication' => 'Communiceren',
   'Add e-mail address' => 'E-mail adres toevoegen',
   'Add phone number' => 'Telefoonnummer toevoegen',

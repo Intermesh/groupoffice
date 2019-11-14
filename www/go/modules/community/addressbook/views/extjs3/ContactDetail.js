@@ -37,7 +37,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 									return isOrganization && !photoBlobId ? '<i class="icon">business</i>' : "";
 								},
 								getStyle: function (photoBlobId) {
-									return photoBlobId ? 'background-image: url(' + go.Jmap.downloadUrl(photoBlobId) + ')"' : "";
+									return photoBlobId ? 'background-image: url(' + go.Jmap.thumbUrl(photoBlobId, {w: 40, h: 40, zc: 1})  + ')"' : "";
 								}
 							})
 						}),
@@ -79,7 +79,9 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 							
 								go.util.mailto({
 									email: this.data.emailAddresses[i].email,
-									name: this.data.name
+									name: this.data.name,
+									entity: "Contact",
+									entityId: this.data.id
 								}, e);
 
 							}, this);
@@ -221,9 +223,18 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 		go.modules.community.addressbook.ContactDetail.superclass.initComponent.call(this);
 
 		this.addCustomFields();
-		this.addLinks();
+		//Sort contact types to top
+		this.addLinks(function(a, b) {
+
+			if(a.link.entity == "Contact" && b.link.entity != "Contact") {
+				return -1;
+			}
+			return 0;
+		});
 		this.addComments();
 		this.addFiles();
+
+		this.add(new go.detail.CreateModifyPanel());
 	},
 
 	onLoad: function () {

@@ -2,9 +2,10 @@
 
 namespace go\core\fs;
 
-use go\core\db\Query;
+use go\core\orm\Query;
 use go\core\orm;
 use go\core\util\DateTime;
+
 use function GO;
 
 /**
@@ -107,11 +108,18 @@ class Blob extends orm\Entity {
 			$dbName = go()->getDatabase()->getName();
 			go()->getDbConnection()->exec("USE information_schema");
 			
-			//somehow bindvalue didn't work here
-			$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . " and referenced_table_name='core_blob' and referenced_column_name = 'id'";
-			$stmt = go()->getDbConnection()->getPDO()->query($sql);
-			$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);		
-			go()->getDbConnection()->exec("USE `" . $dbName . "`");			
+			try {
+				//somehow bindvalue didn't work here
+				$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . " and referenced_table_name='core_blob' and referenced_column_name = 'id'";
+				$stmt = go()->getDbConnection()->getPDO()->query($sql);
+				$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);		
+			}
+			finally{
+				if($dbName == 'information_schema') {
+					throw new \Exception("HUH");
+				}
+				go()->getDbConnection()->exec("USE `" . $dbName . "`");		
+			}	
 			
 			go()->getCache()->set("blob-refs", $refs);			
 		}		
@@ -254,35 +262,53 @@ class Blob extends orm\Entity {
 	 * 
 	 * @return boolean
 	 */
-	protected function internalDelete() {
-		
-		//Check if blob is in use.
-		if(!$this->deleteHard && $this->isUsed()) {
-			go()->debug("Not deleting blob because it's in use");
+	protected static function internalDelete(Query $query) {
+
+		$new = [];
+		$paths = [];
+
+		foreach(Blob::find()->mergeWith($query) as $blob) {;
+			if(!$blob->isUsed()) {
+				$new[] = $blob->id;
+				$paths[] = $blob->path();
+			} else if(isset($blob->staleAt)) {
+				$blob->staleAt = null;
+				$blob->save();
+			}
+		}
+
+		if(empty($new)) {
 			return true;
 		}
+
+		$query->clearWhere()->andWhere(['id' => $new]);
 		
-		if(parent::internalDelete()) {
-			if(is_file($this->path())) {
-				unlink($this->path());
+		if(parent::internalDelete($query)) {
+
+			foreach($paths as $path) {
+				if(is_file($path)) {
+					unlink($path);
+				}
 			}
 			return true;
-		}		
+		}	
+		
+		return false;
 	}
 	
-	private $deleteHard = false;
+	// private $deleteHard = false;
 	
-	/**
-	 * Delete without checking isUsed()
-	 * 
-	 * It will throw an PDOException if you call this when it's in use.
-	 * 
-	 * @return true
-	 */
-	public function hardDelete() {
-		$this->deleteHard = true;
-		return $this->delete();
-	}
+	// /**
+	//  * Delete without checking isUsed()
+	//  * 
+	//  * It will throw an PDOException if you call this when it's in use.
+	//  * 
+	//  * @return true
+	//  */
+	// public function hardDelete() {
+	// 	$this->deleteHard = true;
+	// 	return $this->delete();
+	// }
 
 	/**
 	 * Return file system path of blob data

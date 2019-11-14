@@ -3,7 +3,8 @@ namespace go\core\model;
 
 use go\core\App;
 use go\core\db\Criteria;
-use go\core\jmap\Entity;
+use go\core\orm\Entity;
+use go\core\jmap\Entity as JmapEntity;
 use go\core\model\Group;
 use go\core\model\User;
 use go\core\orm\Query;
@@ -121,7 +122,7 @@ class Acl extends Entity {
 	
 	private function logChanges() {
 		
-		if(!Entity::$trackChanges) {
+		if(!JmapEntity::$trackChanges) {
 			return true;
 		}
 		
@@ -273,25 +274,25 @@ class Acl extends Entity {
 		}
 
 		// WHERE in
-		$subQuery = (new Query)
-						->select('aclId')
-						->from('core_acl_group', 'acl_g');
+		// $subQuery = (new Query)
+		// 				->select('aclId')
+		// 				->from('core_acl_group', 'acl_g');
 						
 						
-		if(isset($groups)) {
-			$subQuery->andWhere('acl_g.groupId', 'IN', $groups);
-		} else {
-			$subQuery->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
-				->andWhere([
-					'acl_u.userId' => $userId			
-							]);
-			}
+		// if(isset($groups)) {
+		// 	$subQuery->andWhere('acl_g.groupId', 'IN', $groups);
+		// } else {
+		// 	$subQuery->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
+		// 		->andWhere([
+		// 			'acl_u.userId' => $userId			
+		// 					]);
+		// 	}
 
-		if($level != self::LEVEL_READ) {			
-			$subQuery->andWhere('acl_g.level', '>=', $level);
-		}
+		// if($level != self::LEVEL_READ) {			
+		// 	$subQuery->andWhere('acl_g.level', '>=', $level);
+		// }
 		
-		$query->where($column, 'IN', $subQuery);
+		// $query->where($column, 'IN', $subQuery);
 
 		//where exists
 		// $subQuery = (new Query)
@@ -313,15 +314,22 @@ class Acl extends Entity {
 
 
 		// join
-		// $on =  'acl_g.aclId = ' . $column;
-		// if($level != self::LEVEL_READ) {
-		// 	$on .= ' AND level >= ' .$level;
-		// }
+		$on =  'acl_g.aclId = ' . $column;
+		if($level != self::LEVEL_READ) {
+			$on .= ' AND level >= ' .$level;
+		}
 
-		// $query->join('core_acl_group', 'acl_g',$on)
-		// 	->join('core_user_group', 'acl_u', 'acl_u.groupId = acl_g.groupId AND acl_u.userId=' . $userId)
-		// 	->select('MAX(acl_g.level) as permissionLevel', true)
-		// 	->groupBy(['id']);
+		if(isset($groups)) {
+			$on = (new Criteria)->where($on)->andWhere('acl_g.groups', 'IN', $groups);
+		}
+
+		$query->join('core_acl_group', 'acl_g', $on)
+			->select('MAX(acl_g.level) as permissionLevel', true)
+			->groupBy(['id']);
+
+		if(!isset($groups)) {
+			$query->join('core_user_group', 'acl_u', 'acl_u.groupId = acl_g.groupId AND acl_u.userId=' . $userId);
+		}
 		
 	}
 	

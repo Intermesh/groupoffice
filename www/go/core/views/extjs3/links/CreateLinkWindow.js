@@ -66,7 +66,10 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 		});
 
 		this.entityGrid = new go.links.EntityGrid({
-			width: dp(240),
+			width: dp(160),
+			mobile:{
+				width: dp(120),
+			},
 			region:"west",
 			savedSelection: "link",
 			entities:this.entities

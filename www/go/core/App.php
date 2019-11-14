@@ -7,7 +7,6 @@ use GO;
 use GO\Base\Observable;
 use go\core\auth\State as AuthState;
 use go\core\cache\CacheInterface;
-use go\core\cache\Disk;
 use go\core\db\Connection;
 use go\core\db\Database;
 use go\core\db\Query;
@@ -175,6 +174,8 @@ use const GO_CONFIG_FILE;
 		public function getDataFolder() {
 			return new Folder($this->getConfig()['core']['general']['dataPath']);
 		}
+
+		private $storageQuota;
 		
 		/**
 		 * Get total space of the data folder in bytes
@@ -182,19 +183,23 @@ use const GO_CONFIG_FILE;
 		 * @return float
 		 */
 		public function getStorageQuota() {
-			$quota = $this->getConfig()['core']['limits']['storageQuota'];
-			if(empty($quota)) {
-				try {
-					$quota = disk_total_space($this->getConfig()['core']['general']['dataPath']);
-				}
-				catch(\Exception $e) {
-					go()->warn("Could not determine total disk space: ". $e->getMessage());
-					return 0;
+			if(!isset($this->storageQuota)) {
+				$this->storageQuota = $this->getConfig()['core']['limits']['storageQuota'];
+				if(empty($this->storageQuota)) {
+					try {
+						$this->storageQuota = disk_total_space($this->getConfig()['core']['general']['dataPath']);
+					}
+					catch(\Exception $e) {
+						go()->warn("Could not determine total disk space: ". $e->getMessage());
+						$this->storageQuota = 0;
+					}
 				}
 			}
 			
-			return $quota;
+			return $this->storageQuota;
 		}		
+
+		private $storageFreeSpace;
 		
 		/**
 		 * Get free space in bytes
@@ -202,20 +207,24 @@ use const GO_CONFIG_FILE;
 		 * @return float
 		 */
 		public function getStorageFreeSpace() {
-			$quota = $this->getConfig()['core']['limits']['storageQuota'];
-			if(empty($quota)) {
-				try {
-					return disk_free_space($this->getConfig()['core']['general']['dataPath']);
+			if(!isset($this->storageFreeSpace)) {
+				$quota = $this->getConfig()['core']['limits']['storageQuota'];
+				if(empty($quota)) {
+					try {
+						$this->storageFreeSpace = disk_free_space($this->getConfig()['core']['general']['dataPath']);
+					}
+					catch(\Exception $e) {
+						go()->warn("Could not determine free disk space: ". $e->getMessage());
+						$this->storageFreeSpace = 0;
+					}
+				} else
+				{
+					$usage = \GO::config()->get_setting('file_storage_usage');				 
+					$this->storageFreeSpace = $quota - $usage;
 				}
-				catch(\Exception $e) {
-					go()->warn("Could not determine free disk space: ". $e->getMessage());
-					return 0;
-				}
-			} else
-			{
-				 $usage = \GO::config()->get_setting('file_storage_usage');				 
-				 return $quota - $usage;
 			}
+
+			return $this->storageFreeSpace;
 		}
 
 		/**
@@ -424,11 +433,12 @@ use const GO_CONFIG_FILE;
 		/**
 		 * Get a simple key value caching object
 		 * 
-		 * @return Disk
+		 * @return Cache\Apcu
 		 */
 		public function getCache() {
-			if (!isset($this->cache)) {
+			if (!isset($this->cache)) {				
 				$cls = $this->getConfig()['core']['general']['cache'];
+				go()->log("Using cache: " . $cls);
 				$this->cache = new $cls;
 			}
 			return $this->cache;

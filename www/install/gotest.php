@@ -274,6 +274,12 @@ function test_system(){
 	$test['fatal']=true;
 
 	$tests[]=$test;
+	$test['name']='CURL extension';
+	$test['pass']=extension_loaded('curl');
+	$test['feedback']='Warning: php-curl extension is required';
+	$test['fatal']=true;
+
+	$tests[]=$test;
 	$test['name']='TAR Compression';
 	$test['showSuccessFeedback'] = false;
 	if(class_exists('GO'))
@@ -431,6 +437,17 @@ function test_system(){
 	$tests[]=$test;	
 	
 	*/
+
+	$test['name']='MySQLnd driver';
+	$test['showSuccessFeedback'] = false;
+	$test['pass']= extension_loaded('mysqlnd');
+	$test['feedback']= "PHP is not using the mysqlnd driver. Please install MySQLi.";
+	$test['fatal']=true;
+	
+
+	$tests[]=$test;
+	
+	
 	
 	$test['name']='Shared Memory Functions';
 	$test['showSuccessFeedback'] = false;

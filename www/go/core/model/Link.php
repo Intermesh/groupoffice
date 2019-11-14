@@ -58,6 +58,8 @@ class Link extends Entity {
 	public $toSearchId;
 	
 	protected $aclId;
+
+	protected $permissionLevel;
 	
 
 	/**
@@ -283,18 +285,18 @@ class Link extends Entity {
 		}
 	}
 	
-	protected function internalDelete() {		
-		if(!parent::internalDelete()) {
-			return false;
-		}
-		
-		$reverse = [];
-		$reverse['fromEntityTypeId'] = $this->toEntityTypeId;
-		$reverse['toEntityTypeId'] = $this->fromEntityTypeId;
-		$reverse['toId'] = $this->fromId;
-		$reverse['fromId'] = $this->toId;
-		
-		return go()->getDbConnection()->delete('core_link', $reverse)->execute();
+	protected static function internalDelete(Query $query) {		
+
+		//delete the reverse links
+		$join = new Query();
+		$joinSubQuery = clone $query;
+		$joinSubQuery->select("*");
+		$join->join($joinSubQuery, 'rev', 
+			'rev.fromEntityTypeId = t.toEntityTypeId AND rev.toEntityTypeId = t.fromEntityTypeId AND rev.toId = t.fromId AND rev.fromId = t.toId');
+		go()->getDbConnection()->delete('core_link', $join)->execute();
+
+		return parent::internalDelete($query);
+
 	}
 	
 	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
@@ -312,8 +314,12 @@ class Link extends Entity {
 		if($this->isNew()) {			
 			$this->updateDataFromSearch();
 		}
+
+		if(!isset($this->permissionLevel)) {
+			$this->permissionLevel = Acl::getUserPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId());
+		}
 		//Readable items may be linked!
-		return Acl::getUserPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId()) ?  Acl::LEVEL_DELETE : false;
+		return $this->permissionLevel ?  Acl::LEVEL_DELETE : false;
 	}
 	
 //	

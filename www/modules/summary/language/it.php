@@ -17,7 +17,7 @@ return array (
   'Type' => 'Tipo',
   'Summary' => 'Riepilogo',
   'Rss Feeds' => 'Fonti RSS',
-  'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'Non Ã¨ stata aggiunta alcuna fonte RSS.<br />Fai clic sul pulsante delle impostazioni nell\'angolo superiore destro di questa finestra per aggiungere nuove fonti.',
+  'No RSS feeds have been added.<br />Click the settings button in the top right corner of this window to add feeds.' => 'Non è stata aggiunta alcuna fonte RSS.<br />Fai clic sul pulsante delle impostazioni nell\'angolo superiore destro di questa finestra per aggiungere nuove fonti.',
   'name' => 'Riepilogo',
   'description' => 'Inserisci qui una descrizione',
   'Start page' => 'Riepilogo',

@@ -3,8 +3,10 @@ namespace go\core\jmap;
 
 class SetError extends \go\core\data\Model {
 	
-	public function __construct($type) {
+	public function __construct($type, $description = null, $properties = null) {
 		$this->type = $type;
+		$this->description = $description;
+		$this->properties = $properties;
 	}
 	public $type;
 	public $description;

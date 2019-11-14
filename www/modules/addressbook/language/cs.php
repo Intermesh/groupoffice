@@ -270,7 +270,7 @@ return array (
   ' for= ' => ' for= ',
   'ID' => 'ID',
   'IBAN' => 'IBAN',
-  'Fax' => 'Fax',
+  'Fax' => 'FAX',
   'E-mail' => 'E-mail',
   'E-mail 2' => 'E-mail 2',
   'E-mail 3' => 'E-mail 3',

@@ -37,7 +37,7 @@ class State extends AbstractState {
 		return $_COOKIE['accessToken'];
 	}
 	
-	/**
+	/**	
 	 *
 	 * @var Token 
 	 */
@@ -60,6 +60,11 @@ class State extends AbstractState {
 			if(!$tokenStr) {
 				return false;
 			}
+
+			$this->token = go()->getCache()->get('token-' . $tokenStr);
+			if($this->token) {
+				return $this->token;
+			}
 		
 			$this->token = Token::find()->where(['accessToken' => $tokenStr])->single();
 			
@@ -68,14 +73,16 @@ class State extends AbstractState {
 			}		
 
 			if($this->token->isExpired()) {				
-				$this->token->delete();				
+				$this->token->delete($this->token->primaryKeyValues());				
 				$this->token = false;
-			}
+			} else{
+				go()->getCache()->set('token-' . $tokenStr, $this->token);
+			}			
 		}
 		
 		return $this->token;
 	}
-  
+
 	public function setToken(Token $token) {
 		$this->token = $token;
 	}
@@ -105,6 +112,10 @@ class State extends AbstractState {
 	
 	public function getDownloadUrl($blobId) {
 		return Settings::get()->URL . "api/download.php?blob=".$blobId;
+	}
+
+	public function getPageUrl($blobId) {
+		return Settings::get()->URL . "api/page.php?blob=".$blobId;
 	}
 	
 	public function getApiUrl() {
@@ -219,6 +230,16 @@ class State extends AbstractState {
 			return false;
 		}
 		return $user->isAdmin();
+	}
+
+
+	/**
+	 * Get the permission level of the module this controller belongs to.
+	 * 
+	 * @return int
+	 */
+	public function getClassPermissionLevel($cls) {
+		return $this->getToken()->getClassPermissionLevel($cls);
 	}
 
 }

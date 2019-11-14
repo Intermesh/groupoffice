@@ -727,12 +727,10 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		layout:'responsive',
 
 		split: true,
-					narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
-
-			width: dp(700),
-			stateId: 'go-email-west',
-		items: [
-			
+		narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
+		width: dp(700),
+		stateId: 'go-email-west',
+		items: [			
 			this.leftMessagesGrid,
 			this.treePanel
 		]

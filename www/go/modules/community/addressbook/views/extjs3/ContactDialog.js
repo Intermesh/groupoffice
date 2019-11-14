@@ -113,18 +113,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 										name: "jobTitle",
 										fieldLabel: t("Job title"),
 										anchor: "100%"
-									}),
-									this.genderField = new go.form.RadioGroup({
-										xtype: 'radiogroup',
-										fieldLabel: t("Gender"),
-										name: "gender",
-										value: null,
-										items: [
-											{boxLabel: t("Unknown"), inputValue: null},
-											{boxLabel: t("Male"), inputValue: 'M'},
-											{boxLabel: t("Female"), inputValue: 'F'}
-										]
 									})
+									
 								]
 							},
 							{
@@ -139,6 +129,18 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 							}
 						]
 					},
+
+					this.genderField = new go.form.RadioGroup({
+						xtype: 'radiogroup',
+						fieldLabel: t("Gender"),
+						name: "gender",
+						value: null,
+						items: [
+							{boxLabel: t("Unknown"), inputValue: null},
+							{boxLabel: t("Male"), inputValue: 'M'},
+							{boxLabel: t("Female"), inputValue: 'F'}
+						]
+					}),
 
 					this.organizationsField = new go.form.Chips({
 						anchor: '-20',
@@ -183,6 +185,12 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					columnWidth: 0.5,
 					anchor: "-20"
 				},
+				mobile: {
+					defaults: {
+						columnWidth: 1,
+						anchor: "-20"
+					}
+				},
 				items: [
 					new go.modules.community.addressbook.EmailAddressesField(),
 					new go.modules.community.addressbook.PhoneNumbersField()
@@ -203,6 +211,12 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 				defaults: {
 					columnWidth: 0.5,
 					anchor: "-20"
+				},
+				mobile: {
+					defaults: {
+						columnWidth: 1,
+						anchor: "-20"
+					}
 				},
 				items: [
 					new go.modules.community.addressbook.DatesField(),

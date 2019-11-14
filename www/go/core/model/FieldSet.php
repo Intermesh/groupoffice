@@ -103,15 +103,13 @@ class FieldSet extends AclOwnerEntity {
 						});
 	}
 	
-	protected function internalDelete() {
+	protected static function internalDelete(Query $query) {
 		
-		foreach(Field::find()->where(['fieldSetId' => $this->id]) as $field) {
-			if(!$field->delete()) {
-				return false;
-			}
+		if(!Field::delete(['fieldSetId' => $query])) {
+			throw new \Exception("Could not delete fields");
 		}
 		
-		return parent::internalDelete();
+		return parent::internalDelete($query);
 	}
 	
 	// protected function internalSave() {

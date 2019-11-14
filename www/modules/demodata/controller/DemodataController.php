@@ -74,7 +74,7 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			$elmer->displayName = 'Elmer Fudd';
 			$elmer->email = $elmer->recoveryEmail = 'elmer@acmerpp.demo';
 			$elmer->setPassword('demo');
-			$elmer->groups[] = Group::ID_INTERNAL;
+			//$elmer->groups[] = Group::ID_INTERNAL;
 
 			if (!$elmer->save()) 
 			{
@@ -96,7 +96,7 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			$demo->displayName = 'Demo User';
 			$demo->email = $demo->recoveryEmail = 'demo@acmerpp.demo';
 			$demo->setPassword('demo');
-			$demo->groups[] = Group::ID_INTERNAL;
+			//$demo->groups[] = Group::ID_INTERNAL;
 
 			if (!$demo->save()) 
 			{
@@ -113,7 +113,7 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			$linda->displayName = 'Linda Smith';
 			$linda->email = $linda->recoveryEmail = 'linda@acmerpp.linda';
 			$linda->setPassword('demo');
-			$linda->groups[] = Group::ID_INTERNAL;
+		//	$linda->groups[] = Group::ID_INTERNAL;
 
 			if (!$linda->save())
 			{

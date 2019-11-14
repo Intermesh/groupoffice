@@ -4,6 +4,7 @@ namespace go\modules\community\addressbook\model;
 use go\core\fs\File;
 use go\core\model\Acl;
 use go\core\orm\Property;
+use go\core\orm\Query;
 use GO\Files\Model\Folder;
 use go\modules\community\addressbook\Module;
 
@@ -139,18 +140,17 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 		return $addressBook;
 	}
 
-	protected function internalDelete()
+	protected static function internalDelete(Query $query)
 	{
-		if(!Contact::find(['id', 'addressBookId'])->where(['addressBookId' => $this->id])->delete()) {
+		if(!Contact::delete(['addressBookId' => $query])) {
 			return false;
 		}
 		
-		//TODO optimize delete performance???
-		if(!Group::find(['id', 'addressBookId'])->where(['addressBookId' => $this->id])->delete()) {
+		if(!Group::delete(['addressBookId' => $query])) {
 			return false;
 		}			
 		
-		return parent::internalDelete();
+		return parent::internalDelete($query);
 	}
 
 }

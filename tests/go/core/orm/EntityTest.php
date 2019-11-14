@@ -2,6 +2,8 @@
 
 namespace go\core\orm;
 
+use go\core\model\Group;
+use go\core\model\User;
 use go\core\util\DateTime;
 use go\modules\community\test\model\A;
 use go\modules\community\test\model\AHasMany;
@@ -14,13 +16,12 @@ use function json_encode;
 class EntityTest extends TestCase {	
 		
 	public function testDelete() {
-		$entities = B::find();
+
+		$success = B::delete((new Query()));
+		$this->assertEquals(true, $success);
 		
-		foreach($entities as $entity) {
-			$success = $entity->delete();
-			
-			$this->assertEquals(true, $success);
-		}
+		$stmt = B::find()->execute();
+		$this->assertEquals(0, $stmt->rowCount());
 	}
 
 	public function testCreate() {
@@ -63,6 +64,63 @@ class EntityTest extends TestCase {
 		$success = $copy->save();		
 
 		$this->assertEquals(true, $success);
+	}
+
+	public function testMap() {
+		$this->internalTestMap();
+		$this->internalTestMap();
+
+		$count = go()->getDbConnection()->selectSingleValue('count(*)')->from('test_a_map')->single();
+
+		$this->assertEquals(2, $count);
+	}
+	private function internalTestMap() {
+		$a1 = new A();
+		$a1->propA = 'map-' . uniqid();
+		$success = $a1->save();
+
+		$this->assertEquals(true, $success);
+
+		$a2 = new A();
+		$a2->propA = 'map-' . uniqid();
+		$success = $a2->save();
+
+		$this->assertEquals(true, $success);
+
+		$a3 = new A();
+		$a3->propA = 'map-' . uniqid();
+		$success = $a3->save();
+
+		$this->assertEquals(true, $success);
+
+		$a1->setValues(['map' => [$a2->id => ['anotherAId' => $a2->id,'description' => 'link to map']]]);
+
+		$success = $a1->save();
+
+		$this->assertEquals(true, $success);
+
+		$a1->setValues(['map' => [$a2->id => ['anotherAId' => $a2->id, 'description' => 'link to a2'], $a3->id => ['anotherAId' => $a3->id,'description' => 'link to a3']]]);
+
+		$success = $a1->save();
+
+		$this->assertEquals(true, $success);
+
+		$arr = $a1->toArray();
+
+		$a1 = A::findById($a1->id);
+		$this->assertEquals($arr, $a1->toArray());
+
+		$a1->setValues(['map' => [$a2->id => null, $a3->id => ['anotherAId' => $a3->id,'description' => 'link to a3']]]);
+		$success = $a1->save();
+
+		$this->assertEquals(true, $success);
+
+		$this->assertEquals(1, count($a1->map));
+
+		$a1 = A::findById($a1->id);
+
+		$this->assertEquals(1, count($a1->map));
+
 	}
 	
 	
@@ -259,5 +317,37 @@ class EntityTest extends TestCase {
 		$a = new A();
 		
 		$test = $a->thisPropDoesNotExist;
+	}
+
+
+	public function testScalar() {
+		
+
+		$newGroup = new Group();
+		$newGroup->name = uniqid();
+		$success = $newGroup->save();
+
+		$this->assertEquals(true, $success);
+
+		$user = User::find(['id','groups'])->single();
+		$count = count($user->groups);
+		$user->groups[] = $newGroup->id;
+		$success = $user->save();
+
+		$this->assertEquals(true, $success);
+
+		$user = User::find(['id','groups'])->single();
+
+		$this->assertEquals($count + 1, count($user->groups));
+
+		$user->groups = array_filter($user->groups, function($groupId) use($newGroup) { return $groupId != $newGroup->id;});
+		$success = $user->save();
+
+		$this->assertEquals(true, $success);
+
+		$this->assertEquals($count, count($user->groups));
+
+		$user = User::find(['id','groups'])->single();
+		$this->assertEquals($count, count($user->groups));
 	}
 }

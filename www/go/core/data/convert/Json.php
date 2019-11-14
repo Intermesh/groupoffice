@@ -2,6 +2,7 @@
 namespace go\core\data\convert;
 
 use go\core\orm\Entity;
+use go\core\util\JSON as GoJSON;
 
 class Json extends AbstractConverter {	
 	
@@ -23,7 +24,7 @@ class Json extends AbstractConverter {
 
 	public function export(Entity $entity) {
 		$properties = $entity->toArray();
-		return json_encode($properties, JSON_PRETTY_PRINT);
+		return $string = GoJSON::encode($properties, JSON_PRETTY_PRINT);
 	}
 
 	protected function exportEntity(Entity $entity, $fp, $index, $total) {

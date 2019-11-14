@@ -48,16 +48,22 @@ class Connection {
 		$this->password = $password;
 		$this->options = [
 				PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
-				PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci',sql_mode='STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',time_zone = '+00:00',lc_messages = 'en_US'"
+				PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci',sql_mode='STRICT_ALL_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION',time_zone = '+00:00',lc_messages = 'en_US'",
+				PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+				PDO::ATTR_PERSISTENT => false, //doesn't work with ATTR_STATEMENT_CLASS but should not have much benefits eanyway
+				PDO::ATTR_STATEMENT_CLASS => [Statement::class],
+				PDO::ATTR_EMULATE_PREPARES => false, //for native data types int, bool etc.
+				PDO::ATTR_STRINGIFY_FETCHES => false
 		];
 	}
 
-	public function __destruct()
-	{
-		if($this->inTransaction()) {
-			throw new \Exception("DB Transaction not closed properly");
-		}
-	}
+	// public function __destruct()
+	// {
+	// 	if($this->inTransaction()) {
+	// 		throw new \Exception("DB Transaction not closed properly");
+	// 	}
+	// }
+	
 	public function getDsn() {
 		return $this->dsn;
 	}
@@ -108,12 +114,11 @@ class Connection {
 	 */
 	private function setPDO() {
 		$this->pdo = null;
-		$this->pdo = new PDO($this->dsn, $this->username, $this->password, $this->options);		
-		$this->getPdo()->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$this->getPdo()->setAttribute(PDO::ATTR_PERSISTENT, true);
-		$this->getPdo()->setAttribute(PDO::ATTR_STATEMENT_CLASS, [Statement::class]);
-		$this->getPdo()->setAttribute(PDO::ATTR_EMULATE_PREPARES, false); //for native data types int, bool etc.
-		$this->getPdo()->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
+		$this->pdo = new PDO($this->dsn, $this->username, $this->password, $this->options);	
+		// go()->debug("PDO Driver: " . $this->pdo->getAttribute(PDO::ATTR_CLIENT_VERSION));
+		// if (strpos($this->pdo->getAttribute(PDO::ATTR_CLIENT_VERSION), 'mysqlnd') !== false) {
+		// 	echo 'PDO MySQLnd enabled!';
+		// }
 	}
 
 	/**
@@ -188,11 +193,12 @@ class Connection {
 
 		}else
 		{
-			$sql = "SAVEPOINT LEVEL".$this->transactionSavePointLevel;
-			if($this->debug) {
-				go()->debug($sql, 1);
-			}
-			$ret = $this->exec($sql) !== false;			
+			// $sql = "SAVEPOINT LEVEL".$this->transactionSavePointLevel;
+			// if($this->debug) {
+			// 	go()->debug($sql, 1);
+			// }
+			// $ret = $this->exec($sql) !== false;	
+			$ret = true;		
 		}		
 		
 		$this->transactionSavePointLevel++;		
@@ -234,9 +240,11 @@ class Connection {
 			return $this->getPdo()->rollBack();
 		}else
 		{
-			$sql = "ROLLBACK TO SAVEPOINT LEVEL".$this->transactionSavePointLevel;
-			go()->warn($sql, 1);
-			return $this->exec($sql) !== false;						
+			return true;
+
+			// $sql = "ROLLBACK TO SAVEPOINT LEVEL".$this->transactionSavePointLevel;
+			// go()->warn($sql, 1);
+			// return $this->exec($sql) !== false;						
 		}
 	}
 
@@ -262,11 +270,12 @@ class Connection {
 			return $this->getPdo()->commit();
 		}else
 		{
-			$sql = "RELEASE SAVEPOINT LEVEL".$this->transactionSavePointLevel;
-			if($this->debug) {
-				go()->debug($sql, 1);				
-			}
-			return $this->exec($sql) !== false;			
+			// $sql = "RELEASE SAVEPOINT LEVEL".$this->transactionSavePointLevel;
+			// if($this->debug) {
+			// 	go()->debug($sql, 1);				
+			// }
+			// return $this->exec($sql) !== false;			
+			return true;
 		}
 	}
 
@@ -460,6 +469,18 @@ class Connection {
 		return $this->createStatement($build);
 	}
 	
+	/**
+	 * Update but with ignore
+	 * @see update()
+	 */
+	public function updateIgnore($tableName, $data, $query = null) {
+		$query = Query::normalize($query);
+
+		$queryBuilder = new QueryBuilder($this);
+		$build = $queryBuilder->buildUpdate($tableName, $data, $query, "UPDATE IGNORE");
+
+		return $this->createStatement($build);
+	}
 
 	/**
 	 * Create a select statement.
@@ -496,7 +517,7 @@ class Connection {
 		$query = new Query();
 		return $query->setDbConnection($this)->selectSingleValue($select);
 	}
-
+	
 	/**
 	 * Create a statement from a QueryBuilder result
 	 * 
@@ -505,14 +526,14 @@ class Connection {
 	 */
 	public function createStatement($build) {
 		try {
-			$build['start'] = go()->getDebugger()->getTimeStamp();
+			$build['start'] = go()->getDebugger()->getMicroTime();			
 			$stmt = $this->getPDO()->prepare($build['sql']);
-			$stmt->setBuild($build);
+			$stmt->setBuild($build);						
 
 			foreach ($build['params'] as $p) {
-				if (isset($p['value']) && !is_scalar($p['value'])) {
-					throw new Exception("Invalid value " . var_export($p['value'], true));
-				}
+				// if (go()->getDebugger()->enabled && isset($p['value']) && !is_scalar($p['value'])) {
+				// 	throw new Exception("Invalid value " . var_export($p['value'], true));
+				// }
 				$stmt->bindValue($p['paramTag'], $p['value'], $p['pdoType']);
 			}
 			return $stmt;

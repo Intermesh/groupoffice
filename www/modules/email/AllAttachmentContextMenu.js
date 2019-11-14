@@ -53,11 +53,8 @@ GO.email.AllAttachmentContextMenu = Ext.extend(Ext.menu.Menu, {
 				cls: 'x-btn-text-icon',
 				handler: function(){
 
-					if(!GO.email.linkAttachmentDialog){
-						GO.email.linkAttachmentDialog = new GO.email.LinkAttachmentDialog();
-					}
-
-					GO.email.linkAttachmentDialog.show(null,this.messagePanel);
+					var dlg = new GO.email.LinkAttachmentDialog();
+					dlg.show(null,this.messagePanel);
 				},
 				scope: this
 			});

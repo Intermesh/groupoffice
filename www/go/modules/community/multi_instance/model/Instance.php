@@ -7,6 +7,7 @@ use go\core\fs\File;
 use go\core\http\Client;
 use go\core\http\Request;
 use go\core\jmap\Entity;
+use go\core\orm\Query;
 use go\core\validate\ErrorCode;
 use go\modules\community\multi_instance\Module;
 use function GO;
@@ -322,7 +323,7 @@ class Instance extends Entity {
 				$this->dropDatabaseUser($dbUsername);
 			}
 			
-			parent::internalDelete();
+			parent::internalDelete((new Query())->where(['id' => $this->id]));
 			
 			throw $e;
 		}
@@ -538,24 +539,29 @@ class Instance extends Entity {
 		return true;
 	}
 	
-	protected function internalDelete() {
-		$this->getTempFolder()->delete();
-		
-		$this->mysqldump();
-		
-		$this->getConfigFile()->move($this->getDataFolder()->getFile('config.php'));
-		$this->getConfigFile()->getFolder()->delete();
+	protected static function internalDelete(Query $query) {
 
-		$dest =	$this->getTrashFolder()->getFolder($this->getDataFolder()->getName());
-		if($dest->exists()) {
-			$dest = $dest->getParent()->getFolder($this->getDataFolder()->getName() . '-' . uniqid());
+		$instances = Instance::find()->mergeWith($query);
+
+		foreach($instances as $instance) {
+			$instance->getTempFolder()->delete();
+			
+			$instance->mysqldump();
+			
+			$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php'));
+			$instance->getConfigFile()->getFolder()->delete();
+
+			$dest =	$instance->getTrashFolder()->getFolder($instance->getDataFolder()->getName());
+			if($dest->exists()) {
+				$dest = $dest->getParent()->getFolder($instance->getDataFolder()->getName() . '-' . uniqid());
+			}
+			$instance->getDataFolder()->move($dest);
+			
+			$instance->dropDatabaseUser($instance->getDbUser());
+			$instance->dropDatabase($instance->getDbName());
 		}
-		$this->getDataFolder()->move($dest);
 		
-		$this->dropDatabaseUser($this->getDbUser());
-		$this->dropDatabase($this->getDbName());
-		
-		return parent::internalDelete();
+		return parent::internalDelete($query);
 	}
 	
 	

@@ -33,6 +33,6 @@ return array (
   'description' => 'Utvide e-postmodulen med støtte for SMIME signering og kryptering.',
   'The Group-Office password was incorrect.' => '{product_name} passordet er feil.',
   'Your SMIME key password matches your Group-Office password. This is prohibited for security reasons!' => 'Passordet til SMIME nøkkelen er det samme som GroupOffice passordet. Av sikkerhetsårsaker er dette ikke tillatt!',
-  'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'For å laste opp et nytt PCSK12 sertifikat må du oppgi ditt {product_name} passord. Av sikkerhetsårsaker må {product_name} passordet være forskjellig fra passordet til PCSK12 sertifikatet. Du kan heller ikke ha tomt passord.',
+  'To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.' => 'For å laste opp et nytt PCSK12 sertifikat må du oppgi ditt GroupOffice passord. Av sikkerhetsårsaker må GroupOffice passordet være forskjellig fra passordet til PCSK12 sertifikatet. Du kan heller ikke ha tomt passord.',
   'Hash' => 'Hash',
 );

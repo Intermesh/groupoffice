@@ -2,12 +2,12 @@
 namespace go\core\auth\model;
 
 use DateInterval;
-use go\core\App;
 use go\core\Environment;
 use go\core\auth\Method;
+use go\core\orm\Query;
 use go\core\orm\Entity;
-use go\core\orm\Mapping;
 use go\core\util\DateTime;
+use go\core\model\Module;
 
 class Token extends Entity {
 	
@@ -94,11 +94,12 @@ class Token extends Entity {
 		parent::init();
 		
 		if($this->isNew()) {	
+			$this->setExpiryDate();
 			$this->lastActiveAt = new \DateTime();
 			$this->setClient();
 			$this->setLoginToken();
 //			$this->internalRefresh();
-		}else if($this->isAuthenticated ()){
+		}else if($this->isAuthenticated ()) {
 			
 			$this->oldLogin();
 			
@@ -106,7 +107,9 @@ class Token extends Entity {
 				$this->lastActiveAt = new \DateTime();				
 				
 				//also refresh token
-				$this->setExpiryDate();
+				if(isset($this->expiresAt)) {
+					$this->setExpiryDate();
+				}
 				$this->internalSave();
 			}
 		}
@@ -156,6 +159,10 @@ class Token extends Entity {
 	 * @return boolean
 	 */
 	public function isExpired(){
+
+		if(!isset($this->expiresAt)) {
+			return false;
+		}
 		
 		return $this->expiresAt < new DateTime();
 	}
@@ -164,8 +171,9 @@ class Token extends Entity {
 		if(!isset($this->accessToken)) {
 			$this->accessToken = $this->generateToken();
 		}
-		
-		$this->setExpiryDate();
+		if(isset($this->expiresAt)) {
+			$this->setExpiryDate();
+		}
 	}
 	
 	public function setLoginToken() {
@@ -289,16 +297,9 @@ class Token extends Entity {
 		$_SESSION['GO_SESSION']['accessToken'] = $this->accessToken;
 	}
 	
-	private function oldLogout() {
+	public function oldLogout() {
 		$this->oldLogin();
 		session_destroy();
-	}
-	
-	protected function internalDelete() {
-		
-		
-		$this->oldLogout();
-		return parent::internalDelete();
 	}
 	
 	/**
@@ -389,5 +390,40 @@ class Token extends Entity {
 
 		return $authenticators;
 	}
+
+	public static function collectGarbage() {
+		return static::delete((new Query)->where('expiresAt', '!=', null)->andWhere('expiresAt', '<', new DateTime()));
+	}
+
+	protected static function internalDelete(\go\core\orm\Query $query)
+	{
+		foreach(self::find()->mergeWith($query)->selectSingleValue('accessToken') as $accessToken) {
+			go()->getCache()->delete('token-' . $accessToken);
+		}
+
+		return parent::internalDelete($query);
+	}
+
+
+
+	private $classPermissionLevels = [];
+
+	/**
+	 * Get the permission level of the module this controller belongs to.
+	 * 
+	 * @return int
+	 */
+	public function getClassPermissionLevel($cls) {
+		if(!isset($this->classPermissionLevels[$cls])) {
+			$mod = Module::findByClass($cls, ['aclId', 'permissionLevel']);
+			$this->classPermissionLevels[$cls]= $mod->getPermissionLevel();	
+			go()->getCache()->set('token-'.$this->accessToken,$this);		
+		}
+
+		return $this->classPermissionLevels[$cls];
+	}
+  
+
+	
 	
 }

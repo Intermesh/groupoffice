@@ -254,12 +254,14 @@ class File extends FileSystemObject {
 	 * @param boolean $useCache
 	 * @param array $headers key value array of http headers to send
 	 */
-	public function output($sendHeaders = true, $useCache = true, array $headers = []) {		
+	public function output($sendHeaders = true, $useCache = true, array $headers = [], $inline = false) {		
 		$r = \go\core\http\Response::get();
 	
 		if($sendHeaders) {
+			$disp = $inline ? 'inline' : 'attachment';
+
 			$r->setHeader('Content-Type', $this->getContentType());
-			$r->setHeader('Content-Disposition', 'attachment; filename="' . $this->getName() . '"');
+			$r->setHeader('Content-Disposition', $disp . '; filename="' . $this->getName() . '"');
 			$r->setHeader('Content-Transfer-Encoding', 'binary');
 
 			if ($useCache) {				

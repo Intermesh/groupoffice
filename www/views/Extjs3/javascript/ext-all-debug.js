@@ -4967,7 +4967,7 @@ Ext.EventManager = function(){
         WINDOW = window,
         DOMCONTENTLOADED = "DOMContentLoaded",
         COMPLETE = 'complete',
-        propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate|callParent)$/,
+        propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate)$/,
         
         specialElCache = [];
 
@@ -5348,10 +5348,9 @@ Ext.EventManager = function(){
         },
         
         removeFromSpecialCache: function(o) {
-            var i = 0,
-                len = specialElCache.length;
+            var i = 0;
                 
-            for (; i < len; ++i) {
+            for (; i < specialElCache.length; ++i) {
                 if (specialElCache[i].el == o) {
                     specialElCache.splice(i, 1); 
                 }
@@ -6917,7 +6916,7 @@ Ext.apply(Ext.EventManager, function(){
        textEvent,
        textSize,
        D = Ext.lib.Dom,
-       propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate|callParent)$/,
+       propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate)$/,
        unload = Ext.EventManager._unload,
        curWidth = 0,
        curHeight = 0,
@@ -11264,6 +11263,12 @@ Ext.Component = function(config){
     this.initialConfig = config;
 
     Ext.apply(this, config);
+
+
+    if(config.mobile && GO.util.isMobileOrTablet()) {
+        Ext.apply(this, config.mobile);
+    }
+
     this.addEvents(
         
         'added',
@@ -11339,10 +11344,6 @@ Ext.Component = function(config){
 Ext.Component.AUTO_ID = 1000;
 
 Ext.extend(Ext.Component, Ext.util.Observable, {
-    // GO override
-    callParent: function(args) {
-		return this.supr()[this.callParent.caller.name].apply(this, args || []);
-	},
 		//GO override
     setTranslationModule : function() {
 			if(this.module) {
@@ -11981,7 +11982,7 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
     mon : function(item, ename, fn, scope, opt){
         this.createMons();
         if(Ext.isObject(ename)){
-            var propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate|callParent)$/;
+            var propRe = /^(?:scope|delay|buffer|single|stopEvent|preventDefault|stopPropagation|normalized|args|delegate)$/;
 
             var o = ename;
             for(var e in o){
@@ -15270,6 +15271,10 @@ Ext.extend(Ext.layout.BorderLayout.SplitRegion, Ext.layout.BorderLayout.Region, 
 
     
     onSplitMove : function(split, newSize){
+
+        //MS: for responsive layout
+        this.panel.wideWidth = newSize.width;
+
         var s = this.panel.getSize();
         this.lastSplitSize = newSize;
         if(this.position == 'north' || this.position == 'south'){
@@ -40209,6 +40214,8 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
     
     autocomplete: "off",
 
+    placeholder: "",
+
     fieldClass : 'x-form-field',
     
     msgTarget : 'qtip',
@@ -40267,6 +40274,7 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
             }
 
             cfg.autocomplete = this.autocomplete;
+            cfg.placeholder = this.placeholder;
             
             this.autoEl = cfg;
         }
@@ -47663,8 +47671,11 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
                 meta.style = column.style;
 
                 var v = this.encodeGridValue(store, column, record);
-                
-                meta.value = column.renderer.call(column.scope, v, meta, record, rowIndex, i, store);
+                try {
+                    meta.value = column.renderer.call(column.scope, v, meta, record, rowIndex, i, store);
+                } catch(e) {
+                    console.error(e);
+                }
 
                 if (Ext.isEmpty(meta.value)) {
                     meta.value = '&#160;';
@@ -50701,6 +50712,7 @@ Ext.grid.RowSelectionModel = Ext.extend(Ext.grid.AbstractSelectionModel,  {
         return (this.selections.key(id) ? true : false);
     },
 
+    simpleSelect : false,
     
     handleMouseDown : function(g, rowIndex, e){
         if(e.button !== 0 || this.isLocked()){
@@ -50714,10 +50726,10 @@ Ext.grid.RowSelectionModel = Ext.extend(Ext.grid.AbstractSelectionModel,  {
             view.focusRow(rowIndex);
         }else{
             var isSelected = this.isSelected(rowIndex);
-            if(e.ctrlKey && isSelected){
+            if((e.ctrlKey || this.simpleSelect) && isSelected){
                 this.deselectRow(rowIndex);
             }else if(!isSelected || this.getCount() > 1){
-                this.selectRow(rowIndex, e.ctrlKey || e.shiftKey);
+                this.selectRow(rowIndex, e.ctrlKey || e.shiftKey || this.simpleSelect);
                 view.focusRow(rowIndex);
             }
         }

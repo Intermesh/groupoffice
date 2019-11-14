@@ -240,7 +240,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 									handler: function() {
 										go.util.exportToFile(
 														'Contact', 
-														Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
+														Ext.apply(go.util.clone(this.grid.store.baseParams), this.grid.store.lastOptions.params, {limit: 0, start: 0}),
 														'text/vcard');									
 									},
 									scope: this
@@ -250,7 +250,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 									handler: function() {
 										go.util.exportToFile(
 														'Contact', 
-														Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
+														Ext.apply(go.util.clone(this.grid.store.baseParams), this.grid.store.lastOptions.params, {limit: 0, start: 0}),
 														'text/csv');									
 									},
 									scope: this
@@ -268,6 +268,18 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 							]							
 						},
 						"-",
+
+						{
+							iconCls: 'ic-content-copy',
+							text: t("Look for duplicates"),
+							handler: function() {
+								var win = new go.modules.community.addressbook.DuplicateDialog();
+								win.show();
+							}
+						},
+
+						"-",
+
 						{
 							itemId: "delete",
 							iconCls: 'ic-delete',

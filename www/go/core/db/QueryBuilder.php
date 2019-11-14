@@ -5,6 +5,7 @@ namespace go\core\db;
 use Exception;
 use go\core\db\Column;
 use go\core\db\Criteria;
+use go\core\util\ArrayUtil;
 
 /**
  * QueryBuilder
@@ -53,13 +54,13 @@ class QueryBuilder {
 	 * 
 	 * @var int
 	 */
-	private static $paramCount = 0;
+	private $paramCount = 0;
 
 	/**
 	 * Prefix of the bind parameter tag
 	 * @var type
 	 */
-	private static $paramPrefix = ':go';
+	private $paramPrefix = ':go';
 
 	/**
 	 * Key value array with [tableAlias => Table()]
@@ -152,12 +153,12 @@ class QueryBuilder {
 			$sql .= ' ' . $build['sql'];
 			$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
 		} else {
-
-			if(!isset($data[0])) {
+			if(ArrayUtil::isAssociative($data)) {
 				$data = [$data];
 			}
 			if(empty($columns)) {
-				$columns = array_keys($data[0]);
+				reset($data);
+				$columns = array_keys(current($data));
 			}
 			$sql .= " (\n\t`" . implode("`,\n\t`", $columns) . "`\n)\n" .
 				"VALUES \n";
@@ -188,7 +189,7 @@ class QueryBuilder {
 		return ['sql' => $sql, 'params' => $this->buildBindParameters];
 	}
 
-	public function buildUpdate($tableName, $data, Query $query) {
+	public function buildUpdate($tableName, $data, Query $query, $command = "UPDATE") {
 
 		$this->reset();
 
@@ -225,7 +226,7 @@ class QueryBuilder {
 			$set = (string) $data;
 		}
 		
-		$sql = "UPDATE `{$this->tableName}` `" . $this->tableAlias . "`";
+		$sql = $command . " `{$this->tableName}` `" . $this->tableAlias . "`";
 		
 		foreach ($this->query->getJoins() as $join) {
 			$sql .= "\n" . $this->join($join, "");
@@ -393,6 +394,10 @@ class QueryBuilder {
 
 	protected function buildSelectFields() {
 		$select = "SELECT ";
+
+		if ($this->query->getCalcFoundRows()) {
+			$select .= "SQL_CALC_FOUND_ROWS ";
+		}
 
 		if ($this->query->getDistinct()) {
 			$select .= "DISTINCT ";
@@ -651,17 +656,16 @@ class QueryBuilder {
 		return $str;
 	}
 
-	private function splitTableAndColumn($column) {
-		$parts = explode('.', $column);
-
-		$c = count($parts);
-		if ($c > 1) {
-			$column = array_pop($parts);
-			$alias = array_pop($parts);
+	private function splitTableAndColumn($tableAndCol) {
+		$dot = strpos($tableAndCol, '.');
+		
+		if ($dot !== false) {
+			$column = substr($tableAndCol, $dot + 1);
+			$alias = substr($tableAndCol, 0, $dot);
 			return [trim($alias, ' `'), trim($column, ' `')];
 		} else {
-			$colName = trim($column, ' `');
-			
+			$colName = trim($tableAndCol, ' `');
+						
 			//if column not found then don'use an alias. It could be an alias defined in the select part or a function.
 			$alias = null;
 			
@@ -771,6 +775,7 @@ class QueryBuilder {
 	}
 
 	private function addBuildBindParameter($paramTag, $value, $tableAlias, $columnName) {
+
 		$columnObj = $this->findColumn($tableAlias, $columnName);
 
 		$this->buildBindParameters[] = [
@@ -786,8 +791,8 @@ class QueryBuilder {
 	 * @param string The next available parameter prefix.
 	 */
 	private function getParamTag() {
-		self::$paramCount++;
-		return self::$paramPrefix . self::$paramCount;
+		$this->paramCount++;
+		return $this->paramPrefix . $this->paramCount;
 	}
 
 	private function join($config, $prefix) {

@@ -1,6 +1,8 @@
 <?php
 namespace go\modules\community\bookmarks\model;
 use \go\core\acl\model\AclOwnerEntity;
+use go\core\orm\Query;
+
 /**
  * Category model
  *
@@ -44,11 +46,11 @@ class Category extends AclOwnerEntity {
 		return "BookmarksCategory";
 	}
 
-	protected function internalDelete() {
-		if(!Bookmark::find()->where(['categoryId' => $this->id])->delete()) {
+	protected static function internalDelete(Query $query) {
+		if(!Bookmark::delete(['categoryId' => query])) {
 			return false;
 		}
 
-		return parent::internalDelete();
+		return parent::internalDelete($query);
 	}
 }

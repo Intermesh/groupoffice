@@ -1,3 +1,74 @@
+14-11-2019 6.4.76
+- Activesync: fixed Can't get not existing property 'timezone' in 'GO\Tasks\Model\Task'
+- E-mail: E-mail printing blank pages fixed
+- Custom fields: Fixed adding unique indexes
+- Demo data: Fixed install
+- Core: Use thumbnailer for photo's an avatars
+
+12-11-2019 6.4.75
+- Billing: add total_outstanding
+- Core: Added check for mysqlnd driver for system requirements
+- Core: Lot's of performance optimizations
+- Fixed: Addressbook - Create and Modified date shows "undefined" next to the time #496
+
+11-11-2019 6.4.74
+- Core: System settings and My Account work on mobile
+- Address book: Edit form works on mobile
+- Core: Global search works on mobile
+- Core: Start Menu full screen on mobile
+- Core: Fixed responsive issue where grid would become smaller then configured
+- Tickets: Works on mobile
+- Core: Sort custom filters alphabetically
+- Core: Fix for user timezones different then client OS
+- Address book: Added street to filter options
+- Newsletters: Improved performance
+- Email: Save all attachements to items worked only one time
+- Core: Fixed AccesToken created from API-Key will expire after 1 week of inactivity #292
+- Time tracking: Works on mobile
+- Core: Smoother scrolling by preloading more.
+- Address book: Show who modified and created in detail
+- Notes: Show who modified and created in detail
+- ActiveSync: Fixed GroupOffice isn't respecting addressbook permissions - CRITICAL (#492
+- Core: Updated Spanish
+
+05-11-2019 6.4.73
+- Core: Fixed error where grid would not load
+- Core: Updated Spanish translation
+- LDAP: Group sync failed on some servers that returned "memberuid".
+- Sieve: Don't autocreate missing mailboxes
+
+31-10-2019 6.4.72
+- Core: Use SQL_CALC_FOUND_ROWS to calculate total
+- Core: Updated Spanish translation
+- Core: bundle Foo/get requests to improve performance.
+- Core: Use disk cache for CLI as Acpu is not enabled on CLI.
+- Core: Performance improvements in ACL queries
+- Address book: City missing from contact in templates
+- LDAP Authenticator: Also match users based on e-mail address
+- Address book: Put organizations on top in contact detail view
+- Hoilidays: removed "From" boxLabel 
+- Projects: Fixed undefined index contact_id error when creating project from mail
+- E-mail: Pass contact ID and don't search by email for e-mail templates
+
+28-10-2019 6.4.71
+- Core: Improved delete performance
+- ActiveSync: Don't sync organizations with ActiveSync as it caused problems on ios not shoin either the contact or the company
+- Core: custom fields were missing in forms
+
+26-10-2019 6.4.70
+- Address book: Implemented Duplicate and merge function
+- Ldapauth: Fixed missing ldapauth_server_user_sync table
+- Core: JSON util for detecting invalid UTF-8
+- Core: Don't add full text index to core_search on update because it's removed later anyway.
+- Address book: Add job title to search cache description
+
+22-10-2019 6.4.69
+- Core: Revert to older italian translation because it was corrupt
+
+22-10-2019 6.4.68
+- Core: Updated Norwegian and Czech translation
+- LDAP Auth: Bind to ldap before authentication
+
 15-10-2019 6.4.67
 - Addressbook and notes: Hide totals in nav bars
 - Core: Fixed import CSV for custom fields values that are exported as text (Select, Multiselect)
@@ -365,8 +436,13 @@
 11-06-2019 6.4.21
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
+- Calendasr: Show unconfirmed holidays
+
+01-11-2019 6.3.84
 - Projects: Fixed activity sort in time tracking
 - Billing: Fixed total not always updating in expense dialog
+- Projects: Send contact ID when creating project from e-mail
+- Tasks: Fixed link to project after cancel
 
 11-10-2019 6.3.83
 - Core: Working week didn't accept half hours

@@ -6,12 +6,10 @@ use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\orm\Entity as OrmEntity;
 use PDO;
-use go\core\util\ClassFinder;
 use go\core\orm\EntityType;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\acl\model\AclItemEntity;
 use go\core\orm\Relation as GoRelation;
-use go\modules\sony\abrelations\model\Relation;
 
 /**
  * Entity model
@@ -129,27 +127,35 @@ abstract class Entity  extends OrmEntity {
 	}
 	
 	/**
-	 * Implements soft delete
+	 * Delete's the entitiy. Implements change logging for sync.
 	 * 
+	 * @param Query $query  The query to select entities in the delete statement
 	 * @return boolean
 	 */
-	protected function internalDelete() {
+	protected static function internalDelete(Query $query) {
 		
 		if(self::$trackChanges) {
-			$this->changeReferencedEntities([$this->id]);
-			$this->checkChangeForRelations();
+			static::changeReferencedEntities($query);
+			static::logDeleteChanges($query);
 		}
 
-		if(!parent::internalDelete()) {
+		if(!parent::internalDelete($query)) {
 			return false;
-		}
-		
-		if(self::$trackChanges) {
-			$this->entityType()->checkChange($this);
-		}
-		
+		}		
 		return true;
 	}	
+
+	/**
+	 * Log's deleted entities for JMAP sync
+	 * 
+	 * @param Query $query The query to select entities in the delete statement
+	 * @return boolean
+	 */
+	protected static function logDeleteChanges(Query $query) {
+		$ids = clone $query;
+		$ids->select($query->getTableAlias() . '.id as entityId, null as aclId, "1" as destroyed');
+		return static::entityType()->changes($ids);
+	}
 
 	// public static function markChangesForDelete(array $ids, $aclId = null) {
 	// 	static::changeReferencedEntities($ids);
@@ -386,76 +392,5 @@ abstract class Entity  extends OrmEntity {
 	}
 
 
-
-	/**
-	 * Get all table columns referencing the id column of the entity's main table.
-	 * 
-	 * It uses the 'information_schema' to read all foreign key relations.
-	 * 
-	 * @return array [['cls'=>'Contact', 'column' => 'id', 'paths' => []]]
-	 */
-	private static function getEntityReferences() {
-		$cacheKey = "refs-" . static::class;
-		$entityClasses = go()->getCache()->get($cacheKey);
-		if($entityClasses === null) {
-
-			$tableName = array_values(static::getMapping()->getTables())[0]->getName();
-
-			$dbName = go()->getDatabase()->getName();
-			go()->getDbConnection()->exec("USE information_schema");
-			//somehow bindvalue didn't work here
-			$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where ".
-				"table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . 
-				" and referenced_table_name=".go()->getDbConnection()->getPDO()->quote($tableName)." and referenced_column_name = 'id'";
-
-			$stmt = go()->getDbConnection()->getPDO()->query($sql);
-			$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);					
-			go()->getDbConnection()->exec("USE `" . $dbName . "`");		
-
-			$entityClasses = [];
-			foreach($refs as $r) {
-				$entities = static::findEntitiesByTable($r['table']);
-				$eWithCol = array_map(function($i) use($r) {
-					$i['column'] = $r['column'];
-					return $i;
-				}, $entities);
-
-				$entityClasses = array_merge($entityClasses, $eWithCol);
-			}	
-			
-			go()->getCache()->set($cacheKey, $entityClasses);			
-		}		
-		
-		return $entityClasses;
-	}
-
-
-	/**
-	 * Find's entities that have the given table name mapped
-	 * 
-	 * @return Array[] [['cls'=>'', 'paths' => 'contactId']]
-	 */
-	private static function findEntitiesByTable($tableName) {
-		$cf = new ClassFinder();
-		$allEntitites = $cf->findByParent(self::class);
-
-		//don't find the entity itself
-		$allEntitites = array_filter($allEntitites, function($e) {
-			return $e != static::class;
-		});
-
-		$mapped = array_map(function($e) use ($tableName) {
-			$paths = $e::getMapping()->hasTable($tableName);
-			return [
-				'cls' => $e,
-				'paths' => $paths
-			];
-
-		}, $allEntitites);
-
-		return array_filter($mapped, function($m) {
-			return !empty($m['paths']);
-		});
-	}
 
 }

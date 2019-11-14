@@ -13,6 +13,11 @@ class Client {
 
   private function getCurl() {
     if(!isset($this->curl)) {
+
+      if(!extension_loaded('curl')) {
+        throw new \Exception("The cUrl extension for PHP isn't installed. This is required for Group-Office.");
+      }
+
       $this->curl = curl_init();
       $this->setOption(CURLOPT_FOLLOWLOCATION, true);
       $this->setOption(CURLOPT_ENCODING, "UTF-8");

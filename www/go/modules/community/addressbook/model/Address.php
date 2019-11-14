@@ -86,6 +86,11 @@ class Address extends Property {
 	}
 	
 	private function validateCountry() {
+
+		if(isset($this->countryCode) && empty($this->countryCode)) {
+			$this->countryCode = null;
+		}
+		
 		if($this->isModified('countryCode')) {			
 			if(isset($this->countryCode)) {
 				$countries = go()->t('countries');
@@ -109,9 +114,7 @@ class Address extends Property {
 		if(empty($this->street) && empty($this->city) && empty($this->state)){
 			return "";
 		}
-		require(\go\core\Environment::get()->getInstallFolder() . '/language/addressformats.php');
-
-		$format = isset($af[$this->countryCode]) ? $af[$this->countryCode] : $af['default'];
+		$format = go()->getLanguage()->getAddressFormat($this->countryCode);		
 
 		$format= str_replace('{address}', $this->street, $format);
 		$format= str_replace('{address_no}', $this->street2, $format);
@@ -120,7 +123,7 @@ class Address extends Property {
 		$format= str_replace('{state}', $this->state, $format);
 		$format= str_replace('{country}', $this->country, $format);
 		
-		return preg_replace("/(\r\n)+|(\n|\r)+/", "\n", $format);
+		return $format;
 	}
 	
 	public function getCombinedStreet() {

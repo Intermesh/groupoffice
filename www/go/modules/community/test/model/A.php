@@ -48,11 +48,15 @@ class A extends Entity {
 	 * @var AHasOne $hasOne The hasOne property model 
 	 */
 	public $hasOne;
+
+
+	public $map;
 					
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable('test_a', 'a')						
 						->addArray('hasMany', AHasMany::class, ['id' => 'aId'])
+						->addMap('map', AMap::class, ['id' => 'aId'])
 						->addHasOne('hasOne', AHasOne::class, ['id' => 'aId']);
 	}
 
