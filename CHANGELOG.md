@@ -1,3 +1,4 @@
+14-11-2019 6.4.76
 - Activesync: fixed Can't get not existing property 'timezone' in 'GO\Tasks\Model\Task'
 - E-mail: E-mail printing blank pages fixed
 - Custom fields: Fixed adding unique indexes
