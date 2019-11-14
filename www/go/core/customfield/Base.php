@@ -47,7 +47,13 @@ abstract class Base extends Model {
 	 * @return string|boolean
 	 */
 	protected function getFieldSQL() {
-		return "VARCHAR(".($this->field->getOption('maxLength') ?? 190).") DEFAULT " . go()->getDbConnection()->getPDO()->quote($this->field->getDefault() ?? "NULL");
+		$def = $this->field->getDefault();
+		if(!empty($def)) {
+			$def = go()->getDbConnection()->getPDO()->quote($def);
+		} else{
+			$def = "NULL";
+		}
+		return "VARCHAR(".($this->field->getOption('maxLength') ?? 190).") DEFAULT " . $def;
 	}
 
 	/**

@@ -1,3 +1,6 @@
+- Activesync: fixed Can't get not existing property 'timezone' in 'GO\Tasks\Model\Task'
+- E-mail: E-mail printing blank pages fixed
+
 12-11-2019 6.4.75
 - Billing: add total_outstanding
 - Core: Added check for mysqlnd driver for system requirements
