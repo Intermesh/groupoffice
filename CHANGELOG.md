@@ -2,6 +2,7 @@
 - E-mail: E-mail printing blank pages fixed
 - Custom fields: Fixed adding unique indexes
 - Demo data: Fixed install
+- Core: Use thumbnailer for photo's an avatars
 
 12-11-2019 6.4.75
 - Billing: add total_outstanding
