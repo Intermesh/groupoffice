@@ -5,9 +5,11 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 	text: t("Links"),
 	cls: "go-create-link-btn",
 	totalCount: 0,
+	cancelAdd: false,
 	addLink : function(entity, entityId) {	
 		
 		var me = this;
+		me.cancelAdd = false;
 		//We need to query the ID of the search cache so the "to" relation can be resolved.
 		go.Db.store("Search").query({
 			filter: {
@@ -15,6 +17,10 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 				entityId: entityId
 			}
 		}).then(function(response) {
+
+			if(me.cancelAdd) {
+				return;
+			}
 			var newLink = {
 				"toId": entityId,
 				"toEntity": entity,
@@ -26,6 +32,11 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			me.setCount(++me.totalCount);
 		});		
 		
+	},
+
+
+	cancelAddLink : function() {
+		this.cancelAdd = true;
 	},
 					
 	initComponent: function () {
@@ -221,9 +232,10 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 		this.linkGrid.store.removeAll();
 		this.linkGrid.store.baseParams.filter.entity = null;
 		this.linkGrid.store.baseParams.filter.entityId = null;	
-		this.setCount(0);
+		this.setCount(0);		
 		//this.menu.un("show", this.load);
 	},
+
 	
 	load: function() {
 		this.linkGrid.store.load();		
