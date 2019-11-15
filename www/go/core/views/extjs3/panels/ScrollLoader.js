@@ -57,7 +57,7 @@ go.panels.ScrollLoader = {
 		} else {
 			// this.el.on('scroll', this.loadMore, this);
 			this.slScroller = this.el.dom;
-			
+			var me = this;
 			this.slScroller.addEventListener('scroll', function() {
 				me.loadMore();
 			}, {passive: true});
