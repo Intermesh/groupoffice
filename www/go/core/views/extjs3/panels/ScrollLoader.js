@@ -28,7 +28,7 @@ go.panels.ScrollLoader = {
 			}, this, {single: true});
 
 			this.store.on("load", function(store, records, o){
-				this.allRecordsLoaded = records.length != this.pageSize;
+				this.allRecordsLoaded = records.length < this.pageSize;
 				//If this element or any parent is hidden then  this.el.dom.offsetParent == null
 				if(this.rendered && this.el.dom.offsetParent) {
 					var me = this;
@@ -42,15 +42,26 @@ go.panels.ScrollLoader = {
 	},
 	
 	onRenderScrollLoader : function() {
-		if(this.isGridPanel()) {
-			this.on("bodyscroll", this.loadMore, this);// {buffer: 10});
+		if(this.isGridPanel()) {	
 			
 			this.slScroller = this.getView().scroller.dom;
 			this.slBody = this.getView().mainBody.dom;
 
+			this.on('viewready', function(){
+				var me = this;
+				this.slScroller.addEventListener('scroll', function() {
+					me.loadMore();
+				}, {passive: true});
+			}, this);
+
 		} else {
-			this.el.on('scroll', this.loadMore, this);
+			// this.el.on('scroll', this.loadMore, this);
 			this.slScroller = this.el.dom;
+			
+			this.slScroller.addEventListener('scroll', function() {
+				me.loadMore();
+			}, {passive: true});
+
 			this.slBody = this.el.dom;
 		}
 	},

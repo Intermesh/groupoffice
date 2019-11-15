@@ -1,3 +1,5 @@
+- Core: Just log could not unserialize cache message
+
 14-11-2019 6.4.77
 - Address book: problem with listing contacts without salutation
 
