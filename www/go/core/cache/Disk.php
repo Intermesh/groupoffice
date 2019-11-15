@@ -5,6 +5,7 @@ namespace go\core\cache;
 use Exception;
 use go\core\App;
 use go\core\cache\CacheInterface;
+use go\core\ErrorHandler;
 use go\core\fs\File;
 
 /**
@@ -88,7 +89,7 @@ class Disk implements CacheInterface {
 		$this->cache[$key] = unserialize($serialized);
 
 		if ($this->cache[$key] === false) {
-			trigger_error("Could not unserialize cache from file " . $key.' data: '.var_export($serialized, true));
+			ErrorHandler::log("Could not unserialize cache from file " . $key.' data: '.var_export($serialized, true));			
 			$this->delete($key);
 			return null;
 		} else {

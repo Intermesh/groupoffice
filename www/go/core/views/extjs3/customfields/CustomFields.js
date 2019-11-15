@@ -219,8 +219,9 @@
 		 * 
 		 */
 		filterFieldSets : function(formPanel) {
+			var values = formPanel instanceof go.form.EntityPanel ? formPanel.getValues() : formPanel.getForm().getFieldValues();
 			formPanel.findByType("customformfieldset").forEach(function(fs){
-				fs.filter(formPanel.getForm().getFieldValues());
+				fs.filter(values);
 			}, this);
 		},
 

@@ -25,6 +25,19 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 		}
 	},
 
+	setLinkEntity: function(config) {
+		if(config.entity == "Contact") {
+			var me = this;			
+			go.Db.store("Contact").single(config.entityId).then(function(contact) {
+				if(contact.isOrganization) {
+					me.organizationsField.setValue([contact.id]);
+					me.createLinkButton.reset();
+					me.createLinkButton.cancelAddLink();
+				} 
+			});
+		}
+	},
+
 	initComponent: function () {
 
 		go.modules.community.addressbook.ContactDialog.superclass.initComponent.call(this);

@@ -87,26 +87,30 @@ trait SearchableTrait {
 		return true;
 	}
 	
-	public static function deleteSearchAndLinks(Query $query) {
-
-		
+	public static function deleteSearchAndLinks(Query $query) {		
 		if(!\go()->getDbConnection()
 						->delete('core_search', 
-										['entityTypeId' => static::entityType()->getId(), 'entityId' => $query]
+										(new Query)
+											->where(['entityTypeId' => static::entityType()->getId()])
+											->andWhere('entityId', 'IN', $query)
 										)->execute()) {
 			return false;
 		}
 		
 		if(!\go()->getDbConnection()
 						->delete('core_link', 
-										['fromEntityTypeId' => static::entityType()->getId(), 'fromId' => $query]
+										(new Query)
+											->where(['fromEntityTypeId' => static::entityType()->getId()])
+											->andWhere('fromId', 'IN', $query)
 										)->execute()) {
 			return false;
 		}
 		
 		if(!\go()->getDbConnection()
-						->delete('core_link', 
-										['toEntityTypeId' => static::entityType()->getId(), 'toId' => $query]
+						->delete('core_link', 										
+										(new Query)
+											->where(['toEntityTypeId' => static::entityType()->getId()])
+											->andWhere('toId', 'IN', $query)
 										)->execute()) {
 			return false;
 		}
