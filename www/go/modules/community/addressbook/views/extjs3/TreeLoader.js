@@ -17,7 +17,7 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(go.tree.EntityLoader, {
 		this.groupLoader = new go.tree.EntityLoader({
 			entityStore: "AddressBookGroup",
 			secondaryTextTpl: Ext.isDefined(config.secondaryTextTpl) ? config.secondaryTextTpl : '<button class="icon">more_vert</button>',
-			baseAttrs: {
+			baseAttrs: {			
 				nodeType: "groupoffice",
 				iconCls: 'ic-group',
 				children: [],
@@ -48,7 +48,6 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(go.tree.EntityLoader, {
 		
 		var attr = go.modules.community.addressbook.TreeLoader.superclass.convertEntityToNode.call(this, entity);
 		attr.loader = this.groupLoader;
-		
 		if(entity.groups.length === 0) {
 			attr.children = [];
 			attr.expanded = true;
