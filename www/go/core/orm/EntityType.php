@@ -214,7 +214,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	public static function findAll(Query $query = null) {
 		
 		if(!isset($query)) {
-			return array_values($this->getCache()['id']);		
+			return array_values(static::getCache()['id']);		
 		}
 		
 		$records = $query
