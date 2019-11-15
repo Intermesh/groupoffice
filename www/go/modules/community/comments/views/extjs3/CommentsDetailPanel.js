@@ -5,16 +5,26 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	height: dp(150),
 
 	growMaxHeight: dp(800),
-	title: t("Comments", "comments"),
+	title: t("Comments"),
 	//
 	/// Collapsilbe was turn off because of height recaculation issues in HtmlEditor
 	//
-	//collapsible: true,
+	collapsible: true,
+	animCollapse: false,
+
+	hideMode: "offsets", //required for htmleditor
 	collapseFirst:false,
 	layout:'border',	
 	titleCollapse: true,
 	stateId: "comments-detail",
 	initComponent: function () {
+
+
+		this.on("expand", function() {
+			this.updateView();
+
+			// this.composer.textField.syncSize();
+		}, this);
 
 
 		if(go.User.isAdmin && this.title) {
@@ -125,6 +135,9 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	},
 		
 	updateView : function(o) {
+		if(!this.commentsContainer.rendered) {
+			return;
+		}
 		o = o || {};
 		this.composer.textField.setValue('');
 		var prevStr;
