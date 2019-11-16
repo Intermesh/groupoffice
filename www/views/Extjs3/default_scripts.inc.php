@@ -53,7 +53,7 @@ $settings['config']['login_message'] = GO::config()->login_message;
 $settings['state_index'] = 'go';
 $settings['language'] = GO::language()->getLanguage();
 $settings['show_contact_cf_tabs'] = array();
-$settings['modules'] = GO::view()->exportModules();
+// $settings['modules'] = [];// GO::view()->exportModules();
 
 $settings['upload_quickselect'] = GO::config()->upload_quickselect;
 $settings['html_editor_font'] = GO::config()->html_editor_font;
@@ -195,6 +195,7 @@ if ($cacheFile->exists()) {
   }
 
 	$rootFolder = new Folder(GO::config()->root_path);
+	$strip = strlen($rootFolder->getPath()) + 1;
 	foreach ($scripts as $script) {
 
 		if (GO::config()->debug) {
@@ -202,7 +203,7 @@ if ($cacheFile->exists()) {
 //        $js .=  $script ."\n;\n";
 				echo '<script type="text/javascript" nonce="'.Response::get()->getCspNonce().'">' . $script . '</script>' . "\n";
 			} else if ($script instanceof File) {
-        $relPath = $script->getRelativePath($rootFolder);
+        $relPath = substr($script->getPath(), $strip);
         $parts = explode('/', $relPath);
 //        $js .= "\n//source: ".$relPath ."\n";
 				
@@ -237,7 +238,7 @@ if ($cacheFile->exists()) {
 		} else {      
       
 			if($script instanceof File) {
-				$relPath = $script->getRelativePath($rootFolder);
+				$relPath = substr($script->getPath(), $strip);
 				$parts = explode('/', $relPath);
 				$js = "";
 				if($parts[0] == 'go' && $parts[1] == 'modules') {

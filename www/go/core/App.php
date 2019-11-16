@@ -302,7 +302,8 @@ use const GO_CONFIG_FILE;
 			if(!isset($config)) {
 				throw new ConfigurationException();
 			}
-			
+			$config['configPath'] = $configFile;
+
 			return $config;
 		}
 		
@@ -328,6 +329,15 @@ use const GO_CONFIG_FILE;
 
 			if (isset($this->config)) {
 				return $this->config;
+			}
+
+			if(cache\Apcu::isSupported()) {
+				$cacheKey = 'go_conf_' . $_SERVER['HTTP_HOST'] ;
+
+				$this->config = apcu_fetch($cacheKey);
+				if($this->config && $this->config['cacheTime'] > filemtime($this->config['configPath'])) {
+					return $this->config;
+				}
 			}
 			
 			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
@@ -384,6 +394,11 @@ use const GO_CONFIG_FILE;
 				{
 					$this->config['core']['general']['cache'] = cache\Disk::class;
 				}
+			}
+
+			if(isset($cacheKey)) {
+				$this->config['cacheTime'] = time();
+				apcu_store($cacheKey, $this->config);
 			}
 			
 			return $this->config;

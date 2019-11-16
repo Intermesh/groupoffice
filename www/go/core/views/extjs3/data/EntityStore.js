@@ -1,161 +1,166 @@
 
 // /* global Ext, go, localforage */
 
+go.browserStorage = {
+	dbName: "go",
+	connect : function(version) {
+		var me = this;
+		if(!me.conn || version) {
+			var p = new Promise(function(resolve, reject) {		
 
-// var idbKeyval = function(storeName, dbName) {
+					var	openreq = indexedDB.open(me.dbName, version);
+					openreq.onerror = function() { reject(openreq.error);};
+					openreq.onsuccess = function() {
+						
+						if(me.upgradeNeeded(openreq.result)) {
+							var newVersion = openreq.result.version + 1;
+							console.warn("IndexedDB Upgrade needed. Bumping version to " + (newVersion));
+							openreq.result.close();
+							me.conn = null;
 
-// 	this.storeName = storeName;
-// 	this.dbName = dbName || "go";
-
-// };
-
-// var dbp, dbInfo;
-
-// idbKeyval.prototype.checkStore = function() {
-
-// }
-
-// idbKeyval.prototype.connect = function(version) {
-// 	if(dbp) {			
-// 			return new Promise(function(resolve, reject) {
-// 				setTimeout(function() {
-// 					resolve( dbp);
-// 				})
-// 			});		
-// 	}
-// 	var me = this;
-// 	dbp = new Promise(function(resolve, reject) {		
-// 		console.warn("Connecting" , version);
-// 			var	openreq = indexedDB.open(me.dbName, version);
-// 			openreq.onerror = function() { reject(openreq.error);};
-// 			openreq.onsuccess = function() {
-// 					console.warn('connect success');			
-
-// 					dbInfo = {
-// 						version: openreq.result.version,
-// 						objectStoreNames: openreq.result.objectStoreNames
-// 					};
+					 		return me.connect(newVersion)
+						}
+												
+						openreq.result.onversionchange = function(e) {
+							console.warn("Version change");
+							openreq.result.close();
+							dbp = null;
+						}
+						resolve(openreq.result); 
+					}
+		
+				openreq.onblocked = function() {
+					console.warn("IndexedDB upgrade blocked");
+		
+					reject("blocked");
+				}
+		
+				openreq.onupgradeneeded = function(e) {
+		
 					
+					var upgradeDb = e.target.result;
+
+					var e = go.Entities.getAllInstalled();
+					for(var n in  e) {
+						var name = e[n].name;
+						
+						if(!upgradeDb.objectStoreNames.contains(name)) {							
+							upgradeDb.createObjectStore(name);					
+						}
+
+						if(!upgradeDb.objectStoreNames.contains(name + "-meta")) {							
+							upgradeDb.createObjectStore(name + "-meta");			
+						}
+					}
+				};
+			});
 			
-// 				openreq.result.onversionchange = function(e) {
-// 					console.warn("Version change");
-// 					openreq.result.close();
-// 					dbp = null;
-// 				}
-// 				resolve(openreq.result); 
-// 			}
-// 		// } else {
-// 		// 	if(!openreq.result.objectStoreNames.contains(me.storeName)) {
-// 		// 		openreq.result.close();
-// 		// 		return me.connect(openreq.result.version + 1)
-// 		// 	}		
-// 		// 	resolve(openreq.result); 	
-// 		// }
+		}
 
-// 		openreq.onblocked = function() {
-// 			console.warn("blocked" + me.storeName);
+		if(!version && p) {
+			me.conn = p;
+		}
 
-// 			reject("blocked");
-// 		}
+		return me.conn;
+	},
 
-// 		openreq.onupgradeneeded = function(e) {
+	upgradeNeeded : function(db) {
+		var e = go.Entities.getAllInstalled();
+		for(var n in  e) {
+			var name = e[n].name;
 
-// 			console.warn("Creating: " + me.storeName);
-// 			var upgradeDb = e.target.result;
-// 			upgradeDb.createObjectStore(me.storeName);					
-// 		};
-// 	});
+			if(!db.objectStoreNames.contains(name)) {
+				return true;
+			}
 
-// 	return dbp;
+			if(!db.objectStoreNames.contains(name + "-meta")) {
+				return true;
+			}
+		}
+
+		return false;
+	},
+
+	deleteDatabase : function () {
+		var me = this;
+		return new Promise(function(resolve, reject) {
+				var openreq = indexedDB.deleteDatabase(me.dbName);
+				openreq.onerror = function() { reject(openreq.error);};
+				openreq.onsuccess = function() { resolve(openreq.result); };
+		});
+	}
+};
+
+var idbKeyval = function(storeName) {
+	this.storeName = storeName;
+};
+
+idbKeyval.prototype._withIDBStore = function (type, callback) {
+	var me = this;
 	
-// }
+	return go.browserStorage.connect().then(function(db) {  
+			return me.createTransaction(db, type, callback);			 
+	});
+}
 
-// idbKeyval.prototype._withIDBStore = function (type, callback) {
-// 	var me = this;
-// 	console.warn("Using " + me.storeName);
-	
-// 	return this.connect().then(function(db) {  
+idbKeyval.prototype.createTransaction = function(db, type, callback) {
+	var me = this;
+	return new Promise( function(resolve, reject) {
+		var transaction = db.transaction(me.storeName, type);
+		transaction.oncomplete = function() {
+				resolve();
+		}
+		transaction.onabort = transaction.onerror = function() {
+				reject(transaction.error);
+		} 
 
-// 		console.warn("Connected " + me.storeName);
+		callback(transaction.objectStore(me.storeName));
 
-// 			if(!db.objectStoreNames.contains(me.storeName)) {
-// 				console.warn(me.storeName + " does not exist. Reconnecting to create it in version " + (dbInfo.version + 1));
-// 				db.close();
-// 				dbp = null;
-// 				return me.connect(++dbInfo.version).then(function(upgradedDb) {
-// 					console.warn(upgradedDb.objectStoreNames);
-// 					return me.createTransaction(upgradedDb, type, callback);
-// 				});
-// 			}
-			
-// 			return me.createTransaction(db, type, callback);			 
-// 	});
-// }
+	});
+}
 
-// idbKeyval.prototype.createTransaction = function(db, type, callback) {
-// 	var me = this;
-// 	return new Promise( function(resolve, reject) {
-// 		var transaction = db.transaction(me.storeName, type);
-// 		transaction.oncomplete = function() {
-// 				resolve();
-// 		}
-// 		transaction.onabort = transaction.onerror = function() {
-// 				reject(transaction.error);
-// 		} 
+idbKeyval.prototype.getItem = function(key) {
+	var req;
+	return this._withIDBStore('readonly', function(store) {
+		req = store.get(key);
+	}).then(function() { 
+			return req.result;
+	});
+}
 
-// 		callback(transaction.objectStore(me.storeName));
+idbKeyval.prototype.setItem = function(key, value) {
+	return this._withIDBStore('readwrite',function(store) { 
+			store.put(value, key);
+	});
+}
 
-// 	});
-// }
+idbKeyval.prototype.removeItem = function(key) {
+	return this._withIDBStore('readwrite', function(store) { 
+			return store.delete(key);
+	});
+}
 
-// idbKeyval.prototype.getItem = function(key) {
-// 	var req;
-// 	return this._withIDBStore('readonly', function(store) {
-// 		req = store.get(key);
-// 	}).then(function() { 
-// 			return req.result;
-// 	});
-// }
+idbKeyval.prototype.clear = function() {
+	return this._withIDBStore('readwrite', function(store) { 
+			return store.clear();
+	});
+}
 
-// idbKeyval.prototype.setItem = function(key, value) {
-// 	return this._withIDBStore('readwrite',function(store) { 
-// 			store.put(value, key);
-// 	});
-// }
 
-// idbKeyval.prototype.removeItem = function(key) {
-// 	return this._withIDBStore('readwrite', function(store) { 
-// 			return store.delete(key);
-// 	});
-// }
 
-// idbKeyval.prototype.clear = function() {
-// 	return this._withIDBStore('readwrite', function(store) { 
-// 			return store.clear();
-// 	});
-// }
-
-// idbKeyval.prototype.deleteDatabase = function () {
-// 	return new Promise(function(resolve, reject) {
-// 			var openreq = indexedDB.deleteDatabase(dbName);
-// 			openreq.onerror = function() { reject(openreq.error);};
-// 			openreq.onsuccess = function() { resolve(openreq.result); };
-// 	});
-// }
-
-// idbKeyval.prototype.keys = function() {
-// 	var keys = [];
-// 	return this._withIDBStore('readonly',function(store) {
-// 			// This would be store.getAllKeys(), but it isn't supported by Edge or Safari.
-// 			// And openKeyCursor isn't supported by Safari.
-// 			(store.openKeyCursor || store.openCursor).call(store).onsuccess = function () {
-// 					if (!this.result)
-// 							return;
-// 					keys.push(this.result.key);
-// 					this.result.continue();
-// 			};
-// 	}).then(function() { return keys;});
-// }
+idbKeyval.prototype.keys = function() {
+	var keys = [];
+	return this._withIDBStore('readonly',function(store) {
+			// This would be store.getAllKeys(), but it isn't supported by Edge or Safari.
+			// And openKeyCursor isn't supported by Safari.
+			(store.openKeyCursor || store.openCursor).call(store).onsuccess = function () {
+					if (!this.result)
+							return;
+					keys.push(this.result.key);
+					this.result.continue();
+			};
+	}).then(function() { return keys;});
+}
 
 
 
@@ -221,15 +226,18 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			return me.initialized;
 		}
 		
-		me.stateStore = localforage.createInstance({
-			name: "groupoffice",
-			storeName: me.entity.name + "-entities"
-		});
+		me.stateStore = new idbKeyval(me.entity.name);
+		// me.stateStore = localforage.createInstance({
+		// 	name: "groupoffice",
+		// 	storeName: me.entity.name + "-entities"
+		// });
 
-		me.metaStore = localforage.createInstance({
-			name: "groupoffice",
-			storeName: me.entity.name + "-meta"
-		});
+		me.metaStore = new idbKeyval(me.entity.name + "-meta");
+		
+		// localforage.createInstance({
+		// 	name: "groupoffice",
+		// 	storeName: me.entity.name + "-meta"
+		// });
 		
 		// me.initialized = this.clearState().then(function() {return Promise.all([			
 		me.initialized = Promise.all([			
@@ -520,7 +528,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 		return me.initState().then(function() {
 			if(me.isComplete) {
-				return me.getUpdates().then(function() {					
+				//return me.getUpdates().then(function() {					
 					return me.stateStore.keys().then(function(keys){
 						return Promise.all(keys.map(function(key){
 							return me.stateStore.getItem(key).then(function(entity) {
@@ -534,10 +542,12 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 						return me.data;
 					});				
 				
-				}).catch(function() {
-					me.isComplete = false;
-					return me.all(cb, scope);							
-				});
+				// }).catch(function() {
+				// 	me.isComplete = false;
+				// 	return me.all(cb, scope);							
+				// });
+
+		
 			} else
 			{
 				return go.Jmap.request({

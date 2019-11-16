@@ -131,32 +131,37 @@ class State extends AbstractState {
 	}
 
 
-	public function getSession() {	
+	public function getSession() {
+			
+		// $user = $this->getToken()->getUser();
+
+		$cacheKey = 'session-' . $this->getToken()->accessToken;
+
+		$response = go()->getCache()->get($cacheKey);
 		
-		$settings = \go\core\model\Settings::get();
-		
-		$user = $this->getToken()->getUser();
-		
-		$response = [
-			'version' => go()->getVersion(),
-			'username' => $user->username,
-			'accounts' => ['1'=> [
-				'name'=>'Virtual',
-				'isPrimary' => true,
-				'isReadOnly' => false,
-				'hasDataFor' => []
-			]],
-			"auth" => [
-						"domains" => User::getAuthenticationDomains()
-			],
-			'capabilities' => Capabilities::get(),
-			'apiUrl' => $this->getApiUrl(),
-			'downloadUrl' => $this->getDownloadUrl("{blobId}"),
-			'uploadUrl' => $this->getUploadUrl(),
-			'eventSourceUrl' => $this->getEventSourceUrl(),
-      'user' => $user->toArray(),
-			'oldSettings' => $this->clientSettings(), // added for compatibility
-		];
+		if(!$response) {
+			$response = [
+				'version' => go()->getVersion(),
+				// 'username' => $user->username,
+				'accounts' => ['1'=> [
+					'name'=>'Virtual',
+					'isPrimary' => true,
+					'isReadOnly' => false,
+					'hasDataFor' => []
+				]],
+				"auth" => [
+							"domains" => User::getAuthenticationDomains()
+				],
+				'capabilities' => Capabilities::get(),
+				'apiUrl' => $this->getApiUrl(),
+				'downloadUrl' => $this->getDownloadUrl("{blobId}"),
+				'uploadUrl' => $this->getUploadUrl(),
+				'eventSourceUrl' => $this->getEventSourceUrl(),
+				'userId' => $this->getUserId(),
+			];
+		}
+
+		go()->getCache()->set($cacheKey, $response);
 
 		return $response;
 	}

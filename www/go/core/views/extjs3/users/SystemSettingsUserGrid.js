@@ -268,9 +268,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 							var me = this;
 							
 							//Drop local data
-							localforage.dropInstance({
-								name: "groupoffice"
-							}, function() {
+							go.browserStorage.deleteDatabase().then(function() {
 								
 								go.Jmap.request({
 									method: "User/loginAs",

@@ -133,9 +133,7 @@ go.AuthenticationManager = (function () {
 				this.logout.defer(500, this, [true]);
 			} else
 			{
-				localforage.dropInstance({
-					name: "groupoffice"
-				}, function() {
+				go.browserStorage.deleteDatabase().then(function() {
 					Ext.Ajax.request({
 						url: go.AuthenticationManager.getAuthUrl(),
 						method: "DELETE",
@@ -145,8 +143,6 @@ go.AuthenticationManager = (function () {
 						}
 					});
 				});
-				
-				
 				
 			}
 		},

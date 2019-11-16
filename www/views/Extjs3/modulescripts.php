@@ -10,6 +10,9 @@ $load_modules = GO::modules()->getAllModules();
 $GO_SCRIPTS_JS = "";
 
 foreach ($load_modules as $module) {
+	if(!$module->enabled) {
+		continue;
+	}
 	if (file_exists($module->moduleManager->path() . 'scripts.inc.php')) {
 		require($module->moduleManager->path() . 'scripts.inc.php');
 	}

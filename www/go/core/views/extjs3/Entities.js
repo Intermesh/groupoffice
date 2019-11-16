@@ -107,9 +107,9 @@ go.Entities = (function () {
 			return e;
 		},
 		
-		// getAllInstalled : function() {
-		// 	return entities;
-		// },
+		getAllInstalled : function() {
+			return entities;
+		},
 		
 		
 		/**

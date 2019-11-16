@@ -49,7 +49,7 @@ function errorHander($e) {
 
 try {
   //initialize autoloading of library
-  require_once('GO.php');  
+  require('GO.php');  
 	
 	if(!empty($_POST['accessToken'])) {
 		$old = date_default_timezone_get();
