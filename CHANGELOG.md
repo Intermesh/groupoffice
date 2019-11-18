@@ -1,3 +1,5 @@
+- Firefox: Workaround for indexeddb state error when firefox is in private browsing mode
+
 18-11-2019 6.4.79
 - Core: Replaced localForage with go.browserStorage to fix problem with Group-Office not always loading in multiple tabs.
 - Newsletters: Fixed problem with new lists not saving and showing

@@ -117,7 +117,7 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 
 	loadLegacyModules : function() {
 
-		go.Db.store("Module").all().then(function(modules) {
+		return go.Db.store("Module").all().then(function(modules) {
 			GO.settings.modules = [];
 			
 			for(var id in modules) {
@@ -128,7 +128,7 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 				GO.settings.modules[m.name].read_permission = !!m.permissionLevel
 				GO.settings.modules[m.name].write_permission = m.permissionLevel >= go.permissionLevels.write;
 			}
-		})
+		});
 	},
   
 	isLoggedIn: function() {

@@ -413,8 +413,8 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	single: function(id) {
 
 		var me = this;
-
-		// return me._getSingleFromServer(id);
+				
+		// 	return me._getSingleFromServer(id);		
 
 		return this._getSingleFromBrowserStorage(id).then(function(entity) {
 			if(entity) {
