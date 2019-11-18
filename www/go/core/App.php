@@ -16,6 +16,7 @@ use go\core\db\Table;
 use go\core\exception\ConfigurationException;
 use go\core\fs\Folder;
     use go\core\http\Request;
+    use go\core\jmap\Request as GoRequest;
     use go\core\jmap\State;
 use go\core\mail\Mailer;
 use go\core\util\Lock;
@@ -331,11 +332,12 @@ use const GO_CONFIG_FILE;
 				return $this->config;
 			}
 
-			if(cache\Apcu::isSupported()) {
-				$cacheKey = 'go_conf_' . $_SERVER['HTTP_HOST'] ;
+			//If acpu is supported we can use it to cache the config object.
+			if(cache\Apcu::isSupported() && ($token = State::getClientAccessToken())) {
+				$cacheKey = 'go_conf_' . $token;
 
 				$this->config = apcu_fetch($cacheKey);
-				if($this->config && $this->config['cacheTime'] > filemtime($this->config['configPath'])) {
+				if($this->config && $this->config['cacheTime'] > filemtime($this->config['configPath']) && $this->config['cacheTime'] > filemtime('/etc/groupoffice/globalconfig.inc.php')) {
 					return $this->config;
 				}
 			}

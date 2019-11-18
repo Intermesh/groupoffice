@@ -1368,7 +1368,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 		if($config_file)
 			include($config_file);
 
-		return $config ?? [];
+		$config['configPath'] = $config_file;
+
+		return $config;
 	}
 		
 	

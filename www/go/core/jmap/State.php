@@ -12,7 +12,7 @@ use go\core\model\User;
 
 class State extends AbstractState {
 	
-	private function getFromHeader() {
+	private static function getFromHeader() {
 		
 		$auth = Request::get()->getHeader('Authorization');
 		if(!$auth) {
@@ -26,7 +26,7 @@ class State extends AbstractState {
 		return $matches[1];
 	}
 	
-	private function getFromCookie() {
+	private static function getFromCookie() {
 //		if(Request::get()->getMethod() != "GET") {
 //			return false;
 //		}
@@ -35,6 +35,18 @@ class State extends AbstractState {
 			return false;
 		}
 		return $_COOKIE['accessToken'];
+	}
+
+	/**
+	 * Gets' the access token from the Authorizaion header or Cookie
+	 */
+	public static function getClientAccessToken() {
+		$tokenStr = static::getFromHeader();
+		if(!$tokenStr) {
+			$tokenStr = static::getFromCookie();
+		}
+
+		return $tokenStr;
 	}
 	
 	/**	
