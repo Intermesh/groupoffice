@@ -80,7 +80,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	 */
 	boot : function() {
 		var me = this;
-		go.browserStorage.connect().then(function() {
+		go.browserStorage.connect().finally(function() {
 			Ext.QuickTips.init();
 			Ext.apply(Ext.QuickTips.getQuickTip(), {
 				dismissDelay: 0,
@@ -358,8 +358,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		Ext.getBody().mask(t("Loading..."));
 	
 		go.Modules.init().then(function() {
-			go.User.loadLegacyModules();
+			;
 			Promise.all([				
+				go.User.loadLegacyModules(),
 				go.customfields.CustomFields.init(),				
 				me.loadLegacyModuleScripts()
 			]).then(function(){

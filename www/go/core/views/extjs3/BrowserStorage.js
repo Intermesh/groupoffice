@@ -1,12 +1,17 @@
 go.browserStorage = {
 	dbName: "go",
+	enabled: true,
 	connect : function(version) {
 		var me = this;
 		if(!me.conn) {
 			 me.conn = new Promise(function(resolve, reject) {		
 
 					var	openreq = version ? indexedDB.open(me.dbName, version) : indexedDB.open(me.dbName); //IE11 required the if/else
-					openreq.onerror = function() { reject(openreq.error);};
+					openreq.onerror = function() { 
+						me.enabled = false;
+						console.warn("Disabling browser storage in indexedDB because browser doesn't support it.")
+						reject(openreq.error);
+					};
 					openreq.onsuccess = function() {
 						
 						if(me.upgradeNeeded(openreq.result)) {
@@ -121,6 +126,11 @@ go.browserStorage.Store.prototype.createTransaction = function(db, type, callbac
 }
 
 go.browserStorage.Store.prototype.getItem = function(key) {
+
+	if(!go.browserStorage.enabled) {
+		return Promise.resolve(null);
+	}
+
 	var req;
 	return this._withIDBStore('readonly', function(store) {
 		req = store.get(key);
@@ -130,24 +140,38 @@ go.browserStorage.Store.prototype.getItem = function(key) {
 }
 
 go.browserStorage.Store.prototype.setItem = function(key, value) {
+	if(!go.browserStorage.enabled) {
+		return Promise.resolve(null);
+	}
+
 	return this._withIDBStore('readwrite',function(store) { 
 			store.put(value, key);
 	});
 }
 
 go.browserStorage.Store.prototype.removeItem = function(key) {
+	if(!go.browserStorage.enabled) {
+		return Promise.resolve(null);
+	}
+
 	return this._withIDBStore('readwrite', function(store) { 
 			return store.delete(key);
 	});
 }
 
 go.browserStorage.Store.prototype.clear = function() {
+	if(!go.browserStorage.enabled) {
+		return Promise.resolve(null);
+	}
 	return this._withIDBStore('readwrite', function(store) { 
 			return store.clear();
 	});
 }
 
 go.browserStorage.Store.prototype.keys = function() {
+	if(!go.browserStorage.enabled) {
+		return Promise.resolve([]);
+	}
 	var keys = [];
 	return this._withIDBStore('readonly',function(store) {
 			// This would be store.getAllKeys(), but it isn't supported by Edge or Safari.
