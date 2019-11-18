@@ -5,7 +5,7 @@ go.browserStorage = {
 		if(!me.conn) {
 			 me.conn = new Promise(function(resolve, reject) {		
 
-					var	openreq = indexedDB.open(me.dbName, version);
+					var	openreq = version ? indexedDB.open(me.dbName, version) : indexedDB.open(me.dbName); //IE11 required the if/else
 					openreq.onerror = function() { reject(openreq.error);};
 					openreq.onsuccess = function() {
 						
