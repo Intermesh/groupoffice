@@ -140,7 +140,7 @@ GO.email.SearchDialog = function(config){
 				});
 				
 				
-				this.dialog = new Ext.Window({
+				this.dialog = new go.Window({
 					layout: 'fit',
 					title: t("Search"),
 					modal:false,

@@ -35,7 +35,7 @@ GO.email.AliasesDialog = function(config){
 	
 	GO.email.AliasesDialog.superclass.constructor.call(this, config);	
 }
-Ext.extend(GO.email.AliasesDialog, Ext.Window,{
+Ext.extend(GO.email.AliasesDialog, go.Window,{
 	show : function(account_id){		
 		
 		this.aliasesGrid.setAccountId(account_id);
