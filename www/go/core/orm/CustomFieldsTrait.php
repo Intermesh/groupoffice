@@ -62,6 +62,8 @@ trait CustomFieldsTrait {
 			$stmt->execute();
 
 			$record = $stmt->fetch();
+
+			$stmt->closeCursor();
 			
 			$this->customFieldsIsNew = !$record;
 							
