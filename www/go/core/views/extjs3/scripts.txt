@@ -1,6 +1,7 @@
 flux/Dispatcher.js
 flux/Store.js
 Jmap.js
+BrowserStorage.js
 
 data/JmapProxy.js
 data/EntityStoreProxy.js

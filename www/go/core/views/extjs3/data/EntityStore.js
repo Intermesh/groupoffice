@@ -1,168 +1,5 @@
 
-// /* global Ext, go, localforage */
-
-go.browserStorage = {
-	dbName: "go",
-	connect : function(version) {
-		var me = this;
-		if(!me.conn || version) {
-			var p = new Promise(function(resolve, reject) {		
-
-					var	openreq = indexedDB.open(me.dbName, version);
-					openreq.onerror = function() { reject(openreq.error);};
-					openreq.onsuccess = function() {
-						
-						if(me.upgradeNeeded(openreq.result)) {
-							var newVersion = openreq.result.version + 1;
-							console.warn("IndexedDB Upgrade needed. Bumping version to " + (newVersion));
-							openreq.result.close();
-							me.conn = null;
-
-					 		return me.connect(newVersion)
-						}
-												
-						openreq.result.onversionchange = function(e) {
-							console.warn("Version change");
-							openreq.result.close();
-							dbp = null;
-						}
-						resolve(openreq.result); 
-					}
-		
-				openreq.onblocked = function() {
-					console.warn("IndexedDB upgrade blocked");
-		
-					reject("blocked");
-				}
-		
-				openreq.onupgradeneeded = function(e) {
-		
-					
-					var upgradeDb = e.target.result;
-
-					var e = go.Entities.getAllInstalled();
-					for(var n in  e) {
-						var name = e[n].name;
-						
-						if(!upgradeDb.objectStoreNames.contains(name)) {							
-							upgradeDb.createObjectStore(name);					
-						}
-
-						if(!upgradeDb.objectStoreNames.contains(name + "-meta")) {							
-							upgradeDb.createObjectStore(name + "-meta");			
-						}
-					}
-				};
-			});
-			
-		}
-
-		if(!version && p) {
-			me.conn = p;
-		}
-
-		return me.conn;
-	},
-
-	upgradeNeeded : function(db) {
-		var e = go.Entities.getAllInstalled();
-		for(var n in  e) {
-			var name = e[n].name;
-
-			if(!db.objectStoreNames.contains(name)) {
-				return true;
-			}
-
-			if(!db.objectStoreNames.contains(name + "-meta")) {
-				return true;
-			}
-		}
-
-		return false;
-	},
-
-	deleteDatabase : function () {
-		var me = this;
-		return new Promise(function(resolve, reject) {
-				var openreq = indexedDB.deleteDatabase(me.dbName);
-				openreq.onerror = function() { reject(openreq.error);};
-				openreq.onsuccess = function() { resolve(openreq.result); };
-		});
-	}
-};
-
-var idbKeyval = function(storeName) {
-	this.storeName = storeName;
-};
-
-idbKeyval.prototype._withIDBStore = function (type, callback) {
-	var me = this;
-	
-	return go.browserStorage.connect().then(function(db) {  
-			return me.createTransaction(db, type, callback);			 
-	});
-}
-
-idbKeyval.prototype.createTransaction = function(db, type, callback) {
-	var me = this;
-	return new Promise( function(resolve, reject) {
-		var transaction = db.transaction(me.storeName, type);
-		transaction.oncomplete = function() {
-				resolve();
-		}
-		transaction.onabort = transaction.onerror = function() {
-				reject(transaction.error);
-		} 
-
-		callback(transaction.objectStore(me.storeName));
-
-	});
-}
-
-idbKeyval.prototype.getItem = function(key) {
-	var req;
-	return this._withIDBStore('readonly', function(store) {
-		req = store.get(key);
-	}).then(function() { 
-			return req.result;
-	});
-}
-
-idbKeyval.prototype.setItem = function(key, value) {
-	return this._withIDBStore('readwrite',function(store) { 
-			store.put(value, key);
-	});
-}
-
-idbKeyval.prototype.removeItem = function(key) {
-	return this._withIDBStore('readwrite', function(store) { 
-			return store.delete(key);
-	});
-}
-
-idbKeyval.prototype.clear = function() {
-	return this._withIDBStore('readwrite', function(store) { 
-			return store.clear();
-	});
-}
-
-
-
-idbKeyval.prototype.keys = function() {
-	var keys = [];
-	return this._withIDBStore('readonly',function(store) {
-			// This would be store.getAllKeys(), but it isn't supported by Edge or Safari.
-			// And openKeyCursor isn't supported by Safari.
-			(store.openKeyCursor || store.openCursor).call(store).onsuccess = function () {
-					if (!this.result)
-							return;
-					keys.push(this.result.key);
-					this.result.continue();
-			};
-	}).then(function() { return keys;});
-}
-
-
+/* global Ext, go, localforage */
 
 /**
  * Entity store
@@ -226,13 +63,13 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			return me.initialized;
 		}
 		
-		me.stateStore = new idbKeyval(me.entity.name);
+		me.stateStore = new go.browserStorage.Store(me.entity.name);
 		// me.stateStore = localforage.createInstance({
 		// 	name: "groupoffice",
 		// 	storeName: me.entity.name + "-entities"
 		// });
 
-		me.metaStore = new idbKeyval(me.entity.name + "-meta");
+		me.metaStore = new go.browserStorage.Store(me.entity.name + "-meta");
 		
 		// localforage.createInstance({
 		// 	name: "groupoffice",
@@ -528,26 +365,15 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 		return me.initState().then(function() {
 			if(me.isComplete) {
-				//return me.getUpdates().then(function() {					
-					return me.stateStore.keys().then(function(keys){
-						return Promise.all(keys.map(function(key){
-							return me.stateStore.getItem(key).then(function(entity) {
-								me.data[entity.id] = entity;
-							});
-						}));
-					}).then(function() {
+				return me.query().then(function(response) {										
+					return me.get(response.ids).then(function(result) {
 						if(cb) {
-							cb.call(scope, true, me.data);
+							cb.call(scope, true, result.entities);
 						}
-						return me.data;
+	
+						return result.entities
 					});				
-				
-				// }).catch(function() {
-				// 	me.isComplete = false;
-				// 	return me.all(cb, scope);							
-				// });
-
-		
+				});
 			} else
 			{
 				return go.Jmap.request({
