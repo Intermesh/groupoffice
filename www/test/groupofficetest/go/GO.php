@@ -474,7 +474,7 @@ class GO{
 			if(Apcu::isSupported() && ($token = State::getClientAccessToken())) {
 				$cacheKey = 'go_old_conf_' . $token;
 				self::$_config = apcu_fetch($cacheKey);
-				if(self::$_config && self::$_config->cacheTime > filemtime(self::$_config->configPath) && (!file_exists('/etc/groupoffice/globalconfig.inc.php') || self::$_config->cacheTime > filemtime('/etc/groupoffice/globalconfig.inc.php'))) {
+				if(self::$_config && self::$_config->cacheTime > filemtime(self::$_config->configPath) && self::$_config->cacheTime > filemtime('/etc/groupoffice/globalconfig.inc.php')) {
 					return self::$_config;
 				}
 			}

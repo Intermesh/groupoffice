@@ -79,35 +79,39 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	 * @returns {undefined}
 	 */
 	boot : function() {
-
-		Ext.QuickTips.init();
-		Ext.apply(Ext.QuickTips.getQuickTip(), {
-			dismissDelay: 0,
-			maxWidth: 500
-		});
 		var me = this;
-		Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso};
-
-		if(go.User.accessToken){
-			Ext.Ajax.defaultHeaders.Authorization = 'Bearer ' + go.User.accessToken;
-			go.User.authenticate(function(data, options, success, response){
-				
-				if(success) {
-					me.on('render', function() {
-						me.fireEvent('boot', me);
-					}, me, {single:true});
-					me.onAuthentication(); // <- start Group-Office
-				} else {
-					go.User.clearAccessToken();
-					
-					me.fireEvent("boot", this);
-					go.Router.check();
-				}
+		go.browserStorage.connect().then(function() {
+			Ext.QuickTips.init();
+			Ext.apply(Ext.QuickTips.getQuickTip(), {
+				dismissDelay: 0,
+				maxWidth: 500
 			});
-		} else {
-			this.fireEvent("boot", this); // In the router there is an event attached.
-			go.Router.check();
-		}
+			
+			Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso};
+
+			if(go.User.accessToken){
+				Ext.Ajax.defaultHeaders.Authorization = 'Bearer ' + go.User.accessToken;
+				go.User.authenticate(function(data, options, success, response){
+					
+					if(success) {
+						me.on('render', function() {
+							me.fireEvent('boot', me);
+						}, me, {single:true});
+						me.onAuthentication(); // <- start Group-Office
+					} else {
+						go.User.clearAccessToken();
+						
+						me.fireEvent("boot", me);
+						go.Router.check();
+					}
+				});
+			} else {
+				me.fireEvent("boot", me); // In the router there is an event attached.
+				go.Router.check();
+			}
+				
+		});
+
 	},
 
 	saveState: function () {
@@ -346,7 +350,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	onAuthentication: function () {
 		
 		//load state
-		Ext.state.Manager.setProvider(new GO.state.HttpProvider());
+		// Ext.state.Manager.setProvider(new GO.state.HttpProvider());
 		
 		this.fireEvent('authenticated', this);
 		var me = this;
@@ -354,7 +358,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		Ext.getBody().mask(t("Loading..."));
 	
 		go.Modules.init().then(function() {
-			Promise.all([
+			go.User.loadLegacyModules();
+			Promise.all([				
 				go.customfields.CustomFields.init(),				
 				me.loadLegacyModuleScripts()
 			]).then(function(){

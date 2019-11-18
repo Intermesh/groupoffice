@@ -16,6 +16,7 @@ use go\core\db\Table;
 use go\core\exception\ConfigurationException;
 use go\core\fs\Folder;
     use go\core\http\Request;
+    use go\core\jmap\Request as GoRequest;
     use go\core\jmap\State;
 use go\core\mail\Mailer;
 use go\core\util\Lock;
@@ -302,7 +303,8 @@ use const GO_CONFIG_FILE;
 			if(!isset($config)) {
 				throw new ConfigurationException();
 			}
-			
+			$config['configPath'] = $configFile;
+
 			return $config;
 		}
 		
@@ -328,6 +330,16 @@ use const GO_CONFIG_FILE;
 
 			if (isset($this->config)) {
 				return $this->config;
+			}
+
+			//If acpu is supported we can use it to cache the config object.
+			if(cache\Apcu::isSupported() && ($token = State::getClientAccessToken())) {
+				$cacheKey = 'go_conf_' . $token;
+
+				$this->config = apcu_fetch($cacheKey);
+				if($this->config && $this->config['cacheTime'] > filemtime($this->config['configPath']) && (!file_exists('/etc/groupoffice/globalconfig.inc.php') || $this->config['cacheTime'] > filemtime('/etc/groupoffice/globalconfig.inc.php'))) {
+					return $this->config;
+				}
 			}
 			
 			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
@@ -384,6 +396,11 @@ use const GO_CONFIG_FILE;
 				{
 					$this->config['core']['general']['cache'] = cache\Disk::class;
 				}
+			}
+
+			if(isset($cacheKey)) {
+				$this->config['cacheTime'] = time();
+				apcu_store($cacheKey, $this->config);
 			}
 			
 			return $this->config;

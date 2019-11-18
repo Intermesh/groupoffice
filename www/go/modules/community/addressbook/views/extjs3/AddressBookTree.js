@@ -19,6 +19,8 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 				secondaryTextTpl: ''
 			});
 		}
+
+		// this.selModel = new Ext.tree.MultiSelectionModel();
 		
 		this.root = {
 			nodeType: 'groupoffice',

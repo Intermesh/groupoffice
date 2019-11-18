@@ -704,6 +704,7 @@ class Contact extends AclItemEntity {
 				$stmt->bindValue(':contactId', $this->id);	
 				$stmt->execute();
 				$this->organizationIds = $stmt->fetchAll();
+				$stmt->closeCursor();
 			}
 		}		
 		

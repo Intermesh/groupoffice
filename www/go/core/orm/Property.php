@@ -193,35 +193,68 @@ abstract class Property extends Model {
 			switch($relation->type) {
 
 				case Relation::TYPE_HAS_ONE:
-					$prop = $this->isNew() ? null : $this->queryRelation($cls, $where, $relation->name, $this->readOnly)->fetch();				
+					if($this->isNew() ) {
+						$prop = null;
+					} else
+					{
+						$stmt = $this->queryRelation($cls, $where, $relation->name, $this->readOnly);
+						$prop = $stmt->fetch();
+						$stmt->closeCursor();	
+						if(!$prop) {
+							$prop = null;
+						}					
+					}
+
 					if(!$prop && $relation->autoCreate) {
 						$prop = new $cls;
 						$this->applyRelationKeys($relation, $prop);
 					}
-					$this->{$relation->name} = $prop ? $prop : null;
+					$this->{$relation->name} = $prop;
 				break;
 
 				case Relation::TYPE_ARRAY:
-					$props = $this->isNew() ? [] : $this->queryRelation($cls, $where, $relation->name, $this->readOnly)->fetchAll();
-					$this->{$relation->name} = $props;
+
+					if($this->isNew() ) {
+						$prop = [];
+					} else
+					{
+						$stmt = $this->queryRelation($cls, $where, $relation->name, $this->readOnly);
+						$prop = $stmt->fetchAll();
+						$stmt->closeCursor();	
+					}
+
+					$this->{$relation->name} = $prop;
 				break;
 
 				case Relation::TYPE_MAP:
 					$values = $this->isNew() ? [] : $this->queryRelation($cls, $where, $relation->name, $this->readOnly)->fetchAll();
-					if(empty($values)) {
-						$this->{$relation->name} = null; //Set to null. Otherwise JSON will be serialized as [] instead of {}
-					} else{
-						$o = [];
-						foreach($values as $v) {
-							$key = $this->buildMapKey($v, $relation);
-							$o[$key] = $v;
-						}
-						$this->{$relation->name} = $o;
+
+					if($this->isNew() ) {
+						$prop = null;
+					} else
+					{
+						$stmt = $this->queryRelation($cls, $where, $relation->name, $this->readOnly);
+						$prop = $stmt->fetchAll();
+						$stmt->closeCursor();	
+						if(empty($prop)) {
+							$prop = null; //Set to null. Otherwise JSON will be serialized as [] instead of {}
+						}	else{
+							$o = [];
+							foreach($prop as $v) {
+								$key = $this->buildMapKey($v, $relation);
+								$o[$key] = $v;
+							}
+							$prop = $o;
+						}						
 					}
+
+					$this->{$relation->name} = $prop;					
 				break;
 
 				case Relation::TYPE_SCALAR:					
-					$scalar = $this->queryScalar($where, $relation)->fetchAll();
+					$stmt =$this->queryScalar($where, $relation);
+					$scalar = $stmt->fetchAll();
+					$stmt->closeCursor();
 					$this->{$relation->name} = $scalar;
 				break;
 			}

@@ -45,7 +45,7 @@ GO.email.AccountsDialog = function(config){
 	GO.email.AccountsDialog.superclass.constructor.call(this, config);	
 
 }
-Ext.extend(GO.email.AccountsDialog, Ext.Window,{
+Ext.extend(GO.email.AccountsDialog, go.Window,{
 	
 	
 

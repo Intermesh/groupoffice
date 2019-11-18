@@ -29,13 +29,8 @@ class Extjs3 {
 	 */
 	public function getCSSFile($theme = 'Paper') {
 
-		$cacheFile = go()->getDataFolder()->getFile('clientscripts/' . $theme . '/style.css');
-		
-		
-		if (go()->getDebugger()->enabled || !$cacheFile->exists()) {
-			if ($cacheFile->exists()) {
-				$cacheFile->delete();
-			}
+		$cacheFile = go()->getDataFolder()->getFile('clientscripts/' . $theme . '/style.css');		
+		if (!$cacheFile->exists()) {			
 			$modules = Module::getInstalled();
 			$css = "";
 			foreach ($modules as $module) {
@@ -99,7 +94,7 @@ class Extjs3 {
 		
 		$cacheFile = go()->getDataFolder()->getFile('clientscripts/lang_'.$iso.'.js');
 
-		if (go()->getDebugger()->enabled || !$cacheFile->exists()) {
+		if (!$cacheFile->exists()) {
 //		if (!$cacheFile->exists()) {
 
 			$str = "var GO = GO || {};\n";

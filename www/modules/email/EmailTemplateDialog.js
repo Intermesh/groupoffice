@@ -48,7 +48,7 @@ GO.email.EmailTemplateDialog = function(config){
 	});
 }
 
-Ext.extend(GO.email.EmailTemplateDialog, Ext.Window,{
+Ext.extend(GO.email.EmailTemplateDialog, go.Window,{
 //
 //	inline_attachments : [],
 	

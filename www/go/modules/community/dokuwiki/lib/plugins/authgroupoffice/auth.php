@@ -68,6 +68,8 @@ class auth_plugin_authgroupoffice extends DokuWiki_Auth_Plugin
         if (!empty($conf['GO_php'])) {
             require_once($conf['GO_php']);
             error_reporting(E_ALL && ~E_NOTICE && ~E_DEPRECATED);
+            set_exception_handler(null);
+            set_error_handler(null);
         } else {
             throw new Exception('NO VALID GO URL GIVEN IN THE DOKUWIKI CONFIGURATION');
         }
@@ -207,7 +209,7 @@ class auth_plugin_authgroupoffice extends DokuWiki_Auth_Plugin
             return false;
         }
 
-        if (!\go\core\App::getModule('community', 'dokuwiki')) {
+        if (!\go\core\App::get()->getModule('community', 'dokuwiki')) {
             return false;
         }
 
@@ -234,7 +236,7 @@ class auth_plugin_authgroupoffice extends DokuWiki_Auth_Plugin
      */
     function checkRights()
     {
-        $module = \go\core\App::getModule('community', 'dokuwiki');
+        $module = \go\core\App::get()->getModule('community', 'dokuwiki');
         if ($module && $module->hasPermissionLevel(\go\core\model\Acl::LEVEL_MANAGE)) {
             $this->cando['UserMod'] = true;
             $this->cando['Profile'] = true;

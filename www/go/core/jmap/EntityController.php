@@ -71,8 +71,7 @@ abstract class EntityController extends Controller {
 	protected function getQueryQuery($params) {
 		$cls = $this->entityClass();
 
-		$query = $cls::find($cls::getPrimaryKey(false), true)
-						->select($cls::getPrimaryKey(true)) //only select primary key
+		$query = $cls::find($cls::getPrimaryKey(false), true)						
 						->limit($params['limit'])
 						->offset($params['position']);
 
@@ -103,6 +102,7 @@ abstract class EntityController extends Controller {
 		}
 		
 		//go()->info($query);
+		$query->select($cls::getPrimaryKey(true)); //only select primary key
 		
 		return $query;
 	}
@@ -225,13 +225,19 @@ abstract class EntityController extends Controller {
 		
 		$p = $this->paramsQuery($params);
 		$idsQuery = $this->getQueryQuery($p);
+		$idsQuery->fetchMode(PDO::FETCH_NUM);
 		
 		$state = $this->getState();
 		
 		$ids = [];		
+			
 		foreach($idsQuery as $record) {
-			$ids[] = $record->id();
+			if(!isset($count)) {
+				$count = count($record);
+			}
+			$ids[] = $count ? $record[0] : implode('-', $record);
 		}
+	
 
 		$response = [
 				'accountId' => $p['accountId'],

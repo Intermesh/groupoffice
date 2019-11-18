@@ -178,7 +178,7 @@ class Response extends Singleton{
 	 */
 	public function setModifiedAt(DateTime $modifiedAt) {
 		$this->modifiedAt = $modifiedAt;
-		$this->setHeader('Modified-At', $this->modifiedAt->format('D, d M Y H:i:s') . ' GMT');
+		$this->setHeader('Last-Modified', $this->modifiedAt->format('D, d M Y H:i:s') . ' GMT');
 	}
 
 	private $etag;

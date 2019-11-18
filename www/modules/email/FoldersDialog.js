@@ -278,7 +278,7 @@ GO.email.FoldersDialog = function(config) {
 	});
 }
 
-Ext.extend(GO.email.FoldersDialog, Ext.Window, {
+Ext.extend(GO.email.FoldersDialog, go.Window, {
 
 	show : function(account_id) {
 

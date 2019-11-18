@@ -167,11 +167,17 @@ class Criteria {
 	protected function internalWhere($condition, $comparisonOperator, $value, $logicalOperator) {			
 		
 		if(is_array($condition)) {
-			$sub = new Criteria();
-			foreach($condition as $colName => $value) {
-				$sub->andWhere($colName, '=', $value);				
-			}			
-			$condition = $sub;			
+			$count = count($condition);
+			if($count > 1) {
+				$sub = new Criteria();
+				foreach($condition as $colName => $value) {
+					$sub->andWhere($colName, '=', $value);				
+				}			
+				$condition = $sub;
+			} else if ($count === 1) {
+				reset($condition);
+				return ["column", $logicalOperator, key($condition), '=', current($condition)];	
+			}
 		} 
 		
 		if(!isset($comparisonOperator) && (is_string($condition) || $condition instanceof Criteria)) {

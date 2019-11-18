@@ -637,3 +637,7 @@ $updates['201910101025'][] = "ALTER TABLE `core_search` DROP INDEX `name`;";
 $updates['201910101025'][] = "ALTER TABLE `core_search` ADD INDEX(`keywords`);";
 
 $updates['201911071025'][] = "ALTER TABLE `core_auth_token` CHANGE `expiresAt` `expiresAt` DATETIME NULL DEFAULT NULL;";
+
+
+$updates['201911181430'][] = "update`core_user` set `displayName` = `username` where displayName = '' or displayName is null";
+$updates['201911181430'][] = "ALTER TABLE `core_user` CHANGE `displayName` `displayName` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;";

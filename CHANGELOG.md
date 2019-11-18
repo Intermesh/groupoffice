@@ -1,3 +1,9 @@
+18-11-2019 6.4.79
+- Core: Replaced localForage with go.browserStorage to fix problem with Group-Office not always loading in multiple tabs.
+- Newsletters: Fixed problem with new lists not saving and showing
+- Core: Performance enhancements
+- Users: user display name can't be null
+
 15-11-2019 6.4.78
 - Core: Just log could not unserialize cache message
 - Core: Fixed dissapearing fieldset's after changing values
