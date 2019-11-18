@@ -53,6 +53,8 @@ class User extends EntityController {
 		$token = go()->getAuthState()->getToken();
 		$token->userId = $params['userId'];
 		$success = $token->setAuthenticated();
+
+		go()->getCache()->delete('token-' . $token->accessToken);
 		
 		$_SESSION['GO_SESSION'] = array_filter($_SESSION['GO_SESSION'], function($key) {
 			return in_array($key, ['user_id', 'accessToken', 'security_token']);
