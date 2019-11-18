@@ -81,6 +81,16 @@ function test_system(){
 	global $product_name;
 	
 	$tests=array();
+
+
+	
+
+	$test['name']='PHP acpu support';
+	$test['showSuccessFeedback'] = false;
+	$test['pass']=extension_loaded('apcu');
+	$test['feedback']="It's recommended to install the PHP acpu extension for Group-Office to improve performance.";
+	$test['fatal']=false;
+	$tests[]=$test;
 	
 	$test['name']='Operating System';
 	$test['showSuccessFeedback'] = false;
