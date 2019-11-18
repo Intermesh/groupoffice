@@ -952,36 +952,6 @@ abstract class Entity extends Property {
 		}
 	}
 
-	/**
-	 * Get all table columns referencing the id column of the entity's main table.
-	 * 
-	 * It uses the 'information_schema' to read all foreign key relations.
-	 * 
-	 * @return array [['cls'=>'Contact', 'column' => 'id', 'paths' => []]]
-	 */
-	protected static function getEntityReferences() {
-		$cacheKey = "refs-entity-" . static::class;
-		$entityClasses = go()->getCache()->get($cacheKey);
-		if($entityClasses === null) {
-
-			$refs = static::getTableReferences();
-
-			$entityClasses = [];
-			foreach($refs as $r) {
-				$entities = static::findEntitiesByTable($r['table']);
-				$eWithCol = array_map(function($i) use($r) {
-					$i['column'] = $r['column'];
-					return $i;
-				}, $entities);
-
-				$entityClasses = array_merge($entityClasses, $eWithCol);
-			}	
-			
-			go()->getCache()->set($cacheKey, $entityClasses);			
-		}		
-		
-		return $entityClasses;
-	}
 
 	/**
 	 * @return array [['column'=>'contactId', 'table'=>'foo']]
@@ -1018,32 +988,5 @@ abstract class Entity extends Property {
 	}
 
 
-	/**
-	 * Find's entities that have the given table name mapped
-	 * 
-	 * @return Array[] [['cls'=>'', 'paths' => 'contactId']]
-	 */
-	protected static function findEntitiesByTable($tableName) {
-		$cf = new ClassFinder();
-		$allEntitites = $cf->findByParent(self::class);
-
-		//don't find the entity itself
-		$allEntitites = array_filter($allEntitites, function($e) {
-			return $e != static::class;
-		});
-
-		$mapped = array_map(function($e) use ($tableName) {
-			$paths = $e::getMapping()->hasTable($tableName);
-			return [
-				'cls' => $e,
-				'paths' => $paths
-			];
-
-		}, $allEntitites);
-
-		return array_filter($mapped, function($m) {
-			return !empty($m['paths']);
-		});
-	}
-
+	
 }
