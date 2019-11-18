@@ -337,7 +337,7 @@ use const GO_CONFIG_FILE;
 				$cacheKey = 'go_conf_' . $token;
 
 				$this->config = apcu_fetch($cacheKey);
-				if($this->config && $this->config['cacheTime'] > filemtime($this->config['configPath']) && $this->config['cacheTime'] > filemtime('/etc/groupoffice/globalconfig.inc.php')) {
+				if($this->config && $this->config['cacheTime'] > filemtime($this->config['configPath']) && (!file_exists('/etc/groupoffice/globalconfig.inc.php') || $this->config['cacheTime'] > filemtime('/etc/groupoffice/globalconfig.inc.php'))) {
 					return $this->config;
 				}
 			}
