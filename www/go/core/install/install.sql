@@ -203,7 +203,7 @@ CREATE TABLE `core_setting` (
 CREATE TABLE `core_user` (
   `id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
-  `displayName` varchar(190) DEFAULT '',
+  `displayName` varchar(190) NOT NULL,
   `avatarId` binary(40) DEFAULT NULL,
   `enabled` tinyint(1) NOT NULL DEFAULT 1,
   `email` varchar(100) NOT NULL,

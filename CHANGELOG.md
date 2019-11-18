@@ -1,4 +1,6 @@
-- Replaced localForage with go.browserStorage to fix problem with Group-Office not always loading in multiple tabs.
+- Core: Replaced localForage with go.browserStorage to fix problem with Group-Office not always loading in multiple tabs.
+- Newsletters: Fixed problem with new lists not saving and showing
+- Core: Performance enhancements
 
 15-11-2019 6.4.78
 - Core: Just log could not unserialize cache message
