@@ -1,4 +1,4 @@
-- Replaced localForage with go.browserStorage
+- Replaced localForage with go.browserStorage to fix problem with Group-Office not always loading in multiple tabs.
 
 15-11-2019 6.4.78
 - Core: Just log could not unserialize cache message
