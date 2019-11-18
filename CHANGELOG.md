@@ -1,3 +1,5 @@
+- Replaced localForage with go.browserStorage
+
 15-11-2019 6.4.78
 - Core: Just log could not unserialize cache message
 - Core: Fixed dissapearing fieldset's after changing values

@@ -51,7 +51,7 @@ go.browserStorage = {
 						}
           }
           
-          upgradeDb.createObjectStore("test_5");
+          // upgradeDb.createObjectStore("test_6");
 				};
       });			
     } 
@@ -62,9 +62,9 @@ go.browserStorage = {
 
 	upgradeNeeded : function(db) {
 
-    if(!db.objectStoreNames.contains("test_5")) {
-      return true;
-    }
+    // if(!db.objectStoreNames.contains("test_6")) {
+    //   return true;
+    // }
 
 		var e = go.Entities.getAllInstalled();
 		for(var n in  e) {
