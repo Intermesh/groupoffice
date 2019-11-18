@@ -230,9 +230,14 @@ abstract class EntityController extends Controller {
 		$state = $this->getState();
 		
 		$ids = [];		
+			
 		foreach($idsQuery as $record) {
-			$ids[] = count($record) == 1 ? $record[0] : implode('-', $record);
+			if(!isset($count)) {
+				$count = count($record);
+			}
+			$ids[] = $count ? $record[0] : implode('-', $record);
 		}
+	
 
 		$response = [
 				'accountId' => $p['accountId'],
