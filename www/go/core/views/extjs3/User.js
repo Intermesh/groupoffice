@@ -5,11 +5,17 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		if(!this.accessToken) {
 			return;
 		}
+		var me = this;
 		go.Jmap.get(function(data, options, success, response){
 			if(data) {
-				this.loadSession(data);
+				
+				me.loadSession(data).then(function() {
+					cb.call(scope, data, options, success, response);
+				});
+			} else {
+				cb.call(scope, data, options, success, response);
 			}
-			cb.call(scope, data, options, success, response);
+			
 		}, this);		
 	},
 	
@@ -39,16 +45,18 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 
 		var me = this;
 		// Ext.apply(this, session.user);
-		go.Db.store("User").single(session.userId).then(function(user) {
+		return go.Db.store("User").single(session.userId).then(function(user) {
 			Ext.apply(me, user);
 			me.firstWeekDay = parseInt(user.firstWeekday);
 			me.legacySettings(user);
+
+			me.fireEvent("load", this);
 		});
 		
 		
     //Ext.apply(GO.settings, session.oldSettings);
 		
-		this.fireEvent("load", this);
+		
 	},
 	
 	legacySettings : function (user) {

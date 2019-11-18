@@ -160,9 +160,9 @@ go.AuthenticationManager = (function () {
 				url: this.getAuthUrl(),
 				jsonData: loginData,
 				callback: function (options, success, response) {
-					var result = response.responseText ? Ext.decode(response.responseText) : {};
+					var result = response.responseText ? Ext.decode(response.responseText) : {}, me = this;
 
-					cb.call(scope || this, this, success, result);					
+									
 					
 					if(!success) {
 						switch(response.status) {
@@ -178,7 +178,9 @@ go.AuthenticationManager = (function () {
 					}
 
 					if (result.accessToken) {
-						this.onAuthenticated(result);
+						this.onAuthenticated(result).then(function() {
+							cb.call(scope || me, me, success, result);	
+						});
 					}
 
 				},
@@ -200,12 +202,13 @@ go.AuthenticationManager = (function () {
 				this.loginPanel = null;
 			}
 
-      go.User.loadSession(result);			
-			
-			this.fireEvent("authenticated", this, result);
-			
-			GO.mainLayout.onAuthentication();
+			var me = this;
 
+			return go.User.loadSession(result).then(function() {
+				me.fireEvent("authenticated", me, result);
+			
+				GO.mainLayout.onAuthentication();
+			});		
 		}
 	});
 
