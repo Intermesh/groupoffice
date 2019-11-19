@@ -1,4 +1,6 @@
+19-11-2019 6.4.80
 - Firefox: Workaround for indexeddb state error when firefox is in private browsing mode
+- Core: Disabled modules were loaded in the old framework settings causing problems.
 
 18-11-2019 6.4.79
 - Core: Replaced localForage with go.browserStorage to fix problem with Group-Office not always loading in multiple tabs.
