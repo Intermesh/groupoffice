@@ -15,6 +15,7 @@ DROP TABLE IF EXISTS `cal_holidays`;
 DROP TABLE IF EXISTS `cal_categories`;
 DROP TABLE IF EXISTS `cal_events_declined`;
 DROP TABLE IF EXISTS `cf_cal_calendars`;
-DROP TABLE IF EXISTS `go_links_cal_calendars`;
 DROP TABLE IF EXISTS `cal_calendar_user_colors`;
 DROP TABLE IF EXISTS `cal_views_groups`;
+DROP TABLE IF EXISTS `cal_events_custom_fields`;
+DROP TABLE IF EXISTS `cal_calendars_custom_fields`;

@@ -1,3 +1,5 @@
+- Core: Create debug log file if not exists
+
 19-11-2019 6.4.81
 - Core: Fixed switch user
 - Core: Performance optimzation by using jsonSerialize and output each jmap method indvidually
