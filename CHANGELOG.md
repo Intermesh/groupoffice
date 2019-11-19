@@ -1,5 +1,5 @@
 - Core: Performance optimzation by using jsonSerialize and output each jmap method indvidually
-
+- Core: Changed state saving to cookies so that you can have different states on different machines
 19-11-2019 6.4.80
 - Firefox: Workaround for indexeddb state error when firefox is in private browsing mode
 - Core: Disabled modules were loaded in the old framework settings causing problems.
