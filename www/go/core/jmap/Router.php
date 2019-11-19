@@ -65,12 +65,19 @@ class Router {
 			throw new Exception(400, 'Bad request');
 		}
 
+		Response::get()->sendHeaders();
+
+		echo '[';
+
 		while($method = array_shift($body)) {
 			$this->callMethod($method);
+
+			if(!empty($body)) {
+				echo ',';
+			}
 		}
 
-		Response::get()->sendHeaders();
-		Response::get()->output();
+		echo ']';
 	}
 
 	private function callMethod(array $body) {
