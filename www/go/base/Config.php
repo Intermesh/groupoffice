@@ -1420,7 +1420,8 @@ var $billing_clear_payment_method_on_duplicate = true;
 		if(empty($this->db_user)) {
 		//Detect some default values for installation if root_path is not set yet
 			$this->host = dirname($_SERVER['SCRIPT_NAME']);
-			if(basename($this->host)=='install')
+			$basename = basename($this->host);
+			if($basename=='install' || $basename == 'api')
 				$this->host = dirname($this->host);
 
 			if(substr($this->host,-1) != '/') {
