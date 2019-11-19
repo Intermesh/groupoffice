@@ -205,6 +205,10 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	private static function classNameToShortName($cls) {
 		return substr($cls, strrpos($cls, '\\') + 1);
 	}
+	public function __wakeup()
+	{
+		$this->highestModSeq = null;
+	}
 	
 	/**
 	 * Find all registered.
