@@ -1,4 +1,5 @@
 - Core: Create debug log file if not exists
+- Core: Added several uninstall commands and fixed entity type register
 
 19-11-2019 6.4.81
 - Core: Fixed switch user
