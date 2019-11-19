@@ -400,33 +400,14 @@ abstract class EntityController extends Controller {
 
 		go()->getDebugger()->debugTiming('after query');
 			
-		$foundIds = [];
-		$result['list'] = [];
-		$unsorted = [];
-		foreach($query as $e) {
-			$arr = $e->toArray();
-			$arr['id'] = $e->id();
-			$unsorted[$arr['id']] = $arr; 
-			$foundIds[] = $arr['id'];
-
-			go()->getDebugger()->debugTiming('item to array');
-		}
-
 		
-		$result['notFound'] = [];
-		if(isset($p['ids'])) {
-			
-			foreach($p['ids'] as $id) {
-				if(isset($unsorted[$id])) {
-					$result['list'][] = $unsorted[$id];
-				}else{
-					$result['notFound'][] = $id;
-				}
-			}
-		} else {
-			$result['list'] = array_values($unsorted);
-		}
-
+		$result['list'] = $query->all();
+		$foundIds = array_map(function($e) {
+			return $e->id();
+		}, $result['list']);
+		
+		$result['notFound'] = isset($p['ids']) ? array_diff($p['ids'], $foundIds) : [];
+				
 
 		return $result;
 	}

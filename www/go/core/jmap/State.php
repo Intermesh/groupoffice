@@ -98,6 +98,28 @@ class State extends AbstractState {
 	public function setToken(Token $token) {
 		$this->token = $token;
 	}
+
+	/**
+	 * Change authenticated user to somebody else.
+	 * 
+	 * @param int $userId
+	 * @return bool
+	 */
+	public function changeUser($userId) {
+		$token = $this->getToken();
+		$token->userId = $userId;
+		$success = $token->setAuthenticated();
+
+		go()->getCache()->delete('token-' . $token->accessToken);
+		go()->getCache()->delete('session-' . $token->accessToken);
+		
+		//for old framework
+		$_SESSION['GO_SESSION'] = array_filter($_SESSION['GO_SESSION'], function($key) {
+			return in_array($key, ['user_id', 'accessToken', 'security_token']);
+		}, ARRAY_FILTER_USE_KEY); 
+
+		return $success;
+	}
 	
 	public function isAuthenticated() {
 		return $this->getToken() !== false;

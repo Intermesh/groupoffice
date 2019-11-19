@@ -96,23 +96,23 @@ class Statement extends \PDOStatement implements \JsonSerializable {
 			throw $e;
 		}
 	}
+// TODO UPDATE PARAMS IN build
+	// public function bindValue($parameter, $value, $data_type = PDO::PARAM_STR)
+	// {
+	// 	if(isset($this->build)) {
+	// 		$this->build['params'][$parameter] = $value;
+	// 	}
 
-	public function bindValue($parameter, $value, $data_type = PDO::PARAM_STR)
-	{
-		if(isset($this->build)) {
-			$this->build[$parameter] = $value;
-		}
+	// 	return parent::bindValue($parameter, $value, $data_type);
+	// }
 
-		return parent::bindValue($parameter, $value, $data_type);
-	}
+	// public function bindParam($parameter, &$variable, $data_type = PDO::PARAM_STR, $length = null, $driver_options = null)
+	// {
+	// 	if(isset($this->build)) {
+	// 		$this->build['params'][$parameter] = $variable;
+	// 	}
 
-	public function bindParam($parameter, &$variable, $data_type = PDO::PARAM_STR, $length = null, $driver_options = null)
-	{
-		if(isset($this->build)) {
-			$this->build[$parameter] = $variable;
-		}
-
-		return parent::bindParam($parameter, $variable, $data_type, $length, $driver_options);
-	}
+	// 	return parent::bindParam($parameter, $variable, $data_type, $length, $driver_options);
+	// }
 	
 }
