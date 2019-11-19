@@ -170,7 +170,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 
 	protected function propToArray($name) {
 		$value = $this->getValue($name);
-		return $this->convertValue($value);
+		return $this->convertValueToArray($value);
 	}
 
 	/**
@@ -182,12 +182,12 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 	 * @return DateTime
 	 * @throws NotArrayable
 	 */
-	protected function convertValue($value) {
+	public static function convertValueToArray($value) {
 		if ($value instanceof ArrayableInterface) {
 			return $value->toArray();
 		} elseif (is_array($value)) {
 			foreach ($value as $key => $v) {
-				$value[$key] = $this->convertValue($v);
+				$value[$key] = static::convertValueToArray($v);
 			}
 			return $value;
 		} else if($value instanceof ArrayObject) {
@@ -197,7 +197,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 			}
 			$arr = $value->getArray();
 			foreach ($arr as $key => $v) {
-				$arr[$key] = $this->convertValue($v);
+				$arr[$key] = static::convertValueToArray($v);
 			}
 			return $arr;
 		} else { //if (is_null($value) || is_scalar($value) || $value instanceof \StdClass) {

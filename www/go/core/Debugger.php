@@ -2,6 +2,7 @@
 namespace go\core;
 
 use go\core\data\ArrayableInterface;
+use go\core\data\Model;
 
 /**
  * Debugger class. All entries are stored and the view can render them eventually.
@@ -204,8 +205,8 @@ class Debugger {
 
 	protected function writeLog($level, $mixed, $cls = null, $lineNo = null) {
 
-		if($mixed instanceof ArrayableInterface) {
-			$print = print_r($mixed->toArray(), true);
+		if(is_array($mixed) || $mixed instanceof ArrayableInterface) {
+			$print = print_r(Model::convertValueToArray($mixed), true);
 		}elseif (!is_scalar($mixed)) {
 			$print = print_r($mixed, true);
 		} else if(is_bool($mixed)) {
