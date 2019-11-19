@@ -453,6 +453,12 @@ abstract class Entity  extends OrmEntity {
 	}
 
 
+	public function jsonSerialize()
+	{
+		$arr = $this->toArray();
+		$arr['id'] = $this->id();
 
+		return $arr;
+	}
 
 }

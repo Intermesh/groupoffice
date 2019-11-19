@@ -61,7 +61,7 @@ GO.email.MessagesGrid = function(config){
 			hidden:true,
 			groupable:true,
 			align:'right',
-			width: dp(80),
+			width: dp(100),
 			renderer: function(value, metaData, record, rowIndex, colIndex, store){
 				return !store.groupField ? go.util.Format.dateTime(value) : go.util.Format.time(value);
 			},
@@ -74,7 +74,7 @@ GO.email.MessagesGrid = function(config){
 			dataIndex:'udate',
 			groupable:true,
 			align:'right',
-			width: dp(80),
+			width: dp(100),
 			renderer: function(value, metaData, record, rowIndex, colIndex, store){
 				return !store.groupField ? go.util.Format.dateTime(value) : go.util.Format.time(value);
 			},

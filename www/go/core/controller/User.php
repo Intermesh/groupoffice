@@ -50,17 +50,9 @@ class User extends EntityController {
 			throw new Exception("This user is disabled");
 		}
 		
-		$token = go()->getAuthState()->getToken();
-		$token->userId = $params['userId'];
-		$success = $token->setAuthenticated();
-
-		go()->getCache()->delete('token-' . $token->accessToken);
+		$success = go()->getAuthState()->changeUser($params['userId']);
 		
-		$_SESSION['GO_SESSION'] = array_filter($_SESSION['GO_SESSION'], function($key) {
-			return in_array($key, ['user_id', 'accessToken', 'security_token']);
-		}, ARRAY_FILTER_USE_KEY); 
-		
-		Response::get()->addResponse(['success' => true]);
+		Response::get()->addResponse(['success' => $success]);
 	}
 	
 	/**
