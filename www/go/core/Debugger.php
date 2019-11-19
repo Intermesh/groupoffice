@@ -70,6 +70,9 @@ class Debugger {
 			if($this->enabled && go()->getConfig()['core']['general']['debugLog']) {
 				$logFile = go()->getDataFolder()->getFile('log/debug.log');
 				if($logFile->isWritable()) {
+					if(!$logFile->exists()) {
+						$logFile->touch(true);
+					}
 					$this->logPath = $logFile->getPath();				
 					$this->logFp = $logFile->open('a+');
 				}
