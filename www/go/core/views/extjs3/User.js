@@ -122,6 +122,11 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 			
 			for(var id in modules) {
 				var m = modules[id];
+
+				if(!m.enabled) {
+					continue;
+				}
+				
 				GO.settings.modules[m.name] = m;
 				// m.url = 
 				GO.settings.modules[m.name].permission_level = m.permissionLevel;
