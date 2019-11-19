@@ -118,7 +118,7 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 	loadLegacyModules : function() {
 
 		return go.Db.store("Module").all().then(function(modules) {
-			GO.settings.modules = [];
+			GO.settings.modules = {};
 			
 			for(var id in modules) {
 				var m = modules[id];
