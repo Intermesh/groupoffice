@@ -893,7 +893,7 @@ abstract class EntityController extends Controller {
 		go()->getDbConnection()->commit();
 
 		return [
-			"updated" => [$primaryId],
+			"updated" => [$primaryId => $entity],
 			"destroyed" => $params['ids'],
 			'oldState' => $oldState,
 			'newState' => $this->getState()
