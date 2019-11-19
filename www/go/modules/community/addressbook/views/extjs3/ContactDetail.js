@@ -191,7 +191,6 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 				},{
 					title: t('Company'),
 					onLoad: function (dv) {
-						console.log(dv.data);
 						this.setVisible(dv.data.IBAN || dv.data.vatNo || dv.data.vatReverseCharge || dv.data.registrationNumber || dv.data.debtorNumber);
 					},
 					collapsible:true,
