@@ -373,13 +373,15 @@ class QueryBuilder {
 	public static function debugBuild($build) {
 		$sql = $build['sql'];
 		$binds = [];
-		foreach ($build['params'] as $p) {
-			if (is_string($p['value']) && !mb_check_encoding($p['value'], 'utf8')) {
-				$queryValue = "[NON UTF8 VALUE]";
-			} else {
-				$queryValue = var_export($p['value'], true);
+		if(isset($build['params'])) {
+			foreach ($build['params'] as $p) {
+				if (is_string($p['value']) && !mb_check_encoding($p['value'], 'utf8')) {
+					$queryValue = "[NON UTF8 VALUE]";
+				} else {
+					$queryValue = var_export($p['value'], true);
+				}
+				$binds[$p['paramTag']] = $queryValue;
 			}
-			$binds[$p['paramTag']] = $queryValue;
 		}
 
 		//sort so $binds :param1 does not replace :param11 first.
