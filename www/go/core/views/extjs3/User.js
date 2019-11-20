@@ -43,6 +43,8 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		this.loaded = true;
 		this.apiVersion = session.version;
 
+		GO.settings.state = session.state;
+
 		var me = this;
 		// Ext.apply(this, session.user);
 		return go.Db.store("User").single(session.userId).then(function(user) {

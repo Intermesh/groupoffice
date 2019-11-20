@@ -536,7 +536,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 				throw new \Exception("Could not execute statement. Error code: ". $stmt->errorCode());
 			}
 		} catch(\Exception $e) {				
-			go()->error("SQL FAILED: " . $this);
+			go()->error("SQL FAILED: " . $this->__toString());
 			
 			throw $e;
 		}

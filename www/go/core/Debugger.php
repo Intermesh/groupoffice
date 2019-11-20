@@ -1,6 +1,8 @@
 <?php
 namespace go\core;
 
+use go\core\data\ArrayableInterface;
+use go\core\data\Model;
 
 /**
  * Debugger class. All entries are stored and the view can render them eventually.
@@ -68,6 +70,9 @@ class Debugger {
 			if($this->enabled && go()->getConfig()['core']['general']['debugLog']) {
 				$logFile = go()->getDataFolder()->getFile('log/debug.log');
 				if($logFile->isWritable()) {
+					if(!$logFile->exists()) {
+						$logFile->touch(true);
+					}
 					$this->logPath = $logFile->getPath();				
 					$this->logFp = $logFile->open('a+');
 				}
@@ -203,7 +208,9 @@ class Debugger {
 
 	protected function writeLog($level, $mixed, $cls = null, $lineNo = null) {
 
-		if (!is_scalar($mixed)) {
+		if(is_array($mixed) || $mixed instanceof ArrayableInterface) {
+			$print = print_r(Model::convertValueToArray($mixed), true);
+		}elseif (!is_scalar($mixed)) {
 			$print = print_r($mixed, true);
 		} else if(is_bool($mixed)) {
 			$print = $mixed ? "TRUE" : "FALSE";

@@ -399,16 +399,20 @@ abstract class EntityController extends Controller {
 		$query = $this->getGetQuery($p);		
 
 		go()->getDebugger()->debugTiming('after query');
-			
 		
-		$result['list'] = $query->all();
-		$foundIds = array_map(function($e) {
-			return $e->id();
-		}, $result['list']);
-		
+		$foundIds = [];
+		$result['list'] = [];
+		foreach($query as $e) {
+			$arr = $e->toArray();
+			$arr['id'] = $e->id();
+			$result['list'][] = $arr; 
+			$foundIds[] = $arr['id'];
+
+			go()->getDebugger()->debugTiming('item to array');
+		}
+
 		$result['notFound'] = isset($p['ids']) ? array_diff($p['ids'], $foundIds) : [];
 				
-
 		return $result;
 	}
 	
@@ -893,7 +897,7 @@ abstract class EntityController extends Controller {
 		go()->getDbConnection()->commit();
 
 		return [
-			"updated" => [$primaryId],
+			"updated" => [$primaryId => $entity],
 			"destroyed" => $params['ids'],
 			'oldState' => $oldState,
 			'newState' => $this->getState()

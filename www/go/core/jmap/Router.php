@@ -54,9 +54,7 @@ class Router {
 	 * 
 	 * community/notes/Note/get maps to go\modules\community\notes\controller\Note::get()
 	 */
-	public function run() {
-
-		
+	public function run() {	
 
 		$body = Request::get()->getBody();
 		
@@ -65,19 +63,12 @@ class Router {
 			throw new Exception(400, 'Bad request');
 		}
 
-		Response::get()->sendHeaders();
-
-		echo '[';
-
 		while($method = array_shift($body)) {
 			$this->callMethod($method);
-
-			if(!empty($body)) {
-				echo ',';
-			}
 		}
 
-		echo ']';
+		Response::get()->sendHeaders();
+		Response::get()->output();
 	}
 
 	private function callMethod(array $body) {

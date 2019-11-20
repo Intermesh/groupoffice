@@ -824,6 +824,35 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 			}
 		});
 	},
+
+	merge: function(ids) {
+		var me = this;
+		return go.Jmap.request({
+			method: me.entity.name + '/merge',
+			params: {
+				ids: ids
+			},
+			
+		}).then(function(response) {
+			if(response.updated) {
+				for(var serverId in response.updated) {
+					//merge existing data, with updates from client and server						
+					entity = Ext.apply(me.data[serverId], response.updated[serverId]);
+					me._add(entity, true);
+				}
+			}
+			
+			me.setState(response.newState);	
+			
+			if(response.destroyed) {
+				for(var i =0, l = response.destroyed.length; i < l; i++) {						
+					me._destroy(response.destroyed[i]);
+				}
+			}
+
+			return response;
+		});
+	},
 	
 	/**
 	 * Query the API for a sorted / filtered list of entity id's

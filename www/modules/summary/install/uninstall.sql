@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS `su_announcements`, `su_latest_read_announcement_records`, `su_notes`, `su_rss_feeds`, `su_visible_calendars`, `su_visible_lists`;

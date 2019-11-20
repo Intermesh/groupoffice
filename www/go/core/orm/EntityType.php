@@ -142,6 +142,8 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			App::get()->getDbConnection()->insert('core_entity', $record)->execute();
 			$record['id'] = App::get()->getDbConnection()->getPDO()->lastInsertId();
 
+			go()->getCache()->delete('entity-types');
+
 			$e = new static;
 			$e->className = $className;
 			$e->id = $record['id'];
@@ -204,6 +206,10 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	 */
 	private static function classNameToShortName($cls) {
 		return substr($cls, strrpos($cls, '\\') + 1);
+	}
+	public function __wakeup()
+	{
+		$this->highestModSeq = null;
 	}
 	
 	/**

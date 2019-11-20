@@ -30,6 +30,9 @@ function errorHander($e) {
 		$msg = ErrorHandler::logException($e);
 
 		if(go()->getDebugger()->enabled) {
+
+			echo "Showing error message because debug is enabled. Normally we would have redirected to install:\n\n";
+
 			echo $msg;
 			exit();
 		}

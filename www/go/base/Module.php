@@ -395,9 +395,13 @@ class Module extends Observable {
 		
 		if(file_exists($sqlFile))
 		{
+			go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");		
+			
 			$queries = Util\SQL::getSqlQueries($sqlFile);
 			foreach($queries as $query)
 				\GO::getDbConnection ()->query($query);
+
+			go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
 		}
 		
 		// \GO::clearCache();

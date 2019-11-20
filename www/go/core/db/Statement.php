@@ -1,5 +1,7 @@
 <?php
 namespace go\core\db;
+
+use go\core\data\ArrayableInterface;
 use go\core\ErrorHandler;
 use PDO;
 
@@ -9,11 +11,16 @@ use PDO;
  * Represents a prepared statement and, after the statement is executed, an
  * associated result set.
  */
-class Statement extends \PDOStatement implements \JsonSerializable {
+class Statement extends \PDOStatement implements \JsonSerializable, ArrayableInterface{
 	
 	private $query;
 	
 	public function jsonSerialize() {
+		return $this->fetchAll();
+	}
+
+	public function toArray($properties = null)
+	{
 		return $this->fetchAll();
 	}
 	
