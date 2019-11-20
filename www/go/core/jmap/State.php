@@ -192,11 +192,13 @@ class State extends AbstractState {
 				'uploadUrl' => $this->getUploadUrl(),
 				'eventSourceUrl' => $this->getEventSourceUrl(),
 				'userId' => $this->getUserId(),
+				
 			];
+			go()->getCache()->set($cacheKey, $response);
 		}
 
-		go()->getCache()->set($cacheKey, $response);
-
+		//todo optimize
+		$response['state'] = OldState::model()->getFullClientState($this->getUserId());
 		return $response;
 	}
 	
