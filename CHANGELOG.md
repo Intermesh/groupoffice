@@ -1,5 +1,7 @@
+20-11-2019 6.4.82
 - Core: Create debug log file if not exists
 - Core: Added several uninstall commands and fixed entity type register
+- Core: Restored state from server
 
 19-11-2019 6.4.81
 - Core: Fixed switch user
