@@ -55,7 +55,7 @@ class Module extends EntityController {
 			throw new \Exception("Failed to install");
 		}
 		
-		return $this->get(['ids' => [$model->id]]);
+		return ['ids' => [$model->id]];
 	}
 	
 	public function uninstall($params) {
@@ -77,7 +77,7 @@ class Module extends EntityController {
 		$mod = new $cls;
 		$success = $mod->uninstall();
 		
-		Response::get()->addResponse(['success' => $success]);
+		return ['success' => $success];
 	}
 	
 	/**

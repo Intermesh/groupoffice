@@ -14,3 +14,4 @@ DROP TABLE IF EXISTS `fs_versions`;
 DROP TABLE IF EXISTS `fs_shared_root_folders`;
 DROP TABLE IF EXISTS `fs_files_custom_fields`;
 DROP TABLE IF EXISTS `fs_folders_custom_fields`;
+DROP TABLE IF EXISTS `fs_bookmarks`, `fs_filehandlers`, `fs_folder_pref`;
