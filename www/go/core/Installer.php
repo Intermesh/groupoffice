@@ -140,6 +140,7 @@ class Installer {
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
 		LoggingTrait::$enabled = true;
+		App::get()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
 	}
 	
 	

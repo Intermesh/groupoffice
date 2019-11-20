@@ -145,6 +145,23 @@ function test_system(){
 	$test['fatal']=false;
 
 	$tests[]=$test;
+
+
+	$test['name']='DOM extension';
+	$test['showSuccessFeedback'] = false;
+	$test['pass']=extension_loaded('dom');
+	$test['feedback']='Error: The PHP xml / dom extension is required';
+	$test['fatal']=true;
+
+	$tests[]=$test;
+
+	$test['name']='fileinfo extension';
+	$test['showSuccessFeedback'] = false;
+	$test['pass']=extension_loaded('fileinfo');
+	$test['feedback']='Error: The PHP fileinfo extension is required';
+	$test['fatal']=true;
+
+	$tests[]=$test;
 	
 	
 	$test['name']='intl';

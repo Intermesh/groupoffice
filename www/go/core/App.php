@@ -498,22 +498,20 @@ use const GO_CONFIG_FILE;
 			
 			if($onDestruct) {				
 				$this->rebuildCacheOnDestruct = $onDestruct;
-			}
+			}			
 			
-			$lock = new Lock("rebuildCache");
-			if($lock->lock()) {
-				\GO::clearCache(); //legacy
+			\GO::clearCache(); //legacy
 
-				go()->getCache()->flush(false);
-				Table::destroyInstances();
+			go()->getCache()->flush(false);
+			Table::destroyInstances();
 
-				$webclient = Extjs3::get();
-				$webclient->flushCache();
+			$webclient = Extjs3::get();
+			$webclient->flushCache();
 
-				Observable::cacheListeners();
+			Observable::cacheListeners();
 
-				Listeners::get()->init();
-			}
+			Listeners::get()->init();
+			
 		}
 		
 		public function __destruct() {

@@ -1,8 +1,8 @@
 6.4
 
-- Billing: Copy matching custom fields in order dialog
+update files when moving a contact
+remove folders when uninstalling module. Error when reinstalling
 
-Merge contacts
 Batch edit custom fields not possible
 Disabled categories for:  folder dialog Folder::deriveCustomfieldSettings
 custom fields billign items dropped ?!

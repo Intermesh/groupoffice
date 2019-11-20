@@ -14,3 +14,4 @@ DROP TABLE IF EXISTS `em_accounts_sort`;
 DROP TABLE IF EXISTS `em_contacts_last_mail_times`;
 
 DROP TABLE IF EXISTS `em_labels`;
+DROP TABLE IF EXISTS `email_default_email_account_templates`, `email_default_email_templates`, `emp_folders`, `em_portlet_folders`;

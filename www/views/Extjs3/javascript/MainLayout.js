@@ -350,7 +350,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	onAuthentication: function () {
 		
 		//load state
-		Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
+		Ext.state.Manager.setProvider(new GO.state.HttpProvider());
 		
 		this.fireEvent('authenticated', this);
 		var me = this;
