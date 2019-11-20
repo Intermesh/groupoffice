@@ -1,4 +1,4 @@
-go.form.HtmlEditor = Ext.extend(Ext.form.HtmlEditor, {
+go.form.HtmlEditor = Ext.extend(GO.form.HtmlEditor, {
 	 
 	iframePad:0,
 	

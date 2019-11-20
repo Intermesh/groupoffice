@@ -350,8 +350,10 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	},
 
 	getDocMarkup: function () {
+		var style = getComputedStyle(this.getEl().dom);
+		var font = "font-size: " + style['font-size'] + ';font-family: '+style['font-family'];
 		var h = Ext.fly(this.iframe).getHeight() - this.iframePad * 2;
-		return String.format('<html><head><meta name="SKYPE_TOOLBAR" content="SKYPE_TOOLBAR_PARSER_COMPATIBLE" /><style type="text/css">body,p,td,div,span{' + GO.settings.html_editor_font + '};body{border: 0; margin: 0; padding: {0}px; height: {1}px; cursor: text}body p{margin:0px;}</style></head><body></body></html>', this.iframePad, h);
+		return String.format('<html><head><meta name="SKYPE_TOOLBAR" content="SKYPE_TOOLBAR_PARSER_COMPATIBLE" /><style type="text/css">body,p,td,div,span{' + font + '};body{border: 0; margin: 0; padding: {0}px; height: {1}px; cursor: text}body p{margin:0px;}</style></head><body></body></html>', this.iframePad, h);
 	},
 	fixKeys: function () { // load time branching for fastest keydown performance
 		if (Ext.isIE) {

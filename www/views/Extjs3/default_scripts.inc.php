@@ -56,7 +56,7 @@ $settings['show_contact_cf_tabs'] = array();
 // $settings['modules'] = [];// GO::view()->exportModules();
 
 $settings['upload_quickselect'] = GO::config()->upload_quickselect;
-$settings['html_editor_font'] = GO::config()->html_editor_font;
+// $settings['html_editor_font'] = GO::config()->html_editor_font;
 
 
 $root_uri = GO::config()->debug ? GO::config()->host : GO::config()->root_path;
