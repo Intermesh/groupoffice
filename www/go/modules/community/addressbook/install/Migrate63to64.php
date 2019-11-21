@@ -89,7 +89,7 @@ class Migrate63to64 {
 			flush();
 		}
 		
-		$this->migrateCompanyLinks();		
+		//$this->migrateCompanyLinks();		
 		$this->addCustomFieldKeys();
 
 		$m = new \go\core\install\MigrateCustomFields63to64();
@@ -235,7 +235,12 @@ class Migrate63to64 {
 	public function migrateCompanyLinksAndComments() {		
 		echo "Migrating links\n";
 		flush();
-		$companyEntityType = \go\core\orm\EntityType::findByName("Company");
+		$companyEntityType =  (new Query)
+						->select('*')
+						->from('core_entity')
+						->where('name = "Company"')
+						->single();
+
 		if(!$companyEntityType) {
 			return;
 		}
@@ -263,7 +268,7 @@ class Migrate63to64 {
 												'fromEntityTypeId' => Contact::entityType()->getId(),
 												'fromId' => new \go\core\db\Expression('fromId + ' . $this->getCompanyIdIncrement())
 										], 
-										['fromEntityTypeId' => $companyEntityType->getId()])
+										['fromEntityTypeId' => $companyEntityType['id']])
 						->execute();
 		
 		go()->getDbConnection()
@@ -272,7 +277,7 @@ class Migrate63to64 {
 												'toEntityTypeId' => Contact::entityType()->getId(),
 												'toId' => new \go\core\db\Expression('toId + ' . $this->getCompanyIdIncrement())
 										], 
-										['toEntityTypeId' => $companyEntityType->getId()])
+										['toEntityTypeId' => $companyEntityType['id']])
 						->execute();
 
 
