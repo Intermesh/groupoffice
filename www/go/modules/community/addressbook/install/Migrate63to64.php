@@ -63,8 +63,16 @@ class Migrate63to64 {
 			if(!$addressBook) {
 				$addressBook = new AddressBook();
 				$addressBook->id = $abRecord['id'];
-				$addressBook->createdBy = $abRecord['user_id'];
-				$addressBook->aclId = $abRecord['acl_id'];
+
+				//make sure user ID exists
+				$id = go()->getDbConnection()->select('id')->from('core_user')->where('id', '=', $abRecord['user_id'])->single();
+
+				$addressBook->createdBy = $id ? $id : 1;
+
+				//make sure ACL exists
+				$aclId = go()->getDbConnection()->select('id')->from('core_acl')->where('id', '=', $abRecord['acl_id'])->single();
+				$addressBook->aclId = $aclId ? $aclId : null;
+				
 				$addressBook->name = $abRecord['name'];
 				$addressBook->filesFolderId = $abRecord['files_folder_id'];
 				
