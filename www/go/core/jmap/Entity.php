@@ -208,6 +208,10 @@ abstract class Entity  extends OrmEntity {
 		$ids = clone $query;
 		$ids = $ids->selectSingleValue($query->getTableAlias() . '.filesFolderId')->andWhere($query->getTableAlias() . '.filesFolderId', '!=', null)->all();
 
+		if(empty($ids)) {
+			return true;
+		}
+
 		$folders = Folder::model()->findByAttribute('id', $ids);
 		foreach($folders as $folder) {
 			if(!$folder->delete(true)) {
