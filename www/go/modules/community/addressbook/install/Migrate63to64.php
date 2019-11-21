@@ -65,12 +65,12 @@ class Migrate63to64 {
 				$addressBook->id = $abRecord['id'];
 
 				//make sure user ID exists
-				$id = go()->getDbConnection()->select('id')->from('core_user')->where('id', '=', $abRecord['user_id'])->single();
+				$id = go()->getDbConnection()->selectSingleValue('id')->from('core_user')->where('id', '=', $abRecord['user_id'])->single();
 
 				$addressBook->createdBy = $id ? $id : 1;
 
 				//make sure ACL exists
-				$aclId = go()->getDbConnection()->select('id')->from('core_acl')->where('id', '=', $abRecord['acl_id'])->single();
+				$aclId = go()->getDbConnection()->selectSingleValue('id')->from('core_acl')->where('id', '=', $abRecord['acl_id'])->single();
 				$addressBook->aclId = $aclId ? $aclId : null;
 				
 				$addressBook->name = $abRecord['name'];
