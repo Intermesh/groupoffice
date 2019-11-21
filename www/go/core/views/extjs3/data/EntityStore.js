@@ -795,7 +795,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 				if(response.created) {
 					for(clientId in response.created) {
 						//merge client data with server defaults.
-						entity = Ext.apply(params.create[clientId], response.created[clientId]);			
+						entity = Ext.apply(params.create[clientId], response.created[clientId] || {});			
 						this._add(entity, true);
 					}
 				}
@@ -804,7 +804,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 					for(var serverId in response.updated) {
 						//merge existing data, with updates from client and server						
 						entity = Ext.apply(this.data[serverId], params.update[serverId]);
-						entity = Ext.apply(entity, response.updated[serverId]);
+						entity = Ext.apply(entity, response.updated[serverId] || {});
 						this._add(entity, true);
 					}
 				}
