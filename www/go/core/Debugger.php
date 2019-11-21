@@ -104,6 +104,8 @@ class Debugger {
 		$time = (int) ($this->getTimeStamp() - $this->groupStartTime);
 		$this->currentGroup .= ', time: '.$time.'ms';
 
+		$this->currentGroup .= ", Peak memory usage: " . number_format(memory_get_peak_usage() / (1024 * 1024), 2) . 'MB';			
+
 		$this->entries[] = ['groupEnd', null];
 
 		$this->writeLog('end', $this->currentGroup);

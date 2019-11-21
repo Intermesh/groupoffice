@@ -77,7 +77,7 @@ class Migrate63to64 {
 				$addressBook->filesFolderId = $abRecord['files_folder_id'];
 				
 				if (!$addressBook->save()) {
-					throw new Exception("Could not save addressbook");
+					throw new Exception("Could not save addressbook: " .var_export($addressBook->getValidationErrors(), true));
 				}
 			}
 
