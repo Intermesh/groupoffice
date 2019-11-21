@@ -11,15 +11,13 @@ use go\core\db\Connection;
 use go\core\db\Database;
 use go\core\db\Query;
 use go\core\db\Table;
-    use go\core\event\EventEmitterTrait;
-    use go\core\event\Listeners;
+use go\core\event\EventEmitterTrait;
+use go\core\event\Listeners;
 use go\core\exception\ConfigurationException;
 use go\core\fs\Folder;
-    use go\core\http\Request;
-    use go\core\jmap\Request as GoRequest;
-    use go\core\jmap\State;
+use go\core\jmap\Request;
+use go\core\jmap\State;
 use go\core\mail\Mailer;
-use go\core\util\Lock;
 use go\core\webclient\Extjs3;
 use go\core\model\Settings;
 use const GO_CONFIG_FILE;
@@ -84,6 +82,8 @@ use const GO_CONFIG_FILE;
 
 			$this->errorHandler = new ErrorHandler();
 			$this->initCompatibility();
+
+			//more code to initialize at the bottom of this file as it depends on this class being constructed
 		}
 		
 		/**
@@ -758,4 +758,13 @@ namespace {
 		return App::get();
 	}
 
+	// for exec with ZIP and UTF8 chars	
+	if(!setlocale(LC_CTYPE, go()->getSettings()->getLocale())) {
+		if(!setlocale(LC_CTYPE, go()->getSettings()->resetLocale()))
+		{
+			throw new \Exception("Could not set locale");
+		}
+	}
+
 }
+

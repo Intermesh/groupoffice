@@ -206,6 +206,11 @@ class Settings extends core\Settings {
 		$this->locale = $locale;
 	}
 
+	public function resetLocale() {
+		$this->locale = null;
+		return $this->getLocale();
+	}
+
 	/**
 	 * Encryption to use for SMTP
 	 * @var string|bool
