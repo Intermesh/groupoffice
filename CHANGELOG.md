@@ -1,3 +1,4 @@
+- Core: Load state only on desktop
 - Core: Copy html editor style from text area element so it matches style from css and doesn't zoom on mobile
 - Address book / Core: Move files when properties affecting the path change and delete files when contact is deleted
 - Core: Fixed logging of deleted contacts and notes
