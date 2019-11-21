@@ -60,6 +60,7 @@
 				xtype: "selectcountry",
 				fieldLabel: t("Country"),
 				hiddenName: "countryCode",
+				name: "country",
 				anchor: "100%"
 			}]
 		}

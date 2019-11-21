@@ -4,6 +4,7 @@ namespace go\core\jmap;
 
 use Exception as CoreException;
 use GO;
+use GO\Base\Util\Number;
 use go\core\App;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
@@ -118,7 +119,8 @@ class Router {
 			Response::get()->addError($error);
 		} finally{
 			
-			if($method != "community/dev/Debugger/get") {			
+			if($method != "community/dev/Debugger/get") {		
+				
 				go()->getDebugger()->groupEnd();
 			}
 		}

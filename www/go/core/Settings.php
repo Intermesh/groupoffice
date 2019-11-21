@@ -20,7 +20,25 @@ use go\core\Module;
  */
 abstract class Settings extends Model {
 	
-	use SingletonTrait;
+	/**
+	 * 
+	 * @return static
+	 */
+	public static function get() {		
+		$cls = static::class;
+
+		$instance = go()->getCache()->get($cls);
+		if($instance) {
+			return $instance;
+		}
+	
+		$instance = new static;	
+
+		go()->getCache()->set($cls, $instance);
+
+		return $instance;
+	}
+	
 
 	protected function getModuleId() {
 		$moduleId = (new Query)
@@ -145,6 +163,8 @@ abstract class Settings extends Model {
 				$this->update($name, $value);
 			}
 		}
+
+		go()->getCache()->set(static::class, $this);
 		
 		return true;
 	}
