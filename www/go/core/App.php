@@ -762,7 +762,7 @@ namespace {
 	if(!setlocale(LC_CTYPE, go()->getSettings()->getLocale())) {
 		if(!setlocale(LC_CTYPE, go()->getSettings()->resetLocale()))
 		{
-			throw new \Exception("Could not set locale");
+			ErrorHandler::log("Could not automatically determine locale");
 		}
 	}
 
