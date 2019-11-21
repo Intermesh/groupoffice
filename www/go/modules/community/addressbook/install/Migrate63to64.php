@@ -89,7 +89,7 @@ class Migrate63to64 {
 			flush();
 		}
 		
-		//$this->migrateCompanyLinks();		
+		$this->migrateCompanyLinks();		
 		$this->addCustomFieldKeys();
 
 		$m = new \go\core\install\MigrateCustomFields63to64();
