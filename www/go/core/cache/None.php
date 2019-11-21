@@ -28,7 +28,7 @@ class None implements CacheInterface {
 	 * @param boolean $persist Cache must be available in next requests. Use false of it's just for this script run.
 	 */
 	public function set($key, $value, $persist = true) {
-		// $this->cache[$key] = $value;
+		$this->cache[$key] = $value;
 		return true;
 	}
 
@@ -39,9 +39,9 @@ class None implements CacheInterface {
 	 * @return mixed Stored value or NULL if not found 
 	 */
 	public function get($key) {
-		// if (isset($this->cache[$key])) {
-		// 	return $this->cache[$key];
-		// }
+		if (isset($this->cache[$key])) {
+			return $this->cache[$key];
+		}
 		return null;
 	}
 
@@ -51,7 +51,7 @@ class None implements CacheInterface {
 	 * @param string $key 
 	 */
 	public function delete($key) {
-		// unset($this->cache[$key]);
+		unset($this->cache[$key]);
 		return true;
 	}
 
@@ -61,7 +61,7 @@ class None implements CacheInterface {
 	 * @return boolean
 	 */
 	public function flush() {
-		// $this->cache = [];
+		$this->cache = [];
 		return true;
 	}
 
