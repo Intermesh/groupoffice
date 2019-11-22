@@ -4,6 +4,7 @@
 - Core: Fixed logging of deleted contacts and notes
 - Core: Fixed bugs in 6.3 to 6.4 upgrade
 - Notes: Supports activity log
+- Core: Fixed error when setting module permissions on group
 
 20-11-2019 6.4.82
 - Core: Create debug log file if not exists
