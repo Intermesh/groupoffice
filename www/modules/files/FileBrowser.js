@@ -2133,8 +2133,8 @@ GO.files.openFolder = function(id, folder_id)
 		});
 		GO.files.fileBrowserWin = new GO.Window({
 			title: t("File browser", "files"),
-			height:500,
-			width:900,
+			height:dp(800),
+			width:dp(1200),
 			layout:'fit',
 			border:false,
 			maximizable:!GO.util.isMobileOrTablet(),
