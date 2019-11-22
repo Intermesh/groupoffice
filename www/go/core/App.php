@@ -757,14 +757,6 @@ namespace {
 	function go() {
 		return App::get();
 	}
-
-	// for exec with ZIP and UTF8 chars	
-	if(!setlocale(LC_CTYPE, go()->getSettings()->getLocale())) {
-		if(!setlocale(LC_CTYPE, go()->getSettings()->resetLocale()))
-		{
-			ErrorHandler::log("Could not automatically determine locale");
-		}
-	}
-
+	
 }
 

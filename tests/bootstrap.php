@@ -48,6 +48,7 @@ if($installDb) {
 
 try {
 	App::get()->setConfig(["core" => $config]);
+	//App::get()->getCache()->flush(false);
 	
 	if($installDb) {
 
