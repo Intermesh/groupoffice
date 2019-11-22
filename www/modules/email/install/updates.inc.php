@@ -167,7 +167,7 @@ CHANGE COLUMN `password` `password` VARCHAR(512) NULL DEFAULT NULL ,
 CHANGE COLUMN `smtp_password` `smtp_password` VARCHAR(512) NOT NULL DEFAULT '';";
 
 $updates['201811181020'][] = function() {
-	$cf = new \go\core\util\ClassFinder();	
+	$cf = new \go\core\util\ClassFinder(false);	
 	$cf->addNamespace("go\\modules\\community\\email");			
 	foreach($cf->findByParent(go\core\orm\Entity::class) as $cls) {
 		$cls::entityType();

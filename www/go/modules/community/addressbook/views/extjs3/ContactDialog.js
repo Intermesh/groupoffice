@@ -82,11 +82,11 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 							name: "IBAN",
 							fieldLabel: t("IBAN")
 						},
-						{
+						this.registrationNumberField = new Ext.form.TextField({
 							xtype: "textfield",
 							name: "registrationNumber",
 							fieldLabel: t("Registration number")
-						},
+						}),
 						{
 							xtype: "textfield",
 							name: "debtorNumber",
@@ -107,7 +107,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 				}]
 
 		}));
-		var items = [{
+		var items = [this.infoFieldSet = new Ext.form.FieldSet({
 				xtype: 'fieldset',
 				items: [
 					{
@@ -188,7 +188,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					})
 
 				]
-			},
+			}),
 
 			this.communicationFieldSet = new Ext.form.FieldSet({
 				xtype: 'fieldset',
@@ -205,8 +205,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					}
 				},
 				items: [
-					new go.modules.community.addressbook.EmailAddressesField(),
-					new go.modules.community.addressbook.PhoneNumbersField()
+					this.emailAddressesField = new go.modules.community.addressbook.EmailAddressesField(),
+					this.phoneNumbersField = new go.modules.community.addressbook.PhoneNumbersField()
 				]
 			}),
 			{
@@ -215,7 +215,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					anchor: "-20"
 				},
 
-				items: [new go.modules.community.addressbook.AddressesField()]
+				items: [this.addressesField = new go.modules.community.addressbook.AddressesField()]
 			},
 			{
 				xtype: "fieldset",
@@ -232,8 +232,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					}
 				},
 				items: [
-					new go.modules.community.addressbook.DatesField(),
-					new go.modules.community.addressbook.UrlsField()
+					this.datesField = new go.modules.community.addressbook.DatesField(),
+					this.urlsField = new go.modules.community.addressbook.UrlsField()
 				]
 			}
 		];

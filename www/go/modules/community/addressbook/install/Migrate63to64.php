@@ -63,13 +63,21 @@ class Migrate63to64 {
 			if(!$addressBook) {
 				$addressBook = new AddressBook();
 				$addressBook->id = $abRecord['id'];
-				$addressBook->createdBy = $abRecord['user_id'];
-				$addressBook->aclId = $abRecord['acl_id'];
+
+				//make sure user ID exists
+				$id = go()->getDbConnection()->selectSingleValue('id')->from('core_user')->where('id', '=', $abRecord['user_id'])->single();
+
+				$addressBook->createdBy = $id ? $id : 1;
+
+				//make sure ACL exists
+				$aclId = go()->getDbConnection()->selectSingleValue('id')->from('core_acl')->where('id', '=', $abRecord['acl_id'])->single();
+				$addressBook->aclId = $aclId ? $aclId : null;
+				
 				$addressBook->name = $abRecord['name'];
 				$addressBook->filesFolderId = $abRecord['files_folder_id'];
 				
 				if (!$addressBook->save()) {
-					throw new Exception("Could not save addressbook");
+					throw new Exception("Could not save addressbook: " .var_export($addressBook->getValidationErrors(), true));
 				}
 			}
 
@@ -227,7 +235,12 @@ class Migrate63to64 {
 	public function migrateCompanyLinksAndComments() {		
 		echo "Migrating links\n";
 		flush();
-		$companyEntityType = \go\core\orm\EntityType::findByName("Company");
+		$companyEntityType =  (new Query)
+						->select('*')
+						->from('core_entity')
+						->where('name = "Company"')
+						->single();
+
 		if(!$companyEntityType) {
 			return;
 		}
@@ -255,7 +268,7 @@ class Migrate63to64 {
 												'fromEntityTypeId' => Contact::entityType()->getId(),
 												'fromId' => new \go\core\db\Expression('fromId + ' . $this->getCompanyIdIncrement())
 										], 
-										['fromEntityTypeId' => $companyEntityType->getId()])
+										['fromEntityTypeId' => $companyEntityType['id']])
 						->execute();
 		
 		go()->getDbConnection()
@@ -264,7 +277,7 @@ class Migrate63to64 {
 												'toEntityTypeId' => Contact::entityType()->getId(),
 												'toId' => new \go\core\db\Expression('toId + ' . $this->getCompanyIdIncrement())
 										], 
-										['toEntityTypeId' => $companyEntityType->getId()])
+										['toEntityTypeId' => $companyEntityType['id']])
 						->execute();
 
 

@@ -15,6 +15,10 @@ trait LoggingTrait {
 	 */
 	public function getLogMessage($action){
 
+		if(!method_exists($this, 'getSearchName')) {
+			throw new \Exception("The LoggingTrait depends on the SearchAble triat. Please implement that too.");
+		}
+
 		$msg = $this->getSearchName();
 		$desc = $this->getSearchDescription();
 		if($desc) {
@@ -118,6 +122,38 @@ trait LoggingTrait {
 		}
 		
 		return true;
+	}
+
+	protected static function logDelete(Query $query) {
+
+		if(!self::$enabled) {
+			return true;
+		}
+
+		$pdo = go()->getDbConnection()->getPDO();
+
+		if (PHP_SAPI == 'cli') {
+			$user_agent = '"cli"';
+		} else {
+			$user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $pdo->quote($_SERVER['HTTP_USER_AGENT']) : '"unknown"';
+		}
+
+		$ip = isset($_SERVER['REMOTE_ADDR']) ? $pdo->quote($_SERVER['REMOTE_ADDR']) : '""';
+		$controller_route = '"JMAP"';
+		$username = $pdo->quote(go()->getDbConnection()->selectSingleValue('username')->from('core_user')->where('id', '=', go()->getUserId())->single());
+		$user_id = go()->getUserId() ?? 1;
+		$ctime = time();
+		$entity = $pdo->quote(static::entityType()->getName());
+
+		return go()->getDbConnection()->insert(
+			'go_log', 
+			\go()->getDbConnection()
+						->select("`name` AS message, entityId as model_id, $user_agent, $ip, $controller_route, $username, $user_id, $ctime, 'delete', $entity")
+						->from('core_search')
+						->where(['entityTypeId' => static::entityType()->getId()])
+						->andWhere('entityId', 'IN', $query),
+			['message', 'model_id', "user_agent", "ip", "controller_route", "username", "user_id", "ctime", "action", "model"])
+			->execute();
 	}
 
 }

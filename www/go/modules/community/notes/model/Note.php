@@ -5,6 +5,7 @@ use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
 use go\core\orm\Query;
 use go\core\orm\CustomFieldsTrait;
+use go\core\orm\LoggingTrait;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
@@ -42,6 +43,8 @@ class Note extends AclItemEntity {
 	use CustomFieldsTrait;
 	
 	use SearchableTrait;
+	
+	use LoggingTrait;
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()

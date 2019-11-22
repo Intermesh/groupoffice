@@ -4,7 +4,6 @@ namespace go\core\orm;
 use Exception;
 use go\core\db\Criteria;
 use go\core\util\DateTime;
-use go\core\util\ArrayObject;
 
 /**
  * Filters

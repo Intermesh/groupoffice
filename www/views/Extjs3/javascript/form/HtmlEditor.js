@@ -41,6 +41,55 @@ GO.form.HtmlEditor = function (config) {
 
 Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
+	iframePad:0,
+	
+	hideToolbar: false,
+
+	initComponent: function() {
+		GO.form.HtmlEditor.superclass.initComponent.apply(this);
+		
+		this.on('initialize', function(){
+			if(this.hideToolbar) {
+				this.tb.hide();
+			}
+			if(Ext.isEmpty(this.emptyText)) {
+				return;
+			}
+			// Ext.EventManager.on(this.getEditorBody(),{
+			// 	focus:this.handleEmptyText,
+			// 	blur:this.applyEmptyText,
+			// 	scope:this
+			// });
+			
+		},this);
+	},
+
+	emptyTextRegex: '<span[^>]+[^>]*>{0}<\/span>',
+   emptyTextTpl: '<span style="color:#ccc;">{0}</span>',
+   emptyText: '',
+	
+	
+
+	// applyEmptyText: function() {
+	// 	var value = this.getValue();
+	// 	if(Ext.isEmpty(value)) {
+	// 		var emptyText = go.util.Format.string(this.emptyTextTpl,this.emptyText);
+	// 		go.form.HtmlEditor.superclass.setValue.apply(this, [emptyText]);
+	// 	}
+	// },
+	// handleEmptyText: function() {
+	// 	var value = this.getValue(),
+	// 		regex = new RegExp(go.util.Format.string( this.emptyTextRegex,this.emptyText ) );
+	// 	if(!Ext.isEmpty(value) && regex.test(value)) {
+	// 		go.form.HtmlEditor.superclass.setValue.apply(this, ['']);
+	// 	}
+	// },
+	// setValue : function(v){
+	// 	go.form.HtmlEditor.superclass.setValue.apply(this, arguments);
+	// 	//this.applyEmptyText();
+	// 	return this;
+  //  },
+
 	initEditor: function () {
 
 		GO.form.HtmlEditor.superclass.initEditor.call(this);
@@ -350,8 +399,10 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	},
 
 	getDocMarkup: function () {
+		var style = getComputedStyle(this.getEl().dom);
+		var font = "font-size: " + style['font-size'] + ';font-family: '+style['font-family'];
 		var h = Ext.fly(this.iframe).getHeight() - this.iframePad * 2;
-		return String.format('<html><head><meta name="SKYPE_TOOLBAR" content="SKYPE_TOOLBAR_PARSER_COMPATIBLE" /><style type="text/css">body,p,td,div,span{' + GO.settings.html_editor_font + '};body{border: 0; margin: 0; padding: {0}px; height: {1}px; cursor: text}body p{margin:0px;}</style></head><body></body></html>', this.iframePad, h);
+		return String.format('<html><head><meta name="SKYPE_TOOLBAR" content="SKYPE_TOOLBAR_PARSER_COMPATIBLE" /><style type="text/css">body,p,td,div,span{' + font + '};body{border: 0; margin: 0; padding: {0}px; height: {1}px; cursor: text}body p{margin:0px;}</style></head><body></body></html>', this.iframePad, h);
 	},
 	fixKeys: function () { // load time branching for fastest keydown performance
 		if (Ext.isIE) {
@@ -449,59 +500,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 //		if(e.keyCode==32 || e.keyCode==12)
 //			this.urlify();
 //	},
-	updateToolbar: function () {
 
-		/*
-		 * I override the default function here to increase performance.
-		 * ExtJS syncs value every 100ms while typing. This is slow with large
-		 * html documents. I manually call syncvalue when the message is sent
-		 * so it's certain the right content is submitted.
-		 */
-
-		//GO.mainLayout.timeout(0); // stop logout timer
-
-		if (this.readOnly) {
-			return;
-		}
-
-		if (!this.activated) {
-			this.onFirstFocus();
-			return;
-		}
-
-		var btns = this.tb.items.map,
-						doc = this.getDoc();
-
-		if (this.enableFont && !Ext.isSafari2) {
-			var name = (doc.queryCommandValue('FontName') || this.defaultFont).toLowerCase();
-			if (name != this.fontSelect.dom.value) {
-				this.fontSelect.dom.value = name;
-			}
-		}
-		if (this.enableFormat) {
-			btns.bold.toggle(doc.queryCommandState('bold'));
-			btns.italic.toggle(doc.queryCommandState('italic'));
-			btns.underline.toggle(doc.queryCommandState('underline'));
-		}
-		if (this.enableAlignments) {
-			btns.justifyleft.toggle(doc.queryCommandState('justifyleft'));
-			btns.justifycenter.toggle(doc.queryCommandState('justifycenter'));
-			btns.justifyright.toggle(doc.queryCommandState('justifyright'));
-		}
-		if (!Ext.isSafari2 && this.enableLists) {
-			btns.insertorderedlist.toggle(doc.queryCommandState('insertorderedlist'));
-			btns.insertunorderedlist.toggle(doc.queryCommandState('insertunorderedlist'));
-		}
-
-		Ext.menu.MenuMgr.hideAll();
-
-		//This property is set in javascript/focus.js. When the mouse goes into
-		//the editor iframe it thinks it has lost the focus.
-		GO.hasFocus = true;
-
-
-		//this.syncValue();
-	},
 
 	createLink: function () {
 
@@ -516,7 +515,32 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 				this.relayCmd("createlink", url);
 			}
 		}
-	}
+	},
+
+	setDesignMode : function(readOnly){
+		this.getEditorBody().contentEditable = readOnly;
+   },
+	
+	onResize : function(w, h){
+	  Ext.form.HtmlEditor.superclass.onResize.apply(this, arguments);
+	  if(this.el && this.iframe){
+			if(Ext.isNumber(w)){
+				 var aw = w - this.wrap.getFrameWidth('lr');
+				 this.el.setWidth(aw);
+				 this.tb.setWidth(aw);
+				 this.iframe.style.width = Math.max(aw, 0) + 'px';
+			}
+			if(Ext.isNumber(h)){
+				 var ah = h - this.wrap.getFrameWidth('tb') - this.tb.el.getHeight();
+				 this.el.setHeight(ah);
+				 this.iframe.style.height = Math.max(ah, 0) + 'px';
+				 var bd = this.getEditorBody();
+				 if(bd){
+					 // bd.style.height = Math.max((ah - (this.iframePad*2)), 0) + 'px';
+				 }
+			}
+		}
+   }
 
 });
 

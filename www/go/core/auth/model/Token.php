@@ -245,6 +245,8 @@ class Token extends Entity {
 		
 		// For backwards compatibility, set the server session for the old code
 		$this->oldLogin();
+
+		$this->classPermissionLevels = [];
 		
 		// Create accessToken and set expire time
 		return true;						

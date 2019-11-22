@@ -291,6 +291,16 @@ class Contact extends AclItemEntity {
 		$new_path .= '/'.$new_folder_name;
 		return $new_path;
 	}
+
+	/**
+	 * Returns properties that affect the files returned in "buildFilesPath()"
+	 * When these properties change the system will move the folder to the new location.
+	 * 
+	 * @return string[]
+	 */
+	protected function filesPathProperties() {
+		return ['addressBookId', 'name'];
+	}
 	
 	
 	/**
