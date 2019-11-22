@@ -455,7 +455,7 @@ use const GO_CONFIG_FILE;
 		public function getCache() {
 			if (!isset($this->cache)) {				
 				$cls = $this->getConfig()['core']['general']['cache'];
-				go()->log("Using cache: " . $cls);
+				// go()->log("Using cache: " . $cls);
 				$this->cache = new $cls;
 			}
 			return $this->cache;
