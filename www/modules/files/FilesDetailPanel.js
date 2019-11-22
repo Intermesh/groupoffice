@@ -33,7 +33,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 <span>{name}</span>\
 \<label>{user_name} at {mtime}</label>\
 \
-</a><hr class="indent"></tpl></div>', {
+</a></tpl></div>', {
 		});
 
 
