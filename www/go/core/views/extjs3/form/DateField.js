@@ -1,4 +1,4 @@
-GO.mainLayout.onReady(function() {
+GO.mainLayout.on("authenticated", function() {
 
 		//Override this when authenticated and mainlayout initializes
 		Ext.override(Ext.DatePicker, {
@@ -8,7 +8,7 @@ GO.mainLayout.onReady(function() {
 		Ext.override(Ext.form.DateField, {
 			format: go.User.dateFormat,
 			startDay: go.User.firstWeekday,
-			altFormats: "Y-m-d|c|" + GO.settings.date_format.replace("Y","y"),
+			altFormats: "Y-m-d|c|" + go.User.dateFormat.replace("Y","y"),
 			dtSeparator:' '
 		});
 });

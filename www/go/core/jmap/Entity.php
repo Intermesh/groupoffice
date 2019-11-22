@@ -11,6 +11,8 @@ use go\core\acl\model\AclOwnerEntity;
 use go\core\acl\model\AclItemEntity;
 use go\core\orm\Relation as GoRelation;
 use go\core\util\ClassFinder;
+use GO\Files\Controller\FolderController;
+use GO\Files\Model\Folder;
 
 /**
  * Entity model
@@ -68,8 +70,52 @@ abstract class Entity  extends OrmEntity {
 
 			$this->checkChangeForRelations();
 		} 
+
+		$this->checkFilesFolder();
 		
 		return true;
+	}
+
+	private function checkFilesFolder() {
+		if(!isset($this->filesFolderId)) {
+			return true;
+		}
+		$filesPathProperties = $this->filesPathProperties();
+		if(!empty($filesPathProperties)) {
+			if($this->isModified($filesPathProperties)) {
+				$folder = \GO\Files\Model\Folder::model()->findForEntity($this, false);
+				$this->filesFolderId = $folder->id;
+			}
+		}
+	}
+
+	/**
+	 * Check if this entity supports a files folder
+	 * 
+	 * @return bool
+	 */
+	private static function supportsFiles() {
+		return property_exists(static::class, 'filesFolderId');
+	}
+
+	/**
+	 * Return a relative path to store the files in. Must be unique!
+	 * 
+	 * @return string
+	 */
+	public function buildFilesPath() {
+		$entityType = self::entityType();
+		return $entityType->getModule()->name. '/' . $entityType->getName() . '/' . $this->id();
+	}
+
+	/**
+	 * Returns properties that affect the files returned in "buildFilesPath()"
+	 * When these properties change the system will move the folder to the new location.
+	 * 
+	 * @return string[]
+	 */
+	protected function filesPathProperties() {
+		return [];
 	}
 
 	private function checkChangeForRelations() {
@@ -140,11 +186,41 @@ abstract class Entity  extends OrmEntity {
 			static::logDeleteChanges($query);
 		}
 
+		if(static::supportsFiles()) {
+			if(!static::deleteFilesFolders($query)) {
+				return false;
+			}
+		}
+
 		if(!parent::internalDelete($query)) {
 			return false;
 		}		
 		return true;
 	}	
+
+	/**
+	 * Log's deleted entities for JMAP sync
+	 * 
+	 * @param Query $query The query to select entities in the delete statement
+	 * @return boolean
+	 */
+	protected static function deleteFilesFolders(Query $query) {
+		$ids = clone $query;
+		$ids = $ids->selectSingleValue($query->getTableAlias() . '.filesFolderId')->andWhere($query->getTableAlias() . '.filesFolderId', '!=', null)->all();
+
+		if(empty($ids)) {
+			return true;
+		}
+
+		$folders = Folder::model()->findByAttribute('id', $ids);
+		foreach($folders as $folder) {
+			if(!$folder->delete(true)) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 
 	/**
 	 * Log's deleted entities for JMAP sync

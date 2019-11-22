@@ -20,10 +20,8 @@ use ReflectionClass;
 use function GO;
 use go\core\db\Query as GoQuery;
 use go\core\db\Table;
-use go\core\util\ArrayObject;
 use go\core\ErrorHandler;
 use go\core\jmap\exception\InvalidArguments;
-use ReflectionProperty;
 
 /**
  * Property model

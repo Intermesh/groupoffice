@@ -11,15 +11,13 @@ use go\core\db\Connection;
 use go\core\db\Database;
 use go\core\db\Query;
 use go\core\db\Table;
-    use go\core\event\EventEmitterTrait;
-    use go\core\event\Listeners;
+use go\core\event\EventEmitterTrait;
+use go\core\event\Listeners;
 use go\core\exception\ConfigurationException;
 use go\core\fs\Folder;
-    use go\core\http\Request;
-    use go\core\jmap\Request as GoRequest;
-    use go\core\jmap\State;
+use go\core\jmap\Request;
+use go\core\jmap\State;
 use go\core\mail\Mailer;
-use go\core\util\Lock;
 use go\core\webclient\Extjs3;
 use go\core\model\Settings;
 use const GO_CONFIG_FILE;
@@ -84,6 +82,8 @@ use const GO_CONFIG_FILE;
 
 			$this->errorHandler = new ErrorHandler();
 			$this->initCompatibility();
+
+			//more code to initialize at the bottom of this file as it depends on this class being constructed
 		}
 		
 		/**
@@ -455,7 +455,7 @@ use const GO_CONFIG_FILE;
 		public function getCache() {
 			if (!isset($this->cache)) {				
 				$cls = $this->getConfig()['core']['general']['cache'];
-				go()->log("Using cache: " . $cls);
+				// go()->log("Using cache: " . $cls);
 				$this->cache = new $cls;
 			}
 			return $this->cache;
@@ -757,5 +757,6 @@ namespace {
 	function go() {
 		return App::get();
 	}
-
+	
 }
+

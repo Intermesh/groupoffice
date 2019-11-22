@@ -277,7 +277,7 @@ abstract class Entity extends Property {
 		//see \go\core\orm\LoggingTrait
 		if(method_exists($this, 'log')) {
 			if(!$this->log($this->isNew() ? \go\core\model\Log::ACTION_ADD : \go\core\model\Log::ACTION_UPDATE)) {				
-				$this->setValidationError("search", ErrorCode::INVALID_INPUT, "Could not save core_search entry");				
+				$this->setValidationError("log", ErrorCode::INVALID_INPUT, "Could not save log entry");				
 				return false;
 			}
 		}	
@@ -311,10 +311,13 @@ abstract class Entity extends Property {
 
 		App::get()->getDbConnection()->beginTransaction();
 
-		try{
-			if (!static::internalDelete($query)) {
-				go()->getDbConnection()->rollBack();
-				return false;
+		try {			
+
+			if(method_exists(static::class, 'logDelete')) {
+				if(!static::logDelete($query)) {
+					go()->getDbConnection()->rollBack();
+					return false;
+				}
 			}
 			
 			//See \go\core\orm\SearchableTrait;
@@ -323,7 +326,12 @@ abstract class Entity extends Property {
 					go()->getDbConnection()->rollBack();
 					return false;
 				}
-			}	
+			}
+
+			if (!static::internalDelete($query)) {
+				go()->getDbConnection()->rollBack();
+				return false;
+			}
 
 			if(!static::fireEvent(static::EVENT_DELETE, $query)) {
 				go()->getDbConnection()->rollBack();

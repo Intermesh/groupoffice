@@ -108,6 +108,11 @@ abstract class AclOwnerEntity extends AclEntity {
 	 */
 	public function getAcl() {
 		$a = $this->findAcl();
+
+		if(empty($a->groups)) {
+			//return null because an empty array is serialzed as [] instead of {}
+			return null;
+		}
 		
 		$acl = [];
 		if($a) {

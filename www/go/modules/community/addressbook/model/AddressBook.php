@@ -3,6 +3,7 @@ namespace go\modules\community\addressbook\model;
 
 use go\core\fs\File;
 use go\core\model\Acl;
+use go\core\orm\LoggingTrait;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use GO\Files\Model\Folder;
@@ -148,7 +149,7 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 		
 		if(!Group::delete(['addressBookId' => $query])) {
 			return false;
-		}			
+		}
 		
 		return parent::internalDelete($query);
 	}

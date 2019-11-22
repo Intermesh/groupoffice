@@ -132,7 +132,10 @@ tree/EntityLoader.js
 tree/Node.js
 tree/TreeNodeUI.js
 
+
 form/HtmlEditor.js
+form/HtmlEditorPlugins.js
+
 menu/EmojiMenu.js
 menu/StoreMenu.js
 

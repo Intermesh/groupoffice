@@ -682,7 +682,7 @@ abstract class EntityController extends Controller {
 		if ($success) {
 			$result['destroyed'] = $doDestroy;
 		} else {
-			throw Exception("Delete error");
+			throw new \Exception("Delete error");
 		}
 	}
 	

@@ -1476,14 +1476,9 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @return self
 	 * @throws \Exception
 	 */
-	public function findForEntity(\go\core\orm\Entity $entity) {
+	public function findForEntity(\go\core\orm\Entity $entity, $saveToEntity = true) {
 
-		if(method_exists($entity, 'buildFilesPath')) {
-			$filesPath = $entity->buildFilesPath();
-		} else{
-			$entityType = $entity->entityType();
-			$filesPath = $entityType->getModule()->name. '/'. $entityType->getName() . '/' . $entity->id;
-		}
+		$filesPath = $entity->buildFilesPath();	
 
 		$folder = empty($entity->filesFolderId) ? null : $this->findByPk($entity->filesFolderId);
 		if($folder) {
@@ -1495,8 +1490,10 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 				$newFolder->acl_id = $entity->findAclId();
 				$newFolder->save();
 
-				$entity->filesFolderId = $newFolder->id;
-				$entity->save();
+				if($saveToEntity) {
+					$entity->filesFolderId = $newFolder->id;
+					$entity->save();
+				}
 
 				return $newFolder;
 			}
