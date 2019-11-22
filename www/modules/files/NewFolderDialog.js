@@ -55,7 +55,7 @@ GO.files.NewFolderDialog = function(config){
 	config.resizable=false;
 	config.width=500;
 	config.items=this.newFolderFormPanel;
-	config.autoHeight=true;
+	config.height=120;
 	config.closeAction='hide';
 	config.focus=focusName.createDelegate(this);
 	config.title= t("Add folder", "files");		
@@ -80,7 +80,7 @@ GO.files.NewFolderDialog = function(config){
 		save:true
 	});
 }
-Ext.extend(GO.files.NewFolderDialog, Ext.Window,{
+Ext.extend(GO.files.NewFolderDialog, go.Window,{
 	
 	submitForm : function(){
 		this.newFolderFormPanel.form.submit({

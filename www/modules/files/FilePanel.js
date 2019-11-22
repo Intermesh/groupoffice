@@ -26,43 +26,44 @@ GO.files.FilePanel = Ext.extend(GO.DisplayPanel,{
 	editGoDialogId : 'file',
 
 	editHandler : function(){
-
-		//browsers don't like loading a json request and download dialog at the same time.'
-		if(this.loading)
-		{
-			this.editHandler.defer(200, this);
-		}else
-		{	
-			//GO.files.openFile({id:this.data.id});
-			this.data.handler.call(this);
-		}
+		GO.files.showFilePropertiesDialog(this.model_id+"");
+		
 	},
 
 	createTopToolbar : function(){
 		var tbar = GO.files.FilePanel.superclass.createTopToolbar.call(this);
 				
-		this.editButton.setText(t("Edit"));
+		// this.editButton.setText(t("Edit"));
 
 		tbar.splice(1,0,this.downloadButton= new Ext.Button({
 			iconCls: 'btn-save',
-			text: t("Download"),
-			cls: 'x-btn-text-icon',
+			tooltip: t("Download"),
 			handler: function(){
 				GO.files.downloadFile(this.model_id);
 			},
 			scope: this
 		}),this.propertiesBtn = new Ext.Button({
-			iconCls: 'btn-settings',
-			text: t("Properties"),
-			cls: 'x-btn-text-icon',
+			iconCls: 'ic-launch',
+			tooltip: t("Open"),			
 			handler: function(){
-				GO.files.showFilePropertiesDialog(this.model_id+"");
-				//this.addSaveHandler(GO.files.filePropertiesDialog);
+				this.launch();
 			},
 			scope: this
 		}));
 
 		return tbar;
+	},
+
+	launch : function() {
+		//browsers don't like loading a json request and download dialog at the same time.'
+		if(this.loading)
+		{
+			this.launch.defer(200, this);
+		}else
+		{	
+			//GO.files.openFile({id:this.data.id});
+			this.data.handler.call(this);
+		}		
 	},
 
 	reset : function(){
