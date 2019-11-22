@@ -440,9 +440,9 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		disabled:true
 	});
 
-	this.deleteButton = new Ext.Button({
+	this.deleteButton = new Ext.menu.Item({
 		iconCls: 'ic-delete',
-		tooltip: t("Delete"),
+		text: t("Delete"),
 		overflowText:t("Delete"),
 		handler: function(){
 			this.onDelete('grid');
@@ -544,20 +544,9 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	// });
 
 
-	tbar.push({
-		iconCls: "ic-refresh",
-		tooltip:t("Refresh"),
-		overflowText:t("Refresh"),
-		handler: function(){          
-			this.refresh(true);
-		},
-		scope:this
-	});
 
-	if(!config.hideActionButtons) {
-		tbar.push(this.deleteButton);
-		tbar.push(['-',this.cutButton,this.copyButton,this.pasteButton]);
-
+	if(!config.hideActionButtons) {		
+		tbar.push([this.cutButton,this.copyButton,this.pasteButton]);
 	}
 	
 	this.thumbsToggle = new Ext.Button({
@@ -606,6 +595,23 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 
 	if(!config.hideActionButtons) {
 		tbar.push(this.newButton);
+
+		tbar.push({
+			iconCls: 'ic-more-vert',
+			tooltip: t("More"),
+			menu: [
+				{
+					iconCls: "ic-refresh",
+					text:t("Refresh"),
+					overflowText:t("Refresh"),
+					handler: function(){          
+						this.refresh(true);
+					},
+					scope:this
+				},
+				this.deleteButton
+			]
+		})
 	}
 
 	config.keys=[{
@@ -2122,8 +2128,8 @@ GO.files.openFolder = function(id, folder_id)
 	{
 		GO.files.fileBrowser=new GO.files.FileBrowser({
 			id:'popupfb',
-			border:false,
-			filePanelCollapsed:true
+			border:false
+			//filePanelCollapsed:true
 		});
 		GO.files.fileBrowserWin = new GO.Window({
 			title: t("File browser", "files"),
@@ -2131,8 +2137,8 @@ GO.files.openFolder = function(id, folder_id)
 			width:900,
 			layout:'fit',
 			border:false,
-			maximizable:true,
-			collapsible:true,
+			maximizable:!GO.util.isMobileOrTablet(),
+			collapsible:!GO.util.isMobileOrTablet(),
 			closeAction:'hide',
 			items: GO.files.fileBrowser
 		});
