@@ -261,3 +261,6 @@ $updates['201903291350'][] = function() {
 	$m->migrateEntity("File");	
 	$m->migrateEntity("Folder");	
 };
+
+
+$updates['201911221720'][] = "delete FROM `go_state` WHERE `name` LIKE 'popupfb%'";
