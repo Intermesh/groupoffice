@@ -167,6 +167,8 @@ class Settings extends core\Settings {
 	 * Get locale for the system. We need a UTF8 locale so command line functions
 	 * work with UTF8.
 	 * 
+	 * initialized in old framework GO.php. What should we do with it later?
+	 * 
 	 * @return string
 	 */
 	public function getLocale() {
