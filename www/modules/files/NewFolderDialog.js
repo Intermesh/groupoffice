@@ -51,11 +51,11 @@ GO.files.NewFolderDialog = function(config){
 	};
 	config.collapsible=false;
 	config.maximizable=false;
-	config.modal=false;
+	config.modal=true;
 	config.resizable=false;
-	config.width=500;
+	config.width=dp(500);
 	config.items=this.newFolderFormPanel;
-	config.height=120;
+	config.height=dp(160);
 	config.closeAction='hide';
 	config.focus=focusName.createDelegate(this);
 	config.title= t("Add folder", "files");		
