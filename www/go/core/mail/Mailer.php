@@ -44,7 +44,7 @@ class Mailer {
 
 		return $this;
 	}
-	
+
 	public function send($message) {
 		
 		if(!empty(go()->getSettings()->debugEmail)){
