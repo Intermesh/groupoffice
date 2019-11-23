@@ -47,18 +47,7 @@ class Message extends \Swift_Message {
 	 * @return static
 	 */
 	public function addBlob(Blob $blob) {
-		$this->attach(Attachment::fromBlob($blob));
-		return $this;
-	}
-
-	/**
-	 * Provide blob path. Blob attachment will be returned.
-	 * 
-	 * @param Blob $blob
-	 * @return static
-	 */
-	public function addBlobFromPath($blob) {
-		$this->attach(Attachment::fromBlobPath($blob));
+		$this->attach(Attachment::fromBlob($blob)->setFilename($blob->name));
 		return $this;
 	}
 
