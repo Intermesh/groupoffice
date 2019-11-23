@@ -1,3 +1,5 @@
+- Files: works on mobile
+
 22-11-2019 6.4.83
 - Core: Load state only on desktop
 - Core: Copy html editor style from text area element so it matches style from css and doesn't zoom on mobile

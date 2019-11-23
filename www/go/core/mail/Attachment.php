@@ -15,15 +15,6 @@ class Attachment extends Swift_Attachment {
 	 */
     public static function fromBlob(Blob $blob) {
         return Swift_Attachment::fromPath($blob->path());
-    }
-
-    /**
-	 * Provide blob path. returns attachment
-	 * 
-	 * @param $blob
-	 * @return Swift_Attachment
-	 */
-    public static function fromBlobPath($blob) {
-        return Swift_Attachment::fromPath($blob);
-    }
+		}
+		
 }

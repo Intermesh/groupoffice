@@ -45,7 +45,8 @@ class Link extends Entity {
 	/**
 	 * The auto increment primary key
 	 * 
-	 * @var int 
+	 * @var int
+     *
 	 */
 	public $id;
 
