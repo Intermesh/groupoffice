@@ -2090,7 +2090,14 @@ GO.files.openFile = function(config)
 
 
 GO.files.downloadFile = function (fileId){
-	document.location = GO.url("files/file/download",{id:fileId,inline:false});
+	var url = GO.url("files/file/download",{id:fileId,inline:false});
+
+	if(window.navigator.standalone) {
+		window.open(url, "_blank");
+	} else
+	{
+		document.location.href = url;
+	}
 }
 
 //GO.files.editFile = function (fileId){
