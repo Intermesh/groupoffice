@@ -362,7 +362,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 
 					$resourceEvent->resource_event_id = $model->id;
 					$resourceEvent->calendar_id = $resource_calendar_id;
-					$resourceEvent->name = $model->name;
+					$resourceEvent->name = $model->private ? \GO::t('privateEvent','calendar') : $model->name;
 					$resourceEvent->start_time = $model->start_time;
 					$resourceEvent->end_time = $model->end_time;
 					$resourceEvent->rrule = $model->rrule;

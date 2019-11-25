@@ -1,4 +1,5 @@
-- Sieve: Remove :create flag in fileinto command 
+- Sieve: Remove :create flag in fileinto command
+- Tickets: Leave ticket blank by default didn't work anymore
 
 10-09-2019 6.2.122
 - Email: Fixed issue with utf-8 chars in attachment name
