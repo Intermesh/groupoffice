@@ -216,7 +216,6 @@ use go\core\orm\Property;
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
-
 class $modelName extends Property {
 	
 	protected static function defineMapping() {
@@ -262,10 +261,7 @@ EOD;
 			}
 
 			$vars .= <<<EOD
-	/**
-	 * {$column->comment}
-	 * @var {$this->columnToPhpType($column)}
-	 */							
+	/** @var {$this->columnToPhpType($column)} {$column->comment} */							
 	public \${$column->name}{$this->getDefaultValue($column)};
 
 

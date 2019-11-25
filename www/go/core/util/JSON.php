@@ -1,8 +1,6 @@
 <?php
 namespace go\core\util;
 
-use function GuzzleHttp\json_decode;
-
 class JSON {
   /**
    * Encode data to JSON
@@ -31,7 +29,7 @@ class JSON {
     $string = json_encode($value, $options);
 		
 		if($string === false) {
-      $this->handleEncodeError($value);
+      self::handleEncodeError($value);
     }
     
     return $string;
