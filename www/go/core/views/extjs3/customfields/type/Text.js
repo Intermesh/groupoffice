@@ -70,6 +70,66 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			config.maxLength = customfield.options.maxLength;
 		}
 
+		if (!GO.util.empty(customfield.requiredCondition)) {
+			config.validate = function () {
+				var condition = customfield.requiredCondition,
+					form = this.findParentByType('form').getForm(),
+					conditionParts,
+					isEmptyCondition = false,
+					isNotEmptyCondition = false,
+					field, operator,
+					value, fieldValue;
+
+				if (condition.includes('is empty')) {
+					isEmptyCondition = true;
+					condition = condition.replace('is empty', '');
+					field = condition.trim(' ');
+					field = form.findField(field);
+				} else if (condition.includes('is not empty')) {
+					isNotEmptyCondition = true;
+					condition = condition.replace('is not empty', '');
+					field = condition.trim(' ');
+					field = form.findField(field);
+				} else {
+					conditionParts = condition.split(' ');
+					if (conditionParts.length === 3) { //valid condition
+						operator = conditionParts[1];
+						field = form.findField(conditionParts[0]);
+						value = conditionParts[2];
+						if (!field) {
+							field = form.findField(conditionParts[2]);
+							value = conditionParts[0];
+						}
+					}
+				}
+
+				if (field) {
+					fieldValue = field.getValue();
+
+					if (isEmptyCondition) {
+						this.allowBlank = !Ext.isEmpty(fieldValue);
+					} else if (isNotEmptyCondition) {
+						this.allowBlank = Ext.isEmpty(fieldValue);
+					} else {
+						switch (operator) {
+							case '=':
+							case '==':
+								this.allowBlank = !(fieldValue == value);
+								break;
+							case '>':
+								this.allowBlank = !(fieldValue > value);
+								break;
+							case '<':
+								this.allowBlank = !(fieldValue < value);
+								break;
+						}
+					}
+				}
+
+				return Ext.form.Field.prototype.validate.apply(this);
+			};
+		}
+
 		return Ext.apply({			
 			xtype: 'textfield',
 			serverFormats: false, //for backwars compatibility with old framework. Can be removed when all is refactored.
