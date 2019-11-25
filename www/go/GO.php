@@ -639,6 +639,13 @@ class GO{
 		
 		date_default_timezone_set(\GO::user() ? \GO::user()->timezone : \GO::config()->default_timezone);
 		
+		// for exec with ZIP and UTF8 chars	
+		if(!setlocale(LC_CTYPE, go()->getSettings()->getLocale())) {
+			if(!setlocale(LC_CTYPE, go()->getSettings()->resetLocale()))
+			{
+				ErrorHandler::log("Could not automatically determine locale");
+			}
+		}
 		//setlocale(LC_CTYPE, go()->getSettings()->getLocale());
 		
 //		}else{

@@ -34,15 +34,15 @@ GO.files.BookmarksGrid = function(config) {
 	config.sm = new Ext.grid.RowSelectionModel();
 	config.loadMask = true;
 	
-	config.bbar = new GO.SmallPagingToolbar({
-//			items:[this.searchField = new GO.form.SearchField({
-//				store: config.store,
-//				width:120,
-//				emptyText: t("Search")
-//			})],
-			store:config.store,
-			pageSize:GO.settings.config.nav_page_size
-		})
+// 	config.bbar = new GO.SmallPagingToolbar({
+// //			items:[this.searchField = new GO.form.SearchField({
+// //				store: config.store,
+// //				width:120,
+// //				emptyText: t("Search")
+// //			})],
+// 			store:config.store,
+// 			pageSize:GO.settings.config.nav_page_size
+// 		})
 	
 	GO.files.BookmarksGrid.superclass.constructor.call(this,config);
 	

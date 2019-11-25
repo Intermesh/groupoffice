@@ -386,14 +386,14 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					},
 					items:[this.globalFieldset,this.regionFieldset
 						
-					// 	,{
-					// 	xtype:'button',
-					// 	style:'margin-left:14px',
-					// 	handler:this.resetState,
-					// 	scope:this,
-					// 	text:t('Reset windows and grids'),
-					// 	anchor:''
-					// }
+						,{
+						xtype:'button',
+						style:'margin-left:14px',
+						handler:this.resetState,
+						scope:this,
+						text:t('Reset windows and grids'),
+						anchor:''
+					}
 				]
 				},{
 					columnWidth: .5,//right

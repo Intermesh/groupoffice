@@ -338,16 +338,15 @@ use const GO_CONFIG_FILE;
 
 				$this->config = apcu_fetch($cacheKey);
 				if($this->config && $this->config['cacheTime'] > filemtime($this->config['configPath']) && (!file_exists('/etc/groupoffice/globalconfig.inc.php') || $this->config['cacheTime'] > filemtime('/etc/groupoffice/globalconfig.inc.php'))) {
+					if(Request::get()->getHeader('X-Debug') == "1") {
+						$this->config['core']['general']['debug'] = true;
+					}
 					return $this->config;
 				}
 			}
 			
 			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
 
-			if(Request::get()->getHeader('X-Debug') == "1") {
-				$config['debug'] = true;
-			}
-			
 			if(!isset($config['debug_log'])) {
 				$config['debug_log'] = !empty($config['debug']);
 			}
@@ -401,6 +400,10 @@ use const GO_CONFIG_FILE;
 			if(isset($cacheKey)) {
 				$this->config['cacheTime'] = time();
 				apcu_store($cacheKey, $this->config);
+			}
+			
+			if(Request::get()->getHeader('X-Debug') == "1") {
+				$this->config['core']['general']['debug'] = true;
 			}
 			
 			return $this->config;
@@ -757,14 +760,6 @@ namespace {
 	function go() {
 		return App::get();
 	}
-
-	// for exec with ZIP and UTF8 chars	
-	if(!setlocale(LC_CTYPE, go()->getSettings()->getLocale())) {
-		if(!setlocale(LC_CTYPE, go()->getSettings()->resetLocale()))
-		{
-			ErrorHandler::log("Could not automatically determine locale");
-		}
-	}
-
+	
 }
 
