@@ -2165,8 +2165,8 @@ GO.files.createSelectFileBrowser = function(){
 
 		GO.selectFileBrowserWindow = new GO.Window({
 			title: t("Select files"),
-			height:500,
-			width:750,
+			height:dp(800),
+			width:dp(1200),
 			modal:true,
 			layout:'fit',
 			border:false,
