@@ -1417,7 +1417,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 				success:function(response, options, result){
 					
 					if(!GO.util.empty(result.archive)){
-						document.location = GO.url("core/downloadTempFile",{path:result.archive});
+						go.util.downloadFile(GO.url("core/downloadTempFile",{path:result.archive}));
             //win.close();
             
 					} else {
@@ -2091,16 +2091,7 @@ GO.files.openFile = function(config)
 
 GO.files.downloadFile = function (fileId){
 	var url = GO.url("files/file/download",{id:fileId,inline:false});
-
-	if(window.navigator.standalone) {
-		//somehow this is the only way a download works on a web application on the iphone.
-		var win = window.open( "about:blank", "_system");
-		win.focus();
-		win.location = url;
-	} else
-	{
-		document.location.href = url;
-	}
+	go.util.downloadFile(url);
 }
 
 //GO.files.editFile = function (fileId){
@@ -2167,9 +2158,9 @@ GO.files.createSelectFileBrowser = function(){
 	if(!GO.selectFileBrowser)
 	{
 		GO.selectFileBrowser= new GO.files.FileBrowser({
-			border:false,
-			filePanelCollapsed:true,
-			treeCollapsed:false
+			// border:false
+			// filePanelCollapsed:true,
+			// treeCollapsed:false
 		});
 
 		GO.selectFileBrowserWindow = new GO.Window({

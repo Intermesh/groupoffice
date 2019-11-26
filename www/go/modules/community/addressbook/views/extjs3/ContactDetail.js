@@ -297,7 +297,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						iconCls: "ic-cloud-download",
 						text: t("Export") + " (vCard)",
 						handler: function () {
-							document.location = go.Jmap.downloadUrl("community/addressbook/vcard/" + this.data.id);
+							go.util.downloadFile(go.Jmap.downloadUrl("community/addressbook/vcard/" + this.data.id));
 						},
 						scope: this
 					},

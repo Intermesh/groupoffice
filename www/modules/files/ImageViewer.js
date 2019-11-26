@@ -42,7 +42,7 @@ GO.files.ImageViewer = Ext.extend(GO.Window, {
 			iconCls: 'btn-download',
 			text: t("Download"),
 			handler: function(){
-				document.location = this.viewerImages[this.currentImgIndex].download_path;
+				go.util.downloadFile(this.viewerImages[this.currentImgIndex].download_path);
 			},
 			scope: this
 		},{
