@@ -1557,7 +1557,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	}
 	
 	public function getsmtp_password() {
-		return go()->getSettings()->getSmtpPassword();
+		return go()->getSettings()->decryptSmtpPassword();
 	}
 	
 	public function getsmtp_encryption() {

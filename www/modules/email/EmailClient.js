@@ -1547,8 +1547,9 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 				default:
 					if(forceDownload)
 						attachment.url+='&inline=0';
+
 					if (attachment.extension!='vcf'||forceDownload)
-						window.open(attachment.url);
+						go.util.downloadFile(attachment.url, !forceDownload);
 					break;
 			}
 		}

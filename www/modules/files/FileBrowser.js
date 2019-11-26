@@ -1417,7 +1417,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 				success:function(response, options, result){
 					
 					if(!GO.util.empty(result.archive)){
-						document.location = GO.url("core/downloadTempFile",{path:result.archive});
+						go.util.downloadFile(GO.url("core/downloadTempFile",{path:result.archive}));
             //win.close();
             
 					} else {
@@ -2090,7 +2090,8 @@ GO.files.openFile = function(config)
 
 
 GO.files.downloadFile = function (fileId){
-	document.location = GO.url("files/file/download",{id:fileId,inline:false});
+	var url = GO.url("files/file/download",{id:fileId,inline:false});
+	go.util.downloadFile(url);
 }
 
 //GO.files.editFile = function (fileId){
@@ -2157,15 +2158,15 @@ GO.files.createSelectFileBrowser = function(){
 	if(!GO.selectFileBrowser)
 	{
 		GO.selectFileBrowser= new GO.files.FileBrowser({
-			border:false,
-			filePanelCollapsed:true,
-			treeCollapsed:false
+			// border:false
+			// filePanelCollapsed:true,
+			// treeCollapsed:false
 		});
 
 		GO.selectFileBrowserWindow = new GO.Window({
 			title: t("Select files"),
-			height:500,
-			width:750,
+			height:dp(800),
+			width:dp(1200),
 			modal:true,
 			layout:'fit',
 			border:false,

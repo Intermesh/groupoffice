@@ -1,4 +1,4 @@
-GO.files.ImageViewer = Ext.extend(GO.Window, {
+GO.files.ImageViewer = Ext.extend(go.Window, {
 	
 	originalImgSize : false,
 	
@@ -15,14 +15,18 @@ GO.files.ImageViewer = Ext.extend(GO.Window, {
 		
 		this.border=false;
 		this.plain=true;
-		this.maximizable=true;
-		this.width=800;
-		this.height=600;
+		this.maximizable=!GO.util.isMobileOrTablet();
+		this.width=dp(1000);
+		this.height=dp(800);
 		this.bodyStyle='text-align:center;vertical-align:middle';
 		this.title=t("Image viewer", "files");
 		this.autoScroll=true;
-		
-		this.tbar=[this.previousButton = new Ext.Button({
+
+		this.tbarCfg = {
+			enableOverflow : true
+		};
+
+		this.tbar=new Ext.Toolbar({enableOverflow: true, items: [this.previousButton = new Ext.Button({
 			iconCls: 'btn-left-arrow',
 			tooltip:t("Previous"),
 			handler: function(){
@@ -37,12 +41,29 @@ GO.files.ImageViewer = Ext.extend(GO.Window, {
 			},
 			scope:this
 		}),
+			'-',
+		this.normalSizeBtn=new Ext.Button({
+			text: t("Normal size", "files"),
+			iconCls: 'ic-zoom-in',
+			handler: function(){
+				this.loadImage(this.currentImgIndex, true);
+			},
+			scope: this
+		}),
+		this.fitImageBtn=new Ext.Button({
+			text: t("Fit image", "files"),
+			iconCls: 'ic-zoom-out-map',
+			handler: function(){
+				this.syncImgSize();
+			},
+			scope: this
+		}),
 		'-',
 		{
 			iconCls: 'btn-download',
 			text: t("Download"),
 			handler: function(){
-				document.location = this.viewerImages[this.currentImgIndex].download_path;
+				go.util.downloadFile(this.viewerImages[this.currentImgIndex].download_path);
 			},
 			scope: this
 		},{
@@ -80,23 +101,8 @@ GO.files.ImageViewer = Ext.extend(GO.Window, {
 			},
 			scope: this
 
-		}, '-',
-		this.normalSizeBtn=new Ext.Button({
-			text: t("Normal size", "files"),
-			iconCls: 'ic-zoom-in',
-			handler: function(){
-				this.loadImage(this.currentImgIndex, true);
-			},
-			scope: this
-		}),
-		this.fitImageBtn=new Ext.Button({
-			text: t("Fit image", "files"),
-			iconCls: 'ic-zoom-out-map',
-			handler: function(){
-				this.syncImgSize();
-			},
-			scope: this
-		})];
+		}
+		]});
 		
 		GO.files.ImageViewer.superclass.initComponent.call(this);
 		this.on('resize', function(){this.syncImgSize(this.fullSize);}, this);
@@ -151,10 +157,14 @@ GO.files.ImageViewer = Ext.extend(GO.Window, {
 		if(this.viewerImages.length==1){
 			this.previousButton.hide();
 			this.nextButton.hide();
+			//separator
+			this.getTopToolbar().items.itemAt(2).hide();
 		}else
 		{
 			this.previousButton.show();
 			this.nextButton.show();
+			//separator
+			this.getTopToolbar().items.itemAt(2).show();
 
 			this.previousButton.setDisabled(index==0);
 			this.nextButton.setDisabled(index==(this.viewerImages.length-1));

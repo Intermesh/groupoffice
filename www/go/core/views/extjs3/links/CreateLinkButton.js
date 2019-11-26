@@ -49,7 +49,8 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			hideLabel: true,
 			listeners: {
 				scope: this,
-				select: function (cmb, record, index) {					
+				select: function (cmb, record, index) {	
+					alert();				
 					this.linkGrid.store.loadData({"records" :[{
 						"toId": record.get('entityId'),
 						"toEntity": record.get('entity'),
@@ -95,7 +96,19 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 		// 		return this.el.up('.x-menu');
 		// 	}
 		// });
-
+		this.store = new go.data.Store({
+			autoDestroy: true,
+			fields: ['id', 'toId', 'toEntity', {name: "to", type: "relation"}, 'description', {name: 'modifiedAt', type: 'date'}],
+			entityStore: "Link",
+			sortInfo: {
+				field: 'modifiedAt',
+				direction: 'DESC'
+			},
+			baseParams: {
+				filter: {}
+			}
+		});
+		
 		this.linkGrid = new go.grid.GridPanel({
 			columns: [
 				{
@@ -106,7 +119,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {						
 						var linkIconCls = go.Entities.getLinkIcon(record.data.toEntity, record.data.to.filter);
 
-						return '<i class="entity ' + linkIconCls + '"></i> ' + record.data.to.name;
+						return '<i class="entity ' + linkIconCls + '"></i> <a>' + record.data.to.name + '</a>';
 					}
 				},
 				{
@@ -123,18 +136,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 				}
 			],
 			autoExpandColumn: 'name',
-			store: new go.data.Store({
-				autoDestroy: true,
-				fields: ['id', 'toId', 'toEntity', {name: "to", type: "relation"}, 'description', {name: 'modifiedAt', type: 'date'}],
-				entityStore: "Link",
-				sortInfo: {
-					field: 'modifiedAt',
-					direction: 'DESC'
-				},
-				baseParams: {
-					filter: {}
-				}
-			}),
+			store: this.store,
 			tbar: new Ext.Toolbar({
 				layout: "fit",
 				items: [{
@@ -145,7 +147,16 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			listeners: {
 				scope: this,
 				rowclick: function (grid, rowIndex, e) {
+
+
 					if (e.target.tagName !== "BUTTON") {
+						var record = this.store.getAt(rowIndex);
+					
+						var win = new go.links.LinkDetailWindow({
+							entity: record.data.toEntity
+						});
+						
+						win.load(record.data.toId);
 						return false;
 					}
 					
