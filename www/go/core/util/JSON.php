@@ -28,8 +28,8 @@ class JSON {
   public static function encode($value, $options = 0, $depth = 512) {
     $string = json_encode($value, $options);
 		
-		if($string === false) {
-      self::handleEncodeError($value);
+    if($string === false) {
+        self::handleEncodeError($value);
     }
     
     return $string;
