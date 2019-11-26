@@ -77,7 +77,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 		// });
 		
 		// me.initialized = this.clearState().then(function() {return Promise.all([			
-		me.initialized = Promise.all([			
+		me.initialized = Promise.all([
 			me.metaStore.getItem('notFound').then(function(v) {
 				me.notFound = v || [];
 				return true;
@@ -140,7 +140,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 
 		return Promise.all([
 			this.metaStore.clear(),
-			this.stateStore.clear(),		
+			this.stateStore.clear(),
 			this.metaStore.setItem("apiVersion", go.User.apiVersion),
 			this.metaStore.setItem("apiUser", go.User.username)
 		]);
@@ -353,11 +353,11 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	
 	/**
 	 * Get all entities
-	 * 
+	 *
 	 * Note: the results are sorted in an unpredictable manner! Use query().then(return get()) for sorting.
-	 * 
-	 * @param {function} cb
-	 * @param {object} scope
+	 *
+	 * @param {function=} cb
+	 * @param {object=} scope
 	 * @returns {Promise}
 	 */
 	all : function(cb, scope) {
@@ -387,7 +387,7 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 						cb.call(scope, true, response.list);
 					}
 
-					return me.data;
+					return response.list;
 				}).catch(function(response) {
 					if(cb) {
 						cb.call(scope, false, response);
