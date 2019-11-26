@@ -20,15 +20,16 @@ use go\core\Module;
  */
 abstract class Settings extends Model {
 
-  private static $instance;
+  private static $instance = [];
 	/**
 	 * 
 	 * @return static
 	 */
 	public static function get() {
+    $cls = static::class;
 
-	  if(!isset(self::$instance)) {
-      $cls = static::class;
+	  if(!isset(self::$instance[$cls])) {
+
 
       $instance = go()->getCache()->get($cls);
       if ($instance) {
@@ -39,10 +40,10 @@ abstract class Settings extends Model {
       $instance = new static;
 
       go()->getCache()->set($cls, $instance);
-      self::$instance = $instance;
+      self::$instance[$cls] = $instance;
     }
 
-		return self::$instance;
+		return self::$instanc[$cls];
 	}
 	
 
