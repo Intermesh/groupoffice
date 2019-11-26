@@ -33,7 +33,7 @@ abstract class Settings extends Model {
 
       $instance = go()->getCache()->get($cls);
       if ($instance) {
-        self::$instance = $instance;
+        self::$instance[$cls] = $instance;
         return $instance;
       }
 
@@ -43,7 +43,7 @@ abstract class Settings extends Model {
       self::$instance[$cls] = $instance;
     }
 
-		return self::$instanc[$cls];
+		return self::$instance[$cls];
 	}
 	
 
