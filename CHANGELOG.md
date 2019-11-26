@@ -1,4 +1,5 @@
 - Files: works on mobile
+- Core: Fixed incorrect module sort order on first load
 
 22-11-2019 6.4.83
 - Core: Load state only on desktop
