@@ -2093,7 +2093,10 @@ GO.files.downloadFile = function (fileId){
 	var url = GO.url("files/file/download",{id:fileId,inline:false});
 
 	if(window.navigator.standalone) {
-		window.open(url, "_blank");
+		//somehow this is the only way a download works on a web application on the iphone.
+		var win = window.open( "about:blank", "_system");
+		win.focus();
+		win.location = url;
 	} else
 	{
 		document.location.href = url;
