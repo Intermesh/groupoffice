@@ -1,4 +1,6 @@
 - Core: Logo didn't display if you didn't set a different primary color
+- Core: Reload did too many requests causing unnecessary load on the server
+- Projects: Added projects grid and works on mobile
 
 26-11-2019 6.4.84
 - Files: works on mobile
