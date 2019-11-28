@@ -1462,6 +1462,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$newFolder = Folder::model()->findByPath($newPath, true);
 		$newFolder->moveContentsFrom($folder, true);
+		$newFolder->visible = 1;
+		$newFolder->readonly = 1;
 
 		$folder->systemSave = true;
 		//delete empty folder.
@@ -1486,9 +1488,10 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$existingPath = $folder->getPath();
 			if($existingPath != $filesPath) {
 				$newFolder = $this->mergeEntityFolders($folder, $existingPath, $filesPath);
-
+				$newFolder->visible = 0;
+				$newFolder->readonly = 1;
 				$newFolder->acl_id = $entity->findAclId();
-				$newFolder->save();
+				$newFolder->save(true);
 
 				if($saveToEntity) {
 					$entity->filesFolderId = $newFolder->id;

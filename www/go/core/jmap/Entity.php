@@ -11,7 +11,6 @@ use go\core\acl\model\AclOwnerEntity;
 use go\core\acl\model\AclItemEntity;
 use go\core\orm\Relation as GoRelation;
 use go\core\util\ClassFinder;
-use GO\Files\Controller\FolderController;
 use GO\Files\Model\Folder;
 
 /**
@@ -78,16 +77,28 @@ abstract class Entity  extends OrmEntity {
 	}
 
 	private function checkFilesFolder() {
-		if(!isset($this->filesFolderId)) {
+		if(empty($this->filesFolderId)) {
 			return true;
 		}
+
 		$filesPathProperties = $this->filesPathProperties();
 		if(!empty($filesPathProperties)) {
 			if($this->isModified($filesPathProperties)) {
-				$folder = \GO\Files\Model\Folder::model()->findForEntity($this, false);
-				$this->filesFolderId = $folder->id;
+				$folder = Folder::model()->findForEntity($this, false);
+
+				if($folder->id != $this->filesFolderId) {
+					$this->filesFolderId = $folder->id;
+					if(!go()->getDbConnection()
+							->update($this->getMapping()->getPrimaryTable()->getName(), 
+											['filesFolderId' => $this->filesFolderId], 
+											['id' => $this->id])
+							->execute()) {
+						return false;
+					}
+				}
 			}
 		}
+		return true;
 	}
 
 	/**
