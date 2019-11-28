@@ -1,0 +1,37 @@
+.external-ticket-page .plupload_add{background:none;border-radius:0;text-align:center; cursor:pointer; border:0; padding:5px; margin:5px 0px; font-size: 12px; text-decoration: underline; color:#000;}
+
+/*#close-ticket-button { font-family: arial; font-size: 12px; background-color: inherit; display: inline-block; border:0px; cursor: pointer; color:blue;text-decoration: underline; padding:0px; margin: 0px;}
+#close-ticket-button:hover {text-decoration: underline;}
+
+#submit-ticket-button {background-color: #99FF99; width:100px!important;}
+#submit-ticket-button:hover {background-color: #88FF88;}
+
+#back-to-overview-button {background-color: #9999FF;float:left;}
+#back-to-overview-button:hover {background-color: #8888FF;}
+
+#new-ticket-button {background-color: #99FF99;}
+#new-ticket-button:hover {background-color: #88FF88;}*/
+
+.external-ticket-page .table-ticketlist tr td {padding:5px;}
+.external-ticket-page .table-ticketlist tr td a{text-decoration: underline; color:#000; cursor:pointer;}
+.external-ticket-page .table-ticketlist tr td a:hover{}
+.external-ticket-page .table-ticketlist tr.odd{background-color: #ddd;}
+.external-ticket-page .table-ticketlist tr.even{}
+
+.external-ticket-page .table-ticketmessages tr td {padding:5px;}
+.external-ticket-page .table-ticketmessages tr td a{text-decoration: underline; color:#000; cursor:pointer;}
+.external-ticket-page .table-ticketmessages tr td a:hover{}
+.external-ticket-page .table-ticketmessages tr td .ticketmessage-name {font-weight: bold;}
+.external-ticket-page .table-ticketmessages tr td .ticketmessage-time {margin: 0px 5px;}
+.external-ticket-page .table-ticketmessages tr td .ticketmessage-message {}
+.external-ticket-page .table-ticketmessages tr td .ticketmessage-files {font-weight: bold;}
+.external-ticket-page .table-ticketmessages tr.odd{background-color: #ddd;}
+.external-ticket-page .table-ticketmessages tr.even{}
+
+
+#close-ticket-button { font-family: arial; font-size: 12px; background-color: inherit; display: inline; border:0px; cursor: pointer; color:blue;text-decoration: underline; padding:0px; margin: 0px;}
+#close-ticket-button:hover {text-decoration: underline;}
+
+#submit-ticket-button { width:auto !important;}
+
+#back-to-overview-button {}
