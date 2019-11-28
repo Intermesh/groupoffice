@@ -439,6 +439,67 @@ GO.customfields.dataTypes={
 				config.maxLength=customfield.max_length;
 			}
 
+			if (customfield.required_condition) {
+				config.validate = function () {
+					var condition = customfield.required_condition,
+ 						modelPrefix = customfield.dataname.split('.')[0],
+						form = this.findParentByType('form').getForm(),
+						conditionParts,
+						isEmptyCondition = false,
+						isNotEmptyCondition = false,
+						field, operator,
+						value, fieldValue;
+
+					if (condition.includes('is empty')) {
+						isEmptyCondition = true;
+						condition = condition.replace('is empty', '');
+						field = condition.trim(' ');
+						field = form.findField(modelPrefix + '.' + field);
+					} else if (condition.includes('is not empty')) {
+						isNotEmptyCondition = true;
+						condition = condition.replace('is not empty', '');
+						field = condition.trim(' ');
+						field = form.findField(modelPrefix + '.' + field);
+					} else {
+						conditionParts = condition.split(' ');
+						if (conditionParts.length === 3) { //valid condition
+							operator = conditionParts[1];
+							field = form.findField(modelPrefix + '.' + conditionParts[0]);
+							value = conditionParts[2];
+							if (!field) {
+								field = form.findField(modelPrefix + '.' + conditionParts[2]);
+								value = conditionParts[0];
+							}
+						}
+					}
+
+					if (field) {
+						fieldValue = field.getValue();
+
+						if (isEmptyCondition) {
+							this.allowBlank = !Ext.isEmpty(fieldValue);
+						} else if (isNotEmptyCondition) {
+							this.allowBlank = Ext.isEmpty(fieldValue);
+						} else {
+							switch (operator) {
+								case '=':
+								case '==':
+									this.allowBlank = !(fieldValue == value);
+									break;
+								case '>':
+									this.allowBlank = !(fieldValue > value);
+									break;
+								case '<':
+									this.allowBlank = !(fieldValue < value);
+									break;
+							}
+						}
+					}
+
+					return Ext.form.Field.prototype.validate.apply(this);
+				};
+			}
+
 			if (!GO.util.empty(customfield.prefix) || !GO.util.empty(customfield.suffix)) {
 				
 				if (!GO.util.empty(customfield.prefix))

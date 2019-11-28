@@ -202,7 +202,18 @@ GO.customfields.FieldDialog = function(config){
 		this.requiredCB = new Ext.ux.form.XCheckbox({
 			xtype:'xcheckbox',
 			name:'required',
-			fieldLabel:GO.customfields.lang.required
+			fieldLabel:GO.customfields.lang.required,
+			listeners: {
+				check: function(cb, value) {
+					this.requiredConditionField.setDisabled(value);
+				},
+				scope: this
+			}
+		}),
+		this.requiredConditionField = new Ext.form.TextField({
+			name:'required_condition',
+			fieldLabel:GO.customfields.lang.required_condition,
+			anchor:'-20'
 		}),
 		this.hideInGridCB = new Ext.ux.form.XCheckbox({
 			xtype:'xcheckbox',
@@ -304,6 +315,7 @@ Ext.extend(GO.customfields.FieldDialog, Ext.Window,{
 
 		this.helptextField.setDisabled(newValue=='GO\\Customfields\\Customfieldtype\\Infotext');
 		this.requiredCB.setDisabled(newValue=='GO\\Customfields\\Customfieldtype\\Infotext');
+		this.requiredConditionField.setDisabled(newValue=='GO\\Customfields\\Customfieldtype\\Infotext');
 		this.decimalsField.setDisabled(newValue!='GO\\Customfields\\Customfieldtype\\Number');
 		this.decimalsField.setVisible(newValue=='GO\\Customfields\\Customfieldtype\\Number');
 
