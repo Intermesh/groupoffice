@@ -162,25 +162,42 @@
 	}
 	
 }
-.x-tab-strip { 
+.x-tab-strip {
+
+	> li {
+		border-bottom: dp(4) solid transparent;
+		min-width: dp(72);
+		max-width: dp(264);
+		height: dp(48);
+		text-align:center;
+		line-height: dp(48);
+		padding: 0 dp(12);
+	}
+
 	&-top{
 		//width:100%; 
 		//display: flex;
 		//justify-content: center; // turn on to center tabs wont work with overflow
 		//flex-direction: row;
 		height: dp(48);
-		border-bottom: 2px solid transparent;
+		//border-bottom: 2px solid transparent;
 		@include var(color, c-primary);
 	}
 	&-bottom{
-		background-color:#cedff5;
-		border-top-color:#8db2e3;
+		height: dp(48);
+		//border-top: 2px solid transparent;
+		@include var(color, c-primary);
+		//background-color:#cedff5;
+		//border-top-color:#8db2e3;
+		> li {
+			border-top: dp(4) solid transparent;
+			border-bottom: 0;
+		}
 	}
 	&-wrap {
 		padding: 0 dp(4);
 	}
-	&-active {
-		border-bottom: dp(4) solid transparent;
+	>li.x-tab-strip-active {
 		@include var(border-color, c-primary);
 		span.x-tab-strip-text {
 			@include var(color, c-primary);
@@ -192,14 +209,7 @@
 	&-disabled .x-tabs-text {
 		color: color($fg, 'disabled');
 	}
-	> li {
-		min-width: dp(72);
-		max-width: dp(264);
-		height: dp(48);
-		text-align:center;
-		line-height: dp(48);
-		padding: 0 dp(12);
-	}
+
 	span.x-tab-strip-text {
 		padding:0;
 		color: color($fg, 'text');

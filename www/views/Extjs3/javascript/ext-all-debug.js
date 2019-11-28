@@ -15431,6 +15431,22 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
             c.label = c.getItemCt().child('label.x-form-item-label');
             if(!c.rendered){
                 c.render('x-form-el-' + c.id);
+                /* start extra code */
+                var newEl,
+                 fEl = Ext.fly('x-form-el-' + c.id),
+                 pos = {suffix: 'beforeEnd', prefix: 'afterBegin'};
+                for(var key in pos){
+                    if (c[key]) { // Field prefix/suffix
+                        if (c.isXType('trigger')) {
+                            newEl = c.wrap.insertHtml(pos[key],  '<span> ' + c[key] + ' </span>', true);
+                            c.el.setWidth(c.el.getWidth() - c.trigger.getWidth() - newEl.getWidth());
+                        } else {
+                            newEl = fEl.insertHtml(pos[key],  '<span> ' + c[key] + ' </span>', true);
+                            c.el.setWidth(c.el.getWidth() - newEl.getWidth());
+                        }
+                    }
+                }
+                /* end extra code */
             }else if(!this.isValidParent(c, target)){
                 Ext.fly('x-form-el-' + c.id).appendChild(c.getPositionEl());
             }
