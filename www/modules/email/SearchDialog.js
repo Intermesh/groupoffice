@@ -69,6 +69,27 @@ GO.email.SearchDialog = function(config){
 						selectOnFocus:true,
 						forceSelection: true
 					}),
+						this.flagsComboBox = new Ext.form.ComboBox({
+							fieldLabel: t("Labels", "email"),
+							name:'flags',
+							store: new GO.data.JsonStore({
+								url : GO.url("email/label/store"),
+								baseParams : {
+									account_id : 0
+								},
+								fields : ['id', 'name', 'flag', 'color', 'default'],
+								remoteSort : false
+							}),
+							value:'',
+							valueField:'id',
+							displayField:'name',
+							mode: 'remote',
+							triggerAction: 'all',
+							editable: false,
+							selectOnFocus:true,
+							forceSelection: true,
+							tpl: '<tpl for="."><div class="x-combo-list-item"><div style="background-color:#{color};float:left;margin-right:5px;width:16px;height:16px;">&nbsp;</div>{name}</div></tpl>'
+						}),
 					new Ext.form.ComboBox({
 						fieldLabel: t("Answered", "email"),
 						name:'answered',
@@ -173,6 +194,8 @@ GO.email.SearchDialog = function(config){
 		
 			}
 
+			//set account_id to labels combobox
+			this.flagsComboBox.store.setBaseParam('account_id', config.store.baseParams['account_id']);
 			this.dialog.show();
 
 			if(GO.email.search_query)
@@ -222,6 +245,8 @@ GO.email.SearchDialog = function(config){
 			var flagged = form.findField('flagged').getValue();
 			var seen = form.findField('seen').getValue();
 			var answered = form.findField('answered').getValue();
+			var flagsField = form.findField('flags'),
+				flag = flagsField.getValue();
 			
 			if (subject) {
 				query += 'SUBJECT "'+subject+'" ';
@@ -264,7 +289,11 @@ GO.email.SearchDialog = function(config){
 				query += ' '+answered;
 			}
 
-			
+			if (flag != '') {
+				flag = flagsField.store.getById(flagsField.getValue());
+				query += ' ' + 'KEYWORD ' + flag.get('flag');
+			}
+
 			return query;
 		}
 		
