@@ -111,7 +111,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 
 			//attempt login using security class inherited from index.php
 			
-			$user = \go\core\model\User::find()->where(['username' => $username])->single();
+			$user = \go\core\model\User::find(['id', 'username', 'password', 'enabled'])->where(['username' => $username])->single();
 			/* @var $user User */
 
 			if(!$user || !$user->enabled) {

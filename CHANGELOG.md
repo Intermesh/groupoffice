@@ -1,4 +1,9 @@
+28-11-2019 6.4.85
 - Core: Logo didn't display if you didn't set a different primary color
+- Core: Reload did too many requests causing unnecessary load on the server
+- Projects: Added projects grid and works on mobile
+- Core: Enter to submit for older dialogs
+- Core: Reduced push checks to every 30s instead of 5s to reduce load on server
 
 26-11-2019 6.4.84
 - Files: works on mobile

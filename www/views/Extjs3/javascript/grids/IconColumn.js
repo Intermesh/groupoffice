@@ -3,7 +3,7 @@ GO.grid.IconColumn = Ext.extend(Ext.grid.Column, {
 	constructor: function(cfg) {
 		//set required properties
 		cfg.id = 'icon';
-		cfg.width = dp(48);
+		cfg.width = dp(32);
 		cfg.sortable = false;
 		cfg.header = 'Icon';
 		cfg.resizable = false;
