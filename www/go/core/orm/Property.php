@@ -1437,6 +1437,8 @@ abstract class Property extends Model {
 			} else {
 				if(isset($stmt)) {
 					go()->error("Failed SQL: " . $stmt);
+                    go()->error($e->getMessage());
+                    go()->error($e->getTraceAsString());
 				}
 				throw $e;
 			}
