@@ -1,3 +1,5 @@
+- Core: Logo didn't display if you didn't set a different primary color
+
 26-11-2019 6.4.84
 - Files: works on mobile
 - Core: Fixed incorrect module sort order on first load
