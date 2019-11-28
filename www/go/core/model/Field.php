@@ -57,6 +57,8 @@ class Field extends AclItemEntity {
 	 * @var boolean
 	 */
 	public $required;
+
+	public $requiredCondition;
 	
 	/**
 	 * Hint text to display in the form
