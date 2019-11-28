@@ -74,7 +74,7 @@ class Migrate63to64 {
 				$addressBook->aclId = $aclId ? $aclId : null;
 				
 				$addressBook->name = $abRecord['name'];
-				$addressBook->filesFolderId = $abRecord['files_folder_id'];
+				$addressBook->filesFolderId = empty($abRecord['files_folder_id']) ? null : $abRecord['files_folder_id'];
 				
 				if (!$addressBook->save()) {
 					throw new Exception("Could not save addressbook: " .var_export($addressBook->getValidationErrors(), true));
@@ -534,7 +534,7 @@ class Migrate63to64 {
 
 			$contact->notes = $r['comment'];
 
-			$contact->filesFolderId = $r['files_folder_id'];
+			$contact->filesFolderId = empty($r['files_folder_id']) ? null : $r['files_folder_id'];
 
 			$contact->createdAt = new DateTime("@" . $r['ctime']);
 			$contact->modifiedAt = new DateTime("@" . $r['mtime']);
@@ -690,7 +690,7 @@ class Migrate63to64 {
 
 			$contact->notes = $r['comment'];
 
-			$contact->filesFolderId = $r['files_folder_id'];
+			$contact->filesFolderId = $contact->filesFolderId = empty($r['files_folder_id']) ? null : $r['files_folder_id'];
 
 			$contact->createdAt = new DateTime("@" . $r['ctime']);
 			$contact->modifiedAt = new DateTime("@" . $r['mtime']);

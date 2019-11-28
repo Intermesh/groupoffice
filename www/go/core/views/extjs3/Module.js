@@ -85,7 +85,7 @@ GO.mainLayout.on('render', function () {
 		items: [searchButton = new Ext.Button({
 				xtype: 'button',
 				iconCls: 'ic-search',
-				tooltip: t("Search") + " (" + (Ext.isMac ? '⌘' : 'CTRL') + ' + F)',
+				tooltip: t("Search") + " (" + (Ext.isMac ? '⌘ + ⇧' : 'CTRL + SHIFT') + ' + F)',
 				
 				handler: function () {
 					enableSearch();
@@ -117,6 +117,7 @@ GO.mainLayout.on('render', function () {
 		stopEvent:true,
 		key:Ext.EventObject.F,
 		ctrl:true,
+		shift: true,
 		fn:function(){
 				searchButton.handler();
 		}

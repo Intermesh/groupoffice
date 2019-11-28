@@ -2,11 +2,8 @@
 namespace go\core\acl\model;
 
 use go\core\model\Acl;
-use go\core\model\AclGroup;
 use go\core\App;
 use go\core\orm\Query;
-use go\core\jmap\Entity;
-use go\core\orm\Mapping;
 use go\core\exception\Forbidden;
 use go\core\db\Expression;
 
@@ -165,7 +162,11 @@ abstract class AclOwnerEntity extends AclEntity {
 		} else
 		{
 			$defaultAcl = Acl::findById(static::entityType()->getDefaultAclId());		
-			$this->acl = $defaultAcl->copy();
+			if($defaultAcl) {
+				$this->acl = $defaultAcl->copy();
+			} else{
+				$this->acl = new Acl();
+			}
 		}
 		$aclColumn = $this->getMapping()->getColumn('aclId');
 		if(!$aclColumn) {

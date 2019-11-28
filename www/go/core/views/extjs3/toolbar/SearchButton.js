@@ -112,24 +112,33 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			if(grid) {
 				this.store = grid.store;			
 			}
-		}	
+		}
+
+		this.bindStore(this.store);
 	
+
+	},
+
+
+	bindStore : function(store) {
+
+		this.store = store;
 		//default filter on 'text'
 		if(this.store) {
 			this.on({
 				scope: this,
 				search: function (tb, v, filters) {
 					if(this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) {
-					
+
 						this.store.setFilter('tbsearch', filters).load();
-						
+
 					} else {
 						//params for old framework
 						this.store.baseParams.query = v;
 						this.store.load();
 					}
-					
-					
+
+
 				},
 				reset: function() {
 					if(this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) {
@@ -138,7 +147,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 					} else {
 						delete this.store.baseParams.query;
 					}
-					
+
 					this.store.load();
 				}
 			});
