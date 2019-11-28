@@ -213,7 +213,7 @@ class Column {
 			default:
 				if ($this->trimInput) {
 					
-					if(!is_string($value) && !is_numeric($value)) {	 //is_nummeric should be gone but gave a problem with custom function fields
+					if(!is_string($value) && !is_numeric($value)) {	 //is_numeric should be gone but gave a problem with custom function fields
 						throw new Exception("No string given for ".$this->name);						
 					}
 					
