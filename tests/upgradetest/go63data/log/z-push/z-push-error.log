@@ -1,0 +1,8 @@
+14/02/2019 13:42:07 [   91] [FATAL] [#unknown] FatalException: FixFileOwner: /var/lib/groupoffice/log/z-push must be owned by the nginx/apache/php user instead of root for debian based systems and by root:z-push for RHEL-based systems - code: 0 - file: /usr/local/share/groupoffice/modules/z-push/vendor/z-push/lib/utils/utils.php:899
+14/02/2019 13:42:41 [   93] [FATAL] [#unknown] FatalException: FixFileOwner: /var/lib/groupoffice/zpush21state must be owned by the nginx/apache/php user instead of root for debian based systems and by root:z-push for RHEL-based systems - code: 0 - file: /usr/local/share/groupoffice/modules/z-push/vendor/z-push/lib/utils/utils.php:899
+14/02/2019 13:45:11 [   97] [FATAL] [#unknown] FatalException: Function pcntl_signal() is not available. Please install package 'php5-pcntl' (or similar) on your system. - code: 0 - file: /usr/local/share/groupoffice/modules/z-push/vendor/z-push/z-push-top.php:44
+22/02/2019 14:02:52 [   63] [FATAL] [#unknown] Exception: (AuthenticationRequiredException) - Access denied. Please send authorisation information
+22/02/2019 14:02:55 [   59] [FATAL] [#unknown] Exception: (AuthenticationRequiredException) - Access denied. Please send authorisation information
+22/02/2019 14:03:48 [   62] [FATAL] [#unknown] Exception: (AuthenticationRequiredException) - Access denied. Please send authorisation information
+22/02/2019 14:03:50 [   47] [FATAL] [#unknown] Exception: (AuthenticationRequiredException) - Access denied. Please send authorisation information
+22/02/2019 14:05:57 [   83] [FATAL] [#unknown] Exception: (ProvisioningRequiredException) - Retry after sending a PROVISION command

@@ -2,6 +2,8 @@
 
 namespace go\core\mail;
 
+use go\core\fs\Blob;
+
 /**
  * A mail message to send
  * 
@@ -36,6 +38,17 @@ class Message extends \Swift_Message {
 	public function setSubject($subject) {
 		$this->getHeaders();
 		return parent::setSubject($subject);
+	}
+
+	/**
+	 * Provide Blob. Blob attachment will be returned.
+	 * 
+	 * @param Blob $blob
+	 * @return static
+	 */
+	public function addBlob(Blob $blob) {
+		$this->attach(Attachment::fromBlob($blob)->setFilename($blob->name));
+		return $this;
 	}
 
 }

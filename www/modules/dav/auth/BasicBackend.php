@@ -49,12 +49,12 @@ class BasicBackend extends AbstractBasic {
 //	For basic auth
 	protected function validateUserPass($username, $password) {
 		
-		$user = User::find(['id', 'username', 'password'])->where(['username' => $username, 'enabled' => true])->single();
+		$user = User::find(['id', 'username', 'password', 'enabled'])->where(['username' => $username])->single();
 		/* @var $user User */
-		
-		if(!$user) {
-			return false;
-		}
+
+    if(!$user || !$user->enabled) {
+      return false;
+    }
 		
 		if(!$user->checkPassword($password)) {
 			return false;

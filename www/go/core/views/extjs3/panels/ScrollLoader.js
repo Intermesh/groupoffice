@@ -6,7 +6,7 @@
  */
 go.panels.ScrollLoader = {
 		
-	pageSize: 30,
+	pageSize: 40,
 	
 	scrollUp: false,  // set to true when you need to loadMore when scrolling up
 	
@@ -28,7 +28,7 @@ go.panels.ScrollLoader = {
 			}, this, {single: true});
 
 			this.store.on("load", function(store, records, o){
-				this.allRecordsLoaded = records.length < this.pageSize;
+				this.allRecordsLoaded = o.params.limit && (records.length < o.params.limit);
 				//If this element or any parent is hidden then  this.el.dom.offsetParent == null
 				if(this.rendered && this.el.dom.offsetParent) {
 					var me = this;
@@ -39,6 +39,16 @@ go.panels.ScrollLoader = {
 				}
 			}, this);
 		}
+	},
+
+
+	wasReloaded : function(o) {
+		console.warn(o);
+		if(!o || !o.params || !o.params.limit) {
+			return false;
+		}
+
+		return o.params.position == 0 && o.params.limit > this.pageSize;
 	},
 	
 	onRenderScrollLoader : function() {
@@ -88,6 +98,7 @@ go.panels.ScrollLoader = {
 	 * @returns {undefined}
 	 */
 	loadMore: function () {
+
 		this.toggleLoadMask();
 		var store = this.store;
 		if (this.allRecordsLoaded || this.store.loading){
@@ -96,7 +107,7 @@ go.panels.ScrollLoader = {
 
 		var me = this;
 		
-		var scrollBoundary = (this.slScroller.offsetHeight * 4) + 600;
+		var scrollBoundary = (this.slScroller.offsetHeight * 2) ;
 
 		if(this.scrollUp) {
 			
@@ -105,7 +116,8 @@ go.panels.ScrollLoader = {
 				o.add = true;
 				o.params = o.params || {};
 				o.params.position = o.params.position || 0;
-				o.params.position += this.pageSize;
+				o.params.position += (o.params.limit || this.pageSize);
+				o.params.limit = this.pageSize;
 				o.paging = true;
 
 				if(this.isGridPanel()) {
@@ -121,16 +133,16 @@ go.panels.ScrollLoader = {
 		} else {			
 
 			var pixelsLeft = this.slScroller.scrollHeight - this.slScroller.scrollTop - this.slScroller.offsetHeight;
-		
 			var shouldLoad = (pixelsLeft < scrollBoundary);
-		
+
 			if (shouldLoad) {
 				var o = store.lastOptions ? GO.util.clone(store.lastOptions) : {};
 				o.add = true;
 				o.params = o.params || {};
 
 				o.params.position = o.params.position || 0;
-				o.params.position += this.pageSize;
+				o.params.position += (o.params.limit || this.pageSize);
+				o.params.limit = this.pageSize;
 				o.paging = true;
 				o.keepScrollPosition = true;
 

@@ -132,7 +132,7 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 				GO.settings.modules[m.name] = m;
 				// m.url = 
 				GO.settings.modules[m.name].permission_level = m.permissionLevel;
-				GO.settings.modules[m.name].read_permission = !!m.permissionLevel
+				GO.settings.modules[m.name].read_permission = !!m.permissionLevel;
 				GO.settings.modules[m.name].write_permission = m.permissionLevel >= go.permissionLevels.write;
 			}
 		});

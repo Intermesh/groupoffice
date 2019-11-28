@@ -152,7 +152,7 @@ class Settings extends core\Settings {
 	protected $smtpPassword = null;
 	
 	
-	public function getSmtpPassword() {
+	public function decryptSmtpPassword() {
 		return Crypt::decrypt($this->smtpPassword);
 	}
 	

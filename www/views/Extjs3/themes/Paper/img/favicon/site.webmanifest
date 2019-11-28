@@ -2,8 +2,8 @@
 	"name": "Group-Office",
 	"short_name": "Group-Office",
 	"description": "Group-Office groupware",
-	"orientation": "landscape",
-	"version": "6.3",
+	"orientation": "any",
+	"version": "6.4",
 	"start_url": "/",
 	"icons": [
         {

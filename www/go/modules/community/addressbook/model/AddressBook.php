@@ -85,6 +85,10 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 
 		return "addressbook/" . File::stripInvalidChars($this->name);
 	}
+
+	public function filesPathProperties() {
+		return ['name'];
+	}
 	
 	// /**
 	//  * Get the group ID's

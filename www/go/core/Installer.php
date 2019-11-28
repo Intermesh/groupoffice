@@ -84,6 +84,7 @@ class Installer {
 
 		//don't cache on install
 		App::get()->getCache()->flush(false);
+		$cacheCls = get_class(App::get()->getCache());
 		App::get()->setCache(new None());
 
 		LoggingTrait::$enabled = false;
@@ -134,7 +135,7 @@ class Installer {
 
 
 
-		App::get()->setCache(new Disk());
+		App::get()->setCache(new $cacheCls);
 		Listeners::get()->init();
 
 		//phpunit tests will use change tracking after install

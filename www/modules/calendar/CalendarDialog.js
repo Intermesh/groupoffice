@@ -148,7 +148,7 @@ GO.calendar.CalendarDialog = function(config)
 			text:t("Export"),
 			disabled:true,
 			handler:function(){
-				document.location=GO.url("calendar/calendar/exportIcs", {"calendar_id":this.calendar_id});
+				go.util.downloadFile(GO.url("calendar/calendar/exportIcs", {"calendar_id":this.calendar_id}));
 			},
 			scope:this
 		})

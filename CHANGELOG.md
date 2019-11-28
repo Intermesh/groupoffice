@@ -1,3 +1,16 @@
+28-11-2019 6.4.85
+- Core: Logo didn't display if you didn't set a different primary color
+- Core: Reload did too many requests causing unnecessary load on the server
+- Projects: Added projects grid and works on mobile
+- Core: Enter to submit for older dialogs
+- Core: Reduced push checks to every 30s instead of 5s to reduce load on server
+
+26-11-2019 6.4.84
+- Files: works on mobile
+- Core: Fixed incorrect module sort order on first load
+- Core: Fixed image viewer for mobile
+- Core: Fixed install problem on multi instance
+
 22-11-2019 6.4.83
 - Core: Load state only on desktop
 - Core: Copy html editor style from text area element so it matches style from css and doesn't zoom on mobile

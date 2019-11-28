@@ -19,24 +19,31 @@ use go\core\Module;
  * @see Module::getSettings()
  */
 abstract class Settings extends Model {
-	
+
+  private static $instance = [];
 	/**
 	 * 
 	 * @return static
 	 */
-	public static function get() {		
-		$cls = static::class;
+	public static function get() {
+    $cls = static::class;
 
-		$instance = go()->getCache()->get($cls);
-		if($instance) {
-			return $instance;
-		}
-	
-		$instance = new static;	
+	  if(!isset(self::$instance[$cls])) {
 
-		go()->getCache()->set($cls, $instance);
 
-		return $instance;
+      $instance = go()->getCache()->get($cls);
+      if ($instance) {
+        self::$instance[$cls] = $instance;
+        return $instance;
+      }
+
+      $instance = new static;
+
+      go()->getCache()->set($cls, $instance);
+      self::$instance[$cls] = $instance;
+    }
+
+		return self::$instance[$cls];
 	}
 	
 

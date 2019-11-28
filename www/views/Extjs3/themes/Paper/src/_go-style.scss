@@ -1416,7 +1416,7 @@ table[id^="comments-ext"] b {
 
 @media screen and (max-width: 1200px) {
 	.go-main-tab-panel {
-		.x-tab-panel-header {
+		> .x-tab-panel-header {
 			display: none;
 		}
 	}
@@ -1731,7 +1731,7 @@ table[id^="comments-ext"] b {
 	text-decoration:underline;
 	color: $cAnchor;
 }
-.go-html-formatted a:visted{
+.go-html-formatted a:visited{
 	color:purple;
 }
 

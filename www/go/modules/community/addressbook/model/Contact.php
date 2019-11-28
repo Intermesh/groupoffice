@@ -18,11 +18,8 @@ use go\core\mail\Message;
 use go\core\TemplateParser;
 use go\core\db\Expression;
 use go\core\fs\File;
-use go\core\mail\Recipient;
 use go\core\model\Acl;
-use go\core\util\StringUtil;
 use GO\Files\Model\Folder;
-use GO\Files\Model\FolderNotificationMessage;
 
 /**
  * Contact model
@@ -392,14 +389,14 @@ class Contact extends AclItemEntity {
 	/**
 	 * Find contact by e-mail address
 	 * 
-	 * @param string $email
+	 * @param string $number
 	 * @return Query
 	 */
-	public static function findByPhone($email) {
+	public static function findByPhone($number) {
 		return static::find()
 						->join("addressbook_phone_number", "e", "e.contactId = c.id")
 						->groupBy(['c.id'])
-						->where('e.email', '=', $email);
+						->where('e.number', '=', $number);
 	}
 	
 	protected static function defineFilters() {

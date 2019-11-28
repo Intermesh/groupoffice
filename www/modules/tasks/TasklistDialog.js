@@ -33,7 +33,7 @@ GO.tasks.TasklistDialog = function(config)
 				text:t("Export"),
 				disabled:true,
 				handler:function(){
-					document.location=GO.url('tasks/task/exportIcs', {"tasklist_id":this.tasklist_id});
+					go.util.downloadFile(GO.url('tasks/task/exportIcs', {"tasklist_id":this.tasklist_id}));
 				},
 				scope:this
 			}),

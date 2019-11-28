@@ -42,26 +42,28 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 				boxLabel:t("Always respond to a read notification", "email"),
 				hideLabel:true,				
 				name:'emailSettings.always_respond_to_notifications'
-			}),this.fontSize = new GO.form.ComboBox({
-				fieldLabel:t("Default font size", "email"),
-				name:'emailSettings.font_size',
-				store : new Ext.data.SimpleStore({
-					fields : ['value'],
-					data : [
-						['10px'],['11px'],['12px'],['13px'],['14px'],['15px'],['16px'],
-						['17px'],['18px'],['19px'],['20px'],['21px'],['22px'],['23px'],['24px']
-					]
-				}),
-				width:80,
-				value : GO.email.fontSize,
-				valueField : 'value',
-				displayField : 'value',
-				mode : 'local',
-				triggerAction : 'all',
-				editable : false,
-				selectOnFocus : true,
-				forceSelection : true
-			})]
+			})
+			// ,this.fontSize = new GO.form.ComboBox({
+			// 	fieldLabel:t("Default font size", "email"),
+			// 	name:'emailSettings.font_size',
+			// 	store : new Ext.data.SimpleStore({
+			// 		fields : ['value'],
+			// 		data : [
+			// 			['10px'],['11px'],['12px'],['13px'],['14px'],['15px'],['16px'],
+			// 			['17px'],['18px'],['19px'],['20px'],['21px'],['22px'],['23px'],['24px']
+			// 		]
+			// 	}),
+			// 	width:80,
+			// 	value : GO.email.fontSize,
+			// 	valueField : 'value',
+			// 	displayField : 'value',
+			// 	mode : 'local',
+			// 	triggerAction : 'all',
+			// 	editable : false,
+			// 	selectOnFocus : true,
+			// 	forceSelection : true
+			// })
+		]
 			},
 //			this.templateGrid = new GO.email.TemplateGrid({
 //				ownedBy: null

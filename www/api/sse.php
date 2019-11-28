@@ -41,7 +41,7 @@ header('X-Accel-Buffering: no');
 ini_set('zlib.output_compression', 0);
 ini_set('implicit_flush', 1);
 
-const CHECK_INTERVAL = 5;
+const CHECK_INTERVAL = 30;
 const MAX_LIFE_TIME = 120;
 
 $ping = $_GET['ping'] ?? 10;
