@@ -1416,7 +1416,7 @@ table[id^="comments-ext"] b {
 
 @media screen and (max-width: 1200px) {
 	.go-main-tab-panel {
-		.x-tab-panel-header {
+		> .x-tab-panel-header {
 			display: none;
 		}
 	}
