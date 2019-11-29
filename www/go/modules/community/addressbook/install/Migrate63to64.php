@@ -83,7 +83,7 @@ class Migrate63to64 {
 
 			$this->copyCompanies($addressBook);
 			
-			$this->copyContacts($addressBook);	
+			$this->copyContacts($addressBook);
 			
 			echo "\n";
 			flush();
@@ -95,8 +95,26 @@ class Migrate63to64 {
 		$m = new \go\core\install\MigrateCustomFields63to64();
 		$m->migrateEntity("Contact");				
 		
-		$this->migrateCustomField();		
+		$this->migrateCustomField();
+
+    $this->checkCount();
 	}
+
+	private function checkCount() {
+	  $c = go()->getDbConnection();
+	  $oldContactCount = $c->selectSingleValue('count(*)')->from('ab_contacts')->single();
+    $oldCompanyCount = $c->selectSingleValue('count(*)')->from('ab_companies')->single();
+    $newCount = $c->selectSingleValue('count(*)')->from('addressbook_contact')->single();
+
+    echo "Migrated " . $newCount ." contacts and organizations\n";
+
+    if($oldContactCount + $oldCompanyCount != $newCount) {
+      echo "Companies in old ab: " . $oldCompanyCount ."\n";
+      echo "Companies in old ab: " . $oldContactCount ."\n";
+
+      throw new \Exception("Number of contacts is not equal to old contacts after migration. Please contact support.");
+    }
+  }
 	
 	private function addCustomFieldKeys() {
 		$c = go()->getDbConnection();
@@ -338,7 +356,7 @@ class Migrate63to64 {
 
 
 	private function copyContacts(AddressBook $addressBook) {
-		
+
 		
 		$db = go()->getDbConnection();
 
@@ -573,9 +591,7 @@ class Migrate63to64 {
 			}
 		}
 	}
-	
-	
-	
+
 	private function copyCompanies(AddressBook $addressBook) {
 		$db = go()->getDbConnection();		
 
