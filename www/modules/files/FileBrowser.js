@@ -405,7 +405,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	this.newMenu = new Ext.menu.Menu({
 		//id: 'new-menu',
 		items: [
-			this.uploadItem, {
+			{
 				iconCls: 'ic-folder',
 				text: t("Folder"),
 				handler: this.promptNewFolder,
@@ -507,41 +507,41 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 
 	
 
-	// this.jUploadItem = new Ext.menu.Item({
-	// 	iconCls: 'ic-file-upload',
-	// 	text : t("Folders (Java required)"),
-	// 	handler : function() {
-	// 		if ( GO.util.empty(this.gridStore.baseParams['query']) ) {
-	// 			GO.currentFilesStore=this.gridStore;
+	this.jUploadItem = new Ext.menu.Item({
+		iconCls: 'ic-file-upload',
+		text : t("Folders (Java required)"),
+		handler : function() {
+			if ( GO.util.empty(this.gridStore.baseParams['query']) ) {
+				GO.currentFilesStore=this.gridStore;
 				
-	// 			window.open(GO.url('files/jupload/renderJupload'));				
+				window.open(GO.url('files/jupload/renderJupload'));
 				
-	// 			Ext.MessageBox.confirm("Uploader", t("Please open the upload program and upload your files. Click 'Yes' when the upload is done.", 'files'),function(btn) {
+				Ext.MessageBox.confirm("Uploader", t("Please open the upload program and upload your files. Click 'Yes' when the upload is done.", 'files'),function(btn) {
 					
-	// 				if(btn == 'yes') {
-	// 					this.sendOverwrite({upload:true});
-	// 				}
-	// 			}, this);
+					if(btn == 'yes') {
+						this.sendOverwrite({upload:true});
+					}
+				}, this);
 
-	// 		} else {
-	// 			Ext.MessageBox.alert('',t("Can't do this when in search mode.", "files"));
-	// 		}
-	// 	},
-	// 	scope : this
-	// });
+			} else {
+				Ext.MessageBox.alert('',t("Can't do this when in search mode.", "files"));
+			}
+		},
+		scope : this
+	});
 
-	// this.uploadMenu = new Ext.menu.Menu({
-	// 	items: [
-	// 		this.uploadItem,
-	// 		this.jUploadItem
-	// 	]
-	// });
+	this.uploadMenu = new Ext.menu.Menu({
+		items: [
+			this.uploadItem,
+			this.jUploadItem
+		]
+	});
 
-	// this.uploadButton = new Ext.Button({
-	// 	text:t("Upload"),
-	// 	iconCls: 'ic-file-upload',
-	// 	menu: this.uploadMenu
-	// });
+	this.uploadButton = new Ext.Button({
+		tooltip:t("Upload"),
+		iconCls: 'ic-file-upload',
+		menu: this.uploadMenu
+	});
 
 
 
@@ -594,6 +594,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	// });
 
 	if(!config.hideActionButtons) {
+		tbar.push(this.uploadButton);
 		tbar.push(this.newButton);
 
 		tbar.push({
