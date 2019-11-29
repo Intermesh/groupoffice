@@ -2134,6 +2134,7 @@ GO.files.openFolder = function(id, folder_id)
 			//filePanelCollapsed:true
 		});
 		GO.files.fileBrowserWin = new GO.Window({
+			stateId: 'go-files-browser-win',
 			title: t("File browser", "files"),
 			height:dp(800),
 			width:dp(1200),
