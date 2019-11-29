@@ -1,3 +1,11 @@
+29-11-2019 6.4.86
+- Projects: Resizable detail view
+- Files: Quicker access to files via toolbars.
+- Files: Folder upload restored.
+- Billing: contact: and compnany: template tags added back in
+- Address book: Some companies might not have been migrated to the new address book.
+- Core: removed incomplete employees module
+
 28-11-2019 6.4.85
 - Core: Logo didn't display if you didn't set a different primary color
 - Core: Reload did too many requests causing unnecessary load on the server
