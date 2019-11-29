@@ -88,6 +88,11 @@ go.browserStorage = {
 	},
 
 	deleteDatabase : function () {
+
+		if(!this.enabled) {
+			return Promise.resolve(null);
+		}
+
 		var me = this;
 		return new Promise(function(resolve, reject) {
 				var openreq = indexedDB.deleteDatabase(me.dbName);

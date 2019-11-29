@@ -83,7 +83,7 @@ class Migrate63to64 {
 
 			$this->copyCompanies($addressBook);
 			
-			$this->copyContacts($addressBook);	
+			$this->copyContacts($addressBook);
 			
 			echo "\n";
 			flush();
@@ -95,8 +95,26 @@ class Migrate63to64 {
 		$m = new \go\core\install\MigrateCustomFields63to64();
 		$m->migrateEntity("Contact");				
 		
-		$this->migrateCustomField();		
+		$this->migrateCustomField();
+
+    $this->checkCount();
 	}
+
+	private function checkCount() {
+	  $c = go()->getDbConnection();
+	  $oldContactCount = $c->selectSingleValue('count(*)')->from('ab_contacts')->single();
+    $oldCompanyCount = $c->selectSingleValue('count(*)')->from('ab_companies')->single();
+    $newCount = $c->selectSingleValue('count(*)')->from('addressbook_contact')->single();
+
+    echo "Migrated " . $newCount ." contacts and organizations\n";
+
+    if($oldContactCount + $oldCompanyCount != $newCount) {
+      echo "Companies in old ab: " . $oldCompanyCount ."\n";
+      echo "Companies in old ab: " . $oldContactCount ."\n";
+
+      throw new \Exception("Number of contacts is not equal to old contacts after migration. Please contact support.");
+    }
+  }
 	
 	private function addCustomFieldKeys() {
 		$c = go()->getDbConnection();
@@ -338,7 +356,7 @@ class Migrate63to64 {
 
 
 	private function copyContacts(AddressBook $addressBook) {
-		
+
 		
 		$db = go()->getDbConnection();
 
@@ -348,15 +366,15 @@ class Migrate63to64 {
 						->orderBy(['id' => 'ASC']);
 		
 		//continue where we left last time if failed.
-		$max = $db->selectSingleValue('max(id)')
-						->from("addressbook_contact")
-						->where('id', '<', $this->getCompanyIdIncrement())
-						->andWhere(['addressBookId' => $addressBook->id])
-						->single();
-		
-		if($max>0) {
-			$contacts->andWhere('id', '>', $max);
-		}
+//		$max = $db->selectSingleValue('max(id)')
+//						->from("addressbook_contact")
+//						->where('id', '<', $this->getCompanyIdIncrement())
+//						->andWhere(['addressBookId' => $addressBook->id])
+//						->single();
+//
+//		if($max>0) {
+//			$contacts->andWhere('id', '>', $max);
+//		}
 						
 
 		$count = 0;
@@ -573,22 +591,20 @@ class Migrate63to64 {
 			}
 		}
 	}
-	
-	
-	
+//select * from ab_companies where (id + (select max(id) from ab_contacts)) not in (select id from addressbook_contact)
 	private function copyCompanies(AddressBook $addressBook) {
 		$db = go()->getDbConnection();		
 
 		$contacts = $db->select()
 		->from('ab_companies')
 		->where(['addressbook_id' => $addressBook->id])
-		->andWhere('id not in (select id + '.$this->getCompanyIdIncrement().' from addressbook_contact)');
+		->andWhere('(id + '.$this->getCompanyIdIncrement().') not in (select id from addressbook_contact)');
 		
 		//continue where we left last time if failed.
-		$max = $db->selectSingleValue('max(id)')->from("addressbook_contact")->andWhere(['addressBookId' => $addressBook->id])->single();
-		if($max>0) {
-			$contacts->andWhere('id', '>', $max - $this->getCompanyIdIncrement());
-		}
+//		$max = $db->selectSingleValue('max(id)')->from("addressbook_contact")->andWhere(['addressBookId' => $addressBook->id])->single();
+//		if($max>0) {
+//			$contacts->andWhere('id', '>', $max - $this->getCompanyIdIncrement());
+//		}
 
 		$count = 0;
 

@@ -51,7 +51,9 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 		
 		
 		this.bbar = [
-			this.browseBtn = new GO.files.FileBrowserButton()
+			this.browseBtn = new GO.files.DetailFileBrowserButton({
+				iconCls: ""
+			})
 		];
 		
 		this.browseBtn.on('close', function(btn, folderId) {
@@ -90,8 +92,8 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 	},
 	onLoad: function (dv) {
 
-		this.browseBtn.model_name = dv.model_name || dv.entity || dv.entityStore.entity.name;
-		this.browseBtn.setId(dv.data.id);		
+		// this.browseBtn.model_name = dv.model_name || dv.entity || dv.entityStore.entity.name;
+		// this.browseBtn.setId(dv.data.id);
 
 		this.detailView = dv;
 
