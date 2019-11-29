@@ -411,7 +411,7 @@ abstract class EntityController extends Controller {
 			go()->getDebugger()->debugTiming('item to array');
 		}
 
-		$result['notFound'] = isset($p['ids']) ? array_diff($p['ids'], $foundIds) : [];
+		$result['notFound'] = isset($p['ids']) ? array_values(array_diff($p['ids'], $foundIds)) : [];
 				
 		return $result;
 	}
