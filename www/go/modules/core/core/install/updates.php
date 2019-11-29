@@ -48,6 +48,10 @@ $updates["201803161130"][] = function() {
 		$config['language'] = 'en';
 	}
 
+  if(!isset($config['webmaster_email'])) {
+    $config['webmaster_email'] = 'webmaster@example.com';
+  }
+
 	if(!isset($config['smtp_host'])) {
 		$config['smtp_host'] = 'localhost';
 	}
