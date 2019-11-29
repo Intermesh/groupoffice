@@ -20,7 +20,7 @@ go.panels.ScrollLoader = {
 
 			this.store.baseParams.limit = this.pageSize;
 			
-			
+			// tests
 			this.on("afterrender", function() {
 				if(this.store.loaded) {
 					this.loadMore();
@@ -28,7 +28,8 @@ go.panels.ScrollLoader = {
 			}, this, {single: true});
 
 			this.store.on("load", function(store, records, o){
-				this.allRecordsLoaded = o.params.limit && (records.length < o.params.limit);
+				var limit = o.params && o.params.limit ? o.params.limit: this.pageSize;
+				this.allRecordsLoaded = (records.length < limit);
 				//If this element or any parent is hidden then  this.el.dom.offsetParent == null
 				if(this.rendered && this.el.dom.offsetParent) {
 					var me = this;
