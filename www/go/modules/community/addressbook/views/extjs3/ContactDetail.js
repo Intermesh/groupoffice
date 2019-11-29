@@ -320,10 +320,10 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 
 				]
 			}]);
-		
+
 		if(go.Modules.isAvailable("legacy", "files")) {
-			this.moreMenu.menu.splice(1,0,{
-				xtype: "filebrowsermenuitem"
+			items.splice(items.length - 1, 0,{
+				xtype: "detailfilebrowserbutton"
 			});
 		}
 
