@@ -19,6 +19,7 @@
 namespace GO\Addressbook\Controller;
 use GO;
 
+//use function GuzzleHttp\json_decode;
 
 class ContactController extends \GO\Base\Controller\AbstractModelController{
 	
@@ -734,7 +735,13 @@ class ContactController extends \GO\Base\Controller\AbstractModelController{
 	}
 	
 	protected function actionSelectContact($params){
-		
+		$cfId = $params["customfield_id"];
+		$cfModel = \GO\Customfields\Model\Field::model()->findByPk($cfId);
+
+		$options = $cfModel->options;
+		$optionsDecoded = json_decode($options,true);
+		$addressBookIds = $optionsDecoded["addressbookIds"];
+		$params['addressbook_ids'] = "[" . $addressBookIds . "]";
 		$response = array('total'=>0, 'results'=>array());
 		
 		if(isset($params['contact_id'])){
