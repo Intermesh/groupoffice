@@ -1680,6 +1680,7 @@ abstract class Property extends Model {
 
 			case 'int':
 			case 'tinyint':
+			case 'smallint':
 			case 'bigint':
 
 			case 'float':
