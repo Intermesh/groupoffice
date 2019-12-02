@@ -153,10 +153,11 @@
 		html:t("Start page", "summary"),
 		cls:'go-module-title-tbar'
 	},{
-  	text: t("Add"),
-  	iconCls:'btn-add',
-  	handler: this.showAvailablePortlets,
-  	scope: this
+		id: 'add',
+		text: t("Add"),
+		iconCls:'ic-add',
+		handler: this.showAvailablePortlets,
+		scope: this
     }];
 
   if(GO.settings.modules.summary.write_permission)
