@@ -1,3 +1,7 @@
+02-12-2019 6.4.87
+- Files: Missing new folder button
+- Core: Export sometimes only exported 40 records.
+
 29-11-2019 6.4.86
 - Projects: Resizable detail view
 - Files: Quicker access to files via toolbars.

@@ -239,8 +239,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 									iconCls: 'ic-contacts',
 									handler: function() {
 										go.util.exportToFile(
-														'Contact', 
-														Ext.apply(go.util.clone(this.grid.store.baseParams), this.grid.store.lastOptions.params, {limit: 0, start: 0}),
+														'Contact',
+														Object.assign(go.util.clone(this.grid.store.baseParams), this.grid.store.lastOptions.params, {limit: 0, position: 0}),
 														'text/vcard');									
 									},
 									scope: this
@@ -249,8 +249,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 									iconCls: 'ic-description',
 									handler: function() {
 										go.util.exportToFile(
-														'Contact', 
-														Ext.apply(go.util.clone(this.grid.store.baseParams), this.grid.store.lastOptions.params, {limit: 0, start: 0}),
+														'Contact',
+														Object.assign(go.util.clone(this.grid.store.baseParams), this.grid.store.lastOptions.params, {limit: 0, position: 0}),
 														'text/csv');									
 									},
 									scope: this

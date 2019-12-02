@@ -433,12 +433,12 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 			this.uploadItem,
 			this.jUploadItem,
 			'-',
-			{
+			this.newFolderBtn = new Ext.menu.Item({
 				iconCls: 'ic-folder',
 				text: t("Folder"),
 				handler: this.promptNewFolder,
 				scope: this
-			}]
+			})]
 	});
 
 	this.newButton = new Ext.Button({
@@ -530,14 +530,6 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		},
 		"->"
 	];
-
-	
-
-	
-
-
-
-
 
 
 	if(!config.hideActionButtons) {		
@@ -1177,8 +1169,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 		var l = this.newMenu.items.getCount();
 
-		if(l > 2) {
-			for(var i = l - 1; i > 2; i--) {
+		if(l > 3) {
+			for(var i = l - 1; i > 3; i--) {
 				this.newMenu.items.itemAt(i).destroy();			
 			}
 		}
