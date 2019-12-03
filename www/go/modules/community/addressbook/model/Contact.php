@@ -467,6 +467,13 @@ class Contact extends AclItemEntity {
 											
 											$criteria->where('adr.street', $comparator, $value);
 										})
+                    ->addText("zip", function(Criteria $criteria, $comparator, $value, Query $query) {
+                      if(!$query->isJoined('addressbook_address')) {
+                        $query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
+                      }
+
+                      $criteria->where('adr.zipCode', $comparator, $value);
+                    })
 										->addNumber("age", function(Criteria $criteria, $comparator, $value, Query $query) {
 											
 											if(!$query->isJoined('addressbook_date')) {
@@ -576,7 +583,7 @@ class Contact extends AclItemEntity {
 	}
 
 	protected static function textFilterColumns() {
-		return ['name', 'debtorNumber', 'notes', 'emailAddresses.email'];
+		return ['name', 'debtorNumber', 'notes', 'emailAddresses.email', 'addresses.zipCode'];
 	}
 
 	protected static function search(\go\core\db\Criteria $criteria, $expression, \go\core\orm\Query $query)
@@ -584,6 +591,9 @@ class Contact extends AclItemEntity {
 		if(!$query->isJoined('addressbook_email_address', 'emailAddresses')) {
 			$query->join('addressbook_email_address', 'emailAddresses', 'emailAddresses.contactId = c.id', 'LEFT')->groupBy(['c.id']);
 		}
+    if(!$query->isJoined('addressbook_address', 'addresses')) {
+      $query->join('addressbook_address', 'addresses', 'addresses.contactId = c.id', 'LEFT')->groupBy(['c.id']);
+    }
 		return parent::search($criteria, $expression, $query);
 	}
 	
