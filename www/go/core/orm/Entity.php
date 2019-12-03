@@ -42,7 +42,14 @@ abstract class Entity extends Property {
 	 * @param Entity $entity The entity that will be saved
 	 */
 	const EVENT_BEFORESAVE = 'beforesave';
-	
+
+	/**
+	 * Fires just before the entity will be deleted
+	 *
+	 * @param Entity $entity The entity that will be saved
+	 */
+	const EVENT_BEFOREDELETE = 'beforedelete';
+
 	/**
 	 * Fires after the entity has been saved
 	 * 
@@ -326,6 +333,11 @@ abstract class Entity extends Property {
 					go()->getDbConnection()->rollBack();
 					return false;
 				}
+			}
+
+			if(!static::fireEvent(static::EVENT_BEFOREDELETE, $query)) {
+				go()->getDbConnection()->rollBack();
+				return false;
 			}
 
 			if (!static::internalDelete($query)) {
