@@ -654,6 +654,46 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		return "[link:".base64_encode($_SERVER['SERVER_NAME'].','.$account->id.','.$model_name.','.$model_id)."]";
 	}
 
+	private function _findUnknownRecipients($params) {
+
+		$unknown = array();
+
+		if (GO::modules()->addressbook && !GO::config()->get_setting('email_skip_unknown_recipients', GO::user()->id)) {
+
+			$recipients = new \GO\Base\Mail\EmailRecipients($params['to']);
+			$recipients->addString($params['cc']);
+			$recipients->addString($params['bcc']);
+
+			foreach ($recipients->getAddresses() as $email => $personal) {
+				$contacts = \go\modules\community\addressbook\model\Contact::findByEmail($email);
+
+				foreach($contacts as $contact){
+					
+					if($contact->getPermissionLevel(Acl::READ_PERMISSION) || $contact->goUser && $contact->goUser->getPermissionLevel(Acl::READ_PERMISSION)){
+						continue 2;
+					}
+				}
+
+				// $company = \GO\Addressbook\Model\Company::model()->findSingleByAttribute('email', $email);
+				// if ($company)
+				// 	continue;
+				
+
+				$recipient = \GO\Base\Util\StringHelper::split_name($personal);
+				if ($recipient['first_name'] == '' && $recipient['last_name'] == '') {
+					$recipient['first_name'] = $email;
+				}
+				$recipient['email'] = $email;
+				$recipient['name'] = (string) \GO\Base\Mail\EmailRecipients::createSingle($email, $personal);
+
+				$unknown[] = $recipient;
+			}
+		}
+
+		return $unknown;
+	}
+
+
 	/**
 	 *
 	 * @todo Save to sent items should be implemented as a Swift outputstream for better memory management
@@ -815,7 +855,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		
 		$this->_link($params, $message, $tags);
 
-		//$response['unknown_recipients'] = $this->_findUnknownRecipients($params);
+		$response['unknown_recipients'] = $this->_findUnknownRecipients($params);
 
 
 		return $response;

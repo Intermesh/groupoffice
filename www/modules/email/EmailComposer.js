@@ -1416,18 +1416,18 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 							var callback = this.callback.createDelegate(this.scope);
 							callback.call();
 						}
+						
+						if (GO.addressbook && action.result.unknown_recipients
+							&& action.result.unknown_recipients.length) {
+							if (!GO.email.unknownRecipientsDialog)
+								GO.email.unknownRecipientsDialog = new GO.email.UnknownRecipientsDialog();
 	
-//						if (GO.addressbook && action.result.unknown_recipients
-//							&& action.result.unknown_recipients.length) {
-//							if (!GO.email.unknownRecipientsDialog)
-//								GO.email.unknownRecipientsDialog = new GO.email.UnknownRecipientsDialog();
-//	
-//							GO.email.unknownRecipientsDialog.store.loadData({
-//								recipients : action.result.unknown_recipients
-//							});
-//	
-//							GO.email.unknownRecipientsDialog.show();
-//						}
+							GO.email.unknownRecipientsDialog.store.loadData({
+								recipients : action.result.unknown_recipients
+							});
+	
+							GO.email.unknownRecipientsDialog.show();
+						}
 
 	
 						this.fireEvent('send', this);

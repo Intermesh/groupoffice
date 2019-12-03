@@ -9,6 +9,7 @@ modules/email/AccountsDialog.js
 modules/email/AccountsGrid.js
 modules/email/MessagesGrid.js
 modules/email/AccountsTree.js
+modules/email/UnknownRecipientsDialog.js
 modules/email/AddressbookDialog.js
 modules/email/SelectAccount.js
 
