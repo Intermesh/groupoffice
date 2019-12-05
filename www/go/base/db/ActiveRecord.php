@@ -2347,6 +2347,19 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 				case 'date':
 					return  \GO\Base\Util\Date::to_db_date($value);
 					break;
+				case 'datetime':
+					if(empty($value))
+					{
+						return null;
+					}
+					$time = \GO\Base\Util\Date::to_unixtime($value);
+					if(!$time)
+					{
+						return null;
+					}
+					$date_format =  'Y-m-d H:i:s';
+					return date($date_format, $time);
+					break;
 				case 'textfield':
 					return (string) $value;
 					break;
@@ -2425,6 +2438,15 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 				return $date->format(GO::user()?GO::user()->completeDateFormat:GO::config()->getCompleteDateFormat());
 
 				//return $value != '0000-00-00' ? \GO\Base\Util\Date::get_timestamp(strtotime($value),false) : '';
+				break;
+
+			case 'datetime':
+
+				if($value == "0000-00-00" || empty($value))
+					return null;
+
+				$date = new \DateTime($value);
+				return $date->format('c');
 				break;
 
 			case 'number':
