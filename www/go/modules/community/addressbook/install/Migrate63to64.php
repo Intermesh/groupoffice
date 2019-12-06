@@ -100,6 +100,13 @@ class Migrate63to64 {
     $this->checkCount();
 	}
 
+  /**
+   * Must be run on a copy. Result exported with insert ignore to be merged in live db,
+   */
+	public function fixMissing() {
+
+  }
+
 	private function checkCount() {
 	  $c = go()->getDbConnection();
 	  $oldContactCount = $c->selectSingleValue('count(*)')->from('ab_contacts')->single();

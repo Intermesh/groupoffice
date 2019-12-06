@@ -49,8 +49,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			hideLabel: true,
 			listeners: {
 				scope: this,
-				select: function (cmb, record, index) {	
-					alert();				
+				select: function (cmb, record, index) {
 					this.linkGrid.store.loadData({"records" :[{
 						"toId": record.get('entityId'),
 						"toEntity": record.get('entity'),
