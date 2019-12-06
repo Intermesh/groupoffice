@@ -1,3 +1,5 @@
+- Address book: Added zipcode to text search and as zip: 1234 AB
+
 02-12-2019 6.4.87
 - Files: Missing new folder button
 - Core: Export sometimes only exported 40 records.

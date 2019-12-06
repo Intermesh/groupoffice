@@ -163,11 +163,11 @@ try {
 		} else if(isset($data['loginToken'])){
 			$token = Token::find()->where(['loginToken' => $data['loginToken']])->single();
 		} else {
-      output([], 400, "Invalid token given");
+      output(["error" => "Invalid token given"], 400, "No token given");
     }
 
 		if (!$token) {
-			output([], 400, "Invalid token given");
+			output(["error" => "Invalid token given"], 400, "Invalid token given");
 		}
 	}
 
