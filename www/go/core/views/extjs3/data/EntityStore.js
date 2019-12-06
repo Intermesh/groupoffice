@@ -197,15 +197,14 @@ go.data.EntityStore = Ext.extend(go.flux.Store, {
 	
 	_fireChanges : function() {
 		var me = this;
-
 		if (me.timeout) {
 			clearTimeout(me.timeout);
 		}
 		
 		//delay fireevent one event loop cycle
+		me.fireEvent('changes', me, me.changes.added, me.changes.changed, me.changes.destroyed);
 		me.timeout = setTimeout(function () {
 			// console.warn('changes', me.entity.name, me.changes.added, me.changes.changed, me.changes.destroyed);
-			me.fireEvent('changes', me, me.changes.added, me.changes.changed, me.changes.destroyed);			
 			me.initChanges();
 			me.timeout = null;
 		}, 0);
