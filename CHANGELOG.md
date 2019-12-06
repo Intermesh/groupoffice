@@ -1,3 +1,5 @@
+06-12-2019 6.4.88
+- Files: New Assistant implementation without webdav requirement. Clients need to be updated!
 - Address book: Added zipcode to text search and as zip: 1234 AB
 
 02-12-2019 6.4.87
