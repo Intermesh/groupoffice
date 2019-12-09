@@ -50,6 +50,7 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Notes: Supports activity log
 - Core: Fixed error when setting module permissions on group
 - Core: Added title's to combo box list items so you can see the whole text when it' cut off.
+- Files: New folder button was missing in "Save as" mode
 
 20-11-2019 6.4.82
 - Core: Create debug log file if not exists
