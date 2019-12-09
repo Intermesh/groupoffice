@@ -8,6 +8,7 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Core: Cleaned up EntityStore code
 - Address book: Sorry, an unexpected error occurred: The contact groups must match with the addressBookId. Group ID: 10 belongs to 3 and the contact belongs to 1
 - Projects: Removed broken natural sort and added created and modified at columns
+- Custom fields: Ignore maxLength on text area's
 
 06-12-2019 6.4.88
 - Files: New Assistant implementation without webdav requirement. Clients need to be updated!

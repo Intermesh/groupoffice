@@ -140,8 +140,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					listeners: {
 						scope: this,
 						afterrender: function(box) {
-							
-							box.getEl().on('click', function(e){								
+							box.getEl().on('click', function(e){
+
+								//don't execute when user selects text
+								if(window.getSelection().toString().length > 0) {
+									return;
+								}
+
 								var container = box.getEl().dom.firstChild, 
 								item = e.getTarget("a", box.getEl()),
 								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
@@ -169,7 +174,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						scope: this,
 						afterrender: function(box) {
 							
-							box.getEl().on('click', function(e){								
+							box.getEl().on('click', function(e){
+
+								//don't execute when user selects text
+								if(window.getSelection().toString().length > 0) {
+									return;
+								}
+
 								var container = box.getEl().dom.firstChild, 
 								item = e.getTarget("a", box.getEl()),
 								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
