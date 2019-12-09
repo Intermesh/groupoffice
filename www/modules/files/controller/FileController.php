@@ -3,6 +3,7 @@
 
 namespace GO\Files\Controller;
 
+use GO\Base\Exception\NotFound;
 use GO\Files\Model\File;
 use go\core\fs\Blob;
 use go\core\fs\File as GoFile;
@@ -369,6 +370,9 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		
 		if(isset($params['path'])){
 			$folder = \GO\Files\Model\Folder::model()->findByPath(dirname($params['path']));
+			if(!$folder) {
+			  throw new NotFound($params['path']);
+      }
 			$file = $folder->hasFile(\GO\Base\Fs\File::utf8Basename($params['path']));
 		}else
 		{

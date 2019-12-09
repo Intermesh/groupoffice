@@ -77,7 +77,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 	onAddressBookChanges: function (entityStore, added, changed, destroyed) {
 
 		//reload if added address book is not present in tree yet.
-		var me = this, reload = false, id;
+		var me = this, reload = false, id, nodeId, node;
 		for (id in added) {
 			if (!me.findAddressbookNode(id)) {
 				me.getRootNode().reload();
@@ -97,15 +97,8 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 				}
 
 				if (changed[id].groups) {
-					for(var i =0, l = changed[id].groups.length; i < l; i ++) {
-						var groupId = changed[id].groups[i];
-						if(!this.getNodeById("AddressBookGroup-" + groupId)) {							
-							delete node.attributes.children;
-							node.reload();
-							break;
-						}
-					}
-					
+					delete node.attributes.children;
+					node.reload();
 				}
 			}
 
@@ -124,14 +117,29 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 			return;
 		}
 
-		var me = this, groupId;
+		var me = this, groupId, reloadAddressBookIds = [];
+		for (groupId in added) {
+			reloadAddressBookIds.push(added[groupId].addressBookId);
+		}
 		for (groupId in changed) {
 			var nodeId = "AddressBookGroup-" + groupId;
-			me.getNodeById(nodeId).setText(changed[groupId].name);
+			var node = me.getNodeById(nodeId);
+			if(node) {
+				node.setText(changed[groupId].name);
+			} else
+			{
+				reloadAddressBookIds.push(changed[groupId].addressBookId);
+			}
 		}		
 
 		destroyed.forEach(function (groupId) {
 			me.getNodeById("AddressBookGroup-" + groupId).destroy();
+		});
+
+		reloadAddressBookIds.forEach(function (addressBookId) {
+			var abNode = me.getNodeById("AddressBook-" + addressBookId);
+			delete abNode.attributes.children;
+			abNode.reload();
 		});
 	},
 	

@@ -228,8 +228,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 		return this;
 	},
 	
-	getValues : function() {
-		return this.formPanel.getValues();
+	getValues : function(dirtyOnly) {
+		return this.formPanel.getValues(dirtyOnly);
 	},
 
 	load: function (id) {

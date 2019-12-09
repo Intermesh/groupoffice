@@ -471,19 +471,21 @@ class GO{
 	public static function config() {
 		if (!isset(self::$_config)) {
 
-			if(Apcu::isSupported() && ($token = State::getClientAccessToken())) {
-				$cacheKey = 'go_old_conf_' . $token;
-				self::$_config = apcu_fetch($cacheKey);
-				if(self::$_config && self::$_config->cacheTime > filemtime(self::$_config->configPath) && (!file_exists('/etc/groupoffice/globalconfig.inc.php') || self::$_config->cacheTime > filemtime('/etc/groupoffice/globalconfig.inc.php'))) {
-					return self::$_config;
-				}
-			}
+			// TODO: improve later, This will cache the same config file for a different installation if: same domain + same $token cookie
+//			if(Apcu::isSupported() && ($token = State::getClientAccessToken())) {
+//				$cacheKey = 'go_old_conf_' . $token;
+//				self::$_config = apcu_fetch($cacheKey);
+//				if(self::$_config && self::$_config->cacheTime > filemtime(self::$_config->configPath) && (!file_exists('/etc/groupoffice/globalconfig.inc.php') || self::$_config->cacheTime > filemtime('/etc/groupoffice/globalconfig.inc.php'))) {
+//					return self::$_config;
+//				}
+//			}
 
 			self::$_config = new \GO\Base\Config();
 			
 			if(isset($cacheKey)) {
 				self::$_config->cacheTime = time();
-				apcu_store($cacheKey, self::$_config);
+
+				//apcu_store($cacheKey, self::$_config);
 			}
 		}
 		return self::$_config;
