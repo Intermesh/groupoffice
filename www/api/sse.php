@@ -27,6 +27,8 @@ if(!go()->getConfig()['core']['general']['sseEnabled'] || (function_exists("xdeb
 	echo "Server Sent Events not available";
 	exit();
 }
+$CHECK_INTERVAL = go()->getDebugger()->enabled ? 5 : 30;
+const MAX_LIFE_TIME = 120;
 
 //Hard code debug to false to prevent spamming of log.
 App::get()->getDebugger()->enabled = false;
@@ -41,8 +43,7 @@ header('X-Accel-Buffering: no');
 ini_set('zlib.output_compression', 0);
 ini_set('implicit_flush', 1);
 
-const CHECK_INTERVAL = 30;
-const MAX_LIFE_TIME = 120;
+
 
 $ping = $_GET['ping'] ?? 10;
 $sleeping = 0;
@@ -102,7 +103,7 @@ function diff($old, $new) {
 	}
 	
 	//sendMessage('ping', []);
-for($i = 0; $i < MAX_LIFE_TIME; $i += CHECK_INTERVAL) {
+for($i = 0; $i < MAX_LIFE_TIME; $i += $CHECK_INTERVAL) {
 
 	// break the loop if the client aborted the connection (closed the page)
 	if(connection_aborted()) {
@@ -124,6 +125,6 @@ for($i = 0; $i < MAX_LIFE_TIME; $i += CHECK_INTERVAL) {
 	}
 
 	go()->getDbConnection()->disconnect();
-	$sleeping += CHECK_INTERVAL;
-	sleep(CHECK_INTERVAL);
+	$sleeping += $CHECK_INTERVAL;
+	sleep($CHECK_INTERVAL);
 }
