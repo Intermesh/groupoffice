@@ -110,7 +110,13 @@ class Sieve {
 	}
 
 	public function __destruct() {
-		$this->sieve->disconnect();
+	  try {
+      $this->sieve->disconnect();
+    }
+    catch(Exception $e) {
+	    //ignore in production
+      go()->warn($e);
+    }
 	}
 
 	/**
