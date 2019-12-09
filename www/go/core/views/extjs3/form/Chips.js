@@ -245,7 +245,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			value:"",
 			tpl: new Ext.XTemplate(
 				'<tpl for=".">',
-				'<div class="x-combo-list-item"><tpl if="!values.' + this.valueField + '"><b>' + t("Create new") + ':</b> </tpl>{' + this.displayField + '}</div>',
+				'<div class="x-combo-list-item" title="{[fm.htmlEncode(values[\'' + this.displayField + '\'] || \'\' )]}"><tpl if="!values.' + this.valueField + '"><b>' + t("Create new") + ':</b> </tpl>{' + this.displayField + '}</div>',
 				'</tpl>')
 		});		
 		

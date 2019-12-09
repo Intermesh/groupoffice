@@ -42,6 +42,7 @@ go.customfields.type.TextArea = Ext.extend(go.customfields.type.Text, {
 		config.xtype = "textarea";
 		config.grow = true;
 		config.preventScrollbars = true;
+		config.maxLength = 65535;
 
 		return config;
 	},

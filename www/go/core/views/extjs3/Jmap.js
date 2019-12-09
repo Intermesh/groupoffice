@@ -316,13 +316,8 @@ go.Jmap = {
 							console.error('server-side JMAP failure', response);							
 						}
 
-						go.flux.Dispatcher.dispatch(response[0], {
-							options: o,
-							response: response[1]
-						});
-
 						//make sure dispatch is executed before callbacks and resolves.
-						setTimeout(function() {
+						// setTimeout(function() {
 							var success = response[0] !== "error";
 							if (o.callback) {
 								if (!o.scope) {
@@ -340,7 +335,7 @@ go.Jmap = {
 							}
 
 							delete me.requestOptions[response[2]];
-						}, 0);
+						// }, 0);
 					}, this);
 
 				// } catch(e) {					

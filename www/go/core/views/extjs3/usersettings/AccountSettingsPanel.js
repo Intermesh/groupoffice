@@ -175,8 +175,9 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 				visible = true;
 			}
 		});
-		
-		this.passwordFieldset.setVisible(visible);
+
+		this.passwordField1.setDisabled(!visible);
+		this.passwordField2.setDisabled(!visible);
 	},
 	
 	onValidate : function() {

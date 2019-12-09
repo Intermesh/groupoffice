@@ -1,3 +1,24 @@
+09-12-2019 6.4.89
+- Files: We did an update to Group-Office which comes with a new implementation of the Group-Office Assistant. If you use this please update it to the new version. You can find it under "Files" for your operating system at this page:
+https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-device.html
+
+- Postfix admin: Auto grow alias field
+- Core: "Login enabled" checkbox visible when using IMAP or LDAP authentication
+- Email: Fixed error in sieve disconnect
+- EMail: Added new header X-Group-Office-Title: Group-Office 
+- Core: Cleaned up EntityStore code
+- Address book: Sorry, an unexpected error occurred: The contact groups must match with the addressBookId. Group ID: 10 belongs to 3 and the contact belongs to 1
+- Projects: Removed broken natural sort and added created and modified at columns
+- Custom fields: Ignore maxLength on text area's
+- Address book: Don't open links when selecting them for text copy
+- Core: Disable spell check on search fields
+- Core: Database check continues if there's an exception
+- Core: Different polyfill promise to support Windows XP with old Chrome.
+
+06-12-2019 6.4.88
+- Files: New Assistant implementation without webdav requirement. Clients need to be updated!
+- Address book: Added zipcode to text search and as zip: 1234 AB
+
 02-12-2019 6.4.87
 - Files: Missing new folder button
 - Core: Export sometimes only exported 40 records.
@@ -31,6 +52,10 @@
 - Core: Fixed fatal error that aborted the 6.3 to 6.4 upgrade in some cases
 - Notes: Supports activity log
 - Core: Fixed error when setting module permissions on group
+- Core: Added title's to combo box list items so you can see the whole text when it' cut off.
+- Files: New folder button was missing in "Save as" mode
+- Projects: Icon column growing too large bug
+- Projects: Wrapping of tables for better display on smaller screens
 
 20-11-2019 6.4.82
 - Core: Create debug log file if not exists
