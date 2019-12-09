@@ -77,7 +77,7 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 	onAddressBookChanges: function (entityStore, added, changed, destroyed) {
 
 		//reload if added address book is not present in tree yet.
-		var me = this, reload = false, id;
+		var me = this, reload = false, id, nodeId, node;
 		for (id in added) {
 			if (!me.findAddressbookNode(id)) {
 				me.getRootNode().reload();
@@ -96,20 +96,9 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 					node.setText(changed[id].name);
 				}
 
-
 				if (changed[id].groups) {
 					delete node.attributes.children;
 					node.reload();
-					//
-					// for(var i =0, l = changed[id].groups.length; i < l; i ++) {
-					// 	var groupId = changed[id].groups[i];
-					// 	if(!this.getNodeById("AddressBookGroup-" + groupId)) {
-					// 		delete node.attributes.children;
-					// 		node.reload();
-					// 		break;
-					// 	}
-					// }
-					
 				}
 			}
 
