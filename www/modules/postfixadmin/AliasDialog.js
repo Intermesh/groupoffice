@@ -59,6 +59,7 @@ GO.postfixadmin.AliasDialog = Ext.extend(GO.dialog.TabbedFormDialog,{
 			  name: 'goto',
 				anchor: '-20',
 			  allowBlank:true,
+				grow: true,
 				height:120,
 			  fieldLabel: t("Goto", "postfixadmin"),
 				plugins:[new Ext.ux.FieldHelp(t("For multiple recipients use a comma separated list eg. alias1@domain.com,alias2@domain.com", "postfixadmin"))]
