@@ -40232,6 +40232,8 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
 
     placeholder: "",
 
+    spellCheck: true,
+
     fieldClass : 'x-form-field',
     
     msgTarget : 'qtip',
@@ -40291,6 +40293,12 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
 
             cfg.autocomplete = this.autocomplete;
             cfg.placeholder = this.placeholder;
+
+            if(!this.spellCheck) {
+              cfg.autocorrect="off";
+              cfg.autocapitalize="off";
+              cfg.spellcheck="false";
+            }
             
             this.autoEl = cfg;
         }
