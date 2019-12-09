@@ -9,6 +9,7 @@ go.search.SearchCombo = Ext.extend(go.form.ComboBox, {
 	selectOnFocus: true,
 	forceSelection: true,
 	allowBlank: true,
+	spellCheck: false,
 	initComponent: function () {
 		
 		this.tpl = new Ext.XTemplate(

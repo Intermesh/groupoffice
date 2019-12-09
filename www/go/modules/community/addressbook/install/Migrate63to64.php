@@ -119,7 +119,14 @@ class Migrate63to64 {
       echo "Companies in old ab: " . $oldCompanyCount ."\n";
       echo "Companies in old ab: " . $oldContactCount ."\n";
 
-      throw new \Exception("Number of contacts is not equal to old contacts after migration. Please contact support.");
+      echo "Number of contacts is not equal to old contacts after migration. This might happen if there are some orphan contacts. You can identify them with:<br />
+       <br />
+      select * from ab_contacts where addressbook_id not in (select id from ab_addressbooks);<br />
+      select * from ab_companies where addressbook_id not in (select id from ab_addressbooks);<br />
+      <br />
+      Perhaps you can simply delete them?";
+
+      throw new \Exception("Number of contacts is not equal to old contacts after migration.");
     }
   }
 	
