@@ -122,7 +122,7 @@ class Migrate63to64 {
       echo "Number of contacts is not equal to old contacts after migration. This might happen if there are some orphan contacts. You can identify them with:<br />
        <br />
       select * from ab_contacts where addressbook_id not in (select id from ab_addressbooks);<br />
-      select * from ab_companies where addressbook_id not in (select id from ab_companies);<br />
+      select * from ab_companies where addressbook_id not in (select id from ab_addressbooks);<br />
       <br />
       Perhaps you can simply delete them?";
 

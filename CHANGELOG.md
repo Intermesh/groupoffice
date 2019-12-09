@@ -1,6 +1,7 @@
 - Files: We did an update to Group-Office which comes with a new implementation of the Group-Office Assistant. If you use this please update it to the new version. You can find it under "Files" for your operating system at this page:
 https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-device.html
 
+- Core: "Login enabled" checkbox visible when using IMAP or LDAP authentication
 - Email: Fixed error in sieve disconnect
 - EMail: Added new header X-Group-Office-Title: Group-Office 
 - Core: Cleaned up EntityStore code
