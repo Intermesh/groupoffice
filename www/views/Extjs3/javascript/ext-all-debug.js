@@ -42149,7 +42149,7 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
 
             if(!this.tpl){
                 
-                this.tpl = '<tpl for="."><div class="'+cls+'-item">{[fm.htmlEncode(values["' + this.displayField + '"] || "" )]}</div></tpl>';
+                this.tpl = '<tpl for="."><div class="'+cls+'-item" title="{[fm.htmlEncode(values[\'' + this.displayField + '\'] || \'\' )]}">{[fm.htmlEncode(values["' + this.displayField + '"] || "" )]}</div></tpl>';
                 
             }
 

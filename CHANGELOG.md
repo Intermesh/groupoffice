@@ -10,6 +10,7 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Projects: Removed broken natural sort and added created and modified at columns
 - Custom fields: Ignore maxLength on text area's
 - Address book: Don't open links when selecting them for text copy
+- Core: Disable spell check on search fields
 
 06-12-2019 6.4.88
 - Files: New Assistant implementation without webdav requirement. Clients need to be updated!
