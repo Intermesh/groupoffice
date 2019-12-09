@@ -11,6 +11,7 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Custom fields: Ignore maxLength on text area's
 - Address book: Don't open links when selecting them for text copy
 - Core: Disable spell check on search fields
+- Core: Database check continues if there's an exception
 
 06-12-2019 6.4.88
 - Files: New Assistant implementation without webdav requirement. Clients need to be updated!
@@ -52,6 +53,7 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Core: Added title's to combo box list items so you can see the whole text when it' cut off.
 - Files: New folder button was missing in "Save as" mode
 - Projects: Icon column growing too large bug
+- Projects: Wrapping of tables for better display on smaller screens
 
 20-11-2019 6.4.82
 - Core: Create debug log file if not exists
