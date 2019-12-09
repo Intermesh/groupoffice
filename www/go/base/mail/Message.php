@@ -376,6 +376,13 @@ class Message extends \Swift_Message{
 					$tmp_file = $this->_tmpDir .$filename;
 					file_put_contents($tmp_file, $part->body);
 
+					if(!isset($part->ctype_primary)) {
+            $part->ctype_primary = 'text';
+          }
+          if(!isset($part->ctype_secondary)) {
+            $part->ctype_secondary = 'plain';
+          }
+
 					$mime_type = $part->ctype_primary.'/'.$part->ctype_secondary;
 
 					if(isset($part->headers['content-id']))
