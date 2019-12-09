@@ -1,3 +1,4 @@
+09-12-2019 6.4.89
 - Files: We did an update to Group-Office which comes with a new implementation of the Group-Office Assistant. If you use this please update it to the new version. You can find it under "Files" for your operating system at this page:
 https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-device.html
 
@@ -12,6 +13,7 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Address book: Don't open links when selecting them for text copy
 - Core: Disable spell check on search fields
 - Core: Database check continues if there's an exception
+- Core: Different polyfill promise to support Windows XP with old Chrome.
 
 06-12-2019 6.4.88
 - Files: New Assistant implementation without webdav requirement. Clients need to be updated!
