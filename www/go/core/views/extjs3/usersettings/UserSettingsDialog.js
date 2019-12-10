@@ -126,25 +126,24 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		}, this);
 
 
-		if(GO.util.isMobileOrTablet()) {
-			this.tools = [{
-				id: "left",
-				handler: function () {
-					this.navMenu.show();
-				},
-				scope: this
-			}];			
+		this.tools = [{
+			id: "left",
+			cls: 'go-show-tablet',
+			handler: function () {
+				this.navMenu.show();
+			},
+			scope: this
+		}];
 
-			this.navMenu.on("show", function() {
-				var tool = this.getTool("left");
-				tool.hide();
-			},this);
+		this.navMenu.on("show", function() {
+			var tool = this.getTool("left");
+			tool.dom.classList.add('go-hide')
+		},this);
 
-			this.formPanel.on("show", function() {			
-				var tool = this.getTool("left");
-				tool.show();				
-			}, this)
-		}
+		this.formPanel.on("show", function() {
+			var tool = this.getTool("left");
+			tool.dom.classList.remove('go-hide')
+		}, this);
 		
 		go.usersettings.UserSettingsDialog.superclass.initComponent.call(this);
 		
@@ -183,7 +182,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	show: function(){
 		go.usersettings.UserSettingsDialog.superclass.show.call(this);
 
-		if(!GO.util.isMobileOrTablet()) {
+		if(!GO.util.isTabletScreenSize()) {
 			this.navMenu.select(this.tabStore.getAt(0));
 		}
 	},
