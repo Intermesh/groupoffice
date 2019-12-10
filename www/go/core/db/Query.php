@@ -530,7 +530,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		try {
 			$stmt = $this->createStatement();	
 			$ret = $stmt->execute();
-			if (!$ret) {
+			if ($ret === false) {
 				go()->error(var_export($ret, true));
 				go()->error($stmt->errorInfo());
 				throw new \Exception("Could not execute statement. Error code: ". $stmt->errorCode());
