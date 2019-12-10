@@ -173,8 +173,13 @@ go.Modules.register("community", "addressbook", {
 					 * @param {string|int} entityId
 					 * @returns {go.form.Dialog}
 					 */
-					linkWindow: function (entity, entityId) {
-						return new go.modules.community.addressbook.ContactDialog();
+					linkWindow: function (entity, entityId, data) {
+						var dlg = new go.modules.community.addressbook.ContactDialog();
+						dlg.setValues({
+							addressBookId: data.addressBookId,
+							isOrganization: false
+						});
+						return dlg;
 					},
 
 					/**
@@ -202,9 +207,12 @@ go.Modules.register("community", "addressbook", {
 					 * @param {string|int} entityId
 					 * @returns {go.form.Dialog}
 					 */
-					linkWindow: function (entity, entityId) {
+					linkWindow: function (entity, entityId, data) {
 						var dlg = new go.modules.community.addressbook.ContactDialog();
-						dlg.setValues({isOrganization: true});
+						dlg.setValues({
+							addressBookId: data.addressBookId,
+							isOrganization: true
+						});
 						return dlg;
 					},
 
