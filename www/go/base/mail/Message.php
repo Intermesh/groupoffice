@@ -105,7 +105,7 @@ class Message extends \Swift_Message{
   public static function newInstance($subject = null, $body = null,
     $contentType = null, $charset = null)
   {
-    $msg = new self($subject, $body, $contentType, $charset);
+    return new self($subject, $body, $contentType, $charset);
   }
 	
 	/**
