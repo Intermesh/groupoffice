@@ -171,8 +171,8 @@ class MaintenanceController extends AbstractController {
 	
 	protected function actionGetNewAcl($params){
 		$acl = new \GO\Base\Model\Acl();
-		$acl->user_id=isset($params['user_id']) ? $params['user_id'] : \GO::user()->id;
-		$acl->description=$params['description'];
+		$acl->ownedBy=isset($params['user_id']) ? $params['user_id'] : \GO::user()->id;
+		$acl->usedIn=$params['description'];
 		$acl->save();
 		
 		echo $acl->id;
