@@ -1,4 +1,5 @@
 - Core: Fixed incorrect info on synchronisation settings as admin
+- Files: Fixed file not found bug when downloading files
 
 10-12-2019 6.4.92
 - Address book: Add contact was broken

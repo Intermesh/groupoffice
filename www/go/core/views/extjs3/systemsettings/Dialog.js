@@ -85,25 +85,27 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		});
 
 
-		if(GO.util.isMobileOrTablet()) {
+		// if(GO.util.isMobileOrTablet()) {
 			this.tools = [{
 				id: "left",
+				cls: 'go-show-tablet',
 				handler: function () {
 					this.selectMenu.show();
 				},
 				scope: this
-			}];			
+			}];
 
 			this.selectMenu.on("show", function() {
 				var tool = this.getTool("left");
-				tool.hide();
+				tool.dom.classList.add('go-hide')
 			},this);
 
-			this.tabPanel.on("show", function() {			
+			this.tabPanel.on("show", function() {
 				var tool = this.getTool("left");
-				tool.show();				
-			}, this)
-		}
+				tool.dom.classList.remove('go-hide')
+			}, this);
+
+		// }
 		
 		this.addEvents({
 			'loadStart' : true,
