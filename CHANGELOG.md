@@ -1,3 +1,6 @@
+10-12-2019 6.4.91
+- Custom fields: db migration contained broken code.
+
 10-12-2019 6.4.90
 - Zpush: mail sync was broken
 
