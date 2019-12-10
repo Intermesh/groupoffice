@@ -154,7 +154,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	
 	loadModulePanels : function() {
     
-		var available = go.Modules.getAvailable(), pnl, config, i, i1;
+		var available = go.Modules.getAvailable(), pnl, config, i, i1, l, l2;
 		for(i = 0, l = available.length; i < l; i++) {
 			
 			config = go.Modules.getConfig(available[i].package, available[i].name);
@@ -367,6 +367,13 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 				me.user = users[0];
 				me.loadModulePanels();
 
+				// loop through child panels and call onLoadComplete function if available
+				me.tabPanel.items.each(function(tab) {
+					if(tab.onLoadStart) {
+						tab.onLoadStart(me.currentUserId);
+					}
+				},me);
+
 				me.formPanel.getForm().setValues(users[0]);
 				
 				me.findBy(function(cmp,cont){
@@ -377,13 +384,6 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 
 				me.loadComplete(users[0]);
 			}, me);
-
-			// loop through child panels and call onLoadComplete function if available
-			me.tabPanel.items.each(function(tab) {
-				if(tab.onLoadStart){
-					tab.onLoadStart(me.currentUserId);
-				}
-			},me);
 		}
 		
 		// The form needs to be rendered before the data can be set

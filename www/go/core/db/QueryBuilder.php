@@ -85,13 +85,14 @@ class QueryBuilder {
 	public function __construct(Connection $conn) {
 		$this->conn = $conn;
 	}
-	
 
-	/**
-	 * Constructor
-	 *
-	 * @param string $tableName The table to operate on
-	 */
+
+  /**
+   * Constructor
+   *
+   * @param string $tableName The table to operate on
+   * @throws Exception
+   */
 	public function setTableName($tableName) {
 		
 		if(!isset($tableName)) {
@@ -124,15 +125,20 @@ class QueryBuilder {
 	/**
 	 * Get the name of the record this query builder is for.
 	 *
-	 * @param string
+	 * @return string
 	 */
 	public function getTableName() {
 		return $this->tableName;
 	}
 
-	/**
-	 * @return bool
-	 */
+  /**
+   * @param $tableName
+   * @param $data
+   * @param array $columns
+   * @param string $command
+   * @return array
+   * @throws Exception
+   */
 	public function buildInsert($tableName, $data, $columns = [], $command = "INSERT") {
 
 		$this->reset();

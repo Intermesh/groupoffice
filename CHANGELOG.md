@@ -1,3 +1,11 @@
+- Core: Fixed incorrect info on synchronisation settings as admin
+
+10-12-2019 6.4.92
+- Address book: Add contact was broken
+- Core: Encode filename in upload header to support UTF-8 filenames
+- Core: try to convert CSV file uploads to UTF-8
+- Core: reverted enter to save because it caused problems when searching inside TabbedFormDialog.js
+
 10-12-2019 6.4.91
 - Custom fields: db migration contained broken code.
 - Email: content type application/eml opens within Group-Office

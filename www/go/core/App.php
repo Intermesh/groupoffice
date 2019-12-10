@@ -307,25 +307,26 @@ use const GO_CONFIG_FILE;
 
 			return $config;
 		}
-		
 
-		/**
-		 * Get the configuration data
-		 * 
-		 * ```
-		 * 
-		  "general" => [
-		  "dataPath" => "/foo/bar"
-		  ],
-		  "db" => [
-		  "dsn" => 'mysql:host=localhost;dbname=groupoffice,
-		  "username" => "user",
-		  "password" => "secret"
-		  ]
-		  ]
-		 * ```
-		 * @return array
-		 */
+
+    /**
+     * Get the configuration data
+     *
+     * ```
+     *
+     * "general" => [
+     * "dataPath" => "/foo/bar"
+     * ],
+     * "db" => [
+     * "dsn" => 'mysql:host=localhost;dbname=groupoffice,
+     * "username" => "user",
+     * "password" => "secret"
+     * ]
+     * ]
+     * ```
+     * @return array
+     * @throws ConfigurationException
+     */
 		public function getConfig() {
 
 			if (isset($this->config)) {

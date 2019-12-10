@@ -16,13 +16,13 @@ use IFW;
  */
 class StringUtil {
 
-	/**
-	 * Normalize the line end style of text.
-	 * 
-	 * @param string $text
-	 * @param string $crlf
-	 * @param string
-	 */
+  /**
+   * Normalize the line end style of text.
+   *
+   * @param string $text
+   * @param string $crlf
+   * @return string
+   */
 	public static function normalizeCrlf($text, $crlf = "\r\n") {
 		if(empty($text)) {
 			return $text;
@@ -36,8 +36,13 @@ class StringUtil {
 	}
 		return $normalized;
 	}
-	
-	
+
+  /**
+   * Normalize UTF-8 to form C
+   *
+   * @param $text
+   * @return string
+   */
 	public static function normalize($text) {
 		if(empty($text)) {
 			return $text;
@@ -52,26 +57,35 @@ class StringUtil {
 
 		return $normalized;
 	}
-	
+
+  /**
+   * Check if UTF-8 string is in FORM_C
+   *
+   * @param $text
+   * @return bool
+   */
 	public static function isNormalized($text) {
 		return \Normalizer::isNormalized($text, \Normalizer::FORM_C);
 	}
-	
-	  /**
-	 * Converts any "CamelCased" into an "underscored_word".
-	 * @param string $camelCasedString the word(s) to underscore
-	 * @param string
-	 */
+
+  /**
+   * Converts any "CamelCased" into an "underscored_word".
+   * @param string $camelCasedString the word(s) to underscore
+   * @param string
+   * @return string
+   */
 	public static function camelCaseToUnderscore($camelCasedString) {
 		return strtolower(preg_replace('/(?<=\\w)([A-Z][a-z])/', '_\\1', $camelCasedString));
 	}
 
-	/**
-	 * Converts and cleans a string to valid UTF-8
-	 * @param string $str
-	 * @param string $sourceCharset
-	 * @param string
-	 */
+  /**
+   * Converts and cleans a string to valid UTF-8
+   *
+   * @param string $str
+   * @param string $sourceCharset
+   * @param string
+   * @return string
+   */
 	public static function cleanUtf8($str, $sourceCharset = null) {
 		
 		if(!isset($sourceCharset)){
@@ -141,15 +155,16 @@ END;
 		return strlen($str) != strlen(utf8_decode($str));
 	}
 
-	/**
-	 * Replace a string within a string once.
-	 *
-	 * @param string $search
-	 * @param string $replace
-	 * @param string $subject
-	 * @param bool $found Pass this to check if an occurence was replaced or not
-	 * @param string
-	 */
+  /**
+   * Replace a string within a string once.
+   *
+   * @param string $search
+   * @param string $replace
+   * @param string $subject
+   * @param bool $found Pass this to check if an occurence was replaced or not
+   * @param string
+   * @return string
+   */
 	public static function replaceOnce($search, $replace, $subject, &$found = false) {
 		$firstChar = strpos($subject, $search);
 		if ($firstChar !== false) {
@@ -193,13 +208,14 @@ END;
 		
 	}
 
-	
-	/**
-	 * Convert plain text to HTML
-	 *
-	 * @param	StringUtil $text Plain text string
-	 * @param string HTML formatted string
-	 */
+
+  /**
+   * Convert plain text to HTML
+   *
+   * @param string $text Plain text string
+   * @param string HTML formatted string
+   * @return string
+   */
 	public static function textToHtml($text, $convertLinks = true) {
 
 		if ($convertLinks) {
@@ -241,14 +257,15 @@ END;
 		return trim($html->getText());
 	}
 
-	/**
-	 * Convert Dangerous HTML to safe HTML for display inside of Group-Office
-	 *
-	 * This also removes everything outside the body and replaces mailto links
-	 *
-	 * @param	StringUtil $html HTML string
-	 * @param string HTML formatted string
-	 */
+  /**
+   * Convert Dangerous HTML to safe HTML for display inside of Group-Office
+   *
+   * This also removes everything outside the body and replaces mailto links
+   *
+   * @param string $html HTML string
+   * @param string HTML formatted string
+   * @return string
+   */
 	public static function sanitizeHtml($html) {
 
 		//needed for very large strings when data is embedded in the html with an img tag
@@ -324,17 +341,16 @@ END;
 
 		return $html;
 	}
-	
-	
-	/**
-	 * Change HTML links to Group-Office links. For example mailto: links will call
-	 * the Group-Office e-mail module if installed.
-	 *
-	 *
-	 * @param	StringUtil $text Plain text string
-	 * @access public
-	 * @param string HTML formatted string
-	 */
+
+
+  /**
+   * Change HTML links to Group-Office links. For example mailto: links will call
+   * the Group-Office e-mail module if installed.
+   *
+   * @param string $text Plain text string
+   * @param string HTML formatted string
+   * @return string
+   */
 
 	public static function convertLinks($html)
 	{
@@ -384,14 +400,14 @@ END;
 	}
 
 
-	/**
-	 * Replace string in html. It will leave strings inside html tags alone.
-	 * 
-	 * @param string $search
-	 * @param string $replacement
-	 * @param string $html
-	 * @param string 
-	 */
+  /**
+   * Replace string in html. It will leave strings inside html tags alone.
+   *
+   * @param string $search
+   * @param string $replacement
+   * @param string $html
+   * @return string
+   */
 	public static function htmlReplace($search, $replacement, $html) {
 		$html = preg_replace_callback('/<[^>]*(' . preg_quote($search) . ')[^>]*>/uis', function($matches) {
 			return stripslashes(str_replace($matches[1], '{TEMP}', $matches[0]));
@@ -456,46 +472,48 @@ END;
 		return false;
 	}
 
-	/**
-	 * Filter possible XSS attacks
-	 * 
-	 * @param string $data;
-	 * @param string
-	 */
-	public static function filterXSS($data) {
+  /**
+   * Filter possible XSS attacks
+   *
+   * @param string $string
+   * @param string
+   * @return string
+   */
+	public static function filterXSS($string) {
 		// Fix &entity\n;
-		$data = str_replace(array('&amp;', '&lt;', '&gt;'), array('&amp;amp;', '&amp;lt;', '&amp;gt;'), $data);
-		$data = preg_replace('/(&#*\w+)[\x00-\x20]+;/u', '$1;', $data);
-		$data = preg_replace('/(&#x*[0-9A-F]+);*/iu', '$1;', $data);
-		$data = html_entity_decode($data, ENT_COMPAT, 'UTF-8');
+		$string = str_replace(array('&amp;', '&lt;', '&gt;'), array('&amp;amp;', '&amp;lt;', '&amp;gt;'), $string);
+		$string = preg_replace('/(&#*\w+)[\x00-\x20]+;/u', '$1;', $string);
+		$string = preg_replace('/(&#x*[0-9A-F]+);*/iu', '$1;', $string);
+		$string = html_entity_decode($string, ENT_COMPAT, 'UTF-8');
 
 		// Remove any attribute starting with "on" or xmlns
-		$data = preg_replace('#(<[^>]+?[\x00-\x20"\'])(?:on|xmlns)[^>]*+>#iu', '$1>', $data);
+		$string = preg_replace('#(<[^>]+?[\x00-\x20"\'])(?:on|xmlns)[^>]*+>#iu', '$1>', $string);
 		// Remove javascript: and vbscript: protocols
-		$data = preg_replace('#([a-z]*)[\x00-\x20]*=[\x00-\x20]*([`\'"]*)[\x00-\x20]*j[\x00-\x20]*a[\x00-\x20]*v[\x00-\x20]*a[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu', '$1=$2nojavascript...', $data);
-		$data = preg_replace('#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*v[\x00-\x20]*b[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu', '$1=$2novbscript...', $data);
-		$data = preg_replace('#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*-moz-binding[\x00-\x20]*:#u', '$1=$2nomozbinding...', $data);
+		$string = preg_replace('#([a-z]*)[\x00-\x20]*=[\x00-\x20]*([`\'"]*)[\x00-\x20]*j[\x00-\x20]*a[\x00-\x20]*v[\x00-\x20]*a[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu', '$1=$2nojavascript...', $string);
+		$string = preg_replace('#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*v[\x00-\x20]*b[\x00-\x20]*s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:#iu', '$1=$2novbscript...', $string);
+		$string = preg_replace('#([a-z]*)[\x00-\x20]*=([\'"]*)[\x00-\x20]*-moz-binding[\x00-\x20]*:#u', '$1=$2nomozbinding...', $string);
 
 //
 //		// Only works in IE: <span style="width: expression(alert('Ping!'));"></span>
-		$data = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?expression[\x00-\x20]*\([^>]*+>#i', '$1>', $data);
-		$data = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?behaviour[\x00-\x20]*\([^>]*+>#i', '$1>', $data);
+		$string = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?expression[\x00-\x20]*\([^>]*+>#i', '$1>', $string);
+		$string = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?behaviour[\x00-\x20]*\([^>]*+>#i', '$1>', $string);
 
 		//the next line removed valid stuff from the body
 		//$data = preg_replace('#(<[^>]+?)style[\x00-\x20]*=[\x00-\x20]*[`\'"]*.*?s[\x00-\x20]*c[\x00-\x20]*r[\x00-\x20]*i[\x00-\x20]*p[\x00-\x20]*t[\x00-\x20]*:*[^>]*+>#iu', '$1>', $data);
 		// Remove namespaced elements (we do not need them)
-		$data = preg_replace('#</*\w+:\w[^>]*+>#i', '', $data);
+		$string = preg_replace('#</*\w+:\w[^>]*+>#i', '', $string);
 
-		return $data;
+		return $string;
 	}
 
-	/**
-	 * Quotes a string with >
-	 *
-	 * @param	StringUtil $text
-	 * @access public
-	 * @param string A string quoted with >
-	 */
+  /**
+   * Quotes a string with >
+   *
+   * @param string $text
+   * @access public
+   * @param string A string quoted with >
+   * @return string
+   */
 	public static function quote($text) {
 		$text = "> " . ereg_replace("\n", "\n> ", trim($text));
 		return ($text);
@@ -511,26 +529,40 @@ END;
 		return mb_strlen($str, 'UTF-8');
 	}
 
-	/**
-	 * 
-	 * @param type $string
-	 * @param type $start
-	 * @param type $length
-	 * @return type
-	 */
+  /**
+   * Get part of string
+   * @link https://php.net/manual/en/function.mb-substr.php
+   * @param string $str <p>
+   * The string being checked.
+   * </p>
+   * @param int $start <p>
+   * The first position used in str.
+   * </p>
+   * @param int $length [optional] <p>
+   * The maximum length of the returned string.
+   * </p>
+   * @param string $encoding [optional] &mbstring.encoding.parameter;
+   * @return string mb_substr returns the portion of
+   * str specified by the
+   * start and
+   * length parameters.
+   * @since 4.0.6
+   * @since 5.0
+   */
 	public static function substr($string, $start, $length = null) {
 		return function_exists("mb_substr") ? mb_substr($string, $start, $length) : substr($string, $start, $length);
 	}
-	
-	
-	/**
-	 * Turn string with underscores into lowerCamelCase
-	 * 
-	 * eg. message_id or message-id will become messageId
-	 * 
-	 * @param string $str
-	 * @param string
-	 */
+
+
+  /**
+   * Turn string with underscores into lowerCamelCase
+   *
+   * eg. message_id or message-id will become messageId
+   *
+   * @param string $str
+   * @param string
+   * @return string
+   */
 	public static function lowerCamelCasify($str){
 		
 		$str = str_replace('-','_', strtolower($str));		
@@ -540,16 +572,16 @@ END;
 		
 		return $str;		
 	}
-	
 
-	/**
-	 * Turn string with underscores into UpperCamelCase
-	 * 
-	 * eg. message_id or message-id will become MessageId
-	 * 
-	 * @param string $str
-	 * @param string
-	 */
+
+  /**
+   * Turn string with underscores into UpperCamelCase
+   *
+   * eg. message_id or message-id will become MessageId
+   *
+   * @param string $str
+   * @return string
+   */
 	public static function upperCamelCasify($str){
 		
 		$str = str_replace('-','_', strtolower($str));		
@@ -616,12 +648,13 @@ END;
 		return $ord;
 	}
 
-	/**
-	 * Generate random string
-	 * 
-	 * @param int $length
-	 * @return string
-	 */
+  /**
+   * Generate random string
+   *
+   * @param int $length
+   * @return string
+   * @throws Exception
+   */
 	public static function random($length) {
 		return bin2hex(random_bytes($length));
 	}
