@@ -1,3 +1,5 @@
+- Core: Fixed incorrect info on synchronisation settings as admin
+
 10-12-2019 6.4.92
 - Address book: Add contact was broken
 - Core: Encode filename in upload header to support UTF-8 filenames
