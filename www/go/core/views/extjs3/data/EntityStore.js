@@ -310,7 +310,9 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					}
 				}
 			}).then(function(response) {
-
+				if(!response.list) {
+					console.warn("No items in response: ", response);
+				}
 				for(var i = 0,l = response.list.length;i < l; i++) {
 					me._add(response.list[i], true);
 				}
@@ -470,8 +472,10 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					me.metaStore.setItem("notfound", me.notFound);									
 				}
 
-				for(var i = 0,l = response.list.length;i < l; i++) {
-					me._add(response.list[i], false);
+				if(response.list) {
+					for (var i = 0, l = response.list.length; i < l; i++) {
+						me._add(response.list[i], false);
+					}
 				}
 
 				for(var i = 0, l = response.options.params.ids.length; i < l; i++) {
