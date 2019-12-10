@@ -180,13 +180,14 @@ class Column {
 		return $sql;
 	}
 
-	/**
-	 * Input formatting for the database.
-	 * Currently only used for date fields because we want ISO 8601 for I/O.
-	 * 
-	 * @param mixed $value
-	 * @return mixed
-	 */
+  /**
+   * Input formatting for the database.
+   * Currently only used for date fields because we want ISO 8601 for I/O.
+   *
+   * @param mixed $value
+   * @return mixed
+   * @throws Exception
+   */
 	public function normalizeInput($value) {
 		if (!isset($value)) {
 			return null;
@@ -241,13 +242,14 @@ class Column {
 		}
 	}
 
-	/**
-	 * Output formatting for the database.
-	 * Currently only used for date fields because we want ISO 8601 for I/O.
-	 * 
-	 * @param mixed $value
-	 * @return mixed
-	 */
+  /**
+   * Output formatting for the database.
+   * Currently only used for date fields because we want ISO 8601 for I/O.
+   *
+   * @param mixed $value
+   * @return mixed
+   * @throws Exception
+   */
 	public function castFromDb($value) {
 
 		if (!isset($value)) {

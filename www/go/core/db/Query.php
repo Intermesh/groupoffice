@@ -2,6 +2,7 @@
 
 namespace go\core\db;
 
+use Exception;
 use go\core\App;
 use go\core\db\Criteria;
 use PDO;
@@ -365,39 +366,40 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		return $this;
 	}
 
-	/**
-	 * Join a table
-	 *
-	 * @Example
-	 * ```````````````````````````````````````````````````````````````````````````
-	 * $query = (new Query())
-	 * 				->select('*')
-	 * 				->from('test_a', "a")
-	 * 				->join("test_b", "b", "a.id = b.id")
-	 * 				->where('id', '=', 1);
-	 * 
-	 * $stmt = $query->execute();
-	 * ```````````````````````````````````````````````````````````````````````````
-	 * 
-	 * @Example Join a query
-	 * 
-	 * ```
-	 * $query = (new Query())
-	 * 				->select('*')
-	 * 				->from('test_a', "a")
-	 * 				->join(
-	 * 								(new Query)
-	 * 								->select('id')
-	 * 								->from("test_b", 'sub_b'), "subjoin", "subjoin.id = a.id"
-	 * 				);						
-	 * ```
-	 *
-	 * @param string|\go\core\db\Query $tableName The record class name or sub query to join
-	 * @param string $joinTableAlias Leave empty for none.
-	 * @param Criteria|array|string $on The criteria used in the ON clause {@see Criteria::normalize()}
-	 * @param string $type The join type. INNER, LEFT or RIGHT
-	 * @return static
-	 */
+  /**
+   * Join a table
+   *
+   * @Example
+   * ```````````````````````````````````````````````````````````````````````````
+   * $query = (new Query())
+   *        ->select('*')
+   *        ->from('test_a', "a")
+   *        ->join("test_b", "b", "a.id = b.id")
+   *        ->where('id', '=', 1);
+   *
+   * $stmt = $query->execute();
+   * ```````````````````````````````````````````````````````````````````````````
+   *
+   * @Example Join a query
+   *
+   * ```
+   * $query = (new Query())
+   *        ->select('*')
+   *        ->from('test_a', "a")
+   *        ->join(
+   *                (new Query)
+   *                ->select('id')
+   *                ->from("test_b", 'sub_b'), "subjoin", "subjoin.id = a.id"
+   *        );
+   * ```
+   *
+   * @param string|\go\core\db\Query $tableName The record class name or sub query to join
+   * @param string $joinTableAlias Leave empty for none.
+   * @param Criteria|array|string $on The criteria used in the ON clause {@see Criteria::normalize()}
+   * @param string $type The join type. INNER, LEFT or RIGHT
+   * @return static
+   * @throws Exception
+   */
 	public function join($tableName, $joinTableAlias, $on, $type = 'INNER') {
 
 		$this->joins[] = [
@@ -485,7 +487,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * 
 	 * Default to App::get()->getDbConnection();
 	 * 
-	 * @param \go\core\db\Connection $conn
+	 * @param Connection $conn
 	 * @return $this
 	 */
 	public function setDbConnection(Connection $conn) {
@@ -497,7 +499,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	/**
 	 * Get the database connection
 	 * 
-	 * @return \go\core\db\Connection
+	 * @return Connection
 	 */
 	public function getDbConnection() {
 		if(!isset($this->dbConn)) {
@@ -520,11 +522,12 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		return $stmt;
 	}
 
-	/**
-	 * Executes the query and returns the statement
-	 * 
-	 * @return Statement Returns false on failure.
-	 */
+  /**
+   * Executes the query and returns the statement
+   *
+   * @return Statement Returns false on failure.
+   * @throws Exception
+   */
 	public function execute() {
 		
 		try {
@@ -533,9 +536,9 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 			if ($ret === false) {
 				go()->error(var_export($ret, true));
 				go()->error($stmt->errorInfo());
-				throw new \Exception("Could not execute statement. Error code: ". $stmt->errorCode());
+				throw new Exception("Could not execute statement. Error code: ". $stmt->errorCode());
 			}
-		} catch(\Exception $e) {				
+		} catch(Exception $e) {
 			go()->error("SQL FAILED: " . $this->__toString());
 			
 			throw $e;
@@ -555,25 +558,27 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		
 		return $this;
 	}
-	
-	/**
-	 * Executes the query and returns a single object
-	 * 
-	 * @return mixed|boolean The queries record, column or object. Returns false 
-	 *   when nothing is found
-	 */
+
+  /**
+   * Executes the query and returns a single object
+   *
+   * @return mixed|boolean The queries record, column or object. Returns false
+   *   when nothing is found
+   * @throws Exception
+   */
 	public function single() {		
 		return $this->offset(0)
 						->limit(1)
 						->execute()
 						->fetch();
 	}
-	
-	/**
-	 * Get all records as an array
-	 * 
-	 * @return mixed[]
-	 */
+
+  /**
+   * Get all records as an array
+   *
+   * @return mixed[]
+   * @throws Exception
+   */
 	public function all() {
 		return $this->execute()->fetchAll();
 	}
@@ -612,7 +617,14 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		return $this->toArray();
 	}
 
-	public function toArray($properties = null) {
+  /**
+   * Convert all results of this query to arrays
+   *
+   * @param array $properties
+   * @return array
+   * @throws Exception
+   */
+  public function toArray($properties = null) {
 		$arr = [];
 		foreach($this->execute() as $entity) {
 			if($entity instanceof \go\core\data\ArrayableInterface) {

@@ -85,25 +85,25 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		});
 
 
-		if(GO.util.isMobileOrTablet()) {
-			this.tools = [{
-				id: "left",
-				handler: function () {
-					this.selectMenu.show();
-				},
-				scope: this
-			}];			
+		this.tools = [{
+			id: "left",
+			cls: 'go-show-tablet',
+			handler: function () {
+				this.selectMenu.show();
+			},
+			scope: this
+		}];
 
-			this.selectMenu.on("show", function() {
-				var tool = this.getTool("left");
-				tool.hide();
-			},this);
+		this.selectMenu.on("show", function() {
+			var tool = this.getTool("left");
+			tool.dom.classList.add('go-hide')
+		},this);
 
-			this.tabPanel.on("show", function() {			
-				var tool = this.getTool("left");
-				tool.show();				
-			}, this)
-		}
+		this.tabPanel.on("show", function() {
+			var tool = this.getTool("left");
+			tool.dom.classList.remove('go-hide')
+		}, this);
+
 		
 		this.addEvents({
 			'loadStart' : true,
@@ -165,7 +165,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	
 	show: function(){
 		go.systemsettings.Dialog.superclass.show.call(this);
-		if(!GO.util.isMobileOrTablet()) {
+		if(!GO.util.isTabletScreenSize()) {
 			this.selectMenu.select(this.tabStore.getAt(0));
 		}
 		this.load();

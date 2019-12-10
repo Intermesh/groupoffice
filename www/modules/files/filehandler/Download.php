@@ -22,6 +22,6 @@ class Download implements FilehandlerInterface{
 	}
 	
 	public function getHandler(\GO\Files\Model\File $file){
-		return 'GO.files.downloadFile("'.$file->getDownloadUrl(true, true).'");';
+		return 'GO.files.downloadFile("'.$file->id.'");';
 	}
 }

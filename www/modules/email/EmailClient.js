@@ -1494,7 +1494,7 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 		}
 		url_params = url_params.substring(0,url_params.length-1);
 
-		if(!forceDownload && attachment.mime=='message/rfc822')
+		if(!forceDownload && (attachment.mime=='message/rfc822' || attachment.mime=='application/eml'))
 		{
 			GO.email.showMessageAttachment(0, params);
 		}else

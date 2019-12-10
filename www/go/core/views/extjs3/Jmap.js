@@ -134,7 +134,7 @@ go.Jmap = {
 				}
 			},
 			headers: {
-				'X-File-Name': file.name,
+				'X-File-Name': "UTF-8''" + encodeURIComponent(file.name),
 				'Content-Type': file.type,
 				'X-File-LastModifed': Math.round(file['lastModified'] / 1000).toString()
 			},
