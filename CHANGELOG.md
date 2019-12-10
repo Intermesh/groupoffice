@@ -1,5 +1,6 @@
 10-12-2019 6.4.91
 - Custom fields: db migration contained broken code.
+- Email: content type application/eml opens within Group-Office
 
 10-12-2019 6.4.90
 - Zpush: mail sync was broken
