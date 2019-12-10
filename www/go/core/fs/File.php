@@ -313,12 +313,13 @@ class File extends FileSystemObject {
 		return fopen($this->getPath(), $mode);
 	}
 
-	/**
-	 * Move a file to new location
-	 *
-	 * @param File $destination The file may not exist yet.
-	 * @return boolean
-	 */
+  /**
+   * Move a file to new location
+   *
+   * @param File $destination The file may not exist yet.
+   * @return boolean
+   * @throws Exception
+   */
 	public function move(File $destination) {
 
 		if ($destination->exists()) {
@@ -328,13 +329,12 @@ class File extends FileSystemObject {
 		if($destination->getPath() == $this->getPath()) {
 			return true;
 		}
-
-		$success = false;
+;
 		try {
 			$success = rename($this->path, $destination->getPath());
 		} catch(\Exception $e) {
-			//renaming accross partitions doesn't work
-			$success = $this->copy($destination);
+			//renaming across partitions doesn't work
+			$success = $destination->exists() || ($this->copy($destination) != false);
 			if($success) {
 				$this->delete();
 			}
@@ -361,12 +361,13 @@ class File extends FileSystemObject {
 		return link($this->getPath(), $targetLink->getPath());
 	}
 
-	/**
-	 * Copy a file to another folder.
-	 *
-	 * @param File $destinationFile
-	 * @return File
-	 */
+  /**
+   * Copy a file to another folder.
+   *
+   * @param self $destinationFile
+   * @return self|bool
+   * @throws Exception
+   */
 	public function copy(File $destinationFile) {
 		
 		if($destinationFile->exists()) {
@@ -412,11 +413,11 @@ class File extends FileSystemObject {
 		return $this->putContents(StringUtil::cleanUtf8($str, $enc));
 	}
 
-	/**
-	 * Get the md5 hash from this file
-	 *
-	 * @param string
-	 */
+  /**
+   * Get the md5 hash from this file
+   *
+   * @return false|string
+   */
 	public function getMd5Hash() {
 		return md5_file($this->path);
 	}
@@ -424,7 +425,7 @@ class File extends FileSystemObject {
 	/**
 	 * Pull 40-char sha1 hex from the binary data
 	 *
-	 * @param string
+	 * @return string
 	 */
 	public function getSha1Hash() {
 		return sha1_file($this->path);
@@ -444,12 +445,13 @@ class File extends FileSystemObject {
 		}
 	}
 
-	/**
-	 * Create the file
-	 *
-	 * @param boolean $createPath Create the folders for this file also?
-	 * @return self|bool $successfull
-	 */
+  /**
+   * Create the file
+   *
+   * @param boolean $createPath Create the folders for this file also?
+   * @return self|bool $successfull
+   * @throws Exception
+   */
 	public function touch($createPath = false) {
 		if ($createPath){
 			$this->getFolder()->create();
