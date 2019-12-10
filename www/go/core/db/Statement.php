@@ -83,7 +83,7 @@ class Statement extends \PDOStatement implements \JsonSerializable, ArrayableInt
 			if(isset($input_parameters) && isset($this->build['params'])) {
 				$keys = array_keys($this->build['params']);
 				foreach($input_parameters as $v) {
-					$key = array_shit($keys);
+					$key = array_shift($keys);
 					$this->build[$key] = $v;
 				}
 			}
@@ -93,7 +93,7 @@ class Statement extends \PDOStatement implements \JsonSerializable, ArrayableInt
 				$duration  = number_format((go()->getDebugger()->getMicrotime() * 1000) - ($this->build['start'] * 1000), 2);
 				go()->debug(QueryBuilder::debugBuild($this->build).' ('.$duration.'ms)', 3);			
 			}
-			if(!$ret) {
+			if($ret === false) {
 				go()->error("SQL FAILURE: " . $this);
 			}
 			return $ret;
