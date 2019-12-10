@@ -203,6 +203,9 @@ class TemplateParser {
 		$tags = array_filter($tags, function($tag) {
 			return $tag['nesting'] == 0;
 		});
+
+		//Make sure index is reset after filtering
+		$tags = array_values($tags);
 		
 		for($i = 0, $c = count($tags); $i < $c; $i++) {
 			$start = $tags[$i]['offset'] + $tags[$i]['tagLength'];
