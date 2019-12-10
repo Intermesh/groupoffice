@@ -1,11 +1,7 @@
 <?php
 namespace go\core\fs;
 
-use DateTime;
 use Exception;
-use go\core\App;
-use go\core\fs\FileSystemObject;
-use go\core\fs\Folder;
 use go\core\util\StringUtil;
 
 
@@ -37,23 +33,25 @@ class File extends FileSystemObject {
 		 return go()->getTmpFolder()->getFile(uniqid(time()) . '.' . $extension);
 	}
 
-	
-	/**
-	 * Get the parent folder object
-	 *
-	 * @return Folder Parent folder object
-	 */
+
+  /**
+   * Get the parent folder object
+   *
+   * @return Folder Parent folder object
+   * @throws Exception
+   */
 	public function getFolder() {
 		$parentPath = dirname($this->path);		
 		return new Folder($parentPath);
 	}
-	
-	
-	/**
-	 * Check if the file or folder is writable for the webserver user.
-	 *
-	 * @return boolean
-	 */
+
+
+  /**
+   * Check if the file or folder is writable for the webserver user.
+   *
+   * @return bool
+   * @throws Exception
+   */
 	public function isWritable() {
 		
 		if($this->exists()) {
@@ -103,7 +101,7 @@ class File extends FileSystemObject {
 	/**
 	 * Delete the file
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	public function delete() {
 		if (!file_exists($this->path)) {
@@ -113,13 +111,12 @@ class File extends FileSystemObject {
 		}
 	}
 
-
-	/**
-	 * Get the extension of a filename
-	 *
-	 * @param string $filename
-	 * @param string
-	 */
+  /**
+   * Get the extension of a filename
+   *
+   * @param string $filename
+   * @return string
+   */
 	public function getExtension() {
 		
 		$filename = $this->getName();
@@ -136,7 +133,7 @@ class File extends FileSystemObject {
 
 	/**
 	 * Get the file name with out extension
-	 * @param string
+	 * @return string
 	 */
 	public function getNameWithoutExtension() {
 		$filename = $this->getName();
@@ -149,13 +146,12 @@ class File extends FileSystemObject {
 		return $filename;
 	}
 
-	/**
-	 * Checks if a filename exists and renames it.
-	 *
-	 * @param	StringUtil $filepath The complete path to the file
-	 * @access public
-	 * @param string  New filepath
-	 */
+  /**
+   * Checks if a filename exists and renames it.
+   *
+   * @return string  New filepath
+   * @throws Exception
+   */
 	public function appendNumberToNameIfExists() {
 		$dir = $this->getFolder()->getPath();
 		$origName = $this->getNameWithoutExtension();
@@ -168,14 +164,76 @@ class File extends FileSystemObject {
 		return $this->path;
 	}
 
-	/**
-	 * Put data in the file. (See php function file_put_contents())
-	 *
-	 * @param string $data
-	 * @param type $flags
-	 * @param type $context
-	 * @return boolean
-	 */
+  /**
+   * Write a string to a file
+   * @link https://php.net/manual/en/function.file-put-contents.php
+   * @param mixed $data <p>
+   * The data to write. Can be either a string, an
+   * array or a stream resource.
+   * </p>
+   * <p>
+   * If data is a stream resource, the
+   * remaining buffer of that stream will be copied to the specified file.
+   * This is similar with using stream_copy_to_stream.
+   * </p>
+   * <p>
+   * You can also specify the data parameter as a single
+   * dimension array. This is equivalent to
+   * file_put_contents($filename, implode('', $array)).
+   * </p>
+   * @param int $flags [optional] <p>
+   * The value of flags can be any combination of
+   * the following flags (with some restrictions), joined with the binary OR
+   * (|) operator.
+   * </p>
+   * <p>
+   * <table>
+   * Available flags
+   * <tr valign="top">
+   * <td>Flag</td>
+   * <td>Description</td>
+   * </tr>
+   * <tr valign="top">
+   * <td>
+   * FILE_USE_INCLUDE_PATH
+   * </td>
+   * <td>
+   * Search for filename in the include directory.
+   * See include_path for more
+   * information.
+   * </td>
+   * </tr>
+   * <tr valign="top">
+   * <td>
+   * FILE_APPEND
+   * </td>
+   * <td>
+   * If file filename already exists, append
+   * the data to the file instead of overwriting it. Mutually
+   * exclusive with LOCK_EX since appends are atomic and thus there
+   * is no reason to lock.
+   * </td>
+   * </tr>
+   * <tr valign="top">
+   * <td>
+   * LOCK_EX
+   * </td>
+   * <td>
+   * Acquire an exclusive lock on the file while proceeding to the
+   * writing. Mutually exclusive with FILE_APPEND.
+   * @since 5.1
+   * </td>
+   * </tr>
+   * </table>
+   * </p>
+   * @param resource $context [optional] <p>
+   * A valid context resource created with
+   * stream_context_create.
+   * </p>
+   * @return int|false The function returns the number of bytes that were written to the file, or
+   * false on failure.
+   * @since 5.0
+   */
 	public function putContents($data, $flags = null, $context = null) {
 		
 		$this->create();
@@ -187,18 +245,27 @@ class File extends FileSystemObject {
 		}
 	}
 
-	/**
-	 * Get the contents of this file.
-	 *
-	 * @param string
-	 */
+  /**
+   * Reads entire file into a string
+   * @link https://php.net/manual/en/function.file-get-contents.php
+   *
+   * @param int $offset [optional] <p>
+   * The offset where the reading starts.
+   * </p>
+   * @param int $maxlen [optional] <p>
+   * Maximum length of data read. The default is to read until end
+   * of file is reached.
+   * </p>
+   * @return string|false The function returns the read data or false on failure.
+   * @since 4.3
+   * @since 5.0
+   */
 	public function getContents($offset = 0, $maxlen = null) {		
 		if(isset($maxlen)) {
 			return file_get_contents($this->getPath(), false, null, $offset, $maxlen);	
 		} else{
 			return file_get_contents($this->getPath(), false, null, $offset);
 		}
-		
 	}
 
 	/**
@@ -230,7 +297,7 @@ class File extends FileSystemObject {
 	 * Returns the mime type for the file.
 	 * If it can't detect it it will return application/octet-stream
 	 *
-	 * @param string
+	 * @return string
 	 */
 	public function getContentType() {
 		
@@ -248,12 +315,13 @@ class File extends FileSystemObject {
 		
 	}
 
-	/**
-	 * Send download headers and output the contents of this file to standard out (browser).
-	 * @param boolean $sendHeaders
-	 * @param boolean $useCache
-	 * @param array $headers key value array of http headers to send
-	 */
+  /**
+   * Send download headers and output the contents of this file to standard out (browser).
+   * @param boolean $sendHeaders
+   * @param boolean $useCache
+   * @param array $headers key value array of http headers to send
+   * @throws Exception
+   */
 	public function output($sendHeaders = true, $useCache = true, array $headers = [], $inline = false) {		
 		$r = \go\core\http\Response::get();
 	
@@ -279,7 +347,7 @@ class File extends FileSystemObject {
 		}		
 		
 		if(ob_get_contents() != '') {			
-			throw new \Exception("Could not output file because output has already been sent. Turn off output buffering to find out where output has been started.");
+			throw new Exception("Could not output file because output has already been sent. Turn off output buffering to find out where output has been started.");
 		}
 
 		// $handle = fopen($this->getPath(), "rb");
@@ -332,7 +400,7 @@ class File extends FileSystemObject {
 ;
 		try {
 			$success = rename($this->path, $destination->getPath());
-		} catch(\Exception $e) {
+		} catch(Exception $e) {
 			//renaming across partitions doesn't work
 			$success = $destination->exists() || ($this->copy($destination) != false);
 			if($success) {
@@ -371,7 +439,7 @@ class File extends FileSystemObject {
 	public function copy(File $destinationFile) {
 		
 		if($destinationFile->exists()) {
-			throw new \Exception("The destination '".$destinationFile->getPath()."' already exists!");
+			throw new Exception("The destination '".$destinationFile->getPath()."' already exists!");
 		}
 		
 		$destinationFile->getFolder()->create();
@@ -383,11 +451,12 @@ class File extends FileSystemObject {
 		}
 	}
 
-	/**
-	 * Convert and clean the file to ensure it has valid UTF-8 data.
-	 *
-	 * @return boolean
-	 */
+  /**
+   * Convert and clean the file to ensure it has valid UTF-8 data.
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	public function convertToUtf8() {
 
 		if (!$this->isWritable()){
