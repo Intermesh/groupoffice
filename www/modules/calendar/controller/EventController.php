@@ -368,7 +368,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 					$resourceEvent->rrule = $model->rrule;
 					$resourceEvent->repeat_end_time = $model->repeat_end_time;
 					$resourceEvent->user_id = $model->user_id;
-
+					$resourceEvent->private = $model->private;
 					$resourceEvent->busy = !$resourceEvent->calendar->group->show_not_as_busy;
 
 
