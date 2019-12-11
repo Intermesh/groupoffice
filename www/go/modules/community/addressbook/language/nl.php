@@ -1,6 +1,6 @@
 <?php
 return array (
-  'salutationTemplate' => 'Geachte [if {{contact.prefixes}}]{{contact.prefixes}}[else][if !{{contact.gender}}]heer/mevrouw[else][if {{contact.gender}}=="M"]heer[else]mevrouw[/if][/if][/if] {{contact.lastName}}',
+  'salutationTemplate' => 'Geachte [if {{contact.prefixes}}]{{contact.prefixes}}[else][if !{{contact.gender}}]heer/mevrouw[else][if {{contact.gender}}=="M"]heer[else]mevrouw[/if][/if][/if][if {{contact.middleName}}] {{contact.middleName}}[/if] {{contact.lastName}}',
   'Contact' => 'Contactpersoon',
   'Job title' => 'Titel',
   'Gender' => 'Geslacht',

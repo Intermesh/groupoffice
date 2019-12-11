@@ -3,6 +3,7 @@ namespace go\core\http;
 
 use Exception;
 use go\core\Singleton;
+use go\core\util\StringUtil;
 use stdClass;
 
 
@@ -296,5 +297,26 @@ class Request extends Singleton{
    */
   public function isXHR() {
     return isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && $_SERVER["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest";
+  }
+
+
+  /**
+   * Decode a HTTP header to UTF-8
+   *
+   * @link https://tools.ietf.org/html/rfc5987
+   * @param $string
+   * @return bool|string
+   */
+  public static function headerDecode($string) {
+      $pos = strpos($string, "''");
+      if($pos == false || $pos > 64) {
+        return false;
+      }
+			//eg. iso-8859-1''%66%6F%73%73%2D%69%74%2D%73%6D%61%6C%6C%2E%67%69%66
+			$charset = substr($string, 0, $pos);
+
+			$string = rawurldecode(substr($string, $pos + 2));
+
+			return StringUtil::cleanUtf8($string, $charset);
   }
 }

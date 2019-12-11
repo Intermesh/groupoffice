@@ -86,7 +86,7 @@ class Connection {
 	 * Close the database connection. Beware that all active PDO statements must be set to null too
 	 * in the current scope.
 	 * 
-	 * Wierd things happen when using fsockopen. This test case leaves the conneciton open. When removing the fputs call it seems to work.
+	 * Weird things happen when using fsockopen. This test case leaves the conneciton open. When removing the fputs call it seems to work.
 	 * 
 	 * 			
 
@@ -142,11 +142,11 @@ class Connection {
 			throw $e;
 		}
 	}
-	
+
 	/**
 	 * Execute an SQL statement and return the number of affected rows
 	 * <p><b>PDO::exec()</b> executes an SQL statement in a single function call, returning the number of rows affected by the statement.</p><p><b>PDO::exec()</b> does not return results from a SELECT statement. For a SELECT statement that you only need to issue once during your program, consider issuing <code>PDO::query()</code>. For a statement that you need to issue multiple times, prepare a PDOStatement object with <code>PDO::prepare()</code> and issue the statement with <code>PDOStatement::execute()</code>.</p>
-	 * @param string $statement <p>The SQL statement to prepare and execute.</p> <p>Data inside the query should be properly escaped.</p>
+	 * @param string $sql <p>The SQL statement to prepare and execute.</p> <p>Data inside the query should be properly escaped.</p>
 	 * @return int <p><b>PDO::exec()</b> returns the number of rows that were modified or deleted by the SQL statement you issued. If no rows were affected, <b>PDO::exec()</b> returns <i>0</i>.</p><p><b>Warning</b></p><p>This function may return Boolean <b><code>FALSE</code></b>, but may also return a non-Boolean value which evaluates to <b><code>FALSE</code></b>. Please read the section on Booleans for more information. Use the === operator for testing the return value of this function.</p><p>The following example incorrectly relies on the return value of <b>PDO::exec()</b>, wherein a statement that affected 0 rows results in a call to <code>die()</code>:</p> <code> &lt;&#63;php<br>$db-&gt;exec()&nbsp;or&nbsp;die(print_r($db-&gt;errorInfo(),&nbsp;true));&nbsp;//&nbsp;incorrect<br>&#63;&gt;  </code>
 	 * @link http://php.net/manual/en/pdo.exec.php
 	 * @see PDO::prepare(), PDO::query(), PDOStatement::execute()
@@ -221,11 +221,12 @@ class Connection {
 		}
 	}
 
-	/**
-	 * Rollback the DB transaction
-	 * 
-	 * @return boolean
-	 */
+  /**
+   * Rollback the DB transaction
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	public function rollBack() {
 //		\go\core\App::get()->debug("Rollback DB transation");
 //		\go\core\App::get()->getDebugger()->debugCalledFrom();
@@ -248,11 +249,12 @@ class Connection {
 		}
 	}
 
-	/**
-	 * Commit the database transaction
-	 * 
-	 * @return boolean
-	 */
+  /**
+   * Commit the database transaction
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	public function commit() {
 
 //		\go\core\App::get()->debug("Commit DB transation");
@@ -319,20 +321,21 @@ class Connection {
 		return App::get()->getDbConnection()->exec($sql) !== false;
 	}
 
-	/**
-	 * Create a delete statement
-	 * 
-	 * @example
-	 * ```
-	 * $success = App::get()
-	 * 				->getDbConnection()
-	 * 				->delete("test_a", ['id' => 1])
-	 * 				->execute();
-	 * ```
-	 * @param string $tableName
-	 * @param Query $query
-	 * @return Statement
-	 */
+  /**
+   * Create a delete statement
+   *
+   * @param string $tableName
+   * @param Query $query
+   * @return Statement
+   * @throws Exception
+   * @example
+   * ```
+   * $success = App::get()
+   *        ->getDbConnection()
+   *        ->delete("test_a", ['id' => 1])
+   *        ->execute();
+   * ```
+   */
 	public function delete($tableName, $query = null) {
 		$query = Query::normalize($query);
 
@@ -342,43 +345,44 @@ class Connection {
 		return $this->createStatement($build);
 	}
 
-	/**
-	 * Create an insert statement
-	 * 
-	 * @example
-	 * ```
-	 * $data = [
-	 * 		"propA" => "string 1",
-	 * 		"createdAt" => new \DateTime(),
-	 * 		"modifiedAt" => new \DateTime()
-	 * ];
-	 * 
-	 * $result = App::get()
-	 * 				->getDbConnection()
-	 * 				->insert("test_a", $data)
-	 * 				->execute();
-	 * ```
-	 * 
-	 * Get the ID if it has an auto increment column:
-	 * ```
-	 * $id = App::get()->getDbConnection()->getPDO()->lastInsertId();
-	 * ```
-	 * 
-	 * Or with an expression:
-	 * 
-	 * ```
-	 * App::get()->getDbConnection()
-	 *	->update("core_state", new \go\core\db\Expression("highestModSeq = highestModSeq + 1"), $query);
+  /**
+   * Create an insert statement
+   *
+   * @param string $tableName
+   * @param array|Query $data Key value array or select query
+   * @param string[] $columns If $data is a query object then you can supply the
+   *  selected columns with this parameter. If not given all columns must be
+   *  selected in the correct order.
+   *
+   * @return Statement
+   * @throws Exception
+   * @example
+   * ```
+   * $data = [
+   *    "propA" => "string 1",
+   *    "createdAt" => new \DateTime(),
+   *    "modifiedAt" => new \DateTime()
+   * ];
+   *
+   * $result = App::get()
+   *        ->getDbConnection()
+   *        ->insert("test_a", $data)
+   *        ->execute();
+   * ```
+   *
+   * Get the ID if it has an auto increment column:
+   * ```
+   * $id = App::get()->getDbConnection()->getPDO()->lastInsertId();
+   * ```
+   *
+   * Or with an expression:
+   *
+   * ```
+   * App::get()->getDbConnection()
+   *  ->update("core_state", new \go\core\db\Expression("highestModSeq = highestModSeq + 1"), $query);
    * ````
-	 * 
-	 * @param string $tableName
-	 * @param array|Query $data Key value array or select query
-	 * @param string[] $columns If $data is a query object then you can supply the 
-	 *	selected columns with this parameter. If not given all columns must be 
-	 *	selected in the correct order.
-	 * 
-	 * @return Statement
-	 */
+   *
+   */
 	public function insert($tableName, $data, $columns = []) {
 
 		$queryBuilder = new QueryBuilder($this);
@@ -386,19 +390,20 @@ class Connection {
 
 		return $this->createStatement($build);
 	}
-	
-	/**
-	 * Insert data in the database and ignore if the records exist
-	 * 
-	 * @see insert()
-	 * @param string $tableName
-	 * @param array|Query $data Key value array or select query
-	 * @param string[] $columns If $data is a query object then you can supply the 
-	 *	selected columns with this parameter. If not given all columns must be 
-	 *	selected in the correct order.
-	 * 
-	 * @return Statement
-	 */
+
+  /**
+   * Insert data in the database and ignore if the records exist
+   *
+   * @param string $tableName
+   * @param array|Query $data Key value array or select query
+   * @param string[] $columns If $data is a query object then you can supply the
+   *  selected columns with this parameter. If not given all columns must be
+   *  selected in the correct order.
+   *
+   * @return Statement
+   * @throws Exception
+   * @see insert()
+   */
 	public function insertIgnore($tableName, $data, $columns = []) {
 
 		$queryBuilder = new QueryBuilder($this);
@@ -406,19 +411,20 @@ class Connection {
 
 		return $this->createStatement($build);
 	}
-	
-	/**
-	 * Replace data in the database
-	 * 
-	 * @see insert()
-	 * @param string $tableName
-	 * @param array|Query $data Key value array, array of key value arrays for multi insert or select query
-	 * @param string[] $columns If $data is a query object then you can supply the 
-	 *	selected columns with this parameter. If not given all columns must be 
-	 *	selected in the correct order.
-	 * 
-	 * @return Statement
-	 */
+
+  /**
+   * Replace data in the database
+   *
+   * @param string $tableName
+   * @param array|Query $data Key value array, array of key value arrays for multi insert or select query
+   * @param string[] $columns If $data is a query object then you can supply the
+   *  selected columns with this parameter. If not given all columns must be
+   *  selected in the correct order.
+   *
+   * @return Statement
+   * @throws Exception
+   * @see insert()
+   */
 	public function replace($tableName, $data, $columns = []) {
 
 		$queryBuilder = new QueryBuilder($this);
@@ -427,39 +433,40 @@ class Connection {
 		return $this->createStatement($build);
 	}
 
-	/**
-	 * Create an update statement
-	 * 
-	 * @example
-	 * ```
-	 * $data = [
-	 * 		"propA" => "string 3",
-	 *		"count" => new \go\core\db\Expression('count + 1'),		//Example for expression
-	 * ];
-	 * 
-	 * $stmt = App::get()->getDbConnection()->update("test_a", $data, ['id' => 1]);
-	 * $stmt->execute();
-	 * ````
-	 * 
-	 * @example with join
-	 * ```
-	 * go()->getDbConnection()->update(
-	 *     'core_acl', 
-	 *     [
-	 *       'acl.entityTypeId' => $entityTypeId, 
-	 *       'acl.entityId' => new Expression('ab.id')], // Use go\core\db\Expression for references to tables
-	 *     (new Query())
-	 *       ->tableAlias('acl') // set alias for core_acl table
-	 *       ->join('addressbook_addressbook, 'ab', 'ab.aclId = acl.id'))
-	 *   ->execute();  
-	 * ``` 
-	 *
-	 * 
-	 * @param string $tableName
-	 * @param array|Expression
-	 * @param Query|string|array $query {@see Query::normalize()}
-	 * @return Statement
-	 */
+  /**
+   * Create an update statement
+   *
+   * @param string $tableName
+   * @param $data
+   * @param Query|string|array $query {@see Query::normalize()}
+   * @return Statement
+   * @throws Exception
+   * @example with join
+   * ```
+   * go()->getDbConnection()->update(
+   *     'core_acl',
+   *     [
+   *       'acl.entityTypeId' => $entityTypeId,
+   *       'acl.entityId' => new Expression('ab.id')], // Use go\core\db\Expression for references to tables
+   *     (new Query())
+   *       ->tableAlias('acl') // set alias for core_acl table
+   *       ->join('addressbook_addressbook, 'ab', 'ab.aclId = acl.id'))
+   *   ->execute();
+   * ```
+   *
+   *
+   * @example
+   * ```
+   * $data = [
+   *    "propA" => "string 3",
+   *    "count" => new \go\core\db\Expression('count + 1'),    //Example for expression
+   * ];
+   *
+   * $stmt = App::get()->getDbConnection()->update("test_a", $data, ['id' => 1]);
+   * $stmt->execute();
+   * ````
+   *
+   */
 	public function update($tableName, $data, $query = null) {
 		$query = Query::normalize($query);
 

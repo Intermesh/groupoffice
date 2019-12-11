@@ -27,4 +27,3 @@ class Inline implements FilehandlerInterface{
 		return 'window.open("'.$file->getDownloadUrl(false, true).'");';
 	}
 }
-?>

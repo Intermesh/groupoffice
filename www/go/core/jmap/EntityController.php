@@ -3,6 +3,7 @@
 namespace go\core\jmap;
 
 use Exception;
+use go\core\fs\File;
 use go\core\model\Acl;
 use go\core\acl\model\AclEntity;
 use go\core\App;
@@ -776,8 +777,11 @@ abstract class EntityController extends Controller {
 		$blob = Blob::findById($params['blobId']);	
 		
 		$converter = $this->findConverter($blob->type);
+
+    $file = $blob->getFile()->copy(File::tempFile('csv'));
+    $file->convertToUtf8();
 		
-		$response = $converter->importFile($blob->getFile(), $this->entityClass(), $params);
+		$response = $converter->importFile($file, $this->entityClass(), $params);
 		
 		if(!$response) {
 			throw new \Exception("Invalid response from import convertor");
@@ -795,12 +799,15 @@ abstract class EntityController extends Controller {
 	 */
 	protected function defaultImportCSVMapping($params) {
 		
-		$blob = Blob::findById($params['blobId']);	
+		$blob = Blob::findById($params['blobId']);
+
+		$file = $blob->getFile()->copy(File::tempFile('csv'));
+    $file->convertToUtf8();
 		
 		$converter = $this->findConverter($blob->type);
 		
 		$response['goHeaders'] = $converter->getHeaders($this->entityClass());
-		$response['csvHeaders'] = $converter->getCsvHeaders($blob->getFile());
+		$response['csvHeaders'] = $converter->getCsvHeaders($file);
 		
 		if(!$response) {
 			throw new \Exception("Invalid response from import convertor");

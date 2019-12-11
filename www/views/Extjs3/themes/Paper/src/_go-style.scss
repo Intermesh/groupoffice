@@ -1413,8 +1413,27 @@ table[id^="comments-ext"] b {
 	}
 }*/
 
+.go-show-tablet, .go-show-mobile {
+	display:none;
+}
+
+.go-hide-tablet, .go-hide-mobile {
+
+}
+
+.go-hide {
+	display: none !important;
+}
 
 @media screen and (max-width: 1200px) {
+	.go-show-tablet {
+		display: block;
+	}
+
+	.go-hide-tablet, .go-hide-mobile {
+		display: none;
+	}
+
 	.go-main-tab-panel {
 		> .x-tab-panel-header {
 			display: none;
@@ -1428,10 +1447,21 @@ table[id^="comments-ext"] b {
 }
 
 @media screen and (max-width: 1000px) {
+	.go-show-mobile, .go-show-tablet {
+		display: block;
+	}
+	.go-hide-tablet {
+		display: none;
+	}
+
+	.go-hide-mobile {
+		display: none;
+	}
 	#go-logo {
 		display: none;
 	}
 }
+
 
 .x-form-element {
 	.x-grid-panel {
