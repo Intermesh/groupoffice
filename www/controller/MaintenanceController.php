@@ -170,10 +170,20 @@ class MaintenanceController extends AbstractController {
 //	}
 	
 	protected function actionGetNewAcl($params){
+
+    if(!empty($params['source_acl_id'])) {
+      $sourceAcl = \GO\Base\Model\Acl::model()->findByPk($params['source_acl_id']);
+      $params['user_id'] = $sourceAcl->ownedBy;
+      $params['description'] = $sourceAcl->usedIn;
+    }
 		$acl = new \GO\Base\Model\Acl();
-		$acl->user_id=isset($params['user_id']) ? $params['user_id'] : \GO::user()->id;
-		$acl->description=$params['description'];
+		$acl->ownedBy=isset($params['user_id']) ? $params['user_id'] : \GO::user()->id;
+		$acl->usedIn=$params['description'];
 		$acl->save();
+
+		if(!empty($sourceAcl)) {
+		  $sourceAcl->copyPermissions($acl);
+    }
 		
 		echo $acl->id;
 	}
