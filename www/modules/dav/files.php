@@ -76,12 +76,12 @@ $auth = new Sabre\DAV\Auth\Plugin($authBackend,\GO::config()->product_name);
 $server->addPlugin($auth);
 
 // Temporary file filter
-$tempFF = new Sabre\DAV\TemporaryFileFilterPlugin($tmpDir->path());
+//$tempFF = new Sabre\DAV\TemporaryFileFilterPlugin($tmpDir->path());
+//
+//// Add regex for Office lock files
+//$tempFF->temporaryFilePatterns[] = '/^~\$.*$/';
 
-// Add regex for Office lock files
-$tempFF->temporaryFilePatterns[] = '/^~\$.*$/';
-
-$server->addPlugin($tempFF);
+//$server->addPlugin($tempFF);
 
 // And off we go!
 

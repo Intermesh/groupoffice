@@ -428,24 +428,31 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 
 
 	this.newMenu = new Ext.menu.Menu({
-		//id: 'new-menu',
-		items: [
-			this.uploadItem,
-			this.jUploadItem,
-			'-',
-			{
-				iconCls: 'ic-folder',
-				text: t("Folder"),
-				handler: this.promptNewFolder,
-				scope: this
-			}]
+		items: []
 	});
+
+
+	if(!config.hideActionButtons) {
+		this.newMenu.add(this.uploadItem);
+		this.newMenu.add(this.jUploadItem);
+		this.newMenu.add("-");
+	}
+
+	this.newFolderBtn = new Ext.menu.Item({
+		iconCls: 'ic-folder',
+		text: t("Folder"),
+		handler: this.promptNewFolder,
+		scope: this
+	});
+
+	this.newMenu.add(this.newFolderBtn);
 
 	this.newButton = new Ext.Button({
 		tooltip:t("New"),
 		iconCls: 'ic-add',
 		menu: this.newMenu
 	});
+
 
    var quotaPercentage = (GO.settings.disk_quota && GO.settings.disk_quota>0) ? GO.settings.disk_usage/GO.settings.disk_quota : 0;
 
@@ -531,14 +538,6 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		"->"
 	];
 
-	
-
-	
-
-
-
-
-
 
 	if(!config.hideActionButtons) {		
 		tbar.push([this.cutButton,this.copyButton,this.pasteButton]);
@@ -588,10 +587,9 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	// 	scope:this
 	// });
 
-	if(!config.hideActionButtons) {
 		tbar.push(this.newButton);
 
-		tbar.push({
+		tbar.push(this.moreBtn = new Ext.Button({
 			iconCls: 'ic-more-vert',
 			tooltip: t("More"),
 			menu: [
@@ -603,11 +601,14 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 						this.refresh(true);
 					},
 					scope:this
-				},
-				this.deleteButton
+				}
 			]
-		})
-	}
+		}));
+
+		if(!config.hideActionButtons) {
+			this.moreBtn.menu.add(this.deleteButton);
+		}
+
 
 	config.keys=[{
 		ctrl:true,
@@ -1175,10 +1176,14 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 	buildNewMenu : function(){
 
+		if(this.hideActionButtons) {
+			return;
+		}
+
 		var l = this.newMenu.items.getCount();
 
-		if(l > 2) {
-			for(var i = l - 1; i > 2; i--) {
+		if(l > 3) {
+			for(var i = l - 1; i > 3; i--) {
 				this.newMenu.items.itemAt(i).destroy();			
 			}
 		}

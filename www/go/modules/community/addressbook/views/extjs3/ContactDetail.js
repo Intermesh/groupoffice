@@ -140,8 +140,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					listeners: {
 						scope: this,
 						afterrender: function(box) {
-							
-							box.getEl().on('click', function(e){								
+							box.getEl().on('click', function(e){
+
+								//don't execute when user selects text
+								if(window.getSelection().toString().length > 0) {
+									return;
+								}
+
 								var container = box.getEl().dom.firstChild, 
 								item = e.getTarget("a", box.getEl()),
 								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
@@ -154,11 +159,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					<tpl for="addresses">\
 						<hr class="indent">\
 						<a class="s6"><i class="icon label">location_on</i>\
-							<span>{street} {street2}<br>\
-							<tpl if="zipCode">{zipCode}<br></tpl>\
-							<tpl if="city">{city}<br></tpl>\
-							<tpl if="state">{state}<br></tpl>\
-							<tpl if="country">{country}</tpl></span>\
+							<span style="white-space:pre">{formatted}</span>\
 							<label>{[t("addressTypes")[values.type] || values.type]}</label>\
 						</a>\
 					</tpl>\
@@ -169,7 +170,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						scope: this,
 						afterrender: function(box) {
 							
-							box.getEl().on('click', function(e){								
+							box.getEl().on('click', function(e){
+
+								//don't execute when user selects text
+								if(window.getSelection().toString().length > 0) {
+									return;
+								}
+
 								var container = box.getEl().dom.firstChild, 
 								item = e.getTarget("a", box.getEl()),
 								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);

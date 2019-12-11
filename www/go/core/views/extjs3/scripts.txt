@@ -1,5 +1,5 @@
-flux/Dispatcher.js
-flux/Store.js
+polyfills.js
+
 Jmap.js
 BrowserStorage.js
 

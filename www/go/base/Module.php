@@ -492,7 +492,7 @@ class Module extends Observable {
 					));
 					
 					while($stmt->rowCount()) {					
-						$stmt->callOnEach('checkDatabase');
+						$stmt->callOnEach('checkDatabase', true);
 						
 						$stmt = $m->find(array(
 								'ignoreAcl'=>true,

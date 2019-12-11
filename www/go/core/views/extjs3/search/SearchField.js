@@ -6,6 +6,7 @@ go.search.SearchField = Ext.extend(Ext.form.TriggerField,{
   validationEvent: false,
   validateOnBlur: false,
   triggerClass: 'x-form-clear-trigger',
+  spellCheck: false,
   // enableKeyEvents: true,
 
   onTriggerClick: function () {

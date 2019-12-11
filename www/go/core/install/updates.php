@@ -1,6 +1,7 @@
 <?php
 
 use go\core\App;
+use go\core\db\Table;
 use go\core\util\ClassFinder;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Expression;
@@ -641,3 +642,5 @@ $updates['201911071025'][] = "ALTER TABLE `core_auth_token` CHANGE `expiresAt` `
 
 $updates['201911181430'][] = "update`core_user` set `displayName` = `username` where displayName = '' or displayName is null";
 $updates['201911181430'][] = "ALTER TABLE `core_user` CHANGE `displayName` `displayName` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;";
+
+$updates['201911120000'][] = "ALTER TABLE `core_customfields_field` ADD `requiredCondition` varchar(255) NOT NULL DEFAULT '' AFTER `required`";

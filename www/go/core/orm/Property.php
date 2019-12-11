@@ -133,11 +133,12 @@ abstract class Property extends Model {
 
 	private $defaults = [];
 
-	/**
-	 * Loads defaults from the database or casts the database value to the right type in PHP
-	 * 
-	 * @param boolean $loadDefault
-	 */
+  /**
+   * Loads defaults from the database or casts the database value to the right type in PHP
+   *
+   * @param boolean $loadDefault
+   * @throws Exception
+   */
 	private function initDatabaseColumns($loadDefault) {	
 		$m = static::getMapping();
 		foreach($this->selectedProperties as $propName) {
@@ -160,11 +161,12 @@ abstract class Property extends Model {
 		}
 	}
 
-	/**
-	 * Returns all relations that were requested in "fetchProperties".
-	 * 
-	 * @return Relation[]
-	 */
+  /**
+   * Returns all relations that were requested in "fetchProperties".
+   *
+   * @return Relation[]
+   * @throws Exception
+   */
 	private function getFetchedRelations() {
 
 		$fetchedRelations = [];

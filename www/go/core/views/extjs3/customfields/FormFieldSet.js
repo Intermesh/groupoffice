@@ -19,7 +19,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		Ext.apply(this, {
 			title: this.fieldSet.name,
 			items: items,
-			stateId: 'cf-form-field-set-' + this.fieldSet.id,
+			stateId: 'cf-form-' +  (this.fieldSet.isTab ? "tab-" : 'field-set-' )  + this.fieldSet.id,
 			stateful: true,
 			collapsible: true
 		});

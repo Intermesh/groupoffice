@@ -307,7 +307,7 @@ class Table {
 	/**
 	 * Get all column names
 	 * 
-	 * @param string[]
+	 * @return string[]
 	 */
 	public function getColumnNames() {
 		return array_keys($this->columns);

@@ -84,7 +84,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 							handler: function() {
 								go.util.importFile(
 												'User', 
-												"text/csv",
+												".csv",
 												{},
 												{
 													labels: {
@@ -103,8 +103,8 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 							text: t("Export"),					
 							handler: function() {
 								go.util.exportToFile(
-												'User', 
-												Ext.apply(this.store.baseParams, this.store.lastOptions.params, {limit: 0, start: 0}),
+												'User',
+												Object.assign(this.store.baseParams, this.store.lastOptions.params, {limit: 0, position: 0}),
 												'text/csv');									
 							},
 							scope: this	

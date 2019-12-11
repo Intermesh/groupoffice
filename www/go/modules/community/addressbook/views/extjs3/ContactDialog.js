@@ -13,6 +13,21 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 		labelWidth: dp(140)
 	},
 
+	onBeforeSubmit: function() {
+
+		//When address book has changed then clear groups.
+		var modified = this.getValues(true);
+		if(!("addressBookId" in modified)) {
+			return true;
+		}
+
+		this.setValues({
+			"groups" : []
+		});
+
+		return true;
+	},
+
 	focus: function () {
 		if(this.formPanel.currentId) {
 			return;

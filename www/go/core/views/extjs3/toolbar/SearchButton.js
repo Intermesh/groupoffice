@@ -86,6 +86,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			xtype: 'trigger',
 			validationEvent: false,
 			validateOnBlur: false,
+			spellCheck: false,
 			triggerClass: 'x-form-search-trigger',
 			value: this.query,
 			listeners: {				
