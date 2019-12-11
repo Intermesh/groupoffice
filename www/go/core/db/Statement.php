@@ -4,6 +4,7 @@ namespace go\core\db;
 use go\core\data\ArrayableInterface;
 use go\core\ErrorHandler;
 use PDO;
+use Exception;
 
 /**
  * PDO Statement
@@ -27,7 +28,7 @@ class Statement extends \PDOStatement implements \JsonSerializable, ArrayableInt
 	/**
 	 * Set's the select query object
 	 * 
-	 * @param \go\core\db\Query $query
+	 * @param Query $query
 	 */
 	public function setQuery(Query $query) {
 		$this->query = $query;
@@ -65,17 +66,18 @@ class Statement extends \PDOStatement implements \JsonSerializable, ArrayableInt
 		}
 	}
 
-	/**
-	 * Executes a prepared statement
-	 * 
-	 * @param $input_parameters An array of values with as many elements as there are bound parameters in the SQL statement being executed. All values are treated as PDO::PARAM_STR.
-	 * 
-	 * Multiple values cannot be bound to a single parameter; for example, it is not allowed to bind two values to a single named parameter in an IN() clause.
-	 * 
-	 * Binding more values than specified is not possible; if more keys exist in input_parameters than in the SQL specified in the PDO::prepare(), then the statement will fail and an error is emitted.
-	 * 
-	 * @return bool
-	 */
+  /**
+   * Executes a prepared statement
+   *
+   * @param $input_parameters An array of values with as many elements as there are bound parameters in the SQL statement being executed. All values are treated as PDO::PARAM_STR.
+   *
+   * Multiple values cannot be bound to a single parameter; for example, it is not allowed to bind two values to a single named parameter in an IN() clause.
+   *
+   * Binding more values than specified is not possible; if more keys exist in input_parameters than in the SQL specified in the PDO::prepare(), then the statement will fail and an error is emitted.
+   *
+   * @return bool
+   * @throws Exception
+   */
 	public function execute($input_parameters = null)
 	{
 		try {
@@ -98,7 +100,7 @@ class Statement extends \PDOStatement implements \JsonSerializable, ArrayableInt
 			}
 			return $ret;
 		}
-		catch(\Exception $e) {
+		catch(Exception $e) {
 			go()->error("SQL FAILURE: " . $this);
 			throw $e;
 		}

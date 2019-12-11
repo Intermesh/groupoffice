@@ -91,7 +91,7 @@ abstract class MultilingualActiveRecord extends ActiveRecord {
 					$requestAttribute = $mLAttribute . '_' . $lang->id;
 					$langModel = $lmodel->findByPk(array($relation['field'] => $this->id, $lColName => $lang->id));
 
-					$this->_attributes[$requestAttribute] = $langModel->$lColValue;
+					$this->_attributes[$requestAttribute] = $langModel ? $langModel->$lColValue : "";
 				}
 			}
 		}

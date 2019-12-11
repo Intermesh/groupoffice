@@ -48,4 +48,12 @@ class UserTasklistController extends \GO\Base\Controller\AbstractMultiSelectMode
 		$cm->formatColumn('permission_level', '$model->permissionLevel');
 		return parent::formatColumns($cm);
 	}
+
+  protected function actionSelectedStore($params)
+  {
+    $user = \GO\Base\Model\User::model()->findByPk($params['model_id']);
+    \GO\Sync\Model\Settings::model()->findForUser($user);
+
+    return parent::actionSelectedStore($params);
+  }
 }

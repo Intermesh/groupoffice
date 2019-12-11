@@ -279,15 +279,18 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 		this.items=this.formPanel;
 
 		//Add a hidden submit button so the form will submit on enter
-		this.formPanel.add(new Ext.Button({
-			hidden: true,
-			hideMode: "offsets",
-			type: "submit",
-			handler: function() {
-				this.submitForm(true);
-			},
-			scope: this
-		}));
+
+		//problem with submit when searching
+
+		// this.formPanel.add(new Ext.Button({
+		// 	hidden: true,
+		// 	hideMode: "offsets",
+		// 	type: "submit",
+		// 	handler: function() {
+		// 		this.submitForm(true);
+		// 	},
+		// 	scope: this
+		// }));
 		
 		GO.dialog.TabbedFormDialog.superclass.initComponent.call(this); 
 		

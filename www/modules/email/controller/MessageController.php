@@ -682,8 +682,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 
 		$message->handleEmailFormInput($params);
-		
-		$recipientCount = $message->countRecipients();
+    $recipientCount = $message->countRecipients();
 
 		if(!$recipientCount)
 			throw new \Exception(GO::t("You didn't enter a recipient", "email"));

@@ -7,7 +7,7 @@ go.SearchField = Ext.extend(Ext.form.TwinTriggerField, {
 	validateOnBlur: false,
 	trigger1Class: 'x-form-search-trigger',
 	trigger2Class: 'x-form-clear-trigger',
-
+	spellCheck: false,
 	onTrigger1Click: function () {
 		this.handler.call(this.scope, this, this.getValue());
 	},

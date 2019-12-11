@@ -25,6 +25,7 @@ if(isset($_GET['url'])) {
 
 } else {
 	$filename = Request::get()->getHeader('X-File-Name');
+  $filename = Request::headerDecode($filename);
 	$tmpFile = \go\core\fs\File::tempFile($filename);
 	
 	$input = fopen('php://input', "r");

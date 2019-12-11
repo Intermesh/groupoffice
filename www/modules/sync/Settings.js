@@ -23,10 +23,6 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 
 
 	onLoadStart: function (userId) {
-		
-		if(this.panelAddressbook)
-			this.panelAddressbook.setModelId(userId);
-
 		if(this.panelTasklist)
 			this.panelTasklist.setModelId(userId);
 
@@ -89,7 +85,7 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 						sortable: true
 					}],
 					fields:['id','name','default_'+id,'permission_level'],
-					model_id:GO.settings.user_id,
+					model_id: GO.settings.user_id,
 					title: t("name", module)					
 				});
 //				this['panel'+name].getTopToolbar().insert(0,"->");

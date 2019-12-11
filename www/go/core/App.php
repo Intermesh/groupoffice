@@ -307,25 +307,26 @@ use const GO_CONFIG_FILE;
 
 			return $config;
 		}
-		
 
-		/**
-		 * Get the configuration data
-		 * 
-		 * ```
-		 * 
-		  "general" => [
-		  "dataPath" => "/foo/bar"
-		  ],
-		  "db" => [
-		  "dsn" => 'mysql:host=localhost;dbname=groupoffice,
-		  "username" => "user",
-		  "password" => "secret"
-		  ]
-		  ]
-		 * ```
-		 * @return array
-		 */
+
+    /**
+     * Get the configuration data
+     *
+     * ```
+     *
+     * "general" => [
+     * "dataPath" => "/foo/bar"
+     * ],
+     * "db" => [
+     * "dsn" => 'mysql:host=localhost;dbname=groupoffice,
+     * "username" => "user",
+     * "password" => "secret"
+     * ]
+     * ]
+     * ```
+     * @return array
+     * @throws ConfigurationException
+     */
 		public function getConfig() {
 
 			if (isset($this->config)) {
@@ -333,17 +334,17 @@ use const GO_CONFIG_FILE;
 			}
 
 			//If acpu is supported we can use it to cache the config object.
-			if(cache\Apcu::isSupported() && ($token = State::getClientAccessToken())) {
-				$cacheKey = 'go_conf_' . $token;
+			// if(cache\Apcu::isSupported() && ($token = State::getClientAccessToken())) {
+			// 	$cacheKey = 'go_conf_' . $token;
 
-				$this->config = apcu_fetch($cacheKey);
-				if($this->config && $this->config['cacheTime'] > filemtime($this->config['configPath']) && (!file_exists('/etc/groupoffice/globalconfig.inc.php') || $this->config['cacheTime'] > filemtime('/etc/groupoffice/globalconfig.inc.php'))) {
-					if(Request::get()->getHeader('X-Debug') == "1") {
-						$this->config['core']['general']['debug'] = true;
-					}
-					return $this->config;
-				}
-			}
+			// 	$this->config = apcu_fetch($cacheKey);
+			// 	if($this->config && $this->config['cacheTime'] > filemtime($this->config['configPath']) && (!file_exists('/etc/groupoffice/globalconfig.inc.php') || $this->config['cacheTime'] > filemtime('/etc/groupoffice/globalconfig.inc.php'))) {
+			// 		if(Request::get()->getHeader('X-Debug') == "1") {
+			// 			$this->config['core']['general']['debug'] = true;
+			// 		}
+			// 		return $this->config;
+			// 	}
+			// }
 			
 			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
 
@@ -397,10 +398,10 @@ use const GO_CONFIG_FILE;
 				}
 			}
 
-			if(isset($cacheKey)) {
-				$this->config['cacheTime'] = time();
-				apcu_store($cacheKey, $this->config);
-			}
+			// if(isset($cacheKey)) {
+			// 	$this->config['cacheTime'] = time();
+			// 	apcu_store($cacheKey, $this->config);
+			// }
 			
 			if(Request::get()->getHeader('X-Debug') == "1") {
 				$this->config['core']['general']['debug'] = true;

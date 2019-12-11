@@ -46,10 +46,10 @@ class Message extends \Swift_Message{
 	
 	public function __construct($subject = null, $body = null, $contentType = null, $charset = null) {
 		parent::__construct($subject, $body, $contentType, $charset);
-		
-//		$headers = $this->getHeaders();
 
-//		$headers->addTextHeader("User-Agent", GO::config()->product_name);
+    $headers = $this->getHeaders();
+    $headers->addTextHeader("X-Group-Office-Title", go()->getSettings()->title);
+
 		// See Mailer.php at line 105 for header encoding
 		if(GO::config()->swift_email_body_force_to_base64) {
 			//Override qupted-prinatble encdoding with base64 because it uses much less memory on larger bodies. See also:
@@ -375,6 +375,13 @@ class Message extends \Swift_Message{
 
 					$tmp_file = $this->_tmpDir .$filename;
 					file_put_contents($tmp_file, $part->body);
+
+					if(!isset($part->ctype_primary)) {
+            $part->ctype_primary = 'text';
+          }
+          if(!isset($part->ctype_secondary)) {
+            $part->ctype_secondary = 'plain';
+          }
 
 					$mime_type = $part->ctype_primary.'/'.$part->ctype_secondary;
 
