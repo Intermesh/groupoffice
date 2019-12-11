@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS `cf_fields` (
   `sort_index` int(11) NOT NULL DEFAULT '0',
   `function` varchar(255) DEFAULT NULL,
   `required` tinyint(1) NOT NULL DEFAULT '0',
+  `required_condition` varchar(255) NOT NULL DEFAULT '',
   `validation_regex` varchar(255) NOT NULL DEFAULT '',
   `helptext` varchar(100) NOT NULL DEFAULT '',
   `multiselect` tinyint(1) NOT NULL DEFAULT '0',

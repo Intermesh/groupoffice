@@ -17,6 +17,7 @@ GO.customfields.TypePanel = Ext.extend(GO.grid.GridPanel, {
 		    'datatype', 
 				'type',
 				'required',
+				'required_condition',
 		    'category_name',
 		    'category_id',
 				'column_name',

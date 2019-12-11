@@ -37,13 +37,13 @@ GO.moduleManager.onModuleReady('email',function(){
 							xtype:'label',
 							html:GO.smime.lang.pkcs12CertInfo,
 							style:'display:block;margin-bottom:10px'
-						},{
-							xtype:'textfield',
+						},
+						this.passwordField = new Ext.form.TextField({
 							fieldLabel:GO.settings.config.product_name+' '+GO.lang.strPassword,
 							inputType:'password',
 							name:'smime_password',
 							width:200
-						},
+						}),
 						
 						this.uploadFile = new GO.form.UploadFile({
 							addText:GO.smime.lang.selectPkcs12Cert,
@@ -86,9 +86,10 @@ GO.moduleManager.onModuleReady('email',function(){
 			}, this);
 								
 			this.propertiesPanel.form.on("actioncomplete", function(form, action){
-				console.log(action.result);
-				if(action.type=='submit'){
+				//console.log(action.result);
+				if(action.type=='submit') {
 					this.uploadFile.clearQueue();
+					this.passwordField.setValue('');
 					
 					// Ticket: 	#201408797
 					// Need to create the upload inputfield again. 

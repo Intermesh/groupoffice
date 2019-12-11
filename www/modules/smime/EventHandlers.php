@@ -50,11 +50,13 @@ class EventHandlers {
 
 		if (isset($certData))
 			$cert->cert = $certData;
-		elseif (!empty($params['delete_cert']))
-			$cert->cert = '';
-
-		$cert->always_sign = !empty($params['always_sign']);
-		$cert->save();
+		if (!empty($params['delete_cert']) || empty($cert->cert)) {
+			//$cert->cert = null;
+			$cert->delete();
+		} else {
+			$cert->always_sign = !empty($params['always_sign']);
+			$cert->save();
+		}
 
 		if (!empty($cert->cert))
 			$response['cert'] = true;
