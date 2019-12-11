@@ -71,7 +71,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 		}
 
 		if (!GO.util.empty(customfield.requiredCondition)) {
-			config.validate = function () {
+			config.validateValue = function () {
 				var condition = customfield.requiredCondition,
 					form = this.findParentByType('form').getForm(),
 					conditionParts,
@@ -126,7 +126,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 					}
 				}
 
-				return Ext.form.Field.prototype.validate.apply(this);
+				return Ext.form.Field.prototype.validateValue.apply(this);
 			};
 		}
 
