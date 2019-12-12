@@ -7,6 +7,7 @@ use GO;
 use GO\Base\Model\AbstractUserDefaultModel;
 use GO\Base\Model\User as LegacyUser;
 use GO\Base\Util\Http;
+use go\core\acl\model\AclItemEntity;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\auth\Method;
@@ -25,7 +26,7 @@ use go\core\model\Group;
 use go\core\model\Settings;
 
 
-class User extends Entity {
+class User extends AclItemEntity {
 	
 	use CustomFieldsTrait;
 
@@ -820,4 +821,20 @@ class User extends Entity {
 		$arr['text/csv'] = UserCsv::class;
 		return $arr;
 	}
+
+  /**
+   * @inheritDoc
+   */
+  protected static function aclEntityClass()
+  {
+    return Group::class;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  protected static function aclEntityKeys()
+  {
+    return ['id' => 'isUserGroupFor'];
+  }
 }

@@ -371,15 +371,16 @@ class Contact extends AclItemEntity {
 		}
 		return static::find($properties)->where('goUserId', '=', $userId)->single();
 	}
-	
-	/**
-	 * Find contact by e-mail address
-	 * 
-	 * @param string $email
-	 * @return Query
-	 */
-	public static function findByEmail($email) {
-		return static::find()
+
+  /**
+   * Find contact by e-mail address
+   *
+   * @param string $email
+   * @return Query
+   * @throws Exception
+   */
+	public static function findByEmail($email, $properties = []) {
+		return static::find($properties)
 						->join("addressbook_email_address", "e", "e.contactId = c.id")
 						->groupBy(['c.id'])
 						->where('e.email', '=', $email);

@@ -6,6 +6,7 @@ namespace GO\Email\Controller;
 use GO;
 use GO\Base\Exception\AccessDenied;
 
+use go\core\model\User;
 use GO\Email\Model\Account;
 use GO\Email\Model\Label;
 
@@ -665,19 +666,16 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$recipients->addString($params['bcc']);
 
 			foreach ($recipients->getAddresses() as $email => $personal) {
-				$contacts = \go\modules\community\addressbook\model\Contact::findByEmail($email);
+				$contact = \go\modules\community\addressbook\model\Contact::findByEmail($email)
+          ->filter(["permissionLevel" => \go\core\model\Acl::LEVEL_READ])->single();
+				if($contact) {
+				  continue;
+        }
 
-				foreach($contacts as $contact){
-					
-					if($contact->getPermissionLevel(Acl::READ_PERMISSION) || $contact->goUser && $contact->goUser->getPermissionLevel(Acl::READ_PERMISSION)){
-						continue 2;
-					}
-				}
-
-				// $company = \GO\Addressbook\Model\Company::model()->findSingleByAttribute('email', $email);
-				// if ($company)
-				// 	continue;
-				
+				$user = User::find(['id'])->filter(["permissionLevel" => \go\core\model\Acl::LEVEL_READ])->single();
+        if($user) {
+          continue;
+        }
 
 				$recipient = \GO\Base\Util\StringHelper::split_name($personal);
 				if ($recipient['first_name'] == '' && $recipient['last_name'] == '') {

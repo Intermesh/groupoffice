@@ -73,34 +73,35 @@ abstract class Entity extends Property {
 	 */
 	const EVENT_FILTER = "filter";
 
-	/**
-	 * Find entities
-	 * 
-	 * Returns a query object that's also directly iterable:
-	 * 
-	 * @exanple
-	 * ````
-	 * $notes = Note::find()->where(['name' => 'Foo']);
-	 * 
-	 * foreach($notes as $note) {
-	 *	echo $note->name;	
-	 * }
-	 * 
-	 * ```
-	 * 
-	 * For a single value do:
-	 * 
-	 * @exanple
-	 * ````
-	 * $note = Note::find()->where(['name' => 'Foo'])->single();
-	 * 
-	 * ```
-	 * 
-	 * For more details see the Criteria::where() function description
-	 * 
-	 * @see Criteria::where()
-	 * @return static[]|Query
-	 */
+  /**
+   * Find entities
+   *
+   * Returns a query object that's also directly iterable:
+   *
+   * @exanple
+   * ````
+   * $notes = Note::find()->where(['name' => 'Foo']);
+   *
+   * foreach($notes as $note) {
+   *  echo $note->name;
+   * }
+   *
+   * ```
+   *
+   * For a single value do:
+   *
+   * @exanple
+   * ````
+   * $note = Note::find()->where(['name' => 'Foo'])->single();
+   *
+   * ```
+   *
+   * For more details see the Criteria::where() function description
+   *
+   * @return static[]|Query
+   * @throws Exception
+   * @see Criteria::where()
+   */
 	public static final function find(array $properties = [], $readOnly = false) {
 		
 		if(count($properties) && !isset($properties[0])) {
