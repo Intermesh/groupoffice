@@ -539,7 +539,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 					foreach($to as $email=>$name){
 						
-						$contacts = Contact::findByEmail($email)->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]);
+						$contacts = Contact::findByEmail($email, ['id', 'addressBookId'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]);
 
 						foreach($contacts as $contact){
 
@@ -666,13 +666,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$recipients->addString($params['bcc']);
 
 			foreach ($recipients->getAddresses() as $email => $personal) {
-				$contact = \go\modules\community\addressbook\model\Contact::findByEmail($email)
+				$contact = \go\modules\community\addressbook\model\Contact::findByEmail($email, ['id', 'addressBookId'])
           ->filter(["permissionLevel" => \go\core\model\Acl::LEVEL_READ])->single();
 				if($contact) {
 				  continue;
         }
 
-				$user = User::find(['id'])->filter(["permissionLevel" => \go\core\model\Acl::LEVEL_READ])->single();
+				$user = User::find(['id'])->where(['email' => $email])->filter(["permissionLevel" => \go\core\model\Acl::LEVEL_READ])->single();
         if($user) {
           continue;
         }
@@ -1808,7 +1808,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$from = $imapMessage->from->getAddress();
 
 			
-			$contacts = Contact::findByEmail($from['email'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]);
+			$contacts = Contact::findByEmail($from['email'], ['id'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]);
 
 			foreach($contacts as $contact) {
 				if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){						
