@@ -1,3 +1,4 @@
+- E-mail: Reimplemented add unknown recipients
 - Core: Updated German translation
 - Core: Fixed incorrect info on synchronisation settings as admin
 - Files: Fixed file not found bug when downloading files
