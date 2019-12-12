@@ -20,30 +20,30 @@ return array (
   'Notes' => 'Notizen',
   'emailTypes' => 
   array (
-    'work' => 'emailTypes[Arbeit]',
-    'home' => 'emailTypes[Privat]',
-    'billing' => 'emailTypes[Faktura]',
+    'work' => 'Arbeit',
+    'home' => 'Privat',
+    'billing' => 'Faktura',
   ),
   'phoneTypes' => 
   array (
-    'work' => 'phoneTypes[Arbeit]',
-    'home' => 'phoneTypes[Privat]',
-    'mobile' => 'phoneTypes[Mobil]',
-    'workmobile' => 'phoneTypes[Arbeit Mobil]',
-    'fax' => 'phoneTypes[Fax]',
-    'workfax' => 'phoneTypes[Arbeit Fax]',
+    'work' => 'Arbeit',
+    'home' => 'Privat',
+    'mobile' => 'Mobil',
+    'workmobile' => 'Arbeit Mobil',
+    'fax' => 'Fax',
+    'workfax' => 'Arbeit Fax',
   ),
   'addressTypes' => 
   array (
-    'visit' => 'addressTypes[Besucher]',
-    'postal' => 'addressTypes[Postalisch]',
-    'work' => 'addressTypes[Arbeit]',
-    'home' => 'addressTypes[Privat]',
+    'visit' => 'Besucher',
+    'postal' => 'Postalisch',
+    'work' => 'Arbeit',
+    'home' => 'Privat',
   ),
   'dateTypes' => 
   array (
-    'birthday' => 'dateTypes[Geburtstag]',
-    'anniversary' => 'dateTypes[Jahrestag]',
+    'birthday' => 'Geburtstag',
+    'anniversary' => 'Jahrestag',
   ),
   'Debtor number' => 'Kundennummer',
   'Star' => 'Stern',
