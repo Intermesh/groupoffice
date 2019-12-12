@@ -159,11 +159,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					<tpl for="addresses">\
 						<hr class="indent">\
 						<a class="s6"><i class="icon label">location_on</i>\
-							<span>{street} {street2}<br>\
-							<tpl if="zipCode">{zipCode}<br></tpl>\
-							<tpl if="city">{city}<br></tpl>\
-							<tpl if="state">{state}<br></tpl>\
-							<tpl if="country">{country}</tpl></span>\
+							<span style="white-space:pre">{formatted}</span>\
 							<label>{[t("addressTypes")[values.type] || values.type]}</label>\
 						</a>\
 					</tpl>\
