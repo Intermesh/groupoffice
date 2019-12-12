@@ -1,6 +1,7 @@
+- Core: Updated German translation
 - Core: Fixed incorrect info on synchronisation settings as admin
 - Files: Fixed file not found bug when downloading files
-- Core: Fixed missing back button on small screens for system settings dialog
+- Core: Fixed missing back button on small screens for system settings dialog and user settings dialog
 
 10-12-2019 6.4.92
 - Address book: Add contact was broken

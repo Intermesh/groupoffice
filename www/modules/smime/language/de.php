@@ -39,4 +39,5 @@ return array (
   'Certificate added' => 'Zertifikat hinzugefügt',
   'SMIME certificate was added for' => 'SMIME-Zertifikat wurde hinzugefügt für',
   'Could not add SMIME certificate for' => 'Das SMIME-Zertifikat konnte nicht hinzugefügt werden für',
+  'This message is encrypted.' => 'Diese Nachricht ist verschlüsselt',
 );
