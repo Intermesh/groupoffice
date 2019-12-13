@@ -1,3 +1,4 @@
+- API keys: Fixed delete error for API keys
 - E-mail: Reimplemented add unknown recipients
 - Core: Updated German translation
 - Core: Fixed incorrect info on synchronisation settings as admin
