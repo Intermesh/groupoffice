@@ -7,7 +7,7 @@ use go\core\App;
 use go\core\data\Model;
 use go\core\db\Column;
 use go\core\db\Criteria;
-use go\core\orm\Query;
+use go\core\db\Statement;
 use go\core\event\EventEmitterTrait;
 use go\core\fs\Blob;
 use go\core\util\DateTime;
@@ -17,6 +17,7 @@ use go\core\validate\ValidationTrait;
 use PDO;
 use PDOException;
 use ReflectionClass;
+use ReflectionException;
 use function GO;
 use go\core\db\Query as GoQuery;
 use go\core\db\Table;
@@ -98,12 +99,13 @@ abstract class Property extends Model {
 
 	protected $readOnly = false;
 
-	/**
-	 * Constructor
-	 * 
-	 * @param boolean $isNew Indicates if this model is saved to the database.
-	 * @param string[] $fetchProperties The properties that were fetched by find. If empty then all properties are fetched
-	 */
+  /**
+   * Constructor
+   *
+   * @param boolean $isNew Indicates if this model is saved to the database.
+   * @param string[] $fetchProperties The properties that were fetched by find. If empty then all properties are fetched
+   * @throws Exception
+   */
 	public function __construct($isNew = true, $fetchProperties = [], $readOnly = false) {
 		$this->isNew = $isNew;
 
@@ -181,9 +183,10 @@ abstract class Property extends Model {
 		return $fetchedRelations;
 	}
 
-	/**
-	 * Fetches the related properties when requested
-	 */
+  /**
+   * Fetches the related properties when requested
+   * @throws Exception
+   */
 	private function initRelations() {		
 		foreach ($this->getFetchedRelations() as $relation) {
 			$cls = $relation->entityName;
@@ -227,7 +230,6 @@ abstract class Property extends Model {
 				break;
 
 				case Relation::TYPE_MAP:
-					$values = $this->isNew() ? [] : $this->queryRelation($cls, $where, $relation->name, $this->readOnly)->fetchAll();
 
 					if($this->isNew() ) {
 						$prop = null;
@@ -261,6 +263,12 @@ abstract class Property extends Model {
 		}
 	}
 
+  /**
+   * @param $where
+   * @param $relation
+   * @return Statement|mixed
+   * @throws Exception
+   */
 	private static function queryScalar($where, $relation) {
 		$cacheKey = static::class.':'.$relation->name;
 
@@ -290,12 +298,24 @@ abstract class Property extends Model {
 	 */
 	private static $cachedRelations = [];
 
+  /**
+   * @param string $cls
+   * @param $where
+   * @param $relationName
+   * @param $readOnly
+   * @return Statement|mixed
+   * @throws Exception
+   */
 	private static function queryRelation($cls, $where, $relationName, $readOnly) {
 
 		$cacheKey = static::class.':'.$relationName;
 
 		if(!isset(self::$cachedRelations[$cacheKey])) {
-			$query = $cls::internalFind([], $readOnly);
+
+      /** @var Query $query */
+      /** @var self $cls */
+      $query = $cls::internalFind([], $readOnly);
+
 			foreach($where as $field => $value) {
 				$query->andWhere($field . '= :'.$field);
 			}
@@ -351,10 +371,11 @@ abstract class Property extends Model {
 
 		return implode('-', $id);
 	}
-	
-	/**
-	 * Copies all properties so isModified() can detect changes.
-	 */
+
+  /**
+   * Copies all properties so isModified() can detect changes.
+   * @throws Exception
+   */
 	private function trackModifications() {
 		//Watch db cols and relations
 		$watch = array_keys($this->getMapping()->getProperties());
@@ -403,11 +424,12 @@ abstract class Property extends Model {
 
 	private static $mapping;
 
-	/**
-	 * Returns the mapping object that is defined in defineMapping()
-	 * 
-	 * @return Mapping
-	 */
+  /**
+   * Returns the mapping object that is defined in defineMapping()
+   *
+   * @return Mapping
+   * @throws Exception
+   */
 	public final static function getMapping() {		
 		$cls = static::class;
 		if(isset(self::$mapping[$cls])) {
@@ -419,7 +441,7 @@ abstract class Property extends Model {
 		if(!self::$mapping[$cls]) {			
 			self::$mapping[$cls] = static::defineMapping();			
 			if(!static::fireEvent(self::EVENT_MAPPING, self::$mapping[$cls])) {
-				throw new \Exception("Mapping event failed!");
+				throw new Exception("Mapping event failed!");
 			}
 			
 			go()->getCache()->set($cacheKey, self::$mapping[$cls]);
@@ -439,7 +461,13 @@ abstract class Property extends Model {
 	}
 
 	static $c;
-	
+
+  /**
+   * Get all API properties
+   *
+   * @return array|mixed
+   * @throws Exception
+   */
 	public static function getApiProperties() {		
 		$cacheKey = 'property-getApiProperties-' . static::class;
 		
@@ -469,7 +497,14 @@ abstract class Property extends Model {
 		self::$c[$cacheKey] = $props;
 		return $props;
 	}
-	
+
+  /**
+   * Magic getter to make dynamically mapped properties possible in other modules
+   *
+   * @param $name
+   * @return mixed
+   * @throws Exception
+   */
 	public function &__get($name) {
 		if(static::getMapping()->hasProperty($name)) {
 			if(!isset($this->dynamicProperties[$name])) {
@@ -480,7 +515,13 @@ abstract class Property extends Model {
 		throw new Exception("Can't get not existing property '$name' in '".static::class."'");			
 		
 	}
-	
+
+  /**
+   * Magic getter to make dynamically mapped properties possible in other modules
+   * @param $name
+   * @return bool
+   * @throws Exception
+   */
 	public function __isset($name) {
 			
 		if(static::getMapping()->hasProperty($name)) {
@@ -488,7 +529,14 @@ abstract class Property extends Model {
 		}
 		return false;
 	}
-	
+
+  /**
+   * Magic setter to make dynamically mapped properties possible in other modules
+   *
+   * @param $name
+   * @param $value
+   * @throws Exception
+   */
 	public function __set($name, $value) {		
 		if(!$this->readOnly && $this->setPrimaryKey($name, $value)) {
 			return ;
@@ -503,7 +551,7 @@ abstract class Property extends Model {
 			throw new Exception("Can't set not existing property '$name' in '".static::class."'");
 		}
 	}
-	
+
 	private function setPrimaryKey($name, $value) {
 		$pos = strpos($name, ".");
 		if($pos === false) {
@@ -545,11 +593,12 @@ abstract class Property extends Model {
 
 	private static $findCache = [];
 
-	/**
-	 * Find entities
-	 * 
-	 * @return static|Query
-	 */
+  /**
+   * Find entities
+   *
+   * @return static|Query
+   * @throws Exception
+   */
 	protected static function internalFind(array $fetchProperties = [], $readOnly = false) {
 
 		$cacheKey = static::class . '-' . implode("-", $fetchProperties);
@@ -561,7 +610,7 @@ abstract class Property extends Model {
 		$tables = self::getMapping()->getTables();
 
 		if(empty($tables)) {
-			throw new \Exception("No tables defined for ". static::class);
+			throw new Exception("No tables defined for ". static::class);
 		}
 
 		$mainTableName = array_keys($tables)[0];
@@ -618,6 +667,12 @@ abstract class Property extends Model {
 
 	protected static $propNames = [];
 
+  /**
+   * Get all property names
+   *
+   * @return array|mixed
+   * @throws ReflectionException
+   */
 	private static function getPropNames() {
 		$cls = static::class;
 		$cacheKey = $cls . '-getPropNames';
@@ -675,12 +730,13 @@ abstract class Property extends Model {
 		return $required;
 	}
 
-	/**
-	 * Evaluates the given fetchProperties and configures the query object to fetch them.
-	 * 
-	 * @param Query $query
-	 * @param array $fetchProperties
-	 */
+  /**
+   * Evaluates the given fetchProperties and configures the query object to fetch them.
+   *
+   * @param Query $query
+   * @param array $fetchProperties
+   * @throws Exception
+   */
 	private static function buildSelect(Query $query, array $fetchProperties, $readOnly) {
 
 		$select = [];
@@ -872,7 +928,7 @@ abstract class Property extends Model {
 	 */
 	public function getOldValue($propName) {
 		if(!array_key_exists($propName, $this->oldProps)){
-			throw new \Exception("Property " . $propName . " does not exist");
+			throw new Exception("Property " . $propName . " does not exist");
 		}
 		return $this->oldProps[$propName];
 	}
@@ -885,19 +941,20 @@ abstract class Property extends Model {
 	public function getOldValues() {
 		return $this->oldProps;
 	}
-	
-	/**
-	 * Saves the model and property relations to the database
-	 * 
-	 * Important: When you override this make sure you call this parent function first so
-	 * that validation takes place!
-	 * 
-	 * @return boolean
-	 */
+
+  /**
+   * Saves the model and property relations to the database
+   *
+   * Important: When you override this make sure you call this parent function first so
+   * that validation takes place!
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	protected function internalSave() {
 
 		if($this->readOnly) {
-			throw new \Exception("Models are fetched read only");
+			throw new Exception("Models are fetched read only");
 		}
 		
 		if (!$this->validate()) {
@@ -922,7 +979,7 @@ abstract class Property extends Model {
 	 */
 	protected function saveTables() {
 		if($this->readOnly) {
-			throw new \Exception("Can't save in read only mode");
+			throw new Exception("Can't save in read only mode");
 		}
 		$modified = $this->getModified();				
 		
@@ -1086,7 +1143,7 @@ abstract class Property extends Model {
 				$tables = $prop->getMapping()->getTables();
 				$firstTable = array_shift($tables);
 				if(!$firstTable->getPrimaryKey()) {
-					throw new \Exception("No primary key defined for ". $firstTable->getName());
+					throw new Exception("No primary key defined for ". $firstTable->getName());
 				}
 			}
 
@@ -1140,7 +1197,7 @@ abstract class Property extends Model {
 			
 			//Check for invalid input
 			if(!($newProp instanceof Property)) {
-				throw new \Exception("Invalid value given for '". $relation->name ."'. Should be a GO\Orm\Property");
+				throw new Exception("Invalid value given for '". $relation->name ."'. Should be a GO\Orm\Property");
 			}
 			
 			$this->applyRelationKeys($relation, $newProp);
@@ -1239,7 +1296,7 @@ abstract class Property extends Model {
 			$query = (new GoQuery())->where($where);
 			$query->andWhere($key, 'IN', $removeIds);
 			if(!go()->getDbConnection()->delete($relation->tableName, $query)->execute()) {
-				throw new \Exception("Could not delete scalar relation ids");
+				throw new Exception("Could not delete scalar relation ids");
 			}
 		}
 
@@ -1251,7 +1308,7 @@ abstract class Property extends Model {
 			}, $insertIds);	
 
 			if(!go()->getDbConnection()->insert($relation->tableName, $data)->execute()) {
-				throw new \Exception("Could not insert scalar relation ids");
+				throw new Exception("Could not insert scalar relation ids");
 			}
 		}
 
@@ -1282,7 +1339,7 @@ abstract class Property extends Model {
 			
 			//Check for invalid input
 			if(!($newProp instanceof Property)) {
-				throw new \Exception("Invalid value given for '". $relation->name ."'. Should be a GO\Orm\Property");
+				throw new Exception("Invalid value given for '". $relation->name ."'. Should be a GO\Orm\Property");
 			}
 			
 			$this->applyRelationKeys($relation, $newProp);
@@ -1401,7 +1458,7 @@ abstract class Property extends Model {
 				
 				$stmt = App::get()->getDbConnection()->insert($table->getName(), $modifiedForTable);
 				if (!$stmt->execute()) {
-					throw new \Exception("Could not execute insert query");
+					throw new Exception("Could not execute insert query");
 				}
 
 				$this->handleAutoIncrement($table, $modified);
@@ -1426,7 +1483,7 @@ abstract class Property extends Model {
 				
 				$stmt = App::get()->getDbConnection()->update($table->getName(), $modifiedForTable, $keys);
 				if (!$stmt->execute()) {
-					throw new \Exception("Could not execute update query");
+					throw new Exception("Could not execute update query");
 				}				
 //				if(!$stmt->rowCount()) {			
 //					
