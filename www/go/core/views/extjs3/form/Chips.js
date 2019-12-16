@@ -80,6 +80,13 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			if(this.entityStore) {
 				this.comboStore.baseParams.filter.exclude = this.dataView.store.getRange().column(this.valueField);				
 			}
+
+			if(this.map) {
+				records.forEach(function(r) {
+					this.mapValues[r.id] = true;
+				}, this);
+			}
+
 			this.comboStore.remove(records);//this.comboBox.store.find(this.valueField, records[0].get(this.valueField)));
 			this._isDirty = true;
 		}, this);
@@ -89,6 +96,10 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			} 
 			this.comboStore.add([record]);
 			this._isDirty = true;
+
+			if(this.map) {
+				this.mapValues[record.id] = null;
+			}
 		}, this);		
 		
 		this.items = [];
@@ -107,6 +118,8 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		}, this);
 
 		go.form.Chips.superclass.initComponent.call(this);
+
+		this.mapValues = {};
 	},
 	isFormField: true,
 	getName: function () {
@@ -157,24 +170,18 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		
 	},
 	getValue: function () {		
-		var records = this.dataView.store.getRange(), me = this;
 
 		if(this.map) {
-			var v = {}, id;
-			records.forEach(function(r) {
-				id = r.get(me.valueField);
-				v[id] = me.mapValues[id] || true;
-			});
-		} else{
-			var v = [];
-			records.forEach(function(r) {
-				v.push(r.get(me.valueField));
-			});
+			return this.mapValues;
 		}
-		
-		
+
+		var records = this.dataView.store.getRange(), me = this;
+		var v = [];
+		records.forEach(function(r) {
+			v.push(r.get(me.valueField));
+		});
+
 		return v;
-		
 	},
 	markInvalid: function (msg) {		
 		if(this.comboBox) {
