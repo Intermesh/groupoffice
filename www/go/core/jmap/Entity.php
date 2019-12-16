@@ -506,9 +506,7 @@ abstract class Entity  extends OrmEntity {
 		$cacheKey = "refs-entity-" . static::class;
 		$entityClasses = go()->getCache()->get($cacheKey);
 		if($entityClasses === null) {
-
 			$refs = static::getTableReferences();
-
 			$entityClasses = [];
 			foreach($refs as $r) {
 				$entities = static::findEntitiesByTable($r['table']);
@@ -527,17 +525,17 @@ abstract class Entity  extends OrmEntity {
 	}
 
   /**
-   * Find's entities that have the given table name mapped
+   * Find's JMAP entities that have the given table name mapped
    *
    * @param $tableName
-   * @return Array[] [['cls'=>'', 'paths' => 'contactId']]
+   * @return Array[] [['cls'=>'jmap\Entity', 'paths' => 'contactId']]
    */
 	protected static function findEntitiesByTable($tableName) {
 		$cf = new ClassFinder();
-		$allEntitites = $cf->findByParent(self::class);
+		$allEntities = $cf->findByParent(Entity::class);
 
 		//don't find the entity itself
-		$allEntitites = array_filter($allEntitites, function($e) {
+    $allEntities = array_filter($allEntities, function($e) {
 			return $e != static::class;
 		});
 
@@ -548,7 +546,7 @@ abstract class Entity  extends OrmEntity {
 				'paths' => $paths
 			];
 
-		}, $allEntitites);
+		}, $allEntities);
 
 		return array_filter($mapped, function($m) {
 			return !empty($m['paths']);

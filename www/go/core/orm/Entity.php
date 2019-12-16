@@ -988,6 +988,7 @@ abstract class Entity extends Property {
 
 
   /**
+   * Find's all tables that reference this items primary changesdt
    * @return array [['column'=>'contactId', 'table'=>'foo']]
    * @throws Exception
    */
