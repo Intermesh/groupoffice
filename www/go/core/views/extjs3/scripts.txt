@@ -170,6 +170,7 @@ users/SelectDialogPanel.js
 customfields/FormFieldSet.js
 customfields/FieldDialog.js
 customfields/CustomFields.js
+customfields/DetailPanel.js
 customfields/EntityPanel.js
 customfields/EntityDialog.js
 customfields/SystemSettingsPanel.js
