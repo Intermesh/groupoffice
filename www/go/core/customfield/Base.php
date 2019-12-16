@@ -131,17 +131,18 @@ abstract class Base extends Model {
 				}
 			}
 		}
-		
-		Table::destroyInstance($table);
+
+    go()->rebuildCache(true);
 		
 		return true;
 	}
 
-	/**
-	 * Called when a field is deleted
-	 * 
-	 * @return boolean
-	 */
+  /**
+   * Called when a field is deleted
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	public function onFieldDelete() {
 		
 		$fieldSql = $this->getFieldSQL();
@@ -158,7 +159,7 @@ abstract class Base extends Model {
 			ErrorHandler::logException($e);
 		}
 		
-		Table::destroyInstance($table);
+		go()->rebuildCache(true);
 		
 		return true;
 	}
