@@ -2,6 +2,8 @@
 
 namespace go\core\jmap;
 
+use Exception;
+use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\orm\Entity as OrmEntity;
@@ -41,7 +43,7 @@ abstract class Entity  extends OrmEntity {
      *
      * @todo ACL state should be per entity and not global. eg. Notebook should return highest mod seq of acl's used by note books.
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
 	public static function getState($entityState = null) {
 		$state = ($entityState ?? static::entityType()->getHighestModSeq()) . ':';
@@ -50,15 +52,16 @@ abstract class Entity  extends OrmEntity {
 
 		return $state;
 	}
-	
-	/**
-	 * Saves the model and property relations to the database
-	 * 
-	 * Important: When you override this make sure you call this parent function first so
-	 * that validation takes place!
-	 * 
-	 * @return boolean
-	 */
+
+  /**
+   * Saves the model and property relations to the database
+   *
+   * Important: When you override this make sure you call this parent function first so
+   * that validation takes place!
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	protected function internalSave() {
 		
 		if(!parent::internalSave()) {
@@ -68,7 +71,7 @@ abstract class Entity  extends OrmEntity {
 		if(self::$trackChanges) {
 			$this->entityType()->checkChange($this);
 
-			$this->checkChangeForRelations();
+			$this->checkChangeForScalarRelations();
 		} 
 
 		$this->checkFilesFolder();
@@ -76,6 +79,10 @@ abstract class Entity  extends OrmEntity {
 		return true;
 	}
 
+  /**
+   * @return bool
+   * @throws Exception
+   */
 	private function checkFilesFolder() {
 		if(empty($this->filesFolderId)) {
 			return true;
@@ -110,11 +117,12 @@ abstract class Entity  extends OrmEntity {
 		return property_exists(static::class, 'filesFolderId');
 	}
 
-	/**
-	 * Return a relative path to store the files in. Must be unique!
-	 * 
-	 * @return string
-	 */
+  /**
+   * Return a relative path to store the files in. Must be unique!
+   *
+   * @return string
+   * @throws Exception
+   */
 	public function buildFilesPath() {
 		$entityType = self::entityType();
 		return $entityType->getModule()->name. '/' . $entityType->getName() . '/' . $this->id();
@@ -130,10 +138,17 @@ abstract class Entity  extends OrmEntity {
 		return [];
 	}
 
-	private function checkChangeForRelations() {
+  /**
+   * Check's if this save operation affects other using the same scalar relation entities by using database references
+   *
+   * For example change user when a group is created with this user
+   *
+   * @throws Exception
+   */
+	private function checkChangeForScalarRelations() {
 		foreach($this->getMapping()->getRelations() as $r) {
 
-			if($r->type != GoRelation::TYPE_SCALAR) {
+			if($r->type != GoRelation::TYPE_SCALAR && $r->type != GoRelation::TYPE_MAP) {
 				continue;
 			}
 			$modified = $this->getModified([$r->name]);
@@ -141,56 +156,66 @@ abstract class Entity  extends OrmEntity {
 				continue;
 			}
 
-			$ids = array_merge(array_diff($modified[$r->name][0], $modified[$r->name][1]), array_diff($modified[$r->name][1], $modified[$r->name][0]));
+			// The ID"s of the relation
+      if($r->type == GoRelation::TYPE_SCALAR) {
+        $ids = array_merge(array_diff($modified[$r->name][0], $modified[$r->name][1]), array_diff($modified[$r->name][1], $modified[$r->name][0]));
+        $tableName = $r->tableName;
+      } else{
+        $newKeys = isset($modified[$r->name][0]) ? array_keys($modified[$r->name][0]) : [];
+        $oldKeys = isset($modified[$r->name][1]) ? array_keys($modified[$r->name][1]) : [];
+        $ids = array_merge(array_diff($newKeys, $oldKeys), array_diff($oldKeys, $newKeys));
+        $tableName = $r->entityName::getMapping()->getPrimaryTable()->getName();
+      }
 
 			if(empty($ids)) {
 				//Just the order of id's has changed.
 				continue;
 			}
 
-			$entities = $this->findEntitiesByTable($r->tableName);
-			foreach($entities as $e) {
-				$cls = $e['cls'];
-
-				$isAclOwnerEntity = is_a($cls, AclOwnerEntity::class, true);
-				$isAclItemEntity = is_a($cls, AclItemEntity::class, true);
-
-				foreach($e['paths'] as $path) {
-					$query = $cls::find();
-
-					$query->where('id', 'IN', $ids);
-					
-
-					$query->select($query->getTableAlias() . '.id AS entityId');
-
-					if($isAclItemEntity) {
-						$aclAlias = $cls::joinAclEntity($query);
-						$query->select($aclAlias .'.aclId', true);
-					} else if($isAclOwnerEntity) {
-						$query->select('aclId', true);
-					} else{
-						$query->select('NULL AS aclId', true);
-					}
-
-					$query->select('"0" AS destroyed', true);
-
-					$type = $cls::entityType();
-
-					//go()->warn($query);
-
-					/** @var EntityType $type */
-					$type->changes($query);
-				}
+			$entities = $this->findEntitiesByTable($tableName);
+			$classes = array_unique(array_map(function($e) {return $e['cls'];},$entities));
+			foreach($classes as $cls) {
+			  $query = $cls::find();
+        $query->where('id', 'IN', $ids);
+        $this->changesQuery($query, $cls, $ids);
 			}			
 		}
 	}
-	
-	/**
-	 * Delete's the entitiy. Implements change logging for sync.
-	 * 
-	 * @param Query $query  The query to select entities in the delete statement
-	 * @return boolean
-	 */
+
+  /**
+   * Marks changes for query already prepared for selecting the right ID's
+   *
+   * @param Query $query
+   * @param Property $cls
+   * @throws Exception
+   */
+	private static function changesQuery(Query $query, $cls) {
+
+    $query->select($query->getTableAlias() . '.id AS entityId');
+
+    if(is_a($cls, AclItemEntity::class, true)) {
+      $aclAlias = $cls::joinAclEntity($query);
+      $query->select($aclAlias .'.aclId', true);
+    } else if(is_a($cls, AclOwnerEntity::class, true)) {
+      $query->select('aclId', true);
+    } else{
+      $query->select('NULL AS aclId', true);
+    }
+
+    $query->select('"0" AS destroyed', true);
+
+    $type = $cls::entityType();
+    /** @var EntityType $type */
+    $type->changes($query);
+  }
+
+  /**
+   * Delete's the entitiy. Implements change logging for sync.
+   *
+   * @param Query $query The query to select entities in the delete statement
+   * @return boolean
+   * @throws Exception
+   */
 	protected static function internalDelete(Query $query) {
 		
 		if(self::$trackChanges) {
@@ -208,14 +233,15 @@ abstract class Entity  extends OrmEntity {
 			return false;
 		}		
 		return true;
-	}	
+	}
 
-	/**
-	 * Log's deleted entities for JMAP sync
-	 * 
-	 * @param Query $query The query to select entities in the delete statement
-	 * @return boolean
-	 */
+  /**
+   * Log's deleted entities for JMAP sync
+   *
+   * @param Query $query The query to select entities in the delete statement
+   * @return boolean
+   * @throws Exception
+   */
 	protected static function deleteFilesFolders(Query $query) {
 		$ids = clone $query;
 		$ids = $ids->selectSingleValue($query->getTableAlias() . '.filesFolderId')->andWhere($query->getTableAlias() . '.filesFolderId', '!=', null)->all();
@@ -234,35 +260,31 @@ abstract class Entity  extends OrmEntity {
 		return true;
 	}
 
-	/**
-	 * Log's deleted entities for JMAP sync
-	 * 
-	 * @param Query $query The query to select entities in the delete statement
-	 * @return boolean
-	 */
+  /**
+   * Log's deleted entities for JMAP sync
+   *
+   * @param Query $query The query to select entities in the delete statement
+   * @return boolean
+   * @throws Exception
+   */
 	protected static function logDeleteChanges(Query $query) {
 		$ids = clone $query;
 		$ids->select($query->getTableAlias() . '.id as entityId, null as aclId, "1" as destroyed');
 		return static::entityType()->changes($ids);
 	}
 
-	// public static function markChangesForDelete(array $ids, $aclId = null) {
-	// 	static::changeReferencedEntities($ids);
-	// 	static::entityType()->changes(array_map(function($id) { return ['entityId' => $id, 'aclId' => $aclId, 'destroyed' => true];}, $ids));
-	// }
-
-	/**
-	 * This function finds all entities that might change because of this delete. 
-	 * This happens when they have a foreign key constraint with SET NULL
-	 */
+  /**
+   * This function finds all entities that might change because of this delete.
+   * This happens when they have a foreign key constraint with SET NULL
+   * @param array|Query $ids
+   * @throws Exception
+   */
 	private static function changeReferencedEntities($ids) {
 		foreach(static::getEntityReferences() as $r) {
-			$cls = $r['cls'];			
-
-			$isAclOwnerEntity = is_a($cls, AclOwnerEntity::class, true);
-			$isAclItemEntity = is_a($cls, AclItemEntity::class, true);
+			$cls = $r['cls'];
 
 			foreach($r['paths'] as $path) {
+        /** @var Query $query */
 				$query = $cls::find();
 
 				if(!empty($path)) {
@@ -272,26 +294,7 @@ abstract class Entity  extends OrmEntity {
 				} else{
 					$query->where($r['column'], 'IN', $ids);					
 				}
-
-				$query->select($query->getTableAlias() . '.id AS entityId');
-
-				if($isAclItemEntity) {
-					$aclAlias = $cls::joinAclEntity($query);
-					$query->select($aclAlias .'.aclId', true);
-				} else if($isAclOwnerEntity) {
-					$query->select('aclId', true);
-				} else{
-					$query->select('NULL AS aclId', true);
-				}
-
-				$query->select('"0" AS destroyed', true);
-
-				$type = $cls::entityType();
-
-				//go()->warn($query);
-
-				/** @var EntityType $type */
-				$type->changes($query);
+				static::changesQuery($query, $cls);
 			}		
 		}
 	}
@@ -335,25 +338,25 @@ abstract class Entity  extends OrmEntity {
 			return $s['modSeq'] . '|' . $s['offset'];			
 		},$stateArray));
 	}
-	
-	
-	/**
-	 * 
-	 * $entityModSeq:$userModSeq-$offset
-	 * 
-	 * @todo Paging with intermediateState() might not be necessary here. It's 
-	 *  required for ACL changes but we could just return the current modseq?
-	 *  Changes should be sent in reversed order. Newest first but this complicates paging.
-	 * 
-	 * @param string $sinceState
-	 * @param int $maxChanges
-	 * @return array ['entityId' => 'destroyed' => boolean, modSeq => int]
-	 * @throws CannotCalculateChanges
-	 */
+
+
+  /**
+   *
+   * $entityModSeq:$userModSeq-$offset
+   *
+   * @todo Paging with intermediateState() might not be necessary here. It's
+   *  required for ACL changes but we could just return the current modseq?
+   *  Changes should be sent in reversed order. Newest first but this complicates paging.
+   *
+   * @param string $sinceState
+   * @param int $maxChanges
+   * @return array ['entityId' => 'destroyed' => boolean, modSeq => int]
+   * @throws CannotCalculateChanges
+   * @throws Exception
+   */
 	public static function getChanges($sinceState, $maxChanges) {
 		
 		$entityType = static::entityType();
-		
 		
 		//states are the main entity state combined with user table states. {@see Mapping::addUserTable()}
 		$states = static::parseState($sinceState);
@@ -418,15 +421,16 @@ abstract class Entity  extends OrmEntity {
 		
 		return $result;		
 	}
-	
-	/**
-	 * Check if this entities has user properties
-	 * 
-	 * User properties can vary between users. For example "starred" of a contact
-	 * can be different between users.
-	 * 
-	 * @return boolean
-	 */
+
+  /**
+   * Check if this entities has user properties
+   *
+   * User properties can vary between users. For example "starred" of a contact
+   * can be different between users.
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	public static function hasUserProperties() {
 		foreach(static::getMapping()->getTables() as $table) {
 			if($table->isUserTable) {
@@ -435,15 +439,16 @@ abstract class Entity  extends OrmEntity {
 		}
 		return false;
 	}
-	
-	/**
-	 * Get all user property names.
-	 * 
-	 * User properties can vary between users. For example "starred" of a contact
-	 * can be different between users.
-	 * 
-	 * @return string[]
-	 */
+
+  /**
+   * Get all user property names.
+   *
+   * User properties can vary between users. For example "starred" of a contact
+   * can be different between users.
+   *
+   * @return string[]
+   * @throws Exception
+   */
 	public static function getUserProperties() {
 		$p = [];
 		foreach(static::getMapping()->getTables() as $table) {
@@ -454,9 +459,14 @@ abstract class Entity  extends OrmEntity {
 		
 		return $p;
 	}
-	
+
+  /**
+   * @param $sinceModSeq
+   * @return Query
+   * @throws Exception
+   */
 	protected static function getUserChangesQuery($sinceModSeq) {
-		return  (new Query())
+		return (new Query())
 						->select('entityId, "0" AS destroyed')
 						->from("core_change_user", "change_user")
 						->where([
@@ -465,36 +475,36 @@ abstract class Entity  extends OrmEntity {
 						])
 						->andWhere('modSeq', '>', $sinceModSeq);
 	}
-	
-	
+
+  /**
+   * @param $sinceModSeq
+   * @return Query
+   * @throws Exception
+   */
 	protected static function getEntityChangesQuery($sinceModSeq) {
-		$changes = (new Query)
-						->select('entityId,max(destroyed) AS destroyed')
-						->from('core_change', 'change')
-						->fetchMode(PDO::FETCH_ASSOC)						
-						->groupBy(['entityId'])
-						->where(["entityTypeId" => static::entityType()->getId()])
-						->andWhere('modSeq', '>', $sinceModSeq);
-		
-	
-		return $changes;
+    return (new Query)
+            ->select('entityId,max(destroyed) AS destroyed')
+            ->from('core_change', 'change')
+            ->fetchMode(PDO::FETCH_ASSOC)
+            ->groupBy(['entityId'])
+            ->where(["entityTypeId" => static::entityType()->getId()])
+            ->andWhere('modSeq', '>', $sinceModSeq);
 	}
 
 
-		/**
-	 * Get all table columns referencing the id column of the entity's main table.
-	 * 
-	 * It uses the 'information_schema' to read all foreign key relations.
-	 * 
-	 * @return array [['cls'=>'Contact', 'column' => 'id', 'paths' => []]]
-	 */
+  /**
+   * Get all table columns referencing the id column of the entity's main table.
+   *
+   * It uses the 'information_schema' to read all foreign key relations.
+   *
+   * @return array [['cls'=>'Contact', 'column' => 'id', 'paths' => []]]
+   * @throws Exception
+   */
 	protected static function getEntityReferences() {
 		$cacheKey = "refs-entity-" . static::class;
 		$entityClasses = go()->getCache()->get($cacheKey);
 		if($entityClasses === null) {
-
 			$refs = static::getTableReferences();
-
 			$entityClasses = [];
 			foreach($refs as $r) {
 				$entities = static::findEntitiesByTable($r['table']);
@@ -512,17 +522,18 @@ abstract class Entity  extends OrmEntity {
 		return $entityClasses;
 	}
 
-	/**
-	 * Find's entities that have the given table name mapped
-	 * 
-	 * @return Array[] [['cls'=>'', 'paths' => 'contactId']]
-	 */
+  /**
+   * Find's JMAP entities that have the given table name mapped
+   *
+   * @param $tableName
+   * @return Array[] [['cls'=>'jmap\Entity', 'paths' => 'contactId']]
+   */
 	protected static function findEntitiesByTable($tableName) {
 		$cf = new ClassFinder();
-		$allEntitites = $cf->findByParent(self::class);
+		$allEntities = $cf->findByParent(Entity::class);
 
 		//don't find the entity itself
-		$allEntitites = array_filter($allEntitites, function($e) {
+    $allEntities = array_filter($allEntities, function($e) {
 			return $e != static::class;
 		});
 
@@ -533,7 +544,7 @@ abstract class Entity  extends OrmEntity {
 				'paths' => $paths
 			];
 
-		}, $allEntitites);
+		}, $allEntities);
 
 		return array_filter($mapped, function($m) {
 			return !empty($m['paths']);
@@ -548,5 +559,4 @@ abstract class Entity  extends OrmEntity {
 
 		return $arr;
 	}
-
 }
