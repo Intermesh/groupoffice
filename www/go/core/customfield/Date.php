@@ -10,23 +10,18 @@ use go\core\orm\Query;
 
 class Date extends Base {
 
-	/**
-	 * Get column definition for SQL
-	 * 
-	 * @return string
-	 */
+  /**
+   * @inheritDoc
+   */
 	protected function getFieldSQL() {
 		$d = $this->field->getDefault();
 		$d = isset($d) && $d != "" ? go()->getDbConnection()->getPDO()->quote($d) : "NULL";
 		return "DATE DEFAULT " . $d;
 	}
-	
-	/**
-	 * Defines an entity filter for this field.
-	 * 
-	 * @see Entity::defineFilters()
-	 * @param Filters $filter
-	 */
+
+  /**
+   * @inheritDoc
+   */
 	public function defineFilter(Filters $filters) {		
 		
 		$filters->addDate($this->field->databaseName, function(Criteria $criteria, $comparator, $value, Query $query, array $filter){
@@ -35,8 +30,4 @@ class Date extends Base {
 		});
 	}
 
-	public function dbToText($value, &$values)
-	{
-		return $value instanceof \DateTime ? $value->format('Y-m-d') : $value;
-	}
 }

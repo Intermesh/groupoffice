@@ -154,7 +154,7 @@
 		date : function(v) {
 			v = checkDate(v);
 			if(!v) {
-				return "-";
+				return "";
 			}
 			return Ext.util.Format.date(v, GO.settings.date_format);
 		},
@@ -166,7 +166,7 @@
 		time : function(v) {
 			v = checkDate(v);
 			if(!v) {
-				return "-";
+				return "";
 			}
 			v = this.dateToUserTZ(v);
 			return Ext.util.Format.date(v, GO.settings.time_format);
@@ -185,7 +185,7 @@
 		dateTime: function (v) {
 			v = checkDate(v);
 			if(!v) {
-				return "-";
+				return "";
 			}
 
 			v = this.dateToUserTZ(v);

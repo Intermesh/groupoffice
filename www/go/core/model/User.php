@@ -193,7 +193,6 @@ class User extends Entity {
 
 	protected $permissionLevel;
 	
-	
 	public function getDateTimeFormat() {
 		return $this->dateFormat . ' ' . $this->timeFormat;
 	}
