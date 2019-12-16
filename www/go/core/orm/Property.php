@@ -849,7 +849,14 @@ abstract class Property extends Model {
 		return $this->internalGetModified($properties);
 	}
 
-	private function datesAreDifferent(DateTime $a, DateTime $b) {
+  /**
+   * Compare two dates
+   *
+   * @param DateTime|null $a
+   * @param DateTime|null $b
+   * @return bool
+   */
+	private function datesAreDifferent($a, $b) {
 		if(!isset($a) && isset($b)) {
 			return true;
 		}
