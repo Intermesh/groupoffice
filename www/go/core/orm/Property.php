@@ -1546,13 +1546,14 @@ abstract class Property extends Model {
 		}
 	}
 
-	/**
-	 * Sets the isNew prop and reset oldDbProps so that the record is no longer
-	 * in a modified state.
-	 * This happens after all related tables and properties are saved.
-	 * 
-	 * @return boolean
-	 */
+  /**
+   * Sets the isNew prop and reset oldDbProps so that the record is no longer
+   * in a modified state.
+   * This happens after all related tables and properties are saved.
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	protected function commit() {
 		
 		foreach ($this->savedPropertyRelations as $property) {
@@ -1566,11 +1567,12 @@ abstract class Property extends Model {
 		return true;
 	}
 
-	/**
-	 * Rollback is called when something fails in the save operation.
-	 * 
-	 * @return boolean
-	 */
+  /**
+   * Rollback is called when something fails in the save operation.
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	protected function rollBack() {
 
 		foreach ($this->savedPropertyRelations as $property) {
@@ -1597,14 +1599,15 @@ abstract class Property extends Model {
 	// 	return $this->isDeleted;
 	// }
 
-	/**
-	 * Parses ID into query
-	 * 
-	 * eg. "1-1" into ['col1=>1, 'col2'=>1];
-	 * 
-	 * @param string $id
-	 * @return array
-	 */
+  /**
+   * Parses ID into query
+   *
+   * eg. "1-1" into ['col1=>1, 'col2'=>1];
+   *
+   * @param string $id
+   * @return array
+   * @throws InvalidArguments
+   */
 	public static function parseId($id) {
 		$primaryTable = static::getMapping()->getPrimaryTable();
 		$pk = $primaryTable->getPrimaryKey();
