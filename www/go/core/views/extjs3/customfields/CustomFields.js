@@ -285,7 +285,7 @@
 		renderField: function (fieldId, values) {
 			var field = this.fields[fieldId];
 
-			type = this.getType(field.type);
+			var type = this.getType(field.type);
 			if(!type) {							
 				console.error("Custom field type " + field.type + " not found");
 				return "";
@@ -303,7 +303,7 @@
 		getFieldIcon: function (fieldId) {
 			var field = this.fields[fieldId];
 			
-			type = this.getType(field.type);
+			var type = this.getType(field.type);
 			if(!type) {							
 				console.error("Custom field type " + field.type + " not found");
 				return "";

@@ -34,6 +34,9 @@
 namespace GO\Base\Model;
 
 
+use go\modules\community\addressbook\model\Contact;
+use go\modules\community\addressbook\model\Date;
+
 class Template extends \GO\Base\Db\ActiveRecord{
 	
 	const TYPE_EMAIL=0;
@@ -75,6 +78,38 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		
 		return parent::init();
 	}
+
+	private static $dateFormat;
+
+  /**
+   * Get the user's date format
+   *
+   * @return string
+   */
+	private static function getDateFormat() {
+	  if(!isset(self::$dateFormat)) {
+	    $user = go()->getAuthState()->getUser(['dateFormat', 'timeFormat']);
+      self::$dateFormat = $user->dateFormat;
+      self::$timeFormat = $user->timeFormat;
+    }
+
+	  return self::$dateFormat;
+  }
+
+  private static $timeFormat;
+
+  /**
+   * Get the user's time format
+   *
+   * @return string
+   */
+  private static function getTimeFormat() {
+    if(!isset(self::$timeFormat)) {
+      self::getDateFormat();
+    }
+
+    return self::$timeFormat;
+  }
 	
 	protected function getPermissionLevelForNewModel() {
 		return \GO\Base\Model\Acl::MANAGE_PERMISSION;
@@ -168,7 +203,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 			return $attributes;
 	} 
 	
-	public static function getContactAttributes($contact, $tagPrefix = 'contact:', $companyTagPrefix = 'company:'){
+	public static function getContactAttributes(Contact $contact, $tagPrefix = 'contact:', $companyTagPrefix = 'company:'){
 		$attributes[$tagPrefix . 'salutation'] = $contact->getSalutation();
 		$attributes[$tagPrefix . 'sirmadam']=$contact->gender=="M" ? \GO::t('sir') : \GO::t('madam');
 		
@@ -193,6 +228,9 @@ class Template extends \GO\Base\Db\ActiveRecord{
 				$attributes[$tagPrefix . 'state'] = $a->state;
 				$attributes[$tagPrefix . 'formatted_address'] = $a->getFormatted();
 			}
+
+			$birthday = $contact->findDateByType(Date::TYPE_BIRTHDAY, false);
+      $attributes[$tagPrefix . 'birthday'] = $birthday ? $birthday->date->format(static::getDateFormat()) : "";
 
 			$attributes[$tagPrefix . 'email'] = $contact->emailAddresses[0] ?? "";
 			$attributes[$tagPrefix . 'email2'] = $contact->emailAddresses[2] ?? "";
@@ -262,7 +300,21 @@ class Template extends \GO\Base\Db\ActiveRecord{
 				
 				break;			
 		}
-				
+
+    $attributes = array_map(function($v) {
+      if($v instanceof \DateTime) {
+        //ugly but should work. If the time is not 0:00 then print it.
+        $format = self::getDateFormat();
+
+        if($v->format('Gi') > 0) {
+          $format .= ' ' . self::getTimeFormat();
+        }
+
+        return $v->format($format);
+      }
+
+      return $v;
+    },$attributes);
 		$attributes = array_filter($attributes, "is_scalar"); 
 		
 		

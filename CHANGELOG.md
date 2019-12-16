@@ -1,3 +1,4 @@
+- Custom fields: Fixed save error when cache was not cleared and cleaned up code
 - API keys: Fixed delete error for API keys
 - E-mail: Reimplemented add unknown recipients
 - Core: Updated German translation
