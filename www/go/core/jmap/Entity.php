@@ -148,7 +148,7 @@ abstract class Entity  extends OrmEntity {
 	private function checkChangeForScalarRelations() {
 		foreach($this->getMapping()->getRelations() as $r) {
 
-			if($r->type != GoRelation::TYPE_SCALAR) {
+			if($r->type != GoRelation::TYPE_SCALAR && $r->type != GoRelation::TYPE_MAP) {
 				continue;
 			}
 			$modified = $this->getModified([$r->name]);
@@ -157,14 +157,22 @@ abstract class Entity  extends OrmEntity {
 			}
 
 			// The ID"s of the relation
-			$ids = array_merge(array_diff($modified[$r->name][0], $modified[$r->name][1]), array_diff($modified[$r->name][1], $modified[$r->name][0]));
+      if($r->type == GoRelation::TYPE_SCALAR) {
+        $ids = array_merge(array_diff($modified[$r->name][0], $modified[$r->name][1]), array_diff($modified[$r->name][1], $modified[$r->name][0]));
+        $tableName = $r->tableName;
+      } else{
+        $newKeys = isset($modified[$r->name][0]) ? array_keys($modified[$r->name][0]) : [];
+        $oldKeys = isset($modified[$r->name][1]) ? array_keys($modified[$r->name][1]) : [];
+        $ids = array_merge(array_diff($newKeys, $oldKeys), array_diff($oldKeys, $newKeys));
+        $tableName = $r->entityName::getMapping()->getPrimaryTable()->getName();
+      }
 
 			if(empty($ids)) {
 				//Just the order of id's has changed.
 				continue;
 			}
 
-			$entities = $this->findEntitiesByTable($r->tableName);
+			$entities = $this->findEntitiesByTable($tableName);
 			$classes = array_unique(array_map(function($e) {return $e['cls'];},$entities));
 			foreach($classes as $cls) {
 			  $query = $cls::find();

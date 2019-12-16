@@ -773,7 +773,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 			//if received state is newer then fetch updates
 			me.getState().then(function(state){
 				if(!state) {
-					me.setState(state);
+					me.setState(response.state);
 				} else if (response.state !== state) {
 					me.getUpdates();
 				}
