@@ -503,6 +503,10 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 					delete me.scheduledPromises[id];					
 				}
+
+				return me.setState(response.state).then(function() {
+					return response;
+				});
 			});
 
 			me.scheduled = [];
@@ -768,9 +772,12 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 			//if received state is newer then fetch updates
 			me.getState().then(function(state){
-				if (state && response.state !== state) {
+				if(!state) {
+					me.setState(state);
+				} else if (response.state !== state) {
 					me.getUpdates();
 				}
+
 			});
 
 			if(cb) {
