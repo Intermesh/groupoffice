@@ -1296,7 +1296,13 @@ abstract class Property extends Model {
 			
 			$key = $this->buildMapKey($newProp, $relation);
 			$this->{$relation->name}[$key] = $newProp;
-		}	
+		}
+
+		//If the array is empty then set it to null because an empty array will be converted to an array in JSON while a map should be an object.
+		//We use null in this case.
+		if(empty($this->{$relation->name})) {
+			$this->{$relation->name} = null;
+		}
 
 		return true;
 	}
@@ -1792,7 +1798,7 @@ abstract class Property extends Model {
 
 		return $value;
 	}
-
+//
 	protected function patch(Relation $relation, $propName, $value) {
 		$old = $this->$propName;
 		$this->$propName = [];
