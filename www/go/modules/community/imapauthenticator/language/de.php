@@ -9,4 +9,6 @@ return array (
   'Enable this if the SMTP server credentials are identical to the IMAP server.' => 'Aktivieren Sie dies, wenn die Anmeldeinformationen des SMTP-Servers mit denen des IMAP-Servers identisch sind.',
   'User options' => 'Benutzeroptionen',
   'Users will automatically be added to these groups' => 'Benutzer werden diesen Gruppen automatisch hinzugefügt',
+  'IMAP Authenticator' => 'IMAP Authentifizierung',
+  'Domains' => 'Domänen',
 );

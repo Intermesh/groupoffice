@@ -312,4 +312,13 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Ihre Mailbox ist v
   'No template' => 'Keine Vorlage',
   'Email address succesfully added to contact' => 'Die E-Mail-Adresse wurde dem Kontakt erfolgreich hinzugefügt',
   'Options' => 'Optionen',
+  'Templates' => 'Vorlagen',
+  'Document template' => 'Dokumentenvorlage',
+  'Default template' => 'Standard Vorlage',
+  'Create contact' => 'Kontakt erstellen',
+  'Add to contact' => 'Zu Kontakt hinzufügen',
+  'Open' => 'Offen',
+  'Custom contact fields' => 'Benutzerdefinierte Kontaktfelder',
+  'Custom company fields' => 'Benutzerdefinierte Organisationsfelder',
+  'Custom user fields' => 'Benutzerdefinierte Benutzerfelder',
 );

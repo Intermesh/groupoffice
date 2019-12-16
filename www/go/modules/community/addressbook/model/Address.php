@@ -123,7 +123,7 @@ class Address extends Property {
 		$format= str_replace('{state}', $this->state, $format);
 		$format= str_replace('{country}', $this->country, $format);
 		
-		return $format;
+		return preg_replace("/\n+/", "\n", $format);
 	}
 	
 	public function getCombinedStreet() {
