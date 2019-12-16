@@ -18,8 +18,8 @@ use PDO;
 use PDOException;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionProperty;
 use function GO;
-use go\core\db\Query as GoQuery;
 use go\core\db\Table;
 use go\core\ErrorHandler;
 use go\core\jmap\exception\InvalidArguments;
@@ -274,7 +274,7 @@ abstract class Property extends Model {
 
 		if(!isset(self::$cachedRelations[$cacheKey])) {
 			$key = self::getScalarKey($relation);
-			$query = (new GoQuery)->selectSingleValue($key)->from($relation->tableName);
+			$query = (new Query)->selectSingleValue($key)->from($relation->tableName);
 			foreach($where as $field => $value) {
 				$query->andWhere($field . '= :'.$field);
 			}
@@ -568,13 +568,14 @@ abstract class Property extends Model {
 		return true;
 	}
 
-	/**
-	 * Get the properties to fetch when using the find() method.
-	 * These properties will be preloaded including related properties from other
-	 * tables. They will also be returned to the client.
-	 * 
-	 * @return string[]
-	 */
+  /**
+   * Get the properties to fetch when using the find() method.
+   * These properties will be preloaded including related properties from other
+   * tables. They will also be returned to the client.
+   *
+   * @return string[]
+   * @throws ReflectionException
+   */
 	protected static function getDefaultFetchProperties() {
 		
 		$cacheKey = 'property-getDefaultFetchProperties-' . static::class;
@@ -665,13 +666,12 @@ abstract class Property extends Model {
 		return $query->single();
 	}
 
-	protected static $propNames = [];
-
   /**
    * Get all property names
    *
    * @return array|mixed
    * @throws ReflectionException
+   * @throws Exception
    */
 	private static function getPropNames() {
 		$cls = static::class;
@@ -681,7 +681,7 @@ abstract class Property extends Model {
 
 		if (!$propNames) {
 			$reflectionClass = new ReflectionClass($cls);
-			$props = $reflectionClass->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED);
+			$props = $reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
 			$propNames = [];
 			foreach ($props as $prop) {
 				if(!$prop->isStatic()) {
@@ -702,6 +702,11 @@ abstract class Property extends Model {
 		return $propNames;
 	}
 
+  /**
+   *
+   * @return string[]
+   * @throws Exception
+   */
 	protected static function getRequiredProperties() {	
 
 		$cls = static::class;
@@ -774,13 +779,14 @@ abstract class Property extends Model {
 		}
 	}
 
-	/**
-	 * 
-	 * @param MappedTable $tables
-	 * @param Query $query
-	 * 
-	 * @todo implement fetch properties
-	 */
+  /**
+   *
+   * @param MappedTable $tables
+   * @param Query $query
+   *
+   * @throws Exception
+   * @todo implement fetch properties
+   */
 	private static function joinAdditionalTables(array $tables, Query $query) {
 		$first = array_shift($tables);
 
@@ -790,7 +796,13 @@ abstract class Property extends Model {
 			$alias = $joinedTable->getAlias();
 		}
 	}
-	
+
+  /**
+   * @param $lastAlias
+   * @param MappedTable $joinedTable
+   * @param Query $query
+   * @throws Exception
+   */
 	private static function joinTable($lastAlias, MappedTable $joinedTable, Query $query) {
 		foreach ($joinedTable->getKeys() as $from => $to) {
 			if (!isset($on)) {
@@ -837,7 +849,7 @@ abstract class Property extends Model {
 		return $this->internalGetModified($properties);
 	}
 
-	private function datesAreDifferent($a, $b) {
+	private function datesAreDifferent(DateTime $a, DateTime $b) {
 		if(!isset($a) && isset($b)) {
 			return true;
 		}
@@ -974,9 +986,10 @@ abstract class Property extends Model {
 		return true;
 	}
 
-	/**
-	 * Saves all modified properties to the database.
-	 */
+  /**
+   * Saves all modified properties to the database.
+   * @throws Exception
+   */
 	protected function saveTables() {
 		if($this->readOnly) {
 			throw new Exception("Can't save in read only mode");
@@ -985,7 +998,7 @@ abstract class Property extends Model {
 		
 		// make sure auto incremented values come first
 		$tables = $this->getMapping()->getTables();
-		usort($tables, function(\go\core\db\Table $a, \go\core\db\Table $b) {
+		usort($tables, function(Table $a, Table $b) {
 			$aHasAI = $a->getAutoIncrementColumn();
 			$bHasAI = $b->getAutoIncrementColumn();
 			if($aHasAI && !$bHasAI) {
@@ -1008,12 +1021,13 @@ abstract class Property extends Model {
 
 		return true;
 	}
-	
-	/**
-	 * Get all columns containing blob id's
-	 * 
-	 * @return Column[]
-	 */
+
+  /**
+   * Get all columns containing blob id's
+   *
+   * @return Column[]
+   * @throws Exception
+   */
 	private static function getBlobColumns() {
 		
 		$refs = Blob::getReferences();
@@ -1030,7 +1044,10 @@ abstract class Property extends Model {
 		
 		return $cols;
 	}
-	
+
+  /**
+   * @throws Exception
+   */
 	private function checkBlobs() {
 		$blobs = [];
 		foreach($this->getBlobColumns() as $col) {
@@ -1055,7 +1072,7 @@ abstract class Property extends Model {
 	/**
 	 * Sets some default values such as modifiedAt and modifiedBy
 	 */
-	private function setSaveProps(\go\core\db\Table $table, $modifiedForTable) {
+	private function setSaveProps(Table $table, $modifiedForTable) {
 		
 		if($table->getColumn("modifiedBy") && !isset($modifiedForTable["modifiedBy"])) {
 			$this->modifiedBy = $modifiedForTable['modifiedBy'] = $this->getDefaultCreatedBy();
@@ -1084,11 +1101,12 @@ abstract class Property extends Model {
 		return !App::get()->getAuthState() || !App::get()->getAuthState()->getUserId() ? 1 : App::get()->getAuthState()->getUserId();
 	}
 
-	/**
-	 * Saves all property relations
-	 * 
-	 * @return boolean
-	 */
+  /**
+   * Saves all property relations
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	private function saveRelatedProperties() {
 		foreach ($this->getFetchedRelations() as $relation) {
 
@@ -1125,6 +1143,11 @@ abstract class Property extends Model {
 		return true;
 	}
 
+  /**
+   * @param Relation $relation
+   * @return bool
+   * @throws Exception
+   */
 	private function saveRelatedHasOne(Relation $relation) {
 		
 		//remove old model if it's replaced
@@ -1173,6 +1196,11 @@ abstract class Property extends Model {
 	 */
 	private $relatedValidationErrors = [];
 
+  /**
+   * @param Relation $relation
+   * @return bool
+   * @throws Exception
+   */
 	private function saveRelatedArray(Relation $relation) {
 	
 		$modified = $this->getModified([$relation->name]);
@@ -1215,38 +1243,25 @@ abstract class Property extends Model {
 		return true;
 	}
 
+  /**
+   * @param Relation $relation
+   * @param self[] $models
+   * @param self[] $oldModels
+   * @return bool
+   * @throws Exception
+   */
 	private function removeRelated(Relation $relation, $models, $oldModels) {
-		$cls = $relation->entityName;
-		$tables = $cls::getMapping()->getTables();
-		$first = array_shift($tables);
-	
-		$where = $this->buildRelationWhere($relation);
 
-		$query = new GoQuery();
+		$cls = $relation->entityName;
+		$where = $this->buildRelationWhere($relation);
+		$query = new Query();
 		$query->where($where);
 
 		if($relation->type == Relation::TYPE_MAP) {
-		
-			// $keepKeys = new Criteria();
-			// foreach ($models as $keep) {
-
-			// 	if($keep === null) {
-			// 		//deleted model
-			// 		continue;
-			// 	}
-
-			// 	if(!$keep->isNew()) {
-			// 		$keepKeys->orWhere($keep->primaryKeyValues());
-			// 	}
-			// }
-			// if($keepKeys->hasConditions()) {
-			// 	$query->andWhereNot($keepKeys);
-			// }
 
 			if(!isset($oldModels)) {
 				return true;
 			}
-			
 			
 			$keepKeys = array_map(function($model){return isset($model) ? $model->id() : '-';}, $models);
 			$removeKeys = new Criteria();
@@ -1271,14 +1286,16 @@ abstract class Property extends Model {
 			}
 
 			$query->andWhere($removeKeys);
-
-			
 		}
-		$stmt = \go()->getDbConnection()->delete($first->getName(), $query);	
 
-		return $stmt->execute();
+		return $cls::internalDelete($query);
 	}
 
+  /**
+   * @param Relation $relation
+   * @return bool
+   * @throws Exception
+   */
 	private function saveRelatedScalar(Relation $relation) {
 		$modified = $this->getModified([$relation->name]);
 		if(empty($modified)) {
@@ -1293,7 +1310,7 @@ abstract class Property extends Model {
 		$removeIds = array_diff($old, $new);
 		if(!empty($removeIds)) {
 			
-			$query = (new GoQuery())->where($where);
+			$query = (new Query())->where($where);
 			$query->andWhere($key, 'IN', $removeIds);
 			if(!go()->getDbConnection()->delete($relation->tableName, $query)->execute()) {
 				throw new Exception("Could not delete scalar relation ids");
@@ -1313,9 +1330,15 @@ abstract class Property extends Model {
 		}
 
 		return true;
-
 	}
 
+  /**
+   * Save's a related map
+   *
+   * @param Relation $relation
+   * @return bool
+   * @throws Exception
+   */
 	private function saveRelatedMap(Relation $relation) {		
 		
 		$modified = $this->getModified([$relation->name]);
@@ -1625,15 +1648,16 @@ abstract class Property extends Model {
 		return $props;
 	}
 
-	/**
-	 * Delete this model
-	 * 
-	 * When finding the models to delete in an override use mergeWith():
-	 * 
-	 * self::find()->mergeWith($query);
-	 * 
-	 * @return boolean
-	 */
+  /**
+   * Delete this model
+   *
+   * When finding the models to delete in an override use mergeWith():
+   *
+   * self::find()->mergeWith($query);
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	protected static function internalDelete(Query $query) {
 
 		$primaryTable = static::getMapping()->getPrimaryTable();

@@ -27,7 +27,7 @@ class Relation {
 	/**
 	 * The class name of the {@see Property} or {@see Entity} this relation points to.
 	 * 
-	 * @var string 
+	 * @var Property
 	 */
 	public $entityName;
 

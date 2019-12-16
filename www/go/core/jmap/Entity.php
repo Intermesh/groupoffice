@@ -3,6 +3,7 @@
 namespace go\core\jmap;
 
 use Exception;
+use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\orm\Entity as OrmEntity;
@@ -166,30 +167,39 @@ abstract class Entity  extends OrmEntity {
 			$entities = $this->findEntitiesByTable($r->tableName);
 			$classes = array_unique(array_map(function($e) {return $e['cls'];},$entities));
 			foreach($classes as $cls) {
-        /** @var Query $query */
-
-        $query = $cls::find();
+			  $query = $cls::find();
         $query->where('id', 'IN', $ids);
-        $query->select($query->getTableAlias() . '.id AS entityId');
-
-        if(is_a($cls, AclItemEntity::class, true)) {
-          $aclAlias = $cls::joinAclEntity($query);
-          $query->select($aclAlias .'.aclId', true);
-        } else if(is_a($cls, AclOwnerEntity::class, true)) {
-          $query->select('aclId', true);
-        } else{
-          $query->select('NULL AS aclId', true);
-        }
-
-        $query->select('"0" AS destroyed', true);
-
-        $type = $cls::entityType();
-        /** @var EntityType $type */
-        $type->changes($query);
-
+        $this->changesQuery($query, $cls, $ids);
 			}			
 		}
 	}
+
+  /**
+   * Marks changes for query already prepared for selecting the right ID's
+   *
+   * @param Query $query
+   * @param Property $cls
+   * @throws Exception
+   */
+	private static function changesQuery(Query $query, $cls) {
+
+    $query->select($query->getTableAlias() . '.id AS entityId');
+
+    if(is_a($cls, AclItemEntity::class, true)) {
+      $aclAlias = $cls::joinAclEntity($query);
+      $query->select($aclAlias .'.aclId', true);
+    } else if(is_a($cls, AclOwnerEntity::class, true)) {
+      $query->select('aclId', true);
+    } else{
+      $query->select('NULL AS aclId', true);
+    }
+
+    $query->select('"0" AS destroyed', true);
+
+    $type = $cls::entityType();
+    /** @var EntityType $type */
+    $type->changes($query);
+  }
 
   /**
    * Delete's the entitiy. Implements change logging for sync.
@@ -255,11 +265,6 @@ abstract class Entity  extends OrmEntity {
 		return static::entityType()->changes($ids);
 	}
 
-	// public static function markChangesForDelete(array $ids, $aclId = null) {
-	// 	static::changeReferencedEntities($ids);
-	// 	static::entityType()->changes(array_map(function($id) { return ['entityId' => $id, 'aclId' => $aclId, 'destroyed' => true];}, $ids));
-	// }
-
   /**
    * This function finds all entities that might change because of this delete.
    * This happens when they have a foreign key constraint with SET NULL
@@ -281,22 +286,7 @@ abstract class Entity  extends OrmEntity {
 				} else{
 					$query->where($r['column'], 'IN', $ids);					
 				}
-
-				$query->select($query->getTableAlias() . '.id AS entityId');
-
-				if(is_a($cls, AclItemEntity::class, true)) {
-					$aclAlias = $cls::joinAclEntity($query);
-					$query->select($aclAlias .'.aclId', true);
-				} else if(is_a($cls, AclOwnerEntity::class, true)) {
-					$query->select('aclId', true);
-				} else{
-					$query->select('NULL AS aclId', true);
-				}
-				$query->select('"0" AS destroyed', true);
-				$type = $cls::entityType();
-
-				/** @var EntityType $type */
-				$type->changes($query);
+				static::changesQuery($query, $cls);
 			}		
 		}
 	}
