@@ -1,3 +1,4 @@
+- Core: Fixed date and date time format in templates
 - Custom fields: Fixed save error when cache was not cleared and cleaned up code
 - API keys: Fixed delete error for API keys
 - E-mail: Reimplemented add unknown recipients
@@ -5,6 +6,7 @@
 - Core: Fixed incorrect info on synchronisation settings as admin
 - Files: Fixed file not found bug when downloading files
 - Core: Fixed missing back button on small screens for system settings dialog and user settings dialog
+- Newsletters: Unable to add new recipients when last recipient was removed
 
 10-12-2019 6.4.92
 - Address book: Add contact was broken
