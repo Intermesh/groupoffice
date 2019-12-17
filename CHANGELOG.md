@@ -1,3 +1,5 @@
+- Core: Paste from spreadsheet editors as HTML and not as an image
+
 17-12-2019 6.4.93
 - Email: improved search toolbar
 - Core: Use accent color for active search to make it more clear

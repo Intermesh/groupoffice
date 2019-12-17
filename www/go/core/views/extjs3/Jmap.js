@@ -25,11 +25,15 @@ go.Jmap = {
 		this.scheduleRequest({
 			method: 'community/dev/Debugger/get',
 			params: {},
-			callback: function(options, success, response, clientCallId) {		
-				for(var i = 0, l = response.length; i < l; i ++) {			
-					var method = response[i].shift();				
-					console[method].apply(null, response[i]);				
+			callback: function(options, success, response, clientCallId) {
+
+				var r;
+				while(r = response.shift()) {
+					var method = r.shift();
+					r.push(clientCallId);
+					console[method].apply(null, r);
 				}
+
 			}
 		}).catch(function() {
 			//ignore error
