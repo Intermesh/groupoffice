@@ -224,7 +224,7 @@ CREATE TABLE `core_user` (
   `timezone` varchar(50) NOT NULL DEFAULT 'Europe/Amsterdam',
   `start_module` varchar(50) NOT NULL DEFAULT 'summary',
   `language` varchar(20) NOT NULL DEFAULT 'en',
-  `theme` varchar(20) NOT NULL DEFAULT 'Default',
+  `theme` varchar(20) NOT NULL DEFAULT 'Paper',
   `firstWeekday` tinyint(4) NOT NULL DEFAULT 1,
   `sort_name` varchar(20) NOT NULL DEFAULT 'first_name',
   `muser_id` int(11) NOT NULL DEFAULT 0,
