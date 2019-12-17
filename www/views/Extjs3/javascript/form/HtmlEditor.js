@@ -137,8 +137,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	onPaste: function (e) {		
 		var clipboardData = e.clipboardData;
 		if (clipboardData.items) {
-			//Chrome has clibBoardData.items
-			console.warn(clipboardData.items);
+			//Chrome /safari has clibBoardData.items
 			for (var i = 0, l = clipboardData.items.length; i < l; i++) {
 				var item = clipboardData.items[i];
 
