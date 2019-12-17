@@ -647,5 +647,4 @@ $updates['201911120000'][] = "ALTER TABLE `core_customfields_field` ADD `require
 
 
 $updates['201912170000'][] = "ALTER TABLE `core_user` CHANGE `theme` `theme` VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Paper';";
-$updates['201912170000'][] = "ALTER TABLE `core_user` CHANGE `theme` `theme` VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Paper';";
 $updates['201912170000'][] = "update `core_user` set theme='Paper' where theme='Default';";
