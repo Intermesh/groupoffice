@@ -1,4 +1,5 @@
 - Calendasr: Show unconfirmed holidays
+- Core: Fixed upgrade when $config['webmaster_email'] is not present.
 
 01-11-2019 6.3.84
 - Projects: Fixed activity sort in time tracking
