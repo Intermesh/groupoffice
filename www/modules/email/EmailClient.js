@@ -1220,6 +1220,7 @@ this.messagePanel.show();
 	},
 
 	addSendersToAddresslist : function(addresslistId) {
+		debugger;
 		var records = this.messagesGrid.getSelectionModel().getSelections();
 		var senderNames = new Array();
 		var senderEmails = new Array();
