@@ -7,13 +7,12 @@
 }
 
 .zpushadmin-new-device{
-	background-color: #FFBD69;
+	color: #FFBD69;
 }
 
 .zpushadmin-enabled-device{
-	background-color: #C6D880;
 }
 
 .zpushadmin-disabled-device{
-	background-color: #ffd1d1;
+	color: #ffd1d1;
 }
