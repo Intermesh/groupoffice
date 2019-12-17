@@ -3,11 +3,9 @@
 namespace go\core\model;
 
 use Exception;
-use GO;
 use GO\Base\Model\AbstractUserDefaultModel;
 use GO\Base\Model\User as LegacyUser;
 use GO\Base\Util\Http;
-use go\core\model\Acl;
 use go\core\App;
 use go\core\auth\Method;
 use go\core\auth\Password;
@@ -17,12 +15,9 @@ use go\core\db\Criteria;
 use go\core\orm\Query;
 use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
-use go\core\model\Module;
 use go\core\orm\CustomFieldsTrait;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
-use go\core\model\Group;
-use go\core\model\Settings;
 
 
 class User extends Entity {
@@ -195,7 +190,9 @@ class User extends Entity {
 	
 	protected $last_password_change;
 	public $force_password_change;
-	
+
+	protected $permissionLevel;
+
 	
 	public function getDateTimeFormat() {
 		return $this->dateFormat . ' ' . $this->timeFormat;
@@ -234,12 +231,13 @@ class User extends Entity {
 			->addScalar('groups', 'core_user_group', ['id' => 'userId'])
 			->addHasOne('workingWeek', WorkingWeek::class, ['id' => 'user_id']);
 	}
-	
-	/**
-	 * Get the user's personal group used for granting permissions
-	 * 
-	 * @return Group	 
-	 */
+
+  /**
+   * Get the user's personal group used for granting permissions
+   *
+   * @return Group
+   * @throws Exception
+   */
 	public function getPersonalGroup() {
 		return Group::find()->where(['isUserGroupFor' => $this->id])->single();
 	}
@@ -279,7 +277,11 @@ class User extends Entity {
 	}
 
 	private $currentPassword;
-	
+
+  /**
+   * @param $currentPassword
+   * @throws Exception
+   */
 	public function setCurrentPassword($currentPassword){
 		$this->currentPassword = $currentPassword;
 		
@@ -288,17 +290,18 @@ class User extends Entity {
 		} 
 	}
 
-	/**
-	 * Check if the password is correct for this user.
-	 * 
-	 * @param string $password
-	 * @return boolean 
-	 */
+  /**
+   * Check if the password is correct for this user.
+   *
+   * @param string $password
+   * @return boolean
+   * @throws Exception
+   */
 	public function checkPassword($password) {		
 		
 		$authenticator = $this->getPrimaryAuthenticator();
 		if(!isset($authenticator)) {
-			throw new \Exception("No primary authenticator found!");
+			throw new Exception("No primary authenticator found!");
 		}
 		$success = $authenticator->authenticate($this->username, $password);		
 		if($success) {
@@ -337,13 +340,14 @@ class User extends Entity {
 		return !empty($this->password);
 	}
 
-	/**
-	 * Clear the password stored in the database.
-	 * 
-	 * Used by authenticators (IMAP or LDAP) so they can clear it if it's not needed.
-	 * 
-	 * @return bool
-	 */
+  /**
+   * Clear the password stored in the database.
+   *
+   * Used by authenticators (IMAP or LDAP) so they can clear it if it's not needed.
+   *
+   * @return bool
+   * @throws Exception
+   */
 	public function clearPassword() {
 		return go()->getDbConnection()->delete('core_auth_password', ['userId' => $this->id])->execute();
 	}
@@ -352,10 +356,11 @@ class User extends Entity {
 		return null;
 	}
 
-	/**
-	 * Make sure to call this when changing the password with a recovery hash
-	 * @param string $hash
-	 */
+  /**
+   * Make sure to call this when changing the password with a recovery hash
+   * @param string $hash
+   * @return bool
+   */
 	public function checkRecoveryHash($hash) {
 		if($hash === $this->recoveryHash) {
 			$this->passwordVerified = true;
@@ -466,33 +471,41 @@ class User extends Entity {
 	
 	protected static function defineFilters() {
 		return parent::defineFilters()
-						->add('showDisabled', function (Criteria $criteria, $value){							
-							if($value === false) {
-								$criteria->andWhere('enabled', '=', true);
-							}
-						})
-						->add('groupId', function (Criteria $criteria, $value, Query $query){
-							$query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $value]);
-						});
+      ->add('permissionLevel', function(Criteria $criteria, $value, Query $query) {
+        if(!$query->isJoined('core_group', 'g')) {
+          $query->join('core_group', 'g', 'u.id = g.isUserGroupFor');
+        }
+        Acl::applyToQuery($query, 'g.aclId', $value);
+      })
+      ->add('showDisabled', function (Criteria $criteria, $value){
+        if($value === false) {
+          $criteria->andWhere('enabled', '=', true);
+        }
+      })
+      ->add('groupId', function (Criteria $criteria, $value, Query $query){
+        $query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $value]);
+      });
 	}
-	
 
-	/**
-	 * Check if use is an admin
-	 * 
-	 * @return boolean
-	 */
+
+  /**
+   * Check if use is an admin
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	public function isAdmin() {
 		return (new Query)
 			->select('*')
 			->from('core_user_group')
 			->where(['groupId' => Group::ID_ADMINS, 'userId' => $this->id])->single() !== false;
 	}
-	
-	/**
-	 * Alias for making isAdmin() a public property
-	 * @return bool
-	 */
+
+  /**
+   * Alias for making isAdmin() a public property
+   * @return bool
+   * @throws Exception
+   */
 	public function getIsAdmin() {
 		return $this->isAdmin();
 	}
@@ -527,14 +540,15 @@ class User extends Entity {
 
 		return $methods;
 	}
-	
-	/**
-	 * Send a password recovery link
-	 * 
-	 * @param string $to
-	 * @param string $redirectUrl If given GroupOffice will redirect to this URL after creating a new password.
-	 * @return boolean
-	 */
+
+  /**
+   * Send a password recovery link
+   *
+   * @param string $to
+   * @param string $redirectUrl If given GroupOffice will redirect to this URL after creating a new password.
+   * @return boolean
+   * @throws Exception
+   */
 	public function sendRecoveryMail($to, $redirectUrl = ""){
 		
 		$this->recoveryHash = bin2hex(random_bytes(20));
@@ -802,7 +816,7 @@ class User extends Entity {
 	
 	public function setProfile($values) {
 		if(!Module::findByName('community', 'addressbook')) {
-			throw new \Exception("Can't set profile without address book module.");
+			throw new Exception("Can't set profile without address book module.");
 		}
 		
 		$this->contact = $this->getProfile();		
@@ -820,4 +834,5 @@ class User extends Entity {
 		$arr['text/csv'] = UserCsv::class;
 		return $arr;
 	}
+
 }

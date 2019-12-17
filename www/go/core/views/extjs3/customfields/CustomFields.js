@@ -285,7 +285,7 @@
 		renderField: function (fieldId, values) {
 			var field = this.fields[fieldId];
 
-			type = this.getType(field.type);
+			var type = this.getType(field.type);
 			if(!type) {							
 				console.error("Custom field type " + field.type + " not found");
 				return "";
@@ -303,7 +303,7 @@
 		getFieldIcon: function (fieldId) {
 			var field = this.fields[fieldId];
 			
-			type = this.getType(field.type);
+			var type = this.getType(field.type);
 			if(!type) {							
 				console.error("Custom field type " + field.type + " not found");
 				return "";
@@ -319,57 +319,13 @@
 		 * @returns {Array}
 		 */
 		getDetailPanels: function (entity) {
-			
 			var fieldSets = this.getFieldSets(entity), panels = [], me = this;
 
 			fieldSets.forEach(function (fieldSet) {
-				
-				var items = [];		
-				
-				
-				go.customfields.CustomFields.getFields(fieldSet.id).forEach(function (field) {					
-					var type = me.getType(field.type);
-					if(!type) {
-						console.error("Custom field type " + field.type + " not found");
-						return;
-					}
-					var cmp = type.getDetailField(field);					
-					cmp.field = field;
-					items.push(cmp);
-				});
-				
-				panels.push({				
-					xtype: "panel",
-					stateId: "cf-detail-field-set-" + fieldSet.id,
-					fieldSetId: fieldSet.id,
-					title: fieldSet.name,
-					bodyCssClass: 'icons',
-					items: items,
-					collapsible: true,
-					onLoad: function(dv) {
-						var vis = false, panel = this;							
-						go.customfields.CustomFields.getFields(fieldSet.id).forEach(function (field) {
-							if(!GO.util.empty(dv.data.customFields[field.databaseName])) {
-								vis = true;
-							}
-							
-							var cmp = panel.getComponent(field.databaseName), type = me.getType(field.type);
-							
-							if(cmp) {
-								var v = type.renderDetailView(dv.data.customFields[field.databaseName], dv.data.customFields, field, cmp);
-					
-								if(typeof(v) !== "undefined") {
-									cmp.setValue(v);
-									cmp.setVisible(!!v);
-								}
-							}
-						});
-
-						this.setVisible(vis);				
-					}
-				});
-			});			
-			
+				panels.push(new go.customfields.DetailPanel({
+					fieldSet: fieldSet
+				}));
+			});
 			return panels;
 		}
 	});

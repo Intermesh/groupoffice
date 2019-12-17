@@ -220,6 +220,11 @@ GO.email.SearchDialog = function(config){
 			this.hasSearch = true;
 			config.store.baseParams['query']=this.buildQuery();
 			config.store.baseParams['searchIn']=this.formPanel.form.findField('searchInGroup').getValue();
+
+
+			config.grid.searchField.resetButton.setDisabled(false);
+			config.grid.searchField.triggerField.setDisabled(true);
+			config.grid.searchField.updateView();
 			config.store.load();
 			
 			this.dialog.hide();					

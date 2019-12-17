@@ -164,7 +164,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 						 * },
 						 */
 						if(this.fireEvent("beforesubmiterror", this, false, null, notSaved[id])) {
-							Ext.MessageBox.alert(t("Error"), t("Sorry, an unexpected error occurred: ") + (response.message || "unkonw error"));
+							Ext.MessageBox.alert(t("Error"), t("Sorry, an unexpected error occurred: ") + (response.message || "unknown error"));
 						}
 						break;
 				}

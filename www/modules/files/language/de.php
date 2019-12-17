@@ -140,4 +140,6 @@ The following changes were made by %s:
   'File info' => 'Dateiinfo',
   'Browse {total} files' => ' {total} Dateien durchsuchen',
   'Browse files' => 'Dateien durchsuchen',
+  'Email files' => 'E-Mail Dateien',
+  'Create folder' => 'Ordner erstellen',
 );

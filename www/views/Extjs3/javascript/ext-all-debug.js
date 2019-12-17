@@ -18044,7 +18044,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
         if(!this.toolTemplate){
             
             var tt = new Ext.Template(
-                 '<div class="x-tool x-tool-{id}">&#160;</div>'
+                 '<div class="x-tool x-tool-{id} {cls}">&#160;</div>'
             );
             tt.disableFormats = true;
             tt.compile();

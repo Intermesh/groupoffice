@@ -1,3 +1,20 @@
+17-12-2019 6.4.93
+- Email: improved search toolbar
+- Core: Use accent color for active search to make it more clear
+- Email: Emoji insert button added
+- Comments: Some buttons were hidden when container is small
+- Core: relation of type 'map' automatically changes state
+- Core: Fixed date and date time format in templates
+- Custom fields: Fixed save error when cache was not cleared and cleaned up code
+- API keys: Fixed delete error for API keys
+- E-mail: Reimplemented add unknown recipients
+- Core: Updated German translation
+- Core: Fixed incorrect info on synchronisation settings as admin
+- Files: Fixed file not found bug when downloading files
+- Core: Fixed missing back button on small screens for system settings dialog and user settings dialog
+- Newsletters: Unable to add new recipients when last recipient was removed
+- Custom fields: Hidden custom fields could show in detail view 
+
 10-12-2019 6.4.92
 - Address book: Add contact was broken
 - Core: Encode filename in upload header to support UTF-8 filenames
@@ -539,7 +556,8 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
 - Calendasr: Show unconfirmed holidays
-
+- Core: Fixed upgrade when $config['webmaster_email'] is not present.
+- Email: Fixed showing emoticons in email
 01-11-2019 6.3.84
 - Projects: Fixed activity sort in time tracking
 - Billing: Fixed total not always updating in expense dialog

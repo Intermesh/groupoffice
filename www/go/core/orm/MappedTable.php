@@ -35,7 +35,7 @@ class MappedTable extends Table {
 	 * Mapped table constructor
 	 * 
 	 * @param string $name The table name
-	 * @param sring $alias The table alias to use in the queries
+	 * @param string $alias The table alias to use in the queries
 	 * @param array $keys If empty then it's assumed the key name is identical in 
 	 *   this and the last added table. eg. ['id' => 'id']
 	 * @params array $columns Leave this empty if you want to automatically build 

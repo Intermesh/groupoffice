@@ -712,6 +712,10 @@
 		&.x-btn-pressed {
 			@extend .z8;
 		}
+
+		&.accent {
+			@include var(background-color, c-accent);
+		}
 	}
 	.x-toolbar & {
 		
@@ -923,6 +927,10 @@
 			pointer-events: none;
 			opacity: 0;
 		}
+		.x-form-field-trigger-wrap > input {
+			padding-right: dp(56);
+		}
+
 		input {
 			box-shadow: none;
 			min-height: dp(56);

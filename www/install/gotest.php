@@ -85,10 +85,10 @@ function test_system(){
 
 	
 
-	$test['name']='PHP acpu support';
+	$test['name']='PHP apcu support';
 	$test['showSuccessFeedback'] = false;
 	$test['pass']=extension_loaded('apcu');
-	$test['feedback']="It's recommended to install the PHP acpu extension for Group-Office to improve performance.";
+	$test['feedback']="It's recommended to install the PHP apcu extension for Group-Office to improve performance.";
 	$test['fatal']=false;
 	$tests[]=$test;
 	

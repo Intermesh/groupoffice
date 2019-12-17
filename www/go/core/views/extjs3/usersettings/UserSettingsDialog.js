@@ -126,25 +126,24 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		}, this);
 
 
-		if(GO.util.isMobileOrTablet()) {
-			this.tools = [{
-				id: "left",
-				handler: function () {
-					this.navMenu.show();
-				},
-				scope: this
-			}];			
+		this.tools = [{
+			id: "left",
+			cls: 'go-show-tablet',
+			handler: function () {
+				this.navMenu.show();
+			},
+			scope: this
+		}];
 
-			this.navMenu.on("show", function() {
-				var tool = this.getTool("left");
-				tool.hide();
-			},this);
+		this.navMenu.on("show", function() {
+			var tool = this.getTool("left");
+			tool.dom.classList.add('go-hide')
+		},this);
 
-			this.formPanel.on("show", function() {			
-				var tool = this.getTool("left");
-				tool.show();				
-			}, this)
-		}
+		this.formPanel.on("show", function() {
+			var tool = this.getTool("left");
+			tool.dom.classList.remove('go-hide')
+		}, this);
 		
 		go.usersettings.UserSettingsDialog.superclass.initComponent.call(this);
 		
@@ -154,7 +153,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	
 	loadModulePanels : function() {
     
-		var available = go.Modules.getAvailable(), pnl, config, i, i1;
+		var available = go.Modules.getAvailable(), pnl, config, i, i1, l, l2;
 		for(i = 0, l = available.length; i < l; i++) {
 			
 			config = go.Modules.getConfig(available[i].package, available[i].name);
@@ -183,7 +182,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	show: function(){
 		go.usersettings.UserSettingsDialog.superclass.show.call(this);
 
-		if(!GO.util.isMobileOrTablet()) {
+		if(!GO.util.isTabletScreenSize()) {
 			this.navMenu.select(this.tabStore.getAt(0));
 		}
 	},
@@ -367,6 +366,13 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 				me.user = users[0];
 				me.loadModulePanels();
 
+				// loop through child panels and call onLoadComplete function if available
+				me.tabPanel.items.each(function(tab) {
+					if(tab.onLoadStart) {
+						tab.onLoadStart(me.currentUserId);
+					}
+				},me);
+
 				me.formPanel.getForm().setValues(users[0]);
 				
 				me.findBy(function(cmp,cont){
@@ -377,13 +383,6 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 
 				me.loadComplete(users[0]);
 			}, me);
-
-			// loop through child panels and call onLoadComplete function if available
-			me.tabPanel.items.each(function(tab) {
-				if(tab.onLoadStart){
-					tab.onLoadStart(me.currentUserId);
-				}
-			},me);
 		}
 		
 		// The form needs to be rendered before the data can be set

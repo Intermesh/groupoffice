@@ -1,7 +1,7 @@
 <?php
 return array (
   'Script name' => 'Skriptname',
-  'Not' => 'nein',
+  'Not' => 'Nicht',
   'Type' => 'Typ',
   'Copy' => 'Kopieren',
   'Target' => 'Ziel',
