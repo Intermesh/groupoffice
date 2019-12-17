@@ -712,6 +712,10 @@
 		&.x-btn-pressed {
 			@extend .z8;
 		}
+
+		&.accent {
+			@include var(background-color, c-accent);
+		}
 	}
 	.x-toolbar & {
 		

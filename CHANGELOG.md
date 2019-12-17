@@ -1,4 +1,5 @@
 17-12-2019 6.4.93
+- Email: Emoji insert button added
 - Comments: Some buttons were hidden when container is small
 - Core: relation of type 'map' automatically changes state
 - Core: Fixed date and date time format in templates

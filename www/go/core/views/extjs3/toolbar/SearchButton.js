@@ -162,9 +162,11 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	updateView : function(){
 		if(this.hasActiveSearch()){
 			this.addClass('raised');
+			this.addClass('accent');
 			this.setTooltip(t("Change search condition"));
 		} else {
 			this.removeClass('raised');
+			this.removeClass('accent');
 			this.setTooltip(t("Search"));
 		}
 	},
