@@ -814,6 +814,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			GO.email.messagesGrid.store.baseParams['unread']=0;
 			this.messagesGrid.setSearchFields('from', sender);
 
+			this.messagesGrid.searchField.search();
+
 			this.messagesGrid.store.load({
 				params:{
 					start:0

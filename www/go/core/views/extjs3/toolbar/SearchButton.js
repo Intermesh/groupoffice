@@ -298,6 +298,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	
 	reset : function() {
 		this.triggerField.setValue("");
+		this.triggerField.setDisabled(false);
 		this.fireEvent('reset', this);
 		this.updateView();
 	},

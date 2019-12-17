@@ -159,7 +159,8 @@ GO.email.MessagesGrid = function(config){
 	});
 	
 	this.searchDialog = new GO.email.SearchDialog({
-		store:config.store
+		store:config.store,
+		grid: this
 	});
 
 	
@@ -251,13 +252,13 @@ GO.email.MessagesGrid = function(config){
 					iconCls: 'ic-more',
 					tooltip: t("Search"),
 					handler: function(){
-						var first = !this.searchDialog.dialog;
+						// var first = !this.searchDialog.dialog;
 						this.searchDialog.show();
-						if(first) {
-							this.searchDialog.dialog.on('hide', function() {
-								this.searchField.updateView();
-							}, this);
-						}
+						// if(first) {
+						// 	this.searchDialog.dialog.on('hide', function() {
+						// 		this.searchField.updateView();
+						// 	}, this);
+						// }
 					},
 					scope: this
 				}
@@ -356,8 +357,6 @@ Ext.extend(GO.email.MessagesGrid, GO.grid.GridPanel,{
 	{
 		this.searchType.setValue(type);
 		this.searchField.setValue(query);
-
-		this.searchField.hasSearch = (query) ? true : false;
 	},
 	toggleUnread : function(item, pressed)
 	{
