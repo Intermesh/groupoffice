@@ -1,4 +1,5 @@
 17-12-2019 6.4.93
+- Email: improved search toolbar
 - Core: Use accent color for active search to make it more clear
 - Email: Emoji insert button added
 - Comments: Some buttons were hidden when container is small
