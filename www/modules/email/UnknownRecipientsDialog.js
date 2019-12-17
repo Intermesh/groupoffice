@@ -14,7 +14,6 @@
 GO.email.UnknownRecipientsDialog = Ext.extend(Ext.Window, {
 	
 	initComponent : function(){
-		
 		this.store = new GO.data.JsonStore({
 			root: 'recipients',
 			fields:['email','name', 'first_name', 'middle_name', 'last_name']

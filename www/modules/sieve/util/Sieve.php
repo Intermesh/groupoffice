@@ -331,11 +331,11 @@ class Sieve {
 					$require[] = 'vacation';
 				}
 				
-				// Check if the "mailbox" extension is supported
-				if($this->sieve->hasExtension('mailbox')){
-					$require[] = 'mailbox';
-					$createFlag = ':create ';
-				}
+				// // Check if the "mailbox" extension is supported
+				// if($this->sieve->hasExtension('mailbox')){
+				// 	$require[] = 'mailbox';
+				// 	$createFlag = ':create ';
+				// }
 								
 				$requireString = 'require ["'.implode('","', $require).'"];';
 

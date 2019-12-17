@@ -41,7 +41,7 @@ class Number {
 		
 		$ts = \GO::user() ? \GO::user()->thousands_separator : \GO::config()->default_thousands_separator;
 		$ds = \GO::user() ? \GO::user()->decimal_separator : \GO::config()->default_decimal_separator;
-		return number_format(floatval($number), $decimals, $ds, $ts);
+		return number_format(floatval($number), (int) $decimals, $ds, $ts);
 	}
 
 	/**

@@ -1330,7 +1330,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 							var callback = this.callback.createDelegate(this.scope);
 							callback.call();
 						}
-	
+						
 						if (GO.addressbook && action.result.unknown_recipients
 							&& action.result.unknown_recipients.length) {
 							if (!GO.email.unknownRecipientsDialog)
