@@ -162,9 +162,11 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	updateView : function(){
 		if(this.hasActiveSearch()){
 			this.addClass('raised');
+			this.addClass('accent');
 			this.setTooltip(t("Change search condition"));
 		} else {
 			this.removeClass('raised');
+			this.removeClass('accent');
 			this.setTooltip(t("Search"));
 		}
 	},
@@ -229,8 +231,10 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 
 				render : function(tb) {
 					tb.getEl().set({tabindex: 0});
-					tb.getEl().on("focusout", function(e) {		
-						if(!this.searchToolBar.getEl().dom.contains(e.browserEvent.relatedTarget)) {
+					tb.getEl().on("focusout", function(e) {
+
+						//hide toolbar if clicked outside. To allow a menu button we check if the target is not a menuy
+						if(!e.browserEvent.relatedTarget.classList.contains('x-menu-focus') && !this.searchToolBar.getEl().dom.contains(e.browserEvent.relatedTarget)) {
 							this.back();
 						}
 					}, this);
@@ -296,6 +300,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	
 	reset : function() {
 		this.triggerField.setValue("");
+		this.triggerField.setDisabled(false);
 		this.fireEvent('reset', this);
 		this.updateView();
 	},
