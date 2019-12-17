@@ -553,7 +553,7 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 
 - Calendasr: Show unconfirmed holidays
 - Core: Fixed upgrade when $config['webmaster_email'] is not present.
-
+- Email: Fixed showing emoticons in email
 01-11-2019 6.3.84
 - Projects: Fixed activity sort in time tracking
 - Billing: Fixed total not always updating in expense dialog
