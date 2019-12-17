@@ -1,3 +1,4 @@
+17-12-2019 6.4.93
 - Core: relation of type 'map' automatically changes state
 - Core: Fixed date and date time format in templates
 - Custom fields: Fixed save error when cache was not cleared and cleaned up code
