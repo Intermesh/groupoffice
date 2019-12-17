@@ -393,7 +393,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		
 		
 	
-		return [imageInsertPlugin];
+		return [imageInsertPlugin, go.form.HtmlEditor.emojiPlugin];
 	},
 	
 	getHtmlEditor : function() {
