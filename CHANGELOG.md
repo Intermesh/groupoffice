@@ -4,6 +4,7 @@
 - User: account creation checks for the max users count
 - Core: Improved printing view for Firefox
 - Address book: Select contact sorts alphabetically
+- Projects: Select user for time entry was missing
 
 17-12-2019 6.4.93
 - Email: improved search toolbar
