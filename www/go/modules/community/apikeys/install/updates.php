@@ -1,6 +1,6 @@
 <?php
 
-use go\core\auth\model\Token;
+use go\core\model\Token;
 use go\modules\community\apikeys\model\Key;
 
 $updates['201911071216'][] = function() {
@@ -8,7 +8,7 @@ $updates['201911071216'][] = function() {
 
     $token = Token::find()->where(['accessToken' => $key->accessToken])->single();
     if($token == false) {
-      $token = new \go\core\auth\model\Token();
+      $token = new \go\core\model\Token();
       $token->accessToken = $key->accessToken;
       $token->userId = 1;
     }

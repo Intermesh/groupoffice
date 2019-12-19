@@ -1,5 +1,5 @@
 <?php
-namespace go\core\auth\model;
+namespace go\core\model;
 
 use go\core\model\User;
 use PHPUnit\Framework\TestCase;

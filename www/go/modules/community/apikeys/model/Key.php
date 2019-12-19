@@ -1,7 +1,7 @@
 <?php
 namespace go\modules\community\apikeys\model;
 
-use go\core\auth\model\Token;
+use go\core\model\Token;
 use go\core\orm\Query;
 
 class Key extends \go\core\jmap\Entity {

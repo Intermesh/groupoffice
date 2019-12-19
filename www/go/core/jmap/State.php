@@ -2,7 +2,7 @@
 namespace go\core\jmap;
 
 use \GO\Base\Model\State as OldState;
-use go\core\auth\model\Token;
+use go\core\model\Token;
 use go\core\auth\State as AbstractState;
 use go\core\http\Exception;
 use go\core\http\Response;
