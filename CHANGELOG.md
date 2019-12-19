@@ -1,6 +1,5 @@
-- Projects: Send company id when selecting contact
-
 19-12-2019 6.3.86
+- Projects: Send company id when selecting contact
 - User: account creation checks for the max users count
 
 17-12-2019 6.3.85
