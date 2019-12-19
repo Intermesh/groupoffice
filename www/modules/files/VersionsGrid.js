@@ -52,7 +52,7 @@ GO.files.VersionsGrid = function(config) {
 		}, {
 			header : t("Modified at"),
 			dataIndex : 'mtime',
-			width:100
+			xtype: "datecolumn"
 		}]
 	});
 	

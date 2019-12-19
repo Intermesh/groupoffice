@@ -1,3 +1,15 @@
+19-12-2019 6.4.94
+- Core: Updated Brasilian Portugese language
+- Custom fields: There were 2 extra decimals for numbers in templates
+- Projects: Set contact on new invoice
+- Core: Optimized various date column widths
+- Core: fixed export error with multi select custom fields in it.
+- Core: Paste from spreadsheet editors as HTML and not as an image
+- User: account creation checks for the max users count
+- Core: Improved printing view for Firefox
+- Address book: Select contact sorts alphabetically
+- Projects: Select user for time entry was missing
+
 17-12-2019 6.4.93
 - Email: improved search toolbar
 - Core: Use accent color for active search to make it more clear
@@ -556,8 +568,19 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
 - Calendasr: Show unconfirmed holidays
+- Projects: Send company id when selecting contact
+
+19-12-2019 6.3.86
+- User: account creation checks for the max users count
+
+17-12-2019 6.3.85
+- Files: We did an update to Group-Office which comes with a new implementation of the Group-Office Assistant. If you use this please update it to the new version. You can find it under "Files" for your operating system at this page:
+https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-device.html
+
+- Calendar: Show unconfirmed holidays
 - Core: Fixed upgrade when $config['webmaster_email'] is not present.
 - Email: Fixed showing emoticons in email
+
 01-11-2019 6.3.84
 - Projects: Fixed activity sort in time tracking
 - Billing: Fixed total not always updating in expense dialog

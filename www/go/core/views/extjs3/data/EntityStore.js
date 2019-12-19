@@ -202,7 +202,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 	_fireChanges : function() {
 		var me = this;
-		console.warn('changes', me.entity.name, me.changes.added, me.changes.changed, me.changes.destroyed);
+		// console.warn('changes', me.entity.name, me.changes.added, me.changes.changed, me.changes.destroyed);
 		me.fireEvent('changes', me, me.changes.added, me.changes.changed, me.changes.destroyed);
 		me.initChanges();
 	},

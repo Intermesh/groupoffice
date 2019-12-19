@@ -174,8 +174,6 @@ GO.email.MessagesGrid = function(config){
 							this.searchType.setValue(item.value);
 							this.updateSearchTypeChecks();
 
-							console.warn(item.value);
-
 							GO.email.search_type = item.value;
 
 							if(localStorage){

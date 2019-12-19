@@ -2218,7 +2218,6 @@ $menuScrollerSize : dp(4);
 	.x-toolbar {
 		height: dp(40);
 		border-top: 1px solid color($fg, 'line');
-		input {min-height: 14px;}
 		.xtb-sep { display:none;}
 		.x-toolbar-cell {padding:0;}
 	}

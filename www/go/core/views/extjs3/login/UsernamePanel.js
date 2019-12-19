@@ -105,6 +105,7 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 			} else
 			{
 				this.usernameField.markInvalid(t("Bad username or password"));
+				Ext.MessageBox.alert("Error",t("Bad username or password"));
 			}
 		}
 	},
