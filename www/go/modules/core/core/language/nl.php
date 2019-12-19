@@ -592,6 +592,7 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Please enter a new password' => 'Voer een nieuw wachtwoord in a.u.b.',
   'New password' => 'Nieuw wachtwoord',
   'Lost password' => 'Wachtwoord vergeten',
+  'You\'re not allowed to create more than x users' => 'Het is niet toegestaan meer gebruikers dan het maximale aan te maken.',
   'countries' => 
   array (
     'AL' => 'Albanië',
