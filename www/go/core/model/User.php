@@ -443,10 +443,29 @@ class User extends Entity {
 				$this->setValidationError('email', ErrorCode::UNIQUE, 'The e-mail address must be unique in the system');
 			}
 		}
+
+		$this->validateMaxUsers();
 		
 		return parent::internalValidate();
 	}
+
+	private function validateMaxUsers () {
+		if(!$this->isNew()) {
+			return;
+		}
+
+		if($this->maxUsersReached()) {
+			$this->setValidationError('password', ErrorCode::FORBIDDEN, "You're not allowed to create more than x users");
+		}
+	}
 	
+	private function maxUsersReached() {
+		$stmt = go()->getDbConnection()->query("SELECT count(*) AS count FROM `core_user` WHERE enabled = 1");
+		$record = $stmt->fetch();
+		$countActive = $record['count'];
+		return \GO::config()->max_users > 0 && $countActive >= \GO::config()->max_users;
+	}
+
 	private static function count() {
 		return (int) (new Query())
 						->selectSingleValue('count(*)')
