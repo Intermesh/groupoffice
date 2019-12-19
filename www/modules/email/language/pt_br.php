@@ -319,4 +319,13 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Sua caixa postal e
   'Save the attachment to these items' => 'Salvar o anexo para estes itens',
   'mailbox' => 'caixa de correio',
   'Email address succesfully added to contact' => 'Endereço de e-mail adicionado com sucesso ao contato',
+  'Custom contact fields' => 'Campos de contato customizados',
+  'Custom company fields' => 'Campos de empresa customizados',
+  'Custom user fields' => 'Campos de usuário customizados',
+  'Create contact' => 'Criar contato',
+  'Add to contact' => 'Adicionar aos contatos',
+  'Open' => 'Abrir',
+  'Default template' => 'Modelo padrão',
+  'Templates' => 'Modelos',
+  'Document template' => 'Modelo de documento',
 );

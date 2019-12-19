@@ -1,3 +1,6 @@
+- Core: Updated Brasilian Portugese language
+- Custom fields: There were 2 extra decimals for numbers in templates
+- Projects: Set contact on new invoice
 - Core: Optimized various date column widths
 - Core: fixed export error with multi select custom fields in it.
 - Core: Paste from spreadsheet editors as HTML and not as an image
