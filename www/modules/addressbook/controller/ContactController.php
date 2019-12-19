@@ -735,13 +735,15 @@ class ContactController extends \GO\Base\Controller\AbstractModelController{
 	}
 	
 	protected function actionSelectContact($params){
-		$cfId = $params["customfield_id"];
-		$cfModel = \GO\Customfields\Model\Field::model()->findByPk($cfId);
+	  if(!empty($params["customfield_id"])) {
+      $cfId = $params["customfield_id"];
+      $cfModel = \GO\Customfields\Model\Field::model()->findByPk($cfId);
 
-		$options = $cfModel->options;
-		$optionsDecoded = json_decode($options,true);
-		$addressBookIds = $optionsDecoded["addressbookIds"];
-		$params['addressbook_ids'] = "[" . $addressBookIds . "]";
+      $options = $cfModel->options;
+      $optionsDecoded = json_decode($options, true);
+      $addressBookIds = $optionsDecoded["addressbookIds"];
+      $params['addressbook_ids'] = "[" . $addressBookIds . "]";
+    }
 		$response = array('total'=>0, 'results'=>array());
 		
 		if(isset($params['contact_id'])){
