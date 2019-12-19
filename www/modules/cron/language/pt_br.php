@@ -21,4 +21,7 @@ legacy;cron;(Only on the given numbers)"',
   'Manage system tasks' => 'Gerenciar tarefas do sistema',
   'Cron Settings' => 'Configurações Cron',
   'Upcoming Cron-Jobs' => 'Próximos Cron-Jobs',
+  'Please use one of these formats (eg. hour, no spaces):' => 'Por favor, use um destes formatos (por exemplo, hora, sem espaços):',
+  '(Only on the given numbers)' => '(Somente os números dados)',
+  'Params' => 'Parâmetros',
 );

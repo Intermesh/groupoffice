@@ -142,13 +142,12 @@ GO.tasks.TasksPanel = function(config)
 				xtype: "datecolumn",
 				header: t("Created at"),
 				dataIndex: 'ctime',
-				hidden:true,
-				
+				hidden:true
 			},{
 				xtype: "datecolumn",
 				header: t("Modified at"),
 				dataIndex: 'mtime',
-				hidden:true,
+				hidden:true
 			},{
 				id:'id',
 				width:200,

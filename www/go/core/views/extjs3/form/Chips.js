@@ -47,6 +47,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	store: null,
 	autoHeight: true,
 	storeBaseParams: null,
+	comboConfig: null,
 	allowBlank: true,
 	
 	initComponent: function () {
@@ -202,20 +203,19 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		}
 		
 		if(this.entityStore){
-			var baseParams = this.storeBaseParams || {filter : {}};
-			if(!baseParams.filter) {
-				baseParams.filter = {};				
+
+
+			var cfg = this.comboConfig || {};
+			cfg.baseParams = this.storeBaseParams || {filter : {}}
+			if(!cfg.baseParams.filter) {
+				cfg.baseParams.filter = {};
 			}
-			baseParams.filter.exclude = [];
+			cfg.baseParams.filter.exclude = [];
 
-			this.comboStore = new go.data.Store({
+			this.comboStore = new go.data.Store(Ext.apply(cfg, {
 				fields: [this.valueField, this.displayField],
-				entityStore: this.entityStore,
-				baseParams: baseParams				
-			});
-
-			
-
+				entityStore: this.entityStore
+			}));
 		} else
 		{
 			//clone the store.

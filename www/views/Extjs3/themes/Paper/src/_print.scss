@@ -14,13 +14,18 @@
 		padding:0;
 		overflow:visible !important;
 		//max-height: 297mm;
-		//max-width: 210mm;
+		max-width: 210mm;
 	}
 	body *, html body * > * {
 		visibility: hidden !important;
 		box-sizing: border-box;
 		//max-height: 297mm;
   	}
+
+	 .go-main-tab-panel, #mainNorthPanel{
+		 display: none !important;
+		 overflow: hidden !important;
+	 }
   	#paper, #paper *, html body #paper * {
 		page-break-after: auto;
 		// page-break-after: always;
@@ -28,7 +33,7 @@
 		visibility: visible !important;
   	}
   	#paper {
-		display:block;
+		display:block !important;
 		overflow:visible !important;
 		position:absolute !important;
 		box-shadow: none !important;

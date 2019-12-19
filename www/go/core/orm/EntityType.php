@@ -62,7 +62,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	/**
 	 * The PHP class name used in the PHP API
 	 * 
-	 * @return string
+	 * @return Entity
 	 */
 	public function getClassName() {
 		return $this->className;
