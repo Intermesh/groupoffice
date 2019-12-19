@@ -1,3 +1,4 @@
+19-12-2019 6.4.94
 - Core: Updated Brasilian Portugese language
 - Custom fields: There were 2 extra decimals for numbers in templates
 - Projects: Set contact on new invoice
