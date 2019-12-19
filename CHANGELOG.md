@@ -1,3 +1,4 @@
+- Core: Optimized various date column widths
 - Core: fixed export error with multi select custom fields in it.
 - Core: Paste from spreadsheet editors as HTML and not as an image
 - User: account creation checks for the max users count
