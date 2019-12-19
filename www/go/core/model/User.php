@@ -455,7 +455,7 @@ class User extends Entity {
 		}
 
 		if($this->maxUsersReached()) {
-			$this->setValidationError('password', ErrorCode::FORBIDDEN, "You're not allowed to create more than x users");
+			$this->setValidationError('password', ErrorCode::FORBIDDEN, go()->t("You're not allowed to create more than x users"));
 		}
 	}
 	
