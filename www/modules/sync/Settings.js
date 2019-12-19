@@ -55,7 +55,7 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 				var defaultCol = new GO.grid.RadioColumn({
 					header: t("Default", "sync"),
 					dataIndex: 'default_'+id,
-					width: 90,
+					width: 22,
 					isDisabled:function(record){
 						return record.get('permission_level')<GO.permissionLevels.writeAndDelete;
 					}
