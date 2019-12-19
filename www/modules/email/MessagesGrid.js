@@ -119,29 +119,123 @@ GO.email.MessagesGrid = function(config){
 	config.ddGroup = 'EmailDD';
 	config.animCollapse=false;
 
-	this.searchType = new GO.form.ComboBox({
-		width:dp(140),
-		store: new Ext.data.SimpleStore({
-			fields: ['value', 'text'],
-			data : [
-			['any', t("Any field", "email")],
-			['fts', t("Full message", "email")],
-			['from', t("Sender", "email")],
-			['subject', t("Subject", "email")],
-			['to', t("Recipient", "email")],
-			['cc', t("Recipient (CC)", "email")]
-			]
-		}),
+	this.searchType = new Ext.form.Hidden({
+		// width:dp(140),
+		// store: new Ext.data.SimpleStore({
+		// 	fields: ['value', 'text'],
+		// 	data : [
+		// 	['any', t("Any field", "email")],
+		// 	['fts', t("Full message", "email")],
+		// 	['from', t("Sender", "email")],
+		// 	['subject', t("Subject", "email")],
+		// 	['to', t("Recipient", "email")],
+		// 	['cc', t("Recipient (CC)", "email")]
+		// 	]
+		// }),
 		value:GO.email.search_type_default,
-		valueField:'value',
-		displayField:'text',
-		mode:'local',
-		minListWidth: dp(168),
-		triggerAction:'all',
-		editable:false,
-		selectOnFocus:true,
-		forceSelection:true
+		// valueField:'value',
+		// displayField:'text',
+		// mode:'local',
+		// minListWidth: dp(168),
+		// triggerAction:'all',
+		// editable:false,
+		// selectOnFocus:true,
+		// forceSelection:true,
+
 	});
+
+	this.updateSearchTypeChecks = function() {
+		this.searchTypeButton.menu.items.each(function(i) {
+			if(i.value) {
+				i.setChecked(this.searchType.getValue() == i.value);
+				if (i.checked) {
+					this.searchTypeButton.setIconClass('ic-' + i.icon);
+					this.searchTypeButton.setTooltip(i.text);
+				}
+			}
+		}, this)
+	}
+
+	this.searchTypeButton = new Ext.Button({
+		iconCls: 'ic-star',
+		menu: new Ext.menu.Menu({
+			listeners: {
+				beforeshow: function(menu) {
+					this.updateSearchTypeChecks();
+				},
+				scope: this
+			},
+			defaults: {
+				checked: false,
+				listeners: {
+					checkchange: function(item, checked) {
+
+						if(checked) {
+							this.searchType.setValue(item.value);
+							this.updateSearchTypeChecks();
+
+							GO.email.search_type = item.value;
+
+							if(localStorage){
+								localStorage.email_search_type = GO.email.search_type;
+							}
+
+							if(this.searchField && this.searchField.getValue()) {
+								// GO.email.messagesGrid.store.baseParams['search'] = this.searchField.getValue();
+								// this.searchField.hasSearch = true;
+
+								// GO.email.messagesGrid.store.reload();
+								this.searchField.search();
+							}
+						}
+					},
+					scope: this
+				},
+				group:"radio"
+			},
+			items: [{
+				value: 'any',
+				text:  t("Any field", "email"),
+				icon: 'star'
+			}, {
+				value: 'fts',
+				text:  t("Full message", "email"),
+				icon: 'email'
+			}, {
+				value: 'from',
+				text:  t("From", "email"),
+				icon: 'inbox'
+			}, {
+				value: 'subject',
+				text:  t("Subject", "email"),
+				icon: 'description'
+			}, {
+				value: 'to',
+				text:  t("Recipient", "email"),
+				icon: 'send'
+			}, {
+				value: 'cc',
+				text:  t("Recipient (CC)", "email"),
+				icon: 'send'
+			}, "-", {
+				iconCls: 'ic-more',
+				text: t("Advanced"),
+				handler: function(){
+					// var first = !this.searchDialog.dialog;
+					this.searchDialog.show();
+					// if(first) {
+					// 	this.searchDialog.dialog.on('hide', function() {
+					// 		this.searchField.updateView();
+					// 	}, this);
+					// }
+				},
+				scope: this
+			}]
+		})
+	});
+
+
+	this.updateSearchTypeChecks();
 
 	this.showUnreadButton = new Ext.Button({
 		iconCls: 'ic-markunread',
@@ -159,7 +253,8 @@ GO.email.MessagesGrid = function(config){
 	});
 	
 	this.searchDialog = new GO.email.SearchDialog({
-		store:config.store
+		store:config.store,
+		grid: this
 	});
 
 	
@@ -247,20 +342,7 @@ GO.email.MessagesGrid = function(config){
 			hidden: config.hideSearch,
 			tools: [
 				this.searchType,
-				{
-					iconCls: 'ic-more',
-					tooltip: t("Search"),
-					handler: function(){
-						var first = !this.searchDialog.dialog;
-						this.searchDialog.show();
-						if(first) {
-							this.searchDialog.dialog.on('hide', function() {
-								this.searchField.updateView();
-							}, this);
-						}
-					},
-					scope: this
-				}
+				this.searchTypeButton
 			],
 			listeners: {
 				search: function(me, v) {
@@ -306,22 +388,7 @@ GO.email.MessagesGrid = function(config){
 		}
 	}, this);
 
-	this.searchType.on('select', function(combo, record) {
-		GO.email.search_type = record.data.value;
-		
-		if(localStorage){
-			localStorage.email_search_type = GO.email.search_type;
-		}
 
-		if(this.searchField.getValue()) {
-			// GO.email.messagesGrid.store.baseParams['search'] = this.searchField.getValue();
-			// this.searchField.hasSearch = true;
-
-			// GO.email.messagesGrid.store.reload();
-			this.searchField.search();
-		}
-
-	}, this);
 
 }
 
@@ -356,8 +423,6 @@ Ext.extend(GO.email.MessagesGrid, GO.grid.GridPanel,{
 	{
 		this.searchType.setValue(type);
 		this.searchField.setValue(query);
-
-		this.searchField.hasSearch = (query) ? true : false;
 	},
 	toggleUnread : function(item, pressed)
 	{

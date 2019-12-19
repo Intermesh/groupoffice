@@ -137,9 +137,16 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	onPaste: function (e) {		
 		var clipboardData = e.clipboardData;
 		if (clipboardData.items) {
-			//Chrome has clibBoardData.items
+			//Chrome /safari has clibBoardData.items
 			for (var i = 0, l = clipboardData.items.length; i < l; i++) {
 				var item = clipboardData.items[i];
+
+				//Some times clipboard data holds multiple versions. When copy pasting from excel you get html, plain text and an image.
+				//We prefer to use the html in that case so we exit if found.
+				if (item.type == 'text/html' || item.type == 'text/plain') {
+					return;
+				}
+
 				if (item.type.match(/^image\//)) {
 					
 					e.preventDefault();
