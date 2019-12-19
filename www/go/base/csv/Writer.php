@@ -17,6 +17,7 @@
  */
 
 namespace GO\Base\Csv;
+use Exception;
 
 
 class Writer extends Reader{
@@ -32,11 +33,19 @@ class Writer extends Reader{
 		$this->setFP('a+');
 //		foreach ($fields as $k => $field)
 //			$fields[$k] = str_replace(array($this->delimiter,$this->enclosure),array(' ',''),$field);
-		if(isset($this->enclosure)){
-			return fputcsv($this->fp, $fields, $this->delimiter, $this->enclosure);
-		}else
-		{
-			return fputcsv($this->fp, $fields, $this->delimiter);
-		}
+
+    try {
+      if (isset($this->enclosure)) {
+        return fputcsv($this->fp, $fields, $this->delimiter, $this->enclosure);
+      } else {
+        return fputcsv($this->fp, $fields, $this->delimiter);
+      }
+    }catch(Exception $e) {
+      echo "Error writing record: \n\n<br /><br /><pre>";
+
+        var_dump($fields);
+        echo "</pre>";
+      throw $e;
+    }
 	}
 }

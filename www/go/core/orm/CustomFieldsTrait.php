@@ -30,6 +30,7 @@ trait CustomFieldsTrait {
   /**
    * Get all custom fields data for an entity
    *
+   * @param bool $asText Returns all values printable as text. Useful for templates and exports.
    * @return array
    * @throws Exception
    */
@@ -162,8 +163,15 @@ trait CustomFieldsTrait {
 		
 		return $m;
 	}
-	
-	
+
+  /**
+   * Converts user input to database formats.
+   *
+   * @param $data
+   * @param bool $asText
+   * @return mixed
+   * @throws Exception
+   */
 	private function normalizeCustomFieldsInput($data, $asText = false) {
 		$columns = Table::getInstance(static::customFieldsTableName())->getColumns();		
 		foreach($columns as $name => $column) {
@@ -183,6 +191,10 @@ trait CustomFieldsTrait {
 		return $data;
 	}
 
+  /**
+   * @return bool
+   * @throws Exception
+   */
 	protected function validateCustomFields() {
 		if(!$this->customFieldsModified) {
 			return true;
@@ -260,11 +272,12 @@ trait CustomFieldsTrait {
 
 	private static $customFieldsTableName;
 
-	/**
-	 * Get table name for custom fields data
-	 * 
-	 * @return string
-	 */
+  /**
+   * Get table name for custom fields data
+   *
+   * @return string
+   * @throws Exception
+   */
 	public static function customFieldsTableName() {
 
 		if(isset(self::$customFieldsTableName)) {
@@ -305,12 +318,13 @@ trait CustomFieldsTrait {
 	public static function customFieldsEntityType() {
 		return static::entityType();
 	}
-	
-	/**
-	 * Defines filters for all custom fields
-	 * 
-	 * @param Filters $filters
-	 */
+
+  /**
+   * Defines filters for all custom fields
+   *
+   * @param Filters $filters
+   * @throws Exception
+   */
 	protected static function defineCustomFieldFilters(Filters $filters) {
 		
 		$fields = static::getCustomFieldModels();		

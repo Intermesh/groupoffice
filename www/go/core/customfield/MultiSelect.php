@@ -110,7 +110,7 @@ class MultiSelect extends Select {
 	{
 		//new model
 		if(empty($values['id'])) {
-			return [];
+			return "";
 		}
 
 		return implode(", ", (new Query())
