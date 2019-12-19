@@ -199,10 +199,11 @@ GO.files.FileBrowser = function(config){
 			hidden:true,
 			width:100
 		},{
+			xtype: "datecolumn",
 			id:'mtime',
 			header:t("Modified at"),
-			dataIndex: 'mtime',
-			width: dp(140)
+			dataIndex: 'mtime'
+			// width: dp(200)
 		}, {
 			id: 'id',
 			header: 'ID',

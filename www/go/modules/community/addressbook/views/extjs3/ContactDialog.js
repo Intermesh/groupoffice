@@ -189,9 +189,15 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 							isOrganization: true,
 							addressBookId: go.User.addressBookSettings.defaultAddressBookId 
 						},
-						storeBaseParams: {
-							filter: {
-								isOrganization: true
+						comboConfig: {
+							sortInfo: {
+								field: 'firstName',
+								direction: 'ASC'
+							},
+							baseParams:  {
+								filter: {
+									isOrganization: true
+								}
 							}
 						},
 						name: "organizationIds",

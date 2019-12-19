@@ -74,7 +74,7 @@ GO.files.PortletFolderBrowserGrid = Ext.extend(GO.grid.GridPanel, {
 						id: 'mtime',
 						header: t("Modified at"),
 						dataIndex: 'mtime',
-						width: 40
+						xtype: "datecolumn"
 					}]
 			}),
 			listeners: {

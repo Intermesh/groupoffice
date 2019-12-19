@@ -1,6 +1,8 @@
+- Core: fixed export error with multi select custom fields in it.
 - Core: Paste from spreadsheet editors as HTML and not as an image
 - User: account creation checks for the max users count
 - Core: Improved printing view for Firefox
+- Address book: Select contact sorts alphabetically
 
 17-12-2019 6.4.93
 - Email: improved search toolbar
