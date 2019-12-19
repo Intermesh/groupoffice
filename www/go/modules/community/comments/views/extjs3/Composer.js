@@ -1,9 +1,11 @@
 go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 	
 	entityStore: "Comment",
-	layout: 'border',
+	layout: 'hbox',
 	cls:'go-form new-message',
-
+	layoutConfig: {
+		align: 'middle'
+	},
 	
 	initComponent : function() {
 		
@@ -15,10 +17,8 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		this.addBtn = new Ext.Button({
 			tooltip: t('Add'),
 			iconCls: 'ic-add',
-			region:"west",
 			menu: {
 				items:[
-
 //					{
 //					iconCls: 'ic-attach-file', 
 //					text: t('Select file')
@@ -57,7 +57,6 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		// this.textField.on('render', this.onSync,this);	
 		
 		this.sendBtn = new Ext.Button({
-			region:"east",
 			tooltip: t('Send'),
 			iconCls: 'ic-send',
 			handler: function(){ 
@@ -72,18 +71,13 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		this.items = [
 			this.addBtn,
 			this.middleBox = new Ext.Container({
-				id: "test",
-				region:"center",
-				layout:'anchor',
-				defaults: {
-					anchor: "100%"
-				},
-				// align: "stretch",
-				// flex: 1,
-
+				layout:'vbox',
+				align:'stretch',
+				flex:1,
 				items: [
 					this.commentBox = new Ext.Container({
 						layout:'fit',
+						width:500,
 						frame: true,
 						items:[this.textField]
 					}),
@@ -123,7 +117,6 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			var h =  Math.max(me.boxMinHeight,Math.min(body.offsetHeight + 16, me.boxMaxHeight)); // 400  max height
 			if(h > 40) {
 				me.tb.show();
-				me.tb.doLayout();
 			} else {
 				me.tb.hide();
 			}
