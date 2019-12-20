@@ -3,7 +3,9 @@ require("../vendor/autoload.php");
 
 use go\core\App;
 use go\core\auth\Method;
-use go\core\model\AllowGroup;
+use go\core\ErrorHandler;
+use go\core\jmap\State;
+use go\core\model\AuthAllowGroup;
 use go\core\model\Token;
 use go\core\model\User;
 use go\core\auth\PrimaryAuthenticator;
@@ -12,6 +14,12 @@ use go\core\http\Response;
 use go\core\jmap\Capabilities;
 use go\core\validate\ErrorCode;
 
+/**
+ * @param array $data
+ * @param int $status
+ * @param null $statusMsg
+ * @throws Exception
+ */
 function output($data = [], $status = 200, $statusMsg = null) {
 	Response::get()->setStatus($status, $statusMsg);
 	Response::get()->sendHeaders();
@@ -22,7 +30,7 @@ function output($data = [], $status = 200, $statusMsg = null) {
 	
 	$json = json_encode($data);
 	if(!$json) {
-		throw new \Exception("Failed to encode JSON: " . json_last_error_msg());
+		throw new Exception("Failed to encode JSON: " . json_last_error_msg());
 	}	
 	Response::get()->output($json);
 
@@ -122,7 +130,7 @@ try {
 			}
 
 			$ip = Request::get()->getRemoteIpAddress();
-			if(!AllowGroup::isAllowed($user, $ip)) {
+			if(!AuthAllowGroup::isAllowed($user, $ip)) {
         output([], 403, str_replace('{ip}', $ip, go()->t("You are not allowed to login from IP address {ip}.") ));
       }
 			
@@ -187,18 +195,17 @@ try {
 	if (empty($methods) && !$token->isAuthenticated()) {
 		$token->setAuthenticated();
 		if(!$token->save()) {
-			throw new \Exception("Could not save token: ". var_export($token->getValidationErrors(), true));
+			throw new Exception("Could not save token: ". var_export($token->getValidationErrors(), true));
 		}
 	}
 
 	if ($token->isAuthenticated()) {
-    $authState = new \go\core\jmap\State();
+    $authState = new State();
     $authState->setToken($token);
 		go()->setAuthState($authState);
     $response = $authState->getSession();
     
 		$response['accessToken'] = $token->accessToken;
-		
 		
 		//Server side cookie worked better on safari. Client side cookies were removed on reboot.
 		$expires = !empty($data['rememberLogin']) ? strtotime("+1 year") : 0;
@@ -232,7 +239,8 @@ try {
 	} else {
 		output($response, 200, "Success, but more authorization required.");
 	}
-} catch (\Exception $e) {
-  \go\core\ErrorHandler::logException($e);
+} catch (Exception $e) {
+  ErrorHandler::logException($e);
+  ErrorHandler::logException($e);
 	output([], 500, $e->getMessage());
 }

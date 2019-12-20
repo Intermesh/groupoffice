@@ -26,7 +26,7 @@ go.Modules.register("core", 'core', {
 		'SmtpAccount',
 		'EmailTemplate',
 		{
-			name: 'AllowGroup',
+			name: 'AuthAllowGroup',
 			relations: {
 				group: {store: "Group", fk:'groupId'}
 			}

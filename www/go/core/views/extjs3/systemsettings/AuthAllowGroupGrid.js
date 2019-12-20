@@ -4,7 +4,7 @@ go.systemsettings.AuthAllowGroupGrid = Ext.extend(go.grid.EditorGridPanel, {
 
     this.store = new go.data.Store({
       fields: ['id', {name:'group', type: "relation"}, {name:'ipPattern'}],
-      entityStore: "AllowGroup",
+      entityStore: "AuthAllowGroup",
       autoLoad: true
     });
 

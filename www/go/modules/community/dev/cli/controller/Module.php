@@ -79,11 +79,14 @@ EOD;
 		}
 	}
 
-	/**
-	 * mschering@mschering-UX31A:/var/www/groupoffice-server/GO/Modules/GroupOffice/Tasks$ ../../../../bin/groupoffice devtools/module/init --tablePrefix=tasks
-	 * 
-	 * @param type $tablePrefix
-	 */
+  /**
+   * mschering@mschering-UX31A:/var/www/groupoffice-server/GO/Modules/GroupOffice/Tasks$ ../../../../bin/groupoffice devtools/module/init --tablePrefix=tasks
+   *
+   * @param $package
+   * @param $name
+   * @param type $tablePrefix
+   * @throws Exception
+   */
 	public function init($package, $name, $tablePrefix = null) {
 
 //		$className = \GO\Modules\GroupOffice\DevTools\Model\RecordTest::class;
@@ -91,34 +94,40 @@ EOD;
 //		$this->convertClass($className);
 //		
 //		exit();
-	
-		$folder = \go\core\Environment::get()->getInstallFolder()->getFolder('go/modules/' . $package .'/' .$name);		
-		$folder->create();
-		
 
-		$folder->getFolder('model')->create();
-		$folder->getFolder('controller')->create();
-		$folder->getFolder('language')->create();
-		$folder->getFolder('install')->create();
-		$folder->getFile('install/install.sql')->touch();
-		$folder->getFile('install/uninstall.sql')->touch();
-		
-		
-		$updatesFile = $folder->getFile('install/updates.php');
-		if(!$updatesFile->exists()) {			
-			$updatesFile->putContents("<?php\n\n\$updates = [];\n\n");			
-		}
-		
-		
-		$this->initView($folder, $package, $name);
-		
-		if(!isset($tablePrefix)) {
-			$tablePrefix = $folder->getName();
-		}
+    if($package == 'core' &&  $name == 'core') {
+      $folder = \go\core\Environment::get()->getInstallFolder()->getFolder('go/core');
+      $namespace = "go\\core";
+      $tablePrefix = "core";
+    } else {
+      $folder = \go\core\Environment::get()->getInstallFolder()->getFolder('go/modules/' . $package . '/' . $name);
+      $folder->create();
 
-		$namespace = "go\\modules\\" . $package . "\\" .$name;	
 
-		$this->createModuleFile($folder, $namespace);
+      $folder->getFolder('model')->create();
+      $folder->getFolder('controller')->create();
+      $folder->getFolder('language')->create();
+      $folder->getFolder('install')->create();
+      $folder->getFile('install/install.sql')->touch();
+      $folder->getFile('install/uninstall.sql')->touch();
+
+
+      $updatesFile = $folder->getFile('install/updates.php');
+      if (!$updatesFile->exists()) {
+        $updatesFile->putContents("<?php\n\n\$updates = [];\n\n");
+      }
+
+
+      $this->initView($folder, $package, $name);
+
+      if (!isset($tablePrefix)) {
+        $tablePrefix = $folder->getName();
+      }
+
+      $namespace = "go\\modules\\" . $package . "\\" . $name;
+
+      $this->createModuleFile($folder, $namespace);
+    }
 
 		$result = go()->getDbConnection()->query("SHOW TABLES");
 

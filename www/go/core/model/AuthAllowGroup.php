@@ -9,7 +9,7 @@ use go\core\jmap\Entity;
  *
  * Is an Access Control List to restrict access to data.
  */
-class AllowGroup extends Entity
+class AuthAllowGroup extends Entity
 {
   /**
    * Primary key
