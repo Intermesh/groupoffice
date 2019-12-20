@@ -38,14 +38,15 @@ abstract class Base extends Model {
 		$this->field = $field;
 	}
 
-	
-	/**
-	 * Get column definition for SQL.
-	 * 
-	 * When false is returned no databaseName is required and no field will be created.
-	 * 
-	 * @return string|boolean
-	 */
+
+  /**
+   * Get column definition for SQL.
+   *
+   * When false is returned no databaseName is required and no field will be created.
+   *
+   * @return string|boolean
+   * @throws Exception
+   */
 	protected function getFieldSQL() {
 		$def = $this->field->getDefault();
 		if(!empty($def)) {
@@ -56,12 +57,13 @@ abstract class Base extends Model {
 		return "VARCHAR(".($this->field->getOption('maxLength') ?? 190).") DEFAULT " . $def;
 	}
 
-	/**
-	 * 
-	 * Check if this custom field has a column in the custom field record table.
-	 * 
-	 * @return bool
-	 */
+  /**
+   *
+   * Check if this custom field has a column in the custom field record table.
+   *
+   * @return bool
+   * @throws Exception
+   */
 	public function hasColumn() {
 		return $this->getFieldSQL() != false;
 	}
@@ -74,14 +76,18 @@ abstract class Base extends Model {
 		
 		if($this->field->isModified("databaseName") && preg_match('/[^a-zA-Z_0-9]/', $this->field->databaseName)) {
 			$this->field->setValidationError('databaseName', ErrorCode::INVALID_INPUT, go()->t("Invalid database name. Only use alpha numeric chars and underscores.", 'core','customfields'));
-		}		
+		}
+
+		//check database name exists
+
 	}
-	
-	/**
-	 * Called when the field is saved
-	 * 
-	 * @return boolean
-	 */
+
+  /**
+   * Called when the field is saved
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	public function onFieldSave() {
 		
 		$fieldSql = $this->getFieldSQL();

@@ -74,7 +74,6 @@ class Installer {
 	 * 
 	 * @param array $adminValues
 	 * @param Module[] $installModules
-	 * @return boolean
 	 * @throws Exception
 	 */
 	public function install(array $adminValues = [], $installModules = []) {
@@ -395,7 +394,7 @@ class Installer {
 	public function checkVersions() {
 		$modules = model\Module::find()->all();
 
-		/* @var $module Module */
+		/* @var $module model\Module */
 		foreach ($modules as $module) {
 
 			if (!$module->isAvailable()) {
