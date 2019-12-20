@@ -611,6 +611,71 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	},
 
 	/**
+	 * Save an entity.
+	 *
+	 * Shortcut method for Foo/set
+	 *
+	 * @example
+	 *
+	 * go.Db.store("Note").save({name: "Test"}, 1).then(function(){});
+	 *
+	 * @param entity
+	 * @param {string} id
+	 * @returns {Promise}
+	 */
+	save : function(entity, id) {
+		var p = {}, op;
+
+		if(id) {
+			op = 'update';
+		}else
+		{
+			op = 'create';
+			id = '_new_';
+		}
+
+		p[op] = {};
+		p[op][id] = entity;
+
+		return this.set(p).then(function(response) {
+			if(op == 'create') {
+				if(response.created && id in response.created) {
+					return response.created[id];
+				} else
+				{
+					return Promise.reject(response);
+				}
+			} else
+			{
+				if(response.updated && id in response.updated) {
+					return response.updated[id];
+				} else
+				{
+					return Promise.reject(response);
+				}
+			}
+		});
+	},
+
+	/**
+	 * Destroy a single item.
+	 *
+	 * Shortcut for this.set().
+	 *
+	 * @param {int} id
+	 * @returns {Promise<object>}
+	 */
+	destroy : function(id) {
+		return this.set( {destroy: [id]}).then(function(response) {
+			if(response.destroyed.indexOf(id) == -1) {
+				return Promise.reject(response);
+			} else {
+				return true;
+			}
+		});
+	},
+
+	/**
 	 * Create or update entities
 	 * 
 	 * 

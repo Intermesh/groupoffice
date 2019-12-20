@@ -10,6 +10,7 @@ use go\core\orm\CustomFieldsTrait;
 use go\core\orm\LoggingTrait;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
+use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 use go\modules\community\addressbook\convert\Csv;
 use go\modules\community\addressbook\convert\VCard;
@@ -70,13 +71,13 @@ class Contact extends AclItemEntity {
 
 	/**
 	 * 
-	 * @var \IFW\Util\DateTime
+	 * @var DateTime
 	 */							
 	public $createdAt;
 
 	/**
 	 * 
-	 * @var \IFW\Util\DateTime
+	 * @var DateTime
 	 */							
 	public $modifiedAt;
 
@@ -331,7 +332,10 @@ class Contact extends AclItemEntity {
 	protected static function aclEntityKeys(): array {
 		return ['addressBookId' => 'id'];
 	}
-	
+
+  /**
+   * @inheritDoc
+   */
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable("addressbook_contact", 'c')
@@ -355,16 +359,18 @@ class Contact extends AclItemEntity {
 		
 		$this->name = trim($this->name);
 	}
-	
-	/**
-	 * Find contact for user ID.
-	 * 
-	 * A contact can optionally be connected to a user. It's not guaranteed that
-	 * the contact is present.
-	 * 
-	 * @param int $userId
-	 * @return static
-	 */
+
+  /**
+   * Find contact for user ID.
+   *
+   * A contact can optionally be connected to a user. It's not guaranteed that
+   * the contact is present.
+   *
+   * @param int $userId
+   * @param array $properties
+   * @return static|false
+   * @throws Exception
+   */
 	public static function findForUser($userId, $properties = []) {
 		if(empty($userId)) {
 			return false;
@@ -385,14 +391,15 @@ class Contact extends AclItemEntity {
 						->groupBy(['c.id'])
 						->where('e.email', '=', $email);
 	}
-	
-	
-	/**
-	 * Find contact by e-mail address
-	 * 
-	 * @param string $number
-	 * @return Query
-	 */
+
+
+  /**
+   * Find contact by e-mail address
+   *
+   * @param string $number
+   * @return Query
+   * @throws Exception
+   */
 	public static function findByPhone($number) {
 		return static::find()
 						->join("addressbook_phone_number", "e", "e.contactId = c.id")
@@ -411,6 +418,10 @@ class Contact extends AclItemEntity {
 											
 											$criteria->andWhere('g.groupId', '=', $value);
 										})
+                    ->add("isInGroup", function(Criteria $criteria, $value, Query $query) {
+                      $not = $value ? '' : 'NOT';
+                      $criteria->andWhere('c.id ' . $not . ' IN (SELECT contactId FROM addressbook_contact_group)');
+                    })
 										->add("isOrganization", function(Criteria $criteria, $value) {
 											$criteria->andWhere('isOrganization', '=', $value);
 										})
@@ -419,6 +430,7 @@ class Contact extends AclItemEntity {
 											->groupBy(['c.id'])
 											->having('count(e.email) '.($value ? '>' : '=').' 0');
 										})
+
 										->addText("email", function(Criteria $criteria, $comparator, $value, Query $query) {
 											$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "INNER");
 											

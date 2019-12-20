@@ -228,6 +228,10 @@ class Criteria {
 
 	/**
 	 * Add where condition with AND NOT(..)
+   *
+   * Don't use this for ..WHERE a NO IN (SELECT... Just use
+   *
+   * andWhere('a', 'NOT IN', $query);
 	 *
 	 * {@see where()}
 	 *

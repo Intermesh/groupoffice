@@ -417,6 +417,7 @@ abstract class Property extends Model {
 	 * ````
 	 * 
 	 * @return Mapping
+   * @throws Exception
 	 */
 	protected static function defineMapping() {
 		return new Mapping(static::class);

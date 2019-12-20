@@ -207,7 +207,15 @@ class Connection {
 
 	private $resumeLevels = 0;
 
+	public function isPaused() {
+	  return $this->resumeLevels > 0;
+  }
+
 	public function pauseTransactions() {
+	  if($this->isPaused()) {
+	    return;
+    }
+
 		$this->resumeLevels = $this->transactionSavePointLevel;
 		while($this->transactionSavePointLevel > 0) {
 			$this->commit();

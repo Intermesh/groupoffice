@@ -1,6 +1,6 @@
 <?php
 
-use go\core\auth\model\Token;
+use go\core\model\Token;
 use go\core\http\Request;
 use go\core\ErrorHandler;
 

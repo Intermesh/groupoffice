@@ -12,7 +12,7 @@ use go\core\db\Query;
 use go\core\event\EventEmitterTrait;
 use go\core\orm\EntityType;
 use GO\Base\Db\ActiveRecord;
-use go\core\auth\model\Token;
+use go\core\model\Token;
 use go\core\jmap\Entity;
 use go\core\orm\Query as GoQuery;
 use Throwable;

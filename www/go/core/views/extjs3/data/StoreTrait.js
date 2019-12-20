@@ -107,6 +107,10 @@ go.data.StoreTrait = {
 
 		this.proxy.getEntityFields().forEach(function(field) {
 			var relation =  this.entityStore.entity.findRelation(field.name);
+
+			if(!relation) {
+				throw "'" + field.name + "' is not a relation of '" + this.entityStore.entity.name + "'";
+			}
 			go.Db.store(relation.store).on("changes", this.onRelationChanges, this);
 		}, this);
 	},

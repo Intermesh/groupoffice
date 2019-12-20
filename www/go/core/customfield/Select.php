@@ -7,6 +7,7 @@ use GO;
 use go\core\db\Criteria;
 use go\core\db\Query;
 use go\core\db\Utils;
+use go\core\ErrorHandler;
 use go\core\orm\Filters;
 use PDOException;
 
@@ -148,8 +149,12 @@ class Select extends Base {
 	
 	public function onFieldDelete() {		
 		$sql = "ALTER TABLE `" . $this->field->tableName() . "` DROP FOREIGN KEY " . $this->getConstraintName();
-		if(!go()->getDbConnection()->query($sql)) {
-			throw new \Exception("Couldn't drop foreign key");
+
+		try {
+      go()->getDbConnection()->query($sql);
+    }catch (Exception $e) {
+		  ErrorHandler::logException($e);
+		  //ignore so we can continue with delete
 		}
 			
 		return parent::onFieldDelete();

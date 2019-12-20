@@ -15,18 +15,17 @@ use go\core\fs\Blob;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
-use go\core\jmap\SetError;
-use go\core\orm\Entity;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
 use PDO;
+use ReflectionException;
 
 abstract class EntityController extends Controller {	
 	
 	/**
 	 * The class name of the entity this controller is for.
 	 * 
-	 * @return string
+	 * @return Entity
 	 */
 	abstract protected function entityClass();
 
@@ -63,12 +62,14 @@ abstract class EntityController extends Controller {
 			return $shortName . 's';
 		}
 	}
-	
-	/**
-	 * 
-	 * @param array $params
-	 * @return Query
-	 */
+
+  /**
+   * Get's the query for the Foo/query JMAP method
+   *
+   * @param array $params
+   * @return Query
+   * @throws Exception
+   */
 	protected function getQueryQuery($params) {
 		$cls = $this->entityClass();
 
@@ -109,13 +110,15 @@ abstract class EntityController extends Controller {
 	}
 	
 	private $permissionLevelFoundInFilters = false;
-	
-	/**
-	 * 
-	 * @param array $filter
-	 * @param Query $query
-	 * @return Query
-	 */
+
+  /**
+   *
+   * @param array $filter
+   * @param Query $query
+   * @param null $criteria
+   * @return void
+   * @throws Exception
+   */
 	private function applyFilterCondition($filter, $query, $criteria = null)  {
 		
 		if(!isset($criteria)) {
@@ -217,11 +220,14 @@ abstract class EntityController extends Controller {
 		return $params;
 	}
 
-	/**
-	 * Handles the Foo entity's  "getFooList" command
-	 * 
-	 * @param array $params
-	 */
+  /**
+   * Handles the Foo entity's  "getFooList" command
+   *
+   * @param array $params
+   * @return array
+   * @throws InvalidArguments
+   * @throws Exception
+   */
 	protected function defaultQuery($params) {
 		
 		$p = $this->paramsQuery($params);
@@ -263,7 +269,13 @@ abstract class EntityController extends Controller {
 		
 		return $response;
 	}
-	
+
+  /**
+   * Get the JMAP sync state of the entity
+   *
+   * @return string
+   * @throws Exception
+   */
 	protected function getState() {
 		$cls = $this->entityClass();
 		
@@ -295,14 +307,16 @@ abstract class EntityController extends Controller {
 		
 		return $transformed;		
 	}
-	
-	
 
-	/**
-	 * 
-	 * @param string $id
-	 * @return boolean|Entity
-	 */
+
+  /**
+   * Get the entity model
+   *
+   * @param string $id
+   * @param array $properties
+   * @return boolean|Entity
+   * @throws Exception
+   */
 	protected function getEntity($id, array $properties = []) {
 		$cls = $this->entityClass();
 
@@ -317,10 +331,7 @@ abstract class EntityController extends Controller {
 		}
 		
 		if(!$entity->hasPermissionLevel(Acl::LEVEL_READ)) {
-//			throw new Forbidden();
-			
 			App::get()->debug("Forbidden: ".$cls.": ".$id);
-							
 			return false; //not found
 		}
 
@@ -339,11 +350,6 @@ abstract class EntityController extends Controller {
 		if(isset($params['ids']) && !is_array($params['ids'])) {
 			throw new InvalidArguments("ids must be of type array");
 		}
-		
-//		if(isset($params['ids']) && count($params['ids']) > Capabilities::get()->maxObjectsInGet) {
-//			throw new InvalidArguments("You can't get more than " . Capabilities::get()->maxObjectsInGet . " objects");
-//		}
-		
 		if(!isset($params['properties'])) {
 			$params['properties'] = [];
 		}
@@ -354,11 +360,13 @@ abstract class EntityController extends Controller {
 		
 		return $params;
 	}
-	
-	/**
-	 * Override to add more query options for the "get" method.
-	 * @return Query
-	 */
+
+  /**
+   * Override to add more query options for the "get" method.
+   * @param $params
+   * @return Entity[]
+   * @throws Exception
+   */
 	protected function getGetQuery($params) {
 		$cls = $this->entityClass();
 		
@@ -375,12 +383,15 @@ abstract class EntityController extends Controller {
 		return $query;	
 	}
 
-	
-	/**
-	 * Handles the Foo entity's getFoo command
-	 * 
-	 * @param array $params
-	 */
+
+  /**
+   * Handles the Foo entity's getFoo command
+   *
+   * @param array $params
+   * @return array
+   * @throws InvalidArguments
+   * @throws Exception
+   */
 	protected function defaultGet($params) {
 		
 		$p = $this->paramsGet($params);
@@ -508,12 +519,15 @@ abstract class EntityController extends Controller {
 		}
 	}
 
-	/**
-	 * Handles the Foo entity setFoos command
-	 * 
-	 * @param array $params
-	 * @throws StateMismatch
-	 */
+  /**
+   * Handles the Foo entity setFoos command
+   *
+   * @param array $params
+   * @return array
+   * @throws InvalidArguments
+   * @throws StateMismatch
+   * @throws Exception
+   */
 	protected function defaultSet($params) {
 
 		$this->trackSaves();
@@ -548,6 +562,14 @@ abstract class EntityController extends Controller {
 		return $result;
 	}
 
+  /**
+   * Create entities
+   *
+   * @param $create
+   * @param $result
+   * @throws ReflectionException
+   * @throws Exception
+   */
 	private function createEntitites($create, &$result) {
 		foreach ($create as $clientId => $properties) {
 
@@ -571,26 +593,31 @@ abstract class EntityController extends Controller {
 			}
 		}
 	}
-	
-	/**
-	 * Override this if you want to implement permissions for creating entities
-	 * 
-	 * @return boolean
-	 */
+
+  /**
+   * Override this if you want to implement permissions for creating entities
+   *
+   * @param Entity $entity
+   * @return boolean
+   */
 	protected function canCreate(Entity $entity) {		
 		return $entity->hasPermissionLevel(Acl::LEVEL_CREATE);
 	}
-	
-	/**
-	 * @todo Check permissions
-	 * 
-	 * @param array $properties
-	 * @return Entity
-	 */
+
+  /**
+   * Creates a single entity
+   *
+   * @param array $properties
+   * @return Entity
+   * @throws Exception
+   * @todo Check permissions
+   *
+   */
 	protected function create(array $properties) {
 		
 		$cls = $this->entityClass();
 
+		/** @var Entity $entity */
 		$entity = new $cls;
 		$entity->setValues($properties); 
 		
@@ -607,11 +634,14 @@ abstract class EntityController extends Controller {
 		return $entity->hasPermissionLevel(Acl::LEVEL_WRITE);
 	}
 
-	/**
-	 * 
-	 * @param type $update
-	 * @param type $result
-	 */
+  /**
+   * Updates the entities
+   *
+   * @param array $update
+   * @param array $result
+   * @throws ReflectionException
+   * @throws Exception
+   */
 	private function updateEntities($update, &$result) {
 		foreach ($update as $id => $properties) {
 			$entity = $this->getEntity($id);			
@@ -651,6 +681,14 @@ abstract class EntityController extends Controller {
 		return $entity->hasPermissionLevel(Acl::LEVEL_DELETE);
 	}
 
+  /**
+   * Destroys entityies
+   *
+   * @param int[] $destroy
+   * @param array $result
+   * @throws InvalidArguments
+   * @throws Exception
+   */
 	private function destroyEntities($destroy, &$result) {
 
 		$doDestroy = [];
@@ -683,7 +721,7 @@ abstract class EntityController extends Controller {
 		if ($success) {
 			$result['destroyed'] = $doDestroy;
 		} else {
-			throw new \Exception("Delete error");
+			throw new Exception("Delete error");
 		}
 	}
 	
@@ -717,12 +755,14 @@ abstract class EntityController extends Controller {
 	}
 
 
-	/**
-	 * Handles the Foo entity's getFooUpdates command
-	 * 
-	 * @param array $params
-	 * @throws CannotCalculateChanges
-	 */
+  /**
+   * Handles the Foo entity's getFooUpdates command
+   *
+   * @param array $params
+   * @return array
+   * @throws InvalidArguments
+   * @throws Exception
+   */
 	protected function defaultChanges($params) {						
 		$p = $this->paramsGetUpdates($params);	
 		$cls = $this->entityClass();		
@@ -737,8 +777,13 @@ abstract class EntityController extends Controller {
 		$result['accountId'] = $p['accountId'];
 
 		return $result;
-	}	
-	
+	}
+
+  /**
+   * @param $params
+   * @return array
+   * @throws InvalidArguments
+   */
 	protected function paramsExport($params){
 		
 		if(!isset($params['contentType'])) {
@@ -747,7 +792,12 @@ abstract class EntityController extends Controller {
 		
 		return $this->paramsGet($params);
 	}
-	
+
+  /**
+   * @param $params
+   * @return mixed
+   * @throws InvalidArguments
+   */
 	protected function paramsImport($params){		
 		
 		if(!isset($params['blobId'])) {
@@ -764,8 +814,8 @@ abstract class EntityController extends Controller {
 	/**
 	 * Default handler for Foo/import method
 	 * 
-	 * @param type $params
-	 * @return type
+	 * @param array $params
+	 * @return array
 	 * @throws Exception
 	 */
 	protected function defaultImport($params) {
@@ -780,11 +830,11 @@ abstract class EntityController extends Controller {
 
     $file = $blob->getFile()->copy(File::tempFile('csv'));
     $file->convertToUtf8();
-		
-		$response = $converter->importFile($file, $this->entityClass(), $params);
+
+    $response = $converter->importFile($file, $this->entityClass(), $params);
 		
 		if(!$response) {
-			throw new \Exception("Invalid response from import convertor");
+			throw new Exception("Invalid response from import convertor");
 		}
 		
 		return $response;
@@ -793,8 +843,8 @@ abstract class EntityController extends Controller {
 	/**
 	 * Default handler for Foo/importCSVMapping method
 	 * 
-	 * @param type $params
-	 * @return type
+	 * @param array $params
+	 * @return array
 	 * @throws Exception
 	 */
 	protected function defaultImportCSVMapping($params) {
@@ -810,18 +860,19 @@ abstract class EntityController extends Controller {
 		$response['csvHeaders'] = $converter->getCsvHeaders($file);
 		
 		if(!$response) {
-			throw new \Exception("Invalid response from import convertor");
+			throw new Exception("Invalid response from import convertor");
 		}
 		
 		return $response;
 	}
-	
-	/**
-	 * 
-	 * 
-	 * @return AbstractConverter
-	 * @throws InvalidArguments
-	 */
+
+  /**
+   *
+   *
+   * @param $contentType
+   * @return AbstractConverter
+   * @throws InvalidArguments
+   */
 	private function findConverter($contentType) {
 		
 		$cls = $this->entityClass();		
@@ -833,19 +884,20 @@ abstract class EntityController extends Controller {
 		
 		return new $map[$contentType];		
 	}
-	
-	/**
-	 * Standard export function
-	 * 
-	 * You can use Foo/query first and then pass the ids of that result to 
-	 * Foo/export().
-	 * 
-	 * @see AbstractConverter
-	 * 
-	 * @param array $params Identical to Foo/get. Additionally you MUST pass a 'contentType'. It will find the converter class using the Entity::converter() method.
-	 * @throws InvalidArguments
-	 * @throws Exception
-	 */
+
+  /**
+   * Standard export function
+   *
+   * You can use Foo/query first and then pass the ids of that result to
+   * Foo/export().
+   *
+   * @param array $params Identical to Foo/get. Additionally you MUST pass a 'contentType'. It will find the converter class using the Entity::converter() method.
+   * @return array
+   * @throws InvalidArguments
+   * @throws Exception
+   * @see AbstractConverter
+   *
+   */
 	protected function defaultExport($params) {
 
 		ini_set('max_execution_time', 10 * 60);
@@ -864,11 +916,16 @@ abstract class EntityController extends Controller {
 		return ['blobId' => $blob->id];		
 	}
 
-	/**
-	 * Merge entities into one
-	 * 
-	 * The first ID in the list will be kept after the merge.
-	 */
+  /**
+   * Merge entities into one
+   *
+   * The first ID in the list will be kept after the merge.
+   * @param $params
+   * @return array
+   * @throws Forbidden
+   * @throws InvalidArguments
+   * @throws Exception
+   */
 	protected function defaultMerge($params) {
 		if(empty($params['ids'])) {
 			throw new InvalidArguments('ids is required');
@@ -897,7 +954,7 @@ abstract class EntityController extends Controller {
 				throw new Forbidden();
 			}
 			if(!$entity->merge($other)) {
-				throw new \Exception("Failed to merge ID: ".$id . ", Validation errors: ". var_export($entity->getValidationErrors(), true));
+				throw new Exception("Failed to merge ID: ".$id . ", Validation errors: ". var_export($entity->getValidationErrors(), true));
 			}
 		}
 
