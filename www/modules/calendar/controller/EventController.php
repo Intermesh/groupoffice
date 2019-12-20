@@ -1059,9 +1059,11 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		$calendar = false;
 		
 		foreach($calendarModels as $cal){
-			if($cal->id == $defaultCalendar->id)
-				return $cal;
-			
+		    if($defaultCalendar) {
+                if($cal->id == $defaultCalendar->id)
+                    return $cal;
+            }
+
 			if(empty($calendar) && $cal->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION))
 				$calendar = $cal;
 		}
