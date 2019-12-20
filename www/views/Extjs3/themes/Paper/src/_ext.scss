@@ -2248,6 +2248,10 @@ $menuScrollerSize : dp(4);
 	}
 }
 .x-panel{
+	border: 1px solid color($fg, "line");
+	&-noborder {
+		border:0;
+	}
 	&-body {
       border:0;
 			-webkit-overflow-scrolling: touch;
