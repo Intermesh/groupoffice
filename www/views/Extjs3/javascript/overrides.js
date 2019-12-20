@@ -343,6 +343,13 @@ Ext.override(Ext.form.TwinTriggerField, {
 	 }
 });
 
+Ext.override(Ext.grid.GroupingView, {
+	/**
+	 * Overridden because sometims we use Objects in the store (Relations) and groupMode = value doesn't work with that.
+	 */
+	groupMode: "display"
+});
+
 Ext.override(Ext.data.GroupingStore,{
 	clearGrouping : function(){
         this.groupField = false;
