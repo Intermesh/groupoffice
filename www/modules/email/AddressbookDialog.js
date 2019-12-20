@@ -20,7 +20,7 @@
 
 /**
  * @class GO.dialog.SelectEmail
- * @extends Ext.Window A window to select a number of User-Office user Users.
+ * @extends go.Window A window to select a number of User-Office user Users.
  * 
  * @cfg {Function} handler A function called when the Add or Ok button is
  *      clicked. The grid will be passed as argument.

@@ -149,7 +149,7 @@ class MemoryFile extends File{
 		return $this->path;
 	}
 	
-	public function output($sendHeaders = true, $useCache = true, array $headers = []) {
+	public function output($sendHeaders = true, $useCache = true, array $headers = [], $inline = true) {
 		echo $this->data;
 	}
 	

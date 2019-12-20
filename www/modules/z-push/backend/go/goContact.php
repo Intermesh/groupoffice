@@ -20,8 +20,8 @@ class goContact extends GoBaseBackendDiff {
 		
 		if (!$contact) {
 			return true;
-		} else if(!$contact->getPermissionLevel() >= Acl::LEVEL_DELETE){
-			return true;
+		} else if($contact->getPermissionLevel() < Acl::LEVEL_DELETE){
+			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 		} else {
 			return $contact->delete($contact->primaryKeyValues()); // This throws an error when the contact is read only
 		}

@@ -25,11 +25,15 @@ go.Jmap = {
 		this.scheduleRequest({
 			method: 'community/dev/Debugger/get',
 			params: {},
-			callback: function(options, success, response, clientCallId) {		
-				for(var i = 0, l = response.length; i < l; i ++) {			
-					var method = response[i].shift();				
-					console[method].apply(null, response[i]);				
+			callback: function(options, success, response, clientCallId) {
+
+				var r;
+				while(r = response.shift()) {
+					var method = r.shift();
+					r.push(clientCallId);
+					console[method].apply(null, r);
 				}
+
 			}
 		}).catch(function() {
 			//ignore error
@@ -98,6 +102,20 @@ go.Jmap = {
 
 		return url;
 	},
+
+	thumbUrl: function(blobId, params) {
+		if (!blobId) {
+			return '';
+		}
+		var url = BaseHref + 'api/thumb.php?blob=' + blobId;
+
+		for(var name in params) {
+			url += '&' + name + '=' + encodeURIComponent(params[name]);
+		}
+
+		return url;
+
+	},
 	
 	upload : function(file, cfg) {
 		if(Ext.isEmpty(file))
@@ -114,10 +132,13 @@ go.Jmap = {
 				if(cfg.failure && response.responseText) {
 					data = Ext.decode(response.responseText);
 					cfg.failure.call(cfg.scope || this,data);
+				} else
+				{
+					Ext.MessageBox.alert(t("Error"), t("Upload failed. Please check if the system is using the correct URL at System settings -> General -> URL."));
 				}
 			},
 			headers: {
-				'X-File-Name': file.name,
+				'X-File-Name': "UTF-8''" + encodeURIComponent(file.name),
 				'Content-Type': file.type,
 				'X-File-LastModifed': Math.round(file['lastModified'] / 1000).toString()
 			},
@@ -273,7 +294,9 @@ go.Jmap = {
 			return;
 		}
 
-		this.debug();
+		if(GO.debug || GO.settings.config.debug) {
+			this.debug();
+		}
 
 		Ext.Ajax.request({
 			url: this.getApiUrl(),
@@ -297,13 +320,8 @@ go.Jmap = {
 							console.error('server-side JMAP failure', response);							
 						}
 
-						go.flux.Dispatcher.dispatch(response[0], {
-							options: o,
-							response: response[1]
-						});
-
 						//make sure dispatch is executed before callbacks and resolves.
-						setTimeout(function() {
+						// setTimeout(function() {
 							var success = response[0] !== "error";
 							if (o.callback) {
 								if (!o.scope) {
@@ -312,6 +330,8 @@ go.Jmap = {
 								o.callback.call(o.scope, o, success, response[1], response[2]);
 							}
 
+							response[1].options = o;
+
 							if(success) {							
 								o.resolve(response[1]);
 							} else{
@@ -319,7 +339,7 @@ go.Jmap = {
 							}
 
 							delete me.requestOptions[response[2]];
-						}, 0);
+						// }, 0);
 					}, this);
 
 				// } catch(e) {					

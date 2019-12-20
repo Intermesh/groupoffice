@@ -8,29 +8,30 @@ GO.files.FolderPanel = Ext.extend(GO.DisplayPanel,{
 	editGoDialogId : 'folder',
 
 	editHandler : function(){	
+		GO.files.showFolderPropertiesDialog(this.link_id+"");
 	},
 
-	createTopToolbar : function(){
-		var tbar = GO.files.FolderPanel.superclass.createTopToolbar.call(this);
+	// createTopToolbar : function(){
+	// 	var tbar = GO.files.FolderPanel.superclass.createTopToolbar.call(this);
 
-		tbar.splice(1,1,{
-			iconCls: 'btn-settings',
-			text: t("Properties"),
-			cls: 'x-btn-text-icon',
-			handler: function(){
-				GO.files.showFolderPropertiesDialog(this.link_id+"");
-			},
-			scope: this
-		});
+	// 	tbar.splice(1,1,{
+	// 		iconCls: 'btn-settings',
+	// 		text: t("Properties"),
+	// 		cls: 'x-btn-text-icon',
+	// 		handler: function(){
+	// 			GO.files.showFolderPropertiesDialog(this.link_id+"");
+	// 		},
+	// 		scope: this
+	// 	});
 
-		return tbar;
-	},
+	// 	return tbar;
+	// },
 
 	setData : function(data)
 	{
 //		this.setTitle(data.name);
 	
-		this.topToolbar.items.items[0].setVisible(false);
+		// this.topToolbar.items.items[0].setVisible(false);
 
 		GO.files.FolderPanel.superclass.setData.call(this, data);
 	},

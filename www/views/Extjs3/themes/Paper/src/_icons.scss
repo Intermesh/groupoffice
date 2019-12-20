@@ -319,7 +319,6 @@ $filetype: (
 
 .filetype {
 	background-size: dp(24) dp(24);
-	background-position: dp(8) dp(8);
 	background-image:url(#{$resourcePath}img/filetype/unknown.svg);
 	background-repeat: no-repeat;
 	&-link {

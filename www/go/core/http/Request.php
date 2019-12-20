@@ -3,6 +3,7 @@ namespace go\core\http;
 
 use Exception;
 use go\core\Singleton;
+use go\core\util\StringUtil;
 use stdClass;
 
 
@@ -57,12 +58,13 @@ class Request extends Singleton{
 	public function getQueryParam($name) {
 		return $_GET[$name] ?? false;
 	}
-	
-	/**
-	 * Get the values of the Accept header in lower case
-	 * 
-	 * @param string[]
-	 */
+
+  /**
+   * Get the values of the Accept header in lower case
+   *
+   * @param string[]
+   * @return array
+   */
 	public function getAccept() {
 
 		if(empty($_SERVER['HTTP_ACCEPT'])) {
@@ -192,11 +194,12 @@ class Request extends Singleton{
 
 		return $this->body;
 	}
-	
-	/**
-	 * Get raw request body as string.
-	 * @param string
-	 */
+
+  /**
+   * Get raw request body as string.
+   *
+   * @return string
+   */
 	public function getRawBody() {
 		if(!isset($this->rawBody)) {
 			$this->rawBody = file_get_contents('php://input');
@@ -208,7 +211,7 @@ class Request extends Singleton{
 	/**
 	 * Get's the content type header
 	 *
-	 * @param string
+	 * @preturn string
 	 */
 	public function getContentType() {
 		return isset($_SERVER["CONTENT_TYPE"]) ? $_SERVER["CONTENT_TYPE"] : '';
@@ -217,7 +220,7 @@ class Request extends Singleton{
 	/**
 	 * Get the request method in upper case
 	 * 
-	 * @param string PUT, POST, DELETE, GET, PATCH, HEAD
+	 * @return string PUT, POST, DELETE, GET, PATCH, HEAD
 	 */
 	public function getMethod() {
 		return strtoupper($_SERVER['REQUEST_METHOD']);
@@ -288,6 +291,23 @@ class Request extends Singleton{
 
     return trim($host);
 	}
+
+  /**
+   * Get the IP address of the user's client
+   *
+   * @return string
+   */
+	public function getRemoteIpAddress() {
+    if(!empty($_SERVER['HTTP_CLIENT_IP'])){
+      //ip from share internet
+      return $_SERVER['HTTP_CLIENT_IP'];
+    }elseif(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){
+      //ip pass from proxy
+      return $_SERVER['HTTP_X_FORWARDED_FOR'];
+    }else{
+      return $_SERVER['REMOTE_ADDR'] ?? null;
+    }
+  }
   
   /**
    * Check if this request is an XMLHttpRequest
@@ -296,5 +316,26 @@ class Request extends Singleton{
    */
   public function isXHR() {
     return isset($_SERVER["HTTP_X_REQUESTED_WITH"]) && $_SERVER["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest";
+  }
+
+
+  /**
+   * Decode a HTTP header to UTF-8
+   *
+   * @link https://tools.ietf.org/html/rfc5987
+   * @param $string
+   * @return bool|string
+   */
+  public static function headerDecode($string) {
+      $pos = strpos($string, "''");
+      if($pos == false || $pos > 64) {
+        return false;
+      }
+			//eg. iso-8859-1''%66%6F%73%73%2D%69%74%2D%73%6D%61%6C%6C%2E%67%69%66
+			$charset = substr($string, 0, $pos);
+
+			$string = rawurldecode(substr($string, $pos + 2));
+
+			return StringUtil::cleanUtf8($string, $charset);
   }
 }

@@ -2,9 +2,9 @@
 namespace go\core\orm;
 
 use Exception;
+use Closure;
 use go\core\db\Criteria;
 use go\core\util\DateTime;
-use go\core\util\ArrayObject;
 
 /**
  * Filters
@@ -68,13 +68,15 @@ class Filters {
 
 		return $f;
 	}
-	
-	/**
-	 * Applies all filters to the query object
-	 * 
-	 * @param Query $criteria
-	 * @param array $filter
-	 */
+
+  /**
+   * Applies all filters to the query object
+   *
+   * @param Query $query
+   * @param Criteria $criteria
+   * @param array $filter
+   * @throws Exception
+   */
 	public function apply(Query $query, Criteria $criteria, array $filter) {
 
 		$filter = $this->applyDefaults($filter);
@@ -134,7 +136,7 @@ class Filters {
 	 * Supports ranges 1..4 between 1 and 4 and >=, <> != = operators
 	 * 
 	 * @param string $name
-	 * @param function $fn Called with: Criteria $criteria, $comparator, $value, Query $query, array $filters
+	 * @param Closure $fn Called with: Criteria $criteria, $comparator, $value, Query $query, array $filters
 	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
 	 * 
 	 * @return $this
@@ -153,7 +155,7 @@ class Filters {
 	 * Values are converted to DateTime objects. Supports all strtotime formats as input.
 	 * 
 	 * @param string $name
-	 * @param function $fn Called with: Criteria $criteria, $comparator, DateTime $value, Query $query, array $filters
+	 * @param Closure $fn Called with: Criteria $criteria, $comparator, DateTime $value, Query $query, array $filters
 	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
 	 * 
 	 * @return $this
@@ -170,7 +172,7 @@ class Filters {
 	 * Values are wrapped with %..% and comparator will be LIKE or NOT LIKE
 	 * 
 	 * @param string $name
-	 * @param function $fn Called with: Criteria $criteria, $comparator, $value, Query $query, array $filters
+	 * @param Closure $fn Called with: Criteria $criteria, $comparator, $value, Query $query, array $filters
 	 * @param mixed $default The default value for the filter. When not set the filter is not applied if no value is given.
 	 * 
 	 * @return $this

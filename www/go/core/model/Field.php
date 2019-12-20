@@ -1,14 +1,15 @@
 <?php
 namespace go\core\model;
 
-use GO;
+use Exception;
 use go\core\acl\model\AclItemEntity;
+use go\core\customfield\Base;
+use go\core\db\Criteria;
 use go\core\db\Table;
 use go\core\orm\EntityType;
 use go\core\orm\Query;
 use go\core\util\DateTime;
-use go\core\model\FieldSet;
-use go\core\customfield\Base;
+use go\core\validate\ErrorCode;
 
 /**
  * Field
@@ -57,6 +58,8 @@ class Field extends AclItemEntity {
 	 * @var boolean
 	 */
 	public $required;
+
+	public $requiredCondition;
 	
 	/**
 	 * Hint text to display in the form
@@ -179,12 +182,13 @@ class Field extends AclItemEntity {
 		$o[$name] = $value;
 		$this->setOptions($o);
 	}
-	
-	/**
-	 * Get default value for the column
-	 * 
-	 * @return mixed
-	 */	
+
+  /**
+   * Get default value for the column
+   *
+   * @return mixed
+   * @throws Exception
+   */
 	public function getDefault() {
 		if($this->defaultModified || $this->isNew()) {
 			return $this->default;
@@ -204,8 +208,13 @@ class Field extends AclItemEntity {
 		$this->default = $v;
 		$this->defaultModified = true;
 	}
-	
-	
+
+  /**
+   * Check's if the column has a unique index
+   *
+   * @return bool
+   * @throws Exception
+   */
 	public function getUnique() {
 		if($this->uniqueModified || $this->isNew()) {
 			return $this->unique;
@@ -215,7 +224,7 @@ class Field extends AclItemEntity {
 		
 		if(!$c) {
 			go()->debug("Column for custom field ".$this->databaseName." not found in ". $this->tableName());
-			return null;
+			return false;
 		}
 		
 		return !!$c->unique;
@@ -240,7 +249,13 @@ class Field extends AclItemEntity {
 		}		
 		return $this->dataType;
 	}
-	
+
+  /**
+   * Used by the API to set values on the datatype
+   *
+   * @param $values
+   * @throws Exception
+   */
 	public function setDataType($values) {
 		$this->getDataType()->setValues($values);
 	}
@@ -253,14 +268,16 @@ class Field extends AclItemEntity {
 		try {
 			go()->getDbConnection()->pauseTransactions();
 			$this->getDataType()->onFieldSave();
-		} catch(\Exception $e) {
+		} catch(Exception $e) {
 			go()->warn($e);
-			go()->getDbConnection()->resumeTransactions();
+
 			if($this->isNew()) {
 				static::delete($this->primaryKeyValues());				
 			}
 
-			$this->setValidationError('id', \go\core\validate\ErrorCode::GENERAL, $e->getMessage());
+      go()->getDbConnection()->resumeTransactions();
+
+			$this->setValidationError('id', ErrorCode::GENERAL, $e->getMessage());
 			
 			return false;
 		} 
@@ -277,7 +294,7 @@ class Field extends AclItemEntity {
 			foreach($fields as $field) {
 				$field->getDataType()->onFieldDelete();
 			}
-		} catch(\Exception $e) {
+		} catch(Exception $e) {
 			go()->warn($e);
 			return false;
 		} finally {
@@ -287,16 +304,18 @@ class Field extends AclItemEntity {
 		return parent::internalDelete($query);
 }
 
-	/**
-	 * Get the table name this field is stored in.
-	 * 
-	 * @return sting
-	 */
+  /**
+   * Get the table name this field is stored in.
+   *
+   * @return string
+   * @throws Exception
+   */
 	public function tableName() {
 		$fieldSet = FieldSet::findById($this->fieldSetId);
-		$entityType = EntityType::findByName($fieldSet->getEntity());
+		$entityName = $fieldSet->getEntity();
+		$entityType = EntityType::findByName($entityName);
 		if(!$entityType) {
-			throw new \Exception("EntityType not found for custom field ".$this->name.' ('. $this->id.')');
+			throw new Exception("EntityType '$entityName' not found for custom field ".$this->name.' ('. $this->id.')');
 		}
 		$entityCls = $entityType->getClassName();
 		return $entityCls::customFieldsTableName(); //From customfieldstrait
@@ -304,17 +323,18 @@ class Field extends AclItemEntity {
 	
 	protected static function defineFilters() {
 		return parent::defineFilters()
-						->add('fieldSetId', function (\go\core\db\Criteria $criteria, $value){
+						->add('fieldSetId', function (Criteria $criteria, $value){
 							$criteria->andWhere(['fieldSetId' => $value]);
 						});
 	}
-	
-	/**
-	 * Find all fields for an entity
-	 * 
-	 * @param int|string $entityTypeId
-	 * @return Query
-	 */
+
+  /**
+   * Find all fields for an entity
+   *
+   * @param int|string $entityTypeId
+   * @return Query
+   * @throws Exception
+   */
 	public static function findByEntity($entityTypeId) {
 		if(!is_numeric($entityTypeId)) {
 			$entityTypeId = EntityType::findByName($entityTypeId)->getId();
@@ -323,18 +343,19 @@ class Field extends AclItemEntity {
 	}
 
 
-	/**
-	 * Find or create custom field
-	 * 
-	 * @param string $entity eg. "User"
-	 * @param string $fieldSetName eg. "Forum"
-	 * @param string $databaseName eg. "numberOfPosts"
-	 * @param string $name eg "Number of posts"
-	 * @param string $type Type of custom field eg. Type
-	 * @param array $values extra values to set on the field.
-	 * 
-	 * @return static
-	 */
+  /**
+   * Find or create custom field
+   *
+   * @param string $entity eg. "User"
+   * @param string $fieldSetName eg. "Forum"
+   * @param string $databaseName eg. "numberOfPosts"
+   * @param string $name eg "Number of posts"
+   * @param string $type Type of custom field eg. Type
+   * @param array $values extra values to set on the field.
+   *
+   * @return static
+   * @throws Exception
+   */
 	public static function create($entity, $fieldSetName, $databaseName, $name, $type = 'Text', $values = []) {
 		$field = Field::findByEntity($entity)->where(['databaseName' => $databaseName])->single();
 
@@ -348,7 +369,7 @@ class Field extends AclItemEntity {
 			$fieldSet->name = $fieldSetName;
 			$fieldSet->setEntity($entity);
 			if(!$fieldSet->save()) {
-				throw new \Exception("Could not save fieldset");
+				throw new Exception("Could not save fieldset");
 			}
 		}
 
@@ -359,7 +380,7 @@ class Field extends AclItemEntity {
 		$field->fieldSetId = $fieldSet->id;
 		$field->setValues($values);
 		if(!$field->save()) {
-			throw new \Exception("Could not save field");
+			throw new Exception("Could not save field");
 		}
 		return $field;
 	}

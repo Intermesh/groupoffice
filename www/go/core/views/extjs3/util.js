@@ -4,8 +4,8 @@ go.print = function(tmpl, data) {
 		document.body.insertAdjacentHTML('beforeend', '<div id="paper"></div>');
 		paper = document.getElementById('paper');
 	}
-	paper.innerHTML = tmpl.apply(data);
-	window.print();
+	paper.innerHTML = Ext.isEmpty(data) ? tmpl : tmpl.apply(data);
+	Ext.isIE || Ext.isSafari ? document.execCommand('print') : window.print();
 };
 go.util =  (function () {
 	return {
@@ -258,6 +258,28 @@ go.util =  (function () {
 			
 			this.uploadDialog.click();
 		},
+
+		/**
+		 * Download an URL
+		 *
+		 * @param {string} url
+		 * @param {boolean=} inline True to use window.open to make the browser display it inline.
+		 */
+		downloadFile: function(url, inline) {
+			if(window.navigator.standalone) {
+				//somehow this is the only way a download works on a web application on the iphone.
+				var win = window.open( "about:blank", "_system");
+				win.focus();
+				win.location = url;
+			} else
+			{
+				if(inline) {
+					window.open(url);
+				} else {
+					document.location.href = url;
+				}
+			}
+		},
 		
 		textToHtml : function(text) {
 			return Ext.util.Format.nl2br(text);
@@ -310,8 +332,8 @@ go.util =  (function () {
 				if(!success) {
 					Ext.MessageBox.alert(t("Error"), response.message);				
 				} else
-				{					
-					document.location = go.Jmap.downloadUrl(response.blobId);
+				{
+					go.util.downloadFile(go.Jmap.downloadUrl(response.blobId));
 				}
 			}
 		});

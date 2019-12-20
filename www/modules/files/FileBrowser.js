@@ -27,6 +27,7 @@ GO.files.FileBrowser = function(config){
 		config.id=Ext.id();
 
 	this.westPanel = new Ext.Panel({
+		hideMode:"offsets",
 		region: 'west',
 		layout: 'border',
 		cls: 'go-sidenav',
@@ -41,8 +42,9 @@ GO.files.FileBrowser = function(config){
 			items:[
 				this.treePanel = new GO.files.TreePanel({
 					collapsed: config.treeCollapsed,
-					collapsible:true,
-					collapseMode:'mini',
+					// collapsible:true,
+					// collapseMode:'mini',
+					animate: false,
 					header:false,
 					ddAppendOnly: true,
 					ddGroup : 'FilesDD',
@@ -89,6 +91,7 @@ GO.files.FileBrowser = function(config){
 
 	this.treePanel.on('click', function(node)	{
 		this.setFolderID(node.id, true);
+		this.cardPanel.show();
 	}, this);
 
 	this.treePanel.on('contextmenu', function(node, e){
@@ -196,10 +199,11 @@ GO.files.FileBrowser = function(config){
 			hidden:true,
 			width:100
 		},{
+			xtype: "datecolumn",
 			id:'mtime',
 			header:t("Modified at"),
-			dataIndex: 'mtime',
-			width: dp(140)
+			dataIndex: 'mtime'
+			// width: dp(200)
 		}, {
 			id: 'id',
 			header: 'ID',
@@ -367,17 +371,89 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 
 	this.gridPanel.on('rowcontextmenu', this.onGridRowContextMenu, this);
 
+	this.uploadItem = new GO.base.upload.PluploadMenuItem({
+		text: t("Files", "files"),
+		upload_config: {
+			listeners: {
+				scope:this,
+				beforestart: function(uploadpanel) {
+					//uploadpanel.uploader.settings.url = '/path/to/upload/handler?_runtime=' + uploadpanel.runtime;
+					
+					
+				},
+				uploadstarted: function(uploadpanel) {
+					this.setDisabled(true);
+				},
+				uploadcomplete: function(uploadpanel, success, failures) {
+					this.setDisabled(false);
+					if ( success.length ) {
+						this.sendOverwrite({
+							upload:true
+
+						});
+						if(!failures.length){
+							uploadpanel.onDeleteAll();
+							
+							if(GO.settings.upload_quickselect !== false)
+								uploadpanel.ownerCt.hide();
+						}
+					}
+				}
+			}
+		}
+	});
+
+	this.jUploadItem = new Ext.menu.Item({
+		iconCls: 'ic-file-upload',
+		text : t("Folders (Java required)"),
+		handler : function() {
+			if ( GO.util.empty(this.gridStore.baseParams['query']) ) {
+				GO.currentFilesStore=this.gridStore;
+
+				window.open(GO.url('files/jupload/renderJupload'));
+
+				Ext.MessageBox.confirm("Uploader", t("Please open the upload program and upload your files. Click 'Yes' when the upload is done.", 'files'),function(btn) {
+
+					if(btn == 'yes') {
+						this.sendOverwrite({upload:true});
+					}
+				}, this);
+
+			} else {
+				Ext.MessageBox.alert('',t("Can't do this when in search mode.", "files"));
+			}
+		},
+		scope : this
+	});
+
+
 
 	this.newMenu = new Ext.menu.Menu({
-		//id: 'new-menu',
 		items: []
 	});
 
+
+	if(!config.hideActionButtons) {
+		this.newMenu.add(this.uploadItem);
+		this.newMenu.add(this.jUploadItem);
+		this.newMenu.add("-");
+	}
+
+	this.newFolderBtn = new Ext.menu.Item({
+		iconCls: 'ic-folder',
+		text: t("Folder"),
+		handler: this.promptNewFolder,
+		scope: this
+	});
+
+	this.newMenu.add(this.newFolderBtn);
+
 	this.newButton = new Ext.Button({
-		text:t("New"),
+		tooltip:t("New"),
 		iconCls: 'ic-add',
 		menu: this.newMenu
 	});
+
 
    var quotaPercentage = (GO.settings.disk_quota && GO.settings.disk_quota>0) ? GO.settings.disk_usage/GO.settings.disk_quota : 0;
 
@@ -400,9 +476,9 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		disabled:true
 	});
 
-	this.deleteButton = new Ext.Button({
+	this.deleteButton = new Ext.menu.Item({
 		iconCls: 'ic-delete',
-		tooltip: t("Delete"),
+		text: t("Delete"),
 		overflowText:t("Delete"),
 		handler: function(){
 			this.onDelete('grid');
@@ -451,98 +527,21 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		scope: this
 	});
 
-	var tbar = [];
-
-	tbar.push(this.newButton);
-
-	this.uploadItem = new GO.base.upload.PluploadMenuItem({
-		text: t("Files", "files"),
-		upload_config: {
-			listeners: {
-				scope:this,
-				beforestart: function(uploadpanel) {
-					//uploadpanel.uploader.settings.url = '/path/to/upload/handler?_runtime=' + uploadpanel.runtime;
-					
-					
-				},
-				uploadstarted: function(uploadpanel) {
-					this.setDisabled(true);
-				},
-				uploadcomplete: function(uploadpanel, success, failures) {
-					this.setDisabled(false);
-					if ( success.length ) {
-						this.sendOverwrite({
-							upload:true
-
-						});
-						if(!failures.length){
-							uploadpanel.onDeleteAll();
-							
-							if(GO.settings.upload_quickselect !== false)
-								uploadpanel.ownerCt.hide();
-						}
-					}
-				}
-			}
-		}
-	});
-
-	this.jUploadItem = new Ext.menu.Item({
-		iconCls: 'ic-file-upload',
-		text : t("Folders (Java required)"),
-		handler : function() {
-			if ( GO.util.empty(this.gridStore.baseParams['query']) ) {
-				GO.currentFilesStore=this.gridStore;
-				
-				window.open(GO.url('files/jupload/renderJupload'));				
-				
-				Ext.MessageBox.confirm("Uploader", t("Please open the upload program and upload your files. Click 'Yes' when the upload is done.", 'files'),function(btn) {
-					
-					if(btn == 'yes') {
-						this.sendOverwrite({upload:true});
-					}
-				}, this);
-
-			} else {
-				Ext.MessageBox.alert('',t("Can't do this when in search mode.", "files"));
-			}
+	var tbar = [
+		{
+			cls: 'go-narrow',
+			iconCls: "ic-menu",
+			handler: function () {
+				this.westPanel.show();
+			},
+			scope: this
 		},
-		scope : this
-	});
+		"->"
+	];
 
-	this.uploadMenu = new Ext.menu.Menu({
-		items: [
-			this.uploadItem,
-			this.jUploadItem
-		]
-	});
 
-	this.uploadButton = new Ext.Button({
-		text:t("Upload"),
-		iconCls: 'ic-file-upload',
-		menu: this.uploadMenu
-	});
-
-	if(!config.hideActionButtons)
-	{
-		tbar.push(this.uploadButton);
-		tbar.push('-');
-	}
-
-	tbar.push({
-		iconCls: "ic-refresh",
-		tooltip:t("Refresh"),
-		overflowText:t("Refresh"),
-		handler: function(){          
-			this.refresh(true);
-		},
-		scope:this
-	});
-
-	if(!config.hideActionButtons) {
-		tbar.push(this.deleteButton);
-		tbar.push(['-',this.cutButton,this.copyButton,this.pasteButton]);
-
+	if(!config.hideActionButtons) {		
+		tbar.push([this.cutButton,this.copyButton,this.pasteButton]);
 	}
 	
 	this.thumbsToggle = new Ext.Button({
@@ -578,16 +577,39 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		scope: this
 	}));
 
-	tbar.push('->', {
-		iconCls: 'ic-more',
-		overflowText: t('File info'),
-		tooltip: t('File info'),
-		//hidden: (config.id === "go-module-panel-files"),
-		handler: function(btn) {
-			this.eastPanel.toggleCollapse();
-		},
-		scope:this
-	});
+	// tbar.push('->', {
+	// 	iconCls: 'ic-more',
+	// 	overflowText: t('File info'),
+	// 	tooltip: t('File info'),
+	// 	//hidden: (config.id === "go-module-panel-files"),
+	// 	handler: function(btn) {
+	// 		this.eastPanel.toggleCollapse();
+	// 	},
+	// 	scope:this
+	// });
+
+		tbar.push(this.newButton);
+
+		tbar.push(this.moreBtn = new Ext.Button({
+			iconCls: 'ic-more-vert',
+			tooltip: t("More"),
+			menu: [
+				{
+					iconCls: "ic-refresh",
+					text:t("Refresh"),
+					overflowText:t("Refresh"),
+					handler: function(){          
+						this.refresh(true);
+					},
+					scope:this
+				}
+			]
+		}));
+
+		if(!config.hideActionButtons) {
+			this.moreBtn.menu.add(this.deleteButton);
+		}
+
 
 	config.keys=[{
 		ctrl:true,
@@ -615,8 +637,6 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	}];
 
 
-	config['layout']='border';
-	//config['tbar']=new Ext.Toolbar({items: tbar});
 
 	this.thumbsPanel = new GO.files.ThumbsPanel({
 		store:this.gridStore
@@ -729,6 +749,16 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		id:config.id+'-file-panel',
 		expandListenObject:this.eastPanel
 	});
+
+	this.filePanel.getTopToolbar().insert(0, {
+		cls: 'go-narrow',
+		iconCls: "ic-arrow-back",
+		handler: function () {
+			this.mainContainer.show();
+		},
+		scope: this
+	});
+
 	this.eastPanel.add(this.filePanel);
 
 	this.folderPanel = this.folderDetail = new GO.files.FolderPanel({
@@ -736,10 +766,35 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		hidden:true,
 		expandListenObject:this.eastPanel
 	});
+	this.folderPanel.getTopToolbar().insert(0, {
+		cls: 'go-narrow',
+		iconCls: "ic-arrow-back",
+		handler: function () {
+			this.mainContainer.show();
+		},
+		scope: this
+	});
+
 	this.eastPanel.add(this.folderPanel);
 
 
-	config['items']=[this.westPanel,this.cardPanel,this.eastPanel];
+	config.items = [
+		this.mainContainer = new Ext.Panel({
+			border:false,
+			region:'center',
+			titlebar: false,
+			layout:'responsive',
+			items: [this.cardPanel,this.westPanel]
+		}),
+		this.eastPanel
+	];
+
+	config.layout='responsive';
+	// change responsive mode on 1000 pixels
+	config.layoutConfig = {
+		triggerWidth: 1000
+	};
+	
 
 	GO.files.FileBrowser.superclass.constructor.call(this, config);
 
@@ -757,23 +812,29 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	this.on('fileselected',function(grid, r){
 		if(r.data.extension!='folder'){
 //			this.folderPanel.setVisible(false);
-			this.filePanel.show();
+			this.eastPanel.show();
+			// this.filePanel.show();			
 			this.eastPanel.getLayout().setActiveItem(this.filePanel);
 
 			this.filePanel.load(r.id.substr(2));
 		}else
 		{
-//			this.filePanel.setVisible(false);
-			this.folderPanel.show();
+			if(GO.util.isMobileOrTablet()) {
+				this.setFolderID(r.data.id, true);
+			} else{
+				this.eastPanel.show();			
+			}
+			// this.folderPanel.show();
 			this.eastPanel.getLayout().setActiveItem(this.folderPanel);
 
-			this.folderPanel.load(r.id.substr(2));
+			this.folderPanel.load(r.id.substr(2));			
 		}
 
 	}, this);
 
 	this.bookmarksGrid.on('bookmarkClicked', function(bookmarksGrid,bookmarkRecord){
 		this.setFolderID(bookmarkRecord.data['folder_id']);
+		this.cardPanel.show();
 	},this);
         
     this.on('beforeFolderIdSet',function(){
@@ -1010,16 +1071,6 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			//prevent infite loop when tree doesn't load node because of 500 node limit.
 			this.initTreeFromGrid = true;
 			
-			this.treePanel.getLoader().on('load', function(){
-//				this.upButton.setDisabled((!this.parentID || !this.treePanel.getNodeById(this.parentID)));
-
-
-
-
-
-
-
-			}, this);
 			this.treePanel.setExpandFolderId(folderId);
 			this.treePanel.getRootNode().reload();
 		}
@@ -1032,27 +1083,9 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			this.upButton.setDisabled(false);
 		}
 
-//Don't reset because direct routes won't work anymore.
-//		if(this.filePanel.model_id>0 && !store.getById('f:'+this.filePanel.model_id)){
-//			this.filePanel.reset();
-//		}
-//
-//		if(this.folderPanel.model_id>0 && !store.getById('d:'+this.folderPanel.model_id)){
-//			this.folderPanel.reset();
-//		}
 
 	},
 
-	/*onShow : function(){
-
-		GO.files.FileBrowser.superclass.onShow.call(this);
-
-		if(!this.loaded)
-		{
-			this.loadFiles();
-		}
-
-	},*/
 
 	setFileClickHandler : function(handler, scope, createBlobs)
 	{
@@ -1144,20 +1177,23 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 	buildNewMenu : function(){
 
-		this.newMenu.removeAll();
+		if(this.hideActionButtons) {
+			return;
+		}
+
+		var l = this.newMenu.items.getCount();
+
+		if(l > 3) {
+			for(var i = l - 1; i > 3; i--) {
+				this.newMenu.items.itemAt(i).destroy();			
+			}
+		}
 
 		GO.request({
 			url: 'files/template/store',
 			success: function(response, options, result)
 			{
-
-				this.newMenu.add( {
-					iconCls: 'ic-folder',
-					text: t("Folder"),
-					handler: this.promptNewFolder,
-					scope: this
-				});
-
+			
 				if(result.results.length)
 				{
 					this.newMenu.add('-');
@@ -1382,7 +1418,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 				success:function(response, options, result){
 					
 					if(!GO.util.empty(result.archive)){
-						document.location = GO.url("core/downloadTempFile",{path:result.archive});
+						go.util.downloadFile(GO.url("core/downloadTempFile",{path:result.archive}));
             //win.close();
             
 					} else {
@@ -1861,7 +1897,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 		this.newButton.setDisabled(!createPermission);
 		this.deleteButton.setDisabled(!deletePermission);
-		this.uploadButton.setDisabled(!createPermission);
+		
 		this.cutButton.setDisabled(!deletePermission);
                 
                 this.copyButton.setDisabled(permissionLevel<=0);
@@ -2055,7 +2091,8 @@ GO.files.openFile = function(config)
 
 
 GO.files.downloadFile = function (fileId){
-	window.open(GO.url("files/file/download",{id:fileId,inline:false}));
+	var url = GO.url("files/file/download",{id:fileId,inline:false});
+	go.util.downloadFile(url);
 }
 
 //GO.files.editFile = function (fileId){
@@ -2093,17 +2130,18 @@ GO.files.openFolder = function(id, folder_id)
 	{
 		GO.files.fileBrowser=new GO.files.FileBrowser({
 			id:'popupfb',
-			border:false,
-			filePanelCollapsed:true
+			border:false
+			//filePanelCollapsed:true
 		});
 		GO.files.fileBrowserWin = new GO.Window({
+			stateId: 'go-files-browser-win',
 			title: t("File browser", "files"),
-			height:500,
-			width:900,
+			height:dp(800),
+			width:dp(1200),
 			layout:'fit',
 			border:false,
-			maximizable:true,
-			collapsible:true,
+			maximizable:!GO.util.isMobileOrTablet(),
+			collapsible:!GO.util.isMobileOrTablet(),
 			closeAction:'hide',
 			items: GO.files.fileBrowser
 		});
@@ -2122,15 +2160,15 @@ GO.files.createSelectFileBrowser = function(){
 	if(!GO.selectFileBrowser)
 	{
 		GO.selectFileBrowser= new GO.files.FileBrowser({
-			border:false,
-			filePanelCollapsed:true,
-			treeCollapsed:false
+			// border:false
+			// filePanelCollapsed:true,
+			// treeCollapsed:false
 		});
 
 		GO.selectFileBrowserWindow = new GO.Window({
 			title: t("Select files"),
-			height:500,
-			width:750,
+			height:dp(800),
+			width:dp(1200),
 			modal:true,
 			layout:'fit',
 			border:false,

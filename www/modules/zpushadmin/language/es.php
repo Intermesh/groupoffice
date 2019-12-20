@@ -19,7 +19,7 @@ return array (
   'Wipe this device' => 'Desparejar dispositivo',
   'This action will RESET the device to the FACTORY settings and will delete ALL data on the device!! Do you really want to wipe the device?' => '¡¡ATENCIÓN!! Esta orden REINICIARÁ el dispositivo a los ajustes de fábrica y eliminará TODOS los datos del mismo. ¿Realmente desea desparejar el dispositivo?',
   'Devices can connect by default.' => 'Los dispositivos pueden conectar por defecto.',
-  'Phone number' => 'Nº de teléfono',
+  'Phone number' => 'Número de teléfono',
   'Model' => 'Modelo',
   'Imei' => 'IMEI',
   'Name' => 'Nombre',

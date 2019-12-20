@@ -1462,6 +1462,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$newFolder = Folder::model()->findByPath($newPath, true);
 		$newFolder->moveContentsFrom($folder, true);
+		$newFolder->visible = 1;
+		$newFolder->readonly = 1;
 
 		$folder->systemSave = true;
 		//delete empty folder.
@@ -1476,14 +1478,9 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @return self
 	 * @throws \Exception
 	 */
-	public function findForEntity(\go\core\orm\Entity $entity) {
+	public function findForEntity(\go\core\orm\Entity $entity, $saveToEntity = true) {
 
-		if(method_exists($entity, 'buildFilesPath')) {
-			$filesPath = $entity->buildFilesPath();
-		} else{
-			$entityType = $entity->entityType();
-			$filesPath = $entityType->getModule()->name. '/'. $entityType->getName() . '/' . $entity->id;
-		}
+		$filesPath = $entity->buildFilesPath();	
 
 		$folder = empty($entity->filesFolderId) ? null : $this->findByPk($entity->filesFolderId);
 		if($folder) {
@@ -1491,12 +1488,15 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$existingPath = $folder->getPath();
 			if($existingPath != $filesPath) {
 				$newFolder = $this->mergeEntityFolders($folder, $existingPath, $filesPath);
-
+				$newFolder->visible = 0;
+				$newFolder->readonly = 1;
 				$newFolder->acl_id = $entity->findAclId();
-				$newFolder->save();
+				$newFolder->save(true);
 
-				$entity->filesFolderId = $newFolder->id;
-				$entity->save();
+				if($saveToEntity) {
+					$entity->filesFolderId = $newFolder->id;
+					$entity->save();
+				}
 
 				return $newFolder;
 			}

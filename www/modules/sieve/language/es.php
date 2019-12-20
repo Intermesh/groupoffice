@@ -127,5 +127,6 @@ return array (
   'before' => 'antes',
   'after' => 'después',
   'description' => 'Gestión de reglas para filtrado automático de correos',
-  'Test' => 'Test',
+  'Test' => 'Probar',
+  'Ok' => 'Okay',
 );

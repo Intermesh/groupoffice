@@ -308,9 +308,25 @@ Alle rechten voorbehouden<br />',
   'All fields' => 'Alle velden',
   'results' => 'resultaten',
   'months' => 'Maanden',
+  'full_months' => 
+  array (
+    1 => 'januari',
+    2 => 'februari',
+    3 => 'maart',
+    4 => 'april',
+    5 => 'mei',
+    6 => 'juni',
+    7 => 'juli',
+    8 => 'augustus',
+    9 => 'september',
+    10 => 'oktober',
+    11 => 'november',
+    12 => 'december',
+  ),
   'short_months' => 
   array (
     5 => 'Mei',
+    10 => 'Okt'
   ),
   'short_days' => 
   array (
@@ -782,6 +798,7 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'An e-mail with instructions has been sent to your e-mail address.' => 'Een e-mail met instructies is naar uw e-mail adres verzonden.',
   'Please enter a new password' => 'Voer een nieuw wachtwoord in a.u.b.',
   'Lost password' => 'Wachtwoord vergeten',
+  'You\'re not allowed to create more than x users' => 'Het is niet toegestaan meer gebruikers dan het maximale aan te maken.',
   'countries' => 
   array (
     'AL' => 'Albanië',

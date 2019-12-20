@@ -46,7 +46,7 @@ GO.summary.AnnouncementDialog = Ext.extend(GO.dialog.TabbedFormDialog, {
 				anchor: '-5',
 				fieldLabel: t("Title", "summary")
 			},{
-				xtype: 'htmleditor',
+				xtype: 'xhtmleditor',
 				name: 'content',
 				anchor: '-5 -60',
 				hideLabel:true

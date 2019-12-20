@@ -37,7 +37,7 @@ GO.email.FindContactDialog = function(config) {
 	});
 
 }
-Ext.extend(GO.email.FindContactDialog, Ext.Window, {
+Ext.extend(GO.email.FindContactDialog, go.Window, {
 
 	email : '',
 	replace_email : '',

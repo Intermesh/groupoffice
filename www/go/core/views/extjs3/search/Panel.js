@@ -9,8 +9,12 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 				click: function () {
 					this.gotoSelected();
 				},
-				keypress: function() {
-					this.gotoSelected();
+				keydown: function(e) {
+					console.warn("keypress", e.getKey());
+
+					if(e.getKey() == Ext.EventObject.SPACE || e.getKey() == Ext.EventObject.ENTER) {
+						this.gotoSelected();
+					}
 				},
 				scope: this
 			}
@@ -18,7 +22,10 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 
 		
 		this.entityGrid = new go.links.EntityGrid({
-			width: dp(200),
+			width: dp(160),
+			mobile:{
+				width: dp(120),
+			},
 			region: "east",
 			split: true,
 			savedSelection: "search"

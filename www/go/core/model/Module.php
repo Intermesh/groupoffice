@@ -158,12 +158,12 @@ class Module extends AclOwnerEntity {
 	 * @return self
 	 * @throws Exception
 	 */
-	public static function findByClass($className) {
+	public static function findByClass($className, $properties = []) {
 		
 		switch($className) {	
 			
 			case strpos($className, "go\\core") === 0 || strpos($className, "GO\\Base") === 0:
-				$module = Module::find()->where(['name' => "core", "package" => "core"])->single();				
+				$module = Module::find($properties)->where(['name' => "core", "package" => "core"])->single();				
 				break;
 			
 			default:				
@@ -180,14 +180,14 @@ class Module extends AclOwnerEntity {
 					$name = $classNameParts[3];
 				}
 				
-				$module = Module::find()->where(['name' => $name, 'package' => $package])->single();
+				$module = Module::find($properties)->where(['name' => $name, 'package' => $package])->single();
 				
 				// Needed for modules which are partly refactored.
 				// For example: The email account entity is required in the new framework 
 				// and the email module itself is not refactored yet.
 				// Can be removed when all is refactored.
 				if(!$module) {
-					$module = Module::find()->where(['name' => $name, 'package' => null])->single();
+					$module = Module::find($properties)->where(['name' => $name, 'package' => null])->single();
 				}
 		}
 		

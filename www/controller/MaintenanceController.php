@@ -170,10 +170,20 @@ class MaintenanceController extends AbstractController {
 //	}
 	
 	protected function actionGetNewAcl($params){
+
+    if(!empty($params['source_acl_id'])) {
+      $sourceAcl = \GO\Base\Model\Acl::model()->findByPk($params['source_acl_id']);
+      $params['user_id'] = $sourceAcl->ownedBy;
+      $params['description'] = $sourceAcl->usedIn;
+    }
 		$acl = new \GO\Base\Model\Acl();
-		$acl->user_id=isset($params['user_id']) ? $params['user_id'] : \GO::user()->id;
-		$acl->description=$params['description'];
+		$acl->ownedBy=isset($params['user_id']) ? $params['user_id'] : \GO::user()->id;
+		$acl->usedIn=$params['description'];
 		$acl->save();
+
+		if(!empty($sourceAcl)) {
+		  $sourceAcl->copyPermissions($acl);
+    }
 		
 		echo $acl->id;
 	}
@@ -378,37 +388,6 @@ class MaintenanceController extends AbstractController {
 			echo '</pre>';
 		}
 	}
-	
-	private function checkCollations() {		
-		$stmt = go()->getDbConnection()->query("SHOW TABLE STATUS");	
-
-		foreach($stmt as $record){
-
-			if($record['Engine'] != 'InnoDB' && $record["Name"] != 'fs_filesearch' && $record["Name"] != 'cms_files') {
-				echo "Converting ". $record["Name"] . " to InnoDB\n";
-				flush();
-				$sql = "ALTER TABLE `".$record["Name"]."` ENGINE=InnoDB;";
-				go()->getDbConnection()->query($sql);	
-			}
-
-			if($record["Collation"] != "utf8mb4_unicode_ci" ) {
-				echo "Converting ". $record["Name"] . " to utf8mb4\n";
-				flush();
-
-				if($record['Name'] === 'em_links') {
-					go()->getDbConnection()->query("ALTER TABLE `em_links` DROP INDEX `uid`");
-				}			
-				$sql = "ALTER TABLE `".$record["Name"]."` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
-				go()->getDbConnection()->query($sql);	
-
-				if($record['Name'] === 'em_links') {
-					go()->getDbConnection()->query("ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';");
-					go()->getDbConnection()->query("ALTER TABLE `em_links` ADD INDEX(`uid`);");
-				}
-
-			}	
-		}
-	}
 
 	/**
 	 * Calls checkDatabase on each Module class.
@@ -437,8 +416,6 @@ class MaintenanceController extends AbstractController {
 
 		go()->getInstaller()->fixCollations();
 		
-		$this->checkCollations();
-	
 				
 		if(!empty($params['module'])){
 			if($params['module']=='base'){

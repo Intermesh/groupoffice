@@ -224,12 +224,10 @@ go.Modules = (function () {
 
 		//will be called after login
 		init: function () {
-			var package, me = this;
+			var me = this;
 			
-			return go.Db.store("Module").query().then(function(response){
-				return go.Db.store("Module").get(response.ids);
-			}).then (function(result) {
-				me.entities = result.entities;
+			return go.Db.store("Module").all().then(function(entities) {
+				me.entities = entities;
 				var promises = [];
 
 				for (var id in me.entities) {

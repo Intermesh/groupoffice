@@ -17,9 +17,23 @@ class Apcu implements CacheInterface {
 
 	private $prefix;
 	private $cache;
+
+	private $disk;
 	
 	public function __construct() {
 		$this->prefix = go()->getConfig()['core']['db']['name'];
+	}
+
+
+	/**
+	 * @return Disk
+	 */
+	private function getDiskCache() {
+		if(!isset($this->disk)) {
+			$this->disk = new Disk();
+		}
+
+		return $this->disk;
 	}
 
 	/**
@@ -30,6 +44,10 @@ class Apcu implements CacheInterface {
 	 * @param boolean $persist Cache must be available in next requests. Use false of it's just for this script run.
 	 */
 	public function set($key, $value, $persist = true) {
+
+		if(PHP_SAPI === 'cli') {
+			return $this->getDiskCache()->set($key, $value, $persist);
+		}
 
 		//don't set false values because unserialize returns false on failure.
 		if ($key === false) {
@@ -50,7 +68,12 @@ class Apcu implements CacheInterface {
 	 * @param string $key 
 	 * @return mixed null if it doesn't exist
 	 */
-	public function get($key) {		
+	public function get($key) {
+
+		if(PHP_SAPI === 'cli') {
+			return $this->getDiskCache()->get($key);
+		}
+
 		if(isset($this->cache[$key])) {
 			return $this->cache[$key];
 		}
@@ -71,7 +94,12 @@ class Apcu implements CacheInterface {
 	 * 
 	 * @param string $key 
 	 */
-	public function delete($key) {		
+	public function delete($key) {
+		
+		if(PHP_SAPI === 'cli') {
+			return $this->getDiskCache()->delete($key);
+		}
+
 		unset($this->cache[$key]);
 		apcu_delete($this->prefix . '-' . $key);
 	}
@@ -91,12 +119,17 @@ class Apcu implements CacheInterface {
 		
 //		throw new \Exception("Flush?");
 		if ($onDestruct) {
+			
+			$this->getDiskCache()->flush(true);
+
 			$this->flushOnDestruct = true;
 			return true;
 		}
 		$this->cache = [];
 //	var_dump(apcu_cache_info());
 		apcu_clear_cache();		
+
+		$this->getDiskCache()->flush(false);
 	}
 
 	public function __destruct() {

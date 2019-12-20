@@ -9,6 +9,7 @@ use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
 use Exception;
+use go\core\db\Criteria;
 
 class CronJobSchedule extends Entity {
 
@@ -131,6 +132,7 @@ class CronJobSchedule extends Entity {
 			
 		} catch (Exception $ex) {			
 			$errorString = \go\core\ErrorHandler::logException($ex);		
+			echo $errorString . "\n";
 			$this->lastError = $errorString;
 		}
 
@@ -155,7 +157,11 @@ class CronJobSchedule extends Entity {
 	public static function runNext() {
 
 		$job = self::find()->where('enabled', '=', true)
-						->andWhere('nextRunAt', '<=', new DateTime())->orWhere('nextRunAt', 'IS', null)
+						->andWhere((new Criteria())
+							->andWhere('nextRunAt', '<=', new DateTime())
+							->orWhere('nextRunAt', 'IS', null)
+						)
+						->andWhere(['runningSince' => null]) 
 						->orderBy(['nextRunAt' => 'ASC'])->single();
 
 		if ($job) {

@@ -36,4 +36,9 @@ class Number extends Base {
 			$criteria->where('customFields.' . $this->field->databaseName, $comparator, $value);
 		});
 	}
+
+	public function dbToApi($value, &$values)
+  {
+    return number_format($value, $this->field->getOption('numberDecimals'));
+  }
 }

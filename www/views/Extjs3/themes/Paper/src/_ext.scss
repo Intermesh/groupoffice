@@ -162,25 +162,42 @@
 	}
 	
 }
-.x-tab-strip { 
+.x-tab-strip {
+
+	> li {
+		border-bottom: dp(4) solid transparent;
+		min-width: dp(72);
+		max-width: dp(264);
+		height: dp(48);
+		text-align:center;
+		line-height: dp(48);
+		padding: 0 dp(12);
+	}
+
 	&-top{
 		//width:100%; 
 		//display: flex;
 		//justify-content: center; // turn on to center tabs wont work with overflow
 		//flex-direction: row;
 		height: dp(48);
-		border-bottom: 2px solid transparent;
+		//border-bottom: 2px solid transparent;
 		@include var(color, c-primary);
 	}
 	&-bottom{
-		background-color:#cedff5;
-		border-top-color:#8db2e3;
+		height: dp(48);
+		//border-top: 2px solid transparent;
+		@include var(color, c-primary);
+		//background-color:#cedff5;
+		//border-top-color:#8db2e3;
+		> li {
+			border-top: dp(4) solid transparent;
+			border-bottom: 0;
+		}
 	}
 	&-wrap {
 		padding: 0 dp(4);
 	}
-	&-active {
-		border-bottom: dp(4) solid transparent;
+	>li.x-tab-strip-active {
 		@include var(border-color, c-primary);
 		span.x-tab-strip-text {
 			@include var(color, c-primary);
@@ -192,14 +209,7 @@
 	&-disabled .x-tabs-text {
 		color: color($fg, 'disabled');
 	}
-	> li {
-		min-width: dp(72);
-		max-width: dp(264);
-		height: dp(48);
-		text-align:center;
-		line-height: dp(48);
-		padding: 0 dp(12);
-	}
+
 	span.x-tab-strip-text {
 		padding:0;
 		color: color($fg, 'text');
@@ -595,7 +605,12 @@
 // }
 
 .x-fieldset {
-	border:0;
+	border: 1px solid color($fg, "line");
+	margin: dp(16);
+	&-noborder {
+		margin: 0;
+		border:0;
+	}
 	padding: dp(8) dp(16);
 	~ .x-fieldset { border-top: 1px solid color($fg, 'divider'); }
 	legend {
@@ -701,6 +716,10 @@
 		}
 		&.x-btn-pressed {
 			@extend .z8;
+		}
+
+		&.accent {
+			@include var(background-color, c-accent);
 		}
 	}
 	.x-toolbar & {
@@ -913,6 +932,10 @@
 			pointer-events: none;
 			opacity: 0;
 		}
+		.x-form-field-trigger-wrap > input {
+			padding-right: dp(56);
+		}
+
 		input {
 			box-shadow: none;
 			min-height: dp(56);
@@ -2200,7 +2223,6 @@ $menuScrollerSize : dp(4);
 	.x-toolbar {
 		height: dp(40);
 		border-top: 1px solid color($fg, 'line');
-		input {min-height: 14px;}
 		.xtb-sep { display:none;}
 		.x-toolbar-cell {padding:0;}
 	}
@@ -2231,6 +2253,10 @@ $menuScrollerSize : dp(4);
 	}
 }
 .x-panel{
+	border: 1px solid color($fg, "line");
+	&-noborder {
+		border:0;
+	}
 	&-body {
       border:0;
 			-webkit-overflow-scrolling: touch;

@@ -78,7 +78,7 @@ class Authenticator extends PrimaryAuthenticator {
 			return false;
 		}
 		
-		$user = User::find()->where(['username' => $username])->single();
+		$user = User::find()->where(['username' => $username])->orWhere('email', '=', $record->mail[0])->single();
 		if(!$user) {
 			$user = new User();
 		}else if($user->hasPassword()){

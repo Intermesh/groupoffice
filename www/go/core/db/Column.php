@@ -147,19 +147,6 @@ class Column {
 	const DATE_FORMAT = "Y-m-d";
 
 	/**
-	 * Default value of dates are stored as times. We must refresh them
-	 */
-	public function __wakeup() {
-		if (isset($this->default)) {
-			if ($this->dbType == 'date') {
-				$this->default = date(Column::DATE_FORMAT);
-			} else if ($this->dbType == 'datetime') {
-				$this->default = date(Column::DATETIME_FORMAT);
-			}
-		}
-	}
-	
-	/**
 	 * Get the SQL string to add / alter this field.
 	 * 
 	 * eg. "tinyint(1) NOT NULL DEFAULT '0'"
@@ -193,13 +180,14 @@ class Column {
 		return $sql;
 	}
 
-	/**
-	 * Input formatting for the database.
-	 * Currently only used for date fields because we want ISO 8601 for I/O.
-	 * 
-	 * @param mixed $value
-	 * @return mixed
-	 */
+  /**
+   * Input formatting for the database.
+   * Currently only used for date fields because we want ISO 8601 for I/O.
+   *
+   * @param mixed $value
+   * @return mixed
+   * @throws Exception
+   */
 	public function normalizeInput($value) {
 		if (!isset($value)) {
 			return null;
@@ -226,7 +214,7 @@ class Column {
 			default:
 				if ($this->trimInput) {
 					
-					if(!is_string($value)) {						
+					if(!is_string($value) && !is_numeric($value)) {	 //is_numeric should be gone but gave a problem with custom function fields
 						throw new Exception("No string given for ".$this->name);						
 					}
 					
@@ -254,13 +242,14 @@ class Column {
 		}
 	}
 
-	/**
-	 * Output formatting for the database.
-	 * Currently only used for date fields because we want ISO 8601 for I/O.
-	 * 
-	 * @param mixed $value
-	 * @return mixed
-	 */
+  /**
+   * Output formatting for the database.
+   * Currently only used for date fields because we want ISO 8601 for I/O.
+   *
+   * @param mixed $value
+   * @return mixed
+   * @throws Exception
+   */
 	public function castFromDb($value) {
 
 		if (!isset($value)) {
@@ -273,16 +262,14 @@ class Column {
 				if ($this->length === 1) {
 					//Boolean fields in mysql are listed at tinyint(1);
 					return (bool) $value;
-				} else {
-					// Use floatval because of ints greater then 32 bit? Problem with floatval that ints will set as modified attribute when saving.
-					return (int) $value;
 				}
+				return $value;
 
-			case 'float':
-			case 'double':
-			case 'decimal':
-			case 'real':
-				return doubleval($value);
+			// case 'float':
+			// case 'double':
+			// case 'decimal':
+			// case 'real':
+			// 	return doubleval($value);
 
 			case 'date':
 			case 'datetime':

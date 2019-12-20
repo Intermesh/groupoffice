@@ -4,13 +4,11 @@ namespace go\core\orm;
 
 use DateTime;
 use Exception;
-use GO;
+use GO\Base\Db\ActiveRecord;
 use go\core\App;
 use go\core\db\Query;
 use go\core\model\Module;
-use go\core\ErrorHandler;
 use go\core\jmap;
-use PDOException;
 use go\core\model\Acl;
 use InvalidArgumentException;
 
@@ -35,6 +33,8 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	private $moduleId;	
   private $clientName;
 	private $defaultAclId;
+
+	private static $cache;
 	
 	/**
 	 * The highest mod sequence used for JMAP data sync
@@ -62,7 +62,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	/**
 	 * The PHP class name used in the PHP API
 	 * 
-	 * @return string
+	 * @return Entity
 	 */
 	public function getClassName() {
 		return $this->className;
@@ -80,40 +80,36 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	/**
 	 * The module ID this entity belongs to
 	 * 
-	 * @return in
+	 * @return int
 	 */
 	public function getModuleId() {
 		return $this->moduleId;
-	}	
-	
-	
-	/**
-	 * Get the module this type belongs to.
-	 * 
-	 * @return Module
-	 */
+	}
+
+
+  /**
+   * Get the module this type belongs to.
+   *
+   * @return Module
+   * @throws Exception
+   */
 	public function getModule() {
 		return Module::findById($this->moduleId);
 	}
 
-	/**
-	 * Find by PHP API class name
-	 * 
-	 * @param string $className
-	 * @return static
-	 */
+  /**
+   * Find by PHP API class name
+   *
+   * @param string  $className
+   * @return static
+   * @throws Exception
+   */
 	public static function findByClassName($className) {
 
-		$e = new static;
-		$e->className = $className;
+		$clientName = $className::getClientName();
+		$c = self::getCache();	
 		
-		$record = (new Query)
-						->select('*')
-						->from('core_entity')
-						->where('clientName', '=', $className::getClientName())
-						->single();
-
-		if (!$record) {
+		if(!isset($c['name'][$clientName])) {
 			$module = Module::findByClass($className);
 		
 			if(!$module) {
@@ -123,30 +119,30 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			$record = [];
 			$record['moduleId'] = isset($module) ? $module->id : null;
 			$record['name'] = self::classNameToShortName($className);
-      $record['clientName'] = $className::getClientName();
+      $record['clientName'] = $clientName;
 			App::get()->getDbConnection()->insert('core_entity', $record)->execute();
-
 			$record['id'] = App::get()->getDbConnection()->getPDO()->lastInsertId();
-		} else
-		{
-			$e->defaultAclId = $record['defaultAclId'] ?? null; // in the upgrade situation this column is not there yet.
-			$e->highestModSeq = (int) $record['highestModSeq'];//) ? (int) $record['highestModSeq'] : null;
-		}
 
-		$e->id = $record['id'];
-		$e->moduleId = $record['moduleId'];
-		$e->clientName = $record['clientName'];
-		$e->name = $record['name'];
-		
-		
-		return $e;
+			go()->getCache()->delete('entity-types');
+
+			$e = new static;
+			$e->className = $className;
+			$e->id = $record['id'];
+			$e->moduleId = $record['moduleId'];
+			$e->clientName = $record['clientName'];
+			$e->name = $record['name'];
+
+			return $e;
+		}
+		return $c['models'][$c['name'][$clientName]] ?? false;
 	}
 
-	/**
-	 * The highest mod sequence used for JMAP data sync
-	 * 
-	 * @return int
-	 */
+  /**
+   * The highest mod sequence used for JMAP data sync
+   *
+   * @return int
+   * @throws Exception
+   */
 	public function getHighestModSeq() {
 		if(isset($this->highestModSeq)) {
 			return $this->highestModSeq;
@@ -193,16 +189,21 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	private static function classNameToShortName($cls) {
 		return substr($cls, strrpos($cls, '\\') + 1);
 	}
-	
-	/**
-	 * Find all registered.
-	 * 
-	 * @return static[]
-	 */
+	public function __wakeup()
+	{
+		$this->highestModSeq = null;
+	}
+
+  /**
+   * Find all registered.
+   *
+   * @return static[]
+   * @throws Exception
+   */
 	public static function findAll(Query $query = null) {
 		
 		if(!isset($query)) {
-			$query = new Query();
+			return array_values(static::getCache()['id']);		
 		}
 		
 		$records = $query
@@ -216,7 +217,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		foreach($records as $record) {
 			$type = static::fromRecord($record);
 			$cls = $type->getClassName();
-			if(!class_exists($cls)) {
+			if(!class_exists($cls) || (!is_a($cls, Entity::class, true) && !is_a($cls, ActiveRecord::class, true))) {
 				go()->warn($cls .' not found!');
 				continue;
 			}
@@ -226,46 +227,65 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		return $i;
 	}
 
-	/**
-	 * Find by db id
-	 * 
-	 * @param int $id
-	 * @return static
-	 */
-	public static function findById($id) {
-		$record = (new Query)
-						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
-						->from('core_entity', 'e')
-						->join('core_module', 'm', 'm.id = e.moduleId')
-						->where('id', '=', $id)->where(['m.enabled' => true])
-						->single();
-		
-		if(!$record) {
-			return false;
+  /**
+   * @return array|mixed
+   * @throws Exception
+   */
+	private static function getCache() {
+		$cache = go()->getCache()->get('entity-types');
+
+		if(!$cache) {
+			$cache= [
+				'id' => [],
+				'name' => [],
+				'models' => self::findAll(new Query)
+			];
+
+			for($i = 0, $c = count($cache['models']); $i < $c; $i++) {
+			  /** @var self $t */
+				$t = $cache['models'][$i];
+				$cache['id'][$t->getId()] = $i;
+				$cache['name'][$t->getName()] = $i;
+			}
+			if(!go()->getInstaller()->isInProgress()) {
+				go()->getCache()->set('entity-types', $cache);
+			}
 		}
-		
-		return static::fromRecord($record);
+
+		return $cache;
 	}
-	
-	/**
-	 * Find by client API name
-	 * 
-	 * @param string $name
-	 * @return static
-	 */
-	public static function findByName($name) {
-		$record = (new Query)
-						->select('e.*, m.name AS moduleName, m.package AS modulePackage')
-						->from('core_entity', 'e')
-						->join('core_module', 'm', 'm.id = e.moduleId')
-						->where('clientName', '=', $name)->where(['m.enabled' => true])
-						->single();
-		
-		if(!$record) {
+
+
+  /**
+   * Find by db id
+   *
+   * @param int $id
+   * @return static|bool
+   * @throws Exception
+   */
+	public static function findById($id) {
+
+		$c = self::getCache();
+		if(!isset($c['id'][$id])) {
 			return false;
 		}
-		
-		return static::fromRecord($record);
+		return $c['models'][$c['id'][$id]] ?? false;
+	}
+
+  /**
+   * Find by client API name
+   *
+   * @param string $name
+   * @return static|bool
+   * @throws Exception
+   */
+	public static function findByName($name) {
+
+		$c = self::getCache();
+		if(!isset($c['name'][$name])) {
+			return false;
+		}
+		return $c['models'][$c['name'][$name]] ?? false;
 	}
 	
 	/**
@@ -278,7 +298,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		return array_map(function($name) {
 			$e = static::findByName($name);
 			if(!$e) {
-				throw new \Exception("Entity '$name'  not found");
+				throw new Exception("Entity '$name'  not found");
 			}
 			return $e->getId();
 		}, $names);	
@@ -297,6 +317,9 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		if (isset($record['modulePackage'])) {
 			if($record['modulePackage'] == 'core') {
 				$e->className = 'go\\core\\model\\' . ucfirst($e->name);	
+				if(!class_exists($e->className)) {
+					$e->className = 'GO\\Base\\Model\\' . ucfirst($e->name);	
+				}
 			} else
 			{
 				$e->className = 'go\\modules\\' . $record['modulePackage'] . '\\' . $record['moduleName'] . '\\model\\' . ucfirst($e->name);
@@ -307,20 +330,21 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		
 		return $e;
 	}
-	
-	/**
-	 * Register multiple changes for JMAP
-	 * 
-	 * This function increments the entity type's modSeq so the JMAP sync API 
-	 * can detect this change for clients.
-	 * 
-	 * It writes the changes into the 'core_change' table.
-	 * 	 
-	 * @param Query|array $changedEntities A query object or an array that provides "entityId", "aclId" and "destroyed" 
-	 * in this order. When using an array you may also provide a list of entity ID's. In that case it's assumed that these 
-	 * entites have no ACL and are not destroyed but modified.
-	 * 
-	 */
+
+  /**
+   * Register multiple changes for JMAP
+   *
+   * This function increments the entity type's modSeq so the JMAP sync API
+   * can detect this change for clients.
+   *
+   * It writes the changes into the 'core_change' table.
+   *
+   * @param Query|array $changedEntities A query object or an array that provides "entityId", "aclId" and "destroyed"
+   * in this order. When using an array you may also provide a list of entity ID's. In that case it's assumed that these
+   * entites have no ACL and are not destroyed but modified.
+   * @return bool
+   * @throws Exception
+   */
 	public function changes($changedEntities) {		
 		
 		go()->getDbConnection()->beginTransaction();
@@ -332,7 +356,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		} else {
 
 			if(empty($changedEntities)) {
-				return;
+				return true;
 			}
 
 			if(!is_array($changedEntities[0])) {
@@ -349,11 +373,10 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			}
 		}
 		
-		
 		try {
 			$stmt = go()->getDbConnection()->insert('core_change', $changedEntities, ['entityId', 'aclId', 'destroyed', 'entityTypeId', 'modSeq', 'createdAt']);
 			$stmt->execute();
-		} catch(\Exception $e) {
+		} catch(Exception $e) {
 			go()->getDbConnection()->rollBack();
 			throw $e;
 		}
@@ -364,23 +387,24 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		// 	go()->getDbConnection()->rollBack();
 		// } else
 		// {
-			go()->getDbConnection()->commit();			
+			return go()->getDbConnection()->commit();
 		// }				
-		return true;
+
 	}
 
-	/**
-	 * Register a change for JMAP
-	 * 
-	 * This function increments the entity type's modSeq so the JMAP sync API 
-	 * can detect this change for clients.
-	 * 
-	 * It writes the changes into the 'core_change' table.
-	 * 
-	 * It also writes user specific changes 'core_user_change' table ({@see \go\core\orm\Mapping::addUserTable()). 
-	 * 
-	 * @param jmap\Entity $entity
-	 */
+  /**
+   * Register a change for JMAP
+   *
+   * This function increments the entity type's modSeq so the JMAP sync API
+   * can detect this change for clients.
+   *
+   * It writes the changes into the 'core_change' table.
+   *
+   * It also writes user specific changes 'core_user_change' table ({@see \go\core\orm\Mapping::addUserTable()).
+   *
+   * @param jmap\Entity $entity
+   * @throws Exception
+   */
 	public function change(jmap\Entity $entity, $isDeleted = false) {
 		$this->highestModSeq = $this->nextModSeq();
 
@@ -403,21 +427,12 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	 * @throws Exception
 	 */
 	public function checkChange(Entity $entity) {
-		
-//		go()->debug($entity->getClientName(). ' checkChange() ' . $entity->getId() . 'mod: '.implode(', ', array_keys($entity->getModified())));
-		
-		// if(!$entity->isDeleted()) {
-			$modifiedPropnames = array_keys($entity->getModified());		
-			$userPropNames = $entity->getUserProperties();
 
-			$entityModified = !empty(array_diff($modifiedPropnames, $userPropNames));
-			$userPropsModified = !empty(array_intersect($userPropNames, $modifiedPropnames));
-		// } else
-		// {
-		// 	$entityModified = true;
-		// 	$userPropsModified = false;
-		// }
-		
+    $modifiedPropnames = array_keys($entity->getModified());
+    $userPropNames = $entity->getUserProperties();
+
+    $entityModified = !empty(array_diff($modifiedPropnames, $userPropNames));
+    $userPropsModified = !empty(array_intersect($userPropNames, $modifiedPropnames));
 	
 		if($entityModified) {			
 			$this->change($entity);
@@ -426,20 +441,6 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		if($userPropsModified) {
 			$this->userChange($entity);
 		}
-		
-		// if($entity->isDeleted()) {
-			
-		// 	$where = [
-		// 			'entityTypeId' => $this->id,
-		// 			'entityId' => $entity->id(),
-		// 			'userId' => go()->getUserId()
-		// 					];
-			
-		// 	$stmt = go()->getDbConnection()->delete('core_change_user', $where);
-		// 	if(!$stmt->execute()) {
-		// 		throw new \Exception("Could not delete user change");
-		// 	}
-		// }
 	}
 	
 	private function userChange(Entity $entity) {
@@ -452,22 +453,16 @@ class EntityType implements \go\core\data\ArrayableInterface {
 
 		$stmt = go()->getDbConnection()->replace('core_change_user', $data);
 		if(!$stmt->execute()) {
-			throw new \Exception("Could not save user change");
+			throw new Exception("Could not save user change");
 		}
-
-		// if(!$stmt->rowCount()) {
-		// 	$where['modSeq'] = 1;
-		// 	if(!go()->getDbConnection()->insert('core_change_user', $where)->execute()) {
-		// 		throw new \Exception("Could not save user change");
-		// 	}
-		// }
 	}
-	
-	/**
-	 * Get the modSeq for the user specific properties.
-	 * 
-	 * @return string
-	 */
+
+  /**
+   * Get the modSeq for the user specific properties.
+   *
+   * @return string
+   * @throws Exception
+   */
 	public function getHighestUserModSeq() {
 		if(!isset($this->highestUserModSeq)) {
 			$this->highestUserModSeq = (int) (new Query())
@@ -478,14 +473,15 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		}
 		return $this->highestUserModSeq;
 	}
-	
-	
-	/**
-	 * Get the modification sequence
-	 * 
-	 * @param string $entityClass
-	 * @return int
-	 */
+
+
+  /**
+   * Get the modification sequence
+   *
+   * @param string $entityClass
+   * @return int
+   * @throws Exception
+   */
 	public function nextModSeq() {
 		
 		if($this->modSeqIncremented) {
@@ -517,14 +513,15 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		$this->highestModSeq = $modSeq;
 		
 		return $modSeq;
-	}	
-	
-	/**
-	 * Get the modification sequence
-	 * 
-	 * @param string $entityClass
-	 * @return int
-	 */
+	}
+
+  /**
+   * Get the modification sequence
+   *
+   * @param string $entityClass
+   * @return int
+   * @throws Exception
+   */
 	public function nextUserModSeq() {
 		
 		if($this->userModSeqIncremented) {
@@ -556,19 +553,28 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		
 		return $modSeq;
 	}
-	
+
+  /**
+   * @return Acl
+   * @throws Exception
+   */
 	private function createAcl() {
-		$acl = new \go\core\model\Acl();
+		$acl = new Acl();
 		$acl->usedIn = 'core_entity.defaultAclId';
 		$acl->ownedBy = 1;
-		//$acl->addGroup(\go\core\model\Group::ID_INTERNAL, \go\core\model\Acl::LEVEL_WRITE);
 		if(!$acl->save()) {
-			throw new \Exception('Could not save default ACL');
+			throw new Exception('Could not save default ACL');
 		}
 		
 		return $acl;
 	}
-	
+
+  /**
+   * Get ACL id of ACL that holds default permissions
+   *
+   * @return int|null
+   * @throws Exception
+   */
 	public function getDefaultAclId() {
 		if(!$this->isAclOwner()) {
 			return null;
@@ -582,7 +588,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			
 			if(!go()->getDbConnection()->update('core_entity', ['defaultAclId' => $acl->id], ['id' => $this->getId()])->execute()) {
 				go()->getDbConnection()->rollBack();
-				throw new \Exception("Could not save defaultAclId");
+				throw new Exception("Could not save defaultAclId");
 			}
 			
 			go()->getDbConnection()->commit();
@@ -625,11 +631,12 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		return property_exists($this->getClassName(), 'filesFolderId') || property_exists($this->getClassName(), 'files_folder_id');
 	}
 
-	/**
-	 * Returns an array with group ID as key and permission level as value.
-	 * 
-	 * @return array eg. ["2" => 50, "3" => 10]
-	 */
+  /**
+   * Returns an array with group ID as key and permission level as value.
+   *
+   * @return array eg. ["2" => 50, "3" => 10]
+   * @throws Exception
+   */
 	public function getDefaultAcl() {
 
 		$defaultAclId = $this->getDefaultAclId();
@@ -648,7 +655,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	public function setDefaultAcl($acl) {
 		$defaultAclId = $this->getDefaultAclId();
 		if(!$defaultAclId) {
-			throw new \Exception("Entity '".$this->name."' does not support a default ACL");
+			throw new Exception("Entity '".$this->name."' does not support a default ACL");
 		}
 		$a = Acl::findById($defaultAclId);
 		foreach($acl as $groupId => $level) {

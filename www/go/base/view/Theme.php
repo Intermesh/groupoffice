@@ -5,19 +5,22 @@ namespace GO\Base\View;
 
 
 class Theme{
+
+	private $name;
 	/**
 	 * Get the name of the theme that is selected by the user.
 	 * 
 	 * @return StringHelper
 	 */
 	public function getName(){
-		$theme = \GO::config()->allow_themes && \GO::user() ? \GO::user()->theme : \GO::config()->theme;
-		
-		if(!file_exists(\GO::view()->getPath().'themes/'.$theme.'/Layout.php')){
-			return 'Paper';
-		}  else {
-			return $theme;
+		if(!isset($this->name)) {
+			$this->name = \GO::config()->allow_themes && \GO::user() ? \GO::user()->theme : \GO::config()->theme;
+			
+			if(!file_exists(\GO::view()->getPath().'themes/'.$this->name.'/Layout.php')){
+				$this->name = 'Paper';
+			}  
 		}
+		return $this->name;
 	}
 	
 	/**

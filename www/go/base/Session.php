@@ -445,7 +445,7 @@ class Session extends Observable{
 		\GO::session()->values['username']=\GO::user()->username;
     
     if(isset(\GO::session()->values['accessToken'])) {
-      $token = \go\core\auth\model\Token::find()->where(['accessToken' => \GO::session()->values['accessToken']])->single();
+      $token = \go\core\model\Token::find()->where(['accessToken' => \GO::session()->values['accessToken']])->single();
       $token->userId = $user_id;
       if(!$token->save()) {
         throw new \Exception("Could not set token");

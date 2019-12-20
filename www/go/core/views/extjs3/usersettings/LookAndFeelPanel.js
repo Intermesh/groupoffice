@@ -31,7 +31,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			title: t('Global','users','core'),
 			labelWidth:dp(160),
 			defaults: { 
-				width:dp(200),
+				anchor: "100%",
 			},
 			items:[
 				this.themeCombo = new Ext.form.ComboBox({
@@ -124,7 +124,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 		
 		this.regionFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(160),
-			defaults: { width:dp(200) },
+			defaults: { anchor: "100%" },
 			title: t('Regional','users','core'),
 			items:[
 				this.languageCombo = new Ext.form.ComboBox({
@@ -381,16 +381,25 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			items: [
 				{
 					columnWidth: .5,//left
-					items:[this.globalFieldset,this.regionFieldset,{
+					mobile: {
+						columnWidth: 1
+					},
+					items:[this.globalFieldset,this.regionFieldset
+						
+						,{
 						xtype:'button',
 						style:'margin-left:14px',
 						handler:this.resetState,
 						scope:this,
 						text:t('Reset windows and grids'),
 						anchor:''
-					}]
+					}
+				]
 				},{
 					columnWidth: .5,//right
+					mobile: {
+						columnWidth: 1
+					},
 					items: [this.formattingFieldset,this.soundsFieldset,this.notificationsFieldset]
 				}
 			]

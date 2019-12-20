@@ -3,6 +3,7 @@
 namespace go\modules\community\dev\cli\controller;
 
 use go\core\Controller;
+use go\core\data\convert\Csv;
 use go\core\Environment;
 use go\core\fs\Blob;
 use go\core\fs\File;
@@ -16,7 +17,7 @@ class Language extends Controller {
 	private $en;
 	private $nl;
 	
-	const DELIMITER = ';';
+	private $delimiter = ';';
 	const ENCLOSURE = '"';
 
 	/**
@@ -49,14 +50,17 @@ class Language extends Controller {
 		}
 		if (!$file->exists()) {
 			throw new \Exception("File not found " . $path);
-		}
+		}		
+
+		$this->delimiter = Csv::sniffDelimiter($file);
+
 		$this->handle = $file->open("r");
 
 		if (!$this->handle) {
 			throw new \Exception("Could not open " . $path);
 		}
 
-		$headers = fgetcsv($this->handle,0, self::DELIMITER, self::ENCLOSURE);
+		$headers = fgetcsv($this->handle,0, $this->delimiter, self::ENCLOSURE);
 
 
 		if (!$headers) {
@@ -71,14 +75,13 @@ class Language extends Controller {
 		$data = [];
 
 		
-		while ($record = fgetcsv($this->handle, 0, self::DELIMITER, self::ENCLOSURE)) {
+		while ($record = fgetcsv($this->handle, 0, $this->delimiter, self::ENCLOSURE)) {
 			
 			try {
 				list($package, $module, $en, $translation, $source) = $record;
 			} catch(\Exception $e) {
 				echo "ERROR: Could not read record: ". var_export($record, true) ."\n\n";
-			}
-			
+			}			
 
 			if (empty($translation)) {
 				continue;

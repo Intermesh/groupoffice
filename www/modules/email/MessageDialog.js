@@ -100,7 +100,7 @@ GO.email.MessageDialog = function(config){
 	GO.email.MessageDialog.superclass.constructor.call(this, config);
 }
 
-Ext.extend(GO.email.MessageDialog, Ext.Window,{
+Ext.extend(GO.email.MessageDialog, go.Window,{
 	closeAction:'hide',	
 	
 	showData : function(data){

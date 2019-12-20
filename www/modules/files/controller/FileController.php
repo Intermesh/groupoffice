@@ -3,10 +3,12 @@
 
 namespace GO\Files\Controller;
 
+use GO\Base\Exception\NotFound;
 use GO\Files\Model\File;
 use go\core\fs\Blob;
 use go\core\fs\File as GoFile;
 use go\core\fs\Folder;
+use GO\Email\Controller\MessageController;
 
 class FileController extends \GO\Base\Controller\AbstractModelController {
 
@@ -369,6 +371,9 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		
 		if(isset($params['path'])){
 			$folder = \GO\Files\Model\Folder::model()->findByPath(dirname($params['path']));
+			if(!$folder) {
+			  throw new NotFound($params['path']);
+      }
 			$file = $folder->hasFile(\GO\Base\Fs\File::utf8Basename($params['path']));
 		}else
 		{
@@ -449,13 +454,15 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 	 * @return StringHelper Json response
 	 */
 	protected function actionEmailDownloadLink($params){
-
+		$msgController = new MessageController();
+		$templateContent = $msgController->loadTemplate($params);
 		$files = \GO\Files\Model\File::model()->findByAttribute('id', json_decode($params['ids']));
 		
 		$html=$params['content_type']=='html';
 		$bodyindex = $html ? 'htmlbody' : 'plainbody';
 		$lb = $html ? '<br />' : "\n";
-		$text = $html ? \GO::t("Click on the link to download the file", "files") : \GO::t("Click the secured link below or copy it to your browser's address bar to download the file.", "files");
+		$text = $templateContent["data"]["htmlbody"];
+		$text .= $html ? \GO::t("Click on the link to download the file", "files") : \GO::t("Click the secured link below or copy it to your browser's address bar to download the file.", "files");
 
 		$linktext = $html ? "<ul>" : $lb;
 		

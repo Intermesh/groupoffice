@@ -1103,10 +1103,10 @@ END;
 		);
 
 		foreach ($emoticons as $emoticon => $img) {
-			
-			$rel = 'views/Extjs3/themes/' . \GO::user()->theme . '/images/emoticons/normal/' . $img;
-			if(!file_exists(\GO::config()->root_path.$rel))
-				$rel = 'views/Extjs3/themes/Default/images/emoticons/normal/' . $img;
+			$rel = 'views/Extjs3/themes/' . \GO::user()->theme . '/img/emoticons/normal/' . $img;
+			if(!file_exists(\GO::config()->root_path.$rel)) {
+				$rel = 'views/Extjs3/themes/Paper/img/emoticons/normal/' . $img;
+			}
 			
 			$imgpath = \GO::config()->host . $rel;
 			$imgstring = '<img src="' . $imgpath . '" alt="' . $emoticon . '" />';

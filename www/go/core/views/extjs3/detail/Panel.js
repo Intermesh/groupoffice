@@ -187,8 +187,8 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		return this.add(go.customfields.CustomFields.getDetailPanels(this.entityStore.entity.name));
 	},
 
-	addLinks : function() {
-		return this.add(new go.links.getDetailPanels());
+	addLinks : function(sortFn) {
+		return this.add(new go.links.getDetailPanels(sortFn));
 	},
 
 	addComments : function() {

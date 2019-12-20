@@ -1059,9 +1059,11 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		$calendar = false;
 		
 		foreach($calendarModels as $cal){
-			if($cal->id == $defaultCalendar->id)
-				return $cal;
-			
+		    if($defaultCalendar) {
+                if($cal->id == $defaultCalendar->id)
+                    return $cal;
+            }
+
 			if(empty($calendar) && $cal->checkPermissionLevel(\GO\Base\Model\Acl::CREATE_PERMISSION))
 				$calendar = $cal;
 		}
@@ -1257,7 +1259,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 //		
 //		$leavedays = \GO\Leavedays\Model\Leaveday::model()
 		//$holidays = \GO\Base\Model\Holiday::model()->getHolidaysInPeriod($startTime, $endTime, $calendar->user->language);
-		$leavedaysStmt = \GO\Leavedays\Model\Leaveday::model()->getLeavedaysInPeriod($calendar->user->id,$startTime, $endTime);
+		$leavedaysStmt = \GO\Leavedays\Model\Leaveday::model()->getLeavedaysInPeriod($calendar->user->id,$startTime, $endTime, null);
 		
 		if($leavedaysStmt){
 			while($leavedayModel = $leavedaysStmt->fetch()){ 

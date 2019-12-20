@@ -24,4 +24,5 @@ return array (
   'Delete older events and tasks at the client (they will be kept in Group-Office)' => 'Apagar eventos e tarefas antigos no dispositivo móvel (eles não serão removidos do {product_name})',
   '<h1>Group-Office SyncML Server</h1><p>This is the Group-Office SyncML server. Use a SyncML compliant device or software package and connect it to this URL to synchronize with Group-Office.</p>' => '<h1>Servidor SyncML do {product_name}</h1><p>Este é o servidor de sincronização do {product_name}. Utilize um dispositivo com suporte SyncML',
   'Notebooks' => 'Notas',
+  'Address books' => 'Catálogos de endereço',
 );

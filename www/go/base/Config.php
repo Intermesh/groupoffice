@@ -1368,7 +1368,9 @@ var $billing_clear_payment_method_on_duplicate = true;
 		if($config_file)
 			include($config_file);
 
-		return $config ?? [];
+		$config['configPath'] = $config_file;
+
+		return $config;
 	}
 		
 	
@@ -1418,8 +1420,11 @@ var $billing_clear_payment_method_on_duplicate = true;
 		if(empty($this->db_user)) {
 		//Detect some default values for installation if root_path is not set yet
 			$this->host = dirname($_SERVER['SCRIPT_NAME']);
-			if(basename($this->host)=='install')
-				$this->host = dirname($this->host);
+			$basename = basename($this->host);
+			while($basename=='install' || $basename == 'api') {
+        $this->host = dirname($this->host);
+        $basename = basename($this->host);
+      }
 
 			if(substr($this->host,-1) != '/') {
 				$this->host .= '/';
@@ -1554,7 +1559,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	}
 	
 	public function getsmtp_password() {
-		return go()->getSettings()->getSmtpPassword();
+		return go()->getSettings()->decryptSmtpPassword();
 	}
 	
 	public function getsmtp_encryption() {

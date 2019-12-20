@@ -6,9 +6,7 @@ use go\core\model\Acl;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\exception\Forbidden;
-use go\core\model\UserGroup;
 use go\core\orm\Query;
-use go\core\util\ArrayObject;
 use go\core\validate\ErrorCode;
 
 /**
@@ -161,14 +159,19 @@ class Group extends AclOwnerEntity {
 
 
 	public function getModules() {
-		$modules = new ArrayObject();
-		$modules->serializeJsonAsObject = true;
+		$modules = [];
 
 		$mods = Module::find()
 							->select('id,level')
 							->fetchMode(\PDO::FETCH_ASSOC)
 							->join('core_acl_group', 'acl_g', 'acl_g.aclId=m.aclId')
-							->where(['acl_g.groupId' => $this->id]);
+							->where(['acl_g.groupId' => $this->id])
+							->all();
+
+		if(empty($mods)) {
+			//return null because an empty array is serialzed as [] instead of {}
+			return null;
+		}
 
 		foreach($mods as $m) {
 			$modules[$m['id']] = $m['level'];

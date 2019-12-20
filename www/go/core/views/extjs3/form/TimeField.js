@@ -1,5 +1,5 @@
 go.form.TimeField = Ext.extend(Ext.form.TextField, {
-	width: dp(72),
+	width: dp(80),
 	defaultAutoCreate : {tag: 'input', type: 'time', size: '20', autocomplete: 'off'},
 
 

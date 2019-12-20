@@ -101,6 +101,11 @@ go.Modules.register("community", "addressbook", {
 					title: t("City"),
 					type: "string",
 					multiple: true
+				},  {
+					name: 'street',
+					title: t("Street"),
+					type: "string",
+					multiple: true
 				}, {
 					name: 'org',
 					title: t("Organization"),
@@ -153,6 +158,21 @@ go.Modules.register("community", "addressbook", {
 							title: t("No")
 						}
 					]
+				}, {
+					title: t("Is in a group"),
+					name: 'isInGroup',
+					multiple: false,
+					type: 'select',
+					options: [
+						{
+							value: true,
+							title: t("Yes")
+						},
+						{
+							value: false,
+							title: t("No")
+						}
+					]
 				}
 			],
 			links: [{
@@ -168,8 +188,13 @@ go.Modules.register("community", "addressbook", {
 					 * @param {string|int} entityId
 					 * @returns {go.form.Dialog}
 					 */
-					linkWindow: function (entity, entityId) {
-						return new go.modules.community.addressbook.ContactDialog();
+					linkWindow: function (entity, entityId, data) {
+						var dlg = new go.modules.community.addressbook.ContactDialog();
+						dlg.setValues({
+							addressBookId: data.addressBookId,
+							isOrganization: false
+						});
+						return dlg;
 					},
 
 					/**
@@ -197,9 +222,12 @@ go.Modules.register("community", "addressbook", {
 					 * @param {string|int} entityId
 					 * @returns {go.form.Dialog}
 					 */
-					linkWindow: function (entity, entityId) {
+					linkWindow: function (entity, entityId, data) {
 						var dlg = new go.modules.community.addressbook.ContactDialog();
-						dlg.setValues({isOrganization: true});
+						dlg.setValues({
+							addressBookId: data.addressBookId,
+							isOrganization: true
+						});
 						return dlg;
 					},
 

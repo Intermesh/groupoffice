@@ -46,11 +46,11 @@ GO.postfixadmin.AliasesGrid = function(config){
 		},		{
 			header: t("Created at"), 
 			dataIndex: 'ctime',
-			width: dp(140)
+				xtype: "datecolumn"
 		},		{
 			header: t("Modified at"), 
 			dataIndex: 'mtime',
-			width: dp(140)
+				xtype: "datecolumn"
 		},		{
 			header: t("Active", "postfixadmin"), 
 			dataIndex: 'active'

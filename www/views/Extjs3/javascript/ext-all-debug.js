@@ -11263,6 +11263,12 @@ Ext.Component = function(config){
     this.initialConfig = config;
 
     Ext.apply(this, config);
+
+
+    if(config.mobile && GO.util.isMobileOrTablet()) {
+        Ext.apply(this, config.mobile);
+    }
+
     this.addEvents(
         
         'added',
@@ -15265,6 +15271,10 @@ Ext.extend(Ext.layout.BorderLayout.SplitRegion, Ext.layout.BorderLayout.Region, 
 
     
     onSplitMove : function(split, newSize){
+
+        //MS: for responsive layout
+        this.panel.wideWidth = newSize.width;
+
         var s = this.panel.getSize();
         this.lastSplitSize = newSize;
         if(this.position == 'north' || this.position == 'south'){
@@ -15421,6 +15431,22 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
             c.label = c.getItemCt().child('label.x-form-item-label');
             if(!c.rendered){
                 c.render('x-form-el-' + c.id);
+                /* start extra code */
+                var newEl,
+                 fEl = Ext.fly('x-form-el-' + c.id),
+                 pos = {suffix: 'beforeEnd', prefix: 'afterBegin'};
+                for(var key in pos){
+                    if (c[key]) { // Field prefix/suffix
+                        if (c.isXType('trigger')) {
+                            newEl = c.wrap.insertHtml(pos[key],  '<span> ' + c[key] + ' </span>', true);
+                            c.el.setWidth(c.el.getWidth() - c.trigger.getWidth() - newEl.getWidth());
+                        } else {
+                            newEl = fEl.insertHtml(pos[key],  '<span> ' + c[key] + ' </span>', true);
+                            c.el.setWidth(c.el.getWidth() - newEl.getWidth());
+                        }
+                    }
+                }
+                /* end extra code */
             }else if(!this.isValidParent(c, target)){
                 Ext.fly('x-form-el-' + c.id).appendChild(c.getPositionEl());
             }
@@ -18018,7 +18044,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
         if(!this.toolTemplate){
             
             var tt = new Ext.Template(
-                 '<div class="x-tool x-tool-{id}">&#160;</div>'
+                 '<div class="x-tool x-tool-{id} {cls}">&#160;</div>'
             );
             tt.disableFormats = true;
             tt.compile();
@@ -40204,6 +40230,10 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
     
     autocomplete: "off",
 
+    placeholder: "",
+
+    spellCheck: true,
+
     fieldClass : 'x-form-field',
     
     msgTarget : 'qtip',
@@ -40262,6 +40292,13 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
             }
 
             cfg.autocomplete = this.autocomplete;
+            cfg.placeholder = this.placeholder;
+
+            if(!this.spellCheck) {
+              cfg.autocorrect="off";
+              cfg.autocapitalize="off";
+              cfg.spellcheck="false";
+            }
             
             this.autoEl = cfg;
         }
@@ -42112,7 +42149,7 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
 
             if(!this.tpl){
                 
-                this.tpl = '<tpl for="."><div class="'+cls+'-item">{[fm.htmlEncode(values["' + this.displayField + '"] || "" )]}</div></tpl>';
+                this.tpl = '<tpl for="."><div class="'+cls+'-item" title="{[fm.htmlEncode(values[\'' + this.displayField + '\'] || \'\' )]}">{[fm.htmlEncode(values["' + this.displayField + '"] || "" )]}</div></tpl>';
                 
             }
 
@@ -47658,8 +47695,11 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
                 meta.style = column.style;
 
                 var v = this.encodeGridValue(store, column, record);
-                
-                meta.value = column.renderer.call(column.scope, v, meta, record, rowIndex, i, store);
+                try {
+                    meta.value = column.renderer.call(column.scope, v, meta, record, rowIndex, i, store);
+                } catch(e) {
+                    console.error(e);
+                }
 
                 if (Ext.isEmpty(meta.value)) {
                     meta.value = '&#160;';
@@ -50696,6 +50736,7 @@ Ext.grid.RowSelectionModel = Ext.extend(Ext.grid.AbstractSelectionModel,  {
         return (this.selections.key(id) ? true : false);
     },
 
+    simpleSelect : false,
     
     handleMouseDown : function(g, rowIndex, e){
         if(e.button !== 0 || this.isLocked()){
@@ -50709,10 +50750,10 @@ Ext.grid.RowSelectionModel = Ext.extend(Ext.grid.AbstractSelectionModel,  {
             view.focusRow(rowIndex);
         }else{
             var isSelected = this.isSelected(rowIndex);
-            if(e.ctrlKey && isSelected){
+            if((e.ctrlKey || this.simpleSelect) && isSelected){
                 this.deselectRow(rowIndex);
             }else if(!isSelected || this.getCount() > 1){
-                this.selectRow(rowIndex, e.ctrlKey || e.shiftKey);
+                this.selectRow(rowIndex, e.ctrlKey || e.shiftKey || this.simpleSelect);
                 view.focusRow(rowIndex);
             }
         }

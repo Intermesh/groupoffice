@@ -107,6 +107,10 @@ go.data.StoreTrait = {
 
 		this.proxy.getEntityFields().forEach(function(field) {
 			var relation =  this.entityStore.entity.findRelation(field.name);
+
+			if(!relation) {
+				throw "'" + field.name + "' is not a relation of '" + this.entityStore.entity.name + "'";
+			}
 			go.Db.store(relation.store).on("changes", this.onRelationChanges, this);
 		}, this);
 	},
@@ -154,7 +158,7 @@ go.data.StoreTrait = {
 	},
 
 	onChanges : function(entityStore, added, changed, destroyed) {
-		if(!this.loaded || this.loading) {
+		if(!this.loaded || this.loading || !this.lastOptions) {
 			return;
 		}		
 
@@ -163,6 +167,7 @@ go.data.StoreTrait = {
 			var o = go.util.clone(this.lastOptions);
 			o.params = o.params || {};
 			o.params.position = 0;
+			o.add = false;
 
 			if(this.lastOptions.params && this.lastOptions.params.position) {				
 				o.params.limit = this.lastOptions.params.position + (this.lastOptions.limit || this.baseParams.limit || 20);

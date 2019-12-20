@@ -157,7 +157,7 @@ GO.email.LinkedMessagePanel = Ext.extend(GO.email.MessagePanel,{
 			win.focus();
 		},
 		attachmentClicked: function(attachment, panel){
-			if(attachment.mime=='message/rfc822')
+			if(attachment.mime=='message/rfc822' || attachment.mime=='application/eml')
 			{
 				GO.email.showMessageAttachment(0, {
 					action:'path',

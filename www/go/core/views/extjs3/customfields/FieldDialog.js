@@ -55,7 +55,19 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 						xtype: "checkbox",
 						name: "required",
 						boxLabel: t("Required field"),
-						hideLabel: true
+						hideLabel: true,
+						listeners: {
+							check: function(cb, value) {
+								this.formPanel.getForm().findField('requiredCondition').setDisabled(value);
+							},
+							scope: this
+						}
+					},
+					{
+						xtype: "textfield",
+						name: "requiredCondition",
+						fieldLabel: t("Required condition"),
+						anchor: "100%"
 					}
 				]
 			}

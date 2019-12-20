@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\apikeys\model;
 
+use go\core\model\Token;
 use go\core\orm\Query;
 
 class Key extends \go\core\jmap\Entity {
@@ -17,8 +18,9 @@ class Key extends \go\core\jmap\Entity {
 	protected function internalSave() {
 		
 		if($this->isNew()) {
-			$token = new \go\core\auth\model\Token();
+			$token = new Token();
 			$token->userId = 1; //TODO make configurable
+			$token->expiresAt = null;
 			if(!$token->refresh()) {
 				$this->setValidationError('accessToken', \go\core\validate\ErrorCode::RELATIONAL, 'Could not save token');
 				return false;
@@ -34,11 +36,15 @@ class Key extends \go\core\jmap\Entity {
 		$q = clone $query;
 		$q->select('accessToken');
 
-		if(!Token::delete(['accessToken' => $q])) {
-			throw new \Exception("Could not delete access token");
-		}
+		if(!parent::internalDelete($query)) {
+		  return false;
+    }
 
-		return parent::internalDelete($query);
+    if(!Token::delete(['accessToken' => $q])) {
+      throw new \Exception("Could not delete access token");
+    }
+
+    return true;
 	}
 }
 

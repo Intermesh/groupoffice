@@ -19,8 +19,33 @@ use go\core\Module;
  * @see Module::getSettings()
  */
 abstract class Settings extends Model {
+
+  private static $instance = [];
+	/**
+	 * 
+	 * @return static
+	 */
+	public static function get() {
+    $cls = static::class;
+
+	  if(!isset(self::$instance[$cls])) {
+
+
+      $instance = go()->getCache()->get($cls);
+      if ($instance) {
+        self::$instance[$cls] = $instance;
+        return $instance;
+      }
+
+      $instance = new static;
+
+      go()->getCache()->set($cls, $instance);
+      self::$instance[$cls] = $instance;
+    }
+
+		return self::$instance[$cls];
+	}
 	
-	use SingletonTrait;
 
 	protected function getModuleId() {
 		$moduleId = (new Query)
@@ -145,6 +170,8 @@ abstract class Settings extends Model {
 				$this->update($name, $value);
 			}
 		}
+
+		go()->getCache()->set(static::class, $this);
 		
 		return true;
 	}

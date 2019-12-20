@@ -38,24 +38,32 @@ abstract class Base extends Model {
 		$this->field = $field;
 	}
 
-	
-	/**
-	 * Get column definition for SQL.
-	 * 
-	 * When false is returned no databaseName is required and no field will be created.
-	 * 
-	 * @return string|boolean
-	 */
+
+  /**
+   * Get column definition for SQL.
+   *
+   * When false is returned no databaseName is required and no field will be created.
+   *
+   * @return string|boolean
+   * @throws Exception
+   */
 	protected function getFieldSQL() {
-		return "VARCHAR(".($this->field->getOption('maxLength') ?? 190).") DEFAULT " . go()->getDbConnection()->getPDO()->quote($this->field->getDefault() ?? "NULL");
+		$def = $this->field->getDefault();
+		if(!empty($def)) {
+			$def = go()->getDbConnection()->getPDO()->quote($def);
+		} else{
+			$def = "NULL";
+		}
+		return "VARCHAR(".($this->field->getOption('maxLength') ?? 190).") DEFAULT " . $def;
 	}
 
-	/**
-	 * 
-	 * Check if this custom field has a column in the custom field record table.
-	 * 
-	 * @return bool
-	 */
+  /**
+   *
+   * Check if this custom field has a column in the custom field record table.
+   *
+   * @return bool
+   * @throws Exception
+   */
 	public function hasColumn() {
 		return $this->getFieldSQL() != false;
 	}
@@ -68,14 +76,18 @@ abstract class Base extends Model {
 		
 		if($this->field->isModified("databaseName") && preg_match('/[^a-zA-Z_0-9]/', $this->field->databaseName)) {
 			$this->field->setValidationError('databaseName', ErrorCode::INVALID_INPUT, go()->t("Invalid database name. Only use alpha numeric chars and underscores.", 'core','customfields'));
-		}		
+		}
+
+		//check database name exists
+
 	}
-	
-	/**
-	 * Called when the field is saved
-	 * 
-	 * @return boolean
-	 */
+
+  /**
+   * Called when the field is saved
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	public function onFieldSave() {
 		
 		$fieldSql = $this->getFieldSQL();
@@ -87,13 +99,13 @@ abstract class Base extends Model {
 		
 		
 		$quotedDbName = Utils::quoteColumnName($this->field->databaseName);
-	
+		
 		if ($this->field->isNew()) {
 			$sql = "ALTER TABLE `" . $table . "` ADD " . $quotedDbName . " " . $fieldSql . ";";
-			go()->getDbConnection()->query($sql);
+			go()->getDbConnection()->exec($sql);
 			if($this->field->getUnique()) {
 				$sql = "ALTER TABLE `" . $table . "` ADD UNIQUE(". $quotedDbName  . ");";
-				go()->getDbConnection()->query($sql);
+				go()->getDbConnection()->exec($sql);
 			}			
 		} else {
 			
@@ -102,27 +114,41 @@ abstract class Base extends Model {
 			$col = Table::getInstance($table)->getColumn($oldName);
 			
 			$sql = "ALTER TABLE `" . $table . "` CHANGE " . Utils::quoteColumnName($oldName) . " " . $quotedDbName . " " . $fieldSql;
-			go()->getDbConnection()->query($sql);
+			go()->getDbConnection()->exec($sql);
 			
 			if($this->field->getUnique() && !$col->unique) {
-				$sql = "ALTER TABLE `" . $table . "` ADD UNIQUE(". $quotedDbName  . ");";
-				go()->getDbConnection()->query($sql);
+				try {
+					$sql = "ALTER TABLE `" . $table . "` ADD UNIQUE ".$quotedDbName." (". $quotedDbName  . ");";
+					go()->getDbConnection()->exec($sql);
+				} catch(\Exception $e) {
+					//key is needed for contraint in select field
+					$sql = "ALTER TABLE `" . $table . "` DROP INDEX " . $quotedDbName .", ADD UNIQUE ".$quotedDbName." (". $quotedDbName  . ");";
+					go()->getDbConnection()->exec($sql);					
+				}
 			} else if(!$this->field->getUnique() && $col->unique) {
-				$sql = "ALTER TABLE `" . $table . "` DROP INDEX " . $quotedDbName;
-				go()->getDbConnection()->query($sql);
+				try {
+					$sql = "ALTER TABLE `" . $table . "` DROP INDEX " . $quotedDbName;
+					go()->getDbConnection()->exec($sql);
+
+				} catch(\Exception $e) {
+					//key is needed for contraint in select field
+					$sql = "ALTER TABLE `" . $table . "` DROP INDEX " . $quotedDbName .", ADD INDEX ".$quotedDbName." (". $quotedDbName  . ");";
+					go()->getDbConnection()->exec($sql);					
+				}
 			}
 		}
-		
-		Table::destroyInstance($table);
+
+    go()->rebuildCache(true);
 		
 		return true;
 	}
 
-	/**
-	 * Called when a field is deleted
-	 * 
-	 * @return boolean
-	 */
+  /**
+   * Called when a field is deleted
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	public function onFieldDelete() {
 		
 		$fieldSql = $this->getFieldSQL();
@@ -139,7 +165,7 @@ abstract class Base extends Model {
 			ErrorHandler::logException($e);
 		}
 		
-		Table::destroyInstance($table);
+		go()->rebuildCache(true);
 		
 		return true;
 	}
@@ -216,9 +242,96 @@ abstract class Base extends Model {
 	 * 
 	 * 
 	 */
-	public function validate($value, Field $field,  Entity $model) {		
+	public function validate($value, Field $field,  Entity $model) {
+		if (!empty($field->requiredCondition)) {
+			if (!$this->validateRequiredCondition($value, $field, $model)) {
+                $model->setValidationError("customFields." . $field->databaseName, ErrorCode::REQUIRED);
+                return false;
+            }
+		}
 		return true;
 	}
+
+	protected function validateRequiredCondition($value, Field $field,  Entity $model)
+    {
+        $value = trim($value);
+
+        $condition = $field->requiredCondition;
+        $isEmptyCondition = false;
+        $isNotEmptyCondition = false;
+        $fieldName = null;
+        $allowBlank = true;
+
+        if (strpos($condition, 'is empty') !== false) {
+            $isEmptyCondition = true;
+            $condition = str_replace('is empty', '', $condition);
+            $fieldName = str_replace(' ', '', $condition);
+            if (property_exists($model, $fieldName)) {
+                $fieldValue = $model->$fieldName;
+            } else {
+                $fieldName = null;
+            }
+        } else if (strpos($condition, 'is not empty') !== false) {
+            $isNotEmptyCondition = true;
+            $condition = str_replace('is not empty', '', $condition);
+            $fieldName = str_replace(' ', '', $condition);
+            if (property_exists($model, $fieldName)) {
+                $fieldValue = $model->$fieldName;
+            } else {
+                $fieldName = null;
+            }
+        } else {
+            $conditionParts = explode(' ', $condition);
+
+            if (count($conditionParts) === 3) {
+                $operator = $conditionParts[1];
+                $fieldName = $conditionParts[0];
+
+                if (property_exists($model, $fieldName)) {
+                    $fieldValue = $model->$fieldName;
+                    $requiredValue = $conditionParts[2];
+                } else {
+                    $fieldName = null;
+                }
+
+                if (null === $fieldName) {
+                    $fieldName = $conditionParts[2];
+                    if (property_exists($model, $fieldName)) {
+                        $fieldValue = $model->$fieldName;
+                        $requiredValue = $conditionParts[0];
+                    } else {
+                        $fieldName = null;
+                    }
+                }
+            }
+        }
+
+        if (null !== $fieldName) {
+            if ($isEmptyCondition) {
+                $allowBlank = !empty($fieldValue);
+            } else if ($isNotEmptyCondition) {
+                $allowBlank = empty($fieldValue);
+            } else {
+                switch ($operator) {
+                    case '=':
+                    case '==':
+                        $allowBlank = !($fieldValue == $requiredValue);
+                        break;
+                    case '>':
+                        $allowBlank = !($fieldValue > $requiredValue);
+                        break;
+                    case '<':
+                        $allowBlank = !($fieldValue < $requiredValue);
+                        break;
+                }
+            }
+        }
+
+        if (!$allowBlank && empty($value)) {
+            return false;
+        }
+        return true;
+    }
 	
 	/**
 	 * Called before the data is saved to API.

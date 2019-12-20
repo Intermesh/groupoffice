@@ -37,7 +37,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 									return isOrganization && !photoBlobId ? '<i class="icon">business</i>' : "";
 								},
 								getStyle: function (photoBlobId) {
-									return photoBlobId ? 'background-image: url(' + go.Jmap.downloadUrl(photoBlobId) + ')"' : "";
+									return photoBlobId ? 'background-image: url(' + go.Jmap.thumbUrl(photoBlobId, {w: 40, h: 40, zc: 1})  + ')"' : "";
 								}
 							})
 						}),
@@ -79,7 +79,9 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 							
 								go.util.mailto({
 									email: this.data.emailAddresses[i].email,
-									name: this.data.name
+									name: this.data.name,
+									entity: "Contact",
+									entityId: this.data.id
 								}, e);
 
 							}, this);
@@ -138,8 +140,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					listeners: {
 						scope: this,
 						afterrender: function(box) {
-							
-							box.getEl().on('click', function(e){								
+							box.getEl().on('click', function(e){
+
+								//don't execute when user selects text
+								if(window.getSelection().toString().length > 0) {
+									return;
+								}
+
 								var container = box.getEl().dom.firstChild, 
 								item = e.getTarget("a", box.getEl()),
 								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
@@ -152,11 +159,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					<tpl for="addresses">\
 						<hr class="indent">\
 						<a class="s6"><i class="icon label">location_on</i>\
-							<span>{street} {street2}<br>\
-							<tpl if="zipCode">{zipCode}<br></tpl>\
-							<tpl if="city">{city}<br></tpl>\
-							<tpl if="state">{state}<br></tpl>\
-							<tpl if="country">{country}</tpl></span>\
+							<span style="white-space:pre">{formatted}</span>\
 							<label>{[t("addressTypes")[values.type] || values.type]}</label>\
 						</a>\
 					</tpl>\
@@ -167,7 +170,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						scope: this,
 						afterrender: function(box) {
 							
-							box.getEl().on('click', function(e){								
+							box.getEl().on('click', function(e){
+
+								//don't execute when user selects text
+								if(window.getSelection().toString().length > 0) {
+									return;
+								}
+
 								var container = box.getEl().dom.firstChild, 
 								item = e.getTarget("a", box.getEl()),
 								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
@@ -189,7 +198,6 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 				},{
 					title: t('Company'),
 					onLoad: function (dv) {
-						console.log(dv.data);
 						this.setVisible(dv.data.IBAN || dv.data.vatNo || dv.data.vatReverseCharge || dv.data.registrationNumber || dv.data.debtorNumber);
 					},
 					collapsible:true,
@@ -221,9 +229,18 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 		go.modules.community.addressbook.ContactDetail.superclass.initComponent.call(this);
 
 		this.addCustomFields();
-		this.addLinks();
+		//Sort contact types to top
+		this.addLinks(function(a, b) {
+
+			if(a.link.entity == "Contact" && b.link.entity != "Contact") {
+				return -1;
+			}
+			return 0;
+		});
 		this.addComments();
 		this.addFiles();
+
+		this.add(new go.detail.CreateModifyPanel());
 	},
 
 	onLoad: function () {
@@ -287,7 +304,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						iconCls: "ic-cloud-download",
 						text: t("Export") + " (vCard)",
 						handler: function () {
-							document.location = go.Jmap.downloadUrl("community/addressbook/vcard/" + this.data.id);
+							go.util.downloadFile(go.Jmap.downloadUrl("community/addressbook/vcard/" + this.data.id));
 						},
 						scope: this
 					},
@@ -310,10 +327,10 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 
 				]
 			}]);
-		
+
 		if(go.Modules.isAvailable("legacy", "files")) {
-			this.moreMenu.menu.splice(1,0,{
-				xtype: "filebrowsermenuitem"
+			items.splice(items.length - 1, 0,{
+				xtype: "detailfilebrowserbutton"
 			});
 		}
 

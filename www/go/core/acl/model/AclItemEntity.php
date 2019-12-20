@@ -164,9 +164,14 @@ abstract class AclItemEntity extends AclEntity {
 	}
 
 	public function getPermissionLevel() {
-		$aclEntity = $this->getAclEntity();
+
+		if(!isset($this->permissionLevel)) {
+			$aclEntity = $this->getAclEntity();
 		
-		return $aclEntity->getPermissionLevel(); 
+			$this->permissionLevel = $aclEntity->getPermissionLevel(); 
+		}
+
+		return $this->permissionLevel;		
 	}
 
 	/**

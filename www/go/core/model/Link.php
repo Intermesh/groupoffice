@@ -45,7 +45,8 @@ class Link extends Entity {
 	/**
 	 * The auto increment primary key
 	 * 
-	 * @var int 
+	 * @var int
+     *
 	 */
 	public $id;
 
@@ -58,6 +59,8 @@ class Link extends Entity {
 	public $toSearchId;
 	
 	protected $aclId;
+
+	protected $permissionLevel;
 	
 
 	/**
@@ -312,8 +315,12 @@ class Link extends Entity {
 		if($this->isNew()) {			
 			$this->updateDataFromSearch();
 		}
+
+		if(!isset($this->permissionLevel)) {
+			$this->permissionLevel = Acl::getUserPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId());
+		}
 		//Readable items may be linked!
-		return Acl::getUserPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId()) ?  Acl::LEVEL_DELETE : false;
+		return $this->permissionLevel ?  Acl::LEVEL_DELETE : false;
 	}
 	
 //	

@@ -214,17 +214,6 @@ class Table {
 				$c->length = 0;
 				$c->default = $c->default == null ? null : floatval($c->default);
 				break;
-			
-			case 'datetime':
-				if($c->default == 'CURRENT_TIMESTAMP') {
-					$c->default = date(Column::DATETIME_FORMAT);
-				}
-				break;
-			case 'date':
-				if($c->default == 'CURRENT_TIMESTAMP') {
-					$c->default = date(Column::DATE_FORMAT);
-				}				
-				break;
 				
 			case 'varbinary':
 			case 'binary':
@@ -286,7 +275,7 @@ class Table {
 				continue;
 			}
 
-			if ($index['Non_unique'] === "0") {
+			if ($index['Non_unique'] == 0) {
 				if (!isset($unique[$index['Key_name']])) {
 					$unique[$index['Key_name']] = [];
 				}
@@ -318,7 +307,7 @@ class Table {
 	/**
 	 * Get all column names
 	 * 
-	 * @param string[]
+	 * @return string[]
 	 */
 	public function getColumnNames() {
 		return array_keys($this->columns);

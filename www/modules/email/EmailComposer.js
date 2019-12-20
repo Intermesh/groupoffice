@@ -984,7 +984,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		Ext.getBody().mask(t("Loading..."));
 
 		this.createLinkButton.reset();
-		
+
 		this.showConfig=config;
 		
 		if (!this.rendered) {
@@ -1121,6 +1121,10 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 			//for directly loading a contact in a template
 			if(config.contact_id)
 				params.contact_id=config.contact_id;
+
+			if(config.entity && config.entity == "Contact") {
+				params.contact_id = config.entityId;
+			}
 			
 			//for directly loading a company in a template
 			if(config.company_id)
@@ -1314,6 +1318,10 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		} else {
 			this.emailEditor.focus();
 		}
+
+		if(this.showConfig.entity && this.showConfig.entityId) {
+			this.setLinkEntity(config);
+		}
 		
 		this.fireEvent('afterShowAndLoad',this);
 	},
@@ -1408,18 +1416,18 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 							var callback = this.callback.createDelegate(this.scope);
 							callback.call();
 						}
+						
+						if (GO.addressbook && action.result.unknown_recipients
+							&& action.result.unknown_recipients.length) {
+							if (!GO.email.unknownRecipientsDialog)
+								GO.email.unknownRecipientsDialog = new GO.email.UnknownRecipientsDialog();
 	
-//						if (GO.addressbook && action.result.unknown_recipients
-//							&& action.result.unknown_recipients.length) {
-//							if (!GO.email.unknownRecipientsDialog)
-//								GO.email.unknownRecipientsDialog = new GO.email.UnknownRecipientsDialog();
-//	
-//							GO.email.unknownRecipientsDialog.store.loadData({
-//								recipients : action.result.unknown_recipients
-//							});
-//	
-//							GO.email.unknownRecipientsDialog.show();
-//						}
+							GO.email.unknownRecipientsDialog.store.loadData({
+								recipients : action.result.unknown_recipients
+							});
+	
+							GO.email.unknownRecipientsDialog.show();
+						}
 
 	
 						this.fireEvent('send', this);

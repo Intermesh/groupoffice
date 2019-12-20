@@ -93,7 +93,8 @@ go.AuthenticationManager = (function () {
 								break;
 								
 							case 403:
-								Ext.MessageBox.alert(t("Account disabled"), t("You're account has been disabled"));
+								// Not allowed by IP filter AllowGroup or user not enabled.
+								Ext.MessageBox.alert(t("Account disabled"), response.statusText);
 								break;
 								
 							case 401: //Bad login
@@ -108,20 +109,13 @@ go.AuthenticationManager = (function () {
 						return;
 					}
 
-					
-
 					if (result.accessToken) {
 						this.onAuthenticated(result);
 					}
-
-					
-
 				},
 				scope: this
 			});
 		},
-
-		
 		
 		logout: function (first) {
 
@@ -133,9 +127,7 @@ go.AuthenticationManager = (function () {
 				this.logout.defer(500, this, [true]);
 			} else
 			{
-				localforage.dropInstance({
-					name: "groupoffice"
-				}, function() {
+				go.browserStorage.deleteDatabase().then(function() {
 					Ext.Ajax.request({
 						url: go.AuthenticationManager.getAuthUrl(),
 						method: "DELETE",
@@ -145,9 +137,6 @@ go.AuthenticationManager = (function () {
 						}
 					});
 				});
-				
-				
-				
 			}
 		},
 
@@ -164,9 +153,9 @@ go.AuthenticationManager = (function () {
 				url: this.getAuthUrl(),
 				jsonData: loginData,
 				callback: function (options, success, response) {
-					var result = response.responseText ? Ext.decode(response.responseText) : {};
+					var result = response.responseText ? Ext.decode(response.responseText) : {}, me = this;
 
-					cb.call(scope || this, this, success, result);					
+									
 					
 					if(!success) {
 						switch(response.status) {
@@ -182,7 +171,9 @@ go.AuthenticationManager = (function () {
 					}
 
 					if (result.accessToken) {
-						this.onAuthenticated(result);
+						this.onAuthenticated(result).then(function() {
+							cb.call(scope || me, me, success, result);	
+						});
 					}
 
 				},
@@ -204,12 +195,13 @@ go.AuthenticationManager = (function () {
 				this.loginPanel = null;
 			}
 
-      go.User.loadSession(result);			
-			
-			this.fireEvent("authenticated", this, result);
-			
-			GO.mainLayout.onAuthentication();
+			var me = this;
 
+			return go.User.loadSession(result).then(function() {
+				me.fireEvent("authenticated", me, result);
+			
+				GO.mainLayout.onAuthentication();
+			});		
 		}
 	});
 

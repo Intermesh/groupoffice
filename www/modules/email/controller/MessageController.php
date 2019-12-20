@@ -6,6 +6,7 @@ namespace GO\Email\Controller;
 use GO;
 use GO\Base\Exception\AccessDenied;
 
+use go\core\model\User;
 use GO\Email\Model\Account;
 use GO\Email\Model\Label;
 
@@ -538,7 +539,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 					foreach($to as $email=>$name){
 						
-						$contacts = Contact::findByEmail($email)->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]);
+						$contacts = Contact::findByEmail($email, ['id', 'addressBookId'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]);
 
 						foreach($contacts as $contact){
 
@@ -654,6 +655,43 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		return "[link:".base64_encode($_SERVER['SERVER_NAME'].','.$account->id.','.$model_name.','.$model_id)."]";
 	}
 
+	private function _findUnknownRecipients($params) {
+
+		$unknown = array();
+
+		if (GO::modules()->addressbook && !GO::config()->get_setting('email_skip_unknown_recipients', GO::user()->id)) {
+
+			$recipients = new \GO\Base\Mail\EmailRecipients($params['to']);
+			$recipients->addString($params['cc']);
+			$recipients->addString($params['bcc']);
+
+			foreach ($recipients->getAddresses() as $email => $personal) {
+				$contact = \go\modules\community\addressbook\model\Contact::findByEmail($email, ['id', 'addressBookId'])
+          ->filter(["permissionLevel" => \go\core\model\Acl::LEVEL_READ])->single();
+				if($contact) {
+				  continue;
+        }
+
+				$user = User::find(['id'])->where(['email' => $email])->filter(["permissionLevel" => \go\core\model\Acl::LEVEL_READ])->single();
+        if($user) {
+          continue;
+        }
+
+				$recipient = \GO\Base\Util\StringHelper::split_name($personal);
+				if ($recipient['first_name'] == '' && $recipient['last_name'] == '') {
+					$recipient['first_name'] = $email;
+				}
+				$recipient['email'] = $email;
+				$recipient['name'] = (string) \GO\Base\Mail\EmailRecipients::createSingle($email, $personal);
+
+				$unknown[] = $recipient;
+			}
+		}
+
+		return $unknown;
+	}
+
+
 	/**
 	 *
 	 * @todo Save to sent items should be implemented as a Swift outputstream for better memory management
@@ -682,8 +720,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 
 		$message->handleEmailFormInput($params);
-		
-		$recipientCount = $message->countRecipients();
+    $recipientCount = $message->countRecipients();
 
 		if(!$recipientCount)
 			throw new \Exception(GO::t("You didn't enter a recipient", "email"));
@@ -816,7 +853,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		
 		$this->_link($params, $message, $tags);
 
-		//$response['unknown_recipients'] = $this->_findUnknownRecipients($params);
+		$response['unknown_recipients'] = $this->_findUnknownRecipients($params);
 
 
 		return $response;
@@ -1771,7 +1808,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$from = $imapMessage->from->getAddress();
 
 			
-			$contacts = Contact::findByEmail($from['email'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]);
+			$contacts = Contact::findByEmail($from['email'], ['id'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]);
 
 			foreach($contacts as $contact) {
 				if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){						

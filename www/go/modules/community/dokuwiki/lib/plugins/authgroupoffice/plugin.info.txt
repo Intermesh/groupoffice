@@ -1,0 +1,7 @@
+base		authgroupoffice
+author	Wesley Smits & WilmarVB & Michal Charvat
+email		info@intermesh.nl
+date		2014-06-05
+name		Group-Office Authentication Plugin
+desc		Group-Office user Authentication Plugin for Dokuwiki version Ponder Stibbons and higher
+url			https://www.group-office.com

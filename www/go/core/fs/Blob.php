@@ -5,6 +5,7 @@ namespace go\core\fs;
 use go\core\orm\Query;
 use go\core\orm;
 use go\core\util\DateTime;
+
 use function GO;
 
 /**
@@ -270,8 +271,15 @@ class Blob extends orm\Entity {
 			if(!$blob->isUsed()) {
 				$new[] = $blob->id;
 				$paths[] = $blob->path();
+			} else if(isset($blob->staleAt)) {
+				$blob->staleAt = null;
+				$blob->save();
 			}
-		}		
+		}
+
+		if(empty($new)) {
+			return true;
+		}
 
 		$query->clearWhere()->andWhere(['id' => $new]);
 		

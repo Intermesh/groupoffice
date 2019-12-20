@@ -4,6 +4,7 @@ namespace go\core\jmap;
 
 use Exception as CoreException;
 use GO;
+use GO\Base\Util\Number;
 use go\core\App;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
@@ -54,9 +55,7 @@ class Router {
 	 * 
 	 * community/notes/Note/get maps to go\modules\community\notes\controller\Note::get()
 	 */
-	public function run() {
-
-		
+	public function run() {	
 
 		$body = Request::get()->getBody();
 		
@@ -120,7 +119,8 @@ class Router {
 			Response::get()->addError($error);
 		} finally{
 			
-			if($method != "community/dev/Debugger/get") {			
+			if($method != "community/dev/Debugger/get") {		
+				
 				go()->getDebugger()->groupEnd();
 			}
 		}

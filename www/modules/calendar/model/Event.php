@@ -2564,7 +2564,7 @@ The following is the error message:
 			// Set the language of the email to the language of the participant.
 			$language = false;
 			if(!empty($participant->user_id)){
-				$user = \GO\Base\Model\User::model()->findByPk($participant->user_id);
+				$user = \GO\Base\Model\User::model()->findByPk($participant->user_id, false, true);
 				
 				if($user)
 					\GO::language()->setLanguage($user->language);

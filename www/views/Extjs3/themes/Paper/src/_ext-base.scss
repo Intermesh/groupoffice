@@ -975,7 +975,7 @@ div.x-toolbar-no-items {
 }
 
 .x-grid-panel .x-panel-mc .x-panel-body {
-    border:1px solid;
+    border:1px solid color($fg, "line");
 }
 
 .x-grid3 table {
@@ -1541,7 +1541,11 @@ input.x-tree-node-cb {
 .x-date-picker {
    border: 1px solid;
    border-top:0 none;
-	position:relative;
+    position:relative;
+    
+    table {
+        margin: 0 auto;
+    }
 }
 
 .x-date-picker a {
@@ -1971,7 +1975,7 @@ a.x-menu-item {
 }
 
 .x-panel-tl .x-panel-icon, .x-window-tl .x-panel-icon {
-    padding-left:dp(16) !important;
+    padding-left:dp(16);
 }
 
 .x-panel-inline-icon {

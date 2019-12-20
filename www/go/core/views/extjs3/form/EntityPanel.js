@@ -49,7 +49,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	getValues : function (dirtyOnly) {	
 		var v = {};		
 		for(var name in this.values) {
-			if(!dirtyOnly || !go.util.isEqual(this.entity[name], this.values[name])) {
+			if(!dirtyOnly || this.entity == null || !go.util.isEqual(this.entity[name], this.values[name])) {
 				v[name] = this.values[name];
 			}
 		}
@@ -133,6 +133,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 						break;
 
 					default:
+
 						//mark validation errors
 						for(var name in notSaved[id].validationErrors) {
 							var field = this.getForm().findField(name);
@@ -141,6 +142,10 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 							} else
 							{
 								console.warn("Could not find form field for server error " + name,notSaved[id].validationErrors[name]);
+
+								if(!response.message) {
+									response.message = notSaved[id].validationErrors[name].description;
+								}
 							}
 						}
 						/**
@@ -159,7 +164,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 						 * },
 						 */
 						if(this.fireEvent("beforesubmiterror", this, false, null, notSaved[id])) {
-							Ext.MessageBox.alert(t("Error"), t("Sorry, an unexpected error occurred: ") + response.message);
+							Ext.MessageBox.alert(t("Error"), t("Sorry, an unexpected error occurred: ") + (response.message || "unknown error"));
 						}
 						break;
 				}

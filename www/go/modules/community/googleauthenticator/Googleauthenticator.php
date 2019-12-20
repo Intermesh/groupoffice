@@ -2,7 +2,7 @@
 
 namespace go\modules\community\googleauthenticator;
 
-use go\core\auth\model\Token;
+use go\core\model\Token;
 use go\core\auth\SecondaryAuthenticator;
 use go\core\db\Query;
 use go\core\validate\ErrorCode;

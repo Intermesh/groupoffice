@@ -84,7 +84,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 							handler: function() {
 								go.util.importFile(
 												'User', 
-												"text/csv",
+												".csv",
 												{},
 												{
 													labels: {
@@ -103,8 +103,8 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 							text: t("Export"),					
 							handler: function() {
 								go.util.exportToFile(
-												'User', 
-												Ext.apply(this.store.baseParams, this.store.lastOptions.params, {limit: 0, start: 0}),
+												'User',
+												Object.assign(this.store.baseParams, this.store.lastOptions.params, {limit: 0, position: 0}),
 												'text/csv');									
 							},
 							scope: this	
@@ -130,7 +130,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'displayName',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-						var style = record.get('avatarId') ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("avatarId")) + ')"' : "";
+						var style = record.get('avatarId') ?  'background-image: url(' + go.Jmap.thumbUrl(record.get("avatarId"), {w: 40, h: 40, zc: 1}) + ')"' : "";
 						
 						return '<div class="user"><div class="avatar" style="'+style+'"></div>' +
 							'<div class="wrap">'+
@@ -268,9 +268,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 							var me = this;
 							
 							//Drop local data
-							localforage.dropInstance({
-								name: "groupoffice"
-							}, function() {
+							go.browserStorage.deleteDatabase().then(function() {
 								
 								go.Jmap.request({
 									method: "User/loginAs",

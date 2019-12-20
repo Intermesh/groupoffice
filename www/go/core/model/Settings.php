@@ -152,7 +152,7 @@ class Settings extends core\Settings {
 	protected $smtpPassword = null;
 	
 	
-	public function getSmtpPassword() {
+	public function decryptSmtpPassword() {
 		return Crypt::decrypt($this->smtpPassword);
 	}
 	
@@ -166,6 +166,8 @@ class Settings extends core\Settings {
 	/**
 	 * Get locale for the system. We need a UTF8 locale so command line functions
 	 * work with UTF8.
+	 * 
+	 * initialized in old framework GO.php. What should we do with it later?
 	 * 
 	 * @return string
 	 */
@@ -204,6 +206,11 @@ class Settings extends core\Settings {
 	
 	public function setLocale($locale) {
 		$this->locale = $locale;
+	}
+
+	public function resetLocale() {
+		$this->locale = null;
+		return $this->getLocale();
 	}
 
 	/**

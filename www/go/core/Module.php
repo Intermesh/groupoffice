@@ -147,7 +147,9 @@ abstract class Module {
 		if(go()->getDbConnection()->inTransaction()) {
 			go()->getDbConnection()->rollBack();
 		}
-		$this->uninstallDatabase();
+		try {
+			$this->uninstallDatabase();
+		}catch(\Exception $e) {}
 	}	
 	
 	/**
@@ -166,16 +168,21 @@ abstract class Module {
 			return false;
 		}
 		
-		$model = model\Module::find()->where(['name' => static::getName()])->single();
+		$model = model\Module::find()->where(['name' => static::getName(), 'package' => static::getPackage()])->single();
 		if(!$model) {
-			throw new NotFound();
+			throw new NotFound("Module not found: ". static::getName() . "/" . static::getPackage());
 		}
+		$model->enabled = false;
 		
-		if(!$model->delete()) {
+		if(!$model->save()) {
 			return false;
 		}
 		
 		go()->rebuildCache(true);
+
+		if(!model\Module::delete(['name' => static::getName(), 'package' => static::getPackage()])) {
+			return false;
+		}	
 		
 		return true;
 	}

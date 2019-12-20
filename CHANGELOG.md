@@ -1,3 +1,194 @@
+20-12-2019 6.4.95
+- Custom fields: Fixed visual problem with select options
+- Custom fields: Fixed problem that adding a field with a duplicate name was possible.
+- Core: Added new allowed groups function for authentication. You can restrict IP addresses per group from where you are allowed to login.
+- Address book: Added filter for contacts being in a group or not
+- Newsletters: Double click to open contact
+
+19-12-2019 6.4.94
+- Core: Updated Brasilian Portugese language
+- Custom fields: There were 2 extra decimals for numbers in templates
+- Projects: Set contact on new invoice
+- Core: Optimized various date column widths
+- Core: fixed export error with multi select custom fields in it.
+- Core: Paste from spreadsheet editors as HTML and not as an image
+- User: account creation checks for the max users count
+- Core: Improved printing view for Firefox
+- Address book: Select contact sorts alphabetically
+- Projects: Select user for time entry was missing
+
+17-12-2019 6.4.93
+- Email: improved search toolbar
+- Core: Use accent color for active search to make it more clear
+- Email: Emoji insert button added
+- Comments: Some buttons were hidden when container is small
+- Core: relation of type 'map' automatically changes state
+- Core: Fixed date and date time format in templates
+- Custom fields: Fixed save error when cache was not cleared and cleaned up code
+- API keys: Fixed delete error for API keys
+- E-mail: Reimplemented add unknown recipients
+- Core: Updated German translation
+- Core: Fixed incorrect info on synchronisation settings as admin
+- Files: Fixed file not found bug when downloading files
+- Core: Fixed missing back button on small screens for system settings dialog and user settings dialog
+- Newsletters: Unable to add new recipients when last recipient was removed
+- Custom fields: Hidden custom fields could show in detail view 
+
+10-12-2019 6.4.92
+- Address book: Add contact was broken
+- Core: Encode filename in upload header to support UTF-8 filenames
+- Core: try to convert CSV file uploads to UTF-8
+- Core: reverted enter to save because it caused problems when searching inside TabbedFormDialog.js
+
+10-12-2019 6.4.91
+- Custom fields: db migration contained broken code.
+- Email: content type application/eml opens within Group-Office
+
+10-12-2019 6.4.90
+- Zpush: mail sync was broken
+- Mail: cleanup script for removing orphaned mailboxes added
+
+09-12-2019 6.4.89
+- Files: We did an update to Group-Office which comes with a new implementation of the Group-Office Assistant. If you use this please update it to the new version. You can find it under "Files" for your operating system at this page:
+https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-device.html
+
+- Postfix admin: Auto grow alias field
+- Core: "Login enabled" checkbox visible when using IMAP or LDAP authentication
+- Email: Fixed error in sieve disconnect
+- EMail: Added new header X-Group-Office-Title: Group-Office 
+- Core: Cleaned up EntityStore code
+- Address book: Sorry, an unexpected error occurred: The contact groups must match with the addressBookId. Group ID: 10 belongs to 3 and the contact belongs to 1
+- Projects: Removed broken natural sort and added created and modified at columns
+- Custom fields: Ignore maxLength on text area's
+- Address book: Don't open links when selecting them for text copy
+- Core: Disable spell check on search fields
+- Core: Database check continues if there's an exception
+- Core: Different polyfill promise to support Windows XP with old Chrome.
+
+06-12-2019 6.4.88
+- Files: New Assistant implementation without webdav requirement. Clients need to be updated!
+- Address book: Added zipcode to text search and as zip: 1234 AB
+
+02-12-2019 6.4.87
+- Files: Missing new folder button
+- Core: Export sometimes only exported 40 records.
+
+29-11-2019 6.4.86
+- Projects: Resizable detail view
+- Files: Quicker access to files via toolbars.
+- Files: Folder upload restored.
+- Billing: contact: and compnany: template tags added back in
+- Address book: Some companies might not have been migrated to the new address book.
+- Core: removed incomplete employees module
+
+28-11-2019 6.4.85
+- Core: Logo didn't display if you didn't set a different primary color
+- Core: Reload did too many requests causing unnecessary load on the server
+- Projects: Added projects grid and works on mobile
+- Core: Enter to submit for older dialogs
+- Core: Reduced push checks to every 30s instead of 5s to reduce load on server
+
+26-11-2019 6.4.84
+- Files: works on mobile
+- Core: Fixed incorrect module sort order on first load
+- Core: Fixed image viewer for mobile
+- Core: Fixed install problem on multi instance
+
+22-11-2019 6.4.83
+- Core: Load state only on desktop
+- Core: Copy html editor style from text area element so it matches style from css and doesn't zoom on mobile
+- Address book / Core: Move files when properties affecting the path change and delete files when contact is deleted
+- Core: Fixed logging of deleted contacts and notes
+- Core: Fixed fatal error that aborted the 6.3 to 6.4 upgrade in some cases
+- Notes: Supports activity log
+- Core: Fixed error when setting module permissions on group
+- Core: Added title's to combo box list items so you can see the whole text when it' cut off.
+- Files: New folder button was missing in "Save as" mode
+- Projects: Icon column growing too large bug
+- Projects: Wrapping of tables for better display on smaller screens
+
+20-11-2019 6.4.82
+- Core: Create debug log file if not exists
+- Core: Added several uninstall commands and fixed entity type register
+- Core: Restored state from server
+
+19-11-2019 6.4.81
+- Core: Fixed switch user
+- Core: Performance optimzation by using jsonSerialize and output each jmap method indvidually
+- Core: Changed state saving to cookies so that you can have different states on different machines
+
+19-11-2019 6.4.80
+- Firefox: Workaround for indexeddb state error when firefox is in private browsing mode
+- Core: Disabled modules were loaded in the old framework settings causing problems.
+
+18-11-2019 6.4.79
+- Core: Replaced localForage with go.browserStorage to fix problem with Group-Office not always loading in multiple tabs.
+- Newsletters: Fixed problem with new lists not saving and showing
+- Core: Performance enhancements
+- Users: user display name can't be null
+
+15-11-2019 6.4.78
+- Core: Just log could not unserialize cache message
+- Core: Fixed dissapearing fieldset's after changing values
+- Comments: collapsible again
+- Address book: Fixed delete of contacts
+- Address book: Show selected organizations when creating a contact from an organization
+
+14-11-2019 6.4.77
+- Address book: problem with listing contacts without salutation
+
+14-11-2019 6.4.76
+- Activesync: fixed Can't get not existing property 'timezone' in 'GO\Tasks\Model\Task'
+- E-mail: E-mail printing blank pages fixed
+- Custom fields: Fixed adding unique indexes
+- Demo data: Fixed install
+- Core: Use thumbnailer for photo's an avatars
+
+12-11-2019 6.4.75
+- Billing: add total_outstanding
+- Core: Added check for mysqlnd driver for system requirements
+- Core: Lot's of performance optimizations
+- Fixed: Addressbook - Create and Modified date shows "undefined" next to the time #496
+
+11-11-2019 6.4.74
+- Core: System settings and My Account work on mobile
+- Address book: Edit form works on mobile
+- Core: Global search works on mobile
+- Core: Start Menu full screen on mobile
+- Core: Fixed responsive issue where grid would become smaller then configured
+- Tickets: Works on mobile
+- Core: Sort custom filters alphabetically
+- Core: Fix for user timezones different then client OS
+- Address book: Added street to filter options
+- Newsletters: Improved performance
+- Email: Save all attachements to items worked only one time
+- Core: Fixed AccesToken created from API-Key will expire after 1 week of inactivity #292
+- Time tracking: Works on mobile
+- Core: Smoother scrolling by preloading more.
+- Address book: Show who modified and created in detail
+- Notes: Show who modified and created in detail
+- ActiveSync: Fixed GroupOffice isn't respecting addressbook permissions - CRITICAL (#492
+- Core: Updated Spanish
+
+05-11-2019 6.4.73
+- Core: Fixed error where grid would not load
+- Core: Updated Spanish translation
+- LDAP: Group sync failed on some servers that returned "memberuid".
+- Sieve: Don't autocreate missing mailboxes
+
+31-10-2019 6.4.72
+- Core: Use SQL_CALC_FOUND_ROWS to calculate total
+- Core: Updated Spanish translation
+- Core: bundle Foo/get requests to improve performance.
+- Core: Use disk cache for CLI as Acpu is not enabled on CLI.
+- Core: Performance improvements in ACL queries
+- Address book: City missing from contact in templates
+- LDAP Authenticator: Also match users based on e-mail address
+- Address book: Put organizations on top in contact detail view
+- Hoilidays: removed "From" boxLabel 
+- Projects: Fixed undefined index contact_id error when creating project from mail
+- E-mail: Pass contact ID and don't search by email for e-mail templates
+
 28-10-2019 6.4.71
 - Core: Improved delete performance
 - ActiveSync: Don't sync organizations with ActiveSync as it caused problems on ios not shoin either the contact or the company
@@ -384,8 +575,25 @@
 11-06-2019 6.4.21
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
+- Calendasr: Show unconfirmed holidays
+- Projects: Send company id when selecting contact
+
+19-12-2019 6.3.86
+- User: account creation checks for the max users count
+
+17-12-2019 6.3.85
+- Files: We did an update to Group-Office which comes with a new implementation of the Group-Office Assistant. If you use this please update it to the new version. You can find it under "Files" for your operating system at this page:
+https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-device.html
+
+- Calendar: Show unconfirmed holidays
+- Core: Fixed upgrade when $config['webmaster_email'] is not present.
+- Email: Fixed showing emoticons in email
+
+01-11-2019 6.3.84
 - Projects: Fixed activity sort in time tracking
 - Billing: Fixed total not always updating in expense dialog
+- Projects: Send contact ID when creating project from e-mail
+- Tasks: Fixed link to project after cancel
 
 11-10-2019 6.3.83
 - Core: Working week didn't accept half hours

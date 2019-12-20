@@ -21,6 +21,14 @@ class Search extends AclOwnerEntity {
 	 */
 	protected $entity;
 	protected $moduleId;
+
+	public static function check()
+	{
+		//remove search cache with invalid aclId's. Can happen in old framework.
+		go()->getDbConnection()->exec("delete s from core_search s left join core_acl a on a.id = s.aclId where a.id is null");
+		return parent::check();
+	}
+		
 	
 	public function getEntity() {
 		return $this->entity;

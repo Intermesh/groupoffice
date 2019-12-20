@@ -57,11 +57,11 @@ class Sync extends Controller {
       $username = $this->getGOUserName($record);
       
       if (empty($username)) {
-        echo "Skipping record. Could not determine username.";
+        $this->output("Skipping record. Could not determine username.");
         continue;
       }
 
-      $user = User::find()->where(['username' => $username]);
+      $user = User::find(['id', 'username', 'email', 'recoveryEmail', 'displayName', 'avatarId'])->where(['username' => $username]);
       
       if(!empty($record->mail[0])) {
         $user->orWhere(['email' => $record->mail[0]]);
@@ -69,13 +69,13 @@ class Sync extends Controller {
       $user = $user->single();
 
       if (!$user) {
-        echo "Creating user '" . $username . "'\n";
+        $this->output("Creating user '" . $username . "'");
 
         $user = new User();
         $user->username = $username;
         
       } else {
-        echo "User '" . $username . "' exists\n";    
+        $this->output("User '" . $username . "' exists");    
       }
 
       Module::ldapRecordToUser($username, $record, $user);
@@ -92,7 +92,7 @@ class Sync extends Controller {
           ->replace('ldapauth_server_user_sync', ['serverId' => $id, 'userId' => $user->id])->execute();
       }      
 
-			echo "Synced " . $username . "\n";		
+			$this->output("Synced " . $username);		
 
 			$usersInLDAP[] = $user->id;
 		}
@@ -101,7 +101,7 @@ class Sync extends Controller {
 			$this->deleteUsers($usersInLDAP, $maxDeletePercentage, $dryRun);
 		}
 
-    echo "Done\n\n";
+    $this->output("Done\n\n");
   }
 
   private function getGOUserName(Record $record) {
@@ -153,7 +153,7 @@ class Sync extends Controller {
 
     if(!in_array($domain, $this->domains)) {
       $err = "Domain '$domain' from '$username' is not listed in the authenticator domains: " . implode(', ', $this->domains);
-      echo "Error: ". $err ."\n";
+      $this->output("Error: ". $err ."\n");
       go()->debug($err);
       return false;
     }
@@ -170,20 +170,20 @@ class Sync extends Controller {
 		$totalInGO = $users->rowCount();
 		$totalInLDAP = count($usersInLDAP);
 
-		echo "Groups in Group-Office: " . $totalInGO . "\n";
-    echo "Groups in LDAP: " . $totalInLDAP . "\n";
+		$this->output("Users in Group-Office: " . $totalInGO);
+    $this->output("Users in LDAP: " . $totalInLDAP);
 
     $percentageToDelete = $totalInGO > 0 ? round((1 - $totalInLDAP / $totalInGO) * 100) : 0;		
 
     if($percentageToDelete > 0) {
-      echo "Delete percentage: " . $percentageToDelete . "%\n";
+      $this->output("Delete percentage: " . $percentageToDelete . "%\n");
 
       if ($percentageToDelete > $maxDeletePercentage)
         throw new \Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
 
       foreach($users as $user) {
         if (!in_array($user->id, $usersInLDAP)) {
-          echo "Deleting " . $user->username . "\n";
+          $this->output("Deleting " . $user->username . "\n");
           if (!$dryRun)
             $user->delete();
         }
@@ -192,6 +192,12 @@ class Sync extends Controller {
   }
   
   private $serverId;
+
+  private function output($str) {
+    go()->debug($str);
+
+    echo $str . "\n";
+  }
 
   /**
    * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php community/ldapauthenticator/Sync/groups --id=2 --dryRun=1 --delete=1 --maxDeletePercentage=50
@@ -233,7 +239,7 @@ class Sync extends Controller {
       $group = Group::find()->where(['name' => $name, 'isUserGroupFor' => null])->single();
       if (!$group) {
 
-        echo "Creating group '" . $name . "'\n";
+        $this->output("Creating group '" . $name . "'");
 
         $group = new Group();
         $group->name = $name;
@@ -241,7 +247,7 @@ class Sync extends Controller {
           echo "Error saving group: " . implode("\n", $group->getValidationErrors());
         }
       } else {
-        echo "Group '" . $name . "' exists\n";    
+        $this->output("Group '" . $name . "' exists");    
       }
 
     
@@ -249,14 +255,14 @@ class Sync extends Controller {
       $group->users = [];
     
 
-      $members = $this->getGroupMembers($record, $connection);      
-
-      foreach ($members as $username) {
-        $user = \go\core\model\User::find()->where(['username' => $username])->single();
+      $members = $this->getGroupMembers($record, $connection, $server);    
+      
+      foreach ($members as $u) {
+        $user = \go\core\model\User::find(['id'])->where(['username' => $u['username']])->orWhere(['email' => $u['email']])->single();
         if (!$user) {
-          echo "Error: user '" . $username . "' does not exist in Group-Office\n";
+          $this->output("Error: user '" . $u['username'] . "' does not exist in Group-Office");
         } else {
-          echo "Adding user '$username'\n";
+          $this->output("Adding user '" . $u['username'] . "'");
           $group->users[] = $user->id; //(new UserGroup())->setValue('userId', $user->id);
         }
       }
@@ -273,7 +279,7 @@ class Sync extends Controller {
 
       }
 
-			echo "Synced " . $name . "\n";		
+			$this->output("Synced " . $name);		
 
 			$groupsInLDAP[] = $group->id;
 		}
@@ -282,7 +288,7 @@ class Sync extends Controller {
 			$this->deleteGroups($groupsInLDAP, $maxDeletePercentage, $dryRun);
 		}
 
-    echo "Done\n\n";
+    $this->output("Done");
     
     // go()->getDebugger()->printEntries();
 
@@ -297,13 +303,13 @@ class Sync extends Controller {
 		$totalInGO = $groups->rowCount();
 		$totalInLDAP = count($groupsInLDAP);
 
-		echo "Groups in Group-Office: " . $totalInGO . "\n";
-    echo "Groups in LDAP: " . $totalInLDAP . "\n";
+		$this->output("Groups in Group-Office: " . $totalInGO);
+    $this->output("Groups in LDAP: " . $totalInLDAP);
     
     $percentageToDelete = $totalInGO > 0 ? round((1 - $totalInLDAP / $totalInGO) * 100) : 0;		
 
     if($percentageToDelete > 0) {
-      echo "Delete percentage: " . $percentageToDelete . "%\n";
+      $this->output("Delete percentage: " . $percentageToDelete . "%");
 
       if ($percentageToDelete > $maxDeletePercentage)
         throw new \Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
@@ -311,7 +317,7 @@ class Sync extends Controller {
       
       foreach($groups as $group) {
         if (!in_array($group->id, $groupsInLDAP)) {
-          echo "Deleting " . $group->name . "\n";
+          $this->output("Deleting " . $group->name);
           if (!$dryRun)
             $group->delete();
         }
@@ -319,28 +325,33 @@ class Sync extends Controller {
     }
   }
   
-  private function getGroupMembers(Record $record, Connection $ldapConn) {
+  private function getGroupMembers(Record $record, Connection $ldapConn, Server $server) {
     $members = [];
     if (isset($record->memberuid)) {
-      //for openldap
-      return $record->memberuid;
+      //for openldap      
+      foreach ($record->memberuid as $uid) {  
+        $accountResult = Record::find($ldapConn, $server->peopleDN, 'uid=' . $uid);
+        $record = $accountResult->fetch();
+        
+        $members[] = ['username' => $this->getGOUserName($record), 'email' => $record->mail[0]]; 
+      }      
     } else if (isset($record->member)) {
       //for Active Directory
       foreach ($record->member as $username) {    
         go()->debug("Member: " . $username);  
-        $username = $this->queryActiveDirectoryUser($ldapConn, $username);
-        if (!$username) {
-          echo "Skipping. Could not find GO user\n";
+        $u = $this->queryActiveDirectoryUser($ldapConn, $username);
+        if (!$u['username']) {
+          $this->output("Skipping. Could not find GO user");
           continue;
         }
-        $members[] = $username;
+        $members[] = $u;
       }
-      return $members;
     } else {
-      echo "Error: no member array found in group";
+      $this->output("Error: no member array found in group");
       return [];
     }
     
+    return $members;
   }
 
 	private function queryActiveDirectoryUser(Connection $ldapConn, $groupMember) {
@@ -354,6 +365,6 @@ class Sync extends Controller {
 		$accountResult = Record::find($ldapConn, $searchDn, $query);
     $record = $accountResult->fetch();
     
-		return $this->getGOUserName($record);
+		return ['username' => $this->getGOUserName($record), 'email' => $record->mail[0]];
 	}
 }

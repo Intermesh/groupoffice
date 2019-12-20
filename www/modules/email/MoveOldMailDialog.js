@@ -38,7 +38,7 @@ GO.email.MoveOldMailDialog = function(config){
 
 }
 
-Ext.extend(GO.email.MoveOldMailDialog, Ext.Window,{
+Ext.extend(GO.email.MoveOldMailDialog, go.Window,{
 
 	onShow : function() {
 		GO.email.MoveOldMailDialog.superclass.onShow.call(this);

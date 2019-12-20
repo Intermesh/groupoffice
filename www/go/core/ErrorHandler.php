@@ -22,10 +22,10 @@ class ErrorHandler {
 
 	public function __construct() {		
 		
-		//error_reporting(E_ALL);
+		//error_reporting(E_ALL)
 		
 		set_error_handler([$this, 'errorHandler']);
-		register_shutdown_function([$this, 'shutdown']);
+		// register_shutdown_function([$this, 'shutdown']);
 		set_exception_handler([$this, 'exceptionHandler']);		
 	}
 
@@ -33,14 +33,14 @@ class ErrorHandler {
 	 * Called when PHP exits.
 	 */
 	public function shutdown() {
-		
+		go()->debug("ErrorHandler::shutdown() called");
 		$error = error_get_last();
 		if ($error) {
 			//Log only fatal errors because other errors should have been logged by the normal error handler
 			if (in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_CORE_WARNING, E_COMPILE_ERROR, E_COMPILE_WARNING])) {
 //				$this->printError($error['type'], $error['message'], $error['file'], $error['line']);				
 				
-				$this->exceptionHandler(new \ErrorException($error['message'],0,$error['type'],$error['file'], $error['line']));
+				$this->exceptionHandler(new ErrorException($error['message'],0,$error['type'],$error['file'], $error['line']));
 			}
 		}
 
@@ -83,7 +83,9 @@ class ErrorHandler {
 	 * support php 5.6 as well.
 	 * @param Throwable $e
 	 */
-	public function exceptionHandler($e) {				
+	public function exceptionHandler($e) {	
+		go()->debug("ErrorHandler::exceptionHandler() called with " . get_class($e));
+
 		$errorString = self::logException($e);
 		
 		if(!headers_sent()) {
@@ -103,19 +105,21 @@ class ErrorHandler {
 		}
 	}
 
-	/**
-	 * Custom error handler that logs to our own error log
-	 * 
-	 * @param int $errno
-	 * @param string $errstr
-	 * @param string $errfile
-	 * @param int $errline
-	 * @return boolean
-	 */
+  /**
+   * Custom error handler that logs to our own error log
+   *
+   * @param int $errno
+   * @param string $errstr
+   * @param string $errfile
+   * @param int $errline
+   * @return void
+   * @throws ErrorException
+   */
 	public static function errorHandler($errno, $errstr, $errfile, $errline) {
-		if (!(error_reporting() & $errno)) {
-			return false;
-		}
+		go()->debug("ErrorHandler:errorHandler called $errno");
+		// if (!(error_reporting() & $errno)) {
+		// 	return false;
+		// }
 		throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 	}
 }

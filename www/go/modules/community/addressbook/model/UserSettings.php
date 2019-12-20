@@ -61,7 +61,7 @@ class UserSettings extends Property {
 
 		if($addressBook) {
 			$this->defaultAddressBookId = $addressBook->id;
-			$this->saveTables();
+			go()->getDbConnection()->update("addressbook_user_settings", ['defaultAddressBookId' => $this->defaultAddressBookId], ['userId' => $this->userId])->execute();
 		}
 
 		return $this->defaultAddressBookId;

@@ -7,19 +7,17 @@ use GO;
 use GO\Base\Observable;
 use go\core\auth\State as AuthState;
 use go\core\cache\CacheInterface;
-use go\core\cache\Disk;
 use go\core\db\Connection;
 use go\core\db\Database;
 use go\core\db\Query;
 use go\core\db\Table;
-    use go\core\event\EventEmitterTrait;
-    use go\core\event\Listeners;
+use go\core\event\EventEmitterTrait;
+use go\core\event\Listeners;
 use go\core\exception\ConfigurationException;
 use go\core\fs\Folder;
-    use go\core\http\Request;
-    use go\core\jmap\State;
+use go\core\jmap\Request;
+use go\core\jmap\State;
 use go\core\mail\Mailer;
-use go\core\util\Lock;
 use go\core\webclient\Extjs3;
 use go\core\model\Settings;
 use const GO_CONFIG_FILE;
@@ -84,6 +82,8 @@ use const GO_CONFIG_FILE;
 
 			$this->errorHandler = new ErrorHandler();
 			$this->initCompatibility();
+
+			//more code to initialize at the bottom of this file as it depends on this class being constructed
 		}
 		
 		/**
@@ -175,6 +175,8 @@ use const GO_CONFIG_FILE;
 		public function getDataFolder() {
 			return new Folder($this->getConfig()['core']['general']['dataPath']);
 		}
+
+		private $storageQuota;
 		
 		/**
 		 * Get total space of the data folder in bytes
@@ -182,19 +184,23 @@ use const GO_CONFIG_FILE;
 		 * @return float
 		 */
 		public function getStorageQuota() {
-			$quota = $this->getConfig()['core']['limits']['storageQuota'];
-			if(empty($quota)) {
-				try {
-					$quota = disk_total_space($this->getConfig()['core']['general']['dataPath']);
-				}
-				catch(\Exception $e) {
-					go()->warn("Could not determine total disk space: ". $e->getMessage());
-					return 0;
+			if(!isset($this->storageQuota)) {
+				$this->storageQuota = $this->getConfig()['core']['limits']['storageQuota'];
+				if(empty($this->storageQuota)) {
+					try {
+						$this->storageQuota = disk_total_space($this->getConfig()['core']['general']['dataPath']);
+					}
+					catch(\Exception $e) {
+						go()->warn("Could not determine total disk space: ". $e->getMessage());
+						$this->storageQuota = 0;
+					}
 				}
 			}
 			
-			return $quota;
+			return $this->storageQuota;
 		}		
+
+		private $storageFreeSpace;
 		
 		/**
 		 * Get free space in bytes
@@ -202,20 +208,24 @@ use const GO_CONFIG_FILE;
 		 * @return float
 		 */
 		public function getStorageFreeSpace() {
-			$quota = $this->getConfig()['core']['limits']['storageQuota'];
-			if(empty($quota)) {
-				try {
-					return disk_free_space($this->getConfig()['core']['general']['dataPath']);
+			if(!isset($this->storageFreeSpace)) {
+				$quota = $this->getConfig()['core']['limits']['storageQuota'];
+				if(empty($quota)) {
+					try {
+						$this->storageFreeSpace = disk_free_space($this->getConfig()['core']['general']['dataPath']);
+					}
+					catch(\Exception $e) {
+						go()->warn("Could not determine free disk space: ". $e->getMessage());
+						$this->storageFreeSpace = 0;
+					}
+				} else
+				{
+					$usage = \GO::config()->get_setting('file_storage_usage');				 
+					$this->storageFreeSpace = $quota - $usage;
 				}
-				catch(\Exception $e) {
-					go()->warn("Could not determine free disk space: ". $e->getMessage());
-					return 0;
-				}
-			} else
-			{
-				 $usage = \GO::config()->get_setting('file_storage_usage');				 
-				 return $quota - $usage;
 			}
+
+			return $this->storageFreeSpace;
 		}
 
 		/**
@@ -293,40 +303,51 @@ use const GO_CONFIG_FILE;
 			if(!isset($config)) {
 				throw new ConfigurationException();
 			}
-			
+			$config['configPath'] = $configFile;
+
 			return $config;
 		}
-		
 
-		/**
-		 * Get the configuration data
-		 * 
-		 * ```
-		 * 
-		  "general" => [
-		  "dataPath" => "/foo/bar"
-		  ],
-		  "db" => [
-		  "dsn" => 'mysql:host=localhost;dbname=groupoffice,
-		  "username" => "user",
-		  "password" => "secret"
-		  ]
-		  ]
-		 * ```
-		 * @return array
-		 */
+
+    /**
+     * Get the configuration data
+     *
+     * ```
+     *
+     * "general" => [
+     * "dataPath" => "/foo/bar"
+     * ],
+     * "db" => [
+     * "dsn" => 'mysql:host=localhost;dbname=groupoffice,
+     * "username" => "user",
+     * "password" => "secret"
+     * ]
+     * ]
+     * ```
+     * @return array
+     * @throws ConfigurationException
+     */
 		public function getConfig() {
 
 			if (isset($this->config)) {
 				return $this->config;
 			}
+
+			//If acpu is supported we can use it to cache the config object.
+			// if(cache\Apcu::isSupported() && ($token = State::getClientAccessToken())) {
+			// 	$cacheKey = 'go_conf_' . $token;
+
+			// 	$this->config = apcu_fetch($cacheKey);
+			// 	if($this->config && $this->config['cacheTime'] > filemtime($this->config['configPath']) && (!file_exists('/etc/groupoffice/globalconfig.inc.php') || $this->config['cacheTime'] > filemtime('/etc/groupoffice/globalconfig.inc.php'))) {
+			// 		if(Request::get()->getHeader('X-Debug') == "1") {
+			// 			$this->config['core']['general']['debug'] = true;
+			// 		}
+			// 		return $this->config;
+			// 	}
+			// }
 			
 			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
 
-			if(Request::get()->getHeader('X-Debug') == "1") {
-				$config['debug'] = true;
-			}
-			
 			if(!isset($config['debug_log'])) {
 				$config['debug_log'] = !empty($config['debug']);
 			}
@@ -376,6 +397,15 @@ use const GO_CONFIG_FILE;
 					$this->config['core']['general']['cache'] = cache\Disk::class;
 				}
 			}
+
+			// if(isset($cacheKey)) {
+			// 	$this->config['cacheTime'] = time();
+			// 	apcu_store($cacheKey, $this->config);
+			// }
+			
+			if(Request::get()->getHeader('X-Debug') == "1") {
+				$this->config['core']['general']['debug'] = true;
+			}
 			
 			return $this->config;
 		}
@@ -424,11 +454,12 @@ use const GO_CONFIG_FILE;
 		/**
 		 * Get a simple key value caching object
 		 * 
-		 * @return Disk
+		 * @return Cache\Apcu
 		 */
 		public function getCache() {
-			if (!isset($this->cache)) {
+			if (!isset($this->cache)) {				
 				$cls = $this->getConfig()['core']['general']['cache'];
+				// go()->log("Using cache: " . $cls);
 				$this->cache = new $cls;
 			}
 			return $this->cache;
@@ -471,22 +502,20 @@ use const GO_CONFIG_FILE;
 			
 			if($onDestruct) {				
 				$this->rebuildCacheOnDestruct = $onDestruct;
-			}
+			}			
 			
-			$lock = new Lock("rebuildCache");
-			if($lock->lock()) {
-				\GO::clearCache(); //legacy
+			\GO::clearCache(); //legacy
 
-				go()->getCache()->flush(false);
-				Table::destroyInstances();
+			go()->getCache()->flush(false);
+			Table::destroyInstances();
 
-				$webclient = Extjs3::get();
-				$webclient->flushCache();
+			$webclient = Extjs3::get();
+			$webclient->flushCache();
 
-				Observable::cacheListeners();
+			Observable::cacheListeners();
 
-				Listeners::get()->init();
-			}
+			Listeners::get()->init();
+			
 		}
 		
 		public function __destruct() {
@@ -732,5 +761,6 @@ namespace {
 	function go() {
 		return App::get();
 	}
-
+	
 }
+
