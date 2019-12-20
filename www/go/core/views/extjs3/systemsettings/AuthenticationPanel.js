@@ -1,6 +1,5 @@
 go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
 	initComponent: function () {
-		
 		this.domainCombo = GO.SystemSettingsDomainCombo = new go.login.DomainCombo({
 			fieldLabel: t("Default domain"),
 			hidden: GO.authenticationDomains.length === 0,
@@ -25,13 +24,13 @@ go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
 						},
 						this.domainCombo
 					]
-			}]
+			},
+
+				new go.systemsettings.AuthAllowGroupGrid()
+			]
 		});
-		
-			
 
 		go.systemsettings.AuthenticationPanel.superclass.initComponent.call(this);
-	
 	}
 
 });

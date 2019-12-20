@@ -9,6 +9,7 @@ use go\core\fs\File;
 use go\core\jmap\EntityController;
 use go\core\orm\Entity;
 use go\core\orm\Query;
+use Traversable;
 
 /**
  * Abstract converter class
@@ -164,14 +165,15 @@ abstract class AbstractConverter {
 			$i++;
 		}
 	}
-	
-	/**
-	 * Export entities to a blob
-	 * 
-	 * @param Query2 $entities
-	 * @return Blob
-	 * @throws Exception
-	 */
+
+  /**
+   * Export entities to a blob
+   *
+   * @param $name
+   * @param Query|array $entities
+   * @return Blob
+   * @throws Exception
+   */
 	public final function exportToBlob($name, Query $entities) {		
 		$tempFile = File::tempFile($this->getFileExtension());
 		$fp = $tempFile->open('w+');

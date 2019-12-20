@@ -3,6 +3,7 @@ require("../vendor/autoload.php");
 
 use go\core\App;
 use go\core\auth\Method;
+use go\core\model\AllowGroup;
 use go\core\model\Token;
 use go\core\model\User;
 use go\core\auth\PrimaryAuthenticator;
@@ -95,12 +96,7 @@ try {
 		exit();
 	}
 
-	/**
-	 * 
-	 * @param type $username
-	 * @param type $password
-	 * @return User|boolean
-	 */
+
 	function getToken($data) {		
 		//loop through all auth methods
 		$authMethods = Method::find()->orderBy(['sortOrder' => 'DESC']);
@@ -124,9 +120,14 @@ try {
 			if(!$user->enabled) {				
 				output([], 403, go()->t("You're account has been disabled."));
 			}
+
+			$ip = Request::get()->getRemoteIpAddress();
+			if(!AllowGroup::isAllowed($user, $ip)) {
+        output([], 403, str_replace('{ip}', $ip, go()->t("You are not allowed to login from IP address {ip}.") ));
+      }
 			
 			if(go()->getSettings()->maintenanceMode && !$user->isAdmin()) {
-				output([], 503, "Service unavailable. Maintenance mode is enabled");
+				output([], 503, go()->t("Service unavailable. Maintenance mode is enabled."));
 			}
 
 			$token = new Token();
