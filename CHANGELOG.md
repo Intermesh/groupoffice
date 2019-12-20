@@ -1,5 +1,9 @@
+20-12-2019 6.4.95
+- Custom fields: Fixed visual problem with select options
+- Custom fields: Fixed problem that adding a field with a duplicate name was possible.
 - Core: Added new allowed groups function for authentication. You can restrict IP addresses per group from where you are allowed to login.
 - Address book: Added filter for contacts being in a group or not
+- Newsletters: Double click to open contact
 
 19-12-2019 6.4.94
 - Core: Updated Brasilian Portugese language
