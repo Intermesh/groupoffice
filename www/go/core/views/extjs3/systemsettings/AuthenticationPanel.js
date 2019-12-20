@@ -33,7 +33,7 @@ go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
 							xtype: "box",
 							autoEl: "p",
 							html: t("Define which groups are allowed to login from which IP addresses. You can use '*' to match any charachters and '?'" +
-								" to match any single character. eg. '192.168.1?.*'. <strong>Be careful!</strong> You can lock yourself out!")
+								" to match any single character. eg. '192.168.1?.*'. Be careful, You can lock yourself out!")
 						},
 						new go.systemsettings.AuthAllowGroupGrid({
 							border: true
