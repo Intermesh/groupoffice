@@ -475,6 +475,9 @@ class Installer {
 			//put the updates in an extra array dimension so we know to which module
 			//they belong too.
 			foreach ($updates as $timestamp => $updatequeries) {
+			  if(!preg_match("/^[0-9]{12}$/", $timestamp)) {
+			    throw new Exception("Invalid timestamp '$timestamp' in file '$updatesFile'");
+        }
 				$u["$timestamp"][$module->id] = $updatequeries;
 			}
 		}

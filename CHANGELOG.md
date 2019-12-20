@@ -1,3 +1,4 @@
+- Core: Added new allowed groups function for authentication. You can restrict IP addresses per group from where you are allowed to login.
 - Address book: Added filter for contacts being in a group or not
 
 19-12-2019 6.4.94
