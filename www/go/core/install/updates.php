@@ -667,4 +667,4 @@ $updates['20191219000'][] = "ALTER TABLE `core_auth_allow_group`
 
 
 $updates['20191219000'][] = "ALTER TABLE `core_auth_allow_group`
-  ADD CONSTRAINT `core_auth_allow_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_auth_allow_group` (`id`) ON DELETE CASCADE;";
+  ADD CONSTRAINT `core_auth_allow_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;";

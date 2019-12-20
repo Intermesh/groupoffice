@@ -1,74 +1,120 @@
 go.systemsettings.AuthAllowGroupGrid = Ext.extend(go.grid.EditorGridPanel, {
-  title: t("Allowed groups"),
+  autoHeight: true,
   initComponent: function () {
 
     this.store = new go.data.Store({
-      fields: ['id', {name:'group', type: "relation"}, {name:'ipPattern'}],
+      fields: ['id', 'groupId', {name:'group', type: "relation", allowBlank:false}, {name:'ipPattern', allowBlank:false}],
       entityStore: "AuthAllowGroup",
       autoLoad: true
     });
 
+    var actions = this.initRowActions();
+
     Ext.apply(this, {
-      tbar: [{
+      plugins: [actions],
+      tbar: [ '->',{
         iconCls: 'ic-add',
-        text: t('Add'),
+        tooltip: t('Add'),
         handler: function () {
           var r = new this.store.recordType({
-            id: 0,
-            name: '',
-            color: ''
+            ipPattern: '',
+            groupId: null
           });
           this.stopEditing();
-          this.store.insert(0, r);
-          this.startEditing(0, 1);
-        },
-        scope: this
-      }, {
-        iconCls: 'ic-delete',
-        text: t('Delete'),
-        handler: function () {
-          var sel = this.selModel.getSelectedCell();
-          if (sel) {
-            // sel now contains an array of [row, col]
-            this.store.removeAt(sel[0]);
-          }
+          this.store.add(r);
+          this.startEditing(this.store.getCount() - 1, 0);
         },
         scope: this
       }],
       columns: [
         {
-          hidden: true,
-          header: 'ID',
-          width: 40,
-          sortable: false,
-          dataIndex: 'id'
-        },
-        {
           id: 'group',
           header: t('Group'),
-          width: 175,
           sortable: false,
           dataIndex: 'groupId',
-          editor: new go.groups.GroupCombo(),
-          renderer: function(v, meta, data) {
-            return data.group.name;
+          editor: this.groupEditor = new go.groups.GroupCombo({
+            allowBlank: false
+          }),
+          renderer: function(v, meta, record) {
+            return record.data.group ? record.data.group.name : "";
           }
         },
         {
           header: t('IP pattern'),
           width: 70,
           dataIndex: 'ipPattern',
-          editor: new Ext.form.TextField()
-        }
+          editor: new Ext.form.TextField({
+            allowBlank: false
+          })
+        },
+        actions
       ],
       viewConfig: {
-        emptyText: 	'<i>label</i><p>' +t("No items to display") + '</p>'
+        emptyText: 	'<i>label</i><p>' +t("No items to display") + '</p>',
+        autoFill: true
       }
     });
 
     go.systemsettings.AuthAllowGroupGrid.superclass.initComponent.call(this);
 
+    this.on("afteredit", function(e) {
 
+
+      if(e.field == "groupId") {
+        if(!e.value) {
+          return;
+        }
+        var groupRecord = this.groupEditor.store.getById(e.value);
+        e.record.set('group', groupRecord.data);
+      }
+
+      var me = this;
+
+      if(!e.record.isValid()) {
+        return;
+      }
+
+      go.Db.store('AuthAllowGroup').save({
+        ipPattern: e.record.data.ipPattern,
+        groupId: e.record.data.groupId
+      }, e.record.data.id).then(function() {
+        //e.record.commit();
+      });
+    }, this);
+  },
+
+  initRowActions : function() {
+    var actions = new Ext.ux.grid.RowActions({
+      menuDisabled: true,
+      hideable: false,
+      draggable: false,
+      fixed: true,
+      header: '',
+      hideMode: 'display',
+      keepSelection: true,
+      actions: [{
+        iconCls: 'ic-delete'
+      }]
+    });
+
+    actions.on({
+      action: function (grid, record, action, row, col, e, target) {
+        Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete the selected item?"), function (btn) {
+
+          if (btn != "yes") {
+            return;
+          }
+
+          go.Db.store("AuthAllowGroup").destroy(record.data.id).then(function() {
+            grid.store.removeAt(row);
+          });
+
+        }, this);
+      },
+      scope: this
+    });
+
+    return actions;
   }
 });
 

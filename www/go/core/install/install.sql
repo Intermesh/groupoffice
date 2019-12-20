@@ -872,7 +872,6 @@ ALTER TABLE `core_search` ADD INDEX(`keywords`);
 ALTER TABLE `core_change` ADD INDEX(`entityId`);
 
 
-
 CREATE TABLE `core_auth_allow_group` (
   `id` int(11) NOT NULL,
   `groupId` int(11) NOT NULL,
@@ -890,4 +889,4 @@ ALTER TABLE `core_auth_allow_group`
 
 
 ALTER TABLE `core_auth_allow_group`
-  ADD CONSTRAINT `core_auth_allow_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_auth_allow_group` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `core_auth_allow_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;
