@@ -605,7 +605,12 @@
 // }
 
 .x-fieldset {
-	border:0;
+	border: 1px solid color($fg, "line");
+	margin: dp(16);
+	&-noborder {
+		margin: 0;
+		border:0;
+	}
 	padding: dp(8) dp(16);
 	~ .x-fieldset { border-top: 1px solid color($fg, 'divider'); }
 	legend {
