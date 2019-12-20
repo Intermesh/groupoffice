@@ -158,6 +158,21 @@ go.Modules.register("community", "addressbook", {
 							title: t("No")
 						}
 					]
+				}, {
+					title: t("Is in a group"),
+					name: 'isInGroup',
+					multiple: false,
+					type: 'select',
+					options: [
+						{
+							value: true,
+							title: t("Yes")
+						},
+						{
+							value: false,
+							title: t("No")
+						}
+					]
 				}
 			],
 			links: [{
