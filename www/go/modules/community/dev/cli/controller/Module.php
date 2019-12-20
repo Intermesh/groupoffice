@@ -7,6 +7,8 @@ use GO;
 use go\core\Controller;
 use go\core\db\Column;
 use go\core\fs\Folder;
+use go\core\jmap\Entity;
+use go\core\orm\Property;
 use go\core\util\StringUtil;
 use PDO;
 
@@ -199,20 +201,21 @@ EOD;
 		}
 	}
 
-	private function tableToModel(Folder $folder, $namespace, $tablePrefix, $tableName) {
+	private function tableToModel(Folder $folder, $namespace, $tablePrefix, $tableName)
+  {
 
-		$modelName = StringUtil::upperCamelCasify(str_replace($tablePrefix . '_', '', $tableName));
-		$className = $namespace . '\\model\\' . $modelName;
-		$tableAlias = strtolower($modelName);
+    $modelName = StringUtil::upperCamelCasify(str_replace($tablePrefix . '_', '', $tableName));
+    $className = $namespace . '\\model\\' . $modelName;
+    $tableAlias = strtolower($modelName);
 
-		$file = $folder->getFolder('model')->getFile($modelName . '.php');
+    $file = $folder->getFolder('model')->getFile($modelName . '.php');
 
-		if (!$file->exists()) {
-			echo "Generating model/$modelName.php\n";
-			
-			$year = date('Y');
+    if (!$file->exists()) {
+      echo "Generating model/$modelName.php\n";
 
-			$data = <<<EOD
+      $year = date('Y');
+
+      $data = <<<EOD
 <?php
 namespace $namespace\model;
 						
@@ -234,15 +237,15 @@ class $modelName extends Property {
 
 }
 EOD;
-			$file->putContents($data);
-		} else if(is_a($className, \go\core\orm\Entity::class, true))
-		{
-			$this->tableToController($namespace, $modelName, $folder);
-		}
+      $file->putContents($data);
+    }else if (is_a($className, Entity::class, true)) {
+      $this->tableToController($namespace, $modelName, $folder);
+    }
 
 
-		
-		$this->convertClass($className, $file);
+    if (is_a($className, Property::class, true)) {
+      $this->convertClass($className, $file);
+    }
 	}
 
 	protected function convertClass($className, $file) {
@@ -284,7 +287,9 @@ EOD;
 		echo "Updating ".$className." with new properties\n";
 
 		//find position to insert properties
-		preg_match('/class .*\{\s*\n/', $source, $matches, PREG_OFFSET_CAPTURE);
+		if(!preg_match('/class .*\{\s*\n/', $source, $matches, PREG_OFFSET_CAPTURE)) {
+		  throw new \Exception();
+    }
 		$pos = $matches[0][1] + strlen($matches[0][0]);
 
 		$source = substr($source, 0, $pos) . $vars . substr($source, $pos);

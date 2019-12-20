@@ -7,7 +7,7 @@ use go\core\exception\Forbidden;
 use go\core\jmap\EntityController;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\Response;
-use go\core\orm\Entity;
+use go\core\jmap\Entity;
 use go\core\model;
 
 
