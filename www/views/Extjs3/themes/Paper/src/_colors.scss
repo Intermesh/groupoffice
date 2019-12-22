@@ -5,8 +5,8 @@
 	@return map-get($color,$hue);
 }
 
-$black-87-opacity: rgba(black, 0.87);
-$white-87-opacity: rgba(white, 0.87);
+$black-87-opacity: rgba(black, 0.87) !default;
+$white-87-opacity: rgba(white, 0.87) !default;
 $red: (
   50: #ffebee,
   100: #ffcdd2,
@@ -160,7 +160,7 @@ $fg: (
   icon:					rgba(black, 0.54),
   icons:					rgba(black, 0.54),
   text:					rgba(black, 0.87)
-);
+) !default;
 $bg: (
 	status-bar: color($grey, 200),
 	app-bar:    color($grey, 100),
@@ -175,35 +175,9 @@ $bg: (
 	card:       white, 
 	dialog:     color($grey, 50),
 	disabled-button:   rgba(black, 0.12)
-);
+) !default;
 
-// DARK 
-$dforeground: (
-  base:            white,
-  divider:         rgba(white, 0.12),
-  line:				 rgba(white, 0.7),
-  disabled:        rgba(white, 0.3),
-  disabled-button: rgba(white, 0.3),
-  track:				 rgba(white, 0.3),
-  disabled-text:   rgba(white, 0.3),
-  hint-text:       rgba(white, 0.3),
-  secondary-text:  rgba(white, 0.7),
-  unfocused:	    rgba(white, 0.7),
-  icon:            white,
-  icons:           white,
-  text:            white
-);
-$dbackground: (
-  status-bar: black,
-  app-bar:    color($grey, 900),
-  background: #303030,
-  hover:      rgba(white, 0.04),
-  pressed:	rgba(#cccccc, .25),
-  box:      rgba(white, 0.1),
-  card:       color($grey, 800),
-  dialog:     color($grey, 800),
-  disabled-button: rgba(white, 0.12)
-);
+
 
 // Colors that have meaning (eg. success/failure)
 // GO 6.2 color:
@@ -211,20 +185,22 @@ $dbackground: (
 // $cPrimaryTp:	rgba(0, 155, 201, 0.16);
 
 //Intermesh blue 
-$cPrimary:		rgb(36, 58, 128);
-$cPrimaryTp:	rgba(36, 58, 128, 0.16);
+$cPrimary:		rgb(36, 58, 128) !default;
+$cPrimaryTp:	rgba(36, 58, 128, 0.16) !default;
 
-$cSecondary:	rgb(104,159,56);
-$cAccent:		color($orange, A400);
+$cHeaderBg: $cPrimary !default;
 
-$cSuccess:		color($green, 700);
-$cDanger:		color($red, 700);
-$cWarning:		color($orange, 700);
+$cSecondary:	rgb(104,159,56) !default;
+$cAccent:		color($orange, A400) !default;
+
+$cSuccess:		color($green, 700) !default;
+$cDanger:		color($red, 700) !default;
+$cWarning:		color($orange, 700) !default;
 
 $cSelected: color($bg, 'selected'); // click on menus, tree items, table
-$cHover: color($bg, 'hover');
-$cActive: color($grey, 200); // focussed
-$cAnchor: rgb(36, 58, 128);
+$cHover: color($bg, 'hover') !default;
+$cActive: color($grey, 200) !default; // focussed
+$cAnchor: rgb(36, 58, 128) !default;
 
 
 

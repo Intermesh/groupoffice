@@ -402,13 +402,13 @@ a {
 	
 	position: relative;
 	color: white;
-	@include var(background-color, c-primary);
+	@include var(background-color, c-header-bg);
 }
 .go-main-tab-panel.x-tab-panel {
 	> .x-tab-panel-header {
 		position: relative;
 		border-width: 0 0 0 0;
-		@include var(background-color, c-primary);
+		@include var(background-color, c-header-bg);
 		.x-tab-strip {
 			
 			&-active {

@@ -1,0 +1,35 @@
+$resourcePath: '../Paper/';
+
+$fg: (
+  base:            white,
+  divider:         rgba(white, 0.12),
+  line:				 rgba(white, 0.7),
+  disabled:        rgba(white, 0.3),
+  disabled-button: rgba(white, 0.3),
+  track:				 rgba(white, 0.3),
+  disabled-text:   rgba(white, 0.3),
+  hint-text:       rgba(white, 0.3),
+  secondary-text:  rgba(white, 0.7),
+  unfocused:	    rgba(white, 0.7),
+  icon:            white,
+  icons:           white,
+  text:            white
+);
+
+$bg: (
+  status-bar: black,
+  app-bar:    #212121,
+  background: #303030,
+  hover:      rgba(white, 0.04),
+  pressed:	rgba(#cccccc, .25),
+  box:      rgba(white, 0.1),
+  card:      #424242,
+  dialog:     #424242,
+  disabled-button: rgba(white, 0.12)
+);
+
+$cPrimary: #009BC9;
+$cHeaderBg : black;
+
+
+@import '../../Paper/src/style';
