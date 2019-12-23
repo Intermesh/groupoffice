@@ -1575,9 +1575,10 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$response['allow_quicklink']=$useQL?1:0;
 
 		
-		$contact = !empty($response['sender']) ? \go\modules\community\addressbook\model\Contact::find()->filter(['email' => $response['sender'], 'permissionLevel' => \go\core\model\Acl::LEVEL_READ])->single() : false;
+		$contact = !empty($response['sender']) ? \go\modules\community\addressbook\model\Contact::find(['id', 'photoBlobId', 'isOrganization', 'name', 'addressBookId', 'color'])->filter(['email' => $response['sender'], 'permissionLevel' => \go\core\model\Acl::LEVEL_READ])->single() : false;
 		if(!empty($contact)){
 			$response['contact_thumb_url']= go()->getAuthState()->getDownloadUrl($contact->photoBlobId);
+			$response['contact'] = $contact->toArray();
 
 			if($useQL){
 				$response['sender_contact_id']=$contact->id;
@@ -1586,7 +1587,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$orgIds = $contact->getOrganizationIds();
 				
 
-				$company = isset($orgIds[0]) ? \go\modules\community\addressbook\model\Contact::findById($orgIds[0]) : null;
+				$company = isset($orgIds[0]) ? \go\modules\community\addressbook\model\Contact::findById($orgIds[0],['id', 'name', 'addressBookId']) : null;
 				if(!empty($company) && $company->getPermissionLevel() >= \go\core\model\Acl::LEVEL_WRITE){
 					$response['sender_company_id']=$company->id;
 					$response['company_name']=$company->name;
