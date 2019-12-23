@@ -211,6 +211,12 @@ $app-icons: (
 	}
 }
 
+#email-message-panel {
+	.x-panel-body {
+		background-color: color($bg, 'box');
+	}
+}
+
 .message-header-table{
 	float:left;
 	margin-right: dp(72);
@@ -219,7 +225,6 @@ $app-icons: (
 
 .message-header {
 	position: relative;
-	background-color: color($bg, "background");
 	border-bottom:1px solid color($fg, "line");
 	padding: dp(8) dp(16);
 		

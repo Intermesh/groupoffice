@@ -1,0 +1,12 @@
+
+.x-layout-split {
+  background-color: black;
+}
+
+.x-panel-tbar .x-toolbar {
+  border-bottom: 1px solid black;
+
+  .go-sidenav & {
+    border-bottom: 0;
+  }
+}
