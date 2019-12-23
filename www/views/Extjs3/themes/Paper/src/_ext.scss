@@ -1865,7 +1865,7 @@ td.grid-hd-group-cell {
 }
 
 .x-date-mp {
-	background-color:#fff;
+	background-color: color($bg, 'background');
 }
 
 .x-date-mp td {
@@ -2057,7 +2057,7 @@ td.x-date-mp-sep {
 	}
 	&-group-item .x-menu-item-icon{ background-image:none;}
 	&-plain {
-		background-color:#f0f0f0 !important;
+		//background-color:#f0f0f0 !important;
 		background-image: none;
 	}
 }
@@ -2079,12 +2079,12 @@ a.x-menu-group-item .x-menu-item-text:before{
 }
 
 
-.x-date-menu, .x-color-menu{
-	background-color: #fff !important;
-}
+//.x-date-menu, .x-color-menu{
+//	background-color: #fff !important;
+//}
 
 .x-menu .x-date-picker{
-	border-color:#a3bad9;
+	border: 1px solid color($fg, 'line');
 }
 
 .x-cycle-menu .x-menu-item-checked {
