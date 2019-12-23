@@ -87,3 +87,5 @@ $updates['201910012019'][] = 'ALTER TABLE `addressbook_contact` ADD CONSTRAINT `
 $updates['201910281039'][] = 'update `addressbook_contact` set lastName = null, firstName = null, middleName = null, suffixes = null, prefixes = null, modifiedAt = now() where isOrganization = true;';
 
 $updates['201911111041'][] = 'ALTER TABLE `addressbook_contact` ADD INDEX(`isOrganization`)';
+
+$updates['201912231421'][] = 'ALTER TABLE `addressbook_contact` ADD `color` CHAR(6) NULL DEFAULT NULL AFTER `uri`;';

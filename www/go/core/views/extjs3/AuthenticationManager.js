@@ -189,6 +189,8 @@ go.AuthenticationManager = (function () {
 		onAuthenticated: function (result) {
 			
 			go.User.setAccessToken(result.accessToken, go.AuthenticationManager.rememberLogin);
+
+
 			
 			if(this.loginPanel) {
 				this.loginPanel.destroy();
@@ -199,6 +201,11 @@ go.AuthenticationManager = (function () {
 
 			return go.User.loadSession(result).then(function() {
 				me.fireEvent("authenticated", me, result);
+
+				if(go.User.theme != GO.settings.config.theme) {
+					document.location = document.location;
+					return;
+				}
 			
 				GO.mainLayout.onAuthentication();
 			});		

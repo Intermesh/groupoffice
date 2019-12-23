@@ -206,7 +206,9 @@ go.form.Chips = Ext.extend(Ext.Container, {
 
 
 			var cfg = this.comboConfig || {};
-			cfg.baseParams = this.storeBaseParams || {filter : {}}
+			if(!cfg.baseParams) {
+				cfg.baseParams = this.storeBaseParams || {filter: {}}
+			}
 			if(!cfg.baseParams.filter) {
 				cfg.baseParams.filter = {};
 			}

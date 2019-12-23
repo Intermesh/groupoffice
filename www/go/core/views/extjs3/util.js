@@ -13,6 +13,10 @@ go.util =  (function () {
 		clone: function(obj) {
 			return JSON.parse(JSON.stringify(obj));
 		},
+
+		initials : function(name) {
+			return name.split(" ").map(function(name){return name.substr(0,1).toUpperCase()}).join("");
+		},
 		
 		/**
 		 * Convert bytes to a user readable format

@@ -29,7 +29,7 @@
   color: #febf35; }
 
 .go-addressbook-index-row {
-  border-top: 7px solid white;
+  border-top: 7px solid transparent;
   margin-top: 7px;
   box-shadow: 0px -1px 0 rgba(0, 0, 0, 0.12); }
 
@@ -75,6 +75,6 @@
       color: white; }
 
 .avatar.organization {
-  background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24)); }
+  background-image: none; }
 
 /*# sourceMappingURL=style.css.map */

@@ -1,3 +1,7 @@
+- Files: Use template with E-mail download link
+- Comments: Composer only rendered at one item
+- Core: Dark mode theme (Beta)
+
 20-12-2019 6.4.95
 - Custom fields: Fixed visual problem with select options
 - Custom fields: Fixed problem that adding a field with a duplicate name was possible.
@@ -39,6 +43,7 @@
 - Core: Encode filename in upload header to support UTF-8 filenames
 - Core: try to convert CSV file uploads to UTF-8
 - Core: reverted enter to save because it caused problems when searching inside TabbedFormDialog.js
+
 
 10-12-2019 6.4.91
 - Custom fields: db migration contained broken code.

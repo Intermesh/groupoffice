@@ -167,7 +167,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			if(creator.avatarId) { 
 				avatar.style = 'background-image: url('+go.Jmap.thumbUrl(creator.avatarId, {w: 40, h: 40, zc: 1})+');background-color: transparent;';
 			} else {
-				avatar.html = creator.displayName.split(" ").map(function(name){return name.substr(0,1).toUpperCase()}).join("");
+				avatar.html = go.util.initials(creator.displayName);
 				avatar.style = 'background-image: none';
 			}
 

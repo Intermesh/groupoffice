@@ -319,7 +319,7 @@ a {
 	background-color: color($bg,'hover');
 }
 #go-logo, .go-app-logo, .go-about-logo {
-	background-image: url('img/logo-white.svg');
+	background-image: url(#{$resourcePath}img/logo-white.svg);
 	background-size: contain;
 	background-repeat: no-repeat;
 	height: dp(40);
@@ -331,10 +331,10 @@ a {
 		border-right: 0;
 }
 .go-about-logo {
-	background-image: url('img/logo-blue.svg');
+	background-image: url(#{$resourcePath}img/logo-blue.svg);
 }
 .go-settings-logo {
-	background-image: url('img/logo-white.svg');
+	background-image: url(#{$resourcePath}img/logo-white.svg);
 	background-size: auto dp(40);
 	background-repeat: no-repeat;
 	background-position: dp(16) dp(16);
@@ -402,13 +402,13 @@ a {
 	
 	position: relative;
 	color: white;
-	@include var(background-color, c-primary);
+	@include var(background-color, c-header-bg);
 }
 .go-main-tab-panel.x-tab-panel {
 	> .x-tab-panel-header {
 		position: relative;
 		border-width: 0 0 0 0;
-		@include var(background-color, c-primary);
+		@include var(background-color, c-header-bg);
 		.x-tab-strip {
 			
 			&-active {
@@ -640,9 +640,9 @@ button {
 	position:relative;
 	display:inline-block;
 	padding:0;
-	background: url('img/default-avatar.svg') no-repeat center center;
-	@include var('background-color', 'c-primary');
-	color: white;
+	background: url(#{$resourcePath}img/default-avatar.svg) no-repeat center center;
+	background-color:  color($grey, 600);
+	color: color($grey, 50);
 	background-size:cover;	
 	border-radius: 50%;
 	width:dp(40);
@@ -976,11 +976,11 @@ button.filetype-pdf, button.filetype-doc {
 		background-color: color($orange, 700) !important;
 	}*/
 	.x-panel-body {
-		background-color:color($bg, 'card');
+		background-color:color($bg, 'box');
 	}
 	
 	figure {
-		background-image: url(img/default-avatar.svg);
+		background-image: url(#{$resourcePath}img/default-avatar.svg);
 		background-position:center 60%;
 		background-size: cover;
 		position: relative;
@@ -1144,7 +1144,7 @@ button.filetype-pdf, button.filetype-doc {
 			left: 0;
 			top:dp(4);
 			position: absolute;
-			color: white;	
+			//color: color($bg, 'background');
 		}
 
 		
@@ -1362,9 +1362,9 @@ table[id^="comments-ext"] b {
 			border-bottom: 0;
 		}
 	}
-	.x-panel-tbar {
-		border-bottom: 1px solid color($fg, "divider");
-	}
+	//.x-panel-tbar {
+	//	border-bottom: 1px solid color($fg, "divider");
+	//}
 	.x-panel-header-text {
 		//@extend %font-title;
 	}
@@ -1773,8 +1773,8 @@ table[id^="comments-ext"] b {
 
 .go-chip {
 	display: inline-block; 
-	border-radius: dp(4); 
-	background-color: $cPrimaryTp; 
+	border-radius: dp(4);
+	background-color:  $cPrimaryTp;
 	margin-right: dp(8);
 	margin-top: dp(8);
 	padding-left: dp(8);
@@ -1998,11 +1998,11 @@ table[id^="comments-ext"] b {
 	line-height: 100px;
 }
 
-.silk-accept { background-image: url(/img/icons/silk/accept.png) !important; background-repeat: no-repeat; }
-.silk-add { background-image: url(/img/icons/silk/add.png) !important; background-repeat: no-repeat; }
-.silk-cross { background-image: url(/img/icons/silk/cross.png) !important; background-repeat: no-repeat; }
-.silk-stop { background-image: url(/img/icons/silk/stop.png) !important; background-repeat: no-repeat; }
-.silk-arrow-up { background-image: url(/img/icons/silk/arrow_up.png) !important; background-repeat: no-repeat; }
+//.silk-accept { background-image: url(/img/icons/silk/accept.png) !important; background-repeat: no-repeat; }
+//.silk-add { background-image: url(/img/icons/silk/add.png) !important; background-repeat: no-repeat; }
+//.silk-cross { background-image: url(/img/icons/silk/cross.png) !important; background-repeat: no-repeat; }
+//.silk-stop { background-image: url(/img/icons/silk/stop.png) !important; background-repeat: no-repeat; }
+//.silk-arrow-up { background-image: url(/img/icons/silk/arrow_up.png) !important; background-repeat: no-repeat; }
 
 .go-grid-total {
 	position: absolute;

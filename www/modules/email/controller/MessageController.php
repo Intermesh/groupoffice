@@ -972,7 +972,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 //				}
 				
 				//cleanup empty tags
-				$response['data']['htmlbody'] = \GO\Base\Model\Template::model()->replaceCustomTags($response['data']['htmlbody'],array(), false);
+				$response['data']['htmlbody'] = \GO\Base\Model\Template::model()->replaceCustomTags($response['data']['htmlbody'],['body' => $params['body'] ?? ""], false);
 			}
 
 			if ($params['content_type'] == 'plain') {
