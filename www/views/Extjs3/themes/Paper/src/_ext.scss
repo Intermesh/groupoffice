@@ -64,7 +64,7 @@
 		position: relative;
 		margin: 0 auto;
 		top: dp(5);			
-		background-color: white;
+		background-color: color($bg, "background");
 		padding: dp(20) dp(40);
 		font-size: dp(18);
 		@extend .z12;

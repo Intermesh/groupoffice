@@ -173,7 +173,7 @@ $bg: (
 				box: white,
 				tbar: white,
 				card: white,
-				dialog: color($grey, 50),
+				dialog: color($grey, 100),
 				disabled-button: rgba(black, 0.12)
 ) !default;
 
@@ -200,7 +200,7 @@ $cWarning:		color($orange, 700) !default;
 $cSelected: color($bg, 'selected'); // click on menus, tree items, table
 $cHover: color($bg, 'hover') !default;
 $cActive: color($grey, 200) !default; // focussed
-$cAnchor: rgb(36, 58, 128) !default;
+$cAnchor: $cPrimary !default;
 
 
 
