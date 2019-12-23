@@ -235,6 +235,8 @@ $app-icons: (
 	.avatar {
 		width: dp(64);
 		height: dp(64);
+		line-height: dp(64);
+		font-size: dp(24);
 		position: absolute;
 		top: dp(16);
 		right: dp(16);

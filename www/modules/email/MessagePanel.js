@@ -138,7 +138,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<div style="clear: both"></div>' +
 			'</tpl>' +
 			
-			'<div class="avatar" id="'+this.contactImageId+'" src="" style="background-image: url(\'{contact_thumb_url}\');cursor:pointer"></div>'+
+			'<div class="avatar" id="'+this.contactImageId+'" style="{[this.getAvatarStyle(values.contact)]}">{[this.getAvatarHtml(values.contact)]}</div>'+
 			
 		'</div>';
 
@@ -203,6 +203,21 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'</div>';
 
 		this.template = new Ext.XTemplate(templateStr,{
+
+			getAvatarHtml: function (v) {
+
+				if(!v || v.photoBlobId) {
+					return "";
+				}
+				return v.isOrganization ? '<i class="icon">business</i>' : go.util.initials(v.name);
+			},
+			getAvatarStyle: function (v) {
+				if(!v) {
+					return "cursor:pointer;";
+				}
+				return v.photoBlobId ? 'background-image: url(' + go.Jmap.thumbUrl(v.photoBlobId, {w: 40, h: 40, zc: 1})  + ')"' : "background-image:none;cursor:pointer;background-color: #" + v.color;;
+			},
+
 			defaultFormatFunc : false,
 			linkIconCls : function(link) {				
 				
