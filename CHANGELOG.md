@@ -1,6 +1,8 @@
+23-12-2019 6.4.96
 - Files: Use template with E-mail download link
 - Comments: Composer only rendered at one item
 - Core: Dark mode theme (Beta)
+- Address book: Colored icon with initials when no photo is present.
 
 20-12-2019 6.4.95
 - Custom fields: Fixed visual problem with select options
