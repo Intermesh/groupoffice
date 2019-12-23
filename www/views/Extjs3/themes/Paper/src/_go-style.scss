@@ -64,7 +64,7 @@ p {
 }
 
 strong { color: color($grey, 700); font-weight: $font-weight-m; }
-small { color: color($grey); font-weight: $font-weight-r; font-size:.85em; line-height: 1.2; }
+small { color: color($fg, 'secondary-text'); font-weight: $font-weight-r; font-size:.85em; line-height: 1.2; }
 
 
 
