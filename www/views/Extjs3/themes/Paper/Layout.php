@@ -57,6 +57,7 @@ $lang = GO::language()->getLanguage(); ?>
                 ?>
             :root {
                 --c-primary: <?= '#'.go()->getSettings()->primaryColor; ?> !important;
+                --c-header-bg: <?= '#'.go()->getSettings()->primaryColor; ?> !important;
                 --c-primary-tp: <?= go()->getSettings()->getPrimaryColorTransparent(); ?> !important;
             }
 
