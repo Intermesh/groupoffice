@@ -1,32 +1,32 @@
 <?php
-namespace {namespace}\controller;
+namespace go\core\controller;
 
 use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\exception\StateMismatch;
-use {namespace}\model;
+use go\core\model;
 
 /**
- * The controller for the {model} entity
+ * The controller for the AuthAllowGroup entity
  *
  * @copyright (c) 2018, Intermesh BV http://www.intermesh.nl
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */ 
-class {model} extends EntityController {
+class AuthAllowGroup extends EntityController {
 	
 	/**
 	 * The class name of the entity this controller is for.
 	 * 
-	 * @return model\{model}
+	 * @return model\AuthAllowGroup
 	 */
 	protected function entityClass() {
-		return model\{model}::class;
+		return model\AuthAllowGroup::class;
 	}	
 	
 	/**
-	 * Handles the {model} entity's {model}/query command
+	 * Handles the AuthAllowGroup entity's AuthAllowGroup/query command
 	 *
 	 * @return array
 	 * @param array $params
@@ -38,7 +38,7 @@ class {model} extends EntityController {
 	}
 	
 	/**
-	 * Handles the {model} entity's {model}/get command
+	 * Handles the AuthAllowGroup entity's AuthAllowGroup/get command
 	 * 
 	 * @param array $params
 	 * @return array
@@ -50,7 +50,7 @@ class {model} extends EntityController {
 	}
 	
 	/**
-	 * Handles the {model} entity's {model}/set command
+	 * Handles the AuthAllowGroup entity's AuthAllowGroup/set command
 	 *
 	 * @see https://jmap.io/spec-core.html#/set
 	 * @param array $params
@@ -63,7 +63,7 @@ class {model} extends EntityController {
 	}
 	
 	/**
-	 * Handles the {model} entity's {model}/changes command
+	 * Handles the AuthAllowGroup entity's AuthAllowGroup/changes command
 	 * @param array $params
 	 * @return mixed
 	 * @throws InvalidArguments

@@ -1,5 +1,5 @@
 <?php
-namespace go\core\auth\model;
+namespace go\core\model;
 
 use DateInterval;
 use go\core\Environment;

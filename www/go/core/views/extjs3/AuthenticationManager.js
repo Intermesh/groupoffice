@@ -93,7 +93,8 @@ go.AuthenticationManager = (function () {
 								break;
 								
 							case 403:
-								Ext.MessageBox.alert(t("Account disabled"), t("You're account has been disabled"));
+								// Not allowed by IP filter AllowGroup or user not enabled.
+								Ext.MessageBox.alert(t("Account disabled"), response.statusText);
 								break;
 								
 							case 401: //Bad login
@@ -108,20 +109,13 @@ go.AuthenticationManager = (function () {
 						return;
 					}
 
-					
-
 					if (result.accessToken) {
 						this.onAuthenticated(result);
 					}
-
-					
-
 				},
 				scope: this
 			});
 		},
-
-		
 		
 		logout: function (first) {
 
@@ -143,7 +137,6 @@ go.AuthenticationManager = (function () {
 						}
 					});
 				});
-				
 			}
 		},
 
@@ -196,6 +189,8 @@ go.AuthenticationManager = (function () {
 		onAuthenticated: function (result) {
 			
 			go.User.setAccessToken(result.accessToken, go.AuthenticationManager.rememberLogin);
+
+
 			
 			if(this.loginPanel) {
 				this.loginPanel.destroy();
@@ -206,6 +201,11 @@ go.AuthenticationManager = (function () {
 
 			return go.User.loadSession(result).then(function() {
 				me.fireEvent("authenticated", me, result);
+
+				if(go.User.theme != GO.settings.config.theme) {
+					document.location = document.location;
+					return;
+				}
 			
 				GO.mainLayout.onAuthentication();
 			});		

@@ -10,6 +10,7 @@ use go\core\orm\CustomFieldsTrait;
 use go\core\orm\LoggingTrait;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
+use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 use go\modules\community\addressbook\convert\Csv;
 use go\modules\community\addressbook\convert\VCard;
@@ -70,13 +71,13 @@ class Contact extends AclItemEntity {
 
 	/**
 	 * 
-	 * @var \IFW\Util\DateTime
+	 * @var DateTime
 	 */							
 	public $createdAt;
 
 	/**
 	 * 
-	 * @var \IFW\Util\DateTime
+	 * @var DateTime
 	 */							
 	public $modifiedAt;
 
@@ -231,6 +232,13 @@ class Contact extends AclItemEntity {
 	 * @var ContactGroup[] 
 	 */
 	public $groups = [];
+
+  /**
+   * Color in hex
+   *
+   * @var string
+   */
+	protected $color;
 	
 	
 	/**
@@ -331,7 +339,10 @@ class Contact extends AclItemEntity {
 	protected static function aclEntityKeys(): array {
 		return ['addressBookId' => 'id'];
 	}
-	
+
+  /**
+   * @inheritDoc
+   */
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable("addressbook_contact", 'c')
@@ -355,43 +366,47 @@ class Contact extends AclItemEntity {
 		
 		$this->name = trim($this->name);
 	}
-	
-	/**
-	 * Find contact for user ID.
-	 * 
-	 * A contact can optionally be connected to a user. It's not guaranteed that
-	 * the contact is present.
-	 * 
-	 * @param int $userId
-	 * @return static
-	 */
+
+  /**
+   * Find contact for user ID.
+   *
+   * A contact can optionally be connected to a user. It's not guaranteed that
+   * the contact is present.
+   *
+   * @param int $userId
+   * @param array $properties
+   * @return static|false
+   * @throws Exception
+   */
 	public static function findForUser($userId, $properties = []) {
 		if(empty($userId)) {
 			return false;
 		}
 		return static::find($properties)->where('goUserId', '=', $userId)->single();
 	}
-	
-	/**
-	 * Find contact by e-mail address
-	 * 
-	 * @param string $email
-	 * @return Query
-	 */
+
+  /**
+   * Find contact by e-mail address
+   *
+   * @param string $email
+   * @return Query
+   * @throws Exception
+   */
 	public static function findByEmail($email) {
 		return static::find()
 						->join("addressbook_email_address", "e", "e.contactId = c.id")
 						->groupBy(['c.id'])
 						->where('e.email', '=', $email);
 	}
-	
-	
-	/**
-	 * Find contact by e-mail address
-	 * 
-	 * @param string $number
-	 * @return Query
-	 */
+
+
+  /**
+   * Find contact by e-mail address
+   *
+   * @param string $number
+   * @return Query
+   * @throws Exception
+   */
 	public static function findByPhone($number) {
 		return static::find()
 						->join("addressbook_phone_number", "e", "e.contactId = c.id")
@@ -410,6 +425,10 @@ class Contact extends AclItemEntity {
 											
 											$criteria->andWhere('g.groupId', '=', $value);
 										})
+                    ->add("isInGroup", function(Criteria $criteria, $value, Query $query) {
+                      $not = $value ? '' : 'NOT';
+                      $criteria->andWhere('c.id ' . $not . ' IN (SELECT contactId FROM addressbook_contact_group)');
+                    })
 										->add("isOrganization", function(Criteria $criteria, $value) {
 											$criteria->andWhere('isOrganization', '=', $value);
 										})
@@ -418,6 +437,7 @@ class Contact extends AclItemEntity {
 											->groupBy(['c.id'])
 											->having('count(e.email) '.($value ? '>' : '=').' 0');
 										})
+
 										->addText("email", function(Criteria $criteria, $comparator, $value, Query $query) {
 											$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "INNER");
 											
@@ -962,12 +982,13 @@ class Contact extends AclItemEntity {
 		return isset($this->$propName[0]) ? $this->$propName[0] : false;
 	}
 
-	/**
-	 * Decorate the message for newsletter sending.
-	 * This function should at least add the to address.
-	 * 
-	 * @param \Swift_Message $message
-	 */
+  /**
+   * Decorate the message for newsletter sending.
+   * This function should at least add the to address.
+   *
+   * @param Message $message
+   * @return bool
+   */
 	public function decorateMessage(Message $message) {
 		if(!isset($this->emailAddresses[0])) {
 			return false;
@@ -981,4 +1002,48 @@ class Contact extends AclItemEntity {
 
 		return $array;
 	}
+
+	private static $colors =  [
+    'C62828',
+    'AD1457',
+    '6A1B9A',
+    '4527A0',
+    '283593',
+    '1565C0',
+    '0277BD',
+    '00838F',
+    '00695C',
+    '2E7D32',
+    '558B2F',
+    '9E9D24',
+    'F9A825',
+    'FF8F00',
+    'EF6C00',
+    '424242'
+  ];
+
+	public function getColor() {
+    if(isset($this->color)) {
+      return $this->color;
+    }
+
+    $index = Settings::get()->lastContactColorIndex;
+
+    if(!isset(self::$colors[$index])) {
+      $index = 0;
+    }
+
+    $this->color = self::$colors[$index];
+    $index++;
+    Settings::get()->lastContactColorIndex = $index;
+    Settings::get()->save();
+
+    go()->getDbConnection()->update(self::getMapping()->getPrimaryTable()->getName(), ['color' => $this->color], ['id' => $this->id])->execute();
+
+    return $this->color;
+  }
+
+  public function setColor($v) {
+	  $this->color = $v;
+  }
 }

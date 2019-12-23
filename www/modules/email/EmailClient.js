@@ -718,7 +718,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		region:'center',
 		autoScroll:true,
 		titlebar: false,
-		border:true,
 		attachmentContextMenu: new GO.email.AttachmentContextMenu()
 	});
 	

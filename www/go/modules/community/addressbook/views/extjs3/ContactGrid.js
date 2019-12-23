@@ -34,7 +34,8 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				"debtorNumber",
 				"registrationNumber",
 				"IBAN",
-				"vatNo"
+				"vatNo",
+				"color"
 			],
 			sortInfo :{field: go.User.addressBookSettings.sortBy, direction: "ASC"},
 			entityStore: "Contact"
@@ -111,7 +112,11 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 							cls = record.data.isOrganization ? "organization" : "";
 							if(record.data.isOrganization) {
 								content = '<i class="icon">business</i>';
+							} else
+							{
+								content = go.util.initials(record.get('name'));
 							}
+							style += "background-image:none;background-color: #" + record.data.color;
 						}
 
 						var sortBy = go.User.addressBookSettings.sortBy, name;

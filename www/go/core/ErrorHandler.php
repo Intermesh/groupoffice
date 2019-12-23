@@ -40,7 +40,7 @@ class ErrorHandler {
 			if (in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_CORE_WARNING, E_COMPILE_ERROR, E_COMPILE_WARNING])) {
 //				$this->printError($error['type'], $error['message'], $error['file'], $error['line']);				
 				
-				$this->exceptionHandler(new \ErrorException($error['message'],0,$error['type'],$error['file'], $error['line']));
+				$this->exceptionHandler(new ErrorException($error['message'],0,$error['type'],$error['file'], $error['line']));
 			}
 		}
 
@@ -105,15 +105,16 @@ class ErrorHandler {
 		}
 	}
 
-	/**
-	 * Custom error handler that logs to our own error log
-	 * 
-	 * @param int $errno
-	 * @param string $errstr
-	 * @param string $errfile
-	 * @param int $errline
-	 * @return boolean
-	 */
+  /**
+   * Custom error handler that logs to our own error log
+   *
+   * @param int $errno
+   * @param string $errstr
+   * @param string $errfile
+   * @param int $errline
+   * @return void
+   * @throws ErrorException
+   */
 	public static function errorHandler($errno, $errstr, $errfile, $errline) {
 		go()->debug("ErrorHandler:errorHandler called $errno");
 		// if (!(error_reporting() & $errno)) {

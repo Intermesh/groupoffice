@@ -64,11 +64,9 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 		this.scheduleFieldset = new Ext.form.FieldSet({
 			title: t("Schedule", "sieve"),
 			height:130,
-			border: true,
 			collapsed: false,
 			labelWidth: 180,
-			items:[this.scheduleText,this.scheduleActivateField,this.scheduleDeactivateField],
-			style: 'margin-right:10px; margin-bottom:5px;'
+			items:[this.scheduleText,this.scheduleActivateField,this.scheduleDeactivateField]
 		});
 		
 		this.activateText = new GO.form.HtmlComponent({
@@ -84,8 +82,6 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 		
 		this.activateFieldset = new Ext.form.FieldSet({
 			title: t("Activate filterset", "sieve"),
-			height:130,
-			border: true,
 			collapsed: false,
 			items:[this.activateText,this.activateCheck]
 		});
@@ -113,7 +109,6 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 			name: 'ooo_message',
 			allowBlank:true,
 			anchor:'100%',
-			height:130,
 			width: 300,
 			hideLabel: true,
 			setValue: function(v){
@@ -125,7 +120,6 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 		this.messageFieldset = new Ext.form.FieldSet({
 			title: t("Message", "sieve"),
 			autoHeight: true,
-			border: true,
 			collapsed: false,
 			items:[
 //				this.subjectText,this.subjectField,

@@ -7,6 +7,8 @@ use GO;
 use go\core\Controller;
 use go\core\db\Column;
 use go\core\fs\Folder;
+use go\core\jmap\Entity;
+use go\core\orm\Property;
 use go\core\util\StringUtil;
 use PDO;
 
@@ -79,11 +81,14 @@ EOD;
 		}
 	}
 
-	/**
-	 * mschering@mschering-UX31A:/var/www/groupoffice-server/GO/Modules/GroupOffice/Tasks$ ../../../../bin/groupoffice devtools/module/init --tablePrefix=tasks
-	 * 
-	 * @param type $tablePrefix
-	 */
+  /**
+   * mschering@mschering-UX31A:/var/www/groupoffice-server/GO/Modules/GroupOffice/Tasks$ ../../../../bin/groupoffice devtools/module/init --tablePrefix=tasks
+   *
+   * @param $package
+   * @param $name
+   * @param type $tablePrefix
+   * @throws Exception
+   */
 	public function init($package, $name, $tablePrefix = null) {
 
 //		$className = \GO\Modules\GroupOffice\DevTools\Model\RecordTest::class;
@@ -91,34 +96,40 @@ EOD;
 //		$this->convertClass($className);
 //		
 //		exit();
-	
-		$folder = \go\core\Environment::get()->getInstallFolder()->getFolder('go/modules/' . $package .'/' .$name);		
-		$folder->create();
-		
 
-		$folder->getFolder('model')->create();
-		$folder->getFolder('controller')->create();
-		$folder->getFolder('language')->create();
-		$folder->getFolder('install')->create();
-		$folder->getFile('install/install.sql')->touch();
-		$folder->getFile('install/uninstall.sql')->touch();
-		
-		
-		$updatesFile = $folder->getFile('install/updates.php');
-		if(!$updatesFile->exists()) {			
-			$updatesFile->putContents("<?php\n\n\$updates = [];\n\n");			
-		}
-		
-		
-		$this->initView($folder, $package, $name);
-		
-		if(!isset($tablePrefix)) {
-			$tablePrefix = $folder->getName();
-		}
+    if($package == 'core' &&  $name == 'core') {
+      $folder = \go\core\Environment::get()->getInstallFolder()->getFolder('go/core');
+      $namespace = "go\\core";
+      $tablePrefix = "core";
+    } else {
+      $folder = \go\core\Environment::get()->getInstallFolder()->getFolder('go/modules/' . $package . '/' . $name);
+      $folder->create();
 
-		$namespace = "go\\modules\\" . $package . "\\" .$name;	
 
-		$this->createModuleFile($folder, $namespace);
+      $folder->getFolder('model')->create();
+      $folder->getFolder('controller')->create();
+      $folder->getFolder('language')->create();
+      $folder->getFolder('install')->create();
+      $folder->getFile('install/install.sql')->touch();
+      $folder->getFile('install/uninstall.sql')->touch();
+
+
+      $updatesFile = $folder->getFile('install/updates.php');
+      if (!$updatesFile->exists()) {
+        $updatesFile->putContents("<?php\n\n\$updates = [];\n\n");
+      }
+
+
+      $this->initView($folder, $package, $name);
+
+      if (!isset($tablePrefix)) {
+        $tablePrefix = $folder->getName();
+      }
+
+      $namespace = "go\\modules\\" . $package . "\\" . $name;
+
+      $this->createModuleFile($folder, $namespace);
+    }
 
 		$result = go()->getDbConnection()->query("SHOW TABLES");
 
@@ -190,20 +201,21 @@ EOD;
 		}
 	}
 
-	private function tableToModel(Folder $folder, $namespace, $tablePrefix, $tableName) {
+	private function tableToModel(Folder $folder, $namespace, $tablePrefix, $tableName)
+  {
 
-		$modelName = StringUtil::upperCamelCasify(str_replace($tablePrefix . '_', '', $tableName));
-		$className = $namespace . '\\model\\' . $modelName;
-		$tableAlias = strtolower($modelName);
+    $modelName = StringUtil::upperCamelCasify(str_replace($tablePrefix . '_', '', $tableName));
+    $className = $namespace . '\\model\\' . $modelName;
+    $tableAlias = strtolower($modelName);
 
-		$file = $folder->getFolder('model')->getFile($modelName . '.php');
+    $file = $folder->getFolder('model')->getFile($modelName . '.php');
 
-		if (!$file->exists()) {
-			echo "Generating model/$modelName.php\n";
-			
-			$year = date('Y');
+    if (!$file->exists()) {
+      echo "Generating model/$modelName.php\n";
 
-			$data = <<<EOD
+      $year = date('Y');
+
+      $data = <<<EOD
 <?php
 namespace $namespace\model;
 						
@@ -225,15 +237,15 @@ class $modelName extends Property {
 
 }
 EOD;
-			$file->putContents($data);
-		} else if(is_a($className, \go\core\orm\Entity::class, true))
-		{
-			$this->tableToController($namespace, $modelName, $folder);
-		}
+      $file->putContents($data);
+    }else if (is_a($className, Entity::class, true)) {
+      $this->tableToController($namespace, $modelName, $folder);
+    }
 
 
-		
-		$this->convertClass($className, $file);
+    if (is_a($className, Property::class, true)) {
+      $this->convertClass($className, $file);
+    }
 	}
 
 	protected function convertClass($className, $file) {
@@ -275,7 +287,9 @@ EOD;
 		echo "Updating ".$className." with new properties\n";
 
 		//find position to insert properties
-		preg_match('/class .*\{\s*\n/', $source, $matches, PREG_OFFSET_CAPTURE);
+		if(!preg_match('/class .*\{\s*\n/', $source, $matches, PREG_OFFSET_CAPTURE)) {
+		  throw new \Exception();
+    }
 		$pos = $matches[0][1] + strlen($matches[0][0]);
 
 		$source = substr($source, 0, $pos) . $vars . substr($source, $pos);

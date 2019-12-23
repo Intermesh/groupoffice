@@ -9,7 +9,7 @@
 }
 
 .go-addressbook-index-row {
-	border-top: dp(8) solid white;
+	border-top: dp(8) solid transparent;
 	margin-top: dp(8);
 	box-shadow: 0px -1px 0 color($fg, 'line');
 }
@@ -77,8 +77,10 @@
 
 .avatar {
 	&.organization {
-		background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));	
+		//background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));
+		background-image: none;
 	}
+
 }
 
 // .go-detail-view-contact {

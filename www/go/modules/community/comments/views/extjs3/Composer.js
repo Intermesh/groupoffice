@@ -4,7 +4,6 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 	layout: 'border',
 	cls:'go-form new-message',
 
-	
 	initComponent : function() {
 		
 		this.store = new go.data.Store({
@@ -54,7 +53,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		});
 		this.textField.on('sync', this.onSync,this);	
 		this.textField.on("initialize", this.onSync, this);
-		// this.textField.on('render', this.onSync,this);	
+		// this.textField.on('afterrender', this.onSync,this);
 		
 		this.sendBtn = new Ext.Button({
 			region:"east",
@@ -72,7 +71,6 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		this.items = [
 			this.addBtn,
 			this.middleBox = new Ext.Container({
-				id: "test",
 				region:"center",
 				layout:'anchor',
 				defaults: {
@@ -83,6 +81,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 
 				items: [
 					this.commentBox = new Ext.Container({
+						boxMinHeight:35,
 						layout:'fit',
 						frame: true,
 						items:[this.textField]
@@ -142,6 +141,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		this.ownerCt.setHeight(h);
 		this.ownerCt.doLayout();	
 		this.doLayout();
+
 	},
 
 

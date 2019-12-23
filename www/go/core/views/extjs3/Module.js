@@ -24,7 +24,13 @@ go.Modules.register("core", 'core', {
 		'Search', 
 		'EntityFilter',
 		'SmtpAccount',
-		'EmailTemplate'
+		'EmailTemplate',
+		{
+			name: 'AuthAllowGroup',
+			relations: {
+				group: {store: "Group", fk:'groupId'}
+			}
+		}
 	],
 
 	userSettingsPanels: [

@@ -13,6 +13,22 @@ go.util =  (function () {
 		clone: function(obj) {
 			return JSON.parse(JSON.stringify(obj));
 		},
+
+		/**
+		 * Grabs the first char of the first and last word.
+		 *
+		 * @param {string} name
+		 * @returns {string}
+		 */
+		initials : function(name) {
+			var parts = name.split(" "), l = parts.length;
+
+			if(l > 2) {
+				parts.splice(1, l - 2);
+			}
+
+			return parts.map(function(name){return name.substr(0,1).toUpperCase()}).join("");
+		},
 		
 		/**
 		 * Convert bytes to a user readable format

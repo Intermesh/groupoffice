@@ -648,3 +648,23 @@ $updates['201911120000'][] = "ALTER TABLE `core_customfields_field` ADD `require
 
 $updates['201912170000'][] = "ALTER TABLE `core_user` CHANGE `theme` `theme` VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Paper';";
 $updates['201912170000'][] = "update `core_user` set theme='Paper' where theme='Default';";
+
+
+$updates['201912190000'][] = "CREATE TABLE `core_auth_allow_group` (
+`id` int(11) NOT NULL,
+  `groupId` int(11) NOT NULL,
+  `ipPattern` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'IP Address. Wildcards can be used where * matches anything and ? matches exactly one character'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
+$updates['201912190000'][] = "ALTER TABLE `core_auth_allow_group`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `groupId` (`groupId`);";
+
+
+$updates['201912190000'][] = "ALTER TABLE `core_auth_allow_group`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;";
+
+
+$updates['201912190000'][] = "ALTER TABLE `core_auth_allow_group`
+  ADD CONSTRAINT `core_auth_allow_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;";
