@@ -24,7 +24,7 @@ go.detail.CreateModifyPanel = Ext.extend(Ext.Panel, {
 			if(!user) {
 				return '?';
 			}
-			return user.avatarId ? "" :user.displayName.split(" ").map(function(name){return name.substr(0,1).toUpperCase()}).join("");
+			return user.avatarId ? "" : go.util.initials(user.displayName);
 		},
 		avatar: function(user) {
 

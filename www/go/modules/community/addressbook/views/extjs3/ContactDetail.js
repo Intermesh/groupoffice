@@ -31,13 +31,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 									});
 								}
 							},
-							tpl: new Ext.XTemplate('<div class="avatar {[values.isOrganization && !values.photoBlobId ? \'organization\' : \'\']}" style="{[this.getStyle(values.photoBlobId)]}">{[this.getHtml(values.isOrganization, values.photoBlobId)]}</div>', 
+							tpl: new Ext.XTemplate('<div class="avatar {[values.isOrganization && !values.photoBlobId ? \'organization\' : \'\']}" style="{[this.getStyle(values)]}">{[this.getHtml(values)]}</div>',
 							{
-								getHtml: function (isOrganization, photoBlobId) {
-									return isOrganization && !photoBlobId ? '<i class="icon">business</i>' : "";
+								getHtml: function (v) {
+									return v.isOrganization && !v.photoBlobId ? '<i class="icon">business</i>' : go.util.initials(v.name);
 								},
-								getStyle: function (photoBlobId) {
-									return photoBlobId ? 'background-image: url(' + go.Jmap.thumbUrl(photoBlobId, {w: 40, h: 40, zc: 1})  + ')"' : "";
+								getStyle: function (v) {
+									return v.photoBlobId ? 'background-image: url(' + go.Jmap.thumbUrl(v.photoBlobId, {w: 40, h: 40, zc: 1})  + ')"' : "background-image:none;background-color: #" + v.color;;
 								}
 							})
 						}),

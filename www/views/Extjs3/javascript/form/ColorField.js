@@ -29,7 +29,7 @@ var cf = new Ext.form.ColorField({
 
 GO.form.ColorField =  Ext.extend(function(config){
 
-	config = config || {color: [
+	config = config || {colors: [
 		'B71C1C','C62828','D32F2F','E53935','F44336','EF5350','E57373','EF9A9A','FFCDD2', // Red
 		'880E4F','AD1457','C2185B','D81B60','E91E63','EC407A','F06292','F48FB1','F8BBD0', // Pink
 		'4A148C','6A1B9A','7B1FA2','8E24AA','9C27B0','AB47BC','BA68C8','CE93D8','E1BEE7', // Purple
