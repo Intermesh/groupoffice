@@ -146,35 +146,35 @@ $grey: (
 
 // LIGHT
 $fg: (
-  base:					black,
-  divider:				rgba(black, 0.04),
-  line:					rgba(black, 0.12),
-  disabled:				rgba(black, 0.38),
-  disabled-button:	rgba(black, 0.26),
-  track:					rgba(black, 0.26),
-  disabled-text:		rgba(black, 0.38),
-  hint-text:			rgba(black, 0.38),
-  textbox-line:		rgba(black, 0.42),
-  secondary-text:		rgba(black, 0.54),
-  unfocused:			rgba(black, 0.54),
-  icon:					rgba(black, 0.54),
-  icons:					rgba(black, 0.54),
-  text:					rgba(black, 0.87)
+				base: black,
+				divider: rgba(black, 0.04),
+				line: rgba(black, 0.12),
+				disabled: rgba(black, 0.38),
+				disabled-button: rgba(black, 0.26),
+				track: rgba(black, 0.26),
+				disabled-text: rgba(black, 0.38),
+				hint-text: rgba(black, 0.38),
+				textbox-line: rgba(black, 0.42),
+				secondary-text: rgba(black, 0.54),
+				unfocused: rgba(black, 0.54),
+				icon: rgba(black, 0.54),
+				icons: rgba(black, 0.54),
+				text: rgba(black, 0.87)
 ) !default;
 $bg: (
-	status-bar: color($grey, 200),
-	app-bar:    color($grey, 100),
-	form:			color($grey, 50),
-	background: color($grey, 50), 
-	hover:      rgba(black, .04),
-	pressed:		rgba(black, .08),
-	selected:	rgba(black, .08),
-	readonly:	rgba(black, .08),
-	box:		  white,
-	tbar:       white,
-	card:       white, 
-	dialog:     color($grey, 50),
-	disabled-button:   rgba(black, 0.12)
+				status-bar: color($grey, 200),
+				app-bar: color($grey, 100),
+				form: color($grey, 50),
+				background: color($grey, 50),
+				hover: rgba(black, .04),
+				pressed: rgba(black, .08),
+				selected: rgba(black, .08),
+				readonly: rgba(black, .08),
+				box: white,
+				tbar: white,
+				card: white,
+				dialog: color($grey, 50),
+				disabled-button: rgba(black, 0.12)
 ) !default;
 
 

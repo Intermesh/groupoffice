@@ -185,11 +185,11 @@ margin:5px 2px;
 }
 
 #email-message-panel .x-panel-body {
-	background-color:white;
+	/*background-color:white;*/
 
 }
 #email-message-panel .message-body {
-	color: rgba(0,0,0,0.87);
+	/*color: rgba(0,0,0,0.87);*/
 }
 
 .email-grid-icon{

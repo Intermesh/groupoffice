@@ -325,6 +325,7 @@
 }
 
 .x-form{
+	background-color: color($bg, 'form');
 	> .x-tab-panel {
 		 > .x-tab-panel-bwrap> .x-tab-panel-body > div { // tabbed form dialog
 			background-color:color($bg, 'form');

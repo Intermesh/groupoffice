@@ -641,9 +641,8 @@ button {
 	display:inline-block;
 	padding:0;
 	background: url(#{$resourcePath}img/default-avatar.svg) no-repeat center center;
-	//@include var('background-color', 'c-primary');
-	background-color: color($fg, "divider");
-	color: white;
+	background-color:  color($grey, 600);
+	color: color($grey, 50);
 	background-size:cover;	
 	border-radius: 50%;
 	width:dp(40);
@@ -1145,7 +1144,7 @@ button.filetype-pdf, button.filetype-doc {
 			left: 0;
 			top:dp(4);
 			position: absolute;
-			color: white;	
+			//color: color($bg, 'background');
 		}
 
 		
@@ -1774,8 +1773,8 @@ table[id^="comments-ext"] b {
 
 .go-chip {
 	display: inline-block; 
-	border-radius: dp(4); 
-	background-color: $cPrimaryTp; 
+	border-radius: dp(4);
+	background-color:  $cPrimaryTp;
 	margin-right: dp(8);
 	margin-top: dp(8);
 	padding-left: dp(8);
