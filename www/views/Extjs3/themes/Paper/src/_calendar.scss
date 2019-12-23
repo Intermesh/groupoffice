@@ -98,7 +98,7 @@ $tagList: (beer, xmas, drinks, xmasparty);
 	@each $tag in $tagList {
 		&.#{$tag} {
 			@extend %tagged;
-			background-image: url('../img/calendar/#{$tag}.jpg');
+			background-image: url(#{$resourcePath}img/calendar/#{$tag}.jpg);
 		}
 	}
 }

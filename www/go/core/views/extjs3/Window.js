@@ -5,6 +5,7 @@ go.Window = Ext.extend(Ext.Window, {
 	draggable: !GO.util.isMobileOrTablet(),
 	maximized: GO.util.isMobileOrTablet(),
 	closeAction: "close",
+	border: true,
 	
 	initComponent : function(){
 		

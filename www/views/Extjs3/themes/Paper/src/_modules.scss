@@ -286,7 +286,7 @@ $app-icons: (
 	position:relative;
 	display:inline-block;
 	padding:0;
-	background: url('img/default-avatar.svg') no-repeat center center;
+	background: url(#{$resourcePath}img/default-avatar.svg) no-repeat center center;
 	background-size:cover;	
 	border-radius: 50%;
 	width:dp(40);

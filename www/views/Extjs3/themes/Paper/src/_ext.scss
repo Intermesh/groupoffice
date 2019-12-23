@@ -1150,8 +1150,8 @@
 		&-row td {
 			@extend %font-caption;
 			border-left:0;
-			border-right: 1px solid;
-			border-image: linear-gradient(to bottom, transparent, color($fg, 'line')) 1 100%;
+			border-right: 1px solid color($fg, 'line');
+			//border-image: linear-gradient(to bottom, transparent, color($fg, 'line')) 1 100%;
 			height: dp(32);
 			
 			&.x-grid3-cell-last {
@@ -1982,7 +1982,7 @@ td.x-date-mp-sep {
 // ############
 .x-menu{
 	border-radius: $borderRadius;
-	background-color:color($bg,'card');
+	background-color:color($bg,'dialog');
 	opacity: 1;
 	transition: opacity 90ms $curve-standard, transform 120ms $curve-deceleration;
 	transform-origin: left top 0px;
@@ -1999,7 +1999,7 @@ td.x-date-mp-sep {
 		opacity: 0;
 		transform: scale(0.6);
 	}
-	&-list { 
+	&-list {
 		padding: dp(8) 0; 
 		overflow-y: auto;
 		-webkit-overflow-scrolling: touch;
@@ -2196,12 +2196,12 @@ $menuScrollerSize : dp(4);
 // ##################
 .x-combo-list {
 	@extend %font-body1;
-	border: 0;
+	border: 1px solid color($fg, 'line');
 	border-radius: $borderRadius;
-	background-color: color($bg, 'card');
+	background-color: color($bg, 'dialog');
 	&-inner {
 		padding: dp(8) 0;
-		background-color:#fff;
+		//background-color:#fff;
 		h4 {
 			padding: dp(8) dp(8) dp(8) dp(24);
 		}
@@ -2218,7 +2218,7 @@ $menuScrollerSize : dp(4);
 		@extend %font-caption;
 	}
 	.x-combo-selected {
-		background-color: color($grey, 100);
+		background-color: $cSelected; //color($grey, 100);
 	}
 	.x-toolbar {
 		height: dp(40);
@@ -2348,7 +2348,7 @@ $menuScrollerSize : dp(4);
 
 .x-panel-mc {
 	@extend %font-body2;
-	background-color:white;
+	background-color: color($bg, 'box');
 }
 
 .x-panel-ghost {
@@ -2380,7 +2380,10 @@ $menuScrollerSize : dp(4);
 	background-color:color($bg,'dialog');
 	border-radius: $borderRadius;
 	overflow:hidden;
-	//border: 1px solid color($fg, 'line');
+	border: 1px solid color($fg, 'line');
+	&-noborder{
+		border: 0;
+	}
 	&-footer.x-panel-btns {
 		padding: dp(8);
 	}
