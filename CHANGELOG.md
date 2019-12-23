@@ -1,3 +1,6 @@
+23-12-2019 6.4.97
+- Core: header color override didn't work anymore
+
 23-12-2019 6.4.96
 - Files: Use template with E-mail download link
 - Comments: Composer only rendered at one item
