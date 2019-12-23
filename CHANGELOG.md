@@ -4,6 +4,7 @@
 - Core: Added new allowed groups function for authentication. You can restrict IP addresses per group from where you are allowed to login.
 - Address book: Added filter for contacts being in a group or not
 - Newsletters: Double click to open contact
+- Comments: Composer only rendered at one item
 
 19-12-2019 6.4.94
 - Core: Updated Brasilian Portugese language

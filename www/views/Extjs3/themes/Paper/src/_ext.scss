@@ -849,9 +849,9 @@
 	width: dp(8);
 }
 
-.x-btn-click .x-btn-text, .x-btn-menu-active .x-btn-text, .x-btn-pressed .x-btn-text{
-	color:#000;
-}
+//.x-btn-click .x-btn-text, .x-btn-menu-active .x-btn-text, .x-btn-pressed .x-btn-text{
+//	color:#000;
+//}
 
 .x-btn-disabled *{
 	color:color($fg, 'disabled-button') !important;
@@ -1477,7 +1477,7 @@ td.grid-hd-group-cell {
 	// border-bottom: 1px solid color($fg, 'line');
 	// border-top: 1px solid color($fg, 'line');
 	
-	border-bottom: 2px solid color($fg, 'divider');
+	border-bottom: 0;//2px solid color($fg, 'divider');
 
 	div.x-grid-group-title {
 		@extend %font-caption;

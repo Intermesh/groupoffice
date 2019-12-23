@@ -168,9 +168,9 @@ $app-icons: (
 
 .ml-unseen-dot {
 	@include var(background-color, c-primary);
-	width: dp(8);
-	height: dp(8);
-	margin: dp(4);
+	width: dp(10);
+	height: dp(10);
+	margin: dp(2);
 	border-radius: 50%;
 	float: right;
 }
