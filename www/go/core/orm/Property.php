@@ -2,12 +2,14 @@
 
 namespace go\core\orm;
 
+use DateTimeImmutable;
 use Exception;
 use go\core\App;
 use go\core\data\Model;
 use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\db\Statement;
+use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
 use go\core\fs\Blob;
 use go\core\util\DateTime;
@@ -349,10 +351,14 @@ abstract class Property extends Model {
 		return array_shift($diff);
 	}
 
-	/**
-	 * Build a key of the primary keys but omit the key from the releation because it's not needed as it's a property,
-	 * 
-	 */
+  /**
+   * Build a key of the primary keys but omit the key from the relation because it's not needed as it's a property.
+   *
+   * @param Property $v
+   * @param Relation $relation
+   * @return string
+   * @throws Exception
+   */
 	private function buildMapKey(Property $v, Relation $relation) {
 
 		$pk = $v->getPrimaryKey();
@@ -451,17 +457,16 @@ abstract class Property extends Model {
 		return self::$mapping[$cls];
 	}
 
-	/**
-	 * Get ID which is are the primary keys combined with a "-".
-	 * 
-	 * @return string eg. "1" or with multiple keys: "1-2"
-	 */
+  /**
+   * Get ID which is are the primary keys combined with a "-".
+   *
+   * @return string eg. "1" or with multiple keys: "1-2"
+   * @throws Exception
+   */
 	public function id() {		
 		$keys = $this->primaryKeyValues();
 		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
 	}
-
-	static $c;
 
   /**
    * Get all API properties
@@ -471,14 +476,10 @@ abstract class Property extends Model {
    */
 	public static function getApiProperties() {		
 		$cacheKey = 'property-getApiProperties-' . static::class;
-		
-		if(isset(self::$c[$cacheKey])) {
-			return self::$c[$cacheKey];
-		}
+
 		$props = go()->getCache()->get($cacheKey);
 		
 		if(!$props) {
-		
 			$props = parent::getApiProperties();
 
 			//add dynamic relations		
@@ -495,7 +496,6 @@ abstract class Property extends Model {
 			
 			go()->getCache()->set($cacheKey, $props);
 		}
-		self::$c[$cacheKey] = $props;
 		return $props;
 	}
 
@@ -782,7 +782,7 @@ abstract class Property extends Model {
 
   /**
    *
-   * @param MappedTable $tables
+   * @param array $tables
    * @param Query $query
    *
    * @throws Exception
@@ -1398,7 +1398,7 @@ abstract class Property extends Model {
 	/**
 	 * When the entity is saved and was new, the auto increment ID must be set to identifying relations
 	 * 
-	 * @param string $relation
+	 * @param Relation $relation
 	 * @param Property $property
 	 */
 	private function applyRelationKeys($relation, Property $property) {
@@ -1523,7 +1523,7 @@ abstract class Property extends Model {
 			}
 		} catch (PDOException $e) {
 			ErrorHandler::logException($e);
-			$uniqueKey = \go\core\db\Utils::isUniqueKeyException($e);
+			$uniqueKey = Utils::isUniqueKeyException($e);
 			
 			if ($uniqueKey) {				
 				$index = $table->getIndex($uniqueKey);
@@ -1538,16 +1538,17 @@ abstract class Property extends Model {
 				}
 				throw $e;
 			}
-		}
+		} catch (Exception $e) {
+    }
 
-		return true;
+    return true;
 	}
 
 	/**
 	 * Get's the auto increment ID after an insert query and sets the property in this model
 	 * 
 	 * @param MappedTable $table
-	 * @param type $modified
+	 * @param array $modified
 	 * @throws Exception
 	 */
 	private function handleAutoIncrement(MappedTable $table, &$modified) {
@@ -1618,17 +1619,6 @@ abstract class Property extends Model {
 
 		return true;
 	}
-	
-	// private $isDeleted = false;
-	
-	// /**
-	//  * Check if this property was just deleted.
-	//  * 
-	//  * @var bool
-	//  */
-	// public function isDeleted() {
-	// 	return $this->isDeleted;
-	// }
 
   /**
    * Parses ID into query
@@ -1638,6 +1628,7 @@ abstract class Property extends Model {
    * @param string $id
    * @return array
    * @throws InvalidArguments
+   * @throws Exception
    */
 	public static function parseId($id) {
 		$primaryTable = static::getMapping()->getPrimaryTable();
@@ -1686,6 +1677,11 @@ abstract class Property extends Model {
 		return true;
 	}
 
+  /**
+   * @param Query $query
+   * @return array
+   * @throws Exception
+   */
 	private static function getBlobsToCheckAfterDelete(Query $query) {
 		
 		$blobCols = static::getBlobColumns();
@@ -1714,7 +1710,7 @@ abstract class Property extends Model {
 		if(!$this->tableIsModified($table)) {
 			// table record will not be validated and inserted if it has no modifications at all
 			// todo: perhaps this should be configurable?
-			return true;
+			return;
 		}
 		
 		foreach ($table->getMappedColumns() as $colName => $column) {
@@ -1729,8 +1725,14 @@ abstract class Property extends Model {
 			}			
 		}
 	}
-	
-	
+
+  /**
+   * Check's if the database conditions are met.
+   *
+   * @param Column $column
+   * @param $value
+   * @return bool
+   */
 	private function validateColumn(Column $column, $value) {
 		if (!$this->validateRequired($column)) {
 			return false;
@@ -1744,13 +1746,20 @@ abstract class Property extends Model {
 		switch ($column->dbType) {
 			case 'date':
 			case 'datetime':
-				return $value instanceof DateTime || $value instanceof DateTimeImmutable;
+				return ($value instanceof DateTime) || ($value instanceof DateTimeImmutable);
 				
 			default:				
 				return $this->validateColumnString($column, $value);		
 		}
 	}
-	
+
+  /**
+   * Check's if the given value is a string and not to long
+   *
+   * @param Column $column
+   * @param $value
+   * @return bool
+   */
 	private function validateColumnString(Column $column, $value) {
 		if(!is_scalar($value) && (!is_object($value) || !method_exists($value, '__toString'))) {
 			$this->setValidationError($column->name, ErrorCode::MALFORMED, "Non scalar value given. Type: ". gettype($value));
@@ -1765,11 +1774,21 @@ abstract class Property extends Model {
 		}
 		return true;		
 	}
-	
+
+  /**
+   * @param MappedTable $table
+   * @return bool
+   */
 	private function tableIsModified(MappedTable $table) {
 		return $this->isModified(array_keys($table->getColumns()));
 	}
 
+  /**
+   * Check's if required columns are set
+   *
+   * @param Column $column
+   * @return bool
+   */
 	private function validateRequired(Column $column) {
 
 		if (!$column->required || $column->primary) {
@@ -1808,11 +1827,12 @@ abstract class Property extends Model {
 		return true;
 	}
 
-	/**
-	 * Set's validation errors on this model if there are any
-	 * 
-	 * Override this and implement custom validation
-	 */
+  /**
+   * Set's validation errors on this model if there are any
+   *
+   * Override this and implement custom validation
+   * @throws Exception
+   */
 	protected function internalValidate() {
 		foreach ($this->getMapping()->getTables() as $table) {
 			$this->validateTable($table);
@@ -1827,29 +1847,14 @@ abstract class Property extends Model {
 		return parent::toArray($properties);
 	}
 
-
-	// protected function propToArray($name) {
-
-	// 	$value = $this->getValue($name);
-
-	// 	if(is_array($value) && empty($value)) {
-	// 		$relation = $this->getMapping()->getRelation($name);
-
-	// 		if($relation && $relation->type == Relation::TYPE_MAP) {
-	// 			$value = new ArrayObject();
-	// 			$value->serializeJsonAsObject = true;
-	// 		}
-	// 	}		
-	// 	return $this->convertValue($value);
-	// }
-
-	/**
-	 * Normalizes API input for this model.
-	 * 
-	 * @param string $propName
-	 * @param mixed $value
-	 * @return mixed
-	 */
+  /**
+   * Normalizes API input for this model.
+   *
+   * @param string $propName
+   * @param mixed $value
+   * @return mixed
+   * @throws Exception
+   */
 	protected function normalizeValue($propName, $value) {
 		$relation = static::getMapping()->getRelation($propName);
 		if ($relation) {
@@ -1864,13 +1869,6 @@ abstract class Property extends Model {
 						return $this->internalNormalizeRelation($relation, $value);
 					}	
 				break;
-
-				// case Relation::TYPE_ARRAY:
-				// 	foreach($value as $key => $item) {
-				// 		$value[$key] = $this->internalNormalizeRelation($relation, $item);
-				// 	}
-				// 	return $value;
-				// break;
 
 				case Relation::TYPE_ARRAY:
 				case Relation::TYPE_MAP:
@@ -1890,7 +1888,14 @@ abstract class Property extends Model {
 
 		return $value;
 	}
-//
+
+  /**
+   * @param Relation $relation
+   * @param string $propName
+   * @param array $value
+   * @return mixed
+   * @throws Exception
+   */
 	protected function patch(Relation $relation, $propName, $value) {
 		$old = $this->$propName;
 		$this->$propName = [];
@@ -1918,16 +1923,21 @@ abstract class Property extends Model {
 					}				
 				}
 			}
-			
 		}
 
 		return $this->$propName;
 	}
 
-
+  /**
+   * Takes a map key eg. ['1-2' => ['propa' => 'foo']]
+   * and converts the key ('1-2') to a key value areay of properties.
+   *
+   * @param $id
+   * @param Relation $relation
+   * @return array
+   * @throws Exception
+   */
 	private function mapKeyToValues($id, Relation $relation) {
-
-
 		$values = explode("-", $id);
 
 		$cls = $relation->entityName;
@@ -1946,6 +1956,14 @@ abstract class Property extends Model {
 		return $id;
 	}
 
+  /**
+   * Check's API input and converts it to properties
+   *
+   * @param Relation $relation
+   * @param $value
+   * @return self|null
+   * @throws Exception
+   */
 	private function internalNormalizeRelation(Relation $relation, $value) {
 		$cls = $relation->entityName;
 		if ($value instanceof $cls) {
@@ -1957,7 +1975,8 @@ abstract class Property extends Model {
 		}
 
 		if (is_array($value)) {
-			$o = new $cls;			
+			$o = new $cls;
+			/** @var self $o */
 			$o->setValues($value);
 
 			return $o;
@@ -1976,12 +1995,13 @@ abstract class Property extends Model {
 	public function isNew() {
 		return $this->isNew;
 	}
-	
-	/**
-	 * Get the primary key value
-	 * 
-	 * @return array eg ['id' => 1]
-	 */
+
+  /**
+   * Get the primary key value
+   *
+   * @return array eg ['id' => 1]
+   * @throws Exception
+   */
 	public function primaryKeyValues() {
 		
 		$keys = $this->getPrimaryKey();
@@ -1992,15 +2012,16 @@ abstract class Property extends Model {
 		
 		return $v;
 	}
-	
-	/**
-	 * Get the primary key column names.
-	 * 
-	 * If you need the values {@see primaryKeyValues()}
-	 * 
-	 * @param boolean $withTableAlias 
-	 * @return string[]
-	 */
+
+  /**
+   * Get the primary key column names.
+   *
+   * If you need the values {@see primaryKeyValues()}
+   *
+   * @param boolean $withTableAlias
+   * @return string[]
+   * @throws Exception
+   */
 	public static function getPrimaryKey($withTableAlias = false) {
 		$tables = static::getMapping()->getTables();
 		$primaryTable = array_shift($tables);
@@ -2014,13 +2035,14 @@ abstract class Property extends Model {
 		}
 		return $keysWithAlias;
 	}
-	
-	/**
-	 * Checks if the given property or entity is equal to this
-	 * 
-	 * @param self $property
-	 * @return boolean
-	 */
+
+  /**
+   * Checks if the given property or entity is equal to this
+   *
+   * @param self $property
+   * @return boolean
+   * @throws Exception
+   */
 	public function equals($property) {
 		if(get_class($property) != get_class($this)) {
 			return false;
@@ -2041,27 +2063,29 @@ abstract class Property extends Model {
 	/**
 	 * Cuts all properties to make sure they are not longer than the database can store.
 	 * Useful when importing or syncing
+   * @throws Exception
 	 */
 	public function cutPropertiesToColumnLength() {
 		
 		$tables = self::getMapping()->getTables();
 		foreach($tables as $table) {
 			foreach ($table->getColumns() as $column) {
-				if ($column->pdoType == PDO::PARAM_STR && $column->length) {
+        if (($column->pdoType == PDO::PARAM_STR) && $column->length && isset($this->{$column->name})) {
 					$this->{$column->name} = StringUtil::cutString($this->{$column->name}, $column->length, false, null);
 				}
 			}
 		}
 	}
-	
-	/**
-	 * Copy the property.
-	 * 
-	 * The property will not be saved to the database.
-	 * The primary key values will not be copied.
-	 * 
-	 * @return \static
-	 */
+
+  /**
+   * Copy the property.
+   *
+   * The property will not be saved to the database.
+   * The primary key values will not be copied.
+   *
+   * @return $this
+   * @throws Exception
+   */
 	protected function internalCopy() {
 		$copy = new static;
 

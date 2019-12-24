@@ -4,9 +4,14 @@ namespace go\core\db;
 
 use Exception;
 use go\core\App;
+use go\core\data\ArrayableInterface;
 use go\core\db\Criteria;
+use IteratorAggregate;
+use JsonSerializable;
 use PDO;
 use ReflectionClass;
+use Traversable;
+
 /**
  * The Query class to select database records
  * 
@@ -32,7 +37,7 @@ use ReflectionClass;
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
-class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \go\core\data\ArrayableInterface {
+class Query extends Criteria implements IteratorAggregate, JsonSerializable, ArrayableInterface {
 
 	private $tableAlias;
 	private $distinct;
@@ -597,7 +602,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * Lock rows for update
 	 * 
 	 * @link https://dev.mysql.com/doc/refman/5.7/en/innodb-locking-reads.html
-	 * @param boolean $value
+	 * @param bool $value
 	 * @return $this
 	 */
 	public function forUpdate($value = true) {
@@ -609,10 +614,22 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		return $this->forUpdate;
 	}
 
+  /**
+   * Executes the query
+   *
+   * @return Statement|Traversable
+   * @throws Exception
+   */
 	public function getIterator() {
 		return $this->execute();
 	}
 
+  /**
+   * Serializes the query to JSON by executing it and fetching into an array
+   *
+   * @return array|mixed
+   * @throws Exception
+   */
 	public function jsonSerialize() {
 		return $this->toArray();
 	}
@@ -627,7 +644,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
   public function toArray($properties = null) {
 		$arr = [];
 		foreach($this->execute() as $entity) {
-			if($entity instanceof \go\core\data\ArrayableInterface) {
+			if($entity instanceof ArrayableInterface) {
 				$arr[] = $entity->toArray($properties);
 			} else
 			{

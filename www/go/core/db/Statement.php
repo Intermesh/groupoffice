@@ -60,7 +60,7 @@ class Statement extends \PDOStatement implements \JsonSerializable, ArrayableInt
 	public function __toString() {
 		try {
 			return QueryBuilder::debugBuild($this->build);
-		} catch(\Exception $e) {
+		} catch(Exception $e) {
 			ErrorHandler::logException($e);
 			return "Error: Could not convert SQL to string: " . $e->getMessage();
 		}
@@ -85,7 +85,7 @@ class Statement extends \PDOStatement implements \JsonSerializable, ArrayableInt
 			if(isset($input_parameters) && isset($this->build['params'])) {
 				$keys = array_keys($this->build['params']);
 				foreach($input_parameters as $v) {
-					$key = array_shit($keys);
+					$key = array_shift($keys);
 					$this->build[$key] = $v;
 				}
 			}
