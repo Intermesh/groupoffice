@@ -25,13 +25,14 @@ class Utils {
 		}
 	}
 
-	/**
-	 * Get's all queries from an SQL dump file in an array
-	 *
-	 * @param File $file The absolute path to the SQL file
-	 * @access public
-	 * @return array An array of SQL strings
-	 */
+  /**
+   * Get's all queries from an SQL dump file in an array
+   *
+   * @param File $file The absolute path to the SQL file
+   * @access public
+   * @return array An array of SQL strings
+   * @throws Exception
+   */
 	public static function getSqlQueries(File $file) {
 		$sql = '';
 		$queries = array();
