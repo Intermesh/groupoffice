@@ -9,6 +9,10 @@ use go\core\orm\Property;
 use go\modules\community\addressbook\install\Migrate63to64;
 
 class Script extends Controller {
+
+  /**
+   * ./cli.php community/addressbook/Script/fixMissingCompanies
+   */
   public function fixMissingCompanies() {
 
     Entity::$trackChanges = false;

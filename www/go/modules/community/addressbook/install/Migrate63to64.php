@@ -112,7 +112,8 @@ class Migrate63to64 {
 
     /*
      *
-     * INSERT INTO addressbook_contact_custom_fields
+     set sql_mode='';
+      INSERT INTO addressbook_contact_custom_fields
  (id, col_1,  col_5, col_6, col_7, col_8, col_9, col_2, col_10)
 
  SELECT
