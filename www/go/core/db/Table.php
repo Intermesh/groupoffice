@@ -94,16 +94,16 @@ class Table {
 		return 'dbColumns_' . $this->name;
 	}
 
-//	/**
-//	 * Clear the columns cache
-//	 */
-//	private function clearCache() {
-//		App::get()->getCache()->delete($this->getCacheKey());
-//		// $this->columns = null;
-//		// $this->pk = [];
-//
-//		// $this->init();
-//	}
+	/**
+	 * Clear the columns cache
+	 */
+	private function clearCache() {
+		go()->getCache()->delete($this->getCacheKey());
+		// $this->columns = null;
+		// $this->pk = [];
+
+		// $this->init();
+	}
 
   /**
    * @throws Exception
