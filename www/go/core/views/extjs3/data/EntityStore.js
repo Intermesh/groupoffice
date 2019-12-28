@@ -202,7 +202,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 	_fireChanges : function() {
 		var me = this;
-		console.warn('changes', me.entity.name, me.changes.added, me.changes.changed, me.changes.destroyed);
+		// console.warn('changes', me.entity.name, me.changes.added, me.changes.changed, me.changes.destroyed);
 		me.fireEvent('changes', me, me.changes.added, me.changes.changed, me.changes.destroyed);
 		me.initChanges();
 	},
@@ -503,6 +503,10 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 					delete me.scheduledPromises[id];					
 				}
+
+				return me.setState(response.state).then(function() {
+					return response;
+				});
 			});
 
 			me.scheduled = [];
@@ -604,6 +608,71 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				return data[i];
 			}
 		}
+	},
+
+	/**
+	 * Save an entity.
+	 *
+	 * Shortcut method for Foo/set
+	 *
+	 * @example
+	 *
+	 * go.Db.store("Note").save({name: "Test"}, 1).then(function(){});
+	 *
+	 * @param entity
+	 * @param {string} id
+	 * @returns {Promise}
+	 */
+	save : function(entity, id) {
+		var p = {}, op;
+
+		if(id) {
+			op = 'update';
+		}else
+		{
+			op = 'create';
+			id = '_new_';
+		}
+
+		p[op] = {};
+		p[op][id] = entity;
+
+		return this.set(p).then(function(response) {
+			if(op == 'create') {
+				if(response.created && id in response.created) {
+					return response.created[id];
+				} else
+				{
+					return Promise.reject(response);
+				}
+			} else
+			{
+				if(response.updated && id in response.updated) {
+					return response.updated[id];
+				} else
+				{
+					return Promise.reject(response);
+				}
+			}
+		});
+	},
+
+	/**
+	 * Destroy a single item.
+	 *
+	 * Shortcut for this.set().
+	 *
+	 * @param {int} id
+	 * @returns {Promise<object>}
+	 */
+	destroy : function(id) {
+		return this.set( {destroy: [id]}).then(function(response) {
+			if(response.destroyed.indexOf(id) == -1) {
+				return Promise.reject(response);
+			} else {
+				return true;
+			}
+		});
 	},
 
 	/**
@@ -768,9 +837,12 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 			//if received state is newer then fetch updates
 			me.getState().then(function(state){
-				if (state && response.state !== state) {
+				if(!state) {
+					me.setState(response.state);
+				} else if (response.state !== state) {
 					me.getUpdates();
 				}
+
 			});
 
 			if(cb) {

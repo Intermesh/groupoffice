@@ -23,8 +23,12 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 	initComponent: function () {
 		Ext.applyIf(this, {
 			store: new go.data.Store({
-				fields: ['id', 'name', "photoBlobId", {name: 'organizations', type: "relation"}, 'goUserId', 'phoneNumbers','addresses','emailAddresses','firstName', 'middleName', 'lastName', 'gender'],
+				fields: ['id', 'name', "photoBlobId", {name: 'organizations', type: "relation"}, 'goUserId', 'phoneNumbers','addresses','emailAddresses','firstName', 'middleName', 'lastName', 'gender', 'color'],
 				entityStore: "Contact",
+				sortInfo: {
+					field: 'firstName',
+					direction: 'ASC' 
+				},
 				baseParams: {
 					filter: {
 						addressBookId: this.addressBookId,
@@ -41,13 +45,24 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 		this.tpl = new Ext.XTemplate(
 				'<tpl for=".">',
 				'<div class="x-combo-list-item"><div class="user">\
-					 <tpl if="!photoBlobId"><div class="avatar"></div></tpl>\\n\
-					 <tpl if="photoBlobId"><div class="avatar" style="background-image:url({[go.Jmap.thumbUrl(values.photoBlobId, {w: 40, h: 40, zc: 1}) ]})"></div></tpl>\
+					 <div class="avatar" style="{[this.getStyle(values)]}">{[this.getHtml(values)]}</div>\
 					 <div class="wrap">\
-						 <div>{name}</div><small style="color:#333;">{[values.organizations ? values.organizations.column("name").join(", ") : ""]}</small>\
+						 <div>{name}</div>\
+						 <tpl if="values.emailAddresses[0]"><small>{[values.emailAddresses[0].email]}</small></tpl>\\n\
+						 <small>{[values.organizations ? values.organizations.column("name").join(", ") : ""]}</small>\
 					 </div>\
 				 </div></div>',
-				'</tpl>'
+				'</tpl>',{
+				getHtml: function (v) {
+					if(v.photoBlobId) {
+						return "";
+					}
+					return v.isOrganization  ? '<i class="icon">business</i>' : go.util.initials(v.name);
+				},
+				getStyle: function (v) {
+					return v.photoBlobId ? 'background-image: url(' + go.Jmap.thumbUrl(v.photoBlobId, {w: 40, h: 40, zc: 1})  + ')"' : "background-image:none;background-color: #" + v.color;;
+				}
+			}
 		 );
 
 		go.modules.community.addressbook.ContactCombo.superclass.initComponent.call(this);

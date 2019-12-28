@@ -3,6 +3,8 @@
 namespace go\core\orm;
 
 use Exception;
+use GO\Base\Exception\AccessDenied;
+use go\core\data\convert\JSON;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
@@ -13,26 +15,29 @@ use go\core\model\Module;
 use go\core\data\exception\NotArrayable;
 use go\core\ErrorHandler;
 use go\core\util\ClassFinder;
+use GO\Files\Model\Folder;
+use function go;
 
 /**
  * Entity model
- * 
- * Note: when changing database columns or creating new entities you need to run install/upgrade.php to 
+ *
+ * Note: when changing database columns or creating new entities you need to run install/upgrade.php to
  * rebuild the cache.
- * 
+ *
  * Note: If you want to manually register an entity from a legacy module this code can be used in upgrades.php:
- * 
+ *
  * $updates['201805011020'][] = function() {
- * 	$cf = new \go\core\util\ClassFinder();	
- * 	$cf->addNamespace("go\\modules\\community\\email");			
- * 	foreach($cf->findByParent(go\core\orm\Entity::class) as $cls) {
- * 		$cls::entityType();
- * 	}
+ *  $cf = new \go\core\util\ClassFinder();
+ *  $cf->addNamespace("go\\modules\\community\\email");
+ *  foreach($cf->findByParent(go\core\orm\Entity::class) as $cls) {
+ *    $cls::entityType();
+ *  }
  * };
- * 
- * An entity is a model that is saved to the database. An entity can have 
+ *
+ * An entity is a model that is saved to the database. An entity can have
  * multiple database tables. It can be extended with has one related tables and
  * it can also have properties in other tables.
+ *
  */
 abstract class Entity extends Property {
 	
@@ -66,38 +71,39 @@ abstract class Entity extends Property {
 	 */
 	const EVENT_FILTER = "filter";
 
-	/**
-	 * Find entities
-	 * 
-	 * Returns a query object that's also directly iterable:
-	 * 
-	 * @exanple
-	 * ````
-	 * $notes = Note::find()->where(['name' => 'Foo']);
-	 * 
-	 * foreach($notes as $note) {
-	 *	echo $note->name;	
-	 * }
-	 * 
-	 * ```
-	 * 
-	 * For a single value do:
-	 * 
-	 * @exanple
-	 * ````
-	 * $note = Note::find()->where(['name' => 'Foo'])->single();
-	 * 
-	 * ```
-	 * 
-	 * For more details see the Criteria::where() function description
-	 * 
-	 * @see Criteria::where()
-	 * @return static[]|Query
-	 */
+  /**
+   * Find entities
+   *
+   * Returns a query object that's also directly iterable:
+   *
+   * @exanple
+   * ````
+   * $notes = Note::find()->where(['name' => 'Foo']);
+   *
+   * foreach($notes as $note) {
+   *  echo $note->name;
+   * }
+   *
+   * ```
+   *
+   * For a single value do:
+   *
+   * @exanple
+   * ````
+   * $note = Note::find()->where(['name' => 'Foo'])->single();
+   *
+   * ```
+   *
+   * For more details see the Criteria::where() function description
+   *
+   * @return static[]|Query
+   * @throws Exception
+   * @see Criteria::where()
+   */
 	public static final function find(array $properties = [], $readOnly = false) {
 		
 		if(count($properties) && !isset($properties[0])) {
-			throw new \Exception("Invalid properties given to Entity::find()");
+			throw new Exception("Invalid properties given to Entity::find()");
 		}
 		return static::internalFind($properties, $readOnly);
 	}
@@ -124,22 +130,23 @@ abstract class Entity extends Property {
 
 		return static::internalFindById($id, $properties, $readOnly);
 	}
-	
-	/**
-	 * Find entities by ids.
-	 * 
-	 * @exanple
-	 * ```
-	 * $notes = Note::findByIds([1, 2, 3]);
-	 * ```
-	 * @exanple
-	 * ```
-	 * $models = ModelWithDoublePK::findByIds(["1-1", "2-1", "3-3"]);
-	 * ```
-	 * @param array $ids
-	 * @param array $properties
-	 * @throws Exception
-	 */
+
+  /**
+   * Find entities by ids.
+   *
+   * @exanple
+   * ```
+   * $notes = Note::findByIds([1, 2, 3]);
+   * ```
+   * @exanple
+   * ```
+   * $models = ModelWithDoublePK::findByIds(["1-1", "2-1", "3-3"]);
+   * ```
+   * @param array $ids
+   * @param array $properties
+   * @return Entity|\go\core\orm\Query
+   * @throws Exception
+   */
 	public static final function findByIds(array $ids, array $properties = [], $readOnly = false) {
 		$tables = static::getMapping()->getTables();
 		$primaryTable = array_shift($tables);
@@ -156,7 +163,7 @@ abstract class Entity extends Property {
 		foreach($ids as $id) {
 			$idParts = explode('-', $id);
 			if(count($idParts) != $keyCount) {
-				throw new \Exception("Given id is invalid (" . $id . ")");
+				throw new Exception("Given id is invalid (" . $id . ")");
 			}
 			for($i = 0; $i < $keyCount; $i++) {			
 				$idArr[$i][] = $idParts[$i];
@@ -186,11 +193,12 @@ abstract class Entity extends Property {
 //		return implode("-", $id);		
 //	}
 
-	/**
-	 * Save the entity
-	 * 
-	 * @return boolean
-	 */
+  /**
+   * Save the entity
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	public final function save() {	
 
 		$this->isSaving = true;
@@ -243,15 +251,16 @@ abstract class Entity extends Property {
 		}
 		return parent::internalValidate();
 	}
-	
-	/**
-	 * Saves the model and property relations to the database
-	 * 
-	 * Important: When you override this make sure you call this parent function first so
-	 * that validation takes place!
-	 * 
-	 * @return boolean
-	 */
+
+  /**
+   * Saves the model and property relations to the database
+   *
+   * Important: When you override this make sure you call this parent function first so
+   * that validation takes place!
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	protected function internalSave() {
 		if(!parent::internalSave()) {
 			App::get()->debug(static::class."::internalSave() returned false");
@@ -296,11 +305,12 @@ abstract class Entity extends Property {
 	// 	return $this->isDeleting;
 	// }
 
-	/**
-	 * Delete the entity
-	 * 
-	 * @return boolean
-	 */
+  /**
+   * Delete the entity
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	public static final function delete($query) {
 
 		$query = Query::normalize($query);
@@ -344,7 +354,10 @@ abstract class Entity extends Property {
 			throw $e;
 		}
 	}
-	
+
+  /**
+   * @inheritDoc
+   */
 	protected function commit() {
 		parent::commit();
 
@@ -354,6 +367,9 @@ abstract class Entity extends Property {
 		return App::get()->getDbConnection()->commit();
 	}
 
+  /**
+   * @inheritDoc
+   */
 	protected function rollback() {
 		App::get()->debug("Rolling back save operation for " . static::class, 1);
 		parent::rollBack();
@@ -404,7 +420,6 @@ abstract class Entity extends Property {
 	 * @return Query $query;
 	 */
 	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
-		
 		return $query;
 	}
 
@@ -421,27 +436,28 @@ abstract class Entity extends Property {
 	public static function findAcls() {
 		return null;
 	}
-	
-	/**
-	 * Finds the ACL id that holds this models permissions.
-	 * Defaults to the module permissions it belongs to.
-	 * 
-	 * @return int
-	 */
+
+  /**
+   * Finds the ACL id that holds this models permissions.
+   * Defaults to the module permissions it belongs to.
+   *
+   * @return int
+   * @throws Exception
+   */
 	public function findAclId() {
 		$moduleId = static::entityType()->getModuleId();
 		
 		return Module::findById($moduleId)->findAclId();
 	}
 
-	//private static $entityType = [];
-	
-	/**
-	 * Gets an ID from the database for this class used in database relations and 
-	 * routing short routes like "Note/get"
-	 * 
-	 * @return EntityType
-	 */
+
+  /**
+   * Gets an ID from the database for this class used in database relations and
+   * routing short routes like "Note/get"
+   *
+   * @return EntityType
+   * @throws Exception
+   */
 	public static function entityType() {		
 
 		$cls = static::class;
@@ -471,39 +487,38 @@ abstract class Entity extends Property {
   public static function getClientName() {
 		$cls = static::class;
     return substr($cls, strrpos($cls, '\\') + 1);
-  }		
-	
-	/**
-	 * Defines JMAP filters
-	 * 
-	 * This also fires the self::EVENT_FILTER event so modules can extend the
-	 * filters.
-	 * 
-	 * By default a q, modifiedsince, modiffiedbefore and excluded filter is added
-	 * 
-	 * @example
-	 * ```
-	 * protected static function defineFilters() {
-	 * 
-	 * 		return parent::defineFilters()
-	 * 										->add("addressBookId", function(Criteria $criteria, $value) {
-	 * 											$criteria->andWhere('addressBookId', '=', $value);
-	 * 										})
-	 * 										->add("groupId", function(Criteria $criteria, $value, Query $query) {
-	 * 											$query->join('addressbook_contact_group', 'g', 'g.contactId = c.id');
-	 * 
-	 * 											 $criteria->andWhere('g.groupId', '=', $value);
-	 * 										});
-	 * }
-	 * ```
-	 * 
-	 * @link https://jmap.io/spec-core.html#/query
-	 * 
-	 * @return Filters
-	 */
-	protected static function defineFilters() {
+  }
 
-		$cls = static::class;
+  /**
+   * Defines JMAP filters
+   *
+   * This also fires the self::EVENT_FILTER event so modules can extend the
+   * filters.
+   *
+   * By default a q, modifiedsince, modiffiedbefore and excluded filter is added
+   *
+   * @return Filters
+   * @throws Exception
+   * @example
+   * ```
+   * protected static function defineFilters() {
+   *
+   *    return parent::defineFilters()
+   *                    ->add("addressBookId", function(Criteria $criteria, $value) {
+   *                      $criteria->andWhere('addressBookId', '=', $value);
+   *                    })
+   *                    ->add("groupId", function(Criteria $criteria, $value, Query $query) {
+   *                      $query->join('addressbook_contact_group', 'g', 'g.contactId = c.id');
+   *
+   *                       $criteria->andWhere('g.groupId', '=', $value);
+   *                    });
+   * }
+   * ```
+   *
+   * @link https://jmap.io/spec-core.html#/query
+   *
+   */
+	protected static function defineFilters() {
 
 		$filters = new Filters();
 
@@ -597,25 +612,26 @@ abstract class Entity extends Property {
 		return $filters;
 	}
 
-	/**
-	 * Filter entities See JMAP spec for details on the $filter array.
-	 * 
-	 * By default these filters are implemented:
-	 * 
-	 * text: Will search on multiple fields defined in {@see textFilterColumns()}
-	 * exclude: Exclude this array of id's
-	 * 
-	 * modifiedsince: YYYY-MM-DD (HH:MM) modified since
-	 * 
-	 * modifiedbefore: YYYY-MM-DD (HH:MM) modified since
-	 * 
-	 * exclude: array of id's to exclude
-	 * 
-	 * @link https://jmap.io/spec-core.html#/query	 
-	 * @param Query $query
-	 * @param array $filter key value array eg. ['text' => "foo"]
-	 * @return Query
-	 */
+  /**
+   * Filter entities See JMAP spec for details on the $filter array.
+   *
+   * By default these filters are implemented:
+   *
+   * text: Will search on multiple fields defined in {@see textFilterColumns()}
+   * exclude: Exclude this array of id's
+   *
+   * modifiedsince: YYYY-MM-DD (HH:MM) modified since
+   *
+   * modifiedbefore: YYYY-MM-DD (HH:MM) modified since
+   *
+   * exclude: array of id's to exclude
+   *
+   * @link https://jmap.io/spec-core.html#/query
+   * @param Query $query
+   * @param array $filter key value array eg. ['text' => "foo"]
+   * @return Query
+   * @throws Exception
+   */
 
 	public static function filter(Query $query, Criteria $criteria, array $filter) {		
 		static::defineFilters()->apply($query, $criteria, $filter);	
@@ -630,14 +646,16 @@ abstract class Entity extends Property {
 	protected static function textFilterColumns() {
 		return [];
 	}
-	
-	/**
-	 * Applies a search expression to the given database query
-	 * 
-	 * @param Query $criteria
-	 * @param string $expression
-	 * @return Query
-	 */
+
+  /**
+   * Applies a search expression to the given database query
+   *
+   * @param Criteria $criteria
+   * @param string $expression
+   * @param Query $query
+   * @return Criteria
+   * @throws Exception
+   */
 	protected static function search(Criteria $criteria, $expression, Query $query) {
 		
 		$columns = static::textFilterColumns();
@@ -684,49 +702,42 @@ abstract class Entity extends Property {
 
 		return $criteria;
 	}
-	
-	/**
-	 * Sort entities.
-	 * 
-	 * By default you can sort on 
-	 * 
-	 * - all database columns
-	 * - All Customfields with "customField.<databasName>"
-	 * - creator Will join core_user.displayName on createdBy
-	 * - modifier Will join core_user.displayName on modifiedBy
-	 * 
-	 *  You can override this to implement custom logic.
-	 * 
-	 * @example
-	 * ```
-	 * public static function sort(Query $query, array $sort) {
-	 * 		
-	 * 		if(isset($sort['special'])) {			
-	 * 			$query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT')->orderBy(['u.displayName' => $sort['creator']]);	
-	 * 			unset($sort['special']);		
-	 * 		} 
-	 * 
-	 * 		
-	 * 		return parent::sort($query, $sort);
-	 * 		
-	 * 	}
-	 * 
-	 * ```
-	 * 
-	 * @param Query $query
-	 * @param array $sort eg. ['field' => 'ASC']
-	 * @return Query
-	 */
+
+  /**
+   * Sort entities.
+   *
+   * By default you can sort on
+   *
+   * - all database columns
+   * - All Customfields with "customField.<databasName>"
+   * - creator Will join core_user.displayName on createdBy
+   * - modifier Will join core_user.displayName on modifiedBy
+   *
+   *  You can override this to implement custom logic.
+   *
+   * @param Query $query
+   * @param array $sort eg. ['field' => 'ASC']
+   * @return Query
+   * @throws Exception
+   * @example
+   * ```
+   * public static function sort(Query $query, array $sort) {
+   *
+   *    if(isset($sort['special'])) {
+   *      $query->join('core_user', 'u', 'n.createdBy = u.id', 'LEFT')->orderBy(['u.displayName' => $sort['creator']]);
+   *      unset($sort['special']);
+   *    }
+   *
+   *
+   *    return parent::sort($query, $sort);
+   *
+   *  }
+   *
+   * ```
+   *
+   */
 	public static function sort(Query $query, array $sort) {	
 		
-		//filter by columns
-//		$query->orderBy(array_filter($sort, function($key) {
-//				return static::getMapping()->getColumn($key) !== false;
-//			}, ARRAY_FILTER_USE_KEY)
-//							, true
-//		);
-		
-		//
 
 		if(isset($sort['modifier'])) {
 			$query->join('core_user', 'modifier', 'modifier.id = '.$query->getTableAlias() . '.modifiedBy');
@@ -781,21 +792,22 @@ abstract class Entity extends Property {
 	 */
 	public static function converters() {
 		return [
-				'application/json' => \go\core\data\convert\JSON::class			
+				'application/json' => JSON::class
 		];
 	}
 
-	/**
-	 * Convert this entity to template models for parsing.
-	 * 
-	 * This will be used for @see TemplateParser::addModel()
-	 * 
-	 * By default it will provide itself with the entityType->getName() in lowerCamelCase.
-	 * 
-	 * for example ['contact' => Contact $this];
-	 * 
-	 * @return array
-	 */
+  /**
+   * Convert this entity to template models for parsing.
+   *
+   * This will be used for @return array
+   * @throws Exception
+   * @see TemplateParser::addModel()
+   *
+   * By default it will provide itself with the entityType->getName() in lowerCamelCase.
+   *
+   * for example ['contact' => Contact $this];
+   *
+   */
 	public function toTemplate() {
 		// return [lcfirst(self::entityType()->getName()) => $this];
 
@@ -811,14 +823,9 @@ abstract class Entity extends Property {
 			if($propName == 'customFields') {
 				$arr['customFields'] = $this->getCustomFields(true);
 			} else{
-				try {
-					$value = $this->getValue($propName);
-					$arr[$propName] = method_exists($value, 'toTemplate') ? $value->toTemplate() : $value;
-				} catch (NotArrayable $e) {
-					
-					App::get()->debug("Skipped prop " . static::class . "::" . $propName . " because type '" . gettype($value) . "' not scalar or ArrayConvertable.");
-				}
-			}			
+        $value = $this->getValue($propName);
+        $arr[$propName] = method_exists($value, 'toTemplate') ? $value->toTemplate() : $value;
+			}
 		}
 		
 		return $arr;
@@ -826,6 +833,8 @@ abstract class Entity extends Property {
 
 	/**
 	 * Check database integrity
+   *
+   * @throws
 	 */
 	public static function check() {
 		echo "Checking ".static::class."\n";
@@ -845,11 +854,17 @@ abstract class Entity extends Property {
 		echo "Done\n";
 	}
 
-
+  /**
+   * Merge this entity with another
+   *
+   * @param Entity $entity
+   * @return bool
+   * @throws Exception
+   */
 	public function merge(self $entity) {
 
 		if($this->equals($entity)) {
-			throw new \Exception("Can't merge with myself!");
+			throw new Exception("Can't merge with myself!");
 		}
 
 		//copy public and protected columns except for auto increments.
@@ -880,7 +895,7 @@ abstract class Entity extends Property {
 		go()->getDbConnection()->beginTransaction();
 
 		//move links
-		if(!\go()->getDbConnection()
+		if(!go()->getDbConnection()
 						->updateIgnore('core_link', 
 										['fromId' => $this->id],
 										['fromEntityTypeId' => static::entityType()->getId(), 'fromId' => $entity->id]
@@ -889,7 +904,7 @@ abstract class Entity extends Property {
 			return false;
 		}
 		
-		if(!\go()->getDbConnection()
+		if(!go()->getDbConnection()
 						->updateIgnore('core_link', 
 										['toId' => $this->id],
 										['toEntityTypeId' => static::entityType()->getId(), 'toId' => $entity->id]
@@ -901,7 +916,7 @@ abstract class Entity extends Property {
 		//move comments
 
 		if(Module::isInstalled('community', 'comments')) {
-			if(!\go()->getDbConnection()
+			if(!go()->getDbConnection()
 						->update('comments_comment', 
 										['entityId' => $this->id],
 										['entityTypeId' => static::entityType()->getId(), 'entityId' => $entity->id]
@@ -930,20 +945,27 @@ abstract class Entity extends Property {
 		return go()->getDbConnection()->commit();
 	}
 
-
+  /**
+   * @param Entity $entity
+   * @throws AccessDenied
+   */
 	private function mergeFiles(self $entity) {
 		if(!Module::isInstalled('legacy', 'files') && $entity->getMapping()->getColumn('filesFolderId')) {
 			return;
 		}
-		$sourceFolder = \GO\Files\Model\Folder::model()->findByPk($entity->filesFolderId);
+		$sourceFolder = Folder::model()->findByPk($entity->filesFolderId);
 		if (!$sourceFolder) {
 			return;
 		}
-		$folder = \GO\Files\Model\Folder::model()->findForEntity($entity);
+		$folder = Folder::model()->findForEntity($entity);
 	
 		$folder->moveContentsFrom($sourceFolder);		
 	}
 
+  /**
+   * @param Entity $entity
+   * @throws Exception
+   */
 	private function mergeRelated(Entity $entity) {
 
 		$refs = static::getTableReferences();
@@ -965,9 +987,11 @@ abstract class Entity extends Property {
 	}
 
 
-	/**
-	 * @return array [['column'=>'contactId', 'table'=>'foo']]
-	 */
+  /**
+   * Find's all tables that reference this items primary changesdt
+   * @return array [['column'=>'contactId', 'table'=>'foo']]
+   * @throws Exception
+   */
 	protected static function getTableReferences() {
 		$cacheKey = "refs-table-" . static::class;;
 		$refs = go()->getCache()->get($cacheKey);
@@ -998,7 +1022,5 @@ abstract class Entity extends Property {
 
 		return $refs;
 	}
-
-
 	
 }

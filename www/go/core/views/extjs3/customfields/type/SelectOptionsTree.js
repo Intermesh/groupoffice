@@ -5,15 +5,15 @@ go.customfields.type.SelectOptionsTree = function(config){
 	config = config || {};
 
 	Ext.apply(config, {
-		animate:true,
-		autoHeight: true,
-		disapled:true,
+		animate:false,
 		enableDrag:true,
-		containerScroll: true,
-		border: true
+		autoScroll: true
 	});
 
 	config.tbar=[{
+		xtype: "tbtitle",
+		text: t("Options"),
+	}, '->',{
 		iconCls: 'ic-add',
 		handler:function(){
 			var node = this.selModel.getSelectedNode();
@@ -34,7 +34,7 @@ go.customfields.type.SelectOptionsTree = function(config){
 			this.treeEditor.triggerEdit(newNode);
 		},
 		scope:this
-	},'-',
+	},
 	{
 		iconCls: 'ic-delete',
 		handler:function(){

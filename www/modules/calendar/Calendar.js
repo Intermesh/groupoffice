@@ -370,7 +370,6 @@ GO.calendar.MainPanel = function(config){
 	}, this);
 
 	this.calendarListPanel = new Ext.Panel({
-		border:true,
 		region:'center',
 		layoutConfig:{hideCollapseTool:true},
 		layout:'accordion',
@@ -540,7 +539,6 @@ GO.calendar.MainPanel = function(config){
 		autoScroll:false,
 		layout: 'card',
 		activeItem: 0,
-		border: true,
 		split: true,
 		cls: 'cal-display-panel',
 		items: [this.daysGrid, this.monthGrid, this.viewGrid, this.listGrid]
@@ -764,7 +762,7 @@ GO.calendar.MainPanel = function(config){
 		},this.periodInfoPanel = new Ext.Panel({
 			html: '',
 			plain:true,
-			border:true,
+			border:false,
 			cls:'cal-period'
 		}),{
 			iconCls: 'ic-keyboard-arrow-right',

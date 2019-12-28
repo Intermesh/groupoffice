@@ -123,6 +123,7 @@ systemsettings/AppearancePanel.js
 systemsettings/NotificationsPanel.js
 systemsettings/AuthenticationPanel.js
 systemsettings/Dialog.js
+systemsettings/AuthAllowGroupGrid.js
 
 Wizard.js
 Array.js
@@ -170,6 +171,7 @@ users/SelectDialogPanel.js
 customfields/FormFieldSet.js
 customfields/FieldDialog.js
 customfields/CustomFields.js
+customfields/DetailPanel.js
 customfields/EntityPanel.js
 customfields/EntityDialog.js
 customfields/SystemSettingsPanel.js

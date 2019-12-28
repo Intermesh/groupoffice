@@ -98,13 +98,16 @@ class Table {
 	 * Clear the columns cache
 	 */
 	private function clearCache() {
-		App::get()->getCache()->delete($this->getCacheKey());
+		go()->getCache()->delete($this->getCacheKey());
 		// $this->columns = null;
 		// $this->pk = [];
-		
+
 		// $this->init();
 	}
 
+  /**
+   * @throws Exception
+   */
 	private function init() {
 		
 		if (isset($this->columns)) {
@@ -156,8 +159,6 @@ class Table {
 			throw new \Exception("The name '$fieldName' is reserved. Please choose another column name.");
 		}
 	}
-	
-	
 
 	private function createColumn($field) {
 		

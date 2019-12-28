@@ -14,7 +14,7 @@ abstract class State {
 	/**
 	 * Get the logged in user
 	 * 
-	 * @return model\User|null
+	 * @return go\core\model\User|null
 	 */
 	abstract function getUser();
 	

@@ -52,17 +52,21 @@ $lang = GO::language()->getLanguage(); ?>
 	?>
 	<style>
         <?php
-        if(go()->getSettings()->primaryColor) {
-            ?>
+        if(GO::view()->getTheme()->getName() == 'Paper') {
+            if(go()->getSettings()->primaryColor) {
+                ?>
             :root {
                 --c-primary: <?= '#'.go()->getSettings()->primaryColor; ?> !important;
+                --c-header-bg: <?= '#'.go()->getSettings()->primaryColor; ?> !important;
                 --c-primary-tp: <?= go()->getSettings()->getPrimaryColorTransparent(); ?> !important;
             }
-        <?php
-        }
-        if(go()->getSettings()->logoId) {
-            //blob id is not used by script but added only for caching.
-            echo ".go-app-logo, #go-logo {background-image: url(" . go()->getSettings()->URL . "api/page.php?blob=" . go()->getSettings()->logoId . ") !important}";
+
+            <?php
+            }
+            if(go()->getSettings()->logoId) {
+                //blob id is not used by script but added only for caching.
+                echo ".go-app-logo, #go-logo {background-image: url(" . go()->getSettings()->URL . "api/page.php?blob=" . go()->getSettings()->logoId . ") !important}";
+            }
         }
         ?>
 	</style>

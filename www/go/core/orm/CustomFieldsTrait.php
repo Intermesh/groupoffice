@@ -1,6 +1,7 @@
 <?php
 namespace go\core\orm;
 
+use Exception;
 use go\core\App;
 use go\core\db\Query;
 use go\core\db\Table;
@@ -8,6 +9,7 @@ use go\core\db\Utils;
 use go\core\validate\ErrorCode;
 use go\core\model\Field;
 use PDOException;
+use go\core\util\JSON;
 
 /**
  * Entities can use this trait to enable a customFields property that can be 
@@ -24,12 +26,14 @@ trait CustomFieldsTrait {
 	private $customFieldsData;
 	private $customFieldsModified = false;
 	private $customFieldsIsNew;
-	
-	/**
-	 * Get all custom fields data for an entity
-	 * 
-	 * @return array
-	 */
+
+  /**
+   * Get all custom fields data for an entity
+   *
+   * @param bool $asText Returns all values printable as text. Useful for templates and exports.
+   * @return array
+   * @throws Exception
+   */
 	public function getCustomFields($asText = false) {
 		$fn = $asText ? 'dbToText' : 'dbToApi';
 		$record = $this->internalGetCustomFields();
@@ -44,6 +48,10 @@ trait CustomFieldsTrait {
 
 	private static $preparedCustomFieldStmt = [];
 
+  /**
+   * @return array
+   * @throws Exception
+   */
 	protected function internalGetCustomFields() {
 		if(!isset($this->customFieldsData)) {
 
@@ -84,24 +92,27 @@ trait CustomFieldsTrait {
 		
 		return $this->customFieldsData;//array_filter($this->customFieldsData, function($key) {return $key != 'id';}, ARRAY_FILTER_USE_KEY);
 	}
-
-
-	
-	//for legacy modules
+  /**
+   * Setter for legacy modules
+   *
+   * @param $json
+   * @throws Exception
+   */
 	public function setCustomFieldsJSON($json) {
-		$data = json_decode($json, true);
+		$data = JSON::decode($json, true);
 		$this->setCustomFields($data);
 	}
-	
-	/**
-	 * Set custom field data
-	 * 
-	 * The data array may hold partial data. It will be merged into the existing
-	 * data.
-	 * 
-	 * @param array $data
-	 * @return $this
-	 */
+
+  /**
+   * Set custom field data
+   *
+   * The data array may hold partial data. It will be merged into the existing
+   * data.
+   *
+   * @param array $data
+   * @return $this
+   * @throws Exception
+   */
 	public function setCustomFields(array $data, $asText = false) {			
 		$this->customFieldsData = array_merge($this->internalGetCustomFields(), $this->normalizeCustomFieldsInput($data, $asText));		
 		
@@ -109,14 +120,15 @@ trait CustomFieldsTrait {
 
 		return $this;
 	}
-	
-	/**
-	 * Set a custom field value
-	 * 
-	 * @param string $name
-	 * @param mixed $value
-	 * @return $this
-	 */
+
+  /**
+   * Set a custom field value
+   *
+   * @param string $name
+   * @param mixed $value
+   * @return $this
+   * @throws Exception
+   */
 	public function setCustomField($name, $value, $asText = false) {
 		return $this->setCustomFields([$name => $value], $asText);
 	}
@@ -131,12 +143,13 @@ trait CustomFieldsTrait {
 	protected function isCustomFieldsModified() {
 		return $this->customFieldsModified;
 	}
-	
-	/**
-	 * Get all custom fields for this entity
-	 * 
-	 * @return Field
-	 */
+
+  /**
+   * Get all custom fields for this entity
+   *
+   * @return Field[]
+   * @throws Exception
+   */
 	public static function getCustomFieldModels() {
 		$cacheKey = 'custom-field-models-' . static::customFieldsEntityType()->getId();
 	 	$m = go()->getCache()->get($cacheKey);
@@ -150,8 +163,15 @@ trait CustomFieldsTrait {
 		
 		return $m;
 	}
-	
-	
+
+  /**
+   * Converts user input to database formats.
+   *
+   * @param $data
+   * @param bool $asText
+   * @return mixed
+   * @throws Exception
+   */
 	private function normalizeCustomFieldsInput($data, $asText = false) {
 		$columns = Table::getInstance(static::customFieldsTableName())->getColumns();		
 		foreach($columns as $name => $column) {
@@ -171,6 +191,10 @@ trait CustomFieldsTrait {
 		return $data;
 	}
 
+  /**
+   * @return bool
+   * @throws Exception
+   */
 	protected function validateCustomFields() {
 		if(!$this->customFieldsModified) {
 			return true;
@@ -182,13 +206,14 @@ trait CustomFieldsTrait {
 		}
 		return true;
 	}
-	
-	/**
-	 * Saves custom fields to the database. Is called by Entity::internalSave()
-	 * 
-	 * @return boolean
-	 * @throws PDOException
-	 */
+
+  /**
+   * Saves custom fields to the database. Is called by Entity::internalSave()
+   *
+   * @return boolean
+   * @throws PDOException
+   * @throws Exception
+   */
 	protected function saveCustomFields() {
 		if(!$this->customFieldsModified) {
 			return true;
@@ -247,11 +272,12 @@ trait CustomFieldsTrait {
 
 	private static $customFieldsTableName;
 
-	/**
-	 * Get table name for custom fields data
-	 * 
-	 * @return string
-	 */
+  /**
+   * Get table name for custom fields data
+   *
+   * @return string
+   * @throws Exception
+   */
 	public static function customFieldsTableName() {
 
 		if(isset(self::$customFieldsTableName)) {
@@ -292,12 +318,13 @@ trait CustomFieldsTrait {
 	public static function customFieldsEntityType() {
 		return static::entityType();
 	}
-	
-	/**
-	 * Defines filters for all custom fields
-	 * 
-	 * @param \go\core\orm\Filters $filters
-	 */
+
+  /**
+   * Defines filters for all custom fields
+   *
+   * @param Filters $filters
+   * @throws Exception
+   */
 	protected static function defineCustomFieldFilters(Filters $filters) {
 		
 		$fields = static::getCustomFieldModels();		

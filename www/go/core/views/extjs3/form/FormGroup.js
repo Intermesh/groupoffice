@@ -33,7 +33,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	hideLabel: true,		
 	
 	addButtonText: null, // deprecated, use btnCfg
-	btnCfg: {}, // @type Ext.Button
+	btnCfg: null, // @type Ext.Button
 	editable: true, // show delete and add buttons when true
 	layout: "form",
 	// @string name of property, when set getValue will build an object map with this property as key
@@ -58,12 +58,17 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		
 		if(!this.itemCfg.xtype) {
 			this.itemCfg.xtype = "formcontainer";
-		}		
+		}
+
+		this.btnCfg = this.btnCfg || {};
+
 		if(this.editable) {
 			this.initBbar();
 		}
 		
 		go.form.FormGroup.superclass.initComponent.call(this);
+
+
 		
 		this.on("add",function(e) {			
 			//to prevent adding to Ext.form.BasicForm with add event.

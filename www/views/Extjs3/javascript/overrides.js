@@ -977,6 +977,7 @@ Ext.override(Ext.DatePicker, {
 });
 
 Ext.override(Ext.Panel, {
+	border: false,
 	panelInitComponent : Ext.Panel.prototype.initComponent,
 	
 	initComponent : function() {

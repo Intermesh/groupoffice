@@ -798,6 +798,7 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'An e-mail with instructions has been sent to your e-mail address.' => 'Een e-mail met instructies is naar uw e-mail adres verzonden.',
   'Please enter a new password' => 'Voer een nieuw wachtwoord in a.u.b.',
   'Lost password' => 'Wachtwoord vergeten',
+  'You\'re not allowed to create more than x users' => 'Het is niet toegestaan meer gebruikers dan het maximale aan te maken.',
   'countries' => 
   array (
     'AL' => 'Albanië',

@@ -8,6 +8,7 @@ use GO\Files\Model\File;
 use go\core\fs\Blob;
 use go\core\fs\File as GoFile;
 use go\core\fs\Folder;
+use GO\Email\Controller\MessageController;
 
 class FileController extends \GO\Base\Controller\AbstractModelController {
 
@@ -459,6 +460,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		$html=$params['content_type']=='html';
 		$bodyindex = $html ? 'htmlbody' : 'plainbody';
 		$lb = $html ? '<br />' : "\n";
+
 		$text = $html ? \GO::t("Click on the link to download the file", "files") : \GO::t("Click the secured link below or copy it to your browser's address bar to download the file.", "files");
 
 		$linktext = $html ? "<ul>" : $lb;
@@ -470,9 +472,13 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		$linktext .= $html ? "</ul>" : "\n";
 		$text .= ' ('.\GO::t("possible until", "files").' '.\GO\Base\Util\Date::get_timestamp(\GO\Base\Util\Date::date_add($file->expire_time,-1), false).')'.$lb;
 		$text .= $linktext;
-		
-		
-		$response['data'][$bodyindex]=$text;
+
+		$params['body']= $text;
+
+    $msgController = new MessageController();
+    $response = $msgController->loadTemplate($params);
+
+//		$response['data'][$bodyindex]=$text;
 				
 		$response['data']['subject'] = \GO::t("Download link", "files"); //.' '.$file->name;
 		$response['success']=true;

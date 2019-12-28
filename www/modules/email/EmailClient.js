@@ -718,7 +718,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		region:'center',
 		autoScroll:true,
 		titlebar: false,
-		border:true,
 		attachmentContextMenu: new GO.email.AttachmentContextMenu()
 	});
 	
@@ -813,6 +812,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			this.messagesGrid.store.baseParams['search'] = sender;
 			GO.email.messagesGrid.store.baseParams['unread']=0;
 			this.messagesGrid.setSearchFields('from', sender);
+
+			this.messagesGrid.searchField.search();
 
 			this.messagesGrid.store.load({
 				params:{

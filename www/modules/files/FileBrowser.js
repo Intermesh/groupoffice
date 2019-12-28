@@ -199,10 +199,11 @@ GO.files.FileBrowser = function(config){
 			hidden:true,
 			width:100
 		},{
+			xtype: "datecolumn",
 			id:'mtime',
 			header:t("Modified at"),
-			dataIndex: 'mtime',
-			width: dp(140)
+			dataIndex: 'mtime'
+			// width: dp(200)
 		}, {
 			id: 'id',
 			header: 'ID',
@@ -2138,7 +2139,6 @@ GO.files.openFolder = function(id, folder_id)
 			height:dp(800),
 			width:dp(1200),
 			layout:'fit',
-			border:false,
 			maximizable:!GO.util.isMobileOrTablet(),
 			collapsible:!GO.util.isMobileOrTablet(),
 			closeAction:'hide',

@@ -108,7 +108,7 @@ border-collapse:collapse;
 	/*font:normal 10px "Lucida Sans Unicode","Lucida Grande","Mukti Narrow", sans-serif;*/
 	font:normal 11px tahoma,arial,helvetica,sans-serif;
 	padding:6px;
-	background-color:white;
+	background-color: transparent;
 	position:relative;
 	/*border-bottom:1px solid #c3daf9;*/
 		
@@ -153,7 +153,7 @@ border-collapse:collapse;
 #viewList {
 	font:normal 11px arial, tahoma, helvetica, sans-serif;
 	padding:6px;
-	background-color:white;
+	background-color: transparent;
 	position:relative;
 }
 
@@ -194,7 +194,7 @@ border-collapse:collapse;
 #resourceList {
 	font:normal 11px arial, tahoma, helvetica, sans-serif;
 	padding:6px;
-	background-color:white;
+	background-color: transparent;
 	position:relative;
 }
 
@@ -233,7 +233,7 @@ border-collapse:collapse;
 }
 
 .x-calGrid-panel .x-panel-body{
-background-color: #F1F1F1 !important;
+/*background-color: #F1F1F1 !important;*/
 }
 .x-calGrid-table-wrapper{
 	position:relative;
@@ -257,28 +257,28 @@ background-color: #F1F1F1 !important;
 	border-top:1px solid transparent;
 	border-right:2px solid rgba(0,0,0, 0.04);
 	height:20px;
-	background-color:#fff;
+	background-color: transparent;
 }
 
 .x-calGrid-hourRow{
 	border-top:1px solid rgba(0,0,0, 0.12);
 	border-right:2px solid rgba(0,0,0, 0.04);
-	background-color:#fff;
+	background-color: transparent;
 }
 
 .x-calGrid-halfhourRow{
 	border-top:1px solid transparent;
 	border-right:2px solid rgba(0,0,0, 0.04);
 	height:20px;
-	background-color:#fff;
+	background-color: transparent;
 }
 
 .x-calGrid-timeHead{
-	background-color:#fff;
+	background-color: transparent;
 	width:39px !important;
 	height:20px;
-	border-top:1px solid #DDDDDD;
-	border-right:1px solid #DDDDDD;
+	border-top:1px solid rgba(0,0,0, 0.04);
+	border-right:1px solid rgba(0,0,0, 0.04);
 	text-align:right;
 }
 /*.x-calGrid-today{
@@ -340,7 +340,7 @@ background-color: #F1F1F1 !important;
 }
 
 .x-calGrid-headings-table {
-	background-color: white;
+	background-color: transparent;
 	border-collapse:collapse;
 	table-layout:fixed;
 	border-bottom:1px solid rgba(0,0,0, 0.12);	
@@ -350,7 +350,7 @@ background-color: #F1F1F1 !important;
 	font-size: 11px;
 	vertical-align:middle;
 	text-align:center;	
-	color:rgba(0,0,0, 0.87);	
+	/*color:rgba(0,0,0, 0.87);	*/
 	line-height:22px;
 	margin:1px;
 }
@@ -365,7 +365,7 @@ background-color: #F1F1F1 !important;
 .x-calGrid-all-day-table {
 	border-collapse:collapse;
 	table-layout:fixed;
-	background-color: white;
+	background-color: transparent;
 	border-bottom:3px solid rgba(0,0,0, 0.12);	
 }
 
@@ -420,11 +420,12 @@ background-color: #F1F1F1 !important;
 	padding:4px;
 	margin-left: 4px;
 }
+
 .x-monthGrid-cell-current, .x-monthGrid-cell-today{
-	background-color: white;
+	background-color: transparent;
 }
 .x-monthGrid-cell-weekend{
-	background-color: #eee;
+	background-color: rgba(0,0,0, 0.04);
 }
 
 .x-monthGrid-cell-today .x-monthGrid-cell-day-text{
@@ -434,7 +435,6 @@ background-color: #F1F1F1 !important;
 }
 
 a.x-monthGrid-cell-day-text:link, a.x-monthGrid-cell-day-text:visited,a.x-monthGrid-cell-day-text:active{
-	color:black;	
 	font-size: 10px;
 	text-decoration: none;
 }
@@ -447,6 +447,7 @@ a.x-monthGrid-cell-day-text:hover{
 	cursor:pointer;
 	margin:0 4px 1px 0;
 	background-color:rgba(23,126,163,.16);
+	color: #000;
 	overflow: hidden;
 	padding-left:8px;
 	position:relative;
