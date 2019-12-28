@@ -668,3 +668,6 @@ $updates['201912190000'][] = "ALTER TABLE `core_auth_allow_group`
 
 $updates['201912190000'][] = "ALTER TABLE `core_auth_allow_group`
   ADD CONSTRAINT `core_auth_allow_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;";
+
+$updates['201912290000'][] = "ALTER TABLE `core_customfields_field` 
+  ADD `conditionallyHidden` tinyint(1) NOT NULL DEFAULT '0' AFTER `requiredCondition`";
