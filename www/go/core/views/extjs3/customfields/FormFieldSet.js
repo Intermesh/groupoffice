@@ -80,8 +80,54 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 					}
 				}, this);
 			}
-			
-			
+
+			/**
+			 * Related fields
+			 */
+			var masterFields = [];
+			this.items.each(function(field) {
+				if (field.conditionallyHidden) {
+					let linkedField = go.customfields.type.Text.prototype.getRequiredConditionField.call(field, field);
+					if (linkedField) {
+						linkedField.relatedFields = linkedField.relatedFields || [];
+						linkedField.relatedFields.push(field);
+						masterFields.push(linkedField);
+					}
+				}
+			}, this);
+
+			Ext.each(masterFields, function(masterField) {
+				masterField.on('select', function (field) {
+					Ext.each(field.relatedFields, function(relatedField) {
+						relatedField.validate();
+						if (relatedField.allowBlank) {
+							relatedField.hide();
+							relatedField.ownerCt.doLayout();
+							return true;
+						}
+
+						relatedField.show();
+						relatedField.ownerCt.doLayout();
+						return true;
+					});
+				});
+
+				masterField.on('check', function (field) {
+					Ext.each(field.relatedFields, function(relatedField) {
+						relatedField.validate();
+						if (relatedField.allowBlank) {
+							relatedField.hide();
+							relatedField.ownerCt.doLayout();
+							return true;
+						}
+
+						relatedField.show();
+						relatedField.ownerCt.doLayout();
+						return true;
+					});
+				});
+			}, this);
+
 		}, this);
 
 		go.customfields.FormFieldSet.superclass.initComponent.call(this);

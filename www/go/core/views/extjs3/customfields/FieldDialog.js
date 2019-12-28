@@ -68,6 +68,22 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 						name: "requiredCondition",
 						fieldLabel: t("Required condition"),
 						anchor: "100%"
+					},
+					{
+						xtype: "checkbox",
+						name: "conditionallyHidden",
+						boxLabel: t("Conditionally hidden field"),
+						hideLabel: true,
+						listeners: {
+							check: function(cb, value) {
+								let requiredField = this.formPanel.getForm().findField('required');
+								if (value) {
+									requiredField.setValue(false);
+								}
+								requiredField.setDisabled(value);
+							},
+							scope: this
+						}
 					}
 				]
 			}

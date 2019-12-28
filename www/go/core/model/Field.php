@@ -60,6 +60,8 @@ class Field extends AclItemEntity {
 	public $required;
 
 	public $requiredCondition;
+
+	public $conditionallyHidden;
 	
 	/**
 	 * Hint text to display in the form
@@ -182,13 +184,13 @@ class Field extends AclItemEntity {
 		$o[$name] = $value;
 		$this->setOptions($o);
 	}
-
-  /**
-   * Get default value for the column
-   *
-   * @return mixed
+	
+	/**
+	 * Get default value for the column
+	 * 
+	 * @return mixed
    * @throws Exception
-   */
+	 */	
 	public function getDefault() {
 		if($this->defaultModified || $this->isNew()) {
 			return $this->default;
@@ -208,7 +210,7 @@ class Field extends AclItemEntity {
 		$this->default = $v;
 		$this->defaultModified = true;
 	}
-
+	
   /**
    * Check's if the column has a unique index
    *
@@ -249,7 +251,7 @@ class Field extends AclItemEntity {
 		}		
 		return $this->dataType;
 	}
-
+	
   /**
    * Used by the API to set values on the datatype
    *
@@ -304,12 +306,12 @@ class Field extends AclItemEntity {
 		return parent::internalDelete($query);
 }
 
-  /**
-   * Get the table name this field is stored in.
-   *
+	/**
+	 * Get the table name this field is stored in.
+	 * 
    * @return string
    * @throws Exception
-   */
+	 */
 	public function tableName() {
 		$fieldSet = FieldSet::findById($this->fieldSetId);
 		$entityName = $fieldSet->getEntity();
@@ -327,14 +329,14 @@ class Field extends AclItemEntity {
 							$criteria->andWhere(['fieldSetId' => $value]);
 						});
 	}
-
-  /**
-   * Find all fields for an entity
-   *
-   * @param int|string $entityTypeId
-   * @return Query
+	
+	/**
+	 * Find all fields for an entity
+	 * 
+	 * @param int|string $entityTypeId
+	 * @return Query
    * @throws Exception
-   */
+	 */
 	public static function findByEntity($entityTypeId) {
 		if(!is_numeric($entityTypeId)) {
 			$entityTypeId = EntityType::findByName($entityTypeId)->getId();
@@ -343,19 +345,19 @@ class Field extends AclItemEntity {
 	}
 
 
-  /**
-   * Find or create custom field
-   *
-   * @param string $entity eg. "User"
-   * @param string $fieldSetName eg. "Forum"
-   * @param string $databaseName eg. "numberOfPosts"
-   * @param string $name eg "Number of posts"
-   * @param string $type Type of custom field eg. Type
-   * @param array $values extra values to set on the field.
-   *
-   * @return static
+	/**
+	 * Find or create custom field
+	 * 
+	 * @param string $entity eg. "User"
+	 * @param string $fieldSetName eg. "Forum"
+	 * @param string $databaseName eg. "numberOfPosts"
+	 * @param string $name eg "Number of posts"
+	 * @param string $type Type of custom field eg. Type
+	 * @param array $values extra values to set on the field.
+	 * 
+	 * @return static
    * @throws Exception
-   */
+	 */
 	public static function create($entity, $fieldSetName, $databaseName, $name, $type = 'Text', $values = []) {
 		$field = Field::findByEntity($entity)->where(['databaseName' => $databaseName])->single();
 
