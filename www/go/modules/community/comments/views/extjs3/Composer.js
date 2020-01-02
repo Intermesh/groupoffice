@@ -3,6 +3,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 	entityStore: "Comment",
 	layout: 'border',
 	cls:'go-form new-message',
+	autoScroll: false,
 
 	initComponent : function() {
 		
@@ -61,10 +62,11 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			tooltip: t('Send'),
 			iconCls: 'ic-send',
 			handler: function(){ 
-				this.submit(); 
-				this.textField.syncValue();
+				this.submit();
+				this.textfield.reset();
 				this.chips.reset();
-				this.loadLabels();
+				// this.loadLabels();
+				this.textfield.syncValue();
 			},
 			scope: this
 		});
@@ -115,7 +117,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		composer = this;
 		body.style.height = 'auto';
 		body.style.display = 'inline-block';
-		body.style.width = '100%';
+		//body.style.width = '100%';
 		body.style.minHeight = '17px';
 		body.style.margin = '8px';
 		
