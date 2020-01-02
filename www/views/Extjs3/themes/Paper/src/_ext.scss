@@ -2382,7 +2382,7 @@ $menuScrollerSize : dp(4);
 	border-radius: $borderRadius;
 	overflow:hidden;
 	border: 1px solid color($fg, 'line');
-	&-noborder{
+	&-noborder, &-maximized{
 		border: 0;
 	}
 	&-footer.x-panel-btns {

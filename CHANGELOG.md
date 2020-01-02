@@ -1,3 +1,4 @@
+- Assistant / files: Assistant host could be wrong when using proxy on the server
 - Billing: report timezone bug showing wrong results in year overview.
 - Email: White background in dark theme for mail
 - Email: Fixed count() error when searching
