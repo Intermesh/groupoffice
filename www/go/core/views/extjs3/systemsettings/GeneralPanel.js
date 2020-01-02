@@ -7,7 +7,7 @@ go.systemsettings.GeneralPanel = Ext.extend(go.systemsettings.Panel, {
 			items: [{
 					xtype: "fieldset",
 					defaults: {
-						width: dp(240)
+						width: dp(360)
 					},
 					items: [
 						{

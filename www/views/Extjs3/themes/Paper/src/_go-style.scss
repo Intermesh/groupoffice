@@ -1920,7 +1920,7 @@ table[id^="comments-ext"] b {
 		position: absolute;
 		top: 0;
 		right:0;
-		background-color: color($bg, 'card');
+		background-color: color($bg, 'background');
 		&:hover {
 			@include var(color, c-primary);
 		}

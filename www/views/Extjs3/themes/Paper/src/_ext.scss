@@ -1151,7 +1151,7 @@
 		&-row td {
 			@extend %font-caption;
 			border-left:0;
-			border-right: 1px solid color($fg, 'line');
+			border-right: 1px solid color($fg, 'divider');
 			//border-image: linear-gradient(to bottom, transparent, color($fg, 'line')) 1 100%;
 			height: dp(32);
 			
@@ -1173,6 +1173,7 @@
 		//margin-top: dp(9); //don't understand why +1 here?
 		height:dp(32);
 		border-bottom: 1px solid color($fg, 'line');
+		background-color: color($bg, 'background');
 	}
 	&-cell-inner, &-hd-inner {
 		@extend .ellipsis;
