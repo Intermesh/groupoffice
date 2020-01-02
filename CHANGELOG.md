@@ -1,3 +1,5 @@
+- Billing: report timezone bug showing wrong results in year overview.
+
 23-12-2019 6.4.97
 - Core: header color override didn't work anymore
 
