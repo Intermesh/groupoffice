@@ -2384,7 +2384,7 @@ $menuScrollerSize : dp(4);
 	border: 1px solid color($fg, 'line');
 	&-noborder, &-maximized{
 		border: 0;
-		&-header {
+		.x-window-header {
 			border-radius: 0;
 		}
 	}
