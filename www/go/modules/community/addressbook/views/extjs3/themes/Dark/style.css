@@ -61,7 +61,7 @@
 .go-addressbook-index-row {
   border-top: 7px solid transparent;
   margin-top: 7px;
-  box-shadow: 0px -1px 0 rgba(0, 0, 0, 0.12); }
+  box-shadow: 0px -1px 0 rgba(255, 255, 255, 0.3); }
 
 .go-addressbook-name-panel {
   padding: 14px; }
@@ -95,7 +95,7 @@
   .go-addressbook-url.twitter {
     background-image: url("resources/twitter.png"); }
   .go-addressbook-url.homepage {
-    background-color: #243a80;
+    background-color: #009BC9;
     border-radius: 2px; }
     .go-addressbook-url.homepage:before {
       font-size: 17.5px;

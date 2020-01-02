@@ -1,0 +1,98 @@
+
+.go-module-icon-addressbook, .go-menu-icon-addressbook {
+  background:url('resources/addressbook.png');
+}
+
+.go-addressbook-star {
+  color: #febf35;
+}
+
+.go-addressbook-index-row {
+  border-top: dp(8) solid transparent;
+  margin-top: dp(8);
+  box-shadow: 0px -1px 0 color($fg, 'line');
+}
+
+.go-addressbook-name-panel {
+  padding: dp(16);
+  h4 {
+    top: dp(-16);
+    left: dp(56);
+  }
+
+  .go-addressbook-star {
+    margin-top: dp(-8);
+  }
+}
+
+.go-addressbook-name {
+  position: absolute;
+  top: dp(16);
+  right: dp(16);
+}
+
+.go-addressbook-url-panel {
+  text-align: right;
+  line-height: dp(20);
+}
+
+.go-addressbook-url{
+
+  height: dp(20);
+  width: dp(20);
+  background-repeat: none;
+  background-position: center;
+  background-size: contain;
+  display: inline-block;
+  border-radius: 1px;
+  &.linkedin {
+    background-image: url("resources/linkedin.png");
+  }
+
+  &.facebook {
+    background-image: url("resources/facebook.png");
+  }
+
+  &.twitter {
+    background-image: url("resources/twitter.png");
+  }
+
+  &.homepage {
+    background-color: $cPrimary;
+    border-radius: 2px;
+
+    &:before {
+      font-size: dp(20);
+      @extend %icon;
+      content: "home";
+      vertical-align: baseline;
+      line-height: inherit;
+      color: white;
+    }
+  }
+
+}
+
+
+.avatar {
+  &.organization {
+    //background: linear-gradient(rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.24));
+    background-image: none;
+  }
+
+}
+
+// .go-detail-view-contact {
+// 	.avatar {
+
+// 		// position: absolute;
+// 		// top: dp(8);
+// 		// right: 0;//dp(16);
+// 		// height: dp(56);
+// 		// width: dp(56);
+
+// 		.icon {
+// 			line-height: 100%;
+// 		}
+// 	}
+// }
