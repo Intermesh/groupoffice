@@ -196,7 +196,9 @@ $app-icons: (
 }
 
 .message-body {
-	padding: dp(8) dp(16);
+	padding: dp(16);
+	background-color: white;
+	color: black;
 
 	position: relative;	
 	

@@ -13,3 +13,19 @@ body {
     border-bottom: 0;
   }
 }
+
+
+.message-body {
+  margin: dp(8);
+  border: 1px solid #ccc;
+}
+
+.em-composer {
+  .x-html-editor-wrap {
+    textarea {
+      color: black;
+      background-color: white; //These styles are copied to the html editor iframe by ExtJS
+    }
+  }
+
+}

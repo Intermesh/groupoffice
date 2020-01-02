@@ -41,7 +41,7 @@ GO.form.HtmlEditor = function (config) {
 
 Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
-	iframePad:0,
+	iframePad:dp(8),
 	
 	hideToolbar: false,
 
@@ -405,12 +405,20 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		this.lastKey = ev.key;
 	},
 
-	getDocMarkup: function () {
-		var style = getComputedStyle(this.getEl().dom);
-		var font = "font-size: " + style['font-size'] + ';font-family: '+style['font-family'];
-		var h = Ext.fly(this.iframe).getHeight() - this.iframePad * 2;
-		return String.format('<html><head><meta name="SKYPE_TOOLBAR" content="SKYPE_TOOLBAR_PARSER_COMPATIBLE" /><style type="text/css">body,p,td,div,span{' + font + '};body{border: 0; margin: 0; padding: {0}px; height: {1}px; cursor: text}body p{margin:0px;}</style></head><body></body></html>', this.iframePad, h);
-	},
+	// getFontStyle :  function() {
+	// 	var style = getComputedStyle(this.getEl().dom);
+	// 	return "font-size: " + style['font-size'] + ';font-family: '+style['font-family'];
+	// },
+	//
+	// getEditorFrameStyle : function() {
+	// 	return 'body,p,td,div,span{' + this.getFontStyle() + '};body{border: 0; margin: 0; padding: {0}px; height: {1}px; cursor: text}body p{margin:0px;}';
+	// },
+	//
+	// getDocMarkup: function () {
+	// 	console.warn( this.getEditorFrameStyle());
+	// 	var h = Ext.fly(this.iframe).getHeight() - this.iframePad * 2;
+	// 	return String.format('<html><head><meta name="SKYPE_TOOLBAR" content="SKYPE_TOOLBAR_PARSER_COMPATIBLE" /><style type="text/css">' + this.getEditorFrameStyle() + '</style></head><body></body></html>', this.iframePad, h);
+	// },
 	fixKeys: function () { // load time branching for fastest keydown performance
 		if (Ext.isIE) {
 			return function (e) {
@@ -543,7 +551,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 				 this.iframe.style.height = Math.max(ah, 0) + 'px';
 				 var bd = this.getEditorBody();
 				 if(bd){
-					 // bd.style.height = Math.max((ah - (this.iframePad*2)), 0) + 'px';
+					 bd.style.height = Math.max((ah - (this.iframePad*2)), 0) + 'px';
 				 }
 			}
 		}

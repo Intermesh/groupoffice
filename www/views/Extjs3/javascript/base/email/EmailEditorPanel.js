@@ -182,7 +182,14 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			name:'htmlbody',
 			hideLabel: true,
 			anchor: '100% '+anchorHeight,
-			plugins:this.initHtmlEditorPlugins(),			
+			plugins:this.initHtmlEditorPlugins(),
+			getFontStyle :  function() {
+				return GO.form.HtmlEditor.prototype.getFontStyle.call(this) + ';color: black';
+			},
+
+			getEditorFrameStyle : function() {
+				return GO.form.HtmlEditor.prototype.getEditorFrameStyle.call(this) + ' body {background-color: white}';
+			},
 			listeners:{
 				activate:function(){
 
