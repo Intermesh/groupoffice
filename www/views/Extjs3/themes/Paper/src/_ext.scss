@@ -2384,6 +2384,7 @@ $menuScrollerSize : dp(4);
 	border: 1px solid color($fg, 'line');
 	&-noborder, &-maximized{
 		border: 0;
+		border-radius: 0;
 	}
 	&-footer.x-panel-btns {
 		padding: dp(8);
