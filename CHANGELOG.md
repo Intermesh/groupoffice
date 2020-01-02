@@ -1,4 +1,6 @@
 - Billing: report timezone bug showing wrong results in year overview.
+- Email: White background in dark theme for mail
+- Email: Fixed count() error when searching
 
 23-12-2019 6.4.97
 - Core: header color override didn't work anymore

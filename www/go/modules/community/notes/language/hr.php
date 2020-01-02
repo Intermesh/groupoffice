@@ -10,4 +10,9 @@ return array (
   'category_id' => 'Bilježnica',
   'content' => 'Sadržaj',
   'manageCategories' => 'Upravljanje bilježnicama',
+  'Default note book' => 'Zadana bilježnica',
+  'Commented at' => 'Komentirano',
+  'Note book' => 'Bilježnica',
+  'Filters' => 'Filteri',
+  'Add test' => 'Dodaj test',
 );
