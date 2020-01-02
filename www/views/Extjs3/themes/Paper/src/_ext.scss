@@ -711,9 +711,9 @@
 		}
 		&.x-btn-focus, &.x-btn-over {
 			@extend .z4;
-			button.x-btn-text {
-				color: $cPrimary;
-			}
+			//button.x-btn-text {
+			//	color: $cPrimary;
+			//}
 		}
 		&.x-btn-pressed {
 			@extend .z8;
@@ -743,7 +743,10 @@
 	//  }
 	&.x-btn-focus, &.x-btn-over {
 		transition: background-color 195ms linear, box-shadow 195ms $curve-standard;
-		@include var(background-color, c-primary-tp);
+		@include var(background-color, c-primary);
+		button {
+			color:white;
+		}
 	}
 	&.primary {
 		.x-btn-text {
