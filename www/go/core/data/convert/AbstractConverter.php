@@ -78,15 +78,16 @@ abstract class AbstractConverter {
 	 * @return string eg. "csv"
 	 */
 	abstract public function getFileExtension();
-	
-	/**
-	 * Read file and import them into Group-Office
-	 * 
-	 * @param File $file the source file
-	 * @param string $entityClass The entity class model. eg. go\modules\community\addressbook\model\Contact
-	 * @param array $params Extra import parameters. By default this can only hold 'values' which is a key value array that will be set on each model.
-	 * @return array ['count', 'errors', 'success']
-	 */
+
+  /**
+   * Read file and import them into Group-Office
+   *
+   * @param File $file the source file
+   * @param string $entityClass The entity class model. eg. go\modules\community\addressbook\model\Contact
+   * @param array $params Extra import parameters. By default this can only hold 'values' which is a key value array that will be set on each model.
+   * @return array ['count', 'errors', 'success']
+   * @throws Exception
+   */
 	public function importFile(File $file, $entityClass, $params = array()) {
 		$response = ['count' => 0, 'errors' => [], 'success' => true];		
 		
@@ -164,7 +165,19 @@ abstract class AbstractConverter {
 			$this->exportEntity($entity, $fp, $i, $total);
 			$i++;
 		}
-	}
+  }
+
+  /**
+   * @var Query
+   */
+  private $entitiesQuery;
+
+  /**
+   * @return Query
+   */
+	protected function getEntitiesQuery(){
+	  return $this->entitiesQuery;
+  }
 
   /**
    * Export entities to a blob
@@ -177,6 +190,8 @@ abstract class AbstractConverter {
 	public final function exportToBlob($name, Query $entities) {		
 		$tempFile = File::tempFile($this->getFileExtension());
 		$fp = $tempFile->open('w+');
+
+		$this->entitiesQuery = $entities;
 		
 		$total = $entities->getIterator()->rowCount();
 		

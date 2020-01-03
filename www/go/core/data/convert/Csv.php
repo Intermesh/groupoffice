@@ -2,6 +2,7 @@
 
 namespace go\core\data\convert;
 
+use Exception;
 use go\core\fs\File;
 use go\core\model\Field;
 use go\core\orm\Entity;
@@ -63,6 +64,13 @@ class Csv extends AbstractConverter {
 		$this->enclosure = $user->textSeparator;
 	}
 
+  /**
+   * Exports an entity to a CSV record array
+   *
+   * @param Entity $entity
+   * @return array
+   * @throws Exception
+   */
 	public function export(Entity $entity) {
 		
 		$headers = $this->getHeaders($entity);
@@ -89,7 +97,7 @@ class Csv extends AbstractConverter {
 	 * 
 	 * @param string $name Column name
 	 * @param string $label Column label
-	 * @param string $many True if this field value should be converted to an array when importing
+	 * @param bool $many True if this field value should be converted to an array when importing
 	 * @param string $exportFunction Defaults to "export" . ucfirst($name) The function is called with Entity $entity, array $templateValues $columnName
 	 * @param string $importFunction Defaults to "import" . ucfirst($name) The import function is called with Entity $entity, $value, array $values
 	 */
@@ -114,7 +122,7 @@ class Csv extends AbstractConverter {
 	 * Get a value for a header
 	 * 
 	 * @param Entity $entity
-	 * @param Array $templateValues
+	 * @param array $templateValues
 	 * @param string $header Header name delimited with a . for sub properties. eg. "emailAddresses.email"
 	 * @return string
 	 */
@@ -170,15 +178,16 @@ class Csv extends AbstractConverter {
 		
 		return $record;
 	}
-	
-	/**
-	 * Get all the CSV field headers
-	 * 
-	 * Sub properties are delimnited with a . For example "emailAddresses.email".
-	 * Multiple values are separated by " ::: ". For example "email1 ::: email2"
-	 * @param string $entityCls
-	 * @return string[]
-	 */
+
+  /**
+   * Get all the CSV field headers
+   *
+   * Sub properties are delimnited with a . For example "emailAddresses.email".
+   * Multiple values are separated by " ::: ". For example "email1 ::: email2"
+   * @param string $entityCls
+   * @return string[]
+   * @throws Exception
+   */
 	public final function getHeaders($entityCls) {
 		
 		if(!isset($this->headers)) {
@@ -187,14 +196,15 @@ class Csv extends AbstractConverter {
 		
 		return $this->headers;		
 	}
-	
-	/**
-	 * Override this to add custom headers
-	 * Override "getValue" and "setVallue" too.
-	 * 
-	 * @param string $entityCls
-	 * @return string[]
-	 */
+
+  /**
+   * Override this to add custom headers
+   * Override "getValue" and "setVallue" too.
+   *
+   * @param string $entityCls
+   * @return string[]
+   * @throws Exception
+   */
 	protected function internalGetHeaders($entityCls) {
 		//Write headers
 		$properties = $entityCls::getMapping()->getProperties();
@@ -235,25 +245,46 @@ class Csv extends AbstractConverter {
 			$headers[] = ['name' => $header, 'label' => null, 'many' => true];			
 			return $headers;
 		}
-		
+
+    $count = $this->countMaxRelated($prop);
 		$cls = $prop->entityName;
-
-
 		$properties = $cls::getMapping()->getProperties();
-		
-		foreach($properties as $name => $value) {
-			
-			if(in_array($name, $prop->keys)) {
-				continue;
-				//don't export relational keys like 'contactId';
-			}
-			
-			$subheader = $header . '.'. $name;
-			$headers =  $this->addSubHeaders($headers, $subheader, $value, $prop->type != Relation::TYPE_HAS_ONE);
-		}	
+
+		for($i = 1; $i <= $count; $i++) {
+      foreach ($properties as $name => $value) {
+
+        if (in_array($name, $prop->keys)) {
+          continue;
+          //don't export relational keys like 'contactId';
+        }
+
+        $subheader = $header . '.' . $name . '-' . $i;
+        $headers = $this->addSubHeaders($headers, $subheader, $value, false);
+      }
+    }
 		
 		return $headers;
 	}
+
+	private function countMaxRelated(Relation $relation) {
+    if($relation->type == Relation::TYPE_HAS_ONE){
+      return 1;
+    }
+
+    $key = key($relation->keys);
+    $fk = current($relation->keys);
+
+    $entitiesSub = clone $this->getEntitiesQuery();
+    $entitiesSub->selectSingleValue($entitiesSub->getTableAlias() . '.' . $key);
+
+    return go()->getDbConnection()
+      ->selectSingleValue('coalesce(count(*), 0) AS count')
+      ->from($relation->entityName::getMapping()->getPrimaryTable()->getName(), 't')
+      ->where($fk, 'IN', $entitiesSub)
+      ->groupBy(['t.' . $fk])
+      ->orderBy(['count' => 'DESC'])
+      ->single();
+  }
 
 	protected function exportEntity(Entity $entity, $fp, $index, $total) {
 
@@ -285,19 +316,21 @@ class Csv extends AbstractConverter {
 
 		return parent::importFile($file, $entityClass, $params);
 	}
-	
-	/**
-	 * Imports a single record and returns an entity 
-	 * 
-	 * @param File $file the source file
-	 * @param string $entityClass The entity class model. eg. go\modules\community\addressbook\model\Contact
-	 * @param array $params Extra import parameters. By default this can only hold 'values' which is a key value array that will be set on each model.
-	 * 	$params Can hold "mapping" property. The key is the CSV record index and value the 
-	 * 	property path. "propName" or "prop.name" if it's a relation.
-	 * 	If the relation is a has many values can be separated with " ::: ".
-	 * 
-	 * @return int[] id's of imported entities
-	 */
+
+  /**
+   * Imports a single record and returns an entity
+   *
+   * @param Entity $entity
+   * @param $fp
+   * @param $index
+   * @param array $params Extra import parameters. By default this can only hold 'values' which is a key value array that will be set on each model.
+   *  $params Can hold "mapping" property. The key is the CSV record index and value the
+   *  property path. "propName" or "prop.name" if it's a relation.
+   *  If the relation is a has many values can be separated with " ::: ".
+   *
+   * @return bool|Entity id's of imported entities
+   * @throws Exception
+   */
 	protected function importEntity(Entity $entity, $fp, $index, array $params) {
 		
 		if($index == 0) {
@@ -393,8 +426,6 @@ class Csv extends AbstractConverter {
 			}
 		}
 		
-		
-		
 		//second pass for multiple values
 		foreach($v as $prop => $value) {
 			$relation = $entityClass::getMapping()->getRelation($prop);
@@ -435,7 +466,7 @@ class Csv extends AbstractConverter {
 			$headers = fgetcsv($fp, 0, $delimiter, $enclosure);
 			fclose($fp);
 			if(!$headers || count($headers) == 1) {
-				throw new \Exception("Unable to detect delimiter");
+				throw new Exception("Unable to detect delimiter");
 			}
 		} else{
 			fclose($fp);
@@ -449,7 +480,7 @@ class Csv extends AbstractConverter {
 	 * 
 	 * @param File $file
 	 * @return string[]
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public function getCsvHeaders(File $file) {
 
@@ -460,7 +491,7 @@ class Csv extends AbstractConverter {
 		$headers = fgetcsv($fp, 0, $this->delimiter, $this->enclosure);
 		
 		if(!$headers) {
-			throw new \Exception("Could not read CSV file");
+			throw new Exception("Could not read CSV file");
 		}
 		
 		return $headers;
