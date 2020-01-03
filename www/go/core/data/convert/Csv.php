@@ -131,10 +131,29 @@ class Csv extends AbstractConverter {
 		if(isset($this->customColumns[$header])) {
 			return $this->getCustomColumnValue($entity, $templateValues, $header);
 		}
+
+
 				
 		$path = explode('.', $header);
 		
-		foreach($path as $seg) {
+		while($seg = array_shift($path)) {
+
+			// Check if there's a [0] ending to indicate an array index for has many properties
+			$index = null;
+			if(preg_match("/\[([0-9]+)\]$/", $seg, $matches)) {
+				//index starts with 1 in CSV but should start with 0 in code.
+				$index = $matches[1] - 1;
+				$seg = substr($seg,0, -(strlen($matches[0])));
+			}
+
+			if(isset($index)) {
+				if(!isset($templateValues[$seg][$index])) {
+					return "";
+				}else{
+					$templateValues = $templateValues[$seg][$index];
+					continue;
+				}
+			}
 			
 			if(is_array($templateValues)) {
 				if(!isset($templateValues[0])) {		
@@ -158,6 +177,10 @@ class Csv extends AbstractConverter {
 			{
 				$templateValues = $templateValues->$seg ?? "";
 			}
+		}
+
+		if(isset($index)) {
+			return $templateValues[$index] ?? "";
 		}
 		
 		return is_array($templateValues) ? implode($this->multipleDelimiter, $templateValues) : $templateValues;
@@ -246,7 +269,7 @@ class Csv extends AbstractConverter {
 			return $headers;
 		}
 
-    $count = $this->countMaxRelated($prop);
+		$count = $this->countMaxRelated($prop);
 		$cls = $prop->entityName;
 		$properties = $cls::getMapping()->getProperties();
 
@@ -258,7 +281,7 @@ class Csv extends AbstractConverter {
           //don't export relational keys like 'contactId';
         }
 
-        $subheader = $header . '.' . $name . '-' . $i;
+        $subheader = $header . '[' . $i . '].' . $name ;
         $headers = $this->addSubHeaders($headers, $subheader, $value, false);
       }
     }
