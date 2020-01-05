@@ -612,7 +612,7 @@
 		margin: 0;
 		border:0;
 	}
-	padding: dp(8) dp(16);
+	padding: dp(8) dp(16) dp(16);
 	~ .x-fieldset { border-top: 1px solid color($fg, 'divider'); }
 	legend {
 		/*@extend %font-caption;*/
@@ -711,9 +711,9 @@
 		}
 		&.x-btn-focus, &.x-btn-over {
 			@extend .z4;
-			button.x-btn-text {
-				color: $cPrimary;
-			}
+			//button.x-btn-text {
+			//	color: $cPrimary;
+			//}
 		}
 		&.x-btn-pressed {
 			@extend .z8;
@@ -743,7 +743,10 @@
 	//  }
 	&.x-btn-focus, &.x-btn-over {
 		transition: background-color 195ms linear, box-shadow 195ms $curve-standard;
-		@include var(background-color, c-primary-tp);
+		@include var(background-color, c-primary);
+		button {
+			color:white;
+		}
 	}
 	&.primary {
 		.x-btn-text {
@@ -1151,7 +1154,7 @@
 		&-row td {
 			@extend %font-caption;
 			border-left:0;
-			border-right: 1px solid color($fg, 'line');
+			border-right: 1px solid color($fg, 'divider');
 			//border-image: linear-gradient(to bottom, transparent, color($fg, 'line')) 1 100%;
 			height: dp(32);
 			
@@ -1173,6 +1176,7 @@
 		//margin-top: dp(9); //don't understand why +1 here?
 		height:dp(32);
 		border-bottom: 1px solid color($fg, 'line');
+		background-color: color($bg, 'background');
 	}
 	&-cell-inner, &-hd-inner {
 		@extend .ellipsis;
@@ -2382,8 +2386,11 @@ $menuScrollerSize : dp(4);
 	border-radius: $borderRadius;
 	overflow:hidden;
 	border: 1px solid color($fg, 'line');
-	&-noborder{
+	&-noborder, &-maximized{
 		border: 0;
+		.x-window-header {
+			border-radius: 0;
+		}
 	}
 	&-footer.x-panel-btns {
 		padding: dp(8);
