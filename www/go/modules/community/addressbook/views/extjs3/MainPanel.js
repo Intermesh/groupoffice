@@ -211,8 +211,14 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 														"dates.date": t("Date"),
 														"phoneNumbers.type": t("Phone type"),
 														"phoneNumbers.number": t("Phone number"),
-														"emailAddresses.type": t("E-mail type"),
-														"emailAddresses.email": t("E-mail address"),
+
+														"emailAddresses": {
+															label: t("E-mail address"),
+															properties: {
+																"email": "E-mail",
+																"type": t("Type")
+															}
+														},
 														"addresses.type": t("Address type"),
 														"addresses.street": t("Address street"),
 														"addresses.street2": t("Address street 2"),

@@ -62,11 +62,39 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			// });
 			
 		},this);
+
+		this.on('activate', function() {
+			this.registerSubmitKey();
+		}, this);
 	},
 
 	emptyTextRegex: '<span[^>]+[^>]*>{0}<\/span>',
-   emptyTextTpl: '<span style="color:#ccc;">{0}</span>',
-   emptyText: '',
+	emptyTextTpl: '<span style="color:#ccc;">{0}</span>',
+	emptyText: '',
+
+	registerSubmitKey: function() {
+		var doc = this.getDoc();
+		if (Ext.isGecko){
+			Ext.EventManager.on(doc, {
+				keypress: this.fireSubmit,
+				scope: this
+			});
+		}
+
+		if (Ext.isIE || Ext.isWebKit || Ext.isOpera) {
+			Ext.EventManager.on(doc, 'keydown', this.fireSubmit,
+				this);
+		}
+	},
+
+	fireSubmit : function(e) {
+		if (e.ctrlKey && Ext.EventObject.ENTER == e.getKey()) {
+			e.preventDefault();
+			console.warn('ctrlenter');
+			this.fireEvent('ctrlenter',this);
+			return false;
+		}
+	},
 	
 	
 
