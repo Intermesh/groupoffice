@@ -58,16 +58,40 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 						hideLabel: true,
 						listeners: {
 							check: function(cb, value) {
-								this.formPanel.getForm().findField('requiredCondition').setDisabled(value);
+								let form = this.formPanel.getForm();
+								form.findField('relatedFieldCondition').setDisabled(value);
+								form.findField('conditionallyRequired').setDisabled(value);
+								form.findField('conditionallyHidden').setDisabled(value);
 							},
 							scope: this
 						}
 					},
 					{
 						xtype: "textfield",
-						name: "requiredCondition",
+						name: "relatedFieldCondition",
 						fieldLabel: t("Required condition"),
 						anchor: "100%"
+					},
+					{
+						xtype: "checkbox",
+						name: "conditionallyRequired",
+						boxLabel: t("Conditionally required field"),
+						hideLabel: true,
+						listeners: {
+							check: function (cb, value) {
+								let form = this.formPanel.getForm(),
+									requiredField = form.findField('required'),
+									conditionallyHidden = form.findField('conditionallyHidden');
+
+								if (!conditionallyHidden.getValue()) {
+									if (value) {
+										requiredField.setValue(false);
+									}
+									requiredField.setDisabled(value);
+								}
+							},
+							scope: this
+						}
 					},
 					{
 						xtype: "checkbox",
@@ -76,11 +100,16 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 						hideLabel: true,
 						listeners: {
 							check: function(cb, value) {
-								let requiredField = this.formPanel.getForm().findField('required');
-								if (value) {
-									requiredField.setValue(false);
+								let form = this.formPanel.getForm(),
+									requiredField = form.findField('required'),
+									conditionallyRequired = form.findField('conditionallyRequired');
+
+								if (!conditionallyRequired.getValue()) {
+									if (value) {
+										requiredField.setValue(false);
+									}
+									requiredField.setDisabled(value);
 								}
-								requiredField.setDisabled(value);
 							},
 							scope: this
 						}

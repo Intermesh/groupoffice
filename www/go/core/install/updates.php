@@ -671,3 +671,7 @@ $updates['201912190000'][] = "ALTER TABLE `core_auth_allow_group`
 
 $updates['201912290000'][] = "ALTER TABLE `core_customfields_field` 
   ADD `conditionallyHidden` tinyint(1) NOT NULL DEFAULT '0' AFTER `requiredCondition`";
+
+$updates['202001060000'][] = "ALTER TABLE `core_customfields_field` CHANGE `requiredCondition` `relatedFieldCondition` varchar(255) NOT NULL DEFAULT '' AFTER `required`";
+$updates['202001060000'][] = "ALTER TABLE `core_customfields_field` ADD `conditionallyHidden` tinyint(1) NOT NULL DEFAULT '0' AFTER `requiredCondition`";
+$updates['202001060000'][] = "ALTER TABLE `core_customfields_field` ADD `conditionallyRequired` tinyint(1) NOT NULL DEFAULT '0' AFTER `conditionallyHidden`";

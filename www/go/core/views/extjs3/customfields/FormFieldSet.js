@@ -86,7 +86,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			 */
 			var masterFields = [];
 			this.items.each(function(field) {
-				if (field.conditionallyHidden) {
+				if (field.conditionallyHidden || field.conditionallyRequired) {
 					let linkedField = go.customfields.type.Text.prototype.getRequiredConditionField.call(field, field);
 					if (linkedField) {
 						linkedField.relatedFields = linkedField.relatedFields || [];
@@ -96,16 +96,15 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 				}
 			}, this);
 
+			function uniqueFieldsFilter(value, index, self) {
+				return self.indexOf(value) === index;
+			}
+			masterFields = masterFields.filter(uniqueFieldsFilter);
+
 			Ext.each(masterFields, function(masterField) {
 				masterField.on('select', function (field) {
 					Ext.each(field.relatedFields, function(relatedField) {
 						relatedField.validate();
-						if (relatedField.allowBlank) {
-							relatedField.hide();
-							relatedField.ownerCt.doLayout();
-							return true;
-						}
-
 						relatedField.show();
 						relatedField.ownerCt.doLayout();
 						return true;
@@ -115,7 +114,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 				masterField.on('check', function (field) {
 					Ext.each(field.relatedFields, function(relatedField) {
 						relatedField.validate();
-						if (relatedField.allowBlank) {
+						if (relatedField.conditionallyHidden && relatedField.isVisible()) {
 							relatedField.hide();
 							relatedField.ownerCt.doLayout();
 							return true;

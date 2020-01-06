@@ -70,24 +70,30 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			config.maxLength = customfield.options.maxLength;
 		}
 
-		if (!GO.util.empty(customfield.requiredCondition)) {
+		if (!GO.util.empty(customfield.relatedFieldCondition)) {
 			config.requiredConditionValidator = this.requiredConditionValidator;
 			config._changeRelatedFieldsVisibility = this._changeRelatedFieldsVisibility;
 			if (customfield.type === 'Select') {
 				config.validate = function () {
-					this.requiredConditionValidator.call(this, customfield);
+					if (customfield.conditionallyRequired) {
+						this.requiredConditionValidator.call(this, customfield);
+					}
 					this._changeRelatedFieldsVisibility(this);
 					return go.customfields.type.TreeSelectField.prototype.validate.apply(this);
 				}
 			} else if (customfield.type === 'MultiSelect') {
 				config.validate = function () {
-					this.requiredConditionValidator.call(this, customfield);
+					if (customfield.conditionallyRequired) {
+						this.requiredConditionValidator.call(this, customfield);
+					}
 					this._changeRelatedFieldsVisibility(this);
 					return go.form.Chips.prototype.validate.apply(this);
 				}
 			} else {
 				config.validateValue = function () {
-					this.requiredConditionValidator.call(this, customfield, this);
+					if (customfield.conditionallyRequired) {
+						this.requiredConditionValidator.call(this, customfield, this);
+					}
 					this._changeRelatedFieldsVisibility(this);
 					return Ext.form.Field.prototype.validateValue.apply(this);
 				}
@@ -104,6 +110,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			value: customfield.default,
 			hidden: customfield.conditionallyHidden || false,
 			conditionallyHidden: customfield.conditionallyHidden || false,
+			conditionallyRequired: customfield.conditionallyRequired || false,
 		}, config);
 
 		//ALTER TABLE `core_customfields_field`
@@ -144,7 +151,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	 * @returns {*}
 	 */
 	getRequiredConditionField: function(customField) {
-		let condition = customField.field.requiredCondition,
+		let condition = customField.field.relatedFieldCondition,
 			form = this.findParentByType('form').getForm(),
 			conditionParts,
 			field, fieldName;
@@ -180,7 +187,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	 * @param customfield
 	 */
 	requiredConditionValidator: function (customfield) {
-		var condition = customfield.requiredCondition,
+		var condition = customfield.relatedFieldCondition,
 			form,
 			conditionParts,
 			isEmptyCondition = false,
