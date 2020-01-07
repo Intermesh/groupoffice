@@ -65,16 +65,14 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		if(this.editable) {
 			this.initBbar();
 		}
-		
-		go.form.FormGroup.superclass.initComponent.call(this);
 
-
-		
-		this.on("add",function(e) {			
+		this.on("add",function(e) {
 			//to prevent adding to Ext.form.BasicForm with add event.
 			//Cancels event bubbling
 			return false;
 		});
+		
+		go.form.FormGroup.superclass.initComponent.call(this);
 	},
 	
 	initBbar: function() {
