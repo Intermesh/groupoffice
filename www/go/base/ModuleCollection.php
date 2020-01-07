@@ -241,7 +241,7 @@ class ModuleCollection extends Model\ModelCollection{
 	 */
 	public function getAllModules($ignoreAcl=false){
 		
-		$cacheKey = $ignoreAcl ? 'all-modules-ignore' : 'all-modules-' . \GO::user()->id;
+		$cacheKey = $ignoreAcl ? 'all-modules-ignore' : 'all-modules-' . (\GO::user()->id ?? "0");
 		
 		if(!$ignoreAcl && \GO::user()) {
 			$cacheKey .= '-'. \GO::user()->id;
