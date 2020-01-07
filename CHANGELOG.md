@@ -1,7 +1,9 @@
+07-01-2020 6.4.99
 - Core: Error could occur with module permissions because some cache was shared which should have been per user
 - Comments: Unable to edit fixed.
 - Comments: CTRL + ENTER to save
 - Tickets: CTRL + ENTER to save
+- Core: Improved CSV import and export to be more compatible with other formats
 
 02-01-2020 6.4.98
 - Assistant / files: Assistant host could be wrong when using proxy on the server
