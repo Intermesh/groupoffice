@@ -3,6 +3,7 @@ namespace go\core\customfield;
 
 use Exception;
 use GO;
+use GO\Base\Db\ActiveRecord;
 use go\core\data\Model;
 use go\core\db\Criteria;
 use go\core\db\Table;
@@ -169,57 +170,63 @@ abstract class Base extends Model {
 		
 		return true;
 	}
-	
-	/**
-	 * Format data from API to model
-	 * 
-	 * This function is called when the API data is applied to the model with setValues();
-	 * 
-	 * @see MultiSelect for an advaced example
-	 * @param mixed $value The value for this field
-	 * @param array $values The values to be saved in the custom fields table
-	 * @return mixed
-	 */
-	public function apiToDb($value, &$values) {
-		return $value;
-	}
-	
-	/**
-	 * Format data from model to API
-	 * 
-	 * This function is called when the data is serialized to JSON
-	 * 
-	 * @see MultiSelect for an advaced example
-	 * @param mixed $value The value for this field
-	 * @param array $values All the values of the custom fields to be returned to the API
-	 * @return mixed
-	 */
-	public function dbToApi($value, &$values) {
+
+    /**
+     * Format data from API to model
+     *
+     * This function is called when the API data is applied to the model with setValues();
+     *
+     * @param mixed $value The value for this field
+     * @param array $values The values to be saved in the custom fields table
+     * @param Entity|ActiveRecord $entity
+     * @return mixed
+     * @see MultiSelect for an advaced example
+     */
+	public function apiToDb($value, &$values, $entity)
+    {
 		return $value;
 	}
 
-	/**
-	 * Get the data as string
-	 * Used for templates or export
-	 * 
-	 * @param mixed $value The value for this field
-	 * @param array $values The values inserted in the database
-	 * @return string
-	 */
-	public function dbToText($value, &$values) {
-		return $this->dbToApi($value, $values);
+    /**
+     * Format data from model to API
+     *
+     * This function is called when the data is serialized to JSON
+     *
+     * @param mixed $value The value for this field
+     * @param array $values All the values of the custom fields to be returned to the API
+     * @param Entity|ActiveRecord $entity
+     * @return mixed
+     * @see MultiSelect for an advaced example
+     */
+	public function dbToApi($value, &$values, $entity)
+    {
+		return $value;
 	}
 
-	/**
-	 * Set the data as string
-	 * Used for templates or export
-	 * 
-	 * @param mixed $value The value for this field
-	 * @param array $values The values inserted in the database
-	 * @return string
-	 */
-	public function textToDb($value, &$values) {
-		return $this->apiToDb($value, $values);
+    /**
+     * Get the data as string
+     * Used for templates or export
+     *
+     * @param mixed $value The value for this field
+     * @param array $values The values inserted in the database
+     * @param Entity|ActiveRecord $entity
+     * @return string
+     */
+	public function dbToText($value, &$values, $entity) {
+		return $this->dbToApi($value, $values, $entity);
+	}
+
+    /**
+     * Set the data as string
+     * Used for templates or export
+     *
+     * @param mixed $value The value for this field
+     * @param array $values The values inserted in the database
+     * @param Entity|ActiveRecord $entity
+     * @return string
+     */
+	public function textToDb($value, &$values, $entity) {
+		return $this->apiToDb($value, $values, $entity);
 	}
 	
 	/**

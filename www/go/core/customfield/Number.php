@@ -37,7 +37,7 @@ class Number extends Base {
 		});
 	}
 
-	public function dbToApi($value, &$values)
+	public function dbToApi($value, &$values, $entity)
   {
     return number_format($value, $this->field->getOption('numberDecimals'));
   }

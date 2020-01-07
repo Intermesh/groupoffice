@@ -27,7 +27,7 @@ class FunctionField extends Number {
 		return "decimal(19,$decimals) DEFAULT " . $d;
 	}
 
-	public function dbToApi($dummy, &$values) {
+	public function dbToApi($value, &$values, $entity) {
 		$f = $this->field->getOption("function");
 		
 		foreach ($values as $key => $value) {
