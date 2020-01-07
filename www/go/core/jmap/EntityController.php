@@ -856,7 +856,7 @@ abstract class EntityController extends Controller {
 		
 		$converter = $this->findConverter($blob->type);
 		
-		$response['goHeaders'] = $converter->getHeaders($this->entityClass());
+		$response['goHeaders'] = $converter->getEntityMapping($this->entityClass());
 		$response['csvHeaders'] = $converter->getCsvHeaders($file);
 		
 		if(!$response) {

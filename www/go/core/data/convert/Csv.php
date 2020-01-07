@@ -6,6 +6,7 @@ use Exception;
 use go\core\fs\File;
 use go\core\model\Field;
 use go\core\orm\Entity;
+use go\core\orm\Property;
 use go\core\orm\Relation;
 use go\core\util\DateTime as GoDateTime;
 use Sabre\VObject\Property\VCard\DateTime;
@@ -131,21 +132,12 @@ class Csv extends AbstractConverter {
 		if(isset($this->customColumns[$header])) {
 			return $this->getCustomColumnValue($entity, $templateValues, $header);
 		}
-
-
 				
 		$path = explode('.', $header);
 		
 		while($seg = array_shift($path)) {
 
-			// Check if there's a [0] ending to indicate an array index for has many properties
-			$index = null;
-			if(preg_match("/\[([0-9]+)\]$/", $seg, $matches)) {
-				//index starts with 1 in CSV but should start with 0 in code.
-				$index = $matches[1] - 1;
-				$seg = substr($seg,0, -(strlen($matches[0])));
-			}
-
+			$index = $this->extractIndex($seg);
 			if(isset($index)) {
 				if(!isset($templateValues[$seg][$index])) {
 					return "";
@@ -178,12 +170,30 @@ class Csv extends AbstractConverter {
 				$templateValues = $templateValues->$seg ?? "";
 			}
 		}
-
-		if(isset($index)) {
-			return $templateValues[$index] ?? "";
-		}
 		
 		return is_array($templateValues) ? implode($this->multipleDelimiter, $templateValues) : $templateValues;
+	}
+
+	/**
+	 * Takes of [1] in emailAddresses[1] and returns 1
+	 *
+	 * Check if there's a [0] ending to indicate an array index for has many properties
+	 * example column header emailAddresses[1].type
+	 *
+	 * @param $seg
+	 * @return int|null
+	 */
+	private static function extractIndex(&$seg) {
+		// Check if there's a [0] ending to indicate an array index for has many properties
+		// example column header emailAddresses[1].type
+		$index = null;
+		if(preg_match("/\[([0-9]+)\]$/", $seg, $matches)) {
+			//index starts with 1 in CSV but should start with 0 in code.
+			$index = $matches[1] - 1;
+			$seg = substr($seg,0, -(strlen($matches[0])));
+		}
+
+		return $index;
 	}
 	
 	private function getCustomColumnValue(Entity $entity, $templateValues, $header) {
@@ -200,6 +210,10 @@ class Csv extends AbstractConverter {
 		}
 		
 		return $record;
+	}
+
+	public function getEntityMapping($entityCls) {
+		return $this->internalGetHeaders($entityCls, true);
 	}
 
   /**
@@ -220,15 +234,16 @@ class Csv extends AbstractConverter {
 		return $this->headers;		
 	}
 
-  /**
-   * Override this to add custom headers
-   * Override "getValue" and "setVallue" too.
-   *
-   * @param string $entityCls
-   * @return string[]
-   * @throws Exception
-   */
-	protected function internalGetHeaders($entityCls) {
+	/**
+	 * Override this to add custom headers
+	 * Override "getValue" and "setVallue" too.
+	 *
+	 * @param string $entityCls
+	 * @param bool $forMapping
+	 * @return string[]
+	 * @throws Exception
+	 */
+	protected function internalGetHeaders($entityCls, $forMapping = false) {
 		//Write headers
 		$properties = $entityCls::getMapping()->getProperties();
 		$headers = [];
@@ -238,19 +253,33 @@ class Csv extends AbstractConverter {
 			if(in_array($name, array_merge(['createdAt', 'createdBy', 'ownedBy', 'modifiedAt','aclId','filesFolderId', 'modifiedBy'], array_keys($this->customColumns)))){
 				continue;
 			}
-			$headers = $this->addSubHeaders($headers, $name, $value);
+			$headers = $this->addSubHeaders($headers, $name, $value, false, $forMapping);
 		}
 		if(method_exists($entityCls, 'getCustomFields')) {
 			$fields = Field::findByEntity($entityCls::entityType()->getId());
+			$customFieldProps = [];
 			foreach($fields as $field) {
-				$headers[] = ['name' => 'customFields.' . $field->databaseName, 'label' => $field->name, 'many' => false];
+
+				if($forMapping) {
+					$customFieldProps[$field->databaseName] = ['name' => $field->databaseName, 'label' => $field->name, 'many' => false];
+				} else{
+					$headers[] =  ['name' => 'customFields.' . $field->databaseName, 'label' => $field->name, 'many' => false];
+				}
+			}
+
+			if($forMapping) {
+				$headers["customFields"] = ['name' => 'customFields', 'label' => null, 'many' => false, 'grouped'=>true, 'properties' => $customFieldProps];
 			}
 		}	
 		
-		return array_merge($headers, array_values($this->customColumns));
+		if($forMapping) {
+			return array_merge($headers, $this->customColumns);
+		} else{
+			return array_merge($headers, array_values($this->customColumns));
+		}
 	}
 	
-	private function addSubHeaders($headers, $header, $prop, $many = false) {
+	private function addSubHeaders($headers, $header, $prop, $many = false, $forMapping = false) {
 		
 		if(in_array($header, static::$excludeHeaders)) {
 			return $headers;
@@ -259,36 +288,63 @@ class Csv extends AbstractConverter {
 		if(!($prop instanceof Relation)) {
 			if(!$prop->primary) {
 				//client will define labels if not given. Only custom fields provide label
-				$headers[] = ['name' => $header, 'label' => null, 'many' => $many];
+				$headers[$header] = ['name' => $header, 'label' => null, 'many' => $many];
 			}
 			return $headers;
 		}
 
 		if($prop->type == Relation::TYPE_SCALAR) {
-			$headers[] = ['name' => $header, 'label' => null, 'many' => true];			
+			$headers[$header] = ['name' => $header, 'label' => null, 'many' => true];
 			return $headers;
 		}
 
-		$count = $this->countMaxRelated($prop);
 		$cls = $prop->entityName;
 		$properties = $cls::getMapping()->getProperties();
 
-		for($i = 1; $i <= $count; $i++) {
-      foreach ($properties as $name => $value) {
+		//Don't add multiple columns for has many if we need the headers for mapping
+		if($forMapping) {
 
-        if (in_array($name, $prop->keys)) {
-          continue;
-          //don't export relational keys like 'contactId';
-        }
+			$props = [];
+			foreach ($properties as $name => $value) {
 
-        $subheader = $header . '[' . $i . '].' . $name ;
-        $headers = $this->addSubHeaders($headers, $subheader, $value, false);
-      }
-    }
+				if (in_array($name, $prop->keys)) {
+					continue;
+					//don't export relational keys like 'contactId';
+				}
+
+				//$subheader = $header . '.' . $name ;
+				$props = $this->addSubHeaders($props, $name, $value, false);
+			}
+
+			$headers[$header] = ['name' => $header, 'label' => null, 'many' => $prop->type != Relation::TYPE_HAS_ONE, 'properties' => $props, 'grouped' => true];
+		} else {
+
+			//create multiple columns for has many like emailAddresses[1].type etc.
+			$count = $this->countMaxRelated($prop);
+			for ($i = 1; $i <= $count; $i++) {
+				foreach ($properties as $name => $value) {
+
+					if (in_array($name, $prop->keys)) {
+						continue;
+						//don't export relational keys like 'contactId';
+					}
+
+					$subheader = $header . '[' . $i . '].' . $name;
+					$headers = $this->addSubHeaders($headers, $subheader, $value, false);
+				}
+			}
+		}
 		
 		return $headers;
 	}
 
+	/**
+	 * Returns the max count of a has many relation in the dataset to export
+	 *
+	 * @param Relation $relation
+	 * @return bool|int|mixed
+	 * @throws Exception
+	 */
 	private function countMaxRelated(Relation $relation) {
     if($relation->type == Relation::TYPE_HAS_ONE){
       return 1;
@@ -365,10 +421,15 @@ class Csv extends AbstractConverter {
 		if(!$record || $this->recordIsEmpty($record)) {
 			return false;
 		}
-		
-		$mapping = $params['mapping'] ?? $this->getHeaders(get_class($entity));
 
-		$values = $this->convertRecordToProperties($record, $mapping, get_class($entity));
+		if(!isset($params['mapping'])) {
+			throw new Exception("Mapping is required");
+		}
+
+		$values = $this->convertRecordToProperties($record, $params['mapping'], $this->getEntityMapping(get_class($entity)));
+		if(!$values) {
+			return false;
+		}
 		
 		$values = $this->importCustomColumns($entity, $values);
 
@@ -394,84 +455,85 @@ class Csv extends AbstractConverter {
 			$entity->setCustomFields($cf, true);
 		}
 	}
-	
+
 	/**
 	 * Will convert the CSV record to a key value array to use in Entity::setValues();
+	 *
+	 * @param $record
+	 * @param array $clientMapping
+	 *
+	 * eg.
+	 * debtorNumber: {csvIndex: 14, fixed: ""},
+	 * emailAddresses: Array (2)
+	 * 0 {type: {csvIndex: 25, fixed: ""}, email: {csvIndex: 26, fixed: ""}}
+	 * 1 {type: {csvIndex: 27, fixed: ""}, email: {csvIndex: 28, fixed: ""}}
+	 *
+	 * Array Prototype
+	 *
+	 * @param $serverMapping
+	 * @return array|false
 	 */
-	private function convertRecordToProperties($record, $mapping, $entityClass) {
-	
+	private function convertRecordToProperties($record, $clientMapping, $serverMapping) {
+
 		$v = [];
-		//create arrays of values that are mapped multiple times.
-		
-		$h = $this->getHeaders($entityClass);
-		$headers = [];
-		foreach($h as $i) {
-			$headers[$i['name']] = $i;
-		}
-		
-		foreach($mapping as $index => $path) {	
-			
-			$index = (int) $index;
-			$modelClass = $entityClass;		
-			$relation = false;
-			if(empty($record[$index])) {
+		$hasCsvData = false;
+
+		foreach($clientMapping as $propName => $map) {
+
+			//empty array for example emailAddresses
+			if(empty($map)) {
 				continue;
 			}
-			$parts = explode('.', $path);
-			$propName = array_pop($parts);
-			$sub = &$v;
-			foreach($parts as $part) {
-				if($modelClass && ($relation = $modelClass::getMapping()->getRelation($part))) {
-					$modelClass = $relation->entityName;
-				}else
-				{
-					$modelClass = false;
-				}
-				
-				if(!isset($sub[$part])) {
-					$sub[$part] = [];
-				}
-				$sub = &$sub[$part];					
-			}
-			
-			$multiple = ($relation && ($relation->type == Relation::TYPE_ARRAY || $relation->type == Relation::TYPE_MAP)) || !empty($headers[$path]['many']);
-			
-			if($multiple) {
-				if(isset($v[$propName])) {
-					$sub[$propName] = array_merge($v[$propName], explode($this->multipleDelimiter, $record[$index]));
-				} else
-				{
-					$sub[$propName] = explode($this->multipleDelimiter, $record[$index]);
-				}
-			} else
-			{
-				$sub[$propName] = $record[$index];
-			}
-		}
-		
-		//second pass for multiple values
-		foreach($v as $prop => $value) {
-			$relation = $entityClass::getMapping()->getRelation($prop);
-			if(!$relation || !($relation->type == Relation::TYPE_ARRAY || $relation->type == Relation::TYPE_MAP)) {
-				continue;
-			}
-			
-			$new = [];
-			foreach($v[$prop] as $subprop => $subval) {
-				for($i = 0, $c = count($subval); $i < $c; $i++) {
-					if(!isset($new[$i])) {
-						$new[$i] = [];
+
+			$c = $serverMapping[$propName] ?? [];
+
+			if (!isset($map['csvIndex'])) {
+				//has many relations have numeric indexes. Has one is an object with key value
+				if(isset($map[0])) {
+					$v[$propName] = [];
+					foreach ($map as $sub) {
+						$item = $this->convertRecordToProperties($record, $sub, $c['properties'] ?? []);
+						if($item) {
+							$v[$propName][] = $item;
+						}
 					}
-					if(!empty($subval[$i])) {
-						$new[$i][$subprop] = $subval[$i];
+				} else{
+					$item = $this->convertRecordToProperties($record, $map, $c['properties'] ?? []);
+					if($item) {
+						$v[$propName] = $item;
 					}
 				}
+			}else {
+
+				switch ($map['csvIndex']) {
+					case -2:
+						continue 2;
+
+					case -1:
+						$v[$propName] = $map['fixed'];
+						break;
+					default:
+						if (empty($record[$map['csvIndex']])) {
+							continue 2;
+						}
+
+						//track if data was set from CSV. We will remove objects without CSV data
+						$hasCsvData = true;
+
+						$v[$propName] = $record[$map['csvIndex']];
+						break;
+				}
+
+				if(!empty($c['many'])) {
+					$v[$propName] = explode($this->multipleDelimiter, $v[$propName]);
+				}
 			}
-//			go()->warn($new);
-			$v[$prop] = $new;
 		}
-		
-		
+
+		if(!$hasCsvData) {
+			return false;
+		}
+
 		return $v;
 	}
 

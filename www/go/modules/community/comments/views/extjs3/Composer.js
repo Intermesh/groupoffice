@@ -152,7 +152,6 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		this.middleBox.setHeight(totalHeight-2);
 		var headerHeight = (this.header || this.ownerCt.header) ? dp(64) : 0;
 		var h = Math.min(this.ownerCt.growMaxHeight,this.ownerCt.commentsContainer.getEl().dom.scrollHeight + totalHeight + headerHeight);
-		console.warn(h);
 		this.ownerCt.setHeight(h);
 		this.ownerCt.doLayout();	
 		this.doLayout();
