@@ -101,13 +101,14 @@ abstract class Property extends Model {
 
 	protected $readOnly = false;
 
-  /**
-   * Constructor
-   *
-   * @param boolean $isNew Indicates if this model is saved to the database.
-   * @param string[] $fetchProperties The properties that were fetched by find. If empty then all properties are fetched
-   * @throws Exception
-   */
+	/**
+	 * Constructor
+	 *
+	 * @param boolean $isNew Indicates if this model is saved to the database.
+	 * @param string[] $fetchProperties The properties that were fetched by find. If empty then all properties are fetched
+	 * @param bool $readOnly
+	 * @throws ReflectionException
+	 */
 	public function __construct($isNew = true, $fetchProperties = [], $readOnly = false) {
 		$this->isNew = $isNew;
 
@@ -133,6 +134,15 @@ abstract class Property extends Model {
 			}
 		}
 		$this->init();
+	}
+
+	/**
+	 * Check if this model is read only. Models can be fetched read only to improve performance.
+	 *
+	 * @return bool
+	 */
+	public function isReadOnly() {
+		return $this->readOnly;
 	}
 
 	private $defaults = [];
