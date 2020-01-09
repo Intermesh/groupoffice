@@ -54,7 +54,7 @@ GO.form.SelectCountry = function(config){
 
 	GO.form.SelectCountry.superclass.constructor.call(this,{
    store: GO.countriesStore,
-	 value: null,
+	 value: config.value || null,
 		valueField: 'iso',
 		displayField: 'name',
 		triggerAction: 'all',

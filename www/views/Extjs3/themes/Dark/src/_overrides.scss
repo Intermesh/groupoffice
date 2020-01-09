@@ -13,3 +13,10 @@ body {
     border-bottom: 0;
   }
 }
+
+.x-form{
+  &-invalid, textarea.x-form-invalid {
+    border-color: rgba(color($red, 700),0.54);
+    background-color: color($bg, 'box');
+  }
+}
