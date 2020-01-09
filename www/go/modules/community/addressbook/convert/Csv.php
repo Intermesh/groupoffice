@@ -55,7 +55,8 @@ class Csv extends convert\Csv {
 	protected function init() {
 		parent::init();
 		$this->addColumn('isOrganization', go()->t("Is organization", "community", "addressbook"), false);
-		$this->addColumn('organizations', go()->t("Organizations", "community", "addressbook"), true);		
+		$this->addColumn('organizations', go()->t("Organizations", "community", "addressbook"), true);
+		$this->addColumn('gender', go()->t("Gender", "community", "addressbook"), false);
 	}
 
 	protected function importIsOrganization(Contact $contact, $isOrganization, array &$values) {
@@ -76,6 +77,26 @@ class Csv extends convert\Csv {
 
 	public function exportIsOrganization(Contact $contact) {
 		return $contact->isOrganization;
+	}
+
+	public function exportGender(Contact $contact) {
+		return $contact->gender;
+	}
+
+	public function importGender(Contact $contact, $gender) {
+		switch($gender) {
+			case 'M':
+			case 'm':
+			case 'Male':
+				$contact->gender = 'M';
+				return;
+
+			case 'F':
+			case 'f':
+			case 'Female':
+				$contact->gender = 'F';
+				return;
+		}
 	}
 	
 	protected function importOrganizations(Contact $contact, $organizationNames) {

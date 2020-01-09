@@ -62,6 +62,23 @@ abstract class AbstractConverter {
 	protected function init() {
 		
 	}
+
+	/**
+	 * Return list of supported file extensions in lower case!
+	 * eg. ['csv'];
+	 *
+	 * @return string[]
+	 */
+	abstract public static function supportedExtensions();
+
+	/**
+	 * Check if this converter supports the given extension
+	 * @param string $extension eg. "csv"
+	 * @return bool
+	 */
+	public static function supportsExtension($extension) {
+		return in_array(strtolower($extension), static::supportedExtensions());
+	}
 	
 	/**
 	 * The name of the convertor

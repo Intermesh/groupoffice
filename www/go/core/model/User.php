@@ -851,11 +851,12 @@ class User extends Entity {
 	}
 
 
+	/**
+	 * @inheritDoc
+	 */
 	public static function converters()
 	{
-		$arr = parent::converters();
-		$arr['text/csv'] = UserCsv::class;
-		return $arr;
+		return array_merge(parent::converters(), [UserCsv::class]);
 	}
 
 }

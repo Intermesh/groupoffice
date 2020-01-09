@@ -593,13 +593,12 @@ class Contact extends AclItemEntity {
 		
 		return parent::sort($query, $sort);
 	}
-	
+
+	/**
+	 * @inheritDoc
+	 */
 	public static function converters() {
-		$arr = parent::converters();
-		$arr['text/vcard'] = VCard::class;		
-		$arr['text/x-vcard'] = VCard::class;
-		$arr['text/csv'] = Csv::class;
-		return $arr;
+		return array_merge(parent::converters(), [VCard::class, Csv::class]);
 	}
 
 	protected static function textFilterColumns() {
@@ -707,11 +706,12 @@ class Contact extends AclItemEntity {
 		
 		return parent::internalValidate();
 	}
-	
+
 	/**
 	 * Find all linked organizations
-	 * 
+	 *
 	 * @return self[]
+	 * @throws Exception
 	 */
 	public function findOrganizations(){
 		return self::find()

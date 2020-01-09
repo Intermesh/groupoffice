@@ -826,7 +826,7 @@ abstract class EntityController extends Controller {
 		
 		$blob = Blob::findById($params['blobId']);	
 		
-		$converter = $this->findConverter($blob->type);
+		$converter = $this->findConverter((new File($blob->name))->getExtension());
 
     $file = $blob->getFile()->copy(File::tempFile('csv'));
     $file->convertToUtf8();
@@ -853,8 +853,8 @@ abstract class EntityController extends Controller {
 
 		$file = $blob->getFile()->copy(File::tempFile('csv'));
     $file->convertToUtf8();
-		
-		$converter = $this->findConverter($blob->type);
+
+		$converter = $this->findConverter((new File($blob->name))->getExtension());
 		
 		$response['goHeaders'] = $converter->getEntityMapping($this->entityClass());
 		$response['csvHeaders'] = $converter->getCsvHeaders($file);
@@ -873,16 +873,18 @@ abstract class EntityController extends Controller {
    * @return AbstractConverter
    * @throws InvalidArguments
    */
-	private function findConverter($contentType) {
+	private function findConverter($extension) {
 		
 		$cls = $this->entityClass();		
-		$map = $cls::converters();
-		
-		if(!isset($map[$contentType])) {
-			throw new InvalidArguments("Converter for file type '" . $contentType .'" is not found');		
+		foreach($cls::converters() as $converter) {
+			if($converter::supportsExtension($extension)) {
+				return new $converter;
+			}
 		}
 		
-		return new $map[$contentType];		
+		throw new InvalidArguments("Converter for file extension '" . $extension .'" is not found');
+
+
 	}
 
   /**
@@ -891,7 +893,7 @@ abstract class EntityController extends Controller {
    * You can use Foo/query first and then pass the ids of that result to
    * Foo/export().
    *
-   * @param array $params Identical to Foo/get. Additionally you MUST pass a 'contentType'. It will find the converter class using the Entity::converter() method.
+   * @param array $params Identical to Foo/get. Additionally you MUST pass a 'extension'. It will find the converter class using the Entity::converter() method.
    * @return array
    * @throws InvalidArguments
    * @throws Exception
@@ -904,7 +906,7 @@ abstract class EntityController extends Controller {
 		
 		$params = $this->paramsExport($params);
 		
-		$convertor = $this->findConverter($params['contentType']);
+		$convertor = $this->findConverter($params['extension']);
 				
 		$entities = $this->getGetQuery($params);
 		

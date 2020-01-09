@@ -4,7 +4,8 @@ namespace go\core\orm;
 
 use Exception;
 use GO\Base\Exception\AccessDenied;
-use go\core\data\convert\JSON;
+use go\core\data\convert\AbstractConverter;
+use go\core\data\convert\Json;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
@@ -772,12 +773,13 @@ abstract class Entity extends Property {
 	public static function getState () {
 		return null;
 	}
-	
+
 	/**
 	 * Copy the entity
 	 *
 	 * @return static
-	 */	
+	 * @throws Exception
+	 */
 	public function copy() {
 		return $this->internalCopy();
 	}
@@ -788,12 +790,10 @@ abstract class Entity extends Property {
 	 * 
 	 * Override to add more.
 	 * 
-	 * @return array
+	 * @return AbstractConverter[]
 	 */
 	public static function converters() {
-		return [
-				'application/json' => JSON::class
-		];
+		return [Json::class];
 	}
 
   /**

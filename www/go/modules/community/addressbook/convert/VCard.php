@@ -454,12 +454,13 @@ class VCard extends AbstractConverter {
 
 		return $response;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param VCardComponent $vcardComponent
 	 * @param int $addressBookId
 	 * @return Contact
+	 * @throws \ReflectionException
 	 */
 	private function findOrCreateContact(VCardComponent $vcardComponent, $addressBookId) {
 		$contact = false;
@@ -494,4 +495,11 @@ class VCard extends AbstractConverter {
 		return $blob;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
+	public static function supportedExtensions()
+	{
+		return ['vcf'];
+	}
 }

@@ -591,4 +591,11 @@ class Csv extends AbstractConverter {
 		return $headers;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
+	public static function supportedExtensions()
+	{
+		return ['csv'];
+	}
 }

@@ -375,82 +375,79 @@ go.util =  (function () {
 				upload: function (response) {
 					Ext.getBody().mask(t("Importing..."));
 
-					switch (response.type) {
 
-						case 'text/csv':
-							Ext.getBody().unmask();
+					if(response.name.toLowerCase().substr(-3) == 'csv') {
+						Ext.getBody().unmask();
 
-							var dlg = new go.import.CsvMappingDialog({
-								entity: entity,
+						var dlg = new go.import.CsvMappingDialog({
+							entity: entity,
+							blobId: response.blobId,
+							values: values,
+							fields: options.fields || {},
+							aliases: options.aliases || {}
+						});
+						dlg.show();
+					}else {
+						go.Jmap.request({
+							method: entity + "/import",
+							params: {
 								blobId: response.blobId,
-								values: values,								
-								fields: options.fields || {},
-								aliases: options.aliases || {}
-							});
-							dlg.show();
-							break;
+								values: values
+							},
+							callback: function (options, success, response) {
 
-						default:
-							go.Jmap.request({
-								method: entity + "/import",
-								params: {
-									blobId: response.blobId,
-									values: values
-								},
-								callback: function (options, success, response) {
-									
-									Ext.getBody().unmask();
-									
-									if (!success) {
-										Ext.MessageBox.alert(t("Error"), response.errors.join("<br />"));
-									} else
-									{
-										var msg = t("Imported {count} items").replace('{count}', response.count) + ". ";;
+								Ext.getBody().unmask();
 
-										if(response.errors && response.errors.length) {
-											msg += t("{count} items failed to import. A log follows: <br /><br />").replace('{count}', response.errors.length) + response.errors.join("<br />");
-										}
-										
-										Ext.MessageBox.alert(t("Success"), msg);
+								if (!success) {
+									Ext.MessageBox.alert(t("Error"), response.errors.join("<br />"));
+								} else {
+									var msg = t("Imported {count} items").replace('{count}', response.count) + ". ";
+									;
+
+									if (response.errors && response.errors.length) {
+										msg += t("{count} items failed to import. A log follows: <br /><br />").replace('{count}', response.errors.length) + response.errors.join("<br />");
 									}
 
-									// if (callback) {
-									// 	callback.call(scope || this, response);
-									// }
-								},
-								scope: this
-							});
-						}
-					},
-					scope: this
-				}
-			});
-		},
+									Ext.MessageBox.alert(t("Success"), msg);
+								}
 
-		parseEmail : function(emails) {			
-			
-			if(Ext.form.VTypes.emailAddress(emails)) {
-				return [{
-						name: "",
-						email: emails
-				}];
+								// if (callback) {
+								// 	callback.call(scope || this, response);
+								// }
+							},
+							scope: this
+						});
+					}
+				},
+				scope: this
 			}
+		});
+	},
 
-			var re  = /(?:"?([A-Z]?[^<"]*)"?\s*)?<?([^>\s,]+)/g;
-			var a = [];
-			while (m = re.exec(emails)) {
-				if(m[1]) { m[1] = m[1].trim(); }
-				console.log("Name: "  + m[1]);
-				console.log("Email: " + m[2]);
+	parseEmail : function(emails) {
 
-				a.push({
-					name: m[1],
-					email: m[2]
-				});
-			}
-
-			return a;
+		if(Ext.form.VTypes.emailAddress(emails)) {
+			return [{
+					name: "",
+					email: emails
+			}];
 		}
+
+		var re  = /(?:"?([A-Z]?[^<"]*)"?\s*)?<?([^>\s,]+)/g;
+		var a = [];
+		while (m = re.exec(emails)) {
+			if(m[1]) { m[1] = m[1].trim(); }
+			console.log("Name: "  + m[1]);
+			console.log("Email: " + m[2]);
+
+			a.push({
+				name: m[1],
+				email: m[2]
+			});
+		}
+
+		return a;
+	}
 	};
 })();
 

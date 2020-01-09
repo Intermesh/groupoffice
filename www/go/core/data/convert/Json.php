@@ -50,4 +50,11 @@ class Json extends AbstractConverter {
 		
 	}
 
+	/**
+	 * @inheritDoc
+	 */
+	public static function supportedExtensions()
+	{
+		return ['json'];
+	}
 }

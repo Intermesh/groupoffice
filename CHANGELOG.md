@@ -1,4 +1,5 @@
 
+- Address book: Auto detect Outlook CSV mapping for import
 - Carddav: Fixed sync problem due to invalid uri's
 - Custom fields: Template custom field added and fixed error function custom field
 - Core: Use ErrorHandler::log instead of trigger_error to prevent exit of function on minor warnings

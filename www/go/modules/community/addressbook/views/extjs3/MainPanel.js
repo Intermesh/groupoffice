@@ -236,7 +236,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 														"Business Street": {
 															field: "addresses[].street",
 															fixed: {type: "work"},
-															related: {
+								  							related: {
 																street2: "Business Street 2",
 																city: "Business City",
 																state: "Business State",
@@ -258,7 +258,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 															}
 														},
 
-														"Company" : "Organizations"
+														"Company" : "organizations"
 													},
 													fields: {
 														prefixes: {label: t("Prefixes")},
