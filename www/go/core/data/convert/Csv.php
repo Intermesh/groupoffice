@@ -56,6 +56,8 @@ class Csv extends AbstractConverter {
 	 */
 	public static $excludeHeaders = [];
 
+	public $aliases = [];
+
 	protected function init()
 	{
 		parent::init();
@@ -63,6 +65,13 @@ class Csv extends AbstractConverter {
 		$user = go()->getAuthState()->getUser(['listSeparator', 'textSeparator']);
 		$this->delimiter = $user->listSeparator;
 		$this->enclosure = $user->textSeparator;
+	}
+
+	public function addAlias($name, $alias) {
+		if(!isset($this->aliases[$name])) {
+			$this->aliases[$name] = [];
+		}
+		$this->aliases[$name][] = $alias;
 	}
 
   /**

@@ -187,51 +187,151 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 												".csv, .vcf, text/vcard",
 												{addressBookId: this.addAddressBookId},
 												{
-													labels: {
-														prefixes: t("Prefixes"),
-														firstName: t("First name"),
-														middleName: t("Middle name"),
-														lastName: t("Last name"),
-														name: t("Name"),
-														suffixes: t("Suffixes"),
-														gender: t("Gender"),
-														notes: t("Notes"),
-														isOrganization: t("Is organization"),
-														IBAN: t("IBAN"),
-														registrationNumber: t("Registration number"),
-														vatNo: t("VAT number"),
-														vatReverseCharge: t("Reverse charge VAT"),
-														debtorNumber: t("Debtor number"),
-														photoBlobId: t("Photo blob ID"),
-														language: t("Language"),
-														jobTitle: t("Job title"),
-														uid: t("UUID"),
-														starred: t("Starred"),
-														"dates.type": t("Date type"),
-														"dates.date": t("Date"),
-														"phoneNumbers.type": t("Phone type"),
-														"phoneNumbers.number": t("Phone number"),
+													aliases : {
+														"Given name": "firstName",
+														"First name": "firstName",
+
+														"Middle name": "middleName",
+
+														"Family Name": "lastName",
+														"Last Name": "lastName",
+
+														"Job Title": "jobTitle",
+														"Suffix": "suffixes",
+														"Web page" : {field: "urls[].url", fixed: {"type": "homepage"}},
+														"Birthday" : {field: "dates[].date", fixed: {"type": "birthday"}},
+														"Anniversary" : {field: "dates[].date", fixed: {"type": "anniversary"}},
+
+														"E-mail 1 - Value": {field: "emailAddresses[].email", related: {"type": "E-mail 1 - Type"}},
+														"email": {field: "emailAddresses[].email", fixed: {"type": "work"}},
+														"E-mail Address": {field: "emailAddresses[].email", fixed: {"type": "work"}},
+														"E-mail 2 Address": {field: "emailAddresses[].email", fixed: {"type": "work"}},
+														"E-mail 3 Address": {field: "emailAddresses[].email", fixed: {"type": "work"}},
+
+														"Primary Phone": {field: "phoneNumbers[].number", fixed: {"type": "work"}},
+														"Home Phone": {field: "phoneNumbers[].number", fixed: {"type": "home"}},
+														"Home Phone 2": {field: "phoneNumbers[].number", fixed: {"type": "home"}},
+
+														"Business Phone": {field: "phoneNumbers[].number", fixed: {"type": "work"}},
+														"Business Phone 2": {field: "phoneNumbers[].number", fixed: {"type": "work"}},
+
+														"Mobile Phone": {field: "phoneNumbers[].number", fixed: {"type": "mobile"}},
+														"Pager": {field: "phoneNumbers[].number", fixed: {"type": "other"}},
+														"Home Fax": {field: "phoneNumbers[].number", fixed: {"type": "fax"}},
+
+														"Other Phone": {field: "phoneNumbers[].number", fixed: {"type": "other"}},
+														"Other Fax": {field: "phoneNumbers[].number", fixed: {"type": "fax"}},
+
+														"Home Street": {
+															field: "addresses[].street",
+															fixed: {type: "home"},
+															related: {
+																street2: "Home Street 2",
+																city: "Home City",
+																state: "Home State",
+																zipCode: "Home Postal Code",
+																country: "Home Country"
+															}
+														},
+														"Business Street": {
+															field: "addresses[].street",
+															fixed: {type: "work"},
+															related: {
+																street2: "Business Street 2",
+																city: "Business City",
+																state: "Business State",
+																zipCode: "Business Postal Code",
+																country: "Business Country"
+
+															}
+														},
+														"Other Street": {
+															field: "addresses[].street",
+															fixed: {type: "other"},
+															related: {
+																street2: "Other Street 2",
+																city: "Other City",
+																state: "Other State",
+																zipCode: "Other Postal Code",
+																country: "Other Country"
+
+															}
+														},
+
+														"Company" : "Organizations"
+													},
+													fields: {
+														prefixes: {label: t("Prefixes")},
+														initials: {label: t("Initials")},
+														salutation: {label: t("Salutation")},
+														color: {label: t("Color")},
+														firstName: {label: t("First name"), aliases: ["First", "Given Name"]},
+														middleName: {label: t("Middle name")},
+														lastName: {label: t("Last name"), aliases: ["Last", "Family name"]},
+														name: {label: t("Name")},
+														suffixes: {label: t("Suffixes")},
+														gender: {label: t("Gender")},
+														notes: {label: t("Notes")},
+														isOrganization: {label: t("Is organization")},
+														IBAN: {label: t("IBAN")},
+														registrationNumber: {label: t("Registration number")},
+														vatNo: {label: t("VAT number")},
+														vatReverseCharge: {label: t("Reverse charge VAT")},
+														debtorNumber: {label: t("Debtor number")},
+														photoBlobId: {label: t("Photo blob ID")},
+														language: {label: t("Language")},
+														jobTitle: {label: t("Job title")},
+														uid: {label: t("UUID")},
+														starred: {label: t("Starred")},
 
 														"emailAddresses": {
 															label: t("E-mail address"),
 															properties: {
-																"email": "E-mail",
-																"type": t("Type")
+																"email": {label: "E-mail"},
+																"type": {label: t("Type")}
 															}
 														},
-														"addresses.type": t("Address type"),
-														"addresses.street": t("Address street"),
-														"addresses.street2": t("Address street 2"),
-														"addresses.zipCode": t("Address ZIP code"),
-														"addresses.city": t("Address city"),
-														"addresses.state": t("Address state"),
-														"addresses.country": t("Address country"),
-														"addresses.countryCode": t("Address country code"),
-														"addresses.latitude": t("Address latitude"),
-														"addresses.longitude": t("Address longitude"),
-														"urls.type": t("URL type"),
-														"urls.number": t("URL number"),
-														
+
+														"dates": {
+															label: t("Dates"),
+															properties: {
+																"date": {label: "Date"},
+																"type": {label: t("Type")}
+															}
+														},
+
+														"dates": {
+															label: t("Phone numbers"),
+															properties: {
+																"number": {label: "Number"},
+																"type": {label: t("Type")}
+															}
+														},
+
+														"urls": {
+															label: t("URL's"),
+															properties: {
+																"url": {label: "URL"},
+																"type": {label: t("Type")}
+															}
+														},
+
+														"addresses": {
+															label: t("Addresses"),
+															properties: {
+																"type": {label: t("Type")},
+																"street": {label: t("Street")},
+																"street 2": {label: t("Street 2")},
+																"zipCode": {label: t("ZIP code")},
+																"city": {label: t("City")},
+																"state": {label: t("state")},
+																"country": {label: t("Country")},
+																"countryCode": {label: t("Country code")},
+																"latitude": {label: t("Latitude")},
+																"longitude": {label: t("Longitude")}
+															}
+														}
+
 													}
 												});
 							},

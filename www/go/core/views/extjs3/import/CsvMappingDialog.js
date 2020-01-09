@@ -55,14 +55,11 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 				}
 				this.csvStore = this.createCsvHeaderStore(response.csvHeaders);
 				this.csvHeaders = response.csvHeaders;
-				// this.goHeaders = response.goHeaders;
 
+				this.fieldSet.add(this.createMappingFields(response.goHeaders, this.fields));
 
-
-
-				this.fieldSet.add(this.createMappingFields(response.goHeaders, this.labels));
-
-				var v = this.transformCsvHeadersToValues(response.goHeaders);
+				var v = this.transformCsvHeadersToValues(response.goHeaders, this.fields);
+				Ext.apply(v, this.findAliases());
 				this.formPanel.form.setValues(v);
 				
 				this.doLayout();
@@ -71,7 +68,59 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 		});
 	},
 
-	transformCsvHeadersToValues : function(goHeaders, parent) {
+
+	findAliases: function() {
+
+		var v = {};
+
+		for(var a in this.aliases) {
+			var index = this.csvHeaders.findIndex(function(h) {
+				return h.toLowerCase() == a.toLowerCase();
+			});
+			if(index == -1) {
+				continue;
+			}
+			var aliasCfg = this.aliases[a];
+			if(Ext.isString(aliasCfg)) {
+				v[aliasCfg] = {csvIndex: index, fixed: null}
+				go.util.Object.applyPath(v, aliasCfg,{csvIndex: index, fixed: null});
+				continue;
+			}
+
+			var child = go.util.Object.applyPath(v, aliasCfg.field,{csvIndex: index, fixed: null});
+
+			if(aliasCfg.fixed) {
+				for(var field in aliasCfg.fixed) {
+					child[field] = {csvIndex: -1, fixed: aliasCfg.fixed[field]};
+				}
+			}
+
+			if(aliasCfg.related) {
+				for(var field in aliasCfg.related) {
+					var index = this.csvHeaders.findIndex(function(h) {
+						return h.toLowerCase() == aliasCfg.related[field].toLowerCase();
+					});
+					if(index > -1) {
+						child[field] = {csvIndex: index, fixed: null};
+					}
+				}
+			}
+		}
+
+		console.warn(v);
+
+		return v;
+	},
+
+
+	/**
+	 * This will generate the form values for the mapping dialog.
+	 *
+	 * @param goHeaders
+	 * @param parent
+	 * @returns {{}}
+	 */
+	transformCsvHeadersToValues : function(goHeaders, fields, parent) {
 		var v = {};
 
 		for(var name in goHeaders) {
@@ -121,7 +170,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 		return {csvIndex: csvIndex, fixed: null};
 	},
 
-	createMappingFields : function(headers, labels, parent) {
+	createMappingFields : function(headers, fields, parent) {
 		// var index = 0;
 		var items = [];
 		// headers.forEach(function(h) {
@@ -132,7 +181,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 					xtype: "formcontainer",
 					labelWidth: dp(200),
 					hideLabel: true,
-					items: this.createMappingFields(h.properties, labels[h.name] ? labels[h.name].properties : {}, parent ? parent + "." + h.name : h.name)
+					items: this.createMappingFields(h.properties, fields[h.name] ? fields[h.name].properties : {}, parent ? parent + "." + h.name : h.name)
 				};
 
 				if(h.many) {
@@ -142,7 +191,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 						name: h.name,
 						xtype: "formgroup",
 						hideLabel: true,
-						title: labels[h.name] ? labels[h.name].label : h.label || h.name,
+						title: fields[h.name] ? fields[h.name].label : h.label || h.name,
 						itemCfg: formContainer
 					};
 				} else {
@@ -150,7 +199,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 					var field = {
 						xtype: "fieldset",
 						hideLabel: true,
-						title: labels[h.name] ? labels[h.name].label : h.label || h.name,
+						title: fields[h.name] ? fields[h.name].label : h.label || h.name,
 						items: [formContainer]
 					};
 				}
@@ -162,7 +211,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 					labelAlign: "top",
 					layout: 'hbox',
 					name: h.name,
-					fieldLabel: this.labels[h.name] || h.label || h.name,
+					fieldLabel: fields[h.name] ? fields[h.name].label : (h.label || h.name),
 					items: [this.createCombo({
 						store: this.csvStore,
 						hiddenName: "csvIndex"
@@ -185,7 +234,6 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 			fields: ['index', 'name'],
 			idField: 0,
 			data: [[-2, t("Empty")], [-1, t("Fixed value")]].concat(headers.map(function(h) {
-				// var label = me.labels[h.name] || h.label || h.name;
 				return [headers.indexOf(h), h];
 			}))
 		});

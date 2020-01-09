@@ -384,7 +384,8 @@ go.util =  (function () {
 								entity: entity,
 								blobId: response.blobId,
 								values: values,								
-								labels: options.labels || {}
+								fields: options.fields || {},
+								aliases: options.aliases || {}
 							});
 							dlg.show();
 							break;
