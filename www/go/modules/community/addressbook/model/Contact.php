@@ -619,7 +619,11 @@ class Contact extends AclItemEntity {
 	
 	public function getUid() {
 		
-		if(!$this->isNew() && !isset($this->uid)) {
+		if(!isset($this->uid)) {
+			if(!isset($this->id)) {
+				return null;
+			}
+
 			$url = trim(go()->getSettings()->URL, '/');
 			$uid = substr($url, strpos($url, '://') + 3);
 			$uid = str_replace('/', '-', $uid );
@@ -639,7 +643,11 @@ class Contact extends AclItemEntity {
 
 	public function getUri() {
 		if(!isset($this->uri)) {
-			$this->uri = $this->getUid() . '.vcf';
+			$uid = $this->getUid();
+			if(!isset($uid)) {
+				return null;
+			}
+			$this->uri = $uid . '.vcf';
 		}
 
 		return $this->uri;
