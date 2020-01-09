@@ -1,3 +1,5 @@
+- Core: Use ErrorHandler::log instead of trigger_error to prevent exit of function on minor warnings
+
 07-01-2020 6.4.99
 - Core: Error could occur with module permissions because some cache was shared which should have been per user
 - Comments: Unable to edit fixed.
