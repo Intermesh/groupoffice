@@ -1,3 +1,6 @@
+09-01-2020 6.4.100
+- Custom fields: Template custom field added and fixed error function custom field
+
 07-01-2020 6.4.99
 - Core: Error could occur with module permissions because some cache was shared which should have been per user
 - Comments: Unable to edit fixed.
