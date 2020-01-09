@@ -94,7 +94,7 @@ class EmailReminders extends AbstractCron {
 				\GO\Base\Mail\Mailer::newGoInstance()->send($message, $failedRecipients);
 				
 				if(!empty($failedRecipients))
-					trigger_error ("Reminder mail failed for recipient: ".implode(',', $failedRecipients), E_USER_NOTICE);
+					\go\core\ErrorHandler::log ("Reminder mail failed for recipient: ".implode(',', $failedRecipients));
 
 				$reminderUserModelSend = \GO\Base\Model\ReminderUser::model()
 					->findSingleByAttributes(array(

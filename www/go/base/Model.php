@@ -68,7 +68,7 @@ abstract class Model extends Observable {
 				throw new \Exception("Can't get not existing property '$name' in '" . $this->className() . "'");
 			else {
 //				TODO Enable this when we're sure all properties exist
-				trigger_error("Can't get not existing property '$name' in '" . $this->className() . "'", E_USER_NOTICE);
+				error_log("Can't get not existing property '$name' in '" . $this->className() . "'");
 				return null;
 			}
 		}
@@ -108,7 +108,7 @@ abstract class Model extends Observable {
 			if (\GO::config()->debug)
 				throw new \Exception($errorMsg);
 			else {
-				trigger_error($errorMsg, E_USER_NOTICE);
+				error_log($errorMsg);
 			}
 		}
 	}
