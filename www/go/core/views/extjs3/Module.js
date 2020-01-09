@@ -136,4 +136,12 @@ GO.mainLayout.on('render', function () {
 		searchField.setValue(query);
 		searchField.search();
 	};
+
+	//Prevent browser nav on file drop.
+	document.addEventListener("dragover",function(e){
+		e.preventDefault();
+	},false);
+	document.addEventListener("drop",function(e){
+		e.preventDefault();
+	},false);
 });
