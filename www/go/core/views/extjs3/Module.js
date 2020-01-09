@@ -47,6 +47,7 @@ go.Modules.register("core", 'core', {
 		"go.customfields.type.DateTime",
 		"go.customfields.type.EncryptedText",
 		"go.customfields.type.FunctionField",
+		"go.customfields.type.Template",
 		"go.customfields.type.Group",
 		"go.customfields.type.Html",
 		"go.customfields.type.MultiSelect",

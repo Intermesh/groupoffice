@@ -12,6 +12,11 @@ class FunctionField extends Number {
 	public function onFieldDelete() {
 		return true;
 	}
+
+	public function hasColumn()
+	{
+		return false;
+	}
 	
 	/**
 	 * Get column definition for SQL
