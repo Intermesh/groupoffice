@@ -1,4 +1,5 @@
 - Core: Use ErrorHandler::log instead of trigger_error to prevent exit of function on minor warnings
+- Core: Fixed truncate holidays tool
 
 07-01-2020 6.4.99
 - Core: Error could occur with module permissions because some cache was shared which should have been per user
