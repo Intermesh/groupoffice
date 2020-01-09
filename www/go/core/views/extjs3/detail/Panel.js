@@ -178,9 +178,12 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 	load: function (id) {
 		this.currentId = id;
-		this.entityStore.get([id], function(entities) {
-			this.internalLoad(entities[0]);
-		}, this);
+		var me = this;
+		this.entityStore.single(id).then(function(entity) {
+			me.internalLoad(entity);
+		}).catch(function() {
+			Ext.MessageBox.alert(t("Not found"), "The requested page was not found");
+		});
 	},
 
 	addCustomFields : function() {

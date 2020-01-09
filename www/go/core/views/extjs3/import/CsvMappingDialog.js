@@ -86,7 +86,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 						part = parent ? parent + "." + part : part;
 
 						var headerIndex = this.csvHeaders.findIndex(function (csvH) {
-							return csvH.indexOf(part) == 0;
+							return csvH.toLowerCase().indexOf(part.toLowerCase()) == 0;
 						});
 
 						if (headerIndex == -1) {
@@ -111,8 +111,8 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 	findSingleCsvIndex : function(h, parent) {
 		var csvIndex = -2;
 		var storeIndex = this.csvStore.findBy(function(r) {
-			var find = r.data.name;
-			return find == (parent ? parent + "." + h.name : h.name);
+			var find = r.data.name.toLowerCase();
+			return find == (parent ? parent + "." + h.name : h.name).toLowerCase();
 		});
 		if(storeIndex > -1){
 			csvIndex = this.csvStore.getAt(storeIndex).data.index;
