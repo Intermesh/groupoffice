@@ -103,7 +103,7 @@ class Csv extends convert\Csv {
 		if(!isset($organizationNames)) {
 			return;
 		}
-		//todo how to handle if org is not imported yet?
+
 		$orgIds = [];
 		foreach($organizationNames as $name) {
 			$org = Contact::find()->where(['name' => $name, 'isOrganization' => true])->single();
@@ -130,4 +130,5 @@ class Csv extends convert\Csv {
 
 		return implode($this->multipleDelimiter, array_column($templateValues['organizations'], 'name'));
 	}
+
 }

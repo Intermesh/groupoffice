@@ -347,7 +347,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 										go.util.exportToFile(
 														'Contact',
 														Object.assign(go.util.clone(this.grid.store.baseParams), this.grid.store.lastOptions.params, {limit: 0, position: 0}),
-														'text/vcard');									
+														'vcf');
 									},
 									scope: this
 								},{
@@ -357,7 +357,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 										go.util.exportToFile(
 														'Contact',
 														Object.assign(go.util.clone(this.grid.store.baseParams), this.grid.store.lastOptions.params, {limit: 0, position: 0}),
-														'text/csv');									
+														'csv');
 									},
 									scope: this
 								}

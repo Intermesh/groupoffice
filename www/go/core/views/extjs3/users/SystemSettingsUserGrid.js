@@ -105,7 +105,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 								go.util.exportToFile(
 												'User',
 												Object.assign(this.store.baseParams, this.store.lastOptions.params, {limit: 0, position: 0}),
-												'text/csv');									
+												'csv');
 							},
 							scope: this	
 						}, '-',

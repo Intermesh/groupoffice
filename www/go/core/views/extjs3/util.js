@@ -320,10 +320,10 @@ go.util =  (function () {
 	 * 
 	 * @param {string} entity eg. "Contact"
 	 * @param {string} queryParams eg. Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0})
-	 * @param {stirng} contentType eg "text/vcard" or "application/json"
+	 * @param {stirng} extension eg "text/vcard" or "application/json"
 	 * @return {undefined}
 	 */
-	exportToFile: function (entity, queryParams, contentType) {
+	exportToFile: function (entity, queryParams, extension) {
 		
 		Ext.getBody().mask(t("Exporting..."));
 		var promise = go.Jmap.request({
@@ -336,7 +336,7 @@ go.util =  (function () {
 		go.Jmap.request({
 			method: entity + "/export",
 			params: {
-				contentType: contentType,
+				extension: extension,
 				"#ids": {
 					resultOf: promise.callId,
 					path: "/ids"

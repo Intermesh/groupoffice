@@ -786,8 +786,8 @@ abstract class EntityController extends Controller {
    */
 	protected function paramsExport($params){
 		
-		if(!isset($params['contentType'])) {
-			throw new InvalidArguments("'contentType' parameter is required");
+		if(!isset($params['extension'])) {
+			throw new InvalidArguments("'extension' parameter is required");
 		}
 		
 		return $this->paramsGet($params);

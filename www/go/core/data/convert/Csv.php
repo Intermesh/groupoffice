@@ -3,6 +3,7 @@
 namespace go\core\data\convert;
 
 use Exception;
+use go\core\event\EventEmitterTrait;
 use go\core\fs\File;
 use go\core\model\Field;
 use go\core\orm\Entity;
@@ -32,6 +33,10 @@ use Sabre\VObject\Property\VCard\DateTime;
  * ]
  */
 class Csv extends AbstractConverter {
+
+	use EventEmitterTrait;
+
+	const EVENT_INIT = 0;
 	
 	/**
 	 *
@@ -56,8 +61,6 @@ class Csv extends AbstractConverter {
 	 */
 	public static $excludeHeaders = [];
 
-	public $aliases = [];
-
 	protected function init()
 	{
 		parent::init();
@@ -65,14 +68,11 @@ class Csv extends AbstractConverter {
 		$user = go()->getAuthState()->getUser(['listSeparator', 'textSeparator']);
 		$this->delimiter = $user->listSeparator;
 		$this->enclosure = $user->textSeparator;
+
+
+		static::fireEvent(static::EVENT_INIT, $this);
 	}
 
-	public function addAlias($name, $alias) {
-		if(!isset($this->aliases[$name])) {
-			$this->aliases[$name] = [];
-		}
-		$this->aliases[$name][] = $alias;
-	}
 
   /**
    * Exports an entity to a CSV record array
@@ -108,15 +108,15 @@ class Csv extends AbstractConverter {
 	 * @param string $name Column name
 	 * @param string $label Column label
 	 * @param bool $many True if this field value should be converted to an array when importing
-	 * @param string $exportFunction Defaults to "export" . ucfirst($name) The function is called with Entity $entity, array $templateValues $columnName
-	 * @param string $importFunction Defaults to "import" . ucfirst($name) The import function is called with Entity $entity, $value, array $values
+	 * @param Callable $exportFunction Defaults to "export" . ucfirst($name) The function is called with Entity $entity, array $templateValues $columnName
+	 * @param Callable $importFunction Defaults to "import" . ucfirst($name) The import function is called with Entity $entity, $value, array $values
 	 */
-	protected function addColumn($name, $label, $many = false, $exportFunction = null, $importFunction = null) {
+	public function addColumn($name, $label, $many = false, $exportFunction = null, $importFunction = null) {
 		if(!isset($exportFunction)) {
-			$exportFunction = "export".ucfirst($name);
+			$exportFunction = [$this, "export".ucfirst($name)];
 		}
 		if(!isset($importFunction)) {
-			$importFunction = "import".ucfirst($name);
+			$importFunction = [$this, "import".ucfirst($name)];
 		}
 		
 		$this->customColumns[$name] = [
@@ -206,7 +206,7 @@ class Csv extends AbstractConverter {
 	}
 	
 	private function getCustomColumnValue(Entity $entity, $templateValues, $header) {
-		return call_user_func([$this, $this->customColumns[$header]['exportFunction']], $entity, $templateValues, $header);
+		return call_user_func($this->customColumns[$header]['exportFunction'], $entity, $templateValues, $header);
 	}
 	
 	private function exportSubFields($record, $v) {
@@ -449,7 +449,7 @@ class Csv extends AbstractConverter {
 	
 	protected function importCustomColumns(Entity $entity, $values){
 		foreach($this->customColumns as $c) {
-			call_user_func_array([$this, $c['importFunction']], [$entity, $values[$c['name']] ?? null, &$values, $c['name']]);
+			call_user_func_array( $c['importFunction'], [$entity, $values[$c['name']] ?? null, &$values, $c['name']]);
 			unset($values[$c['name']]);
 		}
 		return $values;
