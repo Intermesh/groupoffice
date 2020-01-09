@@ -249,7 +249,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 	onLoad: function () {
 
 		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < go.permissionLevels.write);
-
+		this.deleteItem.setDisabled(this.data.permissionLevel < go.permissionLevels.writeAndDelete);
 		this.starItem.setIconClass(this.data.starred ? "ic-star" : "ic-star-border");
 		go.modules.community.addressbook.ContactDetail.superclass.onLoad.call(this);
 	},
