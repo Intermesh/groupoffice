@@ -101,29 +101,26 @@ go.smtp.AccountDialog = Ext.extend(go.form.Dialog, {
 
 	sendTestMessage : function() {
 		this.getEl().mask(t("Sending..."));
+		var me = this;
 		
 		go.Jmap.request({
 			method: "SmtpAccount/test",
-			params: this.formPanel.getForm().getFieldValues(),
-			callback: function (options, success, response) {
-				this.getEl().unmask();
-				if(success) {
-					Ext.MessageBox.alert(
-						t("Success"), 
-						t("A message was sent successfully to {email}").replace('{email}', this.formPanel.getForm().findField('fromEmail').getValue())
-					);
-				} else
-				{
-					var error = "";					
-					error = "<br /><br />" + response.message;
-					
-					Ext.MessageBox.alert(
-						t("Failed"), 
-						t("Failed to send message to {email}").replace('{email}', this.formPanel.getForm().findField('fromEmail').getValue() + error) 
-					);
-				}
-			},
-			scope: this
+			params: this.formPanel.getForm().getFieldValues()
+		}).then(function() {
+			Ext.MessageBox.alert(
+				t("Success"),
+				t("A message was sent successfully to {email}").replace('{email}', me.formPanel.getForm().findField('fromEmail').getValue())
+			);
+		}).catch(function(response) {
+			var error = "";
+			error = "<br /><br />" + response.message;
+
+			Ext.MessageBox.alert(
+				t("Failed"),
+				t("Failed to send message to {email}").replace('{email}', me.formPanel.getForm().findField('fromEmail').getValue() + error)
+			);
+		}).finally(function() {
+			me.getEl().unmask();
 		});
 		
 		

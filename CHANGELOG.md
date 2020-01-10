@@ -1,4 +1,6 @@
-
+- Core: Error handling for uncaught exceptions
+- Address book: Adding contact to two groups immediately after eachother would only add it to the last one.
+- Address book: Improved import / export
 - Address book: Auto detect Outlook CSV mapping for import
 - Carddav: Fixed sync problem due to invalid uri's
 - Custom fields: Template custom field added and fixed error function custom field
