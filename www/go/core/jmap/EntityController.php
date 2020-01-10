@@ -229,6 +229,7 @@ abstract class EntityController extends Controller {
    * @throws Exception
    */
 	protected function defaultQuery($params) {
+
 		
 		$p = $this->paramsQuery($params);
 		$idsQuery = $this->getQueryQuery($p);
@@ -244,7 +245,6 @@ abstract class EntityController extends Controller {
 			}
 			$ids[] = $count ? $record[0] : implode('-', $record);
 		}
-	
 
 		$response = [
 				'accountId' => $p['accountId'],

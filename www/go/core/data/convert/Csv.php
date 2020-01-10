@@ -386,12 +386,12 @@ class Csv extends AbstractConverter {
 	protected function exportEntity(Entity $entity, $fp, $index, $total) {
 
 		if ($index == 0) {
-			fputcsv($fp, array_merge(['id'], array_column($this->getHeaders($entity), 'name')), $this->delimiter, $this->enclosure);
+			fputcsv($fp, array_column($this->getHeaders($entity), 'name'), $this->delimiter, $this->enclosure);
 		}
 
 		$record = $this->export($entity);
 		
-		fputcsv($fp, array_merge(['id' => $entity->id()], $record), $this->delimiter, $this->enclosure);
+		fputcsv($fp, $record, $this->delimiter, $this->enclosure);
 	}
 
 	public function getFileExtension(): string {

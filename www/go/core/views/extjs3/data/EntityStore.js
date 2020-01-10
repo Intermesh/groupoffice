@@ -834,10 +834,12 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 			console.warn(me.entity.name + "/query call without limit");
 		}
 
-		return go.Jmap.request({
+		var reqProm =  go.Jmap.request({
 				method: me.entity.name + "/query",
 				params: params				
-		}).then(function(response) {
+		});
+
+		var retProm = reqProm.then(function(response) {
 
 			//if received state is newer then fetch updates
 			me.getState().then(function(state){
@@ -855,5 +857,10 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 			return response;
 		});
+		//todo there's got to be a better way to do this. Promises should be cancellable. Used in entityStoreProxy
+		retProm.callId = reqProm.callId;
+
+		return retProm;
+
 	}
 });

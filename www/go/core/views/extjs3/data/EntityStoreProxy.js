@@ -46,18 +46,11 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 
 
 		// If a currently running read request is found, abort it
-//		if (action === Ext.data.Api.actions.read && this.activeRequest[action]) {
-//			//console.trace();
-//			go.Jmap.abort(this.activeRequest[action]);
-//		}
-//		this.activeRequest[action] = 
-		// if (params.sort && Ext.isString(params.sort)) {
-		// 	var srt = params.sort.split(' ');
-		// 	params.sort = [{property:srt[0]}];
-		// 	if(srt[1] && srt[1] === 'DESC') {
-		// 		params.sort[0].isAscending = false;
-		// 	}
-		// }
+		if (action === Ext.data.Api.actions.read && this.activeRequest[action]) {
+			//todo there's got to be a better way to do this. Promises should be cancellable. Used in entityStoreProxy
+			go.Jmap.abort(this.activeRequest[action]);
+		}
+
 
 		if (params.dir) {
 			params.sort = [{
@@ -68,8 +61,12 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		}
 		
 		var me = this;
-		this.entityStore.query(params).then(function (response) {
-			return me.entityStore.get(response.ids).then(function(result) {
+		var promise = this.entityStore.query(params);
+
+		this.activeRequest[action] = promise.callId;
+
+		promise.then(function (response) {
+			var getPromise = me.entityStore.get(response.ids).then(function(result) {
 
 				var data = {
 					total: response.total,
@@ -86,12 +83,16 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 				}
 				
 			});
+
+			return getPromise;
 		}).catch(function(response) {
 			//hack to pass error message to load callback in Store.js
 			o.request.arg.error = response;
 			me.fireEvent('exception', this, 'remote', action, o, response, null);			
 			o.request.callback.call(o.request.scope, response, o.request.arg, false);
 		});
+
+
 	},
 
 //exact copy from httpproxy only it uses o.reader.readRecords instead.
