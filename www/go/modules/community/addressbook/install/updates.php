@@ -89,3 +89,6 @@ $updates['201910281039'][] = 'update `addressbook_contact` set lastName = null, 
 $updates['201911111041'][] = 'ALTER TABLE `addressbook_contact` ADD INDEX(`isOrganization`)';
 
 $updates['201912231421'][] = 'ALTER TABLE `addressbook_contact` ADD `color` CHAR(6) NULL DEFAULT NULL AFTER `uri`;';
+
+$updates['202001091545'][] = 'update addressbook_contact set uri = null where uri = ".vcf" and uid is null;';
+$updates['202001091545'][] = 'update addressbook_contact set uri = concat(uid, ".vcf") where uri = \'.vcf\' and uid is not null';

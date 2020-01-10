@@ -3,6 +3,7 @@ polyfills.js
 Jmap.js
 BrowserStorage.js
 
+
 data/JmapProxy.js
 data/EntityStoreProxy.js
 data/StoreTrait.js
@@ -83,6 +84,7 @@ links/LinkGrid.js
 links/CreateLinkWindow.js
 links/LinkBrowser.js
 links/LinksDetailPanel.js
+links/FilterLinkEntityCombo.js
 
 usersettings/AccountSettingsPanel.js
 usersettings/LookAndFeelPanel.js
@@ -98,6 +100,7 @@ util/Format.js
 util/Filters.js
 util/Cookies.js
 util/SelectDialog.js
+util/Object.js
 
 User.js
 String.js

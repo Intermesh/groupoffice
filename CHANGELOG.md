@@ -1,4 +1,14 @@
-09-01-2020 6.4.100
+10-01-2020 6.4.100
+- Core: Fixed problem where list could load older request results
+- Newsletters: Send email to address list owner when someone unsubscribes
+- Core: new filter "Has links to..." to find items linked to another type. For example find all contacts with invoices.
+- Core: Error handling for uncaught exceptions
+- Notes: ctrl + enter to submit
+- Address book: Adding contact to two groups immediately after eachother would only add it to the last one.
+- Address book: CSV import can update contacts
+- Address book: Improved import / export
+- Address book: Auto detect Outlook CSV mapping for import
+- Carddav: Fixed sync problem due to invalid uri's
 - Custom fields: Template custom field added and fixed error function custom field
 - Core: Use ErrorHandler::log instead of trigger_error to prevent exit of function on minor warnings
 - Core: Fixed truncate holidays tool

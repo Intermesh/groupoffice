@@ -22,7 +22,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 							xtype: 'box',
 							autoEl: 'p',
 							html: t("Please match the CSV columns with the correct Group-Office columns and press 'Import' to continue.")
-					}]
+					}, this.createLookupCombo()]
 				})
 			]
 		});
@@ -55,14 +55,11 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 				}
 				this.csvStore = this.createCsvHeaderStore(response.csvHeaders);
 				this.csvHeaders = response.csvHeaders;
-				// this.goHeaders = response.goHeaders;
 
+				this.fieldSet.add(this.createMappingFields(response.goHeaders, this.fields));
 
-
-
-				this.fieldSet.add(this.createMappingFields(response.goHeaders, this.labels));
-
-				var v = this.transformCsvHeadersToValues(response.goHeaders);
+				var v = this.transformCsvHeadersToValues(response.goHeaders, this.fields);
+				Ext.apply(v, this.findAliases());
 				this.formPanel.form.setValues(v);
 				
 				this.doLayout();
@@ -71,7 +68,86 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 		});
 	},
 
-	transformCsvHeadersToValues : function(goHeaders, parent) {
+	createLookupCombo: function() {
+		var storeData = [[null, t("Don't update")]];
+
+		for(var field in this.lookupFields) {
+			storeData.push([field, this.lookupFields[field]]);
+		}
+
+		var store = new Ext.data.ArrayStore({
+			fields: ['field', 'label'],
+			data: storeData
+		});
+
+		return new go.form.ComboBox({
+			hiddenName: "updateBy",
+			store: store,
+			valueField: "field",
+			displayField: "label",
+			mode:"local",
+			triggerAction: "all",
+			fieldLabel: t("Update existing items by"),
+			value: null
+		});
+	},
+
+
+	findAliases: function() {
+
+		var v = {};
+
+		for(var a in this.aliases) {
+			var index = this.csvHeaders.findIndex(function(h) {
+				return h.toLowerCase() == a.toLowerCase();
+			});
+			if(index == -1) {
+				continue;
+			}
+			var aliasCfg = this.aliases[a];
+			if(Ext.isString(aliasCfg)) {
+				v[aliasCfg] = {csvIndex: index, fixed: null}
+				go.util.Object.applyPath(v, aliasCfg,{csvIndex: index, fixed: null});
+				continue;
+			}
+
+			var child = go.util.Object.applyPath(v, aliasCfg.field,{csvIndex: index, fixed: null});
+
+			if(aliasCfg.fixed) {
+				for(var field in aliasCfg.fixed) {
+					child[field] = {csvIndex: -1, fixed: aliasCfg.fixed[field]};
+				}
+			}
+
+			if(aliasCfg.related) {
+				for(var field in aliasCfg.related) {
+					var index = this.csvHeaders.findIndex(function(h) {
+						return h.toLowerCase() == aliasCfg.related[field].toLowerCase();
+					});
+					if(index > -1) {
+						child[field] = {csvIndex: index, fixed: null};
+					}
+				}
+			}
+		}
+
+		console.warn(v);
+
+		return v;
+	},
+
+
+	/**
+	 * This will generate the form values for the mapping dialog.
+	 *
+	 * @param goHeaders
+	 * @param parent
+	 * @returns {{}}
+	 *
+	 *
+	 * BROKEN!
+	 */
+	transformCsvHeadersToValues : function(goHeaders, fields, parent) {
 		var v = {};
 
 		for(var name in goHeaders) {
@@ -93,11 +169,11 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 							break;
 						}
 						headerIndex--;
-						v[h.name][headerIndex] = this.transformCsvHeadersToValues(h.properties, part);
+						v[h.name][headerIndex] = this.transformCsvHeadersToValues(h.properties, fields, part);
 					}
 				}else
 				{
-					v[h.name] = this.transformCsvHeadersToValues(h.properties, h.name);
+					v[h.name] = this.transformCsvHeadersToValues(h.properties, fields, h.name);
 				}
 			} else
 			{
@@ -121,7 +197,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 		return {csvIndex: csvIndex, fixed: null};
 	},
 
-	createMappingFields : function(headers, labels, parent) {
+	createMappingFields : function(headers, fields, parent) {
 		// var index = 0;
 		var items = [];
 		// headers.forEach(function(h) {
@@ -132,7 +208,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 					xtype: "formcontainer",
 					labelWidth: dp(200),
 					hideLabel: true,
-					items: this.createMappingFields(h.properties, labels[h.name] ? labels[h.name].properties : {}, parent ? parent + "." + h.name : h.name)
+					items: this.createMappingFields(h.properties, fields[h.name] ? fields[h.name].properties : {}, parent ? parent + "." + h.name : h.name)
 				};
 
 				if(h.many) {
@@ -142,7 +218,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 						name: h.name,
 						xtype: "formgroup",
 						hideLabel: true,
-						title: labels[h.name] ? labels[h.name].label : h.label || h.name,
+						title: fields[h.name] ? fields[h.name].label : h.label || h.name,
 						itemCfg: formContainer
 					};
 				} else {
@@ -150,7 +226,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 					var field = {
 						xtype: "fieldset",
 						hideLabel: true,
-						title: labels[h.name] ? labels[h.name].label : h.label || h.name,
+						title: fields[h.name] ? fields[h.name].label : h.label || h.name,
 						items: [formContainer]
 					};
 				}
@@ -162,15 +238,30 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 					labelAlign: "top",
 					layout: 'hbox',
 					name: h.name,
-					fieldLabel: this.labels[h.name] || h.label || h.name,
+					fieldLabel: fields[h.name] ? fields[h.name].label : (h.label || h.name),
 					items: [this.createCombo({
 						store: this.csvStore,
-						hiddenName: "csvIndex"
-					}), {
-						xtype: "textfield",
-						name: "fixed",
-						placeholder: t("Fixed value")
-					}]
+						hiddenName: "csvIndex",
+						setValue: function(v) {
+							this.ownerCt.items.itemAt(1).items.itemAt(0).setVisible(v == -1);
+							return go.form.ComboBox.prototype.setValue.call(this, v);
+						},
+						listeners: {
+							change: function(combo, v) {
+								combo.ownerCt.items.itemAt(1).items.itemAt(0).setVisible(v == -1);
+							}
+						}
+					}),{
+						xtype:"container",
+						items: [
+							{
+								xtype: "textfield",
+								name: "fixed",
+								placeholder: t("Fixed value"),
+								hideMode: "visibility"
+							}
+						]
+					} ]
 				}
 			}
 
@@ -184,8 +275,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 		var store = new Ext.data.ArrayStore({
 			fields: ['index', 'name'],
 			idField: 0,
-			data: [[-2, t("Empty")], [-1, t("Fixed value")]].concat(headers.map(function(h) {
-				// var label = me.labels[h.name] || h.label || h.name;
+			data: [[-2, ""], [-1, t("Fixed value")]].concat(headers.map(function(h) {
 				return [headers.indexOf(h), h];
 			}))
 		});
@@ -203,18 +293,19 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 				editable:false
 			});
 	},
-	getMapping : function() {
-		var mapping = this.formPanel.form.getFieldValues();
-		return mapping;
-	},
 	doImport: function() {
 		this.getEl().mask(t("Importing..."));
+		var mapping = this.formPanel.form.getFieldValues();
+		var updateBy = mapping.updateBy;
+		delete mapping.updateBy;
+
 		go.Jmap.request({
 			method: this.entity + "/import",
 			params: {
 				blobId: this.blobId,
 				values: this.values,
-				mapping: this.getMapping()
+				mapping: mapping,
+				updateBy: updateBy
 			},
 			callback: function (options, success, response) {
 				this.getEl().unmask();

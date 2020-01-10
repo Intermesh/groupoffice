@@ -4,7 +4,8 @@ namespace go\core\orm;
 
 use Exception;
 use GO\Base\Exception\AccessDenied;
-use go\core\data\convert\JSON;
+use go\core\data\convert\AbstractConverter;
+use go\core\data\convert\Json;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
@@ -595,6 +596,9 @@ abstract class Entity extends Property {
 			entity: "Contact",
 			id: 1
 		}
+
+		or leave id empty to find items that link to any contact
+
 		*/
 		$filters->add("link", function(Criteria $criteria, $value, Query $query) {
 			$linkAlias = 'link_' . uniqid();
@@ -603,8 +607,11 @@ abstract class Entity extends Property {
 				
 			$query->join('core_link', $linkAlias, $on); 
 
-			$criteria->where('fromId', '=', $value['id'])
-							->andWhere('fromEntityTypeId', '=', EntityType::findByName($value['entity'])->getId());							
+			$criteria->andWhere('fromEntityTypeId', '=', EntityType::findByName($value['entity'])->getId());
+
+			if(!empty($value['id'])) {
+				$criteria->andWhere('fromId', '=', $value['id']);
+			}
 		});
 
 		static::fireEvent(self::EVENT_FILTER, $filters);
@@ -772,12 +779,13 @@ abstract class Entity extends Property {
 	public static function getState () {
 		return null;
 	}
-	
+
 	/**
 	 * Copy the entity
 	 *
 	 * @return static
-	 */	
+	 * @throws Exception
+	 */
 	public function copy() {
 		return $this->internalCopy();
 	}
@@ -788,12 +796,10 @@ abstract class Entity extends Property {
 	 * 
 	 * Override to add more.
 	 * 
-	 * @return array
+	 * @return AbstractConverter[]
 	 */
 	public static function converters() {
-		return [
-				'application/json' => JSON::class
-		];
+		return [Json::class];
 	}
 
   /**

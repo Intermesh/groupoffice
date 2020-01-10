@@ -143,6 +143,11 @@ go.Modules.register("community", "addressbook", {
 					name: 'usergroupid',
 					multiple: true,
 					type: 'go.groups.GroupCombo'
+				},{
+					title: t("Has links to..."),
+					name: 'link',
+					multiple: false,
+					type: 'go.links.FilterLinkEntityCombo'
 				}, {
 					title: t("Is a user"),
 					name: 'isUser',

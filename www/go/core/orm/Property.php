@@ -1756,7 +1756,28 @@ abstract class Property extends Model {
 		switch ($column->dbType) {
 			case 'date':
 			case 'datetime':
-				return ($value instanceof DateTime) || ($value instanceof DateTimeImmutable);
+				if(!($value instanceof \DateTime) || ($value instanceof \DateTimeImmutable)){
+					$this->setValidationError($column->name, ErrorCode::MALFORMED, "No date object given for date column");
+				}
+				break;
+
+			case 'enum':
+				if(!$column->required && $value == null) {
+					return true;
+				}
+
+				if(!preg_match('/enum\((.*)\)/i', $column->dataType, $matches)) {
+					$this->setValidationError($column->name, ErrorCode::GENERAL, "Enum column has no values specified in database");
+					return false;
+				}
+
+				$enumValues = str_getcsv($matches[1], ',' , "'");
+
+				if(!in_array($value, $enumValues)) {
+					$this->setValidationError($column->name, ErrorCode::MALFORMED, "Invalid value for " . $column->dataType);
+					return;
+				}
+				break;
 				
 			default:				
 				return $this->validateColumnString($column, $value);		

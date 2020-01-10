@@ -3,7 +3,9 @@
 namespace go\core\data\convert;
 
 use Exception;
+use go\core\event\EventEmitterTrait;
 use go\core\fs\File;
+use go\core\model\Acl;
 use go\core\model\Field;
 use go\core\orm\Entity;
 use go\core\orm\Property;
@@ -32,6 +34,10 @@ use Sabre\VObject\Property\VCard\DateTime;
  * ]
  */
 class Csv extends AbstractConverter {
+
+	use EventEmitterTrait;
+
+	const EVENT_INIT = 0;
 	
 	/**
 	 *
@@ -44,7 +50,7 @@ class Csv extends AbstractConverter {
 	 * 
 	 * @var string
 	 */
-	protected $multipleDelimiter = ' ::: ';
+	public static $multipleDelimiter = ',';
 
 	protected $delimiter = ',';
 
@@ -56,6 +62,13 @@ class Csv extends AbstractConverter {
 	 */
 	public static $excludeHeaders = [];
 
+	/**
+	 * Can be set to 'id' or an arbitrary value that an extended version understands with an override for {@see createEntity()}
+	 *
+	 * @var string
+	 */
+	public $updateBy = null;
+
 	protected function init()
 	{
 		parent::init();
@@ -63,7 +76,11 @@ class Csv extends AbstractConverter {
 		$user = go()->getAuthState()->getUser(['listSeparator', 'textSeparator']);
 		$this->delimiter = $user->listSeparator;
 		$this->enclosure = $user->textSeparator;
+
+
+		static::fireEvent(static::EVENT_INIT, $this);
 	}
+
 
   /**
    * Exports an entity to a CSV record array
@@ -98,22 +115,21 @@ class Csv extends AbstractConverter {
 	 * 
 	 * @param string $name Column name
 	 * @param string $label Column label
-	 * @param bool $many True if this field value should be converted to an array when importing
-	 * @param string $exportFunction Defaults to "export" . ucfirst($name) The function is called with Entity $entity, array $templateValues $columnName
-	 * @param string $importFunction Defaults to "import" . ucfirst($name) The import function is called with Entity $entity, $value, array $values
+	 * @param Callable $exportFunction Defaults to "export" . ucfirst($name) The function is called with Entity $entity, array $templateValues $columnName
+	 * @param Callable $importFunction Defaults to "import" . ucfirst($name) The import function is called with Entity $entity, $value, array $values
 	 */
-	protected function addColumn($name, $label, $many = false, $exportFunction = null, $importFunction = null) {
+	public function addColumn($name, $label, $exportFunction = null, $importFunction = null) {
 		if(!isset($exportFunction)) {
-			$exportFunction = "export".ucfirst($name);
+			$exportFunction = [$this, "export".ucfirst($name)];
 		}
 		if(!isset($importFunction)) {
-			$importFunction = "import".ucfirst($name);
+			$importFunction = [$this, "import".ucfirst($name)];
 		}
 		
 		$this->customColumns[$name] = [
 				'name' => $name, 
-				'label' => $label, 
-				'many' => $many,
+				'label' => $label,
+
 				'importFunction' => $importFunction, 
 				'exportFunction' => $exportFunction
 		];
@@ -171,7 +187,7 @@ class Csv extends AbstractConverter {
 			}
 		}
 		
-		return is_array($templateValues) ? implode($this->multipleDelimiter, $templateValues) : $templateValues;
+		return is_array($templateValues) ? implode(static::$multipleDelimiter, $templateValues) : $templateValues;
 	}
 
 	/**
@@ -197,7 +213,7 @@ class Csv extends AbstractConverter {
 	}
 	
 	private function getCustomColumnValue(Entity $entity, $templateValues, $header) {
-		return call_user_func([$this, $this->customColumns[$header]['exportFunction']], $entity, $templateValues, $header);
+		return call_user_func($this->customColumns[$header]['exportFunction'], $entity, $templateValues, $header);
 	}
 	
 	private function exportSubFields($record, $v) {
@@ -246,7 +262,9 @@ class Csv extends AbstractConverter {
 	protected function internalGetHeaders($entityCls, $forMapping = false) {
 		//Write headers
 		$properties = $entityCls::getMapping()->getProperties();
-		$headers = [];
+		$headers = [
+			['name' => 'id', 'label' => "ID", 'many' => false]
+		];
 
 		foreach($properties as $name => $value) {
 			//Skip system data
@@ -270,7 +288,7 @@ class Csv extends AbstractConverter {
 			if($forMapping) {
 				$headers["customFields"] = ['name' => 'customFields', 'label' => null, 'many' => false, 'grouped'=>true, 'properties' => $customFieldProps];
 			}
-		}	
+		}
 		
 		if($forMapping) {
 			return array_merge($headers, $this->customColumns);
@@ -393,25 +411,19 @@ class Csv extends AbstractConverter {
 	{
 		$this->delimiter = static::sniffDelimiter($file);
 
+		if(isset($params['updateBy'])) {
+			$this->updateBy = $params['updateBy'];
+		}
+
 		return parent::importFile($file, $entityClass, $params);
 	}
 
   /**
-   * Imports a single record and returns an entity
-   *
-   * @param Entity $entity
-   * @param $fp
-   * @param $index
-   * @param array $params Extra import parameters. By default this can only hold 'values' which is a key value array that will be set on each model.
-   *  $params Can hold "mapping" property. The key is the CSV record index and value the
-   *  property path. "propName" or "prop.name" if it's a relation.
-   *  If the relation is a has many values can be separated with " ::: ".
-   *
-   * @return bool|Entity id's of imported entities
-   * @throws Exception
+   * @inheritDoc
    */
-	protected function importEntity(Entity $entity, $fp, $index, array $params) {
-		
+	protected function importEntity($entityClass, $fp, $index, array $params) {
+
+
 		if($index == 0) {
 			$headers = fgetcsv($fp, 0, $this->delimiter, $this->enclosure);
 		}
@@ -426,21 +438,42 @@ class Csv extends AbstractConverter {
 			throw new Exception("Mapping is required");
 		}
 
-		$values = $this->convertRecordToProperties($record, $params['mapping'], $this->getEntityMapping(get_class($entity)));
+		$values = $this->convertRecordToProperties($record, $params['mapping'], $this->getEntityMapping($entityClass));
 		if(!$values) {
 			return false;
 		}
-		
+
+		if(isset($params['values'])) {
+			$values = array_merge($values, $params['values']);
+		}
+
+		$entity = $this->createEntity($entityClass, $values);
 		$values = $this->importCustomColumns($entity, $values);
+		unset($values['id']);
 
 		$this->setValues($entity, $values);
 
 		return $entity;
 	}
+
+	protected function createEntity($entityClass, $values) {
+		$entity = false;
+		//lookup entity by id if given
+		if($this->updateBy == 'id' && !empty($values['id'])) {
+			$entity = $entityClass::findById($values['id']);
+			if($entity && $entity->getPermissionLevel() < Acl::LEVEL_WRITE) {
+				$entity = false;
+			}
+		}
+		if(!$entity) {
+			$entity = new $entityClass;
+		}
+		return $entity;
+	}
 	
 	protected function importCustomColumns(Entity $entity, $values){
 		foreach($this->customColumns as $c) {
-			call_user_func_array([$this, $c['importFunction']], [$entity, $values[$c['name']] ?? null, &$values, $c['name']]);
+			call_user_func_array( $c['importFunction'], [$entity, $values[$c['name']] ?? null, &$values, $c['name']]);
 			unset($values[$c['name']]);
 		}
 		return $values;
@@ -472,6 +505,7 @@ class Csv extends AbstractConverter {
 	 *
 	 * @param $serverMapping
 	 * @return array|false
+	 * @throws Exception
 	 */
 	private function convertRecordToProperties($record, $clientMapping, $serverMapping) {
 
@@ -485,12 +519,18 @@ class Csv extends AbstractConverter {
 				continue;
 			}
 
+			if(!is_array($map)) {
+				throw new Exception("Invalid map: " .var_export($map, true));
+			}
+
 			$c = $serverMapping[$propName] ?? [];
 
 			if (!isset($map['csvIndex'])) {
 				//has many relations have numeric indexes. Has one is an object with key value
+
 				if(isset($map[0])) {
 					$v[$propName] = [];
+
 					foreach ($map as $sub) {
 						$item = $this->convertRecordToProperties($record, $sub, $c['properties'] ?? []);
 						if($item) {
@@ -525,7 +565,7 @@ class Csv extends AbstractConverter {
 				}
 
 				if(!empty($c['many'])) {
-					$v[$propName] = explode($this->multipleDelimiter, $v[$propName]);
+					$v[$propName] = explode(static::$multipleDelimiter, $v[$propName]);
 				}
 			}
 		}
@@ -582,4 +622,11 @@ class Csv extends AbstractConverter {
 		return $headers;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
+	public static function supportedExtensions()
+	{
+		return ['csv'];
+	}
 }
