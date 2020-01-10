@@ -557,42 +557,51 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 	onNodeDrop: function (e) {
 		var updates = {};
 
-		var removeFromGrid = false;
+		var removeFromGrid = false, me = this;
 
 		//loop through dragged grid records
-		e.source.dragData.selections.forEach(function (r) {
-			var contact = {};
 
-			if (e.target.attributes.entity.name === "AddressBook") {
-				removeFromGrid = r.json.addressBookId !== e.target.attributes.data.id;
-				contact.addressBookId = e.target.attributes.data.id;
-				contact.groups = []; //clear groups when changing address book
-			} else
-			{
-				removeFromGrid = r.json.addressBookId != e.target.attributes.data.addressBookId;
-				//clear groups when changing address book				
-				contact.groups = r.json.addressBookId == e.target.attributes.data.addressBookId ? GO.util.clone(r.json.groups) : [];
-				contact.addressBookId = e.target.attributes.data.addressBookId;
+		go.Db.store("Contact").get(e.source.dragData.selections.map(function(r){return r.id})).then(function(result) {
+			result.entities.forEach(function (c) {
+				var contact = {};
 
-				var groupId = e.target.attributes.data.id;
-				if (contact.groups.indexOf(groupId) > -1) {
-					return; //already in the groups
+				if (e.target.attributes.entity.name === "AddressBook") {
+					removeFromGrid = c.addressBookId !== e.target.attributes.data.id;
+					contact.addressBookId = e.target.attributes.data.id;
+					contact.groups = []; //clear groups when changing address book
+				} else
+				{
+					removeFromGrid = c.addressBookId != e.target.attributes.data.addressBookId;
+					//clear groups when changing address book
+					contact.groups = c.addressBookId == e.target.attributes.data.addressBookId ? go.util.clone(c.groups) : [];
+					contact.addressBookId = e.target.attributes.data.addressBookId;
+
+					var groupId = e.target.attributes.data.id;
+					if (contact.groups.indexOf(groupId) > -1) {
+						return; //already in the groups
+					}
+					contact.groups.push(groupId);
 				}
-				contact.groups.push(groupId);
+
+				updates[c.id] = contact;
+			});
+
+			//console.log(updates);
+
+			if (removeFromGrid) {
+				me.grid.store.remove(e.source.dragData.selections);
 			}
 
-			updates[r.id] = contact;
+			go.Db.store("Contact").set({
+				update: updates
+			}).then(function(response) {
+				if(!go.util.empty(response.notUpdated)) {
+					Ext.MessageBox.alert(t("Error"), t("Failed to add contacts to the group"));
+				}
+			})
 		});
 
-		//console.log(updates);
 
-		if (removeFromGrid) {
-			this.grid.store.remove(e.source.dragData.selections);
-		}
-
-		go.Db.store("Contact").set({
-			update: updates
-		});
 
 	}
 

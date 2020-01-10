@@ -145,4 +145,13 @@ GO.mainLayout.on('render', function () {
 	document.addEventListener("drop",function(e){
 		e.preventDefault();
 	},false);
+
+
+	window.onerror = function(message, source, lineno, colno, error) {
+		Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console.") + "<br /><br />" + message);
+	}
+
+	window.addEventListener('unhandledrejection', function(event) {
+		Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console."));
+	});
 });

@@ -119,6 +119,9 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 	 * @param goHeaders
 	 * @param parent
 	 * @returns {{}}
+	 *
+	 *
+	 * BROKEN!
 	 */
 	transformCsvHeadersToValues : function(goHeaders, fields, parent) {
 		var v = {};
@@ -142,11 +145,11 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 							break;
 						}
 						headerIndex--;
-						v[h.name][headerIndex] = this.transformCsvHeadersToValues(h.properties, part);
+						v[h.name][headerIndex] = this.transformCsvHeadersToValues(h.properties, fields, part);
 					}
 				}else
 				{
-					v[h.name] = this.transformCsvHeadersToValues(h.properties, h.name);
+					v[h.name] = this.transformCsvHeadersToValues(h.properties, fields, h.name);
 				}
 			} else
 			{

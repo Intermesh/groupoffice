@@ -303,23 +303,25 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				}
 
 				if (btn ==="ok") {
-					var updates = {};
+					var updates = {}, me = this;
 
-
-					selectedRecords.forEach(function (r) {
-						var groupIndex = r.json.groups.indexOf(groupId);
+					go.Db.store("Contact").get(ids).then(function(result) {
+						result.entities.forEach(function (contact) {
+							var groupIndex = contact.groups.indexOf(groupId);
 //							console.log(groupIndex, groupId, r.json.groups);
-						updates[r.id] = {
-							groups: GO.util.clone(r.json.groups)
-						};
-						updates[r.id].groups.splice(groupIndex, 1);
+							updates[contact.id] = {
+								groups: go.util.clone(contact.groups)
+							};
+							updates[contact.id].groups.splice(groupIndex, 1);
+						});
+
+						me.getStore().remove(selectedRecords);
+
+						me.getStore().entityStore.set({
+							update: updates
+						});
 					});
 
-					this.getStore().remove(selectedRecords);
-
-					this.getStore().entityStore.set({
-						update: updates
-					});
 				}
 			},
 			scope: this,

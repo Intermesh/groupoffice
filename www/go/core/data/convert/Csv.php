@@ -49,7 +49,7 @@ class Csv extends AbstractConverter {
 	 * 
 	 * @var string
 	 */
-	protected $multipleDelimiter = ' ::: ';
+	public static $multipleDelimiter = ',';
 
 	protected $delimiter = ',';
 
@@ -107,11 +107,10 @@ class Csv extends AbstractConverter {
 	 * 
 	 * @param string $name Column name
 	 * @param string $label Column label
-	 * @param bool $many True if this field value should be converted to an array when importing
 	 * @param Callable $exportFunction Defaults to "export" . ucfirst($name) The function is called with Entity $entity, array $templateValues $columnName
 	 * @param Callable $importFunction Defaults to "import" . ucfirst($name) The import function is called with Entity $entity, $value, array $values
 	 */
-	public function addColumn($name, $label, $many = false, $exportFunction = null, $importFunction = null) {
+	public function addColumn($name, $label, $exportFunction = null, $importFunction = null) {
 		if(!isset($exportFunction)) {
 			$exportFunction = [$this, "export".ucfirst($name)];
 		}
@@ -121,8 +120,8 @@ class Csv extends AbstractConverter {
 		
 		$this->customColumns[$name] = [
 				'name' => $name, 
-				'label' => $label, 
-				'many' => $many,
+				'label' => $label,
+
 				'importFunction' => $importFunction, 
 				'exportFunction' => $exportFunction
 		];
@@ -180,7 +179,7 @@ class Csv extends AbstractConverter {
 			}
 		}
 		
-		return is_array($templateValues) ? implode($this->multipleDelimiter, $templateValues) : $templateValues;
+		return is_array($templateValues) ? implode(static::$multipleDelimiter, $templateValues) : $templateValues;
 	}
 
 	/**
@@ -534,7 +533,7 @@ class Csv extends AbstractConverter {
 				}
 
 				if(!empty($c['many'])) {
-					$v[$propName] = explode($this->multipleDelimiter, $v[$propName]);
+					$v[$propName] = explode(static::$multipleDelimiter, $v[$propName]);
 				}
 			}
 		}
