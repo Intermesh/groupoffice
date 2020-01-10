@@ -731,7 +731,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		var me = this;
 
 		return me.initState().then(function() {
-			go.Jmap.request({
+			return go.Jmap.request({
 				method: me.entity.name + "/set",
 				params: params,
 				scope: me,
