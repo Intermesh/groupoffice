@@ -4,6 +4,7 @@ namespace go\core\cron;
 use Error;
 use ErrorException;
 use Exception;
+use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\util\DateTime;
 use go\core\model\CronJob;
@@ -69,7 +70,7 @@ class GarbageCollection extends CronJob {
 		foreach($types as $type) {
 
 			try {
-				if($type->getName() == "Link" || $type->getName() == "Search") {
+				if($type->getName() == "Link" || $type->getName() == "Search" || !is_a($type->getClassName(), Entity::class, true)) {
 					continue;
 				}
 
@@ -109,7 +110,7 @@ class GarbageCollection extends CronJob {
 
 				go()->debug("Deleted ". $stmt->rowCount() . " links to $cls");
 			}catch(Exception $e) {
-				go()->error($e->getMessage());								
+				ErrorHandler::logException($e);
 			}
 
 		}
