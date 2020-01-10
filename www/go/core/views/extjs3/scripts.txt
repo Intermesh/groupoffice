@@ -84,6 +84,7 @@ links/LinkGrid.js
 links/CreateLinkWindow.js
 links/LinkBrowser.js
 links/LinksDetailPanel.js
+links/FilterLinkEntityCombo.js
 
 usersettings/AccountSettingsPanel.js
 usersettings/LookAndFeelPanel.js

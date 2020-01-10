@@ -596,6 +596,9 @@ abstract class Entity extends Property {
 			entity: "Contact",
 			id: 1
 		}
+
+		or leave id empty to find items that link to any contact
+
 		*/
 		$filters->add("link", function(Criteria $criteria, $value, Query $query) {
 			$linkAlias = 'link_' . uniqid();
@@ -604,8 +607,11 @@ abstract class Entity extends Property {
 				
 			$query->join('core_link', $linkAlias, $on); 
 
-			$criteria->where('fromId', '=', $value['id'])
-							->andWhere('fromEntityTypeId', '=', EntityType::findByName($value['entity'])->getId());							
+			$criteria->andWhere('fromEntityTypeId', '=', EntityType::findByName($value['entity'])->getId());
+
+			if(!empty($value['id'])) {
+				$criteria->andWhere('fromId', '=', $value['id']);
+			}
 		});
 
 		static::fireEvent(self::EVENT_FILTER, $filters);
