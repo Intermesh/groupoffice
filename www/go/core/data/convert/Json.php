@@ -46,7 +46,10 @@ class Json extends AbstractConverter {
 		return 'json';
 	}
 
-	protected function importEntity(Entity $entity, $fp, $index, array $params) {
+	/**
+	 * @inheritDoc
+	 */
+	protected function importEntity($entityClass, $fp, $index, array $params) {
 		
 	}
 

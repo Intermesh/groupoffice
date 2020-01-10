@@ -1,7 +1,10 @@
 6.4
 
-update files when moving a contact
 remove folders when uninstalling module. Error when reinstalling
+
+Assitant to handle mailto: links on system
+Drag and drop files and folders to upload
+
 
 Batch edit custom fields not possible
 Disabled categories for:  folder dialog Folder::deriveCustomfieldSettings
@@ -11,10 +14,6 @@ Demodata
 ticket groups
 
 
-DG::
-
-Income contracts als maatwerk:
-modules/projects2/views/Extjs3/AddressbookOverrides.js
 
 Affected customer modules:
 favorites (greifswald)

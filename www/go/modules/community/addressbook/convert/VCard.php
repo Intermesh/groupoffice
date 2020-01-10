@@ -418,7 +418,7 @@ class VCard extends AbstractConverter {
 		return 'vcf';
 	}
 	
-	protected function importEntity(Entity $entity, $fp, $index, array $params) {
+	protected function importEntity($entityClass, $fp, $index, array $params) {
 		//not needed because of import file override
 	}
 

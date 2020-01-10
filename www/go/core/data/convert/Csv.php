@@ -5,6 +5,7 @@ namespace go\core\data\convert;
 use Exception;
 use go\core\event\EventEmitterTrait;
 use go\core\fs\File;
+use go\core\model\Acl;
 use go\core\model\Field;
 use go\core\orm\Entity;
 use go\core\orm\Property;
@@ -254,7 +255,9 @@ class Csv extends AbstractConverter {
 	protected function internalGetHeaders($entityCls, $forMapping = false) {
 		//Write headers
 		$properties = $entityCls::getMapping()->getProperties();
-		$headers = [];
+		$headers = [
+			['name' => 'id', 'label' => go()->t("Update by ID"), 'many' => false]
+		];
 
 		foreach($properties as $name => $value) {
 			//Skip system data
@@ -278,7 +281,7 @@ class Csv extends AbstractConverter {
 			if($forMapping) {
 				$headers["customFields"] = ['name' => 'customFields', 'label' => null, 'many' => false, 'grouped'=>true, 'properties' => $customFieldProps];
 			}
-		}	
+		}
 		
 		if($forMapping) {
 			return array_merge($headers, $this->customColumns);
@@ -376,12 +379,12 @@ class Csv extends AbstractConverter {
 	protected function exportEntity(Entity $entity, $fp, $index, $total) {
 
 		if ($index == 0) {
-			fputcsv($fp, array_column($this->getHeaders($entity), 'name'), $this->delimiter, $this->enclosure);
+			fputcsv($fp, array_merge(['id'], array_column($this->getHeaders($entity), 'name')), $this->delimiter, $this->enclosure);
 		}
 
 		$record = $this->export($entity);
 		
-		fputcsv($fp, $record, $this->delimiter, $this->enclosure);
+		fputcsv($fp, array_merge(['id' => $entity->id()], $record), $this->delimiter, $this->enclosure);
 	}
 
 	public function getFileExtension(): string {
@@ -405,21 +408,11 @@ class Csv extends AbstractConverter {
 	}
 
   /**
-   * Imports a single record and returns an entity
-   *
-   * @param Entity $entity
-   * @param $fp
-   * @param $index
-   * @param array $params Extra import parameters. By default this can only hold 'values' which is a key value array that will be set on each model.
-   *  $params Can hold "mapping" property. The key is the CSV record index and value the
-   *  property path. "propName" or "prop.name" if it's a relation.
-   *  If the relation is a has many values can be separated with " ::: ".
-   *
-   * @return bool|Entity id's of imported entities
-   * @throws Exception
+   * @inheritDoc
    */
-	protected function importEntity(Entity $entity, $fp, $index, array $params) {
-		
+	protected function importEntity($entityClass, $fp, $index, array $params) {
+
+
 		if($index == 0) {
 			$headers = fgetcsv($fp, 0, $this->delimiter, $this->enclosure);
 		}
@@ -434,11 +427,28 @@ class Csv extends AbstractConverter {
 			throw new Exception("Mapping is required");
 		}
 
-		$values = $this->convertRecordToProperties($record, $params['mapping'], $this->getEntityMapping(get_class($entity)));
+		$values = $this->convertRecordToProperties($record, $params['mapping'], $this->getEntityMapping($entityClass));
 		if(!$values) {
 			return false;
 		}
 		
+
+		$entity = false;
+		//lookup entity by id if given
+		if(!empty($values['id'])) {
+			$entity = $entityClass::findById($values['id']);
+			if($entity && $entity->getPermissionLevel() < Acl::LEVEL_WRITE) {
+				$entity = false;
+			}
+		}
+		if(!$entity) {
+			$entity = new $entityClass;
+		}
+
+		if(isset($params['values'])) {
+			$entity->setValues($params['values']);
+		}
+
 		$values = $this->importCustomColumns($entity, $values);
 
 		$this->setValues($entity, $values);

@@ -114,15 +114,10 @@ abstract class AbstractConverter {
 		
 		while(!feof($fp)) {		
 			try {
-				
-				$entity = new $entityClass;
-				if(isset($params['values'])) {
-					$entity->setValues($params['values']);
-				}
 
 				go()->getDbConnection()->beginTransaction();
 
-				$entity = $this->importEntity($entity, $fp, $index++, $params);
+				$entity = $this->importEntity($entityClass, $fp, $index++, $params);
 				
 				//ignore when false is returned. This is not an error. But intentional. Like CSV skipping a blank line for example.
 				if($entity === false) {
@@ -153,7 +148,6 @@ abstract class AbstractConverter {
 		return $response;
 	}
 
-
 	protected function afterSave(Entity $entity) {
 		return true;
 	}
@@ -165,13 +159,13 @@ abstract class AbstractConverter {
 	 * 
 	 * When false is returned the result will be ignored. For example when you want to skip a CSV line because it's empty.
 	 * 
-	 * @param Entity $entity
+	 * @param Entity $entityClass
 	 * @param resource $fp
 	 * @param int $index
 	 * @param array $params
 	 * @return Entity|false
 	 */
-	abstract protected function importEntity(Entity $entity, $fp, $index, array $params);
+	abstract protected function importEntity($entityClass, $fp, $index, array $params);
 	
 	abstract protected function exportEntity(Entity $entity, $fp, $index, $total);
 		

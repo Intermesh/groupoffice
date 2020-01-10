@@ -39,9 +39,9 @@ class Csv extends convert\Csv {
 	 *
 	 * @inheritDoc
 	 */
-	protected function importEntity(Entity $entity, $fp, $index, array $params)
+	protected function importEntity($entityClass, $fp, $index, array $params)
 	{
-		$contact = parent::importEntity($entity, $fp, $index, $params);
+		$contact = parent::importEntity($entityClass, $fp, $index, $params);
 
 		if(!$contact) {
 			return false;

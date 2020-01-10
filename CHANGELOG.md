@@ -1,5 +1,6 @@
 - Core: new filter "Has links to..." to find items linked to another type. For example find all contacts with invoices.
 - Core: Error handling for uncaught exceptions
+- Notes: ctrl + enter to submit
 - Address book: Adding contact to two groups immediately after eachother would only add it to the last one.
 - Address book: Improved import / export
 - Address book: Auto detect Outlook CSV mapping for import
