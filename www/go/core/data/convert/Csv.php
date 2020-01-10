@@ -62,6 +62,13 @@ class Csv extends AbstractConverter {
 	 */
 	public static $excludeHeaders = [];
 
+	/**
+	 * Can be set to 'id' or an arbitrary value that an extended version understands with an override for {@see createEntity()}
+	 *
+	 * @var string
+	 */
+	public $updateBy = null;
+
 	protected function init()
 	{
 		parent::init();
@@ -256,7 +263,7 @@ class Csv extends AbstractConverter {
 		//Write headers
 		$properties = $entityCls::getMapping()->getProperties();
 		$headers = [
-			['name' => 'id', 'label' => go()->t("Update by ID"), 'many' => false]
+			['name' => 'id', 'label' => "ID", 'many' => false]
 		];
 
 		foreach($properties as $name => $value) {
@@ -404,6 +411,10 @@ class Csv extends AbstractConverter {
 	{
 		$this->delimiter = static::sniffDelimiter($file);
 
+		if(isset($params['updateBy'])) {
+			$this->updateBy = $params['updateBy'];
+		}
+
 		return parent::importFile($file, $entityClass, $params);
 	}
 
@@ -431,11 +442,24 @@ class Csv extends AbstractConverter {
 		if(!$values) {
 			return false;
 		}
-		
 
+		if(isset($params['values'])) {
+			$values = array_merge($values, $params['values']);
+		}
+
+		$entity = $this->createEntity($entityClass, $values);
+		$values = $this->importCustomColumns($entity, $values);
+		unset($values['id']);
+
+		$this->setValues($entity, $values);
+
+		return $entity;
+	}
+
+	protected function createEntity($entityClass, $values) {
 		$entity = false;
 		//lookup entity by id if given
-		if(!empty($values['id'])) {
+		if($this->updateBy == 'id' && !empty($values['id'])) {
 			$entity = $entityClass::findById($values['id']);
 			if($entity && $entity->getPermissionLevel() < Acl::LEVEL_WRITE) {
 				$entity = false;
@@ -444,15 +468,6 @@ class Csv extends AbstractConverter {
 		if(!$entity) {
 			$entity = new $entityClass;
 		}
-
-		if(isset($params['values'])) {
-			$entity->setValues($params['values']);
-		}
-
-		$values = $this->importCustomColumns($entity, $values);
-
-		$this->setValues($entity, $values);
-
 		return $entity;
 	}
 	
@@ -490,6 +505,7 @@ class Csv extends AbstractConverter {
 	 *
 	 * @param $serverMapping
 	 * @return array|false
+	 * @throws Exception
 	 */
 	private function convertRecordToProperties($record, $clientMapping, $serverMapping) {
 
@@ -503,12 +519,18 @@ class Csv extends AbstractConverter {
 				continue;
 			}
 
+			if(!is_array($map)) {
+				throw new Exception("Invalid map: " .var_export($map, true));
+			}
+
 			$c = $serverMapping[$propName] ?? [];
 
 			if (!isset($map['csvIndex'])) {
 				//has many relations have numeric indexes. Has one is an object with key value
+
 				if(isset($map[0])) {
 					$v[$propName] = [];
+
 					foreach ($map as $sub) {
 						$item = $this->convertRecordToProperties($record, $sub, $c['properties'] ?? []);
 						if($item) {

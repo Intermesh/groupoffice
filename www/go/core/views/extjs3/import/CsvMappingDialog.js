@@ -22,7 +22,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 							xtype: 'box',
 							autoEl: 'p',
 							html: t("Please match the CSV columns with the correct Group-Office columns and press 'Import' to continue.")
-					}]
+					}, this.createLookupCombo()]
 				})
 			]
 		});
@@ -65,6 +65,30 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 				this.doLayout();
 			},
 			scope: this
+		});
+	},
+
+	createLookupCombo: function() {
+		var storeData = [[null, t("Don't update")]];
+
+		for(var field in this.lookupFields) {
+			storeData.push([field, this.lookupFields[field]]);
+		}
+
+		var store = new Ext.data.ArrayStore({
+			fields: ['field', 'label'],
+			data: storeData
+		});
+
+		return new go.form.ComboBox({
+			hiddenName: "updateBy",
+			store: store,
+			valueField: "field",
+			displayField: "label",
+			mode:"local",
+			triggerAction: "all",
+			fieldLabel: t("Update existing items by"),
+			value: null
 		});
 	},
 
@@ -217,12 +241,27 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 					fieldLabel: fields[h.name] ? fields[h.name].label : (h.label || h.name),
 					items: [this.createCombo({
 						store: this.csvStore,
-						hiddenName: "csvIndex"
-					}), {
-						xtype: "textfield",
-						name: "fixed",
-						placeholder: t("Fixed value")
-					}]
+						hiddenName: "csvIndex",
+						setValue: function(v) {
+							this.ownerCt.items.itemAt(1).items.itemAt(0).setVisible(v == -1);
+							return go.form.ComboBox.prototype.setValue.call(this, v);
+						},
+						listeners: {
+							change: function(combo, v) {
+								combo.ownerCt.items.itemAt(1).items.itemAt(0).setVisible(v == -1);
+							}
+						}
+					}),{
+						xtype:"container",
+						items: [
+							{
+								xtype: "textfield",
+								name: "fixed",
+								placeholder: t("Fixed value"),
+								hideMode: "visibility"
+							}
+						]
+					} ]
 				}
 			}
 
@@ -236,7 +275,7 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 		var store = new Ext.data.ArrayStore({
 			fields: ['index', 'name'],
 			idField: 0,
-			data: [[-2, t("Empty")], [-1, t("Fixed value")]].concat(headers.map(function(h) {
+			data: [[-2, ""], [-1, t("Fixed value")]].concat(headers.map(function(h) {
 				return [headers.indexOf(h), h];
 			}))
 		});
@@ -254,18 +293,19 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 				editable:false
 			});
 	},
-	getMapping : function() {
-		var mapping = this.formPanel.form.getFieldValues();
-		return mapping;
-	},
 	doImport: function() {
 		this.getEl().mask(t("Importing..."));
+		var mapping = this.formPanel.form.getFieldValues();
+		var updateBy = mapping.updateBy;
+		delete mapping.updateBy;
+
 		go.Jmap.request({
 			method: this.entity + "/import",
 			params: {
 				blobId: this.blobId,
 				values: this.values,
-				mapping: this.getMapping()
+				mapping: mapping,
+				updateBy: updateBy
 			},
 			callback: function (options, success, response) {
 				this.getEl().unmask();

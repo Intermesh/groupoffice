@@ -5,6 +5,7 @@ namespace go\modules\community\addressbook\convert;
 use Exception;
 use go\core\data\convert;
 use go\core\fs\File;
+use go\core\model\Acl;
 use go\core\orm\Entity;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\Group;
@@ -50,7 +51,36 @@ class Csv extends convert\Csv {
 		return $contact->isOrganization == $this->organizations ? $contact : false;
 	}
 
-	
+	protected function createEntity($entityClass, $values)
+	{
+		$entity = false;
+		//lookup entity by id if given
+		if($this->updateBy == 'id' && !empty($values['id'])) {
+			$entity = $entityClass::findById($values['id']);
+			if($entity && $entity->getPermissionLevel() < Acl::LEVEL_WRITE) {
+				$entity = false;
+			}
+		} elseif($this->updateBy == 'email') {
+			$emails = [];
+			if(!empty($values['emailAddresses'])) {
+				foreach ($values['emailAddresses'] as $emailAddress) {
+					if(!empty($emailAddress['email'])) {
+						$emails[] = $emailAddress['email'];
+					}
+				}
+			}
+
+			if(!empty($emails)) {
+				$entity = Contact::findByEmail($emails)->andWhere(['addressBookId' => $values['addressBookId']])->single();
+			}
+		}
+		if(!$entity) {
+			$entity = new $entityClass;
+		}
+		return $entity;
+	}
+
+
 	/**
 	 * List headers to exclude
 	 * @var string[]

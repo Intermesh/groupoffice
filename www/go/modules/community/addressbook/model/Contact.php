@@ -388,7 +388,7 @@ class Contact extends AclItemEntity {
   /**
    * Find contact by e-mail address
    *
-   * @param string $email
+   * @param string|string[] $email
    * @return Query
    * @throws Exception
    */
@@ -396,14 +396,14 @@ class Contact extends AclItemEntity {
 		return static::find()
 						->join("addressbook_email_address", "e", "e.contactId = c.id")
 						->groupBy(['c.id'])
-						->where('e.email', '=', $email);
+						->where(['e.email' => $email]);
 	}
 
 
   /**
    * Find contact by e-mail address
    *
-   * @param string $number
+   * @param string|string[] $number
    * @return Query
    * @throws Exception
    */
@@ -411,7 +411,7 @@ class Contact extends AclItemEntity {
 		return static::find()
 						->join("addressbook_phone_number", "e", "e.contactId = c.id")
 						->groupBy(['c.id'])
-						->where('e.number', '=', $number);
+						->where(['e.number' => $number]);
 	}
 	
 	protected static function defineFilters() {
@@ -579,7 +579,7 @@ class Contact extends AclItemEntity {
 										
 	}
 
-	public static function sort(\go\core\orm\Query $query, array $sort)
+	public static function sort(Query $query, array $sort)
 	{
 		if(isset($sort['firstName'])) {
 			$sort['name'] = $sort['firstName'];
@@ -605,7 +605,7 @@ class Contact extends AclItemEntity {
 		return ['name', 'debtorNumber', 'notes', 'emailAddresses.email', 'addresses.zipCode'];
 	}
 
-	protected static function search(\go\core\db\Criteria $criteria, $expression, \go\core\orm\Query $query)
+	protected static function search(Criteria $criteria, $expression, Query $query)
 	{
 		if(!$query->isJoined('addressbook_email_address', 'emailAddresses')) {
 			$query->join('addressbook_email_address', 'emailAddresses', 'emailAddresses.contactId = c.id', 'LEFT')->groupBy(['c.id']);

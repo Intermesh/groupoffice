@@ -187,6 +187,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 												".csv, .vcf, text/vcard",
 												{addressBookId: this.addAddressBookId},
 												{
+													lookupFields: {'id' : "ID", 'email': 'E-mail'},
 													aliases : {
 														"Given name": "firstName",
 														"First name": "firstName",
