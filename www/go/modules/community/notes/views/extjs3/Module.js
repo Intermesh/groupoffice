@@ -21,6 +21,12 @@ go.Modules.register("community", 'notes', {
 				title: "Query"
 			},
 			{
+				title: t("Has links to..."),
+				name: 'link',
+				multiple: false,
+				type: 'go.links.FilterLinkEntityCombo'
+			},
+			{
 				title: t("Commented at"),
 				name: 'commentedat',
 				multiple: false,

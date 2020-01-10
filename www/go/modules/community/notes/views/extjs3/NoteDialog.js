@@ -32,7 +32,13 @@ go.modules.community.notes.NoteDialog = Ext.extend(go.form.Dialog, {
 						fieldLabel: "",
 						hideLabel: true,
 						anchor: '0 -90',
-						allowBlank: false
+						allowBlank: false,
+						listeners: {
+							scope: this,
+							ctrlenter: function() {
+								this.submit();
+							}
+						}
 					}]
 			}
 		];
