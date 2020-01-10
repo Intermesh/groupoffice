@@ -727,54 +727,58 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		{
 			throw "'destroy' must be an array.";
 		}
+		
+		var me = this;
 
-		return go.Jmap.request({
-			method: this.entity.name + "/set",
-			params: params,
-			scope: this,
-			callback: function (options, success, response) {
-				
-				if(!success) {
-					this.fireEvent("error", options, response);
+		return me.initState().then(function() {
+			go.Jmap.request({
+				method: me.entity.name + "/set",
+				params: params,
+				scope: me,
+				callback: function (options, success, response) {
+
+					if(!success) {
+						me.fireEvent("error", options, response);
+						if(cb) {
+							cb.call(scope || me, options, success, response);
+						}
+						return;
+					}
+
+					var entity, clientId;
+
+					if(response.created) {
+						for(clientId in response.created) {
+							//merge client data with server defaults.
+							entity = Ext.apply(params.create[clientId], response.created[clientId] || {});
+							me._add(entity, true);
+						}
+					}
+
+					if(response.updated) {
+						for(var serverId in response.updated) {
+							//merge existing data, with updates from client and server
+							entity = Ext.apply(me.data[serverId], params.update[serverId]);
+							entity = Ext.apply(entity, response.updated[serverId] || {});
+							me._add(entity, true);
+						}
+					}
+
+					me.setState(response.newState);
+
+					if(response.destroyed) {
+						for(var i =0, l = response.destroyed.length; i < l; i++) {
+							me._destroy(response.destroyed[i]);
+						}
+					}
+
 					if(cb) {
-						cb.call(scope || this, options, success, response);
+						cb.call(scope || me, options, success, response);
 					}
-					return;
-				}
-				
-				var entity, clientId;				
-				
-				if(response.created) {
-					for(clientId in response.created) {
-						//merge client data with server defaults.
-						entity = Ext.apply(params.create[clientId], response.created[clientId] || {});			
-						this._add(entity, true);
-					}
-				}
-				
-				if(response.updated) {
-					for(var serverId in response.updated) {
-						//merge existing data, with updates from client and server						
-						entity = Ext.apply(this.data[serverId], params.update[serverId]);
-						entity = Ext.apply(entity, response.updated[serverId] || {});
-						this._add(entity, true);
-					}
-				}
-				
-				this.setState(response.newState);	
-				
-				if(response.destroyed) {
-					for(var i =0, l = response.destroyed.length; i < l; i++) {						
-						this._destroy(response.destroyed[i]);
-					}
-				}
 
-				if(cb) {
-					cb.call(scope || this, options, success, response);
+					me._fireChanges();
 				}
-
-				this._fireChanges();
-			}
+			})
 		});
 	},
 
