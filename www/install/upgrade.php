@@ -31,9 +31,9 @@ try {
 		
 		echo 'More details about this upgrade can be found in the <a target="_blank" href="https://github.com/Intermesh/groupoffice/blob/master/CHANGELOG.md">change log</a>.<br /><br />';
 
-		echo "Note: You can also upgrade on the command line by running: <br />
+		echo "Note: You can also upgrade on the command line by running (replace www-data with the user of your webserver): <br />
 
-			<code>cli.php core/System/upgrade</code>
+			<code>sudo -u www-data cli.php core/System/upgrade</code>
 
 			";
 
