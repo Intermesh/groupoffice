@@ -312,6 +312,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 			}).then(function(response) {
 				if(!response.list) {
 					console.warn("No items in response: ", response);
+					return;
 				}
 				for(var i = 0,l = response.list.length;i < l; i++) {
 					me._add(response.list[i], true);
