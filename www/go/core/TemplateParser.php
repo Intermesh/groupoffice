@@ -103,13 +103,13 @@ class TemplateParser {
 		$this->addModel('now', new DateTime());	
 	}
 
-	private $user;
+	private $_currentUser;
 
-	protected function getUser() {
-		if(!isset($this->user)) {
-			$this->user = go()->getAuthState()->getUser(['dateFormat', 'timezone']);	
+	protected function _currentUser() {
+		if(!isset($this->_currentUser)) {
+			$this->_currentUser = go()->getAuthState()->getUser(['dateFormat', 'timezone']);
 		}
-		return $this->user;
+		return $this->_currentUser;
 	}
 	
 	private function filterDate(DateTime $date = null, $format = null) {
@@ -119,10 +119,10 @@ class TemplateParser {
 		}
 
 		if(!isset($format)) {
-			$format = $this->getUser()->dateFormat;
+			$format = $this->_currentUser()->dateFormat;
 		}
 
-		$date->setTimezone(new \DateTimeZone($this->getUser()->timezone));
+		$date->setTimezone(new \DateTimeZone($this->_currentUser()->timezone));
 
 		return $date->format($format);
 	}

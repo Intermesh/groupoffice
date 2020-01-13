@@ -1930,28 +1930,30 @@ abstract class Property extends Model {
 	protected function patch(Relation $relation, $propName, $value) {
 		$old = $this->$propName;
 		$this->$propName = [];
-		foreach($value as $id => $patch) {
-			if(!isset($patch) || $patch === false) {
-				if(!array_key_exists($id, $old)) {
-					go()->warn("Key $id does not exist in ". static::class .'->'.$propName);
-				}				
-				continue;
-			}
-			if(is_array($old) && isset($old[$id])) {
-				$this->$propName[$id] = $old[$id];
-				if(is_array($patch)) { //may be given as bool
-					$this->$propName[$id]->setValues($patch);
+		if(isset($value)) {
+			foreach ($value as $id => $patch) {
+				if (!isset($patch) || $patch === false) {
+					if (!array_key_exists($id, $old)) {
+						go()->warn("Key $id does not exist in " . static::class . '->' . $propName);
+					}
+					continue;
 				}
-			} else {
+				if (is_array($old) && isset($old[$id])) {
+					$this->$propName[$id] = $old[$id];
+					if (is_array($patch)) { //may be given as bool
+						$this->$propName[$id]->setValues($patch);
+					}
+				} else {
 
-				$this->$propName[$id] = $this->internalNormalizeRelation($relation, $patch);	
+					$this->$propName[$id] = $this->internalNormalizeRelation($relation, $patch);
 
-				if(is_bool($patch)) {
-				// if($relation->type == Relation::TYPE_MAP) {
-					//Only change key to values when using booleans. Key can also be made up by the client.
-					foreach($this->mapKeyToValues($id, $relation) as $key => $value) {
-						$this->$propName[$id]->$key = $value;
-					}				
+					if (is_bool($patch)) {
+						// if($relation->type == Relation::TYPE_MAP) {
+						//Only change key to values when using booleans. Key can also be made up by the client.
+						foreach ($this->mapKeyToValues($id, $relation) as $key => $value) {
+							$this->$propName[$id]->$key = $value;
+						}
+					}
 				}
 			}
 		}
