@@ -19,21 +19,21 @@ $fg: (
 
 
 $bg: (
-        status-bar: black,
+        status-bar: #1b1b1b,
         app-bar: #303030, //#212121,
         form: #272727,
-        background: #303030,
+        background: #343638,
         hover: rgba(white, 0.04),
         pressed: rgba(#cccccc, .25),
         selected: rgba(white, .08),
         readonly: rgba(white, .08),
         box: #272727, //rgba(white, 0.1),
         tbar: black,
-        card: #272727, //#424242,
+        card: #202020, //#424242,
         dialog: #303030,
         disabled-button: rgba(white, 0.12)
 );
 
 $cPrimary: #009BC9;
 $cPrimaryTp: #0277BD;
-$cHeaderBg: #1b1b1b;
+$cHeaderBg: #202020;

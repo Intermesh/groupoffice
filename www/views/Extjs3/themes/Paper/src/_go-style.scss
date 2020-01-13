@@ -503,7 +503,7 @@ a {
 	right:0;
 	height: dp(64);
 	padding: dp(8);
-	@include var(background-color, c-primary);
+	@include var(background-color, c-header-bg);
 	// border-radius: $borderRadius;
 	// transition: opacity 280ms $curve-standard;
 	// opacity:1;
