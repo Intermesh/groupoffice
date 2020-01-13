@@ -12,7 +12,7 @@ class UserCsv extends Csv {
   {
     parent::init();
 
-    $this->addColumn('createEmailAccount', go()->t("Create E-mail account"), false);
+    $this->addColumn('createEmailAccount', go()->t("Create E-mail account"));
   }
 
   public function exportCreateEmailAccount(Entity $entity, array $templateValues, $columnName) {

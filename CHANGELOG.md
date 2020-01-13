@@ -1,3 +1,45 @@
+- Core: cron will run even though another instance of the cron process is still running. 
+- Newsletters: When cron runs check if newsletters has been active in the past minute. If not then start sending.
+ 
+13-01-2020 6.4.100
+- Core: Fixed problem where list could load older request results
+- Newsletters: Send email to address list owner when someone unsubscribes
+- Core: new filter "Has links to..." to find items linked to another type. For example find all contacts with invoices.
+- Core: Error handling for uncaught exceptions
+- Notes: ctrl + enter to submit
+- Address book: Adding contact to two groups immediately after eachother would only add it to the last one.
+- Address book: CSV import can update contacts
+- Address book: Improved import / export
+- Address book: Auto detect Outlook CSV mapping for import
+- Carddav: Fixed sync problem due to invalid uri's
+- Custom fields: Template custom field added and fixed error function custom field
+- Core: Use ErrorHandler::log instead of trigger_error to prevent exit of function on minor warnings
+- Core: Fixed truncate holidays tool
+
+07-01-2020 6.4.99
+- Core: Error could occur with module permissions because some cache was shared which should have been per user
+- Comments: Unable to edit fixed.
+- Comments: CTRL + ENTER to save
+- Tickets: CTRL + ENTER to save
+- Core: Improved CSV import and export to be more compatible with other formats
+
+02-01-2020 6.4.98
+- Assistant / files: Assistant host could be wrong when using proxy on the server
+- Billing: report timezone bug showing wrong results in year overview.
+- Email: White background in dark theme for mail
+- Email: Fixed count() error when searching
+- Core: Small visual UI improvements
+- Core: Updated Croatian translation
+
+23-12-2019 6.4.97
+- Core: header color override didn't work anymore
+
+23-12-2019 6.4.96
+- Files: Use template with E-mail download link
+- Comments: Composer only rendered at one item
+- Core: Dark mode theme (Beta)
+- Address book: Colored icon with initials when no photo is present.
+
 20-12-2019 6.4.95
 - Custom fields: Fixed visual problem with select options
 - Custom fields: Fixed problem that adding a field with a duplicate name was possible.
@@ -39,6 +81,7 @@
 - Core: Encode filename in upload header to support UTF-8 filenames
 - Core: try to convert CSV file uploads to UTF-8
 - Core: reverted enter to save because it caused problems when searching inside TabbedFormDialog.js
+
 
 10-12-2019 6.4.91
 - Custom fields: db migration contained broken code.
@@ -7396,5 +7439,6 @@ First release including:
 - Addressbook
 - Scheduler
 - Project management (alpha)﻿
+
 
 

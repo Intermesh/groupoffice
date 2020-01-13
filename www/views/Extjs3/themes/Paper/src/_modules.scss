@@ -144,7 +144,7 @@ $app-icons: (
 
 // EMAIL 
 .ml-unseen-row {
-	background-color:white;
+	//background-color:white;
 }
 .ml-unseen-from {
 	font-weight: bold;
@@ -168,9 +168,9 @@ $app-icons: (
 
 .ml-unseen-dot {
 	@include var(background-color, c-primary);
-	width: dp(8);
-	height: dp(8);
-	margin: dp(4);
+	width: dp(10);
+	height: dp(10);
+	margin: dp(2);
 	border-radius: 50%;
 	float: right;
 }
@@ -196,7 +196,9 @@ $app-icons: (
 }
 
 .message-body {
-	padding: dp(8) dp(16);
+	padding: dp(16);
+	background-color: white;
+	color: black;
 
 	position: relative;	
 	
@@ -211,6 +213,12 @@ $app-icons: (
 	}
 }
 
+#email-message-panel {
+	.x-panel-body {
+		background-color: color($bg, 'box');
+	}
+}
+
 .message-header-table{
 	float:left;
 	margin-right: dp(72);
@@ -219,7 +227,6 @@ $app-icons: (
 
 .message-header {
 	position: relative;
-	background-color: color($bg, "background");
 	border-bottom:1px solid color($fg, "line");
 	padding: dp(8) dp(16);
 		
@@ -230,6 +237,8 @@ $app-icons: (
 	.avatar {
 		width: dp(64);
 		height: dp(64);
+		line-height: dp(64);
+		font-size: dp(24);
 		position: absolute;
 		top: dp(16);
 		right: dp(16);
@@ -286,7 +295,7 @@ $app-icons: (
 	position:relative;
 	display:inline-block;
 	padding:0;
-	background: url('img/default-avatar.svg') no-repeat center center;
+	background: url(#{$resourcePath}img/default-avatar.svg) no-repeat center center;
 	background-size:cover;	
 	border-radius: 50%;
 	width:dp(40);

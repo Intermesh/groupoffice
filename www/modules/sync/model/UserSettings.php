@@ -82,7 +82,9 @@ class UserSettings extends Property
 
 	public function toArray($properties = [])
 	{
-		$this->setup();
+		if(!$this->isReadOnly()) {
+			$this->setup();
+		}
 
 		return parent::toArray($properties);
 	}

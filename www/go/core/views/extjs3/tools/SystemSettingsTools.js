@@ -50,7 +50,7 @@ go.tools.SystemSettingsTools = Ext.extend(Ext.Panel,{
 				[t('Create search index'),'', GO.url('maintenance/buildSearchCache') ]);
 		}
 		if(go.Modules.isAvailable(null,'calendar')) {
-			tools.push([t('Clear calendar holiday cache', 'calendar'),'', GO.url("Clears calendar holiday cache so they will be rebuilded through the holiday files. (On first view)", 'calendar') ]);
+			tools.push([t('Clear calendar holiday cache', 'calendar'),'', GO.url('calendar/calendar/truncateHolidays') ]);
 		}
 
 		var scriptList = new GO.grid.SimpleSelectList({

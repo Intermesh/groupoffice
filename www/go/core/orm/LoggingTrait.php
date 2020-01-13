@@ -1,22 +1,24 @@
 <?php
 namespace go\core\orm;
 
+use Exception;
 use go\core\model\Log;
 use go\core\model\Module;
 
 trait LoggingTrait {
 
 	public static $enabled = true;
-	
+
 	/**
 	 * Get the message for the log module. Returns the contents of the first text column by default.
 	 *
 	 * @return string
+	 * @throws Exception
 	 */
 	public function getLogMessage($action){
 
 		if(!method_exists($this, 'getSearchName')) {
-			throw new \Exception("The LoggingTrait depends on the SearchAble triat. Please implement that too.");
+			throw new Exception("The LoggingTrait depends on the SearchAble triat. Please implement that too.");
 		}
 
 		$msg = $this->getSearchName();
@@ -91,9 +93,9 @@ trait LoggingTrait {
 
 	/**
 	 * Will all a log record in go_log
-	 
-	 * @param string $action	 
+	 * @param string $action
 	 * @return boolean returns the created log or succuss status when save is true
+	 * @throws Exception
 	 */
 	protected function log($action) {
 
@@ -117,7 +119,7 @@ trait LoggingTrait {
 			$log->jsonData = json_encode($data);
 			
 			if(!$log->save()) {
-				throw new \Exception("Could not log! " . var_export($log->getValidationErrors(), true));
+				throw new Exception("Could not log! " . var_export($log->getValidationErrors(), true));
 			}
 		}
 		

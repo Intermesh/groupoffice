@@ -2,6 +2,7 @@
 
 namespace go\core\orm;
 
+use Exception;
 use go\core\db\Table;
 
 /**
@@ -57,33 +58,36 @@ class Relation {
 	 */
 	public $autoCreate = false;
 
-	/**
-	 * Constructor
-	 * 
-	 * @param string $name The name of the relation
-	 * @param string $entityName The class name of the {@see Property} this relation points to.
-	 * @param array $keys Associative array with key map
-	 * ```
-	 * ['fromColumn' => 'toColumn']
-	 * ```
-	 * 
-	 * @param boolean $many Indicates if this relation is one to many
-	 */
+  /**
+   * Constructor
+   *
+   * @param string $name The name of the relation
+   * @param array $keys Associative array with key map
+   * ```
+   * ['fromColumn' => 'toColumn']
+   * ```
+   *
+   * @param int $type
+   */
 	public function __construct($name, array $keys, $type = self::TYPE_HAS_ONE) {
 		$this->name = $name;
-		
-		
 		$this->keys = $keys;
 		$this->type = $type;
 	}
 
+  /**
+   * Set the entity name
+   * @param $entityName
+   * @return $this
+   * @throws Exception
+   */
 	public function setEntityName ($entityName) {
 		if(!is_subclass_of($entityName, Property::class, true)) {
-			throw new \Exception($entityName . ' must extend '. Property::class);
+			throw new Exception($entityName . ' must extend '. Property::class);
 		}
 		
 		if(is_subclass_of($entityName, Entity::class, true)) {
-			throw new \Exception($entityName . ' may not be an '. Entity::class .'. Only '. Property::class .' objects can be mapped.');
+			throw new Exception($entityName . ' may not be an '. Entity::class .'. Only '. Property::class .' objects can be mapped.');
 		}
 		
 		$this->entityName = $entityName;

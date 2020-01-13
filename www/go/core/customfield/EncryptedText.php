@@ -14,11 +14,11 @@ class EncryptedText extends Base {
 		return "TEXT NULL";
 	}
 	
-	public function dbToApi($value, &$values) {		
+	public function dbToApi($value, &$values, $entity) {
 		return Crypt::decrypt($value);
 	}
 	
-	public function apiToDb($value, &$values) {
+	public function apiToDb($value, &$values, $entity) {
 		return Crypt::encrypt($value);
 	}
 	

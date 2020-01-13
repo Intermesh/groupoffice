@@ -232,6 +232,13 @@ class Contact extends AclItemEntity {
 	 * @var ContactGroup[] 
 	 */
 	public $groups = [];
+
+  /**
+   * Color in hex
+   *
+   * @var string
+   */
+	protected $color;
 	
 	
 	/**
@@ -381,7 +388,7 @@ class Contact extends AclItemEntity {
   /**
    * Find contact by e-mail address
    *
-   * @param string $email
+   * @param string|string[] $email
    * @return Query
    * @throws Exception
    */
@@ -389,14 +396,14 @@ class Contact extends AclItemEntity {
 		return static::find($properties)
 						->join("addressbook_email_address", "e", "e.contactId = c.id")
 						->groupBy(['c.id'])
-						->where('e.email', '=', $email);
+						->where(['e.email' => $email]);
 	}
 
 
   /**
    * Find contact by e-mail address
    *
-   * @param string $number
+   * @param string|string[] $number
    * @return Query
    * @throws Exception
    */
@@ -404,7 +411,7 @@ class Contact extends AclItemEntity {
 		return static::find()
 						->join("addressbook_phone_number", "e", "e.contactId = c.id")
 						->groupBy(['c.id'])
-						->where('e.number', '=', $number);
+						->where(['e.number' => $number]);
 	}
 	
 	protected static function defineFilters() {
@@ -572,7 +579,7 @@ class Contact extends AclItemEntity {
 										
 	}
 
-	public static function sort(\go\core\orm\Query $query, array $sort)
+	public static function sort(Query $query, array $sort)
 	{
 		if(isset($sort['firstName'])) {
 			$sort['name'] = $sort['firstName'];
@@ -586,20 +593,19 @@ class Contact extends AclItemEntity {
 		
 		return parent::sort($query, $sort);
 	}
-	
+
+	/**
+	 * @inheritDoc
+	 */
 	public static function converters() {
-		$arr = parent::converters();
-		$arr['text/vcard'] = VCard::class;		
-		$arr['text/x-vcard'] = VCard::class;
-		$arr['text/csv'] = Csv::class;
-		return $arr;
+		return array_merge(parent::converters(), [VCard::class, Csv::class]);
 	}
 
 	protected static function textFilterColumns() {
 		return ['name', 'debtorNumber', 'notes', 'emailAddresses.email', 'addresses.zipCode'];
 	}
 
-	protected static function search(\go\core\db\Criteria $criteria, $expression, \go\core\orm\Query $query)
+	protected static function search(Criteria $criteria, $expression, Query $query)
 	{
 		if(!$query->isJoined('addressbook_email_address', 'emailAddresses')) {
 			$query->join('addressbook_email_address', 'emailAddresses', 'emailAddresses.contactId = c.id', 'LEFT')->groupBy(['c.id']);
@@ -612,7 +618,11 @@ class Contact extends AclItemEntity {
 	
 	public function getUid() {
 		
-		if(!$this->isNew() && !isset($this->uid)) {
+		if(!isset($this->uid)) {
+			if(!isset($this->id)) {
+				return null;
+			}
+
 			$url = trim(go()->getSettings()->URL, '/');
 			$uid = substr($url, strpos($url, '://') + 3);
 			$uid = str_replace('/', '-', $uid );
@@ -632,7 +642,11 @@ class Contact extends AclItemEntity {
 
 	public function getUri() {
 		if(!isset($this->uri)) {
-			$this->uri = $this->getUid() . '.vcf';
+			$uid = $this->getUid();
+			if(!isset($uid)) {
+				return null;
+			}
+			$this->uri = $uid . '.vcf';
 		}
 
 		return $this->uri;
@@ -692,11 +706,12 @@ class Contact extends AclItemEntity {
 		
 		return parent::internalValidate();
 	}
-	
+
 	/**
 	 * Find all linked organizations
-	 * 
+	 *
 	 * @return self[]
+	 * @throws Exception
 	 */
 	public function findOrganizations(){
 		return self::find()
@@ -975,12 +990,13 @@ class Contact extends AclItemEntity {
 		return isset($this->$propName[0]) ? $this->$propName[0] : false;
 	}
 
-	/**
-	 * Decorate the message for newsletter sending.
-	 * This function should at least add the to address.
-	 * 
-	 * @param \Swift_Message $message
-	 */
+  /**
+   * Decorate the message for newsletter sending.
+   * This function should at least add the to address.
+   *
+   * @param Message $message
+   * @return bool
+   */
 	public function decorateMessage(Message $message) {
 		if(!isset($this->emailAddresses[0])) {
 			return false;
@@ -994,4 +1010,48 @@ class Contact extends AclItemEntity {
 
 		return $array;
 	}
+
+	private static $colors =  [
+    'C62828',
+    'AD1457',
+    '6A1B9A',
+    '4527A0',
+    '283593',
+    '1565C0',
+    '0277BD',
+    '00838F',
+    '00695C',
+    '2E7D32',
+    '558B2F',
+    '9E9D24',
+    'F9A825',
+    'FF8F00',
+    'EF6C00',
+    '424242'
+  ];
+
+	public function getColor() {
+    if(isset($this->color)) {
+      return $this->color;
+    }
+
+    $index = Settings::get()->lastContactColorIndex;
+
+    if(!isset(self::$colors[$index])) {
+      $index = 0;
+    }
+
+    $this->color = self::$colors[$index];
+    $index++;
+    Settings::get()->lastContactColorIndex = $index;
+    Settings::get()->save();
+
+    go()->getDbConnection()->update(self::getMapping()->getPrimaryTable()->getName(), ['color' => $this->color], ['id' => $this->id])->execute();
+
+    return $this->color;
+  }
+
+  public function setColor($v) {
+	  $this->color = $v;
+  }
 }

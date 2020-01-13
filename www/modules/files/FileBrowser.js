@@ -2139,7 +2139,6 @@ GO.files.openFolder = function(id, folder_id)
 			height:dp(800),
 			width:dp(1200),
 			layout:'fit',
-			border:false,
 			maximizable:!GO.util.isMobileOrTablet(),
 			collapsible:!GO.util.isMobileOrTablet(),
 			closeAction:'hide',

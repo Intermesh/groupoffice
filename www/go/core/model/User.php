@@ -459,10 +459,14 @@ class User extends Entity {
 	}
 	
 	private function maxUsersReached() {
+	  if(empty(go()->getConfig()['core']['limits']['maxUsers'])) {
+	    return false;
+    }
+
 		$stmt = go()->getDbConnection()->query("SELECT count(*) AS count FROM `core_user` WHERE enabled = 1");
 		$record = $stmt->fetch();
 		$countActive = $record['count'];
-		return \GO::config()->max_users > 0 && $countActive >= \GO::config()->max_users;
+		return $countActive >= go()->getConfig()['core']['limits']['maxUsers'];
 	}
 
 	private static function count() {
@@ -846,11 +850,12 @@ class User extends Entity {
 	}
 
 
+	/**
+	 * @inheritDoc
+	 */
 	public static function converters()
 	{
-		$arr = parent::converters();
-		$arr['text/csv'] = UserCsv::class;
-		return $arr;
+		return array_merge(parent::converters(), [UserCsv::class]);
 	}
 
 }

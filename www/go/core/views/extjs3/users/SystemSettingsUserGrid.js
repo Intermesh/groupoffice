@@ -105,7 +105,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 								go.util.exportToFile(
 												'User',
 												Object.assign(this.store.baseParams, this.store.lastOptions.params, {limit: 0, position: 0}),
-												'text/csv');									
+												'csv');
 							},
 							scope: this	
 						}, '-',
@@ -190,6 +190,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',
 				forceFit: true,
 				autoFill: true,
+				totalDisplay: true,
 				getRowClass: function(record) {
 					if(!record.json.enabled)
 						return 'go-user-disabled';

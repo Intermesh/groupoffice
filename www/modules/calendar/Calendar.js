@@ -762,7 +762,7 @@ GO.calendar.MainPanel = function(config){
 		},this.periodInfoPanel = new Ext.Panel({
 			html: '',
 			plain:true,
-			border:true,
+			border:false,
 			cls:'cal-period'
 		}),{
 			iconCls: 'ic-keyboard-arrow-right',

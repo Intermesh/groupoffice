@@ -734,7 +734,7 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 			$values = json_decode($params['values'], true);
 
 			if(!is_array($values)){
-				trigger_error ("Invalid value for Core::actionSaveState: ".var_export($params, true), E_USER_NOTICE);
+				error_log ("Invalid value for Core::actionSaveState: ".var_export($params, true));
 			}else
 			{
 				foreach($values as $name=>$value){

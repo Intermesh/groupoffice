@@ -62,6 +62,23 @@ abstract class AbstractConverter {
 	protected function init() {
 		
 	}
+
+	/**
+	 * Return list of supported file extensions in lower case!
+	 * eg. ['csv'];
+	 *
+	 * @return string[]
+	 */
+	abstract public static function supportedExtensions();
+
+	/**
+	 * Check if this converter supports the given extension
+	 * @param string $extension eg. "csv"
+	 * @return bool
+	 */
+	public static function supportsExtension($extension) {
+		return in_array(strtolower($extension), static::supportedExtensions());
+	}
 	
 	/**
 	 * The name of the convertor
@@ -78,15 +95,16 @@ abstract class AbstractConverter {
 	 * @return string eg. "csv"
 	 */
 	abstract public function getFileExtension();
-	
-	/**
-	 * Read file and import them into Group-Office
-	 * 
-	 * @param File $file the source file
-	 * @param string $entityClass The entity class model. eg. go\modules\community\addressbook\model\Contact
-	 * @param array $params Extra import parameters. By default this can only hold 'values' which is a key value array that will be set on each model.
-	 * @return array ['count', 'errors', 'success']
-	 */
+
+  /**
+   * Read file and import them into Group-Office
+   *
+   * @param File $file the source file
+   * @param string $entityClass The entity class model. eg. go\modules\community\addressbook\model\Contact
+   * @param array $params Extra import parameters. By default this can only hold 'values' which is a key value array that will be set on each model.
+   * @return array ['count', 'errors', 'success']
+   * @throws Exception
+   */
 	public function importFile(File $file, $entityClass, $params = array()) {
 		$response = ['count' => 0, 'errors' => [], 'success' => true];		
 		
@@ -96,15 +114,10 @@ abstract class AbstractConverter {
 		
 		while(!feof($fp)) {		
 			try {
-				
-				$entity = new $entityClass;
-				if(isset($params['values'])) {
-					$entity->setValues($params['values']);
-				}
 
 				go()->getDbConnection()->beginTransaction();
 
-				$entity = $this->importEntity($entity, $fp, $index++, $params);
+				$entity = $this->importEntity($entityClass, $fp, $index++, $params);
 				
 				//ignore when false is returned. This is not an error. But intentional. Like CSV skipping a blank line for example.
 				if($entity === false) {
@@ -135,7 +148,6 @@ abstract class AbstractConverter {
 		return $response;
 	}
 
-
 	protected function afterSave(Entity $entity) {
 		return true;
 	}
@@ -147,13 +159,13 @@ abstract class AbstractConverter {
 	 * 
 	 * When false is returned the result will be ignored. For example when you want to skip a CSV line because it's empty.
 	 * 
-	 * @param Entity $entity
+	 * @param Entity $entityClass
 	 * @param resource $fp
 	 * @param int $index
 	 * @param array $params
 	 * @return Entity|false
 	 */
-	abstract protected function importEntity(Entity $entity, $fp, $index, array $params);
+	abstract protected function importEntity($entityClass, $fp, $index, array $params);
 	
 	abstract protected function exportEntity(Entity $entity, $fp, $index, $total);
 		
@@ -164,7 +176,19 @@ abstract class AbstractConverter {
 			$this->exportEntity($entity, $fp, $i, $total);
 			$i++;
 		}
-	}
+  }
+
+  /**
+   * @var Query
+   */
+  private $entitiesQuery;
+
+  /**
+   * @return Query
+   */
+	protected function getEntitiesQuery(){
+	  return $this->entitiesQuery;
+  }
 
   /**
    * Export entities to a blob
@@ -177,6 +201,8 @@ abstract class AbstractConverter {
 	public final function exportToBlob($name, Query $entities) {		
 		$tempFile = File::tempFile($this->getFileExtension());
 		$fp = $tempFile->open('w+');
+
+		$this->entitiesQuery = $entities;
 		
 		$total = $entities->getIterator()->rowCount();
 		

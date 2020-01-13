@@ -71,19 +71,12 @@ GO.tasks.SettingsPanel = Ext.extend(Ext.Panel, {
 	},
 
 	onSubmitComplete : function(){
-		var t = GO.tasks.taskDialog;
 
 		var now = new Date();
 
 		GO.tasks.reminderDaysBefore=parseInt(this.numberField.getValue());
 		GO.tasks.reminderTime=this.timeField.getValue();
-		if(t){				
-			var remindDate = now.add(Date.DAY, -GO.tasks.reminderDaysBefore);
 
-			t.formPanel.form.findField('taskSettings.remind').originalValue=this.remindCheck.getValue();
-			t.formPanel.form.findField('taskSettings.remind_time').originalValue=this.timeField.getValue();
-			t.formPanel.form.findField('taskSettings.remind_date').originalValue=remindDate;
-		}
 	}
 
 });

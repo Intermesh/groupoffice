@@ -3,10 +3,11 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 	entityStore: "Comment",
 	layout: 'border',
 	cls:'go-form new-message',
+	autoScroll: false,
+	minComposerHeight: dp(32),
 
-	
 	initComponent : function() {
-		
+
 		this.store = new go.data.Store({
 			fields: ['id', 'name', 'color'],
 			entityStore: "CommentLabel"
@@ -38,6 +39,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		},this);
 
 		this.textField = new go.form.HtmlEditor({
+			iframePad: 0,
 			//enableColors: false,
 			enableFont: false,
 			enableFontSize: false,
@@ -47,24 +49,33 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			// emptyText: t('Add comment')+'...',
 			allowBlank: false,
 			plugins: [go.form.HtmlEditor.emojiPlugin],
-			height: 35,
+			height: this.minComposerHeight,
 			name: 'text',
 			boxMaxHeight: 200,
-			boxMinHeight:35
+			boxMinHeight: this.minComposerHeight,
+			listeners: {
+				ctrlenter: function() {
+					this.sendBtn.handler.call(this);
+				},
+				scope: this
+			}
 		});
 		this.textField.on('sync', this.onSync,this);	
 		this.textField.on("initialize", this.onSync, this);
-		// this.textField.on('render', this.onSync,this);	
+		this.textField.on('afterrender', this.onSync,this);
 		
 		this.sendBtn = new Ext.Button({
 			region:"east",
 			tooltip: t('Send'),
 			iconCls: 'ic-send',
 			handler: function(){ 
-				this.submit(); 
-				this.textField.syncValue();
+				this.submit();
+				this.textField.reset();
 				this.chips.reset();
-				this.loadLabels();
+				this.textField.setHeight(this.minComposerHeight);
+				// this.loadLabels();
+				this.textField.syncValue();
+				// this.textfield.focus();
 			},
 			scope: this
 		});
@@ -72,7 +83,6 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		this.items = [
 			this.addBtn,
 			this.middleBox = new Ext.Container({
-				id: "test",
 				region:"center",
 				layout:'anchor',
 				defaults: {
@@ -83,6 +93,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 
 				items: [
 					this.commentBox = new Ext.Container({
+						boxMinHeight: this.minComposerHeight,
 						layout:'fit',
 						frame: true,
 						items:[this.textField]
@@ -115,13 +126,15 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		composer = this;
 		body.style.height = 'auto';
 		body.style.display = 'inline-block';
-		body.style.width = '100%';
-		body.style.minHeight = '17px';
-		body.style.margin = '8px 0';
-		
+
+		body.style.minHeight =  dp(32);
+		body.style.padding = dp(8);
+		body.style.boxSizing = "border-box";
+		body.style.width = "100%";
+
 		setTimeout(function() {
-			var h =  Math.max(me.boxMinHeight,Math.min(body.offsetHeight + 16, me.boxMaxHeight)); // 400  max height
-			if(h > 40) {
+			var h =  Math.max(me.boxMinHeight,Math.min(body.offsetHeight, me.boxMaxHeight)); // 400  max height
+			if(h > 36) {
 				me.tb.show();
 				me.tb.doLayout();
 			} else {
@@ -138,10 +151,11 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		this.setHeight(totalHeight);
 		this.middleBox.setHeight(totalHeight-2);
 		var headerHeight = (this.header || this.ownerCt.header) ? dp(64) : 0;
-		var h = Math.min(400,this.ownerCt.commentsContainer.getEl().dom.scrollHeight + totalHeight + headerHeight);
+		var h = Math.min(this.ownerCt.growMaxHeight,this.ownerCt.commentsContainer.getEl().dom.scrollHeight + totalHeight + headerHeight);
 		this.ownerCt.setHeight(h);
 		this.ownerCt.doLayout();	
 		this.doLayout();
+
 	},
 
 

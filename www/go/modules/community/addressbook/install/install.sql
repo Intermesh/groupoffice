@@ -51,7 +51,8 @@ CREATE TABLE `addressbook_contact` (
   `filesFolderId` int(11) DEFAULT NULL,
   `uid` varchar(200) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
   `vcardBlobId` binary(40) DEFAULT NULL,
-  `uri` varchar(200) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL
+  `uri` varchar(200) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
+  `color` CHAR(6) NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `addressbook_contact_custom_fields` (

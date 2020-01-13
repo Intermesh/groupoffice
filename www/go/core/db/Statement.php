@@ -60,7 +60,7 @@ class Statement extends \PDOStatement implements \JsonSerializable, ArrayableInt
 	public function __toString() {
 		try {
 			return QueryBuilder::debugBuild($this->build);
-		} catch(\Exception $e) {
+		} catch(Exception $e) {
 			ErrorHandler::logException($e);
 			return "Error: Could not convert SQL to string: " . $e->getMessage();
 		}

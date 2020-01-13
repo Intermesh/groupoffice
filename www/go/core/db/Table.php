@@ -98,13 +98,16 @@ class Table {
 	 * Clear the columns cache
 	 */
 	private function clearCache() {
-		App::get()->getCache()->delete($this->getCacheKey());
+		go()->getCache()->delete($this->getCacheKey());
 		// $this->columns = null;
 		// $this->pk = [];
-		
+
 		// $this->init();
 	}
 
+  /**
+   * @throws Exception
+   */
 	private function init() {
 		
 		if (isset($this->columns)) {
@@ -156,8 +159,6 @@ class Table {
 			throw new \Exception("The name '$fieldName' is reserved. Please choose another column name.");
 		}
 	}
-	
-	
 
 	private function createColumn($field) {
 		
@@ -179,12 +180,12 @@ class Table {
 		$c->trimInput = false;
 		$c->dataType = strtoupper($field['Type']);
 
-		preg_match('/(.*)\(([1-9].*)\)/', $field['Type'], $matches);		
+		preg_match('/(.*)\(([1-9].*)\)/', $field['Type'], $matches);
 		if ($matches) {
 			$c->length  = intval($matches[2]);
 			$c->dbType = strtolower($matches[1]);			
 		} else {
-			$c->dbType = strtolower($field['Type']);
+			$c->dbType = strtolower(preg_replace("/\(.*\)$/", "", $field['Type']));
 			$c->length = null;
 		}
 		

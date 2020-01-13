@@ -40,7 +40,7 @@ $lang = GO::language()->getLanguage(); ?>
 	?>
 	<link href="<?= GO::view()->getTheme()->getUrl();?>style.css?v=<?=$cssMtime ?>" media="print, (min-device-width:1201px)" type="text/css" rel="stylesheet" />
 	<link rel="stylesheet" type="text/css" media="screen and (max-device-width:1200px)" href="<?= GO::view()->getTheme()->getUrl(); ?>style-mobile.css?v=<?=$cssMtime;?>" />
-	<link href="<?= GO::view()->getUrl()?>css.php?v=<?=$webclient->getCSSFile()->getModifiedAt()->format("U"); ?>" type="text/css" rel="stylesheet" />
+	<link href="<?= GO::view()->getUrl()?>css.php?theme=<?=\GO::view()->getTheme()->getName(); ?>&v=<?=$webclient->getCSSFile(\GO::view()->getTheme()->getName())->getModifiedAt()->format("U"); ?>" type="text/css" rel="stylesheet" />
 
 	<?php
 	if(!empty(GO::config()->custom_css_url))
@@ -52,17 +52,21 @@ $lang = GO::language()->getLanguage(); ?>
 	?>
 	<style>
         <?php
-        if(go()->getSettings()->primaryColor) {
-            ?>
+        if(GO::view()->getTheme()->getName() == 'Paper') {
+            if(go()->getSettings()->primaryColor) {
+                ?>
             :root {
                 --c-primary: <?= '#'.go()->getSettings()->primaryColor; ?> !important;
+                --c-header-bg: <?= '#'.go()->getSettings()->primaryColor; ?> !important;
                 --c-primary-tp: <?= go()->getSettings()->getPrimaryColorTransparent(); ?> !important;
             }
-        <?php
-        }
-        if(go()->getSettings()->logoId) {
-            //blob id is not used by script but added only for caching.
-            echo ".go-app-logo, #go-logo {background-image: url(" . go()->getSettings()->URL . "api/page.php?blob=" . go()->getSettings()->logoId . ") !important}";
+
+            <?php
+            }
+            if(go()->getSettings()->logoId) {
+                //blob id is not used by script but added only for caching.
+                echo ".go-app-logo, #go-logo {background-image: url(" . go()->getSettings()->URL . "api/page.php?blob=" . go()->getSettings()->logoId . ") !important}";
+            }
         }
         ?>
 	</style>

@@ -7,7 +7,7 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 			iconCls: 'ic-notifications',
 			items: [{
 					defaults: {
-						width: dp(240)
+						width: dp(360)
 					},
 					xtype: "fieldset",
 					title: t('Outgoing E-mail (SMTP)'),

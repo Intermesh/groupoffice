@@ -238,19 +238,20 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 			}
 
 
+			cellClass = 'cal-monthGrid-cell';
 
 			if(dateStr==currentDateStr)
 			{
-				cellClass = 'cal-monthGrid-cell x-monthGrid-cell-today';
-			}else if(monthStr==currentMonthStr && (weekday==0 || weekday==6))
+				cellClass += ' x-monthGrid-cell-today';
+			}
+			if(weekday==0 || weekday==6)
 			{
-				cellClass = 'cal-monthGrid-cell x-monthGrid-cell-weekend';
-			}else if (monthStr==currentMonthStr)
+				cellClass += ' x-monthGrid-cell-weekend';
+			}
+
+			if (monthStr==currentMonthStr)
 			{
-				cellClass = 'cal-monthGrid-cell x-monthGrid-cell-current';
-			}else
-			{
-				cellClass = 'cal-monthGrid-cell';
+				cellClass += ' x-monthGrid-cell-current';
 			}
 
 			var id = 'd'+dateStr;

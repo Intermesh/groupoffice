@@ -40,7 +40,7 @@ class Log extends \go\core\orm\Entity {
 				$this->user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'unknown';
 			}
 
-			$this->ip = Request::get()->getRemoteIpAddress();
+			$this->ip = Request::get()->getRemoteIpAddress() ?? "";
 			$this->controller_route = "JMAP";
 			$this->username = go()->getDbConnection()->selectSingleValue('username')->from('core_user')->where('id', '=', go()->getUserId())->single();
 			$this->user_id = go()->getUserId() ?? 1;

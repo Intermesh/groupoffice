@@ -182,57 +182,13 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			name:'htmlbody',
 			hideLabel: true,
 			anchor: '100% '+anchorHeight,
-			plugins:this.initHtmlEditorPlugins(),			
-			listeners:{
-				activate:function(){
+			plugins:this.initHtmlEditorPlugins(),
+			getFontStyle :  function() {
+				return GO.form.HtmlEditor.prototype.getFontStyle.call(this) + ';color: black';
+			},
 
-					var doc = this.htmlEditor.getDoc();				
-					if (Ext.isGecko){					
-						Ext.EventManager.on(doc, {
-							keypress: this.fireSubmit,
-							scope: this
-						});
-					}
-					if (Ext.isIE || Ext.isWebKit || Ext.isOpera) {
-						Ext.EventManager.on(doc, 'keydown', this.fireSubmit,
-							this);
-					}
-					
-					this.setOriginalValue();					
-					
-					
-//					var pasteEl = doc;
-
-//					if(Ext.isChrome){
-//						var paster = new GO.base.upload.Paster({
-//							pasteEl: pasteEl,
-//							temporaryFile:true,
-//							callback:function(paster, result, xhr){
-////								this.attachmentsView.addTempFile(result.data);
-//
-//									var token = GO.base.util.MD5(result.data.tmp_file);
-//
-//									var url = GO.url("core/downloadTempFile", {path:result.data.tmp_file, token: token});
-//
-//									var html = '<img src="'+url+'" border="0" />';
-//									
-//									this.htmlEditor.focus();
-//									this.htmlEditor.insertAtCursor(html);	
-//									
-//									
-//									this.inlineAttachments.push({
-//										tmp_file : result.data.tmp_file,
-//										from_file_storage : false,
-//										token:token
-//									});				
-//									this.setInlineAttachments(this.inlineAttachments);	
-//							},
-//							scope:this
-//						});
-//
-//					}					
-				},
-				scope:this
+			getEditorFrameStyle : function() {
+				return GO.form.HtmlEditor.prototype.getEditorFrameStyle.call(this) + ' body {background-color: white}';
 			}
 		});
 		
@@ -331,13 +287,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 //		this.htmlEditor.setValue(v);		
 //	},
 
-	fireSubmit : function(e) {
-		if (e.ctrlKey && Ext.EventObject.ENTER == e.getKey()) {
-			e.preventDefault();
-			this.fireEvent('submitshortcut',this);
-			return false;
-		}
-	},
+
 	
 	setEditorHeight : function() {
 

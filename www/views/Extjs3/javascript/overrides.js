@@ -226,9 +226,8 @@ Ext.override(Ext.form.BasicForm,{
 				}
 			}
 		};
-		
+
 		this.items.each(fn);
-  
 
 		var keys, converted = {}, currentJSONlevel;
 
@@ -464,7 +463,7 @@ Ext.override(Ext.FormPanel,{
 				if(this.isField(c)) {
 						m.push(c);
 						//don't cascade into form fields.
-						return (c.getXType() == 'compositefield' || c.getXType() == 'checkboxgroup' || c.getXType() == "radiogroup"); //don't cascade into form fields
+						return (c.getXType() == 'compositefield' || c.getXType() == 'checkboxgroup' || c.getXType() == "radiogroup" || c.getXType() == "formcoontainer" || c.getXType() == "formgroup"); //don't cascade into form fields
 				}
 		}, this);
 		return m;

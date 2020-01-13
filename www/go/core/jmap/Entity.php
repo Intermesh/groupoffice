@@ -33,18 +33,18 @@ abstract class Entity  extends OrmEntity {
 	public static $trackChanges = true;
 
 
-    /**
-     * Get the current state of this entity
-     *
-     * This is the modSeq of the main entity joined with a ":" char with user
-     * table states {@see Mapping::addUserTable()}
-     *
-     * eg."1:2"
-     *
-     * @todo ACL state should be per entity and not global. eg. Notebook should return highest mod seq of acl's used by note books.
-     * @return string
-     * @throws Exception
-     */
+	/**
+	 * Get the current state of this entity
+	 *
+	 * This is the modSeq of the main entity joined with a ":" char with user
+	 * table states {@see Mapping::addUserTable()}
+	 *
+	 * eg."1:2"
+	 *
+	 * @todo ACL state should be per entity and not global. eg. Notebook should return highest mod seq of acl's used by note books.
+	 * @return string
+	 * @throws Exception
+	 */
 	public static function getState($entityState = null) {
 		$state = ($entityState ?? static::entityType()->getHighestModSeq()) . ':';
 		
