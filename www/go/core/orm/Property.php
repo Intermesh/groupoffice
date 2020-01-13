@@ -1771,9 +1771,9 @@ abstract class Property extends Model {
 					return false;
 				}
 
-				$enumValues = str_getcsv($matches[1], ',' , "'");
+				$enumValues = str_getcsv(strtolower($matches[1]), ',' , "'");
 
-				if(!in_array($value, $enumValues)) {
+				if(!in_array(str_tolower($value), $enumValues)) {
 					$this->setValidationError($column->name, ErrorCode::MALFORMED, "Invalid value for " . $column->dataType);
 					return;
 				}
