@@ -260,8 +260,12 @@ class Migrate63to64 {
 		$insert = go()->getDbConnection()->insertIgnore('addressbook_contact_custom_fields', $data, array_merge(['id'], array_values($renameMap)));
 		echo $insert ."\n";
 		$insert->execute();
-		
-		$companyEntityType = \go\core\orm\EntityType::findByName("Company");
+
+		$companyEntityType =  (new Query)
+			->select('*')
+			->from('core_entity')
+			->where('name = "Company"')
+			->single();
 		
 		if($companyEntityType) {
 			
@@ -274,7 +278,7 @@ class Migrate63to64 {
 															(new \go\core\db\Query)
 																->select('id')
 																->from('core_customfields_field_set')
-																->where(['entityId' => $companyEntityType->getId()])
+																->where(['entityId' => $companyEntityType['id']])
 															)
 											->andWhere('databaseName', '=', $old)
 											)
@@ -284,7 +288,7 @@ class Migrate63to64 {
 			go()->getDbConnection()
 							->update("core_customfields_field_set", 
 											['entityId' => Contact::entityType()->getId()], 
-											['entityId' => $companyEntityType->getId()])
+											['entityId' => $companyEntityType['id']])
 							->execute();
 		}
 		
