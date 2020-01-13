@@ -931,7 +931,7 @@ class GO{
 	/**
 	 * Check if require exists
 	 *
-	 * @param StringHelper $fileName
+	 * @param string $fileName
 	 *
 	 * @return boolean
 	 */
@@ -953,7 +953,7 @@ class GO{
 	/**
 	 * Write's to a debug log.
 	 *
-	 * @param StringHelper $text log entry
+	 * @param string $text log entry
 	 */
 	public static function debug($text, $config=false) {
 		
