@@ -19,4 +19,6 @@ return array (
   'description' => 'Opis',
   'Bookmarks' => 'Zabilješke',
   'Logo' => 'Logo',
+  'Toggle view' => 'Promijeni pogled',
+  'noEmployeesToDisplay' => 'Nema djelatnika za prikaz',
 );

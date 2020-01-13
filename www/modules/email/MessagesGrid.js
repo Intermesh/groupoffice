@@ -132,7 +132,7 @@ GO.email.MessagesGrid = function(config){
 		// 	['cc', t("Recipient (CC)", "email")]
 		// 	]
 		// }),
-		value:GO.email.search_type_default,
+		value:GO.email.search_type_default || 'any'
 		// valueField:'value',
 		// displayField:'text',
 		// mode:'local',

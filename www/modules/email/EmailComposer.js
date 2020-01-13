@@ -342,14 +342,12 @@ GO.email.EmailComposer = function(config) {
 	}));
 	this.emailEditor = new GO.base.email.EmailEditorPanel({
 		maxAttachmentsSize:parseInt(GO.settings.config.max_attachment_size),
-		region:'center',
-		listeners:{
-			submitshortcut:function(){
-				this.sendMail(false, false);
-			},
-			scope:this
-		}
+		region:'center'
 	});
+
+	this.emailEditor.getHtmlEditor().on('ctrlenter', function() {
+		this.sendMail(false, false);
+	}, this);
 	
 	this.formPanel = new Ext.form.FormPanel({
 		border : false,		
@@ -806,18 +804,6 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 			this.emailEditor.getActiveEditor().setValue(this.emailEditor.getActiveEditor().getValue()+sig);
 		} else {
 			this.emailEditor.getActiveEditor().setValue(sig+this.emailEditor.getActiveEditor().getValue());
-		}
-	},
-
-	/*
-	 *handles ctrl+enter from html editor
-	 */
-	fireSubmit : function(e) {
-		if (e.ctrlKey && Ext.EventObject.ENTER == e.getKey()) {
-			//e.stopEvent();
-			e.preventDefault();
-			this.sendMail(false, false);
-			return false;
 		}
 	},
 	

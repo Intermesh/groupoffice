@@ -275,16 +275,26 @@ class Field extends AclItemEntity {
 				static::delete($this->primaryKeyValues());				
 			}
 
-      go()->getDbConnection()->resumeTransactions();
+      		go()->getDbConnection()->resumeTransactions();
 
 			$this->setValidationError('id', ErrorCode::GENERAL, $e->getMessage());
 			
 			return false;
 		} 
 		go()->getDbConnection()->resumeTransactions();
-		
+
+		$this->deleteFieldsQueryCache();
 		
 		return true;
+	}
+
+	private function deleteFieldsQueryCache() {
+		$fieldSet = FieldSet::findById($this->fieldSetId);
+		$entityName = $fieldSet->getEntity();
+		$entityType = EntityType::findByName($entityName);
+
+		$cacheKey = 'custom-field-models-' . $entityType->getId();
+		go()->getCache()->delete($cacheKey);
 	}
 
 	protected static function internalDelete(Query $query) {
@@ -293,6 +303,7 @@ class Field extends AclItemEntity {
 			$fields = Field::find()->mergeWith($query);
 			foreach($fields as $field) {
 				$field->getDataType()->onFieldDelete();
+				$field->deleteFieldsQueryCache();
 			}
 		} catch(Exception $e) {
 			go()->warn($e);

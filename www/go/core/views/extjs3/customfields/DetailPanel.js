@@ -37,22 +37,21 @@ go.customfields.DetailPanel = Ext.extend(Ext.Panel, {
 
     var vis = false, panel = this;
     go.customfields.CustomFields.getFields(this.fieldSet.id).forEach(function (field) {
-      if(!GO.util.empty(dv.data.customFields[field.databaseName])) {
-        vis = true;
-      }
+
 
       var cmp = panel.getComponent(field.databaseName), type = go.customfields.CustomFields.getType(field.type);
-
       if(cmp) {
-        var v = type.renderDetailView(dv.data.customFields[field.databaseName], dv.data.customFields, field, cmp);
-
+        var v = type.renderDetailView(dv.data.customFields[field.databaseName], dv.data, field, cmp);
         if(typeof(v) !== "undefined") {
           cmp.setValue(v);
+
           cmp.setVisible(!!v);
+          if(!!v) {
+            vis = true;
+          }
         }
       }
     });
-
     this.setVisible(vis);
   },
 

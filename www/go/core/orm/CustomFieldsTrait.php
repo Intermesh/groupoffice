@@ -41,7 +41,7 @@ trait CustomFieldsTrait {
 			if(empty($field->databaseName)) {
 				continue; //For type Notes which doesn't store any data
 			}
-			$record[$field->databaseName] = $field->getDataType()->$fn(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record);			
+			$record[$field->databaseName] = $field->getDataType()->$fn(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record, $this);
 		}
 		return $record;	
 	}
@@ -184,7 +184,7 @@ trait CustomFieldsTrait {
 			$fn = $asText ? 'textToDb' : 'apiToDb';
 			//if client didn't post value then skip it
 			if(array_key_exists($field->databaseName, $data)) {
-				$data[$field->databaseName] = $field->getDataType()->$fn(isset($data[$field->databaseName]) ? $data[$field->databaseName] : null,  $data);			
+				$data[$field->databaseName] = $field->getDataType()->$fn(isset($data[$field->databaseName]) ? $data[$field->databaseName] : null,  $data, $this);
 			}
 		}
 		

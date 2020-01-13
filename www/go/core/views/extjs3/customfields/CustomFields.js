@@ -243,8 +243,10 @@
 					return;
 				}
 				var formField = type.renderFormField(field);
-				formField.field = field;
-				r.push(formField);						
+				if(formField) {
+					formField.field = field;
+					r.push(formField);
+				}
 			});
 
 			return r;

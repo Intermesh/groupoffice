@@ -22,4 +22,5 @@ return array (
   'name' => 'Početna stranica',
   'description' => 'Prikazuje pregled različitih aktualnih stavki',
   'Start page' => 'Početna stranica',
+  'webfeeds' => 'Web pretplate',
 );

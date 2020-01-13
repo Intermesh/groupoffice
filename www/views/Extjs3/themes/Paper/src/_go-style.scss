@@ -503,7 +503,7 @@ a {
 	right:0;
 	height: dp(64);
 	padding: dp(8);
-	@include var(background-color, c-primary);
+	@include var(background-color, c-header-bg);
 	// border-radius: $borderRadius;
 	// transition: opacity 280ms $curve-standard;
 	// opacity:1;
@@ -1881,7 +1881,7 @@ table[id^="comments-ext"] b {
 	}
 	textarea.x-form-textarea {
 		border:0;
-		margin:dp(2) 0;
+		//margin:dp(2) 0;
 		&.x-form-focus {
 			box-shadow: none;
 		}
@@ -1920,7 +1920,7 @@ table[id^="comments-ext"] b {
 		position: absolute;
 		top: 0;
 		right:0;
-		background-color: color($bg, 'card');
+		background-color: color($bg, 'background');
 		&:hover {
 			@include var(color, c-primary);
 		}

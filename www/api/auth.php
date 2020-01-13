@@ -237,6 +237,7 @@ try {
 		$response['errors'] = $validationErrors;
 		output($response, 400, "Validation errors occurred");
 	} else {
+		go()->debug($methods);
 		output($response, 200, "Success, but more authorization required.");
 	}
 } catch (Exception $e) {

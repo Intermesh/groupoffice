@@ -234,7 +234,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 					tb.getEl().on("focusout", function(e) {
 
 						//hide toolbar if clicked outside. To allow a menu button we check if the target is not a menuy
-						if(!e.browserEvent.relatedTarget.classList.contains('x-menu-focus') && !this.searchToolBar.getEl().dom.contains(e.browserEvent.relatedTarget)) {
+						if(!e.browserEvent.relatedTarget || (!e.browserEvent.relatedTarget.classList.contains('x-menu-focus') && !this.searchToolBar.getEl().dom.contains(e.browserEvent.relatedTarget))) {
 							this.back();
 						}
 					}, this);

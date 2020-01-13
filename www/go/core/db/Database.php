@@ -87,7 +87,7 @@ class Database {
 	/**
 	 * Set UTF8 collation
 	 * 
-	 * @return \PDOStatement
+	 * @return bool
 	 */
 	public function setUtf8() {
 		//Set utf8 as collation default

@@ -1785,7 +1785,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 						}
 					}
 					catch(\Exception $e){
-						trigger_error($e->getMessage(), E_USER_NOTICE);
+						\go\core\ErrorHandler::logException($e);
 					}
 			}
 		}

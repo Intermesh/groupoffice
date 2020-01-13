@@ -105,6 +105,33 @@ class Migrate63to64 {
    */
 	public function fixMissing() {
 
+	  //$sql = "select * from ab_companies where (id + (select max(id) from ab_contacts)) not in (select id from addressbook_contact) ORDER BY `ab_companies`.`name` ASC";
+    foreach(AddressBook::find() as $addressBook) {
+      $this->copyCompanies($addressBook);
+    }
+
+    /*
+     *
+     set sql_mode='';
+      INSERT INTO addressbook_contact_custom_fields
+ (id, col_1,  col_5, col_6, col_7, col_8, col_9, col_2, col_10)
+
+ SELECT
+ (model_id + (select max(id) from ab_contacts)) AS id,
+  (select id from core_user where id = SUBSTRING_INDEX(col_1, ":", 1)) AS col_1,
+   (select id from core_customfields_select_option where text = col_5 OR text = concat("** Missing ** ", col_5) LIMIT 0,1),
+   (select id from core_customfields_select_option where text = col_6 OR text = concat("** Missing ** ", col_6) LIMIT 0,1),
+   (select id from core_customfields_select_option where text = col_7 OR text = concat("** Missing ** ", col_7) LIMIT 0,1),
+   col_8,
+   (select id from core_customfields_select_option where text = col_9 OR text = concat("** Missing ** ", col_9) LIMIT 0,1),
+    (select id from core_customfields_select_option where text = col_2 OR text = concat("** Missing ** ", col_2) LIMIT 0,1),
+     (select id from core_customfields_select_option where text = col_10 OR text = concat("** Missing ** ", col_10) LIMIT 0,1)
+
+     FROM `cf_ab_companies` WHERE (model_id + (select max(id) from ab_contacts)) not in (select id from addressbook_contact_custom_fields) and (model_id + (select max(id) from ab_contacts)) in (select id from addressbook_contact)
+
+
+     */
+
   }
 
 	private function checkCount() {
@@ -624,24 +651,24 @@ class Migrate63to64 {
 
 		foreach ($contacts as $r) {
 			$r = array_map("trim", $r);
-			
+
 			echo ".";
-			
+
 			$count++;
 			if($count == 50) {
 				echo "\n";
 				$count = 0;
 			}
 			flush();
-			
+
 			$contact = new Contact();
 			$contact->isOrganization = true;
 			$contact->id = $r['id'] + $this->getCompanyIdIncrement();
 			$contact->addressBookId = $addressBook->id;
-			$contact->name = $r['name'];		
-			
+			$contact->name = $r['name'];
+
 			//name2 ??
-			
+
 			if (!empty($r['email'])) {
 				$contact->emailAddresses[] = (new EmailAddress())
 								->setValues([
@@ -657,7 +684,7 @@ class Migrate63to64 {
 						'email' => $r['invoice_email']
 				]);
 			}
-			
+
 
 			if (!empty($r['phone'])) {
 				$contact->phoneNumbers[] = (new PhoneNumber())
@@ -675,7 +702,7 @@ class Migrate63to64 {
 				]);
 			}
 
-		
+
 			if (!empty($r['homepage'])) {
 				$contact->urls[] = (new Url())
 								->setValues([
@@ -689,29 +716,29 @@ class Migrate63to64 {
 			$address = new Address();
 			$address->type = Address::TYPE_HOME;
 			$address->countryCode = isset($r['country']) && \go\core\validate\CountryCode::validate(strtoupper($r['country'])) ? strtoupper($r['country']) : null;
-			$address->state = $r['state'] ?? null;
-			$address->city = $r['city'] ?? null;
-			$address->zipCode = $r['zip'] ?? null;
-			$address->street = $r['address'] ?? null;
-			$address->street2 = $r['address_no'] ?? null;
-			$address->latitude = $r['latitude'] ?? null;
-			$address->longitude = $r['longitude'] ?? null;
+			$address->state =!empty($r['state']) ?$r['state'] : null;
+			$address->city = !empty($r['city']) ?$r['city'] : null;
+			$address->zipCode = !empty($r['zip']) ?$r['zip'] : null;
+			$address->street = !empty($r['address']) ?$r['address'] : null;
+			$address->street2 = !empty($r['address_no']) ?$r['address_no'] : null;
+			$address->latitude = !empty($r['latitude']) ? $r['latitude'] : null;
+			$address->longitude = !empty($r['longitude']) ?$r['longitude'] : null;
 			$address->cutPropertiesToColumnLength();
 
-			if ($address->isModified()) {				
+			if ($address->isModified()) {
 				$contact->addresses[] = $address;
 			}
-			
+
 			$address = new Address();
 			$address->type = Address::TYPE_POSTAL;
 			$address->countryCode = isset($r['post_country']) && \go\core\validate\CountryCode::validate(strtoupper($r['post_country'])) ? strtoupper($r['post_country']) : null;
-			$address->state = $r['post_state'] ?? null;
-			$address->city = $r['post_city'] ?? null;
-			$address->zipCode = $r['post_zip'] ?? null;
-			$address->street = $r['post_address'] ?? null;
-			$address->street2 = $r['post_address_no'] ?? null;
-			$address->latitude = $r['post_latitude'] ?? null;
-			$address->longitude = $r['post_longitude'] ?? null;
+      $address->state =!empty($r['post_state']) ?$r['post_state'] : null;
+      $address->city = !empty($r['post_city']) ?$r['post_city'] : null;
+      $address->zipCode = !empty($r['post_zip']) ?$r['post_zip'] : null;
+      $address->street = !empty($r['post_address']) ?$r['post_address'] : null;
+      $address->street2 = !empty($r['post_address_no']) ?$r['post_address_no'] : null;
+      $address->latitude = !empty($r['post_latitude']) ? $r['post_latitude'] : null;
+      $address->longitude = !empty($r['post_longitude']) ?$r['post_longitude'] : null;
 			$address->cutPropertiesToColumnLength();
 
 			if ($address->isModified()) {
@@ -726,14 +753,14 @@ class Migrate63to64 {
 			$contact->modifiedAt = new DateTime("@" . $r['mtime']);
 			$contact->createdBy = \go\core\model\User::findById($r['user_id'], ['id']) ? $r['user_id'] : 1;
 			$contact->modifiedBy = \go\core\model\User::findById($r['muser_id'], ['id']) ? $r['muser_id'] : 1;
-			
+
 			$contact->IBAN = $r['bank_no'];
-			
+
 			//bank_bic???
-			
+
 			$contact->vatNo = $r['vat_no'];
-			
-							
+
+
 
 			if ($r['photo']) {
 
@@ -753,9 +780,9 @@ class Migrate63to64 {
 			$contact->cutPropertiesToColumnLength();
 
 			if (!$contact->save()) {
-				
+
 				go()->debug($r);
-				
+
 				throw new \Exception("Could not save contact" . var_export($contact->getValidationErrors(), true));
 			}
 		}

@@ -36,16 +36,22 @@ class Extjs3 {
 			foreach ($modules as $module) {
 
 				if (isset($module->package)) {
-					$folder = $module->module()->getFolder();
+
+          $folder = $module->module()->getFolder();
+
+          $file = $folder->getFile('views/extjs3/themes/' . $theme . '/style.css');
+          if ($file->exists()) {
+            $css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
+            continue;
+          }
+
+
 					$file = $folder->getFile('views/extjs3/themes/default/style.css');
 					if ($file->exists()) {
 						$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";						
 					}
 
-					$file = $folder->getFile('views/extjs3/themes/' . $theme . '/style.css');
-					if ($file->exists()) {
-						$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";						
-					}
+
 				}
 
 				//old path

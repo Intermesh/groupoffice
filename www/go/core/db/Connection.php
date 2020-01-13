@@ -132,7 +132,7 @@ class Connection {
 	 */
 	public function query($sql) {
 		if($this->debug) {
-			\go\core\App::get()->getDebugger()->debug($sql);
+			go()->getDebugger()->debug($sql);
 		}
 		try {
 			return $this->getPdo()->query($sql);
@@ -154,7 +154,7 @@ class Connection {
 	 */
 	public function exec($sql) {
 		if($this->debug) {
-			\go\core\App::get()->getDebugger()->debug($sql, 1);
+			go()->getDebugger()->debug($sql, 1);
 		}
 		try {
 			return $this->getPdo()->exec($sql);
@@ -211,6 +211,13 @@ class Connection {
 	  return $this->resumeLevels > 0;
   }
 
+  /**
+   * Commit's the transaction but remembers the nesting of transaction nesting level. Must be resumed with resumeTransactions().
+   * This is used by custom fields that do database structure changes. MySQL commits transactions automatically when the database
+   * structure changes.
+   *
+   * @throws Exception
+   */
 	public function pauseTransactions() {
 	  if($this->isPaused()) {
 	    return;
@@ -222,6 +229,9 @@ class Connection {
 		}
 	}
 
+  /**
+   * @see pauseTransactions()
+   */
 	public function resumeTransactions() {
 		while($this->resumeLevels > 0) {
 			$this->beginTransaction();
@@ -236,11 +246,8 @@ class Connection {
    * @throws Exception
    */
 	public function rollBack() {
-//		\go\core\App::get()->debug("Rollback DB transation");
-//		\go\core\App::get()->getDebugger()->debugCalledFrom();
-		
 		if($this->transactionSavePointLevel == 0) {
-			throw new \Exception("Not in transaction!");
+			throw new Exception("Not in transaction!");
 		}
 		
 		$this->transactionSavePointLevel--;	
@@ -269,7 +276,7 @@ class Connection {
 //		\go\core\App::get()->getDebugger()->debugCalledFrom();
 		
 		if($this->transactionSavePointLevel == 0) {
-			throw new \Exception("Not in transaction!");
+			throw new Exception("Not in transaction!");
 		}
 		
 		$this->transactionSavePointLevel--;
@@ -483,11 +490,17 @@ class Connection {
 
 		return $this->createStatement($build);
 	}
-	
-	/**
-	 * Update but with ignore
-	 * @see update()
-	 */
+
+  /**
+   * Update but with ignore
+   *
+   * @param $tableName
+   * @param $data
+   * @param null $query
+   * @return Statement
+   * @throws Exception
+   * @see update()
+   */
 	public function updateIgnore($tableName, $data, $query = null) {
 		$query = Query::normalize($query);
 
@@ -497,23 +510,24 @@ class Connection {
 		return $this->createStatement($build);
 	}
 
-	/**
-	 * Create a select statement.
-	 * 
-	 * @example 
-	 * ```
-	 * $query = go()->getDbConnection()
-	 * 						->select('*')
-	 * 						->from('test_a')
-	 * 						->where('id', '=', 1);
-	 * 
-	 * 	$stmt = $query->execute();
-	 * 
-	 * ```
-	 * 
-	 * @see Query
-	 * @return Query
-	 */
+  /**
+   * Create a select statement.
+   *
+   * @param string $select
+   * @return Query
+   * @example
+   * ```
+   * $query = go()->getDbConnection()
+   *            ->select('*')
+   *            ->from('test_a')
+   *            ->where('id', '=', 1);
+   *
+   *  $stmt = $query->execute();
+   *
+   * ```
+   *
+   * @see Query
+   */
 	public function select($select = "*") {
 		$query = new Query();
 		return $query->setDbConnection($this)->select($select);
@@ -532,13 +546,15 @@ class Connection {
 		$query = new Query();
 		return $query->setDbConnection($this)->selectSingleValue($select);
 	}
-	
-	/**
-	 * Create a statement from a QueryBuilder result
-	 * 
-	 * @return Statement
-	 * @throws PDOException
-	 */
+
+  /**
+   * Create a statement from a QueryBuilder result.
+   *
+   * For internal use of the API.
+   *
+   * @param array $build
+   * @return Statement
+   */
 	public function createStatement($build) {
 		try {
 			$build['start'] = go()->getDebugger()->getMicroTime();			
@@ -552,7 +568,7 @@ class Connection {
 				$stmt->bindValue($p['paramTag'], $p['value'], $p['pdoType']);
 			}
 			return $stmt;
-		}catch(\PDOException $e) {
+		}catch(PDOException $e) {
 			go()->error("Failed SQL: ". QueryBuilder::debugBuild($build));
             go()->error($e->getMessage());
             go()->error($e->getTraceAsString());

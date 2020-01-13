@@ -1,3 +1,33 @@
+.blue {
+  color: #039BE5 !important; }
+
+.red {
+  color: #E53935 !important; }
+
+.pink {
+  color: #D81B60 !important; }
+
+.purple {
+  color: #8E24AA !important; }
+
+.cyan {
+  color: #00ACC1 !important; }
+
+.green {
+  color: #43A047 !important; }
+
+.orange {
+  color: #FB8C00 !important; }
+
+.brown {
+  color: #6D4C41 !important; }
+
+.yellow {
+  color: #FDD835 !important; }
+
+.bluegrey {
+  color: #607D8B !important; }
+
 .go-addressbook-url.homepage:before {
   display: inline-block;
   font-family: 'Material Icons';
@@ -28,7 +58,7 @@
 .go-addressbook-star {
   color: #febf35; }
 
-.go-addressbook-index-row {
+.go-addressbook-index-row:not(:first-child) {
   border-top: 7px solid transparent;
   margin-top: 7px;
   box-shadow: 0px -1px 0 rgba(0, 0, 0, 0.12); }

@@ -47,6 +47,7 @@ go.Modules.register("core", 'core', {
 		"go.customfields.type.DateTime",
 		"go.customfields.type.EncryptedText",
 		"go.customfields.type.FunctionField",
+		"go.customfields.type.Template",
 		"go.customfields.type.Group",
 		"go.customfields.type.Html",
 		"go.customfields.type.MultiSelect",
@@ -136,4 +137,21 @@ GO.mainLayout.on('render', function () {
 		searchField.setValue(query);
 		searchField.search();
 	};
+
+	//Prevent browser nav on file drop.
+	document.addEventListener("dragover",function(e){
+		e.preventDefault();
+	},false);
+	document.addEventListener("drop",function(e){
+		e.preventDefault();
+	},false);
+
+
+	window.onerror = function(message, source, lineno, colno, error) {
+		Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console.") + "<br /><br />" + message);
+	}
+
+	window.addEventListener('unhandledrejection', function(event) {
+		Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console."));
+	});
 });

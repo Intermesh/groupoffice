@@ -12,10 +12,6 @@ go.modules.community.imapauthenticator.ServerGrid = Ext.extend(go.grid.GridPanel
 
 		Ext.apply(this, {	
 			tbar: [
-				{
-					xtype:'tbtitle',
-					text: t("IMAP Authenticator", "imapauthenticator")
-				},
 				'->',
 				{
 					iconCls: 'ic-add',

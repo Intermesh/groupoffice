@@ -92,7 +92,7 @@ class MultiSelect extends Select {
 		return true;
 	}
 
-	public function dbToApi($value, &$values) {
+	public function dbToApi($value, &$values, $entity) {
 		
 		//new model
 		if(empty($values['id'])) {
@@ -106,7 +106,7 @@ class MultiSelect extends Select {
 						->all();
 	}
 
-	public function dbToText($value, &$values)
+	public function dbToText($value, &$values, $entity)
 	{
 		//new model
 		if(empty($values['id'])) {
@@ -121,7 +121,7 @@ class MultiSelect extends Select {
 							->all());
 	}
 
-	public function textToDb($value, &$values)
+	public function textToDb($value, &$values, $entity)
 	{	
 		if(empty($value)) {
 			return [];
