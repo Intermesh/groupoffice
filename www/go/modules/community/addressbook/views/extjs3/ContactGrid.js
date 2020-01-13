@@ -219,6 +219,17 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'vatNo'
 				},
 				{
+					id: 'phoneNumbers',
+					header: t('Phone numbers'),
+					sortable: false,
+					dataIndex: "phoneNumbers",
+					width: dp(300),
+					hidden: true,
+					renderer: function (phoneNumbers, meta, record) {
+						return phoneNumbers.column("number").join(", ");
+					}
+				},
+				{
 					id: 'emailAddresses',
 					header: t('E-mail addresses'),
 					sortable: false,
