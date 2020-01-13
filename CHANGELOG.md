@@ -1,3 +1,6 @@
+- Core: cron will run even though another instance of the cron process is still running. 
+- Newsletters: When cron runs check if newsletters has been active in the past minute. If not then start sending.
+ 
 13-01-2020 6.4.100
 - Core: Fixed problem where list could load older request results
 - Newsletters: Send email to address list owner when someone unsubscribes
@@ -7435,5 +7438,6 @@ First release including:
 - Addressbook
 - Scheduler
 - Project management (alpha)﻿
+
 
 
