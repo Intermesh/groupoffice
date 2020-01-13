@@ -1,4 +1,4 @@
-10-01-2020 6.4.100
+13-01-2020 6.4.100
 - Core: Fixed problem where list could load older request results
 - Newsletters: Send email to address list owner when someone unsubscribes
 - Core: new filter "Has links to..." to find items linked to another type. For example find all contacts with invoices.
