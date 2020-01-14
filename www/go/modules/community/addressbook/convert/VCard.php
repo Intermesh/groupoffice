@@ -78,6 +78,7 @@ class VCard extends AbstractConverter {
 		$vcard->N = $contact->isOrganization ? [$contact->name] : [$contact->lastName, $contact->firstName, $contact->middleName, $contact->prefixes, $contact->suffixes];
 		$vcard->FN = $contact->name;
 		$vcard->REV = $contact->modifiedAt->getTimestamp();
+		$vcard->TITLE = $contact->jobTitle;
 
 		foreach ($contact->emailAddresses as $emailAddr) {
 			$vcard->add('EMAIL', $emailAddr->email, ['TYPE' => [$emailAddr->type]]);
