@@ -1,3 +1,4 @@
+- Email: Fixed error message when saving email as task
 - Newsletters: Users can be recipients now
 
 13-01-2020 6.4.101

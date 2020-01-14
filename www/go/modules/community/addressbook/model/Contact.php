@@ -7,6 +7,7 @@ use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\model\Link;
 use go\core\orm\CustomFieldsTrait;
+use go\core\orm\Entity;
 use go\core\orm\LoggingTrait;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
@@ -1053,5 +1054,18 @@ class Contact extends AclItemEntity {
 
   public function setColor($v) {
 	  $this->color = $v;
+  }
+
+	/**
+	 * @inheritDoc
+	 */
+  protected function mergeProp($entity, $name, $p)
+  {
+  	//Groups can't be merged if addressbook is different.
+  	if($name == "groups" && $entity->addressBookId != $this->getOldValue("addressBookId")) {
+  		$this->groups = $entity->groups;
+	  }
+
+	  return parent::mergeProp($entity, $name, $p);
   }
 }
