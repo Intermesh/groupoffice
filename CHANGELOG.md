@@ -2,6 +2,7 @@
 - Email: Fixed error message when saving email as task
 - Newsletters: Users can be recipients now
 - Files: Fixed comments not showing for folders in filebrowser popup
+- Tasks: Fixed comments editor error in Chrome after adding task
 
 13-01-2020 6.4.101
 - Core: cron will run even though another instance of the cron process is still running. 
