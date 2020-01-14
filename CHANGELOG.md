@@ -1,6 +1,7 @@
 - Address book: Fixed merge error with duplicate values
 - Email: Fixed error message when saving email as task
 - Newsletters: Users can be recipients now
+- Files: Fixed comments not showing for folders in filebrowser popup
 
 13-01-2020 6.4.101
 - Core: cron will run even though another instance of the cron process is still running. 

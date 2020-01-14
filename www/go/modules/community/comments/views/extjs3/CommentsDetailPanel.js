@@ -139,6 +139,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			return;
 		}
 		o = o || {};
+
 		this.composer.textField.setValue('');
 		var prevStr;
 		var initScrollHeight = (this.store.getCount() == this.commentsContainer.pageSize) ? 0 : this.commentsContainer.getEl().dom.scrollHeight,

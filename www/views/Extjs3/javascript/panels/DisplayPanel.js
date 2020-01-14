@@ -321,9 +321,10 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 	},
 	
 	reset : function(){
-		
-		if(this.body)
-			this.body.update("");		
+
+		if(this.mainItem.rendered) {
+			this.mainItem.update("");
+		}
 
 		this.data={};
 		this.model_id=this.link_id=this.collapsedLinkId=0;
