@@ -747,7 +747,8 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 
 	this.filePanel = this.fileDetail = new GO.files.FilePanel({
 		id:config.id+'-file-panel',
-		expandListenObject:this.eastPanel
+		expandListenObject:this.eastPanel,
+		hideMode: "offsets"
 	});
 
 	this.filePanel.getTopToolbar().insert(0, {
@@ -764,7 +765,8 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	this.folderPanel = this.folderDetail = new GO.files.FolderPanel({
 		id:config.id+'-folder-panel',
 		hidden:true,
-		expandListenObject:this.eastPanel
+		expandListenObject:this.eastPanel,
+		hideMode: "offsets"
 	});
 	this.folderPanel.getTopToolbar().insert(0, {
 		cls: 'go-narrow',
