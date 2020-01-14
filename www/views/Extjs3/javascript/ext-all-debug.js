@@ -8237,7 +8237,10 @@ Ext.Element.addMethods(
                 }
                 var me = this;
                 this.masking = setTimeout(function() {
-                    me.doMask(msg, msgCls);
+                		//check if el wasn't destroyed in the mean time.
+                		if(me.dom) {
+											me.doMask(msg, msgCls);
+										}
                 }, 500);
 
             },
