@@ -5,6 +5,8 @@
 - Tasks: Fixed comments editor error in Chrome after adding task
 - Core: Fixed error when saving new group with module permission set
 - Timeregistration: Works without projects module permission again
+- Updated Croatian holidays
+- Core: Reminder request could trigger reload loop
 
 13-01-2020 6.4.101
 - Core: cron will run even though another instance of the cron process is still running. 
