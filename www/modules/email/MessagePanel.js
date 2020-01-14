@@ -44,7 +44,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		this.linkMessageId = Ext.id();
 		this.downloadAllMenuId = Ext.id();
 
-
 		var templateStr =
 						
 		'<div class="message-header">'+
@@ -298,6 +297,10 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			{
 				this.params.password=password;
 			}
+		}
+
+		if(!this.params) {
+			return;
 		}
 
 		this.params['no_max_body_size'] = GO.util.empty(no_max_body_size) ? false : true;
