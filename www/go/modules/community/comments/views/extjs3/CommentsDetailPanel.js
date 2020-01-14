@@ -135,7 +135,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	},
 		
 	updateView : function(o) {
-		if(!this.commentsContainer.rendered) {
+		if(this.collapsed || !this.commentsContainer.rendered) {
 			return;
 		}
 		o = o || {};

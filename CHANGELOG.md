@@ -1,3 +1,4 @@
+- Address book: Fixed merge error with duplicate values
 - Email: Fixed error message when saving email as task
 - Newsletters: Users can be recipients now
 
