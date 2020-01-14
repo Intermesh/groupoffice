@@ -3,6 +3,8 @@
 namespace GO\Base\Mail;
 
 
+use go\core\ErrorHandler;
+
 class Imap extends ImapBodyStruct {
 
 	const SORT_NAME='NAME';
@@ -130,7 +132,7 @@ class Imap extends ImapBodyStruct {
 		$remote = $this->ssl ? 'ssl://' : '';			
 		$remote .=  $this->server.":".$this->port;
 
-		$this->handle = @stream_socket_client($remote, $errorno, $errorstr, 10, STREAM_CLIENT_CONNECT, $streamContext);
+		$this->handle = stream_socket_client($remote, $errorno, $errorstr, 10, STREAM_CLIENT_CONNECT, $streamContext);
 		if (!is_resource($this->handle)) {
 			throw new \Exception('Failed to open socket #'.$errorno.'. '.$errorstr);
 		}
