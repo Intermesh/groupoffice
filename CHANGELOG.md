@@ -1,3 +1,5 @@
+- Newsletters: Users can be recipients now
+
 13-01-2020 6.4.101
 - Core: cron will run even though another instance of the cron process is still running. 
 - Newsletters: When cron runs check if newsletters has been active in the past minute. If not then start sending.
