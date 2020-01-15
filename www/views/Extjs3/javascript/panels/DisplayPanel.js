@@ -121,7 +121,8 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 			
 		
 		this.addButton = this.newMenuButton = new go.detail.addButton({			
-			detailView: this
+			detailView: this,
+			noFiles: this.noFileBrowser
 				})
 		);
 
