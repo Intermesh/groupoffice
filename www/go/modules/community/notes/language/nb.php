@@ -12,4 +12,10 @@ return array (
   'manageCategories' => 'Behandle kategorier',
   'Note' => 'Notat',
   'Content is encrypted' => 'Innholdet er kryptert',
+  'Default note book' => 'Forhåndsvalgt kategori',
+  'Has links to...' => 'Har lenker til...',
+  'Commented at' => 'Kommenterte den',
+  'Note book' => 'Kategori',
+  'Filters' => 'Filtere',
+  'Add test' => 'Ny test',
 );

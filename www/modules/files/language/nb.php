@@ -138,4 +138,5 @@ Følgende endringer er foretatt av %s:
   'Ok' => 'Ok',
   'Create folder' => 'Opprett mappe',
   'File info' => 'Filinformasjon',
+  'Email files' => 'Send filer',
 );

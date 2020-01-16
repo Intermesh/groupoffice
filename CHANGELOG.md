@@ -1,4 +1,7 @@
 - Files: removed document and e-mail from template in file and folder panel
+- Files: Doubleclick from search was broken
+- Core: #202020048 Remove mcrypt dependency #542
+- Custom fields: Fixed problem with required condition
 
 14-01-2020 6.4.102
 - Address book: Fixed merge error with duplicate values
@@ -11,6 +14,7 @@
 - Updated Croatian holidays
 - Core: Reminder request could trigger reload loop
 - Projects: Fixed name column state
+- Core: Updated Norwegian
 
 13-01-2020 6.4.101
 - Core: cron will run even though another instance of the cron process is still running. 
