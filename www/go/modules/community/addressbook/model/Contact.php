@@ -434,14 +434,20 @@ class Contact extends AclItemEntity {
 											$criteria->andWhere('isOrganization', '=', $value);
 										})
 										->add("hasEmailAddresses", function(Criteria $criteria, $value, Query $query) {
-											$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "LEFT")
-											->groupBy(['c.id'])
+
+											if(!$query->isJoined('addressbook_email_address', 'e')) {
+												$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "LEFT");
+											}
+
+											$query->groupBy(['c.id'])
 											->having('count(e.email) '.($value ? '>' : '=').' 0');
 										})
 
 										->addText("email", function(Criteria $criteria, $comparator, $value, Query $query) {
-											$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "INNER");
-											
+											if(!$query->isJoined('addressbook_email_address', 'em')) {
+												$query->join('addressbook_email_address', 'em', 'e.contactId = c.id', "INNER");
+											}
+
 											$criteria->where('e.email', $comparator, $value);
 										})
 										->addText("name", function(Criteria $criteria, $comparator, $value) {											
@@ -451,7 +457,7 @@ class Contact extends AclItemEntity {
 											$criteria->where('notes', $comparator, $value);
 										})
 										->addText("phone", function(Criteria $criteria, $comparator, $value, Query $query) {												
-											if(!$query->isJoined('addressbook_phone')) {
+											if(!$query->isJoined('addressbook_phone_number', 'phone')) {
 												$query->join('addressbook_phone_number', 'phone', 'phone.contactId = c.id', "INNER");
 											}
 											
@@ -459,7 +465,7 @@ class Contact extends AclItemEntity {
 											
 										})
 										->addText("country", function(Criteria $criteria, $comparator, $value, Query $query) {												
-											if(!$query->isJoined('addressbook_address')) {
+											if(!$query->isJoined('addressbook_address', 'adr')) {
 												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
 											}
 											
@@ -475,21 +481,21 @@ class Contact extends AclItemEntity {
 											
 										})
 										->addText("city", function(Criteria $criteria, $comparator, $value, Query $query) {
-											if(!$query->isJoined('addressbook_address')) {
+											if(!$query->isJoined('addressbook_address', 'adr')) {
 												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
 											}
 											
 											$criteria->where('adr.city', $comparator, $value);
 										})
 										->addText("street", function(Criteria $criteria, $comparator, $value, Query $query) {
-											if(!$query->isJoined('addressbook_address')) {
+											if(!$query->isJoined('addressbook_address', 'adr')) {
 												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
 											}
 											
 											$criteria->where('adr.street', $comparator, $value);
 										})
                     ->addText("zip", function(Criteria $criteria, $comparator, $value, Query $query) {
-                      if(!$query->isJoined('addressbook_address')) {
+                      if(!$query->isJoined('addressbook_address', 'adr')) {
                         $query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
                       }
 
@@ -497,7 +503,7 @@ class Contact extends AclItemEntity {
                     })
 										->addNumber("age", function(Criteria $criteria, $comparator, $value, Query $query) {
 											
-											if(!$query->isJoined('addressbook_date')) {
+											if(!$query->isJoined('addressbook_date', 'date')) {
 												$query->join('addressbook_date', 'date', 'date.contactId = c.id', "LEFT");
 											}
 											
@@ -510,7 +516,7 @@ class Contact extends AclItemEntity {
 											$criteria->andWhere(['gender' => $value, 'isOrganization'=> false]);
 										})
 										->addDate("birthday", function(Criteria $criteria, $comparator, $value, Query $query) {
-											if(!$query->isJoined('addressbook_date')) {
+											if(!$query->isJoined('addressbook_date', 'date')) {
 												$query->join('addressbook_date', 'date', 'date.contactId = c.id', "INNER");
 											}
 											
