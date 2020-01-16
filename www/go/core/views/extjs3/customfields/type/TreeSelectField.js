@@ -12,9 +12,20 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 		return this.name;
 	},
 	initComponent: function () {	
-		go.customfields.type.TreeSelectField.superclass.initComponent.call(this);	
+		go.customfields.type.TreeSelectField.superclass.initComponent.call(this);
+
+		this.addEvents('select');
+
 		first = this.createCombo(this.customfield.dataType.options);
-		first.allowBlank = this.allowBlank;	
+		first.allowBlank = this.allowBlank;
+		first.conditionallyHidden = this.conditionallyHidden;
+		first.conditionallyRequired = this.conditionallyRequired;
+
+		first.listeners = first.listeners || {};
+		first.listeners.select = function(field, value) {
+			this.fireEvent('select', value);
+		}.bind(this);
+
 		this.add(first);
 		
 		this.pathMap = {};
