@@ -634,6 +634,8 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 							}
 						}
 					}
+
+					go.form.Dialog.prototype.showFirstInvalidField.call(this);
 				},
 				scope: this
 			});	

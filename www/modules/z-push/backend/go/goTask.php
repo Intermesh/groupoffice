@@ -57,7 +57,7 @@ class goTask extends GoBaseBackendDiff {
 
 			$message->subject = $task->name;
 			$message->importance = $task->priority;
-			$message->completion = $task->percentage_complete;
+			//$message->completion = $task->percentage_complete;
 
 			$bpReturnType = GoSyncUtils::getBodyPreferenceMatch($contentparameters->GetBodyPreference());
 

@@ -268,11 +268,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 
 				GO.tasks.tasksObservable.fireEvent('save', this, this.task_id);
 				this.fireEvent('save', this, this.task_id);
-				
-				
-				
-				
-				
+
 				GO.dialog.TabbedFormDialog.prototype.refreshActiveDisplayPanels.call(this);
 
 				if (hide) {
