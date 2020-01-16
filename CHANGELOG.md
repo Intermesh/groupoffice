@@ -1,3 +1,5 @@
+16-01-2020 6.4.103
+- ActiveSync: Z-push fixed problem with tasks on iOS
 - Files: removed document and e-mail from template in file and folder panel
 - Files: Doubleclick from search was broken
 - Core: #202020048 Remove mcrypt dependency #542
