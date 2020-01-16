@@ -773,18 +773,21 @@ class goMail extends GoBaseBackendDiff {
 		
 		ZLog::Write(LOGLEVEL_DEBUG, "GetFolder($id)");
 
-		$folder = new SyncFolder();
-		$folder->serverid = $id;
-		
 		if(empty($this->_emailFolders)) {
 			$this->GetFolderList();
 		}
 
-		if (isset($this->_emailFolders[$id])) {
-			$folder->displayname = $this->_emailFolders[$id]['displayname'];
-			$folder->type = $this->_emailFolders[$id]['type'];
-			$folder->parentid = $this->_emailFolders[$id]['parentid'];
+		if (!isset($this->_emailFolders[$id])) {
+			ZLog::Write(LOGLEVEL_WARN, "E-mail folder '$id' not found");
+			return false;
 		}
+
+
+		$folder = new SyncFolder();
+		$folder->serverid = $id;
+		$folder->displayname = $this->_emailFolders[$id]['displayname'];
+		$folder->type = $this->_emailFolders[$id]['type'];
+		$folder->parentid = $this->_emailFolders[$id]['parentid'];
 
 		return $folder;
 	}

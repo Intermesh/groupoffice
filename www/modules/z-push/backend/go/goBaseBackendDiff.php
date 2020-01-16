@@ -121,6 +121,9 @@ class GoBaseBackendDiff extends \BackendDiff {
 	 */
 	public function StatFolder($id) {
 		$folder = $this->GetFolder($id);
+		if(!$folder) {
+			return false;
+		}
 		$stat = array();
 		$stat['id'] = $id;
 		$stat['parent'] = $folder->parentid;

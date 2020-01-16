@@ -15,6 +15,7 @@
 - Core: Reminder request could trigger reload loop
 - Projects: Fixed name column state
 - Core: Updated Norwegian and German translations
+- Core: Focus on first invalid field and tab when save fails
 
 13-01-2020 6.4.101
 - Core: cron will run even though another instance of the cron process is still running. 

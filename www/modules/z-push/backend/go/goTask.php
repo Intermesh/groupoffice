@@ -2,16 +2,16 @@
 
 class goTask extends GoBaseBackendDiff {
 
-	public function ChangeFolder($folderid, $oldid, $displayname, $type) {
-
-		ZLog::Write(LOGLEVEL_DEBUG, 'goTask->ChangeFolder(' . $folderid . ',' . $oldid . ',' . $displayname . ', ' . $type . ')');
-
-		//returns stat of the main tasks folder.
-		//this will cause all tasks to be in all created lists on the iphone,
-		//not elegant, but it's the only way to prevent ios7 from crashing.
-		return $this->StatFolder($folderid);
-		//throw new HTTPReturnCodeException("Task folders not supported", 501);
-	}
+//	public function ChangeFolder($folderid, $oldid, $displayname, $type) {
+//
+//		ZLog::Write(LOGLEVEL_DEBUG, 'goTask->ChangeFolder(' . $folderid . ',' . $oldid . ',' . $displayname . ', ' . $type . ')');
+//
+//		//returns stat of the main tasks folder.
+//		//this will cause all tasks to be in all created lists on the iphone,
+//		//not elegant, but it's the only way to prevent ios7 from crashing.
+//		return $this->StatFolder($folderid);
+//		//throw new HTTPReturnCodeException("Task folders not supported", 501);
+//	}
 
 	public function DeleteMessage($folderid, $id, $contentparameters) {
 		ZLog::Write(LOGLEVEL_DEBUG, 'goTask->DeleteMessage(' . $folderid . ',' . $id . ')');
@@ -229,8 +229,8 @@ class goTask extends GoBaseBackendDiff {
 			while ($task = $stmt->fetch()) {
 				$message = array();
 				$message['id'] = $task->id;
-				$message['mod'] = $task->mtime;
 				$message['flags'] = 1;
+				$message['mod'] = $task->mtime;
 				$messages[] = $message;
 			}
 		}
@@ -245,6 +245,13 @@ class goTask extends GoBaseBackendDiff {
 	 * @return \SyncFolder
 	 */
 	public function GetFolder($id) {
+
+		if ($id != BackendGoConfig::TASKSBACKENDFOLDER) {
+
+			ZLog::Write(LOGLEVEL_WARN, "Task folder '$id' not found");
+
+			return false;
+		}
 
 		$folder = new SyncFolder();
 		$folder->serverid = $id;
