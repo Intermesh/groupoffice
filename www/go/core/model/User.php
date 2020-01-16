@@ -102,7 +102,7 @@ class User extends Entity {
 	/**
 	 * Display dates short in lists.
 	 * 
-	 * @var boolean
+	 * @var bool
 	 */
 	public $shortDateInList = true;
 	

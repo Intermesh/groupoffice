@@ -1,3 +1,5 @@
+- Files: removed document and e-mail from template in file and folder panel
+
 14-01-2020 6.4.102
 - Address book: Fixed merge error with duplicate values
 - Email: Fixed error message when saving email as task
