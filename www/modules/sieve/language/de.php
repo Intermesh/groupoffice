@@ -130,4 +130,5 @@ return array (
   'Body' => 'Body',
   'Ok' => 'OK',
   'Filters' => 'Filter',
+  'autoReplyMessage' => 'Automatische Antwort Nachricht',
 );

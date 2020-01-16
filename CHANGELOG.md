@@ -14,7 +14,7 @@
 - Updated Croatian holidays
 - Core: Reminder request could trigger reload loop
 - Projects: Fixed name column state
-- Core: Updated Norwegian
+- Core: Updated Norwegian and German translations
 
 13-01-2020 6.4.101
 - Core: cron will run even though another instance of the cron process is still running. 

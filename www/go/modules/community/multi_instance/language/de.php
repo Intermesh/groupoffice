@@ -12,4 +12,8 @@ return array (
   'Activate instance' => 'Instanz aktivieren',
   'Multi instance' => 'Multiinstanz',
   'Instance' => 'Instanz',
+  'Storage quota' => 'Speicherplatzangebot',
+  'Size in GB' => 'Größe in GB',
+  'Maximum number of users' => 'Max. Anzahl Benutzer',
+  'Show trials' => 'Versuche anzeigen',
 );
