@@ -51,7 +51,7 @@ GO.form.SelectUser = function(config){
 		this.valueField='id';
 	
 	GO.form.SelectUser.superclass.constructor.call(this,{
-		displayField: 'name',		
+		displayField: 'displayName',
 		triggerAction: 'all',
 		selectOnFocus:true,
 		forceSelection: true,
