@@ -448,7 +448,7 @@ class Contact extends AclItemEntity {
 												$query->join('addressbook_email_address', 'em', 'em.contactId = c.id', "INNER");
 											}
 
-											$criteria->where('e.email', $comparator, $value);
+											$criteria->where('em.email', $comparator, $value);
 										})
 										->addText("name", function(Criteria $criteria, $comparator, $value) {											
 											$criteria->where('name', $comparator, $value);
