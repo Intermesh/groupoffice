@@ -138,7 +138,7 @@ go.data.StoreTrait = {
 	 * @param {*} destroyed 
 	 */
 	onRelationChanges : function(entityStore, added, changed, destroyed) {
-		if(!this.proxy.watchRelations[entityStore.entity.name]) {
+		if(!this.proxy.watchRelations[entityStore.entity.name] || !this.lastOptions) {
 			return;
 		}
 
