@@ -151,7 +151,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	 * @returns {*}
 	 */
 	getRequiredConditionField: function(customField) {
-		let condition = customField.field.relatedFieldCondition,
+		var condition = customField.field.relatedFieldCondition,
 			form = this.findParentByType('form').getForm(),
 			conditionParts,
 			field, fieldName;
@@ -233,7 +233,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			fieldValue = fieldValue | 0;
 		}
 
-		let customFieldCmp = this;
+		var customFieldCmp = this;
 		if (this.xtype === 'treeselectfield') {
 			customFieldCmp = this.items.itemAt(0);
 		}
