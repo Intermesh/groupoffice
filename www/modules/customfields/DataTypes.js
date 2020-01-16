@@ -447,19 +447,19 @@ GO.customfields.dataTypes={
 						conditionParts,
 						isEmptyCondition = false,
 						isNotEmptyCondition = false,
-						field, operator,
+						field, fieldName, operator,
 						value, fieldValue;
 
 					if (condition.includes('is empty')) {
 						isEmptyCondition = true;
 						condition = condition.replace('is empty', '');
-						field = condition.trim(' ');
-						field = form.findField(modelPrefix + '.' + field);
+						fieldName = condition.trim(' ');
+						field = form.findField(modelPrefix + '.' + fieldName) || form.findField(fieldName);
 					} else if (condition.includes('is not empty')) {
 						isNotEmptyCondition = true;
 						condition = condition.replace('is not empty', '');
-						field = condition.trim(' ');
-						field = form.findField(modelPrefix + '.' + field);
+						fieldName = condition.trim(' ');
+						field = form.findField(modelPrefix + '.' + fieldName) || form.findField(fieldName);
 					} else {
 						conditionParts = condition.split(' ');
 						if (conditionParts.length === 3) { //valid condition
