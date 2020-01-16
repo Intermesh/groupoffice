@@ -97,10 +97,7 @@ class Crypt {
 	 */
 	private static function decrypt1($msg, $k, $base64 = true) {
 
-		//Check if mcrypt is supported. mbstring.func_overload will mess up substring with this function
-		if (!function_exists('mcrypt_module_open')) {			
-			throw new \Exception("Old mcrypt based hash found but mcrypt is not available. Please install for automatic conversion");			
-		}
+		//mbstring.func_overload will mess up substring with this function
 		
 		if(ini_get('mbstring.func_overload') > 0) {
 			throw new \Exception("Can't decrypt because mbstring.func_overload is enabled");
@@ -121,7 +118,7 @@ class Crypt {
 		if ($base64)
 			$msg = base64_decode($msg);# base64 decode?
 		# open cipher module (do not change cipher/mode)
-		if (!$td = mcrypt_module_open('rijndael-256', '', 'ctr', ''))
+		if (!$td = phpseclib_mcrypt_module_open('rijndael-256', '', 'ctr', ''))
 			return false;
 
 		$iv = substr($msg, 0, 32);		# extract iv
@@ -133,14 +130,14 @@ class Crypt {
 		if ($em !== $mac)		 # authenticate mac
 			return false;
 
-		if (mcrypt_generic_init($td, $k, $iv) !== 0) # initialize buffers
+		if (phpseclib_mcrypt_generic_init($td, $k, $iv) !== 0) # initialize buffers
 			return false;
 
-		$msg = mdecrypt_generic($td, $msg);	 # decrypt
+		$msg = phpseclib_mdecrypt_generic($td, $msg);	 # decrypt
 		$msg = unserialize($msg);		# unserialize
 
-		mcrypt_generic_deinit($td);		# clear buffers
-		mcrypt_module_close($td);		# close cipher module
+		phpseclib_mcrypt_generic_deinit($td);		# clear buffers
+		phpseclib_mcrypt_module_close($td);		# close cipher module
 
 		return $msg;		 # return original msg
 	}
