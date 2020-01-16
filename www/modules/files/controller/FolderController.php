@@ -930,13 +930,16 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			$response['permission_level'] = 0;
 
 			foreach ($filesStmt as $searchFileModel) {
-					$response['results'][] = $searchFileModel->getJsonData();
+				$record = $searchFileModel->getAttributes();
+				$record = $this->formatListRecord($record, $searchFileModel);
+				$record['name'] = $searchFileModel->path;
+				$response['results'][] = $record;
 			}
 
 			return $response;
 	}
         
-	public function formatListRecord($record, $model, $store) {
+	public function formatListRecord($record, $model) {
 
 		$record['path'] = $model->path;
 
