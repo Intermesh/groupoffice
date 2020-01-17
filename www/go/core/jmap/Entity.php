@@ -3,6 +3,7 @@
 namespace go\core\jmap;
 
 use Exception;
+use go\core\Installer;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
@@ -84,7 +85,7 @@ abstract class Entity  extends OrmEntity {
    * @throws Exception
    */
 	private function checkFilesFolder() {
-		if(empty($this->filesFolderId)) {
+		if(empty($this->filesFolderId) || Installer::isInProgress()) {
 			return true;
 		}
 

@@ -75,7 +75,7 @@ class FolderNotification extends \GO\Base\Db\ActiveRecord {
 			if (\GO::user() && $fnRow->user_id == \GO::user()->id)
 				continue;
 
-			if(!Acl::getUserPermissionLevel($acl->id, $fnRow->user_id)) {
+			if(empty($acl) || !Acl::getUserPermissionLevel($acl->id, $fnRow->user_id)) {
 				$fnRow->delete();
 				continue;
 			}
