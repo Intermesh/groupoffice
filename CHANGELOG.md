@@ -1,6 +1,8 @@
 - Billing: Fixed missing contact in recipient when creating invoice from contact
 - Core: support cmd + backspace on macos for deleting in grids
 - Core: Fixed small prints in Firefox
+- Filters: Some filters were not working with "NOT"
+- Filters: Sort combo alpabetically 
 
 16-01-2020 6.4.103
 - ActiveSync: Z-push fixed problem with tasks on iOS

@@ -108,7 +108,7 @@ class ColumnModel {
 			if ($model->hasCustomFields()) {
 				$column = new Column('customFields', 'CF');
 				$column->setFormat(function($model) {
-					$cf = $model->getCustomFields();
+					return $model->getCustomFields();
 				});
 				$this->addColumn($column);
 				
@@ -380,7 +380,9 @@ class ColumnModel {
 				$formattedRecord[$column->getDataIndex()]=$column->render($model);			
 			} catch(\Exception $e) {
 				$formattedRecord[$column->getDataIndex()] = "";
+
 				ErrorHandler::logException($e);
+				go()->log($column);
 			}
 		}
 		
