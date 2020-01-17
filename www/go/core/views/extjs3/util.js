@@ -1,12 +1,11 @@
 go.print = function(tmpl, data) {
 	var paper = document.getElementById('paper');
-	if(!paper) {
-		document.body.insertAdjacentHTML('beforeend', '<div id="paper"></div>');
-		paper = document.getElementById('paper');
-	}
+
 	paper.innerHTML = Ext.isEmpty(data) ? tmpl : tmpl.apply(data);
 	Ext.isIE || Ext.isSafari ? document.execCommand('print') : window.print();
+
 };
+
 go.util =  (function () {
 	return {
 

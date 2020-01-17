@@ -12703,7 +12703,7 @@ Ext.Shadow.prototype = {
         target.getWidth(),
         target.getHeight()
         );
-        this.el.dom.style.display = "block";
+        //this.el.dom.style.display = "block";
     },
 
     
