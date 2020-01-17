@@ -10,82 +10,91 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	value: null,
 
 	minChars : 3,
-	
-	resolveEntity : function(value) {
-		return this.store.entityStore.get([value]).then(function (result) {
-			if(result.entities[0]) {
-				return result.entities[0];
-			}else
-			{
-				return Promise.reject("Not found");
-			}
-		});
+
+	initComponent: function() {
+		go.form.ComboBox.superclass.initComponent.call(this);
+
+		//Set value promise can be used to do stuff after setvalue completed fetching the entity and loaded the store.
+		this.setValuePromise = Promise.resolve(this);
 	},
 	
+	resolveEntity : function(value) {
+		return this.store.entityStore.single(value);
+	},
 	
-	setValue: function (value) {		
+	setValue: function (value) {
 
-		//hack for old framework where relations are "0" instead of null.
-		if(value == "0" && this.store.entityStore) {
-			value = null;			
-		}
-		
-		if(!this.hiddenName || !value) {
-			return go.form.ComboBox.superclass.setValue.call(this, value);
-		}
-		
 		var me = this;
 
-		//create record from entity store if not exists
-		if (this.store.entityStore && this.store.entityStore.entity && !this.findRecord(me.valueField, value)) {
+		this.setValuePromise = new Promise(function(resolve, reject) {
 
-			this.value = value;
-			
-			this.resolveEntity(value).then(function (entity) {			
-				me.store.on("load", function() {
-					go.form.ComboBox.superclass.setValue.call(me, value);				
-				}, this, {single: true});
-				me.store.loadData({records:[entity]}, true);				 
-				
-			}).catch(function(e) {
-				console.error(e);
-				var data = {};
-				//console.warn("Invalid entity ID '" + value + "' for entity store '" + this.store.entityStore.entity.name + "'");
-				//Set all record keys to prevent errors in XTemplates
-				me.store.fields.keys.forEach(function(key) {
-					data[key] = null;
+			//hack for old framework where relations are "0" instead of null.
+			if(value == "0" && me.store.entityStore) {
+				value = null;
+			}
+
+			if(!me.hiddenName || !value) {
+				resolve(me);
+				return go.form.ComboBox.superclass.setValue.call(me, value);
+			}
+
+			//create record from entity store if not exists
+			if (me.store.entityStore && me.store.entityStore.entity && !me.findRecord(me.valueField, value)) {
+
+				me.value = value;
+
+				me.resolveEntity(value).then(function (entity) {
+					me.store.on("load", function() {
+						resolve(me);
+						go.form.ComboBox.superclass.setValue.call(me, value);
+					}, me, {single: true});
+					me.store.loadData({records:[entity]}, true);
+
+				}).catch(function(e) {
+					console.error(e);
+					var data = {};
+					//console.warn("Invalid entity ID '" + value + "' for entity store '" + me.store.entityStore.entity.name + "'");
+					//Set all record keys to prevent errors in XTemplates
+					me.store.fields.keys.forEach(function(key) {
+						data[key] = null;
+					});
+					data[me.valueField] = value;
+					data[me.displayField] = t("Not found or no access!");
+
+					me.store.on("load", function() {
+						go.form.ComboBox.superclass.setValue.call(me, value);
+					}, me, {single: true});
+					me.store.loadData({records:[data]}, true);
+					//go.form.ComboBox.superclass.setValue.call(me, value);
+					resolve(me);
 				});
-				data[me.valueField] = value;
-				data[me.displayField] = t("Not found or no access!");
+			} else
+			{
+				var text = value;
+				if(me.valueField){
+					 var r = me.findRecord(me.valueField, value);
+					 if(r){
+						 if(Ext.isFunction(me.renderer)) {
+								r.data[me.displayField] = me.renderer(r.data);
+							}
+							text = r.data[me.displayField];
+					 }else if(Ext.isDefined(me.valueNotFoundText)){
+							text = me.valueNotFoundText;
+					 }
+				}
+				me.lastSelectionText = text;
+				if(me.hiddenField){
+					 me.hiddenField.value = Ext.value(value, '');
+				}
+				Ext.form.ComboBox.superclass.setValue.call(me, text);
+				me.value = value;
 
-				me.store.on("load", function() {
-					go.form.ComboBox.superclass.setValue.call(me, value);				
-				}, this, {single: true});
-				me.store.loadData({records:[data]}, true);
-				//go.form.ComboBox.superclass.setValue.call(me, value);			
-			});
-		} else
-		{
-			var text = value;
-			if(this.valueField){
-				 var r = this.findRecord(this.valueField, value);
-				 if(r){
-					 if(Ext.isFunction(this.renderer)) {
-							r.data[this.displayField] = this.renderer(r.data);
-						}
-					  text = r.data[this.displayField];
-				 }else if(Ext.isDefined(this.valueNotFoundText)){
-					  text = this.valueNotFoundText;
-				 }
+				resolve(me);
+				return me;
 			}
-			this.lastSelectionText = text;
-			if(this.hiddenField){
-				 this.hiddenField.value = Ext.value(value, '');
-			}
-			Ext.form.ComboBox.superclass.setValue.call(this, text);
-			this.value = value;
-			return this;
-		}
+		});
+
+		return this;
 	},
 	/**
 	 * Clears any text/value currently set in the field
