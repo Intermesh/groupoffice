@@ -104,14 +104,23 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 			}	
 		}
 
+		function onDeleteKey(key, e){
+			//sometimes there's a search input in the grid, so dont delete when focus is on an input
+			if(e.target.tagName!='INPUT')
+				this.deleteSelected(this.deletethis);
+		}
+
 		if(!this.noDelete){
 			this.keys.push({
 				key: Ext.EventObject.DELETE,
-				fn: function(key, e){
-					//sometimes there's a search input in the grid, so dont delete when focus is on an input
-					if(e.target.tagName!='INPUT')
-						this.deleteSelected(this.deletethis);
-				},
+				fn: onDeleteKey,
+				scope:this
+			});
+
+			this.keys.push({
+				key: Ext.EventObject.BACKSPACE,
+				ctrl: true,
+				fn: onDeleteKey,
 				scope:this
 			});
 		}

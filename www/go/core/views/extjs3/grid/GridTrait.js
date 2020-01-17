@@ -127,15 +127,24 @@ go.grid.GridTrait = {
 	},
 	
 	initDeleteKey : function() {
+
+		function onDeleteKey(key, e){
+			//sometimes there's a search input in the grid, so dont delete when focus is on an input
+			if(e.target.tagName!='INPUT')
+				this.deleteSelected();
+		}
+
 		this.keys.push({
 			key: Ext.EventObject.DELETE,
-			fn: function (key, e) {
-				// sometimes there's a search input in the grid, so dont delete when focus is on an input
-				if(e.target.tagName!='INPUT') {
-					this.deleteSelected();
-				}
-			},
-			scope: this
+			fn: onDeleteKey,
+			scope:this
+		});
+
+		this.keys.push({
+			key: Ext.EventObject.BACKSPACE,
+			ctrl: true,
+			fn: onDeleteKey,
+			scope:this
 		});
 	},
 
