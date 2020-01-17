@@ -1,4 +1,14 @@
 <?php
+/**
+ *
+ * Usage
+ *
+ * /api/page.php/$PACKAGE/$MODULENAME/$CONTROLLER/$METHOD
+ *
+ * eg. /api/page.php/nuw/projectsdsgvo/answer/accept
+ * 
+ * 
+ */
 use go\core\fs\Blob;
 use go\core\App;
 use go\core\jmap\State;
@@ -6,7 +16,7 @@ use go\core\jmap\State;
 require("../vendor/autoload.php");
 App::get();
 
-if(strpos($_GET['blob'], '/') === false) {
+if(strpos($_SERVER['PATH_INFO'], '/') === false) {
 
   $blob = Blob::findById(App::get()->getSettings()->logoId);
 
@@ -19,8 +29,8 @@ if(strpos($_GET['blob'], '/') === false) {
   $blob->output();	
 }
 
-$parts = explode("/", $_GET['blob']);
-
+$parts = explode("/", $_SERVER['PATH_INFO']);
+array_shift($parts);
 $package = array_shift($parts);
 if($package == "core") {
 	$c = go();
