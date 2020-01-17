@@ -6923,9 +6923,11 @@ Ext.apply(Ext.EventManager, function(){
        
        
        
-       useKeydown = Ext.isWebKit ?
-                   Ext.num(navigator.userAgent.match(/AppleWebKit\/(\d+)/)[1]) >= 525 :
-                   !((Ext.isGecko && !Ext.isWindows) || Ext.isOpera);
+       useKeydown = true;
+   // No longer needed
+   // Ext.isWebKit ?
+   //                 Ext.num(navigator.userAgent.match(/AppleWebKit\/(\d+)/)[1]) >= 525 :
+   //                 !((Ext.isGecko && !Ext.isWindows) || Ext.isOpera);
 
    return {
        _unload: function(){

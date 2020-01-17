@@ -1,4 +1,5 @@
 - Core: support cmd + backspace on macos for deleting in grids
+- Core: Fixed small prints in Firefox
 
 16-01-2020 6.4.103
 - ActiveSync: Z-push fixed problem with tasks on iOS
