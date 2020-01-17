@@ -335,7 +335,7 @@ class Module extends Observable {
 		
 		foreach($records as $ar) {
 			$cls = $ar->getName();
-			if(is_a($cls, Db\ActiveRecord::class, true) && $cls::model()->hasLinks()) {
+			if(is_a($cls, Db\ActiveRecord::class, true) && ($cls::model()->hasLinks() || method_exists($cls::model(), 'getCustomFields'))) {
 				if(!$cls::entityType()) {
 					return false;
 				}
