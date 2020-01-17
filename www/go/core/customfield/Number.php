@@ -11,7 +11,7 @@ class Number extends Base {
 
 	/**
 	 * Get column definition for SQL
-	 * 
+	 *
 	 * @return string
 	 */
 	protected function getFieldSQL() {

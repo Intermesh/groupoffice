@@ -22,6 +22,8 @@
 namespace GO\Base\Data;
 
 
+use go\core\ErrorHandler;
+
 class ColumnModel {
 
 	/**
@@ -106,7 +108,7 @@ class ColumnModel {
 			if ($model->hasCustomFields()) {
 				$column = new Column('customFields', 'CF');
 				$column->setFormat(function($model) {
-					return $model->getCustomFields();
+					$cf = $model->getCustomFields();
 				});
 				$this->addColumn($column);
 				
@@ -377,7 +379,8 @@ class ColumnModel {
 			try {
 				$formattedRecord[$column->getDataIndex()]=$column->render($model);			
 			} catch(\Exception $e) {
-				go()->getDebugger()->debug($e->getMessage());
+				$formattedRecord[$column->getDataIndex()] = "";
+				ErrorHandler::logException($e);
 			}
 		}
 		
