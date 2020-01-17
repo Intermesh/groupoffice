@@ -22,7 +22,7 @@
   }
 
   body > * {
-    display: none;
+    display: none !important;
   }
 
   .go-main-tab-panel, #mainNorthPanel, .go-search-panel {
