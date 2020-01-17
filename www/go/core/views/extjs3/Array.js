@@ -40,6 +40,39 @@ Ext.applyIf(Array.prototype, {
 			return i[name];
 		});
 	},
+
+	/**
+	 * Sort array of objects by column values.
+	 *
+	 * eg.
+	 *
+	 * var arr = [{foo: 2}, {foo: 1}]
+	 *
+	 * arr.columnSort("foo") == [{foo: 1}, {foo: 2}]
+	 *
+	 * @param {string} col
+	 * @param {boolean} asc
+	 */
+	columnSort: function(col, asc) {
+
+		if(!Ext.isDefined(asc)) {
+			asc = true;
+		}
+
+		this.sort(function compare(a, b) {
+			// Use toUpperCase() to ignore character casing
+			var colA = a[col].toUpperCase();
+			var colB = b[col].toUpperCase();
+
+			var comparison = 0;
+			if (colA > colB) {
+				comparison = asc ? 1 : -1;
+			} else if (colA < colB) {
+				comparison = asc ? -1 : 1;
+			}
+			return comparison;
+		})
+	},
 	
 	/**
 	 * Same as indexOf but not strict. eg. "2" will be found in [2].

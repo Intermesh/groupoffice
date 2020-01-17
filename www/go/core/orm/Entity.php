@@ -602,12 +602,10 @@ abstract class Entity extends Property {
 		*/
 		$filters->add("link", function(Criteria $criteria, $value, Query $query) {
 			$linkAlias = 'link_' . uniqid();
-			$on = $query->getTableAlias() . '.id =  '.$linkAlias.'.toId  AND '.$linkAlias.'.toEntityTypeId = ' . static::entityType()->getId();
-			
-				
-			$query->join('core_link', $linkAlias, $on); 
+			$on = $query->getTableAlias() . '.id =  '.$linkAlias.'.toId  AND '.$linkAlias.'.toEntityTypeId = ' . static::entityType()->getId().' AND ' . $linkAlias . '.fromEntityTypeId = ' .  EntityType::findByName($value['entity'])->getId();
 
-			$criteria->andWhere('fromEntityTypeId', '=', EntityType::findByName($value['entity'])->getId());
+			$query->join('core_link', $linkAlias, $on, "LEFT");
+			$criteria->where('toId', '!=', null);
 
 			if(!empty($value['id'])) {
 				$criteria->andWhere('fromId', '=', $value['id']);

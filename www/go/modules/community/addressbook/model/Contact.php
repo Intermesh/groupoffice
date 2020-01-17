@@ -439,8 +439,7 @@ class Contact extends AclItemEntity {
 												$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "LEFT");
 											}
 
-											$query->groupBy(['c.id'])
-											->having('count(e.email) '.($value ? '>' : '=').' 0');
+											$criteria->andWhere('e.email', $value ? 'IS NOT' : 'IS', null);
 										})
 
 										->addText("email", function(Criteria $criteria, $comparator, $value, Query $query) {
@@ -458,7 +457,7 @@ class Contact extends AclItemEntity {
 										})
 										->addText("phone", function(Criteria $criteria, $comparator, $value, Query $query) {												
 											if(!$query->isJoined('addressbook_phone_number', 'phone')) {
-												$query->join('addressbook_phone_number', 'phone', 'phone.contactId = c.id', "INNER");
+												$query->join('addressbook_phone_number', 'phone', 'phone.contactId = c.id', "LEFT");
 											}
 											
 											$criteria->where('phone.number', $comparator, $value);

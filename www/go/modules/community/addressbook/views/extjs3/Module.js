@@ -178,6 +178,21 @@ go.Modules.register("community", "addressbook", {
 							title: t("No")
 						}
 					]
+				}, {
+					title: t("Has e-mail addresses"),
+					name: 'hasEmailAddresses',
+					multiple: false,
+					type: 'select',
+					options: [
+						{
+							value: true,
+							title: t("Yes")
+						},
+						{
+							value: false,
+							title: t("No")
+						}
+					]
 				}
 			],
 			links: [{
