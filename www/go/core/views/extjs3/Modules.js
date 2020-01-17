@@ -226,6 +226,8 @@ go.Modules = (function () {
 		init: function () {
 			var me = this;
 			
+			go.Db.store("Module").on("changes", this.onModuleChanges, this);
+
 			return go.Db.store("Module").all().then(function(entities) {
 				me.entities = entities;
 				var promises = [];
@@ -279,6 +281,25 @@ go.Modules = (function () {
 					return me.entities;
 				});
 			});
+
+			
+		},
+
+		onModuleChanges : function(entityStore, added, changed, destroyed) {
+			if(!changed) {
+				return;
+			}
+
+			for(var id in changed){
+
+				var index = this.entities.findIndex(function(e) {
+					return e.id == id;
+				});
+
+				if(index>-1) {
+					this.entities[index] = changed[id];
+				}
+			}
 		},
 		
 		addPanel : function(panels) {
