@@ -130,10 +130,10 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 
 		Ext.each(field.relatedFields, function(relatedField) {
 			if (!relatedField.conditionallyHidden) {
-				return false;
+				return true;
 			}
 
-			if (this.allowBlank) {
+			if (this.allowBlank || !this.checked) {
 				relatedField.hide();
 				relatedField.ownerCt.doLayout();
 				return true;
