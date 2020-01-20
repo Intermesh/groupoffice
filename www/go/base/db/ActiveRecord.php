@@ -2458,7 +2458,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	public function getAttributeSelection($attributeNames, $outputType='formatted'){
 		$att=array();
 		foreach($attributeNames as $attName){
-			if(isset($this->columns[$attName])){
+			if(substr($attName, 0, 13) === 'customFields.') {
+				$att[$attName]=$this->getCustomFields()[substr($attName, 13)] ?? null;
+			}else if(isset($this->columns[$attName])){
 				$att[$attName]=$this->getAttribute($attName, $outputType);
 			}elseif($this->hasAttribute($attName)){
 				$att[$attName]=$this->$attName;
