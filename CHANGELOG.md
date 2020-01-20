@@ -5,7 +5,8 @@
 - Core: Fixed small prints in Firefox
 - Filters: Some filters were not working with "NOT"
 - Filters: Sort combo alpabetically 
-- Addressbook: A manual sort was required after changing sorting by last or first name
+- Address book: A manual sort was required after changing sorting by last or first name
+- Address book: Fixed missing contact fields in templates (email, company post address)
 
 16-01-2020 6.4.103
 - ActiveSync: Z-push fixed problem with tasks on iOS
