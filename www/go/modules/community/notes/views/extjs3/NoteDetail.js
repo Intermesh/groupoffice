@@ -38,72 +38,14 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 			return;
 		}
 
-		var data = this.data.content;
+		var data = this.data.content, me = this;
 		this.data.content = t("Encrypted data");
+		go.modules.community.notes.Decrypter.decrypt(data).then(function(text) {
+			me.data.content = text;
+			me.items.item(0).onLoad(me);
+		}).catch(function(){});
 
-		var dlg = new GO.dialog.PasswordDialog({
-			title: t("Enter password to decrypt"),
-			scope: this,
-			handler: function(dlg, btn, password) {
-				var me = this;
-				if(btn == "ok") {
-					this.doDecrypt(data, password)
-						.then(function(text) {
-							me.data.content = text;
-							me.items.item(0).onLoad(me);
-						})
-						.catch(function() {
-							Ext.MessageBox.alert(t("Error"), t("Invalid password"));
-						})
-				}
-			}
-		});
-		dlg.show();
-	},
 
-	doDecrypt : function(data, password) {
-		if(data.substring(0, 9) === "{GOCRYPT}__") {
-
-			var msg = window.atob(data.substring(9));
-
-			var iv = (msg.substring(0, 32));			 // extract iv
-			var body = (msg.substring(32, msg.length - 32));	 //extract ciphertext
-			var serialized = mcrypt.Decrypt(body, iv, password, "rijndael-256", "ctr");
-			//result should be a serialized sting by PHP
-			var match = serialized.match(/.*"([\s\S]*)"/);
-			if (!match) {
-				//data = "Encrypted text";
-				return Promise.reject();
-			}
-
-			var decrypted = Ext.util.Format.nl2br(match[1]);
-			return Promise.resolve(decrypted);
-		} else
-		{
-			//new encryption
-			//data = "Decrypting...";
-
-			return go.Jmap.request({
-				method: "Note/decrypt",
-				params: {
-					id: this.data.id,
-					password: password
-				}
-				// callback: function(options, success, response) {
-				// 	if(success) {
-				// 		this.data.content = response.content;
-				// 		this.items.item(0).onLoad(this);
-				// 	} else
-				// 	{
-				// 		Ext.MessageBox.alert(t("Error"), t("Invalid password"));
-				// 	}
-				// },
-				// scope: this
-			}). then(function() {
-				console.log(response);
-				return response.content;
-			});
-		}
 	},
 
 	onLoad: function () {

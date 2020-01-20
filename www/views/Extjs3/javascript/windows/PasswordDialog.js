@@ -77,7 +77,8 @@ GO.dialog.PasswordDialog = function(config){
 		],
 		keys: [{
 			key: Ext.EventObject.ENTER,
-			fn: function(){
+			stopEvent: true,
+			fn: function(e){
 				this.pressButton('ok');
 			},
 			scope:this
