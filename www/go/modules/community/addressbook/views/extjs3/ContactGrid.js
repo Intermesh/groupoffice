@@ -274,6 +274,22 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 
 		go.modules.community.addressbook.ContactGrid.superclass.initComponent.call(this);
 	},
+
+	applyState: function(state) {
+
+		this.supr().applyState.call(this, state);
+
+		var sort = this.store.getSortState();
+		if(!sort) {
+			return;
+		}
+
+		// If user changed sort preference in my account then change the saved sort state
+		if((sort.field == 'name' || sort.field == 'lastName') && go.User.addressBookSettings.sortBy != sort.field) {
+			this.store.setDefaultSort(go.User.addressBookSettings.sortBy, sort.direction);
+		}
+
+	},
 	
 
 	//when filtering on a group then offer to delete contacts from a group when delting.
