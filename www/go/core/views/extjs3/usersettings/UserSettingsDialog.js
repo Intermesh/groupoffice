@@ -153,22 +153,20 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	
 	loadModulePanels : function() {
     
-		var available = go.Modules.getAvailable(), pnl, config, i, i1, l, l2;
+		var available = go.Modules.getAvailable(), pnl,pnlCls, config, i, i1, l, l2;
 		for(i = 0, l = available.length; i < l; i++) {
-			
 			config = go.Modules.getConfig(available[i].package, available[i].name);
 			
 			if(!config.userSettingsPanels) {
 				continue;			
 			}
-
-			if(!go.Modules.isAvailable(available[i].package, available[i].name, go.permissionLevels.read, this.user)) {
-				continue;
-			}
 			
 			for(i1 = 0, l2 = config.userSettingsPanels.length; i1 < l2; i1++) {
-				pnl = eval(config.userSettingsPanels[i1]);				
-				this.addPanel(pnl);
+				pnlCls = eval(config.userSettingsPanels[i1]);
+				pnl = new pnlCls({header: false, loaded: false, submitted: false});
+				if((pnl.adminOnly && go.User.isAdmin) || (!pnl.adminOnly && go.Modules.isAvailable(available[i].package, available[i].name, go.permissionLevels.read, this.user))) {
+					this._addPanelCmp(pnl);
+				}
 			}
 		}
 
@@ -473,17 +471,11 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 * @param boolean passwordProtected
 	 */
 	addPanel : function(panelClass, position){
-		var cfg = {
+		this._addPanelCmp(new panelClass({
 			header: false,
 			loaded:false,
 			submitted:false
-		};
-
-		
-		
-		var pnl = new panelClass(cfg);
-		this._addPanelCmp(pnl, position);
-		
+		}), position);
 	},
 	
 	_addPanelCmp : function(pnl, position) {

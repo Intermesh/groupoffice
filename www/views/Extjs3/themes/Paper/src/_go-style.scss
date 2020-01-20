@@ -1931,6 +1931,9 @@ table[id^="comments-ext"] b {
 			content:'more_vert';			
 		}
 	}
+	&-row-inactive {
+		color: color($fg, 'disabled-text');
+	}
 	&.x-grid-panel .x-grid3-header {
 		position:relative;
 		//padding-right: dp(24);
