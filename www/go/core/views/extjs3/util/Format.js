@@ -133,7 +133,7 @@
 		},
 
 		valuta : function(amount) {
-			return GO.settings.currency + go.util.Format.number(amount, 2);
+			return go.User.currency + go.util.Format.number(amount, 2);
 		},
 
 		number : function(value, decimals) {
