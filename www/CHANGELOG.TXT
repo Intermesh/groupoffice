@@ -3,6 +3,7 @@
 - Calendar: Set resource title of private event to "Private"
 - Core: Added $config["disable_links_for"] = ['GO\\Modules\\Tickets\\Model\\Ticket'];
 - Calendar: Don't allow calendars from others as default calendar
+- Smime: Added OCSP revocation check
 
 10-09-2019 6.2.122
 - Email: Fixed issue with utf-8 chars in attachment name
