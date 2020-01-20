@@ -26,15 +26,19 @@ GO.dialog.PasswordDialog = function(config){
 	
 	this.formPanel = new Ext.FormPanel({
 		labelWidth: 120, // label settings here cascade unless overridden
-		layout:'form',    
-		bodyStyle:'padding:5px 10px 5px 10px',
-		items: [this.passwordField = new Ext.form.TextField({
-			fieldLabel: t("Password"),
-			name: 'password',
-			inputType: 'password',
-			allowBlank:false,
-			anchor:'100%'
-		})]
+		layout: 'form',
+		items: [{
+			xtype: "fieldset",
+			items: [
+				this.passwordField = new Ext.form.TextField({
+					fieldLabel: t("Password"),
+					name: 'password',
+					inputType: 'password',
+					allowBlank: false,
+					anchor: '100%'
+				})]
+		}]
+
 	});
 	
 	
@@ -96,8 +100,13 @@ GO.dialog.PasswordDialog = function(config){
 Ext.extend(GO.dialog.PasswordDialog, GO.Window, {
 	pressButton : function(button){
 		this.fireEvent('buttonpressed', button, this.formPanel.form.findField('password').getValue(), this);
+		if(this.handler) {
+			this.handler.call(this.scope || this, this, button, this.formPanel.form.findField('password').getValue())
+		}
 		this.formPanel.form.reset();
 		this.hide();
+
+
 	}
 });
 

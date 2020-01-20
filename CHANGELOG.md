@@ -1,3 +1,4 @@
+- Billing: fixed outstanding orders export
 - Billing: Fixed missing contact in recipient when creating invoice from contact
 - Core: support cmd + backspace on macos for deleting in grids
 - Core: Fixed small prints in Firefox

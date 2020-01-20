@@ -37,51 +37,73 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 		if (!this.data.content || this.data.content.substring(0, 8) !== "{GOCRYPT") {
 			return;
 		}
-		
-		var key = prompt("Enter password to decrypt");
 
-		if(this.data.content.substring(0, 9) === "{GOCRYPT}") {
+		var data = this.data.content;
+		this.data.content = t("Encrypted data");
 
-			var msg = window.atob(this.data.content.substring(9));
+		var dlg = new GO.dialog.PasswordDialog({
+			title: t("Enter password to decrypt"),
+			scope: this,
+			handler: function(dlg, btn, password) {
+				var me = this;
+				if(btn == "ok") {
+					this.doDecrypt(data, password)
+						.then(function(text) {
+							me.data.content = text;
+							me.items.item(0).onLoad(me);
+						})
+						.catch(function() {
+							Ext.MessageBox.alert(t("Error"), t("Invalid password"));
+						})
+				}
+			}
+		});
+		dlg.show();
+	},
+
+	doDecrypt : function(data, password) {
+		if(data.substring(0, 9) === "{GOCRYPT}__") {
+
+			var msg = window.atob(data.substring(9));
 
 			var iv = (msg.substring(0, 32));			 // extract iv
 			var body = (msg.substring(32, msg.length - 32));	 //extract ciphertext
-			var serialized = mcrypt.Decrypt(body, iv, key, "rijndael-256", "ctr");
+			var serialized = mcrypt.Decrypt(body, iv, password, "rijndael-256", "ctr");
 			//result should be a serialized sting by PHP
 			var match = serialized.match(/.*"([\s\S]*)"/);
 			if (!match) {
-				alert("Incorrect password!");
-				//this.data.content = "Encrypted text";
-				return;
+				//data = "Encrypted text";
+				return Promise.reject();
 			}
 
-			this.data.content = Ext.util.Format.nl2br(match[1]);
+			var decrypted = Ext.util.Format.nl2br(match[1]);
+			return Promise.resolve(decrypted);
 		} else
 		{
 			//new encryption
-			//this.data.content = "Decrypting...";
-			
-			go.Jmap.request({
+			//data = "Decrypting...";
+
+			return go.Jmap.request({
 				method: "Note/decrypt",
 				params: {
 					id: this.data.id,
-					password: key
-				},
-				callback: function(options, success, response) {
-					if(success) {
-						console.log(response);
-						this.data.content = response.content;
-						
-						this.items.item(0).onLoad(this);
-					} else
-					{
-						Ext.MessageBox.alert(t("Error"), t("Invalid password"));
-					}
-				},
-				scope: this
+					password: password
+				}
+				// callback: function(options, success, response) {
+				// 	if(success) {
+				// 		this.data.content = response.content;
+				// 		this.items.item(0).onLoad(this);
+				// 	} else
+				// 	{
+				// 		Ext.MessageBox.alert(t("Error"), t("Invalid password"));
+				// 	}
+				// },
+				// scope: this
+			}). then(function() {
+				console.log(response);
+				return response.content;
 			});
 		}
-		
 	},
 
 	onLoad: function () {
