@@ -838,7 +838,7 @@ abstract class Entity extends Property {
 	/**
 	 * Check database integrity
    *
-   * @throws
+   * @throws Exception
 	 */
 	public static function check() {
 		echo "Checking ".static::class."\n";

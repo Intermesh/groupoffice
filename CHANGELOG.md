@@ -8,6 +8,7 @@
 - Address book: A manual sort was required after changing sorting by last or first name
 - Address book: Fixed missing contact fields in templates (email, company post address)
 - Leave days: Year summary didn't show if you had hours from last year but no new hours
+- Email: Zip of all attachments failed if content dispostion was not attachment
 
 16-01-2020 6.4.103
 - ActiveSync: Z-push fixed problem with tasks on iOS
