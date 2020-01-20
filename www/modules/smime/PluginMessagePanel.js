@@ -63,13 +63,13 @@ GO.moduleManager.onModuleReady('email',function(){
 		}),
 		
 		checkCert : function (hideDialog, callback, scope){
-			
 			if(!hideDialog){
 				if(!this.certWin){
 					this.certWin = new GO.Window({
 						title:GO.smime.lang.smimeCert,
-						width:500,
-						height:300,
+						width:600,
+						height:400,
+						autoScroll: true,
 						closeAction:'hide',
 						layout:'fit',
 						items:[this.certPanel = new Ext.Panel({
