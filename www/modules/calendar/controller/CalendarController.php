@@ -51,6 +51,11 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 		{
 			$c->addCondition('group_id', 1,'=');
 		}
+
+		if(!empty($params['ownedBy'])) {
+
+			$c->addCondition('user_id', $params['ownedBy']);
+		}
 		return $findParams;
 	}
 	

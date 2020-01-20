@@ -237,7 +237,7 @@ GO.calendar.SettingsPanel = function(config) {
 							store : new GO.data.JsonStore({
 								url : GO.url("calendar/calendar/store"),
 								baseParams : {
-									permissionLevel:GO.permissionLevels.write
+									ownedBy: GO.settings.user_id
 								},
 								fields : ['id', 'name'],
 								remoteSort : true
