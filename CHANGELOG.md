@@ -1,3 +1,4 @@
+
 - Billing: fixed outstanding orders export
 - Billing: Fixed missing contact in recipient when creating invoice from contact
 - Core: support cmd + backspace on macos for deleting in grids
@@ -650,7 +651,9 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Calendasr: Show unconfirmed holidays
 - Projects: Send company id when selecting contact
 
+
 19-12-2019 6.3.86
+- Projects: Send company id when selecting contact
 - User: account creation checks for the max users count
 
 17-12-2019 6.3.85
