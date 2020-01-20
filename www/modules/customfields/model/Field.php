@@ -11,6 +11,7 @@
  * @property string $helptext
  * @property string $validation_regex
  * @property boolean $required
+ * @property string $required_condition
  * @property string $function
  * @property int $sort_index
  * @property string $datatype
@@ -99,7 +100,7 @@ class Field extends \GO\Base\Db\ActiveRecord{
 			
 			restore_error_handler();
 		}
-		
+
 		return parent::validate();
 	}
 	
