@@ -2,8 +2,10 @@
 
 remove folders when uninstalling module. Error when reinstalling
 
-Assitant to handle mailto: links on system
-Drag and drop files and folders to upload
+- Assitant to handle mailto: links on system
+- Drag and drop files and folders to upload
+- riot matrix synapse integration
+- csv export select columns
 
 
 Batch edit custom fields not possible

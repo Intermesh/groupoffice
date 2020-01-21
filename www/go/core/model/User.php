@@ -262,9 +262,9 @@ class User extends Entity {
 			$this->timeFormat = $s->defaultTimeFormat;	
 			$this->dateFormat = $s->defaultDateFormat;
 			$this->timezone = $s->defaultTimezone;
-			$this->firstWeekday = $s->defaultFirstWeekday;
+			$this->firstWeekday = (int) $s->defaultFirstWeekday;
 			$this->currency = $s->defaultCurrency;
-			$this->shortDateInList = $s->defaultShortDateInList;
+			$this->shortDateInList = (bool) $s->defaultShortDateInList;
 			$this->listSeparator = $s->defaultListSeparator;
 			$this->textSeparator = $s->defaultTextSeparator;
 			$this->thousandsSeparator = $s->defaultThousandSeparator;
