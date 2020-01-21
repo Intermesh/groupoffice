@@ -47,7 +47,7 @@ GO.moduleManager.onModuleReady('email',function(){
 									
 				if(data.smime_encrypted){
 					var el = this.body.down(".message-header").createChild({													
-						html:t("This message is encrypted.", "smime"),													
+						html:t("This message is encrypted.", "smime"),
 						cls:'smi-encrypt-notification'
 					});
 				}
@@ -65,13 +65,13 @@ GO.moduleManager.onModuleReady('email',function(){
 		}),
 		
 		checkCert : function (hideDialog, callback, scope){
-			
 			if(!hideDialog){
 				if(!this.certWin){
 					this.certWin = new GO.Window({
 						title:t("SMIME Certificate", "smime"),
-						width:500,
-						height:300,
+						width:600,
+						height:400,
+						autoScroll: true,
 						closeAction:'hide',
 						layout:'fit',
 						items:[this.certPanel = new Ext.Panel({
@@ -114,4 +114,4 @@ GO.moduleManager.onModuleReady('email',function(){
 		}	
 	});
 });
-        
+

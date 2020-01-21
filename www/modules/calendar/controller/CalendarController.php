@@ -51,6 +51,11 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 		{
 			$c->addCondition('group_id', 1,'=');
 		}
+
+		if(!empty($params['ownedBy'])) {
+
+			$c->addCondition('user_id', $params['ownedBy']);
+		}
 		return $findParams;
 	}
 	
@@ -106,6 +111,10 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 			$findParams->getCriteria ()->addCondition ('group_id', 1,'>');
 		elseif(!empty($params['calendarsOnly']))
 			$findParams->getCriteria ()->addCondition ('group_id', 1,'=');
+
+		if(!empty($params['ownedBy'])) {
+			$findParams->getCriteria ()->addCondition('user_id', $params['ownedBy']);
+		}
 		
 		$stmt = \GO\Calendar\Model\Calendar::model()->find($findParams);
 		

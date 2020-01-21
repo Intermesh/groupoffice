@@ -1,3 +1,10 @@
+21-01-2020 6.3.87
+- Sieve: Remove :create flag in fileinto command
+- Tickets: Leave ticket blank by default didn't work anymore
+- Calendar: Set resource title of private event to "Private"
+- Calendar: Don't allow calendars from others as default calendar
+- Smime: Added OCSP revocation check
+
 19-12-2019 6.3.86
 - Projects: Send company id when selecting contact
 - User: account creation checks for the max users count
