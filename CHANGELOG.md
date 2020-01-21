@@ -1,3 +1,4 @@
+21-01-2020 6.3.87
 - Sieve: Remove :create flag in fileinto command
 - Tickets: Leave ticket blank by default didn't work anymore
 - Calendar: Set resource title of private event to "Private"
