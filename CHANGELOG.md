@@ -1,3 +1,5 @@
+- Core: Fixed: PDOException 'shortDateInList' #536
+  Happened when default for shortDateInList was set to false
 - Notes: Fixed note decryption
 - Billing: fixed outstanding orders export
 - Billing: Fixed missing contact in recipient when creating invoice from contact
