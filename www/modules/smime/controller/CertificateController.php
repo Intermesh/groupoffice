@@ -4,6 +4,10 @@
 namespace GO\Smime\Controller;
 
 
+use GO\Base\Fs\File;
+use GO\Base\Util\HttpClient;
+use http\Client;
+
 class CertificateController extends \GO\Base\Controller\AbstractController {
 
 	public function actionDownload($params) {
@@ -47,6 +51,8 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 		
 		$params['email']= strtolower($params['email']);
 
+		$oscpMsg = "Not checked";
+
 		//if file was already stored somewhere after decryption
 		if(!empty($params['cert_id'])){
 			$cert = \GO\Smime\Model\PublicCertificate::model()->findByPk($params['cert_id']);
@@ -85,7 +91,8 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 					$certData = $pubCertFile->getContents();
 
 					$arr = openssl_x509_parse($certData);
-				
+
+
 					$senderEmailStr = !empty($arr['extensions']['subjectAltName']) ? $arr['extensions']['subjectAltName'] : $arr['subject']['emailAddress'];
 					
 					$senderEmails = explode(',', $senderEmailStr);
@@ -97,6 +104,16 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 						if($email) {
 							$emails[] = $email;
 						}
+					}
+
+
+
+					try {
+						$ocsp = $this->checkOCSP($pubCertFile, $arr);
+						$oscpMsg = $ocsp ? "OK" : \GO::t("The certificate has been revoked!", "smime");
+					}catch(\Exception $e) {
+
+						$oscpMsg = '<span style="color:red">' . $e->getMessage() .'</span>';
 					}
 
 					$pubCertFile->delete();
@@ -113,7 +130,9 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 	
 		
 		if(!isset($arr) && isset($certData)){
-			$arr = openssl_x509_parse($certData);			
+			$arr = openssl_x509_parse($certData);
+
+
 
 			$senderEmailStr = !empty($arr['extensions']['subjectAltName']) ? $arr['extensions']['subjectAltName'] : $arr['subject']['emailAddress'];
 			
@@ -129,6 +148,7 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 				}
 		}else if(empty($emails)){
 			$emails = array('unknown');
+
 		}
 
 		$response['html'] = '';
@@ -153,12 +173,21 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 
 				$response['html'] .= $response['short_html'] = '<h1 class="smi-certemailmismatch">' . \GO::t("Valid certificate but the e-mail of the certificate does not match the sender address of the e-mail.", "smime") . '</h1>';
 			} else {
-				$response['cls'] = 'smi-valid';
-				$response['text'] = \GO::t("Valid certificate", "smime");
 
-				$response['html'] .= $response['short_html'] = '<h1 class="smi-valid">' . \GO::t("Valid certificate", "smime") . '</h1>';
+				if((isset($ocsp) && !$ocsp)) {
+					$response['cls'] = 'smi-invalid';
+					$response['text'] =  \GO::t("The certificate is invalid!", "smime");
+					$response['html'] .= $response['short_html'] = '<h1 class="smi-invalid">' .  \GO::t("The certificate is invalid!", "smime"). '</h1>';
+
+				} else{
+					$response['cls'] = 'smi-valid';
+					$response['text'] = \GO::t("Valid certificate", "smime");
+					$response['html'] .= $response['short_html'] = '<h1 class="smi-valid">' . \GO::t("Valid certificate", "smime"). '</h1>';
+
+				}
 			}
 		}
+
 
 		if (!isset($params['account_id']) || $valid) {
 			$response['html'] .= '<table>';
@@ -182,27 +211,28 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 			$response['html'] .= '</td></tr>';
 			$response['html'] .= '<tr><td>'.\GO::t("Valid from", "smime").':</td><td>' . \GO\Base\Util\Date::get_timestamp($arr['validFrom_time_t']) . '</td></tr>';
 			$response['html'] .= '<tr><td>'.\GO::t("Valid to", "smime").':</td><td>' . \GO\Base\Util\Date::get_timestamp($arr['validTo_time_t']) . '</td></tr>';
+			$response['html'] .= '<tr><td>OSCP:</td><td>' . $oscpMsg . '</td></tr>';
 			$response['html'] .= '</table>';
 		}
 
 
 		return $response;
 	}
-	
+
 	public function actionImportCertificate($params) {
 		if(empty($params['blobId']) || empty($params['email'])) {
 			throw new \InvalidArgumentException('Invalid parameter posted');
 		}
-		
+
 		$blob = \go\core\fs\Blob::findById($params['blobId']);
 
-		
+
 		$content = file_get_contents($blob->path());
-		
+
 		$success = $this->_savePublicCertificate($content, array($params['email']));
 		return ['success' => $success];
 	}
-	
+
 	public function actionImportAttachment($params) {
 		// account_id mailbox uid number encoding sender
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
@@ -210,9 +240,72 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 		$success = true;
 
 		$certData = $imap->get_message_part_decoded($params['uid'], $params['number'], $params['encoding']);
-		
+
 		$success = $success && $this->_savePublicCertificate($certData, array($params['sender']));
 		return ['success' => $success];
+	}
+
+	private function checkOCSP(File $cert, $arr) {
+
+		if(!isset($arr['extensions']['authorityInfoAccess'])) {
+			throw new \Exception( "No OCSP information found in certicate");
+		}
+
+		preg_match_all('/^.*URI:(.*)$/m', $arr['extensions']['authorityInfoAccess'], $matches, PREG_SET_ORDER);
+
+		foreach($matches as $match) {
+			if(stristr($match[0], 'issuer')) {
+				$issuerURI = $match[1];
+			}
+			if(stristr($match[0], 'ocsp')) {
+				$ocspURI = $match[1];
+			}
+		}
+
+		if(!isset($ocspURI)) {
+			throw new \Exception("No OCSP URI found : " . var_export($matches, true));
+		}
+
+		if(!isset($issuerURI)) {
+			return "No issuer URI found";
+		}
+
+		//Get OSCP uri and Issuer uri
+
+		//openssl x509 -in signer.pem -text
+		//Authority Information Access:
+		//                CA Issuers - URI:http://secure.globalsign.com/cacert/gspersonalsign1sha2g3ocsp.crt
+		//                OCSP - URI:http://ocsp2.globalsign.com/gspersonalsign1sha2g3
+
+
+		$issuerDerFile = File::tempFile('issuer.der');
+		$issuerPemFile = File::tempFile('issuer.pem');
+		$c = new HttpClient();
+		if(!$c->downloadFile($issuerURI, $issuerDerFile))
+		{
+			throw new \Exception( "Failed to download issuer certificate");
+		}
+
+		//Convert DER to pem
+		//openssl x509 -inform DER -in issuer.crt -out issuer.pem
+		exec("openssl x509 -inform DER -in ". escapeshellarg($issuerDerFile->path()) ." -out " .escapeshellarg($issuerPemFile->path()), $output, $ret);
+
+		if($ret != 0) {
+			throw new \Exception( "Failed to convert issuer certificate");
+		}
+
+		//Do oscp
+		exec ("openssl ocsp -issuer ". escapeshellarg($issuerPemFile->path()) ." -cert " . escapeshellarg($cert->path())." -url ". escapeshellarg($ocspURI) ." -CAfile ". escapeshellarg($issuerPemFile->path()), $output,$ret);
+
+		if($ret != 0) {
+			throw new \Exception( "OSCP request failed");
+		}
+
+		//Response:
+		//OSCP:	/tmp/groupoffice/1/15795372755e25d37b05b00: good
+		//This Update: Jan 20 16:21:15 2020 GMT
+		//Next Update: Jan 24 16:21:15 2020 GMT
+		return stristr($output[0], 'good');
 	}
 
 	private function _savePublicCertificate($certData, $emails) {
