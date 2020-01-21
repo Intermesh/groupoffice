@@ -10,7 +10,12 @@
 - Address book: A manual sort was required after changing sorting by last or first name
 - Address book: Fixed missing contact fields in templates (email, company post address)
 - Leave days: Year summary didn't show if you had hours from last year but no new hours
-- Email: Zip of all attachments failed if content dispostion was not attachment
+- Email: Zip of all attachments failed if content disposition was not attachment
+- Sieve: Remove :create flag in fileinto command
+- Tickets: Leave ticket blank by default didn't work anymore
+- Calendar: Set resource title of private event to "Private"
+- Calendar: Don't allow calendars from others as default calendar
+- Smime: Added OCSP revocation check
 
 16-01-2020 6.4.103
 - ActiveSync: Z-push fixed problem with tasks on iOS
@@ -657,6 +662,12 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Calendasr: Show unconfirmed holidays
 - Projects: Send company id when selecting contact
 
+
+- Sieve: Remove :create flag in fileinto command
+- Tickets: Leave ticket blank by default didn't work anymore
+- Calendar: Set resource title of private event to "Private"
+- Calendar: Don't allow calendars from others as default calendar
+- Smime: Added OCSP revocation check
 
 19-12-2019 6.3.86
 - Projects: Send company id when selecting contact
