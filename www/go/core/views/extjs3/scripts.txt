@@ -45,6 +45,7 @@ form/ComboBox.js
 form/ComboBoxReset.js
 form/multiselect/Field.js
 form/multiselect/Window.js
+form/ArrayFieldGrid.js
 form/GridField.js
 form/RadioGroup.js
 form/Switch.js
