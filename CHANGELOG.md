@@ -1,3 +1,6 @@
+- E-mail: Add attachment to e-mail from item
+- E-mail: Save / Download inline images context menu
+- E-mail: added email all files button
 - Core: Fixed: PDOException 'shortDateInList' #536
   Happened when default for shortDateInList was set to false
 - Project: E-mail all files from a folder

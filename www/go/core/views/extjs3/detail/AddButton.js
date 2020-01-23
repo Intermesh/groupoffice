@@ -32,30 +32,11 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 		
 		//TODO refactor
 		
-		if(!this.noFiles) { //noFiles is used in GO.email.LinkedMessagePanel
+		if(!this.noFiles) {
+
+
+			//noFiles is used in GO.email.LinkedMessagePanel
 			if(go.Modules.isAvailable("legacy", "documenttemplates")) {
-
-				this.menu.add(	{
-					iconCls: 'ic-mail', 
-					text:  t("E-mail from template","documenttemplates", "legacy"),
-					scope: this,
-					handler: function() {
-						if(!GO.documenttemplates.emailTemplateDialog){
-							GO.documenttemplates.emailTemplateDialog = new GO.documenttemplates.EmailTemplateDialog();
-						}
-
-						var dv = this.detailView;
-
-						GO.documenttemplates.emailTemplateDialog.entity = this.getEntity();
-						GO.documenttemplates.emailTemplateDialog.entityId = this.getEntityId();
-
-						GO.documenttemplates.emailTemplateDialog.show();
-
-						GO.documenttemplates.emailTemplateDialog.on('hide', function(){
-							this.detailView.reload();
-						}, this, {single: true});
-					}
-				});
 
 				this.menu.add(	{
 					iconCls: 'ic-mail', 
@@ -91,7 +72,6 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 			this.setDisabled(pl < go.permissionLevels.write);
 		}, this);
 	},
-	
 	addComment : function () {
 		var dv = this.detailView;
 		
@@ -224,6 +204,18 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 				},
 				scope: this
 			});
+			// add E-mail files after E-mail
+			if(l.title == "E-mail") {
+				items.push({
+					iconCls: "entity LinkedEmail bluegrey",
+					text: "E-mail files",
+					handler: function () {
+						var dv = this.detailView;
+						this.folderId = dv.data.files_folder_id;
+						GO.email.openFolderTree(this.folderId);
+					}, scope: this
+				});
+			}
 		}, this);
 
 		return items;

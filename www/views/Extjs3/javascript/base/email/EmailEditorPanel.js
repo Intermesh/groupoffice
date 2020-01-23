@@ -420,7 +420,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		
 			uploadItems.push({
 				iconCls:'ic-folder',
-				text : t("Add from Group-Office", "email").replace('{product_name}', GO.settings.config.product_name),
+				text : t("Add from personal folder", "email").replace('{product_name}', GO.settings.config.product_name),
 				handler : function()
 				{
 					if(go.Modules.isAvailable("legacy", "files"))
@@ -441,6 +441,22 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 						GO.selectFileBrowser.setFilesFilter('');
 						GO.selectFileBrowser.setRootID(0,0);
 						GO.selectFileBrowserWindow.show();
+					}
+				},
+				scope : this
+			});
+
+			uploadItems.push({
+				iconCls:'ic-folder',
+				text : t("Add from item", "email"),
+				handler : function()
+				{
+					if(go.Modules.isAvailable("legacy", "files"))
+					{
+						var dlg = new GO.email.LinkAttachmentDialog();
+						dlg.setEmailEditor(true);
+						dlg.setAttachmentsView(this.attachmentsView)
+						dlg.show(null);
 					}
 				},
 				scope : this
