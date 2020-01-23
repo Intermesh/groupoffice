@@ -193,7 +193,7 @@ class Debugger {
 		}
 		
 		if(empty($caller['class'])) {			
-			$caller['class'] = $lastCaller['class'];
+			$caller['class'] = $lastCaller['class'] ?? "none";
 		}
 		
 		if(!isset($lastCaller['line'])) {

@@ -1140,7 +1140,7 @@ class GO{
 
 		$p = array('m'=>$module,'f'=>$function, 'p'=>$params);
 
-		$r = $toLoginDialog ? '' : 'external/index';
+		$r =  ""; //$toLoginDialog ? '' : 'external/index';
 
 		$url = \GO::config()->orig_full_url.'?r='.$r.'&f='.urlencode(base64_encode(json_encode($p)));
 		return $url;
