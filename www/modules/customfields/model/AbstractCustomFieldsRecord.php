@@ -125,7 +125,6 @@ abstract class AbstractCustomFieldsRecord extends \GO\Base\Db\ActiveRecord{
 					self::$cacheColumns[$this->extendsModel()][$field->columnName()]['regex']=isset($field->options['validationRegex']) ? $field->options['validationRegex'] : "";
 					self::$cacheColumns[$this->extendsModel()][$field->columnName()]['gotype']='customfield';
 					self::$cacheColumns[$this->extendsModel()][$field->columnName()]['unique']=$field->unique_values;
-					self::$cacheColumns[$this->extendsModel()][$field->columnName()]['required_condition']=$field->required_condition;
 
 					//Don't validate required on the server side because customfields tabs can be disabled.
 					//self::$cacheColumns[$this->extendsModel()][$field->columnName()]['required']=$field->required;
@@ -179,99 +178,11 @@ abstract class AbstractCustomFieldsRecord extends \GO\Base\Db\ActiveRecord{
 				if(!$this->columns[$field]['customfield']->customfieldType->validate($this->$field)) {
 					$this->setValidationError ($field, $this->columns[$field]['customfield']->customfieldType->getValidationError());
 				}
-
-				if (!empty($this->columns[$field]['customfield']->getAttribute('required_condition'))) {
-                    if (!$this->validateRequiredCondition($this->$field, $this->columns[$field]['customfield']->customfieldType->getField(), $this->getModel())) {
-                        $this->setValidationError($field, sprintf(\GO::t('attributeRequired'),$this->getAttributeLabel($field)));
-                        return false;
-                    }
-                }
 			}
 		}
 		
 		return parent::validate();
 	}
-
-    protected function validateRequiredCondition($value, Field $field,  ActiveRecord $model)
-    {
-        $value = trim($value);
-
-        $condition = $field->getAttribute('required_condition');
-        $isEmptyCondition = false;
-        $isNotEmptyCondition = false;
-        $fieldName = null;
-        $allowBlank = true;
-
-        if (strpos($condition, 'is empty') !== false) {
-            $isEmptyCondition = true;
-            $condition = str_replace('is empty', '', $condition);
-            $fieldName = str_replace(' ', '', $condition);
-            if (property_exists($model, $fieldName)) {
-                $fieldValue = $model->$fieldName;
-            } else {
-                $fieldName = null;
-            }
-        } else if (strpos($condition, 'is not empty') !== false) {
-            $isNotEmptyCondition = true;
-            $condition = str_replace('is not empty', '', $condition);
-            $fieldName = str_replace(' ', '', $condition);
-            if (property_exists($model, $fieldName)) {
-                $fieldValue = $model->$fieldName;
-            } else {
-                $fieldName = null;
-            }
-        } else {
-            $conditionParts = explode(' ', $condition);
-
-            if (count($conditionParts) === 3) {
-                $operator = $conditionParts[1];
-                $fieldName = $conditionParts[0];
-
-                if ($model->hasAttribute($fieldName)) {
-                    $fieldValue = $model->getAttribute($fieldName);
-                    $requiredValue = $conditionParts[2];
-                } else {
-                    $fieldName = null;
-                }
-
-                if (null === $fieldName) {
-                    $fieldName = $conditionParts[2];
-                    if ($model->hasAttribute($fieldName)) {
-                        $fieldValue = $model->getAttribute($fieldName);
-                        $requiredValue = $conditionParts[0];
-                    } else {
-                        $fieldName = null;
-                    }
-                }
-            }
-        }
-
-        if (null !== $fieldName) {
-            if ($isEmptyCondition) {
-                $allowBlank = !empty($fieldValue);
-            } else if ($isNotEmptyCondition) {
-                $allowBlank = empty($fieldValue);
-            } else {
-                switch ($operator) {
-                    case '=':
-                    case '==':
-                        $allowBlank = !($fieldValue == $requiredValue);
-                        break;
-                    case '>':
-                        $allowBlank = !($fieldValue > $requiredValue);
-                        break;
-                    case '<':
-                        $allowBlank = !($fieldValue < $requiredValue);
-                        break;
-                }
-            }
-        }
-
-        if (!$allowBlank && empty($value)) {
-            return false;
-        }
-        return true;
-    }
 	
 	public function attributeLabels() {
 		return self::$attributeLabels[$this->extendsModel()];
