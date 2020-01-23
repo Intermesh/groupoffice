@@ -263,9 +263,10 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			if(this.entityStore && !record.data[this.valueField]) {
 				this.createNew(record);
 			} else{
-				this.dataView.store.add([record]);			
+				this.dataView.store.add([record]);
 			}
-			combo.reset();			
+			combo.reset();
+
 		}, this);
 
 		if(this.allowNew) {
@@ -301,10 +302,9 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	 this.entityStore.set({
 			create: create
 		}).then(function(response) {
-			record.id = response.created.newid.id;
-			record.set(id, record.id);
+			record.id = record.data. id = response.created.newid.id;
 			me.dataView.store.add([record]);	
-			me.comboBox.reset();		
+			me.comboBox.reset();
 		});
 	},
 
