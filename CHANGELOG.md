@@ -1,3 +1,7 @@
+- E-mail: Add attachment to e-mail from item
+- E-mail: Save / Download inline images context menu
+- E-mail: added email all files button
+
 22-01-2020 6.4.105
 - Core: Load external pages directly because check for existing tabs fail in current browsers
 - Files: Fixed error on search when having custom fields

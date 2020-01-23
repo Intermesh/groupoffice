@@ -35,7 +35,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			load : true,
 			reset : true
 		});
-
 		this.bodyId = Ext.id();
 		this.attachmentsId = Ext.id();
 
@@ -532,7 +531,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 		// this.messageBodyEl = Ext.get(this.bodyId);
 		
-
 		if(data.attachments.length)
 		{
 			this.attachmentsEl = Ext.get(this.attachmentsId);
@@ -551,6 +549,13 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			this.allAttachmentContextMenu.messagePanel = this;
 			this.allAttachmentsMenuEl.on('contextmenu', this.onAllAttachmentContextMenu, this);
 		}
+
+		if(data.inlineAttachments.length) {
+			this.attachmentContextMenu.messagePanel = this;
+			this.allAttachmentsMenuEl = Ext.get(this.bodyId);
+			this.allAttachmentsMenuEl.on('contextmenu', this.onImageContextMenu, this);
+		}
+
 
 		this.contactImageEl = Ext.get(this.contactImageId);
 		this.contactImageEl.on('click', this.lookupContact, this);
@@ -646,10 +651,31 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		}
 
 	},
+	onImageContextMenu : function (e, target){
+		var number = this.getParameterByName("number",target.src);
 
+		for(var i = 0; i < this.data.inlineAttachments.length;i++) {
+			if(this.data.inlineAttachments[i].number == number) {
+				var attachment = this.data.inlineAttachments[i];
+			}
+		}
+		
+		if(target.tagName == "IMG") {
+			e.preventDefault();
+			this.attachmentContextMenu.showAt(e.getXY(),attachment);
+		}
+
+	},
+	getParameterByName : function(name, url) {
+		if (!url) url = window.location.href;
+		name = name.replace(/[\[\]]/g, '\\$&');
+		var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+			results = regex.exec(url);
+		if (!results) return null;
+		if (!results[2]) return '';
+		return decodeURIComponent(results[2].replace(/\+/g, ' '));
+	},
 	onAttachmentContextMenu : function (e, target){
-
-
 		if(target.id.substr(0,this.attachmentsId.length)==this.attachmentsId)
 		{
 			var attachment_no = target.id.substr(this.attachmentsId.length+1);
