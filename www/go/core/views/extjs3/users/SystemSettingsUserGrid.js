@@ -34,7 +34,6 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'createdAt', type: 'date'},
 				{name: 'lastLogin', type: 'date'}	
 			],
-			baseParams: {filter: {}},
 			entityStore: "User"
 		});
 

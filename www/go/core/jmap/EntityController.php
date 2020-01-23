@@ -201,9 +201,9 @@ abstract class EntityController extends Controller {
 				throw new InvalidArguments("Parameter 'sort' must be an array");
 			}
 		}
-		
+
 		if(!isset($params['filter'])) {
-			$params['filter'] = [];
+			$params['filter'] = $this->getDefaultQueryFilter();
 		} else
 		{
 			if(!is_array($params['filter'])) {
@@ -218,6 +218,10 @@ abstract class EntityController extends Controller {
 		$params['calculateTotal'] = !empty($params['calculateTotal']) ? true : false;
 		
 		return $params;
+	}
+
+	protected function getDefaultQueryFilter() {
+		return [];
 	}
 
   /**

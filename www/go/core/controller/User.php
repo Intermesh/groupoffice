@@ -12,8 +12,13 @@ use go\core\model;
 
 
 
-class User extends EntityController {	
-	
+class User extends EntityController {
+
+	protected function getDefaultQueryFilter()
+	{
+		return ['showDisabled'=> false];
+	}
+
 	protected function canUpdate(Entity $entity) {
 		
 		if(!go()->getAuthState()->isAdmin()) {

@@ -17,9 +17,9 @@ go.data.StoreTrait = {
 			this.baseParams = {};
 		}
 		
-		if(!this.baseParams.filter) {
-			this.baseParams.filter = {};
-		}		
+		// if(!this.baseParams.filter) {
+		// 	this.baseParams.filter = {};
+		// }
 		
 		if(this.entityStore) {			
 			this.initEntityStore();
@@ -198,12 +198,27 @@ go.data.StoreTrait = {
 	removeById : function(id) {
 		this.remove(this.getById(id));
   },
+
+	/**
+	 * Same as set filter but keeps existing filter values if set
+	 *
+	 * @param cmpId
+	 * @param filter
+	 * @returns {go.data.StoreTrait}
+	 */
+	patchFilter : function(cmpId, filter) {
+		var f = this.getFilter(cmpId);
+		if(!f) {
+			f = {};
+		}
+		return this.setFilter(cmpId, Ext.apply(f, filter));
+	},
   
   /**
 	 * Set a filter object for a component
 	 * 
 	 * @param {string} cmpId
-	 * @param {object} filter
+	 * @param {object} filter if null is given it's removed
 	 * @returns {this}
 	 */
 	setFilter : function(cmpId, filter) {
@@ -221,6 +236,10 @@ go.data.StoreTrait = {
 		
 		for(var cmpId in this.filters) {
 			this.baseParams.filter.conditions.push(this.filters[cmpId]);
+		}
+
+		if(!this.baseParams.filter.conditions.length) {
+			delete this.baseParams.filter;
 		}
 		
 		return this;

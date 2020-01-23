@@ -105,9 +105,8 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	},
 
 	getParams: function (text) {
-		//override to add q filter for JMAP API
-		this.store.baseParams.filter = this.store.baseParams.filter || {};
-		this.store.baseParams.filter.text = text;
+		//override to add 'text' filter for JMAP API
+		this.store.setFilter('combo', {text: text});
 
 		if(this.pageSize > 0){
 			this.store.baseParams.calculateTotal = true;

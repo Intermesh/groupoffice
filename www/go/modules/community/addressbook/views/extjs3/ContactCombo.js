@@ -21,6 +21,16 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 	 */
 	isOrganization : false,
 	initComponent: function () {
+
+		var comboFilter = {
+			addressBookId: this.addressBookId,
+			permissionLevel: this.permissionLevel || go.permissionLevels.write
+		};
+
+		if(Ext.isDefined(this.isOrganization)) {
+			comboFilter.isOrganization = this.isOrganization;
+		}
+
 		Ext.applyIf(this, {
 			store: new go.data.Store({
 				fields: ['id', 'name', "photoBlobId", {name: 'organizations', type: "relation"}, 'goUserId', 'phoneNumbers','addresses','emailAddresses','firstName', 'middleName', 'lastName', 'gender', 'color'],
@@ -29,18 +39,11 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 					field: 'firstName',
 					direction: 'ASC' 
 				},
-				baseParams: {
-					filter: {
-						addressBookId: this.addressBookId,
-						permissionLevel: this.permissionLevel || go.permissionLevels.write			
-					}
+				filters: {
+					combo: comboFilter
 				}
 			})
 		});
-		
-		if(Ext.isDefined(this.isOrganization)) {
-			this.store.baseParams.filter.isOrganization = this.isOrganization;
-		}
 		
 		this.tpl = new Ext.XTemplate(
 				'<tpl for=".">',

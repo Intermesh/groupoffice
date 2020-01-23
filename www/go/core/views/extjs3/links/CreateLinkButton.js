@@ -212,7 +212,10 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 	
 	setEntity : function(entity, entityId) {
 		
-		var f = this.linkGrid.store.baseParams.filter;
+		var f = this.linkGrid.store.getFilter("link");
+		if(!f) {
+			f = {};
+		}
 		
 		if(f.entity === entity && f.entityId === entityId) {
 			return;
@@ -225,7 +228,9 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			this.reset();
 			return;
 		}
-		
+
+		this.linkGrid.store.setFilter("link", f);
+
 		this.linkGrid.store.load({
 			scope: this,
 			callback: function() {
@@ -240,8 +245,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 		// Clear the new attached links list
 		this.newLinks = [];		
 		this.linkGrid.store.removeAll();
-		this.linkGrid.store.baseParams.filter.entity = null;
-		this.linkGrid.store.baseParams.filter.entityId = null;	
+		this.linkGrid.store.setFilter("link", null);
 		this.setCount(0);		
 		//this.menu.un("show", this.load);
 	},
@@ -252,12 +256,14 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 	},	
 	
 	getNewLinks : function() {
-		var links = {}, i = 0, id;		
+		var links = {}, i = 0, id;
+
+		var f = this.linkGrid.store.getFilter("link");
 		
 		this.newLinks.forEach(function(l) {
 			id = "new" + (i++);
-			l.fromEntity = this.linkGrid.store.baseParams.filter.entity;
-			l.fromId = this.linkGrid.store.baseParams.filter.entityId;
+			l.fromEntity = f.entity;
+			l.fromId = f.entityId;
 			//comes from store record relation
 			delete l.to;
 			links[id] = l;
@@ -285,9 +291,10 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 		
 		.finally(function() {
 			if(!me.isDestroyed) {
-				var e = me.linkGrid.store.baseParams.filter.entity, id = me.linkGrid.store.baseParams.filter.entityId;
+				var f = this.linkGrid.store.getFilter("link");
+
 				me.reset();
-				me.setEntity(e, id);
+				me.setEntity(f.entity, f.entityId);
 			}
 		});
 	}
