@@ -1,4 +1,7 @@
+22-01-2020 6.4.105
 - Core: Load external pages directly because check for existing tabs fail in current browsers
+- Files: Fixed error on search when having custom fields
+- Core: Fixed custom logo not displaying
 
 21-01-2020 6.4.104
 - Core: Fixed: PDOException 'shortDateInList' #536
