@@ -228,18 +228,25 @@ go.data.StoreTrait = {
 		{
 			this.filters[cmpId] = filter;
 		}		
-		
-		this.baseParams.filter = {
-			operator: "AND",
-			conditions: []
-		};
-		
+
+		var conditions = [];
 		for(var cmpId in this.filters) {
-			this.baseParams.filter.conditions.push(this.filters[cmpId]);
+			conditions.push(this.filters[cmpId]);
 		}
 
-		if(!this.baseParams.filter.conditions.length) {
-			delete this.baseParams.filter;
+		switch(conditions.length) {
+			case 0:
+				delete this.baseParams.filter;
+				break;
+			case 1:
+				this.baseParams.filter = conditions[0];
+				break;
+			default:
+				this.baseParams.filter = {
+					operator: "AND",
+					conditions: conditions
+				};
+				break;
 		}
 		
 		return this;
