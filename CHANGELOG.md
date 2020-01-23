@@ -1,3 +1,6 @@
+22-01-2020 6.3.88
+- Core: removed broken required_condition from 6.3
+
 21-01-2020 6.3.87
 - Sieve: Remove :create flag in fileinto command
 - Tickets: Leave ticket blank by default didn't work anymore
