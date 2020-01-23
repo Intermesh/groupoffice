@@ -670,6 +670,10 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Projects: Send company id when selecting contact
 
 
+22-01-2020 6.3.88
+- Core: removed broken required_condition from 6.3
+
+21-01-2020 6.3.87
 - Sieve: Remove :create flag in fileinto command
 - Tickets: Leave ticket blank by default didn't work anymore
 - Calendar: Set resource title of private event to "Private"
