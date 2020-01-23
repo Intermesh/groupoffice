@@ -1,3 +1,5 @@
+- Core: Load external pages directly because check for existing tabs fail in current browsers
+
 21-01-2020 6.4.104
 - Core: Fixed: PDOException 'shortDateInList' #536
   Happened when default for shortDateInList was set to false
