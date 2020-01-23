@@ -932,6 +932,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			foreach ($filesStmt as $searchFileModel) {
 				$record = $searchFileModel->getAttributes();
+				$record['customFields'] = $searchFileModel->getCustomFields();
 				$record = $this->formatListRecord($record, $searchFileModel);
 				$record['name'] = $searchFileModel->path;
 				$response['results'][] = $record;

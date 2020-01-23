@@ -2,10 +2,13 @@
 
 namespace go\core\fs;
 
+use Exception;
+use go\core\exception\ConfigurationException;
 use go\core\orm\Query;
 use go\core\orm;
 use go\core\util\DateTime;
 
+use ReflectionException;
 use function GO;
 
 /**
@@ -85,21 +88,22 @@ class Blob extends orm\Entity {
 	private $tmpFile;
 	private $removeFile = true;
 	private $strContent;
-	
+
 
 	/**
 	 * Get all table columns referencing the core_blob.id column.
-	 * 
+	 *
 	 * It uses the 'information_schema' to read all foreign key relations.
 	 * So it's important that every blob is saved in a column with a 'RESTRICT'
 	 * foreign key relation to core_blob.id. For example:
-	 * 
+	 *
 	 * ```
 	 * ALTER TABLE `addressbook_contact`
 	 *    ADD CONSTRAINT `addressbook_contact_ibfk_2` FOREIGN KEY (`photoBlobId`) REFERENCES `core_blob` (`id`);
 	 * ```
 	 * @link https://groupoffice-developer.readthedocs.io/en/latest/blob.html
 	 * @return array [['table'=>'foo', 'column' => 'blobId']]
+	 * @throws ConfigurationException
 	 */
 	public static function getReferences() {
 		
@@ -116,7 +120,7 @@ class Blob extends orm\Entity {
 			}
 			finally{
 				if($dbName == 'information_schema') {
-					throw new \Exception("HUH");
+					throw new Exception("HUH");
 				}
 				go()->getDbConnection()->exec("USE `" . $dbName . "`");		
 			}	
@@ -126,15 +130,22 @@ class Blob extends orm\Entity {
 		
 		return $refs;
 	}
-	
+
 	/**
 	 * Check if this blob is used in a database table
-	 * 
+	 *
 	 * It uses foreign key relations to check this.
-	 * 
+	 *
 	 * @return boolean
+	 * @throws Exception
 	 */
 	public function isUsed() {
+
+		//TODO: logo must be referenced somewhere. maybe core_settings was a bad idea because it's not relational.
+		if($this->id == go()->getSettings()->logoId) {
+			return true;
+		}
+
 		$refs = $this->getReferences();	
 		
 		$exists = false;
@@ -152,28 +163,30 @@ class Blob extends orm\Entity {
 		
 		return false;
 	}
-	
+
 	/**
 	 * Set the blob stale if it's not used in any of the referencing tables.
-	 * 
+	 *
 	 * @return bool true if blob is stale
+	 * @throws Exception
 	 */
 	public function setStaleIfUnused() {		
 		$this->staleAt = $this->isUsed() ? null : new DateTime();
 		
 		if(!$this->save()) {
-			throw new \Exception("Couldn't save blob");
+			throw new Exception("Couldn't save blob");
 		}
 		return isset($this->staleAt);
 	}
 
 	/**
 	 * Create from file.
-	 * 
+	 *
 	 * The Blob needs to be save after calling this function.
-	 * 
+	 *
 	 * @param File $file
-	 * @return \self
+	 * @return self
+	 * @throws ReflectionException
 	 */
 	public static function fromFile(File $file, $removeFile = false) {
 		$hash = bin2hex(sha1_file($file->getPath(), true));
@@ -191,24 +204,26 @@ class Blob extends orm\Entity {
 		$blob->removeFile = $removeFile;
 		return $blob;
 	}
-	
+
 	/**
 	 * Create from temporary file.
-	 * 
+	 *
 	 * The Blob needs to be save after calling this function. This will remove the temporary file!
-	 * 
+	 *
 	 * @param File $file
-	 * @return \self
+	 * @return self
+	 * @throws ReflectionException
 	 */
 	public static function fromTmp(File $file) {
 		return self::fromFile($file, true);
 	}
-	
+
 	/**
 	 * Create from string
-	 * 
+	 *
 	 * @param string $string
-	 * @return \self
+	 * @return self
+	 * @throws ReflectionException
 	 */
 	public static function fromString($string) {
 		$hash = bin2hex(sha1($string, true));
@@ -226,9 +241,10 @@ class Blob extends orm\Entity {
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable('core_blob', 'b');
 	}
-	
+
 	/**
 	 * @return MetaData
+	 * @throws ReflectionException
 	 */
 	public function getMetaData() {
 		return new MetaData($this);
@@ -255,12 +271,13 @@ class Blob extends orm\Entity {
 		
 		return parent::internalSave();
 	}
-	
+
 	/**
 	 * Checks if blob is in use. If it's used it will not delete but return true.
 	 * It will remove the file on disk.
-	 * 
+	 *
 	 * @return boolean
+	 * @throws Exception
 	 */
 	protected static function internalDelete(Query $query) {
 
@@ -312,18 +329,20 @@ class Blob extends orm\Entity {
 
 	/**
 	 * Return file system path of blob data
-	 * 
+	 *
 	 * @return string
+	 * @throws ConfigurationException
 	 */
 	public function path() {
 		$dir = substr($this->id,0,2) . '/' .substr($this->id,2,2). '/';
 		return go()->getDataFolder()->getPath() . '/data/'.$dir.$this->id;
 	}
-	
+
 	/**
 	 * Get blob data as file system file object
-	 * 
+	 *
 	 * @return File
+	 * @throws ConfigurationException
 	 */
 	public function getFile() {
 		return new File($this->path());

@@ -1,6 +1,13 @@
 - E-mail: Add attachment to e-mail from item
 - E-mail: Save / Download inline images context menu
 - E-mail: added email all files button
+
+22-01-2020 6.4.105
+- Core: Load external pages directly because check for existing tabs fail in current browsers
+- Files: Fixed error on search when having custom fields
+- Core: Fixed custom logo not displaying
+
+21-01-2020 6.4.104
 - Core: Fixed: PDOException 'shortDateInList' #536
   Happened when default for shortDateInList was set to false
 - Project: E-mail all files from a folder
@@ -667,6 +674,10 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Projects: Send company id when selecting contact
 
 
+22-01-2020 6.3.88
+- Core: removed broken required_condition from 6.3
+
+21-01-2020 6.3.87
 - Sieve: Remove :create flag in fileinto command
 - Tickets: Leave ticket blank by default didn't work anymore
 - Calendar: Set resource title of private event to "Private"
