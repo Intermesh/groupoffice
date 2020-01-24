@@ -1,6 +1,10 @@
 - E-mail: Add attachment to e-mail from item
 - E-mail: Save / Download inline images context menu
 - E-mail: added email all files button
+- Comments: After opening an item in a popup an error would occur on every comment update.
+- Comments: cmd + enter on macos didn't work in Firefox
+- Users: Show disabled filter didn't work
+- Address book: Adding new organisation in new contact dialog raised an error.
 
 22-01-2020 6.4.105
 - Core: Load external pages directly because check for existing tabs fail in current browsers
