@@ -5606,7 +5606,6 @@ Ext.EventObject = function(){
                 }
                 me.type = e.type;
                 me.shiftKey = e.shiftKey;
-                
                 me.ctrlKey = e.ctrlKey || e.metaKey || false;
                 me.altKey = e.altKey;
                 
@@ -6973,7 +6972,7 @@ Ext.apply(Ext.EventManager, function(){
        
        onTextResize : function(fn, scope, options){
            if(!textEvent){
-               textEvent = new Ext.util.Event();
+               textEvent = new Ext.util.Event();z
                var textEl = new Ext.Element(document.createElement('div'));
                textEl.dom.className = 'x-text-resize';
                textEl.dom.innerHTML = 'X';

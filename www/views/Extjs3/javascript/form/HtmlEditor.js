@@ -76,7 +76,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		var doc = this.getDoc();
 		if (Ext.isGecko){
 			Ext.EventManager.on(doc, {
-				keypress: this.fireSubmit,
+				keydown: this.fireSubmit,
 				scope: this
 			});
 		}
@@ -90,7 +90,6 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	fireSubmit : function(e) {
 		if (e.ctrlKey && Ext.EventObject.ENTER == e.getKey()) {
 			e.preventDefault();
-			console.warn('ctrlenter');
 			this.fireEvent('ctrlenter',this);
 			return false;
 		}

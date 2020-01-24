@@ -19,6 +19,9 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	stateId: "comments-detail",
 	initComponent: function () {
 
+		this.on('destroy', function() {
+			this.store.destroy();
+		}, this);
 
 		this.on("expand", function() {
 			this.updateView();
