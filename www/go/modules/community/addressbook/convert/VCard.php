@@ -101,8 +101,12 @@ class VCard extends AbstractConverter {
 				}
 				$type = 'ANNIVERSARY';
 				$anniversaryAdded = true;
-			} 
-			$vcard->add($type, $date->date->format('Y-m-d'));
+			}
+
+			//Some databases have '0000-00-00' in the date??
+			if(isset($date->date)) {
+				$vcard->add($type, $date->date->format('Y-m-d'));
+			}
 		}
 		foreach ($contact->addresses as $address) {
 			//ADR: [post-office-box, apartment, street, locality, region, postal, country]
