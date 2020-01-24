@@ -9,7 +9,7 @@ use go\core\model\AuthAllowGroup;
 use go\core\model\Token;
 use go\core\model\User;
 use go\core\auth\PrimaryAuthenticator;
-use go\core\http\Request;
+use go\core\jmap\Request;
 use go\core\http\Response;
 use go\core\jmap\Capabilities;
 use go\core\validate\ErrorCode;
@@ -42,7 +42,7 @@ try {
 //Create the app with the config.php file
 	App::get();
 	
-	if(go\core\jmap\Request::get()->getMethod() == "DELETE") {
+	if(Request::get()->getMethod() == "DELETE") {
 		$state = new go\core\jmap\State();
 		$token = $state->getToken();
 		if(!$token) {
