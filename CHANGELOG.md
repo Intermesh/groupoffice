@@ -1,3 +1,4 @@
+24-01-2020 6.4.106
 - E-mail: Add attachment to e-mail from item
 - E-mail: Save / Download inline images context menu
 - E-mail: added email all files button
@@ -5,6 +6,7 @@
 - Comments: cmd + enter on macos didn't work in Firefox
 - Users: Show disabled filter didn't work
 - Address book: Adding new organisation in new contact dialog raised an error.
+- Address book: Fixed Error in /usr/local/share/src/www/go/modules/community/addressbook/convert/VCard.php at line 105: Call to a member function format() on null at 2020-01-24T15:17:27+00:00
 
 22-01-2020 6.4.105
 - Core: Load external pages directly because check for existing tabs fail in current browsers

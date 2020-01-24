@@ -181,7 +181,8 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					header: "ID",
 					width: dp(100),
 					hidden: true,
-					dataIndex: 'id'
+					dataIndex: 'id',
+					sortable: true
 				},
 				actions
 			],
