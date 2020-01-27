@@ -35,9 +35,14 @@ go.systemsettings.Panel = Ext.extend(Ext.form.FormPanel, {
 	
 	onSubmit: function (cb, scope) {
 		
-		var module = go.Modules.get(this.package, this.module), p = {"update": {}};
+		var module = go.Modules.get(this.package, this.module), p = {"update": {}}, s = this.getForm().getFieldValues(true);
+
+		if(Object.keys(s).length === 0) {
+			cb.call(scope, this, true);
+			return;
+		}
 		
-		p.update[module.id] = {settings: this.getForm().getFieldValues()};
+		p.update[module.id] = {settings: s};
 		
 		go.Db.store("Module").set(p, function (options, success, response) {
 			cb.call(scope, this, success);
