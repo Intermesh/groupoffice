@@ -101,7 +101,6 @@ class Language extends Controller {
 
 		$this->writeStrings("core", "core", $core, "*");
 
-		//todo, this is refsactored in master
 		$blob = Blob::fromTmp($csvFile);
 		$blob->type = "text/csv";
 		$blob->name = "lang.csv";
@@ -110,6 +109,12 @@ class Language extends Controller {
 		Response::get()->addResponse(["blobId" => $blob->id]);
 	}
 
+	/**
+	 * This will parse t("Some text") function calls to find new strings to translate
+	 *
+	 * @param File $file
+	 * @return array
+	 */
 	private function getStringsFromJS(File $file) {
 		$content = $file->getContents();
 
