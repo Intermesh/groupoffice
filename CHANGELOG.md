@@ -1,3 +1,7 @@
+27-01-2020 6.4.107
+- Email: fixed missing email from template option
+- Email: Send didn't work when link was present
+
 24-01-2020 6.4.106
 - E-mail: Add attachment to e-mail from item
 - E-mail: Save / Download inline images context menu
