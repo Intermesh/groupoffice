@@ -1,3 +1,5 @@
+- Sieve: Don't use :create flag on sieve filter action fileinto
+
 27-01-2020 6.2.124
 - Tickets: Show confirm on closing tickets option broke module settings and email viewing.
 
