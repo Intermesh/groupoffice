@@ -1,0 +1,23 @@
+<?php
+return array (
+  'Instance' => 'Omgeving',
+  'Storage quota' => 'Schijfruimte',
+  'Size in GB' => 'Grootte in GB',
+  'Maximum number of users' => 'Maximum aantal gebruikers',
+  'Multi instance' => 'Multiomgeving',
+  'Show trials' => 'Toon proefomgevingen',
+  'E-mail selected' => 'E-mail geselecteerde',
+  'Download site config' => 'Download site configuratie',
+  'Trial' => 'Proefomgeving',
+  'User count' => 'Aantal gebuikers',
+  'Maximum users' => 'Maximum aantal gebruikers',
+  'Login count' => 'Aantal keer ingelogd',
+  'Admin name' => 'Naam van beheerder',
+  'Admin E-mail' => 'E-mail van beheerder',
+  'Storage usage' => 'Gebruikte schijfruimte',
+  'Version' => 'Versie',
+  'Login as administrator' => 'Inloggen als beheerder',
+  'Deactivate' => 'Deactiveren',
+  'Deactivate instance' => 'Deactiveer omgeving',
+  'Activate instance' => 'Activeeer omgeving',
+);
