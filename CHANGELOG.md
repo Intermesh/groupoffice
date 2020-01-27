@@ -1,5 +1,7 @@
+- Core: System settings only submits dirty values. Fixed a bug that caused SMTP password to be cleared for notifications.
 - Core: Setting empty quota didn't work
 - Sync: Fixed error in my account when no email module is available
+- Core/ tickets: fixed error when tickets option "Show confirm dialog when closing tickets" was enabled
 
 27-01-2020 6.4.107
 - Email: fixed missing email from template option
