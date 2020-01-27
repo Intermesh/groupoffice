@@ -1,3 +1,5 @@
+- Core: Setting empty quota didn't work
+
 27-01-2020 6.4.107
 - Email: fixed missing email from template option
 - Email: Send didn't work when link was present

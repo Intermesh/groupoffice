@@ -101,7 +101,10 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 		if(this.serverFormats) {
 			return v;
 		} else
-		{			
+		{
+			if(v === "") {
+				return null;
+			}
 			return GO.util.unlocalizeNumber(v) / this.multiplier;
 		}
 	},	

@@ -324,6 +324,19 @@
 	line-height: dp(18);
 }
 
+.ext-mb-input {
+	@extend %font-data;
+	color: color($fg, 'text');
+	min-height: dp(32);
+	line-height: dp(18);
+	transition: border-color 100ms linear, box-shadow 225ms linear;
+	border-radius: dp(4);
+	background-color:color($bg, 'box');
+	border: 1px solid color($fg, 'track');
+	display: inline-block;
+	padding: dp(6) dp(8);
+}
+
 .x-form{
 	background-color: color($bg, 'form');
 	> .x-tab-panel {

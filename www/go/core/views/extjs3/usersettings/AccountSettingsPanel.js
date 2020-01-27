@@ -85,7 +85,8 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						name: 'disk_quota',
 						fieldLabel: t('Disk quota'),
 						decimals: 0,
-						width: dp(300)
+						width: dp(300),
+						hint: t("Setting '0' will disable uploads for this user. Leave this field empty to allow unlimited space.")
 					},{
 						xtype: 'displayfield',
 						value: 'MB'
