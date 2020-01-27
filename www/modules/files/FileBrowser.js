@@ -1134,7 +1134,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			save:function(dlg, folder_id, parent_id){
 				if(parent_id==this.folder_id)
 				{
-					this.setFolderID(parent_id);
+					this.setFolderID(parent_id, false, true);
 				}
 				//console.log(parent_id);
 				var node = this.treePanel.getNodeById(parent_id);
@@ -1909,14 +1909,14 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 	//this.filesContextMenu.deleteButton.setDisabled(!writePermission);
 	},
 
-	setFolderID : function(id, expand)
+	setFolderID : function(id, expand, forceReload)
 	{
     this.expandTree=expand;
 		this.fireEvent('beforeFolderIdSet');
 		  
 		this.folder_id = id;
 		//this.gridStore.baseParams['id']=this.thumbsStore.baseParams['id']=id;
-		if(this.getActiveGridStore().baseParams['folder_id'] != id) {
+		if(forceReload || this.getActiveGridStore().baseParams['folder_id'] != id) {
 			
 			this.getActiveGridStore().baseParams['folder_id']=id;
 
