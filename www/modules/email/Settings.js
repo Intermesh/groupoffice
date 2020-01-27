@@ -2,11 +2,14 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 	title : t("E-mail"),
 	iconCls: 'ic-email',
 	autoScroll: true,
+	layout: "border",
 	initComponent: function() {
-		
+
 		this.items=[{
 			xtype:'fieldset',
 			title:t("Options"),
+			region: "north",
+			autoHeight: true,
 			items:[
 //			this.sortBySendMailTime = new Ext.form.Checkbox({
 //				boxLabel:t("Sort recipient addresses by time of last email sending (requires Address Book module)", "email"),
@@ -68,7 +71,9 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 //			this.templateGrid = new GO.email.TemplateGrid({
 //				ownedBy: null
 //			}),
-			this.templatesGrid = new GO.email.TemplatesGrid()
+			this.templatesGrid = new GO.email.TemplatesGrid({
+				region: "center"
+			})
 		];
 		
 		GO.email.SettingsPanel.superclass.initComponent.call(this);

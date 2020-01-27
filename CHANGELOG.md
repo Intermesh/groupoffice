@@ -4,6 +4,7 @@
 - Core/ tickets: fixed error when tickets option "Show confirm dialog when closing tickets" was enabled
 - Core: Fixed user export / import
 - Files: Fixed reload issue after creating new folder for an item
+- Files: Refresh UI on change in folder or file dialog
 
 27-01-2020 6.4.107
 - Email: fixed missing email from template option

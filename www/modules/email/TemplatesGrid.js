@@ -102,8 +102,7 @@ GO.email.TemplatesGrid = function(config)
 	});
 	config.cm= columnModel;
 	config.border= false;
-	config.paging= false;
-	config.autoHeight = true;
+	config.paging= true;
 
 	if (GO.util.empty(config.noDocumentTemplates)) {
 		config.deleteConfig= {
