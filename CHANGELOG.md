@@ -1,3 +1,6 @@
+27-01-2020 6.3.89
+- Tickets: Show confirm on closing tickets option broke module settings and email viewing.
+
 22-01-2020 6.3.88
 - Core: removed broken required_condition from 6.3
 
