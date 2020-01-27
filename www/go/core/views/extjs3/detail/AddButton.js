@@ -39,6 +39,27 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 			if(go.Modules.isAvailable("legacy", "documenttemplates")) {
 
 				this.menu.add(	{
+					iconCls: 'ic-mail',
+					text:  t("E-mail from template","documenttemplates", "legacy"),
+					scope: this,
+					handler: function() {
+						if(!GO.documenttemplates.emailTemplateDialog){
+							GO.documenttemplates.emailTemplateDialog = new GO.documenttemplates.EmailTemplateDialog();
+						}
+
+
+						GO.documenttemplates.emailTemplateDialog.entity = this.getEntity();
+						GO.documenttemplates.emailTemplateDialog.entityId = this.getEntityId();
+
+						GO.documenttemplates.emailTemplateDialog.show();
+
+						GO.documenttemplates.emailTemplateDialog.on('hide', function(){
+							this.detailView.reload();
+						}, this, {single: true});
+					}
+				});
+
+				this.menu.add(	{
 					iconCls: 'ic-mail', 
 					text:  t("Document from template", "documenttemplates", "legacy"),
 					scope: this,
@@ -47,7 +68,6 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 							GO.documenttemplates.templateDocumentDialog = new GO.documenttemplates.TemplateDocumentDialog();
 						}
 
-						var dv = this.detailView;
 
 						GO.documenttemplates.templateDocumentDialog.entity = this.getEntity();
 						GO.documenttemplates.templateDocumentDialog.entityId = this.getEntityId();
