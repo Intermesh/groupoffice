@@ -34,15 +34,15 @@ GO.files.openDetailViewFileBrowser = function () {
 				//store.saveState();
 			}
 
-			fb.on('hide', function () {
-				fb.model_id = null;
-				fb.model = null;
-
-			}, {single: true});
 
 			//reload display panel on close
 
 			GO.files.fileBrowserWin.on('hide', function () {
+
+				fb.model_id = null;
+				fb.model = null;
+				//debugger;
+				this.fireEvent("closefilebrowser", this);
 
 				dv.reload();
 			}, this, {single: true});
