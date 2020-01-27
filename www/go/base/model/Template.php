@@ -230,7 +230,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 			}
 
 			$birthday = $contact->findDateByType(Date::TYPE_BIRTHDAY, false);
-      $attributes[$tagPrefix . 'birthday'] = $birthday ? $birthday->date->format(static::getDateFormat()) : "";
+      $attributes[$tagPrefix . 'birthday'] = $birthday && isset($birthday->date) ? $birthday->date->format(static::getDateFormat()) : "";
 
 			$attributes[$tagPrefix . 'email'] = isset($contact->emailAddresses[0]) ? $contact->emailAddresses[0]->email :  "";
 			$attributes[$tagPrefix . 'email2'] = isset($contact->emailAddresses[1]) ? $contact->emailAddresses[1]->email :  "";
