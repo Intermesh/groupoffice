@@ -1,3 +1,6 @@
+27-01-2020 6.2.124
+- Tickets: Show confirm on closing tickets option broke module settings and email viewing.
+
 21-01-2020 6.2.123
 - Sieve: Remove :create flag in fileinto command
 - Tickets: Leave ticket blank by default didn't work anymore
