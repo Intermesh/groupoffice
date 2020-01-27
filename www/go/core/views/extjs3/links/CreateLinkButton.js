@@ -262,8 +262,10 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 		
 		this.newLinks.forEach(function(l) {
 			id = "new" + (i++);
-			l.fromEntity = f.entity;
-			l.fromId = f.entityId;
+			if(f) {
+				l.fromEntity = f.entity;
+				l.fromId = f.entityId;
+			}
 			//comes from store record relation
 			delete l.to;
 			links[id] = l;
