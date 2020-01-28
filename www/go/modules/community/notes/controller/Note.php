@@ -18,9 +18,9 @@ class Note extends EntityController {
 	}
 	
 	public function decrypt($params) {
-		$note = $this->getEntity($params['id']);
+//		$note = $this->getEntity($params['id']);
 		
-		$descrypted = \go\core\util\Crypt::decrypt($note->content, $params['password']);
+		$descrypted = \go\core\util\Crypt::decrypt($params['data'], $params['password']);
 		
 		if(!$descrypted) {
 			throw new \Exception("Invalid password");

@@ -1,3 +1,6 @@
+28-01-2020 6.4.109
+- Note: decryption was broken for second encryption algorithm
+
 28-01-2020 6.4.108
 - Core: System settings only submits dirty values. Fixed a bug that caused SMTP password to be cleared for notifications.
 - Core: Setting empty quota didn't work

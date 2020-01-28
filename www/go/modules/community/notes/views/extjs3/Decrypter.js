@@ -56,7 +56,7 @@ go.modules.community.notes.Decrypter = {
 			return go.Jmap.request({
 				method: "Note/decrypt",
 				params: {
-					id: this.data.id,
+					data: data,
 					password: password
 				}
 			}). then(function(response) {
