@@ -1,4 +1,5 @@
 - Sieve: Don't use :create flag on sieve filter action fileinto
+- Files: Check if old user wasn't deleted when recalculating quota
 
 27-01-2020 6.2.124
 - Tickets: Show confirm on closing tickets option broke module settings and email viewing.
