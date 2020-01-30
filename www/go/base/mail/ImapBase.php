@@ -34,6 +34,8 @@ abstract class ImapBase {
 	public $lastCommand;
 	
 	var $command_count=0;
+
+	public static $debug = false;
 	
 	
 	public function last_error($clear=true){
@@ -290,14 +292,14 @@ abstract class ImapBase {
 		
 		$this->responses[] = $result;
 		if ($chunked) {
-			if(!empty(\GO::session()->values['debugSql'])){
+			if(!empty(\GO::session()->values['debugSql']) || self::$debug){
 				foreach($chunked_result as $chunks)
 					\GO::debug("R: ".implode(" ", $chunks));
 			}
 			$result = $chunked_result;
 		}else
 		{
-			if(!empty(\GO::session()->values['debugSql'])){
+			if(!empty(\GO::session()->values['debugSql']) || self::$debug){
 				foreach($result as $line)
 					\GO::debug("R: ".$line);
 			}
@@ -336,7 +338,7 @@ abstract class ImapBase {
 		}
 		
 
-		if(!empty(\GO::session()->values['debugSql']))
+		if(!empty(\GO::session()->values['debugSql']) || self::$debug)
 			\GO::debug("S: ".$command);
 		
 		$this->commands[trim($command)] = \GO\Base\Util\Date::getmicrotime();

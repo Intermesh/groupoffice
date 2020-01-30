@@ -718,6 +718,9 @@ class goMail extends GoBaseBackendDiff {
 	 * @return array
 	 */
 	public function GetMessageList($folderid, $cutoffdate) {
+
+//		\GO\Base\Mail\ImapBase::$debug = true;
+//		GO::config()->debug = true;
 		
 		ZLog::Write(LOGLEVEL_DEBUG, "GetMessageList($folderid, $cutoffdate)");
 		$messages = array();
@@ -732,7 +735,7 @@ class goMail extends GoBaseBackendDiff {
 					$headers = $imap->get_flags();
 				} else
 				{
-					ZLog::Write(LOGLEVEL_DEBUG, 'Client sent cutoff date for calendar: ' . \GO\Base\Util\Date::get_timestamp($cutoffdate));
+					ZLog::Write(LOGLEVEL_DEBUG, 'Client sent cutoff date for calendar: ' . date("j-M-Y", $cutoffdate));
 					$uids = $imap->search('SINCE ' . date("j-M-Y", $cutoffdate));
 					if(empty($uids)) {
 						return [];
