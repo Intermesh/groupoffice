@@ -1724,13 +1724,13 @@ class Imap extends ImapBodyStruct {
 			}
 
 			if(preg_match('/FLAGS \((.*)\)/', $message, $flagMatches)) {
-				$flags = (int) $flagMatches[1];
+				$flags = $flagMatches[1];
 			}else{
 				return false;
 			}
 
-			if(preg_match('/INTERNALDATE ([^\)]+)/', $message, $dateMatches)) {
-				$date = (int) $dateMatches[1];
+			if(preg_match('/INTERNALDATE ([^\)\s]+)/', $message, $dateMatches)) {
+				$date = $dateMatches[1];
 			}else{
 				return false;
 			}
