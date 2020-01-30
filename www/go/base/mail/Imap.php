@@ -1717,6 +1717,9 @@ class Imap extends ImapBodyStruct {
 		foreach($res as $message) {
 			//UID 17 FLAGS ( \Flagged \Seen ) INTERNALDATE 24-May-2018 13:02:43 +0000
 
+			//or different order!
+			// l * 2 FETCH ( UID 2 INTERNALDATE 30-Jan-2020 11:20:06 +0000 FLAGS ( \Seen ) )
+
 			if(preg_match('/UID ([0-9]+)/', $message, $uidMatches)) {
 				$uid = (int) $uidMatches[1];
 			} else{
@@ -1729,7 +1732,7 @@ class Imap extends ImapBodyStruct {
 				return false;
 			}
 
-			if(preg_match('/INTERNALDATE ([^\)\s]+)/', $message, $dateMatches)) {
+			if(preg_match('/INTERNALDATE ([^\s\)]+ [^\s\)]+ [^\s\)]+)/', $message, $dateMatches)) {
 				$date = $dateMatches[1];
 			}else{
 				return false;

@@ -745,6 +745,7 @@ class goMail extends GoBaseBackendDiff {
 
 				if(!$headers) {
 					ZLog::Write(LOGLEVEL_ERROR, "IMAP returned error reponse" . $imap->last_error());
+					return [];
 				}
 				
 				
