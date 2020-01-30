@@ -1,3 +1,4 @@
+30-01-2020 6.4.110
 - Files / Core: Db check fixes acl problem with files
 - Newsletters: Newsletters set Content-Disposition: inline on attachments. They did not show up on Outlook
 - Calendar: Fixed error message when changing calendar
