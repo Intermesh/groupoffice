@@ -720,8 +720,8 @@ class goMail extends GoBaseBackendDiff {
 	public function GetMessageList($folderid, $cutoffdate) {
 
 //		\GO\Base\Mail\ImapBase::$debug = true;
-//		GO::config()->debug = true;
-		
+//		GO()->getDebugger()->enabled = true;
+		GO::debug():
 		ZLog::Write(LOGLEVEL_DEBUG, "GetMessageList($folderid, $cutoffdate)");
 		$messages = array();
 
