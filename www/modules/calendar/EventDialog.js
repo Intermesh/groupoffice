@@ -901,8 +901,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 							var newValue = record.data.id;
 
 							var record = sc.store.getById(newValue);
-							if(GO.customfields && record)
-								GO.customfields.disableTabs(this.tabPanel, record.data);
+
 							this.selectCategory.setCalendarId(newValue);
 							this.selectCategory.reset();
 							// Set the permissionlevel so we know if we have the right permissions
@@ -910,6 +909,8 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 								this.setPermissionLevel(record.data.permissionLevel);
 
 							this.participantsPanel.reloadOrganizer();
+
+							go.customfields.CustomFields.filterFieldSets(this.formPanel);
 						}
 					}
 				}),
