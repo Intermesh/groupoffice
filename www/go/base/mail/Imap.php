@@ -1716,15 +1716,31 @@ class Imap extends ImapBodyStruct {
 		
 		foreach($res as $message) {
 			//UID 17 FLAGS ( \Flagged \Seen ) INTERNALDATE 24-May-2018 13:02:43 +0000
-			
-			if(preg_match('/UID ([0-9]+) FLAGS \((.*)\) INTERNALDATE ([^\)]+)/', $message, $matches)) {
-				
-				$data[] = [
-						'uid' => (int) $matches[1],
-						'flags' => array_map('trim', explode(' ', trim($matches[2]))),
-						'date' => trim($matches[3])
-				];
+
+			if(preg_match('/UID ([0-9]+)/', $message, $uidMatches)) {
+				$uid = (int) $uidMatches[1];
+			} else{
+				return false;
 			}
+
+			if(preg_match('/FLAGS \((.*)\)/', $message, $flagMatches)) {
+				$flags = (int) $flagMatches[1];
+			}else{
+				return false;
+			}
+
+			if(preg_match('/INTERNALDATE ([^\)]+)/', $message, $dateMatches)) {
+				$date = (int) $dateMatches[1];
+			}else{
+				return false;
+			}
+
+			$data[] = [
+				'uid' => $uid,
+				'flags' => $flags,
+				'date' => $date
+			];
+
 		}
 		
 		return $data;
