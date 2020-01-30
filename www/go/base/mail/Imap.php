@@ -1711,6 +1711,9 @@ class Imap extends ImapBodyStruct {
 		if(!$status) {
 			return false;
 		}
+
+		//remove status response
+		array_pop($res);
 		
 		$data = [];
 		
