@@ -172,7 +172,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 				$attributes[$tagPrefix . 'formatted_address'] = $a->getFormatted();
 			}
 			
-			$a = $company->findAddressByType(\go\modules\community\addressbook\model\Address::TYPE_VISIT, true);
+			$a = $company->findAddressByType(\go\modules\community\addressbook\model\Address::TYPE_POSTAL, true);
 			if($a) {				
 				$attributes[$tagPrefix . 'post_address'] = $a->street;
 				$attributes[$tagPrefix . 'post_address_no'] = $a->street2;
@@ -184,7 +184,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 				$attributes[$tagPrefix . 'formatted_post_address'] = $a->getFormatted();
 			}
 
-			$attributes[$tagPrefix . 'email'] = $company->emailAddresses[0] ?? "";
+			$attributes[$tagPrefix . 'email'] = isset($company->emailAddresses[0]) ? $company->emailAddresses[0]->email :  "";
 			$attributes[$tagPrefix . 'invoice_email'] = $company->findEmailByType(\go\modules\community\addressbook\model\EmailAddress::TYPE_BILLING, true);
 			
 			foreach($company->phoneNumbers as $p) {
@@ -230,11 +230,11 @@ class Template extends \GO\Base\Db\ActiveRecord{
 			}
 
 			$birthday = $contact->findDateByType(Date::TYPE_BIRTHDAY, false);
-      $attributes[$tagPrefix . 'birthday'] = $birthday ? $birthday->date->format(static::getDateFormat()) : "";
+      $attributes[$tagPrefix . 'birthday'] = $birthday && isset($birthday->date) ? $birthday->date->format(static::getDateFormat()) : "";
 
-			$attributes[$tagPrefix . 'email'] = $contact->emailAddresses[0] ?? "";
-			$attributes[$tagPrefix . 'email2'] = $contact->emailAddresses[2] ?? "";
-			$attributes[$tagPrefix . 'email3'] = $contact->emailAddresses[3] ?? "";
+			$attributes[$tagPrefix . 'email'] = isset($contact->emailAddresses[0]) ? $contact->emailAddresses[0]->email :  "";
+			$attributes[$tagPrefix . 'email2'] = isset($contact->emailAddresses[1]) ? $contact->emailAddresses[1]->email :  "";
+			$attributes[$tagPrefix . 'email3'] = isset($contact->emailAddresses[2]) ? $contact->emailAddresses[2]->email :  "";
 
 			$attributes[$tagPrefix . 'function'] = $contact->jobTitle;
 

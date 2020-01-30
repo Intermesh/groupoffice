@@ -22,7 +22,8 @@ GO.email.AttachmentContextMenu = function(config)
 	this.downloadButton = new Ext.menu.Item({
 					iconCls: 'ic-file-download',
 					text: t("Download"),
-					handler: function(){						
+					handler: function(){	
+									
 						GO.email.openAttachment(
 							this.attachment,
 							this.messagePanel,

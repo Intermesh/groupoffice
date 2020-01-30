@@ -354,6 +354,8 @@ abstract class AclOwnerEntity extends AclEntity {
 		if(!$stmt->execute()) {
 			throw new \Exception("Could not update ACL");
 		}
+
+		parent::check();
 	}
 
 }

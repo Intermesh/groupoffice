@@ -201,7 +201,7 @@ if ($cacheFile->exists()) {
 		if (GO::config()->debug) {
 			if (is_string($script)) {
 //        $js .=  $script ."\n;\n";
-				echo '<script type="text/javascript" nonce="'.Response::get()->getCspNonce().'">' . $script . '</script>' . "\n";
+				echo '<script type="text/javascript">' . $script . '</script>' . "\n";
 			} else if ($script instanceof File) {
         $relPath = substr($script->getPath(), $strip);
         $parts = explode('/', $relPath);
@@ -223,7 +223,7 @@ if ($cacheFile->exists()) {
 				
 
 				if(!empty($js)) {
-					echo '<script type="text/javascript" nonce="'.Response::get()->getCspNonce().'">';
+					echo '<script type="text/javascript">';
 					echo $js;				
 					echo "</script>\n";
 				}
@@ -277,7 +277,7 @@ if (file_exists(GO::view()->getTheme()->getPath() . 'MainLayout.js')) {
 	echo "\n";
 }
 ?>
-<script type="text/javascript" nonce="<?= Response::get()->getCspNonce(); ?>">
+<script type="text/javascript">
 <?php
 
 //direct login with token

@@ -12,6 +12,7 @@ use go\core\auth\Password;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\convert\UserCsv;
 use go\core\db\Criteria;
+use go\core\mail\Message;
 use go\core\orm\Query;
 use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
@@ -101,7 +102,7 @@ class User extends Entity {
 	/**
 	 * Display dates short in lists.
 	 * 
-	 * @var boolean
+	 * @var bool
 	 */
 	public $shortDateInList = true;
 	
@@ -260,9 +261,9 @@ class User extends Entity {
 			$this->timeFormat = $s->defaultTimeFormat;	
 			$this->dateFormat = $s->defaultDateFormat;
 			$this->timezone = $s->defaultTimezone;
-			$this->firstWeekday = $s->defaultFirstWeekday;
+			$this->firstWeekday = (int) $s->defaultFirstWeekday;
 			$this->currency = $s->defaultCurrency;
-			$this->shortDateInList = $s->defaultShortDateInList;
+			$this->shortDateInList = (bool) $s->defaultShortDateInList;
 			$this->listSeparator = $s->defaultListSeparator;
 			$this->textSeparator = $s->defaultTextSeparator;
 			$this->thousandsSeparator = $s->defaultThousandSeparator;
@@ -857,5 +858,17 @@ class User extends Entity {
 	{
 		return array_merge(parent::converters(), [UserCsv::class]);
 	}
+
+	/**
+	 * Decorate the message for newsletter sending.
+	 * This function should at least add the to address.
+	 *
+	 * @param Message $message
+	 * @return bool
+	 */
+	public function decorateMessage(Message $message) {
+		$message->setTo($this->email, $this->displayName);
+	}
+
 
 }

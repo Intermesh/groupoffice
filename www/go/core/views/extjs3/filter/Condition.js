@@ -5,6 +5,9 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 
 	initComponent: function () {
 		this.filters = Object.values(go.Entities.get(this.entity).filters);
+
+		this.filters.columnSort('title');
+
 		this.items = [this.createFilterCombo()];		
 		
 		go.filter.Condition.superclass.initComponent.call(this);

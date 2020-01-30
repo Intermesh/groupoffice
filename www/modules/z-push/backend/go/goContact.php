@@ -155,6 +155,11 @@ class goContact extends GoBaseBackendDiff {
 	 */
 	public function GetFolder($id) {
 
+		if ($id != BackendGoConfig::CONTACTBACKENDFOLDER) {
+			ZLog::Write(LOGLEVEL_WARN, "Contact folder '$id' not found");
+			return false;
+		}
+
 		$folder = new SyncFolder();
 		$folder->serverid = $id;
 		$folder->parentid = "0";
@@ -178,6 +183,7 @@ class goContact extends GoBaseBackendDiff {
 	}
 	
 	public function getNotification($folder = null) {
+		Contact::entityType()->clearCache();
 		return Contact::getState();
 	}
 

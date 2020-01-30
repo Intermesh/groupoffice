@@ -78,6 +78,7 @@ class VCard extends AbstractConverter {
 		$vcard->N = $contact->isOrganization ? [$contact->name] : [$contact->lastName, $contact->firstName, $contact->middleName, $contact->prefixes, $contact->suffixes];
 		$vcard->FN = $contact->name;
 		$vcard->REV = $contact->modifiedAt->getTimestamp();
+		$vcard->TITLE = $contact->jobTitle;
 
 		foreach ($contact->emailAddresses as $emailAddr) {
 			$vcard->add('EMAIL', $emailAddr->email, ['TYPE' => [$emailAddr->type]]);
@@ -100,8 +101,12 @@ class VCard extends AbstractConverter {
 				}
 				$type = 'ANNIVERSARY';
 				$anniversaryAdded = true;
-			} 
-			$vcard->add($type, $date->date->format('Y-m-d'));
+			}
+
+			//Some databases have '0000-00-00' in the date??
+			if(isset($date->date)) {
+				$vcard->add($type, $date->date->format('Y-m-d'));
+			}
 		}
 		foreach ($contact->addresses as $address) {
 			//ADR: [post-office-box, apartment, street, locality, region, postal, country]

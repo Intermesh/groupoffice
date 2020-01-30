@@ -22,6 +22,8 @@
 namespace GO\Base\Data;
 
 
+use go\core\ErrorHandler;
+
 class ColumnModel {
 
 	/**
@@ -377,7 +379,10 @@ class ColumnModel {
 			try {
 				$formattedRecord[$column->getDataIndex()]=$column->render($model);			
 			} catch(\Exception $e) {
-				go()->getDebugger()->debug($e->getMessage());
+				$formattedRecord[$column->getDataIndex()] = "";
+
+				ErrorHandler::logException($e);
+				go()->log($column);
 			}
 		}
 		

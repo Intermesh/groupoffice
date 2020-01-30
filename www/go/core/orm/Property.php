@@ -71,6 +71,11 @@ abstract class Property extends Model {
 	 */
 	protected $fetchProperties;
 
+	/**
+	 * Properties that were selected from the database tables
+	 *
+	 * @var array
+	 */
 	protected $selectedProperties;
 
 	/**
@@ -78,8 +83,7 @@ abstract class Property extends Model {
 	 * @var Property[]
 	 */
 	private $savedPropertyRelations = [];
-	
-	
+
 	/**
 	 * Holds primary keys per table alias. Used to track new state of records.
 	 * Only set when not fetched as readonly
@@ -90,15 +94,18 @@ abstract class Property extends Model {
 	 * ```
 	 * @var array
 	 */
-	private $primaryKeys = []; 
-
-
+	private $primaryKeys = [];
 
 	/**
 	 * Holds dynamic properties mapped by other modules with the EVENT_MAPPING
 	 */
 	private $dynamicProperties = [];
 
+	/**
+	 * Entities can be fetched readonly to improve performance
+	 *
+	 * @var bool
+	 */
 	protected $readOnly = false;
 
 	/**
@@ -106,8 +113,9 @@ abstract class Property extends Model {
 	 *
 	 * @param boolean $isNew Indicates if this model is saved to the database.
 	 * @param string[] $fetchProperties The properties that were fetched by find. If empty then all properties are fetched
-	 * @param bool $readOnly
+	 * @param bool $readOnly Entities can be fetched readonly to improve performance
 	 * @throws ReflectionException
+	 * @throws Exception
 	 */
 	public function __construct($isNew = true, $fetchProperties = [], $readOnly = false) {
 		$this->isNew = $isNew;
@@ -145,6 +153,11 @@ abstract class Property extends Model {
 		return $this->readOnly;
 	}
 
+	/**
+	 * When properties have default values in the model they are overwritten by the database defaults. We change them back
+	 * here so the modification is tracked and it will be saved.
+	 * @var array
+	 */
 	private $defaults = [];
 
   /**
@@ -605,12 +618,15 @@ abstract class Property extends Model {
 
 	private static $findCache = [];
 
-  /**
-   * Find entities
-   *
-   * @return static|Query
-   * @throws Exception
-   */
+	/**
+	 * Find entities
+	 *
+	 * @param array $fetchProperties
+	 * @param bool $readOnly
+	 * @return static|Query
+	 * @throws ReflectionException
+	 * @throws Exception
+	 */
 	protected static function internalFind(array $fetchProperties = [], $readOnly = false) {
 
 		$cacheKey = static::class . '-' . implode("-", $fetchProperties);
@@ -1931,28 +1947,30 @@ abstract class Property extends Model {
 	protected function patch(Relation $relation, $propName, $value) {
 		$old = $this->$propName;
 		$this->$propName = [];
-		foreach($value as $id => $patch) {
-			if(!isset($patch) || $patch === false) {
-				if(!array_key_exists($id, $old)) {
-					go()->warn("Key $id does not exist in ". static::class .'->'.$propName);
-				}				
-				continue;
-			}
-			if(is_array($old) && isset($old[$id])) {
-				$this->$propName[$id] = $old[$id];
-				if(is_array($patch)) { //may be given as bool
-					$this->$propName[$id]->setValues($patch);
+		if(isset($value)) {
+			foreach ($value as $id => $patch) {
+				if (!isset($patch) || $patch === false) {
+					if (!array_key_exists($id, $old)) {
+						go()->warn("Key $id does not exist in " . static::class . '->' . $propName);
+					}
+					continue;
 				}
-			} else {
+				if (is_array($old) && isset($old[$id])) {
+					$this->$propName[$id] = $old[$id];
+					if (is_array($patch)) { //may be given as bool
+						$this->$propName[$id]->setValues($patch);
+					}
+				} else {
 
-				$this->$propName[$id] = $this->internalNormalizeRelation($relation, $patch);	
+					$this->$propName[$id] = $this->internalNormalizeRelation($relation, $patch);
 
-				if(is_bool($patch)) {
-				// if($relation->type == Relation::TYPE_MAP) {
-					//Only change key to values when using booleans. Key can also be made up by the client.
-					foreach($this->mapKeyToValues($id, $relation) as $key => $value) {
-						$this->$propName[$id]->$key = $value;
-					}				
+					if (is_bool($patch)) {
+						// if($relation->type == Relation::TYPE_MAP) {
+						//Only change key to values when using booleans. Key can also be made up by the client.
+						foreach ($this->mapKeyToValues($id, $relation) as $key => $value) {
+							$this->$propName[$id]->$key = $value;
+						}
+					}
 				}
 			}
 		}

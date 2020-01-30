@@ -1,57 +1,53 @@
-#paper { display:none;} 
- @media print {
-	@page {
-		margin: 10mm;
-		size: A4;// portrait;
-	}
-	@page landscape {
-		size: A4 landscape;
-	}
-	body,html {
-		background-color:transparent;
-		font-size: 100%;
-		margin:0;
-		padding:0;
-		overflow:visible !important;
-		//max-height: 297mm;
-		max-width: 210mm;
-	}
-	body *, html body * > * {
-		visibility: hidden !important;
-		box-sizing: border-box;
-		//max-height: 297mm;
-  	}
+#paper {
+  display: none;
+}
 
-	 .go-main-tab-panel, #mainNorthPanel{
-		 display: none !important;
-		 overflow: hidden !important;
-	 }
-  	#paper, #paper *, html body #paper * {
-		page-break-after: auto;
-		// page-break-after: always;
-		// page-break-inside: avoid;
-		visibility: visible !important;
-  	}
-  	#paper {
-		display:block !important;
-		overflow:visible !important;
-		position:absolute !important;
-		box-shadow: none !important;
-		top:0;
-		left:0;
-		// bottom:0;
-		right:0;
-		padding:0 !important;
-		margin: 0 !important;
-		//-webkit-print-color-adjust: exact; // turn this on to print background-color as well
-	}
-	table {
-		border-collapse: collapse;
-	}
-	td,th {
-		padding: 0 dp(8);
-	}
-	th {
-		font-weight: bold;
-	}
+@media print {
+  @page {
+    margin: 10mm;
+    size: auto;// portrait;
+  }
+
+  body, html {
+    background-color: transparent;
+    font-size: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: visible !important;
+  }
+
+  html > body {
+    margin: 0mm !important;
+    height: auto !important;
+  }
+
+  body > * {
+    display: none !important;
+  }
+
+  .go-main-tab-panel, #mainNorthPanel, .go-search-panel {
+    display: none !important;
+    overflow: hidden !important;
+  }
+
+  #paper {
+    display: block !important;
+    overflow: visible !important;
+    position: absolute !important;
+    box-shadow: none !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  table {
+    border-collapse: collapse;
+  }
+  td, th {
+    padding: 0 dp(8);
+  }
+  th {
+    font-weight: bold;
+  }
 }

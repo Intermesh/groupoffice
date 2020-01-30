@@ -56,7 +56,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			})
 		];
 		
-		this.browseBtn.on('close', function(btn, folderId) {
+		this.browseBtn.on('closefilebrowser', function(btn, folderId) {
 			this.folderId = folderId;
 			this.store.load({
 				params: {

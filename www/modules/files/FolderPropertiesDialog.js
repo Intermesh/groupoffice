@@ -80,7 +80,9 @@ GO.files.FolderPropertiesDialog = function(config){
 					name: 'share',
 					listeners: {
 						check: function(cb, checked) {
-							this.save(false);
+							if(!this.suspendCheckEvent) {
+								this.save(false);
+							}
 						},
 						scope:this
 					},
@@ -205,6 +207,7 @@ GO.files.FolderPropertiesDialog = function(config){
 			notifyRecursive:false
 		}
 	});
+
 	GO.files.FolderPropertiesDialog.superclass.constructor.call(this,{
 		title:t("Properties"),
 		layout:'fit',
@@ -248,6 +251,8 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 		this.formPanel.baseParams.recursiveApplyCustomFieldCategories=false;
 		if(!this.rendered)
 			this.render(Ext.getBody());
+
+		this.suspendCheckEvent = true;
 		
 		this.formPanel.form.load({
 			url: GO.url('files/folder/load'),
@@ -274,6 +279,9 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 				GO.dialog.TabbedFormDialog.prototype.setRemoteComboTexts.call(this, action);
 				
 				GO.files.FolderPropertiesDialog.superclass.show.call(this);
+
+
+				this.suspendCheckEvent = false;
 			},
 			failure: function(form, action) {
 				if(action.result.exceptionClass === 'GO\\Base\\Exception\\AccessDenied') {

@@ -65,21 +65,27 @@ class Debugger {
 	
 	public function __construct() {
 		try {
-			$this->enabled = !empty(go()->getConfig()['core']['general']['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug');
-			
-			if($this->enabled && go()->getConfig()['core']['general']['debugLog']) {
-				$logFile = go()->getDataFolder()->getFile('log/debug.log');
-				if($logFile->isWritable()) {
-					if(!$logFile->exists()) {
-						$logFile->touch(true);
-					}
-					$this->logPath = $logFile->getPath();				
-					$this->logFp = $logFile->open('a+');
-				}
+			if(!empty(go()->getConfig()['core']['general']['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug')) {
+				$this->enable();
 			}
+
 		} catch (\go\core\exception\ConfigurationException $e) {
 			//GO is not configured / installed yet.
 			$this->enabled = true;
+		}
+	}
+
+	public function enable() {
+		$this->enabled = true;
+		if(go()->getConfig()['core']['general']['debugLog']) {
+			$logFile = go()->getDataFolder()->getFile('log/debug.log');
+			if($logFile->isWritable()) {
+				if(!$logFile->exists()) {
+					$logFile->touch(true);
+				}
+				$this->logPath = $logFile->getPath();
+				$this->logFp = $logFile->open('a+');
+			}
 		}
 	}
 
@@ -193,7 +199,7 @@ class Debugger {
 		}
 		
 		if(empty($caller['class'])) {			
-			$caller['class'] = $lastCaller['class'];
+			$caller['class'] = $lastCaller['class'] ?? "none";
 		}
 		
 		if(!isset($lastCaller['line'])) {

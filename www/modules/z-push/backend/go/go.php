@@ -305,6 +305,26 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		return $backend->MeetingResponse($requestid, $this->GetBackendFolder($folderid), $error);
 	}
 
+
+	/**
+	 * Deletes all contents of the specified folder.
+	 * This is generally used to empty the trash (wastebasked), but could also be used on any
+	 * other folder.
+	 *
+	 * @param string        $folderid
+	 * @param boolean       $includeSubfolders      (opt) also delete sub folders, default true
+	 *
+	 * @access public
+	 * @return boolean
+	 * @throws StatusException
+	 */
+	public function EmptyFolder($folderid, $includeSubfolders = true) {
+		$backend = $this->GetBackend($folderid);
+		if($backend === false)
+			return false;
+		return $backend->EmptyFolder($this->GetBackendFolder($folderid), $includeSubfolders);
+	}
+
 	/**
 	 * Returns the content of the named attachment as stream.
 	 * There is no way to tell which backend the attachment is from, so we try them all
@@ -426,7 +446,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 			}
 		}
 		
-//		ZLog::Write(LOGLEVEL_DEBUG, var_export($ha, true));
+		//ZLog::Write(LOGLEVEL_DEBUG, var_export($ha, true));
 
 		ZLog::Write(LOGLEVEL_DEBUG, "Combined->GetHierarchy() success");
 		return $ha;

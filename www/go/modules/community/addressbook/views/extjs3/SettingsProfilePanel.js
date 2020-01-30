@@ -46,9 +46,15 @@ go.modules.community.addressbook.SettingsProfilePanel = Ext.extend(Ext.Panel, {
 								entityStore: "Contact",
 								displayField: "name",
 								valueField: 'id',
-								storeBaseParams: {
-									filter: {
-										isOrganization: true
+								comboStoreConfig: {
+									sortInfo: {
+										field: 'name',
+										direction: 'ASC'
+									},
+									filters:  {
+										defaults: {
+											isOrganization: true
+										}
 									}
 								},
 								name: "organizationIds",

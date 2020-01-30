@@ -219,6 +219,17 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'vatNo'
 				},
 				{
+					id: 'phoneNumbers',
+					header: t('Phone numbers'),
+					sortable: false,
+					dataIndex: "phoneNumbers",
+					width: dp(300),
+					hidden: true,
+					renderer: function (phoneNumbers, meta, record) {
+						return phoneNumbers.column("number").join(", ");
+					}
+				},
+				{
 					id: 'emailAddresses',
 					header: t('E-mail addresses'),
 					sortable: false,
@@ -262,6 +273,22 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 		
 
 		go.modules.community.addressbook.ContactGrid.superclass.initComponent.call(this);
+	},
+
+	applyState: function(state) {
+
+		this.supr().applyState.call(this, state);
+
+		var sort = this.store.getSortState();
+		if(!sort) {
+			return;
+		}
+
+		// If user changed sort preference in my account then change the saved sort state
+		if((sort.field == 'name' || sort.field == 'lastName') && go.User.addressBookSettings.sortBy != sort.field) {
+			this.store.setDefaultSort(go.User.addressBookSettings.sortBy, sort.direction);
+		}
+
 	},
 	
 

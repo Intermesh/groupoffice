@@ -2,9 +2,13 @@
 
 remove folders when uninstalling module. Error when reinstalling
 
-Assitant to handle mailto: links on system
-Drag and drop files and folders to upload
+- Assitant to handle mailto: links on system
+- Drag and drop files and folders to upload
+- riot matrix synapse integration
+- csv export select columns
+- never respond to email read requests option
 
+- logo blob stale gc?
 
 Batch edit custom fields not possible
 Disabled categories for:  folder dialog Folder::deriveCustomfieldSettings

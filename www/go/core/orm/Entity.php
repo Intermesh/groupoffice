@@ -614,12 +614,10 @@ abstract class Entity extends Property {
 		*/
 		$filters->add("link", function(Criteria $criteria, $value, Query $query) {
 			$linkAlias = 'link_' . uniqid();
-			$on = $query->getTableAlias() . '.id =  '.$linkAlias.'.toId  AND '.$linkAlias.'.toEntityTypeId = ' . static::entityType()->getId();
-			
-				
-			$query->join('core_link', $linkAlias, $on); 
+			$on = $query->getTableAlias() . '.id =  '.$linkAlias.'.toId  AND '.$linkAlias.'.toEntityTypeId = ' . static::entityType()->getId().' AND ' . $linkAlias . '.fromEntityTypeId = ' .  EntityType::findByName($value['entity'])->getId();
 
-			$criteria->andWhere('fromEntityTypeId', '=', EntityType::findByName($value['entity'])->getId());
+			$query->join('core_link', $linkAlias, $on, "LEFT");
+			$criteria->where('toId', '!=', null);
 
 			if(!empty($value['id'])) {
 				$criteria->andWhere('fromId', '=', $value['id']);
@@ -852,7 +850,7 @@ abstract class Entity extends Property {
 	/**
 	 * Check database integrity
    *
-   * @throws
+   * @throws Exception
 	 */
 	public static function check() {
 		echo "Checking ".static::class."\n";
@@ -872,6 +870,54 @@ abstract class Entity extends Property {
 		echo "Done\n";
 	}
 
+
+	/**
+	 * Merge a single property.
+	 *
+	 * Can be overridden to handle specific merge logic.
+	 *
+	 * @param static $entity
+	 * @param string $name
+	 * @param array $p
+	 * @throws Exception
+	 */
+	protected function mergeProp($entity, $name, $p) {
+		$col = static::getMapping()->getColumn($name);
+		if(!isset($p['access']) || ($col && $col->autoIncrement == true)) {
+			return;
+		}
+		if(empty($entity->$name)) {
+			return;
+		}
+		if(!empty($this->$name) && is_array($this->$name)) {
+			$relation = static::getMapping()->getRelation($name);
+
+			$type = $relation ? $relation->type : null;
+			switch($type) {
+				case Relation::TYPE_MAP:
+				case Relation::TYPE_HAS_ONE:
+					$this->$name = array_replace($this->$name, $entity->$name);
+					break;
+
+				case Relation::TYPE_SCALAR:
+					$this->$name = array_unique(array_merge($this->$name, $entity->$name));
+					break;
+
+				case Relation::TYPE_ARRAY:
+					$this->$name = array_merge($this->$name, $entity->$name);
+					break;
+
+				default:
+					$this->$name = array_merge($this->$name, $entity->$name);
+
+					break;
+			}
+
+		} else{
+			$this->$name = $entity->$name;
+		}
+	}
+
   /**
    * Merge this entity with another
    *
@@ -888,16 +934,7 @@ abstract class Entity extends Property {
 		//copy public and protected columns except for auto increments.
 		$props = $this->getApiProperties();
 		foreach($props as $name => $p) {
-			$col = static::getMapping()->getColumn($name);
-			if(isset($p['access']) && (!$col || $col->autoIncrement == false)) {
-				if(!empty($entity->$name)) {
-					if(is_array($this->$name)) {
-						$this->$name = array_merge($this->$name, $entity->$name);
-					} else{
-						$this->$name = $entity->$name;
-					}					
-				}
-			}
+			$this->mergeProp($entity, $name, $p);
 		}
 
 		if(method_exists($this, 'getCustomFields')) {

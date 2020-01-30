@@ -55,10 +55,10 @@ GO.calendar.SummaryGroupPanel = function(config)
 		remoteSort:true
 	});
 
-	config.store.on('load', function(){
-		//do layout on Startpage
-		this.ownerCt.ownerCt.ownerCt.doLayout();
-	}, this);
+	// config.store.on('load', function(){
+	// 	//do layout on Startpage
+	// 	this.ownerCt.ownerCt.ownerCt.doLayout();
+	// }, this);
 
 	config.paging=false,			
 	config.autoExpandColumn='summary-calendar-name-heading';

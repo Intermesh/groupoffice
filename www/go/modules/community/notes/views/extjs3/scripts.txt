@@ -8,3 +8,4 @@ NoteBookDialog.js
 NoteDialog.js
 Decrypt.js
 SettingsPanel.js
+Decrypter.js

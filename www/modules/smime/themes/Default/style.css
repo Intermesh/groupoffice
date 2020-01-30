@@ -21,14 +21,20 @@
 .smi-valid{
 	background:url(images/valid.png) no-repeat;
 	padding:0px 0px 10px 20px;
+	font-size: 16px;
+	line-height: 16px;
 }
 
 .smi-invalid{
 	background:url(images/invalid.png) no-repeat;
 	padding:0px 0px 10px 20px;
+	font-size: 16px;
+	line-height: 16px;
 }
 
 .smi-certemailmismatch{
 	background:url(images/certemailmismatch.png) no-repeat;
 	padding:0px 0px 10px 20px;
+	font-size: 16px;
+	line-height: 16px;
 }

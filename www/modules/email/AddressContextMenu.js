@@ -188,11 +188,11 @@ Ext.extend(GO.email.AddressContextMenu, Ext.menu.Menu,{
 		this.address = address || '';
 		this.personal= personal || '';
 		
-		this.store.baseParams.filter.email = this.address;
+		this.store.setFilter("email", {email: this.address});
 		this.store.load();
 		
 		GO.email.AddressContextMenu.superclass.showAt.call(this, xy);
-	}	,
+	},
 	
 	updateMenu: function () {
 

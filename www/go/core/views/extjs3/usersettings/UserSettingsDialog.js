@@ -51,7 +51,6 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		this.tabPanel = new Ext.TabPanel({
 			headerCfg: {cls:'x-hide-display'},
-			//layout: "card",
 			anchor: '100% 100%',
 			items: []
 		});

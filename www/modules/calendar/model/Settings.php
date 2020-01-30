@@ -58,5 +58,13 @@ class Settings extends \GO\Base\Model\AbstractUserDefaultModel{
 				'calendar' => array('type'=>self::BELONGS_TO, 'model'=>'GO\Calendar\Model\Calendar', 'field'=>'calendar_id')
 		);
 	}
-	
+
+	protected function beforeValidate()
+	{
+		if(!$this->calendar || $this->calendar->user_id != $this->user_id) {
+			$this->setValidationError('calendar_id', "Invalid default calendar, You must be owner.");
+		}
+		return parent::beforeValidate();
+	}
+
 }

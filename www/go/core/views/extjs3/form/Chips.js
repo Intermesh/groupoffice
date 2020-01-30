@@ -12,11 +12,13 @@
 				entityStore: "Contact",
 				displayField: "name",
 				name: "addressBooks",
-				storeBaseParams: { //Optional base params
-					filter: {
-						isOrganization: true
-					}
-				},
+			 comboStoreConfig: {
+						filters: {
+							defaults: {
+								permissionLevel: go.permissionLevels.write
+							}
+						}
+					},
 				fieldLabel: t("Organization")
 			}
  * 
@@ -47,7 +49,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	store: null,
 	autoHeight: true,
 	storeBaseParams: null,
-	comboConfig: null,
+	comboStoreConfig: null,
 	allowBlank: true,
 	
 	initComponent: function () {
@@ -79,7 +81,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	
 		this.dataView.store.on("add", function(store, records) {
 			if(this.entityStore) {
-				this.comboStore.baseParams.filter.exclude = this.dataView.store.getRange().column(this.valueField);				
+				this.comboStore.patchFilter('chips', {exclude: this.dataView.store.getRange().column(this.valueField)});
 			}
 
 			if(this.map) {
@@ -93,7 +95,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		}, this);
 		this.dataView.store.on("remove", function(store, record) {
 			if(this.entityStore) {
-				this.comboStore.baseParams.filter.exclude = this.dataView.store.getRange().column(this.valueField);							
+				this.comboStore.patchFilter('chips', {exclude: this.dataView.store.getRange().column(this.valueField)});
 			} 
 			this.comboStore.add([record]);
 			this._isDirty = true;
@@ -204,15 +206,10 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		
 		if(this.entityStore){
 
-
-			var cfg = this.comboConfig || {};
+			var cfg = this.comboStoreConfig || {};
 			if(!cfg.baseParams) {
-				cfg.baseParams = this.storeBaseParams || {filter: {}}
+				cfg.baseParams = this.storeBaseParams || {};
 			}
-			if(!cfg.baseParams.filter) {
-				cfg.baseParams.filter = {};
-			}
-			cfg.baseParams.filter.exclude = [];
 
 			this.comboStore = new go.data.Store(Ext.apply(cfg, {
 				fields: [this.valueField, this.displayField],
@@ -263,9 +260,10 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			if(this.entityStore && !record.data[this.valueField]) {
 				this.createNew(record);
 			} else{
-				this.dataView.store.add([record]);			
+				this.dataView.store.add([record]);
 			}
-			combo.reset();			
+			combo.reset();
+
 		}, this);
 
 		if(this.allowNew) {
@@ -301,10 +299,9 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	 this.entityStore.set({
 			create: create
 		}).then(function(response) {
-			record.id = response.created.newid.id;
-			record.set(id, record.id);
+			record.id = record.data. id = response.created.newid.id;
 			me.dataView.store.add([record]);	
-			me.comboBox.reset();		
+			me.comboBox.reset();
 		});
 	},
 

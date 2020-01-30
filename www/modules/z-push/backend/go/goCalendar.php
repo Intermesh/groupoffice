@@ -647,6 +647,10 @@ class goCalendar extends GoBaseBackendDiff {
 	 */
 	public function GetFolder($id) {
 
+		if ($id != BackendGoConfig::CALENDARBACKENDFOLDER) {
+			return false;
+		}
+
 		$folder = new SyncFolder();
 		$folder->serverid = $id;
 		$folder->parentid = "0";

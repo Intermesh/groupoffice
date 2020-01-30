@@ -8,6 +8,9 @@ use go\modules\community\serverclient\model\MailDomain;
 use go\modules\community\serverclient\Module as GoModule;
 
 class UserCsv extends Csv {
+
+	public static $excludeHeaders = ['syncSettings', 'taskSettings', 'notesSettings', 'addressBookSettings', 'calendarSettings', 'emailSettings', 'googleauthenticator', 'workingWeek'];
+
   protected function init()
   {
     parent::init();

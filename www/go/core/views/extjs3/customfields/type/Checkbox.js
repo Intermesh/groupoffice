@@ -40,7 +40,7 @@ go.customfields.type.Checkbox = Ext.extend(go.customfields.type.Text, {
 		var config = go.customfields.type.Number.superclass.createFormFieldConfig.call(this, customfield, config);
 
 		delete config.anchor;
-		config.xtype = "checkbox";
+		config.xtype = "xcheckbox";
 		config.boxLabel = config.fieldLabel;
 		config.hideLabel = true;
 		config.checked = !!customfield.default;

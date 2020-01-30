@@ -14,7 +14,8 @@ use go\core\db\Table;
 use go\core\event\EventEmitterTrait;
 use go\core\event\Listeners;
 use go\core\exception\ConfigurationException;
-use go\core\fs\Folder;
+	use go\core\fs\Blob;
+	use go\core\fs\Folder;
 use go\core\jmap\Request;
 use go\core\jmap\State;
 use go\core\mail\Mailer;
@@ -169,19 +170,21 @@ use const GO_CONFIG_FILE;
 
 		/**
 		 * Get the data folder
-		 * 
+		 *
 		 * @return Folder
+		 * @throws ConfigurationException
 		 */
 		public function getDataFolder() {
 			return new Folder($this->getConfig()['core']['general']['dataPath']);
 		}
 
 		private $storageQuota;
-		
+
 		/**
 		 * Get total space of the data folder in bytes
-		 * 
+		 *
 		 * @return float
+		 * @throws ConfigurationException
 		 */
 		public function getStorageQuota() {
 			if(!isset($this->storageQuota)) {
@@ -201,11 +204,12 @@ use const GO_CONFIG_FILE;
 		}		
 
 		private $storageFreeSpace;
-		
+
 		/**
 		 * Get free space in bytes
-		 * 
+		 *
 		 * @return float
+		 * @throws ConfigurationException
 		 */
 		public function getStorageFreeSpace() {
 			if(!isset($this->storageFreeSpace)) {
@@ -230,8 +234,9 @@ use const GO_CONFIG_FILE;
 
 		/**
 		 * Get the temporary files folder
-		 * 
+		 *
 		 * @return Folder
+		 * @throws ConfigurationException
 		 */
 		public function getTmpFolder() {
 			return new Folder($this->getConfig()['core']['general']['tmpPath']);
@@ -453,8 +458,9 @@ use const GO_CONFIG_FILE;
 
 		/**
 		 * Get a simple key value caching object
-		 * 
+		 *
 		 * @return Cache\Apcu
+		 * @throws ConfigurationException
 		 */
 		public function getCache() {
 			if (!isset($this->cache)) {				
@@ -464,16 +470,17 @@ use const GO_CONFIG_FILE;
 			}
 			return $this->cache;
 		}
-		
-		
+
+
 		/**
 		 * Get a module
-		 * 
+		 *
 		 * return the module if it's installed and available.
-		 * 
+		 *
 		 * @param string $package Set to null for legacy modules
 		 * @param string $name
 		 * @return \go\core\model\Module
+		 * @throws Exception
 		 */
 		public function getModule($package, $name) {
 			$model = \go\core\model\Module::find()->where(['package' => $package, 'name' => $name, 'enabled' => true])->single();
@@ -749,7 +756,25 @@ use const GO_CONFIG_FILE;
 			}
 			$file->output(true, true, ['Content-Disposition' => 'inline; filename="module.svg"']);
 		}
+
+
+		/**
+		 * Display's logo without authentication via /api/page.php/core/logo
+		 * @throws Exception
+		 */
+		public function pageLogo() {
+			$blob = Blob::findById(App::get()->getSettings()->logoId);
+
+			if (!$blob) {
+				echo "Not found";
+				http_response_code(404);
+				exit();
+			}
+
+			$blob->output(true);
+		}
 	}
+
 }
 
 namespace {

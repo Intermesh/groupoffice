@@ -27,12 +27,6 @@ GO.tasks.SimpleTasksPanel = function (config)
 		remoteSort: true
 	});
 
-	config.store.on('load', function () {
-		//do layout on Startpage
-		if (this.rendered)
-			this.ownerCt.ownerCt.ownerCt.doLayout();
-	}, this);
-
 	var checkColumn = new GO.grid.CheckColumn({
 		dataIndex: 'completed',
 		header: '<div class="tasks-complete-icon"></div>'

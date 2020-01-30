@@ -2260,7 +2260,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$tmpFolder = \GO\Base\Fs\Folder::tempFolder(uniqid(time()));
 		$atts = $message->getAttachments();
 		while($att=array_shift($atts)){
-			if($att->disposition == 'attachment') {
+			if($att->disposition == 'attachment' || empty($att->content_id)) {
 				$att->saveToFile($tmpFolder);
 			}
 		}

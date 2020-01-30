@@ -13,20 +13,25 @@ $funcParams = isset($p) ? $p : '';
 <head>
 <title><?php echo \GO::config()->product_name; ?></title>
 <script type="text/javascript">
+
+	window.name = "go_launcher";
 function launchGO(){
-	//var win = window.open('', "groupoffice");
-	
+	// var win = window.open('', "groupoffice");
+
+	console.warn(window.name);
 	var win = window.open('', "<?php echo \GO::getId(); ?>");
-	
 
-
-	if(win.GO && win.GO.<?php echo $module; ?>)
+	if(win && win.GO && win.GO.<?php echo $module; ?>)
 	{
 		win.GO.<?php echo $module; ?>.<?php echo $function; ?>.call(this, <?php echo json_encode($funcParams); ?>);
-		self.close();
+		win.focus();
 	}else
 	{
-		win.close();
+
+	     if(!win || win.closed || win.closed == 'undefined') {
+           alert("Your browser is blocking popups. Please allow this site to create a popups.");
+           win = self;
+        }
 		//the parameters will be handled in default_scripts.inc.php
 		<?php
 		\GO::setAfterLoginUrl(\GO::createExternalUrl($module,$function, $funcParams, true));
@@ -35,7 +40,7 @@ function launchGO(){
 	}
 
 	//self.close();
-	//win.focus();
+	win.focus();
 
 }
 </script>

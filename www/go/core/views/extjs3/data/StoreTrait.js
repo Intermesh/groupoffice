@@ -17,9 +17,9 @@ go.data.StoreTrait = {
 			this.baseParams = {};
 		}
 		
-		if(!this.baseParams.filter) {
-			this.baseParams.filter = {};
-		}		
+		// if(!this.baseParams.filter) {
+		// 	this.baseParams.filter = {};
+		// }
 		
 		if(this.entityStore) {			
 			this.initEntityStore();
@@ -138,7 +138,7 @@ go.data.StoreTrait = {
 	 * @param {*} destroyed 
 	 */
 	onRelationChanges : function(entityStore, added, changed, destroyed) {
-		if(!this.proxy.watchRelations[entityStore.entity.name]) {
+		if(!this.proxy.watchRelations[entityStore.entity.name] || !this.lastOptions) {
 			return;
 		}
 
@@ -198,12 +198,27 @@ go.data.StoreTrait = {
 	removeById : function(id) {
 		this.remove(this.getById(id));
   },
+
+	/**
+	 * Same as set filter but keeps existing filter values if set
+	 *
+	 * @param cmpId
+	 * @param filter
+	 * @returns {go.data.StoreTrait}
+	 */
+	patchFilter : function(cmpId, filter) {
+		var f = this.getFilter(cmpId);
+		if(!f) {
+			f = {};
+		}
+		return this.setFilter(cmpId, Ext.apply(f, filter));
+	},
   
   /**
 	 * Set a filter object for a component
 	 * 
 	 * @param {string} cmpId
-	 * @param {object} filter
+	 * @param {object} filter if null is given it's removed
 	 * @returns {this}
 	 */
 	setFilter : function(cmpId, filter) {
@@ -213,14 +228,25 @@ go.data.StoreTrait = {
 		{
 			this.filters[cmpId] = filter;
 		}		
-		
-		this.baseParams.filter = {
-			operator: "AND",
-			conditions: []
-		};
-		
+
+		var conditions = [];
 		for(var cmpId in this.filters) {
-			this.baseParams.filter.conditions.push(this.filters[cmpId]);
+			conditions.push(this.filters[cmpId]);
+		}
+
+		switch(conditions.length) {
+			case 0:
+				delete this.baseParams.filter;
+				break;
+			case 1:
+				this.baseParams.filter = conditions[0];
+				break;
+			default:
+				this.baseParams.filter = {
+					operator: "AND",
+					conditions: conditions
+				};
+				break;
 		}
 		
 		return this;

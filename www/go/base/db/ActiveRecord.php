@@ -2458,7 +2458,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	public function getAttributeSelection($attributeNames, $outputType='formatted'){
 		$att=array();
 		foreach($attributeNames as $attName){
-			if(isset($this->columns[$attName])){
+			if(substr($attName, 0, 13) === 'customFields.') {
+				$att[$attName]=$this->getCustomFields()[substr($attName, 13)] ?? null;
+			}else if(isset($this->columns[$attName])){
 				$att[$attName]=$this->getAttribute($attName, $outputType);
 			}elseif($this->hasAttribute($attName)){
 				$att[$attName]=$this->$attName;
@@ -4414,7 +4416,17 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$isSearchCacheModel = ($this instanceof \GO\Base\Model\SearchCacheRecord);
 
-		if(!$this->hasLinks() && !$isSearchCacheModel)
+		$disableLinksFor = GO::config()->disable_links_for ? GO::config()->disable_links_for : array();
+		if (!is_array($disableLinksFor)) {
+			$disableLinksFor = [$disableLinksFor];
+		}
+
+		$linksDisabled = false;
+		if (in_array(self::className(), $disableLinksFor, true) || in_array(get_class($model), $disableLinksFor, true)) {
+			$linksDisabled = true;
+		}
+
+		if((!$this->hasLinks() && !$isSearchCacheModel) || $linksDisabled)
 			throw new \Exception("Links not supported by ".$this->className ());
 
 		if($this->linkExists($model))
@@ -4711,7 +4723,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		echo "Checking ".(is_array($this->pk)?implode(',',$this->pk):$this->pk)." ".$this->className()."\n";
 		flush();
 
-		if($this->aclField() && !$this->isJoinedAclField){
+		if($this->aclField() && (!$this->isJoinedAclField || $this instanceof GO\Files\Model\Folder)){
 
 			$acl = $this->acl;
 			if(!$acl)

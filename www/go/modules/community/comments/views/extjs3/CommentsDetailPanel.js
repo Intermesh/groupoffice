@@ -19,6 +19,9 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	stateId: "comments-detail",
 	initComponent: function () {
 
+		this.on('destroy', function() {
+			this.store.destroy();
+		}, this);
 
 		this.on("expand", function() {
 			this.updateView();
@@ -135,10 +138,11 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	},
 		
 	updateView : function(o) {
-		if(!this.commentsContainer.rendered) {
+		if(this.collapsed || !this.commentsContainer.rendered) {
 			return;
 		}
 		o = o || {};
+
 		this.composer.textField.setValue('');
 		var prevStr;
 		var initScrollHeight = (this.store.getCount() == this.commentsContainer.pageSize) ? 0 : this.commentsContainer.getEl().dom.scrollHeight,

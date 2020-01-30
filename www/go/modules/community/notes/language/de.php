@@ -18,4 +18,5 @@ return array (
   'Note book' => 'Notizbuch',
   'Default note book' => 'Standard Notizbuch',
   'Filters' => 'Filter',
+  'Has links to...' => 'Hat Verknüpfungen mit…',
 );

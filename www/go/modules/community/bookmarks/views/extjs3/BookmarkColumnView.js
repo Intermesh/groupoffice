@@ -55,7 +55,7 @@ go.modules.community.bookmarks.BookmarkColumnView = Ext.extend(Ext.DataView,{
 			trackOver:true,
 			overClass:'x-view-over',
 			itemSelector:'.link',
-			emptyText: t("noEmployeesToDisplay")
+			emptyText: t("No items to display")
 			,
 			listeners: {
 				contextmenu: function(dv, index, node, e){

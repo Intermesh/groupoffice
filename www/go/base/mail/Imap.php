@@ -3,6 +3,8 @@
 namespace GO\Base\Mail;
 
 
+use go\core\ErrorHandler;
+
 class Imap extends ImapBodyStruct {
 
 	const SORT_NAME='NAME';
@@ -130,7 +132,7 @@ class Imap extends ImapBodyStruct {
 		$remote = $this->ssl ? 'ssl://' : '';			
 		$remote .=  $this->server.":".$this->port;
 
-		$this->handle = @stream_socket_client($remote, $errorno, $errorstr, 10, STREAM_CLIENT_CONNECT, $streamContext);
+		$this->handle = stream_socket_client($remote, $errorno, $errorstr, 10, STREAM_CLIENT_CONNECT, $streamContext);
 		if (!is_resource($this->handle)) {
 			throw new \Exception('Failed to open socket #'.$errorno.'. '.$errorstr);
 		}
@@ -1709,20 +1711,42 @@ class Imap extends ImapBodyStruct {
 		if(!$status) {
 			return false;
 		}
+
+		//remove status response
+		array_pop($res);
 		
 		$data = [];
 		
 		foreach($res as $message) {
 			//UID 17 FLAGS ( \Flagged \Seen ) INTERNALDATE 24-May-2018 13:02:43 +0000
-			
-			if(preg_match('/UID ([0-9]+) FLAGS \((.*)\) INTERNALDATE ([^\)]+)/', $message, $matches)) {
-				
-				$data[] = [
-						'uid' => (int) $matches[1],
-						'flags' => array_map('trim', explode(' ', trim($matches[2]))),
-						'date' => trim($matches[3])
-				];
+
+			//or different order!
+			// l * 2 FETCH ( UID 2 INTERNALDATE 30-Jan-2020 11:20:06 +0000 FLAGS ( \Seen ) )
+
+			if(preg_match('/UID ([0-9]+)/', $message, $uidMatches)) {
+				$uid = (int) $uidMatches[1];
+			} else{
+				return false;
 			}
+
+			if(preg_match('/FLAGS \((.*)\)/', $message, $flagMatches)) {
+				$flags = $flagMatches[1];
+			}else{
+				return false;
+			}
+
+			if(preg_match('/INTERNALDATE ([^\s\)]+ [^\s\)]+ [^\s\)]+)/', $message, $dateMatches)) {
+				$date = $dateMatches[1];
+			}else{
+				return false;
+			}
+
+			$data[] = [
+				'uid' => $uid,
+				'flags' => $flags,
+				'date' => $date
+			];
+
 		}
 		
 		return $data;

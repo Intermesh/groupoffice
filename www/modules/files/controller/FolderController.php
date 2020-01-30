@@ -3,8 +3,9 @@
 
 namespace GO\Files\Controller;
 
+use Exception;
 use GO;
-
+use GO\Base\Exception\AccessDenied;
 
 class FolderController extends \GO\Base\Controller\AbstractModelController {
 
@@ -930,13 +931,17 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			$response['permission_level'] = 0;
 
 			foreach ($filesStmt as $searchFileModel) {
-					$response['results'][] = $searchFileModel->getJsonData();
+				$record = $searchFileModel->getAttributes();
+				$record['customFields'] = $searchFileModel->getCustomFields();
+				$record = $this->formatListRecord($record, $searchFileModel);
+				$record['name'] = $searchFileModel->path;
+				$response['results'][] = $record;
 			}
 
 			return $response;
 	}
         
-	public function formatListRecord($record, $model, $store) {
+	public function formatListRecord($record, $model) {
 
 		$record['path'] = $model->path;
 
@@ -1293,6 +1298,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$destinationFolder = \GO\Files\Model\Folder::model()->findByPk($params['destination_folder_id']);
 		$archiveFile = new \GO\Base\Fs\File(\GO::config()->file_storage_path.$destinationFolder->path . '/' . $params['archive_name'] . '.zip');
 		
+		if($destinationFolder->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)){
+			throw new AccessDenied();
+		}
+
 		if($archiveFile->exists())
 			throw new \Exception(sprintf(\GO::t("Filename %s already exists", "files"), $archiveFile->stripFileStoragePath()));
 		
@@ -1301,13 +1310,14 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			$path = \GO::config()->file_storage_path.$sources[$i];			
 			$sourceObjects[]=\GO\Base\Fs\Base::createFromPath($path);
 		}
-		
+
 		if(\GO\Base\Fs\Zip::create($archiveFile, $workingFolder->fsFolder, $sourceObjects)){
 			\GO\Files\Model\File::importFromFilesystem($archiveFile);
 			$response['success']=true;
 		}  else {
 			throw new \Exception("ZIP creation failed");
 		}
+
 
 		return $response;
 	}

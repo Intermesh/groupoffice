@@ -79,6 +79,7 @@ go.search.SearchField = Ext.extend(Ext.form.TriggerField,{
             break;
   
           case e.DOWN:
+            console.warn(e);
             if (this.panel.isVisible()) {
               this.panel.grid.getSelectionModel().selectRow(0);
               this.panel.grid.getView().focusRow(0);

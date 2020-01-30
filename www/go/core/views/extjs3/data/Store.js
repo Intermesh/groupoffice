@@ -18,6 +18,11 @@
  */
 go.data.Store = Ext.extend(Ext.data.JsonStore, {
 
+	/**
+	 * WIll autodestroy if the component it belongs too is detroyted
+	 *
+	 * WARNING: the component is responsible for handling this, If you have a custom component you must destroy it yourself.
+	 */
 	autoDestroy: true,
 	
 	autoSave: false,
@@ -82,7 +87,7 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	
 	destroy : function() {	
 		this.fireEvent('beforedestroy', this);
-		
+
 		go.data.Store.superclass.destroy.call(this);
 		
 		this.fireEvent('destroy', this);

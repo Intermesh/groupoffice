@@ -161,6 +161,7 @@ groups/GroupCombo.js
 groups/GroupModuleGrid.js
 groups/GroupMemberWindow.js
 
+users/UserGrid.js
 users/UserDefaultsWindow.js
 users/PermissionsDialog.js
 users/SystemSettingsUserGrid.js

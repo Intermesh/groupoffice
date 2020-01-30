@@ -44,5 +44,20 @@ go.modules.community.notes.NoteDialog = Ext.extend(go.form.Dialog, {
 		];
 
 		return items;
+	},
+
+	onLoad : function(entityValues) {
+		this.supr().onLoad.call(this, entityValues);
+
+		if (!entityValues.content || entityValues.content.substring(0, 8) !== "{GOCRYPT") {
+			return;
+		}
+
+		var data = entityValues.content, me = this;
+		me.setValues({"content": t("Encrypted data")});
+		go.modules.community.notes.Decrypter.decrypt(data).then(function(text) {
+			me.setValues({"content": text});
+		}).catch(function(){});
+
 	}
 });

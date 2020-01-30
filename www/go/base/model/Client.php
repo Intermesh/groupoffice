@@ -126,7 +126,9 @@ class Client extends GO\Base\Db\ActiveRecord {
 	}
 	
 	public function setFootPrintToCookie(){
-		Http::setCookie(self::$cookieName, $this->footprint, self::$cookieLifetime);
+		if(!headers_sent()) {
+			Http::setCookie(self::$cookieName, $this->footprint, self::$cookieLifetime);
+		}
 	}
 	
 	public static function getFootPrintFromCookie(){
@@ -137,7 +139,9 @@ class Client extends GO\Base\Db\ActiveRecord {
 	}
 	
 	public static function removeFootPrintFromCookie(){
-		return Http::unsetCookie(self::$cookieName);
+		if(!headers_sent()) {
+			return Http::unsetCookie(self::$cookieName);
+		}
 	}
 	
 	

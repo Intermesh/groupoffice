@@ -37,51 +37,15 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 		if (!this.data.content || this.data.content.substring(0, 8) !== "{GOCRYPT") {
 			return;
 		}
-		
-		var key = prompt("Enter password to decrypt");
 
-		if(this.data.content.substring(0, 9) === "{GOCRYPT}") {
+		var data = this.data.content, me = this;
+		this.data.content = t("Encrypted data");
+		go.modules.community.notes.Decrypter.decrypt(data).then(function(text) {
+			me.data.content = text;
+			me.items.item(0).onLoad(me);
+		}).catch(function(){});
 
-			var msg = window.atob(this.data.content.substring(9));
 
-			var iv = (msg.substring(0, 32));			 // extract iv
-			var body = (msg.substring(32, msg.length - 32));	 //extract ciphertext
-			var serialized = mcrypt.Decrypt(body, iv, key, "rijndael-256", "ctr");
-			//result should be a serialized sting by PHP
-			var match = serialized.match(/.*"([\s\S]*)"/);
-			if (!match) {
-				alert("Incorrect password!");
-				//this.data.content = "Encrypted text";
-				return;
-			}
-
-			this.data.content = Ext.util.Format.nl2br(match[1]);
-		} else
-		{
-			//new encryption
-			//this.data.content = "Decrypting...";
-			
-			go.Jmap.request({
-				method: "Note/decrypt",
-				params: {
-					id: this.data.id,
-					password: key
-				},
-				callback: function(options, success, response) {
-					if(success) {
-						console.log(response);
-						this.data.content = response.content;
-						
-						this.items.item(0).onLoad(this);
-					} else
-					{
-						Ext.MessageBox.alert(t("Error"), t("Invalid password"));
-					}
-				},
-				scope: this
-			});
-		}
-		
 	},
 
 	onLoad: function () {

@@ -59,7 +59,11 @@ class Field extends AclItemEntity {
 	 */
 	public $required;
 
-	public $requiredCondition;
+	public $relatedFieldCondition;
+
+	public $conditionallyRequired;
+
+	public $conditionallyHidden;
 	
 	/**
 	 * Hint text to display in the form

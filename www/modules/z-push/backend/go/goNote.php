@@ -184,6 +184,11 @@ class goNote extends GoBaseBackendDiff {
 	 */
 	public function GetFolder($id) {
 
+		if ($id != BackendGoConfig::NOTESBACKENDFOLDER) {
+			ZLog::Write(LOGLEVEL_WARN, "Note folder '$id' not found");
+			return false;
+		}
+
 		$folder = new SyncFolder();
 		$folder->serverid = $id;
 		$folder->parentid = "0";

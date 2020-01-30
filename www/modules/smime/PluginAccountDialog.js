@@ -39,13 +39,13 @@ GO.moduleManager.onModuleReady('email',function(){
 							xtype:'label',
 							html:t("To upload a new PKCS12 certificate you must enter your Group-Office password. The Group-Office password must be different than your PCSK12 certificate for security reasons. No password is also prohibited.", "smime"),
 							style:'display:block;margin-bottom:10px'
-						},{
-							xtype:'textfield',
-							fieldLabel:GO.settings.config.product_name+' '+t("Password"),
+						},
+						this.passwordField = new Ext.form.TextField({
+							fieldLabel:GO.settings.config.product_name + ' ' + t("Password"),
 							inputType:'password',
 							name:'smime_password',
 							width:200
-						},
+						}),
 						
 						this.uploadFile = new GO.form.UploadFile({
 							addText:t("Select new PKCS12 Certificate", "smime"),
@@ -88,10 +88,11 @@ GO.moduleManager.onModuleReady('email',function(){
 			}, this);
 								
 			this.propertiesPanel.form.on("actioncomplete", function(form, action){
-				console.log(action.result);
-				if(action.type=='submit'){
+				//console.log(action.result);
+				if(action.type=='submit') {
 					this.uploadFile.clearQueue();
-					
+					this.passwordField.setValue('');
+
 					// Ticket: 	#201408797
 					// Need to create the upload inputfield again. 
 					// Because otherwise the upload button doesn't work anymore when opening the dialog the 2nd time.
@@ -116,4 +117,4 @@ GO.moduleManager.onModuleReady('email',function(){
 		})
 	});
 });
-        
+

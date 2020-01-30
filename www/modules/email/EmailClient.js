@@ -1853,7 +1853,6 @@ GO.email.openFolderTree = function(id, folder_id, referenceItem) {
 			buttons:[{
 				text: t("Ok"),
 				handler: function(){
-
 					var selFiles = new Array();
 					var selNodes = GO.email.folderTree.getChecked();
 
@@ -1861,10 +1860,9 @@ GO.email.openFolderTree = function(id, folder_id, referenceItem) {
 						selFiles.push(node.attributes.path);
 					});
 
-					GO.email.emailFiles(
-						selFiles,
-						this.treeFileBrowser.referenceItem
-					);
+
+					GO.email.emailFiles(selFiles);
+
 					GO.email.treeFileBrowser.hide();
 				},
 				scope:this

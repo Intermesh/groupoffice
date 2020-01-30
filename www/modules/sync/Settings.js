@@ -32,16 +32,22 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 	
 	initComponent: function() {
 		
-		this.items = [new Ext.form.FieldSet({
-			title:'E-mail',
-			labelWidth: 170,
-			items: [
-				this.selectAccount = new GO.email.SelectAccount({
-					hidden: (!GO.settings.modules.email || !GO.settings.modules.email.read_permission),
-					hiddenName:'syncSettings.account_id'					
-				})
-			]})
-		];
+		this.items = [];
+
+		if(go.Modules.isAvailable("legacy", "email")) {
+			this.items.push(new Ext.form.FieldSet({
+				title:'E-mail',
+				labelWidth: 170,
+				items: [
+					this.selectAccount = new GO.email.SelectAccount({
+						hidden: (!GO.settings.modules.email || !GO.settings.modules.email.read_permission),
+						hiddenName:'syncSettings.account_id'
+					})
+				]}));
+
+			//Only writable accounts can be used for sync
+			this.selectAccount.store.baseParams.permissionLevel = go.permissionLevels.write;
+		}
 
 		var syncComponents = {calendar: 'Calendar',tasks: 'Tasklist'};
 		

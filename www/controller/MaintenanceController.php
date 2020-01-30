@@ -433,13 +433,13 @@ class MaintenanceController extends AbstractController {
 		}
 
 
-		$cf = new ClassFinder();
-		$entities = $cf->findByParent(Entity::class);
-
-		foreach($entities as $entity) {
-			echo "Checking ". $entity."\n";
-			$entity::check();
-		}
+//		$cf = new ClassFinder();
+//		$entities = $cf->findByParent(Entity::class);
+//
+//		foreach($entities as $entity) {
+//			echo "Checking ". $entity."\n";
+//			$entity::check();
+//		}
 
 		
 		echo "All Done!\n";

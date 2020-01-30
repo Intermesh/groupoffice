@@ -1,3 +1,85 @@
+30-01-2020 6.4.110
+- Files / Core: Db check fixes acl problem with files
+- Newsletters: Newsletters set Content-Disposition: inline on attachments. They did not show up on Outlook
+- Calendar: Fixed error message when changing calendar
+- Calendar: Fixed error after saving with link
+- Sync: Only writable email accounts should be selectable for sync
+- ActiveSync: Some IMAP servers returned a response that GO did not understood which lead to an empty inbox on the phone
+
+28-01-2020 6.4.109
+- Note: decryption was broken for second encryption algorithm
+
+28-01-2020 6.4.108
+- Core: System settings only submits dirty values. Fixed a bug that caused SMTP password to be cleared for notifications.
+- Core: Setting empty quota didn't work
+- Sync: Fixed error in my account when no email module is available
+- Core / tickets: fixed error when tickets option "Show confirm dialog when closing tickets" was enabled
+- Core: Fixed user export / import
+- Files: Fixed reload issue after creating new folder for an item
+- Files: Refresh UI on change in folder or file dialog
+- Email: pagination on templates
+
+27-01-2020 6.4.107
+- Email: fixed missing email from template option
+- Email: Send didn't work when link was present
+
+24-01-2020 6.4.106
+- E-mail: Add attachment to e-mail from item
+- E-mail: Save / Download inline images context menu
+- E-mail: added email all files button
+- Comments: After opening an item in a popup an error would occur on every comment update.
+- Comments: cmd + enter on macos didn't work in Firefox
+- Users: Show disabled filter didn't work
+- Address book: Adding new organisation in new contact dialog raised an error.
+- Address book: Fixed Error in /usr/local/share/src/www/go/modules/community/addressbook/convert/VCard.php at line 105: Call to a member function format() on null at 2020-01-24T15:17:27+00:00
+
+22-01-2020 6.4.105
+- Core: Load external pages directly because check for existing tabs fail in current browsers
+- Files: Fixed error on search when having custom fields
+- Core: Fixed custom logo not displaying
+
+21-01-2020 6.4.104
+- Core: Fixed: PDOException 'shortDateInList' #536
+  Happened when default for shortDateInList was set to false
+- Project: E-mail all files from a folder
+- Notes: Fixed note decryption
+- Billing: fixed outstanding orders export
+- Billing: Fixed missing contact in recipient when creating invoice from contact
+- Core: support cmd + backspace on macos for deleting in grids
+- Core: Fixed small prints in Firefox
+- Filters: Some filters were not working with "NOT"
+- Filters: Sort combo alpabetically 
+- Address book: A manual sort was required after changing sorting by last or first name
+- Address book: Fixed missing contact fields in templates (email, company post address)
+- Leave days: Year summary didn't show if you had hours from last year but no new hours
+- Email: Zip of all attachments failed if content disposition was not attachment
+- Sieve: Remove :create flag in fileinto command
+- Tickets: Leave ticket blank by default didn't work anymore
+- Calendar: Set resource title of private event to "Private"
+- Calendar: Don't allow calendars from others as default calendar
+- Smime: Added OCSP revocation check
+
+16-01-2020 6.4.103
+- ActiveSync: Z-push fixed problem with tasks on iOS
+- Files: removed document and e-mail from template in file and folder panel
+- Files: Doubleclick from search was broken
+- Core: #202020048 Remove mcrypt dependency #542
+- Custom fields: Fixed problem with required condition
+
+14-01-2020 6.4.102
+- Address book: Fixed merge error with duplicate values
+- Email: Fixed error message when saving email as task
+- Newsletters: Users can be recipients now
+- Files: Fixed comments not showing for folders in filebrowser popup
+- Tasks: Fixed comments editor error in Chrome after adding task
+- Core: Fixed error when saving new group with module permission set
+- Timeregistration: Works without projects module permission again
+- Updated Croatian holidays
+- Core: Reminder request could trigger reload loop
+- Projects: Fixed name column state
+- Core: Updated Norwegian and German translations
+- Core: Focus on first invalid field and tab when save fails
+
 13-01-2020 6.4.101
 - Core: cron will run even though another instance of the cron process is still running. 
 - Newsletters: When cron runs check if newsletters has been active in the past minute. If not then start sending.
@@ -44,7 +126,7 @@
 
 20-12-2019 6.4.95
 - Custom fields: Fixed visual problem with select options
-- Custom fields: Fixed problem that adding a field with a duplicate name was possible.
+- Custom fields:ƒ Fixed problem that adding a field with a duplicate name was possible.
 - Core: Added new allowed groups function for authentication. You can restrict IP addresses per group from where you are allowed to login.
 - Address book: Added filter for contacts being in a group or not
 - Newsletters: Double click to open contact
@@ -623,7 +705,22 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Calendasr: Show unconfirmed holidays
 - Projects: Send company id when selecting contact
 
+
+27-01-2020 6.3.89
+- Tickets: Show confirm on closing tickets option broke module settings and email viewing.
+
+22-01-2020 6.3.88
+- Core: removed broken required_condition from 6.3
+
+21-01-2020 6.3.87
+- Sieve: Remove :create flag in fileinto command
+- Tickets: Leave ticket blank by default didn't work anymore
+- Calendar: Set resource title of private event to "Private"
+- Calendar: Don't allow calendars from others as default calendar
+- Smime: Added OCSP revocation check
+
 19-12-2019 6.3.86
+- Projects: Send company id when selecting contact
 - User: account creation checks for the max users count
 
 17-12-2019 6.3.85

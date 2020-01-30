@@ -5606,7 +5606,6 @@ Ext.EventObject = function(){
                 }
                 me.type = e.type;
                 me.shiftKey = e.shiftKey;
-                
                 me.ctrlKey = e.ctrlKey || e.metaKey || false;
                 me.altKey = e.altKey;
                 
@@ -6923,9 +6922,11 @@ Ext.apply(Ext.EventManager, function(){
        
        
        
-       useKeydown = Ext.isWebKit ?
-                   Ext.num(navigator.userAgent.match(/AppleWebKit\/(\d+)/)[1]) >= 525 :
-                   !((Ext.isGecko && !Ext.isWindows) || Ext.isOpera);
+       useKeydown = true;
+   // No longer needed
+   // Ext.isWebKit ?
+   //                 Ext.num(navigator.userAgent.match(/AppleWebKit\/(\d+)/)[1]) >= 525 :
+   //                 !((Ext.isGecko && !Ext.isWindows) || Ext.isOpera);
 
    return {
        _unload: function(){
@@ -6971,7 +6972,7 @@ Ext.apply(Ext.EventManager, function(){
        
        onTextResize : function(fn, scope, options){
            if(!textEvent){
-               textEvent = new Ext.util.Event();
+               textEvent = new Ext.util.Event();z
                var textEl = new Ext.Element(document.createElement('div'));
                textEl.dom.className = 'x-text-resize';
                textEl.dom.innerHTML = 'X';
@@ -8237,7 +8238,10 @@ Ext.Element.addMethods(
                 }
                 var me = this;
                 this.masking = setTimeout(function() {
-                    me.doMask(msg, msgCls);
+                		//check if el wasn't destroyed in the mean time.
+                		if(me.dom) {
+											me.doMask(msg, msgCls);
+										}
                 }, 500);
 
             },
@@ -12700,7 +12704,7 @@ Ext.Shadow.prototype = {
         target.getWidth(),
         target.getHeight()
         );
-        this.el.dom.style.display = "block";
+        //this.el.dom.style.display = "block";
     },
 
     
