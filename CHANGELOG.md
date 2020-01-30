@@ -1,6 +1,8 @@
 - Files / Core: Db check fixes acl problem with files
 - Newsletters: Newsletters set Content-Disposition: inline on attachments. They did not show up on Outlook
 - Calendar: Fixed error message when changing calendar
+- Calendar: Fixed error after saving with link
+- Sync: Only writable email accounts should be selectable for sync
 
 28-01-2020 6.4.109
 - Note: decryption was broken for second encryption algorithm
