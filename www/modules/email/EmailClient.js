@@ -399,6 +399,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 			this.labelsContextMenu.items.each(function(item) {
 				flags[item.flag] = item;
+				item.textEl.setStyle('color', '#' + item.color);
 				item.setChecked(false);
 			});
 
@@ -428,7 +429,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 						account_id: 0,
 						forContextMenu: true
 					},
-					fields: ['flag', 'text'],
+					fields: ['flag', 'text', 'color'],
 					remoteSort: true			
 				}),
 				listeners:{
