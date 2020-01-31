@@ -89,8 +89,8 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	private static function getDateFormat() {
 	  if(!isset(self::$dateFormat)) {
 	    $user = go()->getAuthState()->getUser(['dateFormat', 'timeFormat']);
-      self::$dateFormat = $user->dateFormat;
-      self::$timeFormat = $user->timeFormat;
+      self::$dateFormat = isset($user) ? $user->dateFormat : 'd-m-Y';
+      self::$timeFormat = isset($user) ? $user->timeFormat : 'H:i';
     }
 
 	  return self::$dateFormat;
