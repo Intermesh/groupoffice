@@ -558,10 +558,12 @@ a.x-monthGrid-cell-day-text:hover{
 /* start view grid */
 
 .x-viewGrid-table{
+	table-layout: fixed;
 	border-collapse: collapse;
 }
 
 .x-viewGrid-table td{
+	overflow:hidden;
 	border:1px solid #ddd;
 	border-bottom:4px double #ddd;
 	vertical-align:top;
