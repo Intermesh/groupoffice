@@ -182,25 +182,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	if(go.Modules.isAvailable("community", "addressbook")) {
 		addSendersItems.push({
 			text: t("Address list", "addressbook"),
-			menu: this.addresslistsMenu = new GO.menu.JsonMenu({
-				store: new GO.data.JsonStore({
-					url: GO.url("addressbook/addresslist/store"),
-					baseParams: {
-						permissionLevel: GO.permissionLevels.write,
-						forContextMenu: true
-					},
-					fields: ['addresslist_id', 'text'],
-					remoteSort: true
-				}),
-				listeners:{
-					scope:this,
-					itemclick : function(item, e ) {
-						this.addSendersToAddresslist(item.addresslist_id);
-						return false;
-					}
-				}
-			}),
-			multiple:true,
+			handler: this.addSendersToAddresslist,
 			scope: this
 		});
 	}
@@ -210,25 +192,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	if(go.Modules.isAvailable("community", "addressbook")) {
 		deleteSendersItems.push({
 			text: t("Address list", "addressbook"),
-			menu: this.addresslistsMenu = new GO.menu.JsonMenu({
-				store: new GO.data.JsonStore({
-					url: GO.url("addressbook/addresslist/store"),
-					baseParams: {
-						permissionLevel: GO.permissionLevels.write,
-						forContextMenu: true
-					},
-					fields: ['addresslist_id', 'text'],
-					remoteSort: true
-				}),
-				listeners:{
-					scope:this,
-					itemclick : function(item, e ) {
-						this.deleteSendersFromAddresslist(item.addresslist_id);
-						return false;
-					}
-				}
-			}),
-			multiple:true,
+			handler: this.deleteSendersFromAddresslist,
 			scope: this
 		});
 	}
@@ -902,7 +866,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				//this.messagePanel.uid=r.data['uid'];
 				//this.messagePanel.loadMessage(r.data.uid, this.mailbox, this.account_id);
 				this.messagePanel.loadMessage(r.data.uid, r.data['mailbox'], this.account_id);
-this.messagePanel.show();
+				this.messagePanel.show();
 				if(!r.data.seen && this.messagesGrid.store.reader.jsonData.permission_level > GO.permissionLevels.read){
 					//set read with 2 sec delay.
 					//this.markAsRead.defer(2000, this, [r.data.uid, this.mailbox, this.account_id]);
@@ -1220,93 +1184,57 @@ this.messagePanel.show();
 		}
 	},
 
-	addSendersToAddresslist : function(addresslistId) {
+	addSendersToAddresslist : function(data) {
 		var records = this.messagesGrid.getSelectionModel().getSelections();
-		var senderNames = new Array();
-		var senderEmails = new Array();
-		for (var i=0;i<records.length;i++) {
-			senderNames.push(records[i].data.from);
-			senderEmails.push(records[i].data.sender);
+
+		var emails=[];
+		var from =[];
+		for(var i=0;i<records.length;i++)
+		{
+			//emails.push('"'+records[i].get('from')+'" <'+records[i].get('sender')+'>');
+			from.push(records[i].get('from'));
+			emails.push(records[i].get('sender'));
 		}
-
-		Ext.Ajax.request({
-			url: GO.url('addressbook/addresslist/addContactsToAddresslist'),
-			params: {
-				senderNames: Ext.encode(senderNames),
-				senderEmails: Ext.encode(senderEmails),
-				addresslistId: addresslistId
-			},
-			callback: function(options, success, response)
-			{
-				if(!success)
-				{
-					Ext.MessageBox.alert(t("Error"), response.result.errors);
-				}else
-				{
-					var responseParams = Ext.decode(response.responseText);
-					if(responseParams.success)
-					{
-						Ext.MessageBox.alert(t("Success"),t("%i contacts have been succesfully added to the address list.", "addressbook").replace('%i',responseParams['addedSenders']));
-					}else
-					{
-						if (!GO.util.empty(responseParams.unknownSenders)) {
-
-							if (!this.unknownRecipientsDialogForAddresslist) {
-								this.unknownRecipientsDialogForAddresslist = new GO.email.UnknownRecipientsDialog();
-								this.unknownRecipientsDialogForAddresslist.on('hide',function(){
-									if (!GO.util.empty(this.unknownRecipientsDialogForAddresslist.addresslistId))
-										delete this.unknownRecipientsDialogForAddresslist.addresslistId;
-								},this);
-							}
-
-							this.unknownRecipientsDialogForAddresslist.store.loadData({
-								recipients : Ext.decode(responseParams.unknownSenders)
-							});
-
-							this.unknownRecipientsDialogForAddresslist.addresslistId = addresslistId;
-
-							this.unknownRecipientsDialogForAddresslist.show({
-								title : t("Add unknown senders", "email"),
-								descriptionText : t("You are adding selected email senders to an addresslist. First, the following selected senders must be added to a Group-Office address book. Click on a name if you want to add that person or close this window.", "email"),
-								disableSkipUnknownCheckbox : true
-							});
-
-						} else {
-							Ext.MessageBox.alert(t("Error"),responseParams.feedback);
-						}
-					}
-				}
-			},
-			scope: this
+		//var fromName = from[0];
+		var dialog = new GO.email.AddressListDialog({
+			email:emails[0],
+			from: from[0],
+			delete: false,
+			title: t("Add to address list","email")
 		});
+		dialog.show();
 	},
 
 	deleteSendersFromAddresslist : function(addresslistId) {
-		if(go.Modules.isAvailable("legacy", "addressbook")) {
-			var records = this.messagesGrid.getSelectionModel().getSelections();
-			var senderEmails = new Array();
-			for (var i=0;i<records.length;i++) {
-				senderEmails.push(records[i].data.sender);
-			}
+		var records = this.messagesGrid.getSelectionModel().getSelections();
 
-			Ext.Ajax.request({
-				url: GO.url('addressbook/addresslist/deleteContactsFromAddresslist'),
-				params: {
-					senderEmails: Ext.encode(senderEmails),
-					addresslistId: addresslistId
-				},
-				callback: function(options, success, response)
-				{
-					var responseData = Ext.decode(response.responseText);
-					if(!success) {
-						Ext.MessageBox.alert(t("Error"), responseData.feedback);
-					} else {
-						Ext.MessageBox.alert(t("Success"), t("%n contacts have been identified and removed from the selected address list.", "addressbook").replace('%n',responseData.nRemoved));
-					}
-				},
-				scope: this
-			});
+		var emails=[];
+		for(var i=0;i<records.length;i++)
+		{
+			emails.push(records[i].get('sender'));
 		}
+
+
+		go.Db.store("Contact").query({
+			filter: {
+				email: emails[0],
+				permissionLevel: go.permissionLevels.write
+			},
+			limit: 1
+		}).then(function(result) {
+			// no contact found
+			if (!result.ids.length) {
+				Ext.MessageBox.alert(t("Error"), t("The contact is unknown","email"));
+				return;
+			} else {
+				var dialog = new GO.email.AddressListDialog({
+					email:emails[0],
+					delete: true,
+					title: t("Remove from address list","email")
+				});
+				dialog.show();
+			}
+		});
 	}
 });
 
