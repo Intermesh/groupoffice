@@ -11,6 +11,8 @@ remove folders when uninstalling module. Error when reinstalling
 
 - logo blob stale gc?
 
+- blob:<ID|method> copy pasten. bv. email naar file. Attachment naar file. File kan geplakt worden in files of email composer.
+
 Batch edit custom fields not possible
 Disabled categories for:  folder dialog Folder::deriveCustomfieldSettings
 custom fields billign items dropped ?!
