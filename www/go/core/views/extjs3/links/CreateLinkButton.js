@@ -293,10 +293,12 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 		
 		.finally(function() {
 			if(!me.isDestroyed) {
-				var f = this.linkGrid.store.getFilter("link");
+				var f = me.linkGrid.store.getFilter("link");
 
 				me.reset();
-				me.setEntity(f.entity, f.entityId);
+				if(f) {
+					me.setEntity(f.entity, f.entityId);
+				}
 			}
 		});
 	}

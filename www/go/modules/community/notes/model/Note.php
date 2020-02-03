@@ -60,18 +60,15 @@ class Note extends AclItemEntity {
 	}
 
 	protected function getSearchDescription() {
-		return $this->getExcerpt();
+		$text = preg_replace("/\s+/", " ", strip_tags(str_replace(">", "> ",$this->content)));
+		return StringUtil::cutString($text, 200);
 	}
 
 	protected function getSearchName() {
 		return $this->name;
 	}
 	
-	public function getExcerpt() {
-		$text = preg_replace("/\s+/", " ", strip_tags(str_replace(">", "> ",$this->content)));
-		return StringUtil::cutString($text, 200);
-	}
-	
+
 	
 	/**
 	 * Return columns to search on with the 'text' filter. {@see filter()}

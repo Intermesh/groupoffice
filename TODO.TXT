@@ -7,8 +7,11 @@ remove folders when uninstalling module. Error when reinstalling
 - riot matrix synapse integration
 - csv export select columns
 - never respond to email read requests option
+- mailserver limit access per service and filter remote ip address (global and per domain) to stop hacks. https://doc.dovecot.org/configuration_manual/config_file/config_variables/
 
 - logo blob stale gc?
+
+- blob:<ID|method> copy pasten. bv. email naar file. Attachment naar file. File kan geplakt worden in files of email composer.
 
 Batch edit custom fields not possible
 Disabled categories for:  folder dialog Folder::deriveCustomfieldSettings

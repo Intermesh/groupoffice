@@ -180,8 +180,14 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		this.currentId = id;
 		var me = this;
 		this.entityStore.single(id).then(function(entity) {
-			me.internalLoad(entity);
-		}).catch(function() {
+			try {
+				me.internalLoad(entity);
+			} catch (e) {
+				Ext.MessageBox.alert(t("Error"), t("Sorry, an unexpected error occurred: ") + e.message);
+				console.error(e);
+			}
+		}).catch(function(e) {
+			console.error(e);
 			Ext.MessageBox.alert(t("Not found"), "The requested page was not found");
 		});
 	},

@@ -44,6 +44,9 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 						hiddenName:'syncSettings.account_id'
 					})
 				]}));
+
+			//Only writable accounts can be used for sync
+			this.selectAccount.store.baseParams.permissionLevel = go.permissionLevels.write;
 		}
 
 		var syncComponents = {calendar: 'Calendar',tasks: 'Tasklist'};
