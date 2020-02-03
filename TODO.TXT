@@ -13,6 +13,22 @@ remove folders when uninstalling module. Error when reinstalling
 
 - blob:<ID|method> copy pasten. bv. email naar file. Attachment naar file. File kan geplakt worden in files of email composer.
 
+- threaded mail (new db design required)
+- calendar invite redesign:
+ - Inbox with invites from caldav, EAS and e-mail
+ - Remove email's automatically
+ - Status (number of open invites) indicator on Calendar tab like email
+ - Database redesign with single object per meeting with multiple participants
+
+- New projects module or refactor existing?
+- Tickets finish
+- Share folder external
+- Share project with customer
+
+
+- billing API integratie boekhoudpakketten
+
+
 Batch edit custom fields not possible
 Disabled categories for:  folder dialog Folder::deriveCustomfieldSettings
 custom fields billign items dropped ?!
