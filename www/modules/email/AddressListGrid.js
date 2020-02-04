@@ -1,5 +1,5 @@
 /* global go, Ext, GO */
-go.modules.community.addressbook.AddressListGrid = Ext.extend(go.grid.GridPanel, {
+GO.email.AddressListGrid = Ext.extend(go.grid.GridPanel, {
 
 	mode: "email", // or "id" in the future "phone" or "address"
 	entityName: "Contact",
