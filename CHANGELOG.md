@@ -1,9 +1,11 @@
+03-02-2020 6.4.111
 - E-mail: Fixed converting non-latin characters when creating labels
 - Core / E-mail: Fixed paste and drop of file in html editor
 - Core: smaller font size for printing. Fixed at 12px.
 - ActiveSync: Fixed problem with invalid imap flags reponse causing mails to stay unread on the devices using ActiveSync
 - Core: Fixed invalid output problem on installation
 - Custom field: template parses {{createdAtShortYear}} and uses the last 2 digits of the year #554
+- Billing: Fixed font size in billing tax rate combo
 
 30-01-2020 6.4.110
 - Files / Core: Db check fixes acl problem with files
