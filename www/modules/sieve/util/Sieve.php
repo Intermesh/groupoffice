@@ -337,11 +337,11 @@ class Sieve {
 					$require[] = 'vacation';
 				}
 				
-				// // Check if the "mailbox" extension is supported
-				// if($this->sieve->hasExtension('mailbox')){
-				// 	$require[] = 'mailbox';
-				// 	$createFlag = ':create ';
-				// }
+				 // Check if the "mailbox" extension is supported
+				 if($this->sieve->hasExtension('mailbox')){
+				 	$require[] = 'mailbox';
+				 	$createFlag = ':create ';
+				 }
 								
 				$requireString = 'require ["'.implode('","', $require).'"];';
 
@@ -917,12 +917,12 @@ class go_sieve_script
                     case 'fileinto':
                         array_push($exts, 'fileinto');
 											
-												if($this->sieve->hasExtension('mailbox')){
-													array_push($exts, 'mailbox');
-													$action_script .= 'fileinto :create ';
-												} else {
+//												if($this->sieve->hasExtension('mailbox')){
+//													array_push($exts, 'mailbox');
+//													$action_script .= 'fileinto :create ';
+//												} else {
 													$action_script .= 'fileinto ';
-												}
+//												}
 												
                         if (!empty($action['copy'])) {
                             $action_script .= ':copy ';
