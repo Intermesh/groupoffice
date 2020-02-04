@@ -6,6 +6,7 @@
 - Core: Fixed invalid output problem on installation
 - Custom field: template parses {{createdAtShortYear}} and uses the last 2 digits of the year #554
 - Billing: Fixed font size in billing tax rate combo
+- Newsletters / Email: Fixed Add sender to address list function
 
 30-01-2020 6.4.110
 - Files / Core: Db check fixes acl problem with files
