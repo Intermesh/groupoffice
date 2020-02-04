@@ -25,11 +25,16 @@ $font-weight-l: 100;
 }
 
 %font-body1 {
-	font-size: sp(14);
+	font-size: sp(16);
 	color: color($fg, 'text');
 	font-weight: $font-weight-r;
 	line-height: dp(24);
 	.primary & { color: white; }
+
+	@media print {
+		font-size: 12px;
+		line-height: 18px;
+	}
 }
 
 %font-body2 {

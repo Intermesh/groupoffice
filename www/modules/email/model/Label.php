@@ -4,6 +4,7 @@ namespace GO\Email\Model;
 
 use GO;
 use GO\Base\Db\ActiveRecord;
+use go\core\util\StringUtil;
 
 /**
  * Class Label
@@ -55,7 +56,7 @@ class Label extends ActiveRecord
 
         $sql = "SELECT count(*) FROM `{$this->tableName()}` WHERE account_id = " . $account_id;
         $stmt = $this->getDbConnection()->query($sql);
-        return intval($stmt->fetchColumn(0));
+        return (int)($stmt->fetchColumn(0));
     }
 
     /**
@@ -84,6 +85,7 @@ class Label extends ActiveRecord
      * @param int $account_id Account ID
      *
      * @return bool
+     * @throws GO\Base\Exception\AccessDenied
      */
     public function createDefaultLabels($account_id)
     {
@@ -133,14 +135,18 @@ class Label extends ActiveRecord
 
         if (!$this->default && $this->isNew) {
             $flag = preg_replace('~[^\\pL0-9_]+~u', '-', $this->name);
-            $flag = trim($flag, "-");
-            $flag = iconv("utf-8", "us-ascii//TRANSLIT", $flag);
+            $flag = trim($flag, '-');
+            $flag = StringUtil::toAscii($flag);
             $flag = strtolower($flag);
             $this->flag = preg_replace('~[^-a-z0-9_]+~', '', $flag);
         }
         return true;
     }
 
+    /**
+     * @param $account_id
+     * @return array
+     */
     public function getAccountLabels($account_id)
     {
         $labels = array();

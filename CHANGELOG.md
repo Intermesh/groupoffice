@@ -1,3 +1,7 @@
+- E-mail: Fixed converting non-latin characters when creating labels
+- Core / E-mail: Fixed paste and drop of file in html editor
+- Core: smaller font size for printing. Fixed at 12px.
+
 30-01-2020 6.4.110
 - Files / Core: Db check fixes acl problem with files
 - Newsletters: Newsletters set Content-Disposition: inline on attachments. They did not show up on Outlook

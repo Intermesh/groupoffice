@@ -143,10 +143,21 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		if(!e.dataTransfer.files) {
 			return;
 		}
+
+		//prevent browser from navigating to dropped file
+		e.preventDefault();
+
+		//make sure editor has focus
+		this.focus();
+
+		//this is needed if the editor has not been activated yet.
+		this.updateToolbar();
+
 		Array.from(e.dataTransfer.files).forEach(function(file) {   
 			go.Jmap.upload(file, {
 				scope: this,
 				success: function(response) {
+					console.warn(response);
 					var imgEl = null;
 					if (file.type.match(/^image\//)) {
 						domId = Ext.id(), img = '<img id="' + domId + '" src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="' + file.name + '" />';
@@ -161,7 +172,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		
 	},
 
-	onPaste: function (e) {		
+	onPaste: function (e) {
 		var clipboardData = e.clipboardData;
 		if (clipboardData.items) {
 			//Chrome /safari has clibBoardData.items
@@ -170,7 +181,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 				//Some times clipboard data holds multiple versions. When copy pasting from excel you get html, plain text and an image.
 				//We prefer to use the html in that case so we exit if found.
-				if (item.type == 'text/html' || item.type == 'text/plain') {
+				if (item.type == 'text/html') {
 					return;
 				}
 

@@ -508,6 +508,7 @@ abstract class Module {
 	public function checkDatabase() {
 		$entities = $this->getClassFinder()->findByParent(Entity::class);
 		foreach($entities as $entity) {
+			echo "Checking " . $entity . "\n";
 			$entity::check();
 		}
 	}

@@ -31,9 +31,9 @@ function errorHander($e) {
 
 		if(go()->getDebugger()->enabled) {
 
-			echo "Showing error message because debug is enabled. Normally we would have redirected to install:\n\n";
-
+			echo "Showing error message because debug is enabled. Normally we would have redirected to install. I you're doing a freah install and your database is empty then you can safely ignore this.:\n\n";
 			echo $msg;
+			echo '<a href="/install">Click here to launch the installer</a>';
 			exit();
 		}
 

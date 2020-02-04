@@ -658,4 +658,47 @@ END;
 	public static function random($length) {
 		return bin2hex(random_bytes($length));
 	}
+
+	/**
+	 * Converts to ASCII.
+	 * @param  string  UTF-8 encoding
+	 * @return string  ASCII
+	 *
+	 * @see https://3v4l.org/CiH8j
+	 */
+	public static function toAscii($str)
+	{
+		static $transliterator = null;
+		if ($transliterator === null && class_exists('Transliterator', false)) {
+			$transliterator = \Transliterator::create('Any-Latin; Latin-ASCII');
+		}
+
+		$str = preg_replace('#[^\x09\x0A\x0D\x20-\x7E\xA0-\x{2FF}\x{370}-\x{10FFFF}]#u', '', $str);
+		$str = strtr($str, '`\'"^~?', "\x01\x02\x03\x04\x05\x06");
+		$str = str_replace(
+			["\xE2\x80\x9E", "\xE2\x80\x9C", "\xE2\x80\x9D", "\xE2\x80\x9A", "\xE2\x80\x98", "\xE2\x80\x99", "\xC2\xB0"],
+			["\x03", "\x03", "\x03", "\x02", "\x02", "\x02", "\x04"], $str
+		);
+		if ($transliterator !== null) {
+			$str = $transliterator->transliterate($str);
+		}
+		if (ICONV_IMPL === 'glibc') {
+			$str = str_replace(
+				["\xC2\xBB", "\xC2\xAB", "\xE2\x80\xA6", "\xE2\x84\xA2", "\xC2\xA9", "\xC2\xAE"],
+				['>>', '<<', '...', 'TM', '(c)', '(R)'], $str
+			);
+			$str = iconv('UTF-8', 'WINDOWS-1250//TRANSLIT//IGNORE', $str);
+			$str = strtr($str, "\xa5\xa3\xbc\x8c\xa7\x8a\xaa\x8d\x8f\x8e\xaf\xb9\xb3\xbe\x9c\x9a\xba\x9d\x9f\x9e"
+				. "\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3"
+				. "\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8"
+				. "\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf8\xf9\xfa\xfb\xfc\xfd\xfe"
+				. "\x96\xa0\x8b\x97\x9b\xa6\xad\xb7",
+				'ALLSSSSTZZZallssstzzzRAAAALCCCEEEEIIDDNNOOOOxRUUUUYTsraaaalccceeeeiiddnnooooruuuuyt- <->|-.');
+			$str = preg_replace('#[^\x00-\x7F]++#', '', $str);
+		} else {
+			$str = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $str);
+		}
+		$str = str_replace(['`', "'", '"', '^', '~', '?'], '', $str);
+		return strtr($str, "\x01\x02\x03\x04\x05\x06", '`\'"^~?');
+	}
 }

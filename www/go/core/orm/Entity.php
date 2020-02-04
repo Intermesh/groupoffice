@@ -853,9 +853,8 @@ abstract class Entity extends Property {
    * @throws Exception
 	 */
 	public static function check() {
-		echo "Checking ".static::class."\n";
+		//NOTE: this function may not output as it's used by install.php
 		if(property_exists(static::class, 'filesFolderId') && Module::isInstalled('legacy', 'files')) {
-			echo "Fixing files folder ID's\n";
 			$tables = static::getMapping()->getTables();
 			$table = array_values($tables)[0]->getName();
 			go()->getDbConnection()->update(

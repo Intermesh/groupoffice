@@ -1,36 +1,46 @@
 .blue {
-  color: #039BE5 !important; }
+  color: #039BE5 !important;
+}
 
 .red {
-  color: #E53935 !important; }
+  color: #E53935 !important;
+}
 
 .pink {
-  color: #D81B60 !important; }
+  color: #D81B60 !important;
+}
 
 .purple {
-  color: #8E24AA !important; }
+  color: #8E24AA !important;
+}
 
 .cyan {
-  color: #00ACC1 !important; }
+  color: #00ACC1 !important;
+}
 
 .green {
-  color: #43A047 !important; }
+  color: #43A047 !important;
+}
 
 .orange {
-  color: #FB8C00 !important; }
+  color: #FB8C00 !important;
+}
 
 .brown {
-  color: #6D4C41 !important; }
+  color: #6D4C41 !important;
+}
 
 .yellow {
-  color: #FDD835 !important; }
+  color: #FDD835 !important;
+}
 
 .bluegrey {
-  color: #607D8B !important; }
+  color: #607D8B !important;
+}
 
 .go-addressbook-url.homepage:before {
   display: inline-block;
-  font-family: 'Material Icons';
+  font-family: "Material Icons";
   font-weight: normal;
   font-style: normal;
   font-size: 21px;
@@ -50,35 +60,44 @@
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: 'liga'; }
+  font-feature-settings: "liga";
+}
 
 .go-module-icon-addressbook, .go-menu-icon-addressbook {
-  background: url("resources/addressbook.png"); }
+  background: url("resources/addressbook.png");
+}
 
 .go-addressbook-star {
-  color: #febf35; }
+  color: #febf35;
+}
 
 .go-addressbook-index-row:not(:first-child) {
   border-top: 7px solid transparent;
   margin-top: 7px;
-  box-shadow: 0px -1px 0 rgba(255, 255, 255, 0.3); }
+  box-shadow: 0px -1px 0 rgba(255, 255, 255, 0.3);
+}
 
 .go-addressbook-name-panel {
-  padding: 14px; }
-  .go-addressbook-name-panel h4 {
-    top: -14px;
-    left: 49px; }
-  .go-addressbook-name-panel .go-addressbook-star {
-    margin-top: -7px; }
+  padding: 14px;
+}
+.go-addressbook-name-panel h4 {
+  top: -14px;
+  left: 49px;
+}
+.go-addressbook-name-panel .go-addressbook-star {
+  margin-top: -7px;
+}
 
 .go-addressbook-name {
   position: absolute;
   top: 14px;
-  right: 14px; }
+  right: 14px;
+}
 
 .go-addressbook-url-panel {
   text-align: right;
-  line-height: 17.5px; }
+  line-height: 17.5px;
+}
 
 .go-addressbook-url {
   height: 17.5px;
@@ -87,24 +106,31 @@
   background-position: center;
   background-size: contain;
   display: inline-block;
-  border-radius: 1px; }
-  .go-addressbook-url.linkedin {
-    background-image: url("resources/linkedin.png"); }
-  .go-addressbook-url.facebook {
-    background-image: url("resources/facebook.png"); }
-  .go-addressbook-url.twitter {
-    background-image: url("resources/twitter.png"); }
-  .go-addressbook-url.homepage {
-    background-color: #009BC9;
-    border-radius: 2px; }
-    .go-addressbook-url.homepage:before {
-      font-size: 17.5px;
-      content: "home";
-      vertical-align: baseline;
-      line-height: inherit;
-      color: white; }
+  border-radius: 1px;
+}
+.go-addressbook-url.linkedin {
+  background-image: url("resources/linkedin.png");
+}
+.go-addressbook-url.facebook {
+  background-image: url("resources/facebook.png");
+}
+.go-addressbook-url.twitter {
+  background-image: url("resources/twitter.png");
+}
+.go-addressbook-url.homepage {
+  background-color: #009BC9;
+  border-radius: 2px;
+}
+.go-addressbook-url.homepage:before {
+  font-size: 17.5px;
+  content: "home";
+  vertical-align: baseline;
+  line-height: inherit;
+  color: white;
+}
 
 .avatar.organization {
-  background-image: none; }
+  background-image: none;
+}
 
 /*# sourceMappingURL=style.css.map */
