@@ -510,6 +510,7 @@ abstract class Module {
 		foreach($entities as $entity) {
 			echo "Checking " . $entity . "\n";
 			$entity::check();
+			echo "Done\n";
 		}
 	}
 

@@ -853,8 +853,6 @@ abstract class Entity extends Property {
 					->where('filesFolderId', 'NOT IN', (new Query())->select('id')->from('fs_folders'))
 			)->execute();
 		}
-
-		echo "Done\n";
 	}
 
 
