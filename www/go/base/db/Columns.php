@@ -140,6 +140,9 @@ class Columns{
 					case 'date':
 						$gotype='date';
 						break;
+					case 'datetime':
+						$gotype='datetime';
+						break;
 					case 'time':
 						$gotype='time';
 						break;
