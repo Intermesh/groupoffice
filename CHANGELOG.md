@@ -1,4 +1,5 @@
 03-02-2020 6.4.111
+- Core: Remove fields from fieldset too after deleting fieldset and added loadmask
 - Core: Optimized indexes of core_link table for faster filtering in the address book
 - E-mail: Fixed converting non-latin characters when creating labels
 - Core / E-mail: Fixed paste and drop of file in html editor

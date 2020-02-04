@@ -4,8 +4,7 @@ go.systemsettings.AuthAllowGroupGrid = Ext.extend(go.grid.EditorGridPanel, {
 
     this.store = new go.data.Store({
       fields: ['id', 'groupId', {name:'group', type: "relation", allowBlank:false}, {name:'ipPattern', allowBlank:false}],
-      entityStore: "AuthAllowGroup",
-      autoLoad: true
+      entityStore: "AuthAllowGroup"
     });
 
     var actions = this.initRowActions();
@@ -50,7 +49,7 @@ go.systemsettings.AuthAllowGroupGrid = Ext.extend(go.grid.EditorGridPanel, {
         actions
       ],
       viewConfig: {
-        emptyText: 	'<i>label</i><p>' +t("No items to display") + '</p>',
+        emptyText: 	'<i>lock</i><p>' +t("No items to display") + '</p>',
         autoFill: true
       }
     });
@@ -81,6 +80,10 @@ go.systemsettings.AuthAllowGroupGrid = Ext.extend(go.grid.EditorGridPanel, {
         //e.record.commit();
       });
     }, this);
+
+    this.on("render", function() {
+      this.store.load();
+    }, this);
   },
 
   initRowActions : function() {
@@ -105,9 +108,14 @@ go.systemsettings.AuthAllowGroupGrid = Ext.extend(go.grid.EditorGridPanel, {
             return;
           }
 
-          go.Db.store("AuthAllowGroup").destroy(record.data.id).then(function() {
+          if(record.data.id) {
+            go.Db.store("AuthAllowGroup").destroy(record.data.id).then(function () {
+              grid.store.removeAt(row);
+            });
+          } else
+          {
             grid.store.removeAt(row);
-          });
+          }
 
         }, this);
       },
