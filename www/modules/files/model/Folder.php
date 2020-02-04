@@ -1101,10 +1101,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		$totalQuotaMoved = File::model()->findSingle($fp)->total;
 		
 		// add and substract quota
-		$oldUser->calculatedDiskUsage(0-$totalQuotaMoved)->save(true);
+		if($oldUser) {
+			$oldUser->calculatedDiskUsage(0 - $totalQuotaMoved)->save(true);
+		}
+
 		$newUser->calculatedDiskUsage($totalQuotaMoved)->save(true);
-		\GO::debug($oldUser->getName());
-		\GO::debug($newUser->getName());
 	}
 
 	/**
