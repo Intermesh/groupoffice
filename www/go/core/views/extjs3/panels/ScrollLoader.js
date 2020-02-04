@@ -81,12 +81,16 @@ go.panels.ScrollLoader = {
 		return this.getView && this.getView().scroller;
 	},
 
-	toggleLoadMask : function() {
-		// only show loadmask when 		
-		var pixelsLeft = this.slScroller.scrollHeight - this.slScroller.scrollTop - this.slScroller.offsetHeight;
+	/**
+	 * Only show loadmask if loading the first page or when scrolling down
+	 * @param firstPage
+	 */
+	toggleLoadMask : function(firstPage) {
+
 		if(this.loadMask) {
-			// if(Ext.isObject(this.loadMask))
-			if(pixelsLeft > 100) {
+			var disable = !firstPage && this.slScroller.scrollHeight - this.slScroller.scrollTop - this.slScroller.offsetHeight > 100;
+
+			if(disable) {
 				this.loadMask.disable();
 			}else{
 				this.loadMask.enable();
@@ -100,7 +104,6 @@ go.panels.ScrollLoader = {
 	 */
 	loadMore: function () {
 
-		this.toggleLoadMask();
 		var store = this.store;
 		if (this.allRecordsLoaded || this.store.loading){
 			return;
@@ -125,10 +128,12 @@ go.panels.ScrollLoader = {
 					this.getView().scrollToTopOnLoad = false;
 					//this.toggleLoadMask();
 				}
+
+				me.toggleLoadMask(o.params.position == 0);
 				store.load(o).then(function() {
-					// if(me.loadMask) {
-					// 	me.loadMask.enable();
-					// }
+					if(me.loadMask) {
+						me.loadMask.enable();
+					}
 				});
 			}
 		} else {			
@@ -147,6 +152,7 @@ go.panels.ScrollLoader = {
 				o.paging = true;
 				o.keepScrollPosition = true;
 
+				me.toggleLoadMask(o.params.position == 0);
 				
 				store.load(o).then(function() {
 					if(me.loadMask) {

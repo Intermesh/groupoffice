@@ -675,3 +675,8 @@ $updates['201912290000'][] = "ALTER TABLE `core_customfields_field`
 $updates['202001060000'][] = "ALTER TABLE `core_customfields_field` CHANGE `requiredCondition` `relatedFieldCondition` varchar(190) NOT NULL DEFAULT '' AFTER `required`";
 $updates['202001060000'][] = "ALTER TABLE `core_customfields_field` ADD `conditionallyHidden` BOOLEAN NOT NULL DEFAULT FALSE AFTER `relatedFieldCondition`";
 $updates['202001060000'][] = "ALTER TABLE `core_customfields_field` ADD `conditionallyRequired` BOOLEAN NOT NULL DEFAULT FALSE AFTER `conditionallyHidden`";
+
+$updates['202002041223'][] = "ALTER TABLE `core_link` ADD INDEX(`fromEntityTypeId`);";
+$updates['202002041223'][] = "ALTER TABLE `core_link` ADD INDEX(`fromId`);";
+$updates['202002041223'][] = "ALTER TABLE `core_link` ADD INDEX(`toEntityTypeId`);";
+$updates['202002041223'][] = "ALTER TABLE `core_link` ADD INDEX(`toId`);";
