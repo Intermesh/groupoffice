@@ -38,7 +38,6 @@ go.customfields.type.Template = Ext.extend(go.customfields.type.Text, {
                 for(var propName in data) {
                     var fullProp = prefix + propName;
                     var replacement = data[propName] != null ? data[propName] : "";
-
                     var re = new RegExp('{{' + fullProp + '}}', 'g');
                     tpl = tpl.replace(re,replacement);
                 }
@@ -64,6 +63,15 @@ go.customfields.type.Template = Ext.extend(go.customfields.type.Text, {
      */
     renderDetailView: function (value, data, customfield, detailComponent) {
         var tpl = customfield.options.template;
+
+        if(tpl.indexOf("createdAtShortYear") != -1) {
+            var re = new RegExp('{{createdAtShortYear}}', 'g');
+            var date = new Date();
+            var fullYear = date.getFullYear(data["ctime"]) + "";
+            var lastNumbersYear = fullYear.substring(2,4);
+            tpl = tpl.replace(re, lastNumbersYear);
+        }
+
         tpl = this.recursiveReplace(tpl,data);
         return tpl;
     }
