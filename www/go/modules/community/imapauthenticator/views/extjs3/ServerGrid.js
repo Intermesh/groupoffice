@@ -3,7 +3,8 @@ go.modules.community.imapauthenticator.ServerGrid = Ext.extend(go.grid.GridPanel
 	viewConfig: {
 		forceFit: true,
 		autoFill: true,
-		emptyText: 	'<p>' +t("No items to display") + '</p>'
+		emptyText: 	'<i>mail</i><p>' +t("No items to display") + '</p>'
+
 	},
 
 	initComponent: function () {
