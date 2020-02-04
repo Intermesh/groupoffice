@@ -893,3 +893,9 @@ ALTER TABLE `core_auth_allow_group`
 
 ALTER TABLE `core_auth_allow_group`
   ADD CONSTRAINT `core_auth_allow_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;
+
+
+ALTER TABLE `core_link` ADD INDEX(`fromEntityTypeId`);
+ALTER TABLE `core_link` ADD INDEX(`fromId`);
+ALTER TABLE `core_link` ADD INDEX(`toEntityTypeId`);
+ALTER TABLE `core_link` ADD INDEX(`toId`);
