@@ -1,4 +1,4 @@
-GO.email.AddressListDialog = Ext.extend(Ext.Window, {
+GO.email.AddressListDialog = Ext.extend(go.Window, {
 	stateId: 'address-addToForm',
 	entityStore: "AddressList",
 	width: dp(800),
@@ -8,7 +8,7 @@ GO.email.AddressListDialog = Ext.extend(Ext.Window, {
 	modal: false,
 
 	createGrid: function () {
-		this.grid = new go.modules.community.addressbook.AddressListGrid({
+		this.grid = new GO.email.AddressListGrid({
 			stateId: 'grid-address-list',
 			region: 'center',
 			height: dp(800),

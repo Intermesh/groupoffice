@@ -179,9 +179,9 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		scope:this
 	}];
 
-	if(go.Modules.isAvailable("community", "addressbook")) {
+	if(go.Modules.isAvailable("business", "newsletters")) {
 		addSendersItems.push({
-			text: t("Address list", "addressbook"),
+			text: t("Address list", "newsletters", "business"),
 			handler: this.addSendersToAddresslist,
 			scope: this
 		});
@@ -189,9 +189,9 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 	var deleteSendersItems = [];
 
-	if(go.Modules.isAvailable("community", "addressbook")) {
+	if(go.Modules.isAvailable("business", "newsletters")) {
 		deleteSendersItems.push({
-			text: t("Address list", "addressbook"),
+			text: t("Address list",  "newsletters", "business"),
 			handler: this.deleteSendersFromAddresslist,
 			scope: this
 		});
