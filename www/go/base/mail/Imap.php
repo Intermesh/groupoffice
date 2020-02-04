@@ -1729,8 +1729,8 @@ class Imap extends ImapBodyStruct {
 				return false;
 			}
 
-			if(preg_match('/FLAGS \((.*)\)/', $message, $flagMatches)) {
-				$flags = $flagMatches[1];
+			if(preg_match('/FLAGS \((.*)\)/U', $message, $flagMatches)) {
+				$flags = array_map('trim', explode(' ', trim($flagMatches[1])));
 			}else{
 				return false;
 			}
