@@ -1,3 +1,4 @@
+03-02-2020 6.2.125
 - Sieve: Don't use :create flag on sieve filter action fileinto
 - Files: Check if old user wasn't deleted when recalculating quota
 - Calendar: Fixed view grid misalignment
