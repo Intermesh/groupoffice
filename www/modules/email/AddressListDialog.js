@@ -1,4 +1,4 @@
-GO.email.AddressListDialog = Ext.extend(Ext.Window, {
+GO.email.AddressListDialog = Ext.extend(go.Window, {
 	stateId: 'address-addToForm',
 	entityStore: "AddressList",
 	width: dp(800),
