@@ -1,6 +1,8 @@
 - E-mail: Fixed converting non-latin characters when creating labels
 - Core / E-mail: Fixed paste and drop of file in html editor
 - Core: smaller font size for printing. Fixed at 12px.
+- ActiveSync: Fixed problem with invalid imap flags reponse causing mails to stay unread on the devices using ActiveSync
+- Core: Fixed invalid output problem on installation
 
 30-01-2020 6.4.110
 - Files / Core: Db check fixes acl problem with files
