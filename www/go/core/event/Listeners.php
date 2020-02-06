@@ -4,6 +4,7 @@ namespace go\core\event;
 
 use go\core\App;
 use go\core\model\Module;
+use go\core\orm\Property;
 use go\core\Singleton;
 
 /**
@@ -131,7 +132,7 @@ class Listeners extends Singleton {
 		//recurse up to the parents until the class is found that uses the eventemitter trait.
 		//This way you can use go\core\orm\Entity::on(EVENT_SAVE) for all entities.
 
-		if($calledClass != $traitUser) {
+		if($calledClass != $traitUser && $event != Property::EVENT_MAPPING) {
 			$parent = get_parent_class($calledClass);
 			if($parent) {
 				return $this->fireEvent($parent, $traitUser, $event, $args);
