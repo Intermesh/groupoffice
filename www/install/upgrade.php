@@ -72,8 +72,6 @@ try {
 			$stmt->execute();
 		}	
 
-		\GO::session()->runAsRoot();
-	
 		go()->getInstaller()->upgrade();	
 
 		echo "</pre></div>";

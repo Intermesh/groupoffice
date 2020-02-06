@@ -313,6 +313,8 @@ class Installer {
 		LoggingTrait::$enabled = false;
 
 		go()->setAuthState((new TemporaryState())->setUserId(1));
+		\GO::session()->runAsRoot();
+		GO::$ignoreAclPermissions = true;
 		
 
 		$this->isValidDb();
