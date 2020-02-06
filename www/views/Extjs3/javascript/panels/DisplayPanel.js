@@ -349,7 +349,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		if(tbar)
 			tbar.setDisabled(false);
 
-		if(this.editButton)
+		if(this.editButton && this.editButton.rendered)
 			this.editButton.setDisabled(this.data.permission_level<GO.permissionLevels.write);
 		
 		
