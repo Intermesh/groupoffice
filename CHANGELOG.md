@@ -1,4 +1,5 @@
 - Sieve: Fixed bug where sieve dialog showed folders of other account
+- Files: Assistant installation replaces GOTA file handlers
 
 27-01-2020 6.3.89
 - Tickets: Show confirm on closing tickets option broke module settings and email viewing.
