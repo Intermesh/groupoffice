@@ -278,10 +278,12 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 				this.submitComplete(response);
 			} else
 			{
-				for(name in response.notUpdated[id].validationErrors) {
-					var field = this.formPanel.getForm().findField(name);
-					if(field) {
-						field.markInvalid(response.notUpdated[id].validationErrors[name].description);
+				if(response.notUpdated && id in response.notUpdated) {
+					for (var name in response.notUpdated[id].validationErrors) {
+						var field = this.formPanel.getForm().findField(name);
+						if (field) {
+							field.markInvalid(response.notUpdated[id].validationErrors[name].description);
+						}
 					}
 				}
 				
