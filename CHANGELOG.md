@@ -1,6 +1,7 @@
 - Core: Fixed bugs in group dialog with loading and changing users when deselecting
 - Core: Updated German translation
 - Address book: Select contact field always showed contacts and organizations
+- Tickets: Changing contact in ticket didn't work properly
 
 03-02-2020 6.4.111
 - Core: Remove fields from fieldset too after deleting fieldset and added loadmask
