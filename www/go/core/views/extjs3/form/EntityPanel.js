@@ -173,7 +173,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 				}
 				this.fireEvent("submit", this, false, null, notSaved[id]);
 			}
-		}, this);
+		}, this).catch(function(){}); //handled by callback
 
 	}
 });
