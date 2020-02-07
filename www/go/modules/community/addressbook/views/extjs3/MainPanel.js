@@ -187,7 +187,10 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 												".csv, .vcf, text/vcard",
 												{addressBookId: this.addAddressBookId},
 												{
+													// These fields can be selected to update contacts if ID or e-mail matches
 													lookupFields: {'id' : "ID", 'email': 'E-mail'},
+
+													// This hash map is used to aid in auto selecting the right mappings. Key is possible header in CSV and value is property name in Group-Office
 													aliases : {
 														"Given name": "firstName",
 														"First name": "firstName",
@@ -261,14 +264,17 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 
 														"Company" : "organizations"
 													},
+
+													// Fields with labels and possible subproperties.
+													// For example e-mail and type of an array of e-mail addresses should be grouped together.
 													fields: {
 														prefixes: {label: t("Prefixes")},
 														initials: {label: t("Initials")},
 														salutation: {label: t("Salutation")},
 														color: {label: t("Color")},
-														firstName: {label: t("First name"), aliases: ["First", "Given Name"]},
+														firstName: {label: t("First name")},
 														middleName: {label: t("Middle name")},
-														lastName: {label: t("Last name"), aliases: ["Last", "Family name"]},
+														lastName: {label: t("Last name")},
 														name: {label: t("Name")},
 														suffixes: {label: t("Suffixes")},
 														gender: {label: t("Gender")},
