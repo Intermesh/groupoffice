@@ -113,14 +113,16 @@ class Router {
 			if(go()->getDebugger()->enabled) {
 				//only in debug mode, may contain sensitive information
 				$error["debugMessage"] = ErrorHandler::logException($e);
+				$previous = $e->getPrevious();
+				if($previous) {
+					$error['previous'] = $previous->getMessage();
+				}
 				$error["trace"] = explode("\n", $e->getTraceAsString());
 			}
 			
 			Response::get()->addError($error);
-		} finally{
-			
-			if($method != "community/dev/Debugger/get") {		
-				
+		} finally {
+			if($method != "community/dev/Debugger/get") {
 				go()->getDebugger()->groupEnd();
 			}
 		}

@@ -63,6 +63,12 @@ class ErrorHandler {
 		}
 		
 		App::get()->getDebugger()->error($errorString);
+
+		$previous = $e->getPrevious();
+		if($previous) {
+			App::get()->getDebugger()->error("Previous: " . $previous->getMessage());
+		}
+
 		$lines = explode("\n", $e->getTraceAsString());
 		foreach($lines as $line) {
 			App::get()->getDebugger()->error($line);
