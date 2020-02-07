@@ -608,7 +608,7 @@ abstract class Property extends Model {
 		
 		if(!$props) {
 			$props = array_filter(static::getReadableProperties(), function($propName) {
-				return !in_array($propName, ['modified', 'oldValues', 'validationErrors']);
+				return !in_array($propName, ['modified', 'oldValues', 'validationErrors', 'modifiedCustomFields']);
 			});
 
 			go()->getCache()->set($cacheKey, $props);

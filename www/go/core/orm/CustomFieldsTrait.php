@@ -103,6 +103,43 @@ trait CustomFieldsTrait {
 		$this->setCustomFields($data);
 	}
 
+	/**
+	 * Get the old custom fields data. Returns null if they were never modified.
+	 *
+	 * @return null|[]
+	 */
+	public function oldCustomFields() {
+		return $this->oldCustomFieldsData;
+	}
+
+	/**
+	 * Get modified custom fields with new and old value
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getModifiedCustomFields() {
+		if(!$this->isCustomFieldsModified()) {
+			return [];
+		}
+		$oldCf = $this->oldCustomFields();
+		$newCf = $this->getCustomFields();
+
+		$mod = [];
+		foreach($newCf as $key => $value) {
+			if(!array_key_exists($key, $oldCf)) {
+				$mod[$key] = [$value, null];
+			} elseif($value !== $oldCf[$key]) {
+				$mod[$key] = [$value, $oldCf[$key]];
+			}
+		}
+
+		return $mod;
+
+	}
+
+	private $oldCustomFieldsData;
+
   /**
    * Set custom field data
    *
@@ -113,7 +150,10 @@ trait CustomFieldsTrait {
    * @return $this
    * @throws Exception
    */
-	public function setCustomFields(array $data, $asText = false) {			
+	public function setCustomFields(array $data, $asText = false) {
+		if(!isset($this->oldCustomFieldsData)) {
+			$this->oldCustomFieldsData = $this->internalGetCustomFields();
+		}
 		$this->customFieldsData = array_merge($this->internalGetCustomFields(), $this->normalizeCustomFieldsInput($data, $asText));		
 		
 		$this->customFieldsModified = true;

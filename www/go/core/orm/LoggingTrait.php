@@ -45,25 +45,21 @@ trait LoggingTrait {
 				return $this->cutLengths($this->toArray());
 			case Log::ACTION_ADD:
 			case Log::ACTION_UPDATE:
-				$attrs = $this->getModified();				
-				
-				$cutoffString = ' ..Cut off at 500 chars.';
-				$cutoffLength = 500;
 
-				foreach ($attrs as $attr => $val) {
-					
-					if ((isset($val[0]) && !is_scalar($val[0])) || (isset($val[1]) && !is_scalar($val[1]))) {
-						unset($attrs[$attr]);
-						continue;
-					}
+				$check = array_keys(array_filter($this->getApiProperties(), function($r) {return ($r['setter'] || $r['access'] == self::PROP_PUBLIC);}));
+				$attrs = $this->getModified($check);
+				$attrs = $this->diffModified($attrs);
 
-					if (strlen($val[0]) > $cutoffLength) {
-						$attrs[$attr][0] = substr($val[0], 0, $cutoffLength) . $cutoffString;
+
+				//Quick fix to support custom field changes
+				if(method_exists($this, 'isCustomFieldsModified') && $this->isCustomFieldsModified()) {
+
+					$cfAttrs = $this->getModifiedCustomFields();
+					$cfAttrs = $this->diffModified($cfAttrs);
+
+					foreach($cfAttrs as $key => $value) {
+						$attrs['customFields.'.$key] = $value;
 					}
-					
-					if (strlen($val[1]) > $cutoffLength) {
-						$attrs[$attr][1] = substr($val[1], 0, $cutoffLength) . $cutoffString;
-					}	
 				}
 
 				return $attrs;
@@ -71,6 +67,38 @@ trait LoggingTrait {
 		}
 
 		return array();
+	}
+
+	private function diffModified($attrs) {
+		$cutoffString = ' ..Cut off at 500 chars.';
+		$cutoffLength = 500;
+
+		foreach ($attrs as $attr => $val) {
+
+			if(in_array($attr, ['modifiedAt', 'createdAt'])) {
+				unset($attrs[$attr]);
+				continue;
+			}
+
+			if($val[0] instanceof \DateTime || $val[1] instanceof \DateTime) {
+				continue;
+			}
+
+			if ((isset($val[0]) && !is_scalar($val[0])) || (isset($val[1]) && !is_scalar($val[1]))) {
+				unset($attrs[$attr]);
+				continue;
+			}
+
+			if (strlen($val[0]) > $cutoffLength) {
+				$attrs[$attr][0] = substr($val[0], 0, $cutoffLength) . $cutoffString;
+			}
+
+			if (strlen($val[1]) > $cutoffLength) {
+				$attrs[$attr][1] = substr($val[1], 0, $cutoffLength) . $cutoffString;
+			}
+		}
+
+		return $attrs;
 	}
 	
 	private function cutLengths($attrs) {		

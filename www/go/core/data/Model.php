@@ -27,21 +27,31 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 
 	const PROP_PUBLIC = 2;
 
-  /**
-   * Get all properties exposed to the API
-   *
-   * eg.
-   *
-   * [
-   *  "propName" => [
-   *    'setter' => true, //Set with setPropName
-   *    'getter'=> true', //Get with getPropName
-   *    'access' => self::PROP_PROTECTED // is a protected property
-   * ]
-   *
-   * @return array
-   * @throws \ReflectionException
-   */
+	/**
+	 * Get all properties exposed to the API
+	 *
+	 * eg.
+	 *
+	 * [
+	 *  "propName" => [
+	 *    'setter' => true, //Set with setPropName
+	 *    'getter'=> true', //Get with getPropName
+	 *    'access' => self::PROP_PROTECTED // is a protected property
+	 * ]
+	 *
+	 * So properties are:
+	 *
+	 * 1. Readable in the API if they have access public or getter = true
+	 * 2. Writable in the API if they have access public or setter = true
+	 *
+	 * @example GEt writable property names
+	 *
+	 * $writablePropNames = array_keys(array_filter($this->getApiProperties(), function($r) {return ($r['setter'] || $r['access'] = self::PROP_PUBLIC);}));
+	 *
+	 * @return array
+	 * @throws \ReflectionException
+	 * @throws \go\core\exception\ConfigurationException
+	 */
 	public static function getApiProperties() {
 		$cacheKey = 'api-props-' . static::class;
 		
