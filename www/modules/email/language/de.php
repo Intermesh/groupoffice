@@ -324,4 +324,5 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Ihre Mailbox ist v
   '%n contacts have been identified and removed from the selected address list.' => '%n Kontakte wurden identifiziert und aus der ausgewählten Adressliste entfernt.',
   'Please enter the password of your SMIME certificate.' => 'Bitte geben Sie das Passwort Ihres SMIME-Zertifikats ein.',
   'This panel expects an address list ID that is positive, but did not receive one. Please contact the administrator.' => 'Dieses Panel erwartet eine Adresslisten-ID, die positiv ist, hat aber keine erhalten. Bitte kontaktieren Sie den Administrator.',
+  'Are you sure you want to select all {count} results?' => 'Sind Sie sicher, dass Sie alle {count} Ergebnisse auswählen möchten?',
 );

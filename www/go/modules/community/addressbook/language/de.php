@@ -30,7 +30,6 @@ return array (
     'home' => 'Privat',
     'mobile' => 'Mobil',
     'workmobile' => 'Arbeit Mobil',
-    'fax' => 'Fax',
     'workfax' => 'Arbeit Fax',
   ),
   'addressTypes' => 
@@ -107,4 +106,6 @@ return array (
   'Latitude' => 'Breitengrad',
   'Longitude' => 'Längengrad',
   'Failed to add contacts to the group' => 'Kontakte können der Gruppe nicht hinzugefügt werden',
+  'First' => 'Vorname',
+  'Last' => 'Nachname',
 );
