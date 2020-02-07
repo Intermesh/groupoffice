@@ -147,6 +147,8 @@ go.data.StoreTrait = {
 				var o = go.util.clone(this.lastOptions);
 				o.params = o.params || {};
 				o.params.position = 0;
+				o.add = false;
+
 				if(this.lastOptions.params && this.lastOptions.params.position) {				
 					o.params.limit = this.lastOptions.params.position + (this.lastOptions.limit || this.baseParams.limit || 20);
 				}
@@ -172,6 +174,7 @@ go.data.StoreTrait = {
 			if(this.lastOptions.params && this.lastOptions.params.position) {				
 				o.params.limit = this.lastOptions.params.position + (this.lastOptions.limit || this.baseParams.limit || 20);
 			}
+
 			this.load(o);
 		}
 		

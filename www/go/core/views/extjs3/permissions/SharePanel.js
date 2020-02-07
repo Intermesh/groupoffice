@@ -329,10 +329,13 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			this.store.setFilter('exclude', {
 				exclude: this.getSelectedGroupIds()
 			});
-			
+			var me = this;
 			this.store.load({
 				add: true,
 				selectedLoaded: true
+			}).then(function() {
+				//when reload is called by SSE we need this removed.
+				delete me.store.lastOptions.selectedLoaded;
 			});
 		}, this);
 		

@@ -79,6 +79,15 @@ abstract class Entity extends Property {
 	 */
 	const EVENT_FILTER = "filter";
 
+
+	/**
+	 * Fires when sorting. Other modules can alter sort behavior.
+	 *
+	 * @param Query $query
+	 * #param array $sort
+	 */
+	const EVENT_SORT = "sort";
+
   /**
    * Find entities
    *
@@ -775,9 +784,11 @@ abstract class Entity extends Property {
 				break;
 			}
 		}
+
+		static::fireEvent(self::EVENT_SORT, $query, $sort);
 		
 		$query->orderBy($sort, true);
-		
+
 		return $query;
 	}
 

@@ -1,3 +1,6 @@
+- Core: Fixed bugs in group dialog with loading and changing users when deselecting
+- Core: Updated German translation
+
 03-02-2020 6.4.111
 - Core: Remove fields from fieldset too after deleting fieldset and added loadmask
 - Core: Optimized indexes of core_link table for faster filtering in the address book
