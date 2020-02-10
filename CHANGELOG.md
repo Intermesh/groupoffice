@@ -1,3 +1,5 @@
+10-02-2020 6.4.113
+- Core: Don't encode installation files with ioncube.
 - Core: Support fixed dates in date filters 
 
 07-02-2020 6.4.112
