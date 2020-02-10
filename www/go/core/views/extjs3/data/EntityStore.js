@@ -381,7 +381,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 * ```
 	 * 
 	 * @param {int} id
-	 * @return {Promise} 
+	 * @return {Promise} Promise is rejected when it's not found or there are no permissions.
 	 */
 	single: function(id) {
 
