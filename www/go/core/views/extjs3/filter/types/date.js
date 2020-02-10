@@ -23,7 +23,9 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 					fields: ['value', 'text'],					
 					data: [
 						['before', t("is before, today plus")],
-						['after', t("is after, today plus")]
+						['after', t("is after, today plus")],
+						['beforedate', t("is before")],
+						['beforeafter', t("is after")]
 					]
 				}),
 				valueField: 'value',
@@ -33,7 +35,28 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 				editable: false,
 				selectOnFocus: true,
 				forceSelection: true,
-				width: Math.ceil(dp(200))
+				width: Math.ceil(dp(200)),
+				listeners: {
+					scope: this,
+					select: function(combo, record, index) {
+						switch(record.data.value) {
+							case 'before':
+							case 'after':
+								this.valueField.setVisible(true);
+								this.periodCombo.setVisible(true);
+								this.dateField.setVisible(false);
+								this.doLayout();
+								break;
+
+							case 'beforedate':
+							case 'afterdate':
+								this.valueField.setVisible(false);
+								this.periodCombo.setVisible(false);
+								this.dateField.setVisible(true);
+								this.doLayout();
+						}
+					}
+				}
 			});
 			
 		this.periodCombo = new go.form.ComboBox({
@@ -61,11 +84,16 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 			
 			
 		this.valueField = this.createValueField();
+
+		this.dateField = new go.form.DateField({
+			hidden: true
+		});
 		
 		this.items = [
 			this.operatorCombo,
 			this.valueField,
-			this.periodCombo
+			this.periodCombo,
+			this.dateField
 		];
 
 		go.filter.types.date.superclass.initComponent.call(this);
@@ -89,41 +117,81 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 		return this.name;
 	},
 	
-	setValue: function(v) {
-				
-		var regex = /([><]+) ([\-0-9]+) (days|months|years)/,						
-						operator = 'before', period = 'days', number = 0;
-		
-		if(v) {
-			var matches = v.match(regex);
+	setValue: function (v) {
 
-			if(matches) {	
-				number = parseFloat(matches[2].trim());
-				period = matches[3].trim();
+		v = v + "";
 
-				switch(matches[1]) {
-					case '>':
-						operator = 'after';
-						break;
-					case '<':
-						operator = 'before';
-						break;
-				}
-			}		
+		var regex = /([><]+) ([0-9]{4}-[0-9]{2}-[0-9]{2})/;
+		var matches = v.match(regex);
+
+		if (matches) {
+			switch (matches[1]) {
+				case '>':
+					operator = 'afterdate';
+					break;
+				case '<':
+					operator = 'beforedate';
+					break;
+			}
+
+			this.dateField.setValue(matches[2]);
+
+			this.operatorCombo.setValue(operator);
+			this.valueField.setVisible(false);
+			this.periodCombo.setVisible(false);
+			this.dateField.setVisible(true);
+			this.doLayout();
+
+			return;
 		}
+
+		var regex = /([><]+) ([\-0-9]+) (days|months|years)/,
+			operator = 'before', period = 'days', number = 0;
+
+
+		var matches = v.match(regex);
+
+		if (matches) {
+			number = parseFloat(matches[2].trim());
+			period = matches[3].trim();
+
+			switch (matches[1]) {
+				case '>':
+					operator = 'after';
+					break;
+				case '<':
+					operator = 'before';
+					break;
+			}
+		}
+
+		this.valueField.setVisible(true);
+		this.periodCombo.setVisible(true);
+		this.dateField.setVisible(false);
+
 		this.operatorCombo.setValue(operator);
 		this.valueField.setValue(number);
 		this.periodCombo.setValue(period);
+		this.doLayout();
+
+
 	},
 	getValue: function() {
-		
-		var v =  this.valueField.getValue() + ' ' + this.periodCombo.getValue();
-		
+
+		if(this.dateField.isVisible()) {
+			var v =  this.dateField.getValue().format('Y-m-d');
+		} else
+		{
+			var v =  this.valueField.getValue() + ' ' + this.periodCombo.getValue();
+		}
+
 		switch(this.operatorCombo.getValue()) {				
-								
+
+			case 'afterdate':
 			case 'after':				
 				return '> ' + v;
-				
+
+			case 'beforedate':
 			case 'before':				
 				return '< ' + v;
 			
