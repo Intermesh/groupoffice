@@ -1,11 +1,13 @@
 <?php
 namespace go\core\acl\model;
 
+use Exception;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\orm\Query;
 use go\core\exception\Forbidden;
 use go\core\db\Expression;
+use ReflectionException;
 
 /**
  * The AclEntity
@@ -30,10 +32,12 @@ abstract class AclOwnerEntity extends AclEntity {
 	 */
 	private $acl;
 
+	public static $aclColumnName = 'aclId';
+
 
 	protected function internalSave() {
 		
-		if($this->isNew() && !isset($this->aclId)) {
+		if($this->isNew() && !isset($this->{static::$aclColumnName})) {
 			$this->createAcl();
 		}
 
@@ -60,12 +64,18 @@ abstract class AclOwnerEntity extends AclEntity {
 	/**
 	 * This is set with the new and old groupLevel values
 	 * 
-	 * @var array [groupId => [newLevel, oldLevel]]
+	 * @return array [groupId => [newLevel, oldLevel]]
 	 */
 	protected function getAclChanges() {
 		return $this->aclChanges;
 	}
 
+
+	/**
+	 *
+	 * @return bool
+	 * @throws Exception
+	 */
 	private function saveAcl() {
 		if(!isset($this->setAcl)) {
 			return true;
@@ -78,7 +88,6 @@ abstract class AclOwnerEntity extends AclEntity {
 		foreach($this->setAcl as $groupId => $level) {
 			$a->addGroup($groupId, $level);
 		}
-
 		
 		$mod = $a->getModified(['groups']);
 		if(isset($mod['groups'])) {
@@ -87,10 +96,10 @@ abstract class AclOwnerEntity extends AclEntity {
 				$this->aclChanges[$new->groupId] = [$new->level, null];
 			}
 			foreach($mod['groups'][1] as $old) {
-				if(!isset($this->aclChanges[$new->groupId])) {
-					$this->aclChanges[$new->groupId] = [null, $old->level];
+				if(!isset($this->aclChanges[$old->groupId])) {
+					$this->aclChanges[$old->groupId] = [null, $old->level];
 				} else {
-					$this->aclChanges[$new->groupId][1] = $old->level;
+					$this->aclChanges[$old->groupId][1] = $old->level;
 				}
 			}
 		}
@@ -100,8 +109,9 @@ abstract class AclOwnerEntity extends AclEntity {
 
 	/**
 	 * Returns an array with group ID as key and permission level as value.
-	 * 
+	 *
 	 * @return array eg. ["2" => 50, "3" => 10]
+	 * @throws Exception
 	 */
 	public function getAcl() {
 		$a = $this->findAcl();
@@ -126,7 +136,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	/**
 	 * Set the ACL
 	 * 
-	 * @param $acl an array with group ID as key and permission level as value. eg. ["2" => 50, "3" => 10]
+	 * @param string $acl An array with group ID as key and permission level as value. eg. ["2" => 50, "3" => 10]
 	 * 
 	 * @example
 	 * ```
@@ -142,17 +152,24 @@ abstract class AclOwnerEntity extends AclEntity {
 	/**
 	 * Permissions are set via AclOwnerEntity models through setAcl(). When this propery is used it will configure the Acl models.
 	 * This permission is not checked in the controller as usal but checked on save here.
+	 * @throws Exception
+	 * @return void
 	 */
 	protected function checkManagePermission() {
 		if($this->findAcl()->ownedBy == go()->getUserId()) {
-			return true;
+			return;
 		}
 
 		if(!$this->findAcl()->hasPermissionLevel(Acl::LEVEL_MANAGE)) {		
 			throw new Forbidden("You are not allowed to manage permissions on this ACL");
 		}
+
+		return;
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	protected function createAcl() {
 		
 		// Copy the default one. When installing the default one can't be accessed yet.
@@ -168,14 +185,14 @@ abstract class AclOwnerEntity extends AclEntity {
 				$this->acl = new Acl();
 			}
 		}
-		$aclColumn = $this->getMapping()->getColumn('aclId');
+		$aclColumn = $this->getMapping()->getColumn(static::$aclColumnName);
 		if(!$aclColumn) {
-			throw new \Exception("Column aclId is required for AclOwnerEntity ". static::class);
+			throw new Exception("Column aclId is required for AclOwnerEntity ". static::class);
 		}
-		$this->acl->usedIn = $aclColumn->table->getName().'.aclId';
+		$this->acl->usedIn = $aclColumn->table->getName() . '.' . static::$aclColumnName;
 		try {
 			$this->acl->entityTypeId = $this->entityType()->getId();
-		} catch(\Exception $e) {
+		} catch(Exception $e) {
 
 			//During install this will throw a module not found error due to chicken / egg problem.
 			//We'll fix the data with the Group::check() function in the installer.
@@ -188,28 +205,24 @@ abstract class AclOwnerEntity extends AclEntity {
 		$this->acl->ownedBy = !empty($this->createdBy) ? $this->createdBy : $this->getDefaultCreatedBy();
 
 		if(!$this->acl->save()) {	
-			throw new \Exception("Could not create ACL");
+			throw new Exception("Could not create ACL");
 		}
 
-		$this->aclId = $this->acl->id;		
+		$this->{static::$aclColumnName} = $this->acl->id;
 	}
 
 	/**
 	 * Log's deleted entities for JMAP sync
-	 * 
+	 *
 	 * @param Query $query The query to select entities in the delete statement
 	 * @return boolean
+	 * @throws Exception
 	 */
 	protected static function logDeleteChanges(Query $query) {
 
 		$changes = clone $query;
 
 		$changes->select('id as entityId, aclId, "1" as destroyed');
-
-		// $aclIds = array_map(function($change) {return $change['entityId'];}, $changes);
-		// if(!Acl::delete(['id' => $aclIds])) {
-		// 	return false;
-		// }
 		
 		return static::entityType()->changes($changes);
 	}
@@ -232,27 +245,32 @@ abstract class AclOwnerEntity extends AclEntity {
 		
 		return true;
 	}
-	
+
+	/**
+	 * @param Query $query
+	 * @return mixed[]
+	 * @throws Exception
+	 */
 	protected static function getAclsToDelete(Query $query) {
 		
 		$q = clone $query;
-		$q->select('aclId');
+		$q->select(static::$aclColumnName);
 		return $q->all();
-	
-		
+
 	}
-	
+
 	/**
 	 * Get the ACL entity
-	 * 
+	 *
 	 * @return Acl
+	 * @throws Exception
 	 */
 	public function findAcl() {
-		if(empty($this->aclId)) {
+		if(empty($this->{static::$aclColumnName})) {
 			return null;
 		}
 		if(!isset($this->acl)) {
-			$this->acl = Acl::internalFind()->where(['id' => $this->aclId])->single();
+			$this->acl = Acl::internalFind()->where(['id' => $this->{static::$aclColumnName}])->single();
 		}
 		
 		return $this->acl;
@@ -270,68 +288,71 @@ abstract class AclOwnerEntity extends AclEntity {
 		}
 
 		if(!isset($this->permissionLevel)) {
-			$this->permissionLevel = Acl::getUserPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId());
+			$this->permissionLevel = Acl::getUserPermissionLevel($this->{static::$aclColumnName}, App::get()->getAuthState()->getUserId());
 		}
 
 		return $this->permissionLevel;
 	}
-	
+
 	/**
-	 * Applies conditions to the query so that only entities with the given 
+	 * Applies conditions to the query so that only entities with the given
 	 * permission level are fetched.
-	 * 
+	 *
 	 * Note: when you join another table with an acl ID you can use Acl::applyToQuery():
-	 * 
+	 *
 	 * ```
 	 * $query = User::find();
-	 * 
-	 * $query	->join('applications_application', 'a', 'a.createdBy = u.id')
-							->groupBy(['u.id']);
-			
+	 *
+	 * $query  ->join('applications_application', 'a', 'a.createdBy = u.id')
+	 * ->groupBy(['u.id']);
 	 * //We don't want to use the Users acl but the applications acl.
-			\go\core\model\Acl::applyToQuery($query, 'a.aclId');
-	 * 
+	 * \go\core\model\Acl::applyToQuery($query, 'a.aclId');
+	 *
 	 * ```
-	 * 
+	 *
 	 * @param Query $query
 	 * @param int $level
 	 * @param int $userId
 	 * @param int[] $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
+	 * @return Query
+	 * @throws Exception
 	 */
 	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {			
 		$tables = static::getMapping()->getTables();
 		$firstTable = array_shift($tables);
 		$tableAlias = $firstTable->getAlias();
-		Acl::applyToQuery($query, $tableAlias . '.aclId', $level, $userId, $groups);
+		Acl::applyToQuery($query, $tableAlias . '.' . static::$aclColumnName, $level, $userId, $groups);
 		
 		return $query;
 	}
-	
+
 	/**
 	 * Finds all aclId's for this entity
-	 * 
+	 *
 	 * This query is used in the "getFooUpdates" methods of entities to determine if any of the ACL's has been changed.
 	 * If so then the server will respond that it cannot calculate the updates.
-	 * 
-	 * @see \go\core\jmap\EntityController::getUpdates()
-	 * 
+	 *
 	 * @return Query
+	 * @throws Exception
+	 * @see \go\core\jmap\EntityController::getUpdates()
+	 *
 	 */
 	public static function findAcls() {
 		$tables = static::getMapping()->getTables();
 		$firstTable = array_shift($tables);
-		return (new Query)->selectSingleValue('aclId')->from($firstTable->getName());
+		return (new Query)->selectSingleValue(static::$aclColumnName)->from($firstTable->getName());
 	}
 	
 	public function findAclId() {
-		return $this->aclId;
+		return $this->{static::$aclColumnName};
 	}
 
 	/**
 	 * Get the table alias holding the aclId
+	 * @throws Exception
 	 */
 	public static function getAclEntityTableAlias() {
-		return static::getMapping()->getColumn('aclId')->table->getAlias();
+		return static::getMapping()->getColumn(static::$aclColumnName)->table->getAlias();
 	}
 
 	/**
@@ -349,10 +370,10 @@ abstract class AclOwnerEntity extends AclEntity {
         'acl.entityId' => new Expression('entity.id')],
       (new Query())
         ->tableAlias('acl')
-        ->join($table, 'entity', 'entity.aclId = acl.id'));
+        ->join($table, 'entity', 'entity.' . static::$aclColumnName . ' = acl.id'));
   
 		if(!$stmt->execute()) {
-			throw new \Exception("Could not update ACL");
+			throw new Exception("Could not update ACL");
 		}
 
 		parent::check();

@@ -624,7 +624,6 @@ abstract class Property extends Model {
 	 * @param array $fetchProperties
 	 * @param bool $readOnly
 	 * @return static|Query
-	 * @throws ReflectionException
 	 * @throws Exception
 	 */
 	protected static function internalFind(array $fetchProperties = [], $readOnly = false) {

@@ -195,9 +195,9 @@ abstract class Entity  extends OrmEntity {
 
     if(is_a($cls, AclItemEntity::class, true)) {
       $aclAlias = $cls::joinAclEntity($query);
-      $query->select($aclAlias .'.aclId', true);
+      $query->select($aclAlias, true);
     } else if(is_a($cls, AclOwnerEntity::class, true)) {
-      $query->select('aclId', true);
+      $query->select($cls::$aclColumnName, true);
     } else{
       $query->select('NULL AS aclId', true);
     }
