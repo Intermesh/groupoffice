@@ -1,3 +1,5 @@
+- Core: Support fixed dates in date filters 
+
 07-02-2020 6.4.112
 - Core: Fixed bugs in group dialog with loading and changing users when deselecting
 - Core: Updated German translation
