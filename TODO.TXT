@@ -2,9 +2,8 @@
 
 remove folders when uninstalling module. Error when reinstalling
 
-- Assitant to handle mailto: links on system
 - Drag and drop files and folders to upload
-- riot matrix synapse integration
+- riot matrix synapse integration / mattermost
 - csv export select columns
 - never respond to email read requests option
 - mailserver limit access per service and filter remote ip address (global and per domain) to stop hacks. https://doc.dovecot.org/configuration_manual/config_file/config_variables/
@@ -20,10 +19,13 @@ remove folders when uninstalling module. Error when reinstalling
  - Status (number of open invites) indicator on Calendar tab like email
  - Database redesign with single object per meeting with multiple participants
 
+- Time tracking
 - New projects module or refactor existing?
 - Tickets finish
 - Share folder external
 - Share project with customer
+
+- NOtifications
 
 
 - billing API integratie boekhoudpakketten

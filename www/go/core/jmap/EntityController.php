@@ -63,13 +63,13 @@ abstract class EntityController extends Controller {
 		}
 	}
 
-  /**
-   * Get's the query for the Foo/query JMAP method
-   *
-   * @param array $params
-   * @return Query
-   * @throws Exception
-   */
+	/**
+	 * Get's the query for the Foo/query JMAP method
+	 *
+	 * @param array $params
+	 * @return Query
+	 * @throws Exception
+	 */
 	protected function getQueryQuery($params) {
 		$cls = $this->entityClass();
 
@@ -97,9 +97,9 @@ abstract class EntityController extends Controller {
 		
 		$cls::sort($query, $sort);
 
-		$this->applyFilterCondition($params['filter'], $query);		
-				
-		if(!$this->permissionLevelFoundInFilters && is_a($this->entityClass(), AclEntity::class, true)) {
+		$query->filter($params['filter']);
+
+		if(!$query->getPermissionLevelFoundInFilters() && is_a($this->entityClass(), AclEntity::class, true)) {
 			$query->filter(["permissionLevel" => Acl::LEVEL_READ]);
 		}
 		
@@ -107,64 +107,6 @@ abstract class EntityController extends Controller {
 		$query->select($cls::getPrimaryKey(true)); //only select primary key
 		
 		return $query;
-	}
-	
-	private $permissionLevelFoundInFilters = false;
-
-  /**
-   *
-   * @param array $filter
-   * @param Query $query
-   * @param null $criteria
-   * @return void
-   * @throws Exception
-   */
-	private function applyFilterCondition($filter, $query, $criteria = null)  {
-		
-		if(!isset($criteria)) {
-			$criteria = $query;
-		}
-		
-		$cls = $this->entityClass();
-		if(isset($filter['conditions']) && isset($filter['operator'])) { // is FilterOperator
-			
-			foreach($filter['conditions'] as $condition) {
-				$subCriteria = new Criteria();
-				$this->applyFilterCondition($condition, $query, $subCriteria);
-			
-				if(!$subCriteria->hasConditions()) {
-					continue;
-				}
-				
-				switch(strtoupper($filter['operator'])) {
-					case 'AND':
-						$criteria->where($subCriteria);
-						break;
-
-					case 'OR':
-						$criteria->orWhere($subCriteria);
-						break;
-
-					case 'NOT':
-						$criteria->andWhereNotOrNull($subCriteria);
-						break;
-				}
-			}
-			
-		} else {	
-			// is FilterCondition		
-			$subCriteria = new Criteria();			
-			
-			if(!$this->permissionLevelFoundInFilters) {
-				$this->permissionLevelFoundInFilters = !empty($filter['permissionLevel']);			
-			}
-			
-			$cls::filter($query, $subCriteria, $filter);			
-			
-			if($subCriteria->hasConditions()) {
-				$criteria->andWhere($subCriteria);	
-			}
-		}
 	}
 	
 	/**

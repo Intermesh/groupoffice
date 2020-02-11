@@ -182,6 +182,16 @@ class Filters {
 		
 		return $this;
 	}
+
+	/**
+	 * Check if a filter is already defined.
+	 *
+	 * @param $name
+	 * @return bool
+	 */
+	public function hasFilter($name) {
+		return isset($this->filters[strtolower($name)]);
+	}
 	
 	public static function parseNumericValue($value) {
 		$regex = '/\s*(>=|<=|>|<|!=|<>|=)\s*(.*)/';

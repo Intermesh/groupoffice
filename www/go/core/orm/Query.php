@@ -65,15 +65,79 @@ class Query extends DbQuery {
    *            ]);
    *
    */
-	public function filter(array $filters) {		
-		$cls = $this->model;		
-		$criteria = new Criteria();
-		$cls::filter($this, $criteria, $filters);
-		if($criteria->hasConditions()) {
-			$this->andWhere($criteria);
+
+  private $permissionLevelFoundInFilters = false;
+
+  public function getPermissionLevelFoundInFilters() {
+    return $this->permissionLevelFoundInFilters;
+	}
+
+	/**
+	 *
+	 * @param array $filter
+	 * @param Query $query
+	 * @param null $criteria
+	 * @return void
+	 * @throws Exception
+	 */
+	private function internalFilter($filter, Criteria $criteria)  {
+
+		$cls = $this->model;
+		if(isset($filter['conditions']) && isset($filter['operator'])) { // is FilterOperator
+
+			foreach($filter['conditions'] as $condition) {
+				$subCriteria = new Criteria();
+				$this->internalFilter($condition, $subCriteria);
+
+				if(!$subCriteria->hasConditions()) {
+					continue;
+				}
+
+				switch(strtoupper($filter['operator'])) {
+					case 'AND':
+						$criteria->where($subCriteria);
+						break;
+
+					case 'OR':
+						$criteria->orWhere($subCriteria);
+						break;
+
+					case 'NOT':
+						$criteria->andWhereNotOrNull($subCriteria);
+						break;
+				}
+			}
+
+		} else {
+			// is FilterCondition
+			$subCriteria = new Criteria();
+
+			if(!$this->permissionLevelFoundInFilters) {
+				$this->permissionLevelFoundInFilters = !empty($filter['permissionLevel']);
+			}
+
+			$cls::filter($this, $subCriteria, $filter);
+
+			if($subCriteria->hasConditions()) {
+				$criteria->andWhere($subCriteria);
+			}
 		}
-		
+
 		return $this;
+	}
+
+	public function filter(array $filters) {
+
+		return $this->internalFilter($filters, $this);
+
+//		$cls = $this->model;
+//		$criteria = new Criteria();
+//		$cls::filter($this, $criteria, $filters);
+//		if($criteria->hasConditions()) {
+//			$this->andWhere($criteria);
+//		}
+//
+//		return $this;
 	}
 
   /**

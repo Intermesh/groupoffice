@@ -137,7 +137,13 @@ class Router {
 			if (!$entityType) {
 				throw new Exception(400, 'Bad request. Entity type "' . $parts[0] . '"  not found');
 			}
-			$controllerClass = str_ireplace("model", "controller", $entityType->getClassName());
+
+			//Very ugly hack
+			if($entityType->getName() == "Project") {
+				$controllerClass = "go\\modules\\business\\projects\\controller\\Project";
+			} else {
+				$controllerClass = str_ireplace("model", "controller", $entityType->getClassName());
+			}
 			$controllerMethod = $parts[1];
 		} else if($parts[0] == "core") {
 			$controllerMethod = array_pop($parts);

@@ -370,7 +370,9 @@ trait CustomFieldsTrait {
 		$fields = static::getCustomFieldModels();		
 		
 		foreach($fields as $field) {
-			$field->getDataType()->defineFilter($filters);
+			if(!$filters->hasFilter($field->databaseName)) {
+				$field->getDataType()->defineFilter($filters);
+			}
 		}		
 	}
 }

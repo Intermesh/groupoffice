@@ -2,8 +2,41 @@
 /* global go, Ext */
 
 /**
- * 
- * 
+ * Store for displaying data in components like a grid, combo, dataview etc.
+ *
+ * @example
+ *
+ * this.store = new go.data.Store({
+			fields: [
+				'id',
+				'name',
+				'firstName',
+				'lastName',
+				{name: 'createdAt', type: 'date'},
+				{name: 'modifiedAt', type: 'date'},
+				{name: 'creator', type: "relation"},
+				{name: 'modifier', type: "relation"},
+				{name: 'addressbook', type: "relation"},
+				'starred',
+				'permissionLevel',
+				'photoBlobId',
+				"isOrganization",
+				"emailAddresses",
+				"phoneNumbers",
+				"dates",
+				"streetAddresses",
+				{name: 'organizations', type: "relation"},
+				"jobTitle",
+				"debtorNumber",
+				"registrationNumber",
+				"IBAN",
+				"vatNo",
+				"color"
+			],
+			sortInfo :{field: "name", direction: "ASC"},
+			entityStore: "Contact"
+		});
+ *
  * //Inserting records will trigger server update too:
  * var store = this.noteGrid.store;
 						var myRecordDef = Ext.data.Record.create(store.fields);
