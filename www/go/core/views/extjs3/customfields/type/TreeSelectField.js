@@ -21,11 +21,6 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 		first.conditionallyHidden = this.conditionallyHidden;
 		first.conditionallyRequired = this.conditionallyRequired;
 
-		first.listeners = first.listeners || {};
-		first.listeners.select = function(field, value) {
-			this.fireEvent('select', value);
-		}.bind(this);
-
 		this.add(first);
 		
 		this.pathMap = {};
@@ -97,6 +92,8 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 		
 		if(!go.util.empty(record.json.children)) {			
 			this.add(this.createCombo(record.json.children));
+		} else {
+			this.fireEvent('select', record);
 		}
 		
 		this.doLayout();
