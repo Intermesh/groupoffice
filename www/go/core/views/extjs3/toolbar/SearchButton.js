@@ -1,17 +1,17 @@
 
 
 /**
- * 
+ * Search button
+ *
+ * When used inside a go.grid.GridPanel component it will lookup the store and bind the entity automatically.
+ * The entity filters can be used using the advanced filter syntax
+ *
  * @example
  * 
  * {
 					xtype: 'tbsearch',
-					filters: [
-						'text',
-						'name', 
-						'content',
-						{name: 'modified', multiple: false},
-						{name: 'created', multiple: false}						
+					tools: [
+						new Ext.Button({iconCls: 'star'})//extra tool button inside search toolbar
 					],
 					listeners: {
 						scope: this,
