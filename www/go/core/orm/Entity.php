@@ -9,13 +9,10 @@ use go\core\data\convert\Json;
 use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
-use go\core\orm\Query;
+use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\model\Module;
-use go\core\data\exception\NotArrayable;
-use go\core\ErrorHandler;
-use go\core\util\ClassFinder;
 use GO\Files\Model\Folder;
 use function go;
 
@@ -584,7 +581,8 @@ abstract class Entity extends Property {
 			});
 		}
 
-		
+		self::defineLegacyFilters($filters);
+
 		if(method_exists(static::class, 'defineCustomFieldFilters')) {
 			static::defineCustomFieldFilters($filters);
 		}
@@ -624,6 +622,40 @@ abstract class Entity extends Property {
 		static::fireEvent(self::EVENT_FILTER, $filters);
 		
 		return $filters;
+	}
+
+	/**
+	 * Support for old framework columns. May be removed if all modules are refactored.
+	 *
+	 * @param Filters $filters
+	 * @throws Exception
+	 */
+	private static function defineLegacyFilters(Filters $filters) {
+		if (static::getMapping()->getColumn('ctime')) {
+			$filters->addDate('createdAt', function (Criteria $criteria, $comparator, DateTime $value, Query $query) {
+				$criteria->andWhere('ctime', $comparator, $value->format("U"));
+			});
+		}
+
+		if (static::getMapping()->getColumn('mtime')) {
+			$filters->addDate('modifiedAt', function (Criteria $criteria, $comparator, DateTime $value, Query $query) {
+				$criteria->andWhere('mtime', $comparator, $value->format("U"));
+			});
+		}
+
+		if (static::getMapping()->getColumn('user_id')) {
+			$filters->addText('createdBy', function (Criteria $criteria, $comparator, $value, Query $query) {
+				$query->join('core_user', 'creator', 'creator.id = p.user_id');
+				$query->andWhere('creator.displayName', $comparator, $value);
+			});
+		}
+
+		if (static::getMapping()->getColumn('muser_id')) {
+			$filters->addText('modifiedBy', function (Criteria $criteria, $comparator, $value, Query $query) {
+				$query->join('core_user', 'modifier', 'creator.id = p.muser_id');
+				$query->andWhere('modifier.displayName', $comparator, $value);
+			});
+		}
 	}
 
   /**
