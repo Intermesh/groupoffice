@@ -72,6 +72,13 @@ go.customfields.type.Template = Ext.extend(go.customfields.type.Text, {
             tpl = tpl.replace(re, lastNumbersYear);
         }
 
+        if(tpl.indexOf("id") != -1 && data.parent_project_id > 0) {
+            var re = new RegExp('{{id}}', 'g');
+            var newId = data.parent_project_id;
+            tpl = tpl.replace(re, newId);
+        }
+
+
         tpl = this.recursiveReplace(tpl,data);
         return tpl;
     }
