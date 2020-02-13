@@ -130,6 +130,9 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 
 		this.on("hide", function() {
 			go.Router.setPath("");
+
+			//reload to make sure settings apply
+			window.location.replace(window.location.pathname);
 		}, this);
 	},
 	
