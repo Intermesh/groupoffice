@@ -377,6 +377,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 						var dlg = item.type.getDialog();
 						dlg.setValues({
 							fieldSetId: this.addFieldMenu.record.data.fieldSetId,
+							type: item.type.name,
 							typeLabel: item.text
 						});
 
