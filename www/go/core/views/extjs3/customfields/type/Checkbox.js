@@ -9,6 +9,22 @@ go.customfields.type.Checkbox = Ext.extend(go.customfields.type.Text, {
 	iconCls: "ic-check-box",
 
 	/**
+	 * Returns a component to display the custom field value on the go.detail.Panel of a contact for example.
+	 * When a contact loads the component is set with a value from
+	 * @see this.renderDetailView()
+	 *
+	 * @param customfield
+	 * @param config
+	 */
+	getDetailField: function(customfield, config) {
+		return new go.detail.Property({
+			itemId: customfield.databaseName,
+			label: t("Checked"),
+			icon: this.iconCls
+		});
+	},
+
+	/**
 	 * Return dialog to edit this type of field
 	 * 
 	 * @returns {go.customfields.FieldDialog}
@@ -26,7 +42,7 @@ go.customfields.type.Checkbox = Ext.extend(go.customfields.type.Text, {
 	 * @returns {unresolved}
 	 */
 	renderDetailView: function (value, data, customfield) {
-		return value ? t("Yes") : t("No");
+		return value ? customfield.name : null;
 	},
 
 	/**
@@ -41,10 +57,10 @@ go.customfields.type.Checkbox = Ext.extend(go.customfields.type.Text, {
 
 		delete config.anchor;
 		config.xtype = "xcheckbox";
-		config.boxLabel = config.fieldLabel;
-		config.hideLabel = true;
+		// config.boxLabel = config.fieldLabel;
+		// config.hideLabel = true;
 		config.checked = !!customfield.default;
-		delete config.fieldLabel;
+		// delete config.fieldLabel;
 
 		return config;
 	},

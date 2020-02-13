@@ -18,8 +18,6 @@
 			
 				scope = scope || me;
 
-				
-
 				go.Db.store("Field").all(function (success, fields) {
 					me.fields = fields;
 
@@ -45,8 +43,6 @@
 			});
 		},
 
-		
-
 		loadModuleTypes : function() {
     
 			var available = go.Modules.getAvailable(), pnl, config, i, i1;
@@ -66,12 +62,10 @@
 				}
 			}
 		},
-		
 	
 		getType : function(name) {
 			return types[name] || null;
 		},
-		
 		
 		getTypes : function() {
 			return types;
@@ -171,7 +165,6 @@
 			});
 			return defs;
 		},
-
 		
 		/**
 		 * Get all Ext.grid.Column definitions for an entity's custom fields
@@ -282,7 +275,7 @@
 		 * 
 		 * @param {int} fieldId
 		 * @param {Object} values
-		 * @returns {CustomFieldsL#1.CustomFieldsAnonym$0.render.values}
+		 * @returns {String}
 		 */
 		renderField: function (fieldId, values) {
 			var field = this.fields[fieldId];
@@ -307,7 +300,7 @@
 			
 			var type = this.getType(field.type);
 			if(!type) {							
-				console.error("Custom field type " + field.type + " not found");
+				console.error("Custom field type '" + field.type + "' not found");
 				return "";
 			}
 
@@ -335,5 +328,3 @@
 	go.customfields.CustomFields = new CustomFieldsCls;
 
 })();
-
-
