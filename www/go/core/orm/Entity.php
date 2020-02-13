@@ -116,20 +116,21 @@ abstract class Entity extends Property {
 	}
 
 	/**
-	 * Find by ID's. 
-	 * 
+	 * Find by ID's.
+	 *
 	 * It will search on the primary key field of the first mapped table.
-	 * 
+	 *
 	 * @exanple
 	 * ```
 	 * $note = Note::findById(1);
-	 * 
+	 *
 	 * //If a key has more than one column they can be combined with a "-". eg. "1-2"
 	 * $models = ModelWithDoublePK::findById("1-1");
 	 * ```
-	 * 
-	 * @param string $id 
+	 *
+	 * @param string $id
 	 * @param string[] $properties
+	 * @param bool $readOnly
 	 * @return static
 	 * @throws Exception
 	 */
@@ -138,22 +139,23 @@ abstract class Entity extends Property {
 		return static::internalFindById($id, $properties, $readOnly);
 	}
 
-  /**
-   * Find entities by ids.
-   *
-   * @exanple
-   * ```
-   * $notes = Note::findByIds([1, 2, 3]);
-   * ```
-   * @exanple
-   * ```
-   * $models = ModelWithDoublePK::findByIds(["1-1", "2-1", "3-3"]);
-   * ```
-   * @param array $ids
-   * @param array $properties
-   * @return Entity|\go\core\orm\Query
-   * @throws Exception
-   */
+	/**
+	 * Find entities by ids.
+	 *
+	 * @exanple
+	 * ```
+	 * $notes = Note::findByIds([1, 2, 3]);
+	 * ```
+	 * @exanple
+	 * ```
+	 * $models = ModelWithDoublePK::findByIds(["1-1", "2-1", "3-3"]);
+	 * ```
+	 * @param array $ids
+	 * @param array $properties
+	 * @param bool $readOnly
+	 * @return Entity|\go\core\orm\Query
+	 * @throws Exception
+	 */
 	public static final function findByIds(array $ids, array $properties = [], $readOnly = false) {
 		$tables = static::getMapping()->getTables();
 		$primaryTable = array_shift($tables);

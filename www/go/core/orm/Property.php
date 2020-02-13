@@ -629,6 +629,7 @@ abstract class Property extends Model {
 	protected static function internalFind(array $fetchProperties = [], $readOnly = false) {
 
 		$cacheKey = static::class . '-' . implode("-", $fetchProperties);
+		$cacheKey = $readOnly ? $cacheKey . '-ro' : $cacheKey . '-rw';
 
 		if(isset(self::$findCache[$cacheKey])) {
 			return clone self::$findCache[$cacheKey];
