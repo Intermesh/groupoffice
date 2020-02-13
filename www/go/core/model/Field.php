@@ -269,7 +269,7 @@ class Field extends AclItemEntity {
 			return false;
 		}
 
-		$modified = $this->uniqueModified || $this->defaultModified || $this->isModified(['databaseName', 'options', 'required']);
+		$modified = $this->isNew() || $this->uniqueModified || $this->defaultModified || $this->isModified(['databaseName', 'options', 'required']);
 		if(!$modified) {
 			return true;
 		}
