@@ -2,6 +2,7 @@
 - Files / Core: fix for error loading comments after collapsing file browser popup
 - Projects: Support new framework filters
 - Projects: Added export to main grid
+- Core: fixed filter after fixed date
 
 10-02-2020 6.4.113
 - Core: Don't encode installation files with ioncube.

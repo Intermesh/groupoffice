@@ -211,6 +211,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 														"E-mail Address": {field: "emailAddresses[].email", fixed: {"type": "work"}},
 														"E-mail 2 Address": {field: "emailAddresses[].email", fixed: {"type": "work"}},
 														"E-mail 3 Address": {field: "emailAddresses[].email", fixed: {"type": "work"}},
+														"E-mail": {field: "emailAddresses[].email", fixed: {"type": "work"}},
 
 														"Primary Phone": {field: "phoneNumbers[].number", fixed: {"type": "work"}},
 														"Home Phone": {field: "phoneNumbers[].number", fixed: {"type": "home"}},
@@ -307,7 +308,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 															}
 														},
 
-														"dates": {
+														"phonenumbers": {
 															label: t("Phone numbers"),
 															properties: {
 																"number": {label: "Number"},
