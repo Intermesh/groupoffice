@@ -1190,11 +1190,13 @@ button.filetype-pdf, button.filetype-doc {
 .display-panel-heading {
 	@extend %font-subheading;
 	/*color: color($fg, 'secondary-text');*/
-	border-top: 1px solid color($fg, 'line');
+	//border-top: 1px solid color($fg, 'line');
 	padding: dp(8) dp(16);
 	height: dp(56);
+	.display-panel + .display-panel & {
+		border-top: 1px solid color($fg, 'line');
+	}
 }
-
 
 .go-display-panel {
 	width: 100%;
@@ -1555,7 +1557,6 @@ table[id^="comments-ext"] b {
 		min-height: dp(32);
 		padding: dp(6) dp(8);	
 		height: dp(32);
-		
 	}	
 	
 	.ux-row-action-cell {
