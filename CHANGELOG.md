@@ -1,3 +1,6 @@
+- Core: Various visual enhancements
+- Core: Fixed "Models are read only error"
+
 11-02-2020 6.4.114
 - Files / Core: fix for error loading comments after collapsing file browser popup
 - Projects: Support new framework filters
