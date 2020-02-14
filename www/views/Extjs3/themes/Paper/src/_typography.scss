@@ -77,16 +77,21 @@ $font-weight-l: 100;
   line-height: dp(24);
 	font-weight: $font-weight-r;
 	letter-spacing: 0.6px;
+	color: color($fg, 'base');
 }
 
 %font-headline {
 	font-size: sp(24);
 	line-height: dp(32);
 	font-weight: $font-weight-r;
+	letter-spacing: 0.6px;
+	color: color($fg, 'base');
 }
 
 %font-display1 {
 	font-size: sp(34);
 	line-height: dp(40);
 	font-weight: $font-weight-r;
+	letter-spacing: 0.6px;
+	color: color($fg, 'base');
 }

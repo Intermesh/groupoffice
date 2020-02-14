@@ -20,7 +20,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			cls: 'go-sidenav',
 			region: "west",
 			split: true,
-			autoScroll: true,			
+			// autoScroll: true,
+			layout: "border",
 			items: [
 				this.createAddressBookTree(),
 				this.createFilterPanel()
@@ -66,6 +67,11 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 	
 	createAddressBookTree : function() {
 		this.addressBookTree = new go.modules.community.addressbook.AddressBookTree({
+			region:  "north",
+			split: true,
+			containerScroll: true,
+			autoScroll: true,
+			height: dp(300),
 			enableDrop: true,
 			ddGroup: "addressbook",
 			ddAppendOnly: true,
@@ -481,7 +487,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		
 		
 		return new Ext.Panel({
-			
+			region: "center",
+			boxMinHeight: dp(300),
 			tbar: [
 				{
 					xtype: 'tbtitle',
