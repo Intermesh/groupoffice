@@ -335,6 +335,8 @@ abstract class Property extends Model {
 
 		$cacheKey = static::class.':'.$relationName;
 
+		$cacheKey = $readOnly ? $cacheKey . '-ro' : $cacheKey . '-rw';
+
 		if(!isset(self::$cachedRelations[$cacheKey])) {
 
       /** @var Query $query */
@@ -408,9 +410,13 @@ abstract class Property extends Model {
 	private function trackModifications() {
 		//Watch db cols and relations
 		$watch = array_keys($this->getMapping()->getProperties());
-		
+
+		$watch = array_filter($watch, function($p) {
+			return in_array($p, $this->fetchProperties);
+		});
+
 		//watch other props
-		$watch = array_merge($watch, static::getPropNames());
+		$watch = array_merge($watch, static::getRequiredProperties());
 		$watch = array_unique($watch);
 
 		foreach ($watch as $propName) {
@@ -530,8 +536,12 @@ abstract class Property extends Model {
    * @throws Exception
    */
 	public function &__get($name) {
-		if(static::getMapping()->hasProperty($name)) {
+		$prop = static::getMapping()->getProperty($name);
+		if($prop) {
 			if(!isset($this->dynamicProperties[$name])) {
+				if($prop instanceof Relation && !in_array($name, $this->fetchProperties)) {
+					throw new \Exception("Relation '$name' was not fetched so can't be accessed");
+				}
 				$this->dynamicProperties[$name] = null;
 			}
 			return $this->dynamicProperties[$name];
