@@ -126,11 +126,23 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	onLoad: function () {
 		
 		go.Translate.setModule(this.package, this.module);
+
+		this.applyTemplateToItems(this.items);
 		
-		this.items.each(function (item, index, length) {
-			
+		this.doLayout();
+		this.body.scrollTo('top', 0);		
+	},
+
+	/**
+	 * Helper function to apply data on all items of this panel. It can also be used to apply it to other items.
+	 *
+	 * @param items
+	 */
+	applyTemplateToItems : function(items) {
+		items.each(function (item, index, length) {
+
 			item.show();
-			
+
 			if (item.tpl) {
 				//debugger;
 				item.update(this.data);
@@ -138,12 +150,8 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			if (item.onLoad) {
 				item.onLoad.call(item, this);
 			}
-			
+
 		}, this);
-		
-		
-		this.doLayout();
-		this.body.scrollTo('top', 0);		
 	},
 
 	reload: function () {

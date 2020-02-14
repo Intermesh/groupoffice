@@ -11,7 +11,15 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 		var me = this;
 		
 		Ext.apply(this, {
-			items: [	
+			items: [{
+				xtype: "panel",
+				onLoad: function (detailView) {
+					detailView.data.jobTitle = detailView.data.jobTitle || "";
+
+					detailView.applyTemplateToItems(this.items);
+					detailView.applyTemplateToItems(this.items.itemAt(0).items);
+				},
+				items:[
 				{
 					xtype: 'container',
 					layout: "hbox",
@@ -19,6 +27,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					items: [
 						
 						this.avatar = new Ext.BoxComponent({
+							height: dp(48),
 							xtype: "box",
 							cls: "go-detail-view-avatar",
 							style: "cursor: pointer",
@@ -46,7 +55,8 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						}),
 					
 						this.namePanel = new Ext.BoxComponent({
-							tpl: '<h3><tpl if="prefixes">{prefixes} </tpl>{name}<tpl if="suffixes"> {suffixes}</tpl></h3><h4>{jobTitle}</h4>'							
+							style: "display: table;height:100%",
+							tpl: '<div style="vertical-align: middle;display:table-cell;"><h3><tpl if="prefixes">{prefixes} </tpl>{name}<tpl if="suffixes"> {suffixes}</tpl></h3><h4>{jobTitle}</h4></div>'
 						}),						
 						this.urlPanel = new Ext.BoxComponent({
 							flex: 1,
@@ -54,13 +64,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 							xtype: "box",
 							tpl: '<tpl for=".">&nbsp;&nbsp;<a target="_blank" href="{url}" class="go-addressbook-url {type}"></a></tpl>'
 						})
-					],
-					onLoad: function (detailView) {
-						detailView.data.jobTitle = detailView.data.jobTitle || "";						
-						detailView.namePanel.update(detailView.data);
-						detailView.urlPanel.update(detailView.data.urls);
-						detailView.avatar.update(detailView.data);
-					}
+					]
 					
 				}, 				
 
@@ -213,7 +217,9 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						<tpl if="values.registrationNumber"><label>{[t("Registration number")]}</label><span>{registrationNumber}</span><br><br></tpl>\
 						<tpl if="values.debtorNumber"><label>{[t("Debtor number")]}</label><span>{debtorNumber}</span></tpl>\
 					</p>'
-				},{
+				}]
+			},{
+				collapsible: true,
 					xtype: 'panel',
 					title: t("Notes"),
 					autoHeight: true,

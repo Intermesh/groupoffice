@@ -146,6 +146,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				this.addButton = new Ext.Button({
 					//disabled: true,
 					iconCls: 'ic-add',
+					cls: "primary",
 					tooltip: t('Add'),
 					menu: [
 						{

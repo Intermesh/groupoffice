@@ -632,7 +632,7 @@
 		/*@extend %font-caption;*/
 		/*color: color($primary, 900); //color($fg, 'text');*/
 		
-		@extend %font-subheading; //changed this to be the same as panel headers as they are mixed in forms	
+		@extend %font-title; //changed this to be the same as panel headers as they are mixed in forms
 		float:left;		
 		padding:dp(8) 0 dp(16);
 		position: initial;
@@ -981,7 +981,7 @@
 }
 
 .x-toolbar{
-	height: dp(56);
+	height: dp(48);
 	padding:0 dp(8) 0 0;
 	
 	&.go-paging-tb, .go-paging-tb & {
@@ -1028,7 +1028,7 @@
 	}
 	.xtb-title {
 		padding-left: dp(8);
-		@extend %font-subheading;
+		@extend %font-title;
 	}
 }
 
@@ -2281,14 +2281,14 @@ $menuScrollerSize : dp(4);
 			-webkit-overflow-scrolling: touch;
 	}
 	&-header {
-      border: 0;
+		border: 0;
 		border-top: 1px solid color($fg, 'divider');
-      padding: 0 dp(8) 0 dp(14);
-      height: dp(56);
-      line-height: dp(56);
-      //background-color:$cPrimary;
+		padding: 0 dp(8) 0 dp(14);
+     height: dp(56);
+     line-height: dp(56);
+     //background-color:$cPrimary;
 		&-text {
-			@extend %font-subheading;
+			@extend %font-title;
 			//padding-left: dp(8);
 		}
       .x-border-panel > & {
@@ -2323,26 +2323,29 @@ $menuScrollerSize : dp(4);
 .x-tool{
 	margin: dp(8) 0;
 	position:relative;
-	width:dp(40);
-	height:dp(40);
-	border-radius: 50%;
-	transition: background 250ms linear;
+	width:dp(32);
+	height:dp(32);
+	&:hover {
+		@include var(color, c-primary);
+	}
+//	border-radius: 50%;
+//	transition: background 250ms linear;
 	&::before{
 		position: absolute;
 		top: 50%;
 		left:50%;
 		transform: translate(-50%, -50%);
 	}
-	.x-window-header & {
-
-	}
-/*	&-toggle {
-		float: left;
-	}*/
-	&:hover {
-		transition-duration: 85ms;
-		@include var(background-color, c-primary-tp);
-	}
+//	.x-window-header & {
+//
+//	}
+///*	&-toggle {
+//		float: left;
+//	}*/
+//	&:hover {
+//		transition-duration: 85ms;
+//		@include var(background-color, c-primary-tp);
+//	}
 }
 .x-border-layout-ct {
 	box-shadow: none;
@@ -2420,8 +2423,8 @@ $menuScrollerSize : dp(4);
 			overflow:hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
-			height: dp(56);
-			line-height: dp(56);			
+			height: dp(48);
+			line-height: dp(48);
 		}
 	}
 	&-mc {
