@@ -539,7 +539,7 @@ a {
 		color: white;
 		
 		&.x-form-invalid {
-			background-color: color($red,300);
+			background-color: #e57373;
 		}
 	}
 }
@@ -633,7 +633,7 @@ button {
 	top:dp(-8);
 	right:dp(-8);
 	position:absolute;
-	color: color($orange, 700);
+	color: $cWarning;
 }
 
 .avatar {
@@ -764,7 +764,7 @@ hr {
 .go-tab-notification {
 	@extend %badge;
 	color: rgba(white, 0.87);
-	background-color: color($red,700) !important; // override element style	
+	background-color: $cDanger !important; // override element style
 	position:absolute;
 	right:dp(-4);
 	top:dp(4);	
@@ -1491,7 +1491,7 @@ table[id^="comments-ext"] b {
 	}
 	.x-grid-panel {	
 		&.x-form-invalid {
-			border-color: rgba(color($red, 700),0.54);
+			border-color: rgba($cDanger,0.54);
 		}
 	}
 }

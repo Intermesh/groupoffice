@@ -190,7 +190,7 @@ $app-icons: (
 .x-grid3-col-icon {
 		i {
 			&.em-flag {
-				color: color($red, 700);
+				color: $cDanger;
 			}
 	}
 }

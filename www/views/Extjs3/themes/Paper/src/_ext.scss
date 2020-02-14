@@ -485,7 +485,7 @@
 		@extend %icon;
 		padding: dp(8) 0;
 		content: 'report_problem';
-		color: color($red, 700);
+		color: $cDanger;
 	}
 	
 	&-focus, textarea.x-form-focus {
@@ -493,8 +493,8 @@
 		@include var(border-color, c-primary);
 	}	
 	&-invalid, textarea.x-form-invalid {
-		border-color: rgba(color($red, 700),0.54);
-		background-color: lighten(color($red,100),9%);
+		border-color: rgba($cDanger,0.54);
+		background-color: lighten($cDanger,90%);
 	}
 	
 	&-helptext {
@@ -566,7 +566,7 @@
 	@include var(color, c-primary);
 }
 .x-form-invalid + .x-form-trigger {
-	border-color: color($red, 500);
+	border-color: $cDanger;
 }
 
 
@@ -1298,9 +1298,9 @@
 	}
 	&-dirty-cell > div {
 		border-radius: $borderRadius;
-		border-left: dp(4) solid color($orange, 300);
+		border-left: dp(4) solid $cWarning;
 		padding-left: dp(12);
-		background-color: rgba(color($orange, 300), .08);
+		background-color: rgba($cWarning, .08);
 	}
 	&-body  {
 		/*min-height: dp(152);*/
@@ -1585,11 +1585,11 @@ td.grid-hd-group-cell {
 	}
 	.x-dd-drop-nodrop & {
 		content: 'block';
-		color: color($red, 700);
+		color: $cDanger;
 	}
 	.x-dd-drop-ok &, .x-tree-drop-ok-append & {
 		content: 'done';
-      color: color($green, 700);
+      	color: $cSuccess;
 	}
 }
 
@@ -2000,7 +2000,7 @@ td.x-date-mp-sep {
 // ############
 .x-menu{
 	border-radius: $borderRadius;
-	background-color:color($bg,'dialog');
+	background-color:color($bg,'card');
 	opacity: 1;
 	transition: opacity 90ms $curve-standard, transform 120ms $curve-deceleration;
 	transform-origin: left top 0px;
@@ -2025,7 +2025,8 @@ td.x-date-mp-sep {
 	&-floating{ border:0; }
 	&-nosep { background-image:none; }
 	&-sep {
-		margin: dp(16) 0 dp(16) 0;
+		margin: dp(8) 0;
+		height: 1px;
 		background-color: color($fg, 'divider');
 		border:0;
 	}
@@ -2739,7 +2740,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 	@extend %icon;
 	content: 'warning';
 	font-size:2.2em;
-	color: color($orange, 500);
+	color: $cWarning;
 }
 
 .x-window-dlg .ext-mb-question:after {

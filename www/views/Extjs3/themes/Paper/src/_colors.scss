@@ -7,179 +7,70 @@
 
 $black-87-opacity: rgba(black, 0.87) !default;
 $white-87-opacity: rgba(white, 0.87) !default;
-$red: (
-  50: #ffebee,
-  100: #ffcdd2,
-  200: #ef9a9a,
-  300: #e57373,
-  400: #ef5350,
-  500: #f44336,
-  600: #e53935,
-  700: #d32f2f,
-  800: #c62828,
-  900: #b71c1c,
-  A100: #ff8a80,
-  A200: #ff5252,
-  A400: #ff1744,
-  A700: #d50000,
-  contrast: (
-    50: $black-87-opacity,
-    100: $black-87-opacity,
-    200: $black-87-opacity,
-    300: $black-87-opacity,
-    400: $black-87-opacity,
-    500: white,
-    600: white,
-    700: white,
-    800: $white-87-opacity,
-    900: $white-87-opacity,
-    A100: $black-87-opacity,
-    A200: white,
-    A400: white,
-    A700: white,
-  )
-);
-
-$green: (
-  50: #e8f5e9,
-  100: #c8e6c9,
-  200: #a5d6a7,
-  300: #81c784,
-  400: #66bb6a,
-  500: #4caf50,
-  600: #43a047,
-  700: #388e3c,
-  800: #2e7d32,
-  900: #1b5e20,
-  A100: #b9f6ca,
-  A200: #69f0ae,
-  A400: #00e676,
-  A700: #00c853,
-  contrast: (
-    50: $black-87-opacity,
-    100: $black-87-opacity,
-    200: $black-87-opacity,
-    300: $black-87-opacity,
-    400: $black-87-opacity,
-    500: white,
-    600: white,
-    700: white,
-    800: $white-87-opacity,
-    900: $white-87-opacity,
-    A100: $black-87-opacity,
-    A200: $black-87-opacity,
-    A400: $black-87-opacity,
-    A700: $black-87-opacity,
-  )
-);
-
-$orange: (
-  50: #fff3e0,
-  100: #ffe0b2,
-  200: #ffcc80,
-  300: #ffb74d,
-  400: #ffa726,
-  500: #ff9800,
-  600: #fb8c00,
-  700: #f57c00,
-  800: #ef6c00,
-  900: #e65100,
-  A100: #ffd180,
-  A200: #ffab40,
-  A400: #ff9100,
-  A700: #ff6d00,
-  contrast: (
-    50: $black-87-opacity,
-    100: $black-87-opacity,
-    200: $black-87-opacity,
-    300: $black-87-opacity,
-    400: $black-87-opacity,
-    500: $black-87-opacity,
-    600: $black-87-opacity,
-    700: $black-87-opacity,
-    800: white,
-    900: white,
-    A100: $black-87-opacity,
-    A200: $black-87-opacity,
-    A400: $black-87-opacity,
-    A700: black,
-  )
-);
-
 
 $grey: (
-  0: #ffffff,
-  50: #fafafa,
-  100: #f5f5f5,
-  200: #eeeeee,
-  300: #e0e0e0,
-  400: #bdbdbd,
-  500: #9e9e9e,
-  600: #757575,
-  700: #616161,
-  800: #424242,
-  900: #212121,
-  1000: #000000,
-  A100: #ffffff,
-  A200: #eeeeee,
-  A400: #bdbdbd,
-  A700: #616161,
-  contrast: (
-    0: $black-87-opacity,
-    50: $black-87-opacity,
-    100: $black-87-opacity,
-    200: $black-87-opacity,
-    300: $black-87-opacity,
-    400: $black-87-opacity,
-    500: $black-87-opacity,
-    600: $white-87-opacity,
-    700: $white-87-opacity,
-    800: $white-87-opacity,
-    900: $white-87-opacity,
-    1000: $white-87-opacity,
-    A100: $black-87-opacity,
-    A200: $black-87-opacity,
-    A400: $black-87-opacity,
-    A700: $white-87-opacity,
-  )
+	0: #ffffff,
+	50: #fafafa,
+	100: #f5f5f5,
+	200: #eeeeee,
+	300: #e0e0e0,
+	400: #bdbdbd,
+	500: #9e9e9e,
+	600: #757575,
+	700: #616161,
+	800: #424242,
+	900: #212121,
+	1000: #000000,
+);
+
+$grey-fabric: (
+ 	0: #ffffff,
+	50: #faf9f8,
+	100: #edebe9,
+	200: #e1dfdd,
+	300: #d2d0ce,
+	400: #a19f9d,
+	500: #979593,
+	600: #797775,
+	700: #484644,
+	800: #323130,
+	900: #201f1e,
+	1000: #000000
 );
 
 // LIGHT
 $fg: (
-				base: black,
-				divider: rgba(black, 0.04),
-				line: rgba(black, 0.12),
-				disabled: rgba(black, 0.38),
-				disabled-button: rgba(black, 0.26),
-				track: rgba(black, 0.26),
-				disabled-text: rgba(black, 0.38),
-				hint-text: rgba(black, 0.38),
-				textbox-line: rgba(black, 0.42),
-				secondary-text: rgba(black, 0.64),
-				unfocused: rgba(black, 0.54),
-				icon: rgba(black, 0.54),
-				icons: rgba(black, 0.54),
-				text: rgba(black, 0.87)
+	base: black,
+	divider: rgba(black, 0.04),
+	line: rgba(black, 0.12),
+	disabled: rgba(black, 0.38),
+	disabled-button: rgba(black, 0.26),
+	track: rgba(black, 0.26),
+	disabled-text: rgba(black, 0.38),
+	hint-text: rgba(black, 0.38),
+	textbox-line: rgba(black, 0.42),
+	secondary-text: rgba(black, 0.64),
+	unfocused: rgba(black, 0.54),
+	icon: rgba(black, 0.54),
+	icons: rgba(black, 0.54),
+	text: rgba(black, 0.87)
 ) !default;
 $bg: (
-				status-bar: color($grey, 200),
-				app-bar: color($grey, 100),
-				form: color($grey, 50),
-				background: color($grey, 50),
-				hover: rgba(black, .04),
-				pressed: rgba(black, .08),
-				selected: rgba(black, .08),
-				readonly: rgba(black, .08),
-				box: white,
-				tbar: white,
-				card: white,
-				dialog: color($grey, 100),
-				disabled-button: rgba(black, 0.12)
+	status-bar: color($grey, 200),
+	app-bar: color($grey, 100),
+	form: color($grey, 50),
+	background: color($grey, 50),
+	hover: rgba(black, .04),
+	pressed: rgba(black, .08),
+	selected: rgba(black, .08),
+	readonly: rgba(black, .08),
+	box: white,
+	tbar: white,
+	card: white,
+	dialog: color($grey, 100),
+	disabled-button: rgba(black, 0.12)
 ) !default;
 
-
-
-// Colors that have meaning (eg. success/failure)
 // GO 6.2 color:
 // $cPrimary:		rgb(0, 155, 201);
 // $cPrimaryTp:	rgba(0, 155, 201, 0.16);
@@ -187,64 +78,29 @@ $bg: (
 //Intermesh blue 
 $cPrimary:		rgb(36, 58, 128) !default;
 $cPrimaryTp:	rgba(36, 58, 128, 0.16) !default;
-
-$cHeaderBg: $cPrimary !default;
+$cHeaderBg: 	$cPrimary !default;
 
 $cSecondary:	rgb(104,159,56) !default;
-$cAccent:		color($orange, A400) !default;
-$cAccentTp:	rgba(255, 145, 0, 0.16) !default;
+$cAccent:		#ff9100 !default;
+$cAccentTp:		rgba(255, 145, 0, 0.16) !default;
 
-$cSuccess:		color($green, 700) !default;
-$cDanger:		color($red, 700) !default;
-$cWarning:		color($orange, 700) !default;
+// Colors that have meaning (eg. success/failure)
+$cSuccess:		#43A047 !default;
+$cDanger:		#E53935 !default;
+$cWarning:		#f57c00 !default;
 
-$cSelected: color($bg, 'selected'); // click on menus, tree items, table
-$cHover: color($bg, 'hover') !default;
-$cActive: color($grey, 200) !default; // focussed
-$cAnchor: $cPrimary !default;
+$cSelected: 	color($bg, 'selected'); // click on menus, tree items, table
+$cHover: 		color($bg, 'hover') !default;
+$cActive: 		color($grey, 200) !default; // focussed
+$cAnchor: 		$cPrimary !default;
 
-
-
-.blue {
-	color: #039BE5 !important;
-}
-
-.red {
-	color: #E53935 !important;
-}
-
-.pink {
-  color: #D81B60 !important;
-}
-
-.purple {
-  color: #8E24AA !important;
-}
-
-.cyan {
-  color: #00ACC1 !important;
-}
-
-
-
-.green {
-  color: #43A047 !important;
-}
-
-.orange {
-  color: #FB8C00 !important;
-}
-
-.brown {
-  color: #6D4C41 !important;
-}
-
-
-.yellow {
-  color: #FDD835 !important;
-}
-
-.bluegrey {
-  color: #607D8B !important;
-
-}
+.blue {color: #039BE5 !important;}
+.red {color: $cDanger !important;}
+.pink {color: #D81B60 !important;}
+.purple {color: #8E24AA !important;}
+.cyan {color: #00ACC1 !important;}
+.green {color: $cSuccess !important;}
+.orange {color: #FB8C00 !important;}
+.brown {color: #6D4C41 !important;}
+.yellow {color: #FDD835 !important;}
+.bluegrey {color: #607D8B !important;}
