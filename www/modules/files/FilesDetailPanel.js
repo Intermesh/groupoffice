@@ -19,10 +19,10 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 		this.store.on("load", function() {
 			var count = this.store.getTotalCount();
 			if(count) {
-				this.browseBtn.setText(t("Browse {total} files").replace("{total}", count));
+				this.browseBtn.setText(t("Browse {total} files", "files").replace("{total}", count));
 			} else
 			{
-				this.browseBtn.setText(t("Browse files"));
+				this.browseBtn.setText(t("Browse files", "files"));
 			}
 		}, this);
 
@@ -111,7 +111,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 		} else
 		{
 			this.store.removeAll();
-			this.browseBtn.setText(t("Create folder"));
+			this.browseBtn.setText(t("Create folder", "files"));
 		}
 	}
 
