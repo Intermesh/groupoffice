@@ -72,6 +72,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			containerScroll: true,
 			autoScroll: true,
 			height: dp(300),
+			minHeight: dp(200),
 			enableDrop: true,
 			ddGroup: "addressbook",
 			ddAppendOnly: true,
@@ -488,7 +489,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		
 		return new Ext.Panel({
 			region: "center",
-			boxMinHeight: dp(300),
+			minHeight: dp(200),
+			autoScroll: true,
 			tbar: [
 				{
 					xtype: 'tbtitle',
