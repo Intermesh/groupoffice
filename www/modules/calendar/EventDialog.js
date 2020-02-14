@@ -200,6 +200,10 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 		
 		this.win.show();
 
+		if(!config.initialization) {
+			this.setEventId(config.event_id);
+		}
+
 		if(!this.initialized){
 			
 			
@@ -219,13 +223,13 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					this.resourceGroupsStore.loadData(result.resources);				
 					
 					this.initialized=true;
-					
+					config.initialization = true;
 					this.show(config);
 				},
 				scope:this
 			});
 			return false;
-		}		
+		}
         
 		if (config.oldDomId) {
 			this.oldDomId = config.oldDomId;
@@ -247,7 +251,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			config.event_id = 0;
 		}		
 
-		this.setEventId(config.event_id);	
+
 		
 		var params = {};
 		
@@ -452,6 +456,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			}
 		}
 	},
+
 	setEventId : function(event_id) {		
 		this.formPanel.form.baseParams['id'] = event_id;
 		
@@ -467,7 +472,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 //		this.linkBrowseButton.setDisabled(event_id < 1);
 		if(this.fileBrowseButton)
 			this.fileBrowseButton.setId(event_id);
-		
+
 		this.createLinkButton.setEntity("Event", event_id);
 	},
 
