@@ -1112,4 +1112,5 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Completed' => 'Toekomstige taken',
   'Allowed groups' => 'Toegestane groepen',
   'IP pattern' => 'IP patroon',
+	'Show as tab' => 'Toon als tab'
 );

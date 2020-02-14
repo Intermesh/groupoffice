@@ -18,10 +18,10 @@ $font-weight-l: 100;
 	text-decoration: none;
 }
 
-%font-caption {
+%font-caption { //Used as labels and grid headers
 	font-size: sp(12);
 	font-weight: $font-weight-r;
-	color: color($fg, 'text');
+	color: color($fg, 'secondary-text');
 }
 
 %font-body1 {

@@ -1167,6 +1167,7 @@
 		}
 		&-row td {
 			@extend %font-caption;
+			color: color($fg, 'text');
 			border-left:0;
 			border-right: 1px solid color($fg, 'divider');
 			//border-image: linear-gradient(to bottom, transparent, color($fg, 'line')) 1 100%;
