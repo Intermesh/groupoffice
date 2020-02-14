@@ -1,3 +1,5 @@
+14-02-2020 6.4.115
+- Calendar: Fixed event link not working first time when creating from another item via + button
 - Core: Various visual enhancements
 - Core: Fixed "Models are read only error"
 
