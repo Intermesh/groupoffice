@@ -756,11 +756,9 @@
 	//    background-color: color($grey, 200);
 	//  }
 	&.x-btn-focus, &.x-btn-over {
-		transition: background-color 195ms linear, box-shadow 195ms $curve-standard;
-		@include var(background-color, c-primary);
-		button {
-			color:white;
-		}
+		transition: background-color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+		@include var(background-color, c-primary-tp);
+
 	}
 	&.primary {
 		.x-btn-text {
