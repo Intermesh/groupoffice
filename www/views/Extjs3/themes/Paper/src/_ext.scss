@@ -196,6 +196,7 @@
 	}
 	&-wrap {
 		padding: 0 dp(4);
+		border-bottom: 1px solid color($fg, 'line');
 	}
 	>li.x-tab-strip-active {
 		@include var(border-color, c-primary);
@@ -1196,7 +1197,7 @@
 		// min-height: dp(40); //Seems to cause slightly off positioning in grid cells
 		padding: dp(6) dp(8) dp(6) dp(16); // 10 top = middle of row line-height 20dp
 		.ux-row-action-cell & {
-			padding: dp(8) 0;
+			padding: 0;
 		}
 		> em {
 			@extend %badge;
@@ -2407,6 +2408,7 @@ $menuScrollerSize : dp(4);
 	}
 	&-footer.x-panel-btns {
 		padding: dp(8);
+		border-top: 1px solid color($fg, 'line');
 	}
 	&-header {
 		@extend %font-title;
