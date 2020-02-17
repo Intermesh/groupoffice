@@ -1271,12 +1271,14 @@ END;
 			return str_replace("\n",'  ', $replacement);
 		}, $html);
 
-		$regexp="/<a[^>]*href=\s*([\"']?)(http|https|ftp|bf2)(:\/\/)(.+?)>/i";
-		$html = preg_replace($regexp, "<a target=$1_blank$1 class=$1blue$1 href=$1$2$3$4>", $html);
-		
+//		$regexp="/<a[^>]*href=\s*([\"']?)(http|https|ftp|bf2)(:\/\/)(.+?)>/i";
+		//$html = preg_replace($regexp, "<a target=$1_blank$1 class=$1blue$1 href=$1$2$3$4>", $html);
+
+		$html = str_replace('<a ', '<a target="_blank" ', $html);
+
 		if(!empty($baseUrl)){
-			$regexp="/<a[^>]*href=\s*('|\")(?![a-z]+:)/i";
-			$html = preg_replace($regexp, "<a target=$1_blank$1 class=$1blue$1 href=$1".$baseUrl, $html);
+			$regexp="/href=\s*('|\")(?![a-z]+:)/i";
+			$html = preg_replace($regexp, "href=$1".$baseUrl, $html);
 		}
 
 		//$regexp="/<a.+?href=([\"']?)".str_replace('/','\\/', \GO::config()->full_url)."(.+?)>/i";
