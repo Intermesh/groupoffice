@@ -1434,7 +1434,7 @@ class go_sieve_script
                     }
                 }
 
-                $action['options'] = (array) $action['options'];
+                $action['options'] = isset($action['options']) ? (array) $action['options'] : [];
 
                 // Old-draft way: :method "mailto" :options "email@address"
                 if (!empty($action['method']) && !empty($action['options'])) {

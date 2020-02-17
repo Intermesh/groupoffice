@@ -335,7 +335,27 @@ class Mapping {
 	public function hasProperty($name) {
 		return $this->getRelation($name) != false || $this->getColumn($name) != false;
 	}
-	
+
+	/**
+	 * Get a column or relation property
+	 *
+	 * @param $name
+	 * @return bool|Column|Relation
+	 */
+	public function getProperty($name) {
+		$relation = $this->getRelation($name);
+		if($relation) {
+			return $relation;
+		}
+
+		$col = $this->getColumn($name);
+		if($col) {
+			return $col;
+		}
+
+		return false;
+	}
+
 	/**
 	 * Get all mapped property objects in a key value array. This is a mix of columns 
 	 * and relations.

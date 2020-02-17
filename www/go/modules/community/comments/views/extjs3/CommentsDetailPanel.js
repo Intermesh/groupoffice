@@ -10,7 +10,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	/// Collapsilbe was turn off because of height recaculation issues in HtmlEditor
 	//
 	collapsible: true,
-	animCollapse: false,
+	animCollapse: false, //htmleditor doesn't work with animCollapse
 
 	hideMode: "offsets", //required for htmleditor
 	collapseFirst:false,

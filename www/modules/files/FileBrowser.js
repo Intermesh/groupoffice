@@ -451,6 +451,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	this.newButton = new Ext.Button({
 		tooltip:t("New"),
 		iconCls: 'ic-add',
+		cls: "primary",
 		menu: this.newMenu
 	});
 

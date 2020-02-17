@@ -134,4 +134,7 @@ De volgende wijzigingen zijn aangebracht door %s:
   'Ver.' => 'Ver.',
   'ID' => 'ID',
   'Open in browser' => 'Open in browser',
+	'Create folder' => 'Map aanmaken',
+	"Browse {total} files" => "Bekijk {total} bestanden",
+	"Browse files" => "Bekijk bestanden"
 );

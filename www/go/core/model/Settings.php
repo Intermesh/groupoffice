@@ -298,7 +298,13 @@ class Settings extends core\Settings {
 	 * @var string
 	 */
 	public $databaseVersion;
-	
+
+
+	/**
+	 * Time the db cache was cleared. The client will invalidate it's indexeddb cache when this changes.
+	 * @var int
+	 */
+	public $cacheClearedAt;
 	
 	/**
 	 * Primary color in html notation 000000;

@@ -201,8 +201,6 @@ customfields/type/MultiSelectDialog.js
 customfields/type/MultiSelect.js
 customfields/type/FunctionFieldDialog.js
 customfields/type/FunctionField.js
-customfields/type/Template.js
-customfields/type/TemplateDialog.js
 customfields/type/CheckboxDialog.js
 customfields/type/Checkbox.js
 customfields/type/YesNoDialog.js

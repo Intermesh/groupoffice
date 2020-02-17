@@ -104,7 +104,7 @@
 						fields: ['format', 'label'],		
 						idIndex: 0,
 						data : [
-						['H:i', t('24 hour format','users','core')],
+						['G:i', t('24 hour format','users','core')],
 						['h:i a', t('12 hour format','users','core')]
 						]
 					}),

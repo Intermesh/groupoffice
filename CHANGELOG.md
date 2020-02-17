@@ -1,5 +1,24 @@
+14-02-2020 6.4.115
+- Core: Clear indexedDB cache when /install/upgrade.php has been executed
+- Calendar: Fixed event link not working first time when creating from another item via + button
+- Core: Various visual enhancements
+- Core: Fixed "Models are read only error"
+
+11-02-2020 6.4.114
+- Files / Core: fix for error loading comments after collapsing file browser popup
+- Projects: Support new framework filters
+- Projects: Added export to main grid
+- Core: fixed filter after fixed date
+
+10-02-2020 6.4.113
+- Core: Don't encode installation files with ioncube.
+- Core: Support fixed dates in date filters 
+
+07-02-2020 6.4.112
 - Core: Fixed bugs in group dialog with loading and changing users when deselecting
 - Core: Updated German translation
+- Address book: Select contact field always showed contacts and organizations
+- Tickets: Changing contact in ticket didn't work properly
 
 03-02-2020 6.4.111
 - Core: Remove fields from fieldset too after deleting fieldset and added loadmask

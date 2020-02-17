@@ -2,7 +2,9 @@
 
 namespace go\core\model;
 
+use DateTimeZone;
 use Exception;
+use GO\Base\Html\Error;
 use GO\Base\Model\AbstractUserDefaultModel;
 use GO\Base\Model\User as LegacyUser;
 use GO\Base\Util\Http;
@@ -445,6 +447,14 @@ class User extends Entity {
 		}
 
 		$this->validateMaxUsers();
+
+		if($this->isModified(['timezone'])) {
+			try {
+				$timezone= new DateTimeZone($this->timezone);
+			} catch(Exception $e) {
+				$this->setValidationError('timezone', ErrorCode::INVALID_INPUT, go()->t("Invalid timezone"));
+			}
+		}
 		
 		return parent::internalValidate();
 	}
@@ -786,15 +796,16 @@ class User extends Entity {
 
 		return true;
 	}
-	
+
 	/**
 	 * Get authentication domains that authenticators can use to identify the user
 	 * belongs to that authenticator.
-	 * 
+	 *
 	 * For example the IMAP and LDAP authenticator modules use this by implementing
 	 * the \go\core\auth\DomainProvider interface.
-	 * 
+	 *
 	 * @return string[]
+	 * @throws \go\core\exception\ConfigurationException
 	 */
 	public static function getAuthenticationDomains() {
 		

@@ -32,15 +32,11 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.customfield
 			return "";
 		}
 		
-		go.Db.store("Contact").get([value], function(contacts) {
-			var displayValue;
-			if(!contacts[0]) {
-				displayValue = t("Not found or no access");
-			} else
-			{
-				displayValue = contacts[0].name;
-			}
-			cmp.setValue(displayValue);
+		go.Db.store("Contact").single(value).then(function(contact) {
+			cmp.setValue('<a href="#' + go.Entities.get("Contact").getRouterPath(contact.id) + '">' + contact.name + '</a>');
+		}).catch(function() {
+			cmp.setValue(t("Not found or no access"));
+		}). finally(function() {
 			cmp.setVisible(true);
 		});
 		

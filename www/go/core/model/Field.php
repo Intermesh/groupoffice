@@ -268,6 +268,11 @@ class Field extends AclItemEntity {
 		if(!parent::internalSave()) {
 			return false;
 		}
+
+		$modified = $this->isNew() || $this->uniqueModified || $this->defaultModified || $this->isModified(['databaseName', 'options', 'required']);
+		if(!$modified) {
+			return true;
+		}
 		
 		try {
 			go()->getDbConnection()->pauseTransactions();
@@ -279,7 +284,7 @@ class Field extends AclItemEntity {
 				static::delete($this->primaryKeyValues());				
 			}
 
-      		go()->getDbConnection()->resumeTransactions();
+			go()->getDbConnection()->resumeTransactions();
 
 			$this->setValidationError('id', ErrorCode::GENERAL, $e->getMessage());
 			

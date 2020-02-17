@@ -20,7 +20,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			cls: 'go-sidenav',
 			region: "west",
 			split: true,
-			autoScroll: true,			
+			// autoScroll: true,
+			layout: "border",
 			items: [
 				this.createAddressBookTree(),
 				this.createFilterPanel()
@@ -66,6 +67,12 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 	
 	createAddressBookTree : function() {
 		this.addressBookTree = new go.modules.community.addressbook.AddressBookTree({
+			region:  "north",
+			split: true,
+			containerScroll: true,
+			autoScroll: true,
+			height: dp(300),
+			minHeight: dp(200),
 			enableDrop: true,
 			ddGroup: "addressbook",
 			ddAppendOnly: true,
@@ -146,6 +153,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				this.addButton = new Ext.Button({
 					//disabled: true,
 					iconCls: 'ic-add',
+					cls: "primary",
 					tooltip: t('Add'),
 					menu: [
 						{
@@ -211,6 +219,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 														"E-mail Address": {field: "emailAddresses[].email", fixed: {"type": "work"}},
 														"E-mail 2 Address": {field: "emailAddresses[].email", fixed: {"type": "work"}},
 														"E-mail 3 Address": {field: "emailAddresses[].email", fixed: {"type": "work"}},
+														"E-mail": {field: "emailAddresses[].email", fixed: {"type": "work"}},
 
 														"Primary Phone": {field: "phoneNumbers[].number", fixed: {"type": "work"}},
 														"Home Phone": {field: "phoneNumbers[].number", fixed: {"type": "home"}},
@@ -307,7 +316,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 															}
 														},
 
-														"dates": {
+														"phonenumbers": {
 															label: t("Phone numbers"),
 															properties: {
 																"number": {label: "Number"},
@@ -479,7 +488,9 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		
 		
 		return new Ext.Panel({
-			
+			region: "center",
+			minHeight: dp(200),
+			autoScroll: true,
 			tbar: [
 				{
 					xtype: 'tbtitle',

@@ -40,6 +40,8 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 		];
 		
 		go.import.CsvMappingDialog.superclass.initComponent.call(this);
+
+		this.fieldLabelsToAliases();
 		
 		
 		go.Jmap.request({
@@ -66,6 +68,14 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 			},
 			scope: this
 		});
+	},
+
+	fieldLabelsToAliases : function() {
+		for(var propName in this.fields) {
+			if(!this.aliases[this.fields[propName].label]) {
+				this.aliases[this.fields[propName].label] = propName;
+			}
+		}
 	},
 
 	createLookupCombo: function() {

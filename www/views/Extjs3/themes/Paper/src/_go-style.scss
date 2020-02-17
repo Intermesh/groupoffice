@@ -975,8 +975,24 @@ button.filetype-pdf, button.filetype-doc {
 		@extend .z12;
 		background-color: color($orange, 700) !important;
 	}*/
-	.x-panel-body {
-		background-color:color($bg, 'box');
+		.x-panel-body {
+
+	}
+
+	> .x-panel-bwrap {
+		> .x-panel-body {
+			>.x-panel {
+				@extend .z2;
+				margin: dp(8);
+				background-color: color($bg, 'box');
+
+				> .x-panel-bwrap {
+					>.x-panel-body {
+						padding-bottom: dp(8);
+					}
+				}
+			}
+		}
 	}
 	
 	figure {
@@ -996,8 +1012,7 @@ button.filetype-pdf, button.filetype-doc {
 
 
 		
-	h3, .xtb-title {
-		color: color($fg, 'text');
+	.xtb-title {
 		@extend %font-title;
 	}
 	h5 {		
@@ -1098,11 +1113,6 @@ button.filetype-pdf, button.filetype-doc {
 	h3.title {
 		padding: dp(16);
 	}
-	
-	
-	.x-panel-header {
-		border-top: 1px solid color($fg, "line");
-	}
 }
 
 
@@ -1188,7 +1198,7 @@ button.filetype-pdf, button.filetype-doc {
 
 // old detail view compatibility
 .display-panel-heading {
-	@extend %font-subheading;
+	@extend %font-title;
 	/*color: color($fg, 'secondary-text');*/
 	//border-top: 1px solid color($fg, 'line');
 	padding: dp(8) dp(16);
@@ -1201,7 +1211,7 @@ button.filetype-pdf, button.filetype-doc {
 .go-display-panel {
 	width: 100%;
 	&-heading {
-		@extend %font-subheading;
+		@extend %font-title;
 		/*color: color($fg, 'secondary-text');*/
 		border-top: 1px solid color($fg, 'line');
 		padding: dp(8) dp(16);
@@ -1265,7 +1275,7 @@ table.display-panel {
 	}
 }
 .collapsible-display-panel-header {
-	@extend %font-subheading;
+	@extend %font-title;
 /*	color: color($fg, 'secondary-text');*/
 	border-top: 1px solid color($fg, 'line');
 	padding: 0 dp(8) 0 dp(16);
@@ -1373,6 +1383,15 @@ table[id^="comments-ext"] b {
 	.x-date-picker {
 		transform-origin: 0 0;
 		transform: scale(.9);
+	}
+
+	.x-toolbar:first-of-type {
+		border-bottom: 0;
+	}
+
+
+	.x-panel-body {
+		padding-bottom: dp(8);
 	}
 }
 

@@ -155,7 +155,7 @@ $fg: (
 				disabled-text: rgba(black, 0.38),
 				hint-text: rgba(black, 0.38),
 				textbox-line: rgba(black, 0.42),
-				secondary-text: rgba(black, 0.54),
+				secondary-text: rgba(black, 0.64),
 				unfocused: rgba(black, 0.54),
 				icon: rgba(black, 0.54),
 				icons: rgba(black, 0.54),
@@ -192,6 +192,7 @@ $cHeaderBg: $cPrimary !default;
 
 $cSecondary:	rgb(104,159,56) !default;
 $cAccent:		color($orange, A400) !default;
+$cAccentTp:	rgba(255, 145, 0, 0.16) !default;
 
 $cSuccess:		color($green, 700) !default;
 $cDanger:		color($red, 700) !default;
