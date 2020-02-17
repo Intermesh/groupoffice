@@ -56,9 +56,12 @@ class Statement extends \PDOStatement implements \JsonSerializable, ArrayableInt
 	public function setBuild(array $build) {
 		$this->build = $build;
 	}
-	
+
 	public function __toString() {
 		try {
+			if(!isset($this->build)) {
+				return "Can't render SQL. Please check debug log.";
+			}
 			return QueryBuilder::debugBuild($this->build);
 		} catch(Exception $e) {
 			ErrorHandler::logException($e);
