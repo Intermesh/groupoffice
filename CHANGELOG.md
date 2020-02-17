@@ -1,3 +1,7 @@
+17-02-2020 6.4.116
+- Tickets: Note background color restored
+- Projects: Error on login when not a projects admin
+
 14-02-2020 6.4.115
 - Core: Clear indexedDB cache when /install/upgrade.php has been executed
 - Calendar: Fixed event link not working first time when creating from another item via + button
