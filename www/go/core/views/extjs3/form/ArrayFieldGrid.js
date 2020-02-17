@@ -13,6 +13,9 @@ Ext.define('go.form.ArrayFieldGrid',{
 	 */
 	valueIsId: false,
 
+	properties: false, // array of properties to submit (subset of extraFields)
+
+	defaultValues: {}, // new row values
 	/**
 	 * The entity property to display in the grids
 	 * @property {string}
@@ -83,7 +86,7 @@ Ext.define('go.form.ArrayFieldGrid',{
 
 			tbar: {
 				items: [
-					{xtype: "tbtitle", text: config.title},
+					{xtype: "tbtitle", text: config.tbtitle},'->',
 					this.addCombo = new go.form.ComboBox({
 						//iconCls: "ic-add",
 						allowBlank: true,
@@ -91,7 +94,7 @@ Ext.define('go.form.ArrayFieldGrid',{
 						emptyText: t('Add'),
 						triggerAction: 'all',
 						displayField: config.displayField,
-						editable: true,
+						editable: config.hasOwnProperty('editable') ? config.editable: true,
 						selectOnFocus: true,
 						forceSelection: true,
 						store: {
@@ -112,20 +115,24 @@ Ext.define('go.form.ArrayFieldGrid',{
 						listeners: {
 							select: function(me, record) {
 								// add row and set fields with record
-								var r = {};
+								var r = this.defaultValues;
 								r[this.idField] = record.id;
 								this.store.loadData({records: [r]}, true);
 								this._isDirty = true;
-								//filter store?
+								this.addCombo.setValue(null);
+
+								//filter addCombo.store
+								var ids = this.getIds();
+								this.addCombo.store.filterBy(function(r) {
+									return ids.indexOf(r.id) === -1;
+								});
 							},
 							scope:this
 						}
 					})
 				]
 			},
-			store: new go.data.Store({
-				fields: fields
-			}),
+			store: new go.data.Store({fields: fields}),
 			columns: columns,
 			autoExpandColumn: "name"
 		});
@@ -187,7 +194,15 @@ Ext.define('go.form.ArrayFieldGrid',{
 			if(this.valueIsId) {
 				v.push(records[i].data[this.idField]);
 			} else {
-				v.push(records[i].data);
+				if(this.properties) {
+					var r = {};
+					for(var j in this.properties) {
+						r[this.properties[j]] = records[i].data[this.properties[j]];
+					}
+					v.push(r);
+				} else {
+					v.push(records[i].data);
+				}
 			}
 		}
 		return v;
@@ -224,7 +239,6 @@ Ext.define('go.form.ArrayFieldGrid',{
 			header: '',
 			hideMode: 'display',
 			keepSelection: true,
-
 			actions: [{
 				iconCls: 'ic-delete'
 			}]
@@ -234,6 +248,11 @@ Ext.define('go.form.ArrayFieldGrid',{
 			action: function (grid, record, action, row, col, e, target) {
 				this.store.removeAt(row);
 				this._isDirty = true;
+				//filter addCombo.store
+				var ids = this.getIds();
+				this.addCombo.store.filterBy(function(r) {
+					return ids.indexOf(r.id) === -1;
+				});
 			},
 			scope: this
 		});

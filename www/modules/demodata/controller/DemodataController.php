@@ -983,33 +983,9 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 		
 			
 		if(\GO::modules()->projects2){
-			
-			
-			if(!\GO\Projects2\Model\Employee::model()->count()){
-			
-				$employee = new \GO\Projects2\Model\Employee();
-				$employee->user_id=$elmer->id;
-				$employee->external_fee=120;
-				$employee->internal_fee=60;
-				$employee->save();
 
-				$employee = new \GO\Projects2\Model\Employee();
-				$employee->user_id=$demo->id;
-				$employee->external_fee=80;
-				$employee->internal_fee=40;
-				$employee->save();
+			// todo: Demo data for employees was here but this is moved to business module. (need to refactor)
 
-				$employee = new \GO\Projects2\Model\Employee();
-				$employee->user_id=$linda->id;
-				$employee->external_fee=90;
-				$employee->internal_fee=45;
-				$employee->save();
-			}else
-			{
-				$employee = \GO\Projects2\Model\Employee::model()->findSingle();
-			}
-			
-			
 			$templates = \GO\Projects2\Model\Template::model()->find();
 			
 			$folderTemplate = $templates->fetch();

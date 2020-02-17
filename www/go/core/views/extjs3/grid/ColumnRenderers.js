@@ -7,6 +7,10 @@ go.grid.ColumnRenderers = {
 		}
 	},
 
+	currency: function(v) {
+		return go.User.currency+v;
+	},
+
 	yesNo : function(val){
 		if(val == 1)
 			return t("Yes");
@@ -46,6 +50,13 @@ go.grid.ColumnRenderers = {
 
 	countryCode: function(val, meta, record, rowIndex, columnIndex, store) {
 		return t("countries")[val.toUpperCase()] ? t("countries")[val.toUpperCase()] : val;
+	},
+
+	avatarFn: function(w,h) {
+		return function (value, metaData, record, rowIndex, colIndex, store) {
+			var style = value ? 'background-image: url(' + go.Jmap.thumbUrl(value, {w: w, h: h, zc: 1}) + ');' : '';
+			return '<div class="user" style="width:'+w+'px; height:'+h+'px;"><div class="avatar" style="' + style + ' width: '+w+'px; height:'+h+'px;"></div></div>';
+		}
 	},
 	
 

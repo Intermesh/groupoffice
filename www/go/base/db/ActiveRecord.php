@@ -2486,8 +2486,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				$att[$attName]=$this->getAttribute($attName, $outputType);
 			}elseif($this->hasAttribute($attName)){
 				$att[$attName]=$this->$attName;
-			}else
-			{
+			}else {
 				$att[$attName]=null;
 			}
 		}
