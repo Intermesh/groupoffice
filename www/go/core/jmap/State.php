@@ -176,6 +176,7 @@ class State extends AbstractState {
 		if(!$response) {
 			$response = [
 				'version' => go()->getVersion(),
+				'cacheClearedAt' => go()->getSettings()->cacheClearedAt,
 				// 'username' => $user->username,
 				'accounts' => ['1'=> [
 					'name'=>'Virtual',

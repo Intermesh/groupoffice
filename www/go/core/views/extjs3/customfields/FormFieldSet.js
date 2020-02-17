@@ -87,7 +87,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			var masterFields = [];
 			this.items.each(function(field) {
 				if (field.conditionallyHidden || field.conditionallyRequired) {
-					let linkedField = go.customfields.type.Text.prototype.getRequiredConditionField.call(field, field);
+					var linkedField = go.customfields.type.Text.prototype.getRequiredConditionField.call(field, field);
 					if (linkedField) {
 						linkedField.relatedFields = linkedField.relatedFields || [];
 						linkedField.relatedFields.push(field);
@@ -174,7 +174,5 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	
 	}
 });
-	
-	
 
 Ext.reg("customformfieldset", go.customfields.FormFieldSet);

@@ -9,55 +9,12 @@ go.Modules = (function () {
 		registered: null,
 
 		/**
-		 * 
-		 * @example
-		 * 
-		 * go.Modules.register("community", "addressbook", {
-		 * 	mainPanel: "go.modules.community.addressbook.MainPanel",
-		 * 	title: t("Address book"),
-		 * 	initModule: function() {}, //Will be called after authentication and only if the user has access to the module
-		 * 	entities: [{
-		 * 			
-		 * 			name: "Contact",
-		 * 			hasFiles: true,
-		 * 			links: [{
-		 * 
-		 * 				filter: "isContact",
-		 * 
-		 * 				iconCls: "entity ic-person",
-		 * 
-		 * 				linkWindow: function(entity, entityId) {
-		 * 					return new go.modules.community.addressbook.ContactDialog();
-		 * 				},
-		 * 					
-		 * 				linkDetail: function() {
-		 * 					return new go.modules.community.addressbook.ContactDetail();
-		 * 				}	
-		 * 			},{
-		 * 			
-		 * 				title: t("Organization"),
-		 * 
-		 * 				iconCls: "entity ic-business",			
-		 * 
-		 * 				filter: "isOrganization",
-		 * 
-		 * 				linkWindow: function(entity, entityId) {
-		 * 					var dlg = new go.modules.community.addressbook.ContactDialog();
-		 * 					dlg.setValues({isOrganization: true});
-		 * 					return dlg;
-		 * 				},
-		 * 				
-		 * 				linkDetail: function() {
-		 * 					return new go.modules.community.addressbook.ContactDetail();
-		 * 				}	
-		 * 			}]
-		 * 			
-		 * 	}, "AddressBook", "AddressBookGroup"],
-		 * 	
-		 * 	systemSettingsPanels: ["go.modules.community.addressbook.SystemSettingsPanel"],
-		 * 	userSettingsPanels: ["go.modules.community.addressbook.SettingsPanel"]
-		 * });
-		 * 
+		 *
+		 * Register a module.
+		 *
+		 * @see www/go/modules/community/addressbook/views/extjs3/Module.js for an extended example.
+		 *
+		 *
 		 * @param {string} package
 		 * @param {string} name
 		 * @param {object} config

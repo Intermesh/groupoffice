@@ -154,22 +154,26 @@ class Csv extends convert\Csv {
 	}
 
 	public function importGender(Contact $contact, $gender) {
-		switch($gender) {
-			case 'M':
+		switch(strtolower($gender)) {
 			case 'm':
-			case 'Male':
+			case 'male':
 				$contact->gender = 'M';
 				return;
 
-			case 'F':
 			case 'f':
-			case 'Female':
+			case 'female':
+			case 'v':
 				$contact->gender = 'F';
 				return;
 		}
 	}
 	
-	protected function importOrganizations(Contact $contact, $organizationNames) {
+	protected function importOrganizations(Contact $contact, $organizationNames, array &$values) {
+
+		$addressBookId = $contact->addressBookId ?? $values['addressBookId'];
+		if(empty($addressBookId)) {
+			throw new Exception("No address book ID set");
+		}
 
 		$organizationNames = !empty($organizationNames) ? explode(static::$multipleDelimiter, $organizationNames) : [];
 
@@ -180,7 +184,7 @@ class Csv extends convert\Csv {
 				$org = new Contact();
 				$org->name = $name;
 				$org->isOrganization = true;
-				$org->addressBookId = $contact->addressBookId;
+				$org->addressBookId = $addressBookId;
 				if(!$org->save()) {
 					throw new Exception("Could not create new organization '" . $name . "'");
 				}

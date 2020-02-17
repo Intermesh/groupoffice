@@ -42,25 +42,28 @@ class VCard extends AbstractConverter {
 		if ($contact->vcardBlobId) {
 			//Contact has a stored VCard 
 			$blob = Blob::findById($contact->vcardBlobId);
-			$vcard = Reader::read($blob->getFile()->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);			
-			
-			//remove all supported properties
-			$vcard->remove('EMAIL');
-			$vcard->remove('TEL');
-			$vcard->remove('ADR');
-			$vcard->remove('ORG');
-			$vcard->remove('PHOTO');
-			$vcard->remove('BDAY');
-			$vcard->remove('ANNIVERSARY');
+			$file = $blob->getFile();
+			if($file->exists()) {
+				$vcard = Reader::read($file->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 
-			return $vcard;
-		} else {
-			//We have to use 3.0 for the photo property :( See https://github.com/sabre-io/vobject/issues/294#issuecomment-231987064
-			return new VCardComponent([
-					"VERSION" => "3.0",
-					"UID" => $contact->getUid()
-			]);
+				//remove all supported properties
+				$vcard->remove('EMAIL');
+				$vcard->remove('TEL');
+				$vcard->remove('ADR');
+				$vcard->remove('ORG');
+				$vcard->remove('PHOTO');
+				$vcard->remove('BDAY');
+				$vcard->remove('ANNIVERSARY');
+
+				return $vcard;
+			}
 		}
+
+		//We have to use 3.0 for the photo property :( See https://github.com/sabre-io/vobject/issues/294#issuecomment-231987064
+		return new VCardComponent([
+				"VERSION" => "3.0",
+				"UID" => $contact->getUid()
+		]);
 	}
 
 	/**

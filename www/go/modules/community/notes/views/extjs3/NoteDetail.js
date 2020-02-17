@@ -13,12 +13,15 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 
 		Ext.apply(this, {
 			items: [{
-					xtype: 'readmore',
-					onLoad: function (detailView) {
-						this.setText("<h3>" + Ext.util.Format.htmlEncode(detailView.data.name) + "</h3><div class='go-html-formatted'>" + detailView.data.content + "</div>");
-					}
-				}
-			]
+				title: t("Note"),
+				onLoad: function (detailView) {
+					this.setTitle(Ext.util.Format.htmlEncode(detailView.data.name));
+					this.items.itemAt(0).setText("<div class='go-html-formatted'>" + detailView.data.content + "</div>");
+				},
+				items: [{
+					xtype: 'readmore'
+				}]
+			}]
 		});
 		
 

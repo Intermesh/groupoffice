@@ -522,6 +522,9 @@ use const GO_CONFIG_FILE;
 			Observable::cacheListeners();
 
 			Listeners::get()->init();
+
+			go()->getSettings()->cacheClearedAt = time();
+			go()->getSettings()->save();
 			
 		}
 		

@@ -131,7 +131,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		body.style.padding = dp(8);
 		body.style.boxSizing = "border-box";
 		body.style.width = "100%";
-
+		
 		setTimeout(function() {
 			var h =  Math.max(me.boxMinHeight,Math.min(body.offsetHeight, me.boxMaxHeight)); // 400  max height
 			if(h > 36) {
@@ -150,8 +150,9 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		var totalHeight = this.commentBox.getHeight() + this.chips.getHeight() + this.attachmentBox.getHeight();
 		this.setHeight(totalHeight);
 		this.middleBox.setHeight(totalHeight-2);
-		var headerHeight = (this.header || this.ownerCt.header) ? dp(64) : 0;
+		var headerHeight = (this.header || this.ownerCt.header) ? dp(42) : 0;
 		var h = Math.min(this.ownerCt.growMaxHeight,this.ownerCt.commentsContainer.getEl().dom.scrollHeight + totalHeight + headerHeight);
+		h += dp(14);
 		this.ownerCt.setHeight(h);
 		this.ownerCt.doLayout();	
 		this.doLayout();

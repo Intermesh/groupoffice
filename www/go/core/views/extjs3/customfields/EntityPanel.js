@@ -373,10 +373,12 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 					text: types[name].label,
 					type: types[name],
 					handler: function (item) {
+						console.warn(item);
 						var dlg = item.type.getDialog();
 						dlg.setValues({
 							fieldSetId: this.addFieldMenu.record.data.fieldSetId,
-							type: item.type.name
+							type: item.type.name,
+							typeLabel: item.text
 						});
 
 						dlg.show();
@@ -471,8 +473,6 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 					fsSortOrderMap[fs.id] = fs.sortOrder * 100000;
 
 				});
-
-
 
 				this.store.loadData(storeData, true);
 

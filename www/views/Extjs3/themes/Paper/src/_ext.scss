@@ -196,6 +196,7 @@
 	}
 	&-wrap {
 		padding: 0 dp(4);
+		border-bottom: 1px solid color($fg, 'line');
 	}
 	>li.x-tab-strip-active {
 		@include var(border-color, c-primary);
@@ -631,7 +632,7 @@
 		/*@extend %font-caption;*/
 		/*color: color($primary, 900); //color($fg, 'text');*/
 		
-		@extend %font-subheading; //changed this to be the same as panel headers as they are mixed in forms	
+		@extend %font-title; //changed this to be the same as panel headers as they are mixed in forms
 		float:left;		
 		padding:dp(8) 0 dp(16);
 		position: initial;
@@ -755,11 +756,9 @@
 	//    background-color: color($grey, 200);
 	//  }
 	&.x-btn-focus, &.x-btn-over {
-		transition: background-color 195ms linear, box-shadow 195ms $curve-standard;
-		@include var(background-color, c-primary);
-		button {
-			color:white;
-		}
+		transition: background-color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+		@include var(background-color, c-primary-tp);
+
 	}
 	&.primary {
 		.x-btn-text {
@@ -955,7 +954,7 @@
 
 		input {
 			box-shadow: none;
-			min-height: dp(56);
+			min-height: dp(48);
 			border:0;
 			+ .x-form-search-trigger {
 				min-height:dp(56);
@@ -980,7 +979,7 @@
 }
 
 .x-toolbar{
-	height: dp(56);
+	height: dp(48);
 	padding:0 dp(8) 0 0;
 	
 	&.go-paging-tb, .go-paging-tb & {
@@ -1027,7 +1026,7 @@
 	}
 	.xtb-title {
 		padding-left: dp(8);
-		@extend %font-subheading;
+		@extend %font-title;
 	}
 }
 
@@ -1166,6 +1165,7 @@
 		}
 		&-row td {
 			@extend %font-caption;
+			color: color($fg, 'text');
 			border-left:0;
 			border-right: 1px solid color($fg, 'divider');
 			//border-image: linear-gradient(to bottom, transparent, color($fg, 'line')) 1 100%;
@@ -1196,7 +1196,7 @@
 		// min-height: dp(40); //Seems to cause slightly off positioning in grid cells
 		padding: dp(6) dp(8) dp(6) dp(16); // 10 top = middle of row line-height 20dp
 		.ux-row-action-cell & {
-			padding: dp(8) 0;
+			padding: 0;
 		}
 		> em {
 			@extend %badge;
@@ -2280,14 +2280,14 @@ $menuScrollerSize : dp(4);
 			-webkit-overflow-scrolling: touch;
 	}
 	&-header {
-      border: 0;
+		border: 0;
 		border-top: 1px solid color($fg, 'divider');
-      padding: 0 dp(8) 0 dp(14);
-      height: dp(56);
-      line-height: dp(56);
-      //background-color:$cPrimary;
+		padding: 0 dp(8) 0 dp(14);
+     height: dp(48);
+     line-height: dp(48);
+     //background-color:$cPrimary;
 		&-text {
-			@extend %font-subheading;
+			@extend %font-title;
 			//padding-left: dp(8);
 		}
       .x-border-panel > & {
@@ -2296,10 +2296,9 @@ $menuScrollerSize : dp(4);
 	}
 	&-icon::before { 
 		@extend %icon;		
-		margin-top: dp(-4);
+		//margin-top: dp(-4);
 		float: left;
-		padding: dp(20) sp(16) dp(20) 0;
-	}
+		padding: dp(12) sp(16) dp(12) 0;	}
 	&-collapsed {
 		.x-window-tl {
 			border-bottom-color:#84a0c4;
@@ -2322,26 +2321,29 @@ $menuScrollerSize : dp(4);
 .x-tool{
 	margin: dp(8) 0;
 	position:relative;
-	width:dp(40);
-	height:dp(40);
-	border-radius: 50%;
-	transition: background 250ms linear;
+	width:dp(32);
+	height:dp(32);
+	&:hover {
+		@include var(color, c-primary);
+	}
+//	border-radius: 50%;
+//	transition: background 250ms linear;
 	&::before{
 		position: absolute;
 		top: 50%;
 		left:50%;
 		transform: translate(-50%, -50%);
 	}
-	.x-window-header & {
-
-	}
-/*	&-toggle {
-		float: left;
-	}*/
-	&:hover {
-		transition-duration: 85ms;
-		@include var(background-color, c-primary-tp);
-	}
+//	.x-window-header & {
+//
+//	}
+///*	&-toggle {
+//		float: left;
+//	}*/
+//	&:hover {
+//		transition-duration: 85ms;
+//		@include var(background-color, c-primary-tp);
+//	}
 }
 .x-border-layout-ct {
 	box-shadow: none;
@@ -2406,7 +2408,8 @@ $menuScrollerSize : dp(4);
 		}
 	}
 	&-footer.x-panel-btns {
-		padding: dp(8);
+		padding: dp(4);
+		border-top: 1px solid color($fg, 'line');
 	}
 	&-header {
 		@extend %font-title;
@@ -2418,8 +2421,8 @@ $menuScrollerSize : dp(4);
 			overflow:hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
-			height: dp(56);
-			line-height: dp(56);			
+			height: dp(48);
+			line-height: dp(48);
 		}
 	}
 	&-mc {
@@ -2523,9 +2526,10 @@ body.x-body-masked .x-window-plain .x-window-mc {
 	}
 }
 
-$resizerSize : dp(2);
+$resizerSize : dp(3);
 .x-layout-split {
-	background-color: color($fg,'divider');
+	border-right: 1px solid color($fg,'line');
+	border-top: 1px solid color($fg,'line');
 	&.x-splitbar {
 		&-h {
 			width:$resizerSize;

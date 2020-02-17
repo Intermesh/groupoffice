@@ -30,7 +30,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	
 	dirty: false,
 	
-	hideLabel: true,		
+	hideLabel: true,
+
+	hideBbar: false,
 	
 	addButtonText: null, // deprecated, use btnCfg
 	btnCfg: null, // @type Ext.Button
@@ -62,7 +64,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 		this.btnCfg = this.btnCfg || {};
 
-		if(this.editable) {
+		if(this.editable && !this.hideBbar) {
 			this.initBbar();
 		}
 

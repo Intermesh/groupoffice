@@ -275,7 +275,15 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 		var field = this.createFormFieldConfig(customfield, config);
 		return this.applySuffix(customfield, field);
 	},
-	
+
+	/**
+	 * Returns a component to display the custom field value on the go.detail.Panel of a contact for example.
+	 * When a contact loads the component is set with a value from
+	 * @see this.renderDetailView()
+	 *
+	 * @param customfield
+	 * @param config
+	 */
 	getDetailField: function(customfield, config) {
 		return new go.detail.Property({
 			itemId: customfield.databaseName,

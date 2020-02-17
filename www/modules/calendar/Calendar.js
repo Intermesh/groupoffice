@@ -546,6 +546,7 @@ GO.calendar.MainPanel = function(config){
 			
 	var tbar = [{
 		iconCls: 'ic-add',
+		cls: "primary",
 		text: t("Add"),
 		handler: function(){
 							

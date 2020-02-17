@@ -25,7 +25,7 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 						['before', t("is before, today plus")],
 						['after', t("is after, today plus")],
 						['beforedate', t("is before")],
-						['beforeafter', t("is after")]
+						['afterdate', t("is after")]
 					]
 				}),
 				valueField: 'value',

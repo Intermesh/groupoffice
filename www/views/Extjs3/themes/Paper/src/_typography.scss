@@ -14,11 +14,11 @@ $font-weight-l: 100;
 %font-button {
 	font-size: sp(14);
 	font-weight: $font-weight-m;
-	letter-spacing: 0.015em;
+	letter-spacing: 0.022em;
 	text-decoration: none;
 }
 
-%font-caption {
+%font-caption { //Used as labels and grid headers
 	font-size: sp(12);
 	font-weight: $font-weight-r;
 	color: color($fg, 'secondary-text');
@@ -73,19 +73,25 @@ $font-weight-l: 100;
 }
 
 %font-title {
-	font-size: sp(20);
+	font-size: sp(18);
   line-height: dp(24);
-	font-weight: $font-weight-m;
+	font-weight: $font-weight-r;
+	letter-spacing: 0.6px;
+	color: color($fg, 'base');
 }
 
 %font-headline {
 	font-size: sp(24);
 	line-height: dp(32);
 	font-weight: $font-weight-r;
+	letter-spacing: 0.6px;
+	color: color($fg, 'base');
 }
 
 %font-display1 {
 	font-size: sp(34);
 	line-height: dp(40);
 	font-weight: $font-weight-r;
+	letter-spacing: 0.6px;
+	color: color($fg, 'base');
 }
