@@ -41,7 +41,7 @@ go.User = new (Ext.extend(Ext.util.Observable, {
     this.uploadUrl = session.uploadUrl;
 		this.eventSourceUrl = session.eventSourceUrl;		
 		this.loaded = true;
-		this.apiVersion = session.version;
+		this.apiVersion = session.version + "-" + session.cacheClearedAt;
 
 		GO.settings.state = session.state;
 
