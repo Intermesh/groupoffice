@@ -140,20 +140,6 @@ trait CustomFieldsTrait {
 
 	private $oldCustomFieldsData;
 
-  /**
-   * Set custom field data
-   *
-   * The data array may hold partial data. It will be merged into the existing
-   * data.
-   *
-   * @param array $data
-   * @return $this
-   * @throws Exception
-   */
-	public function setCustomFields(array $data, $asText = false) {
-		if(!isset($this->oldCustomFieldsData)) {
-			$this->oldCustomFieldsData = $this->internalGetCustomFields();
-		}
 	/**
 	 * Set custom field data
 	 *
@@ -166,6 +152,10 @@ trait CustomFieldsTrait {
 	 * @throws Exception
 	 */
 	public function setCustomFields(array $data, $asText = false) {
+		if(!isset($this->oldCustomFieldsData)) {
+			$this->oldCustomFieldsData = $this->internalGetCustomFields();
+		}
+
 		$this->customFieldsData = array_merge($this->internalGetCustomFields(), $this->normalizeCustomFieldsInput($data, $asText));
 		
 		$this->customFieldsModified = true;
