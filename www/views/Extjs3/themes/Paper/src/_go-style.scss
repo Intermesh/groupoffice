@@ -983,6 +983,7 @@ button.filetype-pdf, button.filetype-doc {
 		> .x-panel-body {
 			>.x-panel {
 				@extend .z2;
+				border-radius: $borderRadius;
 				margin: dp(8);
 				background-color: color($bg, 'box');
 
