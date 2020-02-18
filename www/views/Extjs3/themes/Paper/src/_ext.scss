@@ -2408,9 +2408,12 @@ $menuScrollerSize : dp(4);
 			border-radius: 0;
 		}
 	}
-	&-footer.x-panel-btns {
+	&-footer {
 		padding: dp(4);
 		border-top: 1px solid color($fg, 'line');
+	}
+	&-footer-noborder {
+		border-top: 0;
 	}
 	&-header {
 		@extend %font-title;
@@ -2425,6 +2428,9 @@ $menuScrollerSize : dp(4);
 			height: dp(48);
 			line-height: dp(48);
 		}
+	}
+	&-header-noborder {
+		border-bottom: 0;
 	}
 	&-mc {
 		@extend %font-body1;
