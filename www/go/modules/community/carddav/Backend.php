@@ -46,10 +46,10 @@ class Backend extends AbstractBackend {
 		$c->import($vcardComp, $contact);
 		
 		//blob id can serve as ETag
-		return $contact->vcardBlobId;		
+		return '"' . $contact->vcardBlobId . '"';
 	}
 
-	public function deleteAddressBook($addressBookId): void {
+	public function deleteAddressBook($addressBookId) {
 		
 	}
 	
@@ -147,7 +147,7 @@ class Backend extends AbstractBackend {
 					'carddata' => $blob->getFile()->getContents(),
 					'uri' => $contact->getUri(),
 					'lastmodified' => $contact->modifiedAt->format("U"),
-					'etag' => $contact->vcardBlobId,
+					'etag' => '"' . $contact->vcardBlobId . '"',
 					'size' => $blob->size
 			];
 	}	
@@ -189,7 +189,7 @@ class Backend extends AbstractBackend {
 		
 		$this->generateCards($addressbookId);		
 		
-		return go()->getDbConnection()->select('c.uri, UNIX_TIMESTAMP(c.modifiedAt) as lastmodified, vcardBlobId AS etag, b.size')
+		return go()->getDbConnection()->select('c.uri, UNIX_TIMESTAMP(c.modifiedAt) as lastmodified, CONCAT(\'"\', vcardBlobId, \'"\') AS etag, b.size')
 						->from('addressbook_contact', 'c')
 						->join('core_blob', 'b', 'c.vcardBlobId = b.id')
 						->where('c.addressBookId', '=', $addressbookId)->all();
@@ -226,6 +226,6 @@ class Backend extends AbstractBackend {
 			return false;
 		}
 		//vcardBlobId can serve as etag
-		return $contact->vcardBlobId;						
+		return '"' . $contact->vcardBlobId . '"';
 	}
 }
