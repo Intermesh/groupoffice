@@ -329,6 +329,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 			this.showFirstInvalidField();
 			return;
 		}
+
+		var isNew = !!this.currentId;
 		
 		this.actionStart();
 
@@ -345,7 +347,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 				this.showFirstInvalidField();
 				return;
 			}
-			if(this.redirectOnSave) {
+			if(this.redirectOnSave && isNew) {
 				this.entityStore.entity.goto(serverId);
 			}
 			this.close();
