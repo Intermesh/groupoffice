@@ -1,4 +1,8 @@
-17-02-2020 6.4.116
+18-02-2020 6.4.118
+- Core: Removed user "Permissions" and moved it to a "Visible to" tab.
+- Core: Visual enhancements
+
+17-02-2020 6.4.117
 - Tickets: Note background color restored
 - Projects: Error on login when not a projects admin
 
