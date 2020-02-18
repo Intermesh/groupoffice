@@ -19,10 +19,14 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 		this.store.on("load", function() {
 			var count = this.store.getTotalCount();
 			if(count) {
+				var badge = "<span class='badge'>" + count + '</span>';
+				this.setTitle(t("Files", "files") + badge);
+
 				this.browseBtn.setText(t("Browse {total} files", "files").replace("{total}", count));
 			} else
 			{
 				this.browseBtn.setText(t("Browse files", "files"));
+				this.setTitle(t("Files", "files"));
 			}
 		}, this);
 

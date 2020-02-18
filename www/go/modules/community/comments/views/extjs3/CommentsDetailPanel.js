@@ -143,12 +143,15 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		}
 		o = o || {};
 
+		var badge = "<span class='badge'>" + this.store.getTotalCount() + '</span>';
+		this.setTitle(t("Comments") + badge);
 		this.composer.textField.setValue('');
 		var prevStr;
 		var initScrollHeight = (this.store.getCount() == this.commentsContainer.pageSize) ? 0 : this.commentsContainer.getEl().dom.scrollHeight,
 			 initScrollTop = this.commentsContainer.getEl().dom.scrollTop;
 
 		this.commentsContainer.removeAll();
+
 		this.store.each(function(r) {
 			
 			var labelText ='', mineCls = r.get("createdBy") == go.User.id ? 'mine' : '';

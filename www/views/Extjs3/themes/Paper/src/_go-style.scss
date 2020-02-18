@@ -774,18 +774,21 @@ hr {
 	.x-btn-mc em.x-btn-arrow > button:after {
 		content: '';
 	}
-
-	.badge {
-		@extend %badge;
-		float: none;
-		display: inline-block;
-	}
-	
 }
 
 .badge {
 	@extend %badge;
-	float:right;
+
+	.x-panel-header-text & {
+		margin-left: dp(8);
+		color: color($fg, 'text');
+		@include var(background-color, c-primary-tp);
+		display: none;
+
+		.x-panel-collapsed & {
+			display: inline-block;
+		}
+	}
 }
 
 .x-tab-with-icon {
