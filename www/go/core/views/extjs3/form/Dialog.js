@@ -330,7 +330,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 			return;
 		}
 
-		var isNew = !!this.currentId;
+		var isNew = !this.currentId;
 		
 		this.actionStart();
 
