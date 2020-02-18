@@ -78,7 +78,7 @@ class SmtpAccount extends EntityController {
 						->setFrom($smtpAccount->fromEmail, $smtpAccount->fromName)
 						->setTo($smtpAccount->fromEmail)
 						->setSubject(go()->t('Test message'))
-						->setBody(go()->t("You're settings are correct.\n\nBest regards,\n\nGroup-Office"));
+						->setBody(go()->t("Your settings are correct.\n\nBest regards,\n\nGroup-Office"));
 
 		$success = $message->send();
 		

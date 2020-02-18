@@ -734,51 +734,49 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		return me.initState().then(function() {
 			return go.Jmap.request({
 				method: me.entity.name + "/set",
-				params: params,
-				scope: me,
-				callback: function (options, success, response) {
+				params: params
+			}).then(function(response) {
+				var entity, clientId;
 
-					if(!success) {
-						me.fireEvent("error", options, response);
-						if(cb) {
-							cb.call(scope || me, options, success, response);
-						}
-						return;
+				if(response.created) {
+					for(clientId in response.created) {
+						//merge client data with server defaults.
+						entity = Ext.apply(params.create[clientId], response.created[clientId] || {});
+						me._add(entity, true);
 					}
-
-					var entity, clientId;
-
-					if(response.created) {
-						for(clientId in response.created) {
-							//merge client data with server defaults.
-							entity = Ext.apply(params.create[clientId], response.created[clientId] || {});
-							me._add(entity, true);
-						}
-					}
-
-					if(response.updated) {
-						for(var serverId in response.updated) {
-							//merge existing data, with updates from client and server
-							entity = Ext.apply(me.data[serverId], params.update[serverId]);
-							entity = Ext.apply(entity, response.updated[serverId] || {});
-							me._add(entity, true);
-						}
-					}
-
-					me.setState(response.newState);
-
-					if(response.destroyed) {
-						for(var i =0, l = response.destroyed.length; i < l; i++) {
-							me._destroy(response.destroyed[i]);
-						}
-					}
-
-					if(cb) {
-						cb.call(scope || me, options, success, response);
-					}
-
-					me._fireChanges();
 				}
+
+				if(response.updated) {
+					for(var serverId in response.updated) {
+						//merge existing data, with updates from client and server
+						entity = Ext.apply(me.data[serverId], params.update[serverId]);
+						entity = Ext.apply(entity, response.updated[serverId] || {});
+						me._add(entity, true);
+					}
+				}
+
+				me.setState(response.newState);
+
+				if(response.destroyed) {
+					for(var i =0, l = response.destroyed.length; i < l; i++) {
+						me._destroy(response.destroyed[i]);
+					}
+				}
+
+				if(cb) {
+					cb.call(scope || me, response.options, true, response);
+				}
+
+				me._fireChanges();
+
+				return response;
+			}).catch(function(error){
+				me.fireEvent("error", error.options, error);
+				if(cb) {
+					cb.call(scope || me, error.options, false, error);
+				}
+
+				return error;
 			})
 		});
 	},
