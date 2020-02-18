@@ -107,6 +107,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		this.addPanel(go.usersettings.AccountSettingsPanel);
 		this.addPanel(go.usersettings.LookAndFeelPanel);
+
+		this.addPanel(go.usersettings.VisibleToPanel);
 		
 		// this.loadModulePanels();
 		
@@ -361,8 +363,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			me.actionStart();
 			me.fireEvent('loadstart',me, me.currentUserId);
 
-			go.Db.store("User").get([me.currentUserId], function(users){
-				me.user = users[0];
+			go.Db.store("User").single(me.currentUserId).then(function(user){
+				me.user = user;
 				me.loadModulePanels();
 
 				// loop through child panels and call onLoadComplete function if available
@@ -372,16 +374,16 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 					}
 				},me);
 
-				me.formPanel.getForm().setValues(users[0]);
+				me.formPanel.getForm().setValues(user);
 				
 				me.findBy(function(cmp,cont){
 					if(typeof cmp.onLoad === 'function') {
-						cmp.onLoad(users[0]);
+						cmp.onLoad(user);
 					}
 				},me);
 
-				me.loadComplete(users[0]);
-			}, me);
+				me.loadComplete(user);
+			});
 		}
 		
 		// The form needs to be rendered before the data can be set

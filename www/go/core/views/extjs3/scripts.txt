@@ -86,9 +86,8 @@ links/LinkBrowser.js
 links/LinksDetailPanel.js
 links/FilterLinkEntityCombo.js
 
-usersettings/AccountSettingsPanel.js
-usersettings/LookAndFeelPanel.js
-usersettings/UserSettingsDialog.js
+
+
 
 Router.js
 PasswordPrompt.js
@@ -119,6 +118,12 @@ permissions/ShareWindow.js
 defaultpermissions/DefaultPermissionsPanel.js
 defaultpermissions/SystemSettingsPanel.js
 defaultpermissions/ShareWindow.js
+
+
+usersettings/VisibleToPanel.js
+usersettings/AccountSettingsPanel.js
+usersettings/LookAndFeelPanel.js
+usersettings/UserSettingsDialog.js
 
 systemsettings/Panel.js
 systemsettings/GeneralPanel.js
@@ -162,7 +167,6 @@ groups/GroupMemberWindow.js
 
 users/UserGrid.js
 users/UserDefaultsWindow.js
-users/PermissionsDialog.js
 users/SystemSettingsUserGrid.js
 users/CreateUserAccountPanel.js
 users/CreateUserPasswordPanel.js

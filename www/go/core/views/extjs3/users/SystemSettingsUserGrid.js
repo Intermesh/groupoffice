@@ -249,18 +249,6 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 						text: t("Edit"),
 						handler: function() {this.edit(this.moreMenu.record.id);},
 						scope: this						
-					}, {
-						itemId: "share",
-						iconCls: 'ic-share',
-						text: t("Permissions"),
-						handler: function () {
-							var win = new go.users.PermissionsDialog({
-								showLevels: false
-							});
-							console.warn(this.moreMenu.record.data.personalGroup.id);
-							win.load(this.moreMenu.record.data.personalGroup.id).show();
-						},
-						scope: this
 					},{
 						itemId:"loginAs",
 						iconCls: 'ic-swap-horiz',
