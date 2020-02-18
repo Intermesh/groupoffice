@@ -1,6 +1,7 @@
 18-02-2020 6.4.118
 - Core: Removed user "Permissions" and moved it to a "Visible to" tab.
 - Core: Visual enhancements
+- Core: Added counters on collapsed detail panels
 
 17-02-2020 6.4.117
 - Tickets: Note background color restored
