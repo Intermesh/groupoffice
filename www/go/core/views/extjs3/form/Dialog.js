@@ -289,9 +289,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	},
 
 	onSubmit: function (success, serverId) {
-		if (success) {
-			this.entityStore.entity.goto(serverId);
-		}
+
 	},
 
 	actionComplete: function () {
