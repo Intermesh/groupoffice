@@ -18,3 +18,7 @@ String.prototype.splitCSV = function() {
 	var arr = this.match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
 	return arr || [];
 }
+
+String.prototype.escapeRegExp = function() {
+	return this.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}

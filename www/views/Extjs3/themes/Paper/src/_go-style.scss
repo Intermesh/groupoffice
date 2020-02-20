@@ -790,6 +790,17 @@ hr {
 		}
 	}
 }
+.status {
+	@extend %font-subheading-dense;
+	padding-left: dp(8);
+	padding-right: dp(8);
+	background-color: color($bg, 'background');
+	display: inline-block;
+	border-radius: $borderRadius;
+	color: color($fg, 'text');
+	text-shadow: 0px 0px 4px white;
+	border:1px solid color($fg, 'divider');
+}
 
 .x-tab-with-icon {
 	position:relative;
@@ -820,13 +831,7 @@ button.filetype-pdf, button.filetype-doc {
 		}
 	}
 }
-tr.go-grid-row {
-	td {
-		border-bottom: 1px solid rgba(0,0,0,0.04);
-		vertical-align:top;
-		&.r {text-align:right}
-	}
-}
+
 .go-grid-icon { // icon in field
 	background-repeat: no-repeat;
 	background-position: 0 center;
@@ -1244,13 +1249,14 @@ tr.go-grid-row {
 		padding: dp(8);
 		vertical-align: middle;
 		height: dp(40);
-		border-bottom: 1px solid color($fg, 'divider');
+		border-bottom: 1px solid color($fg, 'line');
 		background-color: transparent !important;
 	}
 }
 	
 table.display-panel {
-	
+	border-collapse: collapse;
+	border-spacing: 0;
 	&.labels {		
 		td, th{
 			&:first-child {
@@ -1269,12 +1275,18 @@ table.display-panel {
 		&:last-child  {
 			padding-right: dp(16);
 		}
+		&.r {text-align:right}
 	}
 	th {
 		@extend %font-data-head;
 	}
-	tr.line, td.line, th.line {
-		border-bottom: 1px solid color($fg, 'line');
+	tr.line td, td.line, th.line {
+		border-bottom: 1px solid color($fg, 'divider');
+	}
+	tr.totals th {
+		padding: dp(8);
+		vertical-align: middle;
+		border-right: 1px solid color($fg, 'divider');
 	}
 	table { 
 		td:first-child {
@@ -1283,6 +1295,13 @@ table.display-panel {
 		td:last-child  {
 			padding-right: 0;
 		}
+	}
+}
+tr.go-grid-row {
+	td {
+		border-bottom: 1px solid rgba(0,0,0,0.04);
+		vertical-align:top;
+		//&.r {text-align:right}
 	}
 }
 .collapsible-display-panel-header {
