@@ -1,3 +1,4 @@
+20-02-2020 6.4.119
 - Core: Don't use notification and popups on mobile
 - Google Authenticator: Show invalid code error
 - Google Authenticator: Accept spaces in code.  Fixed: 2FA Improvement #537
