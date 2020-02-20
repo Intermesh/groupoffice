@@ -1,3 +1,5 @@
+- Core: Don't use notification and popups on mobile
+
 18-02-2020 6.4.118
 - Core: Removed user "Permissions" and moved it to a "Visible to" tab.
 - Core: Visual enhancements
