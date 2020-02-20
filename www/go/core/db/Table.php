@@ -226,11 +226,11 @@ class Table {
 				$c->trimInput = true;
 				break;
 			case 'longtext':
-				$c->length = 4294967296;
+				$c->length = 4294967295;
 				$c->trimInput = true;
 				break;
 			case 'mediumtext':
-				$c->length = 16777216;
+				$c->length = 16777215;
 				$c->trimInput = true;
 				break;
 
