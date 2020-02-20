@@ -358,7 +358,7 @@ go.Jmap = {
 					delete this.requestOptions[clientCallId];
 				}
 				
-				Ext.MessageBox.alert(t("Error"), t("Sorry, an unexpected error occurred: ") + response.responseText);
+				Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred: ") + response.responseText);
 				
 			}
 		});

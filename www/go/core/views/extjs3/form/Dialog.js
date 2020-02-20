@@ -88,11 +88,11 @@ go.form.Dialog = Ext.extend(go.Window, {
 		Ext.applyIf(this,{
 			buttons:[
 				'->', 
-				{
+				this.saveButton = new Ext.Button({
 					text: t("Save"),
 					handler: function() {this.submit();},
 					scope: this
-				}
+				})
 			]
 		});
 	},
@@ -318,6 +318,12 @@ go.form.Dialog = Ext.extend(go.Window, {
 	},
 
 	submit: function (cb, scope) {
+
+		//When form is submnitted with enter key the validation errors of the field having focus is not disabled if we
+		// don't give something else focus.
+		if(this.saveButton) {
+			this.saveButton.focus();
+		}
 		
 		if(!this.onBeforeSubmit()) {
 			return;

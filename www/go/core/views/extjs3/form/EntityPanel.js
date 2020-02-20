@@ -139,20 +139,12 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 
 					default:
 
-						//mark validation errors
-						for(var name in notSaved[id].validationErrors) {
-							var field = me.getForm().findField(name);
-							if(field) {
-								field.markInvalid(notSaved[id].validationErrors[name].description);
+						var firstErrorMsg = me.markServerValidationErrors(notSaved[id].validationErrors);
 
-							} else
-							{
-								console.warn("Could not find form field for server error " + name,notSaved[id].validationErrors[name]);
-							}
-							if(!response.message) {
-								response.message = notSaved[id].validationErrors[name].description;
-							}
+						if(!response.message) {
+							response.message = firstErrorMsg;
 						}
+
 						/**
 						 * 
 						 * You can cancel the error message with me event:
@@ -168,8 +160,9 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 						 * 	}, me);
 						 * },
 						 */
+
 						if(me.fireEvent("beforesubmiterror", me, false, null, notSaved[id])) {
-							Ext.MessageBox.alert(t("Error"), t("Sorry, an unexpected error occurred: ") + (response.message || "unknown error"));
+							Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred: ") + (response.message || "unknown error"));
 						}
 						break;
 				}
@@ -186,11 +179,39 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 			}
 			me.fireEvent("submit", me, false, null, error);
 
+			console.error(error);
+
 			return error;
 		}).finally(function() {
 			me.submitting = false;
 		})
 
+	},
+
+	markServerValidationErrors : function(e, fieldPrefix) {
+		var firstError;
+		//mark validation errors
+		for(var name in e) {
+			var field = this.getForm().findField(fieldPrefix + name);
+			if(field) {
+				field.markInvalid(e[name].description);
+			} else
+			{
+				console.warn("Could not find form field for server error " + name, e[name]);
+			}
+			if(!firstError && e[name].code != 4) { // code 4 means error in related record. It will be found deeper in the recursion.
+				firstError = e[name].description;
+			}
+
+			if(e[name].validationErrors) {
+				var subFirst = this.markServerValidationErrors(e[name].validationErrors, name + ".");
+				if(!firstError) {
+					firstError = subFirst;
+				}
+			}
+		}
+
+		return firstError;
 	}
 });
 
