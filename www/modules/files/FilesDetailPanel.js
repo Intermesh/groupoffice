@@ -1,13 +1,11 @@
 Ext.namespace('go.modules.files');
 
 go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
-	title: t("Files", "files"),
+	title: t("Files", "files") + "<span class='badge'>0</span>",
 	collapsible: true,
 	titleCollapse: true,
 	stateId: "files-detail",
 	initComponent: function () {
-
-
 
 		this.store = new GO.data.JsonStore({
 			url: GO.url('files/folder/list'),
@@ -15,13 +13,11 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			remoteSort: true
 		});
 		
-		
 		this.store.on("load", function() {
 			var count = this.store.getTotalCount();
+			var badge = "<span class='badge'>" + count + '</span>';
+			this.setTitle(t("Files", "files") + badge);
 			if(count) {
-				var badge = "<span class='badge'>" + count + '</span>';
-				this.setTitle(t("Files", "files") + badge);
-
 				this.browseBtn.setText(t("Browse {total} files", "files").replace("{total}", count));
 			} else
 			{

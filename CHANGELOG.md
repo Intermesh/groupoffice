@@ -1,4 +1,8 @@
 - Core: Don't use notification and popups on mobile
+- Google Authenticator: Show invalid code error
+- Google Authenticator: Accept spaces in code.  Fixed: 2FA Improvement #537
+- Tickets: Improved detail view
+- Billing: Improved detail view
 
 18-02-2020 6.4.118
 - Core: Removed user "Permissions" and moved it to a "Visible to" tab.
