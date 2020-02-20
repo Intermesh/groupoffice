@@ -15,8 +15,6 @@ class MultiSelect extends Select {
 	protected function getFieldSQL() {
 		return false;
 	}
-	
-
 
 	public function onFieldSave() {
 

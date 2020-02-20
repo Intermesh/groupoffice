@@ -39,6 +39,24 @@ abstract class Base extends Model {
 		$this->field = $field;
 	}
 
+	/**
+	 * Return true if a field save needs to be applied on the database.
+	 * By default it will only do this when these properties change:
+	 *
+	 * 1. unique
+	 * 2. default
+	 * 3. options
+	 * 4. databaseName
+	 * 5. required
+	 *
+	 * Override this to implement special behaviour. @see Select.
+	 *
+	 * @return bool
+	 */
+	public function isModified() {
+		return false;
+	}
+
 
   /**
    * Get column definition for SQL.
