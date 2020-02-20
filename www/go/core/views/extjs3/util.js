@@ -327,9 +327,7 @@ go.util =  (function () {
 		Ext.getBody().mask(t("Exporting..."));
 		var promise = go.Jmap.request({
 			method: entity + "/query",
-			params: queryParams,
-			callback: function (options, success, response) {
-			}
+			params: queryParams
 		});
 		
 		go.Jmap.request({
