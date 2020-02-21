@@ -58,7 +58,7 @@ go.login.ForgotDialog = Ext.extend(go.Window, {
 			callback: function (options, success, response) {
 				this.getEl().unmask();
 				if (!success) {
-					GO.errorDialog.show(t("A server error occurred."));
+					Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred") + ": " +  response.statusText);
 				} else {
 					go.Notifier.msg({
 						time: 3000,

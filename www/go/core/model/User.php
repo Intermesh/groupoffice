@@ -580,13 +580,16 @@ class User extends Entity {
    *
    * @param string $to
    * @param string $redirectUrl If given GroupOffice will redirect to this URL after creating a new password.
-   * @return boolean
    * @throws Exception
    */
 	public function sendRecoveryMail($to, $redirectUrl = ""){
 		
 		$this->recoveryHash = bin2hex(random_bytes(20));
 		$this->recoverySendAt = new DateTime();
+
+		if(!$this->save()) {
+			throw new \Exception("Could not save user");
+		}
 		
 		$siteTitle=go()->getSettings()->title;
 		$url = go()->getSettings()->URL.'#recover/'.$this->recoveryHash . '-' . urlencode($redirectUrl);
@@ -600,7 +603,9 @@ class User extends Entity {
 			->setSubject(go()->t('Lost password'))
 			->setBody($emailBody);
 		
-		return $this->save() && $message->send();
+		if(!$message->send()) {
+			throw new \Exception("Could not send mail. The notication system setttings may be incorrect.");
+		}
 	}
 	
 	protected function internalSave() {
