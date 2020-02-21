@@ -1,5 +1,17 @@
-- Mail2project: added for 6.4
+21-02-2020 6.4.122
+- Projects: Business module code accidentally in projects
+
+21-02-2020 6.4.121
+- Billing: broken add and delete invoice button
+- Core: Removed deprecated timezones
+
+21-02-2020 6.4.120
+- Core: Send test message on Notification failed if you did not re-enter the password.
 - Core: Adding custom field select option didn't save
+- Billing: Clear items on opening new order
+- Core: Connection timeout shows error dialog
+- Billing: HTML formatting on frontpage text
+- Core: Handle invalid sort state which may happen when a (custom) column has been removed
 
 20-02-2020 6.4.119
 - Core: Don't use notification and popups on mobile

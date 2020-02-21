@@ -38,7 +38,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		this.bodyId = Ext.id();
 		this.attachmentsId = Ext.id();
 
-		this.contactImageId = Ext.id();
 
 		this.linkMessageId = Ext.id();
 		this.downloadAllMenuId = Ext.id();
@@ -136,8 +135,8 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<div style="clear: both"></div>' +
 			'</tpl>' +
 			
-			'<div class="avatar" id="'+this.contactImageId+'" style="{[this.getAvatarStyle(values.contact)]}">{[this.getAvatarHtml(values.contact)]}</div>'+
-			
+			'<a href="mailto:&quot;{[GO.util.html_entity_decode(values.from, \'ENT_QUOTES\')]}&quot; &lt;{sender}&gt;" class="avatar" style="{[this.getAvatarStyle(values.contact)]}">{[this.getAvatarHtml(values.contact)]}</a>'+
+
 		'</div>';
 
 		if(go.Modules.isAvailable("legacy", "calendar")){
@@ -248,13 +247,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		this.template.compile();
 	},
 
-	lookupContact : function(){
-		if(this.data.sender_contact_id){
-			go.Router.goto("contact/" + this.data.sender_contact_id);
-		}else{
-			GO.addressbook.searchSender(this.data.sender, this.data.from);
-		}
-	},
 
 	data: null,
 
@@ -557,8 +549,8 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		}
 
 
-		this.contactImageEl = Ext.get(this.contactImageId);
-		this.contactImageEl.on('click', this.lookupContact, this);
+		// this.contactImageEl = Ext.get(this.contactImageId);
+		// this.contactImageEl.on('click', this.lookupContact, this);
 
 		this.body.scrollTo('top',0);
 

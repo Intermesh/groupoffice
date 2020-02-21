@@ -495,13 +495,13 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 					this.summaryDialog.show();
 				}
 
+				this.fireEvent('submit', this, this.remoteModelId);
+				this.fireEvent('save', this, this.remoteModelId);
+
 				if (hide)
 				{
 					this.hide();
 				}
-
-				this.fireEvent('submit', this, this.remoteModelId);
-				this.fireEvent('save', this, this.remoteModelId);
 
 				this.refreshActiveDisplayPanels();
 
@@ -591,13 +591,13 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 						this.summaryDialog.show();
 					}
 
-					if(hide)
-					{
-						this.hide();	
-					}
-
 					this.fireEvent('submit', this, this.remoteModelId);
 					this.fireEvent('save', this, this.remoteModelId);
+
+					if(hide)
+					{
+						this.hide();
+					}
 
 					this.refreshActiveDisplayPanels();
 

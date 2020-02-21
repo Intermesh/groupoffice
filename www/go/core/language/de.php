@@ -1178,7 +1178,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Not found or no access!' => 'Nicht gefunden oder kein Zugriff',
   'Add option' => 'Option hinzufügen',
   'You can only add one service of the same type' => 'Sie können nur einen Service desselben Typs hinzufügen.',
-  'Sorry, an error occurred: ' => 'Sorry, es ist ein Fehler aufgetreten: ',
+  'Sorry, an error occurred' => 'Sorry, es ist ein Fehler aufgetreten',
   'Last' => 'Letzter',
   'Repeat' => 'Wiederholen',
   'times' => 'mal',

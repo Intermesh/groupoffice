@@ -74,7 +74,6 @@ try {
 			go()->debug("Authenticator doesn't support recovery");
 			output([], 200, "Recovery mail sent");	
 		}
-		
 		$user->sendRecoveryMail($data['email']);
 		output([], 200, "Recovery mail sent");	
 	}
@@ -218,8 +217,6 @@ try {
     'loginToken' => $token->loginToken,
     'methods' => $methods
   ];
-  
-
 
 	$methods = array_map(function($o) {
 		return $o->id;
@@ -241,7 +238,6 @@ try {
 		output($response, 200, "Success, but more authorization required.");
 	}
 } catch (Exception $e) {
-  ErrorHandler::logException($e);
   ErrorHandler::logException($e);
 	output([], 500, $e->getMessage());
 }

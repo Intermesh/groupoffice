@@ -4,6 +4,7 @@ namespace go\core\orm;
 use Exception;
 use Closure;
 use go\core\db\Criteria;
+use go\core\jmap\exception\UnsupportedFilter;
 use go\core\util\DateTime;
 
 /**
@@ -83,7 +84,13 @@ class Filters {
 
 		//$this->validate($query, $filter);		
 		foreach($filter as $name => $value) {
-			$filterConfig = $this->filters[strtolower($name)];
+			$name = strtolower($name);
+
+			if(!isset($this->filters[$name])) {
+				throw new UnsupportedFilter();
+			}
+
+			$filterConfig = $this->filters[$name];
 			
 			switch($filterConfig['type']) {
 				

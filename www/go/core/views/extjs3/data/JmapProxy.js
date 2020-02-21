@@ -67,9 +67,9 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 
 			// Get DataReader read-back a response-object to pass along to exception event
 			var res = o.reader.readResponse(action, response);
-			this.fireEvent('exception', this, 'remote', action, o, res, null);
+			this.fireEvent('exception', this.store, 'remote', action, o, res, null);
 		} else {
-			this.fireEvent('load', this, o, o.request.arg);
+			this.fireEvent('load', this.store, o, o.request.arg);
 		}
 		o.request.callback.call(o.request.scope, result, o.request.arg, result.success);
 		

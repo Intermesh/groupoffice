@@ -235,6 +235,12 @@ class User extends Entity {
 			->addHasOne('workingWeek', WorkingWeek::class, ['id' => 'user_id']);
 	}
 
+
+	/**
+	 * @var Group
+	 */
+	private $personalGroup;
+
   /**
    * Get the user's personal group used for granting permissions
    *
@@ -242,7 +248,15 @@ class User extends Entity {
    * @throws Exception
    */
 	public function getPersonalGroup() {
-		return Group::find()->where(['isUserGroupFor' => $this->id])->single();
+		if(empty($this->personalGroup)){
+			$this->personalGroup = Group::find()->where(['isUserGroupFor' => $this->id])->single();
+		}
+
+		return $this->personalGroup;
+	}
+
+	public function setPersonalGroup($values) {
+		$this->getPersonalGroup()->setValues($values);
 	}
 	
 	public function setValues(array $values) {
@@ -580,13 +594,16 @@ class User extends Entity {
    *
    * @param string $to
    * @param string $redirectUrl If given GroupOffice will redirect to this URL after creating a new password.
-   * @return boolean
    * @throws Exception
    */
 	public function sendRecoveryMail($to, $redirectUrl = ""){
 		
 		$this->recoveryHash = bin2hex(random_bytes(20));
 		$this->recoverySendAt = new DateTime();
+
+		if(!$this->save()) {
+			throw new \Exception("Could not save user");
+		}
 		
 		$siteTitle=go()->getSettings()->title;
 		$url = go()->getSettings()->URL.'#recover/'.$this->recoveryHash . '-' . urlencode($redirectUrl);
@@ -600,7 +617,9 @@ class User extends Entity {
 			->setSubject(go()->t('Lost password'))
 			->setBody($emailBody);
 		
-		return $this->save() && $message->send();
+		if(!$message->send()) {
+			throw new \Exception("Could not send mail. The notication system setttings may be incorrect.");
+		}
 	}
 	
 	protected function internalSave() {
@@ -615,6 +634,12 @@ class User extends Entity {
 		
 		$this->saveContact();
 
+		if(isset($this->personalGroup) && $this->personalGroup->isModified()) {
+			if(!$this->personalGroup->save()) {
+				$this->setValidationError('personalGroup', ErrorCode::RELATIONAL, "Couldn't save personal group");
+				return false;
+			}
+		}
 		$this->createPersonalGroup();
 
 		if($this->isNew()) {
@@ -688,6 +713,8 @@ class User extends Entity {
 				if(!$personalGroup->save()) {
 					throw new Exception("Could not create home group");
 				}
+
+				$this->personalGroup = $personalGroup;
 			} else
 			{
 				$personalGroup = $this->getPersonalGroup();
