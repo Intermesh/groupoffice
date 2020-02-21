@@ -1,5 +1,7 @@
 - Mail2project: added for 6.4
 - Core: Adding custom field select option didn't save
+- Billing: Clear items on opening new order
+- Core: Connection timeout shows error dialog
 
 20-02-2020 6.4.119
 - Core: Don't use notification and popups on mobile
