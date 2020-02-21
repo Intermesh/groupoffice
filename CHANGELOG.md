@@ -1,4 +1,4 @@
-- Mail2project: added for 6.4
+- Core: Send test message on Notification failed if you did not re-enter the password.
 - Core: Adding custom field select option didn't save
 - Billing: Clear items on opening new order
 - Core: Connection timeout shows error dialog
