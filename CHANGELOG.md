@@ -1,3 +1,6 @@
+21-02-2020 6.4.122
+- Projects: Business module code accidentally in projects
+
 21-02-2020 6.4.121
 - Billing: broken add and delete invoice button
 - Core: Removed deprecated timezones
