@@ -235,6 +235,12 @@ class User extends Entity {
 			->addHasOne('workingWeek', WorkingWeek::class, ['id' => 'user_id']);
 	}
 
+
+	/**
+	 * @var Group
+	 */
+	private $personalGroup;
+
   /**
    * Get the user's personal group used for granting permissions
    *
@@ -242,7 +248,15 @@ class User extends Entity {
    * @throws Exception
    */
 	public function getPersonalGroup() {
-		return Group::find()->where(['isUserGroupFor' => $this->id])->single();
+		if(empty($this->personalGroup)){
+			$this->personalGroup = Group::find()->where(['isUserGroupFor' => $this->id])->single();
+		}
+
+		return $this->personalGroup;
+	}
+
+	public function setPersonalGroup($values) {
+		$this->getPersonalGroup()->setValues($values);
 	}
 	
 	public function setValues(array $values) {
@@ -620,6 +634,12 @@ class User extends Entity {
 		
 		$this->saveContact();
 
+		if(isset($this->personalGroup) && $this->personalGroup->isModified()) {
+			if(!$this->personalGroup->save()) {
+				$this->setValidationError('personalGroup', ErrorCode::RELATIONAL, "Couldn't save personal group");
+				return false;
+			}
+		}
 		$this->createPersonalGroup();
 
 		if($this->isNew()) {
@@ -693,6 +713,8 @@ class User extends Entity {
 				if(!$personalGroup->save()) {
 					throw new Exception("Could not create home group");
 				}
+
+				$this->personalGroup = $personalGroup;
 			} else
 			{
 				$personalGroup = $this->getPersonalGroup();

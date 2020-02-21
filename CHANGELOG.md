@@ -3,6 +3,7 @@
 - Billing: Clear items on opening new order
 - Core: Connection timeout shows error dialog
 - Billing: HTML formatting on frontpage text
+- Core: Handle invalid sort state which may happen when a (custom) column has been removed
 
 20-02-2020 6.4.119
 - Core: Don't use notification and popups on mobile
