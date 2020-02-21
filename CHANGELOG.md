@@ -1,3 +1,4 @@
+- Mail2project: added for 6.4
 - Core: Adding custom field select option didn't save
 
 20-02-2020 6.4.119
