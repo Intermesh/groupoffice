@@ -644,9 +644,7 @@ Ext.extend(GO.email.AccountDialog, GO.Window, {
 		if (account_id) {
 			this.loadAccount(account_id);
 			GO.email.subscribedFoldersStore.baseParams.account_id = account_id;
-//			GO.email.subscribedFoldersStore.load();
-			if(!GO.email.subscribedFoldersStore.loaded)
-				GO.email.subscribedFoldersStore.load();
+			GO.email.subscribedFoldersStore.load();
 		} else {
 
 			this.propertiesPanel.form.reset();
