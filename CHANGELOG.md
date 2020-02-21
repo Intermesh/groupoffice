@@ -1,3 +1,4 @@
+21-02-2020 6.4.120
 - Core: Send test message on Notification failed if you did not re-enter the password.
 - Core: Adding custom field select option didn't save
 - Billing: Clear items on opening new order
