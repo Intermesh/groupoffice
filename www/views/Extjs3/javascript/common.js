@@ -13,9 +13,9 @@
  
 Ext.namespace('GO.util');
 
-// Ext.override(Ext.data.Connection, {
-// 	timeout:30000
-// });
+Ext.override(Ext.data.Connection, {
+	timeout: 120000
+});
 
 Ext.Ajax.on('requestexception', function(conn, response, options) {
 	if(response.isTimeout) {

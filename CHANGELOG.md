@@ -2,6 +2,7 @@
 - Core: Adding custom field select option didn't save
 - Billing: Clear items on opening new order
 - Core: Connection timeout shows error dialog
+- Billing: HTML formatting on frontpage text
 
 20-02-2020 6.4.119
 - Core: Don't use notification and popups on mobile
