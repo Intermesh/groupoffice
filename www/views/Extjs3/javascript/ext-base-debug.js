@@ -2401,6 +2401,10 @@ Ext.lib.Ajax = function() {
         var o = getConnectionObject() || null;
 
         if (o) {
+            o.conn.timeout = callback.timeout;
+            o.conn.ontimeout = function () {
+                handleTransactionResponse(o, callback, false, true);
+            };
             o.conn.open(method, uri, true);
 
             if (pub.useDefaultXhrHeader) {

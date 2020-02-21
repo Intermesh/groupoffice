@@ -13,7 +13,15 @@
  
 Ext.namespace('GO.util');
 
-Ext.Ajax.timeout = 180000; // 3 minutes
+// Ext.override(Ext.data.Connection, {
+// 	timeout:30000
+// });
+
+Ext.Ajax.on('requestexception', function(conn, response, options) {
+	if(response.isTimeout) {
+		Ext.MessageBox.alert(t("Request error"), t("The connection to the server timed out. Please check your internet connection."))
+	}
+});
 
 GO.permissionLevels = go.permissionLevels = {
 		read: 10,
