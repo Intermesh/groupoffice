@@ -85,8 +85,8 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 				dir: 'dir'       // The parameter name which specifies the sort direction
 			},
 			proxy: config.entityStore ? 
-				new go.data.EntityStoreProxy({entityStore: config.entityStore, fields: config.fields}) :
-				new go.data.JmapProxy({method: config.method, fields: config.fields})
+				new go.data.EntityStoreProxy({entityStore: config.entityStore, fields: config.fields, store: this}) :
+				new go.data.JmapProxy({method: config.method, fields: config.fields, store: this})
 		}));        
 		
 		this.setup();		
@@ -125,8 +125,6 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		
 		this.fireEvent('destroy', this);
 	},
-	
-	
 	
 	//override Extjs writer save for entityStore
 	save: function(cb) {
@@ -182,6 +180,9 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 				if(success) {
 					resolve(records);
 				} else{
+					if(options.error.message == "unsupportedSort") {
+						return; //ignore.
+					}
 					//hack to pass error message from EntityStoreProxy to load callback
 					reject(options.error);
 				}				

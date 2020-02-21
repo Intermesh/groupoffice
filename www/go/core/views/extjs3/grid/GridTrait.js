@@ -34,6 +34,18 @@ go.grid.GridTrait = {
 		}
 		
 		this.initTotalDisplay();
+
+		// Handle invalid sort state which may happen when a (custom) column has been removed.
+		this.store.on("exception", function(store, type, action, options, response, arg ) {
+			if(response.message == "unsupportedSort") {
+				console.warn("Clearing invalid sort state:", store.sortInfo);
+				store.sortInfo = {};
+				store.reload();
+
+				//cancel further exception handling
+				return false;
+			}
+		}, this);
 	},	
 
 	initTotalDisplay: function() {

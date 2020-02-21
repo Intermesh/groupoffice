@@ -16,6 +16,8 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		this.conn = go.Jmap;
 
 		this.watchRelations = {};
+
+		this.store = config.store;
 	},
 
 	entityStore: null,
@@ -52,7 +54,7 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		}
 
 
-		if (params.dir) {
+		if (params.dir && params.sort) {
 			params.sort = [{
 				property: params.sort,
 				isAscending: params.dir === "ASC"
@@ -88,7 +90,7 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		}).catch(function(response) {
 			//hack to pass error message to load callback in Store.js
 			o.request.arg.error = response;
-			me.fireEvent('exception', this, 'remote', action, o, response, null);			
+			var ret = me.fireEvent('exception', me.store, 'remote', action, o, response, null);
 			o.request.callback.call(o.request.scope, response, o.request.arg, false);
 		});
 
