@@ -49,7 +49,13 @@
 				//sigh
 				return date;
 			}
-			var local = date.toLocaleString("en-US", {timeZone: go.User.timezone});					
+			try {
+				var local = date.toLocaleString("en-US", {timeZone: go.User.timezone});
+			}
+			catch(e) {
+				console.error(e);
+				return date;
+			}
 			return new Date(local);		
 		},
 
