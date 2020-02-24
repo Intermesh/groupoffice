@@ -301,7 +301,12 @@ class QueryBuilder {
 			$r['params'] = array_merge($r['params'], $u['params']);
 		}
 		
-		$r['sql'] .= "\n)";		
+		$r['sql'] .= "\n)";
+
+		//reset to the main query object
+		$this->query = $query;
+		// Unions can't have aliases in the global scope
+		$this->aliasMap = [];
 		
 		$orderBy = $this->buildOrderBy(true);
 		if(!empty($orderBy)) {
