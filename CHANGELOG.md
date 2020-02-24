@@ -1,3 +1,5 @@
+- Calendar: Fixed error when saving resource
+
 21-02-2020 6.4.122
 - Projects: Business module code accidentally in projects
 
