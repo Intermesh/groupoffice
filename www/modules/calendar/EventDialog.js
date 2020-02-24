@@ -588,7 +588,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					config.callback.call(this, this, true);
 				}
 
-				if(this.win.closeAction != "close") {					
+				if(this.win.closeAction != "close" && action.result.participants) {
 					this.participantsPanel.store.loadData({results:action.result.participants});
 				}
 				
