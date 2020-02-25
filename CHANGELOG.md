@@ -1,4 +1,5 @@
 - Calendar: Fixed error when saving resource
+- Email composer: sorted search recipients on last contact mail time
 
 21-02-2020 6.4.122
 - Projects: Business module code accidentally in projects
