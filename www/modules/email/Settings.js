@@ -45,6 +45,10 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 				boxLabel:t("Always respond to a read notification", "email"),
 				hideLabel:true,				
 				name:'emailSettings.always_respond_to_notifications'
+			}),this.sortOnMailTime = new Ext.form.Checkbox({
+					boxLabel:t("Sort on last contact mail time", "email"),
+					hideLabel:true,
+					name:'emailSettings.sort_on_mail_time'
 			})
 			// ,this.fontSize = new GO.form.ComboBox({
 			// 	fieldLabel:t("Default font size", "email"),

@@ -19,6 +19,7 @@ class UserSettings extends Property {
 	public $font_size;
 	public $sort_email_addresses_by_time;
 	public $defaultTemplateId;
+	public $sort_on_mail_time;
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable('core_user');
@@ -60,6 +61,7 @@ class UserSettings extends Property {
 		\GO::config()->save_setting('email_always_respond_to_notifications', !empty($this->always_respond_to_notifications) ? '1' : '0', $this->id);
 		\GO::config()->save_setting('email_sort_email_addresses_by_time', !empty($this->sort_email_addresses_by_time) ? '1' : '0', $this->id);
 		\GO::config()->save_setting('email_font_size', $this->font_size, $this->id);
+		\GO::config()->save_setting('sort_on_mail_time', !empty($this->sort_on_mail_time) ? '1' : '0', $this->id);
 
 		return true;
 	}
