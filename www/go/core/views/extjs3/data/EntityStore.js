@@ -203,8 +203,15 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	_fireChanges : function() {
 		var me = this;
 		// console.warn('changes', me.entity.name, me.changes.added, me.changes.changed, me.changes.destroyed);
-		me.fireEvent('changes', me, me.changes.added, me.changes.changed, me.changes.destroyed);
-		me.initChanges();
+
+		//Use set timeout so changes event fires after promises when set() is used.
+		//This way when for example a dialog closes the dialog or stores are destroyed before it fires.
+		// Other wise they are destroyed while it fires and this can lead to errors.
+		setTimeout(function() {
+			me.fireEvent('changes', me, me.changes.added, me.changes.changed, me.changes.destroyed);
+			me.initChanges();
+		}, 0);
+
 	},
 
 	/**

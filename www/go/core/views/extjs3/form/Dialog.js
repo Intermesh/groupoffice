@@ -338,25 +338,19 @@ go.form.Dialog = Ext.extend(go.Window, {
 		
 		this.actionStart();
 
-		this.formPanel.submit(function (formPanel, success, serverId) {
-			this.actionComplete();
-			this.onSubmit(success, serverId);
-			this.fireEvent("submit", this, success, serverId);
-			
-			if(cb) {
-				cb.call(scope || this, success, serverId);
-			}
+		var me = this;
+		return this.formPanel.submit().then(function(serverId) {
+			me.actionComplete();
+			me.onSubmit(true, serverId);
+			me.fireEvent("submit", this, true, serverId);
 
-			if(!success) {
-				this.showFirstInvalidField();
-				return;
+			if(me.redirectOnSave && isNew) {
+				me.entityStore.entity.goto(serverId);
 			}
-			if(this.redirectOnSave && isNew) {
-				this.entityStore.entity.goto(serverId);
-			}
-			this.close();
-						
-		}, this);
+			me.close();
+		}).catch(function(error) {
+			me.showFirstInvalidField();
+		});
 	},
 
 	showFirstInvalidField : function() {
