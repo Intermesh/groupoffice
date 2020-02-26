@@ -1,5 +1,6 @@
 go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 	title: t('Create user'),
+	width: dp(640),
 	user : null,
 	initComponent : function() {
 		

@@ -1,13 +1,12 @@
 go.Wizard = Ext.extend(go.Window, {
 	width: dp(500),
-	height: dp(430),
+	height: dp(440),
 	nextItem : null,
 	previousItem : null,
 	layout: "card",
 	modal: true,
 	initComponent : function() {
-		
-		
+
 		this.backButton = new Ext.Button({
 			text: t("Back"),
 			handler: this.back,
@@ -31,11 +30,8 @@ go.Wizard = Ext.extend(go.Window, {
 			this.setActiveItem(0);
 		}, this);
 		
-		
 	},
-	
 
-	
 	setActiveItem: function(item) {
 		this.getLayout().setActiveItem(item);	
 		item = this.getLayout().activeItem;
@@ -66,8 +62,7 @@ go.Wizard = Ext.extend(go.Window, {
 		
 		if(!this.nextItem) {
 			this.fireEvent('finish', this, this.getLayout().activeItem);			
-		} else
-		{
+		} else {
 			this.setActiveItem(this.nextItem);	
 			this.fireEvent('continue', this, this.previousItem, this.getLayout().activeItem);
 		}
