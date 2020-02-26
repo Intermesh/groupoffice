@@ -83,8 +83,15 @@ class SearchController extends \GO\Base\Controller\AbstractModelController{
 				\GO::config()->save_setting ('link_type_filter', implode(',',$types), \GO::user()->id);
 		}else if(!count($types)) {
 			$types=$this->_getAllModelTypes($filesupport, $forLinks);
-		}		
-		
+		}
+
+		$disableLinksFor = GO::config()->disable_links_for ? GO::config()->disable_links_for : array();
+		foreach ($disableLinksFor as $disabledLinkFor) {
+			$id = ModelType::model()->findByModelName($disabledLinkFor);
+			$modelTypePosition = array_search($id, $types);
+			unset($types[$modelTypePosition]);
+		}
+
 		$storeParams->getCriteria()->addInCondition('model_type_id', $types);
 		
 		if (!empty($params['minimumWritePermission']) && $params['minimumWritePermission']!='false')
