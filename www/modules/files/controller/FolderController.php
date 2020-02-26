@@ -1297,7 +1297,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$destinationFolder = \GO\Files\Model\Folder::model()->findByPk($params['destination_folder_id']);
 		$archiveFile = new \GO\Base\Fs\File(\GO::config()->file_storage_path.$destinationFolder->path . '/' . $params['archive_name'] . '.zip');
 
-		if(GO::user()->getModulePermissionLevel("files") == \GO\Base\Model\Acl::READ_PERMISSION){
+		if(!$destinationFolder->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)){
 			throw new AccessDenied();
 		}
 
