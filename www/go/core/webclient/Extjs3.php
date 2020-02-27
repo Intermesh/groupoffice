@@ -21,6 +21,7 @@ class Extjs3 {
 		return App::get()->getDataFolder()->getFolder('clientscripts')->delete();
 	}
 
+	private $cssFile;
 
 	/**
 	 * 
@@ -29,10 +30,16 @@ class Extjs3 {
 	 */
 	public function getCSSFile($theme = 'Paper') {
 
-		$cacheFile = go()->getDataFolder()->getFile('clientscripts/' . $theme . '/style.css');		
-		if (!$cacheFile->exists()) {			
+		if(isset($this->cssFile)) {
+			return $this->cssFile;
+		}
+
+		$cacheFile = go()->getDataFolder()->getFile('clientscripts/' . $theme . '/style.css');
+		$debug = go()->getDebugger()->enabled && $cacheFile->exists();
+		if ($debug || !$cacheFile->exists()) {
 			$modules = Module::getInstalled();
 			$css = "";
+			$modifiedAt = null;
 			foreach ($modules as $module) {
 
 				if (isset($module->package)) {
@@ -42,13 +49,21 @@ class Extjs3 {
           $file = $folder->getFile('views/extjs3/themes/' . $theme . '/style.css');
           if ($file->exists()) {
             $css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
+
+            if($debug && $file->getModifiedAt() > $modifiedAt) {
+            	$modifiedAt = $file->getModifiedAt();
+            }
             continue;
           }
 
 
 					$file = $folder->getFile('views/extjs3/themes/default/style.css');
 					if ($file->exists()) {
-						$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";						
+						$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
+
+						if($debug && $file->getModifiedAt() > $modifiedAt) {
+							$modifiedAt = $file->getModifiedAt();
+						}
 					}
 
 
@@ -59,16 +74,25 @@ class Extjs3 {
 				$file = $folder->getFile('themes/Default/style.css');
 				if ($file->exists()) {
 					$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
+					if($debug && $file->getModifiedAt() > $modifiedAt) {
+						$modifiedAt = $file->getModifiedAt();
+					}
 				}
 
 				$file = $folder->getFile('themes/' . $theme . '/style.css');
 				if ($file->exists()) {
-					$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";					
+					$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
+					if($debug && $file->getModifiedAt() > $modifiedAt) {
+						$modifiedAt = $file->getModifiedAt();
+					}
 				}
 			}
-			
-			$cacheFile->putContents($css);
+
+			if(!$debug || $modifiedAt > $cacheFile->getModifiedAt()) {
+				$cacheFile->putContents($css);
+			}
 		}
+		$this->cssFile = $cacheFile;
 		return $cacheFile;
 	}
 	

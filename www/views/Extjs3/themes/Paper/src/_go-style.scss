@@ -54,6 +54,17 @@ p {
 	margin: dp(16) 0;
 }
 
+.blue {color: #039BE5 !important;}
+.red {color: $cDanger !important;}
+.pink {color: #D81B60 !important;}
+.purple {color: #8E24AA !important;}
+.cyan {color: #00ACC1 !important;}
+.green {color: $cSuccess !important;}
+.orange {color: #FB8C00 !important;}
+.brown {color: #6D4C41 !important;}
+.yellow {color: #FDD835 !important;}
+.bluegrey {color: #607D8B !important;}
+
 .info {
 	background-color: $cPrimaryTp;
 	color: $cPrimary;
