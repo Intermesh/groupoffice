@@ -340,7 +340,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 
 		var me = this;
 		return this.formPanel.submit().then(function(serverId) {
-			me.actionComplete();
+
 			me.onSubmit(true, serverId);
 			me.fireEvent("submit", this, true, serverId);
 
@@ -350,7 +350,9 @@ go.form.Dialog = Ext.extend(go.Window, {
 			me.close();
 		}).catch(function(error) {
 			me.showFirstInvalidField();
-		});
+		}).finally(function() {
+			me.actionComplete();
+		})
 	},
 
 	showFirstInvalidField : function() {

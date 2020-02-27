@@ -174,7 +174,6 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 				me.fireEvent("submit", me, false, null, notSaved[id]);
 
 				return Promise.reject(notSaved[id]);
-
 			}
 		}, me).catch(function(error){
 			if(cb) {
@@ -184,7 +183,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 
 			console.error(error);
 
-			return error;
+			return Promise.reject(error);
 		}).finally(function() {
 			me.submitting = false;
 		})
@@ -193,6 +192,9 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 
 	markServerValidationErrors : function(e, fieldPrefix) {
 		var firstError;
+		if(!fieldPrefix) {
+			fieldPrefix = "";
+		}
 		//mark validation errors
 		for(var name in e) {
 			var field = this.getForm().findField(fieldPrefix + name);
