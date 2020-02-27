@@ -24,7 +24,7 @@ class Search extends EntityController {
 
 		$selectQueryContact ='u.id as entityId, "User" as entity, u.email, "" as type, u.displayName AS name, u.avatarId AS photoBlobId';
 		$isEmailModuleAvailable = Module::isAvailableFor("legacy","email");
-		$optionEnabled = \GO::config()->get_setting("sort_on_mail_time", \GO::user()->id);
+		$optionEnabled = \GO::config()->get_setting("sort_email_addresses_by_time", \GO::user()->id);
 
 		if($isEmailModuleAvailable && $optionEnabled == "1") {
 			$selectQueryContact .= ', NULL as priority';

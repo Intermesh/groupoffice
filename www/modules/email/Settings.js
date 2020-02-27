@@ -48,7 +48,7 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 			}),this.sortOnMailTime = new Ext.form.Checkbox({
 					boxLabel:t("Sort on last contact mail time", "email"),
 					hideLabel:true,
-					name:'emailSettings.sort_on_mail_time'
+					name:'emailSettings.sort_email_addresses_by_time'
 			})
 			// ,this.fontSize = new GO.form.ComboBox({
 			// 	fieldLabel:t("Default font size", "email"),
