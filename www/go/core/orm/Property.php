@@ -2043,7 +2043,7 @@ abstract class Property extends Model {
 		} else if (is_null($value)) {
 			return null;
 		} else {
-			throw new Exception("Invalid value given to relation '" . $this->name . "'. Should be an array or an object of type '" . $relation->entityName . "': " . var_export($value, true));
+			throw new Exception("Invalid value given to relation '" . $relation->name . "'. Should be an array or an object of type '" . $relation->entityName . "': " . var_export($value, true));
 		}
 	}
 
