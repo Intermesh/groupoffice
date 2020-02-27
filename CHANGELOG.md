@@ -2,6 +2,7 @@
 - Core: Fixed error on saving groups
 - Email composer: sorted search recipients on last contact mail time
 - Tickets: Fixed status filter and status change in tickets
+- Billing: Added Save PDF to order files menu item
 
 21-02-2020 6.4.122
 - Projects: Business module code accidentally in projects
