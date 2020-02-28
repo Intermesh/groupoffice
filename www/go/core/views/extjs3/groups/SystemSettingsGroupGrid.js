@@ -104,7 +104,7 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 
 		go.groups.SystemSettingsGroupGrid.superclass.initComponent.call(this);
 
-		this.on('render', function () {
+		this.on('viewready', function () {
 			this.store.load();
 		}, this);
 

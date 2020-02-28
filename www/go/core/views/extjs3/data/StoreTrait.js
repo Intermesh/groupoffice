@@ -36,6 +36,24 @@ go.data.StoreTrait = {
 			this.loading = false;
 			this.loaded = true;
     }, this);
+
+		this.on('exception',
+			function( store, type, action, options, response){
+
+				if(response.isAbort) {
+					//ignore aborts.
+				} else if(response.isTimeout){
+					console.error(response);
+
+					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
+				}else
+				{
+					console.error(response);
+
+					GO.errorDialog.show(t("Failed to send the request to the server. Please check your internet connection."));
+				}
+			}
+			,this);
     
 		this.initFilters();
 

@@ -18,15 +18,13 @@ Ext.override(Ext.data.Connection, {
 });
 
 Ext.Ajax.on('requestexception', function(conn, response, options) {
-
 	if(response.isAbort) {
 		console.warn("Connection aborted", conn);
 	} else if(response.isTimeout) {
 		Ext.MessageBox.alert(t("Request error"), t("The connection to the server timed out. Please check your internet connection."))
 	} else
 	{
-		console.error("Request error", conn);
-		Ext.MessageBox.alert(t("Request error"), t("Could not send the request to the server. Please check your internet connection."))
+		console.error("Request error", conn, response, options);
 	}
 });
 
@@ -233,13 +231,22 @@ GO.request = function(config){
 		callback:function(options, success, response){
 			
 //			console.log(response);
-//			
-			if(!success && response.isTimeout){
-				GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
-			}
-			
+//
 			if(config.maskEl)
 				config.maskEl.unmask();
+
+			if(!success) {
+				if(response.isTimeout){
+					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
+				}
+
+				if (config.fail) {
+					config.fail.call(config.scope, response, options);
+				} else {
+					console.error(response, options);
+					Ext.Msg.alert(t("Error"), "Failed to send request to the server. Please check your internet connection.");
+				}
+			}
 		},
 		success: function(response, options)
 		{

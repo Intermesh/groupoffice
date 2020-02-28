@@ -203,7 +203,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 
 		go.users.SystemSettingsUserGrid.superclass.initComponent.call(this);
 		
-		this.on('render', function() {
+		this.on('viewready', function() {
 			this.store.load();
 		}, this);
 		
