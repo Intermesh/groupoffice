@@ -18,8 +18,15 @@ Ext.override(Ext.data.Connection, {
 });
 
 Ext.Ajax.on('requestexception', function(conn, response, options) {
-	if(response.isTimeout) {
+
+	if(response.isAbort) {
+		console.warn("Connection aborted", conn);
+	} else if(response.isTimeout) {
 		Ext.MessageBox.alert(t("Request error"), t("The connection to the server timed out. Please check your internet connection."))
+	} else
+	{
+		console.error("Request error", conn);
+		Ext.MessageBox.alert(t("Request error"), t("Could not send the request to the server. Please check your internet connection."))
 	}
 });
 

@@ -2425,6 +2425,15 @@ Ext.lib.Ajax = function() {
             o.conn.addEventListener('load', function() {
               handleTransactionResponse(o, callback);
             });
+
+            o.conn.addEventListener('abort', function() {
+                handleTransactionResponse(o, callback, true, false);
+            });
+
+            o.conn.addEventListener('error', function(err) {
+                console.error("Connection error", err);
+                handleTransactionResponse(o, callback, false, false);
+            });
             
             o.conn.send(postData || null);
         }
