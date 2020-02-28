@@ -1,4 +1,5 @@
 - Core: Improved connection error handling
+- Address books: URL's were not displayed
 
 28-02-2020 6.4.123
 - Calendar: Fixed error when saving resource
