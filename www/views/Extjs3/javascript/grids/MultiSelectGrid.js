@@ -29,7 +29,7 @@ GO.grid.MultiSelectGrid = function (config){
 	
 	
 
-	Ext.apply(config, {
+	Ext.applyIf(config, {
 		plugins: [this.checkColumn],		
 		layout:'fit',
 		autoScroll:true,
