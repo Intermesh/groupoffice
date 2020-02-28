@@ -1,3 +1,4 @@
+28-02-2020 6.4.123
 - Calendar: Fixed error when saving resource
 - Core: Fixed error on saving groups
 - Email composer: sorted search recipients on last contact mail time
