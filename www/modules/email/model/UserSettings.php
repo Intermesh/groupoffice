@@ -44,7 +44,8 @@ class UserSettings extends Property {
 		if(!$this->font_size) {
 			$this->font_size = "14px";
 		}
-		$this->sort_email_addresses_by_time = !!\GO::config()->get_setting("email_sort_email_addresses_by_time", $this->id);
+
+		$this->sort_email_addresses_by_time = !!\GO::config()->get_setting("email_sort_email_addresses_by_time", $this->id, true);
 		
 	}
 	
@@ -60,7 +61,6 @@ class UserSettings extends Property {
 		\GO::config()->save_setting('email_always_respond_to_notifications', !empty($this->always_respond_to_notifications) ? '1' : '0', $this->id);
 		\GO::config()->save_setting('email_sort_email_addresses_by_time', !empty($this->sort_email_addresses_by_time) ? '1' : '0', $this->id);
 		\GO::config()->save_setting('email_font_size', $this->font_size, $this->id);
-		\GO::config()->save_setting('sort_email_addresses_by_time', !empty($this->sort_email_addresses_by_time) ? '1' : '0', $this->id);
 
 		return true;
 	}

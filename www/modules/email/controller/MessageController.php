@@ -18,7 +18,7 @@ use go\core\util\ArrayObject;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\Settings;
 use go\modules\community\addressbook\Module;
-use go\modules\community\addressbook\model\ContactMailTime;
+use GO\Email\Model\ContactMailTime;
 
 class MessageController extends \GO\Base\Controller\AbstractController {
 

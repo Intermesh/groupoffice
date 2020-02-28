@@ -59,22 +59,6 @@ class Contact extends EntityController {
 	 * @param array $params
 	 */
 	public function set($params) {
-
-		if(isset($params["destroy"])) {
-			foreach($params['destroy'] as $id) {
-
-				$contactMailTime = \go\modules\community\addressbook\model\ContactMailTime::model()->findByPk(array(
-					'contact_id'=>$id,
-					'user_id'=> \GO::user()->id
-				));
-
-				if($contactMailTime) {
-					$contactMailTime->delete();
-					$contactMailTime->save();
-				}
-			}
-		}
-
 		return $this->defaultSet($params);
 	}
 	
