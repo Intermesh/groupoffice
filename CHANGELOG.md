@@ -4,6 +4,7 @@
 - Timeregistration: Small visual enhancements
 - Core: fireEvent 'mapping' will not bubble down
 - Billing: fixed broken delete button
+- Leavedays: Fixed invalid float value when saving employee
 
 28-02-2020 6.4.123
 - Calendar: Fixed error when saving resource
