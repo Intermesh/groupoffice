@@ -54,5 +54,29 @@ Ext.apply(Date.prototype, {
 		{
 			return this.format('c');
 		}
-	},
+	}
+
+
 });
+
+Ext.apply(Date, {
+	/**
+	 * Get date from given year and ISO week
+	 * @static
+	 * @param w
+	 * @param y
+	 * @returns {Date}
+	 */
+	fromISOWeek : function(w, y) {
+		var simple = new Date(y, 0, 1 + (w - 1) * 7);
+		var dow = simple.getDay();
+		var ISOweekStart = simple;
+		if (dow <= 4)
+			ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+		else
+			ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+		return ISOweekStart;
+	}
+});
+
+
