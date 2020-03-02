@@ -1,3 +1,4 @@
+02-03-2020 6.4.124
 - Core: Improved connection error handling
 - Address books: URL's were not displayed
 - Timeregistration: Set date to current view when adding time
