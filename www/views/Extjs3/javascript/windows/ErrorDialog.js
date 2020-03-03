@@ -25,6 +25,8 @@ GO.ErrorDialog = function(config) {
 Ext.extend(GO.ErrorDialog, GO.Window, {
 
 	show : function(error, title) {
+
+		//console.trace('errordialog');
 		
 		if(!title)
 			title = t("Error");
