@@ -3599,10 +3599,11 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		
 		if(isset($attr['mtime'])) {
 			$attr['modifiedAt'] = \DateTime::createFromFormat("U", $attr['mtime']);
-			unset($attr['mtime']);
+
 		} else {
 			$attr['modifiedAt'] = \DateTime::createFromFormat("U", $this->mtime);
 		}
+		unset($attr['mtime']);
 
 		// Always unset ctime, we don't use it anymore in the searchcache table
 		unset($attr['ctime']);

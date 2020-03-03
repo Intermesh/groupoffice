@@ -14,8 +14,11 @@ use GO\Base\Fs\File;
 use GO\Base\Fs\Folder;
 use GO\Base\Mail\SystemMessage;
 use GO\Base\Model\User;
+use go\core\model\Acl as GoAcl;
 use GO\Email\Model\Account;
+use GO\Email\Model\ContactMailTime;
 use GO\Email\Model\ImapMessage;
+use go\modules\community\addressbook\model\Settings;
 use GO\Projects2\Model\Project;
 use Swift_Attachment;
 
@@ -53,7 +56,7 @@ class ImportImap extends AbstractCron
      * @return bool
      * @throws Exception
      */
-    public function run(CronJob $cronJob,User $user = null)
+    public function run(CronJob $cronJob = null,User $user = null)
     {
 
 		$account = Account::model()->findSingleByAttribute("id",$this->emailAccount);
@@ -93,11 +96,15 @@ class ImportImap extends AbstractCron
     public function processMessage(ImapMessage $message)
     {
         $project = $this->_createProject($message);
+
+        $folder = $project->getFilesFolder(true)->fsFolder;
         $emailAttachments = $message->getAttachments();
         if (count($emailAttachments)) {
             GO::debug('Found attachments ...');
             foreach ($emailAttachments as $_attachment) {
-                $_folder = new Folder(GO::config()->file_storage_path . '/' . $project->buildFilesPath() . '/Schadensakte/');
+                $_folder = $folder->createChild('Schadensakte', false);
+                $_folder->create();
+
                 GO::debug($_folder->path());
                 $_attachment->saveToFile($_folder);
                 GO::debug('Saving attachment ' . $_attachment->name);
@@ -122,7 +129,7 @@ class ImportImap extends AbstractCron
         $project->template_id = $configuration['project']['template_id'];
         $project->start_time = time();
         // name
-        $project->name = $this->_getProjectName();
+		$project->name = $this->_getProjectName();
         if ($configuration['useCustomNameGenerator']) {
             $project->name = $this->_getProjectName();
         }
@@ -247,15 +254,20 @@ class ImportImap extends AbstractCron
             }
         }
 
+		$project->save();
+
         if (!empty($attributes['vu']) && !empty($attributes['sv'])) {
-            $this->_sendReplyMessage($attributes, $attributes['vu']);
+			//$this->_sendTestMessage($attributes,$attributes['vu'],$project->id);
+			$this->_sendReplyMessage($attributes, $attributes['vu'],$project);
         }
 
         if (!empty($attributes['mak'])) {
-            $this->_sendAttachmentMessage($attributes, $attributes['mak']);
+            $this->_sendAttachmentMessage($attributes['mak'],$project);
+
         }
         if (!empty($attributes['vn'])) {
-            $this->_sendAttachmentMessage($attributes, $attributes['vn']);
+			$this->_sendAttachmentMessage($attributes['vn'],$project);
+
         }
 		$project->setCustomFields(["schadennummer" => $attributes['schadennummer']
 								,"vn" => $attributes['vn']
@@ -263,7 +275,7 @@ class ImportImap extends AbstractCron
 								,"mak" => $attributes['mak']
 								,"sv" => $attributes['sv']
 								,"ast" => $attributes['ast']]);
-        $project->save();
+
 
         if ($contactFound) {
             $this->_sendExistingContactMessage($project);
@@ -477,7 +489,7 @@ class ImportImap extends AbstractCron
      * @param $mailTo
      * @return bool
      */
-    private function _sendReplyMessage($attributes, $mailTo)
+    private function _sendReplyMessage($attributes, $mailTo, $project)
     {
         $template = GO::config()->mail2project['replyTpl'];
         if (!$template) {
@@ -491,11 +503,23 @@ class ImportImap extends AbstractCron
         $template = str_replace('{AST}', $attributes['ast'], $template);
         $template = str_replace('{SCHADENNUMMER}', $attributes['schadennummer'], $template);
 
-        $message = new SystemMessage();
-        $message->setSubject($attributes['schadennummer']);
-        $message->setBody($template);
-        $message->addTo($mailTo, $mailTo);
-        return $message->send();
+		$response['success'] = true;
+		$response['feedback']='';
+
+		$message = new SystemMessage();
+		$message->setSubject($attributes['schadennummer']);
+		$message->setBody($template);
+		$message->addTo($mailTo, $mailTo);
+
+		$tmpfile = File::tempFile("test.eml");
+		$tmpfile->touch(true);
+		$fileByteStream = new \Swift_ByteStream_FileByteStream($tmpfile,true);
+		$message->toByteStream($fileByteStream);
+		$messsageSent = $message->send();
+		$linkedEmailModel = GO\Savemailas\Model\LinkedEmail::model();
+		$linkedEmailModel->createFromMimeFile($tmpfile,$project);
+		$tmpfile->delete();
+		return $messsageSent;
     }
 
     /**
@@ -503,9 +527,10 @@ class ImportImap extends AbstractCron
      * @param $mailTo
      * @return bool
      */
-    private function _sendAttachmentMessage($attributes, $mailTo)
+    private function _sendAttachmentMessage($mailTo,$project)
     {
         $configuration = GO::config()->mail2project['pdfMail'];
+		echo GO::config()->file_storage_path . '/' . $configuration['attachment'];
         if (!$configuration) {
             return false;
         }
@@ -521,12 +546,23 @@ class ImportImap extends AbstractCron
         }
 
         $template = $configuration['tpl'];
+		$response['success'] = true;
+		$response['feedback']='';
 
-        $message = new SystemMessage();
-        $message->setSubject($configuration['subject']);
-        $message->setBody($template);
-        $message->addTo($mailTo, $mailTo);
-        $message->attach(Swift_Attachment::fromPath($attachment->path()));
-        return $message->send();
+		$message = new SystemMessage();
+		$message->setSubject($configuration['subject']);
+		$message->setBody($template);
+		$message->addTo($mailTo, $mailTo);
+		$message->attach(Swift_Attachment::fromPath($attachment->path()));
+
+		$tmpfile = File::tempFile("test.eml");
+		$tmpfile->touch(true);
+		$fileByteStream = new \Swift_ByteStream_FileByteStream($tmpfile,true);
+		$message->toByteStream($fileByteStream);
+		$messsageSent = $message->send();
+		$linkedEmailModel = GO\Savemailas\Model\LinkedEmail::model();
+		$linkedEmailModel->createFromMimeFile($tmpfile,$project);
+		$tmpfile->delete();
+		return $messsageSent;
     }
 }
