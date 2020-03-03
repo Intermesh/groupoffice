@@ -27,6 +27,9 @@ remove folders when uninstalling module. Error when reinstalling
 
 - NOtifications
 
+- Makkelijker taken toevoegen bij projecten. Project eigen lijst?
+tasklist bij default permissions
+
 
 - billing API integratie boekhoudpakketten
 
