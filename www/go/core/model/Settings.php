@@ -393,6 +393,7 @@ class Settings extends core\Settings {
 		}
 
 		if(!$addressBook) {
+			go()->getDbConnection()->beginTransaction();
 			$addressBook = new AddressBook();	
 			$addressBook->name = go()->t("Users");		
 
@@ -406,6 +407,7 @@ class Settings extends core\Settings {
 			if(!$this->save()) {
 				throw new \Exception("Could not save core settings");
 			}
+			go()->getDbConnection()->commit();
 		}
 
 		return $addressBook;		
