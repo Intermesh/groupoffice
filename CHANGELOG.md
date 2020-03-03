@@ -1,3 +1,6 @@
+- Core: Fixed error when double clicking some items.
+- Time tracking: projects with no template caused error in time tracking.
+
 02-03-2020 6.4.124
 - Core: Improved connection error handling
 - Address books: URL's were not displayed
