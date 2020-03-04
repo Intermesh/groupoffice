@@ -44,6 +44,7 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 				var data = {
 					total: response.total,
 					records: response.list,
+					metaData: response.metaData,
 					success: true
 				};
 
