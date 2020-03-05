@@ -8,6 +8,7 @@ GO.form.HtmlEditor = function (config) {
 	Ext.applyIf(config, {
 		border: false,
 		enableFont: false,
+		headingsMenu: true,
 		style: GO.settings.html_editor_font
 	});
 
@@ -24,19 +25,23 @@ GO.form.HtmlEditor = function (config) {
 	var ioDentPlugin = new Ext.ux.form.HtmlEditor.IndentOutdent();
 	var ssScriptPlugin = new Ext.ux.form.HtmlEditor.SubSuperScript();
 	var rmFormatPlugin = new Ext.ux.form.HtmlEditor.RemoveFormat();
-	var headingMenu = new Ext.ux.form.HtmlEditor.HeadingMenu();
+
 
 	if (GO.settings.pspellSupport)
 		config.plugins.unshift(spellcheckInsertPlugin);
 
 	config.plugins.unshift(
-					headingMenu,
 					ioDentPlugin,
 					rmFormatPlugin,
 					wordPastePlugin,
 					hrPlugin,
 					ssScriptPlugin
 					);
+
+	if(config.headingsMenu) {
+		var headingMenu = new Ext.ux.form.HtmlEditor.HeadingMenu();
+		config.plugins.unshift(headingMenu);
+	}
 
 	GO.form.HtmlEditor.superclass.constructor.call(this, config);
 };
@@ -46,6 +51,8 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	iframePad:dp(8),
 	
 	hideToolbar: false,
+
+	headingsMenu: true,
 
 	initComponent: function() {
 		GO.form.HtmlEditor.superclass.initComponent.apply(this);
