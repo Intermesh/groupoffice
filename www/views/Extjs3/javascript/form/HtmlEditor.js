@@ -24,11 +24,13 @@ GO.form.HtmlEditor = function (config) {
 	var ioDentPlugin = new Ext.ux.form.HtmlEditor.IndentOutdent();
 	var ssScriptPlugin = new Ext.ux.form.HtmlEditor.SubSuperScript();
 	var rmFormatPlugin = new Ext.ux.form.HtmlEditor.RemoveFormat();
+	var headingMenu = new Ext.ux.form.HtmlEditor.HeadingMenu();
 
 	if (GO.settings.pspellSupport)
 		config.plugins.unshift(spellcheckInsertPlugin);
 
 	config.plugins.unshift(
+					headingMenu,
 					ioDentPlugin,
 					rmFormatPlugin,
 					wordPastePlugin,
@@ -403,7 +405,10 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			try {
 				this.execCmd('useCSS', true);
 				this.execCmd('styleWithCSS', false);
+				this.execCmd('insertBrOnReturn', false);
+				this.execCmd('enableObjectResizing', true);
 			} catch (e) {
+				console.warn(e);
 			}
 		}
 		this.fireEvent('activate', this);
@@ -484,35 +489,30 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 					//                    }
 				}
 			};
-		} else if (Ext.isOpera) {
-			return function (e) {
-				var k = e.getKey();
-				if (k == e.TAB) {
-					e.stopEvent();
-					this.win.focus();
-					this.execCmd('InsertHTML', '&nbsp;&nbsp;&nbsp;&nbsp;');
-					this.deferFocus();
-				}
-			};
 		} else if (Ext.isWebKit) {
 			return function (e) {
-				var k = e.getKey();
+				var k = e.getKey(), doc = this.getDoc();
 				if (k == e.TAB) {
 					e.stopEvent();
 					this.execCmd('InsertText', '\t');
 					this.deferFocus();
-				}/* Testen in latest chrome and safari with lists else if (k == e.ENTER) {
-					e.stopEvent();
-					var doc = this.getDoc();
-					if (doc.queryCommandState('insertorderedlist') ||
-									doc.queryCommandState('insertunorderedlist')) {
-						this.execCmd('InsertHTML', '</li><br /><li>');
-					} else {
-						this.execCmd('InsertHtml', '<br />&nbsp;');
-						this.execCmd('delete');
-					}
-					this.deferFocus();
-				}*/
+				}else if(k == e.ENTER){
+					// if (doc.queryCommandState('insertorderedlist') || doc.queryCommandState('insertunorderedlist')) {
+					// 	return;
+					// }
+					// e.stopEvent();
+					//
+					//
+					// //make sure last child is a br otherwise it will go wrong!
+					// console.warn(doc.lastElementChild.tagName.toLowerCase());
+					// if(!doc.lastElementChild.tagName.toLowerCase() == "br") {
+					// 	console.warn("added br")
+					// 	doc.appendChild(doc.createElement("br"));
+					// }
+					//
+					// this.execCmd('InsertHtml','<br />');
+					// this.deferFocus();
+				}
 			};
 		}
 	}(),

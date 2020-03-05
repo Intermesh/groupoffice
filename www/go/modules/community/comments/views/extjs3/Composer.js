@@ -136,6 +136,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 				me.tb.show();
 				me.tb.doLayout();
 			} else {
+				me.tb.hideMode = 'offsets';
 				me.tb.hide();
 			}
 			//set height of this.middleBox

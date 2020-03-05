@@ -49,6 +49,16 @@ h4 { @extend %font-subheading; }
 h5 { @extend %font-subheading-dense; }
 h6 { @extend %font-data-head; }
 
+code {
+	border: 1px solid color($fg, 'line');
+	background-color: color($bg, 'background');
+	padding: dp(8);
+	margin: dp(16) 0;
+	display: block;
+	font-family: "Courier New",Courier,monospace;
+	color: black;
+	border-radius: dp(4);
+}
 
 p {
 	margin: dp(16) 0;

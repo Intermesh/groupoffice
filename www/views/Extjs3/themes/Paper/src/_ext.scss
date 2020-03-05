@@ -1028,6 +1028,10 @@
 		padding-left: dp(8);
 		@extend %font-title;
 	}
+
+	.x-form-field-wrap {
+		margin: 0 dp(8);
+	}
 }
 
 .x-small-editor x-form-text, .x-small-editor textarea.x-form-field {

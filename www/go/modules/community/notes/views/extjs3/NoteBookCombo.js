@@ -8,7 +8,7 @@ go.modules.community.notes.NoteBookCombo = Ext.extend(go.form.ComboBox, {
 	displayField: 'name',
 	triggerAction: 'all',
 	editable: true,
-	selectOnFocus: true,
+	selectOnFocus: false,
 	forceSelection: true,
 	allowBlank: false,
 	store: {
