@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\addressbook\controller;
 
+use go\core\fs\Blob;
 use go\core\jmap\EntityController;
 use go\core\jmap\exception\InvalidArguments;
 use go\modules\community\addressbook\model;
@@ -85,9 +86,39 @@ class Contact extends EntityController {
 		return $this->defaultImportCSVMapping($params);
 	}
 
-
 	public function merge($params) {
 		return $this->defaultMerge($params);
+	}
+
+	public function labels($params) {
+
+		$tpl = <<<EOT
+{{contact.name}}
+[assign address = contact.addresses | filter:type:"postal" | first]
+[if !{{address}}]
+[assign address = contact.addresses | first]
+[/if]
+{{address.formatted}}
+EOT;
+
+		$labels = new model\Labels($params['unit'] ?? 'mm', $params['pageFormat'] ?? 'A4');
+
+		$labels->rows = $params['rows'] ?? 8;
+		$labels->cols = $params['columns'] ?? 2;
+		$labels->cellTopMargin = $params['labelTopMargin'] ?? 10;
+		$labels->cellRightMargin = $params['labelRightMargin'] ?? 10;
+		$labels->cellBottomMargin = $params['labelBottomMargin'] ?? 10;
+		$labels->cellLeftMargin = $params['labelLeftMargin'] ?? 10;
+
+		$labels->SetFont($params['font'] ?? 'dejavusans', '', $params['fontSize'] ?? 10);
+
+		$tmpFile = $labels->render($params['ids'], $params['tpl'] ?? $tpl);
+
+		$blob = Blob::fromFile($tmpFile);
+		$blob->save();
+
+		return ['blobId' => $blob->id];
+
 	}
 }
 
