@@ -376,6 +376,21 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 														'csv');
 									},
 									scope: this
+								}, '-',
+								{
+									iconCls: 'ic-print',
+									text: t("Labels"),
+									scope: this,
+									handler: function() {
+										var dlg = new go.modules.community.addressbook.LabelsDialog({
+											queryParams: Object.assign(go.util.clone(this.grid.store.baseParams), this.grid.store.lastOptions.params, {
+												limit: 0,
+												position: 0
+											})
+										});
+										dlg.show();
+
+									}
 								}
 //								{
 //									text: 'JSON',

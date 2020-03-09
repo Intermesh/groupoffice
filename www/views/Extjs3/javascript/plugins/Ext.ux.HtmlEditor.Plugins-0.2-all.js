@@ -671,7 +671,7 @@ Ext.ux.form.HtmlEditor.HeadingMenu = Ext.extend(Ext.util.Observable, {
     // private
     onRender: function(){
         var cmp = this.cmp;
-        var btn = this.cmp.getToolbar().addItem({
+        var btn = this.cmp.getToolbar().insert(0, {
             xtype: 'combo',
             displayField: 'display',
             valueField: 'value',
@@ -685,12 +685,41 @@ Ext.ux.form.HtmlEditor.HeadingMenu = Ext.extend(Ext.util.Observable, {
                 xtype: 'arraystore',
                 autoDestroy: true,
                 fields: ['value','display'],
-                data: [['H1','1st Heading'],['H2','2nd Heading'],['H3','3rd Heading'],['H4','4th Heading'],['H5','5th Heading'],['H6','6th Heading'],['P','Paragraph']]
+                data: [['H1','1st Heading'],['H2','2nd Heading'],['H3','3rd Heading'],['H4','4th Heading'],['H5','5th Heading'],['H6','6th Heading'],['P','Paragraph'],['CODE','Code'],['PRE','Pre']]
             },
             listeners: {
-                'select': function(combo,rec){
-                    this.relayCmd('formatblock', '<'+rec.get('value')+'>');
+                select: function(combo,rec){
+
+                    var v = rec.get('value');
+
+                    switch(v) {
+
+                        case 'CODE':
+                            var range = this.getWin().getSelection().getRangeAt(0);
+                            var selectionContents = range.extractContents();
+                            var code = this.getDoc().createElement(v);
+                            var div = this.getDoc().createElement("div");
+                            code.appendChild(div);
+                            div.appendChild(selectionContents);
+                            range.insertNode(code);
+
+                            if(this.getEditorBody().lastElementChild.tagName.toLowerCase() != 'br') {
+                                //make sure there's a <br> on end so you can click outside the code block
+                                var div = this.getDoc().createElement("br")
+                                //div.appendChild(this.getDoc().createElement("br"))
+                                this.getEditorBody().appendChild(div);
+                            }
+                            break;
+
+                        case 'P':
+                            this.relayCmd('removeFormat');
+                            break;
+
+                        default:
+                            this.relayCmd('formatblock', '<' + rec.get('value') + '>');
+                    }
                     combo.reset();
+                    this.deferFocus();
                 },
                 scope: cmp
             }

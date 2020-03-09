@@ -980,6 +980,10 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$this->_addEmailsAsAttachment($message,$params);
 			
 			$response['data'] = $message->toOutputArray($params['content_type'] == 'html', true);
+
+			if(isset($params['body'])) {
+				$response['data']['htmlbody'] = $params['body'] . '<br />' . $response['data']['htmlbody'];
+			}
 		}
 		
 		$this->_keepHeaders($response, $params, $unsetSubject);

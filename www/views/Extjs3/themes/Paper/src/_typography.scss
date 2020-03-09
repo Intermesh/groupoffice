@@ -56,7 +56,7 @@ $font-weight-l: 100;
 %font-subheading {
 	font-size: sp(16);
 	line-height: dp(24);
-	color: color($fg, 'secondary-text');
+	color: color($fg, 'text');
 	font-weight: $font-weight-r;
 }
 

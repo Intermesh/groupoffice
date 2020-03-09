@@ -1,3 +1,7 @@
+- Core: Select Heading, paragraph or code block in html editor
+- Files: Fixed missing download link when not using templates in email
+
+05-03-2020 6.4.125
 - Core: Fixed error when double clicking some items.
 - Time tracking: projects with no template caused error in time tracking.
 

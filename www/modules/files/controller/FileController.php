@@ -393,14 +393,11 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		{
 			
 			$public = substr($file->path,0,6)=='public';
-			
-			if(!$public){
-			
-				if(!\GO::user())
-					\GO\Base\Util\Http::basicAuth();
 
-				if(!$file->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION))
+			if (!$public) {
+				if (!\GO::user() || !$file->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
 					throw new \GO\Base\Exception\AccessDenied();
+				}
 			}
 		}
 

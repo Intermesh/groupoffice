@@ -181,6 +181,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		this.htmlEditor = new GO.form.HtmlEditor({
 			name:'htmlbody',
 			hideLabel: true,
+			headingsMenu: false,
 			anchor: '100% '+anchorHeight,
 			plugins:this.initHtmlEditorPlugins(),
 			getFontStyle :  function() {
