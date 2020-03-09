@@ -588,6 +588,22 @@ END;
 	}
 
 	/**
+	 * Grab all e-mail addresses out of a string
+	 *
+	 * @param	int $level The log level. See sys_log() of the PHP docs
+	 * @param	StringHelper $message The log message
+	 * @access public
+	 * @return void
+	 */
+	public static function get_emails_from_string($emails) {
+		if (preg_match_all("/(\b)([\w\.\-]+)(@)([\w\.-]+)([A-Za-z]{2,4})\b/i", $emails, $matches)) {
+			return $matches[0];
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * Return only the contents of the body tag from a HTML page
 	 *
 	 * @param	StringHelper $html A HTML formatted string
