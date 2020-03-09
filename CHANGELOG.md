@@ -1,6 +1,8 @@
 - Core: Select Heading, paragraph or code block in html editor
 - Files: Fixed missing download link when not using templates in email
 - Notes: Improved style and removed "Read more..."
+- Address book: Don't show default country in address
+- ActiveSync: Address was not synced if not filled in completely.
 
 05-03-2020 6.4.125
 - Core: Fixed error when double clicking some items.
