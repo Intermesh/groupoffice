@@ -79,12 +79,16 @@ use function GO;
  * @example or by index
  * {{contact.emailAddresses[0].email}} 
  * 
- * ::::::Maybe?::::::
- * 
- * {{contact.emailAddresses[type=billing] ?? contact.emailAddresses ?? "-"}}
- *  
- * ``````````````````
- 
+ * @example Using [assign] to create a new variable.
+ * `````````````````````````````````````````````````````````````````````
+ * {{contact.name}}
+ * [assign address = contact.addresses | filter:type:"postal" | first]
+ * [if !{{address}}]
+ * [assign address = contact.addresses | first]
+ * [/if]
+ * {{address.formatted}}
+ * `````````````````````````````````````````````````````````````````````
+ *
  */
 class TemplateParser {	
 

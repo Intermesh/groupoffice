@@ -633,7 +633,7 @@
 		/*color: color($primary, 900); //color($fg, 'text');*/
 		
 		@extend %font-title; //changed this to be the same as panel headers as they are mixed in forms
-		float:left;		
+		//float:left;
 		padding:dp(8) 0 dp(16);
 		position: initial;
 		top: dp(32);
