@@ -54,10 +54,6 @@ Ext.define('go.form.ArrayFieldGrid',{
 			{
 				id: 'name',
 				header: t('Name'),
-				sortable: false,
-				hideable: false,
-				draggable: false,
-				menuDisabled: true,
 				dataIndex: config.idField,
 				renderer: function (id) {
 					//must be preloaded... but why?
@@ -133,7 +129,15 @@ Ext.define('go.form.ArrayFieldGrid',{
 				]
 			},
 			store: new go.data.Store({fields: fields}),
-			columns: columns,
+			colModel: new Ext.grid.ColumnModel({
+				columns:columns,
+				defaults: {
+					sortable: false,
+					hideable: false,
+					draggable: false,
+					menuDisabled: true
+				}
+			}),
 			autoExpandColumn: "name"
 		});
 

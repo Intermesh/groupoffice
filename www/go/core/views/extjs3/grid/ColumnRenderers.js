@@ -48,6 +48,10 @@ go.grid.ColumnRenderers = {
 		}
 	},
 
+	duration : function(minutes, meta, record, rowIndex, columnIndex, store) {
+		return go.util.Format.duration(minutes);
+	},
+
 	countryCode: function(val, meta, record, rowIndex, columnIndex, store) {
 		return t("countries")[val.toUpperCase()] ? t("countries")[val.toUpperCase()] : val;
 	},

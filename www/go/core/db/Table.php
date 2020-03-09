@@ -196,6 +196,7 @@ class Table {
 		switch ($c->dbType) {
 			case 'int':
 			case 'tinyint':
+			case 'smallint':
 			case 'bigint':
 				if ($c->length == 1 && $c->dbType == 'tinyint') {
 					//$c->pdoType = PDO::PARAM_BOOL; MySQL native doesn't understand PARAM_BOOL. Doesn't work with ATTR_EMULATE_PREPARES = false.
