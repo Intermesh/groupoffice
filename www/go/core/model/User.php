@@ -909,5 +909,17 @@ class User extends Entity {
 		$message->setTo($this->email, $this->displayName);
 	}
 
+	private $country;
+
+	public function getCountry() {
+		if(!isset($this->country)) {
+			$tz = new \DateTimeZone($this->timezone);
+			$i = $tz->getLocation();
+			$this->country = $i['country_code'];
+		}
+
+		return $this->country;
+	}
+
 
 }

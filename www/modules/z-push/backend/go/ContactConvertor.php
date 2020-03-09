@@ -264,12 +264,15 @@ class ContactConvertor {
 	private function buildHasManyValues($m, $message) {		
 		$v = [];
 		$firstPropName = array_values($m)[0];
-		if(empty($message->$firstPropName)) {
-			return false;
-		}
-
+		$found = false;
 		foreach($m as $goProp => $asProp) {
-			$v[$goProp] = $message->$asProp;					
+			$v[$goProp] = $message->$asProp;
+			if(!$found && !empty($message->$asProp)) {
+				$found = true;
+			}
+		}
+		if(!$found) {
+			return false;
 		}
 		return $v;		
 	}
