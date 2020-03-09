@@ -44,14 +44,18 @@ go.modules.community.addressbook.DuplicateDialog = Ext.extend(go.Window, {
 
   doFilter: function() {
 
-    var dup = this.duplicate.getValue();
+    var dup = this.duplicate.getValue(), f = {permissionLevel: go.permissionLevels.writeAndDelete};
     var duparr = [];
     for(var key in dup) {
       if(dup[key]) {
         duparr.push(key);
       }
     }
-    this.grid.store.setFilter('filter', {duplicate: duparr, permissionLevel: go.permissionLevels.writeAndDelete});
+
+    if(duparr.length) {
+      f.duplicate = duparr;
+    }
+    this.grid.store.setFilter('filter', f);
     this.grid.store.load();
   },
 
