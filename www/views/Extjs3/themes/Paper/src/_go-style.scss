@@ -43,27 +43,21 @@ button, html, input, select, textarea {
 }
 
 h1 {
-	margin: dp(16) 0;
 	@extend %font-display1;
 }
 h2 {
-	margin: dp(16) 0;
 	@extend %font-headline; }
 h3 {
 	@extend %font-title;
-	margin: dp(8) 0;
 }
 h4 {
 	@extend %font-subheading;
-	margin: dp(8) 0;
 }
 h5 {
 	@extend %font-subheading-dense;
-	margin: dp(8) 0;
 }
 h6 {
 	@extend %font-data-head;
-	margin: dp(8) 0;
 }
 
 code {
@@ -1750,6 +1744,25 @@ table[id^="comments-ext"] b {
 .go-html-formatted {
 	@extend %font-body1;
 
+	h1 {
+		margin: dp(16) 0;
+	}
+	h2 {
+		margin: dp(16) 0;
+	}
+	h3 {
+		margin: dp(8) 0;
+	}
+	h4 {
+		margin: dp(8) 0;
+	}
+	h5 {
+		margin: dp(8) 0;
+	}
+	h6 {
+		margin: dp(8) 0;
+	}
+
 }
 
 //.go-html-formatted div, .go-html-formatted dl, .go-html-formatted dt, .go-html-formatted dd, .go-html-formatted ul, .go-html-formatted ol, .go-html-formatted li, .go-html-formatted h1, .go-html-formatted h2, .go-html-formatted h3, .go-html-formatted h4, .go-html-formatted h5, .go-html-formatted h6, .go-html-formatted pre, .go-html-formatted form, .go-html-formatted fieldset, .go-html-formatted input, .go-html-formatted p, .go-html-formatted blockquote, .go-html-formatted th, .go-html-formatted td, .go-html-formatted span {
@@ -1761,49 +1774,6 @@ table[id^="comments-ext"] b {
   margin: 1em 40px;  
   padding:0px 10px;
 }
-
-
-//.go-html-formatted h1 {
-//  display: block;
-//  font-size: 2em;
-//  font-weight: bold;
-//  margin: .67em 0;
-//}
-//
-//.go-html-formatted h2 {
-//  display: block;
-//  font-size: 1.5em;
-//  font-weight: bold;
-//  margin: .83em 0;
-//}
-//
-//.go-html-formatted h3 {
-//  display: block;
-//  font-size: 1.17em;
-//  font-weight: bold;
-//  margin: 1em 0;
-//}
-//
-//.go-html-formatted h4 {
-//  display: block;
-//  font-weight: bold;
-//  margin: 1.33em 0;
-//}
-//
-//.go-html-formatted h5 {
-//  display: block;
-//  font-size: 0.83em;
-//  font-weight: bold;
-//  margin: 1.67em 0;
-//}
-//
-//.go-html-formatted h6 {
-//  display: block;
-//  font-size: 0.67em;
-//  font-weight: bold;
-//  margin: 2.33em 0;
-//}
-
 
 .go-html-formatted td {   
    display: table-cell;  

@@ -112,7 +112,7 @@ class Address extends Property {
 	private static $defaultCountryText;
 	private static function isDefaultCountry(Address $address) {
 		if(!isset(self::$defaultCountryIso)) {
-			self::$defaultCountryIso == go()->getAuthState()->getUser(['timezone'])->getCountry();
+			self::$defaultCountryIso = go()->getAuthState()->getUser(['timezone'])->getCountry();
 			$countries = go()->t('countries');
 			self::$defaultCountryText = $countries[self::$defaultCountryIso] ?? "";
 		}
