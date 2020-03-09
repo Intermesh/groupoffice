@@ -2092,3 +2092,15 @@ table[id^="comments-ext"] b {
 	background-color: color($bg, 'box');
 	cursor: pointer;
 }
+
+
+.go-user-settings-dlg {
+	.x-panel-header-text {
+		@extend %font-subheading;
+	}
+	.x-toolbar {
+		.xtb-title {
+			@extend %font-subheading;
+		}
+	}
+}

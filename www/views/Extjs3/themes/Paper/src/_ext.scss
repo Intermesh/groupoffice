@@ -632,7 +632,7 @@
 		/*@extend %font-caption;*/
 		/*color: color($primary, 900); //color($fg, 'text');*/
 		
-		@extend %font-title; //changed this to be the same as panel headers as they are mixed in forms
+		@extend %font-subheading; //changed this to be the same as panel headers as they are mixed in forms
 		//float:left;
 		padding:dp(8) 0 dp(16);
 		position: initial;
@@ -1031,6 +1031,17 @@
 
 	.x-form-field-wrap {
 		margin: 0 dp(8);
+	}
+}
+
+.x-form-panel, .x-fieldset {
+	.x-toolbar {
+		.xtb-title {
+			@extend %font-subheading;
+		}
+	}
+	.x-panel-header-text {
+		@extend %font-subheading;
 	}
 }
 
