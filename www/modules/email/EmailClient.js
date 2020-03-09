@@ -721,7 +721,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			this.replyAllButton.setDisabled(this.readOnly && !this._permissionDelegated);
 			this.replyButton.setDisabled(this.readOnly && !this._permissionDelegated);
 			this.forwardButton.setDisabled(this.readOnly && !this._permissionDelegated);
-			this.printButton.setDisabled(this.readOnly && !this._permissionDelegated);
+			// this.printButton.setDisabled(this.readOnly && !this._permissionDelegated);
 
 			var record = this.messagesGrid.store.getById(this.messagePanel.uid);
 
