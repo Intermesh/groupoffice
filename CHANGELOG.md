@@ -1,3 +1,4 @@
+- Core: Check if db is in invalid state (partially upgraded to 6.3) before upgraded
 - Sieve: Fixed bug where sieve dialog showed folders of other account
 - Files: Assistant installation replaces GOTA file handlers
 
