@@ -517,11 +517,21 @@ Ext.extend(GO.Checker, Ext.util.Observable, {
 		}
 
 		if (Notification.permission === "granted") {
-			var notification = new Notification(title,options);
+			try {
+				var notification = new Notification(title,options);
+			}
+			catch (e) {
+				//ignore failure on mobiles
+			}
 		} else if (Notification.permission !== 'denied' || Notification.permission === "default") {
 		  Notification.requestPermission(function (permission) { // ask first
 			if (permission === "granted") {
-			  var notification = new Notification(title,options);
+				try {
+					var notification = new Notification(title, options);
+				}
+				catch (e) {
+					//ignore failure on mobiles
+				}
 			}
 		  });
 		}
@@ -555,11 +565,21 @@ Ext.extend(GO.Checker, Ext.util.Observable, {
 		}
 
 		if (Notification.permission === "granted") {
-			var notification = new Notification(title,options);
+			try {
+				var notification = new Notification(title,options);
+			}
+			catch(e) {
+				// ignore failure on android
+			}
 		} else if (Notification.permission !== 'denied' || Notification.permission === "default") {
 		  Notification.requestPermission(function (permission) { // ask first
 			if (permission === "granted") {
-			  var notification = new Notification(title,options);
+				try {
+					var notification = new Notification(title, options);
+				}
+				catch(e) {
+					// ignore failure on android
+				}
 			}
 		  });
 		}
