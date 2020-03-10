@@ -16,6 +16,10 @@ class Search extends EntityController {
 		return model\Search::class;
 	}
 
+	public function email2($params) {
+		$t = "";
+	}
+
 	public function email($params) {
 		
 		$q = $params['filter']['text'] ?? null;
