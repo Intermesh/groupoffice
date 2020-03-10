@@ -14,6 +14,11 @@ use go\core\jmap\Entity;
  */
 function isValidDb() {
 	if(GO()->getDatabase()->hasTable("core_module")) {
+
+		if(!GO()->getDatabase()->hasTable("core_user")) {
+			throw new \Exception("Your database seems to be in an invalid state. Please restore a backup and make sure no tables from a partial upgrade process are left.");
+		}
+
 		return 63;
 	}
 	if (!GO()->getDatabase()->hasTable("go_settings")) {
