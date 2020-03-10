@@ -3,8 +3,8 @@ set -e
 
 CONFIG=$1
 
-if [ ! -z "$CONFIG" ]; then
-  echo Please pass config file. eg. /etc/groupoffice/multi_instance/manage.group-office.com/config.php
+if [ -z "$CONFIG" ]; then
+  echo Please pass config file. eg. ./update-git.sh /etc/groupoffice/multi_instance/manage.group-office.com/config.php
   exit 1
 fi
 
@@ -48,5 +48,5 @@ do
 done
 
 composer update --no-dev -o
-sudo -u www-data php cli.php core/System/upgrade -c=/etc/groupoffice/multi_instance/manage.group-office.com/config.php
+sudo -u www-data php cli.php core/System/upgrade -c=$CONFIG
 
