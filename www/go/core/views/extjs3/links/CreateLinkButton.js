@@ -6,7 +6,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 	cls: "go-create-link-btn",
 	totalCount: 0,
 	cancelAdd: false,
-	addLink : function(entity, entityId) {	
+	addLink : function(entity, entityId) {
 		
 		var me = this;
 		me.cancelAdd = false;
@@ -108,12 +108,17 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			}
 		});
 		
-		this.linkGrid = new go.grid.GridPanel({
+		this.linkGrid = new go.grid.EditorGridPanel({
+			name: 'linkGrid',
+			clicktToEdit: 1,
+			trackMouseOver: true,
+			loadMask: true,
 			columns: [
 				{
 					id: 'name',
 					header: t('Name'),					
 					sortable: true,
+					editable: false,
 					dataIndex: 'to',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {						
 						var linkIconCls = go.Entities.getLinkIcon(record.data.toEntity, record.data.to.filter);
@@ -122,7 +127,37 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 					}
 				},
 				{
-					width: dp(80),
+					id: 'description',
+					header: t('Description'),
+					sortable: false,
+					dataIndex: "description",
+					width: dp(200),
+					editable: true,
+					hidable: false,
+					editor: new Ext.form.TextField({
+						allowBlank: true,
+						anchor: '100%',
+						maxLength: 190
+					}),
+					renderer: function(value, metaData, record, rowIndex, colIndex, store) {
+						var desc = '';record.data.description;
+						if(record.data.description && record.data.description.length > 0) {
+							desc = record.data.description;
+							if(desc.length > 15) {
+								desc = desc.substring(0,15) + '...';
+							}
+						}
+						return desc;
+					},
+					listeners: {
+						scope: this,
+						blur: function() {
+
+						}
+					}
+				},
+				{
+					width: dp(60),
 					menuDisabled: true,
 					draggable: false,
 					hidable: false,
@@ -146,35 +181,41 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 			listeners: {
 				scope: this,
 				rowclick: function (grid, rowIndex, e) {
+					if (e.target.tagName === "BUTTON" && e.target.innerHTML === 'delete') {
+						var record = grid.store.getAt(rowIndex);
+						grid.store.remove(record);
+						this.setCount(--this.totalCount);
 
+						var i = this.newLinks.findIndex(function (l) {
+							return l.toId === record.get('toId') && l.toEntity === record.get('toEntity');
+						});
 
+						if (i > -1) {
+							this.newLinks = this.newLinks.splice(i, 1);
+						} else {
+							go.Db.store("Link").set({
+								destroy: [record.id]
+							});
+						}
+					} else {
+						grid.startEditing(rowIndex,1); // The description field
+					}
+				},
+				rowdblclick: function(grid,rowIndex,e) {
 					if (e.target.tagName !== "BUTTON") {
 						var record = this.store.getAt(rowIndex);
-					
+
 						var win = new go.links.LinkDetailWindow({
 							entity: record.data.toEntity
 						});
-						
+
 						win.load(record.data.toId);
 						return false;
 					}
-					
-					var record = grid.store.getAt(rowIndex);
-					grid.store.remove(record);
-					this.setCount(--this.totalCount);
-					
-					var i = this.newLinks.findIndex(function(l) {
-						return l.toId === record.get('toId') && l.toEntity === record.get('toEntity');
-					});
-					
-					if(i > -1) {
-						this.newLinks = this.newLinks.splice(i, 1);
-					} else
-					{
-						go.Db.store("Link").set({
-							destroy: [record.id]
-						});
-					}
+				},
+				afteredit: function(e)
+				{
+					e.record.store.save();
 				}
 			},
 			width: dp(800),
