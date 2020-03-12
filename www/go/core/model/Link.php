@@ -250,6 +250,9 @@ class Link extends Entity {
 		if($this->toId == $this->fromId && $this->toEntityTypeId == $this->fromEntityTypeId) {
 			$this->setValidationError("toId", ErrorCode::UNIQUE, "You can't link to the same item");
 		}
+		if(!empty($this->description) && strlen($this->description) > 190) {
+			$this->setValidationError("description", ErrorCode::INVALID_INPUT, "Description field too long");
+		}
 	}
 	
 	protected function internalSave() {
@@ -267,9 +270,13 @@ class Link extends Entity {
 		
 		if($this->isNew()) {			
 			$this->updateDataFromSearch();
+			return App::get()->getDbConnection()->insertIgnore('core_link', $reverse)->execute();
 		}
-		
-		return App::get()->getDbConnection()->insertIgnore('core_link', $reverse)->execute();
+
+		return App::get()->getDbConnection()->updateIgnore('core_link',
+			['description' => $this->description],
+			['toId' => $this->fromId, 'toEntityTypeId' => $this->fromEntityTypeId, 'fromId' => $this->toId, 'fromEntityTypeId' => $this->toEntityTypeId]
+		)->execute();
 	}
 
 	private function updateDataFromSearch() {
