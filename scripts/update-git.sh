@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# This script can be used to update an environment on a server.
+
 set -e
 
 CONFIG=$1
