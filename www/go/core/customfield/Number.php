@@ -18,7 +18,7 @@ class Number extends Base {
 		$d = $this->field->getDefault();
 		$d = isset($d) && $d != "" ? number_format($d, 4) : "NULL";
 		
-		$decimals = $this->field->getOption('numberDecimals') + 2;
+		$decimals = ((int)$this->field->getOption('numberDecimals')) + 2;
 		
 		return "decimal(19,$decimals) DEFAULT " . $d;
 	}
