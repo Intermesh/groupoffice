@@ -210,22 +210,19 @@ class TemplateParser {
 
 		$tags = $this->findCloseTags($tags);				
 	
-		$tags = array_filter($tags, function($tag) {
+		$tags = array_values(array_filter($tags, function($tag) {
 			return $tag['type'] == null || ($tag['type'] == 'open' && isset($tag['close']));
-		});
+		}));
 
 		foreach($elseMatches as $elseMatch) {
 			$tags = $this->matchElseTag($tags, $elseMatch);
 		}
 
 		//only parse top level blocks because other tags will be parsed separately.
-		$tags = array_filter($tags, function($tag) {
+		$tags = array_values(array_filter($tags, function($tag) {
 			return $tag['nesting'] == 0 && $tag['type'] != 'close';
-		});
+		}));
 
-		//Make sure index is reset after filtering
-		$tags = array_values($tags);
-		
 		for($i = 0, $c = count($tags); $i < $c; $i++) {
 
 			if($tags[$i]['tagName'] != 'if') {

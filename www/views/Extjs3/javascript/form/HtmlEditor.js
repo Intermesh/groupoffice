@@ -50,17 +50,41 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 	iframePad:dp(8),
 	
-	hideToolbar: false,
+	toolbarHidden: false,
 
 	headingsMenu: true,
 
+	// hideToolbar : function() {
+	// 	this.toolbarHidden = true;
+	//
+	// 	if(this.initialized) {
+	// 		this.wrap.dom.firstChild.style.position = 'absolute';
+	// 		this.wrap.dom.firstChild.style.top = "-1000000px";
+	// 		this.wrap.dom.firstChild.style.height = "0px";
+	// 	}
+	// },
+	//
+	// showToolbar : function*() {
+	//
+	// 	this.toolbarHidden = false;
+	//
+	// 	if(this.initialized) {
+	// 		this.wrap.dom.firstChild.style.position = 'relative';
+	// 		delete this.wrap.dom.firstChild.style.top;
+	// 		this.wrap.dom.firstChild.style.height = dp(40) + "px";
+	// 	}
+	// },
+
 	initComponent: function() {
 		GO.form.HtmlEditor.superclass.initComponent.apply(this);
-		
-		this.on('initialize', function(){
-			if(this.hideToolbar) {
+
+		this.on('afterrender', function() {
+			if(this.toolbarHidden) {
 				this.tb.hide();
 			}
+		}, this);
+		this.on('initialize', function(){
+
 			if(Ext.isEmpty(this.emptyText)) {
 				return;
 			}

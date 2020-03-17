@@ -320,16 +320,22 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 									icon: 'views/Extjs3/themes/Group-Office/images/groupoffice.ico'
 								}
 								// Let's check if the browser supports notifications
+
 								if (!("Notification" in window)) {
 									// Browser does not support desktop notification and will show a popup instead
 								} else if (Notification.permission !== 'granted' && (Notification.permission !== 'denied' || Notification.permission === "default")) {
 									Notification.requestPermission(function (permission) {
 									// If the user accepts, let's create a notification
-									if (permission === "granted") {
-										 var notification = new Notification(t("Desktop notifications active"),options);
-									} else {
-										cb.setValue(false);
+									try {
+										if (permission === "granted") {
+											var notification = new Notification(t("Desktop notifications active"), options);
+											return true;
+										}
+									} catch(e) {
+										// ignore failure on android
 									}
+									cb.setValue(false);
+
 									});
 								}
 							} 

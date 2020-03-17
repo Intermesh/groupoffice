@@ -11,10 +11,15 @@ class Labels extends \TCPDF {
 	public $cols = 2;
 	public $rows = 8;
 
-	public $cellTopMargin = 10;
-	public $cellRightMargin = 10;
-	public $cellBottomMargin = 10;
-	public $cellLeftMargin = 10;
+	public $labelTopMargin = 10;
+	public $labelRightMargin = 10;
+	public $labelBottomMargin = 10;
+	public $labelLeftMargin = 10;
+
+	public $pageTopMargin = 10;
+	public $pageRightMargin = 20;
+	public $pageBottomMargin = 10;
+	public $pageLeftMargin = 20;
 
 	private $currentColumn = 0;
 	private $currentRow = 0;
@@ -28,30 +33,12 @@ class Labels extends \TCPDF {
 		$this->SetCreator('Group-Office ' . go()->getVersion());
 		$this->SetCreator(go()->getAuthState()->getUser(['displayName'])->displayName);
 		$this->SetSubject("Labels");
-
-		$this->SetMargins(0,0,0);
-		$this->SetAutoPageBreak(true, 0);
-
-
-		// set font
 		$this->SetFont('dejavusans', '', 10);
-
-// add a page
-		$this->AddPage();
-
-// set cell padding
 		$this->setCellMargins(0, 0, 0, 0);
-
 		$this->SetPrintFooter(false);
 		$this->SetPrintHeader(false);
-		$this->SetAbsXY(0,0);
-
-
-// set cell margins
 
 		$this->templateParser = new TemplateParser();
-
-
 	}
 
 	public function Header()
@@ -64,10 +51,18 @@ class Labels extends \TCPDF {
 
 	public function render($contactIds, $tpl, $filename = 'Contact Labels.pdf') {
 
-		$this->setCellPaddings($this->cellLeftMargin, $this->cellTopMargin, $this->cellRightMargin, $this->cellBottomMargin);
 
-		$this->labelWidth = ($this->getPageWidth() / $this->cols);
-		$this->labelHeight = ($this->getPageHeight() / $this->rows);
+		$this->SetMargins($this->pageLeftMargin,$this->pageTopMargin,$this->pageRightMargin);
+		$this->SetAutoPageBreak(true, $this->pageBottomMargin);
+
+		$this->SetAbsXY(0,0);
+
+		$this->setCellPaddings($this->labelLeftMargin, $this->labelTopMargin, $this->labelRightMargin, $this->labelBottomMargin);
+
+		$this->AddPage();
+
+		$this->labelWidth = ($this->getPageWidth() - $this->pageLeftMargin - $this->pageRightMargin) / $this->cols;
+		$this->labelHeight = ($this->getPageHeight() - $this->pageTopMargin - $this->pageBottomMargin) / $this->rows;
 
 		$contacts = Contact::find()->where('id', 'IN', $contactIds);
 
@@ -101,8 +96,8 @@ class Labels extends \TCPDF {
 			}
 		}
 
-		$x = $this->labelWidth * $this->currentColumn;
-		$y = $this->labelHeight * $this->currentRow;
+		$x = ($this->labelWidth * $this->currentColumn) + $this->pageLeftMargin;
+		$y = ($this->labelHeight * $this->currentRow) + $this->pageTopMargin;
 
 		$this->SetAbsXY($x, $y);
 	}

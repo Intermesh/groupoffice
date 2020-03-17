@@ -45,7 +45,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			enableFontSize: false,
 			enableAlignments: false,
 			enableSourceEdit: false,
-			hideToolbar: true,
+			// toolbarHidden: true,
 			// emptyText: t('Add comment')+'...',
 			allowBlank: false,
 			plugins: [go.form.HtmlEditor.emojiPlugin],
@@ -131,12 +131,13 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		body.style.width = "100%";
 		
 		setTimeout(function() {
-			var h =  Math.max(composer.minComposerHeight,Math.min(body.offsetHeight, me.boxMaxHeight)); // 400  max height
+			var h =  Math.max(composer.minComposerHeight,Math.min(body.offsetHeight - dp(16), me.boxMaxHeight)); // 400  max height
 			if(h > 36) {
 				me.tb.show();
+				//workaround for combo
+				me.tb.items.itemAt(0).wrap.dom.style.width = "100px";
 				me.tb.doLayout();
 			} else {
-				me.tb.hideMode = 'offsets';
 				me.tb.hide();
 			}
 			//set height of this.middleBox

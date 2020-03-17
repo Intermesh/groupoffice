@@ -1,5 +1,17 @@
+17-03-2020 6.4.128
+- Billing: fixed error in opening invoice created by a deleted user.
+- E-mail: fixed error when loading message while it was deleted.
+- Core: missing use statement in GO.php
+
+17-03-2020 6.4.127
+- Core: Catch notification errors to fix error on Android phones.
+
+09-03-2020 6.4.126
 - Core: Select Heading, paragraph or code block in html editor
 - Files: Fixed missing download link when not using templates in email
+- Notes: Improved style and removed "Read more..."
+- Address book: Don't show default country in address
+- ActiveSync: Address was not synced if not filled in completely.
 
 05-03-2020 6.4.125
 - Core: Fixed error when double clicking some items.

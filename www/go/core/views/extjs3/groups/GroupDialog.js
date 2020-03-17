@@ -12,7 +12,14 @@ go.groups.GroupDialog = Ext.extend(go.form.Dialog, {
 			if(!this.currentId) {
 				//needed to load the grid.
 				this.groupUserGrid.setValue([]);
+			} else if(this.currentId == 2) { //group everyone
+				this.groupUserGrid.setDisabled(true);
+				this.groupUserGrid.hide();
 			}
+		}, this);
+
+		this.formPanel.on("beforesetvalues", function(form, values) {
+
 		}, this);
 	},
 

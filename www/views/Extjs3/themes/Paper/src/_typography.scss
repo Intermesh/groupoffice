@@ -49,6 +49,7 @@ $font-weight-l: 100;
 }
 %font-data-head {
 	font-size: sp(12);
+	line-height: sp(16);
 	font-weight: $font-weight-m;
 	color: color($fg, 'secondary-text');
 }
@@ -56,12 +57,14 @@ $font-weight-l: 100;
 %font-subheading {
 	font-size: sp(16);
 	line-height: dp(24);
+	letter-spacing: 0.4px;
 	color: color($fg, 'text');
 	font-weight: $font-weight-r;
 }
 
 %font-label {
 	font-size: sp(12);
+	line-height: dp(16);
 	color: color($fg, 'secondary-text');
 	font-weight: $font-weight-r;
 }

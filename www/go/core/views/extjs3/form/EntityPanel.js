@@ -15,7 +15,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		
 		this.getForm().trackResetOnLoad = true;
 		
-		this.addEvents({load: true, setvalues: true});
+		this.addEvents({load: true, setvalues: true, beforesetvalues: true});
 	},	
 	
 	onChanges : function(entityStore, added, changed, destroyed) {
@@ -66,6 +66,8 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	
 	setValues : function(v, trackReset) {
 		var field, name;
+
+		this.fireEvent("beforesetvalues", this, v);
 		
 		//set all non form values.
 		for(name in v) {		

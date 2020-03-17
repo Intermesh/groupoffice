@@ -13,14 +13,14 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 
 		Ext.apply(this, {
 			items: [{
+				collapsible: true,
 				title: t("Note"),
 				onLoad: function (detailView) {
 					this.setTitle(Ext.util.Format.htmlEncode(detailView.data.name));
-					this.items.itemAt(0).setText("<div class='go-html-formatted'>" + detailView.data.content + "</div>");
+					// this.items.itemAt(0).setText();
 				},
-				items: [{
-					xtype: 'readmore'
-				}]
+				tpl: "<div class='pad go-html-formatted'>{content:raw}</div>"
+
 			}]
 		});
 		
