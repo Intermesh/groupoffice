@@ -28,7 +28,12 @@ class Select extends Base {
 	public function setOptions(array $options) {
 		$this->options = $options;
 	}
-	
+
+	public function isModified()
+	{
+		return isset($this->options);
+	}
+
 	protected function internalGetOptions($parentId = null) {
 		$options = (new Query())
 										->select("*")

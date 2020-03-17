@@ -38,7 +38,11 @@ go.systemsettings.Panel = Ext.extend(Ext.form.FormPanel, {
 		var module = go.Modules.get(this.package, this.module), p = {"update": {}}, s = this.getForm().getFieldValues(true);
 
 		if(Object.keys(s).length === 0) {
-			cb.call(scope, this, true);
+			var me = this;
+			// we need to use settimeout because we want to fire the callback on the next loop. Otherwise system settings will submit too early.
+			setTimeout(function() {
+				cb.call(scope, me, true);
+			}, 0);
 			return;
 		}
 		

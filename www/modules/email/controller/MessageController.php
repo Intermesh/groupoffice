@@ -18,6 +18,7 @@ use go\core\util\ArrayObject;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\Settings;
 use go\modules\community\addressbook\Module;
+use GO\Email\Model\ContactMailTime;
 
 class MessageController extends \GO\Base\Controller\AbstractController {
 
@@ -748,50 +749,43 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$success = $mailer->send($message, $failedRecipients);		
 
 //		// Update "last mailed" time of the emailed contacts.
-//		if ($success && GO::modules()->addressbook) {
-//
-//			$toAddresses = $message->getTo();
-//			if (empty($toAddresses))
-//				$toAddresses = array();
-//			$ccAddresses = $message->getCc();
-//			if (empty($ccAddresses))
-//				$ccAddresses = array();
-//			$bccAddresses = $message->getBcc();
-//			if (empty($bccAddresses))
-//				$bccAddresses = array();
-//			$emailAddresses = array_merge($toAddresses,$ccAddresses);
-//			$emailAddresses = array_merge($emailAddresses,$bccAddresses);
-//
-//			foreach ($emailAddresses as $emailAddress => $fullName) {
-//				$findCriteria = \GO\Base\Db\FindCriteria::newInstance()
-//						->addCondition('email',$emailAddress,'=','t',false)
-//						->addCondition('email2',$emailAddress,'=','t',false)
-//						->addCondition('email3',$emailAddress,'=','t',false);
-//
-//				$findParams = \GO\Base\Db\FindParams::newInstance()
-//					->criteria($findCriteria);
-//				$contactsStmt = \GO\Addressbook\Model\Contact::model()->find($findParams);
-//				if ($contactsStmt) {
-//					foreach ($contactsStmt as $contactModel) {
-//						if ($contactModel->name == $fullName) {
-//
-//							$contactLastMailTimeModel = \GO\Email\Model\ContactMailTime::model()->findSingleByAttributes(array(
-//								'contact_id' => $contactModel->id,
-//								'user_id' => GO::user()->id
-//							));
-//							if (!$contactLastMailTimeModel) {
-//								$contactLastMailTimeModel = new \GO\Email\Model\ContactMailTime();
-//								$contactLastMailTimeModel->contact_id = $contactModel->id;
-//								$contactLastMailTimeModel->user_id = GO::user()->id;
-//							}
-//
-//							$contactLastMailTimeModel->last_mail_time = time();
-//							$contactLastMailTimeModel->save();
-//						}
-//					}
-//				}
-//			}
-//		}
+		if ($success && GO::modules()->addressbook) {
+
+			$toAddresses = $message->getTo();
+			if (empty($toAddresses))
+				$toAddresses = array();
+			$ccAddresses = $message->getCc();
+			if (empty($ccAddresses))
+				$ccAddresses = array();
+			$bccAddresses = $message->getBcc();
+			if (empty($bccAddresses))
+				$bccAddresses = array();
+			$emailAddresses = array_merge($toAddresses,$ccAddresses);
+			$emailAddresses = array_merge($emailAddresses,$bccAddresses);
+
+			foreach ($emailAddresses as $emailAddress => $fullName) {
+
+				$contact = Contact::findByEmail($emailAddress)->orderBy(['c.goUserId' => 'DESC'])->single();
+
+				if($contact) {
+					$contactLastMailTimeModel = ContactMailTime::model()->findSingleByAttributes(array(
+						'contact_id' => $contact->id,
+						'user_id' => GO::user()->id
+					));
+
+					if (!$contactLastMailTimeModel) {
+						$contactLastMailTimeModel = new ContactMailTime();
+						$contactLastMailTimeModel->contact_id = $contact->id;
+						$contactLastMailTimeModel->user_id = GO::user()->id;
+					}
+
+					$contactLastMailTimeModel->last_mail_time = time();
+					$contactLastMailTimeModel->save();
+				}
+
+
+			}
+		}
 
 		if (!empty($params['reply_uid'])) {
 			//set \Answered flag on IMAP message
@@ -986,6 +980,10 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$this->_addEmailsAsAttachment($message,$params);
 			
 			$response['data'] = $message->toOutputArray($params['content_type'] == 'html', true);
+
+			if(isset($params['body'])) {
+				$response['data']['htmlbody'] = $params['body'] . '<br />' . $response['data']['htmlbody'];
+			}
 		}
 		
 		$this->_keepHeaders($response, $params, $unsetSubject);

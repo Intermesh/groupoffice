@@ -1293,12 +1293,11 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		
 		$sources = json_decode($params['compress_sources'], true);
 
-
 		$workingFolder = \GO\Files\Model\Folder::model()->findByPk($params['working_folder_id']);
 		$destinationFolder = \GO\Files\Model\Folder::model()->findByPk($params['destination_folder_id']);
 		$archiveFile = new \GO\Base\Fs\File(\GO::config()->file_storage_path.$destinationFolder->path . '/' . $params['archive_name'] . '.zip');
-		
-		if($destinationFolder->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)){
+
+		if(!$destinationFolder->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)){
 			throw new AccessDenied();
 		}
 

@@ -378,7 +378,7 @@ class ColumnModel {
 			
 			try {
 				$formattedRecord[$column->getDataIndex()]=$column->render($model);			
-			} catch(\Exception $e) {
+			} catch(\Throwable $e) {
 				$formattedRecord[$column->getDataIndex()] = "";
 
 				ErrorHandler::logException($e);

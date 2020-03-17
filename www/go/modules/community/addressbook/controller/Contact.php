@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\addressbook\controller;
 
+use go\core\fs\Blob;
 use go\core\jmap\EntityController;
 use go\core\jmap\exception\InvalidArguments;
 use go\modules\community\addressbook\model;
@@ -85,9 +86,44 @@ class Contact extends EntityController {
 		return $this->defaultImportCSVMapping($params);
 	}
 
-
 	public function merge($params) {
 		return $this->defaultMerge($params);
+	}
+
+	public function labels($params) {
+
+		$tpl = <<<EOT
+{{contact.name}}
+[assign address = contact.addresses | filter:type:"postal" | first]
+[if !{{address}}]
+[assign address = contact.addresses | first]
+[/if]
+{{address.formatted}}
+EOT;
+
+		$labels = new model\Labels($params['unit'] ?? 'mm', $params['pageFormat'] ?? 'A4');
+
+		$labels->rows = $params['rows'] ?? 8;
+		$labels->cols = $params['columns'] ?? 2;
+		$labels->labelTopMargin = $params['labelTopMargin'] ?? 10;
+		$labels->labelRightMargin = $params['labelRightMargin'] ?? 10;
+		$labels->labelBottomMargin = $params['labelBottomMargin'] ?? 10;
+		$labels->labelLeftMargin = $params['labelLeftMargin'] ?? 10;
+
+		$labels->pageTopMargin = $params['pageTopMargin'] ?? 10;
+		$labels->pageRightMargin = $params['pageRightMargin'] ?? 10;
+		$labels->pageBottomMargin = $params['pageBottomMargin'] ?? 10;
+		$labels->pageLeftMargin = $params['pageLeftMargin'] ?? 10;
+
+		$labels->SetFont($params['font'] ?? 'dejavusans', '', $params['fontSize'] ?? 10);
+
+		$tmpFile = $labels->render($params['ids'], $params['tpl'] ?? $tpl);
+
+		$blob = Blob::fromFile($tmpFile);
+		$blob->save();
+
+		return ['blobId' => $blob->id];
+
 	}
 }
 

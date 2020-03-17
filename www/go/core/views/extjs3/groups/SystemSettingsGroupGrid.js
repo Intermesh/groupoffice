@@ -23,7 +23,7 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 		this.store = new go.data.Store({
 			baseParams: {
 				filter: {
-					excludeEveryone: true,
+					//excludeEveryone: true,
 					hideUsers: true
 				}
 			},
@@ -104,7 +104,7 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 
 		go.groups.SystemSettingsGroupGrid.superclass.initComponent.call(this);
 
-		this.on('render', function () {
+		this.on('viewready', function () {
 			this.store.load();
 		}, this);
 

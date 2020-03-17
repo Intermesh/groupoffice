@@ -27,6 +27,9 @@ remove folders when uninstalling module. Error when reinstalling
 
 - NOtifications
 
+- Makkelijker taken toevoegen bij projecten. Project eigen lijst?
+tasklist bij default permissions
+
 
 - billing API integratie boekhoudpakketten
 
@@ -38,6 +41,14 @@ Calendar birthdays
 Demodata
 ticket groups
 
+
+Projecten:
+Losse modules:
+- Nieuwe mininale basis met naam, nummer, status, custom fields en links.
+- Milestones: Has many met datum.
+- Kanban takenlijaten
+- Tijdsregistratie
+    - Project een kleur geven
 
 
 Affected customer modules:

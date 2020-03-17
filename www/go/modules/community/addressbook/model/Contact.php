@@ -685,7 +685,9 @@ class Contact extends AclItemEntity {
 		
 	}
 	
-	protected function internalValidate() {		
+	protected function internalValidate() {
+
+//		$this->setValidationError('name', 'test', 'test');
 		
 		if(empty($this->name)) {
 			$this->setNameFromParts();

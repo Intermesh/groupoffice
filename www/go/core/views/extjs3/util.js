@@ -316,20 +316,19 @@ go.util =  (function () {
 		
 	/**
 	 * Export an entity to a file
-	 * 
+	 *
 	 * @param {string} entity eg. "Contact"
 	 * @param {string} queryParams eg. Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0})
-	 * @param {stirng} extension eg "vcf", "csv" or "son"
+	 * @param {string} extension eg "vcf", "csv" or "json"
+	 * @param {object} params Extra params to send to the export method on the server.
 	 * @return {undefined}
 	 */
-	exportToFile: function (entity, queryParams, extension) {
+	exportToFile: function (entity, queryParams, extension, params) {
 		
 		Ext.getBody().mask(t("Exporting..."));
 		var promise = go.Jmap.request({
 			method: entity + "/query",
-			params: queryParams,
-			callback: function (options, success, response) {
-			}
+			params: queryParams
 		});
 		
 		go.Jmap.request({

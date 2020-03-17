@@ -191,7 +191,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			try {
 				me.internalLoad(entity);
 			} catch (e) {
-				Ext.MessageBox.alert(t("Error"), t("Sorry, an unexpected error occurred: ") + e.message);
+				Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred") + ": " + e.message);
 				console.error(e);
 			}
 		}).catch(function(e) {

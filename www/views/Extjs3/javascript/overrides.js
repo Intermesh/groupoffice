@@ -1007,6 +1007,7 @@ Ext.override(Ext.DatePicker, {
 
 Ext.override(Ext.Panel, {
 	border: false,
+	animCollapse: false,
 	panelInitComponent : Ext.Panel.prototype.initComponent,
 	
 	initComponent : function() {

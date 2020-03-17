@@ -4,6 +4,10 @@ $af['default']='{address} {address_no}
 {state}
 {country}';
 
+$af['NL']='{address} {address_no}
+{zip} {city}
+{country}';
+
 $af['bn_BD']='{address}
 {address_no}
 {city}

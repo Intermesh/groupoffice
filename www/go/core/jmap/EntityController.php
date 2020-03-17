@@ -4,6 +4,7 @@ namespace go\core\jmap;
 
 use Exception;
 use go\core\fs\File;
+use go\core\jmap\exception\UnsupportedSort;
 use go\core\model\Acl;
 use go\core\acl\model\AclEntity;
 use go\core\App;
@@ -18,6 +19,7 @@ use go\core\jmap\exception\StateMismatch;
 use go\core\orm\Query;
 use go\core\util\ArrayObject;
 use PDO;
+use PDOException;
 use ReflectionException;
 
 abstract class EntityController extends Controller {	
@@ -184,33 +186,45 @@ abstract class EntityController extends Controller {
 		$state = $this->getState();
 		
 		$ids = [];		
-			
-		foreach($idsQuery as $record) {
-			if(!isset($count)) {
-				$count = count($record);
-			}
-			$ids[] = $count ? $record[0] : implode('-', $record);
-		}
 
-		$response = [
+		try {
+			foreach ($idsQuery as $record) {
+				if (!isset($count)) {
+					$count = count($record);
+				}
+				$ids[] = $count ? $record[0] : implode('-', $record);
+			}
+
+			$response = [
 				'accountId' => $p['accountId'],
 				'state' => $state,
 				'ids' => $ids,
 				'notfound' => [],
 				'canCalculateUpdates' => false
-		];
-		
-		if($p['calculateTotal']) {
-			// $totalQuery = clone $idsQuery;
-			// $response['total'] = $totalQuery
-			// 								->selectSingleValue("count(distinct " . $totalQuery->getTableAlias() . ".id)")
-			// 								->orderBy([], false)
-			// 								->groupBy([])
-			// 								->limit(1)
-			// 								->offset(0)
-			// 								->single();
+			];
 
-			$response['total'] = go()->getDbConnection()->query("SELECT FOUND_ROWS()")->fetch(PDO::FETCH_COLUMN, 0);
+			if ($p['calculateTotal']) {
+				// $totalQuery = clone $idsQuery;
+				// $response['total'] = $totalQuery
+				// 								->selectSingleValue("count(distinct " . $totalQuery->getTableAlias() . ".id)")
+				// 								->orderBy([], false)
+				// 								->groupBy([])
+				// 								->limit(1)
+				// 								->offset(0)
+				// 								->single();
+
+				$response['total'] = go()->getDbConnection()->query("SELECT FOUND_ROWS()")->fetch(PDO::FETCH_COLUMN, 0);
+			}
+		}catch(PDOException $e) {
+
+			//Check if the PDOException is due to an invalid sort
+			//SQLSTATE[42S22]: Column not found: 1054 Unknown column 'customFields.A_checkbox' in 'order clause'
+			$msg = $e->getMessage();
+			if(strpos($msg, '42S22') !== false && strpos($msg, 'order clause') !== false) {
+				throw new UnsupportedSort();
+			} else{
+				throw $e;
+			}
 		}
 		
 		return $response;

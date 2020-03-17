@@ -102,7 +102,18 @@ class Group extends AclOwnerEntity {
 			$this->setValidationError('users', ErrorCode::FORBIDDEN, go()->t("You can't remove the group owner from the group"));
 		}
 
+		if($this->id == self::ID_EVERYONE && $this->isModified(['users'])) {
+			$this->setValidationError('users', ErrorCode::FORBIDDEN, go()->t("You can't modify members of the everyone group"));
+		}
+
 		return parent::internalValidate();
+	}
+
+	public static function check()
+	{
+		//make sure all users are in group everyone
+		go()->getDbConnection()->exec("INSERT IGNORE INTO core_user_group (SELECT " . self::ID_EVERYONE .", id from core_user)");
+		return parent::check();
 	}
 
 	protected function internalSave() {
@@ -146,6 +157,10 @@ class Group extends AclOwnerEntity {
 		}
 
 		if(in_array(self::ID_INTERNAL, $ids)) {
+			throw new Forbidden("You can't delete the internal group");
+		}
+
+		if(in_array(self::ID_EVERYONE, $ids)) {
 			throw new Forbidden("You can't delete the internal group");
 		}
 		

@@ -13,7 +13,20 @@
  
 Ext.namespace('GO.util');
 
-Ext.Ajax.timeout = 180000; // 3 minutes
+Ext.override(Ext.data.Connection, {
+	timeout: 120000
+});
+
+Ext.Ajax.on('requestexception', function(conn, response, options) {
+	if(response.isAbort) {
+		console.warn("Connection aborted", conn, response, options);
+	} else if(response.isTimeout) {
+		Ext.MessageBox.alert(t("Request error"), t("The connection to the server timed out. Please check your internet connection."))
+	} else
+	{
+		console.warn("Request exception", conn, response, options);
+	}
+});
 
 GO.permissionLevels = go.permissionLevels = {
 		read: 10,
@@ -218,13 +231,22 @@ GO.request = function(config){
 		callback:function(options, success, response){
 			
 //			console.log(response);
-//			
-			if(!success && response.isTimeout){
-				GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
-			}
-			
+//
 			if(config.maskEl)
 				config.maskEl.unmask();
+
+			if(!success) {
+				if(response.isTimeout){
+					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
+				}
+
+				if (config.fail) {
+					config.fail.call(config.scope, response, options);
+				} else {
+					console.error(response, options);
+					Ext.Msg.alert(t("Error"), "Failed to send request to the server. Please check your internet connection.");
+				}
+			}
 		},
 		success: function(response, options)
 		{

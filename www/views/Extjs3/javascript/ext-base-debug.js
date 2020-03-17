@@ -2401,6 +2401,10 @@ Ext.lib.Ajax = function() {
         var o = getConnectionObject() || null;
 
         if (o) {
+            o.conn.timeout = callback.timeout;
+            o.conn.ontimeout = function () {
+                handleTransactionResponse(o, callback, false, true);
+            };
             o.conn.open(method, uri, true);
 
             if (pub.useDefaultXhrHeader) {
@@ -2420,6 +2424,15 @@ Ext.lib.Ajax = function() {
             //Merijn: Use native load event instead of setinterval.
             o.conn.addEventListener('load', function() {
               handleTransactionResponse(o, callback);
+            });
+
+            o.conn.addEventListener('abort', function() {
+                handleTransactionResponse(o, callback, true, false);
+            });
+
+            o.conn.addEventListener('error', function(err) {
+                console.error("Connection error", err);
+                handleTransactionResponse(o, callback, false, false);
             });
             
             o.conn.send(postData || null);

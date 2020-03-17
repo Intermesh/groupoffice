@@ -71,8 +71,8 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		go.modules.community.notes.MainPanel.superclass.initComponent.call(this);
 		
-		
-		this.on("afterrender", this.runModule, this);
+		//use viewready so load mask can show
+		this.noteBookGrid.on("viewready", this.runModule, this);
 	},
 	
 	runModule : function() {

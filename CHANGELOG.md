@@ -1,3 +1,69 @@
+17-03-2020 6.4.128
+- Billing: fixed error in opening invoice created by a deleted user.
+- E-mail: fixed error when loading message while it was deleted.
+- Core: missing use statement in GO.php
+
+17-03-2020 6.4.127
+- Core: Catch notification errors to fix error on Android phones.
+
+09-03-2020 6.4.126
+- Core: Select Heading, paragraph or code block in html editor
+- Files: Fixed missing download link when not using templates in email
+- Notes: Improved style and removed "Read more..."
+- Address book: Don't show default country in address
+- ActiveSync: Address was not synced if not filled in completely.
+
+05-03-2020 6.4.125
+- Core: Fixed error when double clicking some items.
+- Time tracking: projects with no template caused error in time tracking.
+
+02-03-2020 6.4.124
+- Core: Improved connection error handling
+- Address books: URL's were not displayed
+- Timeregistration: Set date to current view when adding time
+- Timeregistration: Small visual enhancements
+- Core: fireEvent 'mapping' will not bubble down
+- Billing: fixed broken delete button
+- Leavedays: Fixed invalid float value when saving employee
+
+28-02-2020 6.4.123
+- Calendar: Fixed error when saving resource
+- Core: Fixed error on saving groups
+- Email composer: sorted search recipients on last contact mail time
+- Tickets: Fixed status filter and status change in tickets
+- Billing: Added Save PDF to order files menu item
+
+21-02-2020 6.4.122
+- Projects: Business module code accidentally in projects
+
+21-02-2020 6.4.121
+- Billing: broken add and delete invoice button
+- Core: Removed deprecated timezones
+
+21-02-2020 6.4.120
+- Core: Send test message on Notification failed if you did not re-enter the password.
+- Core: Adding custom field select option didn't save
+- Billing: Clear items on opening new order
+- Core: Connection timeout shows error dialog
+- Billing: HTML formatting on frontpage text
+- Core: Handle invalid sort state which may happen when a (custom) column has been removed
+
+20-02-2020 6.4.119
+- Core: Don't use notification and popups on mobile
+- Google Authenticator: Show invalid code error
+- Google Authenticator: Accept spaces in code.  Fixed: 2FA Improvement #537
+- Tickets: Improved detail view
+- Billing: Improved detail view
+
+18-02-2020 6.4.118
+- Core: Removed user "Permissions" and moved it to a "Visible to" tab.
+- Core: Visual enhancements
+- Core: Added counters on collapsed detail panels
+
+17-02-2020 6.4.117
+- Tickets: Note background color restored
+- Projects: Error on login when not a projects admin
+
 14-02-2020 6.4.115
 - Core: Clear indexedDB cache when /install/upgrade.php has been executed
 - Calendar: Fixed event link not working first time when creating from another item via + button

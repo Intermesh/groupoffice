@@ -15,10 +15,14 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		
 		this.getForm().trackResetOnLoad = true;
 		
-		this.addEvents({load: true, setvalues: true});
+		this.addEvents({load: true, setvalues: true, beforesetvalues: true});
 	},	
 	
-	onChanges : function(entityStore, added, changed, destroyed) {		
+	onChanges : function(entityStore, added, changed, destroyed) {
+		//don't update on our own submit
+		if(this.submitting) {
+			return;
+		}
 		var entity = added[this.currentId] || changed[this.currentId] || false;
 		if(entity) {			
 			this.entity = entity;
@@ -34,16 +38,18 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	load: function (id, callback, scope) {
 		this.currentId = id;
 
-		this.entityStore.get([id], function(entities) {
-			this.setValues(entities[0], true);
-			this.entity = entities[0];
+		var me = this;
+
+		this.entityStore.single(id).then(function(entity) {
+			me.setValues(entity, true);
+			me.entity = entity;
 			
 			if(callback) {
-				callback.call(scope || this, entities[0]);
+				callback.call(scope || me, entity);
 			}
 			
-			this.fireEvent("load", this, entities[0]);
-		}, this);
+			me.fireEvent("load", me, entity);
+		});
 	},
 	
 	getValues : function (dirtyOnly) {	
@@ -60,6 +66,8 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	
 	setValues : function(v, trackReset) {
 		var field, name;
+
+		this.fireEvent("beforesetvalues", this, v);
 		
 		//set all non form values.
 		for(name in v) {		
@@ -86,7 +94,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 			return;
 		}		
 		//get only modified values on existing items, otherwise get all values.
-		var id, params = {}, values = this.getValues(!!this.currentId);
+		var id, params = {}, values = this.getValues(!!this.currentId), me = this;
 		
 		if (this.currentId) {
 
@@ -100,25 +108,26 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 			params.create = {};
 			params.create[id] = values;
 		}
-		
-//		console.warn(values);
-//		return;
+
+		this.submitting = true;
 
 		this.fireEvent('beforesubmit', this, values);
 		
-		this.entityStore.set(params, function (options, success, response) {
+		return me.entityStore.set(params).then(function(response) {
 
 			var saved = (params.create ? response.created : response.updated) || {};
-			if (id in saved) {				
-				this.fireEvent("save", this, values, serverId);
+			if (id in saved) {
+				me.fireEvent("save", me, values, serverId);
 
 				var serverId = params.create ? response.created[id].id : id;
 
 				if(cb) {
-					cb.call(scope, this, true, serverId);
+					cb.call(scope, me, true, serverId);
 				}
-				
-				this.fireEvent("submit", this, true, serverId);
+
+				me.fireEvent("submit", me, true, serverId);
+
+				return serverId;
 			} else
 			{
 				//something went wrong
@@ -129,52 +138,87 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 
 				switch (notSaved[id].type) {
 					case "forbidden":
-						Ext.MessageBox.alert(t("Access denied"), t("Sorry, you don't have permissions to update this item"));
+						Ext.MessageBox.alert(t("Access denied"), t("Sorry, you don't have permissions to update me item"));
 						break;
 
 					default:
 
-						//mark validation errors
-						for(var name in notSaved[id].validationErrors) {
-							var field = this.getForm().findField(name);
-							if(field) {
-								field.markInvalid(notSaved[id].validationErrors[name].description);
-							} else
-							{
-								console.warn("Could not find form field for server error " + name,notSaved[id].validationErrors[name]);
+						var firstErrorMsg = me.markServerValidationErrors(notSaved[id].validationErrors);
 
-								if(!response.message) {
-									response.message = notSaved[id].validationErrors[name].description;
-								}
-							}
+						if(!response.message) {
+							response.message = firstErrorMsg;
 						}
+
 						/**
 						 * 
-						 * You can cancel the error message with this event:
+						 * You can cancel the error message with me event:
 						 * 
 						 * initComponent: function() {
-						 * 	go.modules.business.wopi.ServiceDialog.superclass.initComponent.call(this);
+						 * 	go.modules.business.wopi.ServiceDialog.superclass.initComponent.call(me);
 						 * 
-						 * 	this.formPanel.on("beforesubmiterror", function(form, success, id, error) {			
+						 * 	me.formPanel.on("beforesubmiterror", function(form, success, id, error) {			
 						 * 		if(error.validationErrors.type) {
 						 * 			Ext.MessageBox.alert(t("Error"), t("You can only add one service of the same type"));
 						 * 			return false; //return false to cancel default error message
 						 * 		}
-						 * 	}, this);
+						 * 	}, me);
 						 * },
 						 */
-						if(this.fireEvent("beforesubmiterror", this, false, null, notSaved[id])) {
-							Ext.MessageBox.alert(t("Error"), t("Sorry, an unexpected error occurred: ") + (response.message || "unknown error"));
+
+						if(me.fireEvent("beforesubmiterror", me, false, null, notSaved[id])) {
+							Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred") +  ": " + (response.message || "unknown error"));
 						}
 						break;
 				}
 				if(cb) {
-					cb.call(scope, this, false, null);
+					cb.call(scope, me, false, null);
 				}
-				this.fireEvent("submit", this, false, null, notSaved[id]);
-			}
-		}, this).catch(function(){}); //handled by callback
+				me.fireEvent("submit", me, false, null, notSaved[id]);
 
+				return Promise.reject(notSaved[id]);
+			}
+		}, me).catch(function(error){
+			if(cb) {
+				cb.call(scope, me, false, null);
+			}
+			me.fireEvent("submit", me, false, null, error);
+
+			console.error(error);
+
+			return Promise.reject(error);
+		}).finally(function() {
+			me.submitting = false;
+		})
+
+	},
+
+	markServerValidationErrors : function(e, fieldPrefix) {
+		var firstError;
+		if(!fieldPrefix) {
+			fieldPrefix = "";
+		}
+		//mark validation errors
+		for(var name in e) {
+			var field = this.getForm().findField(fieldPrefix + name);
+			if(field) {
+				field.markInvalid(e[name].description);
+			} else
+			{
+				console.warn("Could not find form field for server error " + name, e[name]);
+			}
+			if(!firstError && e[name].code != 4) { // code 4 means error in related record. It will be found deeper in the recursion.
+				firstError = e[name].description;
+			}
+
+			if(e[name].validationErrors) {
+				var subFirst = this.markServerValidationErrors(e[name].validationErrors, name + ".");
+				if(!firstError) {
+					firstError = subFirst;
+				}
+			}
+		}
+
+		return firstError;
 	}
 });
 

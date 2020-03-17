@@ -512,18 +512,35 @@ Ext.extend(GO.Checker, Ext.util.Observable, {
 			icon: 'views/Extjs3/themes/Group-Office/images/32x32/reminder.png'
 		};
 
+		if (!("Notification" in window)) {
+			return;
+		}
+
 		if (Notification.permission === "granted") {
-			var notification = new Notification(title,options);
+			try {
+				var notification = new Notification(title,options);
+			}
+			catch (e) {
+				//ignore failure on mobiles
+			}
 		} else if (Notification.permission !== 'denied' || Notification.permission === "default") {
 		  Notification.requestPermission(function (permission) { // ask first
 			if (permission === "granted") {
-			  var notification = new Notification(title,options);
+				try {
+					var notification = new Notification(title, options);
+				}
+				catch (e) {
+					//ignore failure on mobiles
+				}
 			}
 		  });
 		}
 	},
 	
 	showPopup : function(data) {
+		if(GO.util.isMobileOrTablet()) {
+			return;
+		}
 		GO.reminderPopup = GO.util.popup({
 			width:400,
 			height:400,
@@ -543,12 +560,26 @@ Ext.extend(GO.Checker, Ext.util.Observable, {
 			icon: 'modules/email/themes/Group-Office/images/22x22/email.png'
 		};
 
+		if (!("Notification" in window)) {
+			return;
+		}
+
 		if (Notification.permission === "granted") {
-			var notification = new Notification(title,options);
+			try {
+				var notification = new Notification(title,options);
+			}
+			catch(e) {
+				// ignore failure on android
+			}
 		} else if (Notification.permission !== 'denied' || Notification.permission === "default") {
 		  Notification.requestPermission(function (permission) { // ask first
 			if (permission === "granted") {
-			  var notification = new Notification(title,options);
+				try {
+					var notification = new Notification(title, options);
+				}
+				catch(e) {
+					// ignore failure on android
+				}
 			}
 		  });
 		}

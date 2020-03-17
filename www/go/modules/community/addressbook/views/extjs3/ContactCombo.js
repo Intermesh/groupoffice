@@ -14,7 +14,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 	displayField: 'name',
 	triggerAction: 'all',
 	editable: true,
-	selectOnFocus: true,
+	selectOnFocus: false,
 	forceSelection: true,	
 	/**
 	 * Set to true to show organizations, set to null to show both.

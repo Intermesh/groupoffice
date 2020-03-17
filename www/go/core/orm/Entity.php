@@ -59,12 +59,20 @@ abstract class Entity extends Property {
 	 * @param Entity $entity The entity that has been saved
 	 */
 	const EVENT_SAVE = 'save';
-	
+
+	/**
+	 * Fires before the entity has been deleted
+	 *
+	 * @param $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
+	 *  So you can do for example: go()->getDbConnection()->delete('another_table', (new Query()->where('id', 'in' $query))
+	 */
+	const EVENT_BEFORE_DELETE = 'beforedelete';
 	
 	/**
 	 * Fires after the entity has been deleted
 	 * 
-	 * @param Entity $entity The entity that has been deleted
+	 * @param $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
+	 *
 	 */
 	const EVENT_DELETE = 'delete';
 	
@@ -321,12 +329,14 @@ abstract class Entity extends Property {
 	// 	return $this->isDeleting;
 	// }
 
-  /**
-   * Delete the entity
-   *
-   * @return boolean
-   * @throws Exception
-   */
+	/**
+	 * Delete the entity
+	 *
+	 * @param $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
+	 *  So you can do for example: go()->getDbConnection()->delete('another_table', (new Query()->where('id', 'in' $query))
+	 * @return boolean
+	 * @throws Exception
+	 */
 	public static final function delete($query) {
 
 		$query = Query::normalize($query);
@@ -337,7 +347,12 @@ abstract class Entity extends Property {
 
 		App::get()->getDbConnection()->beginTransaction();
 
-		try {			
+		try {
+
+			if(!static::fireEvent(static::EVENT_BEFORE_DELETE, $query)) {
+				go()->getDbConnection()->rollBack();
+				return false;
+			}
 
 			if(method_exists(static::class, 'logDelete')) {
 				if(!static::logDelete($query)) {

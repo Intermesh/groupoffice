@@ -45,7 +45,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			enableFontSize: false,
 			enableAlignments: false,
 			enableSourceEdit: false,
-			hideToolbar: true,
+			// toolbarHidden: true,
 			// emptyText: t('Add comment')+'...',
 			allowBlank: false,
 			plugins: [go.form.HtmlEditor.emojiPlugin],
@@ -93,9 +93,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 
 				items: [
 					this.commentBox = new Ext.Container({
-						boxMinHeight: this.minComposerHeight,
-						layout:'fit',
-						frame: true,
+						layout: "fit",
 						items:[this.textField]
 					}),
 					this.chips = new go.form.Chips({
@@ -133,29 +131,32 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		body.style.width = "100%";
 		
 		setTimeout(function() {
-			var h =  Math.max(me.boxMinHeight,Math.min(body.offsetHeight, me.boxMaxHeight)); // 400  max height
+			var h =  Math.max(composer.minComposerHeight,Math.min(body.offsetHeight - dp(16), me.boxMaxHeight)); // 400  max height
 			if(h > 36) {
 				me.tb.show();
+				//workaround for combo
+				me.tb.items.itemAt(0).wrap.dom.style.width = "100px";
 				me.tb.doLayout();
 			} else {
 				me.tb.hide();
 			}
-			me.ownerCt.setHeight(h + me.tb.el.getHeight());
+			//set height of this.middleBox
+			me.setHeight(h + me.tb.el.getHeight());
 			composer.grow();
 		}, 0);
 	},
 	
 	grow: function(){
-		
-		var totalHeight = this.commentBox.getHeight() + this.chips.getHeight() + this.attachmentBox.getHeight();
-		this.setHeight(totalHeight);
-		this.middleBox.setHeight(totalHeight-2);
-		var headerHeight = (this.header || this.ownerCt.header) ? dp(42) : 0;
-		var h = Math.min(this.ownerCt.growMaxHeight,this.ownerCt.commentsContainer.getEl().dom.scrollHeight + totalHeight + headerHeight);
-		h += dp(14);
+
+		this.setHeight(this.commentBox.getHeight() + this.chips.getHeight() + this.attachmentBox.getHeight());
+		// var totalHeight = this.commentBox.getHeight() + this.chips.getHeight() + this.attachmentBox.getHeight();
+		// this.setHeight(totalHeight);
+		// this.middleBox.setHeight(this.getHeight() + 4);
+		var headerHeight = this.ownerCt.header ? dp(48) : 0;
+		// console.log(this.ownerCt.commentsContainer.getEl().dom.scrollHeight, this.getHeight(), headerHeight);
+		var h = Math.min(this.ownerCt.growMaxHeight, this.ownerCt.commentsContainer.getEl().dom.scrollHeight + this.getHeight() + headerHeight + dp(8));
 		this.ownerCt.setHeight(h);
-		this.ownerCt.doLayout();	
-		this.doLayout();
+		this.ownerCt.doLayout();
 
 	},
 
@@ -179,7 +180,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 				iconStyle: 'color: #'+r.get('color'),
 				handler: function(me) {
 					this.chips.dataView.store.add([me.record]);
-					this.loadLabels(); //redraw
+					//this.loadLabels(); //redraw
 					this.doLayout();
 					this.grow();
 				},

@@ -26,6 +26,12 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 			listeners: {
 				datachanged: function () {
 					this.setVisible(this.store.getCount() > 0);
+
+					if(!this.origTitle) {
+						this.origTitle = this.title;
+					}
+					var badge = "<span class='badge'>" + this.store.getTotalCount() + "</span>";
+					this.setTitle(this.origTitle + badge);
 				},
 				scope: this
 			}
@@ -143,6 +149,8 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 			entity: dv.entity ? dv.entity : dv.entityStore.entity.name, //dv.entity exists on old DetailView or display panels
 			entityId: dv.model_id ? dv.model_id : dv.currentId //model_id is from old display panel
 		});
+
+
 
 		this.store.baseParams.position = 0;
 		this.store.load();

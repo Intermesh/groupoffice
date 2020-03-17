@@ -59,6 +59,7 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 						data[key] = null;
 					});
 					data[me.valueField] = value;
+					data['customFields'] = {}; //to avoid errors in templates
 					data[me.displayField] = t("Not found or no access!");
 
 					me.store.on("load", function() {

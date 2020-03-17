@@ -107,21 +107,39 @@ class Address extends Property {
 			}
 		}
 	}
+
+	private static $defaultCountryIso;
+	private static $defaultCountryText;
+	private static function isDefaultCountry(Address $address) {
+		if(!isset(self::$defaultCountryIso)) {
+			self::$defaultCountryIso = go()->getAuthState()->getUser(['timezone'])->getCountry();
+			$countries = go()->t('countries');
+			self::$defaultCountryText = $countries[self::$defaultCountryIso] ?? "";
+		}
+
+		return $address->countryCode == self::$defaultCountryIso || $address->country == self::$defaultCountryIso || $address->country == self::$defaultCountryText;
+	}
 	
 	
-	public function getFormatted() {
-			
-		if(empty($this->street) && empty($this->city) && empty($this->state)){
+	public function getFormatted()
+	{
+
+		if (empty($this->street) && empty($this->city) && empty($this->state)) {
 			return "";
 		}
-		$format = go()->getLanguage()->getAddressFormat($this->countryCode);		
+		$format = go()->getLanguage()->getAddressFormat($this->countryCode);
 
-		$format= str_replace('{address}', $this->street, $format);
-		$format= str_replace('{address_no}', $this->street2, $format);
-		$format= str_replace('{city}', $this->city, $format);
-		$format= str_replace('{zip}', $this->zipCode, $format);
-		$format= str_replace('{state}', $this->state, $format);
-		$format= str_replace('{country}', $this->country, $format);
+		$format = str_replace('{address}', $this->street, $format);
+		$format = str_replace('{address_no}', $this->street2, $format);
+		$format = str_replace('{city}', $this->city, $format);
+		$format = str_replace('{zip}', $this->zipCode, $format);
+		$format = str_replace('{state}', $this->state, $format);
+
+		if (self::isDefaultCountry($this)) {
+			$format = str_replace('{country}', "", $format);
+		}else{
+			$format = str_replace('{country}', $this->country, $format);
+		}
 		
 		return preg_replace("/\n+/", "\n", $format);
 	}
@@ -132,6 +150,9 @@ class Address extends Property {
 	
 	public function setCombinedStreet($v) {
 		$lastSpace = strrpos($v, ' ');
+		if($lastSpace === false) {
+			$lastSpace = strrpos($v, "\n");
+		}
 		if($lastSpace === false) {
 			$this->street = $v;
 			$this->street2 = null;

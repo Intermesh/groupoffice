@@ -219,7 +219,7 @@ go.Jmap = {
 	 * 
 	 * method: jmap method
 	 * params: jmap method parameters
-	 * callback: function to call after request. Arghuments are options, success, response
+	 * callback: Deprecated! Use the promise functionality. If you pass a callback you can't use the promise. Function to call after request. Arghuments are options, success, response.
 	 * scope: callback function scope
 	 * dispatchAfterCallback: dispatch the response after the callback. Defaults to false.
 	 * 
@@ -239,8 +239,9 @@ go.Jmap = {
 		if(!this.paused) {
 			this.continue();
 		}
-
-		return promise;
+		if(!options.callback) {
+			return promise;
+		}
 	},
 
 	scheduleRequest: function(options) {
@@ -320,26 +321,25 @@ go.Jmap = {
 							console.error('server-side JMAP failure', response);							
 						}
 
-						//make sure dispatch is executed before callbacks and resolves.
-						// setTimeout(function() {
 							var success = response[0] !== "error";
 							if (o.callback) {
 								if (!o.scope) {
 									o.scope = this;
 								}
 								o.callback.call(o.scope, o, success, response[1], response[2]);
-							}
+							} else {
 
-							response[1].options = o;
+								response[1].options = o;
 
-							if(success) {							
-								o.resolve(response[1]);
-							} else{
-								o.reject(response[1]);
+								if (success) {
+									o.resolve(response[1]);
+								} else {
+									o.reject(response[1]);
+								}
 							}
 
 							delete me.requestOptions[response[2]];
-						// }, 0);
+
 					}, this);
 
 				// } catch(e) {					
@@ -358,7 +358,7 @@ go.Jmap = {
 					delete this.requestOptions[clientCallId];
 				}
 				
-				Ext.MessageBox.alert(t("Error"), t("Sorry, an unexpected error occurred: ") + response.responseText);
+				Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred") + ": " + response.responseText);
 				
 			}
 		});

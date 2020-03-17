@@ -1184,7 +1184,7 @@ Si no ha solicitado una nueva contraseña por favor ignore y borre este e-mail.'
   'Module' => 'Módulo',
   'Manage default permissions' => 'Administrar permisos predeterminados',
   'An error occured on the server. The console shows details.' => 'Ocurrió un error en el servidor. La consola muestra más detalles.',
-  'Sorry, an unexpected error occurred: ' => 'Disculpe, ocurrió un error inesperado:',
+  'Sorry, an error occurred' => 'Disculpe, ocurrió un error',
   'Import Comma Separated values' => 'Importar valores separados por comas',
   'Please match the CSV columns with the correct Group-Office columns and press \'Import\' to continue.' => 'Haga coincidir las columnas CSV con las columnas correctas de Group-Office y presione \'Importar\' para continuar.',
   'Show disabled' => 'Mostrar deshabilitados',

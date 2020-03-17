@@ -12,16 +12,19 @@ GO.data.GroupingStore = function(config) {
 		}
 		
 	}, this);
-	
-	this.on('loadexception',		
-		function(proxy, store, response, e){
 
-			if(response.status==0)
+	this.on('exception',
+		function( store, type, action, options, response){
+
+
+			if(response.isAbort) {
+				//ignore aborts.
+			} else if(response.isTimeout){
+				console.error(response);
+
+				GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
+			}else	if(!this.reader.jsonData || GO.jsonAuthHandler(this.reader.jsonData, this.load, this))
 			{
-				//silently ignore because auto refreshing jobs often get here somehow??
-				//GO.errorDialog.show(t("Could not connect to the server. Please check your internet connection."), "");
-			}else if(!this.reader.jsonData || GO.jsonAuthHandler(this.reader.jsonData, this.load, this))
-			{		
 				var msg;
 
 				if(!GO.errorDialog.isVisible()){
@@ -35,8 +38,12 @@ GO.data.GroupingStore = function(config) {
 						msg += '<br /><br />JsonStore load exception occurred';
 						GO.errorDialog.show(msg);
 					}
-				}		
-					
+				}
+			}else
+			{
+				console.error(response);
+
+				GO.errorDialog.show(t("Failed to send the request to the server. Please check your internet connection."));
 			}
 		}
 		,this);

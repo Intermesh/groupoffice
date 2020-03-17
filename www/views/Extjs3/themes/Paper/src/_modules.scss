@@ -168,8 +168,8 @@ $app-icons: (
 
 .ml-unseen-dot {
 	@include var(background-color, c-primary);
-	width: dp(10);
-	height: dp(10);
+	width: 9px;
+	height: 9px;
 	margin: dp(2);
 	border-radius: 50%;
 	float: right;
@@ -190,7 +190,7 @@ $app-icons: (
 .x-grid3-col-icon {
 		i {
 			&.em-flag {
-				color: color($red, 700);
+				color: $cDanger;
 			}
 	}
 }

@@ -305,7 +305,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		this.dirty = false;
 	},
 
-	setValue: function (groups) {		
+	setValue: function (groups) {
 		this._isDirty = false;		
 		this.value = groups;
 		this.store.load().catch(function(){}); //ignore failed load becuase onBeforeStoreLoad can return false

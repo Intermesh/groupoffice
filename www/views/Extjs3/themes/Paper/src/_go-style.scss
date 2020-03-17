@@ -42,17 +42,49 @@ button, html, input, select, textarea {
     font-family: $font-family;
 }
 
-h1 { @extend %font-display1; }
-h2 { @extend %font-headline; }
-h3 { @extend %font-title; }
-h4 { @extend %font-subheading; }
-h5 { @extend %font-subheading-dense; }
-h6 { @extend %font-data-head; }
+h1 {
+	@extend %font-display1;
+}
+h2 {
+	@extend %font-headline; }
+h3 {
+	@extend %font-title;
+}
+h4 {
+	@extend %font-subheading;
+}
+h5 {
+	@extend %font-subheading-dense;
+}
+h6 {
+	@extend %font-data-head;
+}
 
+code {
+	border: 1px solid color($fg, 'line');
+	background-color: color($bg, 'background');
+	padding: dp(8);
+	margin: dp(16) 0;
+	display: block;
+	font-family: "Courier New",Courier,monospace;
+	color: black;
+	border-radius: dp(4);
+}
 
 p {
 	margin: dp(16) 0;
 }
+
+.blue {color: #039BE5 !important;}
+.red {color: $cDanger !important;}
+.pink {color: #D81B60 !important;}
+.purple {color: #8E24AA !important;}
+.cyan {color: #00ACC1 !important;}
+.green {color: $cSuccess !important;}
+.orange {color: #FB8C00 !important;}
+.brown {color: #6D4C41 !important;}
+.yellow {color: #FDD835 !important;}
+.bluegrey {color: #607D8B !important;}
 
 .info {
 	background-color: $cPrimaryTp;
@@ -539,7 +571,7 @@ a {
 		color: white;
 		
 		&.x-form-invalid {
-			background-color: color($red,300);
+			background-color: #e57373;
 		}
 	}
 }
@@ -633,7 +665,7 @@ button {
 	top:dp(-8);
 	right:dp(-8);
 	position:absolute;
-	color: color($orange, 700);
+	color: $cWarning;
 }
 
 .avatar {
@@ -764,7 +796,7 @@ hr {
 .go-tab-notification {
 	@extend %badge;
 	color: rgba(white, 0.87);
-	background-color: color($red,700) !important; // override element style	
+	background-color: $cDanger !important; // override element style
 	position:absolute;
 	right:dp(-4);
 	top:dp(4);	
@@ -774,18 +806,32 @@ hr {
 	.x-btn-mc em.x-btn-arrow > button:after {
 		content: '';
 	}
-
-	.badge {
-		@extend %badge;
-		float: none;
-		display: inline-block;
-	}
-	
 }
 
 .badge {
 	@extend %badge;
-	float:right;
+
+	.x-panel-header-text & {
+		margin-left: dp(8);
+		color: color($fg, 'text');
+		@include var(background-color, c-primary-tp);
+		display: none;
+
+		.x-panel-collapsed & {
+			display: inline-block;
+		}
+	}
+}
+.status {
+	@extend %font-subheading-dense;
+	padding-left: dp(8);
+	padding-right: dp(8);
+	background-color: color($bg, 'background');
+	display: inline-block;
+	border-radius: $borderRadius;
+	color: color($fg, 'text');
+	text-shadow: 0px 0px 4px white;
+	border:1px solid color($fg, 'divider');
 }
 
 .x-tab-with-icon {
@@ -990,6 +1036,7 @@ tr.go-grid-row {
 		> .x-panel-body {
 			>.x-panel {
 				@extend .z2;
+				border-radius: $borderRadius;
 				margin: dp(8);
 				background-color: color($bg, 'box');
 
@@ -1022,12 +1069,7 @@ tr.go-grid-row {
 	.xtb-title {
 		@extend %font-title;
 	}
-	h5 {		
-		padding: dp(8) 0;
-	}
-	
 
-	
 	hr {
 		clear:both;
 		margin:dp(8) 0 ;
@@ -1240,13 +1282,14 @@ tr.go-grid-row {
 		padding: dp(8);
 		vertical-align: middle;
 		height: dp(40);
-		border-bottom: 1px solid color($fg, 'divider');
+		border-bottom: 1px solid color($fg, 'line');
 		background-color: transparent !important;
 	}
 }
 	
 table.display-panel {
-	
+	border-collapse: collapse;
+	border-spacing: 0;
 	&.labels {		
 		td, th{
 			&:first-child {
@@ -1265,12 +1308,18 @@ table.display-panel {
 		&:last-child  {
 			padding-right: dp(16);
 		}
+		&.r {text-align:right}
 	}
 	th {
 		@extend %font-data-head;
 	}
-	tr.line, td.line, th.line {
-		border-bottom: 1px solid color($fg, 'line');
+	tr.line td, td.line, th.line {
+		border-bottom: 1px solid color($fg, 'divider');
+	}
+	tr.totals th {
+		padding: dp(8);
+		vertical-align: middle;
+		border-right: 1px solid color($fg, 'divider');
 	}
 	table { 
 		td:first-child {
@@ -1279,6 +1328,13 @@ table.display-panel {
 		td:last-child  {
 			padding-right: 0;
 		}
+	}
+}
+tr.go-grid-row {
+	td {
+		border-bottom: 1px solid rgba(0,0,0,0.04);
+		vertical-align:top;
+		//&.r {text-align:right}
 	}
 }
 .collapsible-display-panel-header {
@@ -1498,7 +1554,7 @@ table[id^="comments-ext"] b {
 	}
 	.x-grid-panel {	
 		&.x-form-invalid {
-			border-color: rgba(color($red, 700),0.54);
+			border-color: rgba($cDanger,0.54);
 		}
 	}
 }
@@ -1694,60 +1750,36 @@ table[id^="comments-ext"] b {
 .go-html-formatted {
 	@extend %font-body1;
 
+	h1 {
+		margin: dp(16) 0;
+	}
+	h2 {
+		margin: dp(16) 0;
+	}
+	h3 {
+		margin: dp(8) 0;
+	}
+	h4 {
+		margin: dp(8) 0;
+	}
+	h5 {
+		margin: dp(8) 0;
+	}
+	h6 {
+		margin: dp(8) 0;
+	}
+
 }
 
-.go-html-formatted div, .go-html-formatted dl, .go-html-formatted dt, .go-html-formatted dd, .go-html-formatted ul, .go-html-formatted ol, .go-html-formatted li, .go-html-formatted h1, .go-html-formatted h2, .go-html-formatted h3, .go-html-formatted h4, .go-html-formatted h5, .go-html-formatted h6, .go-html-formatted pre, .go-html-formatted form, .go-html-formatted fieldset, .go-html-formatted input, .go-html-formatted p, .go-html-formatted blockquote, .go-html-formatted th, .go-html-formatted td, .go-html-formatted span {
-    font: inherit;
-}
+//.go-html-formatted div, .go-html-formatted dl, .go-html-formatted dt, .go-html-formatted dd, .go-html-formatted ul, .go-html-formatted ol, .go-html-formatted li, .go-html-formatted h1, .go-html-formatted h2, .go-html-formatted h3, .go-html-formatted h4, .go-html-formatted h5, .go-html-formatted h6, .go-html-formatted pre, .go-html-formatted form, .go-html-formatted fieldset, .go-html-formatted input, .go-html-formatted p, .go-html-formatted blockquote, .go-html-formatted th, .go-html-formatted td, .go-html-formatted span {
+//    font: inherit;
+//}
 
 .go-html-formatted  blockquote {  
   display: block;  
   margin: 1em 40px;  
   padding:0px 10px;
 }
-
-
-.go-html-formatted h1 {  
-  display: block;  
-  font-size: 2em;  
-  font-weight: bold;  
-  margin: .67em 0;  
-}  
-   
-.go-html-formatted h2 {  
-  display: block;  
-  font-size: 1.5em;  
-  font-weight: bold;  
-  margin: .83em 0;  
-}  
-   
-.go-html-formatted h3 {  
-  display: block;  
-  font-size: 1.17em;  
-  font-weight: bold;  
-  margin: 1em 0;  
-}  
-   
-.go-html-formatted h4 {  
-  display: block;  
-  font-weight: bold;  
-  margin: 1.33em 0;  
-}  
-  
-.go-html-formatted h5 {  
-  display: block;  
-  font-size: 0.83em;  
-  font-weight: bold;  
-  margin: 1.67em 0;  
-}  
-   
-.go-html-formatted h6 {  
-  display: block;  
-  font-size: 0.67em;  
-  font-weight: bold;  
-  margin: 2.33em 0;  
-}
-
 
 .go-html-formatted td {   
    display: table-cell;  
@@ -2047,4 +2079,16 @@ table[id^="comments-ext"] b {
 	border-top-left-radius: dp(8);
 	background-color: color($bg, 'box');
 	cursor: pointer;
+}
+
+
+.go-user-settings-dlg {
+	.x-panel-header-text {
+		@extend %font-subheading;
+	}
+	.x-toolbar {
+		.xtb-title {
+			@extend %font-subheading;
+		}
+	}
 }
