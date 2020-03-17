@@ -1,3 +1,4 @@
+17-03-2020 6.4.127
 - Core: Catch notification errors to fix error on Android phones.
 
 09-03-2020 6.4.126
