@@ -1,27 +1,13 @@
 go.Notifier = {
 	messageCt: Ext.DomHelper.insertFirst(document.body, {id: 'message-ct'}, true),
 	/**
-	 * message {title, description, iconCls, time (ms)}
+	 * @param msg {title, description, iconCls, time (ms)}
 	 */
 	msg: function (msg) {
-	
 
-		html = "";
-
-		if (msg.iconCls) {
-			html += '<i class="icon ' + msg.iconCls + '"></i>';
-		}
-
-		if (msg.title) {
-			html += '<h4>' + msg.title + '</h4>';
-		}
-
-
-		var msgCtr = new Ext.Container({
-			title: !GO.util.empty(msg.title) ? msg.title : "",
-			html: html + '<p>' + msg.description + '</p>',
-			renderTo: this.messageCt
-		});
+		msg.renderTo = this.messageCt;
+		msg.html = msg.description || msg.html; // backward compat
+		var msgCtr = new Ext.Panel(msg);
 
 		var me = this;
 		if (msg.time) {
@@ -29,10 +15,11 @@ go.Notifier = {
 				me.remove(msgCtr);
 			}, msg.time);
 		}
-		
-		msgCtr.el.on('click', function () {
-			me.remove(msgCtr);
-		});		
+		if(!msg.persistent) {
+			msgCtr.el.on('click', function () {
+				me.remove(msgCtr);
+			});
+		}
 		
 		return msgCtr;
 	},

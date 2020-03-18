@@ -766,12 +766,12 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @param boolean $appendNumberToNameIfExists Set if a number needs to be added to the name if the file already exists.
 	 * @return File
 	 */
-	public function addFilesystemFile(\GO\Base\Fs\File $file, $appendNumberToNameIfExists=false){
+	public function addFilesystemFile(\GO\Base\Fs\File $file, $appendNumberToNameIfExists=false, $newFilename = false){
 
 		if(!File::checkQuota($file->size()))
 			throw new \GO\Base\Exception\InsufficientDiskspace();
 
-		$file->move($this->fsFolder, false, false, $appendNumberToNameIfExists);
+		$file->move($this->fsFolder, $newFilename, false, $appendNumberToNameIfExists);
 		$file->setDefaultPermissions();
 		return $this->addFile($file->name());
 	}

@@ -38,7 +38,7 @@ if(isset($_GET['url'])) {
 
 	$blob = Blob::fromTmp($tmpFile);
 	$blob->name = $filename;
-	$blob->modifiedAt = new \go\core\util\DateTime('@' . Request::get()->getHeader('X-File-LastModifed'));
+	$blob->modifiedAt = new \go\core\util\DateTime('@' . Request::get()->getHeader('X-File-LastModified'));
 	//$blob->type = Request::get()->getContentType(); cant be trusted use extension instead
 }
 

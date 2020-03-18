@@ -226,7 +226,7 @@ go.util =  (function () {
 				this.uploadDialog.setAttribute("type", "file");
 				this.uploadDialog.onchange = function (e) {
 					
-					var uploadCount = this.files.length;
+					var uploadCount = this.files.length, blobs = [];
 					
 					if(!uploadCount) {
 						return;
@@ -242,13 +242,21 @@ go.util =  (function () {
 					
 					for (var i = 0; i < this.files.length; i++) {
 						go.Jmap.upload(this.files[i], {
-							success: function(response) {
+							success: function(response, file) {
 								if(this.cfg.listeners.upload) {
 									this.cfg.listeners.upload.call(this.cfg.listeners.scope||this, response);
 								}
+								if(cfg.directory) {
+									var path = file.webkitRelativePath.split('/');
+									path.pop(); // filename
+									response.subfolder = path;
+								}
+								blobs.push(response);
+							},
+							callback: function(response) {
 								uploadCount--;
 								if(uploadCount === 0 && this.cfg.listeners.uploadComplete) {
-									this.cfg.listeners.uploadComplete.call(this.cfg.listeners.scope||this);
+									this.cfg.listeners.uploadComplete.call(this.cfg.listeners.scope||this, blobs);
 								}
 							},
 							scope: this

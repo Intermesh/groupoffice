@@ -116,31 +116,75 @@ go.Jmap = {
 		return url;
 
 	},
-	
+
+	uploadQueue: [],
 	upload : function(file, cfg) {
-		if(Ext.isEmpty(file))
+		if(Ext.isEmpty(file) || file.name === '.DS_Store') {
+			cfg.callback && cfg.callback.call(cfg.scope || this, {upload:'skipped'});
 			return;
+		}
+		// todo: group file upload in 1 notification
+		//go.Jmap.uploadQueue.push(file);
+
+		var started_at = new Date();
+		var notifyEl = go.Notifier.msg({
+			persistent: true,
+			iconCls: 'ic-file-upload',
+			items:[
+				{xtype:'box',html:'<b>'+file.name+'</b><span>...</span>'},
+				{xtype:'progress',height:4,style:'margin: 7px 0'}
+			],
+			title: t('Uploading')+'...',
+			buttons: [{text:t('Hide'), handler(btn){btn.ownerCt.ownerCt.hide();}}]
+		});
 
 		Ext.Ajax.request({url: go.User.uploadUrl,
 			success: function(response) {
 				if(cfg.success && response.responseText) {
 					data = Ext.decode(response.responseText);
-					cfg.success.call(cfg.scope || this,data);
+					notifyEl.setTitle('Upload complete');
+					setTimeout(function () {
+						go.Notifier.remove(notifyEl);
+					}, 600);
+					cfg.success.call(cfg.scope || this,data, file);
 				}
+			},
+			callback: function(response) {
+				cfg.callback && cfg.callback.call(cfg.scope || this, response);
+			},
+			progress: function(e) {
+				if (e.lengthComputable) {
+					var seconds_elapsed = (new Date().getTime() - started_at.getTime() )/1000;
+					var bytes_per_second =  seconds_elapsed ? e.loaded / seconds_elapsed : 0;
+					var remaining_bytes = e.total - e.loaded;
+					var seconds_remaining = seconds_elapsed ? remaining_bytes / bytes_per_second : '';
+					var percentage = (e.loaded / e.total * 100 | 0);
+					if(notifyEl) {
+						notifyEl.setTitle(t('Uploading')+'... &bull; ' + percentage + '%');
+						notifyEl.items.items[0].getResizeEl().child('span', true).innerText = Math.round(seconds_remaining)+' '+t('seconds left');
+						notifyEl.items.items[1].updateProgress(percentage/100);
+					}
+				}
+				cfg.progress && cfg.progress.call(cfg.scope || this, e);
 			},
 			failure: function(response) {
 				if(cfg.failure && response.responseText) {
 					data = Ext.decode(response.responseText);
+					notifyEl.setTitle('Upload failed');
 					cfg.failure.call(cfg.scope || this,data);
-				} else
-				{
-					Ext.MessageBox.alert(t("Error"), t("Upload failed. Please check if the system is using the correct URL at System settings -> General -> URL."));
+				} else if(response.status === 413) { // "Request Entity Too Large"
+					notifyEl.setTitle('Upload failed: file too large');
+					cfg.failure && cfg.failure.call(cfg.scope || this, response);
+				} else {
+					notifyEl.setTitle('Upload failed: Please check if the system is using the correct URL at System settings -> General -> URL.');
+					cfg.failure && cfg.failure.call(cfg.scope || this, response);
 				}
+
 			},
 			headers: {
 				'X-File-Name': "UTF-8''" + encodeURIComponent(file.name),
 				'Content-Type': file.type,
-				'X-File-LastModifed': Math.round(file['lastModified'] / 1000).toString()
+				'X-File-LastModified': Math.round(file['lastModified'] / 1000).toString()
 			},
 			xmlData: file // just "data" wasn't available in ext
 		});

@@ -17971,14 +17971,14 @@ Ext.Panel = Ext.extend(Ext.Container, {
                 this.header.replaceClass(old, this.iconCls);
             }else{
                 var hd = this.header,
-                    img = hd.child('img.x-panel-inline-icon');
+                    img = hd.child('i.x-panel-inline-icon');
                 if(img){
                     Ext.fly(img).replaceClass(old, this.iconCls);
                 }else{
                     var hdspan = hd.child('span.' + this.headerTextCls);
                     if (hdspan) {
                         Ext.DomHelper.insertBefore(hdspan.dom, {
-                            tag:'img', alt: '', src: Ext.BLANK_IMAGE_URL, cls:'x-panel-inline-icon '+this.iconCls
+                            tag:'i', cls:'x-panel-inline-icon icon '+this.iconCls
                         });
                     }
                  }
