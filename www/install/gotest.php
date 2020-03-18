@@ -350,6 +350,19 @@ function test_system(){
 	$test['fatal']=false;
 
 	$tests[]=$test;
+	$test['name'] = 'pdfinfo';
+	$test['showSuccessFeedback'] = false;
+	if(class_exists('GO'))
+	{
+		$pdfinfo = whereis('pdfinfo') ? whereis('pdfinfo') : \GO::config()->cmd_pdfinfo; 
+	}else
+	{
+		$pdfinfo = whereis('pdfinfo') ? whereis('pdfinfo') : '/usr/bin/pdfinfo'; // The debian default path for pdfinfo
+	}
+	$test['pass']=@is_executable($pdfinfo);
+	$test['feedback']='Warning: pdfinfo is not installed or not executable. Please install the poppler-utils package';
+	$test['fatal']=false;
+	$tests[]=$test;
 	
 	$test['name']='Ioncube enabled';
 	$test['pass']=$ioncubeWorks = ioncube_tester();
