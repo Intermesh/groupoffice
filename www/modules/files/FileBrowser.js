@@ -1603,6 +1603,8 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 			var dropRecord = data.grid.store.data.items[dragData.rowIndex];
 
+
+
 			if(dropRecord.data.extension=='folder')
 			{
 				for(var i=0;i<data.selections.length;i++)
@@ -1817,6 +1819,9 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 								for(var i=0;i<pasteSources.length;i++)
 								{
 									var arr = pasteSources[i].split(':');
+									if(arr[0] != 'd') {
+										continue;
+									}
 									var node = this.treePanel.getNodeById(arr[1]);
 									if(node)
 										node.remove();
