@@ -21,7 +21,7 @@ html {
 }
 
 body {
-	@include var(background-color, c-primary-tp);
+	@include var(background-color, c-primary);
 	//background-image: radial-gradient( circle farthest-corner at 10% 20%,  rgba(239,166,76,1) 0%, rgba(245,184,184,1) 100.2% );
 }
 
@@ -272,8 +272,6 @@ a {
 	left:0;
 	right:0;
 	height: dp(72);
-	@extend .z4;
-	@include var(background-color, c-primary);	
 }
 
 #go-select-language{
@@ -587,15 +585,11 @@ a {
   0% { transform: translateX(100%); }
   100% { transform: translateX(0); }
 }
-#message-ct {
-	position: absolute;
-	pointer-events:none;
-	z-index: 100000;
-	top: dp(64);
-	right: 8px;
-	overflow: visible;
+#message-ct, .notifications {
+
 	> div { // message
 		@extend .z4;
+		cursor: pointer;
 		pointer-events:auto;
 		min-width: dp(400);
 		max-width: dp(480);
@@ -619,7 +613,47 @@ a {
 			padding: dp(8);
 			span {float:right;}
 		}
-
+	}
+}
+#message-ct {
+	position: absolute;
+	pointer-events:none;
+	z-index: 100000;
+	top: dp(64);
+	right: 8px;
+	overflow: visible;
+}
+.notifications {
+	padding: dp(4);
+	@include var('background-color', c-primary);
+	i.entity::before{margin-top: dp(-22);}
+}
+.notificationArea {
+	@include var('background-color', c-primary);
+	.x-panel-header,.x-panel-header-text { border-top:0; color:white; }
+}
+@keyframes blink {
+	0% {opacity: 0;}
+	100% { opacity:1;}
+}
+#status-bar {
+	cursor: pointer;
+	display:inline-block;
+	float:left;
+	height: dp(32);
+	padding: dp(2) dp(8);
+	margin-top: dp(20);
+	margin-right: dp(8);
+	border-radius: dp(16);
+	border: 1px solid color($fg,'line');
+	background-color: color($bg,'readonly');
+	> * {
+		@extend %icon;
+		animation: blink .3s 7 alternate;
+		margin: 0 dp(4);
+		text-shadow: 0px 1px 0px rgba(black, 0.56);
+		zoom:.7;
+		cursor: pointer;
 	}
 }
 
@@ -663,15 +697,6 @@ button {
 }
 .closed{
 	display:none !important;
-}
-
-#reminder-icon {
-	@extend %icon;
-	text-shadow: 0px 1px 0px rgba(black, 0.56);
-	top:dp(-8);
-	right:dp(-8);
-	position:absolute;
-	color: $cWarning;
 }
 
 .avatar {

@@ -124,7 +124,8 @@ go.Jmap = {
 			return;
 		}
 		// todo: group file upload in 1 notification
-		//go.Jmap.uploadQueue.push(file);
+		this.uploadQueue.push(file);
+		go.Notifier.toggleIcon('upload', true);
 
 		var started_at = new Date();
 		var notifyEl = go.Notifier.msg({
@@ -145,11 +146,15 @@ go.Jmap = {
 					notifyEl.setTitle('Upload complete');
 					setTimeout(function () {
 						go.Notifier.remove(notifyEl);
-					}, 600);
+					}, 2000);
 					cfg.success.call(cfg.scope || this,data, file);
 				}
 			},
 			callback: function(response) {
+				go.Jmap.uploadQueue.remove(file);
+				if(Ext.isEmpty(this.uploadQueue)) {
+					go.Notifier.toggleIcon('upload', false); //done
+				}
 				cfg.callback && cfg.callback.call(cfg.scope || this, response);
 			},
 			progress: function(e) {
@@ -161,7 +166,7 @@ go.Jmap = {
 					var percentage = (e.loaded / e.total * 100 | 0);
 					if(notifyEl) {
 						notifyEl.setTitle(t('Uploading')+'... &bull; ' + percentage + '%');
-						notifyEl.items.items[0].getResizeEl().child('span', true).innerText = Math.round(seconds_remaining)+' '+t('seconds left');
+						//notifyEl.items.items[0].getResizeEl().child('span', true).innerText = Math.round(seconds_remaining)+' '+t('seconds left');
 						notifyEl.items.items[1].updateProgress(percentage/100);
 					}
 				}

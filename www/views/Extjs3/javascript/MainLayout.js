@@ -245,15 +245,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 	getModulePanel: function (moduleName) {
 		var panelId = 'go-module-panel-' + moduleName;
-
-		if (this.tabPanel.items.map[panelId])
-		{
+		if (this.tabPanel.items.map[panelId]) {
 			return this.tabPanel.items.map[panelId];
-		} else
-		{
-			return false;
 		}
-		
+
+		return false;
 	},
 
 	//overridable
@@ -310,31 +306,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	 * @param {type} panelConfig
 	 * @returns {MainLayoutAnonym$1.initModule@pro;tabPanel@pro;items@arr;map|MainLayoutAnonym$1.initModule@pro;tabPanel@call;insert|MainLayoutAnonym$1.initModule.panel|Boolean}
 	 */
-	addModulePanel : function(moduleName, panelClass, panelConfig) {		
-		
-//		if(!this.rendered) {
-//			this.on("beforerender", function() {
-//				GO.mainLayout.addModulePanel(moduleName, panelClass, panelConfig);
-//			}, {single: true});
-//			return;
-//		}
-//		
-//		panelConfig = panelConfig || {};
-//		
-//		this.startMenu.add({
-//			id: 'go-start-menu-' + moduleName,
-//			moduleName: moduleName,
-//			text: panelConfig.title || panelClass.prototype.title,
-//			iconCls: panelConfig.iconCls || panelClass.prototype.iconCls || 'go-menu-icon-' + moduleName,
-//			handler: function (item, e) {
-//				this.openModule(item.moduleName);
-//			},
-//			scope: this
-//		});
+	addModulePanel : function(moduleName, panelClass, panelConfig) {
 
 		panelConfig =panelConfig || {}
 		panelConfig.package = panelClass.prototype.package;
-//		
+
 		GO.moduleManager._addModule(moduleName, panelClass, panelConfig);
 				
 		go.Router.add(new RegExp('^(' + moduleName + ")$"), function (name) {
@@ -562,11 +538,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					html:  '<div class="go-header-left"><div id="go-logo" title="'+GO.settings.config.product_name+'"></div></div>\
 					<div class="go-header-right">\
 						<div id="secondary-menu">\
+							<div id="status-bar"></div>\
 							<div id="search_query"></div>\
 							<div id="start-menu-link" ></div>\
-							<a id="user-menu" class="user-img" style="'+getUserImgStyle()+'">\
-								<span id="reminder-icon" style="display: none;">notifications</span>\
-							</a>\
+							<a id="user-menu" class="user-img" style="'+getUserImgStyle()+'"></a>\
 						</div>\
 					</div>',
 					height: dp(64),
@@ -574,12 +549,26 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					border: false
 				});
 
+				var notificationArea = new Ext.Panel({
+					cls: 'notificationArea',
+					region:'east',
+					title:'Notifications',
+					floating:true,
+					width:dp(408),
+					//animCollapse:true,
+					//animFloat: true,
+					collapsible: true,
+					collapsed: true,
+					cmargins:{left:0,top:0,right:0,bottom:0}
+				});
+
 	//			var winSize = [window.scrollWidth , window.scrollHeight];
 
 				GO.viewport = new Ext.Viewport({
 					layout: 'border',
+					split: false,
 					border: false,
-					items: [topPanel, this.tabPanel]
+					items: [topPanel, this.tabPanel, notificationArea]
 				});
 
 
@@ -680,7 +669,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				scope: this
 			});
 		}
-
+		go.Notifier.init.defer(2000, go.Notifier,[notificationArea]);
 		GO.checker.init.defer(2000, GO.checker);
 		GO.checker.on('alert', function (data) {
 			if (data.notification_area)

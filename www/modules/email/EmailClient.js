@@ -1244,77 +1244,66 @@ GO.mainLayout.onReady(function(){
 
 	//contextmenu when an e-mail address is clicked
 	GO.email.addressContextMenu=new GO.email.AddressContextMenu();
-
 	GO.email.search_type_default = localStorage && localStorage.email_search_type  ? localStorage.email_search_type : 'any';
 
+	//register a new request to the checker. It will poll unseen tickets every two minutes
+	go.Notifier.addStatusIcon('email', 'ic-email');
+	GO.checker.registerRequest("email/account/checkUnseen",{},function(checker, data){
 
+		if(!data.email_status) {
+			return;
+		}
 
+		go.Notifier.toggleIcon('email',data.email_status.total_unseen > 0);
 
-	//GO.checker is not available in some screens like accept invitation from calendar
-	if(true){
-		//create notify icon
-//		var notificationArea = Ext.get('notification-area');
-//		if(notificationArea)
-//		{
-//			GO.email.notificationEl = notificationArea.createChild({
-//				id: 'ml-notify',
-//				tag:'a',
-//				href:'#',
-//				style:'display:none'
-//			});
-//			GO.email.notificationEl.on('click', function(){
-//				GO.mainLayout.openModule('email');
-//			}, this);
-//		}
+		if((!data.email_status.has_new && this.countEmailShown)
+			|| data.email_status.total_unseen <= 0
+			|| (this.countEmailShown && this.countEmailShown >= data.email_status.total_unseen)){
 
-			//register a new request to the checker. It will poll unseen tickets every two minutes
-		GO.checker.registerRequest("email/account/checkUnseen",{},function(checker, result, data){
-			
-			if(!result.email_status) {
-				return;
-			}
+			this.countEmailShown = data.email_status.total_unseen;
+			return;
+		}
+		this.countEmailShown = data.email_status.total_unseen;
 
-				var ep = GO.mainLayout.getModulePanel('email');
-
-			//	var totalUnseen = result.email_status.total_unseen;
-				if(ep){
-					for(var i=0;i<result.email_status.unseen.length;i++)
-					{
-						var s = result.email_status.unseen[i];
-						var changed = ep.updateFolderStatus(s.mailbox, s.unseen,s.account_id);
-						if(changed && ep.messagesGrid.store.baseParams.mailbox==s.mailbox && ep.messagesGrid.store.baseParams.account_id==s.account_id)
-						{
-							ep.messagesGrid.store.reload();
-						}
-					}
+		if (GO.settings.popup_emails) {
+			this.countEmailShown = true;
+			var title = t("New email"),
+				text = t("You have %d unread email(s)").replace('%d', data.email_status.total_unseen);
+			go.Notifier.notify({
+				title: title,
+				text: text,
+				iconCls: 'ic-email',
+				icon: 'views/Extjs3/themes/Paper/img/notify/email.png'
+			});
+			go.Notifier.msg({
+				sound: 'message-new-email',
+				iconCls: 'ic-email',
+				items:[{xtype:'box',html:'<b>'+text+'</b>'}],
+				title: title,
+				persistent: true,
+				handler: function(){
+					GO.mainLayout.openModule('email');
 				}
+			}, 'email');
+		}
 
-				if(result.email_status.has_new)
+		var ep = GO.mainLayout.getModulePanel('email');
+
+		if(ep){
+			for(var i=0;i<data.email_status.unseen.length;i++)
+			{
+				var s = data.email_status.unseen[i];
+				var changed = ep.updateFolderStatus(s.mailbox, s.unseen,s.account_id);
+				if(changed && ep.messagesGrid.store.baseParams.mailbox==s.mailbox && ep.messagesGrid.store.baseParams.account_id==s.account_id)
 				{
-					data.getParams={
-						unseenEmails:result.email_status.total_unseen
-					}
-
-//					if(!ep || !ep.isVisible()){
-//						GO.email.notificationEl.setDisplayed(true);
-
-						data.popup=true;
-
-						if(GO.util.empty(GO.settings.mute_new_mail_sound))
-							data.alarm=true;
-//					}
-
-					//GO.email.notificationEl.update(result.email_status.total_unseen);
-
-
+					ep.messagesGrid.store.reload();
 				}
+			}
+		}
 
-				GO.mainLayout.setNotification('email',result.email_status.total_unseen,'green');
-		});
+		GO.mainLayout.setNotification('email',data.email_status.total_unseen,'green');
+	});
 
-
-
-	}
 });
 
 GO.email.aliasesStore = new GO.data.JsonStore({

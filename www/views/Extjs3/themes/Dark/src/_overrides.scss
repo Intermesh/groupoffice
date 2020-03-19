@@ -1,7 +1,11 @@
 
-body {
+body{
   background-color: color($bg, 'background');
 }
+.notifications,.notificationArea {
+  background-color: #1b1b1b;
+}
+
 .x-layout-split {
   background-color: #1b1b1b;
 }
