@@ -103,18 +103,17 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 	
 	protected function actionDelete($params){
 		$response = array();
-		
+		$msg = '';
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
 				
 		$mailbox = new \GO\Email\Model\ImapMailbox($account, array("name"=>$params["mailbox"]));
-		if($mailbox->isSpecial())
+		if($mailbox->isSpecial()) {
 			throw new \Exception(\GO::t("You can't delete the trash, sent items or drafts folder", "email"));
-			
+		}
 		
 		if(strpos($params['mailbox'],$account->trash) !== 0 && !empty($account->trash)) {
 			$targetMailbox = new \GO\Email\Model\ImapMailbox($account, array("name"=>$account->trash));
-			
-			
+
 			if($targetMailbox->getHasChildren()) {
 				
 				if($counter = $this->getCounterMailboxName($targetMailbox, $mailbox->getBaseName())) {
@@ -124,14 +123,16 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 				}
 			
 			}
-			
-			$success = $mailbox->move($targetMailbox);
-		}else {
+			if (!$success = $mailbox->move($targetMailbox)) {
+				$success = $mailbox->delete();
+			}
+		} else {
 			$success = $mailbox->delete();
 		}
-		
-		$success = true;
-		return array("success"=>$success);
+		if(!$success) {
+			$msg = t("Failed to delete folder");
+		}
+		return array("success" => $success, "feedback" => $msg);
 	}
 	
 	private function getCounterMailboxName ($mailbox, $name, $counter = 0) {

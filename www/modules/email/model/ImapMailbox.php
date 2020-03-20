@@ -62,24 +62,24 @@ class ImapMailbox extends \GO\Base\Model {
 		return isset($this->_attributes[$name]) ? $this->_attributes[$name] : null;
 	}
 
-	public function getHasChildren($asSubscribedMailbox=false){
-
-		if($this->isRootMailbox())
+	public function getHasChildren($asSubscribedMailbox=false)
+	{
+		if($this->isRootMailbox()) {
 			return false;
+		}
 
 		//todo make compatible with servers that can't return subscribed flag
 
-		if(isset($this->_attributes['haschildren']) && $this->_attributes['haschildren'])
+		if(isset($this->_attributes['haschildren']) && $this->_attributes['haschildren']) {
 			return true;
-
-		if(isset($this->_attributes['hasnochildren']) && $this->_attributes['hasnochildren'])
+		}
+		if(isset($this->_attributes['hasnochildren']) && $this->_attributes['hasnochildren']) {
 			return false;
+		}
 
-		if(isset($this->_attributes['noinferiors']) && $this->_attributes['noinferiors'])
+		if(isset($this->_attributes['noinferiors']) && $this->_attributes['noinferiors']) {
 			return false;
-
-
-
+		}
 
 		//\GO::debug($this->_attributes['haschildren'])	;
 
@@ -296,19 +296,21 @@ class ImapMailbox extends \GO\Base\Model {
 	}
 
 	public function move(ImapMailbox $targetMailbox){
-		if($this->getAccount()->getPermissionLevel() <= \GO\Base\Model\Acl::READ_PERMISSION)
-		  throw new \GO\Base\Exception\AccessDenied();
+		if($this->getAccount()->getPermissionLevel() <= \GO\Base\Model\Acl::READ_PERMISSION) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
 		$newMailbox = "";
 
-		if(!empty($targetMailbox->name))
-			$newMailbox .= $targetMailbox->name.$this->delimiter;
+		if(!empty($targetMailbox->name)) {
+			$newMailbox .= $targetMailbox->name . $this->delimiter;
+		}
 
 		$newMailbox .= $this->getBaseName();
 
 		$success = $this->getAccount()->openImapConnection()->rename_folder($this->name, $newMailbox);
-		if(!$success)
+		if(!$success) {
 			return false;
-
+		}
 		$this->_attributes['name'] = $newMailbox;
 
 		return true;
