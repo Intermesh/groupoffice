@@ -8,28 +8,32 @@ Ext.onReady(function() {
 
 			var me = this;
 			var contentStripped = go.modules.community.notes.stripTag(this.data.content);
-			var passwordPrompt = new go.PasswordPrompt({
-				text: t('Provide your password to decrypt content'),
-				title: t('Current password required'),
-				listeners:{
-					'ok': function(password){
+
+
+			var dlg = new GO.dialog.PasswordDialog({
+				title: t("Enter password to decrypt"),
+				scope: this,
+				handler: function (dlg, btn, password) {
+					if (btn == "ok") {
 						go.modules.community.notes.aesGcmDecrypt(contentStripped,password).then(function(plaintext) {
 							me.data.content = plaintext;
-							me.items.item(0).onLoad(me);
+							var item = me.items.item(0);
+							item.update(me.data);
+							item.onLoad(me);
+
 							go.modules.community.notes.lastDecryptedValue = plaintext;
 							go.modules.community.notes.lastNoteBookId = me.data.noteBookId;
 						}).catch(function(error) {
-							Ext.Msg.alert(t("Error", "Password"), "Wrong password");
+							Ext.Msg.alert(t("Error", "Password"), t("Wrong password"));
 						});
-					},
-					'cancel': function () {
+					} else {
 						go.modules.community.notes.lastDecryptedValue = me.data.content;
 						go.modules.community.notes.lastNoteBookId = me.data.noteBookId;
-					},
-					scope:this
+					}
 				}
+
 			});
-			passwordPrompt.show();
+			dlg.show();
 		})
 
 	})
