@@ -102,7 +102,6 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 	}
 	
 	protected function actionDelete($params){
-		$response = array();
 		$msg = '';
 		$account = \GO\Email\Model\Account::model()->findByPk($params['account_id']);
 				
@@ -110,29 +109,26 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 		if($mailbox->isSpecial()) {
 			throw new \Exception(\GO::t("You can't delete the trash, sent items or drafts folder", "email"));
 		}
-		
-		if(strpos($params['mailbox'],$account->trash) !== 0 && !empty($account->trash)) {
-			$targetMailbox = new \GO\Email\Model\ImapMailbox($account, array("name"=>$account->trash));
+		if(array_key_exists('trashable', $params) && intval($params['trashable']) === 0) {
+			// The 'Trash' mailbox has the flag 'noinferiors' enabled. The end user was warned, we can safely delete
+			$success = $mailbox->delete();
+		} elseif(strpos($params['mailbox'],$account->trash) !== 0 && !empty($account->trash)) {
+			$targetMailbox = new \GO\Email\Model\ImapMailbox($account, ["name" => $account->trash]);
 
 			if($targetMailbox->getHasChildren()) {
 				
 				if($counter = $this->getCounterMailboxName($targetMailbox, $mailbox->getBaseName())) {
-					
 					$mailbox->rename($mailbox->getBaseName() . $counter);
-					
 				}
-			
 			}
-			if (!$success = $mailbox->move($targetMailbox)) {
-				$success = $mailbox->delete();
-			}
+			$success = $mailbox->move($targetMailbox);
 		} else {
 			$success = $mailbox->delete();
 		}
 		if(!$success) {
 			$msg = t("Failed to delete folder");
 		}
-		return array("success" => $success, "feedback" => $msg);
+		return ['success' => $success, 'feedback' => $msg];
 	}
 	
 	private function getCounterMailboxName ($mailbox, $name, $counter = 0) {

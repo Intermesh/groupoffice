@@ -267,7 +267,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 
 		if(!isset($params['node'])){
 			return $response;
-		}elseif ($params['node'] == 'root') {
+		} elseif ($params['node'] == 'root') {
 
 			$findParams = \GO\Base\Db\FindParams::newInstance()
 						->select('t.*')

@@ -21,7 +21,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 	},
 	initComponent : function(){
 		
-		this.items=[
+		this.items= [
 		this.addFolderButton = new Ext.menu.Item({
 			iconCls: 'btn-add',
 			text: t("Add folder", "email"),
@@ -206,23 +206,26 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 			handler: function(){
 				var sm = this.treePanel.getSelectionModel();
 				var node = sm.getSelectedNode();
-
-				if(!node|| node.attributes.folder_id<1)
-				{
+				if(!node|| node.attributes.folder_id<1) {
 					Ext.MessageBox.alert(t("Error"), t("Select a folder to delete please", "email"));
-				}else if(node.attributes.mailbox=='INBOX')
-				{
+				} else if(node.attributes.mailbox==='INBOX') {
 					Ext.MessageBox.alert(t("Error"), t("You can't delete the INBOX folder", "email"));
-				}else
-				{
+				} else {
+					var trashNode = this.treePanel.findMailboxByName(node, 'Trash'), trashable = true;
+					if(trashNode && trashNode.attributes.noinferiors === true) {
+						trashable = false;
+					}
+	console.log("Trashable = " + trashable);
 					
 					GO.deleteItems({
 						maskEl: GO.mainLayout.getModulePanel("email").getEl(),
 						url: GO.url("email/folder/delete"),
 						params: {					
 							account_id:node.attributes.account_id,
-							mailbox: node.attributes.mailbox
+							mailbox: node.attributes.mailbox,
+							trashable: (trashable ? 1 : 0)
 						},
+						noConfirmation: trashable,
 						callback: function(responseParams)
 						{
 							
