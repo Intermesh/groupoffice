@@ -135,8 +135,7 @@ go.Jmap = {
 				{xtype:'box',html:'<b>'+file.name+'</b><span>...</span>'},
 				{xtype:'progress',height:4,style:'margin: 7px 0'}
 			],
-			title: t('Uploading')+'...',
-			buttons: [{text:t('Hide'), handler(btn){btn.ownerCt.ownerCt.hide();}}]
+			title: t('Uploading')+'...'
 		});
 
 		Ext.Ajax.request({url: go.User.uploadUrl,
