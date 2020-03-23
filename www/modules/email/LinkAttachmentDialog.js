@@ -2,7 +2,7 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 
 	attachmentItem : null, // If this is set to null, then it saves all attachments of the message.
 	messagePanel : null,
-	isEmailEditor : false,
+	attachmentHandle : null,
 	attachmentsView : null,
 	
 	constructor : function(config){
@@ -17,8 +17,8 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 
 		GO.email.LinkAttachmentDialog.superclass.constructor.call(this,config);
 	},
-	setEmailEditor : function(emailEditor) {
-		this.isEmailEditor = emailEditor;
+	setAttachmentHandle : function(handler) {
+		this.attachmentHandle = handler;
 	},
 	setAttachmentsView : function(attachmentsView) {
 		this.attachmentsView = attachmentsView;
@@ -48,23 +48,8 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 			success:function(response, options, result){
 				
 				if(GO.util.empty(this.attachmentItem)){
-					if(this.isEmailEditor) {
-						GO.files.createSelectFileBrowser();
-
-						GO.selectFileBrowser.setFileClickHandler(function(){
-
-							var paths = [];
-							var selections = GO.selectFileBrowser.getSelectedGridRecords();
-							for (var i = 0; i < selections.length; i++)
-								paths.push(selections[i].data.path);
-
-							this.attachmentsView.afterUpload({addFileStorageFiles:Ext.encode(paths)});
-							GO.selectFileBrowserWindow.hide();
-						}, this);
-
-						GO.selectFileBrowser.setFilesFilter('');
-						GO.selectFileBrowser.setRootID(result.files_folder_id,result.files_folder_id);
-						GO.selectFileBrowserWindow.show();
+					if(this.attachmentHandle) {
+						this.attachmentHandle(result);
 						this.hide();
 					} else {
 						this.saveAllToItem(record, result.files_folder_id);

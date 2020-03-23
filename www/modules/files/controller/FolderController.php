@@ -1267,10 +1267,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				if(isset($blob)) {
 					if(isset($blob->subfolder)) {
 						while($fname = array_shift($blob->subfolder)){
-							if($f = $folder->hasFolder($fname)) {
-								$folder = $f;
+							if($f = $destinationFolder->hasFolder($fname)) {
+								$destinationFolder = $f;
 							} else {
-								$folder = $folder->addFolder($fname);
+								$destinationFolder = $destinationFolder->addFolder($fname);
 							}
 						}
 					}
