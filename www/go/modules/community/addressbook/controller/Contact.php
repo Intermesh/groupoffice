@@ -105,10 +105,15 @@ EOT;
 
 		$labels->rows = $params['rows'] ?? 8;
 		$labels->cols = $params['columns'] ?? 2;
-		$labels->cellTopMargin = $params['labelTopMargin'] ?? 10;
-		$labels->cellRightMargin = $params['labelRightMargin'] ?? 10;
-		$labels->cellBottomMargin = $params['labelBottomMargin'] ?? 10;
-		$labels->cellLeftMargin = $params['labelLeftMargin'] ?? 10;
+		$labels->labelTopMargin = $params['labelTopMargin'] ?? 10;
+		$labels->labelRightMargin = $params['labelRightMargin'] ?? 10;
+		$labels->labelBottomMargin = $params['labelBottomMargin'] ?? 10;
+		$labels->labelLeftMargin = $params['labelLeftMargin'] ?? 10;
+
+		$labels->pageTopMargin = $params['pageTopMargin'] ?? 10;
+		$labels->pageRightMargin = $params['pageRightMargin'] ?? 10;
+		$labels->pageBottomMargin = $params['pageBottomMargin'] ?? 10;
+		$labels->pageLeftMargin = $params['pageLeftMargin'] ?? 10;
 
 		$labels->SetFont($params['font'] ?? 'dejavusans', '', $params['fontSize'] ?? 10);
 

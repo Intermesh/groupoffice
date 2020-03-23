@@ -149,6 +149,18 @@ class Contact extends AclItemEntity {
 	public $name;
 
 	/**
+	 * name of the bank for this contact
+	 * @var string
+	 */
+	public $nameBank = '';
+
+	/**
+	 *
+	 * @var string
+	 */
+	public $BIC = '';
+
+	/**
 	 * 
 	 * @var string
 	 */							

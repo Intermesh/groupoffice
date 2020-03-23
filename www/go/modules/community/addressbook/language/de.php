@@ -108,4 +108,5 @@ return array (
   'Failed to add contacts to the group' => 'Kontakte können der Gruppe nicht hinzugefügt werden',
   'First' => 'Vorname',
   'Last' => 'Nachname',
+  'LOB' => 'Branche',
 );

@@ -36,7 +36,6 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 	},
 
 	decrypt: function () {
-
 		if (!this.data.content || this.data.content.substring(0, 8) !== "{GOCRYPT") {
 			return;
 		}
@@ -45,7 +44,12 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 		this.data.content = t("Encrypted data");
 		go.modules.community.notes.Decrypter.decrypt(data).then(function(text) {
 			me.data.content = text;
-			me.items.item(0).onLoad(me);
+			var item = me.items.item(0);
+			item.update(me.data);
+			go.modules.community.notes.lastDecryptedValue = text;
+			go.modules.community.notes.lastNoteBookId = me.data.noteBookId;
+			item.onLoad(this);
+
 		}).catch(function(){});
 
 

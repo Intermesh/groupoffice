@@ -18,7 +18,7 @@ go.modules.community.addressbook.LabelsDialog = Ext.extend(go.Window, {
 					columnWidth: .5,
 					items: [{
 						defaults: {
-							anchor: '100%',
+							anchor: '100%'
 						},
 						xtype: "fieldset",
 						title: t("Page"),
@@ -51,9 +51,44 @@ go.modules.community.addressbook.LabelsDialog = Ext.extend(go.Window, {
 								name: 'columns'
 							}]
 					},
+
+					{
+						columnWidth: .5,
+						items: [
+							{
+								defaults: {
+									anchor: '100%'
+								},
+								xtype: "fieldset",
+								title: t("Page margins"),
+								items: [
+									{
+										xtype: 'numberfield',
+										fieldLabel: t('Top'),
+										value: 10,
+										name: 'pageTopMargin'
+									}, {
+										xtype: 'numberfield',
+										fieldLabel: t('Right'),
+										value: 10,
+										name: 'pageRightMargin'
+									}, {
+										xtype: 'numberfield',
+										fieldLabel: t('Bottom'),
+										value: 10,
+										name: 'pageBottomMargin'
+									}, {
+										xtype: 'numberfield',
+										fieldLabel: t('Left'),
+										value: 10,
+										name: 'pageLeftMargin'
+									}]
+							}]
+						},
+
 						{
 							defaults: {
-								anchor: '100%',
+								anchor: '100%'
 							},
 							xtype: "fieldset",
 							title: t("Font"),
@@ -88,7 +123,7 @@ go.modules.community.addressbook.LabelsDialog = Ext.extend(go.Window, {
 					items: [
 						{
 							defaults: {
-								anchor: '100%',
+								anchor: '100%'
 							},
 							xtype: "fieldset",
 							title: t("Label margins"),
@@ -116,7 +151,7 @@ go.modules.community.addressbook.LabelsDialog = Ext.extend(go.Window, {
 								}]
 						}, {
 							defaults: {
-								anchor: '100%',
+								anchor: '100%'
 							},
 							xtype: 'fieldset',
 							title: t("Template"),
@@ -155,11 +190,19 @@ go.modules.community.addressbook.LabelsDialog = Ext.extend(go.Window, {
 
 		this.supr().initComponent.call(this);
 
+		var v = localStorage.getItem('addressBookLabelValues');
+
+		if(v) {
+			this.formPanel.form.setValues(Ext.decode(v));
+		}
 	},
 
 	print: function () {
 
 		var me = this;
+		var formValues = this.formPanel.form.getFieldValues();
+		localStorage.setItem('addressBookLabelValues', Ext.encode(formValues));
+
 		me.getEl().mask(t("Exporting..."));
 		var promise = go.Jmap.request({
 			method: "Contact/query",
@@ -169,7 +212,7 @@ go.modules.community.addressbook.LabelsDialog = Ext.extend(go.Window, {
 		go.Jmap.request({
 			method: "Contact/labels",
 			params: Ext.apply(
-				this.formPanel.form.getFieldValues(),
+				formValues,
 				{
 					"#ids": {
 						resultOf: promise.callId,
@@ -180,7 +223,7 @@ go.modules.community.addressbook.LabelsDialog = Ext.extend(go.Window, {
 			Ext.MessageBox.alert(t("Error"), response.message);
 		})
 			.then(function (response) {
-				go.util.downloadFile(go.Jmap.downloadUrl(response.blobId));
+				go.util.downloadFile(go.Jmap.downloadUrl(response.blobId, true), true);
 			})
 			.finally(function () {
 				me.getEl().unmask();

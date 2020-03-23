@@ -725,7 +725,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 			var record = this.messagesGrid.store.getById(this.messagePanel.uid);
 
-			if(!record.data.seen && data.notification)
+			if(record && !record.data.seen && data.notification)
 			{
 				if(GO.email.alwaysRespondToNotifications || confirm(t("The sender of this messages likes a read notification by you at: %s. Do you want to send a read notification now?", "email").replace('%s', data.notification)))
 				{
