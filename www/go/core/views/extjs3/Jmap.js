@@ -169,7 +169,9 @@ go.Jmap = {
 					var percentage = (e.loaded / e.total * 100 | 0);
 					if(notifyEl) {
 						notifyEl.setTitle(t('Uploading')+'... &bull; ' + percentage + '%');
-						//notifyEl.items.items[0].getResizeEl().child('span', true).innerText = Math.round(seconds_remaining)+' '+t('seconds left');
+						var box = notifyEl.items.items[0].getResizeEl();
+						if(box)
+							box.child('span', true).innerText = Math.round(seconds_remaining)+' '+t('seconds left');
 						notifyEl.items.items[1].updateProgress(percentage/100);
 					}
 				}
