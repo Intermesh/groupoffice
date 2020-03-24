@@ -47,7 +47,7 @@ GO.base.email.EmailEditorPanel = function(config){
 	
 	if(!config.maxAttachmentsSize)
 		config.maxAttachmentsSize=GO.settings.config.max_attachment_size;
-			
+
 	this.buildForm(config);
 	
 	config.layout='form';
@@ -423,7 +423,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 
 
 		if(!go.Modules.isAvailable("legacy", "files")) {
-			return new Ext.button({
+			return new Ext.Button({
 				iconCls:'ic-attach-file',
 				tooltip: t("Attach files"),
 				handler:uploadHandle,
@@ -450,11 +450,8 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 						tmp_file: selections[i].data.path,
 					});
 				}
-				debugger;
+
 				this.attachmentsView.addFiles(items);
-				// 	paths.push(selections[i].data.path);
-				// debugger;
-				// this.attachmentsView.afterUpload({addFileStorageFiles:Ext.encode(paths)});
 				GO.selectFileBrowserWindow.hide();
 			}, this);
 			GO.selectFileBrowser.setFilesFilter('');

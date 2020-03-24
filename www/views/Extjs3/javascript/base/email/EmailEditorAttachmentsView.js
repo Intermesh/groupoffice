@@ -1,15 +1,15 @@
 GO.base.email.EmailEditorAttachmentsView = function(config){
 		config=config||{};
-		config.store = new Ext.data.ArrayStore({
+		config.store = new Ext.data.JsonStore({
+			root: 'results',
 			fields : ['tmp_file', 'name', 'size', 'type', 'extension', 'human_size','from_file_storage','fileName'],
 			id : 'tmp_file'
 		});
 		
-		config.store.on('add', function(){
+		config.store.on('load', function(){
 
 			if(this.store.data.length) {
 				this.show();
-				//debugger;
 			} else
 				this.hide();
 			if(this.maxSizeExceeded()){
@@ -78,11 +78,7 @@ Ext.extend(GO.base.email.EmailEditorAttachmentsView, Ext.DataView, {
 	},
 
 	addFiles: function(items) {
-		var records = [];
-		for(var i = 0 ; i < items.length; i++) {
-			records.push(new this.store.recordType(items[i]));
-		}
-		this.store.add( records);
+		this.store.loadData({results:items}, true);
 	},
 
 	afterUpload : function(loadParams){
@@ -123,7 +119,7 @@ Ext.extend(GO.base.email.EmailEditorAttachmentsView, Ext.DataView, {
 			this.menu = new Ext.menu.Menu({
 				items: [
 				{
-					iconCls:'btn-delete',
+					iconCls:'ic-delete',
 					text:t("Delete"),
 					scope:this,
 					handler: function()
