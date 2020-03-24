@@ -33,6 +33,12 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 
 	initComponent: function () {
 
+		this.descriptionField = new Ext.form.TextField({
+			'xtype': 'textfield',
+			'fieldLabel': t('Description'),
+			'name': 'description'
+		});
+
 		this.searchField = new go.SearchField({
 			anchor: "100%",
 			handler: function(field, v){
@@ -47,7 +53,7 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 			autoHeight: true,
 			items: [{
 					xtype: "fieldset",
-					items: [this.searchField]
+					items: [this.searchField, this.descriptionField]
 				}]
 		});		
 
@@ -74,13 +80,13 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 			savedSelection: "link",
 			entities:this.entities
 		});
-		
+
 		this.entityGrid.getSelectionModel().on('selectionchange', function (sm) {
 			this.search();
 		}, this, {buffer: 1}); //add buffer because it clears selection first
 
 		Ext.apply(this, {
-			items: [this.entityGrid, search, this.grid],
+			items: [this.entityGrid, search, this.grid, this.descriptionField],
 			buttons: [{
 					text: t("Ok"),
 					handler: function () {
