@@ -113,7 +113,7 @@ class Filters {
 						$range[1] = new DateTime($range[1]);
 						
 						call_user_func($filterConfig['fn'], $criteria, '>=', $range[0], $query, $filter);
-						call_user_func($filterConfig['fn'], $criteria, '<=', $range[1], $query, filter);
+						call_user_func($filterConfig['fn'], $criteria, '<=', $range[1], $query, $filter);
 					} else
 					{
 						$v = self::parseNumericValue($value);
