@@ -259,10 +259,19 @@ class ImapMailbox extends \GO\Base\Model {
 	  return $this->getAccount()->openImapConnection()->delete_folder($this->name);
 	}
 
-	public function truncate(){
-	  if($this->getAccount()->getPermissionLevel() <= \GO\Base\Model\Acl::READ_PERMISSION)
-		  throw new \GO\Base\Exception\AccessDenied();
+	public function truncate()
+	{
+		if ($this->getAccount()->getPermissionLevel() <= \GO\Base\Model\Acl::READ_PERMISSION) {
+			throw new \GO\Base\Exception\AccessDenied();
+		}
 		$imap = $this->getAccount()->openImapConnection($this->name);
+		$success = true;
+		foreach ($imap->get_folders($this->_account->trash) as $folder) {
+			if($folder['name'] == $this->_account->trash) {
+				continue;
+			}
+			$success = $success &&$imap->delete_folder($folder['name']);
+		}
 		$sort = $imap->sort_mailbox();
 		return $imap->delete($sort);
 	}

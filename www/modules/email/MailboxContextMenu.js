@@ -190,6 +190,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 									GO.mainLayout.getModulePanel("email").messagePanel.reset();
 								}
 								GO.mainLayout.getModulePanel("email").updateFolderStatus(node.attributes.mailbox, 0);
+								this.treePanel.mainPanel.refresh(true);
 //								GO.mainLayout.getModulePanel("email").updateNotificationEl();
 							},
 							scope: this
@@ -215,8 +216,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 					if(trashNode && trashNode.attributes.noinferiors === true) {
 						trashable = false;
 					}
-	console.log("Trashable = " + trashable);
-					
+
 					GO.deleteItems({
 						maskEl: GO.mainLayout.getModulePanel("email").getEl(),
 						url: GO.url("email/folder/delete"),

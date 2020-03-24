@@ -355,17 +355,19 @@ class Account extends \GO\Base\Db\ActiveRecord {
 	 * @param StringHelper $mailbox
 	 * @return \GO\Base\Mail\Imap
 	 */
-	public function openImapConnection($mailbox='INBOX'){
-	
-		if(empty($mailbox))
-			$mailbox="INBOX";
-		
+	public function openImapConnection($mailbox = 'INBOX')
+	{
+
+		if (empty($mailbox)) {
+			$mailbox = "INBOX";
+		}
+
 		$imap = $this->justConnect();
-		
-		if(!$imap->select_mailbox($mailbox))
-			throw new \GO\Base\Mail\Exception\MailboxNotFound($mailbox,$imap);
+
+		if (!$imap->select_mailbox($mailbox)) {
+			throw new \GO\Base\Mail\Exception\MailboxNotFound($mailbox, $imap);
 			//throw new \Exception ("Could not open IMAP mailbox $mailbox\nIMAP error: ".$imap->last_error());
-	
+		}
 		return $imap;
 	}
 	
@@ -507,12 +509,12 @@ class Account extends \GO\Base\Db\ActiveRecord {
 		
 		$rootMailboxes = array();
 	
-			$folders = $imap->list_folders($subscribed,$withStatus,"","{$this->mbroot}%", true);		
-	//		\GO::debug($folders);
-			foreach($folders as $folder){
-				$mailbox = new ImapMailbox($this,$folder);
-				$rootMailboxes[]=$mailbox;
-			}
+		$folders = $imap->list_folders($subscribed,$withStatus,"","{$this->mbroot}%", true);
+//		\GO::debug($folders);
+		foreach($folders as $folder){
+			$mailbox = new ImapMailbox($this,$folder);
+			$rootMailboxes[]=$mailbox;
+		}
 		
 		$namespaces = $imap ->get_namespaces();
 		
