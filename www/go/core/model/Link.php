@@ -9,6 +9,7 @@ use go\core\db\Criteria;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\Entity as Entity2;
+use go\core\orm\SearchableTrait;
 use go\core\orm\EntityType;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
@@ -40,8 +41,10 @@ use go\core\model\Search;
  * 
  * 
  */
-class Link extends Entity {
-	
+class Link extends Entity
+{
+	use SearchableTrait;
+
 	/**
 	 * The auto increment primary key
 	 * 
@@ -389,6 +392,20 @@ class Link extends Entity {
 		return parent::sort($query, $sort);
 	}
 
-	
-	
+	protected function getSearchName() :string
+	{
+		return t("Links");
+	}
+
+
+	protected function getSearchDescription() :string
+	{
+		return $this->description;
+	}
+
+	protected function getSearchKeywords() :array
+	{
+		return [$this->description];
+	}
+
 }
