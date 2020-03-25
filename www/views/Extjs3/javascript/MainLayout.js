@@ -552,7 +552,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				var notificationArea = new Ext.Panel({
 					cls: 'notificationArea',
 					region:'east',
-					title:'Notifications',
+					title: t('Notifications'),
 					floating:true,
 					width:dp(408),
 					//animCollapse:true,

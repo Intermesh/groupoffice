@@ -138,7 +138,8 @@ go.Jmap = {
 			title: t('Uploading')+'...'
 		});
 
-		Ext.Ajax.request({url: go.User.uploadUrl,
+		var transactionId = Ext.Ajax.request({url: go.User.uploadUrl,
+			timeout: 4 * 60 * 60 * 100, //4 hours
 			success: function(response) {
 				if(cfg.success && response.responseText) {
 					data = Ext.decode(response.responseText);
@@ -157,7 +158,10 @@ go.Jmap = {
 				cfg.callback && cfg.callback.call(cfg.scope || this, response);
 			},
 			progress: function(e) {
-				if (e.lengthComputable) {
+
+				go.Notifier.notificationArea.expand();
+
+					if (e.lengthComputable) {
 					var seconds_elapsed = (new Date().getTime() - started_at.getTime() )/1000;
 					var bytes_per_second =  seconds_elapsed ? e.loaded / seconds_elapsed : 0;
 					var remaining_bytes = e.total - e.loaded;
@@ -171,7 +175,10 @@ go.Jmap = {
 				}
 				cfg.progress && cfg.progress.call(cfg.scope || this, e);
 			},
-			failure: function(response) {
+			failure: function(response, options) {
+				if(response.isAbort) {
+					return;
+				}
 				if(cfg.failure && response.responseText) {
 					data = Ext.decode(response.responseText);
 					notifyEl.setTitle('Upload failed');
@@ -191,6 +198,12 @@ go.Jmap = {
 				'X-File-LastModified': Math.round(file['lastModified'] / 1000).toString()
 			},
 			xmlData: file // just "data" wasn't available in ext
+		});
+
+		//Abort upload if user destroys notification
+		notifyEl.on("destroy", function() {
+			console.warn("abort upload: " + transactionId);
+			Ext.Ajax.abort(transactionId);
 		});
 	},
 	
