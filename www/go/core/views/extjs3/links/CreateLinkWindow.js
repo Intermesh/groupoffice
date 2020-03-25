@@ -36,7 +36,10 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 		this.descriptionField = new Ext.form.TextField({
 			'xtype': 'textfield',
 			'fieldLabel': t('Description'),
-			'name': 'description'
+			'name': 'description',
+			'maxLength': 190,
+			'emptyText': t('Optional description'),
+			'anchor': '100%'
 		});
 
 		this.searchField = new go.SearchField({
@@ -47,15 +50,28 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 			scope: this
 		});
 
+		this.descriptionPanel = new Ext.Panel({
+			layout: "form",
+			region: "south",
+			autoHeight: true,
+			items: [{
+				xtype: "fieldset",
+				items: [this.descriptionField]
+			}]
+		});
+
 		var search = new Ext.Panel({
 			layout: "form",
 			region: "north",
 			autoHeight: true,
-			items: [{
+				items: [{
 					xtype: "fieldset",
-					items: [this.searchField, this.descriptionField]
+					items: [
+						this.searchField
+					]
 				}]
-		});		
+			}
+		);
 
 		this.grid = new go.links.LinkGrid({
 			selModel: new Ext.grid.RowSelectionModel({
@@ -86,7 +102,7 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 		}, this, {buffer: 1}); //add buffer because it clears selection first
 
 		Ext.apply(this, {
-			items: [this.entityGrid, search, this.grid, this.descriptionField],
+			items: [this.entityGrid, search, this.grid, this.descriptionPanel],
 			buttons: [{
 					text: t("Ok"),
 					handler: function () {
@@ -115,6 +131,7 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 			var link = {
 				fromEntity: me.entity,
 				fromId: me.entityId,
+				description: me.descriptionField.getValue(),
 				toEntity: record.get('entity'),
 				toId: record.get('entityId')
 			};
