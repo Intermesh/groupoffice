@@ -128,16 +128,6 @@ go.Jmap = {
 		go.Notifier.toggleIcon('upload', true);
 
 		var started_at = new Date();
-		var notifyEl = go.Notifier.msg({
-			persistent: true,
-			iconCls: 'ic-file-upload',
-			items:[
-				{xtype:'box',html:'<b>'+file.name+'</b><span>...</span>'},
-				{xtype:'progress',height:4,style:'margin: 7px 0'}
-			],
-			title: t('Uploading')+'...'
-		});
-
 		var transactionId = Ext.Ajax.request({url: go.User.uploadUrl,
 			timeout: 4 * 60 * 60 * 100, //4 hours
 			success: function(response) {
@@ -158,10 +148,7 @@ go.Jmap = {
 				cfg.callback && cfg.callback.call(cfg.scope || this, response);
 			},
 			progress: function(e) {
-
-				go.Notifier.notificationArea.expand();
-
-					if (e.lengthComputable) {
+				if (e.lengthComputable) {
 					var seconds_elapsed = (new Date().getTime() - started_at.getTime() )/1000;
 					var bytes_per_second =  seconds_elapsed ? e.loaded / seconds_elapsed : 0;
 					var remaining_bytes = e.total - e.loaded;
@@ -183,13 +170,13 @@ go.Jmap = {
 				}
 				if(cfg.failure && response.responseText) {
 					data = Ext.decode(response.responseText);
-					notifyEl.setTitle('Upload failed');
+					notifyEl.setPersistent(false).setTitle('Upload failed');
 					cfg.failure.call(cfg.scope || this,data);
 				} else if(response.status === 413) { // "Request Entity Too Large"
-					notifyEl.setTitle('Upload failed: file too large');
+					notifyEl.setPersistent(false).setTitle('Upload failed: file too large');
 					cfg.failure && cfg.failure.call(cfg.scope || this, response);
 				} else {
-					notifyEl.setTitle('Upload failed: Please check if the system is using the correct URL at System settings -> General -> URL.');
+					notifyEl.setPersistent(false).setTitle('Upload failed: Please check if the system is using the correct URL at System settings -> General -> URL.');
 					cfg.failure && cfg.failure.call(cfg.scope || this, response);
 				}
 
@@ -201,11 +188,27 @@ go.Jmap = {
 			},
 			xmlData: file // just "data" wasn't available in ext
 		});
-
-		//Abort upload if user destroys notification
-		notifyEl.on("destroy", function() {
-			console.warn("abort upload: " + transactionId);
-			Ext.Ajax.abort(transactionId);
+		go.Notifier.notificationArea.expand();
+		var notifyEl = go.Notifier.msg({
+			persistent: true,
+			iconCls: 'ic-file-upload',
+			items:[
+				{xtype:'box',html:'<b>'+file.name+'</b><span>...</span>'},
+				{xtype:'progress',height:4,style:'margin: 7px 0'}
+			],
+			title: t('Uploading')+'...',
+			buttons: [{
+				text:t('Abort'),
+				handler: function(btn) {
+					btn.hide();
+					btn.ownerCt.ownerCt.setPersistent(false).setTitle('Upload aborted');
+					Ext.Ajax.abort(transactionId);
+					go.Jmap.uploadQueue.remove(file);
+					if(Ext.isEmpty(this.uploadQueue)) {
+						go.Notifier.toggleIcon('upload', false); //done
+					}
+				}
+			}]
 		});
 	},
 	

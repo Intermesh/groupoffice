@@ -55,26 +55,35 @@ go.Notifier = {
 
 		//msg.renderTo = this.messageCt;
 		msg.html = msg.description || msg.html; // backward compat
-		msg.tools = [{id:'close',handler:function(e, toolEl, panel){
-			me.remove(panel);
-		}}];
+		if (!msg.persistent) {
+			msg.tools = [{
+				id: 'close', handler: function (e, toolEl, panel) {
+					me.remove(panel);
+				}
+			}];
+		}
 		var msgCtr = new Ext.Panel(msg);
 
 		this.notifications.add(msgCtr);
 		this.notifications.doLayout();
 		var me = this;
-		// if (!msg.persistent) {
-		// 	setTimeout(function () {
-		// 		me.remove(msgCtr);
-		// 	}, msg.time || 2000);
-		// }
-		// if(!msg.persistent) {
-		// 	msgCtr.on('afterrender',function(me) {
-		// 		me.el.on('click', function () {
-		// 			me.remove(msgCtr);
-		// 		});
-		// 	});
-		// }
+
+		if(msg.removeAfter) {
+			setTimeout(function () {
+				me.remove(msgCtr);
+			}, msg.removeAfter);
+		}
+		msgCtr.setPersistent = function(bool) {
+			if(!bool) {
+				msgCtr.addTool({
+					id: 'close',
+					handler: function (e, toolEl, panel) {
+						me.remove(panel);
+					}
+				});
+			}
+			return msgCtr;
+		};
 		
 		return msgCtr;
 	},
