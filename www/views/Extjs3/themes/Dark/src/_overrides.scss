@@ -34,7 +34,7 @@ body {
 
 .x-form{
   &-invalid, textarea.x-form-invalid {
-    border-color: rgba(color($red, 700),0.54);
+    border-color: rgba($cDanger,0.54);
     background-color: color($bg, 'box');
   }
 }
