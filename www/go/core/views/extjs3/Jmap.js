@@ -158,28 +158,26 @@ go.Jmap = {
 						notifyEl.setTitle(t('Uploading')+'... &bull; ' + percentage + '%');
 						var box = notifyEl.items.items[0].getResizeEl();
 						if(box)
-							box.child('span', true).innerText = Math.round(seconds_remaining)+' '+t('seconds left');
+							box.child('span', true).innerText = Math.round(seconds_remaining)+t('s');
 						notifyEl.items.items[1].updateProgress(percentage/100);
 					}
 				}
 				cfg.progress && cfg.progress.call(cfg.scope || this, e);
 			},
 			failure: function(response, options) {
-				if(response.isAbort) {
-					return;
-				}
+				var data = response,
+					text = response.isAbort ? 'Upload aborted' : 'Upload failed';
+
 				if(cfg.failure && response.responseText) {
 					data = Ext.decode(response.responseText);
-					notifyEl.setPersistent(false).setTitle('Upload failed');
-					cfg.failure.call(cfg.scope || this,data);
 				} else if(response.status === 413) { // "Request Entity Too Large"
-					notifyEl.setPersistent(false).setTitle('Upload failed: file too large');
-					cfg.failure && cfg.failure.call(cfg.scope || this, response);
-				} else {
-					notifyEl.setPersistent(false).setTitle('Upload failed: Please check if the system is using the correct URL at System settings -> General -> URL.');
-					cfg.failure && cfg.failure.call(cfg.scope || this, response);
+					text += ': file too large';
+				} else if(!response.isAbort) {
+					text += ': Please check if the system is using the correct URL at System settings -> General -> URL.';
 				}
-
+				notifyEl.buttons[0].hide();
+				notifyEl.setPersistent(false).setTitle(text);
+				cfg.failure && cfg.failure.call(cfg.scope || this, data);
 			},
 			headers: {
 				'X-File-Name': "UTF-8''" + encodeURIComponent(file.name),
@@ -199,14 +197,8 @@ go.Jmap = {
 			title: t('Uploading')+'...',
 			buttons: [{
 				text:t('Abort'),
-				handler: function(btn) {
-					btn.hide();
-					btn.ownerCt.ownerCt.setPersistent(false).setTitle('Upload aborted');
+				handler: function() {
 					Ext.Ajax.abort(transactionId);
-					go.Jmap.uploadQueue.remove(file);
-					if(Ext.isEmpty(this.uploadQueue)) {
-						go.Notifier.toggleIcon('upload', false); //done
-					}
 				}
 			}]
 		});
