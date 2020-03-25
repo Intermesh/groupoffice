@@ -5,9 +5,15 @@ Ext.onReady(function() {
 			if (!this.data.content || !go.modules.community.notes.isEncrypted(this.data.content)) {
 				return;
 			}
+			this.originalData = this.data.content;
+			this.data.content = t("Encrypted data");
+			var item = this.items.item(0);
+			item.update(this.data);
+			item.onLoad(this);
 
 			var me = this;
-			var contentStripped = go.modules.community.notes.stripTag(this.data.content);
+			var contentStripped = go.modules.community.notes.stripTag(this.originalData);
+
 
 
 			var dlg = new GO.dialog.PasswordDialog({
@@ -20,14 +26,14 @@ Ext.onReady(function() {
 							var item = me.items.item(0);
 							item.update(me.data);
 							item.onLoad(me);
-
+							go.modules.community.notes.password = password;
 							go.modules.community.notes.lastDecryptedValue = plaintext;
 							go.modules.community.notes.lastNoteBookId = me.data.noteBookId;
 						}).catch(function(error) {
 							Ext.Msg.alert(t("Error", "Password"), t("Wrong password"));
 						});
 					} else {
-						go.modules.community.notes.lastDecryptedValue = me.data.content;
+						go.modules.community.notes.lastDecryptedValue = "";
 						go.modules.community.notes.lastNoteBookId = me.data.noteBookId;
 					}
 				}

@@ -3,14 +3,20 @@ Ext.onReady(function() {
 		onLoad: go.modules.community.notes.NoteDialog.prototype.onLoad.createSequence(function(entityValues) {
 			var me = this;
 			var contentField = this.find('name', 'content')[0];
-			var noteBookId = this.items.items[0].items.items[0].items.items[0].items.items[0].getValue();
+			var noteBookId = entityValues.noteBookId
 			if(noteBookId == go.modules.community.notes.lastNoteBookId && !go.modules.community.notes.isUsingOldEncryption(entityValues.content)) {
-				contentField.setValue(go.modules.community.notes.lastDecryptedValue);
+				if(go.modules.community.notes.lastDecryptedValue != "") {
+					contentField.setValue(go.modules.community.notes.lastDecryptedValue);
+					this.checkEncrypt.setValue(true);
+					this.passwordField.setValue(go.modules.community.notes.password);
+					this.confirmPasswordField.setValue(go.modules.community.notes.password);
+				}
 			}
 
 			var content = contentField.getRawValue();
 
 			if(go.modules.community.notes.isEncrypted(content)) {
+				contentField.setValue(t("Encrypted data"));
 				content = go.modules.community.notes.stripTag(content);
 				if(!go.modules.community.notes.isUsingOldEncryption(content)) {
 
@@ -43,7 +49,7 @@ Ext.onReady(function() {
 
 
 			this.confirmPasswordField = new Ext.form.TextField({
-				fieldLabel: t("Password"),
+				fieldLabel: t("Confirm"),
 				inputType: 'password',
 				anchor:'100%',
 				visible: false,
@@ -53,12 +59,9 @@ Ext.onReady(function() {
 			this.passwordField.setVisible(false);
 			this.confirmPasswordField.setVisible(false);
 
-			this.findByType("fieldset")[0].items.insert(2,this.passwordField);
-			this.findByType("fieldset")[0].items.insert(3,this.confirmPasswordField);
-
 			this.formPanel.ownerCt.doLayout();
 			var contentField = this.find('name', 'content')[0];
-			this.findByType("fieldset")[0].items.insert(4,this.checkEncrypt = new Ext.form.Checkbox(
+			this.findByType("fieldset")[0].items.insert(2,this.checkEncrypt = new Ext.form.Checkbox(
 				{
 					xtype: 'checkbox',
 					name: 'encryptcheck',
@@ -76,7 +79,8 @@ Ext.onReady(function() {
 					},
 				}
 			));
-
+			this.findByType("fieldset")[0].items.insert(3,this.passwordField);
+			this.findByType("fieldset")[0].items.insert(4,this.confirmPasswordField);
 			var passfield = this.passwordField;
 
 		}),

@@ -16,13 +16,15 @@ go.modules.community.notes.Decrypter = {
 					if (btn == "ok") {
 						me.doDecrypt(data, password)
 							.then(function (text) {
-								resolve(text);
+								resolve([text,password]);
 
 							})
 							.catch(function () {
 								Ext.MessageBox.alert(t("Error"), t("Invalid password"));
 								reject();
 							})
+					} else {
+						go.modules.community.notes.lastDecryptedValue = "";
 					}
 				}
 			});
