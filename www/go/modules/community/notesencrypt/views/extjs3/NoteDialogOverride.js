@@ -94,6 +94,11 @@ Ext.onReady(function() {
 				isEncrypted = this.checkEncrypt.getValue();
 			if(isEncrypted == true) {
 
+				if(contentField.getRawValue().indexOf('<img') > -1) {
+					Ext.MessageBox.alert(t("Error"), t("Sorry, you can't use images in encrypted notes"));
+					return false;
+				}
+
 				var passfield = this.passwordField.getValue();
 				var passconfirm = this.confirmPasswordField.getValue();
 				var name = this.titleField.getValue();
@@ -109,6 +114,7 @@ Ext.onReady(function() {
 						if(!go.modules.community.notes.decrypted || !go.modules.community.notes.decrypted[this.currentId]) {
 							go.modules.community.notes.decrypted = {};
 						}
+						go.modules.community.notes.decrypted[this.currentId] = {};
 						go.modules.community.notes.decrypted[this.currentId].content = plaintext;
 						go.modules.community.notes.decrypted[this.currentId].password = password;
 
