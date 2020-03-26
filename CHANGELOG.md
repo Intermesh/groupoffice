@@ -1,3 +1,6 @@
+- Core: Links can have descriptions again. Entities can be found on link descriptions.
+- Notes: New module to encrypt notes
+
 17-03-2020 6.4.128
 - Billing: fixed error in opening invoice created by a deleted user.
 - E-mail: fixed error when loading message while it was deleted.

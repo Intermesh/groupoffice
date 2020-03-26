@@ -3,16 +3,6 @@ Ext.onReady(function() {
 		onLoad: go.modules.community.notes.NoteDialog.prototype.onLoad.createSequence(function(entityValues) {
 			var me = this;
 			var contentField = this.find('name', 'content')[0];
-			var noteBookId = entityValues.noteBookId
-			if(noteBookId == go.modules.community.notes.lastNoteBookId && !go.modules.community.notes.isUsingOldEncryption(entityValues.content)) {
-				if(go.modules.community.notes.lastDecryptedValue != "") {
-					contentField.setValue(go.modules.community.notes.lastDecryptedValue);
-					this.checkEncrypt.setValue(true);
-					this.passwordField.setValue(go.modules.community.notes.password);
-					this.confirmPasswordField.setValue(go.modules.community.notes.password);
-				}
-			}
-
 			var content = contentField.getRawValue();
 
 			if(go.modules.community.notes.isEncrypted(content)) {
@@ -20,21 +10,37 @@ Ext.onReady(function() {
 				content = go.modules.community.notes.stripTag(content);
 				if(!go.modules.community.notes.isUsingOldEncryption(content)) {
 
-					var dlg = new GO.dialog.PasswordDialog({
-						title: t("Enter password to decrypt"),
-						scope: this,
-						handler: function (dlg, btn, password) {
-							if (btn == "ok") {
-								go.modules.community.notes.aesGcmDecrypt(content, password).then(function (plaintext) {
-									contentField.setValue(plaintext);
-								}).catch(function (error) {
-									Ext.Msg.alert(t("Error", "Password"), t("Wrong password"));
-									me.hide();
-								});
+
+					//check if data was just decrypted in detail view
+					if(go.modules.community.notes.decrypted[entityValues.id]) {
+						contentField.setValue(go.modules.community.notes.decrypted[entityValues.id].content);
+
+						me.checkEncrypt.setValue(true);
+						me.passwordField.setValue(go.modules.community.notes.decrypted[entityValues.id].password);
+						me.confirmPasswordField.setValue(go.modules.community.notes.decrypted[entityValues.id].password);
+					} else {
+
+						var dlg = new GO.dialog.PasswordDialog({
+							title: t("Enter password to decrypt"),
+							scope: this,
+							handler: function (dlg, btn, password) {
+								if (btn == "ok") {
+									go.modules.community.notes.aesGcmDecrypt(content, password).then(function (plaintext) {
+										contentField.setValue(plaintext);
+
+										me.checkEncrypt.setValue(true);
+										me.passwordField.setValue(password);
+										me.confirmPasswordField.setValue(password);
+
+									}).catch(function (error) {
+										Ext.Msg.alert(t("Error", "Password"), t("Wrong password"));
+										me.hide();
+									});
+								}
 							}
-						}
-					});
-					dlg.show();
+						});
+						dlg.show();
+					}
 				}
 			}
 		}),
@@ -81,8 +87,6 @@ Ext.onReady(function() {
 			));
 			this.findByType("fieldset")[0].items.insert(3,this.passwordField);
 			this.findByType("fieldset")[0].items.insert(4,this.confirmPasswordField);
-			var passfield = this.passwordField;
-
 		}),
 
 		submit: function() {
@@ -97,9 +101,17 @@ Ext.onReady(function() {
 				if(passfield != passconfirm || passfield == "" || passconfirm == "") {
 					Ext.Msg.alert(t("Error", "Password"), "Passwords do not match");
 				} else {
-					go.modules.community.notes.aesGcmEncrypt(contentField.getRawValue(), this.passwordField.getValue()).then(function(text){
+					var plaintext = contentField.getRawValue(), password = this.passwordField.getValue();
+
+					go.modules.community.notes.aesGcmEncrypt(plaintext, password).then(function(text){
 
 						this.formPanel.values.content = "{ENCRYPTED}" + text;
+						if(!go.modules.community.notes.decrypted || !go.modules.community.notes.decrypted[this.currentId]) {
+							go.modules.community.notes.decrypted = {};
+						}
+						go.modules.community.notes.decrypted[this.currentId].content = plaintext;
+						go.modules.community.notes.decrypted[this.currentId].password = password;
+
 						go.modules.community.notes.NoteDialog.superclass.submit.call(this);
 					}.bind(this));
 				}
