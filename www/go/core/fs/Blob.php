@@ -195,7 +195,7 @@ class Blob extends orm\Entity {
 			$blob = new self();
 			$blob->id = $hash;
 			$blob->size = $file->getSize();
-			//$blob->staleAt = new DateTime("+1 hour");
+			$blob->staleAt = new DateTime("+1 hour");
 		}
 		$blob->name = $file->getName();
 		$blob->tmpFile = $file->getPath();
