@@ -117,3 +117,15 @@ $updates['202003261139'][] = "ALTER TABLE `notes_note_image`
 $updates['202003261139'][] = "ALTER TABLE `notes_note_image`
   ADD CONSTRAINT `notes_note_image_ibfk_1` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`),
   ADD CONSTRAINT `notes_note_image_ibfk_2` FOREIGN KEY (`noteId`) REFERENCES `notes_note` (`id`) ON DELETE CASCADE;";
+
+$updates['202003261139'][] = function() {
+	$notes = \go\modules\community\notes\model\Note::find()->where('content', 'LIKE', '%<img%');
+	foreach($notes as $note) {
+		try {
+			$note->save();
+		}
+		catch(\Exception $e) {
+			echo "Error saving note: " . $e->getMessage() ."\n";
+		}
+	}
+};
