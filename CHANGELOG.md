@@ -4,6 +4,7 @@
 - Email: Empty folder will also remove subfolders.
 - Address book: Sort on firstname too when sorting on last name
 - Address book: Added first name and last name columns
+- Custom fields: Export user, group and contact custom fields to text
 
 17-03-2020 6.4.128
 - Billing: fixed error in opening invoice created by a deleted user.
