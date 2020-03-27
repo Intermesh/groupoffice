@@ -239,6 +239,18 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function (emailAddresses, meta, record) {
 						return emailAddresses.column("email").join(", ");
 					}
+				},{
+					id: 'firstName',
+					header: t('First name'),
+					sortable: true,
+					dataIndex: "firstName",
+					hidden: true
+				},{
+					id: 'lastName',
+					header: t('Last name'),
+					sortable: true,
+					dataIndex: "lastName",
+					hidden: true
 				}
 			],
 			viewConfig: {

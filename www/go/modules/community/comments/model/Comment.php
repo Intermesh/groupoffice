@@ -65,7 +65,7 @@ class Comment extends Entity {
 	/**
 	 * Set the entity type
 	 *
-	 * @param string|Entity|EntityType $entity "note" or entitytype instance
+	 * @param mixed $entity "note", Entity $note or Entitytype instance
 	 * @throws \Exception
 	 */
 	public function setEntity($entity) {
