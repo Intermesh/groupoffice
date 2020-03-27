@@ -251,7 +251,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: "lastName",
 					hidden: true
-				},
+				}
 			],
 			viewConfig: {
 				totalDisplay: true,
