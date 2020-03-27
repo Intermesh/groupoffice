@@ -114,7 +114,6 @@ abstract class Property extends Model {
 	 * @param boolean $isNew Indicates if this model is saved to the database.
 	 * @param string[] $fetchProperties The properties that were fetched by find. If empty then all properties are fetched
 	 * @param bool $readOnly Entities can be fetched readonly to improve performance
-	 * @throws ReflectionException
 	 * @throws Exception
 	 */
 	public function __construct($isNew = true, $fetchProperties = [], $readOnly = false) {
@@ -290,7 +289,7 @@ abstract class Property extends Model {
 
   /**
    * @param $where
-   * @param $relation
+   * @param Relation $relation
    * @return Statement|mixed
    * @throws Exception
    */
@@ -298,7 +297,7 @@ abstract class Property extends Model {
 		$cacheKey = static::class.':'.$relation->name;
 
 		if(!isset(self::$cachedRelations[$cacheKey])) {
-			$key = self::getScalarKey($relation);
+			$key = $relation->getScalarColumn();
 			$query = (new Query)->selectSingleValue($key)->from($relation->tableName);
 			foreach($where as $field => $value) {
 				$query->andWhere($field . '= :'.$field);
@@ -369,12 +368,7 @@ abstract class Property extends Model {
 		}
 		return $where;
 	}
-	private static function getScalarKey(Relation $relation) {
-		$table = Table::getInstance($relation->tableName, go()->getDbConnection());
-		$diff = array_diff($table->getPrimaryKey(), $relation->keys);
 
-		return array_shift($diff);
-	}
 
   /**
    * Build a key of the primary keys but omit the key from the relation because it's not needed as it's a property.
@@ -540,7 +534,7 @@ abstract class Property extends Model {
 		if($prop) {
 			if(!isset($this->dynamicProperties[$name])) {
 				if($prop instanceof Relation && !in_array($name, $this->fetchProperties)) {
-					throw new \Exception("Relation '$name' was not fetched so can't be accessed");
+					throw new Exception("Relation '$name' was not fetched so can't be accessed");
 				}
 				$this->dynamicProperties[$name] = null;
 			}
@@ -602,14 +596,14 @@ abstract class Property extends Model {
 		return true;
 	}
 
-  /**
-   * Get the properties to fetch when using the find() method.
-   * These properties will be preloaded including related properties from other
-   * tables. They will also be returned to the client.
-   *
-   * @return string[]
-   * @throws ReflectionException
-   */
+	/**
+	 * Get the properties to fetch when using the find() method.
+	 * These properties will be preloaded including related properties from other
+	 * tables. They will also be returned to the client.
+	 *
+	 * @return string[]
+	 * @throws Exception
+	 */
 	protected static function getDefaultFetchProperties() {
 		
 		$cacheKey = 'property-getDefaultFetchProperties-' . static::class;
@@ -671,20 +665,21 @@ abstract class Property extends Model {
 	}
 
 	/**
-	 * Find by ID's. 
-	 * 
+	 * Find by ID's.
+	 *
 	 * It will search on the primary key field of the first mapped table.
-	 * 
+	 *
 	 * @exanple
 	 * ```
 	 * $note = Note::findById(1);
-	 * 
+	 *
 	 * //If a key has more than one column they can be combined with a "-". eg. "1-2"
 	 * $models = ModelWithDoublePK::findById("1-1");
 	 * ```
-	 * 
-	 * @param string $id 
+	 *
+	 * @param string $id
 	 * @param string[] $properties
+	 * @param bool $readOnly
 	 * @return static
 	 * @throws Exception
 	 */
@@ -703,41 +698,41 @@ abstract class Property extends Model {
 		return $query->single();
 	}
 
-  /**
-   * Get all property names
-   *
-   * @return array|mixed
-   * @throws ReflectionException
-   * @throws Exception
-   */
-	private static function getPropNames() {
-		$cls = static::class;
-		$cacheKey = $cls . '-getPropNames';
-
-		$propNames = go()->getCache()->get($cacheKey);
-
-		if (!$propNames) {
-			$reflectionClass = new ReflectionClass($cls);
-			$props = $reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
-			$propNames = [];
-			foreach ($props as $prop) {
-				if(!$prop->isStatic()) {
-					$propNames[] = $prop->getName();
-				}
-			}
-			
-			//add dynamic relations		
-			foreach(static::getMapping()->getProperties() as $name => $type) {
-				if(!in_array($name, $propNames)) {
-					$propNames[] = $name;
-				}
-			}
-
-			go()->getCache()->set($cacheKey, $propNames);
-		}
-
-		return $propNames;
-	}
+//  /**
+//   * Get all property names
+//   *
+//   * @return array|mixed
+//   * @throws ReflectionException
+//   * @throws Exception
+//   */
+//	private static function getPropNames() {
+//		$cls = static::class;
+//		$cacheKey = $cls . '-getPropNames';
+//
+//		$propNames = go()->getCache()->get($cacheKey);
+//
+//		if (!$propNames) {
+//			$reflectionClass = new ReflectionClass($cls);
+//			$props = $reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
+//			$propNames = [];
+//			foreach ($props as $prop) {
+//				if(!$prop->isStatic()) {
+//					$propNames[] = $prop->getName();
+//				}
+//			}
+//
+//			//add dynamic relations
+//			foreach(static::getMapping()->getProperties() as $name => $type) {
+//				if(!in_array($name, $propNames)) {
+//					$propNames[] = $name;
+//				}
+//			}
+//
+//			go()->getCache()->set($cacheKey, $propNames);
+//		}
+//
+//		return $propNames;
+//	}
 
   /**
    *
@@ -772,13 +767,14 @@ abstract class Property extends Model {
 		return $required;
 	}
 
-  /**
-   * Evaluates the given fetchProperties and configures the query object to fetch them.
-   *
-   * @param Query $query
-   * @param array $fetchProperties
-   * @throws Exception
-   */
+	/**
+	 * Evaluates the given fetchProperties and configures the query object to fetch them.
+	 *
+	 * @param Query $query
+	 * @param array $fetchProperties
+	 * @param $readOnly
+	 * @throws Exception
+	 */
 	private static function buildSelect(Query $query, array $fetchProperties, $readOnly) {
 
 		$select = [];
@@ -841,10 +837,10 @@ abstract class Property extends Model {
    * @throws Exception
    */
 	private static function joinTable($lastAlias, MappedTable $joinedTable, Query $query) {
+
+		$on = "";
 		foreach ($joinedTable->getKeys() as $from => $to) {
-			if (!isset($on)) {
-				$on = "";
-			} else {
+			if (!empty($on)) {
 				$on .= " AND ";
 			}
 			
@@ -1020,12 +1016,12 @@ abstract class Property extends Model {
 		if(!$this->saveTables()) {
 			return false;
 		}
-		
-		$this->checkBlobs();
 
 		if (!$this->saveRelatedProperties()) {
 			return false;
 		}
+
+		$this->checkBlobs();
 
 		return true;
 	}
@@ -1069,10 +1065,18 @@ abstract class Property extends Model {
   /**
    * Get all columns containing blob id's
    *
-   * @return Column[]
+   * @return string[]
    * @throws Exception
    */
 	private static function getBlobColumns() {
+
+		$cacheKey = 'property-getBlobColumns-' . static::class;
+
+		$cols = go()->getCache()->get($cacheKey);
+
+		if($cols) {
+			return $cols;
+		}
 		
 		$refs = Blob::getReferences();
 		$cols = [];
@@ -1080,11 +1084,27 @@ abstract class Property extends Model {
 			foreach($table->getMappedColumns() as $col) {
 				foreach($refs as $r) {
 					if($r['table'] == $table->getName() && $r['column'] == $col->name) {
-						$cols[] = $col;
+						$cols[] = $col->name;
 					}
 				}
 			}
 		}
+
+		//check scalar blobs
+		foreach(static::getMapping()->getRelations() as $rel) {
+			if($rel->type != Relation::TYPE_SCALAR) {
+				continue;
+			}
+
+			foreach($refs as $r) {
+				if ($r['table'] == $rel->tableName && $r['column'] == $rel->getScalarColumn()) {
+					$cols[] = $rel->name;
+					continue;
+				}
+			}
+		}
+
+		go()->getCache()->set($cacheKey, $cols);
 		
 		return $cols;
 	}
@@ -1093,22 +1113,34 @@ abstract class Property extends Model {
    * @throws Exception
    */
 	private function checkBlobs() {
-		$blobs = [];
-		foreach($this->getBlobColumns() as $col) {
-			if($this->isModified([$col->name])) {				
-				$mod = array_values($this->getModified([$col->name]))[0];
+		$blobIds = [];
+		foreach(static::getBlobColumns() as $col) {
+			if($this->isModified([$col])) {
+				$mod = array_values($this->getModified([$col]))[0];
 				
 				if(isset($mod[0])) {
-					$blobs[] = $mod[0];
+					$v = $mod[0];
+
+					if (is_array($v)) {
+						$blobIds = array_merge($blobIds, $v);
+					} else {
+						$blobIds[] = $v;
+					}
 				}
 				
 				if(isset($mod[1])) {
-					$blobs[] = $mod[1];
+					$v = $mod[1];
+
+					if(is_array($v)) {
+						$blobIds = array_merge($blobIds, $v);
+					} else {
+						$blobIds[] = $v;
+					}
 				}
 			}
 		}
 		
-		foreach($blobs as $id) {
+		foreach($blobIds as $id) {
 			Blob::findById($id)->setStaleIfUnused();
 		}
 	}
@@ -1348,7 +1380,7 @@ abstract class Property extends Model {
 	
 		$where = $this->buildRelationWhere($relation);
 
-		$key = $this->getScalarKey($relation);
+		$key = $relation->getScalarColumn();
 		$old = $modified[$relation->name][1] ?? [];
 		$new = $modified[$relation->name][0] ?? [];
 		$removeIds = array_diff($old, $new);
@@ -1725,15 +1757,21 @@ abstract class Property extends Model {
 			return [];
 		}
 
-		$blobCols = array_map(function($col) {return $col->name;}, $blobCols);
-
 		$entities = static::internalFind($blobCols)->mergeWith($query);
 
 		$blobIds = [];
 		foreach($entities as $entity) {
 			foreach($blobCols as $c) {
 				if(isset($entity->$c) && !in_array($entity->$c, $blobIds)) {
-					$blobIds[] = $entity->$c;
+
+					$v = $entity->$c;
+
+					if(is_array($v)) {
+						$blobIds = array_merge($blobIds, $v);
+					} else {
+						$blobIds[] = $entity->$c;
+					}
+
 				}
 			}
 		}
@@ -1782,7 +1820,7 @@ abstract class Property extends Model {
 		switch ($column->dbType) {
 			case 'date':
 			case 'datetime':
-				if(!($value instanceof \DateTime) || ($value instanceof \DateTimeImmutable)){
+				if(!($value instanceof \DateTime) || ($value instanceof DateTimeImmutable)){
 					$this->setValidationError($column->name, ErrorCode::MALFORMED, "No date object given for date column");
 				}
 				break;
@@ -1801,7 +1839,7 @@ abstract class Property extends Model {
 
 				if(!in_array(strtolower($value), $enumValues)) {
 					$this->setValidationError($column->name, ErrorCode::MALFORMED, "Invalid value for " . $column->dataType);
-					return;
+					return false;
 				}
 				break;
 				

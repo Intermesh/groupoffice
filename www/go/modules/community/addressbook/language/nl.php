@@ -117,4 +117,6 @@ return array (
   'Longitude' => 'Breedtegraard',
   'Look for duplicates' => 'Ontdubbelen',
   'Failed to add contacts to the group' => 'Fout bij het toevoegen van contacten aan de groep',
+  'Information' => 'Informatie',
+  'Name bank' => 'Naam bank',
 );

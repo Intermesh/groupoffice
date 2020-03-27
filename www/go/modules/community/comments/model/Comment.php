@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\comments\model;
 
+use go\core\fs\Blob;
 use go\core\model\Acl;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
@@ -43,21 +44,29 @@ class Comment extends Entity {
 	 */
 	public $section;
 
+	/**
+	 *
+	 * @var string[]
+	 */
+	protected $images = [];
+
 	protected static function defineMapping() {
 		return parent::defineMapping()
 			->addTable("comments_comment", 'c')
 			->addScalar('labels', 'comments_comment_label', ['id' => 'commentId'])
+			->addScalar('images', 'comments_comment_image', ['id' => 'commentId'])
 			->setQuery(
 				(new Query())
 					->select("e.clientName AS entity")
 					->join('core_entity', 'e', 'e.id = c.entityTypeId')
 		);
 	}
-	
+
 	/**
 	 * Set the entity type
-	 * 
-	 * @param string|EntityType|Entity $entity "note" or entitytype instance
+	 *
+	 * @param mixed $entity "note", Entity $note or Entitytype instance
+	 * @throws \Exception
 	 */
 	public function setEntity($entity) {
 
@@ -156,5 +165,12 @@ class Comment extends Entity {
 			$this->setValidationError('text', ErrorCode::INVALID_INPUT, "You're not allowed to use scripts in the content");
 		}
 		return parent::internalValidate();
+	}
+
+
+	protected function internalSave()
+	{
+		$this->images = Blob::parseFromHtml($this->text);
+		return parent::internalSave();
 	}
 }

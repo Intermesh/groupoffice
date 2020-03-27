@@ -1,3 +1,17 @@
+- Core: Links can have descriptions again. Entities can be found on link descriptions.
+- Notes: New module to encrypt notes
+- Email: Delete folder directly when folders can't be moved into trash
+- Email: Empty folder will also remove subfolders.
+- Address book: Sort on firstname too when sorting on last name
+- Address book: Added first name and last name columns
+- Custom fields: Export user, group and contact custom fields to text
+
+17-03-2020 6.4.128
+- Billing: fixed error in opening invoice created by a deleted user.
+- E-mail: fixed error when loading message while it was deleted.
+- Core: missing use statement in GO.php
+
+17-03-2020 6.4.127
 - Core: Catch notification errors to fix error on Android phones.
 
 09-03-2020 6.4.126

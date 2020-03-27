@@ -156,7 +156,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			
 			var labelText ='', mineCls = r.get("createdBy") == go.User.id ? 'mine' : '';
 			var readMore = new go.detail.ReadMore({
-				cls: mineCls
+				cls: 'go-html-formatted ' + mineCls
 			});
 			var creator = r.get("creator");
 			if(!creator) {

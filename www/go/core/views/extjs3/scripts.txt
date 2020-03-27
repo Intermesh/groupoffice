@@ -82,6 +82,7 @@ links/CreateLinkButton.js
 links/EntityGrid.js
 links/LinkGrid.js
 links/CreateLinkWindow.js
+links/EditLinkDialog.js
 links/LinkBrowser.js
 links/LinksDetailPanel.js
 links/FilterLinkEntityCombo.js

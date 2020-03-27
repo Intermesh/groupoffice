@@ -18,6 +18,7 @@
 
 use go\core\cache\Apcu;
 use go\core\jmap\State;
+use go\core\ErrorHandler;
 
 /**
  * The main Group-Office application class. This class only contains static

@@ -1657,6 +1657,10 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 			var dropRecord = data.grid.store.data.items[dragData.rowIndex];
 
+			if(!dropRecord) {
+				return false;
+			}
+
 			if(dropRecord.data.extension=='folder')
 			{
 				for(var i=0;i<data.selections.length;i++)
@@ -1683,6 +1687,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 	paste : function(pasteMode, destination, records)
 	{
+		// debugger;
 		var paste_sources = Array();
 		//var folderSelected = false;
 		for(var i=0;i<records.length;i++)
@@ -1858,12 +1863,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 								}
 							}
 
-							var destinationNode = this.treePanel.getNodeById(pasteDestination);
-							if(destinationNode)
-							{
-								delete destinationNode.attributes.children;
-								destinationNode.reload();
-							}
+
 
 							if(pasteSources && params.paste_mode=="cut")
 							{
@@ -1871,10 +1871,20 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 								for(var i=0;i<pasteSources.length;i++)
 								{
 									var arr = pasteSources[i].split(':');
+									if(arr[0] != 'd') {
+										continue;
+									}
 									var node = this.treePanel.getNodeById(arr[1]);
 									if(node)
 										node.remove();
 								}
+							}
+
+							var destinationNode = this.treePanel.getNodeById(pasteDestination);
+							if(destinationNode)
+							{
+								delete destinationNode.attributes.children;
+								destinationNode.reload();
 							}
 
 							if(this.overwriteDialog)

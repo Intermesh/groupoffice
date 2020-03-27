@@ -36,25 +36,30 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 	},
 
 	decrypt: function () {
-
 		if (!this.data.content || this.data.content.substring(0, 8) !== "{GOCRYPT") {
 			return;
 		}
 
 		var data = this.data.content, me = this;
 		this.data.content = t("Encrypted data");
-		go.modules.community.notes.Decrypter.decrypt(data).then(function(text) {
+		go.modules.community.notes.Decrypter.decrypt(data).then(function(data) {
+			var text = data[0];
+			var password = data[1];
 			me.data.content = text;
-			me.items.item(0).onLoad(me);
+			var item = me.items.item(0);
+			item.update(me.data);
+			go.modules.community.notes.password = password;
+			go.modules.community.notes.lastDecryptedValue = text;
+			go.modules.community.notes.lastNoteBookId = me.data.noteBookId;
+			item.onLoad(this);
+
 		}).catch(function(){});
 
 
 	},
 
 	onLoad: function () {
-
 		this.decrypt();
-
 		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < go.permissionLevels.write);
 		this.deleteItem.setDisabled(this.data.permissionLevel < go.permissionLevels.writeAndDelete);
 
