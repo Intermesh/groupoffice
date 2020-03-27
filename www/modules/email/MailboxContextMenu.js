@@ -219,7 +219,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 					} else if(node.attributes.mailbox.indexOf("Trash/") === 0 ) { // .startsWith does not work with IE. Fools.
 						alreadyTrashed = true;
 					}
-					
+
 					GO.deleteItems({
 						maskEl: GO.mainLayout.getModulePanel("email").getEl(),
 						url: GO.url("email/folder/delete"),
