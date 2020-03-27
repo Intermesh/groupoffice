@@ -207,14 +207,17 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 			handler: function(){
 				var sm = this.treePanel.getSelectionModel();
 				var node = sm.getSelectedNode();
+				var protected_mbs = ["INBOX", "Trash", "Sent"];
 				if(!node|| node.attributes.folder_id<1) {
 					Ext.MessageBox.alert(t("Error"), t("Select a folder to delete please", "email"));
-				} else if(node.attributes.mailbox==='INBOX') {
-					Ext.MessageBox.alert(t("Error"), t("You can't delete the INBOX folder", "email"));
+				} else if(protected_mbs.indexOf(node.attributes.mailbox) > -1) {
+					Ext.MessageBox.alert(t("Error"), t("You can't delete the trash, sent items or drafts folder", "email"));
 				} else {
-					var trashNode = this.treePanel.findMailboxByName(node, 'Trash'), trashable = true;
+					var trashNode = this.treePanel.findMailboxByName(node, 'Trash'), trashable = true, alreadyTrashed = false;
 					if(trashNode && trashNode.attributes.noinferiors === true) {
 						trashable = false;
+					} else if(node.attributes.mailbox.indexOf("Trash/") === 0 ) { // .startsWith does not work with IE. Fools.
+						alreadyTrashed = true;
 					}
 
 					GO.deleteItems({
@@ -225,7 +228,7 @@ GO.email.MailboxContextMenu = Ext.extend(Ext.menu.Menu,{
 							mailbox: node.attributes.mailbox,
 							trashable: (trashable ? 1 : 0)
 						},
-						noConfirmation: trashable,
+						noConfirmation: (trashable && !alreadyTrashed),
 						callback: function(responseParams)
 						{
 							
