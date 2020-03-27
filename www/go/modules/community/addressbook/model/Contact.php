@@ -606,7 +606,8 @@ class Contact extends AclItemEntity {
 		if(isset($sort['lastName'])) {
 			$dir = $sort['lastName'] == 'ASC' ? 'ASC' : 'DESC';
 			$sort[] = new Expression("IF(c.isOrganization, c.name, c.lastName) " . $dir);
-			unset($sort['lastName']);
+			unset($sort['lastName'], $sort['lastName']);
+			$sort['firstName'] = $dir;
 		}
 		
 		return parent::sort($query, $sort);

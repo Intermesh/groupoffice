@@ -1,5 +1,7 @@
 - Core: Links can have descriptions again. Entities can be found on link descriptions.
 - Notes: New module to encrypt notes
+- Email: Delete folder directly when folders can't be moved into trash
+- Email: Empty folder will also remove subfolders.
 
 17-03-2020 6.4.128
 - Billing: fixed error in opening invoice created by a deleted user.
