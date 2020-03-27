@@ -581,13 +581,13 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					template: new Ext.XTemplate('<span><button></button></span>')
 				});
 
-
-
-
-
 				var userBtn = Ext.get('user-menu');
 				var userMenuTpl = userBtn.dom.innerHTML;
 				this.userMenuLink = new Ext.Button({
+					text: userMenuTpl,
+					renderTo: userBtn,
+					clickEvent: 'mousedown',
+					template: new Ext.XTemplate('<div style="border-radius:50%"><button></button></div>'),
 					menu: new Ext.menu.Menu({
 						items: [
 							{
@@ -651,11 +651,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						scope: this
 					}
 				]
-			}),
-			text: userMenuTpl,
-			renderTo: userBtn,
-			clickEvent: 'mousedown',
-			template: new Ext.XTemplate('<span><button></button></span>')
+			})
 		});
 
 
