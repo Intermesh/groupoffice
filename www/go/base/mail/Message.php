@@ -573,8 +573,11 @@ class Message extends \Swift_Message{
 							continue; // Continue to the next inline attachment for processing.
 							//throw new Exception("No temp file for inline attachment ".$ia->name);
 						}
-
-						$path = empty($ia->from_file_storage) ? Blob::buildPath($ia->tmp_file) : \GO::config()->file_storage_path.$ia->tmp_file;
+						if(substr($ia->tmp_file,0,15) == 'saved_messages/') {
+							$path = \GO::config()->tmpdir.$ia->tmp_file;
+						} else {
+							$path = empty($ia->from_file_storage) ? Blob::buildPath($ia->tmp_file) : \GO::config()->file_storage_path . $ia->tmp_file;
+						}
 						$tmpFile = new \GO\Base\Fs\File($path);
 
 						if (!$tmpFile->exists()) {
