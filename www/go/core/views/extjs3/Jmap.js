@@ -133,7 +133,7 @@ go.Jmap = {
 			success: function(response) {
 				if(cfg.success && response.responseText) {
 					data = Ext.decode(response.responseText);
-					notifyEl.setTitle('Upload complete');
+					notifyEl.setTitle(t('Upload complete'));
 					setTimeout(function () {
 						go.Notifier.remove(notifyEl);
 					}, 2000);
@@ -155,7 +155,7 @@ go.Jmap = {
 					var seconds_remaining = seconds_elapsed ? remaining_bytes / bytes_per_second : '';
 					var percentage = (e.loaded / e.total * 100 | 0);
 					if(notifyEl) {
-						notifyEl.setTitle(t('Uploading')+'... &bull; ' + percentage + '%');
+						notifyEl.setTitle(t('Uploading...')+' &bull; ' + percentage + '%');
 						var box = notifyEl.items.items[0].getResizeEl();
 						if(box)
 							box.child('span', true).innerText = Math.round(seconds_remaining)+t('s');
@@ -166,12 +166,12 @@ go.Jmap = {
 			},
 			failure: function(response, options) {
 				var data = response,
-					text = response.isAbort ? 'Upload aborted' : 'Upload failed';
+					text = response.isAbort ? t('Upload aborted') : t('Upload failed');
 
 				if(cfg.failure && response.responseText) {
 					data = Ext.decode(response.responseText);
 				} else if(response.status === 413) { // "Request Entity Too Large"
-					text += ': file too large';
+					text += ': '+t('File too large');
 				} else if(!response.isAbort) {
 					text += ': Please check if the system is using the correct URL at System settings -> General -> URL.';
 				}
@@ -194,7 +194,7 @@ go.Jmap = {
 				{xtype:'box',html:'<b>'+file.name+'</b><span>...</span>'},
 				{xtype:'progress',height:4,style:'margin: 7px 0'}
 			],
-			title: t('Uploading')+'...',
+			title: t('Uploading...'),
 			buttons: [{
 				text:t('Abort'),
 				handler: function() {
