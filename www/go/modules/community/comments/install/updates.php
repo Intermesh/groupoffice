@@ -99,3 +99,30 @@ $updates['201906032000'][] = "ALTER TABLE `comments_comment` ADD CONSTRAINT `fk_
 $updates['201907161437'][] = "";// "ALTER TABLE `comments_comment` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;"; Not yet because of unmgrated comments for companies.
 $updates['201907161437'][] = "ALTER TABLE `comments_comment` ADD `section` VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL AFTER `text`;";
 $updates['201907161437'][] = "ALTER TABLE `comments_comment` ADD INDEX(`section`);";
+
+
+$updates['202003261139'][] = "CREATE TABLE `comments_comment_image` (
+`commentId` int(11) NOT NULL,
+  `blobId` binary(40) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
+$updates['202003261139'][] = "ALTER TABLE `comments_comment_image`
+  ADD PRIMARY KEY (`commentId`,`blobId`),
+  ADD KEY `blobId` (`blobId`);";
+
+$updates['202003261139'][] = "ALTER TABLE `comments_comment_image`
+  ADD CONSTRAINT `comments_comment_image_ibfk_1` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`),
+  ADD CONSTRAINT `comments_comment_image_ibfk_2` FOREIGN KEY (`commentId`) REFERENCES `comments_comment` (`id`) ON DELETE CASCADE;";
+
+$updates['202003261139'][] = function() {
+	$notes = \go\modules\community\comments\model\Comment::find()->where('text', 'LIKE', '%<img%');
+	foreach($notes as $note) {
+		try {
+			$note->save();
+		}
+		catch(\Exception $e) {
+			echo "Error saving comment: " . $e->getMessage() ."\n";
+		}
+	}
+};

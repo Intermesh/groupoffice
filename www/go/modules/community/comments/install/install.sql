@@ -70,3 +70,19 @@ ALTER TABLE `comments_comment_label`
 
 ALTER TABLE `comments_comment` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 ALTER TABLE `comments_comment` ADD INDEX(`section`);
+
+
+
+CREATE TABLE `comments_comment_image` (
+  `commentId` int(11) NOT NULL,
+  `blobId` binary(40) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE `comments_comment_image`
+  ADD PRIMARY KEY (`commentId`,`blobId`),
+  ADD KEY `blobId` (`blobId`);
+
+ALTER TABLE `comments_comment_image`
+  ADD CONSTRAINT `comments_comment_image_ibfk_1` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`),
+  ADD CONSTRAINT `comments_comment_image_ibfk_2` FOREIGN KEY (`commentId`) REFERENCES `comments_comment` (`id`) ON DELETE CASCADE;

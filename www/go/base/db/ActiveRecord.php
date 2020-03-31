@@ -42,6 +42,7 @@ namespace GO\Base\Db;
 
 use GO\Base\Db\PDO;
 use GO;
+use go\core\db\Query;
 use go\core\util\DateTime;
 
 abstract class ActiveRecord extends \GO\Base\Model{
@@ -3759,6 +3760,21 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			foreach($this->getCustomFields() as $col => $v) {
 				if(!empty($v) && is_string($v)) {
 					$keywords[] = $v;
+				}
+			}
+		}
+
+		if($this->hasLinks()) {
+
+			$links = (new Query())
+				->select('description')
+				->from('core_link')
+				->where('(toEntityTypeId = :e1 AND toId = :e2)')
+				->orWhere('(fromEntityTypeId = :e3 AND fromId = :e4)')
+				->bind([':e1' => static::entityType()->getId(), ':e2' => $this->id, ':e3' => static::entityType()->getId(), ':e4' => $this->id]);
+			foreach ($links->all() as $link) {
+				if (!empty($link['description']) && is_string($link['description'])) {
+					$keywords[] = $link['description'];
 				}
 			}
 		}

@@ -53,11 +53,24 @@ go.modules.community.notes.NoteDialog = Ext.extend(go.form.Dialog, {
 			return;
 		}
 
-		var data = entityValues.content, me = this;
-		me.setValues({"content": t("Encrypted data")});
-		go.modules.community.notes.Decrypter.decrypt(data).then(function(text) {
-			me.setValues({"content": text});
-		}).catch(function(){});
+		var contentField = this.find('name', 'content')[0];
+		var noteBookId = entityValues.noteBookId
+		if(noteBookId == go.modules.community.notes.lastNoteBookId && go.modules.community.notes.isUsingOldEncryption(entityValues.content)) {
+			if(go.modules.community.notes.lastDecryptedValue != "") {
+				contentField.setValue(go.modules.community.notes.lastDecryptedValue);
+				this.checkEncrypt.setValue(true);
+				this.passwordField.setValue(go.modules.community.notes.password);
+				this.confirmPasswordField.setValue(go.modules.community.notes.password);
+			} else {
+				var data = entityValues.content, me = this;
+				me.setValues({"content": t("Encrypted data")});
+				go.modules.community.notes.Decrypter.decrypt(data).then(function(text) {
+					me.setValues({"content": text});
+				}).catch(function(){});
+			}
+		}
+
+
 
 	}
 });

@@ -92,3 +92,7 @@ $updates['201912231421'][] = 'ALTER TABLE `addressbook_contact` ADD `color` CHAR
 
 $updates['202001091545'][] = 'update addressbook_contact set uri = null where uri = ".vcf" and uid is null;';
 $updates['202001091545'][] = 'update addressbook_contact set uri = concat(uid, ".vcf") where uri = \'.vcf\' and uid is not null';
+
+
+$updates['202003191040'][] = 'ALTER TABLE addressbook_contact ADD nameBank varchar(50);';
+$updates['202003191040'][] = 'ALTER TABLE addressbook_contact ADD BIC varchar(11);';

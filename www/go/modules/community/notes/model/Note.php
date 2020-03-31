@@ -3,6 +3,8 @@ namespace go\modules\community\notes\model;
 
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
+use go\core\fs\Blob;
+use go\core\model\EmailTemplateAttachment;
 use go\core\orm\Query;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\LoggingTrait;
@@ -45,10 +47,17 @@ class Note extends AclItemEntity {
 	use SearchableTrait;
 	
 	use LoggingTrait;
+
+	/**
+	 *
+	 * @var string[]
+	 */
+	protected $images = [];
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable("notes_note", "n");
+						->addTable("notes_note", "n")
+						->addScalar('images', 'notes_note_image', ['id' => 'noteId']);
 	}
 
 	protected static function aclEntityClass() {
@@ -103,5 +112,13 @@ class Note extends AclItemEntity {
 		}
 		return parent::internalValidate();
 	}
+
+
+	protected function internalSave()
+	{
+		$this->images = Blob::parseFromHtml($this->content);
+		return parent::internalSave();
+	}
+
 
 }

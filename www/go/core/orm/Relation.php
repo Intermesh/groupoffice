@@ -102,5 +102,17 @@ class Relation {
 		return $this;
 	}
 
+	/**
+	 * Get the column of the table to select for the scalar relation
+	 *
+	 * @return string
+	 */
+	public function getScalarColumn() {
+		$table = Table::getInstance($this->tableName, go()->getDbConnection());
+		$diff = array_diff($table->getPrimaryKey(), $this->keys);
+
+		return array_shift($diff);
+	}
+
 
 }

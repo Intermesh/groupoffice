@@ -195,7 +195,7 @@ class Blob extends orm\Entity {
 			$blob = new self();
 			$blob->id = $hash;
 			$blob->size = $file->getSize();
-			//$blob->staleAt = new DateTime("+1 hour");
+			$blob->staleAt = new DateTime("+1 hour");
 		}
 		$blob->name = $file->getName();
 		$blob->tmpFile = $file->getPath();
@@ -365,7 +365,11 @@ class Blob extends orm\Entity {
 	 * @return string[] Array of blob ID's
 	 */
 	public static function parseFromHtml($html) {
-		if(!preg_match_all('/<img [^>]*src="[^>]*\?blob=([^>"]*)"[^>]*>/i', $html, $matches)) {
+//		if(!preg_match_all('/<img [^>]*src="[^>]*\?blob=([^>"]*)"[^>]*>/i', $html, $matches)) {
+//			return [];
+//		}
+
+		if(!preg_match_all('/"http[^>]*\?blob=([^>"]*)"[^>]*>/i', $html, $matches)) {
 			return [];
 		}
 		

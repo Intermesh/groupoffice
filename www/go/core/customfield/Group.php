@@ -5,6 +5,7 @@ namespace go\core\customfield;
 use GO;
 use go\core\db\Criteria;
 use go\core\db\Utils;
+use go\core\model\Acl;
 use go\core\orm\Filters;
 use go\core\orm\Query;
 
@@ -68,5 +69,34 @@ class Group extends Base {
 				$criteria->where($alias . '.name', $comparator, $value);
 			}
 		});
+	}
+
+
+	public function dbToText($value, &$values, $entity) {
+
+		if(empty($value)) {
+			return "";
+		}
+
+		return (new \go\core\db\Query())
+			->selectSingleValue("name")
+			->from('core_group')
+			->where(['id' => $value])
+			->single();
+	}
+
+	public function textToDb($value, &$values, $entity) {
+
+		if(empty($value)) {
+			return null;
+		}
+
+		$id = \go\core\model\Group::find(['id'])
+			->selectSingleValue("g.id")
+			->where(['name' => $value])
+			->filter(['permissionLevel' => Acl::LEVEL_READ])
+			->single();
+
+		return $id;
 	}
 }
