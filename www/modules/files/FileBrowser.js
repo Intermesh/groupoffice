@@ -710,78 +710,10 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 		items:[this.gridPanel, this.thumbsPanel]
 	});
 
-	function isRegularFile(file, cb) {
-		if(file.size > 4096) {
-			cb(file);
-			return;
-		}
-		var reader = new FileReader();
-		reader.onerror = function() {
-			reader.onloadend = reader.onprogress = reader.onerror = null;
-			cb(false); // is a folder
-		};
-		reader.onloadend = reader.onprogress = function(e) {
-			reader.onloadend = reader.onprogress = reader.onerror = null;
-			if (e.type != 'loadend') {
-				reader.abort();
-			}
-			cb(file);
-		};
-		reader.readAsDataURL(file);
-	}
-
-	this.cardPanel.on('afterrender', function(view) {
-		var childCount = 0;
-		this.cardPanel.body.dom.addEventListener('dragenter', function(e) {
-			e.preventDefault();
-			e.stopPropagation();
-			childCount++;
-			this.body.addClass('x-dd-over');
-		}.bind(this.cardPanel));
-
-		this.cardPanel.body.dom.addEventListener('dragleave', function(e) {
-			e.preventDefault();
-			childCount--;
-			if (childCount === 0) {
-				this.body.removeClass('x-dd-over');
-			}
-		}.bind(this.cardPanel));
-
-		this.cardPanel.body.dom.addEventListener('dragover', function(e) {
-			e.preventDefault(); // THIS IS NEEDED
-			e.stopPropagation();
-		});
-
-		this.cardPanel.body.dom.addEventListener('drop', function(e) {
-			e.stopPropagation();
-			e.preventDefault();
-			this.cardPanel.body.removeClass('x-dd-over');
-			var files = e.dataTransfer.files,
-				uploadCount = files.length,
-				blobs = [];
-
-			for (var i = 0; i < files.length; i++) {
-				isRegularFile(files[i], function(file) {
-					if(!file) {
-						uploadCount--;
-						return;
-					}
-					go.Jmap.upload(file, {
-						success: function(response) {
-							blobs.push(response);
-						},
-						callback: function(response) {
-							uploadCount--;
-							if(uploadCount === 0) {
-								this.sendOverwrite({upload:true,blobs:Ext.encode(blobs)});
-							}
-						},
-						scope: this
-					});
-				}.bind(this));
-			}
-		}.bind(this));
-
+	this.cardPanel.on('afterrender', function() {
+		GO.files.DnDFileUpload(function (blobs) {
+			this.sendOverwrite({upload: true, blobs: Ext.encode(blobs)});
+		}, this.cardPanel.body)();
 	},this);
 
 	this.eastPanel = new Ext.Panel({
@@ -1745,8 +1677,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			params.destination_folder_id=this.folder_id;
 
 		this.overwriteParams = params;
-
-		this.getEl().mask(t("Saving..."));
+		this.getEl() && this.getEl().mask(t("Saving..."));
 
 		var url = params.upload ? GO.url('files/folder/processUploadQueue') : GO.url('files/folder/paste');
 
@@ -1755,7 +1686,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			params:this.overwriteParams,
 			callback: function(options, success, response){
 
-				this.getEl().unmask();
+				this.getEl() && this.getEl().unmask();
 
 				var pasteSources = Ext.decode(this.overwriteParams.ids);
 				var pasteDestination = this.overwriteParams.destination_folder_id;
@@ -1889,6 +1820,9 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 
 							if(this.overwriteDialog)
 								this.overwriteDialog.hide();
+							if(params.cb) {
+								params.cb(); // run this callback after files are processed in FileDetailPanel
+							}
 						}
 					}
 				}
