@@ -264,7 +264,7 @@ class Migrate63to64 {
 		$companyEntityType =  (new Query)
 			->select('*')
 			->from('core_entity')
-			->where('name = "Company"')
+			->where('clientName = "Company"')
 			->single();
 		
 		if($companyEntityType) {
@@ -301,7 +301,7 @@ class Migrate63to64 {
 		$companyEntityType =  (new Query)
 						->select('*')
 						->from('core_entity')
-						->where('name = "Company"')
+						->where('clientName = "Company"')
 						->single();
 
 		if(!$companyEntityType) {
@@ -344,9 +344,9 @@ class Migrate63to64 {
 						->execute();
 
 
-		go()->getDbConnection()->exec("update comments_comment n set entityTypeId=(select id from core_entity where name='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = (select id from core_entity where name='Company');");
+		go()->getDbConnection()->exec("update comments_comment n set entityTypeId=(select id from core_entity where clientName='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = (select id from core_entity where clientName='Company');");
 
-		go()->getDbConnection()->delete("core_entity", ['name' => "Company"])->execute();
+		go()->getDbConnection()->delete("core_entity", ['clientName' => "Company"])->execute();
 
 		go()->getDbConnection()->commit();
 		
