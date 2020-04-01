@@ -5,6 +5,7 @@
 - Address book: Sort on firstname too when sorting on last name
 - Address book: Added first name and last name columns
 - Custom fields: Export user, group and contact custom fields to text
+- Billing: Check if telesales and fieldsales agent's still exists
 
 17-03-2020 6.4.128
 - Billing: fixed error in opening invoice created by a deleted user.
