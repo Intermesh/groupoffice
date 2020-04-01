@@ -9,7 +9,7 @@
 - Custom fields: Export user, group and contact custom fields to text
 - Billing: Check if telesales and fieldsales agent's still exists
 - CardDAV, CalDAV: Allow longer DAV uri's changed from 190 to 512 chars
-- Assistant: Will show installation instructions until user dimissess the message instead of protocol detection which failed often.
+- Assistant: Message if not installed can be dismissed.
 
 17-03-2020 6.4.128
 - Billing: fixed error in opening invoice created by a deleted user.
