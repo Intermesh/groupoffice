@@ -96,3 +96,5 @@ $updates['202001091545'][] = 'update addressbook_contact set uri = concat(uid, "
 
 $updates['202003191040'][] = 'ALTER TABLE addressbook_contact ADD nameBank varchar(50);';
 $updates['202003191040'][] = 'ALTER TABLE addressbook_contact ADD BIC varchar(11);';
+
+$updates['202004011205'][] = "ALTER TABLE `addressbook_contact` CHANGE `uid` `uid` VARCHAR(512) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL, CHANGE `uri` `uri` VARCHAR(512) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL;";
