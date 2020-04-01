@@ -1,3 +1,5 @@
+- Core: New upload function with drag and drop support in the file browser and detail view.
+- Core: New notification slide panel
 - Core: Links can have descriptions again. Entities can be found on link descriptions.
 - Notes: New module to encrypt notes
 - Email: Delete folder directly when folders can't be moved into trash
