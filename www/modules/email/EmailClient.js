@@ -304,8 +304,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			 var records = this.messagesGrid.selModel.getSelections();
 			 if(records) {
 					 Ext.each(records, function(record) {
-
-
 						 GO.email.moveToSpam(record.get('uid'), record.get('mailbox'), this.account_id);
 
 					 }, this);
@@ -1851,6 +1849,7 @@ GO.email.showAttendanceWindow=function(event_id){
 
 
 GO.email.moveToSpam = function(mailUid,mailboxName,fromAccountId) {
+	this.messagesGrid.getView().scrollToTopOnLoad=false;
 	Ext.Msg.show({
 		title: t("Move to Spam folder?", "email"),
 		icon: Ext.MessageBox.QUESTION,
@@ -1858,6 +1857,7 @@ GO.email.moveToSpam = function(mailUid,mailboxName,fromAccountId) {
 		buttons: Ext.Msg.YESNO,
 		fn: function(btn) {
 			if (btn=='yes') {
+				var me = this;
 				GO.request({
 					url: 'email/message/moveToSpam',
 					params: {
@@ -1867,6 +1867,10 @@ GO.email.moveToSpam = function(mailUid,mailboxName,fromAccountId) {
 					},
 					success: function() {
 //						GO.email.emailClient.topMessagesGrid.store.load();
+						var records = me.messagesGrid.selModel.getSelections();
+						var lastItem = records.pop();
+						var index = me.messagesGrid.store.indexOfId(lastItem.id);
+						me.messagesGrid.selModel.selectRow(index + 1);
 						GO.email.emailClient.leftMessagesGrid.store.load();
 					},
 					failure: function(response,options,result) {
