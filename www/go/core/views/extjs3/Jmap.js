@@ -123,10 +123,11 @@ go.Jmap = {
 			cfg.callback && cfg.callback.call(cfg.scope || this, {upload:'skipped'});
 			return;
 		}
-		// todo: group file upload in 1 notification
+		// nicetohave: group file upload in 1 notification
 		this.uploadQueue.push(file);
 		go.Notifier.toggleIcon('upload', true);
 
+		var prevNotificationAreaState = null;
 		var started_at = new Date();
 		var transactionId = Ext.Ajax.request({url: go.User.uploadUrl,
 			timeout: 4 * 60 * 60 * 100, //4 hours
@@ -136,6 +137,7 @@ go.Jmap = {
 					notifyEl.setTitle(t('Upload complete'));
 					setTimeout(function () {
 						go.Notifier.remove(notifyEl);
+						go.Notifier.notificationArea[prevNotificationAreaState ? 'collapse' : 'expand']();
 					}, 2000);
 					cfg.success.call(cfg.scope || this,data, file);
 				}
@@ -144,6 +146,7 @@ go.Jmap = {
 				go.Jmap.uploadQueue.remove(file);
 				if(Ext.isEmpty(this.uploadQueue)) {
 					go.Notifier.toggleIcon('upload', false); //done
+
 				}
 				cfg.callback && cfg.callback.call(cfg.scope || this, response);
 			},
@@ -186,6 +189,7 @@ go.Jmap = {
 			},
 			xmlData: file // just "data" wasn't available in ext
 		});
+		var prevNotificationAreaState = go.Notifier.notificationArea.collapsed;
 		go.Notifier.notificationArea.expand();
 		var notifyEl = go.Notifier.msg({
 			persistent: true,

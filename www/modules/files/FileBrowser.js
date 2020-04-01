@@ -713,7 +713,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	this.cardPanel.on('afterrender', function() {
 		GO.files.DnDFileUpload(function (blobs) {
 			this.sendOverwrite({upload: true, blobs: Ext.encode(blobs)});
-		}, this.cardPanel.body)();
+		}.bind(this), this.cardPanel.body)();
 	},this);
 
 	this.eastPanel = new Ext.Panel({
