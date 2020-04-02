@@ -11,6 +11,7 @@
 - CardDAV, CalDAV: Allow longer DAV uri's changed from 190 to 512 chars
 - Assistant: Message if not installed can be dismissed.
 - Tickets: fixed TypeError: undefined is not an object (evaluating 'this.disableTemplateCategoriesPanel.setModel')
+- Tickets: Invoicing failed on companies without country set.Set book earlier so it can be used for invoice country.
 
 17-03-2020 6.4.128
 - Billing: fixed error in opening invoice created by a deleted user.
