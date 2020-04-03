@@ -48,6 +48,11 @@ var store = new GO.data.JsonStore({
 
 GO.data.JsonStore = function(config) {
 
+	if((config.url || config.api) && !config.proxy){
+		config.proxy = new GO.data.PrefetchProxy({url: config.url, api: config.api, fields: config.fields ? config.field : config.reader.meta.fields});
+	}
+
+
 	Ext.applyIf(config,{
 		root: 'results',	
 		id: 'id',

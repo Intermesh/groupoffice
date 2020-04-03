@@ -35,7 +35,7 @@ views/Extjs3/javascript/buttons/QuickEditButton.js
 views/Extjs3/javascript/WeekPicker.js
 
 go/core/views/extjs3/TimeZones.js
-
+views/Extjs3/javascript/data/PrefetchProxy.js
 
 views/Extjs3/javascript/data/JsonStore.js
 views/Extjs3/javascript/data/GroupingStore.js

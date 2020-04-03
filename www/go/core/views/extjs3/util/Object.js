@@ -43,6 +43,9 @@
                 }
                 obj[part] = value;
             }
+            if(Ext.isDefined(value)) {
+                obj[part] = value;
+            }
             obj = obj[part];
         }
 
@@ -76,7 +79,7 @@
             var ret;
 
             parts.forEach(function(part) {
-                ret = obj = traverse(obj, part, {});
+                ret = obj = traverse(obj, part);
             });
 
             traverse(obj, last, value);
