@@ -15,6 +15,7 @@
 - Notes: Added image insert menu button
 - Comments: Added image insert menu button
 - Custom fields: Type User, Group and Contact didn't show in legacy modules
+- Billing: update customer_name when contact changes too
 
 17-03-2020 6.4.128
 - Billing: fixed error in opening invoice created by a deleted user.
