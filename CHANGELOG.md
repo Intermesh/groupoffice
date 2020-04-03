@@ -14,6 +14,7 @@
 - Tickets: Invoicing failed on companies without country set.Set book earlier so it can be used for invoice country.
 - Notes: Added image insert menu button
 - Comments: Added image insert menu button
+- Custom fields: Type User, Group and Contact didn't show in legacy modules
 
 17-03-2020 6.4.128
 - Billing: fixed error in opening invoice created by a deleted user.
