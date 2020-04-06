@@ -441,7 +441,7 @@ class VCard extends AbstractConverter {
 		$values = $params['values'] ?? [];
 		
 		if(!isset($values['addressBookId'])) {
-			$values['addressBookId'] = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->defaultAddressBookId;
+			$values['addressBookId'] = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId();
 		}
 
 		$splitter = new VCardSplitter(StringUtil::cleanUtf8($file->getContents()), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);

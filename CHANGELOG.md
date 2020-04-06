@@ -16,6 +16,7 @@
 - Comments: Added image insert menu button
 - Custom fields: Type User, Group and Contact didn't show in legacy modules
 - Billing: update customer_name when contact changes too
+- Email: Fixed problem for some IMAP server where an attachment was downloaded with zero bytes
 
 17-03-2020 6.4.128
 - Billing: fixed error in opening invoice created by a deleted user.
