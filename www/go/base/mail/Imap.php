@@ -2444,6 +2444,8 @@ class Imap extends ImapBodyStruct {
 	 * @return <type>
 	 */
 	public function get_message_part_start($uid, $message_part=0, $peek=false) {
+
+		$this->readFullLiteral = false;
 		$this->clean($uid, 'uid');
 
 		$peek_str = $peek ? '.PEEK' : '';
@@ -2472,6 +2474,8 @@ class Imap extends ImapBodyStruct {
 //		\GO::debug("Part size: ".$size);
 		return $size;
 	}
+
+ private $readFullLiteral = false;
 	/**
 	 * Read message part line. get_message_part_start must be called first
 	 *
@@ -2497,9 +2501,22 @@ class Imap extends ImapBodyStruct {
 
 		if($line===false){
 
+			if($this->readFullLiteral) {
+				//don't attempt to read response after already have done that because it will hang for a long time
+				$this->readFullLiteral = true;
+				return false;
+			}
+
 			//read and check left over response.
-			$response=$this->get_response();
-			$this->check_response($response);
+			$response = $this->get_response(false, true);
+			if(!$this->check_response($response, true)) {
+				return false;
+			}
+			//for some imap servers that don't return the attachment size. It will read the entire attachment into memory :(
+			if(isset($response[0][6]) && substr($response[0][6], 0, 4) == 'BODY' && !empty($response[0][8])) {
+				$line = $response[0][8];
+				$this->readFullLiteral = true;
+			}
 
 		}
 		return $line;
