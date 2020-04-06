@@ -9,7 +9,7 @@ use go\modules\community\serverclient\Module as GoModule;
 
 class UserCsv extends Csv {
 
-	public static $excludeHeaders = ['syncSettings', 'taskSettings', 'notesSettings', 'addressBookSettings', 'calendarSettings', 'emailSettings', 'googleauthenticator', 'workingWeek'];
+	public static $excludeHeaders = ['syncSettings', 'taskSettings', 'notesSettings', 'addressBookSettings', 'calendarSettings', 'emailSettings', 'googleauthenticator'];
 
   protected function init()
   {

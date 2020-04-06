@@ -5,6 +5,7 @@ use GO;
 use GO\Base\Mail\Message;
 use GO\Base\Mail\Mailer;
 use go\core\db\Query;
+use go\modules\business\business\model\EmployeeAgreement;
 
 /**
  * The User model
@@ -274,18 +275,15 @@ class User extends \GO\Base\Db\ActiveRecord {
 			'group' => array('type' => self::HAS_ONE, 'model' => 'GO\Base\Model\Group', 'field' => 'isUserGroupFor'),
 			'reminders' => array('type'=>self::MANY_MANY, 'model'=>'GO\Base\Model\Reminder', 'field'=>'user_id', 'linkModel' => 'GO\Base\Model\ReminderUser'),
 			'groups' => array('type'=>self::MANY_MANY, 'model'=>'GO\Base\Model\Group', 'field'=>'userId', 'linkModel' => 'GO\Base\Model\UserGroup'),
-			'_workingWeek' => array('type' => self::HAS_ONE, 'model' => 'GO\Base\Model\WorkingWeek', 'field' => 'user_id')
 		);
 	}
 	
 	public function getWorkingWeek(){
-		$ww = $this->_workingWeek;
-		if(!$ww){
-			$ww = new WorkingWeek();
-			$ww->user_id=$this->id;
-			$ww->save();
-		}
-		return $ww;
+		$workingweek = EmployeeAgreement::find()->where('employeeId','=',$this->id)
+			//->andWhere('start','<', $weekStart)
+			->orderBy(['start'=>'DESC'])->limit(1)->single();
+
+		return $workingweek;
 	}
 	
 	protected function getLocalizedName() {
