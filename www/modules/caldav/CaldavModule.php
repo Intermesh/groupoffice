@@ -4,6 +4,7 @@ namespace GO\Caldav;
 
 use GO\Caldav\Model\DavEvent;
 use GO\Caldav\Model\DavTask;
+use go\core\http\Exception;
 
 class CaldavModule extends \GO\Base\Module {
 	
@@ -41,6 +42,8 @@ class CaldavModule extends \GO\Base\Module {
 			$davEvent->uri = $event->getUri();
 			if($davEvent->save()){
 				return $davEvent;
+			}else{
+				throw new Exception("Could not save DAV event");
 			}
 
 		} else  {			
@@ -50,6 +53,8 @@ class CaldavModule extends \GO\Base\Module {
 //			$davEvent->calendarId = $event->calendar_id;
 			if($davEvent->save()){
 				return $davEvent;
+			} else{
+				throw new Exception("Could not save DAV event");
 			}
 
 		}		

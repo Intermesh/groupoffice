@@ -334,8 +334,12 @@ class Blob extends orm\Entity {
 	 * @throws ConfigurationException
 	 */
 	public function path() {
-		$dir = substr($this->id,0,2) . '/' .substr($this->id,2,2). '/';
-		return go()->getDataFolder()->getPath() . '/data/'.$dir.$this->id;
+		return self::buildPath($this->id);
+	}
+
+	static function buildPath($id) {
+		$dir = substr($id,0,2) . '/' .substr($id,2,2). '/';
+		return go()->getDataFolder()->getPath() . '/data/'.$dir.$id;
 	}
 
 	/**

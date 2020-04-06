@@ -60,8 +60,27 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.customfield
 		return c;
 	},
 
-	getFieldType: function () {
-		return "relation";
+
+	getFieldDefinition : function(field) {
+
+		//Use a promise type to prefetch the contact data before store loads
+		var def = this.supr().getFieldDefinition(field);
+		def.type = 'promise';
+		def.promise = function(record) {
+			//old framework has record["customFields.name"] = data;
+			var id = record[this.name];
+			if(!id && record.customFields) {
+				//new framework has record.customFields.name = data
+				id = record.customFields[this.customField.databaseName];
+			}
+			if(!id) {
+				return Promise.resolve(null);
+			}else
+			{
+				return go.Db.store("Contact").single(id);
+			}
+		}
+		return def;
 	},
 
 	getRelations : function(customfield) {

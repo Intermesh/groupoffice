@@ -166,8 +166,8 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 			}
 
 			promiseFields.forEach(function(f) {
-				promises.push(f.promise(record).then(function(data){
-					record[f.name] = data;
+				promises.push(f.promise(record).then(function(data) {
+					go.util.Object.applyPath(record, f.name, data);
 				}));
 			});
 

@@ -319,24 +319,6 @@ GO.util.getFileExtension = function(filename)
 	return extension.toLowerCase();
 }
 
-GO.playAlarm = function(filename){
-	
-	// Check if the user has not muted all GO sounds
-	if(GO.util.empty(GO.settings.mute_sound))
-	{
-		// The folder (From the GO root) in where the soundfiles are stored
-		var soundsfolder = 'views/Extjs3/themes/Paper/sounds/';
-		
-		// Set the default sound when no filename is given
-		if(GO.util.empty(filename)){
-			filename = 'dialog-question';
-		}
-		
-		// Search for the div with the id "sound" and append the HTML5 sound code.
-		document.getElementById("sound").innerHTML='<audio autoplay="autoplay"><source src="' + soundsfolder + filename + '.mp3" type="audio/mpeg" /><source src="' + soundsfolder + filename + '.ogg" type="audio/ogg" /><embed hidden="true" autostart="true" loop="false" src="' + soundsfolder + filename +'.mp3" /></audio>';
-	}	
-}
-
 GO.util.nl2br = function (v)
 {
 	v+="";

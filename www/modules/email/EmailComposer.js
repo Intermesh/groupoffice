@@ -358,6 +358,7 @@ GO.email.EmailComposer = function(config) {
 			region:"north",
 			layout:'form',
 			xtype: "fieldset",
+			style: 'padding-bottom:0',
 			labelWidth : 100,
 			defaultType : 'textfield',
 			autoHeight:true,

@@ -1,6 +1,8 @@
 GO.data.GroupingStore = function(config) {
 
-	
+	if((config.url || config.api) && !config.proxy){
+		config.proxy = new GO.data.PrefetchProxy({url: config.url, api: config.api, fields: config.fields ? config.field : config.reader.meta.fields});
+	}
 
 	GO.data.GroupingStore.superclass.constructor.call (this, config);
 	
@@ -50,7 +52,7 @@ GO.data.GroupingStore = function(config) {
 };
 
 Ext.extend(GO.data.GroupingStore, Ext.data.GroupingStore, {
-	loaded : false	
+	loaded : false
 	
 });
 	

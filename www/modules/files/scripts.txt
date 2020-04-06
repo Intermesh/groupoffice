@@ -1,3 +1,4 @@
+modules/files/DnDFileUpload.js
 modules/files/ExpireDateDialog.js
 modules/files/FilePropertiesDialog.js
 modules/files/FolderPropertiesDialog.js

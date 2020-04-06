@@ -48,6 +48,11 @@ var store = new GO.data.JsonStore({
 
 GO.data.JsonStore = function(config) {
 
+	if((config.url || config.api) && !config.proxy){
+		config.proxy = new GO.data.PrefetchProxy({url: config.url, api: config.api, fields: config.fields ? config.field : config.reader.meta.fields});
+	}
+
+
 	Ext.applyIf(config,{
 		root: 'results',	
 		id: 'id',
@@ -73,15 +78,15 @@ GO.data.JsonStore = function(config) {
 	}
 	
 	GO.data.JsonStore.superclass.constructor.call (this, config);
-	
+
 	this.on('load', function(){
 		this.loaded=true;
 
 		if(this.reader.jsonData.exportVariables){					
-			GO.util.mergeObjec7ts(window,this.reader.jsonData.exportVariables);				
+			GO.util.mergeObjects(window,this.reader.jsonData.exportVariables);
 		}
 		
-		if(this.reader.jsonData.feedback){	
+		if(!config.suppressError && this.reader.jsonData.feedback){
 			GO.errorDialog.show(this.reader.jsonData.feedback);
 		}
 		
@@ -92,8 +97,7 @@ GO.data.JsonStore = function(config) {
 	this.on('exception',		
 		function( store, type, action, options, response){
 
-
-			if(response.isAbort) {
+			if(response.isAbort || this.suppressError) {
 				//ignore aborts.
 			} else if(response.isTimeout){
 				console.error(response);

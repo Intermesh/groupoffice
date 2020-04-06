@@ -52,3 +52,7 @@ $updates['201711161544'][] = 'ALTER TABLE `dav_events` ADD FOREIGN KEY (`id`) RE
 
 $updates['201711161544'][] = 'delete FROM `dav_tasks` WHERE id not in(select id from ta_tasks);';
 $updates['201711161544'][] = 'ALTER TABLE `dav_tasks` ADD FOREIGN KEY (`id`) REFERENCES `ta_tasks`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;';
+
+
+$updates['202004011205'][] = "ALTER TABLE `dav_events` CHANGE `uri` `uri` VARCHAR(512) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';";
+$updates['202004011205'][] = "ALTER TABLE `dav_tasks` CHANGE `uri` `uri` VARCHAR(512) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';";

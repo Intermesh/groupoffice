@@ -4,12 +4,8 @@ GO.files.openDetailViewFileBrowser = function () {
 
 	var dv = this.findParentByType("detailview"), entityId, entity;
 	if(!dv) {
-
-		//for legacy modules
-		dv = this.findParentByType("displaypanel") || this.findParentByType("tmpdetailview");
-
+		dv = this.findParentByType("displaypanel") || this.findParentByType("tmpdetailview"); //for legacy modules
 	}
-
 
 	GO.request({
 		url: 'files/folder/checkModelFolder',

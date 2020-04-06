@@ -116,33 +116,95 @@ go.Jmap = {
 		return url;
 
 	},
-	
-	upload : function(file, cfg) {
-		if(Ext.isEmpty(file))
-			return;
 
-		Ext.Ajax.request({url: go.User.uploadUrl,
+	uploadQueue: [],
+	upload : function(file, cfg) {
+		if(Ext.isEmpty(file) || file.name === '.DS_Store') {
+			cfg.callback && cfg.callback.call(cfg.scope || this, {upload:'skipped'});
+			return;
+		}
+		// nicetohave: group file upload in 1 notification
+		this.uploadQueue.push(file);
+		go.Notifier.toggleIcon('upload', true);
+
+		var prevNotificationAreaState = null;
+		var started_at = new Date();
+		var transactionId = Ext.Ajax.request({url: go.User.uploadUrl,
+			timeout: 4 * 60 * 60 * 100, //4 hours
 			success: function(response) {
 				if(cfg.success && response.responseText) {
 					data = Ext.decode(response.responseText);
-					cfg.success.call(cfg.scope || this,data);
+					notifyEl.setTitle(t('Upload complete'));
+					setTimeout(function () {
+						go.Notifier.remove(notifyEl);
+						go.Notifier.notificationArea[prevNotificationAreaState ? 'collapse' : 'expand']();
+					}, 2000);
+					cfg.success.call(cfg.scope || this,data, file);
 				}
 			},
-			failure: function(response) {
+			callback: function(response) {
+				go.Jmap.uploadQueue.remove(file);
+				if(Ext.isEmpty(this.uploadQueue)) {
+					go.Notifier.toggleIcon('upload', false); //done
+
+				}
+				cfg.callback && cfg.callback.call(cfg.scope || this, response);
+			},
+			progress: function(e) {
+				if (e.lengthComputable) {
+					var seconds_elapsed = (new Date().getTime() - started_at.getTime() )/1000;
+					var bytes_per_second =  seconds_elapsed ? e.loaded / seconds_elapsed : 0;
+					var remaining_bytes = e.total - e.loaded;
+					var seconds_remaining = seconds_elapsed ? remaining_bytes / bytes_per_second : '';
+					var percentage = (e.loaded / e.total * 100 | 0);
+					if(notifyEl) {
+						notifyEl.setTitle(t('Uploading...')+' &bull; ' + percentage + '%');
+						var box = notifyEl.items.items[0].getResizeEl();
+						if(box)
+							box.child('span', true).innerText = Math.round(seconds_remaining)+t('s');
+						notifyEl.items.items[1].updateProgress(percentage/100);
+					}
+				}
+				cfg.progress && cfg.progress.call(cfg.scope || this, e);
+			},
+			failure: function(response, options) {
+				var data = response,
+					text = response.isAbort ? t('Upload aborted') : t('Upload failed');
+
 				if(cfg.failure && response.responseText) {
 					data = Ext.decode(response.responseText);
-					cfg.failure.call(cfg.scope || this,data);
-				} else
-				{
-					Ext.MessageBox.alert(t("Error"), t("Upload failed. Please check if the system is using the correct URL at System settings -> General -> URL."));
+				} else if(response.status === 413) { // "Request Entity Too Large"
+					text += ': '+t('File too large');
+				} else if(!response.isAbort) {
+					text += ': Please check if the system is using the correct URL at System settings -> General -> URL.';
 				}
+				notifyEl.buttons[0].hide();
+				notifyEl.setPersistent(false).setTitle(text);
+				cfg.failure && cfg.failure.call(cfg.scope || this, data);
 			},
 			headers: {
 				'X-File-Name': "UTF-8''" + encodeURIComponent(file.name),
 				'Content-Type': file.type,
-				'X-File-LastModifed': Math.round(file['lastModified'] / 1000).toString()
+				'X-File-LastModified': Math.round(file['lastModified'] / 1000).toString()
 			},
 			xmlData: file // just "data" wasn't available in ext
+		});
+		var prevNotificationAreaState = go.Notifier.notificationArea.collapsed;
+		go.Notifier.notificationArea.expand();
+		var notifyEl = go.Notifier.msg({
+			persistent: true,
+			iconCls: 'ic-file-upload',
+			items:[
+				{xtype:'box',html:'<b>'+file.name+'</b><span>...</span>'},
+				{xtype:'progress',height:4,style:'margin: 7px 0'}
+			],
+			title: t('Uploading...'),
+			buttons: [{
+				text:t('Abort'),
+				handler: function() {
+					Ext.Ajax.abort(transactionId);
+				}
+			}]
 		});
 	},
 	

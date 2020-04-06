@@ -15,6 +15,7 @@ use GO;
 use GO\Base\Fs\Folder;
 
 use Exception;
+use go\core\fs\Blob;
 
 
 //make sure temp dir exists
@@ -572,30 +573,27 @@ class Message extends \Swift_Message{
 							continue; // Continue to the next inline attachment for processing.
 							//throw new Exception("No temp file for inline attachment ".$ia->name);
 						}
-
-						$path = empty($ia->from_file_storage) ? \GO::config()->tmpdir.$ia->tmp_file : \GO::config()->file_storage_path.$ia->tmp_file;
+						if(substr($ia->tmp_file,0,15) == 'saved_messages/') {
+							$path = \GO::config()->tmpdir.$ia->tmp_file;
+						} else {
+							$path = empty($ia->from_file_storage) ? Blob::buildPath($ia->tmp_file) : \GO::config()->file_storage_path . $ia->tmp_file;
+						}
 						$tmpFile = new \GO\Base\Fs\File($path);
 
-						if ($tmpFile->exists()) {				
-							//Different browsers reformat URL's to absolute or relative. So a pattern match on the filename.
-							//$filename = rawurlencode($tmpFile->name());
-							$result = preg_match('/="([^"]*'.preg_quote($ia->token).'[^"]*)"/',$params['htmlbody'],$matches);
-							if($result){
-								$img = \Swift_EmbeddedFile::fromPath($tmpFile->path());
-								$img->setContentType($tmpFile->mimeType());
-								$contentId = $this->embed($img);
+						if (!$tmpFile->exists()) {
+							throw new \Exception("Error: inline attachment missing on server: ".$tmpFile->stripTempPath().
+								".<br /><br />The temporary files folder is cleared on each login. Did you relogin?");
+						}
+						//Different browsers reformat URL's to absolute or relative. So a pattern match on the filename.
+						//$filename = rawurlencode($tmpFile->name());
+						$result = preg_match('/="([^"]*'.preg_quote($ia->token).'[^"]*)"/',$params['htmlbody'],$matches);
+						if($result){
+							$img = \Swift_EmbeddedFile::fromPath($tmpFile->path());
+							$img->setContentType($tmpFile->mimeType());
+							$contentId = $this->embed($img);
 
-								//$tmpFile->delete();								
-								$params['htmlbody'] = \GO\Base\Util\StringHelper::replaceOnce($matches[1], $contentId, $params['htmlbody']);
-							}else
-							{
-								//this may happen when an inline image was attached but deleted in the editor afterwards.
-							//
-								//throw new \Exception("Error: inline attachment could not be found in text: ".$ia->token);
-							}
-						}else
-						{							
-							throw new \Exception("Error: inline attachment missing on server: ".$tmpFile->stripTempPath().".<br /><br />The temporary files folder is cleared on each login. Did you relogin?");
+							//$tmpFile->delete();
+							$params['htmlbody'] = \GO\Base\Util\StringHelper::replaceOnce($matches[1], $contentId, $params['htmlbody']);
 						}
 					}
 				}
@@ -626,7 +624,7 @@ body p{
 		if (!empty($params['attachments'])) {
 			$attachments = json_decode($params['attachments']);
 			foreach ($attachments as $att) {
-				$path = empty($att->from_file_storage) ? \GO::config()->tmpdir.$att->tmp_file : \GO::config()->file_storage_path.$att->tmp_file;
+				$path = empty($att->from_file_storage) ? Blob::buildPath($att->tmp_file) : \GO::config()->file_storage_path.$att->tmp_file;
 				$tmpFile = new \GO\Base\Fs\File($path);
 				if ($tmpFile->exists()) {
 					$file = \Swift_Attachment::fromPath($tmpFile->path());

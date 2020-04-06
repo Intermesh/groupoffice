@@ -21,7 +21,7 @@ html {
 }
 
 body {
-	@include var(background-color, c-primary-tp);
+	@include var(background-color, c-primary);
 	//background-image: radial-gradient( circle farthest-corner at 10% 20%,  rgba(239,166,76,1) 0%, rgba(245,184,184,1) 100.2% );
 }
 
@@ -272,8 +272,6 @@ a {
 	left:0;
 	right:0;
 	height: dp(72);
-	@extend .z4;
-	@include var(background-color, c-primary);	
 }
 
 #go-select-language{
@@ -584,39 +582,81 @@ a {
 }
 
 @keyframes slide-top {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(0); } 
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(0); }
+}
+#message-ct, .notifications {
+
+	> div { // message
+		@extend .z4;
+		cursor: pointer;
+		pointer-events:auto;
+		min-width: dp(400);
+		max-width: dp(480);
+		border-radius: $borderRadius;
+		background-color: color($bg, 'card');
+		min-height: dp(40);
+		//padding: 0 dp(24) dp(8);
+		//color: color($fg, 'secondary-text');
+		margin: 0 auto dp(4);
+		animation: slide-top .2s ease-out; 
+		.x-panel-header {
+			color: color($fg,'secondary-text');
+			zoom:.8;
+			height: dp(40);
+			line-height: dp(40);
+	    }
+		.x-panel-header-text {
+			color: color($fg,'secondary-text');
+		}
+		.x-panel-bwrap {
+			padding: dp(8);
+			span {float:right;}
+		}
+	}
 }
 #message-ct {
 	position: absolute;
 	pointer-events:none;
-	z-index: 100000000;
-	top: dp(16);
+	z-index: 100000;
+	top: dp(64);
 	right: 8px;
-	left: 8px;
-	list-style: none;
 	overflow: visible;
-	> div {
-		@extend .z4;
-		pointer-events:auto;
-		min-width: dp(280);
-		max-width: dp(400);
-		border-radius: $borderRadius;
-		background-color: color($bg, 'card');
-		min-height: dp(40);
-		padding: dp(16) dp(24);
-		color: color($fg, 'secondary-text');
-		margin: 0 auto dp(4);
-		animation: slide-top .2s ease-out; 
-		h4 {
-			margin: dp(8) 0; 
-	   }
-	   i {
-			float: left;
-			margin-right: dp(8); 
-	   }
+}
+.notifications {
+	padding: dp(4);
+	@include var('background-color', c-primary);
+	i.entity::before{margin-top: dp(-22);}
+}
+.notificationArea {
+	@include var('background-color', c-primary);
+	.x-panel-header,.x-panel-header-text { border-top:0; color:white; }
+}
+@keyframes blink {
+	0% {opacity: 0;}
+	100% { opacity:1;}
+}
+#status-bar {
+	cursor: pointer;
+	display:inline-block;
+	float:left;
+	height: dp(32);
+	padding: dp(2) dp(8);
+	margin-top: dp(20);
+	margin-right: dp(8);
+	border-radius: dp(16);
+	border: 1px solid color($fg,'line');
+	background-color: color($bg,'readonly');
+	> * {
+		@extend %icon;
+		animation: blink .3s 7 alternate;
+		margin: 0 dp(4);
+		text-shadow: 0px 1px 0px rgba(black, 0.56);
+		zoom:.7;
+		cursor: pointer;
 	}
 }
+
 .card {
 	background-color: color($bg, 'card');
 }
@@ -657,15 +697,6 @@ button {
 }
 .closed{
 	display:none !important;
-}
-
-#reminder-icon {
-	@extend %icon;
-	text-shadow: 0px 1px 0px rgba(black, 0.56);
-	top:dp(-8);
-	right:dp(-8);
-	position:absolute;
-	color: $cWarning;
 }
 
 .avatar {
@@ -2090,5 +2121,20 @@ table[id^="comments-ext"] b {
 		.xtb-title {
 			@extend %font-subheading;
 		}
+	}
+}
+
+.x-dd-over {
+	position:relative;
+	&::after {
+		content: '';
+		z-index:1;
+		pointer-events : none;
+		position:absolute;
+		@include var(background-color, c-primary-tp);
+		top:dp(8);bottom:dp(8);left:dp(8);right:dp(8);
+		outline: 8px solid transparent;
+		@include var(outline-color, c-primary-tp);
+		border: 2px dashed white;
 	}
 }

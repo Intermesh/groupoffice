@@ -1,3 +1,5 @@
+- Core: New upload function with drag and drop support in the file browser and detail view.
+- Core: New notification slide panel
 - Core: Links can have descriptions again. Entities can be found on link descriptions.
 - Notes: New module to encrypt notes
 - Email: Delete folder directly when folders can't be moved into trash
@@ -5,6 +7,15 @@
 - Address book: Sort on firstname too when sorting on last name
 - Address book: Added first name and last name columns
 - Custom fields: Export user, group and contact custom fields to text
+- Billing: Check if telesales and fieldsales agent's still exists
+- CardDAV, CalDAV: Allow longer DAV uri's changed from 190 to 512 chars
+- Assistant: Message if not installed can be dismissed.
+- Tickets: fixed TypeError: undefined is not an object (evaluating 'this.disableTemplateCategoriesPanel.setModel')
+- Tickets: Invoicing failed on companies without country set.Set book earlier so it can be used for invoice country.
+- Notes: Added image insert menu button
+- Comments: Added image insert menu button
+- Custom fields: Type User, Group and Contact didn't show in legacy modules
+- Billing: update customer_name when contact changes too
 
 17-03-2020 6.4.128
 - Billing: fixed error in opening invoice created by a deleted user.

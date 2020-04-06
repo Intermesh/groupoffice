@@ -33,6 +33,7 @@ go.modules.community.notes.NoteDialog = Ext.extend(go.form.Dialog, {
 						hideLabel: true,
 						anchor: '0 -90',
 						allowBlank: false,
+						plugins: [new GO.plugins.HtmlEditorImageInsert(), go.form.HtmlEditor.emojiPlugin],
 						listeners: {
 							scope: this,
 							ctrlenter: function() {

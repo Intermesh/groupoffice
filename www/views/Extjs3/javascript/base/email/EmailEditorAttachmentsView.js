@@ -1,15 +1,16 @@
 GO.base.email.EmailEditorAttachmentsView = function(config){
 		config=config||{};
-		config.store = new GO.data.JsonStore({
-			url:GO.url('core/pluploads'),
+		config.store = new Ext.data.JsonStore({
+			root: 'results',
 			fields : ['tmp_file', 'name', 'size', 'type', 'extension', 'human_size','from_file_storage','fileName'],
 			id : 'tmp_file'
 		});
 		
 		config.store.on('load', function(){
-			if(this.store.data.length)	
+
+			if(this.store.data.length) {
 				this.show();
-			else
+			} else
 				this.hide();
 			if(this.maxSizeExceeded()){
 				this.fireEvent('maxsizeexceeded',this, this.maxSize, this.getTotalSize());
@@ -75,7 +76,11 @@ Ext.extend(GO.base.email.EmailEditorAttachmentsView, Ext.DataView, {
 		
 		return totalSize;
 	},
-	
+
+	addFiles: function(items) {
+		this.store.loadData({results:items}, true);
+	},
+
 	afterUpload : function(loadParams){
 		var params = {add:true, params:loadParams};
 		this.store.load(params);
@@ -114,7 +119,7 @@ Ext.extend(GO.base.email.EmailEditorAttachmentsView, Ext.DataView, {
 			this.menu = new Ext.menu.Menu({
 				items: [
 				{
-					iconCls:'btn-delete',
+					iconCls:'ic-delete',
 					text:t("Delete"),
 					scope:this,
 					handler: function()
