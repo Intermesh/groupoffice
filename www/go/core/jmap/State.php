@@ -161,7 +161,7 @@ class State extends AbstractState {
 	}
 	
 	public function getEventSourceUrl() {
-		return Settings::get()->URL.'api/sse.php';
+		return go()->getConfig()['core']['general']['sseEnabled'] ? Settings::get()->URL.'api/sse.php' : null;
 	}
 
 

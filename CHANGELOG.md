@@ -19,6 +19,8 @@
 - Email: Fixed problem for some IMAP server where an attachment was downloaded with zero bytes
 - Core: Fixed error field style in Dark mode theme
 - Core: Implemented Dark theme html editor style
+- Core: Clear default calendar and task list in settings works
+- Core: Fixed connection error dialogs that could occur when downloading a file
 
 17-03-2020 6.4.128
 - Billing: fixed error in opening invoice created by a deleted user.

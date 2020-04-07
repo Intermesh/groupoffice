@@ -243,8 +243,10 @@ GO.request = function(config){
 				if (config.fail) {
 					config.fail.call(config.scope, response, options);
 				} else {
-					console.error(response, options);
-					Ext.Msg.alert(t("Error"), "Failed to send request to the server. Please check your internet connection.");
+					//console.error(response, options);
+					if(!response.isAbort) {
+						Ext.Msg.alert(t("Error"), "Failed to send request to the server. Please check your internet connection.");
+					}
 				}
 			}
 		},
