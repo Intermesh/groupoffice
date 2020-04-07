@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="40px" height="51px" viewBox="0 0 40 51" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
+    <title>dwg</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="dwg" fill-rule="nonzero">
+            <path d="M2.5,1 C1.115,1 0,2.115 0,3.5 L0,48.5 C0,49.885 1.115,51 2.5,51 L37.5,51 C38.885,51 40,49.885 40,48.5 L40,16 L26.25,14.75 L25,1 L2.5,1 Z" id="Shape" fill="#000000" opacity="0.2"></path>
+            <path d="M2.5,0 C1.115,0 0,1.115 0,2.5 L0,47.5 C0,48.885 1.115,50 2.5,50 L37.5,50 C38.885,50 40,48.885 40,47.5 L40,15 L26.25,13.75 L25,0 L2.5,0 Z" id="Shape" fill="#4185B0"></path>
+            <path d="M25,1 L25,13.5 C25,14.8808 26.1193,16 27.5,16 L40,16 L25,1 Z" id="Shape" fill="#000000" opacity="0.2"></path>
+            <path d="M25,0 L25,12.5 C25,13.8808 26.1193,15 27.5,15 L40,15 L25,0 Z" id="Shape" fill="#95B9D0"></path>
+            <path d="M13,1 L13,26 L4,26 L4,35 L0,35 L0,38 L4,38 L4,47 L13,47 L13,50 L16,50 L16,47 L25,47 L25,38 L40,38 L40,35 L25,35 L25,26 L16,26 L16,1 L13,1 Z M7,44 L7,29 L22,29 L22,44 L7,44 Z M13,35 L13,38 L16,38 L16,35 L13,35 Z" id="Shape" fill="#000000" opacity="0.2"></path>
+            <path d="M13,0 L13,25 L4,25 L4,34 L0,34 L0,37 L4,37 L4,46 L13,46 L13,50 L16,50 L16,46 L25,46 L25,37 L40,37 L40,34 L25,34 L25,25 L16,25 L16,0 L13,0 Z M7,43 L7,28 L22,28 L22,43 L7,43 Z M13,34 L13,37 L16,37 L16,34 L13,34 Z" id="Shape" fill="#FFFFFF"></path>
+            <path d="M2.5,0 C1.115,0 0,1.115 0,2.5 L0,3.5 C0,2.115 1.115,1 2.5,1 L25,1 C25,0 25,1 25,0 L2.5,0 Z" id="Shape" fill="#FFFFFF" opacity="0.2"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="50px" height="46px" viewBox="0 0 50 46" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
+    <title>folder</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="folder" fill-rule="nonzero">
+            <rect id="Rectangle-path" fill="#000000" opacity="0.2" x="0" y="14" width="50" height="32" rx="2.5"></rect>
+            <path d="M0,34.5 C0,35.885 1.115,37 2.5,37 L47.5,37 C48.885,37 50,35.885 50,34.5 L50,7.5 C50,6.115 48.885,5 47.5,5 L22,5 L22,2.5 C22,1.115 20.885,0 19.5,0 L2.5,0 C1.115,0 0,1.115 0,2.5" id="Shape" fill="#797979"></path>
+            <rect id="Rectangle-path" fill="#000000" opacity="0.2" x="0" y="12" width="50" height="32" rx="2.5"></rect>
+            <rect id="Rectangle-path" fill="#D9D9D9" x="3" y="8" width="44" height="20" rx="2.5"></rect>
+            <rect id="Rectangle-path" fill="#797979" x="0" y="13" width="50" height="32" rx="2.5"></rect>
+            <path d="M2.5,0 C1.115,0 0,1.115 0,2.5 L0,3.5 C0,2.115 1.115,1 2.5,1 L19.5,1 C20.885,1 22,2.115 22,3.5 L22,2.5 C22,1.115 20.885,0 19.5,0 L2.5,0 Z M22,5 L22,6 L47.5,6 C48.89,6 50,7.115 50,8.5 L50,7.5 C50,6.115 48.89,5 47.5,5 L22,5 Z" id="Shape" fill="#FFFFFF" opacity="0.1"></path>
+        </g>
+    </g>
+</svg>
