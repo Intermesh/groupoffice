@@ -89,6 +89,7 @@ $cAccentTp:		rgba(255, 145, 0, 0.16) !default;
 // Colors that have meaning (eg. success/failure)
 $cSuccess:		#43A047 !default;
 $cDanger:		#E53935 !default;
+$cDangerBg: #FFEBEE !default;
 $cWarning:		#f57c00 !default;
 
 $cSelected: 	color($bg, 'selected'); // click on menus, tree items, table

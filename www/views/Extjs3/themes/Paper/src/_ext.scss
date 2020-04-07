@@ -494,7 +494,7 @@
 	}	
 	&-invalid, textarea.x-form-invalid {
 		border-color: rgba($cDanger,0.54);
-		background-color: lighten($cDanger,90%);
+		background-color: $cDangerBg;
 	}
 	
 	&-helptext {
@@ -569,8 +569,6 @@
 	border-color: $cDanger;
 }
 
-
-
 .x-item-disabled .x-form-trigger-over {
 	border-bottom-color:#b5b8c8;
 }
@@ -584,11 +582,9 @@
 	background-image: none;
 }
 
-.x-form-invalid.x-form-composite .x-form-invalid {
-	background-color:#fff;
-	/*background-image:url(../images/default/grid/invalid_line.gif);*/
-	border-color:#c30;
-}
+//.x-form-invalid.x-form-composite .x-form-invalid {
+//	border-color:#c30;
+//}
 
 .x-form-inner-invalid, textarea.x-form-inner-invalid {
 	background-color:#fff;
