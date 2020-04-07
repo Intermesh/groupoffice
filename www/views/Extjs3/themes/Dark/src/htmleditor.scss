@@ -1,5 +1,6 @@
-@import 'base';
-@import 'lato';
+@import 'config';
+@import '../../Paper/src/base';
+@import '../../Paper/src/lato';
 body, html {
 	@extend %font-body1;
 	color: color($fg, 'text');

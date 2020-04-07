@@ -44828,7 +44828,8 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
     
     getDocMarkup : function(){
         var h = Ext.fly(this.iframe).getHeight() - this.iframePad * 2;
-        return String.format('<html><head><link rel="stylesheet" href="' + BaseHref + 'views/Extjs3/themes/Paper/htmleditor.css"> <style type="text/css">body{border: 0; margin: 0; padding: {0}px; height: {1}px; cursor: text}</style></head><body></body></html>', this.iframePad, h);
+        var theme = go.User ? go.User.theme : "Paper";
+        return String.format('<html><head><link rel="stylesheet" href="' + BaseHref + 'views/Extjs3/themes/' + theme + '/htmleditor.css"> <style type="text/css">body{border: 0; margin: 0; padding: {0}px; height: {1}px; cursor: text}</style></head><body></body></html>', this.iframePad, h);
     },
 
     
