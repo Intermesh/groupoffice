@@ -27,7 +27,7 @@ code {
 	margin: dp(16) 0;
 	display: block;
 	font-family: "Courier New",Courier,monospace;
-	color: black;
+	color: color($fg, 'base');
 	border-radius: dp(4);
 }
 

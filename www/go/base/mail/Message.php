@@ -573,7 +573,7 @@ class Message extends \Swift_Message{
 							continue; // Continue to the next inline attachment for processing.
 							//throw new Exception("No temp file for inline attachment ".$ia->name);
 						}
-						if(substr($ia->tmp_file,0,15) == 'saved_messages/') {
+						if(in_array(substr($ia->tmp_file,0,14), ['saved_messages', 'imap_messages/'])) {
 							$path = \GO::config()->tmpdir.$ia->tmp_file;
 						} else {
 							$path = empty($ia->from_file_storage) ? Blob::buildPath($ia->tmp_file) : \GO::config()->file_storage_path . $ia->tmp_file;
@@ -624,7 +624,11 @@ body p{
 		if (!empty($params['attachments'])) {
 			$attachments = json_decode($params['attachments']);
 			foreach ($attachments as $att) {
-				$path = empty($att->from_file_storage) ? Blob::buildPath($att->tmp_file) : \GO::config()->file_storage_path.$att->tmp_file;
+				if(in_array(substr($att->tmp_file,0,14), ['saved_messages', 'imap_messages/'])) {
+					$path = \GO::config()->tmpdir.$att->tmp_file;
+				} else {
+					$path = empty($att->from_file_storage) ? Blob::buildPath($att->tmp_file) : \GO::config()->file_storage_path . $att->tmp_file;
+				}
 				$tmpFile = new \GO\Base\Fs\File($path);
 				if ($tmpFile->exists()) {
 					$file = \Swift_Attachment::fromPath($tmpFile->path());

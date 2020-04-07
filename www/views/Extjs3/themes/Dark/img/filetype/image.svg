@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="52px" height="49px" viewBox="0 0 52 49" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
+    <title>image</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="image" fill-rule="nonzero">
+            <path d="M52,46.3326 L52,3.6666 C52,2.1889 50.84,0.9996 49.4,0.9996 L2.6,0.9996 C1.1596,0.9996 0,2.1889 0,3.6663 L0,46.3333 C0,47.8106 1.1596,49 2.6,49 L49.4,49 C50.8404,49 52,47.8107 52,46.3333 L52,46.3326 Z" id="Shape" fill="#000000" opacity="0.2"></path>
+            <path d="M52,45.333 L52,2.667 C52,1.1893 50.84,3.55271368e-15 49.4,3.55271368e-15 L2.6,3.55271368e-15 C1.1596,3.55271368e-15 0,1.1893 0,2.6667 L0,45.3337 C0,46.811 1.1596,48.0004 2.6,48.0004 L49.4,48.0004 C50.8404,48.0004 52,46.8111 52,45.3337 L52,45.333 Z" id="Shape" fill="#519990"></path>
+            <polygon id="Shape" fill="#000000" opacity="0.2" points="16 18.9996 28 33.9996 37 25.9996 45 33.9996 45 40.9996 6 40.9996 6 30.9996"></polygon>
+            <polygon id="Shape" fill="#FFFFFF" points="16 18 28 33 37 25 45 33 45 40 6 40 6 30"></polygon>
+            <path d="M2.5996094,0 C1.1592094,0 0,1.1886156 0,2.666016 L0,3.666016 C0,2.188616 1.1592094,1 2.5996094,1 L49.400391,1 C50.840391,1 52,2.188316 52,3.666016 L52,2.667969 C52,1.1902687 50.840391,0 49.400391,0 L2.5996094,0 Z" id="Shape" fill="#FFFFFF" opacity="0.2"></path>
+        </g>
+    </g>
+</svg>

@@ -39,9 +39,15 @@ go.Notifier = {
 	},
 
 	/**
+	 * Put a message into the notification area (fallback to notify())
 	 * @param msg {title, description, iconCls, time (ms)}
 	 */
 	msg: function (msg, key) {
+
+		if(!this.notifications) {
+			this.notify({title:msg.title, text: msg.description});
+			return; // not initializes (happens after login)
+		}
 
 		if(msg.sound) {
 			this.playSound(msg.sound, key);
@@ -108,8 +114,8 @@ go.Notifier = {
 		}
 	},
 	/**
-	 * more obstructive flyout message
-	 * will be a desktop notification if permission if granted
+	 * A more obstructive flyout message
+	 * Will use a desktop notification if permission if granted
 	 * {title,body,icon}
 	 * @param storeData
 	 */
@@ -125,19 +131,45 @@ go.Notifier = {
 		try {
 			switch(Notification.permission) {
 				case 'denied':
+					this.flyout(msg);
 					break;
 				case 'default':
 					Notification.requestPermission(function (permission) { // ask first
 						if (permission === "granted") {
 							new Notification(title, {body: msg.text, icon: icon});
+						} else {
+							this.flyout(msg);
 						}
 					});
 					break;
 				case 'granted':
 					new Notification(title,{body: msg.text, icon: icon});
 			}
-		} catch (e) { /* ignore failure on mobiles */ }
+		} catch (e) {
+			/* ignore failure on mobiles */
+			this.flyout(msg);
+		}
 
+	},
+
+	flyout: function(msg) {
+		msg.renderTo = this.messageCt;
+		msg.html = msg.description || msg.html; // backward compat
+		var msgCtr = new Ext.Panel(msg);
+
+		var me = this;
+		if (msg.time) {
+			setTimeout(function () {
+				me.remove(msgCtr);
+			}, msg.time);
+		}
+		if(!msg.persistent) {
+			msgCtr.el.on('click', function () {
+				me.remove(msgCtr);
+			});
+		}
+
+		return msgCtr;
 	},
 
 	playSound: function(filename, type){

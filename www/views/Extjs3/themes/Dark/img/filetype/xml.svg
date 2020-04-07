@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="40px" height="51px" viewBox="0 0 40 51" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
+    <title>xml</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="xml" fill-rule="nonzero">
+            <path d="M2.5,0.9999996 C1.115,0.9999996 0,2.11499959 0,3.49999998 L0,48.4999996 C0,49.8849996 1.115,50.9999996 2.5,50.9999996 L37.5,50.9999996 C38.885,50.9999996 40,49.8849996 40,48.4999996 L40,15.9999999 L26.25,14.7499999 L25,0.9999996 L2.5,0.9999996 Z" id="Shape" fill="#000000" opacity="0.2"></path>
+            <path d="M2.5,0 C1.115,0 0,1.115 0,2.5 L0,47.5 C0,48.885 1.115,50 2.5,50 L37.5,50 C38.885,50 40,48.885 40,47.5 L40,15 L26.25,13.75 L25,0 L2.5,0 Z" id="Shape" fill="#D9D9D9"></path>
+            <path d="M25,0.9999996 L25,13.4999997 C25,14.8807996 26.1193,15.9999996 27.5,15.9999996 L40,15.9999996 L25,0.9999996 Z" id="Shape" fill="#000000" opacity="0.2"></path>
+            <path d="M25,0 L25,12.5 C25,13.8808 26.1193,15 27.5,15 L40,15 L25,0 Z" id="Shape" fill="#EDEDED"></path>
+            <path d="M21.176,22.904 L16,42.223 L18.898,43 L24.074,23.682 L21.176,22.904 Z M25,23 L25,27 L30,32 L25,37 L25,41 L35,32 L25,23 Z M15,25 L5,34 L15,43 L15,39 L10,34 L15,29 L15,25 Z" id="Shape" fill="#8F8F8F"></path>
+            <path d="M2.5,-4e-07 C1.115,-4e-07 0,1.1149996 0,2.4999996 L0,3.5 C0,2.1149996 1.115,0.9999996 2.5,0.9999996 L25,0.9999996 C25,-4e-07 25,0.9999996 25,-4e-07 L2.5,-4e-07 Z" id="Shape" fill="#FFFFFF" opacity="0.2"></path>
+        </g>
+    </g>
+</svg>
