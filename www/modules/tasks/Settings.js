@@ -60,7 +60,11 @@ GO.tasks.SettingsPanel = Ext.extend(Ext.Panel, {
 			new GO.form.HtmlComponent({html:'<br />'}),
 			this.selectTaskList = new GO.tasks.SelectTasklist({
 					fieldLabel : t("Default tasklist", "tasks"),
-					hiddenName : 'taskSettings.default_tasklist_id'
+					hiddenName : 'taskSettings.default_tasklist_id',
+					clearValue: function() {
+							GO.tasks.SelectTasklist.prototype.clearValue.call(this);
+							this.value = "0";
+					}
 				})]
 		};
 		GO.tasks.SettingsPanel.superclass.initComponent.call(this);
