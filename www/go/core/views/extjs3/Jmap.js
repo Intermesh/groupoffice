@@ -226,6 +226,8 @@ go.Jmap = {
 				console.debug("Server Sent Events (EventSource) is disabled on the server.");
 				return false;
 			}
+
+			console.debug("Starting SSE");
 			
 			//filter out legacy modules
 			var entities = go.Entities.getAll().filter(function(e) {return e.package != "legacy";});
@@ -261,13 +263,14 @@ go.Jmap = {
 			}, false);
 
 			source.addEventListener('error', function(e) {
-				// if (e.readyState == EventSource.CLOSED) {
-				// 	// Connection was closed.
-				//
-				// }
-				setTimeout(function() {
-					me.sse();
-				}, 1000)
+				if (e.readyState == EventSource.CLOSED) {
+					// Connection was closed.
+
+				} else
+				{
+					console.error(e);
+				}
+
 			}, false);
 		}
 		catch(e) {
