@@ -1,3 +1,4 @@
+
 go.print = function(tmpl, data) {
 	var paper = document.getElementById('paper');
 
@@ -7,6 +8,9 @@ go.print = function(tmpl, data) {
 };
 
 go.util =  (function () {
+	var downloadFrame;
+
+
 	return {
 
 		clone: function(obj) {
@@ -299,7 +303,14 @@ go.util =  (function () {
 				if(inline) {
 					window.open(url);
 				} else {
-					document.location.href = url;
+					// document.location.href = url; //This causes connection errors with SSE or other simulanous XHR requests
+
+					if(!downloadFrame) {
+						var downloadFrame = document.createElement("a");
+						downloadFrame.download = true;
+					}
+					downloadFrame.href = url;
+					downloadFrame.click();
 				}
 			}
 		},
