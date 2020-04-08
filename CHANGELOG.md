@@ -1,3 +1,4 @@
+08-04-2020 6.4.129
 - Core: New upload function with drag and drop support in the file browser and detail view.
 - Core: New notification slide panel
 - Core: Links can have descriptions again. Entities can be found on link descriptions.
@@ -22,7 +23,7 @@
 - Core: Clear default calendar and task list in settings works
 - Core: Fixed connection error dialogs that could occur when downloading a file
 - Address book: Fixed error after creating new contact
-- Projects: Use {customer:* and {contact:* template tags on template projects, tasks and jobs
+- Projects: Use {customer:* and {contact:* template tags on template projects, tasks and jobs. See https://groupoffice.readthedocs.io/en/latest/using/projects.html#jobs
 
 17-03-2020 6.4.128
 - Billing: fixed error in opening invoice created by a deleted user.
