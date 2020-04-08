@@ -245,7 +245,6 @@ GO.request = function(config){
 				} else {
 					//console.error(response, options);
 					if(!response.isAbort) {
-						debugger;
 						GO.errorDialog.show("Failed to send request to the server. Please check your internet connection.");
 					}
 				}
