@@ -198,7 +198,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 						imgEl = this.getDoc().getElementById(domId);
 					} 
 
-					this.fireEvent('attach', this, response.blobId, file, imgEl);
+					this.fireEvent('attach', this, response, file, imgEl);
 				}
 			});
 		}, this);

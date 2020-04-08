@@ -192,6 +192,8 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 				return GO.form.HtmlEditor.prototype.getEditorFrameStyle.call(this) + ' body {background-color: white}';
 			}
 		});
+
+		this.htmlEditor.on('attach', this.htmlEditorAttach, this);
 		
 		this.textEditor = new Ext.form.TextArea({
 			name: 'plainbody',
@@ -246,6 +248,27 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		});
 		config.items.push(this.attachmentsView);
 
+	},
+
+	htmlEditorAttach : function(htmlEditor,blob, file, img) {
+
+		if(img) {
+			//inline will be processed from body
+			return;
+		}
+
+		var items = [{
+			human_size: Ext.util.Format.fileSize(blob.size),
+			extension: blob.name.split('.').pop(),
+			size: blob.size,
+			type: blob.type,
+			name: blob.name,
+			fileName: blob.name,
+			from_file_storage: false,
+			tmp_file: blob.blobId
+		}];
+
+		this.attachmentsView.addFiles(items);
 	},
 	
 	reset : function(){
@@ -410,7 +433,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 								name: blobs[i].name,
 								fileName: blobs[i].name,
 								from_file_storage: false,
-								tmp_file: blobs[i].blobId,
+								tmp_file: blobs[i].blobId
 							});
 						}
 						//debugger;

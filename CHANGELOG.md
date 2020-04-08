@@ -24,6 +24,7 @@
 - Core: Fixed connection error dialogs that could occur when downloading a file
 - Address book: Fixed error after creating new contact
 - Projects: Use {customer:* and {contact:* template tags on template projects, tasks and jobs. See https://groupoffice.readthedocs.io/en/latest/using/projects.html#jobs
+- E-mail: Drag files into editor to attach
 
 17-03-2020 6.4.128
 - Billing: fixed error in opening invoice created by a deleted user.
