@@ -73,7 +73,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 							this.createFolderWhenNoneExist(function() {
 								options.destination_folder_id = this.folderId;
 								fb.sendOverwrite(options);
-							})
+							}.bind(this))
 						}
 
 					}.bind(this), me.container)();
