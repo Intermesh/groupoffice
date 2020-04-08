@@ -193,7 +193,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 					console.warn(response);
 					var imgEl = null;
 					if (file.type.match(/^image\//)) {
-						domId = Ext.id(), img = '<img id="' + domId + '" src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="' + file.name + '" />';
+						var domId = Ext.id(), img = '<img id="' + domId + '" src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="' + file.name + '" />';
 						this.insertAtCursor(img);
 						imgEl = this.getDoc().getElementById(domId);
 					} 
