@@ -45,18 +45,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			[6*86400, '6 '+t("Days")],
 			[7*86400, '7 '+t("Days")]
 		];
-		var snoozeMenuItems = [];
-		for(var i = 0; i < checkerSnoozeTimes.length; i++){
-			snoozeMenuItems.push(	{
-				text: checkerSnoozeTimes[i][1],
-				value: checkerSnoozeTimes[i][0],
-				handler:function(i){ this.doTask(i.value); },
-				scope: this
-			});
-		}
-		var snoozeMenu = new Ext.menu.Menu({
-			items:snoozeMenuItems
-		});
+
 
 		this.reminders = new Ext.Container({cls: 'notifications'});
 		this.reminderStore = new Ext.data.GroupingStore({
@@ -72,16 +61,29 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 		});
 		this.reminderStore.on('load',function(store, records) {
 			this.reminders.removeAll();
-			for(var i = 0 ; i < records.length; i++) {
-				var ico = records[i].data.iconCls.split('\\').pop();
+			records.forEach(function(record) {
 
-				this.reminders.add(new Ext.Panel({
-					record: records[i],
-					title: records[i].data.name,
+				var snoozeMenuItems = [];
+				for(var i = 0; i < checkerSnoozeTimes.length; i++){
+					snoozeMenuItems.push(	{
+						text: checkerSnoozeTimes[i][1],
+						value: checkerSnoozeTimes[i][0],
+						scope: this
+					});
+				}
+				var snoozeMenu = new Ext.menu.Menu({
+					items:snoozeMenuItems
+				});
+
+				var ico = record.data.iconCls.split('\\').pop();
+				var reminderPanel;
+				this.reminders.add(reminderPanel = new Ext.Panel({
+					record: record,
+					title: record.data.name,
 					iconCls: 'entity '+ico,
 					items: [
-						{xtype:'box',html:'<b>'+records[i].data.description+'</b><span>'+records[i].data.local_time+'</span>'}
-						//{html:records[i].data.description}
+						{xtype:'box',html:'<b>'+record.data.description+'</b><span>'+record.data.local_time+'</span>'}
+						//{html:record.data.description}
 					],
 					listeners: {
 						'afterrender': function(me) {
@@ -99,17 +101,26 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					buttons: [{
 						iconCls : 'ic-timer',
 						text: t("Snooze"),
-						menu: snoozeMenu
+						menu: snoozeMenu,
+						scope: this
 					},{
 						iconCls : 'ic-delete',
 						text:t("Dismiss"),
 						handler: function() {
-							this.doTask();
-						}
+							this.doTask("dismiss_reminders", 0, [record.data.id], reminderPanel);
+						},
+						scope: this
 					}]
 				}))
 
-			}
+				snoozeMenu.items.each(function(i) {
+					i.setHandler(function(item){ this.doTask("snooze_reminders", item.value, [record.data.id], reminderPanel); }, this);
+				}, this);
+
+			}, this);
+
+
+
 			this.reminders.doLayout();
 		},this);
 
@@ -117,7 +128,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 	},
 
-	doTask : function(task, seconds, reminderIds) {
+	doTask : function(task, seconds, reminderIds, reminderPanel) {
 		Ext.Ajax.request({
 			url: seconds ? GO.url('reminder/snooze') : GO.url('reminder/dismiss'),
 			params: {
@@ -127,14 +138,16 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			},
 			callback: function(){
 				for (var i = 0; i < reminderIds.length;  i++) {
-					this.store.remove(reminderIds[i]);
+					this.reminderStore.remove(reminderIds[i]);
 				}
-				GO.checker.lastCount = this.store.getCount();
+				GO.checker.lastCount = this.reminderStore.getCount();
 
 				if(!GO.checker.lastCount){
 					this.ownerCt.hide();
 					go.Notifier.icons['reminder'].setVisible(false);
 				}
+
+				reminderPanel.destroy();
 			}, scope: this
 		});
 	},

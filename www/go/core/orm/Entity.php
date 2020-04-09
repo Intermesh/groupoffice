@@ -334,6 +334,7 @@ abstract class Entity extends Property {
 	 *
 	 * @param $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
 	 *  So you can do for example: go()->getDbConnection()->delete('another_table', (new Query()->where('id', 'in' $query))
+	 *  Or pass ['id' => $id];
 	 * @return boolean
 	 * @throws Exception
 	 */

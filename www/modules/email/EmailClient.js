@@ -1462,11 +1462,11 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 					}
 
 				default:
-					if(forceDownload)
+					// if(forceDownload)
 						attachment.url+='&inline=0';
 
-					if (attachment.extension!='vcf'||forceDownload)
-						go.util.downloadFile(attachment.url, !forceDownload);
+					// if (attachment.extension!='vcf'||forceDownload)
+						go.util.downloadFile(attachment.url);
 					break;
 			}
 		}

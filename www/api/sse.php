@@ -30,6 +30,8 @@ if(!go()->getConfig()['core']['general']['sseEnabled'] || (function_exists("xdeb
 $CHECK_INTERVAL = go()->getDebugger()->enabled ? 5 : 30;
 const MAX_LIFE_TIME = 120;
 
+ini_set("max_execution_time", MAX_LIFE_TIME + 10);
+
 //Hard code debug to false to prevent spamming of log.
 App::get()->getDebugger()->enabled = false;
 

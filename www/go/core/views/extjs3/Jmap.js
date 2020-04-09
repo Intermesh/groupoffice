@@ -223,9 +223,11 @@ go.Jmap = {
 			}
 			
 			if(!go.User.eventSourceUrl) {
-				console.debug("Not starting EventSource when xdebug is running");
+				console.debug("Server Sent Events (EventSource) is disabled on the server.");
 				return false;
 			}
+
+			console.debug("Starting SSE");
 			
 			//filter out legacy modules
 			var entities = go.Entities.getAll().filter(function(e) {return e.package != "legacy";});
@@ -262,9 +264,13 @@ go.Jmap = {
 
 			source.addEventListener('error', function(e) {
 				if (e.readyState == EventSource.CLOSED) {
-					// Connection was closed.					
-					me.sse();
+					// Connection was closed.
+
+				} else
+				{
+					console.error(e);
 				}
+
 			}, false);
 		}
 		catch(e) {
@@ -411,8 +417,12 @@ go.Jmap = {
 				// }
 			},
 			failure: function (response, opts) {
+				if(response.isAbort) {
+					console.warn('Connection aborted', response);
+					return;
+				}
 				console.error('server-side failure with status code ' + response.status);
-				console.error(response.responseText);
+				console.error(response);
 
 				for(var i = 0, l = opts.jsonData.length; i < l; i++) {
 					var clientCallId = opts.jsonData[i][2];

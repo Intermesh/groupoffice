@@ -1252,8 +1252,12 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			if(!is_string($tmpfile)) {
 				// its a json object with blob data
 				$blob = $tmpfile;
+
 				$tmpfile = Blob::buildPath($blob->blobId);
+			} else{
+				unset($blob);
 			}
+
 			$destinationFolder = $currentFolder;
 			if (is_dir($tmpfile)) {
 				$folder = new \GO\Base\Fs\Folder($tmpfile);
@@ -1275,7 +1279,9 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 						}
 					}
 					$filename = $blob->name;
-					unset($blob);
+					$removeBlob = $this->removeBlob($blob->blobId);
+				}else{
+					$removeBlob = false;
 				}
 
 				if ($file->exists()) {
@@ -1291,7 +1297,14 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 								$params['overwrite'] = 'ask';
 							case 'yestoall':
 								//we dont want overwrite file in no case
+								if(!$removeBlob) {
+									$newFile = GO\Base\Fs\File::tempFile();
+									$file = $file->copy($newFile->parent(), $newFile->name());
+								}
 								$existingFile->replace($file);
+								if($removeBlob) {
+									Blob::delete(['id' => $removeBlob->id]);
+								}
 								break;
 							case 'no':
 								$params['overwrite'] = 'ask';
@@ -1299,12 +1312,28 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 								continue 2;
 						}
 					} else {
+						if(!$removeBlob) {
+							$newFile = GO\Base\Fs\File::tempFile();
+							$file = $file->copy($newFile->parent(), $newFile->name());
+						}
 						$destinationFolder->addFileSystemFile($file, false, $filename);
+						if($removeBlob) {
+							Blob::delete(['id' => $removeBlob->id]);
+						}
 					}
 					$response['success'] = true;
 				}
 			}
 		}
+	}
+
+	private function removeBlob($blobId) {
+		$blob = Blob::findById($blobId);
+		if(!$blobId) {
+			throw new \Exception("Blob not found");
+		}
+		return isset($blob->staleAt) ? $blob : false;
+
 	}
 
 	protected function actionCompress($params) {
