@@ -1544,7 +1544,7 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			var id = record.data.id;
 
 			if (!Ext.isEmpty(folderId)) {
-				files.push(record.data.path);
+				files.push(record.data);
 			} else {
 				GO.email.openFolderTree(id);
 			}

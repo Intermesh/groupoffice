@@ -7,7 +7,6 @@ GO.base.email.EmailEditorAttachmentsView = function(config){
 		});
 		
 		config.store.on('load', function(){
-
 			if(this.store.data.length) {
 				this.show();
 			} else

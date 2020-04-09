@@ -1635,7 +1635,7 @@ GO.newMenuItems.push(
 {
 	itemId : 'email-files',
 	text: t("Email files", "email"),
-	iconCls: 'em-btn-email-files',
+	iconCls: 'ic-email',
 	handler:function(item, e){
 		var panel = item.parentMenu.panel;
 
@@ -1647,7 +1647,7 @@ GO.newMenuItems.push(
 					id: panel.data.id
 				},
 				success:function(response, options, result){
-					GO.email.emailFiles(result.data.path, this);
+					GO.email.emailFiles(result.data, this);
 				},
 				scope: this
 			});
@@ -1703,6 +1703,7 @@ GO.email.getTaskShowConfig = function(item) {
 	return taskShowConfig;
 }
 //files is array of relative paths
+// files is array of objects with {name, path, size, type, extension}
 GO.email.emailFiles = function(files, item) {
 	if (!Ext.isArray(files)) {
 		files = new Array(files);
@@ -1713,9 +1714,20 @@ GO.email.emailFiles = function(files, item) {
 	var c = GO.email.showComposer(composerConfig);
 
 	c.on('dialog_ready', function(){
-		c.emailEditor.attachmentsView.afterUpload({
-			addFileStorageFiles: Ext.encode(files)
-		});
+		var items = [];
+		for (var i = 0; i < files.length; i++) {
+			items.push({
+				human_size: Ext.util.Format.fileSize(files[i].size),
+				extension: files[i].extension,
+				size: files[i].size,
+				type: files[i].type,
+				name: files[i].name,
+				fileName: files[i].name,
+				from_file_storage: true,
+				tmp_file: files[i].path,
+			});
+		}
+		c.emailEditor.attachmentsView.addFiles(items);
 	},this,{single:true});
 }
 

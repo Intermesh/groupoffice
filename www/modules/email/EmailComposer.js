@@ -1211,8 +1211,12 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 						}
 							
 //						action.result.data.account_id
-						
-						this.fireEvent('dialog_ready', this);
+
+						Ext.defer(function() {
+							// show() of EmailEditorPanel is deferred 100ms by Ext and the ready event comes to early
+							this.fireEvent('dialog_ready', this);
+						}, 100,this);
+
 					},
 					scope : this
 				});
