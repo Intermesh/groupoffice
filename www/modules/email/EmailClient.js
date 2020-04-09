@@ -1278,7 +1278,6 @@ GO.mainLayout.onReady(function(){
 				iconCls: 'ic-email',
 				items:[{xtype:'box',html:'<b>'+text+'</b>'}],
 				title: title,
-				persistent: true,
 				handler: function(){
 					GO.mainLayout.openModule('email');
 				}
