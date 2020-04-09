@@ -391,7 +391,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		while($file = $stmt->fetch()) {
 			$fileNode = array(
 				'text' => $file->name,
+				'name' => $file->name,
 				'id' => $file->id,
+				'size' => $file->size,
+				'extension' => $file->extension,
 				'draggable' => false,
 				'leaf' => true,
 				'path'=> $folder->path . '/' . $file->name,

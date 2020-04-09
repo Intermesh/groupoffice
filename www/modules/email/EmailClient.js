@@ -1784,9 +1784,8 @@ GO.email.openFolderTree = function(id, folder_id, referenceItem) {
 					var selNodes = GO.email.folderTree.getChecked();
 
 					Ext.each(selNodes, function(node) {
-						selFiles.push(node.attributes.path);
+						selFiles.push(node.attributes);
 					});
-
 
 					GO.email.emailFiles(selFiles);
 
