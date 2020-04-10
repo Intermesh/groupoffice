@@ -304,19 +304,13 @@ go.util =  (function () {
 					window.open(url);
 				} else {
 					// document.location.href = url; //This causes connection errors with SSE or other simulanous XHR requests
-					// if(!downloadFrame) {
-					// 	downloadFrame = document.createElement('iframe');
-					// 	downloadFrame.id="downloader";
-					// 	downloadFrame.style.display = 'none';
-					// 	document.body.appendChild(downloadFrame);
-					// }
-					// downloadFrame.src = url;
-
 					if(!downloadFrame) {
-						var downloadFrame = document.createElement("a");
+						downloadFrame = document.createElement('iframe');
+						downloadFrame.id="downloader";
+						downloadFrame.style.display = 'none';
+						document.body.appendChild(downloadFrame);
 					}
-					downloadFrame.href = url;
-					downloadFrame.click();
+					downloadFrame.src = url;
 				}
 			}
 		},

@@ -238,7 +238,8 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 						this.attachments.push({
 							tmp_file:records[i].data.tmp_file,
 							from_file_storage: records[i].data.from_file_storage,
-							fileName:records[i].data.name
+							fileName:records[i].data.name,
+							blobId: records[i].data.blobId
 						});
 					
 					this.hiddenAttachmentsField.setValue(Ext.encode(this.attachments));
@@ -265,7 +266,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			name: blob.name,
 			fileName: blob.name,
 			from_file_storage: false,
-			tmp_file: blob.blobId
+			blobId: blob.blobId
 		}];
 
 		this.attachmentsView.addFiles(items);
@@ -433,7 +434,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 								name: blobs[i].name,
 								fileName: blobs[i].name,
 								from_file_storage: false,
-								tmp_file: blobs[i].blobId
+								blobId: blobs[i].blobId
 							});
 						}
 						//debugger;

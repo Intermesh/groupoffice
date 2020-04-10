@@ -624,10 +624,12 @@ body p{
 		if (!empty($params['attachments'])) {
 			$attachments = json_decode($params['attachments']);
 			foreach ($attachments as $att) {
-				if(in_array(substr($att->tmp_file,0,14), ['saved_messages', 'imap_messages/'])) {
+				if(!empty($att->blobId)) {
+					$path = Blob::buildPath($att->blobId);
+				}else	if(!empty($att->tmp_file) && empty($att->from_file_storage)){
 					$path = \GO::config()->tmpdir.$att->tmp_file;
 				} else {
-					$path = empty($att->from_file_storage) ? Blob::buildPath($att->tmp_file) : \GO::config()->file_storage_path . $att->tmp_file;
+					$path = \GO::config()->file_storage_path . $att->tmp_file;
 				}
 				$tmpFile = new \GO\Base\Fs\File($path);
 				if ($tmpFile->exists()) {

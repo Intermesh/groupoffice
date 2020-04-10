@@ -2,7 +2,7 @@ GO.base.email.EmailEditorAttachmentsView = function(config){
 		config=config||{};
 		config.store = new Ext.data.JsonStore({
 			root: 'results',
-			fields : ['tmp_file', 'name', 'size', 'type', 'extension', 'human_size','from_file_storage','fileName'],
+			fields : ['tmp_file', 'name', 'size', 'type', 'extension', 'human_size','from_file_storage','fileName', 'blobId'],
 			id : 'tmp_file'
 		});
 		
