@@ -1,4 +1,4 @@
-08-04-2020 6.4.129
+10-04-2020 6.4.129
 - Core: New upload function with drag and drop support in the file browser and detail view.
 - Core: New notification slide panel
 - Core: Links can have descriptions again. Entities can be found on link descriptions.
