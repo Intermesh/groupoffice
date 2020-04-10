@@ -25,6 +25,7 @@
 - Address book: Fixed error after creating new contact
 - Projects: Use {customer:* and {contact:* template tags on template projects, tasks and jobs. See https://groupoffice.readthedocs.io/en/latest/using/projects.html#jobs
 - E-mail: Drag files into editor to attach
+- E-mail: Fixed problem where tree wouldn't load if one of the mailboxes failed to open.
 
 17-03-2020 6.4.128
 - Billing: fixed error in opening invoice created by a deleted user.
