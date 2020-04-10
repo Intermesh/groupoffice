@@ -1,3 +1,4 @@
+10-04-2020 6.4.130
 - Billing: attachment could not be found
 - Core: Connection error when dowloading file
 
