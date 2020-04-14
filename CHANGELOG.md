@@ -1,3 +1,5 @@
+- Fixed ticket and e-mail counters. Issue: some issues on 6.4.130 #574
+
 10-04-2020 6.4.130
 - Billing: attachment could not be found
 - Core: Connection error when dowloading file
