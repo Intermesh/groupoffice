@@ -1253,6 +1253,21 @@ GO.mainLayout.onReady(function(){
 		}
 
 		go.Notifier.toggleIcon('email',data.email_status.total_unseen > 0);
+		GO.mainLayout.setNotification('email',data.email_status.total_unseen,'green');
+
+		var ep = GO.mainLayout.getModulePanel('email');
+
+		if(ep){
+			for(var i=0;i<data.email_status.unseen.length;i++)
+			{
+				var s = data.email_status.unseen[i];
+				var changed = ep.updateFolderStatus(s.mailbox, s.unseen,s.account_id);
+				if(changed && ep.messagesGrid.store.baseParams.mailbox==s.mailbox && ep.messagesGrid.store.baseParams.account_id==s.account_id)
+				{
+					ep.messagesGrid.store.reload();
+				}
+			}
+		}
 
 		if((!data.email_status.has_new && this.countEmailShown)
 			|| data.email_status.total_unseen <= 0
@@ -1284,21 +1299,8 @@ GO.mainLayout.onReady(function(){
 			}, 'email');
 		}
 
-		var ep = GO.mainLayout.getModulePanel('email');
 
-		if(ep){
-			for(var i=0;i<data.email_status.unseen.length;i++)
-			{
-				var s = data.email_status.unseen[i];
-				var changed = ep.updateFolderStatus(s.mailbox, s.unseen,s.account_id);
-				if(changed && ep.messagesGrid.store.baseParams.mailbox==s.mailbox && ep.messagesGrid.store.baseParams.account_id==s.account_id)
-				{
-					ep.messagesGrid.store.reload();
-				}
-			}
-		}
 
-		GO.mainLayout.setNotification('email',data.email_status.total_unseen,'green');
 	});
 
 });
