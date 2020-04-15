@@ -102,12 +102,14 @@ Ext.extend(GO.base.email.EmailEditorAttachmentsView, Ext.DataView, {
 	
 	onAttachmentDblClick : function(view, index, node, e){
 		
-		var record = this.store.getAt(index);	
-		if(record.data.from_file_storage){
-			window.open(GO.url("files/file/download",{path:record.data.tmp_file}));
+		var record = this.store.getAt(index);
+		if(record.data.blobId) {
+			go.util.downloadFile(go.Jmap.downloadUrl(record.data.blobId));
+		} else 	if(record.data.from_file_storage){
+			go.util.downloadFile(GO.url("files/file/download",{path:record.data.tmp_file}));
 		}else
 		{
-			window.open(GO.url("core/downloadTempFile",{path:record.data.tmp_file}));
+			go.util.downloadFile(GO.url("core/downloadTempFile",{path:record.data.tmp_file}));
 		}		
 	},
 	
