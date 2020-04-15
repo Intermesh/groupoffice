@@ -3,6 +3,7 @@
 - Tickets: Changing company in ticket didn't change company name
 - Tickets: Implemented show ticket function for external links
 - Core: Check for mysqlnd driver on upgrade and install
+- Core: Files not uploadable on older iOS fix by removing accept="*/*" (maybe)
 
 10-04-2020 6.4.130
 - Billing: attachment could not be found
