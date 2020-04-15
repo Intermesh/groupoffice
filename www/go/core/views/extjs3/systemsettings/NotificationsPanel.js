@@ -40,7 +40,8 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 							xtype: 'textfield',
 							name: 'smtpPassword',
 							fieldLabel: t('Password'),
-							inputType: "password"
+							inputType: "password",
+							autocomplete: "new-password"
 						}, {
 							xtype: 'combo',
 							name: 'smtpEncryption',
