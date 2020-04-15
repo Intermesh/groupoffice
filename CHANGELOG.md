@@ -2,6 +2,7 @@
 - Email/Tickets: Fixed ticket and e-mail counters. Issue: some issues on 6.4.130 #574
 - Tickets: Changing company in ticket didn't change company name
 - Tickets: Implemented show ticket function for external links
+- Core: Check for mysqlnd driver on upgrade and install
 
 10-04-2020 6.4.130
 - Billing: attachment could not be found

@@ -274,7 +274,14 @@ go.util =  (function () {
 			this.uploadDialog.removeAttribute('webkitdirectory');
 			this.uploadDialog.removeAttribute('directory');
 			this.uploadDialog.removeAttribute('multiple');
-			this.uploadDialog.setAttribute('accept', cfg.accept || '*/*');
+
+			if(cfg.accept) {
+				this.uploadDialog.setAttribute('accept', cfg.accept);
+			}else
+			{
+				this.uploadDialog.removeAttribute('accept');
+			}
+
 			if(cfg.directory) {
 				this.uploadDialog.setAttribute('webkitdirectory', true);
 				this.uploadDialog.setAttribute('directory', true);
