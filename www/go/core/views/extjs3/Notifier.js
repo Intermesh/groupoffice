@@ -30,7 +30,7 @@ go.Notifier = {
 			this.statusBar.show();
 			return;
 		}
-		for(let icon in this._icons[key]) {
+		for(var icon in this._icons[key]) {
 			if(!icon.hidden) return;
 		}
 		this.statusBar.hide();
@@ -150,11 +150,12 @@ go.Notifier = {
 					this.flyout(msg);
 					break;
 				case 'default':
+					var me = this;
 					Notification.requestPermission(function (permission) { // ask first
 						if (permission === "granted") {
 							new Notification(title, {body: msg.text, icon: icon});
 						} else {
-							this.flyout(msg);
+							me.flyout(msg);
 						}
 					});
 					break;
