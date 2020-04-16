@@ -48,6 +48,7 @@ CREATE TABLE `addressbook_contact` (
   `photoBlobId` binary(40) DEFAULT NULL,
   `language` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `jobTitle` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `department` VARCHAR(100) NULL DEFAULT NULL,
   `filesFolderId` int(11) DEFAULT NULL,
   `uid` varchar(512) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
   `vcardBlobId` binary(40) DEFAULT NULL,

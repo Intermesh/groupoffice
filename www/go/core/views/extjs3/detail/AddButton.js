@@ -231,7 +231,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 					text: "E-mail files",
 					handler: function () {
 						var dv = this.detailView;
-						this.folderId = dv.data.files_folder_id;
+						this.folderId = dv.data.filesFolderId || dv.data.files_folder_id;
 						GO.email.openFolderTree(this.folderId);
 					}, scope: this
 				});

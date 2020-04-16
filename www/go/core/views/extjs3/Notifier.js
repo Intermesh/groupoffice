@@ -7,9 +7,9 @@ go.Notifier = {
 		this.notificationArea = notificationArea;
 
 		this.addStatusIcon('upload', 'ic-file-upload');
-		this.statusBar = new Ext.Container({applyTo: "status-bar"});
-		for(var key in this.icons) {
-			this.statusBar.add(this.icons[key]);
+		this.statusBar = new Ext.Container({applyTo: "status-bar", hidden:true});
+		for(var key in this._icons) {
+			this.statusBar.add(this._icons[key]);
 		}
 		this.statusBar.doLayout();
 		this.statusBar.el.on('click', function(){
@@ -17,23 +17,32 @@ go.Notifier = {
 		}, this);
 
 		this.notifications = new Ext.Container({cls: 'notifications'});
-		this.notificationArea.add(this.notifications);
+		this.notificationArea.insert(0,this.notifications);
 	},
 
-	icons: {},
+	_messages: {},
+	_icons: {},
 	toggleIcon: function(key, visible) {
-		if (this.icons[key]) {
-			this.icons[key].setVisible(visible);
+		if (this._icons[key]) {
+			this._icons[key].setVisible(visible);
 		}
+		if(visible) {
+			this.statusBar.show();
+			return;
+		}
+		for(var icon in this._icons[key]) {
+			if(!icon.hidden) return;
+		}
+		this.statusBar.hide();
 	},
 	addStatusIcon : function(key, iconCls) {
-		this.icons[key] = new Ext.BoxComponent({
+		this._icons[key] = new Ext.BoxComponent({
 			hidden:true,
 			autoEl: 'i',
 			cls: 'icon '+iconCls
 		});
 		if(this.statusBar) {
-			this.statusBar.add(this.icons[key]);
+			this.statusBar.add(this._icons[key]);
 			this.statusBar.doLayout();
 		}
 	},
@@ -68,30 +77,37 @@ go.Notifier = {
 				}
 			}];
 		}
-		var msgCtr = new Ext.Panel(msg);
+		var msgPanel = new Ext.Panel(msg);
 
-		this.notifications.add(msgCtr);
+		this.notifications.add(msgPanel);
 		this.notifications.doLayout();
 		var me = this;
 
 		if(msg.removeAfter) {
 			setTimeout(function () {
-				me.remove(msgCtr);
+				me.remove(msgPanel);
 			}, msg.removeAfter);
 		}
-		msgCtr.setPersistent = function(bool) {
+		msgPanel.setPersistent = function(bool) {
 			if(!bool) {
-				msgCtr.addTool({
+				msgPanel.addTool({
 					id: 'close',
 					handler: function (e, toolEl, panel) {
 						me.remove(panel);
 					}
 				});
 			}
-			return msgCtr;
+			return msgPanel;
 		};
+
+		if(key) {
+			if(this._messages[key]) {
+				this._messages[key].destroy();
+			}
+			this._messages[key] = msgPanel;
+		}
 		
-		return msgCtr;
+		return msgPanel;
 	},
 	/**
 	 * For (less obstructive) popup messages from the bottom
@@ -134,11 +150,12 @@ go.Notifier = {
 					this.flyout(msg);
 					break;
 				case 'default':
+					var me = this;
 					Notification.requestPermission(function (permission) { // ask first
 						if (permission === "granted") {
 							new Notification(title, {body: msg.text, icon: icon});
 						} else {
-							this.flyout(msg);
+							me.flyout(msg);
 						}
 					});
 					break;

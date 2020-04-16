@@ -98,3 +98,10 @@ $updates['202003191040'][] = 'ALTER TABLE addressbook_contact ADD nameBank varch
 $updates['202003191040'][] = 'ALTER TABLE addressbook_contact ADD BIC varchar(11);';
 
 $updates['202004011205'][] = "ALTER TABLE `addressbook_contact` CHANGE `uid` `uid` VARCHAR(512) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL, CHANGE `uri` `uri` VARCHAR(512) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL;";
+
+$updates['202004161427'][] = "ALTER TABLE `addressbook_contact` ADD `department` VARCHAR(100) NULL DEFAULT NULL AFTER `jobTitle`;";
+
+$updates['202004161427'][] = function() {
+	$m = new go\modules\community\addressbook\install\Migrate63to64();
+	$m->addDepartment();
+};

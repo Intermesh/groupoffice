@@ -1253,6 +1253,21 @@ GO.mainLayout.onReady(function(){
 		}
 
 		go.Notifier.toggleIcon('email',data.email_status.total_unseen > 0);
+		GO.mainLayout.setNotification('email',data.email_status.total_unseen,'green');
+
+		var ep = GO.mainLayout.getModulePanel('email');
+
+		if(ep){
+			for(var i=0;i<data.email_status.unseen.length;i++)
+			{
+				var s = data.email_status.unseen[i];
+				var changed = ep.updateFolderStatus(s.mailbox, s.unseen,s.account_id);
+				if(changed && ep.messagesGrid.store.baseParams.mailbox==s.mailbox && ep.messagesGrid.store.baseParams.account_id==s.account_id)
+				{
+					ep.messagesGrid.store.reload();
+				}
+			}
+		}
 
 		if((!data.email_status.has_new && this.countEmailShown)
 			|| data.email_status.total_unseen <= 0
@@ -1278,28 +1293,14 @@ GO.mainLayout.onReady(function(){
 				iconCls: 'ic-email',
 				items:[{xtype:'box',html:'<b>'+text+'</b>'}],
 				title: title,
-				persistent: true,
 				handler: function(){
 					GO.mainLayout.openModule('email');
 				}
 			}, 'email');
 		}
 
-		var ep = GO.mainLayout.getModulePanel('email');
 
-		if(ep){
-			for(var i=0;i<data.email_status.unseen.length;i++)
-			{
-				var s = data.email_status.unseen[i];
-				var changed = ep.updateFolderStatus(s.mailbox, s.unseen,s.account_id);
-				if(changed && ep.messagesGrid.store.baseParams.mailbox==s.mailbox && ep.messagesGrid.store.baseParams.account_id==s.account_id)
-				{
-					ep.messagesGrid.store.reload();
-				}
-			}
-		}
 
-		GO.mainLayout.setNotification('email',data.email_status.total_unseen,'green');
 	});
 
 });
@@ -1636,7 +1637,7 @@ GO.newMenuItems.push(
 {
 	itemId : 'email-files',
 	text: t("Email files", "email"),
-	iconCls: 'em-btn-email-files',
+	iconCls: 'ic-email',
 	handler:function(item, e){
 		var panel = item.parentMenu.panel;
 
@@ -1648,7 +1649,7 @@ GO.newMenuItems.push(
 					id: panel.data.id
 				},
 				success:function(response, options, result){
-					GO.email.emailFiles(result.data.path, this);
+					GO.email.emailFiles(result.data, this);
 				},
 				scope: this
 			});
@@ -1704,6 +1705,7 @@ GO.email.getTaskShowConfig = function(item) {
 	return taskShowConfig;
 }
 //files is array of relative paths
+// files is array of objects with {name, path, size, type, extension}
 GO.email.emailFiles = function(files, item) {
 	if (!Ext.isArray(files)) {
 		files = new Array(files);
@@ -1714,9 +1716,20 @@ GO.email.emailFiles = function(files, item) {
 	var c = GO.email.showComposer(composerConfig);
 
 	c.on('dialog_ready', function(){
-		c.emailEditor.attachmentsView.afterUpload({
-			addFileStorageFiles: Ext.encode(files)
-		});
+		var items = [];
+		for (var i = 0; i < files.length; i++) {
+			items.push({
+				human_size: Ext.util.Format.fileSize(files[i].size),
+				extension: files[i].extension,
+				size: files[i].size,
+				type: files[i].type,
+				name: files[i].name,
+				fileName: files[i].name,
+				from_file_storage: true,
+				tmp_file: files[i].path,
+			});
+		}
+		c.emailEditor.attachmentsView.addFiles(items);
 	},this,{single:true});
 }
 
@@ -1773,9 +1786,8 @@ GO.email.openFolderTree = function(id, folder_id, referenceItem) {
 					var selNodes = GO.email.folderTree.getChecked();
 
 					Ext.each(selNodes, function(node) {
-						selFiles.push(node.attributes.path);
+						selFiles.push(node.attributes);
 					});
-
 
 					GO.email.emailFiles(selFiles);
 

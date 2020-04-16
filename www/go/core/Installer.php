@@ -254,6 +254,12 @@ class Installer {
 		if (version_compare(go()->getSettings()->databaseVersion, self::MIN_UPGRADABLE_VERSION) === -1) {
 			throw new \Exception("Your version is " . go()->getSettings()->databaseVersion . ". Please upgrade to " . self::MIN_UPGRADABLE_VERSION . " first.");
 		}
+
+		$clientVersion = go()->getDbConnection()->getPDO()->getAttribute(\PDO::ATTR_CLIENT_VERSION);
+		if (strpos($clientVersion, 'mysqlnd') === false) {
+			throw new \Exception("PDO is not using the mysqlnd driver. Please make sure PDO uses mysqlnd. It's now using: " . $clientVersion);
+
+		}
 	}
 
 	public function getUnavailableModules() {

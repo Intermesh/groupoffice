@@ -658,7 +658,7 @@ class Imap extends ImapBodyStruct {
 
 		\GO\Base\Util\ArrayUtil::caseInsensitiveSort($folders);
 
-//		\GO::debug($folders);
+		\GO::debug($folders);
 
 		return $folders;
 	}

@@ -24,6 +24,11 @@ function dbConnect($config){
 	catch(Exception $e){
 		$dbConnectError = "Could not connect to the database. The database returned this error:<br />".$e->getMessage();
 	}
+	$clientVersion = $pdo->getAttribute(PDO::ATTR_CLIENT_VERSION);
+	if (strpos($clientVersion, 'mysqlnd') === false) {
+	    $dbConnectError = "PDO is not using the mysqlnd driver. Please make sure PDO uses mysqlnd. It's now using: " . $clientVersion;
+	    $pdo = null;
+	}
 	
 	return $pdo;
 }

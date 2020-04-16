@@ -1,4 +1,23 @@
-08-04-2020 6.4.129
+- Address book: Added 'Department' field.
+
+16-04-2020 6.4.132
+- Core: Improved file upload error handling
+- Assistant: files opening twice
+
+15-04-2020 6.4.131
+- Email: open attached file fixed for new uploader
+- Email/Tickets: Fixed ticket and e-mail counters. Issue: some issues on 6.4.130 #574
+- Tickets: Changing company in ticket didn't change company name
+- Tickets: Implemented show ticket function for external links
+- Core: Check for mysqlnd driver on upgrade and install
+- Core: Files not uploadable on older iOS fix by removing accept="*/*" (maybe)
+- Newsletters: Added "creator" column.
+
+10-04-2020 6.4.130
+- Billing: attachment could not be found
+- Core: Connection error when dowloading file
+
+10-04-2020 6.4.129
 - Core: New upload function with drag and drop support in the file browser and detail view.
 - Core: New notification slide panel
 - Core: Links can have descriptions again. Entities can be found on link descriptions.
@@ -25,6 +44,7 @@
 - Address book: Fixed error after creating new contact
 - Projects: Use {customer:* and {contact:* template tags on template projects, tasks and jobs. See https://groupoffice.readthedocs.io/en/latest/using/projects.html#jobs
 - E-mail: Drag files into editor to attach
+- E-mail: Fixed problem where tree wouldn't load if one of the mailboxes failed to open.
 
 17-03-2020 6.4.128
 - Billing: fixed error in opening invoice created by a deleted user.

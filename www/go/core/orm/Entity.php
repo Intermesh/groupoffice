@@ -822,7 +822,7 @@ abstract class Entity extends Property {
 		}
 
 		if(isset($sort['creator'])) {
-			$query->join('core_user', 'creator', 'creator.id = '.$query->getTableAlias() . '.modifiedBy');
+			$query->join('core_user', 'creator', 'creator.id = '.$query->getTableAlias() . '.createdBy');
 			$query->orderBy(['creator.displayName' => $sort['creator']], true);
 			unset($sort['creator']);
 		}

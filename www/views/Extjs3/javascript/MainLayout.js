@@ -538,7 +538,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					html:  '<div class="go-header-left"><div id="go-logo" title="'+GO.settings.config.product_name+'"></div></div>\
 					<div class="go-header-right">\
 						<div id="secondary-menu">\
-							<div id="status-bar"></div>\
+							<div id="status-bar" class="x-hide-display"></div>\
 							<div id="search_query"></div>\
 							<div id="start-menu-link" ></div>\
 							<a id="user-menu" class="user-img" style="'+getUserImgStyle()+'"></a>\
@@ -559,6 +559,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					//animFloat: true,
 					collapsible: true,
 					collapsed: true,
+					autoScroll: true,
 					cmargins:{left:0,top:0,right:0,bottom:0}
 				});
 

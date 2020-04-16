@@ -274,7 +274,14 @@ go.util =  (function () {
 			this.uploadDialog.removeAttribute('webkitdirectory');
 			this.uploadDialog.removeAttribute('directory');
 			this.uploadDialog.removeAttribute('multiple');
-			this.uploadDialog.setAttribute('accept', cfg.accept || '*/*');
+
+			if(cfg.accept) {
+				this.uploadDialog.setAttribute('accept', cfg.accept);
+			}else
+			{
+				this.uploadDialog.removeAttribute('accept');
+			}
+
 			if(cfg.directory) {
 				this.uploadDialog.setAttribute('webkitdirectory', true);
 				this.uploadDialog.setAttribute('directory', true);
@@ -304,19 +311,13 @@ go.util =  (function () {
 					window.open(url);
 				} else {
 					// document.location.href = url; //This causes connection errors with SSE or other simulanous XHR requests
-					// if(!downloadFrame) {
-					// 	downloadFrame = document.createElement('iframe');
-					// 	downloadFrame.id="downloader";
-					// 	downloadFrame.style.display = 'none';
-					// 	document.body.appendChild(downloadFrame);
-					// }
-					// downloadFrame.src = url;
-
 					if(!downloadFrame) {
-						var downloadFrame = document.createElement("a");
+						downloadFrame = document.createElement('iframe');
+						downloadFrame.id="downloader";
+						downloadFrame.style.display = 'none';
+						document.body.appendChild(downloadFrame);
 					}
-					downloadFrame.href = url;
-					downloadFrame.click();
+					downloadFrame.src = url;
 				}
 			}
 		},

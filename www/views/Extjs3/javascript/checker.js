@@ -20,7 +20,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			run: this.checkForNotifications,
 			scope:this,
 			interval: GO.settings.config.checker_interval*1000,
-						// interval: 10000 // debug / test config
+			// 			 interval: 5000 // debug / test config
 		});
 		this.initReminders();
 	},
@@ -144,7 +144,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 				if(!GO.checker.lastCount){
 					this.ownerCt.hide();
-					go.Notifier.icons['reminder'].setVisible(false);
+					go.Notifier.toggleIcon('reminder', false);
 				}
 
 				reminderPanel.destroy();
@@ -196,7 +196,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 	handleReminderResponse : function(storeData){
 //		this.fireEvent('check', this, data);
 		var hasReminders = (storeData.total && storeData.total > 0);
-		go.Notifier.icons['reminder'].setVisible(hasReminders);
+		go.Notifier.toggleIcon('reminder',hasReminders);
 
 		if(!hasReminders) return;
 

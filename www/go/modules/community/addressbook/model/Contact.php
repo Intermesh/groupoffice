@@ -143,6 +143,13 @@ class Contact extends AclItemEntity {
 	public $jobTitle;
 
 	/**
+	 * The department
+	 *
+	 * @var string
+	 */
+	public $department;
+
+	/**
 	 * name field for companies and contacts. It should be the display name of first, middle and last name
 	 * @var string
 	 */							
@@ -463,6 +470,12 @@ class Contact extends AclItemEntity {
 										})
 										->addText("name", function(Criteria $criteria, $comparator, $value) {											
 											$criteria->where('name', $comparator, $value);
+										})
+										->addText("jobTitle", function(Criteria $criteria, $comparator, $value) {
+											$criteria->where('jobTitle', $comparator, $value);
+										})
+										->addText("department", function(Criteria $criteria, $comparator, $value) {
+											$criteria->where('department', $comparator, $value);
 										})
 										->addText("notes", function(Criteria $criteria, $comparator, $value) {											
 											$criteria->where('notes', $comparator, $value);

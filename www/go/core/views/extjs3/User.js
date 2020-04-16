@@ -36,6 +36,10 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 	},
   
   loadSession : function(session) {
+		console.warn(session);
+
+		go.Jmap.capabilities = session.capabilities;
+
     this.apiUrl = session.apiUrl;
     this.downloadUrl = session.downloadUrl;
     this.uploadUrl = session.uploadUrl;
@@ -49,7 +53,7 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		// Ext.apply(this, session.user);
 		return go.Db.store("User").single(session.userId).then(function(user) {
 			Ext.apply(me, user);
-			me.firstWeekDay = parseInt(user.firstWeekday);
+			// me.firstWeekDay = parseInt(user.firstWeekday);
 			me.legacySettings(user);
 
 			me.fireEvent("load", this);

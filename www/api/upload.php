@@ -40,6 +40,15 @@ if(isset($_GET['url'])) {
 	fclose($fp);
 	fclose($input);
 
+	if($tmpFile->getSize() > \go\core\jmap\Capabilities::get()->maxSizeUpload) {
+		$tmpFile->delete();
+		Response::get()->setStatus(413);
+		Response::get()->output([
+			"error" => "File exceeds maximum size of " .  \go\core\jmap\Capabilities::get()->maxSizeUpload. " bytes"
+		]);
+		exit();
+	}
+
 	$blob = Blob::fromTmp($tmpFile);
 	$blob->name = $filename;
 	$blob->modifiedAt = new \go\core\util\DateTime('@' . Request::get()->getHeader('X-File-LastModified'));
