@@ -1,3 +1,7 @@
+16-04-2020 6.4.132
+- Core: Improved file upload error handling
+- Assistant: files opening twice
+
 15-04-2020 6.4.131
 - Email: open attached file fixed for new uploader
 - Email/Tickets: Fixed ticket and e-mail counters. Issue: some issues on 6.4.130 #574
