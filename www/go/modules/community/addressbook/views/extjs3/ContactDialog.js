@@ -177,8 +177,13 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 										name: "jobTitle",
 										fieldLabel: t("Job title"),
 										anchor: "100%"
+									}),
+									this.departmentField = new Ext.form.TextField({
+										xtype: "textfield",
+										name: "department",
+										fieldLabel: t("Department"),
+										anchor: "100%"
 									})
-									
 								]
 							},
 							{
@@ -324,6 +329,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 		this.organizationsField.setDisabled(isOrganization);
 		this.genderField.setVisible(!isOrganization);
 		this.genderField.setDisabled(isOrganization);
+
+		this.departmentField.setVisible(!isOrganization);
 
 		if (isOrganization) {
 			this.tabPanel.unhideTabStripItem(this.businessPanel);

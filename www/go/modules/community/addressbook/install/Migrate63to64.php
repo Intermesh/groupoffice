@@ -758,13 +758,10 @@ class Migrate63to64 {
 			$contact->createdBy = \go\core\model\User::findById($r['user_id'], ['id']) ? $r['user_id'] : 1;
 			$contact->modifiedBy = \go\core\model\User::findById($r['muser_id'], ['id']) ? $r['muser_id'] : 1;
 
-			$contact->IBAN = $r['bank_no'];
-
-			//bank_bic???
+			$contact->IBAN = $r['iban'];
+			$contact->BIC = $r['bank_bic'];
 
 			$contact->vatNo = $r['vat_no'];
-
-
 
 			if ($r['photo']) {
 
@@ -807,6 +804,24 @@ class Migrate63to64 {
 						->join('ab_contacts','old','old.id = t.id')
 				);
 				
+		echo $stmt . "\n";
+		$stmt->execute();
+	}
+
+	public function addDepartment() {
+
+		if(!go()->getDatabase()->hasTable('ab_contacts')) {
+			return;
+		}
+
+		$stmt = go()->getDbConnection()
+			->update("addressbook_contact",
+				[
+					"department" => new Expression('old.department')
+				],
+				(new Query)
+					->join('ab_contacts','old','old.id = t.id')
+			);
 		echo $stmt . "\n";
 		$stmt->execute();
 	}

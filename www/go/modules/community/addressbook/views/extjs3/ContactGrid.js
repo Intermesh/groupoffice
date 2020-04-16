@@ -31,6 +31,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				"streetAddresses",
 				{name: 'organizations', type: "relation"},
 				"jobTitle",
+				"department",
 				"debtorNumber",
 				"registrationNumber",
 				"IBAN",
@@ -194,6 +195,12 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'jobTitle'
 				}, {
+					hidden: true,
+					header: t('Department'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'department'
+				},  {
 					hidden: true,
 					header: t('Registration number'),
 					width: dp(160),
