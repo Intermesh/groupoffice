@@ -1,3 +1,5 @@
+- Address book: Added 'Department' field.
+
 16-04-2020 6.4.132
 - Core: Improved file upload error handling
 - Assistant: files opening twice
