@@ -22,7 +22,7 @@
 	"swiftmailer/swiftmailer": "@stable",
 	"michelf/php-markdown": "^1.7",
 	"phpoffice/phpexcel": "^1.8",
-	"tecnickcom/tcpdf": "6.2.21",
+	"tecnickcom/tcpdf": "6.3.*",
 	"mtdowling/cron-expression": "^1.2",
 	"setasign/fpdi": "^2.2",
 	"setasign/fpdi-tcpdf": "^2.2",

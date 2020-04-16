@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "da9a193aac43a30833e73cc68036b4bd",
+    "content-hash": "9363f4140e095e186ee9693fd18a9a8c",
     "packages": [
         {
             "name": "defuse/php-encryption",
@@ -1197,21 +1197,21 @@
         },
         {
             "name": "setasign/fpdi-tcpdf",
-            "version": "v2.2.0",
+            "version": "v2.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Setasign/FPDI-TCPDF.git",
-                "reference": "95778baea02e5da76acb9f6dc1c946be380a22d8"
+                "reference": "f6711a95cba64db16e1a63e1b6195827a2150c93"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Setasign/FPDI-TCPDF/zipball/95778baea02e5da76acb9f6dc1c946be380a22d8",
-                "reference": "95778baea02e5da76acb9f6dc1c946be380a22d8",
+                "url": "https://api.github.com/repos/Setasign/FPDI-TCPDF/zipball/f6711a95cba64db16e1a63e1b6195827a2150c93",
+                "reference": "f6711a95cba64db16e1a63e1b6195827a2150c93",
                 "shasum": ""
             },
             "require": {
-                "setasign/fpdi": "^2.2",
-                "tecnickcom/tcpdf": "^6.2"
+                "setasign/fpdi": "^2.3",
+                "tecnickcom/tcpdf": "^6.3.5"
             },
             "type": "library",
             "notification-url": "https://packagist.org/downloads/",
@@ -1233,7 +1233,7 @@
                 "pdf"
             ],
             "abandoned": true,
-            "time": "2019-01-30T14:39:33+00:00"
+            "time": "2020-02-19T11:40:30+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -1534,16 +1534,16 @@
         },
         {
             "name": "tecnickcom/tcpdf",
-            "version": "6.2.21",
+            "version": "6.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tecnickcom/TCPDF.git",
-                "reference": "a3273af312d032e317ad151a47d40691d796e5e5"
+                "reference": "19a535eaa7fb1c1cac499109deeb1a7a201b4549"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/a3273af312d032e317ad151a47d40691d796e5e5",
-                "reference": "a3273af312d032e317ad151a47d40691d796e5e5",
+                "url": "https://api.github.com/repos/tecnickcom/TCPDF/zipball/19a535eaa7fb1c1cac499109deeb1a7a201b4549",
+                "reference": "19a535eaa7fb1c1cac499109deeb1a7a201b4549",
                 "shasum": ""
             },
             "require": {
@@ -1572,7 +1572,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "LGPL-3.0"
+                "LGPL-3.0-only"
             ],
             "authors": [
                 {
@@ -1592,7 +1592,7 @@
                 "pdf417",
                 "qrcode"
             ],
-            "time": "2018-09-14T13:49:09+00:00"
+            "time": "2020-02-14T14:20:12+00:00"
         }
     ],
     "packages-dev": [
@@ -3059,8 +3059,8 @@
             "authors": [
                 {
                     "name": "Arne Blankerts",
-                    "email": "arne@blankerts.de",
-                    "role": "Developer"
+                    "role": "Developer",
+                    "email": "arne@blankerts.de"
                 }
             ],
             "description": "A small library for converting tokenized PHP source code into XML and potentially other formats",
