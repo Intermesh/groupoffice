@@ -36,6 +36,10 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 	},
   
   loadSession : function(session) {
+		console.warn(session);
+
+		go.Jmap.capabilities = session.capabilities;
+
     this.apiUrl = session.apiUrl;
     this.downloadUrl = session.downloadUrl;
     this.uploadUrl = session.uploadUrl;

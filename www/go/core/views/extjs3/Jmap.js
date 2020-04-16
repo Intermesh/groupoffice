@@ -15,6 +15,25 @@ go.Jmap = {
 	 */
 	profile: false,
 
+	/**
+	 * Server capabilities. It's set when auth request completes in authentication manager
+	 */
+	capabilities : {
+		maxSizeUpload: 100*1000*1024,
+
+		maxConcurrentUpload: 4,
+
+		maxSizeRequest:  100*1000*1024,
+
+		maxConcurrentRequests: 4,
+
+		maxCallInRequest: 10,
+
+		maxObjectsInGet: 100,
+
+		maxObjectsInSet: 1000
+	},
+
 	nextCallId: function () {
 		this.callId++;
 
@@ -118,11 +137,32 @@ go.Jmap = {
 	},
 
 	uploadQueue: [],
+
+	/**
+	 *
+	 * @param {File} file
+	 * @param {Object} cfg
+	 */
 	upload : function(file, cfg) {
 		if(Ext.isEmpty(file) || file.name === '.DS_Store') {
 			cfg.callback && cfg.callback.call(cfg.scope || this, {upload:'skipped'});
 			return;
 		}
+
+		if(file.size > this.capabilities.maxSizeUpload) {
+			cfg.callback && cfg.callback.call(cfg.scope || this, {upload:'skipped'});
+			cfg.failure && cfg.failure.call(cfg.scope || this, data);
+			go.Notifier.notificationArea.expand();
+			go.Notifier.msg({
+				iconCls: 'ic-file-upload',
+				items:[
+					{xtype:'box',html:'<b>'+file.name+'</b><p class="danger">' +t('File size exceeds the maximum of {max}.').replace('{max}', go.util.humanFileSize(this.capabilities.maxSizeUpload)) + '</p>'},
+				],
+				title: t('Upload failed')
+			})
+			return;
+		}
+
 		// nicetohave: group file upload in 1 notification
 		this.uploadQueue.push(file);
 		go.Notifier.toggleIcon('upload', true);
@@ -169,17 +209,21 @@ go.Jmap = {
 			},
 			failure: function(response, options) {
 				var data = response,
-					text = response.isAbort ? t('Upload aborted') : t('Upload failed');
+					title = response.isAbort ? t('Upload aborted') : t('Upload failed');
+					text = '<b>'+Ext.util.Format.htmlEncode(file.name)+'</b><p class="danger">';
 
 				if(cfg.failure && response.responseText) {
 					data = Ext.decode(response.responseText);
 				} else if(response.status === 413) { // "Request Entity Too Large"
-					text += ': '+t('File too large');
+					text += t('File too large');
 				} else if(!response.isAbort) {
-					text += ': Please check if the system is using the correct URL at System settings -> General -> URL.';
+					text += 'Please check if the system is using the correct URL at System settings -> General -> URL.';
 				}
+				text += "</p>";
+
 				notifyEl.buttons[0].hide();
-				notifyEl.setPersistent(false).setTitle(text);
+				notifyEl.setPersistent(false).setTitle(title);
+				notifyEl.items.get(0).update(text);
 				cfg.failure && cfg.failure.call(cfg.scope || this, data);
 			},
 			headers: {
@@ -195,7 +239,7 @@ go.Jmap = {
 			persistent: true,
 			iconCls: 'ic-file-upload',
 			items:[
-				{xtype:'box',html:'<b>'+file.name+'</b><span>...</span>'},
+				{xtype:'box',html:'<b>'+Ext.util.Format.htmlEncode(file.name)+'</b><span>...</span>'},
 				{xtype:'progress',height:4,style:'margin: 7px 0'}
 			],
 			title: t('Uploading...'),

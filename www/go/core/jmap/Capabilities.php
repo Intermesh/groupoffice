@@ -10,7 +10,7 @@ class Capabilities extends Singleton {
 	 * The maximum file size, in bytes, that the server will accept for a 
 	 * single file upload (for any purpose).
 	 */
-	public $maxSizeUpload = 40*1000*1024; // 40MB
+	public $maxSizeUpload;
 	
 	public $maxConcurrentUpload = 4;
 	
@@ -25,6 +25,7 @@ class Capabilities extends Singleton {
 	public $maxObjectsInSet = 1000;
 	
 	public function __construct() {
-		$this->maxSizeUpload = min($this->maxSizeUpload, Environment::get()->getMaxUploadSize());
+		$this->maxSizeUpload = Environment::get()->getMaxUploadSize();
+		$this->maxSizeRequest = Environment::configToBytes(ini_get('post_max_size'));
 	}
 }

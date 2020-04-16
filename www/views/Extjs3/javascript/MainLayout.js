@@ -559,6 +559,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					//animFloat: true,
 					collapsible: true,
 					collapsed: true,
+					autoScroll: true,
 					cmargins:{left:0,top:0,right:0,bottom:0}
 				});
 
