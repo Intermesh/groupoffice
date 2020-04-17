@@ -114,8 +114,9 @@ class FilesModule extends \GO\Base\Module{
 
 				self::$fileHandlers=array();
 				foreach($modules as $module){
-					self::$fileHandlers = array_merge(self::$fileHandlers, $module->moduleManager->findClasses('filehandler'));
+					self::$fileHandlers = array_merge(self::$fileHandlers, array_map(function($c){return $c->name;}, $module->moduleManager->findClasses('filehandler')));
 				}
+
 				\GO::cache()->set('files-file-handlers', self::$fileHandlers);
 			}
 			
@@ -123,13 +124,15 @@ class FilesModule extends \GO\Base\Module{
 			// If not, then delete them from the array
 			foreach(self::$fileHandlers as $key=>$handler){
 				// $handler->name holds the namespace path of the handler. Based on that we can determine if the module is enabled.
-				$nsArr = explode('\\',$handler->name);
+				$nsArr = explode('\\',$handler);
+
 				$moduleName = strtolower($nsArr[1]);
-				
+
 				if(!\GO::modules()->$moduleName){
 					// Remove if the module is not enabled for this user
 					unset(self::$fileHandlers[$key]);
 				}
+
 			}
 		}		
 		return self::$fileHandlers;
@@ -158,26 +161,26 @@ class FilesModule extends \GO\Base\Module{
 	public static function afterBatchEditStore(&$controller, &$response, &$tmpModel, &$params) {
 		$countCustomfield = 0;
 		$countCustomfieldCategory = array();
-		
-		
+
+
 		if('GO\Files\Model\File' !== $tmpModel->className()) {
 			return $response['results'];
 		}
-		
+
 		$module = call_user_func_array($params['model_name'].'::model', array());
-		$stmt = call_user_func_array(array($module, 'find'), 
+		$stmt = call_user_func_array(array($module, 'find'),
 							array(\GO\Base\Db\FindParams::newInstance()->debugSql()->ignoreAcl()
 							->criteria(
 											\GO\Base\Db\FindCriteria::newInstance()
 											->addInCondition($params['primaryKey'], json_decode($params['keys']))
 											)
 									)
-							);		
-		
+							);
+
 		foreach ($stmt as $model) {
-			
+
 			$customfields = \GO\Customfields\Controller\CategoryController::getEnabledCategoryData("GO\Files\Model\File", $model->folder_id);
-			
+
 			$countCustomfield++;
 			if(isset($customfields['enabled_categories'])) {
 				foreach ($customfields['enabled_categories'] as $id) {
@@ -194,7 +197,7 @@ class FilesModule extends \GO\Base\Module{
 				if(!isset($allCats)) {
 					$allCats = \GO\Customfields\Model\Category::model()->findByModel("GO\Files\Model\File")->fetchAll();
 				}
-				
+
 				foreach($allCats as $cat) {
 					$id = $cat->id;
 					if(isset($countCustomfieldCategory[$id])) {
@@ -204,24 +207,24 @@ class FilesModule extends \GO\Base\Module{
 					}
 				}
 			}
-			
+
 		}
-		
+
 		// remove fields
 		foreach ($response['results']  as $key => $results) {
 			if($results['gotype'] == 'customfield') {
-				
-				
+
+
 				if(!isset($countCustomfieldCategory[$results['category_id']]) || $countCustomfieldCategory[$results['category_id']] != $countCustomfield) {
-					
+
 					unset($response['results'][$key]);
 				}
-				
+
 			}
 		}
-		
+
 		$response['results'] = array_values($response['results']);
-		
+
 	}
-	
+
 }

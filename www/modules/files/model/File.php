@@ -770,9 +770,8 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 		$handlers=array();
 		$classes = \GO\Files\FilesModule::getAllFileHandlers();
 		foreach($classes as $class){
-			/* @var $class ReflectionClass */
 
-			$fileHandler = new $class->name;
+			$fileHandler = new $class;
 			if($fileHandler->fileIsSupported($this)){
 				$handlers[]= $fileHandler;
 			}
@@ -800,9 +799,8 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 			}else{
 				$classes = \GO\Files\FilesModule::getAllFileHandlers();
 				foreach($classes as $class){
-					/* @var $class ReflectionClass */
 
-					$fileHandler = new $class->name;
+					$fileHandler = new $class;
 					if($fileHandler->isDefault($this)){
 						self::$defaultHandlers[$ex]= $fileHandler;
 						break;
