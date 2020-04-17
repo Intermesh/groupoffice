@@ -1,6 +1,7 @@
 17-04-2020 6.4.133
 - Address book: Added 'Department' field.
 - Core: installer broke on mysqlnd check
+- Core: PHP 7.4 issues. (Pro not ready because Ioncube for 7.4 is still in beta)
 
 16-04-2020 6.4.132
 - Core: Improved file upload error handling
