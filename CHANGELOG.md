@@ -1,4 +1,6 @@
+17-04-2020 6.4.133
 - Address book: Added 'Department' field.
+- Core: installer broke on mysqlnd check
 
 16-04-2020 6.4.132
 - Core: Improved file upload error handling
