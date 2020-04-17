@@ -1363,7 +1363,7 @@ class Imap extends ImapBodyStruct {
 		$offset = 0;
 		$parents = array();
 		while($uid_string) {
-			switch ($uid_string{0}) {
+			switch ($uid_string[0]) {
 				case ' ':
 					$level++;
 					$offset++;

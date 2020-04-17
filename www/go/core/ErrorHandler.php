@@ -22,11 +22,11 @@ class ErrorHandler {
 
 	public function __construct() {		
 		
-		//error_reporting(E_ALL)
+//		error_reporting(E_ALL);
 		
-		set_error_handler([$this, 'errorHandler']);
+		set_error_handler([$this, 'errorHandler'], E_ALL);
 		register_shutdown_function([$this, 'shutdown']);
-		set_exception_handler([$this, 'exceptionHandler']);		
+		set_exception_handler([$this, 'exceptionHandler']);
 	}
 
 	/**

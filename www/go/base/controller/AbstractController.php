@@ -362,7 +362,7 @@ abstract class AbstractController extends Observable {
 		if(!method_exists($this, $methodName))
 			throw new NotFound();
 		
-		try {	
+		try {
 			if($checkPermissions && !$this->_checkPermission($action)){
 				$cls = get_class($this);
 				throw new AccessDenied($cls ."::" .$this->getAction());
@@ -393,8 +393,8 @@ abstract class AbstractController extends Observable {
 			//Unset some system parameters not intended for the controller action.
 			unset($params['security_token'], $params['r']);
 			
-			$this->beforeRun($action, $params, $render);			
-			
+			$this->beforeRun($action, $params, $render);
+
 			$response =  $this->callActionMethod($methodName, $params);
 			
 			$this->afterRun($action, $params, $render);
