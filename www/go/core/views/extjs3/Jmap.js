@@ -149,7 +149,7 @@ go.Jmap = {
 			return;
 		}
 
-		if(file.size > this.capabilities.maxSizeUpload) {
+		if(this.capabilities.maxSizeUpload && file.size > this.capabilities.maxSizeUpload) {
 			cfg.callback && cfg.callback.call(cfg.scope || this, {upload:'skipped'});
 			cfg.failure && cfg.failure.call(cfg.scope || this, data);
 			go.Notifier.notificationArea.expand();
