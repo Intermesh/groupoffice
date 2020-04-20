@@ -136,7 +136,7 @@ go.Router = (function () {
 			if (this.getPath() == path) {
 
 				//rerun route if hash is the same
-				//go.Router.check();
+				go.Router.check();
 			} else {
 				window.location.hash = path || "";
 			}

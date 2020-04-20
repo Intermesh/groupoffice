@@ -87,14 +87,17 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					],
 					listeners: {
 						'afterrender': function(me) {
-							me.body.on('click',function (el){
+							var clickHandler = function (el){
 								var record = me.record.data;
 								if(!record.model_name || !record.model_id) {
 									return;
 								}
 								var parts = record.model_name.split("\\");
 								go.Router.goto(parts[3].toLowerCase()+"/"+record.model_id);
-							});
+							};
+
+							me.body.on('click', clickHandler);
+							me.header.on('click', clickHandler);
 						}
 					},
 					buttonAlign: 'left',

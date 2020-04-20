@@ -1,4 +1,6 @@
 - Core: Handle unlimited upload limit
+- Core: Some PHP 7.4 issues
+- Core: Removed notification flyouts
 
 17-04-2020 6.4.133
 - Address book: Added 'Department' field.
