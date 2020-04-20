@@ -554,7 +554,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					region:'east',
 					title: t('Notifications'),
 					floating:true,
-					width:dp(408),
+					width: GO.util.isMobileOrTablet() ? window.innerWidth : dp(408),
 					//animCollapse:true,
 					//animFloat: true,
 					collapsible: true,

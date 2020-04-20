@@ -47,7 +47,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 		];
 
 
-		this.reminders = new Ext.Container({cls: 'notifications'});
+		this.reminders = new Ext.Container({cls: 'notifications', layout:"anchor", defaults: {anchor: "100%"}});
 		this.reminderStore = new Ext.data.GroupingStore({
 			reader: new Ext.data.JsonReader({
 				totalProperty: "count",
@@ -94,10 +94,13 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 								}
 								var parts = record.model_name.split("\\");
 								go.Router.goto(parts[3].toLowerCase()+"/"+record.model_id);
+								go.Notifier.notificationArea.collapse();
 							};
 
 							me.body.on('click', clickHandler);
 							me.header.on('click', clickHandler);
+
+
 						}
 					},
 					buttonAlign: 'left',
@@ -122,12 +125,10 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 			}, this);
 
-
-
-			this.reminders.doLayout();
 		},this);
 
 		go.Notifier.notificationArea.add(this.reminders);
+		go.Notifier.notificationArea.doLayout();
 
 	},
 
