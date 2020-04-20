@@ -1,3 +1,5 @@
+- Core: Handle unlimited upload limit
+
 17-04-2020 6.4.133
 - Address book: Added 'Department' field.
 - Core: installer broke on mysqlnd check
