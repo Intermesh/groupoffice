@@ -147,7 +147,7 @@ go.Notifier = {
 		try {
 			switch(Notification.permission) {
 				case 'denied':
-					this.flyout(msg);
+					//this.flyout(msg);
 					break;
 				case 'default':
 					var me = this;
@@ -155,7 +155,7 @@ go.Notifier = {
 						if (permission === "granted") {
 							new Notification(title, {body: msg.text, icon: icon});
 						} else {
-							me.flyout(msg);
+						//	me.flyout(msg);
 						}
 					});
 					break;
@@ -164,7 +164,7 @@ go.Notifier = {
 			}
 		} catch (e) {
 			/* ignore failure on mobiles */
-			this.flyout(msg);
+		//	this.flyout(msg);
 		}
 
 	},
