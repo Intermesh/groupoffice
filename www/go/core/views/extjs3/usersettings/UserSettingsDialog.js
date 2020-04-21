@@ -376,6 +376,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 				},me);
 
 				me.formPanel.getForm().setValues(user);
+
+				if(user.id != go.User.id) {
+					me.setTitle(t("User") + ": " + Ext.util.Format.htmlEncode(user.username));
+				}
 				
 				me.findBy(function(cmp,cont){
 					if(typeof cmp.onLoad === 'function') {
