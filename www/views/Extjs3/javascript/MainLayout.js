@@ -691,12 +691,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	
 	
 	openSystemSettings : function() {
-		if(!this.systemSettingsWindow)
-		{ 
-			this.systemSettingsWindow = new go.systemsettings.Dialog({
-				closeAction: "hide"
-			});					
-		}
+
+		GO.viewport.items.each(function(i){i.hide()});
+		this.systemSettingsWindow = new go.systemsettings.Dialog({
+			closeAction: "hide"
+		});
 
 		this.systemSettingsWindow.show();
 
