@@ -51,8 +51,14 @@ class Migrate63to64 {
 						->join("ab_contacts", 'c', 'c.addressbook_id = a.id', 'left')
 						->join("ab_companies", 'o', 'o.addressbook_id = a.id', 'left')
 						->groupBy(['a.id'])
-						->having("count(c.id)>0 or count(o.id)>0");		
+						->having("count(c.id)>0 or count(o.id)>0")
+						->all();
 
+		$addressBooks[] = [
+			'id' => 0,
+			'user_id' => 1,
+			'name' => '__ORPHANED__'
+		];
 		// echo $addressBooks ."\n";		
 
 		foreach ($addressBooks as $abRecord) {
@@ -62,7 +68,10 @@ class Migrate63to64 {
 			$addressBook = AddressBook::find()->where(['name'=>$abRecord['name']])->single();
 			if(!$addressBook) {
 				$addressBook = new AddressBook();
-				$addressBook->id = $abRecord['id'];
+
+				if(!empty($abRecord['id'])) {
+					$addressBook->id = $abRecord['id'];
+				}
 
 				//make sure user ID exists
 				$id = go()->getDbConnection()->selectSingleValue('id')->from('core_user')->where('id', '=', $abRecord['user_id'])->single();
@@ -70,8 +79,10 @@ class Migrate63to64 {
 				$addressBook->createdBy = $id ? $id : 1;
 
 				//make sure ACL exists
-				$aclId = go()->getDbConnection()->selectSingleValue('id')->from('core_acl')->where('id', '=', $abRecord['acl_id'])->single();
-				$addressBook->aclId = $aclId ? $aclId : null;
+				if(!empty($abRecord['acl_id'])) {
+					$aclId = go()->getDbConnection()->selectSingleValue('id')->from('core_acl')->where('id', '=', $abRecord['acl_id'])->single();
+					$addressBook->aclId = $aclId ? $aclId : null;
+				}
 				
 				$addressBook->name = $abRecord['name'];
 				$addressBook->filesFolderId = empty($abRecord['files_folder_id']) ? null : $abRecord['files_folder_id'];
@@ -81,9 +92,9 @@ class Migrate63to64 {
 				}
 			}
 
-			$this->copyCompanies($addressBook);
+			$this->copyCompanies($addressBook, empty($abRecord['id']));
 			
-			$this->copyContacts($addressBook);
+			$this->copyContacts($addressBook, empty($abRecord['id']));
 			
 			echo "\n";
 			flush();
@@ -98,6 +109,17 @@ class Migrate63to64 {
 		$this->migrateCustomField();
 
     $this->checkCount();
+
+    //remove orhpans if there were none.
+		$addressBook = AddressBook::find()->where(['name'=> '__ORPHANED__'])->single();
+		$orphanCount = go()->getDbConnection()
+			->selectSingleValue('count(*)')
+			->from('addressbook_contact')
+			->where('addressBookId', '=', $addressBook->id)
+			->single();
+		if($orphanCount == 0) {
+			AddressBook::delete(['id' => $addressBook->id]);
+		}
 	}
 
   /**
@@ -400,16 +422,21 @@ class Migrate63to64 {
 	}
 
 
-	private function copyContacts(AddressBook $addressBook) {
+	private function copyContacts(AddressBook $addressBook, $orphans = false) {
 
 		
 		$db = go()->getDbConnection();
 
 		$contacts = $db->select()->from('ab_contacts')
-						->where(['addressbook_id' => $addressBook->id])
 						->andWhere('id not in (select id from addressbook_contact)')
 						->orderBy(['id' => 'ASC']);
-		
+
+		if(!$orphans) {
+			$contacts->where(['addressbook_id' => $addressBook->id]);
+		}else{
+			$contacts->where('addressbook_id NOT IN (select id from ab_addressbooks)');
+		}
+
 		//continue where we left last time if failed.
 //		$max = $db->selectSingleValue('max(id)')
 //						->from("addressbook_contact")
@@ -637,14 +664,20 @@ class Migrate63to64 {
 		}
 	}
 //select * from ab_companies where (id + (select max(id) from ab_contacts)) not in (select id from addressbook_contact)
-	private function copyCompanies(AddressBook $addressBook) {
+	private function copyCompanies(AddressBook $addressBook, $orphans = false) {
 		$db = go()->getDbConnection();		
 
 		$contacts = $db->select()
 		->from('ab_companies')
-		->where(['addressbook_id' => $addressBook->id])
 		->andWhere('(id + '.$this->getCompanyIdIncrement().') not in (select id from addressbook_contact)');
-		
+
+		if(!$orphans) {
+			$contacts->where(['addressbook_id' => $addressBook->id]);
+		}else{
+			$contacts->where('addressbook_id NOT IN (select id from ab_addressbooks)');
+		}
+
+
 		//continue where we left last time if failed.
 //		$max = $db->selectSingleValue('max(id)')->from("addressbook_contact")->andWhere(['addressBookId' => $addressBook->id])->single();
 //		if($max>0) {
