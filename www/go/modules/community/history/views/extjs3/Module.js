@@ -4,7 +4,7 @@ go.Modules.register("community", "history", {
 	entities: [{
 		name:'LogEntry',
 		relations: {
-			user: {store: 'User', fk:'createdBy'}
+			creator: {store: 'User', fk:'createdBy'}
 		}
 	}],
 	initModule: function () {}
