@@ -230,12 +230,12 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 				for (var i = 0, l = storeData.results.length; i < l; i++) {
 					var rem = storeData.results[i];
-					text += '['+rem.time+']' + rem.type+': '+rem.name + "<br />";
+					text += '['+rem.time+'] ' + rem.type+': '+rem.name + "\n";
 				}
 
 				//console.log(storeData);
 
-				go.Notifier.notify({iconCls: "ic-notifications",description: text, title: t("Reminders")});
+				go.Notifier.notify({iconCls: "ic-notifications",text: text, title: t("Reminders")});
 			}
 		}
 		go.Notifier.playSound('message-new-email', 'reminder');

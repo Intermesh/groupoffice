@@ -144,6 +144,8 @@ go.Notifier = {
 		var icon = msg.icon || 'views/Extjs3/themes/Paper/img/notify/reminder.png';
 		icon = window.location.pathname + icon;
 
+		msg.text = msg.text || msg.description;
+
 		try {
 			switch(Notification.permission) {
 				case 'denied':
