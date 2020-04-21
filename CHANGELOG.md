@@ -4,6 +4,7 @@
 - Core: Removed notification flyouts
 - Addressbook: On 6.3 upgrade move orphans to an address book called __ORPHANED__ so the upgrade can continue
 - time tracking: set start of day to end of last time entry of that day
+- Billing: grouping on status gave error on reload
 
 17-04-2020 6.4.133
 - Address book: Added 'Department' field.
