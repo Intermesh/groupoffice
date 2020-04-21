@@ -1,8 +1,9 @@
+21-04-2020 6.4.134
 - Core: Improved notifications
 - Core: Handle unlimited upload limit
 - Core: Some PHP 7.4 issues
 - Core: Removed notification flyouts
-- Addressbook: On 6.3 upgrade move orphans to an address book called __ORPHANED__ so the upgrade can continue
+- Address book: On 6.3 upgrade move orphans to an address book called __ORPHANED__ so the upgrade can continue
 - time tracking: set start of day to end of last time entry of that day
 - Billing: grouping on status gave error on reload
 - Calendar: All day event black text color in dark theme
