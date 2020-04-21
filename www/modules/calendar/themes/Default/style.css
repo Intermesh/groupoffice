@@ -318,6 +318,7 @@ border-collapse:collapse;
 	margin: 2px 2px 4px 0;
 	position:relative;
 	background-color:#ffffcc;
+	color:#000;
 	overflow: hidden;
 	border-radius: 2px;
 	-moz-outline:none;
