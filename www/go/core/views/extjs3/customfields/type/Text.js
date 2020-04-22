@@ -102,7 +102,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 
 		return Ext.apply({
 			xtype: 'textfield',
-			serverFormats: false, //for backwars compatibility with old framework. Can be removed when all is refactored.
+			serverFormats: false, //for backwards compatibility with old framework. Can be removed when all is refactored.
 			name: 'customFields.' + customfield.databaseName,
 			fieldLabel: fieldLabel,
 			anchor: '100%',
