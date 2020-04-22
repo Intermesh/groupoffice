@@ -1,3 +1,5 @@
+- Core: Custom fields marked as required are only required if they are visible
+
 21-04-2020 6.4.134
 - Core: Improved notifications
 - Core: Handle unlimited upload limit

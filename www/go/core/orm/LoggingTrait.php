@@ -117,6 +117,8 @@ trait LoggingTrait {
 			$log->message = $message;
 			//$log->object = $this;
 			$log->jsonData = json_encode($data);
+
+			$log->cutPropertiesToColumnLength();
 			
 			if(!$log->save()) {
 				throw new Exception("Could not log! " . var_export($log->getValidationErrors(), true));
