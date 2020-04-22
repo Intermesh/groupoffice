@@ -1,4 +1,6 @@
+22-04-2020 6.4.135
 - Core: Custom fields marked as required are only required if they are visible
+- Log: too long descriptions could lead to error
 
 21-04-2020 6.4.134
 - Core: Improved notifications
