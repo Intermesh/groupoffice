@@ -1,7 +1,7 @@
 Ext.define('go.modules.community.history.LogEntryGrid',{
 	extend: go.grid.GridPanel,
 
-	autoHeight:true,
+	layout:'fit',
 	autoExpandColumn: 'name',
 	columns:[{
 		header: t('ID'),
