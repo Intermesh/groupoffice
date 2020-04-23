@@ -164,7 +164,13 @@ GO.mainLayout.on("boot", function () {
 	// default route
 	go.Router.add(function () {
 		if (go.User.isLoggedIn()) {
-			go.Router.goto(GO.settings.start_module);
+			if(go.Router.getPath() != GO.settings.start_module) {
+				go.Router.goto(GO.settings.start_module);
+			} else
+			{
+				var firstTab = GO.mainLayout.tabPanel.items.itemAt(0);
+				GO.mainLayout.tabPanel.setActiveTab(firstTab);
+			}
 		}
 	});
 });

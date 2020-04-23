@@ -1,3 +1,5 @@
+- Core: Fixed Maximum callstack error when start module was set to non-existing module
+
 22-04-2020 6.4.135
 - Core: Custom fields marked as required are only required if they are visible
 - Log: too long descriptions could lead to error
