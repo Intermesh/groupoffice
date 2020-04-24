@@ -25,6 +25,10 @@ class Connection {
 	public function connect($uri) {
 		
 		go()->debug('Connect to '.$uri);
+
+		if(!function_exists("ldap_connect")) {
+			throw new \Exception("Please install the LDAP extesion for PHP if you wish to use LDAP authentication.");
+		}
 		
 		$this->link = ldap_connect($uri);
 
