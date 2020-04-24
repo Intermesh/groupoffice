@@ -411,8 +411,19 @@ use const GO_CONFIG_FILE;
 			if(Request::get()->getHeader('X-Debug') == "1") {
 				$this->config['core']['general']['debug'] = true;
 			}
-			
+
+			$this->initTCPDF();
+
 			return $this->config;
+		}
+
+		/**
+		 * The TCPDF cache path must be set before autoloading it from vendor.
+		 */
+		private function initTCPDF() {
+
+			define("K_PATH_CACHE", $this->config['core']['general']['tmpPath'] . "/");
+
 		}
 
 		/**
