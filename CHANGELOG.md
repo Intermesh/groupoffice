@@ -1,4 +1,5 @@
 28-04-2020 6.4.136
+- Newsletters: Dragging attachment to composer was broken and moved template management to main screen
 - Core: Fixed Maximum callstack error when start module was set to non-existing module
 - Email: fixed template selection dialog that shows when there are more than 10 templates
 - Core: Correct Function type field in custom fields. Rename Function to FunctionField
