@@ -1,3 +1,5 @@
+- Calendar: Import all day events in user time zone always
+
 28-04-2020 6.4.136
 - Newsletters: Dragging attachment to composer was broken and moved template management to main screen
 - Core: Fixed Maximum callstack error when start module was set to non-existing module
