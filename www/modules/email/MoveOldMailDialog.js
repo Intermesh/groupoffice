@@ -12,8 +12,8 @@ GO.email.MoveOldMailDialog = function(config){
 	//	config.stateId='email-message-dialog';
 	config.maximizable=true;
 	config.modal=false;
-	config.width=500;
-	config.height=200;
+	config.width=dp(480);
+	config.height=dp(280);
 	config.resizable=true;
 	config.minizable=true;
 	config.closeAction='hide';	
@@ -88,7 +88,6 @@ Ext.extend(GO.email.MoveOldMailDialog, go.Window,{
 			})
 		, this.untilDate = new Ext.form.DateField({
 				name : 'until_date',
-				width : 100,
 				format : GO.settings['date_format'],
 				allowBlank : false,
 				fieldLabel : t("All emails before", "email")
