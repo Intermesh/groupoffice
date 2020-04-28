@@ -57,7 +57,7 @@ go.emailtemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 		];
 	},
 
-	onAttach: function (htmleditor, blobId, file, imgEl) {
+	onAttach: function (htmleditor, blob, file, imgEl) {
 
 		//Inline images are parsed form the body and should not be sent as attachment
 		if (imgEl) {
@@ -65,7 +65,7 @@ go.emailtemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 		}
 
 		this.attachments.addAttachment({
-			blobId: blobId,
+			blobId: blob.blobId,
 			name: file.name,
 			attachment: true
 		});
