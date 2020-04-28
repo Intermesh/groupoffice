@@ -1,4 +1,5 @@
 - Calendar: Import all day events in user time zone always
+- Core: Users with manage permission couldn't mange permissions
 
 28-04-2020 6.4.136
 - Newsletters: Dragging attachment to composer was broken and moved template management to main screen

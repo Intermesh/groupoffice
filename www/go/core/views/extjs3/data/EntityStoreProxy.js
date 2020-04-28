@@ -65,10 +65,18 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 		var me = this;
 		var promise = this.entityStore.query(params);
 
-		this.activeRequest[action] = promise.callId;
+		me.activeRequest[action] = promise.callId;
+		var clientCallId = promise.callId;
 
 		promise.then(function (response) {
+
 			var getPromise = me.entityStore.get(response.ids).then(function(result) {
+
+				//check if request wasn't replaced
+				if(me.activeRequest[action] != clientCallId) {
+					console.warn("Not handling load callback because another request replaced this one: " + me.activeRequest[action] + '!=' + clientCallId);
+					return;
+				}
 
 				var data = {
 					total: response.total,

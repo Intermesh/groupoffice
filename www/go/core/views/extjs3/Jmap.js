@@ -60,7 +60,7 @@ go.Jmap = {
 	},
 
 	abort: function (clientCallId) {
-		console.log("Abort request " + clientCallId);
+		console.warn("Abort request " + clientCallId);
 
 		for (var i = 0, l = this.requests.length; i < l; i++) {
 			if (this.requests[i][2] == clientCallId) {
@@ -422,8 +422,10 @@ go.Jmap = {
 
 					responses.forEach(function (response) {
 
+						var clientCallId = response[2];
+
 						//lookup request options by client ID
-						var o = this.requestOptions[response[2]], me = this;
+						var o = this.requestOptions[clientCallId], me = this;
 						if (!o) {
 							//aborted
 							console.debug("Aborted");
@@ -438,7 +440,7 @@ go.Jmap = {
 								if (!o.scope) {
 									o.scope = this;
 								}
-								o.callback.call(o.scope, o, success, response[1], response[2]);
+								o.callback.call(o.scope, o, success, response[1], clientCallId);
 							} else {
 
 								response[1].options = o;
@@ -450,7 +452,7 @@ go.Jmap = {
 								}
 							}
 
-							delete me.requestOptions[response[2]];
+							delete me.requestOptions[clientCallId];
 
 					}, this);
 
