@@ -1,4 +1,7 @@
+28-04-2020 6.4.136
 - Core: Fixed Maximum callstack error when start module was set to non-existing module
+- Email: fixed template selection dialog that shows when there are more than 10 templates
+- Core: Correct Function type field in custom fields. Rename Function to FunctionField
 
 22-04-2020 6.4.135
 - Core: Custom fields marked as required are only required if they are visible
