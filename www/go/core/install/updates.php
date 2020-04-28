@@ -680,3 +680,5 @@ $updates['202002041223'][] = "ALTER TABLE `core_link` ADD INDEX(`fromEntityTypeI
 $updates['202002041223'][] = "ALTER TABLE `core_link` ADD INDEX(`fromId`);";
 $updates['202002041223'][] = "ALTER TABLE `core_link` ADD INDEX(`toEntityTypeId`);";
 $updates['202002041223'][] = "ALTER TABLE `core_link` ADD INDEX(`toId`);";
+
+$updates['202004281031'][] = "UPDATE `core_customfields_field` SET `type` = 'FunctionField' WHERE `type` = 'Function';";
