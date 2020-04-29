@@ -38,8 +38,19 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 			//noFiles is used in GO.email.LinkedMessagePanel
 			if(go.Modules.isAvailable("legacy", "documenttemplates")) {
 
-				this.menu.add(	{
-					iconCls: 'ic-mail',
+				var lastEmailIndex = 0;
+				this.menu.items.each(function(item, index) {
+					if(item.text && item.text.indexOf('E-mail') > -1) {
+						lastEmailIndex = index;
+					}
+				});
+
+				if(!lastEmailIndex) {
+					lastEmailIndex = this.menu.items.getCount() - 1;
+				}
+
+				this.menu.insert(lastEmailIndex + 1,	{
+					iconCls: 'ic-mail bluegrey',
 					text:  t("E-mail from template","documenttemplates", "legacy"),
 					scope: this,
 					handler: function() {
@@ -60,7 +71,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 				});
 
 				this.menu.add(	{
-					iconCls: 'ic-mail', 
+					iconCls: 'ic-description pink',
 					text:  t("Document from template", "documenttemplates", "legacy"),
 					scope: this,
 					handler: function() {
