@@ -1,3 +1,4 @@
+- Calendar: Fix for 75th anniversary early may bank holiday
 - Files: Restored sync file system tool in System settings -> tools
 - Calendar: Import all day events in user time zone always
 - Core: Users with manage permission couldn't mange permissions
