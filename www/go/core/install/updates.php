@@ -682,3 +682,4 @@ $updates['202002041223'][] = "ALTER TABLE `core_link` ADD INDEX(`toEntityTypeId`
 $updates['202002041223'][] = "ALTER TABLE `core_link` ADD INDEX(`toId`);";
 
 $updates['202004281031'][] = "UPDATE `core_customfields_field` SET `type` = 'FunctionField' WHERE `type` = 'Function';";
+$updates['202004292101'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
