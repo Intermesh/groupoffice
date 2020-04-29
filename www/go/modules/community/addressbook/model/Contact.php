@@ -450,7 +450,10 @@ class Contact extends AclItemEntity {
                       $criteria->andWhere('c.id ' . $not . ' IN (SELECT contactId FROM addressbook_contact_group)');
                     })
 										->add("isOrganization", function(Criteria $criteria, $value) {
-											$criteria->andWhere('isOrganization', '=', $value);
+											if($value == null) {
+												return;
+											}
+											$criteria->andWhere('isOrganization', '=', (bool) $value);
 										})
 										->add("hasEmailAddresses", function(Criteria $criteria, $value, Query $query) {
 
