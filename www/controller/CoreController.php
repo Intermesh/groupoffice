@@ -803,11 +803,11 @@ All rights reserved.");
 		$response['data']['about']=str_replace('{product_name}', GO::config()->product_name, $response['data']['about']);
 
 		
-		$response['data']['mailbox_usage']=\GO\Base\Util\Number::formatSize(GO::config()->get_setting('mailbox_usage'));
-		$response['data']['file_storage_usage']= \GO\Base\Util\Number::formatSize(GO::config()->get_setting('file_storage_usage')) .' / '.\GO\Base\Util\Number::formatSize(GO::config()->quota * 1024);
+		$response['data']['mailbox_usage']=\GO\Base\Util\Number::formatSize((int) GO::config()->get_setting('mailbox_usage'));
+		$response['data']['file_storage_usage']= \GO\Base\Util\Number::formatSize((int) GO::config()->get_setting('file_storage_usage')) .' / '.\GO\Base\Util\Number::formatSize(GO::config()->quota * 1024);
 		
-		$response['data']['database_usage']=\GO\Base\Util\Number::formatSize(GO::config()->get_setting('database_usage'));
-		$response['data']['total_usage']=\GO\Base\Util\Number::formatSize(GO::config()->get_setting('database_usage') + GO::config()->get_setting('file_storage_usage') + GO::config()->get_setting('mailbox_usage'));
+		$response['data']['database_usage']=\GO\Base\Util\Number::formatSize((int) GO::config()->get_setting('database_usage'));
+		$response['data']['total_usage']=\GO\Base\Util\Number::formatSize((int)GO::config()->get_setting('database_usage') + (int) GO::config()->get_setting('file_storage_usage') + (int) GO::config()->get_setting('mailbox_usage'));
 		$response['data']['has_usage']=$response['data']['total_usage']>0;
 		
 		$response['success']=true;

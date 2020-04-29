@@ -78,6 +78,8 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 			}
 		}
 
+		console.warn(this.values);
+
 		//Set the form values after. It's important to do this after setting this.values otherwise it will add joined object value names like customFields.name
 		var oldReset = this.getForm().trackResetOnLoad;
 		this.getForm().trackResetOnLoad = trackReset;

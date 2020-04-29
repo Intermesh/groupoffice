@@ -936,8 +936,9 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function checkFsSync(){
 
-		if(!$this->fsFolder->exists())
-			throw new \Exception("Folder ".$this->path." doesn't exist on the filesystem! Please run a database check.");
+		if(!$this->fsFolder->exists()) {
+			throw new \Exception("Folder " . $this->path . " doesn't exist on the filesystem! Please run a database check.");
+		}
 
 		\GO::debug('checkFsSync '.$this->path.' : '.$this->mtime.' < '.$this->fsFolder->mtime());
 

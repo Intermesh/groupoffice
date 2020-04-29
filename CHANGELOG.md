@@ -1,3 +1,34 @@
+- Calendar: Fix for 75th anniversary early may bank holiday
+- Files: Restored sync file system tool in System settings -> tools
+- Calendar: Import all day events in user time zone always
+- Core: Users with manage permission couldn't mange permissions
+- Custom fields: Adding of type Notes was broken
+- Projects: Extended automatic name template with {contact} and {customer}
+- Custom fields: Fixed problem with conditionally hidden and required at the same time
+- E-mail: Put e-mail from template next to other e-mail options
+- E-mail: fixed mailbox root not working
+
+28-04-2020 6.4.136
+- Newsletters: Dragging attachment to composer was broken and moved template management to main screen
+- Core: Fixed Maximum callstack error when start module was set to non-existing module
+- Email: fixed template selection dialog that shows when there are more than 10 templates
+- Core: Correct Function type field in custom fields. Rename Function to FunctionField
+
+22-04-2020 6.4.135
+- Core: Custom fields marked as required are only required if they are visible
+- Log: too long descriptions could lead to error
+
+21-04-2020 6.4.134
+- Core: Improved notifications
+- Core: Handle unlimited upload limit
+- Core: Some PHP 7.4 issues
+- Core: Removed notification flyouts
+- Address book: On 6.3 upgrade move orphans to an address book called __ORPHANED__ so the upgrade can continue
+- time tracking: set start of day to end of last time entry of that day
+- Billing: grouping on status gave error on reload
+- Calendar: All day event black text color in dark theme
+- Core: Suppress column eval() errors
+
 17-04-2020 6.4.133
 - Address book: Added 'Department' field.
 - Core: installer broke on mysqlnd check

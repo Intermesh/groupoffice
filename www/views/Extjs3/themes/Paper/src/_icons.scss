@@ -132,8 +132,8 @@ $tools : (
 
 i {
 	&.entity {
+		@extend %icon;
 		&::before {
-			@extend %icon;
 			content: 'help';
 		}
 	}

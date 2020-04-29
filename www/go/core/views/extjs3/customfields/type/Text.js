@@ -102,7 +102,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 
 		return Ext.apply({
 			xtype: 'textfield',
-			serverFormats: false, //for backwars compatibility with old framework. Can be removed when all is refactored.
+			serverFormats: false, //for backwards compatibility with old framework. Can be removed when all is refactored.
 			name: 'customFields.' + customfield.databaseName,
 			fieldLabel: fieldLabel,
 			anchor: '100%',
@@ -128,12 +128,14 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			return false;
 		}
 
+		// relatedFields are populated in FormFieldSet. The validation of this field can affect visibility of other fields
+		// using this fields value in the requiredCondition
 		Ext.each(field.relatedFields, function(relatedField) {
 			if (!relatedField.conditionallyHidden) {
 				return true;
 			}
 
-			if (this.allowBlank || !this.checked) {
+			if (this.requiredConditionMatches) {
 				relatedField.hide();
 				relatedField.ownerCt.doLayout();
 				return true;
@@ -231,6 +233,11 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 		fieldValue = field.getValue();
 		if (field.xtype === 'xcheckbox' || field.xtype === 'checkbox') {
 			fieldValue = fieldValue | 0;
+			if(value === "true") {
+				value = 1;
+			} else if(value === "false") {
+				value = 0;
+			}
 		}
 
 		var customFieldCmp = this;
@@ -260,6 +267,8 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 		if (this.xtype === 'treeselectfield') {
 			this.allowBlank = customFieldCmp.allowBlank;
 		}
+
+		this.requiredConditionMatches = customFieldCmp.allowBlank;
 
 		return true;
 	},

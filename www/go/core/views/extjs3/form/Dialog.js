@@ -358,11 +358,16 @@ go.form.Dialog = Ext.extend(go.Window, {
 	showFirstInvalidField : function() {
 
 		var firstFieldWithError = this.formPanel.form.items.find(function(item) {
-			return !!item.activeError;
+			return !item.validate();
 		});
 
 		if(!firstFieldWithError) {
-			console.warn('A validation error happend but no field with was error found.');
+			console.warn('A validation error occurred but no visible field with was error found.');
+			// this.formPanel.form.items.each(function(f){
+			// 	if(!f.validate()){
+			// 		console.warn(f);
+			// 	}
+			// });
 			return;
 		}
 		//Check for tab panel to show tab with error.
@@ -380,6 +385,16 @@ go.form.Dialog = Ext.extend(go.Window, {
 			// Not elegant but if a user marked a field as required and it's not visible it will magically appear this way
 			tabPanel.unhideTabStripItem(panel);
 		}
+
+		var fieldSet = firstFieldWithError.findParentBy(function(c){
+			if(c.isXType("fieldset")) {
+				return true;
+			}
+		});
+
+		fieldSet.show();
+		fieldSet.setDisabled(false);
+
 
 		// Focus make server side errors dissappear 
 		// firstFieldWithError.focus();

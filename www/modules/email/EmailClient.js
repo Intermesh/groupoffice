@@ -1295,6 +1295,7 @@ GO.mainLayout.onReady(function(){
 				title: title,
 				handler: function(){
 					GO.mainLayout.openModule('email');
+					go.Notifier.notificationArea.collapse();
 				}
 			}, 'email');
 		}
@@ -1463,11 +1464,12 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 					}
 
 				default:
-					// if(forceDownload)
-						attachment.url+='&inline=0';
-
-					// if (attachment.extension!='vcf'||forceDownload)
+					if(forceDownload) {
+						attachment.url += '&inline=0';
 						go.util.downloadFile(attachment.url);
+					}	else {
+						go.util.viewFile(attachment.url);
+					}
 					break;
 			}
 		}

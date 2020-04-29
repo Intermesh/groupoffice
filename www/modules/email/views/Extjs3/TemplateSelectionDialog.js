@@ -2,9 +2,9 @@
 
 GO.email.TemplateSelectionDialog = Ext.extend(GO.Window,{
 	closeAction: 'hide',
-	height: 340,
-	width: 660,
-	
+	height: dp(600),
+	width: dp(660),
+	modal: true,
 	initComponent : function(){
 		
 		//TemplateGridPanel
@@ -26,5 +26,15 @@ GO.email.TemplateSelectionDialog = Ext.extend(GO.Window,{
 		})
 		
 		GO.email.TemplateSelectionDialog.superclass.initComponent.call(this);
+	},
+
+	getSelected : function() {
+		for(var i = 0, max = this.grid.store.getCount();i < max; i++) {
+			var rec = this.grid.store.getAt(i);
+			if (rec.get("checked")) {
+				return rec;
+			}
+		}
+		return null;
 	}
 })

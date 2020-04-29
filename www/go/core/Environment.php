@@ -42,10 +42,9 @@ class Environment extends Singleton {
 	 * Get the maximum size of a file upload
 	 * 
 	 * To increase increase in php.ini:
-	 * 
-	 * 1. memory_limit
-	 * 2. post_max_size
-	 * 3. upload_max_filesize
+	 *
+	 * 1. post_max_size
+	 * 2. upload_max_filesize
 	 * 
 	 * The smallest value will apply here.
 	 * 
@@ -78,7 +77,7 @@ class Environment extends Singleton {
 			case 'k':
 				$val *= 1024;
 		}
-		return $val;
+		return (int) $val;
 	}
 	
 	private $installFolder;

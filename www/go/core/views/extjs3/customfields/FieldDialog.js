@@ -86,7 +86,8 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 						xtype: "textfield",
 						name: "relatedFieldCondition",
 						fieldLabel: t("Required condition"),
-						anchor: "100%"
+						anchor: "100%",
+						hint: "eg. 'nameOfStandardOrCustomField = test'"
 					},
 					{
 						xtype: "checkbox",

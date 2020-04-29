@@ -166,7 +166,6 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 		
 		\GO::session()->closeWriting();
 		\GO::$disableModelCache=true;
-		
 		$response = array( 'success' => true );
 		$count = 0;
 		$failed=array();

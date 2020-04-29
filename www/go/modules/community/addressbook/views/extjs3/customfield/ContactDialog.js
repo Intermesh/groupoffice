@@ -14,7 +14,14 @@
 					{boxLabel: t("Organizations"), inputValue: true}
 				]
 
-			}]);
+			},{
+			 anchor: '100%',
+			 xtype: "chips",
+			 entityStore: "AddressBook",
+			 displayField: "name",
+			 name: "options.addressBookId",
+			 fieldLabel: t("Address books")
+		 }]);
 		
 		 return items;
 	 }

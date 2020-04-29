@@ -159,19 +159,31 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	},
 	
 	setFilterVisible : function(v) {
-		
+
+		//disable recursive so validaters don't apply on hidden items
+		function setDisabled(ct, v) {
+			ct.setDisabled(v);
+
+			if(!ct.items){
+				return;
+			}
+			ct.items.each(function(i) {
+				setDisabled(i, v);
+			});
+		}
+
 		if(!this.fieldSet.isTab) {
 			this.setVisible(v);
-			this.setDisabled(!v);
+			setDisabled(this, !v);
 		} else{
+			setDisabled(this.ownerCt, !v);
 			if(v) {
 			 	this.formTabPanel.unhideTabStripItem(this.ownerCt);
 			} else
 			{
 			 	this.formTabPanel.hideTabStripItem(this.ownerCt);
 			}		
-		}		
-	
+		}
 	}
 });
 

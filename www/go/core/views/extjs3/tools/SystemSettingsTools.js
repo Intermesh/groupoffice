@@ -42,12 +42,10 @@ go.tools.SystemSettingsTools = Ext.extend(Ext.Panel,{
 			[t('Remove duplicate contacts and events'),'', GO.url('maintenance/removeDuplicates') ]
 		];
 		if(go.Modules.isAvailable(null,'files')) {
-			tools.push([t('Database check'),'', GO.url('maintenance/checkDatabase') ],
-				[t('Create search index'),'', GO.url('maintenance/buildSearchCache') ]);
+			tools.push([t('Sync file system'),'', GO.url('files/folder/syncFileSystem') ]);
 		}
 		if(go.Modules.isAvailable(null,'filesearch')) {
-			tools.push([t('Update filesearch index'),'', GO.url('filesearch/filesearch/sync') ],
-				[t('Create search index'),'', GO.url('maintenance/buildSearchCache') ]);
+			tools.push([t('Update filesearch index'),'', GO.url('filesearch/filesearch/sync') ]);
 		}
 		if(go.Modules.isAvailable(null,'calendar')) {
 			tools.push([t('Clear calendar holiday cache', 'calendar'),'', GO.url('calendar/calendar/truncateHolidays') ]);
