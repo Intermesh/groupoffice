@@ -4,6 +4,7 @@
 - Custom fields: Adding of type Notes was broken
 - Projects: Extended automatic name template with {contact} and {customer}
 - Custom fields: Fixed problem with conditionally hidden and required at the same time
+- E-mail: Put e-mail from template next to other e-mail options
 
 28-04-2020 6.4.136
 - Newsletters: Dragging attachment to composer was broken and moved template management to main screen
