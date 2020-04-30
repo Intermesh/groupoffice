@@ -378,7 +378,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			mode:'local',
 			triggerAction:'all',
 			emptyText:t("Select category", "tasks"),
-			editable:false,
+			editable:true,
 			selectOnFocus:true,
 			forceSelection:true,
 			pageSize: parseInt(GO.settings['max_rows_list'])
