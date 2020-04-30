@@ -10,7 +10,8 @@
 - Address book: Contact custom field supports address book selection. (The CustomField Contact type does not use the addressBookId filter #548)
 - E-mail: Fxied Imap - folders with [ ] are badly parsed #561
 - Calendar: Fixed Integrity constraint violation if calendar color changed to auto #575
-- Fixed Postfix Maildir Folder is Hardcoded #547 - Added $config['vmail_path'] = '/path/to/vmail/';
+- postfixadmin: Fixed Postfix Maildir Folder is Hardcoded #547 - Added $config['vmail_path'] = '/path/to/vmail/';
+- postfixadmin: Email Usage Not Showing Correctly #546
 
 28-04-2020 6.4.136
 - Newsletters: Dragging attachment to composer was broken and moved template management to main screen
