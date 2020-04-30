@@ -155,36 +155,39 @@ class Mailbox extends \GO\Base\Db\ActiveRecord {
 		$this->usage = $this->active ? $this->getUsageFromDovecot() : false;
 		
 		if($this->usage === false) {
-			$this->usage = $this->getMaildirFolder()->calculateSize()/1024;
+			$folder = $this->getMaildirFolder();
+			$this->usage = $folder->exists() ? $folder->calculateSize() / 1024 : 0;
 		}
 		
 		return $this->save();
 	}
-	
-	
+
+
 	private function getUsageFromDovecot() {
 		exec("doveadm quota get -u " . escapeshellarg($this->username), $output, $return);
-		
+
 		/**
 		 * returns:
 		 * Quota name Type      Value    Limit                                                                     %
-User quota STORAGE 9547844 10240000                                                                    93
-User quota MESSAGE   81592        -                                                                     0
+		User quota STORAGE 9547844 10240000                                                                    93
+		User quota MESSAGE   81592        -                                                                     0
 		 */
-		
-		if($return !=0) {
+
+		if($return != 0) {
 			return false;
 		}
-	
+
 		if(!isset($output[0])) {
 			return false;
-		}		
-		
-		if(!preg_match("/STORAGE +([0-9]*)/", $output[0], $matches)) {
-			return false;
 		}
-		
-		return (int) $matches[1];
+		array_shift($output);
+		foreach($output as $line) {
+			if(preg_match("/STORAGE\s+([0-9]*)/", $line, $matches)) {
+				return (int) $matches[1];
+			}
+		}
+
+		return false;
 	}
 
 	private function _checkQuota() {
