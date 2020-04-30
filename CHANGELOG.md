@@ -7,6 +7,7 @@
 - Custom fields: Fixed problem with conditionally hidden and required at the same time
 - E-mail: Put e-mail from template next to other e-mail options
 - E-mail: fixed mailbox root not working
+- Address book: Contact custom field supports address book selection
 
 28-04-2020 6.4.136
 - Newsletters: Dragging attachment to composer was broken and moved template management to main screen

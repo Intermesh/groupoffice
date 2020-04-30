@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\addressbook\model;
 						
+use go\core\model\User;
 use go\core\orm\Property;
 						
 /**
@@ -112,7 +113,11 @@ class Address extends Property {
 	private static $defaultCountryText;
 	private static function isDefaultCountry(Address $address) {
 		if(!isset(self::$defaultCountryIso)) {
-			self::$defaultCountryIso = go()->getAuthState()->getUser(['timezone'])->getCountry();
+			$user = go()->getAuthState()->getUser(['timezone']);
+			if(!$user) {
+				$user = User::findById(1, ['timezone']);
+			}
+			self::$defaultCountryIso = $user->getCountry();
 			$countries = go()->t('countries');
 			self::$defaultCountryText = $countries[self::$defaultCountryIso] ?? "";
 		}
