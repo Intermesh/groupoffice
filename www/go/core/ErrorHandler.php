@@ -117,9 +117,12 @@ class ErrorHandler {
    */
 	public static function errorHandler($errno, $errstr, $errfile, $errline) {
 		go()->debug("ErrorHandler:errorHandler called $errno");
-		// if (!(error_reporting() & $errno)) {
-		// 	return false;
-		// }
+
+		// check if error should be reported according to PHP settings
+		if (!(error_reporting() & $errno)) {
+		  return false;
+		}
+
 		throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 	}
 }
