@@ -408,7 +408,25 @@ abstract class AbstractController extends Observable {
 
 			return $response;
 			
-		} catch (Exception $e) {
+		}
+		catch(AccessDenied $e) {
+			GO::debug("EXCEPTION: ".(string) $e);
+
+			$response = new JsonResponse();
+
+			$response['success'] = false;
+
+			$response['feedback'] = !empty($response['feedback']) ? $response['feedback']."\r\n\r\n" : '';
+			$response['feedback'] .= $e->getMessage();
+
+			$response['exceptionCode'] = $e->getCode();
+
+			$response['exceptionClass'] = get_class($e);
+			$response['redirectToLogin']=empty(GO::session()->values['user_id']);
+
+			$this->view->render('Exception', array('response'=>$response));
+		}
+		catch (Exception $e) {
 			
 			GO::debug("EXCEPTION: ".(string) $e);
 			
@@ -424,23 +442,7 @@ abstract class AbstractController extends Observable {
 			$response['exceptionCode'] = $e->getCode();
 					
 			$response['exceptionClass'] = get_class($e);
-			
-			if($e instanceof AccessDenied){
-				
-				//doesn't work well with extjs
-//				header("HTTP/1.1 403 Forbidden");
-				
-//				$report = 
-//								"Access denied\n".								
-//								"controller: ".get_class($this)." action: ".$action."\n".
-//								"params: ".var_export($params, true)."\n".
-//								(string) $e;
-//				if(!\GO::config()->debug)
-//					trigger_error($report, E_USER_WARNING);
 
-				$response['redirectToLogin']=empty(GO::session()->values['user_id']);
-			}
-			
 			if($e instanceof SecurityTokenMismatch)
 				$response['redirectToLogin']=true;
 

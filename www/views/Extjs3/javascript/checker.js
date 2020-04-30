@@ -19,8 +19,8 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 		Ext.TaskMgr.start({
 			run: this.checkForNotifications,
 			scope:this,
-			interval: GO.settings.config.checker_interval*1000,
-			// 			 interval: 5000 // debug / test config
+			interval: GO.settings.config.checker_interval*1000
+						 // interval: 5000 // debug / test config
 		});
 		this.initReminders();
 	},
