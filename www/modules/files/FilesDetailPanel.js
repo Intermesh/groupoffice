@@ -43,6 +43,8 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			<label>{user_name} at {mtime}</label>\
 		</a></tpl></div>');
 
+
+
 		this.items = [new Ext.DataView({
 			store: this.store,
 			tpl: tpl,
@@ -52,31 +54,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			itemSelector: 'a',
 			listeners: {
 				afterrender:function(me) {
-					GO.files.DnDFileUpload(function (blobs) {
-						var fb = GO.mainLayout.getModulePanel('files'),
-							options = {
-								upload: true,
-								destination_folder_id: this.folderId,
-								blobs: Ext.encode(blobs),
-								cb: function() {
-									this.store.load({
-										params: {
-											limit: 10,
-											folder_id: this.folderId
-										}
-									});
-								}.bind(this)
-							};
-						if(this.folderId) {
-							fb.sendOverwrite(options);
-						} else { // create folder first
-							this.createFolderWhenNoneExist(function() {
-								options.destination_folder_id = this.folderId;
-								fb.sendOverwrite(options);
-							}.bind(this))
-						}
-
-					}.bind(this), me.container)();
+					GO.files.DnDFileUpload(this.uploadComplete.bind(this), me.container)();
 
 				},
 				click: this.onClick,
@@ -85,7 +63,22 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 		})];
 		
 		this.bbar = [
-			this.browseBtn = new GO.files.DetailFileBrowserButton({iconCls: ""})
+			this.browseBtn = new GO.files.DetailFileBrowserButton({iconCls: ""}),
+			new Ext.Button({
+				text: t('Upload'),
+				handler: function() {
+
+					go.util.openFileDialog({
+						multiple: true,
+						autoUpload: true,
+						listeners: {
+							uploadComplete: this.uploadComplete,
+							scope: this
+						}
+					});
+				},
+				scope:this
+			})
 		];
 		
 		this.browseBtn.on('closefilebrowser', function(btn, folderId) {
@@ -101,6 +94,31 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 
 		go.modules.files.FilesDetailPanel.superclass.initComponent.call(this);
 
+	},
+
+	uploadComplete: function(blobs) {
+		var fb = GO.mainLayout.getModulePanel('files'),
+			options = {
+				upload: true,
+				destination_folder_id: this.folderId,
+				blobs: Ext.encode(blobs),
+				cb: function() {
+					this.store.load({
+						params: {
+							limit: 10,
+							folder_id: this.folderId
+						}
+					});
+				}.bind(this)
+			};
+		if(this.folderId) {
+			fb.sendOverwrite(options);
+		} else { // create folder first
+			this.createFolderWhenNoneExist(function() {
+				options.destination_folder_id = this.folderId;
+				fb.sendOverwrite(options);
+			}.bind(this))
+		}
 	},
 
 
