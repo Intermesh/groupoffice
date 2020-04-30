@@ -7,7 +7,7 @@
 - Custom fields: Fixed problem with conditionally hidden and required at the same time
 - E-mail: Put e-mail from template next to other e-mail options
 - E-mail: fixed mailbox root not working
-- Address book: Contact custom field supports address book selection
+- Address book: Contact custom field supports address book selection. (The CustomField Contact type does not use the addressBookId filter #548)
 - E-mail: Fxied Imap - folders with [ ] are badly parsed #561
 - Calendar: Fixed Integrity constraint violation if calendar color changed to auto #575
 

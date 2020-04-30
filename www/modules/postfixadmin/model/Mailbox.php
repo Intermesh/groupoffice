@@ -147,7 +147,8 @@ class Mailbox extends \GO\Base\Db\ActiveRecord {
 	 * @return \GO\Base\Fs\Folder
 	 */
 	public function getMaildirFolder(){
-		return new \GO\Base\Fs\Folder('/home/vmail/'.$this->maildir);
+		$vmail = empty(\GO::config()->vmail_path) ? '/var/mail/vhosts/' :  GO::config()->vmail_path;
+		return new \GO\Base\Fs\Folder($vmail . $this->maildir);
 	}
 	
 	public function cacheUsage(){		
