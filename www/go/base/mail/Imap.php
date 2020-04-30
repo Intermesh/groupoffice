@@ -494,7 +494,7 @@ class Imap extends ImapBodyStruct {
 			if($vals[1]==$listCmd){
 				$flags = false;
 				//$count = count($vals);
-				$folder = false;//$vals[($count - 1)];
+				$folder = "";//$vals[($count - 1)];
 				$flag = false;
 				$delim_flag = false;
 				$delim=false;
@@ -521,8 +521,8 @@ class Imap extends ImapBodyStruct {
 						if ($delim_flag && !$delim) {
 							$delim = $this->_unescape($v);
 							$delim_flag = false;
-						}elseif($delim && !$folder){
-								$folder = $v;
+						}elseif($delim){
+								$folder .= $v;
 						}
 					}
 				}
