@@ -157,6 +157,9 @@ GO.email.EmailComposer = function(config) {
 					}).then(function(result) {										
 			
 						result.list.forEach(function(contact) {
+							if(!contact.emailAddresses[0]) {
+								return;
+							}
 							if(!go.util.empty(v)) {
 								v += ", ";
 							}							
