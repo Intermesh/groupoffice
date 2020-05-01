@@ -12,6 +12,7 @@
 - Calendar: Fixed Integrity constraint violation if calendar color changed to auto #575
 - postfixadmin: Fixed Postfix Maildir Folder is Hardcoded #547 - Added $config['vmail_path'] = '/path/to/vmail/';
 - postfixadmin: Email Usage Not Showing Correctly #546
+- Tasks: Made category combo searchable. Fixes #506
 
 28-04-2020 6.4.136
 - Newsletters: Dragging attachment to composer was broken and moved template management to main screen
