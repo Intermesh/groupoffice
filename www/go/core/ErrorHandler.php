@@ -33,7 +33,6 @@ class ErrorHandler {
 	 * Called when PHP exits.
 	 */
 	public function shutdown() {
-		go()->debug("ErrorHandler::shutdown() called");
 		$error = error_get_last();
 		if ($error) {
 			//Log only fatal errors because other errors should have been logged by the normal error handler
