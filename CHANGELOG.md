@@ -13,6 +13,8 @@
 - postfixadmin: Fixed Postfix Maildir Folder is Hardcoded #547 - Added $config['vmail_path'] = '/path/to/vmail/';
 - postfixadmin: Email Usage Not Showing Correctly #546
 - Tasks: Made category combo searchable. Fixes #506
+- Calendar: Fixed Setting reminder to no sets it to zero minutes #456
+- Core: Updated French translation
 
 28-04-2020 6.4.136
 - Newsletters: Dragging attachment to composer was broken and moved template management to main screen
