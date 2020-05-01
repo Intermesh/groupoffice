@@ -409,19 +409,28 @@ abstract class AbstractController extends Observable {
 			return $response;
 			
 		}
+		catch(SecurityTokenMismatch $e) {
+			GO::debug("EXCEPTION: ".(string) $e);
+
+			$response = new JsonResponse();
+
+			$response['success'] = false;
+			$response['feedback'] = !empty($response['feedback']) ? $response['feedback']."\r\n\r\n" : '';
+			$response['feedback'] .= $e->getMessage();
+
+			$response['redirectToLogin'] = true;
+
+			$this->view->render('Exception', array('response'=>$response));
+		}
 		catch(AccessDenied $e) {
 			GO::debug("EXCEPTION: ".(string) $e);
 
 			$response = new JsonResponse();
 
 			$response['success'] = false;
-
 			$response['feedback'] = !empty($response['feedback']) ? $response['feedback']."\r\n\r\n" : '';
 			$response['feedback'] .= $e->getMessage();
 
-			$response['exceptionCode'] = $e->getCode();
-
-			$response['exceptionClass'] = get_class($e);
 			$response['redirectToLogin']=empty(GO::session()->values['user_id']);
 
 			$this->view->render('Exception', array('response'=>$response));
