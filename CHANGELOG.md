@@ -1,3 +1,4 @@
+01-05-2020 6.4.137
 - Calendar: Fix for 75th anniversary early may bank holiday
 - Files: Restored sync file system tool in System settings -> tools
 - Calendar: Import all day events in user time zone always
