@@ -325,4 +325,11 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Ihre Mailbox ist v
   'Please enter the password of your SMIME certificate.' => 'Bitte geben Sie das Passwort Ihres SMIME-Zertifikats ein.',
   'This panel expects an address list ID that is positive, but did not receive one. Please contact the administrator.' => 'Dieses Panel erwartet eine Adresslisten-ID, die positiv ist, hat aber keine erhalten. Bitte kontaktieren Sie den Administrator.',
   'Are you sure you want to select all {count} results?' => 'Sind Sie sicher, dass Sie alle {count} Ergebnisse auswählen möchten?',
+  'Senders have been removed from address list' => 'Absender wurden von der Adressliste entfernt',
+  'Senders have been added to address list' => 'Absender wurden zur Adressliste hinzugefügt',
+  'Encrypted data' => 'Verschlüsselte Daten',
+  'Add to address list' => 'Zu Adressliste hinzufügen',
+  'The contact is unknown' => 'Der Kontakt ist unbekannt',
+  'Remove from address list' => 'Von Adressliste entfernen',
+  'Sort on last contact mail time' => 'Nach letzter Kontakt-Mail-Zeit sortieren',
 );

@@ -24,7 +24,7 @@ return array (
   'all incoming emails' => 'alle Nachrichten',
   'Disable filter' => 'Regel deaktivieren',
   'New rule' => 'Neue Regel',
-  'Error while checking for sieve support' => 'Fehler während Prüfung der Sieveunterstüzung',
+  'Error while checking for sieve support' => 'Regel',
   'One or both grids are empty.' => 'Mindestens ein Feld ist leer.',
   'You are currently editing an item!\\n Please finish that action first.' => 'Sie bearbeiten gerade ein Feld.\\n Beenden Sie dies bitte zuerst.',
   'subject' => 'Betreff',
