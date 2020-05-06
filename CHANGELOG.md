@@ -1,3 +1,7 @@
+- Core: updated German translation
+- Core: Suppress store load error when computer went to sleep
+
+
 01-05-2020 6.4.137
 - Calendar: Fix for 75th anniversary early may bank holiday
 - Files: Restored sync file system tool in System settings -> tools
