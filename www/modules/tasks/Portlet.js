@@ -134,7 +134,7 @@ Ext.extend(GO.tasks.SimpleTasksPanel, GO.grid.GridPanel, {
 				this.store.load();
 			},
 			scope: this,
-			interval: 5000
+			interval: 960000
 		});
 	}
 });
