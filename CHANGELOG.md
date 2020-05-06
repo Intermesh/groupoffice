@@ -1,5 +1,7 @@
 - Core: updated German translation
 - Core: Suppress store load error when computer went to sleep
+- reminders: add function was broken in the latest release
+- Calendar: showed 12h format with 24h format in settings
 
 
 01-05-2020 6.4.137
