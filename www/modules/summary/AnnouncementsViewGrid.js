@@ -21,6 +21,7 @@ GO.summary.AnnouncementsViewGrid = function(config){
 	config.autoScroll=true;
 	config.split=true;
 	config.store = new GO.data.JsonStore({
+		suppressError: true,
 		url: GO.url('summary/announcement/store'),
 		baseParams: {
 			active:'true'
