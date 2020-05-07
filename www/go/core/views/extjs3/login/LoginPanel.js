@@ -52,27 +52,28 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 				go.Router.un("change", this.onRouterChange, this);
 			}, this);
 
-			//todo, this dialog should be part of this conponent
+			//todo, this dialog should be part of this component
 			this.loginDialog = new go.login.LoginDialog();
 			this.loginDialog.panel = this;
 			this.loginDialog.show();
+
+			if (GO.settings.config.login_message) {
+				var motd = new Ext.BoxComponent({
+					id: 'motd',
+					cls: 'go-html-formatted',
+					html: GO.settings.config.login_message,
+					renderTo: Ext.getBody()
+				})
+				this.on("destroy", function () {
+					go.Notifier.remove(motd);
+				});
+			}
 
 			var me = this;
 			setTimeout(function () {
 				if (GO.settings.config.debug) {
 					go.Notifier.flyout({
 						title: t("Warning! Debug mode enabled"), icon: 'warning', description: t("Use $config['debug']=true; only with development and problem solving. It slows " + t('product_name') + " down."), time: 4000});
-				}
-
-				if (GO.settings.config.login_message) {
-					me.loginMsg = go.Notifier.flyout({
-						description: GO.settings.config.login_message
-					});
-
-					me.on("destroy", function () {
-						go.Notifier.remove(me.loginMsg);
-					});
-
 				}
 			}, 1000); // 1 second delay for groupoffice loading
 
