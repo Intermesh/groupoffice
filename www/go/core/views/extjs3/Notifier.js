@@ -47,6 +47,10 @@ go.Notifier = {
 		}
 	},
 
+	msgByKey: function(key) {
+		return this._messages[key] || null;
+	},
+
 	/**
 	 * Put a message into the notification area (fallback to notify())
 	 * @param msg {title, description, iconCls, time (ms)}
@@ -70,41 +74,44 @@ go.Notifier = {
 
 		//msg.renderTo = this.messageCt;
 		msg.html = msg.description || msg.html; // backward compat
-		if (!msg.persistent) {
-			msg.tools = [{
-				id: 'close', handler: function (e, toolEl, panel) {
-					me.remove(panel);
+		var me = this;
+		msg.tools = [{
+			id: 'close',
+			handler: function (e, toolEl, panel) {
+				if(key) {
+					delete me._messages[key];
 				}
-			}];
+				me.remove(panel);
+			},
+			hidden: msg.persistent
+		}];
+		if(key) {
+			msg.itemId = key;
 		}
 		var msgPanel = new Ext.Panel(msg);
 
 		this.notifications.add(msgPanel);
 		this.notifications.doLayout();
-		var me = this;
+
 
 		if(msg.removeAfter) {
 			setTimeout(function () {
+				if(msg.itemId) {
+					delete me._messages[msg.itemId];
+				}
 				me.remove(msgPanel);
 			}, msg.removeAfter);
 		}
 		msgPanel.setPersistent = function(bool) {
-			if(!bool) {
-				msgPanel.addTool({
-					id: 'close',
-					handler: function (e, toolEl, panel) {
-						me.remove(panel);
-					}
-				});
-			}
+			msgPanel.getTool('close').setVisible(!bool);
 			return msgPanel;
 		};
 
-		if(key) {
-			if(this._messages[key]) {
-				this._messages[key].destroy();
+		if(msg.itemId) {
+			if(this._messages[msg.itemId]) {
+				this._messages[msg.itemId].destroy();
 			}
-			this._messages[key] = msgPanel;
+			this._messages[msg.itemId] = msgPanel;
 		}
 		
 		return msgPanel;
@@ -119,6 +126,9 @@ go.Notifier = {
 	remove: function(msg) {
 		if(msg.destroying || msg.isDestroyed) {
 			return;
+		}
+		if(msg.itemId) {
+			delete this._messages[msg.itemId];
 		}
 		msg.destroying = true;
 		if(!msg.el) {
@@ -172,6 +182,13 @@ go.Notifier = {
 
 	},
 
+	/**
+	 * Show top-right on-page notification banner
+	 * @param msg an Ext.Panel config +
+	 *   optional "time" in ms to auto remove
+	 *   optional "persistent" boolean to make it none closable on click
+	 * @returns The created Ext.Panel
+	 */
 	flyout: function(msg) {
 		msg.renderTo = this.messageCt;
 		msg.html = msg.description || msg.html; // backward compat
