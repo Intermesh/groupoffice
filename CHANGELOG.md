@@ -2,7 +2,8 @@
 - Core: Suppress store load error when computer went to sleep
 - reminders: add function was broken in the latest release
 - Calendar: showed 12h format with 24h format in settings
-
+- Billing: View message of status change
+- Files: folder upload with dag and drop
 
 01-05-2020 6.4.137
 - Calendar: Fix for 75th anniversary early may bank holiday
