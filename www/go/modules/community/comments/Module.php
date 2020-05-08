@@ -50,7 +50,7 @@ class Module extends core\Module {
 //			$query = (new Query)->select('sub.id')->from($tableName);
 //
 //			$stmt = go()->getDbConnection()->delete('comments_comment', (new Query)
-//				->where('entityId', '=', $type->getId())
+//				->where('entityTypeId', '=', $type->getId())
 //				->andWhere('entityId', 'NOT IN', $query)
 //			);
 //			$stmt->execute();
