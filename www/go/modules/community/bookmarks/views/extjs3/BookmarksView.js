@@ -25,13 +25,13 @@ go.modules.community.bookmarks.BookmarksView = Ext.extend(Ext.Panel,{
             this.bookmarkthumbs  = new Ext.XTemplate(
                 '<tpl for=".">',
                 '<tpl if="this.is_new_category(values.category.id,xindex,xcount)">', 
-                    '<h1 class="categorie">{values.category.name} </h1>',
+                    '<div style="clear:both"></div><h3 class="categorie">{values.category.name} </h3>',
                 '</tpl>',
                 '<div class="thumb-wrap">',
                 '<div class="thumb">',
                 '<div class="thumb-name" style="background-image:url(' + go.Jmap.downloadUrl('{logo}') + ')"><h4>{name}</h4>{[Ext.util.Format.nl2br(values.description)]}</div>',
-                '</div>',	'</div>',	'</tpl>',
-                '<div style="clear:both"></div>',
+                '</div>',	'</div>',
+                '</tpl>',
                 {
                     // switchen van categorie
                     is_new_category: function(id,index,count){

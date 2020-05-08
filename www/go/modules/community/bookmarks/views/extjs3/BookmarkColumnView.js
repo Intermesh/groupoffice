@@ -24,12 +24,12 @@ go.modules.community.bookmarks.BookmarkColumnView = Ext.extend(Ext.DataView,{
 						'<tpl if="xindex &gt; 1"><br/><br/></div></tpl>', // Close previous category column (Don't do this the first time)
 						'<div class="bookmark-column">',
 						'<tpl for="category">',
-								'<h1 class="categorie">{name}</h1>',
+								'<h3 class="categorie">{name}</h3>',
 						'</tpl>',
 					'</tpl>',
 						
 					'<span class="link" id="{id}" href="{content}" target="_blank">',
-						'<span class="thumb" style="background-image:url(' + go.Jmap.downloadUrl('{logo}') + ')">{name}</span>',
+						'<span class="thumb" style="background-image:url(' + go.Jmap.downloadUrl('{logo}') + ');white-space:nowrap; overflow:hidden;text-overflow: ellipsis;display:block;">{name}</span>',
 					'</span>',
         		'</tpl>',
 				'<br/><br/></div>',
