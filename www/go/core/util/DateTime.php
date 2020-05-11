@@ -23,4 +23,25 @@ class DateTime extends PHPDateTime implements ArrayableInterface, \JsonSerializa
 		return $this->format(self::FORMAT_API);
 	}
 
+	private static $currentUser;
+
+	private static function currentUser() {
+		if(!isset(self::$currentUser)) {
+			self::$currentUser = go()->getAuthState()->getUser(['dateFormat', 'timezone', 'timeFormat' ]);
+		}
+		return self::$currentUser;
+	}
+
+	public function toUserFormat($withTime = false) {
+
+		$f = self::currentUser()->dateFormat;
+		if($withTime) {
+			$date = clone $this;
+			$date->setTimezone(new \DateTimeZone(self::currentUser()->timezone));
+			$f .= ' ' . self::currentUser()->timeFormat;
+			return $date->format($f);
+		}
+		return $this->format($f);
+	}
+
 }

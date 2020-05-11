@@ -1,3 +1,5 @@
+- Core: Add to all and reset buttons didn't change all existing permissions
+
 08-05-2020 6.4.138
 - Core: updated German translation
 - Core: Suppress store load error when computer went to sleep

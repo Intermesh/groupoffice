@@ -30,4 +30,13 @@ class DateTime extends Base {
 			$criteria->where('customFields.' . $this->field->databaseName, $comparator, $value);
 		});
 	}
+
+	public function dbToText($value, &$values, $entity)
+	{
+		if(!isset($value)) {
+			return "";
+		}
+		return $value->toUserFormat(true);
+
+	}
 }
