@@ -317,7 +317,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		return true;
 	},
 
-	submit: function (cb, scope) {
+	submit: function () {
 
 		//When form is submnitted with enter key the validation errors of the field having focus is not disabled if we
 		// don't give something else focus.
@@ -348,8 +348,11 @@ go.form.Dialog = Ext.extend(go.Window, {
 				me.entityStore.entity.goto(serverId);
 			}
 			me.close();
+			return serverId;
+
 		}).catch(function(error) {
 			me.showFirstInvalidField();
+			return error;
 		}).finally(function() {
 			me.actionComplete();
 		})
