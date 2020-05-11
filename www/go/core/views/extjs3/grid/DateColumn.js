@@ -11,8 +11,8 @@ go.grid.DateColumn = Ext.extend(Ext.grid.Column, {
 			if(me.dateOnly) {
 				return go.util.Format.date(v);
 			}
-			
-			return go.User.shortDateInList ? go.util.Format.shortDateTime(v) : go.util.Format.dateTime(v);
+
+			return '<span  style="cursor:pointer" title="' + go.util.Format.dateTime(v) + '">' + go.util.Format.userDateTime(v) + '</span>';
 		};
 		
 		this.resizable = !go.User.shortDateInList;

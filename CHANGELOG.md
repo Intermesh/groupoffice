@@ -1,4 +1,7 @@
 - Core: Add to all and reset buttons didn't change all existing permissions
+- Core: Custom fields of type date and date time didn't print on invoices
+- Core: Short date in list preference also applies to links in detail views.
+- Core: Added tooltip to dates so they show the full date and time.
 
 08-05-2020 6.4.138
 - Core: updated German translation
