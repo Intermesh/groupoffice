@@ -704,7 +704,9 @@ class Migrate63to64 {
 			$contact->addressBookId = $addressBook->id;
 			$contact->name = $r['name'];
 
-			//name2 ??
+			if(!empty($r['name2'])) {
+				$contact->name .= ' - ' . $r['name2'];
+			}
 
 			if (!empty($r['email'])) {
 				$contact->emailAddresses[] = (new EmailAddress())
