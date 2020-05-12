@@ -364,6 +364,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 			return !item.validate();
 		});
 
+		console.log("Field with error", firstFieldWithError);
+
 		if(!firstFieldWithError) {
 			console.warn('A validation error occurred but no visible field with was error found.');
 			// this.formPanel.form.items.each(function(f){
