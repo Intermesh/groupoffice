@@ -3,6 +3,7 @@
 - Core: Short date in list preference also applies to links in detail views.
 - Core: Added tooltip to dates so they show the full date and time.
 - Core: Updated French translation
+- Core: Link browser in menu as button
 
 08-05-2020 6.4.138
 - Core: updated German translation
