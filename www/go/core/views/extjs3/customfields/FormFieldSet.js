@@ -76,7 +76,8 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 				
 				form.getForm().on("actioncomplete", function(f, action) {
 					if(action.type === "load") {
-						this.filter(f.getFieldValues());						
+						this.filter(f.getFieldValues());
+						f.isValid(); //needed for coniditionally hidden
 					}
 				}, this);
 			}
@@ -89,8 +90,8 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 				if (field.conditionallyHidden || field.conditionallyRequired) {
 					var linkedField = go.customfields.type.Text.prototype.getRequiredConditionField.call(field, field);
 					if (linkedField) {
-						linkedField.relatedFields = linkedField.relatedFields || [];
-						linkedField.relatedFields.push(field);
+						// linkedField.relatedFields = linkedField.relatedFields || [];
+						// linkedField.relatedFields.push(field);
 						masterFields.push(linkedField);
 					}
 				}
@@ -102,28 +103,12 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			masterFields = masterFields.filter(uniqueFieldsFilter);
 
 			Ext.each(masterFields, function(masterField) {
-				masterField.on('select', function (field) {
-					Ext.each(field.relatedFields, function(relatedField) {
-						relatedField.validate();
-						relatedField.show();
-						relatedField.ownerCt.doLayout();
-						return true;
-					});
+				masterField.on('change', function (field) {
+					form.getForm().isValid();
 				});
 
 				masterField.on('check', function (field) {
-					Ext.each(field.relatedFields, function(relatedField) {
-						relatedField.validate();
-						if (relatedField.conditionallyHidden && relatedField.isVisible()) {
-							relatedField.hide();
-							relatedField.ownerCt.doLayout();
-							return true;
-						}
-
-						relatedField.show();
-						relatedField.ownerCt.doLayout();
-						return true;
-					});
+					form.getForm().isValid();
 				});
 			}, this);
 

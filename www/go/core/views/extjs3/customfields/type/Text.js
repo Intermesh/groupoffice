@@ -71,30 +71,21 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 		}
 
 		if (!GO.util.empty(customfield.relatedFieldCondition)) {
-			config.requiredConditionValidator = this.requiredConditionValidator;
-			config._changeRelatedFieldsVisibility = this._changeRelatedFieldsVisibility;
+			config.checkRequiredCondition = this.checkRequiredCondition;
 			if (customfield.type === 'Select') {
 				config.validate = function () {
-					if (customfield.conditionallyRequired) {
-						this.requiredConditionValidator.call(this, customfield);
-					}
-					this._changeRelatedFieldsVisibility(this);
+					this.checkRequiredCondition.call(this, customfield);
 					return go.customfields.type.TreeSelectField.prototype.validate.apply(this);
 				}
 			} else if (customfield.type === 'MultiSelect') {
 				config.validate = function () {
-					if (customfield.conditionallyRequired) {
-						this.requiredConditionValidator.call(this, customfield);
-					}
-					this._changeRelatedFieldsVisibility(this);
+					this.checkRequiredCondition.call(this, customfield);
 					return go.form.Chips.prototype.validate.apply(this);
 				}
 			} else {
 				config.validateValue = function () {
-					if (customfield.conditionallyRequired) {
-						this.requiredConditionValidator.call(this, customfield, this);
-					}
-					this._changeRelatedFieldsVisibility(this);
+
+					this.checkRequiredCondition.call(this, customfield, this);
 					return Ext.form.Field.prototype.validateValue.apply(this);
 				}
 			}
@@ -110,43 +101,30 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			value: customfield.default,
 			hidden: customfield.conditionallyHidden || false,
 			conditionallyHidden: customfield.conditionallyHidden || false,
-			conditionallyRequired: customfield.conditionallyRequired || false,
+			conditionallyRequired: customfield.conditionallyRequired || false
 		}, config);
 
 		//ALTER TABLE `core_customfields_field`
 		// ADD `conditionallyHidden` tinyint(1) NOT NULL DEFAULT '0' AFTER `requiredCondition`;
 	},
 
-	/**
-	 *
-	 * @param field
-	 * @returns {boolean}
-	 * @private
-	 */
-	_changeRelatedFieldsVisibility: function(field) {
-		if (!field.relatedFields) {
-			return false;
-		}
-
-		// relatedFields are populated in FormFieldSet. The validation of this field can affect visibility of other fields
-		// using this fields value in the requiredCondition
-		Ext.each(field.relatedFields, function(relatedField) {
-			if (!relatedField.conditionallyHidden) {
-				return true;
-			}
-
-			if (this.requiredConditionMatches) {
-				relatedField.hide();
-				relatedField.ownerCt.doLayout();
-				return true;
-			}
-
-			relatedField.show();
-			relatedField.ownerCt.doLayout();
-			return true;
-
-		}, field);
-	},
+	// /**
+	//  *
+	//  * @param field
+	//  * @returns {boolean}
+	//  * @private
+	//  */
+	// _changeRelatedFieldsVisibility: function(field) {
+	// 	// if (!field.relatedFields) {
+	// 	// 	return false;
+	// 	// }
+	// 	//
+	// 	// // relatedFields are populated in FormFieldSet. The validation of this field can affect visibility of other fields
+	// 	// // using this fields value in the requiredCondition
+	// 	// Ext.each(field.relatedFields, function(relatedField) {
+	// 	// 	relatedField.validate();
+	// 	// }, field);
+	// },
 
 	/**
 	 * @param customField
@@ -188,7 +166,10 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	 *
 	 * @param customfield
 	 */
-	requiredConditionValidator: function (customfield) {
+	checkRequiredCondition: function (customfield) {
+
+		this.requiredConditionMatches = false;
+
 		var condition = customfield.relatedFieldCondition,
 			form,
 			conditionParts,
@@ -240,37 +221,49 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			}
 		}
 
-		var customFieldCmp = this;
-		if (this.xtype === 'treeselectfield') {
-			customFieldCmp = this.items.itemAt(0);
-		}
+
 
 		if (isEmptyCondition) {
-			customFieldCmp.allowBlank = !Ext.isEmpty(fieldValue);
+			this.requiredConditionMatches = !Ext.isEmpty(fieldValue);
 		} else if (isNotEmptyCondition) {
-			customFieldCmp.allowBlank = Ext.isEmpty(fieldValue);
+			this.requiredConditionMatches = Ext.isEmpty(fieldValue);
 		} else {
 			switch (operator) {
 				case '=':
 				case '==':
-					customFieldCmp.allowBlank = !(fieldValue == value);
+					this.requiredConditionMatches = (fieldValue == value);
 					break;
 				case '>':
-					customFieldCmp.allowBlank = !(fieldValue > value);
+					this.requiredConditionMatches = (fieldValue > value);
 					break;
 				case '<':
-					customFieldCmp.allowBlank = !(fieldValue < value);
+					this.requiredConditionMatches = (fieldValue < value);
 					break
 			}
 		}
 
-		if (this.xtype === 'treeselectfield') {
-			this.allowBlank = customFieldCmp.allowBlank;
+
+		if(customfield.conditionallyRequired) {
+			var customFieldCmp = this;
+			if (this.xtype === 'treeselectfield') {
+				customFieldCmp = this.items.itemAt(0);
+			}
+			customFieldCmp.allowBlank = !this.requiredConditionMatches;
 		}
 
-		this.requiredConditionMatches = customFieldCmp.allowBlank;
+		if (!customfield.conditionallyHidden) {
+			return this.requiredConditionMatches;
+		}
 
-		return true;
+		if (this.requiredConditionMatches) {
+			customFieldCmp.show();
+		} else {
+			customFieldCmp.hide();
+		}
+
+		customFieldCmp.ownerCt.doLayout();
+
+		return this.requiredConditionMatches;
 	},
 	
 	/**
