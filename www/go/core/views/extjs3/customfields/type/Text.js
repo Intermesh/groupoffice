@@ -211,7 +211,9 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			return false;
 		}
 
-		fieldValue = field.getValue();
+		fieldValue = field.getRawValue ? field.getRawValue() : field.getValue();
+
+
 		if (field.xtype === 'xcheckbox' || field.xtype === 'checkbox') {
 			fieldValue = fieldValue | 0;
 			if(value === "true") {
@@ -222,6 +224,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 		}
 
 
+		console.log(fieldValue, value, operator);
 
 		if (isEmptyCondition) {
 			this.requiredConditionMatches = !Ext.isEmpty(fieldValue);
@@ -242,13 +245,13 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			}
 		}
 
+		var customFieldCmp = this;
 
 		if(customfield.conditionallyRequired) {
-			var customFieldCmp = this;
-			if (this.xtype === 'treeselectfield') {
-				customFieldCmp = this.items.itemAt(0);
-			}
 			customFieldCmp.allowBlank = !this.requiredConditionMatches;
+			if (this.xtype === 'treeselectfield') {
+				this.items.itemAt(0).allowBlank = !this.requiredConditionMatches;
+			}
 		}
 
 		if (!customfield.conditionallyHidden) {

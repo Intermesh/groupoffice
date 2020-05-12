@@ -112,7 +112,13 @@ go.form.Chips = Ext.extend(Ext.Container, {
 				layout: "form",				
 				items: [cb]
 			});
+			cb.on('change', function() {
+				this.fireEvent('change', this, this.getValue());
+			}, this);
 		}
+
+
+
 		this.items.push(this.dataView);
 		
 		//adds back removed records from static stores.
