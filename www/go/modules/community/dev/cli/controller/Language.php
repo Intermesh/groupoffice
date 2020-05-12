@@ -115,8 +115,13 @@ class Language extends Controller {
 					$langFilePath = "go/modules/" . $package . "/" . $module . "/language/" . $lang . ".php";
 				}
 				
-				
 				$langfile = $rootFolder->getFile($langFilePath);
+				$moduleFolder = $langfile->getFolder()->getParent();
+
+				if(!$moduleFolder->exists()) {
+					echo "MODULE: " . $package . "/" . $module ." does not exist.\n";
+					continue;
+				}
 				
 				if ($langfile->exists()) {
 					$existingTranslations = require($langfile->getPath());
