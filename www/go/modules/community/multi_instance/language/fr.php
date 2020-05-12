@@ -17,4 +17,7 @@ return array (
   'Deactivate' => 'Désactiver',
   'Deactivate instance' => 'Désactiver l\'instance',
   'Activate instance' => 'Activer l\'instance',
+  'Show trials' => 'Montrer Essais',
+  'Download site config' => 'Télécharger configuration site',
+  'Trial' => 'Essai',
 );

@@ -89,7 +89,7 @@ return array (
   'Add Contact' => 'Ajouter un contact',
   'contact\'+this.capitalize(order' => 
   array (
-    'i' => 'contact\'+this.capitalize(order[i]), "addressbook',
+    'i' => 'contact\'+this.capitalize(order[i]), "carnet d\'adresses',
   ),
   'project' => 'Projet',
   'Ok' => 'Ok',
