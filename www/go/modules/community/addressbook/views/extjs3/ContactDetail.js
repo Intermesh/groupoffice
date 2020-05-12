@@ -281,13 +281,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 				detailView: this
 			}),
 
+			{
+				xtype: "linkbrowserbutton"
+			},
+
 			this.moreMenu ={
 				iconCls: 'ic-more-vert',
 				menu: [
-					{
-						xtype: "linkbrowsermenuitem"
-					},
-					'-',
 					this.starItem = new Ext.menu.Item({
 						iconCls: "ic-star",
 						text: t("Star"),
