@@ -1475,10 +1475,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param \go\core\orm\Entity $entity
+	 * @param bool $saveToEntity
 	 * @return self
-	 * @throws \Exception
+	 * @throws GO\Base\Exception\AccessDenied
 	 */
 	public function findForEntity(\go\core\orm\Entity $entity, $saveToEntity = true) {
 
@@ -1495,8 +1496,9 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 				$newFolder->acl_id = $entity->findAclId();
 				$newFolder->save(true);
 
+				$entity->filesFolderId = $newFolder->id;
+
 				if($saveToEntity) {
-					$entity->filesFolderId = $newFolder->id;
 					$entity->save();
 				}
 
@@ -1524,7 +1526,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		$folder->save(true);
 
 		$entity->filesFolderId = $folder->id;
-		if(!$entity->save()) {
+		if($saveToEntity && !$entity->save()) {
 			throw new \Exception("Could not save entity!");
 		}
 		

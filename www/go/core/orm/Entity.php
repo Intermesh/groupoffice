@@ -980,6 +980,9 @@ abstract class Entity extends Property {
 		//copy public and protected columns except for auto increments.
 		$props = $this->getApiProperties();
 		foreach($props as $name => $p) {
+			if($name == 'filesFolderId') {
+				continue;
+			}
 			$this->mergeProp($entity, $name, $p);
 		}
 
@@ -1032,8 +1035,7 @@ abstract class Entity extends Property {
 		$this->mergeFiles($entity);
 
 		$this->mergeRelated($entity);
-
-		if(!$entity->delete(['id' => $entity->id])) {
+		if(!static::delete(['id' => $entity->id])) {
 			go()->getDbConnection()->rollBack();
 				return false;
 		}
@@ -1058,7 +1060,7 @@ abstract class Entity extends Property {
 		if (!$sourceFolder) {
 			return;
 		}
-		$folder = Folder::model()->findForEntity($entity);
+		$folder = Folder::model()->findForEntity($this);
 	
 		$folder->moveContentsFrom($sourceFolder);		
 	}
