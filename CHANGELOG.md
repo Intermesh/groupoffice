@@ -1,3 +1,7 @@
+13-05-2020 6.4.140
+- Address book: Fixed merge of files
+- Core: Database check could set wrong owner to ACL's
+
 12-05-2020 6.4.139
 - Core: Add to all and reset buttons didn't change all existing permissions
 - Core: Custom fields of type date and date time didn't print on invoices
