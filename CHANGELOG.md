@@ -1,6 +1,7 @@
 13-05-2020 6.4.140
 - Address book: Fixed merge of files
 - Core: Database check could set wrong owner to ACL's
+- Custom fields: Required condition matches multiple words
 
 12-05-2020 6.4.139
 - Core: Add to all and reset buttons didn't change all existing permissions
