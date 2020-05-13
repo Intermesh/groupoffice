@@ -196,14 +196,11 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
 		} else {
 			conditionParts = condition.split(' ');
-			if (conditionParts.length === 3) { //valid condition
-				operator = conditionParts[1];
-				field = form.findField(conditionParts[0]) || form.findField('customFields.' + conditionParts[0]);
-				value = conditionParts[2];
-				if (!field) {
-					field = form.findField(conditionParts[2]) || form.findField('customFields.' + conditionParts[2]);
-					value = conditionParts[0];
-				}
+			if (conditionParts.length > 2) { //valid condition
+				fieldName = conditionParts.shift();
+				operator = conditionParts.shift();
+				field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
+				value = conditionParts.join(" ").trim();
 			}
 		}
 
