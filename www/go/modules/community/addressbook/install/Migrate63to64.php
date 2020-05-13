@@ -753,7 +753,7 @@ class Migrate63to64 {
 
 
 			$address = new Address();
-			$address->type = Address::TYPE_HOME;
+			$address->type = Address::TYPE_VISIT;
 			$address->countryCode = isset($r['country']) && \go\core\validate\CountryCode::validate(strtoupper($r['country'])) ? strtoupper($r['country']) : null;
 			$address->state =!empty($r['state']) ?$r['state'] : null;
 			$address->city = !empty($r['city']) ?$r['city'] : null;
