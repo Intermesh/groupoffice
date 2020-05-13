@@ -244,6 +244,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 
 	getModulePanel: function (moduleName) {
+
+		this.initModule(moduleName);
 		var panelId = 'go-module-panel-' + moduleName;
 		if (this.tabPanel.items.map[panelId]) {
 			return this.tabPanel.items.map[panelId];
