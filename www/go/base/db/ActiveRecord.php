@@ -4762,17 +4762,18 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		echo "Checking ".(is_array($this->pk)?implode(',',$this->pk):$this->pk)." ".$this->className()."\n";
 		flush();
 
-		if($this->aclField() && (!$this->isJoinedAclField || (($this instanceof \GO\Files\Model\Folder) && $this->readonly == 0))){
-
-			$acl = $this->acl;
-			if(!$acl)
-				$this->setNewAcl();
-			else
-			{
-				$user_id = empty($this->user_id) ? 1 : $this->user_id;
-				$acl->ownedBy=$user_id;
-				$acl->usedIn=$this->tableName().'.'.$this->aclField();
-				$acl->save();
+		if($this->aclField() && (!$this->isJoinedAclField || $this instanceof \GO\Files\Model\Folder)) {
+			if (!($this instanceof \GO\Files\Model\Folder) || (!$this->readonly && $this->acl_id > 0)) {
+				$acl = $this->acl;
+				if (!$acl)
+					$this->setNewAcl();
+				else {
+					$user_id = empty($this->user_id) ? 1 : $this->user_id;
+					$acl->ownedBy = $user_id;
+					$acl->usedIn = $this->tableName() . '.' . $this->aclField();
+					if($acl->isModified())
+						$acl->save();
+				}
 			}
 		}
 
