@@ -21,10 +21,9 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 		if(config.entities){
 			this.entities = config.entities;
 		}
-
 		var selModel = new Ext.grid.RowSelectionModel({simpleSelect: true});
 
-		var data = [], allEntities = this.entitiies ? this.entities : go.Entities.getLinkConfigs(), id;
+		var data = [], allEntities = this.entities ? this.entities : go.Entities.getLinkConfigs(), id;
 		
 		allEntities.forEach(function(link){			
 			id = link.entity;

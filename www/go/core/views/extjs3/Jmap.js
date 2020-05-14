@@ -302,6 +302,24 @@ go.Jmap = {
 				}
 			}, false);
 
+			source.addEventListener('alert', function(e) {
+				var data = JSON.parse(e.data);
+				go.Db.store(data.entityType).single(data.entityId).then(function(entity) {
+					go.Notifier.flyout({
+						title: entity.title | entity.name || entity.subject || entity.description,
+						buttons: [{
+							text: 'Open',
+							handler: function() {
+								alert('biem');
+							}
+						}]
+					});
+				});
+
+
+			},false);
+
+
 			source.addEventListener('open', function(e) {
 				// Connection was opened.
 			}, false);
