@@ -1,2 +1,16 @@
 Module.js
 MainPanel.js
+SelectPriority.js
+TasklistsGrid.js
+TaskCombo.js
+TaskGrid.js
+ContinueTaskDialog.js
+CategoriesGrid.js
+CategoryDialog.js
+TaskDetail.js
+TasklistDialog.js
+TaskDialog.js
+RecurrencePanel.js
+AlertFields.js
+ChooseTasklistDialog.js
+ChooseTasklistGrid.js

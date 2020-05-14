@@ -5,4 +5,4 @@ if(!$show)
 	$show='active';
 
 //$GO_SCRIPTS_JS .='GO.tasks.defaultTasklist = {id: '.$tasklist['id'].', name: "'.$tasklist['name'].'"};
-$GO_SCRIPTS_JS .='GO.tasks.show="'.$show.'";';
+//$GO_SCRIPTS_JS .='GO.tasks.show="'.$show.'";';

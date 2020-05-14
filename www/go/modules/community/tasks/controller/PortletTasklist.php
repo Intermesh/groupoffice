@@ -9,10 +9,10 @@ namespace go\modules\community\tasks\controller;
 use go\core\jmap\EntityController;
 use go\modules\community\tasks\model;
 
-class Tasklist extends EntityController {
+class PortletTasklist extends EntityController {
 
 	protected function entityClass() {
-		return model\Tasklist::class;
+		return model\PortletTasklist::class;
 	}	
 
 	public function query($params) {
@@ -31,3 +31,4 @@ class Tasklist extends EntityController {
 		return $this->defaultChanges($params);
 	}
 }
+

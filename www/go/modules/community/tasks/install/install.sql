@@ -1,137 +1,160 @@
---
--- Tabelstructuur voor tabel `cf_task_tasks`
---
+-- create tasklist table
+DROP TABLE IF EXISTS `tasks_settings`;
+DROP TABLE IF EXISTS `tasks_portlet_tasklist`;
+DROP TABLE IF EXISTS `tasks_tasks_custom_field`;
+DROP TABLE IF EXISTS `tasks_alert`;
+DROP TABLE IF EXISTS `tasks_task_category`;
+DROP TABLE IF EXISTS `tasks_task`;
+DROP TABLE IF EXISTS `tasks_category`;
+DROP TABLE IF EXISTS `tasks_tasklist`;
 
-DROP TABLE IF EXISTS `task_tasks_custom_fields`;
-CREATE TABLE IF NOT EXISTS `task_tasks_custom_fields` (
+CREATE TABLE `tasks_tasklist` (
   `id` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `createdBy` int(11) NOT NULL,
+  `aclId` int(11) NOT NULL,
+  `filesFolderId` int(11) NOT NULL DEFAULT '0',
+  `version` int(10) UNSIGNED NOT NULL DEFAULT '1'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
+ALTER TABLE `tasks_tasklist`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fkCreatedBy` (`createdBy`),
+  ADD KEY `fkAcl` (`aclId`);
 
---
--- Tabelstructuur voor tabel `go_links_task_tasks`
---
+ALTER TABLE `tasks_tasklist`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-DROP TABLE IF EXISTS `go_links_task_tasks`;
-CREATE TABLE IF NOT EXISTS `go_links_task_tasks` (
+ALTER TABLE `tasks_tasklist`
+  ADD CONSTRAINT `fkAcl` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`),
+  ADD CONSTRAINT `fkCreatedBy` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`);
+
+-- create task category table
+CREATE TABLE `tasks_category` (
   `id` int(11) NOT NULL,
-  `folder_id` int(11) NOT NULL,
-  `model_id` int(11) NOT NULL,
-  `model_type_id` int(11) NOT NULL,
-  `description` varchar(100) DEFAULT NULL,
-  `ctime` int(11) NOT NULL,
-  PRIMARY KEY `model_id` (`id`,`model_id`,`model_type_id`),
-  KEY `id` (`id`,`folder_id`),
-  KEY `ctime` (`ctime`)
-) ENGINE=InnoDB;
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `createdBy` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- --------------------------------------------------------
+ALTER TABLE `tasks_category`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`createdBy`);
 
---
--- Tabelstructuur voor tabel `task_categories`
---
+ALTER TABLE `tasks_category`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-DROP TABLE IF EXISTS `task_categories`;
-CREATE TABLE IF NOT EXISTS `task_categories` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`)
-) ENGINE=InnoDB;
+ALTER TABLE `tasks_category`
+  ADD CONSTRAINT `tasks_category_ibfk_1` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`);
 
--- --------------------------------------------------------
-
---
--- Tabelstructuur voor tabel `task_portlet_tasklists`
---
-
-DROP TABLE IF EXISTS `task_portlet_tasklists`;
-CREATE TABLE IF NOT EXISTS `task_portlet_tasklists` (
-  `user_id` int(11) NOT NULL,
-  `tasklist_id` int(11) NOT NULL,
-  PRIMARY KEY (`user_id`,`tasklist_id`)
-) ENGINE=InnoDB;
-
--- --------------------------------------------------------
---
--- Tabelstructuur voor tabel `task_settings`
---
-
-DROP TABLE IF EXISTS `task_settings`;
-CREATE TABLE IF NOT EXISTS `task_settings` (
-  `user_id` int(11) NOT NULL,
-  `reminder_days` int(11) NOT NULL DEFAULT '0',
-  `reminder_time` varchar(10) NOT NULL DEFAULT '0',
-  `remind` tinyint(1) NOT NULL DEFAULT '0',
-  `default_tasklist_id` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB;
-
--- --------------------------------------------------------
-
---
--- Tabelstructuur voor tabel `task_tasklists`
---
-
-DROP TABLE IF EXISTS `task_tasklists`;
-CREATE TABLE IF NOT EXISTS `task_tasklists` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) DEFAULT NULL,
-  `user_id` int(11) NOT NULL,
-  `acl_id` int(11) NOT NULL,
-  `files_folder_id` int(11) NOT NULL DEFAULT '0',
-  `version` INT UNSIGNED NOT NULL DEFAULT '1',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB;
-
--- --------------------------------------------------------
-
---
--- Tabelstructuur voor tabel `task_tasks`
---
-
-DROP TABLE IF EXISTS `task_tasks`;
-CREATE TABLE IF NOT EXISTS `task_tasks` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `uuid` varchar(190) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '',
-  `tasklist_id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `ctime` int(11) NOT NULL,
-  `mtime` int(11) NOT NULL,
-	`muser_id` int(11) NOT NULL DEFAULT '0',
-  `start_time` int(11) NOT NULL,
-  `due_time` int(11) NOT NULL,
-  `completion_time` int(11) NOT NULL DEFAULT '0',
-  `name` varchar(255) DEFAULT NULL,
-  `description` text,
-  `status` varchar(20) DEFAULT NULL,
-  `repeat_end_time` int(11) NOT NULL DEFAULT '0',
-  `reminder` int(11) NOT NULL DEFAULT '0',
-  `rrule` varchar(100) NOT NULL DEFAULT '',
-  `files_folder_id` int(11) NOT NULL DEFAULT '0',
-  `category_id` int(11) NOT NULL DEFAULT '0',
+-- create task table
+CREATE TABLE `tasks_task` (
+  `id` int(11) NOT NULL,
+  `uid` varchar(190) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '',
+  `tasklistId` int(11) NOT NULL,
+  `createdBy` int(11) NOT NULL,
+  `ownerId` int(11) NOT NULL,
+  `createdAt` datetime NOT NULL,
+  `modifiedAt` datetime NOT NULL,
+  `modifiedBy` int(11) NOT NULL DEFAULT '0',
+  `start` date NOT NULL,
+  `due` date NOT NULL,
+  `completed` datetime DEFAULT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `recurrenceRule` varchar(400) COLLATE utf8mb4_unicode_ci DEFAULT '',
+  `filesFolderId` int(11) NOT NULL DEFAULT '0',
   `priority` int(11) NOT NULL DEFAULT '1',
-	`percentage_complete` TINYINT NOT NULL DEFAULT '0',
-	`project_id` INT NOT NULL DEFAULT '0',
+  `percentageComplete` tinyint(4) NOT NULL DEFAULT '0',
+  `projectId` int(11) NOT NULL DEFAULT '0',
+  `uri` varchar(190) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `tasks_task`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `list_id` (`tasklistId`),
+  ADD KEY `rrule` (`recurrenceRule`(191)),
+  ADD KEY `uuid` (`uid`),
+  ADD KEY `fkModifiedBy` (`modifiedBy`),
+  ADD KEY `fkProject` (`projectId`),
+  ADD KEY `createdBy` (`createdBy`),
+  ADD KEY `fk_tasks_task_ownerId` (`ownerId`),
+  ADD KEY `filesFolderId` (`filesFolderId`);
+
+ALTER TABLE `tasks_task`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `tasks_task`
+  ADD CONSTRAINT `fkModifiedBy` FOREIGN KEY (`modifiedBy`) REFERENCES `core_user` (`id`),
+  ADD CONSTRAINT `tasks_task_ibfk_1` FOREIGN KEY (`tasklistId`) REFERENCES `tasks_tasklist` (`id`),
+  ADD CONSTRAINT `tasks_task_owner_ibfk_2` FOREIGN KEY (`ownerId`) REFERENCES `core_user` (`id`),
+  ADD CONSTRAINT `tasks_task_ibfk_2` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`);
+
+-- create category / task lookup table
+CREATE TABLE `tasks_task_category` (
+  `taskId` int(11) NOT NULL,
+  `categoryId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `tasks_task_category`
+  ADD PRIMARY KEY (`taskId`,`categoryId`),
+  ADD KEY `tasks_task_category_ibfk_2` (`categoryId`);
+
+ALTER TABLE `tasks_task_category`
+  ADD CONSTRAINT `tasks_task_category_ibfk_1` FOREIGN KEY (`taskId`) REFERENCES `tasks_task` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `tasks_task_category_ibfk_2` FOREIGN KEY (`categoryId`) REFERENCES `tasks_category` (`id`) ON DELETE CASCADE;
+
+-- create task alert table
+CREATE TABLE `tasks_alert` (
+  `id` int(11) NOT NULL,
+  `taskId` int(11) NOT NULL,
+  `remindDate` date NOT NULL,
+  `remindTime` time NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `tasks_alert`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fkTaskId` (`taskId`);
+
+ALTER TABLE `tasks_alert`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `tasks_alert`
+  ADD CONSTRAINT `fkTaskId` FOREIGN KEY (`taskId`) REFERENCES `tasks_task` (`id`) ON DELETE CASCADE;
+
+-- create task portlet table
+CREATE TABLE `tasks_portlet_tasklist` (
+  `createdBy` int(11) NOT NULL,
+  `tasklistId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `tasks_portlet_tasklist`
+  ADD PRIMARY KEY (`createdBy`,`tasklistId`),
+  ADD KEY `tasklistId` (`tasklistId`);
+
+ALTER TABLE `tasks_portlet_tasklist`
+  ADD CONSTRAINT `tasks_portlet_tasklist_ibfk_1` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`),
+  ADD CONSTRAINT `tasks_portlet_tasklist_ibfk_2` FOREIGN KEY (`tasklistId`) REFERENCES `tasks_tasklist` (`id`);
+
+-- create task settings table
+CREATE TABLE `tasks_settings` (
+  `createdBy` int(11) NOT NULL,
+  `reminderDays` int(11) NOT NULL DEFAULT '0',
+  `reminderTime` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
+  `remind` tinyint(1) NOT NULL DEFAULT '0',
+  `defaultTasklistId` int(11) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `tasks_settings`
+  ADD PRIMARY KEY (`createdBy`);
+
+ALTER TABLE `tasks_settings`
+  ADD CONSTRAINT `tasks_settings_ibfk_1` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`);
+
+-- create task custom field table
+CREATE TABLE `tasks_task_custom_fields` (
+  `id` INT(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `list_id` (`tasklist_id`),
-  KEY `rrule` (`rrule`),
-  KEY `uuid` (`uuid`)
-) ENGINE=InnoDB;
-
-
---
--- Tabelstructuur voor tabel `su_visible_lists`
---
-
-CREATE TABLE IF NOT EXISTS `su_visible_lists` (
-  `user_id` int(11) NOT NULL,
-  `tasklist_id` int(11) NOT NULL,
-  PRIMARY KEY  (`user_id`,`tasklist_id`)
-) ENGINE=InnoDB;
-
-ALTER TABLE `task_tasks_custom_fields` ADD FOREIGN KEY (`id`) REFERENCES `task_tasks`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
-
+  CONSTRAINT `fk_tasks_task_custom_field1`
+     FOREIGN KEY (`id`)
+     REFERENCES `tasks_task` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

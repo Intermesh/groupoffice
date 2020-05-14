@@ -6,41 +6,26 @@
  */
 namespace go\modules\community\tasks\model;
 						
-use go\core\acl\model\AclOwnerEntity;
-
+use go\core\jmap\Entity;
+						
 /**
- * Tasklist model
+ * PortletTasklist model
  */
-class Tasklist extends AclOwnerEntity {
+class PortletTasklist extends Entity {
 	
-	/** @var int */
-	public $id;
-
-	/** @var string */
-	public $name;
-
 	/** @var int */
 	public $createdBy;
 
 	/** @var int */
-	public $ownerId;
-
-	/** @var int */
-	public $aclId;
-
-	/** @var int */
-	public $filesFolderId = 0;
-
-	/** @var int */
-	public $version = 1;
+	public $tasklistId;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
-			->addTable("tasks_tasklist", "tasklist");
+			->addTable("tasks_portlet_tasklist", "portlettasklist");
 	}
 
 	public static function getClientName() {
-		return "Tasklist";
+		return "PortletTasklist";
 	}
 
 }

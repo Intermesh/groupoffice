@@ -6,41 +6,31 @@
  */
 namespace go\modules\community\tasks\model;
 						
-use go\core\acl\model\AclOwnerEntity;
-
+use go\core\orm\Property;
+						
 /**
- * Tasklist model
+ * Settings model
  */
-class Tasklist extends AclOwnerEntity {
+class Settings extends Property {
 	
-	/** @var int */
-	public $id;
-
-	/** @var string */
-	public $name;
-
 	/** @var int */
 	public $createdBy;
 
 	/** @var int */
-	public $ownerId;
+	public $reminderDays = 0;
+
+	/** @var string */
+	public $reminderTime = '0';
+
+	/** @var bool */
+	public $remind = false;
 
 	/** @var int */
-	public $aclId;
-
-	/** @var int */
-	public $filesFolderId = 0;
-
-	/** @var int */
-	public $version = 1;
+	public $defaultTasklistId = 0;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
-			->addTable("tasks_tasklist", "tasklist");
-	}
-
-	public static function getClientName() {
-		return "Tasklist";
+			->addTable("tasks_settings", "settings");
 	}
 
 }

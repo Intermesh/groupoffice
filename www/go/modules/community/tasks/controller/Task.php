@@ -9,10 +9,10 @@ namespace go\modules\community\tasks\controller;
 use go\core\jmap\EntityController;
 use go\modules\community\tasks\model;
 
-class Tasklist extends EntityController {
+class Task extends EntityController {
 
 	protected function entityClass() {
-		return model\Tasklist::class;
+		return model\Task::class;
 	}	
 
 	public function query($params) {
@@ -27,7 +27,20 @@ class Tasklist extends EntityController {
 		return $this->defaultSet($params);
 	}
 
+	public function export($params) {
+		return $this->defaultExport($params);
+	}
+	
+	public function import($params) {
+		return $this->defaultImport($params);
+	}
+
+	public function importCSVMapping($params) {
+		return $this->defaultImportCSVMapping($params);
+	}
+
 	public function changes($params) {
 		return $this->defaultChanges($params);
 	}
 }
+

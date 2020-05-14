@@ -6,12 +6,12 @@
  */
 namespace go\modules\community\tasks\model;
 						
-use go\core\acl\model\AclOwnerEntity;
+use go\core\jmap\Entity;
 
 /**
- * Tasklist model
+ * Category model
  */
-class Tasklist extends AclOwnerEntity {
+class Category extends Entity {
 	
 	/** @var int */
 	public $id;
@@ -22,25 +22,13 @@ class Tasklist extends AclOwnerEntity {
 	/** @var int */
 	public $createdBy;
 
-	/** @var int */
-	public $ownerId;
-
-	/** @var int */
-	public $aclId;
-
-	/** @var int */
-	public $filesFolderId = 0;
-
-	/** @var int */
-	public $version = 1;
-
 	protected static function defineMapping() {
 		return parent::defineMapping()
-			->addTable("tasks_tasklist", "tasklist");
+			->addTable("tasks_category", "category");
 	}
 
 	public static function getClientName() {
-		return "Tasklist";
+		return "TaskCategory";
 	}
 
 }
