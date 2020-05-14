@@ -5,6 +5,8 @@ go.Window = Ext.extend(Ext.Window, {
 	draggable: !GO.util.isMobileOrTablet(),
 	maximized: GO.util.isMobileOrTablet(),
 	closeAction: "close",
+	border: true,
+	animCollapse: false, //htmleditor doesn't work with animCollapse
 	
 	initComponent : function(){
 		

@@ -63,10 +63,15 @@ class ReminderController extends \GO\Base\Controller\AbstractController {
 
 		if(!empty($record['model_type_id'])){
 			$modelType = \GO\Base\Model\ModelType::model()->findByPk($record['model_type_id']);
-			if($modelType && \GO::getModel($modelType->model_name)){
-				$record['iconCls']='go-model-icon-'.$modelType->model_name;
-				$record['type']=\GO::getModel($modelType->model_name)->localizedName;
-				$record['model_name']=$modelType->model_name;
+			try {
+				if ($modelType && \GO::getModel($modelType->model_name)) {
+					$record['iconCls'] = 'go-model-icon-' . $modelType->model_name;
+					$record['type'] = \GO::getModel($modelType->model_name)->localizedName;
+					$record['model_name'] = $modelType->model_name;
+				}
+			}
+			catch(\Exception $e) {
+
 			}
 		}  
 		

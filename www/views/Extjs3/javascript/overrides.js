@@ -149,6 +149,29 @@ Ext.override(Ext.form.TextField,{
 
 });
 
+Ext.override(Ext.form.FieldSet, {
+	onRender : function(ct, position){
+		if(!this.el){
+			this.el = document.createElement('div');
+			this.el.id = this.id;
+			if (this.title || this.header || this.checkboxToggle) {
+				this.el.appendChild(document.createElement('legend')).className = this.baseCls + '-header';
+			}
+		}
+
+		Ext.form.FieldSet.superclass.onRender.call(this, ct, position);
+
+		if(this.checkboxToggle){
+			var o = typeof this.checkboxToggle == 'object' ?
+				this.checkboxToggle :
+				{tag: 'input', type: 'checkbox', name: this.checkboxName || this.id+'-checkbox'};
+			this.checkbox = this.header.insertFirst(o);
+			this.checkbox.dom.checked = !this.collapsed;
+			this.mon(this.checkbox, 'click', this.onCheckClick, this);
+		}
+	}
+});
+
 
 
 Ext.override(Ext.form.BasicForm,{
@@ -226,9 +249,8 @@ Ext.override(Ext.form.BasicForm,{
 				}
 			}
 		};
-		
+
 		this.items.each(fn);
-  
 
 		var keys, converted = {}, currentJSONlevel;
 
@@ -343,6 +365,13 @@ Ext.override(Ext.form.TwinTriggerField, {
 	 }
 });
 
+Ext.override(Ext.grid.GroupingView, {
+	/**
+	 * Overridden because sometims we use Objects in the store (Relations) and groupMode = value doesn't work with that.
+	 */
+	groupMode: "display"
+});
+
 Ext.override(Ext.data.GroupingStore,{
 	clearGrouping : function(){
         this.groupField = false;
@@ -397,6 +426,7 @@ Ext.TaskMgr.start({
  */
 Ext.override(Ext.FormPanel,{
 	initComponent : Ext.FormPanel.prototype.initComponent.createSequence(function(){
+
 		this.on('actioncomplete', function(form, action){
 			if(action.type=='load'){
 				form.items.each(function(field){
@@ -456,7 +486,7 @@ Ext.override(Ext.FormPanel,{
 				if(this.isField(c)) {
 						m.push(c);
 						//don't cascade into form fields.
-						return (c.getXType() == 'compositefield' || c.getXType() == 'checkboxgroup' || c.getXType() == "radiogroup"); //don't cascade into form fields
+						return (c.getXType() == 'compositefield' || c.getXType() == 'checkboxgroup' || c.getXType() == "radiogroup" || c.getXType() == "formcoontainer" || c.getXType() == "formgroup"); //don't cascade into form fields
 				}
 		}, this);
 		return m;
@@ -680,19 +710,20 @@ Ext.override(Ext.Element, {
 			html = '<h1 style="margin-left:5px;font-size:16px;margin:10px 5px;">'+config.title+'</h1>'+html;
         
 		//Build our HTML document for the iframe
-		strHTML = String.format(
-			strTemplate
-			, Ext.isEmpty(this.printCSS)? '#': this.printCSS
-			, this.printTitle
-			, Ext.isIE? 'document.execCommand(\'print\');': 'window.print();'
-			, html
-			);
-        
-		var popup = window.open('about:blank');
-		if (!popup.opener) popup.opener = self
-		popup.document.write(strHTML);
-		popup.document.close();
-		popup.focus();
+		// strHTML = String.format(
+		// 	strTemplate
+		// 	, Ext.isEmpty(this.printCSS)? '#': this.printCSS
+		// 	, this.printTitle
+		// 	, Ext.isIE? 'document.execCommand(\'print\');': 'window.print();'
+		// 	, html
+		// 	);
+
+      go.print(html);
+		// var popup = window.open('about:blank');
+		// if (!popup.opener) popup.opener = self
+		// popup.document.write(strHTML);
+		// popup.document.close();
+		// popup.focus();
 	}
 });
 
@@ -975,6 +1006,8 @@ Ext.override(Ext.DatePicker, {
 });
 
 Ext.override(Ext.Panel, {
+	border: false,
+	animCollapse: false,
 	panelInitComponent : Ext.Panel.prototype.initComponent,
 	
 	initComponent : function() {
@@ -1078,17 +1111,26 @@ Ext.override(Ext.KeyNav, {
 // Also used by scrollloader in new framework
 Ext.override(Ext.grid.GridView, {
 	scrollToTopOnLoad: true,
-	onLoad : function(){
-			if (this.scrollToTopOnLoad){
+	onLoad : function(store, records, o){
+
+			if (this.scrollToTopOnLoad && !o.keepScrollPosition){
 				if (Ext.isGecko) {
 						if (!this.scrollToTopTask) {
 								this.scrollToTopTask = new Ext.util.DelayedTask(this.scrollToTop, this);
 						}
 						this.scrollToTopTask.delay(1);
-				} else {
+				} else {				
 						this.scrollToTop();
 				}
 			}
-			this.scrollToTopOnLoad=true;
+			this.scrollToTopOnLoad=true;			
 	}
 });
+
+
+
+if(GO.util.isMobileOrTablet()) {
+	Ext.override(Ext.Container, {
+		labelAlign: "top"
+	});
+}

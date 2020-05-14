@@ -3,7 +3,7 @@ go.modules.community.ldapauthenticator.ServerGrid = Ext.extend(go.grid.GridPanel
 	viewConfig: {
 		forceFit: true,
 		autoFill: true,
-		emptyText: 	'<p>' +t("No items to display") + '</p>'
+		emptyText: 	'<i>people</i><p>' +t("No items to display") + '</p>'
 	},
 
 	initComponent: function () {
@@ -12,10 +12,6 @@ go.modules.community.ldapauthenticator.ServerGrid = Ext.extend(go.grid.GridPanel
 
 		Ext.apply(this, {	
 			tbar: [
-				{
-					xtype:'tbtitle',
-					text: t("LDAP Authenticator", "ldapauthenticator")
-				},
 				'->',
 				{
 					iconCls: 'ic-add',

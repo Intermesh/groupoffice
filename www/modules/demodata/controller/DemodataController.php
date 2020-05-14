@@ -74,7 +74,7 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			$elmer->displayName = 'Elmer Fudd';
 			$elmer->email = $elmer->recoveryEmail = 'elmer@acmerpp.demo';
 			$elmer->setPassword('demo');
-			$elmer->groups[] = Group::ID_INTERNAL;
+			//$elmer->groups[] = Group::ID_INTERNAL;
 
 			if (!$elmer->save()) 
 			{
@@ -96,7 +96,7 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			$demo->displayName = 'Demo User';
 			$demo->email = $demo->recoveryEmail = 'demo@acmerpp.demo';
 			$demo->setPassword('demo');
-			$demo->groups[] = Group::ID_INTERNAL;
+			//$demo->groups[] = Group::ID_INTERNAL;
 
 			if (!$demo->save()) 
 			{
@@ -113,7 +113,7 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 			$linda->displayName = 'Linda Smith';
 			$linda->email = $linda->recoveryEmail = 'linda@acmerpp.linda';
 			$linda->setPassword('demo');
-			$linda->groups[] = Group::ID_INTERNAL;
+		//	$linda->groups[] = Group::ID_INTERNAL;
 
 			if (!$linda->save())
 			{
@@ -983,33 +983,9 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 		
 			
 		if(\GO::modules()->projects2){
-			
-			
-			if(!\GO\Projects2\Model\Employee::model()->count()){
-			
-				$employee = new \GO\Projects2\Model\Employee();
-				$employee->user_id=$elmer->id;
-				$employee->external_fee=120;
-				$employee->internal_fee=60;
-				$employee->save();
 
-				$employee = new \GO\Projects2\Model\Employee();
-				$employee->user_id=$demo->id;
-				$employee->external_fee=80;
-				$employee->internal_fee=40;
-				$employee->save();
+			// todo: Demo data for employees was here but this is moved to business module. (need to refactor)
 
-				$employee = new \GO\Projects2\Model\Employee();
-				$employee->user_id=$linda->id;
-				$employee->external_fee=90;
-				$employee->internal_fee=45;
-				$employee->save();
-			}else
-			{
-				$employee = \GO\Projects2\Model\Employee::model()->findSingle();
-			}
-			
-			
 			$templates = \GO\Projects2\Model\Template::model()->find();
 			
 			$folderTemplate = $templates->fetch();
@@ -1305,13 +1281,9 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 		}
 		
 		if(!$this->isCli()){
-			//login as demo				
-			\GO::session()->restart();
-			\GO::session()->setCurrentUser($demo->id);
-			
 			header('Location: ' .go()->getSettings()->URL);
 			exit();
-		}		
+		}
 	}
 	
 	

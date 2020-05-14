@@ -53,7 +53,7 @@ $settings['config']['login_message'] = GO::config()->login_message;
 $settings['state_index'] = 'go';
 $settings['language'] = GO::language()->getLanguage();
 $settings['show_contact_cf_tabs'] = array();
-$settings['modules'] = GO::view()->exportModules();
+// $settings['modules'] = [];// GO::view()->exportModules();
 
 $settings['upload_quickselect'] = GO::config()->upload_quickselect;
 $settings['html_editor_font'] = GO::config()->html_editor_font;
@@ -74,7 +74,7 @@ if(GO::config()->debug) {
 }
 
 //echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
-echo '<script type="text/javascript" src="views/Extjs3/javascript/ext-base-debug.js"></script>';
+echo '<script type="text/javascript" src="views/Extjs3/javascript/ext-base-debug.js?mtime='.filemtime(__DIR__ . '/javascript/ext-base-debug.js').'"></script>';
 echo '<script type="text/javascript" src="views/Extjs3/javascript/ext-all-debug.js?mtime='.filemtime(__DIR__ . '/javascript/ext-all-debug.js').'"></script>';
 echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?lang='.\go()->getLanguage()->getIsoCode() . '&v='.$webclient->getLanguageJS()->getModifiedAt()->format("U").'"></script>';
 
@@ -104,7 +104,7 @@ echo 'window.name="' . GO::getId() . '";';
 if (isset(GO::session()->values['security_token']))
 	echo 'Ext.Ajax.extraParams={security_token:"' . GO::session()->values['security_token'] . '"};';
 
-GO::router()->getController()->fireEvent('inlinescripts');
+//GO::router()->getController()->fireEvent('inlinescripts');
 ?>
 </script>
 <?php
@@ -123,11 +123,16 @@ if ($cacheFile->exists()) {
 	//for t() function to auto detect module package and name
 	$scripts[] = "go.module='core';go.package='core';";
 	
-	$data = file_get_contents(GO::config()->root_path . 'views/Extjs3/javascript/scripts.txt');
-	$lines = array_map('trim', explode("\n", $data));
-	foreach ($lines as $line) {
-		if (!empty($line)) {
-			$scripts[] = new File(GO::config()->root_path . $line);
+	$bundleFile = new File(GO::config()->root_path . 'views/Extjs3/javascript/scripts.js');
+	if ($bundleFile->exists()) {
+		$scripts[] = $bundleFile;
+	} else {
+		$data = file_get_contents(GO::config()->root_path . 'views/Extjs3/javascript/scripts.txt');
+		$lines = array_map('trim', explode("\n", $data));
+		foreach ($lines as $line) {
+			if (!empty($line)) {
+				$scripts[] = new File(GO::config()->root_path . $line);
+			}
 		}
 	}
 
@@ -149,22 +154,26 @@ if ($cacheFile->exists()) {
 			
 			$scripts[] = 'Ext.ns("GO.' . $module->name  . '");';
 
-			if (!$scriptsFile || !file_exists($scriptsFile)) {
-				$scriptsFile = $modulePath . 'scripts.txt';
-				if (!file_exists($scriptsFile))
-					$scriptsFile = $modulePath . 'views/Extjs3/scripts.txt';
+			$bundleFile = new File($module->moduleManager->path() . 'views/extjs3/scripts.js');
+			if($bundleFile->exists()) {
+				$scripts[] = $bundleFile;
+			} else {
 
-				$prefix = "";
-			}
-			
-			
+				if (!$scriptsFile || !file_exists($scriptsFile)) {
+					$scriptsFile = $modulePath . 'scripts.txt';
+					if (!file_exists($scriptsFile))
+						$scriptsFile = $modulePath . 'views/Extjs3/scripts.txt';
 
-			if (file_exists($scriptsFile)) {
-				$data = file_get_contents($scriptsFile);
-				$lines = array_map('trim', explode("\n", $data));
-				foreach ($lines as $line) {
-					if (!empty($line)) {
-						$scripts[] = new File(GO::config()->root_path . $prefix . trim($line));
+					$prefix = "";
+				}
+				
+				if (file_exists($scriptsFile)) {
+					$data = file_get_contents($scriptsFile);
+					$lines = array_map('trim', explode("\n", $data));
+					foreach ($lines as $line) {
+						if (!empty($line)) {
+							$scripts[] = new File(GO::config()->root_path . $prefix . trim($line));
+						}
 					}
 				}
 			}
@@ -186,14 +195,15 @@ if ($cacheFile->exists()) {
   }
 
 	$rootFolder = new Folder(GO::config()->root_path);
+	$strip = strlen($rootFolder->getPath()) + 1;
 	foreach ($scripts as $script) {
 
 		if (GO::config()->debug) {
 			if (is_string($script)) {
 //        $js .=  $script ."\n;\n";
-				echo '<script type="text/javascript" nonce="'.Response::get()->getCspNonce().'">' . $script . '</script>' . "\n";
+				echo '<script type="text/javascript">' . $script . '</script>' . "\n";
 			} else if ($script instanceof File) {
-        $relPath = $script->getRelativePath($rootFolder);
+        $relPath = substr($script->getPath(), $strip);
         $parts = explode('/', $relPath);
 //        $js .= "\n//source: ".$relPath ."\n";
 				
@@ -213,7 +223,7 @@ if ($cacheFile->exists()) {
 				
 
 				if(!empty($js)) {
-					echo '<script type="text/javascript" nonce="'.Response::get()->getCspNonce().'">';
+					echo '<script type="text/javascript">';
 					echo $js;				
 					echo "</script>\n";
 				}
@@ -228,7 +238,7 @@ if ($cacheFile->exists()) {
 		} else {      
       
 			if($script instanceof File) {
-				$relPath = $script->getRelativePath($rootFolder);
+				$relPath = substr($script->getPath(), $strip);
 				$parts = explode('/', $relPath);
 				$js = "";
 				if($parts[0] == 'go' && $parts[1] == 'modules') {
@@ -267,7 +277,7 @@ if (file_exists(GO::view()->getTheme()->getPath() . 'MainLayout.js')) {
 	echo "\n";
 }
 ?>
-<script type="text/javascript" nonce="<?= Response::get()->getCspNonce(); ?>">
+<script type="text/javascript">
 <?php
 
 //direct login with token

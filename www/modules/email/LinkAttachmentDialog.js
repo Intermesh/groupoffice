@@ -2,6 +2,8 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 
 	attachmentItem : null, // If this is set to null, then it saves all attachments of the message.
 	messagePanel : null,
+	attachmentHandle : null,
+	attachmentsView : null,
 	
 	constructor : function(config){
 		
@@ -15,7 +17,12 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 
 		GO.email.LinkAttachmentDialog.superclass.constructor.call(this,config);
 	},
-	
+	setAttachmentHandle : function(handler) {
+		this.attachmentHandle = handler;
+	},
+	setAttachmentsView : function(attachmentsView) {
+		this.attachmentsView = attachmentsView;
+	},
 	link : function()	{
 		var record = this.grid.getSelectionModel().getSelected();
 		
@@ -41,7 +48,13 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 			success:function(response, options, result){
 				
 				if(GO.util.empty(this.attachmentItem)){
-					this.saveAllToItem(record, result.files_folder_id);
+					if(this.attachmentHandle) {
+						this.attachmentHandle(result);
+						this.hide();
+					} else {
+						this.saveAllToItem(record, result.files_folder_id);
+					}
+					
 				} else {
 					this.saveToItem(record, result.files_folder_id);
 				}
@@ -57,7 +70,6 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 	},
 
 	saveToItem : function(record,files_folder_id){
-
 		if(!GO.files.saveAsDialog){
 			GO.files.saveAsDialog = new GO.files.SaveAsDialog();
 		}

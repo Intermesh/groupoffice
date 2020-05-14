@@ -22,7 +22,7 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	title: t("System settings"),	
 	width:dp(1000),
 	height:dp(800),
-	layout:'border',
+	layout:'responsive',
 	closeAction: "hide",
 
 	initComponent: function () {
@@ -31,14 +31,13 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 			text: t('Save'),
 			handler: this.submit,
 			scope:this
-		});
-				
-
+		});		
 		
 		this.tabPanel = new Ext.TabPanel({
 			headerCfg: {cls:'x-hide-display'},
 			region: "center",
-			items: []
+			items: [],
+			hideMode: "offsets"
 		});
 		
 		
@@ -67,6 +66,8 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 					} else{
 						go.Router.setPath("systemsettings");
 					}
+
+					this.tabPanel.show();
 				},
 				scope:this
 			}
@@ -82,6 +83,27 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 				this.saveButton
 			]
 		});
+
+
+		this.tools = [{
+			id: "left",
+			cls: 'go-show-tablet',
+			handler: function () {
+				this.selectMenu.show();
+			},
+			scope: this
+		}];
+
+		this.selectMenu.on("show", function() {
+			var tool = this.getTool("left");
+			tool.dom.classList.add('go-hide')
+		},this);
+
+		this.tabPanel.on("show", function() {
+			var tool = this.getTool("left");
+			tool.dom.classList.remove('go-hide')
+		}, this);
+
 		
 		this.addEvents({
 			'loadStart' : true,
@@ -108,6 +130,9 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 
 		this.on("hide", function() {
 			go.Router.setPath("");
+
+			//reload to make sure settings apply
+			window.location.replace(window.location.pathname);
 		}, this);
 	},
 	
@@ -143,7 +168,9 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	
 	show: function(){
 		go.systemsettings.Dialog.superclass.show.call(this);
-		this.selectMenu.select(this.tabStore.getAt(0));
+		if(!GO.util.isTabletScreenSize()) {
+			this.selectMenu.select(this.tabStore.getAt(0));
+		}
 		this.load();
 	},
 

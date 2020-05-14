@@ -588,6 +588,22 @@ END;
 	}
 
 	/**
+	 * Grab all e-mail addresses out of a string
+	 *
+	 * @param	int $level The log level. See sys_log() of the PHP docs
+	 * @param	StringHelper $message The log message
+	 * @access public
+	 * @return void
+	 */
+	public static function get_emails_from_string($emails) {
+		if (preg_match_all("/(\b)([\w\.\-]+)(@)([\w\.-]+)([A-Za-z]{2,4})\b/i", $emails, $matches)) {
+			return $matches[0];
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * Return only the contents of the body tag from a HTML page
 	 *
 	 * @param	StringHelper $html A HTML formatted string
@@ -1103,10 +1119,10 @@ END;
 		);
 
 		foreach ($emoticons as $emoticon => $img) {
-			
-			$rel = 'views/Extjs3/themes/' . \GO::user()->theme . '/images/emoticons/normal/' . $img;
-			if(!file_exists(\GO::config()->root_path.$rel))
-				$rel = 'views/Extjs3/themes/Default/images/emoticons/normal/' . $img;
+			$rel = 'views/Extjs3/themes/' . \GO::user()->theme . '/img/emoticons/normal/' . $img;
+			if(!file_exists(\GO::config()->root_path.$rel)) {
+				$rel = 'views/Extjs3/themes/Paper/img/emoticons/normal/' . $img;
+			}
 			
 			$imgpath = \GO::config()->host . $rel;
 			$imgstring = '<img src="' . $imgpath . '" alt="' . $emoticon . '" />';
@@ -1271,12 +1287,14 @@ END;
 			return str_replace("\n",'  ', $replacement);
 		}, $html);
 
-		$regexp="/<a[^>]*href=\s*([\"']?)(http|https|ftp|bf2)(:\/\/)(.+?)>/i";
-		$html = preg_replace($regexp, "<a target=$1_blank$1 class=$1blue$1 href=$1$2$3$4>", $html);
-		
+//		$regexp="/<a[^>]*href=\s*([\"']?)(http|https|ftp|bf2)(:\/\/)(.+?)>/i";
+		//$html = preg_replace($regexp, "<a target=$1_blank$1 class=$1blue$1 href=$1$2$3$4>", $html);
+
+		$html = str_replace('<a ', '<a target="_blank" ', $html);
+
 		if(!empty($baseUrl)){
-			$regexp="/<a[^>]*href=\s*('|\")(?![a-z]+:)/i";
-			$html = preg_replace($regexp, "<a target=$1_blank$1 class=$1blue$1 href=$1".$baseUrl, $html);
+			$regexp="/href=\s*('|\")(?![a-z]+:)/i";
+			$html = preg_replace($regexp, "href=$1".$baseUrl, $html);
 		}
 
 		//$regexp="/<a.+?href=([\"']?)".str_replace('/','\\/', \GO::config()->full_url)."(.+?)>/i";

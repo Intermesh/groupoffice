@@ -335,7 +335,7 @@ class Module extends Observable {
 		
 		foreach($records as $ar) {
 			$cls = $ar->getName();
-			if(is_a($cls, Db\ActiveRecord::class, true) && $cls::model()->hasLinks()) {
+			if(is_a($cls, Db\ActiveRecord::class, true) && ($cls::model()->hasLinks() || method_exists($cls::model(), 'getCustomFields'))) {
 				if(!$cls::entityType()) {
 					return false;
 				}
@@ -395,9 +395,13 @@ class Module extends Observable {
 		
 		if(file_exists($sqlFile))
 		{
+			go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");		
+			
 			$queries = Util\SQL::getSqlQueries($sqlFile);
 			foreach($queries as $query)
 				\GO::getDbConnection ()->query($query);
+
+			go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
 		}
 		
 		// \GO::clearCache();
@@ -488,7 +492,7 @@ class Module extends Observable {
 					));
 					
 					while($stmt->rowCount()) {					
-						$stmt->callOnEach('checkDatabase');
+						$stmt->callOnEach('checkDatabase', true);
 						
 						$stmt = $m->find(array(
 								'ignoreAcl'=>true,

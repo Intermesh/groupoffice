@@ -88,7 +88,7 @@ go.login.RecoveryDialog = Ext.extend(go.Window, {
 								}
 							}
 
-							Ext.MessageBox.alert(t("Error"), t("Sorry, something went wrong. Please try again."));
+							Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred") + ": " + response.statusText);
 						}
 					},
 					scope: this	

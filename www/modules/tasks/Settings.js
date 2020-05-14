@@ -60,7 +60,11 @@ GO.tasks.SettingsPanel = Ext.extend(Ext.Panel, {
 			new GO.form.HtmlComponent({html:'<br />'}),
 			this.selectTaskList = new GO.tasks.SelectTasklist({
 					fieldLabel : t("Default tasklist", "tasks"),
-					hiddenName : 'taskSettings.default_tasklist_id'
+					hiddenName : 'taskSettings.default_tasklist_id',
+					clearValue: function() {
+							GO.tasks.SelectTasklist.prototype.clearValue.call(this);
+							this.value = "0";
+					}
 				})]
 		};
 		GO.tasks.SettingsPanel.superclass.initComponent.call(this);
@@ -71,19 +75,12 @@ GO.tasks.SettingsPanel = Ext.extend(Ext.Panel, {
 	},
 
 	onSubmitComplete : function(){
-		var t = GO.tasks.taskDialog;
 
 		var now = new Date();
 
 		GO.tasks.reminderDaysBefore=parseInt(this.numberField.getValue());
 		GO.tasks.reminderTime=this.timeField.getValue();
-		if(t){				
-			var remindDate = now.add(Date.DAY, -GO.tasks.reminderDaysBefore);
 
-			t.formPanel.form.findField('taskSettings.remind').originalValue=this.remindCheck.getValue();
-			t.formPanel.form.findField('taskSettings.remind_time').originalValue=this.timeField.getValue();
-			t.formPanel.form.findField('taskSettings.remind_date').originalValue=remindDate;
-		}
 	}
 
 });

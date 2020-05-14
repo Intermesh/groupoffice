@@ -145,14 +145,15 @@ class CronJobSchedule extends Entity {
 			throw new \Exception("Could not save CRON job");
 		}
 	}
-	
+
 	/**
 	 * Finds all cronjobs that should be executed.
-	 * 
+	 *
 	 * It also finds cron jobs that are not scheduled yet and it will calculate the
 	 * scheduled date for the jobs.
-	 * 
+	 *
 	 * @return bool true if a job was ran
+	 * @throws Exception
 	 */
 	public static function runNext() {
 
@@ -161,7 +162,6 @@ class CronJobSchedule extends Entity {
 							->andWhere('nextRunAt', '<=', new DateTime())
 							->orWhere('nextRunAt', 'IS', null)
 						)
-						->andWhere(['runningSince' => null]) 
 						->orderBy(['nextRunAt' => 'ASC'])->single();
 
 		if ($job) {
@@ -169,6 +169,7 @@ class CronJobSchedule extends Entity {
 
 			return true;
 		} else {
+			go()->debug("No cron job to run a this time");
 			return false;
 		}
 	}

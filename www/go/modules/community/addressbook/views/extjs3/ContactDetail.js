@@ -11,7 +11,15 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 		var me = this;
 		
 		Ext.apply(this, {
-			items: [	
+			items: [{
+				xtype: "panel",
+				onLoad: function (detailView) {
+					detailView.data.jobTitle = detailView.data.jobTitle || "";
+
+					detailView.applyTemplateToItems(this.items);
+					detailView.applyTemplateToItems(this.items.itemAt(0).items);
+				},
+				items:[
 				{
 					xtype: 'container',
 					layout: "hbox",
@@ -19,6 +27,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					items: [
 						
 						this.avatar = new Ext.BoxComponent({
+							height: dp(48),
 							xtype: "box",
 							cls: "go-detail-view-avatar",
 							style: "cursor: pointer",
@@ -31,33 +40,31 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 									});
 								}
 							},
-							tpl: new Ext.XTemplate('<div class="avatar {[values.isOrganization && !values.photoBlobId ? \'organization\' : \'\']}" style="{[this.getStyle(values.photoBlobId)]}">{[this.getHtml(values.isOrganization, values.photoBlobId)]}</div>', 
+							tpl: new Ext.XTemplate('<div class="avatar {[values.isOrganization && !values.photoBlobId ? \'organization\' : \'\']}" style="{[this.getStyle(values)]}">{[this.getHtml(values)]}</div>',
 							{
-								getHtml: function (isOrganization, photoBlobId) {
-									return isOrganization && !photoBlobId ? '<i class="icon">business</i>' : "";
+								getHtml: function (v) {
+									if(v.photoBlobId) {
+										return "";
+									}
+									return v.isOrganization ? '<i class="icon">business</i>' : go.util.initials(v.name);
 								},
-								getStyle: function (photoBlobId) {
-									return photoBlobId ? 'background-image: url(' + go.Jmap.downloadUrl(photoBlobId) + ')"' : "";
+								getStyle: function (v) {
+									return v.photoBlobId ? 'background-image: url(' + go.Jmap.thumbUrl(v.photoBlobId, {w: 40, h: 40, zc: 1})  + ')"' : "background-image:none;background-color: #" + v.color;;
 								}
 							})
 						}),
 					
 						this.namePanel = new Ext.BoxComponent({
-							tpl: '<h3><tpl if="prefixes">{prefixes} </tpl>{name}<tpl if="suffixes"> {suffixes}</tpl></h3><h4>{jobTitle}</h4>'							
+							style: "display: table;height:100%",
+							tpl: '<div style="vertical-align: middle;display:table-cell;"><h3><tpl if="prefixes">{prefixes} </tpl>{name}<tpl if="suffixes"> {suffixes}</tpl></h3><h4>{jobTitle} <tpl if="department">- {department}</tpl></h4></div>'
 						}),						
 						this.urlPanel = new Ext.BoxComponent({
 							flex: 1,
 							cls: 'go-addressbook-url-panel',
 							xtype: "box",
-							tpl: '<tpl for=".">&nbsp;&nbsp;<a target="_blank" href="{url}" class="go-addressbook-url {type}"></a></tpl>'
+							tpl: '<tpl for="urls">&nbsp;&nbsp;<a target="_blank" href="{url}" class="go-addressbook-url {type}"></a></tpl>'
 						})
-					],
-					onLoad: function (detailView) {
-						detailView.data.jobTitle = detailView.data.jobTitle || "";						
-						detailView.namePanel.update(detailView.data);
-						detailView.urlPanel.update(detailView.data.urls);
-						detailView.avatar.update(detailView.data);
-					}
+					]
 					
 				}, 				
 
@@ -140,8 +147,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					listeners: {
 						scope: this,
 						afterrender: function(box) {
-							
-							box.getEl().on('click', function(e){								
+							box.getEl().on('click', function(e){
+
+								//don't execute when user selects text
+								if(window.getSelection().toString().length > 0) {
+									return;
+								}
+
 								var container = box.getEl().dom.firstChild, 
 								item = e.getTarget("a", box.getEl()),
 								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
@@ -154,11 +166,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					<tpl for="addresses">\
 						<hr class="indent">\
 						<a class="s6"><i class="icon label">location_on</i>\
-							<span>{street} {street2}<br>\
-							<tpl if="zipCode">{zipCode}<br></tpl>\
-							<tpl if="city">{city}<br></tpl>\
-							<tpl if="state">{state}<br></tpl>\
-							<tpl if="country">{country}</tpl></span>\
+							<span style="white-space:pre">{formatted}</span>\
 							<label>{[t("addressTypes")[values.type] || values.type]}</label>\
 						</a>\
 					</tpl>\
@@ -169,7 +177,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						scope: this,
 						afterrender: function(box) {
 							
-							box.getEl().on('click', function(e){								
+							box.getEl().on('click', function(e){
+
+								//don't execute when user selects text
+								if(window.getSelection().toString().length > 0) {
+									return;
+								}
+
 								var container = box.getEl().dom.firstChild, 
 								item = e.getTarget("a", box.getEl()),
 								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
@@ -191,7 +205,6 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 				},{
 					title: t('Company'),
 					onLoad: function (dv) {
-						console.log(dv.data);
 						this.setVisible(dv.data.IBAN || dv.data.vatNo || dv.data.vatReverseCharge || dv.data.registrationNumber || dv.data.debtorNumber);
 					},
 					collapsible:true,
@@ -204,7 +217,9 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						<tpl if="values.registrationNumber"><label>{[t("Registration number")]}</label><span>{registrationNumber}</span><br><br></tpl>\
 						<tpl if="values.debtorNumber"><label>{[t("Debtor number")]}</label><span>{debtorNumber}</span></tpl>\
 					</p>'
-				},{
+				}]
+			},{
+				collapsible: true,
 					xtype: 'panel',
 					title: t("Notes"),
 					autoHeight: true,
@@ -233,12 +248,14 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 		});
 		this.addComments();
 		this.addFiles();
+
+		this.add(new go.detail.CreateModifyPanel());
 	},
 
 	onLoad: function () {
 
 		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < go.permissionLevels.write);
-
+		this.deleteItem.setDisabled(this.data.permissionLevel < go.permissionLevels.writeAndDelete);
 		this.starItem.setIconClass(this.data.starred ? "ic-star" : "ic-star-border");
 		go.modules.community.addressbook.ContactDetail.superclass.onLoad.call(this);
 	},
@@ -296,7 +313,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						iconCls: "ic-cloud-download",
 						text: t("Export") + " (vCard)",
 						handler: function () {
-							document.location = go.Jmap.downloadUrl("community/addressbook/vcard/" + this.data.id);
+							go.util.downloadFile(go.Jmap.downloadUrl("community/addressbook/vcard/" + this.data.id));
 						},
 						scope: this
 					},
@@ -319,10 +336,10 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 
 				]
 			}]);
-		
+
 		if(go.Modules.isAvailable("legacy", "files")) {
-			this.moreMenu.menu.splice(1,0,{
-				xtype: "filebrowsermenuitem"
+			items.splice(items.length - 1, 0,{
+				xtype: "detailfilebrowserbutton"
 			});
 		}
 

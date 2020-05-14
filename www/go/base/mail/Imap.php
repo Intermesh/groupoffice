@@ -3,6 +3,8 @@
 namespace GO\Base\Mail;
 
 
+use go\core\ErrorHandler;
+
 class Imap extends ImapBodyStruct {
 
 	const SORT_NAME='NAME';
@@ -130,7 +132,7 @@ class Imap extends ImapBodyStruct {
 		$remote = $this->ssl ? 'ssl://' : '';			
 		$remote .=  $this->server.":".$this->port;
 
-		$this->handle = @stream_socket_client($remote, $errorno, $errorstr, 10, STREAM_CLIENT_CONNECT, $streamContext);
+		$this->handle = stream_socket_client($remote, $errorno, $errorstr, 10, STREAM_CLIENT_CONNECT, $streamContext);
 		if (!is_resource($this->handle)) {
 			throw new \Exception('Failed to open socket #'.$errorno.'. '.$errorstr);
 		}
@@ -164,7 +166,7 @@ class Imap extends ImapBodyStruct {
 			fclose($this->handle);
 
 			foreach($this->errors as $error){
-				trigger_error("IMAP error: ".$error);
+				error_log("IMAP error: ".$error);
 			}
 
 			$this->handle=false;
@@ -656,7 +658,7 @@ class Imap extends ImapBodyStruct {
 
 		\GO\Base\Util\ArrayUtil::caseInsensitiveSort($folders);
 
-//		\GO::debug($folders);
+		\GO::debug($folders);
 
 		return $folders;
 	}
@@ -1101,11 +1103,18 @@ class Imap extends ImapBodyStruct {
 		}
 		elseif (stristr($this->capability, 'SORT')) {
 			$uids=$this->server_side_sort($sort, $reverse, $filter);
+			if($uids === false) {
+			  throw new \Exception("Sort error: " . $this->last_error());
+      }
 			$this->sort_count = count($uids); // <-- BAD
 			return $uids;
 		}
 		else {
 			$uids=$this->client_side_sort($sort, $reverse, $filter);
+      if($uids === false) {
+        throw new \Exception("Sort error: " . $this->last_error());
+      }
+
 			$this->sort_count = count($uids);
 			return $uids;
 		}
@@ -1702,20 +1711,42 @@ class Imap extends ImapBodyStruct {
 		if(!$status) {
 			return false;
 		}
+
+		//remove status response
+		array_pop($res);
 		
 		$data = [];
 		
 		foreach($res as $message) {
 			//UID 17 FLAGS ( \Flagged \Seen ) INTERNALDATE 24-May-2018 13:02:43 +0000
-			
-			if(preg_match('/UID ([0-9]+) FLAGS \((.*)\) INTERNALDATE ([^\)]+)/', $message, $matches)) {
-				
-				$data[] = [
-						'uid' => (int) $matches[1],
-						'flags' => array_map('trim', explode(' ', trim($matches[2]))),
-						'date' => trim($matches[3])
-				];
+
+			//or different order!
+			// l * 2 FETCH ( UID 2 INTERNALDATE 30-Jan-2020 11:20:06 +0000 FLAGS ( \Seen ) )
+
+			if(preg_match('/UID ([0-9]+)/', $message, $uidMatches)) {
+				$uid = (int) $uidMatches[1];
+			} else{
+				return false;
 			}
+
+			if(preg_match('/FLAGS \((.*)\)/U', $message, $flagMatches)) {
+				$flags = array_map('trim', explode(' ', trim($flagMatches[1])));
+			}else{
+				return false;
+			}
+
+			if(preg_match('/INTERNALDATE ([^\s\)]+ [^\s\)]+ [^\s\)]+)/', $message, $dateMatches)) {
+				$date = $dateMatches[1];
+			}else{
+				return false;
+			}
+
+			$data[] = [
+				'uid' => $uid,
+				'flags' => $flags,
+				'date' => $date
+			];
+
 		}
 		
 		return $data;
@@ -2413,6 +2444,8 @@ class Imap extends ImapBodyStruct {
 	 * @return <type>
 	 */
 	public function get_message_part_start($uid, $message_part=0, $peek=false) {
+
+		$this->readFullLiteral = false;
 		$this->clean($uid, 'uid');
 
 		$peek_str = $peek ? '.PEEK' : '';
@@ -2441,6 +2474,8 @@ class Imap extends ImapBodyStruct {
 //		\GO::debug("Part size: ".$size);
 		return $size;
 	}
+
+ private $readFullLiteral = false;
 	/**
 	 * Read message part line. get_message_part_start must be called first
 	 *
@@ -2466,9 +2501,22 @@ class Imap extends ImapBodyStruct {
 
 		if($line===false){
 
+			if($this->readFullLiteral) {
+				//don't attempt to read response after already have done that because it will hang for a long time
+				$this->readFullLiteral = true;
+				return false;
+			}
+
 			//read and check left over response.
-			$response=$this->get_response();
-			$this->check_response($response);
+			$response = $this->get_response(false, true);
+			if(!$this->check_response($response, true)) {
+				return false;
+			}
+			//for some imap servers that don't return the attachment size. It will read the entire attachment into memory :(
+			if(isset($response[0][6]) && substr($response[0][6], 0, 4) == 'BODY' && !empty($response[0][8])) {
+				$line = $response[0][8];
+				$this->readFullLiteral = true;
+			}
 
 		}
 		return $line;

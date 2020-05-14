@@ -33,7 +33,7 @@ GO.tasks.TasklistDialog = function(config)
 				text:t("Export"),
 				disabled:true,
 				handler:function(){
-					document.location=GO.url('tasks/task/exportIcs', {"tasklist_id":this.tasklist_id});
+					go.util.downloadFile(GO.url('tasks/task/exportIcs', {"tasklist_id":this.tasklist_id}));
 				},
 				scope:this
 			}),
@@ -156,32 +156,23 @@ GO.tasks.TasklistDialog = function(config)
 	
 	
 	GO.tasks.TasklistDialog.superclass.constructor.call(this,{
-					title: t("Tasklist", "tasks"),
-					layout:'fit',
-					modal:false,
-					height:600,
-					width:440,
-					closeAction:'hide',
-					items: this.tabPanel,
-					buttons:[
-					{
-						text:t("Ok"),
-						handler: function(){this.save(true)},
-						scope: this
-					},
-					{
-						text:t("Apply"),
-						handler: function(){this.save(false)},
-						scope: this
-					},
-
-					{
-						text:t("Close"),
-						handler: function(){this.hide()},
-						scope: this
-					}
-					]
-				});
+		title: t("Tasklist", "tasks"),
+		layout:'fit',
+		modal:false,
+		height:600,
+		width:440,
+		closeAction:'hide',
+		items: this.tabPanel,
+		buttons:[{
+			text:t("Apply"),
+			handler: function(){this.save(false)},
+			scope: this
+		},{
+			text:t("Save"),
+			handler: function(){this.save(true)},
+			scope: this
+		}]
+	});
 }
 
 Ext.extend(GO.tasks.TasklistDialog, Ext.Window, {

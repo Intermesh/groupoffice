@@ -23,10 +23,6 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 
 
 	onLoadStart: function (userId) {
-		
-		if(this.panelAddressbook)
-			this.panelAddressbook.setModelId(userId);
-
 		if(this.panelTasklist)
 			this.panelTasklist.setModelId(userId);
 
@@ -36,16 +32,22 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 	
 	initComponent: function() {
 		
-		this.items = [new Ext.form.FieldSet({
-			title:'E-mail',
-			labelWidth: 170,
-			items: [
-				this.selectAccount = new GO.email.SelectAccount({
-					hidden: (!GO.settings.modules.email || !GO.settings.modules.email.read_permission),
-					hiddenName:'syncSettings.account_id'					
-				})
-			]})
-		];
+		this.items = [];
+
+		if(go.Modules.isAvailable("legacy", "email")) {
+			this.items.push(new Ext.form.FieldSet({
+				title:'E-mail',
+				labelWidth: 170,
+				items: [
+					this.selectAccount = new GO.email.SelectAccount({
+						hidden: (!GO.settings.modules.email || !GO.settings.modules.email.read_permission),
+						hiddenName:'syncSettings.account_id'
+					})
+				]}));
+
+			//Only writable accounts can be used for sync
+			this.selectAccount.store.baseParams.permissionLevel = go.permissionLevels.write;
+		}
 
 		var syncComponents = {calendar: 'Calendar',tasks: 'Tasklist'};
 		
@@ -59,7 +61,7 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 				var defaultCol = new GO.grid.RadioColumn({
 					header: t("Default", "sync"),
 					dataIndex: 'default_'+id,
-					width: 90,
+					width: 22,
 					isDisabled:function(record){
 						return record.get('permission_level')<GO.permissionLevels.writeAndDelete;
 					}
@@ -89,7 +91,7 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 						sortable: true
 					}],
 					fields:['id','name','default_'+id,'permission_level'],
-					model_id:GO.settings.user_id,
+					model_id: GO.settings.user_id,
 					title: t("name", module)					
 				});
 //				this['panel'+name].getTopToolbar().insert(0,"->");

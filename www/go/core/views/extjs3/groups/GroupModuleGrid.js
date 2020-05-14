@@ -17,7 +17,7 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 	initComponent: function () {
 		
 		if(!this.value) {
-			this.value = [];
+			this.value = {};
 		}
 		
 		var checkColumn = new GO.grid.CheckColumn({
@@ -290,7 +290,7 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 
 	setValue: function (groups) {		
 		this._isDirty = false;		
-		this.value = groups;
+		this.value = groups || {};
 		this.store.load().catch(function(){}); //ignore failed load becuase onBeforeStoreLoad can return false
 	},
 	

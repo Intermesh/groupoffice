@@ -6,9 +6,6 @@ go.modules.community.addressbook.DuplicateDialog = Ext.extend(go.Window, {
   width: dp(1000),
   height: dp(800),
   initComponent: function () {
-
-    var me = this;
-
     this.items = [
       this.createFilter(),
       this.createGrid()
@@ -25,21 +22,16 @@ go.modules.community.addressbook.DuplicateDialog = Ext.extend(go.Window, {
               return;
             }
 
-            go.Jmap.request({
-              method: 'Contact/merge',
-              params: {
-                ids: me.grid.getSelectionModel().getSelections().map(function(r) {return r.id;})
-              },
-              
-            }).then(function() {
-              //me.close();
-            }).catch(function(result) {
+            var ids = this.grid.getSelectionModel().getSelections().map(function(r) {return r.id;});
+
+            go.Db.store("Contact").merge(ids).catch(function(result) {
               Ext.MessageBox.alert(t("Error"), result.message);
             });
-          });
+          }, this);
 
           
-        }
+        },
+        scope: this
       }
     ];
 
@@ -52,14 +44,18 @@ go.modules.community.addressbook.DuplicateDialog = Ext.extend(go.Window, {
 
   doFilter: function() {
 
-    var dup = this.duplicate.getValue();
+    var dup = this.duplicate.getValue(), f = {permissionLevel: go.permissionLevels.writeAndDelete};
     var duparr = [];
     for(var key in dup) {
       if(dup[key]) {
         duparr.push(key);
       }
     }
-    this.grid.store.setFilter('filter', {duplicate: duparr, permissionLevel: go.permissionLevels.writeAndDelete});
+
+    if(duparr.length) {
+      f.duplicate = duparr;
+    }
+    this.grid.store.setFilter('filter', f);
     this.grid.store.load();
   },
 

@@ -7,6 +7,7 @@ use GO;
 use go\core\db\Criteria;
 use go\core\db\Query;
 use go\core\db\Utils;
+use go\core\ErrorHandler;
 use go\core\orm\Filters;
 use PDOException;
 
@@ -27,7 +28,12 @@ class Select extends Base {
 	public function setOptions(array $options) {
 		$this->options = $options;
 	}
-	
+
+	public function isModified()
+	{
+		return isset($this->options);
+	}
+
 	protected function internalGetOptions($parentId = null) {
 		$options = (new Query())
 										->select("*")
@@ -66,7 +72,7 @@ class Select extends Base {
 		return $this->field->tableName() . "_ibfk_go_" . $this->field->id;
 	}
 	
-	public function dbToText($value, &$values) {
+	public function dbToText($value, &$values, $entity) {
 
 		if(empty($value)) {
 			return "";
@@ -79,7 +85,7 @@ class Select extends Base {
 						->single();
 	}
 
-	public function textToDb($value, &$values) {
+	public function textToDb($value, &$values, $entity) {
 
 		if(empty($value)) {
 			return null;
@@ -148,8 +154,12 @@ class Select extends Base {
 	
 	public function onFieldDelete() {		
 		$sql = "ALTER TABLE `" . $this->field->tableName() . "` DROP FOREIGN KEY " . $this->getConstraintName();
-		if(!go()->getDbConnection()->query($sql)) {
-			throw new \Exception("Couldn't drop foreign key");
+
+		try {
+      go()->getDbConnection()->query($sql);
+    }catch (Exception $e) {
+		  ErrorHandler::logException($e);
+		  //ignore so we can continue with delete
 		}
 			
 		return parent::onFieldDelete();

@@ -2,6 +2,8 @@
 
 namespace go\core\acl\model;
 
+use Exception;
+use go\core\exception\Forbidden;
 use go\core\model\Acl;
 use go\core\orm\Query;
 use go\core\db\Query as DbQuery;
@@ -40,27 +42,29 @@ abstract class AclItemEntity extends AclEntity {
 
 	/**
 	 * Applies conditions to the query so that only entities with the given permission level are fetched.
-	 * 
+	 *
 	 * @param Query $query
 	 * @param int $level
 	 * @param int $userId Defaults to current user ID
 	 * @param int[] $groups Supply user groups to check. $userId must be null when usoing this. Leave to null for the current user
 	 * @return Query
+	 * @throws Exception
 	 */
 	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
 
 		$alias = self::joinAclEntity($query);
 
-		Acl::applyToQuery($query, $alias . '.aclId', $level, $userId, $groups);
+		Acl::applyToQuery($query, $alias, $level, $userId, $groups);
 		
 		return $query;
 	}
 
-		/**
+	/**
 	 * Log's deleted entities for JMAP sync
-	 * 
+	 *
 	 * @param Query $query The query to select entities in the delete statement
 	 * @return boolean
+	 * @throws Exception
 	 */
 	protected static function logDeleteChanges(Query $query) {
 
@@ -69,11 +73,20 @@ abstract class AclItemEntity extends AclEntity {
 		$changes->select($table->getAlias() . '.id as entityId');
 
 		$alias = static::joinAclEntity($changes);
-		$changes->select($alias . '.aclId, "1" as destroyed', true);
+
+		$changes->select($alias . ', "1" as destroyed', true);
 	
 		return static::entityType()->changes($changes);
 	}
-	
+
+	/**
+	 * Join's the ACL owner entity primary table
+	 *
+	 * @param DbQuery $query
+	 * @param null $fromAlias
+	 * @return string Alias for the acl column. For example: "addressbook.aclId"
+	 * @throws Exception
+	 */
 	public static function joinAclEntity(DbQuery $query, $fromAlias = null) {
 		$cls = static::aclEntityClass();
 
@@ -82,9 +95,6 @@ abstract class AclItemEntity extends AclEntity {
 		if(!isset($fromAlias)) {
 			$fromAlias = $query->getTableAlias();
 		}
-
-		
-//		$toTable = $cls::getMapping()->getTable($aclColumn->table->getName());
 
 		$keys = [];
 		foreach (static::aclEntityKeys() as $from => $to) {
@@ -102,12 +112,12 @@ abstract class AclItemEntity extends AclEntity {
 		} else
 		{
 			//otherwise this must hold the aclId column
-			$aclColumn = $cls::getMapping()->getColumn('aclId');
+			$aclColumn = $cls::getMapping()->getColumn($cls::$aclColumnName);
 			if(!$aclColumn) {
-				throw new \Exception("Column 'aclId' is required for AclEntity '$cls'");
+				throw new Exception("Column 'aclId' is required for AclEntity '$cls'");
 			}
 			
-			return $column->table->getAlias();
+			return $column->table->getAlias() . '.' . $cls::$aclColumnName;
 		}
 	}	
 
@@ -128,7 +138,7 @@ abstract class AclItemEntity extends AclEntity {
 			//otherwise this must hold the aclId column
 			$aclColumn = $cls::getMapping()->getColumn('aclId');
 			if(!$aclColumn) {
-				throw new \Exception("Column 'aclId' is required for AclEntity '$cls'");
+				throw new Exception("Column 'aclId' is required for AclEntity '$cls'");
 			}
 			
 			return $aclColumn->table->getAlias();
@@ -149,7 +159,7 @@ abstract class AclItemEntity extends AclEntity {
 		$keys = [];
 		foreach (static::aclEntityKeys() as $from => $to) {
 			if(!in_array($from, $this->fetchProperties)) {
-				throw new \Exception("Required property '".static::class."::$from' not fetched");
+				throw new Exception("Required property '".static::class."::$from' not fetched");
 			}
 			$keys[$to] = $this->{$from};
 		}
@@ -157,7 +167,7 @@ abstract class AclItemEntity extends AclEntity {
 		$aclEntity = $cls::find()->where($keys)->single();	
 
 		if(!$aclEntity) {
-			throw new \Exception("Can't find related ACL entity. The keys must be invalid: " . var_export($keys, true));
+			throw new Exception("Can't find related ACL entity. The keys must be invalid: " . var_export($keys, true));
 		}
 	
 		return $aclEntity;

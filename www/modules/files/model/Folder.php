@@ -766,12 +766,12 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @param boolean $appendNumberToNameIfExists Set if a number needs to be added to the name if the file already exists.
 	 * @return File
 	 */
-	public function addFilesystemFile(\GO\Base\Fs\File $file, $appendNumberToNameIfExists=false){
+	public function addFilesystemFile(\GO\Base\Fs\File $file, $appendNumberToNameIfExists=false, $newFilename = false){
 
 		if(!File::checkQuota($file->size()))
 			throw new \GO\Base\Exception\InsufficientDiskspace();
 
-		$file->move($this->fsFolder, false, false, $appendNumberToNameIfExists);
+		$file->move($this->fsFolder, $newFilename, false, $appendNumberToNameIfExists);
 		$file->setDefaultPermissions();
 		return $this->addFile($file->name());
 	}
@@ -1107,10 +1107,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		$totalQuotaMoved = File::model()->findSingle($fp)->total;
 		
 		// add and substract quota
-		$oldUser->calculatedDiskUsage(0-$totalQuotaMoved)->save(true);
+		if($oldUser) {
+			$oldUser->calculatedDiskUsage(0 - $totalQuotaMoved)->save(true);
+		}
+
 		$newUser->calculatedDiskUsage($totalQuotaMoved)->save(true);
-		\GO::debug($oldUser->getName());
-		\GO::debug($newUser->getName());
 	}
 
 	/**
@@ -1462,6 +1463,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$newFolder = Folder::model()->findByPath($newPath, true);
 		$newFolder->moveContentsFrom($folder, true);
+		$newFolder->visible = 1;
+		$newFolder->readonly = 1;
 
 		$folder->systemSave = true;
 		//delete empty folder.
@@ -1476,14 +1479,9 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @return self
 	 * @throws \Exception
 	 */
-	public function findForEntity(\go\core\orm\Entity $entity) {
+	public function findForEntity(\go\core\orm\Entity $entity, $saveToEntity = true) {
 
-		if(method_exists($entity, 'buildFilesPath')) {
-			$filesPath = $entity->buildFilesPath();
-		} else{
-			$entityType = $entity->entityType();
-			$filesPath = $entityType->getModule()->name. '/'. $entityType->getName() . '/' . $entity->id;
-		}
+		$filesPath = $entity->buildFilesPath();	
 
 		$folder = empty($entity->filesFolderId) ? null : $this->findByPk($entity->filesFolderId);
 		if($folder) {
@@ -1491,12 +1489,15 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$existingPath = $folder->getPath();
 			if($existingPath != $filesPath) {
 				$newFolder = $this->mergeEntityFolders($folder, $existingPath, $filesPath);
-
+				$newFolder->visible = 0;
+				$newFolder->readonly = 1;
 				$newFolder->acl_id = $entity->findAclId();
-				$newFolder->save();
+				$newFolder->save(true);
 
-				$entity->filesFolderId = $newFolder->id;
-				$entity->save();
+				if($saveToEntity) {
+					$entity->filesFolderId = $newFolder->id;
+					$entity->save();
+				}
 
 				return $newFolder;
 			}

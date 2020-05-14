@@ -6,7 +6,6 @@ views/Extjs3/javascript/vendor/chartist-plugin-pointlabels.js
 views/Extjs3/javascript/vendor/chartist-plugin-fill-donut.js
 views/Extjs3/javascript/vendor/chartist-plugin-accessibility.js
 views/Extjs3/javascript/vendor/promise-polyfill.js
-views/Extjs3/javascript/vendor/localforage.js
 
 go/core/views/extjs3/go.js
 go/core/views/extjs3/Translate.js
@@ -36,7 +35,7 @@ views/Extjs3/javascript/buttons/QuickEditButton.js
 views/Extjs3/javascript/WeekPicker.js
 
 go/core/views/extjs3/TimeZones.js
-
+views/Extjs3/javascript/data/PrefetchProxy.js
 
 views/Extjs3/javascript/data/JsonStore.js
 views/Extjs3/javascript/data/GroupingStore.js
@@ -140,13 +139,6 @@ views/Extjs3/javascript/windows/MergeDialog.js
 
 views/Extjs3/javascript/windows/DateDialog.js
 
-
-views/Extjs3/javascript/plupload/DataView-more.js
-views/Extjs3/javascript/plupload/plupload/js/plupload.js
-views/Extjs3/javascript/plupload/plupload/js/plupload.html5.js
-views/Extjs3/javascript/plupload/plupload/js/plupload.html4.js
-views/Extjs3/javascript/plupload/ext.ux.plupload.js
-
 views/Extjs3/javascript/panels/Ext.ux.tot2ivn.VrTabPanel.js
 
 views/Extjs3/javascript/base/email/EmailEditorPanel.js
@@ -158,9 +150,6 @@ views/Extjs3/javascript/base/Form.js
 views/Extjs3/javascript/base/model/ImportPanel.js
 
 views/Extjs3/javascript/base/upload/Paster.js
-views/Extjs3/javascript/base/upload/PluploadPanel.js
-views/Extjs3/javascript/base/upload/PluploadButton.js
-views/Extjs3/javascript/base/upload/PluploadMenuItem.js
 
 views/Extjs3/javascript/base/model/multiselect/AddDialog.js
 views/Extjs3/javascript/base/model/multiselect/Dialog.js

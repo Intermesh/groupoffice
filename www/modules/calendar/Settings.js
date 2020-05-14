@@ -115,7 +115,11 @@ GO.calendar.SettingsPanel = Ext.extend(Ext.Panel, {
 						fieldLabel: t("Default calendar", "calendar"),
 						hiddenName: 'calendarSettings.calendar_id',
 						anchor: '-20',
-						emptyText: t("Please select...")						
+						emptyText: t("Please select..."),
+						clearValue: function() {
+							GO.calendar.SelectCalendar.prototype.clearValue.call(this);
+							this.value = "0";
+						}
 					}), {
 						xtype: 'xcheckbox',
 						name: 'calendarSettings.show_statuses',
@@ -130,6 +134,11 @@ GO.calendar.SettingsPanel = Ext.extend(Ext.Panel, {
 
 				]
 			}];
+
+		this.selectCalendar.store.baseParams = {
+			ownedBy: GO.settings.user_id
+		};
+
 		GO.calendar.SettingsPanel.superclass.initComponent.call(this);
 	},
 

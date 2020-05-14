@@ -1,6 +1,6 @@
 <?php
 
-use go\core\auth\model\Token;
+use go\core\model\Token;
 use go\core\http\Request;
 use go\core\ErrorHandler;
 
@@ -27,7 +27,15 @@ use go\core\ErrorHandler;
 function errorHander($e) {
 	if(!Request::get()->isXHR() && (empty($_REQUEST['r']) || $_REQUEST['r'] != 'maintenance/upgrade')) {
 		
-		ErrorHandler::logException($e);
+		$msg = ErrorHandler::logException($e);
+
+		if(go()->getDebugger()->enabled) {
+
+			echo "Showing error message because debug is enabled. Normally we would have redirected to install. I you're doing a freah install and your database is empty then you can safely ignore this.:\n\n";
+			echo $msg;
+			echo '<a href="/install">Click here to launch the installer</a>';
+			exit();
+		}
 
     header('Location: install/');				
     exit();
@@ -44,7 +52,7 @@ function errorHander($e) {
 
 try {
   //initialize autoloading of library
-  require_once('GO.php');  
+  require('GO.php');  
 	
 	if(!empty($_POST['accessToken'])) {
 		$old = date_default_timezone_get();

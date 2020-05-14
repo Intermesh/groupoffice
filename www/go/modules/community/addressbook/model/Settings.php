@@ -14,4 +14,6 @@ class Settings extends core\Settings {
 
 
 	public $createPersonalAddressBooks = true;
+
+	public $lastContactColorIndex = 0;
 }

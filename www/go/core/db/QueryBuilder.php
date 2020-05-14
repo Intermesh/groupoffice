@@ -5,6 +5,7 @@ namespace go\core\db;
 use Exception;
 use go\core\db\Column;
 use go\core\db\Criteria;
+use go\core\util\ArrayUtil;
 
 /**
  * QueryBuilder
@@ -84,13 +85,14 @@ class QueryBuilder {
 	public function __construct(Connection $conn) {
 		$this->conn = $conn;
 	}
-	
 
-	/**
-	 * Constructor
-	 *
-	 * @param string $tableName The table to operate on
-	 */
+
+  /**
+   * Constructor
+   *
+   * @param string $tableName The table to operate on
+   * @throws Exception
+   */
 	public function setTableName($tableName) {
 		
 		if(!isset($tableName)) {
@@ -123,15 +125,20 @@ class QueryBuilder {
 	/**
 	 * Get the name of the record this query builder is for.
 	 *
-	 * @param string
+	 * @return string
 	 */
 	public function getTableName() {
 		return $this->tableName;
 	}
 
-	/**
-	 * @return bool
-	 */
+  /**
+   * @param $tableName
+   * @param $data
+   * @param array $columns
+   * @param string $command
+   * @return array
+   * @throws Exception
+   */
 	public function buildInsert($tableName, $data, $columns = [], $command = "INSERT") {
 
 		$this->reset();
@@ -152,12 +159,12 @@ class QueryBuilder {
 			$sql .= ' ' . $build['sql'];
 			$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
 		} else {
-
-			if(!isset($data[0])) {
+			if(ArrayUtil::isAssociative($data)) {
 				$data = [$data];
 			}
 			if(empty($columns)) {
-				$columns = array_keys($data[0]);
+				reset($data);
+				$columns = array_keys(current($data));
 			}
 			$sql .= " (\n\t`" . implode("`,\n\t`", $columns) . "`\n)\n" .
 				"VALUES \n";
@@ -294,7 +301,12 @@ class QueryBuilder {
 			$r['params'] = array_merge($r['params'], $u['params']);
 		}
 		
-		$r['sql'] .= "\n)";		
+		$r['sql'] .= "\n)";
+
+		//reset to the main query object
+		$this->query = $query;
+		// Unions can't have aliases in the global scope
+		$this->aliasMap = [];
 		
 		$orderBy = $this->buildOrderBy(true);
 		if(!empty($orderBy)) {
@@ -372,13 +384,15 @@ class QueryBuilder {
 	public static function debugBuild($build) {
 		$sql = $build['sql'];
 		$binds = [];
-		foreach ($build['params'] as $p) {
-			if (is_string($p['value']) && !mb_check_encoding($p['value'], 'utf8')) {
-				$queryValue = "[NON UTF8 VALUE]";
-			} else {
-				$queryValue = var_export($p['value'], true);
+		if(isset($build['params'])) {
+			foreach ($build['params'] as $p) {
+				if (is_string($p['value']) && !mb_check_encoding($p['value'], 'utf8')) {
+					$queryValue = "[NON UTF8 VALUE]";
+				} else {
+					$queryValue = var_export($p['value'], true);
+				}
+				$binds[$p['paramTag']] = $queryValue;
 			}
-			$binds[$p['paramTag']] = $queryValue;
 		}
 
 		//sort so $binds :param1 does not replace :param11 first.
@@ -655,17 +669,16 @@ class QueryBuilder {
 		return $str;
 	}
 
-	private function splitTableAndColumn($column) {
-		$parts = explode('.', $column);
-
-		$c = count($parts);
-		if ($c > 1) {
-			$column = array_pop($parts);
-			$alias = array_pop($parts);
+	private function splitTableAndColumn($tableAndCol) {
+		$dot = strpos($tableAndCol, '.');
+		
+		if ($dot !== false) {
+			$column = substr($tableAndCol, $dot + 1);
+			$alias = substr($tableAndCol, 0, $dot);
 			return [trim($alias, ' `'), trim($column, ' `')];
 		} else {
-			$colName = trim($column, ' `');
-			
+			$colName = trim($tableAndCol, ' `');
+						
 			//if column not found then don'use an alias. It could be an alias defined in the select part or a function.
 			$alias = null;
 			

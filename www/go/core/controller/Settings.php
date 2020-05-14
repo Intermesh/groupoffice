@@ -18,7 +18,7 @@ class Settings extends Controller {
 						->setFrom($settings->systemEmail, $settings->title)
 						->setTo($settings->systemEmail)
 						->setSubject(go()->t('Test message'))
-						->setBody(go()->t("You're settings are correct.\n\nBest regards,\n\nGroup-Office"));
+						->setBody(go()->t("Your settings are correct.\n\nBest regards,\n\nGroup-Office"));
 
 		$success = $message->send();
 		

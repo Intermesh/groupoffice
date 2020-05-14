@@ -1,5 +1,7 @@
 go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 	title: t('Create user'),
+	width: dp(660),
+	height: dp(450),
 	user : null,
 	initComponent : function() {
 		
@@ -114,7 +116,8 @@ go.users.CreateUserWizard = Ext.extend(go.Wizard, {
 							}
 						}
 						
-						Ext.MessageBox.alert(t("Error"), t("Sorry, something went wrong. Please try again."));
+						//Ext.MessageBox.alert(t("Error"), t("Sorry, something went wrong. Please try again."));
+						Ext.MessageBox.alert("Error",notSaved[id].validationErrors[name].description);
 						break;
 				}
 

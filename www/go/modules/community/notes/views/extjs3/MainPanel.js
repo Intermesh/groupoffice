@@ -25,10 +25,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.createNoteGrid();
 
 		this.sidePanel = new Ext.Panel({
-			layout: 'anchor',
-			defaults: {
-				anchor: '100%'
-			},
+			layout: 'border',
 			width: dp(300),
 			cls: 'go-sidenav',
 			region: "west",
@@ -44,7 +41,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			region: 'center',
 			split: true,
 			tbar: [{
-					cls: 'go-narrow',
+					cls: 'go-narrow', //will only show on small devices
 					iconCls: "ic-arrow-back",
 					handler: function () {
 						//this.westPanel.show();
@@ -74,8 +71,8 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		go.modules.community.notes.MainPanel.superclass.initComponent.call(this);
 		
-		
-		this.on("afterrender", this.runModule, this);
+		//use viewready so load mask can show
+		this.noteBookGrid.on("viewready", this.runModule, this);
 	},
 	
 	runModule : function() {
@@ -97,7 +94,9 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		
 		
 		return new Ext.Panel({
-			
+			region: "center",
+			minHeight: dp(200),
+			autoScroll: true,
 			tbar: [
 				{
 					xtype: 'tbtitle',
@@ -129,12 +128,16 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	
 	createNoteBookGrid : function() {
 		this.noteBookGrid = new go.modules.community.notes.NoteBookGrid({
-			autoHeight: true,
+			region: "north",
+			height: dp(400),
+			minHeight: dp(200),
+
+			split: true,
+			stateId: "notes-note-book-grid",
 			tbar: [{
 					xtype: 'tbtitle',
 					text: t('Notebooks')
 				}, '->', {
-					//disabled: go.Modules.get("community", 'notes').permissionLevel < go.permissionLevels.write,
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
 					handler: function (e, toolEl) {
@@ -173,11 +176,9 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			region: 'center',
 			tbar: [
 				{
-					cls: 'go-narrow',
+					cls: 'go-narrow', //Shows on mobile only
 					iconCls: "ic-menu",
 					handler: function () {
-//						this.westPanel.getLayout().setActiveItem(this.noteBookGrid);
-						//this.noteBookGrid.show();
 						this.sidePanel.show();
 					},
 					scope: this
@@ -197,6 +198,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					disabled: true,
 					iconCls: 'ic-add',
 					tooltip: t('Add'),
+					cls: "primary",
 					handler: function (btn) {
 						var noteForm = new go.modules.community.notes.NoteDialog();
 						noteForm.show();

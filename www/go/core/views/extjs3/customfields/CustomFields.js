@@ -18,8 +18,6 @@
 			
 				scope = scope || me;
 
-				
-
 				go.Db.store("Field").all(function (success, fields) {
 					me.fields = fields;
 
@@ -45,8 +43,6 @@
 			});
 		},
 
-		
-
 		loadModuleTypes : function() {
     
 			var available = go.Modules.getAvailable(), pnl, config, i, i1;
@@ -66,12 +62,10 @@
 				}
 			}
 		},
-		
 	
 		getType : function(name) {
 			return types[name] || null;
 		},
-		
 		
 		getTypes : function() {
 			return types;
@@ -171,7 +165,6 @@
 			});
 			return defs;
 		},
-
 		
 		/**
 		 * Get all Ext.grid.Column definitions for an entity's custom fields
@@ -219,8 +212,9 @@
 		 * 
 		 */
 		filterFieldSets : function(formPanel) {
+			var values = formPanel instanceof go.form.EntityPanel ? formPanel.getValues() : formPanel.getForm().getFieldValues();
 			formPanel.findByType("customformfieldset").forEach(function(fs){
-				fs.filter(formPanel.getForm().getFieldValues());
+				fs.filter(values);
 			}, this);
 		},
 
@@ -242,8 +236,10 @@
 					return;
 				}
 				var formField = type.renderFormField(field);
-				formField.field = field;
-				r.push(formField);						
+				if(formField) {
+					formField.field = field;
+					r.push(formField);
+				}
 			});
 
 			return r;
@@ -279,12 +275,12 @@
 		 * 
 		 * @param {int} fieldId
 		 * @param {Object} values
-		 * @returns {CustomFieldsL#1.CustomFieldsAnonym$0.render.values}
+		 * @returns {String}
 		 */
 		renderField: function (fieldId, values) {
 			var field = this.fields[fieldId];
 
-			type = this.getType(field.type);
+			var type = this.getType(field.type);
 			if(!type) {							
 				console.error("Custom field type " + field.type + " not found");
 				return "";
@@ -302,9 +298,9 @@
 		getFieldIcon: function (fieldId) {
 			var field = this.fields[fieldId];
 			
-			type = this.getType(field.type);
+			var type = this.getType(field.type);
 			if(!type) {							
-				console.error("Custom field type " + field.type + " not found");
+				console.error("Custom field type '" + field.type + "' not found");
 				return "";
 			}
 
@@ -318,57 +314,13 @@
 		 * @returns {Array}
 		 */
 		getDetailPanels: function (entity) {
-			
 			var fieldSets = this.getFieldSets(entity), panels = [], me = this;
 
 			fieldSets.forEach(function (fieldSet) {
-				
-				var items = [];		
-				
-				
-				go.customfields.CustomFields.getFields(fieldSet.id).forEach(function (field) {					
-					var type = me.getType(field.type);
-					if(!type) {
-						console.error("Custom field type " + field.type + " not found");
-						return;
-					}
-					var cmp = type.getDetailField(field);					
-					cmp.field = field;
-					items.push(cmp);
-				});
-				
-				panels.push({				
-					xtype: "panel",
-					stateId: "cf-detail-field-set-" + fieldSet.id,
-					fieldSetId: fieldSet.id,
-					title: fieldSet.name,
-					bodyCssClass: 'icons',
-					items: items,
-					collapsible: true,
-					onLoad: function(dv) {
-						var vis = false, panel = this;							
-						go.customfields.CustomFields.getFields(fieldSet.id).forEach(function (field) {
-							if(!GO.util.empty(dv.data.customFields[field.databaseName])) {
-								vis = true;
-							}
-							
-							var cmp = panel.getComponent(field.databaseName), type = me.getType(field.type);
-							
-							if(cmp) {
-								var v = type.renderDetailView(dv.data.customFields[field.databaseName], dv.data.customFields, field, cmp);
-					
-								if(typeof(v) !== "undefined") {
-									cmp.setValue(v);
-									cmp.setVisible(!!v);
-								}
-							}
-						});
-
-						this.setVisible(vis);				
-					}
-				});
-			});			
-			
+				panels.push(new go.customfields.DetailPanel({
+					fieldSet: fieldSet
+				}));
+			});
 			return panels;
 		}
 	});
@@ -376,5 +328,3 @@
 	go.customfields.CustomFields = new CustomFieldsCls;
 
 })();
-
-

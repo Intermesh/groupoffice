@@ -425,7 +425,7 @@ class MigrateCustomFields63to64 {
 		array_shift($fields);
 		foreach($fields as $field) {
 			$field->type = "Text";
-			if(!$field->delete()) {
+			if(!$field->delete($field->primaryKeyValues())) {
 				throw new \Exception("Could not delete tree select slave");
 			}
 		}

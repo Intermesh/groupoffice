@@ -38,7 +38,7 @@ GO.form.SearchField = Ext.extend(Ext.form.TwinTriggerField, {
 
 		this.addEvents({reset:true,search:true});
 	},
-
+	spellCheck: false,
 	validationEvent:false,
 	validateOnBlur:false,
 	trigger1Class:'x-form-clear-trigger',

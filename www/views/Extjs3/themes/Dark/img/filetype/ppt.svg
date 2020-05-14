@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="40px" height="51px" viewBox="0 0 40 51" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
+    <title>ppt</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="ppt" fill-rule="nonzero">
+            <path d="M2.5,0.9999996 C1.115,0.9999996 0,2.11499959 0,3.49999998 L0,48.4999996 C0,49.8849996 1.115,50.9999996 2.5,50.9999996 L37.5,50.9999996 C38.885,50.9999996 40,49.8849996 40,48.4999996 L40,15.9999999 L26.25,14.7499999 L25,0.9999996 L2.5,0.9999996 Z" id="Shape" fill="#000000" opacity="0.2"></path>
+            <path d="M2.5,0 C1.115,0 0,1.115 0,2.5 L0,47.5 C0,48.885 1.115,50 2.5,50 L37.5,50 C38.885,50 40,48.885 40,47.5 L40,15 L26.25,13.75 L25,0 L2.5,0 Z" id="Shape" fill="#DF6455"></path>
+            <path d="M25,0.9999996 L25,13.4999997 C25,14.8807996 26.1193,15.9999996 27.5,15.9999996 L40,15.9999996 L25,0.9999996 Z" id="Shape" fill="#000000" opacity="0.2"></path>
+            <path d="M25,0 L25,12.5 C25,13.8808 26.1193,15 27.5,15 L40,15 L25,0 Z" id="Shape" fill="#FBA499"></path>
+            <path d="M13,26 C10.2386,26 8,28.2386 8,31 C8,33.7614 10.2386,36 13,36 C15.7614,36 18,33.7614 18,31 L13,31 L13,26 Z M20,26 L20,29 L31,29 L31,26 L20,26 Z M20,32 L20,35 L31,35 L31,32 L20,32 Z M8,38 L8,41 L26,41 L26,38 L8,38 Z" id="Shape" fill="#000000" opacity="0.2"></path>
+            <path d="M13,25 C10.2386,25 8,27.2386 8,30 C8,32.7614 10.2386,35 13,35 C15.7614,35 18,32.7614 18,30 L13,30 L13,25 Z M20,25 L20,28 L31,28 L31,25 L20,25 Z M20,31 L20,34 L31,34 L31,31 L20,31 Z M8,37 L8,40 L26,40 L26,37 L8,37 Z" id="Shape" fill="#FFFFFF"></path>
+            <path d="M2.5,-4e-07 C1.115,-4e-07 0,1.1149996 0,2.4999996 L0,3.5 C0,2.1149996 1.115,0.9999996 2.5,0.9999996 L25,0.9999996 C25,-4e-07 25,0.9999996 25,-4e-07 L2.5,-4e-07 Z" id="Shape" fill="#FFFFFF" opacity="0.1"></path>
+        </g>
+    </g>
+</svg>

@@ -21,9 +21,20 @@ class Search extends EntityController {
 		$q = $params['filter']['text'] ?? null;
 
 		$query = new Query();
-		$query->select('u.id as entityId, "User" as entity, u.email, "" as type, u.displayName AS name, u.avatarId AS photoBlobId')
+
+		$selectQueryContact ='u.id as entityId, "User" as entity, u.email, "" as type, u.displayName AS name, u.avatarId AS photoBlobId';
+		$isEmailModuleAvailable = Module::isAvailableFor("legacy","email");
+
+		//TODO change when email module has been refactored.
+		$optionEnabled = \GO::config()->get_setting("email_sort_email_addresses_by_time", go()->getAuthState()->getUserId());
+
+		if($isEmailModuleAvailable && $optionEnabled == "1") {
+			$selectQueryContact .= ', NULL as priority';
+		}
+		$query->select($selectQueryContact)
 						->from('core_user', 'u')
 						->join('core_group', 'g', 'u.id = g.isUserGroupFor');
+
 
 		if (!empty($q)) {
 			$query->where(
@@ -37,13 +48,22 @@ class Search extends EntityController {
 
 		if (Module::isAvailableFor("community", "addressbook")) {
 
+			$selectQuery = 'c.id as entityId, "Contact" as entity, e.email, e.type, c.name, c.photoBlobId';
+
+			if($isEmailModuleAvailable && $optionEnabled == "1") {
+				$selectQuery .= ', em.last_mail_time AS priority';
+			}
 			$contactsQuery = (new Query)
-							->select('c.id as entityId, "Contact" as entity, e.email, e.type, c.name, c.photoBlobId')
+							->select($selectQuery)
 							->from("addressbook_contact", "c")
 							->join("addressbook_email_address", "e", "e.contactId=c.id");
 
+			if($isEmailModuleAvailable && $optionEnabled == "1") {
+				$contactsQuery->join("em_contacts_last_mail_times", "em", "em.contact_id=c.id","LEFT");
+			}
+
+
 			Contact::applyAclToQuery($contactsQuery);
-			
 			$contactsQuery->groupBy(['e.email']);
 
 			if (!empty($q)) {
@@ -54,12 +74,16 @@ class Search extends EntityController {
 				);
 			}
 
-			$query->union($contactsQuery);							
+
+			$query->union($contactsQuery);
 		}
 
 		$query->offset($params['position'] ?? 0)
 			->limit(20);
 
+		if($isEmailModuleAvailable && $optionEnabled == "1") {
+			$query->orderBy(["priority" => "DESC", "name" => "ASC"]);
+		}
 		go()->debug($query);
 		
 		\go\core\jmap\Response::get()->addResponse([

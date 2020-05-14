@@ -5606,7 +5606,6 @@ Ext.EventObject = function(){
                 }
                 me.type = e.type;
                 me.shiftKey = e.shiftKey;
-                
                 me.ctrlKey = e.ctrlKey || e.metaKey || false;
                 me.altKey = e.altKey;
                 
@@ -6923,9 +6922,11 @@ Ext.apply(Ext.EventManager, function(){
        
        
        
-       useKeydown = Ext.isWebKit ?
-                   Ext.num(navigator.userAgent.match(/AppleWebKit\/(\d+)/)[1]) >= 525 :
-                   !((Ext.isGecko && !Ext.isWindows) || Ext.isOpera);
+       useKeydown = true;
+   // No longer needed
+   // Ext.isWebKit ?
+   //                 Ext.num(navigator.userAgent.match(/AppleWebKit\/(\d+)/)[1]) >= 525 :
+   //                 !((Ext.isGecko && !Ext.isWindows) || Ext.isOpera);
 
    return {
        _unload: function(){
@@ -6971,7 +6972,7 @@ Ext.apply(Ext.EventManager, function(){
        
        onTextResize : function(fn, scope, options){
            if(!textEvent){
-               textEvent = new Ext.util.Event();
+               textEvent = new Ext.util.Event();z
                var textEl = new Ext.Element(document.createElement('div'));
                textEl.dom.className = 'x-text-resize';
                textEl.dom.innerHTML = 'X';
@@ -8237,7 +8238,10 @@ Ext.Element.addMethods(
                 }
                 var me = this;
                 this.masking = setTimeout(function() {
-                    me.doMask(msg, msgCls);
+                		//check if el wasn't destroyed in the mean time.
+                		if(me.dom) {
+											me.doMask(msg, msgCls);
+										}
                 }, 500);
 
             },
@@ -11263,6 +11267,12 @@ Ext.Component = function(config){
     this.initialConfig = config;
 
     Ext.apply(this, config);
+
+
+    if(config.mobile && GO.util.isMobileOrTablet()) {
+        Ext.apply(this, config.mobile);
+    }
+
     this.addEvents(
         
         'added',
@@ -12694,7 +12704,7 @@ Ext.Shadow.prototype = {
         target.getWidth(),
         target.getHeight()
         );
-        this.el.dom.style.display = "block";
+        //this.el.dom.style.display = "block";
     },
 
     
@@ -15265,6 +15275,10 @@ Ext.extend(Ext.layout.BorderLayout.SplitRegion, Ext.layout.BorderLayout.Region, 
 
     
     onSplitMove : function(split, newSize){
+
+        //MS: for responsive layout
+        this.panel.wideWidth = newSize.width;
+
         var s = this.panel.getSize();
         this.lastSplitSize = newSize;
         if(this.position == 'north' || this.position == 'south'){
@@ -15421,6 +15435,22 @@ Ext.layout.FormLayout = Ext.extend(Ext.layout.AnchorLayout, {
             c.label = c.getItemCt().child('label.x-form-item-label');
             if(!c.rendered){
                 c.render('x-form-el-' + c.id);
+                /* start extra code */
+                var newEl,
+                 fEl = Ext.fly('x-form-el-' + c.id),
+                 pos = {suffix: 'beforeEnd', prefix: 'afterBegin'};
+                for(var key in pos){
+                    if (c[key]) { // Field prefix/suffix
+                        if (c.isXType('trigger')) {
+                            newEl = c.wrap.insertHtml(pos[key],  '<span> ' + c[key] + ' </span>', true);
+                            c.el.setWidth(c.el.getWidth() - c.trigger.getWidth() - newEl.getWidth());
+                        } else {
+                            newEl = fEl.insertHtml(pos[key],  '<span> ' + c[key] + ' </span>', true);
+                            c.el.setWidth(c.el.getWidth() - newEl.getWidth());
+                        }
+                    }
+                }
+                /* end extra code */
             }else if(!this.isValidParent(c, target)){
                 Ext.fly('x-form-el-' + c.id).appendChild(c.getPositionEl());
             }
@@ -17941,14 +17971,14 @@ Ext.Panel = Ext.extend(Ext.Container, {
                 this.header.replaceClass(old, this.iconCls);
             }else{
                 var hd = this.header,
-                    img = hd.child('img.x-panel-inline-icon');
+                    img = hd.child('i.x-panel-inline-icon');
                 if(img){
                     Ext.fly(img).replaceClass(old, this.iconCls);
                 }else{
                     var hdspan = hd.child('span.' + this.headerTextCls);
                     if (hdspan) {
                         Ext.DomHelper.insertBefore(hdspan.dom, {
-                            tag:'img', alt: '', src: Ext.BLANK_IMAGE_URL, cls:'x-panel-inline-icon '+this.iconCls
+                            tag:'i', cls:'x-panel-inline-icon icon '+this.iconCls
                         });
                     }
                  }
@@ -18018,7 +18048,7 @@ Ext.Panel = Ext.extend(Ext.Container, {
         if(!this.toolTemplate){
             
             var tt = new Ext.Template(
-                 '<div class="x-tool x-tool-{id}">&#160;</div>'
+                 '<div class="x-tool x-tool-{id} {cls}">&#160;</div>'
             );
             tt.disableFormats = true;
             tt.compile();
@@ -40204,6 +40234,10 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
     
     autocomplete: "off",
 
+    placeholder: "",
+
+    spellCheck: true,
+
     fieldClass : 'x-form-field',
     
     msgTarget : 'qtip',
@@ -40262,6 +40296,13 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
             }
 
             cfg.autocomplete = this.autocomplete;
+            cfg.placeholder = this.placeholder;
+
+            if(!this.spellCheck) {
+              cfg.autocorrect="off";
+              cfg.autocapitalize="off";
+              cfg.spellcheck="false";
+            }
             
             this.autoEl = cfg;
         }
@@ -42112,7 +42153,7 @@ Ext.form.ComboBox = Ext.extend(Ext.form.TriggerField, {
 
             if(!this.tpl){
                 
-                this.tpl = '<tpl for="."><div class="'+cls+'-item">{[fm.htmlEncode(values["' + this.displayField + '"] || "" )]}</div></tpl>';
+                this.tpl = '<tpl for="."><div class="'+cls+'-item" title="{[fm.htmlEncode(values[\'' + this.displayField + '\'] || \'\' )]}">{[fm.htmlEncode(values["' + this.displayField + '"] || "" )]}</div></tpl>';
                 
             }
 
@@ -44787,7 +44828,8 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
     
     getDocMarkup : function(){
         var h = Ext.fly(this.iframe).getHeight() - this.iframePad * 2;
-        return String.format('<html><head><style type="text/css">body{border: 0; margin: 0; padding: {0}px; height: {1}px; cursor: text}</style></head><body></body></html>', this.iframePad, h);
+        var theme = go.User ? go.User.theme : "Paper";
+        return String.format('<html><head><link rel="stylesheet" href="' + BaseHref + 'views/Extjs3/themes/' + theme + '/htmleditor.css"> <style type="text/css">body{border: 0; margin: 0; padding: {0}px; height: {1}px; cursor: text}body,p,td,div,span{' + GO.settings.html_editor_font + ';};body p{margin:0px;}</style></head><body></body></html>', this.iframePad, h);
     },
 
     
@@ -50699,6 +50741,7 @@ Ext.grid.RowSelectionModel = Ext.extend(Ext.grid.AbstractSelectionModel,  {
         return (this.selections.key(id) ? true : false);
     },
 
+    simpleSelect : false,
     
     handleMouseDown : function(g, rowIndex, e){
         if(e.button !== 0 || this.isLocked()){
@@ -50712,10 +50755,10 @@ Ext.grid.RowSelectionModel = Ext.extend(Ext.grid.AbstractSelectionModel,  {
             view.focusRow(rowIndex);
         }else{
             var isSelected = this.isSelected(rowIndex);
-            if(e.ctrlKey && isSelected){
+            if((e.ctrlKey || this.simpleSelect) && isSelected){
                 this.deselectRow(rowIndex);
             }else if(!isSelected || this.getCount() > 1){
-                this.selectRow(rowIndex, e.ctrlKey || e.shiftKey);
+                this.selectRow(rowIndex, e.ctrlKey || e.shiftKey || this.simpleSelect);
                 view.focusRow(rowIndex);
             }
         }

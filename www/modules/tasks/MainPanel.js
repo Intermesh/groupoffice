@@ -131,7 +131,7 @@ this.gridPanel.store.on('load', function(store, records, options)
 			region:'west',
 			autoScroll:false,
 			closeOnTab: true,
-			width: 200,
+			width: dp(240),
 			resizable:true,
 			cls: 'go-sidenav',
 			layout:'border',

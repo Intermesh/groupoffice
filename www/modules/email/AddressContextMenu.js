@@ -153,29 +153,9 @@ GO.email.AddressContextMenu = function(config)
 		});
 		
 		config.items.push("-", this.createItem, this.updateItem);
-		
-	
-		
-	}
-					
-	
-	
-//	if(go.Modules.isAvailable("legacy", "addressbook"))
-//	{
-//		this.lookUpButton = new Ext.menu.Item({
-//			iconCls: 'btn-addressbook',
-//			text: t("Lookup in address book", "addressbook"),
-//			cls: 'x-btn-text-icon',
-//			handler: function(){
-//				GO.addressbook.searchSender(this.address, this.personal);
-//			},
-//			scope: this
-//		});
-//	
-//		config.items.push(this.lookUpButton);
-//	}
 
-					
+	}
+
 	GO.email.AddressContextMenu.superclass.constructor.call(this, config);	
 }
 
@@ -188,11 +168,11 @@ Ext.extend(GO.email.AddressContextMenu, Ext.menu.Menu,{
 		this.address = address || '';
 		this.personal= personal || '';
 		
-		this.store.baseParams.filter.email = this.address;
+		this.store.setFilter("email", {email: this.address});
 		this.store.load();
 		
 		GO.email.AddressContextMenu.superclass.showAt.call(this, xy);
-	}	,
+	},
 	
 	updateMenu: function () {
 

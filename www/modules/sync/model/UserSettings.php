@@ -10,6 +10,7 @@
 
 namespace GO\Sync\Model;
 
+use go\core\model\Module;
 use go\core\orm\Property;
 use GO\Base\Model\User as GOUser;
 use go\core\model\User;
@@ -48,23 +49,35 @@ class UserSettings extends Property
 
 
 	protected function setup() {
+
+	  if(empty($this->account_id)) {
+      if (Module::isInstalled('legacy', 'email')) {
+        $account = \GO\Email\Model\Account::model()->findSingleByAttribute('user_id', $this->user_id);
+        if ($account) {
+          $this->account_id = $account->id;
+        }
+      }
+	  }
+
 		if (empty($this->addressBooks) || empty($this->noteBooks)) {
-			$user = User::findById($this->user_id, ['addressBookSettings', 'notesSettings']);
+			$user = User::findById($this->user_id, ['addressBookSettings', 'notesSettings', 'syncSettings']);
 
 			if (empty($this->addressBooks)) {
 				if (isset($user->addressBookSettings) && ($addressBookId = $user->addressBookSettings->getDefaultAddressBookId())) {
-					$this->addressBooks[] = (new UserAddressBook())->setValues(['addressBookId' => $addressBookId, 'isDefault' => true]);
+					$user->syncSettings->addressBooks[] = (new UserAddressBook())->setValues(['addressBookId' => $addressBookId, 'isDefault' => true]);
 				}
 			}
 
 			if (empty($this->noteBooks)) {
 				if (isset($user->notesSettings) && ($noteBookId = $user->notesSettings->getDefaultNoteBookId())) {
-					$this->noteBooks[] = (new UserNoteBook())->setValues(['noteBookId' => $noteBookId, 'isDefault' => true]);
+					$user->syncSettings->noteBooks[] = (new UserNoteBook())->setValues(['noteBookId' => $noteBookId, 'isDefault' => true]);
 				}
 			}
 
 			if ($user->isModified()) {
-				$user->save();
+				if(!$user->save()) {
+					throw new \Exception("Could not update user with sync settings: " . var_export($user->getValidationErrors(), true));
+				}
 			}
 		}
 	}

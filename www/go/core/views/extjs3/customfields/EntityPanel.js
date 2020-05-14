@@ -188,7 +188,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 			
 			if(destroyed.length) {
 				this.store.remove(this.store.getRange().filter(function(r) {
-					return r.data.isFieldSet && destroyed.indexOf(r.data.fieldSetId) > -1;
+					return destroyed.indexOf(r.data.fieldSetId) > -1;
 				}));
 			}
 		},
@@ -373,10 +373,12 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 					text: types[name].label,
 					type: types[name],
 					handler: function (item) {
+						console.warn(item);
 						var dlg = item.type.getDialog();
 						dlg.setValues({
 							fieldSetId: this.addFieldMenu.record.data.fieldSetId,
-							type: item.type.name
+							type: item.type.name,
+							typeLabel: item.text
 						});
 
 						dlg.show();
@@ -397,7 +399,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 
 	doDelete: function (selectedRecords) {
 
-		var fieldSetIds = [], fieldIds = [];
+		var fieldSetIds = [], fieldIds = [], me = this;
 		selectedRecords.forEach(function (r) {
 			if (r.data.isFieldSet) {
 				fieldSetIds.push(r.data.fieldSetId);
@@ -408,14 +410,22 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 		});
 
 		if (fieldSetIds.length) {
+			me.getEl().mask(t("Deleting..."));
+
 			go.Db.store("FieldSet").set({
 				destroy: fieldSetIds
+			}).finally(function() {
+				me.getEl().unmask();
 			});
 		}
 
 		if (fieldIds.length) {
+			me.getEl().mask(t("Deleting..."));
+
 			go.Db.store("Field").set({
 				destroy: fieldIds
+			}).finally(function() {
+				me.getEl().unmask();
 			});
 		}
 	},
@@ -463,8 +473,6 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 					fsSortOrderMap[fs.id] = fs.sortOrder * 100000;
 
 				});
-
-
 
 				this.store.loadData(storeData, true);
 

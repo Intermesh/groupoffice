@@ -1,6 +1,15 @@
 <?php
+/**
+ * CRON script
+ * Runs scheduled tasks for the system like garbage collection, sending of newsletters etc. *
+ */
+use GO\Base\Cron\CronJob;
+use GO\Base\Db\FindCriteria;
+use GO\Base\Db\FindParams;
+use GO\Base\Util\Date\DateTime as DateTimeAlias;
 use go\core\App;
 use go\core\cli\State;
+use go\core\model\CronJobSchedule;
 
 if(!empty($argv[1])) {
 	define('GO_CONFIG_FILE', $argv[1]);
@@ -12,40 +21,31 @@ App::get()->setAuthState(new State());
 GO::session()->runAsRoot();
 
 //new framework
-\go\core\model\CronJobSchedule::runNext();
-
-
-go()->debug("Running cron for legacy framework");
+CronJobSchedule::runNext();
 
 //old framework
+/**
+ * @return mixed
+ * @throws Exception
+ */
 function findNextCron(){
-	$currentTime = new \GO\Base\Util\Date\DateTime();
+	$currentTime = new DateTimeAlias();
 
-		$findParams = \GO\Base\Db\FindParams::newInstance()
+		$findParams = FindParams::newInstance()
 			->single()
-			->criteria(\GO\Base\Db\FindCriteria::newInstance()
+			->criteria(FindCriteria::newInstance()
 				->addCondition('nextrun', $currentTime->getTimestamp(),'<')
 				->addCondition('active',true)
 			);
 		
-		return \GO\Base\Cron\CronJob::model()->find($findParams);
+		return CronJob::model()->find($findParams);
 }
 
 $jobAvailable = false;
-\GO::debug('CRONJOB START (PID:'.getmypid().')');
 while($cronToHandle = findNextCron()){
 	$jobAvailable = true;
-	\GO::debug('CRONJOB FOUND');
+	GO::debug('CRONJOB FOUND');
 	$cronToHandle->run();
 }
 
-if(!$jobAvailable)
-	\GO::debug('NO CRONJOB FOUND');
-
-\GO::debug('CRONJOB STOP (PID:'.getmypid().')');
-\GO::config()->save_setting('cron_last_run', time());
-
-
-
-
-
+GO::config()->save_setting('cron_last_run', time());

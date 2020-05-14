@@ -2,8 +2,41 @@
 /* global go, Ext */
 
 /**
- * 
- * 
+ * Store for displaying data in components like a grid, combo, dataview etc.
+ *
+ * @example
+ *
+ * this.store = new go.data.Store({
+			fields: [
+				'id',
+				'name',
+				'firstName',
+				'lastName',
+				{name: 'createdAt', type: 'date'},
+				{name: 'modifiedAt', type: 'date'},
+				{name: 'creator', type: "relation"},
+				{name: 'modifier', type: "relation"},
+				{name: 'addressbook', type: "relation"},
+				'starred',
+				'permissionLevel',
+				'photoBlobId',
+				"isOrganization",
+				"emailAddresses",
+				"phoneNumbers",
+				"dates",
+				"streetAddresses",
+				{name: 'organizations', type: "relation"},
+				"jobTitle",
+				"debtorNumber",
+				"registrationNumber",
+				"IBAN",
+				"vatNo",
+				"color"
+			],
+			sortInfo :{field: "name", direction: "ASC"},
+			entityStore: "Contact"
+		});
+ *
  * //Inserting records will trigger server update too:
  * var store = this.noteGrid.store;
 						var myRecordDef = Ext.data.Record.create(store.fields);
@@ -18,6 +51,11 @@
  */
 go.data.Store = Ext.extend(Ext.data.JsonStore, {
 
+	/**
+	 * WIll autodestroy if the component it belongs too is detroyted
+	 *
+	 * WARNING: the component is responsible for handling this, If you have a custom component you must destroy it yourself.
+	 */
 	autoDestroy: true,
 	
 	autoSave: false,
@@ -47,8 +85,8 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 				dir: 'dir'       // The parameter name which specifies the sort direction
 			},
 			proxy: config.entityStore ? 
-				new go.data.EntityStoreProxy({entityStore: config.entityStore, fields: config.fields}) :
-				new go.data.JmapProxy({method: config.method, fields: config.fields})
+				new go.data.EntityStoreProxy({entityStore: config.entityStore, fields: config.fields, store: this}) :
+				new go.data.JmapProxy({method: config.method, fields: config.fields, store: this})
 		}));        
 		
 		this.setup();		
@@ -82,13 +120,11 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 	
 	destroy : function() {	
 		this.fireEvent('beforedestroy', this);
-		
+
 		go.data.Store.superclass.destroy.call(this);
 		
 		this.fireEvent('destroy', this);
 	},
-	
-	
 	
 	//override Extjs writer save for entityStore
 	save: function(cb) {
@@ -144,6 +180,9 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 				if(success) {
 					resolve(records);
 				} else{
+					if(options.error.message == "unsupportedSort") {
+						return; //ignore.
+					}
 					//hack to pass error message from EntityStoreProxy to load callback
 					reject(options.error);
 				}				

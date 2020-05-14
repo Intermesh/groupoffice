@@ -2,18 +2,22 @@
 
 namespace go\modules\community\addressbook\convert;
 
-use GO;
+use Exception;
 use go\core\data\convert;
+use go\core\fs\File;
+use go\core\model\Acl;
+use go\core\orm\Entity;
 use go\modules\community\addressbook\model\Contact;
+use go\modules\community\addressbook\model\Group;
 
 class Csv extends convert\Csv {	
 
 	private $organizations = true;
 
 	/**
-	 * Override that makes the import run twice. The first time import only organizations so that in the second run organizations can be matched with contacts.
+	 * @inheritDoc
 	 */
-	public function importFile(\go\core\fs\File $file, $entityClass, $params = array())
+	public function importFile(File $file, $entityClass, $params = array())
 	{
 		$contacts = parent::importFile($file, $entityClass, $params);
 		if(!$contacts['success']) {
@@ -33,10 +37,12 @@ class Csv extends convert\Csv {
 
 	/**
 	 * Override that skips contacts on the first run and imports them in the second
+	 *
+	 * @inheritDoc
 	 */
-	protected function importEntity(\go\core\orm\Entity $entity, $fp, $index, array $params)
+	protected function importEntity($entityClass, $fp, $index, array $params)
 	{
-		$contact = parent::importEntity($entity, $fp, $index, $params);
+		$contact = parent::importEntity($entityClass, $fp, $index, $params);
 
 		if(!$contact) {
 			return false;
@@ -45,7 +51,36 @@ class Csv extends convert\Csv {
 		return $contact->isOrganization == $this->organizations ? $contact : false;
 	}
 
-	
+	protected function createEntity($entityClass, $values)
+	{
+		$entity = false;
+		//lookup entity by id if given
+		if($this->updateBy == 'id' && !empty($values['id'])) {
+			$entity = $entityClass::findById($values['id']);
+			if($entity && $entity->getPermissionLevel() < Acl::LEVEL_WRITE) {
+				$entity = false;
+			}
+		} elseif($this->updateBy == 'email') {
+			$emails = [];
+			if(!empty($values['emailAddresses'])) {
+				foreach ($values['emailAddresses'] as $emailAddress) {
+					if(!empty($emailAddress['email'])) {
+						$emails[] = $emailAddress['email'];
+					}
+				}
+			}
+
+			if(!empty($emails)) {
+				$entity = Contact::findByEmail($emails)->andWhere(['addressBookId' => $values['addressBookId']])->single();
+			}
+		}
+		if(!$entity) {
+			$entity = new $entityClass;
+		}
+		return $entity;
+	}
+
+
 	/**
 	 * List headers to exclude
 	 * @var string[]
@@ -54,8 +89,44 @@ class Csv extends convert\Csv {
 	
 	protected function init() {
 		parent::init();
-		$this->addColumn('isOrganization', go()->t("Is organization", "community", "addressbook"), false);
-		$this->addColumn('organizations', go()->t("Organizations", "community", "addressbook"), true);		
+		$this->addColumn('isOrganization', go()->t("Is organization", "community", "addressbook"));
+		$this->addColumn('organizations', go()->t("Organizations", "community", "addressbook"));
+		$this->addColumn('gender', go()->t("Gender", "community", "addressbook"));
+		$this->addColumn('groups', go()->t("Groups", "community", "addressbook"));
+	}
+
+	protected function importGroups(Contact $contact, $groups, array &$values) {
+
+		$contact->groups = [];
+
+		$groups = !empty($groups) ? explode(static::$multipleDelimiter, $groups) : [];
+		$addressBookId = $contact->addressBookId ?? $values['addressBookId'];
+		if(empty($addressBookId)) {
+			throw new Exception("No address book ID set");
+		}
+		foreach($groups as $groupName) {
+			$group = Group::find()->where(['name' => $groupName, 'addressBookId' => $addressBookId])->single();
+			if(!$group) {
+				$group = new Group();
+				$group->name = $groupName;
+				$group->addressBookId = $contact->addressBookId ?? $values['addressBookId'];
+				if(!$group->save()) {
+					throw new Exception("Could not save group");
+				}
+			}
+
+			$contact->groups[] = $group->id;
+		}
+	}
+
+	protected function exportGroups(Contact $contact) {
+		$groupNames = [];
+		foreach($contact->groups as $groupId) {
+			$group = Group::findById($groupId);
+			$groupNames[] = $group->name;
+		}
+
+		return implode(static::$multipleDelimiter, $groupNames);
 	}
 
 	protected function importIsOrganization(Contact $contact, $isOrganization, array &$values) {
@@ -77,12 +148,35 @@ class Csv extends convert\Csv {
 	public function exportIsOrganization(Contact $contact) {
 		return $contact->isOrganization;
 	}
-	
-	protected function importOrganizations(Contact $contact, $organizationNames) {
-		if(!isset($organizationNames)) {
-			return;
+
+	public function exportGender(Contact $contact) {
+		return $contact->gender;
+	}
+
+	public function importGender(Contact $contact, $gender) {
+		switch(strtolower($gender)) {
+			case 'm':
+			case 'male':
+				$contact->gender = 'M';
+				return;
+
+			case 'f':
+			case 'female':
+			case 'v':
+				$contact->gender = 'F';
+				return;
 		}
-		//todo how to handle if org is not imported yet?
+	}
+	
+	protected function importOrganizations(Contact $contact, $organizationNames, array &$values) {
+
+		$addressBookId = $contact->addressBookId ?? $values['addressBookId'];
+		if(empty($addressBookId)) {
+			throw new Exception("No address book ID set");
+		}
+
+		$organizationNames = !empty($organizationNames) ? explode(static::$multipleDelimiter, $organizationNames) : [];
+
 		$orgIds = [];
 		foreach($organizationNames as $name) {
 			$org = Contact::find()->where(['name' => $name, 'isOrganization' => true])->single();
@@ -90,9 +184,9 @@ class Csv extends convert\Csv {
 				$org = new Contact();
 				$org->name = $name;
 				$org->isOrganization = true;
-				$org->addressBookId = $contact->addressBookId;
+				$org->addressBookId = $addressBookId;
 				if(!$org->save()) {
-					throw new \Exception("Could not create new organization '" . $name . "'");
+					throw new Exception("Could not create new organization '" . $name . "'");
 				}
 			}
 
@@ -107,6 +201,7 @@ class Csv extends convert\Csv {
 			return "";
 		}
 
-		return implode($this->multipleDelimiter, array_column($templateValues['organizations'], 'name'));
+		return implode(static::$multipleDelimiter, array_column($templateValues['organizations'], 'name'));
 	}
+
 }

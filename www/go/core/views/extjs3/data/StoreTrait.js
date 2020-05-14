@@ -17,9 +17,9 @@ go.data.StoreTrait = {
 			this.baseParams = {};
 		}
 		
-		if(!this.baseParams.filter) {
-			this.baseParams.filter = {};
-		}		
+		// if(!this.baseParams.filter) {
+		// 	this.baseParams.filter = {};
+		// }
 		
 		if(this.entityStore) {			
 			this.initEntityStore();
@@ -36,6 +36,24 @@ go.data.StoreTrait = {
 			this.loading = false;
 			this.loaded = true;
     }, this);
+
+		this.on('exception',
+			function( store, type, action, options, response){
+
+				if(response.isAbort) {
+					//ignore aborts.
+				} else if(response.isTimeout){
+					console.error(response);
+
+					GO.errorDialog.show(t("The request timed out. The server took too long to respond. Please try again."));
+				}else
+				{
+					console.error(response);
+
+					GO.errorDialog.show(t("Failed to send the request to the server. Please check your internet connection."));
+				}
+			}
+			,this);
     
 		this.initFilters();
 
@@ -107,6 +125,10 @@ go.data.StoreTrait = {
 
 		this.proxy.getEntityFields().forEach(function(field) {
 			var relation =  this.entityStore.entity.findRelation(field.name);
+
+			if(!relation) {
+				throw "'" + field.name + "' is not a relation of '" + this.entityStore.entity.name + "'";
+			}
 			go.Db.store(relation.store).on("changes", this.onRelationChanges, this);
 		}, this);
 	},
@@ -134,7 +156,7 @@ go.data.StoreTrait = {
 	 * @param {*} destroyed 
 	 */
 	onRelationChanges : function(entityStore, added, changed, destroyed) {
-		if(!this.proxy.watchRelations[entityStore.entity.name]) {
+		if(!this.proxy.watchRelations[entityStore.entity.name] || !this.lastOptions) {
 			return;
 		}
 
@@ -143,6 +165,8 @@ go.data.StoreTrait = {
 				var o = go.util.clone(this.lastOptions);
 				o.params = o.params || {};
 				o.params.position = 0;
+				o.add = false;
+
 				if(this.lastOptions.params && this.lastOptions.params.position) {				
 					o.params.limit = this.lastOptions.params.position + (this.lastOptions.limit || this.baseParams.limit || 20);
 				}
@@ -154,7 +178,7 @@ go.data.StoreTrait = {
 	},
 
 	onChanges : function(entityStore, added, changed, destroyed) {
-		if(!this.loaded || this.loading) {
+		if(!this.loaded || this.loading || !this.lastOptions) {
 			return;
 		}		
 
@@ -163,10 +187,12 @@ go.data.StoreTrait = {
 			var o = go.util.clone(this.lastOptions);
 			o.params = o.params || {};
 			o.params.position = 0;
+			o.add = false;
 
 			if(this.lastOptions.params && this.lastOptions.params.position) {				
 				o.params.limit = this.lastOptions.params.position + (this.lastOptions.limit || this.baseParams.limit || 20);
 			}
+
 			this.load(o);
 		}
 		
@@ -193,12 +219,27 @@ go.data.StoreTrait = {
 	removeById : function(id) {
 		this.remove(this.getById(id));
   },
+
+	/**
+	 * Same as set filter but keeps existing filter values if set
+	 *
+	 * @param cmpId
+	 * @param filter
+	 * @returns {go.data.StoreTrait}
+	 */
+	patchFilter : function(cmpId, filter) {
+		var f = this.getFilter(cmpId);
+		if(!f) {
+			f = {};
+		}
+		return this.setFilter(cmpId, Ext.apply(f, filter));
+	},
   
   /**
 	 * Set a filter object for a component
 	 * 
 	 * @param {string} cmpId
-	 * @param {object} filter
+	 * @param {object} filter if null is given it's removed
 	 * @returns {this}
 	 */
 	setFilter : function(cmpId, filter) {
@@ -208,14 +249,25 @@ go.data.StoreTrait = {
 		{
 			this.filters[cmpId] = filter;
 		}		
-		
-		this.baseParams.filter = {
-			operator: "AND",
-			conditions: []
-		};
-		
+
+		var conditions = [];
 		for(var cmpId in this.filters) {
-			this.baseParams.filter.conditions.push(this.filters[cmpId]);
+			conditions.push(this.filters[cmpId]);
+		}
+
+		switch(conditions.length) {
+			case 0:
+				delete this.baseParams.filter;
+				break;
+			case 1:
+				this.baseParams.filter = conditions[0];
+				break;
+			default:
+				this.baseParams.filter = {
+					operator: "AND",
+					conditions: conditions
+				};
+				break;
 		}
 		
 		return this;

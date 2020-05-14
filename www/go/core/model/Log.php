@@ -2,6 +2,8 @@
 
 namespace go\core\model;
 
+use go\core\http\Request;
+
 class Log extends \go\core\orm\Entity {
 
 	const ACTION_ADD = 'add';
@@ -38,7 +40,7 @@ class Log extends \go\core\orm\Entity {
 				$this->user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'unknown';
 			}
 
-			$this->ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+			$this->ip = Request::get()->getRemoteIpAddress() ?? "";
 			$this->controller_route = "JMAP";
 			$this->username = go()->getDbConnection()->selectSingleValue('username')->from('core_user')->where('id', '=', go()->getUserId())->single();
 			$this->user_id = go()->getUserId() ?? 1;

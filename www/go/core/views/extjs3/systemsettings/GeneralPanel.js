@@ -7,7 +7,7 @@ go.systemsettings.GeneralPanel = Ext.extend(go.systemsettings.Panel, {
 			items: [{
 					xtype: "fieldset",
 					defaults: {
-						width: dp(240)
+						width: dp(360)
 					},
 					items: [
 						{
@@ -102,7 +102,7 @@ go.systemsettings.GeneralPanel = Ext.extend(go.systemsettings.Panel, {
 			callback: function (options, success, response) {
 				this.getEl().unmask();
 				if(success) {
-					document.location = go.Jmap.downloadUrl(response.blobId);
+					go.util.downloadFile(go.Jmap.downloadUrl(response.blobId));
 				}
 			},
 			scope: this

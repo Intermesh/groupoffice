@@ -9,55 +9,12 @@ go.Modules = (function () {
 		registered: null,
 
 		/**
-		 * 
-		 * @example
-		 * 
-		 * go.Modules.register("community", "addressbook", {
-		 * 	mainPanel: "go.modules.community.addressbook.MainPanel",
-		 * 	title: t("Address book"),
-		 * 	initModule: function() {}, //Will be called after authentication and only if the user has access to the module
-		 * 	entities: [{
-		 * 			
-		 * 			name: "Contact",
-		 * 			hasFiles: true,
-		 * 			links: [{
-		 * 
-		 * 				filter: "isContact",
-		 * 
-		 * 				iconCls: "entity ic-person",
-		 * 
-		 * 				linkWindow: function(entity, entityId) {
-		 * 					return new go.modules.community.addressbook.ContactDialog();
-		 * 				},
-		 * 					
-		 * 				linkDetail: function() {
-		 * 					return new go.modules.community.addressbook.ContactDetail();
-		 * 				}	
-		 * 			},{
-		 * 			
-		 * 				title: t("Organization"),
-		 * 
-		 * 				iconCls: "entity ic-business",			
-		 * 
-		 * 				filter: "isOrganization",
-		 * 
-		 * 				linkWindow: function(entity, entityId) {
-		 * 					var dlg = new go.modules.community.addressbook.ContactDialog();
-		 * 					dlg.setValues({isOrganization: true});
-		 * 					return dlg;
-		 * 				},
-		 * 				
-		 * 				linkDetail: function() {
-		 * 					return new go.modules.community.addressbook.ContactDetail();
-		 * 				}	
-		 * 			}]
-		 * 			
-		 * 	}, "AddressBook", "AddressBookGroup"],
-		 * 	
-		 * 	systemSettingsPanels: ["go.modules.community.addressbook.SystemSettingsPanel"],
-		 * 	userSettingsPanels: ["go.modules.community.addressbook.SettingsPanel"]
-		 * });
-		 * 
+		 *
+		 * Register a module.
+		 *
+		 * @see www/go/modules/community/addressbook/views/extjs3/Module.js for an extended example.
+		 *
+		 *
 		 * @param {string} package
 		 * @param {string} name
 		 * @param {object} config
@@ -224,12 +181,12 @@ go.Modules = (function () {
 
 		//will be called after login
 		init: function () {
-			var package, me = this;
+			var me = this;
 			
-			return go.Db.store("Module").query().then(function(response){
-				return go.Db.store("Module").get(response.ids);
-			}).then (function(result) {
-				me.entities = result.entities;
+			go.Db.store("Module").on("changes", this.onModuleChanges, this);
+
+			return go.Db.store("Module").all().then(function(entities) {
+				me.entities = entities;
 				var promises = [];
 
 				for (var id in me.entities) {
@@ -281,6 +238,25 @@ go.Modules = (function () {
 					return me.entities;
 				});
 			});
+
+			
+		},
+
+		onModuleChanges : function(entityStore, added, changed, destroyed) {
+			if(!changed) {
+				return;
+			}
+
+			for(var id in changed){
+
+				var index = this.entities.findIndex(function(e) {
+					return e.id == id;
+				});
+
+				if(index>-1) {
+					this.entities[index] = changed[id];
+				}
+			}
 		},
 		
 		addPanel : function(panels) {

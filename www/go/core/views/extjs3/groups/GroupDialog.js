@@ -4,6 +4,25 @@ go.groups.GroupDialog = Ext.extend(go.form.Dialog, {
 	height: dp(800),
 	width: dp(1000),
 	formPanelLayout: "border",
+
+	initComponent: function() {
+		this.supr().initComponent.call(this);
+
+		this.on('show', function() {
+			if(!this.currentId) {
+				//needed to load the grid.
+				this.groupUserGrid.setValue([]);
+			} else if(this.currentId == 2) { //group everyone
+				this.groupUserGrid.setDisabled(true);
+				this.groupUserGrid.hide();
+			}
+		}, this);
+
+		this.formPanel.on("beforesetvalues", function(form, values) {
+
+		}, this);
+	},
+
 	initFormItems: function () {
 
 		this.addPanel(new go.permissions.SharePanel());
@@ -25,7 +44,8 @@ go.groups.GroupDialog = Ext.extend(go.form.Dialog, {
 			this.groupUserGrid = new go.groups.GroupUserGrid({
 				//anchor: '100% -' + dp(64),
 				region: "center",
-				hideLabel: true
+				hideLabel: true,
+				value: []
 			})
 		];
 	}

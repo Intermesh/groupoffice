@@ -10,4 +10,5 @@ return array (
   'name' => 'Logg',
   'description' => 'Loggfører alle slettinger, endringer og nyopprettinger. Kan påvirke hastigheten på store installasjoner!',
   'ID' => 'ID',
+  'Activity log' => 'Logg',
 );

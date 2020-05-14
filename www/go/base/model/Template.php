@@ -34,6 +34,9 @@
 namespace GO\Base\Model;
 
 
+use go\modules\community\addressbook\model\Contact;
+use go\modules\community\addressbook\model\Date;
+
 class Template extends \GO\Base\Db\ActiveRecord{
 	
 	const TYPE_EMAIL=0;
@@ -75,6 +78,38 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		
 		return parent::init();
 	}
+
+	private static $dateFormat;
+
+  /**
+   * Get the user's date format
+   *
+   * @return string
+   */
+	private static function getDateFormat() {
+	  if(!isset(self::$dateFormat)) {
+	    $user = go()->getAuthState()->getUser(['dateFormat', 'timeFormat']);
+      self::$dateFormat = isset($user) ? $user->dateFormat : 'd-m-Y';
+      self::$timeFormat = isset($user) ? $user->timeFormat : 'H:i';
+    }
+
+	  return self::$dateFormat;
+  }
+
+  private static $timeFormat;
+
+  /**
+   * Get the user's time format
+   *
+   * @return string
+   */
+  private static function getTimeFormat() {
+    if(!isset(self::$timeFormat)) {
+      self::getDateFormat();
+    }
+
+    return self::$timeFormat;
+  }
 	
 	protected function getPermissionLevelForNewModel() {
 		return \GO\Base\Model\Acl::MANAGE_PERMISSION;
@@ -137,7 +172,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 				$attributes[$tagPrefix . 'formatted_address'] = $a->getFormatted();
 			}
 			
-			$a = $company->findAddressByType(\go\modules\community\addressbook\model\Address::TYPE_VISIT, true);
+			$a = $company->findAddressByType(\go\modules\community\addressbook\model\Address::TYPE_POSTAL, true);
 			if($a) {				
 				$attributes[$tagPrefix . 'post_address'] = $a->street;
 				$attributes[$tagPrefix . 'post_address_no'] = $a->street2;
@@ -149,7 +184,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 				$attributes[$tagPrefix . 'formatted_post_address'] = $a->getFormatted();
 			}
 
-			$attributes[$tagPrefix . 'email'] = $company->emailAddresses[0] ?? "";
+			$attributes[$tagPrefix . 'email'] = isset($company->emailAddresses[0]) ? $company->emailAddresses[0]->email :  "";
 			$attributes[$tagPrefix . 'invoice_email'] = $company->findEmailByType(\go\modules\community\addressbook\model\EmailAddress::TYPE_BILLING, true);
 			
 			foreach($company->phoneNumbers as $p) {
@@ -168,7 +203,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 			return $attributes;
 	} 
 	
-	public static function getContactAttributes($contact, $tagPrefix = 'contact:', $companyTagPrefix = 'company:'){
+	public static function getContactAttributes(Contact $contact, $tagPrefix = 'contact:', $companyTagPrefix = 'company:'){
 		$attributes[$tagPrefix . 'salutation'] = $contact->getSalutation();
 		$attributes[$tagPrefix . 'sirmadam']=$contact->gender=="M" ? \GO::t('sir') : \GO::t('madam');
 		
@@ -194,9 +229,12 @@ class Template extends \GO\Base\Db\ActiveRecord{
 				$attributes[$tagPrefix . 'formatted_address'] = $a->getFormatted();
 			}
 
-			$attributes[$tagPrefix . 'email'] = $contact->emailAddresses[0] ?? "";
-			$attributes[$tagPrefix . 'email2'] = $contact->emailAddresses[2] ?? "";
-			$attributes[$tagPrefix . 'email3'] = $contact->emailAddresses[3] ?? "";
+			$birthday = $contact->findDateByType(Date::TYPE_BIRTHDAY, false);
+      $attributes[$tagPrefix . 'birthday'] = $birthday && isset($birthday->date) ? $birthday->date->format(static::getDateFormat()) : "";
+
+			$attributes[$tagPrefix . 'email'] = isset($contact->emailAddresses[0]) ? $contact->emailAddresses[0]->email :  "";
+			$attributes[$tagPrefix . 'email2'] = isset($contact->emailAddresses[1]) ? $contact->emailAddresses[1]->email :  "";
+			$attributes[$tagPrefix . 'email3'] = isset($contact->emailAddresses[2]) ? $contact->emailAddresses[2]->email :  "";
 
 			$attributes[$tagPrefix . 'function'] = $contact->jobTitle;
 
@@ -262,7 +300,21 @@ class Template extends \GO\Base\Db\ActiveRecord{
 				
 				break;			
 		}
-				
+
+    $attributes = array_map(function($v) {
+      if($v instanceof \DateTime) {
+        //ugly but should work. If the time is not 0:00 then print it.
+        $format = self::getDateFormat();
+
+        if($v->format('Gi') > 0) {
+          $format .= ' ' . self::getTimeFormat();
+        }
+
+        return $v->format($format);
+      }
+
+      return $v;
+    },$attributes);
 		$attributes = array_filter($attributes, "is_scalar"); 
 		
 		

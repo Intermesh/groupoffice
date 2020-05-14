@@ -301,6 +301,7 @@ abstract class AbstractController extends Observable {
 			$allowWithoutModuleAccess = $this->allowWithoutModuleAccess();
 			if(!in_array($action, $allowWithoutModuleAccess) && !in_array('*', $allowWithoutModuleAccess))		
 			{
+				// return !!go()->getAuthState()->getClassPermissionLevel(static::class);
 				$module = $this->getModule();		
 				if($module && !$module->permissionLevel)
 					return false;

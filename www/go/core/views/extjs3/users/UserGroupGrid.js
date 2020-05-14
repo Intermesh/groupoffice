@@ -73,7 +73,7 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'name',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 						var user = record.get("user"),
-							style = user && user.avatarId ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("user").avatarId) + ')"' : "";
+							style = user && user.avatarId ?  'background-image: url(' + go.Jmap.thumbUrl(record.get("user").avatarId, {w: 40, h: 40, zc: 1}) + ')"' : "";
 
 						memberStr = record.get("users").column('displayName').join(", ");								
 						var more = record.json._meta.users.total - store.fields.item('users').limit;

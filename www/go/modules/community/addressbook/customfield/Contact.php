@@ -6,6 +6,7 @@ use GO;
 use go\core\db\Utils;
 use go\core\customfield\Base;
 use go\core\db\Criteria;
+use go\core\model\Acl;
 use go\core\orm\Filters;
 use go\core\orm\Query;
 use go\modules\community\addressbook\model;
@@ -75,6 +76,34 @@ class Contact extends Base {
 				$criteria->where($alias . '.name', $comparator, $value);
 			}
 		});
+	}
+
+	public function dbToText($value, &$values, $entity) {
+
+		if(empty($value)) {
+			return "";
+		}
+
+		return (new \go\core\db\Query())
+			->selectSingleValue("name")
+			->from('addressbook_contact')
+			->where(['id' => $value])
+			->single();
+	}
+
+	public function textToDb($value, &$values, $entity) {
+
+		if(empty($value)) {
+			return null;
+		}
+
+		$id = model\Contact::find(['id'])
+			->selectSingleValue("c.id")
+			->filter(['permissionLevel' => Acl::LEVEL_READ])
+			->where(['name' => $value])
+			->single();
+
+		return $id;
 	}
 }
 

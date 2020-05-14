@@ -48,10 +48,12 @@ CREATE TABLE `addressbook_contact` (
   `photoBlobId` binary(40) DEFAULT NULL,
   `language` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `jobTitle` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `department` VARCHAR(100) NULL DEFAULT NULL,
   `filesFolderId` int(11) DEFAULT NULL,
-  `uid` varchar(200) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
+  `uid` varchar(512) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
   `vcardBlobId` binary(40) DEFAULT NULL,
-  `uri` varchar(200) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL
+  `uri` varchar(512) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
+  `color` CHAR(6) NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `addressbook_contact_custom_fields` (
@@ -211,3 +213,5 @@ ALTER TABLE `addressbook_user_settings`
   ADD CONSTRAINT `addressbook_user_settings_ibfk_2` FOREIGN KEY (`defaultAddressBookId`) REFERENCES `addressbook_addressbook` (`id`) ON DELETE SET NULL;
 
 ALTER TABLE `addressbook_addressbook` ADD FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
+
+ALTER TABLE `addressbook_contact` ADD INDEX(`isOrganization`)

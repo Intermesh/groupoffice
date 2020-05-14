@@ -3,16 +3,13 @@
 namespace go\core\model;
 
 use GO\Base\Db\ActiveRecord;
-use go\core\model\Acl;
 use go\core\App;
 use go\core\db\Criteria;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
-use go\core\orm\Entity as Entity2;
 use go\core\orm\EntityType;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
-use go\core\model\Search;
 
 /**
  * Link model
@@ -40,12 +37,13 @@ use go\core\model\Search;
  * 
  * 
  */
-class Link extends Entity {
-	
+class Link extends Entity
+{
 	/**
 	 * The auto increment primary key
 	 * 
-	 * @var int 
+	 * @var int
+     *
 	 */
 	public $id;
 
@@ -249,6 +247,9 @@ class Link extends Entity {
 		if($this->toId == $this->fromId && $this->toEntityTypeId == $this->fromEntityTypeId) {
 			$this->setValidationError("toId", ErrorCode::UNIQUE, "You can't link to the same item");
 		}
+		if(!empty($this->description) && strlen($this->description) > 190) {
+			$this->setValidationError("description", ErrorCode::INVALID_INPUT, "Description field too long");
+		}
 	}
 	
 	protected function internalSave() {
@@ -266,9 +267,13 @@ class Link extends Entity {
 		
 		if($this->isNew()) {			
 			$this->updateDataFromSearch();
+			return App::get()->getDbConnection()->insertIgnore('core_link', $reverse)->execute();
 		}
-		
-		return App::get()->getDbConnection()->insertIgnore('core_link', $reverse)->execute();
+
+		return App::get()->getDbConnection()->updateIgnore('core_link',
+			['description' => $this->description],
+			['toId' => $this->fromId, 'toEntityTypeId' => $this->fromEntityTypeId, 'fromId' => $this->toId, 'fromEntityTypeId' => $this->toEntityTypeId]
+		)->execute();
 	}
 
 	private function updateDataFromSearch() {
@@ -380,7 +385,4 @@ class Link extends Entity {
 		}
 		return parent::sort($query, $sort);
 	}
-
-	
-	
 }

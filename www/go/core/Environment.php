@@ -35,7 +35,7 @@ class Environment extends Singleton {
 	 * @return int
 	 */
 	public function getMemoryLimit() {
-		return $this->configToBytes(ini_get('memory_limit'));
+		return self::configToBytes(ini_get('memory_limit'));
 	}
 	
 	/**
@@ -52,7 +52,7 @@ class Environment extends Singleton {
 	 * @return int
 	 */
 	public function getMaxUploadSize() {
-		return min($this->configToBytes(ini_get('post_max_size')), $this->configToBytes(ini_get('upload_max_filesize')), $this->configToBytes(ini_get('memory_limit')));
+		return min(self::configToBytes(ini_get('post_max_size')), self::configToBytes(ini_get('upload_max_filesize')));
 	}
 
 	/**

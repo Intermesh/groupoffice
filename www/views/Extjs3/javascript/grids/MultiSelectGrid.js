@@ -29,7 +29,7 @@ GO.grid.MultiSelectGrid = function (config){
 	
 	
 
-	Ext.apply(config, {
+	Ext.applyIf(config, {
 		plugins: [this.checkColumn],		
 		layout:'fit',
 		autoScroll:true,
@@ -247,12 +247,12 @@ Ext.extend(GO.grid.MultiSelectGrid, GO.grid.GridPanel,{
 
 		var max = this.store.data.items.length;
 		
-		if(select_records=='all' && max>50){
-			
-			if(!confirm(t("This action will select {count} items and might cause Group-Office to become slow. Are you sure you want continue?").replace('{count}', max).replace('Group-Office', GO.settings.config.product_name))){
-				return;
-			}
-		}
+		// if(select_records=='all' && max>50){
+		//
+		// 	if(!confirm(t("This action will select {count} items and might cause Group-Office to become slow. Are you sure you want continue?").replace('{count}', max).replace('Group-Office', GO.settings.config.product_name))){
+		// 		return;
+		// 	}
+		// }
 
 
 		for (var i=0; i < max;  i++)

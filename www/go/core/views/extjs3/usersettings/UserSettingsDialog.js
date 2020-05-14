@@ -11,11 +11,11 @@
  * @author Wesley Smits <wsmits@intermesh.nl>
  */
 go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
-	
 	modal:true,
-	resizable:true,
-	maximizable:true,
+	resizable: !GO.util.isMobileOrTablet(),
+	maximizable: !GO.util.isMobileOrTablet(),
 	iconCls: 'ic-settings',
+	cls: 'go-user-settings-dlg',
 	title: t("My account"),
 	width: dp(1000),
 	currentUserId:null,
@@ -32,8 +32,9 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		this.formPanel = new Ext.form.FormPanel({
 			waitMsgTarget:true,
 			region:'center',
+			hideMode: "offsets",
 			fileUpload: true,
-			baseParams : {}
+			baseParams : {}			
 		});
 		
 		//Add a hidden submit button so the form will submit on enter
@@ -51,7 +52,6 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		this.tabPanel = new Ext.TabPanel({
 			headerCfg: {cls:'x-hide-display'},
-			//layout: "card",
 			anchor: '100% 100%',
 			items: []
 		});
@@ -63,12 +63,13 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			fields: ['name', 'icon'],
 			data: []
 		});
-		
+
 		this.navMenu = new go.NavMenu({
 			region:'west',
 			width:dp(300),
 			store:this.tabStore,
-			listeners: {
+			listeners: {				
+				
 				selectionchange: function(view, nodes) {					
 					if(nodes.length) {
 						this.tabPanel.setActiveTab(nodes[0].viewIndex);
@@ -76,6 +77,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 						//restore selection if user clicked outside of view
 						view.select(this.tabPanel.items.indexOf(this.tabPanel.getActiveTab()));
 					}
+
+					this.formPanel.show();
 				},
 				scope: this
 			}
@@ -84,7 +87,7 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		Ext.apply(this,{
 			width:dp(1100),
 			height:dp(800),
-			layout:'border',
+			layout:'responsive',
 			closeAction:'hide',
 			items: [
 				this.navMenu,
@@ -105,6 +108,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		this.addPanel(go.usersettings.AccountSettingsPanel);
 		this.addPanel(go.usersettings.LookAndFeelPanel);
+
+		this.addPanel(go.usersettings.VisibleToPanel);
 		
 		// this.loadModulePanels();
 		
@@ -121,7 +126,26 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			});
 			this._addPanelCmp(pnl);
 		}, this);
-		
+
+
+		this.tools = [{
+			id: "left",
+			cls: 'go-show-tablet',
+			handler: function () {
+				this.navMenu.show();
+			},
+			scope: this
+		}];
+
+		this.navMenu.on("show", function() {
+			var tool = this.getTool("left");
+			tool.dom.classList.add('go-hide')
+		},this);
+
+		this.formPanel.on("show", function() {
+			var tool = this.getTool("left");
+			tool.dom.classList.remove('go-hide')
+		}, this);
 		
 		go.usersettings.UserSettingsDialog.superclass.initComponent.call(this);
 		
@@ -131,23 +155,20 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	
 	loadModulePanels : function() {
     
-		var available = go.Modules.getAvailable(), pnl, config, i, i1;
-		
+		var available = go.Modules.getAvailable(), pnl,pnlCls, config, i, i1, l, l2;
 		for(i = 0, l = available.length; i < l; i++) {
-			
 			config = go.Modules.getConfig(available[i].package, available[i].name);
 			
 			if(!config.userSettingsPanels) {
 				continue;			
 			}
-
-			if(!go.Modules.isAvailable(available[i].package, available[i].name, go.permissionLevels.read, this.user)) {
-				continue;
-			}
 			
 			for(i1 = 0, l2 = config.userSettingsPanels.length; i1 < l2; i1++) {
-				pnl = eval(config.userSettingsPanels[i1]);				
-				this.addPanel(pnl);
+				pnlCls = eval(config.userSettingsPanels[i1]);
+				pnl = new pnlCls({header: false, loaded: false, submitted: false});
+				if((pnl.adminOnly && go.User.isAdmin) || (!pnl.adminOnly && go.Modules.isAvailable(available[i].package, available[i].name, go.permissionLevels.read, this.user))) {
+					this._addPanelCmp(pnl);
+				}
 			}
 		}
 
@@ -160,7 +181,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 */
 	show: function(){
 		go.usersettings.UserSettingsDialog.superclass.show.call(this);
-		this.navMenu.select(this.tabStore.getAt(0));
+
+		if(!GO.util.isTabletScreenSize()) {
+			this.navMenu.select(this.tabStore.getAt(0));
+		}
 	},
 	
 	/**
@@ -257,10 +281,12 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 				this.submitComplete(response);
 			} else
 			{
-				for(name in response.notUpdated[id].validationErrors) {
-					var field = this.formPanel.getForm().findField(name);
-					if(field) {
-						field.markInvalid(response.notUpdated[id].validationErrors[name].description);
+				if(response.notUpdated && id in response.notUpdated) {
+					for (var name in response.notUpdated[id].validationErrors) {
+						var field = this.formPanel.getForm().findField(name);
+						if (field) {
+							field.markInvalid(response.notUpdated[id].validationErrors[name].description);
+						}
 					}
 				}
 				
@@ -338,27 +364,27 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			me.actionStart();
 			me.fireEvent('loadstart',me, me.currentUserId);
 
-			go.Db.store("User").get([me.currentUserId], function(users){
-				me.user = users[0];
+			go.Db.store("User").single(me.currentUserId).then(function(user){
+				me.user = user;
 				me.loadModulePanels();
 
-				me.formPanel.getForm().setValues(users[0]);
-				
-				me.findBy(function(cmp,cont){
-					if(typeof cmp.onLoad === 'function') {
-						cmp.onLoad(users[0]);
+				// loop through child panels and call onLoadComplete function if available
+				me.tabPanel.items.each(function(tab) {
+					if(tab.onLoadStart) {
+						tab.onLoadStart(me.currentUserId);
 					}
 				},me);
 
-				me.loadComplete(users[0]);
-			}, me);
+				me.formPanel.getForm().setValues(user);
+				
+				me.findBy(function(cmp,cont){
+					if(typeof cmp.onLoad === 'function') {
+						cmp.onLoad(user);
+					}
+				},me);
 
-			// loop through child panels and call onLoadComplete function if available
-			me.tabPanel.items.each(function(tab) {
-				if(tab.onLoadStart){
-					tab.onLoadStart(me.currentUserId);
-				}
-			},me);
+				me.loadComplete(user);
+			});
 		}
 		
 		// The form needs to be rendered before the data can be set
@@ -449,16 +475,11 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 * @param boolean passwordProtected
 	 */
 	addPanel : function(panelClass, position){
-		var cfg = {
+		this._addPanelCmp(new panelClass({
 			header: false,
 			loaded:false,
 			submitted:false
-		};
-
-		
-		var pnl = new panelClass(cfg);
-		this._addPanelCmp(pnl, position);
-		
+		}), position);
 	},
 	
 	_addPanelCmp : function(pnl, position) {

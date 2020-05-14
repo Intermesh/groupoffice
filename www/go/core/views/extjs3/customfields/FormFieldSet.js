@@ -19,7 +19,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		Ext.apply(this, {
 			title: this.fieldSet.name,
 			items: items,
-			stateId: 'cf-form-field-set-' + this.fieldSet.id,
+			stateId: 'cf-form-' +  (this.fieldSet.isTab ? "tab-" : 'field-set-' )  + this.fieldSet.id,
 			stateful: true,
 			collapsible: true
 		});
@@ -80,8 +80,53 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 					}
 				}, this);
 			}
-			
-			
+
+			/**
+			 * Related fields
+			 */
+			var masterFields = [];
+			this.items.each(function(field) {
+				if (field.conditionallyHidden || field.conditionallyRequired) {
+					var linkedField = go.customfields.type.Text.prototype.getRequiredConditionField.call(field, field);
+					if (linkedField) {
+						linkedField.relatedFields = linkedField.relatedFields || [];
+						linkedField.relatedFields.push(field);
+						masterFields.push(linkedField);
+					}
+				}
+			}, this);
+
+			function uniqueFieldsFilter(value, index, self) {
+				return self.indexOf(value) === index;
+			}
+			masterFields = masterFields.filter(uniqueFieldsFilter);
+
+			Ext.each(masterFields, function(masterField) {
+				masterField.on('select', function (field) {
+					Ext.each(field.relatedFields, function(relatedField) {
+						relatedField.validate();
+						relatedField.show();
+						relatedField.ownerCt.doLayout();
+						return true;
+					});
+				});
+
+				masterField.on('check', function (field) {
+					Ext.each(field.relatedFields, function(relatedField) {
+						relatedField.validate();
+						if (relatedField.conditionallyHidden && relatedField.isVisible()) {
+							relatedField.hide();
+							relatedField.ownerCt.doLayout();
+							return true;
+						}
+
+						relatedField.show();
+						relatedField.ownerCt.doLayout();
+						return true;
+					});
+				});
+			}, this);
+
 		}, this);
 
 		go.customfields.FormFieldSet.superclass.initComponent.call(this);
@@ -129,7 +174,5 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	
 	}
 });
-	
-	
 
 Ext.reg("customformfieldset", go.customfields.FormFieldSet);

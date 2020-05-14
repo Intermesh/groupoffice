@@ -718,7 +718,10 @@ class goMail extends GoBaseBackendDiff {
 	 * @return array
 	 */
 	public function GetMessageList($folderid, $cutoffdate) {
-		
+
+//		\GO\Base\Mail\ImapBase::$debug = true;
+//		GO()->getDebugger()->enable();
+
 		ZLog::Write(LOGLEVEL_DEBUG, "GetMessageList($folderid, $cutoffdate)");
 		$messages = array();
 
@@ -732,12 +735,17 @@ class goMail extends GoBaseBackendDiff {
 					$headers = $imap->get_flags();
 				} else
 				{
-					ZLog::Write(LOGLEVEL_DEBUG, 'Client sent cutoff date for calendar: ' . \GO\Base\Util\Date::get_timestamp($cutoffdate));
+					ZLog::Write(LOGLEVEL_DEBUG, 'Client sent cutoff date for calendar: ' . date("j-M-Y", $cutoffdate));
 					$uids = $imap->search('SINCE ' . date("j-M-Y", $cutoffdate));
 					if(empty($uids)) {
 						return [];
 					}
 					$headers = $imap->get_flags(min($uids).':*');
+				}
+
+				if(!$headers) {
+					ZLog::Write(LOGLEVEL_ERROR, "IMAP returned error reponse" . $imap->last_error());
+					return [];
 				}
 				
 				
@@ -773,18 +781,21 @@ class goMail extends GoBaseBackendDiff {
 		
 		ZLog::Write(LOGLEVEL_DEBUG, "GetFolder($id)");
 
-		$folder = new SyncFolder();
-		$folder->serverid = $id;
-		
 		if(empty($this->_emailFolders)) {
 			$this->GetFolderList();
 		}
 
-		if (isset($this->_emailFolders[$id])) {
-			$folder->displayname = $this->_emailFolders[$id]['displayname'];
-			$folder->type = $this->_emailFolders[$id]['type'];
-			$folder->parentid = $this->_emailFolders[$id]['parentid'];
+		if (!isset($this->_emailFolders[$id])) {
+			ZLog::Write(LOGLEVEL_WARN, "E-mail folder '$id' not found");
+			return false;
 		}
+
+
+		$folder = new SyncFolder();
+		$folder->serverid = $id;
+		$folder->displayname = $this->_emailFolders[$id]['displayname'];
+		$folder->type = $this->_emailFolders[$id]['type'];
+		$folder->parentid = $this->_emailFolders[$id]['parentid'];
 
 		return $folder;
 	}

@@ -161,3 +161,21 @@ CREATE TABLE `test_d` (
 --
 ALTER TABLE `test_d`
   ADD PRIMARY KEY (`id`);
+
+
+
+CREATE TABLE `test_a_map` (
+  `aId` int(11) NOT NULL,
+  `anotherAId` int(11) NOT NULL,
+  `description` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE `test_a_map`
+  ADD PRIMARY KEY (`aId`,`anotherAId`),
+  ADD KEY `anotherAId` (`anotherAId`);
+
+
+ALTER TABLE `test_a_map`
+  ADD CONSTRAINT `test_a_map_ibfk_1` FOREIGN KEY (`aId`) REFERENCES `test_a` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `test_a_map_ibfk_2` FOREIGN KEY (`anotherAId`) REFERENCES `test_a` (`id`);

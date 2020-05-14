@@ -1,3 +1,456 @@
+- Address book: Added 'Department' field.
+
+16-04-2020 6.4.132
+- Core: Improved file upload error handling
+- Assistant: files opening twice
+
+15-04-2020 6.4.131
+- Email: open attached file fixed for new uploader
+- Email/Tickets: Fixed ticket and e-mail counters. Issue: some issues on 6.4.130 #574
+- Tickets: Changing company in ticket didn't change company name
+- Tickets: Implemented show ticket function for external links
+- Core: Check for mysqlnd driver on upgrade and install
+- Core: Files not uploadable on older iOS fix by removing accept="*/*" (maybe)
+- Newsletters: Added "creator" column.
+
+10-04-2020 6.4.130
+- Billing: attachment could not be found
+- Core: Connection error when dowloading file
+
+10-04-2020 6.4.129
+- Core: New upload function with drag and drop support in the file browser and detail view.
+- Core: New notification slide panel
+- Core: Links can have descriptions again. Entities can be found on link descriptions.
+- Notes: New module to encrypt notes
+- Email: Delete folder directly when folders can't be moved into trash
+- Email: Empty folder will also remove subfolders.
+- Address book: Sort on firstname too when sorting on last name
+- Address book: Added first name and last name columns
+- Custom fields: Export user, group and contact custom fields to text
+- Billing: Check if telesales and fieldsales agent's still exists
+- CardDAV, CalDAV: Allow longer DAV uri's changed from 190 to 512 chars
+- Assistant: Message if not installed can be dismissed.
+- Tickets: fixed TypeError: undefined is not an object (evaluating 'this.disableTemplateCategoriesPanel.setModel')
+- Tickets: Invoicing failed on companies without country set.Set book earlier so it can be used for invoice country.
+- Notes: Added image insert menu button
+- Comments: Added image insert menu button
+- Custom fields: Type User, Group and Contact didn't show in legacy modules
+- Billing: update customer_name when contact changes too
+- Email: Fixed problem for some IMAP server where an attachment was downloaded with zero bytes
+- Core: Fixed error field style in Dark mode theme
+- Core: Implemented Dark theme html editor style
+- Core: Clear default calendar and task list in settings works
+- Core: Fixed connection error dialogs that could occur when downloading a file
+- Address book: Fixed error after creating new contact
+- Projects: Use {customer:* and {contact:* template tags on template projects, tasks and jobs. See https://groupoffice.readthedocs.io/en/latest/using/projects.html#jobs
+- E-mail: Drag files into editor to attach
+- E-mail: Fixed problem where tree wouldn't load if one of the mailboxes failed to open.
+
+17-03-2020 6.4.128
+- Billing: fixed error in opening invoice created by a deleted user.
+- E-mail: fixed error when loading message while it was deleted.
+- Core: missing use statement in GO.php
+
+17-03-2020 6.4.127
+- Core: Catch notification errors to fix error on Android phones.
+
+09-03-2020 6.4.126
+- Core: Select Heading, paragraph or code block in html editor
+- Files: Fixed missing download link when not using templates in email
+- Notes: Improved style and removed "Read more..."
+- Address book: Don't show default country in address
+- ActiveSync: Address was not synced if not filled in completely.
+
+05-03-2020 6.4.125
+- Core: Fixed error when double clicking some items.
+- Time tracking: projects with no template caused error in time tracking.
+
+02-03-2020 6.4.124
+- Core: Improved connection error handling
+- Address books: URL's were not displayed
+- Timeregistration: Set date to current view when adding time
+- Timeregistration: Small visual enhancements
+- Core: fireEvent 'mapping' will not bubble down
+- Billing: fixed broken delete button
+- Leavedays: Fixed invalid float value when saving employee
+
+28-02-2020 6.4.123
+- Calendar: Fixed error when saving resource
+- Core: Fixed error on saving groups
+- Email composer: sorted search recipients on last contact mail time
+- Tickets: Fixed status filter and status change in tickets
+- Billing: Added Save PDF to order files menu item
+
+21-02-2020 6.4.122
+- Projects: Business module code accidentally in projects
+
+21-02-2020 6.4.121
+- Billing: broken add and delete invoice button
+- Core: Removed deprecated timezones
+
+21-02-2020 6.4.120
+- Core: Send test message on Notification failed if you did not re-enter the password.
+- Core: Adding custom field select option didn't save
+- Billing: Clear items on opening new order
+- Core: Connection timeout shows error dialog
+- Billing: HTML formatting on frontpage text
+- Core: Handle invalid sort state which may happen when a (custom) column has been removed
+
+20-02-2020 6.4.119
+- Core: Don't use notification and popups on mobile
+- Google Authenticator: Show invalid code error
+- Google Authenticator: Accept spaces in code.  Fixed: 2FA Improvement #537
+- Tickets: Improved detail view
+- Billing: Improved detail view
+
+18-02-2020 6.4.118
+- Core: Removed user "Permissions" and moved it to a "Visible to" tab.
+- Core: Visual enhancements
+- Core: Added counters on collapsed detail panels
+
+17-02-2020 6.4.117
+- Tickets: Note background color restored
+- Projects: Error on login when not a projects admin
+
+14-02-2020 6.4.115
+- Core: Clear indexedDB cache when /install/upgrade.php has been executed
+- Calendar: Fixed event link not working first time when creating from another item via + button
+- Core: Various visual enhancements
+- Core: Fixed "Models are read only error"
+
+11-02-2020 6.4.114
+- Files / Core: fix for error loading comments after collapsing file browser popup
+- Projects: Support new framework filters
+- Projects: Added export to main grid
+- Core: fixed filter after fixed date
+
+10-02-2020 6.4.113
+- Core: Don't encode installation files with ioncube.
+- Core: Support fixed dates in date filters 
+
+07-02-2020 6.4.112
+- Core: Fixed bugs in group dialog with loading and changing users when deselecting
+- Core: Updated German translation
+- Address book: Select contact field always showed contacts and organizations
+- Tickets: Changing contact in ticket didn't work properly
+
+03-02-2020 6.4.111
+- Core: Remove fields from fieldset too after deleting fieldset and added loadmask
+- Core: Optimized indexes of core_link table for faster filtering in the address book
+- E-mail: Fixed converting non-latin characters when creating labels
+- Core / E-mail: Fixed paste and drop of file in html editor
+- Core: smaller font size for printing. Fixed at 12px.
+- ActiveSync: Fixed problem with invalid imap flags reponse causing mails to stay unread on the devices using ActiveSync
+- Core: Fixed invalid output problem on installation
+- Custom field: template parses {{createdAtShortYear}} and uses the last 2 digits of the year #554
+- Billing: Fixed font size in billing tax rate combo
+- Newsletters / Email: Fixed Add sender to address list function
+
+30-01-2020 6.4.110
+- Files / Core: Db check fixes acl problem with files
+- Newsletters: Newsletters set Content-Disposition: inline on attachments. They did not show up on Outlook
+- Calendar: Fixed error message when changing calendar
+- Calendar: Fixed error after saving with link
+- Sync: Only writable email accounts should be selectable for sync
+- ActiveSync: Some IMAP servers returned a response that GO did not understood which lead to an empty inbox on the phone
+
+28-01-2020 6.4.109
+- Note: decryption was broken for second encryption algorithm
+
+28-01-2020 6.4.108
+- Core: System settings only submits dirty values. Fixed a bug that caused SMTP password to be cleared for notifications.
+- Core: Setting empty quota didn't work
+- Sync: Fixed error in my account when no email module is available
+- Core / tickets: fixed error when tickets option "Show confirm dialog when closing tickets" was enabled
+- Core: Fixed user export / import
+- Files: Fixed reload issue after creating new folder for an item
+- Files: Refresh UI on change in folder or file dialog
+- Email: pagination on templates
+
+27-01-2020 6.4.107
+- Email: fixed missing email from template option
+- Email: Send didn't work when link was present
+
+24-01-2020 6.4.106
+- E-mail: Add attachment to e-mail from item
+- E-mail: Save / Download inline images context menu
+- E-mail: added email all files button
+- Comments: After opening an item in a popup an error would occur on every comment update.
+- Comments: cmd + enter on macos didn't work in Firefox
+- Users: Show disabled filter didn't work
+- Address book: Adding new organisation in new contact dialog raised an error.
+- Address book: Fixed Error in /usr/local/share/src/www/go/modules/community/addressbook/convert/VCard.php at line 105: Call to a member function format() on null at 2020-01-24T15:17:27+00:00
+
+22-01-2020 6.4.105
+- Core: Load external pages directly because check for existing tabs fail in current browsers
+- Files: Fixed error on search when having custom fields
+- Core: Fixed custom logo not displaying
+
+21-01-2020 6.4.104
+- Core: Fixed: PDOException 'shortDateInList' #536
+  Happened when default for shortDateInList was set to false
+- Project: E-mail all files from a folder
+- Notes: Fixed note decryption
+- Billing: fixed outstanding orders export
+- Billing: Fixed missing contact in recipient when creating invoice from contact
+- Core: support cmd + backspace on macos for deleting in grids
+- Core: Fixed small prints in Firefox
+- Filters: Some filters were not working with "NOT"
+- Filters: Sort combo alpabetically 
+- Address book: A manual sort was required after changing sorting by last or first name
+- Address book: Fixed missing contact fields in templates (email, company post address)
+- Leave days: Year summary didn't show if you had hours from last year but no new hours
+- Email: Zip of all attachments failed if content disposition was not attachment
+- Sieve: Remove :create flag in fileinto command
+- Tickets: Leave ticket blank by default didn't work anymore
+- Calendar: Set resource title of private event to "Private"
+- Calendar: Don't allow calendars from others as default calendar
+- Smime: Added OCSP revocation check
+
+16-01-2020 6.4.103
+- ActiveSync: Z-push fixed problem with tasks on iOS
+- Files: removed document and e-mail from template in file and folder panel
+- Files: Doubleclick from search was broken
+- Core: #202020048 Remove mcrypt dependency #542
+- Custom fields: Fixed problem with required condition
+
+14-01-2020 6.4.102
+- Address book: Fixed merge error with duplicate values
+- Email: Fixed error message when saving email as task
+- Newsletters: Users can be recipients now
+- Files: Fixed comments not showing for folders in filebrowser popup
+- Tasks: Fixed comments editor error in Chrome after adding task
+- Core: Fixed error when saving new group with module permission set
+- Timeregistration: Works without projects module permission again
+- Updated Croatian holidays
+- Core: Reminder request could trigger reload loop
+- Projects: Fixed name column state
+- Core: Updated Norwegian and German translations
+- Core: Focus on first invalid field and tab when save fails
+
+13-01-2020 6.4.101
+- Core: cron will run even though another instance of the cron process is still running. 
+- Newsletters: When cron runs check if newsletters has been active in the past minute. If not then start sending.
+- Addressbook: Fixed bug in company custom fields migration
+ 
+13-01-2020 6.4.100
+- Core: Fixed problem where list could load older request results
+- Newsletters: Send email to address list owner when someone unsubscribes
+- Core: new filter "Has links to..." to find items linked to another type. For example find all contacts with invoices.
+- Core: Error handling for uncaught exceptions
+- Notes: ctrl + enter to submit
+- Address book: Adding contact to two groups immediately after eachother would only add it to the last one.
+- Address book: CSV import can update contacts
+- Address book: Improved import / export
+- Address book: Auto detect Outlook CSV mapping for import
+- Carddav: Fixed sync problem due to invalid uri's
+- Custom fields: Template custom field added and fixed error function custom field
+- Core: Use ErrorHandler::log instead of trigger_error to prevent exit of function on minor warnings
+- Core: Fixed truncate holidays tool
+
+07-01-2020 6.4.99
+- Core: Error could occur with module permissions because some cache was shared which should have been per user
+- Comments: Unable to edit fixed.
+- Comments: CTRL + ENTER to save
+- Tickets: CTRL + ENTER to save
+- Core: Improved CSV import and export to be more compatible with other formats
+
+02-01-2020 6.4.98
+- Assistant / files: Assistant host could be wrong when using proxy on the server
+- Billing: report timezone bug showing wrong results in year overview.
+- Email: White background in dark theme for mail
+- Email: Fixed count() error when searching
+- Core: Small visual UI improvements
+- Core: Updated Croatian translation
+
+23-12-2019 6.4.97
+- Core: header color override didn't work anymore
+
+23-12-2019 6.4.96
+- Files: Use template with E-mail download link
+- Comments: Composer only rendered at one item
+- Core: Dark mode theme (Beta)
+- Address book: Colored icon with initials when no photo is present.
+
+20-12-2019 6.4.95
+- Custom fields: Fixed visual problem with select options
+- Custom fields:ƒ Fixed problem that adding a field with a duplicate name was possible.
+- Core: Added new allowed groups function for authentication. You can restrict IP addresses per group from where you are allowed to login.
+- Address book: Added filter for contacts being in a group or not
+- Newsletters: Double click to open contact
+
+19-12-2019 6.4.94
+- Core: Updated Brasilian Portugese language
+- Custom fields: There were 2 extra decimals for numbers in templates
+- Projects: Set contact on new invoice
+- Core: Optimized various date column widths
+- Core: fixed export error with multi select custom fields in it.
+- Core: Paste from spreadsheet editors as HTML and not as an image
+- User: account creation checks for the max users count
+- Core: Improved printing view for Firefox
+- Address book: Select contact sorts alphabetically
+- Projects: Select user for time entry was missing
+
+17-12-2019 6.4.93
+- Email: improved search toolbar
+- Core: Use accent color for active search to make it more clear
+- Email: Emoji insert button added
+- Comments: Some buttons were hidden when container is small
+- Core: relation of type 'map' automatically changes state
+- Core: Fixed date and date time format in templates
+- Custom fields: Fixed save error when cache was not cleared and cleaned up code
+- API keys: Fixed delete error for API keys
+- E-mail: Reimplemented add unknown recipients
+- Core: Updated German translation
+- Core: Fixed incorrect info on synchronisation settings as admin
+- Files: Fixed file not found bug when downloading files
+- Core: Fixed missing back button on small screens for system settings dialog and user settings dialog
+- Newsletters: Unable to add new recipients when last recipient was removed
+- Custom fields: Hidden custom fields could show in detail view 
+
+10-12-2019 6.4.92
+- Address book: Add contact was broken
+- Core: Encode filename in upload header to support UTF-8 filenames
+- Core: try to convert CSV file uploads to UTF-8
+- Core: reverted enter to save because it caused problems when searching inside TabbedFormDialog.js
+
+
+10-12-2019 6.4.91
+- Custom fields: db migration contained broken code.
+- Email: content type application/eml opens within Group-Office
+
+10-12-2019 6.4.90
+- Zpush: mail sync was broken
+- Mail: cleanup script for removing orphaned mailboxes added
+
+09-12-2019 6.4.89
+- Files: We did an update to Group-Office which comes with a new implementation of the Group-Office Assistant. If you use this please update it to the new version. You can find it under "Files" for your operating system at this page:
+https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-device.html
+
+- Postfix admin: Auto grow alias field
+- Core: "Login enabled" checkbox visible when using IMAP or LDAP authentication
+- Email: Fixed error in sieve disconnect
+- EMail: Added new header X-Group-Office-Title: Group-Office 
+- Core: Cleaned up EntityStore code
+- Address book: Sorry, an unexpected error occurred: The contact groups must match with the addressBookId. Group ID: 10 belongs to 3 and the contact belongs to 1
+- Projects: Removed broken natural sort and added created and modified at columns
+- Custom fields: Ignore maxLength on text area's
+- Address book: Don't open links when selecting them for text copy
+- Core: Disable spell check on search fields
+- Core: Database check continues if there's an exception
+- Core: Different polyfill promise to support Windows XP with old Chrome.
+
+06-12-2019 6.4.88
+- Files: New Assistant implementation without webdav requirement. Clients need to be updated!
+- Address book: Added zipcode to text search and as zip: 1234 AB
+
+02-12-2019 6.4.87
+- Files: Missing new folder button
+- Core: Export sometimes only exported 40 records.
+
+29-11-2019 6.4.86
+- Projects: Resizable detail view
+- Files: Quicker access to files via toolbars.
+- Files: Folder upload restored.
+- Billing: contact: and compnany: template tags added back in
+- Address book: Some companies might not have been migrated to the new address book.
+- Core: removed incomplete employees module
+
+28-11-2019 6.4.85
+- Core: Logo didn't display if you didn't set a different primary color
+- Core: Reload did too many requests causing unnecessary load on the server
+- Projects: Added projects grid and works on mobile
+- Core: Enter to submit for older dialogs
+- Core: Reduced push checks to every 30s instead of 5s to reduce load on server
+
+26-11-2019 6.4.84
+- Files: works on mobile
+- Core: Fixed incorrect module sort order on first load
+- Core: Fixed image viewer for mobile
+- Core: Fixed install problem on multi instance
+
+22-11-2019 6.4.83
+- Core: Load state only on desktop
+- Core: Copy html editor style from text area element so it matches style from css and doesn't zoom on mobile
+- Address book / Core: Move files when properties affecting the path change and delete files when contact is deleted
+- Core: Fixed logging of deleted contacts and notes
+- Core: Fixed fatal error that aborted the 6.3 to 6.4 upgrade in some cases
+- Notes: Supports activity log
+- Core: Fixed error when setting module permissions on group
+- Core: Added title's to combo box list items so you can see the whole text when it' cut off.
+- Files: New folder button was missing in "Save as" mode
+- Projects: Icon column growing too large bug
+- Projects: Wrapping of tables for better display on smaller screens
+
+20-11-2019 6.4.82
+- Core: Create debug log file if not exists
+- Core: Added several uninstall commands and fixed entity type register
+- Core: Restored state from server
+
+19-11-2019 6.4.81
+- Core: Fixed switch user
+- Core: Performance optimzation by using jsonSerialize and output each jmap method indvidually
+- Core: Changed state saving to cookies so that you can have different states on different machines
+
+19-11-2019 6.4.80
+- Firefox: Workaround for indexeddb state error when firefox is in private browsing mode
+- Core: Disabled modules were loaded in the old framework settings causing problems.
+
+18-11-2019 6.4.79
+- Core: Replaced localForage with go.browserStorage to fix problem with Group-Office not always loading in multiple tabs.
+- Newsletters: Fixed problem with new lists not saving and showing
+- Core: Performance enhancements
+- Users: user display name can't be null
+
+15-11-2019 6.4.78
+- Core: Just log could not unserialize cache message
+- Core: Fixed dissapearing fieldset's after changing values
+- Comments: collapsible again
+- Address book: Fixed delete of contacts
+- Address book: Show selected organizations when creating a contact from an organization
+
+14-11-2019 6.4.77
+- Address book: problem with listing contacts without salutation
+
+14-11-2019 6.4.76
+- Activesync: fixed Can't get not existing property 'timezone' in 'GO\Tasks\Model\Task'
+- E-mail: E-mail printing blank pages fixed
+- Custom fields: Fixed adding unique indexes
+- Demo data: Fixed install
+- Core: Use thumbnailer for photo's an avatars
+
+12-11-2019 6.4.75
+- Billing: add total_outstanding
+- Core: Added check for mysqlnd driver for system requirements
+- Core: Lot's of performance optimizations
+- Fixed: Addressbook - Create and Modified date shows "undefined" next to the time #496
+
+11-11-2019 6.4.74
+- Core: System settings and My Account work on mobile
+- Address book: Edit form works on mobile
+- Core: Global search works on mobile
+- Core: Start Menu full screen on mobile
+- Core: Fixed responsive issue where grid would become smaller then configured
+- Tickets: Works on mobile
+- Core: Sort custom filters alphabetically
+- Core: Fix for user timezones different then client OS
+- Address book: Added street to filter options
+- Newsletters: Improved performance
+- Email: Save all attachements to items worked only one time
+- Core: Fixed AccesToken created from API-Key will expire after 1 week of inactivity #292
+- Time tracking: Works on mobile
+- Core: Smoother scrolling by preloading more.
+- Address book: Show who modified and created in detail
+- Notes: Show who modified and created in detail
+- ActiveSync: Fixed GroupOffice isn't respecting addressbook permissions - CRITICAL (#492
+- Core: Updated Spanish
+
+05-11-2019 6.4.73
+- Core: Fixed error where grid would not load
+- Core: Updated Spanish translation
+- LDAP: Group sync failed on some servers that returned "memberuid".
+- Sieve: Don't autocreate missing mailboxes
+
 31-10-2019 6.4.72
 - Core: Use SQL_CALC_FOUND_ROWS to calculate total
 - Core: Updated Spanish translation
@@ -397,6 +850,38 @@
 11-06-2019 6.4.21
 - First release. Read the release notes here: https://groupoffice.blogspot.com/2019/06/group-office-64-released.html
 
+- Calendasr: Show unconfirmed holidays
+- Projects: Send company id when selecting contact
+
+
+- Sieve: Fixed bug where sieve dialog showed folders of other account
+
+27-01-2020 6.3.89
+- Tickets: Show confirm on closing tickets option broke module settings and email viewing.
+
+22-01-2020 6.3.88
+- Core: removed broken required_condition from 6.3
+
+21-01-2020 6.3.87
+- Sieve: Remove :create flag in fileinto command
+- Tickets: Leave ticket blank by default didn't work anymore
+- Calendar: Set resource title of private event to "Private"
+- Calendar: Don't allow calendars from others as default calendar
+- Smime: Added OCSP revocation check
+
+19-12-2019 6.3.86
+- Projects: Send company id when selecting contact
+- User: account creation checks for the max users count
+
+17-12-2019 6.3.85
+- Files: We did an update to Group-Office which comes with a new implementation of the Group-Office Assistant. If you use this please update it to the new version. You can find it under "Files" for your operating system at this page:
+https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-device.html
+
+- Calendar: Show unconfirmed holidays
+- Core: Fixed upgrade when $config['webmaster_email'] is not present.
+- Email: Fixed showing emoticons in email
+
+01-11-2019 6.3.84
 - Projects: Fixed activity sort in time tracking
 - Billing: Fixed total not always updating in expense dialog
 - Projects: Send contact ID when creating project from e-mail
@@ -7203,5 +7688,6 @@ First release including:
 - Addressbook
 - Scheduler
 - Project management (alpha)﻿
+
 
 

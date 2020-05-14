@@ -31,10 +31,12 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				"streetAddresses",
 				{name: 'organizations', type: "relation"},
 				"jobTitle",
+				"department",
 				"debtorNumber",
 				"registrationNumber",
 				"IBAN",
-				"vatNo"
+				"vatNo",
+				"color"
 			],
 			sortInfo :{field: go.User.addressBookSettings.sortBy, direction: "ASC"},
 			entityStore: "Contact"
@@ -105,13 +107,17 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 						var style = "margin-right:16px;", cls = "", content = '<i class="icon"></i>';
 
 						if (record.data.photoBlobId) {
-							style += 'background-image: url(' + go.Jmap.downloadUrl(record.data.photoBlobId) + ')';
+							style += 'background-image: url(' + go.Jmap.thumbUrl(record.data.photoBlobId, {w: 40, h: 40, zc: 1}) + '); background-color: transparent;';
 						} else
 						{
 							cls = record.data.isOrganization ? "organization" : "";
 							if(record.data.isOrganization) {
 								content = '<i class="icon">business</i>';
+							} else
+							{
+								content = go.util.initials(record.get('name'));
 							}
+							style += "background-image:none;background-color: #" + record.data.color;
 						}
 
 						var sortBy = go.User.addressBookSettings.sortBy, name;
@@ -190,6 +196,12 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'jobTitle'
 				}, {
 					hidden: true,
+					header: t('Department'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'department'
+				},  {
+					hidden: true,
 					header: t('Registration number'),
 					width: dp(160),
 					sortable: true,
@@ -214,6 +226,17 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'vatNo'
 				},
 				{
+					id: 'phoneNumbers',
+					header: t('Phone numbers'),
+					sortable: false,
+					dataIndex: "phoneNumbers",
+					width: dp(300),
+					hidden: true,
+					renderer: function (phoneNumbers, meta, record) {
+						return phoneNumbers.column("number").join(", ");
+					}
+				},
+				{
 					id: 'emailAddresses',
 					header: t('E-mail addresses'),
 					sortable: false,
@@ -223,6 +246,18 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					renderer: function (emailAddresses, meta, record) {
 						return emailAddresses.column("email").join(", ");
 					}
+				},{
+					id: 'firstName',
+					header: t('First name'),
+					sortable: true,
+					dataIndex: "firstName",
+					hidden: true
+				},{
+					id: 'lastName',
+					header: t('Last name'),
+					sortable: true,
+					dataIndex: "lastName",
+					hidden: true
 				}
 			],
 			viewConfig: {
@@ -257,6 +292,22 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 		
 
 		go.modules.community.addressbook.ContactGrid.superclass.initComponent.call(this);
+	},
+
+	applyState: function(state) {
+
+		this.supr().applyState.call(this, state);
+
+		var sort = this.store.getSortState();
+		if(!sort) {
+			return;
+		}
+
+		// If user changed sort preference in my account then change the saved sort state
+		if((sort.field == 'name' || sort.field == 'lastName') && go.User.addressBookSettings.sortBy != sort.field) {
+			this.store.setDefaultSort(go.User.addressBookSettings.sortBy, sort.direction);
+		}
+
 	},
 	
 
@@ -298,23 +349,25 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				}
 
 				if (btn ==="ok") {
-					var updates = {};
+					var updates = {}, me = this;
 
-
-					selectedRecords.forEach(function (r) {
-						var groupIndex = r.json.groups.indexOf(groupId);
+					go.Db.store("Contact").get(ids).then(function(result) {
+						result.entities.forEach(function (contact) {
+							var groupIndex = contact.groups.indexOf(groupId);
 //							console.log(groupIndex, groupId, r.json.groups);
-						updates[r.id] = {
-							groups: GO.util.clone(r.json.groups)
-						};
-						updates[r.id].groups.splice(groupIndex, 1);
+							updates[contact.id] = {
+								groups: go.util.clone(contact.groups)
+							};
+							updates[contact.id].groups.splice(groupIndex, 1);
+						});
+
+						me.getStore().remove(selectedRecords);
+
+						me.getStore().entityStore.set({
+							update: updates
+						});
 					});
 
-					this.getStore().remove(selectedRecords);
-
-					this.getStore().entityStore.set({
-						update: updates
-					});
 				}
 			},
 			scope: this,

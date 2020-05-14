@@ -31,7 +31,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			title: t('Global','users','core'),
 			labelWidth:dp(160),
 			defaults: { 
-				width:dp(200),
+				anchor: "100%",
 			},
 			items:[
 				this.themeCombo = new Ext.form.ComboBox({
@@ -124,7 +124,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 		
 		this.regionFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(160),
-			defaults: { width:dp(200) },
+			defaults: { anchor: "100%" },
 			title: t('Regional','users','core'),
 			items:[
 				this.languageCombo = new Ext.form.ComboBox({
@@ -320,16 +320,22 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 									icon: 'views/Extjs3/themes/Group-Office/images/groupoffice.ico'
 								}
 								// Let's check if the browser supports notifications
+
 								if (!("Notification" in window)) {
 									// Browser does not support desktop notification and will show a popup instead
 								} else if (Notification.permission !== 'granted' && (Notification.permission !== 'denied' || Notification.permission === "default")) {
 									Notification.requestPermission(function (permission) {
 									// If the user accepts, let's create a notification
-									if (permission === "granted") {
-										 var notification = new Notification(t("Desktop notifications active"),options);
-									} else {
-										cb.setValue(false);
+									try {
+										if (permission === "granted") {
+											var notification = new Notification(t("Desktop notifications active"), options);
+											return true;
+										}
+									} catch(e) {
+										// ignore failure on android
 									}
+									cb.setValue(false);
+
 									});
 								}
 							} 
@@ -381,16 +387,25 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			items: [
 				{
 					columnWidth: .5,//left
-					items:[this.globalFieldset,this.regionFieldset,{
+					mobile: {
+						columnWidth: 1
+					},
+					items:[this.globalFieldset,this.regionFieldset
+						
+						,{
 						xtype:'button',
 						style:'margin-left:14px',
 						handler:this.resetState,
 						scope:this,
 						text:t('Reset windows and grids'),
 						anchor:''
-					}]
+					}
+				]
 				},{
 					columnWidth: .5,//right
+					mobile: {
+						columnWidth: 1
+					},
 					items: [this.formattingFieldset,this.soundsFieldset,this.notificationsFieldset]
 				}
 			]

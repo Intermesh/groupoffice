@@ -64,7 +64,7 @@
 		position: relative;
 		margin: 0 auto;
 		top: dp(5);			
-		background-color: white;
+		background-color: color($bg, "background");
 		padding: dp(20) dp(40);
 		font-size: dp(18);
 		@extend .z12;
@@ -162,25 +162,43 @@
 	}
 	
 }
-.x-tab-strip { 
+.x-tab-strip {
+
+	> li {
+		border-bottom: dp(4) solid transparent;
+		min-width: dp(72);
+		max-width: dp(264);
+		height: dp(48);
+		text-align:center;
+		line-height: dp(48);
+		padding: 0 dp(12);
+	}
+
 	&-top{
 		//width:100%; 
 		//display: flex;
 		//justify-content: center; // turn on to center tabs wont work with overflow
 		//flex-direction: row;
 		height: dp(48);
-		border-bottom: 2px solid transparent;
+		//border-bottom: 2px solid transparent;
 		@include var(color, c-primary);
 	}
 	&-bottom{
-		background-color:#cedff5;
-		border-top-color:#8db2e3;
+		height: dp(48);
+		//border-top: 2px solid transparent;
+		@include var(color, c-primary);
+		//background-color:#cedff5;
+		//border-top-color:#8db2e3;
+		> li {
+			border-top: dp(4) solid transparent;
+			border-bottom: 0;
+		}
 	}
 	&-wrap {
 		padding: 0 dp(4);
+		border-bottom: 1px solid color($fg, 'line');
 	}
-	&-active {
-		border-bottom: dp(4) solid transparent;
+	>li.x-tab-strip-active {
 		@include var(border-color, c-primary);
 		span.x-tab-strip-text {
 			@include var(color, c-primary);
@@ -192,14 +210,7 @@
 	&-disabled .x-tabs-text {
 		color: color($fg, 'disabled');
 	}
-	> li {
-		min-width: dp(72);
-		max-width: dp(264);
-		height: dp(48);
-		text-align:center;
-		line-height: dp(48);
-		padding: 0 dp(12);
-	}
+
 	span.x-tab-strip-text {
 		padding:0;
 		color: color($fg, 'text');
@@ -314,7 +325,21 @@
 	line-height: dp(18);
 }
 
+.ext-mb-input {
+	@extend %font-data;
+	color: color($fg, 'text');
+	min-height: dp(32);
+	line-height: dp(18);
+	transition: border-color 100ms linear, box-shadow 225ms linear;
+	border-radius: dp(4);
+	background-color:color($bg, 'box');
+	border: 1px solid color($fg, 'track');
+	display: inline-block;
+	padding: dp(6) dp(8);
+}
+
 .x-form{
+	background-color: color($bg, 'form');
 	> .x-tab-panel {
 		 > .x-tab-panel-bwrap> .x-tab-panel-body > div { // tabbed form dialog
 			background-color:color($bg, 'form');
@@ -460,7 +485,7 @@
 		@extend %icon;
 		padding: dp(8) 0;
 		content: 'report_problem';
-		color: color($red, 700);
+		color: $cDanger;
 	}
 	
 	&-focus, textarea.x-form-focus {
@@ -468,8 +493,8 @@
 		@include var(border-color, c-primary);
 	}	
 	&-invalid, textarea.x-form-invalid {
-		border-color: rgba(color($red, 700),0.54);
-		background-color: lighten(color($red,100),9%);
+		border-color: rgba($cDanger,0.54);
+		background-color: $cDangerBg;
 	}
 	
 	&-helptext {
@@ -541,10 +566,8 @@
 	@include var(color, c-primary);
 }
 .x-form-invalid + .x-form-trigger {
-	border-color: color($red, 500);
+	border-color: $cDanger;
 }
-
-
 
 .x-item-disabled .x-form-trigger-over {
 	border-bottom-color:#b5b8c8;
@@ -559,11 +582,9 @@
 	background-image: none;
 }
 
-.x-form-invalid.x-form-composite .x-form-invalid {
-	background-color:#fff;
-	/*background-image:url(../images/default/grid/invalid_line.gif);*/
-	border-color:#c30;
-}
+//.x-form-invalid.x-form-composite .x-form-invalid {
+//	border-color:#c30;
+//}
 
 .x-form-inner-invalid, textarea.x-form-inner-invalid {
 	background-color:#fff;
@@ -595,15 +616,20 @@
 // }
 
 .x-fieldset {
-	border:0;
-	padding: dp(8) dp(16);
+	border: 1px solid color($fg, "line");
+	margin: dp(16);
+	&-noborder {
+		margin: 0;
+		border:0;
+	}
+	padding: dp(8) dp(16) dp(16);
 	~ .x-fieldset { border-top: 1px solid color($fg, 'divider'); }
 	legend {
 		/*@extend %font-caption;*/
 		/*color: color($primary, 900); //color($fg, 'text');*/
 		
-		@extend %font-subheading; //changed this to be the same as panel headers as they are mixed in forms	
-		float:left;		
+		@extend %font-subheading; //changed this to be the same as panel headers as they are mixed in forms
+		//float:left;
 		padding:dp(8) 0 dp(16);
 		position: initial;
 		top: dp(32);
@@ -695,12 +721,16 @@
 		}
 		&.x-btn-focus, &.x-btn-over {
 			@extend .z4;
-			button.x-btn-text {
-				color: $cPrimary;
-			}
+			//button.x-btn-text {
+			//	color: $cPrimary;
+			//}
 		}
 		&.x-btn-pressed {
 			@extend .z8;
+		}
+
+		&.accent {
+			@include var(background-color, c-accent);
 		}
 	}
 	.x-toolbar & {
@@ -722,8 +752,9 @@
 	//    background-color: color($grey, 200);
 	//  }
 	&.x-btn-focus, &.x-btn-over {
-		transition: background-color 195ms linear, box-shadow 195ms $curve-standard;
+		transition: background-color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
 		@include var(background-color, c-primary-tp);
+
 	}
 	&.primary {
 		.x-btn-text {
@@ -781,7 +812,7 @@
 			&::before {
 				@extend %icon;
 				position:absolute;
-				top:dp(8);
+				top:dp(8.5);
 				left:dp(8);
 			}
 		}
@@ -829,9 +860,9 @@
 	width: dp(8);
 }
 
-.x-btn-click .x-btn-text, .x-btn-menu-active .x-btn-text, .x-btn-pressed .x-btn-text{
-	color:#000;
-}
+//.x-btn-click .x-btn-text, .x-btn-menu-active .x-btn-text, .x-btn-pressed .x-btn-text{
+//	color:#000;
+//}
 
 .x-btn-disabled *{
 	color:color($fg, 'disabled-button') !important;
@@ -913,9 +944,13 @@
 			pointer-events: none;
 			opacity: 0;
 		}
+		.x-form-field-trigger-wrap > input {
+			padding-right: dp(56);
+		}
+
 		input {
 			box-shadow: none;
-			min-height: dp(56);
+			min-height: dp(48);
 			border:0;
 			+ .x-form-search-trigger {
 				min-height:dp(56);
@@ -940,7 +975,7 @@
 }
 
 .x-toolbar{
-	height: dp(56);
+	height: dp(48);
 	padding:0 dp(8) 0 0;
 	
 	&.go-paging-tb, .go-paging-tb & {
@@ -987,6 +1022,21 @@
 	}
 	.xtb-title {
 		padding-left: dp(8);
+		@extend %font-title;
+	}
+
+	.x-form-field-wrap {
+		margin: 0 dp(8);
+	}
+}
+
+.x-form-panel, .x-fieldset {
+	.x-toolbar {
+		.xtb-title {
+			@extend %font-subheading;
+		}
+	}
+	.x-panel-header-text {
 		@extend %font-subheading;
 	}
 }
@@ -1126,9 +1176,10 @@
 		}
 		&-row td {
 			@extend %font-caption;
+			color: color($fg, 'text');
 			border-left:0;
-			border-right: 1px solid;
-			border-image: linear-gradient(to bottom, transparent, color($fg, 'line')) 1 100%;
+			border-right: 1px solid color($fg, 'divider');
+			//border-image: linear-gradient(to bottom, transparent, color($fg, 'line')) 1 100%;
 			height: dp(32);
 			
 			&.x-grid3-cell-last {
@@ -1149,13 +1200,14 @@
 		//margin-top: dp(9); //don't understand why +1 here?
 		height:dp(32);
 		border-bottom: 1px solid color($fg, 'line');
+		background-color: color($bg, 'background');
 	}
 	&-cell-inner, &-hd-inner {
 		@extend .ellipsis;
 		// min-height: dp(40); //Seems to cause slightly off positioning in grid cells
 		padding: dp(6) dp(8) dp(6) dp(16); // 10 top = middle of row line-height 20dp
 		.ux-row-action-cell & {
-			padding: dp(8) 0;
+			padding: 0;
 		}
 		> em {
 			@extend %badge;
@@ -1257,9 +1309,9 @@
 	}
 	&-dirty-cell > div {
 		border-radius: $borderRadius;
-		border-left: dp(4) solid color($orange, 300);
+		border-left: dp(4) solid $cWarning;
 		padding-left: dp(12);
-		background-color: rgba(color($orange, 300), .08);
+		background-color: rgba($cWarning, .08);
 	}
 	&-body  {
 		/*min-height: dp(152);*/
@@ -1453,7 +1505,7 @@ td.grid-hd-group-cell {
 	// border-bottom: 1px solid color($fg, 'line');
 	// border-top: 1px solid color($fg, 'line');
 	
-	border-bottom: 2px solid color($fg, 'divider');
+	border-bottom: 0;//2px solid color($fg, 'divider');
 
 	div.x-grid-group-title {
 		@extend %font-caption;
@@ -1544,11 +1596,11 @@ td.grid-hd-group-cell {
 	}
 	.x-dd-drop-nodrop & {
 		content: 'block';
-		color: color($red, 700);
+		color: $cDanger;
 	}
 	.x-dd-drop-ok &, .x-tree-drop-ok-append & {
 		content: 'done';
-      color: color($green, 700);
+      	color: $cSuccess;
 	}
 }
 
@@ -1841,7 +1893,7 @@ td.grid-hd-group-cell {
 }
 
 .x-date-mp {
-	background-color:#fff;
+	background-color: color($bg, 'background');
 }
 
 .x-date-mp td {
@@ -1976,7 +2028,7 @@ td.x-date-mp-sep {
 		opacity: 0;
 		transform: scale(0.6);
 	}
-	&-list { 
+	&-list {
 		padding: dp(8) 0; 
 		overflow-y: auto;
 		-webkit-overflow-scrolling: touch;
@@ -1984,7 +2036,8 @@ td.x-date-mp-sep {
 	&-floating{ border:0; }
 	&-nosep { background-image:none; }
 	&-sep {
-		margin: dp(16) 0 dp(16) 0;
+		margin: dp(8) 0;
+		height: 1px;
 		background-color: color($fg, 'divider');
 		border:0;
 	}
@@ -2033,7 +2086,7 @@ td.x-date-mp-sep {
 	}
 	&-group-item .x-menu-item-icon{ background-image:none;}
 	&-plain {
-		background-color:#f0f0f0 !important;
+		//background-color:#f0f0f0 !important;
 		background-image: none;
 	}
 }
@@ -2055,12 +2108,12 @@ a.x-menu-group-item .x-menu-item-text:before{
 }
 
 
-.x-date-menu, .x-color-menu{
-	background-color: #fff !important;
-}
+//.x-date-menu, .x-color-menu{
+//	background-color: #fff !important;
+//}
 
 .x-menu .x-date-picker{
-	border-color:#a3bad9;
+	border: 1px solid color($fg, 'line');
 }
 
 .x-cycle-menu .x-menu-item-checked {
@@ -2173,14 +2226,14 @@ $menuScrollerSize : dp(4);
 // ##################
 .x-combo-list {
 	@extend %font-body1;
-	border: 0;
+	border: 1px solid color($fg, 'line');
 	border-radius: $borderRadius;
-	background-color: color($bg, 'card');
+	background-color: color($bg, 'dialog');
 	&-inner {
 		padding: dp(8) 0;
-		background-color:#fff;
+		//background-color:#fff;
 		h4 {
-			padding: dp(8) dp(8) dp(8) dp(24);
+			padding: dp(8);
 		}
 	}
 	&-hd {
@@ -2195,12 +2248,11 @@ $menuScrollerSize : dp(4);
 		@extend %font-caption;
 	}
 	.x-combo-selected {
-		background-color: color($grey, 100);
+		background-color: $cSelected; //color($grey, 100);
 	}
 	.x-toolbar {
 		height: dp(40);
 		border-top: 1px solid color($fg, 'line');
-		input {min-height: 14px;}
 		.xtb-sep { display:none;}
 		.x-toolbar-cell {padding:0;}
 	}
@@ -2231,19 +2283,23 @@ $menuScrollerSize : dp(4);
 	}
 }
 .x-panel{
+	border: 1px solid color($fg, "line");
+	&-noborder {
+		border:0;
+	}
 	&-body {
       border:0;
 			-webkit-overflow-scrolling: touch;
 	}
 	&-header {
-      border: 0;
+		border: 0;
 		border-top: 1px solid color($fg, 'divider');
-      padding: 0 dp(8) 0 dp(14);
-      height: dp(56);
-      line-height: dp(56);
-      //background-color:$cPrimary;
+		padding: 0 dp(8) 0 dp(14);
+     height: dp(48);
+     line-height: dp(48);
+     //background-color:$cPrimary;
 		&-text {
-			@extend %font-subheading;
+			@extend %font-title;
 			//padding-left: dp(8);
 		}
       .x-border-panel > & {
@@ -2252,10 +2308,9 @@ $menuScrollerSize : dp(4);
 	}
 	&-icon::before { 
 		@extend %icon;		
-		margin-top: dp(-4);
+		//margin-top: dp(-4);
 		float: left;
-		padding: dp(20) sp(16) dp(20) 0;
-	}
+		padding: dp(12) sp(16) dp(12) 0;	}
 	&-collapsed {
 		.x-window-tl {
 			border-bottom-color:#84a0c4;
@@ -2278,26 +2333,29 @@ $menuScrollerSize : dp(4);
 .x-tool{
 	margin: dp(8) 0;
 	position:relative;
-	width:dp(40);
-	height:dp(40);
-	border-radius: 50%;
-	transition: background 250ms linear;
+	width:dp(32);
+	height:dp(32);
+	&:hover {
+		@include var(color, c-primary);
+	}
+//	border-radius: 50%;
+//	transition: background 250ms linear;
 	&::before{
 		position: absolute;
 		top: 50%;
 		left:50%;
 		transform: translate(-50%, -50%);
 	}
-	.x-window-header & {
-
-	}
-/*	&-toggle {
-		float: left;
-	}*/
-	&:hover {
-		transition-duration: 85ms;
-		@include var(background-color, c-primary-tp);
-	}
+//	.x-window-header & {
+//
+//	}
+///*	&-toggle {
+//		float: left;
+//	}*/
+//	&:hover {
+//		transition-duration: 85ms;
+//		@include var(background-color, c-primary-tp);
+//	}
 }
 .x-border-layout-ct {
 	box-shadow: none;
@@ -2322,7 +2380,7 @@ $menuScrollerSize : dp(4);
 
 .x-panel-mc {
 	@extend %font-body2;
-	background-color:white;
+	background-color: color($bg, 'box');
 }
 
 .x-panel-ghost {
@@ -2354,9 +2412,19 @@ $menuScrollerSize : dp(4);
 	background-color:color($bg,'dialog');
 	border-radius: $borderRadius;
 	overflow:hidden;
-	//border: 1px solid color($fg, 'line');
-	&-footer.x-panel-btns {
-		padding: dp(8);
+	border: 1px solid color($fg, 'line');
+	&-noborder, &-maximized{
+		border: 0;
+		.x-window-header {
+			border-radius: 0;
+		}
+	}
+	&-footer {
+		padding: dp(4);
+		border-top: 1px solid color($fg, 'line');
+	}
+	&-footer-noborder {
+		border-top: 0;
 	}
 	&-header {
 		@extend %font-title;
@@ -2368,9 +2436,12 @@ $menuScrollerSize : dp(4);
 			overflow:hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
-			height: dp(56);
-			line-height: dp(56);			
+			height: dp(48);
+			line-height: dp(48);
 		}
+	}
+	&-header-noborder {
+		border-bottom: 0;
 	}
 	&-mc {
 		@extend %font-body1;
@@ -2473,9 +2544,10 @@ body.x-body-masked .x-window-plain .x-window-mc {
 	}
 }
 
-$resizerSize : dp(2);
+$resizerSize : dp(3);
 .x-layout-split {
-	background-color: color($fg,'divider');
+	border-right: 1px solid color($fg,'line');
+	border-top: 1px solid color($fg,'line');
 	&.x-splitbar {
 		&-h {
 			width:$resizerSize;
@@ -2685,7 +2757,7 @@ input[value="0"] + .x-slider .x-slider-thumb {
 	@extend %icon;
 	content: 'warning';
 	font-size:2.2em;
-	color: color($orange, 500);
+	color: $cWarning;
 }
 
 .x-window-dlg .ext-mb-question:after {

@@ -33,37 +33,32 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 		var me = this;
 		
 		this.store = new go.data.Store({
-			fields: [
-				'id', 
-				'username', 
-				'displayName',
-				'avatarId',
-				'loginCount',
-				{name: 'createdAt', type: 'date'},
-				{name: 'lastLogin', type: 'date'}	,
-				{
-					name: 'selected', 
-					type: {
-						convert: function (v, data) {							
-							return me.selectedUsers.indexOf(data.id) > -1;
+				fields: [
+					'id',
+					'username',
+					'displayName',
+					'avatarId',
+					'loginCount',
+					{name: 'createdAt', type: 'date'},
+					{name: 'lastLogin', type: 'date'},
+					{
+						name: 'selected',
+						type: {
+							convert: function (v, data) {
+								return me.selectedUsers.indexOf(data.id) > -1;
+							}
+						},
+						sortType: function (checked) {
+							return checked ? 1 : 0;
 						}
-					},
-					sortType:function(checked) {
-						return checked ? 1 : 0;
 					}
-				}
-			],
-			baseParams: {
-				filter: {
-					selectForGroupId: null
-				}
-			},
-			sortInfo: {
-				field: 'displayName',
-				direction: 'ASC'
-			},
-			entityStore: "User"
-		});
+				],
+				sortInfo: {
+					field: 'displayName',
+					direction: 'ASC'
+				},
+				entityStore: "User"
+			});
 
 		Ext.apply(this, {		
 			plugins: [checkColumn],
@@ -88,7 +83,7 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'displayName',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 						
-						var style = record.get('avatarId') ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("avatarId")) + ')"' : "";						
+						var style = record.get('avatarId') ?  'background-image: url(' + go.Jmap.thumbUrl(record.get("avatarId"), {w: 40, h: 40, zc: 1}) + ')"' : "";						
 						
 						return '<div class="user"><div class="avatar" style="' + style + '"></div>' +
 							'<div class="wrap">'+
@@ -110,12 +105,6 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 		this.store.on("beforeload", this.onBeforeStoreLoad, this);
 
 		go.groups.GroupUserGrid.superclass.initComponent.call(this);
-
-		this.on("render", function() {
-			if(!this.store.loaded) {
-				this.store.load();
-			}
-		}, this);
 
 	},
 
@@ -144,10 +133,11 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 	},
 
 	setValue: function (users) {
-		
 		this._isDirty = false;
 		this.selectedUsers = users;
-		this.store.load().catch(function(){});
+		if(!this.disabled) {
+			this.store.load().catch(function () {});
+		}
 	},
 	
 	onBeforeStoreLoad : function(store, options) {
@@ -155,22 +145,29 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 		if(this.store.filters.tbsearch || options.selectedLoaded || options.paging) {
 			return true;
 		}
-		
-		go.Db.store("User").get(this.selectedUsers, function(entities) {			
+
+		go.Db.store("User").get(this.selectedUsers, function(entities) {
+			entities.columnSort('displayName', true);
+
 			this.store.loadData({records: entities}, true);
-			this.store.sortData();
-			
+			// this.store.sortData();
+
 			this.store.setFilter('exclude', {
 				exclude: this.selectedUsers
 			});
-			
+
+			var me = this;
+
 			this.store.load({
 				add: true,
 				selectedLoaded: true
+			}).then(function() {
+				//when reload is called by SSE we need this removed.
+				delete me.store.lastOptions.selectedLoaded;
 			});
-			
+
 		}, this);
-		
+
 		return false;
 	},
 	

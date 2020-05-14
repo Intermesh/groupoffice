@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="40px" height="51px" viewBox="0 0 40 51" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
+    <title>wav</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="wav" fill-rule="nonzero">
+            <path d="M2.5,1 C1.115,1 0,2.115 0,3.5 L0,48.5 C0,49.885 1.115,51 2.5,51 L37.5,51 C38.885,51 40,49.885 40,48.5 L40,16 L26.25,14.75 L25,1 L2.5,1 Z" id="Shape" fill="#000000" opacity="0.2"></path>
+            <path d="M2.5,0 C1.115,0 0,1.115 0,2.5 L0,47.5 C0,48.885 1.115,50 2.5,50 L37.5,50 C38.885,50 40,48.885 40,47.5 L40,15 L26.25,13.75 L25,0 L2.5,0 Z" id="Shape" fill="#4F92D1"></path>
+            <path d="M25,1 L25,13.5 C25,14.8808 26.1193,16 27.5,16 L40,16 L25,1 Z" id="Shape" fill="#000000" opacity="0.2"></path>
+            <path d="M25,0 L25,12.5 C25,13.8808 26.1193,15 27.5,15 L40,15 L25,0 Z" id="Shape" fill="#88BAEA"></path>
+            <polygon id="Shape" fill="#000000" opacity="0.2" points="19 19 13 38.5 9.152 27 0 27 0 31 6.828 31 13 48 19 29 23 41 28 29 31.75 41 40 41 40 37 34 37 28 21 23 32"></polygon>
+            <polygon id="Shape" fill="#FFFFFF" points="19 18 13 37.5 9.152 26 0 26 0 30 6.828 30 13 47 19 28 23 40 28 28 31.75 40 40 40 40 36 34 36 28 20 23 31"></polygon>
+            <path d="M2.5,0 C1.115,0 0,1.115 0,2.5 L0,3.5 C0,2.115 1.115,1 2.5,1 L25,1 C25,0 25,1 25,0 L2.5,0 Z" id="Shape" fill="#FFFFFF" opacity="0.2"></path>
+        </g>
+    </g>
+</svg>

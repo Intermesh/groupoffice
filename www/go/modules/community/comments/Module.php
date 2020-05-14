@@ -3,6 +3,7 @@ namespace go\modules\community\comments;
 
 use go\core;
 use go\core\cron\GarbageCollection;
+use go\core\jmap\Entity;
 use go\core\orm\EntityType;
 use go\core\orm\Query;
 use GO\Base\Db\ActiveRecord;
@@ -35,7 +36,7 @@ class Module extends core\Module {
 
 		go()->debug("Cleaning up comments");
 		foreach($types as $type) {
-			if($type->getName() == "Link" || $type->getName() == "Search") {
+			if($type->getName() == "Link" || $type->getName() == "Search" ||  !is_a($type->getClassName(), Entity::class, true)) {
 				continue;
 			}
 

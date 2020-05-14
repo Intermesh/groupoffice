@@ -220,6 +220,8 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 				buttons: buttons
 			});
 		}
+
+
 		
 		this._panels=[];
 		
@@ -274,7 +276,21 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 			this.formPanel.add(this._panels[0]);
 		}
 		
-		this.items=this.formPanel;				
+		this.items=this.formPanel;
+
+		//Add a hidden submit button so the form will submit on enter
+
+		//problem with submit when searching
+
+		// this.formPanel.add(new Ext.Button({
+		// 	hidden: true,
+		// 	hideMode: "offsets",
+		// 	type: "submit",
+		// 	handler: function() {
+		// 		this.submitForm(true);
+		// 	},
+		// 	scope: this
+		// }));
 		
 		GO.dialog.TabbedFormDialog.superclass.initComponent.call(this); 
 		
@@ -479,13 +495,13 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 					this.summaryDialog.show();
 				}
 
+				this.fireEvent('submit', this, this.remoteModelId);
+				this.fireEvent('save', this, this.remoteModelId);
+
 				if (hide)
 				{
 					this.hide();
 				}
-
-				this.fireEvent('submit', this, this.remoteModelId);
-				this.fireEvent('save', this, this.remoteModelId);
 
 				this.refreshActiveDisplayPanels();
 
@@ -575,13 +591,13 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 						this.summaryDialog.show();
 					}
 
-					if(hide)
-					{
-						this.hide();	
-					}
-
 					this.fireEvent('submit', this, this.remoteModelId);
 					this.fireEvent('save', this, this.remoteModelId);
+
+					if(hide)
+					{
+						this.hide();
+					}
 
 					this.refreshActiveDisplayPanels();
 
@@ -618,6 +634,8 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 							}
 						}
 					}
+
+					go.form.Dialog.prototype.showFirstInvalidField.call(this);
 				},
 				scope: this
 			});	

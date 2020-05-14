@@ -285,3 +285,6 @@ CREATE TABLE IF NOT EXISTS `email_default_email_account_templates` (
   PRIMARY KEY (`account_id`),
   KEY `template_id` (`template_id`)
 ) ENGINE=InnoDB;
+
+
+ALTER TABLE `em_contacts_last_mail_times` ADD INDEX(`last_mail_time`);

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="40px" height="51px" viewBox="0 0 40 51" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
+    <title>xls</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="icons" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="xls" fill-rule="nonzero">
+            <path d="M2.5,0.9999999 C1.115,0.9999999 0,2.1149999 0,3.49999999 L0,48.4999999 C0,49.8849999 1.115,50.9999999 2.5,50.9999999 L37.5,50.9999999 C38.885,50.9999999 40,49.8849999 40,48.4999999 L40,16 L26.25,14.75 L25,0.9999999 L2.5,0.9999999 Z" id="Shape" fill="#000000" opacity="0.2"></path>
+            <path d="M2.5,0 C1.115,0 0,1.115 0,2.5 L0,47.5 C0,48.885 1.115,50 2.5,50 L37.5,50 C38.885,50 40,48.885 40,47.5 L40,15 L26.25,13.75 L25,0 L2.5,0 Z" id="Shape" fill="#5FA762"></path>
+            <path d="M25,0.9999999 L25,13.4999999 C25,14.8807999 26.1193,15.9999999 27.5,15.9999999 L40,15.9999999 L25,0.9999999 Z" id="Shape" fill="#000000" opacity="0.2"></path>
+            <path d="M25,0 L25,12.5 C25,13.8808 26.1193,15 27.5,15 L40,15 L25,0 Z" id="Shape" fill="#AEC5AF"></path>
+            <path d="M8,25 L8,43 L31,43 L31,25 L8,25 Z M11,28 L18,28 L18,30 L11,30 L11,28 Z M21,28 L28,28 L28,30 L21,30 L21,28 Z M11,33 L18,33 L18,35 L11,35 L11,33 Z M21,33 L28,33 L28,35 L21,35 L21,33 Z M11,38 L18,38 L18,40 L11,40 L11,38 Z M21,38 L28,38 L28,40 L21,40 L21,38 Z" id="Shape" fill="#000000" opacity="0.2"></path>
+            <path d="M8,24 L8,42 L31,42 L31,24 L8,24 Z M11,27 L18,27 L18,29 L11,29 L11,27 Z M21,27 L28,27 L28,29 L21,29 L21,27 Z M11,32 L18,32 L18,34 L11,34 L11,32 Z M21,32 L28,32 L28,34 L21,34 L21,32 Z M11,37 L18,37 L18,39 L11,39 L11,37 Z M21,37 L28,37 L28,39 L21,39 L21,37 Z" id="Shape" fill="#FFFFFF"></path>
+            <path d="M2.5,-1e-07 C1.115,-1e-07 0,1.1149999 0,2.4999999 L0,3.5 C0,2.1149999 1.115,0.9999999 2.5,0.9999999 L25,0.9999999 C25,-1e-07 25,0.9999999 25,-1e-07 L2.5,-1e-07 Z" id="Shape" fill="#FFFFFF" opacity="0.1"></path>
+        </g>
+    </g>
+</svg>

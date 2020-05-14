@@ -121,7 +121,8 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 			
 		
 		this.addButton = this.newMenuButton = new go.detail.addButton({			
-			detailView: this
+			detailView: this,
+			noFiles: this.noFileBrowser
 				})
 		);
 
@@ -151,8 +152,9 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		
 		
 		if(go.Modules.isAvailable("legacy", "files") && !this.noFileBrowser) {
-			this.moreButton.menu.insert(1,{
-				xtype: "filebrowsermenuitem"
+
+			tbar.push({
+				xtype: "detailfilebrowserbutton"
 			});
 		}
 		
@@ -320,9 +322,10 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 	},
 	
 	reset : function(){
-		
-		if(this.body)
-			this.body.update("");		
+
+		if(this.mainItem.rendered) {
+			this.mainItem.update("");
+		}
 
 		this.data={};
 		this.model_id=this.link_id=this.collapsedLinkId=0;
@@ -346,7 +349,7 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		if(tbar)
 			tbar.setDisabled(false);
 
-		if(this.editButton)
+		if(this.editButton && this.editButton.rendered)
 			this.editButton.setDisabled(this.data.permission_level<GO.permissionLevels.write);
 		
 		

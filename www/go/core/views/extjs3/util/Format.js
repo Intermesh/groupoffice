@@ -29,12 +29,52 @@
 		{
 			date = v;
 		}
-		//convert date to local timezone
-		var local = date.toLocaleString("en-US", {timeZone: go.User.timezone});		
-		return new Date(local);
+		return date;
 	};
 	
 	go.util.Format = {
+
+		parseDateUserTZ: function(v, format) {
+			var date = Date.parseDate(v, format);
+			if(!date) {
+				return false;
+			}
+
+			return this.dateToUserTZ(date);
+				
+		},
+
+		dateToUserTZ : function(date) {
+			if(Ext.isIE) {
+				//sigh
+				return date;
+			}
+			try {
+				var local = date.toLocaleString("en-US", {timeZone: go.User.timezone});
+			}
+			catch(e) {
+				console.error(e);
+				return date;
+			}
+			return new Date(local);		
+		},
+
+		dateToBrowserTZ : function(v) {		
+			
+			if(Ext.isIE) {
+				//sigh
+				return v;
+			}
+
+			var local = v.toLocaleString("en-US", {timeZone: go.User.timezone});					
+			var time = v.getTime();
+			 
+			var diff = time - new Date(local).getTime();
+
+			var browsertz = new Date(time + diff);
+
+			return browsertz;
+		},
 
 		htmlEncode  : function(v) {
 
@@ -70,7 +110,7 @@
 						fields: ['format', 'label'],		
 						idIndex: 0,
 						data : [
-						['H:i', t('24 hour format','users','core')],
+						['G:i', t('24 hour format','users','core')],
 						['h:i a', t('12 hour format','users','core')]
 						]
 					}),
@@ -99,7 +139,7 @@
 		},
 
 		valuta : function(amount) {
-			return GO.settings.currency + go.util.Format.number(amount, 2);
+			return go.User.currency + go.util.Format.number(amount, 2);
 		},
 
 		number : function(value, decimals) {
@@ -120,7 +160,7 @@
 		date : function(v) {
 			v = checkDate(v);
 			if(!v) {
-				return "-";
+				return "";
 			}
 			return Ext.util.Format.date(v, GO.settings.date_format);
 		},
@@ -132,8 +172,9 @@
 		time : function(v) {
 			v = checkDate(v);
 			if(!v) {
-				return "-";
+				return "";
 			}
+			v = this.dateToUserTZ(v);
 			return Ext.util.Format.date(v, GO.settings.time_format);
 		},
 		
@@ -150,8 +191,10 @@
 		dateTime: function (v) {
 			v = checkDate(v);
 			if(!v) {
-				return "-";
+				return "";
 			}
+
+			v = this.dateToUserTZ(v);
 			
 			return Ext.util.Format.date(v, GO.settings.date_format + " " + GO.settings.time_format);
 		},
@@ -165,6 +208,8 @@
 			if(!v) {
 				return "-";
 			}
+
+			v = this.dateToUserTZ(v);
 
 			var now = new Date(),
 							nowYmd = parseInt(now.format("Ymd")),

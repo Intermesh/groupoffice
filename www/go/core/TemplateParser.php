@@ -73,18 +73,22 @@ use function GO;
  * [if {{contact.emailAddresses | filter:type:"billing" | count}} > 0]
  *  {{contact.emailAddresses | filter:type:"billing"}}
  * [else]
- *  {{contact.emailAddresses}}
+ *  {{contact.emailAddresses | first}}
  * [/if]
  * 
  * @example or by index
  * {{contact.emailAddresses[0].email}} 
  * 
- * ::::::Maybe?::::::
- * 
- * {{contact.emailAddresses[type=billing] ?? contact.emailAddresses ?? "-"}}
- *  
- * ``````````````````
- 
+ * @example Using [assign] to create a new variable.
+ * `````````````````````````````````````````````````````````````````````
+ * {{contact.name}}
+ * [assign address = contact.addresses | filter:type:"postal" | first]
+ * [if !{{address}}]
+ * [assign address = contact.addresses | first]
+ * [/if]
+ * {{address.formatted}}
+ * `````````````````````````````````````````````````````````````````````
+ *
  */
 class TemplateParser {	
 
@@ -99,17 +103,18 @@ class TemplateParser {
 		$this->addFilter('number', [$this, "filterNumber"]);
 		$this->addFilter('filter', [$this, "filterFilter"]);
 		$this->addFilter('count', [$this, "filterCount"]);
+		$this->addFilter('first', [$this, "filterFirst"]);
 		
 		$this->addModel('now', new DateTime());	
 	}
 
-	private $user;
+	private $_currentUser;
 
-	protected function getUser() {
-		if(!isset($this->user)) {
-			$this->user = go()->getAuthState()->getUser(['dateFormat', 'timezone']);	
+	protected function _currentUser() {
+		if(!isset($this->_currentUser)) {
+			$this->_currentUser = go()->getAuthState()->getUser(['dateFormat', 'timezone' ]);
 		}
-		return $this->user;
+		return $this->_currentUser;
 	}
 	
 	private function filterDate(DateTime $date = null, $format = null) {
@@ -119,10 +124,10 @@ class TemplateParser {
 		}
 
 		if(!isset($format)) {
-			$format = $this->getUser()->dateFormat;
+			$format = $this->_currentUser()->dateFormat;
 		}
 
-		$date->setTimezone(new \DateTimeZone($this->getUser()->timezone));
+		$date->setTimezone(new \DateTimeZone($this->_currentUser()->timezone));
 
 		return $date->format($format);
 	}
@@ -143,6 +148,10 @@ class TemplateParser {
 	private function filterCount($countable) {
 		return count($countable);
 	}
+
+	private function filterFirst(array $items) {
+		return $items[0] ?? null;
+	}
 	
 	/**
 	 * Add a filter function
@@ -156,9 +165,10 @@ class TemplateParser {
 	
 	private function findBlocks($str) {
 			
-		preg_match_all('/\n?\[(each|if)/s', $str, $openMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
-		preg_match_all('/\[\/(each|if)\]\n?/s', $str, $closeMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+		preg_match_all('/\[(each|if)/s', $str, $openMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+		preg_match_all('/\[\/(each|if)\]/s', $str, $closeMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\[else\]/s', $str, $elseMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+		preg_match_all('/\\[assign\s+([a-z0-9A-Z-_]+)\s*=\s*(.*)(?<!\\\\)\\]/', $str, $assignMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		
 		$count = count($openMatches);
 		if($count != count($closeMatches)) {
@@ -176,7 +186,7 @@ class TemplateParser {
 				'type' => 'open', 
 				'offset' => $offset, 
 				'expression' => $expression, 
-				'tagLength' => strlen($openMatches[$i][0][0]) + strlen($expression) + 1];			
+				'tagLength' => strlen($openMatches[$i][0][0]) + strlen($expression) + 1];
 		}
 		
 		
@@ -184,27 +194,41 @@ class TemplateParser {
 			$offset = $closeMatches[$i][0][1];
 			$tags[$offset] = ['tagName' => $closeMatches[$i][1][0], 'type' => 'close', 'offset' => $offset, 'tagLength' => strlen($closeMatches[$i][0][0])];			
 		}
-		
-		//close and open 
+
+		foreach($assignMatches as $a) {
+			$offset = $a[0][1];
+			$tag = ['tagName' => 'assign', 'type'=> null, 'offset' => $offset, 'tagLength' => strlen($a[0][0]), 'expression' => $a[2][0], 'varName' => $a[1][0]];
+			$tag['close'] = $tag;
+			$tags[$offset] = $tag;
+		}
+
+		//sort by offset
 		ksort($tags);
-		$tags = array_values($tags);		
-	
+
+		//reindex
+		$tags = array_values($tags);
+
 		$tags = $this->findCloseTags($tags);				
 	
 		$tags = array_values(array_filter($tags, function($tag) {
-			return $tag['type'] == 'open' && isset($tag['close']);
+			return $tag['type'] == null || ($tag['type'] == 'open' && isset($tag['close']));
 		}));
-	
+
 		foreach($elseMatches as $elseMatch) {
 			$tags = $this->matchElseTag($tags, $elseMatch);
 		}
 
 		//only parse top level blocks because other tags will be parsed separately.
-		$tags = array_filter($tags, function($tag) {
-			return $tag['nesting'] == 0;
-		});
-		
+		$tags = array_values(array_filter($tags, function($tag) {
+			return $tag['nesting'] == 0 && $tag['type'] != 'close';
+		}));
+
 		for($i = 0, $c = count($tags); $i < $c; $i++) {
+
+			if($tags[$i]['tagName'] != 'if') {
+				continue;
+			}
+
 			$start = $tags[$i]['offset'] + $tags[$i]['tagLength'];
 			
 			if(!isset($tags[$i]['elseOffset']) ) {
@@ -277,12 +301,13 @@ class TemplateParser {
 		$open = 0;
 		$opened = [];
 		
-		for($i = 0, $count = count($tags); $i < $count; $i++) {	
+		for($i = 0, $count = count($tags); $i < $count; $i++) {
+			$tags[$i]['nesting'] = $open;
+
 			if($tags[$i]['type'] == 'open') {
 				$opened[$open] = &$tags[$i];
-				$opened[$open]['nesting'] = $open;
 				$open++;										
-			} else {
+			} elseif($tags[$i]['type'] == 'close') {
 				$open--;	
 				$opened[$open]['close'] = $tags[$i];
 			}
@@ -303,19 +328,29 @@ class TemplateParser {
 		if($this->enableBlocks) {
 			$str = $this->parseBlocks($str);
 		}
+//		$str = preg_replace_callback('/\n?\\[assign\s+([a-z0-9A-Z-_]+)\s*=\s*(.*)(?<!\\\\)\\]\n?/', [$this, 'replaceAssign'], $str);
 		$str = preg_replace_callback('/{{.*?}}/', [$this, 'replaceVar'], $str);	
 		return $str;
-	}	
+	}
+
+
 
 	private function parseBlocks($str) {
 		$tags = $this->findBlocks($str);		
 			
 		for($i = 0;$i < count($tags); $i++) {
-			if($tags[$i]['tagName'] == 'if') {
+			switch($tags[$i]['tagName']){
+				case  'if':
 				$tags[$i] = $this->replaceIf($tags[$i], $str);
-			} else
-			{
-				$tags[$i] = $this->replaceEach($tags[$i], $str);
+				break;
+
+				case 'each':
+					$tags[$i] = $this->replaceEach($tags[$i], $str);
+					break;
+
+				case 'assign':
+					$tags[$i] = $this->replaceAssign($tags[$i], $str);
+					break;
 			}
 		}
 		
@@ -325,6 +360,10 @@ class TemplateParser {
 			
 			if($tag['offset'] > 0) {
 				$cut = substr($str, $offset, $tag['offset'] - $offset);
+
+				//trim single new lines
+				$cut = preg_replace("/(.*)\r?\n?$/", "$1", $cut);
+
 				$replaced .= $cut;
 			}
 
@@ -334,7 +373,18 @@ class TemplateParser {
 		
 		$replaced .= substr($str, $offset);
 
+		$replaced = preg_replace("/(.*)\r?\n?$/", "$1", $replaced);
 		return $replaced;
+	}
+
+	private function replaceAssign($tag, $str) {
+
+		$value = $this->getVarFiltered($tag['expression']);
+		$this->addModel($tag['varName'], $value);
+
+		$tag['replacement'] = "";
+
+		return $tag;
 	}
 	
 	private function replaceEach($tag, $str) {
@@ -535,9 +585,18 @@ class TemplateParser {
 			}else 
 			{				
 				if (!isset($model->$pathPart)) {
-					return null;
+
+					$getter = 'get' . $pathPart;
+
+					if(method_exists($model, $getter)) {
+						$model = $model->$getter();
+					} else{
+						return null;
+					}
+				}else{
+					$model = $model->$pathPart;
 				}
-				$model = $model->$pathPart;
+
 			}
 			
 			if(isset($index)) {

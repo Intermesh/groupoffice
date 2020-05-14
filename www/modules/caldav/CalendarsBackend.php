@@ -725,7 +725,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 //			\GO::debug($e);
 			throw new Sabre\DAV\Exception\Forbidden;
 		}catch (\Exception $e) {
-			trigger_error($e->getMessage(), E_USER_NOTICE);
+			\go\core\ErrorHandler::logException($e);
 			
 			return false;
 		}
@@ -920,7 +920,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			GO::debug($e->getMessage());
 			throw new Sabre\DAV\Exception\Forbidden('Validation errors: '.$e->getMessage());
 		}	catch(Exception $e){
-			trigger_error($e->getMessage(), E_USER_NOTICE);
+			\go\core\ErrorHandler::logException($e);
 			
 			return false;
 

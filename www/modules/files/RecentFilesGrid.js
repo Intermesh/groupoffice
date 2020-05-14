@@ -53,7 +53,7 @@ GO.files.RecentFilesGrid = Ext.extend(GO.grid.GridPanel,{
 		},{
 			header:t("Modified at"),
 			dataIndex:'mtime',
-			width: dp(140)
+			xtype: "datecolumn"
 		},
 			{
 				dataIndex:'weekday',

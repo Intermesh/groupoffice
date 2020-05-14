@@ -3,8 +3,11 @@ namespace go\modules\community\notes\model;
 
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Criteria;
+use go\core\fs\Blob;
+use go\core\model\EmailTemplateAttachment;
 use go\core\orm\Query;
 use go\core\orm\CustomFieldsTrait;
+use go\core\orm\LoggingTrait;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
@@ -43,9 +46,18 @@ class Note extends AclItemEntity {
 	
 	use SearchableTrait;
 	
+	use LoggingTrait;
+
+	/**
+	 *
+	 * @var string[]
+	 */
+	protected $images = [];
+	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-						->addTable("notes_note", "n");
+						->addTable("notes_note", "n")
+						->addScalar('images', 'notes_note_image', ['id' => 'noteId']);
 	}
 
 	protected static function aclEntityClass() {
@@ -57,18 +69,15 @@ class Note extends AclItemEntity {
 	}
 
 	protected function getSearchDescription() {
-		return $this->getExcerpt();
+		$text = preg_replace("/\s+/", " ", strip_tags(str_replace(">", "> ",$this->content)));
+		return StringUtil::cutString($text, 200);
 	}
 
 	protected function getSearchName() {
 		return $this->name;
 	}
 	
-	public function getExcerpt() {
-		$text = preg_replace("/\s+/", " ", strip_tags(str_replace(">", "> ",$this->content)));
-		return StringUtil::cutString($text, 200);
-	}
-	
+
 	
 	/**
 	 * Return columns to search on with the 'text' filter. {@see filter()}
@@ -103,5 +112,13 @@ class Note extends AclItemEntity {
 		}
 		return parent::internalValidate();
 	}
+
+
+	protected function internalSave()
+	{
+		$this->images = Blob::parseFromHtml($this->content);
+		return parent::internalSave();
+	}
+
 
 }

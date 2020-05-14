@@ -255,8 +255,8 @@ class Sync extends Controller {
       $group->users = [];
     
 
-      $members = $this->getGroupMembers($record, $connection);      
-
+      $members = $this->getGroupMembers($record, $connection, $server);    
+      
       foreach ($members as $u) {
         $user = \go\core\model\User::find(['id'])->where(['username' => $u['username']])->orWhere(['email' => $u['email']])->single();
         if (!$user) {
@@ -325,11 +325,16 @@ class Sync extends Controller {
     }
   }
   
-  private function getGroupMembers(Record $record, Connection $ldapConn) {
+  private function getGroupMembers(Record $record, Connection $ldapConn, Server $server) {
     $members = [];
     if (isset($record->memberuid)) {
-      //for openldap
-      return $record->memberuid;
+      //for openldap      
+      foreach ($record->memberuid as $uid) {  
+        $accountResult = Record::find($ldapConn, $server->peopleDN, 'uid=' . $uid);
+        $record = $accountResult->fetch();
+        
+        $members[] = ['username' => $this->getGOUserName($record), 'email' => $record->mail[0]]; 
+      }      
     } else if (isset($record->member)) {
       //for Active Directory
       foreach ($record->member as $username) {    
@@ -341,12 +346,12 @@ class Sync extends Controller {
         }
         $members[] = $u;
       }
-      return $members;
     } else {
       $this->output("Error: no member array found in group");
       return [];
     }
     
+    return $members;
   }
 
 	private function queryActiveDirectoryUser(Connection $ldapConn, $groupMember) {

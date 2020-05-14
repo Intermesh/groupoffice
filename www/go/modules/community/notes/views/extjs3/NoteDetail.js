@@ -13,12 +13,15 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 
 		Ext.apply(this, {
 			items: [{
-					xtype: 'readmore',
-					onLoad: function (detailView) {
-						this.setText("<h3>" + Ext.util.Format.htmlEncode(detailView.data.name) + "</h3><div class='go-html-formatted'>" + detailView.data.content + "</div>");
-					}
-				}
-			]
+				collapsible: true,
+				title: t("Note"),
+				onLoad: function (detailView) {
+					this.setTitle(Ext.util.Format.htmlEncode(detailView.data.name));
+					// this.items.itemAt(0).setText();
+				},
+				tpl: "<div class='pad go-html-formatted'>{content:raw}</div>"
+
+			}]
 		});
 		
 
@@ -28,64 +31,35 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 		this.addLinks();
 		this.addComments();
 		this.addFiles();
+
+		this.add(new go.detail.CreateModifyPanel());
 	},
 
 	decrypt: function () {
-
 		if (!this.data.content || this.data.content.substring(0, 8) !== "{GOCRYPT") {
 			return;
 		}
-		
-		var key = prompt("Enter password to decrypt");
 
-		if(this.data.content.substring(0, 9) === "{GOCRYPT}") {
+		var data = this.data.content, me = this;
+		this.data.content = t("Encrypted data");
+		go.modules.community.notes.Decrypter.decrypt(data).then(function(data) {
+			var text = data[0];
+			var password = data[1];
+			me.data.content = text;
+			var item = me.items.item(0);
+			item.update(me.data);
+			go.modules.community.notes.password = password;
+			go.modules.community.notes.lastDecryptedValue = text;
+			go.modules.community.notes.lastNoteBookId = me.data.noteBookId;
+			item.onLoad(this);
 
-			var msg = window.atob(this.data.content.substring(9));
+		}).catch(function(){});
 
-			var iv = (msg.substring(0, 32));			 // extract iv
-			var body = (msg.substring(32, msg.length - 32));	 //extract ciphertext
-			var serialized = mcrypt.Decrypt(body, iv, key, "rijndael-256", "ctr");
-			//result should be a serialized sting by PHP
-			var match = serialized.match(/.*"([\s\S]*)"/);
-			if (!match) {
-				alert("Incorrect password!");
-				//this.data.content = "Encrypted text";
-				return;
-			}
 
-			this.data.content = Ext.util.Format.nl2br(match[1]);
-		} else
-		{
-			//new encryption
-			//this.data.content = "Decrypting...";
-			
-			go.Jmap.request({
-				method: "Note/decrypt",
-				params: {
-					id: this.data.id,
-					password: key
-				},
-				callback: function(options, success, response) {
-					if(success) {
-						console.log(response);
-						this.data.content = response.content;
-						
-						this.items.item(0).onLoad(this);
-					} else
-					{
-						Ext.MessageBox.alert(t("Error"), t("Invalid password"));
-					}
-				},
-				scope: this
-			});
-		}
-		
 	},
 
 	onLoad: function () {
-
 		this.decrypt();
-
 		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < go.permissionLevels.write);
 		this.deleteItem.setDisabled(this.data.permissionLevel < go.permissionLevels.writeAndDelete);
 
@@ -146,8 +120,8 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 			}]);
 		
 		if(go.Modules.isAvailable("legacy", "files")) {
-			this.moreMenu.menu.splice(1,0,{
-				xtype: "filebrowsermenuitem"
+			items.splice(items.length - 1, 0,{
+				xtype: "detailfilebrowserbutton"
 			});
 		}
 

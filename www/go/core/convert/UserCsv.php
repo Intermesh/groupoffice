@@ -8,11 +8,14 @@ use go\modules\community\serverclient\model\MailDomain;
 use go\modules\community\serverclient\Module as GoModule;
 
 class UserCsv extends Csv {
+
+	public static $excludeHeaders = ['syncSettings', 'taskSettings', 'notesSettings', 'addressBookSettings', 'calendarSettings', 'emailSettings', 'googleauthenticator'];
+
   protected function init()
   {
     parent::init();
 
-    $this->addColumn('createEmailAccount', go()->t("Create E-mail account"), false);
+    $this->addColumn('createEmailAccount', go()->t("Create E-mail account"));
   }
 
   public function exportCreateEmailAccount(Entity $entity, array $templateValues, $columnName) {

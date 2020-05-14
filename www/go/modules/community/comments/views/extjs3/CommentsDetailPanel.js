@@ -5,16 +5,29 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	height: dp(150),
 
 	growMaxHeight: dp(800),
-	title: t("Comments", "comments"),
+	title: t("Comments"),
 	//
 	/// Collapsilbe was turn off because of height recaculation issues in HtmlEditor
 	//
-	//collapsible: true,
+	collapsible: true,
+	animCollapse: false, //htmleditor doesn't work with animCollapse
+
+	hideMode: "offsets", //required for htmleditor
 	collapseFirst:false,
 	layout:'border',	
 	titleCollapse: true,
 	stateId: "comments-detail",
 	initComponent: function () {
+
+		this.on('destroy', function() {
+			this.store.destroy();
+		}, this);
+
+		this.on("expand", function() {
+			this.updateView();
+
+			// this.composer.textField.syncSize();
+		}, this);
 
 
 		if(go.User.isAdmin && this.title) {
@@ -125,18 +138,25 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	},
 		
 	updateView : function(o) {
+		if(this.collapsed || !this.commentsContainer.rendered) {
+			return;
+		}
 		o = o || {};
+
+		var badge = "<span class='badge'>" + this.store.getTotalCount() + '</span>';
+		this.setTitle(t("Comments") + badge);
 		this.composer.textField.setValue('');
 		var prevStr;
 		var initScrollHeight = (this.store.getCount() == this.commentsContainer.pageSize) ? 0 : this.commentsContainer.getEl().dom.scrollHeight,
 			 initScrollTop = this.commentsContainer.getEl().dom.scrollTop;
 
 		this.commentsContainer.removeAll();
+
 		this.store.each(function(r) {
 			
 			var labelText ='', mineCls = r.get("createdBy") == go.User.id ? 'mine' : '';
 			var readMore = new go.detail.ReadMore({
-				cls: mineCls
+				cls: 'go-html-formatted ' + mineCls
 			});
 			var creator = r.get("creator");
 			if(!creator) {
@@ -152,9 +172,9 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				cls: 'photo '+mineCls
 			};
 			if(creator.avatarId) { 
-				avatar.style = 'background-image: url('+go.Jmap.downloadUrl(creator.avatarId)+');';
+				avatar.style = 'background-image: url('+go.Jmap.thumbUrl(creator.avatarId, {w: 40, h: 40, zc: 1})+');background-color: transparent;';
 			} else {
-				avatar.html = creator.displayName.split(" ").map(function(name){return name.substr(0,1).toUpperCase()}).join("");
+				avatar.html = go.util.initials(creator.displayName);
 				avatar.style = 'background-image: none';
 			}
 

@@ -21,7 +21,9 @@ return array (
   '(only for sync with Exchange accounts, please see calendars -> CalDAV-taskslists for CalDAV)' => '(Sólo para sincronización con cuentas Microsoft Exchange. Por favor, ver en Calendarios --> CalDAV --> Listas de tareas para CalDAV)',
   'name' => 'Sincronización',
   'description' => 'Módulo de sincronización',
-  'Synchronization' => 'Sincronizaci√≥n',
+  'Synchronization' => 'Sincronización',
   'Delete older events and tasks at the client (they will be kept in Group-Office)' => 'Eliminar eventos y tareas antiguas en el cliente (se mantendrán en {product_name})',
   '<h1>Group-Office SyncML Server</h1><p>This is the Group-Office SyncML server. Use a SyncML compliant device or software package and connect it to this URL to synchronize with Group-Office.</p>' => '<h1>{product_name} Servidor SyncML</h1><p>Este es el servidor SyncML de {product_name}. Utiliza un cliente SyncML Seleccionar calendarios a sincronizar.',
+  'Notebooks' => 'Libretas de notas',
+  'Address books' => 'Libretas de direcciones',
 );

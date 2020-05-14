@@ -1,6 +1,8 @@
-flux/Dispatcher.js
-flux/Store.js
+polyfills.js
+
 Jmap.js
+BrowserStorage.js
+
 
 data/JmapProxy.js
 data/EntityStoreProxy.js
@@ -43,6 +45,7 @@ form/ComboBox.js
 form/ComboBoxReset.js
 form/multiselect/Field.js
 form/multiselect/Window.js
+form/ArrayFieldGrid.js
 form/GridField.js
 form/RadioGroup.js
 form/Switch.js
@@ -80,12 +83,13 @@ links/CreateLinkButton.js
 links/EntityGrid.js
 links/LinkGrid.js
 links/CreateLinkWindow.js
+links/EditLinkDialog.js
 links/LinkBrowser.js
 links/LinksDetailPanel.js
+links/FilterLinkEntityCombo.js
 
-usersettings/AccountSettingsPanel.js
-usersettings/LookAndFeelPanel.js
-usersettings/UserSettingsDialog.js
+
+
 
 Router.js
 PasswordPrompt.js
@@ -97,6 +101,7 @@ util/Format.js
 util/Filters.js
 util/Cookies.js
 util/SelectDialog.js
+util/Object.js
 
 User.js
 String.js
@@ -116,12 +121,19 @@ defaultpermissions/DefaultPermissionsPanel.js
 defaultpermissions/SystemSettingsPanel.js
 defaultpermissions/ShareWindow.js
 
+
+usersettings/VisibleToPanel.js
+usersettings/AccountSettingsPanel.js
+usersettings/LookAndFeelPanel.js
+usersettings/UserSettingsDialog.js
+
 systemsettings/Panel.js
 systemsettings/GeneralPanel.js
 systemsettings/AppearancePanel.js
 systemsettings/NotificationsPanel.js
 systemsettings/AuthenticationPanel.js
 systemsettings/Dialog.js
+systemsettings/AuthAllowGroupGrid.js
 
 Wizard.js
 Array.js
@@ -131,7 +143,10 @@ tree/EntityLoader.js
 tree/Node.js
 tree/TreeNodeUI.js
 
+
 form/HtmlEditor.js
+form/HtmlEditorPlugins.js
+
 menu/EmojiMenu.js
 menu/StoreMenu.js
 
@@ -152,20 +167,20 @@ groups/GroupCombo.js
 groups/GroupModuleGrid.js
 groups/GroupMemberWindow.js
 
+users/UserGrid.js
 users/UserDefaultsWindow.js
-users/PermissionsDialog.js
 users/SystemSettingsUserGrid.js
 users/CreateUserAccountPanel.js
 users/CreateUserPasswordPanel.js
 users/CreateUserWizard.js
 users/UserGroupGrid.js
 users/UserCombo.js
-users/UserSettingsWorkingWeek.js
 users/SelectDialogPanel.js
 
 customfields/FormFieldSet.js
 customfields/FieldDialog.js
 customfields/CustomFields.js
+customfields/DetailPanel.js
 customfields/EntityPanel.js
 customfields/EntityDialog.js
 customfields/SystemSettingsPanel.js

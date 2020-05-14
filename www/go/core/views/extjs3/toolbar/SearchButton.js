@@ -1,17 +1,17 @@
 
 
 /**
- * 
+ * Search button
+ *
+ * When used inside a go.grid.GridPanel component it will lookup the store and bind the entity automatically.
+ * The entity filters can be used using the advanced filter syntax
+ *
  * @example
  * 
  * {
 					xtype: 'tbsearch',
-					filters: [
-						'text',
-						'name', 
-						'content',
-						{name: 'modified', multiple: false},
-						{name: 'created', multiple: false}						
+					tools: [
+						new Ext.Button({iconCls: 'star'})//extra tool button inside search toolbar
 					],
 					listeners: {
 						scope: this,
@@ -86,6 +86,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			xtype: 'trigger',
 			validationEvent: false,
 			validateOnBlur: false,
+			spellCheck: false,
 			triggerClass: 'x-form-search-trigger',
 			value: this.query,
 			listeners: {				
@@ -112,24 +113,33 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			if(grid) {
 				this.store = grid.store;			
 			}
-		}	
+		}
+
+		this.bindStore(this.store);
 	
+
+	},
+
+
+	bindStore : function(store) {
+
+		this.store = store;
 		//default filter on 'text'
 		if(this.store) {
 			this.on({
 				scope: this,
 				search: function (tb, v, filters) {
 					if(this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) {
-					
+
 						this.store.setFilter('tbsearch', filters).load();
-						
+
 					} else {
 						//params for old framework
 						this.store.baseParams.query = v;
 						this.store.load();
 					}
-					
-					
+
+
 				},
 				reset: function() {
 					if(this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) {
@@ -138,7 +148,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 					} else {
 						delete this.store.baseParams.query;
 					}
-					
+
 					this.store.load();
 				}
 			});
@@ -152,9 +162,11 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	updateView : function(){
 		if(this.hasActiveSearch()){
 			this.addClass('raised');
+			this.addClass('accent');
 			this.setTooltip(t("Change search condition"));
 		} else {
 			this.removeClass('raised');
+			this.removeClass('accent');
 			this.setTooltip(t("Search"));
 		}
 	},
@@ -219,8 +231,10 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 
 				render : function(tb) {
 					tb.getEl().set({tabindex: 0});
-					tb.getEl().on("focusout", function(e) {		
-						if(!this.searchToolBar.getEl().dom.contains(e.browserEvent.relatedTarget)) {
+					tb.getEl().on("focusout", function(e) {
+
+						//hide toolbar if clicked outside. To allow a menu button we check if the target is not a menuy
+						if(!e.browserEvent.relatedTarget || (!e.browserEvent.relatedTarget.classList.contains('x-menu-focus') && !this.searchToolBar.getEl().dom.contains(e.browserEvent.relatedTarget))) {
 							this.back();
 						}
 					}, this);
@@ -286,6 +300,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	
 	reset : function() {
 		this.triggerField.setValue("");
+		this.triggerField.setDisabled(false);
 		this.fireEvent('reset', this);
 		this.updateView();
 	},

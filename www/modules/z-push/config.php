@@ -177,7 +177,7 @@ if(!class_exists('GO'))
     // Interval in seconds before checking if there are changes on the server when in Ping.
     // It means the highest time span before a change is pushed to a mobile. Set it to
     // a higher value if you have a high load on the server.
-    define('PING_INTERVAL', 120);
+    define('PING_INTERVAL', GO::config()->debug ? 5 : 120);
 
     // Set the fileas (save as) order for contacts in the webaccess/webapp/outlook.
     // It will only affect new/modified contacts on the mobile which then are synced to the server.

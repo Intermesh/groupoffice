@@ -1,5 +1,6 @@
 GO.Window = Ext.extend(Ext.Window,{
 
+	border: true,
 	constrainHeader : true,
 	closeAction:'hide',
 //	renderTo: Ext.get('dialogs'), // render before all script tags
@@ -9,11 +10,10 @@ GO.Window = Ext.extend(Ext.Window,{
 	resizable : !GO.util.isMobileOrTablet(),
 	draggable: !GO.util.isMobileOrTablet(),
 	maximized: GO.util.isMobileOrTablet(),
+	animCollapse: false, //htmleditor doesn't work with animCollapse
 	
 	initComponent : function(){
-		
 
-		
 		//make sure window fits screen
 		if(this.width && this.width > window.innerWidth) {
 			this.width = window.innerWidth - dp(32);

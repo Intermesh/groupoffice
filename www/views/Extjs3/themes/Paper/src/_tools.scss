@@ -8,7 +8,7 @@
 		padding-right: 0;
 	}
 	
-	h1, h2, h3, h4, h5, h6 { margin-bottom: dp(16); }
+	//h1, h2, h3, h4, h5, h6 { margin-bottom: dp(16); }
 
 	.content {
 		max-height: dp(400);
@@ -39,11 +39,12 @@
 		right: 0;
 		height: dp(56);
 		transition: opacity 0s linear 360ms;
-		background-image: linear-gradient(to bottom, rgba(255,255,255,.0), white);
+		background-image: linear-gradient(to bottom, rgba(color($bg, "box"),.0), color($bg, "box"));
+
 		padding-top: dp(24);
 		.x-btn {
 			
-			background-color: color($grey, 50);
+			background-color: transparent;
 			@include var(color, c-primary);
 			margin: 0 auto;
 			border-style: solid;

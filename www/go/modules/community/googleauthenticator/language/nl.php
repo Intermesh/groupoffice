@@ -22,4 +22,5 @@ return array (
   'Enable google authenticator' => 'Google Authenticator inschakelen',
   'Disable google authenticator' => 'Google Authenticator uitschakelen',
   'Provide your current password before you can enable Google authenticator.' => 'Voer uw huidige wachtwoord in om Google Authenticator in te schakelen',
+  'Scan the QR code below with the Google authenticator app on your mobile device, after that fill in the field below with the code generated in the app.' => 'Scan de QR code hieronder met de OTP of Google Authenticator App op uw mobiele telefoon. Voer daarna de code in om te bevestigen.',
 );

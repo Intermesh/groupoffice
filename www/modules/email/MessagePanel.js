@@ -35,15 +35,12 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			load : true,
 			reset : true
 		});
-
 		this.bodyId = Ext.id();
 		this.attachmentsId = Ext.id();
 
-		this.contactImageId = Ext.id();
 
 		this.linkMessageId = Ext.id();
 		this.downloadAllMenuId = Ext.id();
-
 
 		var templateStr =
 						
@@ -138,8 +135,8 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				'<div style="clear: both"></div>' +
 			'</tpl>' +
 			
-			'<div class="avatar" id="'+this.contactImageId+'" src="" style="background-image: url(\'{contact_thumb_url}\');cursor:pointer"></div>'+
-			
+			'<a href="mailto:&quot;{[GO.util.html_entity_decode(values.from, \'ENT_QUOTES\')]}&quot; &lt;{sender}&gt;" class="avatar" style="{[this.getAvatarStyle(values.contact)]}">{[this.getAvatarHtml(values.contact)]}</a>'+
+
 		'</div>';
 
 		if(go.Modules.isAvailable("legacy", "calendar")){
@@ -203,6 +200,21 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			'</div>';
 
 		this.template = new Ext.XTemplate(templateStr,{
+
+			getAvatarHtml: function (v) {
+
+				if(!v || v.photoBlobId) {
+					return "";
+				}
+				return v.isOrganization ? '<i class="icon">business</i>' : go.util.initials(v.name);
+			},
+			getAvatarStyle: function (v) {
+				if(!v) {
+					return "cursor:pointer;";
+				}
+				return v.photoBlobId ? 'background-image: url(' + go.Jmap.thumbUrl(v.photoBlobId, {w: 40, h: 40, zc: 1})  + ')"' : "background-image:none;cursor:pointer;background-color: #" + v.color;;
+			},
+
 			defaultFormatFunc : false,
 			linkIconCls : function(link) {				
 				
@@ -235,13 +247,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		this.template.compile();
 	},
 
-	lookupContact : function(){
-		if(this.data.sender_contact_id){
-			go.Router.goto("contact/" + this.data.sender_contact_id);
-		}else{
-			GO.addressbook.searchSender(this.data.sender, this.data.from);
-		}
-	},
 
 	data: null,
 
@@ -283,6 +288,10 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			{
 				this.params.password=password;
 			}
+		}
+
+		if(!this.params) {
+			return;
 		}
 
 		this.params['no_max_body_size'] = GO.util.empty(no_max_body_size) ? false : true;
@@ -514,7 +523,6 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 		// this.messageBodyEl = Ext.get(this.bodyId);
 		
-
 		if(data.attachments.length)
 		{
 			this.attachmentsEl = Ext.get(this.attachmentsId);
@@ -534,8 +542,15 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			this.allAttachmentsMenuEl.on('contextmenu', this.onAllAttachmentContextMenu, this);
 		}
 
-		this.contactImageEl = Ext.get(this.contactImageId);
-		this.contactImageEl.on('click', this.lookupContact, this);
+		if(data.inlineAttachments.length) {
+			this.attachmentContextMenu.messagePanel = this;
+			this.allAttachmentsMenuEl = Ext.get(this.bodyId);
+			this.allAttachmentsMenuEl.on('contextmenu', this.onImageContextMenu, this);
+		}
+
+
+		// this.contactImageEl = Ext.get(this.contactImageId);
+		// this.contactImageEl.on('click', this.lookupContact, this);
 
 		this.body.scrollTo('top',0);
 
@@ -628,10 +643,31 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		}
 
 	},
+	onImageContextMenu : function (e, target){
+		var number = this.getParameterByName("number",target.src);
 
+		for(var i = 0; i < this.data.inlineAttachments.length;i++) {
+			if(this.data.inlineAttachments[i].number == number) {
+				var attachment = this.data.inlineAttachments[i];
+			}
+		}
+		
+		if(target.tagName == "IMG") {
+			e.preventDefault();
+			this.attachmentContextMenu.showAt(e.getXY(),attachment);
+		}
+
+	},
+	getParameterByName : function(name, url) {
+		if (!url) url = window.location.href;
+		name = name.replace(/[\[\]]/g, '\\$&');
+		var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+			results = regex.exec(url);
+		if (!results) return null;
+		if (!results[2]) return '';
+		return decodeURIComponent(results[2].replace(/\+/g, ' '));
+	},
 	onAttachmentContextMenu : function (e, target){
-
-
 		if(target.id.substr(0,this.attachmentsId.length)==this.attachmentsId)
 		{
 			var attachment_no = target.id.substr(this.attachmentsId.length+1);

@@ -1,6 +1,6 @@
 <?php
 return array (
-  'You don\'t have any items on your start page.' => 'No tiene ningún artículo en su página de inicio.',
+  'You don\'t have any items on your start page.' => 'No tiene ningún elemento en su página de inicio.',
   'Select portlet' => 'Seleccionar portlet',
   'Please enter the RSS feed URL:' => 'Introducir URL del feed RSS:',
   'Notes' => 'Notas',

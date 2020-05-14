@@ -136,44 +136,9 @@ go.users.SelectDialogPanel = Ext.extend(Ext.Panel, {
 	
 	createGrid : function() {
 
-		this.grid = new go.grid.GridPanel({
-      region: "center",   
-      store: new go.data.Store({
-        fields: [
-          'id', 
-          'username', 
-          'displayName',
-          'avatarId',
-          'email'			
-        ],
-        baseParams: {filter: {}},
-        entityStore: "User"
-      }),
-      columns: [
-				{
-					id: 'name',
-					header: t('Name'),
-					width: dp(200),
-					sortable: true,
-					dataIndex: 'displayName',
-					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-						var style = record.get('avatarId') ?  'background-image: url(' + go.Jmap.downloadUrl(record.get("avatarId")) + ')"' : "";
-						
-						return '<div class="user"><div class="avatar" style="'+style+'"></div>' +
-							'<div class="wrap">'+
-								'<div class="displayName">' + value + '</div>' +
-								'<small class="username">' + Ext.util.Format.htmlDecode(record.get('username')) + '</small>' +
-							'</div>'+
-							'</div>';
-					}
-				}				
-			],
-			viewConfig: {
-				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',
-				forceFit: true,
-				autoFill: true
-			},
-    });
+		this.grid = new go.users.UserGrid({
+      region: "center"
+		});
 
     this.grid.on('rowdblclick', function(grid, rowIndex, e){
       var r = grid.store.getAt(rowIndex);

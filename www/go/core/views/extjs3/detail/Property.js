@@ -26,7 +26,7 @@ go.detail.Property = Ext.extend(Ext.Container, {
 		this.valueCmp = new Ext.BoxComponent({
 			autoEl: "span",
 			html: this.value
-		})
+		});
 		
 		this.items = [
 			this.iconCmp,			

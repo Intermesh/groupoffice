@@ -22,7 +22,7 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 			this.entities = config.entities;
 		}
 
-		var selModel = new Ext.grid.CheckboxSelectionModel();
+		var selModel = new Ext.grid.RowSelectionModel({simpleSelect: true});
 
 		var data = [], allEntities = this.entitiies ? this.entities : go.Entities.getLinkConfigs(), id;
 		
@@ -46,7 +46,6 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 			}),
 			selModel: selModel,
 			columns: [
-				selModel,
 				{
 					id: 'name',
 					header: t('Name'),

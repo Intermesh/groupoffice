@@ -179,59 +179,23 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		scope:this
 	}];
 
-//	if(go.Modules.isAvailable("legacy", "addressbook")) {
-//		addSendersItems.push({
-//			text: t("Address list", "addressbook"),
-//			menu: this.addresslistsMenu = new GO.menu.JsonMenu({
-//				store: new GO.data.JsonStore({
-//					url: GO.url("addressbook/addresslist/store"),
-//					baseParams: {
-//						permissionLevel: GO.permissionLevels.write,
-//						forContextMenu: true
-//					},
-//					fields: ['addresslist_id', 'text'],
-//					remoteSort: true
-//				}),
-//				listeners:{
-//					scope:this,
-//					itemclick : function(item, e ) {
-//						this.addSendersToAddresslist(item.addresslist_id);
-//						return false;
-//					}
-//				}
-//			}),
-//			multiple:true,
-//			scope: this
-//		});
-//	}
+	if(go.Modules.isAvailable("business", "newsletters")) {
+		addSendersItems.push({
+			text: t("Address list", "newsletters", "business"),
+			handler: this.addSendersToAddresslist,
+			scope: this
+		});
+	}
 
 	var deleteSendersItems = [];
 
-//	if(go.Modules.isAvailable("legacy", "addressbook")) {
-//		deleteSendersItems.push({
-//			text: t("Address list", "addressbook"),
-//			menu: this.addresslistsMenu = new GO.menu.JsonMenu({
-//				store: new GO.data.JsonStore({
-//					url: GO.url("addressbook/addresslist/store"),
-//					baseParams: {
-//						permissionLevel: GO.permissionLevels.write,
-//						forContextMenu: true
-//					},
-//					fields: ['addresslist_id', 'text'],
-//					remoteSort: true
-//				}),
-//				listeners:{
-//					scope:this,
-//					itemclick : function(item, e ) {
-//						this.deleteSendersFromAddresslist(item.addresslist_id);
-//						return false;
-//					}
-//				}
-//			}),
-//			multiple:true,
-//			scope: this
-//		});
-//	}
+	if(go.Modules.isAvailable("business", "newsletters")) {
+		deleteSendersItems.push({
+			text: t("Address list",  "newsletters", "business"),
+			handler: this.deleteSendersFromAddresslist,
+			scope: this
+		});
+	}
 	
 	var contextItems = [
 	this.contextMenuMarkAsRead = new Ext.menu.Item({
@@ -340,8 +304,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			 var records = this.messagesGrid.selModel.getSelections();
 			 if(records) {
 					 Ext.each(records, function(record) {
-
-
 						 GO.email.moveToSpam(record.get('uid'), record.get('mailbox'), this.account_id);
 
 					 }, this);
@@ -399,6 +361,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 
 			this.labelsContextMenu.items.each(function(item) {
 				flags[item.flag] = item;
+				item.textEl.setStyle('color', '#' + item.color);
 				item.setChecked(false);
 			});
 
@@ -428,7 +391,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 						account_id: 0,
 						forContextMenu: true
 					},
-					fields: ['flag', 'text'],
+					fields: ['flag', 'text', 'color'],
 					remoteSort: true			
 				}),
 				listeners:{
@@ -718,7 +681,6 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		region:'center',
 		autoScroll:true,
 		titlebar: false,
-		border:true,
 		attachmentContextMenu: new GO.email.AttachmentContextMenu()
 	});
 	
@@ -727,12 +689,10 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		layout:'responsive',
 
 		split: true,
-					narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
-
-			width: dp(700),
-			stateId: 'go-email-west',
-		items: [
-			
+		narrowWidth: dp(400), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
+		width: dp(700),
+		stateId: 'go-email-west',
+		items: [			
 			this.leftMessagesGrid,
 			this.treePanel
 		]
@@ -759,11 +719,11 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			this.replyAllButton.setDisabled(this.readOnly && !this._permissionDelegated);
 			this.replyButton.setDisabled(this.readOnly && !this._permissionDelegated);
 			this.forwardButton.setDisabled(this.readOnly && !this._permissionDelegated);
-			this.printButton.setDisabled(this.readOnly && !this._permissionDelegated);
+			this.printButton.setDisabled(false);//this.readOnly && !this._permissionDelegated);
 
 			var record = this.messagesGrid.store.getById(this.messagePanel.uid);
 
-			if(!record.data.seen && data.notification)
+			if(record && !record.data.seen && data.notification)
 			{
 				if(GO.email.alwaysRespondToNotifications || confirm(t("The sender of this messages likes a read notification by you at: %s. Do you want to send a read notification now?", "email").replace('%s', data.notification)))
 				{
@@ -815,6 +775,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			this.messagesGrid.store.baseParams['search'] = sender;
 			GO.email.messagesGrid.store.baseParams['unread']=0;
 			this.messagesGrid.setSearchFields('from', sender);
+
+			this.messagesGrid.searchField.search();
 
 			this.messagesGrid.store.load({
 				params:{
@@ -903,7 +865,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				//this.messagePanel.uid=r.data['uid'];
 				//this.messagePanel.loadMessage(r.data.uid, this.mailbox, this.account_id);
 				this.messagePanel.loadMessage(r.data.uid, r.data['mailbox'], this.account_id);
-this.messagePanel.show();
+				this.messagePanel.show();
 				if(!r.data.seen && this.messagesGrid.store.reader.jsonData.permission_level > GO.permissionLevels.read){
 					//set read with 2 sec delay.
 					//this.markAsRead.defer(2000, this, [r.data.uid, this.mailbox, this.account_id]);
@@ -1221,94 +1183,58 @@ this.messagePanel.show();
 		}
 	},
 
-//	addSendersToAddresslist : function(addresslistId) {
-//		var records = this.messagesGrid.getSelectionModel().getSelections();
-//		var senderNames = new Array();
-//		var senderEmails = new Array();
-//		for (var i=0;i<records.length;i++) {
-//			senderNames.push(records[i].data.from);
-//			senderEmails.push(records[i].data.sender);
-//		}
-//
-//		Ext.Ajax.request({
-//			url: GO.url('addressbook/addresslist/addContactsToAddresslist'),
-//			params: {
-//				senderNames: Ext.encode(senderNames),
-//				senderEmails: Ext.encode(senderEmails),
-//				addresslistId: addresslistId
-//			},
-//			callback: function(options, success, response)
-//			{
-//				if(!success)
-//				{
-//					Ext.MessageBox.alert(t("Error"), response.result.errors);
-//				}else
-//				{
-//					var responseParams = Ext.decode(response.responseText);
-//					if(responseParams.success)
-//					{
-//						Ext.MessageBox.alert(t("Success"),t("%i contacts have been succesfully added to the address list.", "addressbook").replace('%i',responseParams['addedSenders']));
-//					}else
-//					{
-//						if (!GO.util.empty(responseParams.unknownSenders)) {
-//
-//							if (!this.unknownRecipientsDialogForAddresslist) {
-//								this.unknownRecipientsDialogForAddresslist = new GO.email.UnknownRecipientsDialog();
-//								this.unknownRecipientsDialogForAddresslist.on('hide',function(){
-//									if (!GO.util.empty(this.unknownRecipientsDialogForAddresslist.addresslistId))
-//										delete this.unknownRecipientsDialogForAddresslist.addresslistId;
-//								},this);
-//							}
-//
-//							this.unknownRecipientsDialogForAddresslist.store.loadData({
-//								recipients : Ext.decode(responseParams.unknownSenders)
-//							});
-//
-//							this.unknownRecipientsDialogForAddresslist.addresslistId = addresslistId;
-//
-//							this.unknownRecipientsDialogForAddresslist.show({
-//								title : t("Add unknown senders", "email"),
-//								descriptionText : t("You are adding selected email senders to an addresslist. First, the following selected senders must be added to a Group-Office address book. Click on a name if you want to add that person or close this window.", "email"),
-//								disableSkipUnknownCheckbox : true
-//							});
-//
-//						} else {
-//							Ext.MessageBox.alert(t("Error"),responseParams.feedback);
-//						}
-//					}
-//				}
-//			},
-//			scope: this
-//		});
-//	},
-//
-//	deleteSendersFromAddresslist : function(addresslistId) {
-//		if(go.Modules.isAvailable("legacy", "addressbook")) {
-//			var records = this.messagesGrid.getSelectionModel().getSelections();
-//			var senderEmails = new Array();
-//			for (var i=0;i<records.length;i++) {
-//				senderEmails.push(records[i].data.sender);
-//			}
-//
-//			Ext.Ajax.request({
-//				url: GO.url('addressbook/addresslist/deleteContactsFromAddresslist'),
-//				params: {
-//					senderEmails: Ext.encode(senderEmails),
-//					addresslistId: addresslistId
-//				},
-//				callback: function(options, success, response)
-//				{
-//					var responseData = Ext.decode(response.responseText);
-//					if(!success) {
-//						Ext.MessageBox.alert(t("Error"), responseData.feedback);
-//					} else {
-//						Ext.MessageBox.alert(t("Success"), t("%n contacts have been identified and removed from the selected address list.", "addressbook").replace('%n',responseData.nRemoved));
-//					}
-//				},
-//				scope: this
-//			});
-//		}
-//	}
+	addSendersToAddresslist : function(data) {
+		var records = this.messagesGrid.getSelectionModel().getSelections();
+
+		var emails=[];
+		var from =[];
+		for(var i=0;i<records.length;i++)
+		{
+			//emails.push('"'+records[i].get('from')+'" <'+records[i].get('sender')+'>');
+			from.push(records[i].get('from'));
+			emails.push(records[i].get('sender'));
+		}
+		//var fromName = from[0];
+		var dialog = new GO.email.AddressListDialog({
+			email:emails[0],
+			from: from[0],
+			delete: false,
+			title: t("Add to address list","email")
+		});
+		dialog.show();
+	},
+
+	deleteSendersFromAddresslist : function(addresslistId) {
+		var records = this.messagesGrid.getSelectionModel().getSelections();
+
+		var emails=[];
+		for(var i=0;i<records.length;i++)
+		{
+			emails.push(records[i].get('sender'));
+		}
+
+
+		go.Db.store("Contact").query({
+			filter: {
+				email: emails[0],
+				permissionLevel: go.permissionLevels.write
+			},
+			limit: 1
+		}).then(function(result) {
+			// no contact found
+			if (!result.ids.length) {
+				Ext.MessageBox.alert(t("Error"), t("The contact is unknown","email"));
+				return;
+			} else {
+				var dialog = new GO.email.AddressListDialog({
+					email:emails[0],
+					delete: true,
+					title: t("Remove from address list","email")
+				});
+				dialog.show();
+			}
+		});
+	}
 });
 
 GO.mainLayout.onReady(function(){
@@ -1316,77 +1242,67 @@ GO.mainLayout.onReady(function(){
 
 	//contextmenu when an e-mail address is clicked
 	GO.email.addressContextMenu=new GO.email.AddressContextMenu();
-
 	GO.email.search_type_default = localStorage && localStorage.email_search_type  ? localStorage.email_search_type : 'any';
 
+	//register a new request to the checker. It will poll unseen tickets every two minutes
+	go.Notifier.addStatusIcon('email', 'ic-email');
+	GO.checker.registerRequest("email/account/checkUnseen",{},function(checker, data){
 
+		if(!data.email_status) {
+			return;
+		}
 
+		go.Notifier.toggleIcon('email',data.email_status.total_unseen > 0);
+		GO.mainLayout.setNotification('email',data.email_status.total_unseen,'green');
 
-	//GO.checker is not available in some screens like accept invitation from calendar
-	if(true){
-		//create notify icon
-//		var notificationArea = Ext.get('notification-area');
-//		if(notificationArea)
-//		{
-//			GO.email.notificationEl = notificationArea.createChild({
-//				id: 'ml-notify',
-//				tag:'a',
-//				href:'#',
-//				style:'display:none'
-//			});
-//			GO.email.notificationEl.on('click', function(){
-//				GO.mainLayout.openModule('email');
-//			}, this);
-//		}
+		var ep = GO.mainLayout.getModulePanel('email');
 
-			//register a new request to the checker. It will poll unseen tickets every two minutes
-		GO.checker.registerRequest("email/account/checkUnseen",{},function(checker, result, data){
-			
-			if(!result.email_status) {
-				return;
-			}
-
-				var ep = GO.mainLayout.getModulePanel('email');
-
-			//	var totalUnseen = result.email_status.total_unseen;
-				if(ep){
-					for(var i=0;i<result.email_status.unseen.length;i++)
-					{
-						var s = result.email_status.unseen[i];
-						var changed = ep.updateFolderStatus(s.mailbox, s.unseen,s.account_id);
-						if(changed && ep.messagesGrid.store.baseParams.mailbox==s.mailbox && ep.messagesGrid.store.baseParams.account_id==s.account_id)
-						{
-							ep.messagesGrid.store.reload();
-						}
-					}
-				}
-
-				if(result.email_status.has_new)
+		if(ep){
+			for(var i=0;i<data.email_status.unseen.length;i++)
+			{
+				var s = data.email_status.unseen[i];
+				var changed = ep.updateFolderStatus(s.mailbox, s.unseen,s.account_id);
+				if(changed && ep.messagesGrid.store.baseParams.mailbox==s.mailbox && ep.messagesGrid.store.baseParams.account_id==s.account_id)
 				{
-					data.getParams={
-						unseenEmails:result.email_status.total_unseen
-					}
-
-//					if(!ep || !ep.isVisible()){
-//						GO.email.notificationEl.setDisplayed(true);
-
-						data.popup=true;
-
-						if(GO.util.empty(GO.settings.mute_new_mail_sound))
-							data.alarm=true;
-//					}
-
-					//GO.email.notificationEl.update(result.email_status.total_unseen);
-
-
+					ep.messagesGrid.store.reload();
 				}
+			}
+		}
 
-				GO.mainLayout.setNotification('email',result.email_status.total_unseen,'green');
-		});
+		if((!data.email_status.has_new && this.countEmailShown)
+			|| data.email_status.total_unseen <= 0
+			|| (this.countEmailShown && this.countEmailShown >= data.email_status.total_unseen)){
+
+			this.countEmailShown = data.email_status.total_unseen;
+			return;
+		}
+		this.countEmailShown = data.email_status.total_unseen;
+
+		if (GO.settings.popup_emails) {
+			this.countEmailShown = true;
+			var title = t("New email"),
+				text = t("You have %d unread email(s)").replace('%d', data.email_status.total_unseen);
+			go.Notifier.notify({
+				title: title,
+				text: text,
+				iconCls: 'ic-email',
+				icon: 'views/Extjs3/themes/Paper/img/notify/email.png'
+			});
+			go.Notifier.msg({
+				sound: 'message-new-email',
+				iconCls: 'ic-email',
+				items:[{xtype:'box',html:'<b>'+text+'</b>'}],
+				title: title,
+				handler: function(){
+					GO.mainLayout.openModule('email');
+				}
+			}, 'email');
+		}
 
 
 
-	}
+	});
+
 });
 
 GO.email.aliasesStore = new GO.data.JsonStore({
@@ -1496,7 +1412,7 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 		}
 		url_params = url_params.substring(0,url_params.length-1);
 
-		if(!forceDownload && attachment.mime=='message/rfc822')
+		if(!forceDownload && (attachment.mime=='message/rfc822' || attachment.mime=='application/eml'))
 		{
 			GO.email.showMessageAttachment(0, params);
 		}else
@@ -1547,10 +1463,11 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 					}
 
 				default:
-					if(forceDownload)
+					// if(forceDownload)
 						attachment.url+='&inline=0';
-					if (attachment.extension!='vcf'||forceDownload)
-						window.open(attachment.url);
+
+					// if (attachment.extension!='vcf'||forceDownload)
+						go.util.downloadFile(attachment.url);
 					break;
 			}
 		}
@@ -1720,7 +1637,7 @@ GO.newMenuItems.push(
 {
 	itemId : 'email-files',
 	text: t("Email files", "email"),
-	iconCls: 'em-btn-email-files',
+	iconCls: 'ic-email',
 	handler:function(item, e){
 		var panel = item.parentMenu.panel;
 
@@ -1732,7 +1649,7 @@ GO.newMenuItems.push(
 					id: panel.data.id
 				},
 				success:function(response, options, result){
-					GO.email.emailFiles(result.data.path, this);
+					GO.email.emailFiles(result.data, this);
 				},
 				scope: this
 			});
@@ -1788,6 +1705,7 @@ GO.email.getTaskShowConfig = function(item) {
 	return taskShowConfig;
 }
 //files is array of relative paths
+// files is array of objects with {name, path, size, type, extension}
 GO.email.emailFiles = function(files, item) {
 	if (!Ext.isArray(files)) {
 		files = new Array(files);
@@ -1798,9 +1716,20 @@ GO.email.emailFiles = function(files, item) {
 	var c = GO.email.showComposer(composerConfig);
 
 	c.on('dialog_ready', function(){
-		c.emailEditor.attachmentsView.afterUpload({
-			addFileStorageFiles: Ext.encode(files)
-		});
+		var items = [];
+		for (var i = 0; i < files.length; i++) {
+			items.push({
+				human_size: Ext.util.Format.fileSize(files[i].size),
+				extension: files[i].extension,
+				size: files[i].size,
+				type: files[i].type,
+				name: files[i].name,
+				fileName: files[i].name,
+				from_file_storage: true,
+				tmp_file: files[i].path,
+			});
+		}
+		c.emailEditor.attachmentsView.addFiles(items);
 	},this,{single:true});
 }
 
@@ -1853,18 +1782,15 @@ GO.email.openFolderTree = function(id, folder_id, referenceItem) {
 			buttons:[{
 				text: t("Ok"),
 				handler: function(){
-
 					var selFiles = new Array();
 					var selNodes = GO.email.folderTree.getChecked();
 
 					Ext.each(selNodes, function(node) {
-						selFiles.push(node.attributes.path);
+						selFiles.push(node.attributes);
 					});
 
-					GO.email.emailFiles(
-						selFiles,
-						this.treeFileBrowser.referenceItem
-					);
+					GO.email.emailFiles(selFiles);
+
 					GO.email.treeFileBrowser.hide();
 				},
 				scope:this
@@ -1924,6 +1850,7 @@ GO.email.showAttendanceWindow=function(event_id){
 
 
 GO.email.moveToSpam = function(mailUid,mailboxName,fromAccountId) {
+	this.messagesGrid.getView().scrollToTopOnLoad=false;
 	Ext.Msg.show({
 		title: t("Move to Spam folder?", "email"),
 		icon: Ext.MessageBox.QUESTION,
@@ -1931,6 +1858,7 @@ GO.email.moveToSpam = function(mailUid,mailboxName,fromAccountId) {
 		buttons: Ext.Msg.YESNO,
 		fn: function(btn) {
 			if (btn=='yes') {
+				var me = this;
 				GO.request({
 					url: 'email/message/moveToSpam',
 					params: {
@@ -1940,6 +1868,10 @@ GO.email.moveToSpam = function(mailUid,mailboxName,fromAccountId) {
 					},
 					success: function() {
 //						GO.email.emailClient.topMessagesGrid.store.load();
+						var records = me.messagesGrid.selModel.getSelections();
+						var lastItem = records.pop();
+						var index = me.messagesGrid.store.indexOfId(lastItem.id);
+						me.messagesGrid.selModel.selectRow(index + 1);
 						GO.email.emailClient.leftMessagesGrid.store.load();
 					},
 					failure: function(response,options,result) {

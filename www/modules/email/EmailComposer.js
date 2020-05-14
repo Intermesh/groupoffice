@@ -342,14 +342,12 @@ GO.email.EmailComposer = function(config) {
 	}));
 	this.emailEditor = new GO.base.email.EmailEditorPanel({
 		maxAttachmentsSize:parseInt(GO.settings.config.max_attachment_size),
-		region:'center',
-		listeners:{
-			submitshortcut:function(){
-				this.sendMail(false, false);
-			},
-			scope:this
-		}
+		region:'center'
 	});
+
+	this.emailEditor.getHtmlEditor().on('ctrlenter', function() {
+		this.sendMail(false, false);
+	}, this);
 	
 	this.formPanel = new Ext.form.FormPanel({
 		border : false,		
@@ -360,6 +358,7 @@ GO.email.EmailComposer = function(config) {
 			region:"north",
 			layout:'form',
 			xtype: "fieldset",
+			style: 'padding-bottom:0',
 			labelWidth : 100,
 			defaultType : 'textfield',
 			autoHeight:true,
@@ -808,18 +807,6 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 			this.emailEditor.getActiveEditor().setValue(sig+this.emailEditor.getActiveEditor().getValue());
 		}
 	},
-
-	/*
-	 *handles ctrl+enter from html editor
-	 */
-	fireSubmit : function(e) {
-		if (e.ctrlKey && Ext.EventObject.ENTER == e.getKey()) {
-			//e.stopEvent();
-			e.preventDefault();
-			this.sendMail(false, false);
-			return false;
-		}
-	},
 	
 	autoSave : function(){
 		if(GO.util.empty(this.sendParams.addresslist_id) && this.lastAutoSave && this.lastAutoSave!=this.emailEditor.getActiveEditor().getValue())
@@ -1224,8 +1211,12 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 						}
 							
 //						action.result.data.account_id
-						
-						this.fireEvent('dialog_ready', this);
+
+						Ext.defer(function() {
+							// show() of EmailEditorPanel is deferred 100ms by Ext and the ready event comes to early
+							this.fireEvent('dialog_ready', this);
+						}, 100,this);
+
 					},
 					scope : this
 				});
@@ -1416,18 +1407,18 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 							var callback = this.callback.createDelegate(this.scope);
 							callback.call();
 						}
+						
+						if (GO.addressbook && action.result.unknown_recipients
+							&& action.result.unknown_recipients.length) {
+							if (!GO.email.unknownRecipientsDialog)
+								GO.email.unknownRecipientsDialog = new GO.email.UnknownRecipientsDialog();
 	
-//						if (GO.addressbook && action.result.unknown_recipients
-//							&& action.result.unknown_recipients.length) {
-//							if (!GO.email.unknownRecipientsDialog)
-//								GO.email.unknownRecipientsDialog = new GO.email.UnknownRecipientsDialog();
-//	
-//							GO.email.unknownRecipientsDialog.store.loadData({
-//								recipients : action.result.unknown_recipients
-//							});
-//	
-//							GO.email.unknownRecipientsDialog.show();
-//						}
+							GO.email.unknownRecipientsDialog.store.loadData({
+								recipients : action.result.unknown_recipients
+							});
+	
+							GO.email.unknownRecipientsDialog.show();
+						}
 
 	
 						this.fireEvent('send', this);

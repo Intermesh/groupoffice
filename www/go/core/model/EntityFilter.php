@@ -60,7 +60,16 @@ class EntityFilter extends AclOwnerEntity {
 						->add('entity', function (Criteria $criteria, $value, \go\core\orm\Query $query){
 							$query->join('core_entity', 'e', 'e.id = f.entityTypeId');
 							
-							$criteria->where(['e.name' => $value]);		
+							$criteria->where(['e.clientName' => $value]);
 						});
+	}
+
+	public static function sort(\go\core\orm\Query $query, array $sort)
+	{
+		if(empty($sort)) {
+			$sort['name'] = 'ASC';
+		}
+
+		return parent::sort($query, $sort);
 	}
 }

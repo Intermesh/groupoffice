@@ -86,3 +86,22 @@ $updates['201910012019'][] = 'ALTER TABLE `addressbook_contact` ADD CONSTRAINT `
 
 $updates['201910281039'][] = 'update `addressbook_contact` set lastName = null, firstName = null, middleName = null, suffixes = null, prefixes = null, modifiedAt = now() where isOrganization = true;';
 
+$updates['201911111041'][] = 'ALTER TABLE `addressbook_contact` ADD INDEX(`isOrganization`)';
+
+$updates['201912231421'][] = 'ALTER TABLE `addressbook_contact` ADD `color` CHAR(6) NULL DEFAULT NULL AFTER `uri`;';
+
+$updates['202001091545'][] = 'update addressbook_contact set uri = null where uri = ".vcf" and uid is null;';
+$updates['202001091545'][] = 'update addressbook_contact set uri = concat(uid, ".vcf") where uri = \'.vcf\' and uid is not null';
+
+
+$updates['202003191040'][] = 'ALTER TABLE addressbook_contact ADD nameBank varchar(50);';
+$updates['202003191040'][] = 'ALTER TABLE addressbook_contact ADD BIC varchar(11);';
+
+$updates['202004011205'][] = "ALTER TABLE `addressbook_contact` CHANGE `uid` `uid` VARCHAR(512) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL, CHANGE `uri` `uri` VARCHAR(512) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL;";
+
+$updates['202004161427'][] = "ALTER TABLE `addressbook_contact` ADD `department` VARCHAR(100) NULL DEFAULT NULL AFTER `jobTitle`;";
+
+$updates['202004161427'][] = function() {
+	$m = new go\modules\community\addressbook\install\Migrate63to64();
+	$m->addDepartment();
+};

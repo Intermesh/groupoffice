@@ -21,6 +21,7 @@ class Extjs3 {
 		return App::get()->getDataFolder()->getFolder('clientscripts')->delete();
 	}
 
+	private $cssFile;
 
 	/**
 	 * 
@@ -29,28 +30,43 @@ class Extjs3 {
 	 */
 	public function getCSSFile($theme = 'Paper') {
 
+		if(isset($this->cssFile)) {
+			return $this->cssFile;
+		}
+
 		$cacheFile = go()->getDataFolder()->getFile('clientscripts/' . $theme . '/style.css');
-		
-		
-		if (go()->getDebugger()->enabled || !$cacheFile->exists()) {
-			if ($cacheFile->exists()) {
-				$cacheFile->delete();
-			}
+		$debug = go()->getDebugger()->enabled && $cacheFile->exists();
+		if ($debug || !$cacheFile->exists()) {
 			$modules = Module::getInstalled();
 			$css = "";
+			$modifiedAt = null;
 			foreach ($modules as $module) {
 
 				if (isset($module->package)) {
-					$folder = $module->module()->getFolder();
+
+          $folder = $module->module()->getFolder();
+
+          $file = $folder->getFile('views/extjs3/themes/' . $theme . '/style.css');
+          if ($file->exists()) {
+            $css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
+
+            if($debug && $file->getModifiedAt() > $modifiedAt) {
+            	$modifiedAt = $file->getModifiedAt();
+            }
+            continue;
+          }
+
+
 					$file = $folder->getFile('views/extjs3/themes/default/style.css');
 					if ($file->exists()) {
-						$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";						
+						$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
+
+						if($debug && $file->getModifiedAt() > $modifiedAt) {
+							$modifiedAt = $file->getModifiedAt();
+						}
 					}
 
-					$file = $folder->getFile('views/extjs3/themes/' . $theme . '/style.css');
-					if ($file->exists()) {
-						$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";						
-					}
+
 				}
 
 				//old path
@@ -58,16 +74,25 @@ class Extjs3 {
 				$file = $folder->getFile('themes/Default/style.css');
 				if ($file->exists()) {
 					$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
+					if($debug && $file->getModifiedAt() > $modifiedAt) {
+						$modifiedAt = $file->getModifiedAt();
+					}
 				}
 
 				$file = $folder->getFile('themes/' . $theme . '/style.css');
 				if ($file->exists()) {
-					$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";					
+					$css .= $this->replaceCssUrl($file->getContents(),$file)."\n";
+					if($debug && $file->getModifiedAt() > $modifiedAt) {
+						$modifiedAt = $file->getModifiedAt();
+					}
 				}
 			}
-			
-			$cacheFile->putContents($css);
+
+			if(!$debug || $modifiedAt > $cacheFile->getModifiedAt()) {
+				$cacheFile->putContents($css);
+			}
 		}
+		$this->cssFile = $cacheFile;
 		return $cacheFile;
 	}
 	
@@ -99,7 +124,7 @@ class Extjs3 {
 		
 		$cacheFile = go()->getDataFolder()->getFile('clientscripts/lang_'.$iso.'.js');
 
-		if (go()->getDebugger()->enabled || !$cacheFile->exists()) {
+		if (!$cacheFile->exists()) {
 //		if (!$cacheFile->exists()) {
 
 			$str = "var GO = GO || {};\n";

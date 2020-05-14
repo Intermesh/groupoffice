@@ -42,6 +42,7 @@ namespace GO\Base\Db;
 
 use GO\Base\Db\PDO;
 use GO;
+use go\core\db\Query;
 use go\core\util\DateTime;
 
 abstract class ActiveRecord extends \GO\Base\Model{
@@ -2263,6 +2264,19 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				case 'date':
 					return  \GO\Base\Util\Date::to_db_date($value);
 					break;
+				case 'datetime':
+					if(empty($value))
+					{
+						return null;
+					}
+					$time = \GO\Base\Util\Date::to_unixtime($value);
+					if(!$time)
+					{
+						return null;
+					}
+					$date_format =  'Y-m-d H:i:s';
+					return date($date_format, $time);
+					break;
 				case 'textfield':
 					return (string) $value;
 					break;
@@ -2334,6 +2348,15 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				return $date->format(GO::user()?GO::user()->completeDateFormat:GO::config()->getCompleteDateFormat());
 
 				//return $value != '0000-00-00' ? \GO\Base\Util\Date::get_timestamp(strtotime($value),false) : '';
+				break;
+
+			case 'datetime':
+
+				if($value == "0000-00-00" || empty($value))
+					return null;
+
+				$date = new \DateTime($value);
+				return $date->format('c');
 				break;
 
 			case 'number':
@@ -2458,12 +2481,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	public function getAttributeSelection($attributeNames, $outputType='formatted'){
 		$att=array();
 		foreach($attributeNames as $attName){
-			if(isset($this->columns[$attName])){
+			if(substr($attName, 0, 13) === 'customFields.') {
+				$att[$attName]=$this->getCustomFields()[substr($attName, 13)] ?? null;
+			}else if(isset($this->columns[$attName])){
 				$att[$attName]=$this->getAttribute($attName, $outputType);
 			}elseif($this->hasAttribute($attName)){
 				$att[$attName]=$this->$attName;
-			}else
-			{
+			}else {
 				$att[$attName]=null;
 			}
 		}
@@ -3575,10 +3599,11 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		
 		if(isset($attr['mtime'])) {
 			$attr['modifiedAt'] = \DateTime::createFromFormat("U", $attr['mtime']);
-			unset($attr['mtime']);
+
 		} else {
 			$attr['modifiedAt'] = \DateTime::createFromFormat("U", $this->mtime);
 		}
+		unset($attr['mtime']);
 
 		// Always unset ctime, we don't use it anymore in the searchcache table
 		unset($attr['ctime']);
@@ -3735,6 +3760,21 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			foreach($this->getCustomFields() as $col => $v) {
 				if(!empty($v) && is_string($v)) {
 					$keywords[] = $v;
+				}
+			}
+		}
+
+		if($this->hasLinks()) {
+
+			$links = (new Query())
+				->select('description')
+				->from('core_link')
+				->where('(toEntityTypeId = :e1 AND toId = :e2)')
+				->orWhere('(fromEntityTypeId = :e3 AND fromId = :e4)')
+				->bind([':e1' => static::entityType()->getId(), ':e2' => $this->id, ':e3' => static::entityType()->getId(), ':e4' => $this->id]);
+			foreach ($links->all() as $link) {
+				if (!empty($link['description']) && is_string($link['description'])) {
+					$keywords[] = $link['description'];
 				}
 			}
 		}
@@ -4414,7 +4454,17 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$isSearchCacheModel = ($this instanceof \GO\Base\Model\SearchCacheRecord);
 
-		if(!$this->hasLinks() && !$isSearchCacheModel)
+		$disableLinksFor = GO::config()->disable_links_for ? GO::config()->disable_links_for : array();
+		if (!is_array($disableLinksFor)) {
+			$disableLinksFor = [$disableLinksFor];
+		}
+
+		$linksDisabled = false;
+		if (in_array(self::className(), $disableLinksFor, true) || in_array(get_class($model), $disableLinksFor, true)) {
+			$linksDisabled = true;
+		}
+
+		if((!$this->hasLinks() && !$isSearchCacheModel) || $linksDisabled)
 			throw new \Exception("Links not supported by ".$this->className ());
 
 		if($this->linkExists($model))
@@ -4711,7 +4761,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		echo "Checking ".(is_array($this->pk)?implode(',',$this->pk):$this->pk)." ".$this->className()."\n";
 		flush();
 
-		if($this->aclField() && !$this->isJoinedAclField){
+		if($this->aclField() && (!$this->isJoinedAclField || $this instanceof GO\Files\Model\Folder)){
 
 			$acl = $this->acl;
 			if(!$acl)

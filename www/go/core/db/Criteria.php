@@ -1,6 +1,8 @@
 <?php
 namespace go\core\db;
 
+use Exception;
+
 /**
  * Create "where", "having" or "join on" part of the query for {@see \go\core\db\Query}
  * 
@@ -29,7 +31,7 @@ class Criteria {
 	 * 
 	 * @param array|string|static $criteria
 	 * @return static
-	 * @throws \Exception
+	 * @throws Exception
 	 */
 	public static function normalize($criteria = null) {
 		if (!isset($criteria)) {
@@ -41,7 +43,7 @@ class Criteria {
 		}
 		
 		if(is_object($criteria)) {
-			throw new \Exception("Invalid query object passed: ".get_class($criteria).". Should be an go\core\orm\Query object, array or string.");
+			throw new Exception("Invalid query object passed: ".get_class($criteria).". Should be an go\core\orm\Query object, array or string.");
 		}
 		
 		return (new static)->where($criteria);
@@ -167,11 +169,17 @@ class Criteria {
 	protected function internalWhere($condition, $comparisonOperator, $value, $logicalOperator) {			
 		
 		if(is_array($condition)) {
-			$sub = new Criteria();
-			foreach($condition as $colName => $value) {
-				$sub->andWhere($colName, '=', $value);				
-			}			
-			$condition = $sub;			
+			$count = count($condition);
+			if($count > 1) {
+				$sub = new Criteria();
+				foreach($condition as $colName => $value) {
+					$sub->andWhere($colName, '=', $value);				
+				}			
+				$condition = $sub;
+			} else if ($count === 1) {
+				reset($condition);
+				return ["column", $logicalOperator, key($condition), '=', current($condition)];	
+			}
 		} 
 		
 		if(!isset($comparisonOperator) && (is_string($condition) || $condition instanceof Criteria)) {
@@ -217,14 +225,18 @@ class Criteria {
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'AND');
 		return $this;
 	}
-	
+
 	/**
 	 * Add where condition with AND NOT(..)
-	 * 
+   *
+   * Don't use this for ..WHERE a NO IN (SELECT... Just use
+   *
+   * andWhere('a', 'NOT IN', $query);
+	 *
 	 * {@see where()}
-	 * 
+	 *
 	 * @param String|array|Criteria $column
-	 * @param string $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
+	 * @param string $operator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
 	 * @param mixed $value
 	 * @return $this
 	 */
@@ -249,7 +261,7 @@ class Criteria {
 	 * {@see where()}
 	 * 
 	 * @param String|array|Criteria $column
-	 * @param string $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
+	 * @param string $operator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
 	 * @param mixed $value
 	 * @return $this
 	 */
@@ -265,7 +277,7 @@ class Criteria {
 	 * {@see where()}
 	 * 
 	 * @param String|array|Criteria $column
-	 * @param string $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
+	 * @param string $operator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
 	 * @param mixed $value
 	 * @return $this
 	 */
@@ -290,7 +302,7 @@ class Criteria {
 	 * {@see where()}
 	 * 
 	 * @param String|array|Criteria $column
-	 * @param string $comparisonOperator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
+	 * @param string $operator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
 	 * @param mixed $value
 	 * @return $this
 	 */
@@ -303,8 +315,10 @@ class Criteria {
 	 * Concatenate where condition with OR
 	 * 
 	 * {@see where()}
-	 * 
-	 * @param String|array|Criteria $condition
+	 *
+   * @param String|array|Criteria $column
+   * @param string $operator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
+   * @param mixed $value
 	 * @return static
 	 */
 	public function orWhere($column, $operator = null, $value = null) {
@@ -314,11 +328,10 @@ class Criteria {
 
 
 	/**
-	 * Cleare where conditions
+	 * Clear where conditions
 	 * 
 	 * @return self
 	 */
-
 	public function clearWhere() {
 		$this->where = [];
 

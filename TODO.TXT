@@ -1,8 +1,39 @@
 6.4
 
-- Billing: Copy matching custom fields in order dialog
+remove folders when uninstalling module. Error when reinstalling
 
-Merge contacts
+- Drag and drop files and folders to upload
+- riot matrix synapse integration / mattermost
+- csv export select columns
+- never respond to email read requests option
+- mailserver limit access per service and filter remote ip address (global and per domain) to stop hacks. https://doc.dovecot.org/configuration_manual/config_file/config_variables/
+
+- logo blob stale gc?
+
+- blob:<ID|method> copy pasten. bv. email naar file. Attachment naar file. File kan geplakt worden in files of email composer.
+
+- threaded mail (new db design required)
+- calendar invite redesign:
+ - Inbox with invites from caldav, EAS and e-mail
+ - Remove email's automatically
+ - Status (number of open invites) indicator on Calendar tab like email
+ - Database redesign with single object per meeting with multiple participants
+
+- Time tracking
+- New projects module or refactor existing?
+- Tickets finish
+- Share folder external
+- Share project with customer
+
+- NOtifications
+
+- Makkelijker taken toevoegen bij projecten. Project eigen lijst?
+tasklist bij default permissions
+
+
+- billing API integratie boekhoudpakketten
+
+
 Batch edit custom fields not possible
 Disabled categories for:  folder dialog Folder::deriveCustomfieldSettings
 custom fields billign items dropped ?!
@@ -11,10 +42,14 @@ Demodata
 ticket groups
 
 
-DG::
+Projecten:
+Losse modules:
+- Nieuwe mininale basis met naam, nummer, status, custom fields en links.
+- Milestones: Has many met datum.
+- Kanban takenlijaten
+- Tijdsregistratie
+    - Project een kleur geven
 
-Income contracts als maatwerk:
-modules/projects2/views/Extjs3/AddressbookOverrides.js
 
 Affected customer modules:
 favorites (greifswald)

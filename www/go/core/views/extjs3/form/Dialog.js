@@ -88,11 +88,11 @@ go.form.Dialog = Ext.extend(go.Window, {
 		Ext.applyIf(this,{
 			buttons:[
 				'->', 
-				{
+				this.saveButton = new Ext.Button({
 					text: t("Save"),
 					handler: function() {this.submit();},
 					scope: this
-				}
+				})
 			]
 		});
 	},
@@ -228,8 +228,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 		return this;
 	},
 	
-	getValues : function() {
-		return this.formPanel.getValues();
+	getValues : function(dirtyOnly) {
+		return this.formPanel.getValues(dirtyOnly);
 	},
 
 	load: function (id) {
@@ -289,9 +289,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	},
 
 	onSubmit: function (success, serverId) {
-		if (success) {
-			this.entityStore.entity.goto(serverId);
-		}
+
 	},
 
 	actionComplete: function () {
@@ -320,6 +318,12 @@ go.form.Dialog = Ext.extend(go.Window, {
 	},
 
 	submit: function (cb, scope) {
+
+		//When form is submnitted with enter key the validation errors of the field having focus is not disabled if we
+		// don't give something else focus.
+		if(this.saveButton) {
+			this.saveButton.focus();
+		}
 		
 		if(!this.onBeforeSubmit()) {
 			return;
@@ -329,28 +333,26 @@ go.form.Dialog = Ext.extend(go.Window, {
 			this.showFirstInvalidField();
 			return;
 		}
+
+		var isNew = !this.currentId;
 		
 		this.actionStart();
 
-		this.formPanel.submit(function (formPanel, success, serverId) {
-			this.actionComplete();
-			this.onSubmit(success, serverId);
-			this.fireEvent("submit", this, success, serverId);
-			
-			if(cb) {
-				cb.call(scope || this, success, serverId);
-			}
+		var me = this;
+		return this.formPanel.submit().then(function(serverId) {
 
-			if(!success) {
-				this.showFirstInvalidField();
-				return;
+			me.onSubmit(true, serverId);
+			me.fireEvent("submit", this, true, serverId);
+
+			if(me.redirectOnSave && isNew) {
+				me.entityStore.entity.goto(serverId);
 			}
-			if(this.redirectOnSave) {
-				this.entityStore.entity.goto(serverId);
-			}
-			this.close();
-						
-		}, this);
+			me.close();
+		}).catch(function(error) {
+			me.showFirstInvalidField();
+		}).finally(function() {
+			me.actionComplete();
+		})
 	},
 
 	showFirstInvalidField : function() {

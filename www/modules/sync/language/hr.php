@@ -23,4 +23,6 @@ return array (
   'Delete older events and tasks at the client (they will be kept in Group-Office)' => 'Obriši starije događaje i zadatke kod klijenta (zadržat će se u {product_name})',
   'Model' => 'Model',
   '<h1>Group-Office SyncML Server</h1><p>This is the Group-Office SyncML server. Use a SyncML compliant device or software package and connect it to this URL to synchronize with Group-Office.</p>' => '<h1>{product_name} SyncML poslužitelj</h1><p>Ovo je {product_name} SyncML poslužitelj. Koristite kompatibilan SyncML uređaj ili programski paket i povežite ih na ovaj URL kako bi započeli sinkronizaciju sa {product_name}.</p>',
+  'Notebooks' => 'Bilježnice',
+  'Address books' => 'Adresari',
 );

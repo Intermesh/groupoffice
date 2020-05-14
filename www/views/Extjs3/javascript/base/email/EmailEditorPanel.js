@@ -47,7 +47,7 @@ GO.base.email.EmailEditorPanel = function(config){
 	
 	if(!config.maxAttachmentsSize)
 		config.maxAttachmentsSize=GO.settings.config.max_attachment_size;
-			
+
 	this.buildForm(config);
 	
 	config.layout='form';
@@ -181,60 +181,19 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		this.htmlEditor = new GO.form.HtmlEditor({
 			name:'htmlbody',
 			hideLabel: true,
+			headingsMenu: false,
 			anchor: '100% '+anchorHeight,
-			plugins:this.initHtmlEditorPlugins(),			
-			listeners:{
-				activate:function(){
+			plugins:this.initHtmlEditorPlugins(),
+			getFontStyle :  function() {
+				return GO.form.HtmlEditor.prototype.getFontStyle.call(this) + ';color: black';
+			},
 
-					var doc = this.htmlEditor.getDoc();				
-					if (Ext.isGecko){					
-						Ext.EventManager.on(doc, {
-							keypress: this.fireSubmit,
-							scope: this
-						});
-					}
-					if (Ext.isIE || Ext.isWebKit || Ext.isOpera) {
-						Ext.EventManager.on(doc, 'keydown', this.fireSubmit,
-							this);
-					}
-					
-					this.setOriginalValue();					
-					
-					
-//					var pasteEl = doc;
-
-//					if(Ext.isChrome){
-//						var paster = new GO.base.upload.Paster({
-//							pasteEl: pasteEl,
-//							temporaryFile:true,
-//							callback:function(paster, result, xhr){
-////								this.attachmentsView.addTempFile(result.data);
-//
-//									var token = GO.base.util.MD5(result.data.tmp_file);
-//
-//									var url = GO.url("core/downloadTempFile", {path:result.data.tmp_file, token: token});
-//
-//									var html = '<img src="'+url+'" border="0" />';
-//									
-//									this.htmlEditor.focus();
-//									this.htmlEditor.insertAtCursor(html);	
-//									
-//									
-//									this.inlineAttachments.push({
-//										tmp_file : result.data.tmp_file,
-//										from_file_storage : false,
-//										token:token
-//									});				
-//									this.setInlineAttachments(this.inlineAttachments);	
-//							},
-//							scope:this
-//						});
-//
-//					}					
-				},
-				scope:this
+			getEditorFrameStyle : function() {
+				return GO.form.HtmlEditor.prototype.getEditorFrameStyle.call(this) + ' body {background-color: white}';
 			}
 		});
+
+		this.htmlEditor.on('attach', this.htmlEditorAttach, this);
 		
 		this.textEditor = new Ext.form.TextArea({
 			name: 'plainbody',
@@ -279,7 +238,8 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 						this.attachments.push({
 							tmp_file:records[i].data.tmp_file,
 							from_file_storage: records[i].data.from_file_storage,
-							fileName:records[i].data.name
+							fileName:records[i].data.name,
+							blobId: records[i].data.blobId
 						});
 					
 					this.hiddenAttachmentsField.setValue(Ext.encode(this.attachments));
@@ -289,6 +249,27 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		});
 		config.items.push(this.attachmentsView);
 
+	},
+
+	htmlEditorAttach : function(htmlEditor,blob, file, img) {
+
+		if(img) {
+			//inline will be processed from body
+			return;
+		}
+
+		var items = [{
+			human_size: Ext.util.Format.fileSize(blob.size),
+			extension: blob.name.split('.').pop(),
+			size: blob.size,
+			type: blob.type,
+			name: blob.name,
+			fileName: blob.name,
+			from_file_storage: false,
+			blobId: blob.blobId
+		}];
+
+		this.attachmentsView.addFiles(items);
 	},
 	
 	reset : function(){
@@ -331,13 +312,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 //		this.htmlEditor.setValue(v);		
 //	},
 
-	fireSubmit : function(e) {
-		if (e.ctrlKey && Ext.EventObject.ENTER == e.getKey()) {
-			e.preventDefault();
-			this.fireEvent('submitshortcut',this);
-			return false;
-		}
-	},
+
 	
 	setEditorHeight : function() {
 
@@ -393,7 +368,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		
 		
 	
-		return [imageInsertPlugin];
+		return [imageInsertPlugin, go.form.HtmlEditor.emojiPlugin];
 	},
 	
 	getHtmlEditor : function() {
@@ -440,90 +415,104 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 
 	
 	getAttachmentsButton : function(){
-		
-		
-		if(go.Modules.isAvailable("legacy", "files"))
-		{
-			var uploadItems = [];
-		
-			uploadItems.push(new GO.base.upload.PluploadMenuItem({
-					text:t("Upload"),
-					upload_config: {
-						max_file_size: Math.floor(this.maxAttachmentsSize/1048576)+'mb',
-						listeners: {
-							scope:this,
-							uploadcomplete: function(uploadpanel, success, failures) {
-								if (success.length){
-									this.attachmentsView.afterUpload();
-									if(!failures.length){
-										uploadpanel.onDeleteAll();
-										
-										if(GO.settings.upload_quickselect !== false)
-											uploadpanel.ownerCt.hide();
-									}
-								}
-							}
+
+		var uploadHandle = function() {
+			go.util.openFileDialog({
+				multiple: true,
+				directory: false,
+				autoUpload: true,
+				maxSize: this.maxAttachmentsSize, // todo
+				listeners: {
+					uploadComplete: function (blobs) {
+						var items = [];
+						for (var i = 0; i < blobs.length; i++) {
+							items.push({
+								human_size: Ext.util.Format.fileSize(blobs[i].size),
+								extension: blobs[i].name.split('.').pop(),
+								size: blobs[i].size,
+								type: blobs[i].type,
+								name: blobs[i].name,
+								fileName: blobs[i].name,
+								from_file_storage: false,
+								blobId: blobs[i].blobId
+							});
 						}
-					}
-				})
-			);
-		
-			uploadItems.push({
-				iconCls:'ic-folder',
-				text : t("Add from Group-Office", "email").replace('{product_name}', GO.settings.config.product_name),
-				handler : function()
-				{
-					if(go.Modules.isAvailable("legacy", "files"))
-					{
-						GO.files.createSelectFileBrowser();
-
-						GO.selectFileBrowser.setFileClickHandler(function(){	
-
-							var paths = [];
-							var selections = GO.selectFileBrowser.getSelectedGridRecords();
-							for (var i = 0; i < selections.length; i++)
-								paths.push(selections[i].data.path);
-							
-							this.attachmentsView.afterUpload({addFileStorageFiles:Ext.encode(paths)});
-							GO.selectFileBrowserWindow.hide();
-						}, this);
-
-						GO.selectFileBrowser.setFilesFilter('');
-						GO.selectFileBrowser.setRootID(0,0);
-						GO.selectFileBrowserWindow.show();
-					}
-				},
-				scope : this
+						//debugger;
+						this.attachmentsView.addFiles(items);
+					},
+					scope: this
+				}
 			});
-			
+		};
+
+
+		if(!go.Modules.isAvailable("legacy", "files")) {
 			return new Ext.Button({
-				iconCls:'btn-attach',
+				iconCls:'ic-attach-file',
 				tooltip: t("Attach files"),
-				menu:{
-					items:uploadItems
-				}
-			});
-			
-		}else
-		{		
-			return new GO.base.upload.PluploadButton({
-				tooltip:t("Attach files"),
-				upload_config: {
-					listeners: {
-						scope:this,
-						uploadcomplete: function(uploadpanel, success, failures) {
-							if (success.length){
-								this.attachmentsView.afterUpload();
-								if(!failures.length){
-									uploadpanel.onDeleteAll();
-									uploadpanel.ownerCt.hide();
-								}
-							}
-						}
-					}
-				}
+				handler:uploadHandle,
+				scope:this
 			});
 		}
+
+		var fileBrowserHandle = function(result) {
+			GO.files.createSelectFileBrowser();
+
+			GO.selectFileBrowser.setFileClickHandler(function(){
+
+				var items = [],
+					selections = GO.selectFileBrowser.getSelectedGridRecords();
+				for (var i = 0; i < selections.length; i++) {
+					items.push({
+						human_size: Ext.util.Format.fileSize(selections[i].data.size),
+						extension: selections[i].data.extension,
+						size: selections[i].data.size,
+						type: selections[i].data.type,
+						name: selections[i].data.name,
+						fileName: selections[i].data.name,
+						from_file_storage: true,
+						tmp_file: selections[i].data.path,
+					});
+				}
+
+				this.attachmentsView.addFiles(items);
+				GO.selectFileBrowserWindow.hide();
+			}, this);
+			GO.selectFileBrowser.setFilesFilter('');
+
+			if(result) {
+				GO.selectFileBrowser.setRootID(result.files_folder_id,result.files_folder_id);
+			} else {
+				GO.selectFileBrowser.setRootID(0,0);
+			}
+			GO.selectFileBrowserWindow.show();
+		}.bind(this);
+
+		return new Ext.Button({
+			iconCls:'ic-attach-file',
+			tooltip: t("Attach files"),
+			menu:[{
+				text: t('Upload'),
+				iconCls: 'ic-file-upload',
+				handler:uploadHandle,
+				scope:this
+			}, {
+				iconCls:'ic-folder',
+				text : t("Add from personal folder", "email").replace('{product_name}', GO.settings.config.product_name),
+				handler : fileBrowserHandle,
+				scope : this
+			},{
+				iconCls:'ic-folder',
+				text : t("Add from item", "email"),
+				handler : function() {
+					var dlg = new GO.email.LinkAttachmentDialog();
+					dlg.setAttachmentHandle(fileBrowserHandle);
+					dlg.setAttachmentsView(this.attachmentsView);
+					dlg.show(null);
+				},
+				scope : this
+			}]
+		});
 	}
 });
 

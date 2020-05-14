@@ -2,27 +2,25 @@
 
 namespace go\core\model;
 
+use DateTimeZone;
 use Exception;
-use GO;
+use GO\Base\Html\Error;
 use GO\Base\Model\AbstractUserDefaultModel;
 use GO\Base\Model\User as LegacyUser;
 use GO\Base\Util\Http;
-use go\core\model\Acl;
 use go\core\App;
 use go\core\auth\Method;
 use go\core\auth\Password;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\convert\UserCsv;
 use go\core\db\Criteria;
+use go\core\mail\Message;
 use go\core\orm\Query;
 use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
-use go\core\model\Module;
 use go\core\orm\CustomFieldsTrait;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
-use go\core\model\Group;
-use go\core\model\Settings;
 
 
 class User extends Entity {
@@ -106,7 +104,7 @@ class User extends Entity {
 	/**
 	 * Display dates short in lists.
 	 * 
-	 * @var boolean
+	 * @var bool
 	 */
 	public $shortDateInList = true;
 	
@@ -195,7 +193,8 @@ class User extends Entity {
 	
 	protected $last_password_change;
 	public $force_password_change;
-	
+
+	protected $permissionLevel;
 	
 	public function getDateTimeFormat() {
 		return $this->dateFormat . ' ' . $this->timeFormat;
@@ -219,29 +218,36 @@ class User extends Entity {
 	 * @var bool 
 	 */
 	private $passwordVerified = true;
-	
-	/**
-	 * The working week
-	 * 
-	 * @var WorkingWeek
-	 */
-	public $workingWeek;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
 			->addTable('core_user', 'u')
 			->addTable('core_auth_password', 'p', ['id' => 'userId'])
-			->addScalar('groups', 'core_user_group', ['id' => 'userId'])
-			->addHasOne('workingWeek', WorkingWeek::class, ['id' => 'user_id']);
+			->addScalar('groups', 'core_user_group', ['id' => 'userId']);
 	}
-	
+
+
 	/**
-	 * Get the user's personal group used for granting permissions
-	 * 
-	 * @return Group	 
+	 * @var Group
 	 */
+	private $personalGroup;
+
+  /**
+   * Get the user's personal group used for granting permissions
+   *
+   * @return Group
+   * @throws Exception
+   */
 	public function getPersonalGroup() {
-		return Group::find()->where(['isUserGroupFor' => $this->id])->single();
+		if(empty($this->personalGroup)){
+			$this->personalGroup = Group::find()->where(['isUserGroupFor' => $this->id])->single();
+		}
+
+		return $this->personalGroup;
+	}
+
+	public function setPersonalGroup($values) {
+		$this->getPersonalGroup()->setValues($values);
 	}
 	
 	public function setValues(array $values) {
@@ -263,9 +269,9 @@ class User extends Entity {
 			$this->timeFormat = $s->defaultTimeFormat;	
 			$this->dateFormat = $s->defaultDateFormat;
 			$this->timezone = $s->defaultTimezone;
-			$this->firstWeekday = $s->defaultFirstWeekday;
+			$this->firstWeekday = (int) $s->defaultFirstWeekday;
 			$this->currency = $s->defaultCurrency;
-			$this->shortDateInList = $s->defaultShortDateInList;
+			$this->shortDateInList = (bool) $s->defaultShortDateInList;
 			$this->listSeparator = $s->defaultListSeparator;
 			$this->textSeparator = $s->defaultTextSeparator;
 			$this->thousandsSeparator = $s->defaultThousandSeparator;
@@ -279,7 +285,11 @@ class User extends Entity {
 	}
 
 	private $currentPassword;
-	
+
+  /**
+   * @param $currentPassword
+   * @throws Exception
+   */
 	public function setCurrentPassword($currentPassword){
 		$this->currentPassword = $currentPassword;
 		
@@ -288,17 +298,18 @@ class User extends Entity {
 		} 
 	}
 
-	/**
-	 * Check if the password is correct for this user.
-	 * 
-	 * @param string $password
-	 * @return boolean 
-	 */
+  /**
+   * Check if the password is correct for this user.
+   *
+   * @param string $password
+   * @return boolean
+   * @throws Exception
+   */
 	public function checkPassword($password) {		
 		
 		$authenticator = $this->getPrimaryAuthenticator();
 		if(!isset($authenticator)) {
-			throw new \Exception("No primary authenticator found!");
+			throw new Exception("No primary authenticator found!");
 		}
 		$success = $authenticator->authenticate($this->username, $password);		
 		if($success) {
@@ -337,13 +348,14 @@ class User extends Entity {
 		return !empty($this->password);
 	}
 
-	/**
-	 * Clear the password stored in the database.
-	 * 
-	 * Used by authenticators (IMAP or LDAP) so they can clear it if it's not needed.
-	 * 
-	 * @return bool
-	 */
+  /**
+   * Clear the password stored in the database.
+   *
+   * Used by authenticators (IMAP or LDAP) so they can clear it if it's not needed.
+   *
+   * @return bool
+   * @throws Exception
+   */
 	public function clearPassword() {
 		return go()->getDbConnection()->delete('core_auth_password', ['userId' => $this->id])->execute();
 	}
@@ -352,10 +364,11 @@ class User extends Entity {
 		return null;
 	}
 
-	/**
-	 * Make sure to call this when changing the password with a recovery hash
-	 * @param string $hash
-	 */
+  /**
+   * Make sure to call this when changing the password with a recovery hash
+   * @param string $hash
+   * @return bool
+   */
 	public function checkRecoveryHash($hash) {
 		if($hash === $this->recoveryHash) {
 			$this->passwordVerified = true;
@@ -438,10 +451,41 @@ class User extends Entity {
 				$this->setValidationError('email', ErrorCode::UNIQUE, 'The e-mail address must be unique in the system');
 			}
 		}
+
+		$this->validateMaxUsers();
+
+		if($this->isModified(['timezone'])) {
+			try {
+				$timezone= new DateTimeZone($this->timezone);
+			} catch(Exception $e) {
+				$this->setValidationError('timezone', ErrorCode::INVALID_INPUT, go()->t("Invalid timezone"));
+			}
+		}
 		
 		return parent::internalValidate();
 	}
+
+	private function validateMaxUsers () {
+		if(!$this->isNew()) {
+			return;
+		}
+
+		if($this->maxUsersReached()) {
+			$this->setValidationError('password', ErrorCode::FORBIDDEN, go()->t("You're not allowed to create more than x users"));
+		}
+	}
 	
+	private function maxUsersReached() {
+	  if(empty(go()->getConfig()['core']['limits']['maxUsers'])) {
+	    return false;
+    }
+
+		$stmt = go()->getDbConnection()->query("SELECT count(*) AS count FROM `core_user` WHERE enabled = 1");
+		$record = $stmt->fetch();
+		$countActive = $record['count'];
+		return $countActive >= go()->getConfig()['core']['limits']['maxUsers'];
+	}
+
 	private static function count() {
 		return (int) (new Query())
 						->selectSingleValue('count(*)')
@@ -466,35 +510,52 @@ class User extends Entity {
 	
 	protected static function defineFilters() {
 		return parent::defineFilters()
-						->add('showDisabled', function (Criteria $criteria, $value){							
-							if($value === false) {
-								$criteria->andWhere('enabled', '=', true);
-							}
-						})
-						->add('groupId', function (Criteria $criteria, $value, Query $query){
-							$query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $value]);
-						});
+      ->add('permissionLevel', function(Criteria $criteria, $value, Query $query) {
+        if(!$query->isJoined('core_group', 'g')) {
+          $query->join('core_group', 'g', 'u.id = g.isUserGroupFor');
+        }
+        Acl::applyToQuery($query, 'g.aclId', $value);
+      })
+      ->add('showDisabled', function (Criteria $criteria, $value){
+        if($value === false) {
+          $criteria->andWhere('enabled', '=', true);
+        }
+      })
+      ->add('groupId', function (Criteria $criteria, $value, Query $query){
+        $query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $value]);
+      });
 	}
-	
 
-	/**
-	 * Check if use is an admin
-	 * 
-	 * @return boolean
-	 */
+
+  /**
+   * Check if use is an admin
+   *
+   * @return boolean
+   * @throws Exception
+   */
 	public function isAdmin() {
 		return (new Query)
 			->select('*')
 			->from('core_user_group')
 			->where(['groupId' => Group::ID_ADMINS, 'userId' => $this->id])->single() !== false;
 	}
-	
-	/**
-	 * Alias for making isAdmin() a public property
-	 * @return bool
-	 */
+
+  /**
+   * Alias for making isAdmin() a public property
+   * @return bool
+   * @throws Exception
+   */
 	public function getIsAdmin() {
 		return $this->isAdmin();
+	}
+
+	private static $authMethods;
+
+	public static function findAuthMethods() {
+		if(!isset(self::$authMethods)) {
+			self::$authMethods = Method::find()->orderBy(['sortOrder' => 'DESC']);
+		}
+		return self::$authMethods;
 	}
 
 	/**
@@ -506,7 +567,7 @@ class User extends Entity {
 
 		$methods = [];
 
-		$authMethods = Method::find()->orderBy(['sortOrder' => 'DESC']);
+		$authMethods = self::findAuthMethods();
 
 		foreach ($authMethods as $authMethod) {
 			$authenticator = $authMethod->getAuthenticator();
@@ -518,18 +579,22 @@ class User extends Entity {
 
 		return $methods;
 	}
-	
-	/**
-	 * Send a password recovery link
-	 * 
-	 * @param string $to
-	 * @param string $redirectUrl If given GroupOffice will redirect to this URL after creating a new password.
-	 * @return boolean
-	 */
+
+  /**
+   * Send a password recovery link
+   *
+   * @param string $to
+   * @param string $redirectUrl If given GroupOffice will redirect to this URL after creating a new password.
+   * @throws Exception
+   */
 	public function sendRecoveryMail($to, $redirectUrl = ""){
 		
 		$this->recoveryHash = bin2hex(random_bytes(20));
 		$this->recoverySendAt = new DateTime();
+
+		if(!$this->save()) {
+			throw new \Exception("Could not save user");
+		}
 		
 		$siteTitle=go()->getSettings()->title;
 		$url = go()->getSettings()->URL.'#recover/'.$this->recoveryHash . '-' . urlencode($redirectUrl);
@@ -543,7 +608,9 @@ class User extends Entity {
 			->setSubject(go()->t('Lost password'))
 			->setBody($emailBody);
 		
-		return $this->save() && $message->send();
+		if(!$message->send()) {
+			throw new \Exception("Could not send mail. The notication system setttings may be incorrect.");
+		}
 	}
 	
 	protected function internalSave() {
@@ -558,6 +625,12 @@ class User extends Entity {
 		
 		$this->saveContact();
 
+		if(isset($this->personalGroup) && $this->personalGroup->isModified()) {
+			if(!$this->personalGroup->save()) {
+				$this->setValidationError('personalGroup', ErrorCode::RELATIONAL, "Couldn't save personal group");
+				return false;
+			}
+		}
 		$this->createPersonalGroup();
 
 		if($this->isNew()) {
@@ -631,6 +704,8 @@ class User extends Entity {
 				if(!$personalGroup->save()) {
 					throw new Exception("Could not create home group");
 				}
+
+				$this->personalGroup = $personalGroup;
 			} else
 			{
 				$personalGroup = $this->getPersonalGroup();
@@ -740,15 +815,16 @@ class User extends Entity {
 
 		return true;
 	}
-	
+
 	/**
 	 * Get authentication domains that authenticators can use to identify the user
 	 * belongs to that authenticator.
-	 * 
+	 *
 	 * For example the IMAP and LDAP authenticator modules use this by implementing
 	 * the \go\core\auth\DomainProvider interface.
-	 * 
+	 *
 	 * @return string[]
+	 * @throws \go\core\exception\ConfigurationException
 	 */
 	public static function getAuthenticationDomains() {
 		
@@ -793,7 +869,7 @@ class User extends Entity {
 	
 	public function setProfile($values) {
 		if(!Module::findByName('community', 'addressbook')) {
-			throw new \Exception("Can't set profile without address book module.");
+			throw new Exception("Can't set profile without address book module.");
 		}
 		
 		$this->contact = $this->getProfile();		
@@ -805,10 +881,36 @@ class User extends Entity {
 	}
 
 
+	/**
+	 * @inheritDoc
+	 */
 	public static function converters()
 	{
-		$arr = parent::converters();
-		$arr['text/csv'] = UserCsv::class;
-		return $arr;
+		return array_merge(parent::converters(), [UserCsv::class]);
 	}
+
+	/**
+	 * Decorate the message for newsletter sending.
+	 * This function should at least add the to address.
+	 *
+	 * @param Message $message
+	 * @return bool
+	 */
+	public function decorateMessage(Message $message) {
+		$message->setTo($this->email, $this->displayName);
+	}
+
+	private $country;
+
+	public function getCountry() {
+		if(!isset($this->country)) {
+			$tz = new \DateTimeZone($this->timezone);
+			$i = $tz->getLocation();
+			$this->country = $i['country_code'];
+		}
+
+		return $this->country;
+	}
+
+
 }

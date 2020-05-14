@@ -2,10 +2,16 @@
 
 namespace go\core\db;
 
+use Exception;
 use go\core\App;
+use go\core\data\ArrayableInterface;
 use go\core\db\Criteria;
+use IteratorAggregate;
+use JsonSerializable;
 use PDO;
 use ReflectionClass;
+use Traversable;
+
 /**
  * The Query class to select database records
  * 
@@ -31,7 +37,7 @@ use ReflectionClass;
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
-class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \go\core\data\ArrayableInterface {
+class Query extends Criteria implements IteratorAggregate, JsonSerializable, ArrayableInterface {
 
 	private $tableAlias;
 	private $distinct;
@@ -241,10 +247,16 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 *
 	 * Remember the default table alias is 't'.
 	 *
-	 * @param string|array $select
+	 * @param string|array $select Pass null to reset.
 	 * @return static
 	 */
 	public function select($select = '*', $append = false) {
+
+		if(!isset($select)) {
+			$this->select = [];
+			return $this;
+		}
+
 		if (!is_array($select)) {
 			$select = [$select];
 		}
@@ -359,39 +371,40 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		return $this;
 	}
 
-	/**
-	 * Join a table
-	 *
-	 * @Example
-	 * ```````````````````````````````````````````````````````````````````````````
-	 * $query = (new Query())
-	 * 				->select('*')
-	 * 				->from('test_a', "a")
-	 * 				->join("test_b", "b", "a.id = b.id")
-	 * 				->where('id', '=', 1);
-	 * 
-	 * $stmt = $query->execute();
-	 * ```````````````````````````````````````````````````````````````````````````
-	 * 
-	 * @Example Join a query
-	 * 
-	 * ```
-	 * $query = (new Query())
-	 * 				->select('*')
-	 * 				->from('test_a', "a")
-	 * 				->join(
-	 * 								(new Query)
-	 * 								->select('id')
-	 * 								->from("test_b", 'sub_b'), "subjoin", "subjoin.id = a.id"
-	 * 				);						
-	 * ```
-	 *
-	 * @param string|\go\core\db\Query $tableName The record class name or sub query to join
-	 * @param string $joinTableAlias Leave empty for none.
-	 * @param Criteria|array|string $on The criteria used in the ON clause {@see Criteria::normalize()}
-	 * @param string $type The join type. INNER, LEFT or RIGHT
-	 * @return static
-	 */
+  /**
+   * Join a table
+   *
+   * @Example
+   * ```````````````````````````````````````````````````````````````````````````
+   * $query = (new Query())
+   *        ->select('*')
+   *        ->from('test_a', "a")
+   *        ->join("test_b", "b", "a.id = b.id")
+   *        ->where('id', '=', 1);
+   *
+   * $stmt = $query->execute();
+   * ```````````````````````````````````````````````````````````````````````````
+   *
+   * @Example Join a query
+   *
+   * ```
+   * $query = (new Query())
+   *        ->select('*')
+   *        ->from('test_a', "a")
+   *        ->join(
+   *                (new Query)
+   *                ->select('id')
+   *                ->from("test_b", 'sub_b'), "subjoin", "subjoin.id = a.id"
+   *        );
+   * ```
+   *
+   * @param string|\go\core\db\Query $tableName The record class name or sub query to join
+   * @param string $joinTableAlias Leave empty for none.
+   * @param Criteria|array|string $on The criteria used in the ON clause {@see Criteria::normalize()}
+   * @param string $type The join type. INNER, LEFT or RIGHT
+   * @return static
+   * @throws Exception
+   */
 	public function join($tableName, $joinTableAlias, $on, $type = 'INNER') {
 
 		$this->joins[] = [
@@ -479,7 +492,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * 
 	 * Default to App::get()->getDbConnection();
 	 * 
-	 * @param \go\core\db\Connection $conn
+	 * @param Connection $conn
 	 * @return $this
 	 */
 	public function setDbConnection(Connection $conn) {
@@ -491,7 +504,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	/**
 	 * Get the database connection
 	 * 
-	 * @return \go\core\db\Connection
+	 * @return Connection
 	 */
 	public function getDbConnection() {
 		if(!isset($this->dbConn)) {
@@ -501,34 +514,37 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		return $this->dbConn;
 	}
 
-	/**
-	 * Executes the query and returns the statement
-	 * 
-	 * @return Statement Returns false on failure.
-	 */
-	public function execute() {
-		
+	public function createStatement() {
+
 		$queryBuilder = new QueryBuilder($this->getDbConnection());
 		$build = $queryBuilder->buildSelect($this);
 		$build['start'] = go()->getDebugger()->getTimeStamp();
-		
-		if($this->debug && !$this->getDbConnection()->debug) {
-			go()->debug(QueryBuilder::debugBuild($build));
-		}
 
 		$stmt = $this->getDbConnection()->createStatement($build);
 		call_user_func_array([$stmt, 'setFetchMode'], $this->getFetchMode());
-
 		$stmt->setQuery($this);		
+
+		return $stmt;
+	}
+
+  /**
+   * Executes the query and returns the statement
+   *
+   * @return Statement Returns false on failure.
+   * @throws Exception
+   */
+	public function execute() {
+		
 		try {
+			$stmt = $this->createStatement();	
 			$ret = $stmt->execute();
-			if (!$ret) {
+			if ($ret === false) {
 				go()->error(var_export($ret, true));
 				go()->error($stmt->errorInfo());
-				throw new \Exception("Could not execute statement. Error code: ". $stmt->errorCode());
+				throw new Exception("Could not execute statement. Error code: ". $stmt->errorCode());
 			}
-		} catch(\Exception $e) {				
-			go()->error("SQL FAILED: " . $queryBuilder->debugBuild($build));
+		} catch(Exception $e) {
+			go()->error("SQL FAILED: " . $this->__toString());
 			
 			throw $e;
 		}
@@ -547,25 +563,27 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		
 		return $this;
 	}
-	
-	/**
-	 * Executes the query and returns a single object
-	 * 
-	 * @return mixed|boolean The queries record, column or object. Returns false 
-	 *   when nothing is found
-	 */
+
+  /**
+   * Executes the query and returns a single object
+   *
+   * @return mixed|boolean The queries record, column or object. Returns false
+   *   when nothing is found
+   * @throws Exception
+   */
 	public function single() {		
 		return $this->offset(0)
 						->limit(1)
 						->execute()
 						->fetch();
 	}
-	
-	/**
-	 * Get all records as an array
-	 * 
-	 * @return mixed[]
-	 */
+
+  /**
+   * Get all records as an array
+   *
+   * @return mixed[]
+   * @throws Exception
+   */
 	public function all() {
 		return $this->execute()->fetchAll();
 	}
@@ -584,7 +602,7 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 	 * Lock rows for update
 	 * 
 	 * @link https://dev.mysql.com/doc/refman/5.7/en/innodb-locking-reads.html
-	 * @param boolean $value
+	 * @param bool $value
 	 * @return $this
 	 */
 	public function forUpdate($value = true) {
@@ -596,18 +614,37 @@ class Query extends Criteria implements \IteratorAggregate, \JsonSerializable, \
 		return $this->forUpdate;
 	}
 
+  /**
+   * Executes the query
+   *
+   * @return Statement|Traversable
+   * @throws Exception
+   */
 	public function getIterator() {
 		return $this->execute();
 	}
 
+  /**
+   * Serializes the query to JSON by executing it and fetching into an array
+   *
+   * @return array|mixed
+   * @throws Exception
+   */
 	public function jsonSerialize() {
 		return $this->toArray();
 	}
 
-	public function toArray($properties = null) {
+  /**
+   * Convert all results of this query to arrays
+   *
+   * @param array $properties
+   * @return array
+   * @throws Exception
+   */
+  public function toArray($properties = null) {
 		$arr = [];
 		foreach($this->execute() as $entity) {
-			if($entity instanceof \go\core\data\ArrayableInterface) {
+			if($entity instanceof ArrayableInterface) {
 				$arr[] = $entity->toArray($properties);
 			} else
 			{

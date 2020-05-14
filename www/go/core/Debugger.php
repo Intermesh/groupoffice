@@ -1,6 +1,8 @@
 <?php
 namespace go\core;
 
+use go\core\data\ArrayableInterface;
+use go\core\data\Model;
 
 /**
  * Debugger class. All entries are stored and the view can render them eventually.
@@ -63,18 +65,27 @@ class Debugger {
 	
 	public function __construct() {
 		try {
-			$this->enabled = !empty(go()->getConfig()['core']['general']['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug');
-			
-			if($this->enabled && go()->getConfig()['core']['general']['debugLog']) {
-				$logFile = go()->getDataFolder()->getFile('log/debug.log');
-				if($logFile->isWritable()) {
-					$this->logPath = $logFile->getPath();				
-					$this->logFp = $logFile->open('a+');
-				}
+			if(!empty(go()->getConfig()['core']['general']['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug')) {
+				$this->enable();
 			}
+
 		} catch (\go\core\exception\ConfigurationException $e) {
 			//GO is not configured / installed yet.
 			$this->enabled = true;
+		}
+	}
+
+	public function enable() {
+		$this->enabled = true;
+		if(go()->getConfig()['core']['general']['debugLog']) {
+			$logFile = go()->getDataFolder()->getFile('log/debug.log');
+			if($logFile->isWritable()) {
+				if(!$logFile->exists()) {
+					$logFile->touch(true);
+				}
+				$this->logPath = $logFile->getPath();
+				$this->logFp = $logFile->open('a+');
+			}
 		}
 	}
 
@@ -96,8 +107,10 @@ class Debugger {
 		if(!$this->enabled) {
 			return;
 		}
-		$time = $this->getTimeStamp() - $this->groupStartTime;
+		$time = (int) ($this->getTimeStamp() - $this->groupStartTime);
 		$this->currentGroup .= ', time: '.$time.'ms';
+
+		$this->currentGroup .= ", Peak memory usage: " . number_format(memory_get_peak_usage() / (1024 * 1024), 2) . 'MB';			
 
 		$this->entries[] = ['groupEnd', null];
 
@@ -105,11 +118,14 @@ class Debugger {
 	}
 
 	/**
-	 * Get time in milliseconds
+	 * Get time in seconds with microseconds
 	 * 
-	 * @return float Milliseconds
+	 * @return float seconds
 	 */
 	public function getMicroTime() {
+		if(!$this->enabled) {
+			return;
+		}
 		// list ($usec, $sec) = explode(" ", microtime());
 		// return ((float) $usec + (float) $sec);
 		return microtime(true);
@@ -183,7 +199,7 @@ class Debugger {
 		}
 		
 		if(empty($caller['class'])) {			
-			$caller['class'] = $lastCaller['class'];
+			$caller['class'] = $lastCaller['class'] ?? "none";
 		}
 		
 		if(!isset($lastCaller['line'])) {
@@ -200,7 +216,9 @@ class Debugger {
 
 	protected function writeLog($level, $mixed, $cls = null, $lineNo = null) {
 
-		if (!is_scalar($mixed)) {
+		if(is_array($mixed) || $mixed instanceof ArrayableInterface) {
+			$print = print_r(Model::convertValueToArray($mixed), true);
+		}elseif (!is_scalar($mixed)) {
 			$print = print_r($mixed, true);
 		} else if(is_bool($mixed)) {
 			$print = $mixed ? "TRUE" : "FALSE";
@@ -240,19 +258,28 @@ class Debugger {
 	 * @param string $message
 	 */
 	public function debugTiming($message) {
-		$this->debug($this->getTimeStamp() . 'ms ' . $message);
+		if(!$this->enabled) {
+			return;
+		}
+		$this->debug((int) ($this->getTimeStamp()) . "ms ". $message);
 	}
 
 	/**
 	 * Get the ellapsed time since the start of the request in milliseconds
 	 * 
-	 * @return int milliseconds
+	 * @return float milliseconds
 	 */
 	public function getTimeStamp() {
-		return intval(($this->getMicroTime() - $_SERVER["REQUEST_TIME_FLOAT"])*1000);
+		if(!$this->enabled) {
+			return;
+		}
+		return ($this->getMicroTime() * 1000) - ($_SERVER["REQUEST_TIME_FLOAT"] * 1000);
 	}
 
 	public function debugCalledFrom($limit = 10) {
+		if(!$this->enabled) {
+			return;
+		}
 
 		$this->debug("START BACKTRACE");
 		$trace = debug_backtrace();

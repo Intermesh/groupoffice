@@ -4,6 +4,7 @@ namespace go\core\jmap;
 
 use Exception as CoreException;
 use GO;
+use GO\Base\Util\Number;
 use go\core\App;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
@@ -54,9 +55,7 @@ class Router {
 	 * 
 	 * community/notes/Note/get maps to go\modules\community\notes\controller\Note::get()
 	 */
-	public function run() {
-
-		
+	public function run() {	
 
 		$body = Request::get()->getBody();
 		
@@ -114,13 +113,16 @@ class Router {
 			if(go()->getDebugger()->enabled) {
 				//only in debug mode, may contain sensitive information
 				$error["debugMessage"] = ErrorHandler::logException($e);
+				$previous = $e->getPrevious();
+				if($previous) {
+					$error['previous'] = $previous->getMessage();
+				}
 				$error["trace"] = explode("\n", $e->getTraceAsString());
 			}
 			
 			Response::get()->addError($error);
-		} finally{
-			
-			if($method != "community/dev/Debugger/get") {			
+		} finally {
+			if($method != "community/dev/Debugger/get") {
 				go()->getDebugger()->groupEnd();
 			}
 		}
@@ -135,7 +137,13 @@ class Router {
 			if (!$entityType) {
 				throw new Exception(400, 'Bad request. Entity type "' . $parts[0] . '"  not found');
 			}
-			$controllerClass = str_ireplace("model", "controller", $entityType->getClassName());
+
+			//Very ugly hack
+			if($entityType->getName() == "Project") {
+				$controllerClass = "go\\modules\\business\\projects\\controller\\Project";
+			} else {
+				$controllerClass = str_ireplace("model", "controller", $entityType->getClassName());
+			}
 			$controllerMethod = $parts[1];
 		} else if($parts[0] == "core") {
 			$controllerMethod = array_pop($parts);

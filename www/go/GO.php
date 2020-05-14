@@ -16,6 +16,10 @@
  * @package GO.base
  */
 
+use go\core\cache\Apcu;
+use go\core\jmap\State;
+use go\core\ErrorHandler;
+
 /**
  * The main Group-Office application class. This class only contains static
  * classes to access commonly used application data like the configuration or the logged in user.
@@ -467,7 +471,23 @@ class GO{
 	 */
 	public static function config() {
 		if (!isset(self::$_config)) {
+
+			// TODO: improve later, This will cache the same config file for a different installation if: same domain + same $token cookie
+//			if(Apcu::isSupported() && ($token = State::getClientAccessToken())) {
+//				$cacheKey = 'go_old_conf_' . $token;
+//				self::$_config = apcu_fetch($cacheKey);
+//				if(self::$_config && self::$_config->cacheTime > filemtime(self::$_config->configPath) && (!file_exists('/etc/groupoffice/globalconfig.inc.php') || self::$_config->cacheTime > filemtime('/etc/groupoffice/globalconfig.inc.php'))) {
+//					return self::$_config;
+//				}
+//			}
+
 			self::$_config = new \GO\Base\Config();
+			
+			if(isset($cacheKey)) {
+				self::$_config->cacheTime = time();
+
+				//apcu_store($cacheKey, self::$_config);
+			}
 		}
 		return self::$_config;
 	}
@@ -622,7 +642,14 @@ class GO{
 		
 		date_default_timezone_set(\GO::user() ? \GO::user()->timezone : \GO::config()->default_timezone);
 		
-		setlocale(LC_CTYPE, go()->getSettings()->getLocale());
+		// for exec with ZIP and UTF8 chars	
+		if(!setlocale(LC_CTYPE, go()->getSettings()->getLocale())) {
+			if(!setlocale(LC_CTYPE, go()->getSettings()->resetLocale()))
+			{
+				ErrorHandler::log("Could not automatically determine locale");
+			}
+		}
+		//setlocale(LC_CTYPE, go()->getSettings()->getLocale());
 		
 //		}else{
 //			//for escape shell arg
@@ -905,7 +932,7 @@ class GO{
 	/**
 	 * Check if require exists
 	 *
-	 * @param StringHelper $fileName
+	 * @param string $fileName
 	 *
 	 * @return boolean
 	 */
@@ -927,7 +954,7 @@ class GO{
 	/**
 	 * Write's to a debug log.
 	 *
-	 * @param StringHelper $text log entry
+	 * @param string $text log entry
 	 */
 	public static function debug($text, $config=false) {
 		
@@ -1114,7 +1141,7 @@ class GO{
 
 		$p = array('m'=>$module,'f'=>$function, 'p'=>$params);
 
-		$r = $toLoginDialog ? '' : 'external/index';
+		$r =  ""; //$toLoginDialog ? '' : 'external/index';
 
 		$url = \GO::config()->orig_full_url.'?r='.$r.'&f='.urlencode(base64_encode(json_encode($p)));
 		return $url;

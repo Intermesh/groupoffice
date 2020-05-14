@@ -14,4 +14,9 @@ return array (
   'Content is encrypted' => 'Inhalt ist verschlüsselt',
   'Add test' => 'Test hinzufügen',
   'Invalid password' => 'Ungültiges Passwort',
+  'Commented at' => 'Kommentiert bei',
+  'Note book' => 'Notizbuch',
+  'Default note book' => 'Standard Notizbuch',
+  'Filters' => 'Filter',
+  'Has links to...' => 'Hat Verknüpfungen mit…',
 );

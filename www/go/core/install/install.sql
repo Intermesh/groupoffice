@@ -37,7 +37,7 @@ CREATE TABLE `core_auth_token` (
   `accessToken` varchar(100) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
   `userId` int(11) NOT NULL,
   `createdAt` datetime NOT NULL,
-  `expiresAt` datetime NOT NULL,
+  `expiresAt` datetime DEFAULT NULL,
   `lastActiveAt` datetime NOT NULL,
   `remoteIpAddress` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `userAgent` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -103,6 +103,9 @@ CREATE TABLE `core_customfields_field` (
   `type` varchar(100) NOT NULL DEFAULT 'Text',
   `sortOrder` int(11) NOT NULL DEFAULT 0,
   `required` tinyint(1) NOT NULL DEFAULT 0,
+  `relatedFieldCondition` varchar(190) NOT NULL DEFAULT '',
+  `conditionallyHidden` BOOLEAN NOT NULL DEFAULT FALSE,
+  `conditionallyRequired` BOOLEAN NOT NULL DEFAULT FALSE,
   `hint` varchar(190) DEFAULT NULL,
   `exclude_from_grid` tinyint(1) NOT NULL DEFAULT 0,
   `unique_values` tinyint(1) NOT NULL DEFAULT 0,
@@ -203,7 +206,7 @@ CREATE TABLE `core_setting` (
 CREATE TABLE `core_user` (
   `id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
-  `displayName` varchar(190) DEFAULT '',
+  `displayName` varchar(190) NOT NULL,
   `avatarId` binary(40) DEFAULT NULL,
   `enabled` tinyint(1) NOT NULL DEFAULT 1,
   `email` varchar(100) NOT NULL,
@@ -224,7 +227,7 @@ CREATE TABLE `core_user` (
   `timezone` varchar(50) NOT NULL DEFAULT 'Europe/Amsterdam',
   `start_module` varchar(50) NOT NULL DEFAULT 'summary',
   `language` varchar(20) NOT NULL DEFAULT 'en',
-  `theme` varchar(20) NOT NULL DEFAULT 'Default',
+  `theme` varchar(20) NOT NULL DEFAULT 'Paper',
   `firstWeekday` tinyint(4) NOT NULL DEFAULT 1,
   `sort_name` varchar(20) NOT NULL DEFAULT 'first_name',
   `muser_id` int(11) NOT NULL DEFAULT 0,
@@ -870,3 +873,29 @@ ALTER TABLE `core_email_template_attachment`
 
 ALTER TABLE `core_search` ADD INDEX(`keywords`);
 ALTER TABLE `core_change` ADD INDEX(`entityId`);
+
+
+CREATE TABLE `core_auth_allow_group` (
+  `id` int(11) NOT NULL,
+  `groupId` int(11) NOT NULL,
+  `ipPattern` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'IP Address. Wildcards can be used where * matches anything and ? matches exactly one character'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE `core_auth_allow_group`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `groupId` (`groupId`);
+
+
+ALTER TABLE `core_auth_allow_group`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+
+ALTER TABLE `core_auth_allow_group`
+  ADD CONSTRAINT `core_auth_allow_group_ibfk_1` FOREIGN KEY (`groupId`) REFERENCES `core_group` (`id`) ON DELETE CASCADE;
+
+
+ALTER TABLE `core_link` ADD INDEX(`fromEntityTypeId`);
+ALTER TABLE `core_link` ADD INDEX(`fromId`);
+ALTER TABLE `core_link` ADD INDEX(`toEntityTypeId`);
+ALTER TABLE `core_link` ADD INDEX(`toId`);

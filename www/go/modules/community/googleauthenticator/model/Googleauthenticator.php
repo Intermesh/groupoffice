@@ -259,6 +259,9 @@ class Googleauthenticator extends Property {
 	 * @return bool
 	 */
 	public function verifyCode($code, $secret=null, $discrepancy = 1, $currentTimeSlice = null) {
+
+		//replace spaces
+		$code = preg_replace('/\s+/', '', $code);
 		
 		$secret = empty($secret)?$this->secret:$secret;
 		

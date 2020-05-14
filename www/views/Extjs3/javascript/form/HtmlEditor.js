@@ -8,6 +8,7 @@ GO.form.HtmlEditor = function (config) {
 	Ext.applyIf(config, {
 		border: false,
 		enableFont: false,
+		headingsMenu: true,
 		style: GO.settings.html_editor_font
 	});
 
@@ -25,6 +26,7 @@ GO.form.HtmlEditor = function (config) {
 	var ssScriptPlugin = new Ext.ux.form.HtmlEditor.SubSuperScript();
 	var rmFormatPlugin = new Ext.ux.form.HtmlEditor.RemoveFormat();
 
+
 	if (GO.settings.pspellSupport)
 		config.plugins.unshift(spellcheckInsertPlugin);
 
@@ -36,10 +38,117 @@ GO.form.HtmlEditor = function (config) {
 					ssScriptPlugin
 					);
 
+	if(config.headingsMenu) {
+		var headingMenu = new Ext.ux.form.HtmlEditor.HeadingMenu();
+		config.plugins.unshift(headingMenu);
+	}
+
 	GO.form.HtmlEditor.superclass.constructor.call(this, config);
 };
 
 Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
+
+	iframePad:dp(8),
+	
+	toolbarHidden: false,
+
+	headingsMenu: true,
+
+	// hideToolbar : function() {
+	// 	this.toolbarHidden = true;
+	//
+	// 	if(this.initialized) {
+	// 		this.wrap.dom.firstChild.style.position = 'absolute';
+	// 		this.wrap.dom.firstChild.style.top = "-1000000px";
+	// 		this.wrap.dom.firstChild.style.height = "0px";
+	// 	}
+	// },
+	//
+	// showToolbar : function*() {
+	//
+	// 	this.toolbarHidden = false;
+	//
+	// 	if(this.initialized) {
+	// 		this.wrap.dom.firstChild.style.position = 'relative';
+	// 		delete this.wrap.dom.firstChild.style.top;
+	// 		this.wrap.dom.firstChild.style.height = dp(40) + "px";
+	// 	}
+	// },
+
+	initComponent: function() {
+		GO.form.HtmlEditor.superclass.initComponent.apply(this);
+
+		this.on('afterrender', function() {
+			if(this.toolbarHidden) {
+				this.tb.hide();
+			}
+		}, this);
+		this.on('initialize', function(){
+
+			if(Ext.isEmpty(this.emptyText)) {
+				return;
+			}
+			// Ext.EventManager.on(this.getEditorBody(),{
+			// 	focus:this.handleEmptyText,
+			// 	blur:this.applyEmptyText,
+			// 	scope:this
+			// });
+			
+		},this);
+
+		this.on('activate', function() {
+			this.registerSubmitKey();
+		}, this);
+	},
+
+	emptyTextRegex: '<span[^>]+[^>]*>{0}<\/span>',
+	emptyTextTpl: '<span style="color:#ccc;">{0}</span>',
+	emptyText: '',
+
+	registerSubmitKey: function() {
+		var doc = this.getDoc();
+		if (Ext.isGecko){
+			Ext.EventManager.on(doc, {
+				keydown: this.fireSubmit,
+				scope: this
+			});
+		}
+
+		if (Ext.isIE || Ext.isWebKit || Ext.isOpera) {
+			Ext.EventManager.on(doc, 'keydown', this.fireSubmit,
+				this);
+		}
+	},
+
+	fireSubmit : function(e) {
+		if (e.ctrlKey && Ext.EventObject.ENTER == e.getKey()) {
+			e.preventDefault();
+			this.fireEvent('ctrlenter',this);
+			return false;
+		}
+	},
+	
+	
+
+	// applyEmptyText: function() {
+	// 	var value = this.getValue();
+	// 	if(Ext.isEmpty(value)) {
+	// 		var emptyText = go.util.Format.string(this.emptyTextTpl,this.emptyText);
+	// 		go.form.HtmlEditor.superclass.setValue.apply(this, [emptyText]);
+	// 	}
+	// },
+	// handleEmptyText: function() {
+	// 	var value = this.getValue(),
+	// 		regex = new RegExp(go.util.Format.string( this.emptyTextRegex,this.emptyText ) );
+	// 	if(!Ext.isEmpty(value) && regex.test(value)) {
+	// 		go.form.HtmlEditor.superclass.setValue.apply(this, ['']);
+	// 	}
+	// },
+	// setValue : function(v){
+	// 	go.form.HtmlEditor.superclass.setValue.apply(this, arguments);
+	// 	//this.applyEmptyText();
+	// 	return this;
+  //  },
 
 	initEditor: function () {
 
@@ -67,30 +176,48 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		if(!e.dataTransfer.files) {
 			return;
 		}
+
+		//prevent browser from navigating to dropped file
+		e.preventDefault();
+
+		//make sure editor has focus
+		this.focus();
+
+		//this is needed if the editor has not been activated yet.
+		this.updateToolbar();
+
 		Array.from(e.dataTransfer.files).forEach(function(file) {   
 			go.Jmap.upload(file, {
 				scope: this,
 				success: function(response) {
+					console.warn(response);
 					var imgEl = null;
 					if (file.type.match(/^image\//)) {
-						domId = Ext.id(), img = '<img id="' + domId + '" src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="' + file.name + '" />';
+						var domId = Ext.id(), img = '<img id="' + domId + '" src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="' + file.name + '" />';
 						this.insertAtCursor(img);
 						imgEl = this.getDoc().getElementById(domId);
 					} 
 
-					this.fireEvent('attach', this, response.blobId, file, imgEl);
+					this.fireEvent('attach', this, response, file, imgEl);
 				}
 			});
 		}, this);
 		
 	},
 
-	onPaste: function (e) {		
+	onPaste: function (e) {
 		var clipboardData = e.clipboardData;
 		if (clipboardData.items) {
-			//Chrome has clibBoardData.items
+			//Chrome /safari has clibBoardData.items
 			for (var i = 0, l = clipboardData.items.length; i < l; i++) {
 				var item = clipboardData.items[i];
+
+				//Some times clipboard data holds multiple versions. When copy pasting from excel you get html, plain text and an image.
+				//We prefer to use the html in that case so we exit if found.
+				if (item.type == 'text/html') {
+					return;
+				}
+
 				if (item.type.match(/^image\//)) {
 					
 					e.preventDefault();
@@ -309,7 +436,10 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			try {
 				this.execCmd('useCSS', true);
 				this.execCmd('styleWithCSS', false);
+				this.execCmd('insertBrOnReturn', false);
+				this.execCmd('enableObjectResizing', true);
 			} catch (e) {
+				console.warn(e);
 			}
 		}
 		this.fireEvent('activate', this);
@@ -349,10 +479,20 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		this.lastKey = ev.key;
 	},
 
-	getDocMarkup: function () {
-		var h = Ext.fly(this.iframe).getHeight() - this.iframePad * 2;
-		return String.format('<html><head><meta name="SKYPE_TOOLBAR" content="SKYPE_TOOLBAR_PARSER_COMPATIBLE" /><style type="text/css">body,p,td,div,span{' + GO.settings.html_editor_font + '};body{border: 0; margin: 0; padding: {0}px; height: {1}px; cursor: text}body p{margin:0px;}</style></head><body></body></html>', this.iframePad, h);
-	},
+	// getFontStyle :  function() {
+	// 	var style = getComputedStyle(this.getEl().dom);
+	// 	return "font-size: " + style['font-size'] + ';font-family: '+style['font-family'];
+	// },
+	//
+	// getEditorFrameStyle : function() {
+	// 	return 'body,p,td,div,span{' + this.getFontStyle() + '};body{border: 0; margin: 0; padding: {0}px; height: {1}px; cursor: text}body p{margin:0px;}';
+	// },
+	//
+	// getDocMarkup: function () {
+	// 	console.warn( this.getEditorFrameStyle());
+	// 	var h = Ext.fly(this.iframe).getHeight() - this.iframePad * 2;
+	// 	return String.format('<html><head><meta name="SKYPE_TOOLBAR" content="SKYPE_TOOLBAR_PARSER_COMPATIBLE" /><style type="text/css">' + this.getEditorFrameStyle() + '</style></head><body></body></html>', this.iframePad, h);
+	// },
 	fixKeys: function () { // load time branching for fastest keydown performance
 		if (Ext.isIE) {
 			return function (e) {
@@ -380,35 +520,30 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 					//                    }
 				}
 			};
-		} else if (Ext.isOpera) {
-			return function (e) {
-				var k = e.getKey();
-				if (k == e.TAB) {
-					e.stopEvent();
-					this.win.focus();
-					this.execCmd('InsertHTML', '&nbsp;&nbsp;&nbsp;&nbsp;');
-					this.deferFocus();
-				}
-			};
 		} else if (Ext.isWebKit) {
 			return function (e) {
-				var k = e.getKey();
+				var k = e.getKey(), doc = this.getDoc();
 				if (k == e.TAB) {
 					e.stopEvent();
 					this.execCmd('InsertText', '\t');
 					this.deferFocus();
-				}/* Testen in latest chrome and safari with lists else if (k == e.ENTER) {
-					e.stopEvent();
-					var doc = this.getDoc();
-					if (doc.queryCommandState('insertorderedlist') ||
-									doc.queryCommandState('insertunorderedlist')) {
-						this.execCmd('InsertHTML', '</li><br /><li>');
-					} else {
-						this.execCmd('InsertHtml', '<br />&nbsp;');
-						this.execCmd('delete');
-					}
-					this.deferFocus();
-				}*/
+				}else if(k == e.ENTER){
+					// if (doc.queryCommandState('insertorderedlist') || doc.queryCommandState('insertunorderedlist')) {
+					// 	return;
+					// }
+					// e.stopEvent();
+					//
+					//
+					// //make sure last child is a br otherwise it will go wrong!
+					// console.warn(doc.lastElementChild.tagName.toLowerCase());
+					// if(!doc.lastElementChild.tagName.toLowerCase() == "br") {
+					// 	console.warn("added br")
+					// 	doc.appendChild(doc.createElement("br"));
+					// }
+					//
+					// this.execCmd('InsertHtml','<br />');
+					// this.deferFocus();
+				}
 			};
 		}
 	}(),
@@ -449,59 +584,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 //		if(e.keyCode==32 || e.keyCode==12)
 //			this.urlify();
 //	},
-	updateToolbar: function () {
 
-		/*
-		 * I override the default function here to increase performance.
-		 * ExtJS syncs value every 100ms while typing. This is slow with large
-		 * html documents. I manually call syncvalue when the message is sent
-		 * so it's certain the right content is submitted.
-		 */
-
-		//GO.mainLayout.timeout(0); // stop logout timer
-
-		if (this.readOnly) {
-			return;
-		}
-
-		if (!this.activated) {
-			this.onFirstFocus();
-			return;
-		}
-
-		var btns = this.tb.items.map,
-						doc = this.getDoc();
-
-		if (this.enableFont && !Ext.isSafari2) {
-			var name = (doc.queryCommandValue('FontName') || this.defaultFont).toLowerCase();
-			if (name != this.fontSelect.dom.value) {
-				this.fontSelect.dom.value = name;
-			}
-		}
-		if (this.enableFormat) {
-			btns.bold.toggle(doc.queryCommandState('bold'));
-			btns.italic.toggle(doc.queryCommandState('italic'));
-			btns.underline.toggle(doc.queryCommandState('underline'));
-		}
-		if (this.enableAlignments) {
-			btns.justifyleft.toggle(doc.queryCommandState('justifyleft'));
-			btns.justifycenter.toggle(doc.queryCommandState('justifycenter'));
-			btns.justifyright.toggle(doc.queryCommandState('justifyright'));
-		}
-		if (!Ext.isSafari2 && this.enableLists) {
-			btns.insertorderedlist.toggle(doc.queryCommandState('insertorderedlist'));
-			btns.insertunorderedlist.toggle(doc.queryCommandState('insertunorderedlist'));
-		}
-
-		Ext.menu.MenuMgr.hideAll();
-
-		//This property is set in javascript/focus.js. When the mouse goes into
-		//the editor iframe it thinks it has lost the focus.
-		GO.hasFocus = true;
-
-
-		//this.syncValue();
-	},
 
 	createLink: function () {
 
@@ -516,7 +599,32 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 				this.relayCmd("createlink", url);
 			}
 		}
-	}
+	},
+
+	setDesignMode : function(readOnly){
+		this.getEditorBody().contentEditable = readOnly;
+   },
+	
+	onResize : function(w, h){
+	  Ext.form.HtmlEditor.superclass.onResize.apply(this, arguments);
+	  if(this.el && this.iframe){
+			if(Ext.isNumber(w)){
+				 var aw = w - this.wrap.getFrameWidth('lr');
+				 this.el.setWidth(aw);
+				 this.tb.setWidth(aw);
+				 this.iframe.style.width = Math.max(aw, 0) + 'px';
+			}
+			if(Ext.isNumber(h)){
+				 var ah = h - this.wrap.getFrameWidth('tb') - this.tb.el.getHeight();
+				 this.el.setHeight(ah);
+				 this.iframe.style.height = Math.max(ah, 0) + 'px';
+				 var bd = this.getEditorBody();
+				 if(bd){
+					 bd.style.height = Math.max((ah - (this.iframePad*2)), 0) + 'px';
+				 }
+			}
+		}
+   }
 
 });
 

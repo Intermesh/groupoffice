@@ -13,6 +13,21 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 		labelWidth: dp(140)
 	},
 
+	onBeforeSubmit: function() {
+
+		//When address book has changed then clear groups.
+		var modified = this.getValues(true);
+		if(!("addressBookId" in modified)) {
+			return true;
+		}
+
+		this.setValues({
+			"groups" : []
+		});
+
+		return true;
+	},
+
 	focus: function () {
 		if(this.formPanel.currentId) {
 			return;
@@ -22,6 +37,19 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 		} else
 		{
 			this.nameField.focus();
+		}
+	},
+
+	setLinkEntity: function(config) {
+		if(config.entity == "Contact") {
+			var me = this;			
+			go.Db.store("Contact").single(config.entityId).then(function(contact) {
+				if(contact.isOrganization) {
+					me.organizationsField.setValue([contact.id]);
+					me.createLinkButton.reset();
+					me.createLinkButton.cancelAddLink();
+				} 
+			});
 		}
 	},
 
@@ -52,7 +80,16 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 
 		this.setTitle(title);
 	},
-
+	setDialogValues: function(firstName, middleName, lastName,email) {
+		this.nameField.firstName.setValue(firstName);
+		this.nameField.middleName.setValue(middleName);
+		this.nameField.lastName.setValue(lastName);
+		var panel = this.emailAddressesField.addPanel();
+		this.emailAddressesField.doLayout();
+		var emailField = panel.formField.items.items[0].items.items[1];
+		emailField.setValue(email);
+		//var example = panel.formField.find("name","email");//.setValue(firstName);
+	},
 	initFormItems: function () {
 
 		this.addPanel(this.businessPanel = new Ext.Panel({
@@ -63,38 +100,65 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						anchor: "-20",
 					},
 					items: [
-
 						{
-							xtype: "textfield",
-							name: "IBAN",
-							fieldLabel: t("IBAN")
+							xtype: "fieldset",
+							defaults: {
+								anchor: "-20",
+							},
+							title: t("Information"),
+							items: [
+								this.registrationNumberField = new Ext.form.TextField({
+									xtype: "textfield",
+									name: "registrationNumber",
+									fieldLabel: t("Registration number")
+								}),
+								{
+									xtype: "textfield",
+									name: "debtorNumber",
+									fieldLabel: t("Customer number")
+								}
+							]
 						},
 						{
-							xtype: "textfield",
-							name: "registrationNumber",
-							fieldLabel: t("Registration number")
-						},
-						{
-							xtype: "textfield",
-							name: "debtorNumber",
-							fieldLabel: t("Customer number")
-						},
-						{
-							xtype: "xcheckbox",
-							name: "vatReverseCharge",
-							hideLabel: true,
-							boxLabel: t("Reverse charge VAT")
-						},
-						{
-							xtype: "textfield",
-							name: "vatNo",
-							fieldLabel: t("VAT number")
+							xtype: "fieldset",
+							defaults: {
+								anchor: "-20",
+							},
+							title: t("Bank details"),
+							items: [
+								{
+									xtype: "textfield",
+									name: "nameBank",
+									fieldLabel: t("Name bank")
+								},
+								{
+									xtype: "textfield",
+									name: "IBAN",
+									fieldLabel: t("IBAN")
+								},
+								{
+									xtype: "textfield",
+									name: "BIC",
+									fieldLabel: t("BIC")
+								},
+								{
+									xtype: "xcheckbox",
+									name: "vatReverseCharge",
+									hideLabel: true,
+									boxLabel: t("Reverse charge VAT")
+								},
+								{
+									xtype: "textfield",
+									name: "vatNo",
+									fieldLabel: t("VAT number")
+								}
+							]
 						}
 					]
 				}]
 
 		}));
-		var items = [{
+		var items = [this.infoFieldSet = new Ext.form.FieldSet({
 				xtype: 'fieldset',
 				items: [
 					{
@@ -114,16 +178,11 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 										fieldLabel: t("Job title"),
 										anchor: "100%"
 									}),
-									this.genderField = new go.form.RadioGroup({
-										xtype: 'radiogroup',
-										fieldLabel: t("Gender"),
-										name: "gender",
-										value: null,
-										items: [
-											{boxLabel: t("Unknown"), inputValue: null},
-											{boxLabel: t("Male"), inputValue: 'M'},
-											{boxLabel: t("Female"), inputValue: 'F'}
-										]
+									this.departmentField = new Ext.form.TextField({
+										xtype: "textfield",
+										name: "department",
+										fieldLabel: t("Department"),
+										anchor: "100%"
 									})
 								]
 							},
@@ -140,6 +199,18 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						]
 					},
 
+					this.genderField = new go.form.RadioGroup({
+						xtype: 'radiogroup',
+						fieldLabel: t("Gender"),
+						name: "gender",
+						value: null,
+						items: [
+							{boxLabel: t("Unknown"), inputValue: null},
+							{boxLabel: t("Male"), inputValue: 'M'},
+							{boxLabel: t("Female"), inputValue: 'F'}
+						]
+					}),
+
 					this.organizationsField = new go.form.Chips({
 						anchor: '-20',
 						xtype: "chips",
@@ -150,9 +221,15 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 							isOrganization: true,
 							addressBookId: go.User.addressBookSettings.defaultAddressBookId 
 						},
-						storeBaseParams: {
-							filter: {
-								isOrganization: true
+						comboStoreConfig: {
+							sortInfo: {
+								field: 'name',
+								direction: 'ASC'
+							},
+							filters:  {
+								defaults: {
+									isOrganization: true
+								}
 							}
 						},
 						name: "organizationIds",
@@ -173,7 +250,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					})
 
 				]
-			},
+			}),
 
 			this.communicationFieldSet = new Ext.form.FieldSet({
 				xtype: 'fieldset',
@@ -183,9 +260,15 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					columnWidth: 0.5,
 					anchor: "-20"
 				},
+				mobile: {
+					defaults: {
+						columnWidth: 1,
+						anchor: "-20"
+					}
+				},
 				items: [
-					new go.modules.community.addressbook.EmailAddressesField(),
-					new go.modules.community.addressbook.PhoneNumbersField()
+					this.emailAddressesField = new go.modules.community.addressbook.EmailAddressesField(),
+					this.phoneNumbersField = new go.modules.community.addressbook.PhoneNumbersField()
 				]
 			}),
 			{
@@ -194,7 +277,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					anchor: "-20"
 				},
 
-				items: [new go.modules.community.addressbook.AddressesField()]
+				items: [this.addressesField = new go.modules.community.addressbook.AddressesField()]
 			},
 			{
 				xtype: "fieldset",
@@ -204,9 +287,15 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 					columnWidth: 0.5,
 					anchor: "-20"
 				},
+				mobile: {
+					defaults: {
+						columnWidth: 1,
+						anchor: "-20"
+					}
+				},
 				items: [
-					new go.modules.community.addressbook.DatesField(),
-					new go.modules.community.addressbook.UrlsField()
+					this.datesField = new go.modules.community.addressbook.DatesField(),
+					this.urlsField = new go.modules.community.addressbook.UrlsField()
 				]
 			}
 		];
@@ -240,6 +329,8 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 		this.organizationsField.setDisabled(isOrganization);
 		this.genderField.setVisible(!isOrganization);
 		this.genderField.setDisabled(isOrganization);
+
+		this.departmentField.setVisible(!isOrganization);
 
 		if (isOrganization) {
 			this.tabPanel.unhideTabStripItem(this.businessPanel);

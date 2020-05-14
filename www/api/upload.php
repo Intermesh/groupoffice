@@ -24,7 +24,12 @@ if(isset($_GET['url'])) {
 	$blob->type = $response['type'];
 
 } else {
+
+	//raise max_execution_time for calculating hash of large files
+	ini_set('max_execution_time', 300);
+
 	$filename = Request::get()->getHeader('X-File-Name');
+  $filename = Request::headerDecode($filename);
 	$tmpFile = \go\core\fs\File::tempFile($filename);
 	
 	$input = fopen('php://input', "r");
@@ -35,9 +40,18 @@ if(isset($_GET['url'])) {
 	fclose($fp);
 	fclose($input);
 
+	if($tmpFile->getSize() > \go\core\jmap\Capabilities::get()->maxSizeUpload) {
+		$tmpFile->delete();
+		Response::get()->setStatus(413);
+		Response::get()->output([
+			"error" => "File exceeds maximum size of " .  \go\core\jmap\Capabilities::get()->maxSizeUpload. " bytes"
+		]);
+		exit();
+	}
+
 	$blob = Blob::fromTmp($tmpFile);
 	$blob->name = $filename;
-	$blob->modifiedAt = new \go\core\util\DateTime('@' . Request::get()->getHeader('X-File-LastModifed'));
+	$blob->modifiedAt = new \go\core\util\DateTime('@' . Request::get()->getHeader('X-File-LastModified'));
 	//$blob->type = Request::get()->getContentType(); cant be trusted use extension instead
 }
 

@@ -63,6 +63,11 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	},
 	
 	onChanges : function(entityStore, added, changed, destroyed) {
+
+		if(this.loading) {
+			return;
+		}
+
 		if(entityStore.entity.name === this.entityStore.entity.name) {
 			var entity = added[this.currentId] || changed[this.currentId] || false;
 
@@ -126,11 +131,23 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	onLoad: function () {
 		
 		go.Translate.setModule(this.package, this.module);
+
+		this.applyTemplateToItems(this.items);
 		
-		this.items.each(function (item, index, length) {
-			
+		this.doLayout();
+		this.body.scrollTo('top', 0);		
+	},
+
+	/**
+	 * Helper function to apply data on all items of this panel. It can also be used to apply it to other items.
+	 *
+	 * @param items
+	 */
+	applyTemplateToItems : function(items) {
+		items.each(function (item, index, length) {
+
 			item.show();
-			
+
 			if (item.tpl) {
 				//debugger;
 				item.update(this.data);
@@ -138,12 +155,8 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			if (item.onLoad) {
 				item.onLoad.call(item, this);
 			}
-			
+
 		}, this);
-		
-		
-		this.doLayout();
-		this.body.scrollTo('top', 0);		
 	},
 
 	reload: function () {
@@ -155,6 +168,8 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		if(this.getTopToolbar()) {
 			this.getTopToolbar().setDisabled(false);
 		}
+
+		console.warn(data);
 		this.data = data;
 
 		var me = this;
@@ -178,9 +193,21 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 
 	load: function (id) {
 		this.currentId = id;
-		this.entityStore.get([id], function(entities) {
-			this.internalLoad(entities[0]);
-		}, this);
+		this.loading = true;
+		var me = this;
+		this.entityStore.single(id).then(function(entity) {
+			try {
+				me.internalLoad(entity);
+			} catch (e) {
+				Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred") + ": " + e.message);
+				console.error(e);
+			}
+		}).catch(function(e) {
+			console.error(e);
+			Ext.MessageBox.alert(t("Not found"), "The requested page was not found");
+		}).finally(function() {
+			me.loading = false;
+		})
 	},
 
 	addCustomFields : function() {

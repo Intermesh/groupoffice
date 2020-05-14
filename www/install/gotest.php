@@ -81,6 +81,16 @@ function test_system(){
 	global $product_name;
 	
 	$tests=array();
+
+
+	
+
+	$test['name']='PHP apcu support';
+	$test['showSuccessFeedback'] = false;
+	$test['pass']=extension_loaded('apcu');
+	$test['feedback']="It's recommended to install the PHP apcu extension for Group-Office to improve performance.";
+	$test['fatal']=false;
+	$tests[]=$test;
 	
 	$test['name']='Operating System';
 	$test['showSuccessFeedback'] = false;
@@ -133,6 +143,23 @@ function test_system(){
 	$test['pass']=!ini_is_enabled('output_buffering');
 	$test['feedback']='Warning: output_buffering is enabled. This will increase memory usage might cause memory errors';
 	$test['fatal']=false;
+
+	$tests[]=$test;
+
+
+	$test['name']='DOM extension';
+	$test['showSuccessFeedback'] = false;
+	$test['pass']=extension_loaded('dom');
+	$test['feedback']='Error: The PHP xml / dom extension is required';
+	$test['fatal']=true;
+
+	$tests[]=$test;
+
+	$test['name']='fileinfo extension';
+	$test['showSuccessFeedback'] = false;
+	$test['pass']=extension_loaded('fileinfo');
+	$test['feedback']='Error: The PHP fileinfo extension is required';
+	$test['fatal']=true;
 
 	$tests[]=$test;
 	
@@ -323,6 +350,19 @@ function test_system(){
 	$test['fatal']=false;
 
 	$tests[]=$test;
+	$test['name'] = 'pdfinfo';
+	$test['showSuccessFeedback'] = false;
+	if(class_exists('GO'))
+	{
+		$pdfinfo = whereis('pdfinfo') ? whereis('pdfinfo') : \GO::config()->cmd_pdfinfo; 
+	}else
+	{
+		$pdfinfo = whereis('pdfinfo') ? whereis('pdfinfo') : '/usr/bin/pdfinfo'; // The debian default path for pdfinfo
+	}
+	$test['pass']=@is_executable($pdfinfo);
+	$test['feedback']='Warning: pdfinfo is not installed or not executable. Please install the poppler-utils package';
+	$test['fatal']=false;
+	$tests[]=$test;
 	
 	$test['name']='Ioncube enabled';
 	$test['pass']=$ioncubeWorks = ioncube_tester();
@@ -437,6 +477,17 @@ function test_system(){
 	$tests[]=$test;	
 	
 	*/
+
+	$test['name']='MySQLnd driver';
+	$test['showSuccessFeedback'] = false;
+	$test['pass']= extension_loaded('mysqlnd');
+	$test['feedback']= "PHP is not using the mysqlnd driver. Please install MySQLi.";
+	$test['fatal']=true;
+	
+
+	$tests[]=$test;
+	
+	
 	
 	$test['name']='Shared Memory Functions';
 	$test['showSuccessFeedback'] = false;

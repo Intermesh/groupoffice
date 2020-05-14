@@ -7,7 +7,7 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 			iconCls: 'ic-notifications',
 			items: [{
 					defaults: {
-						width: dp(240)
+						width: dp(360)
 					},
 					xtype: "fieldset",
 					title: t('Outgoing E-mail (SMTP)'),
@@ -40,7 +40,8 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 							xtype: 'textfield',
 							name: 'smtpPassword',
 							fieldLabel: t('Password'),
-							inputType: "password"
+							inputType: "password",
+							autocomplete: "new-password"
 						}, {
 							xtype: 'combo',
 							name: 'smtpEncryption',
@@ -121,35 +122,31 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 		f.findField('smtpEncryptionVerifyCertificate').setDisabled(!f.findField('smtpEncryption').getValue());
 		f.findField("enableEmailDebug").setValue(!GO.util.empty(f.findField('debugEmail').getValue()));
 	},
-	
+
 	sendTestMessage : function() {
 		this.getEl().mask(t("Sending..."));
-		
+		var me = this;
 		go.Jmap.request({
 			method: "core/Settings/sendTestMessage",
-			params: this.getForm().getFieldValues(),
-			callback: function (options, success, response) {
-				this.getEl().unmask();
-				if(success) {
-					Ext.MessageBox.alert(
-						t("Success"), 
-						t("A message was sent successfully to {email}").replace('{email}', this.getForm().findField('systemEmail').getValue())
-					);
-				} else
-				{
-					var error = "";					
-					error = "<br /><br />" + response.message;
-					
-					Ext.MessageBox.alert(
-						t("Failed"), 
-						t("Failed to send message to {email}").replace('{email}', this.getForm().findField('systemEmail').getValue() + error) 
-					);
-				}
-			},
-			scope: this
+			params: this.getForm().getFieldValues(true)
+		}).then(function(response) {
+			Ext.MessageBox.alert(
+				t("Success"),
+				t("A message was sent successfully to {email}").replace('{email}', me.getForm().findField('systemEmail').getValue())
+			);
+		}).catch(function(response) {
+			var error = "";
+			error = "<br /><br />" + response.message;
+
+			Ext.MessageBox.alert(
+				t("Failed"),
+				t("Failed to send message to {email}").replace('{email}', me.getForm().findField('systemEmail').getValue() + error)
+			);
+		}).finally(function() {
+			me.getEl().unmask();
 		});
-		
-		
+
+
 	}
 
 });

@@ -6,9 +6,7 @@ use go\core\model\Acl;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\exception\Forbidden;
-use go\core\model\UserGroup;
 use go\core\orm\Query;
-use go\core\util\ArrayObject;
 use go\core\validate\ErrorCode;
 
 /**
@@ -104,7 +102,18 @@ class Group extends AclOwnerEntity {
 			$this->setValidationError('users', ErrorCode::FORBIDDEN, go()->t("You can't remove the group owner from the group"));
 		}
 
+		if($this->id == self::ID_EVERYONE && $this->isModified(['users'])) {
+			$this->setValidationError('users', ErrorCode::FORBIDDEN, go()->t("You can't modify members of the everyone group"));
+		}
+
 		return parent::internalValidate();
+	}
+
+	public static function check()
+	{
+		//make sure all users are in group everyone
+		go()->getDbConnection()->exec("INSERT IGNORE INTO core_user_group (SELECT " . self::ID_EVERYONE .", id from core_user)");
+		return parent::check();
 	}
 
 	protected function internalSave() {
@@ -150,6 +159,10 @@ class Group extends AclOwnerEntity {
 		if(in_array(self::ID_INTERNAL, $ids)) {
 			throw new Forbidden("You can't delete the internal group");
 		}
+
+		if(in_array(self::ID_EVERYONE, $ids)) {
+			throw new Forbidden("You can't delete the internal group");
+		}
 		
 		// if(isset($this->isUserGroupFor)) {
 		// 	$this->setValidationError('isUserGroupFor', ErrorCode::FORBIDDEN, "You can't delete a user's personal group");
@@ -161,14 +174,19 @@ class Group extends AclOwnerEntity {
 
 
 	public function getModules() {
-		$modules = new ArrayObject();
-		$modules->serializeJsonAsObject = true;
+		$modules = [];
 
 		$mods = Module::find()
 							->select('id,level')
 							->fetchMode(\PDO::FETCH_ASSOC)
 							->join('core_acl_group', 'acl_g', 'acl_g.aclId=m.aclId')
-							->where(['acl_g.groupId' => $this->id]);
+							->where(['acl_g.groupId' => $this->id])
+							->all();
+
+		if(empty($mods)) {
+			//return null because an empty array is serialzed as [] instead of {}
+			return null;
+		}
 
 		foreach($mods as $m) {
 			$modules[$m['id']] = $m['level'];

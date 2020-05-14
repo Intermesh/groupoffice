@@ -167,7 +167,7 @@ CHANGE COLUMN `password` `password` VARCHAR(512) NULL DEFAULT NULL ,
 CHANGE COLUMN `smtp_password` `smtp_password` VARCHAR(512) NOT NULL DEFAULT '';";
 
 $updates['201811181020'][] = function() {
-	$cf = new \go\core\util\ClassFinder();	
+	$cf = new \go\core\util\ClassFinder(false);	
 	$cf->addNamespace("go\\modules\\community\\email");			
 	foreach($cf->findByParent(go\core\orm\Entity::class) as $cls) {
 		$cls::entityType();
@@ -204,3 +204,5 @@ $updates['201811181020'][] = "CREATE TABLE `email_template_attachment` (
 $updates['201905111651'][] = "DROP TABLE `email_template_attachment`;";
 $updates['201905111651'][] = "DROP TABLE `email_template`;";
 $updates['201906271420'][] = "DELETE FROM go_state WHERE name='em-pnl-west'";
+
+$updates['202002280914'][] = "ALTER TABLE `em_contacts_last_mail_times` ADD INDEX(`last_mail_time`);";

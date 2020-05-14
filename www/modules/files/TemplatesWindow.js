@@ -108,7 +108,7 @@ Ext.extend(GO.files.TemplateWindow,Ext.Window, {
 			
 			this.downloadButton = new Ext.Button({
 				handler: function(){
-					document.location.href = GO.url('files/template/download&id='+this.template_id);
+					go.util.downloadFile(GO.url('files/template/download&id='+this.template_id));
 				},
 				disabled: true,
 				text: t("Download template", "files"),

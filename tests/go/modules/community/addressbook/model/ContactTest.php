@@ -88,4 +88,12 @@ class ContactTest extends TestCase {
     $success = $contact->save();
     $this->assertEquals(true, $success);    
   }
+
+  public function testDelete() {
+    $contact = Contact::find()->single();
+    
+    $success = Contact::delete(['id' => $contact->id]);
+
+    $this->assertEquals(true, $success);
+  }
 }

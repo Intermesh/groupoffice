@@ -10,5 +10,9 @@ return array (
   'Content' => 'Text',
   'Invalid password' => 'Ongeldig wachtwoord',
   'Note book' => 'Notitieblok',
-  'Commented at' => 'Nieuw bericht op'
+  'Commented at' => 'Nieuw bericht op',
+  'Encrypted data' => 'Versleutelde gegevens',
+  'Default note book' => 'Standaard notitieblok',
+  'Enter password to decrypt' => 'Voer wachtwoord in om te ontsleutelen',
+  'Add test' => 'Toevoegen test',
 );

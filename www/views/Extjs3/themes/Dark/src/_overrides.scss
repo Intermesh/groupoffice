@@ -1,0 +1,44 @@
+
+body{
+  background-color: color($bg, 'background');
+}
+.notifications,.notificationArea {
+  background-color: #1b1b1b;
+}
+
+.x-layout-split {
+  background-color: #1b1b1b;
+}
+
+.x-panel-tbar .x-toolbar {
+  border-bottom: 1px solid #1b1b1b;
+
+  .go-sidenav & {
+    border-bottom: 0;
+  }
+}
+.x-grid3-header, .x-grid3-hd-row td {
+  border-color: #1b1b1b;
+}
+
+.message-body {
+  margin: dp(8);
+  border: 1px solid #ccc;
+}
+
+.em-composer {
+  .x-html-editor-wrap {
+    textarea {
+      color: black;
+      background-color: white; //These styles are copied to the html editor iframe by ExtJS
+    }
+  }
+
+}
+
+.x-form{
+  &-invalid, textarea.x-form-invalid {
+    border-color: rgba($cDanger,0.54);
+    background-color: color($bg, 'box');
+  }
+}

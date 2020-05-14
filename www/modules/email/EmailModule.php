@@ -23,9 +23,12 @@ namespace GO\Email;
 
 use GO;
 use go\core\model\User;
+use go\core\Module;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
+use go\core\orm\Query;
 use GO\Email\Model\Account;
+use go\modules\community\addressbook\model\Contact;
 
 class EmailModule extends \GO\Base\Module{	
 
@@ -34,8 +37,8 @@ class EmailModule extends \GO\Base\Module{
 		$c = new \GO\Core\Controller\ReminderController();
 		$c->addListener('reminderdisplay', "GO\Email\EmailModule", "reminderDisplay");
 
-		$c = new \GO\Core\Controller\AuthController();
-		$c->addListener('head', 'GO\Email\EmailModule', 'head');
+		// $c = new \GO\Core\Controller\AuthController();
+		// $c->addListener('head', 'GO\Email\EmailModule', 'head');
 
 		\GO\Base\Model\User::model()->addListener('delete', "GO\Email\EmailModule", "deleteUser");
 
@@ -48,23 +51,31 @@ class EmailModule extends \GO\Base\Module{
 	public static function defineListeners() {
 
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
+
+		if(\go\core\model\Module::isInstalled('community', 'addressbook')) {
+			Contact::on(Contact::EVENT_BEFORE_DELETE, static::class, 'onContactDelete');
+		}
+	}
+
+	public static function onContactDelete(Query $query) {
+		go()->getDbConnection()->delete('em_contacts_last_mail_times', (new Query)->where('contact_id', 'IN', $query))->execute();
 	}
 
 	public static function onMap(Mapping $mapping) {
 		$mapping->addHasOne('emailSettings', \GO\Email\Model\UserSettings::class, ['id' => 'id'], true);
 	}
 
-	public static function head(){
+	// public static function head(){
 
-		$font_size = \GO::user() ? \GO::config()->get_setting('email_font_size', \GO::user()->id) : false;
-		if(!$font_size)
-			$font_size='14px';
+	// 	$font_size = \GO::user() ? \GO::config()->get_setting('email_font_size', \GO::user()->id) : false;
+	// 	if(!$font_size)
+	// 		$font_size='14px';
 
-		echo "\n<!-- Inserted by EmailModule::head() -->\n<style>\n".
-		'.message-body,.message-body p, .message-body li, .go-html-formatted td, .em-composer .em-plaintext-body-field{'.
-			'font-size: '.$font_size.';!important'.
-		"}\n</style>\n<!-- End EmailModule::head() -->\n";
-	}
+	// 	echo "\n<!-- Inserted by EmailModule::head() -->\n<style>\n".
+	// 	'.message-body,.message-body p, .message-body li, .go-html-formatted td, .em-composer .em-plaintext-body-field{'.
+	// 		'font-size: '.$font_size.';!important'.
+	// 	"}\n</style>\n<!-- End EmailModule::head() -->\n";
+	// }
 
 
 	public static function deleteUser($user) {

@@ -15,6 +15,25 @@ go.Jmap = {
 	 */
 	profile: false,
 
+	/**
+	 * Server capabilities. It's set when auth request completes in authentication manager
+	 */
+	capabilities : {
+		maxSizeUpload: 100*1000*1024,
+
+		maxConcurrentUpload: 4,
+
+		maxSizeRequest:  100*1000*1024,
+
+		maxConcurrentRequests: 4,
+
+		maxCallInRequest: 10,
+
+		maxObjectsInGet: 100,
+
+		maxObjectsInSet: 1000
+	},
+
 	nextCallId: function () {
 		this.callId++;
 
@@ -25,11 +44,15 @@ go.Jmap = {
 		this.scheduleRequest({
 			method: 'community/dev/Debugger/get',
 			params: {},
-			callback: function(options, success, response, clientCallId) {		
-				for(var i = 0, l = response.length; i < l; i ++) {			
-					var method = response[i].shift();				
-					console[method].apply(null, response[i]);				
+			callback: function(options, success, response, clientCallId) {
+
+				var r;
+				while(r = response.shift()) {
+					var method = r.shift();
+					r.push(clientCallId);
+					console[method].apply(null, r);
 				}
+
 			}
 		}).catch(function() {
 			//ignore error
@@ -98,30 +121,134 @@ go.Jmap = {
 
 		return url;
 	},
-	
-	upload : function(file, cfg) {
-		if(Ext.isEmpty(file))
-			return;
 
-		Ext.Ajax.request({url: go.User.uploadUrl,
+	thumbUrl: function(blobId, params) {
+		if (!blobId) {
+			return '';
+		}
+		var url = BaseHref + 'api/thumb.php?blob=' + blobId;
+
+		for(var name in params) {
+			url += '&' + name + '=' + encodeURIComponent(params[name]);
+		}
+
+		return url;
+
+	},
+
+	uploadQueue: [],
+
+	/**
+	 *
+	 * @param {File} file
+	 * @param {Object} cfg
+	 */
+	upload : function(file, cfg) {
+		if(Ext.isEmpty(file) || file.name === '.DS_Store') {
+			cfg.callback && cfg.callback.call(cfg.scope || this, {upload:'skipped'});
+			return;
+		}
+
+		if(file.size > this.capabilities.maxSizeUpload) {
+			cfg.callback && cfg.callback.call(cfg.scope || this, {upload:'skipped'});
+			cfg.failure && cfg.failure.call(cfg.scope || this, data);
+			go.Notifier.notificationArea.expand();
+			go.Notifier.msg({
+				iconCls: 'ic-file-upload',
+				items:[
+					{xtype:'box',html:'<b>'+file.name+'</b><p class="danger">' +t('File size exceeds the maximum of {max}.').replace('{max}', go.util.humanFileSize(this.capabilities.maxSizeUpload)) + '</p>'},
+				],
+				title: t('Upload failed')
+			})
+			return;
+		}
+
+		// nicetohave: group file upload in 1 notification
+		this.uploadQueue.push(file);
+		go.Notifier.toggleIcon('upload', true);
+
+		var prevNotificationAreaState = null;
+		var started_at = new Date();
+		var transactionId = Ext.Ajax.request({url: go.User.uploadUrl,
+			timeout: 4 * 60 * 60 * 100, //4 hours
 			success: function(response) {
 				if(cfg.success && response.responseText) {
 					data = Ext.decode(response.responseText);
-					cfg.success.call(cfg.scope || this,data);
+					notifyEl.setTitle(t('Upload complete'));
+					setTimeout(function () {
+						go.Notifier.remove(notifyEl);
+						go.Notifier.notificationArea[prevNotificationAreaState ? 'collapse' : 'expand']();
+					}, 2000);
+					cfg.success.call(cfg.scope || this,data, file);
 				}
 			},
-			failure: function(response) {
+			callback: function(response) {
+				go.Jmap.uploadQueue.remove(file);
+				if(Ext.isEmpty(this.uploadQueue)) {
+					go.Notifier.toggleIcon('upload', false); //done
+
+				}
+				cfg.callback && cfg.callback.call(cfg.scope || this, response);
+			},
+			progress: function(e) {
+				if (e.lengthComputable) {
+					var seconds_elapsed = (new Date().getTime() - started_at.getTime() )/1000;
+					var bytes_per_second =  seconds_elapsed ? e.loaded / seconds_elapsed : 0;
+					var remaining_bytes = e.total - e.loaded;
+					var seconds_remaining = seconds_elapsed ? remaining_bytes / bytes_per_second : '';
+					var percentage = (e.loaded / e.total * 100 | 0);
+					if(notifyEl) {
+						notifyEl.setTitle(t('Uploading...')+' &bull; ' + percentage + '%');
+						var box = notifyEl.items.items[0].getResizeEl();
+						if(box)
+							box.child('span', true).innerText = Math.round(seconds_remaining)+t('s');
+						notifyEl.items.items[1].updateProgress(percentage/100);
+					}
+				}
+				cfg.progress && cfg.progress.call(cfg.scope || this, e);
+			},
+			failure: function(response, options) {
+				var data = response,
+					title = response.isAbort ? t('Upload aborted') : t('Upload failed');
+					text = '<b>'+Ext.util.Format.htmlEncode(file.name)+'</b><p class="danger">';
+
 				if(cfg.failure && response.responseText) {
 					data = Ext.decode(response.responseText);
-					cfg.failure.call(cfg.scope || this,data);
+				} else if(response.status === 413) { // "Request Entity Too Large"
+					text += t('File too large');
+				} else if(!response.isAbort) {
+					text += 'Please check if the system is using the correct URL at System settings -> General -> URL.';
 				}
+				text += "</p>";
+
+				notifyEl.buttons[0].hide();
+				notifyEl.setPersistent(false).setTitle(title);
+				notifyEl.items.get(0).update(text);
+				cfg.failure && cfg.failure.call(cfg.scope || this, data);
 			},
 			headers: {
-				'X-File-Name': file.name,
+				'X-File-Name': "UTF-8''" + encodeURIComponent(file.name),
 				'Content-Type': file.type,
-				'X-File-LastModifed': Math.round(file['lastModified'] / 1000).toString()
+				'X-File-LastModified': Math.round(file['lastModified'] / 1000).toString()
 			},
 			xmlData: file // just "data" wasn't available in ext
+		});
+		var prevNotificationAreaState = go.Notifier.notificationArea.collapsed;
+		go.Notifier.notificationArea.expand();
+		var notifyEl = go.Notifier.msg({
+			persistent: true,
+			iconCls: 'ic-file-upload',
+			items:[
+				{xtype:'box',html:'<b>'+Ext.util.Format.htmlEncode(file.name)+'</b><span>...</span>'},
+				{xtype:'progress',height:4,style:'margin: 7px 0'}
+			],
+			title: t('Uploading...'),
+			buttons: [{
+				text:t('Abort'),
+				handler: function() {
+					Ext.Ajax.abort(transactionId);
+				}
+			}]
 		});
 	},
 	
@@ -140,9 +267,11 @@ go.Jmap = {
 			}
 			
 			if(!go.User.eventSourceUrl) {
-				console.debug("Not starting EventSource when xdebug is running");
+				console.debug("Server Sent Events (EventSource) is disabled on the server.");
 				return false;
 			}
+
+			console.debug("Starting SSE");
 			
 			//filter out legacy modules
 			var entities = go.Entities.getAll().filter(function(e) {return e.package != "legacy";});
@@ -179,9 +308,13 @@ go.Jmap = {
 
 			source.addEventListener('error', function(e) {
 				if (e.readyState == EventSource.CLOSED) {
-					// Connection was closed.					
-					me.sse();
+					// Connection was closed.
+
+				} else
+				{
+					console.error(e);
 				}
+
 			}, false);
 		}
 		catch(e) {
@@ -198,7 +331,7 @@ go.Jmap = {
 	 * 
 	 * method: jmap method
 	 * params: jmap method parameters
-	 * callback: function to call after request. Arghuments are options, success, response
+	 * callback: Deprecated! Use the promise functionality. If you pass a callback you can't use the promise. Function to call after request. Arghuments are options, success, response.
 	 * scope: callback function scope
 	 * dispatchAfterCallback: dispatch the response after the callback. Defaults to false.
 	 * 
@@ -218,8 +351,9 @@ go.Jmap = {
 		if(!this.paused) {
 			this.continue();
 		}
-
-		return promise;
+		if(!options.callback) {
+			return promise;
+		}
 	},
 
 	scheduleRequest: function(options) {
@@ -299,29 +433,25 @@ go.Jmap = {
 							console.error('server-side JMAP failure', response);							
 						}
 
-						go.flux.Dispatcher.dispatch(response[0], {
-							options: o,
-							response: response[1]
-						});
-
-						//make sure dispatch is executed before callbacks and resolves.
-						setTimeout(function() {
 							var success = response[0] !== "error";
 							if (o.callback) {
 								if (!o.scope) {
 									o.scope = this;
 								}
 								o.callback.call(o.scope, o, success, response[1], response[2]);
-							}
+							} else {
 
-							if(success) {							
-								o.resolve(response[1]);
-							} else{
-								o.reject(response[1]);
+								response[1].options = o;
+
+								if (success) {
+									o.resolve(response[1]);
+								} else {
+									o.reject(response[1]);
+								}
 							}
 
 							delete me.requestOptions[response[2]];
-						}, 0);
+
 					}, this);
 
 				// } catch(e) {					
@@ -331,8 +461,12 @@ go.Jmap = {
 				// }
 			},
 			failure: function (response, opts) {
+				if(response.isAbort) {
+					console.warn('Connection aborted', response);
+					return;
+				}
 				console.error('server-side failure with status code ' + response.status);
-				console.error(response.responseText);
+				console.error(response);
 
 				for(var i = 0, l = opts.jsonData.length; i < l; i++) {
 					var clientCallId = opts.jsonData[i][2];
@@ -340,7 +474,7 @@ go.Jmap = {
 					delete this.requestOptions[clientCallId];
 				}
 				
-				Ext.MessageBox.alert(t("Error"), t("Sorry, an unexpected error occurred: ") + response.responseText);
+				Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred") + ": " + response.responseText);
 				
 			}
 		});

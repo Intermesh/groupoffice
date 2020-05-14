@@ -42,7 +42,7 @@ class ToolsController extends GO\Base\Controller\AbstractJsonController{
 			$store->addRecord(array('name'=>'Update filesearch index','script'=>GO::url('filesearch/filesearch/sync')));
 		
 		if(GO::modules()->calendar){
-			$store->addRecord(array('name'=>GO::t("Clear calendar holiday cache", "calendar"),'description'=>GO::t("Clears calendar holiday cache so they will be rebuilded through the holiday files. (On first view)", "calendar"),'script'=>GO::url('calendar/calendar/truncateHolidays')));
+			$store->addRecord(array('name'=>GO::t("Clear calendar holiday cache", "calendar"), 'script'=>GO::url('calendar/calendar/truncateHolidays')));
 		}
 
 		echo $this->renderStore($store);

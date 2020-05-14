@@ -4,7 +4,6 @@ namespace go\core;
 
 use Exception;
 use go\core\db\Utils;
-use go\core\Environment;
 use go\core\exception\NotFound;
 use go\core\fs\File;
 use go\core\fs\Folder;
@@ -34,7 +33,7 @@ abstract class Module {
 	 * Find module class file by name
 	 * 
 	 * @param string $moduleName
-	 * @return self
+	 * @return self|false
 	 */
 	public static function findByName($moduleName) {
 		$classFinder = new ClassFinder(false);
@@ -89,11 +88,11 @@ abstract class Module {
 	}
 
 
-	
 	/**
 	 * Install the module
-	 * 
-	 * @return model\Module;
+	 *
+	 * @return model\Module|false;
+	 * @throws Exception
 	 */
 	public final function install() {
 
@@ -140,21 +139,27 @@ abstract class Module {
 		
 		return $model;
 	}
-	
+
+	/**
+	 * @throws Exception
+	 */
 	private function rollBack() {
 
 		// Transaction is probably aborted by the install.sql file of the module. Any structure change will automatically abort the transaction.			
 		if(go()->getDbConnection()->inTransaction()) {
 			go()->getDbConnection()->rollBack();
 		}
-		$this->uninstallDatabase();
-	}	
-	
+		try {
+			$this->uninstallDatabase();
+		}catch(Exception $e) {}
+	}
+
 	/**
 	 * Uninstall the module
-	 * 
+	 *
 	 * @return bool
 	 * @throws NotFound
+	 * @throws Exception
 	 */
 	public function uninstall() {
 		
@@ -166,27 +171,33 @@ abstract class Module {
 			return false;
 		}
 		
-		$model = model\Module::find()->where(['name' => static::getName()])->single();
+		$model = model\Module::find()->where(['name' => static::getName(), 'package' => static::getPackage()])->single();
 		if(!$model) {
-			throw new NotFound();
+			throw new NotFound("Module not found: ". static::getName() . "/" . static::getPackage());
 		}
+		$model->enabled = false;
 		
-		if(!$model->delete()) {
+		if(!$model->save()) {
 			return false;
 		}
 		
 		go()->rebuildCache(true);
+
+		if(!model\Module::delete(['name' => static::getName(), 'package' => static::getPackage()])) {
+			return false;
+		}	
 		
 		return true;
 	}
-	
-	
+
+
 	/**
-	 * Registers all entity in the core_entity table. This happens after the 
+	 * Registers all entity in the core_entity table. This happens after the
 	 * core_module entry has been inserted.
-	 * 
-	 * De-registration is not necessary when the module is uninstalled because they 
+	 *
+	 * De-registration is not necessary when the module is uninstalled because they
 	 * will be deleted by Mysql because of a cascading relation.
+	 * @throws Exception
 	 */
 	public function registerEntities() {
 		$entities = $this->getClassFinder()->findByParent(Entity::class);
@@ -198,25 +209,26 @@ abstract class Module {
 		foreach($entities as $entity) {
 			$type = $entity::entityType();
 			if(!$type) {
-				throw new \Exception("Could not register entity type for module ". $this->getName() . " with name " . $entity::getClientName());
+				throw new Exception("Could not register entity type for module ". $this->getName() . " with name " . $entity::getClientName());
 			}
 			$typeModuleModel = $type->getModule();
 			
 			if(!$typeModuleModel) {
-				throw new \Exception("Could not register entity type for module ". $this->getName() . " with name " . $entity::getClientName() .' because existing type with ID = '.$type->getId().' had no module.' );				
+				throw new Exception("Could not register entity type for module ". $this->getName() . " with name " . $entity::getClientName() .' because existing type with ID = '.$type->getId().' had no module.' );
 			}
 			
 			if($typeModuleModel->id != $moduleModel->id) {
-				throw new \Exception("Can't register entity '".$entity::getClientName()."' because it's already registered for module " . ($typeModuleModel->package ?? "legacy") . "/" .$typeModuleModel->name);
+				throw new Exception("Can't register entity '".$entity::getClientName()."' because it's already registered for module " . ($typeModuleModel->package ?? "legacy") . "/" .$typeModuleModel->name);
 			}
 		}		
 		
 		return true;
 	}
-	
+
 	/**
 	 * Installs the database for the module. This happens before the core_module entry has been inserted.
 	 * @return boolean
+	 * @throws Exception
 	 */
 	private function installDatabase() {
 		$sqlFile = $this->getFolder()->getFile('install/install.sql');
@@ -227,11 +239,12 @@ abstract class Module {
 				
 		return true;
 	}
-	
+
 	/**
 	 * This will delete the module's database tables
-	 * 
+	 *
 	 * @return boolean
+	 * @throws Exception
 	 */
 	private function uninstallDatabase() {
 		$sqlFile = $this->getFolder()->getFile('install/uninstall.sql');
@@ -245,11 +258,12 @@ abstract class Module {
 		
 		return true;
 	}
-	
+
 	/**
-	 * Override to implement installation routines after the database has been 
+	 * Override to implement installation routines after the database has been
 	 * created. Share the module with group "Internal" for example.
-	 * 
+	 *
+	 * @param model\Module $model
 	 * @return bool
 	 */
 	protected function afterInstall(model\Module $model) {
@@ -340,7 +354,7 @@ abstract class Module {
 	/**
 	 * 
 	 * @deprecated
-	 * @return type
+	 * @return string
 	 */
 	public function path() {
 		return $this->getPath() . '/';
@@ -352,18 +366,14 @@ abstract class Module {
 	 * @return string
 	 */
 	public static function getPath() {
-		
-		//todo use reflection
-		//
-		//$reflector = new ReflectionClass('Foo');
-		//	echo $reflector->getFileName();
 		return Environment::get()->getInstallFolder() . '/' . dirname(str_replace('\\', '/', static::class));
 	}
-	
+
 	/**
 	 * Get the folder of this module
-	 * 
+	 *
 	 * @return Folder
+	 * @throws Exception
 	 */
 	public static function getFolder() {
 		return new Folder(static::getPath());
@@ -373,7 +383,7 @@ abstract class Module {
 	 * 
 	 * Get the name of this module
 	 * 
-	 * @return type
+	 * @return string
 	 */
 	public static function getName() {
 		$parts = explode("\\", static::class);
@@ -385,7 +395,7 @@ abstract class Module {
 	 * // backwards compatible 6.2
 	 * 
 	 * @deprecated since version number
-	 * @return type
+	 * @return string
 	 */
 	public static function name() {
 		return self::getName();
@@ -486,10 +496,22 @@ abstract class Module {
 	 * A module must override this function and implement a \go\core\Settings object
 	 * to store settings.
 	 * 
-	 * @return \go\core\Settings
+	 * @return Settings
 	 */
 	public function getSettings() {
 		return null;
+	}
+
+	/**
+	 * Check the module's data
+	 */
+	public function checkDatabase() {
+		$entities = $this->getClassFinder()->findByParent(Entity::class);
+		foreach($entities as $entity) {
+			echo "Checking " . $entity . "\n";
+			$entity::check();
+			echo "Done\n";
+		}
 	}
 
 }

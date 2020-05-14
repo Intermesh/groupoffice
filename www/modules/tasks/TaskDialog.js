@@ -268,11 +268,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 
 				GO.tasks.tasksObservable.fireEvent('save', this, this.task_id);
 				this.fireEvent('save', this, this.task_id);
-				
-				
-				
-				
-				
+
 				GO.dialog.TabbedFormDialog.prototype.refreshActiveDisplayPanels.call(this);
 
 				if (hide) {
@@ -316,13 +312,13 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			
 			this.formPanel.form.findField('remind_date').setValue(remindDate);
 
-			if (this.repeatType.getValue() != '') {
-				if (this.repeatEndDate.getValue() == '') {
-					this.repeatForever.setValue(true);
+			if (this.recurrencePanel.repeatType.getValue() != '') {
+				if (this.recurrencePanel.repeatEndDate.getValue() == '') {
+					this.recurrencePanel.repeatForeverXCheckbox.setValue(true);
 				} else {
 					var eD = dueDate.getValue();
-					if (this.repeatEndDate.getValue() < eD) {
-						this.repeatEndDate.setValue(eD.add(Date.DAY, 1));
+					if (this.recurrencePanel.repeatEndDate.getValue() < eD) {
+						this.recurrencePanel.repeatEndDate.setValue(eD.add(Date.DAY, 1));
 					}
 				}
 			}

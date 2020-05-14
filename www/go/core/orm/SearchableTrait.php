@@ -3,6 +3,7 @@ namespace go\core\orm;
 
 use go\core\App;
 use go\core\db\Query;
+use go\core\model\Link;
 
 /**
  * Entities can use this trait to make it show up in the global search function
@@ -67,6 +68,19 @@ trait SearchableTrait {
 		if(!isset($keywords)) {
 			$keywords = [$search->name, $search->description];
 		}
+
+		$links = (new Query())
+			->select('description')
+			->from('core_link')
+			->where('(toEntityTypeId = :e1 AND toId = :e2)')
+			->orWhere('(fromEntityTypeId = :e3 AND fromId = :e4)')
+			->bind([':e1' => static::entityType()->getId(), ':e2' => $this->id, ':e3' => static::entityType()->getId(), ':e4' => $this->id ]);
+		foreach($links->all() as $link) {
+			if(!empty($link['description']) && is_string($link['description'])) {
+				$keywords[] = $link['description'];
+			}
+
+		}
 		
 		if(method_exists($this, 'getCustomFields')) {
 			foreach($this->getCustomFields() as $col => $v) {
@@ -87,26 +101,30 @@ trait SearchableTrait {
 		return true;
 	}
 	
-	public static function deleteSearchAndLinks(Query $query) {
-
-		
+	public static function deleteSearchAndLinks(Query $query) {		
 		if(!\go()->getDbConnection()
 						->delete('core_search', 
-										['entityTypeId' => static::entityType()->getId(), 'entityId' => $query]
+										(new Query)
+											->where(['entityTypeId' => static::entityType()->getId()])
+											->andWhere('entityId', 'IN', $query)
 										)->execute()) {
 			return false;
 		}
 		
 		if(!\go()->getDbConnection()
 						->delete('core_link', 
-										['fromEntityTypeId' => static::entityType()->getId(), 'fromId' => $query]
+										(new Query)
+											->where(['fromEntityTypeId' => static::entityType()->getId()])
+											->andWhere('fromId', 'IN', $query)
 										)->execute()) {
 			return false;
 		}
 		
 		if(!\go()->getDbConnection()
-						->delete('core_link', 
-										['toEntityTypeId' => static::entityType()->getId(), 'toId' => $query]
+						->delete('core_link', 										
+										(new Query)
+											->where(['toEntityTypeId' => static::entityType()->getId()])
+											->andWhere('toId', 'IN', $query)
 										)->execute()) {
 			return false;
 		}

@@ -42,25 +42,28 @@ class VCard extends AbstractConverter {
 		if ($contact->vcardBlobId) {
 			//Contact has a stored VCard 
 			$blob = Blob::findById($contact->vcardBlobId);
-			$vcard = Reader::read($blob->getFile()->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);			
-			
-			//remove all supported properties
-			$vcard->remove('EMAIL');
-			$vcard->remove('TEL');
-			$vcard->remove('ADR');
-			$vcard->remove('ORG');
-			$vcard->remove('PHOTO');
-			$vcard->remove('BDAY');
-			$vcard->remove('ANNIVERSARY');
+			$file = $blob->getFile();
+			if($file->exists()) {
+				$vcard = Reader::read($file->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 
-			return $vcard;
-		} else {
-			//We have to use 3.0 for the photo property :( See https://github.com/sabre-io/vobject/issues/294#issuecomment-231987064
-			return new VCardComponent([
-					"VERSION" => "3.0",
-					"UID" => $contact->getUid()
-			]);
+				//remove all supported properties
+				$vcard->remove('EMAIL');
+				$vcard->remove('TEL');
+				$vcard->remove('ADR');
+				$vcard->remove('ORG');
+				$vcard->remove('PHOTO');
+				$vcard->remove('BDAY');
+				$vcard->remove('ANNIVERSARY');
+
+				return $vcard;
+			}
 		}
+
+		//We have to use 3.0 for the photo property :( See https://github.com/sabre-io/vobject/issues/294#issuecomment-231987064
+		return new VCardComponent([
+				"VERSION" => "3.0",
+				"UID" => $contact->getUid()
+		]);
 	}
 
 	/**
@@ -78,6 +81,7 @@ class VCard extends AbstractConverter {
 		$vcard->N = $contact->isOrganization ? [$contact->name] : [$contact->lastName, $contact->firstName, $contact->middleName, $contact->prefixes, $contact->suffixes];
 		$vcard->FN = $contact->name;
 		$vcard->REV = $contact->modifiedAt->getTimestamp();
+		$vcard->TITLE = $contact->jobTitle;
 
 		foreach ($contact->emailAddresses as $emailAddr) {
 			$vcard->add('EMAIL', $emailAddr->email, ['TYPE' => [$emailAddr->type]]);
@@ -100,8 +104,12 @@ class VCard extends AbstractConverter {
 				}
 				$type = 'ANNIVERSARY';
 				$anniversaryAdded = true;
-			} 
-			$vcard->add($type, $date->date->format('Y-m-d'));
+			}
+
+			//Some databases have '0000-00-00' in the date??
+			if(isset($date->date)) {
+				$vcard->add($type, $date->date->format('Y-m-d'));
+			}
 		}
 		foreach ($contact->addresses as $address) {
 			//ADR: [post-office-box, apartment, street, locality, region, postal, country]
@@ -418,7 +426,7 @@ class VCard extends AbstractConverter {
 		return 'vcf';
 	}
 	
-	protected function importEntity(Entity $entity, $fp, $index, array $params) {
+	protected function importEntity($entityClass, $fp, $index, array $params) {
 		//not needed because of import file override
 	}
 
@@ -433,7 +441,7 @@ class VCard extends AbstractConverter {
 		$values = $params['values'] ?? [];
 		
 		if(!isset($values['addressBookId'])) {
-			$values['addressBookId'] = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->defaultAddressBookId;
+			$values['addressBookId'] = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId();
 		}
 
 		$splitter = new VCardSplitter(StringUtil::cleanUtf8($file->getContents()), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
@@ -454,12 +462,13 @@ class VCard extends AbstractConverter {
 
 		return $response;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param VCardComponent $vcardComponent
 	 * @param int $addressBookId
 	 * @return Contact
+	 * @throws \ReflectionException
 	 */
 	private function findOrCreateContact(VCardComponent $vcardComponent, $addressBookId) {
 		$contact = false;
@@ -494,4 +503,11 @@ class VCard extends AbstractConverter {
 		return $blob;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
+	public static function supportedExtensions()
+	{
+		return ['vcf'];
+	}
 }

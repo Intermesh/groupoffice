@@ -16,9 +16,7 @@ class Language {
 	private $isoCode;
 	private $data = [];
 
-	public function __construct() {
-		$this->isoCode = $this->getBrowserLanguage();	
-	}
+
 	
 	/**
 	 * Get ISO code with underscore separator for region
@@ -26,6 +24,9 @@ class Language {
 	 * @return string eg. "en" or "en_UK"
 	 */
 	public function getIsoCode() {
+		if(!isset($this->isoCode)) {
+			$this->isoCode = $this->getBrowserLanguage();
+		}
 		return $this->isoCode;
 	}
 	
@@ -77,6 +78,17 @@ class Language {
 		return go()->getSettings()->language; // from settings if we cant determine
 	}
 
+	private $af;
+	public function getAddressFormat($isoCode) {
+
+		if(!isset($this->af)) {
+			require(\go\core\Environment::get()->getInstallFolder() . '/language/addressformats.php');
+			$this->af = $af;
+		}
+
+		return isset($this->af[$isoCode]) ? $this->af[$isoCode] : $this->af['default'];
+	}
+
 	/**
 	 * Translates a language variable name into the local language.
 	 * 
@@ -108,7 +120,16 @@ class Language {
 			$this->data[$package] = [];
 		} 
 		
+		$isoCode = $this->getIsoCode();
+
 		if(!isset($this->data[$package][$module])) {
+
+			$cacheKey = $isoCode .'-'.$package.'-'.$module;
+
+			$this->data[$package][$module] = go()->getCache()->get($cacheKey);
+			if($this->data[$package][$module]) {
+				return;
+			}
 			
 			$langData = new util\ArrayObject();
 			
@@ -121,14 +142,14 @@ class Language {
 			}
 
 			//overwirte english with actual language
-			if ($this->isoCode != 'en') {
-				$file = $this->findLangFile($this->isoCode, $package, $module);
+			if ($isoCode != 'en') {
+				$file = $this->findLangFile($isoCode, $package, $module);
 				if ($file->exists()) {
 					$langData->mergeRecursive($this->loadFile($file));
 				}
 			}
 
-			$file = $this->findLangOverride($this->isoCode, $package, $module);
+			$file = $this->findLangOverride($isoCode, $package, $module);
 			if ($file->exists()) {
 				$langData->mergeRecursive($this->loadFile($file));
 			}
@@ -158,7 +179,8 @@ class Language {
 								], $langData[$key]);
 			}
 
-			$this->data[$package][$module] = $langData->getArray();			
+			$this->data[$package][$module] = $langData->getArray();	
+			go()->getCache()->set($cacheKey, $this->data[$package][$module]);		
 		}
 	}
 	
@@ -225,8 +247,16 @@ class Language {
 	 * @return array array('en'=>'English');
 	 */
 	public function getLanguages() {
+		$languages = go()->getCache()->get('languages');
+		if($languages) {
+			return $languages;
+		}
+
 		require(Environment::get()->getInstallFolder() . '/language/languages.php');
 		asort($languages);
+
+		go()->getCache()->set('languages', $languages);
+
 		return $languages;
 	}
 

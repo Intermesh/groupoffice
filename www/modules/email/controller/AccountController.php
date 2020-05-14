@@ -267,7 +267,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 
 		if(!isset($params['node'])){
 			return $response;
-		}elseif ($params['node'] == 'root') {
+		} elseif ($params['node'] == 'root') {
 
 			$findParams = \GO\Base\Db\FindParams::newInstance()
 						->select('t.*')
@@ -511,8 +511,8 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 			$this->_treeState = json_decode($state);
 			
 			if(!is_array($this->_treeState)){				
-				$error = json_last_error();				
-				trigger_error('JSON Error: '.var_export($error, true), E_USER_NOTICE);				
+				$error = json_last_error();
+				\go\core\ErrorHandler::log ('JSON Error: '.var_export($error, true));
 				$this->_treeState = array();
 			}
 		}

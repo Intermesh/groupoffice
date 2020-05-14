@@ -97,6 +97,8 @@ class Module extends AclOwnerEntity {
 		return parent::defineMapping()->addTable('core_module', 'm');
 	}
 	
+	private $module;
+
 	
 	/**
 	 * Get the module base file object
@@ -108,9 +110,12 @@ class Module extends AclOwnerEntity {
 			return App::get();
 		}
 		
-		$cls = $this->getModuleClass();
+		if(!isset($this->module)) {
+			$cls = $this->getModuleClass();
+			$this->module = new $cls;
+		}
 		
-		return new $cls;
+		return $this->module;
 	}	
 	
 	private function getModuleClass() {		

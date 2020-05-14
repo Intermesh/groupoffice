@@ -79,35 +79,39 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	 * @returns {undefined}
 	 */
 	boot : function() {
-
-		Ext.QuickTips.init();
-		Ext.apply(Ext.QuickTips.getQuickTip(), {
-			dismissDelay: 0,
-			maxWidth: 500
-		});
 		var me = this;
-		Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso};
-
-		if(go.User.accessToken){
-			Ext.Ajax.defaultHeaders.Authorization = 'Bearer ' + go.User.accessToken;
-			go.User.authenticate(function(data, options, success, response){
-				
-				if(success) {
-					me.on('render', function() {
-						me.fireEvent('boot', me);
-					}, me, {single:true});
-					me.onAuthentication(); // <- start Group-Office
-				} else {
-					go.User.clearAccessToken();
-					
-					me.fireEvent("boot", this);
-					go.Router.check();
-				}
+		go.browserStorage.connect().finally(function() {
+			Ext.QuickTips.init();
+			Ext.apply(Ext.QuickTips.getQuickTip(), {
+				dismissDelay: 0,
+				maxWidth: 500
 			});
-		} else {
-			this.fireEvent("boot", this); // In the router there is an event attached.
-			go.Router.check();
-		}
+			
+			Ext.Ajax.defaultHeaders = {'Accept-Language': GO.lang.iso};
+
+			if(go.User.accessToken){
+				Ext.Ajax.defaultHeaders.Authorization = 'Bearer ' + go.User.accessToken;
+				go.User.authenticate(function(data, options, success, response){
+					
+					if(success) {
+						me.on('render', function() {
+							me.fireEvent('boot', me);
+						}, me, {single:true});
+						me.onAuthentication(); // <- start Group-Office
+					} else {
+						go.User.clearAccessToken();
+						
+						me.fireEvent("boot", me);
+						go.Router.check();
+					}
+				});
+			} else {
+				me.fireEvent("boot", me); // In the router there is an event attached.
+				go.Router.check();
+			}
+				
+		});
+
 	},
 
 	saveState: function () {
@@ -241,15 +245,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 	getModulePanel: function (moduleName) {
 		var panelId = 'go-module-panel-' + moduleName;
-
-		if (this.tabPanel.items.map[panelId])
-		{
+		if (this.tabPanel.items.map[panelId]) {
 			return this.tabPanel.items.map[panelId];
-		} else
-		{
-			return false;
 		}
-		
+
+		return false;
 	},
 
 	//overridable
@@ -306,31 +306,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	 * @param {type} panelConfig
 	 * @returns {MainLayoutAnonym$1.initModule@pro;tabPanel@pro;items@arr;map|MainLayoutAnonym$1.initModule@pro;tabPanel@call;insert|MainLayoutAnonym$1.initModule.panel|Boolean}
 	 */
-	addModulePanel : function(moduleName, panelClass, panelConfig) {		
-		
-//		if(!this.rendered) {
-//			this.on("beforerender", function() {
-//				GO.mainLayout.addModulePanel(moduleName, panelClass, panelConfig);
-//			}, {single: true});
-//			return;
-//		}
-//		
-//		panelConfig = panelConfig || {};
-//		
-//		this.startMenu.add({
-//			id: 'go-start-menu-' + moduleName,
-//			moduleName: moduleName,
-//			text: panelConfig.title || panelClass.prototype.title,
-//			iconCls: panelConfig.iconCls || panelClass.prototype.iconCls || 'go-menu-icon-' + moduleName,
-//			handler: function (item, e) {
-//				this.openModule(item.moduleName);
-//			},
-//			scope: this
-//		});
+	addModulePanel : function(moduleName, panelClass, panelConfig) {
 
 		panelConfig =panelConfig || {}
 		panelConfig.package = panelClass.prototype.package;
-//		
+
 		GO.moduleManager._addModule(moduleName, panelClass, panelConfig);
 				
 		go.Router.add(new RegExp('^(' + moduleName + ")$"), function (name) {
@@ -346,7 +326,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	onAuthentication: function () {
 		
 		//load state
-		Ext.state.Manager.setProvider(new GO.state.HttpProvider());
+		if(!GO.util.isMobileOrTablet()) {
+			Ext.state.Manager.setProvider(new GO.state.HttpProvider());
+		}
 		
 		this.fireEvent('authenticated', this);
 		var me = this;
@@ -354,7 +336,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		Ext.getBody().mask(t("Loading..."));
 	
 		go.Modules.init().then(function() {
-			Promise.all([
+			Promise.all([				
+				go.User.loadLegacyModules(),
 				go.customfields.CustomFields.init(),				
 				me.loadLegacyModuleScripts()
 			]).then(function(){
@@ -368,6 +351,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				console.error(error);
 				Ext.getBody().unmask();
 				Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console."));
+
+				
 			});
 		});
 		
@@ -428,6 +413,14 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			id: 'startMenu',
 			hideOnClick: true
 		});
+
+		if(GO.util.isMobileOrTablet()) {
+			this.startMenu.on("show", function() {
+				this.startMenu.setPosition(0,0);
+				this.startMenu.setWidth(Ext.getBody().getWidth());
+				this.startMenu.setHeight(Ext.getBody().getHeight());
+			}, this);
+		}
 
 		if (allPanels.length == 0) {
 			items = new Ext.Panel({
@@ -536,7 +529,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			if(!go.User.avatarId) {
 				return "";
 			}
-			return 'background-image:url('+go.Jmap.downloadUrl(go.User.avatarId)+');'
+			return 'background-image:url('+go.Jmap.thumbUrl(go.User.avatarId, {w: 40, h: 40, zc: 1})+');'
 		}
 
 				var topPanel = new Ext.Panel({
@@ -545,11 +538,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					html:  '<div class="go-header-left"><div id="go-logo" title="'+GO.settings.config.product_name+'"></div></div>\
 					<div class="go-header-right">\
 						<div id="secondary-menu">\
+							<div id="status-bar" class="x-hide-display"></div>\
 							<div id="search_query"></div>\
 							<div id="start-menu-link" ></div>\
-							<a id="user-menu" class="user-img" style="'+getUserImgStyle()+'">\
-								<span id="reminder-icon" style="display: none;">notifications</span>\
-							</a>\
+							<a id="user-menu" class="user-img" style="'+getUserImgStyle()+'"></a>\
 						</div>\
 					</div>',
 					height: dp(64),
@@ -557,12 +549,27 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					border: false
 				});
 
+				var notificationArea = new Ext.Panel({
+					cls: 'notificationArea',
+					region:'east',
+					title: t('Notifications'),
+					floating:true,
+					width:dp(408),
+					//animCollapse:true,
+					//animFloat: true,
+					collapsible: true,
+					collapsed: true,
+					autoScroll: true,
+					cmargins:{left:0,top:0,right:0,bottom:0}
+				});
+
 	//			var winSize = [window.scrollWidth , window.scrollHeight];
 
 				GO.viewport = new Ext.Viewport({
 					layout: 'border',
+					split: false,
 					border: false,
-					items: [topPanel, this.tabPanel]
+					items: [topPanel, this.tabPanel, notificationArea]
 				});
 
 
@@ -575,13 +582,13 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					template: new Ext.XTemplate('<span><button></button></span>')
 				});
 
-
-
-
-
 				var userBtn = Ext.get('user-menu');
 				var userMenuTpl = userBtn.dom.innerHTML;
 				this.userMenuLink = new Ext.Button({
+					text: userMenuTpl,
+					renderTo: userBtn,
+					clickEvent: 'mousedown',
+					template: new Ext.XTemplate('<div style="border-radius:50%"><button></button></div>'),
 					menu: new Ext.menu.Menu({
 						items: [
 							{
@@ -645,11 +652,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						scope: this
 					}
 				]
-			}),
-			text: userMenuTpl,
-			renderTo: userBtn,
-			clickEvent: 'mousedown',
-			template: new Ext.XTemplate('<span><button></button></span>')
+			})
 		});
 
 
@@ -663,7 +666,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				scope: this
 			});
 		}
-
+		go.Notifier.init.defer(2000, go.Notifier,[notificationArea]);
 		GO.checker.init.defer(2000, GO.checker);
 		GO.checker.on('alert', function (data) {
 			if (data.notification_area)

@@ -7,6 +7,7 @@ use GO;
 use go\core\db\Criteria;
 use go\core\db\Query;
 use go\core\db\Utils;
+use go\core\model\Acl;
 use go\core\orm\Filters;
 
 class User extends Base {
@@ -68,5 +69,34 @@ class User extends Base {
 				$criteria->where($alias . '.displayName', $comparator, $value);
 			}
 		});
+	}
+
+
+	public function dbToText($value, &$values, $entity) {
+
+		if(empty($value)) {
+			return "";
+		}
+
+		return (new \go\core\db\Query())
+			->selectSingleValue("displayName")
+			->from('core_user')
+			->where(['id' => $value])
+			->single();
+	}
+
+	public function textToDb($value, &$values, $entity) {
+
+		if(empty($value)) {
+			return null;
+		}
+
+		$id = \go\core\model\User::find(['id'])
+			->selectSingleValue("u.id")
+			->where(['displayName' => $value])
+			->filter(['permissionLevel' => Acl::LEVEL_READ])
+			->single();
+
+		return $id;
 	}
 }

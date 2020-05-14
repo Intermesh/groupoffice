@@ -98,13 +98,16 @@ class Table {
 	 * Clear the columns cache
 	 */
 	private function clearCache() {
-		App::get()->getCache()->delete($this->getCacheKey());
+		go()->getCache()->delete($this->getCacheKey());
 		// $this->columns = null;
 		// $this->pk = [];
-		
+
 		// $this->init();
 	}
 
+  /**
+   * @throws Exception
+   */
 	private function init() {
 		
 		if (isset($this->columns)) {
@@ -156,8 +159,6 @@ class Table {
 			throw new \Exception("The name '$fieldName' is reserved. Please choose another column name.");
 		}
 	}
-	
-	
 
 	private function createColumn($field) {
 		
@@ -179,12 +180,12 @@ class Table {
 		$c->trimInput = false;
 		$c->dataType = strtoupper($field['Type']);
 
-		preg_match('/(.*)\(([1-9].*)\)/', $field['Type'], $matches);		
+		preg_match('/(.*)\(([1-9].*)\)/', $field['Type'], $matches);
 		if ($matches) {
 			$c->length  = intval($matches[2]);
 			$c->dbType = strtolower($matches[1]);			
 		} else {
-			$c->dbType = strtolower($field['Type']);
+			$c->dbType = strtolower(preg_replace("/\(.*\)$/", "", $field['Type']));
 			$c->length = null;
 		}
 		
@@ -195,6 +196,7 @@ class Table {
 		switch ($c->dbType) {
 			case 'int':
 			case 'tinyint':
+			case 'smallint':
 			case 'bigint':
 				if ($c->length == 1 && $c->dbType == 'tinyint') {
 					//$c->pdoType = PDO::PARAM_BOOL; MySQL native doesn't understand PARAM_BOOL. Doesn't work with ATTR_EMULATE_PREPARES = false.
@@ -214,17 +216,6 @@ class Table {
 				$c->length = 0;
 				$c->default = $c->default == null ? null : floatval($c->default);
 				break;
-			
-			case 'datetime':
-				if($c->default == 'CURRENT_TIMESTAMP') {
-					$c->default = date(Column::DATETIME_FORMAT);
-				}
-				break;
-			case 'date':
-				if($c->default == 'CURRENT_TIMESTAMP') {
-					$c->default = date(Column::DATE_FORMAT);
-				}				
-				break;
 				
 			case 'varbinary':
 			case 'binary':
@@ -236,11 +227,11 @@ class Table {
 				$c->trimInput = true;
 				break;
 			case 'longtext':
-				$c->length = 4294967296;
+				$c->length = 4294967295;
 				$c->trimInput = true;
 				break;
 			case 'mediumtext':
-				$c->length = 16777216;
+				$c->length = 16777215;
 				$c->trimInput = true;
 				break;
 
@@ -286,7 +277,7 @@ class Table {
 				continue;
 			}
 
-			if ($index['Non_unique'] === "0") {
+			if ($index['Non_unique'] == 0) {
 				if (!isset($unique[$index['Key_name']])) {
 					$unique[$index['Key_name']] = [];
 				}
@@ -318,7 +309,7 @@ class Table {
 	/**
 	 * Get all column names
 	 * 
-	 * @param string[]
+	 * @return string[]
 	 */
 	public function getColumnNames() {
 		return array_keys($this->columns);

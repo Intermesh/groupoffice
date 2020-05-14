@@ -20,8 +20,8 @@ class goContact extends GoBaseBackendDiff {
 		
 		if (!$contact) {
 			return true;
-		} else if(!$contact->getPermissionLevel() >= Acl::LEVEL_DELETE){
-			return true;
+		} else if($contact->getPermissionLevel() < Acl::LEVEL_DELETE){
+			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
 		} else {
 			return $contact->delete($contact->primaryKeyValues()); // This throws an error when the contact is read only
 		}
@@ -155,6 +155,11 @@ class goContact extends GoBaseBackendDiff {
 	 */
 	public function GetFolder($id) {
 
+		if ($id != BackendGoConfig::CONTACTBACKENDFOLDER) {
+			ZLog::Write(LOGLEVEL_WARN, "Contact folder '$id' not found");
+			return false;
+		}
+
 		$folder = new SyncFolder();
 		$folder->serverid = $id;
 		$folder->parentid = "0";
@@ -178,6 +183,7 @@ class goContact extends GoBaseBackendDiff {
 	}
 	
 	public function getNotification($folder = null) {
+		Contact::entityType()->clearCache();
 		return Contact::getState();
 	}
 

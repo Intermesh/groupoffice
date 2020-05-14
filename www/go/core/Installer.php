@@ -74,7 +74,6 @@ class Installer {
 	 * 
 	 * @param array $adminValues
 	 * @param Module[] $installModules
-	 * @return boolean
 	 * @throws Exception
 	 */
 	public function install(array $adminValues = [], $installModules = []) {
@@ -84,6 +83,7 @@ class Installer {
 
 		//don't cache on install
 		App::get()->getCache()->flush(false);
+		$cacheCls = get_class(App::get()->getCache());
 		App::get()->setCache(new None());
 
 		LoggingTrait::$enabled = false;
@@ -104,7 +104,7 @@ class Installer {
 		$database->setUtf8();
 
 		Utils::runSQLFile(Environment::get()->getInstallFolder()->getFile("go/core/install/install.sql"));
-		App::get()->getDbConnection()->query("SET FOREIGN_KEY_CHECKS=0;");
+		App::get()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
 		
 		$this->installGroups();
 
@@ -134,12 +134,13 @@ class Installer {
 
 
 
-		App::get()->setCache(new Disk());
+		App::get()->setCache(new $cacheCls);
 		Listeners::get()->init();
 
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
 		LoggingTrait::$enabled = true;
+		App::get()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
 	}
 	
 	
@@ -253,6 +254,12 @@ class Installer {
 		if (version_compare(go()->getSettings()->databaseVersion, self::MIN_UPGRADABLE_VERSION) === -1) {
 			throw new \Exception("Your version is " . go()->getSettings()->databaseVersion . ". Please upgrade to " . self::MIN_UPGRADABLE_VERSION . " first.");
 		}
+
+		$clientVersion = go()->getDbConnection()->getPDO()->getAttribute(\PDO::ATTR_CLIENT_VERSION);
+		if (strpos($clientVersion, 'mysqlnd') === false) {
+			throw new \Exception("PDO is not using the mysqlnd driver. Please make sure PDO uses mysqlnd. It's now using: " . $clientVersion);
+
+		}
 	}
 
 	public function getUnavailableModules() {
@@ -312,6 +319,8 @@ class Installer {
 		LoggingTrait::$enabled = false;
 
 		go()->setAuthState((new TemporaryState())->setUserId(1));
+		\GO::session()->runAsRoot();
+		GO::$ignoreAclPermissions = true;
 		
 
 		$this->isValidDb();
@@ -393,7 +402,7 @@ class Installer {
 	public function checkVersions() {
 		$modules = model\Module::find()->all();
 
-		/* @var $module Module */
+		/* @var $module model\Module */
 		foreach ($modules as $module) {
 
 			if (!$module->isAvailable()) {
@@ -473,6 +482,10 @@ class Installer {
 			//put the updates in an extra array dimension so we know to which module
 			//they belong too.
 			foreach ($updates as $timestamp => $updatequeries) {
+				//somehow this doesn't always match on some installations with Ioncube !?
+			  if(go()->getDebugger()->enabled && !preg_match("/^[0-9]{12}$/", $timestamp)) {
+			    throw new Exception("Invalid timestamp '$timestamp' in file '$updatesFile'");
+        }
 				$u["$timestamp"][$module->id] = $updatequeries;
 			}
 		}
@@ -598,9 +611,15 @@ class Installer {
 	}
 
 	public static function fixCollations() {
+		go()->getDbConnection()->exec("SET foreign_key_checks = 0");
 		$stmt = go()->getDbConnection()->query("SHOW TABLE STATUS");	
 		
 		foreach($stmt as $record){
+
+			if(!isset($record['Engine'])) {
+				//Skip views.
+				continue;
+			}
 			
 			if($record['Engine'] != 'InnoDB' && $record["Name"] != 'fs_filesearch' && $record["Name"] != 'cms_files') {
 				echo "Converting ". $record["Name"] . " to InnoDB\n";
@@ -612,6 +631,25 @@ class Installer {
 			if($record["Collation"] != "utf8mb4_unicode_ci" ) {
 				echo "Converting ". $record["Name"] . " to utf8mb4\n";
 				flush();
+
+				if($record['Name'] == 'fs_files') {
+					go()->getDbConnection()->exec("ALTER TABLE `fs_files` DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;");
+					go()->getDbConnection()->query("ALTER TABLE `fs_files` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;");
+					go()->getDbConnection()->query("ALTER TABLE `fs_files` CHANGE `comment` `comment` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;");
+					go()->getDbConnection()->query("ALTER TABLE `fs_files` CHANGE `extension` `extension` VARCHAR(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;");
+					go()->getDbConnection()->query("ALTER TABLE `fs_files` CHANGE `random_code` `random_code` CHAR(11) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;");
+
+					continue;
+				}
+
+				if($record['Name'] == 'fs_folders') {
+					go()->getDbConnection()->exec("ALTER TABLE `fs_folders` DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;");					
+					go()->getDbConnection()->query("ALTER TABLE `fs_folders` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;");
+					go()->getDbConnection()->query("ALTER TABLE `fs_folders` CHANGE `comment` `comment` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;");
+					go()->getDbConnection()->query("ALTER TABLE `fs_folders` CHANGE `cm_state` `cm_state` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;");
+					
+					continue;
+				}
 				
 				if($record['Name'] === 'em_links') {
 					go()->getDbConnection()->query("ALTER TABLE `em_links` DROP INDEX `uid`");
@@ -623,17 +661,9 @@ class Installer {
 					go()->getDbConnection()->query("ALTER TABLE `em_links` CHANGE `uid` `uid` VARCHAR(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '';");
 					go()->getDbConnection()->query("ALTER TABLE `em_links` ADD INDEX(`uid`);");
 				}
-
-				if($record['Name'] == 'fs_files') {
-					go()->getDbConnection()->query("ALTER TABLE `fs_files` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;");
-				}
-
-				if($record['Name'] == 'fs_folders') {
-					go()->getDbConnection()->query("ALTER TABLE `fs_folders` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL;");
-				}
-	
 			}	
 		}
+		go()->getDbConnection()->exec("SET foreign_key_checks = 1");
 	}
 
 }

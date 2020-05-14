@@ -1,17 +1,36 @@
+
 go.print = function(tmpl, data) {
 	var paper = document.getElementById('paper');
-	if(!paper) {
-		document.body.insertAdjacentHTML('beforeend', '<div id="paper"></div>');
-		paper = document.getElementById('paper');
-	}
-	paper.innerHTML = tmpl.apply(data);
-	window.print();
+
+	paper.innerHTML = Ext.isEmpty(data) ? tmpl : tmpl.apply(data);
+	Ext.isIE || Ext.isSafari ? document.execCommand('print') : window.print();
+
 };
+
 go.util =  (function () {
+	var downloadFrame;
+
+
 	return {
 
 		clone: function(obj) {
 			return JSON.parse(JSON.stringify(obj));
+		},
+
+		/**
+		 * Grabs the first char of the first and last word.
+		 *
+		 * @param {string} name
+		 * @returns {string}
+		 */
+		initials : function(name) {
+			var parts = name.split(" "), l = parts.length;
+
+			if(l > 2) {
+				parts.splice(1, l - 2);
+			}
+
+			return parts.map(function(name){return name.substr(0,1).toUpperCase()}).join("");
 		},
 		
 		/**
@@ -211,7 +230,7 @@ go.util =  (function () {
 				this.uploadDialog.setAttribute("type", "file");
 				this.uploadDialog.onchange = function (e) {
 					
-					var uploadCount = this.files.length;
+					var uploadCount = this.files.length, blobs = [];
 					
 					if(!uploadCount) {
 						return;
@@ -227,13 +246,21 @@ go.util =  (function () {
 					
 					for (var i = 0; i < this.files.length; i++) {
 						go.Jmap.upload(this.files[i], {
-							success: function(response) {
+							success: function(response, file) {
 								if(this.cfg.listeners.upload) {
 									this.cfg.listeners.upload.call(this.cfg.listeners.scope||this, response);
 								}
+								if(cfg.directory) {
+									var path = file.webkitRelativePath.split('/');
+									path.pop(); // filename
+									response.subfolder = path;
+								}
+								blobs.push(response);
+							},
+							callback: function(response) {
 								uploadCount--;
 								if(uploadCount === 0 && this.cfg.listeners.uploadComplete) {
-									this.cfg.listeners.uploadComplete.call(this.cfg.listeners.scope||this);
+									this.cfg.listeners.uploadComplete.call(this.cfg.listeners.scope||this, blobs);
 								}
 							},
 							scope: this
@@ -247,7 +274,14 @@ go.util =  (function () {
 			this.uploadDialog.removeAttribute('webkitdirectory');
 			this.uploadDialog.removeAttribute('directory');
 			this.uploadDialog.removeAttribute('multiple');
-			this.uploadDialog.setAttribute('accept', cfg.accept || '*/*');
+
+			if(cfg.accept) {
+				this.uploadDialog.setAttribute('accept', cfg.accept);
+			}else
+			{
+				this.uploadDialog.removeAttribute('accept');
+			}
+
 			if(cfg.directory) {
 				this.uploadDialog.setAttribute('webkitdirectory', true);
 				this.uploadDialog.setAttribute('directory', true);
@@ -257,6 +291,35 @@ go.util =  (function () {
 			}
 			
 			this.uploadDialog.click();
+		},
+
+		/**
+		 * Download an URL
+		 *
+		 * @param {string} url
+		 * @param {boolean=} inline True to use window.open to make the browser display it inline.
+		 */
+		downloadFile: function(url, inline) {
+			if(window.navigator.standalone) {
+				//somehow this is the only way a download works on a web application on the iphone.
+				var win = window.open( "about:blank", "_system");
+				win.focus();
+				win.location = url;
+			} else
+			{
+				if(inline) {
+					window.open(url);
+				} else {
+					// document.location.href = url; //This causes connection errors with SSE or other simulanous XHR requests
+					if(!downloadFrame) {
+						downloadFrame = document.createElement('iframe');
+						downloadFrame.id="downloader";
+						downloadFrame.style.display = 'none';
+						document.body.appendChild(downloadFrame);
+					}
+					downloadFrame.src = url;
+				}
+			}
 		},
 		
 		textToHtml : function(text) {
@@ -279,26 +342,25 @@ go.util =  (function () {
 		
 	/**
 	 * Export an entity to a file
-	 * 
+	 *
 	 * @param {string} entity eg. "Contact"
 	 * @param {string} queryParams eg. Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0})
-	 * @param {stirng} contentType eg "text/vcard" or "application/json"
+	 * @param {string} extension eg "vcf", "csv" or "json"
+	 * @param {object} params Extra params to send to the export method on the server.
 	 * @return {undefined}
 	 */
-	exportToFile: function (entity, queryParams, contentType) {
+	exportToFile: function (entity, queryParams, extension, params) {
 		
 		Ext.getBody().mask(t("Exporting..."));
 		var promise = go.Jmap.request({
 			method: entity + "/query",
-			params: queryParams,
-			callback: function (options, success, response) {
-			}
+			params: queryParams
 		});
 		
 		go.Jmap.request({
 			method: entity + "/export",
 			params: {
-				contentType: contentType,
+				extension: extension,
 				"#ids": {
 					resultOf: promise.callId,
 					path: "/ids"
@@ -310,8 +372,8 @@ go.util =  (function () {
 				if(!success) {
 					Ext.MessageBox.alert(t("Error"), response.message);				
 				} else
-				{					
-					document.location = go.Jmap.downloadUrl(response.blobId);
+				{
+					go.util.downloadFile(go.Jmap.downloadUrl(response.blobId));
 				}
 			}
 		});
@@ -321,9 +383,174 @@ go.util =  (function () {
 	 * Import a file
 	 * 
 	 * @param {string} entity eg. "Contact"
-	 * @param {string} accept File types to accept. eg. F"text/vcard,application/json"
+	 * @param {string} accept File types to accept. eg. ".csv, .vcf, text/vcard",
 	 * @param {object} values Extra values to apply to all imported items. eg. {addressBookId: 1}
 	 * @param {object} options Options that can be used by importers. For CSV you can provide labels. {labels: {propName: "Label"}}
+	 *
+	 * @example
+	 *
+	 * go.util.importFile(
+												'Contact',
+												".csv, .vcf, text/vcard",
+												{addressBookId: this.addAddressBookId},
+												{
+													// These fields can be selected to update contacts if ID or e-mail matches
+													lookupFields: {'id' : "ID", 'email': 'E-mail'},
+
+													// This hash map is used to aid in auto selecting the right mappings. Key is possible header in CSV and value is property name in Group-Office
+													aliases : {
+														"Given name": "firstName",
+														"First name": "firstName",
+
+														"Middle name": "middleName",
+
+														"Family Name": "lastName",
+														"Last Name": "lastName",
+
+														"Job Title": "jobTitle",
+														"Suffix": "suffixes",
+														"Web page" : {field: "urls[].url", fixed: {"type": "homepage"}},
+														"Birthday" : {field: "dates[].date", fixed: {"type": "birthday"}},
+														"Anniversary" : {field: "dates[].date", fixed: {"type": "anniversary"}},
+
+														"E-mail 1 - Value": {field: "emailAddresses[].email", related: {"type": "E-mail 1 - Type"}},
+														"email": {field: "emailAddresses[].email", fixed: {"type": "work"}},
+														"E-mail Address": {field: "emailAddresses[].email", fixed: {"type": "work"}},
+														"E-mail 2 Address": {field: "emailAddresses[].email", fixed: {"type": "work"}},
+														"E-mail 3 Address": {field: "emailAddresses[].email", fixed: {"type": "work"}},
+
+														"Primary Phone": {field: "phoneNumbers[].number", fixed: {"type": "work"}},
+														"Home Phone": {field: "phoneNumbers[].number", fixed: {"type": "home"}},
+														"Home Phone 2": {field: "phoneNumbers[].number", fixed: {"type": "home"}},
+
+														"Business Phone": {field: "phoneNumbers[].number", fixed: {"type": "work"}},
+														"Business Phone 2": {field: "phoneNumbers[].number", fixed: {"type": "work"}},
+
+														"Mobile Phone": {field: "phoneNumbers[].number", fixed: {"type": "mobile"}},
+														"Pager": {field: "phoneNumbers[].number", fixed: {"type": "other"}},
+														"Home Fax": {field: "phoneNumbers[].number", fixed: {"type": "fax"}},
+
+														"Other Phone": {field: "phoneNumbers[].number", fixed: {"type": "other"}},
+														"Other Fax": {field: "phoneNumbers[].number", fixed: {"type": "fax"}},
+
+														"Home Street": {
+															field: "addresses[].street",
+															fixed: {type: "home"},
+															related: {
+																street2: "Home Street 2",
+																city: "Home City",
+																state: "Home State",
+																zipCode: "Home Postal Code",
+																country: "Home Country"
+															}
+														},
+														"Business Street": {
+															field: "addresses[].street",
+															fixed: {type: "work"},
+								  							related: {
+																street2: "Business Street 2",
+																city: "Business City",
+																state: "Business State",
+																zipCode: "Business Postal Code",
+																country: "Business Country"
+
+															}
+														},
+														"Other Street": {
+															field: "addresses[].street",
+															fixed: {type: "other"},
+															related: {
+																street2: "Other Street 2",
+																city: "Other City",
+																state: "Other State",
+																zipCode: "Other Postal Code",
+																country: "Other Country"
+
+															}
+														},
+
+														"Company" : "organizations"
+													},
+
+													// Fields with labels and possible subproperties.
+													// For example e-mail and type of an array of e-mail addresses should be grouped together.
+													fields: {
+														prefixes: {label: t("Prefixes")},
+														initials: {label: t("Initials")},
+														salutation: {label: t("Salutation")},
+														color: {label: t("Color")},
+														firstName: {label: t("First name")},
+														middleName: {label: t("Middle name")},
+														lastName: {label: t("Last name")},
+														name: {label: t("Name")},
+														suffixes: {label: t("Suffixes")},
+														gender: {label: t("Gender")},
+														notes: {label: t("Notes")},
+														isOrganization: {label: t("Is organization")},
+														IBAN: {label: t("IBAN")},
+														registrationNumber: {label: t("Registration number")},
+														vatNo: {label: t("VAT number")},
+														vatReverseCharge: {label: t("Reverse charge VAT")},
+														debtorNumber: {label: t("Debtor number")},
+														photoBlobId: {label: t("Photo blob ID")},
+														language: {label: t("Language")},
+														jobTitle: {label: t("Job title")},
+														uid: {label: t("UUID")},
+														starred: {label: t("Starred")},
+
+														"emailAddresses": {
+															label: t("E-mail address"),
+															properties: {
+																"email": {label: "E-mail"},
+																"type": {label: t("Type")}
+															}
+														},
+
+														"dates": {
+															label: t("Dates"),
+															properties: {
+																"date": {label: "Date"},
+																"type": {label: t("Type")}
+															}
+														},
+
+														"dates": {
+															label: t("Phone numbers"),
+															properties: {
+																"number": {label: "Number"},
+																"type": {label: t("Type")}
+															}
+														},
+
+														"urls": {
+															label: t("URL's"),
+															properties: {
+																"url": {label: "URL"},
+																"type": {label: t("Type")}
+															}
+														},
+
+														"addresses": {
+															label: t("Addresses"),
+															properties: {
+																"type": {label: t("Type")},
+																"street": {label: t("Street")},
+																"street 2": {label: t("Street 2")},
+																"zipCode": {label: t("ZIP code")},
+																"city": {label: t("City")},
+																"state": {label: t("state")},
+																"country": {label: t("Country")},
+																"countryCode": {label: t("Country code")},
+																"latitude": {label: t("Latitude")},
+																"longitude": {label: t("Longitude")}
+															}
+														}
+
+													}
+												});
+	 *
+	 *
+	 *
 	 * @return {void}
 	 */
 	importFile : function(entity, accept, values, options) {
@@ -337,81 +564,79 @@ go.util =  (function () {
 				upload: function (response) {
 					Ext.getBody().mask(t("Importing..."));
 
-					switch (response.type) {
 
-						case 'text/csv':
-							Ext.getBody().unmask();
+					if(response.name.toLowerCase().substr(-3) == 'csv') {
+						Ext.getBody().unmask();
 
-							var dlg = new go.import.CsvMappingDialog({
-								entity: entity,
+						var dlg = new go.import.CsvMappingDialog({
+							entity: entity,
+							blobId: response.blobId,
+							values: values,
+							fields: options.fields || {},
+							aliases: options.aliases || {},
+							lookupFields: options.lookupFields || {id: "ID"}
+						});
+						dlg.show();
+					}else {
+						go.Jmap.request({
+							method: entity + "/import",
+							params: {
 								blobId: response.blobId,
-								values: values,								
-								labels: options.labels || {}
-							});
-							dlg.show();
-							break;
+								values: values
+							},
+							callback: function (options, success, response) {
 
-						default:
-							go.Jmap.request({
-								method: entity + "/import",
-								params: {
-									blobId: response.blobId,
-									values: values
-								},
-								callback: function (options, success, response) {
-									
-									Ext.getBody().unmask();
-									
-									if (!success) {
-										Ext.MessageBox.alert(t("Error"), response.errors.join("<br />"));
-									} else
-									{
-										var msg = t("Imported {count} items").replace('{count}', response.count) + ". ";;
+								Ext.getBody().unmask();
 
-										if(response.errors && response.errors.length) {
-											msg += t("{count} items failed to import. A log follows: <br /><br />").replace('{count}', response.errors.length) + response.errors.join("<br />");
-										}
-										
-										Ext.MessageBox.alert(t("Success"), msg);
+								if (!success) {
+									Ext.MessageBox.alert(t("Error"), response.errors.join("<br />"));
+								} else {
+									var msg = t("Imported {count} items").replace('{count}', response.count) + ". ";
+
+									if (response.errors && response.errors.length) {
+										msg += t("{count} items failed to import. A log follows: <br /><br />").replace('{count}', response.errors.length) + response.errors.join("<br />");
 									}
 
-									// if (callback) {
-									// 	callback.call(scope || this, response);
-									// }
-								},
-								scope: this
-							});
-						}
-					},
-					scope: this
-				}
-			});
-		},
+									Ext.MessageBox.alert(t("Success"), msg);
+								}
 
-		parseEmail : function(emails) {			
-			
-			if(Ext.form.VTypes.emailAddress(emails)) {
-				return [{
-						name: "",
-						email: emails
-				}];
+								// if (callback) {
+								// 	callback.call(scope || this, response);
+								// }
+							},
+							scope: this
+						});
+					}
+				},
+				scope: this
 			}
+		});
+	},
 
-			var re  = /(?:"?([A-Z]?[^<"]*)"?\s*)?<?([^>\s,]+)/g;
-			var a = [];
-			while (m = re.exec(emails)) {
-				if(m[1]) { m[1] = m[1].trim(); }
-				console.log("Name: "  + m[1]);
-				console.log("Email: " + m[2]);
+	parseEmail : function(emails) {
 
-				a.push({
-					name: m[1],
-					email: m[2]
-				});
-			}
-
-			return a;
+		if(Ext.form.VTypes.emailAddress(emails)) {
+			return [{
+					name: "",
+					email: emails
+			}];
 		}
+
+		var re  = /(?:"?([A-Z]?[^<"]*)"?\s*)?<?([^>\s,]+)/g;
+		var a = [];
+		while (m = re.exec(emails)) {
+			if(m[1]) { m[1] = m[1].trim(); }
+			console.log("Name: "  + m[1]);
+			console.log("Email: " + m[2]);
+
+			a.push({
+				name: m[1],
+				email: m[2]
+			});
+		}
+
+		return a;
+	}
 	};
 })();
 
