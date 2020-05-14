@@ -628,7 +628,8 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	 * @return bool
 	 */
 	public function supportsFiles() {
-		return property_exists($this->getClassName(), 'filesFolderId') || property_exists($this->getClassName(), 'files_folder_id');
+		$cls = $this->getClassName();
+		return property_exists($cls, 'filesFolderId') || (is_a($cls, ActiveRecord::class, true) && $cls::model()->hasFiles());
 	}
 
   /**

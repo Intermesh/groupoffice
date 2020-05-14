@@ -20,7 +20,8 @@ go.Entities = (function () {
 				if(serverInfo) {
 					if(!entity.customFields) {
 						entity.customFields = serverInfo.supportsCustomFields;
-					}				
+					}
+					entity.supportsFiles = serverInfo.supportsFiles;
 					
 					entity.isAclOwner = serverInfo.isAclOwner;
 					entity.defaultAcl = serverInfo.defaultAcl;	
