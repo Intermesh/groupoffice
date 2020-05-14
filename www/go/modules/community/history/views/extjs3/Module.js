@@ -7,5 +7,12 @@ go.Modules.register("community", "history", {
 			creator: {store: 'User', fk:'createdBy'}
 		}
 	}],
+	actionTypes: [
+		"create",
+		"update",
+		"delete",
+		"login",
+		"logout"
+	],
 	initModule: function () {}
 });

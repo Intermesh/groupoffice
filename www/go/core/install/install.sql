@@ -899,3 +899,25 @@ ALTER TABLE `core_link` ADD INDEX(`fromEntityTypeId`);
 ALTER TABLE `core_link` ADD INDEX(`fromId`);
 ALTER TABLE `core_link` ADD INDEX(`toEntityTypeId`);
 ALTER TABLE `core_link` ADD INDEX(`toId`);
+
+CREATE TABLE `core_alert` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `entityTypeId` INT NOT NULL,
+  `entityId` INT NOT NULL,
+  `userId` INT NOT NULL,
+  `triggerAt` DATETIME NOT NULL,
+  `alertId` INT NOT NULL,
+  `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `dk_alert_entityType_idx` (`entityTypeId` ASC),
+  INDEX `fk_alert_user_idx` (`userId` ASC),
+  CONSTRAINT `fk_alert_entityType`
+    FOREIGN KEY (`entityTypeId`)
+    REFERENCES `core_entity` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_alert_user`
+    FOREIGN KEY (`userId`)
+    REFERENCES `core_user` (`id`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION);

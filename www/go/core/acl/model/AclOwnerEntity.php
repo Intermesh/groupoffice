@@ -230,7 +230,9 @@ abstract class AclOwnerEntity extends AclEntity {
 	protected static function internalDelete(Query $query) {
 
 		if(!method_exists(static::class, 'aclEntityClass')) {
-			$aclsToDelete = static::getAclsToDelete($query);
+			if(go()->getModule('community', 'history') || static::class === 'go\modules\community\history\model\LogEntry') {
+				$aclsToDelete = static::getAclsToDelete($query);
+			}
 		}
 
 		if(!parent::internalDelete($query)) {
