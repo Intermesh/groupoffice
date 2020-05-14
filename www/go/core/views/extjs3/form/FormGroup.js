@@ -115,7 +115,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		var item = Ext.ComponentMgr.create(this.itemCfg);
 		
 		if(!item.getValue || !item.setValue) {
-			throw new "Form Group item must be a form field";
+			throw new Error("Form Group item must be a form field");
 		}
 		
 		return item;
