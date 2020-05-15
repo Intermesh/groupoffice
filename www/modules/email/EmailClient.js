@@ -1665,7 +1665,7 @@ GO.newMenuItems.push(
 					id: panel.data.id
 				},
 				success:function(response, options, result){
-					GO.email.openFolderTree(result.files_folder_id, 0, this);
+					GO.email.openFolderTree(result.files_folder_id, 0, panel);
 				},
 				scope: this
 			});
@@ -1673,49 +1673,48 @@ GO.newMenuItems.push(
 	}
 });
 
-GO.email.getTaskShowConfig = function(item) {
-
-	var taskShowConfig = {};
-
-	if (Ext.isDefined(item)) {
-
-		if(item.itemId && item.parentMenu.showConfigs && item.parentMenu.showConfigs[item.itemId]){
-			taskShowConfig = item.parentMenu.showConfigs[item.itemId];
-		}else{
-			taskShowConfig = item.parentMenu.taskShowConfig || {};
-		}
-		taskShowConfig.link_config=item.parentMenu.link_config
-	}
-
-	taskShowConfig.values={};
-
-	if (Ext.isDefined(item)) {
-
-		taskShowConfig.values={};
-		if(typeof(item.parentMenu.panel)!='undefined' && typeof(item.parentMenu.panel.data.email)!='undefined'){
-			var to='';
-			if(item.parentMenu.panel.data.full_name){
-				to='"'+item.parentMenu.panel.data.full_name+'" <'+item.parentMenu.panel.data.email+'>';
-			}else if(item.parentMenu.panel.data.name){
-				to='"'+item.parentMenu.panel.data.name+'" <'+item.parentMenu.panel.data.email+'>';
-			}
-
-			taskShowConfig.values.to=to;
-		}
-	}
-
-	return taskShowConfig;
-}
+// GO.email.getTaskShowConfig = function(item) {
+//
+// 	var taskShowConfig = {};
+//
+// 	if (Ext.isDefined(item)) {
+//
+// 		if(item.itemId && item.parentMenu.showConfigs && item.parentMenu.showConfigs[item.itemId]){
+// 			taskShowConfig = item.parentMenu.showConfigs[item.itemId];
+// 		}else{
+// 			taskShowConfig = item.parentMenu.taskShowConfig || {};
+// 		}
+// 		taskShowConfig.link_config=item.parentMenu.link_config
+// 	}
+//
+// 	taskShowConfig.values={};
+//
+// 	if (Ext.isDefined(item)) {
+//
+// 		taskShowConfig.values={};
+// 		if(typeof(item.parentMenu.panel)!='undefined' && typeof(item.parentMenu.panel.data.email)!='undefined'){
+// 			var to='';
+// 			if(item.parentMenu.panel.data.full_name){
+// 				to='"'+item.parentMenu.panel.data.full_name+'" <'+item.parentMenu.panel.data.email+'>';
+// 			}else if(item.parentMenu.panel.data.name){
+// 				to='"'+item.parentMenu.panel.data.name+'" <'+item.parentMenu.panel.data.email+'>';
+// 			}
+//
+// 			taskShowConfig.values.to=to;
+// 		}
+// 	}
+//
+// 	return taskShowConfig;
+// }
 //files is array of relative paths
 // files is array of objects with {name, path, size, type, extension}
-GO.email.emailFiles = function(files, item) {
+GO.email.emailFiles = function(files, detailView) {
 	if (!Ext.isArray(files)) {
 		files = new Array(files);
 	}
 
-	var composerConfig = GO.email.getTaskShowConfig(item);
 
-	var c = GO.email.showComposer(composerConfig);
+	var c = GO.email.showComposer();
 
 	c.on('dialog_ready', function(){
 		var items = [];
@@ -1728,14 +1727,18 @@ GO.email.emailFiles = function(files, item) {
 				name: files[i].name,
 				fileName: files[i].name,
 				from_file_storage: true,
-				tmp_file: files[i].path,
+				tmp_file: files[i].path
 			});
 		}
 		c.emailEditor.attachmentsView.addFiles(items);
+
+		if(detailView) {
+			c.createLinkButton.addLink(detailView.model_name || detailView.entityStore.entity.name, detailView.data.id);
+		}
 	},this,{single:true});
 }
 
-GO.email.openFolderTree = function(id, folder_id, referenceItem) {
+GO.email.openFolderTree = function(id, folder_id, detailView) {
 
 	if (!GO.email.treeFileBrowser) {
 		GO.email.treeFileBrowser = new GO.Window({
@@ -1791,7 +1794,7 @@ GO.email.openFolderTree = function(id, folder_id, referenceItem) {
 						selFiles.push(node.attributes);
 					});
 
-					GO.email.emailFiles(selFiles);
+					GO.email.emailFiles(selFiles, detailView);
 
 					GO.email.treeFileBrowser.hide();
 				},
@@ -1809,10 +1812,6 @@ GO.email.openFolderTree = function(id, folder_id, referenceItem) {
 		scope:this
 	});
 
-	if (!referenceItem)
-		referenceItem = {};
-
-	GO.email.treeFileBrowser.referenceItem = referenceItem;
 	GO.email.treeFileBrowser.show();
 }
 

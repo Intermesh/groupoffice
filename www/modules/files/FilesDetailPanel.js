@@ -140,10 +140,10 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			success: function (response, options, result) {
 				this.folderId = result.files_folder_id;
 
-				//hack to update entity store
+				//hack to update entity store, detailview and legacy DisplayPanel
 				var store = go.Db.store(modelName);
 				if (store) {
-					store.data[dv.data.id].filesFolderId = result.files_folder_id;
+					store.data[dv.data.id].filesFolderId = dv.data.filesFolderId = dv.data.files_folder_id = result.files_folder_id;
 				}
 
 				cb();
