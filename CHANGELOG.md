@@ -1,6 +1,7 @@
 - E-mail: Attachments from and to items filters out entities that doesn't support that
 - Projects: fixed status, type and template filter to accept the name as text
 - Email: Link mail when using e-mail files
+- Projects: fixed failing report when user was deleted
 
 13-05-2020 6.4.140
 - Address book: Fixed merge of files
