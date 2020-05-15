@@ -244,7 +244,8 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 						var dv = this.detailView;
 						this.folderId = dv.data.filesFolderId || dv.data.files_folder_id;
 						GO.email.openFolderTree(this.folderId, this.folderId, dv);
-					}, scope: this
+					},
+					scope: this
 				});
 			}
 		}, this);

@@ -1733,12 +1733,12 @@ GO.email.emailFiles = function(files, detailView) {
 		c.emailEditor.attachmentsView.addFiles(items);
 
 		if(detailView) {
-			c.createLinkButton.addLink(detailView.model_name || detailView.entityStore.entity.name, detailView.data.id);
+			c.createLinkButton.addLink(detailView.entity || detailView.entityStore.entity.name, detailView.data.id);
 		}
 	},this,{single:true});
 }
 
-GO.email.openFolderTree = function(id, folder_id, detailView) {
+ GO.email.openFolderTree = function(id, folder_id, detailView) {
 
 	if (!GO.email.treeFileBrowser) {
 		GO.email.treeFileBrowser = new GO.Window({
@@ -1794,7 +1794,7 @@ GO.email.openFolderTree = function(id, folder_id, detailView) {
 						selFiles.push(node.attributes);
 					});
 
-					GO.email.emailFiles(selFiles, detailView);
+					GO.email.emailFiles(selFiles, GO.email.treeFileBrowser.detailView);
 
 					GO.email.treeFileBrowser.hide();
 				},
@@ -1812,6 +1812,8 @@ GO.email.openFolderTree = function(id, folder_id, detailView) {
 		scope:this
 	});
 
+
+	GO.email.treeFileBrowser.detailView = detailView;
 	GO.email.treeFileBrowser.show();
 }
 
