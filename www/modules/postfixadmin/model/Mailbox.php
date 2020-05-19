@@ -151,7 +151,7 @@ class Mailbox extends \GO\Base\Db\ActiveRecord {
 		return new \GO\Base\Fs\Folder($vmail . $this->maildir);
 	}
 	
-	public function cacheUsage(){		
+	public function cacheUsage(){
 		$this->usage = $this->active ? $this->getUsageFromDovecot() : false;
 		
 		if($this->usage === false) {
@@ -164,7 +164,7 @@ class Mailbox extends \GO\Base\Db\ActiveRecord {
 
 
 	private function getUsageFromDovecot() {
-		exec("doveadm quota get -u " . escapeshellarg($this->username), $output, $return);
+		exec("doveadm quota get -u " . escapeshellarg($this->username) . " 2>/dev/null", $output, $return);
 
 		/**
 		 * returns:

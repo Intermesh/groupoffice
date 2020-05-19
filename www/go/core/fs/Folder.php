@@ -394,6 +394,9 @@ class Folder extends FileSystemObject {
 
 		if ($io) {
 			$size = fgets($io, 4096);
+			if($size === false) {
+				return false;
+			}
 			$size = preg_replace('/[\t\s]+/', ' ', trim($size));
 			$size = substr($size, 0, strpos($size, ' '));
 
