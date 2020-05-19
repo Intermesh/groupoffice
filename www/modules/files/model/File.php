@@ -484,7 +484,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 		}
 
 		if (!empty($this->expire_time) && !empty($this->random_code)) {
-			return \GO::url('files/file/download', array('id'=>$this->id,'random_code'=>$this->random_code,'inline'=>'false'), false, $html, false);
+			return \GO::url('files/file/download', array('id'=>$this->id, 'inline'=>'false', 'random_code'=>$this->random_code), false, $html, false);
 		}
 	}
 
