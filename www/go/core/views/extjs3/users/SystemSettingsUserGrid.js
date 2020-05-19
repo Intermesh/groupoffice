@@ -16,176 +16,173 @@
 
 go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 	iconCls: 'ic-account-box',
+
+	initColumns: function(fields, columns) {
+		return {fields:fields, columns:columns};
+	},
+
 	initComponent: function () {
 		
 		var actions = this.initRowActions();
 		
 		this.title = t("Users");
 
+		var cols = this.initColumns([
+			'id',
+			'username',
+			'displayName',
+			'avatarId',
+			'loginCount',
+			'authenticationMethods',
+			'personalGroup',
+			{name: 'createdAt', type: 'date'},
+			{name: 'lastLogin', type: 'date'}
+		], [{
+				id: 'name',
+				header: t('Name'),
+				width: dp(200),
+				sortable: true,
+				dataIndex: 'displayName',
+				renderer: function (value, metaData, record, rowIndex, colIndex, store) {
+					var style = record.get('avatarId') ?  'background-image: url(' + go.Jmap.thumbUrl(record.get("avatarId"), {w: 40, h: 40, zc: 1}) + ')"' : "";
+
+					return '<div class="user"><div class="avatar" style="'+style+'"></div>' +
+						'<div class="wrap">'+
+						'<div class="displayName">' + value + '</div>' +
+						'<small class="username">' + Ext.util.Format.htmlDecode(record.get('username')) + '</small>' +
+						'</div>'+
+						'</div>';
+				}
+			},
+			{
+				xtype:"datecolumn",
+				id: 'createdAt',
+				header: t('Created at'),
+				width: dp(160),
+				sortable: true,
+				dataIndex: 'createdAt',
+				hidden: false
+			},
+			{
+				xtype:"datecolumn",
+				id: 'lastLogin',
+				header: t('Last login'),
+				width: dp(160),
+				sortable: true,
+				dataIndex: 'lastLogin',
+				hidden: false
+			},{
+				id: 'loginCount',
+				align: "right",
+				header: t('Logins'),
+				width: dp(100),
+				sortable: true,
+				dataIndex: 'loginCount',
+				hidden: false
+			},{
+				header: t('Authentication'),
+				width: dp(100),
+				sortable: false,
+				renderer: function(v) {
+					var result = '';
+
+					for(var i = 0, method; method = v[i]; i++) {
+						result += '<i title="'+method.name+'" class="icon go-module-icon-'+method.id+'"></i> ';
+					}
+					return result;
+				},
+				dataIndex: 'authenticationMethods'
+			},{
+				header: "ID",
+				width: dp(100),
+				hidden: true,
+				dataIndex: 'id',
+				sortable: true
+			}]);
+
+		cols.columns.push(actions);
+
 		this.store = new go.data.Store({
-			fields: [
-				'id', 
-				'username', 
-				'displayName',
-				'avatarId',
-				'loginCount',
-				'authenticationMethods',
-				'personalGroup',
-				{name: 'createdAt', type: 'date'},
-				{name: 'lastLogin', type: 'date'}	
-			],
+			fields: cols.fields,
 			entityStore: "User"
 		});
 
 		Ext.apply(this, {
 			plugins: [actions],
 			tbar: [{
-					iconCls: 'ic-people-outline',
-					text: t('Show disabled'),
-					enableToggle:true,
-					toggleHandler: function(btn, state) {
-						
-						this.store.setFilter('disabled', state ? {showDisabled: true} : null);
-						this.store.load();
-					},
-					scope:this
-			}, '->', 
-				{
-					xtype: 'tbsearch',
-					filters: [
-						'text'					
-					]
-				},{					
-					iconCls: 'ic-add',
-					tooltip: t('Add'),
-					handler: function (e, toolEl) {
-						var dlg = new go.users.CreateUserWizard();
-						dlg.show();
-					}
-				},
-				
-				{
-					iconCls: 'ic-more-vert',
-					menu: [
-						{
-							iconCls: 'ic-settings',
-							text: t("User defaults"),
-							handler: function() {
-								var dlg = new go.users.UserDefaultsWindow();
-								dlg.show();
-							}
-						},
+				iconCls: 'ic-people-outline',
+				text: t('Show disabled'),
+				enableToggle:true,
+				toggleHandler: function(btn, state) {
 
-						'-',
-						{
-							iconCls: 'ic-cloud-upload',
-							text: t("Import"),
-							handler: function() {
-								go.util.importFile(
-												'User', 
-												".csv",
-												{},
-												{
-													labels: {
-														username: t("Username"),
-														displayName: t("Display name"),
-														password: t("Password"),
-														email: t("E-mail"),
-														recoveryEmail: t("Recovery e-mail"),
-														groups: t("Groups")
-													}
-												});
-							},
-							scope: this
-						}, {
-							iconCls: 'ic-cloud-download',
-							text: t("Export"),					
-							handler: function() {
-								go.util.exportToFile(
-												'User',
-												Object.assign(this.store.baseParams, this.store.lastOptions.params, {limit: 0, position: 0}),
-												'csv');
-							},
-							scope: this	
-						}, '-',
-						{
-							iconCls: 'ic-delete',
-							scope: this,
-							text: t("Delete"),
-							handler: function() {
-								this.deleteSelected();
-							}
-						}
-					]
+					this.store.setFilter('disabled', state ? {showDisabled: true} : null);
+					this.store.load();
 				},
-				
-				
-			],
-			columns: [
-				{
-					id: 'name',
-					header: t('Name'),
-					width: dp(200),
-					sortable: true,
-					dataIndex: 'displayName',
-					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-						var style = record.get('avatarId') ?  'background-image: url(' + go.Jmap.thumbUrl(record.get("avatarId"), {w: 40, h: 40, zc: 1}) + ')"' : "";
-						
-						return '<div class="user"><div class="avatar" style="'+style+'"></div>' +
-							'<div class="wrap">'+
-								'<div class="displayName">' + value + '</div>' +
-								'<small class="username">' + Ext.util.Format.htmlDecode(record.get('username')) + '</small>' +
-							'</div>'+
-							'</div>';
+				scope:this
+			}, '->', {
+				xtype: 'tbsearch',
+				filters: [
+					'text'
+				]
+			},{
+				iconCls: 'ic-add',
+				tooltip: t('Add'),
+				handler: function (e, toolEl) {
+					var dlg = new go.users.CreateUserWizard();
+					dlg.show();
+				}
+			},{
+				iconCls: 'ic-more-vert',
+				menu: [
+					{
+						iconCls: 'ic-settings',
+						text: t("User defaults"),
+						handler: function() {
+							var dlg = new go.users.UserDefaultsWindow();
+							dlg.show();
+						}
+					},'-', {
+						iconCls: 'ic-cloud-upload',
+						text: t("Import"),
+						handler: function() {
+							go.util.importFile(
+											'User',
+											".csv",
+											{},
+											{
+												labels: {
+													username: t("Username"),
+													displayName: t("Display name"),
+													password: t("Password"),
+													email: t("E-mail"),
+													recoveryEmail: t("Recovery e-mail"),
+													groups: t("Groups")
+												}
+											});
+						},
+						scope: this
+					}, {
+						iconCls: 'ic-cloud-download',
+						text: t("Export"),
+						handler: function() {
+							go.util.exportToFile(
+											'User',
+											Object.assign(this.store.baseParams, this.store.lastOptions.params, {limit: 0, position: 0}),
+											'csv');
+						},
+						scope: this
+					}, '-',
+					{
+						iconCls: 'ic-delete',
+						scope: this,
+						text: t("Delete"),
+						handler: function() {
+							this.deleteSelected();
+						}
 					}
-				},
-				{
-					xtype:"datecolumn",
-					id: 'createdAt',
-					header: t('Created at'),
-					width: dp(160),
-					sortable: true,
-					dataIndex: 'createdAt',
-					hidden: false
-				},
-				{
-					xtype:"datecolumn",
-					id: 'lastLogin',
-					header: t('Last login'),
-					width: dp(160),
-					sortable: true,
-					dataIndex: 'lastLogin',
-					hidden: false
-				},{
-					id: 'loginCount',
-					align: "right",
-					header: t('Logins'),
-					width: dp(100),
-					sortable: true,
-					dataIndex: 'loginCount',
-					hidden: false
-				},{
-					header: t('Authentication'),
-					width: dp(100),
-					sortable: false,
-					renderer: function(v) {
-						var result = '';
-						
-						for(var i = 0, method; method = v[i]; i++) {							
-							result += '<i title="'+method.name+'" class="icon go-module-icon-'+method.id+'"></i> ';
-						}
-						return result;
-					},
-					dataIndex: 'authenticationMethods'
-				},{
-					header: "ID",
-					width: dp(100),
-					hidden: true,
-					dataIndex: 'id',
-					sortable: true
-				},
-				actions
-			],
+				]
+			}],
+			columns: cols.columns,
 			viewConfig: {
 				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',
 				forceFit: true,
