@@ -188,6 +188,10 @@
 			});
 		},
 
+		userDateTime : function(v){
+			return go.User.shortDateInList ? go.util.Format.shortDateTime(v) : go.util.Format.dateTime(v)
+		},
+
 		dateTime: function (v) {
 			v = checkDate(v);
 			if(!v) {

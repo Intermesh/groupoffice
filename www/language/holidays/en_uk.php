@@ -24,6 +24,9 @@ if (!class_exists('GOHolidaysUK')) {
 		}
 
 		public static function earlyMayBank($year){
+			if($year == 2020) {
+				return "2020-05-08";
+			}
 			return (new \DateTime('first mon of May '.$year))->format('Y-m-d');
 		}
 	}

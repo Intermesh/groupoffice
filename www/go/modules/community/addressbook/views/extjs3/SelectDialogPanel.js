@@ -9,7 +9,6 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 	query: "",
 	selectSingle: false,
 	initComponent : function() {
-		
 		this.createGrid();
 		
 		this.sidePanel = new Ext.Panel({
@@ -87,10 +86,12 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 				scope: this
 			}
 		});
-		
-		// this.grid.store.setFilter("required", {
-		// 	hasEmailAddresses: true
-		// });
+
+		if(this.mode == 'email') {
+			this.grid.store.setFilter("required", {
+				hasEmailAddresses: true
+			});
+		}
 
 		// this.grid.getSelectionModel().on("selectionchange", function(sm) {
 		// 	this.addSelectionButton.setDisabled(sm.getSelections().length == 0);

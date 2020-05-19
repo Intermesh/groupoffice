@@ -78,7 +78,7 @@ class AccountController extends \GO\Base\Controller\AbstractModelController {
 
 		$alias = $model->getDefaultAlias();
 
-		$response['data']['mbroot'] = trim($response['data']['mbroot'], './');
+//		$response['data']['mbroot'] = trim($response['data']['mbroot'], './');
 
 		$response['data']['email'] = $alias->email;
 		$response['data']['name'] = $alias->name;

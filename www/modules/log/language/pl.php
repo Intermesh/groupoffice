@@ -8,4 +8,5 @@ return array (
   'description' => 'Loguje wszystkie zdarzenia usuwania, modyfikacji i dodawania. Może mieć wpływ na wydajność dużych instalacji!',
   'ID' => 'ID',
   'User agent' => 'User agent',
+  'Activity log' => 'Log aktywności',
 );

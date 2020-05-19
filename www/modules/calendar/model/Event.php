@@ -1772,11 +1772,13 @@ $sub = $offset>0;
 		$dtstart = $vobject->dtstart ? $vobject->dtstart->getDateTime() : new \DateTime();
 		$dtend = $vobject->dtend ? $vobject->dtend->getDateTime() : new \DateTime();
 
-		//turn DateTimeImmutable into DateTime
-		$dtstart = new \DateTime($dtstart->format('Y-m-d H:i'), $dtstart->getTimezone());
-		$dtend = new \DateTime($dtend->format('Y-m-d H:i'), $dtend->getTimezone());
-		
+
 		$this->all_day_event = isset($vobject->dtstart['VALUE']) && $vobject->dtstart['VALUE']=='DATE' ? 1 : 0;
+
+		//turn DateTimeImmutable into DateTime
+		$dtstart = new \DateTime($dtstart->format('Y-m-d H:i'), $this->all_day_event ? null : $dtstart->getTimezone());
+		$dtend = new \DateTime($dtend->format('Y-m-d H:i'), $this->all_day_event ? null : $dtend->getTimezone());
+
 
 		//ios sends start and end date at 00:00 hour
 		//DTEND;TZID=Europe/Amsterdam:20140121T000000

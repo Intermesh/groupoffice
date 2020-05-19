@@ -71,30 +71,21 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 		}
 
 		if (!GO.util.empty(customfield.relatedFieldCondition)) {
-			config.requiredConditionValidator = this.requiredConditionValidator;
-			config._changeRelatedFieldsVisibility = this._changeRelatedFieldsVisibility;
+			config.checkRequiredCondition = this.checkRequiredCondition;
 			if (customfield.type === 'Select') {
 				config.validate = function () {
-					if (customfield.conditionallyRequired) {
-						this.requiredConditionValidator.call(this, customfield);
-					}
-					this._changeRelatedFieldsVisibility(this);
+					this.checkRequiredCondition.call(this, customfield);
 					return go.customfields.type.TreeSelectField.prototype.validate.apply(this);
 				}
 			} else if (customfield.type === 'MultiSelect') {
 				config.validate = function () {
-					if (customfield.conditionallyRequired) {
-						this.requiredConditionValidator.call(this, customfield);
-					}
-					this._changeRelatedFieldsVisibility(this);
+					this.checkRequiredCondition.call(this, customfield);
 					return go.form.Chips.prototype.validate.apply(this);
 				}
 			} else {
 				config.validateValue = function () {
-					if (customfield.conditionallyRequired) {
-						this.requiredConditionValidator.call(this, customfield, this);
-					}
-					this._changeRelatedFieldsVisibility(this);
+
+					this.checkRequiredCondition.call(this, customfield, this);
 					return Ext.form.Field.prototype.validateValue.apply(this);
 				}
 			}
@@ -102,7 +93,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 
 		return Ext.apply({
 			xtype: 'textfield',
-			serverFormats: false, //for backwars compatibility with old framework. Can be removed when all is refactored.
+			serverFormats: false, //for backwards compatibility with old framework. Can be removed when all is refactored.
 			name: 'customFields.' + customfield.databaseName,
 			fieldLabel: fieldLabel,
 			anchor: '100%',
@@ -110,41 +101,30 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			value: customfield.default,
 			hidden: customfield.conditionallyHidden || false,
 			conditionallyHidden: customfield.conditionallyHidden || false,
-			conditionallyRequired: customfield.conditionallyRequired || false,
+			conditionallyRequired: customfield.conditionallyRequired || false
 		}, config);
 
 		//ALTER TABLE `core_customfields_field`
 		// ADD `conditionallyHidden` tinyint(1) NOT NULL DEFAULT '0' AFTER `requiredCondition`;
 	},
 
-	/**
-	 *
-	 * @param field
-	 * @returns {boolean}
-	 * @private
-	 */
-	_changeRelatedFieldsVisibility: function(field) {
-		if (!field.relatedFields) {
-			return false;
-		}
-
-		Ext.each(field.relatedFields, function(relatedField) {
-			if (!relatedField.conditionallyHidden) {
-				return true;
-			}
-
-			if (this.allowBlank || !this.checked) {
-				relatedField.hide();
-				relatedField.ownerCt.doLayout();
-				return true;
-			}
-
-			relatedField.show();
-			relatedField.ownerCt.doLayout();
-			return true;
-
-		}, field);
-	},
+	// /**
+	//  *
+	//  * @param field
+	//  * @returns {boolean}
+	//  * @private
+	//  */
+	// _changeRelatedFieldsVisibility: function(field) {
+	// 	// if (!field.relatedFields) {
+	// 	// 	return false;
+	// 	// }
+	// 	//
+	// 	// // relatedFields are populated in FormFieldSet. The validation of this field can affect visibility of other fields
+	// 	// // using this fields value in the requiredCondition
+	// 	// Ext.each(field.relatedFields, function(relatedField) {
+	// 	// 	relatedField.validate();
+	// 	// }, field);
+	// },
 
 	/**
 	 * @param customField
@@ -186,7 +166,10 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	 *
 	 * @param customfield
 	 */
-	requiredConditionValidator: function (customfield) {
+	checkRequiredCondition: function (customfield) {
+
+		this.requiredConditionMatches = false;
+
 		var condition = customfield.relatedFieldCondition,
 			form,
 			conditionParts,
@@ -213,14 +196,11 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
 		} else {
 			conditionParts = condition.split(' ');
-			if (conditionParts.length === 3) { //valid condition
-				operator = conditionParts[1];
-				field = form.findField(conditionParts[0]) || form.findField('customFields.' + conditionParts[0]);
-				value = conditionParts[2];
-				if (!field) {
-					field = form.findField(conditionParts[2]) || form.findField('customFields.' + conditionParts[2]);
-					value = conditionParts[0];
-				}
+			if (conditionParts.length > 2) { //valid condition
+				fieldName = conditionParts.shift();
+				operator = conditionParts.shift();
+				field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
+				value = conditionParts.join(" ").trim();
 			}
 		}
 
@@ -228,40 +208,62 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			return false;
 		}
 
-		fieldValue = field.getValue();
+		fieldValue = field.getRawValue ? field.getRawValue() : field.getValue();
+
+
 		if (field.xtype === 'xcheckbox' || field.xtype === 'checkbox') {
 			fieldValue = fieldValue | 0;
+			if(value === "true") {
+				value = 1;
+			} else if(value === "false") {
+				value = 0;
+			}
 		}
 
-		var customFieldCmp = this;
-		if (this.xtype === 'treeselectfield') {
-			customFieldCmp = this.items.itemAt(0);
-		}
+
+		console.log(fieldValue, value, operator);
 
 		if (isEmptyCondition) {
-			customFieldCmp.allowBlank = !Ext.isEmpty(fieldValue);
+			this.requiredConditionMatches = !Ext.isEmpty(fieldValue);
 		} else if (isNotEmptyCondition) {
-			customFieldCmp.allowBlank = Ext.isEmpty(fieldValue);
+			this.requiredConditionMatches = Ext.isEmpty(fieldValue);
 		} else {
 			switch (operator) {
 				case '=':
 				case '==':
-					customFieldCmp.allowBlank = !(fieldValue == value);
+					this.requiredConditionMatches = (fieldValue == value);
 					break;
 				case '>':
-					customFieldCmp.allowBlank = !(fieldValue > value);
+					this.requiredConditionMatches = (fieldValue > value);
 					break;
 				case '<':
-					customFieldCmp.allowBlank = !(fieldValue < value);
+					this.requiredConditionMatches = (fieldValue < value);
 					break
 			}
 		}
 
-		if (this.xtype === 'treeselectfield') {
-			this.allowBlank = customFieldCmp.allowBlank;
+		var customFieldCmp = this;
+
+		if(customfield.conditionallyRequired) {
+			customFieldCmp.allowBlank = !this.requiredConditionMatches;
+			if (this.xtype === 'treeselectfield') {
+				this.items.itemAt(0).allowBlank = !this.requiredConditionMatches;
+			}
 		}
 
-		return true;
+		if (!customfield.conditionallyHidden) {
+			return this.requiredConditionMatches;
+		}
+
+		if (this.requiredConditionMatches) {
+			customFieldCmp.show();
+		} else {
+			customFieldCmp.hide();
+		}
+
+		customFieldCmp.ownerCt.doLayout();
+
+		return this.requiredConditionMatches;
 	},
 	
 	/**

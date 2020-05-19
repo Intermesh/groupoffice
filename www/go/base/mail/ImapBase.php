@@ -113,7 +113,7 @@ abstract class ImapBase {
 		$line_cont = false;
 		while ($line) {
 			$chunk = false;
-			switch ($line{0}) {
+			switch ($line[0]) {
 				case "\r":
 				case "\n":
 					$line = false;
@@ -126,7 +126,7 @@ abstract class ImapBase {
 				case ']':
 				case '(':
 				case ')':
-					$chunk = $line{0};
+					$chunk = $line[0];
 					$line = strlen($line) > 1 ? substr($line, 1) : '';
 					break;
 				case '"':

@@ -22,11 +22,6 @@ go.Modules.register("community", "addressbook", {
 		name: "Contact",
 
 		/**
-		 * Indicates the entity supports files
-		 */
-		hasFiles: true, //Rename to files?
-
-		/**
 		 * Override the custom field set dialog when creating it for a contact in system settings
 		 */
 		customFields: {

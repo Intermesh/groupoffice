@@ -19,4 +19,5 @@ return array (
   'Delete older events and tasks at the client (they will be kept in Group-Office)' => 'Kasuj stare zdarzenia i zadania na urządzeniu przenośnym (pozostaną w systemie)',
   'Model' => 'Model',
   '<h1>Group-Office SyncML Server</h1><p>This is the Group-Office SyncML server. Use a SyncML compliant device or software package and connect it to this URL to synchronize with Group-Office.</p>' => '<h1>Serwer synchronizacji {product_name} SyncML</h1><p>To jest serwer synchronizacji {product_name} SyncML. Użyj urządzenia zgodnego z SyncML lub oprogramowania zgodnego i podłącz go do tego URL aby zsynchronizować {product_name}.</p>',
+  'Address books' => 'Książki adresowe',
 );

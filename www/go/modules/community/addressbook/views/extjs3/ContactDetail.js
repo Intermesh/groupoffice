@@ -56,7 +56,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					
 						this.namePanel = new Ext.BoxComponent({
 							style: "display: table;height:100%",
-							tpl: '<div style="vertical-align: middle;display:table-cell;"><h3><tpl if="prefixes">{prefixes} </tpl>{name}<tpl if="suffixes"> {suffixes}</tpl></h3><h4>{jobTitle} <tpl if="department">- {department}</tpl></h4></div>'
+							tpl: '<div style="vertical-align: middle;display:table-cell;"><h3><tpl if="prefixes">{prefixes} </tpl>{name}<tpl if="suffixes"> {suffixes}</tpl></h3><h4>{jobTitle} <tpl if="values.department">- {department}</tpl></h4></div>'
 						}),						
 						this.urlPanel = new Ext.BoxComponent({
 							flex: 1,
@@ -281,13 +281,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 				detailView: this
 			}),
 
+			{
+				xtype: "linkbrowserbutton"
+			},
+
 			this.moreMenu ={
 				iconCls: 'ic-more-vert',
 				menu: [
-					{
-						xtype: "linkbrowsermenuitem"
-					},
-					'-',
 					this.starItem = new Ext.menu.Item({
 						iconCls: "ic-star",
 						text: t("Star"),

@@ -40,7 +40,7 @@ if(isset($_GET['url'])) {
 	fclose($fp);
 	fclose($input);
 
-	if($tmpFile->getSize() > \go\core\jmap\Capabilities::get()->maxSizeUpload) {
+	if(\go\core\jmap\Capabilities::get()->maxSizeUpload && $tmpFile->getSize() > \go\core\jmap\Capabilities::get()->maxSizeUpload) {
 		$tmpFile->delete();
 		Response::get()->setStatus(413);
 		Response::get()->output([

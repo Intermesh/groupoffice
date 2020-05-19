@@ -26,6 +26,7 @@ GO.email.PortletPanel = Ext.extend(Ext.Panel, {
 		});
 		
 		this.messageStore = new GO.data.GroupingStore({
+			suppressError: true,
 			url: GO.url("email/message/store"),
 			root: 'results',
 			totalProperty: 'total',

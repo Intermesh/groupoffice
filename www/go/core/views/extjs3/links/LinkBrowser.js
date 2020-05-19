@@ -108,6 +108,10 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 					dataIndex: 'name',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 
+						if(!record.data.description) {
+							record.data.description = "-";
+						}
+
 						var str = record.data.to.name + " <br /><label>" + record.data.description + "</label>";
 
 						var linkIconCls = go.Entities.getLinkIcon(record.data.toEntity, record.data.to.filter);

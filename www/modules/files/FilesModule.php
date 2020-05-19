@@ -120,13 +120,13 @@ class FilesModule extends \GO\Base\Module{
 				self::$fileHandlers=array();
 				foreach($modules as $module){
 					if($module->moduleManager instanceof \GO\Base\Module) {
-						self::$fileHandlers = array_merge(self::$fileHandlers, $module->moduleManager->findClasses('filehandler'));
+						self::$fileHandlers = array_merge(self::$fileHandlers, array_map(function($c){return $c->name;}, $module->moduleManager->findClasses('filehandler')));
 					}
 				}
 
 				//For new framework
 				$cf = new ClassFinder();
-				self::$fileHandlers = array_merge(self::$fileHandlers, array_map(function($cls) {return  new ReflectionClass($cls);}, $cf->findByParent(FilehandlerInterface::class)));
+				self::$fileHandlers = array_merge(self::$fileHandlers, $cf->findByParent(FilehandlerInterface::class));
 
 				\GO::cache()->set('files-file-handlers', self::$fileHandlers);
 			}
@@ -135,7 +135,7 @@ class FilesModule extends \GO\Base\Module{
 			// If not, then delete them from the array
 			foreach(self::$fileHandlers as $key=>$handler){
 				// $handler->name holds the namespace path of the handler. Based on that we can determine if the module is enabled.
-				$nsArr = explode('\\',$handler->name);
+				$nsArr = explode('\\',$handler);
 
 				if($nsArr[0] == "GO") {
 					$moduleName = strtolower($nsArr[1]);

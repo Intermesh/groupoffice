@@ -32,30 +32,30 @@ class Module extends core\Module {
 	}
 	
 	public static function garbageCollection() {
-		$types = EntityType::findAll();
-
-		go()->debug("Cleaning up comments");
-		foreach($types as $type) {
-			if($type->getName() == "Link" || $type->getName() == "Search" ||  !is_a($type->getClassName(), Entity::class, true)) {
-				continue;
-			}
-
-			$cls = $type->getClassName();
-
-			if(is_a($cls,  ActiveRecord::class, true)) {
-				$tableName = $cls::model()->tableName();
-			} else{
-				$tableName = array_values($cls::getMapping()->getTables())[0]->getName();
-			}
-			$query = (new Query)->select('sub.id')->from($tableName);
-
-			$stmt = go()->getDbConnection()->delete('core_search', (new Query)
-				->where('entityId', '=', $type->getId())
-				->andWhere('entityId', 'NOT IN', $query)
-			);
-			$stmt->execute();
-
-			go()->debug("Deleted ". $stmt->rowCount() . " comments for $cls");
-		}
+//		$types = EntityType::findAll();
+//
+//		go()->debug("Cleaning up comments");
+//		foreach($types as $type) {
+//			if($type->getName() == "Link" || $type->getName() == "Search" ||  !is_a($type->getClassName(), Entity::class, true)) {
+//				continue;
+//			}
+//
+//			$cls = $type->getClassName();
+//
+//			if(is_a($cls,  ActiveRecord::class, true)) {
+//				$tableName = $cls::model()->tableName();
+//			} else{
+//				$tableName = array_values($cls::getMapping()->getTables())[0]->getName();
+//			}
+//			$query = (new Query)->select('sub.id')->from($tableName);
+//
+//			$stmt = go()->getDbConnection()->delete('comments_comment', (new Query)
+//				->where('entityTypeId', '=', $type->getId())
+//				->andWhere('entityId', 'NOT IN', $query)
+//			);
+//			$stmt->execute();
+//
+//			go()->debug("Deleted ". $stmt->rowCount() . " comments for $cls");
+//		}
 	}
 }

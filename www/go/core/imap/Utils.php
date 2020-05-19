@@ -49,7 +49,7 @@ class Utils {
 				$fld = substr($v, 2, -2);
 				$charset = strtolower(substr($fld, 0, strpos($fld, '?')));
 				$fld = substr($fld, (strlen($charset) + 1));
-				$encoding = $fld{0};
+				$encoding = $fld[0];
 				$fld = substr($fld, (strpos($fld, '?') + 1));
 				$fld = str_replace('_', '=20', $fld);
 				if (strtoupper($encoding) == 'B') {

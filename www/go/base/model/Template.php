@@ -266,14 +266,15 @@ class Template extends \GO\Base\Db\ActiveRecord{
 				}
 			}
 
+		$attributes[$tagPrefix . 'homepage'] = $contact->findUrlByType(\go\modules\community\addressbook\model\Url::TYPE_HOMEPAGE, false)->url ?? "";
 
-			$orgs = $contact->getOrganizationIds();
-			if(count($orgs) && ($company = \go\modules\community\addressbook\model\Contact::findById($orgs[0])))
-			{
-				$attributes = array_merge($attributes, static::_getModelAttributes($company, $companyTagPrefix));
-			}
-			
-			return $attributes;
+		$orgs = $contact->getOrganizationIds();
+		if(count($orgs) && ($company = \go\modules\community\addressbook\model\Contact::findById($orgs[0])))
+		{
+			$attributes = array_merge($attributes, static::_getModelAttributes($company, $companyTagPrefix));
+		}
+
+		return $attributes;
 	} 
 	
 	

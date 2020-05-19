@@ -4,15 +4,15 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 	messagePanel : null,
 	attachmentHandle : null,
 	attachmentsView : null,
+	supportsFiles: true,
 	
 	constructor : function(config){
 		
 		config = config || {};
 		
 		Ext.apply(config, {
-			title:t("Save the attachment to these items", "email"),
+			title:t("Search items", "email"),
 			singleSelect:true,
-			filesupport:true
 		});
 
 		GO.email.LinkAttachmentDialog.superclass.constructor.call(this,config);

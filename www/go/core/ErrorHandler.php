@@ -22,18 +22,17 @@ class ErrorHandler {
 
 	public function __construct() {		
 		
-		//error_reporting(E_ALL)
+//		error_reporting(E_ALL);
 		
-		set_error_handler([$this, 'errorHandler']);
+		set_error_handler([$this, 'errorHandler'], E_ALL);
 		register_shutdown_function([$this, 'shutdown']);
-		set_exception_handler([$this, 'exceptionHandler']);		
+		set_exception_handler([$this, 'exceptionHandler']);
 	}
 
 	/**
 	 * Called when PHP exits.
 	 */
 	public function shutdown() {
-		go()->debug("ErrorHandler::shutdown() called");
 		$error = error_get_last();
 		if ($error) {
 			//Log only fatal errors because other errors should have been logged by the normal error handler
@@ -123,9 +122,12 @@ class ErrorHandler {
    */
 	public static function errorHandler($errno, $errstr, $errfile, $errline) {
 		go()->debug("ErrorHandler:errorHandler called $errno");
-		// if (!(error_reporting() & $errno)) {
-		// 	return false;
-		// }
+
+		// check if error should be reported according to PHP settings
+		if (!(error_reporting() & $errno)) {
+		  return false;
+		}
+
 		throw new ErrorException($errstr, 0, $errno, $errfile, $errline);
 	}
 }

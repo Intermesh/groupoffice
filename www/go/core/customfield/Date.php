@@ -30,4 +30,13 @@ class Date extends Base {
 		});
 	}
 
+	public function dbToText($value, &$values, $entity)
+	{
+		if(!isset($value)) {
+			return "";
+		}
+		return $value->toUserFormat();
+
+	}
+
 }

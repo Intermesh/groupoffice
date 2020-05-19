@@ -171,7 +171,23 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 				store : new Ext.data.ArrayStore({
 					idIndex:0,
 					fields : ['value', 'text'],
-					data : GO.checkerSnoozeTimes
+					data : [
+						[300,'5 '+t("Minutes")],
+						[600, '10 '+t("Minutes")],
+						[1200, '20 '+t("Minutes")],
+						[1800, '30 '+t("Minutes")],
+						[3600, '1 '+t("Hour")],
+						[7200, '2 '+t("Hours")],
+						[10800, '3 '+t("Hours")],
+						[14400, '4 '+t("Hours")],
+						[86400, '1 '+t("Day")],
+						[2*86400, '2 '+t("Days")],
+						[3*86400, '3 '+t("Days")],
+						[4*86400, '4 '+t("Days")],
+						[5*86400, '5 '+t("Days")],
+						[6*86400, '6 '+t("Days")],
+						[7*86400, '7 '+t("Days")]
+					]
 				}),
 				value:7200,
 				valueField : 'value',
@@ -182,7 +198,7 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 				selectOnFocus : true,
 				forceSelection : true
 			},{
-				xtype:'htmleditor',
+				xtype:'xhtmleditor',
 				name:'text',
 				fieldLabel:t("Text", "reminders"),
 				anchor:'100% -105'

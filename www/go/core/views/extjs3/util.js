@@ -293,13 +293,16 @@ go.util =  (function () {
 			this.uploadDialog.click();
 		},
 
+		viewFile : function(url) {
+			window.open(url);
+		},
+
 		/**
 		 * Download an URL
 		 *
 		 * @param {string} url
-		 * @param {boolean=} inline True to use window.open to make the browser display it inline.
 		 */
-		downloadFile: function(url, inline) {
+		downloadFile: function(url) {
 			if(window.navigator.standalone) {
 				//somehow this is the only way a download works on a web application on the iphone.
 				var win = window.open( "about:blank", "_system");
@@ -307,19 +310,16 @@ go.util =  (function () {
 				win.location = url;
 			} else
 			{
-				if(inline) {
-					window.open(url);
-				} else {
-					// document.location.href = url; //This causes connection errors with SSE or other simulanous XHR requests
-					if(!downloadFrame) {
-						downloadFrame = document.createElement('iframe');
-						downloadFrame.id="downloader";
-						downloadFrame.style.display = 'none';
-						document.body.appendChild(downloadFrame);
-					}
-					downloadFrame.src = url;
+				// document.location.href = url; //This causes connection errors with SSE or other simulanous XHR requests
+				if(!downloadFrame) {
+					downloadFrame = document.createElement('iframe');
+					downloadFrame.id="downloader";
+					downloadFrame.style.display = 'none';
+					document.body.appendChild(downloadFrame);
 				}
+				downloadFrame.src = url;
 			}
+
 		},
 		
 		textToHtml : function(text) {

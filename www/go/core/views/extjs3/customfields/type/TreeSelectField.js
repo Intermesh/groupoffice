@@ -68,9 +68,14 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 			hideLabel: true,
 			listeners: {
 				scope: this,
-				select: this.onSelect
+				select: this.onSelect,
+				change: this.onChange
 			}
 		};
+	},
+
+	onChange: function() {
+		this.fireEvent('change', this, this.getValue());
 	},
 	
 	reset:function() {
@@ -135,6 +140,20 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 		
 		return go.util.empty(v) ? null : v;
 	},
+
+	getRawValue : function() {
+		if(!this.items || !this.items.length) {
+			return null;
+		}
+		var v = this.items.last().getRawValue();
+
+		if(!v && this.items.getCount() > 1){
+			v = this.items.itemAt(this.items.getCount() -2).getRawValue();
+		}
+
+		return go.util.empty(v) ? null : v;
+	},
+
 	markInvalid: function (msg) {
 		this.items.each(function(i) {			
 			i.markInvalid(msg);

@@ -33,38 +33,37 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 
 			//find entity panel
 			var form = this.findParentByType("form");
-			
+
 			this.formTabPanel = this.findParentByType('tabpanel');
-			
-			if(!form) {
+
+			if (!form) {
 				console.error("No go.form.EntityPanel found for filtering");
 				return;
 			}
-						
-			if(form.getXType() == "entityform") {
+
+			if (form.getXType() == "entityform") {
 				form.on("load", function () {
 					this.filter(form.getValues());
 				}, this);
 
-				form.on("setvalues", function () {					
+				form.on("setvalues", function () {
 					this.filter(form.getValues());
 				}, this);
 
 				this.filter(form.getValues());
-			} else
-			{
+			} else {
 				//Legacy code
-				
+
 				//Add a beforeaction event listener that will send the custom field data JSON encoded.
 				//The old framework will use this to save custom fields.
-				if(!form.legacyParamAdded) {
-					form.getForm().on("beforeaction", function(form, action) {	
-						if(action.type !== "submit") {
+				if (!form.legacyParamAdded) {
+					form.getForm().on("beforeaction", function (form, action) {
+						if (action.type !== "submit") {
 							return true;
 						}
 
 						var v = form.getFieldValues();
-						if(v.customFields) {
+						if (v.customFields) {
 							action.options.params = action.options.params || {};
 							action.options.params.customFieldsJSON = Ext.encode(v.customFields);
 						}
@@ -73,10 +72,11 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 					});
 					form.legacyParamAdded = true;
 				}
-				
-				form.getForm().on("actioncomplete", function(f, action) {
-					if(action.type === "load") {
-						this.filter(f.getFieldValues());						
+
+				form.getForm().on("actioncomplete", function (f, action) {
+					if (action.type === "load") {
+						this.filter(f.getFieldValues());
+						f.isValid(); //needed for coniditionally hidden
 					}
 				}, this);
 			}
@@ -84,50 +84,15 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			/**
 			 * Related fields
 			 */
-			var masterFields = [];
-			this.items.each(function(field) {
-				if (field.conditionallyHidden || field.conditionallyRequired) {
-					var linkedField = go.customfields.type.Text.prototype.getRequiredConditionField.call(field, field);
-					if (linkedField) {
-						linkedField.relatedFields = linkedField.relatedFields || [];
-						linkedField.relatedFields.push(field);
-						masterFields.push(linkedField);
-					}
-				}
-			}, this);
-
-			function uniqueFieldsFilter(value, index, self) {
-				return self.indexOf(value) === index;
-			}
-			masterFields = masterFields.filter(uniqueFieldsFilter);
-
-			Ext.each(masterFields, function(masterField) {
-				masterField.on('select', function (field) {
-					Ext.each(field.relatedFields, function(relatedField) {
-						relatedField.validate();
-						relatedField.show();
-						relatedField.ownerCt.doLayout();
-						return true;
-					});
+			this.items.each(function (field) {
+				field.on('change', function (field) {
+					form.getForm().isValid();
 				});
-
-				masterField.on('check', function (field) {
-					Ext.each(field.relatedFields, function(relatedField) {
-						relatedField.validate();
-						if (relatedField.conditionallyHidden && relatedField.isVisible()) {
-							relatedField.hide();
-							relatedField.ownerCt.doLayout();
-							return true;
-						}
-
-						relatedField.show();
-						relatedField.ownerCt.doLayout();
-						return true;
-					});
+				field.on('check', function (field) {
+					form.getForm().isValid();
 				});
 			}, this);
-
-		}, this);
+		});
 
 		go.customfields.FormFieldSet.superclass.initComponent.call(this);
 	},
@@ -159,19 +124,31 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	},
 	
 	setFilterVisible : function(v) {
-		
+
+		//disable recursive so validaters don't apply on hidden items
+		function setDisabled(ct, v) {
+			ct.setDisabled(v);
+
+			if(!ct.items){
+				return;
+			}
+			ct.items.each(function(i) {
+				setDisabled(i, v);
+			});
+		}
+
 		if(!this.fieldSet.isTab) {
 			this.setVisible(v);
-			this.setDisabled(!v);
+			setDisabled(this, !v);
 		} else{
+			setDisabled(this.ownerCt, !v);
 			if(v) {
 			 	this.formTabPanel.unhideTabStripItem(this.ownerCt);
 			} else
 			{
 			 	this.formTabPanel.hideTabStripItem(this.ownerCt);
 			}		
-		}		
-	
+		}
 	}
 });
 

@@ -43,6 +43,8 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			<label>{user_name} at {mtime}</label>\
 		</a></tpl></div>');
 
+
+
 		this.items = [new Ext.DataView({
 			store: this.store,
 			tpl: tpl,
@@ -52,31 +54,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			itemSelector: 'a',
 			listeners: {
 				afterrender:function(me) {
-					GO.files.DnDFileUpload(function (blobs) {
-						var fb = GO.mainLayout.getModulePanel('files'),
-							options = {
-								upload: true,
-								destination_folder_id: this.folderId,
-								blobs: Ext.encode(blobs),
-								cb: function() {
-									this.store.load({
-										params: {
-											limit: 10,
-											folder_id: this.folderId
-										}
-									});
-								}.bind(this)
-							};
-						if(this.folderId) {
-							fb.sendOverwrite(options);
-						} else { // create folder first
-							this.createFolderWhenNoneExist(function() {
-								options.destination_folder_id = this.folderId;
-								fb.sendOverwrite(options);
-							}.bind(this))
-						}
-
-					}.bind(this), me.container)();
+					GO.files.DnDFileUpload(this.uploadComplete.bind(this), me.container)();
 
 				},
 				click: this.onClick,
@@ -85,7 +63,22 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 		})];
 		
 		this.bbar = [
-			this.browseBtn = new GO.files.DetailFileBrowserButton({iconCls: ""})
+			this.browseBtn = new GO.files.DetailFileBrowserButton({iconCls: ""}),
+			new Ext.Button({
+				text: t('Upload'),
+				handler: function() {
+
+					go.util.openFileDialog({
+						multiple: true,
+						autoUpload: true,
+						listeners: {
+							uploadComplete: this.uploadComplete,
+							scope: this
+						}
+					});
+				},
+				scope:this
+			})
 		];
 		
 		this.browseBtn.on('closefilebrowser', function(btn, folderId) {
@@ -103,23 +96,56 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 
 	},
 
+	uploadComplete: function(blobs) {
+		var fb = GO.mainLayout.getModulePanel('files'),
+			options = {
+				upload: true,
+				destination_folder_id: this.folderId,
+				blobs: Ext.encode(blobs),
+				cb: function() {
+					this.store.load({
+						params: {
+							limit: 10,
+							folder_id: this.folderId
+						}
+					});
+				}.bind(this)
+			};
+		if(this.folderId) {
+			fb.sendOverwrite(options);
+		} else { // create folder first
+			this.createFolderWhenNoneExist(function() {
+				options.destination_folder_id = this.folderId;
+				fb.sendOverwrite(options);
+			}.bind(this))
+		}
+	},
+
 
 	createFolderWhenNoneExist: function(cb) {
 		var dv = this.findParentByType("detailview"), entityId, entity;
 		if(!dv) {
 			dv = this.findParentByType("displaypanel") || this.findParentByType("tmpdetailview"); //for legacy modules
 		}
+		var modelName = dv.model_name || dv.entity || dv.entityStore.entity.name;
 		GO.request({
 			url: 'files/folder/checkModelFolder',
 			maskEl: dv.getEl(),
 			jsonData: {},
 			params: {
 				mustExist: true,
-				model: dv.model_name || dv.entity || dv.entityStore.entity.name,
+				model: modelName,
 				id: dv.data.id
 			},
 			success: function (response, options, result) {
 				this.folderId = result.files_folder_id;
+
+				//hack to update entity store, detailview and legacy DisplayPanel
+				var store = go.Db.store(modelName);
+				if (store) {
+					store.data[dv.data.id].filesFolderId = dv.data.filesFolderId = dv.data.files_folder_id = result.files_folder_id;
+				}
+
 				cb();
 			},
 			scope: this

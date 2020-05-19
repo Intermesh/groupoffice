@@ -137,7 +137,8 @@
 					pnl = eval(config.selectDialogPanels[i1]);				
 					var p = new pnl({
 						singleSelect: this.singleSelect,
-						query: this.query
+						query: this.query,
+						mode: this.mode
 					});
 					p.dialog = this;
 
@@ -145,7 +146,6 @@
 						continue;
 					}
 
-					p.mode = this.mode;
 					p.on('selectsingle', function (pnl, name, email, id) {
 						this.selectSingleEmail.call(this.scope, name, email, id, pnl.entityName);
 						this.close();

@@ -166,7 +166,6 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 		
 		\GO::session()->closeWriting();
 		\GO::$disableModelCache=true;
-		
 		$response = array( 'success' => true );
 		$count = 0;
 		$failed=array();
@@ -305,6 +304,11 @@ class CalendarController extends \GO\Base\Controller\AbstractModelController {
 		
 		foreach($params as $cC){			
 			$calendarColor = \GO\Calendar\Model\CalendarUserColor::model()->findByPk(array('calendar_id'=>$cC->id,'user_id'=>\GO::user()->id));
+
+			if($cC->color == null && $calendarColor) {
+				$calendarColor->delete();
+				continue;
+			}
 			
 			if(!$calendarColor){
 				$calendarColor = new \GO\Calendar\Model\CalendarUserColor();

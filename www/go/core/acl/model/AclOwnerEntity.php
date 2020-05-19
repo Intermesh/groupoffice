@@ -156,15 +156,16 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * @return void
 	 */
 	protected function checkManagePermission() {
-		if($this->findAcl()->ownedBy == go()->getUserId()) {
-			return;
-		}
-
-		if(!$this->findAcl()->hasPermissionLevel(Acl::LEVEL_MANAGE)) {		
-			throw new Forbidden("You are not allowed to manage permissions on this ACL");
-		}
-
-		return;
+		return $this->hasPermissionLevel(Acl::LEVEL_MANAGE);
+//		if($this->findAcl()->ownedBy == go()->getUserId()) {
+//			return;
+//		}
+//
+//		if(!$this->findAcl()->hasPermissionLevel(Acl::LEVEL_MANAGE)) {
+//			throw new Forbidden("You are not allowed to manage permissions on this ACL");
+//		}
+//
+//		return;
 	}
 
 	/**
@@ -185,11 +186,28 @@ abstract class AclOwnerEntity extends AclEntity {
 				$this->acl = new Acl();
 			}
 		}
+
+		$this->setAclProps();
+
+		if(!$this->acl->save()) {	
+			throw new Exception("Could not create ACL");
+		}
+
+		$this->{static::$aclColumnName} = $this->acl->id;
+	}
+
+
+
+	private function setAclProps() {
 		$aclColumn = $this->getMapping()->getColumn(static::$aclColumnName);
+
 		if(!$aclColumn) {
 			throw new Exception("Column aclId is required for AclOwnerEntity ". static::class);
 		}
+
 		$this->acl->usedIn = $aclColumn->table->getName() . '.' . static::$aclColumnName;
+		$this->acl->ownedBy = !empty($this->createdBy) ? $this->createdBy : $this->getDefaultCreatedBy();
+
 		try {
 			$this->acl->entityTypeId = $this->entityType()->getId();
 		} catch(Exception $e) {
@@ -201,14 +219,6 @@ abstract class AclOwnerEntity extends AclEntity {
 			}
 			$this->acl->entityTypeId = null;
 		}
-		//$this->acl->entityId = $this->id;
-		$this->acl->ownedBy = !empty($this->createdBy) ? $this->createdBy : $this->getDefaultCreatedBy();
-
-		if(!$this->acl->save()) {	
-			throw new Exception("Could not create ACL");
-		}
-
-		$this->{static::$aclColumnName} = $this->acl->id;
 	}
 
 	/**
@@ -362,12 +372,24 @@ abstract class AclOwnerEntity extends AclEntity {
 	{
 		$tables = static::getMapping()->getTables();
 		$table = array_values($tables)[0]->getName();
-		
+
+		$aclColumn = static::getMapping()->getColumn(static::$aclColumnName);
+
+		$updates = [
+			'acl.entityTypeId' => static::entityType()->getId(),
+			'acl.entityId' => new Expression('entity.id'),
+			'acl.usedIn' => $aclColumn->table->getName() . '.' . static::$aclColumnName
+			];
+
+		$hasCreatedBy = static::getMapping()->getColumn('createdBy');
+
+		if($hasCreatedBy) {
+			$updates['acl.ownedBy'] = new Expression('coalesce(entity.createdBy, 1)');
+		}
+
 		$stmt = go()->getDbConnection()->update(
       'core_acl', 
-      [
-        'acl.entityTypeId' => static::entityType()->getId(), 
-        'acl.entityId' => new Expression('entity.id')],
+      $updates,
       (new Query())
         ->tableAlias('acl')
         ->join($table, 'entity', 'entity.' . static::$aclColumnName . ' = acl.id'));

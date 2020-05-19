@@ -1,23 +1,41 @@
 GO.files.DnDFileUpload = function(doneCallback, element) {
-	function isRegularFile(file, cb) {
-		if(file.size > 4096) {
-			cb(file);
-			return;
-		}
-		var reader = new FileReader();
-		reader.onerror = function() {
-			reader.onloadend = reader.onprogress = reader.onerror = null;
-			cb(false); // is a folder
-		};
-		reader.onloadend = reader.onprogress = function(e) {
-			reader.onloadend = reader.onprogress = reader.onerror = null;
-			if (e.type != 'loadend') {
-				reader.abort();
+
+	var uploadCount = 0,
+		blobs = [];
+
+	function upload(nodes, subfolder) {
+		uploadCount += nodes.length;
+		Array.prototype.forEach.call(nodes, function(node, i) {
+			if(node && node.isDirectory) {
+				node.createReader().readEntries(function(subnodes) {
+					upload(subnodes, node.fullPath.replace(/^\//,"").split('/'));
+				});
+				uploadCount--; // dont upload folders
+				return;
 			}
-			cb(file);
-		};
-		reader.readAsDataURL(file);
+			node.file(function (file) {
+				if (!file) {
+					uploadCount--; //skip file if not found?
+					return;
+				}
+				go.Jmap.upload(file, {
+					success: function (response) {
+						if(subfolder) {
+							response.subfolder = subfolder;
+						}
+						blobs.push(response);
+					},
+					callback: function (response) {
+						uploadCount--;
+						if (uploadCount === 0) {
+							doneCallback(blobs);
+						}
+					}
+				});
+			});
+		});
 	}
+
 	return function() {
 		var childCount = 0;
 		element.dom.addEventListener('dragenter', function (e) {
@@ -44,29 +62,16 @@ GO.files.DnDFileUpload = function(doneCallback, element) {
 			e.stopPropagation();
 			e.preventDefault();
 			element.removeClass('x-dd-over');
-			var files = e.dataTransfer.files,
-				uploadCount = files.length,
-				blobs = [];
-
-			for (var i = 0; i < files.length; i++) {
-				isRegularFile(files[i], function (file) {
-					if (!file) {
-						uploadCount--;
-						return;
-					}
-					go.Jmap.upload(file, {
-						success: function (response) {
-							blobs.push(response);
-						},
-						callback: function (response) {
-							uploadCount--;
-							if (uploadCount === 0) {
-								doneCallback(blobs);
-							}
-						}
-					});
-				});
+			var entries = [];
+			// convert files[] to entries[]
+			for (var i = 0; i < e.dataTransfer.items.length; i++) {
+				if (e.dataTransfer.items[i].webkitGetAsEntry) {
+					entries.push(e.dataTransfer.items[i].webkitGetAsEntry());
+				} else if (e.dataTransfer.items[i].getAsEntry) {
+					entries.push(e.dataTransfer.items[i].getAsEntry());
+				}
 			}
+			upload(entries);
 		});
 	};
 };

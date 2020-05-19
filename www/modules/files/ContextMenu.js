@@ -37,7 +37,7 @@ GO.files.FilesContextMenu = function(config)
 		iconCls: 'ic-file-download',
 		text: t("Download"),
 		handler: function(){
-			window.open(GO.url("files/file/download",{id:this.records[0].data.id,inline:false}));
+			go.util.downloadFile(GO.url("files/file/download",{id:this.records[0].data.id,inline:"0"}));
 		},
 		scope: this
 	});

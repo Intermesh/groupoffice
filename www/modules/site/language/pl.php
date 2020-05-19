@@ -1,0 +1,21 @@
+<?php
+return array (
+  'Label' => 'Etykieta',
+  'Delete menu item' => 'Usuń pozycję menu',
+  'Add menu' => 'Dodaj menu',
+  'Advanced options' => 'Opcje zaawansowane',
+  'Add content' => 'Dodaj zawartość',
+  'Delete content' => 'Usuń zawartość',
+  'Content' => 'Zawartość',
+  'Template' => 'Szablon',
+  'Open in new window' => 'Otwórz w nowym oknie',
+  'Module' => 'Moduł',
+  '%s file(s)' => '%s plik(i)',
+  'Menu item' => 'Pozycja menu',
+  'Target' => 'Cel',
+  'Dimensions (WxH)' => 'Wymiary (S x W)',
+  'Zoom' => 'Powiększenie',
+  'Dimensions' => 'Wymiary',
+  'Alignment' => 'Wyrównanie',
+  'Alt text' => 'Treść alternatywna',
+);

@@ -1295,4 +1295,5 @@ Ukoliko niste zatražili novu lozinku izbrišite ovu poruku.',
   'Can\'t delete the default item.' => 'Nije moguće obrisati zadanu stavku',
   'Height' => 'Visina',
   'No files have been selected. First select a number of files.' => 'Niti jedna datoteka nije odabrana. Odaberite datoteke.',
+  'Sorry, an unexpected error occurred: ' => 'Došlo je do neočekivane greške',
 );

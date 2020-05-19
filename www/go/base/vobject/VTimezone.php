@@ -52,7 +52,7 @@ class VTimezone extends Sabre\VObject\Document {
 		$STANDARD_RRULE = '';
 		$DAYLIGHT_RRULE = '';
 		
-		for ($i = 0, $max = count($transitions); $i < $max; $i++) {
+		for ($i = 0, $max = count($transitions) - 1; $i < $max; $i++) {
 			if ($transitions[$i]['ts'] > $start_of_year) {
 	
 				$weekday1 = $this->_getDay($transitions[$i]['time']);
