@@ -1,3 +1,4 @@
+20-05-2020 6.4.142
 - Core: Updated Polish and Croatian translation
 - Core: 6.4.141 Quota cronjob not displayed correct #580
 - Tasks: left panel is resizable
