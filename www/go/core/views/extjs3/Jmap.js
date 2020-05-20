@@ -386,21 +386,24 @@ go.Jmap = {
 					}
 				}
 			}, false);
+			//
+			// source.addEventListener('open', function(e) {
+			// 	// Connection was opened.
+			// 	console.log("SSE running");
+			// 	console.log(source);
+			// }, false);
 
-			source.addEventListener('open', function(e) {
-				// Connection was opened.
-			}, false);
-
-			source.addEventListener('error', function(e) {
-				if (e.readyState == EventSource.CLOSED) {
-					// Connection was closed.
-
-				} else
-				{
-					console.error(e);
-				}
-
-			}, false);
+			// source.addEventListener('error', function(e) {
+			// 	console.warn(source);
+			// 	if (source.readyState == EventSource.CLOSED) {
+			// 		// Connection was closed.
+			//
+			// 	} else
+			// 	{
+			// 		console.error(e);
+			// 	}
+			//
+			// }, false);
 		}
 		catch(e) {
 			console.error("Failed to start Server Sent Events. Perhaps the API URL in the system settings is invalid?", e);
