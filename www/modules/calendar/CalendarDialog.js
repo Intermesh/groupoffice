@@ -466,13 +466,10 @@ Ext.extend(GO.calendar.CalendarDialog, GO.Window, {
 			scope: this
 		});
 	},
-	save : function(hide)
-	{        
-		if(this.resource && this.name.getValue() && !this.selectGroup.getValue())
-		{
+	save : function(hide) {
+		if(this.resource && this.name.getValue() && !this.selectGroup.getValue()) {
 			Ext.MessageBox.alert(t("Error"), t("You have errors in your form. You need to select a group for this resource.", "calendar"));
-		}else
-		{
+		} else {
 			var tasklists = (GO.tasks && !this.resource) ? Ext.encode(this.tasklistsTab.getGridData()) : '';
 		
 			this.formPanel.form.submit({

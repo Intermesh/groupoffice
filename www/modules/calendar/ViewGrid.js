@@ -569,15 +569,11 @@ GO.grid.ViewGrid = Ext.extend(Ext.Panel, {
 			{
 				var event = obj.event;
 
-				if(obj.isCopy)
-				{
-					if(calendar_visible)
-					{
-						if(event.repeats)
-						{
+				if(obj.isCopy) {
+					if(calendar_visible) {
+						if(event.repeats) {
 							this.reload();
-						}else
-						{
+						} else {
 							var newEvent = GO.util.clone(event);
 							delete(newEvent.id);
 							delete(newEvent.domId);
@@ -592,18 +588,14 @@ GO.grid.ViewGrid = Ext.extend(Ext.Panel, {
 							
 						}
 					}
-				}else
-				{
-					if(obj.repeats)
-					{
+				} else {
+					if(obj.repeats) {
 						this.reload();
-					}else
-					{
+					} else {
 						this.removeEvent(event.domId);
 						delete event.domId;
 
-						if(calendar_visible)
-						{
+						if(calendar_visible) {
 							event.startDate = Date.parseDate(event.start_time, this.dateTimeFormat).add(Date.DAY, obj.offset);
 							event.endDate = Date.parseDate(event.end_time, this.dateTimeFormat).add(Date.DAY, obj.offset);
 							event.start_time=event.startDate.format(this.dateTimeFormat);
