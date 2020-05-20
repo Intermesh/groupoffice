@@ -2,6 +2,7 @@
 - Core: 6.4.141 Quota cronjob not displayed correct #580
 - Tasks: left panel is resizable
 - Core: fixed disapearing notifications
+- Address book: Export -> Labels didn't download
 
 15-05-2020 6.4.141
 - E-mail: Attachments from and to items filters out entities that doesn't support that
