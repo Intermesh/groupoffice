@@ -222,6 +222,6 @@ views/Extjs3/javascript/calendar/EventEditWindow.js
 views/Extjs3/javascript/calendar/EventRecord.js
 views/Extjs3/javascript/calendar/WeekEventRenderer.js
 
-
+views/Extjs3/javascript/links/LinkViewWindow.js
 
 
