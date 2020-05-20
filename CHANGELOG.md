@@ -1,5 +1,11 @@
+20-05-2020 6.4.142
 - Core: Updated Polish and Croatian translation
 - Core: 6.4.141 Quota cronjob not displayed correct #580
+- Tasks: left panel is resizable
+- Core: fixed disapearing notifications
+- Address book: Export -> Labels didn't download
+- Address book: contacts filter also showed organizations
+- Projects: Fixed project example file and automatically find's contact and customer from address book
 
 15-05-2020 6.4.141
 - E-mail: Attachments from and to items filters out entities that doesn't support that
