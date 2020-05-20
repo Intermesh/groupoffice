@@ -293,7 +293,7 @@ $filetype: (
 	doc: (docx, doc, sxq, odt),
 	zip: (zip, tar, gz, tgz, rar, bz, dat),
 	ics: (ics, vcs),
-	todo: vcf,
+	vcf: vcf,
 	txt: txt,
 	ppt: (odp, pps, ppsx, ppt, pptx),
 	html: (html, htm),
@@ -301,8 +301,10 @@ $filetype: (
 	php: php,
 	js: js,
 	sql: sql,
-	xml: xml
+	xml: xml,
+	kdbx: kdbx
 );
+
 @each $img, $extensions in $filetype {
 	@if type-of($extensions) == 'list' {
 		@each $extension in $extensions {
