@@ -1,3 +1,7 @@
+6.4.143
+
+- Calendar: add 'send email' dialog to context menu actions on appointments 
+
 20-05-2020 6.4.142
 - Core: Updated Polish and Croatian translation
 - Core: 6.4.141 Quota cronjob not displayed correct #580
