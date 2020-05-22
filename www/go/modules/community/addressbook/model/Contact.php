@@ -502,11 +502,33 @@ class Contact extends AclItemEntity {
 										->addText("org", function(Criteria $criteria, $comparator, $value, Query $query) {												
 											if( !$query->isJoined('addressbook_contact', 'org')) {
 												$query->join('core_link', 'l', 'c.id=l.fromId and l.fromEntityTypeId = '.self::entityType()->getId())						
-													->join('addressbook_contact', 'org', 'org.id=l.toId AND l.toEntityTypeId=' . self::entityType()->getId() . ' AND org.isOrganization=true');
+													->join('addressbook_contact', 'org', 'org.id = l.toId AND l.toEntityTypeId=' . self::entityType()->getId() . ' AND org.isOrganization=true');
 											}
 											$criteria->where('org.name', $comparator, $value);
-											
 										})
+
+										->addText("orgCity", function(Criteria $criteria, $comparator, $value, Query $query) {
+											if( !$query->isJoined('addressbook_contact', 'org')) {
+												$query->join('core_link', 'l', 'c.id=l.fromId and l.fromEntityTypeId = '.self::entityType()->getId())
+													->join('addressbook_contact', 'org', 'org.id = l.toId AND l.toEntityTypeId=' . self::entityType()->getId() . ' AND org.isOrganization=true');
+											}
+											if(!$query->isJoined('addressbook_address', 'orgAdr')) {
+												$query->join('addressbook_address', 'orgAdr', 'orgAdr.contactId = org.id', "LEFT");
+											}
+											$criteria->where('orgAdr.city', $comparator, $value);
+										})
+
+										->addText("orgCountry", function(Criteria $criteria, $comparator, $value, Query $query) {
+											if( !$query->isJoined('addressbook_contact', 'org')) {
+												$query->join('core_link', 'l', 'c.id=l.fromId and l.fromEntityTypeId = '.self::entityType()->getId())
+													->join('addressbook_contact', 'org', 'org.id = l.toId AND l.toEntityTypeId=' . self::entityType()->getId() . ' AND org.isOrganization=true');
+											}
+											if(!$query->isJoined('addressbook_address', 'orgAdr')) {
+												$query->join('addressbook_address', 'orgAdr', 'orgAdr.contactId = org.id', "LEFT");
+											}
+											$criteria->where('orgAdr.country', $comparator, $value);
+										})
+
 										->addText("city", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_address', 'adr')) {
 												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");

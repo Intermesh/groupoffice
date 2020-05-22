@@ -460,8 +460,6 @@ abstract class Base extends Model {
 	 * @param Filters $filter
 	 */
 	public function defineFilter(Filters $filters) {
-		
-		
 		$filters->addText($this->field->databaseName, function(Criteria $criteria, $comparator, $value, Query $query, array $filter){
 			$this->joinCustomFieldsTable($query);						
 			$criteria->where('customFields.' . $this->field->databaseName, $comparator, $value);
