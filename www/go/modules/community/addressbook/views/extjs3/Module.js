@@ -49,6 +49,7 @@ go.Modules.register("community", "addressbook", {
 		 */
 		filters: [
 			{
+				wildcards: false,
 				name: 'text',
 				type: "string",
 				multiple: false,

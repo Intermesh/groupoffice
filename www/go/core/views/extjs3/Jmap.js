@@ -50,6 +50,13 @@ go.Jmap = {
 				while(r = response.shift()) {
 					var method = r.shift();
 					r.push(clientCallId);
+					//escape % for console.log
+					r = r.map(function(i) {
+						if(Ext.isString(i)) {
+							i = i.replace(/%/g, "%%");
+						}
+						return i;
+					});
 					console[method].apply(null, r);
 				}
 
