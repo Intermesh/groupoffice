@@ -1,4 +1,115 @@
 
+go.toolbar.SearchField = Ext.extend(GO.form.ComboBox, {
+	sep: ' ',
+	name: 'text',
+	valueField: 'value',
+	displayField: 'display',
+	mode: 'local',
+	typeAhead: false,
+	autoSelect: false,
+	getCursorPosition: function(){
+
+		if (document.selection) { // IE
+			var r = document.selection.createRange();
+			if(!r)
+				return false;
+
+			var d = r.duplicate();
+
+			if(!this.el.dom)
+				return false;
+
+			d.moveToElementText(this.el.dom);
+			d.setEndPoint('EndToEnd', r);
+			return d.text.length;
+		}
+		else {
+			return this.el.dom.selectionEnd;
+		}
+	},
+
+	getActiveRange: function(){
+		var s = this.sep;
+		var p = this.getCursorPosition();
+		var v = this.getRawValue();
+		var left = p;
+		while (left > 0 && v.charAt(left) != s) {
+			--left;
+		}
+		if (left > 0) {
+			left++;
+		}
+		return {
+			left: left,
+			right: p
+		};
+	},
+
+	getActiveEntry: function(){
+		var r = this.getActiveRange();
+		return this.getRawValue().substring(r.left, r.right).trim();//.replace(/^s+|s+$/g, '');
+	},
+
+	replaceActiveEntry: function(value){
+		var r = this.getActiveRange();
+		var v = this.getRawValue();
+		if (this.preventDuplicates && v.indexOf(value) >= 0) {
+			return;
+		}
+		var pad =  (this.sep == ' ' ? '' : ' ');
+		this.setValue(v.substring(0, r.left) + (r.left > 0 ? pad : '') + value + this.sep + pad + v.substring(r.right));
+
+		var p = r.left + value.length + 2 + pad.length;
+		//this.selectText.defer(200, this, [p, p]);
+	},
+
+
+	onSelect: function(record, index){
+		if (this.fireEvent('beforeselect', this, record, index) !== false) {
+			var value = Ext.util.Format.htmlDecode(record.data[this.valueField || this.displayField]);
+			this.replaceActiveEntry(value);
+			this.collapse();
+			this.fireEvent('select', this, record, index);
+		}
+	},
+
+	getValue : function() {
+		return this.getRawValue();
+	},
+
+	initQuery: function(){
+		if(this.getEl().id === document.activeElement.id)
+			this.doQuery(this.getActiveEntry() );
+
+//    	if(this.focused)
+//        this.doQuery(this.sep ? this.getActiveEntry() : this.getRawValue());
+	},
+	onLoad : function(){
+		if(!this.hasFocus){
+			return;
+		}
+		if(this.store.getCount() > 0 || this.listEmptyText){
+			this.expand();
+			this.restrictHeight();
+			if(this.lastQuery == this.allQuery){
+
+				if(this.autoSelect !== false && !this.selectByValue(this.value, true)){
+					this.select(0, true);
+				}
+			}else{
+				if(this.autoSelect !== false){
+					this.selectNext();
+				}
+				if(this.typeAhead && this.lastKey != Ext.EventObject.BACKSPACE && this.lastKey != Ext.EventObject.DELETE){
+					this.taTask.delay(this.typeAheadDelay);
+				}
+			}
+		}else{
+			this.collapse();
+		}
+
+	}
+});
 
 /**
  * Search button
@@ -82,13 +193,16 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 
 		var me = this;
 
-		this.triggerField = new Ext.form.TriggerField({
-			xtype: 'trigger',
+		this.triggerField = new go.toolbar.SearchField({
 			validationEvent: false,
 			validateOnBlur: false,
 			spellCheck: false,
 			triggerClass: 'x-form-search-trigger',
 			value: this.query,
+			store: new Ext.data.ArrayStore({
+				fields: ['display', 'value'],
+				id: 'value'
+			}),
 			listeners: {				
 				specialkey: function (field, e) {					
 					if (e.getKey() == Ext.EventObject.ENTER) {
@@ -257,8 +371,12 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 				if(f.name != 'text' && !f.customfield) {
 					names.push(name);
 				}
+
+				this.triggerField.store.loadData([[f.title, name + ":"]], true);
+
 			}
-			
+
+
 			if(names.length) {
 			
 				var msg = t("You can use these keywords:<br /><br />") + names.join(", ") + "<br /><br />";
@@ -279,9 +397,6 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 				});
 			}
 		}
-
-		
-		
 		
 		go.toolbar.SearchButton.superclass.onRender.call(this, ct, position);
 
