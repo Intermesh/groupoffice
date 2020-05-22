@@ -28,7 +28,7 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 			displayField: 'title',
 			mode: 'local',
 			triggerAction: 'all',
-			editable: false,
+			editable: true,
 			selectOnFocus: true,
 			forceSelection: true,
 			allowBlank: false,

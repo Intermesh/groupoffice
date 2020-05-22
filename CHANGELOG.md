@@ -1,4 +1,5 @@
 6.4.143
+- Address book: Added organization city and organization country to contact filters
 - Address book: Improved simple text search by using global search cache
 - Calendar: add 'send email' dialog to context menu actions on appointments 
 - Address book: Address books searching and sorting in the combo when editing contacts
