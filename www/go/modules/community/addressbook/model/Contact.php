@@ -635,21 +635,6 @@ class Contact extends AclItemEntity {
 	public static function converters() {
 		return array_merge(parent::converters(), [VCard::class, Csv::class]);
 	}
-
-	protected static function textFilterColumns() {
-		return ['name', 'debtorNumber', 'notes', 'emailAddresses.email', 'addresses.zipCode'];
-	}
-
-	protected static function search(Criteria $criteria, $expression, Query $query)
-	{
-		if(!$query->isJoined('addressbook_email_address', 'emailAddresses')) {
-			$query->join('addressbook_email_address', 'emailAddresses', 'emailAddresses.contactId = c.id', 'LEFT')->groupBy(['c.id']);
-		}
-    if(!$query->isJoined('addressbook_address', 'addresses')) {
-      $query->join('addressbook_address', 'addresses', 'addresses.contactId = c.id', 'LEFT')->groupBy(['c.id']);
-    }
-		return parent::search($criteria, $expression, $query);
-	}
 	
 	public function getUid() {
 		
@@ -763,10 +748,10 @@ class Contact extends AclItemEntity {
 	private static function prepareFindOrganizations() {
 		if(!isset(self::$organizationIdsStmt)) {
 			self::$organizationIdsStmt = self::find()
-			->selectSingleValue('c.id')
-			->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::entityType()->getId())
-			->where('fromId = :contactId')
-				->andWhere('fromEntityTypeId = '. self::entityType()->getId())
+				->selectSingleValue('c.id')
+				->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = ' . self::entityType()->getId())
+				->where('fromId = :contactId')
+				->andWhere('fromEntityTypeId = ' . self::entityType()->getId())
 				->andWhere('c.isOrganization = true')
 				->createStatement();
 		}
@@ -854,8 +839,21 @@ class Contact extends AclItemEntity {
 		foreach($this->emailAddresses as $e) {
 			$keywords[] = $e->email;
 		}
+		foreach($this->phoneNumbers as $e) {
+			$keywords[] = preg_replace("/[^0-9+]/", "", $e->number);
+		}
 		if(!$this->isOrganization) {
 			$keywords = array_merge($keywords, $this->findOrganizations()->selectSingleValue('name')->all());
+		}
+
+		foreach($this->addresses as $address) {
+			if(!empty($address->country)) {
+				$keywords[] = $address->country;
+			}
+
+			if(!empty($address->city)) {
+				$keywords[] = $address->city;
+			}
 		}
 
 		return $keywords;

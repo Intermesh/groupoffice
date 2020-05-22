@@ -2,6 +2,8 @@
 
 - Calendar: add 'send email' dialog to context menu actions on appointments 
 
+- Address book: Address books searching and sorting in the combo when editing contacts
+
 20-05-2020 6.4.142
 - Core: Updated Polish and Croatian translation
 - Core: 6.4.141 Quota cronjob not displayed correct #580
