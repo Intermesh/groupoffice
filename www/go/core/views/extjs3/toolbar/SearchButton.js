@@ -364,38 +364,18 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		
 		if(this.store && this.store.entityStore) {
 			
-			var names =  [], f;
+			var f;
 			
 			for ( var name in this.store.entityStore.entity.filters) {
 				f = this.store.entityStore.entity.filters[name];
-				if(f.name != 'text' && !f.customfield) {
-					names.push(name);
+				var v = name + ":";
+				if(f.type == "date") {
+					v += '>' + (new Date()).format("Y-m-d");
 				}
-
-				this.triggerField.store.loadData([[f.title, name + ":"]], true);
-
+				this.triggerField.store.loadData([[f.title, v]], true);
 			}
 
-
-			if(names.length) {
-			
-				var msg = t("You can use these keywords:<br /><br />") + names.join(", ") + "<br /><br />";
-
-				msg += t("And any custom field by 'databaseName'.") + "<br /><br />";
-
-				msg += t("For example:<br /><br />modifiedBy: \"John Doe\" modifiedBy: Foo%");
-
-				if(names.indexOf('modified') > -1) {
-					msg += " modified: >2019-01-31 23:59 modified: <2019-02-01";
-				}
-
-				Ext.QuickTips.register({
-					target: this.triggerField.getEl(),
-					title: t("Advanced search options"),
-					text: msg,				
-					dismissDelay: 10000 // Hide after 10 seconds hover
-				});
-			}
+			// console.warn(this.store.entityStore.entity.filters);
 		}
 		
 		go.toolbar.SearchButton.superclass.onRender.call(this, ct, position);

@@ -12,7 +12,7 @@ go.util.Filters = {
 			f.name = f.name.toLowerCase();
 			normalized[f.name] = f;
 			if(!Ext.isDefined(normalized[f.name].wildcards)){
-				normalized[f.name].wildcards = normalized[f.name] == "string" && f.name != 'text';
+				normalized[f.name].wildcards = normalized[f.name].type == "string" && f.name != 'text';
 			}
 		});
 		
