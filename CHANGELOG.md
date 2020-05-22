@@ -1,7 +1,6 @@
 6.4.143
-
+- Address book: Improved simple text search by using global search cache
 - Calendar: add 'send email' dialog to context menu actions on appointments 
-
 - Address book: Address books searching and sorting in the combo when editing contacts
 
 20-05-2020 6.4.142
