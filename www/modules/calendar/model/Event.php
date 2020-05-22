@@ -330,7 +330,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 
 	
 		if(!$exception->save()){
-			throw new Exception("Event exception not saved: ".var_export($exception->getValidationErrors(), true));
+			throw new \Exception("Event exception not saved: ".var_export($exception->getValidationErrors(), true));
 		}
 			
 		

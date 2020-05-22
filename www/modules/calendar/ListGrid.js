@@ -344,15 +344,11 @@ Ext.extend(GO.calendar.ListGrid, Ext.grid.GridPanel, {
 			{
 				var calendars = Ext.decode(this.store.baseParams['calendars']);
 				
-				if(!obj.isCopy)
-				{
+				if(!obj.isCopy) {
 					this.store.reload();
-				}else
-				{
-					for(var i=0,found=false; i<calendars.length && !found; i++)
-					{
-						if(calendars[i] == obj.event.calendar_id)
-						{
+				} else {
+					for(var i=0,found=false; i<calendars.length && !found; i++) {
+						if(calendars[i] == obj.event.calendar_id) {
 							found = true;
 							this.store.reload();
 						}
