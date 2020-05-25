@@ -1751,22 +1751,26 @@ table[id^="comments-ext"] b {
 
 
 .go-form-group {
-	.x-panel-bbar .x-toolbar {
-		border-top: 0;
+
+
+	.x-panel-bbar {
+		overflow: visible;
+		.x-toolbar {
+			border-top: 0;
+		}
+
+		.x-btn-text {
+			font-weight: normal;
+			@include var(color, c-primary);
+		}
 	}
 
 	.x-toolbar {
-		margin-left: dp(-8);
+		margin-left: dp(-16);
 	}
 	margin-bottom: dp(16);
 	
-	.x-btn-text {
-		font-weight: normal;
-	}
-	
-/*	.x-btn-text-icon button::before {
-		padding-right: dp(16);
-	}*/
+
 }
 
 
@@ -1814,7 +1818,7 @@ table[id^="comments-ext"] b {
 .go-html-formatted  blockquote {  
   display: block;  
   margin: 1em 40px;  
-  padding:0px 10px;
+  pading:0px 10px;
 }
 
 .go-html-formatted td {   

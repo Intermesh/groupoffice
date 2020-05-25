@@ -5,6 +5,11 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 
 	initComponent: function () {
 		this.filters = Object.values(go.Entities.get(this.entity).filters);
+		this.filters.push({
+			name: "subconditions",
+			title: t("Sub conditions"),
+			type: go.filter.types.subconditions
+		});
 
 		this.filters.columnSort('title');
 
@@ -63,6 +68,10 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 			var filter = this.filters.find(function(f) {
 				return v.name == f.name
 			});
+
+			if(!filter) {
+				return;
+			}
 
 			this.switchCondition(filter);
 		}

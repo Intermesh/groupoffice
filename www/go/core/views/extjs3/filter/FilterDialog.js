@@ -28,7 +28,6 @@ go.filter.FilterDialog = Ext.extend(go.form.Dialog, {
 				xtype: 'filterfieldset',
 				entity: this.entity
 			}
-
 		];
 	}
 });

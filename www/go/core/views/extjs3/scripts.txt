@@ -234,6 +234,7 @@ filter/types/string.js
 filter/types/number.js
 filter/types/date.js
 filter/types/select.js
+filter/types/subconditions.js
 filter/FilterGrid.js
 filter/FilterDialog.js
 
