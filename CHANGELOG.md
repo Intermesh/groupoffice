@@ -3,6 +3,7 @@
 - Address book: Improved simple text search by using global search cache
 - Calendar: add 'send email' dialog to context menu actions on appointments 
 - Address book: Address books searching and sorting in the combo when editing contacts
+- Core: filters can have sub groups making complex filters possibl. For example where conditionA and not conditionB 
 
 20-05-2020 6.4.142
 - Core: Updated Polish and Croatian translation
