@@ -330,7 +330,7 @@ class Installer {
 		
 		$unavailable = go()->getInstaller()->getUnavailableModules();
 		if(!empty($unavailable)) {
-			throw new \Exception("There are unavailable modules");
+			throw new \Exception("There are unavailable modules: " . var_export($unavailable, true));
 		}
 
 		$lock = new Lock("upgrade");
