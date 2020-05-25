@@ -501,16 +501,16 @@ class Contact extends AclItemEntity {
 										})
 										->addText("org", function(Criteria $criteria, $comparator, $value, Query $query) {												
 											if( !$query->isJoined('addressbook_contact', 'org')) {
-												$query->join('core_link', 'l', 'c.id=l.fromId and l.fromEntityTypeId = '.self::entityType()->getId())						
-													->join('addressbook_contact', 'org', 'org.id = l.toId AND l.toEntityTypeId=' . self::entityType()->getId() . ' AND org.isOrganization=true');
+												$query->join('core_link', 'l', 'c.id=l.fromId and l.fromEntityTypeId = '.self::entityType()->getId() . ' AND l.toEntityTypeId=' . self::entityType()->getId(), 'LEFT')
+													->join('addressbook_contact', 'org', 'org.id = l.toId AND org.isOrganization=true', 'LEFT');
 											}
 											$criteria->where('org.name', $comparator, $value);
 										})
 
 										->addText("orgCity", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if( !$query->isJoined('addressbook_contact', 'org')) {
-												$query->join('core_link', 'l', 'c.id=l.fromId and l.fromEntityTypeId = '.self::entityType()->getId())
-													->join('addressbook_contact', 'org', 'org.id = l.toId AND l.toEntityTypeId=' . self::entityType()->getId() . ' AND org.isOrganization=true');
+												$query->join('core_link', 'l', 'c.id=l.fromId and l.fromEntityTypeId = '.self::entityType()->getId() . ' AND l.toEntityTypeId=' . self::entityType()->getId() , 'LEFT')
+													->join('addressbook_contact', 'org', 'org.id = l.toId AND org.isOrganization=true', 'LEFT');
 											}
 											if(!$query->isJoined('addressbook_address', 'orgAdr')) {
 												$query->join('addressbook_address', 'orgAdr', 'orgAdr.contactId = org.id', "LEFT");
@@ -520,8 +520,8 @@ class Contact extends AclItemEntity {
 
 										->addText("orgCountry", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if( !$query->isJoined('addressbook_contact', 'org')) {
-												$query->join('core_link', 'l', 'c.id=l.fromId and l.fromEntityTypeId = '.self::entityType()->getId())
-													->join('addressbook_contact', 'org', 'org.id = l.toId AND l.toEntityTypeId=' . self::entityType()->getId() . ' AND org.isOrganization=true');
+												$query->join('core_link', 'l', 'c.id=l.fromId and l.fromEntityTypeId = '.self::entityType()->getId() . ' AND l.toEntityTypeId=' . self::entityType()->getId(), 'LEFT')
+													->join('addressbook_contact', 'org', 'org.id = l.toId AND org.isOrganization=true', 'LEFT');
 											}
 											if(!$query->isJoined('addressbook_address', 'orgAdr')) {
 												$query->join('addressbook_address', 'orgAdr', 'orgAdr.contactId = org.id', "LEFT");

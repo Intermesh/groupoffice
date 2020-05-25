@@ -72,7 +72,7 @@ class Contact extends Base {
 			} else{
 				//for text queries we must join the options.
 				$alias = 'opt_' . $this->field->id;
-				$query->join('addressbook_contact', $alias, $alias . '.id = customFields.' . $this->field->databaseName);
+				$query->join('addressbook_contact', $alias, $alias . '.id = customFields.' . $this->field->databaseName, 'LEFT');
 				$criteria->where($alias . '.name', $comparator, $value);
 			}
 		});

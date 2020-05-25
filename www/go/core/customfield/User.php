@@ -65,7 +65,7 @@ class User extends Base {
 			} else{
 				//for text queries we must join the options.
 				$alias = 'opt_' . $this->field->id;
-				$query->join('core_user', $alias, $alias . '.id = customFields.' . $this->field->databaseName);
+				$query->join('core_user', $alias, $alias . '.id = customFields.' . $this->field->databaseName, 'LEFT');
 				$criteria->where($alias . '.displayName', $comparator, $value);
 			}
 		});

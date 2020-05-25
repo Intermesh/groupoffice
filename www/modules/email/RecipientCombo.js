@@ -5,6 +5,8 @@ GO.email.RecipientCombo = Ext.extend(GO.form.ComboBoxMulti, {
 	flex: 1,
 	valueField: 'full_email',
 	displayField: 'full_email',
+	hideTrigger: true,
+	textarea: true,
 
 	initComponent: function () {
 
