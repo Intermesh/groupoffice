@@ -99,7 +99,7 @@ go.filter.types.subconditions = Ext.extend(Ext.Button, {
 			}
 		})
 
-		this.setText(c.length ? c.join( " " + v.operator + " ") : t("Emtpy"));
+		this.setText(c.length ? v.operator + " " + c.join( " " + v.operator + " ") : t("Emtpy"));
 	},
 	getValue: function() {
 		return this.value;
