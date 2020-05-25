@@ -140,7 +140,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 
 				switch (notSaved[id].type) {
 					case "forbidden":
-						Ext.MessageBox.alert(t("Access denied"), t("Sorry, you don't have permissions to update me item"));
+						Ext.MessageBox.alert(t("Access denied"), t("Sorry, you don't have permissions to update this item"));
 						break;
 
 					default:
