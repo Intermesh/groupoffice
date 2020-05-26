@@ -62,17 +62,6 @@ try {
 			
 		echo "<h2>Upgrading Group-Office</h2><pre>";
 
-
-		if(count($unavailable)) {
-			
-			$where = (new Query);
-			foreach($unavailable as $m) {
-				$where->orWhere($m);
-			}
-			$stmt = go()->getDbConnection()->update("core_module", ['enabled' => false], $where);
-			$stmt->execute();
-		}	
-
 		go()->getInstaller()->upgrade();	
 
 		echo "</pre></div>";

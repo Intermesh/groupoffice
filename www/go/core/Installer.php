@@ -312,6 +312,20 @@ class Installer {
 		
 	}
 
+	public function disableUnavailableModules() {
+
+		$unavailable = $this->getUnavailableModules();
+		if(count($unavailable)) {
+
+			$where = (new Query);
+			foreach($unavailable as $m) {
+				$where->orWhere($m);
+			}
+			$stmt = go()->getDbConnection()->update("core_module", ['enabled' => false], $where);
+			$stmt->execute();
+		}
+	}
+
 	public function upgrade() {
 		self::$isInProgress = true;
 		self::$isUpgrading = true;
@@ -328,10 +342,12 @@ class Installer {
 		\GO::clearCache(); //legacy framework
 		go()->setCache(new None());
 		
-		$unavailable = go()->getInstaller()->getUnavailableModules();
-		if(!empty($unavailable)) {
-			throw new \Exception("There are unavailable modules: " . var_export($unavailable, true));
-		}
+//		$unavailable = go()->getInstaller()->getUnavailableModules();
+//		if(!empty($unavailable)) {
+//			throw new \Exception("There are unavailable modules: " . var_export($unavailable, true));
+//		}
+
+		$this->disableUnavailableModules();
 
 		$lock = new Lock("upgrade");
 		if (!$lock->lock()) {
