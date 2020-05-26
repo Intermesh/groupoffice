@@ -23,7 +23,7 @@ GO.form.ComboBoxMulti = function(config){
 	
 	config = config || {};
 
-	Ext.apply(config, this);
+	Ext.apply(this, config);
 
 
 	if(this.textarea) {
