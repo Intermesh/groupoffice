@@ -1,4 +1,5 @@
 25-05-2020 6.4.143
+- Core: error when loading more items in link browser fixed
 - Address book: Added organization city and organization country to contact filters
 - Address book: Improved simple text search by using global search cache
 - Calendar: add 'send email' dialog to context menu actions on appointments 
