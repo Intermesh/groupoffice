@@ -8,7 +8,7 @@ use go\core\db\Query;
 
 /**
  * Class PushDispatcher
- * This is use by the sse.php endpoint.
+ * This is used by the sse.php endpoint.
  * It dispatches server sent events to the client
  * It fires an 'interval' event every time it checks for updates
  * @package go\core\model
@@ -84,8 +84,8 @@ class PushDispatcher
 		$end->add($halfInterval);
 
 		$alerts = Alert::find()->where('userId','=', go()->getUserId())
-			->andWhere('triggerAt', '>', $start)
-			->andWhere('triggerAt', '<', $end)->all();
+			->andWhere('triggerAt', '<', $start)
+			->andWhere('sentAt', 'IS', null)->all();
 
 		//$this->sendMessage('test', ['alerts'=>$alerts, 'start'=>$start, 'end'=>$end]);
 		foreach($alerts as $alert) {
@@ -93,6 +93,8 @@ class PushDispatcher
 			$data['entityType'] = $this->entityTypes[$alert->entityTypeId];
 			unset($data['enittyTypeId']);
 			$this->sendMessage('alert', $data);
+			$alert->sentAt = new \DateTime();
+			$alert->save();
 			// delete alert here and remove the triggerAt end time??
 		}
 	}

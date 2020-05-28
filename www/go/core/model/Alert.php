@@ -13,6 +13,7 @@ class Alert extends Entity
 
 	public $userId;
 	public $triggerAt;
+	public $sentAt;
 	public $recurrenceId;
 	public $alertId;
 

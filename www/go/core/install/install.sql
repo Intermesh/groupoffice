@@ -906,6 +906,7 @@ CREATE TABLE `core_alert` (
   `entityId` INT NOT NULL,
   `userId` INT NOT NULL,
   `triggerAt` DATETIME NOT NULL,
+  `sentAt` DATETIME NULL,
   `alertId` INT NOT NULL,
   `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
   PRIMARY KEY (`id`),

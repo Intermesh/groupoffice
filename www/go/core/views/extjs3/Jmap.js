@@ -306,11 +306,13 @@ go.Jmap = {
 				var data = JSON.parse(e.data);
 				go.Db.store(data.entityType).single(data.entityId).then(function(entity) {
 					go.Notifier.flyout({
-						title: entity.title | entity.name || entity.subject || entity.description,
+						title: t(data.entityType),
+						html: entity.title || entity.name || entity.subject || entity.description,
 						buttons: [{
 							text: 'Open',
 							handler: function() {
-								alert('biem');
+								var window = new go.links.LinkDetailWindow({entity:data.entityType});
+								window.load(data.entityId).show();
 							}
 						}]
 					});
