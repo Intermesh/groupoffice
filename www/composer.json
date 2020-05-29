@@ -30,7 +30,10 @@
 	"defuse/php-encryption": "^2.1",
 	"html2text/html2text": "^4.1",
 	"sabre/vobject": "^4.2",
-	"phpseclib/mcrypt_compat": "^1.0"
+	"phpseclib/mcrypt_compat": "^1.0",
+		"league/oauth2-server": "^8.1",
+		"guzzlehttp/psr7": "^1.6",
+		"steverhoades/oauth2-openid-connect-server": "^1.2"
     },
 	"license": "AGPL",
 	"authors": [
