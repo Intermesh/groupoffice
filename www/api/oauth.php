@@ -72,7 +72,7 @@ class OAuthController {
 		try {
 			// Validate the HTTP request and return an AuthorizationRequest object.
 			// The auth request object can be serialized into a user's session
-demo			$authRequest = $_SESSION['authRequest'] ?? $server->validateAuthorizationRequest($request);
+			$authRequest = $_SESSION['authRequest'] ?? $server->validateAuthorizationRequest($request);
 
 			unset($_SESSION['authRequest']);
 
