@@ -72,26 +72,25 @@ class OAuthController {
 		try {
 			// Validate the HTTP request and return an AuthorizationRequest object.
 			// The auth request object can be serialized into a user's session
-			$authRequest = $server->validateAuthorizationRequest($request);
+demo			$authRequest = $_SESSION['authRequest'] ?? $server->validateAuthorizationRequest($request);
 
-			//\League\OAuth2\Server\ResponseTypes\RedirectResponse::class;
+			unset($_SESSION['authRequest']);
 
-//			if(!go()->getAuthState()->isAuthenticated()) {
-//				$_SESSION['authRequest'] = $authRequest;
-//				$authRedirectUrl = $_SERVER['PHP_SELF'] . '/authorize';
-//
-//				$loginUrl = dirname(dirname($_SERVER['PHP_SELF']) . '?authRedirectUrl=' . urlencode($authRedirectUrl);
-//				return $response->withStatus(302)->withHeader('Location', $loginUrl);
-//			}
-//
-//			$user = go()->getAuthState()->getUser(['username', 'displayName', 'id', 'email', 'modifiedAt']);
-//			$authRequest->setUser(new \go\core\oauth\server\entities\UserEntity($user));
+			if(!go()->getAuthState()->isAuthenticated()) {
+				$_SESSION['authRequest'] = $authRequest;
+				$authRedirectUrl = $_SERVER['PHP_SELF'] . '/authorize';
+
+				$loginUrl = dirname(dirname(dirname($_SERVER['PHP_SELF']))) . '?authRedirectUrl=' . urlencode($authRedirectUrl);
+				return $response->withStatus(302)->withHeader('Location', $loginUrl);
+			}
+
+			$user = go()->getAuthState()->getUser(['username', 'displayName', 'id', 'email', 'modifiedAt']);
+			$authRequest->setUser(new \go\core\oauth\server\entities\UserEntity($user));
 
 
-			$userRepository = new repositories\UserRepository();
-			$userEntity = $userRepository->getUserEntityByIdentifier(2);
-
-			$authRequest->setUser($userEntity);
+//			$userRepository = new repositories\UserRepository();
+//			$userEntity = $userRepository->getUserEntityByIdentifier(2);
+//			$authRequest->setUser($userEntity);
 
 			// Once the user has approved or denied the client update the status
 			// (true = approved, false = denied)
@@ -111,24 +110,24 @@ class OAuthController {
 		}
 	}
 
-	private function validateResourceRequest(\Psr\Http\Message\RequestInterface $request, \Psr\Http\Message\ResponseInterface $response) {
-
-
-		// Init our repositories
-		$accessTokenRepository = new repositories\AccessTokenRepository(); // instance of AccessTokenRepositoryInterface
-
-// Path to authorization server's public key
-		$publicKeyPath = 'file://' . go()->getEnvironment()->getInstallPath() . '/public.key';
-
-// Setup the authorization server
-		$server = new \League\OAuth2\Server\ResourceServer(
-			$accessTokenRepository,
-			$publicKeyPath
-		);
-
-		return $server->validateAuthenticatedRequest($request);
-
-	}
+//	private function validateResourceRequest(\Psr\Http\Message\RequestInterface $request, \Psr\Http\Message\ResponseInterface $response) {
+//
+//
+//		// Init our repositories
+//		$accessTokenRepository = new repositories\AccessTokenRepository(); // instance of AccessTokenRepositoryInterface
+//
+//// Path to authorization server's public key
+//		$publicKeyPath = 'file://' . go()->getEnvironment()->getInstallPath() . '/public.key';
+//
+//// Setup the authorization server
+//		$server = new \League\OAuth2\Server\ResourceServer(
+//			$accessTokenRepository,
+//			$publicKeyPath
+//		);
+//
+//		return $server->validateAuthenticatedRequest($request);
+//
+//	}
 
 
 	private function validateAccessToken($jwt) {
@@ -172,17 +171,6 @@ class OAuthController {
 	public function userinfo() {
 
 		$token = $this->validateAccessToken($_REQUEST['access_token']);
-
-//		$request = \GuzzleHttp\Psr7\ServerRequest::fromGlobals();
-//		$response = new \GuzzleHttp\Psr7\Response();
-//
-//		$accessTokenId = $_REQUEST['access_token'];
-//
-//		$token = \go\core\oauth\server\entities\AccessTokenEntity::findById($accessTokenId);
-//		if(!$token) {
-//			return (new OAuthServerException("Not found", 0, 'unknown_error', 500))
-//				->generateHttpResponse($response);
-//		}
 
 		$userId = $token->getClaim('sub');
 
