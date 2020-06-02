@@ -1,5 +1,6 @@
 - Core: Render issue with hidden HTML custom field
 - Newsletters: Sometimes errors were reported with an incorrect email address
+- Email: Aliases didn't show without manage permissions
 
 25-05-2020 6.4.143
 - Core: error when loading more items in link browser fixed

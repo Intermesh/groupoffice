@@ -647,6 +647,12 @@ class Contact extends AclItemEntity {
 			unset($sort['lastName'], $sort['lastName']);
 			$sort['firstName'] = $dir;
 		}
+
+		if(isset($sort['birthday'])) {
+			$query->join('addressbook_date', 'birthdaySort', 'birthdaySort.contactId = c.id and birthdaySort.type="birthday"', 'LEFT');
+			$sort['birthdaySort.date'] = $sort['birthday'];
+			unset($sort['birthday']);
+		};
 		
 		return parent::sort($query, $sort);
 	}
