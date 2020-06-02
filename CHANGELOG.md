@@ -1,3 +1,4 @@
+- Address book: Added birthday column
 - Core: Render issue with hidden HTML custom field
 - Newsletters: Sometimes errors were reported with an incorrect email address
 - Email: Aliases didn't show without manage permissions
