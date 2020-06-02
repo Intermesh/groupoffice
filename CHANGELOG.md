@@ -1,3 +1,6 @@
+- Core: Render issue with hidden HTML custom field
+- Newsletters: Sometimes errors were reported with an incorrect email address
+
 25-05-2020 6.4.143
 - Core: error when loading more items in link browser fixed
 - Address book: Added organization city and organization country to contact filters
