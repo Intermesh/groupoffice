@@ -91,9 +91,10 @@ abstract class Entity  extends OrmEntity {
 		$filesPathProperties = $this->filesPathProperties();
 		if(!empty($filesPathProperties)) {
 			if($this->isModified($filesPathProperties)) {
+				$oldFilesFolderId = $this->filesFolderId;
 				$folder = Folder::model()->findForEntity($this, false);
 
-				if($folder->id != $this->filesFolderId) {
+				if($folder->id != $oldFilesFolderId) {
 					$this->filesFolderId = $folder->id;
 					if(!go()->getDbConnection()
 							->update($this->getMapping()->getPrimaryTable()->getName(), 
