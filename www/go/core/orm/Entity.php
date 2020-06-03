@@ -927,21 +927,12 @@ abstract class Entity extends Property {
 	/**
 	 * Check database integrity
    *
+	 * NOTE: this function may not output as it's used by install.php
+	 *
    * @throws Exception
 	 */
 	public static function check() {
-		//NOTE: this function may not output as it's used by install.php
-		if(property_exists(static::class, 'filesFolderId') && Module::isInstalled('legacy', 'files')) {
-			$tables = static::getMapping()->getTables();
-			$table = array_values($tables)[0]->getName();
-			go()->getDbConnection()->update(
-				$table, 
-				['filesFolderId' => null], 
-				(new Query)
-					->tableAlias('entity')
-					->where('filesFolderId', 'NOT IN', (new Query())->select('id')->from('fs_folders'))
-			)->execute();
-		}
+
 	}
 
 
