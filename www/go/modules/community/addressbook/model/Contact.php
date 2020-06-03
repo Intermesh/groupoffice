@@ -324,7 +324,7 @@ class Contact extends AclItemEntity {
 	 * @return string[]
 	 */
 	protected static function filesPathProperties() {
-		return ['addressBookId', 'name'];
+		return ['addressBookId', 'name', 'lastName', 'firstName'];
 	}
 	
 	
