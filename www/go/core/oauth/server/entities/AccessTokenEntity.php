@@ -10,6 +10,8 @@
 namespace go\core\oauth\server\entities;
 
 use go\core\orm\Entity;
+use go\core\orm\Query;
+use go\core\util\DateTime;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\Traits\AccessTokenTrait;
@@ -33,4 +35,8 @@ class AccessTokenEntity extends Entity implements AccessTokenEntityInterface
 	    $this->client = $client;
 	    $this->clientIdentifier = $client->getIdentifier();
     }
+
+		public static function collectGarbage() {
+			return static::delete((new Query)->where('expiryDateTime', '<', new DateTime()));
+		}
 }

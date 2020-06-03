@@ -6,6 +6,7 @@ use ErrorException;
 use Exception;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
+use go\core\oauth\server\entities\AccessTokenEntity;
 use go\core\util\DateTime;
 use go\core\model\CronJob;
 use function GO;
@@ -39,6 +40,7 @@ class GarbageCollection extends CronJob {
 		$this->links();
 
 		Token::collectGarbage();
+		AccessTokenEntity::collectGarbage();
 
 		$this->fireEvent(self::EVENT_RUN);
 	}
