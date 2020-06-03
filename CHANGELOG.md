@@ -1,7 +1,10 @@
+25-05-2020 6.4.144
 - Address book: Added birthday column
 - Core: Render issue with hidden HTML custom field
 - Newsletters: Sometimes errors were reported with an incorrect email address
 - Email: Aliases didn't show without manage permissions
+- Address book / core: Database check fixes mapping of files folders in address book
+- Address book: Upgrade from 6.3 to 6.4 could cause lost mapping of files folder. 
 
 25-05-2020 6.4.143
 - Core: error when loading more items in link browser fixed
