@@ -36,7 +36,7 @@ class OAuthController {
 		$authCodeRepository = new repositories\AuthCodeRepository();
 		$refreshTokenRepository = new repositories\RefreshTokenRepository();
 
-		$privateKeyPath = 'file://' . go()->getEnvironment()->getInstallPath() . '/private.key';
+		$privateKeyPath = 'file://' . $this->getPrivateKeyFile()->getPath();
 
 		// OpenID Connect Response Type
 		$responseType = new \OpenIDConnectServer\IdTokenResponse(new repositories\UserRepository(), new \OpenIDConnectServer\ClaimExtractor());
@@ -129,12 +129,51 @@ class OAuthController {
 //
 //	}
 
+	/**
+	 * @return \go\core\fs\File
+	 * @throws \go\core\exception\ConfigurationException
+	 */
+	private function getPrivateKeyFile() {
+		$file = go()->getDataFolder()->getFile('oauth2/private.key');
+		if(!$file->exists()) {
+			$private = openssl_pkey_new();
+			if(!openssl_pkey_export_to_file($private, $file->getPath())) {
+				throw new \Exception ("Could not create private key file");
+			}
+			$file->chmod(0600);
+
+			$details = openssl_pkey_get_details($private);
+
+			$pubkey = $details["key"];
+			$pubKeyFile = go()->getDataFolder()->getFile('oauth2/public.key');
+			if(!$pubKeyFile->putContents($pubkey)) {
+				throw new \Exception ("Could not create public key file");
+			}
+			$pubKeyFile->chmod(0600);
+		}
+
+
+
+		return $file;
+	}
+
+	/**
+	 * @return \go\core\fs\File
+	 * @throws \go\core\exception\ConfigurationException
+	 */
+	private function getPublicKeyFile() {
+		$file = go()->getDataFolder()->getFile('oauth2/public.key');
+		if(!$file->exists()) {
+			$this->getPrivateKeyFile();
+		}
+		return $file;
+	}
 
 	private function validateAccessToken($jwt) {
 		try {
 			// Attempt to parse and validate the JWT
 			$token = (new Parser())->parse($jwt);
-			$publicKeyPath = 'file://' . go()->getEnvironment()->getInstallPath() . '/public.key';
+			$publicKeyPath = 'file://' . $this->getPublicKeyFile()->getPath();
 //			$publicKey = new CryptKey($publicKeyPath);
 			try {
 				if ($token->verify(new Sha256(), $publicKeyPath) === false) {
