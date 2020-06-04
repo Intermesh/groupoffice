@@ -683,3 +683,37 @@ $updates['202002041223'][] = "ALTER TABLE `core_link` ADD INDEX(`toId`);";
 
 $updates['202004281031'][] = "UPDATE `core_customfields_field` SET `type` = 'FunctionField' WHERE `type` = 'Function';";
 $updates['202004292101'][] ="delete FROM `go_holidays` WHERE region like 'en_uk';";
+
+
+$updates['202006041416'][] = "CREATE TABLE `core_oauth_access_token` (
+`identifier` varchar(128) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `expiryDateTime` datetime DEFAULT NULL,
+  `userIdentifier` int(11) NOT NULL,
+  `clientId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
+$updates['202006041416'][] = "CREATE TABLE `core_oauth_client` (
+`id` int(11) NOT NULL,
+  `identifier` varchar(128) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `isConfidential` tinyint(1) NOT NULL,
+  `name` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `redirectUri` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `secret` varchar(128) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
+$updates['202006041416'][] = "ALTER TABLE `core_oauth_access_token`
+  ADD PRIMARY KEY (`identifier`),
+  ADD KEY `userIdentifier` (`userIdentifier`),
+  ADD KEY `clientId` (`clientId`);";
+
+$updates['202006041416'][] = "ALTER TABLE `core_oauth_client`
+  ADD PRIMARY KEY (`id`);";
+
+$updates['202006041416'][] = "ALTER TABLE `core_oauth_client`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;";
+
+$updates['202006041416'][] = "ALTER TABLE `core_oauth_access_token`
+  ADD CONSTRAINT `core_oauth_access_token_ibfk_2` FOREIGN KEY (`userIdentifier`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_oauth_access_token_ibfk_3` FOREIGN KEY (`clientId`) REFERENCES `core_oauth_client` (`id`) ON DELETE CASCADE;";
