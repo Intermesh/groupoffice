@@ -19,7 +19,12 @@ class ClientRepository implements ClientRepositoryInterface
      */
     public function getClientEntity($clientIdentifier)
     {
-        return OauthClient::find()->where('identifier', '=',  $clientIdentifier)->single();
+        $client = OauthClient::find()->where('identifier', '=',  $clientIdentifier)->single();
+        if(!$client) {
+        	go()->debug("Could not get client '" . $clientIdentifier . "'");
+        }
+
+        return $client;
     }
 
     /**
@@ -34,6 +39,7 @@ class ClientRepository implements ClientRepositoryInterface
 
         if($client->isConfidential() && $client->checkSecret($clientSecret) === false)
         {
+	        go()->debug("Invalid secret for '" . $clientIdentifier . "'");
         	return false;
         }
 
