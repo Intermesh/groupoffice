@@ -59,7 +59,7 @@ class OauthUser implements UserEntityInterface, ClaimSetInterface
 			'phone_number_verified' => true,
 			// address
 			'address' => '',
-			'roles' => $this->user->isAdmin() ? ['admin'] : ['user']
+			//'roles' => $this->user->isAdmin() ? ['admin'] : ['user']
 		];
 	}
 }
