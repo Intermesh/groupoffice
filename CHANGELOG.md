@@ -1,3 +1,5 @@
+- Core: Support for OpenID / OAuth 2.0 so we can integrate with Rocket.Chat
+
 25-05-2020 6.4.144
 - Address book: Added birthday column
 - Core: Render issue with hidden HTML custom field
