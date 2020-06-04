@@ -255,8 +255,10 @@ class OAuthController {
 		try {
 			return $server->respondToAccessTokenRequest($request, $response);
 		} catch (OAuthServerException $exception) {
+			go()->debug($exception);
 			return $exception->generateHttpResponse($response);
 		} catch (Exception $exception) {
+			go()->debug($exception);
 			$body = new StreamAlias(fopen('php://temp', 'r+'));
 			$body->write($exception->getMessage());
 
