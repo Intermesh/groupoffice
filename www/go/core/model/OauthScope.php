@@ -7,13 +7,13 @@
  * @link        https://github.com/thephpleague/oauth2-server
  */
 
-namespace go\core\oauth\server\entities;;
+namespace go\core\model;;
 
 use League\OAuth2\Server\Entities\ScopeEntityInterface;
 use League\OAuth2\Server\Entities\Traits\EntityTrait;
 use League\OAuth2\Server\Entities\Traits\ScopeTrait;
 
-class ScopeEntity implements ScopeEntityInterface
+class OauthScope implements ScopeEntityInterface
 {
     use EntityTrait, ScopeTrait;
 }

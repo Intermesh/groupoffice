@@ -11,7 +11,7 @@ namespace go\core\oauth\server\repositories;;
 
 use League\OAuth2\Server\Entities\RefreshTokenEntityInterface;
 use League\OAuth2\Server\Repositories\RefreshTokenRepositoryInterface;
-use go\core\oauth\server\entities\RefreshTokenEntity;
+use go\core\model\OauthRefreshToken;
 
 class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 {
@@ -44,6 +44,6 @@ class RefreshTokenRepository implements RefreshTokenRepositoryInterface
      */
     public function getNewRefreshToken()
     {
-        return new RefreshTokenEntity();
+        return new OauthRefreshToken();
     }
 }

@@ -9,7 +9,7 @@
 
 namespace go\core\oauth\server\repositories;;
 
-use go\core\oauth\server\entities\ClientEntity;
+use go\core\model\OauthClient;
 use League\OAuth2\Server\Repositories\ClientRepositoryInterface;
 
 class ClientRepository implements ClientRepositoryInterface
@@ -19,7 +19,7 @@ class ClientRepository implements ClientRepositoryInterface
      */
     public function getClientEntity($clientIdentifier)
     {
-        return ClientEntity::findById($clientIdentifier);
+        return OauthClient::find()->where('identifier', '=',  $clientIdentifier)->single();
     }
 
     /**
@@ -27,7 +27,7 @@ class ClientRepository implements ClientRepositoryInterface
      */
     public function validateClient($clientIdentifier, $clientSecret, $grantType)
     {
-        $client = ClientEntity::findById($clientIdentifier);
+        $client = $this->getClientEntity($clientIdentifier);
         if(!$client) {
 					return false;
         }

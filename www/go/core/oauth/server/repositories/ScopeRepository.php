@@ -11,7 +11,7 @@ namespace go\core\oauth\server\repositories;;
 
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
-use go\core\oauth\server\entities\ScopeEntity;
+use go\core\model\OauthScope;
 
 class ScopeRepository implements ScopeRepositoryInterface
 {
@@ -36,7 +36,7 @@ class ScopeRepository implements ScopeRepositoryInterface
             return;
         }
 
-        $scope = new ScopeEntity();
+        $scope = new OauthScope();
         $scope->setIdentifier($scopeIdentifier);
 
         return $scope;
@@ -51,7 +51,7 @@ class ScopeRepository implements ScopeRepositoryInterface
         ClientEntityInterface $clientEntity,
         $userIdentifier = null
     ) {
-        $scope = new ScopeEntity();
+        $scope = new OauthScope();
         $scope->setIdentifier('openid');
         $scopes[] = $scope;
 

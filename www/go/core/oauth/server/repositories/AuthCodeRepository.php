@@ -11,7 +11,7 @@ namespace go\core\oauth\server\repositories;;
 
 use League\OAuth2\Server\Entities\AuthCodeEntityInterface;
 use League\OAuth2\Server\Repositories\AuthCodeRepositoryInterface;
-use go\core\oauth\server\entities\AuthCodeEntity;
+use go\core\model\OauthAuthCode;
 
 class AuthCodeRepository implements AuthCodeRepositoryInterface
 {
@@ -44,6 +44,6 @@ class AuthCodeRepository implements AuthCodeRepositoryInterface
      */
     public function getNewAuthCode()
     {
-        return new AuthCodeEntity();
+        return new OauthAuthCode();
     }
 }

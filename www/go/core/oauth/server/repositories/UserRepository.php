@@ -11,8 +11,7 @@ namespace go\core\oauth\server\repositories;;
 
 use go\core\model\User;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
-use League\OAuth2\Server\Repositories\UserRepositoryInterface;
-use go\core\oauth\server\entities\UserEntity;
+use go\core\model\OauthUser as UserEntity;
 use OpenIDConnectServer\Repositories\IdentityProviderInterface;
 
 class UserRepository implements IdentityProviderInterface
@@ -27,12 +26,17 @@ class UserRepository implements IdentityProviderInterface
         ClientEntityInterface $clientEntity
     ) {
         if ($username === 'alex' && $password === 'whisky') {
-            return new UserEntity();
+            return new User();
         }
 
         return;
     }
 
+	/**
+	 * @param $identifier
+	 * @return bool|UserEntity
+	 * @throws Exception
+	 */
 		public function getUserEntityByIdentifier($identifier)
 		{
 			$user = User::findById($identifier, ['username', 'displayName', 'id', 'email', 'modifiedAt']);

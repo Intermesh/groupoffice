@@ -1,54 +1,55 @@
 {
-	"name": "intermesh/groupoffice",
-	"description": "Group-Office",
-	"require": {
-	"php": ">=7.0.0",
-	"ext-pcre": "*",
-	"ext-mbstring": "*",
-	"ext-ctype": "*",
-	"ext-date": "*",
-	"ext-iconv": "*",
-	"ext-curl": "*",
-	"ext-zip": "*",
-	"ext-soap": "*",
+  "name": "intermesh/groupoffice",
+  "description": "Group-Office",
+  "require": {
+    "php": ">=7.0.0",
+    "ext-pcre": "*",
+    "ext-mbstring": "*",
+    "ext-ctype": "*",
+    "ext-date": "*",
+    "ext-iconv": "*",
+    "ext-curl": "*",
+    "ext-zip": "*",
+    "ext-soap": "*",
     "ext-gd": "*",
     "ext-pdo": "*",
     "ext-pdo_mysql": "*",
     "ext-calendar": "*",
-	"ext-xml": "*",
-	"ext-intl": "*",
-	"sabre/dav": "3.2.*",
-	"ext-json": "*",
-	"swiftmailer/swiftmailer": "@stable",
-	"michelf/php-markdown": "^1.7",
-	"phpoffice/phpexcel": "^1.8",
-	"tecnickcom/tcpdf": "6.3.*",
-	"mtdowling/cron-expression": "^1.2",
-	"setasign/fpdi": "^2.2",
-	"setasign/fpdi-tcpdf": "^2.2",
-	"matthiasmullie/minify": "^1.3",
-	"defuse/php-encryption": "^2.1",
-	"html2text/html2text": "^4.1",
-	"sabre/vobject": "^4.2",
-	"phpseclib/mcrypt_compat": "^1.0",
-		"league/oauth2-server": "^8.1",
-		"guzzlehttp/psr7": "^1.6",
-		"steverhoades/oauth2-openid-connect-server": "^1.2"
-    },
-	"license": "AGPL",
-	"authors": [
-		{
-			"name": "Merijn Schering",
-			"email": "mschering@intermesh.nl"
-		}
-	],
-	"require-dev": {
-		"phpunit/phpunit": "^6.2"
-	},
-	"autoload": {
-		"psr-4": {
-			"go\\core\\": "go/core/",
-			"go\\modules\\": "go/modules/"		
-		} 
-	}
+    "ext-xml": "*",
+    "ext-intl": "*",
+    "sabre/dav": "3.2.*",
+    "ext-json": "*",
+    "ext-openssl": "*",
+    "swiftmailer/swiftmailer": "@stable",
+    "michelf/php-markdown": "^1.7",
+    "phpoffice/phpexcel": "^1.8",
+    "tecnickcom/tcpdf": "6.3.*",
+    "mtdowling/cron-expression": "^1.2",
+    "setasign/fpdi": "^2.2",
+    "setasign/fpdi-tcpdf": "^2.2",
+    "matthiasmullie/minify": "^1.3",
+    "defuse/php-encryption": "^2.1",
+    "html2text/html2text": "^4.1",
+    "sabre/vobject": "^4.2",
+    "phpseclib/mcrypt_compat": "^1.0",
+    "league/oauth2-server": "^8.1",
+    "guzzlehttp/psr7": "^1.6",
+    "steverhoades/oauth2-openid-connect-server": "^1.2"
+  },
+  "license": "AGPL",
+  "authors": [
+    {
+      "name": "Merijn Schering",
+      "email": "mschering@intermesh.nl"
+    }
+  ],
+  "require-dev": {
+    "phpunit/phpunit": "^6.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "go\\core\\": "go/core/",
+      "go\\modules\\": "go/modules/"
+    }
+  }
 }

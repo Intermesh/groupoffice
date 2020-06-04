@@ -7,7 +7,7 @@
  * @link        https://github.com/thephpleague/oauth2-server
  */
 
-namespace go\core\oauth\server\entities;
+namespace go\core\model;
 
 use go\core\orm\Entity;
 use go\core\orm\Query;
@@ -18,11 +18,11 @@ use League\OAuth2\Server\Entities\Traits\AccessTokenTrait;
 use League\OAuth2\Server\Entities\Traits\EntityTrait;
 use League\OAuth2\Server\Entities\Traits\TokenEntityTrait;
 
-class AccessTokenEntity extends Entity implements AccessTokenEntityInterface
+class OauthAccessToken extends Entity implements AccessTokenEntityInterface
 {
     use AccessTokenTrait, TokenEntityTrait, EntityTrait;
 
-    protected $clientIdentifier;
+    protected $clientId;
 
     protected static function defineMapping()
     {
@@ -33,7 +33,7 @@ class AccessTokenEntity extends Entity implements AccessTokenEntityInterface
     public function setClient(ClientEntityInterface $client)
     {
 	    $this->client = $client;
-	    $this->clientIdentifier = $client->getIdentifier();
+	    $this->clientId = $client->id;
     }
 
 		public static function collectGarbage() {

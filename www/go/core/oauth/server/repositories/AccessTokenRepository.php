@@ -12,7 +12,7 @@ namespace go\core\oauth\server\repositories;;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Repositories\AccessTokenRepositoryInterface;
-use go\core\oauth\server\entities\AccessTokenEntity;
+use go\core\model\OauthAccessToken;
 
 class AccessTokenRepository implements AccessTokenRepositoryInterface
 {
@@ -34,7 +34,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
     public function revokeAccessToken($tokenId)
     {
         // Some logic here to revoke the access token
-	    AccessTokenEntity::delete(['identifier' => $tokenId]);
+	    OauthAccessToken::delete(['identifier' => $tokenId]);
     }
 
     /**
@@ -42,7 +42,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
      */
     public function isAccessTokenRevoked($tokenId)
     {
-        $token = AccessTokenEntity::findById($tokenId);
+        $token = OauthAccessToken::findById($tokenId);
         return $token === false || $token->getExpiryDateTime() < (new \DateTime());
     }
 
@@ -51,7 +51,7 @@ class AccessTokenRepository implements AccessTokenRepositoryInterface
      */
     public function getNewToken(ClientEntityInterface $clientEntity, array $scopes, $userIdentifier = null)
     {
-        $accessToken = new AccessTokenEntity();
+        $accessToken = new OauthAccessToken();
         $accessToken->setClient($clientEntity);
         foreach ($scopes as $scope) {
             $accessToken->addScope($scope);

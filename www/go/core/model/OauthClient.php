@@ -1,13 +1,15 @@
 <?php
-namespace go\core\oauth\server\entities;
+namespace go\core\model;
 
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\Traits\ClientTrait;
 use League\OAuth2\Server\Entities\Traits\EntityTrait;
 
-class ClientEntity extends \go\core\jmap\Entity implements ClientEntityInterface
+class OauthClient extends \go\core\jmap\Entity implements ClientEntityInterface
 {
 	use EntityTrait, ClientTrait;
+
+	public $id;
 
 	protected $secret;
 
@@ -18,11 +20,11 @@ class ClientEntity extends \go\core\jmap\Entity implements ClientEntityInterface
 	}
 
 	public function setSecret($secret) {
-		$this->secret = password_hash($secret);
+		$this->secret = password_hash($secret, CRYPT_BLOWFISH);
 	}
 
 	public function checkSecret($secret) {
-		return \password_verify($secret, $this->secret);
+		return password_verify($secret, $this->secret);
 	}
 
 	public function setName($name)
@@ -35,8 +37,17 @@ class ClientEntity extends \go\core\jmap\Entity implements ClientEntityInterface
 		$this->redirectUri = $uri;
 	}
 
-	public function setConfidential()
+	public function getRedirectUri()
+	{
+		return $this->redirectUri;
+	}
+
+	public function setIsCondifential()
 	{
 		$this->isConfidential = true;
+	}
+
+	public function getIsConfidential() {
+		return $this->isConfidential();
 	}
 }

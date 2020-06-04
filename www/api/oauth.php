@@ -1,14 +1,26 @@
 <?php
 require('../vendor/autoload.php');
 use go\core\App;
+use go\core\exception\ConfigurationException;
+use go\core\fs\File as FileAlias;
 use go\core\jmap\State;
 use go\core\http\Router;
+use go\core\model\OauthUser as UserAlias;
 use go\core\oauth\server\repositories;
+use GuzzleHttp\Psr7\MessageTrait as MessageTraitAlias;
+use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\ServerRequest;
+use GuzzleHttp\Psr7\Stream as StreamAlias;
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
+use Lcobucci\JWT\Token as TokenAlias;
 use Lcobucci\JWT\ValidationData;
-use League\OAuth2\Server\CryptKey;
+use League\OAuth2\Server\AuthorizationServer;
 use League\OAuth2\Server\Exception\OAuthServerException;
+use League\OAuth2\Server\Grant\AuthCodeGrant;
+use OpenIDConnectServer\ClaimExtractor;
+use OpenIDConnectServer\IdTokenResponse;
+use Psr\Http\Message\ResponseInterface as ResponseInterfaceAlias;
 
 App::get();
 App::get()->setAuthState(new State());
@@ -20,54 +32,61 @@ session_start();
 class OAuthController {
 
 	/**
-	 * @var  \League\OAuth2\Server\AuthorizationServer
+	 * @var  AuthorizationServer
 	 */
 	private $server;
 
 	/**
-	 * @return \League\OAuth2\Server\AuthorizationServer
+	 * @return AuthorizationServer
+	 * @throws Exception
 	 */
 	private function getServer() {
 
-		// Init our repositories
-		$clientRepository = new repositories\ClientRepository();
-		$scopeRepository = new repositories\ScopeRepository();
-		$accessTokenRepository = new repositories\AccessTokenRepository();
-		$authCodeRepository = new repositories\AuthCodeRepository();
-		$refreshTokenRepository = new repositories\RefreshTokenRepository();
+		if(!isset($this->server)) {
+			// Init our repositories
+			$clientRepository = new repositories\ClientRepository();
+			$scopeRepository = new repositories\ScopeRepository();
+			$accessTokenRepository = new repositories\AccessTokenRepository();
+			$authCodeRepository = new repositories\AuthCodeRepository();
+			$refreshTokenRepository = new repositories\RefreshTokenRepository();
 
-		$privateKeyPath = 'file://' . $this->getPrivateKeyFile()->getPath();
+			$privateKeyPath = 'file://' . $this->getPrivateKeyFile()->getPath();
 
-		// OpenID Connect Response Type
-		$responseType = new \OpenIDConnectServer\IdTokenResponse(new repositories\UserRepository(), new \OpenIDConnectServer\ClaimExtractor());
+			// OpenID Connect Response Type
+			$responseType = new IdTokenResponse(new repositories\UserRepository(), new ClaimExtractor());
 
-		$this->server = new \League\OAuth2\Server\AuthorizationServer(
-			$clientRepository,
-			$accessTokenRepository,
-			$scopeRepository,
-			$privateKeyPath,
-			'lxZFUEsBCJ2Yb14IF2ygAHI5N4+ZAUXXaSeeJm6+twsUmIen',
-			$responseType
-		);
+			$this->server = new AuthorizationServer(
+				$clientRepository,
+				$accessTokenRepository,
+				$scopeRepository,
+				$privateKeyPath,
+				'lxZFUEsBCJ2Yb14IF2ygAHI5N4+ZAUXXaSeeJm6+twsUmIen',
+				$responseType
+			);
 
-		// Enable the authentication code grant on the server with a token TTL of 1 hour
-		$this->server->enableGrantType(
-			new \League\OAuth2\Server\Grant\AuthCodeGrant(
-				$authCodeRepository,
-				$refreshTokenRepository,
-				new \DateInterval('PT10M')
-			),
-			new \DateInterval('PT1H')
-		);
+			// Enable the authentication code grant on the server with a token TTL of 1 hour
+			$this->server->enableGrantType(
+				new AuthCodeGrant(
+					$authCodeRepository,
+					$refreshTokenRepository,
+					new DateInterval('PT10M')
+				),
+				new DateInterval('PT1H')
+			);
+		}
 
 		return $this->server;
 	}
 
+	/**
+	 * @return MessageTraitAlias|Response|ResponseInterfaceAlias
+	 * @throws Exception
+	 */
 	public function authorize() {
 		$server = $this->getServer();
 
-		$request = \GuzzleHttp\Psr7\ServerRequest::fromGlobals();
-		$response = new \GuzzleHttp\Psr7\Response();
+		$request = ServerRequest::fromGlobals();
+		$response = new Response();
 
 		try {
 			// Validate the HTTP request and return an AuthorizationRequest object.
@@ -85,7 +104,7 @@ class OAuthController {
 			}
 
 			$user = go()->getAuthState()->getUser(['username', 'displayName', 'id', 'email', 'modifiedAt']);
-			$authRequest->setUser(new \go\core\oauth\server\entities\UserEntity($user));
+			$authRequest->setUser(new UserAlias($user));
 
 
 //			$userRepository = new repositories\UserRepository();
@@ -100,10 +119,10 @@ class OAuthController {
 			return $server->completeAuthorizationRequest($authRequest, $response);
 		} catch (OAuthServerException $exception) {
 			return $exception->generateHttpResponse($response);
-		} catch (\Exception $exception) {
+		} catch (Exception $exception) {
 
 
-			$body = new \GuzzleHttp\Psr7\Stream(fopen('php://temp', 'r+'));
+			$body = new StreamAlias(fopen('php://temp', 'r+'));
 			$body->write($exception->getMessage());
 
 			return $response->withStatus(500)->withBody($body);
@@ -130,15 +149,15 @@ class OAuthController {
 //	}
 
 	/**
-	 * @return \go\core\fs\File
-	 * @throws \go\core\exception\ConfigurationException
+	 * @return FileAlias
+	 * @throws Exception
 	 */
 	private function getPrivateKeyFile() {
 		$file = go()->getDataFolder()->getFile('oauth2/private.key');
 		if(!$file->exists()) {
 			$private = openssl_pkey_new();
 			if(!openssl_pkey_export_to_file($private, $file->getPath())) {
-				throw new \Exception ("Could not create private key file");
+				throw new Exception ("Could not create private key file");
 			}
 			$file->chmod(0600);
 
@@ -147,7 +166,7 @@ class OAuthController {
 			$pubkey = $details["key"];
 			$pubKeyFile = go()->getDataFolder()->getFile('oauth2/public.key');
 			if(!$pubKeyFile->putContents($pubkey)) {
-				throw new \Exception ("Could not create public key file");
+				throw new Exception ("Could not create public key file");
 			}
 			$pubKeyFile->chmod(0600);
 		}
@@ -158,8 +177,8 @@ class OAuthController {
 	}
 
 	/**
-	 * @return \go\core\fs\File
-	 * @throws \go\core\exception\ConfigurationException
+	 * @return FileAlias
+	 * @throws Exception
 	 */
 	private function getPublicKeyFile() {
 		$file = go()->getDataFolder()->getFile('oauth2/public.key');
@@ -169,6 +188,11 @@ class OAuthController {
 		return $file;
 	}
 
+	/**
+	 * @param $jwt
+	 * @return TokenAlias
+	 * @throws OAuthServerException
+	 */
 	private function validateAccessToken($jwt) {
 		try {
 			// Attempt to parse and validate the JWT
@@ -185,7 +209,7 @@ class OAuthController {
 
 			// Ensure access token hasn't expired
 			$data = new ValidationData();
-			$data->setCurrentTime(\time());
+			$data->setCurrentTime(time());
 
 			if ($token->validate($data) === false) {
 				throw OAuthServerException::accessDenied('Access token is invalid');
@@ -225,15 +249,15 @@ class OAuthController {
 	public function token() {
 		$server = $this->getServer();
 
-		$request = \GuzzleHttp\Psr7\ServerRequest::fromGlobals();
-		$response = new \GuzzleHttp\Psr7\Response();
+		$request = ServerRequest::fromGlobals();
+		$response = new Response();
 
 		try {
 			return $server->respondToAccessTokenRequest($request, $response);
 		} catch (OAuthServerException $exception) {
 			return $exception->generateHttpResponse($response);
-		} catch (\Exception $exception) {
-			$body = new \GuzzleHttp\Psr7\Stream(fopen('php://temp', 'r+'));
+		} catch (Exception $exception) {
+			$body = new StreamAlias(fopen('php://temp', 'r+'));
 			$body->write($exception->getMessage());
 
 			return $response->withStatus(500)->withBody($body);
@@ -241,10 +265,8 @@ class OAuthController {
 	}
 }
 
-$router = (new Router())
+(new Router())
 	->addRoute('/authorize/', 'GET', OAuthController::class, 'authorize')
 	->addRoute('/userinfo/', 'GET', OAuthController::class, 'userinfo')
 	->addRoute('/token/', 'POST', OAuthController::class, 'token')
-
-
 	->run();

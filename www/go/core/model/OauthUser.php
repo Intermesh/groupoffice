@@ -7,17 +7,17 @@
  * @link        https://github.com/thephpleague/oauth2-server
  */
 
-namespace go\core\oauth\server\entities;
+namespace go\core\model;
 ;
 
-use go\core\model\User;
+use go\core\model;
 use League\OAuth2\Server\Entities\UserEntityInterface;
 use OpenIDConnectServer\Entities\ClaimSetInterface;
 
-class UserEntity implements UserEntityInterface, ClaimSetInterface
+class OauthUser implements UserEntityInterface, ClaimSetInterface
 {
 	private $user;
-	public function __construct(User $user)
+	public function __construct(model\User $user)
 	{
 		$this->user = $user;
 	}
