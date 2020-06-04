@@ -326,6 +326,16 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 
 	onAuthentication: function () {
+
+		//check if authRedirecUrl was given.
+		var urlParams = new URLSearchParams(window.location.search);
+		var authRedirectUrl = urlParams.get('authRedirectUrl');
+
+		if(authRedirectUrl) {
+			document.location.replace(authRedirectUrl);
+			return;
+		}
+
 		
 		//load state
 		if(!GO.util.isMobileOrTablet()) {

@@ -75,12 +75,12 @@ try {
 	//check if GO is installed
 	if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){	
 		
-		if(GO::user() && isset($_SESSION['GO_SESSION']['after_login_url'])){
-			$url = GO::session()->values['after_login_url'];
-			unset(GO::session()->values['after_login_url']);
-			header('Location: '.$url);
-			exit();
-		}
+//		if(GO::user() && isset($_SESSION['GO_SESSION']['after_login_url'])){
+//			$url = GO::session()->values['after_login_url'];
+//			unset(GO::session()->values['after_login_url']);
+//			header('Location: '.$url);
+//			exit();
+//		}
 		
 		if(go()->getSettings()->databaseVersion != go()->getVersion()) {
 			header('Location: '.GO::config()->host.'install/upgrade.php');				

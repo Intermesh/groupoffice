@@ -88,7 +88,9 @@ links/LinksDetailPanel.js
 links/FilterLinkEntityCombo.js
 
 
-
+oauth/ClientGrid.js
+oauth/ClientDialog.js
+oauth/SystemSettingsPanel.js
 
 Router.js
 PasswordPrompt.js

@@ -899,3 +899,70 @@ ALTER TABLE `core_link` ADD INDEX(`fromEntityTypeId`);
 ALTER TABLE `core_link` ADD INDEX(`fromId`);
 ALTER TABLE `core_link` ADD INDEX(`toEntityTypeId`);
 ALTER TABLE `core_link` ADD INDEX(`toId`);
+
+
+
+--
+-- Table structure for table `core_oauth_access_token`
+--
+
+CREATE TABLE `core_oauth_access_token` (
+  `identifier` varchar(128) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `expiryDateTime` datetime DEFAULT NULL,
+  `userIdentifier` int(11) NOT NULL,
+  `clientId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `core_oauth_client`
+--
+
+CREATE TABLE `core_oauth_client` (
+  `id` int(11) NOT NULL,
+  `identifier` varchar(128) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `isConfidential` tinyint(1) NOT NULL,
+  `name` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `redirectUri` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `secret` varchar(128) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `core_oauth_access_token`
+--
+ALTER TABLE `core_oauth_access_token`
+  ADD PRIMARY KEY (`identifier`),
+  ADD KEY `userIdentifier` (`userIdentifier`),
+  ADD KEY `clientId` (`clientId`);
+
+--
+-- Indexes for table `core_oauth_client`
+--
+ALTER TABLE `core_oauth_client`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `core_oauth_client`
+--
+ALTER TABLE `core_oauth_client`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `core_oauth_access_token`
+--
+ALTER TABLE `core_oauth_access_token`
+  ADD CONSTRAINT `core_oauth_access_token_ibfk_2` FOREIGN KEY (`userIdentifier`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_oauth_access_token_ibfk_3` FOREIGN KEY (`clientId`) REFERENCES `core_oauth_client` (`id`) ON DELETE CASCADE;

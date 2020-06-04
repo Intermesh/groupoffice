@@ -122,8 +122,10 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		this.addPanel(go.groups.SystemSettingsGroupGrid);
 		this.addPanel(go.modules.SystemSettingsModuleGrid);
 		this.addPanel(go.tools.SystemSettingsTools);
+		this.addPanel(go.oauth.SystemSettingsPanel);
 		this.addPanel(go.cron.SystemSettingsCronGrid, null, 'divider');
-		
+
+
 		this.loadModulePanels();
 		
 		go.systemsettings.Dialog.superclass.initComponent.call(this);

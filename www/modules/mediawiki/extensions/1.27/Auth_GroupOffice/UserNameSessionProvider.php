@@ -693,9 +693,9 @@ class UserNameSessionProvider extends CookieSessionProvider {
 	 * @param Array $preferences
 	 * @param Array $metadata
 	 * @param boolean $saveToDB Save changes to database with this funtion call.
-	 * @see User::setRealName()
-	 * @see User::setEmail()
-	 * @see User::setOption()
+	 * @see OauthUser::setRealName()
+	 * @see OauthUser::setEmail()
+	 * @see OauthUser::setOption()
 	 * @since 2.0.0
 	 */
 	public function setUserPrefs( $user, $preferences, $metadata, $saveToDB = false ) {

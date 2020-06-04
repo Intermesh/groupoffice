@@ -30,7 +30,8 @@ go.Modules.register("core", 'core', {
 			relations: {
 				group: {store: "Group", fk:'groupId'}
 			}
-		}
+		},
+		'OauthClient'
 	],
 
 	userSettingsPanels: [
@@ -38,7 +39,7 @@ go.Modules.register("core", 'core', {
 		"go.users.UserSettingsWorkingWeek"
 	],
 	selectDialogPanels: [
-		"go.users.SelectDialogPanel",
+		"go.users.SelectDialogPanel"
 	],
 
 	customFieldTypes: [
