@@ -14,6 +14,11 @@ use go\core\jmap\Entity;
  */
 function isValidDb() {
 	if(GO()->getDatabase()->hasTable("core_module")) {
+
+		if(!GO()->getDatabase()->hasTable("core_user")) {
+			throw new \Exception("Your database seems to be in an invalid state. Please restore a backup and make sure no tables from a partial upgrade process are left.");
+		}
+
 		return 63;
 	}
 	if (!GO()->getDatabase()->hasTable("go_settings")) {
@@ -139,9 +144,9 @@ try {
 	
 	//remove obsolete modules
 	if($dbValid == 62) {
-		GO()->getDbConnection()->query("delete from go_modules where id IN ('servermanager', 'admin2userlogin', 'formprocessor', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf','imapauth','ldapauth', 'presidents','ab2users', 'backupmanager', 'calllog', 'emailportlet', 'gnupg', 'language', 'mailings', 'newfiles')");
+		GO()->getDbConnection()->query("delete from go_modules where id IN ('blacklist', 'servermanager', 'admin2userlogin', 'formprocessor', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf','imapauth','ldapauth', 'presidents','ab2users', 'backupmanager', 'calllog', 'emailportlet', 'gnupg', 'language', 'mailings', 'newfiles')");
 	} else {
-		GO()->getDbConnection()->query("delete from core_module where name IN ('servermanager', 'admin2userlogin', 'formprocessor', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf','imapauth','ldapauth', 'presidents','ab2users', 'backupmanager', 'calllog', 'emailportlet', 'gnupg', 'language', 'mailings', 'newfiles')");
+		GO()->getDbConnection()->query("delete from core_module where name IN ('blacklist', 'servermanager', 'admin2userlogin', 'formprocessor', 'settings', 'sites', 'syncml', 'dropbox', 'timeregistration', 'projects', 'hoursapproval', 'webodf','imapauth','ldapauth', 'presidents','ab2users', 'backupmanager', 'calllog', 'emailportlet', 'gnupg', 'language', 'mailings', 'newfiles')");
 	}
 	
 	function upgrade() {

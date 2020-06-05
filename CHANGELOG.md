@@ -1,5 +1,8 @@
+05-06-2020 6.3.90
+- Core: Check if db is in invalid state (partially upgraded to 6.3) before upgraded
 - Sieve: Fixed bug where sieve dialog showed folders of other account
 - Files: Assistant installation replaces GOTA file handlers
+- Core: Removed NO_AUTO_CREATE_USER from sql_mode because it doesn't work in Mysql 8 anymore and it wasn't needed anyway.
 
 27-01-2020 6.3.89
 - Tickets: Show confirm on closing tickets option broke module settings and email viewing.
