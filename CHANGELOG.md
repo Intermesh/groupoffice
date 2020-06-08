@@ -1,5 +1,5 @@
 - Core: Support for OpenID / OAuth 2.0 so we can integrate with Rocket.Chat
-- Address book: Added zipcocde to contact search
+- Address book: Added zipcode to contact search
 
 25-05-2020 6.4.144
 - Address book: Added birthday column
