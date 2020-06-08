@@ -499,6 +499,14 @@ class Contact extends AclItemEntity {
 											$criteria->where('adr.country', $comparator, $value);
 											
 										})
+										->addText("zip", function(Criteria $criteria, $comparator, $value, Query $query) {
+											if(!$query->isJoined('addressbook_address', 'adr')) {
+												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
+											}
+
+											$criteria->where('adr.zipCode', $comparator, $value);
+
+										})
 										->addText("org", function(Criteria $criteria, $comparator, $value, Query $query) {												
 											if( !$query->isJoined('addressbook_contact', 'org')) {
 												$query->join('core_link', 'l', 'c.id=l.fromId and l.fromEntityTypeId = '.self::entityType()->getId() . ' AND l.toEntityTypeId=' . self::entityType()->getId(), 'LEFT')
@@ -881,6 +889,10 @@ class Contact extends AclItemEntity {
 
 			if(!empty($address->city)) {
 				$keywords[] = $address->city;
+			}
+
+			if(!empty($address->zipCode)) {
+				$keywords[] = $address->zipCode;
 			}
 		}
 

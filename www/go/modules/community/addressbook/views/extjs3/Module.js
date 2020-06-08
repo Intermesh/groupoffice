@@ -118,6 +118,11 @@ go.Modules.register("community", "addressbook", {
 				type: "string",
 				multiple: true
 			}, {
+				name: 'zip',
+				title: t("ZIP code"),
+				type: "string",
+				multiple: true
+			}, {
 				name: 'city',
 				title: t("City"),
 				type: "string",
