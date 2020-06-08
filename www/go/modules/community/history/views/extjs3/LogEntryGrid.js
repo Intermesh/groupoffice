@@ -49,7 +49,7 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 	initComponent: function() {
 		this.store = new go.data.Store({
 			fields: [{name:'createdAt',type:'date'},'id','action','changes','createdBy', 'description',{name: 'creator', type: "relation"}],
-			sort: [{property: "date"}],
+			baseParams: {sort: [{property: "createdAt", isAscending:false}]},
 			entityStore: "LogEntry"
 		});
 
