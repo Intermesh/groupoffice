@@ -1,5 +1,7 @@
 - Core: Support for OpenID / OAuth 2.0 so we can integrate with Rocket.Chat
 - Address book: Added zipcode to contact search
+- Core: Use host header to determine API endpoints so you can have multiple hosts to connect to GO
+- Core: Upload errors where hidden in collapsed panels
 
 25-05-2020 6.4.144
 - Address book: Added birthday column
