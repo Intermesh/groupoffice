@@ -185,7 +185,11 @@ go.Jmap = {
 				},
 				items:[
 					{xtype:'progress',animate:true,itemId:'totalProgress', height:4,style:'margin: 7px 0'},
-					{xtype:'panel', itemId:'details',collapsed:false,forceLayout:true, collapsible:true, title:'Details'}
+					{xtype:'panel', itemId:'details',collapsed:false, animCollapse: false, forceLayout:true, collapsible:true, title:'Details', listeners: {
+							afterrender: function() {
+								this.collapse();
+							}
+						}}
 				],
 				tbar: [{xtype:'tbtext',itemId: 'fileCount', html:t('{finsished} of {total}')
 						.replace('{finsished}', 0)
@@ -200,11 +204,8 @@ go.Jmap = {
 					},
 					scope:this
 				}]
-			}, 'upload')
-			setTimeout(function() {
-				// the progress bars wont update anymore if they render collapsed
-				uploadNotification.items.get('details').collapse();
-			},200);
+
+			}, 'upload');
 		}
 
 		if(go.Notifier.notificationArea.collapsed) {
@@ -221,6 +222,8 @@ go.Jmap = {
 				title: t('Upload failed'),
 				html:'<b>'+file.name+'</b><p class="danger">' +t('File size exceeds the maximum of {max}.').replace('{max}', go.util.humanFileSize(this.capabilities.maxSizeUpload)) + '</p>'
 			});
+
+			uploadNotification.items.get('details').expand();
 
 			return;
 		}
@@ -312,6 +315,7 @@ go.Jmap = {
 				cfg.progress && cfg.progress.call(cfg.scope || this, e);
 			},
 			failure: function (response, options) {
+
 				var data = response,
 					title = response.isAbort ? t('Upload aborted') : t('Upload failed');
 				text = '<b>' + Ext.util.Format.htmlEncode(file.name) + '</b><p class="danger">';
@@ -329,6 +333,10 @@ go.Jmap = {
 				notifyEl.setTitle(title);
 				notifyEl.items.get(0).update(text);
 				cfg.failure && cfg.failure.call(cfg.scope || this, data);
+
+				uploadNotification.items.get('details').expand();
+				go.Jmap.uploaderCollapsed = false;
+
 			},
 			headers: {
 				'X-File-Name': "UTF-8''" + encodeURIComponent(file.name),
