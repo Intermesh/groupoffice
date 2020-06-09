@@ -1,3 +1,6 @@
+09-06-2020 6.4.147
+- Core: Typo in setIsCondfidential leading to oauth problems
+
 09-06-2020 6.4.146
 - Email: select next message when dragging message to other folder
 - Core: Oauth failure in generating private key
