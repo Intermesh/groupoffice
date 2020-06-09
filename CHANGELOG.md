@@ -1,3 +1,6 @@
+??-6-2020 6.4.147
+- Email: select next message when dragging message to other folder
+
 09-06-2020 6.4.146
 - Core: Oauth failure in generating private key
 
