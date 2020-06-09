@@ -84,14 +84,14 @@ Ext.define('go.modules.community.history.MainPanel', {
 				{xtype:'panel', layout:'anchor',items: [
 					{
 						xtype:'datefield',
-						emptyText: 'vanaf',
+						emptyText: t('from'),
 						anchor: '100%'
 					},{
 						xtype:'datefield',
-						emptyText: 'tot',
+						emptyText: t('till'),
 							anchor: '100%'
 					},new go.users.UserCombo({
-						emptyText: 'all users',
+						emptyText: t('All users'),
 							allowBlank:true,
 						listeners: {
 							select:function(me, v){
@@ -107,7 +107,7 @@ Ext.define('go.modules.community.history.MainPanel', {
 					}),],
 					padding: dp(16)
 				},{
-					title:'Actions',
+					title:t('Actions'),
 					defaults: {xtype:'checkbox', listeners: {
 							check:function(cb, checked) {
 								var combos = cb.ownerCt.findByType('checkbox');
@@ -125,14 +125,14 @@ Ext.define('go.modules.community.history.MainPanel', {
 						}},
 					padding: '0px ' + dp(16),
 					items: [
-						{id:'create',boxLabel: 'Create'},
-						{id:'update',boxLabel: 'Update'},
-						{id:'delete',boxLabel: 'Delete'},
-						{id:'login',boxLabel: 'Login'},
+						{id:'create',boxLabel: t('Create')},
+						{id:'update',boxLabel: t('Update')},
+						{id:'delete',boxLabel: t('Delete')},
+						{id:'login',boxLabel: t('Login')},
 					]
 				},{
 					xtype:'panel',
-					title: 'Types',
+					title: t('Types'),
 					items: [this.entityGrid]
 				}
 			]

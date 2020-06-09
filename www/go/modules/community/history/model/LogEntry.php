@@ -60,6 +60,15 @@ class LogEntry extends AclOwnerEntity {
 					$q->andWhere('entityTypeId', 'IN', $ids);
 				}
 			})
+			->add('entityId', function(Criteria $q, $value) {
+				$q->andWhere('entityId', '=', $value);
+			})
+			->add('entity', function(Criteria $q, $value) {
+				$type = EntityType::findByName($value);
+				if(!empty($type)) {
+					$q->andWhere('entityTypeId', '=', $type->getId());
+				}
+			})
 			->add('user', function(Criteria $q, $value) {
 				$q->andWhere('createdBy', '=', $value);
 			});
