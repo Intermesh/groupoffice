@@ -29,7 +29,7 @@ CREATE TABLE `notes_note_book` (
   `createdBy` int(11) NOT NULL,
   `aclId` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
-  `fileFolderId` int(11) DEFAULT NULL
+  `filesFolderId` int(11) DEFAULT NULL
 ) ENGINE=InnoDB;
 
 -- --------------------------------------------------------
