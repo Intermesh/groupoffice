@@ -1,3 +1,6 @@
+09-06-2020 6.4.146
+- Core: Oauth failure in generating private key
+
 08-06-2020 6.4.145
 - Core: Support for OpenID / OAuth 2.0 so we can integrate with Rocket.Chat
 - Address book: Added zipcode to contact search
