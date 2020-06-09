@@ -127,6 +127,7 @@ abstract class Entity  extends OrmEntity {
 				$e->checkFilesFolder(true);
 			}
 
+			//update fs_folders set acl_id = 0 where acl_id not in (select id from core_acl)
 			// select * from fs_folders where acl_id not in (select id from core_acl)
 			if(is_a(static::class, AclOwnerEntity::class, true)) {
 				$entities = static::find(array_merge(['id', 'filesFolderId'], static::filesPathProperties()));
