@@ -42,9 +42,9 @@ class OauthClient extends \go\core\jmap\Entity implements ClientEntityInterface
 		return $this->redirectUri;
 	}
 
-	public function setIsCondifential()
+	public function setIsConfidential($value = true)
 	{
-		$this->isConfidential = true;
+		$this->isConfidential = $value;
 	}
 
 	public function getIsConfidential() {
