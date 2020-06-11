@@ -1,4 +1,126 @@
+11-06-2020 6.4.149
+- Calendar: missing go-hidden class showed calendar accept links not intended for GO
+- Calendar: Use email account for sending invites
+- Calendar: Fix for "No participant found for this event"
+
+11-06-2020 6.4.148
+- Core: File upload was broken when Group-Office was not running in the root of the domain.
+
+09-06-2020 6.4.147
+- Core: Typo in setIsCondfidential leading to oauth problems
+
+09-06-2020 6.4.146
+- Email: select next message when dragging message to other folder
+- Core: Oauth failure in generating private key
+- Core: Database check fixes file acl problems
+
+08-06-2020 6.4.145
+- Core: Support for OpenID / OAuth 2.0 so we can integrate with Rocket.Chat
+- Address book: Added zipcode to contact search
+- Core: Use host header to determine API endpoints so you can have multiple hosts to connect to GO
+- Core: Upload errors where hidden in collapsed panels
+- Core: CTRL + F7 debug was broken
+
+25-05-2020 6.4.144
+- Address book: Added birthday column
+- Core: Render issue with hidden HTML custom field
+- Newsletters: Sometimes errors were reported with an incorrect email address
+- Email: Aliases didn't show without manage permissions
+- Address book / core: Database check fixes mapping of files folders in address book
+- Address book: Upgrade from 6.3 to 6.4 could cause lost mapping of files folder. 
+
+25-05-2020 6.4.143
+- Core: error when loading more items in link browser fixed
+- Address book: Added organization city and organization country to contact filters
+- Address book: Improved simple text search by using global search cache
+- Calendar: add 'send email' dialog to context menu actions on appointments 
+- Address book: Address books searching and sorting in the combo when editing contacts
+- Core: filters can have sub groups making complex filters possibl. For example where conditionA and not conditionB 
+- Core: Disable cron jobs failing due to uninstalled modules
+
+20-05-2020 6.4.142
+- Core: Updated Polish and Croatian translation
+- Core: 6.4.141 Quota cronjob not displayed correct #580
+- Tasks: left panel is resizable
+- Core: fixed disapearing notifications
+- Address book: Export -> Labels didn't download
+- Address book: contacts filter also showed organizations
+- Projects: Fixed project example file and automatically find's contact and customer from address book
+
+15-05-2020 6.4.141
+- E-mail: Attachments from and to items filters out entities that doesn't support that
+- Projects: fixed status, type and template filter to accept the name as text
+- Email: Link mail when using e-mail files
+- Projects: fixed failing report when user was deleted
+- Projects: Fixed resource not showing in edit dialog
+
+13-05-2020 6.4.140
+- Address book: Fixed merge of files
+- Core: Database check could set wrong owner to ACL's
+- Custom fields: Required condition matches multiple words
+- Files: fixed 6.4.137 Error Uncaught TypeError: fb.sendOverwrite is not a function #576
+
+12-05-2020 6.4.139
+- Core: Add to all and reset buttons didn't change all existing permissions
+- Core: Custom fields of type date and date time didn't print on invoices
+- Core: Short date in list preference also applies to links in detail views.
+- Core: Added tooltip to dates so they show the full date and time.
+- Core: Updated French translation
+- Core: Link browser in menu as button
+- Core: RequiredCondition in custom fields didn't behave well with hiding fields
+
+08-05-2020 6.4.138
+- Core: updated German translation
+- Core: Suppress store load error when computer went to sleep
+- reminders: add function was broken in the latest release
+- Calendar: showed 12h format with 24h format in settings
+- Billing: View message of status change
+- Files: folder upload with drag and drop
+
+01-05-2020 6.4.137
+- Calendar: Fix for 75th anniversary early may bank holiday
+- Files: Restored sync file system tool in System settings -> tools
+- Calendar: Import all day events in user time zone always
+- Core: Users with manage permission couldn't mange permissions
+- Custom fields: Adding of type Notes was broken
+- Projects: Extended automatic name template with {contact} and {customer}
+- Custom fields: Fixed problem with conditionally hidden and required at the same time
+- E-mail: Put e-mail from template next to other e-mail options
+- E-mail: fixed mailbox root not working
+- Address book: Contact custom field supports address book selection. (The CustomField Contact type does not use the addressBookId filter #548)
+- E-mail: Fxied Imap - folders with [ ] are badly parsed #561
+- Calendar: Fixed Integrity constraint violation if calendar color changed to auto #575
+- postfixadmin: Fixed Postfix Maildir Folder is Hardcoded #547 - Added $config['vmail_path'] = '/path/to/vmail/';
+- postfixadmin: Email Usage Not Showing Correctly #546
+- Tasks: Made category combo searchable. Fixes #506
+- Calendar: Fixed Setting reminder to no sets it to zero minutes #456
+- Core: Updated French translation
+
+28-04-2020 6.4.136
+- Newsletters: Dragging attachment to composer was broken and moved template management to main screen
+- Core: Fixed Maximum callstack error when start module was set to non-existing module
+- Email: fixed template selection dialog that shows when there are more than 10 templates
+- Core: Correct Function type field in custom fields. Rename Function to FunctionField
+
+22-04-2020 6.4.135
+- Core: Custom fields marked as required are only required if they are visible
+- Log: too long descriptions could lead to error
+
+21-04-2020 6.4.134
+- Core: Improved notifications
+- Core: Handle unlimited upload limit
+- Core: Some PHP 7.4 issues
+- Core: Removed notification flyouts
+- Address book: On 6.3 upgrade move orphans to an address book called __ORPHANED__ so the upgrade can continue
+- time tracking: set start of day to end of last time entry of that day
+- Billing: grouping on status gave error on reload
+- Calendar: All day event black text color in dark theme
+- Core: Suppress column eval() errors
+
+17-04-2020 6.4.133
 - Address book: Added 'Department' field.
+- Core: installer broke on mysqlnd check
+- Core: PHP 7.4 issues. (Pro not ready because Ioncube for 7.4 is still in beta)
 
 16-04-2020 6.4.132
 - Core: Improved file upload error handling

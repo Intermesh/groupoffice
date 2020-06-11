@@ -216,7 +216,7 @@ class Column {
 
 				$result = '';
 				if($this->_format!='')
-					eval('$result=' . $this->_format . ';');
+					eval('try{$result=' . $this->_format . ';}catch(Exception $e){};');
 
 				if($this->_modelFormatType == 'html'){
 					$result = \GO\Base\Util\StringHelper::encodeHtml($result);

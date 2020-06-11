@@ -323,8 +323,8 @@ class Contact extends AclItemEntity {
 	 * 
 	 * @return string[]
 	 */
-	protected function filesPathProperties() {
-		return ['addressBookId', 'name'];
+	protected static function filesPathProperties() {
+		return ['addressBookId', 'name', 'lastName', 'firstName'];
 	}
 	
 	
@@ -450,7 +450,10 @@ class Contact extends AclItemEntity {
                       $criteria->andWhere('c.id ' . $not . ' IN (SELECT contactId FROM addressbook_contact_group)');
                     })
 										->add("isOrganization", function(Criteria $criteria, $value) {
-											$criteria->andWhere('isOrganization', '=', $value);
+											if($value === null) {
+												return;
+											}
+											$criteria->andWhere('isOrganization', '=', (bool) $value);
 										})
 										->add("hasEmailAddresses", function(Criteria $criteria, $value, Query $query) {
 
@@ -496,14 +499,44 @@ class Contact extends AclItemEntity {
 											$criteria->where('adr.country', $comparator, $value);
 											
 										})
+										->addText("zip", function(Criteria $criteria, $comparator, $value, Query $query) {
+											if(!$query->isJoined('addressbook_address', 'adr')) {
+												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
+											}
+
+											$criteria->where('adr.zipCode', $comparator, $value);
+
+										})
 										->addText("org", function(Criteria $criteria, $comparator, $value, Query $query) {												
 											if( !$query->isJoined('addressbook_contact', 'org')) {
-												$query->join('core_link', 'l', 'c.id=l.fromId and l.fromEntityTypeId = '.self::entityType()->getId())						
-													->join('addressbook_contact', 'org', 'org.id=l.toId AND l.toEntityTypeId=' . self::entityType()->getId() . ' AND org.isOrganization=true');
+												$query->join('core_link', 'l', 'c.id=l.fromId and l.fromEntityTypeId = '.self::entityType()->getId() . ' AND l.toEntityTypeId=' . self::entityType()->getId(), 'LEFT')
+													->join('addressbook_contact', 'org', 'org.id = l.toId AND org.isOrganization=true', 'LEFT');
 											}
 											$criteria->where('org.name', $comparator, $value);
-											
 										})
+
+										->addText("orgCity", function(Criteria $criteria, $comparator, $value, Query $query) {
+											if( !$query->isJoined('addressbook_contact', 'org')) {
+												$query->join('core_link', 'l', 'c.id=l.fromId and l.fromEntityTypeId = '.self::entityType()->getId() . ' AND l.toEntityTypeId=' . self::entityType()->getId() , 'LEFT')
+													->join('addressbook_contact', 'org', 'org.id = l.toId AND org.isOrganization=true', 'LEFT');
+											}
+											if(!$query->isJoined('addressbook_address', 'orgAdr')) {
+												$query->join('addressbook_address', 'orgAdr', 'orgAdr.contactId = org.id', "LEFT");
+											}
+											$criteria->where('orgAdr.city', $comparator, $value);
+										})
+
+										->addText("orgCountry", function(Criteria $criteria, $comparator, $value, Query $query) {
+											if( !$query->isJoined('addressbook_contact', 'org')) {
+												$query->join('core_link', 'l', 'c.id=l.fromId and l.fromEntityTypeId = '.self::entityType()->getId() . ' AND l.toEntityTypeId=' . self::entityType()->getId(), 'LEFT')
+													->join('addressbook_contact', 'org', 'org.id = l.toId AND org.isOrganization=true', 'LEFT');
+											}
+											if(!$query->isJoined('addressbook_address', 'orgAdr')) {
+												$query->join('addressbook_address', 'orgAdr', 'orgAdr.contactId = org.id', "LEFT");
+											}
+											$criteria->where('orgAdr.country', $comparator, $value);
+										})
+
 										->addText("city", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_address', 'adr')) {
 												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
@@ -622,6 +655,12 @@ class Contact extends AclItemEntity {
 			unset($sort['lastName'], $sort['lastName']);
 			$sort['firstName'] = $dir;
 		}
+
+		if(isset($sort['birthday'])) {
+			$query->join('addressbook_date', 'birthdaySort', 'birthdaySort.contactId = c.id and birthdaySort.type="birthday"', 'LEFT');
+			$sort['birthdaySort.date'] = $sort['birthday'];
+			unset($sort['birthday']);
+		};
 		
 		return parent::sort($query, $sort);
 	}
@@ -631,21 +670,6 @@ class Contact extends AclItemEntity {
 	 */
 	public static function converters() {
 		return array_merge(parent::converters(), [VCard::class, Csv::class]);
-	}
-
-	protected static function textFilterColumns() {
-		return ['name', 'debtorNumber', 'notes', 'emailAddresses.email', 'addresses.zipCode'];
-	}
-
-	protected static function search(Criteria $criteria, $expression, Query $query)
-	{
-		if(!$query->isJoined('addressbook_email_address', 'emailAddresses')) {
-			$query->join('addressbook_email_address', 'emailAddresses', 'emailAddresses.contactId = c.id', 'LEFT')->groupBy(['c.id']);
-		}
-    if(!$query->isJoined('addressbook_address', 'addresses')) {
-      $query->join('addressbook_address', 'addresses', 'addresses.contactId = c.id', 'LEFT')->groupBy(['c.id']);
-    }
-		return parent::search($criteria, $expression, $query);
 	}
 	
 	public function getUid() {
@@ -760,10 +784,10 @@ class Contact extends AclItemEntity {
 	private static function prepareFindOrganizations() {
 		if(!isset(self::$organizationIdsStmt)) {
 			self::$organizationIdsStmt = self::find()
-			->selectSingleValue('c.id')
-			->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::entityType()->getId())
-			->where('fromId = :contactId')
-				->andWhere('fromEntityTypeId = '. self::entityType()->getId())
+				->selectSingleValue('c.id')
+				->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = ' . self::entityType()->getId())
+				->where('fromId = :contactId')
+				->andWhere('fromEntityTypeId = ' . self::entityType()->getId())
 				->andWhere('c.isOrganization = true')
 				->createStatement();
 		}
@@ -851,8 +875,25 @@ class Contact extends AclItemEntity {
 		foreach($this->emailAddresses as $e) {
 			$keywords[] = $e->email;
 		}
+		foreach($this->phoneNumbers as $e) {
+			$keywords[] = preg_replace("/[^0-9+]/", "", $e->number);
+		}
 		if(!$this->isOrganization) {
 			$keywords = array_merge($keywords, $this->findOrganizations()->selectSingleValue('name')->all());
+		}
+
+		foreach($this->addresses as $address) {
+			if(!empty($address->country)) {
+				$keywords[] = $address->country;
+			}
+
+			if(!empty($address->city)) {
+				$keywords[] = $address->city;
+			}
+
+			if(!empty($address->zipCode)) {
+				$keywords[] = $address->zipCode;
+			}
 		}
 
 		return $keywords;

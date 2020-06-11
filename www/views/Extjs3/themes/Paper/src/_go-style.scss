@@ -35,7 +35,7 @@ body, html {
 	text-rendering: optimizeLegibility;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
-	height: 100%;
+	//height: 100%;
 }
 
 button, html, input, select, textarea {
@@ -264,6 +264,17 @@ a {
 		top: dp(16);
 		left: dp(16);
 	}
+}
+#motd { // login message of the day
+	@extend .z4;
+	border-radius: $borderRadius;
+	background-color: color($bg, 'card');
+	margin: dp(56) auto 0;
+	padding: dp(8);
+	max-width: 100%;
+	width: 600px;
+	max-height: 220px;
+	overflow:auto;
 }
 
 #go-login-header {
@@ -589,12 +600,12 @@ a {
 
 	> div { // message
 		@extend .z4;
-		cursor: pointer;
-		pointer-events:auto;
-		min-width: dp(400);
-		max-width: dp(480);
 		border-radius: $borderRadius;
 		background-color: color($bg, 'card');
+		cursor: pointer;
+		pointer-events:auto;
+		//min-width: dp(400);
+		max-width: dp(480);
 		min-height: dp(40);
 		//padding: 0 dp(24) dp(8);
 		//color: color($fg, 'secondary-text');
@@ -611,7 +622,7 @@ a {
 		}
 		.x-panel-bwrap {
 			padding: dp(8);
-			span {float:right;}
+			em {float:right;}
 		}
 	}
 }
@@ -1746,22 +1757,26 @@ table[id^="comments-ext"] b {
 
 
 .go-form-group {
-	.x-panel-bbar .x-toolbar {
-		border-top: 0;
+
+
+	.x-panel-bbar {
+		overflow: visible;
+		.x-toolbar {
+			border-top: 0;
+		}
+
+		.x-btn-text {
+			font-weight: normal;
+			@include var(color, c-primary);
+		}
 	}
 
 	.x-toolbar {
-		margin-left: dp(-8);
+		margin-left: dp(-16);
 	}
 	margin-bottom: dp(16);
 	
-	.x-btn-text {
-		font-weight: normal;
-	}
-	
-/*	.x-btn-text-icon button::before {
-		padding-right: dp(16);
-	}*/
+
 }
 
 
@@ -1809,7 +1824,7 @@ table[id^="comments-ext"] b {
 .go-html-formatted  blockquote {  
   display: block;  
   margin: 1em 40px;  
-  padding:0px 10px;
+  pading:0px 10px;
 }
 
 .go-html-formatted td {   
@@ -2137,4 +2152,9 @@ table[id^="comments-ext"] b {
 		@include var(outline-color, c-primary-tp);
 		border: 2px dashed white;
 	}
+}
+
+/* used in mail to hide calendar links */
+.go-hidden {
+	display: none;
 }

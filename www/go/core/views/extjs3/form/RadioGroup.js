@@ -43,9 +43,12 @@ go.form.RadioGroup = Ext.extend(Ext.form.RadioGroup, {
 	//make radio buttons inherit group name
 	onRender : function(ct, position) {
 		var me = this;
+
+		me.groupName = this.name + "-" + Ext.id();
+
 		this.items.forEach(function(i) {
 			if(!i.name) {
-				i.name = me.name;				
+				i.name = me.groupName;
 			}
 			
 			i.checked = me.value === i.inputValue;

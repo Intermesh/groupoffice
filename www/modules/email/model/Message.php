@@ -313,8 +313,8 @@ abstract class Message extends \GO\Base\Model {
 		$response['flagged']=$this->flagged;
 		$response['answered']=$this->answered;
 		
-		$response['from'] = $from['personal'];
-		$response['sender'] = $from['email'];
+		$response['from'] = $from ? $from['personal'] : "";
+		$response['sender'] = $from ? $from['email']: "";
 		$response['to'] = $recipientsAsString ? (string) $this->to : $this->_convertRecipientArray($this->to->getAddresses());
 		$response['cc'] = $recipientsAsString ? (string) $this->cc : $this->_convertRecipientArray($this->cc->getAddresses());
 		$response['bcc'] = $recipientsAsString ? (string) $this->bcc :  $this->_convertRecipientArray($this->bcc->getAddresses());

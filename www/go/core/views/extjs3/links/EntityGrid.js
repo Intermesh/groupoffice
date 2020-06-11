@@ -14,6 +14,8 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 	
 	savedSelection: false,
 
+	supportsFiles: false,
+
 	constructor: function (config) {
 
 		config = config || {};
@@ -21,11 +23,21 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 		if(config.entities){
 			this.entities = config.entities;
 		}
+
 		var selModel = new Ext.grid.RowSelectionModel({simpleSelect: true});
 
-		var data = [], allEntities = this.entities ? this.entities : go.Entities.getLinkConfigs(), id;
-		
-		allEntities.forEach(function(link){			
+		var data = [],
+			allEntities = this.entities ? this.entities : go.Entities.getLinkConfigs(),
+			id;
+console.warn(config);
+		allEntities.forEach(function(link){
+
+			var e = go.Entities.get(link.entity);
+
+			if(config.supportsFiles && !e.supportsFiles) {
+				return;
+			}
+
 			id = link.entity;
 			if(link.filter) {
 				id += "-" + link.filter;
@@ -34,7 +46,7 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 				link.filter = null;
 			}
 			data.push([id, link.entity, link.title, link.filter, link.iconCls]);
-		});
+		}, this);
 
 		Ext.apply(config, {
 			tbar: [{xtype: "selectallcheckbox"}],

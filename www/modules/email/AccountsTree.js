@@ -100,11 +100,16 @@ GO.email.AccountsTree = function(config){
 	},this);
 
 	this.on('nodedragover', function(e)
-	{		
+	{
+		var rowIdx = 0;
+		if(e.data) {
+			rowIdx = e.data.rowIndex;
+		}
 		if(e.dropNode)
 		{
 			var dragId = GO.util.Base64.decode(e.source.dragData.node.id);
 			var targetId = GO.util.Base64.decode(e.target.id);
+
 			//drag within tree
 			if(dragId.indexOf('account')>-1 && targetId.indexOf('account')>-1){
 				if(e.point!='append')
@@ -117,13 +122,19 @@ GO.email.AccountsTree = function(config){
 			}
 			return ((this.getNodeById(e.dropNode.id).parentNode.id != e.target.id) &&
 					(e.source.dragData.node.attributes.account_id == e.target.attributes.account_id));
-		}else
-		{
+		} else {
 			//drag from grid
 			if(e.point!='append'){
 				return false;
-			}else
-			{
+			} else {
+				if(e.data.grid.getSelectionModel()) {
+					var max=e.data.grid.paging, tmpIdx = rowIdx + 1;
+					if(tmpIdx >= max) {
+						tmpIdx = rowIdx -1;
+					}
+					e.data.grid.getSelectionModel().selectRow(tmpIdx);
+					e.data.grid.getView().scrollToTopOnLoad = false;
+				}
 				return true;
 			}
 		}		
@@ -229,8 +240,6 @@ GO.email.AccountsTree = function(config){
 					Ext.MessageBox.progress(t("Moving...", "email"), '', '');
 					Ext.MessageBox.updateProgress(0, '0%', '');
 
-				
-
 					var moveRequest = function(newMessages){
 
 						if(!newMessages)
@@ -310,8 +319,7 @@ GO.email.AccountsTree = function(config){
 	this);
 
 	this.on('nodedrop', function(e){
-		if(e.dropNode)
-		{
+		if(e.dropNode) {
 			var dragId = GO.util.Base64.decode(e.source.dragData.node.id);
 			var targetId = GO.util.Base64.decode(e.target.id);
 			
@@ -328,8 +336,7 @@ GO.email.AccountsTree = function(config){
 						sort_order: Ext.encode(sortorder)
 					}
 				});
-			}else
-			{
+			} else {
 				this.moveFolder(e.target.attributes['account_id'], e.target , e.data.node);
 			}
 		}

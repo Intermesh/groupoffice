@@ -46655,8 +46655,11 @@ Ext.grid.GridPanel = Ext.extend(Ext.Panel, {
             }
             s = state.group;
             if(store.groupBy){
-                if(s){
-                    store.groupBy(s);
+            	  if(s){
+									//MS: Fix for load on state apply.
+									//store.groupBy(s);
+									store.groupField = s;
+									store.applyGroupField();
                 }else{
                     store.clearGrouping();
                 }

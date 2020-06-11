@@ -13,6 +13,13 @@ https://www.group-office.com/documentation.html
 # Developers
 
 ## Docker
+
+### Production
+Our Docker image can be found here:
+
+https://github.com/Intermesh/docker-groupoffice
+
+### Development
 If you'd like to get started with Group-Office development please have a look at
 our docker-compose project. You can get started in minutes with just a few commands:
 

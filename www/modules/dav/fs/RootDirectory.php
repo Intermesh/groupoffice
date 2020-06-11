@@ -37,7 +37,7 @@ class RootDirectory extends Sabre\DAV\FS\Directory{
 		$children[] = new SharedDirectory();
 	
 		
-		if(GO::modules()->addressbook)
+		if(GO::modules()->addressbook && is_dir(GO::config()->file_storage_path . 'addressbook'))
 			$children[] = new Directory('addressbook');
 
 		if(GO::modules()->projects2)

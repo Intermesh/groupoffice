@@ -157,6 +157,9 @@ GO.email.EmailComposer = function(config) {
 					}).then(function(result) {										
 			
 						result.list.forEach(function(contact) {
+							if(!contact.emailAddresses[0]) {
+								return;
+							}
 							if(!go.util.empty(v)) {
 								v += ", ";
 							}							
@@ -561,11 +564,14 @@ GO.email.EmailComposer = function(config) {
 						new Ext.Button({
 							text : t("Set current template as default for myself", "email"),
 							handler : function() {
-								var template_id = "default";
-								this.templatesStore.baseParams.default_template_id=this.lastLoadParams.template_id;
-								this.templatesStore.baseParams.type = template_id;
+
+								var default_template_id = this.templateSelectionDialog.getSelected().data.template_id;
+
+								this.templatesStore.baseParams.default_template_id=default_template_id;
+								this.templatesStore.baseParams.type = "default";
 								
 								this.templatesStore.load();
+
 								delete this.templatesStore.baseParams.default_template_id;
 								delete this.templatesStore.baseParams.type;
 								delete this.templatesStore.baseParams.account_id;
@@ -583,10 +589,12 @@ GO.email.EmailComposer = function(config) {
 						new Ext.Button({
 							text : t("Set current template as default for this email account", "email"),
 							handler : function() {
-								
-								var template_id = "default_for_account";
-								this.templatesStore.baseParams.default_template_id=this.lastLoadParams.template_id;
-								this.templatesStore.baseParams.type = template_id;
+
+								var default_template_id = this.templateSelectionDialog.getSelected().data.template_id;
+
+								this.templatesStore.baseParams.default_template_id=default_template_id;
+								this.templatesStore.baseParams.type = "default_for_account";
+
 								
 								var fromAccountRecord = this.fromCombo.store.getById(this.fromCombo.getValue());
 								this.templatesStore.baseParams.account_id = fromAccountRecord['data']['account_id'];

@@ -18,7 +18,8 @@ GO.calendar.SummaryGroupPanel = function(config)
 		config = {};
 	}
 	
-	config.store = new Ext.data.GroupingStore({
+	config.store = new GO.data.GroupingStore({
+		suppressError: true,
 		reader: new Ext.data.JsonReader({
 			totalProperty: "count",
 			root: "results",

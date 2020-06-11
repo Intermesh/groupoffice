@@ -1945,8 +1945,10 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 	
 	updateLocation : function(){
 		var activeNode = this.treePanel.getNodeById(this.folder_id);
-		
-		this.locationTextField.setValue(this.gridStore.reader.jsonData.path);
+
+		if(this.gridStore.reader.jsonData) {
+			this.locationTextField.setValue(this.gridStore.reader.jsonData.path);
+		}
 		
 		if(this.treePanel.getRootNode().findChild('id',this.gridStore.baseParams.folder_id)) {
 			this.upButton.setDisabled(true);

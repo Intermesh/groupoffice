@@ -46,7 +46,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 				</tpl>\
 				<tpl for="to">\
 					<a>{name}</a>\
-					<small class="go-top-right">{[go.util.Format.shortDateTime(values.modifiedAt)]}</small>\
+					<small class="go-top-right" title="{[go.util.Format.dateTime(values.modifiedAt)]}" style="cursor:pointer">{[go.util.Format.userDateTime(values.modifiedAt)]}</small>\
 					<label>{description}</label>\
 				</tpl>\
 				{[this.getLinkDescription(values)]}\

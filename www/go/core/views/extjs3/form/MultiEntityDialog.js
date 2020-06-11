@@ -115,7 +115,7 @@ go.form.MultiEntityDialog = Ext.extend(go.Window, {
 				this.formGroup.doLayout();
 				this.formGroup.markDeleted = [];
 				entityPanel.currentId = ff.key = entity.id;
-				entityPanel.setValues(entity);
+				entityPanel.setValues(entity, true);
 				entityPanel.entity = entity;
 				
 				this.internalLoad(entityPanel, entity, wrap);

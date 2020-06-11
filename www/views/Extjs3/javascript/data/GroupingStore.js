@@ -9,7 +9,7 @@ GO.data.GroupingStore = function(config) {
 	this.on('load', function(){
 		this.loaded=true;
 		
-		if(this.reader.jsonData.feedback){	
+		if(!this.suppressError && this.reader.jsonData.feedback){
 			GO.errorDialog.show(this.reader.jsonData.feedback);
 		}
 		
@@ -18,8 +18,7 @@ GO.data.GroupingStore = function(config) {
 	this.on('exception',
 		function( store, type, action, options, response){
 
-
-			if(response.isAbort) {
+			if(response.isAbort || this.suppressError) {
 				//ignore aborts.
 			} else if(response.isTimeout){
 				console.error(response);

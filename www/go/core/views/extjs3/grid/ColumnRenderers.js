@@ -8,6 +8,9 @@ go.grid.ColumnRenderers = {
 	},
 
 	currency: function(v) {
+		if(v === null) {
+			return '-';
+		}
 		return go.User.currency+v;
 	},
 

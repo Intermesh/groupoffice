@@ -30,14 +30,15 @@ go.Modules.register("core", 'core', {
 			relations: {
 				group: {store: "Group", fk:'groupId'}
 			}
-		}
+		},
+		'OauthClient'
 	],
 
 	userSettingsPanels: [
 		"go.users.UserGroupGrid"
 	],
 	selectDialogPanels: [
-		"go.users.SelectDialogPanel",
+		"go.users.SelectDialogPanel"
 	],
 
 	customFieldTypes: [

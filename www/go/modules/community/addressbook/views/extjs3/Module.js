@@ -22,11 +22,6 @@ go.Modules.register("community", "addressbook", {
 		name: "Contact",
 
 		/**
-		 * Indicates the entity supports files
-		 */
-		hasFiles: true, //Rename to files?
-
-		/**
 		 * Override the custom field set dialog when creating it for a contact in system settings
 		 */
 		customFields: {
@@ -54,6 +49,7 @@ go.Modules.register("community", "addressbook", {
 		 */
 		filters: [
 			{
+				wildcards: false,
 				name: 'text',
 				type: "string",
 				multiple: false,
@@ -122,6 +118,11 @@ go.Modules.register("community", "addressbook", {
 				type: "string",
 				multiple: true
 			}, {
+				name: 'zip',
+				title: t("ZIP code"),
+				type: "string",
+				multiple: true
+			}, {
 				name: 'city',
 				title: t("City"),
 				type: "string",
@@ -144,6 +145,16 @@ go.Modules.register("community", "addressbook", {
 			}, {
 				name: 'org',
 				title: t("Organization"),
+				type: "string",
+				multiple: true
+			}, {
+				name: 'orgCity',
+				title: t("Organization") + ": " + t ("City"),
+				type: "string",
+				multiple: true
+			}, , {
+				name: 'orgCountry',
+				title: t("Organization") + ": " + t ("Country"),
 				type: "string",
 				multiple: true
 			}, {

@@ -31,7 +31,11 @@ GO.calendar.SettingsPanel = Ext.extend(Ext.Panel, {
 		}
 
 		this.reminder = new Ext.form.Hidden({
-			name: 'calendarSettings.reminder'
+			name: 'calendarSettings.reminder',
+			getValue : function() {
+				//to support null
+				return this.value;
+			}
 		});
 
 		this.reminderValue = new Ext.form.ComboBox({
@@ -54,7 +58,12 @@ GO.calendar.SettingsPanel = Ext.extend(Ext.Panel, {
 			listeners: {
 				scope: this,
 				change: function () {
-					this.reminder.setValue(this.reminderValue.getValue() * this.reminderMultiplier.getValue());
+					var n = this.reminderValue.getValue();
+					if(n === null) {
+						this.reminder.setValue(null);
+					} else {
+						this.reminder.setValue(this.reminderValue.getValue() * this.reminderMultiplier.getValue());
+					}
 				}
 			}
 		});
@@ -164,6 +173,11 @@ GO.calendar.SettingsPanel = Ext.extend(Ext.Panel, {
 
 	splitReminder: function () {
 		var secs = this.reminder.getValue();
+		if(secs === null) {
+			this.reminderValue.setValue(null);
+			return;
+		}
+
 		var multipliers = this.reminderMultiplier.getStore().getRange();
 		for (var i = 0, l = multipliers.length; i < l; i++) {
 			var devided = secs / multipliers[i].get('value');

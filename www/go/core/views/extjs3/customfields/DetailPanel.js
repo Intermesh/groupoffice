@@ -80,3 +80,5 @@ go.customfields.DetailPanel = Ext.extend(Ext.Panel, {
   }
 
 });
+
+Ext.reg('gocustomfieldsdetailpanel', go.customfields.DetailPanel);

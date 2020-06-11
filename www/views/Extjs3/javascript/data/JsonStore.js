@@ -86,7 +86,7 @@ GO.data.JsonStore = function(config) {
 			GO.util.mergeObjects(window,this.reader.jsonData.exportVariables);
 		}
 		
-		if(!config.suppressError && this.reader.jsonData.feedback){
+		if(!this.suppressError && this.reader.jsonData.feedback){
 			GO.errorDialog.show(this.reader.jsonData.feedback);
 		}
 		

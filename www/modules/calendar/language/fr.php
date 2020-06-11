@@ -273,4 +273,7 @@ The following is the error message:
   'Visible tasklists' => 'Listes de tâches visibles',
   'Tasklist' => 'Liste de tâches',
   'Remove duplicates' => 'Supprimer les doublons',
+  'Forthcoming events' => 'Evènements futurs',
+  'Past events' => 'Evènements passés',
+  'Only show this field set for selected calendar groups' => 'Ne montrer ce jeu de champs que pour les groupes de calendriers sélectionnés',
 );

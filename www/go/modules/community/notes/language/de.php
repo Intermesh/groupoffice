@@ -19,4 +19,6 @@ return array (
   'Default note book' => 'Standard Notizbuch',
   'Filters' => 'Filter',
   'Has links to...' => 'Hat Verknüpfungen mit…',
+  'Encrypted data' => 'Verschlüsselte Daten',
+  'Enter password to decrypt' => 'Passwort eingeben zum entschlüsseln',
 );

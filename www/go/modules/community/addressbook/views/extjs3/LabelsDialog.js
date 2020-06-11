@@ -223,7 +223,7 @@ go.modules.community.addressbook.LabelsDialog = Ext.extend(go.Window, {
 			Ext.MessageBox.alert(t("Error"), response.message);
 		})
 			.then(function (response) {
-				go.util.downloadFile(go.Jmap.downloadUrl(response.blobId, true), true);
+				go.util.viewFile(go.Jmap.downloadUrl(response.blobId, true));
 			})
 			.finally(function () {
 				me.getEl().unmask();

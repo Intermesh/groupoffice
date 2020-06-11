@@ -24,6 +24,6 @@ class Inline implements FilehandlerInterface{
 	}
 	
 	public function getHandler(\GO\Files\Model\File $file){
-		return 'window.open("'.$file->getDownloadUrl(false, true).'");';
+		return 'go.util.viewFile("'.$file->getDownloadUrl(false, true).'");';
 	}
 }

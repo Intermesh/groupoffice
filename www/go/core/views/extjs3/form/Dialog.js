@@ -317,7 +317,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		return true;
 	},
 
-	submit: function (cb, scope) {
+	submit: function () {
 
 		//When form is submnitted with enter key the validation errors of the field having focus is not disabled if we
 		// don't give something else focus.
@@ -348,8 +348,11 @@ go.form.Dialog = Ext.extend(go.Window, {
 				me.entityStore.entity.goto(serverId);
 			}
 			me.close();
+			return serverId;
+
 		}).catch(function(error) {
 			me.showFirstInvalidField();
+			return error;
 		}).finally(function() {
 			me.actionComplete();
 		})
@@ -358,11 +361,18 @@ go.form.Dialog = Ext.extend(go.Window, {
 	showFirstInvalidField : function() {
 
 		var firstFieldWithError = this.formPanel.form.items.find(function(item) {
-			return !!item.activeError;
+			return !item.validate();
 		});
 
+		console.log("Field with error", firstFieldWithError);
+
 		if(!firstFieldWithError) {
-			console.warn('A validation error happend but no field with was error found.');
+			console.warn('A validation error occurred but no visible field with was error found.');
+			// this.formPanel.form.items.each(function(f){
+			// 	if(!f.validate()){
+			// 		console.warn(f);
+			// 	}
+			// });
 			return;
 		}
 		//Check for tab panel to show tab with error.
@@ -380,6 +390,16 @@ go.form.Dialog = Ext.extend(go.Window, {
 			// Not elegant but if a user marked a field as required and it's not visible it will magically appear this way
 			tabPanel.unhideTabStripItem(panel);
 		}
+
+		var fieldSet = firstFieldWithError.findParentBy(function(c){
+			if(c.isXType("fieldset")) {
+				return true;
+			}
+		});
+
+		fieldSet.show();
+		fieldSet.setDisabled(false);
+
 
 		// Focus make server side errors dissappear 
 		// firstFieldWithError.focus();

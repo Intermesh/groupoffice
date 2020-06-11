@@ -19,8 +19,8 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 		Ext.TaskMgr.start({
 			run: this.checkForNotifications,
 			scope:this,
-			interval: GO.settings.config.checker_interval*1000,
-			// 			 interval: 5000 // debug / test config
+			interval: GO.settings.config.checker_interval*1000
+						 // interval: 5000 // debug / test config
 		});
 		this.initReminders();
 	},
@@ -46,8 +46,8 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			[7*86400, '7 '+t("Days")]
 		];
 
+		this.reminders = new Ext.Container({cls: 'notifications', layout: "anchor", defaults: {anchor: "100%"}});
 
-		this.reminders = new Ext.Container({cls: 'notifications'});
 		this.reminderStore = new Ext.data.GroupingStore({
 			reader: new Ext.data.JsonReader({
 				totalProperty: "count",
@@ -87,14 +87,20 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					],
 					listeners: {
 						'afterrender': function(me) {
-							me.body.on('click',function (el){
+							var clickHandler = function (el){
 								var record = me.record.data;
 								if(!record.model_name || !record.model_id) {
 									return;
 								}
 								var parts = record.model_name.split("\\");
 								go.Router.goto(parts[3].toLowerCase()+"/"+record.model_id);
-							});
+								go.Notifier.notificationArea.collapse();
+							};
+
+							me.body.on('click', clickHandler);
+							me.header.on('click', clickHandler);
+
+
 						}
 					},
 					buttonAlign: 'left',
@@ -119,12 +125,12 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 			}, this);
 
+			go.Notifier.notificationArea.doLayout();
 
-
-			this.reminders.doLayout();
 		},this);
 
 		go.Notifier.notificationArea.add(this.reminders);
+		// go.Notifier.notificationArea.doLayout();
 
 	},
 
@@ -226,10 +232,12 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 				for (var i = 0, l = storeData.results.length; i < l; i++) {
 					var rem = storeData.results[i];
-					text += rem.type+': '+rem.name+' ['+rem.time+']';
+					text += '['+rem.time+'] ' + rem.type+': '+rem.name + "\n";
 				}
 
-				go.Notifier.notify(text, t("Reminders"));
+				//console.log(storeData);
+
+				go.Notifier.notify({iconCls: "ic-notifications",text: text, title: t("Reminders")});
 			}
 		}
 		go.Notifier.playSound('message-new-email', 'reminder');

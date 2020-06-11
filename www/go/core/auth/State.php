@@ -41,12 +41,13 @@ abstract class State {
 	 * @return int
 	 */
 	public function getClassPermissionLevel($cls) {
-		if(!isset($this->classPermissionLevels[$cls])) {
+		if(!isset(self::$classPermissionLevels[$cls])) {
 			$mod = Module::findByClass($cls, ['aclId', 'permissionLevel']);
-			$this->classPermissionLevels[$cls]= $mod->getPermissionLevel();	
+			self::$classPermissionLevels[$cls]= $mod->getPermissionLevel();
 		}
 
-		return $this->classPermissionLevels[$cls];
+
+		return self::$classPermissionLevels[$cls];
 	}
 
 }

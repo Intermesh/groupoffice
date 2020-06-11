@@ -2,7 +2,6 @@
 
 remove folders when uninstalling module. Error when reinstalling
 
-- Drag and drop files and folders to upload
 - riot matrix synapse integration / mattermost
 - csv export select columns
 - never respond to email read requests option

@@ -52,6 +52,7 @@ Ext.applyIf(Array.prototype, {
 	 *
 	 * @param {string} col
 	 * @param {boolean} asc
+	 * @returns {Array}
 	 */
 	columnSort: function(col, asc) {
 
@@ -59,7 +60,7 @@ Ext.applyIf(Array.prototype, {
 			asc = true;
 		}
 
-		this.sort(function compare(a, b) {
+		return this.sort(function compare(a, b) {
 			// Use toUpperCase() to ignore character casing
 			var colA = a[col].toUpperCase();
 			var colB = b[col].toUpperCase();
@@ -72,6 +73,7 @@ Ext.applyIf(Array.prototype, {
 			}
 			return comparison;
 		})
+
 	},
 	
 	/**

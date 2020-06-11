@@ -244,6 +244,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 
 	getModulePanel: function (moduleName) {
+
+		this.initModule(moduleName);
 		var panelId = 'go-module-panel-' + moduleName;
 		if (this.tabPanel.items.map[panelId]) {
 			return this.tabPanel.items.map[panelId];
@@ -324,6 +326,16 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 
 	onAuthentication: function () {
+
+		//check if authRedirecUrl was given.
+		var urlParams = new URLSearchParams(window.location.search);
+		var authRedirectUrl = urlParams.get('authRedirectUrl');
+
+		if(authRedirectUrl) {
+			document.location.replace(authRedirectUrl);
+			return;
+		}
+
 		
 		//load state
 		if(!GO.util.isMobileOrTablet()) {
@@ -554,7 +566,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					region:'east',
 					title: t('Notifications'),
 					floating:true,
-					width:dp(408),
+					width: GO.util.isMobileOrTablet() ? window.innerWidth : dp(408),
 					//animCollapse:true,
 					//animFloat: true,
 					collapsible: true,
@@ -691,12 +703,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	
 	
 	openSystemSettings : function() {
-		if(!this.systemSettingsWindow)
-		{ 
-			this.systemSettingsWindow = new go.systemsettings.Dialog({
-				closeAction: "hide"
-			});					
-		}
+
+		GO.viewport.items.each(function(i){i.hide()});
+		this.systemSettingsWindow = new go.systemsettings.Dialog({
+			closeAction: "hide"
+		});
 
 		this.systemSettingsWindow.show();
 

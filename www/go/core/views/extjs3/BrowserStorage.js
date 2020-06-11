@@ -7,7 +7,7 @@ go.browserStorage = {
 			 me.conn = new Promise(function(resolve, reject) {		
 
 					var	openreq = version ? indexedDB.open(me.dbName, version) : indexedDB.open(me.dbName); //IE11 required the if/else
-					openreq.onerror = function() { 
+					openreq.onerror = function() {
 						me.enabled = false;
 						console.warn("Disabling browser storage in indexedDB because browser doesn't support it.")
 						reject(openreq.error);
@@ -22,7 +22,13 @@ go.browserStorage = {
 
 					 		me.connect(newVersion).then(function() {
                 resolve(openreq.result); 
-              });
+              }).catch(function(error) {
+              	console.error("Upgrade failed. Deleting database and disabling storage.");
+								me.enabled = true;
+								me.deleteDatabase();
+								me.enabled = false;
+								reject(error);
+							});
 						}
 												
 						openreq.result.onversionchange = function(e) {
@@ -39,8 +45,7 @@ go.browserStorage = {
 					reject("blocked");
 				}
 		
-				openreq.onupgradeneeded = function(e) {	
-					
+				openreq.onupgradeneeded = function(e) {
 					var upgradeDb = e.target.result;
 
 					var e = go.Entities.getAllInstalled();

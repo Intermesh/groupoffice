@@ -14,7 +14,8 @@ GO.tasks.SimpleTasksPanel = function (config)
 		id: 'id'
 	});
 	
-	config.store = new Ext.data.GroupingStore({
+	config.store = new GO.data.GroupingStore({
+		suppressError: true,
 		url: GO.url('tasks/portlet/portletGrid'),
 		baseParams: {},
 		reader: reader,

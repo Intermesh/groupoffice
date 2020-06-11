@@ -5,6 +5,10 @@ go.customfields.type.NotesDialog = Ext.extend(go.customfields.FieldDialog, {
 				xtype: 'fieldset',
 				items: [
 					{
+						xtype:'plainfield',
+						name: 'typeLabel',
+						fieldLabel: t('Type')
+					},{
 						xtype: 'textfield',
 						name: 'name',
 						fieldLabel: t("Name"),

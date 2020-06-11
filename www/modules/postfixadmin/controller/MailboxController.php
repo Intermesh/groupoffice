@@ -148,9 +148,14 @@ class MailboxController extends \GO\Base\Controller\AbstractModelController {
 		$activeStmt = \GO\Postfixadmin\Model\Mailbox::model()->find();
 		
 		while ($mailboxModel = $activeStmt->fetch()) {
-			echo 'Calculating size of '.$mailboxModel->getMaildirFolder()->path()."\n";
+			if(empty($params['q'])) {
+				echo 'Calculating size of ' . $mailboxModel->getMaildirFolder()->path() . "\n";
+			}
 			$mailboxModel->cacheUsage();
-			echo \GO\Base\Util\Number::formatSize($mailboxModel->usage*1024)."\n";
+
+			if(empty($params['q'])) {
+				echo \GO\Base\Util\Number::formatSize($mailboxModel->usage * 1024) . "\n";
+			}
 		}
 
 	}

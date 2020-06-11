@@ -17,4 +17,7 @@ return array (
   'Filters' => 'Filtres',
   'Commented at' => 'Commenté à',
   'Note book' => 'Carnet de notes',
+  'Default note book' => 'Carnet de notes par defaut',
+  'Enter password to decrypt' => 'Entrer mot de passe pour decrypter',
+  'Encrypted data' => 'Données Cryptées',
 );

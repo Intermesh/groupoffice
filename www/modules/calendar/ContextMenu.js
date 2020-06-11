@@ -32,11 +32,9 @@ GO.calendar.ContextMenu = function(config){
 		disabled:true,
 		handler: function()
 		{
-			if(this.event.repeats)
-			{
+			if(this.event.repeats) {
 				this.menuHandler();
-			}else
-			{
+			} else {
 				this.showSelectDateDialog(false, false);
 			}
 		}
@@ -91,13 +89,6 @@ GO.calendar.ContextMenu = function(config){
 		config.items.splice(1,0,this.actionAddTimeRegistration);
 	}
 
-/*
-	this.selectDateDialog = new GO.calendar.SelectDateDialog();
-	this.selectDateDialog.on('updateEvent', function(event, isCopy, repeats, offset, new_event_id)
-	{
-		this.fireEvent('updateEvent', this, event, isCopy, repeats, offset, new_event_id);
-	}, this);			
-	*/
 	GO.calendar.ContextMenu.superclass.constructor.call(this,config);
 
 	this.addEvents({

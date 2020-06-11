@@ -47,7 +47,10 @@ go.links.LinkGrid = Ext.extend(go.grid.GridPanel, {
 			  enableRowBody:true,
 			  showPreview:true,
 			  getRowClass : function(record, rowIndex, p, ds) {
-					p.body = '<small>' +record.data.description + '</small>';
+			  	if(!record.data.description) {
+						record.data.description = "-";
+					}
+					p.body = '<small>' + record.data.description + '</small>';
 					return 'x-grid3-row-expanded';				
 			  },
 				grid: this,

@@ -1,0 +1,51 @@
+<?php
+return array (
+  'Address Book' => 'Książka adresowa',
+  'emailTypes' => 
+  array (
+    'work' => 'praca',
+    'home' => 'dom',
+  ),
+  'Address books' => 'Książki adresowe',
+  'Contact' => 'Kontakt',
+  'All contacts' => 'Wszystkie kontakty',
+  'Add phone number' => 'Dodaj nr telefonu',
+  'Labels' => 'Etykiety',
+  'Page' => 'Strona',
+  'Page format' => 'Marginesy strony',
+  'Page margins' => 'Ustawienia strony',
+  'Font' => 'Czcionka',
+  'Template' => 'Szablon',
+  'Advanced' => 'Zaawansowane',
+  'salutationTemplate' => 'Dear [if {{contact.prefixes}}]{{contact.prefixes}}[else][if !{{contact.gender}}]Ms./Mr.[else][if {{contact.gender}}=="M"]Mr.[else]Ms.[/if][/if][/if][if {{contact.middleName}}] {{contact.middleName}}[/if] {{contact.lastName}}',
+  'addressTypes' => 
+  array (
+    'visit' => 'Zamieszkania',
+    'postal' => 'Korespondencyjny',
+    'work' => 'Praca',
+    'home' => 'Domowy',
+  ),
+  'dateTypes' => 
+  array (
+    'birthday' => 'urodziny',
+    'anniversary' => 'rocznica',
+  ),
+  'E-mail addresses' => 'Adresy e-mail',
+  'Add e-mail address' => 'Dodaj adres e-mail',
+  'E-mail address' => 'Adres e-mail',
+  'Dates' => 'Daty',
+  'Addresses' => 'Adresy',
+  'ZIP code' => 'Kod pocztowy',
+  'state' => 'województwo',
+  'Country code' => 'Kod kraju',
+  'Add online url' => 'Dodaj adres strony',
+  'Enable for' => 'Włącz dla',
+  'Customer number' => 'Numer klienta',
+  'Name bank' => 'Nazwa banku',
+  'Show' => 'Pokaż',
+  'Add group' => 'Dodaj grupę',
+  'Add date' => 'Dodaj datę',
+  'Default address book' => 'Domyślna książka adresowa',
+  'Create personal address book for each user' => 'Utwórz prywatną książkę adresową dla każdego użytkownika',
+  'Add street address' => 'Dodaj adres',
+);

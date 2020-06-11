@@ -186,7 +186,7 @@ class Account extends \GO\Base\Db\ActiveRecord {
 		}
 		
 		if(
-				($this->isNew || $this->isModified("host") || $this->isModified("port") || $this->isModified("username")  || $this->isModified("password") || $this->isModified("imap_encryption")) 
+				($this->isNew || $this->isModified("mbroot") || $this->isModified("host") || $this->isModified("port") || $this->isModified("username")  || $this->isModified("password") || $this->isModified("imap_encryption"))
 				&& $this->checkImapConnectionOnSave
 			){
 

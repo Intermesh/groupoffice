@@ -50,6 +50,13 @@ go.Jmap = {
 				while(r = response.shift()) {
 					var method = r.shift();
 					r.push(clientCallId);
+					//escape % for console.log
+					r = r.map(function(i) {
+						if(Ext.isString(i)) {
+							i = i.replace(/%/g, "%%");
+						}
+						return i;
+					});
 					console[method].apply(null, r);
 				}
 
@@ -60,7 +67,7 @@ go.Jmap = {
 	},
 
 	abort: function (clientCallId) {
-		console.log("Abort request " + clientCallId);
+		console.warn("Abort request " + clientCallId);
 
 		for (var i = 0, l = this.requests.length; i < l; i++) {
 			if (this.requests[i][2] == clientCallId) {
@@ -136,8 +143,18 @@ go.Jmap = {
 
 	},
 
-	uploadQueue: [],
+	uploadQueue: {},
 
+	resetUploadQueue: function() {
+		this.uploadQueue = {
+			totalBytes: 0,
+			remainingBytes: 0,
+			finished: 0,
+			failed: 0,
+			items: []
+		};
+	},
+	uploaderCollapsed: false,
 	/**
 	 *
 	 * @param {File} file
@@ -148,83 +165,178 @@ go.Jmap = {
 			cfg.callback && cfg.callback.call(cfg.scope || this, {upload:'skipped'});
 			return;
 		}
+		var uploadNotification = go.Notifier.msgByKey('upload');
+		if(!uploadNotification) {
+			this.resetUploadQueue();
+			//var finsished = this.uploadQueue.filter((obj) => obj.finsished).length
+			//create upload notification container
+			uploadNotification = go.Notifier.msg({
+				persistent: true,
+				iconCls: 'ic-file-upload',
+				title: t('Uploads'),
+				addUpload: function(item) {
+					var details = this.items.get('details');
+					if(!details.rendered) {
+						details.render();
+					}
+					var comp = details.add(new Ext.Panel(item));
+					details.doLayout(false, true);
+					return comp;
+				},
+				items:[
+					{xtype:'progress',animate:true,itemId:'totalProgress', height:4,style:'margin: 7px 0'},
+					{xtype:'panel', itemId:'details',collapsed:false, animCollapse: false, forceLayout:true, collapsible:true, title:'Details', listeners: {
+							afterrender: function() {
+								this.collapse();
+							}
+						}}
+				],
+				tbar: [{xtype:'tbtext',itemId: 'fileCount', html:t('{finsished} of {total}')
+						.replace('{finsished}', 0)
+						.replace('{total}', 1)},'->', {
+					text:t('Abort all'),
+					handler: function() {
+						uploadNotification.setPersistent(false);
+						for(var i = 0; i < this.uploadQueue.items.length; i++) {
+							this.uploadQueue.items[i].remainingBytes = 0;
+							Ext.Ajax.abort(this.uploadQueue.items[i].transactionId);
+						}
+					},
+					scope:this
+				}]
 
-		if(file.size > this.capabilities.maxSizeUpload) {
+			}, 'upload');
+		}
+
+		if(go.Notifier.notificationArea.collapsed) {
+			this.uploaderCollapsed = true;
+			go.Notifier.notificationArea.expand();
+		}
+
+		if(this.capabilities.maxSizeUpload && file.size > this.capabilities.maxSizeUpload) {
 			cfg.callback && cfg.callback.call(cfg.scope || this, {upload:'skipped'});
 			cfg.failure && cfg.failure.call(cfg.scope || this, data);
-			go.Notifier.notificationArea.expand();
-			go.Notifier.msg({
-				iconCls: 'ic-file-upload',
-				items:[
-					{xtype:'box',html:'<b>'+file.name+'</b><p class="danger">' +t('File size exceeds the maximum of {max}.').replace('{max}', go.util.humanFileSize(this.capabilities.maxSizeUpload)) + '</p>'},
-				],
-				title: t('Upload failed')
-			})
+			go.Jmap.uploadQueue.failed++;
+			uploadNotification.addUpload({
+				xtype:'panel',
+				title: t('Upload failed'),
+				html:'<b>'+file.name+'</b><p class="danger">' +t('File size exceeds the maximum of {max}.').replace('{max}', go.util.humanFileSize(this.capabilities.maxSizeUpload)) + '</p>'
+			});
+
+			uploadNotification.items.get('details').expand();
+
 			return;
 		}
 
-		// nicetohave: group file upload in 1 notification
-		this.uploadQueue.push(file);
 		go.Notifier.toggleIcon('upload', true);
 
-		var prevNotificationAreaState = null;
-		var started_at = new Date();
-		var transactionId = Ext.Ajax.request({url: go.User.uploadUrl,
-			timeout: 4 * 60 * 60 * 100, //4 hours
-			success: function(response) {
-				if(cfg.success && response.responseText) {
+		//start upload
+		uploadNotification.setPersistent(true); // cant close during upload
+		var started_at = new Date(),
+			queueItem = {
+				file: file,
+				finished: false,
+				transactionId: null
+			},
+			notifyEl = uploadNotification.addUpload({
+				items:[
+					{xtype:'box',html:'<b>'+Ext.util.Format.htmlEncode(file.name)+'</b><em>...</em>'},
+					{xtype:'progress',animate:true,itemId:'bar',height:4,style:'margin: 7px 0'}
+				],
+				title: t('Pending')+'...',
+				buttons: [{
+					text:t('Abort'),
+					handler: function() {
+						queueItem.remainingBytes = 0;
+						Ext.Ajax.abort(queueItem.transactionId);
+					}
+				}]
+			});
+
+
+		queueItem.transactionId = Ext.Ajax.request({
+			url: go.User.uploadUrl,
+			timeout: 4 * 60 * 60 * 1000, //4 hours
+			success: function (response) {
+				if (cfg.success && response.responseText) {
 					data = Ext.decode(response.responseText);
 					notifyEl.setTitle(t('Upload complete'));
 					setTimeout(function () {
 						go.Notifier.remove(notifyEl);
-						go.Notifier.notificationArea[prevNotificationAreaState ? 'collapse' : 'expand']();
 					}, 2000);
-					cfg.success.call(cfg.scope || this,data, file);
+					cfg.success.call(cfg.scope || this, data, file);
 				}
 			},
-			callback: function(response) {
-				go.Jmap.uploadQueue.remove(file);
-				if(Ext.isEmpty(this.uploadQueue)) {
+			callback: function (response) {
+				queueItem.finished = true;
+				queueItem.remainingBytes = 0; // success or fail, we are done
+				notifyEl.buttons[0].hide();
+				uploadNotification.getTopToolbar().items.get('fileCount').update(t('{finsished} of {total}')
+					.replace('{finsished}', ++go.Jmap.uploadQueue.finished)
+					.replace('{total}', go.Jmap.uploadQueue.items.length) + ' ' + t('files'));
+				if (go.Jmap.uploadQueue.items.length <= go.Jmap.uploadQueue.finished) {
 					go.Notifier.toggleIcon('upload', false); //done
-
+					if(go.Jmap.uploadQueue.failed == 0) { // noneFailed1
+						go.Notifier.remove(uploadNotification);
+					}
+					uploadNotification.setPersistent(false);
+					go.Notifier.notificationArea[go.Jmap.uploaderCollapsed ? 'collapse' : 'expand']();
+					go.Jmap.uploaderCollapsed = false; // default only set to true when collapsed on first upload
 				}
 				cfg.callback && cfg.callback.call(cfg.scope || this, response);
 			},
-			progress: function(e) {
+			progress: function (e) {
 				if (e.lengthComputable) {
-					var seconds_elapsed = (new Date().getTime() - started_at.getTime() )/1000;
-					var bytes_per_second =  seconds_elapsed ? e.loaded / seconds_elapsed : 0;
-					var remaining_bytes = e.total - e.loaded;
-					var seconds_remaining = seconds_elapsed ? remaining_bytes / bytes_per_second : '';
+					var seconds_elapsed = (new Date().getTime() - started_at.getTime()) / 1000;
+					var bytes_per_second = seconds_elapsed ? e.loaded / seconds_elapsed : 0;
+					queueItem.remainingBytes = e.total - e.loaded;
+					queueItem.remainingSeconds = seconds_elapsed ? queueItem.remainingBytes / bytes_per_second : '';
 					var percentage = (e.loaded / e.total * 100 | 0);
-					if(notifyEl) {
-						notifyEl.setTitle(t('Uploading...')+' &bull; ' + percentage + '%');
-						var box = notifyEl.items.items[0].getResizeEl();
-						if(box)
-							box.child('span', true).innerText = Math.round(seconds_remaining)+t('s');
-						notifyEl.items.items[1].updateProgress(percentage/100);
+					if (notifyEl) {
+						notifyEl.setTitle(t('Uploading...') + ' &bull; ' + percentage + '%');
+						var box = notifyEl.items.get(0).getResizeEl();
+						if (box)
+							box.child('em', true).innerText = Math.round(queueItem.remainingSeconds) + t('s');
+						notifyEl.items.get('bar').updateProgress(percentage / 100);
+					}
+
+					if(uploadNotification) {
+						var totalBytesRemaining = 0;
+						for(var i = 0; i < go.Jmap.uploadQueue.items.length; i++) {
+							var q = go.Jmap.uploadQueue.items[i];
+							totalBytesRemaining += (q.hasOwnProperty('remainingBytes') ? q.remainingBytes : q.file.size);
+						}
+						var loadedBytes = go.Jmap.uploadQueue.totalBytes - totalBytesRemaining;
+						var totalPercentage = loadedBytes / go.Jmap.uploadQueue.totalBytes * 100 | 0;
+						uploadNotification.setTitle(t('Uploads') + ' &bull; ' + totalPercentage + '%');
+						uploadNotification.items.get('totalProgress').updateProgress(totalPercentage / 100)
 					}
 				}
 				cfg.progress && cfg.progress.call(cfg.scope || this, e);
 			},
-			failure: function(response, options) {
+			failure: function (response, options) {
+
 				var data = response,
 					title = response.isAbort ? t('Upload aborted') : t('Upload failed');
-					text = '<b>'+Ext.util.Format.htmlEncode(file.name)+'</b><p class="danger">';
+				text = '<b>' + Ext.util.Format.htmlEncode(file.name) + '</b><p class="danger">';
 
-				if(cfg.failure && response.responseText) {
+				if (cfg.failure && response.responseText) {
 					data = Ext.decode(response.responseText);
-				} else if(response.status === 413) { // "Request Entity Too Large"
+				} else if (response.status === 413) { // "Request Entity Too Large"
 					text += t('File too large');
-				} else if(!response.isAbort) {
+				} else if (!response.isAbort) {
 					text += 'Please check if the system is using the correct URL at System settings -> General -> URL.';
 				}
 				text += "</p>";
 
-				notifyEl.buttons[0].hide();
-				notifyEl.setPersistent(false).setTitle(title);
+				go.Jmap.uploadQueue.failed++;
+				notifyEl.setTitle(title);
 				notifyEl.items.get(0).update(text);
 				cfg.failure && cfg.failure.call(cfg.scope || this, data);
+
+				uploadNotification.items.get('details').expand();
+				go.Jmap.uploaderCollapsed = false;
+
 			},
 			headers: {
 				'X-File-Name': "UTF-8''" + encodeURIComponent(file.name),
@@ -233,23 +345,11 @@ go.Jmap = {
 			},
 			xmlData: file // just "data" wasn't available in ext
 		});
-		var prevNotificationAreaState = go.Notifier.notificationArea.collapsed;
-		go.Notifier.notificationArea.expand();
-		var notifyEl = go.Notifier.msg({
-			persistent: true,
-			iconCls: 'ic-file-upload',
-			items:[
-				{xtype:'box',html:'<b>'+Ext.util.Format.htmlEncode(file.name)+'</b><span>...</span>'},
-				{xtype:'progress',height:4,style:'margin: 7px 0'}
-			],
-			title: t('Uploading...'),
-			buttons: [{
-				text:t('Abort'),
-				handler: function() {
-					Ext.Ajax.abort(transactionId);
-				}
-			}]
-		});
+		this.uploadQueue.totalBytes += file.size;
+		this.uploadQueue.items.push(queueItem);
+		uploadNotification.getTopToolbar().items.get('fileCount').update(t('{finsished} of {total}')
+			.replace('{finsished}', this.uploadQueue.finished)
+			.replace('{total}', this.uploadQueue.items.length) + ' ' + t('files'));
 	},
 	
 	/**
@@ -320,22 +420,6 @@ go.Jmap = {
 
 
 			},false);
-
-
-			source.addEventListener('open', function(e) {
-				// Connection was opened.
-			}, false);
-
-			source.addEventListener('error', function(e) {
-				if (e.readyState == EventSource.CLOSED) {
-					// Connection was closed.
-
-				} else
-				{
-					console.error(e);
-				}
-
-			}, false);
 		}
 		catch(e) {
 			console.error("Failed to start Server Sent Events. Perhaps the API URL in the system settings is invalid?", e);
@@ -442,8 +526,10 @@ go.Jmap = {
 
 					responses.forEach(function (response) {
 
+						var clientCallId = response[2];
+
 						//lookup request options by client ID
-						var o = this.requestOptions[response[2]], me = this;
+						var o = this.requestOptions[clientCallId], me = this;
 						if (!o) {
 							//aborted
 							console.debug("Aborted");
@@ -458,7 +544,7 @@ go.Jmap = {
 								if (!o.scope) {
 									o.scope = this;
 								}
-								o.callback.call(o.scope, o, success, response[1], response[2]);
+								o.callback.call(o.scope, o, success, response[1], clientCallId);
 							} else {
 
 								response[1].options = o;
@@ -470,7 +556,7 @@ go.Jmap = {
 								}
 							}
 
-							delete me.requestOptions[response[2]];
+							delete me.requestOptions[clientCallId];
 
 					}, this);
 

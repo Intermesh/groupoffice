@@ -101,13 +101,16 @@ trait SearchableTrait {
 		return true;
 	}
 	
-	public static function deleteSearchAndLinks(Query $query) {		
-		if(!\go()->getDbConnection()
-						->delete('core_search', 
-										(new Query)
-											->where(['entityTypeId' => static::entityType()->getId()])
-											->andWhere('entityId', 'IN', $query)
-										)->execute()) {
+	public static function deleteSearchAndLinks(Query $query) {
+		$delSearchStmt = \go()->getDbConnection()
+			->delete('core_search',
+				(new Query)
+					->where(['entityTypeId' => static::entityType()->getId()])
+					->andWhere('entityId', 'IN', $query)
+			);
+//		$s = (string) $delSearchStmt;
+
+		if(!$delSearchStmt->execute()) {
 			return false;
 		}
 		

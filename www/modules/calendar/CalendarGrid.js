@@ -441,10 +441,10 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 		var timeformat;
 
 		var timeColHeight = (((this.rowHeight)*this.rowsPerHour));
-
+		var h = GO.settings.time_format.substr(0,1);
 		for (var i = 0;i<this.scale;i+=this.rowsPerHour)
 		{
-			timeformat = GO.settings.time_format.substr(0,1)=='H' ? 'G:i' : 'g a';
+			timeformat = h=='H' || h=='G' ? 'G:i' : 'g a';
 			Ext.DomHelper.append(timeCol,
 			{
 				tag: 'div',

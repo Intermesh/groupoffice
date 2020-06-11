@@ -147,43 +147,47 @@ class Mailbox extends \GO\Base\Db\ActiveRecord {
 	 * @return \GO\Base\Fs\Folder
 	 */
 	public function getMaildirFolder(){
-		return new \GO\Base\Fs\Folder('/home/vmail/'.$this->maildir);
+		$vmail = empty(\GO::config()->vmail_path) ? '/var/mail/vhosts/' :  GO::config()->vmail_path;
+		return new \GO\Base\Fs\Folder($vmail . $this->maildir);
 	}
 	
-	public function cacheUsage(){		
+	public function cacheUsage(){
 		$this->usage = $this->active ? $this->getUsageFromDovecot() : false;
 		
 		if($this->usage === false) {
-			$this->usage = $this->getMaildirFolder()->calculateSize()/1024;
+			$folder = $this->getMaildirFolder();
+			$this->usage = $folder->exists() ? $folder->calculateSize() / 1024 : 0;
 		}
 		
 		return $this->save();
 	}
-	
-	
+
+
 	private function getUsageFromDovecot() {
-		exec("doveadm quota get -u " . escapeshellarg($this->username), $output, $return);
-		
+		exec("doveadm quota get -u " . escapeshellarg($this->username) . " 2>/dev/null", $output, $return);
+
 		/**
 		 * returns:
 		 * Quota name Type      Value    Limit                                                                     %
-User quota STORAGE 9547844 10240000                                                                    93
-User quota MESSAGE   81592        -                                                                     0
+		User quota STORAGE 9547844 10240000                                                                    93
+		User quota MESSAGE   81592        -                                                                     0
 		 */
-		
-		if($return !=0) {
+
+		if($return != 0) {
 			return false;
 		}
-	
+
 		if(!isset($output[0])) {
 			return false;
-		}		
-		
-		if(!preg_match("/STORAGE +([0-9]*)/", $output[0], $matches)) {
-			return false;
 		}
-		
-		return (int) $matches[1];
+		array_shift($output);
+		foreach($output as $line) {
+			if(preg_match("/STORAGE\s+([0-9]*)/", $line, $matches)) {
+				return (int) $matches[1];
+			}
+		}
+
+		return false;
 	}
 
 	private function _checkQuota() {

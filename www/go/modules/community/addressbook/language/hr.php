@@ -101,4 +101,6 @@ return array (
   'Street 2' => 'Ulica 2',
   'ZIP code' => 'Poštanski broj',
   'Add group' => 'Dodaj grupu',
+  'First' => 'Ime',
+  'Last' => 'Prezime',
 );

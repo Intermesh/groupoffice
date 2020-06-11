@@ -66,7 +66,7 @@ class Debugger {
 	public function __construct() {
 		try {
 			if(!empty(go()->getConfig()['core']['general']['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug')) {
-				$this->enable();
+				$this->enable(go()->getConfig()['core']['general']['debugLog']);
 			}
 
 		} catch (\go\core\exception\ConfigurationException $e) {
@@ -75,9 +75,9 @@ class Debugger {
 		}
 	}
 
-	public function enable() {
+	public function enable($log = true) {
 		$this->enabled = true;
-		if(go()->getConfig()['core']['general']['debugLog']) {
+		if($log) {
 			$logFile = go()->getDataFolder()->getFile('log/debug.log');
 			if($logFile->isWritable()) {
 				if(!$logFile->exists()) {
