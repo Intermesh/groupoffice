@@ -1,3 +1,6 @@
+11-06-2020 6.4.148
+- Core: File upload was broken when Group-Office was not running in the root of the domain.
+
 09-06-2020 6.4.147
 - Core: Typo in setIsCondfidential leading to oauth problems
 
