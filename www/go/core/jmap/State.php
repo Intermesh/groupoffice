@@ -4,9 +4,7 @@ namespace go\core\jmap;
 use \GO\Base\Model\State as OldState;
 use go\core\model\Token;
 use go\core\auth\State as AbstractState;
-use go\core\http\Exception;
 use go\core\http\Response;
-use go\core\jmap\Request;
 use go\core\model\Settings;
 use go\core\model\User;
 
@@ -143,25 +141,31 @@ class State extends AbstractState {
 			Response::get()->output($this->getSession());
 		}
 	}
+
+	private function getBaseUrl() {
+		$url = Request::get()->isHttps() ? 'https://' : 'http://';
+		$url .= Request::get()->getHost(false) . dirname($_SERVER['PHP_SELF']);
+		return $url;
+	}
 	
 	public function getDownloadUrl($blobId) {
-		return Settings::get()->URL . "api/download.php?blob=".$blobId;
+		return $this->getBaseUrl() . "/download.php?blob=".$blobId;
 	}
 
 	public function getPageUrl($blobId) {
-		return Settings::get()->URL . "api/page.php?blob=".$blobId;
+		return $this->getBaseUrl(). "/page.php?blob=".$blobId;
 	}
 	
 	public function getApiUrl() {
-		return Settings::get()->URL . 'api/jmap.php';
+		return $this->getBaseUrl() . '/jmap.php';
 	}
 	
 	public function getUploadUrl() {
-		return Settings::get()->URL . 'api/upload.php';
+		return $this->getBaseUrl(). '/upload.php';
 	}
 	
 	public function getEventSourceUrl() {
-		return go()->getConfig()['core']['general']['sseEnabled'] ? Settings::get()->URL.'api/sse.php' : null;
+		return go()->getConfig()['core']['general']['sseEnabled'] ? $this->getBaseUrl() . '/sse.php' : null;
 	}
 
 

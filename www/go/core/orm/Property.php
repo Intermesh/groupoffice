@@ -1820,7 +1820,7 @@ abstract class Property extends Model {
 		switch ($column->dbType) {
 			case 'date':
 			case 'datetime':
-				if(!($value instanceof \DateTime) || ($value instanceof DateTimeImmutable)){
+				if(!($value instanceof \DateTime) && !($value instanceof DateTimeImmutable)){
 					$this->setValidationError($column->name, ErrorCode::MALFORMED, "No date object given for date column");
 				}
 				break;

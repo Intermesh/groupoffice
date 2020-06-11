@@ -76,9 +76,7 @@ class Note extends AclItemEntity {
 	protected function getSearchName() {
 		return $this->name;
 	}
-	
 
-	
 	/**
 	 * Return columns to search on with the 'text' filter. {@see filter()}
 	 * 

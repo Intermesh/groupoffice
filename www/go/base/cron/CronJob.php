@@ -292,7 +292,11 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 				$moduleId = strtolower($parts[1]);
 				
 				if ($moduleId != 'base' && !GO::modules()->isInstalled($moduleId)) {
-					throw new Exception('Aborted because module ' . $moduleId . ' is not installed');
+
+					$this->error ='Aborted because module ' . $moduleId . ' is not installed';
+					$this->save();
+
+					return false;
 				}
 
 				if ($moduleId != 'base' && !GO::modules()->isAvailable($moduleId)) {
@@ -303,12 +307,18 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 					if(!$ioncubeInstalled) {
 						$msg .= 'Ioncube is NOT installed on the CLI interface. This might be a problem if this is a professional module.';
 					}
-					
-					throw new Exception($msg);
+
+					$this->error = $msg;
+					$this->save();
+
+					return false;
 				}
 
 				if (!class_exists($this->job)) {
-					throw new Exception('Aborted because cron job class file is missing');
+					$this->error = 'Aborted because cron job class file is missing';
+					$this->save();
+
+					return false;
 				}
 				
 				// Run the specified cron file code

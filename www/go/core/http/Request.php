@@ -261,37 +261,42 @@ class Request extends Singleton{
 		return false;
 	}
 
+	private $host;
 	/**
 	 * Get the host name of the request.
-	 * 
-	 * @return string
+	 *
+	 * @param bool $stripPort remove :1234 from result
+	 * @return string eg. localhost:6480
 	 */
 	public function getHost($stripPort = true) {
-		$possibleHostSources = array('HTTP_X_FORWARDED_HOST', 'HTTP_HOST', 'SERVER_NAME', 'SERVER_ADDR');
-    $sourceTransformations = array(
-        "HTTP_X_FORWARDED_HOST" => function($value) {
-            $elements = explode(',', $value);
-            return trim(end($elements));
-        }
-    );
-    $host = '';
-    foreach ($possibleHostSources as $source)
-    {
-        if (!empty($host)) break;
-        if (empty($_SERVER[$source])) continue;
-        $host = $_SERVER[$source];
-        if (array_key_exists($source, $sourceTransformations))
-        {
-            $host = $sourceTransformations[$source]($host);
-        } 
-    }
+
+		if(!isset($this->host)) {
+			$possibleHostSources = array('HTTP_X_FORWARDED_HOST', 'HTTP_HOST', 'SERVER_NAME', 'SERVER_ADDR');
+			$sourceTransformations = array(
+				"HTTP_X_FORWARDED_HOST" => function ($value) {
+					$elements = explode(',', $value);
+					return trim(end($elements));
+				}
+			);
+			$this->host = '';
+			foreach ($possibleHostSources as $source) {
+				if (!empty($this->host)) break;
+				if (empty($_SERVER[$source])) continue;
+				$this->host = $_SERVER[$source];
+				if (array_key_exists($source, $sourceTransformations)) {
+					$this->host = $sourceTransformations[$source]($this->host);
+				}
+			}
+
+			$this->host = trim($this->host);
+		}
 
     // Remove port number from host
 		if($stripPort) {
-			$host = preg_replace('/:\d+$/', '', $host);
+			return preg_replace('/:\d+$/', '', $this->host);
 		}
 
-    return trim($host);
+    return $this->host;
 	}
 
 //	/**

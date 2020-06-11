@@ -8,6 +8,7 @@ use GO\Base\Exception\AccessDenied;
 
 use go\core\model\User;
 use GO\Email\Model\Account;
+use GO\Email\Model\Alias;
 use GO\Email\Model\Label;
 
 use GO\Base\Model\Acl;
@@ -1628,6 +1629,26 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if($vcalendar){
 			$vevent = $vcalendar->vevent[0];
 
+			$aliases = GO\Email\Model\Alias::model()->find(
+				GO\Base\Db\FindParams::newInstance()
+					->select('email')
+					->criteria(GO\Base\Db\FindCriteria::newInstance()->addCondition('account_id' , $imapMessage->account->id))
+			)->fetchAll(\PDO::FETCH_COLUMN, 0);
+
+			$emailFound = false;
+			foreach($vevent->attendee as $vattendee) {
+				$attendeeEmail = str_replace('mailto:','', strtolower((string) $vattendee));
+				if(in_array($attendeeEmail, $aliases)) {
+					$emailFound = true;
+					$accountEmail = $attendeeEmail;
+				}
+			}
+
+			if(!$emailFound) {
+				$response['iCalendar']['feedback'] = GO::t("None of the participants match your e-mail aliases for this e-mail account.", "email");
+				return $response;
+			}
+
 			//is this an update for a specific recurrence?
 			$recurrenceDate = isset($vevent->{"recurrence-id"}) ? $vevent->{"recurrence-id"}->getDateTime()->format('U') : 0;
 
@@ -1675,7 +1696,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$response['iCalendar']['invitation'] = array(
 						'uuid' => $uuid,
 						'email_sender' => $response['sender'],
-						'email' => $imapMessage->account->getDefaultAlias()->email,
+						'email' => $accountEmail,
 						//'event_declined' => $event && $event->status == 'DECLINED',
 						'event_id' => $event ? $event->id : 0,
 						'is_organizer'=>$event && $event->is_organizer,

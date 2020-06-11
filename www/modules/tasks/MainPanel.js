@@ -135,6 +135,8 @@ this.gridPanel.store.on('load', function(store, records, options)
 			resizable:true,
 			cls: 'go-sidenav',
 			layout:'border',
+			split: true,
+			id: 'ta-west-panel',
 			items:[
 				filterPanel,
 				this.accordionPanel

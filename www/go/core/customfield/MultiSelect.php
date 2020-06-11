@@ -166,7 +166,7 @@ class MultiSelect extends Select {
 			$cls = $query->getModel();
 			$primaryTableAlias = array_values($cls::getMapping()->getTables())[0]->getAlias();
 			$joinAlias = $this->getJoinAlias();
-			$query->join($this->getMultiSelectTableName(), $joinAlias, $joinAlias.'.id = '.$primaryTableAlias.'.id');
+			$query->join($this->getMultiSelectTableName(), $joinAlias, $joinAlias.'.id = '.$primaryTableAlias.'.id', 'left');
 
 			if(isset($value[0]) && is_numeric($value[0])) {
 				//When field option ID is passed by a saved filter
@@ -174,7 +174,7 @@ class MultiSelect extends Select {
 			} else{
 				//for text queries we must join the options.
 				$alias = 'opt_' . uniqid();
-				$query->join('core_customfields_select_option', $alias, $alias . '.id = '.$joinAlias. '.optionId');
+				$query->join('core_customfields_select_option', $alias, $alias . '.id = '.$joinAlias. '.optionId', 'left');
 				$criteria->where($alias . '.text', $comparator, $value);
 			}	
 			

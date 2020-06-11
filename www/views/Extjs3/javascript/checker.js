@@ -46,8 +46,8 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			[7*86400, '7 '+t("Days")]
 		];
 
+		this.reminders = new Ext.Container({cls: 'notifications', layout: "anchor", defaults: {anchor: "100%"}});
 
-		this.reminders = new Ext.Container({cls: 'notifications', layout:"anchor", defaults: {anchor: "100%"}});
 		this.reminderStore = new Ext.data.GroupingStore({
 			reader: new Ext.data.JsonReader({
 				totalProperty: "count",
@@ -125,10 +125,12 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 			}, this);
 
+			go.Notifier.notificationArea.doLayout();
+
 		},this);
 
 		go.Notifier.notificationArea.add(this.reminders);
-		go.Notifier.notificationArea.doLayout();
+		// go.Notifier.notificationArea.doLayout();
 
 	},
 

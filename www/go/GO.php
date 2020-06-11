@@ -488,6 +488,10 @@ class GO{
 
 				//apcu_store($cacheKey, self::$_config);
 			}
+
+			if(!empty(GO::session()->values['debug'])) {
+				go()->getDebugger()->enable();
+			}
 		}
 		return self::$_config;
 	}

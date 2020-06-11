@@ -183,7 +183,11 @@ class Select extends Base {
 			} else{
 				//for text queries we must join the options.
 				$alias = 'opt_' . $this->field->id;
-				$query->join('core_customfields_select_option', $alias, $alias . '.id = customFields.' . $this->field->databaseName);
+				$query->join(
+					'core_customfields_select_option',
+					$alias, $alias . '.id = customFields.' .
+					$this->field->databaseName,
+				'left');
 				$criteria->where($alias . '.text', $comparator, $value);
 			}
 		});

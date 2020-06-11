@@ -4,6 +4,7 @@ namespace go\core\jmap;
 
 use Exception;
 use go\core\Installer;
+use go\core\model\Module;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
@@ -80,21 +81,23 @@ abstract class Entity  extends OrmEntity {
 		return true;
 	}
 
-  /**
-   * @return bool
-   * @throws Exception
-   */
-	private function checkFilesFolder() {
-		if(empty($this->filesFolderId) || Installer::isInProgress()) {
+	/**
+	 * @param bool $force Used in database check to force a check
+	 * @return bool
+	 * @throws \GO\Base\Exception\AccessDenied
+	 */
+	private function checkFilesFolder($force = false) {
+		if(empty($this->filesFolderId)  || Installer::isInProgress()) {
 			return true;
 		}
 
-		$filesPathProperties = $this->filesPathProperties();
+		$filesPathProperties = static::filesPathProperties();
 		if(!empty($filesPathProperties)) {
-			if($this->isModified($filesPathProperties)) {
+			if($force || $this->isModified($filesPathProperties)) {
+				$oldFilesFolderId = $this->filesFolderId;
 				$folder = Folder::model()->findForEntity($this, false);
 
-				if($folder->id != $this->filesFolderId) {
+				if($folder->id != $oldFilesFolderId) {
 					$this->filesFolderId = $folder->id;
 					if(!go()->getDbConnection()
 							->update($this->getMapping()->getPrimaryTable()->getName(), 
@@ -107,6 +110,39 @@ abstract class Entity  extends OrmEntity {
 			}
 		}
 		return true;
+	}
+
+	public static function check()
+	{
+		parent::check();
+
+		if(property_exists(static::class, 'filesFolderId') && Module::isInstalled('legacy', 'files')) {
+			$tables = static::getMapping()->getTables();
+			$table = array_values($tables)[0]->getName();
+
+			$entities = static::find(array_merge(['id', 'filesFolderId'], static::filesPathProperties()))
+				->where('filesFolderId', '!=', null)
+				->where('filesFolderId', 'NOT IN', (new Query())->select('id')->from('fs_folders'));
+
+			foreach($entities as $e) {
+				$e->checkFilesFolder(true);
+			}
+
+			//update fs_folders set acl_id = 0 where acl_id not in (select id from core_acl)
+			// select * from fs_folders where acl_id not in (select id from core_acl)
+			if(is_a(static::class, AclOwnerEntity::class, true)) {
+				$entities = static::find(array_merge(['id', 'filesFolderId'], static::filesPathProperties()));
+
+				$entities->join('fs_folders', 'f', 'f.id = '.$entities->getTableAlias() .'.filesFolderId')
+					->where('f.acl_id', 'NOT IN', (new Query())->select('id')->from('core_acl'));
+
+				//$sql = (string) $entities;
+
+				foreach($entities as $e) {
+					$e->checkFilesFolder(true);
+				}
+			}
+		}
 	}
 
 	/**
@@ -135,7 +171,7 @@ abstract class Entity  extends OrmEntity {
 	 * 
 	 * @return string[]
 	 */
-	protected function filesPathProperties() {
+	protected static function filesPathProperties() {
 		return [];
 	}
 

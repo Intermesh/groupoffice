@@ -2,6 +2,7 @@
 
 go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	fieldSet: null,
+	hideMode: 'offsets',
 	initComponent: function () {
 		
 		var items = [];

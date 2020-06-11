@@ -1,5 +1,51 @@
+11-06-2020 6.4.149
+- Calendar: missing go-hidden class showed calendar accept links not intended for GO
+- Calendar: Use email account for sending invites
+- Calendar: Fix for "No participant found for this event"
+
+11-06-2020 6.4.148
+- Core: File upload was broken when Group-Office was not running in the root of the domain.
+
+09-06-2020 6.4.147
+- Core: Typo in setIsCondfidential leading to oauth problems
+
+09-06-2020 6.4.146
+- Email: select next message when dragging message to other folder
+- Core: Oauth failure in generating private key
+- Core: Database check fixes file acl problems
+
+08-06-2020 6.4.145
+- Core: Support for OpenID / OAuth 2.0 so we can integrate with Rocket.Chat
+- Address book: Added zipcode to contact search
+- Core: Use host header to determine API endpoints so you can have multiple hosts to connect to GO
+- Core: Upload errors where hidden in collapsed panels
+- Core: CTRL + F7 debug was broken
+
+25-05-2020 6.4.144
+- Address book: Added birthday column
+- Core: Render issue with hidden HTML custom field
+- Newsletters: Sometimes errors were reported with an incorrect email address
+- Email: Aliases didn't show without manage permissions
+- Address book / core: Database check fixes mapping of files folders in address book
+- Address book: Upgrade from 6.3 to 6.4 could cause lost mapping of files folder. 
+
+25-05-2020 6.4.143
+- Core: error when loading more items in link browser fixed
+- Address book: Added organization city and organization country to contact filters
+- Address book: Improved simple text search by using global search cache
+- Calendar: add 'send email' dialog to context menu actions on appointments 
+- Address book: Address books searching and sorting in the combo when editing contacts
+- Core: filters can have sub groups making complex filters possibl. For example where conditionA and not conditionB 
+- Core: Disable cron jobs failing due to uninstalled modules
+
+20-05-2020 6.4.142
 - Core: Updated Polish and Croatian translation
 - Core: 6.4.141 Quota cronjob not displayed correct #580
+- Tasks: left panel is resizable
+- Core: fixed disapearing notifications
+- Address book: Export -> Labels didn't download
+- Address book: contacts filter also showed organizations
+- Projects: Fixed project example file and automatically find's contact and customer from address book
 
 15-05-2020 6.4.141
 - E-mail: Attachments from and to items filters out entities that doesn't support that
