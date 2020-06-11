@@ -56,6 +56,7 @@ use DateTimeZone;
 use GO\Calendar\Model\Exception;
 use GO;
 use GO\Base\Util\StringHelper;
+use go\core\model\Module;
 use Sabre;
 use Swift_Attachment;
 use Swift_Mime_ContentEncoder_PlainContentEncoder;
@@ -969,7 +970,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 
 					$message = \GO\Base\Mail\Message::newInstance(
 										$subject
-										)->setFrom(\GO::user()->email, \GO::user()->name)
+										)->setFrom(go()->getSettings()->systemEmail, go()->getSettings()->title)
 										->addTo($adminUser->email, $adminUser->name);
 
 					$message->setHtmlAlternateBody($body);					
@@ -1014,7 +1015,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 
 				$message = \GO\Base\Mail\Message::newInstance(
 									$subject
-									)->setFrom(\GO::user()->email, \GO::user()->name)
+									)->setFrom(go()->getSettings()->systemEmail, go()->getSettings()->title)
 									->addTo($this->user->email, $this->user->name);
 
 				$message->setHtmlAlternateBody($body);					
@@ -2034,7 +2035,7 @@ The following is the error message:
 										);
 						$message = \GO\Base\Mail\Message::newInstance(
 														$mailSubject
-														)->setFrom(\GO::config()->webmaster_email, \GO::config()->title)
+														)->setFrom(go()->getSettings()->systemEmail, go()->getSettings()->title)
 														->addTo($this->calendar->user->email);
 
 						$message->setHtmlAlternateBody(nl2br($body));
@@ -2546,7 +2547,7 @@ The following is the error message:
 
 		$message->setHtmlAlternateBody($body);
 
-		\GO\Base\Mail\Mailer::newGoInstance()->send($message);
+		$this->getUserMailer()->send($message);
 
 	}
 	
@@ -2613,8 +2614,8 @@ The following is the error message:
 			// Set back the original language
 			if($language !== false)
 				\GO::language()->setLanguage($language);
-			
-			\GO\Base\Mail\Mailer::newGoInstance()->send($message);
+
+			$this->getUserMailer()->send($message);
 		}
 
 		return true;
@@ -2730,10 +2731,9 @@ The following is the error message:
 					if($language !== false)
 						\GO::language()->setLanguage($language);
 
-					if(!\GO\Base\Mail\Mailer::newGoInstance()->send($message)) {
+					if(!$this->getUserMailer()->send($message)) {
 						throw new \Exception("Failed to send invite");
 					}
-
 					
 				}
 				
@@ -2742,6 +2742,23 @@ The following is the error message:
 			unset(\GO::session()->values['new_participant_ids']);
 			
 			return true;
+	}
+
+	/**
+	 *
+	 * @return GO\Base\Mail\Mailer
+	 */
+	private function getUserMailer() {
+
+		if(Module::isInstalled('legacy', 'email')) {
+			$account = GO\Email\Model\Account::model()->findByEmail($this->user->email)->findSingle();
+			if($account) {
+				$transport = GO\Email\Transport::newGoInstance($account);
+				return \GO\Base\Mail\Mailer::newGoInstance($transport);
+			}
+		}
+
+		return \GO\Base\Mail\Mailer::newGoInstance();
 	}
 	
 	public function resourceGetEventCalendarName() {

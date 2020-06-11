@@ -1,3 +1,5 @@
+- Calendar: missing go-hidden class showed calendar accept links not intended for GO
+
 11-06-2020 6.4.148
 - Core: File upload was broken when Group-Office was not running in the root of the domain.
 
