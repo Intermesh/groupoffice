@@ -17,8 +17,10 @@ class AttendanceController extends AbstractController{
 			throw new NotFound();
 		
 		$participant=$event->getParticipantOfCalendar();
-		if(!$participant)
-			throw new Exception("The participant of this event is missing");
+		if(!$participant) {
+			$name = $event->calendar->user->displayName . ' (' . $event->calendar->user->email . ')';
+			throw new Exception(str_replace('{name}', $name, go()->t("{name} was not invited for this event")));
+		}
 		
 		$organizer = $event->getOrganizer();
 		if(!$organizer)

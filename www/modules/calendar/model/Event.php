@@ -2444,9 +2444,16 @@ The following is the error message:
 	 * 
 	 * @return Participant
 	 */
-	public function getParticipantOfCalendar(){
+	public function getParticipantOfCalendar() {
+
+		$aliases = GO\Email\Model\Alias::model()->find(
+				GO\Base\Db\FindParams::newInstance()
+					->select('email')
+					->permissionLevel(GO\Base\Model\Acl::WRITE_PERMISSION, $this->calendar->user_id)
+				)->fetchAll(\PDO::FETCH_COLUMN, 0);
+
 		return Participant::model()->findSingleByAttributes(array(
-				'user_id'=>$this->calendar->user_id,
+				'email' => $aliases,
 				'event_id'=>$this->id
 		));
 	}
