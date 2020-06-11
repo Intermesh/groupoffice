@@ -227,7 +227,12 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		if (go.Modules.isAvailable("legacy", "files")) {
 			return this.add(new go.modules.files.FilesDetailPanel());
 		}
-	}
+	},
+	addHistory : function() {
+		if (go.Modules.isAvailable("community", "history")) {
+			this.add(new go.modules.community.history.HistoryDetailPanel());
+		}
+	},
 });
 
 Ext.reg("detailview", go.detail.Panel);

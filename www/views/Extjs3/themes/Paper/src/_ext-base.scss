@@ -1008,6 +1008,9 @@ div.x-toolbar-no-items {
 
 .x-action-col-icon {
    cursor: pointer;
+  &::before{
+    @extend %icon;
+  }
 }
 
 .x-grid3-hd-inner {
@@ -1716,6 +1719,9 @@ td.x-date-mp-month a:hover,td.x-date-mp-year a:hover {
 
 .ext-border-box .x-tip .x-tip-header, .ext-border-box .x-tip .x-tip-tc{
     line-height: 1px;
+}
+.x-tip-header .x-tool {
+  color:white;
 }
 
 .x-tip .x-tip-header-text {

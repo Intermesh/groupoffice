@@ -966,3 +966,24 @@ ALTER TABLE `core_oauth_client`
 ALTER TABLE `core_oauth_access_token`
   ADD CONSTRAINT `core_oauth_access_token_ibfk_2` FOREIGN KEY (`userIdentifier`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_oauth_access_token_ibfk_3` FOREIGN KEY (`clientId`) REFERENCES `core_oauth_client` (`id`) ON DELETE CASCADE;
+CREATE TABLE `core_alert` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `entityTypeId` INT NOT NULL,
+  `entityId` INT NOT NULL,
+  `userId` INT NOT NULL,
+  `triggerAt` DATETIME NOT NULL,
+  `alertId` INT NOT NULL,
+  `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `dk_alert_entityType_idx` (`entityTypeId` ASC),
+  INDEX `fk_alert_user_idx` (`userId` ASC),
+  CONSTRAINT `fk_alert_entityType`
+    FOREIGN KEY (`entityTypeId`)
+    REFERENCES `core_entity` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_alert_user`
+    FOREIGN KEY (`userId`)
+    REFERENCES `core_user` (`id`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION);

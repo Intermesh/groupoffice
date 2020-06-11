@@ -401,24 +401,23 @@ go.Jmap = {
 					}
 				}
 			}, false);
-			//
-			// source.addEventListener('open', function(e) {
-			// 	// Connection was opened.
-			// 	console.log("SSE running");
-			// 	console.log(source);
-			// }, false);
 
-			// source.addEventListener('error', function(e) {
-			// 	console.warn(source);
-			// 	if (source.readyState == EventSource.CLOSED) {
-			// 		// Connection was closed.
-			//
-			// 	} else
-			// 	{
-			// 		console.error(e);
-			// 	}
-			//
-			// }, false);
+			source.addEventListener('alert', function(e) {
+				var data = JSON.parse(e.data);
+				go.Db.store(data.entityType).single(data.entityId).then(function(entity) {
+					go.Notifier.flyout({
+						title: entity.title | entity.name || entity.subject || entity.description,
+						buttons: [{
+							text: 'Open',
+							handler: function() {
+								alert('biem');
+							}
+						}]
+					});
+				});
+
+
+			},false);
 		}
 		catch(e) {
 			console.error("Failed to start Server Sent Events. Perhaps the API URL in the system settings is invalid?", e);
