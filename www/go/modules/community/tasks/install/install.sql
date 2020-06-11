@@ -52,7 +52,6 @@ CREATE TABLE `tasks_task` (
   `uid` varchar(190) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '',
   `tasklistId` int(11) NOT NULL,
   `createdBy` int(11) NOT NULL,
-  `ownerId` int(11) NOT NULL,
   `createdAt` datetime NOT NULL,
   `modifiedAt` datetime NOT NULL,
   `modifiedBy` int(11) NOT NULL DEFAULT '0',
@@ -86,7 +85,6 @@ ALTER TABLE `tasks_task`
 ALTER TABLE `tasks_task`
   ADD CONSTRAINT `fkModifiedBy` FOREIGN KEY (`modifiedBy`) REFERENCES `core_user` (`id`),
   ADD CONSTRAINT `tasks_task_ibfk_1` FOREIGN KEY (`tasklistId`) REFERENCES `tasks_tasklist` (`id`),
-  ADD CONSTRAINT `tasks_task_owner_ibfk_2` FOREIGN KEY (`ownerId`) REFERENCES `core_user` (`id`),
   ADD CONSTRAINT `tasks_task_ibfk_2` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`);
 
 -- create category / task lookup table

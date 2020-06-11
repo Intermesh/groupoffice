@@ -130,7 +130,7 @@ class VCalendar extends AbstractConverter {
 		fputs($fp, $str);
 	}
 
-	protected function importEntity($entity, $fp, $index, array $params) {
+	protected function importEntity($entityClass, $fp, $index, array $params){
 		$t = "";
 	}
 	

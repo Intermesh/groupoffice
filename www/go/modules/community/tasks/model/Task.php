@@ -90,7 +90,7 @@ class Task extends AclItemEntity {
 
 
 	protected static function aclEntityClass(){
-		return TaskList::class;
+		return Tasklist::class;
 	}
 
 	protected static function aclEntityKeys(){
