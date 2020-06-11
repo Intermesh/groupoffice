@@ -28,4 +28,4 @@ CREATE TABLE IF NOT EXISTS `history_log_entry` (
     REFERENCES `core_entity` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
-ENGINE = InnoDB
+ENGINE = InnoDB;
