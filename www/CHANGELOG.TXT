@@ -1,3 +1,6 @@
+11-06-2020 6.2.126
+- Calendar: Fix for "No participant found for this event"
+
 03-02-2020 6.2.125
 - Sieve: Don't use :create flag on sieve filter action fileinto
 - Files: Check if old user wasn't deleted when recalculating quota
