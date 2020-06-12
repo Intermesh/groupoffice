@@ -1636,11 +1636,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			)->fetchAll(\PDO::FETCH_COLUMN, 0);
 
 			$emailFound = false;
-			foreach($vevent->attendee as $vattendee) {
-				$attendeeEmail = str_replace('mailto:','', strtolower((string) $vattendee));
-				if(in_array($attendeeEmail, $aliases)) {
-					$emailFound = true;
-					$accountEmail = $attendeeEmail;
+			if(isset($vevent->attendee)) {
+				foreach ($vevent->attendee as $vattendee) {
+					$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vattendee));
+					if (in_array($attendeeEmail, $aliases)) {
+						$emailFound = true;
+						$accountEmail = $attendeeEmail;
+					}
 				}
 			}
 
