@@ -1,3 +1,6 @@
+- Tickets: Search unseen only and fix missing domain in email
+- Email: Error on some ICS attachments or calendar invites
+  			
 11-06-2020 6.4.149
 - Calendar: missing go-hidden class showed calendar accept links not intended for GO
 - Calendar: Use email account for sending invites

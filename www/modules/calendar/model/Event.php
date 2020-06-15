@@ -2758,12 +2758,16 @@ The following is the error message:
 	private function getUserMailer() {
 
 		if(Module::isInstalled('legacy', 'email')) {
-			$account = GO\Email\Model\Account::model()->findByEmail($this->user->email)->findSingle();
+			$account = GO\Email\Model\Account::model()->findByEmail($this->user->email);
 			if($account) {
 				$transport = GO\Email\Transport::newGoInstance($account);
 				return \GO\Base\Mail\Mailer::newGoInstance($transport);
 			}
+			go()->debug("Can't find e-mail account for " . $this->user->email ." so will fall back on main SMTP configuration");
+
 		}
+
+		go()->debug("Using main SMTP configuration");
 
 		return \GO\Base\Mail\Mailer::newGoInstance();
 	}
