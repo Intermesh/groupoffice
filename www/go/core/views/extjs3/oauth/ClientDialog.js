@@ -21,7 +21,7 @@ go.oauth.ClientDialog = Ext.extend(go.form.Dialog, {
 						allowBlank: false
 					},
 					{
-						xtype: "checkbox",
+						xtype: "xcheckbox",
 						name: 'isConfidential',
 						boxLabel: t("Is confidential"),
 						listeners: {

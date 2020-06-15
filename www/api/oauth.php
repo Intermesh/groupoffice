@@ -155,6 +155,9 @@ class OAuthController {
 	private function getPrivateKeyFile() {
 		$file = go()->getDataFolder()->getFile('oauth2/private.key');
 		if(!$file->exists()) {
+
+			$file->getFolder()->create();
+
 			$private = openssl_pkey_new();
 			if(!openssl_pkey_export_to_file($private, $file->getPath())) {
 				throw new Exception ("Could not create private key file");

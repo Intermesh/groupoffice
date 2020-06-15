@@ -144,30 +144,28 @@ class State extends AbstractState {
 
 	private function getBaseUrl() {
 		$url = Request::get()->isHttps() ? 'https://' : 'http://';
-
-		$url .= Request::get()->getHost(false) ;
-
+		$url .= Request::get()->getHost(false) . dirname($_SERVER['PHP_SELF']);
 		return $url;
 	}
 	
 	public function getDownloadUrl($blobId) {
-		return $this->getBaseUrl() . "/api/download.php?blob=".$blobId;
+		return $this->getBaseUrl() . "/download.php?blob=".$blobId;
 	}
 
 	public function getPageUrl($blobId) {
-		return $this->getBaseUrl(). "/api/page.php?blob=".$blobId;
+		return $this->getBaseUrl(). "/page.php?blob=".$blobId;
 	}
 	
 	public function getApiUrl() {
-		return $this->getBaseUrl() . '/api/jmap.php';
+		return $this->getBaseUrl() . '/jmap.php';
 	}
 	
 	public function getUploadUrl() {
-		return $this->getBaseUrl(). '/api/upload.php';
+		return $this->getBaseUrl(). '/upload.php';
 	}
 	
 	public function getEventSourceUrl() {
-		return go()->getConfig()['core']['general']['sseEnabled'] ? $this->getBaseUrl() . '/api/sse.php' : null;
+		return go()->getConfig()['core']['general']['sseEnabled'] ? $this->getBaseUrl() . '/sse.php' : null;
 	}
 
 

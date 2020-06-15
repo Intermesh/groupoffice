@@ -275,15 +275,17 @@ class Folder extends Base {
 //				\GO::debug("chmod failed on ".$this->path);
 			return true;
 		}		
-		
-		if(mkdir($this->path, $permissionsMode,true)){
-			if(\GO::config()->file_change_group)
-				chgrp ($this->path, \GO::config()->file_change_group);
-			
-			return true;
-		}else
-		{			
-			throw new \Exception("Could not create folder ".$this->path);
+		try {
+			if (mkdir($this->path, $permissionsMode, true)) {
+				if (\GO::config()->file_change_group)
+					chgrp($this->path, \GO::config()->file_change_group);
+
+				return true;
+			} else {
+				throw new \Exception("Could not create folder " . $this->path);
+			}
+		} catch(Exception $e) {
+			throw new \Exception("Could not create folder '" . $this->path . "' " .$e->getMessage());
 		}
 	}
 	

@@ -2147,3 +2147,8 @@ table[id^="comments-ext"] b {
 		border: 2px dashed white;
 	}
 }
+
+/* used in mail to hide calendar links */
+.go-hidden {
+	display: none;
+}

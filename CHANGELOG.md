@@ -1,5 +1,29 @@
+15-06-2020 6.4.150
+- Tickets: Search unseen only and fix missing domain in email
+- Email: Error on some ICS attachments or calendar invites
+  			
+11-06-2020 6.4.149
+- Calendar: missing go-hidden class showed calendar accept links not intended for GO
+- Calendar: Use email account for sending invites
+- Calendar: Fix for "No participant found for this event"
+
+11-06-2020 6.4.148
+- Core: File upload was broken when Group-Office was not running in the root of the domain.
+
+09-06-2020 6.4.147
+- Core: Typo in setIsCondfidential leading to oauth problems
+
+09-06-2020 6.4.146
+- Email: select next message when dragging message to other folder
+- Core: Oauth failure in generating private key
+- Core: Database check fixes file acl problems
+
+08-06-2020 6.4.145
 - Core: Support for OpenID / OAuth 2.0 so we can integrate with Rocket.Chat
 - Address book: Added zipcode to contact search
+- Core: Use host header to determine API endpoints so you can have multiple hosts to connect to GO
+- Core: Upload errors where hidden in collapsed panels
+- Core: CTRL + F7 debug was broken
 
 25-05-2020 6.4.144
 - Address book: Added birthday column
