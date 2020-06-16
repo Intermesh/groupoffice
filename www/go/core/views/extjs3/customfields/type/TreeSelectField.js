@@ -165,6 +165,19 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 		});
 	},
 
+	isValid : function(preventMark){
+		if(this.disabled){
+			return true;
+		}
+		var f = this.items.items;
+		for(var i = 0, l = f.length; i < l; i++) {
+			if(f[i].isFormField && !f[i].isValid(preventMark)) {
+				return false;
+			}
+		}
+		return true;
+	},
+
 	validate: function () {
 		var valid = true, fn = function (i) {
 			if (i.isFormField && !i.validate()) {

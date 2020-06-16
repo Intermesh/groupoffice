@@ -357,6 +357,10 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	
 	validate : function() {
 		return true;
+	},
+
+	isValid: function(preventMark) {
+		return true;
 	}
 });
 

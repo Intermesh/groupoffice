@@ -208,7 +208,10 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 	},
 	isDirty : function() {
 		return this.valueField.isDirty() || this.operatorCombo.isDirty();
+	},
+	isValid : function(preventMark){
+		return this.valueField.isValid(preventMark) && this.operatorCombo.isValid(preventMark);
 	}
-	
+
 });
 

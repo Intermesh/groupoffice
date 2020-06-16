@@ -114,6 +114,9 @@ go.filter.types.string = Ext.extend(Ext.Panel, {
 	validate: function() {
 		return this.valueField.validate() && this.operatorCombo.validate();
 	},
+	isValid : function(preventMark){
+		return this.valueField.isValid(preventMark) && this.operatorCombo.isValid(preventMark);
+	},
 	markInvalid : function() {
 		return this.valueField.markInvalid();
 	},

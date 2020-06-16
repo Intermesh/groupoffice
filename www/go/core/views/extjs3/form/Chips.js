@@ -294,6 +294,10 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		return true;
 	},
 
+	isValid: function (preventMark) {
+		return this.allowBlank || !go.util.empty(this.getValue());
+	},
+
 	createNew : function(record) {
 
 		var data = record.data;
