@@ -25,6 +25,10 @@ GO.email.SettingsPanel = Ext.extend(Ext.Panel, {
 				boxLabel:t("Use HTML markup", "email"),
 				hideLabel:true,				
 				name:'emailSettings.use_html_markup'
+			}),this.showFrom = new Ext.form.Checkbox({
+				boxLabel:t("Show from field by default", "email"),
+				hideLabel:true,
+				name:'emailSettings.show_from'
 			}),this.showCC = new Ext.form.Checkbox({
 				boxLabel:t("Show CC field by default", "email"),
 				hideLabel:true,

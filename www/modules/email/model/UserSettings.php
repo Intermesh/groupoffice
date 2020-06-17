@@ -11,6 +11,7 @@ use function GO;
 class UserSettings extends Property {
 	public $id;
 	public $use_html_markup;
+	public $show_from;
 	public $show_cc;
 	public $show_bcc;
 	public $skip_unknown_recipients;
@@ -35,8 +36,9 @@ class UserSettings extends Property {
 			$this->defaultTemplateId = (int) $this->defaultTemplateId;
 		}
 		$this->use_html_markup = !\GO::config()->get_setting("email_use_plain_text_markup", $this->id);
-		$this->show_cc = !!\GO::config()->get_setting("email_show_cc", $this->id);
-		$this->show_bcc = !!\GO::config()->get_setting("email_show_bcc", $this->id);
+		$this->show_from = !!\GO::config()->get_setting("email_show_from", $this->id, 1);
+		$this->show_cc = !!\GO::config()->get_setting("email_show_cc", $this->id, 1);
+		$this->show_bcc = !!\GO::config()->get_setting("email_show_bcc", $this->id, 0);
 		$this->skip_unknown_recipients = !!\GO::config()->get_setting("email_skip_unknown_recipients", $this->id);
 		$this->always_request_notification = !!\GO::config()->get_setting("email_always_request_notification", $this->id);
 		$this->always_respond_to_notifications = !!\GO::config()->get_setting("email_always_respond_to_notifications", $this->id);
@@ -54,6 +56,7 @@ class UserSettings extends Property {
 	protected function internalSave() {
 		\GO::config()->save_setting('email_defaultTemplateId', $this->defaultTemplateId, $this->id);
 		\GO::config()->save_setting('email_use_plain_text_markup', !empty($this->use_html_markup) ? '0' : '1', $this->id);
+		\GO::config()->save_setting('email_show_from', !empty($this->show_from) ? 1 : 0, $this->id);
 		\GO::config()->save_setting('email_show_cc', !empty($this->show_cc) ? 1 : 0, $this->id);
 		\GO::config()->save_setting('email_show_bcc', !empty($this->show_bcc) ? 1 : 0, $this->id);
 		\GO::config()->save_setting('email_skip_unknown_recipients', !empty($this->skip_unknown_recipients) ? '1' : '0', $this->id);
