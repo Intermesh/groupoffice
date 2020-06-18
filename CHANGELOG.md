@@ -1,3 +1,5 @@
+- Core: Made it possible to brand and style the install pages
+
 15-06-2020 6.4.150
 - Tickets: Search unseen only and fix missing domain in email
 - Email: Error on some ICS attachments or calendar invites
