@@ -761,11 +761,8 @@ class CoreController extends \GO\Base\Controller\AbstractController {
 Copyright (c) 2003-{current_year}, {company_name}<br/>
 All rights reserved.");
 		
-		if(GO::config()->product_name=='Group-Office')
-			$response['data']['about']=str_replace('{company_name}', 'Intermesh B.V.', $response['data']['about']);
-		else
-			$response['data']['about']=str_replace('{company_name}', GO::config()->product_name, $response['data']['about']);
-		
+		$response['data']['about']=str_replace('{company_name}', 'Group-Office by Intermesh B.V.', $response['data']['about']);
+
 		
 		$strVersion = GO::config()->version;
 		

@@ -1,4 +1,5 @@
 - Core: Made it possible to brand and style the install pages
+- Multi instance: If hostname is does not match installation of manager it will display a not found notice.
 
 15-06-2020 6.4.150
 - Tickets: Search unseen only and fix missing domain in email
