@@ -49,7 +49,7 @@ class Installer {
 	 * @return bool
 	 */
 	public static function isInProgress() {
-		return self::$isInProgress;
+		return static::isUpgrading() || static::isInstalling();
 	}
 
 	/**
@@ -58,7 +58,7 @@ class Installer {
 	 * @return bool
 	 */
 	public static function isInstalling() {
-		return self::$isInstalling;
+		return self::$isInstalling || (basename(dirname($_SERVER['PHP_SELF'])) == 'install' && basename($_SERVER['PHP_SELF']) != 'upgrade.php');
 	}
 
 	/**
@@ -67,7 +67,7 @@ class Installer {
 	 * @return bool
 	 */
 	public static function isUpgrading() {
-		return self::$isUpgrading;
+		return self::$isUpgrading || basename($_SERVER['PHP_SELF']) == 'upgrade.php';
 	}
 
 	/**

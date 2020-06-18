@@ -41,6 +41,10 @@ use const GO_CONFIG_FILE;
 
 		use EventEmitterTrait;
 
+		/**
+		 * Fires when the index page loads for the web client.
+		 */
+		const EVENT_INDEX = 'index';
 
 		/**
 		 * Fires when the application is loaded in the <head></head> section of the webclient.

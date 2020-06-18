@@ -94,5 +94,6 @@ try {
   errorHander($e);  
 }
 
+go()->fireEvent(\go\core\App::EVENT_INDEX);
 
 GO::router()->runController();

@@ -6,6 +6,7 @@ use GO;
 use go\core\App;
 use go\core\Environment;
 use go\core\fs\File;
+use go\core\jmap\Request;
 use go\core\Language;
 use go\core\model\Settings;
 use go\core\model\Module;
@@ -159,6 +160,60 @@ class Extjs3 {
 		}
 		
 		return $cacheFile;
+	}
+
+	/**
+	 * Get URL to webclient
+	 *
+	 * @return string
+	 */
+	public function getBaseUrl() {
+
+		$path = dirname($_SERVER['PHP_SELF']); // /index.php or /install/*.php
+
+		if(basename($path) == 'install') {
+			$path = dirname($path);
+		}
+
+		$url = Request::get()->isHttps() ? 'https://' : 'http://';
+		$url .= Request::get()->getHost(false) . $path;
+		return $url;
+	}
+
+	public function getBasePath() {
+		return go()->getEnvironment()->getInstallPath();
+	}
+
+	private $theme;
+
+	public function getTheme() {
+		if(!isset($this->theme)) {
+			if(go()->getAuthState() && go()->getAuthState()->isAuthenticated()) {
+				$this->theme = go()->getAuthState()->getUser(['theme'])->theme;
+				if(!file_exists(\GO::view()->getPath().'themes/'.$this->theme.'/Layout.php')){
+					$this->theme = 'Paper';
+				}
+			} else{
+				$this->theme = 'Paper';
+			}
+		}
+
+		return $this->theme;
+	}
+
+	public function getThemePath() {
+		return $this->getBasePath() . '/views/Extjs3/themes/' . $this->getTheme() . '/';
+	}
+
+	public function getThemeUrl() {
+		return $this->getBaseUrl() . '/views/Extjs3/themes/' . $this->getTheme() . '/';
+	}
+
+	public function renderPage($html, $title = null) {
+		$themePath = $this->getThemePath();
+		require($themePath . 'pageHeader.php');
+		echo $html;
+		require($themePath . 'pageFooter.php');
 	}
 
 }
