@@ -109,6 +109,13 @@ class Field extends AclItemEntity {
 	 * @var DateTime
 	 */
 	public $createdAt;
+
+	/**
+	 * Hide field by default in grids
+	 *
+	 * @var bool
+	 */
+	public $hiddenInGrid = true;
 	
 	
 	private $default;

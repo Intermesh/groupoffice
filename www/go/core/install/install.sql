@@ -111,7 +111,8 @@ CREATE TABLE `core_customfields_field` (
   `unique_values` tinyint(1) NOT NULL DEFAULT 0,
   `prefix` varchar(32) NOT NULL DEFAULT '',
   `suffix` varchar(32) NOT NULL DEFAULT '',
-  `options` text DEFAULT NULL
+  `options` text DEFAULT NULL,
+  `hiddenInGrid` BOOLEAN NOT NULL DEFAULT TRUE
 ) ENGINE=InnoDB;
 
 CREATE TABLE `core_customfields_field_set` (

@@ -352,11 +352,10 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	getColumn : function(field) {
 		
 		var def = this.getFieldDefinition(field);
-		
 		return {
 			dataIndex: def.name,
 			header: def.customField.name,
-			hidden: true,
+			hidden: def.customField.hiddenInGrid,
 			id: "custom-field-" + encodeURIComponent(def.customField.databaseName),
 			sortable: true,
 			hideable: true,
