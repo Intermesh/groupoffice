@@ -983,7 +983,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$response['data'] = $message->toOutputArray($params['content_type'] == 'html', true);
 
 			if(isset($params['body'])) {
-				$response['data']['htmlbody'] = $params['body'] . '<br />' . $response['data']['htmlbody'];
+				if ($params['content_type'] == 'plain') {
+					$response['data']['plainbody'] = $params['body'] . "\n" . $response['data']['plainbody'];
+				} else {
+					$response['data']['htmlbody'] = $params['body'] . '<br />' . $response['data']['htmlbody'];
+				}
 			}
 		}
 		

@@ -6,6 +6,7 @@ remove folders when uninstalling module. Error when reinstalling
 - never respond to email read requests option
 - mailserver limit access per service and filter remote ip address (global and per domain) to stop hacks. https://doc.dovecot.org/configuration_manual/config_file/config_variables/
 - mailserver permissions per account?
+- mailserver DKIM generator and implementation
 
 - logo blob stale gc?
 
