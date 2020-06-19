@@ -1,6 +1,7 @@
 - Core: Made it possible to brand and style the install pages
 - Multi instance: If hostname is does not match installation of manager it will display a not found notice.
 - Email: Email download link broken in plain text email without template
+- Address book: Generate missing URI and UID's
 
 15-06-2020 6.4.150
 - Tickets: Search unseen only and fix missing domain in email
