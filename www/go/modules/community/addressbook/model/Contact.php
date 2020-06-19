@@ -674,7 +674,7 @@ class Contact extends AclItemEntity {
 	
 	public function getUid() {
 		
-		if(!isset($this->uid)) {
+		if(empty($this->uid)) {
 			if(!isset($this->id)) {
 				return null;
 			}
@@ -697,7 +697,7 @@ class Contact extends AclItemEntity {
 	}
 
 	public function getUri() {
-		if(!isset($this->uri)) {
+		if(empty($this->uri)) {
 			$uid = $this->getUid();
 			if(!isset($uid)) {
 				return null;
@@ -717,7 +717,7 @@ class Contact extends AclItemEntity {
 			return false;
 		}
 		
-		if(!isset($this->uid)) {
+		if(empty($this->uid)) {
 			//We need the auto increment ID for the UID so we need to save again if this is a new contact
 			$this->getUid();
 			$this->getUri();
