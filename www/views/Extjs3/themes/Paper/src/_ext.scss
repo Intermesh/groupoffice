@@ -416,6 +416,7 @@
 		display: inline-block;
 		padding: dp(6) dp(8);
 	}
+	&-time { max-height: dp(32);  }
 	
 	textarea.x-form-field {
 		/*height: min-content;*/
@@ -1573,14 +1574,14 @@ td.grid-hd-group-cell {
 .x-dd-drag-ghost {
 	@extend %font-data;
 	color:color($fg, 'text');
-	opacity:1;
+	opacity:.9;
 	border:0;
 	padding: 0 dp(8) 0 dp(40);
-	background-color:#fff;
+
 	a { color:inherit;}
 }
 .x-dd-drag-proxy {
-	
+	background-color:color($bg,'card');
 	line-height: dp(40);
 
 	.x-grid3-hd-inner{
