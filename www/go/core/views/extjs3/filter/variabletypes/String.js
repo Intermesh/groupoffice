@@ -1,4 +1,4 @@
-go.filter.variabletypes.Number = Ext.extend(Ext.Panel, {
+go.filter.variabletypes.String = Ext.extend(Ext.Panel, {
 	layout: "hbox",
 	/**
 	 * Filter definition
@@ -15,33 +15,31 @@ go.filter.variabletypes.Number = Ext.extend(Ext.Panel, {
 
 		this.addEvents({select: true});
 
-		this.operatorCombo = new go.form.ComboBox({
+		// this.operatorCombo = new go.form.ComboBox({
+		//
+		// 	hideLabel: true,
+		// 	name: "operator",
+		// 	value: '*',
+		// 	store: new Ext.data.ArrayStore({
+		// 		fields: ['value'],
+		// 		data: [
+		// 			['='],
+		// 			['*']
+		// 			// ['...*'],
+		// 			// ['*...']
+		// 		]
+		// 	}),
+		// 	valueField: 'value',
+		// 	displayField: 'value',
+		// 	mode: 'local',
+		// 	triggerAction: 'all',
+		// 	editable: false,
+		// 	selectOnFocus: true,
+		// 	forceSelection: true,
+		// 	width: dp(64)
+		// });
 
-			hideLabel: true,
-			name: "operator",
-			value: '=',
-			store: new Ext.data.ArrayStore({
-				fields: ['value'],
-				data: [
-					['<'],
-					['<='],
-					['>'],
-					['>='],
-					['=']
-				]
-			}),
-			valueField: 'value',
-			displayField: 'value',
-			mode: 'local',
-			triggerAction: 'all',
-			editable: false,
-			selectOnFocus: true,
-			forceSelection: true,
-			width: dp(64)
-		});
-
-		this.valueField = new GO.form.NumberField({
-			serverFormats: false,
+		this.valueField = new Ext.form.TextField({
 			flex: 1,
 			name: 'value',
 			listeners: {
@@ -56,7 +54,7 @@ go.filter.variabletypes.Number = Ext.extend(Ext.Panel, {
 
 
 		this.items = [
-			this.operatorCombo,
+			// this.operatorCombo,
 			this.valueField
 		];
 
@@ -76,17 +74,49 @@ go.filter.variabletypes.Number = Ext.extend(Ext.Panel, {
 	},
 
 	getValue: function() {
-		if(this.operatorCombo.getValue() == '=') {
-			return this.valueField.getValue();
-		}
-		return this.operatorCombo.getValue() + ' ' + this.valueField.getValue();
+
+
+		// switch(this.operatorCombo.getValue()) {
+		// 	case '=':
+		// 		return this.valueField.getValue();
+		// 		break;
+		//
+		// 	case '*':
+				return '%' + this.valueField.getValue() + '%';
+				// break;
+
+			// case '*...':
+			// 	return '%' + this.valueField.getValue();
+			// 	break;
+			//
+			// case '...*':
+			// 	return this.valueField.getValue() + '%';
+			// 	break;
+		// }
+
 	},
 
 	getRawValue : function() {
-		if(this.operatorCombo.getValue() == '=') {
-			return this.valueField.getRawValue();
-		}
-		return this.operatorCombo.getValue() + ' ' + this.valueField.getRawValue();
+
+		return this.valueField.getValue();
+
+		// switch(this.operatorCombo.getValue()) {
+		// 	case '=':
+		// 		return this.valueField.getValue();
+		// 		break;
+		//
+		// 	case '*':
+		// 		return '*' + this.valueField.getValue() + '*';
+		// 		break;
+
+			// case '*...':
+			// 	return '*' + this.valueField.getValue();
+			// 	break;
+			//
+			// case '...*':
+			// 	return this.valueField.getValue() + '*';
+			// 	break;
+		// }
 	},
 
 	reset: function() {

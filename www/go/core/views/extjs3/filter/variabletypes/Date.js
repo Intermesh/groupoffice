@@ -40,7 +40,7 @@ go.filter.variabletypes.Date = Ext.extend(Ext.Panel, {
 			width: dp(64)
 		});
 
-		this.dateField = new go.form.DateField({
+		this.valueField = new go.form.DateField({
 			flex: 1,
 			width: undefined,
 			listeners: {
@@ -52,10 +52,10 @@ go.filter.variabletypes.Date = Ext.extend(Ext.Panel, {
 
 		this.items = [
 			this.operatorCombo,
-			this.dateField
+			this.valueField
 		];
 
-		go.filter.types.date.superclass.initComponent.call(this);
+		this.supr().initComponent.call(this);
 	},
 
 	onSelect: function() {
@@ -72,36 +72,36 @@ go.filter.variabletypes.Date = Ext.extend(Ext.Panel, {
 
 	getValue: function() {
 		if(this.operatorCombo.getValue() == '=') {
-			return this.dateField.getValue();
+			return this.valueField.getValue();
 		}
-		return this.operatorCombo.getValue() + ' ' + this.dateField.getValue();
+		return this.operatorCombo.getValue() + ' ' + this.valueField.getValue();
 	},
 
 	getRawValue : function() {
 		if(this.operatorCombo.getValue() == '=') {
-			return this.dateField.getRawValue();
+			return this.valueField.getRawValue();
 		}
-		return this.operatorCombo.getValue() + ' ' + this.dateField.getRawValue();
+		return this.operatorCombo.getValue() + ' ' + this.valueField.getRawValue();
 	},
 
 	reset: function() {
-		return this.dateField.reset() && this.operatorCombo.reset();
+		return this.valueField.reset() && this.operatorCombo.reset();
 	},
 
 	validate: function() {
-		return this.dateField.validate() && this.operatorCombo.validate();
+		return this.valueField.validate() && this.operatorCombo.validate();
 	},
 	markInvalid : function() {
-		return this.dateField.markInvalid();
+		return this.valueField.markInvalid();
 	},
 	clearInvalid : function() {
-		return this.dateField.clearInvalid();
+		return this.valueField.clearInvalid();
 	},
 	isDirty : function() {
-		return this.dateField.isDirty() || this.operatorCombo.isDirty();
+		return this.valueField.isDirty() || this.operatorCombo.isDirty();
 	},
 	isValid : function(preventMark){
-		return this.dateField.isValid(preventMark) && this.operatorCombo.isValid(preventMark);
+		return this.valueField.isValid(preventMark) && this.operatorCombo.isValid(preventMark);
 	}
 
 });

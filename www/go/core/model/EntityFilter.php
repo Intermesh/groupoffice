@@ -34,6 +34,8 @@ class EntityFilter extends AclOwnerEntity {
 	
 	public $aclId;
 
+	public $type = "fixed";
+
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable("core_entity_filter", 'f');
