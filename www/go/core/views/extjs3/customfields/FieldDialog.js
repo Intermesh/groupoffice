@@ -74,12 +74,6 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 						hideLabel: true,
 						checked: true,
 						hint: t("Field will be hidden by default in grids. Users can enable it through the grid column menu.")
-					}, {
-						xtype: "checkbox",
-						name: "filterable",
-						boxLabel: t("Filterable"),
-						hideLabel: true,
-						hint: t("Create a filter option in the left area")
 					},{
 						xtype: "checkbox",
 						name: "required",
