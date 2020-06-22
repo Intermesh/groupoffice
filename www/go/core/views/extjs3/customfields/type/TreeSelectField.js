@@ -7,6 +7,7 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 	findBy: false,
 	customfield: null,
 	allowBlank: true,
+	collapseOnSelect: true,
 	//height: dp(36),
 	getName : function() {
 		return this.name;
@@ -56,7 +57,7 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 		return {
 			submit: false,
 			anchor: "100%",
-			xtype: 'combo',
+			xtype: 'gocombo',
 			store: store,
 			valueField: 'id',
 			displayField: 'text',
@@ -69,6 +70,7 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 			listeners: {
 				scope: this,
 				select: this.onSelect,
+				beforeselect: this.onBeforeSelect,
 				change: this.onChange
 			}
 		};
@@ -85,6 +87,11 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 	  return this;
 	},
 
+	onBeforeSelect : function(field, record) {
+		if(go.util.empty(record.json.children) && !this.collapseOnSelect) {
+			field.collapseOnSelect = false;
+		}
+	},
 	onSelect : function(field, record) {
 		var index = this.items.indexOf(field), nextIndex = index + 1;
 
@@ -98,7 +105,7 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 		if(!go.util.empty(record.json.children)) {			
 			this.add(this.createCombo(record.json.children));
 		} else {
-			this.fireEvent('select', record);
+			this.fireEvent('select', this, record);
 		}
 		
 		this.doLayout();

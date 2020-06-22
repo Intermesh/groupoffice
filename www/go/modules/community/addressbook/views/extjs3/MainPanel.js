@@ -530,7 +530,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				this.filterGrid = new go.filter.FilterGrid({
 					filterStore: this.grid.store,
 					entity: "Contact"
-				})
+				}),
+				go.customfields.CustomFields.getFilterPanel("Contact", this.grid.store)
 			]
 		});
 		

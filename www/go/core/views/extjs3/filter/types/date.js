@@ -25,7 +25,8 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 						['before', t("is before, today plus")],
 						['after', t("is after, today plus")],
 						['beforedate', t("is before")],
-						['afterdate', t("is after")]
+						['afterdate', t("is after")],
+							['equals', t("equals")]
 					]
 				}),
 				valueField: 'value',
@@ -50,6 +51,7 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 
 							case 'beforedate':
 							case 'afterdate':
+							case 'equals':
 								this.valueField.setVisible(false);
 								this.periodCombo.setVisible(false);
 								this.dateField.setVisible(true);
@@ -121,17 +123,22 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 
 		v = v + "";
 
-		var regex = /([><]+) ([0-9]{4}-[0-9]{2}-[0-9]{2})/;
+		var regex = /([>< ]+)?([0-9]{4}-[0-9]{2}-[0-9]{2})/;
 		var matches = v.match(regex);
 
 		if (matches) {
-			switch (matches[1]) {
+			var op = (matches[1]+"").trim();
+
+			switch (op) {
 				case '>':
 					operator = 'afterdate';
 					break;
 				case '<':
 					operator = 'beforedate';
 					break;
+
+				default:
+					operator = 'equals';
 			}
 
 			this.dateField.setValue(matches[2]);
@@ -194,6 +201,9 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 			case 'beforedate':
 			case 'before':				
 				return '< ' + v;
+
+			case'equals':
+				return v;
 			
 		}
 	},

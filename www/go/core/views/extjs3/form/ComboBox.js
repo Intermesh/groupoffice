@@ -11,6 +11,19 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 	minChars : 3,
 
+	collapseOnSelect: true,
+
+	// private
+	onSelect : function(record, index){
+		if(this.fireEvent('beforeselect', this, record, index) !== false){
+			this.setValue(record.data[this.valueField || this.displayField]);
+			if(this.collapseOnSelect) {
+				this.collapse();
+			}
+			this.fireEvent('select', this, record, index);
+		}
+	},
+
 	initComponent: function() {
 		go.form.ComboBox.superclass.initComponent.call(this);
 

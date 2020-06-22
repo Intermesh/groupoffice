@@ -116,7 +116,13 @@ class Field extends AclItemEntity {
 	 * @var bool
 	 */
 	public $hiddenInGrid = true;
-	
+
+	/**
+	 * Make a filter available in the UI
+	 *
+	 * @var bool
+	 */
+	public $filterable = false;
 	
 	private $default;
 	private $defaultModified = false;

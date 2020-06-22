@@ -39,6 +39,45 @@
 			}
  * 
  */
+
+go.form.ChipsView = Ext.extend(Ext.DataView, {
+	autoHeight: true,
+	multiSelect: true,
+	overClass: 'x-view-over',
+	itemSelector: 'div.go-chip',
+	displayField: 'display',
+	valueField: 'value',
+	initComponent: function() {
+		var tpl = new Ext.XTemplate(
+			'<tpl for=".">',
+			'<div class="go-chip">{' + this.displayField + '} <button type="button" class="icon">delete</button></div>',
+			'</tpl>',
+			'<div class="x-clear"></div>'
+		);
+
+		Ext.apply(this, {
+			store: new Ext.data.JsonStore({
+				fields: [this.valueField, this.displayField],
+				root: "records",
+				idProperty: this.valueField
+			}),
+			tpl: tpl,
+
+			listeners: {
+				click: function(dv, index, node,e) {
+					if(e.target.tagName === "BUTTON") {
+						dv.store.removeAt(index);
+					}
+				},
+				scope: this
+			}
+		});
+
+		this.supr().initComponent.call(this);
+	}
+})
+
+
 go.form.Chips = Ext.extend(Ext.Container, {
 	name: null,
 	displayField: "name",
@@ -61,25 +100,13 @@ go.form.Chips = Ext.extend(Ext.Container, {
 						'<div class="x-clear"></div>'
 						);		
 	
-		this.dataView = new Ext.DataView({
-			store: new Ext.data.JsonStore({
-				fields: [this.valueField, this.displayField],
-				root: "records",
-				idProperty: this.valueField				
-			}),
-			tpl: tpl,
-			autoHeight: true,
-			multiSelect: true,
-			overClass: 'x-view-over',
-			itemSelector: 'div.go-chip',
-			listeners: {
-				click: this.onClick,
-				scope: this
-			}
+		this.dataView = new go.form.ChipsView({
+			valueField: this.valueField,
+			displayField: this.displayField
 		});
-		
 	
 		this.dataView.store.on("add", function(store, records) {
+			var old = this.getValue(), me = this;
 			if(this.entityStore) {
 				this.comboStore.patchFilter('chips', {exclude: this.dataView.store.getRange().column(this.valueField)});
 			}
@@ -92,8 +119,16 @@ go.form.Chips = Ext.extend(Ext.Container, {
 
 			this.comboStore.remove(records);//this.comboBox.store.find(this.valueField, records[0].get(this.valueField)));
 			this._isDirty = true;
+
+			//use settimeout to allow chips to render first
+			var newV = this.getValue();
+			setTimeout(function() {
+				me.fireEvent("change", me, newV, old);
+			});
 		}, this);
 		this.dataView.store.on("remove", function(store, record) {
+			var old = this.getValue(), me = this;
+
 			if(this.entityStore) {
 				this.comboStore.patchFilter('chips', {exclude: this.dataView.store.getRange().column(this.valueField)});
 			} 
@@ -103,6 +138,11 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			if(this.map) {
 				this.mapValues[record.id] = null;
 			}
+
+			var newV = this.getValue();
+			setTimeout(function() {
+				me.fireEvent("change", me, newV, old);
+			}, 100);
 		}, this);		
 		
 		this.items = [];
@@ -116,8 +156,6 @@ go.form.Chips = Ext.extend(Ext.Container, {
 				this.fireEvent('change', this, this.getValue());
 			}, this);
 		}
-
-
 
 		this.items.push(this.dataView);
 		
@@ -241,6 +279,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 						combo.onTriggerClick();
 				}
 			},
+			submit: false,
 			lazyInit: false,
 			hideLabel: true,
 			anchor: '100%',
@@ -255,6 +294,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			mode: this.entityStore ? 'remote' : 'local',
 			store: this.comboStore,
 			value:"",
+			collapseOnSelect: false,
 			tpl: new Ext.XTemplate(
 				'<tpl for=".">',
 				'<div class="x-combo-list-item" title="{[fm.htmlEncode(values[\'' + this.displayField + '\'] || \'\' )]}"><tpl if="!values.' + this.valueField + '"><b>' + t("Create new") + ':</b> </tpl>{' + this.displayField + '}</div>',
@@ -342,3 +382,4 @@ go.form.Chips = Ext.extend(Ext.Container, {
 
 
 Ext.reg('chips', go.form.Chips);
+Ext.reg('chipsview', go.form.ChipsView);

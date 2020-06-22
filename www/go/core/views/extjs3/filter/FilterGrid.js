@@ -24,7 +24,8 @@ go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 				fields: ['id', 'name', 'aclId', "permissionLevel", "filter"],
 				entityStore: "EntityFilter"				
 			}).setFilter('base', {
-				entity: this.entity
+				entity: this.entity,
+				type: "fixed"
 			}),
 			selModel: selModel,
 			plugins: [actions],
