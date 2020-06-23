@@ -17,6 +17,7 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 			height: dp(260),
 			layout:'card',
 			title: t("Login required"),
+			maximized: false,
 			activeItem: 0,
 			listeners: {
 				scope:this,
@@ -35,7 +36,11 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 		
 		
 		go.login.LoginDialog.superclass.initComponent.call(this);
-		
+
+		this.on('render', function() {
+			this.maximize();
+		}, this);
+
 		this.add(this.userNamePanel = new go.login.UsernamePanel());
 		for(var i=0; i< go.AuthenticationManager.panels.length; i++){
 			this.add(go.AuthenticationManager.panels[i].panel);
