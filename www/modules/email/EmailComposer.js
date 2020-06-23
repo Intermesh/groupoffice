@@ -119,21 +119,21 @@ GO.email.EmailComposer = function(config) {
 
 	this.showMenu = new Ext.menu.Menu({
 				
-		items : [this.formFieldCheck = new Ext.menu.CheckItem({
+		items : [this.fromFieldCheck = new Ext.menu.CheckItem({
 			text : t("From field", "email"),
-			checked : true,
+			checked : go.User.emailSettings.show_from,
 			checkHandler : this.onShowFieldCheck,
 			scope : this
 		}),
 		this.ccFieldCheck = new Ext.menu.CheckItem({
 			text : t("CC field", "email"),
-			checked : GO.email.showCCfield,
+			checked : go.User.emailSettings.show_cc,
 			checkHandler : this.onShowFieldCheck,
 			scope : this
 		}),
 		this.bccFieldCheck = new Ext.menu.CheckItem({
 			text : t("BCC field", "email"),
-			checked : GO.email.showBCCfield,
+			checked : go.User.emailSettings.show_bcc,
 			checkHandler : this.onShowFieldCheck,
 			scope : this
 		})
@@ -856,10 +856,12 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 //		GO.email.showCCfield = true;
 //		GO.email.showBCCfield = false;
 
-		this.showCC(GO.email.showCCfield===1);
-		this.showBCC(GO.email.showBCCfield===1);			
-		this.ccFieldCheck.setChecked(GO.email.showCCfield);
-		this.bccFieldCheck.setChecked(GO.email.showBCCfield);
+		this.showFrom(go.User.emailSettings.show_from);
+		this.showCC(go.User.emailSettings.show_cc);
+		this.showBCC(go.User.emailSettings.show_bcc);
+		this.fromFieldCheck.setChecked(go.User.emailSettings.show_from);
+		this.ccFieldCheck.setChecked(go.User.emailSettings.show_cc);
+		this.bccFieldCheck.setChecked(go.User.emailSettings.show_bcc);
 
 		if (this.defaultAcccountId) {
 			this.fromCombo.setValue(this.defaultAcccountId);
@@ -871,6 +873,15 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		this.emailEditor.reset();
 		
 		this.fireEvent("reset", this);
+	},
+
+	showFrom : function(show){
+		this.fromCombo.getEl().up('.x-form-item').setDisplayed(show);
+		if(show)
+		{
+			this.fromCombo.onResize();
+		}
+		this.doLayout();
 	},
 
 	showCC : function(show){
@@ -1461,9 +1472,8 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 	onShowFieldCheck : function(check, checked) {
 		
 		switch (check.id) {
-			case this.formFieldCheck.id :
-				this.fromCombo.getEl().up('.x-form-item').setDisplayed(checked);
-				this.doLayout();
+			case this.fromFieldCheck.id :
+				this.showFrom(checked);
 				break;
 
 			case this.ccFieldCheck.id :

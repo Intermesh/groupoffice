@@ -137,6 +137,9 @@ Ext.extend(go.customfields.type.SelectOptionsTree, Ext.tree.TreePanel, {
 		this.getEl().removeClass('x-form-invalid');
 		Ext.form.MessageTargets.qtip.clear(this);
 	},
+	isValid : function(preventMark){
+		return true;
+	},
 	validate : function() {
 		return true;
 	}

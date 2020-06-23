@@ -171,6 +171,10 @@ go.form.ImageField = Ext.extend(Ext.BoxComponent, {
 
 	validate: function() {
 		return true;
+	},
+
+	isValid: function(preventMark) {
+		return true;
 	}
 
 });

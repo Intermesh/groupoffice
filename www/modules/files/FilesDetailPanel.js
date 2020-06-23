@@ -30,7 +30,9 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 		this.store.on('exception',function(store, type, action, options, response) {
 			var data = Ext.decode(response.responseText);
 			if(data && data.feedback) {
-				this.items.get(0).getTemplateTarget().update('<div class="pad danger">'+data.feedback+'</div>');
+				this.expand();
+				this.items.get(0).getTemplateTarget().update('<div class="pad danger">' + data.feedback + '</div>');
+
 				this.browseBtn.setText(t("Create folder", "files"));
 			}
 		},this);

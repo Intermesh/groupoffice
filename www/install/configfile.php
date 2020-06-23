@@ -117,7 +117,7 @@ require('header.php');
 		
 		<section>
 			<fieldset>
-				<h2>Config file</h2>
+				<h2><?= go()->t("Config file"); ?></h2>
 				<p class="error">Please create a writeable config.php file here: <?= $configFile; ?>.</p>
 			</fieldset>
 		</section>
@@ -189,7 +189,7 @@ require('header.php');
 				</p>
 			</fieldset>
 
-			<button name="submitButton">Continue</button>
+			<button name="submitButton"><?= go()->t('Continue'); ?></button>
 			</form>
 		</section>
 

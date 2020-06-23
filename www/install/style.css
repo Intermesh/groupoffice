@@ -58,7 +58,7 @@ label {
   margin-bottom: 8px;
   font-size: .8rem;
   letter-spacing: 0.04em;
-  display: inline-block; 
+  display: inline-block;
 	color: #666;
 }
 
@@ -78,7 +78,7 @@ input:focus {
 input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active {
 	transition: background-color 5000s ease-in-out 0s, color 5000s ease-in-out 0s;
 	transition-delay: background-color 5000s, color 5000s;
-	-webkit-text-fill-color: #2a2a2a; 
+	-webkit-text-fill-color: #2a2a2a;
 }
 
 *[disabled] {
@@ -126,5 +126,5 @@ code {
   padding: 12px;
   display: block;
   margin: 12px 0;
-  white-space: pre; 
+  white-space: pre;
 }

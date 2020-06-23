@@ -253,7 +253,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 
 
 		
-		var params = {};
+		var params = config.params || {};
 		
 		if(!config.event_id){
 			
@@ -276,13 +276,12 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 		
 			// if the newMenuButton from another passed a linkTypeId then set this
 		// value in the select link field
-		
-		
+
 
 		//if (config.event_id > 0) {
 			this.formPanel.load({
 				params:params,
-				url : GO.url('calendar/event/load'),
+				url : config.url || GO.url('calendar/event/load'),
 				waitMsg:t("Loading..."),
 				success : function(form, action) {
 					//this.win.show();

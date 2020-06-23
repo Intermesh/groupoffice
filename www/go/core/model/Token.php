@@ -395,7 +395,10 @@ class Token extends Entity {
 	}
 
 	public static function collectGarbage() {
-		return static::delete((new Query)->where('expiresAt', '!=', null)->andWhere('expiresAt', '<', new DateTime()));
+		return static::delete(
+			(new Query)
+				->where('expiresAt', '!=', null)
+				->andWhere('expiresAt', '<', new DateTime()));
 	}
 
 	protected static function internalDelete(\go\core\orm\Query $query)

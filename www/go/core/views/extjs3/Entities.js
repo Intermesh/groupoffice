@@ -121,8 +121,7 @@ go.Entities = (function () {
 		getAllInstalled : function() {
 			return entities;
 		},
-		
-		
+
 		/**
 		 * Get link configurations as degined in Module.js with go.Modules.register();
 		 * 

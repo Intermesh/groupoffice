@@ -29,9 +29,7 @@ abstract class Settings extends Model {
     $cls = static::class;
 
 	  if(!isset(self::$instance[$cls])) {
-
-
-      $instance = go()->getCache()->get($cls);
+      $instance = !Installer::isInProgress() ? go()->getCache()->get($cls) : false;
       if ($instance) {
         self::$instance[$cls] = $instance;
         return $instance;
@@ -39,7 +37,9 @@ abstract class Settings extends Model {
 
       $instance = new static;
 
-      go()->getCache()->set($cls, $instance);
+		  if(!Installer::isInProgress()) {
+			  go()->getCache()->set($cls, $instance);
+		  }
       self::$instance[$cls] = $instance;
     }
 
@@ -80,35 +80,33 @@ abstract class Settings extends Model {
 	 * @param int $moduleId If null is given the "core" module is used.
 	 */
 	protected function __construct() {
-		
-		if(go()->getInstaller()->isInstalling()) {
-			$this->oldData = [];
-			return;
-		}
-		
+
 		$props = array_keys($this->getSettingProperties());	
 		
 		$record = array_filter($this->loadFromConfigFile(), function($key) use ($props) { return in_array($key, $props);}, ARRAY_FILTER_USE_KEY);
 		$this->readOnlyKeys = array_keys($record);
 		
 		$this->setValues($record);
-		
-		$selectProps = array_diff($props, $this->readOnlyKeys);
-		
-		if(!empty($selectProps)) {
-			$stmt = (new Query)
-							->select('name, value')
-							->from('core_setting')
-							->where([
-									'moduleId' => $this->getModuleId(), 
-									'name' => $selectProps
-									])
-							->execute();
-			
-			while($record = $stmt->fetch()) {
-				$this->{$record['name']} = $record['value'];
+
+		if(!Installer::isInstalling()) {
+			$selectProps = array_diff($props, $this->readOnlyKeys);
+
+			if (!empty($selectProps)) {
+				$stmt = (new Query)
+					->select('name, value')
+					->from('core_setting')
+					->where([
+						'moduleId' => $this->getModuleId(),
+						'name' => $selectProps
+					])
+					->execute();
+
+				while ($record = $stmt->fetch()) {
+					$this->{$record['name']} = $record['value'];
+				}
 			}
-		}		
+
+		}
 		
 		$this->oldData = (array) $this;
 	}
@@ -158,13 +156,14 @@ abstract class Settings extends Model {
 	}
 	
 	public function save() {
+
 		$new = (array) $this;
 		
 		foreach($this->getSettingProperties() as $name => $value) {
 			
 			if(!array_key_exists($name, $this->oldData) || $value != $this->oldData[$name]) {
 				if(in_array($name, $this->readOnlyKeys)) {
-					throw new Forbidden("This key can't be changed because it's defined in the configuration file on the server.");
+					throw new Forbidden(static::class . ':' . $name . " can't be changed because it's defined in the configuration file on the server.");
 				}
 				
 				$this->update($name, $value);

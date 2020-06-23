@@ -28,7 +28,7 @@ try {
 
 	if (!isset($_GET['confirmed'])) {
 	
-		echo "<h2>Backup before upgrade</h2><p>";
+		echo "<h2>". go()->t("Upgrade Group-Office") ."</h2><p>";
 		echo "Please <b>BACKUP</b> your database and files before proceeding. You're database is going to be upgraded and all caches will be cleared.<br />This operation can only be undone by restoring a backup.<br />";
 		
 		echo 'More details about this upgrade can be found in the <a target="_blank" href="https://github.com/Intermesh/groupoffice/blob/' . go()->getMajorVersion()  . '.x/CHANGELOG.md">change log</a>.<br /><br />';
@@ -45,7 +45,7 @@ try {
 		echo '<a class="button" href="?confirmed=1">Upgrade database</a>';
 	} elseif (!isset($_GET['ignore']) && count($unavailable)) {
 	
-		echo "<h2>Upgrading Group-Office</h2><pre>";
+		echo "<h2>". go()->t("Upgrade Group-Office") ."</h2><pre>";
 
 		echo "The following modules are not available because they're missing on disk\n"
 		. "or you've got an <b>invalid or missing license file</b>: \n"
@@ -59,14 +59,14 @@ try {
 
 	} else
 	{
-			
-		echo "<h2>Upgrading Group-Office</h2><pre>";
+
+		echo "<h2>". go()->t("Upgrade Group-Office") ."</h2><pre>";
 
 		go()->getInstaller()->upgrade();	
 
 		echo "</pre></div>";
 
-		echo '<a class="button" href="../">Continue</a>';
+		echo '<a class="button" href="../">' . go()->t('Continue') . '</a>';
 
 		if(go()->getDebugger()->enabled) {
 			echo "<div style=\"clear:both;margin-bottom:20px;\"></div><div class=\"card\"><h2>Debugger output</h2><pre style=\"max-height: 600px; overflow:scroll;\">" ;

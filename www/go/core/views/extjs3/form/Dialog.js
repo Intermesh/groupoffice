@@ -361,7 +361,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	showFirstInvalidField : function() {
 
 		var firstFieldWithError = this.formPanel.form.items.find(function(item) {
-			return !item.validate();
+			return item.isValid && !item.isValid(true);
 		});
 
 		console.log("Field with error", firstFieldWithError);

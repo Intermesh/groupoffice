@@ -674,18 +674,30 @@ class Contact extends AclItemEntity {
 	
 	public function getUid() {
 		
-		if(!isset($this->uid)) {
+		if(empty($this->uid)) {
 			if(!isset($this->id)) {
 				return null;
 			}
 
-			$url = trim(go()->getSettings()->URL, '/');
-			$uid = substr($url, strpos($url, '://') + 3);
-			$uid = str_replace('/', '-', $uid );
-			$this->uid = $this->id . '@' . $uid;
+			$this->uid = $this->generateUid();
+			if(empty($this->uri)) {
+				$this->uri = $this->uid . '.vcf';
+			}
+
+			if(!empty($this->id)) {
+				$this->saveUri();
+			}
 		}
 
 		return $this->uid;		
+	}
+
+	private function generateUid() {
+		$url = trim(go()->getSettings()->URL, '/');
+		$uid = substr($url, strpos($url, '://') + 3);
+		$uid = str_replace('/', '-', $uid );
+
+		return $this->id . '@' . $uid;
 	}
 
 	public function setUid($uid) {
@@ -697,15 +709,22 @@ class Contact extends AclItemEntity {
 	}
 
 	public function getUri() {
-		if(!isset($this->uri)) {
-			$uid = $this->getUid();
+		if(empty($this->uri)) {
+			$uid = $this->getUid(); //generates uri as well
 			if(!isset($uid)) {
 				return null;
 			}
-			$this->uri = $uid . '.vcf';
 		}
 
 		return $this->uri;
+	}
+
+	private function saveUri() {
+		return go()->getDbConnection()
+			->update('addressbook_contact',
+				['uid' => $this->uid, 'uri' => $this->uri],
+				['id' => $this->id])
+			->execute();
 	}
 
 	public function setUri($uri) {
@@ -717,16 +736,12 @@ class Contact extends AclItemEntity {
 			return false;
 		}
 		
-		if(!isset($this->uid)) {
+		if(empty($this->uid)) {
 			//We need the auto increment ID for the UID so we need to save again if this is a new contact
 			$this->getUid();
 			$this->getUri();
 
-			if(!go()->getDbConnection()
-							->update('addressbook_contact', 
-											['uid' => $this->uid, 'uri' => $this->uri], 
-											['id' => $this->id])
-							->execute()) {
+			if(!$this->saveUri()) {
 				return false;
 			}
 		}		

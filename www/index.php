@@ -31,7 +31,7 @@ function errorHander($e) {
 
 		if(go()->getDebugger()->enabled) {
 
-			echo "Showing error message because debug is enabled. Normally we would have redirected to install. I you're doing a freah install and your database is empty then you can safely ignore this.:\n\n";
+			echo "Showing error message because debug is enabled. Normally we would have redirected to install. I you're doing a freah install and your database is empty then you can safely ignore this.:<br /><br />";
 			echo $msg;
 			echo '<a href="/install">Click here to launch the installer</a>';
 			exit();
@@ -83,6 +83,12 @@ try {
 //		}
 		
 		if(go()->getSettings()->databaseVersion != go()->getVersion()) {
+
+			if(go()->getDebugger()->enabled) {
+				echo "Version mismatch. Database version = ". go()->getSettings()->databaseVersion .", Application version: " . go()->getVersion() .".<br /><br />";
+				echo '<a href="/install/upgrade.php">Click here to launch the upgrade</a>';
+				exit();
+			}
 			header('Location: '.GO::config()->host.'install/upgrade.php');				
 			exit();
 		}
@@ -94,5 +100,6 @@ try {
   errorHander($e);  
 }
 
+go()->fireEvent(\go\core\App::EVENT_INDEX);
 
 GO::router()->runController();

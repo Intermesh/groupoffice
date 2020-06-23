@@ -1,8 +1,11 @@
 <?php
 namespace go\modules\community\multi_instance;
 
+use go\core\App;
+use go\core\http\Request;
 use go\core\http\Response;
 use go\core\Installer;
+use go\core\webclient\Extjs3;
 use go\modules\community\multi_instance\model\Instance;
 
 class Module extends \go\core\Module {
@@ -10,6 +13,7 @@ class Module extends \go\core\Module {
 	public function getAuthor() {
 		return "Intermesh BV";
 	}
+
 
 	protected function afterInstall(\go\core\model\Module $model) {
 		
@@ -42,6 +46,25 @@ class Module extends \go\core\Module {
 		parent::defineListeners();
 
 		go()->getInstaller()->on(Installer::EVENT_UPGRADE, static::class, 'upgradeInstances');
+
+		go()->on(App::EVENT_INDEX, static::class, 'checkUrl');
+	}
+
+	public static function checkUrl() {
+		$configUrl = go()->getSettings()->URL;
+		$p = parse_url($configUrl, PHP_URL_HOST);
+
+		if($p != Request::get()->getHost())  {
+			Extjs3::get()->renderPage(
+				"<section><div class='card'><h1>" .go()->t("Not found") . "</h1><p>" .
+				go()->t("Sorry, this instance wasn't found. Please double check the URL you've entered.")
+				."</p></div></section>"
+
+				,
+				go()->t("Not found"));
+			exit();
+		}
+
 	}
 
 	public static function upgradeInstances() {

@@ -15,7 +15,7 @@ go.form.StoreField = Ext.extend(Ext.form.Field, {
 
 	isFormField: true,
 
-	getName() {
+	getName: function() {
 		return this.name;
 	},
 
@@ -57,6 +57,10 @@ go.form.StoreField = Ext.extend(Ext.form.Field, {
 	},
 	
 	validate : function() {
+		return true;
+	},
+
+	isValid: function(preventMark) {
 		return true;
 	}
 });

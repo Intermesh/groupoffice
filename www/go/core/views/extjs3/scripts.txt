@@ -239,7 +239,12 @@ filter/types/select.js
 filter/types/subconditions.js
 filter/FilterGrid.js
 filter/FilterDialog.js
-
+filter/VariableFilterPanel.js
+filter/VariableFilterDialog.js
+filter/variabletypes/date.js
+filter/variabletypes/number.js
+filter/variabletypes/string.js
+filter/variabletypes/select.js
 
 import/CsvMappingDialog.js
 

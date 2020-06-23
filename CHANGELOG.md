@@ -1,3 +1,14 @@
+- Billing: selecting a TAX rate in the order dialog items is fixed
+- Contacts: German contact salutation was incorrect
+- Core: Made it possible to brand and style the install pages
+- Multi instance: If hostname is does not match installation of manager it will display a not found notice.
+- Email: Email download link broken in plain text email without template
+- Address book: Generate missing URI and UID's
+- Custom fields: Set fields hidden or shown by default in grids
+- Custom filters: Add custom input fields to the navigation area.
+- Custom fields: Rename select field database name gave constraint error.
+- Libreoffice online: Fixed printing and download as PDF.
+
 15-06-2020 6.4.150
 - Tickets: Search unseen only and fix missing domain in email
 - Email: Error on some ICS attachments or calendar invites
@@ -8,6 +19,7 @@
 - Calendar: Fix for "No participant found for this event"
 
 11-06-2020 6.4.148
+- Email: Suggested contact link of mails in "Sent" folder will look for "to" address
 - Core: File upload was broken when Group-Office was not running in the root of the domain.
 
 09-06-2020 6.4.147

@@ -193,6 +193,10 @@ go.form.AttachmentsField = Ext.extend(Ext.Panel, {
 		return true;
 	},
 
+	isValid : function(preventMark){
+		return true;
+	},
+
 	validate: function () {
 		return true;
   },
