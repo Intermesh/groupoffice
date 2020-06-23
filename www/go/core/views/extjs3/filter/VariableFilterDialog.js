@@ -20,7 +20,7 @@ go.filter.VariableFilterDialog = Ext.extend(go.form.Dialog, {
 			displayField: 'display',
 			mode: 'local',
 			triggerAction: 'all',
-			editable: false,
+			editable: true,
 			selectOnFocus: true,
 			forceSelection: true,
 			anchor: '100%'
