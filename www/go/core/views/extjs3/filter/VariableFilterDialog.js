@@ -32,6 +32,8 @@ go.filter.VariableFilterDialog = Ext.extend(go.form.Dialog, {
 			this.nameCombo.store.loadData([[f.title, f.name], ], true);
 		}
 
+		this.nameCombo.store.sort('display', 'ASC');
+
 		return [{
 				xtype: 'fieldset',
 				items: [{

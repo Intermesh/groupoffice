@@ -273,6 +273,8 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 				this.triggerField.store.loadData([[f.title, v], [ f.title + " (-)", "-" + v]], true);
 			}
 
+			this.triggerField.store.sort('display', 'ASC');
+
 			// console.warn(this.store.entityStore.entity.filters);
 		}
 		
