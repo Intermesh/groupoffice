@@ -69,6 +69,8 @@ code {
 	font-family: "Courier New",Courier,monospace;
 	color: color($fg, 'base');
 	border-radius: dp(4);
+	overflow: auto;
+	white-space: pre-wrap;
 }
 
 p {
