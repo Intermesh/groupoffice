@@ -3,6 +3,7 @@
 - Email: Email download link broken in plain text email without template
 - Address book: Generate missing URI and UID's
 - Custom fields: Set fields hidden or shown by default in grids
+- Custom filters: Add custom input fields to the navigation area.
 
 15-06-2020 6.4.150
 - Tickets: Search unseen only and fix missing domain in email
