@@ -7,6 +7,7 @@
 - Custom fields: Set fields hidden or shown by default in grids
 - Custom filters: Add custom input fields to the navigation area.
 - Custom fields: Rename select field database name gave constraint error.
+- Libreoffice online: Fixed printing and download as PDF.
 
 15-06-2020 6.4.150
 - Tickets: Search unseen only and fix missing domain in email
