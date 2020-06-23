@@ -17,7 +17,7 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 
 	},
 
-	onChanges: function() {
+	onChanges: function(entityStore, added, changed, destroyed) {
 		this.fieldset.removeAll(true);
 		this.loadFilters();
 	},

@@ -317,7 +317,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					}
 				}
 			}).then(function(response) {
-				if(!response.list) {
+				if(go.util.empty(response.list)) {
 					console.warn("No items in response: ", response);
 					return;
 				}
