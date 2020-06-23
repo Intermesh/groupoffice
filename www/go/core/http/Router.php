@@ -93,7 +93,7 @@ class Router {
       ErrorHandler::logException($e);    
     }
 
-	  if($response instanceof \GuzzleHttp\Psr7\Response) {
+	  if(isset($response) && $response instanceof \GuzzleHttp\Psr7\Response) {
 		  $this->emitPsr7Response($response);
 	  } else{
 		  Response::get()->output(isset($response) ? $response : null);
