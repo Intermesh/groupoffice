@@ -39,7 +39,11 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 					console.warn('No such filter: ' + f.name);
 					return;
 				}
-				var cmp = Ext.create(me.getFilterCmp(filterConfig));
+				var cfg = me.getFilterCmp(filterConfig);
+				if(!cfg) {
+					return;
+				}
+				var cmp = Ext.create(cfg);
 				cmp.serverId = f.id;
 
 				var chipView = new go.form.ChipsView();
@@ -165,18 +169,11 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 
 		var cls;
 
-		switch(filter.type) {
-			case 'number':
-				cls =go.filter.variabletypes.Number;
-				break;
-			case 'string':
-				cls = go.filter.variabletypes.String;
-				break;
-			case 'date':
-				cls = go.filter.variabletypes.Date;
-				break;
-			default:
-				cls = eval(filter.type);
+		try {
+			cls = go.filter.variabletypes[filter.type] || eval(filter.type);
+		}catch(e) {
+			console.error(e);
+			return false;
 		}
 
 		if(!filter.typeConfig) {
