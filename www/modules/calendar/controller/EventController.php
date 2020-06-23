@@ -22,8 +22,10 @@ namespace GO\Calendar\Controller;
 
 use GO\Base\Db\ActiveRecord;
 use GO\Base\Db\FindCriteria;
+use GO\Base\Fs\File;
 use GO\Calendar\Model\Event;
 use go\core\orm\EntityType;
+use GO\Email\Model\Account;
 
 class EventController extends \GO\Base\Controller\AbstractModelController {
 
@@ -1978,6 +1980,38 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		$response['data']['past_events']=$data['results'];
 		
 		return $response;
-	}	
+	}
+
+
+	public function actionLoadICS($params) {
+
+		$response = array( 'success' => true );
+
+
+		$account = Account::model()->findByPk($params['account_id']);
+		$imap = $account->openImapConnection($params['mailbox']);
+		$data = $imap->get_message_part_decoded($params['uid'], $params['number'], $params['encoding'], false, true, false);
+
+		$vcal = \GO\Base\VObject\Reader::read($data);
+
+		$vevents = $vcal->select("VEVENT");
+
+		$vevent = array_shift($vevents);
+
+		$event = new Event();
+		$event->importVObject( $vevent, array(), true);
+
+		$response['data'] = $event->getAttributes();
+		$response['data']['permission_level']=$event->getPermissionLevel();
+		$response['data']['write_permission']=true;
+		$response['data']['customFields'] = $event->getCustomFields();
+		$response['success'] = true;
+
+		$response = $this->_loadComboTexts($response, $event);
+
+		$this->afterLoad($response, $event, $params);
+
+		return $response;
+	}
 	
 }

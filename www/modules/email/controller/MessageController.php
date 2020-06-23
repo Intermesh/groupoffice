@@ -1661,6 +1661,14 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				}
 			}
 
+			if(!$emailFound && isset($vevent->organizer)) {
+				$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vevent->organizer));
+				if (in_array($attendeeEmail, $aliases)) {
+					$emailFound = true;
+					$accountEmail = $attendeeEmail;
+				}
+			}
+
 			if(!$emailFound) {
 				$response['iCalendar']['feedback'] = GO::t("None of the participants match your e-mail aliases for this e-mail account.", "email");
 				return $response;
@@ -1722,6 +1730,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 						'is_invitation' => !$alreadyProcessed && $vcalendar->method == 'REQUEST', //&& !$event,
 						'is_cancellation' => $vcalendar->method == 'CANCEL'
 				);
+
+				//filter out invites
+
+				$response['attachments'] = array_filter($response['attachments'], function($a) {
+					return $a['isInvite'] == false;
+				});
+
 //			}elseif($event){
 
 //			if($event){

@@ -169,6 +169,7 @@ class MessageAttachment extends \GO\Base\Model{
 				"extension"=>$this->getExtension(),
 				"encoding"=>$this->encoding,
 				"disposition"=>$this->disposition,
+			  "isInvite" => $this->isVcalendar()
 		);
 	}	
 	
