@@ -71,6 +71,11 @@ class Settings extends core\Settings {
 	 */
 	private function detectURL() {
 
+		//check if this is ran on a webserver
+		if(!isset($_SERVER['REQUEST_METHOD'])) {
+			return null;
+		}
+
 		$path = dirname($_SERVER['SCRIPT_NAME']); // /index.php or /install/*.php
 
 		if(basename($path) == 'install') {

@@ -33,7 +33,7 @@ function errorHander($e) {
 
 			echo "Showing error message because debug is enabled. Normally we would have redirected to install. I you're doing a freah install and your database is empty then you can safely ignore this.:<br /><br />";
 			echo $msg;
-			echo '<a href="/install">Click here to launch the installer</a>';
+			echo '<br /><br /><a href="/install">Click here to launch the installer</a>';
 			exit();
 		}
 
