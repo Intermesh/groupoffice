@@ -1,3 +1,4 @@
+25-06-2020 6.4.151
 - Billing: selecting a TAX rate in the order dialog items is fixed
 - Contacts: German contact salutation was incorrect
 - Core: Made it possible to brand and style the install pages
@@ -8,6 +9,7 @@
 - Custom filters: Add custom input fields to the navigation area.
 - Custom fields: Rename select field database name gave constraint error.
 - Libreoffice online: Fixed printing and download as PDF.
+- Email: Save calendar invite where you are not a participant
 
 15-06-2020 6.4.150
 - Tickets: Search unseen only and fix missing domain in email

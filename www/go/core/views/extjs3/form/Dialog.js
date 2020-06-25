@@ -12,6 +12,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	autoScroll: true,
 	width: dp(500),
 	modal: true,
+	maximizable: !GO.util.isMobileOrTablet(),
 	entityStore: null,
 	currentId: null,
 	buttonAlign: 'left',

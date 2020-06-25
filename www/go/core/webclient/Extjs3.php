@@ -162,6 +162,8 @@ class Extjs3 {
 		return $cacheFile;
 	}
 
+	private $baseUrl;
+
 	/**
 	 * Get URL to webclient
 	 *
@@ -169,15 +171,20 @@ class Extjs3 {
 	 */
 	public function getBaseUrl() {
 
-		$path = dirname($_SERVER['PHP_SELF']); // /index.php or /install/*.php
+		if(isset($this->baseUrl)) {
+			return $this->baseUrl;
+		}
+
+		$path = dirname($_SERVER['SCRIPT_NAME']); // /index.php or /install/*.php
 
 		if(basename($path) == 'install') {
 			$path = dirname($path);
 		}
 
-		$url = Request::get()->isHttps() ? 'https://' : 'http://';
-		$url .= Request::get()->getHost(false) . $path;
-		return $url;
+		$this->baseUrl = Request::get()->isHttps() ? 'https://' : 'http://';
+		$this->baseUrl .= Request::get()->getHost(false) . $path;
+
+		return $this->baseUrl;
 	}
 
 	public function getBasePath() {
