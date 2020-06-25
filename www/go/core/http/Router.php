@@ -68,7 +68,7 @@ class Router {
 
     try {
       $c = new $route['controller'];
-      go()->debug("Router: ". $route['controller']."::".$route['method']);
+      go()->debug("################   Router: ". $route['controller']."::".$route['method'] ." ################");
       go()->debug($route['params']);
 
       $response = call_user_func_array([$c, $route['method']], $route['params']);		
