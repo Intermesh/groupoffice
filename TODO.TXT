@@ -1,3 +1,14 @@
+Roadmap
+
+- Batch edit custom fields
+- Tasks module with kanban support
+- Time tracking
+- Billing module refactor
+
+
+
+
+
 6.4
 
 remove folders when uninstalling module. Error when reinstalling

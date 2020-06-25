@@ -1,3 +1,4 @@
+25-06-2020 6.4.151
 - Billing: selecting a TAX rate in the order dialog items is fixed
 - Contacts: German contact salutation was incorrect
 - Core: Made it possible to brand and style the install pages
