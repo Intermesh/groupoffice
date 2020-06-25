@@ -169,7 +169,7 @@ class Extjs3 {
 	 */
 	public function getBaseUrl() {
 
-		$path = dirname($_SERVER['PHP_SELF']); // /index.php or /install/*.php
+		$path = dirname($_SERVER['SCRIPT_NAME']); // /index.php or /install/*.php
 
 		if(basename($path) == 'install') {
 			$path = dirname($path);

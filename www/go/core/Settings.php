@@ -29,7 +29,7 @@ abstract class Settings extends Model {
     $cls = static::class;
 
 	  if(!isset(self::$instance[$cls])) {
-      $instance = !Installer::isInProgress() ? go()->getCache()->get($cls) : false;
+      $instance = static::dbIsReady() ? go()->getCache()->get($cls) : false;
       if ($instance) {
         self::$instance[$cls] = $instance;
         return $instance;
@@ -37,7 +37,7 @@ abstract class Settings extends Model {
 
       $instance = new static;
 
-		  if(!Installer::isInProgress()) {
+		  if(static::dbIsReady()) {
 			  go()->getCache()->set($cls, $instance);
 		  }
       self::$instance[$cls] = $instance;
@@ -73,6 +73,26 @@ abstract class Settings extends Model {
 	}
 	
 	private $oldData;
+
+
+	private static function dbIsReady() {
+		$ready = go()->getCache()->get('has_table_core_setting');
+		if($ready) {
+			return true;
+		}
+
+		try {
+			$ready = go()->getDatabase()->hasTable('core_setting');
+			if($ready) {
+				go()->getCache()->set('has_table_core_setting', true);
+			}
+			return $ready;
+		}catch(Exception $e) {
+			go()->debug($e);
+		}
+
+		return false;
+	}
 	
 	/**
 	 * Constructor
@@ -88,7 +108,8 @@ abstract class Settings extends Model {
 		
 		$this->setValues($record);
 
-		if(!Installer::isInstalling()) {
+
+		if(static::dbIsReady()) {
 			$selectProps = array_diff($props, $this->readOnlyKeys);
 
 			if (!empty($selectProps)) {

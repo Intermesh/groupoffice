@@ -15,13 +15,15 @@ try {
 		header("Location: test.php");
 		exit();
 	}
-	
+
+	go()->setCache(new \go\core\cache\None());
+
 	require('header.php');
 
 	echo "<section><div class=\"card\">";
 
 	go()->getInstaller()->isValidDb();
-	go()->setCache(new \go\core\cache\None());	
+
 	Table::destroyInstances();
 	
 	$unavailable = go()->getInstaller()->getUnavailableModules();

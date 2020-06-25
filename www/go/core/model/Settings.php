@@ -70,30 +70,15 @@ class Settings extends core\Settings {
 	 * @return string
 	 */
 	private function detectURL() {
-		
-		if(!isset($_SERVER['REQUEST_URI'])) {
-			return null;
-		}		
-		
-		$path = $_SERVER['REQUEST_URI'];
 
-		$scriptName = basename($_SERVER['SCRIPT_NAME']);
-		$lastSlash = strrpos($path, $scriptName);
-		if($lastSlash !== false) {
-			$path = substr($path, 0, $lastSlash);
+		$path = dirname($_SERVER['SCRIPT_NAME']); // /index.php or /install/*.php
+
+		if(basename($path) == 'install') {
+			$path = dirname($path);
 		}
-		//replace double slashes as they also resolve
-		$path = preg_replace('/\/+/', '/', $path);
-		
-			//trim install folder
-		if(substr($path, -9) == '/install/') {
-			$path = substr($path, 0, -8);
-		}		
-		
-		$https = (isset($_SERVER["HTTPS"]) && ($_SERVER["HTTPS"] == "on" || $_SERVER["HTTPS"] == "1")) || !empty($_SERVER["HTTP_X_SSL_REQUEST"]) || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on');
-		$protocol = $https ? 'https://' : 'http://';
-		
-		$url = $protocol . $_SERVER['HTTP_HOST'] . $path;
+
+		$url = \go\core\jmap\Request::get()->isHttps() ? 'https://' : 'http://';
+		$url .= Request::get()->getHost(false) . $path;
 		
 		return $url;
 	}
