@@ -38,7 +38,8 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 		go.login.LoginDialog.superclass.initComponent.call(this);
 
 		this.on('render', function() {
-			this.maximize();
+			if(GO.util.isMobileOrTablet())
+				this.maximize();
 		}, this);
 
 		this.add(this.userNamePanel = new go.login.UsernamePanel());
