@@ -117,11 +117,16 @@ go.form.BatchEditDialog = Ext.extend(go.Window, {
 			params.update[id] = values;
 		})
 
+		me.getEl().mask(t("Saving..."));
+
 		return me.entityStore.set(params).then(function(response) {
+			me.close();
 			return response;
 		}).catch(function(error){
 			console.error(error);
-		})
+		}).finally(function() {
+			me.getEl().unmask();
+		});
 	}
 
 
