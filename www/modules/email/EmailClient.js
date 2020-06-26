@@ -1295,7 +1295,6 @@ GO.mainLayout.onReady(function(){
 				title: title,
 				handler: function(){
 					GO.mainLayout.openModule('email');
-					go.Notifier.notificationArea.collapse();
 				}
 			}, 'email');
 		}
