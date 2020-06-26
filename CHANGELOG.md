@@ -1,3 +1,6 @@
+26-06-2020 6.4.152
+- Core: Loading issue when used in subdirctory
+
 26-06-2020 6.4.151
 - Core: Collapse notification panel when clicked on mobile
 - Core: Added new toolbar when user has selected multiple items
