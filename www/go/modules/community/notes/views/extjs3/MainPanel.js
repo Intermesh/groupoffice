@@ -207,40 +207,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 							});
 					},
 					scope: this
-				}),
-				{
-					iconCls: 'ic-more-vert',
-					menu: [
-						{
-							itemId: "delete",
-							iconCls: 'ic-delete',
-							text: t("Delete"),
-							handler: function () {
-								this.noteGrid.deleteSelected();
-							},
-							scope: this
-						}
-					]
-				}
-				
-//				,{
-//					disabled: go.Modules.get("community", 'notes').permissionLevel < go.permissionLevels.write,
-//					iconCls: 'ic-add',
-//					tooltip: t('Add test'),
-//					handler: function (e, toolEl) {
-//						var store = this.noteGrid.store;
-//						var myRecordDef = Ext.data.Record.create(store.fields);
-//
-//						store.insert(0, new myRecordDef({
-//							name: "New",
-//							content: "Testing",
-//							noteBookId: this.addNoteBookId
-//						}));
-//						
-//						store.commitChanges();
-//					},
-//					scope: this
-//				}
+				})
 			],
 			listeners: {				
 				rowdblclick: this.onNoteGridDblClick,
