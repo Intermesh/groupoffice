@@ -57,18 +57,15 @@ go.form.BatchEditDialog = Ext.extend(go.Window, {
 
 			f = Ext.create(f);
 
-			f.on('change', function() {
-				f.ownerCt.ownerCt.doLayout();
-			});
-
 			if(!f.isFormField) {
 				return;
 			}
 			fieldSet.add({
 				xtype: 'container',
-				layout: 'hbox',
+				layout: 'column',
 				items: [
 					{
+						columnWidth: .3,
 						xtype: 'checkbox',
 						submit: false,
 						width: dp(200),
@@ -79,7 +76,7 @@ go.form.BatchEditDialog = Ext.extend(go.Window, {
 							}
 						}
 					},{
-						flex: 1,
+						columnWidth: .7,
 						layout: 'form',
 						xtype: 'container',
 						items: [f]
