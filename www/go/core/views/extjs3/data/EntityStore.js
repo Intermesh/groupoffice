@@ -527,6 +527,12 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		
 		//Pause JMAP requests because indexeddb events will trigger the queue
 		go.Jmap.pause();
+		if(!go.pauseCalls) {
+			go.pauseCalls = 0;
+			go.continueCalls = 0;
+		}
+		go.pauseCalls++;
+
 		this.pauseGet();
 		return me.initState().then(function() {			
 			return me.stateStore.getItem(id + "").then(function(entity) {		
@@ -541,6 +547,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 			//continueGet JMAP
 			go.Jmap.continue();
 			me.continueGet();
+			go.continueCalls++;
 		});
 	},
 

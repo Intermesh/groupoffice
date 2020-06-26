@@ -155,7 +155,7 @@ go.browserStorage.Store.prototype.setItem = function(key, value) {
 	}
 
 	return this._withIDBStore('readwrite',function(store) { 
-			store.put(value, key);
+			return store.put(value, key);
 	});
 }
 

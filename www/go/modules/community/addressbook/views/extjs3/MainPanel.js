@@ -415,6 +415,18 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 							}
 						},
 
+						{
+							iconCls: 'ic-edit',
+							text: t("Batch edit"),
+							handler: function() {
+								var dlg = new go.form.BatchEditDialog({
+									entityStore: "Contact"
+								});
+								dlg.setIds(this.grid.getSelectionModel().getSelections().column('id')).show();
+							},
+							scope: this
+						},
+
 						"-",
 
 						{

@@ -169,7 +169,6 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			this.getTopToolbar().setDisabled(false);
 		}
 
-		console.warn(data);
 		this.data = data;
 
 		var me = this;
@@ -177,11 +176,12 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 		if(!this.relations.length) {
 			this.onLoad();
 			this.fireEvent('load', this);
-			return;
+			return Promise.resolve(data);
 		}	
 		
-		go.Relations.get(me.entityStore, data, this.relations).then(function(result) {
-			me.watchRelations = result.watch;					
+		return go.Relations.get(me.entityStore, data, this.relations).then(function(result) {
+			me.watchRelations = result.watch;
+			return data;
 		}).catch(function(result) {
 			console.warn("Failed to fetch relation", result);
 		}).finally(function() {
@@ -192,22 +192,29 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	},
 
 	load: function (id) {
-		this.currentId = id;
-		this.loading = true;
 		var me = this;
-		this.entityStore.single(id).then(function(entity) {
+		if(this.loading) {
+			return this.loading.then(function() {
+				return me.load(id);
+			});
+		}
+		this.currentId = id;
+		this.loading = this.entityStore.single(id).then(function(entity) {
 			try {
-				me.internalLoad(entity);
+				return me.internalLoad(entity);
 			} catch (e) {
 				Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred") + ": " + e.message);
 				console.error(e);
+				return Promise.reject(e);
 			}
 		}).catch(function(e) {
 			console.error(e);
 			Ext.MessageBox.alert(t("Not found"), "The requested page was not found");
 		}).finally(function() {
 			me.loading = false;
-		})
+		});
+
+		return this.loading;
 	},
 
 	addCustomFields : function() {
