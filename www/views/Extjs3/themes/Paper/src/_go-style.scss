@@ -2268,3 +2268,25 @@ table[id^="comments-ext"] b {
 		cursor: not-allowed;
 	}
 }
+
+
+.x-panel-tbar {
+	.go-multiselect-toolbar {
+		background-color: color($bg, 'box');
+		opacity: 1;
+		padding: 0;
+		.x-toolbar-left .x-toolbar-cell:first-child {
+			padding-left: 0;
+		}
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		transition: opacity 260ms $curve-standard;
+
+		&.x-hide-display {
+			display: block !important;
+			pointer-events: none;
+			opacity: 0;
+		}
+	}
+}
