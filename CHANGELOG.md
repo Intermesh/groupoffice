@@ -1,4 +1,5 @@
 26-06-2020 6.4.151
+- Core: Collapse notification panel when clicked on mobile
 - Core: Added new toolbar when user has selected multiple items
 - Billing: selecting a TAX rate in the order dialog items is fixed
 - Contacts: German contact salutation was incorrect
