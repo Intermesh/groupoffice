@@ -173,6 +173,20 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	createNoteGrid : function() {
 		this.noteGrid = new go.modules.community.notes.NoteGrid({
 			region: 'center',
+			multiSelectToolbarItems: [
+				{
+					hidden: go.customfields.CustomFields.getFieldSets('Note').length == 0,
+					iconCls: 'ic-edit',
+					tooltip: t("Batch edit"),
+					handler: function() {
+						var dlg = new go.form.BatchEditDialog({
+							entityStore: "Note"
+						});
+						dlg.setIds(this.noteGrid.getSelectionModel().getSelections().column('id')).show();
+					},
+					scope: this
+				}
+			],
 			tbar: [
 				{
 					cls: 'go-narrow', //Shows on mobile only

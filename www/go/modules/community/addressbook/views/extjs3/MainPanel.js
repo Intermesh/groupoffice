@@ -139,6 +139,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			ddGroup: "addressbook",
 			multiSelectToolbarItems: [
 				{
+					hidden: go.customfields.CustomFields.getFieldSets('Contact').length == 0,
 					iconCls: 'ic-edit',
 					tooltip: t("Batch edit"),
 					handler: function() {
