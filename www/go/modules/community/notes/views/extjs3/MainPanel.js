@@ -104,22 +104,21 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				},
 				'->',
 				{
-					xtype: "button",
-					iconCls: "ic-add",
-					handler: function() {
-						var dlg = new go.filter.FilterDialog({
-							entity: "Note"
-						});
-						dlg.show();
-					},
-					scope: this
+					xtype: 'filteraddbutton',
+					entity: 'Note'
 				}
 			],
 			items: [
-				this.filterGrid = new go.filter.FilterGrid({
+				{
+					xtype: 'filtergrid',
 					filterStore: this.noteGrid.store,
 					entity: "Note"
-				})
+				},
+				{
+					xtype: 'variablefilterpanel',
+					filterStore: this.noteGrid.store,
+					entity: "Note"
+				}
 			]
 		});
 		
@@ -174,6 +173,20 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	createNoteGrid : function() {
 		this.noteGrid = new go.modules.community.notes.NoteGrid({
 			region: 'center',
+			multiSelectToolbarItems: [
+				{
+					hidden: go.customfields.CustomFields.getFieldSets('Note').length == 0,
+					iconCls: 'ic-edit',
+					tooltip: t("Batch edit"),
+					handler: function() {
+						var dlg = new go.form.BatchEditDialog({
+							entityStore: "Note"
+						});
+						dlg.setIds(this.noteGrid.getSelectionModel().getSelections().column('id')).show();
+					},
+					scope: this
+				}
+			],
 			tbar: [
 				{
 					cls: 'go-narrow', //Shows on mobile only
@@ -207,40 +220,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 							});
 					},
 					scope: this
-				}),
-				{
-					iconCls: 'ic-more-vert',
-					menu: [
-						{
-							itemId: "delete",
-							iconCls: 'ic-delete',
-							text: t("Delete"),
-							handler: function () {
-								this.noteGrid.deleteSelected();
-							},
-							scope: this
-						}
-					]
-				}
-				
-//				,{
-//					disabled: go.Modules.get("community", 'notes').permissionLevel < go.permissionLevels.write,
-//					iconCls: 'ic-add',
-//					tooltip: t('Add test'),
-//					handler: function (e, toolEl) {
-//						var store = this.noteGrid.store;
-//						var myRecordDef = Ext.data.Record.create(store.fields);
-//
-//						store.insert(0, new myRecordDef({
-//							name: "New",
-//							content: "Testing",
-//							noteBookId: this.addNoteBookId
-//						}));
-//						
-//						store.commitChanges();
-//					},
-//					scope: this
-//				}
+				})
 			],
 			listeners: {				
 				rowdblclick: this.onNoteGridDblClick,

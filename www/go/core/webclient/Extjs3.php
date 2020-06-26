@@ -181,6 +181,8 @@ class Extjs3 {
 			$path = dirname($path);
 		}
 
+		$path = rtrim($path, '/') . '/';
+
 		$this->baseUrl = Request::get()->isHttps() ? 'https://' : 'http://';
 		$this->baseUrl .= Request::get()->getHost(false) . $path;
 

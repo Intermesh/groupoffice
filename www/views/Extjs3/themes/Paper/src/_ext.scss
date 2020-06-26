@@ -935,7 +935,7 @@
 	.x-searchbar {
 		background-color: color($bg, 'box');
 		opacity:1;
-		padding:0 dp(8);
+		padding:0;
 		position:absolute;
 		top:0;
 		bottom:0;
@@ -948,6 +948,7 @@
 		.x-form-field-trigger-wrap > input {
 			padding-right: dp(56);
 		}
+
 
 		input {
 			box-shadow: none;
@@ -977,7 +978,7 @@
 
 .x-toolbar{
 	height: dp(48);
-	padding:0 dp(8) 0 0;
+	padding:0;
 	
 	&.go-paging-tb, .go-paging-tb & {
 		height: dp(40);

@@ -33,6 +33,7 @@ Window.js
 form/EntityPanel.js
 form/MultiEntityDialog.js
 form/Dialog.js
+form/BatchEditDialog.js
 form/CheckboxGroup.js
 form/PasswordGeneratorField.js
 form/DateField.js
@@ -239,6 +240,7 @@ filter/types/select.js
 filter/types/subconditions.js
 filter/FilterGrid.js
 filter/FilterDialog.js
+filter/FilterAddButton.js
 filter/VariableFilterPanel.js
 filter/VariableFilterDialog.js
 filter/variabletypes/date.js

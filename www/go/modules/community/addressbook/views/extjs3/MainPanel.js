@@ -137,6 +137,20 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			region: 'center',
 			enableDragDrop: true, //for dragging contacts to address books or groups in the tree
 			ddGroup: "addressbook",
+			multiSelectToolbarItems: [
+				{
+					hidden: go.customfields.CustomFields.getFieldSets('Contact').length == 0,
+					iconCls: 'ic-edit',
+					tooltip: t("Batch edit"),
+					handler: function() {
+						var dlg = new go.form.BatchEditDialog({
+							entityStore: "Contact"
+						});
+						dlg.setIds(this.grid.getSelectionModel().getSelections().column('id')).show();
+					},
+					scope: this
+				}
+			],
 			tbar: [
 				{
 					cls: 'go-narrow',
@@ -413,19 +427,11 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 								var win = new go.modules.community.addressbook.DuplicateDialog();
 								win.show();
 							}
-						},
+						}
 
-						"-",
 
-						{
-							itemId: "delete",
-							iconCls: 'ic-delete',
-							text: t("Delete"),
-							handler: function () {
-								this.grid.deleteSelected();
-							},
-							scope: this
-						}]
+
+					]
 				}
 
 			],
@@ -513,47 +519,24 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				},
 				'->',
 				{
-					xtype: "button",
-					iconCls: "ic-add",
-					menu:[
-						{
-							text: t("Filter"),
-							iconCls: 'ic-filter-list',
-							handler: function() {
-								var dlg = new go.filter.FilterDialog({
-									entity: "Contact"
-								});
-								dlg.show();
-							},
-							scope: this
-						},
-						{
-							text: t("Input field"),
-							iconCls: 'ic-search',
-							handler: function() {
-								var dlg = new go.filter.VariableFilterDialog({
-									entity: "Contact"
-								});
-								dlg.show();
-							},
-							scope: this
-						}
-					]
-
+					xtype: 'filteraddbutton',
+					entity: 'Contact'
 				}
 			],
 			items: [
 				orgFilter,
 				{xtype: "box", autoEl: "hr"},
-				this.filterGrid = new go.filter.FilterGrid({
+				{
+					xtype: 'filtergrid',
 					filterStore: this.grid.store,
 					entity: "Contact"
-				}),
-				new go.filter.VariableFilterPanel({
+				},
+				{
+					xtype: 'variablefilterpanel',
 					filterStore: this.grid.store,
 					entity: "Contact"
-				})
-			]
+				}
+				]
 		});
 		
 		

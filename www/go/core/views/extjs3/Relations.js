@@ -43,6 +43,7 @@ go.Relations = {
 		var key = this.resolveKey(relation.path + relation.fk, entity), me = this;
 
 		if(!key) {
+			console.warn("No key found for ", relation, entity);
       me.applyRelationEntity(relation.path + relName, entity, null);
 			return Promise.resolve(null);
 		}		
@@ -69,6 +70,7 @@ go.Relations = {
 
 		return go.Db.store(relation.store).single(key).then(function(relatedEntity) {
 			me.applyRelationEntity(relName, entity, relatedEntity);
+			return relatedEntity;
 		});
 	},
 

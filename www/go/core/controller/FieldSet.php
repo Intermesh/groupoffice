@@ -22,10 +22,10 @@ class FieldSet extends EntityController {
 	}
 
 	protected function getQueryQuery($params) {
-		return $this->checkEnabledModule(parent::getQueryQuery($params)->orderBy(['sortOrder' => 'ASC']));
+		return $this->checkEnabledModule(parent::getQueryQuery($params)->orderBy(['sortOrder' => 'ASC', 'id' => 'ASC']));
 	}
 	protected function getGetQuery($params) {
-		return $this->checkEnabledModule(parent::getGetQuery($params)->orderBy(['sortOrder' => 'ASC']));
+		return $this->checkEnabledModule(parent::getGetQuery($params)->orderBy(['sortOrder' => 'ASC', 'id' => 'ASC']));
 	}
 	
 	/**

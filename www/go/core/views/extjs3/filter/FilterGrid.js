@@ -148,3 +148,6 @@ go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 		this.moreMenu.showAt(e.getXY());
 	}
 });
+
+
+Ext.reg('filtergrid', go.filter.FilterGrid);
