@@ -104,22 +104,21 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				},
 				'->',
 				{
-					xtype: "button",
-					iconCls: "ic-add",
-					handler: function() {
-						var dlg = new go.filter.FilterDialog({
-							entity: "Note"
-						});
-						dlg.show();
-					},
-					scope: this
+					xtype: 'filteraddbutton',
+					entity: 'Note'
 				}
 			],
 			items: [
-				this.filterGrid = new go.filter.FilterGrid({
+				{
+					xtype: 'filtergrid',
 					filterStore: this.noteGrid.store,
 					entity: "Note"
-				})
+				},
+				{
+					xtype: 'variablefilterpanel',
+					filterStore: this.noteGrid.store,
+					entity: "Note"
+				}
 			]
 		});
 		

@@ -194,3 +194,5 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 
 
 });
+
+Ext.reg('variablefilterpanel', go.filter.VariableFilterPanel);

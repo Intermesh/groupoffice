@@ -240,6 +240,7 @@ filter/types/select.js
 filter/types/subconditions.js
 filter/FilterGrid.js
 filter/FilterDialog.js
+filter/FilterAddButton.js
 filter/VariableFilterPanel.js
 filter/VariableFilterDialog.js
 filter/variabletypes/date.js

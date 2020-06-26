@@ -518,47 +518,24 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				},
 				'->',
 				{
-					xtype: "button",
-					iconCls: "ic-add",
-					menu:[
-						{
-							text: t("Filter"),
-							iconCls: 'ic-filter-list',
-							handler: function() {
-								var dlg = new go.filter.FilterDialog({
-									entity: "Contact"
-								});
-								dlg.show();
-							},
-							scope: this
-						},
-						{
-							text: t("Input field"),
-							iconCls: 'ic-search',
-							handler: function() {
-								var dlg = new go.filter.VariableFilterDialog({
-									entity: "Contact"
-								});
-								dlg.show();
-							},
-							scope: this
-						}
-					]
-
+					xtype: 'filteraddbutton',
+					entity: 'Contact'
 				}
 			],
 			items: [
 				orgFilter,
 				{xtype: "box", autoEl: "hr"},
-				this.filterGrid = new go.filter.FilterGrid({
+				{
+					xtype: 'filtergrid',
 					filterStore: this.grid.store,
 					entity: "Contact"
-				}),
-				new go.filter.VariableFilterPanel({
+				},
+				{
+					xtype: 'variablefilterpanel',
 					filterStore: this.grid.store,
 					entity: "Contact"
-				})
-			]
+				}
+				]
 		});
 		
 		
