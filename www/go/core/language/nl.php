@@ -1,5 +1,8 @@
 <?php
 return array (
+	'Input field' => 'Invoerveld',
+	'Add sub group' => 'Subgroep toevoegen',
+	'{count} selected' => '{count} geselecteerd',
   'Groups' => 'Groepen',
   'You can\'t delete the group Admins' => 'U kunt de groep Admins niet verwijderen',
   'You can\'t delete the group Everyone' => 'U kunt de groep Iedereen niet verwijderen',
