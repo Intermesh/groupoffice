@@ -137,6 +137,19 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			region: 'center',
 			enableDragDrop: true, //for dragging contacts to address books or groups in the tree
 			ddGroup: "addressbook",
+			multiSelectToolbarItems: [
+				{
+					iconCls: 'ic-edit',
+					tooltip: t("Batch edit"),
+					handler: function() {
+						var dlg = new go.form.BatchEditDialog({
+							entityStore: "Contact"
+						});
+						dlg.setIds(this.grid.getSelectionModel().getSelections().column('id')).show();
+					},
+					scope: this
+				}
+			],
 			tbar: [
 				{
 					cls: 'go-narrow',
@@ -413,31 +426,11 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 								var win = new go.modules.community.addressbook.DuplicateDialog();
 								win.show();
 							}
-						},
+						}
 
-						{
-							iconCls: 'ic-edit',
-							text: t("Batch edit"),
-							handler: function() {
-								var dlg = new go.form.BatchEditDialog({
-									entityStore: "Contact"
-								});
-								dlg.setIds(this.grid.getSelectionModel().getSelections().column('id')).show();
-							},
-							scope: this
-						},
 
-						"-",
 
-						{
-							itemId: "delete",
-							iconCls: 'ic-delete',
-							text: t("Delete"),
-							handler: function () {
-								this.grid.deleteSelected();
-							},
-							scope: this
-						}]
+					]
 				}
 
 			],

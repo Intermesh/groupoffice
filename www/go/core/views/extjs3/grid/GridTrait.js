@@ -61,7 +61,7 @@ go.grid.GridTrait = {
 	},
 
 	getMultiSelectToolbarItems : function() {
-		return [
+		var items = [
 
 			{
 				iconCls: 'ic-arrow-back',
@@ -82,6 +82,13 @@ go.grid.GridTrait = {
 				scope: this
 			}
 		];
+
+		if(this.multiSelectToolbarItems) {
+			var args = [3,0].concat(this.multiSelectToolbarItems);
+			Array.prototype.splice.apply(items, args);
+		}
+
+		return items;
 	},
 
 	showMultiSelectToolbar : function(selections) {
