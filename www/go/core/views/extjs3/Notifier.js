@@ -68,7 +68,12 @@ go.Notifier = {
 		if(msg.handler) {
 			msg.listeners = msg.listeners || {};
 			msg.listeners.afterrender = function(p){
-				p.el.on('click', msg.handler);
+				p.el.on('click', function() {
+					if(GO.util.isMobileOrTablet()) {
+						go.Notifier.notificationArea.collapse();
+					}
+					msg.handler();
+				});
 			}
 		}
 
