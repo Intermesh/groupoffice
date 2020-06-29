@@ -857,7 +857,7 @@ class Contact extends AclItemEntity {
 		return true;
 	}
 
-	protected function getSearchDescription() {
+	public function getSearchDescription() {
 		$addressBook = AddressBook::findById($this->addressBookId);
 		
 		$orgStr = "";	
@@ -876,7 +876,7 @@ class Contact extends AclItemEntity {
 		return $addressBook->name . $jobTitle . $orgStr;
 	}
 
-	protected function getSearchName() {
+	public function getSearchName() {
 		return $this->name;
 	}
 

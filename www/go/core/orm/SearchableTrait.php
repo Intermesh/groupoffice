@@ -17,14 +17,14 @@ trait SearchableTrait {
 	 * 
 	 * @return string
 	 */
-	abstract protected function getSearchName() ;
+	abstract public function getSearchName() ;
 	
 	/**
 	 * The description in the search results
 	 * 
 	 * @return string
 	 */
-	abstract protected function getSearchDescription();
+	abstract public function getSearchDescription();
 	
 	/**
 	 * All the keywords that can be searched on

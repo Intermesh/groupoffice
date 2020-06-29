@@ -24,7 +24,7 @@ class Module extends core\Module
 
 	public function defineListeners() {
 		Entity::on(Entity::EVENT_SAVE, static::class, 'onEntitySave');
-		Entity::on(Entity::EVENT_DELETE, static::class, 'onEntityDelete');
+		Entity::on(Entity::EVENT_BEFORE_DELETE, static::class, 'onEntityDelete');
 		//cant get id
 		Token::on(Entity::EVENT_SAVE, static::class, 'onLogin');
 	}
@@ -51,9 +51,15 @@ class Module extends core\Module
 		self::logEntity($entity, $entity->isNew() ? 'create' : 'update');
 	}
 
-	static function onEntityDelete($query) {
+	static function onEntityDelete(core\orm\Query $query, $cls) {
 		// find al items with $query and log that they are being deleted
-		self::logEntity($query, 'delete');
+		if(is_a($cls,LogEntry::class, true)) return;
+
+		$entities = $cls::find()->mergeWith(clone $query);
+
+		foreach($entities as $e) {
+			static::logEntity($e, 'delete');
+		}
 	}
 
 	private static function logEntity(Entity $entity, $action) {
@@ -67,22 +73,15 @@ class Module extends core\Module
 		$log->setAction($action);
 		$log->changes = json_encode($action ==='update' ? $entity->getModified() : $entity->toArray());
 		$log->setAclId($entity->findAclId());
-		$log->save();
+		if(!$log->save()) {
+			throw new \Exception ("Could not save log");
+		}
 	}
 
+
 	private static function parseDescription($entity) {
-		$m = $entity::getMapping();
-		if($m->getColumn('title')) {
-			return $entity->title;
-		}
-		if($m->getColumn('name')) {
-			return $entity->name;
-		}
-		if($m->getColumn('displayName')) {
-			return $entity->displayName;
-		}
-		if($m->getColumn('description')) {
-			return $entity->description;
+		if(method_exists($entity, 'getSearchName')) {
+			return $entity->getSearchName();
 		}
 		return get_class($entity);
 	}
