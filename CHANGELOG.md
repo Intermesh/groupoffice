@@ -1,3 +1,6 @@
+29-06-2020 6.4.153
+- Core: Fixed manuall install error
+
 26-06-2020 6.4.152
 - Core: Loading issue when used in subdirctory
 
