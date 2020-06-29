@@ -1155,7 +1155,7 @@ abstract class Property extends Model {
 		}
 		
 		if($table->getColumn("modifiedAt") && !isset($modifiedForTable["modifiedAt"])) {
-			$this->modifiedAt = $modifiedForTable['modifiedAt'] = new DateTime();
+			$this->modifiedAt = $modifiedForTable['modifiedAt'] = new DateTime('now', new \DateTimeZone('UTC'));
 		}
 		
 		if(!$this->isNew()) {
@@ -1163,7 +1163,7 @@ abstract class Property extends Model {
 		}
 		
 		if($table->getColumn("createdAt") && !isset($modifiedForTable["createdAt"])) {
-			$this->createdAt = $modifiedForTable['createdAt'] = new DateTime();
+			$this->createdAt = $modifiedForTable['createdAt'] = new DateTime('now', new \DateTimeZone('UTC'));
 		}
 		
 		if($table->getColumn("createdBy") && !isset($modifiedForTable["createdBy"])) {

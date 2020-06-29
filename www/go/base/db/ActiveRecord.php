@@ -3394,26 +3394,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if(!self::$log_enabled) {
 			return true;
 		}
-		$message = $this->getLogMessage($action);
-		if($message && GO::modules()->isInstalled('log')){
-			
-			$data = $this->getLogJSON($action,$modifiedCustomfieldAttrs);
-			
-			$log = new \GO\Log\Model\Log();
 
-			$pk = $this->pk;
-			$log->model_id=is_array($pk) ? var_export($pk, true) : $pk;
+		\go\modules\community\history\Module::onActiveRecordSave($this, $this->getCacheAttributes(), $action);
 
-			$log->action=$action;
-			$log->model=$this->className();
-			$log->message = $message;
-			$log->object=$this;
-			$log->jsonData = json_encode($data);
-			if($save)
-				return $log->save();
-			else
-				return $log;
-		}
 	}
 
 	/**

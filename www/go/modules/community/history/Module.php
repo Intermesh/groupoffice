@@ -18,8 +18,8 @@ class Module extends core\Module
 	}
 
 	public static function initListeners(){
-		//ActiveRecord::model()->addListener('save', self::class, 'onActiveRecordSave');
-		//ActiveRecord::model()->addListener('delete', self::class, 'onActiveRecordDelete');
+//		ActiveRecord::model()->addListener('save', self::class, 'onActiveRecordSave');
+//		ActiveRecord::model()->addListener('delete', self::class, 'onActiveRecordDelete');
 	}
 
 	public function defineListeners() {
@@ -29,22 +29,23 @@ class Module extends core\Module
 		Token::on(Entity::EVENT_SAVE, static::class, 'onLogin');
 	}
 
-	static function onActiveRecordSave(ActiveRecord $record) {
-		self::logActiveRecord($record,$record->isNew ? 'create' : 'update');
-	}
-	static function onActiveRecordDelete($record) {
-		self::logActiveRecord($record, 'delete');
-	}
+	static function onActiveRecordSave(ActiveRecord $record, $cache, $action) {
 
-	private static function logActiveRecord($record, $action) {
+		if(!$cache) {
+			return;
+		}
+
 		$pk = $record->getPk();
 		$log = new LogEntry();
 		$log->entityId = is_array($pk) ? var_export($pk, true) : $pk;
-		$log->entityTypeId = $record->className();
+		$log->entityTypeId = $record::entityType()->getId();
 		$log->setAction($action);
+		$log->description = $cache ? $cache['name'] : get_class($record);
 		$log->changes = json_encode($record->getLogJSON($action));
 		$log->setAclId($record->findAclId());
-		$log->save();
+		if(!$log->save()) {
+			throw new \Exception("Could not save log");
+		}
 	}
 
 	static function onEntitySave(Entity $entity) {
@@ -53,7 +54,7 @@ class Module extends core\Module
 
 	static function onEntityDelete(core\orm\Query $query, $cls) {
 		// find al items with $query and log that they are being deleted
-		if(is_a($cls,LogEntry::class, true)) return;
+		if(!method_exists($cls, 'getSearchName')) return;
 
 		$entities = $cls::find()->mergeWith(clone $query);
 
@@ -63,12 +64,12 @@ class Module extends core\Module
 	}
 
 	private static function logEntity(Entity $entity, $action) {
-		if(is_a($entity,LogEntry::class)) return;
+		if(!method_exists($entity, 'getSearchName')) return;
 
 		$log = new LogEntry();
 		$log->entityId = $entity->id;
 		$log->removeAcl = is_a($entity, AclOwnerEntity::class);
-		$log->description = self::parseDescription($entity);
+		$log->description = $entity->getSearchName();
 		$log->entityTypeId = $entity->entityType()->getId();
 		$log->setAction($action);
 		$log->changes = json_encode($action ==='update' ? $entity->getModified() : $entity->toArray());
@@ -78,13 +79,6 @@ class Module extends core\Module
 		}
 	}
 
-
-	private static function parseDescription($entity) {
-		if(method_exists($entity, 'getSearchName')) {
-			return $entity->getSearchName();
-		}
-		return get_class($entity);
-	}
 
 	static function onLogin(Token $token) {
 		$log = new LogEntry();
