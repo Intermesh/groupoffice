@@ -1,6 +1,5 @@
 Roadmap
 
-- Batch edit custom fields
 - Tasks module with kanban support
 - Time tracking
 - Billing module refactor
