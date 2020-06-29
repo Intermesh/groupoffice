@@ -1,5 +1,9 @@
+- Email: Pasted or dropped image resized to max-width: 100%
+- Leavedays: Incorrect email when booking was made for another user
+- Address book: Removed duplciate "Sort by" last name setting.
+
 29-06-2020 6.4.153
-- Core: Fixed manuall install error
+- Core: Fixed manual install error
 
 26-06-2020 6.4.152
 - Core: Loading issue when used in subdirctory
