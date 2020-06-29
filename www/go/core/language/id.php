@@ -598,7 +598,7 @@ return array (
   'Are you sure you want to delete this item?' => 'Anda yakin ingin menghapus item ini?',
   'Back' => 'Kembali',
   'Finish' => 'Selesai',
-  'Forgot username?' => 'Lupa nama pengguna?',
+  'Forgot login credentials?' => 'Lupa nama pengguna?',
   'Password is required' => 'Kata sandi diperlukan',
   'Not found' => 'Tidak ditemukan',
   'Invalid password' => 'Kata sandi salah',
