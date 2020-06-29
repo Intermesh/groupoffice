@@ -15,7 +15,7 @@ $lang = GO::language()->getLanguage(); ?>
 	<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
 	<meta http-equiv="x-ua-compatible" content="IE=edge">
 	<meta name="apple-mobile-web-app-capable" content="yes">
-	<meta name="apple-mobile-web-app-title" content="<?= GO::config()->title; ?>">
+	<meta name="apple-mobile-web-app-title" content="<?= go()->getSettings()->title; ?>">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <link rel="apple-touch-icon" sizes="180x180" href="<?= GO::view()->getTheme()->getUrl(); ?>img/favicon/apple-touch-icon.png">
 
@@ -34,7 +34,7 @@ $lang = GO::language()->getLanguage(); ?>
 	<meta name="msapplication-TileColor" content="#2b5797">
 	<meta name="theme-color" content="#ffffff">
 
-	<title><?= GO::config()->title; ?></title>
+	<title><?= go()->getSettings()->title; ?></title>
 	<?php
 	$cssMtime = filemtime(__DIR__ . "/style.css");
 	?>
@@ -43,8 +43,6 @@ $lang = GO::language()->getLanguage(); ?>
 	<link href="<?= GO::view()->getUrl()?>css.php?theme=<?=\GO::view()->getTheme()->getName(); ?>&v=<?=$webclient->getCSSFile(\GO::view()->getTheme()->getName())->getModifiedAt()->format("U"); ?>" type="text/css" rel="stylesheet" />
 
 	<?php
-	if(!empty(GO::config()->custom_css_url))
-		echo '<link href="'. GO::config()->custom_css_url.'" type="text/css" rel="stylesheet" />';
 
 	//$this is \GO\Core\Controller\Auth
 	GO::router()->getController()->fireEvent('head');
@@ -70,6 +68,13 @@ $lang = GO::language()->getLanguage(); ?>
         }
         ?>
 	</style>
+
+    <?php
+
+    if(!empty(GO::config()->custom_css_url)){
+	  echo '<link href="'. GO::config()->custom_css_url.'" type="text/css" rel="stylesheet" />';
+    }
+  ?>
 	<meta http-equiv="Content-Security-Policy" content="<?= CSP::get(); ?>">
 </head>
 <body>

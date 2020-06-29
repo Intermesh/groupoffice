@@ -1,0 +1,1 @@
+go.filter.variabletypes.select = Ext.extend(go.filter.types.select, {});

@@ -416,6 +416,7 @@
 		display: inline-block;
 		padding: dp(6) dp(8);
 	}
+	&-time { max-height: dp(32);  }
 	
 	textarea.x-form-field {
 		/*height: min-content;*/
@@ -934,7 +935,7 @@
 	.x-searchbar {
 		background-color: color($bg, 'box');
 		opacity:1;
-		padding:0 dp(8);
+		padding:0;
 		position:absolute;
 		top:0;
 		bottom:0;
@@ -947,6 +948,7 @@
 		.x-form-field-trigger-wrap > input {
 			padding-right: dp(56);
 		}
+
 
 		input {
 			box-shadow: none;
@@ -976,7 +978,7 @@
 
 .x-toolbar{
 	height: dp(48);
-	padding:0 dp(8) 0 0;
+	padding:0;
 	
 	&.go-paging-tb, .go-paging-tb & {
 		height: dp(40);
@@ -1573,14 +1575,14 @@ td.grid-hd-group-cell {
 .x-dd-drag-ghost {
 	@extend %font-data;
 	color:color($fg, 'text');
-	opacity:1;
+	opacity:.9;
 	border:0;
 	padding: 0 dp(8) 0 dp(40);
-	background-color:#fff;
+
 	a { color:inherit;}
 }
 .x-dd-drag-proxy {
-	
+	background-color:color($bg,'card');
 	line-height: dp(40);
 
 	.x-grid3-hd-inner{

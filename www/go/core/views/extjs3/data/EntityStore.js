@@ -317,7 +317,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					}
 				}
 			}).then(function(response) {
-				if(!response.list) {
+				if(go.util.empty(response.list)) {
 					console.warn("No items in response: ", response);
 					return;
 				}
@@ -527,6 +527,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		
 		//Pause JMAP requests because indexeddb events will trigger the queue
 		go.Jmap.pause();
+
 		this.pauseGet();
 		return me.initState().then(function() {			
 			return me.stateStore.getItem(id + "").then(function(entity) {		

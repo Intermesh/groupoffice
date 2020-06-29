@@ -46,7 +46,72 @@ go.grid.GridTrait = {
 				return false;
 			}
 		}, this);
-	},	
+
+		if(this.getTopToolbar() && !this.getSelectionModel().singleSelect) {
+			this.initMultiSelectToolbar();
+		}
+	},
+
+	initMultiSelectToolbar : function() {
+		this.getSelectionModel().on('selectionchange', function(sm) {
+			var selections = sm.getSelections();
+
+			selections.length > 1 ? this.showMultiSelectToolbar(selections) : this.hideMultiSelectToolbar();
+		}, this);
+	},
+
+	getMultiSelectToolbarItems : function() {
+		var items = [
+
+			{
+				iconCls: 'ic-arrow-back',
+				tooltip: t("Clear selection"),
+				handler: function() {
+					this.getSelectionModel().clearSelections();
+				},
+				scope: this
+			},
+			this.selectedLabel,
+			'->',
+			{
+				iconCls: 'ic-delete',
+				tooltip: t("Delete"),
+				handler: function() {
+					this.deleteSelected();
+				},
+				scope: this
+			}
+		];
+
+		if(this.multiSelectToolbarItems) {
+			var args = [3,0].concat(this.multiSelectToolbarItems);
+			Array.prototype.splice.apply(items, args);
+		}
+
+		return items;
+	},
+
+	showMultiSelectToolbar : function(selections) {
+		if(!this.multiSelectToolBar ) {
+			this.selectedLabel = new Ext.form.Label({});
+			this.multiSelectToolBar = new Ext.Toolbar({
+				cls: 'go-multiselect-toolbar',
+				hidden: true, //default
+				items: this.getMultiSelectToolbarItems()
+			});
+			this.multiSelectToolBar.render(this.getTopToolbar().getEl());
+		}
+
+		this.multiSelectToolBar.setWidth(this.getTopToolbar().getWidth());
+		this.multiSelectToolBar.setVisible(true);
+		this.selectedLabel.setText(t("{count} selected").replace('{count}', selections.length));
+	},
+
+	hideMultiSelectToolbar : function() {
+		if(this.multiSelectToolBar) {
+			this.multiSelectToolBar.hide();
+		}
+	},
 
 	initTotalDisplay: function() {
 

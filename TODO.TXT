@@ -1,44 +1,75 @@
-6.4
+Roadmap
 
-remove folders when uninstalling module. Error when reinstalling
-
-- riot matrix synapse integration / mattermost
-- csv export select columns
-- never respond to email read requests option
-- mailserver limit access per service and filter remote ip address (global and per domain) to stop hacks. https://doc.dovecot.org/configuration_manual/config_file/config_variables/
-
-- logo blob stale gc?
-
-- blob:<ID|method> copy pasten. bv. email naar file. Attachment naar file. File kan geplakt worden in files of email composer.
-
-- threaded mail (new db design required)
-- calendar invite redesign:
- - Inbox with invites from caldav, EAS and e-mail
- - Remove email's automatically
- - Status (number of open invites) indicator on Calendar tab like email
- - Database redesign with single object per meeting with multiple participants
-
+- Tasks module with kanban support
 - Time tracking
-- New projects module or refactor existing?
-- Tickets finish
-- Share folder external
-- Share project with customer
+- Billing module refactor
+    - JMAP
+    - Debtor management
+    - PayPal and other payment provider integration
+    - Integrate accountant packages. Invoice Sync API
 
-- NOtifications
+- Email module
+ - JMAP
+ - Threaded
+ - Headers in DB for better linking and searching
+ - never respond to email read requests option
 
-- Makkelijker taken toevoegen bij projecten. Project eigen lijst?
-tasklist bij default permissions
+- Calendar module
+    - JMAP
+    - calendar invite redesign:
+    - Inbox with invites from caldav, EAS and e-mail
+    - Remove email's automatically
+    - Status (number of open invites) indicator on Calendar tab like email
+    - Database redesign with single object per meeting with multiple participants
+    - Subscribe to external calendars
+    - Birthdays from address book as special calendar
+
+- Mailserver
+    - limit access per service and filter remote ip address (global and per domain) to stop hacks. https://doc.dovecot.org/configuration_manual/config_file/config_variables/
+    - permissions per account?
+    - DKIM generator and implementation
+
+- Tickets module
+- Rocket chat
+    - Live chat on sites feed back into GO
+    - Notifications from GO to RC
+
+- Files
+    - JMAP
+    - Share folders to external users
+    - How to use blob system? Customers rely on logical file structure. Easier restore from backup
+
+- Projects
+    - JMAP
+    - Dismantle into small sub modules so we can have different building blocks for different needs
+    - Share project with customer
+    - Integrate with new tasks and kanban
+
+- Core:
+    - remove folders when uninstalling module. Error when reinstalling
+    - csv export select columns
+    - logo blob stale gc?
+    - blob:<ID|method> copy pasten. bv. email naar file. Attachment naar file. File kan geplakt worden in files of email composer.
 
 
-- billing API integratie boekhoudpakketten
 
 
-Batch edit custom fields not possible
+
+
+
+
+
 Disabled categories for:  folder dialog Folder::deriveCustomfieldSettings
 custom fields billign items dropped ?!
 Calendar birthdays
 Demodata
 ticket groups
+
+
+
+
+
+
 
 
 Projecten:

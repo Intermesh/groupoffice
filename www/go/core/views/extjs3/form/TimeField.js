@@ -1,7 +1,7 @@
 go.form.TimeField = Ext.extend(Ext.form.TextField, {
-	width: dp(80),
+	width: dp(90),
 	defaultAutoCreate : {tag: 'input', type: 'time', size: '20', autocomplete: 'off'},
-
+	inMinutes: false,
 
 	onBlur: function() {
 
@@ -29,6 +29,10 @@ go.form.TimeField = Ext.extend(Ext.form.TextField, {
 
 	setValue : function(v) {
 		if(!go.util.empty(v)) {
+			if(this.inMinutes) {
+				this.setMinutes(v);
+				return;
+			}
 			var parts = v.split(":");
 			if(parts.length == 3) {
 				parts.pop(); //pop seconds
@@ -40,6 +44,9 @@ go.form.TimeField = Ext.extend(Ext.form.TextField, {
 
 	getValue: function() {
 		var v = this.getRawValue();
+		if(this.inMinutes) {
+			return this.getMinutes();
+		}
 		if(!v) {
 			return;
 		}

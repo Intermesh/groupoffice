@@ -555,22 +555,25 @@ function test_system(){
 
 
 
-		if(GO\Base\Db\Utils::tableExists('core_module'))
-		{		
-			$test['name']='Protected files path';
-			$test['showSuccessFeedback'] = false;
-			$test['pass']=is_writable(\GO::config()->file_storage_path);
-			$test['feedback']='Fatal error: the file_storage_path setting in config.php is not writable. You must correct this or '.$product_name.' will not run.';
-			$test['fatal']=false;
-			$tests[]=$test;	
+		try {
+			if (GO\Base\Db\Utils::tableExists('core_module')) {
+				$test['name'] = 'Protected files path';
+				$test['showSuccessFeedback'] = false;
+				$test['pass'] = is_writable(\GO::config()->file_storage_path);
+				$test['feedback'] = 'Fatal error: the file_storage_path setting in config.php is not writable. You must correct this or ' . $product_name . ' will not run.';
+				$test['fatal'] = false;
+				$tests[] = $test;
 
-			$test['name']='Cronjob';
-			$test['showSuccessFeedback'] = false;
-			$test['pass']=GO::cronIsRunning();
-			$test['feedback']="Warning: The main cron job doesn't appear to be running. Please add a cron job: \n\n* * * * * www-data php ".\GO::config()->root_path."cron.php ".\GO::config()->get_config_file();
-			$test['fatal']=false;
-			$tests[]=$test;	
-		}	
+				$test['name'] = 'Cronjob';
+				$test['showSuccessFeedback'] = false;
+				$test['pass'] = GO::cronIsRunning();
+				$test['feedback'] = "Warning: The main cron job doesn't appear to be running. Please add a cron job: \n\n* * * * * www-data php " . \GO::config()->root_path . "cron.php " . \GO::config()->get_config_file();
+				$test['fatal'] = false;
+				$tests[] = $test;
+			}
+		} catch(Exception $e) {
+
+		}
 	}
 	
 	return $tests;

@@ -1295,7 +1295,6 @@ GO.mainLayout.onReady(function(){
 				title: title,
 				handler: function(){
 					GO.mainLayout.openModule('email');
-					go.Notifier.notificationArea.collapse();
 				}
 			}, 'email');
 		}
@@ -1418,8 +1417,26 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 			GO.email.showMessageAttachment(0, params);
 		}else
 		{
+			if(forceDownload) {
+				attachment.url += '&inline=0';
+				go.util.downloadFile(attachment.url);
+				return;
+			}
+
 			switch(attachment.extension)
 			{
+				case 'ics':
+					GO.calendar.showEventDialog({
+						url: GO.url('calendar/event/loadICS'),
+						params: {
+							account_id: panel.account_id,
+							mailbox: panel.mailbox,
+							uid: panel.uid,
+							number: attachment.number,
+							encoding: attachment.encoding
+						}
+					});
+					break;
 				case 'png':
 				case 'bmp':
 				case 'png':
@@ -1464,12 +1481,9 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 					}
 
 				default:
-					if(forceDownload) {
-						attachment.url += '&inline=0';
-						go.util.downloadFile(attachment.url);
-					}	else {
-						go.util.viewFile(attachment.url);
-					}
+
+					go.util.viewFile(attachment.url);
+
 					break;
 			}
 		}

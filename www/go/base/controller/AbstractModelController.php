@@ -269,7 +269,7 @@ class AbstractModelController extends AbstractController {
 		return array();
 	}
 
-	private function _loadComboTexts($response, $model) {
+	protected function _loadComboTexts($response, $model) {
 
 		$response['remoteComboTexts'] = array();
 
