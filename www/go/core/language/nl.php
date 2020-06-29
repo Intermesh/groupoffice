@@ -777,7 +777,7 @@ Alle rechten voorbehouden<br />',
 If you log in here, your other instance will be logged out.' => 'U bent al ingelogd op een andere locatie via IP {last_login_ip} sinds {last_login_time}.
 Als u hier inlogd, wordt u op de andere locatie uitgelogd.',
   'Recovery e-mail' => 'Herstel e-mail',
-  'Forgot username?' => 'Wachtwoord vergeten?',
+  'Forgot login credentials?' => 'Inloggegevens vergeten?',
   'The recovery e-mail is used to send a forgotten password request to.<br />Please use an email address that you can access from outside Group-Office.' => 'Dit e-mailadres wordt gebruikt om u een vergeten wachtwoord verzoek te sturen. Gebruik een e-mail adres waar u toegang toe heeft zonder GroupOffice toegang.',
   'You need to provide your current password to be able to modify the settings below.' => 'Om onderstaande velden te wijzigen dient u uw huidige wachtwoord op te geven.',
   'Good morning' => 'Goedemorgen',
