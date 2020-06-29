@@ -258,7 +258,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	},
 	
 	insertImage : function(src) {
-		var domId = Ext.id(), img = '<img id="' + domId + '" src="' + src + '" alt="pasted image" />';
+		var domId = Ext.id(), img = '<img style="max-width: 100%" id="' + domId + '" src="' + src + '" alt="pasted image" />';
 		this.insertAtCursor(img);
 		
 		return  this.getDoc().getElementById(domId);		
