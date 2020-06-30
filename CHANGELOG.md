@@ -1,3 +1,6 @@
+30-06-2020 6.4.155
+- Emnail: Problem with empty emails
+
 30-06-2020 6.4.154
 - Custom fields: Changing multi select options could destroy all values of the field
 - Email: Pasted or dropped image resized to max-width: 100%
