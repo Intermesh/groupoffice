@@ -3235,7 +3235,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		//TODO modified custom fields attr?
 		
-		$this->log($wasNew ? \GO\Log\Model\Log::ACTION_ADD : \GO\Log\Model\Log::ACTION_UPDATE,true, false);
+		$this->log($wasNew ? "create" : "update",true, false);
 
 		if($this->hasCustomFields() && !$this->saveCustomFields()) {
 			return false;
@@ -3303,9 +3303,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$cutoffLength = 500;
 		
 		switch($action){
-			case \GO\Log\Model\Log::ACTION_DELETE:
+			case "delete":
 				return null;
-			case \GO\Log\Model\Log::ACTION_UPDATE:
+			case "update":
 				$oldValues = $this->getModifiedAttributes();
 								
 				$modifications = array();
@@ -3371,7 +3371,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				
 				
 				return $modifications;
-			case \GO\Log\Model\Log::ACTION_ADD:
+			case "create":
 				$attrs =  $this->getAttributes();
 				$logAttrs = array();
 				foreach($attrs as $attr=>$val){
@@ -4025,7 +4025,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$r= $this->relations();
 
-		$this->log(\GO\Log\Model\Log::ACTION_DELETE);
+		$this->log("delete");
 		
 		foreach($r as $name => $attr){
 			if (!GO::classExists($attr['model'])){				
