@@ -69,6 +69,8 @@ code {
 	font-family: "Courier New",Courier,monospace;
 	color: color($fg, 'base');
 	border-radius: dp(4);
+	overflow: auto;
+	white-space: pre-wrap;
 }
 
 p {
@@ -2160,4 +2162,144 @@ table[id^="comments-ext"] b {
 /* used in mail to hide calendar links */
 .go-hidden {
 	display: none;
+}
+
+
+.go-page {
+	background: color($bg, 'dialog');
+	header {
+		text-align: center;
+		@include var(background-color, c-primary);
+		padding: dp(24);
+		color: white;
+	}
+
+	footer {
+		text-align: center;
+		clear: both;
+	}
+
+	header .go-app-logo {
+		height: dp(40);
+		display: inline-block;
+	}
+
+
+	section {
+		width: dp(800);
+		margin: 0 auto;
+		padding: dp(16);
+	}
+
+	fieldset, .card {
+		@extend .z4;
+		border-radius: $borderRadius;
+		background-color: color($bg, 'card');
+		border: none;
+		padding: dp(16);
+	}
+
+	.error {
+		color: red;
+	}
+
+	button, a.button {
+		box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+		transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+		will-change: box-shadow;
+		min-width: dp(80);
+		font-family: Helvetica, sans-serif;
+		font-size: 0.875rem;
+		font-weight: 500;
+		letter-spacing: 0.04em;
+		color: rgba(255, 255, 255, 0.87);
+		display: inline-block;
+		position: relative;
+		min-width: 64px;
+		height: 36px;
+		padding: 0 16px;
+		border: none;
+		border-radius: 2px;
+		outline: none;
+		@include var(background-color, c-secondary);
+		font-size: 14px;
+		font-weight: 500;
+		line-height: 36px;
+		text-align: center;
+		text-decoration: none;
+		text-transform: uppercase;
+		overflow: hidden; }
+
+	h2 {
+		font-size: 1.5rem;
+		font-weight: 400;
+		letter-spacing: normal;
+		line-height: 2rem;
+		color: rgba(0, 0, 0, 0.87); }
+
+	fieldset, .card {
+		border: none;
+		margin-bottom: 16px;
+		overflow: hidden;
+	}
+
+	label {
+		width: 80%;
+		margin-top: 4px;
+		margin-bottom: 8px;
+		font-size: .8rem;
+		letter-spacing: 0.04em;
+		display: inline-block;
+		color: #666;
+	}
+
+	input:not([type=checkbox]):not([type=radio]) {
+		color: rgba(0, 0, 0, 0.87);
+		width: 100%;
+		padding: 0 0 8px;
+		border: none;
+		transition: background-color 180ms cubic-bezier(0.4, 0, 0.2, 1), transform 180ms cubic-bezier(0.4, 0, 0.2, 1);
+		border-bottom: 2px solid rgba(0, 0, 0, 0.12);
+		background: none;
+		font-size: inherit;
+		-webkit-appearance: none; }
+	input:focus {
+		outline: none;
+		border-bottom: 2px solid #212121; }
+	input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active {
+		transition: background-color 5000s ease-in-out 0s, color 5000s ease-in-out 0s;
+		transition-delay: background-color 5000s, color 5000s;
+		-webkit-text-fill-color: #2a2a2a;
+	}
+
+	pre {
+		@extend code;
+	}
+
+	*[disabled] {
+		opacity: 0.65;
+		cursor: not-allowed;
+	}
+}
+
+
+.x-panel-tbar {
+	.go-multiselect-toolbar {
+		background-color: color($bg, 'box');
+		opacity: 1;
+		padding: 0;
+		.x-toolbar-left .x-toolbar-cell:first-child {
+			padding-left: 0;
+		}
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		transition: opacity 260ms $curve-standard;
+
+		&.x-hide-display {
+			display: block !important;
+			pointer-events: none;
+			opacity: 0;
+		}
+	}
 }

@@ -84,4 +84,13 @@ go.form.CheckboxGroup = Ext.extend(Ext.Container, {
 		});
 		return true;
 	},
+
+	isValid: function (preventMark) {
+		this.items.each(function(cb) {
+			if(!cb.isValid(preventMark)) {
+				return false;
+			}
+		});
+		return true;
+	}
 });

@@ -312,7 +312,7 @@ class Table {
 	 * @return string[]
 	 */
 	public function getColumnNames() {
-		return array_keys($this->columns);
+		return array_keys($this->getColumns());
 	}
 	
 	

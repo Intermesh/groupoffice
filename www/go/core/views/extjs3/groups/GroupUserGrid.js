@@ -190,6 +190,10 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 	
 	validate : function() {
 		return true;
+	},
+
+	isValid: function(preventMark) {
+		return true;
 	}
 });
 

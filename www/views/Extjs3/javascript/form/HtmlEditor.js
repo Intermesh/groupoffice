@@ -193,7 +193,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 					console.warn(response);
 					var imgEl = null;
 					if (file.type.match(/^image\//)) {
-						var domId = Ext.id(), img = '<img id="' + domId + '" src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="' + file.name + '" />';
+						var domId = Ext.id(), img = '<img style="max-width: 100%" id="' + domId + '" src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="' + file.name + '" />';
 						this.insertAtCursor(img);
 						imgEl = this.getDoc().getElementById(domId);
 					} 
@@ -258,7 +258,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	},
 	
 	insertImage : function(src) {
-		var domId = Ext.id(), img = '<img id="' + domId + '" src="' + src + '" alt="pasted image" />';
+		var domId = Ext.id(), img = '<img style="max-width: 100%" id="' + domId + '" src="' + src + '" alt="pasted image" />';
 		this.insertAtCursor(img);
 		
 		return  this.getDoc().getElementById(domId);		
@@ -316,7 +316,8 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 				var file = new File([blob], "pasted-image." + blob.type.substring(6),{type: blob.type});
 				go.Jmap.upload(file, {
 					success: function(response) {
-						imgEl.setAttribute("src", go.Jmap.downloadUrl(response.blobId));						
+						imgEl.setAttribute("src", go.Jmap.downloadUrl(response.blobId));
+						imgEl.setAttribute('style', 'max-width: 100%');
 						me.fireEvent('attach', me, response.blobId, file, imgEl);
 					}
 				});

@@ -44,14 +44,7 @@ abstract class Entity extends Property {
 	 * 
 	 * @param Entity $entity The entity that will be saved
 	 */
-	const EVENT_BEFORESAVE = 'beforesave';
-
-	/**
-	 * Fires just before the entity will be deleted
-	 *
-	 * @param Entity $entity The entity that will be saved
-	 */
-	const EVENT_BEFOREDELETE = 'beforedelete';
+	const EVENT_BEFORE_SAVE = 'beforesave';
 
 	/**
 	 * Fires after the entity has been saved
@@ -63,15 +56,18 @@ abstract class Entity extends Property {
 	/**
 	 * Fires before the entity has been deleted
 	 *
-	 * @param $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
-	 *  So you can do for example: go()->getDbConnection()->delete('another_table', (new Query()->where('id', 'in' $query))
+	 * @param Query $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
+	 *  So you can do for example: go()->getDbConnection()->delete('another_table', (new Query()->where('id', 'in' $query)) or
+	 *  fetch the entities: $entities = $cls::find()->mergeWith(clone $query);
+	 * @param string $cls The static class name the function was called on.
 	 */
 	const EVENT_BEFORE_DELETE = 'beforedelete';
 	
 	/**
 	 * Fires after the entity has been deleted
 	 * 
-	 * @param $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
+	 * @param Query $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
+	 * @param string $cls The static class name the function was called on.
 	 *
 	 */
 	const EVENT_DELETE = 'delete';
@@ -232,7 +228,7 @@ abstract class Entity extends Property {
 
 		try {
 			
-			if (!$this->fireEvent(self::EVENT_BEFORESAVE, $this)) {
+			if (!$this->fireEvent(self::EVENT_BEFORE_SAVE, $this)) {
 				$this->rollback();
 				return false;
 			}
@@ -335,6 +331,11 @@ abstract class Entity extends Property {
 	 * @param $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
 	 *  So you can do for example: go()->getDbConnection()->delete('another_table', (new Query()->where('id', 'in' $query))
 	 *  Or pass ['id' => $id];
+	 *
+	 *  Or:
+	 *
+	 *  SomeEntity::delete($instance->primaryKeyValues());
+	 *
 	 * @return boolean
 	 * @throws Exception
 	 */
@@ -350,7 +351,7 @@ abstract class Entity extends Property {
 
 		try {
 
-			if(!static::fireEvent(static::EVENT_BEFORE_DELETE, $query)) {
+			if(!static::fireEvent(static::EVENT_BEFORE_DELETE, $query, static::class)) {
 				go()->getDbConnection()->rollBack();
 				return false;
 			}
@@ -370,17 +371,12 @@ abstract class Entity extends Property {
 				}
 			}
 
-			if(!static::fireEvent(static::EVENT_BEFOREDELETE, $query)) {
-				go()->getDbConnection()->rollBack();
-				return false;
-			}
-
 			if (!static::internalDelete($query)) {
 				go()->getDbConnection()->rollBack();
 				return false;
 			}
 
-			if(!static::fireEvent(static::EVENT_DELETE, $query)) {
+			if(!static::fireEvent(static::EVENT_DELETE, $query, static::class)) {
 				go()->getDbConnection()->rollBack();
 				return false;			
 			}

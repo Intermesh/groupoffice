@@ -913,58 +913,13 @@ class GO{
 	 * @param string $text log entry
 	 */
 	public static function debug($text, $config=false) {
-		
+		if(isset($_REQUEST['r'])&& $_REQUEST['r'] == 'core/debug')
+		{
+			return;
+		}
+
 		return go()->debug($text, 1);
 
-		if (   self::config()->debug
-			|| self::config()->debug_log
-			|| self::config()->firephp
-		) {
-			
-	
-			
-			if(!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug')
-			{
-				if (self::config()->firephp) {
-					if (class_exists('FB')) {
-						ob_start();
-						FB::send($text);
-					}
-				}
-
-//				if (self::config()->debug_log) {
-
-					if (!is_string($text)) {
-						$text = var_export($text, true);
-					}
-
-					if ($text == '')
-						$text = '(empty string)';
-
-					
-					if ($text == 'undefined')
-						throw new \Exception();
-					
-					//$username=\GO::user() ? \GO::user()->username : 'nobody';
-
-					//$trace = debug_backtrace();
-
-					//$prefix = "\n[".date("Ymd G:i:s")."][".$trace[0]['file'].":".$trace[0]['line']."]\n";
-
-					//$lines = explode("\n", $text);
-
-					//$text = $prefix.$text;
-
-					$user = isset(\GO::session()->values['username']) ? \GO::session()->values['username'] : 'notloggedin';
-
-					$text = "[$user] ".str_replace("\n","\n[$user] ", $text);
-					
-					$text .= "[" . \GO\Base\Util\Date::getmicrotime() . "] ";
-
-					file_put_contents(self::config()->file_storage_path . 'log/debug.log', $text . "\n", FILE_APPEND);
-//				}
-			}
-		}
 	}
 
 	

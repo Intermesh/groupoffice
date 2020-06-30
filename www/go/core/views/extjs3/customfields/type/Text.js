@@ -352,11 +352,10 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	getColumn : function(field) {
 		
 		var def = this.getFieldDefinition(field);
-		
 		return {
 			dataIndex: def.name,
 			header: def.customField.name,
-			hidden: true,
+			hidden: def.customField.hiddenInGrid,
 			id: "custom-field-" + encodeURIComponent(def.customField.databaseName),
 			sortable: true,
 			hideable: true,
@@ -364,6 +363,14 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			xtype: this.getColumnXType()
 		};
 	},
+
+	getFilterCmp : function(field) {
+		var cmp =  this.createFormFieldConfig(field);
+		cmp.name = cmp.hiddenName = field.databaseName;
+		return cmp;
+	},
+
+
 	
 	/**
 	 * See https://docs.sencha.com/extjs/3.4.0/#!/api/Ext.grid.Column-cfg-xtype

@@ -36,7 +36,7 @@
 						if(cb) {
 							cb.call(scope);
 						}
-						success ? resolve(me) : reject(me);
+						success ? resolve (me) : reject(me);
 					}
 				}, me);
 			
@@ -72,25 +72,13 @@
 		},
 		
 		/**
-		 * Get field set entitiues
+		 * Get field set entities
 		 * @param {string} entity eg. "note"
 		 * @returns {Array}
 		 */
 		getFieldSets: function (entity) {
-			var r = [];
-
-			for (var id in this.fieldSets) {
-				if (this.fieldSets[id].entity === entity) {
-					r.push(this.fieldSets[id]);
-				}
-			}
-			
-			return r.sort(function(a, b) {
-				if (a.sortOrder === b.sortOrder) {
-					return 0;
-				}	else {
-						return (a.sortOrder < b.sortOrder) ? -1 : 1;
-				}
+			return Object.values(this.fieldSets).filter(function(f) {
+				return f.entity === entity;
 			});
 		},
 		
@@ -191,6 +179,8 @@
 			return cols;
 		},
 
+
+
 		/**
 		 * Get form fieldsets
 		 * 
@@ -252,21 +242,8 @@
 		 * @returns {Array}
 		 */
 		getFields: function (fieldSetId) {
-			var r = [],	field;
-
-			for (var id in this.fields) {
-				field = this.fields[id];
-				if (field.fieldSetId == fieldSetId) {
-					r.push(field);
-				}
-			}
-
-			return r.sort(function(a, b) {
-				if (a.sortOrder === b.sortOrder) {
-					return 0;
-				}	else {
-						return (a.sortOrder < b.sortOrder) ? -1 : 1;
-				}
+			return Object.values(this.fields).filter(function(f) {
+				return f.fieldSetId == fieldSetId;
 			});
 		},
 

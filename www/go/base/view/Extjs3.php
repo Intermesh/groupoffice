@@ -30,7 +30,7 @@ class Extjs3{
 	}
 	
 	public function getUrl(){
-		return 'views/Extjs3/';
+		return \go\core\webclient\Extjs3::get()->getBaseUrl() . 'views/Extjs3/';
 	}
 	
 	private $_stylesheets=array();

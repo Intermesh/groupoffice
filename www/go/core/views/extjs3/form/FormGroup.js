@@ -234,6 +234,19 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		return v;
 	},
 
+	isValid : function(preventMark){
+		if(this.disabled){
+			return true;
+		}
+		var f = this.getAllFormFields();
+		for(var i = 0, l = f.length; i < l; i++) {
+			if(!f[i].isValid(preventMark)) {
+				return false;
+			}
+		}
+		return true;
+	},
+
 	markInvalid: function (msg) {
 		var f = this.getAllFormFields();
 		for(var i = 0, l = f.length; i < l; i++) {

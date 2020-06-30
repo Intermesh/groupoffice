@@ -162,6 +162,19 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 		});
 	},
 
+	isValid : function(preventMark){
+		if(this.disabled){
+			return true;
+		}
+		var f = this.getAllFormFields();
+		for(var i = 0, l = f.length; i < l; i++) {
+			if(!f[i].isValid(preventMark)) {
+				return false;
+			}
+		}
+		return true;
+	},
+
 	validate: function () {
 		var valid = true, fn = function (i) {
 			if (i.isFormField && !i.validate()) {

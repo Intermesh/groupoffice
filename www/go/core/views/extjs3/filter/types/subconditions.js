@@ -107,6 +107,10 @@ go.filter.types.subconditions = Ext.extend(Ext.Button, {
 	validate: function() {
 		return true;
 	},
+	isValid : function(preventMark){
+		return true;
+	},
+
 	markInvalid : function() {
 
 	},

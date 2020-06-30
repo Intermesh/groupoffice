@@ -105,7 +105,7 @@ class Language {
 			return $this->t($str);
 		}
 		
-		return $this->data[$package][$module][$str] ?? $str;
+		return $this->data[$package][$module][$str] ?? $this->replaceBrand($str);
 	}
 	
 	public function translationExists($str, $package = 'core', $module = 'core') {
@@ -163,25 +163,30 @@ class Language {
 				}
 							
 				//branding
-				$langData[$key]  = str_replace(
-								[
-										"{product_name}",
-										"GroupOffice",
-										"Group-Office",
-										"Group Office"
-								], 
-								[
-										$productName,
-										$productName,
-										$productName,
-										$productName
-
-								], $langData[$key]);
+				$langData[$key]  = $this->replaceBrand($langData[$key]);
 			}
 
 			$this->data[$package][$module] = $langData->getArray();	
 			go()->getCache()->set($cacheKey, $this->data[$package][$module]);		
 		}
+	}
+
+	private function replaceBrand($str) {
+		$productName = go()->getConfig()['core']['branding']['name'];
+		return str_replace(
+			[
+				"{product_name}",
+				"GroupOffice",
+				"Group-Office",
+				"Group Office"
+			],
+			[
+				$productName,
+				$productName,
+				$productName,
+				$productName
+
+			], $str);
 	}
 	
 	private function loadFile($file) {

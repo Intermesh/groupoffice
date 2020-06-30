@@ -29,7 +29,7 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 		var data = [],
 			allEntities = this.entities ? this.entities : go.Entities.getLinkConfigs(),
 			id;
-console.warn(config);
+
 		allEntities.forEach(function(link){
 
 			var e = go.Entities.get(link.entity);

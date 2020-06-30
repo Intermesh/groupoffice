@@ -191,15 +191,8 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 				},
 				'->',
 				{
-					xtype: "button",
-					iconCls: "ic-add",
-					handler: function() {
-						var dlg = new go.filter.FilterDialog({
-							entity: "Contact"
-						});
-						dlg.show();
-					},
-					scope: this
+					xtype: 'filteraddbutton',
+					entity: 'Contact'
 				}
 			],
 			items: [
@@ -207,10 +200,16 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 				
 				{xtype: "box", autoEl: "hr"},
 
-				this.filterGrid = new go.filter.FilterGrid({
+				{
+					xtype: 'filtergrid',
 					filterStore: this.grid.store,
 					entity: "Contact"
-				})
+				},
+				{
+					xtype: 'variablefilterpanel',
+					filterStore: this.grid.store,
+					entity: "Contact"
+				}
 			]
 		});
 	},

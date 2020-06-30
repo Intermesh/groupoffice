@@ -68,7 +68,7 @@ class Router {
 
     try {
       $c = new $route['controller'];
-      go()->debug("Router: ". $route['controller']."::".$route['method']);
+      go()->debug("################   Router: ". $route['controller']."::".$route['method'] ." ################");
       go()->debug($route['params']);
 
       $response = call_user_func_array([$c, $route['method']], $route['params']);		
@@ -93,7 +93,7 @@ class Router {
       ErrorHandler::logException($e);    
     }
 
-	  if($response instanceof \GuzzleHttp\Psr7\Response) {
+	  if(isset($response) && $response instanceof \GuzzleHttp\Psr7\Response) {
 		  $this->emitPsr7Response($response);
 	  } else{
 		  Response::get()->output(isset($response) ? $response : null);

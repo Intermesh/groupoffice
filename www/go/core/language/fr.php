@@ -1023,7 +1023,7 @@ return array (
   'Enter your email address' => 'Entrez votre adresse email',
   'A server error occurred.' => 'Une erreur de serveur s\'est produite.',
   'Recovery e-mail sent' => 'Email de récupération envoyé !',
-  'Forgot username?' => 'Identifiant oublié ?',
+  'Forgot login credentials?' => 'Identifiant oublié ?',
   'Password is required' => 'Mot de passe requis',
   'Not found' => 'Pas trouvé',
   'Invalid password' => 'Mot de passe incorrect',

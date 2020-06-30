@@ -16,9 +16,9 @@ class TemporaryState extends AbstractState {
 	private $user;
 	private $userId;	
 	
-	public function getUser() {
+	public function getUser(array $properties = []) {
 		if(!$this->user) {
-			$this->user = User::findById($this->userId);
+			$this->user = User::findById($this->userId, $properties);
 		}
 		
 		return $this->user;

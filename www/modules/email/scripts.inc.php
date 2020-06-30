@@ -84,12 +84,14 @@ if(isset($_GET['mail_to']))
 }
 
 
+$email_show_from = GO::config()->get_setting('email_show_from', GO::user()->id,1);
 $email_show_cc = GO::config()->get_setting('email_show_cc', GO::user()->id,1);
 $email_show_bcc = GO::config()->get_setting('email_show_bcc', GO::user()->id,0);
 
 
 $GO_SCRIPTS_JS .='GO.email.showCCfield='.$email_show_cc.';'
-		. 'GO.email.showBCCfield='.$email_show_bcc.';';
+		. 'GO.email.showBCCfield='.$email_show_bcc.';'
+		. 'GO.email.showFromField='.$email_show_from.';';
 
 $GO_SCRIPTS_JS .= "GO.email.disableAliases=";
 

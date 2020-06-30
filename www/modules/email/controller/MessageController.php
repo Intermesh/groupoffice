@@ -983,7 +983,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$response['data'] = $message->toOutputArray($params['content_type'] == 'html', true);
 
 			if(isset($params['body'])) {
-				$response['data']['htmlbody'] = $params['body'] . '<br />' . $response['data']['htmlbody'];
+				if ($params['content_type'] == 'plain') {
+					$response['data']['plainbody'] = $params['body'] . "\n" . $response['data']['plainbody'];
+				} else {
+					$response['data']['htmlbody'] = $params['body'] . '<br />' . $response['data']['htmlbody'];
+				}
 			}
 		}
 		
@@ -1501,7 +1505,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 		
 		$response['isInSpamFolder']=$this->_getSpamMoveMailboxName($params['uid'],$params['mailbox'],$account->id);
-		$response = $this->_getContactInfo($imapMessage, $params, $response);
+		$response = $this->_getContactInfo($imapMessage, $params, $response, $account);
 
 		// START Handle the links div in the email display panel		
 		if(!$plaintext){
@@ -1563,7 +1567,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		);
 	}
 
-	private function _getContactInfo(\GO\Email\Model\ImapMessage $imapMessage,$params, $response){
+	private function _getContactInfo(\GO\Email\Model\ImapMessage $imapMessage,$params, $response, $account){
 		$response['sender_contact_id']=0;
 		$response['sender_company_id']=0;
 		$response['allow_quicklink']=1;
@@ -1573,8 +1577,19 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$useQL = GO::config()->allow_quicklink;
 		$response['allow_quicklink']=$useQL?1:0;
 
-		
-		$contact = !empty($response['sender']) ? \go\modules\community\addressbook\model\Contact::find(['id', 'photoBlobId', 'isOrganization', 'name', 'addressBookId', 'color'])->filter(['email' => $response['sender'], 'permissionLevel' => \go\core\model\Acl::LEVEL_READ])->single() : false;
+		if($params['mailbox'] === $account->sent) {
+			$contact = (!empty($response['to']) && !empty($response['to'][0]['email'])) ?
+				\go\modules\community\addressbook\model\Contact::find(['id', 'photoBlobId', 'isOrganization', 'name', 'addressBookId', 'color'])
+					->filter(['email' => $response['to'][0]['email'], 'permissionLevel' => \go\core\model\Acl::LEVEL_READ])
+					->single()
+				: false;
+		} else {
+			$contact = !empty($response['sender']) ?
+				\go\modules\community\addressbook\model\Contact::find(['id', 'photoBlobId', 'isOrganization', 'name', 'addressBookId', 'color'])
+					->filter(['email' => $response['sender'], 'permissionLevel' => \go\core\model\Acl::LEVEL_READ])
+					->single()
+				: false;
+		}
 		if(!empty($contact)){
 			$response['contact_thumb_url']= go()->getAuthState()->getDownloadUrl($contact->photoBlobId);
 			$response['contact'] = $contact->toArray();
@@ -1636,9 +1651,19 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			)->fetchAll(\PDO::FETCH_COLUMN, 0);
 
 			$emailFound = false;
-			foreach($vevent->attendee as $vattendee) {
-				$attendeeEmail = str_replace('mailto:','', strtolower((string) $vattendee));
-				if(in_array($attendeeEmail, $aliases)) {
+			if(isset($vevent->attendee)) {
+				foreach ($vevent->attendee as $vattendee) {
+					$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vattendee));
+					if (in_array($attendeeEmail, $aliases)) {
+						$emailFound = true;
+						$accountEmail = $attendeeEmail;
+					}
+				}
+			}
+
+			if(!$emailFound && isset($vevent->organizer)) {
+				$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vevent->organizer));
+				if (in_array($attendeeEmail, $aliases)) {
 					$emailFound = true;
 					$accountEmail = $attendeeEmail;
 				}
@@ -1705,6 +1730,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 						'is_invitation' => !$alreadyProcessed && $vcalendar->method == 'REQUEST', //&& !$event,
 						'is_cancellation' => $vcalendar->method == 'CANCEL'
 				);
+
+				//filter out invites
+
+				$response['attachments'] = array_filter($response['attachments'], function($a) {
+					return $a['isInvite'] == false;
+				});
+
 //			}elseif($event){
 
 //			if($event){
