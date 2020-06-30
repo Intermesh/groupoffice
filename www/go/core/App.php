@@ -392,7 +392,7 @@ use const GO_CONFIG_FILE;
 			
 			if(!isset($this->config['core']['general']['cache'])) {
 				if(cache\Apcu::isSupported()) {
-					$this->config['core']['general']['cache'] = cache\Apcu::class;				
+					$this->config['core']['general']['cache'] = cache\Apcu::class;
 				} else
 				{
 					$this->config['core']['general']['cache'] = cache\Disk::class;
