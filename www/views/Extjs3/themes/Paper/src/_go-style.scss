@@ -1152,7 +1152,8 @@ tr.go-grid-row {
 	}
 
 	.icons {
-		@extend .go-icon-list;
+		// This is causing sassc to fail. @extends .xxx is deprecated
+		@extend %go-icon-list;
 		
 		h5 {
 			margin-left: dp(16);
@@ -1218,7 +1219,7 @@ tr.go-grid-row {
 }
 
 
-.go-icon-list {
+%go-icon-list {
 	p, > a {		
 		min-height: dp(40);
 		box-sizing: border-box;
@@ -1281,10 +1282,12 @@ tr.go-grid-row {
 		position:absolute;
 	}
 }
-.go-icon-list > p, .go-icon-list > a {
-	position:relative;
-	padding-left: dp(56);
-
+.go-icon-list {
+	@extend %go-icon-list;
+	& > p, & > a {
+		position:relative;
+		padding-left: dp(56);
+	}
 }
 
 // old detail view compatibility
