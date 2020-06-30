@@ -847,7 +847,7 @@ Minden jog fenntartva.<br />
   'Back' => 'Vissza',
   'Continue' => 'Folytatás',
   'Finish' => 'Befejez',
-  'Forgot username?' => 'Elfelejtette felhasználónevét?',
+  'Forgot login credentials?' => 'Elfelejtette felhasználónevét?',
   'Password is required' => 'Jelszó szükséges',
   'Not found' => 'Nem található',
   'Invalid password' => 'Érvénytelen jelszó',

@@ -65,7 +65,7 @@ Ext.extend(GO.plugins.HtmlEditorImageInsert, Ext.util.Observable, {
 					autoUpload: true,
 					listeners: {
 						upload: function(response) {
-							var img = '<img src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="'+response.name+'" />';
+							var img = '<img style="max-width: 100%" src="' + go.Jmap.downloadUrl(response.blobId) + '" alt="'+response.name+'" />';
 							
 							this.editor.focus();
 							this.editor.insertAtCursor(img);

@@ -1090,7 +1090,7 @@ Si no ha solicitado una nueva contraseña por favor ignore y borre este e-mail.'
   ' and {count} more' => ' y {count} más',
   'View members' => 'Ver miembros',
   'Share' => 'Compartir',
-  'Forgot username?' => '¿Olvidó su usuario/contraseña?',
+  'Forgot login credentials?' => '¿Olvidó su usuario/contraseña?',
   'Password is required' => 'Por favor ingrese su contraseña',
   'Not found' => 'No encontrado',
   'Invalid password' => 'Contraseña invalida',

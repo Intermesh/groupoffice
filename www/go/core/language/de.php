@@ -1089,7 +1089,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Change' => 'Ändern',
   'Your password was changed successfully' => 'Ihr Kennwort wurde erfolgreich geändert!',
   'This password recovery link is invalid' => 'Dieser Link zur Passwortwiederherstellung ist ungültig',
-  'Forgot username?' => 'Benutzername vergessen?',
+  'Forgot login credentials?' => 'Anmeldeinformationen vergessen?',
   'Password is required' => 'Passwort erforderlich',
   'Not found' => 'Nicht gefunden',
   'Invalid password' => 'Ungültiges Passwort',

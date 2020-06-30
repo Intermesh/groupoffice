@@ -296,21 +296,13 @@ use const GO_CONFIG_FILE;
 		private function getInstanceConfig() {
 			$configFile = $this->findConfigFile();
 			if(!$configFile) {
-				
-				$host = isset($_SERVER['HTTP_HOST']) ? explode(':', $_SERVER['HTTP_HOST'])[0] : '<HOSTNAME>';
-				
-				$msg = "No config.php was found. Possible locations: \n\n".
-								"/etc/groupoffice/multi_instance/" .$host . "/config.php\n\n".				
-								 dirname(dirname(__DIR__)) . "/config.php\n\n".
-								"/etc/groupoffice/config.php";
-				
-				throw new Exception($msg);
+				return [];
 			}
 			
 			require($configFile);	
 			
 			if(!isset($config)) {
-				throw new ConfigurationException();
+				$config = [];
 			}
 			$config['configPath'] = $configFile;
 
@@ -376,7 +368,7 @@ use const GO_CONFIG_FILE;
 							"db" => [
 									"host" => ($config['db_host'] ?? "localhost"),
 									"port" => $config['db_port'] ?? 3306,
-									"name" => $config['db_name'],
+									"name" => $config['db_name'] ?? 'groupoffice',
 									"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice-com"),
 									"username" => $config['db_user'] ?? "groupoffice",
 									"password" => $config['db_pass'] ?? ""
@@ -400,7 +392,7 @@ use const GO_CONFIG_FILE;
 			
 			if(!isset($this->config['core']['general']['cache'])) {
 				if(cache\Apcu::isSupported()) {
-					$this->config['core']['general']['cache'] = cache\Apcu::class;				
+					$this->config['core']['general']['cache'] = cache\Apcu::class;
 				} else
 				{
 					$this->config['core']['general']['cache'] = cache\Disk::class;

@@ -1045,6 +1045,15 @@ Ext.override(Ext.form.Field, {
 	}		
 });
 
+Ext.override(Ext.form.Hidden, {
+	getValue: function() {
+		return this.value;
+	},
+	setValue: function(v) {
+		this.value = v;
+	}
+});
+
 Ext.util.Format.dateRenderer = function(format) {
 		return function(v) {
 				return GO.util.dateFormat(v);

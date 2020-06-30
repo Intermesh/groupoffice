@@ -24,14 +24,6 @@ class UserSettings extends Property {
 	 */
 	protected $defaultAddressBookId;
 
-
-	/**
-	 * Sort by name or 'lastName'
-	 * 
-	 * @var string
-	 */
-	public $sortBy = 'name';
-
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable("addressbook_user_settings", "abs");
 	}
@@ -70,6 +62,10 @@ class UserSettings extends Property {
 
 	public function setDefaultAddressBookId($id) {
 		$this->defaultAddressBookId = $id;
+	}
+
+	public function getSortBy() {
+		return User::findById($this->userId, ['sort_name'])->sort_name == 'first_name' ? 'name' : 'lastName';
 	}
 
 	

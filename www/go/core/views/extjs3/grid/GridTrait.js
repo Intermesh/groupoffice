@@ -13,6 +13,8 @@ go.grid.GridTrait = {
 	 */
 	scrollLoader: true,
 
+	multiSelectToolbarEnabled: true,
+
 	initGridTrait : function() {
 		if (!this.keys)
 		{
@@ -47,13 +49,18 @@ go.grid.GridTrait = {
 			}
 		}, this);
 
-		if(this.getTopToolbar() && !this.getSelectionModel().singleSelect) {
+		if(this.multiSelectToolbarEnabled && this.getTopToolbar() && !this.getSelectionModel().singleSelect) {
 			this.initMultiSelectToolbar();
 		}
 	},
 
 	initMultiSelectToolbar : function() {
+
 		this.getSelectionModel().on('selectionchange', function(sm) {
+
+			if(!sm.getSelections) {
+				return;
+			}
 			var selections = sm.getSelections();
 
 			selections.length > 1 ? this.showMultiSelectToolbar(selections) : this.hideMultiSelectToolbar();
