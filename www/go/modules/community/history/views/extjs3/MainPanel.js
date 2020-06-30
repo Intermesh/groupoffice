@@ -32,6 +32,7 @@ Ext.define('go.modules.community.history.MainPanel', {
 
 	createGrid : function() {
 		this.grid = new go.modules.community.history.LogEntryGrid({
+			forDetailView: false,
 			region: 'center',
 			tbar: [{
 				cls: 'go-narrow',

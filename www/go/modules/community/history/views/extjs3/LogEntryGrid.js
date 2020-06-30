@@ -2,7 +2,8 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 	extend: go.grid.GridPanel,
 
 	layout:'fit',
-	autoExpandColumn: 'name',
+	autoExpandColumn: 'user',
+	stateId: 'logentrygrid-detail',
 
 	// input json object output html
 	renderJson: function(json, name) {
@@ -70,21 +71,78 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 		return html;
 	},
 
+	forDetailView: true,
+
 	initComponent: function() {
-		Ext.applyIf(this,{
-			store: new go.data.Store({
-				fields: [{name:'createdAt',type:'date'},'id', 'entity', 'action','changes','createdBy', 'description',{name: 'creator', type: "relation"}],
-				baseParams: {sort: [{property: "createdAt", isAscending:false}]},
-				entityStore: "LogEntry"
-			}),
-			viewConfig: {emptyText: '<i>description</i><p>' + t("Item was never modified",'community','history') + '</p>'},
-			columns:[{
-				header: t('ID'),
-				width: dp(80),
-				dataIndex: 'id',
-				hidden:true,
-				align: "right"
-			},{
+
+		var cols = [{
+			header: t('ID'),
+			width: dp(80),
+			dataIndex: 'id',
+			hidden:true,
+			align: "right"
+		},{
+			id: 'user',
+			header: t('User'),
+			dataIndex: 'creator',
+			width:300,
+			renderer: function (v) {
+				return v ? v.displayName : "-";
+			}
+		},{
+			header: t('Changes'),
+			xtype: 'actioncolumn',
+			width: dp(80),
+			items: [{
+				iconCls: 'ic-note',
+				handler: function(grid, rowIndex, colIndex) {
+					var rec = grid.store.getAt(rowIndex),
+						json = JSON.parse(rec.data.changes);
+
+					if(!json) {
+						return;
+					}
+
+					var target = grid.view.getCell(rowIndex, colIndex),
+						html = '';
+
+					switch(rec.data.action) {
+						case 'update': html = this.renderOldNew(json).join('');
+							break;
+						case 'create':
+						case 'delete': html = this.renderJson(json).join('<br>');
+							break;
+						case 'login': html = rec.data.createdAt;
+							break;
+					}
+
+					var tt = new Ext.menu.Menu({
+						//target: target,
+						//title: rec.data.description,
+						width:500,
+						html: '<div style="padding:7px"><h5>'+rec.data.description+'</h5>'+html+'</div>' ,
+						autoHide: false
+						//closable: true
+					});
+					tt.show(target);
+				},
+				scope:this
+			}]
+		},{
+			header: t('Action'),
+			dataIndex: 'action',
+			renderer: function(v, meta, r) {
+				return t(v.charAt(0).toUpperCase() + v.slice(1));
+				//return go.Modules.registered.community.history.actionTypes[v] || 'Unknown';
+			}
+		},{
+			xtype: "datecolumn",
+			header: t('Date'),
+			dataIndex: 'createdAt'
+		}];
+
+		if(!this.forDetailView) {
+			cols.splice(1,0, {
 				header: t('Name'),
 				dataIndex: 'description',
 				id: 'name'
@@ -92,65 +150,19 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 				header: t('Entity'),
 				dataIndex: 'entity',
 				id: 'entity'
-			},{
-				header: t('Changes'),
-				xtype: 'actioncolumn',
-				width: dp(80),
-				items: [{
-					iconCls: 'ic-note',
-					handler: function(grid, rowIndex, colIndex) {
-						var rec = grid.store.getAt(rowIndex),
-							json = JSON.parse(rec.data.changes);
+			});
+			this.autoExpandColumn = 'name';
+			this.stateId = 'logentrygrid-main';
+		}
 
-						if(!json) {
-							return;
-						}
-
-						var target = grid.view.getCell(rowIndex, colIndex),
-							html = '';
-
-						switch(rec.data.action) {
-							case 'update': html = this.renderOldNew(json).join('');
-								break;
-							case 'create':
-							case 'delete': html = this.renderJson(json).join('<br>');
-								break;
-							case 'login': html = rec.data.createdAt;
-								break;
-						}
-
-						var tt = new Ext.menu.Menu({
-							//target: target,
-							//title: rec.data.description,
-							width:500,
-							html: '<div style="padding:7px"><h5>'+rec.data.description+'</h5>'+html+'</div>' ,
-							autoHide: false
-							//closable: true
-						});
-						tt.show(target);
-					},
-					scope:this
-				}]
-			},{
-				header: t('Action'),
-				dataIndex: 'action',
-				renderer: function(v, meta, r) {
-					return t(v.charAt(0).toUpperCase() + v.slice(1));
-					//return go.Modules.registered.community.history.actionTypes[v] || 'Unknown';
-				}
-			},{
-				xtype: "datecolumn",
-				header: t('Date'),
-				dataIndex: 'createdAt',
-
-			},{
-				header: t('User'),
-				dataIndex: 'creator',
-				width:300,
-				renderer: function (v) {
-					return v ? v.displayName : "-";
-				}
-			}]
+		Ext.applyIf(this,{
+			store: new go.data.Store({
+				fields: [{name:'createdAt',type:'date'},'id', 'entity', 'action','changes','createdBy', 'description',{name: 'creator', type: "relation"}],
+				baseParams: {sort: [{property: "createdAt", isAscending:false}]},
+				entityStore: "LogEntry"
+			}),
+			viewConfig: {emptyText: '<i>description</i><p>' + t("Item was never modified",'community','history') + '</p>'},
+			columns: cols
 		});
 
 		this.callParent();
