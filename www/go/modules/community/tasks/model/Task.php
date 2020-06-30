@@ -15,6 +15,23 @@ use go\core\db\Criteria;
 use go\core\orm\Query;
 use go\core\util\DateTime;
 
+trait Recurrence {
+    public $interval = 1;
+    public $rscale = 'gregorian';
+    public $skip = 'omit';
+    public $firstDayOfWeek = 'mo';
+    public $byMonthDay;
+    public $byMonth;
+    public $byYearDAy;
+    public $byWeekNo;
+    public $byHour;
+    public $byMinute;
+    public $bySecond;
+    public $bySetPosition;
+    public $count;
+    public $until;
+}
+
 /**
  * Task model
  */
@@ -23,16 +40,16 @@ class Task extends AclItemEntity {
 	use SearchableTrait;
 	use CustomFieldsTrait;
 	
-	/** @var int */
+	/** @var int PK in the database */
 	public $id;
 
-	/** @var Alert[] */
+	/** @var Alert[] List of notification alerts when $useDefaultAlerts is not set */
 	public $alerts;
 
-	/** @var string */
+	/** @var string global unique id for invites and sync  */
 	protected $uid = '';
 
-	/** @var int */
+	/** @var int The list this Task belongs to */
 	public $tasklistId;
 
 	/** @var int */
@@ -47,32 +64,46 @@ class Task extends AclItemEntity {
 	/** @var int */
 	public $modifiedBy = 0;
 
-	/** @var DateTime */
+	/** @var DateTime local date when this task will be started */
 	public $start;
 
-	/** @var DateTime */
+	/** @var DateTime due date (when this should be finished) */
 	public $due;
 
-	/** @var DateTime */
-	public $completed;
+	/** @var DateTime  */
+	//public $completed; // migrate to $progress = 'completed'
 
 	/** @var string */
 	public $title;
 
 	/** @var string */
 	public $description;
-
-	/** @var string */
-	protected $recurrenceRule = '';
-
 	/** @var int */
 	public $filesFolderId = 0;
+
+	//public $keywords; // only in jmap
 
 	/** @var int[] */
 	public $categories;
 
+	public $color;
+
+	public $recurrenceId;
+
+    /** @var Recurrence */
+    protected $recurrenceRule;
+
+    protected $recurrenceOverrides;
+    protected $excluded;
+
 	/** @var int */
 	public $priority = 1;
+
+	public $freeBusy;
+    public $privacy;
+
+    public $replyTo;
+    public $participants;
 
 	/** @var int */
 	public $percentageComplete = 0;
