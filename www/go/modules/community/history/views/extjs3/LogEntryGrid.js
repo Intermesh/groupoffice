@@ -5,6 +5,12 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 	autoExpandColumn: 'user',
 	stateId: 'logentrygrid-detail',
 
+	multiSelectToolbarEnabled: false,
+
+	deleteSelected: function() {
+
+	},
+
 	// input json object output html
 	renderJson: function(json, name) {
 
