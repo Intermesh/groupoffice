@@ -1023,6 +1023,70 @@ button.filetype-pdf, button.filetype-doc {
 	//background-color: color($grey, 100);
 }
 
+%go-icon-list {
+	p, > a {
+		min-height: dp(40);
+		box-sizing: border-box;
+		display:table;
+		text-decoration: none;
+		padding: dp(8) dp(16);
+		margin: 0;
+		width: 100%;
+		span, a {
+			display: inline-block;
+			min-height: dp(24);
+		}
+
+		i.label {
+			left: dp(16);
+			top: dp(12);
+			width:  dp(24);
+			height: dp(24);
+			position: absolute;
+			color: color($fg, 'icon');
+		}
+
+		.avatar {
+			left: 0;
+			top:dp(4);
+			position: absolute;
+			//color: color($bg, 'background');
+		}
+
+
+		&:hover {
+			.show-on-hover {
+				display:block !important;
+			}
+			.hide-on-hover {
+				display: none;
+			}
+		}
+
+		label {
+			@extend %font-caption;
+			width:100%;
+			display: block;
+			line-height: dp(16);
+		}
+
+	}
+
+
+
+	.left {
+		top: dp(12);
+		left: dp(16);
+		position:absolute;
+	}
+
+	.right {
+		top: dp(12);
+		right: dp(16);
+		position:absolute;
+	}
+}
+
 //detail view
 .go-detail-view {
 	
@@ -1203,7 +1267,6 @@ button.filetype-pdf, button.filetype-doc {
 	}
 }
 
-
 .show-on-hover {
 	display: none !important;		
 }
@@ -1215,76 +1278,6 @@ button.filetype-pdf, button.filetype-doc {
 }
 
 
-%go-icon-list {
-	p, > a {		
-		min-height: dp(40);
-		box-sizing: border-box;
-		display:table;
-		text-decoration: none;
-		padding: dp(8) dp(16);
-		margin: 0;
-		width: 100%;
-		span, a {
-			display: inline-block;
-			min-height: dp(24);
-		}
-		
-		i.label {			
-			left: dp(16);
-			top: dp(12);
-			width:  dp(24);
-			height: dp(24);
-			position: absolute;
-			color: color($fg, 'icon');	
-		}
-
-		.avatar {			
-			left: 0;
-			top:dp(4);
-			position: absolute;
-			//color: color($bg, 'background');
-		}
-
-		
-		&:hover {
-			.show-on-hover {
-				display:block !important;
-			}
-			.hide-on-hover {
-				display: none;
-			}
-		}
-		
-		label {
-			@extend %font-caption;
-			width:100%;
-			display: block;
-			line-height: dp(16);
-		}
-		
-	}
-
-	
-
-	.left {
-		top: dp(12);
-		left: dp(16);
-		position:absolute;
-	}
-
-	.right {
-		top: dp(12);
-		right: dp(16);
-		position:absolute;
-	}
-}
-.go-icon-list {
-	@extend %go-icon-list;
-	& > p, & > a {
-		position:relative;
-		padding-left: dp(56);
-	}
-}
 
 // old detail view compatibility
 .display-panel-heading {
