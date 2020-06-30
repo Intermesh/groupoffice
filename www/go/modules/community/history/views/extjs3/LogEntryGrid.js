@@ -6,7 +6,12 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 
 	// input json object output html
 	renderJson: function(json, name) {
+
 		var html = [];
+		if(!json) {
+			return html;
+		}
+
 		if(Ext.isDate(json)) {
 			// skip for now
 			html.push('datum');
@@ -53,6 +58,9 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 	},
 
 	renderOldNew: function(json) {
+		if(!json) {
+			return [];
+		}
 		html = ['<table style="width:100%;border-spacing: 3px"><tr><th>'+t('Name')+'</th><th>'+t('Old')+'</th><th>'+t('New')+'</th></tr>'];
 		for(var key in json) {
 			html.push('<tr><td>'+key+':</td><td>'+this.renderJsonValue(json[key][1]).join('<br>')+
@@ -65,7 +73,7 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 	initComponent: function() {
 		Ext.applyIf(this,{
 			store: new go.data.Store({
-				fields: [{name:'createdAt',type:'date'},'id','action','changes','createdBy', 'description',{name: 'creator', type: "relation"}],
+				fields: [{name:'createdAt',type:'date'},'id', 'entity', 'action','changes','createdBy', 'description',{name: 'creator', type: "relation"}],
 				baseParams: {sort: [{property: "createdAt", isAscending:false}]},
 				entityStore: "LogEntry"
 			}),
@@ -81,6 +89,10 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 				dataIndex: 'description',
 				id: 'name'
 			},{
+				header: t('Entity'),
+				dataIndex: 'entity',
+				id: 'entity'
+			},{
 				header: t('Changes'),
 				xtype: 'actioncolumn',
 				width: dp(80),
@@ -89,6 +101,10 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 					handler: function(grid, rowIndex, colIndex) {
 						var rec = grid.store.getAt(rowIndex),
 							json = JSON.parse(rec.data.changes);
+
+						if(!json) {
+							return;
+						}
 
 						var target = grid.view.getCell(rowIndex, colIndex),
 							html = '';

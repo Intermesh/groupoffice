@@ -29,7 +29,6 @@ use go\core\model\Module as GoCoreModule;
 use GO\Base\Db\ActiveRecord;
 use go\core\orm\EntityType;
 use go\core\model\Acl;
-use go\core\orm\LoggingTrait;
 
 class Installer {
 	
@@ -86,7 +85,6 @@ class Installer {
 		$cacheCls = get_class(App::get()->getCache());
 		App::get()->setCache(new None());
 
-		LoggingTrait::$enabled = false;
 
 		self::$isInProgress = true;
 		self::$isInstalling = true;
@@ -139,7 +137,6 @@ class Installer {
 
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
-		LoggingTrait::$enabled = true;
 		App::get()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
 	}
 	
@@ -330,8 +327,6 @@ class Installer {
 		self::$isInProgress = true;
 		self::$isUpgrading = true;
 
-		LoggingTrait::$enabled = false;
-
 		go()->setAuthState((new TemporaryState())->setUserId(1));
 		\GO::session()->runAsRoot();
 		GO::$ignoreAclPermissions = true;
@@ -407,7 +402,6 @@ class Installer {
 
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
-		LoggingTrait::$enabled = true;
 		echo "Done!\n";
 	}
 	

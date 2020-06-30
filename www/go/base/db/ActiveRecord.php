@@ -666,6 +666,21 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 	/**
+	 * For compatibility with entities. Used in logging.
+	 *
+	 * @return string
+	 */
+	public function id() {
+		$pk = $this->getPk();
+		if(is_array($pk)) {
+			return implode('-', $this->getPk());
+		} else
+		{
+			return $pk;
+		}
+	}
+
+	/**
 	 * Check if this model is new and not stored in the database yet.
 	 *
 	 * @return bool
@@ -872,7 +887,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	public function findAclId() {
 		if (!$this->aclField()) {
 			$moduleName = $this->getModule();
-			return \GO::modules()->{$moduleName}->acl_id;
+			return \GO::modules()->{$moduleName}->aclId;
 		}
 
 		//removed caching of _acl_id because the relation is cached already and when the relation changes the wrong acl_id is returned,
@@ -3289,12 +3304,16 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		
 		switch($action){
 			case \GO\Log\Model\Log::ACTION_DELETE:
-				return $this->getAttributes();
+				return null;
 			case \GO\Log\Model\Log::ACTION_UPDATE:
 				$oldValues = $this->getModifiedAttributes();
 								
 				$modifications = array();
 				foreach($oldValues as  $key=>$oldVal){
+
+					if($key == 'mtime') {
+						continue;
+					}
 					
 					if(!is_scalar($oldVal)) {
 						continue;
@@ -3395,8 +3414,46 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			return true;
 		}
 
-		\go\modules\community\history\Module::onActiveRecordSave($this, $this->getCacheAttributes(), $action);
+		if(go()->getModule('community', 'history') ) {
+			\go\modules\community\history\Module::logActiveRecord($this, $action);
+		}
 
+	}
+
+
+	/**
+	 * A title for this entity used in search cache and logging for example.
+	 *
+	 * @return string
+	 */
+	public function title() {
+
+		$cache = $this->getCacheAttributes();
+		if($cache) {
+			return $cache['name'];
+		}
+
+		if($this->hasAttribute('name')) {
+			return $this->name;
+		}
+
+		if($this->hasAttribute('title')) {
+			return $this->title;
+		}
+
+		if($this->hasAttribute('subject')) {
+			return $this->subject;
+		}
+
+		if($this->hasAttribute('description')) {
+			return $this->description;
+		}
+
+		if($this->hasAttribute('displayName')) {
+			return $this->displayName;
+		}
+
+		return static::class;
 	}
 
 	/**
@@ -3967,6 +4024,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				return false;
 
 		$r= $this->relations();
+
+		$this->log(\GO\Log\Model\Log::ACTION_DELETE);
 		
 		foreach($r as $name => $attr){
 			if (!GO::classExists($attr['model'])){				
@@ -4080,7 +4139,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$this->_isDeleted = true;
 		
-		$this->log(\GO\Log\Model\Log::ACTION_DELETE);
+
 
 		$attr = $this->getCacheAttributes();
 
@@ -4095,7 +4154,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 		
 
-		if($this->aclField() && (!$this->isJoinedAclField || $this->isAclOverwritten())){
+		if($this->aclField() && (!$this->isJoinedAclField || $this->isAclOverwritten()) && !go()->getModule('community', 'history')){
 			//echo 'Deleting acl '.$this->{$this->aclField()}.' '.$this->aclField().'<br />';
 			$aclField = $this->isAclOverwritten() ? $this->aclOverwrite() : $this->aclField();
 

@@ -7,7 +7,6 @@ use go\core\fs\Blob;
 use go\core\model\EmailTemplateAttachment;
 use go\core\orm\Query;
 use go\core\orm\CustomFieldsTrait;
-use go\core\orm\LoggingTrait;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
@@ -45,8 +44,7 @@ class Note extends AclItemEntity {
 	use CustomFieldsTrait;
 	
 	use SearchableTrait;
-	
-	use LoggingTrait;
+
 
 	/**
 	 *
@@ -73,7 +71,7 @@ class Note extends AclItemEntity {
 		return StringUtil::cutString($text, 200);
 	}
 
-	public function getSearchName() {
+	public function title() {
 		return $this->name;
 	}
 

@@ -7,8 +7,6 @@ use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\model\Link;
 use go\core\orm\CustomFieldsTrait;
-use go\core\orm\Entity;
-use go\core\orm\LoggingTrait;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
@@ -36,9 +34,7 @@ class Contact extends AclItemEntity {
 	use CustomFieldsTrait;
 	
 	use SearchableTrait;
-	
-	use LoggingTrait;
-	
+
 	/**
 	 * 
 	 * @var int
@@ -876,7 +872,7 @@ class Contact extends AclItemEntity {
 		return $addressBook->name . $jobTitle . $orgStr;
 	}
 
-	public function getSearchName() {
+	public function title() {
 		return $this->name;
 	}
 

@@ -11,13 +11,6 @@ use go\core\model\Link;
  * @property array $customFields 
  */
 trait SearchableTrait {
-
-	/**
-	 * The name for the search results
-	 * 
-	 * @return string
-	 */
-	abstract public function getSearchName() ;
 	
 	/**
 	 * The description in the search results
@@ -57,7 +50,7 @@ trait SearchableTrait {
 		
 		$search->entityId = $this->id;
 		$search->setAclId($this->findAclId());
-		$search->name = $this->getSearchName();
+		$search->name = $this->title();
 		$search->description = $this->getSearchDescription();
 		$search->filter = $this->getSearchFilter();
 		$search->modifiedAt = $this->modifiedAt;

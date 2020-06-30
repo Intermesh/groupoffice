@@ -40,7 +40,7 @@ use GO;
 class Log extends \GO\Base\Db\ActiveRecord {
 	
 	
-	const ACTION_ADD='add';
+	const ACTION_ADD='create';
 	const ACTION_DELETE='delete';
 	const ACTION_UPDATE='update';
 	const ACTION_LOGIN='login';

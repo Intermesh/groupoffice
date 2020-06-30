@@ -490,10 +490,21 @@ use const GO_CONFIG_FILE;
 		 * @throws Exception
 		 */
 		public function getModule($package, $name) {
+
+			$cacheKey = 'getModule-' . $package .'-'.$name;
+
+			$model = go()->getCache()->get($cacheKey);
+
+			if(isset($model)) {
+				return $model;
+			}
+
 			$model = \go\core\model\Module::find()->where(['package' => $package, 'name' => $name, 'enabled' => true])->single();
 			if(!$model || !$model->isAvailable()) {
-				return false;
+				$model = false;
 			}
+
+			go()->getCache()->set($cacheKey, $model);
 			
 			return $model;
 		}

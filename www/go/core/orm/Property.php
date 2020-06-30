@@ -403,6 +403,7 @@ abstract class Property extends Model {
    */
 	private function trackModifications() {
 		//Watch db cols and relations
+
 		$watch = array_keys($this->getMapping()->getProperties());
 
 		$watch = array_filter($watch, function($p) {
@@ -511,6 +512,7 @@ abstract class Property extends Model {
 				if(!isset($props[$propName])) {
 					$props[$propName] = ['setter' => false, 'getter' => false, 'access' => self::PROP_PUBLIC, 'dynamic' => true];
 				}
+				$props[$propName]['db'] = true;
 			}
 
 			if(method_exists(static::class, 'getCustomFields')) {
@@ -698,43 +700,8 @@ abstract class Property extends Model {
 		return $query->single();
 	}
 
-//  /**
-//   * Get all property names
-//   *
-//   * @return array|mixed
-//   * @throws ReflectionException
-//   * @throws Exception
-//   */
-//	private static function getPropNames() {
-//		$cls = static::class;
-//		$cacheKey = $cls . '-getPropNames';
-//
-//		$propNames = go()->getCache()->get($cacheKey);
-//
-//		if (!$propNames) {
-//			$reflectionClass = new ReflectionClass($cls);
-//			$props = $reflectionClass->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
-//			$propNames = [];
-//			foreach ($props as $prop) {
-//				if(!$prop->isStatic()) {
-//					$propNames[] = $prop->getName();
-//				}
-//			}
-//
-//			//add dynamic relations
-//			foreach(static::getMapping()->getProperties() as $name => $type) {
-//				if(!in_array($name, $propNames)) {
-//					$propNames[] = $name;
-//				}
-//			}
-//
-//			go()->getCache()->set($cacheKey, $propNames);
-//		}
-//
-//		return $propNames;
-//	}
-
   /**
+   * Get properties that are minimally required to load for the object to function properly.
    *
    * @return string[]
    * @throws Exception
@@ -755,7 +722,7 @@ abstract class Property extends Model {
 
 		$required = static::getPrimaryKey();
 		foreach($props as $name => $meta) {
-			if($meta['access'] === self::PROP_PROTECTED) {
+			if($meta['access'] === self::PROP_PROTECTED && !empty($meta['db'])) {
 				$required[] = $name;
 			}
 		}
