@@ -28,6 +28,12 @@ class User extends Entity {
 	use CustomFieldsTrait;
 
 	const ID_SUPER_ADMIN = 1;
+
+	const EVENT_LOGIN = 'login';
+
+	const EVENT_LOGOUT = 'logout';
+
+	const EVENT_BADLOGIN = 'badlogin';
 	
 	public $validatePassword = true;
 

@@ -5,8 +5,8 @@ namespace go\modules\community\history;
 
 use GO\Base\Db\ActiveRecord;
 use go\core;
-use go\core\model\Token;
 use go\core\jmap\Entity;
+use go\core\model\User;
 use go\modules\community\history\model\LogEntry;
 
 class Module extends core\Module
@@ -19,7 +19,9 @@ class Module extends core\Module
 	public function defineListeners() {
 		Entity::on(Entity::EVENT_SAVE, static::class, 'onEntitySave');
 		Entity::on(Entity::EVENT_BEFORE_DELETE, static::class, 'onEntityDelete');
-		Token::on(Entity::EVENT_SAVE, static::class, 'onLogin');
+		User::on(User::EVENT_LOGIN, static::class, 'onLogin');
+		User::on(User::EVENT_LOGOUT, static::class, 'onLogout');
+		User::on(User::EVENT_BADLOGIN, static::class, 'onBadLogin');
 	}
 
 	static function logActiveRecord(ActiveRecord $record, $action) {
@@ -106,24 +108,33 @@ class Module extends core\Module
 		}
 	}
 
-	public static function onLogin(core\model\User $user) {
+	public static function onLogin(User $user) {
 		$log = new LogEntry();
 		$log->setEntity($user);
-		$log->description = core\http\Request::get()->getRemoteIpAddress();
+		$log->description = $user->username . ' [' . core\http\Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('login');
 		$log->changes = null;
 		$log->setAclId($user->findAclId());
 		$log->save();
 	}
 
-	public static function onBadLogin(core\model\User $user) {
+	public static function onBadLogin(User $user) {
 		$log = new LogEntry();
 		$log->setEntity($user);
-		$log->description = core\http\Request::get()->getRemoteIpAddress();
+		$log->description = $user->username . ' [' . core\http\Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('badlogin');
 		$log->changes = null;
 		$log->setAclId($user->findAclId());
 		$log->save();
 	}
 
+	public static function onLogout(User $user) {
+		$log = new LogEntry();
+		$log->setEntity($user);
+		$log->description = $user->username . ' [' . core\http\Request::get()->getRemoteIpAddress() . ']';
+		$log->setAction('logout');
+		$log->changes = null;
+		$log->setAclId($user->findAclId());
+		$log->save();
+	}
 }
