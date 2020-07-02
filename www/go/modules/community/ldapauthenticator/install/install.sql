@@ -20,6 +20,7 @@ CREATE TABLE `ldapauth_server` (
   `imapPort` int(11) NOT NULL DEFAULT '143',
   `imapEncryption` enum('tls','ssl') COLLATE utf8mb4_unicode_ci DEFAULT 'tls',
   `imapValidateCertificate` tinyint(1) NOT NULL DEFAULT '1',
+  `imapUseEmailForUsername` BOOLEAN NOT NULL DEFAULT FALSE,
   `loginWithEmail` tinyint(1) NOT NULL DEFAULT '0',
   `smtpHostname` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `smtpPort` int(11) NOT NULL DEFAULT '587',

@@ -136,7 +136,7 @@ class Authenticator extends PrimaryAuthenticator {
 			$account->user_id = $user->id;
 			$account->host = $server->imapHostname;
 			$account->port = $server->imapPort;
-			$account->username = $username; //$email;
+			$account->username = $server->imapUseEmailForUsername ? $email : $username;
 			$account->password = $password;
 			$account->imap_encryption = $server->imapEncryption ?? "";
 

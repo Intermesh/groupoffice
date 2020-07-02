@@ -171,6 +171,11 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 					anchor: '100%'
 				},
 				items: [{
+					xtype: 'checkbox',
+					hideLabel: true,
+					boxLabel: t("Use e-mail instead of LDAP username as IMAP username"),
+					name:'imapUseEmailForUsername'
+				},{
 						xtype: 'textfield',
 						name: 'imapHostname',
 						fieldLabel: t("Hostname", "imapauthenticator"),
