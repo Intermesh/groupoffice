@@ -744,10 +744,30 @@ class Contact extends AclItemEntity {
 			if(!$this->saveUri()) {
 				return false;
 			}
-		}		
+		}
+
+		if($this->isOrganization && $this->isModified(['name']) && !$this->updateEmployees()) {
+			return false;
+		}
 		
 		return $this->saveOriganizationIds();
 		
+	}
+
+	private function updateEmployees() {
+		$employees = $this->findEmployees(['jobTitle', 'addressBookId', 'id', 'name']);
+		foreach($employees as $e) {
+			if(!$e->saveSearch(true)) {
+				go()->error("Saving search cache of employee with ID: " . $e->id . " failed");
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public function findEmployees($properties = []) {
+		return static::findByLink($this, $properties)->andWhere(['isOrganization' => false]);
 	}
 	
 	protected function internalValidate() {
@@ -787,10 +807,7 @@ class Contact extends AclItemEntity {
 	 * @throws Exception
 	 */
 	public function findOrganizations(){
-		return self::find()
-			->where('fromId', '=', $this->id)
-			->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::entityType()->getId())		
-			->andWhere('fromEntityTypeId = '. self::entityType()->getId())
+		return self::findByLink($this)
 			->andWhere('c.isOrganization = true');
 	}
 
@@ -858,7 +875,7 @@ class Contact extends AclItemEntity {
 	}
 
 	protected function getSearchDescription() {
-		$addressBook = AddressBook::findById($this->addressBookId);
+		$addressBook = AddressBook::findById($this->addressBookId, ['name']);
 		
 		$orgStr = "";	
 		
@@ -950,12 +967,14 @@ class Contact extends AclItemEntity {
 	public function setSalutation($v) {
 		$this->salutation = $v;
 	}
+
 	/**
-	 * Because we've implemented the getter method "getOrganizationIds" the contact 
-	 * modSeq must be incremented when a link between two contacts is deleted or 
+	 * Because we've implemented the getter method "getOrganizationIds" the contact
+	 * modSeq must be incremented when a link between two contacts is deleted or
 	 * created.
-	 * 
+	 *
 	 * @param Link $link
+	 * @throws Exception
 	 */
 	public static function onLinkSave(Link $link) {
 		if($link->getToEntity() !== "Contact" || $link->getFromEntity() !== "Contact") {
