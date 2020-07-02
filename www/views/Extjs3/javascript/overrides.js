@@ -1055,9 +1055,6 @@ Ext.override(Ext.form.Field, {
 Ext.override(Ext.form.Hidden, {
 	getValue: function() {
 		return this.value;
-	},
-	setValue: function(v) {
-		this.value = v;
 	}
 });
 
