@@ -1,3 +1,5 @@
+- Address book: Update search cache of employees when changing company name
+
 30-06-2020 6.4.155
 - Emnail: Problem with empty emails
 

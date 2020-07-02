@@ -31,11 +31,14 @@ go.modules.community.ldapauthenticator.ServerGrid = Ext.extend(go.grid.GridPanel
 				{
 					id: 'hostname',
 					header: t('Hostname', 'ldapauthenticator'),
-					sortable: false,
+					sortable: true,
 					dataIndex: 'hostname',
-					hideable: false,
-					draggable: false,
-					menuDisabled: true
+					hideable: false
+				}, {
+					id: 'id',
+					header: 'ID',
+					dataIndex: 'id',
+					width: dp(80)
 				},
 				actions
 			],
