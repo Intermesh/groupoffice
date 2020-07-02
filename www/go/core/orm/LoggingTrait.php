@@ -17,11 +17,11 @@ trait LoggingTrait {
 	 */
 	public function getLogMessage($action){
 
-		if(!method_exists($this, 'getSearchName')) {
+		if(!method_exists($this, 'getSearchDescription')) {
 			throw new Exception("The LoggingTrait depends on the SearchAble triat. Please implement that too.");
 		}
 
-		$msg = $this->getSearchName();
+		$msg = $this->title();
 		$desc = $this->getSearchDescription();
 		if($desc) {
 			$msg .= "\n".$desc;

@@ -17,7 +17,7 @@ trait SearchableTrait {
 	 * 
 	 * @return string
 	 */
-	abstract protected function getSearchName() ;
+	abstract public function title() ;
 	
 	/**
 	 * The description in the search results
@@ -57,7 +57,7 @@ trait SearchableTrait {
 		
 		$search->entityId = $this->id;
 		$search->setAclId($this->findAclId());
-		$search->name = $this->getSearchName();
+		$search->name = $this->title();
 		$search->description = $this->getSearchDescription();
 		$search->filter = $this->getSearchFilter();
 		$search->modifiedAt = $this->modifiedAt;

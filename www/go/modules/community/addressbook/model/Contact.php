@@ -876,7 +876,7 @@ class Contact extends AclItemEntity {
 		return $addressBook->name . $jobTitle . $orgStr;
 	}
 
-	protected function getSearchName() {
+	public function title() {
 		return $this->name;
 	}
 
