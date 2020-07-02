@@ -1,4 +1,6 @@
 - Address book: Update search cache of employees when changing company name
+- LDAP Auth: Added option to login to IMAP server with email instead of username 
+- Core: Added complete rebuild search cache option.
 
 30-06-2020 6.4.155
 - Emnail: Problem with empty emails
