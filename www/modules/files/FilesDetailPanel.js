@@ -52,7 +52,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			tpl: tpl,
 			autoHeight: true,
 			multiSelect: true,
-			emptyText: '<div class="fs-dropzone">'+t('Drop files here')+'</div>',
+			emptyText: '<div class="go-dropzone">'+t('Drop files here')+'</div>',
 			itemSelector: 'a',
 			listeners: {
 				afterrender:function(me) {
