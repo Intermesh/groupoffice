@@ -11,13 +11,6 @@ use go\core\model\Link;
  * @property array $customFields 
  */
 trait SearchableTrait {
-
-	/**
-	 * The name for the search results
-	 * 
-	 * @return string
-	 */
-	abstract public function title() ;
 	
 	/**
 	 * The description in the search results
