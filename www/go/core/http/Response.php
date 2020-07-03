@@ -243,7 +243,7 @@ class Response extends Singleton{
 		$this->setHeader("Content-Security-Policy", (new \go\core\webclient\CSP()));
 		$this->setHeader("X-Content-Type-Options","nosniff");
 		$this->setHeader("Strict-Transport-Security"," max-age=31536000");
-		$this->setHeader("X-XSS-Protection", "1");
+		$this->setHeader("X-XSS-Protection", "1;mode=block");
 	}
 
 	public function sendHeaders() {		
