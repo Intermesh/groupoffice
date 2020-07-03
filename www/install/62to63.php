@@ -250,7 +250,7 @@ $qs[] = "ALTER TABLE `core_entity` ADD UNIQUE(`clientName`);";
 
 
 
-$qs[] = "insert into core_entity (name) select extendsModel from core_customfields_field_set where extendsModel not in (select name from core_entity)";
+$qs[] = "insert into core_entity (name) select distinct extendsModel from core_customfields_field_set where extendsModel not in (select name from core_entity)";
 $qs[] = 'ALTER TABLE `core_customfields_field_set` ADD `entityId` INT NOT NULL AFTER `id`, ADD INDEX (`entityId`);';
 
 
