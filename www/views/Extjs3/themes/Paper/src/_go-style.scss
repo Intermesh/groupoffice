@@ -1087,6 +1087,14 @@ button.filetype-pdf, button.filetype-doc {
 	}
 }
 
+.go-icon-list {
+	@extend %go-icon-list;
+	& > p, & > a {
+		position:relative;
+		padding-left: dp(56);
+	}
+}
+
 //detail view
 .go-detail-view {
 	
