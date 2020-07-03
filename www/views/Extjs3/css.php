@@ -1,10 +1,13 @@
 <?php
 
+use go\core\App;
 use go\core\webclient\Extjs3;
 
 require(__DIR__ . "/../../vendor/autoload.php");
 
-\go\core\App::get();
+App::get();
+
+
 $theme = $_GET['theme'] ?? 'Paper';
 $webclient = Extjs3::get();
 $webclient->getCSSFile($theme)->output(true, true, [

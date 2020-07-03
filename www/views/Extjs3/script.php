@@ -2,7 +2,6 @@
 require(__DIR__ . "/../../vendor/autoload.php");
 
 \go\core\App::get();
-
 $cacheFile = \go\core\App::get()->getDataFolder()->getFile('clientscripts/all.js');
 
 $cacheFile->output(true, true, [
