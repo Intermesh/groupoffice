@@ -1087,6 +1087,14 @@ button.filetype-pdf, button.filetype-doc {
 	}
 }
 
+.go-icon-list {
+	@extend %go-icon-list;
+	& > p, & > a {
+		position:relative;
+		padding-left: dp(56);
+	}
+}
+
 //detail view
 .go-detail-view {
 	
@@ -2289,4 +2297,13 @@ table[id^="comments-ext"] b {
 			opacity: 0;
 		}
 	}
+}
+
+.go-dropzone {
+	border: 2px dashed color($fg, 'line');
+	border-radius: $borderRadius;
+	margin: dp(16) dp(16) 0;
+	text-align:center;
+	padding: dp(48);
+	color: color($fg, 'secondary-text');
 }

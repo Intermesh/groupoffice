@@ -50,7 +50,7 @@ class Select extends Base {
 
 	public function onFieldSave() {
 
-		if($this->field->isModified('databaseName')) {
+		if ($this->field->isModified('databaseName') && !$this->field->isNew()) {
 			$this->dropConstraint();
 		}
 

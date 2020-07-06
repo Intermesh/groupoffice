@@ -10,6 +10,20 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 			var types = go.customfields.CustomFields.getTypes();
 			form.getForm().findField('typeLabel').setValue(types[entity.type] ? types[entity.type].label : entity.type);
 		}, this);
+		this.isReserved = function(value) {
+			// Make sure that a database column name is NOT a reserved keyword
+			// As per https://mariadb.com/kb/en/columnstore-naming-conventions/
+			var arReserved = ['select','char','table','action','add','alter','bigint','bit','cascade','change','character',
+				'charset','check','clob','column','columns','comment','constraint','constraints','create','current_user','datetime',
+				'dec','decimal','deferred','default','deferrable','double','drop','engine','exists','foreign','full','idb_blob',
+				'idb_char','idb_delete','idb_float','idb_int','if','immediate','index','initially','integer', 'key', 'match',
+				'max_rows', 'min_rows', 'modify', 'no', 'not', 'null_tok', 'number', 'numeric', 'on', 'partial', 'precision',
+				'primary', 'real', 'references', 'rename', 'restrict', 'session_user', 'set', 'smallint', 'system_user', 'table',
+				'time', 'tinyint', 'to', 'truncate', 'unique', 'unsigned', 'update', 'user', 'varbinary', 'varchar', 'varying',
+				'with', 'zone'];
+			return (arReserved.indexOf(String(value).toLowerCase()) > -1);
+		};
+
 	},
 	initFormItems: function () {
 		return [{
@@ -35,7 +49,13 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 								//replace all whitespaces with underscores
 								var dbName = value.replace(/\s+/g, '_');
 								dbName = dbName.replace(/[^A-Za-z0-9_\-]+/g, "");
-
+								dbName = dbName.replace(/^[0-9]+/, '');
+								if(String(dbName).length === 0) {
+									return false;
+								}
+								if(this.isReserved(dbName)) {
+									dbName = 'go_' + dbName;
+								}
 								dbField.setValue(dbName);
 							},
 							scope: this
@@ -46,7 +66,22 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 						fieldLabel: t("Database name"),
 						anchor: '100%',
 						allowBlank: false,
-						hint: t("This name is used in the database and can only contain alphanummeric characters and undescores. It's only visible to exports and the API.")
+						hint: t("This name is used in the database and can only contain alphanumeric characters and underscores. It's only visible to exports and the API."),
+						listeners: {
+							change: function(field, value, old) {
+								var dbName = value.replace(/\s+/g, '_');
+								dbName = dbName.replace(/[^A-Za-z0-9_\-]+/g, "");
+								dbName = dbName.replace(/^[0-9]+/, '');
+								if(String(dbName).length === 0) {
+									return false
+								}
+								if(this.isReserved(dbName)) {
+									dbName = 'go_' + dbName;
+								}
+								field.setValue(dbName);
+							},
+							scope: this
+						}
 					},{
 						xtype: "textfield",
 						name: "hint",

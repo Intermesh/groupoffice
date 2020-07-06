@@ -4,6 +4,7 @@ use go\core\model\Token;
 use go\core\http\Request;
 use go\core\ErrorHandler;
 
+use go\core\http\Response;
 /**
  * Copyright Intermesh
  *
@@ -99,6 +100,10 @@ try {
 } catch(Exception $e) {
   errorHander($e);  
 }
+
+
+
+Response::get()->sendHeaders();
 
 go()->fireEvent(\go\core\App::EVENT_INDEX);
 

@@ -120,27 +120,27 @@ abstract class Entity  extends OrmEntity {
 			$table = array_values($tables)[0]->getName();
 
 			$entities = static::find(array_merge(['id', 'filesFolderId'], static::filesPathProperties()))
-				->where('filesFolderId', '!=', null)
-				->where('filesFolderId', 'NOT IN', (new Query())->select('id')->from('fs_folders'));
+				->where('filesFolderId', '!=', null);
+//				->where('filesFolderId', 'NOT IN', (new Query())->select('id')->from('fs_folders'));
 
 			foreach($entities as $e) {
 				$e->checkFilesFolder(true);
 			}
 
-			//update fs_folders set acl_id = 0 where acl_id not in (select id from core_acl)
-			// select * from fs_folders where acl_id not in (select id from core_acl)
-			if(is_a(static::class, AclOwnerEntity::class, true)) {
-				$entities = static::find(array_merge(['id', 'filesFolderId'], static::filesPathProperties()));
-
-				$entities->join('fs_folders', 'f', 'f.id = '.$entities->getTableAlias() .'.filesFolderId')
-					->where('f.acl_id', 'NOT IN', (new Query())->select('id')->from('core_acl'));
-
-				//$sql = (string) $entities;
-
-				foreach($entities as $e) {
-					$e->checkFilesFolder(true);
-				}
-			}
+//			//update fs_folders set acl_id = 0 where acl_id not in (select id from core_acl)
+//			// select * from fs_folders where acl_id not in (select id from core_acl)
+//			if(is_a(static::class, AclOwnerEntity::class, true)) {
+//				$entities = static::find(array_merge(['id', 'filesFolderId'], static::filesPathProperties()));
+//
+//				$entities->join('fs_folders', 'f', 'f.id = '.$entities->getTableAlias() .'.filesFolderId')
+//					->where('f.acl_id', 'NOT IN', (new Query())->select('id')->from('core_acl'));
+//
+//				//$sql = (string) $entities;
+//
+//				foreach($entities as $e) {
+//					$e->checkFilesFolder(true);
+//				}
+//			}
 		}
 	}
 

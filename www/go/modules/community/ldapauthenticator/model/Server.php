@@ -41,6 +41,8 @@ class Server extends Entity {
 	public $syncGroups = false;
 	public $syncGroupsQuery;
 
+	public $imapUseEmailForUsername = false;
+
 	
 	
 	/**

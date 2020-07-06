@@ -1,7 +1,6 @@
 <?php
 
 use go\core\App;
-use go\core\webclient\CSP;
 use go\core\webclient\Extjs3;
 
 $webclient = Extjs3::get();
@@ -75,7 +74,6 @@ $lang = GO::language()->getLanguage(); ?>
 	  echo '<link href="'. GO::config()->custom_css_url.'" type="text/css" rel="stylesheet" />';
     }
   ?>
-	<meta http-equiv="Content-Security-Policy" content="<?= CSP::get(); ?>">
 </head>
 <body>
 	<div id="sound"></div>

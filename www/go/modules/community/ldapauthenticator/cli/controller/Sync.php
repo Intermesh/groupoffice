@@ -23,13 +23,13 @@ class Sync extends Controller {
   private $domains;
 
   /**
-   * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php community/ldapauthenticator/Sync/users --id=2 --dryRun=1 --delete=1 --maxDeletePercentage=50
+   * docker-compose exec --user www-data groupoffice-64 php /usr/local/share/src/www/cli.php community/ldapauthenticator/Sync/users --id=1 --dryRun=1 --delete=1 --maxDeletePercentage=50
    */
   public function users($id, $dryRun = false, $delete = false, $maxDeletePercentage = 5) {
     //objectClass	inetOrgPerson)
     $server = Server::findById($id);
     if(!$server) {
-      throw new NotFound();
+      throw new NotFound("No LDAP config found with id = ". $id);
     }
 
     $this->serverId = $id;

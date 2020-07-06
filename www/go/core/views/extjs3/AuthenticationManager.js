@@ -78,7 +78,16 @@ go.AuthenticationManager = (function () {
 				url: this.getAuthUrl(),
 				jsonData: clientData,
 				callback: function (options, success, response) {
+
+
 					var result = Ext.decode(response.responseText);
+
+					if(result.debug) {
+						go.Jmap.processDebugResponse(result.debug, 'auth');
+					} else {
+						debugger;
+					}
+
           
           this.userMethods = result.methods || [];
 					this.loginToken = result.loginToken;

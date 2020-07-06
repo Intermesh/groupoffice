@@ -100,7 +100,7 @@ class Extjs3 {
 	
 	private function replaceCssUrl($css, File $file){
 		
-		$baseurl = str_replace(Environment::get()->getInstallFolder()->getPath() . '/', Settings::get()->URL, $file->getFolder()->getPath()).'/';
+		$baseurl = str_replace(Environment::get()->getInstallFolder()->getPath() . '/', $this->getRelativeUrl(), $file->getFolder()->getPath()).'/';
 		
 		$css = preg_replace_callback('/url[\s]*\(([^\)]*)\)/iU', 
 			function($matches) use($baseurl) { 
@@ -175,18 +175,25 @@ class Extjs3 {
 			return $this->baseUrl;
 		}
 
+		$this->baseUrl = Request::get()->isHttps() ? 'https://' : 'http://';
+		$this->baseUrl .= Request::get()->getHost(false) . $this->getRelativeUrl();
+
+		return $this->baseUrl;
+	}
+
+	/**
+	 * Get relative URL to webclient.
+	 *
+	 * @return string eg. /groupofice/
+	 */
+	public function getRelativeUrl() {
 		$path = dirname($_SERVER['SCRIPT_NAME']); // /index.php or /install/*.php
 
 		if(basename($path) == 'install') {
 			$path = dirname($path);
 		}
 
-		$path = rtrim($path, '/') . '/';
-
-		$this->baseUrl = Request::get()->isHttps() ? 'https://' : 'http://';
-		$this->baseUrl .= Request::get()->getHost(false) . $path;
-
-		return $this->baseUrl;
+		return rtrim($path, '/') . '/';
 	}
 
 	public function getBasePath() {
@@ -215,7 +222,7 @@ class Extjs3 {
 	}
 
 	public function getThemeUrl() {
-		return $this->getBaseUrl() . '/views/Extjs3/themes/' . $this->getTheme() . '/';
+		return $this->getRelativeUrl() . 'views/Extjs3/themes/' . $this->getTheme() . '/';
 	}
 
 	public function renderPage($html, $title = null) {

@@ -45,25 +45,28 @@ go.Jmap = {
 			method: 'community/dev/Debugger/get',
 			params: {},
 			callback: function(options, success, response, clientCallId) {
-
-				var r;
-				while(r = response.shift()) {
-					var method = r.shift();
-					r.push(clientCallId);
-					//escape % for console.log
-					r = r.map(function(i) {
-						if(Ext.isString(i)) {
-							i = i.replace(/%/g, "%%");
-						}
-						return i;
-					});
-					console[method].apply(null, r);
-				}
-
-			}
+				this.processDebugResponse(response, clientCallId);
+			},
+			scope: this
 		}).catch(function() {
 			//ignore error
 		});
+	},
+
+	processDebugResponse : function(response, clientCallId) {
+		var r;
+		while(r = response.shift()) {
+			var method = r.shift();
+			r.push(clientCallId);
+			//escape % for console.log
+			r = r.map(function(i) {
+				if(Ext.isString(i)) {
+					i = i.replace(/%/g, "%%");
+				}
+				return i;
+			});
+			console[method].apply(null, r);
+		}
 	},
 
 	abort: function (clientCallId) {
