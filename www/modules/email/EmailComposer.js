@@ -75,43 +75,7 @@ GO.email.EmailComposer = function(config) {
 			scope:this
 		}
 	})];
-						
-//	if(go.Modules.isAvailable("legacy", "gnupg"))
-//	{
-//		optionsMenuItems.push('-');
-//			
-//		optionsMenuItems.push(this.encryptCheck = new Ext.menu.CheckItem({
-//			text:t("encryptMessage", "gnupg"),
-//			checked: false,
-//			listeners : {
-//				checkchange: function(check, checked) {
-//					if(this.formPanel.baseParams.content_type=='html')
-//					{
-//						if(!confirm(t("confirmChangeToText", "gnupg")))
-//						{
-//							check.setChecked(!checked, true);
-//							return false;
-//						}else
-//						{
-//							this.emailEditor.setContentTypeHtml(false);
-//							this.htmlCheck.setChecked(false, true);
-//							this.showConfig.keepEditingMode=true;
-//							this.show(this.showConfig);
-//						}
-//					}
-//						
-//					this.htmlCheck.setDisabled(checked);
-//						
-//					this.sendParams['encrypt'] = checked
-//					? '1'
-//					: '0';
-//								
-//					return true;
-//				},
-//				scope:this
-//			}
-//		}));
-//	}
+
 
 	this.optionsMenu = new Ext.menu.Menu({
 		items : optionsMenuItems

@@ -744,9 +744,9 @@ $l["currentPasswordText"] = 'You need to provide your current password to be abl
 $l['strId'] = 'ID';
 $l['strModule'] = 'Module';
 
-$l['createEventText'] = 'Create event for {0}';
+$l['Create event'] = 'Create event for {0}';
 $l['moveEventText'] = 'Move event to {0}';
-$l['updateEventText'] = 'Update event to {0}';
+$l['Update event'] = 'Update event to {0}';
 
 $l['filterOnly'] = 'Filter only';
 $l['use'] = 'Use';
