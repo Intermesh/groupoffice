@@ -1,6 +1,7 @@
 <?php
 
 use go\core\App;
+use go\core\http\Response;
 
 require(__DIR__ . "/../../vendor/autoload.php");
 App::get();
