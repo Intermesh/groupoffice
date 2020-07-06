@@ -12,6 +12,7 @@
     	- X-Content-Type-Options: nosniff
     	- Strict-Transport-Security: max-age=31536000
         - X-XSS-Protection: 1;mode=block
+- Core: Use relative URL's in webclient
 
 30-06-2020 6.4.155
 - Email: Problem with empty emails

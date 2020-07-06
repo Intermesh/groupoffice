@@ -22,7 +22,7 @@ use go\core\webclient\Extjs3;
 
 $webclient = Extjs3::get();
 
-$baseUrl = $webclient->getBaseUrl();
+$baseUrl = $webclient->getRelativeUrl();
 
 
 $settings['max_rows_list'] = 50;
