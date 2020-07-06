@@ -1,3 +1,6 @@
+- Core: Fixed 500 error upon rebuilding module cache
+- Core: Fixed custom fields saving new select box.
+- Core: Custom fields, generate database name as per MariaDB naming conventions.
 - Address book: Update search cache of employees when changing company name
 - LDAP Auth: Added option to login to IMAP server with email instead of username 
 - Core: Added complete rebuild search cache option.
@@ -10,7 +13,7 @@
         - X-XSS-Protection: 1;mode=block
 
 30-06-2020 6.4.155
-- Emnail: Problem with empty emails
+- Email: Problem with empty emails
 
 30-06-2020 6.4.154
 - Custom fields: Changing multi select options could destroy all values of the field
