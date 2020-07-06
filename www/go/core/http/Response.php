@@ -6,7 +6,6 @@ use DateTime;
 use go\core\http;
 use go\core\Singleton;
 use go\core\util\StringUtil;
-use Defuse\Crypto\Crypto;
 use go\core\util\JSON;
 
 /**
