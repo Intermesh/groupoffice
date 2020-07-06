@@ -48,7 +48,7 @@ class CSP {
     ->add('frame-src', 'http:')
     ->add('frame-src', "groupoffice:")
     ->add('frame-src', "groupoffices:")
-	    ->add('frame-ancestors', "self");
+	    ->add('frame-ancestors', "'self'");
   }
 
   public function add($directive, $value) {
