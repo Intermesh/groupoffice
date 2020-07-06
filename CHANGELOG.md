@@ -1,4 +1,4 @@
-- Billing: Field 'invoice_no' is now a varchar
+- Billing: Field 'invoice_no' in expenses is now a varchar
 - Core: Fixed 500 error upon rebuilding module cache
 - Core: Fixed custom fields saving new select box.
 - Core: Custom fields, generate database name as per MariaDB naming conventions.
