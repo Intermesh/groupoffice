@@ -1,4 +1,5 @@
 - Calendar: Fix for "No participant found for this event"
+- Core: Start with create trigger in 6.2 upgrade to avoid problems when it's not allowed later on.
 
 05-06-2020 6.3.90
 - Core: Check if db is in invalid state (partially upgraded to 6.3) before upgraded
