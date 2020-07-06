@@ -142,8 +142,8 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 			hideLabel: true
 		});
 			
-		this.nDaysText = new GO.form.HtmlComponent({
-			html:t("nDaysText", "sieve"),
+		this.Senders will only be notified periodically. You can set the number of days below. = new GO.form.HtmlComponent({
+			html:t("Senders will only be notified periodically. You can set the number of days below.", "sieve"),
 			style:'padding:5px 0px'
 		});
 		
@@ -163,7 +163,7 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 			collapsed: true,
 			collapsible: true,
 			labelWidth: 180,
-			items:[this.aliassesText,this.aliassesField,this.nDaysText,this.nDaysField]
+			items:[this.aliassesText,this.aliassesField,this.Senders will only be notified periodically. You can set the number of days below.,this.nDaysField]
 		});
 			
 		this.scriptNameField = new Ext.form.Hidden({
