@@ -240,7 +240,7 @@ class Response extends Singleton{
 
 	private function sendSecurityHeaders() {
 		$this->setHeader("X-Frame-Options", "SAMEORIGIN");
-		$this->setHeader("Content-Security-Policy", (new \go\core\webclient\CSP()));
+		$this->setHeader("Content-Security-Policy", "default-src 'self' about:;font-src 'self' data:;script-src 'unsafe-eval' 'self' 'unsafe-inline';img-src 'self' about: data: http: https:;style-src 'self' 'unsafe-inline';frame-src 'self' https: http: groupoffice: groupoffices:;frame-ancestors 'self';");
 		$this->setHeader("X-Content-Type-Options","nosniff");
 		$this->setHeader("Strict-Transport-Security"," max-age=31536000");
 		$this->setHeader("X-XSS-Protection", "1;mode=block");
