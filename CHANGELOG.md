@@ -2,6 +2,12 @@
 - LDAP Auth: Added option to login to IMAP server with email instead of username 
 - Core: Added complete rebuild search cache option.
 - Core: Fixed broken link display in e-mail
+- Core: Set security headers: 
+    	- X-Frame-Options: SAMEORIGIN
+        - Content-Security-Policy
+    	- X-Content-Type-Options: nosniff
+    	- Strict-Transport-Security: max-age=31536000
+        - X-XSS-Protection: 1;mode=block
 
 30-06-2020 6.4.155
 - Emnail: Problem with empty emails
