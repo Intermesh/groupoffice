@@ -409,7 +409,7 @@ class Contact extends AclItemEntity {
    * Find contact by e-mail address
    *
    * @param string|string[] $email
-   * @return Query
+   * @return static[]|Query
    * @throws Exception
    */
 	public static function findByEmail($email) {
@@ -803,11 +803,12 @@ class Contact extends AclItemEntity {
 	/**
 	 * Find all linked organizations
 	 *
+	 * @param array $properties
 	 * @return self[]
 	 * @throws Exception
 	 */
-	public function findOrganizations(){
-		return self::findByLink($this)
+	public function findOrganizations($properties = []){
+		return self::findByLink($this, $properties)
 			->andWhere('c.isOrganization = true');
 	}
 
