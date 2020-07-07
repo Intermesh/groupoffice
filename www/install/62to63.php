@@ -7,6 +7,9 @@ App::get()->getCache()->flush(false);
 
 App::get()->getDatabase()->setUtf8();
 
+$qs[] = "DROP TRIGGER IF EXISTS `Create ACL`;";
+$qs[] = "CREATE TRIGGER `Create ACL` BEFORE INSERT ON `go_groups` FOR EACH ROW BEGIN INSERT INTO `go_acl_items` (`ownedBy`, `description`) VALUES (NEW.createdBy, 'go_groups.aclId'); set NEW.aclId = (SELECT last_insert_id()); END";
+
 $qs[] = "DROP TABLE IF EXISTS `go_mail_counter`;";
 $qs[] = function () {
 	$stmt = GO()->getDbConnection()->query("SHOW TABLE STATUS");	
@@ -110,8 +113,6 @@ $qs[] = "ALTER TABLE `go_acl` CHANGE `group_id` `groupId` INT(11) NOT NULL DEFAU
 $qs[] = "ALTER TABLE `go_acl` CHANGE `acl_id` `aclId` INT(11) NOT NULL;";
 $qs[] = "ALTER TABLE `go_groups` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;";
 
-$qs[] = "DROP TRIGGER IF EXISTS `Create ACL`;";
-$qs[] = "CREATE TRIGGER `Create ACL` BEFORE INSERT ON `go_groups` FOR EACH ROW BEGIN INSERT INTO `go_acl_items` (`ownedBy`, `description`) VALUES (NEW.createdBy, 'go_groups.aclId'); set NEW.aclId = (SELECT last_insert_id()); END";
 $qs[] = "insert into go_groups (name, createdBy, isUserGroupFor) select username,id,id from go_users;";
 $qs[] = "DROP TRIGGER IF EXISTS `Create ACL`;";
 
@@ -250,7 +251,7 @@ $qs[] = "ALTER TABLE `core_entity` ADD UNIQUE(`clientName`);";
 
 
 
-$qs[] = "insert into core_entity (name) select extendsModel from core_customfields_field_set where extendsModel not in (select name from core_entity)";
+$qs[] = "insert into core_entity (name) select distinct extendsModel from core_customfields_field_set where extendsModel not in (select name from core_entity)";
 $qs[] = 'ALTER TABLE `core_customfields_field_set` ADD `entityId` INT NOT NULL AFTER `id`, ADD INDEX (`entityId`);';
 
 
