@@ -1,3 +1,4 @@
+07-07-2020 6.4.156
 - Billing: Field 'invoice_no' is now a varchar
 - Core: Fixed 500 error upon rebuilding module cache
 - Core: Fixed custom fields saving new select box.
