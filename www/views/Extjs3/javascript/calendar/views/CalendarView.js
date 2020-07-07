@@ -98,7 +98,7 @@ Ext.calendar.CalendarView = Ext.extend(Ext.BoxComponent, {
      * The text to display inside the drag proxy while dragging over the calendar to create a new event (defaults to 
      * 'Create event for {0}' where {0} is a date range supplied by the view)
      */
-    ddCreateEventText: t("createEventText"),
+    ddCreateEventText: t("Create event"),
     /**
      * @cfg {String} ddMoveEventText
      * The text to display inside the drag proxy while dragging an event to reposition it (defaults to 
@@ -112,7 +112,7 @@ Ext.calendar.CalendarView = Ext.extend(Ext.BoxComponent, {
      * this text is only used in views
      * that allow resizing of events.
      */
-    ddResizeEventText: t("updateEventText"),
+    ddResizeEventText: t("Update event"),
 
     //private properties -- do not override:
     weekCount: 1,

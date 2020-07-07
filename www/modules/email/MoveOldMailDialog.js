@@ -123,7 +123,7 @@ Ext.extend(GO.email.MoveOldMailDialog, go.Window,{
 
 	submitForm : function(hide) {
 		Ext.Msg.show({
-			title: t("MoveOldMails", "email"),
+			title: t("Move old mails", "email"),
 			icon: Ext.MessageBox.WARNING,
 			msg: t("Are you sure you want to move all the emails older then {date} from \"{source}\" to \"{target}\"?", "email").replace("{date}", this.untilDate.value).replace("{source}", this.folderNameField.getValue()).replace("{target}", this.selectMailbox.getValue()),
 			buttons: Ext.Msg.YESNO,
