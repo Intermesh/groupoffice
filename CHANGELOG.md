@@ -14,6 +14,7 @@
         - X-XSS-Protection: 1;mode=block
 - Core: Use relative URL's in webclient
 - Email: reload grid and keep position but don't select next mail
+- Email: Contact autolinking will link to all contacts organizations too
 
 30-06-2020 6.4.155
 - Email: Problem with empty emails
