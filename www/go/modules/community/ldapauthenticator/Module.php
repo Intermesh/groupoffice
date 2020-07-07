@@ -34,7 +34,9 @@ class Module extends core\Module implements DomainProvider {
 
 
 	public static function ldapRecordToUser($username, Record $record, User $user) {
-		
+
+		go()->debug($record->getAttributes());
+
 		$user->username = $username;
 
 		if(!empty($record->jpegPhoto[0])) {

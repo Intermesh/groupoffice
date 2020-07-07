@@ -129,7 +129,8 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						name: 'usernameAttribute',
 						fieldLabel: t("Username attribute"),
 						value: "uid",
-						required: true
+						required: true,
+						hint: t("Use 'samaccountname' for Microsoft ActiveDirectory.")
 					}, 
 					{
 						xtype:"checkbox",
@@ -140,13 +141,15 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						xtype: 'textfield',
 						name: 'peopleDN',
 						fieldLabel: "peopleDN",
-						value: "ou=people,dc=example,dc=com	",
+						value: "ou=people,dc=example,dc=com",
+						hint: t("For Microsoft ActiveDirectory it's typically 'cn=Users,dc=example,dc=com'."),
 						required: true
 					}, {
 						xtype: 'textfield',
 						name: 'groupsDN',
 						fieldLabel: "groupsDN",
-						value: "ou=groups,dc=example,dc=com	",
+						value: "ou=groups,dc=example,dc=com",
+						hint: t("For Microsoft ActiveDirectory it's typically 'cn=Groups,dc=example,dc=com'."),
 						required: true
 					},this.createEmailCheckbox = new Ext.form.Checkbox({
 						xtype:"checkbox",
