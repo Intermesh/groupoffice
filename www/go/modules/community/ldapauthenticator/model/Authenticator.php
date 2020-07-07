@@ -92,7 +92,7 @@ class Authenticator extends PrimaryAuthenticator {
 		}
 		if($user->isModified()) {
 			if(!$user->save()) {
-				throw new \Exception("Could not save user");
+				throw new \Exception("Could not save user: " . $user->getValidationErrorsAsString());
 			}
 		}
 		
