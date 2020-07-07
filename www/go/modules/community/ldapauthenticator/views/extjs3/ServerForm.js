@@ -311,7 +311,9 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						xtype: 'textfield',
 						name: 'syncUsersQuery',
 						fieldLabel: t("User query"),
-						required: true
+						required: true,
+						value: "(objectClass=InetOrgPerson)",
+						hint: t("For Microsoft ActiveDirectory use '(objectCategory=InetOrgPerson)'")
 					},  {
 						xtype: 'checkbox',
 						checked: false,
@@ -322,7 +324,9 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						xtype: 'textfield',
 						name: 'syncGroupsQuery',
 						fieldLabel: t("Group query"),
-						required: true
+						required: true,
+						value: "(objectClass=Group)",
+						hint: t("For Microsoft ActiveDirectory use '(objectCategory=group)'")
 					},  
 				]
 			}

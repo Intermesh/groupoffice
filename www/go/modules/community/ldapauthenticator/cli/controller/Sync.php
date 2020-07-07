@@ -54,7 +54,7 @@ class Sync extends Controller {
     $i = 0;
     foreach($records as $record) {
       $i++;
-      $username = $this->getGOUserName($record);
+      $username = $this->getGOUserName($record,$server);
       
       if (empty($username)) {
         $this->output("Skipping record. Could not determine username.");
@@ -104,8 +104,8 @@ class Sync extends Controller {
     $this->output("Done\n\n");
   }
 
-  private function getGOUserName(Record $record) {
-    $username = $record->uid[0] ?? $record->SAMAccountName[0];
+  private function getGOUserName(Record $record, Server $server) {
+    $username = $record->{$server->usernameAttribute}[0];
 
     if(!$username) {
       go()->debug("No username found in record: ");
@@ -143,10 +143,11 @@ class Sync extends Controller {
 
     $mailDomain = isset($record->mail[0]) ? explode('@', $record->mail[0])[1] : null;
 
-    if(empty($domain) || !in_array($domain, $this->domains)) {    
-      if(empty($mailDomain)) {
-        go()->info("Using domain from mail property for " . $username);
-        return false;
+    if(empty($domain) || !in_array($domain, $this->domains)) {
+	    go()->info("Using domain from mail property for " . $username);
+	    if(empty($mailDomain)) {
+		    go()->info("No email property available!");
+		    return false;
       } 
       $domain = $mailDomain;
     }
@@ -333,15 +334,15 @@ class Sync extends Controller {
         $accountResult = Record::find($ldapConn, $server->peopleDN, 'uid=' . $uid);
         $record = $accountResult->fetch();
         
-        $members[] = ['username' => $this->getGOUserName($record), 'email' => $record->mail[0]]; 
+        $members[] = ['username' => $this->getGOUserName($record, $server), 'email' => $record->mail[0]];
       }      
     } else if (isset($record->member)) {
       //for Active Directory
       foreach ($record->member as $username) {    
         go()->debug("Member: " . $username);  
-        $u = $this->queryActiveDirectoryUser($ldapConn, $username);
+        $u = $this->queryActiveDirectoryUser($ldapConn, $username, $server);
         if (!$u['username']) {
-          $this->output("Skipping. Could not find GO user");
+          $this->output("Skipping '$username'. Could not find GO user");
           continue;
         }
         $members[] = $u;
@@ -354,7 +355,7 @@ class Sync extends Controller {
     return $members;
   }
 
-	private function queryActiveDirectoryUser(Connection $ldapConn, $groupMember) {
+	private function queryActiveDirectoryUser(Connection $ldapConn, $groupMember, Server $server) {
 		$parts = preg_split('~(?<!\\\),~', $groupMember);
 		$query = str_replace('\\,', ',', array_shift($parts));
 		$query = str_replace('(', '\\(', $query);
@@ -365,6 +366,6 @@ class Sync extends Controller {
 		$accountResult = Record::find($ldapConn, $searchDn, $query);
     $record = $accountResult->fetch();
     
-		return ['username' => $this->getGOUserName($record), 'email' => $record->mail[0]];
+		return ['username' => $this->getGOUserName($record, $server), 'email' => $record->mail[0]];
 	}
 }
