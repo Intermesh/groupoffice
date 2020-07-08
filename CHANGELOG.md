@@ -1,4 +1,5 @@
-- Billing: Field 'invoice_no' in expenses is now a varchar
+07-07-2020 6.4.156
+- Billing: Field 'invoice_no' is now a varchar
 - Core: Fixed 500 error upon rebuilding module cache
 - Core: Fixed custom fields saving new select box.
 - Core: Custom fields, generate database name as per MariaDB naming conventions.
@@ -14,6 +15,7 @@
         - X-XSS-Protection: 1;mode=block
 - Core: Use relative URL's in webclient
 - Email: reload grid and keep position but don't select next mail
+- Email: Contact autolinking will link to all contacts organizations too
 
 30-06-2020 6.4.155
 - Email: Problem with empty emails

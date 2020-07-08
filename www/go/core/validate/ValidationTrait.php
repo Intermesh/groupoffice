@@ -32,6 +32,21 @@ trait ValidationTrait {
 	}
 
 	/**
+	 * Get validation errors formatted as string.
+	 *
+	 * @return string
+	 */
+	public function getValidationErrorsAsString() {
+
+		$s = "";
+		foreach($this->validationErrors as $key => $value) {
+			$s .= '"' . $key . '": ' . $value['description'] . "\n";
+		}
+
+		return $s;
+	}
+
+	/**
 	 * Get the validationError for the given attribute
 	 * If the attribute has no error then fals will be returned
 	 * 
