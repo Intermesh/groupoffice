@@ -155,7 +155,7 @@ a {
 		
 	}
 	&[target], &[onclick] {
-		@include var(color, c-primary);
+		color: $cAnchor;
 	}
 	&:hover {
 		text-decoration: underline;

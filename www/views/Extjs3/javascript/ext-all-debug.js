@@ -45066,7 +45066,6 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
             html = html.replace(/\sclass="(?:Apple-style-span|khtml-block-placeholder)"/gi, '');
         }
 
-        
         if(html.charCodeAt(0) == this.defaultValue.replace(/\D/g, '')){
             html = html.substring(1);
         }

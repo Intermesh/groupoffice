@@ -32,7 +32,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	 * @returns {string}|undefined
 	 */
 	renderDetailView: function (value, data, customfield, detailComponent) {
-		return Ext.util.Format.htmlEncode(value);
+		return  go.util.textToHtml(value);
 	},
 	
 	/**
