@@ -1,6 +1,7 @@
 - Core: new config option $config['frameAncestors'] = 'http://examplea.com https/exampleb.com'; to allow Group-Office in 
         a frame.
 - LDAP auth: Use e-mail for mail username works for SMTP too
+- Core: Auto link URL's and emails in html editor and html rendering
 
 07-07-2020 6.4.156
 - Billing: Field 'invoice_no' is now a varchar
