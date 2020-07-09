@@ -181,14 +181,16 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 		clearTimeout(this.debounceTimeout);
 		this.debounceTimeout = setTimeout(function () {
-			var anchored = Autolinker.link(html, {stripPrefix: false, stripTrailingSlash: false, className: "normal-link", newWindow: true});
-			if(html != anchored) {
+			var h = me.getEditorBody().innerHTML;
+			var anchored = Autolinker.link(h, {stripPrefix: false, stripTrailingSlash: false, className: "normal-link", newWindow: true});
+			if(h != anchored) {
 				var cPos = me.getCursorPosition();
-				var diff = anchored.length - html.length;
-				me.setValue(anchored);
+				var diff = anchored.length - h.length;
+				//me.setValue(anchored);
+				me.getEditorBody().innerHTML = anchored;
 				me.setCursorPosition(cPos);
 			}
-		}, 500);
+		}, 1000);
 	},
 
 	onDrop: function(e) {
