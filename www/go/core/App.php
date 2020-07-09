@@ -353,7 +353,8 @@ use const GO_CONFIG_FILE;
 				$config['debug_log'] = !empty($config['debug']);
 			}
 			
-			$this->config = (new util\ArrayObject([					
+			$this->config = (new util\ArrayObject([
+					"frameAncestors" => $config['frameAncestors'] ?? "",
 					"core" => [
 							"general" => [
 									"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
