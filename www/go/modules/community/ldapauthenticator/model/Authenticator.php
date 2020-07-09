@@ -160,7 +160,7 @@ class Authenticator extends PrimaryAuthenticator {
 			$account->password = $password;			
 			
 			if($server->smtpUseUserCredentials) {				
-				$account->smtp_username = $username;
+				$account->smtp_username = $server->imapUseEmailForUsername ? $email : $username;
 				$account->smtp_password = $password;
 			}
 			

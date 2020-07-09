@@ -1,4 +1,4 @@
-- Core: new config option $config['frameAncestors'] = 'http://examplea.com https/exampleb.com' to allow Group-Office in 
+- Core: new config option $config['frameAncestors'] = 'http://examplea.com https/exampleb.com'; to allow Group-Office in 
         a frame.
 
 07-07-2020 6.4.156
