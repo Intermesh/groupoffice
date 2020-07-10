@@ -1,3 +1,4 @@
+- Core: Added some common file type icons
 - Core: new config option $config['frameAncestors'] = 'http://examplea.com https/exampleb.com'; to allow Group-Office in 
         a frame.
 - LDAP auth: Use e-mail for mail username works for SMTP too
