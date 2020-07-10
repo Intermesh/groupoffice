@@ -2,7 +2,7 @@
 # group-office.com
 
 # Check if PHP CLI is installed
-hash php 2>/dev/null || { echo >&2 "The script requires php5-cli but it's not installed.  Aborting."; exit 1; }
+hash php 2>/dev/null || { echo >&2 "The script requires php-cli but it's not installed.  Aborting."; exit 1; }
 
 # Find the system architecture
 DPKG_ARCH=$(dpkg --print-architecture)
