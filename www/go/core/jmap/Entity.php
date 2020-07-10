@@ -159,6 +159,16 @@ abstract class Entity  extends OrmEntity {
 		return property_exists(static::class, 'filesFolderId');
 	}
 
+	/**
+	 * Override to use different ACL for files.
+	 *
+	 * @return int
+	 * @throws Exception
+	 */
+	public function filesFolderAclId() {
+		return $this->findAclId();
+	}
+
   /**
    * Return a relative path to store the files in. Must be unique!
    *
