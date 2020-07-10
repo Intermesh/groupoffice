@@ -82,7 +82,9 @@ try {
 //			header('Location: '.$url);
 //			exit();
 //		}
-		
+
+		Response::get()->sendHeaders();
+
 		if(go()->getSettings()->databaseVersion != go()->getVersion()) {
 
 			if(go()->getDebugger()->enabled) {
@@ -102,8 +104,6 @@ try {
 }
 
 
-
-Response::get()->sendHeaders();
 
 go()->fireEvent(\go\core\App::EVENT_INDEX);
 

@@ -18,7 +18,12 @@ class Response extends \go\core\http\Response {
 		parent::__construct();
 		$this->setHeader('Content-Type', 'application/json;charset=utf-8');
 	}
-	
+
+	protected function sendSecurityHeaders()
+	{
+		//no headers needed for JMAP
+	}
+
 	/**
 	 * Output a response
 	 * 

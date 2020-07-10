@@ -238,7 +238,7 @@ class Response extends Singleton{
 		}
 	}
 
-	private function sendSecurityHeaders() {
+	protected function sendSecurityHeaders() {
 
 		$frameAncestors = go()->getConfig()['frameAncestors'];
 
