@@ -2,6 +2,7 @@
         a frame.
 - LDAP auth: Use e-mail for mail username works for SMTP too
 - Core: Auto link URL's and emails in html editor and html rendering
+- Email: Case insensitive file extension checking on uploading file in email composer
 
 07-07-2020 6.4.156
 - Billing: Field 'invoice_no' is now a varchar
