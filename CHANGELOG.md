@@ -1,5 +1,6 @@
 -07-2020 6.4.158
 - Files: Fixed minor bug in download function
+- Core: Fixed rendering of yesNo custom fields in grid and detail panel.
 
 
 13-07-2020 6.4.157

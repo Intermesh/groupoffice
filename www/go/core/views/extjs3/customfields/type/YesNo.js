@@ -26,12 +26,11 @@ go.customfields.type.YesNo = Ext.extend(go.customfields.type.Text, {
 	 * @returns {unresolved}
 	 */
 	renderDetailView: function (value, data, customfield) {
-
 		if (value === null) {
 			return t("Unknown");
 		}
 
-		return value ? t("Yes") : t("No");
+		return value === 1 ? t("Yes") : t("No");
 	},
 
 	/**
@@ -91,7 +90,38 @@ go.customfields.type.YesNo = Ext.extend(go.customfields.type.Text, {
 					title: t("No")
 			}]
 		};
-	}
+	},
+
+	getColumnXType : function() {
+		return "gridcolumn";
+	},
+
+	/**
+	 * Get grid column definition
+	 *
+	 * @param {type} field
+	 * @returns {TextAnonym$0.getColumn.TextAnonym$6}
+	 */
+	getColumn : function(field) {
+		var def = this.getFieldDefinition(field);
+		return {
+			dataIndex: def.name,
+			header: def.customField.name,
+			hidden: def.customField.hiddenInGrid,
+			id: "custom-field-" + encodeURIComponent(def.customField.databaseName),
+			sortable: true,
+			hideable: true,
+			draggable: true,
+			xtype: this.getColumnXType(),
+			renderer: function(value) {
+				if(value === null) {
+					return t("Not set");
+				}
+				return value === 1 ? t("Yes") : t("No");
+			}
+		};
+	},
+
 
 
 });

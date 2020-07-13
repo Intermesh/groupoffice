@@ -344,7 +344,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	},
 	
 	/**
-	 * Get grid column defnitition
+	 * Get grid column definition
 	 * 
 	 * @param {type} field
 	 * @returns {TextAnonym$0.getColumn.TextAnonym$6}
