@@ -1,5 +1,8 @@
 go.Relations = {
 
+	/**
+	 * @var {go.data.EntityStore}
+	 */
   entityStore: null,
   get : function (entityStore, entity, relations) {
 
@@ -43,7 +46,7 @@ go.Relations = {
 		var key = this.resolveKey(relation.path + relation.fk, entity), me = this;
 
 		if(!key) {
-			console.warn("No key found for ", relation, entity);
+			console.warn("No key found for relation '" + this.entityStore.entity.name + "." +relName + "'", relation, entity);
       me.applyRelationEntity(relation.path + relName, entity, null);
 			return Promise.resolve(null);
 		}		

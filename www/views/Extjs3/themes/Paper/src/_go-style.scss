@@ -155,7 +155,7 @@ a {
 		
 	}
 	&[target], &[onclick] {
-		@include var(color, c-primary);
+		color: $cAnchor;
 	}
 	&:hover {
 		text-decoration: underline;
@@ -2302,7 +2302,7 @@ table[id^="comments-ext"] b {
 .go-dropzone {
 	border: 2px dashed color($fg, 'line');
 	border-radius: $borderRadius;
-	margin: dp(16) dp(16) 0;
+	margin: dp(16);
 	text-align:center;
 	padding: dp(48);
 	color: color($fg, 'secondary-text');

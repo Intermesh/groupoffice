@@ -1,3 +1,18 @@
+-07-2020 6.4.158
+- Files: Fixed minor bug in download function
+- Core: Fixed rendering of yesNo custom fields in grid and detail panel.
+
+
+13-07-2020 6.4.157
+- Core: Added some common file type icons
+- Core: new config option $config['frameAncestors'] = 'http://examplea.com https/exampleb.com'; to allow Group-Office in 
+        a frame.
+- LDAP auth: Use e-mail for mail username works for SMTP too
+- Core: Auto link URL's and emails in html editor and html rendering
+- Email: Case insensitive file extension checking on uploading file in email composer
+- Core: Restored CSP object so it can be extended by modules
+
+07-07-2020 6.4.156
 - Billing: Field 'invoice_no' is now a varchar
 - Core: Fixed 500 error upon rebuilding module cache
 - Core: Fixed custom fields saving new select box.
@@ -14,6 +29,7 @@
         - X-XSS-Protection: 1;mode=block
 - Core: Use relative URL's in webclient
 - Email: reload grid and keep position but don't select next mail
+- Email: Contact autolinking will link to all contacts organizations too
 
 30-06-2020 6.4.155
 - Email: Problem with empty emails

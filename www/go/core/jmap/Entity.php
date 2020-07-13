@@ -92,6 +92,7 @@ abstract class Entity  extends OrmEntity {
 
 		$filesPathProperties = static::filesPathProperties();
 		if(!empty($filesPathProperties)) {
+
 			if($force || $this->isModified($filesPathProperties)) {
 				$oldFilesFolderId = $this->filesFolderId;
 				$folder = Folder::model()->findForEntity($this, false);
@@ -119,7 +120,12 @@ abstract class Entity  extends OrmEntity {
 			$tables = static::getMapping()->getTables();
 			$table = array_values($tables)[0]->getName();
 
-			$entities = static::find(array_merge(['id', 'filesFolderId'], static::filesPathProperties()))
+			$filesPathProperties = static::filesPathProperties();
+			if(is_a(static::class, AclOwnerEntity::class, true)) {
+				$filesPathProperties[] = static::$aclColumnName;
+			}
+
+			$entities = static::find(array_merge(['id', 'filesFolderId'], $filesPathProperties))
 				->where('filesFolderId', '!=', null);
 //				->where('filesFolderId', 'NOT IN', (new Query())->select('id')->from('fs_folders'));
 
@@ -151,6 +157,16 @@ abstract class Entity  extends OrmEntity {
 	 */
 	private static function supportsFiles() {
 		return property_exists(static::class, 'filesFolderId');
+	}
+
+	/**
+	 * Override to use different ACL for files.
+	 *
+	 * @return int
+	 * @throws Exception
+	 */
+	public function filesFolderAclId() {
+		return $this->findAclId();
 	}
 
   /**

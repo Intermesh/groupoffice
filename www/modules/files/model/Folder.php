@@ -1493,7 +1493,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 				$newFolder = $this->mergeEntityFolders($folder, $existingPath, $filesPath);
 				$newFolder->visible = 0;
 				$newFolder->readonly = 1;
-				$newFolder->acl_id = $entity->findAclId();
+				$newFolder->acl_id = $entity->filesFolderAclId();
 				$newFolder->save(true);
 
 				$entity->filesFolderId = $newFolder->id;
@@ -1509,7 +1509,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		}
 
 		
-		$aclId =$entity->findAclId();
+		$aclId = $entity->filesFolderAclId();
 		$folder = \GO\Files\Model\Folder::model()->findByPath($filesPath,true, array('acl_id'=>$aclId,'readonly'=>1));
 
 		if(!$folder){

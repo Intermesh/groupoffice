@@ -288,14 +288,18 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 
 		//Convert DER to pem
 		//openssl x509 -inform DER -in issuer.crt -out issuer.pem
-		exec("openssl x509 -inform DER -in ". escapeshellarg($issuerDerFile->path()) ." -out " .escapeshellarg($issuerPemFile->path()), $output, $ret);
+		$cmd = "openssl x509 -inform DER -in ". escapeshellarg($issuerDerFile->path()) ." -out " .escapeshellarg($issuerPemFile->path());
+		go()->debug("Running: $cmd");
+		exec($cmd, $output, $ret);
 
 		if($ret != 0) {
 			throw new \Exception( "Failed to convert issuer certificate");
 		}
 
 		//Do oscp
-		exec ("openssl ocsp -issuer ". escapeshellarg($issuerPemFile->path()) ." -cert " . escapeshellarg($cert->path())." -url ". escapeshellarg($ocspURI) ." -CAfile ". escapeshellarg($issuerPemFile->path()), $output,$ret);
+		$cmd = "openssl ocsp -issuer ". escapeshellarg($issuerPemFile->path()) ." -cert " . escapeshellarg($cert->path())." -url ". escapeshellarg($ocspURI) ." -CAfile ". escapeshellarg($issuerPemFile->path());
+		go()->debug("Running: $cmd");
+		exec ($cmd, $output,$ret);
 
 		if($ret != 0) {
 			throw new \Exception( "OSCP request failed");

@@ -132,6 +132,6 @@ return array (
   'Ok' => 'OK',
   'autoReplyMessage' => 'Automatická odpověď',
   'Filters' => 'Filtry',
-  'nDaysText' => 'dní',
+  'Senders will only be notified periodically. You can set the number of days below.' => 'dní',
   'Sieve' => 'Síto',
 );

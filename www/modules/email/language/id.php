@@ -138,7 +138,7 @@ return array (
   'Select a date. If you click OK after that, all the emails in the selected folder before that date will be moved to the selected target folder.' => 'Pilih tanggal. Jika Anda mengeklik OKE setelah itu, semua email dalam folder yang dipilih sebelum tanggal tersebut akan dipindahkan ke folder target yang dipilih.',
   'Move to' => 'Pindahkan ke',
   'All emails before' => 'Semua email sebelumnya',
-  'MoveOldMails' => 'MoveOldMails',
+  'Move old mails' => 'Move old mails',
   'Are you sure you want to move all the emails older then {date} from "{source}" to "{target}"?' => 'Anda yakin ingin memindahkan semua email yang lebih lama sejak {date} dari "{source}" ke "{target}"?',
   'The number of moved messages is' => 'Jumlah pesan yang dipindahkan adalah',
   'This panel expects an address list ID that is positive, but did not receive one. Please contact the administrator.' => 'Panel ini mengharapkan ID daftar alamat yang positif, tetapi tidak menerimanya. Hubungi administrator.',

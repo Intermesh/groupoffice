@@ -92,7 +92,7 @@ class Authenticator extends PrimaryAuthenticator {
 		}
 		if($user->isModified()) {
 			if(!$user->save()) {
-				throw new \Exception("Could not save user");
+				throw new \Exception("Could not save user: " . $user->getValidationErrorsAsString());
 			}
 		}
 		
@@ -160,7 +160,7 @@ class Authenticator extends PrimaryAuthenticator {
 			$account->password = $password;			
 			
 			if($server->smtpUseUserCredentials) {				
-				$account->smtp_username = $username;
+				$account->smtp_username = $server->imapUseEmailForUsername ? $email : $username;
 				$account->smtp_password = $password;
 			}
 			

@@ -12,8 +12,6 @@ go.users.SelectDialogPanel = Ext.extend(Ext.Panel, {
 	initComponent : function() {
 		
 		this.createGrid();		
-		
-		this.labels = t("emailTypes");
 
 
 		this.searchField = new go.SearchField({

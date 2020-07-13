@@ -323,7 +323,15 @@ go.util =  (function () {
 		},
 		
 		textToHtml : function(text) {
-			return Ext.util.Format.nl2br(text);
+			if(!text) {
+				return text;
+			}
+			return Ext.util.Format.nl2br(
+				Autolinker.link(
+					Ext.util.Format.htmlEncode(text),
+					{stripPrefix: false, stripTrailingSlash: false, className: "normal-link", newWindow: true}
+					)
+			);
 		},
 		
 		addSlashes : function( str ) {

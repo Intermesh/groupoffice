@@ -34,10 +34,10 @@ GO.calendar.EventDialog = function(calendar) {
 	}, this);
 
 	var items  = [
-	this.propertiesPanel,
-	this.optionsPanel,
-	this.participantsPanel,
-	this.resourcesPanel
+		this.propertiesPanel,
+		this.optionsPanel,
+		this.participantsPanel,
+		this.resourcesPanel
 	];
 
 	//This field is added for filtering the custom field panels. It needs the group_id to be in the form values to filter on this value.
@@ -75,8 +75,7 @@ GO.calendar.EventDialog = function(calendar) {
 				items: [fs]
 			});
 			this.tabPanel.add(pnl);
-		}else
-		{			
+		} else {
 			this.propertiesPanel.add(fs);
 		}
 	}, this);
@@ -155,29 +154,31 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			focus : focusSubject.createDelegate(this),
 			buttonAlign:'left',
 			buttons : [
-			this.createLinkButton = new go.links.CreateLinkButton(),
-			this.fileBrowseButton,
-			'->',{
-				text : t("Apply"),
-				handler : function() {
-					this.submitForm(false, { 
-						'check_conflicts' : 1
-					} );
-				},
-				scope : this
-			},{
-				text : t("Save"),
-				iconCls: 'ic-done',
-				handler : function() {
-					this.submitForm(true, { 
-						'check_conflicts' : 1
-					} );
-				},
-				scope : this
-			}]
+				this.createLinkButton = new go.links.CreateLinkButton(),
+				this.fileBrowseButton,
+				'->',{
+					text : t("Apply"),
+					handler : function() {
+						this.submitForm(false, {
+							'check_conflicts' : 1
+						} );
+					},
+					scope : this
+				},{
+					text : t("Save"),
+					iconCls: 'ic-done',
+					handler : function() {
+						this.submitForm(true, {
+							'check_conflicts' : 1
+						} );
+					},
+					scope : this
+				}
+			]
 		});
 
 		this.win.on("hide", function() {
+			this.initialized = false;
 			this.createLinkButton.reset();
 		}, this);
 	},
@@ -193,7 +194,6 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 	},
 
 	show : function(config) {
-
 		config = config || {};
 
 		GO.dialogListeners.apply(this);		
@@ -251,12 +251,9 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			config.event_id = 0;
 		}		
 
-
-		
 		var params = config.params || {};
 		
-		if(!config.event_id){
-			
+		if(!config.event_id) {
 			if(!GO.util.empty(config.calendar_id))
 				params.calendar_id=config.calendar_id;
 
@@ -335,11 +332,8 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 					this.selectCalendar.setRemoteText(action.result.remoteComboTexts.calendar_id);
 					
 					this.setPermissionLevel(action.result.data.permission_level);
-					
-				
 
-					if(action.result.group_id == 1)
-					{
+					if(action.result.group_id == 1) {
 						//TODO
 						this.toggleFieldSets(action.result.data.resources_checked);
 					}
@@ -384,11 +378,6 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				scope : this
 
 			});
-		
-					
-		
-	
-
 
 		this.fireEvent('show', this);
 	},
