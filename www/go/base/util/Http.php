@@ -224,7 +224,7 @@ class Http {
 				header('Pragma: public');
 			}
 		} else {
-			header('Content-Type: ' .$file->mimeType());
+			header('Content-Type: ' . ($inline ? $file->mimeType() : 'application/octet-stream') ); //safari sometimes shows files even with content-disposition attachment
 			header('Content-Disposition: '.$disposition.'; filename="' . $file->name() . '"');
 
 			if (!$cache) {

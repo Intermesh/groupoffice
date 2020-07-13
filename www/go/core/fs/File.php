@@ -328,7 +328,7 @@ class File extends FileSystemObject {
 		if($sendHeaders) {
 			$disp = $inline ? 'inline' : 'attachment';
 
-			$r->setHeader('Content-Type', $this->getContentType());
+			$r->setHeader('Content-Type', ($inline ? $this->getContentType() : 'application/octet-stream'));//safari sometimes shows files even with content-disposition attachment
 			$r->setHeader('Content-Disposition', $disp . '; filename="' . $this->getName() . '"');
 			$r->setHeader('Content-Transfer-Encoding', 'binary');
 
