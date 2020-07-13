@@ -1,3 +1,4 @@
+13-07-2020 6.4.157
 - Core: Added some common file type icons
 - Core: new config option $config['frameAncestors'] = 'http://examplea.com https/exampleb.com'; to allow Group-Office in 
         a frame.
