@@ -1,4 +1,5 @@
 -07-2020 6.4.158
+- Core: Updated German translation
 - Files: Fixed minor bug in download function
 - Core: Fixed rendering of yesNo custom fields in grid and detail panel.
 
