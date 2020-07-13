@@ -116,11 +116,13 @@ class Authenticator extends PrimaryAuthenticator {
 		if(!$user->hasModule('legacy', 'email')) {
 			return;
 		}
+
+		$imapUsername = $server->imapUseEmailForUsername ? $email : $username;
 		
 		//old framework code here		
 		$accounts = Account::model()->findByAttributes(array(
 					'host' => $server->imapHostname,
-					'username' => $username
+					'username' => $imapUsername
 							))->fetchAll();
 		
 		$foundForUser = false;
@@ -136,7 +138,7 @@ class Authenticator extends PrimaryAuthenticator {
 			$account->user_id = $user->id;
 			$account->host = $server->imapHostname;
 			$account->port = $server->imapPort;
-			$account->username = $server->imapUseEmailForUsername ? $email : $username;
+			$account->username = $imapUsername;
 			$account->password = $password;
 			$account->imap_encryption = $server->imapEncryption ?? "";
 
@@ -160,7 +162,7 @@ class Authenticator extends PrimaryAuthenticator {
 			$account->password = $password;			
 			
 			if($server->smtpUseUserCredentials) {				
-				$account->smtp_username = $server->imapUseEmailForUsername ? $email : $username;
+				$account->smtp_username = $$imapUsername;
 				$account->smtp_password = $password;
 			}
 			
