@@ -64,7 +64,7 @@ class Backend extends AbstractBackend {
 		$blob->name = $contact->getUri();
 		$blob->modifiedAt = $contact->modifiedAt;
 		if(!$blob->save()) {
-			throw new \Exception("could not save vcard blob");
+			throw new \Exception("could not save vcard blob: " . $blob->getValidationErrorsAsString());
 		}
 		
 		if(isset($contact->vcardBlobId)) {
