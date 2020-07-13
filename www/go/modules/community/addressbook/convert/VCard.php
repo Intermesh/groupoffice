@@ -497,7 +497,7 @@ class VCard extends AbstractConverter {
 		$blob->type = 'text/vcard';
 		$blob->name = ($vcardComponent->uid ?? 'nouid' ) . '.vcf';
 		if(!$blob->save()) {
-			throw new \Exception("could not save vcard blob");
+			throw new \Exception("could not save vcard blob: " . $blob->getValidationErrorsAsString());
 		}
 		
 		return $blob;
