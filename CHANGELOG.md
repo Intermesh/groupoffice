@@ -3,6 +3,7 @@
 - Files: Fixed minor bug in download function
 - Core: Fixed rendering of yesNo custom fields in grid and detail panel.
 - LDAP: Created multiple acocunts when using email for username
+- Files: Fixed folder upload problem where previous folder upload was created empty on a second upload
 
 13-07-2020 6.4.157
 - Core: Added some common file type icons
