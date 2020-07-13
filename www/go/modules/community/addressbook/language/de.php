@@ -120,4 +120,8 @@ return array (
   'Family' => 'Familie',
   'Label margins' => 'Labelränder',
   'Template' => 'Vorlage',
+  'Labels' => 'Label',
+  'Top' => 'Oben',
+  'Bottom' => 'Unten',
+  'Font' => 'Zeichensatz',
 );
