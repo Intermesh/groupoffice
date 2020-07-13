@@ -52,3 +52,6 @@ $updates['201610281650'][] = 'ALTER TABLE `pa_mailboxes` CONVERT TO CHARACTER SE
 
 $updates['201806010710'][] = 'ALTER TABLE `pa_mailboxes` ADD `homedir` VARCHAR(255) DEFAULT NULL AFTER `maildir`;';
 $updates['201806010710'][] = 'update `pa_mailboxes` set homedir = maildir;';
+
+$updates['202007131017'][] = "update `pa_mailboxes` set `password` = concat("{PLAIN-MD5}", `password`) WHERE `password` NOT LIKE '{%' AND `password` NOT LIKE '$%'";
+
