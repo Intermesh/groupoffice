@@ -52,7 +52,7 @@ class File extends Base{
 	 * @param StringHelper $extension
 	 * @return File 
 	 */
-	public static function tempFile($filename='',$extension=''){
+	public static function tempFile($filename='',$extension='', $deleteIfExists = true){
 		$folder = \GO::config()->getTempFolder();
 		
 		if(!empty($filename))
@@ -64,8 +64,10 @@ class File extends Base{
 			$p.='.'.$extension;
 		
 		$file =  new static($p);
-		
-		$file->delete();
+
+		if($deleteIfExists) {
+			$file->delete();
+		}
 		
 		return $file;
 	}
