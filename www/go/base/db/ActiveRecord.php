@@ -3727,7 +3727,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * @param String $prepend
 	 * @return String
 	 */
-	public function getSearchCacheKeywords(string $prepend='') :string
+	public function getSearchCacheKeywords($prepend='')
 	{
 		$keywords = array();
 
