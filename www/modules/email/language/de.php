@@ -231,7 +231,7 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Ihre Mailbox ist v
   'Read only and delegated' => 'Stellvertreter',
   'Show CC field by default' => 'CC-Feld standardmäßig anzeigen',
   'Show BCC field by default' => 'BCC-Feld standardmäßig anzeigen',
-  'Save to item' => 'Zu Element anhängen',
+  'Save to item' => 'Speichern in Element',
   'Save the attachment to these items' => 'Anhang zu diesen Elementen anhängen',
   'I tried to process the following "Until Date", but the processing stopped because an error occurred' => 'Habe versucht, das folgende Enddatum einzutragen, aber der Prozess stoppte mit einem Fehler',
   'Label' => 'Schlagwort',
@@ -332,4 +332,6 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Ihre Mailbox ist v
   'The contact is unknown' => 'Der Kontakt ist unbekannt',
   'Remove from address list' => 'Von Adressliste entfernen',
   'Sort on last contact mail time' => 'Nach letzter Kontakt-Mail-Zeit sortieren',
+  'Show from field by default' => 'Standardmäßig aus Feld anzeigen',
+  'Search items' => 'Elemente durchsuchen',
 );

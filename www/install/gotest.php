@@ -969,7 +969,7 @@ function save_config($config_obj)
 
 function whereis($cmd)
 {
-	if(strtoupper(substr(PHP_OS, 0, 3)) != 'WIN' && @is_executable('whereis'))
+	if(strtoupper(substr(PHP_OS, 0, 3)) != 'WIN')
 	{
 		exec('whereis '.$cmd, $return);
 
