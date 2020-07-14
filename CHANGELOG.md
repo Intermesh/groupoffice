@@ -1,8 +1,6 @@
-14-07-2020 6.4.160
+14-07-2020 6.4.159
 - Billing: fixed problem where items grid wouldn't load anymore
 - E-mail: Drag and drop caused jump to page 1 in list
-
-14-07-2020 6.4.159
 - Core: pre-6.4 ActiveRecord find function will use core_search;
 - Projects: generate proper keywords for search function;
 - Documents: Implemented filters in file search module and added custom fields back into edit panel
