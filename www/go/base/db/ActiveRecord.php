@@ -1208,388 +1208,384 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * @param FindParams $params
 	 * @return static ActiveStatement
 	 */
-	public function find($params=array()){
-
-		if(!is_array($params))
-		{
-			if(!($params instanceof FindParams))
+	public function find($params=array())
+	{
+		if (!is_array($params)) {
+			if (!($params instanceof FindParams)) {
 				throw new \Exception('$params parameter for find() must be instance of FindParams');
-
-			if($params->getParam("export")){
-				GO::session()->values[$params->getParam("export")]=array(
-						'name'=>$params->getParam("export"),
-						'model'=>$this->className(),
-						'findParams'=>$params,
-						'totalizeColumns'=>$params->getParam('export_totalize_columns'));
+			}
+			if ($params->getParam("export")) {
+				GO::session()->values[$params->getParam("export")] = array(
+					'name' => $params->getParam("export"),
+					'model' => $this->className(),
+					'findParams' => $params,
+					'totalizeColumns' => $params->getParam('export_totalize_columns'));
 			}
 
 			//it must be a FindParams object
 			$params = $params->getParams();
 		}
 
-		if(!empty($params['single'])){
+		if (!empty($params['single'])) {
 			unset($params['single']);
 			return $this->findSingle($params);
 		}
 
-		if(!empty($params['debugSql'])){
-			$this->_debugSql=true;
+		if (!empty($params['debugSql'])) {
+			$this->_debugSql = true;
 			//GO::debug($params);
-		}else
-		{
-			$this->_debugSql=!empty(GO::session()->values['debugSql']);
+		} else {
+			$this->_debugSql = !empty(GO::session()->values['debugSql']);
 		}
 //		$this->_debugSql=true;
-		if(GO::$ignoreAclPermissions)
-			$params['ignoreAcl']=true;
-
-		if(empty($params['userId'])){
-			$params['userId']=!empty(GO::session()->values['user_id']) ? GO::session()->values['user_id'] : 1;
+		if (GO::$ignoreAclPermissions) {
+			$params['ignoreAcl'] = true;
 		}
-		
-		if($this->aclField() && (empty($params['ignoreAcl']) || !empty($params['joinAclFieldTable']))){
+		if (empty($params['userId'])) {
+			$params['userId'] = !empty(GO::session()->values['user_id']) ? GO::session()->values['user_id'] : 1;
+		}
+
+		if ($this->aclField() && (empty($params['ignoreAcl']) || !empty($params['joinAclFieldTable']))) {
 			$aclJoinProps = $this->_getAclJoinProps();
 
-			if(isset($aclJoinProps['relation']))
-				$params['joinRelations'][$aclJoinProps['relation']['name']]=array('name'=>$aclJoinProps['relation']['name'], 'type'=>'INNER');
+			if (isset($aclJoinProps['relation'])) {
+				$params['joinRelations'][$aclJoinProps['relation']['name']] = array('name' => $aclJoinProps['relation']['name'], 'type' => 'INNER');
+			}
 		}
 
 		$select = "SELECT ";
 
-		if(!empty($params['distinct']))
+		if (!empty($params['distinct'])) {
 			$select .= "DISTINCT ";
+		}
 
 		//Unique query ID for storing found rows in session
 		$queryUid = $this->_getFindQueryUid($params);
 
-		if(!empty($params['calcFoundRows']) && !empty($params['limit']) && (empty($params['start']) || !isset(GO::session()->values[$queryUid]))){
-
+		if (!empty($params['calcFoundRows']) && !empty($params['limit']) && (empty($params['start']) || !isset(GO::session()->values[$queryUid]))) {
 			//TODO: This is MySQL only code
-			if($this->useSqlCalcFoundRows)
+			if ($this->useSqlCalcFoundRows) {
 				$select .= "SQL_CALC_FOUND_ROWS ";
-
-			$calcFoundRows=true;
-		}else
-		{
-			$calcFoundRows=false;
+			}
+			$calcFoundRows = true;
+		} else {
+			$calcFoundRows = false;
 		}
 
 //		$select .= "SQL_NO_CACHE ";
-		
-		
 
-		if(empty($params['fields']))
-			$params['fields']=$this->getDefaultFindSelectFields(isset($params['limit']) && $params['limit']==1);
-		else
+		if (empty($params['fields'])) {
+			$params['fields'] = $this->getDefaultFindSelectFields(isset($params['limit']) && $params['limit'] == 1);
+		} else {
 			go()->debug($params['fields']);
+		}
 
+		$fields = $params['fields'] . ' ';
 
-		$fields = $params['fields'].' ';
+		$joinRelationSelectFields = '';
+		$joinRelationjoins = '';
+		if (!empty($params['joinRelations'])) {
 
-		$joinRelationSelectFields='';
-		$joinRelationjoins='';
-		if(!empty($params['joinRelations'])){
-
-			foreach($params['joinRelations'] as $joinRelation){
+			foreach ($params['joinRelations'] as $joinRelation) {
 
 				$names = explode('.', $joinRelation['name']);
 				$relationModel = $this;
-				$relationAlias='t';
+				$relationAlias = 't';
 				$attributePrefix = '';
 
-				foreach($names as $name){
+				foreach ($names as $name) {
 					$r = $relationModel->getRelation($name);
 
-					$attributePrefix.=$name.'@';
+					$attributePrefix .= $name . '@';
 
-					if(!$r)
-						throw new \Exception("Can't join non existing relation '".$name.'"');
-
+					if (!$r) {
+						throw new \Exception("Can't join non existing relation '" . $name . '"');
+					}
 					$model = GO::getModel($r['model']);
-					$joinRelationjoins .= "\n".$joinRelation['type']." JOIN `".$model->tableName().'` `'.$name.'` ON (';
+					$joinRelationjoins .= "\n" . $joinRelation['type'] . " JOIN `" . $model->tableName() . '` `' . $name . '` ON (';
 
-					switch($r['type']){
+					switch ($r['type']) {
 						case self::BELONGS_TO:
-							$joinRelationjoins .= '`'.$name.'`.`'.$model->primaryKey().'`=`'.$relationAlias.'`.`'.$r['field'].'`';
-						break;
+							$joinRelationjoins .= '`' . $name . '`.`' . $model->primaryKey() . '`=`' . $relationAlias . '`.`' . $r['field'] . '`';
+							break;
 
 						case self::HAS_ONE:
 						case self::HAS_MANY:
-							if(is_array($r['field'])){
+							if (is_array($r['field'])) {
 								$conditions = array();
-								foreach($r['field'] as $my=>$foreign){
-									$conditions[]= '`'.$name.'`.`'.$foreign.'`=t.`'.$my.'`';
+								foreach ($r['field'] as $my => $foreign) {
+									$conditions[] = '`' . $name . '`.`' . $foreign . '`=t.`' . $my . '`';
 								}
 								$joinRelationjoins .= implode(' AND ', $conditions);
-							}else{
-								$joinRelationjoins .= '`'.$name.'`.`'.$r['field'].'`=t.`'.$this->primaryKey().'`';
+							} else {
+								$joinRelationjoins .= '`' . $name . '`.`' . $r['field'] . '`=t.`' . $this->primaryKey() . '`';
 							}
 							break;
 
 						default:
-							throw new \Exception("The relation type of ".$name." is not supported by joinRelation or groupRelation");
+							throw new \Exception("The relation type of " . $name . " is not supported by joinRelation or groupRelation");
 							break;
 					}
 
-					$joinRelationjoins .=') ';
+					$joinRelationjoins .= ') ';
 
 					//if a diffent fetch class is passed then we should not join the relational fields because it makes no sense.
 					//\GO\Base\Model\Grouped does this for example.
-					if(empty($params['fetchClass'])){
+					if (empty($params['fetchClass'])) {
 						$cols = $model->getColumns();
 
-						foreach($cols as $field=>$props){
-							$joinRelationSelectFields .=",\n`".$name.'`.`'.$field.'` AS `'.$attributePrefix.$field.'`';
+						foreach ($cols as $field => $props) {
+							$joinRelationSelectFields .= ",\n`" . $name . '`.`' . $field . '` AS `' . $attributePrefix . $field . '`';
 						}
 					}
 
-					$relationModel=$model;
-					$relationAlias=$name;
+					$relationModel = $model;
+					$relationAlias = $name;
 
 				}
 			}
 		}
 
-		
+
 		$joinCf = !empty($params['joinCustomFields']) && $this->hasCustomFields();
 
-		if($joinCf) {
-			$cfFieldModels = array_filter(static::getCustomFieldModels(), function($f) {
+		if ($joinCf) {
+			$cfFieldModels = array_filter(static::getCustomFieldModels(), function ($f) {
 				return $f->getDataType()->hasColumn();
 			});
-			
-			$names = array_map(function($f) {
-				if(empty($f->databaseName)) {
-					throw new Exception("Custom field ". $f->id ." has no databaseName");
+
+			$names = array_map(function ($f) {
+				if (empty($f->databaseName)) {
+					throw new Exception("Custom field " . $f->id . " has no databaseName");
 				}
 				return "cf." . $f->databaseName;
 			}, $cfFieldModels);
-			
-			if(!empty($names)) {
-				$fields .= ", " .implode(', ', $names);
+
+			if (!empty($names)) {
+				$fields .= ", " . implode(', ', $names);
 			}
 		}
 
 		$fields .= $joinRelationSelectFields;
 
-		if(!empty($params['groupRelationSelect'])){
-			$fields .= ",\n".$params['groupRelationSelect'];
+		if (!empty($params['groupRelationSelect'])) {
+			$fields .= ",\n" . $params['groupRelationSelect'];
 		}
 
-		$from = "\nFROM `".$this->tableName()."` t ".$joinRelationjoins;
+		$from = "\nFROM `" . $this->tableName() . "` t " . $joinRelationjoins;
 
 		$joins = "";
 		if (!empty($params['linkModel'])) { //passed in case of a MANY_MANY relation query
-      $linkModel = new $params['linkModel'];
-      $primaryKeys = $linkModel->primaryKey();
+			$linkModel = new $params['linkModel'];
+			$primaryKeys = $linkModel->primaryKey();
 
-			if(!is_array($primaryKeys))
-				throw new \Exception ("Fatal error: Primary key of linkModel '".$params['linkModel']."' in relation '".$params['relation']."' should be an array.");
+			if (!is_array($primaryKeys)) {
+				throw new \Exception ("Fatal error: Primary key of linkModel '" . $params['linkModel'] . "' in relation '" . $params['relation'] . "' should be an array.");
+			}
+			$remoteField = $primaryKeys[0] == $params['linkModelLocalField'] ? $primaryKeys[1] : $primaryKeys[0];
+			$joins .= "\nINNER JOIN `" . $linkModel->tableName() . "` link_t ON t.`" . $this->primaryKey() . "`= link_t." . $remoteField . ' ';
+		}
 
-      $remoteField = $primaryKeys[0]==$params['linkModelLocalField'] ? $primaryKeys[1] : $primaryKeys[0];
-      $joins .= "\nINNER JOIN `".$linkModel->tableName()."` link_t ON t.`".$this->primaryKey()."`= link_t.".$remoteField.' ';
-    }
 
-
-		if($joinCf)
-			$joins .= "\nLEFT JOIN `".$this->customFieldsTableName()."` cf ON cf.id=t.id ";
-
-		if(isset($aclJoinProps) && empty($params['ignoreAcl']))
+		if ($joinCf) {
+			$joins .= "\nLEFT JOIN `" . $this->customFieldsTableName() . "` cf ON cf.id=t.id ";
+		}
+		if (isset($aclJoinProps) && empty($params['ignoreAcl'])) {
 			$joins .= $this->_appendAclJoin($params, $aclJoinProps);
+		}
 
-		if(isset($params['join']))
-			$joins .= "\n".$params['join'];
+		if (!empty($params['searchQuery'])) {
+			$joins .= PHP_EOL . "INNER JOIN `core_search` cs ON t.id=cs.entityId ";
+		}
 
-			$where = "\nWHERE 1 ";
+		if (isset($params['join'])) {
+			$joins .= "\n" . $params['join'];
+		}
+		$where = "\nWHERE 1 ";
 
-		if(isset($params['criteriaObject'])){
+		if (isset($params['criteriaObject']) && !isset($params['searchQuery'])) {
 			$conditionSql = $params['criteriaObject']->getCondition();
-			if(!empty($conditionSql))
-				$where .= "\nAND".$conditionSql;
+			if (!empty($conditionSql)) {
+				$where .= "\nAND" . $conditionSql;
+			}
 		}
 
 		$where = self::_appendByParamsToSQL($where, $params);
 
-		if(isset($params['where']))
-			$where .= "\nAND ".$params['where'];
+		if (isset($params['where']) && !isset($params['searchQuery'])) {
+			$where .= "\nAND " . $params['where'];
+		}
+		if (isset($linkModel)) {
+			//$primaryKeys = $linkModel->primaryKey();
+			//$remoteField = $primaryKeys[0]==$params['linkModelLocalField'] ? $primaryKeys[1] : $primaryKeys[0];
+			$where .= " \nAND link_t.`" . $params['linkModelLocalField'] . "` = " . intval($params['linkModelLocalPk']) . " ";
+		}
 
-    if(isset($linkModel)){
-      //$primaryKeys = $linkModel->primaryKey();
-      //$remoteField = $primaryKeys[0]==$params['linkModelLocalField'] ? $primaryKeys[1] : $primaryKeys[0];
-      $where .= " \nAND link_t.`".$params['linkModelLocalField']."` = ".intval($params['linkModelLocalPk'])." ";
-    }
+		if (!empty($params['searchQuery'])) {
+			$where .= PHP_EOL . "AND cs.entityTypeId=" . $this->entityType()->getId() . " AND (";
 
-		if(!empty($params['searchQuery'])){
-			$where .= " \nAND (";
-
-			if(empty($params['searchQueryFields'])){
-				$searchFields = $this->getFindSearchQueryParamFields('t',$joinCf);
-			}else{
+			if (empty($params['searchQueryFields'])) {
+				$searchFields = $this->getFindSearchQueryParamFields('t', $joinCf);
+			} else {
 				$searchFields = $params['searchQueryFields'];
 			}
 
-
-			if(empty($searchFields))
-				throw new \Exception("No automatic search fields defined for ".$this->className().". Maybe this model has no varchar fields? You can override function getFindSearchQueryParamFields() or you can supply them with FindParams::searchFields()");
-
+			if (empty($searchFields)) {
+				throw new \Exception("No automatic search fields defined for " . $this->className() . ". Maybe this model has no varchar fields? You can override function getFindSearchQueryParamFields() or you can supply them with FindParams::searchFields()");
+			}
 			//`name` LIKE "test" OR `content` LIKE "test"
 
 			$first = true;
-			foreach($searchFields as $searchField){
-				if($first){
-					$first=false;
-				}else
-				{
+			foreach ($searchFields as $searchField) {
+				if ($first) {
+					$first = false;
+				} else {
 					$where .= ' OR ';
 				}
-				$where .= $searchField.' LIKE '.$this->getDbConnection()->quote($params['searchQuery'], PDO::PARAM_STR);
+				$where .= $searchField . ' LIKE ' . $this->getDbConnection()->quote($params['searchQuery'], PDO::PARAM_STR);
 			}
 
-			if($this->primaryKey()=='id'){
+			if ($this->primaryKey() == 'id') {
 				//Searc on exact ID match too.
-				$idQuery = trim($params['searchQuery'],'% ');
-				if(intval($idQuery)."" === $idQuery){
-					if($first){
-						$first=false;
-					}else
-					{
+				$idQuery = trim($params['searchQuery'], '% ');
+				if (intval($idQuery) . "" === $idQuery) {
+					if ($first) {
+						$first = false;
+					} else {
 						$where .= ' OR ';
 					}
 
-					$where .= 't.id='.intval($idQuery);
+					$where .= 't.id=' . intval($idQuery);
 				}
 			}
 
 			$where .= ') ';
 		}
 
-		$group="";
-		if($this->aclField() && empty($params['ignoreAcl']) && (empty($params['limit']) || $params['limit']!=1)){
+		$group = "";
+		if ($this->aclField() && empty($params['ignoreAcl']) && (empty($params['limit']) || $params['limit'] != 1)) {
 
 			//add group by pk so acl join won't return duplicate rows. Don't do this with limit=1 because that makes no sense and causes overhead.
 
 			$pk = is_array($this->primaryKey()) ? $this->primaryKey() : array($this->primaryKey());
 
-			$group .= "\nGROUP BY t.`".implode('`,t.`', $pk)."` ";
-			if(isset($params['group']))
+			$group .= "\nGROUP BY t.`" . implode('`,t.`', $pk) . "` ";
+			if (isset($params['group']))
 				$group .= ", ";
 
 
-		}elseif(isset($params['group'])){
+		} elseif (isset($params['group'])) {
 			$group .= "\nGROUP BY ";
 		}
 
-		if(isset($params['group'])){
-			if(!is_array($params['group']))
-				$params['group']=array($params['group']);
-
-			for($i=0;$i<count($params['group']);$i++){
-				if($i>0)
+		if (isset($params['group'])) {
+			if (!is_array($params['group'])) {
+				$params['group'] = array($params['group']);
+			}
+			for ($i = 0; $i < count($params['group']); $i++) {
+				if ($i > 0) {
 					$group .= ', ';
-
-				$group .= $this->_quoteColumnName($params['group'][$i]).' ';
+				}
+				$group .= $this->_quoteColumnName($params['group'][$i]) . ' ';
 			}
 		}
 
-		if(isset($params['having']))
-			$group.="\nHAVING ".$params['having'];
+		if (isset($params['having'])) {
+			$group .= "\nHAVING " . $params['having'];
+		}
 
-
-		$order="";
-		if(!empty($params['order'])){
+		$order = "";
+		if (!empty($params['order'])) {
 			$order .= "\nORDER BY ";
 
-			if(!is_array($params['order']))
-				$params['order']=array($params['order']);
+			if (!is_array($params['order']))
+				$params['order'] = array($params['order']);
 
-			if(!isset($params['orderDirection'])){
-				$params['orderDirection']=array('ASC');
-			}elseif(!is_array($params['orderDirection'])){
-				$params['orderDirection']=array($params['orderDirection']);
+			if (!isset($params['orderDirection'])) {
+				$params['orderDirection'] = array('ASC');
+			} elseif (!is_array($params['orderDirection'])) {
+				$params['orderDirection'] = array($params['orderDirection']);
 			}
 
-			for($i=0;$i<count($params['order']);$i++){
-				if($i>0)
+			for ($i = 0; $i < count($params['order']); $i++) {
+				if ($i > 0)
 					$order .= ',';
 
 				if ($params['order'][$i] instanceof \go\core\db\Expression) {
-				//if(strpos($params['order'][$i], '(')!==false) {
-					$order .= $params['order'][$i].' ';
+					//if(strpos($params['order'][$i], '(')!==false) {
+					$order .= $params['order'][$i] . ' ';
 				} else {
-					$order .= $this->_quoteColumnName($params['order'][$i]).' ';
-					if(isset($params['orderDirection'][$i])){
-						$order .= strtoupper($params['orderDirection'][$i])=='ASC' ? 'ASC ' : 'DESC ';
-					}else{
-						$order .= strtoupper($params['orderDirection'][0])=='ASC' ? 'ASC ' : 'DESC ';
+					$order .= $this->_quoteColumnName($params['order'][$i]) . ' ';
+					if (isset($params['orderDirection'][$i])) {
+						$order .= strtoupper($params['orderDirection'][$i]) == 'ASC' ? 'ASC ' : 'DESC ';
+					} else {
+						$order .= strtoupper($params['orderDirection'][0]) == 'ASC' ? 'ASC ' : 'DESC ';
 					}
 				}
 			}
 		}
 
-		$limit="";
-		if(!empty($params['limit'])){
-			if(!isset($params['start']))
-				$params['start']=0;
+		$limit = "";
+		if (!empty($params['limit'])) {
+			if (!isset($params['start'])) {
+				$params['start'] = 0;
+			}
 
-			$limit .= "\nLIMIT ".intval($params['start']).','.intval($params['limit']);
+			$limit .= "\nLIMIT " . intval($params['start']) . ',' . intval($params['limit']);
 		}
 
 
-		$sql = $select.$fields.$from.$joins.$where.$group.$order.$limit;
-		if($this->_debugSql)
+		$sql = $select . $fields . $from . $joins . $where . $group . $order . $limit;
+		if ($this->_debugSql) {
 			$this->_debugSql($params, $sql);
+		}
 
-
-		try{
-
-
-			if($this->_debugSql)
+		try {
+			if ($this->_debugSql) {
 				$start = \GO\Base\Util\Date::getmicrotime();
-
+			}
 			$result = $this->getDbConnection()->prepare($sql);
 
-			if(isset($params['criteriaObject'])){
+			if (isset($params['criteriaObject'])) {
 				$criteriaObjectParams = $params['criteriaObject']->getParams();
 
-				foreach($criteriaObjectParams as $param=>$value)
+				foreach ($criteriaObjectParams as $param => $value)
 					$result->bindValue($param, $value[0], $value[1]);
 
 				$result->execute();
-			}elseif(isset($params['bindParams'])){
+			} elseif (isset($params['bindParams'])) {
 				$result = $this->getDbConnection()->prepare($sql);
 				$result->execute($params['bindParams']);
-			}else
-			{
+			} else {
 				$result = $this->getDbConnection()->query($sql);
 			}
 
-			if($this->_debugSql){
+			if ($this->_debugSql) {
 				$end = \GO\Base\Util\Date::getmicrotime();
-				GO::debug("SQL Query took: ".($end-$start));
+				GO::debug("SQL Query took: " . ($end - $start));
 			}
 
-		}catch(\Exception $e){
+		} catch (\Exception $e) {
 			$msg = $e->getMessage();
 
-			if(GO::config()->debug){
-				$msg .= "\n\nFull SQL Query: ".$sql;
+			if (GO::config()->debug) {
+				$msg .= "\n\nFull SQL Query: " . $sql;
 
-				if(isset($params['bindParams'])){
-					$msg .= "\nBind params: ".var_export($params['bindParams'], true);
+				if (isset($params['bindParams'])) {
+					$msg .= "\nBind params: " . var_export($params['bindParams'], true);
 				}
 
-				if(isset($criteriaObjectParams)){
-					$msg .= "\nBind params: ".var_export($criteriaObjectParams, true);
+				if (isset($criteriaObjectParams)) {
+					$msg .= "\nBind params: " . var_export($criteriaObjectParams, true);
 				}
 
-				$msg .= "\n\n".$e->getTraceAsString();
+				$msg .= "\n\n" . $e->getTraceAsString();
 
 				GO::debug($msg);
 			}
 
 			//SQLSTATE[42S22]: Column not found: 1054 Unknown column 'progress' in 'order clause
-			if(strpos($msg, 'order clause')!==false && strpos($msg, 'Unknown column')!==false)
-			{
+			if (strpos($msg, 'order clause') !== false && strpos($msg, 'Unknown column') !== false) {
 				$msg = GO::t("Sorry, you can't sort on that column. Please click on another column header in the grid for sorting.");
 			}
 
@@ -1598,71 +1594,59 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$AS = new ActiveStatement($result, $this);
 
-
-		if(!empty($params['calcFoundRows'])){
-			if(!empty($params['limit'])){
+		if (!empty($params['calcFoundRows'])) {
+			if (!empty($params['limit'])) {
 
 				//Total numbers are cached in session when browsing through pages.
-				if($calcFoundRows){
+				if ($calcFoundRows) {
 
-					if($this->useSqlCalcFoundRows){
+					if ($this->useSqlCalcFoundRows) {
 //					//TODO: This is MySQL only code
 						$sql = "SELECT FOUND_ROWS() as found;";
 						$r2 = $this->getDbConnection()->query($sql);
 						$record = $r2->fetch(PDO::FETCH_ASSOC);
 						//$foundRows = intval($record['found']);
-						$foundRows = GO::session()->values[$queryUid]=intval($record['found']);
-					}else{
-						$countField = is_array($this->primaryKey()) ? '*' : 't.'.$this->primaryKey();
+						$foundRows = GO::session()->values[$queryUid] = intval($record['found']);
+					} else {
+						$countField = is_array($this->primaryKey()) ? '*' : 't.' . $this->primaryKey();
 
-						$sql = $select.'COUNT('.$countField.') AS found '.$from.$joins.$where;
-
-//						GO::debug($sql);
-
-						if($this->_debugSql){
+						$sql = $select . 'COUNT(' . $countField . ') AS found ' . $from . $joins . $where;
+						if ($this->_debugSql) {
 							$this->_debugSql($params, $sql);
 							$start = \GO\Base\Util\Date::getmicrotime();
 						}
 
 						$r2 = $this->getDbConnection()->prepare($sql);
 
-						if(isset($params['criteriaObject'])){
+						if (isset($params['criteriaObject'])) {
 							$criteriaObjectParams = $params['criteriaObject']->getParams();
 
-							foreach($criteriaObjectParams as $param=>$value)
+							foreach ($criteriaObjectParams as $param => $value)
 								$r2->bindValue($param, $value[0], $value[1]);
 
 							$r2->execute();
-						}elseif(isset($params['bindParams'])){
+						} elseif (isset($params['bindParams'])) {
 							$r2 = $this->getDbConnection()->prepare($sql);
 							$r2->execute($params['bindParams']);
-						}else
-						{
+						} else {
 							$r2 = $this->getDbConnection()->query($sql);
 						}
 
-						if($this->_debugSql){
+						if ($this->_debugSql) {
 							$end = \GO\Base\Util\Date::getmicrotime();
-							GO::debug("SQL Count Query took: ".($end-$start));
+							GO::debug("SQL Count Query took: " . ($end - $start));
 						}
 
 						$record = $r2->fetch(PDO::FETCH_ASSOC);
 
-
-
-
-
 						//$foundRows = intval($record['found']);
-						$foundRows = GO::session()->values[$queryUid]=intval($record['found']);
+						$foundRows = GO::session()->values[$queryUid] = intval($record['found']);
 					}
-				}
-				else
-				{
-					$foundRows=GO::session()->values[$queryUid];
+				} else {
+					$foundRows = GO::session()->values[$queryUid];
 				}
 
-
-				$AS->foundRows=$foundRows;
+				$AS->foundRows = $foundRows;
 			}
 		}
 
@@ -1672,17 +1656,17 @@ abstract class ActiveRecord extends \GO\Base\Model{
 //		else
 //			$result->setFetchMode (PDO::FETCH_ASSOC);
 
-    //TODO these values should be set on findByPk too.
-    $AS->findParams=$params;
-    if(isset($params['relation']))
-      $AS->relation=$params['relation'];
+		//TODO these values should be set on findByPk too.
+		$AS->findParams = $params;
+		if (isset($params['relation'])) {
+			$AS->relation = $params['relation'];
+		}
 
-
-		if(!empty($params['fetchClass'])){
+		if (!empty($params['fetchClass'])) {
 			$AS->stmt->setFetchMode(PDO::FETCH_CLASS, $params['fetchClass']);
 		}
 
-    return $AS;
+		return $AS;
 	}
 
 	public function hasCustomFields() {
@@ -1802,29 +1786,34 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 	/**
 	 * Override this method to supply the fields that the searchQuery argument
-	 * will usein the find function.
+	 * will use in the find function.
 	 *
 	 * By default all fields with type PDO::PARAM_STR are returned
 	 *
 	 * @return array Field names that should be used for the search query.
 	 */
-	public function getFindSearchQueryParamFields($prefixTable='t', $withCustomFields=false){
+	public function getFindSearchQueryParamFields($prefixTable='t', $withCustomFields=false)
+	{
+		return ['`cs`.`keywords`'];
+		/*
 		//throw new \Exception('Error: you supplied a searchQuery parameter to find but getFindSearchQueryParamFields() should be overriden in '.$this->className());
 		$fields = array();
 		foreach($this->columns as $field=>$attributes){
-			
-			if($field != 'uuid'){ 
+
+			if($field != 'uuid'){
 				if(isset($attributes['gotype']) && ($attributes['gotype']=='textfield' || ($attributes['gotype']=='customfield' && $attributes['customfield']->customfieldtype->includeInSearches()))){
 					$fields[]='`'.$prefixTable.'`.`'.$field.'`';
 				}
 			}
 		}
 
-//		if($withCustomFields && GO::modules()->customfields && $this->customfieldsRecord  && GO::modules()->customfields->permissionLevel)
-//		{
-//			$fields = array_merge($fields, $this->customfieldsRecord->getFindSearchQueryParamFields('cf'));
-//		}
+		if($withCustomFields && GO::modules()->customfields && $this->customfieldsRecord  && GO::modules()->customfields->permissionLevel)
+		{
+			$fields = array_merge($fields, $this->customfieldsRecord->getFindSearchQueryParamFields('cf'));
+		}
+
 		return $fields;
+		*/
 	}
 
 	private function _appendPkSQL($sql, $primaryKey=false){
@@ -1852,8 +1841,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 				$sql .= "`".$field.'`='.$this->getDbConnection()->quote($value, $this->columns[$field]['type']);
 			}
-		}else
-		{
+		} else {
 			
 			//TODO: WHY ARE WE SETTING THIS????
 			$this->{$this->primaryKey()}=$primaryKey;
@@ -1870,24 +1858,22 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * @param int $primaryKey
 	 * @return static
 	 */
-
-	public function findByPk($primaryKey, $findParams=false, $ignoreAcl=false, $noCache=false){
-
+	public function findByPk($primaryKey, $findParams=false, $ignoreAcl=false, $noCache=false)
+	{
 //		if(GO::config()->debug && $findParams != false){
 //			throw new \Exception('Adding findparams to findByPk is not yet available');
 //		}
 		
 //		GO::debug($this->className()."::findByPk($primaryKey)");
-		if(empty($primaryKey))
+		if(empty($primaryKey)) {
 			return false;
-
+		}
 		//Use cache so identical findByPk calls are only executed once per script request
-		if(!$noCache){
+		if (!$noCache) {
 			$cachedModel =  GO::modelCache()->get($this->className(), $primaryKey);
 //			GO::debug("Cached : ".$this->className()."::findByPk($primaryKey)");
 			if($cachedModel){
-
-				if($cachedModel && !$ignoreAcl && !$cachedModel->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)){
+				if($cachedModel && !$ignoreAcl && !$cachedModel->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
 					$msg = GO::config()->debug ? $this->className().' pk: '.var_export($this->getPk(), true) : '';
 					throw new \GO\Base\Exception\AccessDenied($msg);
 				}
@@ -1900,12 +1886,11 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$sql = $this->_appendPkSQL($sql, $primaryKey);
 
-//		GO::debug("DEBUG SQL: ".var_export($this->_debugSql, true));
+		if($this->_debugSql) {
+			GO::debug($sql);
+		}
 
-		if($this->_debugSql)
-				GO::debug($sql);
-
-		try{
+		try {
 			$result = $this->getDbConnection()->query($sql);
 			$result->model=$this;
 			$result->findParams=$findParams;
@@ -1914,7 +1899,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 			$models =  $result->fetchAll();
 			$model = isset($models[0]) ? $models[0] : false;
-		}catch(PDOException $e){
+		} catch(PDOException $e){
 			$msg = $e->getMessage()."\n\nFull SQL Query: ".$sql;
 
 			throw new \Exception($msg);
@@ -3581,11 +3566,12 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 *
 	 * @return boolean
 	 */
-	public function cacheSearchRecord(){
-
+	public function cacheSearchRecord()
+	{
 		//don't do this on datbase checks.
-		if(GO::router()->getControllerAction()=='checkdatabase')
+		if(GO::router()->getControllerAction()=='checkdatabase') {
 			return false;
+		}
 
 		$attr = $this->getCacheAttributes();
 		if(!$attr) {		
@@ -3600,7 +3586,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		
 		if(isset($attr['mtime'])) {
 			$attr['modifiedAt'] = \DateTime::createFromFormat("U", $attr['mtime']);
-
 		} else {
 			$attr['modifiedAt'] = \DateTime::createFromFormat("U", $this->mtime);
 		}
@@ -3742,8 +3727,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * @param String $prepend
 	 * @return String
 	 */
-	public function getSearchCacheKeywords($prepend=''){
-		$keywords=array();
+	public function getSearchCacheKeywords(string $prepend='') :string
+	{
+		$keywords = array();
 
 		foreach($this->columns as $key=>$attr)
 		{
@@ -4806,10 +4792,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 
-	public function rebuildSearchCache() {		
-		
-		
-				
+	public function rebuildSearchCache()
+	{
 		$rc = new \GO\Base\Util\ReflectionClass($this);
 		$overriddenMethods = $rc->getOverriddenMethods();
 		if(in_array("getCacheAttributes", $overriddenMethods)){
