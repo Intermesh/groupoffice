@@ -1,8 +1,12 @@
+??-07-2020 6.4.159
+- Core: pre-6.4 ActiveRecord find function will use core_search;
+- Projects: generate proper keywords for search function;
+
 13-07-2020 6.4.158
 - Core: Updated German translation
 - Files: Fixed minor bug in download function
 - Core: Fixed rendering of yesNo custom fields in grid and detail panel.
-- LDAP: Created multiple acocunts when using email for username
+- LDAP: Created multiple accounts when using email for username
 - Files: Fixed folder upload problem where previous folder upload was created empty on a second upload
 
 13-07-2020 6.4.157
