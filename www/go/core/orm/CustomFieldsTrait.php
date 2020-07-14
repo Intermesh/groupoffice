@@ -230,7 +230,8 @@ trait CustomFieldsTrait {
 			}			
 			
 			if($this->customFieldsIsNew) {
-				if(!empty($record)) {								
+
+				//if(!empty($record)) { //always create record for select fields with foreign keys!
 					$record['id'] = $this->id;	
 					if(!App::get()
 									->getDbConnection()
@@ -238,7 +239,7 @@ trait CustomFieldsTrait {
 									return false;
 					}
 					$this->customFieldsIsNew = false;
-				}
+				//}
 			} else
 			{
 				unset($record['id']);
