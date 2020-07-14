@@ -12,4 +12,4 @@ $theme = $_GET['theme'] ?? 'Paper';
 $webclient = Extjs3::get();
 $webclient->getCSSFile($theme)->output(true, true, [
 	"Expires" => (new DateTime("1 year"))->format("D, j M Y H:i:s")
-]);
+], true);

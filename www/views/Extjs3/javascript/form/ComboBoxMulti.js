@@ -72,6 +72,10 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 
 		syncHeight: function () {
 
+			if(!this.el) {
+				return;
+			}
+
 			this.el.dom.style.overflowY = 'auto';
 			var changed = false;
 			if (this.el.dom.offsetHeight > this.growMin) {

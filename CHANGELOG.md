@@ -1,7 +1,17 @@
--07-2020 6.4.158
+14-07-2020 6.4.159
+- Billing: fixed problem where items grid wouldn't load anymore
+- E-mail: Drag and drop caused jump to page 1 in list
+- Core: pre-6.4 ActiveRecord find function will use core_search;
+- Projects: generate proper keywords for search function;
+- Documents: Implemented filters in file search module and added custom fields back into edit panel
+- Custom fields: Save failed when custom fields had only a select fields.
+
+13-07-2020 6.4.158
+- Core: Updated German translation
 - Files: Fixed minor bug in download function
 - Core: Fixed rendering of yesNo custom fields in grid and detail panel.
-
+- LDAP: Created multiple accounts when using email for username
+- Files: Fixed folder upload problem where previous folder upload was created empty on a second upload
 
 13-07-2020 6.4.157
 - Core: Added some common file type icons

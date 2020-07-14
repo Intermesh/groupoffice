@@ -4284,6 +4284,3 @@
 	return Autolinker;
 
 }));
-
-
-//# sourceMappingURL=Autolinker.js.map
