@@ -287,7 +287,7 @@ GO.email.AccountsTree = function(config){
 					this.mainPanel.messagesGrid.store.baseParams['messages']=Ext.encode(messages);
 
 					this.mainPanel.messagesGrid.getView().scrollToTopOnLoad = false;
-					this.mainPanel.messagesGrid.store.load({
+					this.mainPanel.messagesGrid.store.reload({
 						callback:function(){
 							if(this.mainPanel.messagePanel.uid && !this.mainPanel.messagesGrid.store.getById(this.mainPanel.messagePanel.uid))
 							{
