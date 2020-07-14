@@ -1,7 +1,11 @@
 /* global go, Ext */
 
 go.Entities = (function () {
-  
+
+	/**
+	 *
+	 * @type {go.Entity}
+	 */
   var entities = {};
 
   
@@ -28,17 +32,7 @@ go.Entities = (function () {
 				}
 				
 				if(entity.customFields) {
-					var existingNames = entity.filters.column("name");
-					var customFieldFilters = go.customfields.CustomFields.getFilters(entity.name);
-					customFieldFilters = customFieldFilters.filter(function(f) {
-						var exists = existingNames.indexOf(f.name) > -1;
-						if(exists) {
-							console.warn("Custom field name " + f.name+ " can't be filtered as the name conflicts with an existing filter for entity " + entity.name);
-						}
-						return !exists;
-
-					});
-					entity.filters = entity.filters.concat(customFieldFilters);
+					entity.applyCustomFieldFilters();
 				}
 
 				entity.filters =  go.util.Filters.normalize(entity.filters);		
@@ -47,6 +41,7 @@ go.Entities = (function () {
 				entity.relations.customFields = go.customfields.CustomFields.getRelations(entity.name);
 			});
 		},
+
 
     /**
      * Register an entity

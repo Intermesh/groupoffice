@@ -81,7 +81,7 @@ class VCard extends AbstractConverter {
 		$vcard->N = $contact->isOrganization ? [$contact->name] : [$contact->lastName, $contact->firstName, $contact->middleName, $contact->prefixes, $contact->suffixes];
 		$vcard->FN = $contact->name;
 		$vcard->REV = $contact->modifiedAt->getTimestamp();
-		$vcard->TITLE = $contact->jobTitle;
+		$vcard->TITLE = (string) $contact->jobTitle;
 
 		foreach ($contact->emailAddresses as $emailAddr) {
 			$vcard->add('EMAIL', $emailAddr->email, ['TYPE' => [$emailAddr->type]]);
@@ -128,8 +128,8 @@ class VCard extends AbstractConverter {
 			$vcard->{"X-GO-IS-ORGANIZATION"} = 1;
 		}
 
-		$vcard->NOTE = $contact->notes;
-		$vcard->{"X-GO-GENDER"} = $contact->gender;
+		$vcard->NOTE = (string) $contact->notes;
+		$vcard->{"X-GO-GENDER"} = (string) $contact->gender;
 		
 
 		$blob = isset($contact->photoBlobId) ? Blob::findById($contact->photoBlobId) : false;
