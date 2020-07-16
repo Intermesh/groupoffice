@@ -16863,18 +16863,6 @@ Ext.layout.HBoxLayout = Ext.extend(Ext.layout.BoxLayout, {
             leftOffset += calcs.width + childMargins.right;
         }
 
-        console.warn({
-					boxes: boxes,
-					meta: {
-						maxHeight: maxHeight,
-						nonFlexWidth: nonFlexWidth,
-						desiredWidth: desiredWidth,
-						minimumWidth: minimumWidth,
-						shortfall: desiredWidth - width,
-						tooNarrow: tooNarrow
-					}
-				});
-
         return {
             boxes: boxes,
             meta : {
