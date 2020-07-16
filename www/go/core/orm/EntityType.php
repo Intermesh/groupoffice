@@ -495,7 +495,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		 */
 		$modSeq = (new Query())
 						->selectSingleValue("highestModSeq")
-						->from("core_entity")
+						->from("core_entity", 'entity')
 						->where(["id" => $this->id])
 						->forUpdate()
 						->single();
@@ -505,7 +505,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 						->update(
 										"core_entity", 
 										['highestModSeq' => $modSeq],
-										["id" => $this->id]
+										\go\core\orm\Query::normalize(["id" => $this->id])->tableAlias('entity')
 						)->execute(); //mod seq is a global integer that is incremented on any entity update
 	
 		$this->modSeqIncremented = true;
