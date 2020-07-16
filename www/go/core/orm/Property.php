@@ -1579,8 +1579,10 @@ abstract class Property extends Model {
 				if($table->isUserTable) {
 					$keys['userId'] = go()->getUserId();
 				}
+
+				$query = Query::normalize($keys)->tableAlias($table->getAlias());
 				
-				$stmt = App::get()->getDbConnection()->update($table->getName(), $modifiedForTable, $keys);
+				$stmt = App::get()->getDbConnection()->update($table->getName(), $modifiedForTable, $query);
 				if (!$stmt->execute()) {
 					throw new Exception("Could not execute update query");
 				}				
