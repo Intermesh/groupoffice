@@ -319,20 +319,24 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					},{
 						iconCls: "ic-attach-file",
 						text: t("Send") + " (vCard)",
-						handler: function (elem,e) {
+						handler: function () {
+							Ext.getBody().mask(t("Exporting..."));
 							go.Jmap.request({
-								method: "Contact/saveVCF",
+								method: "Contact/export",
 								params: {
-									contact_id: this.data.id,
-									filename: this.data.id +"-"+ this.data.name.replace('/\W/g','_'),
-									path: 'vcard'
+									extension: 'vcf',
+									ids: [this.data.id]
 								},
 								scope: this,
-								callback: function(options, success, response) {
+								callback: function (options, success, response) {
+									Ext.getBody().unmask();
 									if(!success) {
-										Ext.MessageBox.alert(t("Error"), t("Error exporting vcard"));
+										Ext.MessageBox.alert(t("Error"), response.message);
 									} else {
-										GO.email.emailFiles(response);
+										var c = GO.email.showComposer(),b=response.blob;
+										c.on('dialog_ready', function() {
+											c.emailEditor.attachmentsView.addFiles([c.emailEditor.addBlob(b)]);
+										},this,{single:true});
 									}
 								}
 							});

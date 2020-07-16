@@ -875,7 +875,7 @@ abstract class EntityController extends Controller {
 		
 		$blob = $convertor->exportToBlob($name, $entities);
 		
-		return ['blobId' => $blob->id];		
+		return ['blobId' => $blob->id, 'blob' => $blob->toArray()];
 	}
 
   /**

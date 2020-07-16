@@ -127,47 +127,5 @@ EOT;
 		return ['blobId' => $blob->id];
 
 	}
-
-	/**
-	 * Save a VCF file in order to be able to mail it
-	 *
-	 * @param array $params
-	 * @return array
-	 * @throws \GO\Base\Exception\NotFound
-	 */
-	public function saveVCF(array $params) :array
-	{
-		$card = new VCard();
-		if (!empty($params['contact_id'])) {
-			$contact = model\Contact::findById($params['contact_id']);
-			if (!$contact) {
-				throw new \GO\Base\Exception\NotFound();
-			}
-		}
-
-		// TODO: Save into personal folder?
-		$contents = $card->export($contact);
-		$file = new \GO\Base\Fs\File(go()->getDataFolder()->getFile($params['path'] . '/' . $params['filename'] . '.' . $card->getFileExtension()));
-		if (!$file->exists()) {
-			$file->touch(true);
-		}
-		$file->putContents(\GO\Base\Util\StringHelper::clean_utf8($contents));
-
-		$folder = \GO\Files\Model\Folder::model()->findByPath($file->parent()->stripFileStoragePath(),true);
-		if($folder->hasFile($file->name())) {
-			$fileModel = \GO\Files\Model\File::model()->findByPath($params['path'] . '/' . $params['filename'] . '.' . $card->getFileExtension());
-		} else {
-			$fileModel = $folder->addFile($file->name());
-		}
-		$fileModel->save(); // to take into account any intermediate changes
-		return [
-			'success' => true,
-			'file_id' => $fileModel->id,
-			'path' => $fileModel->path,
-			'size' => $fileModel->size,
-			'name' => $fileModel->name,
-			'extension' => $fileModel->extension
-		];
-	}
 }
 

@@ -234,14 +234,14 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 					var records = av.store.getRange();
 					
 					this.attachments=[];
-					for(var i=0;i<records.length;i++)
+					for(var i=0, l=records.length;i<l;i++) {
 						this.attachments.push({
-							tmp_file:records[i].data.tmp_file,
+							tmp_file: records[i].data.tmp_file,
 							from_file_storage: records[i].data.from_file_storage,
-							fileName:records[i].data.name,
+							fileName: records[i].data.name,
 							blobId: records[i].data.blobId
 						});
-					
+					}
 					this.hiddenAttachmentsField.setValue(Ext.encode(this.attachments));
 				},
 				scope:this
@@ -258,18 +258,21 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			return;
 		}
 
-		var items = [{
-			human_size: Ext.util.Format.fileSize(blob.size),
-			extension: blob.name.split('.').pop().toLowerCase(),
-			size: blob.size,
-			type: blob.type,
-			name: blob.name,
-			fileName: blob.name,
-			from_file_storage: false,
-			blobId: blob.blobId
-		}];
+		this.attachmentsView.addFiles([this.addBlob(blob)]);
+	},
 
-		this.attachmentsView.addFiles(items);
+	addBlob: function(b) {
+		return {
+			human_size: Ext.util.Format.fileSize(b.size),
+			extension: b.name.split('.').pop().toLowerCase(),
+			size: b.size,
+			type: b.type,
+			name: b.name,
+			fileName: b.name,
+			from_file_storage: false,
+			tmp_file: b.tmp_file,
+			blobId: b.id
+		}
 	},
 	
 	reset : function(){
@@ -437,7 +440,6 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 								blobId: blobs[i].blobId
 							});
 						}
-						//debugger;
 						this.attachmentsView.addFiles(items);
 					},
 					scope: this
