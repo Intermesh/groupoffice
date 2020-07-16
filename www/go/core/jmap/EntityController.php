@@ -541,6 +541,12 @@ abstract class EntityController extends Controller {
 			}
 
 			if ($entity->save()) {
+
+				//refetch from server when mapping has a query object.
+				if($entity::getMapping()->getQuery() != null) {
+					$entity = $this->getEntity($entity->id());
+				}
+
 				$entityProps = new ArrayObject($entity->toArray());
 				$diff = $entityProps->diff($properties);
 				$diff['id'] = $entity->id();
@@ -627,6 +633,11 @@ abstract class EntityController extends Controller {
 				$result['notUpdated'][$id]->properties = array_keys($entity->getValidationErrors());
 				$result['notUpdated'][$id]->validationErrors = $entity->getValidationErrors();				
 				continue;
+			}
+
+			//refetch from server when mapping has a query object.
+			if($entity::getMapping()->getQuery() != null) {
+				$entity = $this->getEntity($id);
 			}
 			
 			//The server must return all properties that were changed during a create or update operation for the JMAP spec
