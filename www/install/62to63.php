@@ -8,7 +8,8 @@ App::get()->getCache()->flush(false);
 App::get()->getDatabase()->setUtf8();
 
 $qs[] = "DROP TRIGGER IF EXISTS `Create ACL`;";
-$qs[] = "CREATE TRIGGER `Create ACL` BEFORE INSERT ON `go_groups` FOR EACH ROW BEGIN INSERT INTO `go_acl_items` (`ownedBy`, `description`) VALUES (NEW.createdBy, 'go_groups.aclId'); set NEW.aclId = (SELECT last_insert_id()); END";
+$qs[] = "CREATE TRIGGER `__test__` BEFORE INSERT ON `go_users` FOR EACH ROW set NEW.lastlogin = NOW();";
+$qs[] = "DROP TRIGGER IF EXISTS `__test__`;";
 
 $qs[] = "DROP TABLE IF EXISTS `go_mail_counter`;";
 $qs[] = function () {
@@ -113,8 +114,9 @@ $qs[] = "ALTER TABLE `go_acl` CHANGE `group_id` `groupId` INT(11) NOT NULL DEFAU
 $qs[] = "ALTER TABLE `go_acl` CHANGE `acl_id` `aclId` INT(11) NOT NULL;";
 $qs[] = "ALTER TABLE `go_groups` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;";
 
+$qs[] = "CREATE TRIGGER `Create ACL` BEFORE INSERT ON `go_groups` FOR EACH ROW BEGIN INSERT INTO `go_acl_items` (`ownedBy`, `description`) VALUES (NEW.createdBy, 'go_groups.aclId'); set NEW.aclId = (SELECT last_insert_id()); END";
 $qs[] = "insert into go_groups (name, createdBy, isUserGroupFor) select username,id,id from go_users;";
-$qs[] = "DROP TRIGGER IF EXISTS `Create ACL`;";
+$qs[] = "DROP TRIGGER `Create ACL`;";
 
 
 $qs[] = "ALTER TABLE `go_acl` DROP PRIMARY KEY;";
