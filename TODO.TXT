@@ -2,11 +2,17 @@ Roadmap
 
 - Tasks module with kanban support
 - Time tracking
+ - Time entity entity can be linked to anything
+ - Any item with time entries shows a summary too.
+ - Items can be invoiced just like projects -> more menu -> invoice
+
+- Tickets module (extension for tasks)
 - Billing module refactor
     - JMAP
     - Debtor management
     - PayPal and other payment provider integration
     - Integrate accountant packages. Invoice Sync API
+    - Item with links to invoices shows summary too
 
 - Email module
  - JMAP
@@ -29,7 +35,7 @@ Roadmap
     - permissions per account?
     - DKIM generator and implementation
 
-- Tickets module
+
 - Rocket chat
     - Live chat on sites feed back into GO
     - Notifications from GO to RC
