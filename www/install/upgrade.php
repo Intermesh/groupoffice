@@ -47,16 +47,16 @@ try {
 		echo '<a class="button" href="?confirmed=1">Upgrade database</a>';
 	} elseif (!isset($_GET['ignore']) && count($unavailable)) {
 	
-		echo "<h2>". go()->t("Upgrade Group-Office") ."</h2><pre>";
+		echo "<h2>". go()->t("Upgrade Group-Office") ."</h2>";
 
-		echo "The following modules are not available because they're missing on disk\n"
-		. "or you've got an <b>invalid or missing license file</b>: \n"
-		. "<ul style=\"font-size:1.5em\"><li>" . implode("</li><li>", array_map(function($a){return ($a['package'] ?? "legacy") .'/'.$a['name'];}, $unavailable)) . "</li></ul>"
-		. "Please install the license file(s) and refresh this page or disable these modules.\n"
-		. "If you continue the incompatible modules will be disabled.\n\n";
+		echo "<p>The following modules are not available because they're missing on disk\n"
+		. "or you've got an <b>invalid or missing license file</b>: </p>"
+		. "<ul style=\"font-size:1.5em\"><li>" . implode("</li><li>", array_map(function($a){return ($a['package'] ?? "legacy") .'/'.$a['name'];}, $unavailable)) . "</li></ul>\n"
+		. "<p>Please install the license file(s) and refresh this page or disable these modules.\n"
+		. "If you continue the incompatible modules will be disabled.</p>";
 		
 		
-		echo "</pre></div>";
+		echo "</div>";
 		echo '<a class="button" href="?ignore=modules&confirmed=1">Disable &amp; Continue</a>';
 
 	} else

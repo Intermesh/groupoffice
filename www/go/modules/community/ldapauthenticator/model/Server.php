@@ -41,6 +41,8 @@ class Server extends Entity {
 	public $syncGroups = false;
 	public $syncGroupsQuery;
 
+	public $imapUseEmailForUsername = false;
+
 	
 	
 	/**
@@ -157,7 +159,7 @@ class Server extends Entity {
 		if (!empty($this->username)) {			
 			
 			if (!$this->connection->bind($this->username, $this->getPassword())) {				
-				throw new \Exception("Invalid password given for '".$this->username."' " . $this->getPassword());
+				throw new \Exception("Invalid password given for '".$this->username."'");
 			} else
 			{
 				go()->debug("Authenticated with user '" . $this->username . '"');

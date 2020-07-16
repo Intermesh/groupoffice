@@ -14,6 +14,11 @@
  * added: int[]|string[] array of ids's
  * changed: int[]|string[] array of ids's
  * detroyed: int[]|string[] array of ids's
+ *
+ * Do not instantiate directly use:
+ *
+ * @example
+ * go.Db.store("User").query();
  * 
  */
 go.data.EntityStore = Ext.extend(Ext.util.Observable, {
@@ -24,6 +29,9 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	
 	notFound: null,
 
+	/**
+	 * @var {go.Entity}
+	 */
 	entity: null,	
 	
 	changes : null,

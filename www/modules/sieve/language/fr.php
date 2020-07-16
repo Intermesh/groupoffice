@@ -131,6 +131,6 @@ return array (
   'Sieve' => 'Sieve',
   'Filters' => 'Filtres',
   'Fill in the subject of the response in the field below.' => 'Remplissez le sujet de la réponse dans le champ ci-dessous.',
-  'nDaysText' => 'Fréquence de réponse automatique',
+  'Senders will only be notified periodically. You can set the number of days below.' => 'Fréquence de réponse automatique',
   'Ok' => 'Ok',
 );

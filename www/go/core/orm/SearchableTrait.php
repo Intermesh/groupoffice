@@ -36,7 +36,14 @@ trait SearchableTrait {
 	protected function getSearchFilter() {
 		return null;
 	}
-	
+
+	/**
+	 * Save entity to search cache
+	 *
+	 * @param bool $checkExisting If certain there's no existing record then this can be set to false
+	 * @return bool
+	 * @throws \Exception
+	 */
 	public function saveSearch($checkExisting = true) {
 		$search = $checkExisting ? \go\core\model\Search::find()->where('entityTypeId','=', static::entityType()->getId())->andWhere('entityId', '=', $this->id)->single() : false;
 		if(!$search) {

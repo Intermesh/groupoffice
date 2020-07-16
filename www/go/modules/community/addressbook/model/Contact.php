@@ -405,7 +405,7 @@ class Contact extends AclItemEntity {
    * Find contact by e-mail address
    *
    * @param string|string[] $email
-   * @return Query
+   * @return static[]|Query
    * @throws Exception
    */
 	public static function findByEmail($email, $properties = []) {
@@ -740,12 +740,32 @@ class Contact extends AclItemEntity {
 			if(!$this->saveUri()) {
 				return false;
 			}
-		}		
+		}
+
+		if($this->isOrganization && $this->isModified(['name']) && !$this->updateEmployees()) {
+			return false;
+		}
 		
 		return $this->saveOriganizationIds();
 		
 	}
-	
+
+	private function updateEmployees() {
+		$employees = $this->findEmployees(['jobTitle', 'addressBookId', 'id', 'name']);
+		foreach($employees as $e) {
+			if(!$e->saveSearch(true)) {
+				go()->error("Saving search cache of employee with ID: " . $e->id . " failed");
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public function findEmployees($properties = []) {
+		return static::findByLink($this, $properties)->andWhere(['isOrganization' => false]);
+	}
+
 	protected function internalValidate() {
 
 //		$this->setValidationError('name', 'test', 'test');
@@ -779,14 +799,12 @@ class Contact extends AclItemEntity {
 	/**
 	 * Find all linked organizations
 	 *
+	 * @param array $properties
 	 * @return self[]
 	 * @throws Exception
 	 */
-	public function findOrganizations(){
-		return self::find()
-			->where('fromId', '=', $this->id)
-			->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::entityType()->getId())		
-			->andWhere('fromEntityTypeId = '. self::entityType()->getId())
+	public function findOrganizations($properties = []){
+		return self::findByLink($this, $properties)
 			->andWhere('c.isOrganization = true');
 	}
 
@@ -854,8 +872,8 @@ class Contact extends AclItemEntity {
 	}
 
 	public function getSearchDescription() {
-		$addressBook = AddressBook::findById($this->addressBookId);
-		
+		$addressBook = AddressBook::findById($this->addressBookId, ['name']);
+
 		$orgStr = "";	
 		
 		if(!$this->isOrganization) {
@@ -946,12 +964,14 @@ class Contact extends AclItemEntity {
 	public function setSalutation($v) {
 		$this->salutation = $v;
 	}
+
 	/**
-	 * Because we've implemented the getter method "getOrganizationIds" the contact 
-	 * modSeq must be incremented when a link between two contacts is deleted or 
+	 * Because we've implemented the getter method "getOrganizationIds" the contact
+	 * modSeq must be incremented when a link between two contacts is deleted or
 	 * created.
-	 * 
+	 *
 	 * @param Link $link
+	 * @throws Exception
 	 */
 	public static function onLinkSave(Link $link) {
 		if($link->getToEntity() !== "Contact" || $link->getFromEntity() !== "Contact") {

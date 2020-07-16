@@ -121,7 +121,7 @@ return array (
   'Fill in the subject of the response in the field below.' => 'Digite o assunto da resposta no campo abaixo.',
   'Fill in your message in the field below.' => 'Digite sua mensagem no campo abaixo.',
   'Fill in the aliasses on which this message also needs to apply to. If you have multiple aliasses; then separate each alias with a comma (;).' => 'Preencha os apelidos aos quais essa mensagem também precisa ser aplicada. Se você tiver vários apelidos, separe cada um com ponto e vírgula (;).',
-  'nDaysText' => 'nTextoDias',
+  'Senders will only be notified periodically. You can set the number of days below.' => 'nTextoDias',
   'Advanced options' => 'Opções avançadas',
   'Body' => 'Corpo',
   'Current Date' => 'Data Atual',

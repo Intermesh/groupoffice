@@ -160,7 +160,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 					width: dp(60),
 					menuDisabled: true,
 					draggable: false,
-					hidable: false,
+					hideable: false,
 					align: "right",
 					sortable: false,
 					dataIndex: "entityId",

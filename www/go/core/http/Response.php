@@ -6,8 +6,8 @@ use DateTime;
 use go\core\http;
 use go\core\Singleton;
 use go\core\util\StringUtil;
-use Defuse\Crypto\Crypto;
 use go\core\util\JSON;
+use go\core\webclient\CSP;
 
 /**
  * Response Object
@@ -39,7 +39,7 @@ use go\core\util\JSON;
  */
 class Response extends Singleton{
 	
-	public function __construct() {
+//	public function __construct() {
 //		$this->setHeader('Cache-Control', 'private');
 //		$this->removeHeader('Pragma');
 //		
@@ -47,6 +47,13 @@ class Response extends Singleton{
 //		$this->setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, PUT, DELETE, OPTIONS');
 //		$this->setHeader('Access-Control-Allow-Headers', 'Origin, Content-Type, Authorization, X-XSRFToken');
 //		$this->setHeader('Access-Control-Max-Age', "1728000");
+//	}
+
+	protected function __construct()
+	{
+		parent::__construct();
+
+		$this->sendSecurityHeaders();
 	}
 
 	/**
@@ -229,8 +236,22 @@ class Response extends Singleton{
 			$this->setStatus(304);
 			exit();
 		}
-	}	
-	
+	}
+
+	protected function sendSecurityHeaders() {
+
+		$frameAncestors = go()->getConfig()['frameAncestors'];
+
+		if(empty($frameAncestors)) {
+			$this->setHeader("X-Frame-Options", "SAMEORIGIN");
+		}
+
+		$this->setHeader("Content-Security-Policy", Csp::get());
+		$this->setHeader("X-Content-Type-Options","nosniff");
+		$this->setHeader("Strict-Transport-Security","max-age=31536000");
+		$this->setHeader("X-XSS-Protection", "1;mode=block");
+	}
+
 	public function sendHeaders() {		
 		foreach ($this->headers as $name => $h) {			
 			foreach ($h[1] as $v) {

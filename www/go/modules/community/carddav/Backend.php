@@ -62,9 +62,12 @@ class Backend extends AbstractBackend {
 		$blob = \go\core\fs\Blob::fromString($cardData);
 		$blob->type = 'text/vcard';
 		$blob->name = $contact->getUri();
+		if(empty($blob->name)) {
+			$blob->name = 'nouid.vcf';
+		}
 		$blob->modifiedAt = $contact->modifiedAt;
 		if(!$blob->save()) {
-			throw new \Exception("could not save vcard blob");
+			throw new \Exception("could not save vcard blob for contact '" . $contact->id() . "'. Validation error: " . $blob->getValidationErrorsAsString());
 		}
 		
 		if(isset($contact->vcardBlobId)) {

@@ -127,14 +127,6 @@ GO.email.AccountsTree = function(config){
 			if(e.point!='append'){
 				return false;
 			} else {
-				if(e.data.grid.getSelectionModel()) {
-					var max=e.data.grid.paging, tmpIdx = rowIdx + 1;
-					if(tmpIdx >= max) {
-						tmpIdx = rowIdx -1;
-					}
-					e.data.grid.getSelectionModel().selectRow(tmpIdx);
-					e.data.grid.getView().scrollToTopOnLoad = false;
-				}
 				return true;
 			}
 		}		
@@ -293,8 +285,8 @@ GO.email.AccountsTree = function(config){
 //					this.messagesGrid.store.baseParams['from_mailbox']=this.mailbox;
 					this.mainPanel.messagesGrid.store.baseParams['to_mailbox']=e.target.attributes['mailbox'];
 					this.mainPanel.messagesGrid.store.baseParams['messages']=Ext.encode(messages);
-					
-					this.mainPanel.messagesGrid.getView().holdPosition = true;
+
+					this.mainPanel.messagesGrid.getView().scrollToTopOnLoad = false;
 					this.mainPanel.messagesGrid.store.reload({
 						callback:function(){
 							if(this.mainPanel.messagePanel.uid && !this.mainPanel.messagesGrid.store.getById(this.mainPanel.messagePanel.uid))

@@ -105,6 +105,7 @@ util/Filters.js
 util/Cookies.js
 util/SelectDialog.js
 util/Object.js
+util/Autolinker.js
 
 User.js
 String.js

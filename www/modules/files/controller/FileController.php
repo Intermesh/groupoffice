@@ -389,9 +389,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			
 			if(time()>$file->expire_time)
 				throw new \Exception(\GO::t("Sorry, the download link for this file has expired", "files"));				
-		}else
-		{
-			
+		} else {
 			$public = substr($file->path,0,6)=='public';
 
 			if (!$public) {
@@ -404,8 +402,9 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		
 		// Show the file inside the browser or give it as a download
 		$inline = true; // Defaults to show inside the browser
-		if(isset($params['inline']) && $params['inline'] == "false")
+		if(isset($params['inline']) && (bool) $params['inline'] === false) {
 			$inline = false;
+		}
 
 		\GO\Base\Util\Http::outputDownloadHeaders($file->fsFile, $inline, !empty($params['cache']));
 		$file->open();

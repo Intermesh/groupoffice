@@ -1,7 +1,5 @@
 <?php
 
-use go\core\App;
-use go\core\webclient\CSP;
 use go\core\webclient\Extjs3;
 
 $webclient = Extjs3::get();
@@ -61,7 +59,6 @@ $goTitle = basename(dirname($_SERVER['PHP_SELF'])) == 'install' ? go()->t("Insta
 }
 ?>
 	</style>
-	<meta http-equiv="Content-Security-Policy" content="<?= CSP::get(); ?>">
 </head>
 <body class="go-page">
 

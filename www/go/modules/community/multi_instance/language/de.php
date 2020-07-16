@@ -16,4 +16,8 @@ return array (
   'Size in GB' => 'Größe in GB',
   'Maximum number of users' => 'Max. Anzahl Benutzer',
   'Show trials' => 'Versuche anzeigen',
+  'Download site config' => 'Download Seitenkonfiguration',
+  'Maximum users' => 'Maximale Benutzer',
+  'Storage usage' => 'Speicherplatznutzung',
+  'Deactivate' => 'Deaktivieren',
 );

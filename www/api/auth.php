@@ -24,6 +24,7 @@ function output($data = [], $status = 200, $statusMsg = null) {
 	Response::get()->setStatus($status, $statusMsg);
 	Response::get()->sendHeaders();
 
+	go()->getDebugger()->groupEnd();
 	$data['debug'] = go()->getDebugger()->getEntries();
 	
 	//var_dump($data);
@@ -41,6 +42,8 @@ function output($data = [], $status = 200, $statusMsg = null) {
 try {
 //Create the app with the config.php file
 	App::get();
+
+	go()->getDebugger()->group("auth");
 	
 	if(Request::get()->getMethod() == "DELETE") {
 		$state = new go\core\jmap\State();

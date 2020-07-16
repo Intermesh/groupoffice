@@ -322,6 +322,14 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 	},
 
 	setData : function (data){
+
+		if(data.htmlbody) {
+			data.htmlbody = Autolinker.link(
+				data.htmlbody,
+				{stripPrefix: false, stripTrailingSlash: false, className: "normal-link", newWindow: true}
+			)
+		}
+
 		this.data=data;
 
 
@@ -359,7 +367,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 			if(!this.passwordDialog)
 			{
 				this.passwordDialog = new GO.dialog.PasswordDialog({
-					title:GO.smime ? t("Please enter the password of your SMIME certificate.", "smime") : t("enterPassword", "gnupg"),
+					title: t("Please enter the password of your SMIME certificate.", "smime"),
 					fn:function(button, password, passwordDialog){
 						if(button=='cancel')
 						{

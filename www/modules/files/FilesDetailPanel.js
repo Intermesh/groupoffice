@@ -47,7 +47,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 
 
 
-		this.items = [new Ext.DataView({
+		this.items = [this.dataView = new Ext.DataView({
 			store: this.store,
 			tpl: tpl,
 			autoHeight: true,
@@ -66,7 +66,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 		
 		this.bbar = [
 			this.browseBtn = new GO.files.DetailFileBrowserButton({iconCls: ""}),
-			new Ext.Button({
+			this.uploadBtn = new Ext.Button({
 				text: t('Upload'),
 				handler: function() {
 
@@ -99,8 +99,8 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 	},
 
 	uploadComplete: function(blobs) {
-		var fb = GO.mainLayout.getModulePanel('files'),
-			options = {
+
+		var	options = {
 				upload: true,
 				destination_folder_id: this.folderId,
 				blobs: Ext.encode(blobs),
@@ -114,14 +114,137 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 				}.bind(this)
 			};
 		if(this.folderId) {
-			fb.sendOverwrite(options);
+			this.sendOverwrite(options);
 		} else { // create folder first
 			this.createFolderWhenNoneExist(function() {
 				options.destination_folder_id = this.folderId;
-				fb.sendOverwrite(options);
+				this.sendOverwrite(options);
 			}.bind(this))
 		}
 	},
+
+
+	sendOverwrite : function(params) {
+
+		if(!params.command)
+			params.command='ask';
+
+		if(!params.destination_folder_id)
+			params.destination_folder_id=this.folder_id;
+
+		this.overwriteParams = params;
+		this.getEl() && this.getEl().mask(t("Saving..."));
+
+		var url = params.upload ? GO.url('files/folder/processUploadQueue') : GO.url('files/folder/paste');
+
+		Ext.Ajax.request({
+			url: url,
+			params:this.overwriteParams,
+			callback: function(options, success, response){
+
+				this.getEl() && this.getEl().unmask();
+
+				var pasteSources = Ext.decode(this.overwriteParams.ids);
+				var pasteDestination = this.overwriteParams.destination_folder_id;
+
+
+				//delete params.paste_sources;
+				//delete params.paste_destination;
+
+				if(!success)
+				{
+					Ext.MessageBox.alert(t("Error"), t("Could not connect to the server. Please check your internet connection."));
+				}else
+				{
+
+					var responseParams = Ext.decode(response.responseText);
+
+					if(!responseParams.success && !responseParams.fileExists)
+					{
+						if(this.overwriteDialog)
+						{
+							this.overwriteDialog.hide();
+						}
+						Ext.MessageBox.alert(t("Error"), responseParams.feedback);
+					}else
+					{
+						if(responseParams.fileExists)
+						{
+							if(!this.overwriteDialog)
+							{
+
+								this.overwriteDialog = new Ext.Window({
+									width:500,
+									autoHeight:true,
+									closeable:false,
+									closeAction:'hide',
+									plain:true,
+									border: false,
+									title:t("File exists"),
+									modal:false,
+									buttons: [
+										{
+											text: t("Yes"),
+											handler: function(){
+												this.overwriteParams.overwrite='yes';
+												this.sendOverwrite(this.overwriteParams);
+											},
+											scope: this
+										},{
+											text: t("Yes to all"),
+											handler: function(){
+												this.overwriteParams.overwrite='yestoall';
+												this.sendOverwrite(this.overwriteParams);
+											},
+											scope: this
+										},{
+											text: t("No"),
+											handler: function(){
+												this.overwriteParams.overwrite='no';
+												this.sendOverwrite(this.overwriteParams);
+											},
+											scope: this
+										},{
+											text: t("No to all"),
+											handler: function(){
+												this.overwriteParams.overwrite='notoall';
+												this.sendOverwrite(this.overwriteParams);
+											},
+											scope: this
+										},{
+											text: t("Cancel"),
+											handler: function(){
+												this.getActiveGridStore().reload();
+												this.overwriteDialog.hide();
+											},
+											scope: this
+										}]
+
+								});
+								this.overwriteDialog.render(Ext.getBody());
+							}
+
+							var tpl = new Ext.Template(t("Do you wish to overwrite the file '{file}'?"));
+							tpl.overwrite(this.overwriteDialog.body, {
+								file: responseParams.fileExists
+							});
+							this.overwriteDialog.show();
+						}else
+						{
+							if(this.overwriteDialog)
+								this.overwriteDialog.hide();
+							if(params.cb) {
+								params.cb(); // run this callback after files are processed in FileDetailPanel
+							}
+						}
+					}
+				}
+			},
+			scope: this
+		});
+
+	},
+
 
 
 	createFolderWhenNoneExist: function(cb) {
@@ -185,7 +308,16 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 
 		//this.setVisible(this.folderId != undefined);
 
+		this.uploadBtn.setDisabled(dv.data.permissionLevel < go.permissionLevels.write);
+		if(dv.data.permissionLevel < go.permissionLevels.write) {
+			this.dataView.emptyText = "<p class='pad'>" + t("No items found") + '</p>';
+		} else
+		{
+			this.dataView.emptyText = '<div class="go-dropzone">'+t('Drop files here')+'</div>';
+		}
+
 		if (this.folderId) {
+			this.browseBtn.setDisabled(false);
 			this.store.load({
 				params: {
 					limit: 10,
@@ -194,7 +326,8 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			});
 		} else {
 			this.store.removeAll();
-			this.browseBtn.setText(t("Create folder", "files"));
+			this.browseBtn.setText(t("Browse files", "files"));
+			this.browseBtn.setDisabled(dv.data.permissionLevel < go.permissionLevels.write);
 		}
 	}
 

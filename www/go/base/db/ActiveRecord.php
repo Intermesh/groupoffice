@@ -1261,7 +1261,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if(empty($params['userId'])){
 			$params['userId']=!empty(GO::session()->values['user_id']) ? GO::session()->values['user_id'] : 1;
 		}
-		
+
 		if($this->aclField() && (empty($params['ignoreAcl']) || !empty($params['joinAclFieldTable']))){
 			$aclJoinProps = $this->_getAclJoinProps();
 
@@ -1290,8 +1290,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 //		$select .= "SQL_NO_CACHE ";
-		
-		
+
+
 
 		if(empty($params['fields']))
 			$params['fields']=$this->getDefaultFindSelectFields(isset($params['limit']) && $params['limit']==1);
@@ -1365,21 +1365,21 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 		}
 
-		
+
 		$joinCf = !empty($params['joinCustomFields']) && $this->hasCustomFields();
 
 		if($joinCf) {
 			$cfFieldModels = array_filter(static::getCustomFieldModels(), function($f) {
 				return $f->getDataType()->hasColumn();
 			});
-			
+
 			$names = array_map(function($f) {
 				if(empty($f->databaseName)) {
 					throw new Exception("Custom field ". $f->id ." has no databaseName");
 				}
 				return "cf." . $f->databaseName;
 			}, $cfFieldModels);
-			
+
 			if(!empty($names)) {
 				$fields .= ", " .implode(', ', $names);
 			}
@@ -1827,8 +1827,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		//throw new \Exception('Error: you supplied a searchQuery parameter to find but getFindSearchQueryParamFields() should be overriden in '.$this->className());
 		$fields = array();
 		foreach($this->columns as $field=>$attributes){
-			
-			if($field != 'uuid'){ 
+
+			if($field != 'uuid'){
 				if(isset($attributes['gotype']) && ($attributes['gotype']=='textfield' || ($attributes['gotype']=='customfield' && $attributes['customfield']->customfieldtype->includeInSearches()))){
 					$fields[]='`'.$prefixTable.'`.`'.$field.'`';
 				}
@@ -4847,10 +4847,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 
-	public function rebuildSearchCache() {		
-		
-		
-				
+	public function rebuildSearchCache() {
+
+
+
 		$rc = new \GO\Base\Util\ReflectionClass($this);
 		$overriddenMethods = $rc->getOverriddenMethods();
 		if(in_array("getCacheAttributes", $overriddenMethods)){

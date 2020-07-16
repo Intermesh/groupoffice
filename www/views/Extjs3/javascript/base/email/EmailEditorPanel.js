@@ -260,7 +260,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 
 		var items = [{
 			human_size: Ext.util.Format.fileSize(blob.size),
-			extension: blob.name.split('.').pop(),
+			extension: blob.name.split('.').pop().toLowerCase(),
 			size: blob.size,
 			type: blob.type,
 			name: blob.name,
@@ -428,7 +428,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 						for (var i = 0; i < blobs.length; i++) {
 							items.push({
 								human_size: Ext.util.Format.fileSize(blobs[i].size),
-								extension: blobs[i].name.split('.').pop(),
+								extension: blobs[i].name.split('.').pop().toLowerCase(),
 								size: blobs[i].size,
 								type: blobs[i].type,
 								name: blobs[i].name,
