@@ -76,7 +76,7 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 				return;
 			}
 
-			this.el.dom.style.overflowY = 'auto';
+			this.el.dom.style.overflowY = 'hidden';
 			var changed = false;
 			if (this.el.dom.offsetHeight > this.growMin) {
 				this.el.dom.style.height = this.growMin + "px";
