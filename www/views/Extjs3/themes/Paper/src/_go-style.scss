@@ -865,6 +865,11 @@ hr {
 			display: inline-block;
 		}
 	}
+
+	&.right {
+		float: right;
+	}
+
 }
 .status {
 	@extend %font-subheading-dense;
