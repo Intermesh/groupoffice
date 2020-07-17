@@ -117,15 +117,15 @@ Ext.override(Ext.form.TextArea,{
 		this.el.focus();
 		text_field.setSelectionRange(endPos+v.length, endPos+v.length);
 	},
-	// origAfterRender : Ext.form.TextArea.prototype.afterRender,
-	// afterRender : function() {
-	// 	this.origAfterRender();
-	//
-	// 	if (this.grow) {
-	// 		// debugger;
-	// 			this.autoSize();
-	// 	}
-	// },
+	origAfterRender : Ext.form.TextArea.prototype.afterRender,
+	afterRender : function() {
+		this.origAfterRender();
+
+		if (this.grow) {
+			// debugger;
+				this.autoSize();
+		}
+	},
 
 	/**
 	 * Automatically grows the field to accomodate the height of the text up to the maximum field height allowed.
@@ -144,7 +144,8 @@ Ext.override(Ext.form.TextArea,{
 
 		var height = Math.min(this.el.dom.scrollHeight, this.growMax);
 		if (height > this.growMin) {
-			this.el.dom.style.height = (height + dp(8)) + "px";
+			height += dp(8);
+			this.el.setHeight(height);
 			changed = true;
 		}
 
