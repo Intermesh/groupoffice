@@ -1437,7 +1437,31 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 						}
 					});
 					break;
-				case 'png':
+				case 'vcf':
+					Ext.getBody().mask(t("Importing..."));
+					go.Jmap.request({
+						method: "Contact/loadVCS",
+						params: {
+							account_id: panel.account_id,
+							mailbox: panel.mailbox,
+							uid: panel.uid,
+							number: attachment.number,
+							encoding: attachment.encoding
+						},
+						callback: function (options, success, response) {
+							Ext.getBody().unmask();
+							if (!success) {
+								Ext.MessageBox.alert(t("Error"), response.errors.join("<br />"));
+							} else {
+								var msg = t("Imported {count} items").replace('{count}', response.count) + ". ";
+								if (response.errors && response.errors.length) {
+									msg += t("{count} items failed to import. A log follows: <br /><br />").replace('{count}', response.errors.length) + response.errors.join("<br />");
+								}
+								Ext.MessageBox.alert(t("Success"), msg);
+							}
+						}
+					});
+					break;
 				case 'bmp':
 				case 'png':
 				case 'gif':

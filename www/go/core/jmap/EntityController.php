@@ -794,7 +794,7 @@ abstract class EntityController extends Controller {
     $response = $converter->importFile($file, $this->entityClass(), $params);
 		
 		if(!$response) {
-			throw new Exception("Invalid response from import convertor");
+			throw new Exception("Invalid response from import converter");
 		}
 		
 		return $response;
