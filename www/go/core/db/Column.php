@@ -266,11 +266,9 @@ class Column {
 				}
 				return $value;
 
-			// case 'float':
-			// case 'double':
-			// case 'decimal':
-			// case 'real':
-			// 	return doubleval($value);
+
+			case 'decimal':
+				return doubleval($value);
 
 			case 'date':
 			case 'datetime':
