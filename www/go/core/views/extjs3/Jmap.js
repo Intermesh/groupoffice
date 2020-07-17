@@ -450,6 +450,7 @@ go.Jmap = {
 
 		if (this.timeout) {
 			clearTimeout(this.timeout);
+			this.timeout = null;
 		}
 		
 		var promise = this.scheduleRequest(options);
@@ -482,6 +483,7 @@ go.Jmap = {
 		this.paused++;
 		if (this.timeout) {
 			clearTimeout(this.timeout);
+			this.timeout = null;
 		}
 	},
 
@@ -489,7 +491,7 @@ go.Jmap = {
 	 * Continue request event execution as the next macro task.
 	 */
 	continue: function() {
-		if(this.paused>0) {
+		if(this.paused > 0) {
 			this.paused--;
 		}
 
@@ -497,6 +499,7 @@ go.Jmap = {
 		{
 			return;
 		}
+
 		if (this.timeout) {
 			clearTimeout(this.timeout);
 		}
@@ -507,6 +510,8 @@ go.Jmap = {
 	},
 
 	processQueue: function () {
+
+		this.timeout = null;
 
 		if (!this.requests.length) {
 			//All requests aborted
@@ -588,7 +593,6 @@ go.Jmap = {
 		});
 
 		this.requests = [];
-		this.timeout = null;
 
 	}
 };
