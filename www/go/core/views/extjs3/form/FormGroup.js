@@ -127,8 +127,6 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		this.on("destroy", function() {
 			this.dropZone.destroy();
 		}, this);
-
-		console.warn(Ext.dd.DragDropMgr.ids.sortable);
 	},
 	
 	initBbar: function() {
@@ -232,6 +230,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			iconCls: "ic-drag-handle",
 			tooltip: t("Drag to sort"),
 			rowId: rowId,
+			tabIndex: -1,
 			listeners: {
 				scope: this,
 				destroy: function(cmp) {
