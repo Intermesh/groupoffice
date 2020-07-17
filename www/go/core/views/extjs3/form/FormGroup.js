@@ -42,6 +42,11 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	mapKey: null,
 	// When mapKey is set we remember the keys of properties that are going to be deleted here
 	markDeleted: [],
+
+	/**
+	 * Enable sorting by drag and drop
+	 */
+	sortable: false,
 	
 	defaults: {
 		anchor: "100%"
@@ -75,6 +80,55 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		});
 		
 		go.form.FormGroup.superclass.initComponent.call(this);
+
+		if(this.sortable) {
+			this.on("render", this.initSortable, this);
+		}
+	},
+
+	initSortable : function() {
+		var me = this;
+		this.dropZone = new Ext.dd.DropZone(this.getEl(), {
+			ddGroup: "form-group-sortable",
+			getTargetFromEvent: function(e) {
+				return e.getTarget('.go-form-group-row');
+			},
+			onNodeEnter: function(target,dd,e,data) {
+				Ext.fly(target).addClass('x-dd-over');
+			},
+			onNodeOut: function(target,dd,e,data) {
+				Ext.fly(target).removeClass('x-dd-over');
+			},
+			onNodeOver: function (target, dd, e, data) {
+				if(e.altKey) {
+					return "x-dd-drop-ok-add";
+				}
+				return Ext.dd.DropZone.prototype.dropAllowed;
+			},
+			onNodeDrop: function (target, dd, e, data) {
+				var dropRow = Ext.getCmp(target.id);
+				var newItems = me.getValue();
+				if(Ext.isObject(newItems)) {
+					newItems = Object.values(newItems);
+				}
+				var dragItem = newItems[data.rowIndex];
+				if(!e.altKey) {
+					newItems.splice(data.rowIndex, 1);
+					if (dropRow.rowIndex > data.dragIndex) {
+						dropRow.rowIndex--;
+					}
+				}
+				newItems.splice(dropRow.rowIndex, 0, dragItem);
+				me.setValue(newItems);
+				return true;
+			}
+		});
+
+		this.on("destroy", function() {
+			this.dropZone.destroy();
+		}, this);
+
+		console.warn(Ext.dd.DragDropMgr.ids.sortable);
 	},
 	
 	initBbar: function() {
@@ -142,16 +196,26 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 				this.ownerCt.ownerCt.destroy();
 				me.dirty = true;
 			}
-		});
+		}),
+			rowId  = Ext.id();
 
 		if(this.editable) {
 			items.unshift({
 				xtype: "container",
 				width: dp(48),		
 				items: [delBtn]
-			});	
+			});
+
+			if(this.sortable) {
+				var dragHandle = this.createDragHandle(rowId);
+				items.push(dragHandle);
+			}
 		}
+
 		var wrap = new Ext.Container({
+			id: rowId,
+			rowIndex: this.items.getCount(),
+			cls: 'go-form-group-row',
 			layout: "column",
 			formField: formField,			
 			findBy: false,
@@ -161,6 +225,47 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		});
 		this.add(wrap);
 		return wrap;
+	},
+
+	createDragHandle : function(rowId) {
+		return new Ext.Button({
+			iconCls: "ic-drag-handle",
+			tooltip: t("Drag to sort"),
+			rowId: rowId,
+			listeners: {
+				scope: this,
+				destroy: function(cmp) {
+
+					setTimeout(function()
+					{
+						cmp.dragZone.destroy();
+					});
+				},
+				afterrender: function(cmp) {
+
+					cmp.dragZone = new Ext.dd.DragZone(cmp.getEl(), {
+						ddGroup: this.dropZone.ddGroup,
+						getDragData: function(e) {
+							var row = Ext.getCmp(cmp.rowId);
+							var sourceEl = row.getEl().dom;
+							if (sourceEl) {
+								d = sourceEl.cloneNode(true);
+								d.id = Ext.id();
+								return {
+									sourceEl: sourceEl,
+									repairXY: Ext.fly(sourceEl).getXY(),
+									ddel: d,
+									rowIndex: row.rowIndex
+								}
+							}
+						},
+						getRepairXY: function() {
+							return this.dragData.repairXY;
+						}
+					});
+				}
+			}
+		});
 	},
 
 	getName: function() {
