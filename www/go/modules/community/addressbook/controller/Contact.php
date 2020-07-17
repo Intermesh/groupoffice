@@ -146,7 +146,7 @@ EOT;
 		$contact = new model\Contact();
 		$contact->addressBookId = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId();;
 		$contact = $importer->import($vcard, $contact);
-		return ['success' => true, 'count' => 1];
+		return ['success' => true, 'contactId' => $contact->id];
 
 	}
 }
