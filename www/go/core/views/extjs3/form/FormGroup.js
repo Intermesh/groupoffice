@@ -43,6 +43,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	// When mapKey is set we remember the keys of properties that are going to be deleted here
 	markDeleted: [],
 
+	startWithItem: true,
+
 	/**
 	 * Enable sorting by drag and drop
 	 */
@@ -80,9 +82,15 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		});
 		
 		go.form.FormGroup.superclass.initComponent.call(this);
+	},
 
+	afterRender: function() {
+		go.form.FormGroup.superclass.afterRender.call(this);
 		if(this.sortable) {
-			this.on("render", this.initSortable, this);
+			this.initSortable();
+		}
+		if(this.startWithItem && this.items.getCount() == 0) {
+			this.addPanel(true);
 		}
 	},
 
@@ -163,12 +171,14 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 //		return false;
 //	},
 	
-	createNewItem : function() {
+	createNewItem : function(auto) {
 		var item = Ext.ComponentMgr.create(this.itemCfg);
 		
 		if(!item.getValue || !item.setValue) {
 			throw "Form Group item must be a form field";
 		}
+
+		item.auto = auto;
 		
 		return item;
 	},
@@ -182,8 +192,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}
 	},
 	
-	addPanel : function() {
-		var formField = this.createNewItem(), me = this, items = [formField], delBtn = new Ext.Button({				
+	addPanel : function(auto) {
+		var formField = this.createNewItem(auto), me = this, items = [formField], delBtn = new Ext.Button({
 			//disabled: formField.disabled,
 			xtype: "button",
 			iconCls: 'ic-delete',
@@ -294,7 +304,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		this.dirty = false;
 	},
 
-	setValue: function (records) {	
+	setValue: function (records) {
 		this.dirty = true;
 		this.removeAll();
 		this.markDeleted = [];
@@ -311,16 +321,17 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		} else {
 			records.forEach(set);
 		}
-		
+
 		this.doLayout();
 	},
 	
 
 	getValue: function () {
 		var v = this.mapKey ? {} : [];
-		if(!this.items) {
+		if(!this.items || (this.items.getCount() == 1 && !this.items.get(0).formField.isDirty())) {
 			return v;
 		}
+
 		this.items.each(function(wrap) {
 			if(this.mapKey) {
 				// TODO make minimal PatchObject
@@ -342,7 +353,12 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		if(this.disabled){
 			return true;
 		}
+
 		var f = this.getAllFormFields();
+		if(f.length == 1 && f[0].auto && !f[0].isDirty()) {
+			return true;
+		}
+
 		for(var i = 0, l = f.length; i < l; i++) {
 			if(!f[i].isValid(preventMark)) {
 				return false;
@@ -367,6 +383,11 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 	validate: function () {
 		var f = this.getAllFormFields();
+
+		if(f.length == 1 && f[0].auto && !f[0].isDirty()) {
+			return true;
+		}
+
 		for(var i = 0, l = f.length; i < l; i++) {
 			if(!f[i].validate()) {
 				return false;
