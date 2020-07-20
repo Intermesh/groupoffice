@@ -163,7 +163,7 @@ trait SearchableTrait {
 
 		$stmt = go()->getDbConnection()->delete('core_search', (new Query)
 			->where('entityTypeId', '=', $cls::entityType()->getId())
-			->andWhere('entityId', 'NOT IN', $cls::find()->selectSingleValue('id'))
+			->andWhere('entityId', 'NOT IN', $cls::find()->selectSingleValue($cls::getMapping()->getPrimaryTable()->getAlias() . '.id'))
 		);
 		$stmt->execute();
 
