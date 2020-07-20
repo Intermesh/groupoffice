@@ -97,7 +97,7 @@ p {
 	margin: dp(16);
 }
 
-strong { color: color($grey, 700); font-weight: $font-weight-m; }
+strong { font-weight: $font-weight-m; }
 small { color: color($fg, 'secondary-text'); font-weight: $font-weight-r; font-size:.85em; line-height: 1.2; }
 
 
@@ -1372,6 +1372,11 @@ table.display-panel {
 		vertical-align: middle;
 		border-right: 1px solid color($fg, 'divider');
 	}
+
+	tr.bold-line td, td.bold-line,  tr.line th, th.line {
+		border-bottom: 1px solid color($fg, 'line');
+	}
+
 	table { 
 		td:first-child {
 			padding-left: 0;
