@@ -134,14 +134,14 @@ class Comment extends Entity {
 		}
 
 		if($this->isNew()) {
-			return $this->findEntity()->getPermissionLevel();
+			return $this->findEntity()->getPermissionLevel() ? Acl::LEVEL_WRITE : false;
 		}
 
 		if($this->createdBy == go()->getAuthState()->getUserId()) {
 			return Acl::LEVEL_MANAGE;
 		}
 
-		return $this->findEntity()->hasPermissionLevel(Acl::LEVEL_READ) ? Acl::LEVEL_READ : false;
+		return $this->findEntity()->hasPermissionLevel(Acl::LEVEL_READ) ? Acl::LEVEL_WRITE : false;
 		
 	}
 	
