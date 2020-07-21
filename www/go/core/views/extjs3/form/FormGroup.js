@@ -328,7 +328,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 	getValue: function () {
 		var v = this.mapKey ? {} : [];
-		if(!this.items || (this.items.getCount() == 1 && !this.items.get(0).formField.isDirty())) {
+		if(!this.items || (this.items.getCount() == 1 && this.items.get(0).formField.auto && !this.items.get(0).formField.isDirty())) {
 			return v;
 		}
 

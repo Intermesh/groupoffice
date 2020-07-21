@@ -523,6 +523,14 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				return me.setState(response.state).then(function() {
 					return response;
 				});
+			}).catch(function(response) {
+				for(var i = 0, l = response.options.params.ids.length; i < l; i++) {
+					var id = response.options.params.ids[i];
+
+					delete me.pending[id];
+					me.scheduledPromises[id].reject(response);
+					delete me.scheduledPromises[id];
+				}
 			});
 
 			me.scheduled = [];

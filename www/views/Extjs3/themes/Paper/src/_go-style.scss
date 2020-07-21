@@ -43,22 +43,29 @@ button, html, input, select, textarea {
 }
 
 h1 {
+	margin: dp(16) 0;
 	@extend %font-display1;
 }
 h2 {
+	margin: dp(16) 0;
 	@extend %font-headline; }
 h3 {
+	margin: dp(8) 0;
 	@extend %font-title;
 }
 h4 {
+	margin: dp(8) 0;
 	@extend %font-subheading;
 }
 h5 {
+	margin: dp(8) 0;
 	@extend %font-subheading-dense;
 }
 h6 {
+	margin: dp(8) 0;
 	@extend %font-data-head;
 }
+
 
 code {
 	border: 1px solid color($fg, 'line');
@@ -1358,6 +1365,7 @@ table.display-panel {
 	width: 100%;
 	clear: both;
 	td, th {
+		vertical-align:top;
 		padding: dp(8);
 		&:first-child {
 			padding-left: dp(16);
@@ -1816,24 +1824,7 @@ table[id^="comments-ext"] b {
 .go-html-formatted {
 	@extend %font-body1;
 
-	h1 {
-		margin: dp(16) 0;
-	}
-	h2 {
-		margin: dp(16) 0;
-	}
-	h3 {
-		margin: dp(8) 0;
-	}
-	h4 {
-		margin: dp(8) 0;
-	}
-	h5 {
-		margin: dp(8) 0;
-	}
-	h6 {
-		margin: dp(8) 0;
-	}
+
 
 }
 
