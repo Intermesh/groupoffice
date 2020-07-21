@@ -26328,7 +26328,11 @@ Ext.extend(Ext.data.JsonReader, Ext.data.DataReader, {
         var f, values = {};
         for(var j = 0; j < len; j++){
             f = items[j];
-            var v = this.ef[j](data);
+            try {
+							var v = this.ef[j](data);
+						}catch(e) {
+            	var v = undefined;
+						}
             values[f.name] = f.convert((v !== undefined) ? v : f.defaultValue, data);
         }
         return values;

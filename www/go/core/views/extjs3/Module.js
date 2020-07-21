@@ -148,10 +148,11 @@ GO.mainLayout.on('render', function () {
 
 
 	window.onerror = function(message, source, lineno, colno, error) {
-		Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console.") + "<br /><br />" + message);
+		GO.errorDialog.show(t("An error occurred. More details can be found in the console.") + "<br /><br />" + message);
 	}
 
 	window.addEventListener('unhandledrejection', function(event) {
-		Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console."));
+		console.error(event.reason);
+		GO.errorDialog.show(t("An error occurred. More details can be found in the console."));
 	});
 });
