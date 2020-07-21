@@ -104,6 +104,7 @@ class TemplateParser {
 		$this->addFilter('filter', [$this, "filterFilter"]);
 		$this->addFilter('count', [$this, "filterCount"]);
 		$this->addFilter('first', [$this, "filterFirst"]);
+		$this->addFilter('nl2br', "nl2br");
 		
 		$this->addModel('now', new DateTime());	
 	}

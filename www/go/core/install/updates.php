@@ -721,3 +721,56 @@ $updates['202006041416'][] = "ALTER TABLE `core_oauth_access_token`
 $updates['202006191648'][] = "ALTER TABLE `core_customfields_field` ADD `hiddenInGrid` BOOLEAN NOT NULL DEFAULT TRUE AFTER `options`;";
 $updates['202006191648'][] = "ALTER TABLE `core_entity_filter` ADD `type` ENUM('fixed','variable') NOT NULL DEFAULT 'fixed' AFTER `aclId`;";
 $updates['202006191648'][] = "ALTER TABLE `core_entity_filter` CHANGE `filter` `filter` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL;";
+
+
+$updates['202007211057'][] = "CREATE TABLE `core_pdf_block` (
+`id` bigint(20) UNSIGNED NOT NULL,
+  `pdfTemplateId` bigint(20) UNSIGNED NOT NULL,
+  `x` int(11) NOT NULL,
+  `y` int(11) NOT NULL,
+  `width` int(11) NOT NULL,
+  `height` int(11) NOT NULL,
+  `align` enum('L','C','R','J') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'L',
+  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+$updates['202007211057'][] = "CREATE TABLE `core_pdf_template` (
+`id` bigint(20) UNSIGNED NOT NULL,
+  `moduleId` int(11) NOT NULL,
+  `language` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'en',
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `stationaryBlobId` binary(40) DEFAULT NULL,
+  `landscape` tinyint(1) NOT NULL DEFAULT 0,
+  `pageSize` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'A4',
+  `measureUnit` enum('mm','pt','cm','in') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'mm',
+  `marginTop` decimal(19,4) NOT NULL DEFAULT 10.0000,
+  `marginRight` decimal(19,4) NOT NULL DEFAULT 10.0000,
+  `marginBottom` decimal(19,4) NOT NULL DEFAULT 10.0000,
+  `marginLeft` decimal(19,4) NOT NULL DEFAULT 10.0000
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
+$updates['202007211057'][] = "ALTER TABLE `core_pdf_block`
+  ADD UNIQUE KEY `id` (`id`),
+  ADD KEY `pdfTemplateId` (`pdfTemplateId`);";
+
+$updates['202007211057'][] = "ALTER TABLE `core_pdf_template`
+  ADD UNIQUE KEY `id` (`id`),
+  ADD KEY `moduleId` (`moduleId`),
+  ADD KEY `stationaryBlobId` (`stationaryBlobId`);";
+
+
+$updates['202007211057'][] = "ALTER TABLE `core_pdf_block`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;";
+
+$updates['202007211057'][] = "ALTER TABLE `core_pdf_template`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;";
+
+
+$updates['202007211057'][] = "ALTER TABLE `core_pdf_block`
+  ADD CONSTRAINT `core_pdf_block_ibfk_1` FOREIGN KEY (`pdfTemplateId`) REFERENCES `core_pdf_template` (`id`) ON DELETE CASCADE;";
+
+$updates['202007211057'][] = "ALTER TABLE `core_pdf_template`
+  ADD CONSTRAINT `core_pdf_template_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_pdf_template_ibfk_2` FOREIGN KEY (`stationaryBlobId`) REFERENCES `core_blob` (`id`);";
