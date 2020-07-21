@@ -3,6 +3,7 @@
 namespace go\core;
 
 use Exception;
+use go\core\orm\EntityType;
 use go\core\util\DateTime;
 use stdClass;
 use Traversable;
@@ -89,6 +90,10 @@ use function GO;
  * {{address.formatted}}
  * `````````````````````````````````````````````````````````````````````
  *
+ * @example Using [assign] to lookup a Contact entity with id = 1
+ *
+ * [assign contact = 1 | entity:Contact]
+ *
  */
 class TemplateParser {	
 
@@ -104,6 +109,7 @@ class TemplateParser {
 		$this->addFilter('filter', [$this, "filterFilter"]);
 		$this->addFilter('count', [$this, "filterCount"]);
 		$this->addFilter('first', [$this, "filterFirst"]);
+		$this->addFilter('entity', [$this, "filterEntity"]);
 		$this->addFilter('nl2br', "nl2br");
 		
 		$this->addModel('now', new DateTime());	
@@ -131,6 +137,15 @@ class TemplateParser {
 		$date->setTimezone(new \DateTimeZone($this->_currentUser()->timezone));
 
 		return $date->format($format);
+	}
+
+	private function filterEntity($id, $entityName) {
+		$et = EntityType::findByName($entityName);
+		$cls = $et->getClassName();
+
+		$e = $cls::findById($id);
+
+		return $e;
 	}
 	
 	private function filterNumber($number,$decimals=2, $decimalSeparator='.', $thousandsSeparator=',') {
@@ -226,7 +241,7 @@ class TemplateParser {
 
 		for($i = 0, $c = count($tags); $i < $c; $i++) {
 
-			if($tags[$i]['tagName'] != 'if') {
+			if($tags[$i]['tagName'] != 'if' && $tags[$i]['tagName'] != 'each') {
 				continue;
 			}
 
@@ -392,6 +407,10 @@ class TemplateParser {
 		
 		//example emailAddress in contact.emailAddresses
 		$expressionParts = array_map('trim', explode(' in ', $tag['expression']));
+
+		if(!isset($expressionParts[1])) {
+			throw new \Exception("Invalid expression: ". $tag['expression']);
+		}
 
 		$array = $this->getVarFiltered($expressionParts[1]);	
 		

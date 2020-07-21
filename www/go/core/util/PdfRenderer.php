@@ -106,12 +106,12 @@ class PdfRenderer extends Fpdi {
 	}
 
 	/**
-	 * Renders the PDF to a string
+	 * Renders the PDF
 	 *
-	 * @return string
+	 * @return self
 	 */
 	public function render() {
-		return parent::Output("", "S");
+		return $this;
 	}
 
 }
