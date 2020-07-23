@@ -36,7 +36,11 @@ go.form.Dialog = Ext.extend(go.Window, {
 	redirectOnSave: true,
 	
 	panels : null,
-	
+
+	/**
+	 * When overriding then add items to "mainPanel" instead of "formPanel" for consistency with tabbed dialogs and non
+	 * tabbed dialogs.
+	 */
 	initComponent: function () {
 
 		this.panels = [];
