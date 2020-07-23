@@ -119,7 +119,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
    * @return string[]
    * @throws \ReflectionException
    */
-	protected static function getReadableProperties() {
+	protected static function  getReadableProperties() {
 		return array_keys(array_filter(static::getApiProperties(), function($props){
 			return $props['getter'] || $props['access'] == self::PROP_PUBLIC;
 		}));
