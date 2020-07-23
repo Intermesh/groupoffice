@@ -173,15 +173,16 @@ go.grid.GridTrait = {
 	},
 	
 	initCustomFields : function() {
-		if(!this.columns || !this.store || !this.store.entityStore || !this.store.entityStore.entity.customFields) {
+		if (!this.columns || !this.store || !this.store.entityStore || !this.store.entityStore.entity.customFields) {
 			return;
 		}
 		var customFldColumns = go.customfields.CustomFields.getColumns(this.store.entityStore.entity.name);
-		if(Ext.isDefined(this.autoExpandColumn) && this.autoExpandColumn.substring(0,13) === 'custom-field-') {
+
+		if (this.autoExpandColumn && this.autoExpandColumn.indexOf('custom-field-') === 0) {
 			var autoExpandColumnName = this.autoExpandColumn.substring(13);
 			var restOfCustomColumns = [], arClmn = [];
-			customFldColumns.forEach(function(col) {
-				if(col.dataIndex === 'customfields.' + autoExpandColumnName) {
+			customFldColumns.forEach(function (col) {
+				if (col.dataIndex === 'customfields.' + autoExpandColumnName) {
 					arClmn.push(col);
 				} else {
 					restOfCustomColumns.push(col);
