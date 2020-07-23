@@ -1,3 +1,4 @@
+23-07-2020 6.4.160
 - Core: phone number autolinking only if surrounded by word boundaries.
 - Filesearch: Error in files when not having permissions for filesearch module
 - Files: fix for invalid ACL's in root folders causing integrity constraint errors
