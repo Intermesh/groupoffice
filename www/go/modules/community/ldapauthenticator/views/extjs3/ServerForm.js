@@ -118,23 +118,8 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 					},{
 						xtype: "checkbox",
 						fieldLabel: t("Follow referrals"),
-						checked: true
-					}, {
-						xtype: 'combo',
-						name: 'protocolVersion',
-						fieldLabel: t('Protocol version'),
-						mode: 'local',
-						editable: false,
-						triggerAction: 'all',
-						store: new Ext.data.ArrayStore({
-							fields: [
-								'value'
-							],
-							data: [['2'], ['3']]
-						}),
-						valueField: 'value',
-						displayField: 'value',
-						value: '3'
+						checked: true,
+						hint: t("For older Microsoft ActiveDirectory installation this has to be disabled")
 					}
 				]
 			}, this.usersFieldSet = new Ext.form.FieldSet({
