@@ -77,6 +77,10 @@ class Authenticator extends PrimaryAuthenticator {
 		if(!$connection->bind($record->getDn(), $password)) {
 			return false;
 		}
+
+		if(!isset($record->mail) || !isset($record->mail[0])) {
+			throw new \Exception("User '$username' has no 'mail' attribute set. Can't create a user");
+		}
 		
 		$user = User::find()->where(['username' => $username])->orWhere('email', '=', $record->mail[0])->single();
 		if(!$user) {
