@@ -11,6 +11,8 @@ CREATE TABLE `ldapauth_server` (
   `port` int(11) NOT NULL DEFAULT '389',
   `encryption` enum('ssl','tls') COLLATE utf8mb4_unicode_ci DEFAULT 'tls',
   `ldapVerifyCertificate` BOOLEAN NOT NULL DEFAULT TRUE,
+  `followReferrals` BOOLEAN NOT NULL DEFAULT TRUE,
+  `protocolVersion` TINYINT UNSIGNED NOT NULL DEFAULT '3',
   `username` VARCHAR(190) NULL DEFAULT NULL,
   `password` VARCHAR(512) NULL COLLATE ascii_bin DEFAULT NULL,
   `usernameAttribute` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'uid',

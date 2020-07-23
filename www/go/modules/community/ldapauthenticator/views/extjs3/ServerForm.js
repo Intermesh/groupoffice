@@ -115,9 +115,28 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						disabled: true,
 						fieldLabel: t('Password'),
 						inputType:"password"
-					},
-					
-					]
+					},{
+						xtype: "checkbox",
+						fieldLabel: t("Follow referrals"),
+						checked: true
+					}, {
+						xtype: 'combo',
+						name: 'protocolVersion',
+						fieldLabel: t('Protocol version'),
+						mode: 'local',
+						editable: false,
+						triggerAction: 'all',
+						store: new Ext.data.ArrayStore({
+							fields: [
+								'value'
+							],
+							data: [['2'], ['3']]
+						}),
+						valueField: 'value',
+						displayField: 'value',
+						value: '3'
+					}
+				]
 			}, this.usersFieldSet = new Ext.form.FieldSet({
 				title: t("Users"),
 				defaults: {
