@@ -22,6 +22,27 @@ class Sync extends Controller {
   
   private $domains;
 
+
+  public function test($id) {
+	  //objectClass	inetOrgPerson)
+	  $server = Server::findById($id);
+	  if(!$server) {
+		  throw new NotFound("No LDAP config found with id = ". $id);
+	  }
+
+	  $this->serverId = $id;
+
+	  $connection = $server->connect();
+
+	  echo "Connected\n";
+
+	  $records = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=*");
+
+	  foreach($records as $record) {
+	  	echo $record->getDn() . "\n";
+	  }
+  }
+
   /**
    * docker-compose exec --user www-data groupoffice-64 php /usr/local/share/src/www/cli.php community/ldapauthenticator/Sync/users --id=1 --dryRun=1 --delete=1 --maxDeletePercentage=50
    */
