@@ -1,4 +1,5 @@
 - Core: phone number autolinking only if surrounded by word boundaries.
+- Filesearch: Error in files when not having permissions for filesearch module
 
 14-07-2020 6.4.159
 - Billing: fixed problem where items grid wouldn't load anymore
