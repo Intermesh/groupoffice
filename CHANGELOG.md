@@ -1,3 +1,6 @@
+??-07-2020 6.4.161
+- billing / core: Removed duplicate translations;
+
 23-07-2020 6.4.160
 - officeonline: Auto detect wopi client URL instead of using system settings url.
 - Core: phone number autolinking only if surrounded by word boundaries.
