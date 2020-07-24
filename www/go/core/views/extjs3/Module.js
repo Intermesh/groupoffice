@@ -25,6 +25,7 @@ go.Modules.register("core", 'core', {
 		'EntityFilter',
 		'SmtpAccount',
 		'EmailTemplate',
+		'PdfTemplate',
 		{
 			name: 'AuthAllowGroup',
 			relations: {

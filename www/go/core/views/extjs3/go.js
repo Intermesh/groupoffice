@@ -35,4 +35,5 @@ Ext.ns("go.customfields.filter");
 Ext.ns('go.import');
 Ext.ns('go.smtp');
 Ext.ns('go.emailtemplate');
+Ext.ns('go.pdftemplate');
 Ext.ns('go.oauth');

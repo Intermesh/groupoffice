@@ -3,7 +3,7 @@ namespace go\core\util;
 
 use Exception;
 use go\core\fs\Blob;
-use go\core\model\Pdf;
+use go\core\model\PdfTemplate;
 use go\core\TemplateParser;
 use go\core\util\PdfRenderer;
 use go\core\model\PdfBlock;
@@ -32,7 +32,7 @@ class PdfTemplateRenderer extends PdfRenderer {
 
 	/**
 	 *
-	 * @var Pdf
+	 * @var PdfTemplate
 	 */
 	protected $template;
 
@@ -49,10 +49,10 @@ class PdfTemplateRenderer extends PdfRenderer {
 	/**
 	 * Constructor
 	 *
-	 * @param Pdf $template
+	 * @param PdfTemplate $template
 	 * @param array $templateModels Key value array that will be used to parse templates. eg. ['invoice' => $invoice] {@see VariableParser::addModel()}
 	 */
-	public function __construct(Pdf $template, $templateModels = []) {
+	public function __construct(PdfTemplate $template, $templateModels = []) {
 
 		$this->template = $template;
 
@@ -71,10 +71,9 @@ class PdfTemplateRenderer extends PdfRenderer {
 		$this->SetAutoPageBreak(true, $this->template->marginBottom);
 
 		// Set the source PDF file
-		if(isset($template->stationaryBlobId)) {
-
-			$blob = Blob::findById($template->stationaryBlobId);
-			$numberOfPages = $this->setSourceFile($blob->getFile()->getPath());
+		$stationary = $template->getStationary();
+		if($stationary) {
+			$numberOfPages = $this->setSourceFile($stationary->getFile()->getPath());
 			// Import the first page of the template PDF
 			for($i = 1; $i <= $numberOfPages; $i++) {
 				$this->tplIdx[$i] = $this->importPage($i);

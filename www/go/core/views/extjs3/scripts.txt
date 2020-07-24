@@ -258,9 +258,13 @@ smtp/GridPanel.js
 smtp/AccountCombo.js
 
 form/AttachmentsField.js
+form/LanguageCombo.js
 
 emailtemplate/TemplateDialog.js
 emailtemplate/GridPanel.js
+pdftemplate/TemplateDialog.js
+pdftemplate/GridPanel.js
+pdftemplate/BlocksField.js
 
 chart/ChartComponent.js
 chart/LineChart.js
