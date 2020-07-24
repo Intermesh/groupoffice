@@ -5,6 +5,8 @@
 - Files: fix for invalid ACL's in root folders causing integrity constraint errors
 - Studio: New module to create your own modules!
 - Core: Removed incorrect country translations for French
+- Address book: Send vcard by email feature
+- E-mail: Import vcard from attachment feature
 
 14-07-2020 6.4.159
 - Billing: fixed problem where items grid wouldn't load anymore
