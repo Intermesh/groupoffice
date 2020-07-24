@@ -4,6 +4,7 @@
 - Filesearch: Error in files when not having permissions for filesearch module
 - Files: fix for invalid ACL's in root folders causing integrity constraint errors
 - Studio: New module to create your own modules!
+- Core: Removed incorrect country translations for French
 
 14-07-2020 6.4.159
 - Billing: fixed problem where items grid wouldn't load anymore
