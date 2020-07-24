@@ -31,7 +31,7 @@ try {
 	if (!isset($_GET['confirmed'])) {
 	
 		echo "<h2>". go()->t("Upgrade Group-Office") ."</h2><p>";
-		echo "Please <b>BACKUP</b> your database and files before proceeding. You're database is going to be upgraded and all caches will be cleared.<br />This operation can only be undone by restoring a backup.<br />";
+		echo "Please <b>BACKUP</b> your database and files before proceeding. Your database is going to be upgraded and all caches will be cleared.<br />This operation can only be undone by restoring a backup.<br />";
 		
 		echo 'More details about this upgrade can be found in the <a target="_blank" href="https://github.com/Intermesh/groupoffice/blob/' . go()->getMajorVersion()  . '.x/CHANGELOG.md">change log</a>.<br /><br />';
 
