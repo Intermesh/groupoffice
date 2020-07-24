@@ -237,7 +237,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 			if(l.title == "E-mail") {
 				items.push({
 					iconCls: "entity LinkedEmail bluegrey",
-					text: "E-mail files",
+					text: t("E-mail files"),
 					handler: function () {
 						var dv = this.detailView;
 						this.folderId = dv.data.filesFolderId || dv.data.files_folder_id;
