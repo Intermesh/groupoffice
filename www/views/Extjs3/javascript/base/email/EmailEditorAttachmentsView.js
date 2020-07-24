@@ -80,6 +80,20 @@ Ext.extend(GO.base.email.EmailEditorAttachmentsView, Ext.DataView, {
 		this.store.loadData({results:items}, true);
 	},
 
+	addBlob: function(b) {
+		this.addFiles([{
+			human_size: Ext.util.Format.fileSize(b.size),
+			extension: b.name.split('.').pop().toLowerCase(),
+			size: b.size,
+			type: b.type,
+			name: b.name,
+			fileName: b.name,
+			from_file_storage: false,
+			tmp_file: b.tmp_file,
+			blobId: b.id
+		}]);
+	},
+
 	afterUpload : function(loadParams){
 		var params = {add:true, params:loadParams};
 		this.store.load(params);

@@ -37,3 +37,5 @@ $updates['201910220909'][] = "CREATE TABLE IF NOT EXISTS `ldapauth_server_user_s
  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
 $updates['202007021707'][] = "ALTER TABLE `ldapauth_server` ADD `imapUseEmailForUsername` BOOLEAN NOT NULL DEFAULT FALSE AFTER `imapValidateCertificate`;";
+
+$updates['202007021707'][] = "ALTER TABLE `ldapauth_server` ADD `followReferrals` BOOLEAN NOT NULL DEFAULT TRUE AFTER `ldapVerifyCertificate`, ADD `protocolVersion` TINYINT UNSIGNED NOT NULL DEFAULT '3' AFTER `followReferrals`;";

@@ -115,9 +115,13 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						disabled: true,
 						fieldLabel: t('Password'),
 						inputType:"password"
-					},
-					
-					]
+					},{
+						xtype: "checkbox",
+						fieldLabel: t("Follow referrals"),
+						checked: true,
+						hint: t("For older Microsoft ActiveDirectory installation this has to be disabled")
+					}
+				]
 			}, this.usersFieldSet = new Ext.form.FieldSet({
 				title: t("Users"),
 				defaults: {

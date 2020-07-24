@@ -921,7 +921,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 
 			$defaultTags = array(
-					'contact:salutation'=>GO::t("Dear Mr / Ms")
+					'contact:salutation'=>GO::t("Dear sir/madam")
 			);
 			
 			// Parse the link tag

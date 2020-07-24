@@ -564,7 +564,7 @@ All rights reserved.<br />
   '2nd mobile' => 'โทรศัพท์เคลือนที่ 2',
   'Dear Mr' => 'ถึง นาย',
   'Dear Ms' => 'ถึง นางสาว',
-  'Dear Mr / Ms' => 'ถึง นาย /นางสาว',
+  'Dear sir/madam' => 'ถึง นาย /นางสาว',
   'You can\'t change the permissions of the admin' => 'คุณไม่สามารถเปลี่ยนเปลงสิทธิ์ของผู้ดูแลระบบได้',
   'Other' => 'อื่นๆ',
   'The file you tried to upload was larger then the maximum allowed size of %s.' => 'ไฟล์ที่คุณกำลังอัพโหลดไฟล์มีขนาดใหญ่เกินความจุสูงสุดที่อนุญาตคือ %s.',

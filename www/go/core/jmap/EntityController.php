@@ -805,7 +805,7 @@ abstract class EntityController extends Controller {
     $response = $converter->importFile($file, $this->entityClass(), $params);
 		
 		if(!$response) {
-			throw new Exception("Invalid response from import convertor");
+			throw new Exception("Invalid response from import converter");
 		}
 		
 		return $response;
@@ -886,7 +886,7 @@ abstract class EntityController extends Controller {
 		
 		$blob = $convertor->exportToBlob($name, $entities);
 		
-		return ['blobId' => $blob->id];		
+		return ['blobId' => $blob->id, 'blob' => $blob->toArray()];
 	}
 
   /**
