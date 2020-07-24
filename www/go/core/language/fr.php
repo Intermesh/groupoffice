@@ -389,7 +389,7 @@ return array (
   '2nd mobile' => '2éme mobile',
   'Dear Mr' => 'Cher Monsieur',
   'Dear Ms' => 'Chère Madame',
-  'Dear Mr / Ms' => 'Chère Madame, cher Monsieur',
+  'Dear sir/madam' => 'Chère Madame, cher Monsieur',
   'You can\'t change the permissions of the admin' => 'Vous ne pouvez pas changer les permissions de l\'administrateur',
   'Batch edit' => 'Editer par lots',
   'Select at least one item' => 'Sélectionnez au moins un élément',

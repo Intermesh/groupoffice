@@ -526,7 +526,7 @@ Wszystkie prawa zastrzeżone.<br />
   '2nd mobile' => 'Drugi telefon komórkowy',
   'Dear Mr' => 'Szanowny Panie',
   'Dear Ms' => 'Szanowna Pani',
-  'Dear Mr / Ms' => 'Szanowni Państwo',
+  'Dear sir/madam' => 'Szanowni Państwo',
   'You can\'t change the permissions of the admin' => 'Nie możesz zmienić uprawnień administratora',
   'Select at least one item' => 'Wybierz co najmniej jeden element',
   'You didn\'t select anything' => 'Nic nie wybrano',
