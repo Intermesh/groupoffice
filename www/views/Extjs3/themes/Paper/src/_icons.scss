@@ -313,11 +313,17 @@ $filetype: (
 		@each $extension in $extensions {
 			.filetype-#{$extension} {
 				background-image:url('#{$resourcePath}img/filetype/#{$img}.svg') !important;
+				&.x-tree-node-icon:before  {
+						content: none;
+				}
 			}
 		}
 	} @else {
 		.filetype-#{$extensions} {
 			background-image:url('#{$resourcePath}img/filetype/#{$img}.svg') !important;
+			&.x-tree-node-icon:before  {
+				content: none;
+			}
 		}
 	}
 }
