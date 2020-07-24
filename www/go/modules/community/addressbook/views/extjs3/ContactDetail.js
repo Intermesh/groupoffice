@@ -335,7 +335,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 									} else {
 										var c = GO.email.showComposer(),b=response.blob;
 										c.on('dialog_ready', function() {
-											c.emailEditor.attachmentsView.addFiles([c.emailEditor.addBlob(b)]);
+											c.emailEditor.attachmentsView.addBlob(b);
 										},this,{single:true});
 									}
 								}

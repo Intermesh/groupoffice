@@ -258,21 +258,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			return;
 		}
 
-		this.attachmentsView.addFiles([this.addBlob(blob)]);
-	},
-
-	addBlob: function(b) {
-		return {
-			human_size: Ext.util.Format.fileSize(b.size),
-			extension: b.name.split('.').pop().toLowerCase(),
-			size: b.size,
-			type: b.type,
-			name: b.name,
-			fileName: b.name,
-			from_file_storage: false,
-			tmp_file: b.tmp_file,
-			blobId: b.id
-		}
+		this.attachmentsView.addBlob(blob);
 	},
 	
 	reset : function(){
@@ -290,33 +276,11 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		this.textEditor.getEl().up('.x-form-item').setDisplayed(!html);
 		
 		this.hiddenCtField.setValue(html ? 'html' : 'plain');
-		
-//		if(html)
-//			this.insertDefaultFont();
-//		else
-//			this.textEditor.selectText(0,0);
-//		
+
 		if(!html)
 			this.textEditor.selectText(0,0);
-
-	//this.editor = html ? this.htmlEditor : this.textEditor;
 	},
 
-//	insertDefaultFont : function(){
-//		var font = this.htmlEditor.fontSelect.dom.value;
-//		var v = this.htmlEditor.getValue();
-//		if(v.toLowerCase().substring(0,5)!='<font'){
-//			if(v=='')
-//				v='<br />';
-//			
-//			v='<font face="'+font+'">'+v+'</font>'
-//		}
-//
-//		this.htmlEditor.setValue(v);		
-//	},
-
-
-	
 	setEditorHeight : function() {
 
 		var height=0;
@@ -350,12 +314,6 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		this.ownerCt.doLayout();
 	},
 
-	// doLayout: function() {
-		
-	// 	GO.base.email.EmailEditorPanel.superclass.doLayout.call(this, arguments);
-	// 	this.htmlEditor.syncSize();
-	// },
-	
 	initHtmlEditorPlugins : function(htmlEditorConfig) {		
 		// optional image attachment
 		var imageInsertPlugin = new GO.plugins.HtmlEditorImageInsert();
@@ -366,10 +324,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 				token:token
 			});				
 			this.setInlineAttachments(this.inlineAttachments);	
-		}, this);	
-		
-		
-		
+		}, this);
 	
 		return [imageInsertPlugin, go.form.HtmlEditor.emojiPlugin];
 	},
@@ -427,20 +382,9 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 				maxSize: this.maxAttachmentsSize, // todo
 				listeners: {
 					uploadComplete: function (blobs) {
-						var items = [];
 						for (var i = 0; i < blobs.length; i++) {
-							items.push({
-								human_size: Ext.util.Format.fileSize(blobs[i].size),
-								extension: blobs[i].name.split('.').pop().toLowerCase(),
-								size: blobs[i].size,
-								type: blobs[i].type,
-								name: blobs[i].name,
-								fileName: blobs[i].name,
-								from_file_storage: false,
-								blobId: blobs[i].blobId
-							});
+							this.attachmentsView.addBlob(blobs[i]);
 						}
-						this.attachmentsView.addFiles(items);
 					},
 					scope: this
 				}
@@ -473,7 +417,7 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 						name: selections[i].data.name,
 						fileName: selections[i].data.name,
 						from_file_storage: true,
-						tmp_file: selections[i].data.path,
+						tmp_file: selections[i].data.path
 					});
 				}
 
