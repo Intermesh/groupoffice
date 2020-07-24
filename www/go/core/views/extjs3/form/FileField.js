@@ -49,6 +49,8 @@ go.form.FileField = Ext.extend(Ext.form.TextField, {
 	// private
 	readOnly: true,
 
+	height: dp(32),
+
 	/**
 	 * @hide
 	 * @method autoSize
@@ -57,7 +59,7 @@ go.form.FileField = Ext.extend(Ext.form.TextField, {
 	
 	cls: '',
 
-	autoUpload: false,
+	autoUpload: true,
 	
 	accept: '*/*',
 
@@ -160,7 +162,7 @@ go.form.FileField = Ext.extend(Ext.form.TextField, {
 
 	createFileInput: function () {
 		var style = {},
-			height = this.buttonCfg.height || this.height;
+			height = this.buttonCfg && this.buttonCfg.height ? this.buttonCfg.height : this.height;
 		if(height) {
 			var style = {height: height+'px'};
 		}
