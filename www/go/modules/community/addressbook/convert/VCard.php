@@ -232,21 +232,22 @@ class VCard extends AbstractConverter {
 	 * @param Contact $entity
 	 * @return Contact[]
 	 */
-	public function import(VCardComponent $vcardComponent, Entity $entity = null) {
+	public function import(VCardComponent $vcardComponent, Entity $entity = null)
+	{
 		if ($vcardComponent->VERSION != "3.0") {
 			$vcardComponent->convert(\Sabre\VObject\Document::VCARD30);
 		}
-		
+
 		if (!isset($entity)) {
 			$entity = new Contact();
 		}
-		
-		if(!$entity->hasUid() && isset($vcardComponent->uid)) {
-			$entity->setUid((string) $vcardComponent->uid);
+
+		if (!$entity->hasUid() && isset($vcardComponent->uid)) {
+			$entity->setUid((string)$vcardComponent->uid);
 		}
 
-		if(isset($vcardComponent->{"X_GO-GENDER"})) {
-			$gender = (string) $vcardComponent->{"X_GO-GENDER"};
+		if (isset($vcardComponent->{"X_GO-GENDER"})) {
+			$gender = (string)$vcardComponent->{"X_GO-GENDER"};
 			switch ($gender) {
 				case 'M':
 				case 'F':
@@ -257,21 +258,26 @@ class VCard extends AbstractConverter {
 			}
 		}
 
-		if(isset($vcardComponent->{"X-ABShowAs"})) {
+		if (isset($vcardComponent->{"X-ABShowAs"})) {
 			$entity->isOrganization = $vcardComponent->{"X-ABShowAs"} == "COMPANY";
 		}
-		
-		if(isset($vcardComponent->{"X-GO-IS-ORGANIZATION"})) {
+
+		if (isset($vcardComponent->{"X-GO-IS-ORGANIZATION"})) {
 			$entity->isOrganization = !empty($vcardComponent->{"X-GO-IS-ORGANIZATION"});
 		}
 
-		$n = $vcardComponent->N->getParts();
-		$entity->lastName = $n[0] ?? null;
-		$entity->firstName = $n[1] ?? null;
-		$entity->middleName = $n[2] ?? null;
-		$entity->prefixes = $n[3] ?? null;
-		$entity->suffixes = $n[4] ?? null;
-		$entity->name = (string) $vcardComponent->FN ?? self::EMPTY_NAME;
+		if (isset($vcardComponent->N)) {
+			$n = $vcardComponent->N->getParts();
+			$entity->lastName = $n[0] ?? null;
+			$entity->firstName = $n[1] ?? null;
+			$entity->middleName = $n[2] ?? null;
+			$entity->prefixes = $n[3] ?? null;
+			$entity->suffixes = $n[4] ?? null;
+		}
+
+		if (isset($vcardComponent->FN)) {
+			$entity->name = (string) $vcardComponent->FN;
+		}
 
 		$this->importDate($entity, Date::TYPE_BIRTHDAY, $vcardComponent->BDAY);
 		$this->importDate($entity, Date::TYPE_ANNIVERSARY, $vcardComponent->ANNIVERSARY);
@@ -280,6 +286,23 @@ class VCard extends AbstractConverter {
 		$entity->emailAddresses = $this->importHasMany($entity->emailAddresses, $vcardComponent->EMAIL, EmailAddress::class, function($value) {
 			return ['email' => (string) $value];
 		});
+
+		if(empty($entity->name)) {
+			if(!empty($entity->firstName)) {
+				$entity->name = $entity->firstName;
+				if(!empty($entity->lastName)) {
+					$entity->name .= " " . $entity->lastName;
+				}
+			} else if(!empty($entity->lastName)) {
+				$entity->name = $entity->lastName;
+			} else if(!empty($entity->emailAddresses)) {
+				$entity->name = $entity->emailAddresses[0]->email;
+			}
+		}
+
+		if(!$entity->isOrganization && empty($entity->lastName) && empty($entity->firstName)) {
+			$entity->firstName = $entity->name;
+		}
 
 		$entity->phoneNumbers = $this->importHasMany($entity->phoneNumbers, $vcardComponent->TEL, PhoneNumber::class, function($value) {
 			return ['number' => (string) $value];
