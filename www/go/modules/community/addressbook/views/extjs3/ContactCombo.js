@@ -22,6 +22,13 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 	isOrganization : false,
 	initComponent: function () {
 
+		if(this.allowNew == undefined) {
+			this.allowNew = {
+				isOrganization: this.isOrganization,
+				addressBookId: go.User.addressBookSettings.defaultAddressBookId
+			};
+		}
+
 		var comboFilter = {
 			addressBookId: this.addressBookId,
 			permissionLevel: this.permissionLevel || go.permissionLevels.write
@@ -50,12 +57,12 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 				'<div class="x-combo-list-item"><div class="user">\
 					 <div class="avatar" style="{[this.getStyle(values)]}">{[this.getHtml(values)]}</div>\
 					 <div class="wrap">\
-						 <div>{name}</div>\
-						 <tpl if="values.emailAddresses[0]"><small>{[values.emailAddresses[0].email]}</small></tpl>\\n\
+						 <div><tpl if="!values.id"><b>' + t("Create new") + ':</b> </tpl>{name}</div>\
+						 <tpl if="values.emailAddresses && values.emailAddresses[0]"><small>{[values.emailAddresses[0].email]}</small></tpl>\\n\
 						 <small>{[values.organizations ? values.organizations.column("name").join(", ") : ""]}</small>\
 					 </div>\
 				 </div></div>',
-				'</tpl>',{
+				'</tpl>', {
 				getHtml: function (v) {
 					if(v.photoBlobId) {
 						return "";
