@@ -18,6 +18,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	buttonAlign: 'left',
 	layout: "fit",
 	showCustomfields:true,
+	closeOnSave: true,
 
 	/**
 	 * If set then the title bar will be appended with ": "+ value of the field.
@@ -346,13 +347,17 @@ go.form.Dialog = Ext.extend(go.Window, {
 		var me = this;
 		return this.formPanel.submit().then(function(serverId) {
 
+			me.currentId = serverId;
+
 			me.onSubmit(true, serverId);
 			me.fireEvent("submit", this, true, serverId);
 
 			if(me.redirectOnSave && isNew) {
 				me.entityStore.entity.goto(serverId);
 			}
-			me.close();
+			if(me.closeOnSave) {
+				me.close();
+			}
 			return serverId;
 
 		}).catch(function(error) {
