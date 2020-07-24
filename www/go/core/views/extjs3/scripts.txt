@@ -268,3 +268,4 @@ pdftemplate/BlocksField.js
 
 chart/ChartComponent.js
 chart/LineChart.js
+chart/PieChart.js
