@@ -1,7 +1,4 @@
-??-07-2020 6.4.161
 - billing / core: Removed duplicate translations;
-
-23-07-2020 6.4.160
 - ldapauth: check if mail and username attribute are present for sync, allow larger queries
 - officeonline: Auto detect wopi client URL instead of using system settings url.
 - Core: phone number autolinking only if surrounded by word boundaries.
