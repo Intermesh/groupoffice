@@ -368,7 +368,7 @@ Tento program je chráněn autorským zákonem a {product_name} licencí.<br />
   'Date' => 'Datum',
   'Dear Mr' => 'Milý pane',
   'Dear Ms' => 'Milá paní',
-  'Dear Mr / Ms' => 'Milý pane / Milá paní',
+  'Dear sir/madam' => 'Milý pane / Milá paní',
   'Dear' => 'Milý(á)',
   'Mins' => 'Min',
   'hour' => 'hodina',

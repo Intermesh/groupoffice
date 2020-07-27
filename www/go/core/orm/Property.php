@@ -612,7 +612,7 @@ abstract class Property extends Model {
 		
 		if(!$props) {
 			$props = array_filter(static::getReadableProperties(), function($propName) {
-				return !in_array($propName, ['modified', 'oldValues', 'validationErrors']);
+				return !in_array($propName, ['modified', 'oldValues', 'validationErrors', 'modifiedCustomFields', 'validationErrorsAsString']);
 			});
 
 			go()->getCache()->set($cacheKey, $props);
@@ -1579,8 +1579,10 @@ abstract class Property extends Model {
 				if($table->isUserTable) {
 					$keys['userId'] = go()->getUserId();
 				}
+
+				$query = Query::normalize($keys)->tableAlias($table->getAlias());
 				
-				$stmt = App::get()->getDbConnection()->update($table->getName(), $modifiedForTable, $keys);
+				$stmt = App::get()->getDbConnection()->update($table->getName(), $modifiedForTable, $query);
 				if (!$stmt->execute()) {
 					throw new Exception("Could not execute update query");
 				}				

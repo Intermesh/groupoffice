@@ -58,12 +58,9 @@ if(isset($_GET['url'])) {
 
 if ($blob->save()) {
 	Response::get()->setStatus(201, 'Created');
-	Response::get()->output([
-		'blobId' => $blob->id,			
-		'name' => $blob->name,
-		'type' => $blob->type,
-		'size' => $blob->size
-	]);
+	$response = $blob->toArray();
+	$response['blobId'] = $blob->id; //deprecated
+	Response::get()->output($response);
 } else {
 	echo 'Could not save '.$blob->id;
 	

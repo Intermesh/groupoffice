@@ -14,7 +14,7 @@ go.Relations = {
     var promises = [];
     relations.forEach(function(relName) {
       promises.push(me.getRelation(relName, entity));
-    });  
+    });
 
 		return Promise.all(promises).then(function() {
 			return {entity: entity, watch: me.watchRelations};
@@ -66,6 +66,8 @@ go.Relations = {
 
 			return go.Db.store(relation.store).get(key).then(function(result) {
 				me.applyRelationEntity(relName, entity, result.entities);
+			}).catch(function(reason) {
+				me.applyRelationEntity(relName, entity, null);
 			});
 		}
 
@@ -74,6 +76,8 @@ go.Relations = {
 		return go.Db.store(relation.store).single(key).then(function(relatedEntity) {
 			me.applyRelationEntity(relName, entity, relatedEntity);
 			return relatedEntity;
+		}).catch(function(reason) {
+			me.applyRelationEntity(relName, entity, null);
 		});
 	},
 

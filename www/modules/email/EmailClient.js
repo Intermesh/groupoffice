@@ -1437,7 +1437,34 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 						}
 					});
 					break;
-				case 'png':
+				case 'vcf':
+					Ext.MessageBox.confirm(t('Confirm'), t('Are you sure that you would like to import this VCard?'),
+						function(btn) {
+							if (btn !== "yes") {
+								return;
+							}
+							Ext.getBody().mask(t("Importing..."));
+							go.Jmap.request({
+								method: "Contact/loadVCS",
+								params: {
+									account_id: panel.account_id,
+									mailbox: panel.mailbox,
+									uid: panel.uid,
+									number: attachment.number,
+									encoding: attachment.encoding
+								},
+								callback: function (options, success, response) {
+									Ext.getBody().unmask();
+									if (!success) {
+										Ext.MessageBox.alert(t("Error"), response.errors.join("<br />"));
+									} else {
+										var dlg = new go.modules.community.addressbook.ContactDialog();
+										dlg.load(response.contactId).show();
+									}
+								}
+							});
+						});
+					break;
 				case 'bmp':
 				case 'png':
 				case 'gif':

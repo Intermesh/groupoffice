@@ -45,6 +45,9 @@ class Module extends core\Module {
 	
 	public function downloadVCard($contactId) {
 		$contact = Contact::findById($contactId);
+		if(!$contact->getPermissionLevel()) {
+			throw new core\exception\Forbidden();
+		}
 		
 		$c = new VCard();
 		

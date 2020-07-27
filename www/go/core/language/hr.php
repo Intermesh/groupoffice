@@ -533,7 +533,7 @@ Sva prava pridržana.<br />
   'You are using %s of %s' => 'Koristite %s od %s',
   'Dear Mr' => 'Dragi gospodine',
   'Dear Ms' => 'Draga gospođo',
-  'Dear Mr / Ms' => 'Dragi gospodine / gospođo',
+  'Dear sir/madam' => 'Dragi gospodine / gospođo',
   'You can\'t change the permissions of the admin' => 'Nemožete  promjeniti dozvole administratora',
   'Batch edit' => 'Grupne izmjene',
   'Select at least one item' => 'Odaberite barem jednu stavku',

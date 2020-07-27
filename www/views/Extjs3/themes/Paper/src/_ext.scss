@@ -623,7 +623,8 @@
 		margin: 0;
 		border:0;
 	}
-	padding: dp(8) dp(16) dp(16);
+
+	padding: dp(8) dp(16) 0;
 	~ .x-fieldset { border-top: 1px solid color($fg, 'divider'); }
 	legend {
 		/*@extend %font-caption;*/

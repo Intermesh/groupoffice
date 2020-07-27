@@ -2,8 +2,11 @@
 namespace go\modules\community\addressbook\controller;
 
 use go\core\fs\Blob;
+use go\core\fs\File;
 use go\core\jmap\EntityController;
 use go\core\jmap\exception\InvalidArguments;
+use GO\Email\Model\Account;
+use go\modules\community\addressbook\convert\VCard;
 use go\modules\community\addressbook\model;
 
 /**
@@ -123,6 +126,27 @@ EOT;
 		$blob->save();
 
 		return ['blobId' => $blob->id];
+
+	}
+
+	/**
+	 * Import one or more VCards from an email attachment
+	 * @param array $params
+	 * @return array
+	 * @throws \Exception
+	 */
+	public function loadVCS( array $params) :array
+	{
+		$account = Account::model()->findByPk($params['account_id']);
+		$imap = $account->openImapConnection($params['mailbox']);
+		$data = $imap->get_message_part_decoded($params['uid'], $params['number'], $params['encoding'], false, true, false);
+
+		$vcard = \GO\Base\VObject\Reader::read($data);
+		$importer = new VCard();
+		$contact = new model\Contact();
+		$contact->addressBookId = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId();;
+		$contact = $importer->import($vcard, $contact);
+		return ['success' => true, 'contactId' => $contact->id];
 
 	}
 }

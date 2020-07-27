@@ -173,11 +173,25 @@ go.grid.GridTrait = {
 	},
 	
 	initCustomFields : function() {
-		if(!this.columns || !this.store || !this.store.entityStore || !this.store.entityStore.entity.customFields) {
+		if (!this.columns || !this.store || !this.store.entityStore || !this.store.entityStore.entity.customFields) {
 			return;
-		}		
-		
-		this.columns = this.columns.concat(go.customfields.CustomFields.getColumns(this.store.entityStore.entity.name))
+		}
+		var customFldColumns = go.customfields.CustomFields.getColumns(this.store.entityStore.entity.name);
+
+		if (this.autoExpandColumn && this.autoExpandColumn.indexOf('custom-field-') === 0) {
+			var autoExpandColumnName = this.autoExpandColumn.substring(13);
+			var restOfCustomColumns = [], arClmn = [];
+			customFldColumns.forEach(function (col) {
+				if (col.dataIndex === 'customfields.' + autoExpandColumnName) {
+					arClmn.push(col);
+				} else {
+					restOfCustomColumns.push(col);
+				}
+			});
+			this.columns = arClmn.concat(restOfCustomColumns, this.columns);
+		} else {
+			this.columns = this.columns.concat(customFldColumns);
+		}
 	},
 	
 	//The navigate can be used in modules to track row selections for navigation.
