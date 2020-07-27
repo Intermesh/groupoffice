@@ -115,9 +115,13 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						disabled: true,
 						fieldLabel: t('Password'),
 						inputType:"password"
-					},
-					
-					]
+					},{
+						xtype: "checkbox",
+						fieldLabel: t("Follow referrals"),
+						checked: true,
+						hint: t("For older Microsoft ActiveDirectory installation this has to be disabled")
+					}
+				]
 			}, this.usersFieldSet = new Ext.form.FieldSet({
 				title: t("Users"),
 				defaults: {
@@ -308,7 +312,8 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						boxLabel: t('Synchronize users'),
 						name: 'syncUsers'
 					},{
-						xtype: 'textfield',
+						xtype: 'textarea',
+						grow: true,
 						name: 'syncUsersQuery',
 						fieldLabel: t("User query"),
 						required: true,
@@ -321,7 +326,8 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						boxLabel: t('Synchronize groups'),
 						name: 'syncGroups'
 					},{
-						xtype: 'textfield',
+						xtype: 'textarea',
+						grow: true,
 						name: 'syncGroupsQuery',
 						fieldLabel: t("Group query"),
 						required: true,

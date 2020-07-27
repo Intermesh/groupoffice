@@ -1113,7 +1113,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		GO::debug("Create new model folder ".$model->className()."(ID:".$model->id.")");
 		$filesPath = \go\core\util\StringUtil::normalize(rtrim($model->buildFilesPath(),'.'));
-		$folder = Folder::model()->findByPath($filesPath,true, array('acl_id'=>$model->findAclId(),'readonly'=>1));
+		$folder = Folder::model()->findByPath($filesPath,true, array('readonly'=>1));
 		
 		if(!$folder){
 			throw new \Exception("Failed to create folder ".$filesPath);

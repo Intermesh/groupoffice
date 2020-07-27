@@ -316,6 +316,32 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 							go.util.downloadFile(go.Jmap.downloadUrl("community/addressbook/vcard/" + this.data.id));
 						},
 						scope: this
+					},{
+						iconCls: "ic-attach-file",
+						text: t("Send") + " (vCard)",
+						handler: function () {
+							Ext.getBody().mask(t("Exporting..."));
+							go.Jmap.request({
+								method: "Contact/export",
+								params: {
+									extension: 'vcf',
+									ids: [this.data.id]
+								},
+								scope: this,
+								callback: function (options, success, response) {
+									Ext.getBody().unmask();
+									if(!success) {
+										Ext.MessageBox.alert(t("Error"), response.message);
+									} else {
+										var c = GO.email.showComposer(),b=response.blob;
+										c.on('dialog_ready', function() {
+											c.emailEditor.attachmentsView.addBlob(b);
+										},this,{single:true});
+									}
+								}
+							});
+						},
+						scope: this
 					},
 					'-',
 					

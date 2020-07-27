@@ -150,6 +150,8 @@ tree/TreeNodeUI.js
 form/HtmlEditor.js
 form/HtmlEditorPlugins.js
 
+form/NumberField.js
+
 menu/EmojiMenu.js
 menu/StoreMenu.js
 

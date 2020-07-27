@@ -32,9 +32,6 @@ class Connection {
 		
 		$this->link = ldap_connect($uri);
 
-		$this->setOption(LDAP_OPT_PROTOCOL_VERSION, 3);
-		$this->setOption(LDAP_OPT_REFERRALS, 0);
-
 		return $this->link != false;
 	}
 

@@ -328,7 +328,7 @@ All rights reserved.<br />
   array (
     'M' => 'Dear Mr',
     'F' => 'Dear Ms',
-    'unknown' => 'Dear Mr / Ms',
+    'unknown' => 'Dear sir/madam',
   ),
   'day' => '일',
   'days' => '일',

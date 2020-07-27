@@ -11,9 +11,9 @@
  * It will pass:
  * 
  * store: the entity store
- * added: int[]|string[] array of ids's
- * changed: int[]|string[] array of ids's
- * detroyed: int[]|string[] array of ids's
+ * added: Object Entity object mapped by ID
+ * changed: Object Entity object mapped by ID
+ * destroyed: int[]|string[] array of ids's
  *
  * Do not instantiate directly use:
  *
@@ -523,6 +523,14 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				return me.setState(response.state).then(function() {
 					return response;
 				});
+			}).catch(function(response) {
+				for(var i = 0, l = response.options.params.ids.length; i < l; i++) {
+					var id = response.options.params.ids[i];
+
+					delete me.pending[id];
+					me.scheduledPromises[id].reject(response);
+					delete me.scheduledPromises[id];
+				}
 			});
 
 			me.scheduled = [];

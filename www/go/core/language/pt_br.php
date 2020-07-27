@@ -396,7 +396,7 @@ Este programa é protegido por leis de copyright e pela licença do {product_nam
   'You are using %s of %s' => 'Em uso %s de %s',
   'Dear Mr' => 'Caro Sr.',
   'Dear Ms' => 'Cara Sra.',
-  'Dear Mr / Ms' => 'Caro Sr(a)',
+  'Dear sir/madam' => 'Caro Sr(a)',
   'You can\'t change the permissions of the admin' => 'Você não pode alterar permissões do administrador',
   'Other' => 'Outro',
   'The file you tried to upload was larger then the maximum allowed size of %s.' => 'O arquivo que você tentou madnar excede o limite de %s.',

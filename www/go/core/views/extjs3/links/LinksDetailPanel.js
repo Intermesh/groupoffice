@@ -40,7 +40,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 		
 		
 		var tpl = new Ext.XTemplate('<div class="icons"><tpl for=".">\
-				<p data-id="{id}">\
+				<p data-id="{id}" class="s12">\
 				<tpl if="xindex === 1">\
 					<i class="label ' + this.link.iconCls + '" ext:qtip="{toEntity}"></i>\
 				</tpl>\

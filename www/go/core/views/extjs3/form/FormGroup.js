@@ -42,6 +42,13 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	mapKey: null,
 	// When mapKey is set we remember the keys of properties that are going to be deleted here
 	markDeleted: [],
+
+	startWithItem: true,
+
+	/**
+	 * Enable sorting by drag and drop
+	 */
+	sortable: false,
 	
 	defaults: {
 		anchor: "100%"
@@ -75,6 +82,59 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		});
 		
 		go.form.FormGroup.superclass.initComponent.call(this);
+	},
+
+	afterRender: function() {
+		go.form.FormGroup.superclass.afterRender.call(this);
+		if(this.sortable) {
+			this.initSortable();
+		}
+		if(this.startWithItem && this.items.getCount() == 0) {
+			this.addPanel(true);
+		}
+	},
+
+	initSortable : function() {
+		var me = this;
+		this.dropZone = new Ext.dd.DropZone(this.getEl(), {
+			ddGroup: "form-group-sortable",
+			getTargetFromEvent: function(e) {
+				return e.getTarget('.go-form-group-row');
+			},
+			onNodeEnter: function(target,dd,e,data) {
+				Ext.fly(target).addClass('x-dd-over');
+			},
+			onNodeOut: function(target,dd,e,data) {
+				Ext.fly(target).removeClass('x-dd-over');
+			},
+			onNodeOver: function (target, dd, e, data) {
+				if(e.altKey) {
+					return "x-dd-drop-ok-add";
+				}
+				return Ext.dd.DropZone.prototype.dropAllowed;
+			},
+			onNodeDrop: function (target, dd, e, data) {
+				var dropRow = Ext.getCmp(target.id);
+				var newItems = me.getValue();
+				if(Ext.isObject(newItems)) {
+					newItems = Object.values(newItems);
+				}
+				var dragItem = newItems[data.rowIndex];
+				if(!e.altKey) {
+					newItems.splice(data.rowIndex, 1);
+					if (dropRow.rowIndex > data.dragIndex) {
+						dropRow.rowIndex--;
+					}
+				}
+				newItems.splice(dropRow.rowIndex, 0, dragItem);
+				me.setValue(newItems);
+				return true;
+			}
+		});
+
+		this.on("destroy", function() {
+			this.dropZone.destroy();
+		}, this);
 	},
 	
 	initBbar: function() {
@@ -111,12 +171,14 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 //		return false;
 //	},
 	
-	createNewItem : function() {
+	createNewItem : function(auto) {
 		var item = Ext.ComponentMgr.create(this.itemCfg);
 		
 		if(!item.getValue || !item.setValue) {
 			throw "Form Group item must be a form field";
 		}
+
+		item.auto = auto;
 		
 		return item;
 	},
@@ -130,8 +192,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}
 	},
 	
-	addPanel : function() {
-		var formField = this.createNewItem(), me = this, items = [formField], delBtn = new Ext.Button({				
+	addPanel : function(auto) {
+		var formField = this.createNewItem(auto), me = this, items = [formField], delBtn = new Ext.Button({
 			//disabled: formField.disabled,
 			xtype: "button",
 			iconCls: 'ic-delete',
@@ -142,16 +204,26 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 				this.ownerCt.ownerCt.destroy();
 				me.dirty = true;
 			}
-		});
+		}),
+			rowId  = Ext.id();
 
 		if(this.editable) {
 			items.unshift({
 				xtype: "container",
 				width: dp(48),		
 				items: [delBtn]
-			});	
+			});
+
+			if(this.sortable) {
+				var dragHandle = this.createDragHandle(rowId);
+				items.push(dragHandle);
+			}
 		}
+
 		var wrap = new Ext.Container({
+			id: rowId,
+			rowIndex: this.items.getCount(),
+			cls: 'go-form-group-row',
 			layout: "column",
 			formField: formField,			
 			findBy: false,
@@ -161,6 +233,48 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		});
 		this.add(wrap);
 		return wrap;
+	},
+
+	createDragHandle : function(rowId) {
+		return new Ext.Button({
+			iconCls: "ic-drag-handle",
+			tooltip: t("Drag to sort"),
+			rowId: rowId,
+			tabIndex: -1,
+			listeners: {
+				scope: this,
+				destroy: function(cmp) {
+
+					setTimeout(function()
+					{
+						cmp.dragZone.destroy();
+					});
+				},
+				afterrender: function(cmp) {
+
+					cmp.dragZone = new Ext.dd.DragZone(cmp.getEl(), {
+						ddGroup: this.dropZone.ddGroup,
+						getDragData: function(e) {
+							var row = Ext.getCmp(cmp.rowId);
+							var sourceEl = row.getEl().dom;
+							if (sourceEl) {
+								d = sourceEl.cloneNode(true);
+								d.id = Ext.id();
+								return {
+									sourceEl: sourceEl,
+									repairXY: Ext.fly(sourceEl).getXY(),
+									ddel: d,
+									rowIndex: row.rowIndex
+								}
+							}
+						},
+						getRepairXY: function() {
+							return this.dragData.repairXY;
+						}
+					});
+				}
+			}
+		});
 	},
 
 	getName: function() {
@@ -190,7 +304,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		this.dirty = false;
 	},
 
-	setValue: function (records) {	
+	setValue: function (records) {
 		this.dirty = true;
 		this.removeAll();
 		this.markDeleted = [];
@@ -207,16 +321,17 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		} else {
 			records.forEach(set);
 		}
-		
+
 		this.doLayout();
 	},
 	
 
 	getValue: function () {
 		var v = this.mapKey ? {} : [];
-		if(!this.items) {
+		if(!this.items || (this.items.getCount() == 1 && this.items.get(0).formField.auto && !this.items.get(0).formField.isDirty())) {
 			return v;
 		}
+
 		this.items.each(function(wrap) {
 			if(this.mapKey) {
 				// TODO make minimal PatchObject
@@ -238,7 +353,12 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		if(this.disabled){
 			return true;
 		}
+
 		var f = this.getAllFormFields();
+		if(f.length == 1 && f[0].auto && !f[0].isDirty()) {
+			return true;
+		}
+
 		for(var i = 0, l = f.length; i < l; i++) {
 			if(!f[i].isValid(preventMark)) {
 				return false;
@@ -263,6 +383,11 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 	validate: function () {
 		var f = this.getAllFormFields();
+
+		if(f.length == 1 && f[0].auto && !f[0].isDirty()) {
+			return true;
+		}
+
 		for(var i = 0, l = f.length; i < l; i++) {
 			if(!f[i].validate()) {
 				return false;

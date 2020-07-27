@@ -160,6 +160,12 @@ class Filters {
 	 * Supports ranges. For example last week..now,  >last year, >2019-01-01
 	 * 
 	 * Values are converted to DateTime objects. Supports all strtotime formats as input.
+	 *
+	 * @example
+	 *
+	 * ->addDate('date',function(Criteria $criteria, $comparator, $value){
+	 * 	$criteria->where('date', $comparator, $value);
+	 * })
 	 * 
 	 * @param string $name
 	 * @param Closure $fn Called with: Criteria $criteria, $comparator, DateTime $value, Query $query, array $filters
