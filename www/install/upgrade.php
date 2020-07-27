@@ -37,7 +37,7 @@ try {
 
 		echo "Note: You can also upgrade on the command line by running (replace www-data with the user of your webserver): <br />
 
-			<code>sudo -u www-data cli.php core/System/upgrade</code>
+			<code>sudo -u www-data php cli.php core/System/upgrade</code>
 
 			";
 

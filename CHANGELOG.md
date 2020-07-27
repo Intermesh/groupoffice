@@ -1,3 +1,7 @@
+??-07-2020 6.4.161
+- billing / core: Removed duplicate translations;
+
+23-07-2020 6.4.160
 - ldapauth: check if mail and username attribute are present for sync, allow larger queries
 - officeonline: Auto detect wopi client URL instead of using system settings url.
 - Core: phone number autolinking only if surrounded by word boundaries.
@@ -38,7 +42,7 @@
 - Core: Custom fields, generate database name as per MariaDB naming conventions.
 - Address book: Update search cache of employees when changing company name
 - LDAP Auth: Added option to login to IMAP server with email instead of username 
-- Core: Added colete rebuild search cache option.
+- Core: Added complete rebuild search cache option.
 - Core: Fixed broken link display in e-mail
 - Core: Set security headers: 
     	- X-Frame-Options: SAMEORIGIN
