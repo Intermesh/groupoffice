@@ -32,12 +32,12 @@ CREATE TABLE `ldapauth_server` (
   `smtpEncryption` enum('tls','ssl') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `smtpValidateCertificate` tinyint(1) NOT NULL DEFAULT '1',
   `syncUsers` BOOLEAN NOT NULL DEFAULT FALSE,
-  `syncUsersQuery` VARCHAR(190) NOT NULL DEFAULT '(objectClass=inetOrgPerson)',
+  `syncUsersQuery` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `syncGroups` BOOLEAN NOT NULL DEFAULT FALSE, 
-  `syncGroupsQuery` VARCHAR(190) NOT NULL DEFAULT '(objectClass=Group)'
+  `syncGroupsQuery` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB;
-
 --
+
 -- Gegevens worden geëxporteerd voor tabel `ldapauth_server`
 --
 
