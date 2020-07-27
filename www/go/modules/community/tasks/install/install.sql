@@ -1,158 +1,279 @@
--- create tasklist table
-DROP TABLE IF EXISTS `tasks_settings`;
-DROP TABLE IF EXISTS `tasks_portlet_tasklist`;
-DROP TABLE IF EXISTS `tasks_tasks_custom_field`;
-DROP TABLE IF EXISTS `tasks_alert`;
-DROP TABLE IF EXISTS `tasks_task_category`;
-DROP TABLE IF EXISTS `tasks_task`;
-DROP TABLE IF EXISTS `tasks_category`;
-DROP TABLE IF EXISTS `tasks_tasklist`;
+-- -----------------------------------------------------
+-- Table `tasks_tasklist`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tasks_tasklist` (
+  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `role` TINYINT(2) UNSIGNED NULL DEFAULT NULL,
+  `name` VARCHAR(100) NOT NULL,
+  `description` VARCHAR(255) NULL,
+  `createdBy` INT(11) NOT NULL,
+  `aclId` INT(11) NOT NULL,
+  `version` INT(10) UNSIGNED NOT NULL DEFAULT 1,
+  `ownerId` INT(11) NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  INDEX `fkCreatedBy` (`createdBy` ASC),
+  INDEX `fkAcl` (`aclId` ASC),
+  CONSTRAINT `fkAcl`
+    FOREIGN KEY (`aclId`)
+    REFERENCES `core_acl` (`id`),
+  CONSTRAINT `fkCreatedBy`
+    FOREIGN KEY (`createdBy`)
+    REFERENCES `core_user` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_unicode_ci;
 
-CREATE TABLE `tasks_tasklist` (
-  `id` int(11) NOT NULL,
-  `name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `createdBy` int(11) NOT NULL,
-  `aclId` int(11) NOT NULL,
-  `filesFolderId` int(11) NOT NULL DEFAULT '0',
-  `version` int(10) UNSIGNED NOT NULL DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-ALTER TABLE `tasks_tasklist`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fkCreatedBy` (`createdBy`),
-  ADD KEY `fkAcl` (`aclId`);
+-- -----------------------------------------------------
+-- Table `tasks_task`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tasks_task` (
+  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `uid` VARCHAR(190) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NOT NULL DEFAULT '',
+  `tasklistId` INT(11) UNSIGNED NOT NULL,
+  `createdBy` INT(11) NOT NULL,
+  `createdAt` DATETIME NOT NULL,
+  `modifiedAt` DATETIME NOT NULL,
+  `modifiedBy` INT(11) NOT NULL DEFAULT 0,
+  `filesFolderId` INT(11) NOT NULL DEFAULT 0,
+  `due` DATE NOT NULL,
+  `start` DATE NOT NULL,
+  `estimatedDuration` VARCHAR(20) NULL,
+  `progress` TINYINT(2) NOT NULL DEFAULT 1,
+  `progressUpdated` DATETIME NULL DEFAULT NULL,
+  `title` VARCHAR(255) NOT NULL,
+  `description` TEXT NULL DEFAULT NULL,
+  `color` CHAR(6) NULL,
+  `recurrenceRule` VARCHAR(400) NULL DEFAULT '',
+  `priority` INT(11) NOT NULL DEFAULT 1,
+  `freeBusyStatus` CHAR(4) NULL DEFAULT 'busy',
+  `privacy` VARCHAR(7) NULL DEFAULT 'public',
+  `percentageComplete` TINYINT(4) NOT NULL DEFAULT 0,
+  `uri` VARCHAR(190) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `list_id` (`tasklistId` ASC),
+  INDEX `rrule` (`recurrenceRule`(191) ASC),
+  INDEX `uuid` (`uid` ASC),
+  INDEX `fkModifiedBy` (`modifiedBy` ASC),
+  INDEX `createdBy` (`createdBy` ASC),
+  INDEX `filesFolderId` (`filesFolderId` ASC),
+  CONSTRAINT `fkModifiedBy`
+    FOREIGN KEY (`modifiedBy`)
+    REFERENCES `core_user` (`id`),
+  CONSTRAINT `tasks_task_ibfk_1`
+    FOREIGN KEY (`tasklistId`)
+    REFERENCES `tasks_tasklist` (`id`),
+  CONSTRAINT `tasks_task_ibfk_2`
+    FOREIGN KEY (`createdBy`)
+    REFERENCES `core_user` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_unicode_ci;
 
-ALTER TABLE `tasks_tasklist`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `tasks_tasklist`
-  ADD CONSTRAINT `fkAcl` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`),
-  ADD CONSTRAINT `fkCreatedBy` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`);
+-- -----------------------------------------------------
+-- Table `tasks_task_user`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tasks_task_user` (
+  `taskId` INT(11) UNSIGNED NOT NULL,
+  `userId` INT NOT NULL,
+  `modSeq` INT NOT NULL,
+  `freeBusyStatus` CHAR(4) NOT NULL DEFAULT 'busy',
+  PRIMARY KEY (`taskId`, `userId`),
+  INDEX `fk_tasks_task_user_tasks_task1_idx` (`taskId` ASC),
+  CONSTRAINT `fk_tasks_task_user_tasks_task1`
+    FOREIGN KEY (`taskId`)
+    REFERENCES `tasks_task` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
 
--- create task category table
-CREATE TABLE `tasks_category` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `createdBy` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-ALTER TABLE `tasks_category`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`createdBy`);
+-- -----------------------------------------------------
+-- Table `tasks_alert`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tasks_alert` (
+  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `when` DATETIME NOT NULL,
+  `acknowledged` DATETIME NOT NULL,
+  `relatedTo` TEXT NULL,
+  `action` SMALLINT(2) NOT NULL DEFAULT 1,
+  `offset` VARCHAR(45) NULL,
+  `relativeTo` VARCHAR(5) NULL DEFAULT 'start',
+  `taskId` INT(11) UNSIGNED NOT NULL,
+  `userId` INT NOT NULL,
+  PRIMARY KEY (`id`, `taskId`, `userId`),
+  INDEX `fk_tasks_alert_tasks_task_user1_idx` (`taskId` ASC, `userId` ASC),
+  CONSTRAINT `fk_tasks_alert_tasks_task_user1`
+    FOREIGN KEY (`taskId` , `userId`)
+    REFERENCES `tasks_task_user` (`taskId` , `userId`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_unicode_ci;
 
-ALTER TABLE `tasks_category`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `tasks_category`
-  ADD CONSTRAINT `tasks_category_ibfk_1` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`);
+-- -----------------------------------------------------
+-- Table `tasks_category`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tasks_category` (
+  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `createdBy` INT(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `user_id` (`createdBy` ASC),
+  CONSTRAINT `tasks_category_ibfk_1`
+    FOREIGN KEY (`createdBy`)
+    REFERENCES `core_user` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_unicode_ci;
 
--- create task table
-CREATE TABLE `tasks_task` (
-  `id` int(11) NOT NULL,
-  `uid` varchar(190) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT '',
-  `tasklistId` int(11) NOT NULL,
-  `createdBy` int(11) NOT NULL,
-  `createdAt` datetime NOT NULL,
-  `modifiedAt` datetime NOT NULL,
-  `modifiedBy` int(11) NOT NULL DEFAULT '0',
-  `start` date NOT NULL,
-  `due` date NOT NULL,
-  `completed` datetime DEFAULT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `recurrenceRule` varchar(400) COLLATE utf8mb4_unicode_ci DEFAULT '',
-  `filesFolderId` int(11) NOT NULL DEFAULT '0',
-  `priority` int(11) NOT NULL DEFAULT '1',
-  `percentageComplete` tinyint(4) NOT NULL DEFAULT '0',
-  `projectId` int(11) NOT NULL DEFAULT '0',
-  `uri` varchar(190) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-ALTER TABLE `tasks_task`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `list_id` (`tasklistId`),
-  ADD KEY `rrule` (`recurrenceRule`(191)),
-  ADD KEY `uuid` (`uid`),
-  ADD KEY `fkModifiedBy` (`modifiedBy`),
-  ADD KEY `fkProject` (`projectId`),
-  ADD KEY `createdBy` (`createdBy`),
-  ADD KEY `fk_tasks_task_ownerId` (`ownerId`),
-  ADD KEY `filesFolderId` (`filesFolderId`);
+-- -----------------------------------------------------
+-- Table `tasks_portlet_tasklist`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tasks_portlet_tasklist` (
+  `createdBy` INT(11) NOT NULL,
+  `tasklistId` INT(11) UNSIGNED NOT NULL,
+  PRIMARY KEY (`createdBy`, `tasklistId`),
+  INDEX `tasklistId` (`tasklistId` ASC),
+  CONSTRAINT `tasks_portlet_tasklist_ibfk_1`
+    FOREIGN KEY (`createdBy`)
+    REFERENCES `core_user` (`id`)
+    ON DELETE CASCADE,
+  CONSTRAINT `tasks_portlet_tasklist_ibfk_2`
+    FOREIGN KEY (`tasklistId`)
+    REFERENCES `tasks_tasklist` (`id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_unicode_ci;
 
-ALTER TABLE `tasks_task`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `tasks_task`
-  ADD CONSTRAINT `fkModifiedBy` FOREIGN KEY (`modifiedBy`) REFERENCES `core_user` (`id`),
-  ADD CONSTRAINT `tasks_task_ibfk_1` FOREIGN KEY (`tasklistId`) REFERENCES `tasks_tasklist` (`id`),
-  ADD CONSTRAINT `tasks_task_ibfk_2` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`);
+-- -----------------------------------------------------
+-- Table `tasks_task_category`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tasks_task_category` (
+  `taskId` INT(11) UNSIGNED NOT NULL,
+  `categoryId` INT(11) UNSIGNED NOT NULL,
+  PRIMARY KEY (`taskId`, `categoryId`),
+  INDEX `tasks_task_category_ibfk_2` (`categoryId` ASC),
+  CONSTRAINT `tasks_task_category_ibfk_1`
+    FOREIGN KEY (`taskId`)
+    REFERENCES `tasks_task` (`id`)
+    ON DELETE CASCADE,
+  CONSTRAINT `tasks_task_category_ibfk_2`
+    FOREIGN KEY (`categoryId`)
+    REFERENCES `tasks_category` (`id`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_unicode_ci;
 
--- create category / task lookup table
-CREATE TABLE `tasks_task_category` (
-  `taskId` int(11) NOT NULL,
-  `categoryId` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-ALTER TABLE `tasks_task_category`
-  ADD PRIMARY KEY (`taskId`,`categoryId`),
-  ADD KEY `tasks_task_category_ibfk_2` (`categoryId`);
-
-ALTER TABLE `tasks_task_category`
-  ADD CONSTRAINT `tasks_task_category_ibfk_1` FOREIGN KEY (`taskId`) REFERENCES `tasks_task` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `tasks_task_category_ibfk_2` FOREIGN KEY (`categoryId`) REFERENCES `tasks_category` (`id`) ON DELETE CASCADE;
-
--- create task alert table
-CREATE TABLE `tasks_alert` (
-  `id` int(11) NOT NULL,
-  `taskId` int(11) NOT NULL,
-  `remindDate` date NOT NULL,
-  `remindTime` time NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-ALTER TABLE `tasks_alert`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `fkTaskId` (`taskId`);
-
-ALTER TABLE `tasks_alert`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
-ALTER TABLE `tasks_alert`
-  ADD CONSTRAINT `fkTaskId` FOREIGN KEY (`taskId`) REFERENCES `tasks_task` (`id`) ON DELETE CASCADE;
-
--- create task portlet table
-CREATE TABLE `tasks_portlet_tasklist` (
-  `createdBy` int(11) NOT NULL,
-  `tasklistId` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-ALTER TABLE `tasks_portlet_tasklist`
-  ADD PRIMARY KEY (`createdBy`,`tasklistId`),
-  ADD KEY `tasklistId` (`tasklistId`);
-
-ALTER TABLE `tasks_portlet_tasklist`
-  ADD CONSTRAINT `tasks_portlet_tasklist_ibfk_1` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`),
-  ADD CONSTRAINT `tasks_portlet_tasklist_ibfk_2` FOREIGN KEY (`tasklistId`) REFERENCES `tasks_tasklist` (`id`);
-
--- create task settings table
-CREATE TABLE `tasks_settings` (
-  `createdBy` int(11) NOT NULL,
-  `reminderDays` int(11) NOT NULL DEFAULT '0',
-  `reminderTime` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '0',
-  `remind` tinyint(1) NOT NULL DEFAULT '0',
-  `defaultTasklistId` int(11) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-ALTER TABLE `tasks_settings`
-  ADD PRIMARY KEY (`createdBy`);
-
-ALTER TABLE `tasks_settings`
-  ADD CONSTRAINT `tasks_settings_ibfk_1` FOREIGN KEY (`createdBy`) REFERENCES `core_user` (`id`);
-
--- create task custom field table
-CREATE TABLE `tasks_task_custom_fields` (
-  `id` INT(11) NOT NULL,
+-- -----------------------------------------------------
+-- Table `tasks_task_custom_fields`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tasks_task_custom_fields` (
+  `id` INT(11) UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_tasks_task_custom_field1`
-     FOREIGN KEY (`id`)
-     REFERENCES `tasks_task` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+    FOREIGN KEY (`id`)
+    REFERENCES `tasks_task` (`id`)
+    ON DELETE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_unicode_ci;
+
+
+-- -----------------------------------------------------
+-- Table `tasks_tasklist_group`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tasks_tasklist_group` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100) NOT NULL,
+  `color` CHAR(6) NULL,
+  `sortOrder` SMALLINT(2) UNSIGNED NOT NULL DEFAULT 0,
+  `tasklistId` INT(11) UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`, `tasklistId`),
+  INDEX `fk_tasks_column_tasks_tasklist1_idx` (`tasklistId` ASC),
+  CONSTRAINT `fk_tasks_column_tasks_tasklist1`
+    FOREIGN KEY (`tasklistId`)
+    REFERENCES `tasks_tasklist` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `tasks_tasklist_user`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tasks_tasklist_user` (
+  `tasklistId` INT(11) UNSIGNED NOT NULL,
+  `userId` INT NOT NULL,
+  `modSeq` INT NOT NULL,
+  `color` CHAR(6) NULL,
+  `sortOrder` INT NULL,
+  `isVisible` TINYINT(1) NOT NULL DEFAULT 0,
+  `isSubscribed` TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`tasklistId`, `userId`),
+  INDEX `fk_tasks_tasklist_user_tasks_tasklist1_idx` (`tasklistId` ASC),
+  CONSTRAINT `fk_tasks_tasklist_user_tasks_tasklist1`
+    FOREIGN KEY (`tasklistId`)
+    REFERENCES `tasks_tasklist` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `tasks_participant`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tasks_participant` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100) NULL,
+  `email` VARCHAR(100) NULL,
+  `description` VARCHAR(255) NULL,
+  `sendTo` VARCHAR(200) NULL,
+  `kind` SMALLINT(2) NULL,
+  `roles` VARCHAR(72) NULL,
+  `participantionStatus` SMALLINT(2) NOT NULL DEFAULT 1,
+  `participantionComment` VARCHAR(255) NULL,
+  `progress` TINYINT(2) UNSIGNED NOT NULL DEFAULT 1,
+  `progressUpdated` DATETIME NULL,
+  `percentComplete` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0,
+  `taskId` INT(11) UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`, `taskId`),
+  INDEX `fk_task_participant_tasks_task1_idx` (`taskId` ASC),
+  CONSTRAINT `fk_task_participant_tasks_task1`
+    FOREIGN KEY (`taskId`)
+    REFERENCES `tasks_task` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `tasks_default_alert`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `tasks_default_alert` (
+  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `when` DATETIME NOT NULL,
+  `acknowledged` DATETIME NOT NULL,
+  `relatedTo` TEXT NULL,
+  `action` SMALLINT(2) NOT NULL DEFAULT 1,
+  `offset` VARCHAR(45) NULL,
+  `relativeTo` VARCHAR(5) NULL DEFAULT 'start',
+  `withTime` TINYINT(1) NOT NULL DEFAULT 1,
+  `tasklistId` INT(11) UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`, `tasklistId`),
+  INDEX `fk_tasks_default_alert_tasks_tasklist1_idx` (`tasklistId` ASC),
+  CONSTRAINT `fk_tasks_default_alert_tasks_tasklist1`
+    FOREIGN KEY (`tasklistId`)
+    REFERENCES `tasks_tasklist` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_unicode_ci;

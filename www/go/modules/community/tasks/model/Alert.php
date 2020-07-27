@@ -7,26 +7,102 @@
 namespace go\modules\community\tasks\model;
 						
 use go\core\orm\Property;
-						
+
 /**
- * Alert model
+ * Representing alerts/reminders to display or send to the user for this calendar object.
  */
 class Alert extends Property {
-	
-	/** @var int */
+
+    const ActionDisplay = 1;
+    const ActionsEmail = 2;
+
+	/** @var int PK */
 	public $id;
 
-	/** @var int */
+	/** @var int PK to task this Alert belongs to */
 	public $taskId;
 
-	/** @var \go\core\util\DateTime */
-	public $remindDate;
+	/**
+     * Defines a specific UTC date-time when the alert is triggered.
+     * Wen using a OffsetTrigger this will still be set
+     * @var DateTime
+     */
+    protected $when;
 
-	/** @var \go\core\util\DateTime */
-	public $remindTime;
+	/** @var If set trigger is not absolute and should change when start or end time change */
+    protected $offset;
 
-	protected static function defineMapping() {
-		return parent::defineMapping()->addTable("tasks_alert", "alert");
-	}
+    protected $relativeTo = 'start'; // start or due time of task
+
+	/** @var DateTime This records when an alert was last acknowledged. This is set when the user has dismissed the alert */
+    public $acknowledged;
+
+    /**
+     * @var string[Relation]
+     * Relates this alert to other alerts in the same task.
+     * If the user wishes to snooze an alert, the application
+     * creates an alert to trigger after snoozing.
+     * Relation type: 'first', 'next', 'child', 'parent
+     * eg. [5 => {relation: {'parent':true,'next':true}}]
+     */
+    public $relatedTo;
+
+    /** @var string 'display' or 'email' */
+    protected $action = self::ActionDisplay;
+
+    protected static function defineMapping() {
+        return parent::defineMapping()->addTable("tasks_alert", "alert");
+    }
+
+    public function getAction() {
+        return $this->action === self::ActionDisplay ? 'display' : 'email';
+    }
+
+    public function getTrigger() {
+        if(isset($this->offset)) {
+            return (object)[
+                'offset' => $this->offset,
+                'relativeTo' => $this->relativeTo ?? 'start'
+            ];
+        }
+        if(isset($this->when)) {
+            return (object)['when'=>$this->when];
+        }
+        return null;
+    }
+
+    /**
+     * OffsetTrigger
+     *  - offset = SignedDuration Defines the offset at which to trigger the alert relative to
+     *      the time property defined in the "relativeTo" property of the alert
+     *  - relativeTo = 'start' or 'end'
+     * AbsoluteTrigger
+     *  - when DateTime Defines a specific UTC date-time when the alert is triggered.
+     * @params $value OffsetTrigger|AbsoluteTrigger
+     */
+    public function setTrigger($value) {
+        if(isset($value->offset)) {
+            $task = Task::findById($this->taskId);
+            $this->offset = $value->offset;
+            $this->relativeTo = $value->relativeTo;
+            $relDate = clone ($value->relativeTo === 'end' ? $task->due : $task->start);
+            $this->when = $relDate->add(new \DateInterval($value->offset));
+        }
+        if(isset($value->when)) {
+            $this->offset = null;
+            $this->relativeTo = null;
+            $this->when = new \DateTime($value->when);
+        }
+    }
+
+    public function setAction($value) {
+        switch($value) {
+            case 'display': $this->action = self::ActionDisplay;
+                break;
+            case 'email':   $this->action = self::ActionEmail;
+                break;
+            default: $this->action = self::ActionDisplay;
+        }
+    }
 
 }

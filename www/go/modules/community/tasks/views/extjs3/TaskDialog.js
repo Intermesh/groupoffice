@@ -13,51 +13,21 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			return !fs.fieldSet.isTab;
 		});
 		var fieldSetAnchor = formFieldSets.length ? '100% 80%' : '100% 100%';
-		
-		this.titleField = new Ext.form.TextField({
-			name : 'title',
-			allowBlank : false,
-			fieldLabel : t("Subject")
-		});
+
 
 		var checkDateInput = function(field) {
-			if (field.name == 'due') {
-				if (start.getValue() > due.getValue()) {
-					start.setValue(due.getValue());
+			if (field.itemId === 'due') {
+				var start = field.ownerCt.get('start');
+				if (start.getValue() > field.getValue()) {
+					start.setValue(field.getValue());
 				}
 			} else {
-				if (start.getValue() > due.getValue()) {
-					due.setValue(start.getValue());
+				var due = field.ownerCt.get('due');
+				if (field.getValue() > due.getValue()) {
+					due.setValue(field.getValue());
 				}
 			}
 		}
-
-		var now = new Date();
-
-		var start = new Ext.form.DateField({
-			name : 'start',
-			fieldLabel : t("Starts at", "tasks"),
-			value : now.format(go.User.dateFormat),
-			listeners : {
-				change : {
-					fn : checkDateInput,
-					scope : this
-				}
-			}
-		});
-
-		var due = new Ext.form.DateField({
-			name : 'due',
-			allowBlank : false,
-			fieldLabel : t("Due at", "tasks"),
-			value : now.format(go.User.dateFormat),
-			listeners : {
-				change : {
-					fn : checkDateInput,
-					scope : this
-				}
-			}
-		});
 
 		this.selectCategory = new go.form.Chips({
 			anchor: '-20',
@@ -74,28 +44,32 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			fieldLabel:t("Category", "tasks")
 		}),
 
-		this.selectTasklist = new go.form.ComboBoxReset({
-			hiddenName:'tasklistId',
-			fieldLabel:t("Tasklist"),
-			valueField:'id',
-			displayField:'name',			
-			store: new go.data.Store({
-				fields:['id','name','user_name'],
-				entityStore: "Tasklist",
-				displayField: "name",
-			}),
-			mode:'local',
-			triggerAction:'all',
-			emptyText:t("Select tasklist"),
-			editable:false,
-			selectOnFocus:true,
-			forceSelection:true,
-			pageSize: parseInt(GO.settings['max_rows_list'])
-		});
-		
-
 		this.taskCombo = new go.modules.community.tasks.TaskCombo({});
-		this.selectPriority = new go.modules.community.tasks.SelectPriority();
+
+		this.selectPriority = {
+			xtype:'combo',
+			name: 'priority_text',
+			hiddenName: 'priority',
+			triggerAction: 'all',
+			editable: false,
+			selectOnFocus: true,
+			width: 120,
+			forceSelection: true,
+			fieldLabel: t("Priority"),
+			mode: 'local',
+			value: 1,
+			valueField: 'value',
+			displayField: 'text',
+			store: new Ext.data.SimpleStore({
+				fields: ['value', 'text'],
+				data: [
+					[1, t("Low")],
+					[5, t("Normal")],
+					[8, t("High")]
+				]
+			})
+		};
+
 		this.descriptionField = new Ext.form.TextArea({
 			name : 'description',
 			allowBlank : false,
@@ -104,51 +78,85 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 		var propertiesPanel = new Ext.Panel({
 			hideMode : 'offsets',
-			title : t("Properties"),
-			
+			//title : t("Properties"),
+			labelAlign: 'top',
 			layout : 'form',
 			autoScroll : true,
 			items : [{
-					xtype: "fieldset",
-					defaults : {
+				xtype: "fieldset",
+				defaults : {
 					anchor : '100%'
-			},
-			labelWidth:120,
-					items:[
-				this.titleField, 
-				start,
-				due,
-				this.selectTasklist,
-				this.selectCategory,
-				this.selectPriority,
-				this.descriptionField
+				},
+				labelWidth:90,
+				items:[
+					{
+						xtype: 'container',
+						layout: 'column',
+						items: [
+							{
+								xtype:'textfield',
+								name : 'title',
+								columnWidth:.87,
+								allowBlank : false,
+								emptyText : t("Subject")
+							},
+							{html:' ', columnWidth:.03},
+							{xtype: 'colorfield', emptyText:'color', name: 'color', columnWidth:.1}
+						]
+					},{
+						xtype:'container',
+						layout:'hbox',
+						defaults: {xtype:'container',layout:'form'},
+						items: [
+							{items:[{
+								xtype:'datefield',
+								name : 'start',
+								itemId: 'start',
+								fieldLabel : t("Starts at", "tasks"),
+								listeners : {
+									change : checkDateInput,
+									scope : this
+								}
+							}]},
+							{items:[{
+								xtype:'datefield',
+								name : 'due',
+								itemId: 'due',
+								fieldLabel : t("Due at", "tasks"),
+								listeners : {
+									change : checkDateInput,
+									scope : this
+								}
+							}]},
+							{items:[this.selectPriority]}
+						]
+					},
+					{xtype:'hidden', name: 'tasklistId'},
+					{xtype:'hidden', name: 'groupId'},
+					this.selectCategory,
+					this.descriptionField,
+					{
+						xtype:'container',
+						title : t("Alerts"),
+						layout : 'form',
+						hideMode : 'offsets',
+						autoScroll : true,
+						items: [
+							new go.modules.community.tasks.AlertFields()
+						]
+					}
 				]
-			}
-			]
+			}]
 		});
 
 		this.recurrencePanel = new go.modules.community.tasks.RecurrencePanel();
 		// start other options tab
-		this.optionsPanel = new Ext.Panel({
-			title : t("Alerts"),
-			layout : 'form',
-			hideMode : 'offsets',
-			autoScroll : true,
-			items: [
-				new go.modules.community.tasks.AlertFields()
-			],
-		});
 
 		var items = [
-			propertiesPanel,{
-				hideMode : 'offsets',
-				cls:"go-form-panel",
-				title: t("Recurrence"),
-				items:[this.recurrencePanel]
-			},this.optionsPanel
+			propertiesPanel
 		];
 
-		this.tabPanel = new Ext.TabPanel({
+		this.tabPanel = new Ext.form.FieldSet({
 			activeTab : 0,
 			deferredRender : false,
 			border : false,
@@ -156,8 +164,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			hideLabel : true,
 			items : items
 		});
-		
-		this.selectTasklist.store.load();
-		return this.tabPanel;
+
+		return propertiesPanel;//this.tabPanel;
 	}
 });

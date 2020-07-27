@@ -15,23 +15,6 @@ use go\core\db\Criteria;
 use go\core\orm\Query;
 use go\core\util\DateTime;
 
-trait Recurrence {
-    public $interval = 1;
-    public $rscale = 'gregorian';
-    public $skip = 'omit';
-    public $firstDayOfWeek = 'mo';
-    public $byMonthDay;
-    public $byMonth;
-    public $byYearDAy;
-    public $byWeekNo;
-    public $byHour;
-    public $byMinute;
-    public $bySecond;
-    public $bySetPosition;
-    public $count;
-    public $until;
-}
-
 /**
  * Task model
  */
@@ -43,14 +26,14 @@ class Task extends AclItemEntity {
 	/** @var int PK in the database */
 	public $id;
 
-	/** @var Alert[] List of notification alerts when $useDefaultAlerts is not set */
-	public $alerts;
-
 	/** @var string global unique id for invites and sync  */
 	protected $uid = '';
 
 	/** @var int The list this Task belongs to */
 	public $tasklistId;
+
+    /** @var int */
+    public $projectId = 0;
 
 	/** @var int */
 	public $createdBy;
@@ -64,22 +47,29 @@ class Task extends AclItemEntity {
 	/** @var int */
 	public $modifiedBy = 0;
 
+    /** @var int */
+    public $filesFolderId = 0;
+
+    /** @var DateTime due date (when this should be finished) */
+    public $due;
+
 	/** @var DateTime local date when this task will be started */
 	public $start;
 
-	/** @var DateTime due date (when this should be finished) */
-	public $due;
+	/** @var Duration Estimated positive duration the task takes to complete. */
+    public $estimatedDuration;
 
-	/** @var DateTime  */
-	//public $completed; // migrate to $progress = 'completed'
+    /** @var Progress Defines the progress of this task */
+    public $progress = Progress::NeedsAction;
+
+	/** @var DateTime When the "progress" of either the task or a specific participant was last updated. */
+	public $progressUpdated;
 
 	/** @var string */
 	public $title;
 
 	/** @var string */
 	public $description;
-	/** @var int */
-	public $filesFolderId = 0;
 
 	//public $keywords; // only in jmap
 
@@ -88,37 +78,52 @@ class Task extends AclItemEntity {
 
 	public $color;
 
-	public $recurrenceId;
+	/**
+     * If present, this object represents one occurrence of a
+     * recurring object.  If present the "recurrenceRule" and
+     * "recurrenceOverrides" properties MUST NOT be present.
+     *
+     * The value is a date-time either produced by the "recurrenceRules" of
+     * the master event, or added as a key to the "recurrenceOverrides"
+     * property of the master event.
+     * @var DateTime
+     */
+	//public $recurrenceId;
 
     /** @var Recurrence */
     protected $recurrenceRule;
 
-    protected $recurrenceOverrides;
-    protected $excluded;
+    /** @var DateTime[PatchObject] map of recurrenceId => Task */
+    //protected $recurrenceOverrides;
 
-	/** @var int */
-	public $priority = 1;
+    /** @var boolean only set in recurrenceOverrides */
+    //protected $excluded;
 
-	public $freeBusy;
-    public $privacy;
+	/** @var int [0-9] 1 = highest priority, 9 = lowest, 0 = undefined */
+	public $priority = 0;
+
+	/** @var string free or busy */
+	public $freeBusyStatus = 'free';
+
+	/** @var string public , private, secret */
+    public $privacy = 'public';
 
     public $replyTo;
     public $participants;
 
-	/** @var int */
-	public $percentageComplete = 0;
-
-	/** @var int */
-	public $projectId = 0;
-
-	/** @var string */
-	protected $byDay = '';
+	/** @var int between 0 and 100 */
+	public $percentComplete = 0;
 
 	protected $uri;
 
+	/** @var bool If true, use the user's default alerts and ignore the value of the "alerts" property. */
+	public $useDefaultAlerts = false;
+
+    /** @var Alert[] List of notification alerts when $useDefaultAlerts is not set */
+    public $alerts;
+
 	/** @var int */
 	public $vcalendarBlobId;
-
 
 	protected static function aclEntityClass(){
 		return Tasklist::class;
@@ -131,7 +136,8 @@ class Task extends AclItemEntity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 			->addTable("tasks_task", "task")
-			->addArray('alerts', Alert::class, ['id' => 'taskId'])
+			->addUserTable("tasks_task_user", "ut", ['id' => 'taskId'])
+			->addMap('alerts', Alert::class, ['id' => 'taskId', 'ut.userId' => 'userId'])
 			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId']);
 	}
 
@@ -189,8 +195,8 @@ class Task extends AclItemEntity {
 				$criteria->where(['start' => $value]);
 			})->addDate("due", function(Criteria $criteria, $comparator, $value) {
 				$criteria->where(['due' => $value]);
-			})->add('percentageComplete', function(Criteria $criteria, $value) {
-				$criteria->where(['percentageComplete' => $value]);
+			})->add('percentComplete', function(Criteria $criteria, $value) {
+				$criteria->where(['percentComplete' => $value]);
 			})->addDate("late", function(Criteria $criteria, $comparator, $value) {
 				$criteria->where('due', '<', $value);
 			})->addDate("future", function(Criteria $criteria, $comparator, $value) {
@@ -212,8 +218,13 @@ class Task extends AclItemEntity {
 			}
 		}
 
-		// if alert can be based on start / end of task check those properties as well
-		if($this->isModified('alerts')) {
+		if($this->isNew()) {
+		    $this->uid = \go\core\util\UUID::v4();
+        }
+
+		// if alert can be based on start / due of task check those properties as well
+		if($this->isModified('alerts') ||
+           $this->isModified('useDefaultAlerts')) {
 			$this->updateAlerts();
 		}
 
@@ -233,7 +244,7 @@ class Task extends AclItemEntity {
 		foreach($this->alerts as $alert) {
 			$notify = new \go\core\model\Alert();
 			$notify->alertId = $alert->id;
-			$notify->triggerAt = new DateTime($alert->remindDate->format('Y-m-d '.$alert->remindTime));
+			$notify->triggerAt = $alert->when;
 			$notify->userId = $tasklist->ownerId;
 			$notify->entityId =  $this->id;
 			$notify->entityTypeId = $entityType->getId();
@@ -310,19 +321,7 @@ class Task extends AclItemEntity {
 
 
 	public function getUid() {
-		
-		if(empty($this->uid)) {
-			$url = trim(go()->getSettings()->URL, '/');
-			$uid = substr($url, strpos($url, '://') + 3);
-			$uid = str_replace('/', '-', $uid );
-			$this->uid = $this->id . '@' . $uid;
-		}
-
 		return $this->uid;		
-	}
-
-	public function setUid($uid) {
-		$this->uid = $uid;
 	}
 
 	public function hasUid() {
