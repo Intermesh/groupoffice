@@ -222,7 +222,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 		var wrap = new Ext.Container({
 			id: rowId,
-			rowIndex: this.items.getCount(),
+			rowIndex: this.items ? this.items.getCount() : 0,
 			cls: 'go-form-group-row',
 			layout: "column",
 			formField: formField,			
