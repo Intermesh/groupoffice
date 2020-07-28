@@ -22,24 +22,106 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 		});
 		this.endDatePicker.on("select", this.onEndDateSelect, this);
 
+		var todayStart = (new Date()).clearTime(),
+			todayEnd = new Date(todayStart).add(Date.DAY, 1),
+			yesterdayStart = new Date(todayStart).add(Date.DAY, -1),
+
+			thisWeekStart = (new Date(todayStart)).add(Date.DAY, (todayStart.format('N') - 1) * -1),
+			thisWeekEnd = (new Date(thisWeekStart)).add(Date.DAY, 6),
+
+		 	thisMonthStart = new Date(todayStart.getFullYear(), todayStart.getMonth(), 1),
+		 	thisMonthEnd = new Date(todayStart.getFullYear(), todayStart.getMonth() + 1, 1).add(Date.DAY, -1),
+
+		 	lastMonthStart = new Date(todayStart.getFullYear(), todayStart.getMonth()-1, 1),
+		 	lastMonthEnd = new Date(todayStart.getFullYear(), todayStart.getMonth(), 1).add(Date.DAY, -1)
+
+			lastYearStart = new Date(todayStart.getFullYear() - 1, 0, 1),
+			lastYearEnd = new Date(todayStart.getFullYear(), 0, 1).add(Date.DAY, -1);
+
 		this.menu = new Ext.menu.Menu({
 			items: [{
-				xtype: "container",
-				layout: "column",
-				defaults: {
-					columnWidth: .5
-				},
-				items: [
-					this.startDatePicker,
-					this.endDatePicker
-				]
-			}],
-			doFocus: function () {
-				me.startDatePicker.focus();
-			}
+				text: t("Today"),
+				start: todayStart,
+				end: todayStart,
+				handler: this.setDateRange,
+				scope: this
+			},{
+				text: t("Yesterday"),
+				start: yesterdayStart,
+				end: yesterdayStart,
+				handler: this.setDateRange,
+				scope: this
+			},{
+				text: t("This week"),
+				start: thisWeekStart,
+				end: thisWeekEnd,
+				handler: this.setDateRange,
+				scope: this
+			},{
+				text: t("This month"),
+				start: thisMonthStart,
+				end: thisMonthEnd,
+				handler: this.setDateRange,
+				scope: this
+			},{
+				text: t("Last month"),
+				start: lastMonthStart,
+				end: lastMonthEnd,
+				handler: this.setDateRange,
+				scope: this
+			},{
+				text: t("Last year"),
+				start: lastYearStart,
+				end: lastYearEnd,
+				handler: this.setDateRange,
+				scope: this
+			}, {
+				text: t("Custom"),
+				menu: [{
+					xtype: "container",
+					layout: "column",
+					width: dp(600),
+					defaults: {
+						columnWidth: .5,
+						xtype: "container",
+						layout: "anchor",
+						anchor: "100%"
+					},
+					items: [{
+						items: [
+							{
+								style: 'padding-left: ' + dp(16) + 'px',
+								xtype: "box",
+								html: t("Start") + ":"
+							},
+							this.startDatePicker
+						]
+					},{
+						items: [
+							{
+								style: 'padding-left: ' + dp(16) + 'px',
+								xtype: "box",
+								html: t("End") + ":"
+							},
+							this.endDatePicker
+						]
+					}
+					]
+				}],
+				doFocus: function () {
+					me.startDatePicker.focus();
+				}
+
+			}]
 		});
 
 		this.supr().initComponent.call(this);
+	},
+
+	setDateRange: function(btn) {
+		this.startDatePicker.setValue(btn.start);
+		this.endDatePicker.setValue(btn.end);
+		this.onEndDateSelect();
 	},
 
 	getName: function () {
@@ -98,7 +180,7 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 		var txt = go.util.Format.date(this.startDatePicker.getValue()) + ' - ' + go.util.Format.date(this.endDatePicker.getValue());
 		this.setText(txt);
 	},
-	onEndDateSelect : function(dp, date) {
+	onEndDateSelect : function() {
 
 		this.value = this.startDatePicker.getValue().format("Y-m-d") +
 			".." +
