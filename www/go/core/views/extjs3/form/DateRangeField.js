@@ -37,6 +37,9 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 		 	lastMonthStart = new Date(todayStart.getFullYear(), todayStart.getMonth()-1, 1),
 		 	lastMonthEnd = new Date(todayStart.getFullYear(), todayStart.getMonth(), 1).add(Date.DAY, -1)
 
+			thisYearStart = new Date(todayStart.getFullYear() , 0, 1),
+			thisYearEnd = new Date(todayStart.getFullYear() +1 , 0, 1).add(Date.DAY, -1),
+
 			lastYearStart = new Date(todayStart.getFullYear() - 1, 0, 1),
 			lastYearEnd = new Date(todayStart.getFullYear(), 0, 1).add(Date.DAY, -1);
 
@@ -61,6 +64,12 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 				handler: this.setDateRange,
 				scope: this
 			},{
+				text: t("Last week"),
+				start: thisWeekStart.add(Date.DAY, -7),
+				end: thisWeekEnd.add(Date.DAY, -7),
+				handler: this.setDateRange,
+				scope: this
+			},{
 				text: t("This month"),
 				start: thisMonthStart,
 				end: thisMonthEnd,
@@ -70,6 +79,12 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 				text: t("Last month"),
 				start: lastMonthStart,
 				end: lastMonthEnd,
+				handler: this.setDateRange,
+				scope: this
+			},{
+				text: t("This year"),
+				start: thisYearStart,
+				end: thisYearEnd,
 				handler: this.setDateRange,
 				scope: this
 			},{
