@@ -107,13 +107,10 @@ class Filters {
 					break;
 					
 				case 'date':					
-					$range = $this->checkRange($value);
+					$range = $this->checkDateRange($value);
 					if($range) {
-						$range[0] = new DateTime($range[0]);
-						$range[1] = new DateTime($range[1]);
-						
 						call_user_func($filterConfig['fn'], $criteria, '>=', $range[0], $query, $filter);
-						call_user_func($filterConfig['fn'], $criteria, '<=', $range[1], $query, $filter);
+						call_user_func($filterConfig['fn'], $criteria, $range['endHasTime'] ? '<=' : '<', $range[1], $query, $filter);
 					} else
 					{
 						$v = self::parseNumericValue($value);
@@ -251,7 +248,33 @@ class Filters {
 			//no range given
 			return false;
 		}
-		
+
+		return $parts;
+	}
+
+	private function checkDateRange($value) {
+		//Operators >, <, =, !=,
+		//Range ..
+
+		$parts = array_map('trim', explode('..', $value));
+		if(count($parts) > 2) {
+			throw new \Exception("Invalid range. Only one .. allowed");
+		}
+
+		if(count($parts) == 1) {
+			//no range given
+			return false;
+		}
+
+		$endHasTime = strpos($parts[1], ':') !== false;
+
+		$parts[0] = new DateTime($parts[0]);
+		$parts[1] = new DateTime($parts[1]);
+		$parts['endHasTime'] = $endHasTime;
+		if(!$endHasTime) {
+			$parts[1]->add(new \DateInterval("P1D"));
+		}
+
 		return $parts;
 	}
 }

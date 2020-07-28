@@ -278,7 +278,7 @@ Alle rechten voorbehouden<br />',
   'City (work)' => 'Woonplaats (werk)',
   'Initials' => 'Voorletters',
   'Sex' => 'Geslacht',
-  'Birthday' => 'Geboortedatum',
+  'Birthday' => 'Verjaardag',
   'sexes' => 
   array (
     'M' => 'Man',

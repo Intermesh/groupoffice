@@ -78,7 +78,7 @@ class Sync extends Controller {
       $username = $this->getGOUserName($record,$server);
       
       if (empty($username)) {
-        $this->output("Skipping record. Could not determine username.");
+        $this->output("Skipping record. Could not determine username for record: " . $record->getDn());
         continue;
       }
 
@@ -126,7 +126,7 @@ class Sync extends Controller {
   }
 
   private function getGOUserName(Record $record, Server $server) {
-    $username = $record->{$server->usernameAttribute}[0];
+    $username = $record->{$server->usernameAttribute}[0] ?? null;
 
     if(!$username) {
       go()->debug("No username found in record: ");
@@ -285,7 +285,9 @@ class Sync extends Controller {
           $this->output("Error: user '" . $u['username'] . "' does not exist in Group-Office");
         } else {
           $this->output("Adding user '" . $u['username'] . "'");
-          $group->users[] = $user->id; //(new UserGroup())->setValue('userId', $user->id);
+          if(!in_array($user->id, $group->users)) {
+	          $group->users[] = $user->id; //(new UserGroup())->setValue('userId', $user->id);
+          }
         }
       }
 
@@ -362,7 +364,7 @@ class Sync extends Controller {
       foreach ($record->member as $username) {    
         go()->debug("Member: " . $username);  
         $u = $this->queryActiveDirectoryUser($ldapConn, $username, $server);
-        if (!$u['username']) {
+        if ($u || !$u['username']) {
           $this->output("Skipping '$username'. Could not find GO user");
           continue;
         }

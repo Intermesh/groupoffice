@@ -312,7 +312,8 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						boxLabel: t('Synchronize users'),
 						name: 'syncUsers'
 					},{
-						xtype: 'textfield',
+						xtype: 'textarea',
+						grow: true,
 						name: 'syncUsersQuery',
 						fieldLabel: t("User query"),
 						required: true,
@@ -325,7 +326,8 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						boxLabel: t('Synchronize groups'),
 						name: 'syncGroups'
 					},{
-						xtype: 'textfield',
+						xtype: 'textarea',
+						grow: true,
 						name: 'syncGroupsQuery',
 						fieldLabel: t("Group query"),
 						required: true,
