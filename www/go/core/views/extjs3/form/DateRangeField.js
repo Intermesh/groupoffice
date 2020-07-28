@@ -3,7 +3,7 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 	value: null,
 	lastValue: null,
 
-	text: t("Select date range..."),
+	text: t("No range selected"),
 
 	iconCls: 'ic-schedule',
 
@@ -51,18 +51,18 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 	},
 
 	reset: function () {
-		this.setValue(null);
+		this.value = null;
+		this.updateBtnText();
 	},
 
 	setValue: function (v) {
 		this.lastValue = this.getValue();
+		this.value = v;
 		this.updateBtnText();
 	},
 
 	getValue: function () {
-		return this.startDatePicker.getValue().format("Y-m-d") +
-			".." +
-			this.endDatePicker.getValue().format('Y-m-d');
+		return this.value;
 	},
 
 	getRawValue : function() {
@@ -91,10 +91,19 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 	},
 
 	updateBtnText: function() {
+		if(this.value == null) {
+			this.setText(t("No range selected"));
+			return;
+		}
 		var txt = go.util.Format.date(this.startDatePicker.getValue()) + ' - ' + go.util.Format.date(this.endDatePicker.getValue());
 		this.setText(txt);
 	},
 	onEndDateSelect : function(dp, date) {
+
+		this.value = this.startDatePicker.getValue().format("Y-m-d") +
+			".." +
+			this.endDatePicker.getValue().format('Y-m-d')
+
 		this.updateBtnText();
 
 		this.fireEvent("change", this, this.getValue(), this.lastValue);
