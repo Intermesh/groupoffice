@@ -1,3 +1,6 @@
+28-07-2020 6.4.161
+- Core: Date range component
+
 27-07-2020 6.4.160
 - billing / core: Removed duplicate translations;
 - ldapauth: check if mail and username attribute are present for sync, allow larger queries
