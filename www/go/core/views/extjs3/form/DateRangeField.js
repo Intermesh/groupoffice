@@ -41,6 +41,7 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 			lastYearEnd = new Date(todayStart.getFullYear(), 0, 1).add(Date.DAY, -1);
 
 		this.menu = new Ext.menu.Menu({
+			cls: "x-menu-no-icons",
 			items: [{
 				text: t("Today"),
 				start: todayStart,
