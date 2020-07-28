@@ -572,6 +572,13 @@ class Contact extends AclItemEntity {
 										->add('gender', function(Criteria $criteria, $value) {
 											$criteria->andWhere(['gender' => $value, 'isOrganization'=> false]);
 										})
+										->addDate("dateofbirth", function(Criteria $criteria, $comparator, $value, Query $query) {
+											if(!$query->isJoined('addressbook_date', 'dob')) {
+												$query->join('addressbook_date', 'dob', 'dob.contactId = c.id', "INNER");
+											}
+											$criteria->where('dob.type', '=', Date::TYPE_BIRTHDAY)
+												->andWhere('dob.date',$comparator, $value);
+										})
 										->addDate("birthday", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_date', 'date')) {
 												$query->join('addressbook_date', 'date', 'date.contactId = c.id', "INNER");

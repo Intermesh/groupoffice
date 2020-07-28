@@ -9,6 +9,8 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 
 	isFormField: true,
 
+	autoWidth: false,
+
 	initComponent: function() {
 
 		var me = this;

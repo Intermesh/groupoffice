@@ -185,6 +185,11 @@ go.Modules.register("community", "addressbook", {
 				name: 'birthday',
 				multiple: false,
 				type: 'date'
+			},{
+				title: t("Date of birth"),
+				name: 'dateofbirth',
+				multiple: false,
+				type: 'date'
 			}, {
 				title: t("User group"),
 				name: 'usergroupid',
