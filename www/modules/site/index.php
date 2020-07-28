@@ -67,6 +67,7 @@ RewriteRule ^(.*)\?*$ index.php/$1 [L,QSA]
 //Or you can use:
 //define('GO_CONFIG_FILE', '/path/to/config.php');
 
+
 $go = dirname(__FILE__).'/../../GO.php';
 if(file_exists($go))
 	require($go);
@@ -77,7 +78,12 @@ else
 
 
 //GO::setMaxExecutionTime(3, true);
+header("X-Frame-Options: SAMEORIGIN");
+header("Content-Security-Policy: default-src 'self' about:;font-src 'self' data:;script-src 'unsafe-eval' 'self' 'unsafe-inline';img-src 'self' about: data: http: https:;style-src 'self' 'unsafe-inline';frame-src 'self' https: http: groupoffice: groupoffices:;frame-ancestors 'self';");
+header("X-Content-Type-Options: nosniff");
+header("Strict-Transport-Security: max-age=31536000");
+header("X-XSS-Protection: 1;mode=block");
 
 require(\GO::config()->root_path.'modules/site/components/Site.php');
 \Site::launch();
-?>
+
