@@ -459,23 +459,25 @@ abstract class EntityController extends Controller {
 			$setIds = array_keys($result['updated']);
 		}
 		if(isset($result['created'])) {
-			$setIds = array_merge(array_map(function($mod) {return $mod['id'];}, $result['created']));
+			$setIds = array_merge(array_map(function($mod) {return $mod['id'];}, $result['created']), $setIds);
 		}
 
-		if(count(static::$updatedEntitities) > 1) {						
-			static::$updatedEntitities = array_filter(static::$updatedEntitities, function($id) use($setIds) {
-				return !in_array($id, $setIds);
-			}, ARRAY_FILTER_USE_KEY);
+		static::$updatedEntitities = array_filter(static::$updatedEntitities, function($id) use($setIds) {
+			return !in_array($id, $setIds);
+		}, ARRAY_FILTER_USE_KEY);
 
-			$result['updated'] = isset($result['updated']) ? array_replace($result['updated'], static::$updatedEntitities) : static::$updatedEntitities;
+		$result['updated'] = isset($result['updated']) ? array_replace($result['updated'], static::$updatedEntitities) : static::$updatedEntitities;
+		if(empty($result['updated'])) {
+			$result['updated'] = null;
 		}
-		if(count(static::$createdEntitities) > 1) {
 
-			static::$createdEntitities = array_filter(static::$createdEntitities, function($id) use($setIds) {
-				return !in_array($id, $setIds);
-			}, ARRAY_FILTER_USE_KEY);
+		static::$createdEntitities = array_filter(static::$createdEntitities, function($id) use($setIds) {
+			return !in_array($id, $setIds);
+		}, ARRAY_FILTER_USE_KEY);
 
-			$result['created'] = isset($result['created']) ? array_replace($result['created'], static::$createdEntitities) : static::$createdEntitities;
+		$result['created'] = isset($result['created']) ? array_replace($result['created'], static::$createdEntitities) : static::$createdEntitities;
+		if(empty($result['created'])) {
+			$result['created'] = null;
 		}
 	}
 

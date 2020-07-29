@@ -68,7 +68,7 @@ $query = new Query();
 //Client may specify 
 if(isset($_GET['types'])) {
 	$entityNames = explode(",", $_GET['types']);
-	$query->where('e.name', 'IN', $entityNames);
+	$query->where('e.clientName', 'IN', $entityNames);
 }
 $entities = EntityType::findAll($query);
 $map = [];

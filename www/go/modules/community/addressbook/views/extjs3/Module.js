@@ -153,7 +153,7 @@ go.Modules.register("community", "addressbook", {
 				title: t("Organization") + ": " + t ("City"),
 				type: "string",
 				multiple: true
-			}, , {
+			}, {
 				name: 'orgCountry',
 				title: t("Organization") + ": " + t ("Country"),
 				type: "string",
@@ -183,6 +183,11 @@ go.Modules.register("community", "addressbook", {
 			{
 				title: t("Birthday"),
 				name: 'birthday',
+				multiple: false,
+				type: 'date'
+			},{
+				title: t("Date of birth"),
+				name: 'dateofbirth',
 				multiple: false,
 				type: 'date'
 			}, {
