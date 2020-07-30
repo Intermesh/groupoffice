@@ -133,6 +133,10 @@ abstract class Message extends \GO\Base\Model {
 	public function setAttributes($attributes) {
 
 		$this->attributes = array_merge($this->attributes, $attributes);
+
+		if(empty($this->attributes['from'])) {
+			$this->attributes['from'] = "unknown@unkonwn.domain";
+		}
 		
 		$this->attributes['to'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['to']));
 		$this->attributes['cc'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['cc']));

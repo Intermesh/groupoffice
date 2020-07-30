@@ -1,6 +1,7 @@
 - Bookmarks: fixed bug where logo didn't save
-- Email: Workaround if from header is missing in email message
+- Email: Workaround if "From" header is missing in email message
 - Core: disable JMAP sync states on rebuild search cache and database check. Reset state when done.
+- Address book / carddav: Database check fixes missing uri's and import will generate uri if uid is already present
 
 30-07-2020 6.4.162
 - Studio: Was missing license definition which caused install to fial without license.

@@ -250,8 +250,8 @@ class ImapMessage extends ComposerMessage {
 		$attributes = $this->attributes;
 		
 		$from = $this->from->getAddress();
-		$attributes['from']= $from ? $from["personal"] : "unknown@localhost.localdomain";
-		$attributes['sender']= $from ? $from["email"] : "unknown@localhost.localdomain";
+		$attributes['from']= $from["personal"];
+		$attributes['sender'] = $from["email"];
 		
 		$attributes['to']=(string) $this->to;
 		$attributes['cc']=(string) $this->cc;
