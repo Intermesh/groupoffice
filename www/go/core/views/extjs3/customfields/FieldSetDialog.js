@@ -31,7 +31,13 @@ go.customfields.FieldSetDialog = Ext.extend(go.form.Dialog, {
 						anchor: "100%",
 						grow: true,
 						hint: t("This description will show in the edit form")
-					}	
+					}	,{
+						xtype:'gonumberfield',
+						name: 'columns',
+						fieldLabel: t("Columns"),
+						value: 2,
+						decimals: 0
+					}
 				]
 			}
 		];
