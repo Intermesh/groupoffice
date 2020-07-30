@@ -7,13 +7,11 @@ go.customfields.type.SelectOptionsTree = function(config){
 	Ext.apply(config, {
 		animate:false,
 		enableDrag:true,
-		autoScroll: true
+		autoScroll: true,
+		title:  t("Options")
 	});
 
-	config.tbar=[{
-		xtype: "tbtitle",
-		text: t("Options"),
-	}, '->',{
+	config.bbar=[ '->',{
 		iconCls: 'ic-add',
 		handler:function(){
 			var node = this.selModel.getSelectedNode();
