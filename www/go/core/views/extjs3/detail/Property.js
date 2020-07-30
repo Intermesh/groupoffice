@@ -44,7 +44,7 @@ go.detail.Property = Ext.extend(Ext.Container, {
 	
 	setValue : function(v) {
 		this.value = this.valueCmp.value = this.format(v);
-		if(this.rendered) {
+		if(this.valueCmp.rendered) {
 			this.valueCmp.update(this.value);
 		}else{
 			this.valueCmp.on("render", function(cmp){
