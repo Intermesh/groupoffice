@@ -2130,6 +2130,7 @@ table[id^="comments-ext"] b {
 	border-top-left-radius: dp(8);
 	background-color: color($bg, 'box');
 	cursor: pointer;
+	z-index:2;
 }
 
 

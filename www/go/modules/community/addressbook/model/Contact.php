@@ -572,6 +572,13 @@ class Contact extends AclItemEntity {
 										->add('gender', function(Criteria $criteria, $value) {
 											$criteria->andWhere(['gender' => $value, 'isOrganization'=> false]);
 										})
+										->addDate("dateofbirth", function(Criteria $criteria, $comparator, $value, Query $query) {
+											if(!$query->isJoined('addressbook_date', 'dob')) {
+												$query->join('addressbook_date', 'dob', 'dob.contactId = c.id', "INNER");
+											}
+											$criteria->where('dob.type', '=', Date::TYPE_BIRTHDAY)
+												->andWhere('dob.date',$comparator, $value);
+										})
 										->addDate("birthday", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_date', 'date')) {
 												$query->join('addressbook_date', 'date', 'date.contactId = c.id', "INNER");
@@ -689,6 +696,14 @@ class Contact extends AclItemEntity {
 			}
 		}
 
+		if(empty($this->uri)) {
+			$this->uri = $this->uid . '.vcf';
+
+			if(!empty($this->id)) {
+				$this->saveUri();
+			}
+		}
+
 		return $this->uid;		
 	}
 
@@ -736,7 +751,7 @@ class Contact extends AclItemEntity {
 			return false;
 		}
 		
-		if(empty($this->uid)) {
+		if(empty($this->uid) || empty($this->uri)) {
 			//We need the auto increment ID for the UID so we need to save again if this is a new contact
 			$this->getUid();
 			$this->getUri();
@@ -1176,5 +1191,15 @@ class Contact extends AclItemEntity {
 	  }
 
 	  return parent::mergeProp($entity, $name, $p);
+  }
+
+  public static function check()
+  {
+  	//fix missing uri or uid
+  	$contacts = Contact::find(['id', 'uri', 'uid', 'addressBookId'])->where('uid is null OR uri is null');
+  	foreach($contacts as $contact) {
+  		$contact->save();
+	  }
+	  return parent::check();
   }
 }
