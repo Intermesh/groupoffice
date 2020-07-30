@@ -66,7 +66,7 @@ go.customfields.DetailPanel = Ext.extend(Ext.Panel, {
     go.customfields.CustomFields.getFields(this.fieldSet.id).forEach(function (field) {
 
       var cmp = panel.fieldMap[field.databaseName], type = go.customfields.CustomFields.getType(field.type);
-      if(cmp) {
+      if(cmp && cmp.setValue) {
         var v = type.renderDetailView(dv.data.customFields[field.databaseName], dv.data, field, cmp);
         if(typeof(v) !== "undefined") {
           cmp.setVisible(!!v);
