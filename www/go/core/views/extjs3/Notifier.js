@@ -1,13 +1,13 @@
 go.Notifier = {
 
 	messageCt: Ext.DomHelper.insertFirst(document.body, {id: 'message-ct'}, true),
-
+	showStatusBar: false,
 	notificationArea: null,
 	init: function(notificationArea) {
 		this.notificationArea = notificationArea;
 
 		this.addStatusIcon('upload', 'ic-file-upload');
-		this.statusBar = new Ext.Container({applyTo: "status-bar", hidden:true});
+		this.statusBar = new Ext.Container({applyTo: "status-bar", hidden:!this.showStatusBar});
 		for(var key in this._icons) {
 			this.statusBar.add(this._icons[key]);
 		}
@@ -27,7 +27,11 @@ go.Notifier = {
 			this._icons[key].setVisible(visible);
 		}
 		if(visible) {
-			this.statusBar.show();
+			if(this.statusBar) {
+				this.statusBar.show();
+			} else {
+				this.showStatusBar = true;
+			}
 			return;
 		}
 		for(var icon in this._icons[key]) {
@@ -53,7 +57,7 @@ go.Notifier = {
 
 	/**
 	 * Put a message into the notification area (fallback to notify())
-	 * @param msg {title, description, iconCls, time (ms)}
+	 * @param msg {title, description, iconCls, removeAfter (ms)}
 	 */
 	msg: function (msg, key) {
 
