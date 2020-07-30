@@ -1,4 +1,5 @@
 - Bookmarks: fixed bug where logo didn't save
+- Email: Workaround if from header is missing in email message
 
 30-07-2020 6.4.162
 - Studio: Was missing license definition which caused install to fial without license.
