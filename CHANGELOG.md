@@ -1,3 +1,6 @@
+30-07-2020 6.4.162
+- Studio: Was missing license definition which caused install to fial without license.
+
 28-07-2020 6.4.161
 - Core: Date range component
 
