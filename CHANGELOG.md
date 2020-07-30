@@ -2,9 +2,10 @@
 - Email: Workaround if "From" header is missing in email message
 - Core: disable JMAP sync states on rebuild search cache and database check. Reset state when done.
 - Address book / carddav: Database check fixes missing uri's and import will generate uri if uid is already present
+- Tickets: re-enabled ticket groups
 
 30-07-2020 6.4.162
-- Studio: Was missing license definition which caused install to fial without license.
+- Studio: Was missing license definition which caused install to fail without license.
 
 28-07-2020 6.4.161
 - Core: Date range component
