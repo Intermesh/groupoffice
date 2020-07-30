@@ -1,3 +1,5 @@
+- Bookmarks: fixed bug where logo didn't save
+
 30-07-2020 6.4.162
 - Studio: Was missing license definition which caused install to fial without license.
 
