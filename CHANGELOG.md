@@ -1,3 +1,4 @@
+30-07-2020 6.4.163
 - Bookmarks: fixed bug where logo didn't save
 - Email: Workaround if "From" header is missing in email message
 - Core: disable JMAP sync states on rebuild search cache and database check. Reset state when done.
