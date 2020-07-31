@@ -20,7 +20,8 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		var fields = go.customfields.CustomFields.getFormFields(this.fieldSet.id);
 
 		var c = fields.length;
-		var fieldsPerColumn = Math.ceil(c / this.fieldSet.columns);
+		var fieldsPerColumn = Math.floor(c / this.fieldSet.columns);
+		var fieldsInFirstColumn = fieldsPerColumn + (c % this.fieldSet.columns);
 
 		this.defaults = {
 			xtype: "container",
@@ -31,15 +32,18 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 
 		var currentCol = {items: []},
 			colItemCount = 0,
-			me = this;
+			me = this,
+			max = fieldsInFirstColumn;
+
 
 		fields.forEach(function (field) {
 			currentCol.items.push(field);
 			colItemCount++;
-			if(colItemCount == fieldsPerColumn) {
+			if(colItemCount == max) {
 				items.push(currentCol);
 				currentCol = {items: [], style: "padding-left: " +dp(16) + "px"};
 				colItemCount = 0;
+				max = fieldsPerColumn;
 			}
 		});
 

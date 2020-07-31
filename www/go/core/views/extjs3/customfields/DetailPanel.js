@@ -18,7 +18,8 @@ go.customfields.DetailPanel = Ext.extend(Ext.Panel, {
     var fields = go.customfields.CustomFields.getFields(this.fieldSet.id);
 
     var c = fields.length;
-    var fieldsPerColumn = Math.ceil(c / this.fieldSet.columns);
+    var fieldsPerColumn = Math.floor(c / this.fieldSet.columns);
+    var fieldsInFirstColumn = fieldsPerColumn + (c % this.fieldSet.columns);
 
     this.defaults = {
       xtype: "container",
@@ -29,6 +30,8 @@ go.customfields.DetailPanel = Ext.extend(Ext.Panel, {
     var colItemCount = 0;
 
     this.fieldMap = {};
+
+    var max = fieldsInFirstColumn;
 
     fields.forEach(function (field) {
       var type = go.customfields.CustomFields.getType(field.type);
@@ -43,10 +46,11 @@ go.customfields.DetailPanel = Ext.extend(Ext.Panel, {
       me.fieldMap[field.databaseName] = cmp;
 
       colItemCount++;
-      if(colItemCount == fieldsPerColumn) {
+      if(colItemCount == max) {
         me.items.push(currentCol);
         currentCol = {items: []};
         colItemCount = 0;
+        max = fieldsPerColumn;
       }
     });
 
