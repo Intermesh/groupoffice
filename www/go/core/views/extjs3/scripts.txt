@@ -55,6 +55,7 @@ form/FormContainer.js
 form/Chips.js
 form/RecurrenceFieldset.js
 form/KeyValueEditorGrid.js
+form/DateRangeField.js
 
 modules/ModulePanel.js
 
@@ -105,6 +106,7 @@ util/Filters.js
 util/Cookies.js
 util/SelectDialog.js
 util/Object.js
+util/Autolinker.js
 
 User.js
 String.js
@@ -149,6 +151,8 @@ tree/TreeNodeUI.js
 
 form/HtmlEditor.js
 form/HtmlEditorPlugins.js
+
+form/NumberField.js
 
 menu/EmojiMenu.js
 menu/StoreMenu.js
@@ -255,9 +259,14 @@ smtp/GridPanel.js
 smtp/AccountCombo.js
 
 form/AttachmentsField.js
+form/LanguageCombo.js
 
 emailtemplate/TemplateDialog.js
 emailtemplate/GridPanel.js
+pdftemplate/TemplateDialog.js
+pdftemplate/GridPanel.js
+pdftemplate/BlocksField.js
 
 chart/ChartComponent.js
 chart/LineChart.js
+chart/PieChart.js

@@ -5,9 +5,8 @@ namespace go\modules\community\history;
 
 use GO\Base\Db\ActiveRecord;
 use go\core;
-use go\core\acl\model\AclOwnerEntity;
-use go\core\model\Token;
 use go\core\jmap\Entity;
+use go\core\model\User;
 use go\modules\community\history\model\LogEntry;
 
 class Module extends core\Module
@@ -17,79 +16,125 @@ class Module extends core\Module
 		return "Intermesh BV <info@intermesh.nl>";
 	}
 
-	public static function initListeners(){
-//		ActiveRecord::model()->addListener('save', self::class, 'onActiveRecordSave');
-//		ActiveRecord::model()->addListener('delete', self::class, 'onActiveRecordDelete');
-	}
-
 	public function defineListeners() {
 		Entity::on(Entity::EVENT_SAVE, static::class, 'onEntitySave');
 		Entity::on(Entity::EVENT_BEFORE_DELETE, static::class, 'onEntityDelete');
-		//cant get id
-		Token::on(Entity::EVENT_SAVE, static::class, 'onLogin');
+		User::on(User::EVENT_LOGIN, static::class, 'onLogin');
+		User::on(User::EVENT_LOGOUT, static::class, 'onLogout');
+		User::on(User::EVENT_BADLOGIN, static::class, 'onBadLogin');
 	}
 
-	static function onActiveRecordSave(ActiveRecord $record, $cache, $action) {
+	static function logActiveRecord(ActiveRecord $record, $action) {
 
-		if(!$cache) {
+		//hacky but works for old code
+		if(!$record->aclField()) {
 			return;
 		}
 
-		$pk = $record->getPk();
 		$log = new LogEntry();
-		$log->entityId = is_array($pk) ? var_export($pk, true) : $pk;
-		$log->entityTypeId = $record::entityType()->getId();
+		$log->setEntity($record);
 		$log->setAction($action);
-		$log->description = $cache ? $cache['name'] : get_class($record);
-		$log->changes = json_encode($record->getLogJSON($action));
-		$log->setAclId($record->findAclId());
+		$changes = $record->getLogJSON($action);
+		if($action == 'update' && empty($changes)) {
+			return;
+		}
+		$log->changes = json_encode($changes);
+
 		if(!$log->save()) {
 			throw new \Exception("Could not save log");
 		}
 	}
 
-	static function onEntitySave(Entity $entity) {
+	public static function onEntitySave(Entity $entity) {
 		self::logEntity($entity, $entity->isNew() ? 'create' : 'update');
 	}
 
-	static function onEntityDelete(core\orm\Query $query, $cls) {
-		// find al items with $query and log that they are being deleted
-		if(!method_exists($cls, 'getSearchName')) return;
+	public static function onEntityDelete(core\orm\Query $query, $cls) {
+		if(is_a($cls, LogEntry::class, true) || is_a($cls, core\model\Search::class, true)) {
+			return;
+		}
+
+		//Don't delete ACL's because we're taking them over.
+		if(is_a($cls, core\acl\model\AclOwnerEntity::class, true)) {
+			$cls::keepAcls();
+		}
 
 		$entities = $cls::find()->mergeWith(clone $query);
-
 		foreach($entities as $e) {
 			static::logEntity($e, 'delete');
 		}
 	}
 
 	private static function logEntity(Entity $entity, $action) {
-		if(!method_exists($entity, 'getSearchName')) return;
+		if($entity instanceof LogEntry || $entity instanceof core\model\Search) {
+			return;
+		}
 
 		$log = new LogEntry();
-		$log->entityId = $entity->id;
-		$log->removeAcl = is_a($entity, AclOwnerEntity::class);
-		$log->description = $entity->getSearchName();
-		$log->entityTypeId = $entity->entityType()->getId();
+		$log->setEntity($entity);
 		$log->setAction($action);
-		$log->changes = json_encode($action ==='update' ? $entity->getModified() : $entity->toArray());
-		$log->setAclId($entity->findAclId());
+
+		if($action !== 'delete') {
+			$changes = $entity->getModified();
+			unset($changes['modifiedAt']);
+			unset($changes['acl']);
+			unset($changes['aclId']);
+			unset($changes['createdBy']);
+			unset($changes['createdAt']);
+			unset($changes['modifiedBy']);
+
+			if(empty($changes)) {
+				return;
+			}
+
+			if($action == 'create') {
+				$changes = array_map(function($c) {
+					return $c[0];
+				}, $changes);
+
+				$changes = array_filter($changes, function($c){
+					return $c !== "";
+				});
+			}
+			$log->changes = json_encode($changes);
+
+		} else {
+			$log->changes = null;
+		}
+
+
 		if(!$log->save()) {
-			throw new \Exception ("Could not save log");
+			throw new \Exception ("Could not save log: " . var_export($log->getValidationErrors(), true));
 		}
 	}
 
-
-	static function onLogin(Token $token) {
+	public static function onLogin(User $user) {
 		$log = new LogEntry();
-		$log->entityId = $token->userId;
-		$log->removeAcl = 0;
-		$log->description = $token->remoteIpAddress;
-		$log->entityTypeId = core\orm\EntityType::findByName('User')->getId(); // token doesnt have one
+		$log->setEntity($user);
+		$log->description = $user->username . ' [' . core\http\Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('login');
-		$log->changes = '{"login":"success"}';
-		$log->setAclId($token->findAclId());
+		$log->changes = null;
+		$log->setAclId($user->findAclId());
 		$log->save();
 	}
 
+	public static function onBadLogin(User $user) {
+		$log = new LogEntry();
+		$log->setEntity($user);
+		$log->description = $user->username . ' [' . core\http\Request::get()->getRemoteIpAddress() . ']';
+		$log->setAction('badlogin');
+		$log->changes = null;
+		$log->setAclId($user->findAclId());
+		$log->save();
+	}
+
+	public static function onLogout(User $user) {
+		$log = new LogEntry();
+		$log->setEntity($user);
+		$log->description = $user->username . ' [' . core\http\Request::get()->getRemoteIpAddress() . ']';
+		$log->setAction('logout');
+		$log->changes = null;
+		$log->setAclId($user->findAclId());
+		$log->save();
+	}
 }

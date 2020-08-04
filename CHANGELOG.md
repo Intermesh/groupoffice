@@ -1,6 +1,71 @@
+28-07-2020 6.4.161
+- Core: Date range component
+
+27-07-2020 6.4.160
+- billing / core: Removed duplicate translations;
+- ldapauth: check if mail and username attribute are present for sync, allow larger queries
+- officeonline: Auto detect wopi client URL instead of using system settings url.
+- Core: phone number autolinking only if surrounded by word boundaries.
+- Filesearch: Error in files when not having permissions for filesearch module
+- Files: fix for invalid ACL's in root folders causing integrity constraint errors
+- Studio: New module to create your own modules!
+- Core: Removed incorrect country translations for French
+- Address book: Send vcard by email feature
+- E-mail: Import vcard from attachment feature
+
+14-07-2020 6.4.159
+- Billing: fixed problem where items grid wouldn't load anymore
+- E-mail: Drag and drop caused jump to page 1 in list
+- Projects: generate proper keywords for search function;
+- Documents: Implemented filters in file search module and added custom fields back into edit panel
+- Custom fields: Save failed when custom fields had only a select fields.
+
+13-07-2020 6.4.158
+- Core: Updated German translation
+- Files: Fixed minor bug in download function
+- Core: Fixed rendering of yesNo custom fields in grid and detail panel.
+- LDAP: Created multiple accounts when using email for username
+- Files: Fixed folder upload problem where previous folder upload was created empty on a second upload
+
+13-07-2020 6.4.157
+- Core: Added some common file type icons
+- Core: new config option $config['frameAncestors'] = 'http://examplea.com https/exampleb.com'; to allow Group-Office in 
+        a frame.
+- LDAP auth: Use e-mail for mail username works for SMTP too
+- Core: Auto link URL's and emails in html editor and html rendering
+- Email: Case insensitive file extension checking on uploading file in email composer
+- Core: Restored CSP object so it can be extended by modules
+
+07-07-2020 6.4.156
+- Billing: Field 'invoice_no' is now a varchar
+- Core: Fixed 500 error upon rebuilding module cache
+- Core: Fixed custom fields saving new select box.
+- Core: Custom fields, generate database name as per MariaDB naming conventions.
+- Address book: Update search cache of employees when changing company name
+- LDAP Auth: Added option to login to IMAP server with email instead of username 
+- Core: Added complete rebuild search cache option.
+- Core: Fixed broken link display in e-mail
+- Core: Set security headers: 
+    	- X-Frame-Options: SAMEORIGIN
+        - Content-Security-Policy
+    	- X-Content-Type-Options: nosniff
+    	- Strict-Transport-Security: max-age=31536000
+        - X-XSS-Protection: 1;mode=block
+- Core: Use relative URL's in webclient
+- Email: reload grid and keep position but don't select next mail
+- Email: Contact autolinking will link to all contacts organizations too
+
+30-06-2020 6.4.155
+- Email: Problem with empty emails
+
+30-06-2020 6.4.154
+- Custom fields: Changing multi select options could destroy all values of the field
 - Email: Pasted or dropped image resized to max-width: 100%
 - Leavedays: Incorrect email when booking was made for another user
 - Address book: Removed duplciate "Sort by" last name setting.
+- Core: Updated translations 'Forgot username?' to 'Forgot login credentials?'
+- Files: search results > send by email, prevent full path from showing in attachment view
+- Core: Bug in manual install without Acpu
 
 29-06-2020 6.4.153
 - Core: Fixed manual install error

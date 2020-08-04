@@ -16,6 +16,8 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 
 	supportsFiles: false,
 
+	multiSelectToolbarEnabled: false,
+
 	constructor: function (config) {
 
 		config = config || {};

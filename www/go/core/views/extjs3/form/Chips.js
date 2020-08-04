@@ -259,18 +259,6 @@ go.form.Chips = Ext.extend(Ext.Container, {
 				fields: [this.valueField, this.displayField],
 				entityStore: this.entityStore
 			}));
-		} else
-		{
-			//clone the store.
-//			var records = [];
-//			this.comboStore.each(function(r){
-//				records.push(r.copy());
-//			});
-//			
-//			this.comboStore = new Ext.data.Store({
-//				recordType: this.comboStore.recordType
-//			});
-//			this.comboStore.add(records);
 		}
 		
 		this.comboBox = new go.form.ComboBox({
@@ -294,27 +282,14 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			mode: this.entityStore ? 'remote' : 'local',
 			store: this.comboStore,
 			value:"",
-			collapseOnSelect: false,
-			tpl: new Ext.XTemplate(
-				'<tpl for=".">',
-				'<div class="x-combo-list-item" title="{[fm.htmlEncode(values[\'' + this.displayField + '\'] || \'\' )]}"><tpl if="!values.' + this.valueField + '"><b>' + t("Create new") + ':</b> </tpl>{' + this.displayField + '}</div>',
-				'</tpl>')
+			collapseOnSelect: true, //Maybe false for selecting more options? But it's annoying in contact dialog
+			allowNew: this.allowNew
 		});		
 		
-		this.comboBox.on('select', function(combo, record, index) {			
-
-			if(this.entityStore && !record.data[this.valueField]) {
-				this.createNew(record);
-			} else{
-				this.dataView.store.add([record]);
-			}
+		this.comboBox.on('select', function(combo, record, index) {
+			this.dataView.store.add([record]);
 			combo.reset();
-
 		}, this);
-
-		if(this.allowNew) {
-			this.comboStore.on("load", this.addCreateNewRecord, this);
-		}
 		
 		return this.comboBox;
 	},
@@ -336,47 +311,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 
 	isValid: function (preventMark) {
 		return this.allowBlank || !go.util.empty(this.getValue());
-	},
-
-	createNew : function(record) {
-
-		var data = record.data;
-		if(Ext.isObject(this.allowNew)) {
-			Ext.apply(data, this.allowNew);
-		}
-		var create = {"newid" : data}, me = this;
-
-	 this.entityStore.set({
-			create: create
-		}).then(function(response) {
-			record.id = record.data. id = response.created.newid.id;
-			me.dataView.store.add([record]);	
-			me.comboBox.reset();
-		});
-	},
-
-	addCreateNewRecord: function() {
-		var text =  this.comboBox.getRawValue();
-		if(!text) {
-			return;
-		}
-		var def = Ext.data.Record.create([{
-			name: this.valueField
-		},{
-			name: this.displayField
-		}]);
-
-		var recordData = {};
-		recordData[this.displayField] = text;						
-		var record = new def(recordData);
-		this.comboStore.insert(0, record);
-		
-		if(this.comboStore.getCount() > 1) {								
-			this.comboBox.select(0);
-		} 
-		
 	}
-
 
 });
 

@@ -285,19 +285,22 @@ $filetype: (
 	folder: folder,
 	folder_shared: folder-shared,
 	folder_special: folder-special,
-	image: (jpeg, jpg, gif, bmp, tif, png, tiff),
+	image: (jpeg, jpg, gif, bmp, tif, png, tiff, svg, eps, ai),
+				video: (mov, mp4, webm, asf, mkv, 264, avi, m4v, mpg, mpeg, ogv, wmv, wlmp, 3g2,3gp, asf, vob),
+				sound: (mp3, ogg, aif, iff, wma),
+				wav: wav,
 	svg: svg,
 	pdf: pdf,
 	gpg: (asc, gpg),
 	pgp: pgp,
-	doc: (docx, doc, sxq, odt),
-	zip: (zip, tar, gz, tgz, rar, bz, dat),
+	doc: (docx, doc, sxq, odt, dot),
+	zip: (zip, tar, gz, tgz, rar, bz, dat, 7z),
 	ics: (ics, vcs),
 	vcf: vcf,
 	txt: txt,
 	ppt: (odp, pps, ppsx, ppt, pptx),
 	html: (html, htm),
-	xls: (ods,xls,xlsx),
+	xls: (ods,xls,xlsx,xlsm),
 	php: php,
 	js: js,
 	sql: sql,
@@ -310,11 +313,17 @@ $filetype: (
 		@each $extension in $extensions {
 			.filetype-#{$extension} {
 				background-image:url('#{$resourcePath}img/filetype/#{$img}.svg') !important;
+				&.x-tree-node-icon:before  {
+						content: none;
+				}
 			}
 		}
 	} @else {
 		.filetype-#{$extensions} {
 			background-image:url('#{$resourcePath}img/filetype/#{$img}.svg') !important;
+			&.x-tree-node-icon:before  {
+				content: none;
+			}
 		}
 	}
 }
@@ -588,6 +597,7 @@ $material-icons : (
 	donut_small,
 	drafts,
 	drag_handle,
+	drag_indicator,
 	drive_eta,
 	dvr,
 	edit,

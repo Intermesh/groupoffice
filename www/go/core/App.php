@@ -353,7 +353,8 @@ use const GO_CONFIG_FILE;
 				$config['debug_log'] = !empty($config['debug']);
 			}
 			
-			$this->config = (new util\ArrayObject([					
+			$this->config = (new util\ArrayObject([
+					"frameAncestors" => $config['frameAncestors'] ?? "",
 					"core" => [
 							"general" => [
 									"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
@@ -392,7 +393,7 @@ use const GO_CONFIG_FILE;
 			
 			if(!isset($this->config['core']['general']['cache'])) {
 				if(cache\Apcu::isSupported()) {
-					$this->config['core']['general']['cache'] = cache\Apcu::class;				
+					$this->config['core']['general']['cache'] = cache\Apcu::class;
 				} else
 				{
 					$this->config['core']['general']['cache'] = cache\Disk::class;
@@ -490,10 +491,21 @@ use const GO_CONFIG_FILE;
 		 * @throws Exception
 		 */
 		public function getModule($package, $name) {
+
+			$cacheKey = 'getModule-' . $package .'-'.$name;
+
+			$model = go()->getCache()->get($cacheKey);
+
+			if(isset($model)) {
+				return $model;
+			}
+
 			$model = \go\core\model\Module::find()->where(['package' => $package, 'name' => $name, 'enabled' => true])->single();
 			if(!$model || !$model->isAvailable()) {
-				return false;
+				$model = false;
 			}
+
+			go()->getCache()->set($cacheKey, $model);
 			
 			return $model;
 		}

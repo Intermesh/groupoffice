@@ -33,7 +33,7 @@ return array (
   'Fill in the subject of the response in the field below.' => 'Isi subjek respons di bidang di bawah ini.',
   'Fill in your message in the field below.' => 'Isi pesan Anda di bidang di bawah ini.',
   'Fill in the aliasses on which this message also needs to apply to. If you have multiple aliasses, then separate each alias with a comma (,).' => 'Isi alias yang juga harus diaplikasikan pesan ini. Jika Anda memiliki beberapa alias, maka pisahkan setiap alias dengan koma (,).',
-  'nDaysText' => 'nDaysText',
+  'Senders will only be notified periodically. You can set the number of days below.' => 'Senders will only be notified periodically. You can set the number of days below.',
   'Advanced options' => 'Opsi lanjutan',
   'subject' => 'subjek',
   'sender' => 'pengirim',

@@ -178,8 +178,6 @@ class Session extends Observable{
 		
 		\GO::debug("Logout called for ".$username);
 		
-		if(!empty(\GO::session()->values['countLogin']))
-			$this->_log(\GO\Log\Model\Log::ACTION_LOGOUT);
 
 		$old_session = $_SESSION;
 		$_SESSION=array();
@@ -354,10 +352,7 @@ class Session extends Observable{
 				session_regenerate_id();
 			}
 			
-			if($countLogin)
-				$this->_log(\GO\Log\Model\Log::ACTION_LOGIN);
-			
-			\GO::session()->values['countLogin']=$countLogin;
+		\GO::session()->values['countLogin']=$countLogin;
 			
 
 			
@@ -365,13 +360,7 @@ class Session extends Observable{
 		}		
 	}
 	
-	private function _log($action){
-		if(\GO::modules()->isInstalled('log')){	
-			$log = new \GO\Log\Model\Log();			
-			$log->action=$action;						
-			$log->save();
-		}
-	}
+
 	
 	/**
 	 * Close writing to session so other concurrent requests won't be blocked.

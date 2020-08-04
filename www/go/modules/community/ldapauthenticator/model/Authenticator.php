@@ -77,6 +77,10 @@ class Authenticator extends PrimaryAuthenticator {
 		if(!$connection->bind($record->getDn(), $password)) {
 			return false;
 		}
+
+		if(!isset($record->mail) || !isset($record->mail[0])) {
+			throw new \Exception("User '$username' has no 'mail' attribute set. Can't create a user");
+		}
 		
 		$user = User::find()->where(['username' => $username])->orWhere('email', '=', $record->mail[0])->single();
 		if(!$user) {
@@ -92,7 +96,7 @@ class Authenticator extends PrimaryAuthenticator {
 		}
 		if($user->isModified()) {
 			if(!$user->save()) {
-				throw new \Exception("Could not save user");
+				throw new \Exception("Could not save user: " . $user->getValidationErrorsAsString());
 			}
 		}
 		
@@ -116,11 +120,13 @@ class Authenticator extends PrimaryAuthenticator {
 		if(!$user->hasModule('legacy', 'email')) {
 			return;
 		}
+
+		$imapUsername = $server->imapUseEmailForUsername ? $email : $username;
 		
 		//old framework code here		
 		$accounts = Account::model()->findByAttributes(array(
 					'host' => $server->imapHostname,
-					'username' => $username
+					'username' => $imapUsername
 							))->fetchAll();
 		
 		$foundForUser = false;
@@ -136,7 +142,7 @@ class Authenticator extends PrimaryAuthenticator {
 			$account->user_id = $user->id;
 			$account->host = $server->imapHostname;
 			$account->port = $server->imapPort;
-			$account->username = $username; //$email;
+			$account->username = $imapUsername;
 			$account->password = $password;
 			$account->imap_encryption = $server->imapEncryption ?? "";
 
@@ -160,7 +166,7 @@ class Authenticator extends PrimaryAuthenticator {
 			$account->password = $password;			
 			
 			if($server->smtpUseUserCredentials) {				
-				$account->smtp_username = $username;
+				$account->smtp_username = $imapUsername;
 				$account->smtp_password = $password;
 			}
 			

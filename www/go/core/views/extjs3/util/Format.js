@@ -145,13 +145,42 @@
 		number : function(value, decimals) {
 			if(isNaN(value))
 				return value; // only localize number values
+
+			var neg = value < 0;
+
+			if(neg) {
+				value *= -1;
+			}
 			
-			var dec = GO.settings.decimal_separator,
-				tho = GO.settings.thousands_separator;
+			var dec = go.User.decimalSeparator,
+				tho = go.User.thousandsSeparator;
+
+			if(decimals === undefined) {
+				decimals = 2;
+			}
 			
-			return value
-				.toFixed(decimals || 2)
-				.replace(/[,.]/g, function($1) { return $1 === ',' ? tho : dec });
+			var no =  value.toFixed(decimals);
+			var parts = no.split('.');
+
+			var formatted = "";
+			var length = parts[0].length;
+			for(var i = length - 1, l = 0; i >= l; i--) {
+				formatted = parts[0][i] + formatted;
+
+				if(i > 0 && (length - i) % 3 == 0) {
+					formatted = tho + formatted;
+				}
+			}
+
+			if(decimals) {
+				formatted += dec + parts[1];
+			}
+
+			if(neg) {
+				formatted = "-" + formatted;
+			}
+
+			return formatted;
 		},
 		/**
 		 * @param {string|Date} v

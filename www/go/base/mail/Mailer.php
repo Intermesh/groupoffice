@@ -69,32 +69,32 @@ class Mailer extends \Swift_Mailer{
 			\GO::debug("E-mail debugging is enabled in the Group-Office config.php file. All emails are send to: ".\GO::config()->debug_email);
 		}
 		
-		if(\GO::modules()->isInstalled("log")){
-			
-			$str = "";
-			
-			$from = $message->getFrom ();
-			if(!empty($from))
-				$str .= implode(",",array_keys($from));
-			else
-				$str .= "unknown";
-			
-			$str .= " -> ";
-			
-			$to = $message->getTo ();
-			if(!empty($to))
-				$str .= implode(",",array_keys($to));
-			
-			$to = $message->getCc ();
-			if(!empty($to))
-				$str .= implode(",",array_keys($to));
-			
-			$to = $message->getBcc ();
-			if(!empty($to))
-				$str .= implode(",",array_keys($to));
-			
-			\GO\Log\Model\Log::create ("email", $str);
-		}
+//		if(\GO::modules()->isInstalled("log")){
+//
+//			$str = "";
+//
+//			$from = $message->getFrom ();
+//			if(!empty($from))
+//				$str .= implode(",",array_keys($from));
+//			else
+//				$str .= "unknown";
+//
+//			$str .= " -> ";
+//
+//			$to = $message->getTo ();
+//			if(!empty($to))
+//				$str .= implode(",",array_keys($to));
+//
+//			$to = $message->getCc ();
+//			if(!empty($to))
+//				$str .= implode(",",array_keys($to));
+//
+//			$to = $message->getBcc ();
+//			if(!empty($to))
+//				$str .= implode(",",array_keys($to));
+//
+//			\GO\Log\Model\Log::create ("email", $str);
+//		}
 		
 //		debug_print_backtrace();
 //		exit("NO MAIL");

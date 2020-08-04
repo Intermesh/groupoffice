@@ -240,9 +240,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	protected static function internalDelete(Query $query) {
 
 		if(!method_exists(static::class, 'aclEntityClass')) {
-			if(go()->getModule('community', 'history') || static::class === 'go\modules\community\history\model\LogEntry') {
-				$aclsToDelete = static::getAclsToDelete($query);
-			}
+			$aclsToDelete = static::getAclsToDelete($query);
 		}
 
 		if(!parent::internalDelete($query)) {
@@ -258,13 +256,27 @@ abstract class AclOwnerEntity extends AclEntity {
 		return true;
 	}
 
+	private static $keepAcls = [];
+
+	/**
+	 * Keep acl's when deleting. This is used by the community/history module because it wasnts to take over the ACL
+	 * on delete. It will remove the acl when the log entry is delete.
+	 */
+	public static function keepAcls() {
+		self::$keepAcls[static::class] = true;
+	}
+
 	/**
 	 * @param Query $query
 	 * @return mixed[]
 	 * @throws Exception
 	 */
 	protected static function getAclsToDelete(Query $query) {
-		
+
+		if(!empty(self::$keepAcls[static::class])) {
+			return [];
+		}
+
 		$q = clone $query;
 		$q->select(static::$aclColumnName);
 		return $q->all();

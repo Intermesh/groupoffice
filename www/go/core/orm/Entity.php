@@ -196,6 +196,28 @@ abstract class Entity extends Property {
 		
 		return $query;
 	}
+
+	/**
+	 * Find entities linked to the given entity
+	 *
+	 * @param $entity
+	 * @param array $properties
+	 * @param bool $readOnly
+	 * @return Query|static[]
+	 * @throws Exception
+	 */
+	public static function findByLink($entity, $properties = [], $readOnly = false) {
+		$query = static::find($properties, $readOnly);
+		$query->join(
+			'core_link',
+			'l',
+			$query->getTableAlias() . '.id = l.toId and l.toEntityTypeId = '.static::entityType()->getId())
+
+			->andWhere('fromEntityTypeId = '. $entity::entityType()->getId())
+			->andWhere('fromId', '=', $entity->id);
+
+		return $query;
+	}
 	
 //	
 //	public function getId() {		
@@ -301,15 +323,7 @@ abstract class Entity extends Property {
 				$this->setValidationError("search", ErrorCode::INVALID_INPUT, "Could not save core_search entry");				
 				return false;
 			}
-		}		
-		
-		//see \go\core\orm\LoggingTrait
-		if(method_exists($this, 'log')) {
-			if(!$this->log($this->isNew() ? \go\core\model\Log::ACTION_ADD : \go\core\model\Log::ACTION_UPDATE)) {				
-				$this->setValidationError("log", ErrorCode::INVALID_INPUT, "Could not save log entry");				
-				return false;
-			}
-		}	
+		}
 		
 		return true;
 	}
@@ -344,7 +358,7 @@ abstract class Entity extends Property {
 		$query = Query::normalize($query);
 		//Set select for overrides.
 		$primaryTable = static::getMapping()->getPrimaryTable();
-		$query->selectSingleValue('id')->from($primaryTable->getName(), $primaryTable->getAlias());
+		$query->selectSingleValue($primaryTable->getAlias() . '.id')->from($primaryTable->getName(), $primaryTable->getAlias());
 
 
 		App::get()->getDbConnection()->beginTransaction();
@@ -1151,6 +1165,35 @@ abstract class Entity extends Property {
 		}
 
 		return $refs;
+	}
+
+	/**
+	 * A title for this entity used in search cache and logging for example.
+	 * 
+	 * @return string
+	 */
+	public function title() {
+		if(property_exists($this,'name')) {
+			return $this->name;
+		}
+
+		if(property_exists($this,'title')) {
+			return $this->title;
+		}
+
+		if(property_exists($this,'subject')) {
+			return $this->subject;
+		}
+
+		if(property_exists($this,'description')) {
+			return $this->description;
+		}
+
+		if(property_exists($this,'displayName')) {
+			return $this->displayName;
+		}
+
+		return static::class;
 	}
 	
 }

@@ -558,35 +558,35 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	 * Just the let someone kow the file was opened
 	 */
 	public function open() {
-		$this->log('open');
+//		$this->log('open');
 	}
 
-	/**
-	 * Adds some extra info to the loggin of files
-	 * @param StringHelper $action the action to log
-	 * @param boolean $save unused
-	 * @return boolean if save was successful
-	 */
-	protected function log($action, $save=true, $modifiedCustomfieldAttrs = false) {
-		$log = parent::log($action, false, $modifiedCustomfieldAttrs);
-		if(empty($log))
-			return false;
-		
-		if($log === true) {
-			return true;
-		}
-		
-		if($log->action=='update') {
-			$log->action = 'propedit';
-			if($log->object->isModified('folder_id'))
-				$log->action='moved';
-			if($log->object->isModified('name')) {
-				$log->action='renamed';
-				$log->message = $log->object->getOldAttributeValue('name') . ' > ' . $log->message;
-			}
-		}
-		return $save ? $log->save() : $log;
-	}
+//	/**
+//	 * Adds some extra info to the loggin of files
+//	 * @param StringHelper $action the action to log
+//	 * @param boolean $save unused
+//	 * @return boolean if save was successful
+//	 */
+//	protected function log($action, $save=true, $modifiedCustomfieldAttrs = false) {
+//		$log = parent::log($action, false, $modifiedCustomfieldAttrs);
+//		if(empty($log))
+//			return false;
+//
+//		if($log === true) {
+//			return true;
+//		}
+//
+//		if($log->action=='update') {
+//			$log->action = 'propedit';
+//			if($log->object->isModified('folder_id'))
+//				$log->action='moved';
+//			if($log->object->isModified('name')) {
+//				$log->action='renamed';
+//				$log->message = $log->object->getOldAttributeValue('name') . ' > ' . $log->message;
+//			}
+//		}
+//		return $save ? $log->save() : $log;
+//	}
 
 	/**
 	 * Copy a file to another folder.

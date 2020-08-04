@@ -24,6 +24,7 @@ function output($data = [], $status = 200, $statusMsg = null) {
 	Response::get()->setStatus($status, $statusMsg);
 	Response::get()->sendHeaders();
 
+	go()->getDebugger()->groupEnd();
 	$data['debug'] = go()->getDebugger()->getEntries();
 	
 	//var_dump($data);
@@ -41,16 +42,21 @@ function output($data = [], $status = 200, $statusMsg = null) {
 try {
 //Create the app with the config.php file
 	App::get();
+
+	go()->getDebugger()->group("auth");
 	
 	if(Request::get()->getMethod() == "DELETE") {
 		$state = new go\core\jmap\State();
 		$token = $state->getToken();
+
+		User::fireEvent(User::EVENT_LOGOUT, $token->getUser(), $token);
+
 		if(!$token) {
 			output([], 404);
 		}
 		$token->oldLogout();
 		$token->delete($token->primaryKeyValues());
-		
+
 		output();		
 	}
 
@@ -193,6 +199,7 @@ try {
 
 	if (empty($methods) && !$token->isAuthenticated()) {
 		$token->setAuthenticated();
+		User::fireEvent(User::EVENT_LOGIN, isset($user) ? $user : $token->getUser(), $token);
 		if(!$token->save()) {
 			throw new Exception("Could not save token: ". var_export($token->getValidationErrors(), true));
 		}

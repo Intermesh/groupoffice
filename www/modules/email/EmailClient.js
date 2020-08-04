@@ -1277,27 +1277,27 @@ GO.mainLayout.onReady(function(){
 			return;
 		}
 		this.countEmailShown = data.email_status.total_unseen;
+		var title = t("New email"),
+			text = t("You have %d unread email(s)").replace('%d', data.email_status.total_unseen);
 
 		if (GO.settings.popup_emails) {
-			this.countEmailShown = true;
-			var title = t("New email"),
-				text = t("You have %d unread email(s)").replace('%d', data.email_status.total_unseen);
 			go.Notifier.notify({
 				title: title,
 				text: text,
 				iconCls: 'ic-email',
 				icon: 'views/Extjs3/themes/Paper/img/notify/email.png'
 			});
-			go.Notifier.msg({
-				sound: 'message-new-email',
-				iconCls: 'ic-email',
-				items:[{xtype:'box',html:'<b>'+text+'</b>'}],
-				title: title,
-				handler: function(){
-					GO.mainLayout.openModule('email');
-				}
-			}, 'email');
 		}
+		go.Notifier.msg({
+			sound: 'message-new-email',
+			iconCls: 'ic-email',
+			items:[{xtype:'box',html:'<b>'+text+'</b>'}],
+			title: title,
+			handler: function(){
+				GO.mainLayout.openModule('email');
+			}
+		}, 'email');
+
 
 
 
@@ -1437,7 +1437,34 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 						}
 					});
 					break;
-				case 'png':
+				case 'vcf':
+					Ext.MessageBox.confirm(t('Confirm'), t('Are you sure that you would like to import this VCard?'),
+						function(btn) {
+							if (btn !== "yes") {
+								return;
+							}
+							Ext.getBody().mask(t("Importing..."));
+							go.Jmap.request({
+								method: "Contact/loadVCS",
+								params: {
+									account_id: panel.account_id,
+									mailbox: panel.mailbox,
+									uid: panel.uid,
+									number: attachment.number,
+									encoding: attachment.encoding
+								},
+								callback: function (options, success, response) {
+									Ext.getBody().unmask();
+									if (!success) {
+										Ext.MessageBox.alert(t("Error"), response.errors.join("<br />"));
+									} else {
+										var dlg = new go.modules.community.addressbook.ContactDialog();
+										dlg.load(response.contactId).show();
+									}
+								}
+							});
+						});
+					break;
 				case 'bmp':
 				case 'png':
 				case 'gif':

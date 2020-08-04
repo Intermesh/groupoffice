@@ -35,7 +35,8 @@ go.Modules.register("community", "addressbook", {
 			organizations: {store: "Contact", fk: "organizationIds"},
 			creator: {store: "User", fk: "createdBy"},
 			modifier: {store: "User", fk: "createdBy"},
-			addressbook: {store: "AddressBook", fk: "addressBookId"}
+			addressbook: {store: "AddressBook", fk: "addressBookId"},
+			test: {store: "AddressBook", fk: "testId"}
 		},
 
 		/**
@@ -152,7 +153,7 @@ go.Modules.register("community", "addressbook", {
 				title: t("Organization") + ": " + t ("City"),
 				type: "string",
 				multiple: true
-			}, , {
+			}, {
 				name: 'orgCountry',
 				title: t("Organization") + ": " + t ("Country"),
 				type: "string",
@@ -182,6 +183,11 @@ go.Modules.register("community", "addressbook", {
 			{
 				title: t("Birthday"),
 				name: 'birthday',
+				multiple: false,
+				type: 'date'
+			},{
+				title: t("Date of birth"),
+				name: 'dateofbirth',
 				multiple: false,
 				type: 'date'
 			}, {

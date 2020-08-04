@@ -45,25 +45,28 @@ go.Jmap = {
 			method: 'community/dev/Debugger/get',
 			params: {},
 			callback: function(options, success, response, clientCallId) {
-
-				var r;
-				while(r = response.shift()) {
-					var method = r.shift();
-					r.push(clientCallId);
-					//escape % for console.log
-					r = r.map(function(i) {
-						if(Ext.isString(i)) {
-							i = i.replace(/%/g, "%%");
-						}
-						return i;
-					});
-					console[method].apply(null, r);
-				}
-
-			}
+				this.processDebugResponse(response, clientCallId);
+			},
+			scope: this
 		}).catch(function() {
 			//ignore error
 		});
+	},
+
+	processDebugResponse : function(response, clientCallId) {
+		var r;
+		while(r = response.shift()) {
+			var method = r.shift();
+			r.push(clientCallId);
+			//escape % for console.log
+			r = r.map(function(i) {
+				if(Ext.isString(i)) {
+					i = i.replace(/%/g, "%%");
+				}
+				return i;
+			});
+			console[method].apply(null, r);
+		}
 	},
 
 	abort: function (clientCallId) {
@@ -448,6 +451,7 @@ go.Jmap = {
 
 		if (this.timeout) {
 			clearTimeout(this.timeout);
+			this.timeout = null;
 		}
 		
 		var promise = this.scheduleRequest(options);
@@ -480,6 +484,7 @@ go.Jmap = {
 		this.paused++;
 		if (this.timeout) {
 			clearTimeout(this.timeout);
+			this.timeout = null;
 		}
 	},
 
@@ -487,7 +492,7 @@ go.Jmap = {
 	 * Continue request event execution as the next macro task.
 	 */
 	continue: function() {
-		if(this.paused>0) {
+		if(this.paused > 0) {
 			this.paused--;
 		}
 
@@ -495,6 +500,7 @@ go.Jmap = {
 		{
 			return;
 		}
+
 		if (this.timeout) {
 			clearTimeout(this.timeout);
 		}
@@ -505,6 +511,8 @@ go.Jmap = {
 	},
 
 	processQueue: function () {
+
+		this.timeout = null;
 
 		if (!this.requests.length) {
 			//All requests aborted
@@ -547,7 +555,7 @@ go.Jmap = {
 								o.callback.call(o.scope, o, success, response[1], clientCallId);
 							} else {
 
-								response[1].options = o;
+								//response[1].options = o;
 
 								if (success) {
 									o.resolve(response[1]);
@@ -586,7 +594,6 @@ go.Jmap = {
 		});
 
 		this.requests = [];
-		this.timeout = null;
 
 	}
 };

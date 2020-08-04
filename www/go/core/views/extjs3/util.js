@@ -312,18 +312,32 @@ go.util =  (function () {
 			{
 				// document.location.href = url; //This causes connection errors with SSE or other simulanous XHR requests
 				if(!downloadFrame) {
-					downloadFrame = document.createElement('iframe');
-					downloadFrame.id="downloader";
-					downloadFrame.style.display = 'none';
-					document.body.appendChild(downloadFrame);
+					// downloadFrame = document.createElement('iframe');
+					// downloadFrame.id="downloader";
+					// downloadFrame.style.display = 'none';
+					// document.body.appendChild(downloadFrame);
+					var downloadFrame = document.createElement('a');
+					downloadFrame.target = '_blank';
+					downloadFrame.toggleAttribute("download");
+
 				}
-				downloadFrame.src = url;
+				//downloadFrame.src = url;
+				downloadFrame.href = url;
+				downloadFrame.click();
 			}
 
 		},
 		
 		textToHtml : function(text) {
-			return Ext.util.Format.nl2br(text);
+			if(!text) {
+				return text;
+			}
+			return Ext.util.Format.nl2br(
+				Autolinker.link(
+					Ext.util.Format.htmlEncode(text),
+					{stripPrefix: false, stripTrailingSlash: false, className: "normal-link", newWindow: true}
+					)
+			);
 		},
 		
 		addSlashes : function( str ) {

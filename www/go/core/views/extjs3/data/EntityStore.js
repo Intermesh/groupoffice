@@ -11,9 +11,14 @@
  * It will pass:
  * 
  * store: the entity store
- * added: int[]|string[] array of ids's
- * changed: int[]|string[] array of ids's
- * detroyed: int[]|string[] array of ids's
+ * added: Object Entity object mapped by ID
+ * changed: Object Entity object mapped by ID
+ * destroyed: int[]|string[] array of ids's
+ *
+ * Do not instantiate directly use:
+ *
+ * @example
+ * go.Db.store("User").query();
  * 
  */
 go.data.EntityStore = Ext.extend(Ext.util.Observable, {
@@ -24,6 +29,9 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	
 	notFound: null,
 
+	/**
+	 * @var {go.Entity}
+	 */
 	entity: null,	
 	
 	changes : null,
@@ -467,13 +475,13 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 			if(!me.scheduled.length) {
 				return;
 			}
-			
-			go.Jmap.request({
+			var options = {
 				method: me.entity.name + "/get",
 				params: {
 					ids: me.scheduled
 				}
-			}).then(function(response) {
+			};
+			go.Jmap.request(options).then(function(response) {
 
 				if(!go.util.empty(response.notFound)) {
 					me.notFound = me.notFound.concat(response.notFound);
@@ -486,8 +494,8 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					}
 				}
 
-				for(var i = 0, l = response.options.params.ids.length; i < l; i++) {
-					var id = response.options.params.ids[i];
+				for(var i = 0, l = options.params.ids.length; i < l; i++) {
+					var id = options.params.ids[i];
 
 					delete me.pending[id];
 					if(response.notFound.indexOf(id) > -1) {
@@ -515,6 +523,14 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				return me.setState(response.state).then(function() {
 					return response;
 				});
+			}).catch(function(response) {
+				for(var i = 0, l = options.params.ids.length; i < l; i++) {
+					var id = options.params.ids[i];
+
+					delete me.pending[id];
+					me.scheduledPromises[id].reject(response);
+					delete me.scheduledPromises[id];
+				}
 			});
 
 			me.scheduled = [];
@@ -740,10 +756,12 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		var me = this;
 
 		return me.initState().then(function() {
-			return go.Jmap.request({
+			var options = {
 				method: me.entity.name + "/set",
 				params: params
-			}).then(function(response) {
+			};
+
+			return go.Jmap.request(options).then(function(response) {
 				var entity, clientId;
 
 				if(response.created) {
@@ -772,16 +790,16 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				}
 
 				if(cb) {
-					cb.call(scope || me, response.options, true, response);
+					cb.call(scope || me, options, true, response);
 				}
 
 				me._fireChanges();
 
 				return response;
 			}).catch(function(error){
-				me.fireEvent("error", error.options, error);
+				me.fireEvent("error", options, error);
 				if(cb) {
-					cb.call(scope || me, error.options, false, error);
+					cb.call(scope || me, options, false, error);
 				}
 
 				return error;

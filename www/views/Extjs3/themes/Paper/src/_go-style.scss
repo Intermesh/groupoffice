@@ -43,22 +43,29 @@ button, html, input, select, textarea {
 }
 
 h1 {
+	margin: dp(16) 0;
 	@extend %font-display1;
 }
 h2 {
+	margin: dp(16) 0;
 	@extend %font-headline; }
 h3 {
+	margin: dp(8) 0;
 	@extend %font-title;
 }
 h4 {
+	margin: dp(8) 0;
 	@extend %font-subheading;
 }
 h5 {
+	margin: dp(8) 0;
 	@extend %font-subheading-dense;
 }
 h6 {
+	margin: dp(8) 0;
 	@extend %font-data-head;
 }
+
 
 code {
 	border: 1px solid color($fg, 'line');
@@ -97,7 +104,7 @@ p {
 	margin: dp(16);
 }
 
-strong { color: color($grey, 700); font-weight: $font-weight-m; }
+strong { font-weight: $font-weight-m; }
 small { color: color($fg, 'secondary-text'); font-weight: $font-weight-r; font-size:.85em; line-height: 1.2; }
 
 
@@ -155,7 +162,7 @@ a {
 		
 	}
 	&[target], &[onclick] {
-		@include var(color, c-primary);
+		color: $cAnchor;
 	}
 	&:hover {
 		text-decoration: underline;
@@ -866,6 +873,11 @@ hr {
 		}
 	}
 }
+
+.right {
+	float: right;
+}
+
 .status {
 	@extend %font-subheading-dense;
 	padding-left: dp(8);
@@ -876,6 +888,10 @@ hr {
 	color: color($fg, 'text');
 	text-shadow: 0px 0px 4px white;
 	border:1px solid color($fg, 'divider');
+
+	.x-panel-header-text & {
+		margin: dp(8);
+	}
 }
 
 .x-tab-with-icon {
@@ -1027,6 +1043,78 @@ tr.go-grid-row {
 
 .go-border-west {
 	//background-color: color($grey, 100);
+}
+
+%go-icon-list {
+	p, > a {
+		min-height: dp(40);
+		box-sizing: border-box;
+		display:table;
+		text-decoration: none;
+		padding: dp(8) dp(16);
+		margin: 0;
+		//width: 100%;
+		span, a {
+			display: inline-block;
+			min-height: dp(24);
+		}
+
+		i.label {
+			left: dp(16);
+			top: dp(12);
+			width:  dp(24);
+			height: dp(24);
+			position: absolute;
+			color: color($fg, 'icon');
+		}
+
+		.avatar {
+			left: 0;
+			top:dp(4);
+			position: absolute;
+			//color: color($bg, 'background');
+		}
+
+
+		&:hover {
+			.show-on-hover {
+				display:block !important;
+			}
+			.hide-on-hover {
+				display: none;
+			}
+		}
+
+		label {
+			@extend %font-caption;
+			width:100%;
+			display: block;
+			line-height: dp(16);
+		}
+
+	}
+
+
+
+	.left {
+		top: dp(12);
+		left: dp(16);
+		position:absolute;
+	}
+
+	.right {
+		top: dp(12);
+		right: dp(16);
+		position:absolute;
+	}
+}
+
+.go-icon-list {
+	@extend %go-icon-list;
+	& > p, & > a {
+		position:relative;
+		padding-left: dp(56);
+	}
 }
 
 //detail view
@@ -1209,7 +1297,6 @@ tr.go-grid-row {
 	}
 }
 
-
 .show-on-hover {
 	display: none !important;		
 }
@@ -1221,76 +1308,6 @@ tr.go-grid-row {
 }
 
 
-%go-icon-list {
-	p, > a {		
-		min-height: dp(40);
-		box-sizing: border-box;
-		display:table;
-		text-decoration: none;
-		padding: dp(8) dp(16);
-		margin: 0;
-		width: 100%;
-		span, a {
-			display: inline-block;
-			min-height: dp(24);
-		}
-		
-		i.label {			
-			left: dp(16);
-			top: dp(12);
-			width:  dp(24);
-			height: dp(24);
-			position: absolute;
-			color: color($fg, 'icon');	
-		}
-
-		.avatar {			
-			left: 0;
-			top:dp(4);
-			position: absolute;
-			//color: color($bg, 'background');
-		}
-
-		
-		&:hover {
-			.show-on-hover {
-				display:block !important;
-			}
-			.hide-on-hover {
-				display: none;
-			}
-		}
-		
-		label {
-			@extend %font-caption;
-			width:100%;
-			display: block;
-			line-height: dp(16);
-		}
-		
-	}
-
-	
-
-	.left {
-		top: dp(12);
-		left: dp(16);
-		position:absolute;
-	}
-
-	.right {
-		top: dp(12);
-		right: dp(16);
-		position:absolute;
-	}
-}
-.go-icon-list {
-	@extend %go-icon-list;
-	& > p, & > a {
-		position:relative;
-		padding-left: dp(56);
-	}
-}
 
 // old detail view compatibility
 .display-panel-heading {
@@ -1348,6 +1365,7 @@ table.display-panel {
 	width: 100%;
 	clear: both;
 	td, th {
+		vertical-align:top;
 		padding: dp(8);
 		&:first-child {
 			padding-left: dp(16);
@@ -1355,12 +1373,12 @@ table.display-panel {
 		&:last-child  {
 			padding-right: dp(16);
 		}
-		&.r {text-align:right}
+		&.r, &.right {text-align:right; float: none}
 	}
 	th {
 		@extend %font-data-head;
 	}
-	tr.line td, td.line, th.line {
+	tr.line td, td.line, th.line, tr.line th {
 		border-bottom: 1px solid color($fg, 'divider');
 	}
 	tr.totals th {
@@ -1368,7 +1386,12 @@ table.display-panel {
 		vertical-align: middle;
 		border-right: 1px solid color($fg, 'divider');
 	}
-	table { 
+
+	tr.bold-line td, td.bold-line,  tr.line th, th.line {
+		border-bottom: 1px solid color($fg, 'line');
+	}
+
+	table {
 		td:first-child {
 			padding-left: 0;
 		}
@@ -1801,24 +1824,7 @@ table[id^="comments-ext"] b {
 .go-html-formatted {
 	@extend %font-body1;
 
-	h1 {
-		margin: dp(16) 0;
-	}
-	h2 {
-		margin: dp(16) 0;
-	}
-	h3 {
-		margin: dp(8) 0;
-	}
-	h4 {
-		margin: dp(8) 0;
-	}
-	h5 {
-		margin: dp(8) 0;
-	}
-	h6 {
-		margin: dp(8) 0;
-	}
+
 
 }
 
@@ -2130,6 +2136,7 @@ table[id^="comments-ext"] b {
 	border-top-left-radius: dp(8);
 	background-color: color($bg, 'box');
 	cursor: pointer;
+	z-index:2;
 }
 
 
@@ -2302,4 +2309,13 @@ table[id^="comments-ext"] b {
 			opacity: 0;
 		}
 	}
+}
+
+.go-dropzone {
+	border: 2px dashed color($fg, 'line');
+	border-radius: $borderRadius;
+	margin: dp(16);
+	text-align:center;
+	padding: dp(48);
+	color: color($fg, 'secondary-text');
 }

@@ -192,8 +192,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 					if(createLinkButton) {
 						//if window has a create link button then use this. Otherwise add a save listener.
 						createLinkButton.addLink(this.getEntity(), this.getEntityId());
-					} else
-					{
+					} else {
 						window.on('save', function (window, entity) {
 
 							//hack for event dialog because save event is different
@@ -211,8 +210,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 							if (!Ext.isObject(entity)) {
 								//old modules just pass ID
 								link.toId = entity;
-							} else
-							{
+							} else {
 								//in this case it's a go.form.Dialog							
 								link.toId = entity.id;
 							}
@@ -239,7 +237,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 			if(l.title == "E-mail") {
 				items.push({
 					iconCls: "entity LinkedEmail bluegrey",
-					text: "E-mail files",
+					text: t("E-mail files"),
 					handler: function () {
 						var dv = this.detailView;
 						this.folderId = dv.data.filesFolderId || dv.data.files_folder_id;

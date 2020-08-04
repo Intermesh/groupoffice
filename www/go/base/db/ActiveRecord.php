@@ -666,6 +666,21 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 	/**
+	 * For compatibility with entities. Used in logging.
+	 *
+	 * @return string
+	 */
+	public function id() {
+		$pk = $this->getPk();
+		if(is_array($pk)) {
+			return implode('-', $this->getPk());
+		} else
+		{
+			return $pk;
+		}
+	}
+
+	/**
 	 * Check if this model is new and not stored in the database yet.
 	 *
 	 * @return bool
@@ -872,7 +887,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	public function findAclId() {
 		if (!$this->aclField()) {
 			$moduleName = $this->getModule();
-			return \GO::modules()->{$moduleName}->acl_id;
+			return \GO::modules()->{$moduleName}->aclId;
 		}
 
 		//removed caching of _acl_id because the relation is cached already and when the relation changes the wrong acl_id is returned,
@@ -1246,7 +1261,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if(empty($params['userId'])){
 			$params['userId']=!empty(GO::session()->values['user_id']) ? GO::session()->values['user_id'] : 1;
 		}
-		
+
 		if($this->aclField() && (empty($params['ignoreAcl']) || !empty($params['joinAclFieldTable']))){
 			$aclJoinProps = $this->_getAclJoinProps();
 
@@ -1275,8 +1290,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 //		$select .= "SQL_NO_CACHE ";
-		
-		
+
+
 
 		if(empty($params['fields']))
 			$params['fields']=$this->getDefaultFindSelectFields(isset($params['limit']) && $params['limit']==1);
@@ -1350,21 +1365,21 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 		}
 
-		
+
 		$joinCf = !empty($params['joinCustomFields']) && $this->hasCustomFields();
 
 		if($joinCf) {
 			$cfFieldModels = array_filter(static::getCustomFieldModels(), function($f) {
 				return $f->getDataType()->hasColumn();
 			});
-			
+
 			$names = array_map(function($f) {
 				if(empty($f->databaseName)) {
 					throw new Exception("Custom field ". $f->id ." has no databaseName");
 				}
 				return "cf." . $f->databaseName;
 			}, $cfFieldModels);
-			
+
 			if(!empty($names)) {
 				$fields .= ", " .implode(', ', $names);
 			}
@@ -1812,8 +1827,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		//throw new \Exception('Error: you supplied a searchQuery parameter to find but getFindSearchQueryParamFields() should be overriden in '.$this->className());
 		$fields = array();
 		foreach($this->columns as $field=>$attributes){
-			
-			if($field != 'uuid'){ 
+
+			if($field != 'uuid'){
 				if(isset($attributes['gotype']) && ($attributes['gotype']=='textfield' || ($attributes['gotype']=='customfield' && $attributes['customfield']->customfieldtype->includeInSearches()))){
 					$fields[]='`'.$prefixTable.'`.`'.$field.'`';
 				}
@@ -3220,7 +3235,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		//TODO modified custom fields attr?
 		
-		$this->log($wasNew ? \GO\Log\Model\Log::ACTION_ADD : \GO\Log\Model\Log::ACTION_UPDATE,true, false);
+		$this->log($wasNew ? "create" : "update",true, false);
 
 		if($this->hasCustomFields() && !$this->saveCustomFields()) {
 			return false;
@@ -3288,13 +3303,17 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$cutoffLength = 500;
 		
 		switch($action){
-			case \GO\Log\Model\Log::ACTION_DELETE:
-				return $this->getAttributes();
-			case \GO\Log\Model\Log::ACTION_UPDATE:
+			case "delete":
+				return null;
+			case "update":
 				$oldValues = $this->getModifiedAttributes();
 								
 				$modifications = array();
 				foreach($oldValues as  $key=>$oldVal){
+
+					if($key == 'mtime') {
+						continue;
+					}
 					
 					if(!is_scalar($oldVal)) {
 						continue;
@@ -3352,7 +3371,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				
 				
 				return $modifications;
-			case \GO\Log\Model\Log::ACTION_ADD:
+			case "create":
 				$attrs =  $this->getAttributes();
 				$logAttrs = array();
 				foreach($attrs as $attr=>$val){
@@ -3395,8 +3414,46 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			return true;
 		}
 
-		\go\modules\community\history\Module::onActiveRecordSave($this, $this->getCacheAttributes(), $action);
+		if(go()->getModule('community', 'history') ) {
+			\go\modules\community\history\Module::logActiveRecord($this, $action);
+		}
 
+	}
+
+
+	/**
+	 * A title for this entity used in search cache and logging for example.
+	 *
+	 * @return string
+	 */
+	public function title() {
+
+		$cache = $this->getCacheAttributes();
+		if($cache) {
+			return $cache['name'];
+		}
+
+		if($this->hasAttribute('name')) {
+			return $this->name;
+		}
+
+		if($this->hasAttribute('title')) {
+			return $this->title;
+		}
+
+		if($this->hasAttribute('subject')) {
+			return $this->subject;
+		}
+
+		if($this->hasAttribute('description')) {
+			return $this->description;
+		}
+
+		if($this->hasAttribute('displayName')) {
+			return $this->displayName;
+		}
+
+		return static::class;
 	}
 
 	/**
@@ -3967,6 +4024,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				return false;
 
 		$r= $this->relations();
+
+		$this->log("delete");
 		
 		foreach($r as $name => $attr){
 			if (!GO::classExists($attr['model'])){				
@@ -4080,7 +4139,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$this->_isDeleted = true;
 		
-		$this->log(\GO\Log\Model\Log::ACTION_DELETE);
+
 
 		$attr = $this->getCacheAttributes();
 
@@ -4095,7 +4154,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 		
 
-		if($this->aclField() && (!$this->isJoinedAclField || $this->isAclOverwritten())){
+		if($this->aclField() && (!$this->isJoinedAclField || $this->isAclOverwritten()) && !go()->getModule('community', 'history')){
 			//echo 'Deleting acl '.$this->{$this->aclField()}.' '.$this->aclField().'<br />';
 			$aclField = $this->isAclOverwritten() ? $this->aclOverwrite() : $this->aclField();
 
@@ -4788,10 +4847,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 
-	public function rebuildSearchCache() {		
-		
-		
-				
+	public function rebuildSearchCache() {
+
+
+
 		$rc = new \GO\Base\Util\ReflectionClass($this);
 		$overriddenMethods = $rc->getOverriddenMethods();
 		if(in_array("getCacheAttributes", $overriddenMethods)){

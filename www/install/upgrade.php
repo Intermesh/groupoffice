@@ -31,13 +31,13 @@ try {
 	if (!isset($_GET['confirmed'])) {
 	
 		echo "<h2>". go()->t("Upgrade Group-Office") ."</h2><p>";
-		echo "Please <b>BACKUP</b> your database and files before proceeding. You're database is going to be upgraded and all caches will be cleared.<br />This operation can only be undone by restoring a backup.<br />";
+		echo "Please <b>BACKUP</b> your database and files before proceeding. Your database is going to be upgraded and all caches will be cleared.<br />This operation can only be undone by restoring a backup.<br />";
 		
 		echo 'More details about this upgrade can be found in the <a target="_blank" href="https://github.com/Intermesh/groupoffice/blob/' . go()->getMajorVersion()  . '.x/CHANGELOG.md">change log</a>.<br /><br />';
 
 		echo "Note: You can also upgrade on the command line by running (replace www-data with the user of your webserver): <br />
 
-			<code>sudo -u www-data cli.php core/System/upgrade</code>
+			<code>sudo -u www-data php cli.php core/System/upgrade</code>
 
 			";
 
@@ -47,16 +47,16 @@ try {
 		echo '<a class="button" href="?confirmed=1">Upgrade database</a>';
 	} elseif (!isset($_GET['ignore']) && count($unavailable)) {
 	
-		echo "<h2>". go()->t("Upgrade Group-Office") ."</h2><pre>";
+		echo "<h2>". go()->t("Upgrade Group-Office") ."</h2>";
 
-		echo "The following modules are not available because they're missing on disk\n"
-		. "or you've got an <b>invalid or missing license file</b>: \n"
-		. "<ul style=\"font-size:1.5em\"><li>" . implode("</li><li>", array_map(function($a){return ($a['package'] ?? "legacy") .'/'.$a['name'];}, $unavailable)) . "</li></ul>"
-		. "Please install the license file(s) and refresh this page or disable these modules.\n"
-		. "If you continue the incompatible modules will be disabled.\n\n";
+		echo "<p>The following modules are not available because they're missing on disk\n"
+		. "or you've got an <b>invalid or missing license file</b>: </p>"
+		. "<ul style=\"font-size:1.5em\"><li>" . implode("</li><li>", array_map(function($a){return ($a['package'] ?? "legacy") .'/'.$a['name'];}, $unavailable)) . "</li></ul>\n"
+		. "<p>Please install the license file(s) and refresh this page or disable these modules.\n"
+		. "If you continue the incompatible modules will be disabled.</p>";
 		
 		
-		echo "</pre></div>";
+		echo "</div>";
 		echo '<a class="button" href="?ignore=modules&confirmed=1">Disable &amp; Continue</a>';
 
 	} else

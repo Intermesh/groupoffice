@@ -267,7 +267,14 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 				},
 				items: [
 					this.emailAddressesField = new go.modules.community.addressbook.EmailAddressesField(),
-					this.phoneNumbersField = new go.modules.community.addressbook.PhoneNumbersField()
+					this.phoneNumbersField = new go.modules.community.addressbook.PhoneNumbersField(),
+					{
+						layout: "form",
+						xtype: "container",
+						items: {
+							xtype: 'golanguagecombo'
+						}
+					}
 				]
 			}),
 			{
@@ -295,6 +302,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 				items: [
 					this.datesField = new go.modules.community.addressbook.DatesField(),
 					this.urlsField = new go.modules.community.addressbook.UrlsField()
+
 				]
 			}
 		];

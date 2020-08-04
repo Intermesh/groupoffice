@@ -93,6 +93,7 @@ abstract class Entity  extends OrmEntity {
 
 		$filesPathProperties = static::filesPathProperties();
 		if(!empty($filesPathProperties)) {
+
 			if($force || $this->isModified($filesPathProperties)) {
 				$oldFilesFolderId = $this->filesFolderId;
 				$folder = Folder::model()->findForEntity($this, false);
@@ -120,28 +121,33 @@ abstract class Entity  extends OrmEntity {
 			$tables = static::getMapping()->getTables();
 			$table = array_values($tables)[0]->getName();
 
-			$entities = static::find(array_merge(['id', 'filesFolderId'], static::filesPathProperties()))
-				->where('filesFolderId', '!=', null)
-				->where('filesFolderId', 'NOT IN', (new Query())->select('id')->from('fs_folders'));
+			$filesPathProperties = static::filesPathProperties();
+			if(is_a(static::class, AclOwnerEntity::class, true)) {
+				$filesPathProperties[] = static::$aclColumnName;
+			}
+
+			$entities = static::find(array_merge(['id', 'filesFolderId'], $filesPathProperties))
+				->where('filesFolderId', '!=', null);
+//				->where('filesFolderId', 'NOT IN', (new Query())->select('id')->from('fs_folders'));
 
 			foreach($entities as $e) {
 				$e->checkFilesFolder(true);
 			}
 
-			//update fs_folders set acl_id = 0 where acl_id not in (select id from core_acl)
-			// select * from fs_folders where acl_id not in (select id from core_acl)
-			if(is_a(static::class, AclOwnerEntity::class, true)) {
-				$entities = static::find(array_merge(['id', 'filesFolderId'], static::filesPathProperties()));
-
-				$entities->join('fs_folders', 'f', 'f.id = '.$entities->getTableAlias() .'.filesFolderId')
-					->where('f.acl_id', 'NOT IN', (new Query())->select('id')->from('core_acl'));
-
-				//$sql = (string) $entities;
-
-				foreach($entities as $e) {
-					$e->checkFilesFolder(true);
-				}
-			}
+//			//update fs_folders set acl_id = 0 where acl_id not in (select id from core_acl)
+//			// select * from fs_folders where acl_id not in (select id from core_acl)
+//			if(is_a(static::class, AclOwnerEntity::class, true)) {
+//				$entities = static::find(array_merge(['id', 'filesFolderId'], static::filesPathProperties()));
+//
+//				$entities->join('fs_folders', 'f', 'f.id = '.$entities->getTableAlias() .'.filesFolderId')
+//					->where('f.acl_id', 'NOT IN', (new Query())->select('id')->from('core_acl'));
+//
+//				//$sql = (string) $entities;
+//
+//				foreach($entities as $e) {
+//					$e->checkFilesFolder(true);
+//				}
+//			}
 		}
 	}
 
@@ -152,6 +158,16 @@ abstract class Entity  extends OrmEntity {
 	 */
 	private static function supportsFiles() {
 		return property_exists(static::class, 'filesFolderId');
+	}
+
+	/**
+	 * Override to use different ACL for files.
+	 *
+	 * @return int
+	 * @throws Exception
+	 */
+	public function filesFolderAclId() {
+		return $this->findAclId();
 	}
 
   /**

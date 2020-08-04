@@ -7,8 +7,6 @@ use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\model\Link;
 use go\core\orm\CustomFieldsTrait;
-use go\core\orm\Entity;
-use go\core\orm\LoggingTrait;
 use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
@@ -36,9 +34,7 @@ class Contact extends AclItemEntity {
 	use CustomFieldsTrait;
 	
 	use SearchableTrait;
-	
-	use LoggingTrait;
-	
+
 	/**
 	 * 
 	 * @var int
@@ -409,7 +405,7 @@ class Contact extends AclItemEntity {
    * Find contact by e-mail address
    *
    * @param string|string[] $email
-   * @return Query
+   * @return static[]|Query
    * @throws Exception
    */
 	public static function findByEmail($email, $properties = []) {
@@ -571,6 +567,13 @@ class Contact extends AclItemEntity {
 										})
 										->add('gender', function(Criteria $criteria, $value) {
 											$criteria->andWhere(['gender' => $value, 'isOrganization'=> false]);
+										})
+										->addDate("dateofbirth", function(Criteria $criteria, $comparator, $value, Query $query) {
+											if(!$query->isJoined('addressbook_date', 'dob')) {
+												$query->join('addressbook_date', 'dob', 'dob.contactId = c.id', "INNER");
+											}
+											$criteria->where('dob.type', '=', Date::TYPE_BIRTHDAY)
+												->andWhere('dob.date',$comparator, $value);
 										})
 										->addDate("birthday", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_date', 'date')) {
@@ -744,12 +747,32 @@ class Contact extends AclItemEntity {
 			if(!$this->saveUri()) {
 				return false;
 			}
-		}		
+		}
+
+		if($this->isOrganization && $this->isModified(['name']) && !$this->updateEmployees()) {
+			return false;
+		}
 		
 		return $this->saveOriganizationIds();
 		
 	}
-	
+
+	private function updateEmployees() {
+		$employees = $this->findEmployees(['jobTitle', 'addressBookId', 'id', 'name']);
+		foreach($employees as $e) {
+			if(!$e->saveSearch(true)) {
+				go()->error("Saving search cache of employee with ID: " . $e->id . " failed");
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	public function findEmployees($properties = []) {
+		return static::findByLink($this, $properties)->andWhere(['isOrganization' => false]);
+	}
+
 	protected function internalValidate() {
 
 //		$this->setValidationError('name', 'test', 'test');
@@ -783,14 +806,12 @@ class Contact extends AclItemEntity {
 	/**
 	 * Find all linked organizations
 	 *
+	 * @param array $properties
 	 * @return self[]
 	 * @throws Exception
 	 */
-	public function findOrganizations(){
-		return self::find()
-			->where('fromId', '=', $this->id)
-			->join('core_link', 'l', 'c.id=l.toId and l.toEntityTypeId = '.self::entityType()->getId())		
-			->andWhere('fromEntityTypeId = '. self::entityType()->getId())
+	public function findOrganizations($properties = []){
+		return self::findByLink($this, $properties)
 			->andWhere('c.isOrganization = true');
 	}
 
@@ -858,8 +879,8 @@ class Contact extends AclItemEntity {
 	}
 
 	public function getSearchDescription() {
-		$addressBook = AddressBook::findById($this->addressBookId);
-		
+		$addressBook = AddressBook::findById($this->addressBookId, ['name']);
+
 		$orgStr = "";	
 		
 		if(!$this->isOrganization) {
@@ -876,7 +897,7 @@ class Contact extends AclItemEntity {
 		return $addressBook->name . $jobTitle . $orgStr;
 	}
 
-	public function getSearchName() {
+	public function title() {
 		return $this->name;
 	}
 
@@ -950,12 +971,14 @@ class Contact extends AclItemEntity {
 	public function setSalutation($v) {
 		$this->salutation = $v;
 	}
+
 	/**
-	 * Because we've implemented the getter method "getOrganizationIds" the contact 
-	 * modSeq must be incremented when a link between two contacts is deleted or 
+	 * Because we've implemented the getter method "getOrganizationIds" the contact
+	 * modSeq must be incremented when a link between two contacts is deleted or
 	 * created.
-	 * 
+	 *
 	 * @param Link $link
+	 * @throws Exception
 	 */
 	public static function onLinkSave(Link $link) {
 		if($link->getToEntity() !== "Contact" || $link->getFromEntity() !== "Contact") {

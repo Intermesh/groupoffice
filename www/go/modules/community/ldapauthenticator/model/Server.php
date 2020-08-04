@@ -41,6 +41,11 @@ class Server extends Entity {
 	public $syncGroups = false;
 	public $syncGroupsQuery;
 
+	public $imapUseEmailForUsername = false;
+
+	public $followReferrals = 1;
+	public $protocolVersion = 3;
+
 	
 	
 	/**
@@ -145,6 +150,11 @@ class Server extends Entity {
 		if(!$this->connection->connect($this->getUri())) {
 			throw new \Exception("Could not connect to LDAP server");
 		}
+
+		$this->connection->setOption(LDAP_OPT_REFERRALS, $this->followReferrals);
+		$this->connection->setOption(LDAP_OPT_PROTOCOL_VERSION, $this->protocolVersion);
+
+
 		if(!$this->ldapVerifyCertificate) {
 			$this->connection->setOption(LDAP_OPT_X_TLS_REQUIRE_CERT, LDAP_OPT_X_TLS_NEVER);
 		}
@@ -157,7 +167,7 @@ class Server extends Entity {
 		if (!empty($this->username)) {			
 			
 			if (!$this->connection->bind($this->username, $this->getPassword())) {				
-				throw new \Exception("Invalid password given for '".$this->username."' " . $this->getPassword());
+				throw new \Exception("Invalid password given for '".$this->username."'");
 			} else
 			{
 				go()->debug("Authenticated with user '" . $this->username . '"');

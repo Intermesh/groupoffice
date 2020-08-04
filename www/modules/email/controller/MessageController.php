@@ -407,7 +407,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$from = $message->from->getAddress();
 						
 		if(\GO\Base\Util\Validate::email(($record['from'])) && strtolower($record['from']) != strtolower($from['email'])) {
-			$record['from'] = '<div style="color: red">'.$from['email'].'</div>';
+			$record['from'] = '<div style="color: #ff0000">' .$from['email'].'</div>';
 		}
 		
 		return $record;
@@ -541,26 +541,34 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 					foreach($to as $email=>$name){
 						
-						$contacts = Contact::findByEmail($email, ['id', 'addressBookId'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]);
+						$contacts = Contact::findByEmail($email, ['id', 'addressBookId', 'isOrganization'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE])->all();
+						foreach($contacts as $contact) {
+							/** @var Contact $contact */
+							if(!$contact->isOrganization) {
+								foreach($contact->findOrganizations(['id', 'addressBookId', 'name']) as $o) {
+									$contacts[] = $o;
+								}
+							}
+						}
 
 						foreach($contacts as $contact){
 
-						if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){						
+							if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){
 
-							$attributes['acl_id']= $contact->findAclId();
-							
-							$linkedEmail = \GO\Savemailas\Model\LinkedEmail::model()->findSingleByAttributes(array(
-								'uid'=>$attributes['uid'], 
-								'acl_id'=>$attributes['acl_id']));
-							
-							if(!$linkedEmail){
-								$linkedEmail = new \GO\Savemailas\Model\LinkedEmail();
-								$linkedEmail->setAttributes($attributes);
-								$linkedEmail->save();
+								$attributes['acl_id']= $contact->findAclId();
+
+								$linkedEmail = \GO\Savemailas\Model\LinkedEmail::model()->findSingleByAttributes(array(
+									'uid'=>$attributes['uid'],
+									'acl_id'=>$attributes['acl_id']));
+
+								if(!$linkedEmail){
+									$linkedEmail = new \GO\Savemailas\Model\LinkedEmail();
+									$linkedEmail->setAttributes($attributes);
+									$linkedEmail->save();
+								}
+
+								$linkedEmail->link($contact);
 							}
-
-							$linkedEmail->link($contact);
-						}
 							
 							// Also link the company to the email if the contact has a company attached to it.
 						// 	if(!empty(GO::config()->email_autolink_companies) && !empty($contact->company_id)){
@@ -913,7 +921,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 
 			$defaultTags = array(
-					'contact:salutation'=>GO::t("Dear Mr / Ms")
+					'contact:salutation'=>GO::t("Dear sir/madam")
 			);
 			
 			// Parse the link tag
@@ -1494,7 +1502,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 
 			//Don't do these special actions in the special folders
-			if($params['mailbox']!=$account->sent && $params['mailbox']!=$account->trash && $params['mailbox']!=$account->drafts){
+			if(!$imapMessage->seen && $params['mailbox']!=$account->sent && $params['mailbox']!=$account->trash && $params['mailbox']!=$account->drafts){
 				$linkedModels = $this->_handleAutoLinkTag($imapMessage, $response);
 				$response = $this->_handleInvitations($imapMessage, $params, $response);
 
@@ -1860,7 +1868,16 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$from = $imapMessage->from->getAddress();
 
 			
-			$contacts = Contact::findByEmail($from['email'], ['id'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]);
+			$contacts = Contact::findByEmail($from['email'], ['id', 'isOrganization', 'addressBookId', 'name'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE])->all();
+
+			foreach($contacts as $contact) {
+				/** @var Contact $contact */
+				if(!$contact->isOrganization) {
+					foreach($contact->findOrganizations(['id', 'addressBookId', 'name']) as $o) {
+						$contacts[] = $o;
+					}
+				}
+			}
 
 			foreach($contacts as $contact) {
 				if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){						

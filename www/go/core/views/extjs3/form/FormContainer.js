@@ -190,6 +190,19 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 
 	focus: function () {
 		var fields = this.getAllFormFields();
+
+		fields = fields.filter(function(field) {
+			if(field.hidden) {
+				return false;
+			}
+
+			if(field instanceof Ext.form.Hidden) {
+				return false;
+			}
+
+			return true;
+		});
+
 		var firstFormField = fields.length ? fields[0] : false;
 
 		if (firstFormField) {

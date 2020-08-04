@@ -239,7 +239,7 @@ class Token extends Entity {
 		if(!$user->save()) {
 			return false;
 		}
-		
+
 		if(!$this->refresh()) {
 			return false;
 		}

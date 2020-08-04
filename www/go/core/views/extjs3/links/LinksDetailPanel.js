@@ -40,7 +40,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 		
 		
 		var tpl = new Ext.XTemplate('<div class="icons"><tpl for=".">\
-				<p data-id="{id}">\
+				<p data-id="{id}" class="s12">\
 				<tpl if="xindex === 1">\
 					<i class="label ' + this.link.iconCls + '" ext:qtip="{toEntity}"></i>\
 				</tpl>\
@@ -145,7 +145,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 					text: t("Edit"),
 					handler: function () {
 						var dlg = new go.links.EditLinkDialog();
-						dlg.load(record.id).show();
+						dlg.load(this.linkMoreMenu.record.id).show();
 					},
 					scope: this
 				}, {
@@ -156,7 +156,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 						Ext.MessageBox.confirm(t("Delete"), t("Are you sure you want to delete this item?"), function (btn) {
 							if (btn == "yes") {
 								go.Db.store("Link").set({
-									destroy: [record.id]
+									destroy: [this.linkMoreMenu.record.id]
 								});
 							}
 						}, this);
@@ -168,16 +168,17 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 					text: t("Open"),
 					handler: function () {
 						var win = new go.links.LinkDetailWindow({
-							entity: record.data.toEntity
+							entity: this.linkMoreMenu.record.data.toEntity
 						});
 
-						win.load(record.data.toId);
+						win.load(this.linkMoreMenu.record.data.toId);
 					},
 					scope: this
 				}]
 			});
 		}
 		this.linkMoreMenu.data = node.attributes.data;
+		this.linkMoreMenu.record = record;
 		this.linkMoreMenu.showAt(e.getXY());
 	},
 	

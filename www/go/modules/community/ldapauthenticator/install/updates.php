@@ -35,3 +35,9 @@ $updates['201910220909'][] = "CREATE TABLE IF NOT EXISTS `ldapauth_server_user_s
   CONSTRAINT `ldapauth_server_user_sync_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
   CONSTRAINT `ldapauth_server_user_sync_ibfk_2` FOREIGN KEY (`serverId`) REFERENCES `ldapauth_server` (`id`) ON DELETE CASCADE
  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+$updates['202007021707'][] = "ALTER TABLE `ldapauth_server` ADD `imapUseEmailForUsername` BOOLEAN NOT NULL DEFAULT FALSE AFTER `imapValidateCertificate`;";
+
+$updates['202007021707'][] = "ALTER TABLE `ldapauth_server` ADD `followReferrals` BOOLEAN NOT NULL DEFAULT TRUE AFTER `ldapVerifyCertificate`, ADD `protocolVersion` TINYINT UNSIGNED NOT NULL DEFAULT '3' AFTER `followReferrals`;";
+
+$updates['202007271145'][] = "ALTER TABLE `ldapauth_server` CHANGE `syncUsersQuery` `syncUsersQuery` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL, CHANGE `syncGroupsQuery` `syncGroupsQuery` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;";

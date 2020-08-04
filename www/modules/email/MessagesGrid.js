@@ -281,20 +281,7 @@ GO.email.MessagesGrid = function(config){
 		]
 	});
 
-	if(go.Modules.isAvailable("legacy", "gnupg")) {
-		this.settingsMenu.add('-');
-		this.settingsMenu.add({
-			iconCls:'gpg-btn-settings',
-			text:t("encryptionSettings", "gnupg"),
-			handler:function(){
-				if(!this.securityDialog) {
-					this.securityDialog = new GO.gnupg.SecurityDialog();
-				}
-				this.securityDialog.show();
-			},
-			scope:this
-		});
-	}
+
 	if(!config.hideSearch)
 		config.tbar = [];
 	

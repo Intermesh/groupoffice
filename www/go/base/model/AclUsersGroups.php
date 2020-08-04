@@ -29,7 +29,6 @@ use GO;
 use GO\Base\Db\ActiveRecord;
 use go\core\App;
 use go\core\orm\StateManager;
-use GO\Log\Model\Log;
 
 
 class AclUsersGroups extends ActiveRecord {
@@ -99,11 +98,6 @@ class AclUsersGroups extends ActiveRecord {
 	
 	protected function afterSave($wasNew) {
 		if($this->aclItem){
-			//Add log message for activitylog here
-			if(GO::modules()->isInstalled("log")){
-				Log::create("acl", $this->aclItem->usedIn,$this->aclItem->className(),$this->aclItem->id);
-			}
-		
 			$this->aclItem->touch();
 		}
 		

@@ -307,7 +307,7 @@ Administration -> Comptes de messagerie -> Double-cliquez sur votre compte -> On
   'Contact' => 'Contact',
   'encryptionSettings' => 'Paramètres de cryptage',
   'folder' => 'dossier',
-  'MoveOldMails' => 'Déplacer anciens emails',
+  'Move old mails' => 'Déplacer anciens emails',
   'Address list' => 'Liste d\'adresses',
   '%n contacts have been identified and removed from the selected address list.' => '%n contacts ont été identifiés et supprimés de la liste d\'adresses sélectionnée.',
   'File browser' => 'Navigateur de fichiers',

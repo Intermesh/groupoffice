@@ -1,6 +1,7 @@
 <?php
 
 use go\core\App;
+use go\core\http\Response;
 
 require(__DIR__ . "/../../vendor/autoload.php");
 App::get();
@@ -24,7 +25,9 @@ foreach ($load_modules as $module) {
 	}
 }
 
-header('Content-Type: application/javascript; charset=utf8');
+Response::get()->setContentType("application/javascript; charset=utf8");
+Response::get()->sendHeaders();
+
 header("Expires: " . date("D, j M Y H:i:s", strtotime("+1 year")));
 header('Cache-Control: PRIVATE');
 header('Modified-At: '.date('D, j M Y H:i:s'));

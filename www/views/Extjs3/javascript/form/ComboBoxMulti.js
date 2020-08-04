@@ -72,7 +72,11 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 
 		syncHeight: function () {
 
-			this.el.dom.style.overflowY = 'auto';
+			if(!this.el) {
+				return;
+			}
+
+			this.el.dom.style.overflowY = 'hidden';
 			var changed = false;
 			if (this.el.dom.offsetHeight > this.growMin) {
 				this.el.dom.style.height = this.growMin + "px";
@@ -81,7 +85,8 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 
 			var height = Math.min(this.el.dom.scrollHeight, this.growMax);
 			if (height > this.growMin) {
-				this.el.dom.style.height = (height + dp(8)) + "px";
+				height += dp(8);
+				this.el.dom.style.height = height + "px";
 				changed = true;
 			}
 
