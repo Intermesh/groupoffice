@@ -78,9 +78,13 @@ go.customfields.DetailPanel = Ext.extend(Ext.Panel, {
           if(!!v) {
             vis = true;
           }
+        } else if(!vis && (field.type === 'Contact' || field.type === 'User')) {
+          // Hack: relation CFs are dependent on promises and will never return anything. They should be displayed though
+          vis = true;
         }
       }
     });
+
     this.setVisible(vis);
   },
 
