@@ -170,7 +170,9 @@ GO.files.FileBrowser = function(config){
 
 
 	var fields ={
-		fields:['type_id', 'id','name','type', 'size', 'mtime', 'extension', 'timestamp', 'thumb_url','path','acl_id','locked_user_id','locked','folder_id','permission_level','readonly','unlock_allowed','handler', 'content_expire_date'].concat(go.customfields.CustomFields.getFieldDefinitions("File")),
+		fields:['type_id', 'id','name','type', 'size', 'mtime', 'extension', 'timestamp', 'thumb_url','path','acl_id','locked_user_id','locked','folder_id','permission_level','readonly','unlock_allowed','handler', 'content_expire_date']
+			.concat(go.customfields.CustomFields.getFieldDefinitions("File"))
+			.concat(go.customfields.CustomFields.getFieldDefinitions("Folder")),
 		columns:[{
 			id:'name',
 			header:t("Name"),
@@ -210,6 +212,7 @@ GO.files.FileBrowser = function(config){
 			dataIndex: 'id',
 			hidden: true
 		}].concat(go.customfields.CustomFields.getColumns("File"))
+			.concat(go.customfields.CustomFields.getColumns("Folder"))
 	};
 
 
