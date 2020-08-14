@@ -1,3 +1,8 @@
+6.4.164
+
+- Core: Fixed bug to enable deleting comment
+- Core: Better link color in dark theme 
+
 30-07-2020 6.4.163
 - Bookmarks: fixed bug where logo didn't save
 - Email: Workaround if "From" header is missing in email message
