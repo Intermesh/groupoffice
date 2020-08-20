@@ -6,7 +6,7 @@
 - Time registration: new time insert dialog. (small date field as this is already set in the new view)
 - Time registration: Drag-n-Drop to move / set duration / holt Alt-n-Drag to copy / Click Add time + Hold-n-drag to set duration 
 - Core: Added authorisation check to SSE
-- Customfields: User costumfield will now display in the detail field when not empty
+- Customfields: fix User custumfield will display in the detail field when not empty
 - Files: added Folder customfield to be displayable in the grid.
 - Core: Fix scrollbar issues when focusing/clicking on a textarea with autogrow
 - Contact: When creating a contact from unknown email address there was one email field to many
