@@ -2,6 +2,7 @@
 namespace go\core\orm;
 
 use Exception;
+use GO\Base\Db\ActiveRecord;
 use go\core\App;
 use go\core\db\Query;
 use go\core\db\Table;
@@ -114,9 +115,10 @@ trait CustomFieldsTrait {
 	 * @return $this
 	 * @throws Exception
 	 */
-	public function setCustomFields(array $data, $asText = false) {			
-		$this->customFieldsData = array_merge($this->internalGetCustomFields(), $this->normalizeCustomFieldsInput($data, $asText));		
-		
+	public function setCustomFields(array $data, $asText = false)
+	{
+		$this->customFieldsData = array_merge($this->internalGetCustomFields(), $this->normalizeCustomFieldsInput($data, $asText));
+
 		$this->customFieldsModified = true;
 
 		return $this;
@@ -127,6 +129,7 @@ trait CustomFieldsTrait {
    *
    * @param string $name
    * @param mixed $value
+   * @param bool $asText
    * @return $this
    * @throws Exception
    */
@@ -177,12 +180,15 @@ trait CustomFieldsTrait {
 		$columns = Table::getInstance(static::customFieldsTableName())->getColumns();		
 		foreach($columns as $name => $column) {
 			if(array_key_exists($name, $data)) {
-				$data[$name] = $column->normalizeInput($data[$name]);
+				if(empty($data[$name]) && $column->nullAllowed ) {
+					$data[$name] = null;
+				} else {
+					$data[$name] = $column->normalizeInput($data[$name]);
+				}
 			}
 		}
-			
+		$fn = $asText ? 'textToDb' : 'apiToDb';
 		foreach(self::getCustomFieldModels() as $field) {	
-			$fn = $asText ? 'textToDb' : 'apiToDb';
 			//if client didn't post value then skip it
 			if(array_key_exists($field->databaseName, $data)) {
 				$data[$field->databaseName] = $field->getDataType()->$fn(isset($data[$field->databaseName]) ? $data[$field->databaseName] : null,  $data, $this);
@@ -240,8 +246,7 @@ trait CustomFieldsTrait {
 					}
 					$this->customFieldsIsNew = false;
 				//}
-			} else
-			{
+			} else {
 				unset($record['id']);
 				if(!empty($record) && !App::get()
 								->getDbConnection()
@@ -268,6 +273,7 @@ trait CustomFieldsTrait {
 				return false;
 			} else {
 				throw $e;
+//				throw new \Exception($e->getMessage());
 			}
 		}
 	}

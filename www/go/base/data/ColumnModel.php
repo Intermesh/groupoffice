@@ -365,7 +365,16 @@ class ColumnModel {
 			$formattedRecord = $model->getAttributes($this->_modelFormatType);
 		
 		if(method_exists($model, 'getCustomFields')) {
-			$model->customFields = $model->getCustomFields($this->_modelFormatType == 'formatted');
+//			$model->customFields = $model->getCustomFields($this->_modelFormatType == 'formatted');
+			if(method_exists($model, 'setCustomFields')) {
+				// In certain cases (e.g. old style exports), we need the as_text parameter. Since the magic setter
+				// ingores any extra parameters, we call setCustomFields explicitly
+				$bAsTxt =$this->_modelFormatType === 'formatted';
+				$data = $model->getCustomFields($bAsTxt);
+				$model->setCustomFields($data, $bAsTxt);
+			} else {
+				$model->customFields = $model->getCustomFields($this->_modelFormatType == 'formatted');
+			}
 		}
 		
 		$columns = $this->getColumns();
