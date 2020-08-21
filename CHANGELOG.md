@@ -1,19 +1,21 @@
 6.4.164
 
-- Email: users are able to delete there own Email templates
-- Billing: Fixed the PDF temaplte tax totals when printing costs
+- Email: users are able to delete their own Email templates
+- Billing: Fixed the PDF template tax totals when printing costs
 - Time registration: Timer button will use Notification area to save/show the timer
 - Time registration: new time insert dialog. (small date field as this is already set in the new view)
 - Time registration: Drag-n-Drop to move / set duration / holt Alt-n-Drag to copy / Click Add time + Hold-n-drag to set duration 
 - Core: Added authorisation check to SSE
-- Customfields: fix User custumfield will display in the detail field when not empty
+- Customfields: fix User customfield will display in the detail field when not empty
 - Files: added Folder customfield to be displayable in the grid.
 - Core: Fix scrollbar issues when focusing/clicking on a textarea with autogrow
 - Contact: When creating a contact from unknown email address there was one email field to many
 - Language: updated pt_br Thanks to @flaviozluca
 - Customfields: fixed division by zero for functionfield in newer PHP versions
 - Core: Fixed bug to enable deleting comment
-- Core: Better link color in dark theme 
+- Core: Better link color in dark theme
+- Bookmarks: fixed bug deleting bookmark categories
+- Customfields: Several bugfixes import and export from projects  
 
 30-07-2020 6.4.163
 - Bookmarks: fixed bug where logo didn't save

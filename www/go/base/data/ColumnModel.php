@@ -363,18 +363,13 @@ class ColumnModel {
 		$formattedRecord = array();
 		if($model instanceof \GO\Base\Db\ActiveRecord)
 			$formattedRecord = $model->getAttributes($this->_modelFormatType);
-		
+
+		// Avoid magic getters by custom fields in its own variable.
+		$customFlds = array();
+
 		if(method_exists($model, 'getCustomFields')) {
-//			$model->customFields = $model->getCustomFields($this->_modelFormatType == 'formatted');
-			if(method_exists($model, 'setCustomFields')) {
-				// In certain cases (e.g. old style exports), we need the as_text parameter. Since the magic setter
-				// ingores any extra parameters, we call setCustomFields explicitly
-				$bAsTxt =$this->_modelFormatType === 'formatted';
-				$data = $model->getCustomFields($bAsTxt);
-				$model->setCustomFields($data, $bAsTxt);
-			} else {
-				$model->customFields = $model->getCustomFields($this->_modelFormatType == 'formatted');
-			}
+			$customFlds = $model->getCustomFields($this->_modelFormatType == 'formatted');
+			$model->customFields = $customFlds;
 		}
 		
 		$columns = $this->getColumns();
@@ -386,7 +381,15 @@ class ColumnModel {
 			}
 			
 			try {
-				$formattedRecord[$column->getDataIndex()]=$column->render($model);			
+				$dataIdx = $column->getDataIndex();
+				$mfType = $column->getModelFormatType();
+
+				// Since custom fields were already properly retrieved, we do not need to re-'render' them.
+				if(substr($dataIdx,0,13) === 'customFields.' && $mfType === 'formatted' && count($customFlds) > 0) {
+					$formattedRecord[$dataIdx] = $customFlds[substr($dataIdx,13)];
+				} else {
+					$formattedRecord[$column->getDataIndex()]=$column->render($model);
+				}
 			} catch(\Throwable $e) {
 				$formattedRecord[$column->getDataIndex()] = "";
 

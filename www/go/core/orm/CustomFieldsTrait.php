@@ -272,8 +272,8 @@ trait CustomFieldsTrait {
 				$this->setValidationError('customFields.' . $uniqueKey, ErrorCode::UNIQUE);				
 				return false;
 			} else {
-				throw $e;
-//				throw new \Exception($e->getMessage());
+//				throw $e;
+				throw new \Exception($e->getMessage());
 			}
 		}
 	}
