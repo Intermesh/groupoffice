@@ -11,6 +11,11 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
+//Default timeout 3 minutes.
+Ext.override(Ext.data.Connection, {
+	timeout: 180000
+});
+
 /**
  * Density Independend pixel calculation
  * 

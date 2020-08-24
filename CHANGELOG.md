@@ -16,6 +16,8 @@
 - Core: Better link color in dark theme
 - Bookmarks: fixed bug deleting bookmark categories
 - Customfields: Several bugfixes import and export from projects  
+- Customfields: Improved layout and define columns for showing custom fields net to eachother.
+- Core: Raised default timeout to 3 minutes.
 
 30-07-2020 6.4.163
 - Bookmarks: fixed bug where logo didn't save

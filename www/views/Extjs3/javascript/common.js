@@ -13,9 +13,6 @@
  
 Ext.namespace('GO.util');
 
-Ext.override(Ext.data.Connection, {
-	timeout: 120000
-});
 
 Ext.Ajax.on('requestexception', function(conn, response, options) {
 	if(response.isAbort) {
@@ -204,8 +201,6 @@ GO.url = function(relativeUrl, params){
  * 
  */
 GO.request = function(config){
-	
-//	Ext.Ajax.timeout=180000;
 
 	var url = GO.url(config.url);
 	delete config.url;
