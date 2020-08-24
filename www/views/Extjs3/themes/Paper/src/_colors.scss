@@ -38,7 +38,7 @@ $grey-fabric: (
 	1000: #000000
 );
 
-$grey: $grey-material;
+$grey: $grey-material !default;
 
 // LIGHT
 $fg: (
