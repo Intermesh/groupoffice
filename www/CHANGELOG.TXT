@@ -1,6 +1,7 @@
 - Files: Added permission checks to compress functions
 - SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
 - Calendar: Missing resource admin email #201919703
+- Calendar: Category permissions  #202020841
 
 11-06-2020 6.2.126
 - Calendar: Fix for "No participant found for this event"
