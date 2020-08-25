@@ -146,6 +146,7 @@ class LocalEvent extends \GO\Base\Model {
 		
 		$response['id'] = $this->_event->id.':'.$this->getAlternateStartTime(); // a unique id for the data store. Is not really used.
 		$response['background'] = $this->_backgroundColor;
+		$response['recurring_start_time'] = date('Y-m-d H:i', $this->_event->start_time);
 		$response['start_time'] = date('Y-m-d H:i', $this->getAlternateStartTime());
 		$response['end_time'] = date('Y-m-d H:i',  $this->getAlternateEndTime());	
 		$response['ctime'] = date('Y-m-d H:i',  $this->_event->ctime);
