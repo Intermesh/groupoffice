@@ -33,8 +33,8 @@ GO.calendar.RecurrenceDialog = function(config){
 			this.fireEvent('entire', this);
 		},
 		scope: this
-	},{
-		text: t("This and future", "calendar"),
+	},this.thisAndFutureButton = new Ext.Button({
+		text: text: t("This and future", "calendar"),
 		handler: function()
 		{
 			this.fireEvent('thisandfuture', this);
@@ -47,7 +47,7 @@ GO.calendar.RecurrenceDialog = function(config){
 //			this.fireEvent('cancel', this);
 //		},
 //		scope: this
-	}]	
+	})]
 
 	GO.calendar.RecurrenceDialog.superclass.constructor.call(this,config);
 

@@ -1821,6 +1821,8 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 
 				if(event.repeats && actionData.singleInstance)
 				{
+					debugger;
+
 					GO.calendar.showEventDialog({
 						exception_date: event['startDate'].format("U"),
 						thisAndFuture: actionData.thisAndFuture || false,
