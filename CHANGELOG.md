@@ -1,6 +1,13 @@
 6.4.165
 - Core: fixed render bug in link browser window
 - Files: Added permission checks to compress functions
+- Files: Added permission checks to compress functions
+- SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
+- Calendar: Missing resource admin email #201919703
+- Calendar: Category permissions  #202020841
+- Tickets: Only messages from agent are sent to CC contact #201919432
+- Calender: Bug changing "this and future events" #202021084
+- Calendar: No notification when a participant is removed #202021083
 
 25-08-2020 6.4.164
 - Email: users are able to delete their own Email templates
