@@ -1,4 +1,5 @@
 6.4.165
+- Email: Workaround if message has invalid From header
 - Core: fixed render bug in link browser window
 - Files: Added permission checks to compress functions
 - Files: Added permission checks to compress functions
