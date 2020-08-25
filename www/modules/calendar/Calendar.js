@@ -384,7 +384,7 @@ GO.calendar.MainPanel = function(config){
 	this.calendarListPanel.add(this.viewsList);
 	this.calendarListPanel.add(this.resourcesList);
 	
-	var storeFields=['id','event_id','name','start_time','end_time','description', 'repeats', 'private','private_enabled','status','location', 'background', 'status_color', 'read_only','is_virtual', 'task_id', 'contact_id','calendar_name','calendar_id','all_day_event','username','duration', 'link_count','has_reminder', 'has_other_participants','participant_ids','ctime','mtime','musername', 'is_organizer', 'partstatus','model_name','permission_level','resources','resourced_calendar_name'];
+	var storeFields=['id','event_id','name','start_time','end_time', 'recurring_start_time', 'description', 'repeats', 'private','private_enabled','status','location', 'background', 'status_color', 'read_only','is_virtual', 'task_id', 'contact_id','calendar_name','calendar_id','all_day_event','username','duration', 'link_count','has_reminder', 'has_other_participants','participant_ids','ctime','mtime','musername', 'is_organizer', 'partstatus','model_name','permission_level','resources','resourced_calendar_name'];
 
 	this.daysGridStore = new GO.data.JsonStore({
 		url:GO.url('calendar/event/store'),
@@ -1235,7 +1235,8 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 					this.recurrenceDialog.hide();
 				},this)
 			}
-		
+
+			this.recurrenceDialog.thisAndFutureButton.setDisabled(event.recurring_start_time == event.start_time);
 			this.recurrenceDialog.show();
 		}else
 		{

@@ -1105,7 +1105,18 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Projects: Send company id when selecting contact
 
 
+
+- Files: Added permission checks to compress functions
+- SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
+- Calendar: Missing resource admin email #201919703
+- Calendar: Category permissions  #202020841
+- Tickets: Only messages from agent are sent to CC contact #201919432
+- Calender: Bug changing "this and future events" #202021084
+- Calendar: No notification when a participant is removed #202021083
+
 - Sieve: Fixed bug where sieve dialog showed folders of other account
+- Files: Assistant installation replaces GOTA file handlers
+- Core: Removed NO_AUTO_CREATE_USER from sql_mode because it doesn't work in Mysql 8 anymore and it wasn't needed anyway.
 
 27-01-2020 6.3.89
 - Tickets: Show confirm on closing tickets option broke module settings and email viewing.
@@ -7939,6 +7950,5 @@ First release including:
 - Addressbook
 - Scheduler
 - Project management (alpha)﻿
-
 
 

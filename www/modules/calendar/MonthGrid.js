@@ -957,6 +957,7 @@ GO.grid.MonthGrid = Ext.extend(Ext.Panel, {
 			},this)
 		}
 
+		this.recurrenceDialog.thisAndFutureButton.setDisabled(this.currentRecurringEvent.recurring_start_time == this.currentRecurringEvent.start_time);
 		this.recurrenceDialog.show();
 	},
 	clearGrid : function()
