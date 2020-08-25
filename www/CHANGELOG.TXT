@@ -4,6 +4,7 @@
 - Calendar: Category permissions  #202020841
 - Tickets: Only messages from agent are sent to CC contact #201919432
 - Calender: Bug changing "this and future events" #202021084
+- Calendar: No notification when a participant is removed #202021083
 
 11-06-2020 6.2.126
 - Calendar: Fix for "No participant found for this event"

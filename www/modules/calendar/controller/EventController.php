@@ -26,6 +26,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	protected $model = 'GO\Calendar\Model\Event';
 	
 	private $newParticipants;
+
+	private $removedParticipants;
 	
 	private $_uuidEvents = array();
 	
@@ -281,8 +283,11 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		
 		if($model->is_organizer){
 			//$model->sendMeetingRequest();
-			
-			if($model->hasOtherParticipants())// && isset($modifiedAttributes['start_time']))
+
+			if(!$isNewEvent && $this->removedParticipants) {
+				$response['askForMeetingRequest']=true;
+				$response['is_update']=true;
+			} elseif($model->hasOtherParticipants())// && isset($modifiedAttributes['start_time']))
 			{			
 				$response['isNewEvent']=$isNewEvent;
 				
@@ -319,6 +324,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		if ($this->newParticipants && count($allParticipantIds) > 1 && !$isNewEvent) {
 			$response['askForMeetingRequestForNewParticipants'] = true;
 		}
+
+
 		
 		$response['permission_level'] = $model->calendar->permissionLevel;
 		
@@ -396,6 +403,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	private function _saveParticipants($params, \GO\Calendar\Model\Event $event, &$response) {
 		\GO::session()->values['new_participant_ids'] = array();
 		$this->newParticipants = false;
+		$this->removedParticipants = false;
 		$response['participants'] = array();
 		
 		$ids = array();
@@ -419,6 +427,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 						$participant->delete();
 						$participant = false;
 						$participantsIsUpdate = true;
+						$this->removedParticipants = true;
 					}
 					
 					if (!$participant){
@@ -468,6 +477,10 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 															->addCondition('event_id', $event->id)
 											)
 			);
+
+			if($stmt->rowCount()) {
+				$this->removedParticipants = true;
+			}
 			$stmt->callOnEach('delete');
 			
 			
