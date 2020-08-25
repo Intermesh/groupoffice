@@ -1,7 +1,7 @@
 6.4.165
+- Time registration: fixed Firefox bug in Timesheet
 - Email: Workaround if message has invalid From header
 - Core: fixed render bug in link browser window
-- Files: Added permission checks to compress functions
 - Files: Added permission checks to compress functions
 - SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
 - Calendar: Missing resource admin email #201919703
