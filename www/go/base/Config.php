@@ -1059,7 +1059,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @var     StringHelper
 	 * @access  public
 	 */
-	var $version = '6.2.126';
+	var $version = '6.2.127';
 
 	/**
 	 * Modification date
@@ -1068,7 +1068,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * @access  public
 	 */
 	
-	var $mtime = '20200611';
+	var $mtime = '20200825';
 
 	#group configuration
 	/**

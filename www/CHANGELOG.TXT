@@ -1,3 +1,4 @@
+25-08-2020 6.2.127
 - Files: Added permission checks to compress functions
 - SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
 - Calendar: Missing resource admin email #201919703
