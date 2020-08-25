@@ -764,8 +764,8 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		}
 	
 		if($this->isResource()){
-			
-			if ((! $this->isCurrentUserResourceAdmin() || $this->isModified('status'))&& $this->end_time > time()) {
+
+			if ((! $this->isCurrentUserResourceAdmin() || $this->isModified('status'))&& ($this->end_time > time() || ($this->isRecurring() && (empty($this->repeat_end_time) || $this->repeat_end_time > time())))) {
 				$this->_sendResourceNotification($wasNew);
 			}
 		}else
@@ -883,7 +883,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function hasModificationsForParticipants(){
-		return $this->isModified("start_time") || $this->isModified("end_time") || $this->isModified("name") || $this->isModified("location") || $this->isModified('status');
+		return $this->isModified("start_time") || $this->isModified("end_time") || $this->isModified("name") || $this->isModified("location") || $this->isModified('status') || $this->isModified('rrule');
 	}
 	
 	/**
@@ -921,7 +921,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	}
 		
 	private function _sendResourceNotification($wasNew){
-		
+
 		if(!$this->dontSendEmails && $this->hasModificationsForParticipants()){			
 			$url = \GO::createExternalUrl('calendar', 'showEventDialog', array('event_id' => $this->id));		
 
@@ -960,7 +960,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 
 					$message = \GO\Base\Mail\Message::newInstance(
 										$subject
-										)->setFrom(\GO::user()->email, \GO::user()->name)
+										)->setFrom(\GO::config()->webmaster_email, \GO::config()->title)
 										->addTo($adminUser->email, $adminUser->name);
 
 					$message->setHtmlAlternateBody($body);					
