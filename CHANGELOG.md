@@ -20,6 +20,7 @@
 - Customfields: Several bugfixes import and export from projects  
 - Customfields: Improved layout and define columns for showing custom fields net to eachother.
 - Core: Fixed display of relation fields in legacy modules
+- Core: Fixed error handling in grid delete
 
 30-07-2020 6.4.163
 - Bookmarks: fixed bug where logo didn't save
