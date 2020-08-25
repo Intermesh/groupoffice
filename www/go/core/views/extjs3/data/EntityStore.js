@@ -805,7 +805,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					cb.call(scope || me, error.options, false, error);
 				}
 
-				return error;
+				return Promise.reject(error);
 			})
 		});
 	},
