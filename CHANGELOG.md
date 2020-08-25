@@ -1,5 +1,4 @@
-6.4.164
-
+25-08-2020 6.4.164
 - Email: users are able to delete their own Email templates
 - Billing: Fixed the PDF template tax totals when printing costs
 - Time registration: Timer button will use Notification area to save/show the timer
