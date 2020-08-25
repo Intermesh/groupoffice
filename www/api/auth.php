@@ -52,7 +52,7 @@ try {
 			output([], 404);
 		}
 		$token->oldLogout();
-		$token->delete($token->primaryKeyValues());
+		Token::delete($token->primaryKeyValues());
 		
 		output();		
 	}
