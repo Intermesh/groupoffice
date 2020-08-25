@@ -1,5 +1,6 @@
 6.4.165
 - Core: fixed render bug in link browser window
+- Files: Added permission checks to compress functions
 
 25-08-2020 6.4.164
 - Email: users are able to delete their own Email templates
