@@ -9,7 +9,7 @@
 - Tickets: Only messages from agent are sent to CC contact #201919432
 - Calender: Bug changing "this and future events" #202021084
 - Calendar: No notification when a participant is removed #202021083
-- Customfields: fixed error in email with inline attachments in case SMIME is installed
+- SMIME: fixed error in linked email with inline attachments
 
 25-08-2020 6.4.164
 - Email: users are able to delete their own Email templates
