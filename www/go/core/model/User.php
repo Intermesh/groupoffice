@@ -261,6 +261,10 @@ class User extends Entity {
 	
 	public function setValues(array $values) {
 		$this->passwordVerified = false;
+		if(isset($values['archive'])) {
+			$this->archiveUser($values['archive']);
+			unset($values['archive']);
+		}
 		return parent::setValues($values);
 	}
 
@@ -922,4 +926,40 @@ class User extends Entity {
 	}
 
 
+	/**
+	 * Archive a user - remove all shares instead of with admins only
+	 * @param bool $doArchive
+	 */
+	private function archiveUser(bool $doArchive=false)
+	{
+		$userId = $this->id;
+
+		// Admins should not be able to be archived!
+		if(! $doArchive || $userId === go()->getUserId() || $this->isAdmin()) {
+			return;
+		}
+		$aclIds = [];
+
+		if($defAddressBookId = $this->addressBookSettings->getDefaultAddressBookId()) {
+			$aclIds[] = \go\modules\community\addressbook\model\AddressBook::findById($defAddressBookId)->findAclId();
+		};
+		if($defNoteBookId = $this->notesSettings->getDefaultNoteBookId()) {
+			$aclIds[] = \go\modules\community\notes\model\NoteBook::findById($defNoteBookId)->findAclId();
+		}
+		if($defTaskListId = $this->taskSettings->default_tasklist_id) {
+			$aclIds[] = \GO\Tasks\Model\Tasklist::model()->findByPk($defTaskListId)->findAclId();
+		}
+		if($calendarId = $this->calendarSettings->calendar_id) {
+			$aclIds[] = \GO\Calendar\Model\Calendar::model()->findByPk($calendarId)->findAclId();
+		}
+		$grpId = $this->getPersonalGroup()->id();
+		foreach(Acl::findByIds($aclIds) as $rec) {
+			foreach($rec->groups as $aclGrp) {
+				if (!in_array($aclGrp->groupId, [Group::ID_ADMINS, $grpId])) {
+					$rec->removeGroup($aclGrp->groupId);
+				}
+			}
+			$rec->save();
+		}
+	}
 }
