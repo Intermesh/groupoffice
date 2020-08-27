@@ -1,4 +1,4 @@
-6.4.165
+27-08-2020 6.4.165
 - Email: Workaround if message has invalid From header
 - Core: fixed render bug in link browser window
 - Files: Added permission checks to compress functions
@@ -9,6 +9,7 @@
 - Tickets: Only messages from agent are sent to CC contact #201919432
 - Calender: Bug changing "this and future events" #202021084
 - Calendar: No notification when a participant is removed #202021083
+- Core: Upgrade from 6.3 failed if comments module was not installed.
 
 25-08-2020 6.4.164
 - Email: users are able to delete their own Email templates
