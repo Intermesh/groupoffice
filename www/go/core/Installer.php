@@ -377,10 +377,6 @@ class Installer {
 		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
 		App::get()->getSettings()->save();
 		
-		echo "Resetting state\n";
-		
-		go()->resetSyncState();
-		
 		echo "Registering all entities\n";		
 		$modules = model\Module::find()->where(['enabled' => true])->all();
 		foreach($modules as $module) {

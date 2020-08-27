@@ -480,6 +480,11 @@
 		margin-bottom:dp(4);
 		//Following line made grid in forms appear in disabled like text
 		/*@extend %font-caption;*/
+
+		// Merijn for custom form elements nested in another (chips).
+		.x-form-element {
+			margin: 0;
+		}
 	}
 
 	&-invalid-icon:before {

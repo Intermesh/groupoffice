@@ -68,7 +68,7 @@ go.modules.community.bookmarks.BookmarksDialog = Ext.extend(go.form.Dialog,{
 				name: 'logo',
 				setValue: function(value) {
 					thumbExample.getEl().dom.style.backgroundImage = 'url(' + go.Jmap.downloadUrl(value) + ')';
-					this.setRawValue(value);
+					Ext.form.Hidden.prototype.setValue.call(this, value);
 				}
 			}),
 			thumbExample = new Ext.Button({

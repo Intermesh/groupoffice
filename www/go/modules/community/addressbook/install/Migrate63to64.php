@@ -372,7 +372,9 @@ class Migrate63to64 {
 						->execute();
 
 
-		go()->getDbConnection()->exec("update comments_comment n set entityTypeId=(select id from core_entity where clientName='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = (select id from core_entity where clientName='Company');");
+		if(\go\core\model\Module::isInstalled( 'community', 'comments') || \go\core\model\Module::isInstalled( 'legacy', 'comments')) {
+			go()->getDbConnection()->exec("update comments_comment n set entityTypeId=(select id from core_entity where clientName='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = (select id from core_entity where clientName='Company');");
+		}
 
 		go()->getDbConnection()->delete("core_entity", ['clientName' => "Company"])->execute();
 

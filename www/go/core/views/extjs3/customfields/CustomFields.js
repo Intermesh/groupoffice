@@ -163,7 +163,7 @@
 			var cols = [], me = this, type;
 			
 			this.getFieldSets(entity).forEach(function(fs) {
-				me.getFields(fs.id).forEach(function(field) {					
+				me.getFields(fs.id).forEach(function(field) {
 					type = me.getType(field.type);
 					if(!type) {
 						console.error("Custom field type " + field.type + " not found");

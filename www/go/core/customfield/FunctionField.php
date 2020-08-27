@@ -43,13 +43,18 @@ class FunctionField extends Number {
 		$f = preg_replace('/\{[^}]*\}/', '0', $f);
 		
 		// go()->debug("Function field formula: \$result = " .  $f. ";");
-		
+
 		if(empty($f)) {
 			return null;
 		}
 
-		$result = null;		
-		eval("\$result = " . $f . ";");		
+		$result = null;
+		try {
+			eval("\$result = " . $f . ";");
+		} catch (\ParseError $e) {
+			return null;
+		}
+
 		return $result;
 	}
 

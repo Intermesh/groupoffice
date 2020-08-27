@@ -124,7 +124,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		});
 
 		return me.initialized;
-		
+
 	},
 
 	/**
@@ -540,13 +540,18 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 	_getSingleFromBrowserStorage : function(id) {
 		var me = this;
+
+		// check if we already fetched it.
+		if(me.data[id]) {
+			return Promise.resolve(go.util.clone(me.data[id]));
+		}
 		
 		//Pause JMAP requests because indexeddb events will trigger the queue
 		go.Jmap.pause();
 
 		this.pauseGet();
 		return me.initState().then(function() {			
-			return me.stateStore.getItem(id + "").then(function(entity) {		
+			return me.stateStore.getItem(id + "").then(function(entity) {
 				if(!entity) {
 					return null;
 				}				
@@ -554,8 +559,8 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				me.data[id] = entity;
 				return go.util.clone(entity);
 			});
-		}).finally(function(){			
-			//continueGet JMAP
+		}).finally(function(){
+
 			go.Jmap.continue();
 			me.continueGet();
 		});
@@ -802,7 +807,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					cb.call(scope || me, options, false, error);
 				}
 
-				return error;
+				return Promise.reject(error);
 			})
 		});
 	},

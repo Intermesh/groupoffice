@@ -4265,7 +4265,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	public function resolveAttribute($path, $outputType='raw'){
 		
 		if(substr($path, 0, 13) === 'customFields.') { 
-			$cf = $this->getCustomFields();
+			$cf = $this->getCustomFields($outputType === 'formatted');
 			return $cf[substr($path, 13)] ?? null;
 		}
 		

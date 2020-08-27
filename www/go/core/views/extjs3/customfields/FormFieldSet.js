@@ -3,6 +3,7 @@
 go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	fieldSet: null,
 	hideMode: 'offsets',
+	layout: "column",
 	initComponent: function () {
 		
 		var items = [];
@@ -11,11 +12,42 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			items.push({
 				xtype: "box",
 				autoEl: "p",
+				columnWidth: 1,
 				html: go.util.textToHtml(this.fieldSet.description)
 			});
 		}
-		
-		items = items.concat(go.customfields.CustomFields.getFormFields(this.fieldSet.id));
+
+		var fields = go.customfields.CustomFields.getFormFields(this.fieldSet.id);
+
+		var c = fields.length;
+		var fieldsPerColumn = Math.floor(c / this.fieldSet.columns);
+		var fieldsInFirstColumn = fieldsPerColumn + (c % this.fieldSet.columns);
+
+		this.defaults = {
+			xtype: "container",
+			labelAlign: "top",
+			columnWidth: 1 / this.fieldSet.columns,
+			layout: "form"
+		};
+
+		var currentCol = {items: []},
+			colItemCount = 0,
+			me = this,
+			max = fieldsInFirstColumn;
+
+
+		fields.forEach(function (field) {
+			currentCol.items.push(field);
+			colItemCount++;
+			if(colItemCount == max) {
+				items.push(currentCol);
+				currentCol = {items: [], style: "padding-left: " +dp(16) + "px"};
+				colItemCount = 0;
+				max = fieldsPerColumn;
+			}
+		});
+
+		items.push(currentCol);
 		
 		Ext.apply(this, {
 			title: this.fieldSet.name,
@@ -30,7 +62,6 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		}, this);
 
 		this.on("afterrender", function() {
-
 
 			//find entity panel
 			var form = this.findParentByType("form");

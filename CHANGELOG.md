@@ -1,3 +1,50 @@
+27-08-2020 6.4.165
+- Time registration: fixed Firefox bug in Timesheet
+- Email: Workaround if message has invalid From header
+- Core: fixed render bug in link browser window
+- Files: Added permission checks to compress functions
+- Files: Added permission checks to compress functions
+- SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
+- Calendar: Missing resource admin email #201919703
+- Calendar: Category permissions  #202020841
+- Tickets: Only messages from agent are sent to CC contact #201919432
+- Calender: Bug changing "this and future events" #202021084
+- Calendar: No notification when a participant is removed #202021083
+- Core: Upgrade from 6.3 failed if comments module was not installed.
+- SMIME: fixed error in linked email with inline attachments
+- Core: Prevent combo from expanding when opening dialogs
+
+25-08-2020 6.4.164
+- Email: users are able to delete their own Email templates
+- Billing: Fixed the PDF template tax totals when printing costs
+- Time registration: Timer button will use Notification area to save/show the timer
+- Time registration: new time insert dialog. (small date field as this is already set in the new view)
+- Time registration: Drag-n-Drop to move / set duration / holt Alt-n-Drag to copy / Click Add time + Hold-n-drag to set duration 
+- Core: Added authorisation check to SSE
+- Customfields: fix User customfield will display in the detail field when not empty
+- Files: added Folder customfield to be displayable in the grid.
+- Core: Fix scrollbar issues when focusing/clicking on a textarea with autogrow
+- Contact: When creating a contact from unknown email address there was one email field to many
+- Language: updated pt_br Thanks to @flaviozluca
+- Customfields: fixed division by zero for functionfield in newer PHP versions
+- Core: Fixed bug to enable deleting comment
+- Core: Better link color in dark theme
+- Bookmarks: fixed bug deleting bookmark categories
+- Customfields: Several bugfixes import and export from projects  
+- Customfields: Improved layout and define columns for showing custom fields net to eachother.
+- Core: Fixed display of relation fields in legacy modules
+- Core: Fixed error handling in grid delete
+
+30-07-2020 6.4.163
+- Bookmarks: fixed bug where logo didn't save
+- Email: Workaround if "From" header is missing in email message
+- Core: disable JMAP sync states on rebuild search cache and database check. Reset state when done.
+- Address book / carddav: Database check fixes missing uri's and import will generate uri if uid is already present
+- Tickets: re-enabled ticket groups
+
+30-07-2020 6.4.162
+- Studio: Was missing license definition which caused install to fail without license.
+
 28-07-2020 6.4.161
 - Core: Date range component
 
@@ -1071,7 +1118,18 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Projects: Send company id when selecting contact
 
 
+
+- Files: Added permission checks to compress functions
+- SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
+- Calendar: Missing resource admin email #201919703
+- Calendar: Category permissions  #202020841
+- Tickets: Only messages from agent are sent to CC contact #201919432
+- Calender: Bug changing "this and future events" #202021084
+- Calendar: No notification when a participant is removed #202021083
+
 - Sieve: Fixed bug where sieve dialog showed folders of other account
+- Files: Assistant installation replaces GOTA file handlers
+- Core: Removed NO_AUTO_CREATE_USER from sql_mode because it doesn't work in Mysql 8 anymore and it wasn't needed anyway.
 
 27-01-2020 6.3.89
 - Tickets: Show confirm on closing tickets option broke module settings and email viewing.
@@ -7905,6 +7963,5 @@ First release including:
 - Addressbook
 - Scheduler
 - Project management (alpha)﻿
-
 
 

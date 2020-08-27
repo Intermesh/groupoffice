@@ -63,7 +63,7 @@ GO.email.TemplatesGrid = function(config)
 	tbarItems.push({
 		iconCls: 'ic-delete',
 		text: t("Delete"),
-		disabled:!GO.settings.modules.email.write_permission,
+//		disabled:!GO.settings.modules.email.write_permission,
 		handler: function(){
 			this.deleteSelected();
 		},
@@ -107,7 +107,7 @@ GO.email.TemplatesGrid = function(config)
 	if (GO.util.empty(config.noDocumentTemplates)) {
 		config.deleteConfig= {
 			callback: function(){
-				GO.email.ooTemplatesStore.reload();
+				config.store.reload();
 			},
 			scope: this
 		};

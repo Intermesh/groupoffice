@@ -125,7 +125,8 @@ $tools : (
  edit: edit,
  add: add,
  delete: delete,
- home: home
+ home: home,
+ dismiss: delete_sweep
 );
 .icon {@extend %icon;}
 

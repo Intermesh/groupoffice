@@ -346,6 +346,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		var me = this;
 
 		Ext.getBody().mask(t("Loading..."));
+	
 		go.Modules.init().then(function() {
 			Promise.all([				
 				go.User.loadLegacyModules(),
@@ -355,15 +356,12 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				go.Entities.init();
 				me.addDefaultRoutes();
 				me.renderUI();
-				go.Router.check();
 				Ext.getBody().unmask();
-				
+				go.Router.check();
 			}).catch(GO.settings.config.debug ? undefined : function(error){
 				console.error(error);
 				Ext.getBody().unmask();
 				Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console."));
-
-				
 			});
 		});
 		

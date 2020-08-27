@@ -51,6 +51,16 @@ class Category extends \GO\Base\Db\ActiveRecord{
 		return parent::model($className);
 	}
 
+	public function getPermissionLevel()
+	{
+		//if you have manage permissions to the calendar you may delete categories created by others
+		if(!empty($this->calendar_id)) {
+			return $this->calendar->getPermissionLevel();
+		} else{
+			return parent::getPermissionLevel();
+		}
+	}
+
 	protected function init() {
 		$this->columns['name']['unique']=array("calendar_id");
 		return parent::init();
