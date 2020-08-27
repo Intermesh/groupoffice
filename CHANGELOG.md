@@ -1,4 +1,5 @@
 27-08-2020 6.4.165
+- Time registration: fixed Firefox bug in Timesheet
 - Email: Workaround if message has invalid From header
 - Core: fixed render bug in link browser window
 - Files: Added permission checks to compress functions
@@ -10,6 +11,7 @@
 - Calender: Bug changing "this and future events" #202021084
 - Calendar: No notification when a participant is removed #202021083
 - Core: Upgrade from 6.3 failed if comments module was not installed.
+- Customfields: fixed error in email with inline attachments in case SMIME is installed
 
 25-08-2020 6.4.164
 - Email: users are able to delete their own Email templates
