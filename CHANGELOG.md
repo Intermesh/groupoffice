@@ -12,6 +12,7 @@
 - Calendar: No notification when a participant is removed #202021083
 - Core: Upgrade from 6.3 failed if comments module was not installed.
 - SMIME: fixed error in linked email with inline attachments
+- Core: Prevent combo from expanding when opening dialogs
 
 25-08-2020 6.4.164
 - Email: users are able to delete their own Email templates
