@@ -2,7 +2,7 @@
 
 go.users.SelectDialogPanel = Ext.extend(Ext.Panel, {
 	
-	layout: "responsive",
+	layout: "border",
 	mode: "email", // or "id" in the future "phone" or "address"	
 	entityName:  "User",
 	title: t("Users"),
@@ -12,8 +12,6 @@ go.users.SelectDialogPanel = Ext.extend(Ext.Panel, {
 	initComponent : function() {
 		
 		this.createGrid();		
-		
-		this.labels = t("emailTypes");
 
 
 		this.searchField = new go.SearchField({
@@ -37,7 +35,7 @@ go.users.SelectDialogPanel = Ext.extend(Ext.Panel, {
 		});	
 
 		
-		this.items = [search, this.grid, this.createGroupFilter()];
+		this.items = [search, {xtype:'panel',layout:'responsive',region:'center', items:[this.grid, this.createGroupFilter()]}];
 
 		this.grid.getSelectionModel().singleSelect = this.singleSelect;		
 		

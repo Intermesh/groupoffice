@@ -34,7 +34,14 @@ class Module extends core\Module implements DomainProvider {
 
 
 	public static function ldapRecordToUser($username, Record $record, User $user) {
-		
+
+		go()->debug("cn: " . $record->cn[0] ?? "NULL");
+		go()->debug("mail: " .$record->mail[0] ?? "NULL");
+
+		if(!isset($record->mail) || !isset($record->mail[0])) {
+			throw new \Exception("User '$username' has no 'mail' attribute set. Can't create a user");
+		}
+
 		$user->username = $username;
 
 		if(!empty($record->jpegPhoto[0])) {

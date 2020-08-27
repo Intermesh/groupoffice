@@ -115,9 +115,13 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						disabled: true,
 						fieldLabel: t('Password'),
 						inputType:"password"
-					},
-					
-					]
+					},{
+						xtype: "checkbox",
+						fieldLabel: t("Follow referrals"),
+						checked: true,
+						hint: t("For older Microsoft ActiveDirectory installation this has to be disabled")
+					}
+				]
 			}, this.usersFieldSet = new Ext.form.FieldSet({
 				title: t("Users"),
 				defaults: {
@@ -129,7 +133,8 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						name: 'usernameAttribute',
 						fieldLabel: t("Username attribute"),
 						value: "uid",
-						required: true
+						required: true,
+						hint: t("Use 'samaccountname' for Microsoft ActiveDirectory.")
 					}, 
 					{
 						xtype:"checkbox",
@@ -140,13 +145,15 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						xtype: 'textfield',
 						name: 'peopleDN',
 						fieldLabel: "peopleDN",
-						value: "ou=people,dc=example,dc=com	",
+						value: "ou=people,dc=example,dc=com",
+						hint: t("For Microsoft ActiveDirectory it's typically 'cn=Users,dc=example,dc=com'."),
 						required: true
 					}, {
 						xtype: 'textfield',
 						name: 'groupsDN',
 						fieldLabel: "groupsDN",
-						value: "ou=groups,dc=example,dc=com	",
+						value: "ou=groups,dc=example,dc=com",
+						hint: t("For Microsoft ActiveDirectory it's typically 'cn=Groups,dc=example,dc=com'."),
 						required: true
 					},this.createEmailCheckbox = new Ext.form.Checkbox({
 						xtype:"checkbox",
@@ -171,6 +178,11 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 					anchor: '100%'
 				},
 				items: [{
+					xtype: 'checkbox',
+					hideLabel: true,
+					boxLabel: t("Use e-mail instead of LDAP username as IMAP username"),
+					name:'imapUseEmailForUsername'
+				},{
 						xtype: 'textfield',
 						name: 'imapHostname',
 						fieldLabel: t("Hostname", "imapauthenticator"),
@@ -300,10 +312,13 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						boxLabel: t('Synchronize users'),
 						name: 'syncUsers'
 					},{
-						xtype: 'textfield',
+						xtype: 'textarea',
+						grow: true,
 						name: 'syncUsersQuery',
 						fieldLabel: t("User query"),
-						required: true
+						required: true,
+						value: "(objectClass=InetOrgPerson)",
+						hint: t("For Microsoft ActiveDirectory use '(objectCategory=InetOrgPerson)'")
 					},  {
 						xtype: 'checkbox',
 						checked: false,
@@ -311,10 +326,13 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						boxLabel: t('Synchronize groups'),
 						name: 'syncGroups'
 					},{
-						xtype: 'textfield',
+						xtype: 'textarea',
+						grow: true,
 						name: 'syncGroupsQuery',
 						fieldLabel: t("Group query"),
-						required: true
+						required: true,
+						value: "(objectClass=Group)",
+						hint: t("For Microsoft ActiveDirectory use '(objectCategory=group)'")
 					},  
 				]
 			}

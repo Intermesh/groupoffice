@@ -16,7 +16,8 @@ GO.moduleManager.onModuleReady('email',function(){
 		}),
 		
 		showAt : GO.email.AttachmentContextMenu.prototype.showAt.createSequence(function(xy, attachment){
-			this.smimeAddItem.setVisible(attachment.extension === 'cer');
+			var bIsVisible = (Ext.isDefined(attachment) && attachment.extension === 'cer');
+			this.smimeAddItem.setVisible(bIsVisible);
 			this.doLayout();
 		}),
 		

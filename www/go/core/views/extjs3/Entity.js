@@ -49,6 +49,13 @@ Ext.apply(go.Entity.prototype, {
 			},
 	 */
 	customFields : false,
+
+
+	/**
+	 * The enetity that defines the custom fields. Usually null to make this.name.
+	 * But sometimes a model extends another model.
+	 */
+	extends : null,
 	
 	/**
 	 * True if this models holds an ACL Id in property aclId
@@ -114,6 +121,24 @@ Ext.apply(go.Entity.prototype, {
 		}
 		current[last].path = parts.length > 0 ? parts.join('.') + "." : "";
 		return current[last];
+	},
+
+	applyCustomFieldFilters: function() {
+		entityName = this.extends || this.name;
+
+		var existingNames = this.filters.column("name"),
+			customFieldFilters = go.customfields.CustomFields.getFilters(entityName),
+			me = this;
+
+		customFieldFilters = customFieldFilters.filter(function(f) {
+			var exists = existingNames.indexOf(f.name) > -1;
+			if(exists) {
+				console.warn("Custom field name " + f.name+ " can't be filtered as the name conflicts with an existing filter for entity " + me.name);
+			}
+			return !exists;
+
+		});
+		this.filters = this.filters.concat(customFieldFilters);
 	}
 
 });

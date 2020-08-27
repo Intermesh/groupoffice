@@ -332,7 +332,7 @@ class Connection {
 
 		$sql = rtrim($sql, ', ');
 
-		App::get()->debug($sql);
+//		App::get()->debug($sql);
 		return App::get()->getDbConnection()->exec($sql) !== false;
 	}
 

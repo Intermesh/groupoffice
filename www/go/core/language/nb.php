@@ -607,7 +607,7 @@ Alle rettigheter forbeholdt.<br />
   'You are using %s of %s' => 'Du bruker %s av %s',
   'Dear Mr' => 'Kjære',
   'Dear Ms' => 'Kjære',
-  'Dear Mr / Ms' => 'Kjære',
+  'Dear sir/madam' => 'Kjære',
   'You can\'t change the permissions of the admin' => 'Du kan ikke endre rettighetene for administrator',
   'Batch edit' => 'Masseredigering',
   'Select at least one item' => 'Du må velge minst ett element!',

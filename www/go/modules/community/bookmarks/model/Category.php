@@ -47,7 +47,7 @@ class Category extends AclOwnerEntity {
 	}
 
 	protected static function internalDelete(Query $query) {
-		if(!Bookmark::delete(['categoryId' => query])) {
+		if(!Bookmark::delete(['categoryId' => $query])) {
 			return false;
 		}
 

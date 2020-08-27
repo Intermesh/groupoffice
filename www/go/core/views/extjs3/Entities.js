@@ -1,7 +1,11 @@
 /* global go, Ext */
 
 go.Entities = (function () {
-  
+
+	/**
+	 *
+	 * @type {go.Entity}
+	 */
   var entities = {};
 
   
@@ -20,14 +24,15 @@ go.Entities = (function () {
 				if(serverInfo) {
 					if(!entity.customFields) {
 						entity.customFields = serverInfo.supportsCustomFields;
-					}				
+					}
+					entity.supportsFiles = serverInfo.supportsFiles;
 					
 					entity.isAclOwner = serverInfo.isAclOwner;
 					entity.defaultAcl = serverInfo.defaultAcl;	
 				}
 				
 				if(entity.customFields) {
-					entity.filters = entity.filters.concat(go.customfields.CustomFields.getFilters(entity.name));
+					entity.applyCustomFieldFilters();
 				}
 
 				entity.filters =  go.util.Filters.normalize(entity.filters);		
@@ -36,6 +41,7 @@ go.Entities = (function () {
 				entity.relations.customFields = go.customfields.CustomFields.getRelations(entity.name);
 			});
 		},
+
 
     /**
      * Register an entity
@@ -110,8 +116,7 @@ go.Entities = (function () {
 		getAllInstalled : function() {
 			return entities;
 		},
-		
-		
+
 		/**
 		 * Get link configurations as degined in Module.js with go.Modules.register();
 		 * 

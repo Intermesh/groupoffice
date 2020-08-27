@@ -2625,10 +2625,10 @@ class Imap extends ImapBodyStruct {
 	 * \Deleted
 	 * $Forwarded
 	 *
-	 * @param <type> $uids
-	 * @param <type> $flags
-	 * @param <type> $clear
-	 * @return <type>
+	 * @param array $uids
+	 * @param string $flags
+	 * @param boolean $clear
+	 * @return boolean
 	 */
 	public function set_message_flag($uids, $flags, $clear=false) {
 		$status=false;

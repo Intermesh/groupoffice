@@ -7,7 +7,7 @@ go.browserStorage = {
 			 me.conn = new Promise(function(resolve, reject) {		
 
 					var	openreq = version ? indexedDB.open(me.dbName, version) : indexedDB.open(me.dbName); //IE11 required the if/else
-					openreq.onerror = function() { 
+					openreq.onerror = function() {
 						me.enabled = false;
 						console.warn("Disabling browser storage in indexedDB because browser doesn't support it.")
 						reject(openreq.error);
@@ -22,7 +22,13 @@ go.browserStorage = {
 
 					 		me.connect(newVersion).then(function() {
                 resolve(openreq.result); 
-              });
+              }).catch(function(error) {
+              	console.error("Upgrade failed. Deleting database and disabling storage.");
+								me.enabled = true;
+								me.deleteDatabase();
+								me.enabled = false;
+								reject(error);
+							});
 						}
 												
 						openreq.result.onversionchange = function(e) {
@@ -39,8 +45,7 @@ go.browserStorage = {
 					reject("blocked");
 				}
 		
-				openreq.onupgradeneeded = function(e) {	
-					
+				openreq.onupgradeneeded = function(e) {
 					var upgradeDb = e.target.result;
 
 					var e = go.Entities.getAllInstalled();
@@ -110,7 +115,7 @@ go.browserStorage.Store.prototype._withIDBStore = function (type, callback) {
 	var me = this;
 	
 	return go.browserStorage.connect().then(function(db) {  
-			return me.createTransaction(db, type, callback);			 
+			return me.createTransaction(db, type, callback);
 	});
 }
 
@@ -118,14 +123,21 @@ go.browserStorage.Store.prototype.createTransaction = function(db, type, callbac
 	var me = this;
 	return new Promise( function(resolve, reject) {
 		var transaction = db.transaction(me.storeName, type);
-		transaction.oncomplete = function() {
-				resolve();
-		}
+		// this somehow didn't work occasionally in Safari ?!
+		// transaction.oncomplete = function() {
+		// 		resolve();
+		// }
 		transaction.onabort = transaction.onerror = function() {
 				reject(transaction.error);
-		} 
+		}
 
-		callback(transaction.objectStore(me.storeName));
+		var req = callback(transaction.objectStore(me.storeName));
+		req.onsuccess = function() {
+			resolve(req);
+		}
+		req.onerror = function(e) {
+			reject(req.error);
+		}
 
 	});
 }
@@ -136,10 +148,14 @@ go.browserStorage.Store.prototype.getItem = function(key) {
 		return Promise.resolve(null);
 	}
 
-	var req;
+	// console.warn("get-" +this.storeName + '-' + key);
+
+	var req, me = this;
 	return this._withIDBStore('readonly', function(store) {
 		req = store.get(key);
-	}).then(function() { 
+		return req;
+	}).then(function() {
+		// console.warn("then-" +me.storeName + '-' + key)
 			return req.result;
 	});
 }
@@ -150,7 +166,7 @@ go.browserStorage.Store.prototype.setItem = function(key, value) {
 	}
 
 	return this._withIDBStore('readwrite',function(store) { 
-			store.put(value, key);
+			return store.put(value, key);
 	});
 }
 

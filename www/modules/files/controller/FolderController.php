@@ -1113,7 +1113,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		GO::debug("Create new model folder ".$model->className()."(ID:".$model->id.")");
 		$filesPath = \go\core\util\StringUtil::normalize(rtrim($model->buildFilesPath(),'.'));
-		$folder = Folder::model()->findByPath($filesPath,true, array('acl_id'=>$model->findAclId(),'readonly'=>1));
+		$folder = Folder::model()->findByPath($filesPath,true, array('readonly'=>1));
 		
 		if(!$folder){
 			throw new \Exception("Failed to create folder ".$filesPath);
@@ -1360,7 +1360,17 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 			throw new \Exception(sprintf(\GO::t("Filename %s already exists", "files"), $archiveFile->stripFileStoragePath()));
 		
 		$sourceObjects = array();
-		for($i=0;$i<count($sources);$i++){			
+		for($i=0;$i<count($sources);$i++){
+
+			$file = \GO\Files\Model\File::model()->findByPath($sources[$i]);
+			if(!$file) {
+				throw new NotFound();
+			}
+
+			if(!$file->getPermissionLevel()) {
+				throw new AccessDenied();
+			}
+
 			$path = \GO::config()->file_storage_path.$sources[$i];			
 			$sourceObjects[]=\GO\Base\Fs\Base::createFromPath($path);
 		}
@@ -1406,6 +1416,16 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$maxFilesize = GO::config()->zip_max_file_size;
 		
 		for($i=0;$i<count($sources);$i++){
+
+			$file = \GO\Files\Model\File::model()->findByPath($sources[$i]);
+			if(!$file) {
+				throw new NotFound();
+			}
+
+			if(!$file->getPermissionLevel()) {
+				throw new AccessDenied();
+			}
+
 			$path = \GO::config()->file_storage_path.$sources[$i];
 			
 			$sourceFile = \GO\Base\Fs\Base::createFromPath($path);

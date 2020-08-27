@@ -6,6 +6,7 @@ use GO;
 use go\core\App;
 use go\core\Environment;
 use go\core\fs\File;
+use go\core\jmap\Request;
 use go\core\Language;
 use go\core\model\Settings;
 use go\core\model\Module;
@@ -99,7 +100,7 @@ class Extjs3 {
 	
 	private function replaceCssUrl($css, File $file){
 		
-		$baseurl = str_replace(Environment::get()->getInstallFolder()->getPath() . '/', Settings::get()->URL, $file->getFolder()->getPath()).'/';
+		$baseurl = str_replace(Environment::get()->getInstallFolder()->getPath() . '/', $this->getRelativeUrl(), $file->getFolder()->getPath()).'/';
 		
 		$css = preg_replace_callback('/url[\s]*\(([^\)]*)\)/iU', 
 			function($matches) use($baseurl) { 
@@ -159,6 +160,76 @@ class Extjs3 {
 		}
 		
 		return $cacheFile;
+	}
+
+	private $baseUrl;
+
+	/**
+	 * Get URL to webclient
+	 *
+	 * @return string
+	 */
+	public function getBaseUrl() {
+
+		if(isset($this->baseUrl)) {
+			return $this->baseUrl;
+		}
+
+		$this->baseUrl = Request::get()->isHttps() ? 'https://' : 'http://';
+		$this->baseUrl .= Request::get()->getHost(false) . $this->getRelativeUrl();
+
+		return $this->baseUrl;
+	}
+
+	/**
+	 * Get relative URL to webclient.
+	 *
+	 * @return string eg. /groupofice/
+	 */
+	public function getRelativeUrl() {
+		$path = dirname($_SERVER['SCRIPT_NAME']); // /index.php or /install/*.php
+
+		if(basename($path) == 'install') {
+			$path = dirname($path);
+		}
+
+		return rtrim($path, '/') . '/';
+	}
+
+	public function getBasePath() {
+		return go()->getEnvironment()->getInstallPath();
+	}
+
+	private $theme;
+
+	public function getTheme() {
+		if(!isset($this->theme)) {
+			if(go()->getAuthState() && go()->getAuthState()->isAuthenticated()) {
+				$this->theme = go()->getAuthState()->getUser(['theme'])->theme;
+				if(!file_exists(\GO::view()->getPath().'themes/'.$this->theme.'/Layout.php')){
+					$this->theme = 'Paper';
+				}
+			} else{
+				$this->theme = 'Paper';
+			}
+		}
+
+		return $this->theme;
+	}
+
+	public function getThemePath() {
+		return $this->getBasePath() . '/views/Extjs3/themes/' . $this->getTheme() . '/';
+	}
+
+	public function getThemeUrl() {
+		return $this->getRelativeUrl() . 'views/Extjs3/themes/' . $this->getTheme() . '/';
+	}
+
+	public function renderPage($html, $title = null) {
+		$themePath = $this->getThemePath();
+		require($themePath . 'pageHeader.php');
+		echo $html;
+		require($themePath . 'pageFooter.php');
 	}
 
 }

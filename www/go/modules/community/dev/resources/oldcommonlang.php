@@ -422,7 +422,7 @@ $l['description']='Description';
 $l['date']='Date';
 $l['default_salutation_M']='Dear Mr';
 $l['default_salutation_F']='Dear Ms';
-$l['default_salutation_unknown']='Dear Mr / Ms';
+$l['default_salutation_unknown']='Dear sir/madam';
 $l['dear']='Dear';
 $l['mins'] = 'Mins';
 $l['hour'] = 'hour';
@@ -744,9 +744,9 @@ $l["currentPasswordText"] = 'You need to provide your current password to be abl
 $l['strId'] = 'ID';
 $l['strModule'] = 'Module';
 
-$l['createEventText'] = 'Create event for {0}';
+$l['Create event'] = 'Create event for {0}';
 $l['moveEventText'] = 'Move event to {0}';
-$l['updateEventText'] = 'Update event to {0}';
+$l['Update event'] = 'Update event to {0}';
 
 $l['filterOnly'] = 'Filter only';
 $l['use'] = 'Use';

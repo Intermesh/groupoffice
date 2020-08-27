@@ -41,6 +41,10 @@ use const GO_CONFIG_FILE;
 
 		use EventEmitterTrait;
 
+		/**
+		 * Fires when the index page loads for the web client.
+		 */
+		const EVENT_INDEX = 'index';
 
 		/**
 		 * Fires when the application is loaded in the <head></head> section of the webclient.
@@ -292,21 +296,13 @@ use const GO_CONFIG_FILE;
 		private function getInstanceConfig() {
 			$configFile = $this->findConfigFile();
 			if(!$configFile) {
-				
-				$host = isset($_SERVER['HTTP_HOST']) ? explode(':', $_SERVER['HTTP_HOST'])[0] : '<HOSTNAME>';
-				
-				$msg = "No config.php was found. Possible locations: \n\n".
-								"/etc/groupoffice/multi_instance/" .$host . "/config.php\n\n".				
-								 dirname(dirname(__DIR__)) . "/config.php\n\n".
-								"/etc/groupoffice/config.php";
-				
-				throw new Exception($msg);
+				return [];
 			}
 			
 			require($configFile);	
 			
 			if(!isset($config)) {
-				throw new ConfigurationException();
+				$config = [];
 			}
 			$config['configPath'] = $configFile;
 
@@ -357,7 +353,8 @@ use const GO_CONFIG_FILE;
 				$config['debug_log'] = !empty($config['debug']);
 			}
 			
-			$this->config = (new util\ArrayObject([					
+			$this->config = (new util\ArrayObject([
+					"frameAncestors" => $config['frameAncestors'] ?? "",
 					"core" => [
 							"general" => [
 									"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
@@ -372,7 +369,7 @@ use const GO_CONFIG_FILE;
 							"db" => [
 									"host" => ($config['db_host'] ?? "localhost"),
 									"port" => $config['db_port'] ?? 3306,
-									"name" => $config['db_name'],
+									"name" => $config['db_name'] ?? 'groupoffice',
 									"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice-com"),
 									"username" => $config['db_user'] ?? "groupoffice",
 									"password" => $config['db_pass'] ?? ""
@@ -396,7 +393,7 @@ use const GO_CONFIG_FILE;
 			
 			if(!isset($this->config['core']['general']['cache'])) {
 				if(cache\Apcu::isSupported()) {
-					$this->config['core']['general']['cache'] = cache\Apcu::class;				
+					$this->config['core']['general']['cache'] = cache\Apcu::class;
 				} else
 				{
 					$this->config['core']['general']['cache'] = cache\Disk::class;
@@ -534,6 +531,7 @@ use const GO_CONFIG_FILE;
 
 			Listeners::get()->init();
 
+			$this->resetSyncState();
 			go()->getSettings()->cacheClearedAt = time();
 			go()->getSettings()->save();
 			
@@ -731,10 +729,8 @@ use const GO_CONFIG_FILE;
 		
 		/**
 		 * Resets all entity state so all clients must resync data.
-		 * 
-		 * @todo resync per entity
 		 */
-		public function resetSyncState() {		
+		private function resetSyncState() {
 			//reset all mod seqs
 			go()->getDbConnection()->update('core_entity', ['highestModSeq' => 0])->execute();
 			go()->getDbConnection()->exec("TRUNCATE TABLE core_change");

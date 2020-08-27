@@ -49,7 +49,7 @@ class Installer {
 	 * @return bool
 	 */
 	public static function isInProgress() {
-		return self::$isInProgress;
+		return static::isUpgrading() || static::isInstalling();
 	}
 
 	/**
@@ -58,7 +58,7 @@ class Installer {
 	 * @return bool
 	 */
 	public static function isInstalling() {
-		return self::$isInstalling;
+		return self::$isInstalling || (basename(dirname($_SERVER['PHP_SELF'])) == 'install' && basename($_SERVER['PHP_SELF']) != 'upgrade.php');
 	}
 
 	/**
@@ -67,7 +67,7 @@ class Installer {
 	 * @return bool
 	 */
 	public static function isUpgrading() {
-		return self::$isUpgrading;
+		return self::$isUpgrading || basename($_SERVER['PHP_SELF']) == 'upgrade.php';
 	}
 
 	/**
@@ -312,6 +312,20 @@ class Installer {
 		
 	}
 
+	public function disableUnavailableModules() {
+
+		$unavailable = $this->getUnavailableModules();
+		if(count($unavailable)) {
+
+			$where = (new Query);
+			foreach($unavailable as $m) {
+				$where->orWhere($m);
+			}
+			$stmt = go()->getDbConnection()->update("core_module", ['enabled' => false], $where);
+			$stmt->execute();
+		}
+	}
+
 	public function upgrade() {
 		self::$isInProgress = true;
 		self::$isUpgrading = true;
@@ -328,10 +342,12 @@ class Installer {
 		\GO::clearCache(); //legacy framework
 		go()->setCache(new None());
 		
-		$unavailable = go()->getInstaller()->getUnavailableModules();
-		if(!empty($unavailable)) {
-			throw new \Exception("There are unavailable modules");
-		}
+//		$unavailable = go()->getInstaller()->getUnavailableModules();
+//		if(!empty($unavailable)) {
+//			throw new \Exception("There are unavailable modules: " . var_export($unavailable, true));
+//		}
+
+		$this->disableUnavailableModules();
 
 		$lock = new Lock("upgrade");
 		if (!$lock->lock()) {
@@ -365,10 +381,6 @@ class Installer {
 		go()->rebuildCache();
 		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
 		App::get()->getSettings()->save();
-		
-		echo "Resetting state\n";
-		
-		go()->resetSyncState();
 		
 		echo "Registering all entities\n";		
 		$modules = model\Module::find()->where(['enabled' => true])->all();

@@ -171,7 +171,7 @@ cursor:pointer;
 .fs-dropzone {
 	border: 2px dashed grey;
 	min-height: 100px;
-	margin: 7px 7px 0;
+	margin: 14px 14px 0;
 	text-align:center;
 	padding-top:40px;
 }

@@ -73,7 +73,7 @@ go.filter.types.number = Ext.extend(Ext.Panel, {
 						operator = 'equals';
 		
 		if(v) {
-			var matches = v.match(regex);
+			var matches = (v + '').match(regex);
 			if(matches) {		
 				v = parseFloat(matches[2].trim());			
 
@@ -123,6 +123,9 @@ go.filter.types.number = Ext.extend(Ext.Panel, {
 	},
 	validate: function() {
 		return this.valueField.validate() && this.operatorCombo.validate();
+	},
+	isValid : function(preventMark){
+		return this.valueField.isValid(preventMark) && this.operatorCombo.isValid(preventMark);
 	},
 	markInvalid : function() {
 		return this.valueField.markInvalid();

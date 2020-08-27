@@ -1,4 +1,13 @@
 
+go.toolbar.SearchField = Ext.extend(GO.form.ComboBoxMulti, {
+	sep: ' ',
+	name: 'text',
+	valueField: 'value',
+	displayField: 'display',
+	mode: 'local',
+	autoSelect: false,
+	minChars: 2
+});
 
 /**
  * Search button
@@ -82,13 +91,16 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 
 		var me = this;
 
-		this.triggerField = new Ext.form.TriggerField({
-			xtype: 'trigger',
+		this.triggerField = new go.toolbar.SearchField({
 			validationEvent: false,
 			validateOnBlur: false,
 			spellCheck: false,
 			triggerClass: 'x-form-search-trigger',
 			value: this.query,
+			store: new Ext.data.ArrayStore({
+				fields: ['display', 'value'],
+				id: 'value'
+			}),
 			listeners: {				
 				specialkey: function (field, e) {					
 					if (e.getKey() == Ext.EventObject.ENTER) {
@@ -250,38 +262,21 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 		
 		if(this.store && this.store.entityStore) {
 			
-			var names =  [], f;
+			var f;
 			
 			for ( var name in this.store.entityStore.entity.filters) {
 				f = this.store.entityStore.entity.filters[name];
-				if(f.name != 'text' && !f.customfield) {
-					names.push(name);
+				var v = name + ":";
+				if(f.type == "date") {
+					v += '>' + (new Date()).format("Y-m-d");
 				}
+				this.triggerField.store.loadData([[f.title, v], [ f.title + " (-)", "-" + v]], true);
 			}
-			
-			if(names.length) {
-			
-				var msg = t("You can use these keywords:<br /><br />") + names.join(", ") + "<br /><br />";
 
-				msg += t("And any custom field by 'databaseName'.") + "<br /><br />";
+			this.triggerField.store.sort('display', 'ASC');
 
-				msg += t("For example:<br /><br />modifiedBy: \"John Doe\" modifiedBy: Foo%");
-
-				if(names.indexOf('modified') > -1) {
-					msg += " modified: >2019-01-31 23:59 modified: <2019-02-01";
-				}
-
-				Ext.QuickTips.register({
-					target: this.triggerField.getEl(),
-					title: t("Advanced search options"),
-					text: msg,				
-					dismissDelay: 10000 // Hide after 10 seconds hover
-				});
-			}
+			// console.warn(this.store.entityStore.entity.filters);
 		}
-
-		
-		
 		
 		go.toolbar.SearchButton.superclass.onRender.call(this, ct, position);
 

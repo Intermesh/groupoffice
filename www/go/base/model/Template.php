@@ -72,8 +72,8 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	protected function init() {
 		$this->columns['content']['required']=true;
 		
-//		$this->addDefaultTag('contact:salutation', \GO::t("Dear Mr / Ms"));
-		$this->addDefaultTag('salutation', \GO::t("Dear Mr / Ms"));
+//		$this->addDefaultTag('contact:salutation', \GO::t("Dear sir/madam"));
+		$this->addDefaultTag('salutation', \GO::t("Dear sir/madam"));
 		$this->addDefaultTag('date', \GO\Base\Util\Date::get_timestamp(time(), false));
 		
 		return parent::init();
@@ -459,7 +459,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		
 		$attributes = array_merge($attributes, $this->_getUserAttributes());
 		
-		//$attributes['contact:salutation']=\GO::t("Dear Mr / Ms");
+		//$attributes['contact:salutation']=\GO::t("Dear sir/madam");
 		
 		return $this->_parse($content, $attributes, $leaveEmptyTags);
 	}

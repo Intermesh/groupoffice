@@ -193,6 +193,28 @@ abstract class Entity extends Property {
 		
 		return $query;
 	}
+
+	/**
+	 * Find entities linked to the given entity
+	 *
+	 * @param $entity
+	 * @param array $properties
+	 * @param bool $readOnly
+	 * @return Query|static[]
+	 * @throws Exception
+	 */
+	public static function findByLink($entity, $properties = [], $readOnly = false) {
+		$query = static::find($properties, $readOnly);
+		$query->join(
+			'core_link',
+			'l',
+			$query->getTableAlias() . '.id = l.toId and l.toEntityTypeId = '.static::entityType()->getId())
+
+			->andWhere('fromEntityTypeId = '. $entity::entityType()->getId())
+			->andWhere('fromId', '=', $entity->id);
+
+		return $query;
+	}
 	
 //	
 //	public function getId() {		
@@ -328,6 +350,11 @@ abstract class Entity extends Property {
 	 * @param $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
 	 *  So you can do for example: go()->getDbConnection()->delete('another_table', (new Query()->where('id', 'in' $query))
 	 *  Or pass ['id' => $id];
+	 *
+	 *  Or:
+	 *
+	 *  SomeEntity::delete($instance->primaryKeyValues());
+	 *
 	 * @return boolean
 	 * @throws Exception
 	 */
@@ -711,6 +738,30 @@ abstract class Entity extends Property {
 		return [];
 	}
 
+	/**
+	 * Checks if this entity supports SearchableTrait and uses that for the "text" query filter.
+	 * Override and return false to disable this behaviour.
+	 *
+	 * @param Query $query
+	 * @return bool
+	 * @throws Exception
+	 */
+	protected static function useSearchableTraitForSearch(Query $query) {
+		// Join search cache on when searchable trait is used
+		if(!method_exists(static::class, 'getSearchKeywords')) {
+			return false;
+		}
+		if(!$query->isJoined('core_search', 'search')) {
+			$query->join(
+				'core_search',
+				'search',
+				'search.entityId = ' . $query->getTableAlias() . '.id and search.entityTypeId = ' . static::entityType()->getId()
+			);
+		}
+
+		return true;
+	}
+
   /**
    * Applies a search expression to the given database query
    *
@@ -721,9 +772,13 @@ abstract class Entity extends Property {
    * @throws Exception
    */
 	protected static function search(Criteria $criteria, $expression, Query $query) {
-		
+
 		$columns = static::textFilterColumns();
-		
+
+		if(static::useSearchableTraitForSearch($query)) {
+			$columns[] = 'search.keywords';
+		}
+
 		if(empty($columns)) {
 			go()->warn(static::class . ' entity has no textFilterColumns() defined. The "text" filter will not work.');
 		}
@@ -899,21 +954,12 @@ abstract class Entity extends Property {
 	/**
 	 * Check database integrity
    *
+	 * NOTE: this function may not output as it's used by install.php
+	 *
    * @throws Exception
 	 */
 	public static function check() {
-		//NOTE: this function may not output as it's used by install.php
-		if(property_exists(static::class, 'filesFolderId') && Module::isInstalled('legacy', 'files')) {
-			$tables = static::getMapping()->getTables();
-			$table = array_values($tables)[0]->getName();
-			go()->getDbConnection()->update(
-				$table, 
-				['filesFolderId' => null], 
-				(new Query)
-					->tableAlias('entity')
-					->where('filesFolderId', 'NOT IN', (new Query())->select('id')->from('fs_folders'))
-			)->execute();
-		}
+
 	}
 
 
@@ -980,6 +1026,9 @@ abstract class Entity extends Property {
 		//copy public and protected columns except for auto increments.
 		$props = $this->getApiProperties();
 		foreach($props as $name => $p) {
+			if($name == 'filesFolderId') {
+				continue;
+			}
 			$this->mergeProp($entity, $name, $p);
 		}
 
@@ -1032,8 +1081,7 @@ abstract class Entity extends Property {
 		$this->mergeFiles($entity);
 
 		$this->mergeRelated($entity);
-
-		if(!$entity->delete(['id' => $entity->id])) {
+		if(!static::delete(['id' => $entity->id])) {
 			go()->getDbConnection()->rollBack();
 				return false;
 		}
@@ -1058,7 +1106,7 @@ abstract class Entity extends Property {
 		if (!$sourceFolder) {
 			return;
 		}
-		$folder = Folder::model()->findForEntity($entity);
+		$folder = Folder::model()->findForEntity($this);
 	
 		$folder->moveContentsFrom($sourceFolder);		
 	}
@@ -1122,6 +1170,35 @@ abstract class Entity extends Property {
 		}
 
 		return $refs;
+	}
+
+	/**
+	 * A title for this entity used in search cache and logging for example.
+	 *
+	 * @return string
+	 */
+	public function title() {
+		if(property_exists($this,'name')) {
+			return $this->name;
+		}
+
+		if(property_exists($this,'title')) {
+			return $this->title;
+		}
+
+		if(property_exists($this,'subject')) {
+			return $this->subject;
+		}
+
+		if(property_exists($this,'description')) {
+			return $this->description;
+		}
+
+		if(property_exists($this,'displayName')) {
+			return $this->displayName;
+		}
+
+		return static::class;
 	}
 	
 }

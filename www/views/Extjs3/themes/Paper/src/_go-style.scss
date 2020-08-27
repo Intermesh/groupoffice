@@ -43,22 +43,29 @@ button, html, input, select, textarea {
 }
 
 h1 {
+	margin: dp(16) 0;
 	@extend %font-display1;
 }
 h2 {
+	margin: dp(16) 0;
 	@extend %font-headline; }
 h3 {
+	margin: dp(8) 0;
 	@extend %font-title;
 }
 h4 {
+	margin: dp(8) 0;
 	@extend %font-subheading;
 }
 h5 {
+	margin: dp(8) 0;
 	@extend %font-subheading-dense;
 }
 h6 {
+	margin: dp(8) 0;
 	@extend %font-data-head;
 }
+
 
 code {
 	border: 1px solid color($fg, 'line');
@@ -69,6 +76,8 @@ code {
 	font-family: "Courier New",Courier,monospace;
 	color: color($fg, 'base');
 	border-radius: dp(4);
+	overflow: auto;
+	white-space: pre-wrap;
 }
 
 p {
@@ -95,7 +104,7 @@ p {
 	margin: dp(16);
 }
 
-strong { color: color($grey, 700); font-weight: $font-weight-m; }
+strong { font-weight: $font-weight-m; }
 small { color: color($fg, 'secondary-text'); font-weight: $font-weight-r; font-size:.85em; line-height: 1.2; }
 
 
@@ -153,7 +162,7 @@ a {
 		
 	}
 	&[target], &[onclick] {
-		@include var(color, c-primary);
+		color: $cAnchor;
 	}
 	&:hover {
 		text-decoration: underline;
@@ -864,6 +873,11 @@ hr {
 		}
 	}
 }
+
+.right {
+	float: right;
+}
+
 .status {
 	@extend %font-subheading-dense;
 	padding-left: dp(8);
@@ -874,6 +888,10 @@ hr {
 	color: color($fg, 'text');
 	text-shadow: 0px 0px 4px white;
 	border:1px solid color($fg, 'divider');
+
+	.x-panel-header-text & {
+		margin: dp(8);
+	}
 }
 
 .x-tab-with-icon {
@@ -1021,6 +1039,78 @@ button.filetype-pdf, button.filetype-doc {
 	//background-color: color($grey, 100);
 }
 
+%go-icon-list {
+	p, > a {
+		min-height: dp(40);
+		box-sizing: border-box;
+		display:table;
+		text-decoration: none;
+		padding: dp(8) dp(16);
+		margin: 0;
+		//width: 100%;
+		span, a {
+			display: inline-block;
+			min-height: dp(24);
+		}
+
+		i.label {
+			left: dp(16);
+			top: dp(12);
+			width:  dp(24);
+			height: dp(24);
+			position: absolute;
+			color: color($fg, 'icon');
+		}
+
+		.avatar {
+			left: 0;
+			top:dp(4);
+			position: absolute;
+			//color: color($bg, 'background');
+		}
+
+
+		&:hover {
+			.show-on-hover {
+				display:block !important;
+			}
+			.hide-on-hover {
+				display: none;
+			}
+		}
+
+		label {
+			@extend %font-caption;
+			width:100%;
+			display: block;
+			line-height: dp(16);
+		}
+
+	}
+
+
+
+	.left {
+		top: dp(12);
+		left: dp(16);
+		position:absolute;
+	}
+
+	.right {
+		top: dp(12);
+		right: dp(16);
+		position:absolute;
+	}
+}
+
+.go-icon-list {
+	@extend %go-icon-list;
+	& > p, & > a {
+		position:relative;
+		padding-left: dp(56);
+	}
+}
+
 //detail view
 .go-detail-view {
 	
@@ -1146,7 +1236,8 @@ button.filetype-pdf, button.filetype-doc {
 	}
 
 	.icons {
-		@extend .go-icon-list;
+		// This is causing sassc to fail. @extends .xxx is deprecated
+		@extend %go-icon-list;
 		
 		h5 {
 			margin-left: dp(16);
@@ -1200,7 +1291,6 @@ button.filetype-pdf, button.filetype-doc {
 	}
 }
 
-
 .show-on-hover {
 	display: none !important;		
 }
@@ -1212,74 +1302,6 @@ button.filetype-pdf, button.filetype-doc {
 }
 
 
-.go-icon-list {
-	p, > a {		
-		min-height: dp(40);
-		box-sizing: border-box;
-		display:table;
-		text-decoration: none;
-		padding: dp(8) dp(16);
-		margin: 0;
-		width: 100%;
-		span, a {
-			display: inline-block;
-			min-height: dp(24);
-		}
-		
-		i.label {			
-			left: dp(16);
-			top: dp(12);
-			width:  dp(24);
-			height: dp(24);
-			position: absolute;
-			color: color($fg, 'icon');	
-		}
-
-		.avatar {			
-			left: 0;
-			top:dp(4);
-			position: absolute;
-			//color: color($bg, 'background');
-		}
-
-		
-		&:hover {
-			.show-on-hover {
-				display:block !important;
-			}
-			.hide-on-hover {
-				display: none;
-			}
-		}
-		
-		label {
-			@extend %font-caption;
-			width:100%;
-			display: block;
-			line-height: dp(16);
-		}
-		
-	}
-
-	
-
-	.left {
-		top: dp(12);
-		left: dp(16);
-		position:absolute;
-	}
-
-	.right {
-		top: dp(12);
-		right: dp(16);
-		position:absolute;
-	}
-}
-.go-icon-list > p, .go-icon-list > a {
-	position:relative;
-	padding-left: dp(56);
-
-}
 
 // old detail view compatibility
 .display-panel-heading {
@@ -1337,6 +1359,7 @@ table.display-panel {
 	width: 100%;
 	clear: both;
 	td, th {
+		vertical-align:top;
 		padding: dp(8);
 		&:first-child {
 			padding-left: dp(16);
@@ -1344,12 +1367,12 @@ table.display-panel {
 		&:last-child  {
 			padding-right: dp(16);
 		}
-		&.r {text-align:right}
+		&.r, &.right {text-align:right; float: none}
 	}
 	th {
 		@extend %font-data-head;
 	}
-	tr.line td, td.line, th.line {
+	tr.line td, td.line, th.line, tr.line th {
 		border-bottom: 1px solid color($fg, 'divider');
 	}
 	tr.totals th {
@@ -1357,6 +1380,11 @@ table.display-panel {
 		vertical-align: middle;
 		border-right: 1px solid color($fg, 'divider');
 	}
+
+	tr.bold-line td, td.bold-line,  tr.line th, th.line {
+		border-bottom: 1px solid color($fg, 'line');
+	}
+
 	table { 
 		td:first-child {
 			padding-left: 0;
@@ -1751,22 +1779,26 @@ table[id^="comments-ext"] b {
 
 
 .go-form-group {
-	.x-panel-bbar .x-toolbar {
-		border-top: 0;
+
+
+	.x-panel-bbar {
+		overflow: visible;
+		.x-toolbar {
+			border-top: 0;
+		}
+
+		.x-btn-text {
+			font-weight: normal;
+			@include var(color, c-primary);
+		}
 	}
 
 	.x-toolbar {
-		margin-left: dp(-8);
+		margin-left: dp(-16);
 	}
 	margin-bottom: dp(16);
 	
-	.x-btn-text {
-		font-weight: normal;
-	}
-	
-/*	.x-btn-text-icon button::before {
-		padding-right: dp(16);
-	}*/
+
 }
 
 
@@ -1786,24 +1818,7 @@ table[id^="comments-ext"] b {
 .go-html-formatted {
 	@extend %font-body1;
 
-	h1 {
-		margin: dp(16) 0;
-	}
-	h2 {
-		margin: dp(16) 0;
-	}
-	h3 {
-		margin: dp(8) 0;
-	}
-	h4 {
-		margin: dp(8) 0;
-	}
-	h5 {
-		margin: dp(8) 0;
-	}
-	h6 {
-		margin: dp(8) 0;
-	}
+
 
 }
 
@@ -1814,7 +1829,7 @@ table[id^="comments-ext"] b {
 .go-html-formatted  blockquote {  
   display: block;  
   margin: 1em 40px;  
-  padding:0px 10px;
+  pading:0px 10px;
 }
 
 .go-html-formatted td {   
@@ -1835,6 +1850,7 @@ table[id^="comments-ext"] b {
    display: block;  
    list-style-type: disc;  
    margin: 1em 2em;
+	 padding: 0 40px;
    /*-moz-padding-start: 40px;  */
  }  
    
@@ -1842,6 +1858,7 @@ table[id^="comments-ext"] b {
    display: block;  
    list-style-type: decimal;  
    margin: 1em 2em;
+	 padding: 0 40px;
    /*-moz-padding-start: 40px;  */
  }  
    
@@ -2115,6 +2132,7 @@ table[id^="comments-ext"] b {
 	border-top-left-radius: dp(8);
 	background-color: color($bg, 'box');
 	cursor: pointer;
+	z-index:2;
 }
 
 
@@ -2142,4 +2160,158 @@ table[id^="comments-ext"] b {
 		@include var(outline-color, c-primary-tp);
 		border: 2px dashed white;
 	}
+}
+
+/* used in mail to hide calendar links */
+.go-hidden {
+	display: none;
+}
+
+
+.go-page {
+	background: color($bg, 'dialog');
+	header {
+		text-align: center;
+		@include var(background-color, c-primary);
+		padding: dp(24);
+		color: white;
+	}
+
+	footer {
+		text-align: center;
+		clear: both;
+	}
+
+	header .go-app-logo {
+		height: dp(40);
+		display: inline-block;
+	}
+
+
+	section {
+		width: dp(800);
+		margin: 0 auto;
+		padding: dp(16);
+	}
+
+	fieldset, .card {
+		@extend .z4;
+		border-radius: $borderRadius;
+		background-color: color($bg, 'card');
+		border: none;
+		padding: dp(16);
+	}
+
+	.error {
+		color: red;
+	}
+
+	button, a.button {
+		box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+		transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
+		will-change: box-shadow;
+		min-width: dp(80);
+		font-family: Helvetica, sans-serif;
+		font-size: 0.875rem;
+		font-weight: 500;
+		letter-spacing: 0.04em;
+		color: rgba(255, 255, 255, 0.87);
+		display: inline-block;
+		position: relative;
+		min-width: 64px;
+		height: 36px;
+		padding: 0 16px;
+		border: none;
+		border-radius: 2px;
+		outline: none;
+		@include var(background-color, c-secondary);
+		font-size: 14px;
+		font-weight: 500;
+		line-height: 36px;
+		text-align: center;
+		text-decoration: none;
+		text-transform: uppercase;
+		overflow: hidden; }
+
+	h2 {
+		font-size: 1.5rem;
+		font-weight: 400;
+		letter-spacing: normal;
+		line-height: 2rem;
+		color: rgba(0, 0, 0, 0.87); }
+
+	fieldset, .card {
+		border: none;
+		margin-bottom: 16px;
+		overflow: hidden;
+	}
+
+	label {
+		width: 80%;
+		margin-top: 4px;
+		margin-bottom: 8px;
+		font-size: .8rem;
+		letter-spacing: 0.04em;
+		display: inline-block;
+		color: #666;
+	}
+
+	input:not([type=checkbox]):not([type=radio]) {
+		color: rgba(0, 0, 0, 0.87);
+		width: 100%;
+		padding: 0 0 8px;
+		border: none;
+		transition: background-color 180ms cubic-bezier(0.4, 0, 0.2, 1), transform 180ms cubic-bezier(0.4, 0, 0.2, 1);
+		border-bottom: 2px solid rgba(0, 0, 0, 0.12);
+		background: none;
+		font-size: inherit;
+		-webkit-appearance: none; }
+	input:focus {
+		outline: none;
+		border-bottom: 2px solid #212121; }
+	input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active {
+		transition: background-color 5000s ease-in-out 0s, color 5000s ease-in-out 0s;
+		transition-delay: background-color 5000s, color 5000s;
+		-webkit-text-fill-color: #2a2a2a;
+	}
+
+	pre {
+		@extend code;
+	}
+
+	*[disabled] {
+		opacity: 0.65;
+		cursor: not-allowed;
+	}
+}
+
+
+.x-panel-tbar {
+	.go-multiselect-toolbar {
+		background-color: color($bg, 'box');
+		opacity: 1;
+		padding: 0;
+		.x-toolbar-left .x-toolbar-cell:first-child {
+			padding-left: 0;
+		}
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		transition: opacity 260ms $curve-standard;
+
+		&.x-hide-display {
+			display: block !important;
+			pointer-events: none;
+			opacity: 0;
+		}
+	}
+}
+
+.go-dropzone {
+	border: 2px dashed color($fg, 'line');
+	border-radius: $borderRadius;
+	margin: dp(16);
+	text-align:center;
+	padding: dp(48);
+	color: color($fg, 'secondary-text');
 }

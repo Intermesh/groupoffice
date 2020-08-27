@@ -7,7 +7,6 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 	width: dp(800),
 	height: dp(1000),
 	modal: false,
-	maximizable: true,
 	collapsible: true,
 	defaults: {
 		labelWidth: dp(140)
@@ -84,7 +83,7 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 		this.nameField.firstName.setValue(firstName);
 		this.nameField.middleName.setValue(middleName);
 		this.nameField.lastName.setValue(lastName);
-		var panel = this.emailAddressesField.addPanel();
+		var panel = this.emailAddressesField.items.get(0);
 		this.emailAddressesField.doLayout();
 		var emailField = panel.formField.items.items[0].items.items[1];
 		emailField.setValue(email);

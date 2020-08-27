@@ -1706,6 +1706,8 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 			},this)
 		}
 
+		this.recurrenceDialog.thisAndFutureButton.setDisabled(event.recurring_start_time == event.start_time);
+
 		this.recurrenceDialog.show();
 	},
 

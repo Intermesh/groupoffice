@@ -78,8 +78,6 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 			}
 		}
 
-		console.warn(this.values);
-
 		//Set the form values after. It's important to do this after setting this.values otherwise it will add joined object value names like customFields.name
 		var oldReset = this.getForm().trackResetOnLoad;
 		this.getForm().trackResetOnLoad = trackReset;
@@ -140,7 +138,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 
 				switch (notSaved[id].type) {
 					case "forbidden":
-						Ext.MessageBox.alert(t("Access denied"), t("Sorry, you don't have permissions to update me item"));
+						Ext.MessageBox.alert(t("Access denied"), t("Sorry, you don't have permissions to update this item"));
 						break;
 
 					default:

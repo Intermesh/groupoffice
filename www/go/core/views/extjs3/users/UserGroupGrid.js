@@ -94,7 +94,8 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 			viewConfig: {
 				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',
 				forceFit: true,
-				autoFill: true
+				autoFill: true,
+				totalDisplay: true
 			}
 			// config options for stateful behavior
 //			stateful: true,
@@ -181,6 +182,10 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 	},
 	
 	validate : function() {
+		return true;
+	},
+
+	isValid: function(preventMark) {
 		return true;
 	}
 	

@@ -3,6 +3,7 @@ namespace go\core\http;
 
 use go\core\exception\NotFound;
 use go\core\ErrorHandler;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Simple RESTful router
@@ -67,7 +68,7 @@ class Router {
 
     try {
       $c = new $route['controller'];
-      go()->debug("Router: ". $route['controller']."::".$route['method']);
+      go()->debug("################   Router: ". $route['controller']."::".$route['method'] ." ################");
       go()->debug($route['params']);
 
       $response = call_user_func_array([$c, $route['method']], $route['params']);		
@@ -83,11 +84,47 @@ class Router {
       ErrorHandler::logException($e);      
     } catch(\Exception $e) {
       Response::get()->setStatus(500, $e->getMessage());
+
+      echo '<h1>' . $e->getMessage() .'</h1>';
+      echo '<pre>';
+      echo $e->getTraceAsString();
+      echo '</pre>';
+
       ErrorHandler::logException($e);    
-    } 
-    
-    Response::get()->output(isset($response) ? $response : null);
-    
+    }
+
+	  if(isset($response) && $response instanceof \GuzzleHttp\Psr7\Response) {
+		  $this->emitPsr7Response($response);
+	  } else{
+		  Response::get()->output(isset($response) ? $response : null);
+	  }
+
+  }
+
+  private function emitPsr7Response(ResponseInterface $response){
+	  if (headers_sent()) {
+		  throw new RuntimeException('Headers were already sent. The response could not be emitted!');
+	  }
+
+// Step 1: Send the "status line".
+	  $statusLine = sprintf('HTTP/%s %s %s'
+		  , $response->getProtocolVersion()
+		  , $response->getStatusCode()
+		  , $response->getReasonPhrase()
+	  );
+	  header($statusLine, TRUE); /* The header replaces a previous similar header. */
+
+// Step 2: Send the response headers from the headers list.
+	  foreach ($response->getHeaders() as $name => $values) {
+		  $responseHeader = sprintf('%s: %s'
+			  , $name
+			  , $response->getHeaderLine($name)
+		  );
+		  header($responseHeader, FALSE); /* The header doesn't replace a previous similar header. */
+	  }
+
+// Step 3: Output the message body.
+	  echo $response->getBody();
   }
 
   private function findRoute() {

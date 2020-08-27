@@ -6,6 +6,7 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.grid.GridPanel, {
 		totalDisplay: false
 	},
 	hideHeaders: true,
+	multiSelectToolbarEnabled : false,
 	initComponent: function () {
 
 		var actions = this.initRowActions();

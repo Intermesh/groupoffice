@@ -8,6 +8,7 @@ use GO\Base\Exception\AccessDenied;
 
 use go\core\model\User;
 use GO\Email\Model\Account;
+use GO\Email\Model\Alias;
 use GO\Email\Model\Label;
 
 use GO\Base\Model\Acl;
@@ -406,7 +407,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$from = $message->from->getAddress();
 						
 		if(\GO\Base\Util\Validate::email(($record['from'])) && strtolower($record['from']) != strtolower($from['email'])) {
-			$record['from'] = '<div style="color: red">'.$from['email'].'</div>';
+			$record['from'] = '<div style="color: #ff0000">' .$from['email'].'</div>';
 		}
 		
 		return $record;
@@ -540,26 +541,34 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 					foreach($to as $email=>$name){
 						
-						$contacts = Contact::findByEmail($email, ['id', 'addressBookId'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]);
+						$contacts = Contact::findByEmail($email, ['id', 'addressBookId', 'isOrganization'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE])->all();
+						foreach($contacts as $contact) {
+							/** @var Contact $contact */
+							if(!$contact->isOrganization) {
+								foreach($contact->findOrganizations(['id', 'addressBookId', 'name']) as $o) {
+									$contacts[] = $o;
+								}
+							}
+						}
 
 						foreach($contacts as $contact){
 
-						if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){						
+							if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){
 
-							$attributes['acl_id']= $contact->findAclId();
-							
-							$linkedEmail = \GO\Savemailas\Model\LinkedEmail::model()->findSingleByAttributes(array(
-								'uid'=>$attributes['uid'], 
-								'acl_id'=>$attributes['acl_id']));
-							
-							if(!$linkedEmail){
-								$linkedEmail = new \GO\Savemailas\Model\LinkedEmail();
-								$linkedEmail->setAttributes($attributes);
-								$linkedEmail->save();
+								$attributes['acl_id']= $contact->findAclId();
+
+								$linkedEmail = \GO\Savemailas\Model\LinkedEmail::model()->findSingleByAttributes(array(
+									'uid'=>$attributes['uid'],
+									'acl_id'=>$attributes['acl_id']));
+
+								if(!$linkedEmail){
+									$linkedEmail = new \GO\Savemailas\Model\LinkedEmail();
+									$linkedEmail->setAttributes($attributes);
+									$linkedEmail->save();
+								}
+
+								$linkedEmail->link($contact);
 							}
-
-							$linkedEmail->link($contact);
-						}
 							
 							// Also link the company to the email if the contact has a company attached to it.
 						// 	if(!empty(GO::config()->email_autolink_companies) && !empty($contact->company_id)){
@@ -912,7 +921,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 
 			$defaultTags = array(
-					'contact:salutation'=>GO::t("Dear Mr / Ms")
+					'contact:salutation'=>GO::t("Dear sir/madam")
 			);
 			
 			// Parse the link tag
@@ -982,7 +991,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$response['data'] = $message->toOutputArray($params['content_type'] == 'html', true);
 
 			if(isset($params['body'])) {
-				$response['data']['htmlbody'] = $params['body'] . '<br />' . $response['data']['htmlbody'];
+				if ($params['content_type'] == 'plain') {
+					$response['data']['plainbody'] = $params['body'] . "\n" . $response['data']['plainbody'];
+				} else {
+					$response['data']['htmlbody'] = $params['body'] . '<br />' . $response['data']['htmlbody'];
+				}
 			}
 		}
 		
@@ -1489,7 +1502,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 
 			//Don't do these special actions in the special folders
-			if($params['mailbox']!=$account->sent && $params['mailbox']!=$account->trash && $params['mailbox']!=$account->drafts){
+			if(!$imapMessage->seen && $params['mailbox']!=$account->sent && $params['mailbox']!=$account->trash && $params['mailbox']!=$account->drafts){
 				$linkedModels = $this->_handleAutoLinkTag($imapMessage, $response);
 				$response = $this->_handleInvitations($imapMessage, $params, $response);
 
@@ -1500,7 +1513,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 		
 		$response['isInSpamFolder']=$this->_getSpamMoveMailboxName($params['uid'],$params['mailbox'],$account->id);
-		$response = $this->_getContactInfo($imapMessage, $params, $response);
+		$response = $this->_getContactInfo($imapMessage, $params, $response, $account);
 
 		// START Handle the links div in the email display panel		
 		if(!$plaintext){
@@ -1562,7 +1575,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		);
 	}
 
-	private function _getContactInfo(\GO\Email\Model\ImapMessage $imapMessage,$params, $response){
+	private function _getContactInfo(\GO\Email\Model\ImapMessage $imapMessage,$params, $response, $account){
 		$response['sender_contact_id']=0;
 		$response['sender_company_id']=0;
 		$response['allow_quicklink']=1;
@@ -1572,8 +1585,19 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$useQL = GO::config()->allow_quicklink;
 		$response['allow_quicklink']=$useQL?1:0;
 
-		
-		$contact = !empty($response['sender']) ? \go\modules\community\addressbook\model\Contact::find(['id', 'photoBlobId', 'isOrganization', 'name', 'addressBookId', 'color'])->filter(['email' => $response['sender'], 'permissionLevel' => \go\core\model\Acl::LEVEL_READ])->single() : false;
+		if($params['mailbox'] === $account->sent) {
+			$contact = (!empty($response['to']) && !empty($response['to'][0]['email'])) ?
+				\go\modules\community\addressbook\model\Contact::find(['id', 'photoBlobId', 'isOrganization', 'name', 'addressBookId', 'color'])
+					->filter(['email' => $response['to'][0]['email'], 'permissionLevel' => \go\core\model\Acl::LEVEL_READ])
+					->single()
+				: false;
+		} else {
+			$contact = !empty($response['sender']) ?
+				\go\modules\community\addressbook\model\Contact::find(['id', 'photoBlobId', 'isOrganization', 'name', 'addressBookId', 'color'])
+					->filter(['email' => $response['sender'], 'permissionLevel' => \go\core\model\Acl::LEVEL_READ])
+					->single()
+				: false;
+		}
 		if(!empty($contact)){
 			$response['contact_thumb_url']= go()->getAuthState()->getDownloadUrl($contact->photoBlobId);
 			$response['contact'] = $contact->toArray();
@@ -1628,6 +1652,36 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if($vcalendar){
 			$vevent = $vcalendar->vevent[0];
 
+			$aliases = GO\Email\Model\Alias::model()->find(
+				GO\Base\Db\FindParams::newInstance()
+					->select('email')
+					->criteria(GO\Base\Db\FindCriteria::newInstance()->addCondition('account_id' , $imapMessage->account->id))
+			)->fetchAll(\PDO::FETCH_COLUMN, 0);
+
+			$emailFound = false;
+			if(isset($vevent->attendee)) {
+				foreach ($vevent->attendee as $vattendee) {
+					$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vattendee));
+					if (in_array($attendeeEmail, $aliases)) {
+						$emailFound = true;
+						$accountEmail = $attendeeEmail;
+					}
+				}
+			}
+
+			if(!$emailFound && isset($vevent->organizer)) {
+				$attendeeEmail = str_replace('mailto:', '', strtolower((string)$vevent->organizer));
+				if (in_array($attendeeEmail, $aliases)) {
+					$emailFound = true;
+					$accountEmail = $attendeeEmail;
+				}
+			}
+
+			if(!$emailFound) {
+				$response['iCalendar']['feedback'] = GO::t("None of the participants match your e-mail aliases for this e-mail account.", "email");
+				return $response;
+			}
+
 			//is this an update for a specific recurrence?
 			$recurrenceDate = isset($vevent->{"recurrence-id"}) ? $vevent->{"recurrence-id"}->getDateTime()->format('U') : 0;
 
@@ -1675,7 +1729,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$response['iCalendar']['invitation'] = array(
 						'uuid' => $uuid,
 						'email_sender' => $response['sender'],
-						'email' => $imapMessage->account->getDefaultAlias()->email,
+						'email' => $accountEmail,
 						//'event_declined' => $event && $event->status == 'DECLINED',
 						'event_id' => $event ? $event->id : 0,
 						'is_organizer'=>$event && $event->is_organizer,
@@ -1684,6 +1738,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 						'is_invitation' => !$alreadyProcessed && $vcalendar->method == 'REQUEST', //&& !$event,
 						'is_cancellation' => $vcalendar->method == 'CANCEL'
 				);
+
+				//filter out invites
+
+				$response['attachments'] = array_filter($response['attachments'], function($a) {
+					return $a['isInvite'] == false;
+				});
+
 //			}elseif($event){
 
 //			if($event){
@@ -1807,7 +1868,16 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$from = $imapMessage->from->getAddress();
 
 			
-			$contacts = Contact::findByEmail($from['email'], ['id'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]);
+			$contacts = Contact::findByEmail($from['email'], ['id', 'isOrganization', 'addressBookId', 'name'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE])->all();
+
+			foreach($contacts as $contact) {
+				/** @var Contact $contact */
+				if(!$contact->isOrganization) {
+					foreach($contact->findOrganizations(['id', 'addressBookId', 'name']) as $o) {
+						$contacts[] = $o;
+					}
+				}
+			}
 
 			foreach($contacts as $contact) {
 				if($contact && $linkedModels->findKeyBy(function($item) use ($contact) { return $item->equals($contact); } ) === false){						

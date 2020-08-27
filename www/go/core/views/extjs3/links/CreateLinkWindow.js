@@ -9,6 +9,7 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 	height: dp(600),
 	title: t("Create link", "links"),
 	layout:"border",
+	supportsFiles: false,
 
 	/**
 	 * Provide the entities to show in the list here
@@ -94,7 +95,8 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 			},
 			region:"west",
 			savedSelection: "link",
-			entities:this.entities
+			supportsFiles: this.supportsFiles,
+			split: true
 		});
 
 		this.entityGrid.getSelectionModel().on('selectionchange', function (sm) {

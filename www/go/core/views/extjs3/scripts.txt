@@ -33,6 +33,7 @@ Window.js
 form/EntityPanel.js
 form/MultiEntityDialog.js
 form/Dialog.js
+form/BatchEditDialog.js
 form/CheckboxGroup.js
 form/PasswordGeneratorField.js
 form/DateField.js
@@ -53,6 +54,7 @@ form/FormContainer.js
 form/Chips.js
 form/RecurrenceFieldset.js
 form/KeyValueEditorGrid.js
+form/DateRangeField.js
 
 modules/ModulePanel.js
 
@@ -88,7 +90,9 @@ links/LinksDetailPanel.js
 links/FilterLinkEntityCombo.js
 
 
-
+oauth/ClientGrid.js
+oauth/ClientDialog.js
+oauth/SystemSettingsPanel.js
 
 Router.js
 PasswordPrompt.js
@@ -101,6 +105,7 @@ util/Filters.js
 util/Cookies.js
 util/SelectDialog.js
 util/Object.js
+util/Autolinker.js
 
 User.js
 String.js
@@ -145,6 +150,8 @@ tree/TreeNodeUI.js
 
 form/HtmlEditor.js
 form/HtmlEditorPlugins.js
+
+form/NumberField.js
 
 menu/EmojiMenu.js
 menu/StoreMenu.js
@@ -234,9 +241,16 @@ filter/types/string.js
 filter/types/number.js
 filter/types/date.js
 filter/types/select.js
+filter/types/subconditions.js
 filter/FilterGrid.js
 filter/FilterDialog.js
-
+filter/FilterAddButton.js
+filter/VariableFilterPanel.js
+filter/VariableFilterDialog.js
+filter/variabletypes/date.js
+filter/variabletypes/number.js
+filter/variabletypes/string.js
+filter/variabletypes/select.js
 
 import/CsvMappingDialog.js
 

@@ -11,13 +11,6 @@ use go\core\model\Link;
  * @property array $customFields 
  */
 trait SearchableTrait {
-
-	/**
-	 * The name for the search results
-	 * 
-	 * @return string
-	 */
-	abstract protected function getSearchName() ;
 	
 	/**
 	 * The description in the search results
@@ -43,7 +36,14 @@ trait SearchableTrait {
 	protected function getSearchFilter() {
 		return null;
 	}
-	
+
+	/**
+	 * Save entity to search cache
+	 *
+	 * @param bool $checkExisting If certain there's no existing record then this can be set to false
+	 * @return bool
+	 * @throws \Exception
+	 */
 	public function saveSearch($checkExisting = true) {
 		$search = $checkExisting ? \go\core\model\Search::find()->where('entityTypeId','=', static::entityType()->getId())->andWhere('entityId', '=', $this->id)->single() : false;
 		if(!$search) {
@@ -57,7 +57,7 @@ trait SearchableTrait {
 		
 		$search->entityId = $this->id;
 		$search->setAclId($this->findAclId());
-		$search->name = $this->getSearchName();
+		$search->name = $this->title();
 		$search->description = $this->getSearchDescription();
 		$search->filter = $this->getSearchFilter();
 		$search->modifiedAt = $this->modifiedAt;
@@ -101,13 +101,16 @@ trait SearchableTrait {
 		return true;
 	}
 	
-	public static function deleteSearchAndLinks(Query $query) {		
-		if(!\go()->getDbConnection()
-						->delete('core_search', 
-										(new Query)
-											->where(['entityTypeId' => static::entityType()->getId()])
-											->andWhere('entityId', 'IN', $query)
-										)->execute()) {
+	public static function deleteSearchAndLinks(Query $query) {
+		$delSearchStmt = \go()->getDbConnection()
+			->delete('core_search',
+				(new Query)
+					->where(['entityTypeId' => static::entityType()->getId()])
+					->andWhere('entityId', 'IN', $query)
+			);
+//		$s = (string) $delSearchStmt;
+
+		if(!$delSearchStmt->execute()) {
 			return false;
 		}
 		
@@ -160,7 +163,7 @@ trait SearchableTrait {
 
 		$stmt = go()->getDbConnection()->delete('core_search', (new Query)
 			->where('entityTypeId', '=', $cls::entityType()->getId())
-			->andWhere('entityId', 'NOT IN', $cls::find()->selectSingleValue('id'))
+			->andWhere('entityId', 'NOT IN', $cls::find()->selectSingleValue($cls::getMapping()->getPrimaryTable()->getAlias() . '.id'))
 		);
 		$stmt->execute();
 

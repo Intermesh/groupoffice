@@ -612,7 +612,7 @@ abstract class Property extends Model {
 		
 		if(!$props) {
 			$props = array_filter(static::getReadableProperties(), function($propName) {
-				return !in_array($propName, ['modified', 'oldValues', 'validationErrors']);
+				return !in_array($propName, ['modified', 'oldValues', 'validationErrors', 'modifiedCustomFields', 'validationErrorsAsString']);
 			});
 
 			go()->getCache()->set($cacheKey, $props);
@@ -1579,8 +1579,10 @@ abstract class Property extends Model {
 				if($table->isUserTable) {
 					$keys['userId'] = go()->getUserId();
 				}
+
+				$query = Query::normalize($keys)->tableAlias($table->getAlias());
 				
-				$stmt = App::get()->getDbConnection()->update($table->getName(), $modifiedForTable, $keys);
+				$stmt = App::get()->getDbConnection()->update($table->getName(), $modifiedForTable, $query);
 				if (!$stmt->execute()) {
 					throw new Exception("Could not execute update query");
 				}				
@@ -1756,8 +1758,10 @@ abstract class Property extends Model {
 		if(!count($blobCols)) {
 			return [];
 		}
+		$clnQry = clone($query);
+		$clnQry->select([],false); // reset $query in order to prevent ambiguous ID
 
-		$entities = static::internalFind($blobCols)->mergeWith($query);
+		$entities = static::internalFind($blobCols)->mergeWith($clnQry);
 
 		$blobIds = [];
 		foreach($entities as $entity) {
@@ -1820,7 +1824,7 @@ abstract class Property extends Model {
 		switch ($column->dbType) {
 			case 'date':
 			case 'datetime':
-				if(!($value instanceof \DateTime) || ($value instanceof DateTimeImmutable)){
+				if(!($value instanceof \DateTime) && !($value instanceof DateTimeImmutable)){
 					$this->setValidationError($column->name, ErrorCode::MALFORMED, "No date object given for date column");
 				}
 				break;

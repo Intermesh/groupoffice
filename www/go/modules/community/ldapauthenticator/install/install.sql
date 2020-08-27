@@ -11,6 +11,8 @@ CREATE TABLE `ldapauth_server` (
   `port` int(11) NOT NULL DEFAULT '389',
   `encryption` enum('ssl','tls') COLLATE utf8mb4_unicode_ci DEFAULT 'tls',
   `ldapVerifyCertificate` BOOLEAN NOT NULL DEFAULT TRUE,
+  `followReferrals` BOOLEAN NOT NULL DEFAULT TRUE,
+  `protocolVersion` TINYINT UNSIGNED NOT NULL DEFAULT '3',
   `username` VARCHAR(190) NULL DEFAULT NULL,
   `password` VARCHAR(512) NULL COLLATE ascii_bin DEFAULT NULL,
   `usernameAttribute` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'uid',
@@ -20,6 +22,7 @@ CREATE TABLE `ldapauth_server` (
   `imapPort` int(11) NOT NULL DEFAULT '143',
   `imapEncryption` enum('tls','ssl') COLLATE utf8mb4_unicode_ci DEFAULT 'tls',
   `imapValidateCertificate` tinyint(1) NOT NULL DEFAULT '1',
+  `imapUseEmailForUsername` BOOLEAN NOT NULL DEFAULT FALSE,
   `loginWithEmail` tinyint(1) NOT NULL DEFAULT '0',
   `smtpHostname` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `smtpPort` int(11) NOT NULL DEFAULT '587',
@@ -29,12 +32,12 @@ CREATE TABLE `ldapauth_server` (
   `smtpEncryption` enum('tls','ssl') COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `smtpValidateCertificate` tinyint(1) NOT NULL DEFAULT '1',
   `syncUsers` BOOLEAN NOT NULL DEFAULT FALSE,
-  `syncUsersQuery` VARCHAR(190) NOT NULL DEFAULT '(objectClass=inetOrgPerson)',
+  `syncUsersQuery` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `syncGroups` BOOLEAN NOT NULL DEFAULT FALSE, 
-  `syncGroupsQuery` VARCHAR(190) NOT NULL DEFAULT '(objectClass=Group)'
+  `syncGroupsQuery` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB;
-
 --
+
 -- Gegevens worden geëxporteerd voor tabel `ldapauth_server`
 --
 

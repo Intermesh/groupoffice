@@ -22,6 +22,8 @@ use go\core\webclient\Extjs3;
 
 $webclient = Extjs3::get();
 
+$baseUrl = $webclient->getRelativeUrl();
+
 
 $settings['max_rows_list'] = 50;
 
@@ -74,8 +76,8 @@ if(GO::config()->debug) {
 }
 
 //echo '<script type="text/javascript" src="' . GO::url('core/language', ['lang' => \GO::language()->getLanguage()]) . '"></script>';
-echo '<script type="text/javascript" src="views/Extjs3/javascript/ext-base-debug.js?mtime='.filemtime(__DIR__ . '/javascript/ext-base-debug.js').'"></script>';
-echo '<script type="text/javascript" src="views/Extjs3/javascript/ext-all-debug.js?mtime='.filemtime(__DIR__ . '/javascript/ext-all-debug.js').'"></script>';
+echo '<script type="text/javascript" src="'.$baseUrl.'views/Extjs3/javascript/ext-base-debug.js?mtime='.filemtime(__DIR__ . '/javascript/ext-base-debug.js').'"></script>';
+echo '<script type="text/javascript" src="'.$baseUrl.'views/Extjs3/javascript/ext-all-debug.js?mtime='.filemtime(__DIR__ . '/javascript/ext-all-debug.js').'"></script>';
 echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?lang='.\go()->getLanguage()->getIsoCode() . '&v='.$webclient->getLanguageJS()->getModifiedAt()->format("U").'"></script>';
 
 ?>
@@ -116,7 +118,7 @@ if ($cacheFile->exists()) {
 	$scripts = array();
 	$load_modules = GO::modules()->getAllModules(true);
 
-	$scripts[] = "var BaseHref = '';";
+	$scripts[] = "var BaseHref = '" . $baseUrl . "';";
 
 	$scripts[] = new File(GO::config()->root_path . 'views/Extjs3/javascript/namespaces.js');
 	
@@ -205,6 +207,8 @@ if ($cacheFile->exists()) {
 			} else if ($script instanceof File) {
         $relPath = substr($script->getPath(), $strip);
         $parts = explode('/', $relPath);
+
+        $relPath = $baseUrl . $relPath;
 //        $js .= "\n//source: ".$relPath ."\n";
 				
 				$js = "";

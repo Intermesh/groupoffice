@@ -255,7 +255,6 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 			url : GO.url('tasks/task/submit'),
 			waitMsg : t("Saving..."),
 			success : function(form, action) {
-
 				if (action.result.id) {
 					this.setTaskId(action.result.id);
 					

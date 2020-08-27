@@ -9,7 +9,7 @@
 go.detail.Property = Ext.extend(Ext.Container, {
 	autoEl: "p",
 	label : "",
-	icon: "ic-star",
+	// icon: null,
 	value: "",
 	initComponent: function() {
 		
@@ -29,9 +29,10 @@ go.detail.Property = Ext.extend(Ext.Container, {
 		});
 		
 		this.items = [
-			this.iconCmp,			
-			this.valueCmp,
-			this.labelCmp
+			// this.iconCmp,
+
+			this.labelCmp,
+			this.valueCmp
 		];
 		
 		go.detail.Property.superclass.initComponent.call(this);
@@ -42,23 +43,27 @@ go.detail.Property = Ext.extend(Ext.Container, {
 	},
 	
 	setValue : function(v) {
-		this.value = this.format(v);
-		if(this.rendered) {
+		this.value = this.valueCmp.value = this.format(v);
+		if(this.valueCmp.rendered) {
 			this.valueCmp.update(this.value);
-		} 
+		}else{
+			this.valueCmp.on("render", function(cmp){
+				cmp.update(v);
+			}, {single: true});
+		}
 	},
 
 	
-	setIcon : function(v) {
-		this.icon = v;
-		if(this.rendered) {
-			this.iconCmp.update(v);
-		}
-	},
+	// setIcon : function(v) {
+	// 	this.icon = v;
+	// 	if(this.rendered) {
+	// 		this.iconCmp.update(v);
+	// 	}
+	// },
 	
 	
 	setLabel : function(v) {
-		this.label = v;
+		this.label = this.labelCmp.label = v;
 		if(this.rendered) {
 			this.labelCmp.update(v);
 		}

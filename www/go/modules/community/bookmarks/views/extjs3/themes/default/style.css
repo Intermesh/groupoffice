@@ -1,11 +1,8 @@
-s
+
 .categorie {
 	clear: both;
-	font-size: 14px;
-  	color: #333333;
-	margin-left: 6px;
-	padding-top: 10px;
-	letter-spacing:1px;
+	margin-bottom: 8px;
+	margin-top: 16px;
 }
 
 .closebutton {
@@ -80,9 +77,8 @@ s
 .bookmark-column {
     float:left;
     width:320px;
-    padding:0px;
     border-right: 1px solid #eee;
-    margin: 16px 0 0 0;
+    padding: 16px;
 }
 
 .bookmark-column span{

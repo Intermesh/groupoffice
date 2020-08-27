@@ -86,14 +86,13 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 			new go.detail.addButton({
 				detailView: this
 			}),
+			{
+				xtype: "linkbrowserbutton"
+			},
 
 			this.moreMenu = {
 				iconCls: 'ic-more-vert',
 				menu: [
-					{
-						xtype: "linkbrowsermenuitem"
-					},
-					'-',
 					{
 						iconCls: "btn-print",
 						text: t("Print"),

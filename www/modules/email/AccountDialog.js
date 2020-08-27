@@ -413,7 +413,7 @@ GO.email.AccountDialog = function(config) {
 	var serverTab = {
 		title: t('Server', 'email'),
 		autoScroll: true,
-		visible: (GO.settings.modules.email.write_permission),
+		disabled: (!GO.settings.modules.email.write_permission),
 		layout:'table',
 		layoutConfig: {columns: 2},
 		items: [{ 
@@ -441,7 +441,7 @@ GO.email.AccountDialog = function(config) {
 		outgoingTab
 		]
 	};
-	
+	console.log(serverTab);
 	this.filterGrid = new GO.email.FilterGrid();
 	this.labelsTab = new GO.email.LabelsGrid();
 
@@ -540,7 +540,7 @@ GO.email.AccountDialog = function(config) {
 				}
 				this.aliasesDialog.show(this.account_id);
 			},
-			hidden: (!GO.settings.modules.email.write_permission || GO.email.disableAliases),
+			hidden: (!GO.settings.modules.email.write_permission && GO.email.disableAliases),
 			scope : this
 		}),{
 			iconCls : 'btn-folder',

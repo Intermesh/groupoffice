@@ -65,7 +65,7 @@ return array (
   'Is a user' => 'Ist ein Benutzer',
   'Advanced' => 'Erweitert',
   'Salutation template' => 'Anrede Vorlage',
-  'salutationTemplate' => 'Sehr geehrte(r)[if {{contact.prefixes}}]{{contact.prefixes}}}[else][if !{{contact.gender}}]Frau/Herr[else][if {{contact.gender}}==="M"]Herr[else]Frau[/if][/if][/if] {{contact.lastName}}}}',
+  'salutationTemplate' => 'Sehr geehrte[if {{contact.prefixes}} ] {{contact.prefixes}}[else][if !{{contact.gender}} ] Frau/Herr[else][if {{contact.gender}}=="M"]r Herr[else] Frau[/if][/if][/if] {{contact.lastName}}',
   'Create personal address book for each user' => 'Persönliches Adressbuch für jeden Benutzer erstellen',
   'Automatically link e-mail to contacts' => 'Automatische Verknüpfung von E-Mails mit Kontakten',
   'Warning: this will copy e-mails to the Group-Office storage and will therefore increase disk space usage. The e-mail will be visible to all people that can view the contact too.' => 'Warnung: Dies kopiert E-Mails in den Speicher des  und erhöht somit den Speicherverbrauch. Die E-Mail ist für alle Personen sichtbar, die den Kontakt auch sehen können.',
@@ -120,4 +120,8 @@ return array (
   'Family' => 'Familie',
   'Label margins' => 'Labelränder',
   'Template' => 'Vorlage',
+  'Labels' => 'Label',
+  'Top' => 'Oben',
+  'Bottom' => 'Unten',
+  'Font' => 'Zeichensatz',
 );

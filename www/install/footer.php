@@ -1,5 +1,3 @@
+<?php
+require('../views/Extjs3/themes/Paper/pageFooter.php');
 
-		<footer>Group-Office &dash; Online Groupware Platform</footer>
-
-	</body>
-</html>

@@ -244,6 +244,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 
 	getModulePanel: function (moduleName) {
+
+		this.initModule(moduleName);
 		var panelId = 'go-module-panel-' + moduleName;
 		if (this.tabPanel.items.map[panelId]) {
 			return this.tabPanel.items.map[panelId];
@@ -324,6 +326,16 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 
 	onAuthentication: function () {
+
+		//check if authRedirecUrl was given.
+		var urlParams = new URLSearchParams(window.location.search);
+		var authRedirectUrl = urlParams.get('authRedirectUrl');
+
+		if(authRedirectUrl) {
+			document.location.replace(authRedirectUrl);
+			return;
+		}
+
 		
 		//load state
 		if(!GO.util.isMobileOrTablet()) {
@@ -344,9 +356,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				go.Entities.init();
 				me.addDefaultRoutes();
 				me.renderUI();
-				go.Router.check();
 				Ext.getBody().unmask();
-				
+				go.Router.check();
 			}).catch(function(error){
 				console.error(error);
 				Ext.getBody().unmask();

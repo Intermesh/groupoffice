@@ -130,10 +130,6 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 			iconCls: 'ic-more-vert',
 			menu:[
 				{
-					xtype: "linkbrowsermenuitem"
-				},
-				'-',
-				{            
 					iconCls: "ic-print",
 					
 					text:t("Print"),      
@@ -157,6 +153,9 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 				xtype: "detailfilebrowserbutton"
 			});
 		}
+		tbar.push({
+			xtype: "linkbrowserbutton"
+		});
 		
 		tbar.push(this.moreButton);
 

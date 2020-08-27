@@ -18,12 +18,18 @@ use function GO;
 use go\core\db\Table;
 
 /*
-update addressbook_contact n set filesFolderId = (select files_folder_id from ab_contacts o where o.id=n.id);
-update addressbook_contact n set filesFolderId = (select files_folder_id from ab_companies o where n.id = (o.id + (select max(id) from ab_contacts)) );
+
+update addressbook_contact n set filesFolderId = (select files_folder_id from ab_contacts o where o.id=n.id) where n.filesFolderId = null ;
+update addressbook_contact n set filesFolderId = (select files_folder_id from ab_companies o where o.id = (n.id - (select max(id) from ab_contacts)) ) where n.filesFolderId = null ;
 
 
 update comments_comment n set entityTypeId=(select id from core_entity where name='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = 3;
 
+
+
+update addressbook_address a inner join addressbook_contact c on c.id = a.contactId set a.type='visit' where a.type='home' and c.isOrganization = true;
+
+update addressbook_contact c inner join ab_companies old on old.id + (select max(id) from ab_contacts) = c.id set c.name = concat(c.name, ' - ', old.name2) where old.name2 != "" and old.name2 is not null;
 */
 class Migrate63to64 {
 	
@@ -366,7 +372,9 @@ class Migrate63to64 {
 						->execute();
 
 
-		go()->getDbConnection()->exec("update comments_comment n set entityTypeId=(select id from core_entity where clientName='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = (select id from core_entity where clientName='Company');");
+		if(\go\core\model\Module::isInstalled( 'community', 'comments') || \go\core\model\Module::isInstalled( 'legacy', 'comments')) {
+			go()->getDbConnection()->exec("update comments_comment n set entityTypeId=(select id from core_entity where clientName='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = (select id from core_entity where clientName='Company');");
+		}
 
 		go()->getDbConnection()->delete("core_entity", ['clientName' => "Company"])->execute();
 
@@ -704,7 +712,9 @@ class Migrate63to64 {
 			$contact->addressBookId = $addressBook->id;
 			$contact->name = $r['name'];
 
-			//name2 ??
+			if(!empty($r['name2'])) {
+				$contact->name .= ' - ' . $r['name2'];
+			}
 
 			if (!empty($r['email'])) {
 				$contact->emailAddresses[] = (new EmailAddress())
@@ -751,7 +761,7 @@ class Migrate63to64 {
 
 
 			$address = new Address();
-			$address->type = Address::TYPE_HOME;
+			$address->type = Address::TYPE_VISIT;
 			$address->countryCode = isset($r['country']) && \go\core\validate\CountryCode::validate(strtoupper($r['country'])) ? strtoupper($r['country']) : null;
 			$address->state =!empty($r['state']) ?$r['state'] : null;
 			$address->city = !empty($r['city']) ?$r['city'] : null;

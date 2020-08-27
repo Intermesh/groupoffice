@@ -133,7 +133,7 @@ class MessageAttachment extends \GO\Base\Model{
 			return \GO::url('email/message/tnefAttachmentFromTempFile', array('tmp_file'=>$this->getTempFile()));
 		}else
 		{		
-			return \GO::url('core/downloadTempFile', array('path'=>$this->getTempFile()));		
+			return \GO::url('core/downloadTempFile', array('path'=>$this->getTempFile(), "cache" => "1"));
 		}		
 	}
 	
@@ -169,6 +169,7 @@ class MessageAttachment extends \GO\Base\Model{
 				"extension"=>$this->getExtension(),
 				"encoding"=>$this->encoding,
 				"disposition"=>$this->disposition,
+			  "isInvite" => $this->isVcalendar()
 		);
 	}	
 	

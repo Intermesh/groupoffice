@@ -1,9 +1,223 @@
+27-08-2020 6.4.165
+- Time registration: fixed Firefox bug in Timesheet
+- Email: Workaround if message has invalid From header
+- Core: fixed render bug in link browser window
+- Files: Added permission checks to compress functions
+- Files: Added permission checks to compress functions
+- SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
+- Calendar: Missing resource admin email #201919703
+- Calendar: Category permissions  #202020841
+- Tickets: Only messages from agent are sent to CC contact #201919432
+- Calender: Bug changing "this and future events" #202021084
+- Calendar: No notification when a participant is removed #202021083
+- Core: Upgrade from 6.3 failed if comments module was not installed.
+- SMIME: fixed error in linked email with inline attachments
+- Core: Prevent combo from expanding when opening dialogs
+
+25-08-2020 6.4.164
+- Email: users are able to delete their own Email templates
+- Billing: Fixed the PDF template tax totals when printing costs
+- Time registration: Timer button will use Notification area to save/show the timer
+- Time registration: new time insert dialog. (small date field as this is already set in the new view)
+- Time registration: Drag-n-Drop to move / set duration / holt Alt-n-Drag to copy / Click Add time + Hold-n-drag to set duration 
+- Core: Added authorisation check to SSE
+- Customfields: fix User customfield will display in the detail field when not empty
+- Files: added Folder customfield to be displayable in the grid.
+- Core: Fix scrollbar issues when focusing/clicking on a textarea with autogrow
+- Contact: When creating a contact from unknown email address there was one email field to many
+- Language: updated pt_br Thanks to @flaviozluca
+- Customfields: fixed division by zero for functionfield in newer PHP versions
+- Core: Fixed bug to enable deleting comment
+- Core: Better link color in dark theme
+- Bookmarks: fixed bug deleting bookmark categories
+- Customfields: Several bugfixes import and export from projects  
+- Customfields: Improved layout and define columns for showing custom fields net to eachother.
+- Core: Fixed display of relation fields in legacy modules
+- Core: Fixed error handling in grid delete
+
+30-07-2020 6.4.163
+- Bookmarks: fixed bug where logo didn't save
+- Email: Workaround if "From" header is missing in email message
+- Core: disable JMAP sync states on rebuild search cache and database check. Reset state when done.
+- Address book / carddav: Database check fixes missing uri's and import will generate uri if uid is already present
+- Tickets: re-enabled ticket groups
+
+30-07-2020 6.4.162
+- Studio: Was missing license definition which caused install to fail without license.
+
+28-07-2020 6.4.161
+- Core: Date range component
+
+27-07-2020 6.4.160
+- billing / core: Removed duplicate translations;
+- ldapauth: check if mail and username attribute are present for sync, allow larger queries
+- officeonline: Auto detect wopi client URL instead of using system settings url.
+- Core: phone number autolinking only if surrounded by word boundaries.
+- Filesearch: Error in files when not having permissions for filesearch module
+- Files: fix for invalid ACL's in root folders causing integrity constraint errors
+- Studio: New module to create your own modules!
+- Core: Removed incorrect country translations for French
+- Address book: Send vcard by email feature
+- E-mail: Import vcard from attachment feature
+
+14-07-2020 6.4.159
+- Billing: fixed problem where items grid wouldn't load anymore
+- E-mail: Drag and drop caused jump to page 1 in list
+- Projects: generate proper keywords for search function;
+- Documents: Implemented filters in file search module and added custom fields back into edit panel
+- Custom fields: Save failed when custom fields had only a select fields.
+
+13-07-2020 6.4.158
+- Core: Updated German translation
+- Files: Fixed minor bug in download function
+- Core: Fixed rendering of yesNo custom fields in grid and detail panel.
+- LDAP: Created multiple accounts when using email for username
+- Files: Fixed folder upload problem where previous folder upload was created empty on a second upload
+
+13-07-2020 6.4.157
+- Core: Added some common file type icons
+- Core: new config option $config['frameAncestors'] = 'http://examplea.com https/exampleb.com'; to allow Group-Office in 
+        a frame.
+- LDAP auth: Use e-mail for mail username works for SMTP too
+- Core: Auto link URL's and emails in html editor and html rendering
+- Email: Case insensitive file extension checking on uploading file in email composer
+- Core: Restored CSP object so it can be extended by modules
+
+07-07-2020 6.4.156
+- Billing: Field 'invoice_no' is now a varchar
+- Core: Fixed 500 error upon rebuilding module cache
+- Core: Fixed custom fields saving new select box.
+- Core: Custom fields, generate database name as per MariaDB naming conventions.
+- Address book: Update search cache of employees when changing company name
+- LDAP Auth: Added option to login to IMAP server with email instead of username 
+- Core: Added complete rebuild search cache option.
+- Core: Fixed broken link display in e-mail
+- Core: Set security headers: 
+    	- X-Frame-Options: SAMEORIGIN
+        - Content-Security-Policy
+    	- X-Content-Type-Options: nosniff
+    	- Strict-Transport-Security: max-age=31536000
+        - X-XSS-Protection: 1;mode=block
+- Core: Use relative URL's in webclient
+- Email: reload grid and keep position but don't select next mail
+- Email: Contact autolinking will link to all contacts organizations too
+
+30-06-2020 6.4.155
+- Email: Problem with empty emails
+
+30-06-2020 6.4.154
+- Custom fields: Changing multi select options could destroy all values of the field
+- Email: Pasted or dropped image resized to max-width: 100%
+- Leavedays: Incorrect email when booking was made for another user
+- Address book: Removed duplciate "Sort by" last name setting.
+- Core: Updated translations 'Forgot username?' to 'Forgot login credentials?'
+- Files: search results > send by email, prevent full path from showing in attachment view
+- Core: Bug in manual install without Acpu
+
+29-06-2020 6.4.153
+- Core: Fixed manual install error
+
+26-06-2020 6.4.152
+- Core: Loading issue when used in subdirctory
+
+26-06-2020 6.4.151
+- Core: Collapse notification panel when clicked on mobile
+- Core: Added new toolbar when user has selected multiple items
+- Billing: selecting a TAX rate in the order dialog items is fixed
+- Contacts: German contact salutation was incorrect
+- Core: Made it possible to brand and style the install pages
+- Multi instance: If hostname is does not match installation of manager it will display a not found notice.
+- Email: Email download link broken in plain text email without template
+- Address book: Generate missing URI and UID's
+- Custom fields: Set fields hidden or shown by default in grids
+- Custom filters: Add custom input fields to the navigation area.
+- Custom fields: Rename select field database name gave constraint error.
+- Libreoffice online: Fixed printing and download as PDF.
+- Email: Save calendar invite where you are not a participant
+
+15-06-2020 6.4.150
+- Tickets: Search unseen only and fix missing domain in email
+- Email: Error on some ICS attachments or calendar invites
+  			
+11-06-2020 6.4.149
+- Calendar: missing go-hidden class showed calendar accept links not intended for GO
+- Calendar: Use email account for sending invites
+- Calendar: Fix for "No participant found for this event"
+
+11-06-2020 6.4.148
+- Email: Suggested contact link of mails in "Sent" folder will look for "to" address
+- Core: File upload was broken when Group-Office was not running in the root of the domain.
+
+09-06-2020 6.4.147
+- Core: Typo in setIsCondfidential leading to oauth problems
+
+09-06-2020 6.4.146
+- Email: select next message when dragging message to other folder
+- Core: Oauth failure in generating private key
+- Core: Database check fixes file acl problems
+
+08-06-2020 6.4.145
+- Core: Support for OpenID / OAuth 2.0 so we can integrate with Rocket.Chat
+- Address book: Added zipcode to contact search
+- Core: Use host header to determine API endpoints so you can have multiple hosts to connect to GO
+- Core: Upload errors where hidden in collapsed panels
+- Core: CTRL + F7 debug was broken
+
+25-05-2020 6.4.144
+- Address book: Added birthday column
+- Core: Render issue with hidden HTML custom field
+- Newsletters: Sometimes errors were reported with an incorrect email address
+- Email: Aliases didn't show without manage permissions
+- Address book / core: Database check fixes mapping of files folders in address book
+- Address book: Upgrade from 6.3 to 6.4 could cause lost mapping of files folder. 
+
+25-05-2020 6.4.143
+- Core: error when loading more items in link browser fixed
+- Address book: Added organization city and organization country to contact filters
+- Address book: Improved simple text search by using global search cache
+- Calendar: add 'send email' dialog to context menu actions on appointments 
+- Address book: Address books searching and sorting in the combo when editing contacts
+- Core: filters can have sub groups making complex filters possibl. For example where conditionA and not conditionB 
+- Core: Disable cron jobs failing due to uninstalled modules
+
+20-05-2020 6.4.142
+- Core: Updated Polish and Croatian translation
+- Core: 6.4.141 Quota cronjob not displayed correct #580
+- Tasks: left panel is resizable
+- Core: fixed disapearing notifications
+- Address book: Export -> Labels didn't download
+- Address book: contacts filter also showed organizations
+- Projects: Fixed project example file and automatically find's contact and customer from address book
+
+15-05-2020 6.4.141
+- E-mail: Attachments from and to items filters out entities that doesn't support that
+- Projects: fixed status, type and template filter to accept the name as text
+- Email: Link mail when using e-mail files
+- Projects: fixed failing report when user was deleted
+- Projects: Fixed resource not showing in edit dialog
+
+13-05-2020 6.4.140
+- Address book: Fixed merge of files
+- Core: Database check could set wrong owner to ACL's
+- Custom fields: Required condition matches multiple words
+- Files: fixed 6.4.137 Error Uncaught TypeError: fb.sendOverwrite is not a function #576
+
+12-05-2020 6.4.139
+- Core: Add to all and reset buttons didn't change all existing permissions
+- Core: Custom fields of type date and date time didn't print on invoices
+- Core: Short date in list preference also applies to links in detail views.
+- Core: Added tooltip to dates so they show the full date and time.
+- Core: Updated French translation
+- Core: Link browser in menu as button
+- Core: RequiredCondition in custom fields didn't behave well with hiding fields
+
+08-05-2020 6.4.138
 - Core: updated German translation
 - Core: Suppress store load error when computer went to sleep
 - reminders: add function was broken in the latest release
 - Calendar: showed 12h format with 24h format in settings
 - Billing: View message of status change
-- Files: folder upload with dag and drop
+- Files: folder upload with drag and drop
 
 01-05-2020 6.4.137
 - Calendar: Fix for 75th anniversary early may bank holiday
@@ -903,7 +1117,18 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Projects: Send company id when selecting contact
 
 
+
+- Files: Added permission checks to compress functions
+- SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
+- Calendar: Missing resource admin email #201919703
+- Calendar: Category permissions  #202020841
+- Tickets: Only messages from agent are sent to CC contact #201919432
+- Calender: Bug changing "this and future events" #202021084
+- Calendar: No notification when a participant is removed #202021083
+
 - Sieve: Fixed bug where sieve dialog showed folders of other account
+- Files: Assistant installation replaces GOTA file handlers
+- Core: Removed NO_AUTO_CREATE_USER from sql_mode because it doesn't work in Mysql 8 anymore and it wasn't needed anyway.
 
 27-01-2020 6.3.89
 - Tickets: Show confirm on closing tickets option broke module settings and email viewing.
@@ -7737,6 +7962,5 @@ First release including:
 - Addressbook
 - Scheduler
 - Project management (alpha)﻿
-
 
 

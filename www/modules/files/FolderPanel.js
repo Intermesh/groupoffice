@@ -46,23 +46,6 @@ GO.files.FolderPanel = Ext.extend(GO.DisplayPanel,{
 					'<tr>'+
 						'<td colspan="2" class="display-panel-heading">'+t("Folder", "files")+': {path}</td>'+
 					'</tr>'+
-//					'<tr>'+
-//						'<td>'+t("Type")+':</td>'+
-//						'<td>{type}</td>'+
-//					'</tr>'+					
-					
-					'<tr>'+
-						'<td>'+t("Created at")+':</td>'+'<td>{ctime}</td>'+
-					'</tr><tr>'+
-						'<td>'+t("Created by")+':</td>'+'<td>{username}</td>'+
-					'</tr><tr>'+
-						'<td>'+t("Modified at")+':</td>'+'<td>{mtime}</td>'+
-					'</tr><tr>'+
-						'<td>'+t("Modified by")+':</td>'+'<td>'+
-							'<tpl if="muser_id">{musername}</tpl>'+
-							'</td>'+
-					'</tr>'+
-					
 					'<tr>'+
 						'<td>URL:</td>'+
 						'<td><a target="_blank" href="{url}">'+t("Right click to copy", "files")+'</a></td>'+
@@ -82,10 +65,11 @@ GO.files.FolderPanel = Ext.extend(GO.DisplayPanel,{
 					
 		if(go.Modules.isAvailable("legacy", "workflow"))
 			this.template +=GO.workflow.WorkflowTemplate;
-		
-		
+
 		GO.files.FolderPanel.superclass.initComponent.call(this);
-		
+
 		this.add(go.customfields.CustomFields.getDetailPanels("Folder"));
+
+		this.add(new go.detail.CreateModifyPanel());
 	}
 });

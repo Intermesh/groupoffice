@@ -22,188 +22,182 @@
 GO.form.ComboBoxMulti = function(config){
 	
 	config = config || {};
-   
-    // this option will interfere will expected operation
-    config.typeAhead = false;
-    // these options customize behavior
-    config.minChars = 3;
-		config.queryDelay=500;
-		
-    config.hideTrigger = true;
-    config.defaultAutoCreate = {
-        tag: "textarea",
-        autocomplete: "off"
-    };
-		 //config.height = dp(24);
-    GO.form.ComboBoxMulti.superclass.constructor.call(this, config);
-		
-		
-		
-    this.on('render', function() {			
-        //this.syncHeight();
-        this.getEl().on('input', function(e) {								
-            this.syncHeight();
-        }, this);
 
-        
-    }, this);
-   
-//    this.on('focus', function(){this.focused=true;}, this);
-//    this.on('blur', function(){this.focused=false;}, this);
+	Ext.apply(this, config);
+
+
+	if(this.textarea) {
+		config.defaultAutoCreate = {
+			tag: "textarea",
+			autocomplete: "off"
+		};
+	}
+	 //config.height = dp(24);
+	GO.form.ComboBoxMulti.superclass.constructor.call(this, config);
+
+
+	if(this.textarea) {
+		this.on('render', function () {
+			//this.syncHeight();
+			this.getEl().on('input', function (e) {
+				this.syncHeight();
+			}, this);
+		}, this);
+	}
 };
 
 Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
+		hideTrigger: true,
+		queryDelay: 500,
+		typeAhead: false,
 		/**
-     * @cfg {String} sep is used to separate text entries
-     */
-		sep : ',',
+		 * @cfg {String} sep is used to separate text entries
+		 */
+		sep: ',',
+		textarea: false,
 
-		//private
-		focused : false,
-		
-		//maxHeight: 100,
-		
-		getParams : function(q) {
+		getParams: function (q) {
 			//override to add q filter for JMAP API
-			this.store.baseParams.filter = this.store.baseParams.filter || {};		
+			this.store.baseParams.filter = this.store.baseParams.filter || {};
 			this.store.baseParams.filter.text = q;
 
 			var p = GO.form.ComboBoxMulti.superclass.getParams.call(this, q);
 			//delete p[this.queryParam];
 
 			return p;
-        },
-        
-        growMin : dp(32),
-        growMax: dp(120),
-		
-		syncHeight : function() {
-			
-			this.el.dom.style.overflowY = 'auto';
+		},
+
+		growMin: dp(32),
+		growMax: dp(120),
+
+		syncHeight: function () {
+
+			if(!this.el) {
+				return;
+			}
+
+			this.el.dom.style.overflowY = 'hidden';
 			var changed = false;
-			if(this.el.dom.offsetHeight > this.growMin){
+			if (this.el.dom.offsetHeight > this.growMin) {
 				this.el.dom.style.height = this.growMin + "px";
 				changed = true;
 			}
 
 			var height = Math.min(this.el.dom.scrollHeight, this.growMax);
-			if(height > this.growMin) {
-				this.el.dom.style.height = (height + dp(8)) + "px";
+			if (height > this.growMin) {
+				height += dp(8);
+				this.el.dom.style.height = height + "px";
 				changed = true;
-            }
-            	
-			if(changed) {
-                //this.fireEvent('grow', this);
-                this.fireEvent("autosize", this, height);
+			}
+
+			if (changed) {
+				//this.fireEvent('grow', this);
+				this.fireEvent("autosize", this, height);
 			}
 		},
-		
-		
-		// private
-//    onViewClick : function(doFocus){
-//			
-//			//don't autoselect on tab. But do this on enter only.
-//			if(doFocus === false)
-//				return this.collapse();
-//			else
-//				return GO.form.ComboBoxMulti.superclass.onViewClick.call(this, doFocus);
-//    },
-		
-    getCursorPosition: function(){
-		
-	    if (document.selection) { // IE
-	        var r = document.selection.createRange();
-					if(!r)
-						return false;
 
-	        var d = r.duplicate();
+		getCursorPosition: function () {
 
-					if(!this.el.dom)
-						return false;
+			if (document.selection) { // IE
+				var r = document.selection.createRange();
+				if (!r)
+					return false;
 
-	        d.moveToElementText(this.el.dom);
-	        d.setEndPoint('EndToEnd', r);
-	        return d.text.length;            
-	    }
-	    else {
-	        return this.el.dom.selectionEnd;
-	    }
-    },
-    
-    getActiveRange: function(){
-        var s = this.sep;
-        var p = this.getCursorPosition();
-        var v = this.getRawValue();
-        var left = p;
-        while (left > 0 && v.charAt(left) != s) {
-            --left;
-        }
-        if (left > 0) {
-            left++;
-        }
-        return {
-            left: left,
-            right: p
-        };
-    },
-    
-    getActiveEntry: function(){
-        var r = this.getActiveRange();
-        return this.getRawValue().substring(r.left, r.right).trim();//.replace(/^s+|s+$/g, '');
-    },
-    
-    replaceActiveEntry: function(value){
-        var r = this.getActiveRange();
-        var v = this.getRawValue();
-        if (this.preventDuplicates && v.indexOf(value) >= 0) {
-            return;
-        }
-        var pad = (this.sep == ' ' ? '' : ' ');
-//				
-//				This code messed up names with utf8
-//				var typedValue = v.substring(r.left, r.right).trim();			
-				
-//				var parts = typedValue.toLowerCase().split(' ')
-				
-//				for(var i=0;i<parts.length;i++){
-//					if(value.toLowerCase().indexOf(parts[i])==-1){
-//						//don't replace with different value
-//						//return false;
-//						value=typedValue;
-//						break;
-//					}
-//				}				
-				
-				this.setValue(v.substring(0, r.left) + (r.left > 0 ? pad : '') + value + this.sep + pad + v.substring(r.right));
-				
-        var p = r.left + value.length + 2 + pad.length;
-        this.selectText.defer(200, this, [p, p]);
-    },
-		
-		setValue : function(v) {
+				var d = r.duplicate();
+
+				if (!this.el.dom)
+					return false;
+
+				d.moveToElementText(this.el.dom);
+				d.setEndPoint('EndToEnd', r);
+				return d.text.length;
+			} else {
+				return this.el.dom.selectionEnd;
+			}
+		},
+
+		getActiveRange: function () {
+			var s = this.sep;
+			var p = this.getCursorPosition();
+			var v = this.getRawValue();
+			var left = p;
+			while (left > 0 && v.charAt(left) != s) {
+				--left;
+			}
+			if (left > 0) {
+				left++;
+			}
+			return {
+				left: left,
+				right: p
+			};
+		},
+
+		getActiveEntry: function () {
+			var r = this.getActiveRange();
+			return this.getRawValue().substring(r.left, r.right).trim();//.replace(/^s+|s+$/g, '');
+		},
+
+		replaceActiveEntry: function (value) {
+			var r = this.getActiveRange();
+			var v = this.getRawValue();
+			if (this.preventDuplicates && v.indexOf(value) >= 0) {
+				return;
+			}
+			var pad = (this.sep == ' ' ? '' : ' ');
+			this.setValue(v.substring(0, r.left) + (r.left > 0 ? pad : '') + value + this.sep + pad + v.substring(r.right));
+
+			var p = r.left + value.length + 2 + pad.length;
+			// this.selectText.defer(200, this, [p, p]);
+		},
+
+		setValue: function (v) {
 			GO.form.ComboBoxMulti.superclass.setValue.call(this, v);
 			this.syncHeight();
 		},
-    
-    onSelect: function(record, index){
-        if (this.fireEvent('beforeselect', this, record, index) !== false) {
-            var value = Ext.util.Format.htmlDecode(record.data[this.valueField || this.displayField]);
-            if (this.sep) {
-                this.replaceActiveEntry(value);
-            }
-            else {
-                this.setValue(value);
-            }
-            this.collapse();
-            this.fireEvent('select', this, record, index);
-        }
-    },
-    
-    initQuery: function(){
-			if(this.getEl().id === document.activeElement.id)
-				this.doQuery(this.sep ? this.getActiveEntry() : this.getRawValue());
-			
-//    	if(this.focused)
-//        this.doQuery(this.sep ? this.getActiveEntry() : this.getRawValue());
-    }
-});
+
+		onSelect: function (record, index) {
+			if (this.fireEvent('beforeselect', this, record, index) !== false) {
+				var value = Ext.util.Format.htmlDecode(record.data[this.valueField || this.displayField]);
+				this.replaceActiveEntry(value);
+				this.collapse();
+				this.fireEvent('select', this, record, index);
+			}
+		},
+
+		getValue : function() {
+			return this.getRawValue();
+		},
+
+		initQuery: function () {
+			if (this.getEl().id === document.activeElement.id) {
+				this.doQuery(this.getActiveEntry());
+			}
+		},
+
+		onLoad: function () {
+			if (!this.hasFocus) {
+				return;
+			}
+			if (this.store.getCount() > 0 || this.listEmptyText) {
+				this.expand();
+				this.restrictHeight();
+				if (this.lastQuery == this.allQuery) {
+
+					if (this.autoSelect !== false && !this.selectByValue(this.value, true)) {
+						this.select(0, true);
+					}
+				} else {
+					if (this.autoSelect !== false) {
+						this.selectNext();
+					}
+					if (this.typeAhead && this.lastKey != Ext.EventObject.BACKSPACE && this.lastKey != Ext.EventObject.DELETE) {
+						this.taTask.delay(this.typeAheadDelay);
+					}
+				}
+			} else {
+				this.collapse();
+			}
+
+		}
+	});

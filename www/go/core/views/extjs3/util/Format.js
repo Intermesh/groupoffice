@@ -148,9 +148,13 @@
 			
 			var dec = GO.settings.decimal_separator,
 				tho = GO.settings.thousands_separator;
+
+			if(decimals === undefined) {
+				decimals = 2;
+			}
 			
 			return value
-				.toFixed(decimals || 2)
+				.toFixed(decimals)
 				.replace(/[,.]/g, function($1) { return $1 === ',' ? tho : dec });
 		},
 		/**
@@ -186,6 +190,10 @@
 			return string.replace(/{(\d+)}/g, function(match, number) { 
 			  return typeof args[number] != 'undefined' ? args[number] : match;
 			});
+		},
+
+		userDateTime : function(v){
+			return go.User.shortDateInList ? go.util.Format.shortDateTime(v) : go.util.Format.dateTime(v)
 		},
 
 		dateTime: function (v) {

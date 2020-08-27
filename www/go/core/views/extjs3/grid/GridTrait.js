@@ -13,6 +13,8 @@ go.grid.GridTrait = {
 	 */
 	scrollLoader: true,
 
+	multiSelectToolbarEnabled: true,
+
 	initGridTrait : function() {
 		if (!this.keys)
 		{
@@ -46,7 +48,77 @@ go.grid.GridTrait = {
 				return false;
 			}
 		}, this);
-	},	
+
+		if(this.multiSelectToolbarEnabled && this.getTopToolbar() && !this.getSelectionModel().singleSelect) {
+			this.initMultiSelectToolbar();
+		}
+	},
+
+	initMultiSelectToolbar : function() {
+
+		this.getSelectionModel().on('selectionchange', function(sm) {
+
+			if(!sm.getSelections) {
+				return;
+			}
+			var selections = sm.getSelections();
+
+			selections.length > 1 ? this.showMultiSelectToolbar(selections) : this.hideMultiSelectToolbar();
+		}, this);
+	},
+
+	getMultiSelectToolbarItems : function() {
+		var items = [
+
+			{
+				iconCls: 'ic-arrow-back',
+				tooltip: t("Clear selection"),
+				handler: function() {
+					this.getSelectionModel().clearSelections();
+				},
+				scope: this
+			},
+			this.selectedLabel,
+			'->',
+			{
+				iconCls: 'ic-delete',
+				tooltip: t("Delete"),
+				handler: function() {
+					this.deleteSelected();
+				},
+				scope: this
+			}
+		];
+
+		if(this.multiSelectToolbarItems) {
+			var args = [3,0].concat(this.multiSelectToolbarItems);
+			Array.prototype.splice.apply(items, args);
+		}
+
+		return items;
+	},
+
+	showMultiSelectToolbar : function(selections) {
+		if(!this.multiSelectToolBar ) {
+			this.selectedLabel = new Ext.form.Label({});
+			this.multiSelectToolBar = new Ext.Toolbar({
+				cls: 'go-multiselect-toolbar',
+				hidden: true, //default
+				items: this.getMultiSelectToolbarItems()
+			});
+			this.multiSelectToolBar.render(this.getTopToolbar().getEl());
+		}
+
+		this.multiSelectToolBar.setWidth(this.getTopToolbar().getWidth());
+		this.multiSelectToolBar.setVisible(true);
+		this.selectedLabel.setText(t("{count} selected").replace('{count}', selections.length));
+	},
+
+	hideMultiSelectToolbar : function() {
+		if(this.multiSelectToolBar) {
+			this.multiSelectToolBar.hide();
+		}
+	},
 
 	initTotalDisplay: function() {
 
@@ -101,11 +173,25 @@ go.grid.GridTrait = {
 	},
 	
 	initCustomFields : function() {
-		if(!this.columns || !this.store || !this.store.entityStore || !this.store.entityStore.entity.customFields) {
+		if (!this.columns || !this.store || !this.store.entityStore || !this.store.entityStore.entity.customFields) {
 			return;
-		}		
-		
-		this.columns = this.columns.concat(go.customfields.CustomFields.getColumns(this.store.entityStore.entity.name))
+		}
+		var customFldColumns = go.customfields.CustomFields.getColumns(this.store.entityStore.entity.name);
+
+		if (this.autoExpandColumn && this.autoExpandColumn.indexOf('custom-field-') === 0) {
+			var autoExpandColumnName = this.autoExpandColumn.substring(13);
+			var restOfCustomColumns = [], arClmn = [];
+			customFldColumns.forEach(function (col) {
+				if (col.dataIndex === 'customfields.' + autoExpandColumnName) {
+					arClmn.push(col);
+				} else {
+					restOfCustomColumns.push(col);
+				}
+			});
+			this.columns = arClmn.concat(restOfCustomColumns, this.columns);
+		} else {
+			this.columns = this.columns.concat(customFldColumns);
+		}
 	},
 	
 	//The navigate can be used in modules to track row selections for navigation.
@@ -196,7 +282,6 @@ go.grid.GridTrait = {
 		var prom = this.getStore().entityStore.set({
 			destroy:  selectedRecords.column("id")
 		}).then(function(result){
-			me.getEl().unmask();
 			if(!result.notDestroyed) {
 				return;
 			}
@@ -209,7 +294,10 @@ go.grid.GridTrait = {
 			Ext.MessageBox.alert(t("Error"), t("Could not delete some items: <br /><br />" + msg));
 
 		})
-		.catch(function() {
+		.catch(function(reason) {
+			GO.errorDialog.show(t( 'Sorry, an unexpected error occurred: ' + reason.message));
+		})
+		.finally(function() {
 			me.getEl().unmask();			
 		});
 	},

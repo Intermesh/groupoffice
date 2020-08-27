@@ -49,11 +49,16 @@ class Select extends Base {
 	}
 
 	public function onFieldSave() {
+
+		if ($this->field->isModified('databaseName') && !$this->field->isNew()) {
+			$this->dropConstraint();
+		}
+
 		if (!parent::onFieldSave()) {
 			return false;
 		}		
 
-		if ($this->field->isNew()) {
+		if ($this->field->isNew() || $this->field->isModified('databaseName')) {
 			$this->addConstraint();
 		}
 		
@@ -65,7 +70,12 @@ class Select extends Base {
 	//Is public for migration. Can be made private in 6.5
 	public function addConstraint() {
 		$sql = "ALTER TABLE `" . $this->field->tableName() . "` ADD CONSTRAINT `" . $this->getConstraintName() . "` FOREIGN KEY (" . Utils::quoteColumnName($this->field->databaseName) . ") REFERENCES `core_customfields_select_option`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";			
-		go()->getDbConnection()->query($sql);
+		return go()->getDbConnection()->exec($sql);
+	}
+
+	private function dropConstraint() {
+		$sql = "ALTER TABLE `" . $this->field->tableName() . "` DROP CONSTRAINT `" . $this->getConstraintName() . "`;";
+		return go()->getDbConnection()->exec($sql);
 	}
 	
 	private function getConstraintName() {
@@ -183,7 +193,11 @@ class Select extends Base {
 			} else{
 				//for text queries we must join the options.
 				$alias = 'opt_' . $this->field->id;
-				$query->join('core_customfields_select_option', $alias, $alias . '.id = customFields.' . $this->field->databaseName);
+				$query->join(
+					'core_customfields_select_option',
+					$alias, $alias . '.id = customFields.' .
+					$this->field->databaseName,
+				'left');
 				$criteria->where($alias . '.text', $comparator, $value);
 			}
 		});

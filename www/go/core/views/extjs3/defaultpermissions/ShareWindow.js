@@ -26,6 +26,9 @@ go.defaultpermissions.ShareWindow = Ext.extend(go.form.Dialog, {
 		this.getFooterToolbar().insert(0, new Ext.Button({
 			text: t('Add to all'),
 			handler: function () {
+
+				var me = this;
+
 				Ext.MessageBox.confirm(t("Confirm"), t("Are you sure you want to add the default groups to all items? WARNING: This can't be undone."), function (btn) {
 
 					if (btn !== "yes") {
@@ -34,31 +37,24 @@ go.defaultpermissions.ShareWindow = Ext.extend(go.form.Dialog, {
 
 					Ext.getBody().mask(t("Changing permissions..."));
 
-					this.submit(function (success, serverId) {
+					me.submit().then(function(serverId) {
 
-						if (!success) {
-							
-							tExt.getBody().unmask();
-							Ext.MessageBox.alert(t("Error"), t("Failed to save default permissions"));
-						}
-
-						go.Jmap.request({
+						return go.Jmap.request({
 							method: "Acl/reset",
 							params: {
 								add: true,
-								entity: this.forEntityStore
-							},
-							callback: function (options, success, response) {
-								Ext.getBody().unmask();
-								if (!success) {
-									Ext.MessageBox.alert(t("Error"), t("Failed to reset permissions"));
-								}
-							},
-							scope: this
+								entity: me.forEntityStore
+							}
 						});
-					}, this);
-
-				}, this);
+					}).catch(function(){
+						if (!success) {
+							Ext.getBody().unmask();
+							Ext.MessageBox.alert(t("Error"), t("Failed to save default permissions"));
+						}
+					}).finally(function(){
+						Ext.getBody().unmask();
+					});
+				});
 			},
 			scope: this
 		}));
@@ -66,6 +62,9 @@ go.defaultpermissions.ShareWindow = Ext.extend(go.form.Dialog, {
 		this.getFooterToolbar().insert(0, new Ext.Button({
 			text: t('Reset all'),
 			handler: function () {
+
+				var me = this;
+
 				Ext.MessageBox.confirm(t("Confirm"), t("Are you sure you want to reset all permissions? WARNING: This can't be undone."), function (btn) {
 
 					if (btn !== "yes") {
@@ -74,30 +73,24 @@ go.defaultpermissions.ShareWindow = Ext.extend(go.form.Dialog, {
 
 					Ext.getBody().mask("Changing permissions...");
 
-					this.submit(function (success, serverId) {
+					me.submit().then(function (serverId) {
 
+						return go.Jmap.request({
+							method: "Acl/reset",
+							params: {
+								add: false,
+								entity: me.forEntityStore
+							}
+						});
+					}).catch(function(){
 						if (!success) {
 							Ext.getBody().unmask();
 							Ext.MessageBox.alert(t("Error"), t("Failed to save default permissions"));
 						}
-
-
-						go.Jmap.request({
-							method: "Acl/reset",
-							params: {
-								add: false,
-								entity: this.forEntityStore
-							},
-							callback: function (options, success, response) {
-								Ext.getBody().unmask();
-								if (!success) {
-									Ext.MessageBox.alert(t("Error"), t("Failed to reset permissions"));
-								}
-							},
-							scope: this
-						});
-					}, this);
-				}, this);
+					}).finally(function(){
+						Ext.getBody().unmask();
+					})
+				})
 			},
 			scope: this
 		}));

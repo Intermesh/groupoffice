@@ -2703,7 +2703,7 @@ legacy;forms;Completed;Compleet;modules/forms/views/Extjs3/ExportDialog.js
 legacy;forms;"Only show not completed forms";"Toon alleen niet complete formulieren";modules/forms/views/Extjs3/ExportDialog.js
 legacy;forms;Fields;Velden;modules/forms/views/Extjs3/ExportDialog.js
 legacy;forms;"Add entire address book";;modules/forms/views/Extjs3/ExportDialog.js
-legacy;forms;"Are you sure that you want to add al the contacts from this addressbook?";"Weet u zeker dat u alle contacten uit dit adresboek toe wilt voegen?";modules/forms/views/Extjs3/ExportDialog.js
+legacy;forms;"Are you sure that you want to add all the contacts from this address book?";"Weet u zeker dat u alle contacten uit dit adresboek toe wilt voegen?";modules/forms/views/Extjs3/ExportDialog.js
 legacy;forms;"Please select a form below and choose what you want to export. After that click on Export to get the csv data.";"Selecteer een formulier in het onderstaande veld en kies wat u precies wilt exporteren. Klik daarna op Exporteren om de csv data te krijgen.";modules/forms/views/Extjs3/ExportDialog.js
 legacy;forms;"What do you want to export?";"Wat wilt u exporteren?";modules/forms/views/Extjs3/ExportDialog.js
 legacy;forms;"Export all";Alles;modules/forms/views/Extjs3/ExportDialog.js

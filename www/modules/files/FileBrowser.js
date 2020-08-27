@@ -170,7 +170,9 @@ GO.files.FileBrowser = function(config){
 
 
 	var fields ={
-		fields:['type_id', 'id','name','type', 'size', 'mtime', 'extension', 'timestamp', 'thumb_url','path','acl_id','locked_user_id','locked','folder_id','permission_level','readonly','unlock_allowed','handler', 'content_expire_date'].concat(go.customfields.CustomFields.getFieldDefinitions("File")),
+		fields:['type_id', 'id','name','type', 'size', 'mtime', 'extension', 'timestamp', 'thumb_url','path','acl_id','locked_user_id','locked','folder_id','permission_level','readonly','unlock_allowed','handler', 'content_expire_date']
+			.concat(go.customfields.CustomFields.getFieldDefinitions("File"))
+			.concat(go.customfields.CustomFields.getFieldDefinitions("Folder")),
 		columns:[{
 			id:'name',
 			header:t("Name"),
@@ -210,6 +212,7 @@ GO.files.FileBrowser = function(config){
 			dataIndex: 'id',
 			hidden: true
 		}].concat(go.customfields.CustomFields.getColumns("File"))
+			.concat(go.customfields.CustomFields.getColumns("Folder"))
 	};
 
 
@@ -1544,6 +1547,9 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 			var id = record.data.id;
 
 			if (!Ext.isEmpty(folderId)) {
+				if(record.data.name.lastIndexOf('/') > -1) {
+					record.data.name = String(record.data.name).split('/').reverse()[0];
+				}
 				files.push(record.data);
 			} else {
 				GO.email.openFolderTree(id);
@@ -1945,8 +1951,10 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 	
 	updateLocation : function(){
 		var activeNode = this.treePanel.getNodeById(this.folder_id);
-		
-		this.locationTextField.setValue(this.gridStore.reader.jsonData.path);
+
+		if(this.gridStore.reader.jsonData) {
+			this.locationTextField.setValue(this.gridStore.reader.jsonData.path);
+		}
 		
 		if(this.treePanel.getRootNode().findChild('id',this.gridStore.baseParams.folder_id)) {
 			this.upButton.setDisabled(true);

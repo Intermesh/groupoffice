@@ -58,5 +58,35 @@ go.data.GroupingStore = Ext.extend(Ext.data.GroupingStore, {
 		go.data.GroupingStore.superclass.destroy.call(this);
 		
 		this.fireEvent('destroy', this);
+	},
+
+	load: function(o) {
+		o = o || {};
+
+		var origCallback = o.callback, origScope = o.scope || this, me = this;
+
+		return new Promise(function(resolve, reject) {
+			o.callback = function(records, options, success) {
+				if(origCallback) {
+					origCallback.call(origScope, records, options, success);
+				}
+
+				if(success) {
+					resolve(records);
+				} else{
+					if(options.error.message == "unsupportedSort") {
+						return; //ignore.
+					}
+					//hack to pass error message from EntityStoreProxy to load callback
+					reject(options.error);
+				}
+			};
+
+			if(go.data.GroupingStore.superclass.load.call(me, o) === false) {
+				//beforeload handlers cancelled
+				//reject();
+			}
+
+		});
 	}
 });

@@ -73,12 +73,10 @@ class Note extends AclItemEntity {
 		return StringUtil::cutString($text, 200);
 	}
 
-	protected function getSearchName() {
+	public function title() {
 		return $this->name;
 	}
-	
 
-	
 	/**
 	 * Return columns to search on with the 'text' filter. {@see filter()}
 	 * 

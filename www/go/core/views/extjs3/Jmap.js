@@ -45,18 +45,28 @@ go.Jmap = {
 			method: 'community/dev/Debugger/get',
 			params: {},
 			callback: function(options, success, response, clientCallId) {
-
-				var r;
-				while(r = response.shift()) {
-					var method = r.shift();
-					r.push(clientCallId);
-					console[method].apply(null, r);
-				}
-
-			}
+				this.processDebugResponse(response, clientCallId);
+			},
+			scope: this
 		}).catch(function() {
 			//ignore error
 		});
+	},
+
+	processDebugResponse : function(response, clientCallId) {
+		var r;
+		while(r = response.shift()) {
+			var method = r.shift();
+			r.push(clientCallId);
+			//escape % for console.log
+			r = r.map(function(i) {
+				if(Ext.isString(i)) {
+					i = i.replace(/%/g, "%%");
+				}
+				return i;
+			});
+			console[method].apply(null, r);
+		}
 	},
 
 	abort: function (clientCallId) {
@@ -178,7 +188,11 @@ go.Jmap = {
 				},
 				items:[
 					{xtype:'progress',animate:true,itemId:'totalProgress', height:4,style:'margin: 7px 0'},
-					{xtype:'panel', itemId:'details',collapsed:false,forceLayout:true, collapsible:true, title:'Details'}
+					{xtype:'panel', itemId:'details',collapsed:false, animCollapse: false, forceLayout:true, collapsible:true, title:'Details', listeners: {
+							afterrender: function() {
+								this.collapse();
+							}
+						}}
 				],
 				tbar: [{xtype:'tbtext',itemId: 'fileCount', html:t('{finsished} of {total}')
 						.replace('{finsished}', 0)
@@ -193,11 +207,8 @@ go.Jmap = {
 					},
 					scope:this
 				}]
-			}, 'upload')
-			setTimeout(function() {
-				// the progress bars wont update anymore if they render collapsed
-				uploadNotification.items.get('details').collapse();
-			},200);
+
+			}, 'upload');
 		}
 
 		if(go.Notifier.notificationArea.collapsed) {
@@ -214,6 +225,8 @@ go.Jmap = {
 				title: t('Upload failed'),
 				html:'<b>'+file.name+'</b><p class="danger">' +t('File size exceeds the maximum of {max}.').replace('{max}', go.util.humanFileSize(this.capabilities.maxSizeUpload)) + '</p>'
 			});
+
+			uploadNotification.items.get('details').expand();
 
 			return;
 		}
@@ -305,6 +318,7 @@ go.Jmap = {
 				cfg.progress && cfg.progress.call(cfg.scope || this, e);
 			},
 			failure: function (response, options) {
+
 				var data = response,
 					title = response.isAbort ? t('Upload aborted') : t('Upload failed');
 				text = '<b>' + Ext.util.Format.htmlEncode(file.name) + '</b><p class="danger">';
@@ -322,6 +336,10 @@ go.Jmap = {
 				notifyEl.setTitle(title);
 				notifyEl.items.get(0).update(text);
 				cfg.failure && cfg.failure.call(cfg.scope || this, data);
+
+				uploadNotification.items.get('details').expand();
+				go.Jmap.uploaderCollapsed = false;
+
 			},
 			headers: {
 				'X-File-Name': "UTF-8''" + encodeURIComponent(file.name),
@@ -345,6 +363,7 @@ go.Jmap = {
 	 * @returns {Boolean}
 	 */
 	sse : function() {
+		// return;
 		try {
 			if (!window.EventSource) {
 				console.debug("Browser doesn't support EventSource");
@@ -386,21 +405,24 @@ go.Jmap = {
 					}
 				}
 			}, false);
+			//
+			// source.addEventListener('open', function(e) {
+			// 	// Connection was opened.
+			// 	console.log("SSE running");
+			// 	console.log(source);
+			// }, false);
 
-			source.addEventListener('open', function(e) {
-				// Connection was opened.
-			}, false);
-
-			source.addEventListener('error', function(e) {
-				if (e.readyState == EventSource.CLOSED) {
-					// Connection was closed.
-
-				} else
-				{
-					console.error(e);
-				}
-
-			}, false);
+			// source.addEventListener('error', function(e) {
+			// 	console.warn(source);
+			// 	if (source.readyState == EventSource.CLOSED) {
+			// 		// Connection was closed.
+			//
+			// 	} else
+			// 	{
+			// 		console.error(e);
+			// 	}
+			//
+			// }, false);
 		}
 		catch(e) {
 			console.error("Failed to start Server Sent Events. Perhaps the API URL in the system settings is invalid?", e);
@@ -429,12 +451,13 @@ go.Jmap = {
 
 		if (this.timeout) {
 			clearTimeout(this.timeout);
+			this.timeout = null;
 		}
 		
 		var promise = this.scheduleRequest(options);
 
 		if(!this.paused) {
-			this.continue();
+			this.delayedProcessQueue();
 		}
 		if(!options.callback) {
 			return promise;
@@ -458,9 +481,18 @@ go.Jmap = {
 	 * Pause request execution
 	 */
 	pause : function() {
+
+		// if(!GO.pauseCalls) {
+		// 	GO.pauseCalls = 1;
+		// } else {
+		// 	GO.pauseCalls++
+		// }
+		// console.trace("pause", GO.pauseCalls);
+
 		this.paused++;
 		if (this.timeout) {
 			clearTimeout(this.timeout);
+			this.timeout = null;
 		}
 	},
 
@@ -468,7 +500,15 @@ go.Jmap = {
 	 * Continue request event execution as the next macro task.
 	 */
 	continue: function() {
-		if(this.paused>0) {
+
+		// if(!GO.continueCalls) {
+		// 	GO.continueCalls = 1;
+		// } else {
+		// 	GO.continueCalls++
+		// }
+		// console.trace("continue", GO.continueCalls);
+
+		if(this.paused > 0) {
 			this.paused--;
 		}
 
@@ -476,6 +516,11 @@ go.Jmap = {
 		{
 			return;
 		}
+
+		this.delayedProcessQueue();
+	},
+
+	delayedProcessQueue : function() {
 		if (this.timeout) {
 			clearTimeout(this.timeout);
 		}
@@ -486,6 +531,8 @@ go.Jmap = {
 	},
 
 	processQueue: function () {
+
+		this.timeout = null;
 
 		if (!this.requests.length) {
 			//All requests aborted
@@ -567,7 +614,6 @@ go.Jmap = {
 		});
 
 		this.requests = [];
-		this.timeout = null;
 
 	}
 };

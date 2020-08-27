@@ -107,7 +107,7 @@ GO.GoToWeekDialog = function(config) {
 	};
 
 	config.layout = 'fit';
-	config.title = t("goToWeek", "projects");
+	config.title = t("Go to week", "projects");
 	config.modal = false;
 	config.width = 335;
 	config.height = 135;

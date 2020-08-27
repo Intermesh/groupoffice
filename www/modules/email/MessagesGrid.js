@@ -281,20 +281,7 @@ GO.email.MessagesGrid = function(config){
 		]
 	});
 
-	if(go.Modules.isAvailable("legacy", "gnupg")) {
-		this.settingsMenu.add('-');
-		this.settingsMenu.add({
-			iconCls:'gpg-btn-settings',
-			text:t("encryptionSettings", "gnupg"),
-			handler:function(){
-				if(!this.securityDialog) {
-					this.securityDialog = new GO.gnupg.SecurityDialog();
-				}
-				this.securityDialog.show();
-			},
-			scope:this
-		});
-	}
+
 	if(!config.hideSearch)
 		config.tbar = [];
 	
@@ -314,6 +301,7 @@ GO.email.MessagesGrid = function(config){
 		this.composerButton = new Ext.Button({
 			iconCls: 'ic-drafts',
 			text: t("Compose", "email"),
+			cls: 'primary',
 			handler: function(){
 				GO.email.showComposer({account_id: this.account_id});
 			},

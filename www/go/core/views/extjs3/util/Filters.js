@@ -9,22 +9,10 @@ go.util.Filters = {
 
 		var normalized = {};
 		filters.map(function (f) {
-			if (Ext.isObject(f)) {
-				f.name = f.name.toLowerCase();
-				normalized[f.name] = f;
-				if(!Ext.isDefined(normalized[f.name].wildcards)){
-					normalized[f.name].wildcards = normalized[f.name] == "string";
-				}
-			} else
-			{
-				var name = f.toLowerCase();
-				normalized[name] = {
-					name: name,
-					multiple: true,
-					type: "string",
-					title: t(name),
-					wildcards: true
-				};
+			f.name = f.name.toLowerCase();
+			normalized[f.name] = f;
+			if(!Ext.isDefined(normalized[f.name].wildcards)){
+				normalized[f.name].wildcards = normalized[f.name].type == "string" && f.name != 'text';
 			}
 		});
 		

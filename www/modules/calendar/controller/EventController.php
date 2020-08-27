@@ -22,14 +22,18 @@ namespace GO\Calendar\Controller;
 
 use GO\Base\Db\ActiveRecord;
 use GO\Base\Db\FindCriteria;
+use GO\Base\Fs\File;
 use GO\Calendar\Model\Event;
 use go\core\orm\EntityType;
+use GO\Email\Model\Account;
 
 class EventController extends \GO\Base\Controller\AbstractModelController {
 
 	protected $model = 'GO\Calendar\Model\Event';
 	
 	private $newParticipants;
+
+	private $removedParticipants;
 	
 	private $_uuidEvents = array();
 	
@@ -287,8 +291,11 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		
 		if($model->is_organizer){
 			//$model->sendMeetingRequest();
-			
-			if($model->hasOtherParticipants())// && isset($modifiedAttributes['start_time']))
+
+			if(!$isNewEvent && $this->removedParticipants) {
+				$response['askForMeetingRequest']=true;
+				$response['is_update']=true;
+			} elseif($model->hasOtherParticipants())// && isset($modifiedAttributes['start_time']))
 			{			
 				$response['isNewEvent']=$isNewEvent;
 				
@@ -325,6 +332,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		if ($this->newParticipants && count($allParticipantIds) > 1 && !$isNewEvent) {
 			$response['askForMeetingRequestForNewParticipants'] = true;
 		}
+
+
 		
 		$response['permission_level'] = $model->calendar->permissionLevel;
 		
@@ -402,6 +411,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 	private function _saveParticipants($params, \GO\Calendar\Model\Event $event, &$response) {
 		\GO::session()->values['new_participant_ids'] = array();
 		$this->newParticipants = false;
+		$this->removedParticipants = false;
 		$response['participants'] = array();
 		
 		$ids = array();
@@ -425,6 +435,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 						$participant->delete();
 						$participant = false;
 						$participantsIsUpdate = true;
+						$this->removedParticipants = true;
 					}
 					
 					if (!$participant){
@@ -474,6 +485,10 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 															->addCondition('event_id', $event->id)
 											)
 			);
+
+			if($stmt->rowCount()) {
+				$this->removedParticipants = true;
+			}
 			$stmt->callOnEach('delete');
 			
 			
@@ -1978,6 +1993,38 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		$response['data']['past_events']=$data['results'];
 		
 		return $response;
-	}	
+	}
+
+
+	public function actionLoadICS($params) {
+
+		$response = array( 'success' => true );
+
+
+		$account = Account::model()->findByPk($params['account_id']);
+		$imap = $account->openImapConnection($params['mailbox']);
+		$data = $imap->get_message_part_decoded($params['uid'], $params['number'], $params['encoding'], false, true, false);
+
+		$vcal = \GO\Base\VObject\Reader::read($data);
+
+		$vevents = $vcal->select("VEVENT");
+
+		$vevent = array_shift($vevents);
+
+		$event = new Event();
+		$event->importVObject( $vevent, array(), true);
+
+		$response['data'] = $event->getAttributes();
+		$response['data']['permission_level']=$event->getPermissionLevel();
+		$response['data']['write_permission']=true;
+		$response['data']['customFields'] = $event->getCustomFields();
+		$response['success'] = true;
+
+		$response = $this->_loadComboTexts($response, $event);
+
+		$this->afterLoad($response, $event, $params);
+
+		return $response;
+	}
 	
 }

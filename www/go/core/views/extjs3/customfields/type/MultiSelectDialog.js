@@ -8,6 +8,7 @@ go.customfields.type.MultiSelectDialog = Ext.extend(go.customfields.FieldDialog,
 
 
 		items.push({
+			columnWidth: 1,
 			xtype: "fieldset",
 			title: t("Options"),
 			items: [				
@@ -16,11 +17,15 @@ go.customfields.type.MultiSelectDialog = Ext.extend(go.customfields.FieldDialog,
 					fieldLabel: t("Options"),
 					itemCfg: {					
 						items: [{
-								hideLabel: true,
-								xtype: "textfield",
-								name: "text",
-								anchor: "100%"
-							}]
+							xtype: "hidden",
+							name: "id",
+							value: null
+						},{
+							hideLabel: true,
+							xtype: "textfield",
+							name: "text",
+							anchor: "100%"
+						}]
 					}
 				})
 			]

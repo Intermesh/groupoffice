@@ -19,7 +19,7 @@ function dbConnect($config){
 	}
 	try{		
 		$dsn = 'mysql:host=' . $config['db_host'] . ';port=' . $config['db_port'] . ';dbname=' . $config['db_name'];
-		$pdo = new PDO($dsn, $config['db_user'], $config['db_pass']);		
+		$pdo = new PDO($dsn, $config['db_user'], $config['db_pass']);
 	}
 	catch(Exception $e){
 		$dbConnectError = "Could not connect to the database. The database returned this error:<br />".$e->getMessage();
@@ -94,7 +94,7 @@ if($_SERVER['REQUEST_METHOD'] != 'POST')
 		$cFile = new \go\core\fs\File($configFile);
 		
 		if(!$cFile->putContents("<?php\n\n\$config = ".var_export($config, true) .";\n\n")) {
-			die("Could not write config.php");
+			$configError = "Could not write config.php";
 		} else
 		{
 			if(function_exists("opcache_invalidate")) {
@@ -117,7 +117,7 @@ require('header.php');
 		
 		<section>
 			<fieldset>
-				<h2>Config file</h2>
+				<h2><?= go()->t("Config file"); ?></h2>
 				<p class="error">Please create a writeable config.php file here: <?= $configFile; ?>.</p>
 			</fieldset>
 		</section>
@@ -163,7 +163,7 @@ require('header.php');
 				<h2>Configure the database</h2>
 				
 				<?php
-				if(!dbConnect($config)) {
+				if(isset($config['db_host']) && !dbConnect($config)) {
 					echo '<p class="error">'.$dbConnectError.'</p>';
 				}
 				?>
@@ -173,7 +173,7 @@ require('header.php');
 				</p>
 				<p>
 					<label>Database password</label>
-					<input type="password" name="dbPassword" value="<?=$_POST['dbPassword'];?>" required  />
+					<input type="password" name="dbPassword" value="<?=$_POST['dbPassword'] ?? "";?>" required  />
 				</p>
 				<p>
 					<label>Database name</label>
@@ -189,7 +189,7 @@ require('header.php');
 				</p>
 			</fieldset>
 
-			<button name="submitButton">Continue</button>
+			<button name="submitButton"><?= go()->t('Continue'); ?></button>
 			</form>
 		</section>
 

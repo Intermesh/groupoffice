@@ -61,7 +61,7 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 			bbar: [
 				this.forgotBtn = new Ext.Button({
 					cls: "go-login-forgot-username",
-					text: t("Forgot username?"),
+					text: t("Forgot login credentials?"),
 					handler: this.showForgot,
 					scope: this
 				}),

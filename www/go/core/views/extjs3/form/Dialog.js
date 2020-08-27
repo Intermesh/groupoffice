@@ -12,6 +12,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	autoScroll: true,
 	width: dp(500),
 	modal: true,
+	maximizable: !GO.util.isMobileOrTablet(),
 	entityStore: null,
 	currentId: null,
 	buttonAlign: 'left',
@@ -317,7 +318,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		return true;
 	},
 
-	submit: function (cb, scope) {
+	submit: function () {
 
 		//When form is submnitted with enter key the validation errors of the field having focus is not disabled if we
 		// don't give something else focus.
@@ -348,8 +349,11 @@ go.form.Dialog = Ext.extend(go.Window, {
 				me.entityStore.entity.goto(serverId);
 			}
 			me.close();
+			return serverId;
+
 		}).catch(function(error) {
 			me.showFirstInvalidField();
+			return error;
 		}).finally(function() {
 			me.actionComplete();
 		})
@@ -358,8 +362,10 @@ go.form.Dialog = Ext.extend(go.Window, {
 	showFirstInvalidField : function() {
 
 		var firstFieldWithError = this.formPanel.form.items.find(function(item) {
-			return !item.validate();
+			return item.isValid && !item.isValid(true);
 		});
+
+		console.log("Field with error", firstFieldWithError);
 
 		if(!firstFieldWithError) {
 			console.warn('A validation error occurred but no visible field with was error found.');

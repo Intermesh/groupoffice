@@ -54,9 +54,9 @@ Ext.extend(GO.calendar.SelectDateDialog, Ext.Window, {
 
 	show : function(event, isCopy, repeats, view_id)
 	{
-		if(!this.rendered)
+		if(!this.rendered) {
 			this.render(Ext.getBody());
-
+		}
 		this.event = event;
 
 		this.isCopy = (isCopy) ? true : false;
@@ -88,23 +88,19 @@ Ext.extend(GO.calendar.SelectDateDialog, Ext.Window, {
 		
 		var calendar_id = this.selectCalendar.getValue();
 		var update_calendar_id = (calendar_id != this.event.calendar_id) ? calendar_id : 0;
-		if(update_calendar_id)
-		{
+		if(update_calendar_id) {
 			this.event.calendar_id = this.formPanel.form.baseParams.update_calendar_id = update_calendar_id;
 		}
 		
 		this.formPanel.form.baseParams.id = this.event.event_id;
 			this.formPanel.form.baseParams.offset_days = this.offset;
 			
-		if(this.isCopy)
-		{
+		if(this.isCopy) {
 			this.formPanel.form.baseParams.duplicate = true;		
-		}else
-		{
+		} else {
 			delete this.formPanel.form.baseParams.duplicate;			
 			
-			if(this.event.repeats && !this.repeats)
-			{
+			if(this.event.repeats && !this.repeats) {
 				this.formPanel.form.baseParams.exception_for_event_id = this.event.event_id;
 				this.formPanel.form.baseParams.exception_date = this.event.startDate.format("U");
 			}
@@ -128,17 +124,16 @@ Ext.extend(GO.calendar.SelectDateDialog, Ext.Window, {
 
 				this.fireEvent('updateEvent', this, new_event_id, is_visible);
 				
-				if(this.isCopy)
-				{					
+				if(this.isCopy) {
 					delete(this.formPanel.form.baseParams.event_id);
 					delete(this.formPanel.form.baseParams.offset);
-				}else
-				{
+				} else {
+					GO.calendar.handleMeetingRequest(action.result);
+
 					delete(this.formPanel.form.baseParams.update_event_id);
 					delete(this.formPanel.form.baseParams.offsetDays);
 
-					if(this.formPanel.form.baseParams.repeats)
-					{
+					if(this.formPanel.form.baseParams.repeats) {
 						delete(this.formPanel.form.baseParams.repeats);
 						delete(this.formPanel.form.baseParams.createException);
 						delete(this.formPanel.form.baseParams.exceptionDate);

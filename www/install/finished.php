@@ -3,7 +3,7 @@ if($_SERVER['REQUEST_METHOD'] == "POST") {
 	header('Location: ../');
 	exit();	
 }
-
+require('../vendor/autoload.php');
 require('header.php');
 ?>
 
@@ -14,7 +14,7 @@ require('header.php');
 				<p>Thank you for installing Group-Office.</p>				
 		</fieldset>
 
-		<button name="submitButton" type="submit">Continue</button>
+		<button name="submitButton" type="submit"><?= go()->t('Continue'); ?></button>
 	</form>
 
 </section>

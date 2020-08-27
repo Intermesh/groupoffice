@@ -459,23 +459,25 @@ abstract class EntityController extends Controller {
 			$setIds = array_keys($result['updated']);
 		}
 		if(isset($result['created'])) {
-			$setIds = array_merge(array_map(function($mod) {return $mod['id'];}, $result['created']));
+			$setIds = array_merge(array_map(function($mod) {return $mod['id'];}, $result['created']), $setIds);
 		}
 
-		if(count(static::$updatedEntitities) > 1) {						
-			static::$updatedEntitities = array_filter(static::$updatedEntitities, function($id) use($setIds) {
-				return !in_array($id, $setIds);
-			}, ARRAY_FILTER_USE_KEY);
+		static::$updatedEntitities = array_filter(static::$updatedEntitities, function($id) use($setIds) {
+			return !in_array($id, $setIds);
+		}, ARRAY_FILTER_USE_KEY);
 
-			$result['updated'] = isset($result['updated']) ? array_replace($result['updated'], static::$updatedEntitities) : static::$updatedEntitities;
+		$result['updated'] = isset($result['updated']) ? array_replace($result['updated'], static::$updatedEntitities) : static::$updatedEntitities;
+		if(empty($result['updated'])) {
+			$result['updated'] = null;
 		}
-		if(count(static::$createdEntitities) > 1) {
 
-			static::$createdEntitities = array_filter(static::$createdEntitities, function($id) use($setIds) {
-				return !in_array($id, $setIds);
-			}, ARRAY_FILTER_USE_KEY);
+		static::$createdEntitities = array_filter(static::$createdEntitities, function($id) use($setIds) {
+			return !in_array($id, $setIds);
+		}, ARRAY_FILTER_USE_KEY);
 
-			$result['created'] = isset($result['created']) ? array_replace($result['created'], static::$createdEntitities) : static::$createdEntitities;
+		$result['created'] = isset($result['created']) ? array_replace($result['created'], static::$createdEntitities) : static::$createdEntitities;
+		if(empty($result['created'])) {
+			$result['created'] = null;
 		}
 	}
 
@@ -541,6 +543,12 @@ abstract class EntityController extends Controller {
 			}
 
 			if ($entity->save()) {
+
+				//refetch from server when mapping has a query object.
+				if($entity::getMapping()->getQuery() != null) {
+					$entity = $this->getEntity($entity->id());
+				}
+
 				$entityProps = new ArrayObject($entity->toArray());
 				$diff = $entityProps->diff($properties);
 				$diff['id'] = $entity->id();
@@ -627,6 +635,11 @@ abstract class EntityController extends Controller {
 				$result['notUpdated'][$id]->properties = array_keys($entity->getValidationErrors());
 				$result['notUpdated'][$id]->validationErrors = $entity->getValidationErrors();				
 				continue;
+			}
+
+			//refetch from server when mapping has a query object.
+			if($entity::getMapping()->getQuery() != null) {
+				$entity = $this->getEntity($id);
 			}
 			
 			//The server must return all properties that were changed during a create or update operation for the JMAP spec
@@ -794,7 +807,7 @@ abstract class EntityController extends Controller {
     $response = $converter->importFile($file, $this->entityClass(), $params);
 		
 		if(!$response) {
-			throw new Exception("Invalid response from import convertor");
+			throw new Exception("Invalid response from import converter");
 		}
 		
 		return $response;
@@ -875,7 +888,7 @@ abstract class EntityController extends Controller {
 		
 		$blob = $convertor->exportToBlob($name, $entities);
 		
-		return ['blobId' => $blob->id];		
+		return ['blobId' => $blob->id, 'blob' => $blob->toArray()];
 	}
 
   /**

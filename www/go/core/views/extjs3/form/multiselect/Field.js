@@ -211,6 +211,10 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 	validate : function() {
 		return true;
 	},
+
+	isValid: function(preventMark) {
+		return true;
+	},
 	
 	getIds : function() {
 		var records = this.store.getRange(), v = [];

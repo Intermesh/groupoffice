@@ -502,7 +502,7 @@ Copyright (c) 2003-{current_year}, {company_name}<br/>
   ),
   'Dear Mr' => 'Уважаеми г-н',
   'Dear Ms' => 'Уважаема г-жа',
-  'Dear Mr / Ms' => 'Уважаеми г-жа/г-не',
+  'Dear sir/madam' => 'Уважаеми г-жа/г-не',
   'Dear' => 'Уважаеми',
   'Mins' => 'Минути',
   'hour' => 'час',

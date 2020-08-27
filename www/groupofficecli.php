@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 $root = dirname(__FILE__) . '/';
 //chdir($root);

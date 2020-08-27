@@ -5,6 +5,7 @@ use go\core\http\Response;
 use go\core;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
+use go\core\webclient\CSP;
 use go\modules\community\addressbook\convert\VCard;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\UserSettings;
@@ -44,6 +45,9 @@ class Module extends core\Module {
 	
 	public function downloadVCard($contactId) {
 		$contact = Contact::findById($contactId);
+		if(!$contact->getPermissionLevel()) {
+			throw new core\exception\Forbidden();
+		}
 		
 		$c = new VCard();
 		

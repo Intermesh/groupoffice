@@ -17,6 +17,11 @@ require("../vendor/autoload.php");
 //Create the app with the database connection
 App::get()->setAuthState(new State());
 
+if(!App::get()->setAuthState(new State())->getAuthState()->isAuthenticated()) {
+	http_response_code(403);
+	exit("Unauthorized.");
+}
+
 //for servers with session.autostart
 @session_write_close();
 
@@ -68,7 +73,7 @@ $query = new Query();
 //Client may specify 
 if(isset($_GET['types'])) {
 	$entityNames = explode(",", $_GET['types']);
-	$query->where('e.name', 'IN', $entityNames);
+	$query->where('e.clientName', 'IN', $entityNames);
 }
 $entities = EntityType::findAll($query);
 $map = [];

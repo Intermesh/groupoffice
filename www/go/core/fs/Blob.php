@@ -338,8 +338,8 @@ class Blob extends orm\Entity {
 	}
 
 	static function buildPath($id) {
-		$dir = substr($id,0,2) . '/' .substr($id,2,2). '/';
-		return go()->getDataFolder()->getPath() . '/data/'.$dir.$id;
+		$dir = substr($id,0,2) . DIRECTORY_SEPARATOR .substr($id,2,2). DIRECTORY_SEPARATOR;
+		return go()->getDataFolder()->getPath() . DIRECTORY_SEPARATOR . 'data'. DIRECTORY_SEPARATOR . $dir . $id;
 	}
 
 	/**

@@ -7,6 +7,7 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 	findBy: false,
 	customfield: null,
 	allowBlank: true,
+	collapseOnSelect: true,
 	//height: dp(36),
 	getName : function() {
 		return this.name;
@@ -56,7 +57,7 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 		return {
 			submit: false,
 			anchor: "100%",
-			xtype: 'combo',
+			xtype: 'gocombo',
 			store: store,
 			valueField: 'id',
 			displayField: 'text',
@@ -68,9 +69,15 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 			hideLabel: true,
 			listeners: {
 				scope: this,
-				select: this.onSelect
+				select: this.onSelect,
+				beforeselect: this.onBeforeSelect,
+				change: this.onChange
 			}
 		};
+	},
+
+	onChange: function() {
+		this.fireEvent('change', this, this.getValue());
 	},
 	
 	reset:function() {
@@ -80,6 +87,11 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 	  return this;
 	},
 
+	onBeforeSelect : function(field, record) {
+		if(go.util.empty(record.json.children) && !this.collapseOnSelect) {
+			field.collapseOnSelect = false;
+		}
+	},
 	onSelect : function(field, record) {
 		var index = this.items.indexOf(field), nextIndex = index + 1;
 
@@ -93,7 +105,7 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 		if(!go.util.empty(record.json.children)) {			
 			this.add(this.createCombo(record.json.children));
 		} else {
-			this.fireEvent('select', record);
+			this.fireEvent('select', this, record);
 		}
 		
 		this.doLayout();
@@ -135,6 +147,20 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 		
 		return go.util.empty(v) ? null : v;
 	},
+
+	getRawValue : function() {
+		if(!this.items || !this.items.length) {
+			return null;
+		}
+		var v = this.items.last().getRawValue();
+
+		if(!v && this.items.getCount() > 1){
+			v = this.items.itemAt(this.items.getCount() -2).getRawValue();
+		}
+
+		return go.util.empty(v) ? null : v;
+	},
+
 	markInvalid: function (msg) {
 		this.items.each(function(i) {			
 			i.markInvalid(msg);
@@ -144,6 +170,19 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 		this.items.each(function(i) {
 			i.clearInvalid();
 		});
+	},
+
+	isValid : function(preventMark){
+		if(this.disabled){
+			return true;
+		}
+		var f = this.items.items;
+		for(var i = 0, l = f.length; i < l; i++) {
+			if(f[i].isFormField && !f[i].isValid(preventMark)) {
+				return false;
+			}
+		}
+		return true;
 	},
 
 	validate: function () {

@@ -11,6 +11,19 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 	minChars : 3,
 
+	collapseOnSelect: true,
+
+	// private
+	onSelect : function(record, index){
+		if(this.fireEvent('beforeselect', this, record, index) !== false){
+			this.setValue(record.data[this.valueField || this.displayField]);
+			if(this.collapseOnSelect) {
+				this.collapse();
+			}
+			this.fireEvent('select', this, record, index);
+		}
+	},
+
 	initComponent: function() {
 		go.form.ComboBox.superclass.initComponent.call(this);
 
@@ -44,10 +57,17 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 				me.value = value;
 
 				me.resolveEntity(value).then(function (entity) {
+					//this prevents the list to expand on loading the value
+					var origHasFocus = me.hasFocus;
+
 					me.store.on("load", function() {
-						resolve(me);
 						go.form.ComboBox.superclass.setValue.call(me, value);
+
+						me.hasFocus = origHasFocus;
+						resolve(me);
 					}, me, {single: true});
+
+					me.hasFocus = false;
 					me.store.loadData({records:[entity]}, true);
 
 				}).catch(function(e) {

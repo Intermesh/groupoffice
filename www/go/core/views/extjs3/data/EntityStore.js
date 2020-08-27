@@ -11,9 +11,14 @@
  * It will pass:
  * 
  * store: the entity store
- * added: int[]|string[] array of ids's
- * changed: int[]|string[] array of ids's
- * detroyed: int[]|string[] array of ids's
+ * added: Object Entity object mapped by ID
+ * changed: Object Entity object mapped by ID
+ * destroyed: int[]|string[] array of ids's
+ *
+ * Do not instantiate directly use:
+ *
+ * @example
+ * go.Db.store("User").query();
  * 
  */
 go.data.EntityStore = Ext.extend(Ext.util.Observable, {
@@ -24,6 +29,9 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	
 	notFound: null,
 
+	/**
+	 * @var {go.Entity}
+	 */
 	entity: null,	
 	
 	changes : null,
@@ -116,7 +124,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		});
 
 		return me.initialized;
-		
+
 	},
 
 	/**
@@ -317,7 +325,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					}
 				}
 			}).then(function(response) {
-				if(!response.list) {
+				if(go.util.empty(response.list)) {
 					console.warn("No items in response: ", response);
 					return;
 				}
@@ -515,6 +523,14 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				return me.setState(response.state).then(function() {
 					return response;
 				});
+			}).catch(function(response) {
+				for(var i = 0, l = response.options.params.ids.length; i < l; i++) {
+					var id = response.options.params.ids[i];
+
+					delete me.pending[id];
+					me.scheduledPromises[id].reject(response);
+					delete me.scheduledPromises[id];
+				}
 			});
 
 			me.scheduled = [];
@@ -524,12 +540,18 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 	_getSingleFromBrowserStorage : function(id) {
 		var me = this;
+
+		// check if we already fetched it.
+		if(me.data[id]) {
+			return Promise.resolve(go.util.clone(me.data[id]));
+		}
 		
 		//Pause JMAP requests because indexeddb events will trigger the queue
 		go.Jmap.pause();
+
 		this.pauseGet();
 		return me.initState().then(function() {			
-			return me.stateStore.getItem(id + "").then(function(entity) {		
+			return me.stateStore.getItem(id + "").then(function(entity) {
 				if(!entity) {
 					return null;
 				}				
@@ -537,8 +559,8 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				me.data[id] = entity;
 				return go.util.clone(entity);
 			});
-		}).finally(function(){			
-			//continueGet JMAP
+		}).finally(function(){
+
 			go.Jmap.continue();
 			me.continueGet();
 		});
@@ -783,7 +805,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					cb.call(scope || me, error.options, false, error);
 				}
 
-				return error;
+				return Promise.reject(error);
 			})
 		});
 	},

@@ -29,7 +29,10 @@ Ext.namespace('go.toolbar');
 Ext.namespace('go.filter');
 Ext.namespace('go.chart');
 Ext.ns("go.filter.types");
+Ext.ns("go.filter.variabletypes");
 Ext.ns("go.customfields.filter");
+
 Ext.ns('go.import');
 Ext.ns('go.smtp');
 Ext.ns('go.emailtemplate');
+Ext.ns('go.oauth');

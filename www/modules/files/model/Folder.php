@@ -1475,10 +1475,11 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param \go\core\orm\Entity $entity
+	 * @param bool $saveToEntity
 	 * @return self
-	 * @throws \Exception
+	 * @throws GO\Base\Exception\AccessDenied
 	 */
 	public function findForEntity(\go\core\orm\Entity $entity, $saveToEntity = true) {
 
@@ -1492,11 +1493,12 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 				$newFolder = $this->mergeEntityFolders($folder, $existingPath, $filesPath);
 				$newFolder->visible = 0;
 				$newFolder->readonly = 1;
-				$newFolder->acl_id = $entity->findAclId();
+				$newFolder->acl_id = $entity->filesFolderAclId();
 				$newFolder->save(true);
 
+				$entity->filesFolderId = $newFolder->id;
+
 				if($saveToEntity) {
-					$entity->filesFolderId = $newFolder->id;
 					$entity->save();
 				}
 
@@ -1507,8 +1509,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		}
 
 		
-		$aclId =$entity->findAclId();
-		$folder = \GO\Files\Model\Folder::model()->findByPath($filesPath,true, array('acl_id'=>$aclId,'readonly'=>1));
+		$aclId = $entity->filesFolderAclId();
+		$folder = \GO\Files\Model\Folder::model()->findByPath($filesPath,true, array('readonly'=>1));
 
 		if(!$folder){
 			throw new \Exception("Failed to create folder ".$filesPath);
@@ -1524,7 +1526,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		$folder->save(true);
 
 		$entity->filesFolderId = $folder->id;
-		if(!$entity->save()) {
+		if($saveToEntity && !$entity->save()) {
 			throw new \Exception("Could not save entity!");
 		}
 		

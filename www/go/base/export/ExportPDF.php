@@ -85,7 +85,9 @@ class ExportPDF extends AbstractExport {
 		$pdf->SetAuthor($this->title);
 		$pdf->SetCreator($this->title);
 		$pdf->SetKeywords($this->title);
-		$pdf->subtitle = $this->params['name'];
+		if(isset($this->params['name'])) {
+			$pdf->subtitle = $this->params['name'];
+		}
 		
 
 		$pdf->AddPage();

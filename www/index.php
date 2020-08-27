@@ -4,6 +4,7 @@ use go\core\model\Token;
 use go\core\http\Request;
 use go\core\ErrorHandler;
 
+use go\core\http\Response;
 /**
  * Copyright Intermesh
  *
@@ -31,9 +32,9 @@ function errorHander($e) {
 
 		if(go()->getDebugger()->enabled) {
 
-			echo "Showing error message because debug is enabled. Normally we would have redirected to install. I you're doing a freah install and your database is empty then you can safely ignore this.:\n\n";
+			echo "DEBUGGER: Showing error message because debug is enabled. Normally we would have redirected to install. I you're doing a freah install and your database is empty then you can safely ignore this.:<br /><br />";
 			echo $msg;
-			echo '<a href="/install">Click here to launch the installer</a>';
+			echo '<br /><br /><a href="install">Click here to launch the installer</a>';
 			exit();
 		}
 
@@ -75,14 +76,22 @@ try {
 	//check if GO is installed
 	if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){	
 		
-		if(GO::user() && isset($_SESSION['GO_SESSION']['after_login_url'])){
-			$url = GO::session()->values['after_login_url'];
-			unset(GO::session()->values['after_login_url']);
-			header('Location: '.$url);
-			exit();
-		}
-		
+//		if(GO::user() && isset($_SESSION['GO_SESSION']['after_login_url'])){
+//			$url = GO::session()->values['after_login_url'];
+//			unset(GO::session()->values['after_login_url']);
+//			header('Location: '.$url);
+//			exit();
+//		}
+
+		Response::get()->sendHeaders();
+
 		if(go()->getSettings()->databaseVersion != go()->getVersion()) {
+
+			if(go()->getDebugger()->enabled) {
+				echo "DEBUGGER: Version mismatch. Database version = ". go()->getSettings()->databaseVersion .", Application version: " . go()->getVersion() .".<br /><br />";
+				echo '<a href="install/upgrade.php">Click here to launch the upgrade</a>';
+				exit();
+			}
 			header('Location: '.GO::config()->host.'install/upgrade.php');				
 			exit();
 		}
@@ -94,5 +103,8 @@ try {
   errorHander($e);  
 }
 
+
+
+go()->fireEvent(\go\core\App::EVENT_INDEX);
 
 GO::router()->runController();

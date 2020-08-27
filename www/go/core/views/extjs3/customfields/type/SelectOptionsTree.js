@@ -7,13 +7,11 @@ go.customfields.type.SelectOptionsTree = function(config){
 	Ext.apply(config, {
 		animate:false,
 		enableDrag:true,
-		autoScroll: true
+		autoScroll: true,
+		title:  t("Options")
 	});
 
-	config.tbar=[{
-		xtype: "tbtitle",
-		text: t("Options"),
-	}, '->',{
+	config.bbar=[ '->',{
 		iconCls: 'ic-add',
 		handler:function(){
 			var node = this.selModel.getSelectedNode();
@@ -136,6 +134,9 @@ Ext.extend(go.customfields.type.SelectOptionsTree, Ext.tree.TreePanel, {
 	clearInvalid: function () {
 		this.getEl().removeClass('x-form-invalid');
 		Ext.form.MessageTargets.qtip.clear(this);
+	},
+	isValid : function(preventMark){
+		return true;
 	},
 	validate : function() {
 		return true;

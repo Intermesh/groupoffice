@@ -9,6 +9,7 @@ class NoteBook extends AclOwnerEntity {
 	public $id;
 	public $createdBy;
 	public $name;
+	public $filesFolderId;
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()

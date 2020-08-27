@@ -8,7 +8,6 @@ go.Modules.register("community", 'notes', {
 
 	entities: [{
 		name: "Note",
-		hasFiles: true,
 		relations: {
 			creator: { store: "User", fk: "createdBy" },
 			modifier: { store: "User", fk: "createdBy" }

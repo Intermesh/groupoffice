@@ -99,6 +99,9 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 	validate: function () {
 		return true;
 	},
+	isValid: function () {
+		return true;
+	},
 
 	reset : function() {
 		this.setValue([]);

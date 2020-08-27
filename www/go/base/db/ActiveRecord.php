@@ -1246,7 +1246,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if(empty($params['userId'])){
 			$params['userId']=!empty(GO::session()->values['user_id']) ? GO::session()->values['user_id'] : 1;
 		}
-		
+
 		if($this->aclField() && (empty($params['ignoreAcl']) || !empty($params['joinAclFieldTable']))){
 			$aclJoinProps = $this->_getAclJoinProps();
 
@@ -1275,8 +1275,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 //		$select .= "SQL_NO_CACHE ";
-		
-		
+
+
 
 		if(empty($params['fields']))
 			$params['fields']=$this->getDefaultFindSelectFields(isset($params['limit']) && $params['limit']==1);
@@ -1350,21 +1350,21 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 		}
 
-		
+
 		$joinCf = !empty($params['joinCustomFields']) && $this->hasCustomFields();
 
 		if($joinCf) {
 			$cfFieldModels = array_filter(static::getCustomFieldModels(), function($f) {
 				return $f->getDataType()->hasColumn();
 			});
-			
+
 			$names = array_map(function($f) {
 				if(empty($f->databaseName)) {
 					throw new Exception("Custom field ". $f->id ." has no databaseName");
 				}
 				return "cf." . $f->databaseName;
 			}, $cfFieldModels);
-			
+
 			if(!empty($names)) {
 				$fields .= ", " .implode(', ', $names);
 			}
@@ -1812,8 +1812,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		//throw new \Exception('Error: you supplied a searchQuery parameter to find but getFindSearchQueryParamFields() should be overriden in '.$this->className());
 		$fields = array();
 		foreach($this->columns as $field=>$attributes){
-			
-			if($field != 'uuid'){ 
+
+			if($field != 'uuid'){
 				if(isset($attributes['gotype']) && ($attributes['gotype']=='textfield' || ($attributes['gotype']=='customfield' && $attributes['customfield']->customfieldtype->includeInSearches()))){
 					$fields[]='`'.$prefixTable.'`.`'.$field.'`';
 				}
@@ -4224,7 +4224,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	public function resolveAttribute($path, $outputType='raw'){
 		
 		if(substr($path, 0, 13) === 'customFields.') { 
-			$cf = $this->getCustomFields();
+			$cf = $this->getCustomFields($outputType === 'formatted');
 			return $cf[substr($path, 13)] ?? null;
 		}
 		
@@ -4762,17 +4762,18 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		echo "Checking ".(is_array($this->pk)?implode(',',$this->pk):$this->pk)." ".$this->className()."\n";
 		flush();
 
-		if($this->aclField() && (!$this->isJoinedAclField || $this instanceof GO\Files\Model\Folder)){
-
-			$acl = $this->acl;
-			if(!$acl)
-				$this->setNewAcl();
-			else
-			{
-				$user_id = empty($this->user_id) ? 1 : $this->user_id;
-				$acl->ownedBy=$user_id;
-				$acl->usedIn=$this->tableName().'.'.$this->aclField();
-				$acl->save();
+		if($this->aclField() && (!$this->isJoinedAclField || $this instanceof \GO\Files\Model\Folder)) {
+			if (!($this instanceof \GO\Files\Model\Folder) || (!$this->readonly && $this->acl_id > 0)) {
+				$acl = $this->acl;
+				if (!$acl)
+					$this->setNewAcl();
+				else {
+					$user_id = empty($this->user_id) ? 1 : $this->user_id;
+					$acl->ownedBy = $user_id;
+					$acl->usedIn = $this->tableName() . '.' . $this->aclField();
+					if($acl->isModified())
+						$acl->save();
+				}
 			}
 		}
 
@@ -4805,10 +4806,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 
-	public function rebuildSearchCache() {		
-		
-		
-				
+	public function rebuildSearchCache() {
+
+
+
 		$rc = new \GO\Base\Util\ReflectionClass($this);
 		$overriddenMethods = $rc->getOverriddenMethods();
 		if(in_array("getCacheAttributes", $overriddenMethods)){

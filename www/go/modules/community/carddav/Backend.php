@@ -62,9 +62,12 @@ class Backend extends AbstractBackend {
 		$blob = \go\core\fs\Blob::fromString($cardData);
 		$blob->type = 'text/vcard';
 		$blob->name = $contact->getUri();
+		if(empty($blob->name)) {
+			$blob->name = 'nouid.vcf';
+		}
 		$blob->modifiedAt = $contact->modifiedAt;
 		if(!$blob->save()) {
-			throw new \Exception("could not save vcard blob");
+			throw new \Exception("could not save vcard blob for contact '" . $contact->id() . "'. Validation error: " . $blob->getValidationErrorsAsString());
 		}
 		
 		if(isset($contact->vcardBlobId)) {
@@ -177,7 +180,7 @@ class Backend extends AbstractBackend {
 		}
 	}
 
-	public function getCards($addressbookId): array {
+	public function getCards($addressbookId) {
 		$addressbook = AddressBook::findById($addressbookId);
 		if(!$addressbook) {
 			throw new NotFound();
@@ -189,10 +192,12 @@ class Backend extends AbstractBackend {
 		
 		$this->generateCards($addressbookId);		
 		
-		return go()->getDbConnection()->select('c.uri, UNIX_TIMESTAMP(c.modifiedAt) as lastmodified, CONCAT(\'"\', vcardBlobId, \'"\') AS etag, b.size')
+		$contacts = go()->getDbConnection()->select('c.uri, UNIX_TIMESTAMP(c.modifiedAt) as lastmodified, CONCAT(\'"\', vcardBlobId, \'"\') AS etag, b.size')
 						->from('addressbook_contact', 'c')
 						->join('core_blob', 'b', 'c.vcardBlobId = b.id')
-						->where('c.addressBookId', '=', $addressbookId)->all();
+						->where('c.addressBookId', '=', $addressbookId);
+
+		return $contacts->all();
 	}
 	
 

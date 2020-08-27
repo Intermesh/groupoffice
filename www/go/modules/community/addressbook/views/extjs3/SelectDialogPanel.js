@@ -2,7 +2,7 @@
 
 go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 	
-	layout: "responsive",
+	layout: "border",
 	mode: "email", // or "id" in the future "phone" or "address"	
 	entityName:  "Contact",
 	title: t("Address Book"),
@@ -44,9 +44,9 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 					xtype: "fieldset",
 					items: [this.searchField]
 				}]
-		});	
-		
-		this.items = [search, this.grid, this.sidePanel];
+		});
+
+		this.items = [search, {xtype:'panel',layout:'responsive',region:'center', items:[this.grid,  this.sidePanel]}];
 		
 		this.grid.getSelectionModel().singleSelect = this.singleSelect;		
 		
@@ -191,15 +191,8 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 				},
 				'->',
 				{
-					xtype: "button",
-					iconCls: "ic-add",
-					handler: function() {
-						var dlg = new go.filter.FilterDialog({
-							entity: "Contact"
-						});
-						dlg.show();
-					},
-					scope: this
+					xtype: 'filteraddbutton',
+					entity: 'Contact'
 				}
 			],
 			items: [
@@ -207,10 +200,16 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 				
 				{xtype: "box", autoEl: "hr"},
 
-				this.filterGrid = new go.filter.FilterGrid({
+				{
+					xtype: 'filtergrid',
 					filterStore: this.grid.store,
 					entity: "Contact"
-				})
+				},
+				{
+					xtype: 'variablefilterpanel',
+					filterStore: this.grid.store,
+					entity: "Contact"
+				}
 			]
 		});
 	},
