@@ -57,10 +57,17 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 				me.value = value;
 
 				me.resolveEntity(value).then(function (entity) {
+					//this prevents the list to expand on loading the value
+					var origHasFocus = me.hasFocus;
+
 					me.store.on("load", function() {
-						resolve(me);
 						go.form.ComboBox.superclass.setValue.call(me, value);
+
+						me.hasFocus = origHasFocus;
+						resolve(me);
 					}, me, {single: true});
+
+					me.hasFocus = false;
 					me.store.loadData({records:[entity]}, true);
 
 				}).catch(function(e) {
