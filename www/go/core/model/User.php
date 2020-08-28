@@ -927,34 +927,38 @@ class User extends Entity {
 
 
 	/**
-	 * Archive a user - remove all shares instead of with admins only
+	 * Archive a user - remove all shares instead of with admins only.
+	 *
+	 * If a user is archived, any shares with themselves and non-admin users are deleted.Please note that we only do
+	 * this for community items. It is not entirely certain for other objects if they should be archived.
+	 *
 	 * @param bool $doArchive
 	 */
-	private function archiveUser(bool $doArchive=false)
+	private function archiveUser(bool $doArchive = false)
 	{
 		$userId = $this->id;
 
 		// Admins should not be able to be archived!
-		if(! $doArchive || $userId === go()->getUserId() || $this->isAdmin()) {
+		if (!$doArchive || $userId === go()->getUserId() || $this->isAdmin()) {
 			return;
 		}
 		$aclIds = [];
 
-		if($defAddressBookId = $this->addressBookSettings->getDefaultAddressBookId()) {
+		if ($defAddressBookId = $this->addressBookSettings->getDefaultAddressBookId()) {
 			$aclIds[] = \go\modules\community\addressbook\model\AddressBook::findById($defAddressBookId)->findAclId();
 		};
-		if($defNoteBookId = $this->notesSettings->getDefaultNoteBookId()) {
+		if ($defNoteBookId = $this->notesSettings->getDefaultNoteBookId()) {
 			$aclIds[] = \go\modules\community\notes\model\NoteBook::findById($defNoteBookId)->findAclId();
 		}
-		if($defTaskListId = $this->taskSettings->default_tasklist_id) {
+		if ($defTaskListId = $this->taskSettings->default_tasklist_id) {
 			$aclIds[] = \GO\Tasks\Model\Tasklist::model()->findByPk($defTaskListId)->findAclId();
 		}
-		if($calendarId = $this->calendarSettings->calendar_id) {
+		if ($calendarId = $this->calendarSettings->calendar_id) {
 			$aclIds[] = \GO\Calendar\Model\Calendar::model()->findByPk($calendarId)->findAclId();
 		}
 		$grpId = $this->getPersonalGroup()->id();
-		foreach(Acl::findByIds($aclIds) as $rec) {
-			foreach($rec->groups as $aclGrp) {
+		foreach (Acl::findByIds($aclIds) as $rec) {
+			foreach ($rec->groups as $aclGrp) {
 				if (!in_array($aclGrp->groupId, [Group::ID_ADMINS, $grpId])) {
 					$rec->removeGroup($aclGrp->groupId);
 				}
