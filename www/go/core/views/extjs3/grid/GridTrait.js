@@ -173,6 +173,11 @@ go.grid.GridTrait = {
 	},
 	
 	initCustomFields : function() {
+
+		if(Ext.isObject(this.store) && !this.store.events) {
+			this.store = Ext.create(this.store, 'store');
+		}
+
 		if (!this.columns || !this.store || !this.store.entityStore || !this.store.entityStore.entity.customFields) {
 			return;
 		}
