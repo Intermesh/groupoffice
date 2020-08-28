@@ -271,7 +271,6 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					},
 					"-"
 					,{
-						/* TODO: Hide when already disabled */
 						itemId: "archive",
 						iconCls: "ic-archive",
 						text: t("Archive user"),
@@ -298,13 +297,6 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 										if (response.notUpdated && response.notUpdated[id] && response.notUpdated[id].validationErrors && response.notUpdated[id].validationErrors.currentPassword) {
 											Ext.MessageBox.alert(t('Error'), t('Error while saving the data'));
 											return;
-										}
-
-										if (response.updated && id in response.updated) {
-											// TODO: JMAP (?) function to update ACLs and ownership
-
-											// 	me.store.reload()
-											// this.submitComplete(response);
 										}
 									});
 								});
@@ -365,8 +357,15 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				});
 			}
 		}
-		
-		
+
+		var archiveItm  = this.moreMenu.find('itemId','archive'), loginItm = this.moreMenu.find('itemId', 'loginAs');
+		if(archiveItm.length > 0) {
+			archiveItm[0].setDisabled(!record.data.enabled);
+		}
+		if(loginItm.length > 0 ) {
+			loginItm[0].setDisabled(!record.data.enabled);
+		}
+
 		this.moreMenu.record = record;
 		
 		this.moreMenu.showAt(e.getXY());
