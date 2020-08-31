@@ -1,3 +1,5 @@
+- Core: Support --debug flag for cli.php
+
 27-08-2020 6.4.165
 - Time registration: fixed Firefox bug in Timesheet
 - Email: Workaround if message has invalid From header
