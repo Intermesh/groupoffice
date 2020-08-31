@@ -5,6 +5,7 @@
 - Projects: Sometimes PDF report didn't render if page break occurred on table header.
 - CustomFields: fixed refresh bug on conditionally hidden field.
 - Address book: dialog failed to open without manage permisions for tickets module (if installed)
+- Calender: Bug changing "this and future events" #202021084 (was broken in 6.4)
 
 27-08-2020 6.4.165
 - Time registration: fixed Firefox bug in Timesheet

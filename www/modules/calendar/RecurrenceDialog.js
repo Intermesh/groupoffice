@@ -34,7 +34,7 @@ GO.calendar.RecurrenceDialog = function(config){
 		},
 		scope: this
 	},this.thisAndFutureButton = new Ext.Button({
-		text: text: t("This and future", "calendar"),
+		text: t("This and future", "calendar"),
 		handler: function()
 		{
 			this.fireEvent('thisandfuture', this);
