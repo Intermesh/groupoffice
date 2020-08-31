@@ -4,6 +4,7 @@
 - Core: New feature to "Archive" users.
 - Projects: Sometimes PDF report didn't render if page break occurred on table header.
 - CustomFields: fixed refresh bug on conditionally hidden field.
+- Address book: dialog failed to open without manage permisions for tickets module (if installed)
 
 27-08-2020 6.4.165
 - Time registration: fixed Firefox bug in Timesheet
