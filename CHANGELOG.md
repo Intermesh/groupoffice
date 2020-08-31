@@ -1,4 +1,5 @@
 - Core: Support --debug flag for cli.php
+- ldapauth: group member sync for ActiveDirectory broken
 
 27-08-2020 6.4.165
 - Time registration: fixed Firefox bug in Timesheet
