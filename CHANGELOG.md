@@ -1,3 +1,7 @@
+- Calendar: Month by date recurrence will turn into Month by day when re-opened.
+- Timeregistration shows html tags when editing an entry with newline characters
+- Customfields: Multiselect customfield had a very small list width
+- Newsletter: Separated User list and Contact list in the Person select dialog for the Email composer.
 - Core: Support --debug flag for cli.php
 - ldapauth: group member sync for ActiveDirectory broken
 - projects: fixed error when you didn't have access to the contacts linked to projects
