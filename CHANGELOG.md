@@ -3,6 +3,7 @@
 - projects: fixed error when you didn't have access to the contacts linked to projects
 - Core: New feature to "Archive" users.
 - Projects: Sometimes PDF report didn't render if page break occurred on table header.
+- CustomFields: fixed refresh bug on conditionally hidden field.
 
 27-08-2020 6.4.165
 - Time registration: fixed Firefox bug in Timesheet
