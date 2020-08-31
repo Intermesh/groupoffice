@@ -180,6 +180,8 @@ class Sync extends Controller {
       return false;
     }
 
+    go()->debug("GO username should be: " . $username . '@' . $domain);
+
     return $username . '@' . $domain;
 
   }
@@ -364,7 +366,8 @@ class Sync extends Controller {
       foreach ($record->member as $username) {    
         go()->debug("Member: " . $username);  
         $u = $this->queryActiveDirectoryUser($ldapConn, $username, $server);
-        if ($u || !$u['username']) {
+        if (!$u || !$u['username']) {
+        	go()->debug($u);
           $this->output("Skipping '$username'. Could not find GO user");
           continue;
         }

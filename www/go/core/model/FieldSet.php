@@ -50,6 +50,13 @@ class FieldSet extends AclOwnerEntity {
 	 * @var bool 
 	 */
 	public $isTab = false;
+
+	/**
+	 * Amount of columns the fieldset should render.
+	 *
+	 * @var int
+	 */
+	public $columns = 2;
 	
 	/**
 	 * The filter is an object that can be used to show and hide field sets based

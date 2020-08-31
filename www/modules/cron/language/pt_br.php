@@ -5,8 +5,7 @@ return array (
   '(all)' => '(todos)',
   '(only the first)' => '(somente o primeiro)',
   '(All between 1 and 5)' => '(Todos entre 1 e 5)',
-  '(Every 2nd between 0 and 23)' => '(A cada segundo entre 0 e 23;modules/cron/views/Extjs3/SettingsDialog.js
-legacy;cron;(Only on the given numbers)"',
+  '(Every 2nd between 0 and 23)' => '(A cada segundo entre 0 e 23;modules/cron/views/Extjs3/SettingsDialog.js',
   '(Between 0 and 4 and between 8 and 12)' => '(Entre 0 e 4 e entre 8 e 12)',
   'user' => 'usuário',
   'Month days' => 'Dias do mês',
@@ -24,4 +23,5 @@ legacy;cron;(Only on the given numbers)"',
   'Please use one of these formats (eg. hour, no spaces):' => 'Por favor, use um destes formatos (por exemplo, hora, sem espaços):',
   '(Only on the given numbers)' => '(Somente os números dados)',
   'Params' => 'Parâmetros',
+  '(Only on the given numbers)"""' => 'modules/cron/views/Extjs3/SettingsDialog.js',
 );

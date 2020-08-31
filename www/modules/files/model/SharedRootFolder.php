@@ -96,7 +96,8 @@ class SharedRootFolder extends \GO\Base\Db\ActiveRecord {
 		
 		$lastBuildTime = $force ? 0 : \GO::config()->get_setting('files_shared_cache_ctime', $user_id);
 		if(!$lastBuildTime || $this->_getLastMtime($user_id)>$lastBuildTime){	
-			
+
+			GO::setMaxExecutionTime(3600);
 			
 			$home = \GO\Files\Model\Folder::model()->findHomeFolder(GO::user());
 			

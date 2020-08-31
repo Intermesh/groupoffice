@@ -8,6 +8,7 @@ go.customfields.type.MultiSelectDialog = Ext.extend(go.customfields.FieldDialog,
 
 
 		items.push({
+			columnWidth: 1,
 			xtype: "fieldset",
 			title: t("Options"),
 			items: [				

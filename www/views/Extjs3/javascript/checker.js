@@ -45,6 +45,17 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			[6*86400, '6 '+t("Days")],
 			[7*86400, '7 '+t("Days")]
 		];
+		go.Notifier.notificationArea.addTool({
+			id:'dismiss',
+			qtip: t('Dismiss all'),
+			handler: function() {
+				if(confirm(t('Are you sure you want to dismiss all reminder?'))) {
+					this.doTask("dismiss_reminders", 0, this.reminderStore.data.keys);
+					this.reminders.removeAll();
+				}
+			},
+			scope:this
+		});
 
 		this.reminders = new Ext.Container({cls: 'notifications', layout: "anchor", defaults: {anchor: "100%"}});
 
@@ -153,7 +164,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					go.Notifier.toggleIcon('reminder', false);
 				}
 
-				reminderPanel.destroy();
+				reminderPanel && reminderPanel.destroy();
 			}, scope: this
 		});
 	},

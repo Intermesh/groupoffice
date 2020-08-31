@@ -356,9 +356,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				go.Entities.init();
 				me.addDefaultRoutes();
 				me.renderUI();
-				go.Router.check();
 				Ext.getBody().unmask();
-				
+				go.Router.check();
 			}).catch(function(error){
 				console.error(error);
 				Ext.getBody().unmask();

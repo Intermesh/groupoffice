@@ -115,7 +115,7 @@ go.browserStorage.Store.prototype._withIDBStore = function (type, callback) {
 	var me = this;
 	
 	return go.browserStorage.connect().then(function(db) {  
-			return me.createTransaction(db, type, callback);			 
+			return me.createTransaction(db, type, callback);
 	});
 }
 
@@ -123,14 +123,21 @@ go.browserStorage.Store.prototype.createTransaction = function(db, type, callbac
 	var me = this;
 	return new Promise( function(resolve, reject) {
 		var transaction = db.transaction(me.storeName, type);
-		transaction.oncomplete = function() {
-				resolve();
-		}
+		// this somehow didn't work occasionally in Safari ?!
+		// transaction.oncomplete = function() {
+		// 		resolve();
+		// }
 		transaction.onabort = transaction.onerror = function() {
 				reject(transaction.error);
-		} 
+		}
 
-		callback(transaction.objectStore(me.storeName));
+		var req = callback(transaction.objectStore(me.storeName));
+		req.onsuccess = function() {
+			resolve(req);
+		}
+		req.onerror = function(e) {
+			reject(req.error);
+		}
 
 	});
 }
@@ -141,10 +148,14 @@ go.browserStorage.Store.prototype.getItem = function(key) {
 		return Promise.resolve(null);
 	}
 
-	var req;
+	// console.warn("get-" +this.storeName + '-' + key);
+
+	var req, me = this;
 	return this._withIDBStore('readonly', function(store) {
 		req = store.get(key);
-	}).then(function() { 
+		return req;
+	}).then(function() {
+		// console.warn("then-" +me.storeName + '-' + key)
 			return req.result;
 	});
 }

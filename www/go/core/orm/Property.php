@@ -1758,8 +1758,10 @@ abstract class Property extends Model {
 		if(!count($blobCols)) {
 			return [];
 		}
+		$clnQry = clone($query);
+		$clnQry->select([],false); // reset $query in order to prevent ambiguous ID
 
-		$entities = static::internalFind($blobCols)->mergeWith($query);
+		$entities = static::internalFind($blobCols)->mergeWith($clnQry);
 
 		$blobIds = [];
 		foreach($entities as $entity) {

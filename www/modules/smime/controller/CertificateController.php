@@ -277,6 +277,52 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 		//                CA Issuers - URI:http://secure.globalsign.com/cacert/gspersonalsign1sha2g3ocsp.crt
 		//                OCSP - URI:http://ocsp2.globalsign.com/gspersonalsign1sha2g3
 
+		$issuerPemFile = false;
+		if(!empty(\GO::config()->smime_root_cert_location)) {
+			$issuerPemFile = $this->getIssuerPemFileFromLocal($cert);
+		}
+
+		if(!$issuerPemFile) {
+			$issuerPemFile = $this->getIssuerPemFileFromURI($issuerURI);
+		}
+
+		//Do oscp
+		$cmd = "openssl ocsp -issuer ". escapeshellarg($issuerPemFile->path()) ." -cert " . escapeshellarg($cert->path())." -url ". escapeshellarg($ocspURI) ." -CAfile ". escapeshellarg($issuerPemFile->path());
+		go()->debug("Running: $cmd");
+		exec ($cmd, $output,$ret);
+
+		if($ret != 0) {
+			throw new \Exception( "OSCP request failed");
+		}
+
+		//Response:
+		//OSCP:	/tmp/groupoffice/1/15795372755e25d37b05b00: good
+		//This Update: Jan 20 16:21:15 2020 GMT
+		//Next Update: Jan 24 16:21:15 2020 GMT
+		return stristr($output[0], 'good');
+	}
+
+	private function getIssuerPemFileFromLocal(File $cert) {
+		exec ("openssl x509 -noout -in " . escapeshellarg($cert->path()) ." -issuer_hash", $output,$ret);
+		if($ret != 0) {
+			throw new \Exception( "OSCP request failed");
+		}
+		$hash = $output[0];
+
+		$issuerPemFile = new File(\GO::config()->smime_root_cert_location . '/' . $hash . '.0');
+
+
+		if(!$issuerPemFile->exists()) {
+			\GO::debug("Local cert " . $issuerPemFile->path() ." does not exist.");
+			return false;
+		}
+
+		\GO::debug("Checking local cert " . $issuerPemFile->path());
+
+		return $issuerPemFile;
+	}
+
+	private function getIssuerPemFileFromURI($issuerURI) {
 
 		$issuerDerFile = File::tempFile('issuer.der');
 		$issuerPemFile = File::tempFile('issuer.pem');
@@ -296,11 +342,6 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 			throw new \Exception( "Failed to convert issuer certificate");
 		}
 
-		//Do oscp
-		$cmd = "openssl ocsp -issuer ". escapeshellarg($issuerPemFile->path()) ." -cert " . escapeshellarg($cert->path())." -url ". escapeshellarg($ocspURI) ." -CAfile ". escapeshellarg($issuerPemFile->path());
-		go()->debug("Running: $cmd");
-		exec ($cmd, $output,$ret);
-
 		if($ret != 0) {
 			throw new \Exception( "OSCP request failed");
 		}
@@ -310,6 +351,7 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 		//This Update: Jan 20 16:21:15 2020 GMT
 		//Next Update: Jan 24 16:21:15 2020 GMT
 		return stristr($output[0], 'good');
+		return $issuerPemFile;
 	}
 
 	private function _savePublicCertificate($certData, $emails) {
