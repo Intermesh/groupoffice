@@ -4897,9 +4897,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			return false;
 		}
 
-		foreach($attributes as $key=>$value) {
-			$copy->$key = $value;
-		}
+//		foreach($attributes as $key=>$value) {
+//			$copy->$key = $value;
+//		}
+		$copy->setAttributes($attributes, false);
 
 		//Generate new acl for this model
 		if($this->aclField() && !$this->isJoinedAclField){
@@ -4971,7 +4972,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 //			var_dump(array_merge($model->getAttributes('raw'),$attributes));
 
-			$duplicateRelatedModel = $model->duplicate($attributes);
+			$duplicateRelatedModel = $model->duplicate($attributes, true, true);
 
 			$this->afterDuplicateRelation($relationName, $model, $duplicateRelatedModel);
 		}
