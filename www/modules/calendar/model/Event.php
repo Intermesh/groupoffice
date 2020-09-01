@@ -1083,10 +1083,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	public function getConflictingEvents($exception_for_event_id=0){
 		
 		$conflictEvents=array();
-		
-		
-		
-		
+
 		$settings = Settings::model()->getDefault(GO::user());
 		if(!$settings->check_conflict) {
 			return $conflictEvents;
