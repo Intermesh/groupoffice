@@ -494,8 +494,15 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		$attr['end_time']=\GO::t('endsAt','calendar');
 		return $attr;
 	}
+
+	public $skipValidation = false;
 	
 	public function validate() {
+
+		if($this->skipValidation) {
+			return true;
+		}
+
 		if($this->rrule != ""){			
 			$rrule = new \GO\Base\Util\Icalendar\Rrule();
 			$rrule->readIcalendarRruleString($this->start_time, $this->rrule);						

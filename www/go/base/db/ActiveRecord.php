@@ -4902,9 +4902,10 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 			return false;
 		}
 
-		foreach($attributes as $key=>$value) {
-			$copy->$key = $value;
-		}
+//		foreach($attributes as $key=>$value) {
+//			$copy->$key = $value;
+//		}
+		$copy->setAttributes($attributes, false);
 
 		//Generate new acl for this model
 		if($this->aclField() && !$this->isJoinedAclField){
@@ -4978,7 +4979,7 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 
 //			var_dump(array_merge($model->getAttributes('raw'),$attributes));
 
-			$duplicateRelatedModel = $model->duplicate($attributes);
+			$duplicateRelatedModel = $model->duplicate($attributes, true, true);
 
 			$this->afterDuplicateRelation($relationName, $model, $duplicateRelatedModel);
 		}
