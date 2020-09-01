@@ -1,3 +1,4 @@
+- ldapauth: fixed bug in server creation dialog.
 - Calendar: When checking for conflicts, leave days are taken into account.
 - Calendar: Month by date recurrence will turn into Month by day when re-opened.
 - Timeregistration shows html tags when editing an entry with newline characters
@@ -10,7 +11,7 @@
 - Projects: Sometimes PDF report didn't render if page break occurred on table header.
 - CustomFields: fixed refresh bug on conditionally hidden field.
 - Address book: dialog failed to open without manage permisions for tickets module (if installed)
-- Calender: Bug changing "this and future events" #202021084 (was broken in 6.4)
+- Calendar: Bug changing "this and future events" #202021084 (was broken in 6.4)
 
 27-08-2020 6.4.165
 - Time registration: fixed Firefox bug in Timesheet
