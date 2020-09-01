@@ -1,3 +1,4 @@
+- Calendar: When checking for conflicts, leave days are taken into account.
 - Calendar: Month by date recurrence will turn into Month by day when re-opened.
 - Timeregistration shows html tags when editing an entry with newline characters
 - Customfields: Multiselect customfield had a very small list width
