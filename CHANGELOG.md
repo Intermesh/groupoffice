@@ -1,3 +1,18 @@
+- ldapauth: fixed bug in server creation dialog.
+- Calendar: When checking for conflicts, leave days are taken into account.
+- Calendar: Month by date recurrence will turn into Month by day when re-opened.
+- Timeregistration shows html tags when editing an entry with newline characters
+- Customfields: Multiselect customfield had a very small list width
+- Newsletter: Separated User list and Contact list in the Person select dialog for the Email composer.
+- Core: Support --debug flag for cli.php
+- ldapauth: group member sync for ActiveDirectory broken
+- projects: fixed error when you didn't have access to the contacts linked to projects
+- Core: New feature to "Archive" users.
+- Projects: Sometimes PDF report didn't render if page break occurred on table header.
+- CustomFields: fixed refresh bug on conditionally hidden field.
+- Address book: dialog failed to open without manage permisions for tickets module (if installed)
+- Calendar: Bug changing "this and future events" #202021084 (was broken in 6.4)
+
 27-08-2020 6.4.165
 - Time registration: fixed Firefox bug in Timesheet
 - Email: Workaround if message has invalid From header

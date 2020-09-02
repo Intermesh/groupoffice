@@ -31,6 +31,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				'loginCount',
 				'authenticationMethods',
 				'personalGroup',
+				'enabled',
 				{name: 'createdAt', type: 'date'},
 				{name: 'lastLogin', type: 'date'}	
 			],
@@ -270,6 +271,39 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					},
 					"-"
 					,{
+						itemId: "archive",
+						iconCls: "ic-archive",
+						text: t("Archive user"),
+						handler: function() {
+							var me = this;
+
+							Ext.MessageBox.confirm(
+								t("Confirm"),
+								t("Archiving a user will disable them and make their items invisible. Are you sure?"),
+								function(btn) {
+									if(btn !== 'yes') {
+										return;
+									}
+									var id = me.moreMenu.record.id, params = {};
+
+									if(id === go.User.id) {
+										Ext.MessageBox.alert(t('Error'), t('You can\' t archive yourself'));
+										return;
+									}
+									params.update = {};
+									params.update[id] = {'enabled': false, 'archive': true};
+
+									go.Db.store("User").set(params, function(options, success, response) {
+										if (response.notUpdated && response.notUpdated[id] && response.notUpdated[id].validationErrors && response.notUpdated[id].validationErrors.currentPassword) {
+											Ext.MessageBox.alert(t('Error'), t('Error while saving the data'));
+											return;
+										}
+									});
+								});
+						},
+						scope: this
+					}
+					,{
 						itemId:"delete",
 						iconCls: 'ic-delete',
 						text: t("Delete"),
@@ -323,8 +357,15 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				});
 			}
 		}
-		
-		
+
+		var archiveItm  = this.moreMenu.find('itemId','archive'), loginItm = this.moreMenu.find('itemId', 'loginAs');
+		if(archiveItm.length > 0) {
+			archiveItm[0].setDisabled(!record.data.enabled);
+		}
+		if(loginItm.length > 0 ) {
+			loginItm[0].setDisabled(!record.data.enabled);
+		}
+
 		this.moreMenu.record = record;
 		
 		this.moreMenu.showAt(e.getXY());

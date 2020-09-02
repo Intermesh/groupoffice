@@ -62,7 +62,6 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		}, this);
 
 		this.on("afterrender", function() {
-
 			//find entity panel
 			var form = this.findParentByType("form");
 
@@ -108,7 +107,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 				form.getForm().on("actioncomplete", function (f, action) {
 					if (action.type === "load") {
 						this.filter(f.getFieldValues());
-						f.isValid(); //needed for coniditionally hidden
+						f.isValid(); //needed for conditionally hidden
 					}
 				}, this);
 			}
@@ -116,13 +115,18 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			/**
 			 * Related fields
 			 */
-			this.items.each(function (field) {
-				field.on('change', function (field) {
-					form.getForm().isValid();
-				});
-				field.on('check', function (field) {
-					form.getForm().isValid();
-				});
+			this.items.each(function (cnt) {
+				var f = form.getForm();
+				if(cnt.getXType() === 'container') {
+					cnt.items.each(function(field) {
+						field.on('change', function (field) {
+							f.isValid();
+						});
+						field.on('check', function (field, checked) {
+							f.isValid();
+						});
+					});
+				}
 			}, this);
 		});
 
@@ -157,7 +161,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	
 	setFilterVisible : function(v) {
 
-		//disable recursive so validaters don't apply on hidden items
+		//disable recursive so validators don't apply on hidden items
 		function setDisabled(ct, v) {
 			ct.setDisabled(v);
 

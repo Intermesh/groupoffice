@@ -118,6 +118,7 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 					},{
 						xtype: "checkbox",
 						fieldLabel: t("Follow referrals"),
+						name: 'followReferrals',
 						checked: true,
 						hint: t("For older Microsoft ActiveDirectory installation this has to be disabled")
 					}
@@ -156,10 +157,11 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						hint: t("For Microsoft ActiveDirectory it's typically 'cn=Groups,dc=example,dc=com'."),
 						required: true
 					},this.createEmailCheckbox = new Ext.form.Checkbox({
-						xtype:"checkbox",
+						xtype: "checkbox",
 						submit: false,
 						hideLabel: true,
 						boxLabel: t("Create e-mail account for users"),
+						name: 'createUserEmail',
 						listeners: {
 							check: function (checkbox, checked) {
 								this.imapFieldSet.setVisible(checked);
