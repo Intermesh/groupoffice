@@ -1,3 +1,4 @@
+- Timeregstration: set default status upon copying registration;
 - ldapauth: fixed bug in server creation dialog.
 - Calendar: When checking for conflicts, leave days are taken into account.
 - Calendar: Month by date recurrence will turn into Month by day when re-opened.
