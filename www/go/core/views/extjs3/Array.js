@@ -62,8 +62,8 @@ Ext.applyIf(Array.prototype, {
 
 		return this.sort(function compare(a, b) {
 			// Use toUpperCase() to ignore character casing
-			var colA = a[col].toUpperCase();
-			var colB = b[col].toUpperCase();
+			var colA = Ext.isString(a[col]) ? a[col].toUpperCase() : a[col];
+			var colB = Ext.isString(b[col]) ? b[col].toUpperCase() : b[col];
 
 			var comparison = 0;
 			if (colA > colB) {

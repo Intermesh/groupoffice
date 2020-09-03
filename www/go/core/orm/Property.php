@@ -489,6 +489,9 @@ abstract class Property extends Model {
    */
 	public function id() {		
 		$keys = $this->primaryKeyValues();
+		if(empty($keys)) {
+			return false;
+		}
 		return count($keys) > 1 ? implode("-", array_values($keys)) : array_values($keys)[0];
 	}
 
@@ -1255,14 +1258,8 @@ abstract class Property extends Model {
 		$models = $this->{$relation->name} ?? [];		
 		$this->relatedValidationErrorIndex = 0;
 
-
 		$this->removeRelated($relation, $models, $modified[$relation->name][1]);
-		
-		//set state to new for all models. Models could have been saved if save() is called multiple times.
-		$models = array_map(function($model) {
-			return $model->internalCopy();
-		}, $models);		
-		
+
 		$this->{$relation->name} = [];
 		foreach ($models as $newProp) {
 			
@@ -1287,6 +1284,8 @@ abstract class Property extends Model {
 	}
 
   /**
+   * Removes related models no longer in the object
+   *
    * @param Relation $relation
    * @param self[] $models
    * @param self[] $oldModels
@@ -1300,36 +1299,33 @@ abstract class Property extends Model {
 		$query = new Query();
 		$query->where($where);
 
-		if($relation->type == Relation::TYPE_MAP) {
-
-			if(!isset($oldModels)) {
-				return true;
-			}
-			
-			$keepKeys = array_map(function($model){return isset($model) ? $model->id() : '-';}, $models);
-			$removeKeys = new Criteria();
-			$pk = $cls::getPrimaryKey();
-			
-			foreach($oldModels as $model) {
-				$id = $model->id();
-				if(in_array($id, $keepKeys)) {
-					continue;
-				}
-
-				$diff = array_diff($pk, array_values($relation->keys));
-				$where = [];
-				foreach($diff as $key) {
-					$where[$key] = $model->$key;
-				}
-				$removeKeys->orWhere($where);
-			}
-
-			if(!$removeKeys->hasConditions()) {
-				return true;
-			}
-
-			$query->andWhere($removeKeys);
+		if(!isset($oldModels)) {
+			return true;
 		}
+
+		$keepKeys = array_map(function($model){return isset($model) ? $model->id() : '-';}, $models);
+		$removeKeys = new Criteria();
+		$pk = $cls::getPrimaryKey();
+
+		foreach($oldModels as $model) {
+			$id = $model->id();
+			if(in_array($id, $keepKeys)) {
+				continue;
+			}
+
+			$diff = array_diff($pk, array_values($relation->keys));
+			$where = [];
+			foreach($diff as $key) {
+				$where[$key] = $model->$key;
+			}
+			$removeKeys->orWhere($where);
+		}
+
+		if(!$removeKeys->hasConditions()) {
+			return true;
+		}
+
+		$query->andWhere($removeKeys);
 
 		return $cls::internalDelete($query);
 	}
@@ -1938,8 +1934,10 @@ abstract class Property extends Model {
 				break;
 
 				case Relation::TYPE_ARRAY:
+					return $this->patchArray($relation, $propName, $value);
+					break;
 				case Relation::TYPE_MAP:
-					return $this->patch($relation, $propName, $value);
+					return $this->patchMap($relation, $propName, $value);
 				break;
 
 				case Relation::TYPE_SCALAR:
@@ -1956,14 +1954,59 @@ abstract class Property extends Model {
 		return $value;
 	}
 
+	/**
+	 * Patches an array relation with new objects or arrays
+	 *
+	 * @param Relation $relation
+	 * @param string $propName
+	 * @param array $value
+	 * @return mixed
+	 * @throws Exception
+	 */
+	protected function patchArray(Relation $relation, $propName, $value) {
+		$old = $this->$propName;
+
+		//build map for lookup
+		$mapped = [];
+		foreach($old as $prop) {
+			$id = $prop->id();
+			if($id) {
+				$mapped[$id] = $prop;
+			}
+		}
+
+		$this->$propName = [];
+		if(isset($value)) {
+			foreach ($value as $patch) {
+
+				//check if we can find an existing model to patch.
+				$temp = new $relation->entityName;
+				$temp->setValues($patch);
+				$id = $temp->id();
+
+				if(isset($mapped[$id])) {
+					$mapped[$id]->setValues($patch);
+					$this->$propName[] = $mapped[$id];
+				} else{
+					//create new model
+					$this->$propName[] = $temp;
+				}
+			}
+		}
+
+		return $this->$propName;
+	}
+
   /**
+   * Patches a map relation with new objects or arrays
+   *
    * @param Relation $relation
    * @param string $propName
    * @param array $value
    * @return mixed
    * @throws Exception
    */
-	protected function patch(Relation $relation, $propName, $value) {
+	protected function patchMap(Relation $relation, $propName, $value) {
 		$old = $this->$propName;
 		$this->$propName = [];
 		if(isset($value)) {
@@ -2036,6 +2079,7 @@ abstract class Property extends Model {
 	private function internalNormalizeRelation(Relation $relation, $value) {
 		$cls = $relation->entityName;
 		if ($value instanceof $cls) {
+			throw new Exception("Deprecated use of setValues with object");
 			return $value;
 		}
 
