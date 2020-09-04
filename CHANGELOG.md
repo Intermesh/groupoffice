@@ -1,3 +1,4 @@
+- Notes: added simple CSV import and export;
 - Timeregstration: set default status upon copying registration;
 - ldapauth: fixed bug in server creation dialog.
 - Calendar: When checking for conflicts, leave days are taken into account.
