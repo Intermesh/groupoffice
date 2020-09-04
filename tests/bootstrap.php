@@ -14,7 +14,7 @@ const INSTALL_NEW = 0;
 const INSTALL_UPGRADE = 1;
 const INSTALL_NONE = 2;
 
-$installDb = INSTALL_UPGRADE;
+$installDb = INSTALL_NEW;
 
 $autoLoader = require(__DIR__ . "/../www/vendor/autoload.php");
 $autoLoader->add('go\\', __DIR__);
@@ -84,10 +84,8 @@ try {
 				continue;
 			}
 			if ($moduleController->autoInstall() && $moduleController->isInstallable()) {
-				$module = new Module();
-				$module->name = $moduleController->name();
-				if (!$module->save()) {
-					throw new \Exception("Could not save module " . $module->name);
+				if(!Module::install($moduleController->name())) {
+					throw new \Exception("Could not save module " . $moduleController->name());
 				}
 			}
 		}

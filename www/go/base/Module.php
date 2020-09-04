@@ -46,7 +46,7 @@ class Module extends Observable {
 	 * the folder name in the modules folder.
 	 * 
 	 * eg. notes, calendar  etc.
-	 * @return StringHelper 
+	 * @return string
 	 */
 	public function name() {
 		
@@ -58,7 +58,20 @@ class Module extends Observable {
 		}
 		return $this->_name;
 	}
-	
+
+	/**
+	 * For compatibility with new framework
+	 *
+	 * @return string
+	 */
+	public function getName() {
+		return $this->name();
+	}
+
+
+	public function __toString() {
+		return 'legacy/' . $this->getName();
+	}
 	
 	/**
 	 * Get the absolute filesystem path to the module.
@@ -105,6 +118,15 @@ class Module extends Observable {
 	
 	public function package(){
 		return self::PACKAGE_COMMUNITY;
+	}
+
+	/**
+	 * For compatibility with new framework
+	 *
+	 * @return string
+	 */
+	public function getPackage() {
+		return "legacy";
 	}
 	
 	private function _findIconByTheme($theme){
@@ -215,6 +237,11 @@ class Module extends Observable {
 	public function isAvailable(){
 		return true;
 	}
+
+	public function isLicensed(){
+		return $this->isAvailable();
+	}
+
 	
 	/**
 	 * Return false is for some reason this module is not instalable.

@@ -104,7 +104,6 @@ abstract class Module {
 			go()->rebuildCache(true);
 
 			go()->getDbConnection()->beginTransaction();
-			
 		
 			$model = new model\Module();
 			$model->name = static::getName();
@@ -343,6 +342,106 @@ abstract class Module {
 	}
 
 	/**
+	 *
+	 * @todo make non static when old framework modules are gone.
+	 *
+	 * @param static|GO\Base\Module $module
+	 * @return static|GO\Base\Module[]
+	 *
+	 */
+	public static function resolveDependencies($module) {
+		$resolved = [];
+		foreach($module->getDependencies() as $dependency) {
+			$d = explode("/",  $dependency);
+			if(count($d) == 1) {
+				array_unshift($d, "legacy");
+			}
+
+			if($d[0] == "legacy") {
+				$cls = "GO\\" . $d[1] . "\\" . $d[1] . "Module";
+
+			} else{
+				$cls = "go\\modules\\" . $d[0] . "\\" . $d[1] . "\\Module";
+			}
+
+			if(!class_exists($cls)) {
+				throw new Exception("Module $dependency is not available!");
+			}
+			$manager = new $cls;
+
+			if(!$manager->isLicensed()) {
+				throw new Exception("Module $dependency is not licensed!");
+			}
+
+			if(!in_array($manager, $resolved)) {
+				$resolved[] = $manager;
+			}
+		}
+
+		return $resolved;
+	}
+
+	/**
+	 * @param static|GO\Base\Module $module
+
+	 */
+	public static function installDependencies($module) {
+		foreach(self::resolveDependencies($module) as $dependency) {
+
+			$installed = model\Module::findByName($dependency->getPackage(), $dependency->getName(), null);
+
+			if (!$installed) {
+
+				if($dependency instanceof self) {
+					if (!$dependency->install()) {
+						throw new Exception("Could not install '" . get_class($dependency) . "'");
+					}
+				} else{
+					if (!\GO\Base\Model\Module::install($dependency->getName(), true)) {
+						throw new Exception("Could not install '" . get_class($dependency) . "'");
+					}
+				}
+			} else if (!$installed->enabled) {
+				$installed->enabled = true;
+				if (!$installed->save()) {
+					throw new Exception("Could not enable '" . get_class($dependency) . "'");
+				}
+			}
+
+		}
+	}
+
+
+	/**
+	 * @param static|GO\Base\Module $module
+	 * @return static|GO\Base\Module[]
+	 */
+	public static function getModulesThatDependOn($module) {
+
+		$depStr = $module->getPackage() . '/' . $module->getName();
+
+		$installedModules = model\Module::find()->where(['enabled' => true]);
+
+		$modules = [];
+
+		foreach($installedModules as $installedModule) {
+
+			$installedModuleManager = $installedModule->module();
+
+			if(in_array($depStr, $installedModuleManager->getDependencies())) {
+				$modules[] = $installedModuleManager;
+			}
+			if($module->getPackage() == 'legacy' && in_array($module->getName(), $installedModuleManager->getDependencies())){
+				$modules[] = $installedModuleManager;
+			}
+		}
+
+		return $modules;
+	}
+
+
+
+	/**
 	 * get conflicting modules.
 	 * 
 	 * @return string[] eg. ["community/notes"]
@@ -512,6 +611,10 @@ abstract class Module {
 			$entity::check();
 			echo "Done\n";
 		}
+	}
+
+	public function __toString() {
+		return static::getPackage() . '/' . static::getName();
 	}
 
 }

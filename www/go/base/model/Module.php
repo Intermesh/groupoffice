@@ -77,13 +77,9 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		if(!($module = Module::model()->findByName($name))){
 			$module = new Module();
 			$module->name=$name;
-						
-			$dependencies = $module->moduleManager->getDependencies();	
-			
-			foreach($dependencies as $dependency){
-				if($ignoreDependentModule!==$dependency){
-					self::install($dependency, $name);
-				}
+
+			if(!$ignoreDependentModule) {
+				\go\core\Module::installDependencies($module->moduleManager);
 			}
 
 			if(!$module->save())
@@ -92,16 +88,12 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		{
 			if(!$module->enabled){
 				$module->enabled=true;
-				
-				$dependencies = $module->moduleManager->getDependencies();	
-				
-				GO::debug($dependencies);
-			
-				foreach($dependencies as $dependency){
-					if($ignoreDependentModule!==$dependency){
-						self::install($dependency, $name);
-					}
+
+				if(!$ignoreDependentModule) {
+					\go\core\Module::installDependencies($module->moduleManager);
 				}
+
+
 				$module->save();				
 			}
 		}
@@ -180,7 +172,15 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		if($this->isNew){			
 			$this->version = $this->moduleManager->databaseVersion();		
 			$this->admin_menu = $this->moduleManager->adminModule();
-		}		
+		}
+
+		if($this->isModified('enabled')) {
+			if(!$this->enabled) {
+				$this->_checkDependencies();
+			} else {
+				\go\core\Module::installDependencies($this->moduleManager);
+			}
+		}
 		return parent::beforeSave();
 	}
 	
@@ -244,18 +244,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	
 	private function _checkDependencies() {
 		
-		$dependentModuleNames = array();
-		$modules = \GO::modules()->getAllModules(true);
-		foreach ($modules as $module) {
-			
-			if($module->moduleManager instanceof \go\core\Module) {
-				continue;
-			}
-			
-			$depends = $module->moduleManager->depends();
-			if (in_array($this->id,$depends))
-				$dependentModuleNames[] = $module->moduleManager->name();
-		}
+		$dependentModuleNames = \go\core\Module::getModulesThatDependOn($this->moduleManager);
 		
 		if (count($dependentModuleNames)>0)
 			throw new \Exception(sprintf(\GO::t("You cannot delete the current module, because the following (installed) modules depend on it: %s."),implode(', ',$dependentModuleNames)));
