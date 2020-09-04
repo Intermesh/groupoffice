@@ -1258,7 +1258,18 @@ abstract class Property extends Model {
 		$models = $this->{$relation->name} ?? [];		
 		$this->relatedValidationErrorIndex = 0;
 
-		$this->removeRelated($relation, $models, $modified[$relation->name][1]);
+		$hasPk = !empty($relation->entityName::getPrimaryKey());
+		if($hasPk) {
+			$this->removeRelated($relation, $models, $modified[$relation->name][1]);
+		} else{
+			//without pk remove all
+			$this->removeAllRelated($relation);
+
+			//reset models to new state because current ones think they're existing
+			$models = array_map(function($model) {
+				return $model->internalCopy();
+			}, $models);
+		}
 
 		$this->{$relation->name} = [];
 		foreach ($models as $newProp) {
@@ -1281,6 +1292,14 @@ abstract class Property extends Model {
 		}	
 
 		return true;
+	}
+
+	private function removeAllRelated(Relation $relation) {
+		$cls = $relation->entityName;
+		$where = $this->buildRelationWhere($relation);
+		$query = new Query();
+		$query->where($where);
+		return $cls::internalDelete($query);
 	}
 
   /**
@@ -1308,8 +1327,8 @@ abstract class Property extends Model {
 		$pk = $cls::getPrimaryKey();
 
 		foreach($oldModels as $model) {
-			$id = $model->id();
-			if(in_array($id, $keepKeys)) {
+			if(in_array($model, $models)) {
+				//if object is still present then don't remove
 				continue;
 			}
 
