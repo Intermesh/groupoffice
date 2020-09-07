@@ -8,6 +8,7 @@ use go\core\jmap\State;
 use go\core\model\AuthAllowGroup;
 use go\core\model\Token;
 use go\core\model\User;
+use go\core\model\Log;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\jmap\Request;
 use go\core\http\Response;
@@ -51,8 +52,18 @@ try {
 		if(!$token) {
 			output([], 404);
 		}
+		if(go()->getModule(null,'log')) {
+			$oUser = User::findById($token->userId);
+			$oLog = new Log();
+			$oLog->setValues(['user_id' => $oUser->id, 'message' => $oUser->username, 'action' => $oLog::ACTION_LOGOUT,
+				'controller_route' => 'auth', 'model' => '', 'model_id' => $oUser->id,
+				'username' => $oUser->username]);
+			$oLog->save();
+
+		}
+
 		$token->oldLogout();
-		$token->delete($token->primaryKeyValues());
+		Token::delete($token->primaryKeyValues());
 		
 		output();		
 	}
@@ -146,6 +157,14 @@ try {
 
 			if (!$token->save()) {
 				throw new Exception("Could not save token");
+			}
+
+			if(go()->getModule(null, 'log')){
+				$oLog = new \go\core\model\Log();
+				$oLog->setValues(['user_id' => $user->id, 'message' => $user->username, 'action' => $oLog::ACTION_LOGIN,
+					'controller_route' => 'auth', 'model' => get_class($authenticator), 'model_id' => $user->id,
+					'username' => 'notloggedin']);
+				$oLog->save();
 			}
 
 			return $token;

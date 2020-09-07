@@ -72,7 +72,9 @@ class FilesModule extends \GO\Base\Module{
 			$folder->readonly=1;
 			$folder->save();
 		}
-		
+
+		go()->getDbConnection()->exec("update fs_folders set acl_id = 0 where acl_id not in (select id from core_acl);");
+
 		parent::checkDatabase($response);
 	}
 	

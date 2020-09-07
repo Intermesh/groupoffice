@@ -50,6 +50,13 @@ class Debugger {
 	 */
 	public $enabled = false;
 
+
+	/**
+	 * Output log entries (for CLI)
+	 * @var bool
+	 */
+	public $output = false;
+
 	/**
 	 * When set all visible debug messaged are written to this file
 	 * @var string Full path on FS
@@ -243,9 +250,9 @@ class Debugger {
 			$line = "\n" . $line;
 		}
 
-		// if(go()->getEnvironment()->isCli()) {
-		// 	echo $line;
-		// }
+		 if($this->output) {
+		 	echo $line;
+		 }
 
 		if(is_resource($this->logFp)) {
 			fputs($this->logFp, $line);

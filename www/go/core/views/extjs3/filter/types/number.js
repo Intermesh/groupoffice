@@ -73,7 +73,7 @@ go.filter.types.number = Ext.extend(Ext.Panel, {
 						operator = 'equals';
 		
 		if(v) {
-			var matches = v.match(regex);
+			var matches = (v + '').match(regex);
 			if(matches) {		
 				v = parseFloat(matches[2].trim());			
 

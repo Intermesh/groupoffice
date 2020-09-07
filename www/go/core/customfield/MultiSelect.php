@@ -35,8 +35,9 @@ class MultiSelect extends Select {
 	public function createMultiSelectTable() {
 
 		$tableName = $this->field->tableName();
+		$multiSelectTableName = $this->getMultiSelectTableName();
 
-		$sql = "CREATE TABLE IF NOT EXISTS `" . $this->getMultiSelectTableName() . "` (
+		$sql = "CREATE TABLE IF NOT EXISTS `" . $multiSelectTableName . "` (
 			`id` int(11) NOT NULL,
 			`optionId` int(11) NOT NULL,
 			PRIMARY KEY (`id`,`optionId`),
@@ -47,9 +48,9 @@ class MultiSelect extends Select {
 			return false;
 		}
 
-		$sql = "ALTER TABLE `" . $this->getMultiSelectTableName() . "`
-			ADD CONSTRAINT `" . $this->getMultiSelectTableName() . "_ibfk_1` FOREIGN KEY (`id`) REFERENCES `" . $this->field->tableName() . "` (`id`) ON DELETE CASCADE,
-		  ADD CONSTRAINT `" . $this->getMultiSelectTableName() . "_ibfk_2` FOREIGN KEY (`optionId`) REFERENCES `core_customfields_select_option` (`id`) ON DELETE CASCADE;";
+		$sql = "ALTER TABLE `" . $multiSelectTableName . "`
+			ADD CONSTRAINT `" . $multiSelectTableName . "_ibfk_1` FOREIGN KEY (`id`) REFERENCES `" . $tableName . "` (`id`) ON DELETE CASCADE,
+		  ADD CONSTRAINT `" . $multiSelectTableName . "_ibfk_2` FOREIGN KEY (`optionId`) REFERENCES `core_customfields_select_option` (`id`) ON DELETE CASCADE;";
 
 		return go()->getDbConnection()->query($sql);
 	}

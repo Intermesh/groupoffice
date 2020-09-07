@@ -17,4 +17,6 @@ return array (
   'Commented at' => 'Comentado em',
   'Note book' => 'Categoria',
   'Filters' => 'Filtros',
+  'Encrypted data' => 'Dados criptografados',
+  'Enter password to decrypt' => 'Digite a senha para descriptografar',
 );

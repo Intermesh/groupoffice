@@ -363,6 +363,7 @@ go.Jmap = {
 	 * @returns {Boolean}
 	 */
 	sse : function() {
+		// return;
 		try {
 			if (!window.EventSource) {
 				console.debug("Browser doesn't support EventSource");
@@ -456,7 +457,7 @@ go.Jmap = {
 		var promise = this.scheduleRequest(options);
 
 		if(!this.paused) {
-			this.continue();
+			this.delayedProcessQueue();
 		}
 		if(!options.callback) {
 			return promise;
@@ -480,6 +481,14 @@ go.Jmap = {
 	 * Pause request execution
 	 */
 	pause : function() {
+
+		// if(!GO.pauseCalls) {
+		// 	GO.pauseCalls = 1;
+		// } else {
+		// 	GO.pauseCalls++
+		// }
+		// console.trace("pause", GO.pauseCalls);
+
 		this.paused++;
 		if (this.timeout) {
 			clearTimeout(this.timeout);
@@ -491,6 +500,14 @@ go.Jmap = {
 	 * Continue request event execution as the next macro task.
 	 */
 	continue: function() {
+
+		// if(!GO.continueCalls) {
+		// 	GO.continueCalls = 1;
+		// } else {
+		// 	GO.continueCalls++
+		// }
+		// console.trace("continue", GO.continueCalls);
+
 		if(this.paused > 0) {
 			this.paused--;
 		}
@@ -500,6 +517,10 @@ go.Jmap = {
 			return;
 		}
 
+		this.delayedProcessQueue();
+	},
+
+	delayedProcessQueue : function() {
 		if (this.timeout) {
 			clearTimeout(this.timeout);
 		}

@@ -30,6 +30,7 @@ GO.calendar.ListGrid = function(config)
 			'time',
 			'start_time',
 			'end_time',
+				'recurrence_start_time',
 			'description',
 			'location',
 			'private',

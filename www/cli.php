@@ -25,5 +25,10 @@ if(!Environment::get()->isCli()) {
 	throw new Exception("You can only run this script on the Command Line Interface");
 }
 
+if(!empty($args['debug'])) {
+    go()->getDebugger()->output = true;
+	go()->getDebugger()->enable(false);
+}
+
 $router = new Router();
 $router->run();

@@ -30,13 +30,13 @@ $curve-sharper: cubic-bezier(.25, .8, .25, 1); //slider
 // used for developemnt in PHP replace "var(--c-primary)" with actual configured color for IE support
 // If not replaced IE will default to the color set in $cPrimary
 $vars: (
-  c-primary: $cPrimary,
-  c-primary-tp: $cPrimaryTp,
-  c-header-bg: $cHeaderBg,
-				c-secondary: $cSecondary,
-  c-accent: $cAccent,
+    c-primary: $cPrimary,
+    c-primary-tp: $cPrimaryTp,
+    c-header-bg: $cHeaderBg,
+	c-secondary: $cSecondary,
+    c-accent: $cAccent,
 	c-accent-tp: $cAccentTp
-);
+) !default;
 
 
 @mixin var($property, $varName) {

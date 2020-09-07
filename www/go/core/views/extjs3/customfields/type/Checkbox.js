@@ -34,7 +34,7 @@ go.customfields.type.Checkbox = Ext.extend(go.customfields.type.Text, {
 	},
 	
 	/**
-	 * Render's the custom field value for the detail views
+	 * Renders the custom field value for the detail views
 	 * 
 	 * @param {mixed} value
 	 * @param {object} data Complete entity
@@ -46,7 +46,7 @@ go.customfields.type.Checkbox = Ext.extend(go.customfields.type.Text, {
 	},
 
 	/**
-	 * Returns config oject to create the form field 
+	 * Returns config object to create the form field
 	 * 
 	 * @param {object} customfield customfield Field entity from custom fields
 	 * @param {object} config Extra config options to apply to the form field

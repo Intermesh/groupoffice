@@ -133,15 +133,16 @@ abstract class Message extends \GO\Base\Model {
 	public function setAttributes($attributes) {
 
 		$this->attributes = array_merge($this->attributes, $attributes);
-
-		if(empty($this->attributes['from'])) {
-			$this->attributes['from'] = "unknown@unkonwn.domain";
-		}
 		
 		$this->attributes['to'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['to']));
 		$this->attributes['cc'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['cc']));
 		$this->attributes['bcc'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['bcc']));
 		$this->attributes['from'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['from']));
+
+		//workaround for invalid from
+		if(!$this->attributes['from']->getAddress()) {
+			$this->attributes['from'] = 	new \GO\Base\Mail\EmailRecipients("unknown@unkonwn.domain");
+		}
 		$this->attributes['reply_to'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['reply_to']));
 
 		$this->attributes['x_priority']= isset($this->attributes['x_priority']) ? strtolower($this->attributes['x_priority']) : 3;

@@ -41,7 +41,7 @@ CREATE TABLE `ldapauth_server` (
 -- Gegevens worden geëxporteerd voor tabel `ldapauth_server`
 --
 
-------------------------------------------------------
+-- ----------------------------------------------------
 
 --
 -- Tabelstructuur voor tabel `ldapauth_server_domain`

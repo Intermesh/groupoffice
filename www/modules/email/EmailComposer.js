@@ -350,6 +350,7 @@ GO.email.EmailComposer = function(config) {
 		
 		iconCls : 'ic-send',
 		text: t("Send", "email"),
+		cls: 'primary',
 		tooltip: 'CTRL + Enter',
 		handler : function() {
 			this.sendMail();

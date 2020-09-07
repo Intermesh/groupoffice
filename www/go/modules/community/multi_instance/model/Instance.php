@@ -384,8 +384,12 @@ class Instance extends Entity {
 	private $globalConfig;
 	
 	private function getInstanceConfig() {
-		if(!isset($this->instanceConfig)) {						
-			include($this->getConfigFile()->getPath());
+		if(!isset($this->instanceConfig)) {
+			try {
+				include($this->getConfigFile()->getPath());
+			} catch(Exception $e) {
+				throw new \Exception("config file missing for instance : " . $this->hostname);
+			}
 			$this->instanceConfig = $config;
 		}		
 		return $this->instanceConfig;

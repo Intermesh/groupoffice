@@ -43,7 +43,7 @@ go.customfields.type.User = Ext.extend(go.customfields.type.Text, {
 			cmp.setValue(displayValue);
 			cmp.setVisible(true);
 		});
-		
+		return value;
 	},
 	
 	/**
