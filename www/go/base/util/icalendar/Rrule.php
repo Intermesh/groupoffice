@@ -70,12 +70,24 @@ class Rrule extends \GO\Base\Util\Date\RecurrencePattern
 	public function readJsonArray($json)
 	{
 		$parameters = array();
-		
-		
+
+		$parameters['byday']=array();
 		$parameters['interval'] = \GO\Base\Util\Number::unlocalize($json['interval']);
 		$parameters['freq'] = strtoupper($json['freq']);
-		if($parameters['freq']=='MONTHLY_DATE')
-			$parameters['freq']='MONTHLY';
+		if ($parameters['freq'] == 'MONTHLY_DATE') {
+			$parameters['freq'] = 'MONTHLY';
+		} else {
+
+			foreach($this->_days as $day){
+				if(!empty($json[$day])){
+					$day = $day;
+//				if(!empty($json['bysetpos']))
+//					$day = $json['bysetpos'].$day;
+
+					$parameters['byday'][]=$day;
+				}
+			}
+		}
 		$parameters['eventstarttime'] = isset($json['eventstarttime'])?\GO\Base\Util\Date::to_unixtime($json['eventstarttime']):\GO\Base\Util\Date::to_unixtime($json['start_time']);
 		$parameters['until'] = !empty($json['repeat_UntilDate']) && isset($json['until']) ? \GO\Base\Util\Date::to_unixtime($json['until'].' 23:59') : 0; //date('G', $parameters['eventstarttime']).':'.date('i', $parameters['eventstarttime'])) : 0;
 		$parameters['bymonth'] = isset($json['bymonth'])?$json['bymonth']:'';
@@ -86,17 +98,6 @@ class Rrule extends \GO\Base\Util\Date\RecurrencePattern
 		
 		//bysetpos is not understood by old lib
 		$parameters['bysetpos']=isset($json['bysetpos']) ? $json['bysetpos'] : 1;
-		$parameters['byday']=array();
-		
-		foreach($this->_days as $day){
-			if(!empty($json[$day])){
-				$day = $day;
-//				if(!empty($json['bysetpos']))
-//					$day = $json['bysetpos'].$day;
-				
-				$parameters['byday'][]=$day;
-			}
-		}		
 		
 		// Weekly recurrence _must_ have BYDAY set.
 		if (strtolower($parameters['freq'])=='weekly' && count($parameters['byday'])<1 ) {

@@ -743,7 +743,7 @@
 	.x-toolbar & {
 		
 		//@include var(color, c-primary);
-		box-shadow: none !important;
+		//box-shadow: none;
 		border: 0;
 	}
 	.x-small-editor & {
@@ -898,11 +898,11 @@
 
 // BUTTON GROUP = TODO
 .x-btn-group {
-	@extend .z1;
-	border-radius: $borderRadius;
 	padding:0;
 	background-color: color($bg, 'card');
 	margin-right: dp(8);
+	border-radius:$borderRadius;
+	border: 1px solid color($fg, 'line');
 	&-header{
 		color: inherit;
 	}
@@ -916,15 +916,20 @@
 		width:dp(8);
 		padding:0;
 	}
-	&-notitle .x-btn-group-tc {
-		//background-image: url(../images/default/button/group-tb.gif);
-	}
-	.x-btn, .x-toolbar & .x-btn {
+	.x-btn {
 		border-radius: 0;
 		margin:0;
 	}
+	.x-btn-pressed {
+		box-shadow: inset 0 -2px 0 $cPrimary; // underline
+		background-color: color($bg, 'card');
+	}
 	.x-btn-icon button {
 		min-height: dp(36); 
+	}
+	td.x-table-layout-cell:first-child ~ td {
+		border-left: 1px solid color($fg, 'line');
+
 	}
 }
 
