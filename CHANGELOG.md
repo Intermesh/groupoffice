@@ -1,3 +1,4 @@
+- Core: allow login if there are no restrictive rules at all for you instead of no rules at all for the whole system
 - Notes: added simple CSV import and export;
 - Timeregstration: set default status upon copying registration;
 - ldapauth: fixed bug in server creation dialog.
