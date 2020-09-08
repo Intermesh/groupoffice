@@ -6,6 +6,13 @@
  *	name: "dataType.options",
  *	addButtonText: t("Add option"),
  *	addButtonIconCls: 'ic-add',
+ *  listeners: {
+								scope: this,
+								newitem: function(fg, item) {
+									//example of how to set value on new form group item. Where formFiel is of type "gocontainer".
+									item.formField.findField("text").setValue(this.formPanel.entity.name);
+								}
+							},
  *	itemCfg: {
  *		items: [{
  *				xtype: "hidden",
@@ -151,6 +158,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 					this.doLayout();
 					
 					wrap.formField.focus();
+
+					this.fireEvent("newitem", this, wrap);
 				
 				},
 				scope: this

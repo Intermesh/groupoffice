@@ -1,3 +1,12 @@
+Master
+- Core: array relation with ID's keeps records
+- Core: Module dependencies are respected
+- Business: New finance module
+- Projects: new module
+- Tasks: new module
+- Business: New employee management module
+- Time tracking: new module
+
 08-09-2020 6.4.167
 - Core: if Activity Log enabled, show successful login and logout attempts
 - Leavedays / calendar: Fix for holidays blocking calendar entry
