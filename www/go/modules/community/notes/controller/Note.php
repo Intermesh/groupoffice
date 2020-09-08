@@ -72,4 +72,35 @@ class Note extends EntityController {
 	public function changes($params) {
 		return $this->defaultChanges($params);
 	}
+
+
+	/**
+	 * @param $params
+	 * @return array
+	 * @throws \go\core\jmap\exception\InvalidArguments
+	 */
+	public function export($params) {
+		return $this->defaultExport($params);
+	}
+
+	
+	/**
+	 * @param $params
+	 * @return array
+	 * @throws \Exception
+	 */
+	public function import($params) {
+		return $this->defaultImport($params);
+	}
+
+
+	/**
+	 * @param $params
+	 * @return array
+	 * @throws \Exception
+	 */
+	public function importCSVMapping($params)
+	{
+		return $this->defaultImportCSVMapping($params);
+	}
 }

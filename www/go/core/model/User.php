@@ -21,6 +21,8 @@ use go\core\jmap\Entity;
 use go\core\orm\CustomFieldsTrait;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
+use go\modules\community\addressbook\model\AddressBook;
+use go\modules\community\notes\model\NoteBook;
 
 
 class User extends Entity {
@@ -156,6 +158,12 @@ class User extends Entity {
 	
 	
 	public $max_rows_list;
+
+	/**
+	 *
+	 * @var bool
+	 */
+	protected $archive = false;
 	
 	/**
 	 * The user timezone
@@ -256,9 +264,18 @@ class User extends Entity {
 		$this->getPersonalGroup()->setValues($values);
 	}
 	
-	public function setValues(array $values) {
+	public function setValues(array $values)
+	{
 		$this->passwordVerified = false;
 		return parent::setValues($values);
+	}
+
+
+	public function setArchive($v) {
+		if(!go()->getAuthState()->isAdmin()) {
+			throw new Forbidden("Only admins can archive");
+		}
+		$this->archive = $v;
 	}
 
 	protected function canCreate()
@@ -642,6 +659,10 @@ class User extends Entity {
 		if($this->isNew()) {
 			$this->legacyOnSave();	
 		}
+
+		if($this->archive) {
+			$this->archiveUser();
+		}
 		
 		return true;		
 	}
@@ -919,4 +940,41 @@ class User extends Entity {
 	}
 
 
+	/**
+	 * Archive a user - remove all shares instead of with admins only.
+	 *
+	 * If a user is archived, any shares with themselves and non-admin users are deleted.Please note that we only do
+	 * this for community items. It is not entirely certain for other objects if they should be archived.
+	 *
+	 */
+	private function archiveUser()
+	{
+		$aclIds = [];
+
+		if ($defAddressBookId = $this->addressBookSettings->getDefaultAddressBookId()) {
+			$addressBook = AddressBook::findById($defAddressBookId);
+			$aclIds[] = $addressBook->findAclId();
+			AddressBook::entityType()->change($addressBook);
+		};
+		if ($defNoteBookId = $this->notesSettings->getDefaultNoteBookId()) {
+			$noteBook = NoteBook::findById($defNoteBookId);
+			$aclIds[] = $noteBook->findAclId();
+			NoteBook::entityType()->change($noteBook);
+		}
+		if ($defTaskListId = $this->taskSettings->default_tasklist_id) {
+			$aclIds[] = \GO\Tasks\Model\Tasklist::model()->findByPk($defTaskListId)->findAclId();
+		}
+		if ($calendarId = $this->calendarSettings->calendar_id) {
+			$aclIds[] = \GO\Calendar\Model\Calendar::model()->findByPk($calendarId)->findAclId();
+		}
+		$grpId = $this->getPersonalGroup()->id();
+		foreach (Acl::findByIds($aclIds) as $rec) {
+			foreach ($rec->groups as $aclGrp) {
+				if (!in_array($aclGrp->groupId, [Group::ID_ADMINS, $grpId])) {
+					$rec->removeGroup($aclGrp->groupId);
+				}
+			}
+			$rec->save();
+		}
+	}
 }

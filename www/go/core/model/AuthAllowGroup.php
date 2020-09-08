@@ -39,16 +39,6 @@ class AuthAllowGroup extends Entity
   }
 
   /**
-   * The restrictions only apply if rules are defined
-   *
-   * @return bool
-   * @throws Exception
-   */
-  private static function isEnabled() {
-    return self::find()->selectSingleValue('id')->single() != false;
-  }
-
-  /**
    * Check if a user is allowed for a given IP address
    *
    * @param User $user
@@ -57,13 +47,15 @@ class AuthAllowGroup extends Entity
    * @throws Exception
    */
   public static function isAllowed(User $user, $ip) {
-    if(!self::isEnabled()) {
-      return true;
-    }
 
     $patterns = self::find()->selectSingleValue('ipPattern')
       ->join('core_user_group', 'ug', 'ug.groupId = ag.groupId')
-      ->where('ug.userId', '=',  $user->id);
+      ->where('ug.userId', '=',  $user->id)
+	    ->execute();
+
+    if(!$patterns->rowCount()) {
+    	return true;
+    }
 
     foreach($patterns as $pattern) {
       if(self::match($ip, $pattern)) {

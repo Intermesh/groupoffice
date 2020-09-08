@@ -504,8 +504,15 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		$attr['end_time']=\GO::t("Ends at", "calendar");
 		return $attr;
 	}
+
+	public $skipValidation = false;
 	
 	public function validate() {
+
+		if($this->skipValidation) {
+			return true;
+		}
+
 		if($this->rrule != ""){			
 			$rrule = new \GO\Base\Util\Icalendar\Rrule();
 			$rrule->readIcalendarRruleString($this->start_time, $this->rrule);						
@@ -1083,10 +1090,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	public function getConflictingEvents($exception_for_event_id=0){
 		
 		$conflictEvents=array();
-		
-		
-		
-		
+
 		$settings = Settings::model()->getDefault(GO::user());
 		if(!$settings->check_conflict) {
 			return $conflictEvents;

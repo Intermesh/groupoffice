@@ -87,7 +87,13 @@ trait CustomFieldsTrait {
 				
 			} else
 			{
-				$this->customFieldsData = [];
+				$record = [];
+				$columns = Table::getInstance(static::customFieldsTableName())->getColumns();
+				foreach($columns as $name => $column) {
+					$record[$name] = $column->default;
+				}
+
+				$this->customFieldsData = $record;
 			}
 		}
 		

@@ -61,7 +61,9 @@ Ext.extend(GO.data.PrefetchProxy, Ext.data.HttpProxy, {
 
 		}, this);
 
-		Promise.all(promises).then(function() {
+		Promise.all(promises).catch(function(e) {
+			console.error(e);
+		}).finally(function(){
 			cb.call(scope);
 		});
 	},

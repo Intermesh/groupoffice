@@ -20,12 +20,16 @@
 
 namespace GO\Calendar\Controller;
 
+use DateTime;
+use \GO\Base\Util\Date as GODate;
 use GO\Base\Db\ActiveRecord;
 use GO\Base\Db\FindCriteria;
+use GO\Base\Db\FindParams;
 use GO\Base\Fs\File;
 use GO\Calendar\Model\Event;
 use go\core\orm\EntityType;
 use GO\Email\Model\Account;
+use GO\Leavedays\Model\Leaveday;
 
 class EventController extends \GO\Base\Controller\AbstractModelController {
 
@@ -160,6 +164,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 					//$model = new \GO\Calendar\Model\Event();
 					unset($params['exception_for_event_id']);
 					unset($params['repeat_end_time']);
+					unset($params['id']);
 					$duration = $model->end_time - $model->start_time;
 					$this->_setEventAttributes($model, $params);
 
@@ -184,6 +189,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 					$rRule->setParams(array('until'=> $untilTime));
 					$recurringEvent->rrule = $rRule->createRrule();
 					$recurringEvent->repeat_end_time = $untilTime;
+					$recurringEvent->skipValidation = true;
 					$recurringEvent->save(); // CLOSE Recurrence, forget about exceptions (this en future means everything)
 				} else {
 					$model = $recurringEvent->createExceptionEvent($params['exception_date'], array(), true);
@@ -195,6 +201,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 
 					$this->_setEventAttributes($model, $params);
 
+					$model->skipValidation = true;
 				}
 			}
 		}
@@ -232,6 +239,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		/* Check for conflicts regarding resources */
 		if (!$event->isResource() && isset($params['resources'])) {
 			//TODO code does not work right. Should be refactored in 4.1
+			// Hmmmm... 6.5 maybe?
 			$resources=array();
 			foreach ($params['resources'] as $resource_calendar_id => $enabled) {
 				if($enabled=='on')
@@ -240,12 +248,12 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			
 			if (count($resources) > 0) {
 				
-				$findParams = \GO\Base\Db\FindParams::newInstance();
+				$findParams = FindParams::newInstance();
 				$findParams->getCriteria()->addInCondition("calendar_id", $resources);
 				if(!$event->isNew)
 					$findParams->getCriteria()->addCondition("resource_event_id", $event->id, '<>');
 				
-				$conflictingEvents = \GO\Calendar\Model\Event::model()->findCalculatedForPeriod($findParams, $event->start_time, $event->end_time, true);
+				$conflictingEvents = Event::model()->findCalculatedForPeriod($findParams, $event->start_time, $event->end_time, true);
 				
 				$resourceConlictsFound=false;
 			
@@ -262,6 +270,54 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 					$response["success"]=false;
 					return false;
 				}
+			}
+		}
+
+		// Check for approved leave hours
+		if(!empty($params["check_conflicts"]) && \GO::modules()->leavedays ) {
+			// Get user IDs from participants
+			$num_conflicts = 0;
+			$userIds[] = $event->user_id;
+
+			if(isset($params['participants'])) {
+				$participants = json_decode($params['participants'],true);
+				foreach($participants as $participant) {
+					if($participant['user_id'] > 0 && $participant['user_id'] != $event->user_id) {
+						$userIds[] = $participant['user_id'];
+					}
+				}
+			}
+
+			if(empty($userIds)) {
+				return true;
+			}
+
+			// Get Leave days in period for selected users
+			$findParams = FindParams::newInstance();
+			$findParams->getCriteria()->addInCondition("user_id", $userIds)
+				->addCondition('status',1)
+				->mergeWith(
+					\GO\Base\Db\FindCriteria::newInstance()
+						->addCondition('first_date', $event->end_time, '<=')
+						->addCondition('last_date', $event->start_time, '>=','t',false)
+				);
+
+			$stmt = Leaveday::model()->find($findParams);
+			foreach($stmt as $item) {
+				// Now we have to take the start time and duration of the leave day into account. These are saved in
+				// a peculiar way, so we have to make a hack.
+				$itemStartTime = (new DateTime())->setTimeStamp($item->first_date);
+				$tsItemStart = GODate::to_unixtime($itemStartTime->format('Y-m-d'). ' '. $item->from_time. ':00');
+				$tsItemEnd = GODate::dateTime_add($tsItemStart,0, (($item->n_hours + $item->n_nat_holiday_hours) * 60));
+				if($tsItemStart < $event->end_time && $tsItemEnd > $event->start_time) {
+					$num_conflicts++;
+				}
+			}
+
+			if($num_conflicts > 0) {
+				$response["feedback"] = 'Ask permission';
+				$response["success"] = false;
+				return false;
 			}
 		}
 		

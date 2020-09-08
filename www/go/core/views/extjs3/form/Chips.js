@@ -90,6 +90,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	storeBaseParams: null,
 	comboStoreConfig: null,
 	allowBlank: true,
+	layout:'form',
 	
 	initComponent: function () {
 
@@ -148,10 +149,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		this.items = [];
 		var cb = this.createComboBox();
 		if(cb) {
-			this.items.push({
-				layout: "form",				
-				items: [cb]
-			});
+			this.items.push(cb);
 			cb.on('change', function() {
 				this.fireEvent('change', this, this.getValue());
 			}, this);
