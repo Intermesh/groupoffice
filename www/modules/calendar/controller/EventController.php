@@ -296,8 +296,11 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			$findParams = FindParams::newInstance();
 			$findParams->getCriteria()->addInCondition("user_id", $userIds)
 				->addCondition('status',1)
-				->addCondition('first_date', $event->end_time, '<=')
-				->addCondition('last_date', $event->start_time, '>=','t',false);
+				->mergeWith(
+					\GO\Base\Db\FindCriteria::newInstance()
+						->addCondition('first_date', $event->end_time, '<=')
+						->addCondition('last_date', $event->start_time, '>=','t',false)
+				);
 
 			$stmt = Leaveday::model()->find($findParams);
 			foreach($stmt as $item) {
