@@ -1,5 +1,6 @@
-6.4.167
+08-09-2020 6.4.167
 - Core: if Activity Log enabled, show successful login and logout attempts
+- Leavedays / calendar: Fix for holidays blocking calendar entry
 
 07-09-2020 6.4.166
 - Core: allow login if there are no restrictive rules at all for you instead of no rules at all for the whole system
