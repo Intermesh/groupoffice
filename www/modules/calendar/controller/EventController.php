@@ -274,7 +274,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		}
 
 		// Check for approved leave hours
-		if(\GO::modules()->leavedays) {
+		if(!empty($params["check_conflicts"]) && \GO::modules()->leavedays ) {
 			// Get user IDs from participants
 			$num_conflicts = 0;
 			$userIds[] = $event->user_id;
@@ -286,6 +286,10 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 						$userIds[] = $participant['user_id'];
 					}
 				}
+			}
+
+			if(empty($userIds)) {
+				return true;
 			}
 
 			// Get Leave days in period for selected users
