@@ -274,7 +274,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		}
 
 		// Check for approved leave hours
-		if(\GO::modules()->leavedays) {
+		if(!empty($params["check_conflicts"]) && \GO::modules()->leavedays ) {
 			// Get user IDs from participants
 			$num_conflicts = 0;
 			$userIds[] = $event->user_id;
@@ -288,12 +288,19 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				}
 			}
 
+			if(empty($userIds)) {
+				return true;
+			}
+
 			// Get Leave days in period for selected users
 			$findParams = FindParams::newInstance();
 			$findParams->getCriteria()->addInCondition("user_id", $userIds)
 				->addCondition('status',1)
-				->addCondition('first_date', $event->end_time, '<=')
-				->addCondition('last_date', $event->start_time, '>=','t',false);
+				->mergeWith(
+					\GO\Base\Db\FindCriteria::newInstance()
+						->addCondition('first_date', $event->end_time, '<=')
+						->addCondition('last_date', $event->start_time, '>=','t',false)
+				);
 
 			$stmt = Leaveday::model()->find($findParams);
 			foreach($stmt as $item) {
