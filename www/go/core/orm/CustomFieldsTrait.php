@@ -44,6 +44,7 @@ trait CustomFieldsTrait {
 			}
 			$record[$field->databaseName] = $field->getDataType()->$fn(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record, $this);
 		}
+		unset($record['id']);
 		return $record;	
 	}
 
@@ -90,13 +91,16 @@ trait CustomFieldsTrait {
 				$record = [];
 				$columns = Table::getInstance(static::customFieldsTableName())->getColumns();
 				foreach($columns as $name => $column) {
+					if($name == "id") {
+						continue;
+					}
 					$record[$name] = $column->default;
 				}
 
 				$this->customFieldsData = $record;
 			}
 		}
-		
+
 		return $this->customFieldsData;//array_filter($this->customFieldsData, function($key) {return $key != 'id';}, ARRAY_FILTER_USE_KEY);
 	}
   /**
