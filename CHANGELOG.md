@@ -6,6 +6,7 @@ Master
 - Tasks: new module
 - Business: New employee management module
 - Time tracking: new module
+- History: new module replacing Activity log
 
 08-09-2020 6.4.167
 - Core: if Activity Log enabled, show successful login and logout attempts
