@@ -101,11 +101,23 @@ class Link extends Entity
 	public function getToEntity() {
 		return $this->toEntity;
 	}
+
 	
 	public function setToEntity($entityName) {
 		$e = EntityType::findByName($entityName);
 		$this->toEntity = $e->getName();
 		$this->toEntityTypeId = $e->getId();
+	}
+
+	/**
+	 * Check if this links from type 1 to type 2
+	 *
+	 * @param string $entityType1
+	 * @param string $entityType2
+	 * @return bool
+	 */
+	public function isBetween($entityType1, $entityType2) {
+		return ($this->getToEntity() == $entityType1 && $this->getFromEntity() !== $entityType2) || ($this->getToEntity() == $entityType1 && $this->getFromEntity() == $entityType2);
 	}
 
 	/**

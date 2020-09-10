@@ -989,7 +989,8 @@ class Contact extends AclItemEntity {
 	 * @throws Exception
 	 */
 	public static function onLinkSave(Link $link) {
-		if($link->getToEntity() !== "Contact" || $link->getFromEntity() !== "Contact") {
+
+		if(!$link->isBetween("Contact", "Contact")) {
 			return;
 		}
 		
