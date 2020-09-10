@@ -7,6 +7,12 @@ Master
 - Business: New employee management module
 - Time tracking: new module
 - History: new module replacing Activity log
+end master
+
+
+- Core: custom fields don't return id in data
+
+
 
 08-09-2020 6.4.167
 - Core: if Activity Log enabled, show successful login and logout attempts
@@ -618,7 +624,6 @@ Master
 
 10-12-2019 6.4.90
 - Zpush: mail sync was broken
-- Mail: cleanup script for removing orphaned mailboxes added
 
 09-12-2019 6.4.89
 - Files: We did an update to Group-Office which comes with a new implementation of the Group-Office Assistant. If you use this please update it to the new version. You can find it under "Files" for your operating system at this page:
