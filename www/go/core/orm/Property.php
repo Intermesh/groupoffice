@@ -535,7 +535,7 @@ abstract class Property extends Model {
    * @throws Exception
    */
 	public function &__get($name) {
-		$prop = static::getMapping()->getProperty($name);
+		$prop = static::getMapping()->getRelation($name);
 		if($prop) {
 			if(!isset($this->dynamicProperties[$name])) {
 				if($prop instanceof Relation && !in_array($name, $this->fetchProperties)) {
