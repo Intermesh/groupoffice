@@ -954,7 +954,9 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 
 		Ext.getBody().mask(t("Loading..."));
 
-		this.createLinkButton.reset();
+		if(!config.keepLinks) {
+			this.createLinkButton.reset();
+		}
 
 		this.showConfig=config;
 		
@@ -1297,8 +1299,20 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		if(this.showConfig.entity && this.showConfig.entityId) {
 			this.setLinkEntity(config);
 		}
+
+
 		
 		this.fireEvent('afterShowAndLoad',this);
+
+
+		if(config.blobs) {
+			let me = this;
+			setTimeout(function(){
+			config.blobs.forEach(function(b) {
+				me.emailEditor.attachmentsView.addBlob(b);
+			}, me);
+			});
+		}
 	},
 	
 
@@ -1316,7 +1330,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 	},
 	
 	setLinkEntity : function(link) {
-		this.createLinkButton.addLink(link.entity, link.entityId);
+	//	this.createLinkButton.addLink(link.entity, link.entityId);
 	},
 
 	sendMail : function(draft, autoSave) {

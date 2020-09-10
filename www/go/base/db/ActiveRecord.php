@@ -43,6 +43,8 @@ namespace GO\Base\Db;
 use GO\Base\Db\PDO;
 use GO;
 use go\core\db\Query;
+use go\core\model\Link;
+use go\core\orm\EntityType;
 use go\core\util\DateTime;
 
 abstract class ActiveRecord extends \GO\Base\Model{
@@ -4509,53 +4511,59 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if((!$this->hasLinks() && !$isSearchCacheModel) || $linksDisabled)
 			throw new \Exception("Links not supported by ".$this->className ());
 
-		if($this->linkExists($model))
-			return true;
+		Link::create($this, $model);
 
-		if($model instanceof \GO\Base\Model\SearchCacheRecord){
-			$to_model_id = $model->entityId;
-			$to_model_type_id = $model->entityTypeId;
-		}else
-		{
-			$to_model_id = $model->id;
-			$to_model_type_id = $model->entityType()->getId();
-		}
-		
-		
-
-		$from_model_type_id = $isSearchCacheModel ? $this->entityTypeId : $this->modelTypeId();
-
-		$from_model_id = $isSearchCacheModel ? $this->model_id : $this->id;
-		
-		if($to_model_id == $from_model_id && $to_model_type_id == $from_model_type_id) {
-			//don't link to self
-			return true;
-		}
-		
-		if(!\go\core\App::get()->getDbConnection()->insert('core_link', [
-				"toId" => $to_model_id,
-				"toEntityTypeId" => $to_model_type_id,
-				"fromId" => $from_model_id,
-				"fromEntityTypeId" => $from_model_type_id,
-				"description" => $description,
-				"createdAt" => new \DateTime('now',new \DateTimeZone('UTC'))
-				
-		])->execute()){
-			return false;
-		}
-
-		$reverse = [];
-		$reverse['fromEntityTypeId'] = $to_model_type_id;
-		$reverse['toEntityTypeId'] = $from_model_type_id;
-		$reverse['toId'] = $from_model_id;
-		$reverse['fromId'] = $to_model_id;		
-		$reverse['description'] = $description;
-		$reverse['createdAt'] = new \DateTime('now',new \DateTimeZone('UTC'));
-	
-		
-		if(!\go\core\App::get()->getDbConnection()->insert('core_link', $reverse)->execute()) {
-			return false;
-		}
+//		if($this->linkExists($model))
+//			return true;
+//
+//
+//
+//		if($model instanceof \GO\Base\Model\SearchCacheRecord){
+//			$to_model_id = $model->entityId;
+//			$to_model_type_id = $model->entityTypeId;
+//		}else
+//		{
+//			$to_model_id = $model->id;
+//			$to_model_type_id = $model->entityType()->getId();
+//		}
+//
+//
+//
+//		$from_model_type_id = $isSearchCacheModel ? $this->entityTypeId : $this->modelTypeId();
+//
+//		$from_model_id = $isSearchCacheModel ? $this->model_id : $this->id;
+//
+//		if($to_model_id == $from_model_id && $to_model_type_id == $from_model_type_id) {
+//			//don't link to self
+//			return true;
+//		}
+//
+//		//Link::create()
+//
+//		if(!\go\core\App::get()->getDbConnection()->insert('core_link', [
+//				"toId" => $to_model_id,
+//				"toEntityTypeId" => $to_model_type_id,
+//				"fromId" => $from_model_id,
+//				"fromEntityTypeId" => $from_model_type_id,
+//				"description" => $description,
+//				"createdAt" => new \DateTime('now',new \DateTimeZone('UTC'))
+//
+//		])->execute()){
+//			return false;
+//		}
+//
+//		$reverse = [];
+//		$reverse['fromEntityTypeId'] = $to_model_type_id;
+//		$reverse['toEntityTypeId'] = $from_model_type_id;
+//		$reverse['toId'] = $from_model_id;
+//		$reverse['fromId'] = $to_model_id;
+//		$reverse['description'] = $description;
+//		$reverse['createdAt'] = new \DateTime('now',new \DateTimeZone('UTC'));
+//
+//
+//		if(!\go\core\App::get()->getDbConnection()->insert('core_link', $reverse)->execute()) {
+//			return false;
+//		}
 
 		$this->fireEvent('link', array($this, $model, $description, $this_folder_id, $model_folder_id));
 		return true;
