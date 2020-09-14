@@ -2456,6 +2456,7 @@ The following is the error message:
 				GO\Base\Db\FindParams::newInstance()
 					->select('email')
 					->permissionLevel(GO\Base\Model\Acl::WRITE_PERMISSION, $this->calendar->user_id)
+					->ignoreAdminGroup()
 			)->fetchAll(\PDO::FETCH_COLUMN, 0);
 		}
 
