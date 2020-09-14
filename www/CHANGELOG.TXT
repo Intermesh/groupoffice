@@ -1,4 +1,5 @@
 - Email: Strip invalid chars from attachments when creating temporary files
+- Calendar: optimized loading performance
 
 07-09-2020 6.2.128
 - Core: Wrong encoding for 7.1+ version
