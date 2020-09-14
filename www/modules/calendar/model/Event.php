@@ -2406,7 +2406,8 @@ $sub = $offset>0;
 				'event_id'=>$this->id
 		));
 	}
-	
+
+	private static $aliases = [];
 	
 	/**
 	 * Get the participant model where the user matches the calendar user
@@ -2415,14 +2416,16 @@ $sub = $offset>0;
 	 */
 	public function getParticipantOfCalendar() {
 
-		$aliases = GO\Email\Model\Alias::model()->find(
+		if(!isset(self::$aliases[$this->calendar->user_id])) {
+			self::$aliases[$this->calendar->user_id] = \GO\Email\Model\Alias::model()->find(
 				GO\Base\Db\FindParams::newInstance()
 					->select('email')
 					->permissionLevel(GO\Base\Model\Acl::WRITE_PERMISSION, $this->calendar->user_id)
-				)->fetchAll(\PDO::FETCH_COLUMN, 0);
+			)->fetchAll(\PDO::FETCH_COLUMN, 0);
+		}
 
 		return Participant::model()->findSingleByAttributes(array(
-				'email' => $aliases,
+				'email' => self::$aliases[$this->calendar->user_id],
 				'event_id'=>$this->id
 		));
 	}
