@@ -3617,7 +3617,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		unset($attr['modifiedAt']);
 		
 		$search->entityId = $this->id;
-		$search->setAclId(!empty($attr['acl_id']) ? $attr['acl_id'] : $this->findAclId());			
+		$search->setAclId(!empty($attr['aclId']) ? $attr['aclId'] : $this->findAclId());
 		//$search->createdAt = \DateTime::createFromFormat("U", $this->mtime);		
 		$search->setKeywords($this->getSearchCacheKeywords($this->localizedName.','.implode(',', $attr)));
 		
