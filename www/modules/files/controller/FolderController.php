@@ -1286,7 +1286,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			$file = \GO\Files\Model\File::model()->findByPath($sources[$i]);
 			if(!$file) {
-				throw new NotFound();
+				throw new \GO\Base\Exception\NotFound($sources[$i]);
 			}
 
 			if(!$file->getPermissionLevel()) {
