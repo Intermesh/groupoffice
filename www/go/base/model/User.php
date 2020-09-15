@@ -592,6 +592,8 @@ class User extends \GO\Base\Db\ActiveRecord {
 		return strtoupper($short);
 	}
 
+	private static $groupIds = [];
+
 	/**
 	 * Returns an array of user group id's
 	 * 
@@ -616,19 +618,21 @@ class User extends \GO\Base\Db\ActiveRecord {
 		
 			return GO::session()->values['user_groups'];
 		} else {
-			$ids = array();
-			$stmt= UserGroup::model()->find(
-								\GO\Base\Db\FindParams::newInstance()
-								->select('t.group_id')
-								->debugSql()
-								->criteria(\GO\Base\Db\FindCriteria::newInstance()
-												->addCondition("user_id", $userId))
-								);
-			
-			while ($r = $stmt->fetch()) {
-				$ids[] = $r->group_id;
+			if(!isset(self::$groupIds[$userId])) {
+				self::$groupIds[$userId] = array();
+				$stmt = UserGroup::model()->find(
+					\GO\Base\Db\FindParams::newInstance()
+						->select('t.group_id')
+						->debugSql()
+						->criteria(\GO\Base\Db\FindCriteria::newInstance()
+							->addCondition("user_id", $userId))
+				);
+
+				while ($r = $stmt->fetch()) {
+					self::$groupIds[$userId][] = $r->group_id;
+				}
 			}
-			return $ids;
+			return self::$groupIds[$userId];
 		}
 	}
 	
