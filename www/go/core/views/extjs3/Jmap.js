@@ -197,10 +197,10 @@ go.Jmap = {
 				},
 				items:[
 					{xtype:'progress',animate:true,itemId:'totalProgress', height:4,style:'margin: 7px 0'},
-					{xtype:'panel', itemId:'details',collapsed:false, animCollapse: false, forceLayout:true, collapsible:true, title:'Details', listeners: {
-							afterrender: function() {
-								this.collapse();
-							}
+					{xtype:'panel', itemId:'details',collapsed:true, animCollapse: false, forceLayout:true, collapsible:true, title:t('Details'), listeners: {
+							// afterrender: function() {
+							// 	this.collapse();
+							// }
 						}}
 				],
 				tbar: [{xtype:'tbtext',itemId: 'fileCount', html:t('{finsished} of {total}')
@@ -246,7 +246,7 @@ go.Jmap = {
 				html:'<b>'+file.name+'</b><p class="danger">' +t('File size exceeds the maximum of {max}.').replace('{max}', go.util.humanFileSize(this.capabilities.maxSizeUpload)) + '</p>'
 			});
 
-			uploadNotification.items.get('details').expand();
+			uploadNotification.rendered ? uploadNotification.items.get('details').expand() : uploadNotification.items.get('details').collapsed = false;
 
 			return;
 		}
@@ -356,7 +356,7 @@ go.Jmap = {
 				notifyEl.items.get(0).update(text);
 				cfg.failure && cfg.failure.call(cfg.scope || this, data);
 
-				uploadNotification.items.get('details').expand();
+				uuploadNotification.rendered ? uploadNotification.items.get('details').expand() : uploadNotification.items.get('details').collapsed = false;
 
 			},
 			headers: {
