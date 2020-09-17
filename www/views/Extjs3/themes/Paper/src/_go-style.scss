@@ -622,8 +622,9 @@ a {
 		animation: slide-top .2s ease-out; 
 		.x-panel-header {
 			color: color($fg,'secondary-text');
-			zoom:.8;
+			transform: scale(.8);
 			height: dp(40);
+
 			line-height: dp(40);
 	    }
 		.x-panel-header-text {
