@@ -15,12 +15,13 @@ go.Modules.register("community", "bookmarks", {
 	
 	initModule: function () {
 		var me = this;
-		return go.Db.store("Bookmark").all().then(function(all){
-			
-			for(var id in all) {
-				var bookmark = all[id];
+		return go.Db.store("Bookmark").query({
+			filter: {behaveAsModule: true}
+		}).then(function(response){
 
-				if(bookmark.behaveAsModule) {
+			go.Db.store("Bookmark").get(response.ids).then(function(result){
+
+				result.entities.forEach(function() {
 					var style = document.createElement('style');
 					style.type = 'text/css';
 					style.innerHTML = '.go-menu-icon-bookmarks-' + bookmark.id + ' { ' +
@@ -35,8 +36,9 @@ go.Modules.register("community", "bookmarks", {
 						url: bookmark.content					
 					});
 					me.addPanel(cls);
-				}
-			}
+				});
+			});
+
 		});	
 	}
 });
