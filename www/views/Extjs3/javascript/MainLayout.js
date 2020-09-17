@@ -678,7 +678,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				scope: this
 			});
 		}
-		go.Notifier.init.defer(2000, go.Notifier,[notificationArea]);
+		go.Notifier.init(notificationArea);
 		GO.checker.init.defer(2000, GO.checker);
 		GO.checker.on('alert', function (data) {
 			if (data.notification_area)
