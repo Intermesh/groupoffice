@@ -79,7 +79,7 @@ go.Notifier = {
 			msg.listeners.afterrender = function(p){
 				p.el.on('click', function() {
 					if(GO.util.isMobileOrTablet()) {
-						go.Notifier.notificationArea.collapse();
+						go.Notifier.notificationArea.hideNotifications();
 					}
 					msg.handler();
 				});
