@@ -21,7 +21,7 @@ go.Modules.register("community", "bookmarks", {
 
 			go.Db.store("Bookmark").get(response.ids).then(function(result){
 
-				result.entities.forEach(function() {
+				result.entities.forEach(function(bookmark) {
 					var style = document.createElement('style');
 					style.type = 'text/css';
 					style.innerHTML = '.go-menu-icon-bookmarks-' + bookmark.id + ' { ' +

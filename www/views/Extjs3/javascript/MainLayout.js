@@ -348,8 +348,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		Ext.getBody().mask(t("Loading..."));
 	
 		go.Modules.init().then(function() {
-			Promise.all([				
-				go.User.loadLegacyModules(),
+			go.User.loadLegacyModules();
+			Promise.all([
 				go.customfields.CustomFields.init(),				
 				me.loadLegacyModuleScripts()
 			]).then(function(){
