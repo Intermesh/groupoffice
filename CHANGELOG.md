@@ -1,5 +1,6 @@
 - Projects: Revert search for projects to old method
 - Notes: Fixed e-mail -> save as note
+- Core: Improved upload notifications. (Fixes safari 14 crash)
 
 15-09-2020 6.4.168
 - Core: custom fields don't return id in data

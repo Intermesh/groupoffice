@@ -566,11 +566,12 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					title: t('Notifications'),
 					floating:true,
 					width: GO.util.isMobileOrTablet() ? window.innerWidth : dp(408),
-					//animCollapse:true,
-					//animFloat: true,
+					animCollapse:false,
+					animFloat: false,
 					collapsible: true,
 					collapsed: true,
 					autoScroll: true,
+					autoHide: false,
 					cmargins:{left:0,top:0,right:0,bottom:0}
 				});
 
@@ -685,7 +686,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				Ext.get('notification-area').update(data.notification_area);
 			}
 		}, this);
-
 
 
 		
