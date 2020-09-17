@@ -78,9 +78,9 @@ go.Notifier = {
 			msg.listeners = msg.listeners || {};
 			msg.listeners.afterrender = function(p){
 				p.el.on('click', function() {
-					if(GO.util.isMobileOrTablet()) {
-						go.Notifier.notificationArea.hideNotifications();
-					}
+					//if(GO.util.isMobileOrTablet()) {
+						go.Notifier.hideNotifications();
+					//}
 					msg.handler();
 				});
 			}
