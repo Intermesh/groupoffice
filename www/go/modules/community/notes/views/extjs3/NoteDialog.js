@@ -48,6 +48,7 @@ go.modules.community.notes.NoteDialog = Ext.extend(go.form.Dialog, {
 	},
 
 	onLoad : function(entityValues) {
+		debugger;
 		this.supr().onLoad.call(this, entityValues);
 
 		if (!entityValues.content || entityValues.content.substring(0, 8) !== "{GOCRYPT") {

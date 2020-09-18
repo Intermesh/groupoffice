@@ -990,19 +990,19 @@
 .x-toolbar{
 	height: dp(48);
 	padding:0;
-	
+
 	&.go-paging-tb, .go-paging-tb & {
 		height: dp(40);
 	}
 	&-ct {
 		height: 100%;
 	}
-	
-	
+
+
 	.x-panel-tbar & {
 		border-bottom: 1px solid color($fg, 'line');
 	}
-	
+
 	.x-panel-bbar & {
 		height: dp(40);
 		border-top: 1px solid color($fg, 'line');
@@ -1105,7 +1105,7 @@
 .x-tbar-page-next:before { @extend %icon; content: 'chevron_right'; }
 .x-tbar-page-prev:before { @extend %icon; content: 'chevron_left'; }
 
-.x-tbar-page-number{ 
+.x-tbar-page-number{
 	width: dp(48);
 }
 
