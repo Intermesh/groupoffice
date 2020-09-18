@@ -137,7 +137,31 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 						name: "relatedFieldCondition",
 						fieldLabel: t("Required condition"),
 						anchor: "100%",
-						hint: "eg. 'nameOfStandardOrCustomField = test'"
+						hint: "eg. 'nameOfStandardOrCustomField = test'",
+						listeners: {
+							valid: function(elm) {
+								var value = elm.getValue();
+								if(!Ext.isEmpty(value)) {
+									var re=/(={1,2}|<|>)/;
+									var arVal = String(value()).split(re);
+									elm.setRawValue(arVal[0].trim() + " " + arVal[1]  + " " + arVal[2].trim());
+								}
+							},
+							scope: this
+						},
+						validationEvent: 'change',
+						validator: function(value) {
+							if(Ext.isEmpty(value)) {
+								return true;
+							}
+							var re=/(={1,2}|<|>)/;
+							var arVal = String(value).split(re);
+							if(arVal.length !== 3) {
+								return t('The value was not formatted correctly');
+							}
+
+							return true;
+						}
 					},
 					{
 						xtype: "checkbox",

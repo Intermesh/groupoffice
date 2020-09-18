@@ -1,3 +1,4 @@
+- Core: Bugfix in language export
 - Projects: Revert search for projects to old method
 - Notes: Fixed e-mail -> save as note
 - Core: Improved upload notifications. (Fixes safari 14 crash)

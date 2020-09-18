@@ -75,11 +75,11 @@ class Folder extends FileSystemObject {
 	 * @param boolean $includeFiles
 	 * @param boolean $includeFolders
 	 * 
-	 * @return File[]|Folder[]
+	 * @return File[]|Folder[]|array[]
 	 */
 	public function getChildren($includeFiles = true, $includeFolders = true) {
-		if (!$dir = opendir($this->path)) {
-			return false;
+		if (!$dir = @opendir($this->path)) {
+			return []; // Return an empty array to prevent crashing foreach() loops
 		}
 
 		$children = [];
