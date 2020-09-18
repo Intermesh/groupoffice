@@ -3,6 +3,7 @@
 namespace go\core\orm;
 
 use Exception;
+use GO\Base\Db\ActiveRecord;
 use GO\Base\Exception\AccessDenied;
 use go\core\data\convert\AbstractConverter;
 use go\core\data\convert\Json;
@@ -200,7 +201,7 @@ abstract class Entity extends Property {
 	/**
 	 * Find entities linked to the given entity
 	 *
-	 * @param $entity
+	 * @param self|ActiveRecord $entity
 	 * @param array $properties
 	 * @param bool $readOnly
 	 * @return Query|static[]
