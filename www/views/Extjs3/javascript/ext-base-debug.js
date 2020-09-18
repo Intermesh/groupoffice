@@ -1551,7 +1551,7 @@ Ext.TaskMgr.start({
  * (defaults to 10)
  */
 Ext.util.TaskRunner = function(interval){
-    interval = interval || 10;
+    interval = interval || 100;
     var tasks = [], 
     	removeQueue = [],
     	id = 0,
