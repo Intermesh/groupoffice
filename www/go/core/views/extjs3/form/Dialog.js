@@ -241,6 +241,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 	load: function (id) {
 		
 		var me = this;
+
+		me.loading = true;
 		
 		function innerLoad(){
 			me.currentId = id;
@@ -248,6 +250,10 @@ go.form.Dialog = Ext.extend(go.Window, {
 			me.formPanel.load(id, function(entityValues) {
 				me.onLoad(entityValues);
 				me.actionComplete();
+
+				me.loading = false;
+
+				me.onReady();
 			}, this);
 		}
 		
@@ -259,6 +265,14 @@ go.form.Dialog = Ext.extend(go.Window, {
 		}
 
 		return this;
+	},
+
+	/**
+	 * Called on show() if not loading an entity or on load if loading an entity.
+	 */
+	onReady: function() {
+
+		this.fireEvent("ready", this);
 	},
 	
 	delete: function () {
@@ -425,6 +439,20 @@ go.form.Dialog = Ext.extend(go.Window, {
 //				required: true
 //			}
 		];
+	},
+
+	show : function() {
+		go.form.Dialog.superclass.show.call(this);
+
+		var me = this;
+		setTimeout(function() {
+			if(me.loading || me.currentId) {
+				//onReady is called after load.
+				return;
+			}
+
+			me.onReady();
+		});
 	}
 });
 
