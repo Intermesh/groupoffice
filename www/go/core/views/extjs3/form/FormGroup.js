@@ -260,7 +260,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 					setTimeout(function()
 					{
-						cmp.dragZone.destroy();
+						if(cmp.dragZone) {
+							cmp.dragZone.destroy();
+						}
 					});
 				},
 				afterrender: function(cmp) {
