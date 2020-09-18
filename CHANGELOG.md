@@ -1,3 +1,4 @@
+15-09-2020 6.4.169
 - Core: Bugfix in language export
 - Projects: Revert search for projects to old method
 - Notes: Fixed e-mail -> save as note
