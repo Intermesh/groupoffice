@@ -13,6 +13,13 @@
  
 Ext.namespace('GO.util');
 
+// to capture ALL events use:
+// Ext.util.Observable.prototype.fireEvent =
+// 	Ext.util.Observable.prototype.fireEvent.createInterceptor(function() {
+// 		console.log(arguments);
+// 		return true;
+// 	});
+
 
 Ext.Ajax.on('requestexception', function(conn, response, options) {
 	if(response.isAbort) {
