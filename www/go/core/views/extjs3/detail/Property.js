@@ -49,7 +49,7 @@ go.detail.Property = Ext.extend(Ext.Container, {
 		}else{
 			this.valueCmp.on("render", function(cmp){
 				cmp.update(v);
-			}, {single: true});
+			},this, {single: true});
 		}
 	},
 

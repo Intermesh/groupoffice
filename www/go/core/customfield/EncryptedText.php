@@ -15,11 +15,11 @@ class EncryptedText extends Base {
 	}
 	
 	public function dbToApi($value, &$values, $entity) {
-		return Crypt::decrypt($value);
+		return isset($value) ? Crypt::decrypt($value) : null;
 	}
 	
 	public function apiToDb($value, &$values, $entity) {
-		return Crypt::encrypt($value);
+		return isset($value) ? Crypt::encrypt($value) : null;
 	}
 	
 }

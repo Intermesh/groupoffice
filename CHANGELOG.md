@@ -1,3 +1,16 @@
+15-09-2020 6.4.169
+- Core: Bugfix in language export
+- Projects: Revert search for projects to old method
+- Notes: Fixed e-mail -> save as note
+- Core: Improved upload notifications. (Fixes safari 14 crash)
+- Core: Toolbars in a side panel next to a grid crashed Safari 14.0 (100% cpu usage)
+
+15-09-2020 6.4.168
+- Core: custom fields don't return id in data
+- Tickets: tickets where searchable for all users allowed to create tickets. The same thing happened to mail linked to those tickets
+- Calendar: Optimized loading performance
+- Custom fields: Fixed error when using encrypted text field
+
 08-09-2020 6.4.167
 - Core: if Activity Log enabled, show successful login and logout attempts
 - Leavedays / calendar: Fix for holidays blocking calendar entry

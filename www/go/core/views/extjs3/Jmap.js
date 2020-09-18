@@ -157,7 +157,7 @@ go.Jmap = {
 			items: []
 		};
 	},
-	uploaderCollapsed: false,
+
 	/**
 	 *
 	 * @param {File} file
@@ -168,6 +168,7 @@ go.Jmap = {
 			cfg.callback && cfg.callback.call(cfg.scope || this, {upload:'skipped'});
 			return;
 		}
+
 		var uploadNotification = go.Notifier.msgByKey('upload');
 		if(!uploadNotification) {
 			this.resetUploadQueue();
@@ -177,21 +178,29 @@ go.Jmap = {
 				persistent: true,
 				iconCls: 'ic-file-upload',
 				title: t('Uploads'),
+
+				updateCount: function() {
+
+					if(!this.rendered) {
+						return;
+					}
+					uploadNotification.getTopToolbar().items.get('fileCount').update(t('{finished} of {total}')
+						.replace('{finished}', go.Jmap.uploadQueue.finished)
+						.replace('{total}', go.Jmap.uploadQueue.items.length) + ' ' + t('files'));
+				},
+
 				addUpload: function(item) {
 					var details = this.items.get('details');
-					if(!details.rendered) {
-						details.render();
-					}
 					var comp = details.add(new Ext.Panel(item));
 					details.doLayout(false, true);
 					return comp;
 				},
 				items:[
 					{xtype:'progress',animate:true,itemId:'totalProgress', height:4,style:'margin: 7px 0'},
-					{xtype:'panel', itemId:'details',collapsed:false, animCollapse: false, forceLayout:true, collapsible:true, title:'Details', listeners: {
-							afterrender: function() {
-								this.collapse();
-							}
+					{xtype:'panel', itemId:'details',collapsed:true, animCollapse: false, forceLayout:true, collapsible:true, title:t('Details'), listeners: {
+							// afterrender: function() {
+							// 	this.collapse();
+							// }
 						}}
 				],
 				tbar: [{xtype:'tbtext',itemId: 'fileCount', html:t('{finsished} of {total}')
@@ -206,14 +215,25 @@ go.Jmap = {
 						}
 					},
 					scope:this
-				}]
+				}],
+				listeners: {
+					afterrender: function(n) {
+						setTimeout(function(){
+							n.updateCount();
+						})
+					}
+				}
 
 			}, 'upload');
 		}
 
 		if(go.Notifier.notificationArea.collapsed) {
-			this.uploaderCollapsed = true;
-			go.Notifier.notificationArea.expand();
+			//show only if uploading for more than 1s
+			setTimeout(function() {
+				if (go.Jmap.uploadQueue.items.length > go.Jmap.uploadQueue.finished) {
+					go.Notifier.showNotifications();
+				}
+			}, 1000);
 		}
 
 		if(this.capabilities.maxSizeUpload && file.size > this.capabilities.maxSizeUpload) {
@@ -226,7 +246,7 @@ go.Jmap = {
 				html:'<b>'+file.name+'</b><p class="danger">' +t('File size exceeds the maximum of {max}.').replace('{max}', go.util.humanFileSize(this.capabilities.maxSizeUpload)) + '</p>'
 			});
 
-			uploadNotification.items.get('details').expand();
+			uploadNotification.rendered ? uploadNotification.items.get('details').expand() : uploadNotification.items.get('details').collapsed = false;
 
 			return;
 		}
@@ -256,7 +276,6 @@ go.Jmap = {
 				}]
 			});
 
-
 		queueItem.transactionId = Ext.Ajax.request({
 			url: go.User.uploadUrl,
 			timeout: 4 * 60 * 60 * 1000, //4 hours
@@ -274,17 +293,17 @@ go.Jmap = {
 				queueItem.finished = true;
 				queueItem.remainingBytes = 0; // success or fail, we are done
 				notifyEl.buttons[0].hide();
-				uploadNotification.getTopToolbar().items.get('fileCount').update(t('{finsished} of {total}')
-					.replace('{finsished}', ++go.Jmap.uploadQueue.finished)
-					.replace('{total}', go.Jmap.uploadQueue.items.length) + ' ' + t('files'));
+
+				go.Jmap.uploadQueue.finished++;
+				uploadNotification.updateCount();
+
 				if (go.Jmap.uploadQueue.items.length <= go.Jmap.uploadQueue.finished) {
 					go.Notifier.toggleIcon('upload', false); //done
 					if(go.Jmap.uploadQueue.failed == 0) { // noneFailed1
 						go.Notifier.remove(uploadNotification);
+						go.Notifier.hideNotifications();
 					}
 					uploadNotification.setPersistent(false);
-					go.Notifier.notificationArea[go.Jmap.uploaderCollapsed ? 'collapse' : 'expand']();
-					go.Jmap.uploaderCollapsed = false; // default only set to true when collapsed on first upload
 				}
 				cfg.callback && cfg.callback.call(cfg.scope || this, response);
 			},
@@ -337,8 +356,7 @@ go.Jmap = {
 				notifyEl.items.get(0).update(text);
 				cfg.failure && cfg.failure.call(cfg.scope || this, data);
 
-				uploadNotification.items.get('details').expand();
-				go.Jmap.uploaderCollapsed = false;
+				uuploadNotification.rendered ? uploadNotification.items.get('details').expand() : uploadNotification.items.get('details').collapsed = false;
 
 			},
 			headers: {
@@ -350,9 +368,8 @@ go.Jmap = {
 		});
 		this.uploadQueue.totalBytes += file.size;
 		this.uploadQueue.items.push(queueItem);
-		uploadNotification.getTopToolbar().items.get('fileCount').update(t('{finsished} of {total}')
-			.replace('{finsished}', this.uploadQueue.finished)
-			.replace('{total}', this.uploadQueue.items.length) + ' ' + t('files'));
+
+		uploadNotification.updateCount();
 	},
 	
 	/**

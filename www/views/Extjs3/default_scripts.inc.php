@@ -154,9 +154,10 @@ if ($cacheFile->exists()) {
 				
 			}
 			
-			$scripts[] = 'Ext.ns("GO.' . $module->name  . '");';
+			$scripts[] = $module->package ? 'Ext.ns("go.modules.' . $module->package . '.' . $module->name . '");' : 'Ext.ns("GO.' . $module->name  . '");';
 
-			$bundleFile = new File($module->moduleManager->path() . 'views/extjs3/scripts.js');
+
+			$bundleFile = new File($module->moduleManager->path(). 'views/extjs3/scripts.js');
 			if($bundleFile->exists()) {
 				$scripts[] = $bundleFile;
 			} else {
