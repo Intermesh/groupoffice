@@ -40592,6 +40592,8 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
             this.el.dom.value = (Ext.isEmpty(v) ? '' : v);
             this.validate();
         }
+
+        this.fireEvent('setvalue', this, v);
         return this;
     },
 
