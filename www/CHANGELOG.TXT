@@ -1,3 +1,5 @@
+- Core: Fixed not found error on compressing folders.
+
 21-09-2020 6.2.129
 - Email: Strip invalid chars from attachments when creating temporary files
 - Calendar: optimized loading performance

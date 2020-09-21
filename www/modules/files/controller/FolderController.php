@@ -6,6 +6,7 @@ namespace GO\Files\Controller;
 use Exception;
 use GO;
 use GO\Base\Exception\AccessDenied;
+use GO\Files\Model\Folder;
 
 class FolderController extends \GO\Base\Controller\AbstractModelController {
 
@@ -573,7 +574,6 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 						array_unshift(\GO::session()->values['files']['pasteIds']['folders'], $folder_id);
 						$response['fileExists'] = $folderName;
 						return $response;
-						break;
 
 					case 'yestoall':
 					case 'yes':
@@ -588,9 +588,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 						if ($params['overwrite'] == 'no')
 							$params['overwrite'] = 'ask';
 
-						continue;
-
-						break;
+						continue 2;
 				}
 			}
 
@@ -1179,7 +1177,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 								array_unshift(\GO::session()->values['files']['uploadqueue'], $tmpfile);
 								$response['fileExists'] = $file->name();
 								return $response;
-								break;
+
 
 							case 'yestoall':
 							case 'yes':
@@ -1194,9 +1192,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 								if ($params['overwrite'] == 'no')
 									$params['overwrite'] = 'ask';
 
-								continue;
+								continue 2;
 
-								break;
 						}
 					} else {
 						$destinationFolder->addFileSystemFile($file);
@@ -1232,7 +1229,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			$file = \GO\Files\Model\File::model()->findByPath($sources[$i]);
 			if(!$file) {
-				throw new NotFound();
+				$file = Folder::model()->findByPath($sources[$i], false, [], true, true);
+				if(!$file) {
+					throw new NotFound("Couldn't find '" . $sources[$i] . "'");
+				}
 			}
 
 			if(!$file->getPermissionLevel()) {
@@ -1286,7 +1286,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			$file = \GO\Files\Model\File::model()->findByPath($sources[$i]);
 			if(!$file) {
-				throw new \GO\Base\Exception\NotFound($sources[$i]);
+				$file = Folder::model()->findByPath($sources[$i], false, [], true, true);
+				if(!$file) {
+					throw new NotFound("Couldn't find '" . $sources[$i] . "'");
+				}
 			}
 
 			if(!$file->getPermissionLevel()) {

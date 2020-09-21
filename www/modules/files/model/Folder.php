@@ -574,7 +574,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 * @param boolean $autoCreate True to auto create the folders. ACL's will be ignored.
 	 * @return Folder
 	 */
-	public function findByPath($relpath, $autoCreate=false, $autoCreateAttributes=array(), $caseSensitive=true) {
+	public function findByPath($relpath, $autoCreate=false, $autoCreateAttributes=array(), $caseSensitive=true, $returnLastFound = false) {
 
 
 		$oldIgnoreAcl = \GO::$ignoreAclPermissions;
@@ -589,7 +589,8 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		$parent_id = 0;
 
 		foreach($parts as $index=>$folderName){
-		
+			$lastFolder = $folder;
+
 			$cacheKey = $parent_id.'/'.$folderName;
 
 			if(!isset($this->_folderCache[$cacheKey])){
@@ -604,8 +605,13 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 				$folder = $this->findSingle($findParams);
 				if (!$folder) {
-					if (!$autoCreate)
-						return false;
+					if (!$autoCreate) {
+						if($returnLastFound) {
+							return $lastFolder;
+						} else{
+							return false;
+						}
+					}
 
 					$folder = new Folder();
 					$folder->setAttributes($autoCreateAttributes);
