@@ -4,6 +4,7 @@ go.smtp.GridPanel = Ext.extend(go.grid.GridPanel, {
 	viewConfig: {
 		forceFit: true,
 		autoFill: true,
+		sortable: false,
 		emptyText: 	'<p>' +t("No items to display") + '</p>'
 	},
 
@@ -11,7 +12,7 @@ go.smtp.GridPanel = Ext.extend(go.grid.GridPanel, {
 
 		var actions = this.initRowActions();
 
-		Ext.apply(this, {	
+		Ext.apply(this, {
 			tbar: [
 				{
 					xtype:'tbtitle',
@@ -40,19 +41,21 @@ go.smtp.GridPanel = Ext.extend(go.grid.GridPanel, {
 				{
 					id: 'hostname',
 					header: t('Hostname'),
-					sortable: false,
+					sortable: this.viewConfig.sortable,
 					dataIndex: 'hostname',
 					hideable: false,
 					draggable: false,
-					menuDisabled: true
+					menuDisabled: true,
+					width: 'auto'
 				},{
 					id: 'fromEmail',
 					header: t('E-mail'),
-					sortable: false,
+					sortable: this.viewConfig.sortable,
 					dataIndex: 'fromEmail',
 					hideable: false,
 					draggable: false,
-					menuDisabled: true
+					menuDisabled: true,
+					width: 'auto'
 				},
 				actions
 			],
@@ -65,7 +68,7 @@ go.smtp.GridPanel = Ext.extend(go.grid.GridPanel, {
 		});
 
 		go.smtp.GridPanel.superclass.initComponent.call(this);
-		
+
 		this.on("rowdblclick", function(grid, rowIndex, e) {
 			var record = grid.getStore().getAt(rowIndex);
 			this.edit(record.data.id);
@@ -135,7 +138,7 @@ go.smtp.GridPanel = Ext.extend(go.grid.GridPanel, {
 		this.moreMenu.record = record;		
 		this.moreMenu.showAt(e.getXY());
 	},
-	
+
 	edit: function(id) {
 		var dlg = new go.smtp.AccountDialog();
 		dlg.load(id).show();
