@@ -17062,7 +17062,9 @@ Ext.layout.ToolbarLayout = Ext.extend(Ext.layout.ContainerLayout, {
         '<table cellspacing="0" class="x-toolbar-ct">',
             '<tbody>',
                 '<tr>',
-                    '<td class="x-toolbar-left" align="{0}">',
+			'<td></td>', //without this Safari 14.0 hangs with 100% CPU when selecting rows in a grid next to a panel having a tbar.... Don't ask!
+
+			'<td class="x-toolbar-left" align="{0}">',
                         '<table cellspacing="0">',
                             '<tbody>',
                                 '<tr class="x-toolbar-left-row"></tr>',
