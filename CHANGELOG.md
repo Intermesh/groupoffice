@@ -3,6 +3,7 @@
 - Core: Disable username field if using external authentication
 - Core: Fixed shifting custom field date column in some timezones
 - Core: Fixed upload to files module where files with identical content wouldn't upload more than once
+- Core: Fixed not found error on compressing folders.
 
 15-09-2020 6.4.169
 - Core: Bugfix in language export

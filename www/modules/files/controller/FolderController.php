@@ -1385,7 +1385,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			$file = \GO\Files\Model\File::model()->findByPath($sources[$i]);
 			if(!$file) {
-				throw new NotFound();
+				$file = Folder::model()->findByPath($sources[$i], false, [], true);
+				if(!$file) {
+					throw new NotFound("Couldn't find '" . $sources[$i] . "'");
+				}
 			}
 
 			if(!$file->getPermissionLevel()) {
@@ -1440,7 +1443,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			$file = \GO\Files\Model\File::model()->findByPath($sources[$i]);
 			if(!$file) {
-				throw new NotFound();
+				$file = Folder::model()->findByPath($sources[$i], false, [], true);
+				if(!$file) {
+					throw new NotFound("Couldn't find '" . $sources[$i] . "'");
+				}
 			}
 
 			if(!$file->getPermissionLevel()) {
