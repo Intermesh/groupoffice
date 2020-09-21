@@ -6,6 +6,7 @@
 - Core: Fixed upload to files module where files with identical content wouldn't upload more than once
 - Core: Fixed not found error on compressing folders.
 - Newsletters: Bugfix, make SMTP accounts sortable and scrollable in System settings;
+- Newsletters: add text filter to SMTP combobbox, sort SMTP combobox items by name.
 
 15-09-2020 6.4.169
 - Core: Bugfix in language export
