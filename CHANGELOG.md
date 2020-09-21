@@ -1,3 +1,4 @@
+21-09-2020 6.4.170
 - Time registration: use start time of same weekday in previous week as start time for first entry of the day
 - DAV: Fixed case sensitive login
 - Email: Worked around error if status could not be fetched from IMAP
