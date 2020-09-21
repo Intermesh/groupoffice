@@ -1251,6 +1251,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 	private function processPaths($paths, Folder $currentFolder, $overwrite, &$response) {
 
+		$removeBlobs = [];
+
 		while ($tmpfile = array_shift($paths)){
 			if(!is_string($tmpfile)) {
 				// its a json object with blob data
@@ -1295,7 +1297,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 							case 'ask':
 								array_unshift($paths, $tmpfile);
 								$response['fileExists'] = $filename;
-								return;
+								continue 2;
 							case 'yes':
 								$params['overwrite'] = 'ask';
 							case 'yestoall':
@@ -1306,7 +1308,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 								}
 								$existingFile->replace($file);
 								if($removeBlob) {
-									Blob::delete(['id' => $removeBlob->id]);
+									$removeBlobs[] = $removeBlob->id;
 								}
 								break;
 							case 'no':
@@ -1315,19 +1317,38 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 								continue 2;
 						}
 					} else {
-						if(!$removeBlob) {
+						if(!$removeBlob || $this->blobIsNeededAgain($removeBlob->id, $paths)) {
 							$newFile = GO\Base\Fs\File::tempFile();
 							$file = $file->copy($newFile->parent(), $newFile->name());
 						}
 						$destinationFolder->addFileSystemFile($file, false, $filename);
 						if($removeBlob) {
-							Blob::delete(['id' => $removeBlob->id]);
+							$removeBlobs[] = $removeBlob->id;
 						}
 					}
 					$response['success'] = true;
 				}
 			}
 		}
+
+		if(count($removeBlobs)) {
+			Blob::delete(['id' => $removeBlobs]);
+		}
+	}
+
+	/**
+	 * Check if user uploaded the same blob more than once so the blob must be copied
+	 *
+	 * @param $id
+	 * @param $blobs
+	 */
+	private function blobIsNeededAgain($id, $blobs) {
+		foreach($blobs as $blob) {
+			if($blob->id == $id) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private function removeBlob($blobId) {

@@ -1504,6 +1504,35 @@ abstract class Property extends Model {
 	}
 
 	/**
+	 * Inserts the record into the database table when save() is performed
+	 *
+	 * @param Table $table
+	 * @param array $record
+	 * @throws Exception
+	 */
+	protected function insertTableRecord(Table $table, array $record) {
+		$stmt = go()->getDbConnection()->insert($table->getName(), $record);
+		if (!$stmt->execute()) {
+			throw new Exception("Could not execute insert query");
+		}
+	}
+
+	/**
+	 * Updates the record in the database table when save() is performed
+	 *
+	 * @param Table $table
+	 * @param array $record
+	 * @param Query $query
+	 * @throws Exception
+	 */
+	protected function updateTableRecord(Table $table, array $record, Query $query) {
+		$stmt = go()->getDbConnection()->update($table->getName(), $record, $query);
+		if (!$stmt->execute()) {
+			throw new Exception("Could not execute update query");
+		}
+	}
+
+	/**
 	 * Saves properties to the mapped table
 	 * 
 	 * @param MappedTable $table
@@ -1554,11 +1583,8 @@ abstract class Property extends Model {
 				if($table->isUserTable) {
 					$modifiedForTable["userId"] = go()->getUserId();
 				}
-				
-				$stmt = App::get()->getDbConnection()->insert($table->getName(), $modifiedForTable);
-				if (!$stmt->execute()) {
-					throw new Exception("Could not execute insert query");
-				}
+
+				$this->insertTableRecord($table, $modifiedForTable);
 
 				$this->handleAutoIncrement($table, $modified);
 				
@@ -1581,15 +1607,8 @@ abstract class Property extends Model {
 				}
 
 				$query = Query::normalize($keys)->tableAlias($table->getAlias());
-				
-				$stmt = App::get()->getDbConnection()->update($table->getName(), $modifiedForTable, $query);
-				if (!$stmt->execute()) {
-					throw new Exception("Could not execute update query");
-				}				
-//				if(!$stmt->rowCount()) {			
-//					
-//					throw new \Exception("No affected rows for update!");
-//				}				
+
+				$this->updateTableRecord($table, $modifiedForTable, $query);
 			}
 		} catch (PDOException $e) {
 			ErrorHandler::logException($e);
