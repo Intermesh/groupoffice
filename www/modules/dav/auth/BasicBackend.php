@@ -42,7 +42,9 @@ class BasicBackend extends AbstractBasic {
 			
 			GO::session()->setCurrentUser($this->user->id);
 		}
-		
+		if($this->user) {
+			$result[1] = $this->principalPrefix . $this->user->username; // fix case insensitive login
+		}
 		return $result;
 	}
 
@@ -55,10 +57,15 @@ class BasicBackend extends AbstractBasic {
     if(!$user || !$user->enabled) {
       return false;
     }
+//		if($username != $user->username) {
+//			// check case sensitive
+//			return false;
+//		}
 		
 		if(!$user->checkPassword($password)) {
 			return false;
 		}
+
 		
 		$state = new TemporaryState();
 		$state->setUserId($user->id);		
