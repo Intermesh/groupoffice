@@ -242,6 +242,7 @@ Het volgende is de foutmelding:
   'You don\'t have a default calendar configured. Please select one at your settings.' => 'Je hebt geen standaard agenda ingesteld. Kies deze in het Instellingen paneel.',
   'Last' => 'Laatste',
   'This and future' => 'Deze en toekomstige',
+	'Enable reminder for this event' => 'Stel een herinnering in voor deze afspraak',
   'name' => 'Agenda',
   'description' => 'Agenda module; Iedere gebruiker kan afspraken toevoegen, bewerken of verwijderen. Ook kunnen afspraken van andere gebruikers worden ingezien en als het nodig is aangepast worden.',
   'Calendar' => 'Agenda',
