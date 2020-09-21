@@ -1,3 +1,4 @@
+- DAV: Fixed case sensitive login
 - Email: Worked around error if status could not be fetched from IMAP
 - Core: Updated PT-BR Translations thanks to Everson Guimarães!
 - Core: Disable username field if using external authentication
