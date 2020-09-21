@@ -1,3 +1,4 @@
+21-09-2020 6.2.129
 - Email: Strip invalid chars from attachments when creating temporary files
 - Calendar: optimized loading performance
 - Core: Workaround Safari 14.0 bug where it hangs with 100% CPU usage
