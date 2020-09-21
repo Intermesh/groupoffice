@@ -57,10 +57,6 @@ class BasicBackend extends AbstractBasic {
     if(!$user || !$user->enabled) {
       return false;
     }
-//		if($username != $user->username) {
-//			// check case sensitive
-//			return false;
-//		}
 		
 		if(!$user->checkPassword($password)) {
 			return false;
