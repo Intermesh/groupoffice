@@ -6,6 +6,7 @@
 - Core: Fixed shifting custom field date column in some timezones
 - Core: Fixed upload to files module where files with identical content wouldn't upload more than once
 - Core: Fixed not found error on compressing folders.
+- Custom Fields: Fixed render bug in field dialog.
 - Newsletters: Bugfix, make SMTP accounts sortable and scrollable in System settings;
 - Newsletters: add text filter to SMTP combobbox, sort SMTP combobox items by name.
 
