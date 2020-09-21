@@ -1,8 +1,5 @@
 - Email: Worked around error if status could not be fetched from IMAP
-
-
 - Core: Updated PT-BR Translations thanks to Everson Guimarães!
-
 
 15-09-2020 6.4.169
 - Core: Bugfix in language export
