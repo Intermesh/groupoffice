@@ -377,5 +377,23 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 
 		return new Ext.Toolbar(tbarCfg);
 
-	}
+	},
+
+
+	getEmailComposerConfig: function() {
+
+		return go.Db.store('Contact').single(this.currentId).then(contact => {
+			const to = contact.emailAddresses.length ? '"' + contact.name.replace('/"/g', '\\"') + '" <' + contact.emailAddresses[0].email + ">" : "";
+
+			return {
+				entity: "Contact",
+				entityId: contact.id,
+				values: {
+					to: to
+				}
+			};
+		})
+
+
+	},
 });

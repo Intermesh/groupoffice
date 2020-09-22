@@ -216,7 +216,8 @@ class Mapping {
 	}
 
 	/**
-	 * Add an array relation.
+	 * Add an array relation. Array relations are replaced completely when saved.
+	 * Auto incremented primary keys are lost. If you need them to persist use addMap()
 	 * 
 	 * @param string $name
 	 * @param string $entityName

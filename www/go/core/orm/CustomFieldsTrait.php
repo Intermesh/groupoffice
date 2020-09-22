@@ -2,6 +2,7 @@
 namespace go\core\orm;
 
 use Exception;
+use GO\Base\Db\ActiveRecord;
 use go\core\App;
 use go\core\db\Query;
 use go\core\db\Table;
@@ -43,6 +44,7 @@ trait CustomFieldsTrait {
 			}
 			$record[$field->databaseName] = $field->getDataType()->$fn(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record, $this);
 		}
+		unset($record['id']);
 		return $record;	
 	}
 
@@ -86,10 +88,19 @@ trait CustomFieldsTrait {
 				
 			} else
 			{
-				$this->customFieldsData = [];
+				$record = [];
+				$columns = Table::getInstance(static::customFieldsTableName())->getColumns();
+				foreach($columns as $name => $column) {
+					if($name == "id") {
+						continue;
+					}
+					$record[$name] = $column->default;
+				}
+
+				$this->customFieldsData = $record;
 			}
 		}
-		
+
 		return $this->customFieldsData;//array_filter($this->customFieldsData, function($key) {return $key != 'id';}, ARRAY_FILTER_USE_KEY);
 	}
   /**
@@ -168,6 +179,7 @@ trait CustomFieldsTrait {
    *
    * @param string $name
    * @param mixed $value
+   * @param bool $asText
    * @return $this
    * @throws Exception
    */
@@ -218,12 +230,15 @@ trait CustomFieldsTrait {
 		$columns = Table::getInstance(static::customFieldsTableName())->getColumns();		
 		foreach($columns as $name => $column) {
 			if(array_key_exists($name, $data)) {
-				$data[$name] = $column->normalizeInput($data[$name]);
+				if(empty($data[$name]) && $column->nullAllowed ) {
+					$data[$name] = null;
+				} else {
+					$data[$name] = $column->normalizeInput($data[$name]);
+				}
 			}
 		}
-			
-		foreach(self::getCustomFieldModels() as $field) {	
-			$fn = $asText ? 'textToDb' : 'apiToDb';
+		$fn = $asText ? 'textToDb' : 'apiToDb';
+		foreach(self::getCustomFieldModels() as $field) {
 			//if client didn't post value then skip it
 			if(array_key_exists($field->databaseName, $data)) {
 				$data[$field->databaseName] = $field->getDataType()->$fn(isset($data[$field->databaseName]) ? $data[$field->databaseName] : null,  $data, $this);
@@ -281,8 +296,7 @@ trait CustomFieldsTrait {
 					}
 					$this->customFieldsIsNew = false;
 				//}
-			} else
-			{
+			} else {
 				unset($record['id']);
 				if(!empty($record) && !App::get()
 								->getDbConnection()
@@ -308,7 +322,8 @@ trait CustomFieldsTrait {
 				$this->setValidationError('customFields.' . $uniqueKey, ErrorCode::UNIQUE);				
 				return false;
 			} else {
-				throw $e;
+//				throw $e;
+				throw new \Exception($e->getMessage());
 			}
 		}
 	}

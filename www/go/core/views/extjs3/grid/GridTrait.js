@@ -173,6 +173,11 @@ go.grid.GridTrait = {
 	},
 	
 	initCustomFields : function() {
+
+		if(Ext.isObject(this.store) && !this.store.events) {
+			this.store = Ext.create(this.store, 'store');
+		}
+
 		if (!this.columns || !this.store || !this.store.entityStore || !this.store.entityStore.entity.customFields) {
 			return;
 		}
@@ -282,7 +287,6 @@ go.grid.GridTrait = {
 		var prom = this.getStore().entityStore.set({
 			destroy:  selectedRecords.column("id")
 		}).then(function(result){
-			me.getEl().unmask();
 			if(!result.notDestroyed) {
 				return;
 			}
@@ -295,7 +299,10 @@ go.grid.GridTrait = {
 			Ext.MessageBox.alert(t("Error"), t("Could not delete some items: <br /><br />" + msg));
 
 		})
-		.catch(function() {
+		.catch(function(reason) {
+			GO.errorDialog.show(t( 'Sorry, an unexpected error occurred: ' + reason.message));
+		})
+		.finally(function() {
 			me.getEl().unmask();			
 		});
 	},

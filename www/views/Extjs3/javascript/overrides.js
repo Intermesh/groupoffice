@@ -11,6 +11,11 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
+//Default timeout 3 minutes.
+Ext.override(Ext.data.Connection, {
+	timeout: 180000
+});
+
 /**
  * Density Independend pixel calculation
  * 
@@ -130,30 +135,31 @@ Ext.override(Ext.form.TextArea,{
 	/**
 	 * Automatically grows the field to accomodate the height of the text up to the maximum field height allowed.
 	 * This only takes effect if grow = true, and fires the {@link #autosize} event if the height changes.
+	 * COMMENTED OUT: This is causing the effect in ticket #202021014
 	 */
-	autoSize: function(){
-		if(!this.grow || !this.textSizeEl){
-			return;
-		}
-		this.el.dom.style.overflowY = 'hidden';
-		var changed = false;
-		if (this.el.dom.offsetHeight > this.growMin) {
-			this.el.dom.style.height = this.growMin + "px";
-			changed = true;
-		}
-
-		var height = Math.min(this.el.dom.scrollHeight, this.growMax);
-		if (height > this.growMin) {
-			height += dp(8);
-			this.el.setHeight(height);
-			changed = true;
-		}
-
-		if (changed) {
-			//this.fireEvent('grow', this);
-			this.fireEvent("autosize", this, height);
-		}
-	},
+	// autoSize: function(){
+	// 	if(!this.grow || !this.textSizeEl){
+	// 		return;
+	// 	}
+	// 	this.el.dom.style.overflowY = 'hidden';
+	// 	var changed = false;
+	// 	if (this.el.dom.offsetHeight > this.growMin) {
+	// 		this.el.dom.style.height = this.growMin + "px";
+	// 		changed = true;
+	// 	}
+	//
+	// 	var height = Math.min(this.el.dom.scrollHeight, this.growMax);
+	// 	if (height > this.growMin) {
+	// 		height += dp(8);
+	// 		this.el.setHeight(height);
+	// 		changed = true;
+	// 	}
+	//
+	// 	if (changed) {
+	// 		//this.fireEvent('grow', this);
+	// 		this.fireEvent("autosize", this, height);
+	// 	}
+	// },
 	growMin : dp(48),
 	height: dp(48)
 });

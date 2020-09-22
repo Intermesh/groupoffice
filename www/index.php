@@ -34,7 +34,7 @@ function errorHander($e) {
 
 			echo "DEBUGGER: Showing error message because debug is enabled. Normally we would have redirected to install. I you're doing a freah install and your database is empty then you can safely ignore this.:<br /><br />";
 			echo $msg;
-			echo '<br /><br /><a href="/install">Click here to launch the installer</a>';
+			echo '<br /><br /><a href="install">Click here to launch the installer</a>';
 			exit();
 		}
 
@@ -89,7 +89,7 @@ try {
 
 			if(go()->getDebugger()->enabled) {
 				echo "DEBUGGER: Version mismatch. Database version = ". go()->getSettings()->databaseVersion .", Application version: " . go()->getVersion() .".<br /><br />";
-				echo '<a href="/install/upgrade.php">Click here to launch the upgrade</a>';
+				echo '<a href="install/upgrade.php">Click here to launch the upgrade</a>';
 				exit();
 			}
 			header('Location: '.GO::config()->host.'install/upgrade.php');				

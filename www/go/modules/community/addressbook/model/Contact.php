@@ -692,6 +692,14 @@ class Contact extends AclItemEntity {
 			}
 		}
 
+		if(empty($this->uri)) {
+			$this->uri = $this->uid . '.vcf';
+
+			if(!empty($this->id)) {
+				$this->saveUri();
+			}
+		}
+
 		return $this->uid;		
 	}
 
@@ -739,7 +747,7 @@ class Contact extends AclItemEntity {
 			return false;
 		}
 		
-		if(empty($this->uid)) {
+		if(empty($this->uid) || empty($this->uri)) {
 			//We need the auto increment ID for the UID so we need to save again if this is a new contact
 			$this->getUid();
 			$this->getUri();
@@ -981,7 +989,8 @@ class Contact extends AclItemEntity {
 	 * @throws Exception
 	 */
 	public static function onLinkSave(Link $link) {
-		if($link->getToEntity() !== "Contact" || $link->getFromEntity() !== "Contact") {
+
+		if(!$link->isBetween("Contact", "Contact")) {
 			return;
 		}
 		
@@ -1179,5 +1188,15 @@ class Contact extends AclItemEntity {
 	  }
 
 	  return parent::mergeProp($entity, $name, $p);
+  }
+
+  public static function check()
+  {
+  	//fix missing uri or uid
+  	$contacts = Contact::find(['id', 'uri', 'uid', 'addressBookId'])->where('uid is null OR uri is null');
+  	foreach($contacts as $contact) {
+  		$contact->save();
+	  }
+	  return parent::check();
   }
 }

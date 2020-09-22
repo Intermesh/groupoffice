@@ -1754,29 +1754,37 @@ GO.email.emailFiles = function(files, detailView) {
 		files = new Array(files);
 	}
 
+	var promise
+	if(detailView.getEmailComposerConfig) {
+		promise = detailView.getEmailComposerConfig();
+	} else {
+		promise = Promise.resolve({});
+	}
 
-	var c = GO.email.showComposer();
+	promise.then(config => {
+		const c = GO.email.showComposer(config);
 
-	c.on('dialog_ready', function(){
-		var items = [];
-		for (var i = 0; i < files.length; i++) {
-			items.push({
-				human_size: Ext.util.Format.fileSize(files[i].size),
-				extension: files[i].extension,
-				size: files[i].size,
-				type: files[i].type,
-				name: files[i].name,
-				fileName: files[i].name,
-				from_file_storage: true,
-				tmp_file: files[i].path
-			});
-		}
-		c.emailEditor.attachmentsView.addFiles(items);
+		c.on('dialog_ready', function(){
+			var items = [];
+			for (var i = 0; i < files.length; i++) {
+				items.push({
+					human_size: Ext.util.Format.fileSize(files[i].size),
+					extension: files[i].extension,
+					size: files[i].size,
+					type: files[i].type,
+					name: files[i].name,
+					fileName: files[i].name,
+					from_file_storage: true,
+					tmp_file: files[i].path
+				});
+			}
+			c.emailEditor.attachmentsView.addFiles(items);
 
-		if(detailView) {
-			c.createLinkButton.addLink(detailView.entity || detailView.entityStore.entity.name, detailView.data.id);
-		}
-	},this,{single:true});
+			if(detailView) {
+				c.createLinkButton.addLink(detailView.entity || detailView.entityStore.entity.name, detailView.data.id);
+			}
+		},this,{single:true});
+	});
 }
 
  GO.email.openFolderTree = function(id, folder_id, detailView) {

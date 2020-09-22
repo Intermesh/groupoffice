@@ -1,3 +1,99 @@
+Master
+- Core: array relation with ID's keeps records
+- Core: Module dependencies are respected
+- Business: New finance module
+- Projects: new module
+- Tasks: new module
+- Business: New employee management module
+- Time tracking: new module
+- History: new module replacing Activity log
+end master
+
+
+15-09-2020 6.4.169
+- Core: Bugfix in language export
+- Projects: Revert search for projects to old method
+- Notes: Fixed e-mail -> save as note
+- Core: Improved upload notifications. (Fixes safari 14 crash)
+- Core: Toolbars in a side panel next to a grid crashed Safari 14.0 (100% cpu usage)
+
+15-09-2020 6.4.168
+- Core: custom fields don't return id in data
+- Tickets: tickets where searchable for all users allowed to create tickets. The same thing happened to mail linked to those tickets
+- Calendar: Optimized loading performance
+
+
+
+08-09-2020 6.4.167
+- Core: if Activity Log enabled, show successful login and logout attempts
+- Leavedays / calendar: Fix for holidays blocking calendar entry
+
+07-09-2020 6.4.166
+- Core: allow login if there are no restrictive rules at all for you instead of no rules at all for the whole system
+- Notes: added simple CSV import and export;
+- Timeregstration: set default status upon copying registration;
+- ldapauth: fixed bug in server creation dialog.
+- Calendar: When checking for conflicts, leave days are taken into account.
+- Calendar: Month by date recurrence will turn into Month by day when re-opened.
+- Timeregistration shows html tags when editing an entry with newline characters
+- Customfields: Multiselect customfield had a very small list width
+- Newsletter: Separated User list and Contact list in the Person select dialog for the Email composer.
+- Core: Support --debug flag for cli.php
+- ldapauth: group member sync for ActiveDirectory broken
+- projects: fixed error when you didn't have access to the contacts linked to projects
+- Core: New feature to "Archive" users.
+- Projects: Sometimes PDF report didn't render if page break occurred on table header.
+- CustomFields: fixed refresh bug on conditionally hidden field.
+- Address book: dialog failed to open without manage permisions for tickets module (if installed)
+- Calendar: Bug changing "this and future events" #202021084 (was broken in 6.4)
+
+27-08-2020 6.4.165
+- Time registration: fixed Firefox bug in Timesheet
+- Email: Workaround if message has invalid From header
+- Core: fixed render bug in link browser window
+- Files: Added permission checks to compress functions
+- Files: Added permission checks to compress functions
+- SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
+- Calendar: Missing resource admin email #201919703
+- Calendar: Category permissions  #202020841
+- Tickets: Only messages from agent are sent to CC contact #201919432
+- Calender: Bug changing "this and future events" #202021084
+- Calendar: No notification when a participant is removed #202021083
+- Core: Upgrade from 6.3 failed if comments module was not installed.
+- SMIME: fixed error in linked email with inline attachments
+- Core: Prevent combo from expanding when opening dialogs
+
+25-08-2020 6.4.164
+- Email: users are able to delete their own Email templates
+- Billing: Fixed the PDF template tax totals when printing costs
+- Time registration: Timer button will use Notification area to save/show the timer
+- Time registration: new time insert dialog. (small date field as this is already set in the new view)
+- Time registration: Drag-n-Drop to move / set duration / holt Alt-n-Drag to copy / Click Add time + Hold-n-drag to set duration 
+- Core: Added authorisation check to SSE
+- Customfields: fix User customfield will display in the detail field when not empty
+- Files: added Folder customfield to be displayable in the grid.
+- Core: Fix scrollbar issues when focusing/clicking on a textarea with autogrow
+- Contact: When creating a contact from unknown email address there was one email field to many
+- Language: updated pt_br Thanks to @flaviozluca
+- Customfields: fixed division by zero for functionfield in newer PHP versions
+- Core: Fixed bug to enable deleting comment
+- Core: Better link color in dark theme
+- Bookmarks: fixed bug deleting bookmark categories
+- Customfields: Several bugfixes import and export from projects  
+- Customfields: Improved layout and define columns for showing custom fields net to eachother.
+- Core: Fixed display of relation fields in legacy modules
+- Core: Fixed error handling in grid delete
+
+30-07-2020 6.4.163
+- Bookmarks: fixed bug where logo didn't save
+- Email: Workaround if "From" header is missing in email message
+- Core: disable JMAP sync states on rebuild search cache and database check. Reset state when done.
+- Address book / carddav: Database check fixes missing uri's and import will generate uri if uid is already present
+- Tickets: re-enabled ticket groups
+
+30-07-2020 6.4.162
+- Studio: Was missing license definition which caused install to fail without license.
+
 28-07-2020 6.4.161
 - Core: Date range component
 
@@ -538,7 +634,6 @@
 
 10-12-2019 6.4.90
 - Zpush: mail sync was broken
-- Mail: cleanup script for removing orphaned mailboxes added
 
 09-12-2019 6.4.89
 - Files: We did an update to Group-Office which comes with a new implementation of the Group-Office Assistant. If you use this please update it to the new version. You can find it under "Files" for your operating system at this page:
@@ -1071,7 +1166,18 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Projects: Send company id when selecting contact
 
 
+
+- Files: Added permission checks to compress functions
+- SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
+- Calendar: Missing resource admin email #201919703
+- Calendar: Category permissions  #202020841
+- Tickets: Only messages from agent are sent to CC contact #201919432
+- Calender: Bug changing "this and future events" #202021084
+- Calendar: No notification when a participant is removed #202021083
+
 - Sieve: Fixed bug where sieve dialog showed folders of other account
+- Files: Assistant installation replaces GOTA file handlers
+- Core: Removed NO_AUTO_CREATE_USER from sql_mode because it doesn't work in Mysql 8 anymore and it wasn't needed anyway.
 
 27-01-2020 6.3.89
 - Tickets: Show confirm on closing tickets option broke module settings and email viewing.
@@ -7905,6 +8011,5 @@ First release including:
 - Addressbook
 - Scheduler
 - Project management (alpha)﻿
-
 
 

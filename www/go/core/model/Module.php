@@ -37,8 +37,26 @@ class Module extends AclOwnerEntity {
 	{
 		return ['name', 'package'];
 	}
+
+	public $checkDepencencies = true;
 	
 	protected function internalSave() {
+
+		if($this->isModified(['enabled']) || $this->isNew()) {
+
+			if($this->enabled) {
+				if($this->checkDepencencies) {
+					core\Module::installDependencies($this->module());
+				}
+			}else if ($this->checkDepencencies) {
+				$mods = core\Module::getModulesThatDependOn($this->module());
+				if(!empty($mods)) {
+					$this->setValidationError('name', ErrorCode::DEPENDENCY_NOT_SATISFIED, 	sprintf(\GO::t("You cannot delete the current module, because the following (installed) modules depend on it: %s."),implode(', ',$mods)));
+
+					return false;
+				}
+			}
+		}
 		
 		if($this->isNew() || $this->sort_order < 1) {
 			$this->sort_order = $this->nextSortOrder();			
@@ -72,7 +90,7 @@ class Module extends AclOwnerEntity {
 		
 		return true;
 	}
-	
+
 	public function package(){
 		return self::PACKAGE_COMMUNITY;
 	}
@@ -118,7 +136,11 @@ class Module extends AclOwnerEntity {
 		return $this->module;
 	}	
 	
-	private function getModuleClass() {		
+	private function getModuleClass() {
+		if(!isset($this->package)) {
+			//legacy module
+			return "GO\\" . $this->name ."\\" . $this->name ."Module";
+		}
 		return "\\go\\modules\\" . $this->package ."\\" . $this->name ."\\Module";
 	}
 
@@ -269,14 +291,20 @@ class Module extends AclOwnerEntity {
 	 * 
 	 * @param string $package
 	 * @param string $name
-	 * @param bool $enabled
+	 * @param bool $enabled Set to null for both enabled and disabled
 	 * @return self
 	 */
 	public static function findByName($package, $name, $enabled = true) {
 		if($package == "legacy") {
 			$package = null;
 		}
-		return static::find()->where(['package' => $package, 'name' => $name, 'enabled' => $enabled])->single();
+		$query = static::find()->where(['package' => $package, 'name' => $name]);
+
+		if(isset($enabled)) {
+			$query->andWhere(['enabled' => $enabled]);
+		}
+
+		return $query->single();
 	}
 
 	/**

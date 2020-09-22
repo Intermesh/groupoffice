@@ -220,6 +220,33 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 							});
 					},
 					scope: this
+				}),
+				this.moreMenu = new Ext.Button({
+					iconCls: 'ic-more-vert',
+					menu: [{
+						iconCls: 'ic-cloud-upload',
+						text: t("Import"),
+						handler: function() {
+							go.util.importFile(
+								'Note',
+								'.csv',
+								{},
+								{}
+							);
+						},
+						scope: this
+					},{
+						iconCls: 'ic-cloud-download',
+						text: t("Export"),
+						handler: function() {
+							go.util.exportToFile(
+								'Note',
+								Object.assign(go.util.clone(this.noteGrid.store.baseParams), this.noteGrid.store.lastOptions.params, {limit: 0, position: 0}),
+								'csv');
+						},
+						scope: this
+
+					}]
 				})
 			],
 			listeners: {				

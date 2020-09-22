@@ -267,7 +267,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 		if(record.data.isRefactored) {
 			return this.submitJmap(record);
 		}
-		
+
+		this.getEl().mask(t("Loading..."));
+
 		var url = GO.url('modules/module/updateModuleModel');
 
 		Ext.Ajax.request({
@@ -279,10 +281,13 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 			jsonData: {module:this.createJSON(record.data)},
 			scope : this,
 			callback : function (options, success,response) {
+
+				this.getEl().unmask();
 				var responseParams = Ext.decode(response.responseText);
 
 				if (!responseParams.success) {
 					GO.errorDialog.show(responseParams.feedback);
+					this.store.load();
 				}else{
 					if(responseParams.id){
 						record.set('id', responseParams.id);
@@ -297,6 +302,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 	submitJmap : function(record) {
 		
 		var params = {};
+
+		this.getEl().mask(t("Loading..."));
 		
 		
 		if(record.data.id) {
@@ -306,20 +313,26 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 				sort_order: record.data.sort_order ? record.data.sort_order : 0
 			};
 			go.Db.store("Module").set(params, function(options, success, response) {
-
-				if(success){
+				this.getEl().unmask();
+				if(success && response.updated && response.updated[record.data.id]){
 					if(record.data.enabled && record.isModified("enabled")) {						
 						// record.set('aclId', response['created'][record.data.id].aclId);
 						this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);
-						this.store.load();				
 					}
 
 					record.commit();
 				} else
 				{
-					Ext.MessageBox.alert(t("Error"), response.message);
-					this.store.load();
+					var msg = response.message || t("Sorry, an error occurred");
+					if(response.notUpdated && response.notUpdated[record.data.id] && response.notUpdated[record.data.id].validationErrors) {
+						for(var prop in response.notUpdated[record.data.id].validationErrors) {
+							msg = response.notUpdated[record.data.id].validationErrors[prop].description;
+						}
+					}
+					Ext.MessageBox.alert(t("Error"), msg);
+
 				}
+				this.store.load();
 
 			}, this);
 		} else
@@ -332,7 +345,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 					package: record.data.package
 				},
 				callback: function(options, success, response) {
-					if(success) {
+					this.getEl().unmask();
+
+					if(success && response['list'][0]) {
 						record.set('enabled', true);										
 						record.set('id', response['list'][0].id);
 						record.set('aclId', response['list'][0].aclId);
@@ -340,9 +355,11 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 						record.commit();
 					} else
 					{
-						Ext.MessageBox.alert(t("Error"), response.message);
-						this.store.load();
+						var msg = response.message || t("Sorry, an error occurred");
+
+						Ext.MessageBox.alert(t("Error"), msg);
 					}
+					this.store.load();
 				},
 				scope: this
 			});

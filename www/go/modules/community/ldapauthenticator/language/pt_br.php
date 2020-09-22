@@ -16,4 +16,9 @@ return array (
   'Users will automatically be added to these groups' => 'Usuários serão automaticamente adicionados a este grupos',
   'Verify SSL certicate' => 'Verificar certificado SSL',
   'Login with e-mail address' => 'Login com endereço de e-mail',
+  'Synchronization' => 'Sincronização',
+  'Synchronize users' => 'Sincronizar usuários',
+  'User query' => 'Consulta de usuário',
+  'Synchronize groups' => 'Sincronizar grupós',
+  'Group query' => 'Consulta de grupo',
 );

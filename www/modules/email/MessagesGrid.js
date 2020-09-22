@@ -301,6 +301,7 @@ GO.email.MessagesGrid = function(config){
 		this.composerButton = new Ext.Button({
 			iconCls: 'ic-drafts',
 			text: t("Compose", "email"),
+			cls: 'primary',
 			handler: function(){
 				GO.email.showComposer({account_id: this.account_id});
 			},

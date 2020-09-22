@@ -78,6 +78,10 @@ class Bookmark extends AclItemEntity {
 	protected static function defineFilters() {
 		return parent::defineFilters()->add('categoryId', function(Criteria $criteria, $value, Query $query, array $filter){
 			$criteria->andWhere('categoryId', '=', $value);
+		})->add('behaveAsModule', function(
+			Criteria $criteria, $value
+		){
+			$criteria->andWhere('behaveAsModule', '=', !empty($value));
 		});
 	}
 

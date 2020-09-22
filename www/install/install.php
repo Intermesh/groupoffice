@@ -81,11 +81,9 @@ if (!empty($_POST)) {
 				continue;
 			}
 			if ($moduleController->autoInstall() && $moduleController->isInstallable()) {
-				$module = new Module();
-				$module->name = $moduleController->name();
-				if (!$module->save()) {
-					throw new Exception("Could not save module " . $module->name);
-				}
+                if(!Module::install($moduleController->name())) {
+                    throw new \Exception("Could not save module " . $moduleController->name());
+                }
 			}
 		}
 

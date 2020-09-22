@@ -2,7 +2,7 @@
 
 go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 	
-	layout: "responsive",
+	layout: "border",
 	mode: "email", // or "id" in the future "phone" or "address"	
 	entityName:  "Contact",
 	title: t("Address Book"),
@@ -44,9 +44,9 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 					xtype: "fieldset",
 					items: [this.searchField]
 				}]
-		});	
-		
-		this.items = [search, this.grid, this.sidePanel];
+		});
+
+		this.items = [search, {xtype:'panel',layout:'responsive',region:'center', items:[this.grid,  this.sidePanel]}];
 		
 		this.grid.getSelectionModel().singleSelect = this.singleSelect;		
 		

@@ -3,6 +3,7 @@
 go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	fieldSet: null,
 	hideMode: 'offsets',
+	layout: "column",
 	initComponent: function () {
 		
 		var items = [];
@@ -11,11 +12,42 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			items.push({
 				xtype: "box",
 				autoEl: "p",
+				columnWidth: 1,
 				html: go.util.textToHtml(this.fieldSet.description)
 			});
 		}
-		
-		items = items.concat(go.customfields.CustomFields.getFormFields(this.fieldSet.id));
+
+		var fields = go.customfields.CustomFields.getFormFields(this.fieldSet.id);
+
+		var c = fields.length;
+		var fieldsPerColumn = Math.floor(c / this.fieldSet.columns);
+		var fieldsInFirstColumn = fieldsPerColumn + (c % this.fieldSet.columns);
+
+		this.defaults = {
+			xtype: "container",
+			labelAlign: "top",
+			columnWidth: 1 / this.fieldSet.columns,
+			layout: "form"
+		};
+
+		var currentCol = {items: []},
+			colItemCount = 0,
+			me = this,
+			max = fieldsInFirstColumn;
+
+
+		fields.forEach(function (field) {
+			currentCol.items.push(field);
+			colItemCount++;
+			if(colItemCount == max) {
+				items.push(currentCol);
+				currentCol = {items: [], style: "padding-left: " +dp(16) + "px"};
+				colItemCount = 0;
+				max = fieldsPerColumn;
+			}
+		});
+
+		items.push(currentCol);
 		
 		Ext.apply(this, {
 			title: this.fieldSet.name,
@@ -30,8 +62,6 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		}, this);
 
 		this.on("afterrender", function() {
-
-
 			//find entity panel
 			var form = this.findParentByType("form");
 
@@ -77,7 +107,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 				form.getForm().on("actioncomplete", function (f, action) {
 					if (action.type === "load") {
 						this.filter(f.getFieldValues());
-						f.isValid(); //needed for coniditionally hidden
+						f.isValid(); //needed for conditionally hidden
 					}
 				}, this);
 			}
@@ -85,13 +115,18 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			/**
 			 * Related fields
 			 */
-			this.items.each(function (field) {
-				field.on('change', function (field) {
-					form.getForm().isValid();
-				});
-				field.on('check', function (field) {
-					form.getForm().isValid();
-				});
+			this.items.each(function (cnt) {
+				var f = form.getForm();
+				if(cnt.getXType() === 'container') {
+					cnt.items.each(function(field) {
+						field.on('change', function (field) {
+							f.isValid();
+						});
+						field.on('check', function (field, checked) {
+							f.isValid();
+						});
+					});
+				}
 			}, this);
 		});
 
@@ -126,7 +161,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	
 	setFilterVisible : function(v) {
 
-		//disable recursive so validaters don't apply on hidden items
+		//disable recursive so validators don't apply on hidden items
 		function setDisabled(ct, v) {
 			ct.setDisabled(v);
 

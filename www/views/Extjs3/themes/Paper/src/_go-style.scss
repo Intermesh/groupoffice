@@ -622,8 +622,9 @@ a {
 		animation: slide-top .2s ease-out; 
 		.x-panel-header {
 			color: color($fg,'secondary-text');
-			zoom:.8;
+			transform: scale(.8);
 			height: dp(40);
+
 			line-height: dp(40);
 	    }
 		.x-panel-header-text {
@@ -672,7 +673,7 @@ a {
 		animation: blink .3s 7 alternate;
 		margin: 0 dp(4);
 		text-shadow: 0px 1px 0px rgba(black, 0.56);
-		zoom:.7;
+		transform: scale(0.7);
 		cursor: pointer;
 	}
 }
@@ -1856,6 +1857,7 @@ table[id^="comments-ext"] b {
    display: block;  
    list-style-type: disc;  
    margin: 1em 2em;
+	 padding: 0 40px;
    /*-moz-padding-start: 40px;  */
  }  
    
@@ -1863,6 +1865,7 @@ table[id^="comments-ext"] b {
    display: block;  
    list-style-type: decimal;  
    margin: 1em 2em;
+	 padding: 0 40px;
    /*-moz-padding-start: 40px;  */
  }  
    

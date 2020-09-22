@@ -180,7 +180,7 @@ class Backend extends AbstractBackend {
 		}
 	}
 
-	public function getCards($addressbookId): array {
+	public function getCards($addressbookId) {
 		$addressbook = AddressBook::findById($addressbookId);
 		if(!$addressbook) {
 			throw new NotFound();
@@ -192,10 +192,12 @@ class Backend extends AbstractBackend {
 		
 		$this->generateCards($addressbookId);		
 		
-		return go()->getDbConnection()->select('c.uri, UNIX_TIMESTAMP(c.modifiedAt) as lastmodified, CONCAT(\'"\', vcardBlobId, \'"\') AS etag, b.size')
+		$contacts = go()->getDbConnection()->select('c.uri, UNIX_TIMESTAMP(c.modifiedAt) as lastmodified, CONCAT(\'"\', vcardBlobId, \'"\') AS etag, b.size')
 						->from('addressbook_contact', 'c')
 						->join('core_blob', 'b', 'c.vcardBlobId = b.id')
-						->where('c.addressBookId', '=', $addressbookId)->all();
+						->where('c.addressBookId', '=', $addressbookId);
+
+		return $contacts->all();
 	}
 	
 

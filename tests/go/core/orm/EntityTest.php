@@ -138,7 +138,7 @@ class EntityTest extends TestCase {
 		
 		$fetchProperties = ['id', 'createdAt', 'propA', 'propB', 'hasMany', 'hasOne', 'sumOfTableBIds'];
 		
-		$entity = B::find($fetchProperties)->single();
+		$entity = B::find($fetchProperties)->orderBy(['id' => 'DESC'])->single();
 
 
 		$this->assertInstanceOf(Entity::class, $entity);

@@ -62,7 +62,7 @@ use Swift_Attachment;
 use Swift_Mime_ContentEncoder_PlainContentEncoder;
 
 class Event extends \GO\Base\Db\ActiveRecord {
-	
+
 	use \go\core\orm\CustomFieldsTrait;
 
 	const STATUS_TENTATIVE = 'TENTATIVE';
@@ -504,8 +504,15 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		$attr['end_time']=\GO::t("Ends at", "calendar");
 		return $attr;
 	}
+
+	public $skipValidation = false;
 	
 	public function validate() {
+
+		if($this->skipValidation) {
+			return true;
+		}
+
 		if($this->rrule != ""){			
 			$rrule = new \GO\Base\Util\Icalendar\Rrule();
 			$rrule->readIcalendarRruleString($this->start_time, $this->rrule);						
@@ -774,8 +781,8 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		}
 	
 		if($this->isResource()){
-			
-			if ((! $this->isCurrentUserResourceAdmin() || $this->isModified('status'))&& $this->end_time > time()) {
+
+			if ((! $this->isCurrentUserResourceAdmin() || $this->isModified('status'))&& ($this->end_time > time() || ($this->isRecurring() && (empty($this->repeat_end_time) || $this->repeat_end_time > time())))) {
 				$this->_sendResourceNotification($wasNew);
 			}
 		}else
@@ -893,7 +900,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function hasModificationsForParticipants(){
-		return $this->isModified("start_time") || $this->isModified("end_time") || $this->isModified("name") || $this->isModified("location") || $this->isModified('status');
+		return $this->isModified("start_time") || $this->isModified("end_time") || $this->isModified("name") || $this->isModified("location") || $this->isModified('status') || $this->isModified('rrule');
 	}
 	
 	/**
@@ -931,7 +938,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	}
 		
 	private function _sendResourceNotification($wasNew){
-		
+
 		if(!$this->dontSendEmails && $this->hasModificationsForParticipants()){			
 			$url = \GO::createExternalUrl('calendar', 'showEventDialog', array('event_id' => $this->id));		
 
@@ -1083,10 +1090,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	public function getConflictingEvents($exception_for_event_id=0){
 		
 		$conflictEvents=array();
-		
-		
-		
-		
+
 		$settings = Settings::model()->getDefault(GO::user());
 		if(!$settings->check_conflict) {
 			return $conflictEvents;
@@ -1445,27 +1449,27 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		//$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 
 		$cfRecord = $this->getCustomFields();
-		
+
 		if (!empty($cfRecord)) {
 		$fieldsets = \go\core\model\FieldSet::find()->filter(['entities' => ['Event']]);
-		
+
 			foreach($fieldsets as $fieldset) {
 				$html .= '<tr><td colspan="2"><b>'.($fieldset->name).'</td></tr>';
 
 				$fields = \go\core\model\Field::find()->where(['fieldSetId' => $fieldset->id]);
-				
+
 				foreach($fields as $field) {
-					
+
 					if(empty($cfRecord[$field->databaseName])) {
 						continue;
 					}
-					
+
 					$html .= '<tr><td style="vertical-align:top">'.($field->name).'</td>'.
 										'<td>'.$cfRecord[$field->databaseName].'</td></tr>';
-				}				
+				}
 			}
-		}		
-	
+		}
+
 		$html .= '</table>';
 		
 		$stmt = $this->participants();
@@ -1877,10 +1881,10 @@ $sub = $offset>0;
 		// 	}
 		// }elseif($vobject->aalarm){ //funambol sends old vcalendar 1.0 format
 		// 	$aalarm = explode(';', (string) $vobject->aalarm);
-		// 	if(!empty($aalarm[0])) {				
+		// 	if(!empty($aalarm[0])) {
 		// 		$p = Sabre\VObject\DateTimeParser::parse($aalarm[0]);
 		// 		$this->reminder = $this->start_time-$p->format('U');
-		// 	}		
+		// 	}
 		// }
 		
 		$this->setAttributes($attributes, false);
@@ -1946,7 +1950,7 @@ $sub = $offset>0;
 		}
 		
 		if($vobject->valarm && $vobject->valarm->trigger){
-			
+
 			$reminderTime = false;
 			try {
 				$reminderTime = $vobject->valarm->getEffectiveTriggerTime();
@@ -1967,10 +1971,10 @@ $sub = $offset>0;
 			}
 		}elseif($vobject->aalarm){ //funambol sends old vcalendar 1.0 format
 			$aalarm = explode(';', (string) $vobject->aalarm);
-			if(!empty($aalarm[0])) {				
+			if(!empty($aalarm[0])) {
 				$p = Sabre\VObject\DateTimeParser::parse($aalarm[0]);
 				$this->reminder = $this->start_time-$p->format('U');
-			}		
+			}
 		}
 		
 		if($withCategories) {
@@ -2355,8 +2359,8 @@ The following is the error message:
 		
 		$participant = new Participant();
 		$participant->event_id=$this->id;
-		$participant->user_id=$user->id;		
-		
+		$participant->user_id=$user->id;
+
 		$participant->name=$user->name;
 		$participant->email=$user->email;
 		$participant->status=Participant::STATUS_ACCEPTED;
@@ -2437,7 +2441,8 @@ The following is the error message:
 				'event_id'=>$this->id
 		));
 	}
-	
+
+	private static $aliases = [];
 	
 	/**
 	 * Get the participant model where the user matches the calendar user
@@ -2446,14 +2451,17 @@ The following is the error message:
 	 */
 	public function getParticipantOfCalendar() {
 
-		$aliases = GO\Email\Model\Alias::model()->find(
+		if(!isset(self::$aliases[$this->calendar->user_id])) {
+			self::$aliases[$this->calendar->user_id] = \GO\Email\Model\Alias::model()->find(
 				GO\Base\Db\FindParams::newInstance()
 					->select('email')
 					->permissionLevel(GO\Base\Model\Acl::WRITE_PERMISSION, $this->calendar->user_id)
-				)->fetchAll(\PDO::FETCH_COLUMN, 0);
+					->ignoreAdminGroup()
+			)->fetchAll(\PDO::FETCH_COLUMN, 0);
+		}
 
 		return Participant::model()->findSingleByAttributes(array(
-				'email' => $aliases,
+				'email' => self::$aliases[$this->calendar->user_id],
 				'event_id'=>$this->id
 		));
 	}
@@ -2771,7 +2779,7 @@ The following is the error message:
 
 		return \GO\Base\Mail\Mailer::newGoInstance();
 	}
-	
+
 	public function resourceGetEventCalendarName() {
 		
 		if ($this->isResource()) {

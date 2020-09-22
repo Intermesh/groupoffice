@@ -336,6 +336,8 @@ class MaintenanceController extends AbstractController {
 		if(!$this->lockAction()) {
 			exit("Already running!");
 		}
+
+		\go\core\jmap\Entity::$trackChanges = false;
 		
 		if(!$this->isCli()){
 			echo '<pre>';
@@ -377,7 +379,9 @@ class MaintenanceController extends AbstractController {
 		
 		
 		\go\core\orm\SearchableTrait::rebuildSearch();
-		
+
+		echo "Resettings JMAP sync state\n";
+		go()->rebuildCache();
 		
 //		echo "Adding full text search index\n";
 //		\GO::getDbConnection()->query("ALTER TABLE `go_search_cache` ADD FULLTEXT ft_keywords(`name` ,`keywords`);");
@@ -405,6 +409,8 @@ class MaintenanceController extends AbstractController {
 		//$this->run("upgrade",$params);		
 		
 		$this->lockAction();
+
+		\go\core\jmap\Entity::$trackChanges = false;
 		
 		$response = array();
 		
@@ -447,6 +453,9 @@ class MaintenanceController extends AbstractController {
 //			$entity::check();
 //		}
 
+
+		echo "Resettings JMAP sync state\n";
+		go()->rebuildCache();
 		
 		echo "All Done!\n";
 		

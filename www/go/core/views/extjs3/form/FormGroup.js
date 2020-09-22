@@ -6,6 +6,13 @@
  *	name: "dataType.options",
  *	addButtonText: t("Add option"),
  *	addButtonIconCls: 'ic-add',
+ *  listeners: {
+								scope: this,
+								newitem: function(fg, item) {
+									//example of how to set value on new form group item. Where formFiel is of type "gocontainer".
+									item.formField.findField("text").setValue(this.formPanel.entity.name);
+								}
+							},
  *	itemCfg: {
  *		items: [{
  *				xtype: "hidden",
@@ -49,6 +56,10 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	 * Enable sorting by drag and drop
 	 */
 	sortable: false,
+	/**
+	 * If set then this property will be set with the sort order ASC
+	 */
+	sortColumn: null,
 	
 	defaults: {
 		anchor: "100%"
@@ -147,6 +158,8 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 					this.doLayout();
 					
 					wrap.formField.focus();
+
+					this.fireEvent("newitem", this, wrap);
 				
 				},
 				scope: this
@@ -247,7 +260,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 					setTimeout(function()
 					{
-						cmp.dragZone.destroy();
+						if(cmp.dragZone) {
+							cmp.dragZone.destroy();
+						}
 					});
 				},
 				afterrender: function(cmp) {
@@ -309,9 +324,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		this.removeAll();
 		this.markDeleted = [];
 		var me = this, wrap;
-		function set(r) {
+		function set(r, key) {
 			wrap = me.addPanel();
-			wrap.formField.key = r.id;
+			wrap.formField.key = key;
 			wrap.formField.setValue(r);
 		}
 		if(this.mapKey) {
@@ -332,14 +347,20 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			return v;
 		}
 
-		this.items.each(function(wrap) {
+		this.items.each(function(wrap, index) {
+
+			var item = wrap.formField.getValue();
+			if(this.sortColumn) {
+				item[this.sortColumn] = index;
+			}
+
 			if(this.mapKey) {
 				// TODO make minimal PatchObject
 				//if(wrap.formField.isDirty()) {
-					v[wrap.formField.key || Ext.id()] = wrap.formField.getValue();
+					v[wrap.formField.key || Ext.id()] = item;
 				//}
 			} else {
-				v.push(wrap.formField.getValue());
+				v.push(item);
 			}
 		}, this);
 		if(this.mapKey) {

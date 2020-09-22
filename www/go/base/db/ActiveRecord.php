@@ -43,6 +43,8 @@ namespace GO\Base\Db;
 use GO\Base\Db\PDO;
 use GO;
 use go\core\db\Query;
+use go\core\model\Link;
+use go\core\orm\EntityType;
 use go\core\util\DateTime;
 
 abstract class ActiveRecord extends \GO\Base\Model{
@@ -3656,7 +3658,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		unset($attr['modifiedAt']);
 		
 		$search->entityId = $this->id;
-		$search->setAclId(!empty($attr['acl_id']) ? $attr['acl_id'] : $this->findAclId());			
+		$search->setAclId(!empty($attr['aclId']) ? $attr['aclId'] : $this->findAclId());
 		//$search->createdAt = \DateTime::createFromFormat("U", $this->mtime);		
 		$search->setKeywords($this->getSearchCacheKeywords($this->localizedName.','.implode(',', $attr)));
 		
@@ -4265,7 +4267,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	public function resolveAttribute($path, $outputType='raw'){
 		
 		if(substr($path, 0, 13) === 'customFields.') { 
-			$cf = $this->getCustomFields();
+			$cf = $this->getCustomFields($outputType === 'formatted');
 			return $cf[substr($path, 13)] ?? null;
 		}
 		
@@ -4509,53 +4511,59 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if((!$this->hasLinks() && !$isSearchCacheModel) || $linksDisabled)
 			throw new \Exception("Links not supported by ".$this->className ());
 
-		if($this->linkExists($model))
-			return true;
+		Link::create($this, $model);
 
-		if($model instanceof \GO\Base\Model\SearchCacheRecord){
-			$to_model_id = $model->entityId;
-			$to_model_type_id = $model->entityTypeId;
-		}else
-		{
-			$to_model_id = $model->id;
-			$to_model_type_id = $model->entityType()->getId();
-		}
-		
-		
-
-		$from_model_type_id = $isSearchCacheModel ? $this->entityTypeId : $this->modelTypeId();
-
-		$from_model_id = $isSearchCacheModel ? $this->model_id : $this->id;
-		
-		if($to_model_id == $from_model_id && $to_model_type_id == $from_model_type_id) {
-			//don't link to self
-			return true;
-		}
-		
-		if(!\go\core\App::get()->getDbConnection()->insert('core_link', [
-				"toId" => $to_model_id,
-				"toEntityTypeId" => $to_model_type_id,
-				"fromId" => $from_model_id,
-				"fromEntityTypeId" => $from_model_type_id,
-				"description" => $description,
-				"createdAt" => new \DateTime('now',new \DateTimeZone('UTC'))
-				
-		])->execute()){
-			return false;
-		}
-
-		$reverse = [];
-		$reverse['fromEntityTypeId'] = $to_model_type_id;
-		$reverse['toEntityTypeId'] = $from_model_type_id;
-		$reverse['toId'] = $from_model_id;
-		$reverse['fromId'] = $to_model_id;		
-		$reverse['description'] = $description;
-		$reverse['createdAt'] = new \DateTime('now',new \DateTimeZone('UTC'));
-	
-		
-		if(!\go\core\App::get()->getDbConnection()->insert('core_link', $reverse)->execute()) {
-			return false;
-		}
+//		if($this->linkExists($model))
+//			return true;
+//
+//
+//
+//		if($model instanceof \GO\Base\Model\SearchCacheRecord){
+//			$to_model_id = $model->entityId;
+//			$to_model_type_id = $model->entityTypeId;
+//		}else
+//		{
+//			$to_model_id = $model->id;
+//			$to_model_type_id = $model->entityType()->getId();
+//		}
+//
+//
+//
+//		$from_model_type_id = $isSearchCacheModel ? $this->entityTypeId : $this->modelTypeId();
+//
+//		$from_model_id = $isSearchCacheModel ? $this->model_id : $this->id;
+//
+//		if($to_model_id == $from_model_id && $to_model_type_id == $from_model_type_id) {
+//			//don't link to self
+//			return true;
+//		}
+//
+//		//Link::create()
+//
+//		if(!\go\core\App::get()->getDbConnection()->insert('core_link', [
+//				"toId" => $to_model_id,
+//				"toEntityTypeId" => $to_model_type_id,
+//				"fromId" => $from_model_id,
+//				"fromEntityTypeId" => $from_model_type_id,
+//				"description" => $description,
+//				"createdAt" => new \DateTime('now',new \DateTimeZone('UTC'))
+//
+//		])->execute()){
+//			return false;
+//		}
+//
+//		$reverse = [];
+//		$reverse['fromEntityTypeId'] = $to_model_type_id;
+//		$reverse['toEntityTypeId'] = $from_model_type_id;
+//		$reverse['toId'] = $from_model_id;
+//		$reverse['fromId'] = $to_model_id;
+//		$reverse['description'] = $description;
+//		$reverse['createdAt'] = new \DateTime('now',new \DateTimeZone('UTC'));
+//
+//
+//		if(!\go\core\App::get()->getDbConnection()->insert('core_link', $reverse)->execute()) {
+//			return false;
+//		}
 
 		$this->fireEvent('link', array($this, $model, $description, $this_folder_id, $model_folder_id));
 		return true;
@@ -4938,9 +4946,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			return false;
 		}
 
-		foreach($attributes as $key=>$value) {
-			$copy->$key = $value;
-		}
+//		foreach($attributes as $key=>$value) {
+//			$copy->$key = $value;
+//		}
+		$copy->setAttributes($attributes, false);
 
 		//Generate new acl for this model
 		if($this->aclField() && !$this->isJoinedAclField){
@@ -5012,7 +5021,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 //			var_dump(array_merge($model->getAttributes('raw'),$attributes));
 
-			$duplicateRelatedModel = $model->duplicate($attributes);
+			$duplicateRelatedModel = $model->duplicate($attributes, true, true);
 
 			$this->afterDuplicateRelation($relationName, $model, $duplicateRelatedModel);
 		}

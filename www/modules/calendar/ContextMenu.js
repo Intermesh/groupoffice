@@ -236,6 +236,7 @@ Ext.extend(GO.calendar.ContextMenu, Ext.menu.Menu, {
 				this.menuRecurrenceDialog.hide();
 			},this)
 		}
+		this.menuRecurrenceDialog.thisAndFutureButton.setDisabled(this.event.recurring_start_time == this.event.start_time);
 		this.menuRecurrenceDialog.show();
 	}
 });

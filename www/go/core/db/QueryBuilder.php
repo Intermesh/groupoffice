@@ -633,8 +633,7 @@ class QueryBuilder {
 				throw new Exception('Null value not possible with comparator: ' . $comparisonOperator);
 			}
 		} else if (is_array($value)) {
-			$tokens[] = $comparisonOperator == "=" ? "IN" : $comparisonOperator;
-			$tokens[] = $this->buildInValues($columnParts, $value);
+			$this->buildColumnIn($value, $columnParts, $comparisonOperator, $tokens);
 		} else if ($value instanceof \go\core\db\Query) {
 			$tokens[] = $comparisonOperator;
 			$tokens[] = $value;
@@ -648,6 +647,29 @@ class QueryBuilder {
 		}
 
 		return $this->buildTokens($tokens, $prefix);
+	}
+
+	private function buildColumnIn($value, $columnParts, $comparisonOperator, &$tokens){
+		if(in_array(null, $value)) {
+			//null value not possible with IN() so build (col is null or col in (..))
+			$value = array_filter($value, function ($v) {
+				return $v !== null;
+			});
+
+			array_splice($tokens, -1, 0, '(');
+
+			$tokens[] = 'IS NULL';
+			if(count($value)) {
+				$tokens[] = 'OR';
+				$tokens[] = $this->quoteTableName($columnParts[0]) . '.' . $this->quoteColumnName($columnParts[1]); //column name
+				$tokens[] = $comparisonOperator == "=" ? "IN" : $comparisonOperator;
+				$tokens[] = $this->buildInValues($columnParts, $value);
+			}
+			$tokens[] = ')';
+		} else{
+			$tokens[] = $comparisonOperator == "=" ? "IN" : $comparisonOperator;
+			$tokens[] = $this->buildInValues($columnParts, $value);
+		}
 	}
 
 	private function buildSubQuery(\go\core\db\Query $query, $prefix) {

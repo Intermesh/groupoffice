@@ -542,6 +542,7 @@ use const GO_CONFIG_FILE;
 
 			Listeners::get()->init();
 
+			$this->resetSyncState();
 			go()->getSettings()->cacheClearedAt = time();
 			go()->getSettings()->save();
 			
@@ -739,10 +740,8 @@ use const GO_CONFIG_FILE;
 		
 		/**
 		 * Resets all entity state so all clients must resync data.
-		 * 
-		 * @todo resync per entity
 		 */
-		public function resetSyncState() {		
+		private function resetSyncState() {
 			//reset all mod seqs
 			go()->getDbConnection()->update('core_entity', ['highestModSeq' => 0])->execute();
 			go()->getDbConnection()->exec("TRUNCATE TABLE core_change");

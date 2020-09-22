@@ -129,4 +129,5 @@ return array (
   'after' => 'após',
   'Body doesn\'t contain' => 'Corpo não contém',
   'Body contains' => 'Corpo contém',
+  'nDaysText' => 'nTextoDias',
 );

@@ -743,23 +743,34 @@ $updates['202006111515'][] = "CREATE TABLE `core_alert` (
 $updates['202006191648'][] = "ALTER TABLE `core_customfields_field` ADD `hiddenInGrid` BOOLEAN NOT NULL DEFAULT TRUE AFTER `options`;";
 $updates['202006191648'][] = "ALTER TABLE `core_entity_filter` ADD `type` ENUM('fixed','variable') NOT NULL DEFAULT 'fixed' AFTER `aclId`;";
 $updates['202006191648'][] = "ALTER TABLE `core_entity_filter` CHANGE `filter` `filter` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL;";
+$updates['202007302016'][] = "ALTER TABLE `core_customfields_field_set` ADD `columns` TINYINT NOT NULL DEFAULT '2' AFTER `isTab`;";
 
-
-//$updates['202007211057'][] = "CREATE TABLE `core_pdf_block` (
+//--
+//-- Table structure for table `core_pdf_block`
+//--
+//
+//                       CREATE TABLE `core_pdf_block` (
 //`id` bigint(20) UNSIGNED NOT NULL,
 //  `pdfTemplateId` bigint(20) UNSIGNED NOT NULL,
-//  `x` int(11) NOT NULL,
-//  `y` int(11) NOT NULL,
-//  `width` int(11) NOT NULL,
-//  `height` int(11) NOT NULL,
+//  `x` int(11) DEFAULT NULL,
+//  `y` int(11) DEFAULT NULL,
+//  `width` int(11) DEFAULT NULL,
+//  `height` int(11) DEFAULT NULL,
 //  `align` enum('L','C','R','J') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'L',
 //  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
 //  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text'
-//) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+//) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 //
-//$updates['202007211057'][] = "CREATE TABLE `core_pdf_template` (
+//-- --------------------------------------------------------
+//
+//--
+//-- Table structure for table `core_pdf_template`
+//--
+//
+//                       CREATE TABLE `core_pdf_template` (
 //`id` bigint(20) UNSIGNED NOT NULL,
 //  `moduleId` int(11) NOT NULL,
+//  `key` varchar(20) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
 //  `language` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'en',
 //  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
 //  `stationaryBlobId` binary(40) DEFAULT NULL,
@@ -770,29 +781,56 @@ $updates['202006191648'][] = "ALTER TABLE `core_entity_filter` CHANGE `filter` `
 //  `marginRight` decimal(19,4) NOT NULL DEFAULT 10.0000,
 //  `marginBottom` decimal(19,4) NOT NULL DEFAULT 10.0000,
 //  `marginLeft` decimal(19,4) NOT NULL DEFAULT 10.0000
-//) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+//) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 //
+//--
+//-- Indexes for dumped tables
+//--
 //
-//$updates['202007211057'][] = "ALTER TABLE `core_pdf_block`
-//  ADD UNIQUE KEY `id` (`id`),
-//  ADD KEY `pdfTemplateId` (`pdfTemplateId`);";
+//               --
+//-- Indexes for table `core_pdf_block`
+//--
+//               ALTER TABLE `core_pdf_block`
+//  ADD PRIMARY KEY (`id`) USING BTREE,
+//  ADD KEY `pdfTemplateId` (`pdfTemplateId`);
 //
-//$updates['202007211057'][] = "ALTER TABLE `core_pdf_template`
-//  ADD UNIQUE KEY `id` (`id`),
+//--
+//-- Indexes for table `core_pdf_template`
+//--
+//               ALTER TABLE `core_pdf_template`
+//  ADD PRIMARY KEY (`id`),
 //  ADD KEY `moduleId` (`moduleId`),
-//  ADD KEY `stationaryBlobId` (`stationaryBlobId`);";
+//  ADD KEY `stationaryBlobId` (`stationaryBlobId`);
 //
+//--
+//-- AUTO_INCREMENT for dumped tables
+//--
 //
-//$updates['202007211057'][] = "ALTER TABLE `core_pdf_block`
-//  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;";
+//                      --
+//-- AUTO_INCREMENT for table `core_pdf_block`
+//--
+//                      ALTER TABLE `core_pdf_block`
+//  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 //
-//$updates['202007211057'][] = "ALTER TABLE `core_pdf_template`
-//  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;";
+//--
+//-- AUTO_INCREMENT for table `core_pdf_template`
+//--
+//                      ALTER TABLE `core_pdf_template`
+//  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 //
+//--
+//-- Constraints for dumped tables
+//--
 //
-//$updates['202007211057'][] = "ALTER TABLE `core_pdf_block`
-//  ADD CONSTRAINT `core_pdf_block_ibfk_1` FOREIGN KEY (`pdfTemplateId`) REFERENCES `core_pdf_template` (`id`) ON DELETE CASCADE;";
+//                   --
+//-- Constraints for table `core_pdf_block`
+//--
+//                   ALTER TABLE `core_pdf_block`
+//  ADD CONSTRAINT `core_pdf_block_ibfk_1` FOREIGN KEY (`pdfTemplateId`) REFERENCES `core_pdf_template` (`id`) ON DELETE CASCADE;
 //
-//$updates['202007211057'][] = "ALTER TABLE `core_pdf_template`
+//--
+//-- Constraints for table `core_pdf_template`
+//--
+//                   ALTER TABLE `core_pdf_template`
 //  ADD CONSTRAINT `core_pdf_template_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE,
-//  ADD CONSTRAINT `core_pdf_template_ibfk_2` FOREIGN KEY (`stationaryBlobId`) REFERENCES `core_blob` (`id`);";
+//  ADD CONSTRAINT `core_pdf_template_ibfk_2` FOREIGN KEY (`stationaryBlobId`) REFERENCES `core_blob` (`id`);
