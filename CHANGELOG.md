@@ -1,10 +1,14 @@
+21-09-2020 6.4.171
+- Release in GitHub
+
+21-09-2020 6.4.170
 - Time registration: use start time of same weekday in previous week as start time for first entry of the day
 - DAV: Fixed case sensitive login
 - Email: Worked around error if status could not be fetched from IMAP
 - Core: Updated PT-BR Translations thanks to Everson Guimarães!
 - Core: Disable username field if using external authentication
 - Core: Fixed shifting custom field date column in some timezones
-- Core: Fixed upload to files module where files with identical content wouldn't upload more than once
+- Files: Fixed upload to files module where files with identical content wouldn't upload more than once
 - Core: Fixed not found error on compressing folders.
 - Custom Fields: Fixed render bug in field dialog.
 - Newsletters: Bugfix, make SMTP accounts sortable and scrollable in System settings;
