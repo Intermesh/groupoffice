@@ -649,8 +649,13 @@ class Imap extends ImapBodyStruct {
 					}else
 					{
 						$status = $this->get_status($folder["name"]);
-						$folders[$name]['messages']=$status['messages'];
-						$folders[$name]['unseen']=$status['unseen'];
+						if(!$status) {
+							go()->warn("Could not get status for folder '" . $folder['name'] . "'");
+						} else{
+							$folders[$name]['messages']=$status['messages'];
+							$folders[$name]['unseen']=$status['unseen'];
+						}
+
 					}
 				}
 			}

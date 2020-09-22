@@ -143,7 +143,7 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 								var value = elm.getValue();
 								if(!Ext.isEmpty(value)) {
 									var re=/(={1,2}|<|>)/;
-									var arVal = String(value()).split(re);
+									var arVal = String(value).split(re);
 									elm.setRawValue(arVal[0].trim() + " " + arVal[1]  + " " + arVal[2].trim());
 								}
 							},
