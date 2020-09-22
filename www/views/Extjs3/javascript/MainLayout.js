@@ -342,7 +342,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			Ext.state.Manager.setProvider(new GO.state.HttpProvider());
 		}
 		
-		this.fireEvent('authenticated', this);
+
 		var me = this;
 
 		Ext.getBody().mask(t("Loading..."));
@@ -355,6 +355,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			]).then(function(){
 				go.Entities.init();
 				me.addDefaultRoutes();
+
+				me.fireEvent('authenticated', this);
+
 				me.renderUI();
 				Ext.getBody().unmask();
 				go.Router.check();
@@ -407,7 +410,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	renderUI : function() {
 
 		GO.checker = new GO.Checker();
-
 
 		this.fireReady();				
 
