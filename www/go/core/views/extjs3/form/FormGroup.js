@@ -209,23 +209,20 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		var formField = this.createNewItem(auto), me = this, items = [formField], delBtn = new Ext.Button({
 			//disabled: formField.disabled,
 			xtype: "button",
+			cls: "small",
 			iconCls: 'ic-delete',
 			handler: function() {
-				if(this.ownerCt.ownerCt.formField.key) {
-					me.markDeleted.push(this.ownerCt.ownerCt.formField.key);
+				if(this.ownerCt.formField.key) {
+					me.markDeleted.push(this.ownerCt.formField.key);
 				}
-				this.ownerCt.ownerCt.destroy();
+				this.ownerCt.destroy();
 				me.dirty = true;
 			}
 		}),
 			rowId  = Ext.id();
 
 		if(this.editable) {
-			items.unshift({
-				xtype: "container",
-				width: dp(48),		
-				items: [delBtn]
-			});
+			items.push(delBtn);
 
 			if(this.sortable) {
 				var dragHandle = this.createDragHandle(rowId);
@@ -251,6 +248,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	createDragHandle : function(rowId) {
 		return new Ext.Button({
 			iconCls: "ic-drag-handle",
+			cls: "small",
 			tooltip: t("Drag to sort"),
 			rowId: rowId,
 			tabIndex: -1,

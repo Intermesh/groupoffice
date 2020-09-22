@@ -683,6 +683,12 @@
 }
 
 .x-btn{
+
+	&.small {
+		transform: scale(.8);
+		margin-top: dp(-4);
+	}
+
 	@extend %font-button;
 	letter-spacing: 0; // for button icons
 	height: dp(36); // 32 for dense
