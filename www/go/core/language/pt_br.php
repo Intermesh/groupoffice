@@ -21,7 +21,14 @@ return array (
   'Lost password?' => 'Esqueceu sua senha?',
   'To recover your password you must be able to read your e-mail without access to {product_name}. If you enter your e-mail address an e-mail with instructions will be sent to your e-mail address.<br /><br />Enter your e-mail address:' => 'Para recuperar sua senha você precisa ter acesso ao seu e-mail sem acessar o {product_name}. Se você informar o e-mail, uma nova senha será enviada para ele.<br /><br />Informe seu e-mail:',
   'Java Webstart is not installed. Java enables easier editing of files and easier file uploading. Please visit <a class="normal-link" href="http://www.java.com/download" target="_blank">http://www.java.com/download</a> to install it.' => 'Java Webstart não instalado. O Java habilita a edição e envio fácil de arquivos . Visite <a class="normal-link" href="http://www.java.com/download" target="_blank">http://www.java.com/download</a> para instalar.',
-  'Help contents' => 'Conteúdo da ajuda',
+	'recoveryMailBody' => 'Prezado Senhor %s,
+Você solicitou uma nova senha para %s do endereço IP: {ip_address}. Seu nome de usuário é "%s".
+Clique no link abaixo (ou copie e cole em um browser) para alterar sua senha:
+
+%s
+
+Se você não solicitou uma nova senha por favor ignore esta mensagem.',
+	'Help contents' => 'Conteúdo da ajuda',
   'Report a bug' => 'Informar um erro',
   'About {product_name}' => 'Sobre o GroupOffice',
   'Usage statistics' => 'Estatísticas de uso',
