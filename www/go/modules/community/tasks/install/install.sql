@@ -31,24 +31,26 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `uid` VARCHAR(190) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NOT NULL DEFAULT '',
   `tasklistId` INT(11) UNSIGNED NOT NULL,
+  `groupId` INT UNSIGNED NULL DEFAULT NULL,
+  `responsibleUserId` INT(11) NOT NULL,
   `createdBy` INT(11) NOT NULL,
   `createdAt` DATETIME NOT NULL,
   `modifiedAt` DATETIME NOT NULL,
   `modifiedBy` INT(11) NOT NULL DEFAULT 0,
   `filesFolderId` INT(11) NOT NULL DEFAULT 0,
-  `due` DATE NOT NULL,
-  `start` DATE NOT NULL,
+  `due` DATE NULL,
+  `start` DATE NULL,
   `estimatedDuration` VARCHAR(20) NULL,
   `progress` TINYINT(2) NOT NULL DEFAULT 1,
   `progressUpdated` DATETIME NULL DEFAULT NULL,
   `title` VARCHAR(255) NOT NULL,
   `description` TEXT NULL DEFAULT NULL,
   `color` CHAR(6) NULL,
-  `recurrenceRule` VARCHAR(400) NULL DEFAULT '',
+  `recurrenceRule` VARCHAR(400) NULL DEFAULT NULL,
   `priority` INT(11) NOT NULL DEFAULT 1,
   `freeBusyStatus` CHAR(4) NULL DEFAULT 'busy',
   `privacy` VARCHAR(7) NULL DEFAULT 'public',
-  `percentageComplete` TINYINT(4) NOT NULL DEFAULT 0,
+  `percentComplete` TINYINT(4) NOT NULL DEFAULT 0,
   `uri` VARCHAR(190) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX `list_id` (`tasklistId` ASC),
@@ -57,6 +59,7 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   INDEX `fkModifiedBy` (`modifiedBy` ASC),
   INDEX `createdBy` (`createdBy` ASC),
   INDEX `filesFolderId` (`filesFolderId` ASC),
+  INDEX `tasks_task_groupId_idx` (`groupId` ASC),
   CONSTRAINT `fkModifiedBy`
     FOREIGN KEY (`modifiedBy`)
     REFERENCES `core_user` (`id`),
@@ -65,7 +68,12 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
     REFERENCES `tasks_tasklist` (`id`),
   CONSTRAINT `tasks_task_ibfk_2`
     FOREIGN KEY (`createdBy`)
-    REFERENCES `core_user` (`id`))
+    REFERENCES `core_user` (`id`)
+    CONSTRAINT `tasks_task_groupId`
+  FOREIGN KEY (`groupId`)
+   REFERENCES `tasks_tasklist_group` (`id`)
+   ON DELETE SET NULL
+   ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
@@ -77,7 +85,7 @@ COLLATE = utf8mb4_unicode_ci;
 CREATE TABLE IF NOT EXISTS `tasks_task_user` (
   `taskId` INT(11) UNSIGNED NOT NULL,
   `userId` INT NOT NULL,
-  `modSeq` INT NOT NULL,
+  `modSeq` INT NOT NULL DEFAULT 0,
   `freeBusyStatus` CHAR(4) NOT NULL DEFAULT 'busy',
   PRIMARY KEY (`taskId`, `userId`),
   INDEX `fk_tasks_task_user_tasks_task1_idx` (`taskId` ASC),
@@ -222,33 +230,6 @@ CREATE TABLE IF NOT EXISTS `tasks_tasklist_user` (
   CONSTRAINT `fk_tasks_tasklist_user_tasks_tasklist1`
     FOREIGN KEY (`tasklistId`)
     REFERENCES `tasks_tasklist` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `tasks_participant`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tasks_participant` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(100) NULL,
-  `email` VARCHAR(100) NULL,
-  `description` VARCHAR(255) NULL,
-  `sendTo` VARCHAR(200) NULL,
-  `kind` SMALLINT(2) NULL,
-  `roles` VARCHAR(72) NULL,
-  `participantionStatus` SMALLINT(2) NOT NULL DEFAULT 1,
-  `participantionComment` VARCHAR(255) NULL,
-  `progress` TINYINT(2) UNSIGNED NOT NULL DEFAULT 1,
-  `progressUpdated` DATETIME NULL,
-  `percentComplete` TINYINT(3) UNSIGNED NOT NULL DEFAULT 0,
-  `taskId` INT(11) UNSIGNED NOT NULL,
-  PRIMARY KEY (`id`, `taskId`),
-  INDEX `fk_task_participant_tasks_task1_idx` (`taskId` ASC),
-  CONSTRAINT `fk_task_participant_tasks_task1`
-    FOREIGN KEY (`taskId`)
-    REFERENCES `tasks_task` (`id`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

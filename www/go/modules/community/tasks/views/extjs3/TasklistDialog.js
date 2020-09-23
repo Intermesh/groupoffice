@@ -10,18 +10,10 @@ go.modules.community.tasks.TasklistDialog = Ext.extend(go.form.Dialog, {
 		return [{
 			xtype: 'fieldset',
 			items: [{
-				xtype: 'radiogroup',
+				xtype: 'hidden',
 				allowBlank: false,
-				fieldLabel: t('Type'),
 				value: 'list',
-				name: 'role',
-				items: [{
-					boxLabel: t('List'),
-					inputValue: 'list'
-				},{
-					boxLabel: t('Board'),
-					inputValue: 'board',
-				}]
+				name: 'role'
 			},{
 				xtype: 'textfield',
 				name: 'name',

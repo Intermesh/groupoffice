@@ -322,6 +322,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	setValue: function (records) {
 		this.dirty = true;
 		this.removeAll();
+		if(records === null) return;
 		this.markDeleted = [];
 		var me = this, wrap;
 		function set(r, key) {

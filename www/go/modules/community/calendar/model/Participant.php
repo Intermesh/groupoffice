@@ -1,9 +1,15 @@
 <?php
 
-namespace go\modules\community\tasks\model;
+namespace go\modules\community\calendar\model;
 
 use go\core\orm\Property;
 
+/**
+ * Class Participant
+ *
+ * This is unused, originally written for the task module but we decided to take
+ * a simpler approach for task participants.
+ */
 class Participant extends Property
 {
 
@@ -27,7 +33,7 @@ class Participant extends Property
     /** @var string email address for the participant */
     public $email;
 
-    /** @var string description with for eample information about there role or how best to contact them. */
+    /** @var string description with for example information about there role or how best to contact them. */
     public $description;
 
     /**
@@ -47,10 +53,10 @@ class Participant extends Property
     public $roles;
 
     /** @var string An id from the CalendarObject its `locations` array Where this participant is expected to be attending */
-    // public $locationId;
+    public $locationId;
 
     /** @var string language tag the best describes the participant's preferred language */
-    // public $language;
+    public $language;
 
     /** @var string 'needs-action', 'accepted', 'declined', 'tentative', 'delegated' */
     public $participationStatus;
@@ -62,7 +68,7 @@ class Participant extends Property
     public $expectReply;
 
     /** @var string is the client, server or none responsible for sending imip invites */
-    // public $scheduleAgent = 'server';
+    public $scheduleAgent = 'server';
 
     /** @var uint The sequence number of the last response from the participant.  */
     public $scheduleSequence = 0;
@@ -74,28 +80,19 @@ class Participant extends Property
     public $invitedBy;
 
     /** @var string[bool] participantIds A set of participant ids that this participant has delegated their participation to. */
-    // public $delegatedTo;
+    public $delegatedTo;
 
     /** @var string[bool] participantIds A set of participant ids that this participant is acting as a delegate for */
-    // public $delegatedFrom;
+    public $delegatedFrom;
 
     /** @var string[bool] participantIds A set of group participants that were invited to this calendar
     object, which caused this participant to be invited due to their
     membership in the group(s). */
-    // public $memberOf;
+    public $memberOf;
 
-    // public $linkIds;
-
-    /** @var Progress Represents the progress of the participant for this task. */
-    public $progress = Progress::NeedsAction;
-
-    /** @var DateTime Specifies the date-time the progress property was last set on this participant */
-    public $progressUpdated;
-
-    /** @var uint [0-100] Represents the percent completion of the participant for this task */
-    public $percentComplete = 0;
+    public $linkIds;
 
     protected static function defineMapping() {
-        return parent::defineMapping()->addTable("tasks_participant", "participant");
+        return parent::defineMapping()->addTable("calendar_participant", "participant");
     }
 }

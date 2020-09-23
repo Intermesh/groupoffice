@@ -3,7 +3,7 @@
 go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 	
 	entityStore: "Task",
-
+	width:dp(400),
 	stateId: 'ta-tasks-detail',
 
 	initComponent: function () {
@@ -13,49 +13,29 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 
 		Ext.apply(this, {
 			items: [{
-				xtype: 'readmore',
-				onLoad: function (dv) {
-					this.setText("<h3>" + dv.data.title +
-					 "</h3><div class='go-html-formatted'>" +(dv.data.description||"") + "</div>");
-
-				}
-			},{
-				tpl: '<table class="display-panel" cellpadding="0" cellspacing="0" border="0">'+
-					'<tr>'+
-					'<td colspan="2"><h3>{name}</h3></td>'+
-					'</tr>'+
-					'<tr>'+
-					'<td>'+t("Tasklist", "tasks")+':</td>'+
-					'<td>{tasklistId}</td>'+
-					'</tr>'+
-					'<tr>'+
-					'<td>'+t("Starts at", "tasks")+':</td>'+
-					'<td>{[go.util.Format.date(values.start)]}</td>'+
-					'</tr>'+
-					'<tr>'+
-					'<td>'+t("Due at", "tasks")+':</td>'+
-					'<td{[go.util.Format.date(values.due)]}</td>'+
-					'</tr>'+
-					'<tr>'+
-					'<td>'+t("Status")+':</td>'+
-					'<td>{[values.completed ? "Done" : "Open"]}</td>'+
-					'</tr>'+
-				'<tpl if="!GO.util.empty(description)">'+
-						'<tr>'+
-					'<td colspan="2" class="display-panel-heading">'+t("Description")+'</td>'+
-					'</tr>'+
-					'<tr>'+
-					'<td colspan="2">{description}</td>'+
-					'</tr>'+
-					'</tpl>'+
-
-					'</table>'
+				tpl: '<h3 class="title s8">{title}</h3>\
+					<h4 style="text-transform:uppercase; float:right; padding:12px 8px 0 0;">{[go.modules.community.tasks.progress[values.progress]]}</h4>\
+					<p class="s6 pad">\
+					<label>'+t("Starts at")+'</label>\
+					<span>{[fm.date(values.start)]}</span><br><br>\
+					<label>'+t("Tasklist")+'</label>\
+					<span>{[fm.date(values.start)]}</span><br><br>\
+					<label>'+t('Email')+'</label><span>{tasklistId}</span><br><br>\
+				</p>\
+				<p class="s6">\
+					\<label>'+t("Due at")+'</label>\
+					<span>{[fm.date(values.due)]}</span><br><br>\
+				</p><tpl if="!GO.util.empty(description)"><p class="s12 pad">\
+					<label>'+t('Description')+'</label>\
+					<span>{description}</span>\
+				</p></tpl>'
 			}]
 		});
 		
 
 		go.modules.community.tasks.TaskDetail.superclass.initComponent.call(this);
 		this.addCustomFields();
+		this.addComments();
 		this.addLinks();
 		this.addFiles();
 	},

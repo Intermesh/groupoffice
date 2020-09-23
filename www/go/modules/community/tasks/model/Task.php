@@ -8,6 +8,7 @@
 namespace go\modules\community\tasks\model;
 
 use go\core\acl\model\AclItemEntity;
+use go\core\db\Expression;
 use go\core\orm\CustomFieldsTrait;
 use go\core\orm\EntityType;
 use go\core\orm\SearchableTrait;
@@ -29,8 +30,16 @@ class Task extends AclItemEntity {
 	/** @var string global unique id for invites and sync  */
 	protected $uid = '';
 
+	protected $userId;
+
 	/** @var int The list this Task belongs to */
 	public $tasklistId;
+
+	/** @var int id of user responsible for completing this tasks  */
+	public $responsibleUserId;
+
+	/** @var int used for the kanban groups */
+	public $groupId;
 
     /** @var int */
     public $projectId = 0;
@@ -60,7 +69,7 @@ class Task extends AclItemEntity {
     public $estimatedDuration;
 
     /** @var Progress Defines the progress of this task */
-    public $progress = Progress::NeedsAction;
+    protected $progress = Progress::NeedsAction;
 
 	/** @var DateTime When the "progress" of either the task or a specific participant was last updated. */
 	public $progressUpdated;
@@ -77,6 +86,8 @@ class Task extends AclItemEntity {
 	public $categories;
 
 	public $color;
+
+	public $status;
 
 	/**
      * If present, this object represents one occurrence of a
@@ -120,7 +131,7 @@ class Task extends AclItemEntity {
 	public $useDefaultAlerts = false;
 
     /** @var Alert[] List of notification alerts when $useDefaultAlerts is not set */
-    public $alerts;
+	public $alerts = [];
 
 	/** @var int */
 	public $vcalendarBlobId;
@@ -137,7 +148,7 @@ class Task extends AclItemEntity {
 		return parent::defineMapping()
 			->addTable("tasks_task", "task")
 			->addUserTable("tasks_task_user", "ut", ['id' => 'taskId'])
-			->addMap('alerts', Alert::class, ['id' => 'taskId', 'ut.userId' => 'userId'])
+			->addMap('alerts', Alert::class, ['id' => 'taskId'])
 			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId']);
 	}
 
@@ -149,10 +160,6 @@ class Task extends AclItemEntity {
 		return $arr;
 	}
 
-	public function getRrule() {
-		return $this->recurrenceRule;
-	}
-
 	public function getRecurrenceRule() {
 		return empty($this->recurrenceRule) ? null : json_decode($this->recurrenceRule);
 	}
@@ -162,6 +169,18 @@ class Task extends AclItemEntity {
 			$rrule = json_encode($rrule);
 		}
 		$this->recurrenceRule = $rrule;
+	}
+
+	public function getProgress() {
+		return Progress::$db[$this->progress];
+	}
+
+	public function setProgress($value) {
+		$key = array_search($value, Progress::$db, true);
+		if($key === false) {
+			$this->setValidationError('progress', 10, 'Incorrect Progress value for task');
+		} else
+			$this->progress = $key;
 	}
 
 	public function setRecurrenceRuleEncoded($rrule) {
@@ -317,6 +336,17 @@ class Task extends AclItemEntity {
 		$rRuleIt->next();
 		$nextTime = $rRuleIt->current();
 		return $nextTime;
+	}
+
+	public static function sort(Query $query, array $sort)
+	{
+		if(isset($sort['groupOrder'])) {
+			$query->join('tasks_tasklist_group', 'listGroup', 'listGroup.id = task.groupId', 'LEFT');
+			$sort['listGroup.sortOrder'] = $sort['groupOrder'];
+			unset($sort['groupOrder']);
+		};
+
+		return parent::sort($query, $sort);
 	}
 
 

@@ -1048,7 +1048,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				
 					
 				if(\GO::modules()->tasks && empty($params['events_only'])){
-					$response = $this->_getTaskResponseForPeriod($response,$calendar,$startTime,$endTime);
+					//$response = $this->_getTaskResponseForPeriod($response,$calendar,$startTime,$endTime);
 				}				
 				
 				$response = $this->_getEventResponseForPeriod($response,$calendar,$startTime,$endTime, $categories);

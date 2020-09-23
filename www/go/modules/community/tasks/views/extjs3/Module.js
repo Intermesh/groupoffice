@@ -26,3 +26,11 @@ go.Modules.register("community", "tasks", {
 	}],
 	initModule: function () {}
 });
+
+go.modules.community.tasks.progress = {
+	'needs-action' : t('Needs action'),
+	'in-progress': t('In progress'),
+	'complete': t('Complete'),
+	'failed': t('Failed'),
+	'cancelled' : t('Cancelled')
+};

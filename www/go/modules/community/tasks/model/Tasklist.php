@@ -15,9 +15,12 @@ use go\core\acl\model\AclOwnerEntity;
 class Tasklist extends AclOwnerEntity
 {
 
+	const Board = 2;
+
 	const Roles = [
-		'list' => 1,
-		'board' => 2
+		1 => 'list',
+		2 => 'board',
+		3 => 'project'
 	];
 
 	/** @var int */
@@ -29,14 +32,16 @@ class Tasklist extends AclOwnerEntity
 	/** @var string What kind of list: 'list', 'board' */
 	protected $role;
 
-	public function getRole()
-	{
-		return array_search($this->role, self::Roles);
+	public function getRole() {
+		return self::Roles[$this->role];
 	}
 
-	public function setRole($value)
-	{
-		$this->role = self::Roles[$value];
+	public function setRole($value) {
+		$key = array_search($value, self::Roles, true);
+		if($key === false) {
+			$this->setValidationError('role', 10, 'Incorrect role value for tasklist');
+		} else
+			$this->role = $key;
 	}
 
 	/** @var string if a longer description then name s needed */
@@ -66,7 +71,7 @@ class Tasklist extends AclOwnerEntity
 
 	protected function internalSave()
 	{
-		if ($this->isNew() && $this->role == self::Roles['board']) {
+		if ($this->isNew() && $this->role == self::Board) {
 			if (empty($this->groups)) {
 
 				$this->setValue('groups', [

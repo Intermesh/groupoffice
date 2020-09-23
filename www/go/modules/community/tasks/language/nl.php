@@ -21,5 +21,10 @@ return [
 	'Open file' => 'Open bestand',
 	'Tasklist not selected' => 'Takenlijst niet geselecteerd',
 	'You have not selected any tasklist. Select a tasklist before proceeding.' => 'Er is geen takenlijst geselecteerd. Selecteer een takenlijst om verder te gaan.',
-	'Choose a tasklist' => 'Kies een takenlijst'
+	'Choose a tasklist' => 'Kies een takenlijst',
+	'In progress' => 'Bezig',
+	'Complete' => 'Voltooid',
+	'Failed' => 'Mislukt',
+	'Needs action' => 'Actie nodig',
+	'Cancelled' => 'Geannuleerd'
 ];
