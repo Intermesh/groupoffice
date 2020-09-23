@@ -439,11 +439,13 @@ abstract class EntityController extends Controller {
 
 	public static function onEntitySave(Entity $entity) {
 
-		$mod = array_map(function($mod) { return $mod[0];}, $entity->getModified()); //Get only modified values
+		//$mod = array_map(function($mod) { return $mod[0];}, $entity->getModified()); //Get only modified values
+
+		//Server should sent modified only but it's hard to check with getters and setters. So we just send all.
 		if($entity->isNew()) {
-			static::$createdEntitities[$entity->id()] = $mod;
+			static::$createdEntitities[$entity->id()] = $entity->toArray();
 		} else {
-			static::$updatedEntitities[$entity->id()] = $mod;
+			static::$updatedEntitities[$entity->id()] = $entity->toArray();
 		}
 	}
 

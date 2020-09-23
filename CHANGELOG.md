@@ -1,4 +1,14 @@
-- Timeregistration: When changing the start time, the end time will change instead of the duration
+Master
+- Core: array relation with ID's keeps records
+- Core: Module dependencies are respected
+- Business: New finance module
+- Projects: new module
+- Tasks: new module
+- Business: New employee management module
+- Time tracking: new module
+- History: new module replacing Activity log
+end master
+
 
 21-09-2020 6.4.171
 - Release in GitHub

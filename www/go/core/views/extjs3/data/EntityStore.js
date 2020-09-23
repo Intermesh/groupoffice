@@ -779,6 +779,10 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 				if(response.updated) {
 					for(var serverId in response.updated) {
+						//server updated something we don't have
+						if(!me.data[serverId]) {
+							continue;
+						}
 						//merge existing data, with updates from client and server
 						entity = Ext.apply(me.data[serverId], params.update[serverId]);
 						entity = Ext.apply(entity, response.updated[serverId] || {});
