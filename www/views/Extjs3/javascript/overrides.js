@@ -374,6 +374,15 @@ Ext.override(Ext.form.TriggerField,{
 			}
 		}
 	},
+
+	onResize: function(w, h){
+		Ext.form.TriggerField.superclass.onResize.call(this, w, h);
+		var tw = this.getTriggerWidth();
+		if(Ext.isNumber(w)){
+			this.el.setWidth(w - tw);
+		}
+		this.wrap.setWidth(w + tw);
+	},
 	
 	 onRender : function(ct, position){
         this.doc = Ext.isIE ? Ext.getBody() : Ext.getDoc();
@@ -384,7 +393,7 @@ Ext.override(Ext.form.TriggerField,{
                 {tag: "button", type: "button", tabindex: "-1", cls: "x-form-trigger " + this.triggerClass});
         this.initTrigger();
         if(!this.width){
-            this.wrap.setWidth(this.el.getWidth()+this.getTriggerWidth());
+            this.wrap.setWidth('auto');
         }
         this.resizeEl = this.positionEl = this.wrap;
     },
