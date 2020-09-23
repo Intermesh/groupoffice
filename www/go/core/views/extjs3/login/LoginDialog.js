@@ -66,6 +66,7 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 
 			while(next < this.items.length && go.AuthenticationManager.userMethods.indexOf(nextItem.id) == -1) {
 				next++;
+				this.next(next);
 			}
 		}
  
