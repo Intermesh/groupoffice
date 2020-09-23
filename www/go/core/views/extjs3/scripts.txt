@@ -57,6 +57,7 @@ form/RecurrenceFieldset.js
 form/KeyValueEditorGrid.js
 form/DateRangeField.js
 form/RecurrenceField.js
+form/SelectField.js
 
 modules/ModulePanel.js
 
@@ -183,6 +184,7 @@ users/CreateUserPasswordPanel.js
 users/CreateUserWizard.js
 users/UserGroupGrid.js
 users/UserCombo.js
+users/UserSettingsWorkingWeek.js
 users/SelectDialogPanel.js
 
 customfields/FormFieldSet.js

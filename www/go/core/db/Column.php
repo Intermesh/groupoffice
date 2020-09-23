@@ -208,7 +208,9 @@ class Column {
 				if ($value instanceof DateTime || $value instanceof DateTimeImmutable) {
 					return $value;
 				} else {
-					return new GoDateTime($value);
+					$dt = new GoDateTime($value);
+					$dt->setTimezone(new DateTimeZone("UTC")); //UTC
+					return $dt;
 				}
 				
 			default:

@@ -1,14 +1,20 @@
-Master
-- Core: array relation with ID's keeps records
-- Core: Module dependencies are respected
-- Business: New finance module
-- Projects: new module
-- Tasks: new module
-- Business: New employee management module
-- Time tracking: new module
-- History: new module replacing Activity log
-end master
+- Timeregistration: When changing the start time, the end time will change instead of the duration
 
+21-09-2020 6.4.171
+- Release in GitHub
+
+21-09-2020 6.4.170
+- Time registration: use start time of same weekday in previous week as start time for first entry of the day
+- DAV: Fixed case sensitive login
+- Email: Worked around error if status could not be fetched from IMAP
+- Core: Updated PT-BR Translations thanks to Everson Guimarães!
+- Core: Disable username field if using external authentication
+- Core: Fixed shifting custom field date column in some timezones
+- Files: Fixed upload to files module where files with identical content wouldn't upload more than once
+- Core: Fixed not found error on compressing folders.
+- Custom Fields: Fixed render bug in field dialog.
+- Newsletters: Bugfix, make SMTP accounts sortable and scrollable in System settings;
+- Newsletters: add text filter to SMTP combobbox, sort SMTP combobox items by name.
 
 15-09-2020 6.4.169
 - Core: Bugfix in language export
@@ -21,8 +27,7 @@ end master
 - Core: custom fields don't return id in data
 - Tickets: tickets where searchable for all users allowed to create tickets. The same thing happened to mail linked to those tickets
 - Calendar: Optimized loading performance
-
-
+- Custom fields: Fixed error when using encrypted text field
 
 08-09-2020 6.4.167
 - Core: if Activity Log enabled, show successful login and logout attempts
