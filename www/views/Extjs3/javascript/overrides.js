@@ -393,7 +393,7 @@ Ext.override(Ext.form.TriggerField,{
                 {tag: "button", type: "button", tabindex: "-1", cls: "x-form-trigger " + this.triggerClass});
         this.initTrigger();
         if(!this.width){
-            this.wrap.setWidth('auto');
+            this.wrap.setWidth(this.el.getWidth()+this.getTriggerWidth());
         }
         this.resizeEl = this.positionEl = this.wrap;
     },
