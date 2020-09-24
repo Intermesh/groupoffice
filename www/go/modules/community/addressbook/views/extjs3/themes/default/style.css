@@ -31,10 +31,18 @@
   color: #febf35;
 }
 
+.go-addressbook-index-row:not(:first-child):before {
+  content: "";
+  top: -7px;
+  position: absolute;
+  width: 100%;
+  display: block;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
 .go-addressbook-index-row:not(:first-child) {
-  border-top: 7px solid transparent;
-  margin-top: 7px;
-  box-shadow: 0px -1px 0 rgba(0, 0, 0, 0.12);
+  margin-top: 14px;
+  position: relative;
 }
 
 .go-addressbook-name-panel {

@@ -619,12 +619,11 @@ a {
 		//padding: 0 dp(24) dp(8);
 		//color: color($fg, 'secondary-text');
 		margin: 0 auto dp(4);
-		animation: slide-top .2s ease-out; 
+
 		.x-panel-header {
 			color: color($fg,'secondary-text');
-			transform: scale(.8);
+			zoom:.8;
 			height: dp(40);
-
 			line-height: dp(40);
 	    }
 		.x-panel-header-text {
@@ -643,6 +642,7 @@ a {
 	top: dp(64);
 	right: 8px;
 	overflow: visible;
+	> div {animation: slide-top .2s ease-out;}
 }
 .notifications {
 	padding: dp(4);
