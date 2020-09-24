@@ -122,7 +122,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 						}
 
 						var sortBy = go.User.addressBookSettings.sortBy, name;
-						if(!record.data.isOrganization && sortBy == 'lastName') {
+						if(!record.data.isOrganization && sortBy == 'lastName' && !go.util.empty(record.data.lastName)) {
 							name = record.data.lastName + ', ' + record.data.firstName;
 						} else{
 							name = record.get('name');
