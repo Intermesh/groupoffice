@@ -202,47 +202,60 @@ class Mapping {
 	 * Add has one relation
 	 * 
 	 * @param string $name
-	 * @param string $entityName
+	 * @param string $propertyName
 	 * @param array $keys
 	 * @param bool $autoCreate If not found then automatically create an empty object
 	 * 
 	 * @return $this;
 	 */
-	public function addHasOne($name, $entityName, array $keys, $autoCreate = false) {
+	public function addHasOne($name, $propertyName, array $keys, $autoCreate = false) {
 		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_HAS_ONE);
-		$this->relations[$name]->setEntityName($entityName);
+		$this->relations[$name]->setEntityName($propertyName);
 		$this->relations[$name]->autoCreate = $autoCreate;
 		return $this;
 	}
 
 	/**
-	 * Add an array relation. Array relations are replaced completely when saved.
-	 * Auto incremented primary keys are lost. If you need them to persist use addMap()
-	 * 
+	 * Add an array relation.
+	 *
+	 * Array's can be sorted. When the property does not have a primary key, the whole array will be deleted and rewritten
+	 * when saved. This will retain the sort order automatically.
+	 *
+	 * If the property does have a primary key. The client can sent it along to retain it. In this case the sort order must
+	 * be stored in an int column. The framework does this automatically when you specify this. See the $options parameter.
+	 *
 	 * @param string $name
-	 * @param string $entityName
-	 * @param array $keys
-	 * 
+	 * @param string $propertyName
+	 * @param array $keys	 *
+	 * @param array $options pass ['orderBy' => 'sortOrder'] to save the sort order in this int column,
+	 *
 	 * @return $this;
+	 * @throws Exception
 	 */
-	public function addArray($name, $entityName, array $keys) {
+	public function addArray($name, $propertyName, array $keys, array $options = []) {
 		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_ARRAY);
-		$this->relations[$name]->setEntityName($entityName);
+		$this->relations[$name]->setEntityName($propertyName);
+		foreach($options as $option => $value) {
+			$this->relations[$name]->$option = $value;
+		}
 		return $this;
 	}
 
 	/**
 	 * Add a mapped relation. Index is the ID.
-	 * 
+	 *
+	 * Map objects are unsorted!
+	 *
 	 * @param string $name
-	 * @param string $entityName
+	 * @param string $propertyName
 	 * @param array $keys
-	 * 
+	 *
 	 * @return $this;
+	 * @throws Exception
 	 */
-	public function addMap($name, $entityName, array $keys) {
+	public function addMap($name, $propertyName, array $keys) {
 		$this->relations[$name] = new Relation($name, $keys, Relation::TYPE_MAP);
-		$this->relations[$name]->setEntityName($entityName);
+		$this->relations[$name]->setEntityName($propertyName);
 		return $this;
 	}
 
