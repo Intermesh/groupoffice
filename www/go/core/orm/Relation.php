@@ -26,7 +26,9 @@ class Relation {
 	public $name;
 
 	/**
-	 * The class name of the {@see Property} or {@see Entity} this relation points to.
+	 * The class name of the {@see Property} this relation points to.
+	 *
+	 * @todo rename to propertyName. This must actually be a Property class.
 	 * 
 	 * @var Property
 	 */
@@ -58,6 +60,14 @@ class Relation {
 	 */
 	public $autoCreate = false;
 
+
+	/**
+	 * Only used by array relations. Used for ordering the relation on save and when fetching.
+	 *
+	 * @var string
+	 */
+	public $orderBy;
+
   /**
    * Constructor
    *
@@ -76,7 +86,9 @@ class Relation {
 	}
 
   /**
-   * Set the entity name
+   * Set the entity name.
+   * @todo rename to propertyName. This must actually be a Property class.
+   *
    * @param $entityName
    * @return $this
    * @throws Exception

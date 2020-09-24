@@ -56,10 +56,10 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	 * Enable sorting by drag and drop
 	 */
 	sortable: false,
-	/**
-	 * If set then this property will be set with the sort order ASC
-	 */
-	sortColumn: null,
+	// /**
+	//  * If set then this property will be set with the sort order ASC
+	//  */
+	// sortColumn: null,
 	
 	defaults: {
 		anchor: "100%"
@@ -349,9 +349,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		this.items.each(function(wrap, index) {
 
 			var item = wrap.formField.getValue();
-			if(this.sortColumn) {
-				item[this.sortColumn] = index;
-			}
+			// if(this.sortColumn) {
+			// 	item[this.sortColumn] = index;
+			// }
 
 			if(this.mapKey) {
 				// TODO make minimal PatchObject

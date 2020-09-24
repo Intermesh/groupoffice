@@ -4,6 +4,7 @@ namespace go\core\model;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\acl\model\AclOwnerEntity;
+use go\core\validate\ErrorCode;
 
 /**
  * Newsletter model

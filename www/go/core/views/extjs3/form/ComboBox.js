@@ -29,8 +29,15 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		if(!this.tpl) {
 			this.tpl =
 				'<tpl for=".">'+
-				'<div class="x-combo-list-item" title="{[fm.htmlEncode(values[\'' + this.displayField + '\'] || \'\' )]}"><tpl if="!values.' + this.valueField + '"><b>' + t("Create new") + ':</b> </tpl>{[fm.htmlEncode(values["' + this.displayField + '"] || "" )]}</div>'+
-				'</tpl>';
+				'<div class="x-combo-list-item" title="{[fm.htmlEncode(values[\'' + this.displayField + '\'] || \'\' )]}">';
+
+			if(this.allowNew) {
+				this.tpl += '<tpl if="!values.' + this.valueField + '"><b>' + t("Create new") + ':</b> </tpl>';
+			}
+
+			this.tpl += '{[fm.htmlEncode(values["' + this.displayField + '"] || "" )]}</div>';
+
+			this.tpl +=	'</tpl>';
 		}
 
 		go.form.ComboBox.superclass.initComponent.call(this);

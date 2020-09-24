@@ -224,7 +224,7 @@ abstract class Property extends Model {
 						$prop = null;
 					} else
 					{
-						$stmt = $this->queryRelation($cls, $where, $relation->name, $this->readOnly);
+						$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly);
 						$prop = $stmt->fetch();
 						$stmt->closeCursor();	
 						if(!$prop) {
@@ -245,7 +245,8 @@ abstract class Property extends Model {
 						$prop = [];
 					} else
 					{
-						$stmt = $this->queryRelation($cls, $where, $relation->name, $this->readOnly);
+						$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly);
+
 						$prop = $stmt->fetchAll();
 						$stmt->closeCursor();	
 					}
@@ -259,7 +260,7 @@ abstract class Property extends Model {
 						$prop = null;
 					} else
 					{
-						$stmt = $this->queryRelation($cls, $where, $relation->name, $this->readOnly);
+						$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly);
 						$prop = $stmt->fetchAll();
 						$stmt->closeCursor();	
 						if(empty($prop)) {
@@ -324,15 +325,15 @@ abstract class Property extends Model {
 
   /**
    * @param string $cls
-   * @param $where
-   * @param $relationName
-   * @param $readOnly
+   * @param array $where
+   * @param Relation $relation
+   * @param boolean $readOnly
    * @return Statement|mixed
    * @throws Exception
    */
-	private static function queryRelation($cls, $where, $relationName, $readOnly) {
+	private static function queryRelation($cls, array $where, Relation $relation, $readOnly) {
 
-		$cacheKey = static::class.':'.$relationName;
+		$cacheKey = static::class.':'.$relation->name;
 
 		$cacheKey = $readOnly ? $cacheKey . '-ro' : $cacheKey . '-rw';
 
@@ -345,6 +346,11 @@ abstract class Property extends Model {
 			foreach($where as $field => $value) {
 				$query->andWhere($field . '= :'.$field);
 			}
+
+			if(!empty($relation->orderBy)) {
+				$query->orderBy([$relation->orderBy => 'ASC']);
+			}
+
 			$stmt = $query->createStatement();
 			self::$cachedRelations[$cacheKey] = $stmt;
 		} else
@@ -1271,15 +1277,21 @@ abstract class Property extends Model {
 			}, $models);
 		}
 
+		$sortOrder = 0;
 		$this->{$relation->name} = [];
 		foreach ($models as $newProp) {
 			
 			//Check for invalid input
 			if(!($newProp instanceof Property)) {
-				throw new Exception("Invalid value given for '". $relation->name ."'. Should be a GO\Orm\Property");
+				throw new Exception("Invalid value given for '". $relation->name ."'. Should be a go\core\orm\Property");
 			}
 			
 			$this->applyRelationKeys($relation, $newProp);
+
+			if(isset($relation->orderBy)) {
+				$newProp->{$relation->orderBy} = $sortOrder++;
+			}
+
 			if (!$newProp->internalSave()) {
 				$this->relatedValidationErrors = $newProp->getValidationErrors();
 				return false;

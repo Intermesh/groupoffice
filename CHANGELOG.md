@@ -9,6 +9,7 @@ Master
 - History: new module replacing Activity log
 end master
 
+- Timeregistration: When changing the start time, the end time will change instead of the duration
 
 21-09-2020 6.4.171
 - Release in GitHub

@@ -622,9 +622,8 @@ a {
 
 		.x-panel-header {
 			color: color($fg,'secondary-text');
-			transform: scale(.8);
+			zoom:.8;
 			height: dp(40);
-
 			line-height: dp(40);
 	    }
 		.x-panel-header-text {
