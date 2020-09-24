@@ -19,7 +19,7 @@ class TasklistGroup extends Property
 	/** @var string 6 char hex code */
 	public $color;
 
-	public $sortOrder;
+	protected $sortOrder;
 
 	/** @var Progress if set the progress of a task will change when the task goes into this column */
 	public $progressChange;

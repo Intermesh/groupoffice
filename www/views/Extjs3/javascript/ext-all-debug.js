@@ -40428,6 +40428,7 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
         if(String(v) !== String(this.startValue)){
             this.fireEvent('change', this, v, this.startValue);
         }
+        this.fireEvent('setvalue', this, v);
         this.fireEvent('blur', this);
         this.postBlur();
     },
@@ -40593,7 +40594,6 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
             this.el.dom.value = (Ext.isEmpty(v) ? '' : v);
             this.validate();
         }
-
         this.fireEvent('setvalue', this, v);
         return this;
     },

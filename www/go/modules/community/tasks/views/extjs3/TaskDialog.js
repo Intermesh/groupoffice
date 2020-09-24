@@ -55,8 +55,10 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 									itemId: 'start',
 									fieldLabel : t("Start"),
 									listeners : {
-										change : function(me,val) {
+										setvalue : function(me,val) {
+											console.log(val);
 											me.nextSibling().setMinValue(val);
+											this.recurrenceField.setDisabled(Ext.isEmpty(val));
 										},
 										scope : this
 									}
@@ -155,8 +157,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								]}
 						]
 					},
-					new go.form.RecurrenceField({
-						name: 'recurrenceRule'
+					this.recurrenceField = new go.form.RecurrenceField({
+						name: 'recurrenceRule',
+						disabled: true,
 					}),
 					{xtype:'hidden', name: 'tasklistId'},
 					{xtype:'hidden', name: 'groupId'},

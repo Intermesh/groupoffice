@@ -66,7 +66,7 @@ class Tasklist extends AclOwnerEntity
 		return parent::defineMapping()
 			->addTable("tasks_tasklist", "tasklist")
 			->addUserTable('tasks_tasklist_user', "ut", ['id' => 'tasklistId'])
-			->addMap('groups', TasklistGroup::class, ['id' => 'tasklistId']);
+			->addArray('groups', TasklistGroup::class, ['id' => 'tasklistId'], ['sortBy'=>'sortOrder']);
 	}
 
 	protected function internalSave()
