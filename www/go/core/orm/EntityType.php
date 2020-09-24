@@ -426,15 +426,15 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	 * @param Entity $entity
 	 * @throws Exception
 	 */
-	public function checkChange(Entity $entity) {
+	public function checkChange(Entity $entity, $force = false) {
 
-    $modifiedPropnames = array_keys($entity->getModified());
-    $userPropNames = $entity->getUserProperties();
+		$modifiedPropnames = array_keys($entity->getModified());
+		$userPropNames = $entity->getUserProperties();
 
-    $entityModified = !empty(array_diff($modifiedPropnames, $userPropNames));
-    $userPropsModified = !empty(array_intersect($userPropNames, $modifiedPropnames));
-	
-		if($entityModified) {			
+		$entityModified = !empty(array_diff($modifiedPropnames, $userPropNames));
+		$userPropsModified = !empty(array_intersect($userPropNames, $modifiedPropnames));
+
+		if($force || $entityModified) {
 			$this->change($entity);
 		}
 		

@@ -70,12 +70,10 @@ abstract class Entity  extends OrmEntity {
 		if(!parent::internalSave()) {
 			return false;
 		}
-		
-		if(self::$trackChanges) {
-			$this->entityType()->checkChange($this);
 
-			$this->checkChangeForScalarRelations();
-		} 
+		if(self::$trackChanges) {
+			$this->change();
+		}
 
 		$this->checkFilesFolder();
 
@@ -85,6 +83,17 @@ abstract class Entity  extends OrmEntity {
 	}
 
 	private $tmpFiles;
+
+	/**
+	 * Logs change for this entity
+	 *
+	 * @param bool $force
+	 * @throws Exception
+	 */
+	public function change($force = false) {
+		$this->entityType()->checkChange($this, $force);
+		$this->checkChangeForScalarRelations();
+	}
 
 	/**
 	 * Set files to be saved into the files folder after save
