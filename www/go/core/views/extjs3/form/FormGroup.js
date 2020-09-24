@@ -125,20 +125,49 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 				return Ext.dd.DropZone.prototype.dropAllowed;
 			},
 			onNodeDrop: function (target, dd, e, data) {
+				// var dropRow = Ext.getCmp(target.id);
+				// var newItems = me.getValue();
+				// if(Ext.isObject(newItems)) {
+				// 	newItems = Object.values(newItems);
+				// }
+				// var dragItem = newItems[data.rowIndex];
+				// if(!e.altKey) {
+				// 	newItems.splice(data.rowIndex, 1);
+				// 	if (dropRow.rowIndex > data.dragIndex) {
+				// 		dropRow.rowIndex--;
+				// 	}
+				// }
+				// newItems.splice(dropRow.rowIndex, 0, dragItem);
+				// me.setValue(newItems);
+
+
 				var dropRow = Ext.getCmp(target.id);
-				var newItems = me.getValue();
-				if(Ext.isObject(newItems)) {
-					newItems = Object.values(newItems);
-				}
-				var dragItem = newItems[data.rowIndex];
+				var dragItem = me.items.itemAt(data.rowIndex);
+
+				var v = dragItem.formField.getValue();
+
 				if(!e.altKey) {
-					newItems.splice(data.rowIndex, 1);
+					me.remove(dragItem, true);
+
 					if (dropRow.rowIndex > data.dragIndex) {
 						dropRow.rowIndex--;
 					}
+
+				} else
+				{
+					//todo id configurable?
+					delete v.id;
 				}
-				newItems.splice(dropRow.rowIndex, 0, dragItem);
-				me.setValue(newItems);
+
+				var p = me.addPanel(false, dropRow.rowIndex);
+				p.formField.setValue(v);
+
+				me.items.each(function(i, rowIndex) {
+					i.rowIndex = rowIndex;
+				});
+
+				me.doLayout();
+
 				return true;
 			}
 		});
@@ -205,7 +234,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}
 	},
 	
-	addPanel : function(auto) {
+	addPanel : function(auto, index) {
 		var formField = this.createNewItem(auto), me = this, items = [formField], delBtn = new Ext.Button({
 			//disabled: formField.disabled,
 			xtype: "button",
@@ -241,7 +270,14 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			style: this.pad ?  "padding-top: " + dp(16) + "px" : "",
 			items: items
 		});
-		this.add(wrap);
+
+		if(index == undefined) {
+			this.add(wrap);
+		} else
+		{
+			this.insert(index, wrap);
+		}
+
 		return wrap;
 	},
 
