@@ -227,7 +227,8 @@ class Mapping {
 	 * @param string $name
 	 * @param string $propertyName
 	 * @param array $keys	 *
-	 * @param array $options pass ['orderBy' => 'sortOrder'] to save the sort order in this int column,
+	 * @param array $options pass ['orderBy' => 'sortOrder'] to save the sort order in this int column. This property can
+	 *   be a protected property because the client does not need to know of it's existence.
 	 *
 	 * @return $this;
 	 * @throws Exception
