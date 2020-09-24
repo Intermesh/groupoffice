@@ -29,6 +29,7 @@ require_once("backend/ipcmemcached/config.php");
 
 class IpcMemcachedProvider implements IIpcProvider {
     protected $type;
+    protected $serverKey;
     private $typeMutex;
     private $maxWaitCycles;
     private $logWaitCycles;
@@ -50,10 +51,12 @@ class IpcMemcachedProvider implements IIpcProvider {
      * @param int $type
      * @param int $allocate
      * @param string $class
+     * @param string $serverKey
      */
-    public function __construct($type, $allocate, $class) {
+    public function __construct($type, $allocate, $class, $serverKey) {
         $this->type = $type;
         $this->typeMutex = $type . "MX";
+        $this->serverKey = $serverKey;
         $this->maxWaitCycles = round(MEMCACHED_MUTEX_TIMEOUT * 1000 / MEMCACHED_BLOCK_WAIT)+1;
         $this->logWaitCycles = round($this->maxWaitCycles/5);
 
@@ -165,7 +168,7 @@ class IpcMemcachedProvider implements IIpcProvider {
         }
 
         $n = 0;
-        while(!$this->memcached->add($this->typeMutex, true, MEMCACHED_MUTEX_TIMEOUT)) {
+        while(!$this->memcached->addByKey($this->serverKey, $this->typeMutex, true, MEMCACHED_MUTEX_TIMEOUT)) {
             if (++$n % $this->logWaitCycles == 0) {
                 ZLog::Write(LOGLEVEL_DEBUG, sprintf("IpcMemcachedProvider->BlockMutex() waiting to aquire mutex for type: %s ", $this->typeMutex));
             }
@@ -191,7 +194,7 @@ class IpcMemcachedProvider implements IIpcProvider {
      * @return boolean
      */
     public function ReleaseMutex() {
-        return $this->memcached->delete($this->typeMutex);
+        return $this->memcached->deleteByKey($this->serverKey, $this->typeMutex);
     }
 
     /**
@@ -203,7 +206,7 @@ class IpcMemcachedProvider implements IIpcProvider {
      * @return boolean
      */
     public function HasData($id = 2) {
-        $this->memcached->get($this->type.':'.$id);
+        $this->memcached->getByKey($this->serverKey, $this->type.':'.$id);
         return $this->memcached->getResultCode() === Memcached::RES_SUCCESS;
     }
 
@@ -216,7 +219,7 @@ class IpcMemcachedProvider implements IIpcProvider {
      * @return mixed
      */
     public function GetData($id = 2) {
-        return $this->memcached->get($this->type.':'.$id);
+        return $this->memcached->getByKey($this->serverKey, $this->type.':'.$id);
     }
 
     /**
@@ -230,7 +233,7 @@ class IpcMemcachedProvider implements IIpcProvider {
      * @return boolean
      */
     public function SetData($data, $id = 2) {
-        return $this->memcached->set($this->type.':'.$id, $data);
+        return $this->memcached->setByKey($this->serverKey, $this->type.':'.$id, $data);
     }
 
     /**

@@ -46,6 +46,17 @@ class BaseException extends Exception
      */
     public $displayMessage = null;
 
+
+    /**
+     * Flag for allow to exception details message or not
+     */
+    public $allowToShowDetailsMessage = false;
+
+    /**
+     * The exception title to show as a message box title at client side.
+     */
+    public $title = null;
+
     /**
      * Construct the exception
      *
@@ -64,7 +75,7 @@ class BaseException extends Exception
     }
 
     /**
-     * @return string returns file name and line number combined where exception occured.
+     * @return string returns file name and line number combined where exception occurred.
      */
     public function getFileLine()
     {
@@ -94,6 +105,25 @@ class BaseException extends Exception
     }
 
     /**
+     * Function sets title of an exception that will be sent to the client side
+     * to show it to user.
+     * @param string $title title of an exception.
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    /**
+     * @return string returns title that should be sent to client to display as a message box
+     * title.
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
      * Function sets a flag in exception class to indicate that exception is already handled
      * so if it is caught again in the top level of function stack then we have to silently
      * ignore it.
@@ -104,7 +134,7 @@ class BaseException extends Exception
     }
 
     /**
-     * @return string returns base path of the file where exception occured.
+     * @return string returns base path of the file where exception occurred.
      */
     public function getBaseFile()
     {
@@ -123,6 +153,16 @@ class BaseException extends Exception
     public function getName()
     {
         return get_class($this);
+    }
+
+    /**
+     * It will return details error message if allowToShowDetailsMessage is set.
+     *
+     * @return string returns details error message.
+     */
+    public function getDetailsMessage()
+    {
+        return $this->allowToShowDetailsMessage ? $this->__toString() : '';
     }
 
     // @TODO getTrace and getTraceAsString

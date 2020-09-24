@@ -35,8 +35,9 @@ class IpcSharedMemoryProvider implements IIpcProvider {
      * @param int $type
      * @param int $allocate
      * @param string $class
+     * @param string $serverKey
      */
-    public function __construct($type, $allocate, $class) {
+    public function __construct($type, $allocate, $class, $serverKey) {
         $this->type = $type;
         $this->allocate = $allocate;
 

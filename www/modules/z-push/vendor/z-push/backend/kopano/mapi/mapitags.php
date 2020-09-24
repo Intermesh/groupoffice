@@ -931,3 +931,7 @@ define('PR_WB_SF_ID'                                  ,mapi_prop_tag(PT_BINARY, 
 
 /* Search folder properties */
 define('PR_EC_SUGGESTION'                             ,mapi_prop_tag(PT_TSTRING,     0x6707));
+
+define('PR_EC_BODY_FILTERED'                          ,mapi_prop_tag(PT_BINARY, 0x6791));
+define('PR_PROPOSEDNEWTIME_START'                     ,PR_PROPOSENEWTIME_START);
+define('PR_PROPOSEDNEWTIME_END'                       ,PR_PROPOSENEWTIME_END);

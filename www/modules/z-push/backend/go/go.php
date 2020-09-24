@@ -123,7 +123,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 			}			
 
 			$state = new go\core\auth\TemporaryState();
-			$state->setUser($user);		
+			$state->setUserId($user->id);
 			\go()->setAuthState($state);		
 
 			$this->oldLogin($user);	
@@ -172,7 +172,19 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		}
 		return true;
 	}
-	
+
+	/**
+	 * Returns the email address and the display name of the user. Used by autodiscover.
+	 *
+	 * @param string        $username           The username
+	 *
+	 * @access public
+	 * @return Array
+	 */
+	public function GetUserDetails($username) {
+		$user = go()->getAuthState()->getUser(['id', 'username', 'displayName', 'email']);
+		return array('emailaddress' => $user->email, 'fullname' => $user->displayName);
+	}
 	
 		/**
 	 * for old framework to work in GO::session()

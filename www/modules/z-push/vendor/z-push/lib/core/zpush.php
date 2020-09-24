@@ -291,17 +291,36 @@ class ZPush {
         }
 
         //check folder re-sync triggering settings
-        if (defined('DELETION_COUNT_THR') && !defined('DELETION_RATIO_THR')) {
-            throw new FatalMisconfigurationException("Only DELETION_COUNT_THR defined. Please define DELETION_RATIO_THR.");
+        if(defined('DELETION_RATIO_THR') || defined('DELETION_COUNT_THR') || defined('DELETION_COUNT_LIMIT')){
+            if (!defined('DELETION_RATIO_THR')) {
+                throw new FatalMisconfigurationException("Please define DELETION_RATIO_THR.");
+            }
+            elseif (!defined('DELETION_COUNT_THR')) {
+                throw new FatalMisconfigurationException("Please define DELETION_COUNT_THR.");
+            }
+            elseif (!defined('DELETION_COUNT_LIMIT')) {
+                throw new FatalMisconfigurationException("Please define DELETION_COUNT_LIMIT.");
+            }
+            elseif (!is_numeric(DELETION_RATIO_THR) || DELETION_RATIO_THR <= 0) {
+                throw new FatalMisconfigurationException("The DELETION_RATIO_THR value must be a number higher than 0.");
+            } 
+            elseif (!is_int(DELETION_COUNT_THR) || DELETION_COUNT_THR < 1) {
+                throw new FatalMisconfigurationException("The DELETION_COUNT_THR value must be a number higher than 0.");
+            }     
+            elseif (!is_int(DELETION_COUNT_LIMIT) || DELETION_COUNT_LIMIT <= DELETION_COUNT_THR) {
+                throw new FatalMisconfigurationException("The DELETION_COUNT_LIMIT value must be a positive number higher than DELETION_COUNT_THR.");
+            }
         }
-        elseif (!defined('DELETION_COUNT_THR') && defined('DELETION_RATIO_THR')) {
-            throw new FatalMisconfigurationException("Only DELETION_RATIO_THR defined. Please define DELETION_COUNT_THR.");
+
+        //check retry loop settings when writing/reading file state machine data to disk
+        if ((defined('FILE_STATE_ATTEMPTS')) && (!is_int(FILE_STATE_ATTEMPTS) || FILE_STATE_ATTEMPTS < 1)) {
+            throw new FatalMisconfigurationException("The FILE_STATE_ATTEMPTS value must be a number higher than 0.");
         }
-        if ((defined('DELETION_COUNT_THR')) && (!is_int(DELETION_COUNT_THR) || DELETION_COUNT_THR < 1)) {
-            throw new FatalMisconfigurationException("The DELETION_COUNT_THR value must be a number higher than 0.");
-        }
-        if ((defined('DELETION_RATIO_THR')) && (!is_numeric(DELETION_RATIO_THR) || DELETION_RATIO_THR <= 0)) {
-            throw new FatalMisconfigurationException("The DELETION_RATIO_THR value must be a number higher than 0.");
+        if ((defined('FILE_STATE_SLEEP')) && (!is_int(FILE_STATE_SLEEP) || FILE_STATE_SLEEP < 1)) {
+            throw new FatalMisconfigurationException("The FILE_STATE_SLEEP value must be a number higher than 0.");
+        }   
+        if (defined('FILE_STATE_WRITE_ATTEMPTS') || defined('FILE_STATE_WRITE_SLEEP')){
+            throw new FatalMisconfigurationException("The configuration parameter 'FILE_STATE_WRITE_ATTEMPTS' and 'FILE_STATE_WRITE_SLEEP' were deprecated in favor of 'FILE_STATE_ATTEMPTS' and 'FILE_STATE_SLEEP'. Please update your configuration.");
         }
 
         //check retry loop settings when writing file state machine data to disk
@@ -661,7 +680,10 @@ class ZPush {
             $val = self::getAddSyncFolders()[$backendid]->Store;
         }
         else {
-            $val = self::GetDeviceManager()->GetAdditionalUserSyncFolderStore($backendid);
+            $val = self::GetDeviceManager()->GetAdditionalUserSyncFolder($backendid);
+            if (isset($val['store'])) {
+                $val = $val['store'];
+            }
         }
 
         if (!$noDebug)
