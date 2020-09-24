@@ -66,21 +66,10 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						required: true,
 						value: 389
 					}, {
-						xtype: 'combo',
+						xtype: 'selectfield',
 						name: 'encryption',
 						fieldLabel: t('Encryption'),
-						mode: 'local',
-						editable: false,
-						triggerAction: 'all',
-						store: new Ext.data.ArrayStore({
-							fields: [
-								'value',
-								'display'
-							],
-							data: [['tls', 'TLS'], ['ssl', 'SSL'], [null, 'None']]
-						}),
-						valueField: 'value',
-						displayField: 'display',
+						options: [['tls', 'TLS'], ['ssl', 'SSL'], [null, 'None']],
 						value: 'tls'
 					},{
 						xtype:"checkbox",
