@@ -198,6 +198,11 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 				return me.load(id);
 			});
 		}
+
+		if(this.currentId == id) {
+			return Promise.resolve(this.data);
+		}
+
 		this.currentId = id;
 		this.loading = this.entityStore.single(id).then(function(entity) {
 			try {
