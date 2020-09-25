@@ -12,7 +12,12 @@ use go\core\model\User;
  * authenticate on each request.
  */
 class TemporaryState extends AbstractState {
-	
+
+	public function __construct($userId = null)
+	{
+		$this->setUserId($userId);
+	}
+
 	private $user;
 	private $userId;	
 	
