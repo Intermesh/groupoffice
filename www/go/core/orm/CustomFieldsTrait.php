@@ -167,7 +167,7 @@ trait CustomFieldsTrait {
 	public static function getCustomFieldModels() {
 		$cacheKey = 'custom-field-models-' . static::customFieldsEntityType()->getId();
 	 	$m = go()->getCache()->get($cacheKey);
-		if(!$m) {
+		if($m === false) {
 			$m = Field::find(['id', 'databaseName', 'fieldSetId', 'type', 'options', 'required'], true)
 						->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId')
 						->where(['fs.entityId' => static::customFieldsEntityType()->getId()])->all();
