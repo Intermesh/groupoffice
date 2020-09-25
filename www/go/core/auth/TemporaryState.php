@@ -15,7 +15,9 @@ class TemporaryState extends AbstractState {
 
 	public function __construct($userId = null)
 	{
-		$this->setUserId($userId);
+		if(isset($userId)) {
+			$this->setUserId($userId);
+		}
 	}
 
 	private $user;
