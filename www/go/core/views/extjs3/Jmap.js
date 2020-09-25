@@ -132,6 +132,14 @@ go.Jmap = {
 		return url;
 	},
 
+	pageUrl: function(route) {
+		if(route.substr(0,1) != '/') {
+			route = "/" + route;
+		}
+		var url = go.User.pageUrl + route
+		return url;
+	},
+
 	thumbUrl: function(blobId, params) {
 		if (!blobId) {
 			return '';

@@ -152,8 +152,8 @@ class State extends AbstractState {
 		return $this->getBaseUrl() . "/download.php?blob=".$blobId;
 	}
 
-	public function getPageUrl($blobId) {
-		return $this->getBaseUrl(). "/page.php?blob=".$blobId;
+	public function getPageUrl() {
+		return $this->getBaseUrl(). "/page.php";
 	}
 	
 	public function getApiUrl() {
@@ -194,6 +194,7 @@ class State extends AbstractState {
 				'capabilities' => Capabilities::get(),
 				'apiUrl' => $this->getApiUrl(),
 				'downloadUrl' => $this->getDownloadUrl("{blobId}"),
+				'pageUrl' => $this->getPageUrl(),
 				'uploadUrl' => $this->getUploadUrl(),
 				'eventSourceUrl' => $this->getEventSourceUrl(),
 				'userId' => $this->getUserId(),

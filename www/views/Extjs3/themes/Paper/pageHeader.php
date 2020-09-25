@@ -37,7 +37,14 @@ $goTitle = basename(dirname($_SERVER['PHP_SELF'])) == 'install' ? go()->t("Insta
     if(!empty(go()->getConfig()['custom_css_url'])) {
         echo '<link href="'. GO::config()->custom_css_url.'" type="text/css" rel="stylesheet" />';
     }
+
+    if(isset($head)) {
+        foreach($head as $h) {
+            echo $h ."\n";
+        }
+    }
     ?>
+
 	<style>
         <?php
 
