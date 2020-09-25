@@ -10,7 +10,13 @@ Master
 end master
 
 
+- Core: Toggle notifications when icon is clicked
+
+25-09-2020 6.4.172
 - Timeregistration: When changing the start time, the end time will change instead of the duration
+- ActiveSync: Upgraded z-push to 2.5.2 and fixed e-mail sending problem on iOS 14.0. You might need to correct the email address in your iOS account too!
+- ActiveSync: Fixed no results when searching All folders. It will search inbox only in that case for performance reasons. We'll fix this later.
+- Core: Restore correct height of windows when closing in collapsed state
 
 21-09-2020 6.4.171
 - Release in GitHub

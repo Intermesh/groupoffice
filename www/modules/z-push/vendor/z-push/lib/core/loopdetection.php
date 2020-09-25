@@ -664,6 +664,7 @@ class LoopDetection extends InterProcessData {
      *    2. request counter is the same as the previous, but no data was sent on the last request (standard situation)
      *
      *    3. request counter is the same as the previous and last time objects were sent (loop!)
+     *      3.0)   no loop was detected before, but with big window size -> lower window size first - NO LOOP mode yet
      *      3.1)   no loop was detected before, entereing loop mode     -> save loop data, loopcount = 1
      *      3.2)   loop was detected before, but are gone               -> loop resolved
      *      3.3)   loop was detected before, continuing in loop mode    -> this is probably the broken element,loopcount++,
@@ -676,7 +677,7 @@ class LoopDetection extends InterProcessData {
      * @param string $queuedMessages    the amount of messages which were found by the exporter
      *
      * @access public
-     * @return boolean      when returning true if a loop has been identified
+     * @return boolean/int      when returning true if a loop has been identified - returns new suggested window size if window might have been too big
      */
     public function Detect($folderid, $uuid, $counter, $maxItems, $queuedMessages) {
         ZLog::Write(LOGLEVEL_DEBUG, sprintf("LoopDetection->Detect(): folderid:'%s' uuid:'%s' counter:'%s' max:'%s' queued:'%s'", $folderid, $uuid, $counter, $maxItems, $queuedMessages));
@@ -730,6 +731,7 @@ class LoopDetection extends InterProcessData {
                 unset($current['ignored']);
                 unset($current['maxCount']);
                 unset($current['potential']);
+                unset($current['windowLimit']);
             }
 
             // see if there are values
@@ -763,6 +765,7 @@ class LoopDetection extends InterProcessData {
                             unset($current['ignored']);
                             unset($current['maxCount']);
                             unset($current['potential']);
+                            unset($current['windowLimit']);
                         }
                     }
                 }
@@ -778,12 +781,28 @@ class LoopDetection extends InterProcessData {
                 else if ($current['count'] == $counter && $current['queued'] > 0) {
 
                     if (!isset($current['loopcount'])) {
-                        // case 3.1) we have just encountered a loop!
-                        ZLog::Write(LOGLEVEL_DEBUG, "LoopDetection->Detect(): case 3.1 detected - loop detected, init loop mode");
-                        $current['loopcount'] = 1;
-                        // the MaxCount is the max number of messages exported before
-                        $current['maxCount'] = $counter + (($maxItems < $queuedMessages) ? $maxItems : $queuedMessages);
-                        $loop = true;   // loop mode!!
+                        // ZP-1213 we are potentially synching a lot of data, e.g. OL with 512 WindowSize
+                        // In case there are more then 40 items in the last request, we limit to 25 items
+                        // before entering 1-by-1 loop detection if counter is re-requested
+                        if ($maxItems > 40 && !isset($current['windowLimit'])) {
+                            // case 3.0) we have just encountered a loop, but with a big window size, lower window first
+                            ZLog::Write(LOGLEVEL_DEBUG, sprintf("LoopDetection->Detect(): case 3.0 detected - big windowsize of %d, lowering before entering loop mode", $maxItems));
+                            // return suggested new window size
+                            $current['windowLimit'] = 25;
+                            $loop = $current['windowLimit'];
+                        }
+                        else {
+                            // case 3.1) we have just encountered a loop!
+                            ZLog::Write(LOGLEVEL_DEBUG, "LoopDetection->Detect(): case 3.1 detected - loop detected, init loop mode");
+                            if (isset($current['windowLimit'])) {
+                                $maxItems = $current['windowLimit'];
+                                unset($current['windowLimit']);
+                            }
+                            $current['loopcount'] = 1;
+                            // the MaxCount is the max number of messages exported before
+                            $current['maxCount'] = $counter + (($maxItems < $queuedMessages) ? $maxItems : $queuedMessages);
+                            $loop = true;   // loop mode!!
+                        }
                     }
                     else if ($queuedMessages == 0) {
                         // case 3.2) there was a loop before but now the changes are GONE
@@ -793,6 +812,7 @@ class LoopDetection extends InterProcessData {
                         unset($current['ignored']);
                         unset($current['maxCount']);
                         unset($current['potential']);
+                        unset($current['windowLimit']);
                     }
                     else {
                         // case 3.3) still looping the same message! Increase counter
@@ -821,7 +841,7 @@ class LoopDetection extends InterProcessData {
         }
         // end exclusive block
 
-        if ($loop == true && $this->ignore_messageid == false) {
+        if ($loop === true && $this->ignore_messageid == false) {
             ZPush::GetTopCollector()->AnnounceInformation("Loop detection", true);
         }
 

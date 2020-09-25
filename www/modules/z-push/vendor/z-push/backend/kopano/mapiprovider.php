@@ -1022,7 +1022,7 @@ class MAPIProvider {
      */
     public function GetFolderType($entryid, $class = false) {
         $storeprops = $this->GetStoreProps();
-        $inboxprops = $this->getInboxProps();
+        $inboxprops = $this->GetInboxProps();
 
         if($entryid == $storeprops[PR_IPM_WASTEBASKET_ENTRYID])
             return SYNC_FOLDER_TYPE_WASTEBASKET;
@@ -2826,12 +2826,12 @@ class MAPIProvider {
     /**
      * Gets the required inbox properties.
      *
-     * @access private
+     * @access public
      * @return array
      */
-    private function getInboxProps() {
+    public function GetInboxProps() {
         if (!isset($this->inboxProps) || empty($this->inboxProps)) {
-            ZLog::Write(LOGLEVEL_DEBUG, "MAPIProvider->getInboxProps(): Getting inbox properties.");
+            ZLog::Write(LOGLEVEL_DEBUG, "MAPIProvider->GetInboxProps(): Getting inbox properties.");
             $this->inboxProps = array();
             $inbox = mapi_msgstore_getreceivefolder($this->store);
             if ($inbox) {

@@ -55,6 +55,11 @@ GO.Window = Ext.extend(Ext.Window,{
 		delete s.x;
 		delete s.y;
 
+		//when collapsed the state contains the collapsed height. this.height contains the correct height.
+		if(s.collapsed) {
+			s.height = this.height;
+		}
+
 		return s;
 
 	},
