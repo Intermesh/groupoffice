@@ -367,6 +367,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 							},
 							scope: this
 						}, {
+							disabled: !go.User.isAdmin && go.Modules.get("community", "addressbook").settings.restrictExportToAdmins,
 							iconCls: 'ic-cloud-download',
 							text: t("Export"),
 							menu: [

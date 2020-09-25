@@ -1,5 +1,6 @@
 - Core: Toggle notifications when icon is clicked
 - Core: Optimized (custom field) filter loading
+- Address book: New setting to restrict export to administrators
 
 25-09-2020 6.4.172
 - Timeregistration: When changing the start time, the end time will change instead of the duration
