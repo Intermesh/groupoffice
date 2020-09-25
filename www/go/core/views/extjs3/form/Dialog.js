@@ -171,6 +171,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 					this.addPanel(pnl);
 				}else
 				{
+					//in case formPanelLayout is set to column
+					fs.columnWidth = 1;
 					items.push(fs);
 				}
 			}, this);

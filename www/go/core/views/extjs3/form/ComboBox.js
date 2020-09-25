@@ -63,6 +63,9 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	},
 
 	addCreateNewRecord: function() {
+		if(!this.isExpanded()) {
+			return;
+		}
 		var text =  this.getRawValue();
 		if(!text) {
 			return;
