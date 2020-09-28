@@ -5,7 +5,7 @@
 - Core: Test script checks whether modules subdirectory is writable if Professional License available
 - Studio: return user friendly feedback if module directory not writable;
 - Address book: Unlinking organization updates search cache
-- Email: WHen links were removed they were no longer removed when there are no links left
+- Email: When links were removed they were no longer removed when there are no links left
 
 25-09-2020 6.4.172
 - Timeregistration: When changing the start time, the end time will change instead of the duration
