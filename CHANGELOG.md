@@ -71,13 +71,6 @@
 - Email: Workaround if message has invalid From header
 - Core: fixed render bug in link browser window
 - Files: Added permission checks to compress functions
-- Files: Added permission checks to compress functions
-- SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
-- Calendar: Missing resource admin email #201919703
-- Calendar: Category permissions  #202020841
-- Tickets: Only messages from agent are sent to CC contact #201919432
-- Calender: Bug changing "this and future events" #202021084
-- Calendar: No notification when a participant is removed #202021083
 - Core: Upgrade from 6.3 failed if comments module was not installed.
 - SMIME: fixed error in linked email with inline attachments
 - Core: Prevent combo from expanding when opening dialogs
@@ -1184,8 +1177,14 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Calendasr: Show unconfirmed holidays
 - Projects: Send company id when selecting contact
 
+28-09-2020 6.3.94
+- Assistant: removed install sql that could cause:
+    Exception in /usr/share/groupoffice/go/base/Module.php at line 298:
+    SQL query failed: UPDATE `fs_filehandlers` SET cls =
+    'GO\\Assistant\\Filehandler\\Assistant' WHERE
+    cls='GO\\Gota\\Filehandler\\Gota'
 
-
+28-09-2020 6.3.93
 - Files: Added permission checks to compress functions
 - SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
 - Calendar: Missing resource admin email #201919703
@@ -1193,7 +1192,17 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Tickets: Only messages from agent are sent to CC contact #201919432
 - Calender: Bug changing "this and future events" #202021084
 - Calendar: No notification when a participant is removed #202021083
+- Core: Workaround Safari 14.0 hang with 100% cpu usage
 
+16-07-2020 6.3.92
+- Core: upgrade problem with trigger
+
+07-07-2020 6.3.91
+- Calendar: Fix for "No participant found for this event"
+- Core: Start with create trigger in 6.2 upgrade to avoid problems when it's not allowed later on.
+
+05-06-2020 6.3.90
+- Core: Check if db is in invalid state (partially upgraded to 6.3) before upgraded
 - Sieve: Fixed bug where sieve dialog showed folders of other account
 - Files: Assistant installation replaces GOTA file handlers
 - Core: Removed NO_AUTO_CREATE_USER from sql_mode because it doesn't work in Mysql 8 anymore and it wasn't needed anyway.
@@ -1228,7 +1237,6 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Billing: Fixed total not always updating in expense dialog
 - Projects: Send contact ID when creating project from e-mail
 - Tasks: Fixed link to project after cancel
-
 11-10-2019 6.3.83
 - Core: Working week didn't accept half hours
 - Time Tracking: Sort time tracking activities by name
