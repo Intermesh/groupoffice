@@ -154,6 +154,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 					//$model = new \GO\Calendar\Model\Event();
 					unset($params['exception_for_event_id']);
 					unset($params['repeat_end_time']);
+					unset($params['id']);
 					$duration = $model->end_time - $model->start_time;
 					$this->_setEventAttributes($model, $params);
 
@@ -178,6 +179,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 					$rRule->setParams(array('until'=> $untilTime));
 					$recurringEvent->rrule = $rRule->createRrule();
 					$recurringEvent->repeat_end_time = $untilTime;
+					$recurringEvent->skipValidation = true;
 					$recurringEvent->save(); // CLOSE Recurrence, forget about exceptions (this en future means everything)
 				} else {
 					$model = $recurringEvent->createExceptionEvent($params['exception_date'], array(), true);
@@ -189,6 +191,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 
 					$this->_setEventAttributes($model, $params);
 
+					$model->skipValidation = true;
 				}
 			}
 		}

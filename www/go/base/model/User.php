@@ -74,85 +74,85 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 * @deprecated since version 6.3
 	 */
 	public function getPassword(){
-		
+
 		if(empty($this->id)) {
 			return null;
 		}
-		
+
 		$user = \go\modules\core\users\model\User::findById($this->id);
-		
+
 		return $user->password;
 	}
-	
+
 	private $password;
-	
+
 	public function getLastlogin() {
 		return strtotime($this->getAttribute("lastLogin"));
 	}
-	
+
 	public function getCtime() {
 		return strtotime($this->createdAt);
 	}
-	
+
 	public function getMtime() {
 		return strtotime($this->createdAt);
 	}
-	
+
 	public function getLogins() {
 		return $this->loginCount;
 	}
-	
+
 	public function getList_separator() {
 		return $this->listSeparator;
 	}
-	
+
 	public function getThousands_separator() {
 		return $this->thousandsSeparator;
 	}
-	
+
 	public function getDecimal_separator() {
 		return $this->decimalSeparator;
 	}
-	
+
 	public function gettext_separator() {
 		return $this->textSeparator;
 	}
-	
+
 	public function getfirst_weekday() {
 		return $this->firstWeekday;
 	}
-	
+
 	public function getdate_format() {
 		return $this->dateFormat;
 	}
-	
+
 	public function gettime_format() {
 		return $this->timeFormat;
 	}
-	
+
 	public function setLogins($value) {
 		$this->loginCount = $value;
 	}
-	
+
 	public function setLastLogin($value) {
 		$this->setAttribute("lastLogin", date('Y-m-d H:i:s', $value));
 	}
-	
+
 	/**
 	 * Get the password hash from the new framework
 	 * @deprecated since version 6.3
 	 */
-	public function setPassword($password){		
+	public function setPassword($password){
 		$this->password = $password;
 	}
-	
+
 	/**
 	 * Get the digest from the new framework
 	 * @deprecated since version 6.3
 	 */
 	public function getDigest(){
 		$user = \go\modules\core\users\model\User::findById($this->id);
-		
+
 		return $user->getDigest();
 	}
 
@@ -263,7 +263,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	public function tableName() {
 		return 'core_user';
 	}
-	
+
 	public function aclField() {
 		return 'group.aclId';
 	}
@@ -337,7 +337,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 
 		$this->columns['username']['required'] = true;
 		$this->columns['username']['regex'] = '/^[A-Za-z0-9_\-\.\@]*$/';
-		
+
 		$this->columns['timezone']['required']=true;
 		
 //		$this->columns['lastlogin']['gotype']='unixtimestamp';
@@ -348,7 +348,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	
 	public function getFindSearchQueryParamFields($prefixTable = 't', $withCustomFields = true) {
 		$fields=array(
-				$prefixTable.'.displayName', 
+				$prefixTable.'.displayName',
 				$prefixTable.".email",
 				$prefixTable.".username"
 				);
@@ -456,7 +456,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 		$existing = $this->findSingleByAttribute('username', $this->username);
 		if (($this->isNew && $existing) || $existing && $existing->id != $this->id )
 			$this->setValidationError('username', GO::t("Sorry, that username already exists", "users"));
-		
+
 		$existingGroup = Group::model()->findSingleByAttribute('name', $this->username);
 		if (($this->isNew && $existingGroup) || $existingGroup && $existingGroup->id != $existingGroup->id )
 			$this->setValidationError('username', GO::t("error_group_exists", "users"));
@@ -540,9 +540,9 @@ class User extends \GO\Base\Db\ActiveRecord {
 			$group->name = $this->username;
 			$group->isUserGroupFor = $this->id;
 			$group->save();
-			
+
 			$group->addUser($this->id);
-			
+
 
 			
 			if(!empty(GO::config()->register_user_groups)){
@@ -556,10 +556,10 @@ class User extends \GO\Base\Db\ActiveRecord {
 				}
 			}
 		}
-		
+
 		if(isset($this->password)) {
-			$user = \go\modules\core\users\model\User::findById($this->id);		
-			$user->setPassword($this->password);		
+			$user = \go\modules\core\users\model\User::findById($this->id);
+			$user->setPassword($this->password);
 			if(!$user->save()) {
 				throw new \Exception("Could not set password: ".var_export($user->getValidationErrors(), true));
 			}
@@ -568,7 +568,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 		return parent::afterSave($wasNew);
 	}
 	
-	
+
 	
 	/**
 	 * Makes shure that this model's user has all the default models it should have.
@@ -586,7 +586,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 		if($this->id==1){
 			throw new \Exception(GO::t("You can't delete the primary administrator", "users"));
 		}elseif($this->id==GO::user()->id){
-			throw new \Exception(GO::t("You can't delete yourself", "users"));			
+			throw new \Exception(GO::t("You can't delete yourself", "users"));
 		}else
 		{
 			return parent::beforeDelete();
@@ -605,7 +605,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	protected function afterDelete() {
 		
 		
-		//delete all acl records		
+		//delete all acl records
 		$defaultModels = AbstractUserDefaultModel::getAllUserDefaultModels();
 	
 		foreach($defaultModels as $model){
@@ -635,10 +635,12 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function getShortName() {
 		
-		$short = \GO\Base\Util\StringHelper::substr($this->displayName,0,1);  
+		$short = \GO\Base\Util\StringHelper::substr($this->displayName,0,1);
 		
 		return strtoupper($short);
 	}
+
+	private static $groupIds = [];
 
 	/**
 	 * Returns an array of user group id's
@@ -674,7 +676,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 		// 						->criteria(\GO\Base\Db\FindCriteria::newInstance()
 		// 										->addCondition("userId", $userId))
 		// 						);
-			
+
 		// 	while ($r = $stmt->fetch()) {
 		// 		$ids[] = $r->groupId;
 		// 	}
@@ -688,9 +690,9 @@ class User extends \GO\Base\Db\ActiveRecord {
 	 * @return array
 	 */
 	public static function getDefaultGroupIds(){
-		
+
 		$groups = [];
-		$s = \go\modules\core\users\model\Settings::get();			
+		$s = \go\modules\core\users\model\Settings::get();
 		foreach($s->getDefaultGroups() as $v) {
 			$groups[] = $v['groupId'];
 		}
@@ -794,9 +796,9 @@ class User extends \GO\Base\Db\ActiveRecord {
 		
 		$s = \go\modules\core\users\model\Settings::get();
 
-		
-		$attr['language']=GO()->getSettings()->language;		
-		$attr['date_format']=$s->defaultDateFormat;		
+
+		$attr['language']=GO()->getSettings()->language;
+		$attr['date_format']=$s->defaultDateFormat;
 		$attr['date_separator']=GO::config()->default_date_separator;
 		$attr['theme']=GO::config()->theme;
 		$attr['timezone']=$s->defaultTimezone;
@@ -829,7 +831,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 				$contact = \GO\Addressbook\Model\Contact::model()->findByPk($this->contact_id);
 				if($contact){
 					$contact->go_user_id=$this->id;
-					
+
 					$name = GO\Base\Util\StringHelper::split_name($this->displayName);
 					$contact->first_name = $name['first_name'];
 					$contact->middle_name =$name['middle_name'];
@@ -848,15 +850,15 @@ class User extends \GO\Base\Db\ActiveRecord {
 				$contact = new \GO\Addressbook\Model\Contact();
 				$addressbook = \GO\Addressbook\Model\Addressbook::model()->getUsersAddressbook();
 				$contact->go_user_id = $this->id;
-				$contact->addressbook_id = $addressbook->id;			
-					
+				$contact->addressbook_id = $addressbook->id;
+
 				$name = GO\Base\Util\StringHelper::split_name($this->displayName);
 				$contact->first_name = $name['first_name'];
 				$contact->middle_name =$name['middle_name'];
 				$contact->last_name = $name['last_name'];
 			}			
 			
-		
+
 			$contact->email = $this->email;
 
 			if($contact->isNew || $contact->isModified()){
