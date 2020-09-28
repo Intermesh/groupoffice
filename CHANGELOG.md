@@ -1,3 +1,10 @@
+28-09-2020 6.3.94
+- Assistant: removed install sql that could cause:
+    Exception in /usr/share/groupoffice/go/base/Module.php at line 298:
+    SQL query failed: UPDATE `fs_filehandlers` SET cls =
+    'GO\\Assistant\\Filehandler\\Assistant' WHERE
+    cls='GO\\Gota\\Filehandler\\Gota'
+
 28-09-2020 6.3.93
 - Files: Added permission checks to compress functions
 - SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
