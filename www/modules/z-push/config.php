@@ -59,34 +59,35 @@ if(!class_exists('GO'))
      *   false - use the username only.
      *   true  - string the mobile sends as username, e.g. full email address (default).
      */
-    define('USE_FULLEMAIL_FOR_LOGIN', false);
+    define('USE_FULLEMAIL_FOR_LOGIN', true);
 
-/**********************************************************************************
- * StateMachine setting
- *
- * These StateMachines can be used:
- *   FILE  - FileStateMachine (default). Needs STATE_DIR set as well.
- *   SQL   - SqlStateMachine has own configuration file. STATE_DIR is ignored.
- *           State migration script is available, more informations: https://wiki.z-hub.io/x/xIAa
- */
-	$folder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path.'zpush21state/');
+	/**********************************************************************************
+	 * StateMachine setting
+	 *
+	 * These StateMachines can be used:
+	 *   FILE  - FileStateMachine (default). Needs STATE_DIR set as well.
+	 *   SQL   - SqlStateMachine has own configuration file. STATE_DIR is ignored.
+	 *           State migration script is available, more informations: https://wiki.z-hub.io/x/xIAa
+	 */
+		$folder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path.'zpush21state/');
 		$folder->create();
     define('STATE_MACHINE', 'FILE');
     define('STATE_DIR', $folder->path().'/');
-/**********************************************************************************
- *  IPC - InterProcessCommunication
- *
- *  Is either provided by using shared memory on a single host or
- *  using the memcache provider for multi-host environments.
- *  When another implementation should be used, the class can be set here explicitly.
- *  If empty Z-Push will try to use available providers.
 
- *  Possible values:
- *  IpcSharedMemoryProvider - default. Requires z-push-ipc-sharedmemory package.
- *  IpcMemcachedProvider    - requires z-push-ipc-memcached package. It is necessary to set up
- *                            memcached server before (it won't be installed by z-push-ipc-memcached).
- *  IpcWincacheProvider     - for windows systems.
- */
+		/**********************************************************************************
+		 *  IPC - InterProcessCommunication
+		 *
+		 *  Is either provided by using shared memory on a single host or
+		 *  using the memcache provider for multi-host environments.
+		 *  When another implementation should be used, the class can be set here explicitly.
+		 *  If empty Z-Push will try to use available providers.
+
+		 *  Possible values:
+		 *  IpcSharedMemoryProvider - default. Requires z-push-ipc-sharedmemory package.
+		 *  IpcMemcachedProvider    - requires z-push-ipc-memcached package. It is necessary to set up
+		 *                            memcached server before (it won't be installed by z-push-ipc-memcached).
+		 *  IpcWincacheProvider     - for windows systems.
+		 */
     define('IPC_PROVIDER', '');
 
 /**********************************************************************************
@@ -114,14 +115,15 @@ if(!class_exists('GO'))
  *
  *  LOGAUTHFAIL is logged to the LOGBACKEND.
  */
-	//note: you can't use z-push constants in the GO config file!
-	//use 16 for debug or 32 for wbxml
-	if(!isset(\GO::config()->zpush2_loglevel)){
-		\GO::config()->zpush2_loglevel = \GO::config()->debug ? LOGLEVEL_WBXML : LOGLEVEL_OFF;
-	}
-    define('LOGBACKEND', 'filelog');
-	define('LOGLEVEL', \GO::config()->zpush2_loglevel);
-    define('LOGAUTHFAIL', false);
+		//note: you can't use z-push constants in the GO config file!
+		//use 16 for debug or 32 for wbxml
+		if(!isset(\GO::config()->zpush2_loglevel)){
+			\GO::config()->zpush2_loglevel = \GO::config()->debug ? LOGLEVEL_WBXML : LOGLEVEL_OFF;
+		}
+
+		define('LOGBACKEND', 'filelog');
+		define('LOGLEVEL', \GO::config()->zpush2_loglevel);
+		define('LOGAUTHFAIL', false);
 
     // To save e.g. WBXML data only for selected users, add the usernames to the array
     // The data will be saved into a dedicated file per user in the LOGFILEDIR
@@ -130,10 +132,10 @@ if(!class_exists('GO'))
     define('LOGUSERLEVEL', LOGLEVEL_DEVICEID);
     $GLOBALS['specialLogUsers'] = isset(\GO::config()->zpush2_special_log_users) ?  \GO::config()->zpush2_special_log_users : array();
 
-	$folder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path.'log/z-push/');
-	$folder->create();
+		$folder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path.'log/z-push/');
+		$folder->create();
 
-	define('LOGFILEDIR', $folder->path().'/');
+		define('LOGFILEDIR', $folder->path().'/');
     define('LOGFILE', LOGFILEDIR . 'z-push.log');
     define('LOGERRORFILE', LOGFILEDIR . 'z-push-error.log');
 
