@@ -363,7 +363,7 @@ abstract class Entity extends Property {
 		$query = Query::normalize($query);
 		//Set select for overrides.
 		$primaryTable = static::getMapping()->getPrimaryTable();
-		$query->selectSingleValue('id')->from($primaryTable->getName(), $primaryTable->getAlias());
+		$query->selectSingleValue( '`' . $primaryTable->getAlias() . '`.`id`')->from($primaryTable->getName(), $primaryTable->getAlias());
 
 
 		App::get()->getDbConnection()->beginTransaction();

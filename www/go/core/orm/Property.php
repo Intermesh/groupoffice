@@ -1712,7 +1712,7 @@ abstract class Property extends Model {
   /**
    * Parses ID into query
    *
-   * eg. "1-1" into ['col1=>1, 'col2'=>1];
+   * eg. "1-1" into ['`alias`.`col1`' => 1, '`alias`.`col2`'' => 1];
    *
    * @param string $id
    * @return array
@@ -1730,7 +1730,7 @@ abstract class Property extends Model {
 			throw new InvalidArguments("Invalid ID given for " . static::class.' : '.$id);
 		}
 		foreach ($pk as $key) {
-			$props[$key] = array_shift($keys);
+			$props['`' . $primaryTable->getAlias() . '`.`' . $key . '`'] = array_shift($keys);
 		}
 
 		return $props;
