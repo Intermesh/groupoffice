@@ -1,3 +1,4 @@
+28-09-2020 6.3.93
 - Files: Added permission checks to compress functions
 - SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
 - Calendar: Missing resource admin email #201919703
@@ -5,6 +6,7 @@
 - Tickets: Only messages from agent are sent to CC contact #201919432
 - Calender: Bug changing "this and future events" #202021084
 - Calendar: No notification when a participant is removed #202021083
+- Core: Workaround Safari 14.0 hang with 100% cpu usage
 
 16-07-2020 6.3.92
 - Core: upgrade problem with trigger
