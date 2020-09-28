@@ -2569,7 +2569,7 @@ $sub = $offset>0;
 //			if(!$participantEvent){
 				
 
-				$ics=$this->toICS("CANCEL");				
+				$ics=$this->toICS("CANCEL", $participant);
 				$a = \Swift_Attachment::newInstance($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="CANCEL"');
 				$a->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
 				$a->setDisposition("inline");

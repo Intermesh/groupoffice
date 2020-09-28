@@ -1,3 +1,5 @@
+- Calendar: Missing delete link in cancellation e-mail
+
 21-09-2020 6.2.130
 - Core: Fixed not found error on compressing folders.
 
