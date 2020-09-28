@@ -8,6 +8,7 @@
 - Email: When links were removed they were no longer removed when there are no links left
 - Studio: Replace permissions panel with share panel
 - Studio: Unlock a studio module upon opening the wizard after confirm
+- E-mail: Always process calendar invites. (not just when message is unread)
 
 25-09-2020 6.4.172
 - Timeregistration: When changing the start time, the end time will change instead of the duration
