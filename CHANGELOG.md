@@ -1,3 +1,4 @@
+- Core: allowed modules can work with packages now. eg. $config['allowed_modules'] = ['legacy/*', 'community/*', 'business/newsletters'];
 - Core: Toggle notifications when icon is clicked
 - Core: Optimized (custom field) filter loading
 - Address book: New setting to restrict export to administrators
