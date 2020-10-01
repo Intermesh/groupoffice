@@ -494,11 +494,11 @@ class Migrate63to64 {
 				]);
 			}
 
-			if (!empty($r['action_date'])) {
+			if ($r['action_date'] > 0) {
 				$contact->dates[] = (new Date())
 								->setValues([
 						'type' => "action",
-						'date' => DateTime::createFromFormat('Y-m-d', $r['action_date'])
+						'date' => DateTime::createFromFormat('U', $r['action_date'])
 				]);
 			}
 
