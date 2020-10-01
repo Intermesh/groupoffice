@@ -7,10 +7,8 @@ forum
 /www/vendor
 /config.php
 /www/config.php
-/www/views/Extjs3/themes/Paper/*.css
-/www/views/Extjs3/themes/Paper/*.css.map
-/www/views/Extjs3/themes/Dark/*.css
-/www/views/Extjs3/themes/Dark/*.css.map
+/www/views/Extjs3/themes/**/*.css
+/www/views/Extjs3/themes/**/*.css.map
 /config.ini
 /www/config.ini
 /www/promodules
