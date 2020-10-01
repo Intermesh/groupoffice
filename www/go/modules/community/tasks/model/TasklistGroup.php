@@ -11,7 +11,7 @@ class TasklistGroup extends Property
 	public $id;
 
 	/** @var int FK to tasklist this column belongs to */
-	public $tasklistId;
+	protected $tasklistId;
 
 	/** @var string Column name */
 	public $name;
