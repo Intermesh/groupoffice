@@ -7,6 +7,10 @@ go.print = function(tmpl, data) {
 
 };
 
+go.Colors = [
+	'C62828', 'AD1457', '6A1B9A', '4527A0', '283593', '1565C0', '0277BD', '00838F',
+	'00695C', '2E7D32', '558B2F', '9E9D24', 'F9A825', 'FF8F00', 'EF6C00', '424242'];
+
 go.util =  (function () {
 	var downloadFrame;
 
@@ -31,6 +35,24 @@ go.util =  (function () {
 			}
 
 			return parts.map(function(name){return name.substr(0,1).toUpperCase()}).join("");
+		},
+
+		avatar: function(name, blob) {
+			var initials = '', style = '', color = 'transparent';
+			if(!blob) {
+				initials = this.initials(name);
+				for(var i=0,j=0; i<name.length; i++) {
+					j += name.charCodeAt(i);
+				}
+				style = 'background-image:none;background-color: #'+go.Colors[j % go.Colors.length];
+			} else {
+				style = 'background-image: url(' + go.Jmap.thumbUrl(blob, {
+					w: 40,
+					h: 40,
+					zc: 1
+				}) + ')';
+			}
+			return '<span class="avatar" style="'+style+'" title="'+name+'">'+initials+'</span>';
 		},
 		
 		/**
