@@ -225,7 +225,7 @@ class ModuleCollection extends Model\ModelCollection{
 	{
 			$model = $this->model->findByName($name);
 
-			if (!$model || static::isAllowed($model->name))
+			if (!$model || !static::isAllowed($model->name))
 					return false;
 
 			if ($checkEnabled && !$model->enabled)
