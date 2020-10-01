@@ -86,7 +86,7 @@ class Installer {
 		$cacheCls = get_class(App::get()->getCache());
 		App::get()->setCache(new None());
 
-		LoggingTrait::$enabled = false;
+		LoggingTrait::disable();
 
 		self::$isInProgress = true;
 		self::$isInstalling = true;
@@ -139,7 +139,7 @@ class Installer {
 
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
-		LoggingTrait::$enabled = true;
+		LoggingTrait::enable();
 		App::get()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
 	}
 	
@@ -330,7 +330,7 @@ class Installer {
 		self::$isInProgress = true;
 		self::$isUpgrading = true;
 
-		LoggingTrait::$enabled = false;
+		LoggingTrait::disable();
 
 		go()->setAuthState((new TemporaryState())->setUserId(1));
 		\GO::session()->runAsRoot();
@@ -403,7 +403,7 @@ class Installer {
 
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
-		LoggingTrait::$enabled = true;
+		LoggingTrait::enable();
 		echo "Done!\n";
 	}
 	

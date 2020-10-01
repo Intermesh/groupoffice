@@ -1,3 +1,4 @@
+- Core: Speed up 6.3 to 6.4 upgrade
 - Core: allowed modules can work with packages now. eg. $config['allowed_modules'] = ['legacy/*', 'community/*', 'business/newsletters'];
 - Core: Toggle notifications when icon is clicked
 - Core: Optimized (custom field) filter loading

@@ -7,7 +7,21 @@ use go\core\model\Module;
 
 trait LoggingTrait {
 
-	public static $enabled = true;
+	private static $enabled = true;
+
+	public static function enable() {
+		static::$enabled = true;
+	}
+
+	public static function disable() {
+		static::$enabled = false;
+	}
+
+	public static function isEnabled() {
+		return static::$enabled;
+	}
+
+
 
 	/**
 	 * Get the message for the log module. Returns the contents of the first text column by default.

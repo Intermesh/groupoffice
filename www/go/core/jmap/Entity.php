@@ -9,6 +9,7 @@ use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\orm\Entity as OrmEntity;
+use go\core\util\StringUtil;
 use PDO;
 use go\core\orm\EntityType;
 use go\core\acl\model\AclOwnerEntity;
@@ -117,12 +118,18 @@ abstract class Entity  extends OrmEntity {
 	}
 
 	/**
+	 * Toggle checking of files folder. Used to speedup 6.3 to 6.4 upgrade
+	 * @var bool
+	 */
+	public static $checkFilesFolder = true;
+
+	/**
 	 * @param bool $force Used in database check to force a check
 	 * @return bool
 	 * @throws \GO\Base\Exception\AccessDenied
 	 */
 	private function checkFilesFolder($force = false) {
-		if(empty($this->filesFolderId)) {
+		if(!self::$checkFilesFolder || empty($this->filesFolderId)) {
 			return true;
 		}
 
