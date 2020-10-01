@@ -12,6 +12,8 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  */
 
+use go\core\Environment;
+
 $product_name = class_exists('GO') ? \GO::config()->product_name : 'Group-Office';
 
 /**
@@ -530,6 +532,7 @@ function test_system(){
 
 		if($ioncubeWorks)
 		{
+			$bHasProfessionalLicense = \GO::scriptCanBeDecoded('Professional');
 
 			$test['name']='Professional license';
 			$test['showSuccessFeedback'] = false;
@@ -538,19 +541,22 @@ function test_system(){
 	//			$test['fatal']=false;
 	//			$test['pass']=false;
 	//		}else
-			if(!\GO::scriptCanBeDecoded('Professional'))
-			{
-				$test['feedback']='Warning: Your professional license is invalid. The professional modules will not be enabled. Please contact Intermesh about this problem and supply the output of this page.';
-				$test['fatal']=false;
-				$test['pass']=false;
-			}else
-			{
-				$test['feedback']='';
-				$test['fatal']=false;
-				$test['pass']=true;
-			}	
+			$test['feedback']='';
+			$test['fatal']=false;
+			$test['pass'] = !$bHasProfessionalLicense;
 
 			$tests[]=$test;
+
+			if ($bHasProfessionalLicense) {
+				$moduleFolder = Environment::get()->getInstallFolder()->getFolder('go' . DIRECTORY_SEPARATOR . 'modules');
+				$test['name'] = 'Modules directory writable';
+				$test['showSuccessFeedback'] = false;
+				$test['fatal'] = false;
+				$test['pass'] = $moduleFolder->isWritable();
+				$test['feedback'] = 'Warning: Modules subdirectory is not writable. You will not be able to use GroupOffice Studio.';
+				$tests[] = $test;
+			}
+
 		}
 
 

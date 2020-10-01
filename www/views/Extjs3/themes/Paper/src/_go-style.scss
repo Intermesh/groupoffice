@@ -1825,7 +1825,9 @@ table[id^="comments-ext"] b {
 .go-html-formatted {
 	@extend %font-body1;
 
-
+	* {
+		color: color($fg, 'text');
+	}
 
 }
 

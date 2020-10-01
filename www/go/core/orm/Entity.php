@@ -325,7 +325,7 @@ abstract class Entity extends Property {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -359,7 +359,7 @@ abstract class Entity extends Property {
 		$query = Query::normalize($query);
 		//Set select for overrides.
 		$primaryTable = static::getMapping()->getPrimaryTable();
-		$query->selectSingleValue($primaryTable->getAlias() . '.id')->from($primaryTable->getName(), $primaryTable->getAlias());
+		$query->selectSingleValue( '`' . $primaryTable->getAlias() . '`.`id`')->from($primaryTable->getName(), $primaryTable->getAlias());
 
 
 		App::get()->getDbConnection()->beginTransaction();
@@ -1176,7 +1176,7 @@ abstract class Entity extends Property {
 
 	/**
 	 * A title for this entity used in search cache and logging for example.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function title() {

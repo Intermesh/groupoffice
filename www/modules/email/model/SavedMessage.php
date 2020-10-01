@@ -3,6 +3,8 @@
 namespace GO\Email\Model;
 
 
+use GO\Base\Fs\File;
+
 class SavedMessage extends ComposerMessage {
 	
 	private $_loadedBody;
@@ -223,7 +225,8 @@ class SavedMessage extends ComposerMessage {
 					} else {
 						$content_id='';						
 					}
-					
+
+					$filename = File::stripInvalidChars($filename);
 					
 					$f = new \GO\Base\Fs\File($filename);
 					
