@@ -1,0 +1,205 @@
+@function color($color, $hue: 500, $contrast: 0) {
+  @if $contrast == 1 {
+    @return map-get(map-get($color, contrast), $hue);
+  }
+  @return map-get($color,$hue);
+}
+
+@font-face {
+  font-family: 'Material Icons Outline';
+  font-style: normal;
+  font-weight: 400;
+  src:  url('./fonts/outline.woff2') format("woff2"); // Super Modern
+}
+
+$black-87-opacity: rgba(black, 0.87) !default;
+$white-87-opacity: rgba(white, 0.87) !default;
+
+$cPrimary:		#689F38;
+$cPrimaryTp:	rgba(#009BC9, 0.16);
+$cHeaderBg: #006d98;
+$cDangerBg: #B71C1C;
+$cSecondary: #006d98;
+$cAccent:		#ff9100;
+$cAccentTp:		$cPrimaryTp;
+
+$grey: (
+        0: #ffffff,
+        50: #faf9f8,
+        100: #edebe9,
+        200: #e1dfdd,
+        300: #d2d0ce,
+        400: #a19f9d,
+        500: #979593,
+        600: #797775,
+        700: #484644,
+        800: #323130,
+        900: #201f1e,
+        1000: #000000
+);
+
+$fg: (
+        base: $cSecondary,
+        divider: rgba(black, 0.04),
+        line: rgba(black, 0.12),
+        disabled: rgba(black, 0.38),
+        disabled-button: rgba(black, 0.26),
+        track: rgba(black, 0.26),
+        disabled-text: rgba(black, 0.38),
+        hint-text: rgba(black, 0.38),
+        textbox-line: rgba(black, 0.42),
+        secondary-text: rgba(black, 0.64),
+        unfocused: rgba(black, 0.54),
+        icon: rgba(black, 0.54),
+        icons: rgba(black, 0.54),
+        text: rgba(black, 0.87)
+);
+
+$bg: (
+        status-bar: #d2d0ce,
+        app-bar: #e1dfdd,
+        form: #edebe9,
+        background: #edebe9,
+        hover: rgba(black, .04),
+        pressed: rgba(black, .08),
+        selected: $cAccentTp,
+        readonly: rgba(black, .08),
+        box: white,
+        tbar: white,
+        card: white,
+        dialog: #edebe9,
+        disabled-button: rgba(black, 0.12)
+);
+
+
+
+// Colors that have meaning (eg. success/failure)
+$cSuccess:		#43A047;
+$cDanger:		#E53935;
+$cDangerBg: #FFEBEE;
+$cWarning:		#f57c00;
+
+$cSelected: 	color($bg, 'selected'); // click on menus, tree items, table
+$cHover: 		color($bg, 'hover');
+$cActive: 		color($grey, 200); // focussed
+$cAnchor: 		#0000FF;
+
+// end colors
+
+
+$resourcePath: '../Paper/';
+$density: 110;
+$font-scale: 1.1;
+
+@function dp($width) {
+  @return (($width * $density) / 160) *1px;
+}
+@function sp($size) {
+  @return ceil(dp($size) * $font-scale);
+}
+
+$layout-xs:     600px !default;
+$layout-sm:     960px !default;
+$layout-md:     1280px !default;
+$layout-lg:     1920px !default;
+
+$borderRadius: dp(2);
+
+// Bezier easing curve
+$curve-standard: cubic-bezier(0.4, 0.0, 0.2, 1);
+$curve-deceleration: cubic-bezier(0.0, 0.0, 0.2, 1);
+$curve-acceleration: cubic-bezier(0.4, 0.0, 1, 1);
+$curve-sharp: cubic-bezier(0.4, 0.0, 0.6, 1);
+$curve-sharper: cubic-bezier(.25, .8, .25, 1); //slider
+
+// for providing a fallback for browser not supporting css variables
+// used for developemnt in PHP replace "var(--c-primary)" with actual configured color for IE support
+// If not replaced IE will default to the color set in $cPrimary
+$vars: (
+        c-primary: $cPrimary,
+        c-primary-tp: $cPrimaryTp,
+        c-header-bg: $cHeaderBg,
+        c-secondary: $cSecondary,
+        c-accent: $cAccent,
+        c-accent-tp: $cAccentTp
+);
+
+
+@mixin var($property, $varName) {
+  #{$property}: map-get($vars, $varName);
+  #{$property}: var(--#{$varName}, map-get($vars, $varName));
+}
+
+//------------------------------------------------
+// Layouts and backgrounds
+//------------------------------------------------
+
+%badge {
+  vertical-align: text-bottom;
+  display: inline-block;
+  font-size: sp(13);
+  font-weight: 600;
+  color: rgba(white, 0.87);
+  //margin-top: dp(1.5);
+  min-width:dp(21);
+  height:dp(21);
+  padding: 0 dp(4);
+  line-height:dp(21);
+  letter-spacing: 0;
+  text-align:center;
+  border-radius: dp(10.5); // only round with 1 char
+  background-color: #727272; //color($fg, 'secondary-text');
+
+  .x-tree-node & {
+    //position: absolute;
+    //right: 8px;
+  }
+}
+
+%hover {
+  background-color: $cHover;
+  @include var(color, c-primary);
+}
+
+
+
+%hidden {
+  visibility: hidden;
+  position: absolute;
+  opacity:0;
+  overflow:hidden;
+}
+
+%icon {
+  display: inline-block;
+  font-family: 'Material Icons Outline';
+  font-weight: normal;
+  font-style: normal;
+  font-size: dp(24);  /* Preferred icon size */
+  /*	max-width: dp(24);
+      max-height: dp(24);*/
+  color:inherit;
+  width: auto;
+  height: auto;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  vertical-align:middle;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased; // Support for all WebKit browsers.
+  text-rendering: optimizeLegibility; // Support for Safari and Chrome.
+  -moz-osx-font-smoothing: grayscale; // Support for Firefox.
+  font-feature-settings: 'liga'; // Support for IE
+}
+
+@function str-replace($string, $search, $replace: '') {
+  $index: str-index($string, $search);
+
+  @if $index {
+    @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+  }
+
+  @return $string;
+}
