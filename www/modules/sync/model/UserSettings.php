@@ -64,19 +64,19 @@ class UserSettings extends Property
 
 			if (empty($this->addressBooks)) {
 				if (isset($user->addressBookSettings) && ($addressBookId = $user->addressBookSettings->getDefaultAddressBookId())) {
-					$user->syncSettings->addressBooks[] = (new UserAddressBook())->setValues(['addressBookId' => $addressBookId, 'isDefault' => true]);
+					$this->addressBooks[] = (new UserAddressBook())->setValues(['addressBookId' => $addressBookId, 'isDefault' => true]);
 				}
 			}
 
 			if (empty($this->noteBooks)) {
 				if (isset($user->notesSettings) && ($noteBookId = $user->notesSettings->getDefaultNoteBookId())) {
-					$user->syncSettings->noteBooks[] = (new UserNoteBook())->setValues(['noteBookId' => $noteBookId, 'isDefault' => true]);
+					$this->noteBooks[] = (new UserNoteBook())->setValues(['noteBookId' => $noteBookId, 'isDefault' => true]);
 				}
 			}
 
-			if ($user->isModified()) {
-				if(!$user->save()) {
-					throw new \Exception("Could not update user with sync settings: " . var_export($user->getValidationErrors(), true));
+			if ($this->isModified()) {
+				if(!$this->internalSave()) {
+					throw new \Exception("Could not update user with sync settings.");
 				}
 			}
 		}
