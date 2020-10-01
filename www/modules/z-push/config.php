@@ -31,7 +31,7 @@ if(!class_exists('GO'))
  *  Default settings
  */
     // Defines the default time zone, change e.g. to "Europe/London" if necessary
-//    define('TIMEZONE', '');
+    define('TIMEZONE', '');
 
     // Defines the base path on the server
 //    define('BASE_PATH', dirname($_SERVER['SCRIPT_FILENAME']). '/');
@@ -40,7 +40,11 @@ if(!class_exists('GO'))
     // Try to set unlimited timeout
     define('SCRIPT_TIMEOUT', 0);
 
-    // When accessing through a proxy, the "X-Forwarded-For" header contains the original remote IP
+    // Use a custom header to determinate the remote IP of a client.
+    // By default, the server provided REMOTE_ADDR is used. If the header here set
+    // is available, the provided value will be used, else REMOTE_ADDR is maintained.
+    // set to false to disable this behaviour.
+    // common values: 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP' (casing is ignored)
     define('USE_CUSTOM_REMOTE_IP_HEADER', false);
 
     // When using client certificates, we can check if the login sent matches the owner of the certificate.
@@ -57,26 +61,33 @@ if(!class_exists('GO'))
      */
     define('USE_FULLEMAIL_FOR_LOGIN', true);
 
-/**********************************************************************************
- * StateMachine setting
- *
- * These StateMachines can be used:
- *   FILE  - FileStateMachine (default). Needs STATE_DIR set as well.
- *   SQL   - SqlStateMachine has own configuration file. STATE_DIR is ignored.
- *           State migration script is available, more informations: https://wiki.z-hub.io/x/xIAa
- */
-	$folder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path.'zpush21state/');
+	/**********************************************************************************
+	 * StateMachine setting
+	 *
+	 * These StateMachines can be used:
+	 *   FILE  - FileStateMachine (default). Needs STATE_DIR set as well.
+	 *   SQL   - SqlStateMachine has own configuration file. STATE_DIR is ignored.
+	 *           State migration script is available, more informations: https://wiki.z-hub.io/x/xIAa
+	 */
+		$folder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path.'zpush21state/');
 		$folder->create();
     define('STATE_MACHINE', 'FILE');
     define('STATE_DIR', $folder->path().'/');
-/**********************************************************************************
- *  IPC - InterProcessCommunication
- *
- *  Is either provided by using shared memory on a single host or
- *  using the memcache provider for multi-host environments.
- *  When another implementation should be used, the class can be set here explicitly.
- *  If empty Z-Push will try to use available providers.
- */
+
+		/**********************************************************************************
+		 *  IPC - InterProcessCommunication
+		 *
+		 *  Is either provided by using shared memory on a single host or
+		 *  using the memcache provider for multi-host environments.
+		 *  When another implementation should be used, the class can be set here explicitly.
+		 *  If empty Z-Push will try to use available providers.
+
+		 *  Possible values:
+		 *  IpcSharedMemoryProvider - default. Requires z-push-ipc-sharedmemory package.
+		 *  IpcMemcachedProvider    - requires z-push-ipc-memcached package. It is necessary to set up
+		 *                            memcached server before (it won't be installed by z-push-ipc-memcached).
+		 *  IpcWincacheProvider     - for windows systems.
+		 */
     define('IPC_PROVIDER', '');
 
 /**********************************************************************************
@@ -104,14 +115,15 @@ if(!class_exists('GO'))
  *
  *  LOGAUTHFAIL is logged to the LOGBACKEND.
  */
-	//note: you can't use z-push constants in the GO config file!
-	//use 16 for debug or 32 for wbxml
-	if(!isset(\GO::config()->zpush2_loglevel)){
-		\GO::config()->zpush2_loglevel = \GO::config()->debug ? LOGLEVEL_WBXML : LOGLEVEL_OFF;
-	}
-    define('LOGBACKEND', 'filelog');
-	define('LOGLEVEL', \GO::config()->zpush2_loglevel);
-    define('LOGAUTHFAIL', false);
+		//note: you can't use z-push constants in the GO config file!
+		//use 16 for debug or 32 for wbxml
+		if(!isset(\GO::config()->zpush2_loglevel)){
+			\GO::config()->zpush2_loglevel = \GO::config()->debug ? LOGLEVEL_WBXML : LOGLEVEL_OFF;
+		}
+
+		define('LOGBACKEND', 'filelog');
+		define('LOGLEVEL', \GO::config()->zpush2_loglevel);
+		define('LOGAUTHFAIL', false);
 
     // To save e.g. WBXML data only for selected users, add the usernames to the array
     // The data will be saved into a dedicated file per user in the LOGFILEDIR
@@ -120,10 +132,10 @@ if(!class_exists('GO'))
     define('LOGUSERLEVEL', LOGLEVEL_DEVICEID);
     $GLOBALS['specialLogUsers'] = isset(\GO::config()->zpush2_special_log_users) ?  \GO::config()->zpush2_special_log_users : array();
 
-	$folder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path.'log/z-push/');
-	$folder->create();
+		$folder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path.'log/z-push/');
+		$folder->create();
 
-	define('LOGFILEDIR', $folder->path().'/');
+		define('LOGFILEDIR', $folder->path().'/');
     define('LOGFILE', LOGFILEDIR . 'z-push.log');
     define('LOGERRORFILE', LOGFILEDIR . 'z-push-error.log');
 
@@ -204,7 +216,7 @@ if(!class_exists('GO'))
     // MS Outlook 2013+ request up to 512 items to accelerate the sync process.
     // If you detect high load (also on subsystems) you could try a lower setting.
     // max: 512 - value used if mobile does not limit amount of items
-    define('SYNC_MAX_ITEMS', 100);
+    define('SYNC_MAX_ITEMS', 512);
 
     // The devices usually send a list of supported properties for calendar and contact
     // items. If a device does not includes such a supported property in Sync request,
@@ -265,7 +277,7 @@ if(!class_exists('GO'))
     // point. You can add DeviceType strings to the categories.
     // In general longer timeouts are better, because more data can be streamed at once.
     define('SYNC_TIMEOUT_MEDIUM_DEVICETYPES', "SAMSUNGGTI");
-    define('SYNC_TIMEOUT_LONG_DEVICETYPES',   "iPod, iPad, iPhone, WP, WindowsOutlook");
+    define('SYNC_TIMEOUT_LONG_DEVICETYPES',   "iPod, iPad, iPhone, WP, WindowsOutlook, WindowsMail");
 
     // Time in seconds the device should wait whenever the service is unavailable,
     // e.g. when a backend service is unavailable.
@@ -324,6 +336,10 @@ if(!class_exists('GO'))
     define('KOE_CAPABILITY_SECONDARYCONTACTS', true);
     // Copy WebApp signature into KOE
     define('KOE_CAPABILITY_SIGNATURES', true);
+    // Delivery receipt requests
+    define('KOE_CAPABILITY_RECEIPTS', true);
+    // Impersonate other users
+    define('KOE_CAPABILITY_IMPERSONATE', true);
 
     // To synchronize the GAB KOE, the GAB store and folderid need to be specified.
     // Use the gab-sync script to generate this data. The name needs to
@@ -354,6 +370,16 @@ if(!class_exists('GO'))
  *                      SYNC_FOLDER_TYPE_USER_TASK
  *                      SYNC_FOLDER_TYPE_USER_MAIL
  *                      SYNC_FOLDER_TYPE_USER_NOTE
+ *      flags:      sets additional options on the shared folder. Supported are:
+ *                      DeviceManager::FLD_FLAGS_NONE
+ *                          No flags configured, default flag to be set
+ *                      DeviceManager::FLD_FLAGS_SENDASOWNER
+ *                          When replying in this folder, automatically do Send-As
+ *                      DeviceManager::FLD_FLAGS_CALENDARREMINDERS
+ *                          If set, Outlook shows reminders for these shares with KOE
+ *                      DeviceManager::FLD_FLAGS_NOREADONLYNOTIFY
+ *                          If set, Z-Push won't send notification emails for changes
+ *                          if the folder is read-only
  *
  *  Additional notes:
  *  - on Kopano systems use backend/kopano/listfolders.php script to get a list
@@ -381,6 +407,7 @@ if(!class_exists('GO'))
             'folderid'  => "",
             'name'      => "Public Contacts",
             'type'      => SYNC_FOLDER_TYPE_USER_CONTACT,
+            'flags'     => DeviceManager::FLD_FLAGS_NONE,
         ),
 */
     );

@@ -43,15 +43,17 @@
                     return _("You have insufficient privileges to open this object.");
                 case MAPI_E_LOGON_FAILED:
                 case MAPI_E_UNCONFIGURED:
-                    return _("Logon Failed. Please check your username/password.");
+                    return _("Logon Failed. Please check your name/password.");
                 case MAPI_E_NETWORK_ERROR:
-                    return _("Can not connect to Kopano server.");
+                    return _("Can not connect to Kopano Core.");
                 case MAPI_E_UNKNOWN_ENTRYID:
                     return _("Can not open object with provided id.");
                 case MAPI_E_NO_RECIPIENTS:
                     return _("There are no recipients in the message.");
                 case MAPI_E_NOT_FOUND:
                     return _("Can not find object.");
+                case MAPI_E_NOT_ENOUGH_MEMORY:
+                    return _("Operation failed: Server does not have enough memory.");
                 case MAPI_E_INTERFACE_NOT_SUPPORTED:
                 case MAPI_E_INVALID_PARAMETER:
                 case MAPI_E_INVALID_ENTRYID:

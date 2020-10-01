@@ -15,10 +15,13 @@ go.Notifier = {
 			this.statusBar.add(this._icons[key]);
 		}
 		this.statusBar.doLayout();
-		this.statusBar.el.on('click', function() {
-			setTimeout(function() {
-				me.showNotifications();
-			});
+		this.statusBar.el.on('click', function(e) {
+			if(me.notificationsVisible()) {
+				return; // it will hide on any click outside the panel
+			}
+			me.showNotifications();
+			e.stopPropagation();
+
 		}, this);
 
 		this.notifications = new Ext.Container({cls: 'notifications'});
@@ -145,6 +148,10 @@ go.Notifier = {
 		//this.showNotifications();
 		
 		return msgPanel;
+	},
+
+	notificationsVisible : function() {
+		return this.notificationArea.ownerCt.getLayout()['east'].isSlid;
 	},
 
 	showNotifications : function() {

@@ -101,6 +101,11 @@ class SendMail extends RequestProcessor {
             if (!isset($sm->source->itemid)) $sm->source->itemid = Request::GetGETItemId();
             if (!isset($sm->source->folderid)) $sm->source->folderid = Request::GetGETCollectionId();
 
+            // split long-id if it's set - it overwrites folderid and itemid
+            if (isset($sm->source->longid) && $sm->source->longid) {
+                list($sm->source->folderid, $sm->source->itemid) = Utils::SplitMessageId($sm->source->longid);
+            }
+
             // Rewrite the AS folderid into a backend folderid
             if (isset($sm->source->folderid)) {
                 $sm->source->folderid = self::$deviceManager->GetBackendIdForFolderId($sm->source->folderid);
@@ -111,12 +116,14 @@ class SendMail extends RequestProcessor {
             }
             // replyflag and forward flags are actually only for the correct icon.
             // Even if they are a part of SyncSendMail object, they won't be streamed.
-            if ($smartreply || $reply)
+            if ($smartreply || $reply) {
                 $sm->replyflag = true;
-            else
+            }
+            else {
                 $sm->forwardflag = true;
+            }
 
-            if (!isset($sm->source->folderid))
+            if (!isset($sm->source->folderid) || !$sm->source->folderid)
                 ZLog::Write(LOGLEVEL_ERROR, sprintf("SendMail(): No parent folder id while replying or forwarding message:'%s'", (($reply) ? $reply : $forward)));
         }
 

@@ -54,5 +54,11 @@ class SmtpAccount extends AclOwnerEntity {
 	
 	public function setPassword($value) {
 		$this->password = Crypt::encrypt($value);
-	}	
+	}
+
+	protected static function textFilterColumns()
+	{
+		return ['hostname', 'fromName', 'fromEmail'];
+	}
+
 }

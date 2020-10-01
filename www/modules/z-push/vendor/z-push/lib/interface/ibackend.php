@@ -341,4 +341,13 @@ interface IBackend {
      * @return KoeSignatures
      */
     public function GetKoeSignatures();
+
+    /**
+     * Returns information about the user's store:
+     * number of folders, store size, full name, email address.
+     *
+     * @access public
+     * @return UserStoreInfo
+     */
+    public function GetUserStoreInfo();
 }

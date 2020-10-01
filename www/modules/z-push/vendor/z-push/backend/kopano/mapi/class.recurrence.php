@@ -58,51 +58,56 @@
          * Constructor
          * @param resource $store MAPI Message Store Object
          * @param resource $message the MAPI (appointment) message
+         * @param array    $proptags an associative array of protags and their values.
          */
-        function __construct($store, $message)
+        function __construct($store, $message, $proptags = [])
         {
 
-            $properties = array();
-            $properties["entryid"] = PR_ENTRYID;
-            $properties["parent_entryid"] = PR_PARENT_ENTRYID;
-            $properties["message_class"] = PR_MESSAGE_CLASS;
-            $properties["icon_index"] = PR_ICON_INDEX;
-            $properties["subject"] = PR_SUBJECT;
-            $properties["display_to"] = PR_DISPLAY_TO;
-            $properties["importance"] = PR_IMPORTANCE;
-            $properties["sensitivity"] = PR_SENSITIVITY;
-            $properties["startdate"] = "PT_SYSTIME:PSETID_Appointment:0x820d";
-            $properties["duedate"] = "PT_SYSTIME:PSETID_Appointment:0x820e";
-            $properties["recurring"] = "PT_BOOLEAN:PSETID_Appointment:0x8223";
-            $properties["recurring_data"] = "PT_BINARY:PSETID_Appointment:0x8216";
-            $properties["busystatus"] = "PT_LONG:PSETID_Appointment:0x8205";
-            $properties["label"] = "PT_LONG:PSETID_Appointment:0x8214";
-            $properties["alldayevent"] = "PT_BOOLEAN:PSETID_Appointment:0x8215";
-            $properties["private"] = "PT_BOOLEAN:PSETID_Common:0x8506";
-            $properties["meeting"] = "PT_LONG:PSETID_Appointment:0x8217";
-            $properties["startdate_recurring"] = "PT_SYSTIME:PSETID_Appointment:0x8235";
-            $properties["enddate_recurring"] = "PT_SYSTIME:PSETID_Appointment:0x8236";
-            $properties["recurring_pattern"] = "PT_STRING8:PSETID_Appointment:0x8232";
-            $properties["location"] = "PT_STRING8:PSETID_Appointment:0x8208";
-            $properties["duration"] = "PT_LONG:PSETID_Appointment:0x8213";
-            $properties["responsestatus"] = "PT_LONG:PSETID_Appointment:0x8218";
-            $properties["reminder"] = "PT_BOOLEAN:PSETID_Common:0x8503";
-            $properties["reminder_minutes"] = "PT_LONG:PSETID_Common:0x8501";
-            $properties["recurrencetype"] = "PT_LONG:PSETID_Appointment:0x8231";
-            $properties["contacts"] = "PT_MV_STRING8:PSETID_Common:0x853a";
-            $properties["contacts_string"] = "PT_STRING8:PSETID_Common:0x8586";
-            $properties["categories"] = "PT_MV_STRING8:PS_PUBLIC_STRINGS:Keywords";
-            $properties["reminder_time"] = "PT_SYSTIME:PSETID_Common:0x8502";
-            $properties["commonstart"] = "PT_SYSTIME:PSETID_Common:0x8516";
-            $properties["commonend"] = "PT_SYSTIME:PSETID_Common:0x8517";
-            $properties["basedate"] = "PT_SYSTIME:PSETID_Appointment:0x8228";
-            $properties["timezone_data"] = "PT_BINARY:PSETID_Appointment:0x8233";
-            $properties["timezone"] = "PT_STRING8:PSETID_Appointment:0x8234";
-            $properties["flagdueby"] = "PT_SYSTIME:PSETID_Common:0x8560";
-            $properties["side_effects"] = "PT_LONG:PSETID_Common:0x8510";
-            $properties["hideattachments"] = "PT_BOOLEAN:PSETID_Common:0x8514";
+            if ($proptags) {
+                $this->proptags = $proptags;
+            } else {
+                $properties = array();
+                $properties["entryid"] = PR_ENTRYID;
+                $properties["parent_entryid"] = PR_PARENT_ENTRYID;
+                $properties["message_class"] = PR_MESSAGE_CLASS;
+                $properties["icon_index"] = PR_ICON_INDEX;
+                $properties["subject"] = PR_SUBJECT;
+                $properties["display_to"] = PR_DISPLAY_TO;
+                $properties["importance"] = PR_IMPORTANCE;
+                $properties["sensitivity"] = PR_SENSITIVITY;
+                $properties["startdate"] = "PT_SYSTIME:PSETID_Appointment:0x820d";
+                $properties["duedate"] = "PT_SYSTIME:PSETID_Appointment:0x820e";
+                $properties["recurring"] = "PT_BOOLEAN:PSETID_Appointment:0x8223";
+                $properties["recurring_data"] = "PT_BINARY:PSETID_Appointment:0x8216";
+                $properties["busystatus"] = "PT_LONG:PSETID_Appointment:0x8205";
+                $properties["label"] = "PT_LONG:PSETID_Appointment:0x8214";
+                $properties["alldayevent"] = "PT_BOOLEAN:PSETID_Appointment:0x8215";
+                $properties["private"] = "PT_BOOLEAN:PSETID_Common:0x8506";
+                $properties["meeting"] = "PT_LONG:PSETID_Appointment:0x8217";
+                $properties["startdate_recurring"] = "PT_SYSTIME:PSETID_Appointment:0x8235";
+                $properties["enddate_recurring"] = "PT_SYSTIME:PSETID_Appointment:0x8236";
+                $properties["recurring_pattern"] = "PT_STRING8:PSETID_Appointment:0x8232";
+                $properties["location"] = "PT_STRING8:PSETID_Appointment:0x8208";
+                $properties["duration"] = "PT_LONG:PSETID_Appointment:0x8213";
+                $properties["responsestatus"] = "PT_LONG:PSETID_Appointment:0x8218";
+                $properties["reminder"] = "PT_BOOLEAN:PSETID_Common:0x8503";
+                $properties["reminder_minutes"] = "PT_LONG:PSETID_Common:0x8501";
+                $properties["recurrencetype"] = "PT_LONG:PSETID_Appointment:0x8231";
+                $properties["contacts"] = "PT_MV_STRING8:PSETID_Common:0x853a";
+                $properties["contacts_string"] = "PT_STRING8:PSETID_Common:0x8586";
+                $properties["categories"] = "PT_MV_STRING8:PS_PUBLIC_STRINGS:Keywords";
+                $properties["reminder_time"] = "PT_SYSTIME:PSETID_Common:0x8502";
+                $properties["commonstart"] = "PT_SYSTIME:PSETID_Common:0x8516";
+                $properties["commonend"] = "PT_SYSTIME:PSETID_Common:0x8517";
+                $properties["basedate"] = "PT_SYSTIME:PSETID_Appointment:0x8228";
+                $properties["timezone_data"] = "PT_BINARY:PSETID_Appointment:0x8233";
+                $properties["timezone"] = "PT_STRING8:PSETID_Appointment:0x8234";
+                $properties["flagdueby"] = "PT_SYSTIME:PSETID_Common:0x8560";
+                $properties["side_effects"] = "PT_LONG:PSETID_Common:0x8510";
+                $properties["hideattachments"] = "PT_BOOLEAN:PSETID_Common:0x8514";
 
-            $this->proptags = getPropIdsFromStrings($store, $properties);
+                $this->proptags = getPropIdsFromStrings($store, $properties);
+            }
 
             parent::__construct($store, $message);
         }

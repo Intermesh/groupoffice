@@ -41,6 +41,11 @@ go.Window = Ext.extend(Ext.Window, {
 	getState : function(){
 		var s = go.Window.superclass.getState.call(this);
 
+		//when collapsed the state contains the collapsed height. this.height contains the correct height.
+		if(s.collapsed) {
+			s.height = this.height;
+		}
+
 		delete s.x;
 		delete s.y;
 

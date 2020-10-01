@@ -3,6 +3,8 @@
 namespace go\core\fs;
 
 use Exception;
+use go\core\App;
+use go\core\db\Table;
 use go\core\exception\ConfigurationException;
 use go\core\orm\Query;
 use go\core\orm;
@@ -250,6 +252,14 @@ class Blob extends orm\Entity {
 		return new MetaData($this);
 	}
 
+	protected function insertTableRecord(Table $table, array $record)
+	{
+		$stmt = go()->getDbConnection()->insertIgnore($table->getName(), $record);
+		if (!$stmt->execute()) {
+			throw new Exception("Could not execute insert query");
+		}
+	}
+
 	protected function internalSave() {
 		if (!is_dir(dirname($this->path()))) {
 			mkdir(dirname($this->path()), 0775, true);
@@ -419,5 +429,10 @@ class Blob extends orm\Entity {
 			"Expires" => (new DateTime("1 year"))->format("D, j M Y H:i:s"),
 			'Content-Disposition' => $disp . ';filename="' . $this->name . '"'
 					]);
+	}
+
+	protected static function getDefaultFetchProperties()
+	{
+		return array_filter(parent::getDefaultFetchProperties(), function($propName) { return $propName != 'file';});
 	}
 }

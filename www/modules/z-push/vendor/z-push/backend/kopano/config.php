@@ -75,3 +75,9 @@ END
 // Format of the **DATE** and **TIME** placeholders - more information on formats, see http://php.net/manual/en/function.strftime.php
 define('READ_ONLY_NOTIFY_DATE_FORMAT', "%d.%m.%Y");
 define('READ_ONLY_NOTIFY_TIME_FORMAT', "%H:%M:%S");
+
+// Comma separated list of folder ids as string for which the notification emails of the changes in read-only folders shouldn't be sent.
+// E.g. define('READ_ONLY_NONOTIFY', '1, 2, 3, 4');
+// When configuring $additionalFolders it is possible to use DeviceManager::FLD_FLAGS_NOREADONLYNOTIFY in the flags bitmask
+// in order to prevent the notifications as well.
+define('READ_ONLY_NONOTIFY', '');

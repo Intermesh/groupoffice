@@ -33,8 +33,9 @@ class IpcWincacheProvider implements IIpcProvider {
      * @param int $type
      * @param int $allocate
      * @param string $class
+     * @param string $serverKey
      */
-    public function __construct($type, $allocate, $class) {
+    public function __construct($type, $allocate, $class, $serverKey) {
 
         if (!function_exists('wincache_lock')) {
             throw new FatalMisconfigurationException("IpcWincacheProvider failure: PHP libraries for wincache not found. Please make sure the wincache extension is installed and enabled.");

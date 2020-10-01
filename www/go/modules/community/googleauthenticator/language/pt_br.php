@@ -1,6 +1,6 @@
 <?php
 return array (
-  'Google authenticator' => 'Google authenticator',
+  'Google authenticator' => 'Autenticador do Google',
   'Enable google authenticator' => 'Habilitar Google authenticator',
   'Disable google authenticator' => 'Desatilivar Google authenticator',
   'When disabling Google autenticator this step will be removed from the login process.' => 'Ao desabilitar o Google authenticator, esta etapa será removida do processo de login.',
@@ -17,4 +17,5 @@ return array (
   'Code is required' => 'Código é requerido',
   'Not found' => 'Não encontrado',
   'Invalid code' => 'Código inválido',
+  'Scan the QR code below with the Google authenticator app on your mobile device, after that fill in the field below with the code generated in the app.' => 'Faça a leitura do código QR abaixo com o aplicativo autenticador Google em seu dispositivo móvel, em seguida preencha o campo abaixo com o código gerado no aplicativo.',
 );

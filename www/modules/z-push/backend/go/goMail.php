@@ -1062,7 +1062,12 @@ class goMail extends GoBaseBackendDiff {
 //		$searchwords = preg_split("/\W+/", $searchwords);
 		
 		$searchFolder = $cpo->GetSearchFolderid(); // RESULTS IN "m/INBOX" OR "m/Concepten"
-		$searchFolder = substr($searchFolder, 2); // REMOVE THE "m/" from the folder id
+		if(!$searchFolder) {
+			//happens when searching "All folders" on iphone but we don't support this yet.
+			$searchFolder = 'INBOX';
+		} else {
+			$searchFolder = substr($searchFolder, 2); // REMOVE THE "m/" from the folder id
+		}
 		
 		// Build the imap search query
 		$searchData = $cpo->GetData();

@@ -336,4 +336,5 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Sua caixa postal e
   'Remove from address list' => 'Remover da lista de endereços',
   'MoveOldMails' => 'MoverMailsAntigos',
   'Are you sure you want to select all {count} results?' => 'Tem certeza de que deseja selecionar todos os {count} resultados?',
+  'Importing...' => 'Importando...',
 );

@@ -14,7 +14,7 @@ class FreebusypermissionsModule extends \GO\Base\Module{
 		\GO\Calendar\Model\Event::model()->addListener('load', 'GO\Freebusypermissions\FreebusypermissionsModule', 'has_freebusy_access');
 	}
 	
-	public static function defineListeners() {
+	public function defineListeners() {
 		User::on(orm\Property::EVENT_MAPPING, static::class, 'onMap');
 	}
 	

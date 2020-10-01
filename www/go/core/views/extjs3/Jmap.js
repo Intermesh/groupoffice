@@ -356,7 +356,7 @@ go.Jmap = {
 				notifyEl.items.get(0).update(text);
 				cfg.failure && cfg.failure.call(cfg.scope || this, data);
 
-				uuploadNotification.rendered ? uploadNotification.items.get('details').expand() : uploadNotification.items.get('details').collapsed = false;
+				uploadNotification.rendered ? uploadNotification.items.get('details').expand() : uploadNotification.items.get('details').collapsed = false;
 
 			},
 			headers: {

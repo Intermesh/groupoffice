@@ -269,22 +269,43 @@ class ReplyBackImExporter implements IImportChanges, IExportChanges {
                 }
             }
         }
-
+        $hexFolderid = bin2hex($this->folderid);
         // data is going to be dropped, inform the user
         if (@constant('READ_ONLY_NOTIFY_LOST_DATA')) {
-            try {
-                // get the old message - if there is no old message, this is a "create" action
-                $oldmessage = $this->getMessage($id, false);
-                if (!$oldmessage instanceof SyncObject) {
-                    $oldmessage = $message;
-                }
+            $notifyUser = true;
 
-                ZLog::Write(LOGLEVEL_DEBUG, sprintf("ReplyBackImExporter->ImportMessageChange(): Data send from the mobile will be lost. Sending email to user notifying about this."));
-                $this->sendNotificationEmail($message, $oldmessage);
+
+            $userFolder = ZPush::GetDeviceManager()->GetAdditionalUserSyncFolder($hexFolderid);
+            if ($userFolder['flags'] & DeviceManager::FLD_FLAGS_NOREADONLYNOTIFY) {
+                ZLog::Write(LOGLEVEL_INFO, "ReplyBackImExporter->ImportMessageChange(): the folder has no notify flag. Data received from the mobile will be lost. User was *not* informed as configured (see FLD_FLAGS_NOREADONLYNOTIFY)");
+                $notifyUser = false;
             }
-            catch (ZPushException $zpe) {
-                // TODO should we still print the email to the log so the data is not lost at all?
-                ZLog::Write(LOGLEVEL_ERROR, "ReplyBackImExporter->ImportMessageChange(): exception sending notification email");
+            elseif (@constant('READ_ONLY_NONOTIFY')) {
+                $noNotifyFolders = explode(',', READ_ONLY_NONOTIFY);
+                foreach ($noNotifyFolders as $noNotifyFolder) {
+                    if (strcasecmp(trim($noNotifyFolder), $hexFolderid) == 0) {
+                        ZLog::Write(LOGLEVEL_INFO, "ReplyBackImExporter->ImportMessageChange(): the folder is in no notify list. Data received from the mobile will be lost. User was *not* informed as configured (see READ_ONLY_NONOTIFY)");
+                        $notifyUser = false;
+                        break;
+                    }
+                }
+            }
+
+            if ($notifyUser) {
+                try {
+                    // get the old message - if there is no old message, this is a "create" action
+                    $oldmessage = $this->getMessage($id, false);
+                    if (!$oldmessage instanceof SyncObject) {
+                        $oldmessage = $message;
+                    }
+
+                    ZLog::Write(LOGLEVEL_DEBUG, sprintf("ReplyBackImExporter->ImportMessageChange(): Data send from the mobile will be lost. Sending email to user notifying about this."));
+                    $this->sendNotificationEmail($message, $oldmessage);
+                }
+                catch (ZPushException $zpe) {
+                    // TODO should we still print the email to the log so the data is not lost at all?
+                    ZLog::Write(LOGLEVEL_ERROR, "ReplyBackImExporter->ImportMessageChange(): exception sending notification email");
+                }
             }
         }
         else {
@@ -296,7 +317,7 @@ class ReplyBackImExporter implements IImportChanges, IExportChanges {
             return true;
         }
         // if there is no $id it means it's a new object. We have to reply back that we accepted it and then delete it.
-        $id = $this->getTmpId();
+        $id = $this->getTmpId($hexFolderid);
         $this->changes[] = array(self::CREATION, $id, $message);
         return $id;
     }
@@ -322,12 +343,14 @@ class ReplyBackImExporter implements IImportChanges, IExportChanges {
      *
      * @param string        $id
      * @param int           $flags
+     * @param array         $categories
+     *
      *
      * @access public
      * @return boolean
      * @throws StatusException
      */
-    public function ImportMessageReadFlag($id, $flags) {
+    public function ImportMessageReadFlag($id, $flags, $categories = array()) {
         $this->changes[] = array(self::READFLAG, $id, $flags);
         return true;
     }

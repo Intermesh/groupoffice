@@ -89,7 +89,8 @@ class Listeners extends Singleton {
 					continue;
 				}
 				if(method_exists($cls, 'defineListeners')){
-					$cls::defineListeners();
+					$o = new $cls;
+					$o->defineListeners();
 				}
 				continue;
 			}
