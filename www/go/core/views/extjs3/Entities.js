@@ -29,6 +29,8 @@ go.Entities = (function () {
 					
 					entity.isAclOwner = serverInfo.isAclOwner;
 					entity.defaultAcl = serverInfo.defaultAcl;	
+				} else {
+					delete entities[entity.name.toLowerCase()];
 				}
 				
 				if(entity.customFields) {
@@ -40,6 +42,8 @@ go.Entities = (function () {
 				entity.relations = entity.relations || {};
 				entity.relations.customFields = go.customfields.CustomFields.getRelations(entity.name);
 			});
+
+
 		},
 
 
