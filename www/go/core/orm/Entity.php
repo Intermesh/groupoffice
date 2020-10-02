@@ -726,8 +726,8 @@ abstract class Entity extends Property {
    * @throws Exception
    */
 
-	public static function filter(Query $query, Criteria $criteria, array $filter) {		
-		static::defineFilters()->apply($query, $criteria, $filter);	
+	public static function filter(Query $query, array $filter) {
+		static::defineFilters()->apply($query, $filter);
 		return $query;
 	}
 	
