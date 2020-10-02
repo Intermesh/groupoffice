@@ -87,7 +87,8 @@ try {
 
 		if(go()->getSettings()->databaseVersion != go()->getVersion()) {
 
-			//retry without cache
+			//retry without cache. becuse when upgrading on cli the cache might be out of date.
+			//cli can't clear apcu cache.
 			go()->getCache()->flush(false);
 
 			if(go()->getSettings()->databaseVersion != go()->getVersion()) {
