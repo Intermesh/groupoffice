@@ -87,13 +87,20 @@ try {
 
 		if(go()->getSettings()->databaseVersion != go()->getVersion()) {
 
-			if(go()->getDebugger()->enabled) {
-				echo "DEBUGGER: Version mismatch. Database version = ". go()->getSettings()->databaseVersion .", Application version: " . go()->getVersion() .".<br /><br />";
-				echo '<a href="install/upgrade.php">Click here to launch the upgrade</a>';
+			//retry without cache. becuse when upgrading on cli the cache might be out of date.
+			//cli can't clear apcu cache.
+			go()->getCache()->flush(false);
+
+			if(go()->getSettings()->databaseVersion != go()->getVersion()) {
+
+				if (go()->getDebugger()->enabled) {
+					echo "DEBUGGER: Version mismatch. Database version = " . go()->getSettings()->databaseVersion . ", Application version: " . go()->getVersion() . ".<br /><br />";
+					echo '<a href="install/upgrade.php">Click here to launch the upgrade</a>';
+					exit();
+				}
+				header('Location: ' . GO::config()->host . 'install/upgrade.php');
 				exit();
 			}
-			header('Location: '.GO::config()->host.'install/upgrade.php');				
-			exit();
 		}
 	}
 
