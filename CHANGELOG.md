@@ -1,3 +1,5 @@
+- Projects: Added finance report with date filter showing all costs, hours, income and budgets
+
 01-10-2020 6.4.173
 - Core: Fixed shifting in date fields
 - Core: Speed up 6.3 to 6.4 upgrade
