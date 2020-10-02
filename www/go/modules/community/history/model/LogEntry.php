@@ -49,6 +49,11 @@ class LogEntry extends AclOwnerEntity {
 			);
 	}
 
+	protected static function textFilterColumns()
+	{
+		return ['description'];
+	}
+
 	protected static function defineFilters()
 	{
 		return parent::defineFilters()

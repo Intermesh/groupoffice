@@ -79,7 +79,46 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 
 	forDetailView: true,
 
+
+
+	onCellClick : function(grid, rowIndex, colIndex, e) {
+
+		if(e.target.tagName != "BUTTON") {
+			return;
+		}
+
+		var rec = this.store.getAt(rowIndex), json = JSON.parse(rec.data.changes);
+
+		if(!json) {
+			return;
+		}
+
+		var target = this.view.getCell(rowIndex, colIndex),
+			html = '';
+
+		switch(rec.data.action) {
+			case 'update': html = this.renderOldNew(json).join('');
+				break;
+			case 'create':
+			case 'delete': html = this.renderJson(json).join('<br>');
+				break;
+			case 'login': html = rec.data.createdAt;
+				break;
+		}
+
+		var tt = new Ext.menu.Menu({
+			//target: target,
+			//title: rec.data.description,
+			width:500,
+			html: '<div style="padding:7px"><h5>'+rec.data.description+'</h5>'+html+'</div>' ,
+			autoHide: false
+			//closable: true
+		});
+		tt.show(target);
+	},
+
 	initComponent: function() {
+
 
 		var cols = [{
 			header: t('ID'),
@@ -97,43 +136,13 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 			}
 		},{
 			header: t('Changes'),
-			xtype: 'actioncolumn',
+			dataIndex: "changes",
 			width: dp(80),
-			items: [{
-				iconCls: 'ic-note',
-				handler: function(grid, rowIndex, colIndex) {
-					var rec = grid.store.getAt(rowIndex),
-						json = JSON.parse(rec.data.changes);
-
-					if(!json) {
-						return;
-					}
-
-					var target = grid.view.getCell(rowIndex, colIndex),
-						html = '';
-
-					switch(rec.data.action) {
-						case 'update': html = this.renderOldNew(json).join('');
-							break;
-						case 'create':
-						case 'delete': html = this.renderJson(json).join('<br>');
-							break;
-						case 'login': html = rec.data.createdAt;
-							break;
-					}
-
-					var tt = new Ext.menu.Menu({
-						//target: target,
-						//title: rec.data.description,
-						width:500,
-						html: '<div style="padding:7px"><h5>'+rec.data.description+'</h5>'+html+'</div>' ,
-						autoHide: false
-						//closable: true
-					});
-					tt.show(target);
-				},
-				scope:this
-			}]
+			renderer: function(v, meta, record) {
+				if(v) {
+					return '<button class="icon">note</button>';
+				}
+			}
 		},{
 			header: t('Action'),
 			dataIndex: 'action',
@@ -174,5 +183,7 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 		this.callParent();
 
 		this.on('afterrender',function(){this.store.load();},this);
+
+		this.on('cellclick', this.onCellClick, this);
 	}
 });
