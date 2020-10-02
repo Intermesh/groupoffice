@@ -3,6 +3,7 @@ namespace go\modules\community\multi_instance\model;
 
 use Exception;
 use go\core\db\Criteria;
+use go\core\ErrorHandler;
 use go\core\fs\File;
 use go\core\http\Client;
 use go\core\http\Request;
@@ -529,7 +530,7 @@ class Instance extends Entity {
 			
 	
 		$cmd = "mysqldump --force --opt --host=" . ($c['db_host'] ?? "localhost") . " --port=" . ($c['db_port'] ?? 3306) . " --user=" . $c['db_user'] . " --password=" . $c['db_pass'] . " " . $c['db_name'] . " > \"" . $file->getPath() . "\"";
-		go()->debug($cmd);
+		//go()->debug($cmd);
 		exec($cmd, $output, $retVar);
 		
 		if($retVar != 0) {
@@ -548,21 +549,31 @@ class Instance extends Entity {
 		$instances = Instance::find()->mergeWith($query);
 
 		foreach($instances as $instance) {
-			$instance->getTempFolder()->delete();
-			
-			$instance->mysqldump();
-			
-			$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php'));
-			$instance->getConfigFile()->getFolder()->delete();
+			try {
+				$instance->getTempFolder()->delete();
 
-			$dest =	$instance->getTrashFolder()->getFolder($instance->getDataFolder()->getName());
-			if($dest->exists()) {
-				$dest = $dest->getParent()->getFolder($instance->getDataFolder()->getName() . '-' . uniqid());
-			}
-			$instance->getDataFolder()->move($dest);
+				$instance->mysqldump();
+
+				$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php'));
+				$instance->getConfigFile()->getFolder()->delete();
+
+				$dest = $instance->getTrashFolder()->getFolder($instance->getDataFolder()->getName());
+				if ($dest->exists()) {
+					$dest = $dest->getParent()->getFolder($instance->getDataFolder()->getName() . '-' . uniqid());
+				}
+				$instance->getDataFolder()->move($dest);
 			
-			$instance->dropDatabaseUser($instance->getDbUser());
-			$instance->dropDatabase($instance->getDbName());
+				$instance->dropDatabaseUser($instance->getDbUser());
+				$instance->dropDatabase($instance->getDbName());
+			}catch(Exception $e) {
+				ErrorHandler::logException($e);
+
+				go()->getMailer()
+					->compose()
+					->setSubject("Error deleting instance: ". $instance->hostname)
+					->setBody($e->getMessage())
+					->send();
+			}
 		}
 		
 		return parent::internalDelete($query);
