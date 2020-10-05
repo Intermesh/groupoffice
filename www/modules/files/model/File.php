@@ -16,6 +16,7 @@
 namespace GO\Files\Model;
 
 use GO;
+use go\modules\community\history\model\LogEntry;
 
 /**
  * The File model
@@ -642,7 +643,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 //		if(!File::checkQuota($fsFile->size()-$this->size))
 //			throw new \GO\Base\Exception\InsufficientDiskSpace();
 		if(!$this->isNew)
-			$this->log('edit');
+			$this->log("update");
 		$this->saveVersion();
 
 		if(!$fsFile->move($this->folder->fsFolder,$this->name, $isUploadedFile)){		
