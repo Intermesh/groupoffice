@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\addressbook\controller;
 
+use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\jmap\EntityController;
@@ -8,6 +9,7 @@ use go\core\jmap\exception\InvalidArguments;
 use GO\Email\Model\Account;
 use go\modules\community\addressbook\convert\VCard;
 use go\modules\community\addressbook\model;
+use go\modules\community\addressbook\Module;
 
 /**
  * The controller for the Contact entity
@@ -78,6 +80,10 @@ class Contact extends EntityController {
 	}
 	
 	public function export($params) {
+		$addressbookMod = new Module();
+		if($addressbookMod->getSettings()->restrictExportToAdmins && !go()->getAuthState()->isAdmin()) {
+			throw new Forbidden("Export has been restricted to administrators");
+		}
 		return $this->defaultExport($params);
 	}
 	
@@ -94,6 +100,11 @@ class Contact extends EntityController {
 	}
 
 	public function labels($params) {
+
+		$addressbookMod = new Module();
+		if($addressbookMod->getSettings()->restrictExportToAdmins && !go()->getAuthState()->isAdmin()) {
+			throw new Forbidden("Export has been restricted to administrators");
+		}
 
 		$tpl = <<<EOT
 {{contact.name}}

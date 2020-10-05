@@ -55,6 +55,7 @@ form/Chips.js
 form/RecurrenceFieldset.js
 form/KeyValueEditorGrid.js
 form/DateRangeField.js
+form/SelectField.js
 
 modules/ModulePanel.js
 

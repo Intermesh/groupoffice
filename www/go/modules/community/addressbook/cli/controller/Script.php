@@ -16,7 +16,7 @@ class Script extends Controller {
   public function fixMissingCompanies() {
 
     Entity::$trackChanges = false;
-    LoggingTrait::$enabled = false;
+    LoggingTrait::disable();
 
     $m = new Migrate63to64();
     $m->fixMissing();

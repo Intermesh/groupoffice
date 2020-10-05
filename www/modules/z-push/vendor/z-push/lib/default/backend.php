@@ -273,6 +273,16 @@ abstract class Backend implements IBackend {
         return new KoeSignatures();
     }
 
+    /**
+     * Returns information about the user's store:
+     * number of folders, store size, full name, email address.
+     *
+     * @access public
+     * @return UserStoreInfo
+     */
+    public function GetUserStoreInfo() {
+        return new UserStoreInfo();
+    }
 
     /**----------------------------------------------------------------------------------------------------------
      * Protected methods for BackendStorage

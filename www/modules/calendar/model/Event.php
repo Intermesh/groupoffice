@@ -506,14 +506,14 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	}
 
 	public $skipValidation = false;
-	
+
 	public function validate() {
 
 		if($this->skipValidation) {
 			return true;
 		}
 
-		if($this->rrule != ""){			
+		if($this->rrule != ""){
 			$rrule = new \GO\Base\Util\Icalendar\Rrule();
 			$rrule->readIcalendarRruleString($this->start_time, $this->rrule);						
 			$this->repeat_end_time = $rrule->until;
@@ -2599,12 +2599,12 @@ The following is the error message:
 			//check if we have a Group-Office event. If so, we can handle accepting and declining in Group-Office. Otherwise we'll use ICS calendar objects by mail
 			$participantEvent = $participant->getParticipantEvent();
 
-			$body = '<p>'.\GO::t("The following event has been cancelled by the organizer", "calendar").': </p>'.$this->toHtml();					
+			$body = '<p>'.\GO::t("The following event has been cancelled by the organizer", "calendar").': </p>'.$this->toHtml();
 			
 //			if(!$participantEvent){
 				
 
-				$ics=$this->toICS("CANCEL");				
+				$ics=$this->toICS("CANCEL", $participant);
 				$a = new \Swift_Attachment($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="CANCEL"');
 				$a->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
 				$a->setDisposition("inline");

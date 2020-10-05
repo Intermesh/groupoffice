@@ -29,9 +29,13 @@
 class TopCollector extends InterProcessData {
     const ENABLEDAT = 2;
     const TOPDATA = 3;
+    const ENABLED_CACHETIME = 5; // how often in seconds to check the ipc provider if it has data for the TopCollector
 
     protected $preserved;
     protected $latest;
+    private $disabled;
+    private $checkEnabledTime;
+    private $enabled;
 
     /**
      * Constructor
@@ -60,7 +64,8 @@ class TopCollector extends InterProcessData {
                                 "ended"     => 0,
                                 "push"      => false,
                         );
-
+        $this->disabled = !!(defined('TOPCOLLECTOR_DISABLED') && constant('TOPCOLLECTOR_DISABLED') === true);
+        $this->checkEnabledTime = time() - self::ENABLED_CACHETIME - 1;
         $this->AnnounceInformation("initializing");
     }
 
@@ -114,7 +119,7 @@ class TopCollector extends InterProcessData {
      * @return boolean
      */
     public function AnnounceInformation($addinfo, $preserve = false, $terminating = false) {
-        if (defined('TOPCOLLECTOR_DISABLED') && constant('TOPCOLLECTOR_DISABLED') === true) {
+        if ($this->disabled) {
             return true;
         }
 
@@ -268,8 +273,13 @@ class TopCollector extends InterProcessData {
      * @return boolean
      */
     private function isEnabled() {
-        $isEnabled = ($this->hasData(self::ENABLEDAT)) ? $this->getData(self::ENABLEDAT) : false;
-        return ($isEnabled !== false && ($isEnabled +300) > time());
+        $time = time();
+        if ($this->checkEnabledTime + self::ENABLED_CACHETIME < $time) {
+            $isEnabled = ($this->hasData(self::ENABLEDAT)) ? $this->getData(self::ENABLEDAT) : false;
+            $this->enabled = ($isEnabled !== false && ($isEnabled +300) > $time);
+            $this->checkEnabledTime = $time;
+        }
+        return $this->enabled;
     }
 
     /**

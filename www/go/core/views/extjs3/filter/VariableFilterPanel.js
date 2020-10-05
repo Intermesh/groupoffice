@@ -11,9 +11,11 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 
 		this.items = [this.fieldset];
 
-		this.loadFilters();
 		this.supr().initComponent.call(this);
 
+		this.on("render", function() {
+			this.loadFilters();
+		}, this);
 
 	},
 

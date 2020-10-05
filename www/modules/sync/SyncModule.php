@@ -22,7 +22,7 @@ class SyncModule extends Module{
 		return true;
 	}
 	
-	public static function defineListeners() {
+	public function defineListeners() {
 
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		// User::on(User::EVENT_SAVE, static::class, 'onUserSave');

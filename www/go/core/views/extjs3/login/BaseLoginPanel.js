@@ -49,13 +49,14 @@ go.login.BaseLoginPanel = Ext.extend(Ext.FormPanel, {
 		this.getEl().mask(t("loading..."));
 		go.AuthenticationManager.doAuthentication(this.getPostData(),function(authMan, success, result){
 			this.submitting = false;
+			this.getEl().unmask();
+
 			if(result.errors && result.errors[this.getId()]){
 				this.setErrors(result.errors[this.getId()]);
 				return;
 			}
 
 			this.onSuccess();
-			this.getEl().unmask();
 
 		},this);
 	},

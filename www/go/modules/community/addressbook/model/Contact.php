@@ -1024,9 +1024,12 @@ class Contact extends AclItemEntity {
 	 */
 	public static function onLinkDelete(Query $links) {
 		
-		$links = Link::find()->where($links->andWhere('(toEntityTypeId = :e1 OR fromEntityTypeId = :e2)'))->bind([':e1'=> static::entityType()->getId(), ':e2'=> static::entityType()->getId()]);
+		$query = clone $links;
+		$query->andWhere('(toEntityTypeId = :e1 AND fromEntityTypeId = :e2)')->bind([':e1'=> static::entityType()->getId(), ':e2'=> static::entityType()->getId()]);
 
-		foreach($links as $link) {			
+		$contactLinks = Link::find()->mergeWith($query);
+
+		foreach($contactLinks as $link) {
 			$to = Contact::findById($link->toId);
 			$from = Contact::findById($link->fromId);
 			

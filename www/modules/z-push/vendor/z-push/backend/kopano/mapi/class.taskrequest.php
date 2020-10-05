@@ -257,7 +257,7 @@
                 $task = mapi_folder_createmessage($taskFolder);
 
                 $sub = $this->getEmbeddedTask($this->message);
-                mapi_copyto($sub, array(), array(), $task);
+                mapi_copyto($sub, array(), array($this->props['categories']), $task);
 
                 $senderProps = array(
                     PR_SENT_REPRESENTING_NAME,
@@ -433,7 +433,7 @@
 
                 mapi_setprops($task, $senderProps);
 
-                // Update taskstate (what the task looks like) and task history (last action done by the assignee)
+                // Update taskstate and task history (last action done by the assignee)
                 mapi_setprops($task,$props);
 
                 mapi_savechanges($task);
@@ -867,7 +867,7 @@
 
             $message = !$this->isTaskRequest() ? $this->message : $this->getAssociatedTask(false);
 
-            $ignoreProps = array(PR_ICON_INDEX, PR_SENT_REPRESENTING_NAME, PR_SENT_REPRESENTING_EMAIL_ADDRESS, PR_SENT_REPRESENTING_ADDRTYPE, PR_SENT_REPRESENTING_ENTRYID, PR_SENT_REPRESENTING_SEARCH_KEY);
+            $ignoreProps = array(PR_ICON_INDEX, $this->props["categories"], PR_SENT_REPRESENTING_NAME, PR_SENT_REPRESENTING_EMAIL_ADDRESS, PR_SENT_REPRESENTING_ADDRTYPE, PR_SENT_REPRESENTING_ENTRYID, PR_SENT_REPRESENTING_SEARCH_KEY);
 
             mapi_copyto($message, array(), $ignoreProps, $outgoing);
             mapi_copyto($message, array(), array(), $sub);
@@ -1058,17 +1058,19 @@
             }
 
             $recips = array();
-            $taskReqProps = mapi_getprops($this->message, array(PR_SENT_REPRESENTING_NAME, PR_SENT_REPRESENTING_EMAIL_ADDRESS, PR_SENT_REPRESENTING_ENTRYID, PR_SENT_REPRESENTING_ADDRTYPE));
+            $taskReqProps = mapi_getprops($this->message, array(PR_SENT_REPRESENTING_NAME, PR_SENT_REPRESENTING_EMAIL_ADDRESS, PR_SENT_REPRESENTING_ENTRYID, PR_SENT_REPRESENTING_ADDRTYPE, PR_SENT_REPRESENTING_SEARCH_KEY));
             $associatedTaskProps = mapi_getprops($task, array($this->props['taskupdates'], $this->props['tasksoc'], $this->props['taskmultrecips']));
 
             // Build assignor info
-            $assignor = array(    PR_ENTRYID => $taskReqProps[PR_SENT_REPRESENTING_ENTRYID],
-                                PR_DISPLAY_NAME => $taskReqProps[PR_SENT_REPRESENTING_NAME],
-                                PR_EMAIL_ADDRESS => $taskReqProps[PR_SENT_REPRESENTING_EMAIL_ADDRESS],
-                                PR_RECIPIENT_DISPLAY_NAME => $taskReqProps[PR_SENT_REPRESENTING_NAME],
-                                PR_ADDRTYPE => empty($taskReqProps[PR_SENT_REPRESENTING_ADDRTYPE]) ? 'SMTP' : $taskReqProps[PR_SENT_REPRESENTING_ADDRTYPE],
-                                PR_RECIPIENT_FLAGS => recipSendable
-                        );
+            $assignor = array(
+                PR_ENTRYID => $taskReqProps[PR_SENT_REPRESENTING_ENTRYID],
+                PR_DISPLAY_NAME => $taskReqProps[PR_SENT_REPRESENTING_NAME],
+                PR_EMAIL_ADDRESS => $taskReqProps[PR_SENT_REPRESENTING_EMAIL_ADDRESS],
+                PR_RECIPIENT_DISPLAY_NAME => $taskReqProps[PR_SENT_REPRESENTING_NAME],
+                PR_ADDRTYPE => empty($taskReqProps[PR_SENT_REPRESENTING_ADDRTYPE]) ? 'SMTP' : $taskReqProps[PR_SENT_REPRESENTING_ADDRTYPE],
+                PR_RECIPIENT_FLAGS => recipSendable,
+                PR_SEARCH_KEY => $taskReqProps[PR_SENT_REPRESENTING_SEARCH_KEY]
+            );
 
             // Assignor has requested task updates, so set him/her as MAPI_CC in recipienttable.
             if ((isset($associatedTaskProps[$this->props['taskupdates']]) && $associatedTaskProps[$this->props['taskupdates']])
@@ -1096,6 +1098,10 @@
         function deleteReceivedTR()
         {
             $store = $this->getTaskFolderStore();
+            $storeType = mapi_getprops($store, array(PR_MDB_PROVIDER));
+            if ($storeType[PR_MDB_PROVIDER] === ZARAFA_STORE_PUBLIC_GUID) {
+                $store = $this->getDefaultStore();
+            }
             $inbox = mapi_msgstore_getreceivefolder($store);
 
             $storeProps = mapi_getprops($store, array(PR_IPM_WASTEBASKET_ENTRYID));

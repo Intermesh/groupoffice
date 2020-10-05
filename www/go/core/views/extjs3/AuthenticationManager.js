@@ -175,7 +175,7 @@ go.AuthenticationManager = (function () {
 								Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred") + ": " +  response.statusText);
 							break;
 						}
-						
+						cb.call(scope || me, me, success, result);
 						return;
 					}
 

@@ -6,6 +6,7 @@ use Exception;
 use go\core\db\Database;
 use go\core\db\Expression;
 use go\core\db\Query;
+use go\core\jmap\Entity;
 use go\core\util\DateTime;
 use go\modules\community\addressbook\model\Address;
 use go\modules\community\addressbook\model\AddressBook;
@@ -40,6 +41,8 @@ class Migrate63to64 {
 		//clear cache for ClassFinder fail in custom field type somehow.
 		go()->getCache()->flush();
 		Table::destroyInstances();
+
+		Entity::$checkFilesFolder = false;
 		
 		$this->countries = go()->t('countries');
 		
@@ -126,6 +129,8 @@ class Migrate63to64 {
 		if($orphanCount == 0) {
 			AddressBook::delete(['id' => $addressBook->id]);
 		}
+
+		Entity::$checkFilesFolder = true;
 	}
 
   /**
@@ -489,11 +494,11 @@ class Migrate63to64 {
 				]);
 			}
 
-			if (!empty($r['action_date'])) {
+			if ($r['action_date'] > 0) {
 				$contact->dates[] = (new Date())
 								->setValues([
 						'type' => "action",
-						'date' => DateTime::createFromFormat('Y-m-d', $r['action_date'])
+						'date' => DateTime::createFromFormat('U', $r['action_date'])
 				]);
 			}
 

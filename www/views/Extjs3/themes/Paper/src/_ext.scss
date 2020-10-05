@@ -1020,13 +1020,16 @@
 	&.header {
 		border-bottom: 0;
 	}
-	&-left .x-toolbar-cell {
-		padding-right:dp(8);
+	&-left .x-toolbar-cell > * {
+		margin-right:dp(8);
 	}
-	&-right .x-toolbar-cell {
-		padding-left: dp(8);
+	&-right .x-toolbar-cell > * {
+		margin-left:dp(8);
 	}
-	&-left .x-toolbar-cell:first-child {
+	&-right {
+		padding-right: dp(8);
+	}
+	&-left {
 		padding-left: dp(8);
 	}
 	div.xtb-text {

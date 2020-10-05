@@ -184,6 +184,7 @@ class Meetingrequest {
         $properties['meetingtype'] = 'PT_LONG:PSETID_Meeting:0x26';
         $properties['timezone_data'] = 'PT_BINARY:PSETID_Appointment:0x8233';
         $properties['timezone'] = 'PT_STRING8:PSETID_Appointment:0x8234';
+        $properties["categories"] = "PT_MV_STRING8:PS_PUBLIC_STRINGS:Keywords";
         $properties['toattendeesstring'] = 'PT_STRING8:PSETID_Appointment:0x823B';
         $properties['ccattendeesstring'] = 'PT_STRING8:PSETID_Appointment:0x823C';
 
@@ -297,7 +298,7 @@ class Meetingrequest {
                                                     PR_MESSAGE_DELIVERY_TIME,
                                                     PR_MESSAGE_CLASS,
                                                     PR_PROCESSED,
-                                                    PR_RCVD_REPRESENTING_NAME,
+                                                    PR_RCVD_REPRESENTING_ENTRYID,
                                                     $this->proptags['proposed_start_whole'],
                                                     $this->proptags['proposed_end_whole'],
                                                     $this->proptags['proposed_duration'],
@@ -314,8 +315,8 @@ class Meetingrequest {
         $basedate = $this->getBasedateFromGlobalID($messageprops[$this->proptags['goid']]);
 
         // check if delegate is processing the response
-        if (isset($messageprops[PR_RCVD_REPRESENTING_NAME])) {
-            $delegatorStore = $this->getDelegatorStore($messageprops[PR_RCVD_REPRESENTING_NAME], array(PR_IPM_APPOINTMENT_ENTRYID));
+        if (isset($messageprops[PR_RCVD_REPRESENTING_ENTRYID])) {
+            $delegatorStore = $this->getDelegatorStore($messageprops[PR_RCVD_REPRESENTING_ENTRYID], array(PR_IPM_APPOINTMENT_ENTRYID));
 
             $userStore = $delegatorStore['store'];
             $calFolder = $delegatorStore[PR_IPM_APPOINTMENT_ENTRYID];
@@ -541,8 +542,8 @@ If it is the first time this attendee has proposed a new date/time, increment th
         }
 
         // get delegator store, if delegate is processing this cancellation
-        if (isset($messageProps[PR_RCVD_REPRESENTING_NAME])){
-            $delegatorStore = $this->getDelegatorStore($messageProps[PR_RCVD_REPRESENTING_NAME], array(PR_IPM_APPOINTMENT_ENTRYID));
+        if (isset($messageProps[PR_RCVD_REPRESENTING_ENTRYID])){
+            $delegatorStore = $this->getDelegatorStore($messageProps[PR_RCVD_REPRESENTING_ENTRYID], array(PR_IPM_APPOINTMENT_ENTRYID));
 
             $store = $delegatorStore['store'];
             $calFolder = $delegatorStore[PR_IPM_APPOINTMENT_ENTRYID];
@@ -611,20 +612,21 @@ If it is the first time this attendee has proposed a new date/time, increment th
      * @param string $newProposedStartTime contains starttime if user has proposed other time
      * @param string $newProposedEndTime contains endtime if user has proposed other time
      * @param string $basedate start of day of occurrence for which user has accepted the recurrent meeting
+	 * @param boolean $isImported true to indicate that MR is imported from .ics or .vcs file else it false.
      * @return string $entryid entryid of item which created/updated in calendar
      */
-    function doAccept($tentative, $sendresponse, $move, $newProposedStartTime=false, $newProposedEndTime=false, $body=false, $userAction = false, $store=false, $basedate = false)
+    function doAccept($tentative, $sendresponse, $move, $newProposedStartTime=false, $newProposedEndTime=false, $body=false, $userAction = false, $store=false, $basedate = false, $isImported = false)
     {
         if($this->isLocalOrganiser()) {
             return false;
         }
 
         // Remove any previous calendar items with this goid and appt id
-        $messageprops = mapi_getprops($this->message, Array(PR_ENTRYID, PR_MESSAGE_CLASS, $this->proptags['goid'], $this->proptags['updatecounter'], PR_PROCESSED, PR_RCVD_REPRESENTING_NAME, PR_SENDER_ENTRYID, PR_SENT_REPRESENTING_ENTRYID, PR_RECEIVED_BY_ENTRYID));
+        $messageprops = mapi_getprops($this->message, Array(PR_ENTRYID, PR_MESSAGE_CLASS, $this->proptags['goid'], $this->proptags['updatecounter'], PR_PROCESSED, PR_RCVD_REPRESENTING_ENTRYID, PR_SENDER_ENTRYID, PR_SENT_REPRESENTING_ENTRYID, PR_RECEIVED_BY_ENTRYID));
 
         // If this meeting request is received by a delegate then open delegator's store.
-        if (isset($messageprops[PR_RCVD_REPRESENTING_NAME])) {
-            $delegatorStore = $this->getDelegatorStore($messageprops[PR_RCVD_REPRESENTING_NAME], array(PR_IPM_APPOINTMENT_ENTRYID));
+        if (isset($messageprops[PR_RCVD_REPRESENTING_ENTRYID])) {
+            $delegatorStore = $this->getDelegatorStore($messageprops[PR_RCVD_REPRESENTING_ENTRYID], array(PR_IPM_APPOINTMENT_ENTRYID));
 
             $store = $delegatorStore['store'];
             $calFolder = $delegatorStore[PR_IPM_APPOINTMENT_ENTRYID];
@@ -661,7 +663,7 @@ If it is the first time this attendee has proposed a new date/time, increment th
             // if correspondent calendar item is already processed then don't do anything
             $calendarItem = $this->getCorrespondentCalendarItem();
             $calendarItemProps = mapi_getprops($calendarItem, array(PR_PROCESSED));
-            if(isset($calendarItemProps) && $calendarItemProps[PR_PROCESSED] == true) {
+            if(isset($calendarItemProps[PR_PROCESSED]) && $calendarItemProps[PR_PROCESSED] == true) {
                 // mark meeting-request mail as processed as well
                 mapi_setprops($this->message, Array(PR_PROCESSED => true));
                 mapi_savechanges($this->message);
@@ -687,14 +689,14 @@ If it is the first time this attendee has proposed a new date/time, increment th
         // While sender is receiver then we have to process the meeting request as per the intended busy status
         // instead of tentative, and accept the same as per the intended busystatus.
         $senderEntryId = isset($messageprops[PR_SENT_REPRESENTING_ENTRYID]) ? $messageprops[PR_SENT_REPRESENTING_ENTRYID] : $messageprops[PR_SENDER_ENTRYID];
-        if(MAPIUtils::CompareEntryIds($senderEntryId, $messageprops[PR_RECEIVED_BY_ENTRYID])) {
+        if(isset($messageprops[PR_RECEIVED_BY_ENTRYID]) && MAPIUtils::CompareEntryIds($senderEntryId, $messageprops[PR_RECEIVED_BY_ENTRYID])) {
             $entryid = $this->accept(false, $sendresponse, $move, $proposeNewTimeProps, $body, true, $store, $calFolder, $basedate);
         } else {
             $entryid = $this->accept($tentative, $sendresponse, $move, $proposeNewTimeProps, $body, $userAction, $store, $calFolder, $basedate);
         }
 
         // if we have first time processed this meeting then set PR_PROCESSED property
-        if($this->isMeetingRequest($messageprops[PR_MESSAGE_CLASS]) && $userAction == false) {
+        if($this->isMeetingRequest($messageprops[PR_MESSAGE_CLASS]) && $userAction === false && $isImported === false) {
             if(!isset($messageprops[PR_PROCESSED]) || $messageprops[PR_PROCESSED] != true) {
                 // set processed flag
                 mapi_setprops($this->message, Array(PR_PROCESSED => true));
@@ -770,6 +772,10 @@ If it is the first time this attendee has proposed a new date/time, increment th
                     $props = mapi_getprops($this->message, array(PR_ENTRYID));
                 }
 
+                // While we applying updates of MR then all local categories will be removed,
+                // So get the local categories of all occurrence before applying update from organiser.
+                $localCategories = $this->getLocalCategories($calendarItem, $store, $calFolder);
+
                 $props[PR_MESSAGE_CLASS] = 'IPM.Appointment';
                 // When meeting requests are generated by third-party solutions, we might be missing the updatecounter property.
                 if (!isset($props[$this->proptags['updatecounter']])) {
@@ -835,6 +841,12 @@ If it is the first time this attendee has proposed a new date/time, increment th
 
                 mapi_savechanges($calendarItem);
 
+                // After applying update of organiser all local categories of occurrence was removed,
+                // So if local categories exist then apply it on respective occurrence.
+                if (!empty($localCategories)) {
+                    $this->applyLocalCategories($calendarItem, $store, $localCategories);
+                }
+
                 if ($move) {
                     // open wastebasket of currently logged in user and move the meeting request to it
                     // for delegates this will be delegate's wastebasket folder
@@ -871,9 +883,12 @@ If it is the first time this attendee has proposed a new date/time, increment th
 
                 if (!$calendarItem) {
                     $items = $this->findCalendarItems($messageprops[$this->proptags['goid']], $calFolder);
-
-                    if (is_array($items))
+                    if (is_array($items)) {
+                        // Get local categories before deleting MR.
+                        $message = mapi_msgstore_openentry($store, $items[0]);
+                        $localCategories = mapi_getprops($message, array($this->proptags['categories']));
                         mapi_folder_deletemessages($calFolder, $items);
+                    }
 
                     if ($move) {
                         // All we have to do is open the default calendar,
@@ -886,6 +901,11 @@ If it is the first time this attendee has proposed a new date/time, increment th
                         $old_entryid = mapi_getprops($this->message, Array(PR_ENTRYID));
                         $calmsg = mapi_folder_createmessage($calFolder);
                         mapi_copyto($this->message, array(), array(), $calmsg); /* includes attachments and recipients */
+
+                        // After creating new MR, If local categories exist then apply it on new MR.
+                        if(!empty($localCategories)) {
+                            mapi_setprops($calmsg, $localCategories);
+                        }
 
                         $calItemProps = Array();
                         $calItemProps[PR_MESSAGE_CLASS] = 'IPM.Appointment';
@@ -930,21 +950,7 @@ If it is the first time this attendee has proposed a new date/time, increment th
                         // add owner to recipient table
                         $recips = array();
                         $this->addOrganizer($props, $recips);
-
-                        if($isDelegate) {
-                            /**
-                             * If user is delegate then remove that user from recipienttable of the MR.
-                             * and delegate MR mail doesn't contain any of the attendees in recipient table.
-                             * So, other required and optional attendees are added from
-                             * toattendeesstring and ccattendeesstring properties.
-                             */
-                            $this->setRecipsFromString($recips, $messageprops[$this->proptags['toattendeesstring']], MAPI_TO);
-                            $this->setRecipsFromString($recips, $messageprops[$this->proptags['ccattendeesstring']], MAPI_CC);
-                            mapi_message_modifyrecipients($calmsg, 0, $recips);
-                        } else {
-                            mapi_message_modifyrecipients($calmsg, MODRECIP_ADD, $recips);
-                        }
-
+                        mapi_message_modifyrecipients($calmsg, MODRECIP_ADD, $recips);
                         mapi_savechanges($calmsg);
 
                         // Move the message to the wastebasket
@@ -959,6 +965,11 @@ If it is the first time this attendee has proposed a new date/time, increment th
                         $props = mapi_getprops($this->message);
 
                         $props[PR_MESSAGE_CLASS] = 'IPM.Appointment';
+
+                        // After creating new MR, If local categories exist then apply it on new MR.
+                        if (!empty($localCategories)) {
+                            mapi_setprops($new, $localCategories);
+                        }
 
                         /*
                          * the client which has sent this meeting request can generate wrong flagdueby
@@ -1006,20 +1017,7 @@ If it is the first time this attendee has proposed a new date/time, increment th
                             $recips = mapi_table_queryallrows($reciptable, $this->recipprops);
 
                         $this->addOrganizer($props, $recips);
-
-                        if($isDelegate) {
-                            /**
-                             * If user is delegate then remove that user from recipienttable of the MR.
-                             * and delegate MR mail doesn't contain any of the attendees in recipient table.
-                             * So, other required and optional attendees are added from
-                             * toattendeesstring and ccattendeesstring properties.
-                             */
-                            $this->setRecipsFromString($recips, $messageprops[$this->proptags['toattendeesstring']], MAPI_TO);
-                            $this->setRecipsFromString($recips, $messageprops[$this->proptags['ccattendeesstring']], MAPI_CC);
-                            mapi_message_modifyrecipients($new, 0, $recips);
-                        } else {
-                            mapi_message_modifyrecipients($new, MODRECIP_ADD, $recips);
-                        }
+                        mapi_message_modifyrecipients($new, MODRECIP_ADD, $recips);
                         mapi_savechanges($new);
 
                         $props = mapi_getprops($new, array(PR_ENTRYID));
@@ -1106,11 +1104,11 @@ If it is the first time this attendee has proposed a new date/time, increment th
         $calendaritem = false;
 
         // Remove any previous calendar items with this goid and appt id
-        $messageprops = mapi_getprops($this->message, Array($this->proptags['goid'], $this->proptags['goid2'], PR_RCVD_REPRESENTING_NAME));
+        $messageprops = mapi_getprops($this->message, Array($this->proptags['goid'], $this->proptags['goid2'], PR_RCVD_REPRESENTING_ENTRYID));
 
         // If this meeting request is received by a delegate then open delegator's store.
-        if (isset($messageprops[PR_RCVD_REPRESENTING_NAME])) {
-            $delegatorStore = $this->getDelegatorStore($messageprops[PR_RCVD_REPRESENTING_NAME], array(PR_IPM_APPOINTMENT_ENTRYID));
+        if (isset($messageprops[PR_RCVD_REPRESENTING_ENTRYID])) {
+            $delegatorStore = $this->getDelegatorStore($messageprops[PR_RCVD_REPRESENTING_ENTRYID], array(PR_IPM_APPOINTMENT_ENTRYID));
 
             $store = $delegatorStore['store'];
             $calFolder = $delegatorStore[PR_IPM_APPOINTMENT_ENTRYID];
@@ -1197,12 +1195,12 @@ If it is the first time this attendee has proposed a new date/time, increment th
             return false;
         }
 
-        $messageprops = mapi_getprops($this->message, Array(PR_ENTRYID, $this->proptags['goid'], PR_RCVD_REPRESENTING_NAME, PR_MESSAGE_CLASS));
+        $messageprops = mapi_getprops($this->message, Array(PR_ENTRYID, $this->proptags['goid'], PR_RCVD_REPRESENTING_ENTRYID, PR_MESSAGE_CLASS));
 
         $goid = $messageprops[$this->proptags['goid']];
 
-        if (isset($messageprops[PR_RCVD_REPRESENTING_NAME])) {
-            $delegatorStore = $this->getDelegatorStore($messageprops[PR_RCVD_REPRESENTING_NAME], array(PR_IPM_APPOINTMENT_ENTRYID));
+        if (isset($messageprops[PR_RCVD_REPRESENTING_ENTRYID])) {
+            $delegatorStore = $this->getDelegatorStore($messageprops[PR_RCVD_REPRESENTING_ENTRYID], array(PR_IPM_APPOINTMENT_ENTRYID));
 
             $store = $delegatorStore['store'];
             $calFolder = $delegatorStore[PR_IPM_APPOINTMENT_ENTRYID];
@@ -1794,9 +1792,9 @@ If it is the first time this attendee has proposed a new date/time, increment th
     {
         if($store === false) {
             // If this meeting request is received by a delegate then open delegator's store.
-            $messageProps = mapi_getprops($this->message, array(PR_RCVD_REPRESENTING_NAME));
-            if (isset($messageProps[PR_RCVD_REPRESENTING_NAME])) {
-                $delegatorStore = $this->getDelegatorStore($messageProps[PR_RCVD_REPRESENTING_NAME]);
+            $messageProps = mapi_getprops($this->message, array(PR_RCVD_REPRESENTING_ENTRYID));
+            if (isset($messageProps[PR_RCVD_REPRESENTING_ENTRYID])) {
+                $delegatorStore = $this->getDelegatorStore($messageProps[PR_RCVD_REPRESENTING_ENTRYID]);
 
                 $store = $delegatorStore['store'];
             } else {
@@ -1825,22 +1823,22 @@ If it is the first time this attendee has proposed a new date/time, increment th
 
     /**
      * Function will resolve the user and open its store
-     * @param String $userName display name of the user
+	 * @param String $ownerentryid the entryid of the user
      * @return MAPIStore store of the user
      */
-    function openCustomUserStore($userName)
+    function openCustomUserStore($ownerentryid)
     {
-        // resolve user
         $ab = mapi_openaddressbook($this->session);
 
-        $userName = array(array(PR_DISPLAY_NAME => $userName));
-        $user = mapi_ab_resolvename($ab, $userName, EMS_AB_ADDRESS_LOOKUP);
+        try {
+            $mailuser = mapi_ab_openentry($ab, $ownerentryid);
+        } catch (MAPIException $e) {
+            return;
+        }
 
-        // Get StoreEntryID by username
-        $userEntryid = mapi_msgstore_createentryid($this->store, $user[0][PR_EMAIL_ADDRESS]);
-
-        // Open store of the user
-        $userStore = mapi_openmsgstore($this->session, $userEntryid);
+        $mailuserprops = mapi_getprops($mailuser, array(PR_EMAIL_ADDRESS));
+        $storeid = mapi_msgstore_createentryid($this->store, $mailuserprops[PR_EMAIL_ADDRESS]);
+        $userStore = mapi_openmsgstore($this->session, $storeid);
 
         return $userStore;
     }
@@ -2096,9 +2094,8 @@ If it is the first time this attendee has proposed a new date/time, increment th
 
         if($props[PR_ADDRTYPE] == 'SMTP') {
             return $props[PR_EMAIL_ADDRESS];
-        } else { // TODO remove else case and just return
-            return $props[PR_SMTP_ADDRESS];
         }
+        return $props[PR_SMTP_ADDRESS];
     }
 
     /**
@@ -2203,46 +2200,6 @@ If it is the first time this attendee has proposed a new date/time, increment th
 
             // Add organizer to recipients list.
             array_unshift($recipients, $organizer);
-        }
-    }
-
-    /**
-     * Function adds recipients in recips array from the string.
-     *
-     * @param array $recips recipient array.
-     * @param string $recipString recipient string attendees.
-     * @param int $type type of the recipient, MAPI_TO/MAPI_CC.
-     */
-    function setRecipsFromString(&$recips, $recipString, $recipType = MAPI_TO)
-    {
-        $ab = mapi_openaddressbook($this->session);
-        $recipArray = explode(';', $recipString);
-
-        foreach($recipArray as $recip) {
-            $recip = trim($recip);
-            if (!empty($recip)) {
-                try {
-                    $userName = array(array(PR_DISPLAY_NAME => $recip));
-                    $user = mapi_ab_resolvename($ab, $userName, EMS_AB_ADDRESS_LOOKUP);
-
-                    $extraRecipient = array();
-                    $extraRecipient[PR_RECIPIENT_TYPE] = $recipType;
-                    $extraRecipient[PR_ENTRYID] = $user[0][PR_ENTRYID];
-                    $extraRecipient[PR_DISPLAY_NAME] = $user[0][PR_DISPLAY_NAME];
-                    $extraRecipient[PR_OBJECT_TYPE] = $user[0][PR_OBJECT_TYPE];
-                    $extraRecipient[PR_EMAIL_ADDRESS] = $user[0][PR_EMAIL_ADDRESS];
-                    $extraRecipient[PR_SMTP_ADDRESS] = $user[0][PR_SMTP_ADDRESS];
-                    $extraRecipient[PR_ADDRTYPE] = $user[0][PR_ADDRTYPE];
-                    array_push($recips, $extraRecipient);
-                } catch (MAPIException $e) {
-                    // We couldn't resolve the user, fallback to filling
-                    // in the properties which we do know.
-                    $extraRecipient = array();
-                    $extraRecipient[PR_RECIPIENT_TYPE] = $recipType;
-                    $extraRecipient[PR_DISPLAY_NAME] = $recip;
-                    array_push($recips, $extraRecipient);
-                }
-            }
         }
     }
 
@@ -2429,7 +2386,7 @@ If it is the first time this attendee has proposed a new date/time, increment th
         $i = 0;
         $len = count($resourceRecipients);
         while(!$this->errorSetResource && $i < $len){
-            $userStore = $this->openCustomUserStore($resourceRecipients[$i][PR_DISPLAY_NAME]);
+            $userStore = $this->openCustomUserStore($resourceRecipients[$i][PR_ENTRYID]);
 
             // Open root folder
             $userRoot = mapi_msgstore_openentry($userStore, null);
@@ -2956,6 +2913,10 @@ If it is the first time this attendee has proposed a new date/time, increment th
         if ($prefix && isset($newmessageprops[PR_SUBJECT]))
             $newmessageprops[PR_SUBJECT] = $prefix . $newmessageprops[PR_SUBJECT];
 
+        if(isset($newmessageprops[$this->proptags['categories']]) &&
+            !empty($newmessageprops[$this->proptags['categories']])) {
+            unset($newmessageprops[$this->proptags['categories']]);
+        }
         mapi_setprops($new, $newmessageprops);
 
         // Copy attachments
@@ -3435,7 +3396,7 @@ If it is the first time this attendee has proposed a new date/time, increment th
      */
     function getCorrespondentCalendarItem($open = true)
     {
-        $props = mapi_getprops($this->message, array(PR_MESSAGE_CLASS, $this->proptags['goid'], $this->proptags['goid2'], PR_RCVD_REPRESENTING_NAME));
+        $props = mapi_getprops($this->message, array(PR_MESSAGE_CLASS, $this->proptags['goid'], $this->proptags['goid2'], PR_RCVD_REPRESENTING_ENTRYID));
 
         if(!$this->isMeetingRequest($props[PR_MESSAGE_CLASS]) && !$this->isMeetingRequestResponse($props[PR_MESSAGE_CLASS]) && !$this->isMeetingCancellation($props[PR_MESSAGE_CLASS])) {
             // can work only with meeting requests/responses/cancellations
@@ -3446,8 +3407,8 @@ If it is the first time this attendee has proposed a new date/time, increment th
         $cleanGlobalId = $props[$this->proptags['goid2']];
 
         // If Delegate is processing Meeting Request/Response for Delegator then retrieve Delegator's store and calendar.
-        if (isset($props[PR_RCVD_REPRESENTING_NAME])) {
-            $delegatorStore = $this->getDelegatorStore($props[PR_RCVD_REPRESENTING_NAME], array(PR_IPM_APPOINTMENT_ENTRYID));
+        if (isset($props[PR_RCVD_REPRESENTING_ENTRYID])) {
+            $delegatorStore = $this->getDelegatorStore($props[PR_RCVD_REPRESENTING_ENTRYID], array(PR_IPM_APPOINTMENT_ENTRYID));
 
             $store = $delegatorStore['store'];
             $calFolder = $delegatorStore[PR_IPM_APPOINTMENT_ENTRYID];
@@ -3500,7 +3461,7 @@ If it is the first time this attendee has proposed a new date/time, increment th
     {
         $occurItem = false;
 
-        $props = mapi_getprops($this->message, array(PR_RCVD_REPRESENTING_NAME, $this->proptags['recurring']));
+        $props = mapi_getprops($this->message, array(PR_RCVD_REPRESENTING_ENTRYID, $this->proptags['recurring']));
 
         // check if the passed item is recurring series
         if($props[$this->proptags['recurring']] !== false) {
@@ -3509,8 +3470,8 @@ If it is the first time this attendee has proposed a new date/time, increment th
 
         if($store === false) {
             // If Delegate is processing Meeting Request/Response for Delegator then retrieve Delegator's store and calendar.
-            if (isset($props[PR_RCVD_REPRESENTING_NAME])) {
-                $delegatorStore = $this->getDelegatorStore($props[PR_RCVD_REPRESENTING_NAME]);
+            if (isset($props[PR_RCVD_REPRESENTING_ENTRYID])) {
+                $delegatorStore = $this->getDelegatorStore($props[PR_RCVD_REPRESENTING_ENTRYID]);
                 $store = $delegatorStore['store'];
             } else {
                 $store = $this->store;
@@ -3553,6 +3514,8 @@ If it is the first time this attendee has proposed a new date/time, increment th
                     $this->proptags['recurring'],
                     $this->proptags['clipstart'],
                     $this->proptags['clipend'],
+                    PR_RCVD_REPRESENTING_ENTRYID,
+                    $this->proptags['basedate'],
                     PR_RCVD_REPRESENTING_NAME
                 )
         );
@@ -3561,8 +3524,8 @@ If it is the first time this attendee has proposed a new date/time, increment th
             $userStore = $this->store;
 
             // check if delegate is processing the response
-            if (isset($messageProps[PR_RCVD_REPRESENTING_NAME])) {
-                $delegatorStore = $this->getDelegatorStore($messageProps[PR_RCVD_REPRESENTING_NAME], array(PR_IPM_APPOINTMENT_ENTRYID));
+            if (isset($messageProps[PR_RCVD_REPRESENTING_ENTRYID])) {
+                $delegatorStore = $this->getDelegatorStore($messageProps[PR_RCVD_REPRESENTING_ENTRYID], array(PR_IPM_APPOINTMENT_ENTRYID));
 
                 $userStore = $delegatorStore['store'];
                 $calFolder = $delegatorStore[PR_IPM_APPOINTMENT_ENTRYID];
@@ -3609,6 +3572,15 @@ If it is the first time this attendee has proposed a new date/time, increment th
             } else {
                 // Get all items in the timeframe that we want to book, and get the goid and busystatus for each item
                 $items = getCalendarItems($userStore, $calFolder, $messageProps[$this->proptags['startdate']], $messageProps[$this->proptags['duedate']], array($this->proptags['goid'], $this->proptags['busystatus']));
+
+                if(isset($messageProps[$this->proptags['basedate']]) && !empty($messageProps[$this->proptags['basedate']])) {
+                    $basedate = $messageProps[$this->proptags['basedate']];
+                    // Get the goid2 from recurring MR which further used to
+                    // check the resource conflicts item.
+                    $recurrItemProps = mapi_getprops($this->message, array($this->proptags['goid2']));
+                    $messageProps[$this->proptags['goid']] = $this->setBasedateInGlobalID($recurrItemProps[$this->proptags['goid2']], $basedate);
+                    $messageProps[$this->proptags['goid2']] = $recurrItemProps[$this->proptags['goid2']];
+                }
 
                 foreach($items as $item) {
                     if ($item[$this->proptags['busystatus']] !== fbFree) {
@@ -3667,15 +3639,15 @@ If it is the first time this attendee has proposed a new date/time, increment th
 
     /**
      * Function will return delegator's store and calendar folder for processing meetings
-     * @param String $receivedRepresentingName name of the delegator user
+     * @param String $receivedRepresentingEnryid entryid of the delegator user
      * @param Array $foldersToOpen contains list of folder types that should be returned in result
      * @return Array contains store of the delegator and resource of folders if $foldersToOpen is not empty
      */
-    function getDelegatorStore($receivedRepresentingName, $foldersToOpen = array())
+    function getDelegatorStore($receivedRepresentingEntryId, $foldersToOpen = array())
     {
         $returnData = Array();
 
-        $delegatorStore = $this->openCustomUserStore($receivedRepresentingName);
+        $delegatorStore = $this->openCustomUserStore($receivedRepresentingEntryId);
         $returnData['store'] = $delegatorStore;
 
         if(!empty($foldersToOpen)) {
@@ -3723,4 +3695,70 @@ If it is the first time this attendee has proposed a new date/time, increment th
     {
         $this->meetingTimeInfo = $meetingTimeInfo;
     }
+
+    /**
+     * Helper function which is use to get local categories of all occurrence.
+     *
+     * @param MAPIMessage $calendarItem meeting request item
+     * @param MAPIStore $store store containing calendar folder
+     * @param MAPIFolder $calFolder calendar folder
+     * @return Array $localCategories which contain array of basedate along with categories
+     */
+    function getLocalCategories($calendarItem, $store, $calFolder)
+    {
+        $calendarItemProps = mapi_getprops($calendarItem);
+        $recurrence = new Recurrence($store, $calendarItem);
+
+        //Retrieve all occurrences(max: 30 occurrence because recurrence can also be set as 'no end date')
+        $items = $recurrence->getItems($calendarItemProps[$this->proptags['clipstart']], $calendarItemProps[$this->proptags['clipend']] * (24*24*60), 30);
+        $localCategories = array();
+
+        foreach ($items as $item) {
+            $recurrenceItems = $recurrence->getCalendarItems($store, $calFolder, $item[$this->proptags['startdate']], $item[$this->proptags['duedate']], array($this->proptags['goid'], $this->proptags['busystatus'], $this->proptags['categories']));
+            foreach ($recurrenceItems as $recurrenceItem) {
+
+                // Check if occurrence is exception then get the local categories of that occurrence.
+                if (isset($recurrenceItem[$this->proptags['goid']]) && $recurrenceItem[$this->proptags['goid']] == $calendarItemProps[$this->proptags['goid']]) {
+
+                    $exceptionAttach = $recurrence->getExceptionAttachment($recurrenceItem['basedate']);
+
+                    if ($exceptionAttach) {
+                        $exception = mapi_attach_openobj($exceptionAttach, 0);
+                        $exceptionProps = mapi_getprops($exception, array($this->proptags['categories']));
+                        if (isset($exceptionProps[$this->proptags['categories']])) {
+                            $localCategories[$recurrenceItem['basedate']] = $exceptionProps[$this->proptags['categories']];
+                        }
+}                   
+                }
+            }
+        }
+
+        return $localCategories;
+	}
+
+    /**
+     * Helper function which is use to apply local categories on respective occurrences.
+     *
+     * @param MAPIMessage $calendarItem meeting request item
+     * @param MAPIStore $store store containing calendar folder
+     * @param Array $localCategories array contains basedate and array of categories
+     */
+    function applyLocalCategories($calendarItem, $store, $localCategories)
+    {
+        $calendarItemProps = mapi_getprops($calendarItem, array(PR_PARENT_ENTRYID, PR_ENTRYID));
+        $message = mapi_msgstore_openentry($store, $calendarItemProps[PR_ENTRYID]);
+        $recurrence = new Recurrence($store, $message);
+
+        // Check for all occurrence if it is exception then modify the exception by setting up categories,
+        // Otherwise create new exception with categories.
+        foreach ($localCategories as $key => $value) {
+            if ($recurrence->isException($key)) {
+                $recurrence->modifyException(array($this->proptags['categories'] => $value), $key);
+            } else {
+                $recurrence->createException(array($this->proptags['categories'] => $value), $key, false);
+            }
+            mapi_savechanges($message);
+        }
+    }
 }
+

@@ -92,7 +92,7 @@ try {
 				echo '<a href="install/upgrade.php">Click here to launch the upgrade</a>';
 				exit();
 			}
-			header('Location: '.GO::config()->host.'install/upgrade.php');				
+			header('Location: '.GO::config()->host.'install/upgrade.php');
 			exit();
 		}
 	}

@@ -25,6 +25,11 @@ go.modules.community.addressbook.SystemSettingsPanel = Ext.extend(go.systemsetti
 					name: "autoLinkEmail",
 					disabled: !GO.savemailas,
 					hint: t("Warning: this will copy e-mails to the Group-Office storage and will therefore increase disk space usage. The e-mail will be visible to all people that can view the contact too.")
+				},{
+					hideLabel: true,
+					xtype: "checkbox",
+					boxLabel: t("Restrict export to administrators"),
+					name: "restrictExportToAdmins"
 				}]
 		}];
 

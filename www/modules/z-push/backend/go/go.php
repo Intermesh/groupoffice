@@ -43,7 +43,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	 * Indicates which AS version is supported by the backend.
 	 *
 	 * @access public
-	 * @return StringHelper       AS version constant
+	 * @return string       AS version constant
 	 */
 	public function GetSupportedASVersion() {
 		return ZPush::ASV_14;
@@ -69,7 +69,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 //	/**
 //	 * Loads a backend class file identified by filename
 //	 * 
-//	 * @param StringHelper $backendname
+//	 * @param string $backendname
 //	 * @return boolean
 //	 */
 //	private function _includeBackend($backendname) {
@@ -91,14 +91,14 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	 * All other backends are automatically logged in when they are connecting 
 	 * through this base backend.
 	 * 
-	 * @param StringHelper $username
-	 * @param StringHelper $domain
-	 * @param StringHelper $password
+	 * @param string $username
+	 * @param string $domain
+	 * @param string $password
 	 * @return boolean
 	 */
 	public function Logon($username, $domain, $password) {
 		
-		// if it is eamil aderes try to use the name to login
+		// if it is e-mail address try to use the name to login
 		if(strpos($username, '@') && !(defined('USE_FULLEMAIL_FOR_LOGIN') && USE_FULLEMAIL_FOR_LOGIN)) {
 				$username = Utils::GetLocalPartFromEmail($username);
 		}
@@ -123,7 +123,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 			}			
 
 			$state = new go\core\auth\TemporaryState();
-			$state->setUser($user);		
+			$state->setUserId($user->id);
 			\go()->setAuthState($state);		
 
 			$this->oldLogin($user);	
@@ -172,7 +172,19 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		}
 		return true;
 	}
-	
+
+	/**
+	 * Returns the email address and the display name of the user. Used by autodiscover.
+	 *
+	 * @param string        $username           The username
+	 *
+	 * @access public
+	 * @return Array
+	 */
+	public function GetUserDetails($username) {
+		$user = go()->getAuthState()->getUser(['id', 'username', 'displayName', 'email']);
+		return array('emailaddress' => $user->email, 'fullname' => $user->displayName);
+	}
 	
 		/**
 	 * for old framework to work in GO::session()
@@ -207,9 +219,9 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	 *
 	 * The ACLcheck MUST fail if a folder of the authenticated user is checked!
 	 *
-	 * @param StringHelper        $store              target store, could contain a "domain\user" value
+	 * @param string        $store              target store, could contain a "domain\user" value
 	 * @param boolean       $checkACLonly       if set to true, Setup() should just check ACLs
-	 * @param StringHelper        $folderid           if set, only ACLs on this folderid are relevant
+	 * @param string        $folderid           if set, only ACLs on this folderid are relevant
 	 * @return boolean
 	 */
 	public function Setup($store, $checkACLonly = false, $folderid = false, $readonly = false) {
@@ -236,8 +248,8 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	 * Returns an understandable folderid for the backend
 	 * For example it looks like: "c/GroupOfficeContacts"
 	 *
-	 * @param StringHelper        $folderid       combinedid of the folder
-	 * @return StringHelper
+	 * @param string        $folderid       combinedid of the folder
+	 * @return string
 	 */
 	public function GetBackendFolder($folderid) {
 	//	ZLog::Write(LOGLEVEL_DEBUG, "BackendGO->GetBackendFolder('.$folderid.')");
@@ -251,7 +263,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	/**
 	 * Returns backend id for a folder
 	 *
-	 * @param StringHelper $folderid	combined id of the folder
+	 * @param string $folderid	combined id of the folder
 	 * @return object
 	 */
 	public function GetBackendId($folderid) {
@@ -266,7 +278,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	/**
 	 * Finds the correct backend for a folder
 	 *
-	 * @param StringHelper $folderid	combined id of the folder
+	 * @param string $folderid	combined id of the folder
 	 * @return object
 	 */
 	public function GetBackend($folderid) {
@@ -290,10 +302,10 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	/**
 	 * Processes a response to a meeting request.
 	 *
-	 * @param StringHelper        $requestid      id of the object containing the request
-	 * @param StringHelper        $folderid       id of the parent folder of $requestid
-	 * @param StringHelper        $response
-	 * @return StringHelper       id of the created/updated calendar obj
+	 * @param string        $requestid      id of the object containing the request
+	 * @param string        $folderid       id of the parent folder of $requestid
+	 * @param string        $response
+	 * @return string       id of the created/updated calendar obj
 	 * @throws StatusException
 	 */
 	public function MeetingResponse($requestid, $folderid, $error) {
@@ -329,7 +341,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	 * Returns the content of the named attachment as stream.
 	 * There is no way to tell which backend the attachment is from, so we try them all
 	 *
-	 * @param StringHelper        $attname
+	 * @param string        $attname
 	 * @return SyncItemOperationsAttachment
 	 * @throws StatusException
 	 */
@@ -347,7 +359,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	 * Returns the exporter to send changes to the mobile
 	 * the exporter from right backend for contents exporter and our own exporter for hierarchy exporter
 	 *
-	 * @param StringHelper        $folderid (opt)
+	 * @param string        $folderid (opt)
 	 * @return object(ExportChanges)
 	 */
 	public function GetExporter($folderid = false) {
@@ -378,8 +390,8 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	/**
 	 * Returns all available data of a single message
 	 *
-	 * @param StringHelper            $folderid
-	 * @param StringHelper            $id
+	 * @param string            $folderid
+	 * @param string            $id
 	 * @param ContentParameters $contentparameters flag
 	 * @return object(SyncObject)
 	 * @throws StatusException
@@ -396,7 +408,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	 * Returns the waste basket
 	 * If the wastebasket is set to one backend, return the wastebasket of that backend
 	 * else return the first waste basket we can find
-	 * @return StringHelper
+	 * @return string
 	 */
 	function GetWasteBasket() {
 		ZLog::Write(LOGLEVEL_DEBUG, "Combined->GetWasteBasket()");
@@ -455,7 +467,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	/**
 	 * Returns the importer to process changes from the mobile
 	 *
-	 * @param StringHelper $folderid (opt)
+	 * @param string $folderid (opt)
 	 * @return object(ImportChanges)
 	 */
 	public function GetImporter($folderid = false) {
@@ -521,7 +533,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	/**
 	 * Get the supported search options for the GO backend
 	 * 
-	 * @param StringHelper $searchtype GAL / MAILBOX
+	 * @param string $searchtype GAL / MAILBOX
 	 * @return boolean
 	 */
 	public function SupportsType($searchtype) {
@@ -583,7 +595,7 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 	 * Folders which were not initialized should not result in a notification
 	 * of IBacken->ChangesSink().
 	 *
-	 * @param StringHelper        $folderid
+	 * @param string        $folderid
 	 *
 	 * @access public
 	 * @return boolean      false if found can not be found

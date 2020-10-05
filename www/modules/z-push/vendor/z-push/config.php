@@ -74,6 +74,12 @@
  *  using the memcache provider for multi-host environments.
  *  When another implementation should be used, the class can be set here explicitly.
  *  If empty Z-Push will try to use available providers.
+
+ *  Possible values:
+ *  IpcSharedMemoryProvider - default. Requires z-push-ipc-sharedmemory package.
+ *  IpcMemcachedProvider    - requires z-push-ipc-memcached package. It is necessary to set up
+ *                            memcached server before (it won't be installed by z-push-ipc-memcached).
+ *  IpcWincacheProvider     - for windows systems.
  */
     define('IPC_PROVIDER', '');
 
@@ -356,6 +362,9 @@
  *                          When replying in this folder, automatically do Send-As
  *                      DeviceManager::FLD_FLAGS_CALENDARREMINDERS
  *                          If set, Outlook shows reminders for these shares with KOE
+ *                      DeviceManager::FLD_FLAGS_NOREADONLYNOTIFY
+ *                          If set, Z-Push won't send notification emails for changes
+ *                          if the folder is read-only
  *
  *  Additional notes:
  *  - on Kopano systems use backend/kopano/listfolders.php script to get a list

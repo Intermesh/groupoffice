@@ -15,7 +15,8 @@ go.smtp.AccountCombo = Ext.extend(go.form.ComboBox, {
 	store: {
 		xtype: "gostore",
 		fields: ['id', 'fromName', 'fromEmail', 'host', {name: 'name', convert: function(v, rec) {return rec.fromName + ": " + rec.fromEmail;}}],
-		entityStore: "SmtpAccount"
+		entityStore: "SmtpAccount",
+		sortBy: 'name'
 	}
 });
 

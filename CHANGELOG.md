@@ -1,3 +1,45 @@
+- Core: sort comments explicitly by creation date
+- Projects: Added finance report with date filter showing all costs, hours, income and budgets
+- Files: Fixed blob ID appearing in files after overwrite
+
+01-10-2020 6.4.173
+- Core: Fixed shifting in date fields
+- Core: Speed up 6.3 to 6.4 upgrade
+- Core: allowed modules can work with packages now. eg. $config['allowed_modules'] = ['legacy/*', 'community/*', 'business/newsletters'];
+- Core: Toggle notifications when icon is clicked
+- Core: Optimized (custom field) filter loading
+- Address book: New setting to restrict export to administrators
+- ActiveSync: Set USE_FULLEMAIL_FOR_LOGIN back to the default value (true)
+- Core: Test script checks whether modules subdirectory is writable if Professional License available
+- Studio: return user friendly feedback if module directory not writable;
+- Address book: Unlinking organization updates search cache
+- Email: When links were removed they were no longer removed when there are no links left
+- Studio: Replace permissions panel with share panel
+- Studio: Unlock a studio module upon opening the wizard after confirm
+- E-mail: Always process calendar invites. (not just when message is unread)
+
+25-09-2020 6.4.172
+- Timeregistration: When changing the start time, the end time will change instead of the duration
+- ActiveSync: Upgraded z-push to 2.5.2 and fixed e-mail sending problem on iOS 14.0. You might need to correct the email address in your iOS account too!
+- ActiveSync: Fixed no results when searching All folders. It will search inbox only in that case for performance reasons. We'll fix this later.
+- Core: Restore correct height of windows when closing in collapsed state
+
+21-09-2020 6.4.171
+- Release in GitHub
+
+21-09-2020 6.4.170
+- Time registration: use start time of same weekday in previous week as start time for first entry of the day
+- DAV: Fixed case sensitive login
+- Email: Worked around error if status could not be fetched from IMAP
+- Core: Updated PT-BR Translations thanks to Everson Guimarães!
+- Core: Disable username field if using external authentication
+- Core: Fixed shifting custom field date column in some timezones
+- Files: Fixed upload to files module where files with identical content wouldn't upload more than once
+- Core: Fixed not found error on compressing folders.
+- Custom Fields: Fixed render bug in field dialog.
+- Newsletters: Bugfix, make SMTP accounts sortable and scrollable in System settings;
+- Newsletters: add text filter to SMTP combobbox, sort SMTP combobox items by name.
+
 15-09-2020 6.4.169
 - Core: Bugfix in language export
 - Projects: Revert search for projects to old method
@@ -39,13 +81,6 @@
 - Email: Workaround if message has invalid From header
 - Core: fixed render bug in link browser window
 - Files: Added permission checks to compress functions
-- Files: Added permission checks to compress functions
-- SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
-- Calendar: Missing resource admin email #201919703
-- Calendar: Category permissions  #202020841
-- Tickets: Only messages from agent are sent to CC contact #201919432
-- Calender: Bug changing "this and future events" #202021084
-- Calendar: No notification when a participant is removed #202021083
 - Core: Upgrade from 6.3 failed if comments module was not installed.
 - SMIME: fixed error in linked email with inline attachments
 - Core: Prevent combo from expanding when opening dialogs
@@ -1152,8 +1187,14 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Calendasr: Show unconfirmed holidays
 - Projects: Send company id when selecting contact
 
+28-09-2020 6.3.94
+- Assistant: removed install sql that could cause:
+    Exception in /usr/share/groupoffice/go/base/Module.php at line 298:
+    SQL query failed: UPDATE `fs_filehandlers` SET cls =
+    'GO\\Assistant\\Filehandler\\Assistant' WHERE
+    cls='GO\\Gota\\Filehandler\\Gota'
 
-
+28-09-2020 6.3.93
 - Files: Added permission checks to compress functions
 - SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
 - Calendar: Missing resource admin email #201919703
@@ -1161,7 +1202,17 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Tickets: Only messages from agent are sent to CC contact #201919432
 - Calender: Bug changing "this and future events" #202021084
 - Calendar: No notification when a participant is removed #202021083
+- Core: Workaround Safari 14.0 hang with 100% cpu usage
 
+16-07-2020 6.3.92
+- Core: upgrade problem with trigger
+
+07-07-2020 6.3.91
+- Calendar: Fix for "No participant found for this event"
+- Core: Start with create trigger in 6.2 upgrade to avoid problems when it's not allowed later on.
+
+05-06-2020 6.3.90
+- Core: Check if db is in invalid state (partially upgraded to 6.3) before upgraded
 - Sieve: Fixed bug where sieve dialog showed folders of other account
 - Files: Assistant installation replaces GOTA file handlers
 - Core: Removed NO_AUTO_CREATE_USER from sql_mode because it doesn't work in Mysql 8 anymore and it wasn't needed anyway.
@@ -1196,7 +1247,6 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Billing: Fixed total not always updating in expense dialog
 - Projects: Send contact ID when creating project from e-mail
 - Tasks: Fixed link to project after cancel
-
 11-10-2019 6.3.83
 - Core: Working week didn't accept half hours
 - Time Tracking: Sort time tracking activities by name

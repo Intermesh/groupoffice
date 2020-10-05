@@ -31,31 +31,41 @@ use GO\Base\Model\Acl;
 
 class ModuleCollection extends Model\ModelCollection{
 	
-	private $_allowedModules;
+	private static $allowedModules;
 	
 	public function __construct($model='GO\Base\Model\Module'){
 
 		parent::__construct($model);
 	}
 	
-	
-	
-	
-	
-	private function _isAllowed($name){
+	public static function isAllowed($name, $package = null){
 		
-		if(!isset($this->_allowedModules)) {
+		if(!isset(self::$allowedModules)) {
 			if(!empty(\GO::config()->allowed_modules)) {
-				$this->_allowedModules = explode(',', \GO::config()->allowed_modules);		
-				$this->_allowedModules = array_merge($this->_allowedModules, ['core', 'links', 'search', 'users', 'modules', 'groups', 'customfields']);
+				if(!is_array(\GO::config()->allowed_modules)) {
+					self::$allowedModules = explode(',', \GO::config()->allowed_modules);
+				} else{
+					self::$allowedModules = \GO::config()->allowed_modules;
+				}
+				self::$allowedModules = array_merge(self::$allowedModules, ['core/core']);
 				
 			} else
 			{
-				$this->_allowedModules = [];
+				self::$allowedModules = [];
 			}
 		}
-		
-		return empty($this->_allowedModules) || in_array($name, $this->_allowedModules);			
+
+		if(empty(self::$allowedModules)) {
+			return true;
+		}
+
+		if(isset($package)) {
+			$name = $package . "/" . $name;
+			return in_array($name, self::$allowedModules) || in_array($package . "/*", self::$allowedModules);
+		} else{
+			return in_array($name, self::$allowedModules) || in_array(  "legacy/*", self::$allowedModules);
+		}
+
 	}
 	
 	/**
@@ -97,7 +107,7 @@ class ModuleCollection extends Model\ModelCollection{
 		$classFinder->addNamespace("go\\modules");
 		$mods = $classFinder->findByParent(\go\core\Module::class);
 		$mods = array_filter($mods, function($mod) {
-			return $this->_isAllowed($mod::getName());
+			return static::isAllowed($mod::getName(), $mod::getPackage());
 		});
 		$modules = array_merge($modules, $mods);
 		
@@ -116,7 +126,7 @@ class ModuleCollection extends Model\ModelCollection{
 	 */
 	public function isAvailable($moduleId, $checkModuleAvailabiltiy=true){
 		
-		if(!$this->_isAllowed($moduleId))
+		if(!static::isAllowed($moduleId))
 			return false;
 		
 		$folder = new Fs\Folder(\GO::config()->root_path.'modules/'.$moduleId);
@@ -215,7 +225,7 @@ class ModuleCollection extends Model\ModelCollection{
 	{
 			$model = $this->model->findByName($name);
 
-			if (!$model || !$this->_isAllowed($model->name))
+			if (!$model || !static::isAllowed($model->name))
 					return false;
 
 			if ($checkEnabled && !$model->enabled)
@@ -259,7 +269,7 @@ class ModuleCollection extends Model\ModelCollection{
 		$stmt = $this->model->find($findParams);
 		$modules = array();
 		while($module = $stmt->fetch()){
-			if($this->_isAllowed($module->name) && $module->isAvailable())
+			if(static::isAllowed($module->name, $module->package) && $module->isAvailable())
 				$modules[]=$module;
 		}
 		
