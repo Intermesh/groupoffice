@@ -1,3 +1,4 @@
+05-10-2020 6.4.174
 - Core: sort comments explicitly by creation date
 - Core: Added Romaian holidays and translations. Thanks to safetybroker.ro 
 - Projects: Added finance report with date filter showing all costs, hours, income and budgets
@@ -7,6 +8,7 @@
 - Core: prevent spell check on text fields and enable on text area's
 - Core: Fixed: 6.4.70 user:department value #490 by adding it to user account dialog
 - Calendar: Added missing charset and method to calendar invites
+- ActiveSync: Fixed problem where some attachments didn't show on iphone/iOS
 
 01-10-2020 6.4.173
 - Core: Fixed shifting in date fields

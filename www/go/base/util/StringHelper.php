@@ -300,7 +300,7 @@ class StringHelper {
 		$source_charset = self::fixCharset($source_charset);
 		try {
 			$c = iconv($source_charset, 'UTF-8//IGNORE', $str);
-		} catch(\ErrorException $e) {
+		} catch(\Exception $e) {
 			//Does not always work. We suppress the:
 			//Notice:  iconv() [function.iconv]: Detected an illegal character in input string in /var/www/community/trunk/www/classes/String.class.inc.php on line 31		
 		}

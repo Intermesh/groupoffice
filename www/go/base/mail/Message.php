@@ -392,9 +392,9 @@ class Message extends \Swift_Message{
 
 					$mime_type = $part->ctype_primary.'/'.$part->ctype_secondary;
 
-					if(isset($part->headers['content-id']))
+          //only embed if we can find the content-id in the body
+					if(isset($part->headers['content-id']) && ($content_id=trim($part->headers['content-id'],' <>')) && strpos($this->_loadedBody, $content_id) !== false)
 					{
-						$content_id=trim($part->headers['content-id'],' <>');
 						$img = \Swift_EmbeddedFile::fromPath($tmp_file);
 						$img->setContentType($mime_type);
 						
