@@ -55,7 +55,13 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				{name: "permissionLevel", type: "int"},
 				{name: "labels", type: "relation"}
 			],
-			entityStore: "Comment"
+			entityStore: "Comment",
+			remoteSort: true,
+			sortInfo: {
+				field: "createdAt",
+				direction: 'ASC'
+
+			}
 		});
 		
 		this.store.on('load', function(store,records,options) {		
