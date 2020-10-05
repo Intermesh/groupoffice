@@ -6,6 +6,7 @@
 - Core: fixed Multi select custom field / chips component rendered small list.
 - Core: prevent spell check on text fields and enable on text area's
 - Core: Fixed: 6.4.70 user:department value #490 by adding it to user account dialog
+- Calendar: Added missing charset and method to calendar invites
 
 01-10-2020 6.4.173
 - Core: Fixed shifting in date fields
