@@ -50,11 +50,12 @@ class DateTime extends \DateTime {
 	/**
 	 * Get the easter date time object with the correct timezone
 	 * @param int $year
+	 *
 	 * @return DateTime
 	 */
-	public static function getEasterDatetime($year) {
+	public static function getEasterDatetime($year, $defEasterCalendar) {
 			$base = new \DateTime("$year-03-21");
-			$days = easter_days($year);
+			$days = easter_days($year, $defEasterCalendar);
 
 			return $base->add(new \DateInterval("P{$days}D"));
 	}

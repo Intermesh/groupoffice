@@ -199,8 +199,8 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 	 * @param StringHelper $locale
 	 * @throws Exception 
 	 */
-	public function generateHolidays($year,$locale='en'){
-		
+	public function generateHolidays($year,$locale='en')
+	{
 		$this->deleteHolidays($year,$locale);
 		
 		// Load the holidays file for the given $locale
@@ -214,10 +214,14 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 		}
 		
 		$holidays = array();
+		$defEasterCalendar = CAL_EASTER_DEFAULT;
 		
-		if(!empty($input_holidays))
+		if(!empty($input_holidays)) {
 			$holidays = $input_holidays;
-		
+			if(isset($input_holidays['conf']['easter_calendar'])) {
+				$defEasterCalendar = $input_holidays['conf']['easter_calendar'];
+			}
+		}
 		// Set the fixed holidays from the holidays file
 		if(isset($holidays['fix'])) {
 			foreach($holidays['fix'] as $key => $record) {
@@ -248,7 +252,7 @@ class Holiday extends \GO\Base\Db\ActiveRecord {
 		if(isset($holidays['var']) && function_exists('easter_date') && $year > 1969 && $year < 2037) {
 //			$easter_day = easter_date($year);
 			
-			$easterDT = \GO\Base\Util\Date\DateTime::getEasterDatetime($year);
+			$easterDT = \GO\Base\Util\Date\DateTime::getEasterDatetime($year, $defEasterCalendar);
 			$easter_day = $easterDT->format('U');
 			
 			foreach($holidays['var'] as $key => $record) {

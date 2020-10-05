@@ -2551,12 +2551,13 @@ The following is the error message:
 			$a = new Swift_Attachment($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REPLY"');
 			$a->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
 			$a->setDisposition("inline");
+			$a->setContentType("text/calendar;method=CANCEL;charset=utf-8");
 			$message->attach($a);
 			
 			//for outlook 2003 compatibility
-			$a2 = new Swift_Attachment($ics, 'invite.ics', 'application/ics');
-			$a2->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
-			$message->attach($a2);
+//			$a2 = new Swift_Attachment($ics, 'invite.ics', 'application/ics');
+//			$a2->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
+//			$message->attach($a2);
 		}
 //		}
 
@@ -2608,12 +2609,13 @@ The following is the error message:
 				$a = new \Swift_Attachment($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="CANCEL"');
 				$a->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
 				$a->setDisposition("inline");
+				$a->setContentType("text/calendar;method=CANCEL;charset=utf-8");
 				$message->attach($a);
 				
-				//for outlook 2003 compatibility
-				$a2 = new \Swift_Attachment($ics, 'invite.ics', 'application/ics');
-				$a2->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
-				$message->attach($a2);
+//				//for outlook 2003 compatibility
+//				$a2 = new \Swift_Attachment($ics, 'invite.ics', 'application/ics');
+//				$a2->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
+//				$message->attach($a2);
 				
 //			}else{
 			if($participantEvent){
@@ -2725,6 +2727,8 @@ The following is the error message:
 					$a = new \Swift_Attachment($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REQUEST"');
 					$a->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
 					$a->setDisposition("inline");
+					$a->setContentType("text/calendar;method=REQUEST;charset=utf-8");
+
 					$message->attach($a);
 
 					//for outlook 2003 compatibility

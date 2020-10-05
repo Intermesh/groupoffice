@@ -40241,7 +40241,7 @@ Ext.form.Field = Ext.extend(Ext.BoxComponent,  {
 
     placeholder: "",
 
-    spellCheck: true,
+    spellCheck: false,
 
     fieldClass : 'x-form-field',
     
@@ -41353,8 +41353,8 @@ Ext.form.TextArea = Ext.extend(Ext.form.TextField,  {
 
     
     preventScrollbars: false,
-    
 
+		spellCheck: true,
     
     onRender : function(ct, position){
         if(!this.el){
