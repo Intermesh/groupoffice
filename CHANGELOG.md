@@ -1,4 +1,5 @@
 - Core: sort comments explicitly by creation date
+- Core: Added Romaian holidays and translations. Thanks to safetybroker.ro 
 - Projects: Added finance report with date filter showing all costs, hours, income and budgets
 - Files: Fixed blob ID appearing in files after overwrite
 - Core: Date columns included time stamp T00:00:00 which lead to date changing when in a negative time zone.
