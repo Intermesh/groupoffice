@@ -2,6 +2,7 @@
 - Projects: Added finance report with date filter showing all costs, hours, income and budgets
 - Files: Fixed blob ID appearing in files after overwrite
 - Core: Date columns included time stamp T00:00:00 which lead to date changing when in a negative time zone.
+- Core: fixed Multi select custom field / chips component rendered small list.
 
 01-10-2020 6.4.173
 - Core: Fixed shifting in date fields
