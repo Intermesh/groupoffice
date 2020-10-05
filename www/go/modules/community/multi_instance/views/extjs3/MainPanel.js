@@ -213,7 +213,8 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 			viewConfig: {
 				emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
 				forceFit: true,
-				autoFill: true
+				autoFill: true,
+				totalDisplay: true
 			},
 			autoExpandColumn: 'hostname',
 			// config options for stateful behavior
