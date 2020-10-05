@@ -1,13 +1,14 @@
 Master
-- Core: array relation with ID's keeps records
-- Core: Module dependencies are respected
 - Business: New finance module
 - Projects: new module
 - Tasks: new module
-- Business: New employee management module
 - Time tracking: new module
+
+6.5
+- Core: array relation with ID's keeps records
+- Core: Module dependencies are respected
+- Business: New employee management module
 - History: new module replacing Activity log
-end master
 
 01-10-2020 6.4.173
 - Core: Fixed shifting in date fields
