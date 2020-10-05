@@ -3,6 +3,7 @@
 - Files: Fixed blob ID appearing in files after overwrite
 - Core: Date columns included time stamp T00:00:00 which lead to date changing when in a negative time zone.
 - Core: fixed Multi select custom field / chips component rendered small list.
+- Core: prevent spell check on text fields and enable on text area's
 
 01-10-2020 6.4.173
 - Core: Fixed shifting in date fields
