@@ -703,6 +703,10 @@ class goMail extends GoBaseBackendDiff {
 		//$imapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($this->getImapAccount(), $mailbox, $id);
 
 		$headers = $imap->get_flags($id);
+		if($headers == false) {
+			return false;
+		}
+
 		$stat = false;
 		
 		if ($header = array_shift($headers)) {
