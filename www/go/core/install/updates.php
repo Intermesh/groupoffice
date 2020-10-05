@@ -723,6 +723,28 @@ $updates['202006191648'][] = "ALTER TABLE `core_entity_filter` ADD `type` ENUM('
 $updates['202006191648'][] = "ALTER TABLE `core_entity_filter` CHANGE `filter` `filter` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL;";
 $updates['202007302016'][] = "ALTER TABLE `core_customfields_field_set` ADD `columns` TINYINT NOT NULL DEFAULT '2' AFTER `isTab`;";
 
+$updates['202010051413'][] = "CREATE TABLE `core_alert` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `entityTypeId` INT NOT NULL,
+  `entityId` INT NOT NULL,
+  `userId` INT NOT NULL,
+  `triggerAt` DATETIME NOT NULL,
+  `alertId` INT NOT NULL,
+  `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `dk_alert_entityType_idx` (`entityTypeId` ASC),
+  INDEX `fk_alert_user_idx` (`userId` ASC),
+  CONSTRAINT `fk_alert_entityType`
+    FOREIGN KEY (`entityTypeId`)
+    REFERENCES `core_entity` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_alert_user`
+    FOREIGN KEY (`userId`)
+    REFERENCES `core_user` (`id`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION);";
+
 //--
 //-- Table structure for table `core_pdf_block`
 //--
