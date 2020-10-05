@@ -15,6 +15,7 @@ use GO;
 use GO\Base\Fs\Folder;
 
 use Exception;
+use go\core\ErrorHandler;
 use go\core\fs\Blob;
 
 
@@ -224,8 +225,13 @@ class Message extends \Swift_Message{
 		}
 		
 		if($loadDate){
-			$date=isset($structure->headers['date']) ? $structure->headers['date'] : date('c');		
-			$udate=new \DateTime($date);
+			$date=isset($structure->headers['date']) ? preg_replace('/\([^\)]*\)/','', $structure->headers['date']) : date('c');
+			try {
+				$udate = new \DateTime($date);
+			} catch(\Exception $e) {
+				ErrorHandler::logException($e);
+				$udate = date('c');
+			}
 
 			$this->setDate($udate);
 		}
