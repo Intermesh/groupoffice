@@ -29,7 +29,10 @@ GO.form.ComboBoxMulti = function(config){
 	if(this.textarea) {
 		config.defaultAutoCreate = {
 			tag: "textarea",
-			autocomplete: "off"
+			autocomplete: "off",
+			autocorrect: "off",
+			autocapitalize: "off",
+			spellcheck: "false"
 		};
 	}
 	 //config.height = dp(24);
