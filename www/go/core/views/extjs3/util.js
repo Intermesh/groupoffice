@@ -38,7 +38,7 @@ go.util =  (function () {
 		},
 
 		avatar: function(name, blob) {
-			var initials = '', style = '', color = 'transparent';
+			var initials = '', style = '';
 			if(!blob) {
 				initials = this.initials(name);
 				for(var i=0,j=0; i<name.length; i++) {
@@ -52,7 +52,7 @@ go.util =  (function () {
 					zc: 1
 				}) + ')';
 			}
-			return '<span class="avatar" style="'+style+'" title="'+name+'">'+initials+'</span>';
+			return '<span class="avatar" style="'+style+'" title="'+Ext.util.Format.htmlEncode(name)+'">'+initials+'</span>';
 		},
 		
 		/**
