@@ -1,3 +1,5 @@
+- Core: Dark theme showed e-mail text in light font colors.
+
 05-10-2020 6.4.174
 - Core: sort comments explicitly by creation date
 - Core: Added Romaian holidays and translations. Thanks to safetybroker.ro 
