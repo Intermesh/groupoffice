@@ -29,6 +29,12 @@ go.modules.community.addressbook.SettingsProfilePanel = Ext.extend(Ext.Panel, {
 								fieldLabel: t("Job title"),
 								anchor: "100%"
 							}),
+							this.departmentField = new Ext.form.TextField({
+								xtype: "textfield",
+								name: "department",
+								fieldLabel: t("Department"),
+								anchor: "100%"
+							}),
 							this.genderField = new go.form.RadioGroup({
 								xtype: 'radiogroup',
 								fieldLabel: t("Gender"),

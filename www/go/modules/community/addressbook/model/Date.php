@@ -31,7 +31,7 @@ class Date extends Property {
 
 	/**
 	 * 
-	 * @var \IFW\Util\DateTime
+	 * @var \go\core\util\DateTime
 	 */							
 	public $date;
 

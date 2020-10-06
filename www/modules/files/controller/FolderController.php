@@ -1293,14 +1293,14 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					if ($existingFile) {
 						switch ($overwrite) {
 							case 'ask':
-								array_unshift($paths, $tmpfile);
+//								array_unshift($paths, $tmpfile);
 								$response['fileExists'] = $filename;
 								continue 2;
 							case 'yes':
 								$params['overwrite'] = 'ask';
 							case 'yestoall':
 								//we dont want overwrite file in no case
-								if(!$removeBlob) {
+								if(!$removeBlob || $this->blobIsNeededAgain($removeBlob->id, $paths)) {
 									$newFile = GO\Base\Fs\File::tempFile();
 									$file = $file->copy($newFile->parent(), $newFile->name());
 								}

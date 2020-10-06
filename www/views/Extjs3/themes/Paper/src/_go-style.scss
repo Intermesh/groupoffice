@@ -449,6 +449,9 @@ a {
 
 #mainNorthPanel {
 	height: dp(56);
+	.x-panel-body {
+		min-height: dp(56);
+	}
 	
 	position: relative;
 	color: white;
@@ -533,7 +536,7 @@ a {
 		display:inline-block;
 		text-decoration: none;
 		height:dp(40);
-		padding: dp(22) dp(8) dp(8) dp(8);
+		padding: dp(18) dp(8) dp(8) dp(8);
 		color: white;
 		&:hover,&:active { color: white; }
 	}
@@ -541,7 +544,7 @@ a {
 #search_query {
 	float:left;
 	display:block;
-	padding-top: dp(16);	
+	padding-top: dp(12);
 }
 
 .search-field-wrap {
@@ -622,15 +625,23 @@ a {
 
 		.x-panel-header {
 			color: color($fg,'secondary-text');
-			zoom:.8;
+			>i, .x-tool {
+				transform: scale(.8);
+				margin-top: dp(-4);
+			}
+			.x-tool {
+				transform: scale(.8);
+				margin-top: dp(4);
+			};
 			height: dp(40);
-			line-height: dp(40);
+			//line-height: dp(40);
 	    }
 		.x-panel-header-text {
 			color: color($fg,'secondary-text');
+			font-size: dp(16);
 		}
 		.x-panel-bwrap {
-			padding: dp(8);
+			padding: dp(8) dp(16);
 			em {float:right;}
 		}
 	}
@@ -663,7 +674,7 @@ a {
 	float:left;
 	height: dp(32);
 	padding: dp(2) dp(8);
-	margin-top: dp(20);
+	margin-top: dp(16);
 	margin-right: dp(8);
 	border-radius: dp(16);
 	border: 1px solid color($fg,'line');
@@ -1591,6 +1602,9 @@ table[id^="comments-ext"] b {
 	
 	#mainNorthPanel {
 		height: dp(64);
+		.x-panel-body {
+			min-height: dp(64);
+		}
 	}
 
 }
@@ -1798,8 +1812,6 @@ table[id^="comments-ext"] b {
 		margin-left: dp(-16);
 	}
 	margin-bottom: dp(16);
-	
-
 }
 
 
@@ -2317,4 +2329,34 @@ table[id^="comments-ext"] b {
 	text-align:center;
 	padding: dp(48);
 	color: color($fg, 'secondary-text');
+}
+
+
+//compact header
+body.go-compact {
+	#mainNorthPanel {
+		height: dp(64);
+
+		.x-panel-body {
+			min-height: dp(64);
+		}
+	}
+
+	.go-main-tab-panel {
+		overflow: visible;
+	}
+
+	.go-main-tab-panel.x-tab-panel > .x-tab-panel-header {
+		position: absolute;
+		top: dp(-56);
+		left: dp(224);
+		right: dp(272);
+		width: auto !important;
+		height: 0;
+		overflow: visible;
+	}
+
+	.go-main-tab-panel {
+		bottom: 0;
+	}
 }
