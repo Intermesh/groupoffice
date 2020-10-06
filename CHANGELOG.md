@@ -1,5 +1,7 @@
 - Core: Dark theme showed e-mail text in light font colors.
 - Core: notification style improved
+- Studio: Supports fixing the package name by setting $config['business'] = [ 'studio' =>  [ 'package' => 'foo']];
+- Multi instance: Creates studio package folder and sets it in the instance config
 
 05-10-2020 6.4.174
 - Core: sort comments explicitly by creation date

@@ -183,6 +183,10 @@ class Instance extends Entity {
 	private function getDbName() {
 		return str_replace(['.','-'], '_', $this->hostname);
 	}
+
+	private function getSubDomain() {
+		return explode(".", $this->hostname)[0];
+	}
 	
 	private function getDbUser() {
 		return substr($this->getDbName(), 0, 16);
@@ -292,7 +296,12 @@ class Instance extends Entity {
 		$tmpFolder = $this->getTempFolder();	
 		$configFile = $this->getConfigFile();
 		$databaseCreated = $databaseUserCreated = false;
-		try {			
+		try {
+
+			if(!$this->getModulePackageFolder()->create()) {
+				throw new Exception("Could not create module package folder in go/modules/*. Please make go/modules writable.");
+			}
+
 			if(!$dataFolder->create()) {
 				throw new Exception("Could not create data folder");
 			}
@@ -310,6 +319,8 @@ class Instance extends Entity {
 			if(!$configFile->putContents($this->createConfigFile($dbName, $dbUsername, $dbPassword, $tmpFolder->getPath(), $dataFolder->getPath()))) {
 				throw new Exception("Could not write to config file");
 			}
+
+
 		} catch(\Exception $e) {
 			
 			//cleanup
@@ -323,11 +334,20 @@ class Instance extends Entity {
 			if($databaseUserCreated) {
 				$this->dropDatabaseUser($dbUsername);
 			}
+
+			$this->getModulePackageFolder()->delete();
 			
 			parent::internalDelete((new Query())->where(['id' => $this->id]));
 			
 			throw $e;
 		}
+	}
+
+	/**
+	 * @return \go\core\fs\Folder
+	 */
+	private function getModulePackageFolder() {
+		return go()->getEnvironment()->getInstallFolder()->getFolder("go/modules/" . $this->getSubDomain());
 	}
 	
 	private function dropDatabase($dbName) {		
@@ -366,6 +386,7 @@ class Instance extends Entity {
 				'{tmpPath}',
 				'{dataPath}',
 				'{servermanager}',
+				'{subDomain}',
 		], [
 				$dsn['options']['host'],
 				$dbName,
@@ -373,7 +394,8 @@ class Instance extends Entity {
 				$dbPassword,
 				$tmpPath,
 				$dataPath,
-				go()->findConfigFile()
+				go()->findConfigFile(),
+				$this->getSubDomain()
 		],
 		$tpl->getContents());		
 	}
@@ -553,6 +575,8 @@ class Instance extends Entity {
 				$instance->getTempFolder()->delete();
 
 				$instance->mysqldump();
+
+				$instance->getModulePackageFolder()->move($instance->getDataFolder()->getFolder($instance->getSubDomain() .'_MODULE_PACKAGE'));
 
 				$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php'));
 				$instance->getConfigFile()->getFolder()->delete();
