@@ -1,3 +1,4 @@
+06-10-2020 6.5.175
 - Core: Dark theme showed e-mail text in light font colors.
 - Core: notification style improved
 - Studio: Supports fixing the package name by setting $config['business'] = [ 'studio' =>  [ 'package' => 'foo']];
