@@ -51,7 +51,7 @@ class FunctionField extends Number {
 		$result = null;
 		try {
 			eval("\$result = " . $f . ";");
-		} catch (\ParseError $e) {
+		} catch (\Error $e) {
 			return null;
 		}
 
