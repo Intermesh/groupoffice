@@ -1016,6 +1016,12 @@ Ext.override(Ext.menu.Item ,{
 		}		
 		
  });
+go.DrawIcon = function(values,cls) {
+	if(values.iconCls.substring(0,3) === 'ic-') {
+		return '<i style="'+values.iconStyle+'" class="icon">'+values.iconCls.substring(3).split('-').join('_')+'</i>';
+	}
+	return '<span style="'+values.iconStyle+'" class="x-menu-item-icon '+values.iconCls+'"></span>';
+}
 
 Ext.menu.Item.prototype.itemTpl = new Ext.XTemplate(
 	'<a id="{id}" class="{cls} x-unselectable" hidefocus="true" unselectable="on" href="{href}"',
@@ -1023,7 +1029,7 @@ Ext.menu.Item.prototype.itemTpl = new Ext.XTemplate(
 			  ' target="{hrefTarget}"',
 		 '</tpl>',
 	 '>',
-		  '<span style="{iconStyle}" class="x-menu-item-icon {iconCls}"></span>',
+		'{[go.DrawIcon(values, "x-menu-item-icon") ]}',
 		  '<span class="x-menu-item-text">{text:raw}</span>',
 	 '</a>'
 );

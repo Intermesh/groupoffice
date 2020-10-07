@@ -798,7 +798,10 @@
 		.x-btn-text { @include var(color, c-primary); }
    }
    &-icon {
-		i {width:0}
+		i {
+			position:absolute;
+			left:dp(8);
+		}
 		border: 0;
 		.x-btn-ml, .x-btn-mr {
 			min-width: 0;
@@ -2073,6 +2076,7 @@ td.x-date-mp-sep {
 		background-color: $cHover;
 		border:0;
 	}
+	&-item i { margin-right: dp(16); }
 	&-item-icon {
 		display:inline-block;
 		width: dp(40) !important; // <- some modules mess this up

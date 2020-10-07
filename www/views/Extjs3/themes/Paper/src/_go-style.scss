@@ -754,7 +754,7 @@ button {
 		width: 100%;
 	}
 
-	.icons & {
+	.icons &, .go-detail-view-avatar & {
 		//float:left; ?? why?
 		margin-top:dp(4);
 		margin-right: dp(16);
