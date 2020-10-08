@@ -2076,7 +2076,6 @@ td.x-date-mp-sep {
 		background-color: $cHover;
 		border:0;
 	}
-	&-item i { margin-right: dp(16); }
 	&-item-icon {
 		display:inline-block;
 		width: dp(40) !important; // <- some modules mess this up
