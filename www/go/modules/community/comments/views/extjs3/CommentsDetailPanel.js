@@ -173,7 +173,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			var avatar = {
 				xtype:'box',
 				autoEl: {tag: 'span','ext:qtip': t('{author} wrote at {date}')
-					.replace('{author}', creator.displayName)
+					.replace('{author}', Ext.util.Format.htmlEncode(creator.displayName))
 					.replace('{date}', Ext.util.Format.date(r.get('createdAt'),go.User.dateTimeFormat))},
 				cls: 'photo '+mineCls
 			};
