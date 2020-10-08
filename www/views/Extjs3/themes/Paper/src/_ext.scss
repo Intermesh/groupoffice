@@ -764,17 +764,17 @@
 
 	}
 	&.primary {
-		.x-btn-text {
+		//.x-btn-text {
 			@include var(color, c-primary);
-		}
+		//}
    }
 	&.danger {
 		&.x-btn-focus, &.x-btn-over {
 			@include var(background-color, c-primary-tp);
 		}
-		.x-btn-text {
+		//.x-btn-text {
 			color: $cDanger;
-		}
+		//}
 	} 
 	&-icon-small-top {
 		height: dp(56);
@@ -801,12 +801,18 @@
 		i {
 			position:absolute;
 			left:dp(8);
+			&.icon {
+				position:absolute;
+				top:dp(-1);
+				left:dp(8);
+			}
 		}
 		border: 0;
 		.x-btn-ml, .x-btn-mr {
 			min-width: 0;
 			width: 0;
 		}
+	   em{ position:relative;}
 		em.x-btn-arrow {
 			.ic-more, .ic-more-vert, .ic-more-horiz, .x-toolbar-more-icon {
 				&::after { display:none;}
@@ -827,11 +833,17 @@
 			}
 		}
    }
-	&-text-icon button::before{
-		@extend %icon;
-		padding-right: dp(8);
-		//MS Why was this here?
-		/*margin-top: dp(-4);*/
+	&-text-icon {
+		button::before{
+			@extend %icon;
+			padding-right: dp(8);
+			//MS Why was this here?
+			/*margin-top: dp(-4);*/
+		}
+		i.icon {
+			margin-right: dp(8);
+			color:inherit;
+		}
 	}
    &-pressed {
 		//background-color: color($bg, 'hover');

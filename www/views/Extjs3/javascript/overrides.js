@@ -1024,6 +1024,24 @@ Ext.override(Ext.menu.Item ,{
 
  });
 
+Ext.override(Ext.Button, {
+	setIcon : function(icon){
+		this.icon = icon;
+		if(this.el){
+			var iTag = this.btnEl.prev('i');
+			if(!icon && iTag ) {
+				iTag.remove();
+			}
+			if(icon) {
+				iTag = iTag || this.btnEl.insertHtml('beforeBegin','<i class="icon"></i>', true);
+				iTag.dom.innerText = icon;
+			}
+			this.setButtonClass();
+		}
+		return this;
+	}
+});
+
 Ext.menu.Item.prototype.itemTpl = new Ext.XTemplate(
 	'<a id="{id}" class="{cls} x-unselectable" hidefocus="true" unselectable="on" href="{href}"',
 		 '<tpl if="hrefTarget">',
