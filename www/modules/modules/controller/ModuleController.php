@@ -77,7 +77,7 @@ class ModuleController extends AbstractJsonController{
 						
 		foreach($modules as $moduleClass){		
 			
-			$module = new $moduleClass;	
+			$module = $moduleClass::get();
 			
 			
 			

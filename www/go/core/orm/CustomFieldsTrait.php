@@ -7,6 +7,7 @@ use go\core\App;
 use go\core\db\Query;
 use go\core\db\Table;
 use go\core\db\Utils;
+use go\core\Installer;
 use go\core\validate\ErrorCode;
 use go\core\model\Field;
 use PDOException;
@@ -234,7 +235,12 @@ trait CustomFieldsTrait {
 	public function saveCustomFields() {
 
 		
-		try {			
+		try {
+
+			if(Installer::isInstalling()) {
+				return true;
+			}
+
 			$record = $this->customFieldsData;			
 			
 			foreach(self::getCustomFieldModels() as $field) {
