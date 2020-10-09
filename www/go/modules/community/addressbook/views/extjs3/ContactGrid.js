@@ -29,6 +29,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				"phoneNumbers",
 				"dates",
 				"birthday", //dummy
+				"actionDate", //dummy
 				"streetAddresses",
 				{name: 'organizations', type: "relation"},
 				"jobTitle",
@@ -104,23 +105,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: go.User.addressBookSettings.sortBy,
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 
-						// empty <i> tag is needed to increase line-height
-						var style = "margin-right:16px;", cls = "", content = '<i class="icon"></i>';
-
-						if (record.data.photoBlobId) {
-							style += 'background-image: url(' + go.Jmap.thumbUrl(record.data.photoBlobId, {w: 40, h: 40, zc: 1}) + '); background-color: transparent;';
-						} else
-						{
-							cls = record.data.isOrganization ? "organization" : "";
-							if(record.data.isOrganization) {
-								content = '<i class="icon">business</i>';
-							} else
-							{
-								content = go.util.initials(record.get('name'));
-							}
-							style += "background-image:none;background-color: #" + record.data.color;
-						}
-
+						var icon = record.data.isOrganization ? '<i class="icon">business</i>' : null;
 						var sortBy = go.User.addressBookSettings.sortBy, name;
 						if(!record.data.isOrganization && sortBy == 'lastName' && !go.util.empty(record.data.lastName)) {
 							name = record.data.lastName + ', ' + record.data.firstName;
@@ -128,7 +113,13 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 							name = record.get('name');
 						}
 
-						return '<div class="avatar ' + cls + '" style="' + style + '">'+content+'</div>' + Ext.util.Format.htmlEncode(name);
+						if(record.get("color")) {
+							metaData.attr = 'style="color: #' + record.get("color") + ';"';
+						}
+
+						return '<span class="go-ab-avatar">' + go.util.avatar(record.get('name'), record.data.photoBlobId, icon) + '</span>' + Ext.util.Format.htmlEncode(name);
+
+						// return '<div class="avatar ' + cls + '" style="' + style + '">'+content+'</div>' + Ext.util.Format.htmlEncode(name);
 					}
 				},
 				{
@@ -271,6 +262,25 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 						var bday = "";
 						record.data.dates.forEach(function(date) {
 							if(date.type == "birthday") {
+								bday = date.date;
+							}
+						});
+
+						return go.util.Format.date(bday);
+					},
+					hidden: true
+				},{
+					id: 'actionDate',
+					header: t('Action date'),
+					sortable: true,
+					dataIndex: "actionDate",
+					renderer: function(v, meta, record) {
+						if(!record.data.dates) {
+							return "";
+						}
+						var bday = "";
+						record.data.dates.forEach(function(date) {
+							if(date.type == "action") {
 								bday = date.date;
 							}
 						});

@@ -17,6 +17,8 @@ class Date extends Property {
 	
 	const TYPE_ANNIVERSARY = 'anniversary';
 
+	const TYPE_ACTION = 'action';
+
 	/**
 	 * 
 	 * @var int

@@ -48,9 +48,8 @@
 .go-addressbook-name-panel {
   padding: 14px;
 }
-.go-addressbook-name-panel h4 {
-  top: -14px;
-  left: 49px;
+.go-addressbook-name-panel h4, .go-addressbook-name-panel h3 {
+  margin: 0;
 }
 .go-addressbook-name-panel .go-addressbook-star {
   margin-top: -7px;
@@ -95,6 +94,10 @@
   vertical-align: baseline;
   line-height: inherit;
   color: white;
+}
+
+.go-ab-avatar {
+  margin-right: 14px;
 }
 
 .avatar.organization {

@@ -107,3 +107,10 @@ $updates['202004161427'][] = function() {
 };
 
 $updates['202006291222'][] = "ALTER TABLE `addressbook_user_settings` DROP `sortBy`";
+
+$updates['202010080821'][] = "update `addressbook_contact` set color = null;";
+
+$updates['202010080821'][] = function() {
+	$m = new go\modules\community\addressbook\install\Migrate63to64();
+	$m->addDepartment();
+};
