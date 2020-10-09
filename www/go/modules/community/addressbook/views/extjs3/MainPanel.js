@@ -133,6 +133,10 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 	},
 	
 	createGrid : function() {
+		console.clear();
+		console.log(go.User);
+		console.log("ADMIN AVAILABLE: "+ go.Modules.isAvailable("community","addressbook",50,go.User));
+		console.log("RESTRICT EXPORT TO ADMINS: " + go.Modules.get("community", "addressbook").settings.restrictExportToAdmins);
 		this.grid = new go.modules.community.addressbook.ContactGrid({
 			region: 'center',
 			enableDragDrop: true, //for dragging contacts to address books or groups in the tree
@@ -203,6 +207,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 					menu: [{
 							iconCls: 'ic-cloud-upload',
 							text: t("Import"),
+							disabled: !go.Modules.isAvailable("community","addressbook",50,go.User) && go.Modules.get("community", "addressbook").settings.restrictExportToAdmins,
 							handler: function() {
 								go.util.importFile(
 												'Contact', 
@@ -367,7 +372,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 							},
 							scope: this
 						}, {
-							disabled: !go.User.isAdmin && go.Modules.get("community", "addressbook").settings.restrictExportToAdmins,
+							disabled: !go.Modules.isAvailable("community","addressbook",50,go.User) && go.Modules.get("community", "addressbook").settings.restrictExportToAdmins,
 							iconCls: 'ic-cloud-download',
 							text: t("Export"),
 							menu: [
