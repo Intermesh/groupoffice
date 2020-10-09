@@ -948,6 +948,10 @@ class Contact extends AclItemEntity {
 				$keywords[] = $address->country;
 			}
 
+			if(!empty($address->state)) {
+				$keywords[] = $address->state;
+			}
+
 			if(!empty($address->city)) {
 				$keywords[] = $address->city;
 			}
