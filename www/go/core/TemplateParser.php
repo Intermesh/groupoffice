@@ -95,6 +95,12 @@ use function GO;
  *
  * [assign contact = 1 | entity:Contact]
  *
+ * @example Using [assign] to lookup a linked Contact entity with id = 1
+ *
+ * [assign firstContactLink = someEntiyVar | links:Contact | first]
+ *
+ * {{firstContactLink.name}}
+ *
  */
 class TemplateParser {	
 
@@ -148,6 +154,15 @@ class TemplateParser {
 		$e = $cls::findById($id);
 
 		return $e;
+	}
+
+	private function filterLinks(Entity $entity, $entityName) {
+
+		$entityType = EntityType::findByName($entityName);
+		$entityCls = $entityType->getClassName();
+		$entities = $entityCls::findByLink($entity,[], true)->all();
+
+		return $entities;
 	}
 
 	private function filterNumber($number,$decimals=2, $decimalSeparator='.', $thousandsSeparator=',') {
