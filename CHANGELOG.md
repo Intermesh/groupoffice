@@ -1,4 +1,5 @@
 - Address book: Added color back in to contacts
+- Core: Custom fields saved as text to search cache
 
 06-10-2020 6.5.175
 - Core: Dark theme showed e-mail text in light font colors.
