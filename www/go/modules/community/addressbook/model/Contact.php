@@ -254,7 +254,7 @@ class Contact extends AclItemEntity {
    *
    * @var string
    */
-	protected $color;
+	public $color;
 	
 	
 	/**
@@ -575,6 +575,13 @@ class Contact extends AclItemEntity {
 											$criteria->where('dob.type', '=', Date::TYPE_BIRTHDAY)
 												->andWhere('dob.date',$comparator, $value);
 										})
+										->addDate("actionDate", function(Criteria $criteria, $comparator, $value, Query $query) {
+											if(!$query->isJoined('addressbook_date', 'actionDate')) {
+												$query->join('addressbook_date', 'actionDate', 'actionDate.contactId = c.id', "INNER");
+											}
+											$criteria->where('actionDate.type', '=', Date::TYPE_ACTION)
+												->andWhere('actionDate.date',$comparator, $value);
+										})
 										->addDate("birthday", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_date', 'date')) {
 												$query->join('addressbook_date', 'date', 'date.contactId = c.id', "INNER");
@@ -663,6 +670,12 @@ class Contact extends AclItemEntity {
 			$query->join('addressbook_date', 'birthdaySort', 'birthdaySort.contactId = c.id and birthdaySort.type="birthday"', 'LEFT');
 			$sort['birthdaySort.date'] = $sort['birthday'];
 			unset($sort['birthday']);
+		};
+
+		if(isset($sort['actionDate'])) {
+			$query->join('addressbook_date', 'actionDateSort', 'actionDateSort.contactId = c.id and actionDateSort.type="action"', 'LEFT');
+			$sort['actionDateSort.date'] = $sort['actionDate'];
+			unset($sort['actionDate']);
 		};
 		
 		return parent::sort($query, $sort);
@@ -931,6 +944,10 @@ class Contact extends AclItemEntity {
 				$keywords[] = $address->country;
 			}
 
+			if(!empty($address->state)) {
+				$keywords[] = $address->state;
+			}
+
 			if(!empty($address->city)) {
 				$keywords[] = $address->city;
 			}
@@ -1135,50 +1152,50 @@ class Contact extends AclItemEntity {
 
 		return $array;
 	}
-
-	private static $colors =  [
-    'C62828',
-    'AD1457',
-    '6A1B9A',
-    '4527A0',
-    '283593',
-    '1565C0',
-    '0277BD',
-    '00838F',
-    '00695C',
-    '2E7D32',
-    '558B2F',
-    '9E9D24',
-    'F9A825',
-    'FF8F00',
-    'EF6C00',
-    '424242'
-  ];
-
-	public function getColor() {
-    if(isset($this->color)) {
-      return $this->color;
-    }
-
-    $index = Settings::get()->lastContactColorIndex;
-
-    if(!isset(self::$colors[$index])) {
-      $index = 0;
-    }
-
-    $this->color = self::$colors[$index];
-    $index++;
-    Settings::get()->lastContactColorIndex = $index;
-    Settings::get()->save();
-
-    go()->getDbConnection()->update(self::getMapping()->getPrimaryTable()->getName(), ['color' => $this->color], ['id' => $this->id])->execute();
-
-    return $this->color;
-  }
-
-  public function setColor($v) {
-	  $this->color = $v;
-  }
+//
+//	private static $colors =  [
+//    'C62828',
+//    'AD1457',
+//    '6A1B9A',
+//    '4527A0',
+//    '283593',
+//    '1565C0',
+//    '0277BD',
+//    '00838F',
+//    '00695C',
+//    '2E7D32',
+//    '558B2F',
+//    '9E9D24',
+//    'F9A825',
+//    'FF8F00',
+//    'EF6C00',
+//    '424242'
+//  ];
+//
+//	public function getColor() {
+//    if(isset($this->color)) {
+//      return $this->color;
+//    }
+//
+//    $index = Settings::get()->lastContactColorIndex;
+//
+//    if(!isset(self::$colors[$index])) {
+//      $index = 0;
+//    }
+//
+//    $this->color = self::$colors[$index];
+//    $index++;
+//    Settings::get()->lastContactColorIndex = $index;
+//    Settings::get()->save();
+//
+//    go()->getDbConnection()->update(self::getMapping()->getPrimaryTable()->getName(), ['color' => $this->color], ['id' => $this->id])->execute();
+//
+//    return $this->color;
+//  }
+//
+//  public function setColor($v) {
+//	  $this->color = $v;
+//  }
 
 	/**
 	 * @inheritDoc

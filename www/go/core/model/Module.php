@@ -130,7 +130,7 @@ class Module extends AclOwnerEntity {
 		
 		if(!isset($this->module)) {
 			$cls = $this->getModuleClass();
-			$this->module = new $cls;
+			$this->module = $cls::get();
 		}
 		
 		return $this->module;
@@ -174,7 +174,7 @@ class Module extends AclOwnerEntity {
 		
 		//todo, how to handle licenses for future packages?
 		$cls = $this->getModuleClass();
-		return class_exists($cls) && (new $cls)->isLicensed();
+		return class_exists($cls) && $cls::get()->isLicensed();
 	}
 
 	/**

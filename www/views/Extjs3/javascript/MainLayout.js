@@ -555,7 +555,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 							<a id="user-menu" class="user-img" style="'+getUserImgStyle()+'"></a>\
 						</div>\
 					</div>',
-					height: dp(64),
+					//height: dp(64),
+					autoHeight: true,
 					titlebar: false,
 					border: false
 				});

@@ -298,7 +298,7 @@ class Installer {
 				}			
 			}
 
-			$mod = new $moduleCls();
+			$mod = $moduleCls::get();
 
 			if (!$mod->isAvailable()) {
 				$unavailable[] = ["package" => $module['package'], "name" => $module['name']];

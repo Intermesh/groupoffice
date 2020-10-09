@@ -4,6 +4,10 @@ namespace go\core;
 
 use Exception;
 use go\core\orm\EntityType;
+use go\core\db\Query;
+use go\core\db\Statement;
+use go\core\orm\Entity;
+use go\core\orm\EntityType;
 use go\core\util\DateTime;
 use stdClass;
 use Traversable;
@@ -69,7 +73,11 @@ use function GO;
  *     {{emailAddress.email}}
  *   [/if]
  * [/each]
- * 
+ *
+ * @example Implode all e-mail
+ *
+ * {{contact.emailAddresses | column:email | implode}}
+ *
  * @example Print billing address if available, else print first.
  * [if {{contact.emailAddresses | filter:type:"billing" | count}} > 0]
  *  {{contact.emailAddresses | filter:type:"billing"}}
@@ -94,6 +102,16 @@ use function GO;
  *
  * [assign contact = 1 | entity:Contact]
  *
+ * @example Using [assign] to lookup a Contact entity with id = 1
+ *
+ * [assign contact = 1 | entity:Contact]
+ *
+ * @example Using [assign] to lookup a linked Contact entity with id = 1
+ *
+ * [assign firstContactLink = someEntityVar | links:Contact | first]
+ *
+ * {{firstContactLink.name}}
+ *
  */
 class TemplateParser {	
 
@@ -109,9 +127,12 @@ class TemplateParser {
 		$this->addFilter('filter', [$this, "filterFilter"]);
 		$this->addFilter('count', [$this, "filterCount"]);
 		$this->addFilter('first', [$this, "filterFirst"]);
+		$this->addFilter('column', [$this, "filterColumn"]);
+		$this->addFilter('implode', [$this, "filterImplode"]);
 		$this->addFilter('entity', [$this, "filterEntity"]);
+		$this->addFilter('links', [$this, "filterLinks"]);
 		$this->addFilter('nl2br', "nl2br");
-		
+
 		$this->addModel('now', new DateTime());	
 	}
 
@@ -147,13 +168,26 @@ class TemplateParser {
 
 		return $e;
 	}
-	
+
+	private function filterLinks(Entity $entity, $entityName) {
+
+		$entityType = EntityType::findByName($entityName);
+		$entityCls = $entityType->getClassName();
+		$entities = $entityCls::findByLink($entity,[], true);
+
+		return $entities;
+	}
+
 	private function filterNumber($number,$decimals=2, $decimalSeparator='.', $thousandsSeparator=',') {
 		return number_format($number,$decimals, $decimalSeparator, $thousandsSeparator);
 	}
 	
 	private function filterFilter($array, $propName, $propValue) {
-		
+
+		if(!isset($array)) {
+			return null;
+		}
+
 		$filtered = array_filter($array, function($i) use($propValue, $propName){
 			return $i->$propName == $propValue;
 		});
@@ -161,12 +195,56 @@ class TemplateParser {
 		return $filtered;
 	}
 
+	private function filterColumn($array, $propName) {
+
+		if(!isset($array)) {
+			return null;
+		}
+
+		$c = [];
+
+		foreach($array as $item) {
+			$c[] = $this->getVar($propName, $item);
+		}
+
+		return $c;
+	}
+
+	private function filterImplode($array, $glue = ', ') {
+
+		if(!isset($array)) {
+			return "";
+		}
+
+		return implode($glue, $array);
+	}
+
+
+
 	private function filterCount($countable) {
+		if(!isset($countable)) {
+			return 0;
+		}
 		return count($countable);
 	}
 
-	private function filterFirst(array $items) {
-		return $items[0] ?? null;
+	private function filterFirst($items) {
+
+		if(!isset($items)) {
+			return null;
+		}
+
+		if(is_array($items)) {
+			return reset($items);
+		}
+
+		if($items instanceof Query) {
+			return $items->single();
+		}
+
+		throw new \Exception("Unsupported type for filter 'first'");
+
+
 	}
 	
 	/**
@@ -412,7 +490,7 @@ class TemplateParser {
 			throw new \Exception("Invalid expression: ". $tag['expression']);
 		}
 
-		$array = $this->getVarFiltered($expressionParts[1]);	
+		$array = $this->getVarFiltered($expressionParts[1]);
 		
 		if(!is_array($array) && !($array instanceof Traversable)) {
 			$tag['replacement'] = "";
@@ -578,12 +656,14 @@ class TemplateParser {
 		return true;
 	}
 	
-	private function getVar($path) {
+	private function getVar($path, $model = null) {
 		
 		// var_dump('getVar('.trim($path).')');
 		$pathParts = explode(".", trim($path)); //eg "contact.name"		
 
-		$model = $this;
+		if(!isset($model)) {
+			$model = $this;
+		}
 
 		foreach ($pathParts as $pathPart) {
 			//check for array access eg. contact.emailAddresses[0];

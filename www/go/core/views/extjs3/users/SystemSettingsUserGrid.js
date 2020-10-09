@@ -45,9 +45,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				sortable: true,
 				dataIndex: 'displayName',
 				renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-					var style = record.get('avatarId') ?  'background-image: url(' + go.Jmap.thumbUrl(record.get("avatarId"), {w: 40, h: 40, zc: 1}) + ')"' : "";
-
-					return '<div class="user"><div class="avatar" style="'+style+'"></div>' +
+					return '<div class="user">' + go.util.avatar(value, record.data.avatarId)  +
 						'<div class="wrap">'+
 						'<div class="displayName">' + value + '</div>' +
 						'<small class="username">' + Ext.util.Format.htmlDecode(record.get('username')) + '</small>' +

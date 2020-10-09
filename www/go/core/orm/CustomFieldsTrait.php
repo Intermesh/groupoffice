@@ -7,6 +7,7 @@ use go\core\App;
 use go\core\db\Query;
 use go\core\db\Table;
 use go\core\db\Utils;
+use go\core\Installer;
 use go\core\validate\ErrorCode;
 use go\core\model\Field;
 use PDOException;
@@ -271,20 +272,27 @@ trait CustomFieldsTrait {
    * @throws PDOException
    * @throws Exception
    */
-	protected function saveCustomFields() {
-		if(!$this->customFieldsModified) {
-			return true;
-		}
+	public function saveCustomFields() {
+
 		
-		try {			
+		try {
+
+			if(Installer::isInstalling()) {
+				return true;
+			}
+
 			$record = $this->customFieldsData;			
 			
 			foreach(self::getCustomFieldModels() as $field) {
-				if(!$field->getDataType()->beforeSave(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record)) {
+				if(!$field->getDataType()->beforeSave(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record,  $this)) {
 					return false;
 				}
-			}			
-			
+			}
+
+			if(!$this->customFieldsModified && $record == $this->customFieldsData) {
+				return true;
+			}
+
 			if($this->customFieldsIsNew) {
 
 				//if(!empty($record)) { //always create record for select fields with foreign keys!
@@ -304,13 +312,17 @@ trait CustomFieldsTrait {
 					return false;
 				}
 			}
+
+
+			//beforeSave might have changed the data
+			$this->customFieldsData = $record;
 			
 			//After save might need this.
 			$this->customFieldsData['id'] = $this->id;
 		
 			
 			foreach(self::getCustomFieldModels() as $field) {
-				if(!$field->getDataType()->afterSave(isset($this->customFieldsData[$field->databaseName]) ? $this->customFieldsData[$field->databaseName] : null, $this->customFieldsData)) {
+				if(!$field->getDataType()->afterSave(isset($this->customFieldsData[$field->databaseName]) ? $this->customFieldsData[$field->databaseName] : null, $this->customFieldsData, $this)) {
 					return false;
 				}
 			}

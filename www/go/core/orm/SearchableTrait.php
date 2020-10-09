@@ -83,8 +83,14 @@ trait SearchableTrait {
 		}
 		
 		if(method_exists($this, 'getCustomFields')) {
-			foreach($this->getCustomFields() as $col => $v) {
-				if(!empty($v) && is_string($v)) {
+			foreach($this->getCustomFields(true) as $col => $v) {
+				if(is_array($v)) {
+					foreach($v as $i) {
+						if(!empty($v) && is_string($v)) {
+							$keywords[] = $v;
+						}
+					}
+				} else if(!empty($v) && is_string($v)) {
 					$keywords[] = $v;
 				}
 			}

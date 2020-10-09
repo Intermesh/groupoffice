@@ -1406,7 +1406,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 							callback.call();
 						}
 						
-						if (GO.addressbook && action.result.unknown_recipients
+						if (go.Modules.isAvailable("community", "addressbook") && action.result.unknown_recipients
 							&& action.result.unknown_recipients.length) {
 							if (!GO.email.unknownRecipientsDialog)
 								GO.email.unknownRecipientsDialog = new GO.email.UnknownRecipientsDialog();
