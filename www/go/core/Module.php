@@ -465,6 +465,8 @@ abstract class Module extends Singleton {
 		
 		return 'data:'.$icon->getContentType().';base64,'. base64_encode($icon->getContents());
 	}
+
+	private $model;
 	
 	/**
 	 * Get the module entity model
@@ -472,7 +474,12 @@ abstract class Module extends Singleton {
 	 * @return model\Module
 	 */
 	public function getModel() {
-		return model\Module::findByName($this->getPackage(), $this->getName());
+
+		if(!isset($this->model)) {
+			$this->model = model\Module::findByName($this->getPackage(), $this->getName());
+		}
+
+		return $this->model;
 	}
 
 	/**
