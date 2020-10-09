@@ -112,5 +112,5 @@ $updates['202010080821'][] = "update `addressbook_contact` set color = null;";
 
 $updates['202010080821'][] = function() {
 	$m = new go\modules\community\addressbook\install\Migrate63to64();
-	$m->addDepartment();
+	$m->addColor();
 };
