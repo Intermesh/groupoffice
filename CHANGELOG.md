@@ -1,12 +1,17 @@
-09-10-2020 6.5.176
+09-10-2020 6.4.177
+- Core: Custom fields error in old framework
+
+09-10-2020 6.4.176
+- Address book: If module setting 'restrict to admins' is on, restrtict import/export to both admins and users with 'manage' permissions
 - Address book: Added color back in to contacts
 - Core: Custom fields saved as text to search cache
 - Core: New template custom field: https://groupoffice.readthedocs.io/en/latest/system-settings/custom-fields.html#template-field
 - Studio: Only users with "Manage" permissions on the module may edit and create.
 - Core: Users have auto generated avatar with color and initials
 - Email: Font colors sometimes not working
+- Email: Add unknown recipients dialog didn't show up anymore
 
-06-10-2020 6.5.175
+06-10-2020 6.4.175
 - Core: Dark theme showed e-mail text in light font colors.
 - Core: notification style improved
 - Studio: Supports fixing the package name by setting $config['business'] = [ 'studio' =>  [ 'package' => 'foo']];
@@ -8069,6 +8074,7 @@ First release including:
 - E-mail client
 - Addressbook
 - Scheduler
-- Project management (alpha)﻿
+- Project management (alpha)
+
 
 

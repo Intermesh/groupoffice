@@ -58,7 +58,7 @@ class FunctionField extends Number {
 		return $result;
 	}
 
-	public function beforeSave($value, &$record, \go\core\orm\Entity $entity)
+	public function beforeSave($value, &$record, $entity)
 	{
 		//remove data because it's not saved to the database
 		unset($record[$this->field->databaseName]);
