@@ -7,7 +7,6 @@ use go\core\orm\EntityType;
 use go\core\db\Query;
 use go\core\db\Statement;
 use go\core\orm\Entity;
-use go\core\orm\EntityType;
 use go\core\util\DateTime;
 use stdClass;
 use Traversable;
