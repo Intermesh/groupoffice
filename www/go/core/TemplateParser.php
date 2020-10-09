@@ -99,7 +99,7 @@ use function GO;
  *
  * @example Using [assign] to lookup a linked Contact entity with id = 1
  *
- * [assign firstContactLink = someEntiyVar | links:Contact | first]
+ * [assign firstContactLink = someEntityVar | links:Contact | first]
  *
  * {{firstContactLink.name}}
  *
@@ -172,6 +172,10 @@ class TemplateParser {
 	}
 	
 	private function filterFilter($array, $propName, $propValue) {
+
+		if(!isset($array)) {
+			return null;
+		}
 		
 		$filtered = array_filter($array, function($i) use($propValue, $propName){
 			return $i->$propName == $propValue;
@@ -181,10 +185,17 @@ class TemplateParser {
 	}
 
 	private function filterCount($countable) {
+		if(!isset($countable)) {
+			return 0;
+		}
 		return count($countable);
 	}
 
 	private function filterFirst($items) {
+
+		if(!isset($items)) {
+			return null;
+		}
 
 		if(is_array($items)) {
 			return reset($items);
