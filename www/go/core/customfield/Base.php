@@ -256,7 +256,7 @@ abstract class Base extends Model {
 	 * @return boolean
 	 * @see MultiSelect for an advaced example
 	 */
-	public function afterSave($value, &$customFieldData, Entity $entity)
+	public function afterSave($value, &$customFieldData, $entity)
 	{
 		
 		return true;
@@ -369,7 +369,7 @@ abstract class Base extends Model {
 	 * @return boolean
 	 * @see MultiSelect for an advaced example
 	 */
-	public function beforeSave($value, &$record, Entity $entity)
+	public function beforeSave($value, &$record, $entity)
 	{
 		
 		return true;

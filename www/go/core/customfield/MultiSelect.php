@@ -56,7 +56,7 @@ class MultiSelect extends Select {
 	}
 	
 	
-	public function beforeSave($value, &$record, \go\core\orm\Entity $entity) {
+	public function beforeSave($value, &$record, $entity) {
 		
 		//remove options from record to be inserted and save them for the afterSave method.
 		$this->optionsToSave = $value;
@@ -64,7 +64,7 @@ class MultiSelect extends Select {
 		return true;
 	}
 	
-	public function afterSave($value, &$customFieldData, \go\core\orm\Entity $entity) {
+	public function afterSave($value, &$customFieldData, $entity) {
 		
 		if(!isset($this->optionsToSave)) {
 			return true;
