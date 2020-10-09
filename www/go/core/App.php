@@ -37,7 +37,7 @@ use const GO_CONFIG_FILE;
 	 */
 	class App extends Module {
 		
-		use SingletonTrait;
+		//use SingletonTrait;
 
 		use EventEmitterTrait;
 

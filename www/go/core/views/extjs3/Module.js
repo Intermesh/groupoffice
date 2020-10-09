@@ -57,7 +57,8 @@ go.Modules.register("core", 'core', {
 		"go.customfields.type.Text",
 		"go.customfields.type.TextArea",
 		"go.customfields.type.User",
-		"go.customfields.type.YesNo"
+		"go.customfields.type.YesNo",
+		"go.customfields.type.TemplateField"
 	]
 });
 

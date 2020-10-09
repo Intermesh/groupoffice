@@ -886,8 +886,7 @@ class Migrate63to64 {
 					"color" => new Expression('old.color')
 				],
 				(new Query)
-					->join('ab_contacts','old','old.id = t.id')
-					->where('old.color', '!=', '000000')
+					->join('ab_contacts','old','old.color != "000000" AND old.id = t.id')
 			);
 		echo $stmt . "\n";
 		$stmt->execute();
@@ -898,8 +897,8 @@ class Migrate63to64 {
 					"color" => new Expression('old.color')
 				],
 				(new Query)
-					->join('ab_companies','old','old.id = (t.id - ' . $this->getCompanyIdIncrement())
-					->where('old.color', '!=', '000000')
+					->join('ab_companies','old','old.color != "000000" AND old.id = (t.id - ' . $this->getCompanyIdIncrement() .')')
+
 			);
 		echo $stmt . "\n";
 		$stmt->execute();

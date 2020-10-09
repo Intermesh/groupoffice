@@ -51,7 +51,7 @@ Ext.extend(GO.ErrorDialog, GO.Window, {
 //		if(details)
 //			error += "<br /><br />"+details;
 
-		this.messagePanel.body.update(Ext.util.Format.nl2br(error));
+		this.messagePanel.body.update(Ext.util.Format.nl2br(Ext.util.Format.htmlEncode(error)));
 				
 		//				if(GO.util.empty(details))
 		//				{

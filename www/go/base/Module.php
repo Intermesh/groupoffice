@@ -58,6 +58,14 @@ class Module extends Observable {
 		}
 		return $this->_name;
 	}
+
+	/**
+	 * For compatibility with new framework
+	 * @return static
+	 */
+	public static function get() {
+		return new static;
+	}
 	
 	
 	/**
