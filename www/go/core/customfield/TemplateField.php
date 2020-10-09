@@ -7,7 +7,7 @@ use go\core\TemplateParser;
 
 class TemplateField extends TextArea {
 
-	public function beforeSave($value, &$record, \go\core\orm\Entity $entity)
+	public function beforeSave($value, &$record, $entity)
 	{
 		$tpl = $this->field->getOption('template');
 
