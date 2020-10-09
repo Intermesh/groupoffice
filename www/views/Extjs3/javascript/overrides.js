@@ -995,68 +995,43 @@ Ext.override(Ext.layout.ToolbarLayout ,{
 
 Ext.override(Ext.menu.Item ,{
 	getTemplateArgs: function() {
-        return {
-            id: this.id,
-            cls: this.itemCls + (this.menu ?  ' x-menu-item-arrow' : '') + (this.cls ?  ' ' + this.cls : ''),
-            href: this.href || '#',
-            hrefTarget: this.hrefTarget,
-            icon: this.icon || '',
-            iconCls: this.iconCls || '',
-            text: this.itemText||this.text||'&#160;',
-            altText: this.altText || '',
-            iconStyle: this.iconStyle || ''
-        };
-    },
+		return {
+			id: this.id,
+			cls: this.itemCls + (this.menu ?  ' x-menu-item-arrow' : '') + (this.cls ?  ' ' + this.cls : ''),
+			href: this.href || '#',
+			hrefTarget: this.hrefTarget,
+			icon: this.icon || Ext.BLANK_IMAGE_URL,
+			iconCls: this.iconCls || '',
+			text: this.itemText||this.text||'&#160;',
+			altText: this.altText || '',
+			iconStyle: this.iconStyle || ''
+		};
+	},
 	origOnRender: Ext.menu.Item.prototype.onRender,
 	onRender : function(container, position){
 		this.origOnRender.call(this, container, position);
 
 		//tpl has been overridden and there's no img tag anymore. Without this setIconCls doesn't work.
-		this.iconEl = this.iconEl = this.el.child('.x-menu-item-icon');
-	},
-	setIcon : function(icon){
-		//var old = this.icon;
-		this.icon = icon;
-		if(this.rendered){
-			this.iconEl.dom.innerText = icon;
-		}
+		this.iconEl = this.iconEl = this.el.child('span.x-menu-item-icon');
 	}
 
- });
-
-Ext.override(Ext.Button, {
-	setIcon : function(icon){
-		this.icon = icon;
-		if(this.el){
-			var iTag = this.btnEl.prev('i');
-			if(!icon && iTag ) {
-				iTag.remove();
-			}
-			if(icon) {
-				iTag = iTag || this.btnEl.insertHtml('beforeBegin','<i class="icon"></i>', true);
-				iTag.dom.innerText = icon;
-			}
-			this.setButtonClass();
-		}
-		return this;
-	}
 });
 
 Ext.menu.Item.prototype.itemTpl = new Ext.XTemplate(
 	'<a id="{id}" class="{cls} x-unselectable" hidefocus="true" unselectable="on" href="{href}"',
-		 '<tpl if="hrefTarget">',
-			  ' target="{hrefTarget}"',
-		 '</tpl>',
-	 '>',
-		'<i alt="{altText}" class="x-menu-item-icon <tpl if="icon">icon</tpl> {iconCls}">{icon}</i>',
-		'<span class="x-menu-item-text">{text:raw}</span>',
+	'<tpl if="hrefTarget">',
+	' target="{hrefTarget}"',
+	'</tpl>',
+	'>',
+	'<span style="{iconStyle}" class="x-menu-item-icon {iconCls}"></span>',
+	'<span class="x-menu-item-text">{text:raw}</span>',
 	'</a>'
 );
 Ext.layout.MenuLayout.prototype.itemTpl = new Ext.XTemplate(
 	'<li id="{itemId}" class="{itemCls}">',
-		 '<tpl if="needsIcon">',
-			  '<span style="{iconStyle}" class="{iconCls}"><tpl if="icon"><img alt="{altText}" src="{icon}" /></tpl></span>',
-		 '</tpl>',
+	'<tpl if="needsIcon">',
+	'<span style="{iconStyle}" class="{iconCls}"><tpl if="icon"><img alt="{altText}" src="{icon}" /></tpl></span>',
+	'</tpl>',
 	'</li>'
 );
 
