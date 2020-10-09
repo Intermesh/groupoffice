@@ -72,6 +72,10 @@ use function GO;
  *     {{emailAddress.email}}
  *   [/if]
  * [/each]
+ *
+ * @example Implode all e-mail
+ *
+ * {{contact.emailAddresses | column:email | implode}}
  * 
  * @example Print billing address if available, else print first.
  * [if {{contact.emailAddresses | filter:type:"billing" | count}} > 0]
@@ -118,6 +122,8 @@ class TemplateParser {
 		$this->addFilter('filter', [$this, "filterFilter"]);
 		$this->addFilter('count', [$this, "filterCount"]);
 		$this->addFilter('first', [$this, "filterFirst"]);
+		$this->addFilter('column', [$this, "filterColumn"]);
+		$this->addFilter('implode', [$this, "filterImplode"]);
 		$this->addFilter('entity', [$this, "filterEntity"]);
 		$this->addFilter('links', [$this, "filterLinks"]);
 		$this->addFilter('nl2br', "nl2br");
@@ -183,6 +189,32 @@ class TemplateParser {
 
 		return $filtered;
 	}
+
+	private function filterColumn($array, $propName) {
+
+		if(!isset($array)) {
+			return null;
+		}
+
+		$c = [];
+
+		foreach($array as $item) {
+			$c[] = $this->getVar($propName, $item);
+		}
+
+		return $c;
+	}
+
+	private function filterImplode($array, $glue = ', ') {
+
+		if(!isset($array)) {
+			return "";
+		}
+
+		return implode($glue, $array);
+	}
+
+
 
 	private function filterCount($countable) {
 		if(!isset($countable)) {
@@ -619,12 +651,14 @@ class TemplateParser {
 		return true;
 	}
 	
-	private function getVar($path) {
+	private function getVar($path, $model = null) {
 		
 		// var_dump('getVar('.trim($path).')');
 		$pathParts = explode(".", trim($path)); //eg "contact.name"		
 
-		$model = $this;
+		if(!isset($model)) {
+			$model = $this;
+		}
 
 		foreach ($pathParts as $pathPart) {
 			//check for array access eg. contact.emailAddresses[0];
