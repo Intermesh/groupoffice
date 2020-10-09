@@ -387,6 +387,8 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 				});
 			}
 
+			items = items.columnSort('text');
+
 			this.addFieldMenu = new Ext.menu.Menu({
 				items: items
 			});
