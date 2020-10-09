@@ -1,0 +1,107 @@
+.go-addressbook-url.homepage:before {
+  display: inline-block;
+  font-family: "Material Icons";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 21px;
+  /* Preferred icon size */
+  /*	max-width: dp(24);
+  	max-height: dp(24);*/
+  color: inherit;
+  width: auto;
+  height: auto;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  vertical-align: middle;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "liga";
+}
+
+.go-module-icon-addressbook, .go-menu-icon-addressbook {
+  background: url("resources/addressbook.png");
+}
+
+.go-addressbook-star {
+  color: #febf35;
+}
+
+.go-addressbook-index-row:not(:first-child):before {
+  content: "";
+  top: -7px;
+  position: absolute;
+  width: 100%;
+  display: block;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.go-addressbook-index-row:not(:first-child) {
+  margin-top: 14px;
+  position: relative;
+}
+
+.go-addressbook-name-panel {
+  padding: 14px;
+}
+.go-addressbook-name-panel h4, .go-addressbook-name-panel h3 {
+  margin: 0;
+}
+.go-addressbook-name-panel .go-addressbook-star {
+  margin-top: -7px;
+}
+
+.go-addressbook-name {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+}
+
+.go-addressbook-url-panel {
+  text-align: right;
+  line-height: 17.5px;
+}
+
+.go-addressbook-url {
+  height: 17.5px;
+  width: 17.5px;
+  background-repeat: none;
+  background-position: center;
+  background-size: contain;
+  display: inline-block;
+  border-radius: 1px;
+}
+.go-addressbook-url.linkedin {
+  background-image: url("resources/linkedin.png");
+}
+.go-addressbook-url.facebook {
+  background-image: url("resources/facebook.png");
+}
+.go-addressbook-url.twitter {
+  background-image: url("resources/twitter.png");
+}
+.go-addressbook-url.homepage {
+  background-color: #009BC9;
+  border-radius: 2px;
+}
+.go-addressbook-url.homepage:before {
+  font-size: 17.5px;
+  content: "home";
+  vertical-align: baseline;
+  line-height: inherit;
+  color: white;
+}
+
+.go-ab-avatar {
+  margin-right: 14px;
+}
+
+.avatar.organization {
+  background-image: none;
+}
+
+/*# sourceMappingURL=style.css.map */

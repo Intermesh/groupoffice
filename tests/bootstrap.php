@@ -14,7 +14,7 @@ const INSTALL_NEW = 0;
 const INSTALL_UPGRADE = 1;
 const INSTALL_NONE = 2;
 
-$installDb = INSTALL_UPGRADE;
+$installDb = INSTALL_NEW;
 
 $autoLoader = require(__DIR__ . "/../www/vendor/autoload.php");
 $autoLoader->add('go\\', __DIR__);
@@ -66,10 +66,10 @@ try {
 
 		$installer = go()->getInstaller();
 		$installer->install($admin, [
-				new go\modules\community\notes\Module(),
-				new go\modules\community\test\Module(),
-				new go\modules\community\addressbook\Module(),
-				new go\modules\community\comments\Module(),
+				\go\modules\community\notes\Module::get(),
+				\go\modules\community\test\Module::get(),
+				\go\modules\community\addressbook\Module::get(),
+				\go\modules\community\comments\Module::get(),
 				]);
 
 
@@ -79,7 +79,7 @@ try {
 
 		foreach ($modules as $moduleClass) {
 
-			$moduleController = new $moduleClass;
+			$moduleController = $moduleClass::get();
 			if ($moduleController instanceof core\Module) {
 				continue;
 			}
@@ -114,10 +114,12 @@ try {
 
 	  go()->getInstaller()->upgrade();
 
-    $mod = new \go\modules\community\test\Module();
+    $mod = \go\modules\community\test\Module::get();
     $mod->install();
 
-  }
+  }else {
+		go()->rebuildCache();
+	}
 
 	go()->setAuthState(new State());
 

@@ -21,9 +21,8 @@
 
 .go-addressbook-name-panel {
   padding: dp(16);
-  h4 {
-    top: dp(-16);
-    left: dp(56);
+  h4, h3{
+    margin:0;
   }
 
   .go-addressbook-star {
@@ -77,6 +76,10 @@
     }
   }
 
+}
+
+.go-ab-avatar {
+  margin-right: dp(16);
 }
 
 

@@ -281,7 +281,8 @@ class Column {
 				if(!($value instanceof GoDateTime)) {
 					$value = new GoDateTime($value, new DateTimeZone("UTC"));
 				}
-				$value->hasTime = false;
+
+				$value->hasTime = $this->dbType == 'datetime';
 
 				return $value;
 

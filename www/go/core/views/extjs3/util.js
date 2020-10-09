@@ -37,22 +37,35 @@ go.util =  (function () {
 			return parts.map(function(name){return name.substr(0,1).toUpperCase()}).join("");
 		},
 
-		avatar: function(name, blob) {
-			var initials = '', style = '', color = 'transparent';
+		/**
+		 * Generate avatar for name with initials and color or use the blob if set.
+		 *
+		 * @param name
+		 * @param blob
+		 * @param content If empty initials will be generated from the name
+		 * @returns {string}
+		 */
+		avatar: function(name, blob, content) {
+
+			var style = '';
 			if(!blob) {
-				initials = this.initials(name);
+				if(go.util.empty(content)) {
+					content = this.initials(name);
+				}
+
 				for(var i=0,j=0; i<name.length; i++) {
 					j += name.charCodeAt(i);
 				}
 				style = 'background-image:none;background-color: #'+go.Colors[j % go.Colors.length];
 			} else {
+				content = '&nbsp;';
 				style = 'background-image: url(' + go.Jmap.thumbUrl(blob, {
 					w: 40,
 					h: 40,
 					zc: 1
 				}) + ')';
 			}
-			return '<span class="avatar" style="'+style+'" title="'+name+'">'+initials+'</span>';
+			return '<span class="avatar" style="'+style+'" title="'+Ext.util.Format.htmlEncode(name)+'">'+content+'</span>';
 		},
 		
 		/**

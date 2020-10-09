@@ -63,11 +63,11 @@ if (!empty($_POST)) {
 		];
 
 		App::get()->getInstaller()->install($admin, [
-				new AddressBookModule(), 
-				new NotesModule(),
-				new GAModule(),
-				new CommentsModule(),
-				new BookmarksModule()
+				AddressBookModule::get(),
+				NotesModule::get(),
+				GAModule::get(),
+				CommentsModule::get(),
+				BookmarksModule::get()
 				]);
 
 		//install not yet refactored modules
