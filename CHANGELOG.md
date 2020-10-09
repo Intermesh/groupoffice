@@ -1,3 +1,4 @@
+09-10-2020 6.5.176
 - Address book: Added color back in to contacts
 - Core: Custom fields saved as text to search cache
 - Core: New template custom field: https://groupoffice.readthedocs.io/en/latest/system-settings/custom-fields.html#template-field
