@@ -6,6 +6,7 @@
 - Studio: Only users with "Manage" permissions on the module may edit and create.
 - Core: Users have auto generated avatar with color and initials
 - Email: Font colors sometimes not working
+- Email: Add unknown recipients dialog didn't show up anymore
 
 06-10-2020 6.4.175
 - Core: Dark theme showed e-mail text in light font colors.
