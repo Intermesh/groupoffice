@@ -231,7 +231,7 @@ trait CustomFieldsTrait {
    * @throws PDOException
    * @throws Exception
    */
-	protected function saveCustomFields() {
+	public function saveCustomFields() {
 
 		
 		try {			

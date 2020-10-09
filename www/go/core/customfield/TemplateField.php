@@ -27,6 +27,17 @@ class TemplateField extends TextArea {
 		return true;
 	}
 
+	public function dbToApi($value, &$values, $entity)
+	{
+		if($value == null) {
+			//field just added and value not saved yet.
+			$this->beforeSave($value, $values, $entity);
+			$entity->saveCustomFields();
+			$value = $values[$this->field->databaseName];
+		}
+		return parent::dbToApi($value, $values, $entity);
+	}
+
 
 }
 
