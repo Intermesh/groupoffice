@@ -1,5 +1,7 @@
 - Address book: Added color back in to contacts
 - Core: Custom fields saved as text to search cache
+- Core: New template custom field: https://groupoffice.readthedocs.io/en/latest/system-settings/custom-fields.html#template-field
+- Studio: Only users with "Manage" permissions on the module may edit and create.
 
 06-10-2020 6.5.175
 - Core: Dark theme showed e-mail text in light font colors.
