@@ -2,6 +2,7 @@
 namespace go\core;
 
 use go\core\model\Link;
+use go\modules\community\addressbook\model\Address;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;
 
@@ -27,6 +28,16 @@ class TemplateParserTest extends \PHPUnit\Framework\TestCase
 		$contact1->addressBookId = $addressBook->id;
 		$contact1->firstName = "John";
 		$contact1->lastName = "Doe";
+
+		$contact1->addresses[0] = $a = new Address();
+
+		$a->type = Address::TYPE_POSTAL;
+		$a->street =	"Street";
+		$a->street2 = "1";
+		$a->city = "Den Bosch";
+		$a->zipCode = "5222 AE";
+		$a->countryCode = "NL";
+
 		$success = $contact1->save();
 		$this->assertEquals(true, $success);
 
@@ -48,6 +59,12 @@ class TemplateParserTest extends \PHPUnit\Framework\TestCase
 		$str = $tplParser->parse($tpl);
 
 		$this->assertEquals($contact2->name, $str);
+
+		$tpl = '[assign address = contact.addresses | filter:type:"postal" | first]{{address.zipCode}}';
+
+		$str = $tplParser->parse($tpl);
+
+		$this->assertEquals($a->zipCode, $str);
 
 	}
 }

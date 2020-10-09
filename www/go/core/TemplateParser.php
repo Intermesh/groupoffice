@@ -3,6 +3,8 @@
 namespace go\core;
 
 use Exception;
+use go\core\db\Query;
+use go\core\db\Statement;
 use go\core\orm\Entity;
 use go\core\orm\EntityType;
 use go\core\util\DateTime;
@@ -160,7 +162,7 @@ class TemplateParser {
 
 		$entityType = EntityType::findByName($entityName);
 		$entityCls = $entityType->getClassName();
-		$entities = $entityCls::findByLink($entity,[], true)->all();
+		$entities = $entityCls::findByLink($entity,[], true);
 
 		return $entities;
 	}
@@ -182,8 +184,19 @@ class TemplateParser {
 		return count($countable);
 	}
 
-	private function filterFirst(array $items) {
-		return $items[0] ?? null;
+	private function filterFirst($items) {
+
+		if(is_array($items)) {
+			return reset($items);
+		}
+
+		if($items instanceof Query) {
+			return $items->single();
+		}
+
+		throw new \Exception("Unsupported type for filter 'first'");
+
+
 	}
 	
 	/**
