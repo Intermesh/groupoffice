@@ -1,9 +1,5 @@
-XX-10-2020 6.4.177
+XX-10-2020 6.4.176
 - Address book: If module setting 'restrict to admins' is on, restrtict import/export to both admins and users with 'manage' permissions
-
-
-09-10-2020 6.5.176
-09-10-2020 6.4.176
 - Address book: Added color back in to contacts
 - Core: Custom fields saved as text to search cache
 - Core: New template custom field: https://groupoffice.readthedocs.io/en/latest/system-settings/custom-fields.html#template-field
@@ -8074,6 +8070,7 @@ First release including:
 - E-mail client
 - Addressbook
 - Scheduler
-- Project management (alpha)﻿
+- Project management (alpha)
+
 
 
