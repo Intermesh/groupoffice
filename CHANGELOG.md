@@ -1,4 +1,5 @@
 - Address book: Added color back in to contacts
+- Address book: If module setting 'restrict to admins' is on, restrtict import/export to both admins and users with 'manage' permissions
 
 06-10-2020 6.5.175
 - Core: Dark theme showed e-mail text in light font colors.
