@@ -1,3 +1,6 @@
+10-10-2020 6.4.178
+- ActiveSync: Invalid date string in message source caused sync loop
+
 09-10-2020 6.4.177
 - Core: Custom fields error in old framework
 
