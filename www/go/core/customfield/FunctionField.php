@@ -51,14 +51,14 @@ class FunctionField extends Number {
 		$result = null;
 		try {
 			eval("\$result = " . $f . ";");
-		} catch (\ParseError $e) {
+		} catch (\Error $e) {
 			return null;
 		}
 
 		return $result;
 	}
 
-	public function beforeSave($value, &$record)
+	public function beforeSave($value, &$record, $entity)
 	{
 		//remove data because it's not saved to the database
 		unset($record[$this->field->databaseName]);

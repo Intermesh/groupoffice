@@ -173,16 +173,12 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 			var avatar = {
 				xtype:'box',
 				autoEl: {tag: 'span','ext:qtip': t('{author} wrote at {date}')
-					.replace('{author}', creator.displayName)
+					.replace('{author}', Ext.util.Format.htmlEncode(creator.displayName))
 					.replace('{date}', Ext.util.Format.date(r.get('createdAt'),go.User.dateTimeFormat))},
 				cls: 'photo '+mineCls
 			};
-			if(creator.avatarId) { 
-				avatar.style = 'background-image: url('+go.Jmap.thumbUrl(creator.avatarId, {w: 40, h: 40, zc: 1})+');background-color: transparent;';
-			} else {
-				avatar.html = go.util.initials(creator.displayName);
-				avatar.style = 'background-image: none';
-			}
+
+			avatar.html = go.util.avatar(creator.displayName,creator.avatarId);
 
 			for(var i = 0, l = r.data.labels.length; i < l; i++){
 				labelText += '<i class="icon" title="' + r.data.labels[i].name + '" style="color: #' + r.data.labels[i].color + '">label</i>';

@@ -874,6 +874,36 @@ class Migrate63to64 {
 		$stmt->execute();
 	}
 
+	public function addColor() {
+
+		if(!go()->getDatabase()->hasTable('ab_contacts')) {
+			return;
+		}
+
+		$stmt = go()->getDbConnection()
+			->update("addressbook_contact",
+				[
+					"color" => new Expression('old.color')
+				],
+				(new Query)
+					->join('ab_contacts','old','old.color != "000000" AND old.id = t.id')
+			);
+		echo $stmt . "\n";
+		$stmt->execute();
+
+		$stmt = go()->getDbConnection()
+			->update("addressbook_contact",
+				[
+					"color" => new Expression('old.color')
+				],
+				(new Query)
+					->join('ab_companies','old','old.color != "000000" AND old.id = (t.id - ' . $this->getCompanyIdIncrement() .')')
+
+			);
+		echo $stmt . "\n";
+		$stmt->execute();
+	}
+
 	public function addSalutation() {
 
 		if(!go()->getDatabase()->hasTable('ab_contacts')) {
@@ -887,6 +917,7 @@ class Migrate63to64 {
 				],
 					(new Query)
 						->join('ab_contacts','old','old.id = t.id')
+
 				);		
 		echo $stmt . "\n";
 		$stmt->execute();

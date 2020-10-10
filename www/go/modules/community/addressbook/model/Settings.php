@@ -12,10 +12,7 @@ class Settings extends core\Settings {
 	 */
 	public $autoLinkEmail = false;
 
-
 	public $createPersonalAddressBooks = true;
-
-	public $lastContactColorIndex = 0;
 
 	public $restrictExportToAdmins = false;
 }

@@ -246,16 +246,18 @@ abstract class Base extends Model {
 	public function textToDb($value, &$values, $entity) {
 		return $this->apiToDb($value, $values, $entity);
 	}
-	
+
 	/**
 	 * Called after the data is saved to API.
-	 * 
-	 * @see MultiSelect for an advaced example
+	 *
 	 * @param mixed $value The value for this field
 	 * @param array $customFieldData The custom fields data
+	 * @param Entity $entity
 	 * @return boolean
+	 * @see MultiSelect for an advaced example
 	 */
-	public function afterSave($value, &$customFieldData) {
+	public function afterSave($value, &$customFieldData, $entity)
+	{
 		
 		return true;
 	}
@@ -357,16 +359,18 @@ abstract class Base extends Model {
         }
         return true;
     }
-	
+
 	/**
 	 * Called before the data is saved to API.
-	 * 
-	 * @see MultiSelect for an advaced example
+	 *
 	 * @param mixed $value The value for this field
 	 * @param array $record The values inserted in the database
+	 * @param Entity $entity
 	 * @return boolean
+	 * @see MultiSelect for an advaced example
 	 */
-	public function beforeSave($value, &$record) {
+	public function beforeSave($value, &$record, $entity)
+	{
 		
 		return true;
 	}
