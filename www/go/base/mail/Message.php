@@ -230,7 +230,7 @@ class Message extends \Swift_Message{
 				$udate = new \DateTime($date);
 			} catch(\Exception $e) {
 				ErrorHandler::logException($e);
-				$udate = date('c');
+				$udate = new \DateTime();
 			}
 
 			$this->setDate($udate);
