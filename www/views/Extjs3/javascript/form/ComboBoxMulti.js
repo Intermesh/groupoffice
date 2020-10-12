@@ -91,6 +91,7 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 				height += dp(8);
 				this.el.dom.style.height = height + "px";
 				changed = true;
+				this.el.dom.style.overflowY = 'auto';
 			}
 
 			if (changed) {

@@ -1,3 +1,6 @@
+XX-10-2020: 6.4.180
+- Email: In compose message, display vertical scroll bar if max height exxceeded
+
 11-10-2020 6.4.179
 - Address book: CSV export broken
 - Core: some modules couldn't be installed from system settings
