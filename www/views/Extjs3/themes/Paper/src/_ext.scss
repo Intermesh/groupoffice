@@ -319,10 +319,16 @@
 }
 
 .x-form-grow-sizer {
+	font-family: $font-family;
 	@extend %font-data;
 	padding: dp(6) dp(8);
 	min-height: dp(32);
 	line-height: dp(18);
+	border: 1px solid red;
+	//color: red;
+	//top: 10px;
+	//left: 10px;
+	//visibility: visible;
 }
 
 .ext-mb-input {

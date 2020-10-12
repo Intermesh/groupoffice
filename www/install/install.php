@@ -76,7 +76,7 @@ if (!empty($_POST)) {
 
 		foreach ($modules as $moduleClass) {
 
-			$moduleController = new $moduleClass;
+			$moduleController = $moduleClass::get();
 			if ($moduleController instanceof core\Module) {
 				continue;
 			}

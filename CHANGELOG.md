@@ -1,3 +1,10 @@
+- Email: Fixed scroll bars in recipient fields
+
+11-10-2020 6.4.179
+- Address book: CSV export broken
+- Core: some modules couldn't be installed from system settings
+- Core: fixed dismiss all button in notifications panel
+
 10-10-2020 6.4.178
 - ActiveSync: Invalid date string in message source caused sync loop
 
