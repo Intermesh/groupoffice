@@ -1,5 +1,5 @@
 /**
- * Cookie utitilies
+ * Cookie utilities
  */
 go.util.Cookies = {
 	/**
@@ -18,7 +18,7 @@ go.util.Cookies = {
 			maxAge = "";
 		}
 		var secure = location.protocol === 'https:' ? ';secure' : '';		
-		var cookie = name + "=" + encodeURIComponent(value + "") + maxAge + secure + ";path=" + document.location.pathname;
+		var cookie = name + "=" + encodeURIComponent(value + "") + maxAge + secure + ";path=" + document.location.pathname + ';SameSite=Strict';
 		document.cookie = cookie;
 	},
 	
@@ -48,6 +48,6 @@ go.util.Cookies = {
 	 * @returns {void}
 	 */
 	unset: function (name) {
-		document.cookie = name + '=; Max-Age=-99999999;';
+		document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=' + document.location.pathname + ';SameSite=Strict';
 	}
 }
