@@ -1,6 +1,9 @@
 //--------------------------------------------------------------
 // 0. Density independent pixels
 //--------------------------------------------------------------
+
+//TODO: Javascript in overrides.js uses 140 and 160 for
+// mobile and desktop so this can only be 140 or 160 at the moment
 $density: 140 !default; // LARGE SCREEN
 $font-scale: 1 !default;
 $resourcePath: './' !default;

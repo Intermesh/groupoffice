@@ -183,8 +183,6 @@ if ($cacheFile->exists()) {
 		}
 	}
 
-	$scripts[] = "GO.util.density = GO.util.isMobileOrTablet() ? 160 : 140;";
-
 	//two modules may include the same script
 	//$scripts = array_map('trim', $scripts);
 	//	$scripts = array_unique($scripts);
