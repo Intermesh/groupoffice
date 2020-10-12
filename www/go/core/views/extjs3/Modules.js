@@ -94,7 +94,7 @@ go.Modules = (function () {
 			}
 
 			//for the logged in user we can simply check permissionLevel
-			if(!user) {
+			if(!user || user.id == go.User.id) {
 				return module.permissionLevel >= permissionLevel;
 			}
 
