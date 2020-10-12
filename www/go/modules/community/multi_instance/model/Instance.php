@@ -538,8 +538,8 @@ class Instance extends Entity {
 	/**
 	 * Create a mysql dump of the installation database.
 	 * 
-	 * @param StringHelper $outputDir
-	 * @param StringHelper $filename Optional filename. If omitted then $config['db_name'] will be used.
+	 * @param string $outputDir
+	 * @param string $filename Optional filename. If omitted then $config['db_name'] will be used.
 	 * @return boolean
 	 * @throws Exception
 	 */

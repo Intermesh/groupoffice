@@ -35,7 +35,7 @@ GO.base.model.multiselect.addDialog = function(config){
 	
 	GO.base.model.multiselect.addDialog.superclass.constructor.call(this, {
 		layout: 'fit',
-		modal:false,
+		modal:true,
 		height:600,
 		tbar: [this.searchField],
 		width:500,

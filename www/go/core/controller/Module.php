@@ -48,7 +48,7 @@ class Module extends EntityController {
 			throw new NotFound();
 		}
 		
-		$mod = new $cls;
+		$mod = $cls::get();
 		$model = $mod->install();
 
 		if(!$model) {

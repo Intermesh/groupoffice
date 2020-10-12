@@ -276,6 +276,9 @@ a {
 		top: dp(16);
 		left: dp(16);
 	}
+	#go-powered-by {
+		color: white;
+	}
 }
 #motd { // login message of the day
 	@extend .z4;

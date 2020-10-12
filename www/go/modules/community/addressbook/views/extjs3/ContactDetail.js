@@ -85,8 +85,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 								}
 								
 								var container = box.getEl().dom.firstChild, 
-								item = e.getTarget("a"),								
-									i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);									
+								item = e.getTarget("a");
+
+								if(!item) {
+									return;
+								}
+
+								var	i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
 							
 								go.util.mailto({
 									email: this.data.emailAddresses[i].email,
@@ -123,8 +128,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 								}
 
 								var container = box.getEl().dom.firstChild, 
-								item = e.getTarget("a"),
-								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);						
+								item = e.getTarget("a");
+
+								if(!item) {
+									return;
+								}
+
+								var i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
 							
 								go.util.callto({
 									number: this.data.phoneNumbers[i].number.replace(/[^0-9+]/g, ""),
@@ -189,8 +199,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 								}
 
 								var container = box.getEl().dom.firstChild, 
-								item = e.getTarget("a", box.getEl()),
-								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
+								item = e.getTarget("a", box.getEl());
+
+								if(!item) {
+									return;
+								}
+
+								var i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
 								
 								go.util.showDate(new Date(this.data.dates[i].date));
 							}, this);
