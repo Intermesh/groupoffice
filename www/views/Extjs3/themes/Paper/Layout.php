@@ -75,7 +75,7 @@ $lang = GO::language()->getLanguage(); ?>
     }
   ?>
 </head>
-<body>
+<body class="go-compact">
 	<div id="sound"></div>
     <div id="paper"></div>
 	<!--Putting scripts in div will speed up developer tools because they don't have to show all those nodes-->
