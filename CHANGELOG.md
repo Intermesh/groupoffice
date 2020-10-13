@@ -1,3 +1,5 @@
+- Core: Custom field of type function could cause error "Division by zero"
+
 13-10-2020 6.4.180
 - Email: Fixed scroll bars in recipient fields
 - Core: Special download actions for modules were broken
