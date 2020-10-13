@@ -1,3 +1,6 @@
+13-10-2020 6.3.95
+- GOTA: certificate renewed
+
 28-09-2020 6.3.94
 - Assistant: removed install sql that could cause:
     Exception in /usr/share/groupoffice/go/base/Module.php at line 298:
