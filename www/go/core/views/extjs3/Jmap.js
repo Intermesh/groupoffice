@@ -168,7 +168,6 @@ go.Jmap = {
 			cfg.callback && cfg.callback.call(cfg.scope || this, {upload:'skipped'});
 			return;
 		}
-
 		var uploadNotification = go.Notifier.msgByKey('upload');
 		if(!uploadNotification) {
 			this.resetUploadQueue();
@@ -227,7 +226,7 @@ go.Jmap = {
 			}, 'upload');
 		}
 
-		if(go.Notifier.notificationArea.collapsed) {
+		if(!go.Notifier.notificationsVisible()) {
 			//show only if uploading for more than 1s
 			setTimeout(function() {
 				if (go.Jmap.uploadQueue.items.length > go.Jmap.uploadQueue.finished) {
@@ -293,7 +292,6 @@ go.Jmap = {
 				queueItem.finished = true;
 				queueItem.remainingBytes = 0; // success or fail, we are done
 				notifyEl.buttons[0].hide();
-
 				go.Jmap.uploadQueue.finished++;
 				uploadNotification.updateCount();
 
