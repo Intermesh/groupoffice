@@ -1,6 +1,7 @@
 - Core: In system settings, extra filter 'Disabled users', make sortable by change date
 - Core: Custom field of type function could cause error "Division by zero"
 - Core: Fixed safari 14.0 crash on pasting image in HTML editor fields
+- Core: JMAP didn't track change if only custom fields were modified
 
 13-10-2020 6.4.180
 - Email: Fixed scroll bars in recipient fields
