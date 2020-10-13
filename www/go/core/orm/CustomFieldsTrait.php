@@ -8,6 +8,7 @@ use go\core\db\Query;
 use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\Installer;
+use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 use go\core\model\Field;
 use PDOException;
@@ -128,9 +129,10 @@ trait CustomFieldsTrait {
 	 */
 	public function setCustomFields(array $data, $asText = false)
 	{
-		$this->customFieldsData = array_merge($this->internalGetCustomFields(), $this->normalizeCustomFieldsInput($data, $asText));
+		$old = $this->internalGetCustomFields();
+		$this->customFieldsData = array_merge($old, $this->normalizeCustomFieldsInput($data, $asText));
 
-		$this->customFieldsModified = true;
+		$this->customFieldsModified = $old != $this->customFieldsData;
 
 		return $this;
 	}
@@ -155,7 +157,7 @@ trait CustomFieldsTrait {
 	 * 
 	 * @return bool
 	 */
-	protected function isCustomFieldsModified() {
+	public function isCustomFieldsModified() {
 		return $this->customFieldsModified;
 	}
 
@@ -234,7 +236,6 @@ trait CustomFieldsTrait {
    */
 	public function saveCustomFields() {
 
-		
 		try {
 
 			if(Installer::isInstalling()) {
@@ -251,6 +252,12 @@ trait CustomFieldsTrait {
 
 			if(!$this->customFieldsModified && $record == $this->customFieldsData) {
 				return true;
+			}
+
+			//Set modifiedAt because otherwise the entity might have no change at all. Then no change will be logged for
+			//JMAP sync
+			if(!$this->isModified(['modifiedAt'])) {
+				$this->modifiedAt = new DateTime();
 			}
 
 			if($this->customFieldsIsNew) {

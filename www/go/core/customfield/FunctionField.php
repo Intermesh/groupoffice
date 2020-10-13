@@ -53,6 +53,8 @@ class FunctionField extends Number {
 			eval("\$result = " . $f . ";");
 		} catch (\Error $e) {
 			return null;
+		} catch(\Exception $e) {
+			return null;
 		}
 
 		return $result;
