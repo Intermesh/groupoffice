@@ -1,3 +1,4 @@
+- Core: In system settings, extra filter 'Disabled users', make sortable by change date
 - Core: Custom field of type function could cause error "Division by zero"
 - Core: Fixed safari 14.0 crash on pasting image in HTML editor fields
 
