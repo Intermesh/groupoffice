@@ -1,4 +1,6 @@
+13-10-2020 6.2.131
 - Calendar: Missing delete link in cancellation e-mail
+- Gota: signed the application with new certificate
 
 21-09-2020 6.2.130
 - Core: Fixed not found error on compressing folders.
