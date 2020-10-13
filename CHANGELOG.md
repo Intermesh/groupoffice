@@ -1,5 +1,6 @@
 
 
+
 Master
 - Business: New finance module
 - Projects: new module
@@ -16,8 +17,9 @@ end 6.5
 --------
 
 
-
+13-10-2020 6.4.180
 - Email: Fixed scroll bars in recipient fields
+- Core: Special download actions for modules were broken
 
 11-10-2020 6.4.179
 - Address book: CSV export broken
