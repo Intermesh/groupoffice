@@ -629,7 +629,7 @@ Ext.override(Ext.grid.GridView, {
 });
 
 Ext.override(Ext.grid.CheckboxSelectionModel, {
-	width: dp(32),
+	width: dp(40),
 });
 
 Ext.override(Ext.layout.ToolbarLayout, {
