@@ -1,4 +1,5 @@
 - Core: some modules couldn't be uninstalled from system settings
+- Core: Fixed too large cc field in e-mail composer
 
 13-10-2020 6.4.181
 - Core: In system settings, extra filter 'Disabled users', make sortable by change date
