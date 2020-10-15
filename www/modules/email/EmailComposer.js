@@ -844,7 +844,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		this.fromCombo.getEl().up('.x-form-item').setDisplayed(show);
 		if(show)
 		{
-			this.fromCombo.onResize();
+			this.fromCombo.autoSize();
 		}
 		this.doLayout();
 	},
@@ -853,7 +853,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		this.ccCombo.getEl().up('.x-form-item').setDisplayed(show);
 		if(show)
 		{
-			this.ccCombo.onResize();
+			this.ccCombo.autoSize();
 		}		
 		this.doLayout();
 	},
@@ -862,7 +862,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		this.bccCombo.getEl().up('.x-form-item').setDisplayed(show);		
 		if(show)
 		{
-			this.bccCombo.onResize();
+			this.bccCombo.autoSize();
 		}
 		this.doLayout();
 	},
