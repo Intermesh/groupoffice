@@ -832,6 +832,8 @@ CREATE TABLE `core_email_template` (
   `id` int(11) NOT NULL,
   `moduleId` int(11) NOT NULL,
   `aclId` int(11) NOT NULL,
+  `key` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL,
+  `language` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'en',
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `body` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL

@@ -30,6 +30,10 @@ class EmailTemplate extends AclOwnerEntity
 	 */
 	protected $moduleId;
 
+	public $key;
+
+	public $language = "en";
+
 	/**
 	 * 
 	 * @var string
