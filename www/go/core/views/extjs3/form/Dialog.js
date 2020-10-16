@@ -95,6 +95,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 			buttons:[
 				'->', 
 				this.saveButton = new Ext.Button({
+					cls: "primary",
 					text: t("Save"),
 					handler: function() {this.submit();},
 					scope: this
