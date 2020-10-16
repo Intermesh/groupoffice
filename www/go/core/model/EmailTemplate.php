@@ -69,10 +69,13 @@ class EmailTemplate extends AclOwnerEntity
 
 	protected static function defineFilters() {
 		return parent::defineFilters()
-						->add('module', function (Criteria $criteria, $module){
-              $module = Module::findByName($module['package'], $module['name']);
-							$criteria->where(['moduleId' => $module->id]);		
-						});
+			->add('module', function (Criteria $criteria, $module){
+        $module = Module::findByName($module['package'], $module['name']);
+				$criteria->where(['moduleId' => $module->id]);
+			})
+			->add('language' , function(Criteria $criteria, $language){
+				$criteria->where('language', '=',$language);
+			});
 					
 	}
 
