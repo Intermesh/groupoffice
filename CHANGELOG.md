@@ -2,7 +2,7 @@
 
 
 Master
-- Business: New finance module
+- Business: New finance and contracts module
 - Projects: new module
 - Tasks: new module
 - Time tracking: new module
