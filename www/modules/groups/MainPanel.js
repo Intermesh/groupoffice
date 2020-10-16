@@ -22,7 +22,7 @@ GO.groups.MainPanel = function(config){
 	this.store = new GO.data.JsonStore({
 	    url: GO.url('groups/group/store'),
 	    baseParams: {
-				manage:1
+				permissionLevel: GO.permissionLevels.manage
 			},
 	    root: 'results',
 	    id: 'id',

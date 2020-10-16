@@ -1,3 +1,5 @@
+- Groups: Users could see read only groups in the manage area
+
 13-10-2020 6.2.131
 - Calendar: Missing delete link in cancellation e-mail
 - Gota: signed the application with new certificate
