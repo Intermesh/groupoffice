@@ -697,8 +697,8 @@
 
 	@extend %font-button;
 	letter-spacing: 0; // for button icons
-	height: dp(36); // 32 for dense
-	line-height: dp(36) - 2; // 32 for dense
+	height: dp(32); // 32 for dense
+	line-height: dp(32) - 2; // 32 for dense
 	border-radius: $borderRadius;
 	vertical-align: middle;
 	white-space: nowrap;
@@ -776,9 +776,11 @@
 
 	}
 	&.primary {
-		//.x-btn-text {
-			@include var(color, c-primary);
-		//}
+
+		@include var('background-color', c-secondary);
+		color: white;
+		//@include var(color, c-primary);
+
    }
 	&.danger {
 		&.x-btn-focus, &.x-btn-over {
@@ -834,14 +836,14 @@
 			}
 		}
 		button {
-			min-width:dp(40);
-			min-height: dp(40);
+			min-width:dp(32);
+			min-height: dp(32);
 			position:relative;
 			&::before {
 				@extend %icon;
 				position:absolute;
-				top:dp(8.5);
-				left:dp(8);
+				top:dp(4);
+				left:dp(4);
 			}
 		}
    }
@@ -1055,9 +1057,15 @@
 	}
 	&-right {
 		padding-right: dp(8);
+		.x-window & {
+			padding-right: dp(16);
+		}
 	}
 	&-left {
 		padding-left: dp(8);
+		.x-window & {
+			padding-left: dp(16);
+		}
 	}
 	div.xtb-text {
 		@extend %font-subheading-dense;
@@ -2444,7 +2452,7 @@ $menuScrollerSize : dp(4);
 .x-panel-fbar td,.x-panel-fbar span,.x-panel-fbar input,.x-panel-fbar div,.x-panel-fbar select,.x-panel-fbar label{
 	@extend %font-data;
 	button {
-		@include var(color, c-primary);
+		//@include var(color, c-primary);
 	}
 }
 
