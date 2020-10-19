@@ -48,4 +48,7 @@ return array (
   'Fetchall' => 'Fetchall',
   'Mda' => 'Mda',
   'Email' => 'Email',
+  'Ok' => 'ОК',
+  'Use \'*\' for a catch all alias (not recommended).' => 'Използвай \'*\' за намиране на всички псевдоними (не се препоръчва).',
+  'Postfix admin' => 'Администратор на Postfix',
 );
