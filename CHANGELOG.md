@@ -4,6 +4,7 @@
 - Email: more user friendly icon and tooltip for CC / BCC submenu
 - Tickets: remove limit on writable ticket store for custom fields
 - Translations: Added Bulgarian translation thanks to Nikolay Stoychev.
+- Timeregistration: Activity name and code visible on ediding time registration
 
 13-10-2020 6.4.181
 - Core: In system settings, extra filter 'Disabled users', make sortable by change date
