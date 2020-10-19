@@ -85,7 +85,7 @@
   background-image: url("resources/twitter.png");
 }
 .go-addressbook-url.homepage {
-  background-color: #243a80;
+  background-color: #0277bd;
   border-radius: 2px;
 }
 .go-addressbook-url.homepage:before {

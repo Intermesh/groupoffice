@@ -836,14 +836,14 @@
 			}
 		}
 		button {
-			min-width:dp(40);
-			min-height: dp(40);
+			min-width:dp(32);
+			min-height: dp(32);
 			position:relative;
 			&::before {
 				@extend %icon;
 				position:absolute;
-				top:dp(8.5);
-				left:dp(8);
+				top:dp(4);
+				left:dp(4);
 			}
 		}
    }
