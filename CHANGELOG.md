@@ -1,7 +1,8 @@
 - Core: some modules couldn't be uninstalled from system settings
 - Core: Fixed too large cc field in e-mail composer
 - Core: Disabled phone number auto linking
-- Email: more user fliendly icon and tooltip for CC / BCC submenu
+- Email: more user friendly icon and tooltip for CC / BCC submenu
+- Tickets: remove limit on writable ticket store for custom fields
 
 13-10-2020 6.4.181
 - Core: In system settings, extra filter 'Disabled users', make sortable by change date
