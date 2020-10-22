@@ -538,20 +538,16 @@ a {
 
 #secondary-menu {
 	padding-right: dp(56);
-	#start-menu-link {		
-		display:inline-block;
+	#start-menu-link, #search_query {
+		float: left;
 		text-decoration: none;
 		height:dp(40);
-		padding: dp(18) dp(8) dp(8) dp(8);
+		padding: dp(18) dp(8) 0 0;
 		color: white;
 		&:hover,&:active { color: white; }
 	}
 }
-#search_query {
-	float:left;
-	display:block;
-	padding-top: dp(12);
-}
+
 
 .search-field-wrap {
 	position:absolute;

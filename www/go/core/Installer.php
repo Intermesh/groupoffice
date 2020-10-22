@@ -21,6 +21,7 @@ use go\core\model\User;
 use go\core\model\UserGroup;
 use go\core\Module;
 use go\core\orm\Entity;
+use go\core\orm\Filters;
 use go\core\util\ClassFinder;
 use go\core\util\Lock;
 use PDOException;
@@ -67,6 +68,15 @@ class Installer {
 	 */
 	public static function isUpgrading() {
 		return self::$isUpgrading || basename($_SERVER['PHP_SELF']) == 'upgrade.php';
+	}
+
+	public function toggleGarbageCollection($enabled) {
+		$job = model\CronJobSchedule::findByName("GarbageCollection", "core", "core");
+		$job->enabled = $enabled;
+		if(!$job->save()) {
+			throw new \Exception("Could not toggle garbage collection job");
+		}
+
 	}
 
 	/**
@@ -130,8 +140,6 @@ class Installer {
 		App::get()->getSettings()->setDefaultGroups([Group::ID_INTERNAL]);
 		App::get()->getSettings()->save();
 
-
-
 		App::get()->setCache(new $cacheCls);
 		Listeners::get()->init();
 
@@ -153,7 +161,10 @@ class Installer {
 			}
 		}
 
-		EntityType::findByName('FieldSet')->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
+		//Allow people to read filters by default
+		model\EntityFilter::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
+		//Allow people to read custom fieldsets by default
+		model\FieldSet::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
 	}
 	
 	private function installCoreModule() {
@@ -351,8 +362,8 @@ class Installer {
 		
 		ini_set("max_execution_time", 0);
 		ini_set("memory_limit", -1);
-		
 
+		$this->toggleGarbageCollection(false);
 
 		go()->getDbConnection()->query("SET sql_mode=''");
 		
@@ -398,6 +409,9 @@ class Installer {
 
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
+
+		$this->toggleGarbageCollection(true);
+
 		echo "Done!\n";
 	}
 	

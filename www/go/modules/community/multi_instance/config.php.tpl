@@ -10,6 +10,6 @@ $config['debug'] = false;
 $config['servermanager'] = '{servermanager}';
 $config['business'] = [
 	'studio' => [
-        'package' => '{subDomain}'
+        'package' => '{studioPackage}'
     ]
 ];

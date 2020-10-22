@@ -379,7 +379,7 @@
 	}
 	
 	&-composite {
-		div.x-box-item.text {
+		div.x-box-item.text, label {
 			@extend %font-subheading-dense;
 			padding: dp(4) 0;
 			line-height:dp(24)

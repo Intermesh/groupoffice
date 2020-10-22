@@ -77,7 +77,7 @@ class Labels extends \TCPDF {
 	}
 
 	private function addLabel(Contact $contact, $tpl) {
-		$this->templateParser->addModel('contact', $contact->toTemplate());
+		$this->templateParser->addModel('contact', $contact);
 		$txt = $this->templateParser->parse($tpl);
 		$this->MultiCell($this->labelWidth, $this->labelHeight, $txt, 0, 'L', 0, 0, '', '', true,0,false,true,$this->labelHeight,'T', false);
 

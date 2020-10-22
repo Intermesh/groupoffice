@@ -37,6 +37,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 			'personalGroup',
 			'enabled',
 			{name: 'createdAt', type: 'date'},
+			{name: 'modifiedAt', type: 'date'},
 			{name: 'lastLogin', type: 'date'}
 		], [{
 				id: 'name',
@@ -61,6 +62,15 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				sortable: true,
 				dataIndex: 'createdAt',
 				hidden: false
+			},
+			{
+				xtype:"datecolumn",
+				id: 'modifiedAt',
+				header: t('Modified at'),
+				width: dp(160),
+				sortable: true,
+				dataIndex: 'createdAt',
+				hidden: true
 			},
 			{
 				xtype:"datecolumn",

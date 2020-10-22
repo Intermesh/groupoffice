@@ -37,16 +37,6 @@ GO.form.ComboBoxMulti = function(config){
 	}
 	 //config.height = dp(24);
 	GO.form.ComboBoxMulti.superclass.constructor.call(this, config);
-
-
-	if(this.textarea) {
-		this.on('render', function () {
-			//this.syncHeight();
-			this.getEl().on('input', function (e) {
-				//this.syncHeight();
-			}, this);
-		}, this);
-	}
 };
 
 Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {

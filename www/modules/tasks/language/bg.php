@@ -85,4 +85,6 @@ return array (
   'name' => 'Задачи',
   'description' => 'Модул за прости задачи.',
   'Tasks' => 'Задачи',
+  'project' => 'проект',
+  'Remove duplicates' => 'Премахни дубликатите',
 );
