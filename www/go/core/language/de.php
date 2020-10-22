@@ -146,6 +146,7 @@ Password: {password}' => 'Ein {product_name} Konto wurde für Sie auf {url} erst
   'Login enabled' => 'Anmeldung aktiviert',
   'Create user' => 'Benutzer anlegen',
   'Show disabled' => 'Deaktivierte anzeigen',
+  'Show enabled' => 'Aktivierte anzeigen',
   'Last login' => 'Letzter Login',
   'Login as this user' => 'Anmelden als dieser Benutzer',
   'Failed to login as this user' => 'Fehler beim Anmelden als dieser Benutzer',

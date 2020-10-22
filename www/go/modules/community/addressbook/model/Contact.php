@@ -870,7 +870,22 @@ class Contact extends AclItemEntity {
 		
 		return $this->organizationIds;
 	}
-	
+
+	/**
+	 * Used in templates. Not returned to API by default.
+	 *
+	 * @return Contact[]
+	 * @throws Exception
+	 */
+	public function getOrganizations() {
+		return $this->findOrganizations()->all();
+	}
+
+	protected static function atypicalApiProperties()
+	{
+		return array_merge(parent::atypicalApiProperties(), ['organizations']);
+	}
+
 	public function setOrganizationIds($ids) {		
 		$this->setOrganizationIds = $ids;				
 	}
@@ -1146,12 +1161,6 @@ class Contact extends AclItemEntity {
 		$message->setTo($this->emailAddresses[0]->email, $this->name);
 	}
 
-	public function toTemplate() {
-		$array = parent::toTemplate();
-		$array['organizations'] = $this->findOrganizations()->all();
-
-		return $array;
-	}
 //
 //	private static $colors =  [
 //    'C62828',

@@ -326,7 +326,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		if(data.htmlbody) {
 			data.htmlbody = Autolinker.link(
 				data.htmlbody,
-				{stripPrefix: false, stripTrailingSlash: false, className: "normal-link", newWindow: true}
+				{stripPrefix: false, stripTrailingSlash: false, className: "normal-link", newWindow: true, phone: false}
 			)
 		}
 

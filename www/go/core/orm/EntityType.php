@@ -653,6 +653,19 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		return $acl;
 	}
 
+	/**
+	 *
+	 * @example
+	 *
+	 * You can manually set the default for a group like this:
+	 *
+	 * ```
+	 * Calendar::entityType()->setDefaultAcl([Group::ID_INTERNAL => Acl::LEVEL_WRITE]);
+	 * ```
+	 * @param $acl
+	 * @return bool
+	 * @throws Exception
+	 */
 	public function setDefaultAcl($acl) {
 		$defaultAclId = $this->getDefaultAclId();
 		if(!$defaultAclId) {

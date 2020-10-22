@@ -19,4 +19,5 @@ return array (
   'name' => 'Отметки',
   'description' => 'Пояснение за уебсайта.',
   'Bookmarks' => 'Отметки',
+  'Toggle view' => 'Смяна на изгледа',
 );

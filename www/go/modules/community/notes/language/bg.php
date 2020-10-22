@@ -1,7 +1,7 @@
 <?php
 return array (
-  'Notebook' => 'Бележка',
-  'Notebooks' => 'Бележки',
+  'Notebook' => 'Бележник',
+  'Notebooks' => 'Бележници',
   'Note' => 'Бележка',
   'Notes' => 'Бележка',
   'category_id' => 'Бележка №',
@@ -11,4 +11,8 @@ return array (
   'General' => 'Общ',
   'You don\'t have permission to delete all selected notes' => 'Нямате права да изтривате всички избрани бележки',
   'Multiple note books selected' => 'Избрани много категории бележници',
+  'Encrypted data' => 'Шифровани данни',
+  'Note book' => 'Бележник',
+  'Enter password to decrypt' => 'Въведете парола за дешифриране',
+  'Default note book' => 'Бележник по подазбиране',
 );
