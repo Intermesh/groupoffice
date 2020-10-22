@@ -922,41 +922,6 @@ abstract class Entity extends Property {
 		return [Json::class];
 	}
 
-  /**
-   * Convert this entity to template models for parsing.
-   *
-   * This will be used for @return array
-   * @throws Exception
-   * @see TemplateParser::addModel()
-   *
-   * By default it will provide itself with the entityType->getName() in lowerCamelCase.
-   *
-   * for example ['contact' => Contact $this];
-   *
-   */
-	public function toTemplate() {
-		// return [lcfirst(self::entityType()->getName()) => $this];
-
-		$arr = [];
-		
-		if(empty($properties)) {
-			$properties = array_filter($this->getReadableProperties(), function($propName) {
-				return !in_array($propName, ['acl', 'permissionLevel']);
-			});
-		}
-
-		foreach ($properties as $propName) {
-			if($propName == 'customFields') {
-				$arr['customFields'] = $this->getCustomFields(true);
-			} else{
-        $value = $this->getValue($propName);
-        $arr[$propName] = method_exists($value, 'toTemplate') ? $value->toTemplate() : $value;
-			}
-		}
-		
-		return $arr;
-	}
-
 	/**
 	 * Check database integrity
    *

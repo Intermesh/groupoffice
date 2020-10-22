@@ -3,6 +3,8 @@
 namespace go\core\customfield;
 
 class FunctionField extends Number {
+
+	private static $loopIds = [];
 	
 	//no db field for functions
 	public function onFieldSave() {
@@ -32,10 +34,26 @@ class FunctionField extends Number {
 		return "decimal(19,$decimals) DEFAULT " . $d;
 	}
 
+
+
 	public function dbToApi($value, &$values, $entity) {
+
+		//prevent infinite loop because this function is used in beforeSave too
+		if(in_array($this->field->id, self::$loopIds)) {
+			return null;
+		}
+
+		self::$loopIds[] = $this->field->id;
+
+		$v = $entity->getCustomFields(true);
+
+		self::$loopIds = array_filter(self::$loopIds, function($id) {
+			return $id != $this->field->id;
+		});
+
 		$f = $this->field->getOption("function");
-		
-		foreach ($values as $key => $value) {
+
+		foreach ($v as $key => $value) {
 			if(is_numeric($value)) {
 				$f = str_replace('{' . $key . '}', $value, $f);
 			}
