@@ -17,7 +17,7 @@ class MigrateCustomFields63to64 {
 
 	const TREE_SELECT_OPTION_INCREMENT = 100000;
 
-	private static $TREE_SELECT_OPTION__MISSING_ID = 200000;
+	private static $TREE_SELECT_OPTION_MISSING_ID = 200000;
 	
 	public function migrateEntity($entityName) {
 
@@ -100,11 +100,17 @@ class MigrateCustomFields63to64 {
 
 			//Value is string <id>:<Text>
 			$id = explode(':', $record[$field->databaseName])[0];
-			
+
+			if(!is_numeric($id)) {
+				$value = null;
+			} else{
+				$value = $id + $incrementID;
+			}
+
 			go()->getDbConnection()
 								->update(
 												$field->tableName(), 
-												[$field->databaseName => $id + $incrementID],
+												[$field->databaseName => $value],
 												['id' => $record['id']]
 												)->execute();
 		}
@@ -332,7 +338,7 @@ class MigrateCustomFields63to64 {
 		}
 
 		//create new
-		$newId = static::$TREE_SELECT_OPTION__MISSING_ID++;
+		$newId = static::$TREE_SELECT_OPTION_MISSING_ID++;
 		$data = [
 			'id'=> $newId,
 			'fieldId'=>$fields[0]->id,
@@ -463,7 +469,7 @@ class MigrateCustomFields63to64 {
 		
 		$data = array_map(function($text) use ($field) {
 			return [
-				"id" => self::$TREE_SELECT_OPTION__MISSING_ID++,
+				"id" => self::$TREE_SELECT_OPTION_MISSING_ID++,
 				"text" => self::MISSING_PREFIX.$text,
 				"fieldId" => $field->id
 			];
