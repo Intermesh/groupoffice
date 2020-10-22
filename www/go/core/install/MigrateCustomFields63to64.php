@@ -20,10 +20,12 @@ class MigrateCustomFields63to64 {
 	private static $TREE_SELECT_OPTION_MISSING_ID = 200000;
 	
 	public function migrateEntity($entityName) {
-
 		
 		echo "Migrating custom fields for entity: " . $entityName ."\n";
-		
+
+		$max = (int) go()->getDbConnection()->selectSingleValue('max(id)')->from("core_customfields_select_option")->single();
+		self::$TREE_SELECT_OPTION_MISSING_ID += $max;
+
 		$entityType = EntityType::findByName($entityName);
 		
 		if(!$entityType) {
