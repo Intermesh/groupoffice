@@ -1,7 +1,17 @@
+- Core: some modules couldn't be uninstalled from system settings
+- Core: Fixed too large cc field in e-mail composer
+- Core: Disabled phone number auto linking
+- Email: more user friendly icon and tooltip for CC / BCC submenu
+- Tickets: remove limit on writable ticket store for custom fields
+- Translations: Added Bulgarian translation thanks to Nikolay Stoychev.
+- Timeregistration: Activity name and code visible on ediding time registration
+
+13-10-2020 6.4.181
 - Core: In system settings, extra filter 'Disabled users', make sortable by change date
 - Core: Custom field of type function could cause error "Division by zero"
 - Core: Fixed safari 14.0 crash on pasting image in HTML editor fields
 - Core: JMAP didn't track change if only custom fields were modified
+- GOTA: Signed jar file
 
 13-10-2020 6.4.180
 - Email: Fixed scroll bars in recipient fields

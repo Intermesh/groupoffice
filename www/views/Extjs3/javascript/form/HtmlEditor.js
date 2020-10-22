@@ -190,7 +190,14 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		this.debounceTimeout = setTimeout(function () {
 			me.storeCursorPosition();
 			var h = me.getEditorBody().innerHTML;
-			var anchored = Autolinker.link(h, {stripPrefix: false, stripTrailingSlash: false, className: "normal-link", newWindow: true});
+			var anchored = Autolinker.link(h, {
+				stripPrefix: false,
+				stripTrailingSlash: false,
+				className: "normal-link",
+				newWindow: true,
+				phone: false
+			});
+
 			if(h != anchored) {
 				me.getEditorBody().innerHTML = anchored;
 				me.restoreCursorPosition();
