@@ -7,6 +7,8 @@
 - Timeregistration: Activity name and code visible on ediding time registration
 - Core: Template and function custom field use text values instead of id's of select fields
 - Core: Turn off GarbageCollection while upgrading
+- Studio: Checks for reserved PHP Keywords
+- Studio: Generates commented at and has links to filters
 
 13-10-2020 6.4.181
 - Core: In system settings, extra filter 'Disabled users', make sortable by change date
