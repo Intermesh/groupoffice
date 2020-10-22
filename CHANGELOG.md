@@ -1,3 +1,4 @@
+22-10-2020 6.4.182
 - Core: some modules couldn't be uninstalled from system settings
 - Core: Fixed too large cc field in e-mail composer
 - Core: Disabled phone number auto linking
@@ -9,6 +10,7 @@
 - Core: Turn off GarbageCollection while upgrading
 - Studio: Checks for reserved PHP Keywords
 - Studio: Generates commented at and has links to filters
+- Core: Share custom filters with everyone by default on new installations
 
 13-10-2020 6.4.181
 - Core: In system settings, extra filter 'Disabled users', make sortable by change date

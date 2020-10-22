@@ -21,6 +21,7 @@ use go\core\model\User;
 use go\core\model\UserGroup;
 use go\core\Module;
 use go\core\orm\Entity;
+use go\core\orm\Filters;
 use go\core\util\ClassFinder;
 use go\core\util\Lock;
 use PDOException;
@@ -141,8 +142,6 @@ class Installer {
 		App::get()->getSettings()->setDefaultGroups([Group::ID_INTERNAL]);
 		App::get()->getSettings()->save();
 
-
-
 		App::get()->setCache(new $cacheCls);
 		Listeners::get()->init();
 
@@ -165,7 +164,10 @@ class Installer {
 			}
 		}
 
-		EntityType::findByName('FieldSet')->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
+		//Allow people to read filters by default
+		model\EntityFilter::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
+		//Allow people to read custom fieldsets by default
+		model\FieldSet::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
 	}
 	
 	private function installCoreModule() {
