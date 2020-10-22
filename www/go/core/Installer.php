@@ -70,6 +70,15 @@ class Installer {
 		return self::$isUpgrading || basename($_SERVER['PHP_SELF']) == 'upgrade.php';
 	}
 
+	public function toggleGarbageCollection($enabled) {
+		$job = model\CronJobSchedule::findByName("GarbageCollection", "core", "core");
+		$job->enabled = $enabled;
+		if(!$job->save()) {
+			throw new \Exception("Could not toggle garbage collection job");
+		}
+
+	}
+
 	/**
 	 * 
 	 * @param array $adminValues
@@ -356,8 +365,8 @@ class Installer {
 		
 		ini_set("max_execution_time", 0);
 		ini_set("memory_limit", -1);
-		
 
+		$this->toggleGarbageCollection(false);
 
 		go()->getDbConnection()->query("SET sql_mode=''");
 		
@@ -404,6 +413,8 @@ class Installer {
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
 		LoggingTrait::enable();
+
+		$this->toggleGarbageCollection(true);
 		echo "Done!\n";
 	}
 	
