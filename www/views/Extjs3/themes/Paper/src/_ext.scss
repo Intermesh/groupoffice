@@ -46,7 +46,7 @@
 		border:0;
 		padding:0;
 		height:dp(5);
-		background-color: $cAccent;
+		@include var(background-color, c-accent);
 		animation-name: indeterminate1;
 		animation-duration: 2s;
 		animation-iteration-count: infinite;
@@ -1902,7 +1902,7 @@ td.grid-hd-group-cell {
 		}
 		a:hover, .x-date-inner .x-date-disabled a:hover{
 			color:white;
-			background-color:$cAccent;
+			@include var(background-color, c-accent);
 		}
 	}
 }
@@ -1970,7 +1970,7 @@ td.x-date-mp-month a,td.x-date-mp-year a {
 
 td.x-date-mp-month a:hover,td.x-date-mp-year a:hover {
 	color:white;
-	background-color: $cAccent;
+	@include var(background-color, c-accent);
 }
 
 td.x-date-mp-sel a {
