@@ -1,3 +1,5 @@
+- Email: Fixed download inline image on linked messages
+
 22-10-2020 6.4.182
 - Core: some modules couldn't be uninstalled from system settings
 - Core: Fixed too large cc field in e-mail composer
