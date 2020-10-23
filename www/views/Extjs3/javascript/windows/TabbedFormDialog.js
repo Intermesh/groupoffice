@@ -212,6 +212,7 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 				handler: function(){
 					this.submitForm(true);
 				},
+				primary: true,
 				scope: this
 			}));
 		

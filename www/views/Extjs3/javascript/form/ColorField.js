@@ -53,7 +53,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 
 				'009BC9', //Group-Office blue
 				'243A80', //Intermesh blue
-				'689F38', //default secondary
+				'78A22F', //default secondary
 				'FF9100'  //Default accent
 			];
 		} else if(config.light) {
@@ -97,7 +97,7 @@ GO.form.ColorField =  Ext.extend(function(config){
 
 				'009BC9', //Group-Office blue
 				'243A80', //Intermesh blue
-				'689F38', //default secondary
+				'78A22F', //default secondary
 				'FF9100'  //Default accent
 			];
 		}

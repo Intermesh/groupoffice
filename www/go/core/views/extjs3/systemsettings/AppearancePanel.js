@@ -56,7 +56,7 @@ go.systemsettings.AppearancePanel = Ext.extend(go.systemsettings.Panel, {
 								scope: this,
 								change: function (field, color) {
 									if (!color) {
-										color = "243A80"; //default color
+										color = "0277BD"; //default color
 									}
 									document.body.style.setProperty('--c-primary', '#' + color);
 								}
@@ -75,7 +75,7 @@ go.systemsettings.AppearancePanel = Ext.extend(go.systemsettings.Panel, {
 								scope: this,
 								change: function (field, color) {
 									if (!color) {
-										color = "689F38"; //default color
+										color = "78A22F"; //default color
 									}
 									document.body.style.setProperty('--c-secondary', '#' + color);
 								}

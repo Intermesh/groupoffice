@@ -176,7 +176,10 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 				baseParams: {sort: [{property: "createdAt", isAscending:false}]},
 				entityStore: "LogEntry"
 			}),
-			viewConfig: {emptyText: '<i>description</i><p>' + t("Item was never modified",'community','history') + '</p>'},
+			viewConfig: {
+				emptyText: '<i>description</i><p>' + t("Item was never modified",'community','history') + '</p>',
+				totalDisplay: true
+			},
 			columns: cols
 		});
 

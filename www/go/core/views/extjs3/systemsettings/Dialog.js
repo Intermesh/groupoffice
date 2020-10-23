@@ -15,22 +15,24 @@
 go.systemsettings.Dialog = Ext.extend(go.Window, {
 	
 	modal:true,
-	resizable:false,
-	maximizable:false,
-	maximized: true,
+	resizable:true,
+	maximizable:true,
+	//maximized: true,
 	iconCls: 'ic-settings',
 	title: t("System settings"),	
 	width:dp(1000),
 	height:dp(800),
 	layout:'responsive',
 	closeAction: "hide",
+	stateId: "go-system-settings",
 
 	initComponent: function () {
 		
 		this.saveButton = new Ext.Button({
 			text: t('Save'),
 			handler: this.submit,
-			scope:this
+			scope:this,
+			cls: "primary"
 		});		
 		
 		this.tabPanel = new Ext.TabPanel({

@@ -186,8 +186,8 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 			columns: cols.columns,
 			viewConfig: {
 				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',
-				forceFit: true,
-				autoFill: true,
+				// forceFit: true,
+				// autoFill: true,
 				totalDisplay: true,
 				getRowClass: function(record) {
 					if(!record.json.enabled)

@@ -776,12 +776,9 @@
 
 	}
 	&.primary {
-
 		@include var('background-color', c-secondary);
 		color: white;
-		//@include var(color, c-primary);
-
-   }
+	}
 	&.danger {
 		&.x-btn-focus, &.x-btn-over {
 			@include var(background-color, c-primary-tp);
@@ -811,6 +808,9 @@
 		background-color: color($bg, 'pressed') !important;
 		.x-btn-text { @include var(color, c-primary); }
    }
+	&-click.primary {
+		.x-btn-text { @include var(color, c-secondary); }
+	}
    &-icon {
 		i {
 			position:absolute;
