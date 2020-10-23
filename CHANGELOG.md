@@ -1,3 +1,7 @@
+23-10-2020 6.4.184
+- Core: Template parse gave error on arrays
+- Core: Chips component error on empty value in custom fields
+
 23-10-2020 6.4.183
 - Email: Fixed download inline image on linked messages
 - Core: Add constraints to acl from core_search

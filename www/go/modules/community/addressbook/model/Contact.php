@@ -998,7 +998,7 @@ class Contact extends AclItemEntity {
 		//re fetch in case this object is not complete
 		$contact= Contact::findById($this->id, ['firstName', 'lastName', 'middleName', 'name', 'gender', 'prefixes', 'suffixes', 'language']);
 		$tpl = new TemplateParser();
-		$tpl->addModel('contact', $contact->toArray());
+		$tpl->addModel('contact', $contact);
 
 		$addressBook = AddressBook::findById($this->addressBookId, ['salutationTemplate']);
 
