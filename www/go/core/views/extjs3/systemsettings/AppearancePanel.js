@@ -51,12 +51,12 @@ go.systemsettings.AppearancePanel = Ext.extend(go.systemsettings.Panel, {
 							]
 						},
 
-						this.colorField = new GO.form.ColorField({
+						this.primaryColorField = new GO.form.ColorField({
 							listeners: {
 								scope: this,
 								change: function (field, color) {
 									if (!color) {
-										color = "009BC9"; //default color
+										color = "243A80"; //default color
 									}
 									document.body.style.setProperty('--c-primary', '#' + color);
 								}
@@ -66,32 +66,44 @@ go.systemsettings.AppearancePanel = Ext.extend(go.systemsettings.Panel, {
 							value: null,
 							width: 200,
 							name: 'primaryColor',
-							colors: [
-								'009BC9', //Group-Office blue
-								'0E3B83', //Intermesh blue
+							dark: true
 
-								'C62828', //al 800 variants of Material design
-								'AD1457',
-								'6A1B9A',
-								'4527A0',
-								'283593',
-								'1565C0',
-								'0277BD',
-								'00838F',
-								'00695C',
-								'2E7D32',
-								'558B2F',
-								'9E9D24',
-								'F9A825',
-								'FF8F00',
-								'EF6C00',
-								'D84315',
-								'4E342E',
-								'424242',
-								'37474F',
-								'000000'
-							]
+						}),
 
+						this.secondaryColorField = new GO.form.ColorField({
+							listeners: {
+								scope: this,
+								change: function (field, color) {
+									if (!color) {
+										color = "689F38"; //default color
+									}
+									document.body.style.setProperty('--c-secondary', '#' + color);
+								}
+							},
+							fieldLabel: t("Secondary color"),
+							showHexValue: true,
+							value: null,
+							width: 200,
+							name: 'secondaryColor',
+							dark: true
+
+						}),
+						this.accentColorField = new GO.form.ColorField({
+							listeners: {
+								scope: this,
+								change: function (field, color) {
+									if (!color) {
+										color = "FF9100"; //default color
+									}
+									document.body.style.setProperty('--c-accent', '#' + color);
+								}
+							},
+							fieldLabel: t("Accent color"),
+							showHexValue: true,
+							value: null,
+							width: 200,
+							name: 'accentColor',
+							dark: true
 
 						})
 					]

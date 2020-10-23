@@ -652,18 +652,21 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 	},
 	onImageContextMenu : function (e, target){
-		var number = this.getParameterByName("number",target.src);
 
+		if(target.tagName != "IMG") {
+			return;
+		}
+		var token = this.getParameterByName("token",target.src), path = null;
 		for(var i = 0; i < this.data.inlineAttachments.length;i++) {
-			if(this.data.inlineAttachments[i].number == number) {
+
+			if(this.data.inlineAttachments[i].token == token) {
 				var attachment = this.data.inlineAttachments[i];
 			}
 		}
-		
-		if(target.tagName == "IMG") {
-			e.preventDefault();
-			this.attachmentContextMenu.showAt(e.getXY(),attachment);
-		}
+
+		e.preventDefault();
+		this.attachmentContextMenu.showAt(e.getXY(),attachment);
+
 
 	},
 	getParameterByName : function(name, url) {
@@ -671,8 +674,8 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		name = name.replace(/[\[\]]/g, '\\$&');
 		var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
 			results = regex.exec(url);
-		if (!results) return null;
-		if (!results[2]) return '';
+		if (!results) return false;
+		if (!results[2]) return false;
 		return decodeURIComponent(results[2].replace(/\+/g, ' '));
 	},
 	onAttachmentContextMenu : function (e, target){
