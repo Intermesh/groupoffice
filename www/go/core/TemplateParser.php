@@ -724,7 +724,7 @@ class TemplateParser {
 	public function addModel($name, $model) {
 
 		//set custom fields to text mode
-		if(property_exists($model, "returnAsText")) {
+		if(is_object($model) && property_exists($model, "returnAsText")) {
 			$model->returnAsText = true;
 		}
 

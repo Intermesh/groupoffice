@@ -16,10 +16,12 @@ end 6.5
 --------
 
 
+23-10-2020 6.4.183
 - Email: Fixed download inline image on linked messages
 - Core: Add constraints to acl from core_search
 - Filesearch: raise default index file sizze limit to 10MB
 - Core: Configure secondary and accent color for Paper theme
+- Core: Fixed missing GC cron job Groupoffice #620
 
 
 22-10-2020 6.4.182
