@@ -92,7 +92,7 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 				actionConfig: {
 					scope: this,
 					menu: this.initMoreMenu()
-				},
+				}
 			}
 			// config options for stateful behavior
 //			stateful: true,
