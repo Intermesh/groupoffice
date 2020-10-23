@@ -15,11 +15,7 @@
 go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 	iconCls: 'ic-group',
 	initComponent: function () {
-
-		var actions = this.initRowActions();
-
 		this.title = t("Groups");
-
 		this.store = new go.data.Store({
 			baseParams: {
 				filter: {
@@ -37,11 +33,8 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 			],
 			entityStore: "Group"
 		});
-		
-
 
 		Ext.apply(this, {
-			plugins: [actions],
 			tbar: ['->',
 				{
 					xtype: 'tbsearch',
@@ -90,14 +83,16 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 						return '<div>' + value + '</div>' +
 										'<small class="username">' + Ext.util.Format.htmlEncode(memberStr) + '</small>';
 					}
-				},
-				actions
+				}
 			],
+			autoExpandColumn: 'name',
 			viewConfig: {
 				emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
-				forceFit: true,
-				autoFill: true,
-				totalDisplay: true
+				totalDisplay: true,
+				actionConfig: {
+					scope: this,
+					menu: this.initMoreMenu()
+				},
 			}
 			// config options for stateful behavior
 //			stateful: true,
@@ -115,64 +110,36 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 		});
 	},
 
-	initRowActions: function () {
-
-		var actions = new Ext.ux.grid.RowActions({
-			menuDisabled: true,
-			hideable: false,
-			draggable: false,
-			fixed: true,
-			header: '',
-			hideMode: 'display',
-			keepSelection: true,
-
-			actions: [{
-					iconCls: 'ic-more-vert'
-				}]
-		});
-
-		actions.on({
-			action: function (grid, record, action, row, col, e, target) {
-				this.showMoreMenu(record, e);
-			},
-			scope: this
-		});
-
-		return actions;
-
-	},
-
-	showMoreMenu: function (record, e) {
-		if (!this.moreMenu) {
-			this.moreMenu = new Ext.menu.Menu({
-				items: [
-					{
-						itemId: "view",
-						iconCls: 'ic-edit',
-						text: t("Edit"),
-						handler: function () {
-							this.edit(this.moreMenu.record.id);
-						},
-						scope: this
-					},					
-					"-", 
-					{
-						itemId: "delete",
-						iconCls: 'ic-delete',
-						text: t("Delete"),
-						handler: function () {
-							this.getSelectionModel().selectRecords([this.moreMenu.record]);
-							this.deleteSelected();
-						},
-						scope: this
+	initMoreMenu: function () {
+		this.moreMenu = new Ext.menu.Menu({
+			items: [
+				{
+					itemId: "view",
+					iconCls: 'ic-edit',
+					text: t("Edit"),
+					handler: function (item) {
+						var record = this.store.getAt(item.parentMenu.rowIndex);
+						this.edit(record.id);
 					},
-				]
-			})
-		}
+					scope: this
+				},
+				"-",
+				{
+					itemId: "delete",
+					iconCls: 'ic-delete',
+					text: t("Delete"),
+					handler: function (item) {
+						var record = this.store.getAt(item.parentMenu.rowIndex);
+						this.getSelectionModel().selectRecords([record]);
+						this.deleteSelected();
+					},
+					scope: this
+				},
+			]
+		});
 
-		this.moreMenu.record = record;
 
-		this.moreMenu.showAt(e.getXY());
+		return this.moreMenu;
 	},
 
 	edit: function (id) {
