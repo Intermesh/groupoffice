@@ -44,6 +44,7 @@ GO.tasks.TaskDialog = function() {
 					this.submitForm(true);
 
 				},
+				cls: "primary",
 				scope : this
 			}]
 	/*

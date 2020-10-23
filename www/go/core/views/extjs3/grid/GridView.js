@@ -1,3 +1,28 @@
+/**
+ * Supports extra features:
+ *
+ * {
+ * 	totalDisplay: true,
+ *
+ * 	actionConfig: {
+ * 		handler: function(btn) {
+ * 			// btn.rowIndex is available
+ * 		},
+ * 		scope: this,
+ * 		menu:  [{
+ * 				itemId: "view",
+ * 				iconCls: 'ic-edit',
+ * 				text: t("Edit"),
+ * 				handler: function(item) {
+ * 					//use item.parentMenu.rowIndex to find record
+ * 					var record = this.store.getAt(item.parentMenu.rowIndex);
+ * 					this.edit(record.id);
+ * 				},
+ * 				scope: this
+ * 			}]
+ * 		}
+ * 	}
+ */
 Ext.define('go.grid.GridView', {
   extend: 'Ext.grid.GridView',
 	htmlEncode: true,
@@ -21,36 +46,102 @@ Ext.define('go.grid.GridView', {
 				'<div class="x-grid3-resize-proxy">&#160;</div>',
 		'</div>'),		
 
-		initElements: function() {
-			this.callParent(arguments);
+	initElements: function() {
+		this.callParent(arguments);
 
-			if(this.totalDisplay) {
-				this.totalDisplay = this.el.child('div.go-grid-total');
-				this.totalDisplay.setRight(this.scrollOffset);
-				this.totalDisplay.on("click", function() {
-					this.totalDisplay.hide();
-				}, this);
-
-				this.setTotalCount(this.totalCount);
-			} else{
-				var td = this.el.child('div.go-grid-total');
-				if(td) {
-					td.remove();
-				}
-			}			
-		},
-
-		totalCount: 0,
-		setTotalCount: function(c) {
-			this.totalCount = c;
-			if(Ext.isBoolean(this.totalDisplay)){
-				return; //not rendered
-			}
-			if(c) {
-				this.totalDisplay.update(c + " " +t("items"));
-				this.totalDisplay.show();
-			} else {
+		if(this.totalDisplay) {
+			this.totalDisplay = this.el.child('div.go-grid-total');
+			this.totalDisplay.setRight(this.scrollOffset);
+			this.totalDisplay.on("click", function() {
 				this.totalDisplay.hide();
+			}, this);
+
+			this.setTotalCount(this.totalCount);
+		} else{
+			var td = this.el.child('div.go-grid-total');
+			if(td) {
+				td.remove();
 			}
 		}
+
+		this.initActionButton();
+	},
+
+	totalCount: 0,
+	setTotalCount: function(c) {
+		this.totalCount = c;
+		if(Ext.isBoolean(this.totalDisplay)){
+			return; //not rendered
+		}
+		if(c) {
+			this.totalDisplay.update(c + " " +t("items"));
+			this.totalDisplay.show();
+		} else {
+			this.totalDisplay.hide();
+		}
+	},
+
+	onRowOver : function(e, target) {
+		var row = this.findRowIndex(target);
+
+		if (row !== false) {
+			this.addRowClass(row, this.rowOverCls);
+
+			this.showActionButton(row);
+		}
+	},
+
+	initActionButton : function() {
+		if(this.actionConfig) {
+			this.actionBtn = new Ext.Button({
+				iconCls: this.actionConfig.iconCls || 'ic-more-vert',
+				cls: "primary",
+				style: "position:absolute; z-index: 99999999; left: -9999999; top: -9999999",
+				renderTo: this.el,
+				handler: this.actionConfig.hander,
+				scope: this.actionConfig.scope,
+				menu: this.actionConfig.menu
+			});
+			this.scroller.dom.addEventListener("scroll", () => this.actionBtn.hide());
+		}
+	},
+
+	showActionButton : function(rowIndex) {
+  	if(!this.actionBtn) {
+  		return;
+		}
+
+		this.actionBtn.show();
+
+  	var rowEl = Ext.get(this.getRow(rowIndex));
+
+		var offset = (rowEl.getHeight() - this.actionBtn.getHeight()) / 2;
+
+		var y = rowEl.getY() + offset;
+		var x = this.scroller.getX() + this.scroller.getWidth() - dp(40) - this.scrollOffset;
+		var pos = [x,y];
+		this.actionBtn.getEl().setXY(pos);
+		this.actionBtn.rowIndex = rowIndex;
+		if(this.actionBtn.menu) {
+			this.actionBtn.menu.rowIndex = rowIndex;
+		}
+	},
+
+
+	onRowOut : function(e, target) {
+		var row = this.findRowIndex(target);
+
+		if (row !== false && !e.within(this.getRow(row), true)) {
+			this.removeRowClass(row, this.rowOverCls);
+
+		}
+
+	},
+
+	destroy : function() {
+		this.callParent(arguments);
+		if(this.actionBtn) {
+			this.actionBtn.destroy();
+		}
+	}
 });

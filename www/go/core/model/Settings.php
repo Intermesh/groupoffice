@@ -302,6 +302,20 @@ class Settings extends core\Settings {
 	 * @var string
 	 */
 	public $primaryColor;
+
+	/**
+	 * Secondary color in html notation 000000;
+	 *
+	 * @var string
+	 */
+	public $secondaryColor;
+
+	/**
+	 * Secondary color in html notation 000000;
+	 *
+	 * @var string
+	 */
+	public $accentColor;
 	
 	/**
 	 * Blob ID for the logo

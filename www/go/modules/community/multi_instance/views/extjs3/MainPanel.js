@@ -15,7 +15,6 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 
 	initComponent: function () {
 
-		var actions = this.initRowActions();
 
 		this.store = new go.data.Store({
 			fields: [
@@ -42,7 +41,6 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 		});
 
 		Ext.apply(this, {
-			plugins: [actions],
 			tbar: [{
 					iconCls: 'ic-block',
 					text: t('Show disabled'),
@@ -206,13 +204,15 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 					width: 160,
 					sortable: true,
 					dataIndex: 'version'
-				},
-				actions
-
+				}
 			],
 			viewConfig: {
 				emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
-				totalDisplay: true
+				totalDisplay: true,
+				actionConfig: {
+					scope: this,
+					menu: this.initMoreMenu()
+				}
 			},
 			autoExpandColumn: 'hostname',
 			// config options for stateful behavior
@@ -231,116 +231,98 @@ go.modules.community.multi_instance.MainPanel = Ext.extend(go.grid.GridPanel, {
 		}, this);
 	},
 
-	initRowActions: function () {
 
-		var actions = new Ext.ux.grid.RowActions({
-			menuDisabled: true,
-			hideable: false,
-			draggable: false,
-			fixed: true,
-			header: '',
-			hideMode: 'display',
-			keepSelection: true,
-			actions: [{
-					iconCls: 'ic-more-vert'
-				}]
-		});
+	initMoreMenu: function (record, e) {
 
-		actions.on({
-			action: function (grid, record, action, row, col, e, target) {
-				this.showMoreMenu(record, e);
+		this.moreMenu = new Ext.menu.Menu({
+			listeners: {
+				scope: this,
+				show: function(menu) {
+					var record = this.store.getAt(menu.rowIndex);
+					menu.items.item("deactivate").setText(record.data.enabled ? t("Deactivate instance") : t("Activate instance"));
+				}
 			},
-			scope: this
+			items: [
+				{
+					itemId: "login",
+					iconCls: 'ic-lock-open',
+					text: t("Login as administrator"),
+					handler: function (item) {
+						var record = this.store.getAt(item.parentMenu.rowIndex);
+
+						var win = window.open("about:blank", "groupoffice_instance");
+						go.Jmap.request({
+							method: "community/multi_instance/Instance/login",
+							params: {
+								id: record.get('id')
+							},
+							callback: function (options, success, result) {
+
+								//POST access token to popup for enhanced security
+								var f = document.createElement("form");
+								f.setAttribute('method', "post");
+								f.setAttribute('target', "groupoffice_instance");
+								f.setAttribute('action', document.location.protocol + "//" + record.get('hostname') + ':' + document.location.port);
+
+								var i = document.createElement("input"); //input element, text
+								i.setAttribute('type', "hidden");
+								i.setAttribute('name', "accessToken");
+								i.setAttribute('value', result.accessToken);
+								f.appendChild(i);
+
+								var body = document.getElementsByTagName('body')[0];
+								body.appendChild(f);
+								f.submit();
+								body.removeChild(f);
+
+							},
+							scope: this
+						});
+					},
+					scope: this
+				}, '-',
+				{
+					itemId: "deactivate",
+					iconCls: 'ic-block',
+					text: t("Deactivate"),
+					handler: function (item) {
+						var record = this.store.getAt(item.parentMenu.rowIndex);
+
+						var update = {};
+						update[record.id] = {enabled: !record.data.enabled};
+
+						go.Db.store("Instance").set({
+							update: update
+						});
+
+					},
+					scope: this
+				}, {
+					itemId: "edit",
+					iconCls: 'ic-edit',
+					text: t("Edit"),
+					handler: function (item) {
+						var record = this.store.getAt(item.parentMenu.rowIndex);
+
+						this.edit(record.data.id);
+
+					},
+					scope: this
+				}, {
+					itemId: "delete",
+					iconCls: 'ic-delete',
+					text: t("Delete"),
+					handler: function (item) {
+						var record = this.store.getAt(item.parentMenu.rowIndex);
+						this.getSelectionModel().selectRecords([record]);
+						this.deleteSelected();
+					},
+					scope: this
+				}
+			]
 		});
 
-		return actions;
-
-	},
-
-	showMoreMenu: function (record, e) {
-		if (!this.moreMenu) {
-			this.moreMenu = new Ext.menu.Menu({
-				items: [
-					{
-						itemId: "login",
-						iconCls: 'ic-lock-open',
-						text: t("Login as administrator"),
-						handler: function () {
-
-							var win = window.open("about:blank", "groupoffice_instance");
-							go.Jmap.request({
-								method: "community/multi_instance/Instance/login",
-								params: {
-									id: this.moreMenu.record.get('id')
-								},
-								callback: function (options, success, result) {
-
-									//POST access token to popup for enhanced security
-									var f = document.createElement("form");
-									f.setAttribute('method', "post");
-									f.setAttribute('target', "groupoffice_instance");
-									f.setAttribute('action', document.location.protocol + "//" + this.moreMenu.record.get('hostname') + ':' + document.location.port);
-
-									var i = document.createElement("input"); //input element, text
-									i.setAttribute('type', "hidden");
-									i.setAttribute('name', "accessToken");
-									i.setAttribute('value', result.accessToken);
-									f.appendChild(i);
-
-									var body = document.getElementsByTagName('body')[0];
-									body.appendChild(f);
-									f.submit();
-									body.removeChild(f);
-
-								},
-								scope: this
-							});
-						},
-						scope: this
-					}, '-',
-					{
-						itemId: "deactivate",
-						iconCls: 'ic-block',
-						text: t("Deactivate"),
-						handler: function () {
-
-							var update = {};
-							update[this.moreMenu.record.id] = {enabled: !this.moreMenu.record.data.enabled};
-
-							go.Db.store("Instance").set({
-								update: update
-							});
-
-						},
-						scope: this
-					}, {
-						itemId: "edit",
-						iconCls: 'ic-edit',
-						text: t("Edit"),
-						handler: function () {
-
-							this.edit(this.moreMenu.record.data.id);
-
-						},
-						scope: this
-					}, {
-						itemId: "delete",
-						iconCls: 'ic-delete',
-						text: t("Delete"),
-						handler: function () {
-							this.getSelectionModel().selectRecords([this.moreMenu.record]);
-							this.deleteSelected();
-						},
-						scope: this
-					}
-
-				]
-			});
-		}
-
-		this.moreMenu.record = record;
-		this.moreMenu.items.item("deactivate").setText(record.data.enabled ? t("Deactivate instance") : t("Activate instance"));
-		this.moreMenu.showAt(e.getXY());
+		return this.moreMenu;
 	},
 
 	edit: function (instanceId) {

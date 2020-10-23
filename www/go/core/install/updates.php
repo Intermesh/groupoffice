@@ -723,6 +723,10 @@ $updates['202006191648'][] = "ALTER TABLE `core_entity_filter` ADD `type` ENUM('
 $updates['202006191648'][] = "ALTER TABLE `core_entity_filter` CHANGE `filter` `filter` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL;";
 $updates['202007302016'][] = "ALTER TABLE `core_customfields_field_set` ADD `columns` TINYINT NOT NULL DEFAULT '2' AFTER `isTab`;";
 
+
+$updates['202010231035'][] = "delete FROM `core_search` WHERE aclId not in (select id from core_acl);";
+$updates['202010231035'][] = "ALTER TABLE `core_search` ADD  FOREIGN KEY (`aclId`) REFERENCES `core_acl`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
 $updates['202010051413'][] = "CREATE TABLE `core_alert` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `entityTypeId` INT NOT NULL,

@@ -12,7 +12,7 @@ GO.buttons.AddButton = Ext.extend(Ext.Button,{
 			itemId:'add',
 			disabled:!this.ignoreButtonParams,
 			text: t("Add"),
-			cls: 'x-btn-text-icon'
+			cls: 'primary'
 		});
 		
 		if(this.grid && !this.ignoreButtonParams){
