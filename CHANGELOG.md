@@ -1,6 +1,7 @@
 - Email: Fixed download inline image on linked messages
 - Core: Add constraints to acl from core_search
 - Filesearch: raise default index file sizze limit to 10MB
+- Core: Configure secondary and accent color for Paper theme
 
 22-10-2020 6.4.182
 - Core: some modules couldn't be uninstalled from system settings
