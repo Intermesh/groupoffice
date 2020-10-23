@@ -73,11 +73,31 @@ class Installer {
 
 	public function toggleGarbageCollection($enabled) {
 		$job = model\CronJobSchedule::findByName("GarbageCollection", "core", "core");
+		if(!$job) {
+			$job = $this->createGarbageCollection();
+		}
 		$job->enabled = $enabled;
 		if(!$job->save()) {
 			throw new \Exception("Could not toggle garbage collection job");
 		}
 
+	}
+
+	private function createGarbageCollection() {
+
+		$module = model\Module::findByName("core", "core");
+
+		$cron = new model\CronJobSchedule();
+		$cron->moduleId = $module->id;
+		$cron->name = "GarbageCollection";
+		$cron->expression = "0 * * * *";
+		$cron->description = "Garbage collection";
+
+		if(!$cron->save()) {
+			throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
+		}
+
+		return $cron;
 	}
 
 	/**
@@ -168,6 +188,8 @@ class Installer {
 		model\EntityFilter::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
 		//Allow people to read custom fieldsets by default
 		model\FieldSet::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
+		//groups readble to everyone
+		Group::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
 	}
 	
 	private function installCoreModule() {
@@ -182,23 +204,9 @@ class Installer {
 
 		//Share core with everyone
 		$module->findAcl()->addGroup(Group::ID_EVERYONE)->save();
-		
-		$cron = new model\CronJobSchedule();
-		$cron->moduleId = $module->id;
-		$cron->name = "GarbageCollection";
-		$cron->expression = "0 * * * *";
-		$cron->description = "Garbage collection";
-		
-		if(!$cron->save()) {
-			throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
-		}
-		
-		$acl = model\Acl::findById(Group::entityType()->getDefaultAclId());
-		$acl->addGroup(model\Group::ID_EVERYONE);
-		if(!$acl->save()) {
-			throw new \Exception("Could not save default ACL for groups");
-		}
-		
+
+		$this->createGarbageCollection();
+
 		if(!Password::register()) {
 			throw new \Exception("Failed to register Password authenticator");
 		}
