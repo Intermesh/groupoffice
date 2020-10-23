@@ -60,7 +60,7 @@ $lang = GO::language()->getLanguage(); ?>
             <?php
             }
 
-            if(go()->getSettings()->primaryColor) {
+            if(go()->getSettings()->secondaryColor) {
                 ?>
                 :root {
                     --c-secondary: <?= '#'.go()->getSettings()->secondaryColor; ?> !important;
