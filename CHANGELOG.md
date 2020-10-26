@@ -1,3 +1,5 @@
+- Calendar: Error when adding event while in read only calendar
+
 23-10-2020 6.4.184
 - Core: Template parse gave error on arrays
 - Core: Chips component error on empty value in custom fields
