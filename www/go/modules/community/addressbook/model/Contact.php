@@ -514,6 +514,19 @@ class Contact extends AclItemEntity {
 											}
 											$criteria->where('org.name', $comparator, $value);
 										})
+//
+//										->add("orgFilter", function(Criteria $criteria, $value, Query $query){
+//											if( !$query->isJoined('addressbook_contact', 'orgFilter')) {
+//												$query->join('core_link', 'lOrgFilter', 'c.id = lOrgFilter.fromId and lOrgFilter.fromEntityTypeId = '.self::entityType()->getId() . ' AND lOrgFilter.toEntityTypeId=' . self::entityType()->getId(), 'LEFT');
+//											}
+//
+//											$orgs = Contact::find(['id'])
+//												->selectSingleValue('id')
+//												->where('isOrganization', '=', true)
+//												->filter($value);
+//
+//											$query->where('lOrgFilter.id', 'IN', $orgs);
+//										})
 
 										->addText("orgCity", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if( !$query->isJoined('addressbook_contact', 'org')) {

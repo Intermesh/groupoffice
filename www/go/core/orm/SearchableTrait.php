@@ -2,6 +2,7 @@
 namespace go\core\orm;
 
 use go\core\App;
+use go\core\customfield\Html;
 use go\core\db\Query;
 use go\core\model\Link;
 
@@ -45,8 +46,8 @@ trait SearchableTrait {
 	 * @return array|false|string[]
 	 */
 	private static function splitTextKeywords($text) {
-		$strPtrn = '/[\s\,\.\!\?\;\;\(\)\{\}]/i';// Split by non-word characters
-		return preg_split($strPtrn, strtolower($text), 0, PREG_SPLIT_NO_EMPTY);
+		$split = preg_split('/[^\w\-_\+\\\\\/:]/', strtolower($text), 0, PREG_SPLIT_NO_EMPTY);
+		return $split;
 	}
 
 	/**
@@ -95,7 +96,17 @@ trait SearchableTrait {
 		}
 		
 		if(method_exists($this, 'getCustomFields')) {
-			foreach($this->getCustomFields(true) as $col => $v) {
+
+			$cfData = $this->getCustomFields(true);
+
+			foreach(static::getCustomFieldModels() as $field) {
+
+				if($field->getDataType() instanceof Html) {
+					continue;
+				}
+
+				$v = $cfData[$field->databaseName];
+
 				if(is_array($v)) {
 					foreach($v as $i) {
 						if(!empty($v) && is_string($v)) {
