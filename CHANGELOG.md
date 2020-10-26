@@ -3,6 +3,7 @@
 - Core: optimized search keywords
 - Address book: include notes in search keywords
 - Core: Upgrade form 6.3 was broken due to toggleGarbageCollection()
+- Core: New configuration option to logout users when inactive for more than x number of seconds.
 
 23-10-2020 6.4.184
 - Core: Template parse gave error on arrays

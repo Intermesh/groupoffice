@@ -22,7 +22,16 @@ go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
 							value: 6,
 							width: dp(48)
 						},
-						this.domainCombo
+						this.domainCombo,
+						{
+							xtype:"numberfield",
+							fieldLabel: t("Logout when inactive"),
+							hint: t("Logout users when inactive for more than this number of seconds. This will also disable the 'Remember my login' checkbox in the login dialog. 0 disables this setting."),
+							name: "logoutWhenInactive",
+							decimals: 0,
+							value: 0,
+							width: dp(48)
+						}
 					]
 			},
 				{

@@ -73,10 +73,15 @@ class Token extends Entity {
 	
 	/**
 	 * A date interval for the lifetime of a token
+	 *
+	 * On each JMAP request the token's expiry time will be pushed with this interval forward in time.
+	 * So a request within this life time will keep it alive.
+	 * The client (browser) will keep it alive by using SSE or checking for updates every 2 minutes. When the
+	 * client is closed the token will be cleaned up after this lifetime.
 	 * 
 	 * @link http://php.net/manual/en/dateinterval.construct.php
 	 */
-	const LIFETIME = 'P7D';
+	const LIFETIME = 'PT30M';
 	
 	/**
 	 * A date interval for the login lifetime of a token
@@ -103,16 +108,20 @@ class Token extends Entity {
 			
 			$this->oldLogin();
 			
-			if($this->lastActiveAt < new \DateTime("-5 mins")) {
-				$this->lastActiveAt = new \DateTime();				
-				
-				//also refresh token
-				if(isset($this->expiresAt)) {
-					$this->setExpiryDate();
-				}
-				$this->internalSave();
-			}
+			$this->activity();
 		}
+	}
+
+	public function activity() {
+//		if($this->lastActiveAt < new \DateTime("-5 mins")) {
+			$this->lastActiveAt = new \DateTime();
+
+			//also refresh token
+			if(isset($this->expiresAt)) {
+				$this->setExpiryDate();
+			}
+			$this->internalSave();
+//		}
 	}
 	
 	/**

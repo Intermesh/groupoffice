@@ -172,6 +172,8 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 		});
 
+		go.ActivityWatcher.registerDocument(doc);
+
 	},
 
 	debounceTimeout : null,

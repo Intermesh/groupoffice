@@ -56,10 +56,12 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 			// me.firstWeekDay = parseInt(user.firstWeekday);
 			me.legacySettings(user);
 
+			go.ActivityWatcher.init(GO.settings.config.logoutWhenInactive);
+
 			me.fireEvent("load", this);
 		});
 		
-		
+
     //Ext.apply(GO.settings, session.oldSettings);
 		
 		
