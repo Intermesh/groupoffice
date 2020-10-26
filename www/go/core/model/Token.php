@@ -4,6 +4,7 @@ namespace go\core\model;
 use DateInterval;
 use go\core\Environment;
 use go\core\auth\Method;
+use go\core\http\Request;
 use go\core\orm\Query;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
@@ -81,7 +82,7 @@ class Token extends Entity {
 	 * 
 	 * @link http://php.net/manual/en/dateinterval.construct.php
 	 */
-	const LIFETIME = 'PT30M';
+	const LIFETIME = 'P7D';
 	
 	/**
 	 * A date interval for the login lifetime of a token
@@ -113,7 +114,7 @@ class Token extends Entity {
 	}
 
 	public function activity() {
-//		if($this->lastActiveAt < new \DateTime("-5 mins")) {
+		if($this->lastActiveAt < new \DateTime("-5 mins")) {
 			$this->lastActiveAt = new \DateTime();
 
 			//also refresh token
@@ -121,7 +122,7 @@ class Token extends Entity {
 				$this->setExpiryDate();
 			}
 			$this->internalSave();
-//		}
+		}
 	}
 	
 	/**
