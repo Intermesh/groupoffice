@@ -726,3 +726,9 @@ $updates['202007302016'][] = "ALTER TABLE `core_customfields_field_set` ADD `col
 
 $updates['202010231035'][] = "delete FROM `core_search` WHERE aclId not in (select id from core_acl);";
 $updates['202010231035'][] = "ALTER TABLE `core_search` ADD  FOREIGN KEY (`aclId`) REFERENCES `core_acl`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
+$updates['202010261619'][] = "ALTER TABLE `core_email_template` ROW_FORMAT=DYNAMIC;";
+$updates['202010261619'][] = "ALTER TABLE `core_email_template_attachment` ROW_FORMAT=DYNAMIC;";
+
+$updates['202010261619'][] = "ALTER TABLE `core_search` ROW_FORMAT=DYNAMIC;";
+$updates['202010261619'][] = "ALTER TABLE `core_search` CHANGE `keywords` `keywords` VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;";
