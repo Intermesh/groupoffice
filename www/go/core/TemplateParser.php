@@ -684,7 +684,12 @@ class TemplateParser {
 					$getter = 'get' . $pathPart;
 
 					if(method_exists($model, $getter)) {
-						$model = $model->$getter();
+						if(strtolower($getter) == "customfields") {
+							//Get custom fields in text mode
+							$model = $model->getCustomFields(true);
+						} else {
+							$model = $model->$getter();
+						}
 					} else{
 						return null;
 					}
@@ -718,12 +723,6 @@ class TemplateParser {
 	 * @return TemplateParser
 	 */
 	public function addModel($name, $model) {
-
-		//set custom fields to text mode
-		if(is_object($model) && property_exists($model, "returnAsText")) {
-			$model->returnAsText = true;
-		}
-
 		$this->models[$name] = $model;
 
 		return $this;

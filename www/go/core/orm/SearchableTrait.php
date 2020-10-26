@@ -20,7 +20,9 @@ trait SearchableTrait {
 	abstract protected function getSearchDescription();
 	
 	/**
-	 * All the keywords that can be searched on
+	 * All the keywords that can be searched on.
+	 *
+	 * Note: for larger text fields it might be useful to use {@see self::splitTextKeywords()} on it.
 	 * 
 	 * @return string[]
 	 */
@@ -35,6 +37,16 @@ trait SearchableTrait {
 	 */
 	protected function getSearchFilter() {
 		return null;
+	}
+
+	/**
+	 * Split text by non word characters to get useful search keywords.
+	 * @param $text
+	 * @return array|false|string[]
+	 */
+	private static function splitTextKeywords($text) {
+		$strPtrn = '/[\s\,\.\!\?\;\;\(\)\{\}]/i';// Split by non-word characters
+		return preg_split($strPtrn, strtolower($text), 0, PREG_SPLIT_NO_EMPTY);
 	}
 
 	/**
@@ -95,10 +107,15 @@ trait SearchableTrait {
 				}
 			}
 		}
+
+		$sanitized = [];
+		foreach($keywords as $keyword) {
+			$sanitized = array_merge($sanitized, self::splitTextKeywords($keyword));
+		}
+
+		$sanitized = array_unique($sanitized);
 		
-		$keywords = array_unique($keywords);
-		
-		$search->setKeywords(implode(',', $keywords));		
+		$search->setKeywords(implode(' ', $sanitized));
 		
 		if(!$search->internalSave()) {
 			throw new \Exception("Could not save search cache: " . var_export($search->getValidationErrors(), true));

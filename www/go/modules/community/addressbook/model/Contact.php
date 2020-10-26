@@ -976,6 +976,10 @@ class Contact extends AclItemEntity {
 			}
 		}
 
+		if(!empty($this->notes)) {
+			$keywords[] = $this->notes;
+		}
+
 		return $keywords;
 	}
 

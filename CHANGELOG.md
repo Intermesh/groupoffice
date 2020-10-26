@@ -1,4 +1,7 @@
 - Calendar: Error when adding event while in read only calendar
+- Custom fields: Could be returned as text
+- Core: optimized search keywords
+- Address book: include notes in search keywords
 
 23-10-2020 6.4.184
 - Core: Template parse gave error on arrays
