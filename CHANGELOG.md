@@ -2,6 +2,7 @@
 - Custom fields: Could be returned as text
 - Core: optimized search keywords
 - Address book: include notes in search keywords
+- Core: Upgrade form 6.3 was broken due to toggleGarbageCollection()
 
 23-10-2020 6.4.184
 - Core: Template parse gave error on arrays

@@ -74,6 +74,11 @@ class Installer {
 	public function toggleGarbageCollection($enabled) {
 		$job = model\CronJobSchedule::findByName("GarbageCollection", "core", "core");
 		if(!$job) {
+
+			if(!$enabled) {
+				return;
+			}
+
 			$job = $this->createGarbageCollection();
 		}
 		$job->enabled = $enabled;
@@ -376,13 +381,13 @@ class Installer {
 		ini_set("max_execution_time", 0);
 		ini_set("memory_limit", -1);
 
-		$this->toggleGarbageCollection(false);
-
 		go()->getDbConnection()->query("SET sql_mode=''");
 		
 		jmap\Entity::$trackChanges = false;
 
 		ActiveRecord::$log_enabled = false;
+
+		$this->toggleGarbageCollection(false);
 		
 		go()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
 
