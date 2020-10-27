@@ -194,11 +194,11 @@ CREATE TABLE `core_search` (
   `name` varchar(100) DEFAULT NULL,
   `description` varchar(190) NOT NULL DEFAULT '',
   `entityTypeId` int(11) NOT NULL,
-  `keywords` VARCHAR(190) NULL,
+  `keywords` VARCHAR(750) NULL,
   `filter` VARCHAR(50) NULL DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
   `aclId` int(11) NOT NULL
-) ENGINE=InnoDB;
+) ENGINE=InnoDB ROW_FORMAT=DYNAMIC;
 
 CREATE TABLE `core_setting` (
   `moduleId` int(11) NOT NULL,
@@ -780,7 +780,7 @@ CREATE TABLE `core_entity_filter` (
   `filter` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `aclId` int(11) NOT NULL,
   `type` ENUM('fixed','variable') NOT NULL DEFAULT 'fixed'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 
 ALTER TABLE `core_entity_filter`
@@ -835,7 +835,7 @@ CREATE TABLE `core_email_template` (
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `body` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 CREATE TABLE `core_email_template_attachment` (
   `id` int(11) NOT NULL,
@@ -844,7 +844,7 @@ CREATE TABLE `core_email_template_attachment` (
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `inline` tinyint(1) NOT NULL DEFAULT 0,
   `attachment` tinyint(1) NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC;
 
 
 ALTER TABLE `core_email_template`

@@ -73,6 +73,11 @@ class Installer {
 	public function toggleGarbageCollection($enabled) {
 		$job = model\CronJobSchedule::findByName("GarbageCollection", "core", "core");
 		if(!$job) {
+
+			if(!$enabled) {
+				return;
+			}
+
 			$job = $this->createGarbageCollection();
 		}
 		$job->enabled = $enabled;
@@ -130,6 +135,9 @@ class Installer {
 		}
 
 		$database->setUtf8();
+
+		//set DYNAMIC row format by default
+		go()->getDbConnection()->exec("SET GLOBAL innodb_default_row_format=DYNAMIC;");
 
 		Utils::runSQLFile(Environment::get()->getInstallFolder()->getFile("go/core/install/install.sql"));
 		App::get()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
@@ -371,16 +379,18 @@ class Installer {
 		ini_set("max_execution_time", 0);
 		ini_set("memory_limit", -1);
 
-		$this->toggleGarbageCollection(false);
-
 		go()->getDbConnection()->query("SET sql_mode=''");
 		
 		jmap\Entity::$trackChanges = false;
 
 		ActiveRecord::$log_enabled = false;
+
+		$this->toggleGarbageCollection(false);
 		
 		go()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
 
+		//set DYNAMIC row format by default
+		go()->getDbConnection()->exec("SET GLOBAL innodb_default_row_format=DYNAMIC;");
 		
 		while (!$this->upgradeModules()) {
 			echo "\n\nA module was refactored. Rerunning...\n\n";			

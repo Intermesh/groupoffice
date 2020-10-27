@@ -377,6 +377,22 @@ go.Jmap = {
 
 		uploadNotification.updateCount();
 	},
+
+	/**
+	 * When SSE is disabled we'll poll the server for changes every 2 minutes.
+	 * This also keeps the token alive. Which expires in 30M.
+	 */
+	poll : function() {
+		console.log("Start check for updates every 60s.");
+		setInterval(function() {
+			go.Db.stores().forEach(function(store) {
+				store.getState().then(function(state) {
+					if (state)
+						store.getUpdates();
+				});
+			})
+		}, 5000);
+	},
 	
 	/**
 	 * Initializes Server Sent Events via EventSource. This function is called in MainLayout.onAuthenticated()
@@ -390,11 +406,13 @@ go.Jmap = {
 		try {
 			if (!window.EventSource) {
 				console.debug("Browser doesn't support EventSource");
+				this.poll();
 				return false;
 			}
 			
 			if(!go.User.eventSourceUrl) {
 				console.debug("Server Sent Events (EventSource) is disabled on the server.");
+				this.poll();
 				return false;
 			}
 

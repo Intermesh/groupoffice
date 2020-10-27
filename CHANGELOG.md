@@ -16,6 +16,23 @@ end 6.5
 --------
 
 
+27-10-2020 6.4.185
+- Calendar: Error when adding event while in read only calendar
+- Custom fields: Could be returned as text
+- Core: optimized search keywords
+- Address book: include notes in search keywords
+- Core: Upgrade form 6.3 was broken due to toggleGarbageCollection()
+- Core: New configuration option to logout users when inactive for more than x number of seconds.
+- Core: Raised size of search cache from 190 chars to 750 chars
+- Core: fixed <br /> tags in error messages 
+- Sieve: make sure result is defined
+- OfficeOnline: Send locale string with country. en_us instead of just en.
+
+23-10-2020 6.4.184
+- Core: Template parse gave error on arrays
+- Core: Chips component error on empty value in custom fields
+
+
 23-10-2020 6.4.183
 - Email: Fixed download inline image on linked messages
 - Core: Add constraints to acl from core_search
