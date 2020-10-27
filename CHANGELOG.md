@@ -1,3 +1,7 @@
+27-10-2020 6.4.187
+- Core: Set core_acl.ownedBy to 1 when user has been removed.  
+- Core: Cleanup address books and note books on user delete
+
 27-10-2020 6.4.186
 - Core: error on modifiedAt in old framework when saving custom fields
 - Core: Fixed [6.4.185] Error: PDOException with update #623

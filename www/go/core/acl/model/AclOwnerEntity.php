@@ -239,9 +239,7 @@ abstract class AclOwnerEntity extends AclEntity {
 	
 	protected static function internalDelete(Query $query) {
 
-		if(!method_exists(static::class, 'aclEntityClass')) {
-			$aclsToDelete = static::getAclsToDelete($query);
-		}
+		$aclsToDelete = static::getAclsToDelete($query);
 
 		if(!parent::internalDelete($query)) {
 			return false;

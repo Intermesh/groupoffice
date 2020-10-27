@@ -732,3 +732,11 @@ $updates['202010261619'][] = "ALTER TABLE `core_email_template_attachment` ROW_F
 
 $updates['202010261619'][] = "ALTER TABLE `core_search` ROW_FORMAT=DYNAMIC;";
 $updates['202010261619'][] = "ALTER TABLE `core_search` CHANGE `keywords` `keywords` VARCHAR(750) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;";
+
+
+$updates['202010261619'][] = "ALTER TABLE `core_acl` CHANGE `ownedBy` `ownedBy` INT(11) NULL;";
+
+$updates['202010261619'][] = "update `core_acl` set ownedBy = 1 where ownedBy not in (select id from core_user);";
+
+$updates['202010261619'][] = "ALTER TABLE `core_acl` ADD FOREIGN KEY (`ownedBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";
+
