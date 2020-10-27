@@ -1,3 +1,4 @@
+27-10-2020 6.4.185
 - Calendar: Error when adding event while in read only calendar
 - Custom fields: Could be returned as text
 - Core: optimized search keywords
