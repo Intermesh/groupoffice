@@ -268,7 +268,7 @@ trait CustomFieldsTrait {
 
 			//Set modifiedAt because otherwise the entity might have no change at all. Then no change will be logged for
 			//JMAP sync
-			if(!$this->isModified(['modifiedAt'])) {
+			if(property_exists($this, 'modifiedAt') && !$this->isModified(['modifiedAt'])) {
 				$this->modifiedAt = new DateTime();
 			}
 

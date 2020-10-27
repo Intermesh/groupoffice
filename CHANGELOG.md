@@ -1,3 +1,6 @@
+27-10-2020 6.4.186
+- Core: error on modifiedAt in old framework when saving custom fields
+
 27-10-2020 6.4.185
 - Calendar: Error when adding event while in read only calendar
 - Custom fields: Could be returned as text
