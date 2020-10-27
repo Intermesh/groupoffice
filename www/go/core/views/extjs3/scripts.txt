@@ -70,6 +70,7 @@ layout/ResponsiveLayout.js
 
 
 AuthenticationManager.js
+ActivityWatcher.js
 login/LanguageCombobox.js
 login/DomainCombo.js
 login/LoginDialog.js

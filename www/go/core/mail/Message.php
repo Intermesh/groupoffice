@@ -29,13 +29,20 @@ class Message extends \Swift_Message {
 	}
 
 	/**
-	 * 
-	 * @param \go\core\mail\Mailer $mailer
-	 * @return int Number of successful recipients.
-	 * 
+	 * Send this Message like it would be sent in a mail client.
+	 *
+	 * All recipients (with the exception of Bcc) will be able to see the other
+	 * recipients this message was sent to.
+
+	 * The return value is the number of recipients who were accepted for
+	 * delivery.
+	 *
+	 * @param array $failedRecipients An array of failures by-reference
+	 *
+	 * @return int The number of successful recipients. Can be 0 which indicates failure
 	 */
-	public function send(Mailer $mailer = null) {
-		return $this->mailer->send($this);
+	public function send(&$failedRecipients = null) {
+		return $this->mailer->send($this, $failedRecipients);
 	}
 
 	public function setSubject($subject) {

@@ -2,6 +2,7 @@
 namespace go\core\orm;
 
 use go\core\App;
+use go\core\customfield\Html;
 use go\core\db\Query;
 use go\core\model\Link;
 
@@ -20,7 +21,9 @@ trait SearchableTrait {
 	abstract protected function getSearchDescription();
 	
 	/**
-	 * All the keywords that can be searched on
+	 * All the keywords that can be searched on.
+	 *
+	 * Note: for larger text fields it might be useful to use {@see self::splitTextKeywords()} on it.
 	 * 
 	 * @return string[]
 	 */
@@ -35,6 +38,16 @@ trait SearchableTrait {
 	 */
 	protected function getSearchFilter() {
 		return null;
+	}
+
+	/**
+	 * Split text by non word characters to get useful search keywords.
+	 * @param $text
+	 * @return array|false|string[]
+	 */
+	private static function splitTextKeywords($text) {
+		$split = preg_split('/[^\w\-_\+\\\\\/:]/', strtolower($text), 0, PREG_SPLIT_NO_EMPTY);
+		return $split;
 	}
 
 	/**
@@ -83,7 +96,17 @@ trait SearchableTrait {
 		}
 		
 		if(method_exists($this, 'getCustomFields')) {
-			foreach($this->getCustomFields(true) as $col => $v) {
+
+			$cfData = $this->getCustomFields(true);
+
+			foreach(static::getCustomFieldModels() as $field) {
+
+				if($field->getDataType() instanceof Html) {
+					continue;
+				}
+
+				$v = $cfData[$field->databaseName];
+
 				if(is_array($v)) {
 					foreach($v as $i) {
 						if(!empty($v) && is_string($v)) {
@@ -95,10 +118,15 @@ trait SearchableTrait {
 				}
 			}
 		}
+
+		$sanitized = [];
+		foreach($keywords as $keyword) {
+			$sanitized = array_merge($sanitized, self::splitTextKeywords($keyword));
+		}
+
+		$sanitized = array_unique($sanitized);
 		
-		$keywords = array_unique($keywords);
-		
-		$search->setKeywords(implode(',', $keywords));		
+		$search->setKeywords(implode(' ', $sanitized));
 		
 		if(!$search->internalSave()) {
 			throw new \Exception("Could not save search cache: " . var_export($search->getValidationErrors(), true));

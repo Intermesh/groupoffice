@@ -21,6 +21,7 @@ use go\core\model\User;
 use go\core\model\UserGroup;
 use go\core\Module;
 use go\core\orm\Entity;
+use go\core\orm\Filters;
 use go\core\util\ClassFinder;
 use go\core\util\Lock;
 use PDOException;
@@ -68,6 +69,40 @@ class Installer {
 	 */
 	public static function isUpgrading() {
 		return self::$isUpgrading || basename($_SERVER['PHP_SELF']) == 'upgrade.php';
+	}
+
+	public function toggleGarbageCollection($enabled) {
+		$job = model\CronJobSchedule::findByName("GarbageCollection", "core", "core");
+		if(!$job) {
+
+			if(!$enabled) {
+				return;
+			}
+
+			$job = $this->createGarbageCollection();
+		}
+		$job->enabled = $enabled;
+		if(!$job->save()) {
+			throw new \Exception("Could not toggle garbage collection job");
+		}
+
+	}
+
+	private function createGarbageCollection() {
+
+		$module = model\Module::findByName("core", "core");
+
+		$cron = new model\CronJobSchedule();
+		$cron->moduleId = $module->id;
+		$cron->name = "GarbageCollection";
+		$cron->expression = "0 * * * *";
+		$cron->description = "Garbage collection";
+
+		if(!$cron->save()) {
+			throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
+		}
+
+		return $cron;
 	}
 
 	/**
@@ -132,8 +167,6 @@ class Installer {
 		App::get()->getSettings()->setDefaultGroups([Group::ID_INTERNAL]);
 		App::get()->getSettings()->save();
 
-
-
 		App::get()->setCache(new $cacheCls);
 		Listeners::get()->init();
 
@@ -156,7 +189,12 @@ class Installer {
 			}
 		}
 
-		EntityType::findByName('FieldSet')->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
+		//Allow people to read filters by default
+		model\EntityFilter::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
+		//Allow people to read custom fieldsets by default
+		model\FieldSet::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
+		//groups readble to everyone
+		Group::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
 	}
 	
 	private function installCoreModule() {
@@ -171,23 +209,9 @@ class Installer {
 
 		//Share core with everyone
 		$module->findAcl()->addGroup(Group::ID_EVERYONE)->save();
-		
-		$cron = new model\CronJobSchedule();
-		$cron->moduleId = $module->id;
-		$cron->name = "GarbageCollection";
-		$cron->expression = "0 * * * *";
-		$cron->description = "Garbage collection";
-		
-		if(!$cron->save()) {
-			throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
-		}
-		
-		$acl = model\Acl::findById(Group::entityType()->getDefaultAclId());
-		$acl->addGroup(model\Group::ID_EVERYONE);
-		if(!$acl->save()) {
-			throw new \Exception("Could not save default ACL for groups");
-		}
-		
+
+		$this->createGarbageCollection();
+
 		if(!Password::register()) {
 			throw new \Exception("Failed to register Password authenticator");
 		}
@@ -356,18 +380,17 @@ class Installer {
 		
 		ini_set("max_execution_time", 0);
 		ini_set("memory_limit", -1);
-		
-
 
 		go()->getDbConnection()->query("SET sql_mode=''");
 		
 		jmap\Entity::$trackChanges = false;
 
 		ActiveRecord::$log_enabled = false;
+
+		$this->toggleGarbageCollection(false);
 		
 		go()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
 
-		
 		while (!$this->upgradeModules()) {
 			echo "\n\nA module was refactored. Rerunning...\n\n";			
 		}
@@ -404,6 +427,8 @@ class Installer {
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
 		LoggingTrait::enable();
+
+		$this->toggleGarbageCollection(true);
 		echo "Done!\n";
 	}
 	

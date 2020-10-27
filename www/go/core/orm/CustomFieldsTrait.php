@@ -30,6 +30,13 @@ trait CustomFieldsTrait {
 	private $customFieldsModified = false;
 	private $customFieldsIsNew;
 
+	/**
+	 * Set the default return type of @see getCustomFields()
+	 *
+	 * @var bool
+	 */
+	public $returnAsText = false;
+
   /**
    * Get all custom fields data for an entity
    *
@@ -37,7 +44,12 @@ trait CustomFieldsTrait {
    * @return array
    * @throws Exception
    */
-	public function getCustomFields($asText = false) {
+	public function getCustomFields($asText = null) {
+
+		if(!isset($asText)) {
+			$asText = $this->returnAsText;
+		}
+
 		$fn = $asText ? 'dbToText' : 'dbToApi';
 		$record = $this->internalGetCustomFields();
 		foreach(self::getCustomFieldModels() as $field) {
@@ -256,7 +268,7 @@ trait CustomFieldsTrait {
 
 			//Set modifiedAt because otherwise the entity might have no change at all. Then no change will be logged for
 			//JMAP sync
-			if(!$this->isModified(['modifiedAt'])) {
+			if(property_exists($this, 'modifiedAt') && !$this->isModified(['modifiedAt'])) {
 				$this->modifiedAt = new DateTime();
 			}
 

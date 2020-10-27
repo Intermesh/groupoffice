@@ -184,8 +184,8 @@ class Instance extends Entity {
 		return str_replace(['.','-'], '_', $this->hostname);
 	}
 
-	private function getSubDomain() {
-		return explode(".", $this->hostname)[0];
+	private function getStudioPackage() {
+		return str_replace('-', "", explode(".", $this->hostname)[0]);
 	}
 	
 	private function getDbUser() {
@@ -347,7 +347,7 @@ class Instance extends Entity {
 	 * @return \go\core\fs\Folder
 	 */
 	private function getModulePackageFolder() {
-		return go()->getEnvironment()->getInstallFolder()->getFolder("go/modules/" . $this->getSubDomain());
+		return go()->getEnvironment()->getInstallFolder()->getFolder("go/modules/" . $this->getStudioPackage());
 	}
 	
 	private function dropDatabase($dbName) {		
@@ -386,7 +386,7 @@ class Instance extends Entity {
 				'{tmpPath}',
 				'{dataPath}',
 				'{servermanager}',
-				'{subDomain}',
+				'{studioPackage}',
 		], [
 				$dsn['options']['host'],
 				$dbName,
@@ -395,7 +395,7 @@ class Instance extends Entity {
 				$tmpPath,
 				$dataPath,
 				go()->findConfigFile(),
-				$this->getSubDomain()
+				$this->getStudioPackage()
 		],
 		$tpl->getContents());		
 	}
@@ -576,7 +576,7 @@ class Instance extends Entity {
 
 				$instance->mysqldump();
 
-				$instance->getModulePackageFolder()->move($instance->getDataFolder()->getFolder($instance->getSubDomain() .'_MODULE_PACKAGE'));
+				$instance->getModulePackageFolder()->move($instance->getDataFolder()->getFolder($instance->getStudioPackage() .'_MODULE_PACKAGE'));
 
 				$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php'));
 				$instance->getConfigFile()->getFolder()->delete();
