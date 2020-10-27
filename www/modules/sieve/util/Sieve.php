@@ -1313,7 +1313,7 @@ class go_sieve_script
             case 'exists':
                 $tests[] = array('test' => 'exists', 'not'  => $not,
                     'arg'  => array_pop($tokens));
-          §      break;
+                break;
 
             case 'true':
                 $tests[] = array('test' => 'true', 'not'  => $not);
