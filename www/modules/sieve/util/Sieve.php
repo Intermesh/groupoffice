@@ -1313,7 +1313,7 @@ class go_sieve_script
             case 'exists':
                 $tests[] = array('test' => 'exists', 'not'  => $not,
                     'arg'  => array_pop($tokens));
-                break;
+          §      break;
 
             case 'true':
                 $tests[] = array('test' => 'true', 'not'  => $not);
@@ -1333,15 +1333,13 @@ class go_sieve_script
         // ...and actions block
         $actions = $this->_parse_actions($content);
 
-        if ($tests && $actions) {
-            $result = array(
-                'type'     => $cond,
-                'tests'    => $tests,
-                'actions'  => $actions,
-                'join'     => $join,
-                'disabled' => $disabled,
-            );
-        }
+        $result = array(
+            'type'     => $cond,
+            'tests'    => $tests ? $tests : [],
+            'actions'  => $actions ? $actions : [],
+            'join'     => $join,
+            'disabled' => $disabled,
+        );
 
         return $result;
     }

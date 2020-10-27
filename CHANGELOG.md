@@ -6,6 +6,7 @@
 - Core: New configuration option to logout users when inactive for more than x number of seconds.
 - Core: Raised size of search cache from 190 chars to 750 chars
 - Core: fixed <br /> tags in error messages 
+- Sieve: make sure result is defined
 
 23-10-2020 6.4.184
 - Core: Template parse gave error on arrays
