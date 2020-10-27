@@ -7,6 +7,7 @@
 - Core: Raised size of search cache from 190 chars to 750 chars
 - Core: fixed <br /> tags in error messages 
 - Sieve: make sure result is defined
+- OfficeOnline: Send locale string with country. en_us instead of just en.
 
 23-10-2020 6.4.184
 - Core: Template parse gave error on arrays
