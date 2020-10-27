@@ -136,9 +136,6 @@ class Installer {
 
 		$database->setUtf8();
 
-		//set DYNAMIC row format by default
-		go()->getDbConnection()->exec("SET GLOBAL innodb_default_row_format=DYNAMIC;");
-
 		Utils::runSQLFile(Environment::get()->getInstallFolder()->getFile("go/core/install/install.sql"));
 		App::get()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
 		
@@ -389,9 +386,6 @@ class Installer {
 		
 		go()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
 
-		//set DYNAMIC row format by default
-		go()->getDbConnection()->exec("SET GLOBAL innodb_default_row_format=DYNAMIC;");
-		
 		while (!$this->upgradeModules()) {
 			echo "\n\nA module was refactored. Rerunning...\n\n";			
 		}
