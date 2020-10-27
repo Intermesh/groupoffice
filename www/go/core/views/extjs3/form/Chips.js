@@ -187,7 +187,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	setValue: function (values) {
 		
 		if(!values) {
-			values = {};
+			values = this.map ? {} : [];
 		}
 		
 		if(this.entityStore) {	

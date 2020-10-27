@@ -431,8 +431,8 @@ class Blob extends orm\Entity {
 					]);
 	}
 
-	protected static function getDefaultFetchProperties()
+	protected static function atypicalApiProperties()
 	{
-		return array_filter(parent::getDefaultFetchProperties(), function($propName) { return $propName != 'file';});
+		return array_merge(parent::atypicalApiProperties(), ['file']);
 	}
 }

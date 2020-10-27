@@ -174,4 +174,23 @@ class CronJobSchedule extends Entity {
 		}
 	}
 
+	/**
+	 * Find crob job by name
+	 *
+	 * @param $name
+	 * @param string $package
+	 * @param string $module
+	 * @return CronJobSchedule|false
+	 * @throws Exception
+	 */
+	public static function findByName($name, $package = "core", $module = "core") {
+		$module = \go\core\model\Module::findByName($package, $module);
+
+		if(!$module) {
+			return false;
+		}
+
+		return static::find()->where('moduleId','=', $module->id)->andWhere('name', '=', $name)->single();
+	}
+
 }

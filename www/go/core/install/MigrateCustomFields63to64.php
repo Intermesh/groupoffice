@@ -17,14 +17,15 @@ class MigrateCustomFields63to64 {
 
 	const TREE_SELECT_OPTION_INCREMENT = 100000;
 
-	private static $newIds = 0;
+	private static $TREE_SELECT_OPTION_MISSING_ID = 200000;
 	
 	public function migrateEntity($entityName) {
-
-		self::$newIds = self::TREE_SELECT_OPTION_INCREMENT * 2;
 		
 		echo "Migrating custom fields for entity: " . $entityName ."\n";
-		
+
+		$max = (int) go()->getDbConnection()->selectSingleValue('max(id)')->from("core_customfields_select_option")->single();
+		self::$TREE_SELECT_OPTION_MISSING_ID += $max;
+
 		$entityType = EntityType::findByName($entityName);
 		
 		if(!$entityType) {
@@ -101,11 +102,17 @@ class MigrateCustomFields63to64 {
 
 			//Value is string <id>:<Text>
 			$id = explode(':', $record[$field->databaseName])[0];
-			
+
+			if(!is_numeric($id)) {
+				$value = null;
+			} else{
+				$value = $id + $incrementID;
+			}
+
 			go()->getDbConnection()
 								->update(
 												$field->tableName(), 
-												[$field->databaseName => $id + $incrementID],
+												[$field->databaseName => $value],
 												['id' => $record['id']]
 												)->execute();
 		}
@@ -333,7 +340,7 @@ class MigrateCustomFields63to64 {
 		}
 
 		//create new
-		$newId = self::$newIds++;
+		$newId = static::$TREE_SELECT_OPTION_MISSING_ID++;
 		$data = [
 			'id'=> $newId,
 			'fieldId'=>$fields[0]->id,
@@ -345,9 +352,6 @@ class MigrateCustomFields63to64 {
 		$insertQ->execute();
 
 		return $newId;
-		
-		
-		
 	}
 	
 	private function findTreeSelectRecords(Field $field, array $fields) {
@@ -467,8 +471,9 @@ class MigrateCustomFields63to64 {
 		
 		$data = array_map(function($text) use ($field) {
 			return [
-					"text" => self::MISSING_PREFIX.$text,
-					"fieldId" => $field->id
+				"id" => self::$TREE_SELECT_OPTION_MISSING_ID++,
+				"text" => self::MISSING_PREFIX.$text,
+				"fieldId" => $field->id
 			];
 		}, $missing);
 		

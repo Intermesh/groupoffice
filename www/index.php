@@ -83,6 +83,8 @@ try {
 //			exit();
 //		}
 
+		go()->fireEvent(\go\core\App::EVENT_INDEX);
+
 		Response::get()->sendHeaders();
 
 		if(go()->getSettings()->databaseVersion != go()->getVersion()) {
@@ -103,8 +105,5 @@ try {
   errorHander($e);  
 }
 
-
-
-go()->fireEvent(\go\core\App::EVENT_INDEX);
 
 GO::router()->runController();

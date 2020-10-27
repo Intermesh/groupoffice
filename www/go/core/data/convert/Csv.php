@@ -92,7 +92,12 @@ class Csv extends AbstractConverter {
 	public function export(Entity $entity) {
 		
 		$headers = $this->getHeaders($entity);
-		$templateValues = $entity->toTemplate();
+		//set custom fields to text mode
+		if(property_exists($entity, "returnAsText")) {
+			$entity->returnAsText = true;
+		}
+		$templateValues = $entity->toArray();
+
 		$record = [];
 		foreach($headers as $header) {
 			$record[$header['name']] = $this->getValue($entity, $templateValues, $header['name']);

@@ -514,6 +514,19 @@ class Contact extends AclItemEntity {
 											}
 											$criteria->where('org.name', $comparator, $value);
 										})
+//
+//										->add("orgFilter", function(Criteria $criteria, $value, Query $query){
+//											if( !$query->isJoined('addressbook_contact', 'orgFilter')) {
+//												$query->join('core_link', 'lOrgFilter', 'c.id = lOrgFilter.fromId and lOrgFilter.fromEntityTypeId = '.self::entityType()->getId() . ' AND lOrgFilter.toEntityTypeId=' . self::entityType()->getId(), 'LEFT');
+//											}
+//
+//											$orgs = Contact::find(['id'])
+//												->selectSingleValue('id')
+//												->where('isOrganization', '=', true)
+//												->filter($value);
+//
+//											$query->where('lOrgFilter.id', 'IN', $orgs);
+//										})
 
 										->addText("orgCity", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if( !$query->isJoined('addressbook_contact', 'org')) {
@@ -874,7 +887,22 @@ class Contact extends AclItemEntity {
 		
 		return $this->organizationIds;
 	}
-	
+
+	/**
+	 * Used in templates. Not returned to API by default.
+	 *
+	 * @return Contact[]
+	 * @throws Exception
+	 */
+	public function getOrganizations() {
+		return $this->findOrganizations()->all();
+	}
+
+	protected static function atypicalApiProperties()
+	{
+		return array_merge(parent::atypicalApiProperties(), ['organizations']);
+	}
+
 	public function setOrganizationIds($ids) {		
 		$this->setOrganizationIds = $ids;				
 	}
@@ -961,6 +989,10 @@ class Contact extends AclItemEntity {
 			}
 		}
 
+		if(!empty($this->notes)) {
+			$keywords[] = $this->notes;
+		}
+
 		return $keywords;
 	}
 
@@ -983,7 +1015,7 @@ class Contact extends AclItemEntity {
 		//re fetch in case this object is not complete
 		$contact= Contact::findById($this->id, ['firstName', 'lastName', 'middleName', 'name', 'gender', 'prefixes', 'suffixes', 'language']);
 		$tpl = new TemplateParser();
-		$tpl->addModel('contact', $contact->toArray());
+		$tpl->addModel('contact', $contact);
 
 		$addressBook = AddressBook::findById($this->addressBookId, ['salutationTemplate']);
 
@@ -1149,12 +1181,6 @@ class Contact extends AclItemEntity {
 		$message->setTo($this->emailAddresses[0]->email, $this->name);
 	}
 
-	public function toTemplate() {
-		$array = parent::toTemplate();
-		$array['organizations'] = $this->findOrganizations()->all();
-
-		return $array;
-	}
 //
 //	private static $colors =  [
 //    'C62828',

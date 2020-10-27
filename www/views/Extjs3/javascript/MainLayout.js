@@ -346,7 +346,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		var me = this;
 
 		Ext.getBody().mask(t("Loading..."));
-	
+
 		go.Modules.init().then(function() {
 			go.User.loadLegacyModules();
 			Promise.all([
@@ -362,8 +362,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				console.error(error);
 				Ext.getBody().unmask();
 				Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console."));
-
-				
 			});
 		});
 		
