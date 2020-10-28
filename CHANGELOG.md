@@ -1,3 +1,7 @@
+6.4.188
+
+- Translations: added more Romanian translations thanks to Safety Broker de Asigurare SRL
+
 27-10-2020 6.4.187
 - Core: Set core_acl.ownedBy to 1 when user has been removed.  
 - Core: Cleanup address books and note books on user delete
