@@ -93,8 +93,8 @@ class Module extends \GO\Base\Db\ActiveRecord {
 					\go\core\Module::installDependencies($module->moduleManager);
 				}
 
-
-				$module->save();				
+				if(!$module->save())
+					throw new \GO\Base\Exception\Save();
 			}
 		}
 			

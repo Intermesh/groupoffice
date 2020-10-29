@@ -21,6 +21,7 @@
 namespace GO\Calendar\Controller;
 
 use DateTime;
+use GO\Base\Exception\AccessDenied;
 use \GO\Base\Util\Date as GODate;
 use GO\Base\Db\ActiveRecord;
 use GO\Base\Db\FindCriteria;
@@ -681,8 +682,12 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		unset(\GO::session()->values['new_participant_ids']);
 		
 		$this->_changeTimeParams($params);
-		
-		return parent::actionLoad($params);
+		try {
+			return parent::actionLoad($params);
+		} catch (AccessDenied $e) {
+			unset($params['calendar_id']);
+			return parent::actionLoad($params);
+		}
 	}
 
 	protected function beforeLoad(&$response, &$model, &$params) {

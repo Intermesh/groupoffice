@@ -370,7 +370,7 @@ go.util =  (function () {
 			return Ext.util.Format.nl2br(
 				Autolinker.link(
 					Ext.util.Format.htmlEncode(text),
-					{stripPrefix: false, stripTrailingSlash: false, className: "normal-link", newWindow: true}
+					{stripPrefix: false, stripTrailingSlash: false, className: "normal-link", newWindow: true, phone: false}
 					)
 			);
 		},

@@ -25,6 +25,22 @@ go.Db = (function() {
 			}
 			
 			return stores[lcname];
+		},
+
+
+		/**
+		 * Get all entity stores.
+		 *
+		 * @returns {Object[]}
+		 */
+		stores : function() {
+			var all = [];
+
+			go.Entities.getAll().forEach(function(e) {
+				all.push(go.Db.store(e.name));
+			});
+
+			return all;
 		}
 	};
 })();

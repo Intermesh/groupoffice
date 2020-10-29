@@ -23,9 +23,9 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 
 	initComponent: function () {
 		
-		var actions = this.initRowActions();
-		
 		this.title = t("Users");
+
+
 
 		var cols = this.initColumns([
 			'id',
@@ -37,6 +37,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 			'personalGroup',
 			'enabled',
 			{name: 'createdAt', type: 'date'},
+			{name: 'modifiedAt', type: 'date'},
 			{name: 'lastLogin', type: 'date'}
 		], [{
 				id: 'name',
@@ -61,6 +62,15 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				sortable: true,
 				dataIndex: 'createdAt',
 				hidden: false
+			},
+			{
+				xtype:"datecolumn",
+				id: 'modifiedAt',
+				header: t('Modified at'),
+				width: dp(160),
+				sortable: true,
+				dataIndex: 'createdAt',
+				hidden: true
 			},
 			{
 				xtype:"datecolumn",
@@ -99,7 +109,6 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				sortable: true
 			}]);
 
-		cols.columns.push(actions);
 
 		this.store = new go.data.Store({
 			fields: cols.fields,
@@ -107,7 +116,6 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 		});
 
 		Ext.apply(this, {
-			plugins: [actions],
 			tbar: [{
 				iconCls: 'ic-people-outline',
 				text: t('Show disabled'),
@@ -176,9 +184,11 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 			columns: cols.columns,
 			viewConfig: {
 				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',
-				forceFit: true,
-				autoFill: true,
 				totalDisplay: true,
+				actionConfig: {
+					scope: this,
+					menu: this.initMoreMenu()
+				},
 				getRowClass: function(record) {
 					if(!record.json.enabled)
 						return 'go-user-disabled';
@@ -198,174 +208,114 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 		this.on('rowdblclick', function(grid, rowIndex, e) {
 			this.edit(this.store.getAt(rowIndex).id);
 		}); 
-	}, 
-	
-	initRowActions: function () {
-
-		var actions = new Ext.ux.grid.RowActions({
-			menuDisabled: true,
-			hideable: false,
-			draggable: false,
-			fixed: true,
-			header: '',
-			hideMode: 'display',
-			keepSelection: true,
-
-			actions: [{
-					iconCls: 'ic-more-vert'
-				}]
-		});
-
-		actions.on({
-			action: function (grid, record, action, row, col, e, target) {
-				this.showMoreMenu(record, e);
-			},
-			scope: this
-		});
-
-		return actions;
-
 	},
-	
-	showMoreMenu : function(record, e) {
-		if(!this.moreMenu) {
-			this.moreMenu = new Ext.menu.Menu({
-				items: [
-					{
-						itemId: "view",
-						iconCls: 'ic-edit',
-						text: t("Edit"),
-						handler: function() {this.edit(this.moreMenu.record.id);},
-						scope: this						
-					},{
-						itemId:"loginAs",
-						iconCls: 'ic-swap-horiz',
-						text: t("Login as this user"),
-						handler: function() {
-							var me = this;
-							
-							//Drop local data
-							go.browserStorage.deleteDatabase().then(function() {
-								
-								go.Jmap.request({
-									method: "User/loginAs",
-									params: {userId: me.moreMenu.record.id},
-									callback: function(options, success, result) {
-										if(!result.success) {
-											Ext.MessageBox.alert(t("Error"), t("Failed to login as this user"));
-											return;
-										}
 
-										//reload client
-										document.location = BaseHref;
+	initMoreMenu : function() {
+		this.moreMenu = new Ext.menu.Menu({
+			items: [
+				{
+					itemId: "view",
+					iconCls: 'ic-edit',
+					text: t("Edit"),
+					handler: function(item) {
+						var record = this.store.getAt(item.parentMenu.rowIndex);
+						this.edit(record.id);
+					},
+					scope: this
+				},{
+					itemId:"loginAs",
+					iconCls: 'ic-swap-horiz',
+					text: t("Login as this user"),
+					handler: function(item) {
+						var record = this.store.getAt(item.parentMenu.rowIndex);
+						//Drop local data
+						go.browserStorage.deleteDatabase().then(function() {
+
+							go.Jmap.request({
+								method: "User/loginAs",
+								params: {userId: record.id},
+								callback: function(options, success, result) {
+									if(!result.success) {
+										Ext.MessageBox.alert(t("Error"), t("Failed to login as this user"));
+										return;
+									}
+
+									//reload client
+									document.location = BaseHref;
+								}
+							});
+						});
+					},
+					scope: this
+				},
+				"-"
+				,{
+					itemId: "archive",
+					iconCls: "ic-archive",
+					text: t("Archive user"),
+					handler: function(item) {
+
+						var record = this.store.getAt(item.parentMenu.rowIndex);
+
+						Ext.MessageBox.confirm(
+							t("Confirm"),
+							t("Archiving a user will disable them and make their items invisible. Are you sure?"),
+							function(btn) {
+								if(btn !== 'yes') {
+									return;
+								}
+								var id = record.id, params = {};
+
+								if(id === go.User.id) {
+									Ext.MessageBox.alert(t('Error'), t('You can\' t archive yourself'));
+									return;
+								}
+								params.update = {};
+								params.update[id] = {'enabled': false, 'archive': true};
+
+								go.Db.store("User").set(params, function(options, success, response) {
+									if (response.notUpdated && response.notUpdated[id] && response.notUpdated[id].validationErrors && response.notUpdated[id].validationErrors.currentPassword) {
+										Ext.MessageBox.alert(t('Error'), t('Error while saving the data'));
+										return;
 									}
 								});
 							});
-						},
-						scope: this						
 					},
-					"-"
-					,{
-						itemId: "archive",
-						iconCls: "ic-archive",
-						text: t("Archive user"),
-						handler: function() {
-							var me = this;
+					scope: this
+				}
+				,{
+					itemId:"delete",
+					iconCls: 'ic-delete',
+					text: t("Delete"),
+					handler: function(item) {
+						var record = this.store.getAt(item.parentMenu.rowIndex);
 
-							Ext.MessageBox.confirm(
-								t("Confirm"),
-								t("Archiving a user will disable them and make their items invisible. Are you sure?"),
-								function(btn) {
-									if(btn !== 'yes') {
-										return;
-									}
-									var id = me.moreMenu.record.id, params = {};
+						this.getSelectionModel().selectRecords([record]);
+						this.deleteSelected();
+					},
+					scope: this
+				}
+			],
+			listeners: {
+				scope: this,
+				show: function(menu) {
 
-									if(id === go.User.id) {
-										Ext.MessageBox.alert(t('Error'), t('You can\' t archive yourself'));
-										return;
-									}
-									params.update = {};
-									params.update[id] = {'enabled': false, 'archive': true};
+					var record = this.store.getAt(menu.rowIndex);
 
-									go.Db.store("User").set(params, function(options, success, response) {
-										if (response.notUpdated && response.notUpdated[id] && response.notUpdated[id].validationErrors && response.notUpdated[id].validationErrors.currentPassword) {
-											Ext.MessageBox.alert(t('Error'), t('Error while saving the data'));
-											return;
-										}
-									});
-								});
-						},
-						scope: this
+					var archiveItm  = menu.find('itemId','archive'), loginItm = menu.find('itemId', 'loginAs');
+					if(archiveItm.length > 0) {
+						archiveItm[0].setDisabled(!record.data.enabled);
 					}
-					,{
-						itemId:"delete",
-						iconCls: 'ic-delete',
-						text: t("Delete"),
-						handler: function() {
-							this.getSelectionModel().selectRecords([this.moreMenu.record]);
-							this.deleteSelected();
-						},
-						scope: this						
+					if(loginItm.length > 0 ) {
+						loginItm[0].setDisabled(!record.data.enabled);
 					}
-				]
-			});
-			
-			
-			if(go.Modules.isAvailable("legacy", "addressbook")) {
-				this.moreMenu.insert(1, {
-					iconCls: "ic-contacts",
-					text: t("Edit contact"),
-					scope: this,
-					handler: function() {
-						GO.request({
-							url: 'addressbook/contact/findForUser',
-							params: {
-								user_id: this.moreMenu.record.id
-							},
-							scope: this,
-							success: function(response, success, result) {
-								if(result.contact_id) {
-									GO.addressbook.showContactDialog(result.contact_id);
-								} else
-								{
-									var u = this.moreMenu.record.data;
-									
-									GO.addressbook.showContactDialog(0, {
-										values: {
-											first_name: u.displayName,
-											email: u.email
-										}
-									});
-									
-									GO.addressbook.contactDialog.formPanel.baseParams.go_user_id = u.id;
-									
-									GO.addressbook.contactDialog.on("hide", function() {
-										delete GO.addressbook.contactDialog.formPanel.baseParams.go_user_id;
-									}, {single: true});
-									
-									
-								}
-							}						
-						});
-					}
-				});
+				}
 			}
-		}
+		});
 
-		var archiveItm  = this.moreMenu.find('itemId','archive'), loginItm = this.moreMenu.find('itemId', 'loginAs');
-		if(archiveItm.length > 0) {
-			archiveItm[0].setDisabled(!record.data.enabled);
-		}
-		if(loginItm.length > 0 ) {
-			loginItm[0].setDisabled(!record.data.enabled);
-		}
-
-		this.moreMenu.record = record;
-		
-		this.moreMenu.showAt(e.getXY());
+		return this.moreMenu
 	},
-	
+
 	edit : function(id) {
 		var dlg = new go.usersettings.UserSettingsDialog();
 		dlg.load(id).show();

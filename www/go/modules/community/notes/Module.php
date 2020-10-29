@@ -42,10 +42,15 @@ class Module extends core\Module {
 	
 	public function defineListeners() {
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
+		User::on(User::EVENT_BEFORE_DELETE, static::class, 'onUserDelete');
 	}
 	
 	public static function onMap(Mapping $mapping) {
 		$mapping->addHasOne('notesSettings', UserSettings::class, ['id' => 'userId'], true);
+	}
+
+	public static function onUserDelete(core\db\Query $query) {
+		NoteBook::delete(['createdBy' => $query]);
 	}
 
 }

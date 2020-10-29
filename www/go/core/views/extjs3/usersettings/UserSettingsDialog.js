@@ -26,7 +26,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		this.saveButton = new Ext.Button({
 			text: t('Save'),
 			handler: this.submit,
-			scope:this
+			scope:this,
+			cls: "primary"
 		});
 				
 		this.formPanel = new Ext.form.FormPanel({

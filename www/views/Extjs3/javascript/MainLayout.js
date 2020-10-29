@@ -346,7 +346,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		var me = this;
 
 		Ext.getBody().mask(t("Loading..."));
-	
+
 		go.Modules.init().then(function() {
 			go.User.loadLegacyModules();
 			Promise.all([

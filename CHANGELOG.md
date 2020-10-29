@@ -1,6 +1,5 @@
 
 
-
 Master
 - Business: New finance and contracts module
 - Projects: new module
@@ -16,6 +15,65 @@ Master
 end 6.5
 --------
 
+
+
+6.4.188
+- Core: Stop CRON execution when upgrade is needed
+- Core: Run GarbageCollection once per day at midnight instead of every hour
+- Core: added more Romanian translations thanks to Safety Broker de Asigurare SRL
+- Projects: Removed projects v1 to v2 upgrade. UPgrade must be done in v6.2.
+
+27-10-2020 6.4.187
+- Core: Set core_acl.ownedBy to 1 when user has been removed.  
+- Core: Cleanup address books and note books on user delete
+
+27-10-2020 6.4.186
+- Core: error on modifiedAt in old framework when saving custom fields
+- Core: Fixed [6.4.185] Error: PDOException with update #623
+
+27-10-2020 6.4.185
+- Calendar: Error when adding event while in read only calendar
+- Custom fields: Could be returned as text
+- Core: optimized search keywords
+- Address book: include notes in search keywords
+- Core: Upgrade form 6.3 was broken due to toggleGarbageCollection()
+- Core: New configuration option to logout users when inactive for more than x number of seconds.
+- Core: Raised size of search cache from 190 chars to 750 chars
+- Core: fixed <br /> tags in error messages 
+- Sieve: make sure result is defined
+- OfficeOnline: Send locale string with country. en_us instead of just en.
+
+23-10-2020 6.4.184
+- Core: Template parse gave error on arrays
+- Core: Chips component error on empty value in custom fields
+
+23-10-2020 6.4.183
+- Email: Fixed download inline image on linked messages
+- Core: Add constraints to acl from core_search
+- Filesearch: raise default index file sizze limit to 10MB
+- Core: Configure secondary and accent color for Paper theme
+- Core: Fixed missing GC cron job Groupoffice #620
+
+22-10-2020 6.4.182
+- Core: some modules couldn't be uninstalled from system settings
+- Core: Fixed too large cc field in e-mail composer
+- Core: Disabled phone number auto linking
+- Email: more user friendly icon and tooltip for CC / BCC submenu
+- Tickets: remove limit on writable ticket store for custom fields
+- Translations: Added Bulgarian translation thanks to Nikolay Stoychev.
+- Timeregistration: Activity name and code visible on ediding time registration
+- Core: Template and function custom field use text values instead of id's of select fields
+- Core: Turn off GarbageCollection while upgrading
+- Studio: Checks for reserved PHP Keywords
+- Studio: Generates commented at and has links to filters
+- Core: Share custom filters with everyone by default on new installations
+
+13-10-2020 6.4.181
+- Core: In system settings, extra filter 'Disabled users', make sortable by change date
+- Core: Custom field of type function could cause error "Division by zero"
+- Core: Fixed safari 14.0 crash on pasting image in HTML editor fields
+- Core: JMAP didn't track change if only custom fields were modified
+- GOTA: Signed jar file
 
 13-10-2020 6.4.180
 - Email: Fixed scroll bars in recipient fields

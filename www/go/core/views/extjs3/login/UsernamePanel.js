@@ -30,6 +30,7 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 			this.usernameField,
 			this.passwordField,
 			{
+				hidden: GO.settings.config.logoutWhenInactive > 0,
 				itemCls: 'go-login-remember',
 				hideLabel: true,
 				xtype: "xcheckbox",
@@ -70,7 +71,8 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 					type: "submit",
 					text: t("Next"),
 					handler: this.submit,
-					scope: this
+					scope: this,
+					cls: "primary"
 				})
 			],
 			items: [{

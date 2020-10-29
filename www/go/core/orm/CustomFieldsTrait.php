@@ -8,6 +8,7 @@ use go\core\db\Query;
 use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\Installer;
+use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 use go\core\model\Field;
 use PDOException;
@@ -29,6 +30,13 @@ trait CustomFieldsTrait {
 	private $customFieldsModified = false;
 	private $customFieldsIsNew;
 
+	/**
+	 * Set the default return type of @see getCustomFields()
+	 *
+	 * @var bool
+	 */
+	public $returnAsText = false;
+
   /**
    * Get all custom fields data for an entity
    *
@@ -36,7 +44,12 @@ trait CustomFieldsTrait {
    * @return array
    * @throws Exception
    */
-	public function getCustomFields($asText = false) {
+	public function getCustomFields($asText = null) {
+
+		if(!isset($asText)) {
+			$asText = $this->returnAsText;
+		}
+
 		$fn = $asText ? 'dbToText' : 'dbToApi';
 		$record = $this->internalGetCustomFields();
 		foreach(self::getCustomFieldModels() as $field) {
@@ -169,8 +182,8 @@ trait CustomFieldsTrait {
 		}
 
 		$this->customFieldsData = array_merge($this->internalGetCustomFields(), $this->normalizeCustomFieldsInput($data, $asText));
-		
-		$this->customFieldsModified = true;
+
+		$this->customFieldsModified = $this->oldCustomFieldsData != $this->customFieldsData;
 
 		return $this;
 	}
@@ -195,7 +208,7 @@ trait CustomFieldsTrait {
 	 * 
 	 * @return bool
 	 */
-	protected function isCustomFieldsModified() {
+	public function isCustomFieldsModified() {
 		return $this->customFieldsModified;
 	}
 
@@ -274,7 +287,6 @@ trait CustomFieldsTrait {
    */
 	public function saveCustomFields() {
 
-		
 		try {
 
 			if(Installer::isInstalling()) {
@@ -291,6 +303,12 @@ trait CustomFieldsTrait {
 
 			if(!$this->customFieldsModified && $record == $this->customFieldsData) {
 				return true;
+			}
+
+			//Set modifiedAt because otherwise the entity might have no change at all. Then no change will be logged for
+			//JMAP sync
+			if(property_exists($this, 'modifiedAt') && !$this->isModified(['modifiedAt'])) {
+				$this->modifiedAt = new DateTime();
 			}
 
 			if($this->customFieldsIsNew) {

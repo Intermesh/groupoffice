@@ -723,7 +723,26 @@ $updates['202006191648'][] = "ALTER TABLE `core_entity_filter` ADD `type` ENUM('
 $updates['202006191648'][] = "ALTER TABLE `core_entity_filter` CHANGE `filter` `filter` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL;";
 $updates['202007302016'][] = "ALTER TABLE `core_customfields_field_set` ADD `columns` TINYINT NOT NULL DEFAULT '2' AFTER `isTab`;";
 
-$updates['202010051413'][] = "CREATE TABLE `core_alert` (
+
+$updates['202010231035'][] = "delete FROM `core_search` WHERE aclId not in (select id from core_acl);";
+$updates['202010231035'][] = "ALTER TABLE `core_search` ADD  FOREIGN KEY (`aclId`) REFERENCES `core_acl`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
+$updates['202010261619'][] = "ALTER TABLE `core_email_template` ROW_FORMAT=DYNAMIC;";
+$updates['202010261619'][] = "ALTER TABLE `core_email_template_attachment` ROW_FORMAT=DYNAMIC;";
+
+$updates['202010261619'][] = "ALTER TABLE `core_search` ROW_FORMAT=DYNAMIC;";
+$updates['202010261619'][] = "ALTER TABLE `core_search` CHANGE `keywords` `keywords` VARCHAR(750) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;";
+
+
+$updates['202010261619'][] = "ALTER TABLE `core_acl` CHANGE `ownedBy` `ownedBy` INT(11) NULL;";
+
+$updates['202010261619'][] = "update `core_acl` set ownedBy = 1 where ownedBy not in (select id from core_user);";
+
+$updates['202010261619'][] = "ALTER TABLE `core_acl` ADD FOREIGN KEY (`ownedBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";
+
+$updates['202010271619'][] = "UPDATE `core_cron_job` SET `expression` = '0 0 * * *' WHERE `core_cron_job`.`name` = 'GarbageCollection' and moduleId = (select id from core_module where name='core' and package='core')";
+
+$updates['202010271619'][] = "CREATE TABLE `core_alert` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `entityTypeId` INT NOT NULL,
   `entityId` INT NOT NULL,

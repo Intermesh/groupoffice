@@ -148,12 +148,14 @@ GO.mainLayout.on('render', function () {
 	},false);
 
 
-	window.onerror = function(message, source, lineno, colno, error) {
-		GO.errorDialog.show(t("An error occurred. More details can be found in the console.") + "<br /><br />" + message);
-	}
+	if(!GO.settings.config.debug) {
+		window.onerror = function (message, source, lineno, colno, error) {
+			GO.errorDialog.show(t("An error occurred. More details can be found in the console.") + "<br /><br />" + message);
+		}
 
-	window.addEventListener('unhandledrejection', function(event) {
-		console.error(event.reason);
-		GO.errorDialog.show(t("An error occurred. More details can be found in the console."));
-	});
+		window.addEventListener('unhandledrejection', function (event) {
+			console.error(event.reason);
+			GO.errorDialog.show(t("An error occurred. More details can be found in the console."));
+		});
+	}
 });

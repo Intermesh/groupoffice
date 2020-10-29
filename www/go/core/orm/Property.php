@@ -541,7 +541,7 @@ abstract class Property extends Model {
    * @throws Exception
    */
 	public function &__get($name) {
-		$prop = static::getMapping()->getRelation($name);
+		$prop = static::getMapping()->getProperty($name);
 		if($prop) {
 			if(!isset($this->dynamicProperties[$name])) {
 				if($prop instanceof Relation && !in_array($name, $this->fetchProperties)) {
@@ -608,9 +608,30 @@ abstract class Property extends Model {
 	}
 
 	/**
+	 * Returns property names that are not returned to the client by default
+	 *
+	 * You may override and extend this.
+	 * @example
+	 * ```
+	 * protected static function atypicalApiProperties()
+	 * {
+	 *	 return array_merge(parent::atypicalApiProperties(), ['file']);
+	 * }
+	 * ```
+	 *
+	 * @return string[]
+	 */
+	protected static function atypicalApiProperties() {
+		return ['modified', 'oldValues', 'validationErrors', 'modifiedCustomFields', 'validationErrorsAsString'];
+	}
+
+	/**
 	 * Get the properties to fetch when using the find() method.
 	 * These properties will be preloaded including related properties from other
 	 * tables. They will also be returned to the client.
+	 *
+	 * If you have getters that typically shouldn't be returned by the API then list them in the
+	 * @see atypicalApiProperties() method.
 	 *
 	 * @return string[]
 	 * @throws Exception
@@ -623,7 +644,7 @@ abstract class Property extends Model {
 		
 		if(!$props) {
 			$props = array_filter(static::getReadableProperties(), function($propName) {
-				return !in_array($propName, ['modified', 'oldValues', 'validationErrors', 'modifiedCustomFields', 'validationErrorsAsString']);
+				return !in_array($propName, static::atypicalApiProperties());
 			});
 
 			go()->getCache()->set($cacheKey, $props);

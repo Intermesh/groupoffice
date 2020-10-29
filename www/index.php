@@ -63,13 +63,11 @@ try {
 		$token = Token::find()->where('accessToken', '=', $_POST['accessToken'])->single();
 		if($token) {
 			$token->setAuthenticated();
+			setcookie('accessToken', $token->accessToken, null, "/", Request::get()->getHost(), false, false);
 		} else
 		{
 			unset($_POST['accessToken']);
 		}
-
-		setcookie('accessToken', $token->accessToken, null, "/", Request::get()->getHost(), false, false);
-
 		date_default_timezone_set($old);
 	}
 

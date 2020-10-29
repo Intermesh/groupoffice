@@ -84,11 +84,7 @@ try {
 				continue;
 			}
 			if ($moduleController->autoInstall() && $moduleController->isInstallable()) {
-				$module = new Module();
-				$module->name = $moduleController->name();
-				if (!$module->save()) {
-					throw new \Exception("Could not save module " . $module->name);
-				}
+				Module::install($moduleController->name());
 			}
 		}
 		GO::$ignoreAclPermissions = false;

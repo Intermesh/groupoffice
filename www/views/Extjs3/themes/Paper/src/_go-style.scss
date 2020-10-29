@@ -471,7 +471,7 @@ a {
 		.x-tab-strip {
 			
 			&-active {
-				border-bottom-color: $cAccent;
+				@include var(border-bottom-color, c-accent);
 				color:white;
 				.x-tab-strip-text{ color:white;}
 			}
@@ -513,7 +513,6 @@ a {
 	position:relative;
 	z-index: 2;
 	background-color: color($bg, 'background') !important;
-	// /color: $cAccent;
 }
 
 // empty state icons
@@ -538,20 +537,16 @@ a {
 
 #secondary-menu {
 	padding-right: dp(56);
-	#start-menu-link {		
-		display:inline-block;
+	#start-menu-link, #search_query {
+		float: left;
 		text-decoration: none;
 		height:dp(40);
-		padding: dp(18) dp(8) dp(8) dp(8);
+		padding: dp(18) dp(8) 0 0;
 		color: white;
 		&:hover,&:active { color: white; }
 	}
 }
-#search_query {
-	float:left;
-	display:block;
-	padding-top: dp(12);
-}
+
 
 .search-field-wrap {
 	position:absolute;
@@ -1142,49 +1137,12 @@ tr.go-grid-row {
 		color: color($fg, 'secondary-text');
 	}
 	
-	
-	// .go-detail-view-avatar {
-	// 	text-align: center;
-	// 	.avatar {
-	// 		font-size: dp(154);
-	// 		line-height: dp(120);
-
-	// 		height: dp(120);
-	// 		width: dp(120);
-	// 	}
-	// }
-	
 	.content {
 		padding: dp(16);
 	}
 	
 	@extend %font-body1;
-	/*.x-btn.fab {
-		@extend .z6;
-		position:absolute;
-		box-sizing: border-box;
-		right: dp(32);
-		top:dp(-24);
-		background-color: $cAccent;
-		color:white;
-		width:dp(48);
-		height: dp(48) !important;
-		transition: box-shadow 280ms $curve-standard;
-		border-radius: 50%;
-		button::before {
-			color:white;
-		}
-	}
-	.x-btn-over.fab {
-		@extend .z8;
-	}
-	.x-btn-click.fab {
-		@extend .z12;
-		background-color: color($orange, 700) !important;
-	}*/
-		.x-panel-body {
 
-	}
 
 	> .x-panel-bwrap {
 		> .x-panel-body {
@@ -1216,9 +1174,6 @@ tr.go-grid-row {
 		  padding-top: (9 / 16) * 100%;
 		}
 	}
-	/*.x-tool { margin-top: dp(3);}*/
-
-
 		
 	.xtb-title {
 		@extend %font-title;
