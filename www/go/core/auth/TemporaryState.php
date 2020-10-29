@@ -2,6 +2,7 @@
 namespace go\core\auth;
 
 use go\core\auth\State as AbstractState;
+use go\core\jmap\Request;
 use go\core\model\User;
 
 /**
@@ -73,6 +74,10 @@ class TemporaryState extends AbstractState {
 			return false;
 		}
 		return $user->isAdmin();
+	}
+
+	protected function getBaseUrl() {
+		return go()->getSettings()->URL . 'api/';
 	}
 }
 

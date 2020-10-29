@@ -12,7 +12,9 @@ use function GO;
 class System extends Controller {
 	
 	/**
-	 * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php core/System/runCron --module=ldapauthenticatior --package=community --name=Sync
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=ldapauthenticatior --package=community --name=Sync
+	 *
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=contracts --package=business --name=CreateInvoices
 	 */
 	public function runCron($name, $module = "core", $package = "core") {
 		$cls = $package == "core" ?

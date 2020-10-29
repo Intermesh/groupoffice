@@ -143,32 +143,11 @@ class State extends AbstractState {
 		}
 	}
 
-	private function getBaseUrl() {
+	protected function getBaseUrl() {
 		$url = Request::get()->isHttps() ? 'https://' : 'http://';
 		$url .= Request::get()->getHost(false) . dirname($_SERVER['PHP_SELF']);
 		return $url;
 	}
-	
-	public function getDownloadUrl($blobId) {
-		return $this->getBaseUrl() . "/download.php?blob=".$blobId;
-	}
-
-	public function getPageUrl() {
-		return $this->getBaseUrl(). "/page.php";
-	}
-	
-	public function getApiUrl() {
-		return $this->getBaseUrl() . '/jmap.php';
-	}
-	
-	public function getUploadUrl() {
-		return $this->getBaseUrl(). '/upload.php';
-	}
-	
-	public function getEventSourceUrl() {
-		return go()->getConfig()['core']['general']['sseEnabled'] ? $this->getBaseUrl() . '/sse.php' : null;
-	}
-
 
 	public function getSession() {
 			
