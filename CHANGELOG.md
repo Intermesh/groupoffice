@@ -1,6 +1,7 @@
 6.4.188
-
-- Translations: added more Romanian translations thanks to Safety Broker de Asigurare SRL
+- Core: Stop CRON execution when upgrade is needed
+- Core: Run GarbageCollection once per day at midnight instead of every hour
+- Core: added more Romanian translations thanks to Safety Broker de Asigurare SRL
 
 27-10-2020 6.4.187
 - Core: Set core_acl.ownedBy to 1 when user has been removed.  
