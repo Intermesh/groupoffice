@@ -1,4 +1,5 @@
 
+
 Master
 - Business: New finance module
 - Projects: new module
@@ -16,6 +17,15 @@ end 6.5
 
 
 
+6.4.188
+- Core: Stop CRON execution when upgrade is needed
+- Core: Run GarbageCollection once per day at midnight instead of every hour
+- Core: added more Romanian translations thanks to Safety Broker de Asigurare SRL
+- Projects: Removed projects v1 to v2 upgrade. UPgrade must be done in v6.2.
+
+27-10-2020 6.4.187
+- Core: Set core_acl.ownedBy to 1 when user has been removed.  
+- Core: Cleanup address books and note books on user delete
 
 27-10-2020 6.4.186
 - Core: error on modifiedAt in old framework when saving custom fields
@@ -37,14 +47,12 @@ end 6.5
 - Core: Template parse gave error on arrays
 - Core: Chips component error on empty value in custom fields
 
-
 23-10-2020 6.4.183
 - Email: Fixed download inline image on linked messages
 - Core: Add constraints to acl from core_search
 - Filesearch: raise default index file sizze limit to 10MB
 - Core: Configure secondary and accent color for Paper theme
 - Core: Fixed missing GC cron job Groupoffice #620
-
 
 22-10-2020 6.4.182
 - Core: some modules couldn't be uninstalled from system settings

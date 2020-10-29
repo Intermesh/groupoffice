@@ -1,6 +1,6 @@
 CREATE TABLE `core_acl` (
   `id` int(11) NOT NULL,
-  `ownedBy` int(11) NOT NULL,
+  `ownedBy` int(11) NULL,
   `usedIn` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
   `entityTypeId` int(11) DEFAULT NULL,
@@ -1048,3 +1048,5 @@ ALTER TABLE `core_pdf_template`
 
 
 ALTER TABLE `core_search` ADD  FOREIGN KEY (`aclId`) REFERENCES `core_acl`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+
+ALTER TABLE `core_acl` ADD FOREIGN KEY (`ownedBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;

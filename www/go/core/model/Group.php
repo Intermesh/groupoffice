@@ -227,6 +227,9 @@ class Group extends AclOwnerEntity {
 			return $groupId;
 		}
 		$user = User::findById($userId, ['username']);
+		if(!$user) {
+			throw new \Exeption("Invalid userId given");
+		}
 		$personalGroup = new Group();
 		$personalGroup->name = $user->username;
 		$personalGroup->isUserGroupFor = $userId;

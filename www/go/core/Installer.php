@@ -70,19 +70,10 @@ class Installer {
 		return self::$isUpgrading || basename($_SERVER['PHP_SELF']) == 'upgrade.php';
 	}
 
-	public function toggleGarbageCollection($enabled) {
+	public function enableGarbageCollection() {
 		$job = model\CronJobSchedule::findByName("GarbageCollection", "core", "core");
 		if(!$job) {
-
-			if(!$enabled) {
-				return;
-			}
-
 			$job = $this->createGarbageCollection();
-		}
-		$job->enabled = $enabled;
-		if(!$job->save()) {
-			throw new \Exception("Could not toggle garbage collection job");
 		}
 
 	}
@@ -94,7 +85,7 @@ class Installer {
 		$cron = new model\CronJobSchedule();
 		$cron->moduleId = $module->id;
 		$cron->name = "GarbageCollection";
-		$cron->expression = "0 * * * *";
+		$cron->expression = "0 0 * * *";
 		$cron->description = "Garbage collection";
 
 		if(!$cron->save()) {
@@ -382,7 +373,6 @@ class Installer {
 
 		ActiveRecord::$log_enabled = false;
 
-		$this->toggleGarbageCollection(false);
 		
 		go()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
 
@@ -422,8 +412,7 @@ class Installer {
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
 
-		$this->toggleGarbageCollection(true);
-
+		$this->enableGarbageCollection();
 		echo "Done!\n";
 	}
 	
