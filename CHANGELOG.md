@@ -2,6 +2,7 @@
 - Core: Stop CRON execution when upgrade is needed
 - Core: Run GarbageCollection once per day at midnight instead of every hour
 - Core: added more Romanian translations thanks to Safety Broker de Asigurare SRL
+- Projects: Removed projects v1 to v2 upgrade. UPgrade must be done in v6.2.
 
 27-10-2020 6.4.187
 - Core: Set core_acl.ownedBy to 1 when user has been removed.  
