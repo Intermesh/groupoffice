@@ -56,7 +56,7 @@ class MultiSelect extends Select {
 	}
 	
 	
-	public function beforeSave($value, &$record, $entity) {
+	public function beforeSave($value, \go\core\orm\CustomFieldsModel $model, $entity, &$record) {
 		
 		//remove options from record to be inserted and save them for the afterSave method.
 		$this->optionsToSave = $value;
@@ -71,13 +71,13 @@ class MultiSelect extends Select {
 		}
 		
 		foreach($this->optionsToSave as $optionId) {
-			if(!go()->getDbConnection()->replace($this->getMultiSelectTableName(), ['id' => $customFieldData['id'], 'optionId' => $optionId])->execute()) {
+			if(!go()->getDbConnection()->replace($this->getMultiSelectTableName(), ['id' => $entity->id, 'optionId' => $optionId])->execute()) {
 				return false;
 			}
 		}
 		
 		
-		$query  = (new Query)->where(['id' => $customFieldData['id']]);
+		$query  = (new Query)->where(['id' => $entity->id]);
 		if (!empty($this->optionsToSave)) {	 
 			 $query	->andWhere('optionId', 'not in', $this->optionsToSave);
 		}
@@ -91,24 +91,24 @@ class MultiSelect extends Select {
 		return true;
 	}
 
-	public function dbToApi($value, &$values, $entity) {
+	public function dbToApi($value, \go\core\orm\CustomFieldsModel $values, $entity) {
 		
 		//new model
-		if(empty($values['id'])) {
+		if($entity->isNew()) {
 			return [];
 		}
 
 		return (new Query())
 						->selectSingleValue("optionId")
 						->from($this->getMultiSelectTableName())
-						->where(['id' => $values['id']])
+						->where(['id' => $entity->id])
 						->all();
 	}
 
-	public function dbToText($value, &$values, $entity)
+	public function dbToText($value, \go\core\orm\CustomFieldsModel $values, $entity)
 	{
 		//new model
-		if(empty($values['id'])) {
+		if($entity->isNew()) {
 			return "";
 		}
 
@@ -116,11 +116,11 @@ class MultiSelect extends Select {
 							->selectSingleValue("o.text")
 							->join("core_customfields_select_option", "o", "o.id = ms.optionId")
 							->from($this->getMultiSelectTableName(), 'ms')
-							->where(['id' => $values['id']])
+							->where(['id' => $entity->id])
 							->all());
 	}
 
-	public function textToDb($value, &$values, $entity)
+	public function textToDb($value, \go\core\orm\CustomFieldsModel $values, $entity)
 	{	
 		if(empty($value)) {
 			return [];
