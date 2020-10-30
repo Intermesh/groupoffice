@@ -66,7 +66,7 @@ class Module extends core\Module
 	}
 
 	private static function logEntity(Entity $entity, $action) {
-		if($entity instanceof LogEntry || $entity instanceof core\model\Search) {
+		if($entity instanceof LogEntry || $entity instanceof core\model\Search  || $entity instanceof core\model\CronJobSchedule) {
 			return;
 		}
 

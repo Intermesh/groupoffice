@@ -201,7 +201,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 				);
 
 			if(method_exists($this, "getCustomFields")) {
-				$data['customFields'] = $this->getCustomFields();
+				$data['customFields'] = $this->getCustomFields()->toArray();
 			}
 			return $data;
 	}
