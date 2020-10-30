@@ -24,7 +24,7 @@ Ext.override(Ext.data.Connection, {
  * 
  * @type Number
  */
-GO.util.density = 160; // set in Theme
+GO.util.density = GO.util.isMobileOrTablet() ? 160 : 140;
 function dp(size) {
 	return ((size * GO.util.density) / 160);
 };
@@ -374,6 +374,15 @@ Ext.override(Ext.form.TriggerField,{
 			}
 		}
 	},
+
+	onResize: function(w, h){
+		Ext.form.TriggerField.superclass.onResize.call(this, w, h);
+		var tw = this.getTriggerWidth();
+		if(Ext.isNumber(w)){
+			this.el.setWidth(w - tw);
+		}
+		this.wrap.setWidth(w + tw);
+	},
 	
 	 onRender : function(ct, position){
         this.doc = Ext.isIE ? Ext.getBody() : Ext.getDoc();
@@ -620,7 +629,7 @@ Ext.override(Ext.grid.GridView, {
 });
 
 Ext.override(Ext.grid.CheckboxSelectionModel, {
-	width: dp(32),
+	width: dp(40),
 });
 
 Ext.override(Ext.layout.ToolbarLayout, {
@@ -986,43 +995,43 @@ Ext.override(Ext.layout.ToolbarLayout ,{
 
 Ext.override(Ext.menu.Item ,{
 	getTemplateArgs: function() {
-        return {
-            id: this.id,
-            cls: this.itemCls + (this.menu ?  ' x-menu-item-arrow' : '') + (this.cls ?  ' ' + this.cls : ''),
-            href: this.href || '#',
-            hrefTarget: this.hrefTarget,
-            icon: this.icon || Ext.BLANK_IMAGE_URL,
-            iconCls: this.iconCls || '',
-            text: this.itemText||this.text||'&#160;',
-            altText: this.altText || '',
-            iconStyle: this.iconStyle || ''
-        };
-    },
-		origOnRender: Ext.menu.Item.prototype.onRender,
-		onRender : function(container, position){
-			this.origOnRender.call(this, container, position);
-		
-			//tpl has been overridden and there's no img tag anymore. Without this setIconCls doesn't work.
-			this.iconEl = this.iconEl = this.el.child('span.x-menu-item-icon');
-		}		
-		
- });
+		return {
+			id: this.id,
+			cls: this.itemCls + (this.menu ?  ' x-menu-item-arrow' : '') + (this.cls ?  ' ' + this.cls : ''),
+			href: this.href || '#',
+			hrefTarget: this.hrefTarget,
+			icon: this.icon || Ext.BLANK_IMAGE_URL,
+			iconCls: this.iconCls || '',
+			text: this.itemText||this.text||'&#160;',
+			altText: this.altText || '',
+			iconStyle: this.iconStyle || ''
+		};
+	},
+	origOnRender: Ext.menu.Item.prototype.onRender,
+	onRender : function(container, position){
+		this.origOnRender.call(this, container, position);
+
+		//tpl has been overridden and there's no img tag anymore. Without this setIconCls doesn't work.
+		this.iconEl = this.iconEl = this.el.child('span.x-menu-item-icon');
+	}
+
+});
 
 Ext.menu.Item.prototype.itemTpl = new Ext.XTemplate(
 	'<a id="{id}" class="{cls} x-unselectable" hidefocus="true" unselectable="on" href="{href}"',
-		 '<tpl if="hrefTarget">',
-			  ' target="{hrefTarget}"',
-		 '</tpl>',
-	 '>',
-		  '<span style="{iconStyle}" class="x-menu-item-icon {iconCls}"></span>',
-		  '<span class="x-menu-item-text">{text:raw}</span>',
-	 '</a>'
+	'<tpl if="hrefTarget">',
+	' target="{hrefTarget}"',
+	'</tpl>',
+	'>',
+	'<span style="{iconStyle}" class="x-menu-item-icon {iconCls}"></span>',
+	'<span class="x-menu-item-text">{text:raw}</span>',
+	'</a>'
 );
 Ext.layout.MenuLayout.prototype.itemTpl = new Ext.XTemplate(
 	'<li id="{itemId}" class="{itemCls}">',
-		 '<tpl if="needsIcon">',
-			  '<span style="{iconStyle}" class="{iconCls}"><tpl if="icon"><img alt="{altText}" src="{icon}" /></tpl></span>',
-		 '</tpl>',
+	'<tpl if="needsIcon">',
+	'<span style="{iconStyle}" class="{iconCls}"><tpl if="icon"><img alt="{altText}" src="{icon}" /></tpl></span>',
+	'</tpl>',
 	'</li>'
 );
 

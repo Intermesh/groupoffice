@@ -43,13 +43,14 @@ $settings['config']['help_link'] = GO::config()->help_link;
 $settings['config']['support_link'] = GO::config()->support_link;
 $settings['config']['report_bug_link'] = GO::config()->report_bug_link;
 $settings['config']['nav_page_size'] = intval(GO::config()->nav_page_size);
-$settings['config']['session_inactivity_timeout'] = intval(GO::config()->session_inactivity_timeout);
+$settings['config']['logoutWhenInactive'] = intval(go()->getSettings()->logoutWhenInactive);
 $settings['config']['tickets_no_email_required'] = GO::config()->tickets_no_email_required;
 $settings['config']['default_country'] = GO::config()->default_country;
 $settings['config']['checker_interval'] = (int) GO::config()->checker_interval;
 $settings['config']['remember_login'] = GO::config()->remember_login;
 $settings['config']['encode_callto_link'] = GO::config()->encode_callto_link;
 $settings['config']['login_message'] = GO::config()->login_message;
+
 
  
 $settings['state_index'] = 'go';
@@ -154,9 +155,10 @@ if ($cacheFile->exists()) {
 				
 			}
 			
-			$scripts[] = 'Ext.ns("GO.' . $module->name  . '");';
+			$scripts[] = $module->package ? 'Ext.ns("go.modules.' . $module->package . '.' . $module->name . '");' : 'Ext.ns("GO.' . $module->name  . '");';
 
-			$bundleFile = new File($module->moduleManager->path() . 'views/extjs3/scripts.js');
+
+			$bundleFile = new File($module->moduleManager->path(). 'views/extjs3/scripts.js');
 			if($bundleFile->exists()) {
 				$scripts[] = $bundleFile;
 			} else {
@@ -181,8 +183,6 @@ if ($cacheFile->exists()) {
 			}
 		}
 	}
-
-	$scripts[] = "GO.util.density = GO.util.isMobileOrTablet() ? 160 : 140;";
 
 	//two modules may include the same script
 	//$scripts = array_map('trim', $scripts);

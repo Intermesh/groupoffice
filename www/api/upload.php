@@ -62,7 +62,9 @@ if ($blob->save()) {
 	$response['blobId'] = $blob->id; //deprecated
 	Response::get()->output($response);
 } else {
-	echo 'Could not save '.$blob->id;
-	
-	var_dump(go()->getDebugger()->getEntries());
+
+	Response::get()->setStatus(500, 'Could not save '.$blob->id);
+	$response = $blob->toArray();
+	$response['validationErrors'] = $blob->getValidationErrors();
+	Response::get()->output($response);
 }

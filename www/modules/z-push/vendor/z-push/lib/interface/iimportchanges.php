@@ -73,12 +73,13 @@ interface IImportChanges extends IChanges {
      *
      * @param string        $id
      * @param int           $flags
+     * @param array         $categories
      *
      * @access public
      * @return boolean
      * @throws StatusException
      */
-    public function ImportMessageReadFlag($id, $flags);
+    public function ImportMessageReadFlag($id, $flags, $categories = array());
 
     /**
      * Imports a move of a message. This occurs when a user moves an item to another folder

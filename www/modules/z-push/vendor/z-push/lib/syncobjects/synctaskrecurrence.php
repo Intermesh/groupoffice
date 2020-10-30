@@ -41,6 +41,7 @@ class SyncTaskRecurrence extends SyncObject {
     public $regenerate;
     public $deadoccur;
     public $calendartype;
+    public $firstdayofweek;
 
     function __construct() {
         $mapping = array (
@@ -118,6 +119,21 @@ class SyncTaskRecurrence extends SyncObject {
 
         if(Request::GetProtocolVersion() >= 14.0) {
             $mapping[SYNC_POOMTASKS_CALENDARTYPE]                       = array (   self::STREAMER_VAR      => "calendartype",
+                                                                                    self::STREAMER_RONOTIFY => true);
+        }
+
+        if(Request::GetProtocolVersion() >= 14.1) {
+            // First day of the calendar week for recurrence.
+            // FirstDayOfWeek values:
+            //   0 = Sunday
+            //   1 = Monday
+            //   2 = Tuesday
+            //   3 = Wednesday
+            //   4 = Thursday
+            //   5 = Friday
+            //   6 = Saturday
+            $mapping[SYNC_POOMTASKS_FIRSTDAYOFWEEK]                     = array (   self::STREAMER_VAR      => "firstdayofweek",
+                                                                                    self::STREAMER_CHECKS   => array(   self::STREAMER_CHECK_ONEVALUEOF => array(0,1,2,3,4,5,6) ),
                                                                                     self::STREAMER_RONOTIFY => true);
         }
 

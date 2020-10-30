@@ -1,6 +1,9 @@
 //--------------------------------------------------------------
 // 0. Density independent pixels
 //--------------------------------------------------------------
+
+//TODO: Javascript in overrides.js uses 140 and 160 for
+// mobile and desktop so this can only be 140 or 160 at the moment
 $density: 140 !default; // LARGE SCREEN
 $font-scale: 1 !default;
 $resourcePath: './' !default;
@@ -29,6 +32,9 @@ $curve-sharper: cubic-bezier(.25, .8, .25, 1); //slider
 // for providing a fallback for browser not supporting css variables
 // used for developemnt in PHP replace "var(--c-primary)" with actual configured color for IE support
 // If not replaced IE will default to the color set in $cPrimary
+
+//Example use:
+// @include var(color, c-accent);
 $vars: (
     c-primary: $cPrimary,
     c-primary-tp: $cPrimaryTp,

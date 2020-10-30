@@ -75,11 +75,11 @@ class Folder extends FileSystemObject {
 	 * @param boolean $includeFiles
 	 * @param boolean $includeFolders
 	 * 
-	 * @return File[]|Folder[]
+	 * @return File[]|Folder[]|array[]
 	 */
 	public function getChildren($includeFiles = true, $includeFolders = true) {
-		if (!$dir = opendir($this->path)) {
-			return false;
+		if (!$dir = @opendir($this->path)) {
+			return []; // Return an empty array to prevent crashing foreach() loops
 		}
 
 		$children = [];
@@ -207,7 +207,9 @@ class Folder extends FileSystemObject {
 		return !is_dir($this->path) || rmdir($this->path);
 	}
 	/**
-	 * Move the folder to a new location
+	 * Move the folder to a new location.
+	 *
+	 * Note, it's not moved into this folder but moved as this name into it's parent
 	 *
 	 * @param Folder $destinationFolder This folder may not exist
 	 */

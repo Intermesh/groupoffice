@@ -178,6 +178,7 @@ return array(
     'TimezoneUtil' => $baseDir . '/lib/utils/timezoneutil.php',
     'TopCollector' => $baseDir . '/lib/core/topcollector.php',
     'UnavailableException' => $baseDir . '/lib/exceptions/unavailableexception.php',
+    'UserStoreInfo' => $baseDir . '/lib/core/userstoreinfo.php',
     'Utils' => $baseDir . '/lib/utils/utils.php',
     'ValidateCert' => $baseDir . '/lib/request/validatecert.php',
     'WBXMLDecoder' => $baseDir . '/lib/wbxml/wbxmldecoder.php',
@@ -197,5 +198,7 @@ return array(
     'iCalComponent' => $baseDir . '/include/iCalendar.php',
     'iCalProp' => $baseDir . '/include/iCalendar.php',
     'iCalendar' => $baseDir . '/include/iCalendar.php',
-    'rtf' => $baseDir . '/include/z_RTF.php',
+    'rtf' => $baseDir . '/include/rtfclass.php',
+    'rtfState' => $baseDir . '/include/rtfclass.php',
+    'z_RTF' => $baseDir . '/include/z_RTF.php',
 );

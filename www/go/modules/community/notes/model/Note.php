@@ -70,8 +70,7 @@ class Note extends AclItemEntity {
 	}
 
 	protected function getSearchDescription() {
-		$text = preg_replace("/\s+/", " ", strip_tags(str_replace(">", "> ",$this->content)));
-		return StringUtil::cutString($text, 200);
+		return preg_replace("/\s+/", " ", strip_tags(str_replace(">", "> ",$this->content)));
 	}
 
 	public function title() {

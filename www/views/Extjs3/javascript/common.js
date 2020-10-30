@@ -13,6 +13,13 @@
  
 Ext.namespace('GO.util');
 
+// to capture ALL events use:
+// Ext.util.Observable.prototype.fireEvent =
+// 	Ext.util.Observable.prototype.fireEvent.createInterceptor(function() {
+// 		console.log(arguments);
+// 		return true;
+// 	});
+
 
 Ext.Ajax.on('requestexception', function(conn, response, options) {
 	if(response.isAbort) {
@@ -565,6 +572,10 @@ String.prototype.regexpEscape = function() {
 
 GO.util.numberFormat = function (number, decimals, decimal_separator, thousands_separator)
 {
+	if(number == "∞") {
+		return "∞";
+	}
+
 	if(typeof(decimals)=='undefined')
 	{
 		decimals=2;

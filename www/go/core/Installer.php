@@ -21,6 +21,7 @@ use go\core\model\User;
 use go\core\model\UserGroup;
 use go\core\Module;
 use go\core\orm\Entity;
+use go\core\orm\Filters;
 use go\core\util\ClassFinder;
 use go\core\util\Lock;
 use PDOException;
@@ -70,6 +71,31 @@ class Installer {
 		return self::$isUpgrading || basename($_SERVER['PHP_SELF']) == 'upgrade.php';
 	}
 
+	public function enableGarbageCollection() {
+		$job = model\CronJobSchedule::findByName("GarbageCollection", "core", "core");
+		if(!$job) {
+			$job = $this->createGarbageCollection();
+		}
+
+	}
+
+	private function createGarbageCollection() {
+
+		$module = model\Module::findByName("core", "core");
+
+		$cron = new model\CronJobSchedule();
+		$cron->moduleId = $module->id;
+		$cron->name = "GarbageCollection";
+		$cron->expression = "0 0 * * *";
+		$cron->description = "Garbage collection";
+
+		if(!$cron->save()) {
+			throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
+		}
+
+		return $cron;
+	}
+
 	/**
 	 * 
 	 * @param array $adminValues
@@ -86,7 +112,7 @@ class Installer {
 		$cacheCls = get_class(App::get()->getCache());
 		App::get()->setCache(new None());
 
-		LoggingTrait::$enabled = false;
+		LoggingTrait::disable();
 
 		self::$isInProgress = true;
 		self::$isInstalling = true;
@@ -132,14 +158,12 @@ class Installer {
 		App::get()->getSettings()->setDefaultGroups([Group::ID_INTERNAL]);
 		App::get()->getSettings()->save();
 
-
-
 		App::get()->setCache(new $cacheCls);
 		Listeners::get()->init();
 
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
-		LoggingTrait::$enabled = true;
+		LoggingTrait::enable();
 		App::get()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
 	}
 	
@@ -156,7 +180,12 @@ class Installer {
 			}
 		}
 
-		EntityType::findByName('FieldSet')->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
+		//Allow people to read filters by default
+		model\EntityFilter::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
+		//Allow people to read custom fieldsets by default
+		model\FieldSet::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
+		//groups readble to everyone
+		Group::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
 	}
 	
 	private function installCoreModule() {
@@ -171,23 +200,9 @@ class Installer {
 
 		//Share core with everyone
 		$module->findAcl()->addGroup(Group::ID_EVERYONE)->save();
-		
-		$cron = new model\CronJobSchedule();
-		$cron->moduleId = $module->id;
-		$cron->name = "GarbageCollection";
-		$cron->expression = "0 * * * *";
-		$cron->description = "Garbage collection";
-		
-		if(!$cron->save()) {
-			throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
-		}
-		
-		$acl = model\Acl::findById(Group::entityType()->getDefaultAclId());
-		$acl->addGroup(model\Group::ID_EVERYONE);
-		if(!$acl->save()) {
-			throw new \Exception("Could not save default ACL for groups");
-		}
-		
+
+		$this->createGarbageCollection();
+
 		if(!Password::register()) {
 			throw new \Exception("Failed to register Password authenticator");
 		}
@@ -301,7 +316,7 @@ class Installer {
 				}			
 			}
 
-			$mod = new $moduleCls();
+			$mod = $moduleCls::get();
 
 			if (!$mod->isAvailable()) {
 				$unavailable[] = ["package" => $module['package'], "name" => $module['name']];
@@ -330,7 +345,7 @@ class Installer {
 		self::$isInProgress = true;
 		self::$isUpgrading = true;
 
-		LoggingTrait::$enabled = false;
+		LoggingTrait::disable();
 
 		go()->setAuthState((new TemporaryState())->setUserId(1));
 		\GO::session()->runAsRoot();
@@ -356,18 +371,16 @@ class Installer {
 		
 		ini_set("max_execution_time", 0);
 		ini_set("memory_limit", -1);
-		
-
 
 		go()->getDbConnection()->query("SET sql_mode=''");
 		
 		jmap\Entity::$trackChanges = false;
 
 		ActiveRecord::$log_enabled = false;
+
 		
 		go()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
 
-		
 		while (!$this->upgradeModules()) {
 			echo "\n\nA module was refactored. Rerunning...\n\n";			
 		}
@@ -403,7 +416,9 @@ class Installer {
 
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
-		LoggingTrait::$enabled = true;
+		LoggingTrait::enable();
+
+		$this->enableGarbageCollection();
 		echo "Done!\n";
 	}
 	

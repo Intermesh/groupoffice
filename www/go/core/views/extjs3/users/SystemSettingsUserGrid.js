@@ -33,24 +33,43 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 				'personalGroup',
 				'enabled',
 				{name: 'createdAt', type: 'date'},
-				{name: 'lastLogin', type: 'date'}	
+				{name: 'modifiedAt', type: 'date'},
+				{name: 'lastLogin', type: 'date'}
 			],
 			entityStore: "User"
 		});
 
 		Ext.apply(this, {
 			plugins: [actions],
-			tbar: [{
+			tbar: [this.showDisabledBtn = {
 					iconCls: 'ic-people-outline',
 					text: t('Show disabled'),
-					enableToggle:true,
+					enableToggle: true,
+					pressed: false,
+					id: 'showDisabledBtn',
 					toggleHandler: function(btn, state) {
-						
-						this.store.setFilter('disabled', state ? {showDisabled: true} : null);
+						this.showDisabledBtn.pressed = btn.pressed;
+						this.showEnabledBtn.pressed = !btn.pressed;
+						this.store.setFilter('disabled', {showDisabled: true});
 						this.store.load();
+
 					},
 					scope:this
-			}, '->', 
+			},this.showEnabledBtn = {
+				iconCls: 'ic-people',
+				text: t('Show enabled'),
+				enableToggle: true,
+				pressed: true,
+				id: 'showEnabledBtn',
+				toggleHandler: function(btn, state) {
+					this.showEnabledBtn.pressed = btn.pressed;
+					this.showDisabledBtn.pressed = !btn.pressed;
+					this.store.setFilter('disabled', {showDisabled: false});
+					this.store.load();
+
+				},
+				scope:this
+			}, '->',
 				{
 					xtype: 'tbsearch',
 					filters: [
@@ -122,9 +141,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'displayName',
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
-						var style = record.get('avatarId') ?  'background-image: url(' + go.Jmap.thumbUrl(record.get("avatarId"), {w: 40, h: 40, zc: 1}) + ')"' : "";
-						
-						return '<div class="user"><div class="avatar" style="'+style+'"></div>' +
+						return '<div class="user">' + go.util.avatar(value, record.data.avatarId)  +
 							'<div class="wrap">'+
 								'<div class="displayName">' + value + '</div>' +
 								'<small class="username">' + Ext.util.Format.htmlDecode(record.get('username')) + '</small>' +
@@ -140,6 +157,15 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: true,
 					dataIndex: 'createdAt',
 					hidden: false
+				},
+				{
+					xtype:"datecolumn",
+					id: 'modifiedAt',
+					header: t('Modified at'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'createdAt',
+					hidden: true
 				},
 				{
 					xtype:"datecolumn",

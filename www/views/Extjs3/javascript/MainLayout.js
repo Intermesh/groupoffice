@@ -346,10 +346,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		var me = this;
 
 		Ext.getBody().mask(t("Loading..."));
-	
+
 		go.Modules.init().then(function() {
-			Promise.all([				
-				go.User.loadLegacyModules(),
+			go.User.loadLegacyModules();
+			Promise.all([
 				go.customfields.CustomFields.init(),				
 				me.loadLegacyModuleScripts()
 			]).then(function(){
@@ -362,8 +362,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				console.error(error);
 				Ext.getBody().unmask();
 				Ext.MessageBox.alert(t("Error"), t("An error occurred. More details can be found in the console."));
-
-				
 			});
 		});
 		
@@ -555,7 +553,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 							<a id="user-menu" class="user-img" style="'+getUserImgStyle()+'"></a>\
 						</div>\
 					</div>',
-					height: dp(64),
+					//height: dp(64),
+					autoHeight: true,
 					titlebar: false,
 					border: false
 				});
@@ -566,11 +565,12 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					title: t('Notifications'),
 					floating:true,
 					width: GO.util.isMobileOrTablet() ? window.innerWidth : dp(408),
-					//animCollapse:true,
-					//animFloat: true,
+					animCollapse:false,
+					animFloat: false,
 					collapsible: true,
 					collapsed: true,
 					autoScroll: true,
+					autoHide: false,
 					cmargins:{left:0,top:0,right:0,bottom:0}
 				});
 
@@ -677,7 +677,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				scope: this
 			});
 		}
-		go.Notifier.init.defer(2000, go.Notifier,[notificationArea]);
+		go.Notifier.init(notificationArea);
 		GO.checker.init.defer(2000, GO.checker);
 		GO.checker.on('alert', function (data) {
 			if (data.notification_area)
@@ -685,7 +685,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				Ext.get('notification-area').update(data.notification_area);
 			}
 		}, this);
-
 
 
 		

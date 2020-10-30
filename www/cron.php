@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 /**
  * CRON script
@@ -19,6 +20,11 @@ require('GO.php');
 
 App::get()->setAuthState(new State());
 GO::session()->runAsRoot();
+
+if(go()->getSettings()->databaseVersion != go()->getVersion()) {
+    echo "Aborting CRON because an update is needed: " . go()->getSettings()->databaseVersion . " -> " . go()->getVersion() . "\n";
+	exit();
+}
 
 //new framework
 CronJobSchedule::runNext();

@@ -187,7 +187,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	setValue: function (values) {
 		
 		if(!values) {
-			values = {};
+			values = this.map ? {} : [];
 		}
 		
 		if(this.entityStore) {	
@@ -274,11 +274,15 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		this.comboBox = new go.form.ComboBox({
 			listeners: {
 				focus: function(combo){
-						combo.onTriggerClick();
+					//use settimeout to give combo change to run initLis()
+					setTimeout(function() {
+						if(!combo.isExpanded()) {
+							combo.onTriggerClick();
+						}
+					});
 				}
 			},
 			submit: false,
-			lazyInit: false,
 			hideLabel: true,
 			anchor: '100%',
 			emptyText: t("Please select..."),

@@ -6,6 +6,7 @@ use Exception;
 use go\core\db\Database;
 use go\core\db\Expression;
 use go\core\db\Query;
+use go\core\jmap\Entity;
 use go\core\util\DateTime;
 use go\modules\community\addressbook\model\Address;
 use go\modules\community\addressbook\model\AddressBook;
@@ -40,6 +41,8 @@ class Migrate63to64 {
 		//clear cache for ClassFinder fail in custom field type somehow.
 		go()->getCache()->flush();
 		Table::destroyInstances();
+
+		Entity::$checkFilesFolder = false;
 		
 		$this->countries = go()->t('countries');
 		
@@ -126,6 +129,8 @@ class Migrate63to64 {
 		if($orphanCount == 0) {
 			AddressBook::delete(['id' => $addressBook->id]);
 		}
+
+		Entity::$checkFilesFolder = true;
 	}
 
   /**
@@ -489,11 +494,11 @@ class Migrate63to64 {
 				]);
 			}
 
-			if (!empty($r['action_date'])) {
+			if ($r['action_date'] > 0) {
 				$contact->dates[] = (new Date())
 								->setValues([
 						'type' => "action",
-						'date' => DateTime::createFromFormat('Y-m-d', $r['action_date'])
+						'date' => DateTime::createFromFormat('U', $r['action_date'])
 				]);
 			}
 
@@ -869,6 +874,36 @@ class Migrate63to64 {
 		$stmt->execute();
 	}
 
+	public function addColor() {
+
+		if(!go()->getDatabase()->hasTable('ab_contacts')) {
+			return;
+		}
+
+		$stmt = go()->getDbConnection()
+			->update("addressbook_contact",
+				[
+					"color" => new Expression('old.color')
+				],
+				(new Query)
+					->join('ab_contacts','old','old.color != "000000" AND old.id = t.id')
+			);
+		echo $stmt . "\n";
+		$stmt->execute();
+
+		$stmt = go()->getDbConnection()
+			->update("addressbook_contact",
+				[
+					"color" => new Expression('old.color')
+				],
+				(new Query)
+					->join('ab_companies','old','old.color != "000000" AND old.id = (t.id - ' . $this->getCompanyIdIncrement() .')')
+
+			);
+		echo $stmt . "\n";
+		$stmt->execute();
+	}
+
 	public function addSalutation() {
 
 		if(!go()->getDatabase()->hasTable('ab_contacts')) {
@@ -882,6 +917,7 @@ class Migrate63to64 {
 				],
 					(new Query)
 						->join('ab_contacts','old','old.id = t.id')
+
 				);		
 		echo $stmt . "\n";
 		$stmt->execute();

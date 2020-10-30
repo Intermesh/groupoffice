@@ -506,14 +506,14 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	}
 
 	public $skipValidation = false;
-	
+
 	public function validate() {
 
 		if($this->skipValidation) {
 			return true;
 		}
 
-		if($this->rrule != ""){			
+		if($this->rrule != ""){
 			$rrule = new \GO\Base\Util\Icalendar\Rrule();
 			$rrule->readIcalendarRruleString($this->start_time, $this->rrule);						
 			$this->repeat_end_time = $rrule->until;
@@ -1448,7 +1448,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 
 		//$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 
-		$cfRecord = $this->getCustomFields();
+		$cfRecord = $this->getCustomFields()->toArray();
 
 		if (!empty($cfRecord)) {
 		$fieldsets = \go\core\model\FieldSet::find()->filter(['entities' => ['Event']]);
@@ -2441,7 +2441,8 @@ The following is the error message:
 				'event_id'=>$this->id
 		));
 	}
-	
+
+	private static $aliases = [];
 	
 	/**
 	 * Get the participant model where the user matches the calendar user
@@ -2450,14 +2451,17 @@ The following is the error message:
 	 */
 	public function getParticipantOfCalendar() {
 
-		$aliases = GO\Email\Model\Alias::model()->find(
+		if(!isset(self::$aliases[$this->calendar->user_id])) {
+			self::$aliases[$this->calendar->user_id] = \GO\Email\Model\Alias::model()->find(
 				GO\Base\Db\FindParams::newInstance()
 					->select('email')
 					->permissionLevel(GO\Base\Model\Acl::WRITE_PERMISSION, $this->calendar->user_id)
-				)->fetchAll(\PDO::FETCH_COLUMN, 0);
+					->ignoreAdminGroup()
+			)->fetchAll(\PDO::FETCH_COLUMN, 0);
+		}
 
 		return Participant::model()->findSingleByAttributes(array(
-				'email' => $aliases,
+				'email' => self::$aliases[$this->calendar->user_id],
 				'event_id'=>$this->id
 		));
 	}
@@ -2547,12 +2551,13 @@ The following is the error message:
 			$a = new Swift_Attachment($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REPLY"');
 			$a->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
 			$a->setDisposition("inline");
+			$a->setContentType("text/calendar;method=CANCEL;charset=utf-8");
 			$message->attach($a);
 			
 			//for outlook 2003 compatibility
-			$a2 = new Swift_Attachment($ics, 'invite.ics', 'application/ics');
-			$a2->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
-			$message->attach($a2);
+//			$a2 = new Swift_Attachment($ics, 'invite.ics', 'application/ics');
+//			$a2->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
+//			$message->attach($a2);
 		}
 //		}
 
@@ -2595,21 +2600,22 @@ The following is the error message:
 			//check if we have a Group-Office event. If so, we can handle accepting and declining in Group-Office. Otherwise we'll use ICS calendar objects by mail
 			$participantEvent = $participant->getParticipantEvent();
 
-			$body = '<p>'.\GO::t("The following event has been cancelled by the organizer", "calendar").': </p>'.$this->toHtml();					
+			$body = '<p>'.\GO::t("The following event has been cancelled by the organizer", "calendar").': </p>'.$this->toHtml();
 			
 //			if(!$participantEvent){
 				
 
-				$ics=$this->toICS("CANCEL");				
+				$ics=$this->toICS("CANCEL", $participant);
 				$a = new \Swift_Attachment($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="CANCEL"');
 				$a->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
 				$a->setDisposition("inline");
+				$a->setContentType("text/calendar;method=CANCEL;charset=utf-8");
 				$message->attach($a);
 				
-				//for outlook 2003 compatibility
-				$a2 = new \Swift_Attachment($ics, 'invite.ics', 'application/ics');
-				$a2->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
-				$message->attach($a2);
+//				//for outlook 2003 compatibility
+//				$a2 = new \Swift_Attachment($ics, 'invite.ics', 'application/ics');
+//				$a2->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
+//				$message->attach($a2);
 				
 //			}else{
 			if($participantEvent){
@@ -2721,6 +2727,8 @@ The following is the error message:
 					$a = new \Swift_Attachment($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REQUEST"');
 					$a->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
 					$a->setDisposition("inline");
+					$a->setContentType("text/calendar;method=REQUEST;charset=utf-8");
+
 					$message->attach($a);
 
 					//for outlook 2003 compatibility

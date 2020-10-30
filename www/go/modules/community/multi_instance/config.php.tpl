@@ -8,3 +8,8 @@ $config['file_storage_path'] = "{dataPath}";
 $config['tmpdir'] = "{tmpPath}";
 $config['debug'] = false;
 $config['servermanager'] = '{servermanager}';
+$config['business'] = [
+	'studio' => [
+        'package' => '{studioPackage}'
+    ]
+];

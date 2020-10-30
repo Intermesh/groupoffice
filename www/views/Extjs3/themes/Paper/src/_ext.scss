@@ -319,10 +319,16 @@
 }
 
 .x-form-grow-sizer {
+	font-family: $font-family;
 	@extend %font-data;
 	padding: dp(6) dp(8);
 	min-height: dp(32);
 	line-height: dp(18);
+	border: 1px solid red;
+	//color: red;
+	//top: 10px;
+	//left: 10px;
+	//visibility: visible;
 }
 
 .ext-mb-input {
@@ -373,7 +379,7 @@
 	}
 	
 	&-composite {
-		div.x-box-item.text {
+		div.x-box-item.text, label {
 			@extend %font-subheading-dense;
 			padding: dp(4) 0;
 			line-height:dp(24)
@@ -764,17 +770,17 @@
 
 	}
 	&.primary {
-		.x-btn-text {
+		//.x-btn-text {
 			@include var(color, c-primary);
-		}
+		//}
    }
 	&.danger {
 		&.x-btn-focus, &.x-btn-over {
 			@include var(background-color, c-primary-tp);
 		}
-		.x-btn-text {
+		//.x-btn-text {
 			color: $cDanger;
-		}
+		//}
 	} 
 	&-icon-small-top {
 		height: dp(56);
@@ -798,12 +804,21 @@
 		.x-btn-text { @include var(color, c-primary); }
    }
    &-icon {
-		i {width:0}
+		i {
+			position:absolute;
+			left:dp(8);
+			&.icon {
+				position:absolute;
+				top:dp(-1);
+				left:dp(8);
+			}
+		}
 		border: 0;
 		.x-btn-ml, .x-btn-mr {
 			min-width: 0;
 			width: 0;
 		}
+	   em{ position:relative;}
 		em.x-btn-arrow {
 			.ic-more, .ic-more-vert, .ic-more-horiz, .x-toolbar-more-icon {
 				&::after { display:none;}
@@ -824,11 +839,17 @@
 			}
 		}
    }
-	&-text-icon button::before{
-		@extend %icon;
-		padding-right: dp(8);
-		//MS Why was this here?
-		/*margin-top: dp(-4);*/
+	&-text-icon {
+		button::before{
+			@extend %icon;
+			padding-right: dp(8);
+			//MS Why was this here?
+			/*margin-top: dp(-4);*/
+		}
+		i.icon {
+			margin-right: dp(8);
+			color:inherit;
+		}
 	}
    &-pressed {
 		//background-color: color($bg, 'hover');
@@ -990,19 +1011,19 @@
 .x-toolbar{
 	height: dp(48);
 	padding:0;
-	
+
 	&.go-paging-tb, .go-paging-tb & {
 		height: dp(40);
 	}
 	&-ct {
 		height: 100%;
 	}
-	
-	
+
+
 	.x-panel-tbar & {
 		border-bottom: 1px solid color($fg, 'line');
 	}
-	
+
 	.x-panel-bbar & {
 		height: dp(40);
 		border-top: 1px solid color($fg, 'line');
@@ -1020,13 +1041,16 @@
 	&.header {
 		border-bottom: 0;
 	}
-	&-left .x-toolbar-cell {
-		padding-right:dp(8);
+	&-left .x-toolbar-cell > * {
+		margin-right:dp(8);
 	}
-	&-right .x-toolbar-cell {
-		padding-left: dp(8);
+	&-right .x-toolbar-cell > * {
+		margin-left:dp(8);
 	}
-	&-left .x-toolbar-cell:first-child {
+	&-right {
+		padding-right: dp(8);
+	}
+	&-left {
 		padding-left: dp(8);
 	}
 	div.xtb-text {
@@ -1105,7 +1129,7 @@
 .x-tbar-page-next:before { @extend %icon; content: 'chevron_right'; }
 .x-tbar-page-prev:before { @extend %icon; content: 'chevron_left'; }
 
-.x-tbar-page-number{ 
+.x-tbar-page-number{
 	width: dp(48);
 }
 

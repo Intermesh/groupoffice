@@ -14,7 +14,7 @@ use GO\Tasks\Model\Task;
 
 class TasksModule extends \GO\Base\Module {
 	
-	public static function defineListeners() {
+	public function defineListeners() {
 
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		Link::on(Entity::EVENT_FILTER, static::class, 'onLinkFilter');

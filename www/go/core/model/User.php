@@ -542,10 +542,12 @@ class User extends Entity {
         }
         Acl::applyToQuery($query, 'g.aclId', $value);
       })
-      ->add('showDisabled', function (Criteria $criteria, $value){
-        if($value === false) {
-          $criteria->andWhere('enabled', '=', true);
-        }
+      ->add('showDisabled', function (Criteria $criteria, $value) {
+	      if ($value === false) {
+		      $criteria->andWhere('enabled', '=', true);
+	      } elseif ($value === true) {
+		      $criteria->andWhere('enabled', '=', false);
+	      }
       })
       ->add('groupId', function (Criteria $criteria, $value, Query $query){
         $query->join('core_user_group', 'ug', 'ug.userId = u.id')->andWhere(['ug.groupId' => $value]);

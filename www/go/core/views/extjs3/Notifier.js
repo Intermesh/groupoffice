@@ -4,6 +4,9 @@ go.Notifier = {
 	showStatusBar: false,
 	notificationArea: null,
 	init: function(notificationArea) {
+
+		var me = this;
+
 		this.notificationArea = notificationArea;
 
 		this.addStatusIcon('upload', 'ic-file-upload');
@@ -12,8 +15,13 @@ go.Notifier = {
 			this.statusBar.add(this._icons[key]);
 		}
 		this.statusBar.doLayout();
-		this.statusBar.el.on('click', function(){
-			notificationArea.toggleCollapse();
+		this.statusBar.el.on('click', function(e) {
+			if(me.notificationsVisible()) {
+				return; // it will hide on any click outside the panel
+			}
+			me.showNotifications();
+			e.stopPropagation();
+
 		}, this);
 
 		this.notifications = new Ext.Container({cls: 'notifications'});
@@ -73,9 +81,9 @@ go.Notifier = {
 			msg.listeners = msg.listeners || {};
 			msg.listeners.afterrender = function(p){
 				p.el.on('click', function() {
-					if(GO.util.isMobileOrTablet()) {
-						go.Notifier.notificationArea.collapse();
-					}
+					//if(GO.util.isMobileOrTablet()) {
+						go.Notifier.hideNotifications();
+					//}
 					msg.handler();
 				});
 			}
@@ -97,10 +105,16 @@ go.Notifier = {
 		if(key) {
 			msg.itemId = key;
 		}
+
+		//makes it fly out
+		// msg.renderTo = this.messageCt;
+
 		var msgPanel = new Ext.Panel(msg);
+
 
 		this.notifications.add(msgPanel);
 		this.notifications.doLayout();
+
 
 
 		if(msg.removeAfter) {
@@ -112,6 +126,14 @@ go.Notifier = {
 			}, msg.removeAfter);
 		}
 		msgPanel.setPersistent = function(bool) {
+
+			if(!msgPanel.rendered) {
+				msgPanel.on("render", function() {
+					msgPanel.setPersistent(bool);
+				}, this, {single: true});
+				return msgPanel;
+			}
+
 			msgPanel.getTool('close').setVisible(!bool);
 			return msgPanel;
 		};
@@ -122,8 +144,22 @@ go.Notifier = {
 			}
 			this._messages[msg.itemId] = msgPanel;
 		}
+
+		//this.showNotifications();
 		
 		return msgPanel;
+	},
+
+	notificationsVisible : function() {
+		return this.notificationArea.ownerCt.getLayout()['east'].isSlid;
+	},
+
+	showNotifications : function() {
+		this.notificationArea.ownerCt.getLayout()['east'].slideOut();
+	},
+
+	hideNotifications : function() {
+		this.notificationArea.ownerCt.getLayout()['east'].slideIn();
 	},
 	/**
 	 * For (less obstructive) popup messages from the bottom

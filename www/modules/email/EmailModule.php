@@ -48,7 +48,7 @@ class EmailModule extends \GO\Base\Module{
 		return true;
 	}
 	
-	public static function defineListeners() {
+	public function defineListeners() {
 
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 

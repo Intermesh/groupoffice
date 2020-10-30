@@ -3,11 +3,13 @@
 namespace go\core\jmap;
 
 use Exception;
+use go\core\fs\File;
 use go\core\model\Module;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\orm\Entity as OrmEntity;
+use go\core\util\StringUtil;
 use PDO;
 use go\core\orm\EntityType;
 use go\core\acl\model\AclOwnerEntity;
@@ -76,9 +78,50 @@ abstract class Entity  extends OrmEntity {
 		} 
 
 		$this->checkFilesFolder();
+
+		$this->saveTmpFiles();
 		
 		return true;
 	}
+
+	private $tmpFiles;
+
+	/**
+	 * Set files to be saved into the files folder after save
+	 *
+	 * eg.
+	 *
+	 * [
+	 *  ['name'=>'foo.txt', 'tmpFile' => 'relative/path/to/foo.txt']
+	 * ]
+	 * @param array $files
+	 */
+	public function setTmpFiles($files) {
+		$this->tmpFiles = $files;
+	}
+
+	private function saveTmpFiles() {
+		if(empty($this->tmpFiles)) {
+			return;
+		}
+
+		$folder = Folder::model()->findForEntity($this);
+		while ($f = array_shift($this->tmpFiles)) {
+			if (!empty($f['tmpFile'])) {
+				$file = go()->getTmpFolder()->getFolder(go()->getAuthState()->getUserId())->getFile($f['tmpFile']);
+				$dest = go()->getDataFolder()->getFile($folder->path . '/' . $f['name']);
+				$dest->appendNumberToNameIfExists();
+				$file->move($dest);
+				$folder->addFile($dest->getName());
+			}
+		}
+	}
+
+	/**
+	 * Toggle checking of files folder. Used to speedup 6.3 to 6.4 upgrade
+	 * @var bool
+	 */
+	public static $checkFilesFolder = true;
 
 	/**
 	 * @param bool $force Used in database check to force a check
@@ -86,7 +129,7 @@ abstract class Entity  extends OrmEntity {
 	 * @throws \GO\Base\Exception\AccessDenied
 	 */
 	private function checkFilesFolder($force = false) {
-		if(empty($this->filesFolderId)) {
+		if(!self::$checkFilesFolder || empty($this->filesFolderId)) {
 			return true;
 		}
 

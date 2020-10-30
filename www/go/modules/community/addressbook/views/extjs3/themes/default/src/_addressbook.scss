@@ -6,17 +6,23 @@
   color: #febf35;
 }
 
+.go-addressbook-index-row:not(:first-child):before {
+  content: '';
+  top:dp(-8);
+  position:absolute;
+  width:100%;
+  display:block;
+  border-top: 1px solid color($fg, 'line');
+}
 .go-addressbook-index-row:not(:first-child) {
-  border-top: dp(8) solid transparent;
-  margin-top: dp(8);
-  box-shadow: 0px -1px 0 color($fg, 'line');
+  margin-top: dp(16);
+  position:relative;
 }
 
 .go-addressbook-name-panel {
   padding: dp(16);
-  h4 {
-    top: dp(-16);
-    left: dp(56);
+  h4, h3{
+    margin:0;
   }
 
   .go-addressbook-star {
@@ -70,6 +76,10 @@
     }
   }
 
+}
+
+.go-ab-avatar {
+  margin-right: dp(16);
 }
 
 

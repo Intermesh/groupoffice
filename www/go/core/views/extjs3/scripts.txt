@@ -55,6 +55,7 @@ form/Chips.js
 form/RecurrenceFieldset.js
 form/KeyValueEditorGrid.js
 form/DateRangeField.js
+form/SelectField.js
 
 modules/ModulePanel.js
 
@@ -69,6 +70,7 @@ layout/ResponsiveLayout.js
 
 
 AuthenticationManager.js
+ActivityWatcher.js
 login/LanguageCombobox.js
 login/DomainCombo.js
 login/LoginDialog.js
@@ -223,6 +225,8 @@ customfields/type/Group.js
 customfields/type/NotesDialog.js
 customfields/type/Notes.js
 customfields/type/EncryptedText.js
+customfields/type/TemplateFieldDialog.js
+customfields/type/TemplateField.js
 
 
 search/Panel.js

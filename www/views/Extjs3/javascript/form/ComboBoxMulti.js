@@ -29,21 +29,14 @@ GO.form.ComboBoxMulti = function(config){
 	if(this.textarea) {
 		config.defaultAutoCreate = {
 			tag: "textarea",
-			autocomplete: "off"
+			autocomplete: "off",
+			autocorrect: "off",
+			autocapitalize: "off",
+			spellcheck: "false"
 		};
 	}
 	 //config.height = dp(24);
 	GO.form.ComboBoxMulti.superclass.constructor.call(this, config);
-
-
-	if(this.textarea) {
-		this.on('render', function () {
-			//this.syncHeight();
-			this.getEl().on('input', function (e) {
-				this.syncHeight();
-			}, this);
-		}, this);
-	}
 };
 
 Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
@@ -55,6 +48,14 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 		 */
 		sep: ',',
 		textarea: false,
+
+		initComponent: function() {
+			this.textSizeEl = Ext.DomHelper.append(document.body, {
+				tag: "pre", cls: "x-form-grow-sizer"
+			});
+
+			GO.form.ComboBoxMulti.superclass.initComponent.call(this);
+		},
 
 		getParams: function (q) {
 			//override to add q filter for JMAP API
@@ -70,29 +71,35 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 		growMin: dp(32),
 		growMax: dp(120),
 
-		syncHeight: function () {
+		growAppend : '&#160;\n&#160;',
 
-			if(!this.el) {
+		grow: true,
+
+		autoSize: function(){
+			if(!this.grow || !this.textSizeEl || !this.el){
 				return;
 			}
+			var el = this.el,
+				v = Ext.util.Format.htmlEncode(el.dom.value),
+				ts = this.textSizeEl,
+				h;
 
-			this.el.dom.style.overflowY = 'hidden';
-			var changed = false;
-			if (this.el.dom.offsetHeight > this.growMin) {
-				this.el.dom.style.height = this.growMin + "px";
-				changed = true;
+			Ext.fly(ts).setWidth(this.el.getWidth());
+			if(v.length < 1){
+				v = "";
+			}else{
+				// v += this.growAppend;
+				// if(Ext.isIE){
+				// 	v = v.replace(/\n/g, '&#160;<br />');
+				// }
 			}
+			ts.innerHTML = v;
 
-			var height = Math.min(this.el.dom.scrollHeight, this.growMax);
-			if (height > this.growMin) {
-				height += dp(8);
-				this.el.dom.style.height = height + "px";
-				changed = true;
-			}
-
-			if (changed) {
-				//this.fireEvent('grow', this);
-				this.fireEvent("autosize", this, height);
+			h = Math.min(this.growMax, Math.max(ts.offsetHeight, this.growMin));
+			if(h != this.lastHeight){
+				this.lastHeight = h;
+				this.el.setHeight(h);
+				this.fireEvent("autosize", this, h);
 			}
 		},
 
@@ -151,10 +158,10 @@ Ext.extend(GO.form.ComboBoxMulti, GO.form.ComboBox, {
 			// this.selectText.defer(200, this, [p, p]);
 		},
 
-		setValue: function (v) {
-			GO.form.ComboBoxMulti.superclass.setValue.call(this, v);
-			this.syncHeight();
-		},
+		// setValue: function (v) {
+		// 	GO.form.ComboBoxMulti.superclass.setValue.call(this, v);
+		// 	this.syncHeight();
+		// },
 
 		onSelect: function (record, index) {
 			if (this.fireEvent('beforeselect', this, record, index) !== false) {

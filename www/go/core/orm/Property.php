@@ -597,9 +597,30 @@ abstract class Property extends Model {
 	}
 
 	/**
+	 * Returns property names that are not returned to the client by default
+	 *
+	 * You may override and extend this.
+	 * @example
+	 * ```
+	 * protected static function atypicalApiProperties()
+	 * {
+	 *	 return array_merge(parent::atypicalApiProperties(), ['file']);
+	 * }
+	 * ```
+	 *
+	 * @return string[]
+	 */
+	protected static function atypicalApiProperties() {
+		return ['modified', 'oldValues', 'validationErrors', 'modifiedCustomFields', 'validationErrorsAsString'];
+	}
+
+	/**
 	 * Get the properties to fetch when using the find() method.
 	 * These properties will be preloaded including related properties from other
 	 * tables. They will also be returned to the client.
+	 *
+	 * If you have getters that typically shouldn't be returned by the API then list them in the
+	 * @see atypicalApiProperties() method.
 	 *
 	 * @return string[]
 	 * @throws Exception
@@ -612,7 +633,7 @@ abstract class Property extends Model {
 		
 		if(!$props) {
 			$props = array_filter(static::getReadableProperties(), function($propName) {
-				return !in_array($propName, ['modified', 'oldValues', 'validationErrors', 'modifiedCustomFields', 'validationErrorsAsString']);
+				return !in_array($propName, static::atypicalApiProperties());
 			});
 
 			go()->getCache()->set($cacheKey, $props);
@@ -1504,6 +1525,35 @@ abstract class Property extends Model {
 	}
 
 	/**
+	 * Inserts the record into the database table when save() is performed
+	 *
+	 * @param Table $table
+	 * @param array $record
+	 * @throws Exception
+	 */
+	protected function insertTableRecord(Table $table, array $record) {
+		$stmt = go()->getDbConnection()->insert($table->getName(), $record);
+		if (!$stmt->execute()) {
+			throw new Exception("Could not execute insert query");
+		}
+	}
+
+	/**
+	 * Updates the record in the database table when save() is performed
+	 *
+	 * @param Table $table
+	 * @param array $record
+	 * @param Query $query
+	 * @throws Exception
+	 */
+	protected function updateTableRecord(Table $table, array $record, Query $query) {
+		$stmt = go()->getDbConnection()->update($table->getName(), $record, $query);
+		if (!$stmt->execute()) {
+			throw new Exception("Could not execute update query");
+		}
+	}
+
+	/**
 	 * Saves properties to the mapped table
 	 * 
 	 * @param MappedTable $table
@@ -1554,11 +1604,8 @@ abstract class Property extends Model {
 				if($table->isUserTable) {
 					$modifiedForTable["userId"] = go()->getUserId();
 				}
-				
-				$stmt = App::get()->getDbConnection()->insert($table->getName(), $modifiedForTable);
-				if (!$stmt->execute()) {
-					throw new Exception("Could not execute insert query");
-				}
+
+				$this->insertTableRecord($table, $modifiedForTable);
 
 				$this->handleAutoIncrement($table, $modified);
 				
@@ -1581,15 +1628,8 @@ abstract class Property extends Model {
 				}
 
 				$query = Query::normalize($keys)->tableAlias($table->getAlias());
-				
-				$stmt = App::get()->getDbConnection()->update($table->getName(), $modifiedForTable, $query);
-				if (!$stmt->execute()) {
-					throw new Exception("Could not execute update query");
-				}				
-//				if(!$stmt->rowCount()) {			
-//					
-//					throw new \Exception("No affected rows for update!");
-//				}				
+
+				$this->updateTableRecord($table, $modifiedForTable, $query);
 			}
 		} catch (PDOException $e) {
 			ErrorHandler::logException($e);
@@ -1693,7 +1733,7 @@ abstract class Property extends Model {
   /**
    * Parses ID into query
    *
-   * eg. "1-1" into ['col1=>1, 'col2'=>1];
+   * eg. "1-1" into ['`alias`.`col1`' => 1, '`alias`.`col2`'' => 1];
    *
    * @param string $id
    * @return array
@@ -1711,7 +1751,7 @@ abstract class Property extends Model {
 			throw new InvalidArguments("Invalid ID given for " . static::class.' : '.$id);
 		}
 		foreach ($pk as $key) {
-			$props[$key] = array_shift($keys);
+			$props['`' . $primaryTable->getAlias() . '`.`' . $key . '`'] = array_shift($keys);
 		}
 
 		return $props;

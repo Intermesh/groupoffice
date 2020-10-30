@@ -42,13 +42,13 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 					defaults: {
 						anchor: "100%"
 					},
-					items: [{
+					items: [this.usernameField = new Ext.form.TextField({
 						xtype: 'textfield',
 						name: 'username',
 						fieldLabel: t("Username"),
 						needPasswordForChange: true,
 						allowBlank: false
-					}, 
+					}),
 					this.displayNameField = new Ext.form.TextField({
 						fieldLabel: t('Display name','users','core'),
 						name: 'displayName',
@@ -177,6 +177,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			}
 		});
 
+		this.usernameField.setDisabled(!visible);
 		this.passwordField1.setDisabled(!visible);
 		this.passwordField2.setDisabled(!visible);
 	},

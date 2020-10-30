@@ -70,26 +70,26 @@ class Auth_SASL
     *                             SCRAM-* (any mechanism of the SCRAM family)
     *                     Types are not case sensitive
     */
-    function &factory($type)
+    public static function factory($type)
     {
         switch (strtolower($type)) {
             case 'anonymous':
-                $filename  = 'include/Auth/SASL/Anonymous.php';
+                $filename  = 'Auth/SASL/Anonymous.php';
                 $classname = 'Auth_SASL_Anonymous';
                 break;
 
             case 'login':
-                $filename  = 'include/Auth/SASL/Login.php';
+                $filename  = 'Auth/SASL/Login.php';
                 $classname = 'Auth_SASL_Login';
                 break;
 
             case 'plain':
-                $filename  = 'include/Auth/SASL/Plain.php';
+                $filename  = 'Auth/SASL/Plain.php';
                 $classname = 'Auth_SASL_Plain';
                 break;
 
             case 'external':
-                $filename  = 'include/Auth/SASL/External.php';
+                $filename  = 'Auth/SASL/External.php';
                 $classname = 'Auth_SASL_External';
                 break;
 
@@ -97,7 +97,7 @@ class Auth_SASL
                 // $msg = 'Deprecated mechanism name. Use IANA-registered name: CRAM-MD5.';
                 // trigger_error($msg, E_USER_DEPRECATED);
             case 'cram-md5':
-                $filename  = 'include/Auth/SASL/CramMD5.php';
+                $filename  = 'Auth/SASL/CramMD5.php';
                 $classname = 'Auth_SASL_CramMD5';
                 break;
 
@@ -107,7 +107,7 @@ class Auth_SASL
             case 'digest-md5':
                 // $msg = 'DIGEST-MD5 is a deprecated SASL mechanism as per RFC-6331. Using it could be a security risk.';
                 // trigger_error($msg, E_USER_NOTICE);
-                $filename  = 'include/Auth/SASL/DigestMD5.php';
+                $filename  = 'Auth/SASL/DigestMD5.php';
                 $classname = 'Auth_SASL_DigestMD5';
                 break;
 
@@ -116,7 +116,7 @@ class Auth_SASL
                 if (preg_match($scram, $type, $matches))
                 {
                     $hash = $matches[1];
-                    $filename = 'include/Auth/SASL/SCRAM.php';
+                    $filename = 'Auth/SASL/SCRAM.php';
                     $classname = 'Auth_SASL_SCRAM';
                     $parameter = $hash;
                     break;

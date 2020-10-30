@@ -18,6 +18,10 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 
 					detailView.applyTemplateToItems(this.items);
 					detailView.applyTemplateToItems(this.items.itemAt(0).items);
+
+					var icon = detailView.data.isOrganization ? '<i class="icon">business</i>' : null;
+
+					detailView.avatar.update(go.util.avatar(detailView.data.name, detailView.data.photoBlobId, icon))
 				},
 				items:[
 				{
@@ -39,24 +43,24 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 										}
 									});
 								}
-							},
-							tpl: new Ext.XTemplate('<div class="avatar {[values.isOrganization && !values.photoBlobId ? \'organization\' : \'\']}" style="{[this.getStyle(values)]}">{[this.getHtml(values)]}</div>',
-							{
-								getHtml: function (v) {
-									if(v.photoBlobId) {
-										return "";
-									}
-									return v.isOrganization ? '<i class="icon">business</i>' : go.util.initials(v.name);
-								},
-								getStyle: function (v) {
-									return v.photoBlobId ? 'background-image: url(' + go.Jmap.thumbUrl(v.photoBlobId, {w: 40, h: 40, zc: 1})  + ')"' : "background-image:none;background-color: #" + v.color;;
-								}
-							})
+							}
+							// tpl: new Ext.XTemplate('<div class="avatar {[values.isOrganization && !values.photoBlobId ? \'organization\' : \'\']}" style="{[this.getStyle(values)]}">{[this.getHtml(values)]}</div>',
+							// {
+							// 	getHtml: function (v) {
+							// 		if(v.photoBlobId) {
+							// 			return "";
+							// 		}
+							// 		return v.isOrganization ? '<i class="icon">business</i>' : go.util.initials(v.name);
+							// 	},
+							// 	getStyle: function (v) {
+							// 		return v.photoBlobId ? 'background-image: url(' + go.Jmap.thumbUrl(v.photoBlobId, {w: 40, h: 40, zc: 1})  + ')"' : "background-image:none;background-color: #" + v.color;;
+							// 	}
+							// })
 						}),
 					
 						this.namePanel = new Ext.BoxComponent({
-							style: "display: table;height:100%",
-							tpl: '<div style="vertical-align: middle;display:table-cell;"><h3><tpl if="prefixes">{prefixes} </tpl>{name}<tpl if="suffixes"> {suffixes}</tpl></h3><h4>{jobTitle} <tpl if="values.department">- {department}</tpl></h4></div>'
+							style: "display: table;height:100%;",
+							tpl: '<div style="vertical-align: middle;display:table-cell;"><h3 <tpl if="color">style=\"color: #{color};\"</tpl>><tpl if="prefixes">{prefixes} </tpl>{name}<tpl if="suffixes"> {suffixes}</tpl></h3><h4>{jobTitle} <tpl if="values.department">- {department}</tpl></h4></div>'
 						}),						
 						this.urlPanel = new Ext.BoxComponent({
 							flex: 1,
@@ -81,8 +85,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 								}
 								
 								var container = box.getEl().dom.firstChild, 
-								item = e.getTarget("a"),								
-									i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);									
+								item = e.getTarget("a");
+
+								if(!item) {
+									return;
+								}
+
+								var	i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
 							
 								go.util.mailto({
 									email: this.data.emailAddresses[i].email,
@@ -119,8 +128,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 								}
 
 								var container = box.getEl().dom.firstChild, 
-								item = e.getTarget("a"),
-								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);						
+								item = e.getTarget("a");
+
+								if(!item) {
+									return;
+								}
+
+								var i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
 							
 								go.util.callto({
 									number: this.data.phoneNumbers[i].number.replace(/[^0-9+]/g, ""),
@@ -185,8 +199,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 								}
 
 								var container = box.getEl().dom.firstChild, 
-								item = e.getTarget("a", box.getEl()),
-								i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
+								item = e.getTarget("a", box.getEl());
+
+								if(!item) {
+									return;
+								}
+
+								var i = Array.prototype.indexOf.call(container.getElementsByTagName("a"), item);
 								
 								go.util.showDate(new Date(this.data.dates[i].date));
 							}, this);

@@ -676,6 +676,15 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	}
 
 	/**
+	 * For compatibility with new framework.
+	 *
+	 * @return bool
+	 */
+	public function isNew() {
+		return $this->getIsNew();
+	}
+
+	/**
 	 * Set if this model is new and not stored in the database yet.
 	 * Note: this function is generally only used by the framework internally.
 	 * You don't need to set this boolean. The framework takes care of that.
@@ -3617,7 +3626,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		unset($attr['modifiedAt']);
 		
 		$search->entityId = $this->id;
-		$search->setAclId(!empty($attr['acl_id']) ? $attr['acl_id'] : $this->findAclId());			
+		$search->setAclId(!empty($attr['aclId']) ? $attr['aclId'] : $this->findAclId());
 		//$search->createdAt = \DateTime::createFromFormat("U", $this->mtime);		
 		$search->setKeywords($this->getSearchCacheKeywords($this->localizedName.','.implode(',', $attr)));
 		

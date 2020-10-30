@@ -283,8 +283,8 @@ abstract class Entity extends Property {
 
 	protected function internalValidate()
 	{
-		if(method_exists($this, 'validateCustomFields')) {
-			if(!$this->validateCustomFields()) {				
+		if(method_exists($this, 'getCustomFields')) {
+			if(!$this->getCustomFields()->validate()) {
 				return false;
 			}
 		}
@@ -363,7 +363,7 @@ abstract class Entity extends Property {
 		$query = Query::normalize($query);
 		//Set select for overrides.
 		$primaryTable = static::getMapping()->getPrimaryTable();
-		$query->selectSingleValue('id')->from($primaryTable->getName(), $primaryTable->getAlias());
+		$query->selectSingleValue( '`' . $primaryTable->getAlias() . '`.`id`')->from($primaryTable->getName(), $primaryTable->getAlias());
 
 
 		App::get()->getDbConnection()->beginTransaction();
@@ -541,6 +541,8 @@ abstract class Entity extends Property {
     return substr($cls, strrpos($cls, '\\') + 1);
   }
 
+  private static $filters = [];
+
   /**
    * Defines JMAP filters
    *
@@ -572,101 +574,105 @@ abstract class Entity extends Property {
    */
 	protected static function defineFilters() {
 
-		$filters = new Filters();
+		$cls = static::class;
 
-		$filters->add('text', function(Criteria $criteria, $value, Query $query) {
-							if(!is_array($value)) {
-								$value = [$value];
-							}
-							
-							foreach($value as $q) {
-								if (!empty($q)) {								
-									static::search($criteria, $q, $query);
-								}
-							}
-						})
-						
-						->add('exclude', function(Criteria $criteria, $value) {
-							if (!empty($value)) {
-								$criteria->andWhere('id', 'NOT IN', $value);
-							}
-						});
-						
-		if (static::getMapping()->getColumn('modifiedAt')) {
-			$filters->addDate("modifiedAt", function(Criteria $criteria, $comparator, $value) {				
-				$criteria->where('modifiedAt', $comparator, $value);								
-			});
-		}
+		if(!isset(self::$filters[$cls])) {
 
+			self::$filters[$cls] = new Filters();
 
-		if (static::getMapping()->getColumn('modifiedBy')) {
-			$filters->addText("modifiedBy", function(Criteria $criteria, $comparator, $value, Query $query) {				
-				if(!$query->isJoined('core_user', 'modifier')) {
-					$query->join('core_user','modifier', 'modifier.id = '. $query->getTableAlias() .'.modifiedBy');
+			self::$filters[$cls]->add('text', function (Criteria $criteria, $value, Query $query) {
+				if (!is_array($value)) {
+					$value = [$value];
 				}
-	
-				$criteria->where('modifier.displayName', $comparator, $value);					
-			});
-		}
-		
-		if (static::getMapping()->getColumn('createdAt')) {
-			$filters->addDate("createdAt", function(Criteria $criteria, $comparator, $value) {				
-				$criteria->where('createdAt', $comparator, $value);								
-			});
-		}
 
-
-		if (static::getMapping()->getColumn('createdBy')) {
-			$filters->addText("createdBy", function(Criteria $criteria, $comparator, $value, Query $query) {				
-				if(!$query->isJoined('core_user', 'creator')) {
-					$query->join('core_user','creator', 'creator.id = '. $query->getTableAlias() .'.createdBy');
+				foreach ($value as $q) {
+					if (!empty($q)) {
+						static::search($criteria, $q, $query);
+					}
 				}
-	
-				$criteria->where('creator.displayName', $comparator, $value);					
-			});
-		}
+			})
+				->add('exclude', function (Criteria $criteria, $value) {
+					if (!empty($value)) {
+						$criteria->andWhere('id', 'NOT IN', $value);
+					}
+				});
 
-		self::defineLegacyFilters($filters);
-
-		if(method_exists(static::class, 'defineCustomFieldFilters')) {
-			static::defineCustomFieldFilters($filters);
-		}
-		
-		$filters->addDate('commentedAt', function(Criteria $criteria, $comparator, $value, Query $query) {
-			if(!$query->isJoined('comments_comment', 'comment')) {
-				$query->join('comments_comment','comment', 'comment.entityId = '. $query->getTableAlias() .'.id AND comment.entityTypeId=' . static::entityType()->getId());
+			if (static::getMapping()->getColumn('modifiedAt')) {
+				self::$filters[$cls]->addDate("modifiedAt", function (Criteria $criteria, $comparator, $value) {
+					$criteria->where('modifiedAt', $comparator, $value);
+				});
 			}
 
-			$criteria->where('comment.modifiedAt', $comparator, $value);					
-		});
 
+			if (static::getMapping()->getColumn('modifiedBy')) {
+				self::$filters[$cls]->addText("modifiedBy", function (Criteria $criteria, $comparator, $value, Query $query) {
+					if (!$query->isJoined('core_user', 'modifier')) {
+						$query->join('core_user', 'modifier', 'modifier.id = ' . $query->getTableAlias() . '.modifiedBy');
+					}
 
-		/* 
-			find all items with link to:
-
-		link : {
-			entity: "Contact",
-			id: 1
-		}
-
-		or leave id empty to find items that link to any contact
-
-		*/
-		$filters->add("link", function(Criteria $criteria, $value, Query $query) {
-			$linkAlias = 'link_' . uniqid();
-			$on = $query->getTableAlias() . '.id =  '.$linkAlias.'.toId  AND '.$linkAlias.'.toEntityTypeId = ' . static::entityType()->getId().' AND ' . $linkAlias . '.fromEntityTypeId = ' .  EntityType::findByName($value['entity'])->getId();
-
-			$query->join('core_link', $linkAlias, $on, "LEFT");
-			$criteria->where('toId', '!=', null);
-
-			if(!empty($value['id'])) {
-				$criteria->andWhere('fromId', '=', $value['id']);
+					$criteria->where('modifier.displayName', $comparator, $value);
+				});
 			}
-		});
 
-		static::fireEvent(self::EVENT_FILTER, $filters);
+			if (static::getMapping()->getColumn('createdAt')) {
+				self::$filters[$cls]->addDate("createdAt", function (Criteria $criteria, $comparator, $value) {
+					$criteria->where('createdAt', $comparator, $value);
+				});
+			}
+
+
+			if (static::getMapping()->getColumn('createdBy')) {
+				self::$filters[$cls]->addText("createdBy", function (Criteria $criteria, $comparator, $value, Query $query) {
+					if (!$query->isJoined('core_user', 'creator')) {
+						$query->join('core_user', 'creator', 'creator.id = ' . $query->getTableAlias() . '.createdBy');
+					}
+
+					$criteria->where('creator.displayName', $comparator, $value);
+				});
+			}
+
+			self::defineLegacyFilters(self::$filters[$cls]);
+
+			if (method_exists(static::class, 'defineCustomFieldFilters')) {
+				static::defineCustomFieldFilters(self::$filters[$cls]);
+			}
+
+			self::$filters[$cls]->addDate('commentedAt', function (Criteria $criteria, $comparator, $value, Query $query) {
+				if (!$query->isJoined('comments_comment', 'comment')) {
+					$query->join('comments_comment', 'comment', 'comment.entityId = ' . $query->getTableAlias() . '.id AND comment.entityTypeId=' . static::entityType()->getId());
+				}
+
+				$criteria->where('comment.modifiedAt', $comparator, $value);
+			});
+
+
+			/*
+				find all items with link to:
+
+			link : {
+				entity: "Contact",
+				id: 1
+			}
+
+			or leave id empty to find items that link to any contact
+
+			*/
+			self::$filters[$cls]->add("link", function (Criteria $criteria, $value, Query $query) {
+				$linkAlias = 'link_' . uniqid();
+				$on = $query->getTableAlias() . '.id =  ' . $linkAlias . '.toId  AND ' . $linkAlias . '.toEntityTypeId = ' . static::entityType()->getId() . ' AND ' . $linkAlias . '.fromEntityTypeId = ' . EntityType::findByName($value['entity'])->getId();
+
+				$query->join('core_link', $linkAlias, $on, "LEFT");
+				$criteria->where('toId', '!=', null);
+
+				if (!empty($value['id'])) {
+					$criteria->andWhere('fromId', '=', $value['id']);
+				}
+			});
+
+			static::fireEvent(self::EVENT_FILTER, self::$filters[$cls]);
+		}
 		
-		return $filters;
+		return self::$filters[$cls];
 	}
 
 	/**
@@ -914,41 +920,6 @@ abstract class Entity extends Property {
 	 */
 	public static function converters() {
 		return [Json::class];
-	}
-
-  /**
-   * Convert this entity to template models for parsing.
-   *
-   * This will be used for @return array
-   * @throws Exception
-   * @see TemplateParser::addModel()
-   *
-   * By default it will provide itself with the entityType->getName() in lowerCamelCase.
-   *
-   * for example ['contact' => Contact $this];
-   *
-   */
-	public function toTemplate() {
-		// return [lcfirst(self::entityType()->getName()) => $this];
-
-		$arr = [];
-		
-		if(empty($properties)) {
-			$properties = array_filter($this->getReadableProperties(), function($propName) {
-				return !in_array($propName, ['acl', 'permissionLevel']);
-			});
-		}
-
-		foreach ($properties as $propName) {
-			if($propName == 'customFields') {
-				$arr['customFields'] = $this->getCustomFields(true);
-			} else{
-        $value = $this->getValue($propName);
-        $arr[$propName] = method_exists($value, 'toTemplate') ? $value->toTemplate() : $value;
-			}
-		}
-		
-		return $arr;
 	}
 
 	/**

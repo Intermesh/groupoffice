@@ -56,10 +56,12 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 			// me.firstWeekDay = parseInt(user.firstWeekday);
 			me.legacySettings(user);
 
+			go.ActivityWatcher.init(GO.settings.config.logoutWhenInactive);
+
 			me.fireEvent("load", this);
 		});
 		
-		
+
     //Ext.apply(GO.settings, session.oldSettings);
 		
 		
@@ -122,10 +124,8 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 	},
 
 	loadLegacyModules : function() {
-
-		return go.Db.store("Module").all().then(function(modules) {
 			GO.settings.modules = {};
-			
+			var modules = go.Modules.getAll();
 			for(var id in modules) {
 				var m = modules[id];
 
@@ -139,7 +139,7 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 				GO.settings.modules[m.name].read_permission = !!m.permissionLevel;
 				GO.settings.modules[m.name].write_permission = m.permissionLevel >= go.permissionLevels.write;
 			}
-		});
+
 	},
   
 	isLoggedIn: function() {

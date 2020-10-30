@@ -188,7 +188,7 @@ abstract class Log {
      * @return bool True if we do have to log some specific user. False otherwise.
      */
     public function HasSpecialLogUsers() {
-        return !empty($this->specialLogUsers);
+        return !empty($this->specialLogUsers) || $this->isAuthUserInSpecialLogUsers;
     }
 
     /**

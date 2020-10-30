@@ -46,7 +46,7 @@ if($package == "core") {
 		exit("Controller class '$ctrlCls' not found");
 	}
 	
-	$c = new $ctrlCls;
+	$c = $ctrlCls::get();
 }
 
 if(!method_exists($c, $method)) {

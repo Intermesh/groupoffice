@@ -83,6 +83,8 @@ try {
 //			exit();
 //		}
 
+		go()->fireEvent(\go\core\App::EVENT_INDEX);
+
 		Response::get()->sendHeaders();
 
 		if(go()->getSettings()->databaseVersion != go()->getVersion()) {
@@ -92,7 +94,7 @@ try {
 				echo '<a href="install/upgrade.php">Click here to launch the upgrade</a>';
 				exit();
 			}
-			header('Location: '.GO::config()->host.'install/upgrade.php');				
+			header('Location: '.GO::config()->host.'install/upgrade.php');
 			exit();
 		}
 	}
@@ -103,8 +105,5 @@ try {
   errorHander($e);  
 }
 
-
-
-go()->fireEvent(\go\core\App::EVENT_INDEX);
 
 GO::router()->runController();

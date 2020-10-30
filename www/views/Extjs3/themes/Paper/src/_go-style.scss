@@ -105,7 +105,10 @@ p {
 }
 
 strong { font-weight: $font-weight-m; }
-small { color: color($fg, 'secondary-text'); font-weight: $font-weight-r; font-size:.85em; line-height: 1.2; }
+small {
+	font-weight: $font-weight-r;
+	font-size:.85em; line-height: 1.2;
+}
 
 
 
@@ -272,6 +275,9 @@ a {
 		position:absolute;
 		top: dp(16);
 		left: dp(16);
+	}
+	#go-powered-by {
+		color: white;
 	}
 }
 #motd { // login message of the day
@@ -449,6 +455,9 @@ a {
 
 #mainNorthPanel {
 	height: dp(56);
+	.x-panel-body {
+		min-height: dp(56);
+	}
 	
 	position: relative;
 	color: white;
@@ -462,7 +471,7 @@ a {
 		.x-tab-strip {
 			
 			&-active {
-				border-bottom-color: $cAccent;
+				@include var(border-bottom-color, c-accent);
 				color:white;
 				.x-tab-strip-text{ color:white;}
 			}
@@ -533,7 +542,7 @@ a {
 		display:inline-block;
 		text-decoration: none;
 		height:dp(40);
-		padding: dp(22) dp(8) dp(8) dp(8);
+		padding: dp(18) dp(8) dp(8) dp(8);
 		color: white;
 		&:hover,&:active { color: white; }
 	}
@@ -541,7 +550,7 @@ a {
 #search_query {
 	float:left;
 	display:block;
-	padding-top: dp(16);	
+	padding-top: dp(12);
 }
 
 .search-field-wrap {
@@ -619,18 +628,26 @@ a {
 		//padding: 0 dp(24) dp(8);
 		//color: color($fg, 'secondary-text');
 		margin: 0 auto dp(4);
-		animation: slide-top .2s ease-out; 
+
 		.x-panel-header {
 			color: color($fg,'secondary-text');
-			zoom:.8;
+			>i, .x-tool {
+				transform: scale(.8);
+				margin-top: dp(-4);
+			}
+			.x-tool {
+				transform: scale(.8);
+				margin-top: dp(4);
+			};
 			height: dp(40);
-			line-height: dp(40);
+			//line-height: dp(40);
 	    }
 		.x-panel-header-text {
 			color: color($fg,'secondary-text');
+			font-size: dp(16);
 		}
 		.x-panel-bwrap {
-			padding: dp(8);
+			padding: dp(8) dp(16);
 			em {float:right;}
 		}
 	}
@@ -642,6 +659,7 @@ a {
 	top: dp(64);
 	right: 8px;
 	overflow: visible;
+	> div {animation: slide-top .2s ease-out;}
 }
 .notifications {
 	padding: dp(4);
@@ -662,7 +680,7 @@ a {
 	float:left;
 	height: dp(32);
 	padding: dp(2) dp(8);
-	margin-top: dp(20);
+	margin-top: dp(16);
 	margin-right: dp(8);
 	border-radius: dp(16);
 	border: 1px solid color($fg,'line');
@@ -672,7 +690,7 @@ a {
 		animation: blink .3s 7 alternate;
 		margin: 0 dp(4);
 		text-shadow: 0px 1px 0px rgba(black, 0.56);
-		zoom:.7;
+		transform: scale(0.7);
 		cursor: pointer;
 	}
 }
@@ -742,7 +760,7 @@ button {
 		width: 100%;
 	}
 
-	.go-detail-view & {
+	.icons &, .go-detail-view-avatar & {
 		//float:left; ?? why?
 		margin-top:dp(4);
 		margin-right: dp(16);
@@ -1113,6 +1131,10 @@ button.filetype-pdf, button.filetype-doc {
 
 //detail view
 .go-detail-view {
+
+	small {
+		color: color($fg, 'secondary-text');
+	}
 	
 	
 	// .go-detail-view-avatar {
@@ -1590,6 +1612,9 @@ table[id^="comments-ext"] b {
 	
 	#mainNorthPanel {
 		height: dp(64);
+		.x-panel-body {
+			min-height: dp(64);
+		}
 	}
 
 }
@@ -1797,8 +1822,6 @@ table[id^="comments-ext"] b {
 		margin-left: dp(-16);
 	}
 	margin-bottom: dp(16);
-	
-
 }
 
 
@@ -1817,9 +1840,6 @@ table[id^="comments-ext"] b {
 
 .go-html-formatted {
 	@extend %font-body1;
-
-
-
 }
 
 //.go-html-formatted div, .go-html-formatted dl, .go-html-formatted dt, .go-html-formatted dd, .go-html-formatted ul, .go-html-formatted ol, .go-html-formatted li, .go-html-formatted h1, .go-html-formatted h2, .go-html-formatted h3, .go-html-formatted h4, .go-html-formatted h5, .go-html-formatted h6, .go-html-formatted pre, .go-html-formatted form, .go-html-formatted fieldset, .go-html-formatted input, .go-html-formatted p, .go-html-formatted blockquote, .go-html-formatted th, .go-html-formatted td, .go-html-formatted span {
@@ -2314,4 +2334,34 @@ table[id^="comments-ext"] b {
 	text-align:center;
 	padding: dp(48);
 	color: color($fg, 'secondary-text');
+}
+
+
+//compact header
+body.go-compact {
+	#mainNorthPanel {
+		height: dp(64);
+
+		.x-panel-body {
+			min-height: dp(64);
+		}
+	}
+
+	.go-main-tab-panel {
+		overflow: visible;
+	}
+
+	.go-main-tab-panel.x-tab-panel > .x-tab-panel-header {
+		position: absolute;
+		top: dp(-56);
+		left: dp(224);
+		right: dp(272);
+		width: auto !important;
+		height: 0;
+		overflow: visible;
+	}
+
+	.go-main-tab-panel {
+		bottom: 0;
+	}
 }

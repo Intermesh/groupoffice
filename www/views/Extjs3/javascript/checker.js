@@ -160,7 +160,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 				GO.checker.lastCount = this.reminderStore.getCount();
 
 				if(!GO.checker.lastCount){
-					this.ownerCt.hide();
+					go.Notifier.hideNotifications();
 					go.Notifier.toggleIcon('reminder', false);
 				}
 
