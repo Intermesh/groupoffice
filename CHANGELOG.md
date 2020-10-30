@@ -18,6 +18,8 @@ end 6.5
 
 
 6.4.188
+- Core: Refactored custom fields to handle functions inside other functions and detect infinite loops for template fields
+  and function fields.
 - Core: Stop CRON execution when upgrade is needed
 - Core: Run GarbageCollection once per day at midnight instead of every hour
 - Core: added more Romanian translations thanks to Safety Broker de Asigurare SRL

@@ -631,29 +631,7 @@ class TemplateParser {
 	
 	private $filters = [];
 	
-	
-	private function isVar($path) {
-		$pathParts = explode(".", trim($path)); //eg "contact.name"		
 
-		$model = $this;
-
-		foreach ($pathParts as $pathPart) {
-			if(is_array($model)) {
-				if(!array_key_exists($pathPart, $model)) {
-					return false;
-				}
-				$model = $model[$pathPart];
-			}else
-			{
-				if(!$model->hasReadableProperty($pathPart)) {
-					return false;
-				}
-				$model = $model->$pathPart;
-			}			
-		}
-
-		return true;
-	}
 	
 	private function getVar($path, $model = null) {
 		
