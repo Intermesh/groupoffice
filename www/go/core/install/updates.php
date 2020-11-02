@@ -321,7 +321,7 @@ $updates['201902141322'][] = "RENAME TABLE `cf_select_options` TO `core_customfi
 
 $updates['201902141322'][] = "ALTER TABLE `core_customfields_select_option` CHANGE `field_id` `fieldId` INT(11) NOT NULL;";
 $updates['201902141322'][] = "ALTER TABLE `core_customfields_select_option` CHANGE `sort_order` `sortOrder` INT(11) NOT NULL;";
-$updates['201902141322'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+$updates['201902141322'][] = "delete FROM `core_customfields_select_option` WHERE fieldId not in (select id from core_customfields_field);";
 $updates['201902141322'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 
 $updates['201902141322'][] = "ALTER TABLE `core_customfields_field_set` ADD `description` TEXT NULL AFTER `name`;";
@@ -741,3 +741,5 @@ $updates['202010261619'][] = "update `core_acl` set ownedBy = 1 where ownedBy no
 $updates['202010261619'][] = "ALTER TABLE `core_acl` ADD FOREIGN KEY (`ownedBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";
 
 $updates['202010271619'][] = "UPDATE `core_cron_job` SET `expression` = '0 0 * * *' WHERE `core_cron_job`.`name` = 'GarbageCollection' and moduleId = (select id from core_module where name='core' and package='core')";
+
+$updates['202011021149'][] = "ALTER TABLE core_customfields_select_option DROP FOREIGN KEY core_customfields_select_option_ibfk_2;";
