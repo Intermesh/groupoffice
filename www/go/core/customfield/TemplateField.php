@@ -31,11 +31,13 @@ class TemplateField extends TextArea {
 
 	public function dbToApi($value, \go\core\orm\CustomFieldsModel $values, $entity)
 	{
-		if($value == null) {
+		if($value === null) {
 			//field just added and value not saved yet.
-			//$this->beforeSave($value, $values, $entity,);
-			$entity->saveCustomFields();
-			$value = $values[$this->field->databaseName];
+			$this->beforeSave($value, $values, $entity, $record);
+			if(!$entity->isNew()) {
+				$entity->saveCustomFields();
+			}
+			$value = $record[$this->field->databaseName];
 		}
 		return parent::dbToApi($value, $values, $entity);
 	}
