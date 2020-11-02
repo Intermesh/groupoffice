@@ -104,7 +104,7 @@ trait CustomFieldsTrait {
 	 * @return bool
 	 */
 	public function isCustomFieldsModified() {
-		return $this->customFieldsModified;
+		return $this->getCustomFields()->isModified();
 	}
 
   /**
