@@ -71,12 +71,12 @@ trait CustomFieldsTrait {
 	 * The data array may hold partial data. It will be merged into the existing
 	 * data.
 	 *
-	 * @param array $data
+	 * @param array|CustomFieldsModel $data
 	 * @param bool $asText
 	 * @return $this
 	 * @throws Exception
 	 */
-	public function setCustomFields(array $data, $asText = false)
+	public function setCustomFields($data, $asText = false)
 	{
 		$this->getCustomFields($asText)->setValues($data);
 
