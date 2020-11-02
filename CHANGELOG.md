@@ -10,6 +10,7 @@
 - Core: Fixed internationalization of search keywords
 - Custom fields: Only 1 column on mobiles]
 - Projects: Link was not established when creating from other items
+- Billing: Create link to quote and contacts when automatically creating task
 
 27-10-2020 6.4.187
 - Core: Set core_acl.ownedBy to 1 when user has been removed.  
