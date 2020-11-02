@@ -73,15 +73,14 @@ class MailDomain {
 		
 		go()->debug("SERVERCLIENT: Updating password for mailbox ".$user->username.'@'.$domain);
 		
-		$username = $user->username;
-		if(empty(GO::config()->serverclient_dont_add_domain_to_imap_username))
-			$username.='@'.$domain;
+		$username = explode('@', $user->username) [0];
+		$username.='@'.$domain;
 		
 		$url = $this->getBaseUrl("postfixadmin/mailbox/setPassword");
 
 		$params = array(			
-			"username"=>$username,
-			"password"=>$this->password,
+			"username" => $username,
+			"password" => $this->password,
 		);
 
 		go()->debug($url);
@@ -139,11 +138,12 @@ class MailDomain {
 		$account->imap_allow_self_signed = GO::config()->serverclient_novalidate_cert ?? true;
 		$account->host = GO::config()->serverclient_host ?? "localhost";
 		$account->port = GO::config()->serverclient_port ?? 143;
-		$account->username = $user->username;
-		
-		if(empty(GO::config()->serverclient_dont_add_domain_to_imap_username)){
-			$account->username .= '@'.$domain;
-		}
+
+		$username = explode('@', $user->username) [0];
+		$username.='@'.$domain;
+
+		$account->username = $username;
+
 		$account->password = $this->password;
 		$account->smtp_host = GO::config()->serverclient_smtp_host ?? 'localhost';
 		$account->smtp_port = GO::config()->serverclient_smtp_port ?? 25;
