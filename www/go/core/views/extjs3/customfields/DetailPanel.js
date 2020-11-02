@@ -8,6 +8,10 @@ go.customfields.DetailPanel = Ext.extend(Ext.Panel, {
 
   initComponent: function() {
 
+    if(GO.util.isMobileOrTablet()) {
+      this.fieldSet.columns = 1;
+    }
+
     this.stateId = "cf-detail-field-set-" + this.fieldSet.id;
     // this.fieldSetId = this.fieldSet.id;
     this.title = this.fieldSet.name;
