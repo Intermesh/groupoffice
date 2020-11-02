@@ -83,16 +83,19 @@ Ext.onReady(function(){
 
 			if(this.rendered)
 			{
+				var username = this.form.findField('username').getValue();
+				var emailField = this.form.findField('email');
+
 				for(var i=0;i<this.serverclientDomainCheckboxes.length;i++)
 				{
 					if(this.serverclientDomainCheckboxes[i].getValue())
 					{
-						var username = this.form.findField('username').getValue();
-						var emailField = this.form.findField('email');
+						if(emailField) {
+							var email = username.indexOf('@') > -1 ? username : username + '@' + GO.serverclient.domains[i];
 
-						if(emailField)
-							this.form.findField('email').setValue(username+'@'+GO.serverclient.domains[i]);
-							this.form.findField('recoveryEmail').setValue(username+'@'+GO.serverclient.domains[i]);
+							this.form.findField('email').setValue(email);
+							this.form.findField('recoveryEmail').setValue(email);
+						}
 						break;
 					}
 				}

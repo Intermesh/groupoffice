@@ -46,8 +46,10 @@ trait SearchableTrait {
 	 * @return array|false|string[]
 	 */
 	private static function splitTextKeywords($text) {
-		$split = preg_split('/[^\w\-_\+\\\\\/:]/', strtolower($text), 0, PREG_SPLIT_NO_EMPTY);
-		return $split;
+		mb_internal_encoding("UTF-8");
+		mb_regex_encoding("UTF-8");
+//		$split = preg_split('/[^\w\-_\+\\\\\/:]/', mb_strtolower($text), 0, PREG_SPLIT_NO_EMPTY);
+		return mb_split('[^\w\-_\+\\\\\/:]', mb_strtolower($text), -1);
 	}
 
 	/**
