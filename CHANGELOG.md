@@ -8,6 +8,7 @@
 - Serverclient: Works when using e-mail as username
 - Core: remove double key and clean up core_customfields_select_option before adding foreign key in upgrade
 - Core: Fixed internationalization of search keywords
+- Custom fields: Only 1 column on mobiles
 
 27-10-2020 6.4.187
 - Core: Set core_acl.ownedBy to 1 when user has been removed.  

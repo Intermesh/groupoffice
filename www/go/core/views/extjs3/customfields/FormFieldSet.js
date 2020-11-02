@@ -6,7 +6,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	layout: "column",
 	initComponent: function () {
 
-		if(GO.isMobileOrTablet()) {
+		if(GO.util.isMobileOrTablet()) {
 			this.fieldSet.columns = 1;
 		}
 		

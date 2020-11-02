@@ -8,7 +8,7 @@ go.customfields.DetailPanel = Ext.extend(Ext.Panel, {
 
   initComponent: function() {
 
-    if(GO.isMobileOrTablet()) {
+    if(GO.util.isMobileOrTablet()) {
       this.fieldSet.columns = 1;
     }
 
