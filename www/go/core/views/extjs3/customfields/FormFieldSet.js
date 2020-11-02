@@ -5,6 +5,10 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	hideMode: 'offsets',
 	layout: "column",
 	initComponent: function () {
+
+		if(GO.isMobileOrTablet()) {
+			this.fieldSet.columns = 1;
+		}
 		
 		var items = [];
 		
