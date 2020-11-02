@@ -104,7 +104,7 @@ trait CustomFieldsTrait {
 	 * @return bool
 	 */
 	public function isCustomFieldsModified() {
-		return $this->getCustomFields()->isModified();
+		return isset($this->customFieldsModel) && $this->getCustomFields()->isModified();
 	}
 
   /**
@@ -138,7 +138,7 @@ trait CustomFieldsTrait {
    * @throws Exception
    */
 	public function saveCustomFields() {
-		return $this->getCustomFields()->save();
+		return isset($this->customFieldsModel) &&  $this->getCustomFields()->save();
 	}
 
   /**
