@@ -12,6 +12,7 @@
 - Projects: Link was not established when creating from other items
 - Billing: Create link to quote and contacts when automatically creating task
 - Projects: Status filter applied to search when not needed
+- Core: Search splits words from text area fields only and not from small fields. So initials in a contact remain intact for example
 
 27-10-2020 6.4.187
 - Core: Set core_acl.ownedBy to 1 when user has been removed.  
