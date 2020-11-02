@@ -574,7 +574,7 @@ abstract class Module extends Singleton {
 	 */
 	public function getModel() {
 
-		if(!isset($this->model)) {
+		if(!$this->model) {
 			$this->model = model\Module::findByName($this->getPackage(), $this->getName());
 		}
 

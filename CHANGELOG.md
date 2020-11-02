@@ -24,6 +24,14 @@ end 6.5
 - Core: Run GarbageCollection once per day at midnight instead of every hour
 - Core: added more Romanian translations thanks to Safety Broker de Asigurare SRL
 - Projects: Removed projects v1 to v2 upgrade. UPgrade must be done in v6.2.
+- Serverclient: Works when using e-mail as username
+- Core: remove double key and clean up core_customfields_select_option before adding foreign key in upgrade
+- Core: Fixed internationalization of search keywords
+- Custom fields: Only 1 column on mobiles]
+- Projects: Link was not established when creating from other items
+- Billing: Create link to quote and contacts when automatically creating task
+- Projects: Status filter applied to search when not needed
+- Core: Search splits words from text area fields only and not from small fields. So initials in a contact remain intact for example
 
 27-10-2020 6.4.187
 - Core: Set core_acl.ownedBy to 1 when user has been removed.  
