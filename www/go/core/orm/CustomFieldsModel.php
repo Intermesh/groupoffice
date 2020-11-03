@@ -197,6 +197,12 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 	 * @throws Exception
 	 */
 	private function normalizeCustomFieldsInput($data, $asText = false) {
+
+		if($data instanceof CustomFieldsModel)
+		{
+			$data = $data->toArray();
+		}
+
 		$columns = Table::getInstance(static::customFieldsTableName())->getColumns();
 		foreach($columns as $name => $column) {
 			if(array_key_exists($name, $data)) {
@@ -272,7 +278,7 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 			}
 
 			//beforeSave might change $record
-			if(!$this->isModified() || $record == $this->data) {
+			if(!$this->isModified() && $record == $this->data) {
 				return true;
 			}
 

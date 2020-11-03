@@ -4,6 +4,8 @@ namespace go\core\orm;
 use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\App;
+use go\core\customfield\Html;
+use go\core\customfield\TextArea;
 use go\core\db\Query;
 use go\core\db\Table;
 use go\core\db\Utils;
@@ -71,12 +73,12 @@ trait CustomFieldsTrait {
 	 * The data array may hold partial data. It will be merged into the existing
 	 * data.
 	 *
-	 * @param array $data
+	 * @param array|CustomFieldsModel $data
 	 * @param bool $asText
 	 * @return $this
 	 * @throws Exception
 	 */
-	public function setCustomFields(array $data, $asText = false)
+	public function setCustomFields($data, $asText = false)
 	{
 		$this->getCustomFields($asText)->setValues($data);
 
@@ -104,7 +106,7 @@ trait CustomFieldsTrait {
 	 * @return bool
 	 */
 	public function isCustomFieldsModified() {
-		return $this->customFieldsModified;
+		return isset($this->customFieldsModel) && $this->getCustomFields()->isModified();
 	}
 
   /**
@@ -138,6 +140,9 @@ trait CustomFieldsTrait {
    * @throws Exception
    */
 	public function saveCustomFields() {
+		if(!isset($this->customFieldsModel) ) {
+			return true;
+		}
 		return $this->getCustomFields()->save();
 	}
 
@@ -204,5 +209,43 @@ trait CustomFieldsTrait {
 				$field->getDataType()->defineFilter($filters);
 			}
 		}		
+	}
+
+
+	protected function getCustomFieldsSearchKeywords()
+	{
+		$keywords = [];
+
+		$cfData = $this->getCustomFields(true);
+
+		foreach (static::getCustomFieldModels() as $field) {
+
+			if ($field->getDataType() instanceof Html) {
+				continue;
+			}
+
+			$v = $cfData[$field->databaseName];
+
+			if (is_array($v)) {
+				foreach ($v as $i) {
+					if (!empty($v) && is_string($v)) {
+						$keywords[] = $v;
+					}
+				}
+			} else if (!empty($v) && is_string($v)) {
+
+				$split = $field->getDataType() instanceof TextArea;
+
+				if ($split) {
+					$keywords = array_merge($keywords, SearchableTrait::splitTextKeywords($v));
+				} else {
+					$keywords[] = $v;
+				}
+
+			}
+		}
+
+		return $keywords;
+
 	}
 }
