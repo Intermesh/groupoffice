@@ -310,7 +310,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 				this.fireEvent('load', options, true, response, data, password);
 			},
 			fail: function(response, options, result) {
-				Ext.Msg.alert(t("Error"), result.feedback);
+				Ext.Msg.alert(t("Error"), result ? result.feedback : t('An error occurred. More details can be found in the console.'));
 				this.loading=false;
 				this.el.unmask();
 			}
