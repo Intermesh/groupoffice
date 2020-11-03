@@ -18,7 +18,7 @@ class Html extends Base {
 		return "TEXT NULL";
 	}
 
-	public function validate($value, Field $field, Entity $model)
+	public function validate($value, Field $field, $model)
 	{
 		if(!empty($value) && StringUtil::detectXSS($value)) {
 			$model->setValidationError("customFields." . $field->databaseName, ErrorCode::INVALID_INPUT, "You're not allowed to put scripts in customFields." . $field->databaseName);				

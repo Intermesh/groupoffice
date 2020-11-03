@@ -368,8 +368,9 @@ class ColumnModel {
 		$customFlds = array();
 
 		if(method_exists($model, 'getCustomFields')) {
-			$customFlds = $model->getCustomFields($this->_modelFormatType == 'formatted');
-			$model->customFields = $customFlds;
+			$model->returnAsText = $this->_modelFormatType == 'formatted';
+//			$customFlds = $model->getCustomFields($this->_modelFormatType == 'formatted');
+//			$model->customFields = $customFlds;
 		}
 		
 		$columns = $this->getColumns();

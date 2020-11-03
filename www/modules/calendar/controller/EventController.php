@@ -823,7 +823,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			
 			if(\GO::modules()->customfields){
 				
-				$attr = $resourceEvent->getCustomFields();
+				$attr = $resourceEvent->getCustomFields()->toArray();
 				foreach($attr as $key=>$value){
 					$resource_options = 'resource_options['.$resourceEvent->calendar->id.']['.$key.']';
 					$response['data'][$resource_options] = $value;
@@ -2078,7 +2078,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		$response['data'] = $event->getAttributes();
 		$response['data']['permission_level']=$event->getPermissionLevel();
 		$response['data']['write_permission']=true;
-		$response['data']['customFields'] = $event->getCustomFields();
+		$response['data']['customFields'] = $event->getCustomFields()->toArray();
 		$response['success'] = true;
 
 		$response = $this->_loadComboTexts($response, $event);

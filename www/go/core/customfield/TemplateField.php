@@ -7,9 +7,9 @@ use go\core\TemplateParser;
 
 class TemplateField extends TextArea {
 
-	private static $loopIds = [];
 
-	public function beforeSave($value, &$record, $entity)
+
+	public function beforeSave($value, \go\core\orm\CustomFieldsModel $model, $entity, &$record)
 	{
 		$tpl = $this->field->getOption('template');
 
@@ -29,24 +29,15 @@ class TemplateField extends TextArea {
 		return true;
 	}
 
-	public function dbToApi($value, &$values, $entity)
+	public function dbToApi($value, \go\core\orm\CustomFieldsModel $values, $entity)
 	{
-		if($value == null) {
-			//prevent infinite loop because this function is used in beforeSave too
-			if(in_array($this->field->id, self::$loopIds)) {
-				return null;
-			}
-
-			self::$loopIds[] = $this->field->id;
-
+		if($value === null) {
 			//field just added and value not saved yet.
-			$this->beforeSave($value, $values, $entity);
-			$entity->saveCustomFields();
-			$value = $values[$this->field->databaseName];
-
-			self::$loopIds = array_filter(self::$loopIds, function($id) {
-				return $id != $this->field->id;
-			});
+			$this->beforeSave($value, $values, $entity, $record);
+			if(!$entity->isNew()) {
+				$entity->saveCustomFields();
+			}
+			$value = $record[$this->field->databaseName];
 		}
 		return parent::dbToApi($value, $values, $entity);
 	}

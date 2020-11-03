@@ -1448,7 +1448,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 
 		//$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 
-		$cfRecord = $this->getCustomFields();
+		$cfRecord = $this->getCustomFields()->toArray();
 
 		if (!empty($cfRecord)) {
 		$fieldsets = \go\core\model\FieldSet::find()->filter(['entities' => ['Event']]);
