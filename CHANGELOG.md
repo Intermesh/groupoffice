@@ -1,3 +1,5 @@
+- Core: upgrade output is logged
+
 03-11-2020 6.4.188
 - Core: Refactored custom fields to handle functions inside other functions and detect infinite loops for template fields
   and function fields.
