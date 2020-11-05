@@ -1,6 +1,7 @@
 - Core: upgrade output is logged
 - Core: When installing module first check if it's not already installed to prevent data loss.
 - Core: invalid allowed_modules string could show incorrect installed/enabled status in the modules section
+- Core: Ignore error when creating a link that already exists
 
 03-11-2020 6.4.188
 - Core: Refactored custom fields to handle functions inside other functions and detect infinite loops for template fields
