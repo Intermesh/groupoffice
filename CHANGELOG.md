@@ -1,5 +1,3 @@
-
-
 Master
 - Business: New finance module
 - Projects: new module
@@ -18,6 +16,17 @@ end 6.5
 
 
 6.4.188
+
+06-11-2020 6.4.189
+- Core: upgrade output is logged
+- Core: When installing module first check if it's not already installed to prevent data loss.
+- Core: invalid allowed_modules string could show incorrect installed/enabled status in the modules section
+- Core: Ignore error when creating a link that already exists
+- Core: demodata error when clicking 'no'
+- Core: welcome message is displayed
+- Core: Custom field type Encrypted text showed hash value
+
+03-11-2020 6.4.188
 - Core: Refactored custom fields to handle functions inside other functions and detect infinite loops for template fields
   and function fields.
 - Core: Stop CRON execution when upgrade is needed

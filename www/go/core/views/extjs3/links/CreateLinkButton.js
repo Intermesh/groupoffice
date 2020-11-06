@@ -343,7 +343,21 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 		})
 		.then(function(result) {
 			if(result.notCreated) {
-				Ext.MessageBox.alert(t("Error"), t("Sorry, the link could not be created."));
+
+				//ignore if it already existed
+				for(var id in result.notCreated) {
+					var ve = result.notCreated[id].validationErrors;
+					if(!ve) {
+						Ext.MessageBox.alert(t("Error"), t("Sorry, the link could not be created."));
+						return;
+					}
+					for(var prop in ve) {
+						if(ve[prop].code != 11) { //unique error
+							Ext.MessageBox.alert(t("Error"), t("Sorry, the link could not be created."));
+						}
+					}
+				}
+
 			}
 		})
 		

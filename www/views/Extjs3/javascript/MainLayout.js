@@ -715,7 +715,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 	
 	welcome : function() {
-		if(go.User.id==1 && go.User.logins == 1) {
+		if(go.User.id==1 && go.User.loginCount == 1) {
 			
 			Ext.MessageBox.alert(t("Welcome!"), t("Please complete the installation by running through the system settings. Click OK to continue to the system settings dialog."), function() {
 				go.systemsettingsDialog = new go.systemsettings.Dialog();						

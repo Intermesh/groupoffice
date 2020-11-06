@@ -14,6 +14,7 @@ use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\Environment;
 use go\core\event\Listeners;
+use go\core\fs\File;
 use go\core\jmap;
 use go\core\model;
 use go\core\model\Group;
@@ -338,6 +339,32 @@ class Installer {
 		}
 	}
 
+	private function initLogFile() {
+		$logDir = go()->getDataFolder()->getFolder('log/upgrade/')->create();
+
+
+		static::$logFile = $logDir->getFile(date('Ymd_His') . '.log');
+
+		if(!static::$logFile->isWritable()){
+			throw new \Exception('Fatal error: Could not write to log file');
+		}
+
+		echo "Upgrade output will be logged into: " . static::$logFile->getRelativePath(go()->getDataFolder()) ."\n\n";
+	}
+
+
+	/**
+	 * @var File
+	 */
+	private static $logFile;
+
+
+	private static function upgradeLog($buffer)
+	{
+		self::$logFile->putContents($buffer, FILE_APPEND);
+		return $buffer;
+	}
+
 	public function upgrade() {
 		self::$isInProgress = true;
 		self::$isUpgrading = true;
@@ -363,6 +390,9 @@ class Installer {
 		if (!$lock->lock()) {
 			throw new \Exception("Upgrade is already in progress");
 		}
+
+		$this->initLogFile();
+		ob_start([static::class, 'upgradeLog'], 128);
 		
 		ini_set("max_execution_time", 0);
 		ini_set("memory_limit", -1);
@@ -414,6 +444,8 @@ class Installer {
 
 		$this->enableGarbageCollection();
 		echo "Done!\n";
+
+		ob_end_clean();
 	}
 	
 	/**
