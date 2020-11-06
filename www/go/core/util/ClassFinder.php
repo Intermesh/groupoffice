@@ -182,7 +182,13 @@ class ClassFinder {
 
 				$className = $namespace . '\\'. $name;
 
-				if (!class_exists($className)) {
+				try {
+					if (!class_exists($className)) {
+						continue;
+					}
+				}
+				catch(\Throwable $e) {
+					go()->debug("Class '$className' couldn't be loaded: " . $e->getMessage());
 					continue;
 				}
 
