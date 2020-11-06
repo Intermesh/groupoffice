@@ -1,5 +1,5 @@
 Ext.onReady(function () {
-	GO.mainLayout.on("authenticated", function () {
+	GO.mainLayout.on("render", function () {
 		if (!go.User.isAdmin) {
 			return;
 		}
@@ -7,10 +7,12 @@ Ext.onReady(function () {
 			if (btn == 'yes') {
 				document.location = GO.url('demodata/demodata/create');
 			} else {
+
+				var demodataMod = go.Db.store("Module").findBy(function (mod) { console.log(mod); return mod.name == 'demodata'; });
 				GO.request({
 					url: 'modules/module/delete',
 					params: {
-						id: go.Db.store("Module").findBy(function (mod) { console.log(mod); return mod.name == 'demodata'; }).id
+						id: demodataMod.id
 					}
 				});
 			}
