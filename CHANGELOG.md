@@ -4,6 +4,7 @@
 - Core: Ignore error when creating a link that already exists
 - Core: demodata error when clicking 'no'
 - Core: welcome message is displayed
+- Core: Custom field type Encrypted text showed hash value
 
 03-11-2020 6.4.188
 - Core: Refactored custom fields to handle functions inside other functions and detect infinite loops for template fields
