@@ -281,3 +281,4 @@ CREATE TABLE `fs_folders_custom_fields` (
 
 
 ALTER TABLE `fs_files` ADD INDEX(`mtime`);
+ALTER TABLE `fs_files` ADD INDEX(`expire_time`);

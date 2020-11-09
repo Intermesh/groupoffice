@@ -15,8 +15,22 @@ end 6.5
 
 
 
-6.4.188
+06-11-2020 6.4.190
+- Email: find correct translation string for 'Advanced'
+- Core: Added extra check for post_max_size php.ini setting to GO test script
+- Core: Better rendering of accented capital letters in form fields
+- Core: Fixed regression in permissions tab in module management
+- Core: Ignore missing foreign keys when deleting custom fields
+- Multi instance: Brought back allowed modules tab for instances. Thanks to Pieter van de Ven.
+- Core: Order global search results by id descending to speed up search
+- Core: Logo could be cleaned up by garbage collection
+- Calendar: zooming in could cause events to move to a day ahead
+- Files: Add index on expiry time to speed up portlet
+- ActiveSync: Fixed z-push-admin.php and z-push-top.php CLI commands
+- Core: Welcome message kept reappearing until logout
+- Time tracking: HTML entities were shown as code in edit dialog
 
+6.4.188
 06-11-2020 6.4.189
 - Core: upgrade output is logged
 - Core: When installing module first check if it's not already installed to prevent data loss.

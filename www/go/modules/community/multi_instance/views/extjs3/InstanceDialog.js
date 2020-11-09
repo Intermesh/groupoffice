@@ -2,8 +2,15 @@ go.modules.community.multi_instance.InstanceDialog = Ext.extend(go.form.Dialog, 
 	stateId: 'multi_instance-InstanceDialog',
 	title: t('Instance'),
 	entityStore: "Instance",
-	autoHeight: true,
+	autoHeight: false,
+	height: dp(900),
+	closeOnSubmit: false,
 	initFormItems: function () {
+
+		this.addPanel(this.allowedModulesPanel = new go.modules.community.multi_instance.AllowedModulesPanel({
+			disabled: true
+		}));
+
 		return [{
 				xtype: 'fieldset',
 				items: [
@@ -30,17 +37,58 @@ go.modules.community.multi_instance.InstanceDialog = Ext.extend(go.form.Dialog, 
 						name: "usersMax",
 						decimals: 0,
 						fieldLabel: t("Maximum number of users")
+					}, {
+						xtype: 'hidden',
+						name: 'allowedModules'
 					}]
 			}
 		];
 	},
+
+	submit : function() {
+		var me = this;
+		return this.supr().submit.call(this) . then (function() {
+			if(me.allowedModulesPanel.disabled) {
+				// setTimeout(function(){
+					me.onLoad(me.formPanel.entity);
+					me.tabPanel.setActiveTab(me.allowedModulesPanel);
+				// });
+			} else
+			{
+				me.close();
+			}
+		});
+	},
 	
-	onLoad : function() {
+	onLoad : function(entityValues) {
 		go.modules.community.multi_instance.InstanceDialog.superclass.onLoad.call(this);
+
+		this.allowedModulesPanel.setDisabled(false);
 		
 		if(this.currentId) {
 			this.formPanel.getForm().findField("hostname").setDisabled(true);
 		}
+
+		this.allowedModulesPanel.store.loadData(entityValues, false);
+		this.allowedModulesPanel.store.sort([{
+			field: 'localizedPackage',
+			direction: 'ASC'
+		}, {
+			field: 'title',
+			direction: 'ASC'
+		}]);
+	},
+
+	onBeforeSubmit: function() {
+		var m = [];
+		this.allowedModulesPanel.store.each(function(record) {
+			if (record.data.allowed) {
+				m.push(record.data.package + "/" + record.data.module)
+			}
+		}, this);
+		this.formPanel.getForm().findField('allowedModules').setValue(m);
+
+		return true;
 	}
 });
 
