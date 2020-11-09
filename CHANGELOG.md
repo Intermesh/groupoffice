@@ -9,6 +9,7 @@
 - Calendar: zooming in could cause events to move to a day ahead
 - Files: Add index on expiry time to speed up portlet
 - ActiveSync: Fixed z-push-admin.php and z-push-top.php CLI commands
+- Core: Welcome message kept reappearing until logout
 
 06-11-2020 6.4.189
 - Core: upgrade output is logged
