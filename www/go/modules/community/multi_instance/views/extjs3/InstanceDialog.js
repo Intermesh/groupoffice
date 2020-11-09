@@ -4,7 +4,7 @@ go.modules.community.multi_instance.InstanceDialog = Ext.extend(go.form.Dialog, 
 	entityStore: "Instance",
 	modulesStore: new Ext.data.JsonStore({
 		fields: ['id', 'package', 'module', 'title', 'icon', 'allowed', 'localizedPackage'],
-		root: 'availableModules',
+		root: 'allowedModules',
 		id: 'id',
 		remoteSort: false
 	}),
@@ -66,7 +66,7 @@ go.modules.community.multi_instance.InstanceDialog = Ext.extend(go.form.Dialog, 
 					}, {
 						xtype: 'textfield',
 						hidden: true,
-						name: 'availableModules'
+						name: 'allowedModules'
 					}]
 			}
 		];
@@ -96,7 +96,7 @@ go.modules.community.multi_instance.InstanceDialog = Ext.extend(go.form.Dialog, 
 				string = string + record.data.package + "/" + record.data.module + ","
 			}
 		}, this);
-		this.formPanel.getForm().findField('availableModules').setValue(string);
+		this.formPanel.getForm().findField('allowedModules').setValue(string);
 
 		return true;
 	}

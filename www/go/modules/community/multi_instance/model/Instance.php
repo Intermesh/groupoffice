@@ -626,11 +626,11 @@ class Instance extends Entity {
 	}
 
     /**
-     * All available modules;
+     * All modules with allowed bit set;
      * @return array
      * @throws Exception
      */
-    public function getAvailableModules()
+    public function getAllowedModules()
     {
         $modules = \GO::modules()->getAvailableModules(true);
         $instanceConfig = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
@@ -687,8 +687,8 @@ class Instance extends Entity {
         return $retMods;
     }
 
-    public function setAvailableModules($availableString) {
-        $allowedModules = explode(',', $availableString);
+    public function setAllowedModules($allowedString) {
+        $allowedModules = explode(',', $allowedString);
         $config = $this->getInstanceConfig();
         $config['allowed_modules'] = $allowedModules;
         $this->setInstanceConfig($config);
