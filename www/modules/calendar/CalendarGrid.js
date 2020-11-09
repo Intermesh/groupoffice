@@ -690,7 +690,13 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 		var snap = this.getSnap();
 		var gridPosition = this.gridTable.getXY();
 //	console.log(x, gridPosition[0], snap['x'], (x-gridPosition[0]-40)/snap["x"]);
-		return Math.floor((x-gridPosition[0]-40)/snap["x"]);
+
+		//substract 40 for timne label columns
+		var xOnGrid = x - gridPosition[0] - 40;
+
+		var day = Math.floor(xOnGrid / snap["x"]);
+
+		return day;
 	},
 	startSelection : function (e){
 		//check if we are not dragging an event, check for left button		
@@ -730,7 +736,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 
 					this.selector.setXY(position);
 					//substract double border
-					this.selector.setSize(this.snapCol['x'] -2, this.snapCol['y']);
+					this.selector.setSize(this.snapCol['x'], this.snapCol['y']);
 					this.selector.setVisible(true,false);
 				}
 			}
@@ -1309,7 +1315,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 
 
 		event.setXY(startRowPos);
-		event.setSize(snap["x"]-2, height);
+		event.setSize(snap["x"], height);
 
 		if(!eventData.read_only){
 			event.on('mousedown', function(e, eventEl){
@@ -1609,13 +1615,13 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 			{
 				if(typeof(this.rows[startRowId+r]) != 'undefined' && typeof(this.rows[startRowId+r][rowPosition]) != 'undefined')
 				{
-					return eventWidth-2;
+					return eventWidth;
 				}
 			}
 			eventWidth+=posWidth;
 			rowPosition++;
 		}
-		return eventWidth-2;
+		return eventWidth;
 	},
 
 	inAppointmentsArray : function (id, appointments)
@@ -2290,7 +2296,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 			//adjust with offsets so event will not jump to mouse position
 			var x = this.snapPos(this.dragappointmentstartPos[0],mouseEventPos[0]-this.dragXoffset,this.dragSnap["x"],this.days);
 
-			var day = this.getDayByX(mouseEventPos[0]+1);
+			var day = this.getDayByX(mouseEventPos[0]);
 
 			//var gridLeft = this.gridCells[0][0].xy[0]-4;
 			//var gridRight=this.gridCells[this.days-1][47].xy[0]+4;
@@ -2307,12 +2313,12 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 
 		if(this.allDayDragEvent)
 		{
-			var newPos = e.getXY();
+			var newPos = this.allDayDragEvent.getXY();
 
 			if(newPos[0] != this.dragappointmentstartPos[0])
 			{
-				var dragDay = this.getDayByX(this.dragappointmentstartPos[0]+1);
-				var dropDay = this.getDayByX(newPos[0]+1);
+				var dragDay = this.getDayByX(this.dragappointmentstartPos[0]);
+				var dropDay = this.getDayByX(newPos[0]);
 
 				if(dragDay!=dropDay && this.allDayColumns[dropDay])
 				{
@@ -2339,7 +2345,6 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 						event.end_time=event.endDate.format(this.dateTimeFormat);
 
 						var domIds = this.addDaysGridEvent(event);
-
 						this.fireEvent("move", this, event, actionData, domIds);
 					}
 				}

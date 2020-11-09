@@ -3,6 +3,7 @@
 - Multi instance: Brought back allowed modules tab for instances. Thanks to Pieter van de Ven.
 - Core: Order global search results by id descending to speed up search
 - Core: Logo could be cleaned up by garbage collection
+- Calendar: zooming in could cause events to move to a day ahead
 
 06-11-2020 6.4.189
 - Core: upgrade output is logged
