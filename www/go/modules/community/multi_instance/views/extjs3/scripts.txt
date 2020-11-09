@@ -1,3 +1,4 @@
 Module.js
 MainPanel.js
 InstanceDialog.js
+AllowedModulesPanel.js

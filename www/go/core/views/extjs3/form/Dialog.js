@@ -34,6 +34,11 @@ go.form.Dialog = Ext.extend(go.Window, {
 	 * Redirect to the entity detail view after save.
 	 */
 	redirectOnSave: true,
+
+	/**
+	 * Close dialog on submit
+	 */
+	closeOnSubmit: true,
 	
 	panels : null,
 	
@@ -348,12 +353,15 @@ go.form.Dialog = Ext.extend(go.Window, {
 			if(me.redirectOnSave && isNew) {
 				me.entityStore.entity.goto(serverId);
 			}
-			me.close();
+
+			if(me.closeOnSubmit) {
+				me.close();
+			}
 			return serverId;
 
 		}).catch(function(error) {
 			me.showFirstInvalidField();
-			return error;
+			return Promise.reject(error);
 		}).finally(function() {
 			me.actionComplete();
 		})

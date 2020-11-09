@@ -127,7 +127,11 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 
 				me.fireEvent("submit", me, true, serverId);
 
-				return serverId;
+				return me.entityStore.single(serverId).then(function(entity) {
+					me.entity = entity;
+					me.currentId = serverId;
+					return serverId;
+				});
 			} else
 			{
 				//something went wrong

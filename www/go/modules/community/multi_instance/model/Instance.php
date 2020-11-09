@@ -9,10 +9,10 @@ use go\core\http\Client;
 use go\core\http\Request;
 use go\core\jmap\Entity;
 use go\core\orm\Query;
+use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 use go\modules\community\multi_instance\Module;
 use function GO;
-use go\core\util\DateTime;
 
 class Instance extends Entity {
 	
@@ -625,73 +625,82 @@ class Instance extends Entity {
 		return $response['status'] == 200;
 	}
 
-    /**
-     * All modules with allowed bit set;
-     * @return array
-     * @throws Exception
-     */
-    public function getAllowedModules()
-    {
-        $modules = \GO::modules()->getAvailableModules(true);
-        $instanceConfig = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
-        $checkAllowed = false;
-        if (array_key_exists('allowed_modules', $instanceConfig) && is_array($instanceConfig['allowed_modules'])) {
-            $checkAllowed = true;
-        }
-        $returnMods = [];
-        $id = 0;
-        foreach ($modules as $module) {
-            $mod = $module::get();
-            if ($mod instanceof \GO\Base\Module) {
-                $key = $mod->package().$mod->name();
-                // old Framework
-                $avMod = [
-                    'id' => $id,
-                    'package' => 'legacy',
-                    'module' => $mod->name(),
-                    'title' => $mod->localizedName(),
-                    'icon'=> $mod->icon(),
-                    'localizedPackage' => ucfirst($mod->package())
-                ];
-            } elseif ($mod instanceof \go\core\Module) {
-                $key = ucfirst($mod->getPackage()) . $mod->getName();
-                // new Framework
-                $avMod = [
-                    'id' => $id,
-                    'package' => $mod->getPackage(),
-                    'module' => $mod->getName(),
-                    'title' => $mod->getTitle(),
-                    'icon'=> $mod->getIcon(),
-                    'localizedPackage' => ucfirst($mod->getPackage())
-                ];
-            }
-            if ($checkAllowed) {
-                if (in_array($avMod['package'] . '/*', $instanceConfig['allowed_modules']) ||
-                    in_array($avMod['package'] . '/' . $avMod['module'], $instanceConfig['allowed_modules'])) {
-                    $avMod['allowed'] = true;
-                } else {
-                    $avMod['allowed'] = false;
-                }
-            } else {
-                $avMod['allowed'] = true;
-            }
-            $returnMods[$key] = $avMod;
-            $id++;
-        }
+	private static $availableModules;
 
-        $retMods = [];
-        foreach ($returnMods as $key => $mod) {
-            $retMods[] = $mod;
-        }
+	private static function getAvailableModules() {
+		if(!isset(self::$availableModules)) {
+			self::$availableModules =  \GO::modules()->getAvailableModules(true);
+		}
 
-        return $retMods;
-    }
+		return self::$availableModules;
+	}
 
-    public function setAllowedModules($allowedString) {
-        $allowedModules = explode(',', $allowedString);
-        $config = $this->getInstanceConfig();
-        $config['allowed_modules'] = $allowedModules;
-        $this->setInstanceConfig($config);
+	/**
+	 * All modules with allowed bit set;
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getAllowedModules()
+	{
+		$modules = self::getAvailableModules();
+		$instanceConfig = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
+		$checkAllowed = false;
+		if (array_key_exists('allowed_modules', $instanceConfig) && is_array($instanceConfig['allowed_modules'])) {
+			$checkAllowed = true;
+		}
+		$returnMods = [];
+		$id = 0;
+		foreach ($modules as $module) {
+			$mod = $module::get();
+			if ($mod instanceof \GO\Base\Module) {
+				$key = $mod->package() . $mod->name();
+				// old Framework
+				$avMod = [
+					'id' => $id,
+					'package' => 'legacy',
+					'module' => $mod->name(),
+					'title' => $mod->localizedName(),
+					'icon' => $mod->icon(),
+					'localizedPackage' => ucfirst($mod->package())
+				];
+			} elseif ($mod instanceof \go\core\Module) {
+				$key = ucfirst($mod->getPackage()) . $mod->getName();
+				// new Framework
+				$avMod = [
+					'id' => $id,
+					'package' => $mod->getPackage(),
+					'module' => $mod->getName(),
+					'title' => $mod->getTitle(),
+					'icon' => $mod->getIcon(),
+					'localizedPackage' => ucfirst($mod->getPackage())
+				];
+			}
+			if ($checkAllowed) {
+				$avMod['allowed'] = \GO\Base\ModuleCollection::isAllowed($avMod['module'], $avMod['package']);
+			} else {
+				$avMod['allowed'] = true;
+			}
+			$returnMods[$key] = $avMod;
+			$id++;
+		}
 
-    }
+		$retMods = [];
+		foreach ($returnMods as $key => $mod) {
+			$retMods[] = $mod;
+		}
+
+		return $retMods;
+	}
+
+	public function setAllowedModules($allowedModules)
+	{
+		if($this->isNew()) {
+			return;
+		}
+
+		$config = $this->getInstanceConfig();
+		$config['allowed_modules'] = $allowedModules;
+		$this->setInstanceConfig($config);
+
+	}
 }
