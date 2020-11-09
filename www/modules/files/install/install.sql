@@ -278,3 +278,6 @@ CREATE TABLE `fs_folders_custom_fields` (
  PRIMARY KEY (`id`),
  CONSTRAINT `fs_folders_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `fs_folders` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
+
+ALTER TABLE `fs_files` ADD INDEX(`mtime`);
