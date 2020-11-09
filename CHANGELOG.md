@@ -1,3 +1,4 @@
+- Core: Better rendering of accented capital letters in form fields
 - Core: Fixed regression in permissions tab in module management
 - Core: Ignore missing foreign keys when deleting custom fields
 - Multi instance: Brought back allowed modules tab for instances. Thanks to Pieter van de Ven.
