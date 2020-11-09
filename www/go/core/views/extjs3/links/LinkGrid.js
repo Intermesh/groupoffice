@@ -63,7 +63,7 @@ go.links.LinkGrid = Ext.extend(go.grid.GridPanel, {
 		this.store = new go.data.Store({			
 			fields: ['id', 'entityId', 'entity', 'name', 'description', 'filter', {name: 'modifiedAt', type: 'date'}],
 			entityStore: "Search",
-			sortInfo: {
+			sortInfo: this.sortInfo || {
 				field: 'modifiedAt',
 				direction: 'DESC'
 			}
