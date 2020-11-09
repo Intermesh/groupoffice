@@ -267,3 +267,5 @@ $updates['201911221720'][] = "delete FROM `go_state` WHERE `name` LIKE 'popupfb%
 
 $updates['202007231658'][] = "update fs_folders set acl_id = (select aclId from core_module where name='files' limit 0,1) where parent_id=0;";
 $updates['202011061353'][] = "ALTER TABLE `fs_files` ADD INDEX(`mtime`);";
+
+$updates['202011061353'][] = "ALTER TABLE `fs_files` ADD INDEX(`expire_time`);";
