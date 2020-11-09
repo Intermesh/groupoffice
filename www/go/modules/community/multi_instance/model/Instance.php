@@ -430,7 +430,7 @@ class Instance extends Entity {
 	
 	private function getGlobalConfig() {
 		
-		if(!isset($this->instanceConfig)) {			
+		if(!isset($this->globalConfig)) {
 			$globalConfigFile = "/etc/groupoffice/globalconfig.inc.php";
 			if(file_exists($globalConfigFile)) {
 				include("/etc/groupoffice/globalconfig.inc.php");
@@ -624,4 +624,74 @@ class Instance extends Entity {
 
 		return $response['status'] == 200;
 	}
+
+    /**
+     * All modules with allowed bit set;
+     * @return array
+     * @throws Exception
+     */
+    public function getAllowedModules()
+    {
+        $modules = \GO::modules()->getAvailableModules(true);
+        $instanceConfig = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
+        $checkAllowed = false;
+        if (array_key_exists('allowed_modules', $instanceConfig) && is_array($instanceConfig['allowed_modules'])) {
+            $checkAllowed = true;
+        }
+        $returnMods = [];
+        $id = 0;
+        foreach ($modules as $module) {
+            $mod = $module::get();
+            if ($mod instanceof \GO\Base\Module) {
+                $key = $mod->package().$mod->name();
+                // old Framework
+                $avMod = [
+                    'id' => $id,
+                    'package' => 'legacy',
+                    'module' => $mod->name(),
+                    'title' => $mod->localizedName(),
+                    'icon'=> $mod->icon(),
+                    'localizedPackage' => ucfirst($mod->package())
+                ];
+            } elseif ($mod instanceof \go\core\Module) {
+                $key = ucfirst($mod->getPackage()) . $mod->getName();
+                // new Framework
+                $avMod = [
+                    'id' => $id,
+                    'package' => $mod->getPackage(),
+                    'module' => $mod->getName(),
+                    'title' => $mod->getTitle(),
+                    'icon'=> $mod->getIcon(),
+                    'localizedPackage' => ucfirst($mod->getPackage())
+                ];
+            }
+            if ($checkAllowed) {
+                if (in_array($avMod['package'] . '/*', $instanceConfig['allowed_modules']) ||
+                    in_array($avMod['package'] . '/' . $avMod['module'], $instanceConfig['allowed_modules'])) {
+                    $avMod['allowed'] = true;
+                } else {
+                    $avMod['allowed'] = false;
+                }
+            } else {
+                $avMod['allowed'] = true;
+            }
+            $returnMods[$key] = $avMod;
+            $id++;
+        }
+
+        $retMods = [];
+        foreach ($returnMods as $key => $mod) {
+            $retMods[] = $mod;
+        }
+
+        return $retMods;
+    }
+
+    public function setAllowedModules($allowedString) {
+        $allowedModules = explode(',', $allowedString);
+        $config = $this->getInstanceConfig();
+        $config['allowed_modules'] = $allowedModules;
+        $this->setInstanceConfig($config);
+
+    }
 }
