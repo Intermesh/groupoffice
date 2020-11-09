@@ -1,3 +1,4 @@
+- Core: Added extra check for post_max_size php.ini setting to GO test script
 - Core: Better rendering of accented capital letters in form fields
 - Core: Fixed regression in permissions tab in module management
 - Core: Ignore missing foreign keys when deleting custom fields
