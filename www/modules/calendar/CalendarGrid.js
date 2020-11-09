@@ -254,13 +254,15 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 		this.columnWidth = ((ctSize['width']-40-this.scrollOffset)/this.days);
 		this.columnWidth = Math.floor(this.columnWidth);
 
+		//var tableWidth = 40 + this.days * this.columnWidth;
+
 		//generate table for headings and all day events
 		this.headingsTable = Ext.DomHelper.append(this.body,
 		{
 			tag: 'table',
 			id: Ext.id(),
 			cls: "x-calGrid-headings-table",
-			style: "width:"+this.containerSize+"px;"
+			//style: "width:"+this.containerSize+"px;"
 
 		},true);
 
@@ -291,7 +293,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 			tag: 'table',
 			id: Ext.id(),
 			cls: "x-calGrid-all-day-table",
-			style: "width:"+this.containerSize+"px;"
+			//style: "width:"+this.containerSize+"px;"
 
 		},true);
 
@@ -409,7 +411,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 			tag: 'table',
 			id: Ext.id(),
 			cls: "x-calGrid-table",
-			style: "width:"+(ctSize['width']-this.scrollOffset)+"px;"
+			//style: "width:"+(ctSize['width']-this.scrollOffset)+"px;"
 
 		},true);
 
@@ -451,7 +453,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 				id: 'head'+i,
 				cls: "x-calGrid-timeHead",
 				html: Date.parseDate(i/this.rowsPerHour, "G").format(timeformat),
-				style: 'width:40px;height:'+timeColHeight+'px'
+				style: 'width:39px;height:'+timeColHeight+'px'
 				}, true);
 		}
 
@@ -1313,7 +1315,6 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 		// var height = endRowPos[1]-startRowPos[1]+snap["y"]+3;
 		var height = endRowPos[1]-startRowPos[1]+snap["y"];
 
-
 		event.setXY(startRowPos);
 		event.setSize(snap["x"], height);
 
@@ -1599,7 +1600,7 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 				this.appointments[day][i].setWidth(eventWidth);
 
 				var offset = positions[this.appointments[day][i].id]*posWidth;
-				this.appointments[day][i].setX(dayColumnLeft+offset);
+				this.appointments[day][i].setX(dayColumnLeft + offset);
 			}
 		}
 	},
