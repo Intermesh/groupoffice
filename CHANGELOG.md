@@ -1,3 +1,5 @@
+- Core: Ignore missing foreign keys when deleting custom fields
+
 06-11-2020 6.4.189
 - Core: upgrade output is logged
 - Core: When installing module first check if it's not already installed to prevent data loss.
