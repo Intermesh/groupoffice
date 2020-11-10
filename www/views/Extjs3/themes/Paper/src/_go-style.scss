@@ -1207,8 +1207,8 @@ tr.go-grid-row {
 	.s11 {width:91.666666%;}
 	.s12 {width:100%;}
 	.pad {
-		padding-left: dp(16);
-		padding-bottom:dp(8)
+		padding: dp(8) dp(16);
+		//padding-bottom:dp(8)
 	}
 
 	label {
