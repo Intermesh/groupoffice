@@ -216,7 +216,7 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 		$fn = $asText ? 'textToDb' : 'apiToDb';
 		foreach($this->getCustomFieldModels() as $field) {
 			//if client didn't post value then skip it
-			if(array_key_exists($field->databaseName, $data)) {
+ 			if(array_key_exists($field->databaseName, $data)) {
 				$data[$field->databaseName] = $field->getDataType()->$fn(isset($data[$field->databaseName]) ? $data[$field->databaseName] : null,  $this, $this->entity);
 			}
 		}
@@ -230,7 +230,8 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 	public function getCustomFieldModels() {
 		$cls = get_class($this->entity);
 
-		return $cls::getCustomFieldModels();
+		$models = $cls::getCustomFieldModels();
+		return $models;
 	}
 
 	/**
@@ -307,7 +308,7 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 				}
 			}
 
-			$this->setValues($record);
+			$this->data = $record;
 
 			//After save might need this.
 			//$this->data['id'] = $this->entity->id;

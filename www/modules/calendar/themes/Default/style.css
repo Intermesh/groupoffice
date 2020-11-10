@@ -249,6 +249,7 @@ border-collapse:collapse;
 	table-layout:fixed;
 	border-collapse: collapse;
 }
+
 .x-calGrid-blankRow,.x-calGrid-hourRow{
 	/*new theme fix */
 	/* box-sizing: content-box; */
@@ -275,11 +276,12 @@ border-collapse:collapse;
 
 .x-calGrid-timeHead{
 	background-color: transparent;
-	width:39px !important;
+	width:40px;
 	height:20px;
 	border-top:1px solid rgba(0,0,0, 0.04);
 	border-right:1px solid rgba(0,0,0, 0.04);
 	text-align:right;
+	overflow: hidden;
 }
 /*.x-calGrid-today{
 	background-color:rgba(0,0,0, 0.04) !important;
@@ -338,6 +340,7 @@ border-collapse:collapse;
 	overflow:auto;
 	position:relative;
 	font:normal 11px arial, tahoma, helvetica, sans-serif;
+	margin: -1px;
 }
 
 .x-calGrid-headings-table {
@@ -372,7 +375,7 @@ border-collapse:collapse;
 
 
 .x-calGrid-all-day-first-col{
-	width: 40px !important;
+	width: 40px;
 	/*border-right:1px solid rgba(0,0,0, 0.12);;*/	
 } 
 

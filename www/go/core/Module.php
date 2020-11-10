@@ -97,6 +97,11 @@ abstract class Module extends Singleton {
 	public final function install() {
 
 		try{
+
+			if(model\Module::findByName($this->getPackage(), $this->getName(), null)) {
+				throw new \Exception("This module has already been installed!");
+			}
+
 			go()->getDbConnection()->pauseTransactions();
 			$this->installDatabase();
 			go()->getDbConnection()->resumeTransactions();
