@@ -1,3 +1,6 @@
+
+- Studio: fixed (re)generation of ACL entity models
+
 06-11-2020 6.4.190
 - Email: find correct translation string for 'Advanced'
 - Core: Added extra check for post_max_size php.ini setting to GO test script
