@@ -1675,6 +1675,9 @@ abstract class Property extends Model {
 	 * @param MappedTable $table
 	 */
 	private function rollBackAutoIncrement(MappedTable $table) {
+		if(!$this->recordIsNew($table)) {
+			return;
+		}
 		$aiCol = $table->getAutoIncrementColumn();
 
 		if ($aiCol) {
