@@ -341,7 +341,7 @@ abstract class Module extends Singleton {
 	/**
 	 * Get dependent modules.
 	 * 
-	 * @return string[] eg. ["community/notes"]
+	 * @return array[] eg. ["community/notes"]
 	 */
 	public function getDependencies() {
 		return [];
