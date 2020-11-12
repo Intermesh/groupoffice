@@ -61,6 +61,11 @@ abstract class State {
 		return $this->getBaseUrl() . "/download.php?blob=".$blobId;
 	}
 
+	/**
+	 * Get URL to page.php
+	 *
+	 * @return string
+	 */
 	public function getPageUrl() {
 		return $this->getBaseUrl(). "/page.php";
 	}
