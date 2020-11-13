@@ -104,38 +104,6 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 			this.edit(record.data.id);
 		}, this);
 	},
-	
-	
-	//This reloads the domains combo after changes. 
-	entityStore: "SmtpAccount",	
-
-	initRowActions: function () {
-
-		var actions = new Ext.ux.grid.RowActions({
-			menuDisabled: true,
-			hideable: false,
-			draggable: false,
-			fixed: true,
-			header: '',
-			hideMode: 'display',
-			keepSelection: true,
-
-			actions: [{
-					iconCls: 'ic-more-vert'
-			}]
-		});
-
-		actions.on({
-			action: function (grid, record, action, row, col, e, target) {				
-				this.showMoreMenu(record, e);
-			},
-			scope: this
-		});
-
-		return actions;
-
-	},
-	
 
 	
 	edit: function(id) {
