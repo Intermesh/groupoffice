@@ -1,5 +1,7 @@
 
+- Studio: disabled locking and unlocking of studio modules.
 - Studio: fixed (re)generation of ACL entity models
+- Studio: check whether package / module in allowed_modules
 
 06-11-2020 6.4.190
 - Email: find correct translation string for 'Advanced'
