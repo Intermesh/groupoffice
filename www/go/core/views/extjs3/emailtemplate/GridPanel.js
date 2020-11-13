@@ -99,71 +99,7 @@ go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 			this.edit(record.data.id);
 		}, this);
 	},
-	
-	
-	//This reloads the domains combo after changes. 
-	entityStore: "SmtpAccount",	
 
-	initRowActions: function () {
-
-		var actions = new Ext.ux.grid.RowActions({
-			menuDisabled: true,
-			hideable: false,
-			draggable: false,
-			fixed: true,
-			header: '',
-			hideMode: 'display',
-			keepSelection: true,
-
-			actions: [{
-					iconCls: 'ic-more-vert'
-			}]
-		});
-
-		actions.on({
-			action: function (grid, record, action, row, col, e, target) {				
-				this.showMoreMenu(record, e);
-			},
-			scope: this
-		});
-
-		return actions;
-
-	},
-	
-	showMoreMenu : function(record, e) {
-		if(!this.moreMenu) {
-			this.moreMenu = new Ext.menu.Menu({
-				items: [
-					{
-						itemId: "edit",
-						iconCls: 'ic-edit',
-						text: t("Edit"),
-						handler: function() {
-							
-							this.edit(this.moreMenu.record.data.id);
-							
-						},
-						scope: this
-					},{
-						itemId: "delete",
-						iconCls: 'ic-delete',
-						text: t("Delete"),
-						handler: function() {
-							this.getSelectionModel().selectRecords([this.moreMenu.record]);
-							this.deleteSelected();
-						},
-						scope: this
-					}
-					
-				]
-			});
-		}	
-		
-		this.moreMenu.record = record;		
-		this.moreMenu.showAt(e.getXY());
-	},
-	
 	edit: function(id) {
 		var dlg = new go.emailtemplate.TemplateDialog();
 		dlg.load(id).show();
