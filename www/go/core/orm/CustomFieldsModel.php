@@ -7,6 +7,7 @@ use go\core\data\ArrayableInterface;
 use go\core\db\Query;
 use go\core\db\Table;
 use go\core\db\Utils;
+use go\core\http\Exception;
 use go\core\Installer;
 use go\core\model\Field;
 use go\core\util\DateTime;
@@ -115,7 +116,11 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 
 	public function __isset($name)
 	{
-		$val = $this->getValue($name);
+		try {
+			$val = $this->getValue($name);
+		} catch(Exception $e) {
+			return false;
+		}
 		return isset($val);
 	}
 
