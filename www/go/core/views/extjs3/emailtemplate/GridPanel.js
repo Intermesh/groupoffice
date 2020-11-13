@@ -70,11 +70,8 @@ go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 				{
 					id: 'name',
 					header: t('Name'),
-					sortable: false,
-					dataIndex: 'name',
-					hideable: false,
-					draggable: false,
-					menuDisabled: true
+					sortable: true,
+					dataIndex: 'name'
 				},
 				 {
 					id:'language',
