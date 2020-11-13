@@ -1,4 +1,5 @@
 
+- Studio: set sort direction for ID field
 - Studio: disabled locking and unlocking of studio modules.
 - Studio: fixed (re)generation of ACL entity models
 - Studio: check whether package / module in allowed_modules

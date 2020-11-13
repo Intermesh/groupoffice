@@ -19,7 +19,7 @@ class TemplateField extends TextArea {
 		try {
 			$parsed = $tplParser->parse($tpl);
 		}
-		catch(\Exception $e) {
+		catch(\Throwable $e) {
 			ErrorHandler::logException($e);
 			$parsed = $e->getMessage();
 		}
