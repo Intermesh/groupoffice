@@ -26,6 +26,8 @@ use Throwable;
  * 
  * - BLOB storage
  * - core_change sync changelog
+ *
+ * Modules can use EVENT_RUN to extend the process
  * 
  */
 class GarbageCollection extends CronJob {
