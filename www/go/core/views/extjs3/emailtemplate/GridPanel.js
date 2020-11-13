@@ -2,14 +2,42 @@
 go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 	module: null,
 	viewConfig: {
-		forceFit: true,
-		autoFill: true,
 		emptyText: 	'<p>' +t("No items to display") + '</p>'
 	},
 
 	initComponent: function () {
 
-		var actions = this.initRowActions();
+		this.viewConfig.actionConfig = {
+			scope: this,
+			menu: {
+				items: [
+					{
+						itemId: "edit",
+						iconCls: 'ic-edit',
+						text: t("Edit"),
+						handler: function(item) {
+
+							var record = this.store.getAt(item.parentMenu.rowIndex);
+
+							this.edit(record.data.id);
+
+						},
+						scope: this
+					},{
+						itemId: "delete",
+						iconCls: 'ic-delete',
+						text: t("Delete"),
+						handler: function(item) {
+							var record = this.store.getAt(item.parentMenu.rowIndex);
+							this.getSelectionModel().selectRecords([record]);
+							this.deleteSelected();
+						},
+						scope: this
+					}
+
+				]
+			}
+		};
 
 		Ext.apply(this, {	
 			tbar: [
@@ -31,14 +59,13 @@ go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 			}],
 			
 			store: new go.data.Store({
-				fields: ['id', 'name'],
+				fields: ['id', 'name', 'language'],
 				entityStore: "EmailTemplate",
 				filters: {
 					module: {module: this.module}
 				}	
 			}),
 			autoHeight: true,
-			plugins: [actions],
 			columns: [
 				{
 					id: 'name',
@@ -49,14 +76,20 @@ go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 					draggable: false,
 					menuDisabled: true
 				},
-				actions
+				 {
+					id:'language',
+					header:t("Language"),
+					dataIndex: "language",
+					sortable: true
+				}
 			],
 			listeners : {
 				render: function() {
 					this.store.load();
 				},
 				scope: this
-			}
+			},
+			autoExpandColumn: "name"
 		});
 
 		go.smtp.GridPanel.superclass.initComponent.call(this);

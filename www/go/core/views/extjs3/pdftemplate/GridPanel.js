@@ -3,8 +3,6 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 	module: null,
 	key: null,
 	viewConfig: {
-		forceFit: true,
-		autoFill: true,
 		emptyText: 	'<p>' +t("No items to display") + '</p>'
 	},
 
@@ -15,7 +13,38 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 
 	initComponent: function () {
 
-		var actions = this.initRowActions();
+
+		this.viewConfig.actionConfig = {
+			scope: this,
+			menu: {
+				items: [
+					{
+						itemId: "edit",
+						iconCls: 'ic-edit',
+						text: t("Edit"),
+						handler: function(item) {
+
+							var record = this.store.getAt(item.parentMenu.rowIndex);
+
+							this.edit(record.data.id);
+
+						},
+						scope: this
+					},{
+						itemId: "delete",
+						iconCls: 'ic-delete',
+						text: t("Delete"),
+						handler: function(item) {
+							var record = this.store.getAt(item.parentMenu.rowIndex);
+							this.getSelectionModel().selectRecords([record]);
+							this.deleteSelected();
+						},
+						scope: this
+					}
+
+				]
+			}
+		};
 
 		Ext.apply(this, {	
 			tbar: [
@@ -37,25 +66,25 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 			}],
 			
 			store: new go.data.Store({
-				fields: ['id', 'name'],
+				fields: ['id', 'name', 'language'],
 				entityStore: "PdfTemplate",
 				filters: {
 					module: {module: this.module, key: this.key}
 				}	
 			}),
 			autoHeight: true,
-			plugins: [actions],
 			columns: [
 				{
 					id: 'name',
 					header: t('Name'),
-					sortable: false,
 					dataIndex: 'name',
-					hideable: false,
-					draggable: false,
-					menuDisabled: true
-				},
-				actions
+					sortable: true
+				}, {
+					id:'language',
+					header:t("Language"),
+					dataIndex: "language",
+					sortable: true
+				}
 			],
 			listeners : {
 				render: function() {
@@ -64,7 +93,8 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 					}
 				},
 				scope: this
-			}
+			},
+			autoExpandColumn: "name"
 		});
 
 		go.smtp.GridPanel.superclass.initComponent.call(this);
@@ -106,38 +136,7 @@ go.pdftemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 
 	},
 	
-	showMoreMenu : function(record, e) {
-		if(!this.moreMenu) {
-			this.moreMenu = new Ext.menu.Menu({
-				items: [
-					{
-						itemId: "edit",
-						iconCls: 'ic-edit',
-						text: t("Edit"),
-						handler: function() {
-							
-							this.edit(this.moreMenu.record.data.id);
-							
-						},
-						scope: this
-					},{
-						itemId: "delete",
-						iconCls: 'ic-delete',
-						text: t("Delete"),
-						handler: function() {
-							this.getSelectionModel().selectRecords([this.moreMenu.record]);
-							this.deleteSelected();
-						},
-						scope: this
-					}
-					
-				]
-			});
-		}	
-		
-		this.moreMenu.record = record;		
-		this.moreMenu.showAt(e.getXY());
-	},
+
 	
 	edit: function(id) {
 		var dlg = new go.pdftemplate.TemplateDialog();
