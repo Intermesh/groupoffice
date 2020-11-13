@@ -1,6 +1,20 @@
+/**
+ *
+ * @example
+ * ```
+ * {
+						xtype: 'selectfield',
+						name: 'encryption',
+						fieldLabel: t('Encryption'),
+						options: [['tls', 'TLS'], ['ssl', 'SSL'], [null, 'None']],
+						value: 'tls'
+					}
+
+ ```
+ */
 go.form.SelectField = Ext.extend(go.form.ComboBox, {
 
-    options: {},
+    options: null,
     valueField: 'value',
     displayField: 'text',
     mode: 'local',

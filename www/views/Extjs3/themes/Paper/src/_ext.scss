@@ -693,7 +693,7 @@
 
 	&.small {
 		transform: scale(.8);
-		margin-top: dp(-4);
+		transform-origin: center center;
 	}
 
 	@extend %font-button;

@@ -1,5 +1,6 @@
 /* global Ext */
 
+
 /**
  * 
  * new go.form.FormGroup({
@@ -23,10 +24,19 @@
  *				name: "text",
  *				anchor: "100%",
  *				setFocus: true //this will focus this field when a new item has been added
+ *			},{
+ *			 xtype: "button",
+ *			 handler: function(btn) {
+ *			 //find row index and form
+ *			   var index = btn.findParentByType("formgroupitemcontainer").rowIndex,
+									 form = btn.findParentByType("entityform");
+ *			 }
  *			}]
  *	}
  *})
  */
+
+
 go.form.FormGroup = Ext.extend(Ext.Panel, {
 	isFormField: true,
 	
@@ -259,14 +269,11 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			}
 		}
 
-		var wrap = new Ext.Container({
+		var wrap = new go.form.FormGroupItemContainer({
 			id: rowId,
 			rowIndex: this.items ? this.items.getCount() : 0,
-			cls: 'go-form-group-row',
-			layout: "column",
-			formField: formField,			
-			findBy: false,
-			isFormField: false,
+
+			formField: formField,
 			style: this.pad ?  "padding-top: " + dp(16) + "px" : "",
 			items: items
 		});
@@ -371,13 +378,17 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			records.forEach(set);
 		}
 
+		if(this.startWithItem) {
+			this.addPanel(true);
+		}
+
 		this.doLayout();
 	},
 	
 
 	getValue: function () {
 		var v = this.mapKey ? {} : [];
-		if(!this.items || (this.items.getCount() == 1 && this.items.get(0).formField.auto && !this.items.get(0).formField.isDirty())) {
+		if(!this.items) {// || (this.items.getCount() == 1 && this.items.get(0).formField.auto && !this.items.get(0).formField.isDirty())) {
 			return v;
 		}
 
@@ -387,6 +398,10 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			// if(this.sortColumn) {
 			// 	item[this.sortColumn] = index;
 			// }
+
+			if(index == this.items.length -1 && item.auto && !item.isDirty()) {
+				return;
+			}
 
 			if(this.mapKey) {
 				// TODO make minimal PatchObject
@@ -410,12 +425,10 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 		}
 
 		var f = this.getAllFormFields();
-		if(f.length == 1 && f[0].auto && !f[0].isDirty()) {
-			return true;
-		}
+
 
 		for(var i = 0, l = f.length; i < l; i++) {
-			if(!f[i].isValid(preventMark)) {
+			if(!(i == (l - 1) && f[i].auto && !f[i].isDirty()) && !f[i].isValid(preventMark)) {
 				return false;
 			}
 		}
@@ -439,13 +452,9 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	validate: function () {
 		var f = this.getAllFormFields();
 
-		if(f.length == 1 && f[0].auto && !f[0].isDirty()) {
-			return true;
-		}
-
 		for(var i = 0, l = f.length; i < l; i++) {
-			if(!f[i].validate()) {
-				return false;
+			if(!(i == (l - 1) && f[i].auto && !f[i].isDirty()) && !f[i].validate()) {
+					return false;
 			}
 		}
 		return true;
@@ -469,3 +478,12 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 });
 
 Ext.reg('formgroup', go.form.FormGroup);
+
+go.form.FormGroupItemContainer = Ext.extend(Ext.Container, {
+
+	findBy: false,
+	isFormField: false,
+	cls: 'go-form-group-row',
+	layout: "column"
+});
+Ext.reg('formgroupitemcontainer', go.form.FormGroupItemContainer);
