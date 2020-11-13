@@ -59,20 +59,24 @@ go.menu.StoreMenu = Ext.extend(Ext.menu.Menu, {
   initComponent: function () {
 
     this.on('show', this.loadMenu, this);
-    //this.store.on('beforeload', this.onBeforeLoad, this);
     this.store.on('load', this.onLoad, this);
 
     this.addEvents({load: true, itemclick: true, createitem: true});
 
-    this.on("afterrender", function() {
-      this.updateMenuItems();
-    });
+    // this.on("afterrender", function() {
+    //   this.updateMenuItems();
+    // });
 
     go.menu.StoreMenu.superclass.initComponent.call(this);
+
+    this.add({
+      text: "<small>" + this.loadingText + "</small>"
+    });
   },
 
   loadMenu: function () {
     if(!this.store.loaded && !this.store.loading) {
+
       this.store.load();    
     }
   },
