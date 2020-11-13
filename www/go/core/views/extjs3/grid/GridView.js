@@ -118,7 +118,11 @@ Ext.define('go.grid.GridView', {
 		var offset = (rowEl.getHeight() - this.actionBtn.getHeight()) / 2;
 
 		var y = rowEl.getY() + offset;
-		var x = this.scroller.getX() + this.scroller.getWidth() - dp(40) - this.scrollOffset;
+
+		var x = this.scroller.getX() + this.scroller.getWidth() - dp(40);
+		if(this.scrollOffset) {
+			x -= this.scrollOffset;
+		}
 		var pos = [x,y];
 		this.actionBtn.getEl().setXY(pos);
 		this.actionBtn.rowIndex = rowIndex;
