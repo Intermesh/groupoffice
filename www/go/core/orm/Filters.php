@@ -36,6 +36,26 @@ class Filters {
 		
 		return $this;
 	}
+
+
+	/**
+	 * Add a filter on a column name
+	 *
+	 * Shortcut for:
+	 *
+	 * ```
+	 * ->add('businessId', function(Criteria  $c, $value) {
+	 *  $c->andWhere('businessId', $value);
+	 * });
+	 * ```
+	 * @param $name
+	 * @return $this
+	 */
+	public function addColumn($name) {
+		return $this->add($name, function(Criteria  $c, $value) use ($name) {
+			$c->andWhere($name, '=', $value);
+		});
+	}
 	
 	// private function validate(Query $query, array $filter) {
 	// 	$invalidFilters = array_diff(array_map('strtolower',array_keys($filter)), array_keys($this->filters));
