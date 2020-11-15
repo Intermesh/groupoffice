@@ -1,3 +1,49 @@
+
+- Studio: set sort direction for ID field
+- Studio: disabled locking and unlocking of studio modules.
+- Studio: fixed (re)generation of ACL entity models
+- Studio: check whether package / module in allowed_modules
+
+06-11-2020 6.4.190
+- Email: find correct translation string for 'Advanced'
+- Core: Added extra check for post_max_size php.ini setting to GO test script
+- Core: Better rendering of accented capital letters in form fields
+- Core: Fixed regression in permissions tab in module management
+- Core: Ignore missing foreign keys when deleting custom fields
+- Multi instance: Brought back allowed modules tab for instances. Thanks to Pieter van de Ven.
+- Core: Order global search results by id descending to speed up search
+- Core: Logo could be cleaned up by garbage collection
+- Calendar: zooming in could cause events to move to a day ahead
+- Files: Add index on expiry time to speed up portlet
+- ActiveSync: Fixed z-push-admin.php and z-push-top.php CLI commands
+- Core: Welcome message kept reappearing until logout
+- Time tracking: HTML entities were shown as code in edit dialog
+
+06-11-2020 6.4.189
+- Core: upgrade output is logged
+- Core: When installing module first check if it's not already installed to prevent data loss.
+- Core: invalid allowed_modules string could show incorrect installed/enabled status in the modules section
+- Core: Ignore error when creating a link that already exists
+- Core: demodata error when clicking 'no'
+- Core: welcome message is displayed
+- Core: Custom field type Encrypted text showed hash value
+
+03-11-2020 6.4.188
+- Core: Refactored custom fields to handle functions inside other functions and detect infinite loops for template fields
+  and function fields.
+- Core: Stop CRON execution when upgrade is needed
+- Core: Run GarbageCollection once per day at midnight instead of every hour
+- Core: added more Romanian translations thanks to Safety Broker de Asigurare SRL
+- Projects: Removed projects v1 to v2 upgrade. UPgrade must be done in v6.2.
+- Serverclient: Works when using e-mail as username
+- Core: remove double key and clean up core_customfields_select_option before adding foreign key in upgrade
+- Core: Fixed internationalization of search keywords
+- Custom fields: Only 1 column on mobiles]
+- Projects: Link was not established when creating from other items
+- Billing: Create link to quote and contacts when automatically creating task
+- Projects: Status filter applied to search when not needed
+- Core: Search splits words from text area fields only and not from small fields. So initials in a contact remain intact for example
+
 27-10-2020 6.4.187
 - Core: Set core_acl.ownedBy to 1 when user has been removed.  
 - Core: Cleanup address books and note books on user delete

@@ -1,10 +1,9 @@
 <?php
 namespace go\core\orm;
 
-use go\core\App;
 use go\core\customfield\Html;
+use go\core\customfield\TextArea;
 use go\core\db\Query;
-use go\core\model\Link;
 
 /**
  * Entities can use this trait to make it show up in the global search function
@@ -45,9 +44,11 @@ trait SearchableTrait {
 	 * @param $text
 	 * @return array|false|string[]
 	 */
-	private static function splitTextKeywords($text) {
-		$split = preg_split('/[^\w\-_\+\\\\\/:]/', strtolower($text), 0, PREG_SPLIT_NO_EMPTY);
-		return $split;
+	public static function splitTextKeywords($text) {
+		mb_internal_encoding("UTF-8");
+		mb_regex_encoding("UTF-8");
+//		$split = preg_split('/[^\w\-_\+\\\\\/:]/', mb_strtolower($text), 0, PREG_SPLIT_NO_EMPTY);
+		return mb_split('[^\w\-_\+\\\\\/:]', mb_strtolower($text), -1);
 	}
 
 	/**
@@ -73,13 +74,13 @@ trait SearchableTrait {
 		$search->name = $this->title();
 		$search->description = $this->getSearchDescription();
 		$search->filter = $this->getSearchFilter();
-		$search->modifiedAt = $this->modifiedAt;
+		$search->modifiedAt = property_exists($this, 'modifiedAt') ? $this->modifiedAt : new \DateTime();
 		
 //		$search->createdAt = $this->createdAt;
 		
 		$keywords = $this->getSearchKeywords();
 		if(!isset($keywords)) {
-			$keywords = [$search->name, $search->description];
+			$keywords = array_merge([$search->name], self::splitTextKeywords($search->description));
 		}
 
 		$links = (new Query())
@@ -94,39 +95,14 @@ trait SearchableTrait {
 			}
 
 		}
-		
-		if(method_exists($this, 'getCustomFields')) {
 
-			$cfData = $this->getCustomFields(true);
-
-			foreach(static::getCustomFieldModels() as $field) {
-
-				if($field->getDataType() instanceof Html) {
-					continue;
-				}
-
-				$v = $cfData[$field->databaseName];
-
-				if(is_array($v)) {
-					foreach($v as $i) {
-						if(!empty($v) && is_string($v)) {
-							$keywords[] = $v;
-						}
-					}
-				} else if(!empty($v) && is_string($v)) {
-					$keywords[] = $v;
-				}
-			}
+		if (method_exists($this, 'getCustomFields')) {
+			$keywords = array_merge($keywords, $this->getCustomFieldsSearchKeywords());
 		}
 
-		$sanitized = [];
-		foreach($keywords as $keyword) {
-			$sanitized = array_merge($sanitized, self::splitTextKeywords($keyword));
-		}
-
-		$sanitized = array_unique($sanitized);
+		$keywords = array_unique($keywords);
 		
-		$search->setKeywords(implode(' ', $sanitized));
+		$search->setKeywords(implode(' ', $keywords));
 		
 		if(!$search->internalSave()) {
 			throw new \Exception("Could not save search cache: " . var_export($search->getValidationErrors(), true));
@@ -134,6 +110,8 @@ trait SearchableTrait {
 		
 		return true;
 	}
+
+
 	
 	public static function deleteSearchAndLinks(Query $query) {
 		$delSearchStmt = \go()->getDbConnection()

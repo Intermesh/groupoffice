@@ -169,7 +169,7 @@ class Search extends AclOwnerEntity {
 	public static function sort(\go\core\orm\Query $query, array $sort)
 	{
 		if(empty($sort)) {
-			$sort['s.modifiedAt'] = 'DESC';
+			$sort['s.id'] = 'DESC'; //sort by id is fast. Sorting by modified at is slow
 		}
 
 		return parent::sort($query, $sort);

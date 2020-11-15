@@ -31,7 +31,7 @@ class DateTime extends Base {
 		});
 	}
 
-	public function dbToText($value, &$values, $entity)
+	public function dbToText($value, \go\core\orm\CustomFieldsModel $values, $entity)
 	{
 		if(!isset($value)) {
 			return "";

@@ -269,14 +269,21 @@ class Module extends AclOwnerEntity {
 	 * 
 	 * @param string $package
 	 * @param string $name
-	 * @param bool $enabled
+	 * @param bool $enabled Set to null to return both enable and disabled
 	 * @return self
 	 */
 	public static function findByName($package, $name, $enabled = true) {
 		if($package == "legacy") {
 			$package = null;
 		}
-		return static::find()->where(['package' => $package, 'name' => $name, 'enabled' => $enabled])->single();
+
+		$where = ['package' => $package, 'name' => $name];
+
+		if($enabled !== null) {
+			$where['enabled'] = $enabled;
+		}
+
+		return static::find()->where($where)->single();
 	}
 
 	/**

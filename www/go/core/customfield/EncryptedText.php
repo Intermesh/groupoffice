@@ -14,11 +14,11 @@ class EncryptedText extends Base {
 		return "TEXT NULL";
 	}
 	
-	public function dbToApi($value, &$values, $entity) {
+	public function dbToApi($value, \go\core\orm\CustomFieldsModel $values, $entity) {
 		return isset($value) ? Crypt::decrypt($value) : null;
 	}
 	
-	public function apiToDb($value, &$values, $entity) {
+	public function apiToDb($value, \go\core\orm\CustomFieldsModel $values, $entity) {
 		return isset($value) ? Crypt::encrypt($value) : null;
 	}
 	

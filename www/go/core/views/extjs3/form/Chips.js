@@ -43,6 +43,7 @@
 go.form.ChipsView = Ext.extend(Ext.DataView, {
 	autoHeight: true,
 	multiSelect: true,
+	pageSize: null,
 	overClass: 'x-view-over',
 	itemSelector: 'div.go-chip',
 	displayField: 'display',
@@ -286,7 +287,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			hideLabel: true,
 			anchor: '100%',
 			emptyText: t("Please select..."),
-			pageSize: this.entityStore ? 50 : null,
+			pageSize: this.entityStore ? 50 : this.pageSize,
 			valueField: 'id',
 			displayField: this.displayField,
 			triggerAction: 'all',

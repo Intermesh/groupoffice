@@ -97,6 +97,11 @@ abstract class Module extends Singleton {
 	public final function install() {
 
 		try{
+
+			if(model\Module::findByName($this->getPackage(), $this->getName(), null)) {
+				throw new \Exception("This module has already been installed!");
+			}
+
 			go()->getDbConnection()->pauseTransactions();
 			$this->installDatabase();
 			go()->getDbConnection()->resumeTransactions();
@@ -336,7 +341,7 @@ abstract class Module extends Singleton {
 	/**
 	 * Get dependent modules.
 	 * 
-	 * @return string[] eg. ["community/notes"]
+	 * @return array[] eg. ["community/notes"]
 	 */
 	public function getDependencies() {
 		return [];
@@ -475,7 +480,7 @@ abstract class Module extends Singleton {
 	 */
 	public function getModel() {
 
-		if(!isset($this->model)) {
+		if(!$this->model) {
 			$this->model = model\Module::findByName($this->getPackage(), $this->getName());
 		}
 
