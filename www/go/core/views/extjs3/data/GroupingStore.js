@@ -1,3 +1,26 @@
+/**
+ * GroupingStore:
+ *
+ * eg.
+ * ```
+ * this.store = new go.data.GroupingStore({
+ *
+ *			fields: ['id', 'package', 'module', 'title', 'icon', 'allowed', 'localizedPackage'],
+ *			root: 'allowedModules',
+ *			id: 'id',
+ *
+ *			remoteGroup: false,
+ *			remoteSort: false,
+ *			groupField: 'localizedPackage'
+ *
+ *		});
+ *
+ *		this.view = new Ext.grid.GroupingView({
+ *			hideGroupedColumn:true,
+ *			emptyText: t("No items to display")
+ *		});
+ * ```
+ */
 go.data.GroupingStore = Ext.extend(Ext.data.GroupingStore, {
 	
 	autoDestroy: true,
@@ -5,7 +28,9 @@ go.data.GroupingStore = Ext.extend(Ext.data.GroupingStore, {
 	constructor: function (config) {
 		
 		config = config || {};
-		config.root = "records";
+		if(!config.root) {
+			config.root = "records";
+		}
 
 		Ext.applyIf(this, go.data.StoreTrait);
 		
@@ -18,7 +43,9 @@ go.data.GroupingStore = Ext.extend(Ext.data.GroupingStore, {
 				sort: 'sort', // The parameter name which specifies the column to sort on
 				dir: 'dir'       // The parameter name which specifies the sort direction
 			},
-			proxy: new go.data.EntityStoreProxy(config),
+			proxy: config.entityStore ?
+				new go.data.EntityStoreProxy({entityStore: config.entityStore, fields: config.fields, store: this}) :
+				new go.data.JmapProxy({method: config.method, fields: config.fields, store: this}),
 			reader: new Ext.data.JsonReader(config)
 		}));
 		

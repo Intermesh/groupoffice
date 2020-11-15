@@ -572,6 +572,10 @@ String.prototype.regexpEscape = function() {
 
 GO.util.numberFormat = function (number, decimals, decimal_separator, thousands_separator)
 {
+	if(number == "∞") {
+		return "∞";
+	}
+
 	if(typeof(decimals)=='undefined')
 	{
 		decimals=2;

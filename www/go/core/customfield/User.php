@@ -39,10 +39,16 @@ class User extends Base {
 		return $this->field->tableName() . "_ibfk_go_" . $this->field->id;
 	}
 	
-	public function onFieldDelete() {		
-		$sql = "ALTER TABLE `" . $this->field->tableName() . "` DROP FOREIGN KEY " . $this->getConstraintName();
-		if(!go()->getDbConnection()->query($sql)) {
-			throw new \Exception("Couldn't drop foreign key");
+	public function onFieldDelete() {
+		try {
+			$sql = "ALTER TABLE `" . $this->field->tableName() . "` DROP FOREIGN KEY " . $this->getConstraintName();
+			if(!go()->getDbConnection()->query($sql)) {
+				throw new \Exception("Couldn't drop foreign key");
+			}
+		} catch(\PDOException $e) {
+
+			//ignore
+			go()->getDebugger()->warn($e);
 		}
 			
 		return parent::onFieldDelete();
@@ -72,7 +78,7 @@ class User extends Base {
 	}
 
 
-	public function dbToText($value, &$values, $entity) {
+	public function dbToText($value, \go\core\orm\CustomFieldsModel $values, $entity) {
 
 		if(empty($value)) {
 			return "";
@@ -85,7 +91,7 @@ class User extends Base {
 			->single();
 	}
 
-	public function textToDb($value, &$values, $entity) {
+	public function textToDb($value, \go\core\orm\CustomFieldsModel $values, $entity) {
 
 		if(empty($value)) {
 			return null;

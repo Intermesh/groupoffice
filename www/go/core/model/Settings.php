@@ -491,6 +491,17 @@ class Settings extends core\Settings {
 	
 	
 	public function save() {
+
+		if(isset($this->logoId)) {
+			//todo settings should have real columns with real keys?
+			$blob = core\fs\Blob::findById($this->logoId);
+			if($blob && isset($blob->staleAt)) {
+				$blob->staleAt = null;
+				$blob->save();
+			}
+		}
+
+
 		
 		//for old framework config caching in GO\Base\Config
 		if(isset($_SESSION)) {

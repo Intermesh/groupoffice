@@ -82,28 +82,27 @@ class ModuleController extends AbstractJsonController{
 			
 			
 			if($module instanceof \go\core\Module) {
-			
-			$model = GO::modules()->isInstalled($module->getName(), false);
-			
-			
-			$availableModules[ucfirst($module->getPackage()) . $module->getName()] = array(		
+
+				$model = \go\core\model\Module::findByName($module->getPackage(), $module->getName(), null);
+
+				$availableModules[ucfirst($module->getPackage()) . $module->getName()] = array(
 					'id' => $model ? $model->id : null,
 					'name'=>$module->getName(),
 					'localizedName' => $module->getTitle(),
 					'author'=>$module->getAuthor(),
 					'description'=>$module->getDescription(),
 					'icon'=>$module->getIcon(),
-					'aclId'=>$model ? $model->acl_id : 0,
-//					'buyEnabled'=>!GO::scriptCanBeDecoded() || 
-//							($module->appCenter() && (\GO\Professional\License::isTrial() || \GO\Professional\License::moduleIsRestricted($module->name())!==false)),
-				
+					'aclId'=>$model ? $model->getAclId() : 0,
+
 					'localizedPackage'=>ucfirst($module->getPackage()),
 					'package'=>$module->getPackage(),
 					'enabled'=>$model && $model->enabled,
 					'isRefactored' => true,
 					'not_installable'=> !$module->isInstallable(),
 					'sort_order' => ($model && $model->sort_order)?$model->sort_order:''
-			);
+				);
+			
+
 			} else
 			{
 				
@@ -116,7 +115,7 @@ class ModuleController extends AbstractJsonController{
 					'author'=>$module->author(),
 					'description'=>$module->description(),
 					'icon'=>$module->icon(),
-					'aclId'=>$model ? $model->aclId : 0,
+					'aclId'=>$model ? $model->getAcl_id() : 0,
 //					'buyEnabled'=>!GO::scriptCanBeDecoded() || 
 //							($module->appCenter() && (\GO\Professional\License::isTrial() || \GO\Professional\License::moduleIsRestricted($module->name())!==false)),
 					'package' => 'legacy',

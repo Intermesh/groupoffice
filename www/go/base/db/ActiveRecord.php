@@ -43,6 +43,8 @@ namespace GO\Base\Db;
 use GO\Base\Db\PDO;
 use GO;
 use go\core\db\Query;
+use go\core\orm\CustomFieldsTrait;
+use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 
 abstract class ActiveRecord extends \GO\Base\Model{
@@ -673,6 +675,15 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	public function getIsNew(){
 
 		return $this->_new;
+	}
+
+	/**
+	 * For compatibility with new framework.
+	 *
+	 * @return bool
+	 */
+	public function isNew() {
+		return $this->getIsNew();
 	}
 
 	/**
@@ -3751,18 +3762,19 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				$value = $this->$key;
 
 				if(is_string($value) && ($attr['gotype']=='textfield' || $attr['gotype']=='customfield' || $attr['gotype']=='textarea') && !in_array($value,$keywords)){
-					if(!empty($value))
-						$keywords[]=$value;
+					if(!empty($value)) {
+						if($attr['gotype'] == 'textarea') {
+							$keywords = array_merge($keywords, SearchableTrait::splitTextKeywords($value));
+						} else {
+							$keywords[] = $value;
+						}
+					}
 				}
 			}
 		}
 
-		if($this->hasCustomFields()) {
-			foreach($this->getCustomFields() as $col => $v) {
-				if(!empty($v) && is_string($v)) {
-					$keywords[] = $v;
-				}
-			}
+		if (method_exists($this, 'getCustomFields')) {
+			$keywords = array_merge($keywords, $this->getCustomFieldsSearchKeywords());
 		}
 
 		if($this->hasLinks()) {
@@ -3782,16 +3794,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$keywords = $prepend.','.implode(',',$keywords);
 
-//		if($this->customfieldsRecord){
-//			$keywords .= ','.$this->customfieldsRecord->getSearchCacheKeywords();
-//		}
-		
+
 		// Remove duplicate and empty entries
 		$arr = explode(',', $keywords);
 		$arr = array_filter(array_unique($arr), function($item){
 			return $item != '';
 		});
-		return implode(',', $arr);
+		return implode(' ', $arr);
 	}
 
 	protected function beforeSave(){

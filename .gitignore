@@ -3,6 +3,7 @@ forum
 .gitmodules
 /nbproject
 /*-license.txt
+/www/*-license.txt
 .idea
 /www/vendor
 /config.php
@@ -75,3 +76,4 @@ forum
 lang.csv
 .gitmodules
 /www/branding
+/.project

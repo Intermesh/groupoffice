@@ -283,8 +283,8 @@ abstract class Entity extends Property {
 
 	protected function internalValidate()
 	{
-		if(method_exists($this, 'validateCustomFields')) {
-			if(!$this->validateCustomFields()) {				
+		if(method_exists($this, 'getCustomFields')) {
+			if(!$this->getCustomFields()->validate()) {
 				return false;
 			}
 		}

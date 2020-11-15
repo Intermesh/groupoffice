@@ -4,6 +4,8 @@ namespace go\core\orm;
 use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\App;
+use go\core\customfield\Html;
+use go\core\customfield\TextArea;
 use go\core\db\Query;
 use go\core\db\Table;
 use go\core\db\Utils;
@@ -21,14 +23,10 @@ use go\core\util\JSON;
  * @property array $customFields 
  */
 trait CustomFieldsTrait {
-	
-	/**
-	 * Holds the custom fields record data
-	 * @var array
-	 */
-	private $customFieldsData;
-	private $customFieldsModified = false;
-	private $customFieldsIsNew;
+
+	private static $customFieldsTableName;
+
+	private $customFieldsModel;
 
 	/**
 	 * Set the default return type of @see getCustomFields()
@@ -50,73 +48,14 @@ trait CustomFieldsTrait {
 			$asText = $this->returnAsText;
 		}
 
-		$fn = $asText ? 'dbToText' : 'dbToApi';
-		$record = $this->internalGetCustomFields();
-		foreach(self::getCustomFieldModels() as $field) {
-			if(empty($field->databaseName)) {
-				continue; //For type Notes which doesn't store any data
-			}
-			$record[$field->databaseName] = $field->getDataType()->$fn(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record, $this);
-		}
-		unset($record['id']);
-		return $record;	
-	}
-
-	private static $preparedCustomFieldStmt = [];
-
-  /**
-   * @return array
-   * @throws Exception
-   */
-	protected function internalGetCustomFields() {
-		if(!isset($this->customFieldsData)) {
-
-			if(!isset(self::$preparedCustomFieldStmt[$this->customFieldsTableName()])) {
-				$query = (new Query())
-							->select('*')
-							->from($this->customFieldsTableName(), 'cf')
-							->where('cf.id = :id');
-
-				self::$preparedCustomFieldStmt[$this->customFieldsTableName()] = $query->createStatement();
-			}
-
-			$stmt = self::$preparedCustomFieldStmt[$this->customFieldsTableName()];
-			$stmt->bindValue(':id', $this->id);
-
-			$stmt->execute();
-
-			$record = $stmt->fetch();
-
-			$stmt->closeCursor();
-			
-			$this->customFieldsIsNew = !$record;
-							
-			if($record) {			
-				
-				$columns = Table::getInstance(static::customFieldsTableName())->getColumns();		
-				foreach($columns as $name => $column) {					
-					$record[$name] = $column->castFromDb($record[$name]);					
-				}			
-				
-				$this->customFieldsData = $record;
-				
-			} else
-			{
-				$record = [];
-				$columns = Table::getInstance(static::customFieldsTableName())->getColumns();
-				foreach($columns as $name => $column) {
-					if($name == "id") {
-						continue;
-					}
-					$record[$name] = $column->default;
-				}
-
-				$this->customFieldsData = $record;
-			}
+		if(!isset($this->customFieldsModel)) {
+			$this->customFieldsModel = new CustomFieldsModel($this);
 		}
 
-		return $this->customFieldsData;//array_filter($this->customFieldsData, function($key) {return $key != 'id';}, ARRAY_FILTER_USE_KEY);
+		$this->customFieldsModel->returnAsText = $asText;
+		return $this->customFieldsModel;
 	}
+
   /**
    * Setter for legacy modules
    *
@@ -134,17 +73,14 @@ trait CustomFieldsTrait {
 	 * The data array may hold partial data. It will be merged into the existing
 	 * data.
 	 *
-	 * @param array $data
+	 * @param array|CustomFieldsModel $data
 	 * @param bool $asText
 	 * @return $this
 	 * @throws Exception
 	 */
-	public function setCustomFields(array $data, $asText = false)
+	public function setCustomFields($data, $asText = false)
 	{
-		$old = $this->internalGetCustomFields();
-		$this->customFieldsData = array_merge($old, $this->normalizeCustomFieldsInput($data, $asText));
-
-		$this->customFieldsModified = $old != $this->customFieldsData;
+		$this->getCustomFields($asText)->setValues($data);
 
 		return $this;
 	}
@@ -170,11 +106,11 @@ trait CustomFieldsTrait {
 	 * @return bool
 	 */
 	public function isCustomFieldsModified() {
-		return $this->customFieldsModified;
+		return isset($this->customFieldsModel) && $this->getCustomFields()->isModified();
 	}
 
   /**
-   * Get all custom fields for this entity
+   * Get all custom fields for this entity indexed by database name
    *
    * @return Field[]
    * @throws Exception
@@ -183,60 +119,17 @@ trait CustomFieldsTrait {
 		$cacheKey = 'custom-field-models-' . static::customFieldsEntityType()->getId();
 	 	$m = go()->getCache()->get($cacheKey);
 		if($m === null) {
-			$m = Field::find(['id', 'databaseName', 'fieldSetId', 'type', 'options', 'required'], true)
+			$m = array();
+			foreach(Field::find(['id', 'databaseName', 'fieldSetId', 'type', 'options', 'required'], true)
 						->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId')
-						->where(['fs.entityId' => static::customFieldsEntityType()->getId()])->all();
+						->where(['fs.entityId' => static::customFieldsEntityType()->getId()]) as $field) {
+				$m[$field->databaseName] = $field;
+			}
 
 			go()->getCache()->set($cacheKey, $m);
 		}
 		
 		return $m;
-	}
-
-  /**
-   * Converts user input to database formats.
-   *
-   * @param $data
-   * @param bool $asText
-   * @return mixed
-   * @throws Exception
-   */
-	private function normalizeCustomFieldsInput($data, $asText = false) {
-		$columns = Table::getInstance(static::customFieldsTableName())->getColumns();		
-		foreach($columns as $name => $column) {
-			if(array_key_exists($name, $data)) {
-				if(empty($data[$name]) && $column->nullAllowed ) {
-					$data[$name] = null;
-				} else {
-					$data[$name] = $column->normalizeInput($data[$name]);
-				}
-			}
-		}
-		$fn = $asText ? 'textToDb' : 'apiToDb';
-		foreach(self::getCustomFieldModels() as $field) {	
-			//if client didn't post value then skip it
-			if(array_key_exists($field->databaseName, $data)) {
-				$data[$field->databaseName] = $field->getDataType()->$fn(isset($data[$field->databaseName]) ? $data[$field->databaseName] : null,  $data, $this);
-			}
-		}
-		
-		return $data;
-	}
-
-  /**
-   * @return bool
-   * @throws Exception
-   */
-	protected function validateCustomFields() {
-		if(!$this->customFieldsModified) {
-			return true;
-		}
-		foreach(self::getCustomFieldModels() as $field) {
-			if(!$field->getDataType()->validate(isset($this->customFieldsData[$field->databaseName]) ? $this->customFieldsData[$field->databaseName] : null, $field, $this)) {
-				return false;
-			}
-		}
-		return true;
 	}
 
   /**
@@ -247,79 +140,11 @@ trait CustomFieldsTrait {
    * @throws Exception
    */
 	public function saveCustomFields() {
-
-		try {
-
-			if(Installer::isInstalling()) {
-				return true;
-			}
-
-			$record = $this->customFieldsData;			
-			
-			foreach(self::getCustomFieldModels() as $field) {
-				if(!$field->getDataType()->beforeSave(isset($record[$field->databaseName]) ? $record[$field->databaseName] : null, $record,  $this)) {
-					return false;
-				}
-			}
-
-			if(!$this->customFieldsModified && $record == $this->customFieldsData) {
-				return true;
-			}
-
-			//Set modifiedAt because otherwise the entity might have no change at all. Then no change will be logged for
-			//JMAP sync
-			if(property_exists($this, 'modifiedAt') && !$this->isModified(['modifiedAt'])) {
-				$this->modifiedAt = new DateTime();
-			}
-
-			if($this->customFieldsIsNew) {
-
-				//if(!empty($record)) { //always create record for select fields with foreign keys!
-					$record['id'] = $this->id;	
-					if(!App::get()
-									->getDbConnection()
-									->insert($this->customFieldsTableName(), $record)->execute()){
-									return false;
-					}
-					$this->customFieldsIsNew = false;
-				//}
-			} else {
-				unset($record['id']);
-				if(!empty($record) && !App::get()
-								->getDbConnection()
-								->update($this->customFieldsTableName(), $record, ['id' => $this->id])->execute()) {
-					return false;
-				}
-			}
-
-
-			//beforeSave might have changed the data
-			$this->customFieldsData = $record;
-			
-			//After save might need this.
-			$this->customFieldsData['id'] = $this->id;
-		
-			
-			foreach(self::getCustomFieldModels() as $field) {
-				if(!$field->getDataType()->afterSave(isset($this->customFieldsData[$field->databaseName]) ? $this->customFieldsData[$field->databaseName] : null, $this->customFieldsData, $this)) {
-					return false;
-				}
-			}
-			
+		if(!isset($this->customFieldsModel) ) {
 			return true;
-		} catch(PDOException $e) {
-			$uniqueKey = Utils::isUniqueKeyException($e);
-			if ($uniqueKey) {				
-				$this->setValidationError('customFields.' . $uniqueKey, ErrorCode::UNIQUE);				
-				return false;
-			} else {
-//				throw $e;
-				throw new \Exception($e->getMessage());
-			}
 		}
+		return $this->getCustomFields()->save();
 	}
-
-	private static $customFieldsTableName;
 
   /**
    * Get table name for custom fields data
@@ -332,6 +157,7 @@ trait CustomFieldsTrait {
 		if(isset(self::$customFieldsTableName)) {
 			return self::$customFieldsTableName;
 		}
+
 		$cls = static::customFieldsEntityType()->getClassName();
 		
 		if(is_a($cls, Entity::class, true)) {		
@@ -383,5 +209,43 @@ trait CustomFieldsTrait {
 				$field->getDataType()->defineFilter($filters);
 			}
 		}		
+	}
+
+
+	protected function getCustomFieldsSearchKeywords()
+	{
+		$keywords = [];
+
+		$cfData = $this->getCustomFields(true);
+
+		foreach (static::getCustomFieldModels() as $field) {
+
+			if ($field->getDataType() instanceof Html) {
+				continue;
+			}
+
+			$v = $cfData[$field->databaseName];
+
+			if (is_array($v)) {
+				foreach ($v as $i) {
+					if (!empty($v) && is_string($v)) {
+						$keywords[] = $v;
+					}
+				}
+			} else if (!empty($v) && is_string($v)) {
+
+				$split = $field->getDataType() instanceof TextArea;
+
+				if ($split) {
+					$keywords = array_merge($keywords, SearchableTrait::splitTextKeywords($v));
+				} else {
+					$keywords[] = $v;
+				}
+
+			}
+		}
+
+		return $keywords;
+
 	}
 }

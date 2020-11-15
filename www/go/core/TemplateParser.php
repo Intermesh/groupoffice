@@ -157,6 +157,9 @@ class TemplateParser {
 
 	private function filterEntity($id, $entityName) {
 		$et = EntityType::findByName($entityName);
+		if(!$et) {
+			return null;
+		}
 		$cls = $et->getClassName();
 
 		$e = $cls::findById($id);
@@ -257,7 +260,7 @@ class TemplateParser {
 		preg_match_all('/\[(each|if)/s', $str, $openMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\[\/(each|if)\]/s', $str, $closeMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\[else\]/s', $str, $elseMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
-		preg_match_all('/\\[assign\s+([a-z0-9A-Z-_]+)\s*=\s*(.*)(?<!\\\\)\\]/', $str, $assignMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+		preg_match_all('/\\[assign\s+([a-z0-9A-Z-_]+)\s*=\s*(.*?)(?<!\\\\)\\]/', $str, $assignMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		
 		$count = count($openMatches);
 		if($count != count($closeMatches)) {
@@ -627,29 +630,7 @@ class TemplateParser {
 	
 	private $filters = [];
 	
-	
-	private function isVar($path) {
-		$pathParts = explode(".", trim($path)); //eg "contact.name"		
 
-		$model = $this;
-
-		foreach ($pathParts as $pathPart) {
-			if(is_array($model)) {
-				if(!array_key_exists($pathPart, $model)) {
-					return false;
-				}
-				$model = $model[$pathPart];
-			}else
-			{
-				if(!$model->hasReadableProperty($pathPart)) {
-					return false;
-				}
-				$model = $model->$pathPart;
-			}			
-		}
-
-		return true;
-	}
 	
 	private function getVar($path, $model = null) {
 		
