@@ -319,7 +319,7 @@ class Criteria {
    * @param String|array|Criteria $column
    * @param string $operator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
    * @param mixed $value
-	 * @return static
+	 * @return $this
 	 */
 	public function orWhere($column, $operator = null, $value = null) {
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'OR');
@@ -356,7 +356,7 @@ class Criteria {
 	 * @param string|array $tag eg. ":userId" or [':userId' => 1]
 	 * @param mixed $value
 	 * @param int $pdoType {@see \PDO} Autodetected based on the type of $value if omitted.
-	 * @return static
+	 * @return $this
 	 */
 	public function bind($tag, $value = null, $pdoType = null) {
 		
