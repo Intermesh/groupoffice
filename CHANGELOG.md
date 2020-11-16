@@ -1,3 +1,4 @@
+16-11-2020 6.4.191
 - Email: Fixed problem in Thunderbird e-mails that were cut off. Issue #632.
 - Email: Fixed corupted mail body due to XSS filter
 - Studio: set sort direction for ID field
