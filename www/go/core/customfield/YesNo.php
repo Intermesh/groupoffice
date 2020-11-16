@@ -12,4 +12,17 @@ class YesNo extends Base {
 	protected function getFieldSQL() {		
 		return "tinyint DEFAULT NULL";
 	}
+
+	public function dbToText($value, \go\core\orm\CustomFieldsModel $values, $entity)
+	{
+		switch($value) {
+			case -1:
+				return go()->t("No");
+			case 1:
+				return go()->t("Yes");
+
+			default:
+				return "";
+		}
+	}
 }

@@ -15,6 +15,18 @@ end 6.5
 
 
 
+
+16-11-2020 6.4.191
+- Email: Fixed problem in Thunderbird e-mails that were cut off. Issue #632.
+- Email: Fixed corupted mail body due to XSS filter
+- Studio: set sort direction for ID field
+- Studio: disabled locking and unlocking of studio modules.
+- Studio: fixed (re)generation of ACL entity models
+- Studio: check whether package / module in allowed_modules
+- Core: Custom logo didn't display in Dark theme
+- Projects: fixed default income email template combo not loading
+- Core: Yes or no custom field exports as text
+
 06-11-2020 6.4.190
 - Email: find correct translation string for 'Advanced'
 - Core: Added extra check for post_max_size php.ini setting to GO test script

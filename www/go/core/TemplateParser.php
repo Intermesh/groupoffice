@@ -100,6 +100,7 @@ use function GO;
  * @example Using [assign] to lookup a Contact entity with id = 1
  *
  * ```
+
  * [assign contact = 1 | entity:Contact]
  * ```
  *
@@ -196,6 +197,9 @@ class TemplateParser {
 
 	private function filterEntity($id, $entityName) {
 		$et = EntityType::findByName($entityName);
+		if(!$et) {
+			return null;
+		}
 		$cls = $et->getClassName();
 
 		$e = $cls::findById($id);
@@ -296,7 +300,7 @@ class TemplateParser {
 		preg_match_all('/\[(each|if)/s', $str, $openMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\[\/(each|if)\]/s', $str, $closeMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\[else\]/s', $str, $elseMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
-		preg_match_all('/\\[assign\s+([a-z0-9A-Z-_\.]+)\s*=\s*(.*)(?<!\\\\)\\]/', $str, $assignMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+		preg_match_all('/\\[assign\s+([a-z0-9A-Z-_\.]+)\s*=\s*(.*?)(?<!\\\\)\\]/', $str, $assignMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		
 		$count = count($openMatches);
 		if($count != count($closeMatches)) {
@@ -561,7 +565,7 @@ class TemplateParser {
 	}
 
 
-	
+
 	private function replaceEach($tag, $str) {
 		
 		//example emailAddress in contact.emailAddresses
@@ -738,7 +742,7 @@ class TemplateParser {
 //		}
 //
 //	}
-	
+
 	private function getVarFiltered($expression) {
 		$filters = explode('|', $expression);
 		
