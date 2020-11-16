@@ -982,7 +982,7 @@ END;
 		
 		$to_removed_array = array (
 		"'<!DOCTYPE[^>]*>'usi",
-		"'<!--.*-->'Uusi",
+
 		"'<html[^>]*>'usi",
 		"'</html>'usi",
 		"'<body[^>]*>'usi",
@@ -1013,7 +1013,8 @@ END;
 		"'<input[^>]*>'usi",
 		"'<select[^>]*>.*?</select>'usi",
 		"'<textarea[^>]*>.*?</textarea>'usi",
-		"'</form>'usi"
+		"'</form>'usi",
+		"'<!--.*-->'Uusi"
 		);
 
 		$html = preg_replace($to_removed_array, '', $html);
