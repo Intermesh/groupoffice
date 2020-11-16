@@ -9,6 +9,7 @@ Master
 - Core: Module dependencies are respected
 - Business: New employee management module
 - History: new module replacing Activity log
+- Comments: Editable date field
 
 end 6.5
 --------
