@@ -28,6 +28,8 @@ class Comment extends Entity {
 	public $modifiedAt;
 	public $createdBy;
 	public $modifiedBy;
+	/** @var DateTime */
+	public $date;
 
 	/**
 	 * Label ID's
@@ -100,8 +102,8 @@ class Comment extends Entity {
 	}
 	
 	public static function sort(Query $query, array $sort) {	
-		if(!empty($sort['id'])) {
-			$sort = ['c.createdAt' => 'DESC'];
+		if(empty($sort)) {
+			$sort = ['c.date' => 'ASC'];
 		}
 
 		return parent::sort($query, $sort);		
@@ -164,13 +166,28 @@ class Comment extends Entity {
 		if($this->isModified(['text']) && StringUtil::detectXSS($this->text)) {
 			$this->setValidationError('text', ErrorCode::INVALID_INPUT, "You're not allowed to use scripts in the content");
 		}
+
+		if(!isset($this->date)) {
+			$this->date = new DateTime();
+		}
 		return parent::internalValidate();
 	}
-
 
 	protected function internalSave()
 	{
 		$this->images = Blob::parseFromHtml($this->text);
 		return parent::internalSave();
+	}
+
+	public function title()
+	{
+		$entity = $this->findEntity();
+
+		if($entity) {
+			return $entity->title();
+
+		} else {
+			return $this->id;
+		}
 	}
 }
