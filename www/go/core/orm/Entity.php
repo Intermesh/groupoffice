@@ -638,7 +638,7 @@ abstract class Entity extends Property {
 					$query->join('comments_comment', 'comment', 'comment.entityId = ' . $query->getTableAlias() . '.id AND comment.entityTypeId=' . static::entityType()->getId());
 				}
 
-				$criteria->where(new \go\core\db\Expression('MAX(comment.modifiedAt)'), $comparator, $value);
+				$criteria->where('MAX(comment.modifiedAt) ' . $comparator . ' :commentedAt')->bind(':commentedAt', $value);
 			});
 
 
