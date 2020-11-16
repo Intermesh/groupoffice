@@ -5,6 +5,7 @@
 - Studio: fixed (re)generation of ACL entity models
 - Studio: check whether package / module in allowed_modules
 - Core: Custom logo didn't display in Dark theme
+- Projects: fixed default income email template combo not loading
 
 06-11-2020 6.4.190
 - Email: find correct translation string for 'Advanced'
