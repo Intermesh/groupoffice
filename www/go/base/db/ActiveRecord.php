@@ -43,6 +43,8 @@ namespace GO\Base\Db;
 use GO\Base\Db\PDO;
 use GO;
 use go\core\db\Query;
+use go\core\ErrorHandler;
+use go\core\http\Exception;
 use go\core\model\Link;
 use go\core\orm\EntityType;
 use go\core\orm\CustomFieldsTrait;
@@ -3441,29 +3443,33 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public function title() {
 
-		$cache = $this->getCacheAttributes();
-		if($cache) {
-			return $cache['name'];
-		}
+		try {
+			$cache = $this->getCacheAttributes();
+			if ($cache) {
+				return $cache['name'];
+			}
 
-		if($this->hasAttribute('name')) {
-			return $this->name;
-		}
+			if ($this->hasAttribute('name')) {
+				return $this->name;
+			}
 
-		if($this->hasAttribute('title')) {
-			return $this->title;
-		}
+			if ($this->hasAttribute('title')) {
+				return $this->title;
+			}
 
-		if($this->hasAttribute('subject')) {
-			return $this->subject;
-		}
+			if ($this->hasAttribute('subject')) {
+				return $this->subject;
+			}
 
-		if($this->hasAttribute('description')) {
-			return $this->description;
-		}
+			if ($this->hasAttribute('description')) {
+				return $this->description;
+			}
 
-		if($this->hasAttribute('displayName')) {
-			return $this->displayName;
+			if ($this->hasAttribute('displayName')) {
+				return $this->displayName;
+			}
+		} catch(Exception $e) {
+			ErrorHandler::logException($e);
 		}
 
 		return static::class;
