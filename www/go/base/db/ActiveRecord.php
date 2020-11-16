@@ -3468,7 +3468,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			if ($this->hasAttribute('displayName')) {
 				return $this->displayName;
 			}
-		} catch(Exception $e) {
+		} catch(\Exception $e) {
 			ErrorHandler::logException($e);
 		}
 
