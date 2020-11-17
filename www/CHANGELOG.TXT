@@ -1,6 +1,8 @@
+17-11-2020 6.2.132
 - Groups: Users could see read only groups in the manage area
 - Email: Fixed problem in Thunderbird e-mails that were cut off. Issue #632.
 - ActiveSync: Problem with iOS 14
+- Calendar: Accept appointment dialog didn't show
 
 13-10-2020 6.2.131
 - Calendar: Missing delete link in cancellation e-mail
