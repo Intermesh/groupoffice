@@ -41,8 +41,8 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		var me = this;
 
 		this.entityStore.single(id).then(function(entity) {
-			me.setValues(entity, true);
 			me.entity = entity;
+			me.setValues(entity, true);
 			
 			if(callback) {
 				callback.call(scope || me, entity);
