@@ -75,7 +75,10 @@ class EmailTemplate extends AclOwnerEntity
 			})
 			->add('language' , function(Criteria $criteria, $language){
 				$criteria->where('language', '=',$language);
-			});
+			})
+			->add('key', function (Criteria $criteria, $value){
+				$criteria->where(['key' => $value]);
+			});;
 					
 	}
 
