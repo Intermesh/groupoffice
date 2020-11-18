@@ -32,8 +32,9 @@ interface IIpcProvider
 	 * @param int $type
 	 * @param int $allocate
 	 * @param string $class
+	 * @param string $serverKey
 	 */
-    public function __construct($type, $allocate, $class);
+    public function __construct($type, $allocate, $class, $serverKey);
 
     /**
      * Reinitializes the IPC data. If the provider has no way of performing

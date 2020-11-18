@@ -17,6 +17,8 @@ class Date extends Property {
 	
 	const TYPE_ANNIVERSARY = 'anniversary';
 
+	const TYPE_ACTION = 'action';
+
 	/**
 	 * 
 	 * @var int
@@ -31,7 +33,7 @@ class Date extends Property {
 
 	/**
 	 * 
-	 * @var \IFW\Util\DateTime
+	 * @var \go\core\util\DateTime
 	 */							
 	public $date;
 

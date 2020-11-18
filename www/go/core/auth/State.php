@@ -50,5 +50,37 @@ abstract class State {
 		return self::$classPermissionLevels[$cls];
 	}
 
+	/**
+	 * Return absolute URL to /api folder
+	 *
+	 * @return string
+	 */
+	abstract protected function getBaseUrl();
+
+	public function getDownloadUrl($blobId) {
+		return $this->getBaseUrl() . "/download.php?blob=".$blobId;
+	}
+
+	/**
+	 * Get URL to page.php
+	 *
+	 * @return string
+	 */
+	public function getPageUrl() {
+		return $this->getBaseUrl(). "/page.php";
+	}
+
+	public function getApiUrl() {
+		return $this->getBaseUrl() . '/jmap.php';
+	}
+
+	public function getUploadUrl() {
+		return $this->getBaseUrl(). '/upload.php';
+	}
+
+	public function getEventSourceUrl() {
+		return go()->getConfig()['core']['general']['sseEnabled'] ? $this->getBaseUrl() . '/sse.php' : null;
+	}
+
 }
 

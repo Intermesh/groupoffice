@@ -43,8 +43,12 @@ namespace GO\Base\Db;
 use GO\Base\Db\PDO;
 use GO;
 use go\core\db\Query;
+use go\core\ErrorHandler;
+use go\core\http\Exception;
 use go\core\model\Link;
 use go\core\orm\EntityType;
+use go\core\orm\CustomFieldsTrait;
+use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 
 abstract class ActiveRecord extends \GO\Base\Model{
@@ -690,6 +694,15 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	public function getIsNew(){
 
 		return $this->_new;
+	}
+
+	/**
+	 * For compatibility with new framework.
+	 *
+	 * @return bool
+	 */
+	public function isNew() {
+		return $this->getIsNew();
 	}
 
 	/**
@@ -3316,7 +3329,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 					if($key == 'mtime') {
 						continue;
 					}
-					
+
 					if(!is_scalar($oldVal)) {
 						continue;
 					}
@@ -3430,29 +3443,33 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public function title() {
 
-		$cache = $this->getCacheAttributes();
-		if($cache) {
-			return $cache['name'];
-		}
+		try {
+			$cache = $this->getCacheAttributes();
+			if ($cache) {
+				return $cache['name'];
+			}
 
-		if($this->hasAttribute('name')) {
-			return $this->name;
-		}
+			if ($this->hasAttribute('name')) {
+				return $this->name;
+			}
 
-		if($this->hasAttribute('title')) {
-			return $this->title;
-		}
+			if ($this->hasAttribute('title')) {
+				return $this->title;
+			}
 
-		if($this->hasAttribute('subject')) {
-			return $this->subject;
-		}
+			if ($this->hasAttribute('subject')) {
+				return $this->subject;
+			}
 
-		if($this->hasAttribute('description')) {
-			return $this->description;
-		}
+			if ($this->hasAttribute('description')) {
+				return $this->description;
+			}
 
-		if($this->hasAttribute('displayName')) {
-			return $this->displayName;
+			if ($this->hasAttribute('displayName')) {
+				return $this->displayName;
+			}
+		} catch(\Exception $e) {
+			ErrorHandler::logException($e);
 		}
 
 		return static::class;
@@ -3792,18 +3809,19 @@ abstract class ActiveRecord extends \GO\Base\Model{
 				$value = $this->$key;
 
 				if(is_string($value) && ($attr['gotype']=='textfield' || $attr['gotype']=='customfield' || $attr['gotype']=='textarea') && !in_array($value,$keywords)){
-					if(!empty($value))
-						$keywords[]=$value;
+					if(!empty($value)) {
+						if($attr['gotype'] == 'textarea') {
+							$keywords = array_merge($keywords, SearchableTrait::splitTextKeywords($value));
+						} else {
+							$keywords[] = $value;
+						}
+					}
 				}
 			}
 		}
 
-		if($this->hasCustomFields()) {
-			foreach($this->getCustomFields() as $col => $v) {
-				if(!empty($v) && is_string($v)) {
-					$keywords[] = $v;
-				}
-			}
+		if (method_exists($this, 'getCustomFields')) {
+			$keywords = array_merge($keywords, $this->getCustomFieldsSearchKeywords());
 		}
 
 		if($this->hasLinks()) {
@@ -3823,16 +3841,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$keywords = $prepend.','.implode(',',$keywords);
 
-//		if($this->customfieldsRecord){
-//			$keywords .= ','.$this->customfieldsRecord->getSearchCacheKeywords();
-//		}
-		
+
 		// Remove duplicate and empty entries
 		$arr = explode(',', $keywords);
 		$arr = array_filter(array_unique($arr), function($item){
 			return $item != '';
 		});
-		return implode(',', $arr);
+		return implode(' ', $arr);
 	}
 
 	protected function beforeSave(){
@@ -4028,7 +4043,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$r= $this->relations();
 
 		$this->log("delete");
-		
+
 		foreach($r as $name => $attr){
 			if (!GO::classExists($attr['model'])){				
 				unset($r[$name]);

@@ -118,14 +118,7 @@ class goMail extends GoBaseBackendDiff {
 
 			 if (Request::GetProtocolVersion() >= 12.0) {
 				 
-				//attachments are not necessary when using mime
-				//
-				//Attachments probably need to be sent even with MIME type:
-				//http://talk.sonymobile.com/t5/Xperia-Z1-Compact/Z1-Compact-Problem-With-EAS/m-p/866755#11220
-				//zpush_always_send_attachments config setting is for testing this carefully.
-				if($bpReturnType!=SYNC_BODYPREFERENCE_MIME || !empty(\GO::config()->zpush_always_send_attachments)){
-					$message->asattachments = $this->_getASAttachments($imapMessage,$id,$mailbox);
-				}
+
 				 
 				$message->asbody = new SyncBaseBody();
 				$asBodyData = null;
@@ -165,6 +158,16 @@ class goMail extends GoBaseBackendDiff {
 						$asBodyData = base64_encode(\GO\Base\Util\StringHelper::normalizeCrlf($imapMessage->getPlainBody()).$this->_getTooBigAttachmentsString());
 						break;
 				}
+
+
+				 //attachments are not necessary when using mime
+				 //
+				 //Attachments probably need to be sent even with MIME type:
+				 //http://talk.sonymobile.com/t5/Xperia-Z1-Compact/Z1-Compact-Problem-With-EAS/m-p/866755#11220
+				 //zpush_always_send_attachments config setting is for testing this carefully.
+				 if($bpReturnType!=SYNC_BODYPREFERENCE_MIME || !empty(\GO::config()->zpush_always_send_attachments)){
+					 $message->asattachments = $this->_getASAttachments($imapMessage,$id,$mailbox, $bpReturnType != SYNC_BODYPREFERENCE_PLAIN ? $asBodyData : null);
+				 }
 
 				// truncate body, if requested
 				//MS: Not sure if !empty($truncsize) is needed here. Testing for Robert S.
@@ -329,7 +332,7 @@ class goMail extends GoBaseBackendDiff {
 	 * @param String $mailbox
 	 * @return array attachment array
 	 */
-	private function _getASAttachments($imapMessage,$msgId,$mailbox){
+	private function _getASAttachments($imapMessage,$msgId,$mailbox, $body){
 		$asAttachments = array();
 		$attachments = $imapMessage->getAttachments();
 		
@@ -344,9 +347,16 @@ class goMail extends GoBaseBackendDiff {
 				$attach->filereference = $this->_encodeFileReference($msgId,$attachment,$mailbox);
 				$attach->method = 1;
 				$attach->estimatedDataSize = $attachment->getEstimatedSize();
-				$attach->contentid = $attachment->isInline()?$attachment->content_id:NULL;
-				$attach->isinline = $attachment->isInline() ? 1 : 0;
-				
+
+				if(!isset($body)) {
+					$inline = false;
+				} else{
+					$inline = $attachment->isInline() && strpos($body, $attachment->content_id) !== false;
+				}
+
+				$attach->contentid = $inline ? $attachment->content_id : NULL;
+				$attach->isinline = $inline;
+
 				array_push($asAttachments, $attach);
 			}
 		}
@@ -693,6 +703,10 @@ class goMail extends GoBaseBackendDiff {
 		//$imapMessage = \GO\Email\Model\ImapMessage::model()->findByUid($this->getImapAccount(), $mailbox, $id);
 
 		$headers = $imap->get_flags($id);
+		if($headers == false) {
+			return false;
+		}
+
 		$stat = false;
 		
 		if ($header = array_shift($headers)) {
@@ -1062,7 +1076,12 @@ class goMail extends GoBaseBackendDiff {
 //		$searchwords = preg_split("/\W+/", $searchwords);
 		
 		$searchFolder = $cpo->GetSearchFolderid(); // RESULTS IN "m/INBOX" OR "m/Concepten"
-		$searchFolder = substr($searchFolder, 2); // REMOVE THE "m/" from the folder id
+		if(!$searchFolder) {
+			//happens when searching "All folders" on iphone but we don't support this yet.
+			$searchFolder = 'INBOX';
+		} else {
+			$searchFolder = substr($searchFolder, 2); // REMOVE THE "m/" from the folder id
+		}
 		
 		// Build the imap search query
 		$searchData = $cpo->GetData();

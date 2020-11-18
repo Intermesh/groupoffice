@@ -49,7 +49,13 @@ $lang = GO::language()->getLanguage(); ?>
 	?>
 	<style>
         <?php
-        if(GO::view()->getTheme()->getName() == 'Paper') {
+
+        if(go()->getSettings()->logoId) {
+                //blob id is not used by script but added only for caching.
+                echo ".go-app-logo, #go-logo {background-image: url(" . go()->getSettings()->URL . "api/page.php/core/logo) !important}";
+        }
+
+        if(GO::view()->getTheme()->getName() == 'Paper' || isset($useThemeSettings)) {
             if(go()->getSettings()->primaryColor) {
                 ?>
             :root {
@@ -57,15 +63,26 @@ $lang = GO::language()->getLanguage(); ?>
                 --c-header-bg: <?= '#'.go()->getSettings()->primaryColor; ?> !important;
                 --c-primary-tp: <?= go()->getSettings()->getPrimaryColorTransparent(); ?> !important;
             }
-
             <?php
             }
-            if(go()->getSettings()->logoId) {
-                //blob id is not used by script but added only for caching.
-                echo ".go-app-logo, #go-logo {background-image: url(" . go()->getSettings()->URL . "api/page.php/core/logo) !important}";
+
+            if(go()->getSettings()->secondaryColor) {
+                ?>
+                :root {
+                    --c-secondary: <?= '#'.go()->getSettings()->secondaryColor; ?> !important;
+                }
+            <?php
+            }
+
+            if(go()->getSettings()->accentColor) {
+                ?>
+                :root {
+                    --c-accent: <?= '#'.go()->getSettings()->accentColor; ?> !important;
+                }
+            <?php
             }
         }
-        ?>
+		?>
 	</style>
 
     <?php
@@ -75,7 +92,7 @@ $lang = GO::language()->getLanguage(); ?>
     }
   ?>
 </head>
-<body>
+<body class="go-compact">
 	<div id="sound"></div>
     <div id="paper"></div>
 	<!--Putting scripts in div will speed up developer tools because they don't have to show all those nodes-->

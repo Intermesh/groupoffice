@@ -167,9 +167,31 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 								flex: 1,
 								layout: "form",
 								items: [
-									this.nameField = new go.modules.community.addressbook.NameField({
-										flex: 1
-									}),
+									{
+										xtype: "container",
+										flex: 1,
+										layout: "hbox",
+										items: [
+											{
+												flex: 1,
+												layout:"form",
+												items: [this.nameField = new go.modules.community.addressbook.NameField({
+													flex: 1
+												})]
+											},{
+												width: dp(8),
+												xtype: "box"
+											},
+											{
+												layout: "form",
+												items: [new GO.form.ColorField({
+													hideLabel: true,
+													name: "color"
+												})]
+											}
+										]
+									},
+
 
 									this.jobTitle = new Ext.form.TextField({
 										xtype: "textfield",

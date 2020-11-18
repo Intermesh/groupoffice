@@ -252,6 +252,14 @@ class Settings extends core\Settings {
 	 * @var int
 	 */
 	public $passwordMinLength = 6;
+
+
+	/**
+	 * Number of seconds to auto logout the user if inactive.
+	 * Also disables the "remember login" feature as it would make no sense.
+	 * @var int
+	 */
+	public $logoutWhenInactive = 0;
 	
 	
 	/**
@@ -302,6 +310,20 @@ class Settings extends core\Settings {
 	 * @var string
 	 */
 	public $primaryColor;
+
+	/**
+	 * Secondary color in html notation 000000;
+	 *
+	 * @var string
+	 */
+	public $secondaryColor;
+
+	/**
+	 * Secondary color in html notation 000000;
+	 *
+	 * @var string
+	 */
+	public $accentColor;
 	
 	/**
 	 * Blob ID for the logo
@@ -469,6 +491,17 @@ class Settings extends core\Settings {
 	
 	
 	public function save() {
+
+		if(isset($this->logoId)) {
+			//todo settings should have real columns with real keys?
+			$blob = core\fs\Blob::findById($this->logoId);
+			if($blob && isset($blob->staleAt)) {
+				$blob->staleAt = null;
+				$blob->save();
+			}
+		}
+
+
 		
 		//for old framework config caching in GO\Base\Config
 		if(isset($_SESSION)) {

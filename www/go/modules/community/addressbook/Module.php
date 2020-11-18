@@ -38,9 +38,10 @@ class Module extends core\Module {
 	public function defineListeners() {
 		parent::defineListeners();
 		
-		Link::on(Link::EVENT_DELETE, Contact::class, 'onLinkDelete');
+		Link::on(Link::EVENT_BEFORE_DELETE, Contact::class, 'onLinkDelete');
 		Link::on(Link::EVENT_SAVE, Contact::class, 'onLinkSave');
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
+		User::on(User::EVENT_BEFORE_DELETE, static::class, 'onUserDelete');
 	}
 	
 	public function downloadVCard($contactId) {
@@ -65,6 +66,10 @@ class Module extends core\Module {
 	
 	public static function onMap(Mapping $mapping) {
 		$mapping->addHasOne('addressBookSettings', UserSettings::class, ['id' => 'userId'], true);
+	}
+
+	public static function onUserDelete(core\db\Query $query) {
+		AddressBook::delete(['createdBy' => $query]);
 	}
 
 	protected function afterInstall(\go\core\model\Module $model)

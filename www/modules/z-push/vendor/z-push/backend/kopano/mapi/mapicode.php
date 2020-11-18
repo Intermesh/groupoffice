@@ -142,6 +142,7 @@ define('MAPI_E_PASSWORD_EXPIRED'                         ,make_mapi_e(0x121));
 define('MAPI_E_INVALID_WORKSTATION_ACCOUNT'              ,make_mapi_e(0x122));
 define('MAPI_E_INVALID_ACCESS_TIME'                      ,make_mapi_e(0x123));
 define('MAPI_E_ACCOUNT_DISABLED'                         ,make_mapi_e(0x124));
+define('MAPI_E_WEBAPP_FEATURE_DISABLED'                  ,make_mapi_e(0x125));
 
 /* MAPI base function and status object specific errors and warnings */
 

@@ -24,7 +24,8 @@ return [
 		],
 		"dateTypes" => [
 				"birthday" => "Birthday",
-				"anniversary" => "Anniversary"
+				"anniversary" => "Anniversary",
+				"action" => "Action"
 		],
 		"urlTypes" => [
 				"homepage" => "Homepage",

@@ -54,6 +54,16 @@ class BackendIMAP extends BackendDiff implements ISearchProvider {
     private static $mimeTypes = false;
     private $imapParams = array();
 
+    private $dontStat = array();            //keys in this array represent mailboxes which can't be stat'd (ie, /NoSELECT status)
+    
+    //define constants for imap mailbox attributes
+    const LATT_NOINFERIORS = 1;
+    const LATT_NOSELECT = 2;
+    const LATT_MARKED = 4;
+    const LATT_UNMARKED = 8;
+    const LATT_REFERRAL = 16;
+    const LATT_HASCHILDREN = 32;
+    const LATT_HASNOCHILDREN = 64;
 
     public function __construct() {
         if (BackendIMAP::$mimeTypes === false) {
@@ -295,7 +305,7 @@ class BackendIMAP extends BackendDiff implements ISearchProvider {
             $boundary = '=_' . md5(rand() . microtime());
             $finalEmail = $finalEmail->encode($boundary);
 
-            $finalHeaders = array('Mime-Version' => '1.0');
+            $finalHeaders = array('MIME-Version' => '1.0');
             // We copy all the non-existent headers, minus content_type
             ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->SendMail(): Copying new headers"));
             foreach ($message->headers as $k => $v) {
@@ -625,10 +635,19 @@ class BackendIMAP extends BackendDiff implements ISearchProvider {
 
         if (!$this->changessinkinit) {
             // First folder, store the actual folder structure
-            $this->folderhierarchy = $this->get_folder_list();
+            $list= $this->get_attributes_list();
+            foreach ($list as $l) {
+                //ZLog::Write(LOGLEVEL_INFO, sprintf("BackendIMAP->ChangesSinkInitialize(): adding '%s' with attributes: '%s'", $l['name'], print_r($l,true)));
+                $this->folderhierarchy[] = $l['name'];
+                if (isset($l['noSelect']) && $l['noSelect'] != false) {
+                    $dontStatFolder = str_replace( $this->server, '', $l['name']);
+                    //ZLog::Write(LOGLEVEL_INFO, sprintf("BackendIMAP->ChangesSinkInitialize(): adding '%s' to dontStatFolders()", $dontStatFolder));
+                    $this->dontStatFolders[$dontStatFolder] = true;
+                }
+            }
         }
 
-        if ($imapid !== false) {
+        if (($imapid !== false) && !(isset($this->dontStatFolders[$imapid]) )) {
             $this->sinkfolders[] = $imapid;
             $this->changessinkinit = true;
         }
@@ -1701,7 +1720,7 @@ class BackendIMAP extends BackendDiff implements ISearchProvider {
 
                 if (is_calendar($part)) {
                     ZLog::Write(LOGLEVEL_DEBUG, "BackendIMAP->MeetingResponse - text/calendar part found, trying to reply");
-                    $body_part = reply_meeting_calendar($part, $response, GetUserDetails($this->username)['emailaddress']);
+                    $body_part = reply_meeting_calendar($part, $response, $this->GetUserDetails($this->username)['emailaddress']);
                 }
             }
             unset($mparts);
@@ -1984,8 +2003,8 @@ class BackendIMAP extends BackendDiff implements ISearchProvider {
      */
     private function getSearchRestriction($cpo) {
         $searchText = $cpo->GetSearchFreeText();
-        $searchGreater = strftime("%Y-%m-%d", strtotime($cpo->GetSearchValueGreater()));
-        $searchLess = strftime("%Y-%m-%d", strtotime($cpo->GetSearchValueLess()));
+        $searchGreater = $cpo->GetSearchValueGreater() ? strftime("%Y-%m-%d", strtotime($cpo->GetSearchValueGreater())) : '';
+        $searchLess = $cpo->GetSearchValueLess() ? strftime("%Y-%m-%d", strtotime($cpo->GetSearchValueLess())) : '';
 
         $filter = '';
         if ($searchGreater != '') {
@@ -2716,5 +2735,40 @@ class BackendIMAP extends BackendDiff implements ISearchProvider {
             ZLog::Write(LOGLEVEL_DEBUG, "BackendIMAP->close_connection(): disconnected from IMAP server");
             $this->mbox = false;
         }
+    }
+
+    /**
+     * Gets the folder list attributes
+     *
+     * @access private
+     * @return array of ( ['name'], ['noInferiors'], ['noSelect'], ['marked'], ['referral'], ['children'] )
+     */
+    private function get_attributes_list() {
+        $attributes = array();
+        $list = @imap_getmailboxes($this->mbox, $this->server, "*");
+        if (is_array($list)) {
+            $list = array_reverse($list);
+            foreach ($list as $l) {
+                $attr = array(
+                    'name' => $l->name,
+                    'noInferiors' => (($l->attributes & LATT_NOINFERIORS) != false) ,
+                    'noSelect' => (($l->attributes & LATT_NOSELECT) != false) ,
+                    'referral' => (($l->attributes & LATT_REFERRAL) != false)
+                );
+                if ($l->attributes & LATT_MARKED) {
+                    $attr['marked'] = true;
+                } elseif ($l->attributes & LATT_UNMARKED) {
+                    $attr['marked'] = false;    
+                }
+                if ($l->attributes & LATT_HASCHILDREN) {
+                    $attr['children'] = true;
+                } elseif ($l->attributes & LATT_HASNOCHILDREN) {
+                    $attr['children'] = false;
+                }
+                $attributes[] = $attr;
+                $attr = array();
+            }
+        }
+        return $attributes;
     }
 };

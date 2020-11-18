@@ -43,6 +43,7 @@ go.User = new (Ext.extend(Ext.util.Observable, {
     this.apiUrl = session.apiUrl;
     this.downloadUrl = session.downloadUrl;
     this.uploadUrl = session.uploadUrl;
+		this.pageUrl = session.pageUrl;
 		this.eventSourceUrl = session.eventSourceUrl;		
 		this.loaded = true;
 		this.apiVersion = session.version + "-" + session.cacheClearedAt;
@@ -56,10 +57,12 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 			// me.firstWeekDay = parseInt(user.firstWeekday);
 			me.legacySettings(user);
 
+			go.ActivityWatcher.init(GO.settings.config.logoutWhenInactive);
+
 			me.fireEvent("load", this);
 		});
 		
-		
+
     //Ext.apply(GO.settings, session.oldSettings);
 		
 		

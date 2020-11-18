@@ -283,7 +283,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		$attributes = $model instanceof \GO\Base\Db\ActiveRecord ? $model->getAttributes(static::$attributesFormat) : $model->toArray();		
 		
 		if(method_exists($model, "getCustomFields")){
-			$attributes = array_merge($attributes, $model->getCustomFields(true));
+			$attributes = array_merge($attributes, $model->getCustomFields(true)->toArray());
 		}
 
 		$attributes = static::_addTagPrefixAndRemoveEmptyValues($attributes, $tagPrefix);
@@ -327,7 +327,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 		
 		
 		if(\GO::user() && ($contact = \go\modules\community\addressbook\model\Contact::findForUser(\GO::user()->id))){
-			$attributes = array_merge($attributes, $contact->getCustomFields(true));			
+			$attributes = array_merge($attributes, $contact->getCustomFields(true)->toArray());
 			$attributes = $this->_addTagPrefixAndRemoveEmptyValues($attributes, 'user:');
 			$attributes = array_merge($attributes, $this->getContactAttributes($contact, 'user:', 'usercompany:'));			
 

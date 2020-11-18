@@ -348,6 +348,10 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 		if(tbar)
 			tbar.setDisabled(false);
 
+		if(this.editButton && !this.editButton.dom) {// dialog is (being) destroyed
+			return;
+		}
+
 		if(this.editButton && this.editButton.rendered)
 			this.editButton.setDisabled(this.data.permission_level<GO.permissionLevels.write);
 		
@@ -517,7 +521,12 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 				url: this.loadUrl,
 				params:this.loadParams,
 				success: function(options, response, result)
-				{				
+				{
+					//user can destroy window while loading
+					if(this.isDestroyed) {
+						return;
+					}
+
 					this.setData(result.data);
 					this.onLoad();
 					if(!reload)

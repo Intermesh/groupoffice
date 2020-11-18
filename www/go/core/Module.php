@@ -27,8 +27,8 @@ use function GO;
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
-abstract class Module {
-	
+abstract class Module extends Singleton {
+
 	/**
 	 * Find module class file by name
 	 * 
@@ -97,6 +97,11 @@ abstract class Module {
 	public final function install() {
 
 		try{
+
+			if(model\Module::findByName($this->getPackage(), $this->getName(), null)) {
+				throw new \Exception("This module has already been installed!");
+			}
+
 			go()->getDbConnection()->pauseTransactions();
 			$this->installDatabase();
 			go()->getDbConnection()->resumeTransactions();
@@ -335,7 +340,7 @@ abstract class Module {
 	/**
 	 * Get dependent modules.
 	 * 
-	 * @return string[] eg. ["community/notes"]
+	 * @return array[] eg. ["community/notes"]
 	 */
 	public function getDependencies() {
 		return [];
@@ -564,6 +569,8 @@ abstract class Module {
 		
 		return 'data:'.$icon->getContentType().';base64,'. base64_encode($icon->getContents());
 	}
+
+	private $model;
 	
 	/**
 	 * Get the module entity model
@@ -571,7 +578,12 @@ abstract class Module {
 	 * @return model\Module
 	 */
 	public function getModel() {
-		return model\Module::findByName($this->getPackage(), $this->getName());
+
+		if(!$this->model) {
+			$this->model = model\Module::findByName($this->getPackage(), $this->getName());
+		}
+
+		return $this->model;
 	}
 
 	/**

@@ -50,94 +50,19 @@ class Query extends DbQuery {
 		return $this->model;
 	}
 
-  /**
-   * Applies JMAP filters to the query
-   *
-   * @param array $filters
-   *
-   * @return $this
-   * @throws Exception
-   * @example:
-   *
-   * $stmt = Contact::find()
-   *            ->filter([
-   *                "permissionLevel" => Acl::LEVEL_READ
-   *            ]);
-   *
-   */
-
-  private $permissionLevelFoundInFilters = false;
-
-  public function getPermissionLevelFoundInFilters() {
-    return $this->permissionLevelFoundInFilters;
-	}
-
 	/**
+	 * Apply JMAP filters
 	 *
-	 * @param array $filter
-	 * @param Query $query
-	 * @param null $criteria
-	 * @return void
+	 * @see \go\core\jmap\Entity::filter()
+	 * @param array $filters
+	 * @return $this
 	 * @throws Exception
 	 */
-	private function internalFilter($filter, Criteria $criteria)  {
-
+	public function filter(array $filters) {
 		$cls = $this->model;
-		if(isset($filter['conditions']) && isset($filter['operator'])) { // is FilterOperator
-
-			foreach($filter['conditions'] as $condition) {
-				$subCriteria = new Criteria();
-				$this->internalFilter($condition, $subCriteria);
-
-				if(!$subCriteria->hasConditions()) {
-					continue;
-				}
-
-				switch(strtoupper($filter['operator'])) {
-					case 'AND':
-						$criteria->where($subCriteria);
-						break;
-
-					case 'OR':
-						$criteria->orWhere($subCriteria);
-						break;
-
-					case 'NOT':
-						$criteria->andWhereNotOrNull($subCriteria);
-						break;
-				}
-			}
-
-		} else {
-			// is FilterCondition
-			$subCriteria = new Criteria();
-
-			if(!$this->permissionLevelFoundInFilters) {
-				$this->permissionLevelFoundInFilters = !empty($filter['permissionLevel']);
-			}
-
-			$cls::filter($this, $subCriteria, $filter);
-
-			if($subCriteria->hasConditions()) {
-				$criteria->andWhere($subCriteria);
-			}
-		}
+		$cls::filter($this, $filters);
 
 		return $this;
-	}
-
-	public function filter(array $filters) {
-
-		return $this->internalFilter($filters, $this);
-
-//		$cls = $this->model;
-//		$criteria = new Criteria();
-//		$cls::filter($this, $criteria, $filters);
-//		if($criteria->hasConditions()) {
-//			$this->andWhere($criteria);
-//		}
-//
-//		return $this;
 	}
 
   /**

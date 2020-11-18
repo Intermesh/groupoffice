@@ -321,7 +321,7 @@ $updates['201902141322'][] = "RENAME TABLE `cf_select_options` TO `core_customfi
 
 $updates['201902141322'][] = "ALTER TABLE `core_customfields_select_option` CHANGE `field_id` `fieldId` INT(11) NOT NULL;";
 $updates['201902141322'][] = "ALTER TABLE `core_customfields_select_option` CHANGE `sort_order` `sortOrder` INT(11) NOT NULL;";
-$updates['201902141322'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+$updates['201902141322'][] = "delete FROM `core_customfields_select_option` WHERE fieldId not in (select id from core_customfields_field);";
 $updates['201902141322'][] = "ALTER TABLE `core_customfields_select_option` ADD FOREIGN KEY (`fieldId`) REFERENCES `core_customfields_field`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 
 $updates['201902141322'][] = "ALTER TABLE `core_customfields_field_set` ADD `description` TEXT NULL AFTER `name`;";
@@ -745,92 +745,102 @@ $updates['202006191648'][] = "ALTER TABLE `core_entity_filter` ADD `type` ENUM('
 $updates['202006191648'][] = "ALTER TABLE `core_entity_filter` CHANGE `filter` `filter` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL;";
 $updates['202007302016'][] = "ALTER TABLE `core_customfields_field_set` ADD `columns` TINYINT NOT NULL DEFAULT '2' AFTER `isTab`;";
 
-//--
-//-- Table structure for table `core_pdf_block`
-//--
-//
-//                       CREATE TABLE `core_pdf_block` (
-//`id` bigint(20) UNSIGNED NOT NULL,
-//  `pdfTemplateId` bigint(20) UNSIGNED NOT NULL,
-//  `x` int(11) DEFAULT NULL,
-//  `y` int(11) DEFAULT NULL,
-//  `width` int(11) DEFAULT NULL,
-//  `height` int(11) DEFAULT NULL,
-//  `align` enum('L','C','R','J') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'L',
-//  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
-//  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text'
-//) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-//
-//-- --------------------------------------------------------
-//
-//--
-//-- Table structure for table `core_pdf_template`
-//--
-//
-//                       CREATE TABLE `core_pdf_template` (
-//`id` bigint(20) UNSIGNED NOT NULL,
-//  `moduleId` int(11) NOT NULL,
-//  `key` varchar(20) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
-//  `language` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'en',
-//  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-//  `stationaryBlobId` binary(40) DEFAULT NULL,
-//  `landscape` tinyint(1) NOT NULL DEFAULT 0,
-//  `pageSize` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'A4',
-//  `measureUnit` enum('mm','pt','cm','in') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'mm',
-//  `marginTop` decimal(19,4) NOT NULL DEFAULT 10.0000,
-//  `marginRight` decimal(19,4) NOT NULL DEFAULT 10.0000,
-//  `marginBottom` decimal(19,4) NOT NULL DEFAULT 10.0000,
-//  `marginLeft` decimal(19,4) NOT NULL DEFAULT 10.0000
-//) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-//
-//--
-//-- Indexes for dumped tables
-//--
-//
-//               --
-//-- Indexes for table `core_pdf_block`
-//--
-//               ALTER TABLE `core_pdf_block`
-//  ADD PRIMARY KEY (`id`) USING BTREE,
-//  ADD KEY `pdfTemplateId` (`pdfTemplateId`);
-//
-//--
-//-- Indexes for table `core_pdf_template`
-//--
-//               ALTER TABLE `core_pdf_template`
-//  ADD PRIMARY KEY (`id`),
-//  ADD KEY `moduleId` (`moduleId`),
-//  ADD KEY `stationaryBlobId` (`stationaryBlobId`);
-//
-//--
-//-- AUTO_INCREMENT for dumped tables
-//--
-//
-//                      --
-//-- AUTO_INCREMENT for table `core_pdf_block`
-//--
-//                      ALTER TABLE `core_pdf_block`
-//  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-//
-//--
-//-- AUTO_INCREMENT for table `core_pdf_template`
-//--
-//                      ALTER TABLE `core_pdf_template`
-//  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-//
-//--
-//-- Constraints for dumped tables
-//--
-//
-//                   --
-//-- Constraints for table `core_pdf_block`
-//--
-//                   ALTER TABLE `core_pdf_block`
-//  ADD CONSTRAINT `core_pdf_block_ibfk_1` FOREIGN KEY (`pdfTemplateId`) REFERENCES `core_pdf_template` (`id`) ON DELETE CASCADE;
-//
-//--
-//-- Constraints for table `core_pdf_template`
-//--
-//                   ALTER TABLE `core_pdf_template`
-//  ADD CONSTRAINT `core_pdf_template_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE,
-//  ADD CONSTRAINT `core_pdf_template_ibfk_2` FOREIGN KEY (`stationaryBlobId`) REFERENCES `core_blob` (`id`);
+
+$updates['202010231035'][] = "delete FROM `core_search` WHERE aclId not in (select id from core_acl);";
+$updates['202010231035'][] = "ALTER TABLE `core_search` ADD  FOREIGN KEY (`aclId`) REFERENCES `core_acl`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
+$updates['202010261619'][] = "ALTER TABLE `core_email_template` ROW_FORMAT=DYNAMIC;";
+$updates['202010261619'][] = "ALTER TABLE `core_email_template_attachment` ROW_FORMAT=DYNAMIC;";
+
+$updates['202010261619'][] = "ALTER TABLE `core_search` ROW_FORMAT=DYNAMIC;";
+$updates['202010261619'][] = "ALTER TABLE `core_search` CHANGE `keywords` `keywords` VARCHAR(750) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL;";
+
+
+$updates['202010261619'][] = "ALTER TABLE `core_acl` CHANGE `ownedBy` `ownedBy` INT(11) NULL;";
+
+$updates['202010261619'][] = "update `core_acl` set ownedBy = 1 where ownedBy not in (select id from core_user);";
+
+$updates['202010261619'][] = "ALTER TABLE `core_acl` ADD FOREIGN KEY (`ownedBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";
+
+$updates['202010271619'][] = "UPDATE `core_cron_job` SET `expression` = '0 0 * * *' WHERE `core_cron_job`.`name` = 'GarbageCollection' and moduleId = (select id from core_module where name='core' and package='core')";
+
+$updates['202011021149'][] = "ALTER TABLE core_customfields_select_option DROP FOREIGN KEY core_customfields_select_option_ibfk_2;";
+
+$updates['202011021149'][] = "CREATE TABLE `core_alert` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `entityTypeId` INT NOT NULL,
+  `entityId` INT NOT NULL,
+  `userId` INT NOT NULL,
+  `triggerAt` DATETIME NOT NULL,
+  `alertId` INT NOT NULL,
+  `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `dk_alert_entityType_idx` (`entityTypeId` ASC),
+  INDEX `fk_alert_user_idx` (`userId` ASC),
+  CONSTRAINT `fk_alert_entityType`
+    FOREIGN KEY (`entityTypeId`)
+    REFERENCES `core_entity` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_alert_user`
+    FOREIGN KEY (`userId`)
+    REFERENCES `core_user` (`id`)
+    ON DELETE RESTRICT
+    ON UPDATE NO ACTION);";
+
+
+
+// MASTER UPDATES
+
+$updates['202010161128'][] = "CREATE TABLE `core_pdf_block` (
+`id` bigint(20) UNSIGNED NOT NULL,
+  `pdfTemplateId` bigint(20) UNSIGNED NOT NULL,
+  `x` int(11) DEFAULT NULL,
+  `y` int(11) DEFAULT NULL,
+  `width` int(11) DEFAULT NULL,
+  `height` int(11) DEFAULT NULL,
+  `align` enum('L','C','R','J') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'L',
+  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+$updates['202010161128'][] = "CREATE TABLE `core_pdf_template` (
+`id` bigint(20) UNSIGNED NOT NULL,
+  `moduleId` int(11) NOT NULL,
+  `key` varchar(20) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
+  `language` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'en',
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `stationaryBlobId` binary(40) DEFAULT NULL,
+  `landscape` tinyint(1) NOT NULL DEFAULT 0,
+  `pageSize` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'A4',
+  `measureUnit` enum('mm','pt','cm','in') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'mm',
+  `marginTop` decimal(19,4) NOT NULL DEFAULT 10.0000,
+  `marginRight` decimal(19,4) NOT NULL DEFAULT 10.0000,
+  `marginBottom` decimal(19,4) NOT NULL DEFAULT 10.0000,
+  `marginLeft` decimal(19,4) NOT NULL DEFAULT 10.0000
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+$updates['202010161128'][] = "ALTER TABLE `core_pdf_block`
+  ADD PRIMARY KEY (`id`) USING BTREE,
+  ADD KEY `pdfTemplateId` (`pdfTemplateId`);";
+
+$updates['202010161128'][] = "ALTER TABLE `core_pdf_template`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `moduleId` (`moduleId`),
+  ADD KEY `stationaryBlobId` (`stationaryBlobId`);";
+
+$updates['202010161128'][] = "ALTER TABLE `core_pdf_block`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;";
+
+$updates['202010161128'][] = "ALTER TABLE `core_pdf_template`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;";
+
+$updates['202010161128'][] = "ALTER TABLE `core_pdf_block`
+  ADD CONSTRAINT `core_pdf_block_ibfk_1` FOREIGN KEY (`pdfTemplateId`) REFERENCES `core_pdf_template` (`id`) ON DELETE CASCADE;";
+
+$updates['202010161128'][] = "ALTER TABLE `core_pdf_template`
+  ADD CONSTRAINT `core_pdf_template_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_pdf_template_ibfk_2` FOREIGN KEY (`stationaryBlobId`) REFERENCES `core_blob` (`id`);";
+
+
+$updates['202010161128'][] = "ALTER TABLE `core_email_template` ADD `key` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL AFTER `aclId`, ADD `language` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'en' AFTER `key`;";

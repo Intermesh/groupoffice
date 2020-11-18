@@ -219,7 +219,7 @@ GO.email.MessagesGrid = function(config){
 				icon: 'send'
 			}, "-", {
 				iconCls: 'ic-more',
-				text: t("Advanced"),
+				text: t("Advanced", "email"),
 				handler: function(){
 					// var first = !this.searchDialog.dialog;
 					this.searchDialog.show();

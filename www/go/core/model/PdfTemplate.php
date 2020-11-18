@@ -117,6 +117,9 @@ class PdfTemplate extends Entity {
 				$module = Module::findByName($module['package'], $module['name']);
 				$criteria->where(['moduleId' => $module->id]);
 			})
+			->add('language' , function(Criteria $criteria, $language){
+				$criteria->where('language', '=',$language);
+			})
 			->add('key', function (Criteria $criteria, $value){
 				$criteria->where(['key' => $value]);
 			});

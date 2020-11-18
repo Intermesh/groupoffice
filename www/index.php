@@ -63,13 +63,11 @@ try {
 		$token = Token::find()->where('accessToken', '=', $_POST['accessToken'])->single();
 		if($token) {
 			$token->setAuthenticated();
+			setcookie('accessToken', $token->accessToken, null, "/", Request::get()->getHost(), false, false);
 		} else
 		{
 			unset($_POST['accessToken']);
 		}
-
-		setcookie('accessToken', $token->accessToken, null, "/", Request::get()->getHost(), false, false);
-
 		date_default_timezone_set($old);
 	}
 
@@ -83,6 +81,8 @@ try {
 //			exit();
 //		}
 
+		go()->fireEvent(\go\core\App::EVENT_INDEX);
+
 		Response::get()->sendHeaders();
 
 		if(go()->getSettings()->databaseVersion != go()->getVersion()) {
@@ -92,7 +92,7 @@ try {
 				echo '<a href="install/upgrade.php">Click here to launch the upgrade</a>';
 				exit();
 			}
-			header('Location: '.GO::config()->host.'install/upgrade.php');				
+			header('Location: '.GO::config()->host.'install/upgrade.php');
 			exit();
 		}
 	}
@@ -103,8 +103,5 @@ try {
   errorHander($e);  
 }
 
-
-
-go()->fireEvent(\go\core\App::EVENT_INDEX);
 
 GO::router()->runController();

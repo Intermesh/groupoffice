@@ -6,6 +6,7 @@ use Closure;
 use go\core\db\Criteria;
 use go\core\jmap\exception\UnsupportedFilter;
 use go\core\util\DateTime;
+use go\modules\community\test\model\C;
 
 /**
  * Filters
@@ -35,6 +36,26 @@ class Filters {
 		
 		return $this;
 	}
+
+
+	/**
+	 * Add a filter on a column name
+	 *
+	 * Shortcut for:
+	 *
+	 * ```
+	 * ->add('businessId', function(Criteria  $c, $value) {
+	 *  $c->andWhere('businessId', $value);
+	 * });
+	 * ```
+	 * @param $name
+	 * @return $this
+	 */
+	public function addColumn($name) {
+		return $this->add($name, function(Criteria  $c, $value) use ($name) {
+			$c->andWhere($name, '=', $value);
+		});
+	}
 	
 	// private function validate(Query $query, array $filter) {
 	// 	$invalidFilters = array_diff(array_map('strtolower',array_keys($filter)), array_keys($this->filters));
@@ -43,21 +64,16 @@ class Filters {
 	// 	}
 	// }
 
-	private function applyDefaults(array $filter) {
+	private function applyDefaults(Query $query, Criteria $criteria) {
 
 		$f = [];
-		foreach($filter as $k => $v) {
 
-			$index = strtolower($k);
+		foreach($this->filters as $name => $value) {
 
-			if(!isset($this->filters[$index])) {
-				throw new Exception("Filter '". $k."' is invalid");
+			if(in_array($name, $this->usedFilters)) {
+				continue;
 			}
 
-			$f[$this->filters[$index]['name']] = $v;
-		}
-
-		foreach($this->filters as $value) {
 			if($value['default'] === self::NO_DEFAULT) {
 				continue;
 			}
@@ -67,7 +83,73 @@ class Filters {
 			}
 		}
 
-		return $f;
+		$this->internalApply($query, $f, $criteria);
+
+	}
+
+	/**
+	 * Apply given filters to query object
+	 *
+	 * @param Query $query
+	 * @param array $filter
+	 * @param Criteria|null $criteria
+	 * @return Filters
+	 * @throws Exception
+	 */
+	public function apply(Query $query, array $filter)  {
+		//keep track of used filters because they can be nested in sub conditions
+		$this->usedFilters = [];
+		$criteria = new Criteria();
+		$this->internalApply($query, $filter, $criteria);
+
+		//apply defaults of unused filters
+		$this->applyDefaults($query, $criteria);
+
+		if($criteria->hasConditions()) {
+			$query->andWhere($criteria);
+		}
+
+		return $this;
+	}
+
+	private function internalApply(Query $query, array $filter, Criteria $criteria) {
+		if(isset($filter['conditions']) && isset($filter['operator'])) { // is FilterOperator
+
+			foreach($filter['conditions'] as $condition) {
+				$subCriteria = new Criteria();
+				$this->internalApply($query, $condition, $subCriteria);
+
+				if(!$subCriteria->hasConditions()) {
+					continue;
+				}
+
+				switch(strtoupper($filter['operator'])) {
+					case 'AND':
+						$criteria->where($subCriteria);
+						break;
+
+					case 'OR':
+						$criteria->orWhere($subCriteria);
+						break;
+
+					case 'NOT':
+						$criteria->andWhereNotOrNull($subCriteria);
+						break;
+				}
+			}
+
+		} else {
+			// is FilterCondition
+			$subCriteria = new Criteria();
+
+			$this->applyCondition($query, $subCriteria, $filter);
+
+			if($subCriteria->hasConditions()) {
+				$criteria->andWhere($subCriteria);
+			}
+		}
+
+		return $this;
 	}
 
   /**
@@ -78,10 +160,7 @@ class Filters {
    * @param array $filter
    * @throws Exception
    */
-	public function apply(Query $query, Criteria $criteria, array $filter) {
-
-		$filter = $this->applyDefaults($filter);
-
+	private function applyCondition(Query $query, Criteria $criteria, array $filter) {
 		//$this->validate($query, $filter);		
 		foreach($filter as $name => $value) {
 			$name = strtolower($name);
@@ -89,6 +168,8 @@ class Filters {
 			if(!isset($this->filters[$name])) {
 				throw new UnsupportedFilter();
 			}
+
+			$this->usedFilters[] = $name;
 
 			$filterConfig = $this->filters[$name];
 			

@@ -4,6 +4,9 @@ namespace go\core;
 
 use Exception;
 use go\core\orm\EntityType;
+use go\core\db\Query;
+use go\core\db\Statement;
+use go\core\orm\Entity;
 use go\core\util\DateTime;
 use stdClass;
 use Traversable;
@@ -69,7 +72,11 @@ use function GO;
  *     {{emailAddress.email}}
  *   [/if]
  * [/each]
- * 
+ *
+ * @example Implode all e-mail
+ *
+ * {{contact.emailAddresses | column:email | implode}}
+ *
  * @example Print billing address if available, else print first.
  * [if {{contact.emailAddresses | filter:type:"billing" | count}} > 0]
  *  {{contact.emailAddresses | filter:type:"billing"}}
@@ -92,13 +99,59 @@ use function GO;
  *
  * @example Using [assign] to lookup a Contact entity with id = 1
  *
+ * ```
+
  * [assign contact = 1 | entity:Contact]
+ * ```
+ *
+ * @example Using [assign] to lookup a Contact entity with id = 1
+ *
+ * ```
+ * [assign contact = 1 | entity:Contact]
+ * ```
+ *
+ * @example Using [assign] to lookup a linked Contact entity with id = 1
+ *
+ * ```
+ * [assign firstContactLink = someEntityVar | links:Contact | first]
+ *
+ * {{firstContactLink.name}}
+ * ```
+ *
+ * @example Using [assign] to do some basic math
+ *
+ * Note that inside the [each] block we access total with parent.total
+ *
+ * ```
+ * [assign total = 0]
+ *
+ * [each invoice in invoices]
+ *  <tr>
+ *    <td>{{invoice.number}}</td>
+ *    <td>{{invoice.date|date:d-m-Y}}</td>
+ *    <td>{{invoice.expiresAt|date:d-m-Y}}</td>
+ *    <td align="right">{{business.finance.currency}} {{invoice.totalPrice|number}}</td>
+ *    <td align="right">{{business.finance.currency}} {{invoice.paidAmount|number}}</td>
+ *    [assign balance = {{invoice.totalPrice}} - {{invoice.paidAmount}} ]
+ *    [assign parent.total = {{parent.total}} + {{balance}}]
+ *    <td align="right">{{business.finance.currency}} {{balance|number}}</td>
+ *  </tr>
+ * [/each]
+ *
+ * {{business.finance.currency}} {{total|number}}
+ * </tr>
+ * ````
  *
  */
 class TemplateParser {	
 
 	private $models = [];
 
+	/**
+	 * Values in IF expressions will be enlosed with quotes.
+	 *
+	 * @var bool
+	 */
 	public $encloseVars = false;
 
 	public $enableBlocks = true;
@@ -109,9 +162,12 @@ class TemplateParser {
 		$this->addFilter('filter', [$this, "filterFilter"]);
 		$this->addFilter('count', [$this, "filterCount"]);
 		$this->addFilter('first', [$this, "filterFirst"]);
+		$this->addFilter('column', [$this, "filterColumn"]);
+		$this->addFilter('implode', [$this, "filterImplode"]);
 		$this->addFilter('entity', [$this, "filterEntity"]);
+		$this->addFilter('links', [$this, "filterLinks"]);
 		$this->addFilter('nl2br', "nl2br");
-		
+
 		$this->addModel('now', new DateTime());	
 	}
 
@@ -141,19 +197,35 @@ class TemplateParser {
 
 	private function filterEntity($id, $entityName) {
 		$et = EntityType::findByName($entityName);
+		if(!$et) {
+			return null;
+		}
 		$cls = $et->getClassName();
 
 		$e = $cls::findById($id);
 
 		return $e;
 	}
-	
+
+	private function filterLinks(Entity $entity, $entityName) {
+
+		$entityType = EntityType::findByName($entityName);
+		$entityCls = $entityType->getClassName();
+		$entities = $entityCls::findByLink($entity,[], true);
+
+		return $entities;
+	}
+
 	private function filterNumber($number,$decimals=2, $decimalSeparator='.', $thousandsSeparator=',') {
 		return number_format($number,$decimals, $decimalSeparator, $thousandsSeparator);
 	}
 	
 	private function filterFilter($array, $propName, $propValue) {
-		
+
+		if(!isset($array)) {
+			return null;
+		}
+
 		$filtered = array_filter($array, function($i) use($propValue, $propName){
 			return $i->$propName == $propValue;
 		});
@@ -161,12 +233,56 @@ class TemplateParser {
 		return $filtered;
 	}
 
+	private function filterColumn($array, $propName) {
+
+		if(!isset($array)) {
+			return null;
+		}
+
+		$c = [];
+
+		foreach($array as $item) {
+			$c[] = $this->getVar($propName, $item);
+		}
+
+		return $c;
+	}
+
+	private function filterImplode($array, $glue = ', ') {
+
+		if(!isset($array)) {
+			return "";
+		}
+
+		return implode($glue, $array);
+	}
+
+
+
 	private function filterCount($countable) {
+		if(!isset($countable)) {
+			return 0;
+		}
 		return count($countable);
 	}
 
-	private function filterFirst(array $items) {
-		return $items[0] ?? null;
+	private function filterFirst($items) {
+
+		if(!isset($items)) {
+			return null;
+		}
+
+		if(is_array($items)) {
+			return reset($items);
+		}
+
+		if($items instanceof Query) {
+			return $items->single();
+		}
+
+		throw new \Exception("Unsupported type for filter 'first'");
+
+
 	}
 	
 	/**
@@ -184,7 +300,7 @@ class TemplateParser {
 		preg_match_all('/\[(each|if)/s', $str, $openMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\[\/(each|if)\]/s', $str, $closeMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		preg_match_all('/\[else\]/s', $str, $elseMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
-		preg_match_all('/\\[assign\s+([a-z0-9A-Z-_]+)\s*=\s*(.*)(?<!\\\\)\\]/', $str, $assignMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
+		preg_match_all('/\\[assign\s+([a-z0-9A-Z-_\.]+)\s*=\s*(.*?)(?<!\\\\)\\]/', $str, $assignMatches, PREG_OFFSET_CAPTURE|PREG_SET_ORDER);
 		
 		$count = count($openMatches);
 		if($count != count($closeMatches)) {
@@ -395,14 +511,61 @@ class TemplateParser {
 
 	private function replaceAssign($tag, $str) {
 
-		$value = $this->getVarFiltered($tag['expression']);
-		$this->addModel($tag['varName'], $value);
-
+		//assign won't output
 		$tag['replacement'] = "";
+
+		if(is_numeric($tag['expression'])) {
+			//allow assigning a new numeric value for math operations
+			$value = $tag['expression'];
+		} else 	if(preg_match('/{{.*?}}/',$tag['expression'])) {
+			$sum = $this->parse($tag['expression']);
+
+			try{
+				$sum = $this->validateExpression($sum);
+				$value = eval($sum);
+			} catch(\Throwable $e) {
+				$value = $e->getMessage();
+			}
+
+		} else {
+			$value = $this->getVarFiltered($tag['expression']);
+		}
+
+		$o = &$this->models;
+
+		$path = explode(".", $tag['varName']);
+
+		$lastPart = array_pop($path);
+
+		foreach($path as $part) {
+			if(is_array($o)) {
+				if (!isset($o[$part])) {
+					//ignore invalid assign
+					return $tag;
+				}
+				$o = &$o[$part];
+			} else{
+				if (!isset($o->$part)) {
+					//ignore invalid assign
+					return $tag;
+				}
+				$o = &$o->$part;
+			}
+		}
+
+		if(is_array($o)) {
+			$o[$lastPart] = $value;
+		} else if(is_object($o)) {
+			$o->$lastPart = $value;
+		}
+
+
 
 		return $tag;
 	}
-	
+
+
+
 	private function replaceEach($tag, $str) {
 		
 		//example emailAddress in contact.emailAddresses
@@ -412,7 +575,7 @@ class TemplateParser {
 			throw new \Exception("Invalid expression: ". $tag['expression']);
 		}
 
-		$array = $this->getVarFiltered($expressionParts[1]);	
+		$array = $this->getVarFiltered($expressionParts[1]);
 		
 		if(!is_array($array) && !($array instanceof Traversable)) {
 			$tag['replacement'] = "";
@@ -423,7 +586,8 @@ class TemplateParser {
 		
 		$replacement = '';
 		$eachIndex = 0;
-		$parser = clone $this;		
+		$parser = clone $this;
+		$parser->addModel("parent", $this);
 		foreach($array as $model) {
 			
 			$parser->addModel($varName, $model);		
@@ -450,7 +614,7 @@ class TemplateParser {
 		$expression = $this->validateExpression($parsed);	
 		try {
 			$ret = eval($expression);	
-		} catch(\ParseError $e) {
+		} catch(\Throwable $e) {
 			go()->warn('eval() failed '. $e->getMessage());
 			go()->warn($tag['expression']);
 			go()->warn($expression);
@@ -513,7 +677,9 @@ class TemplateParser {
 	}
 
 	private function replaceVar($matches) {
-		$str = substr($matches[0], 2, -2);		
+		//take off {{ .. }}
+		$str = substr($matches[0], 2, -2);
+
 		$value =  $this->getVarFiltered($str);
 
 		//If replace value is array use first value for convenience
@@ -529,7 +695,54 @@ class TemplateParser {
 
 		return $value;
 	}
-	
+
+
+//	private function replaceVar($matches) {
+//
+//		//take off {{ .. }}
+//		$str = substr($matches[0], 2, -2);
+//
+//		//split for allowing simple calculations
+//		$parts = preg_split('/([+\-\/\*])/', $str, -1, PREG_SPLIT_DELIM_CAPTURE);
+//
+//		$math = "";
+//
+//		$mathExpression = count($parts) > 1;
+//
+//		while($part = array_shift($parts)) {
+//
+//			$varName = trim($part);
+//			$operator = array_shift($parts);
+//
+//			$value = $this->getVarFiltered($varName);
+//
+//			//If replace value is array use first value for convenience
+//			if (is_array($value)) {
+//				$value = array_shift($value);
+//			}
+//
+//			if ($this->encloseVars) {
+//				$value = is_scalar($value) ||
+//				!isset($value) ||
+//				(is_object($value) && method_exists($value, '__toString')) ? '"' . str_replace('"', '\\"', $value) . '"' : !empty($value);
+//			}
+//
+//			if(!$mathExpression) {
+//				return $value;
+//			}
+//
+//			$math .= $value . $operator;
+//		}
+//
+//
+//		try {
+//			return eval($math);
+//		}catch(\Throwable $e) {
+//			return $e->getMessage();
+//		}
+//
+//	}
+
 	private function getVarFiltered($expression) {
 		$filters = explode('|', $expression);
 		
@@ -554,36 +767,16 @@ class TemplateParser {
 	
 	private $filters = [];
 	
+
 	
-	private function isVar($path) {
-		$pathParts = explode(".", trim($path)); //eg "contact.name"		
-
-		$model = $this;
-
-		foreach ($pathParts as $pathPart) {
-			if(is_array($model)) {
-				if(!array_key_exists($pathPart, $model)) {
-					return false;
-				}
-				$model = $model[$pathPart];
-			}else
-			{
-				if(!$model->hasReadableProperty($pathPart)) {
-					return false;
-				}
-				$model = $model->$pathPart;
-			}			
-		}
-
-		return true;
-	}
-	
-	private function getVar($path) {
+	private function getVar($path, $model = null) {
 		
 		// var_dump('getVar('.trim($path).')');
 		$pathParts = explode(".", trim($path)); //eg "contact.name"		
 
-		$model = $this;
+		if(!isset($model)) {
+			$model = $this;
+		}
 
 		foreach ($pathParts as $pathPart) {
 			//check for array access eg. contact.emailAddresses[0];
@@ -609,7 +802,12 @@ class TemplateParser {
 					$getter = 'get' . $pathPart;
 
 					if(method_exists($model, $getter)) {
-						$model = $model->$getter();
+						if(strtolower($getter) == "customfields") {
+							//Get custom fields in text mode
+							$model = $model->getCustomFields(true);
+						} else {
+							$model = $model->$getter();
+						}
 					} else{
 						return null;
 					}
@@ -648,11 +846,15 @@ class TemplateParser {
 		return $this;
 	}
 
+	public function __set($name, $value) {
+		$this->addModel($name, $value);
+	}
+
 	public function __isset($name) {
 		return isset($this->models[$name]);
 	}
 
-	public function __get($name) {
+	public function &__get($name) {
 		return $this->models[$name];
 	}
 }

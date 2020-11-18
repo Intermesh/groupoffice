@@ -43,6 +43,7 @@
 go.form.ChipsView = Ext.extend(Ext.DataView, {
 	autoHeight: true,
 	multiSelect: true,
+	pageSize: null,
 	overClass: 'x-view-over',
 	itemSelector: 'div.go-chip',
 	displayField: 'display',
@@ -187,7 +188,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	setValue: function (values) {
 		
 		if(!values) {
-			values = {};
+			values = this.map ? {} : [];
 		}
 		
 		if(this.entityStore) {	
@@ -262,15 +263,19 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		this.comboBox = new go.form.ComboBox({
 			listeners: {
 				focus: function(combo){
-						combo.onTriggerClick();
+					//use settimeout to give combo change to run initLis()
+					setTimeout(function() {
+						if(!combo.isExpanded()) {
+							combo.onTriggerClick();
+						}
+					});
 				}
 			},
 			submit: false,
-			lazyInit: false,
 			hideLabel: true,
 			anchor: '100%',
 			emptyText: t("Please select..."),
-			pageSize: this.entityStore ? 50 : null,
+			pageSize: this.entityStore ? 50 : this.pageSize,
 			valueField: 'id',
 			displayField: this.displayField,
 			triggerAction: 'all',

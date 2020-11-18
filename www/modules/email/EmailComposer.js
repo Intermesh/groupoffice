@@ -373,8 +373,9 @@ GO.email.EmailComposer = function(config) {
 
 	tbar.push(this.emailEditor.getAttachmentsButton(), 
 			this.showMenuButton = new Ext.Button({
-				tooltip : t("Show", "email"),
-				iconCls : 'ic-more',				
+				tooltip : t("Add recipients", "email"),
+				// iconCls : 'ic-contact-mail',
+				iconCls : 'ic-people',
 				menu : this.showMenu
 			}));
 
@@ -844,7 +845,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		this.fromCombo.getEl().up('.x-form-item').setDisplayed(show);
 		if(show)
 		{
-			this.fromCombo.onResize();
+			this.fromCombo.autoSize();
 		}
 		this.doLayout();
 	},
@@ -853,7 +854,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		this.ccCombo.getEl().up('.x-form-item').setDisplayed(show);
 		if(show)
 		{
-			this.ccCombo.onResize();
+			this.ccCombo.autoSize();
 		}		
 		this.doLayout();
 	},
@@ -862,7 +863,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		this.bccCombo.getEl().up('.x-form-item').setDisplayed(show);		
 		if(show)
 		{
-			this.bccCombo.onResize();
+			this.bccCombo.autoSize();
 		}
 		this.doLayout();
 	},
@@ -1406,7 +1407,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 							callback.call();
 						}
 						
-						if (GO.addressbook && action.result.unknown_recipients
+						if (go.Modules.isAvailable("community", "addressbook") && action.result.unknown_recipients
 							&& action.result.unknown_recipients.length) {
 							if (!GO.email.unknownRecipientsDialog)
 								GO.email.unknownRecipientsDialog = new GO.email.UnknownRecipientsDialog();
@@ -1433,7 +1434,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 					{
 						var fb = action.result && action.result.feedback ? action.result.feedback : t("Could not connect to the server. Please check your internet connection.");
 						
-						GO.errorDialog.show(fb);						
+						GO.errorDialog.show(Ext.util.Format.nl2br(Ext.util.Format.htmlEncode(fb)));
 					}
 					this.saveButton.setDisabled(false);
 					this.sendButton.setDisabled(false);

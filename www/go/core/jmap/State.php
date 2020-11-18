@@ -73,6 +73,7 @@ class State extends AbstractState {
 
 			$this->token = go()->getCache()->get('token-' . $tokenStr);
 			if($this->token) {
+				$this->token->activity();
 				return $this->token;
 			}
 		
@@ -142,32 +143,11 @@ class State extends AbstractState {
 		}
 	}
 
-	private function getBaseUrl() {
+	protected function getBaseUrl() {
 		$url = Request::get()->isHttps() ? 'https://' : 'http://';
 		$url .= Request::get()->getHost(false) . dirname($_SERVER['PHP_SELF']);
 		return $url;
 	}
-	
-	public function getDownloadUrl($blobId) {
-		return $this->getBaseUrl() . "/download.php?blob=".$blobId;
-	}
-
-	public function getPageUrl($blobId) {
-		return $this->getBaseUrl(). "/page.php?blob=".$blobId;
-	}
-	
-	public function getApiUrl() {
-		return $this->getBaseUrl() . '/jmap.php';
-	}
-	
-	public function getUploadUrl() {
-		return $this->getBaseUrl(). '/upload.php';
-	}
-	
-	public function getEventSourceUrl() {
-		return go()->getConfig()['core']['general']['sseEnabled'] ? $this->getBaseUrl() . '/sse.php' : null;
-	}
-
 
 	public function getSession() {
 			
@@ -194,6 +174,7 @@ class State extends AbstractState {
 				'capabilities' => Capabilities::get(),
 				'apiUrl' => $this->getApiUrl(),
 				'downloadUrl' => $this->getDownloadUrl("{blobId}"),
+				'pageUrl' => $this->getPageUrl(),
 				'uploadUrl' => $this->getUploadUrl(),
 				'eventSourceUrl' => $this->getEventSourceUrl(),
 				'userId' => $this->getUserId(),

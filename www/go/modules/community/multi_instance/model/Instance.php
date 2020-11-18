@@ -3,15 +3,16 @@ namespace go\modules\community\multi_instance\model;
 
 use Exception;
 use go\core\db\Criteria;
+use go\core\ErrorHandler;
 use go\core\fs\File;
 use go\core\http\Client;
 use go\core\http\Request;
 use go\core\jmap\Entity;
 use go\core\orm\Query;
+use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 use go\modules\community\multi_instance\Module;
 use function GO;
-use go\core\util\DateTime;
 
 class Instance extends Entity {
 	
@@ -182,6 +183,10 @@ class Instance extends Entity {
 	private function getDbName() {
 		return str_replace(['.','-'], '_', $this->hostname);
 	}
+
+	private function getStudioPackage() {
+		return str_replace('-', "", explode(".", $this->hostname)[0]);
+	}
 	
 	private function getDbUser() {
 		return substr($this->getDbName(), 0, 16);
@@ -291,7 +296,12 @@ class Instance extends Entity {
 		$tmpFolder = $this->getTempFolder();	
 		$configFile = $this->getConfigFile();
 		$databaseCreated = $databaseUserCreated = false;
-		try {			
+		try {
+
+			if(!$this->getModulePackageFolder()->create()) {
+				throw new Exception("Could not create module package folder in go/modules/*. Please make go/modules writable.");
+			}
+
 			if(!$dataFolder->create()) {
 				throw new Exception("Could not create data folder");
 			}
@@ -309,6 +319,8 @@ class Instance extends Entity {
 			if(!$configFile->putContents($this->createConfigFile($dbName, $dbUsername, $dbPassword, $tmpFolder->getPath(), $dataFolder->getPath()))) {
 				throw new Exception("Could not write to config file");
 			}
+
+
 		} catch(\Exception $e) {
 			
 			//cleanup
@@ -322,11 +334,20 @@ class Instance extends Entity {
 			if($databaseUserCreated) {
 				$this->dropDatabaseUser($dbUsername);
 			}
+
+			$this->getModulePackageFolder()->delete();
 			
 			parent::internalDelete((new Query())->where(['id' => $this->id]));
 			
 			throw $e;
 		}
+	}
+
+	/**
+	 * @return \go\core\fs\Folder
+	 */
+	private function getModulePackageFolder() {
+		return go()->getEnvironment()->getInstallFolder()->getFolder("go/modules/" . $this->getStudioPackage());
 	}
 	
 	private function dropDatabase($dbName) {		
@@ -365,6 +386,7 @@ class Instance extends Entity {
 				'{tmpPath}',
 				'{dataPath}',
 				'{servermanager}',
+				'{studioPackage}',
 		], [
 				$dsn['options']['host'],
 				$dbName,
@@ -372,7 +394,8 @@ class Instance extends Entity {
 				$dbPassword,
 				$tmpPath,
 				$dataPath,
-				go()->findConfigFile()
+				go()->findConfigFile(),
+				$this->getStudioPackage()
 		],
 		$tpl->getContents());		
 	}
@@ -407,7 +430,7 @@ class Instance extends Entity {
 	
 	private function getGlobalConfig() {
 		
-		if(!isset($this->instanceConfig)) {			
+		if(!isset($this->globalConfig)) {
 			$globalConfigFile = "/etc/groupoffice/globalconfig.inc.php";
 			if(file_exists($globalConfigFile)) {
 				include("/etc/groupoffice/globalconfig.inc.php");
@@ -515,8 +538,8 @@ class Instance extends Entity {
 	/**
 	 * Create a mysql dump of the installation database.
 	 * 
-	 * @param StringHelper $outputDir
-	 * @param StringHelper $filename Optional filename. If omitted then $config['db_name'] will be used.
+	 * @param string $outputDir
+	 * @param string $filename Optional filename. If omitted then $config['db_name'] will be used.
 	 * @return boolean
 	 * @throws Exception
 	 */
@@ -529,7 +552,7 @@ class Instance extends Entity {
 			
 	
 		$cmd = "mysqldump --force --opt --host=" . ($c['db_host'] ?? "localhost") . " --port=" . ($c['db_port'] ?? 3306) . " --user=" . $c['db_user'] . " --password=" . $c['db_pass'] . " " . $c['db_name'] . " > \"" . $file->getPath() . "\"";
-		go()->debug($cmd);
+		//go()->debug($cmd);
 		exec($cmd, $output, $retVar);
 		
 		if($retVar != 0) {
@@ -548,21 +571,33 @@ class Instance extends Entity {
 		$instances = Instance::find()->mergeWith($query);
 
 		foreach($instances as $instance) {
-			$instance->getTempFolder()->delete();
-			
-			$instance->mysqldump();
-			
-			$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php'));
-			$instance->getConfigFile()->getFolder()->delete();
+			try {
+				$instance->getTempFolder()->delete();
 
-			$dest =	$instance->getTrashFolder()->getFolder($instance->getDataFolder()->getName());
-			if($dest->exists()) {
-				$dest = $dest->getParent()->getFolder($instance->getDataFolder()->getName() . '-' . uniqid());
-			}
-			$instance->getDataFolder()->move($dest);
+				$instance->mysqldump();
+
+				$instance->getModulePackageFolder()->move($instance->getDataFolder()->getFolder($instance->getStudioPackage() .'_MODULE_PACKAGE'));
+
+				$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php'));
+				$instance->getConfigFile()->getFolder()->delete();
+
+				$dest = $instance->getTrashFolder()->getFolder($instance->getDataFolder()->getName());
+				if ($dest->exists()) {
+					$dest = $dest->getParent()->getFolder($instance->getDataFolder()->getName() . '-' . uniqid());
+				}
+				$instance->getDataFolder()->move($dest);
 			
-			$instance->dropDatabaseUser($instance->getDbUser());
-			$instance->dropDatabase($instance->getDbName());
+				$instance->dropDatabaseUser($instance->getDbUser());
+				$instance->dropDatabase($instance->getDbName());
+			}catch(Exception $e) {
+				ErrorHandler::logException($e);
+
+				go()->getMailer()
+					->compose()
+					->setSubject("Error deleting instance: ". $instance->hostname)
+					->setBody($e->getMessage())
+					->send();
+			}
 		}
 		
 		return parent::internalDelete($query);
@@ -588,5 +623,84 @@ class Instance extends Entity {
 		//echo $response['body'];
 
 		return $response['status'] == 200;
+	}
+
+	private static $availableModules;
+
+	private static function getAvailableModules() {
+		if(!isset(self::$availableModules)) {
+			self::$availableModules =  \GO::modules()->getAvailableModules(true);
+		}
+
+		return self::$availableModules;
+	}
+
+	/**
+	 * All modules with allowed bit set;
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getAllowedModules()
+	{
+		$modules = self::getAvailableModules();
+		$instanceConfig = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
+		$checkAllowed = false;
+		if (array_key_exists('allowed_modules', $instanceConfig) && is_array($instanceConfig['allowed_modules'])) {
+			$checkAllowed = true;
+		}
+		$returnMods = [];
+		$id = 0;
+		foreach ($modules as $module) {
+			$mod = $module::get();
+			if ($mod instanceof \GO\Base\Module) {
+				$key = $mod->package() . $mod->name();
+				// old Framework
+				$avMod = [
+					'id' => $id,
+					'package' => 'legacy',
+					'module' => $mod->name(),
+					'title' => $mod->localizedName(),
+					'icon' => $mod->icon(),
+					'localizedPackage' => ucfirst($mod->package())
+				];
+			} elseif ($mod instanceof \go\core\Module) {
+				$key = ucfirst($mod->getPackage()) . $mod->getName();
+				// new Framework
+				$avMod = [
+					'id' => $id,
+					'package' => $mod->getPackage(),
+					'module' => $mod->getName(),
+					'title' => $mod->getTitle(),
+					'icon' => $mod->getIcon(),
+					'localizedPackage' => ucfirst($mod->getPackage())
+				];
+			}
+			if ($checkAllowed) {
+				$avMod['allowed'] = \GO\Base\ModuleCollection::isAllowed($avMod['module'], $avMod['package']);
+			} else {
+				$avMod['allowed'] = true;
+			}
+			$returnMods[$key] = $avMod;
+			$id++;
+		}
+
+		$retMods = [];
+		foreach ($returnMods as $key => $mod) {
+			$retMods[] = $mod;
+		}
+
+		return $retMods;
+	}
+
+	public function setAllowedModules($allowedModules)
+	{
+		if($this->isNew()) {
+			return;
+		}
+
+		$config = $this->getInstanceConfig();
+		$config['allowed_modules'] = $allowedModules;
+		$this->setInstanceConfig($config);
+
 	}
 }

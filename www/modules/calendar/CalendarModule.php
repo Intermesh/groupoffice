@@ -22,7 +22,7 @@ use go\core\util\DateTime;
 class CalendarModule extends \GO\Base\Module{
 	
 	
-	public static function defineListeners() {
+	public function defineListeners() {
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		Link::on(Entity::EVENT_FILTER, static::class, 'onLinkFilter');
 	}

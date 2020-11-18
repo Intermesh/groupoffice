@@ -1,11 +1,11 @@
 /* global go */
 
 go.pdftemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
-	title: t('E-mail template'),
+	title: t('PDF template'),
 	entityStore: "PdfTemplate",
 	width: dp(1000),
 	height: dp(800),
-	formPanelLayout: "form",
+	formPanelLayout: "column",
 	resizable: true,
 	maximizable: true,
 	collapsible: true,
@@ -13,8 +13,21 @@ go.pdftemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 
 	initFormItems: function () {
 
+		this.addPanel({
+			title: t("Content blocks"),
+			items: [
+				{
+					xtype: 'fieldset',
+					items: [{
+						xtype: "goblocksfield"
+					}]
+				}
+			]
+		});
 
 		return [{
+			columnWidth: 1,
+			labelAlign: "top",
 			xtype: 'fieldset',
 			defaults: {
 				anchor: '100%'
@@ -27,6 +40,8 @@ go.pdftemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 				xtype: 'golanguagecombo'
 			}]
 		},{
+			columnWidth: .5,
+			labelAlign: "top",
 			title: t("Page"),
 			xtype: 'fieldset',
 			defaults: {
@@ -34,7 +49,8 @@ go.pdftemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 			},
 			items: [{
 				xtype: "checkbox",
-				fieldLabel: t("Landscape"),
+				boxLabel: t("Landscape"),
+				hideLabel: true,
 				name: "landscape"
 			},{
 				xtype: 'combo',
@@ -78,49 +94,33 @@ go.pdftemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 				accept: '.pdf'
 			})]
 		}, {
+			columnWidth: .5,
 			xtype: 'fieldset',
 			title: t("Margins"),
-			layout: 'hbox',
-			defaults: {
-				layout: 'form',
-				labelAlign: 'top',
-				cls: 'go-form-panel'
-			},
+			labelAlign: 'top',
+
 			items: [{
-				items: [{
-					xtype: 'gonumberfield',
-					fieldLabel: t('Top'),
-					name: 'marginTop',
-					value: 10
-				}]
-			}, {
-				items: [{
-					xtype: 'gonumberfield',
-					fieldLabel: t('Right'),
-					name: 'marginRight',
-					value: 10
-				}]
+				xtype: 'gonumberfield',
+				fieldLabel: t('Top'),
+				name: 'marginTop',
+				value: 10
 			},{
-				items: [{
-					xtype: 'gonumberfield',
-					fieldLabel: t('Bottom'),
-					name: 'marginBottom',
-					value: 10
-				}]
-			}, {
-				items: [{
-					xtype: 'gonumberfield',
-					fieldLabel: t('Left'),
-					name: 'marginLeft',
-					value: 10
-				}]
+				xtype: 'gonumberfield',
+				fieldLabel: t('Right'),
+				name: 'marginRight',
+				value: 10
+			},{
+				xtype: 'gonumberfield',
+				fieldLabel: t('Bottom'),
+				name: 'marginBottom',
+				value: 10
+			},{
+				xtype: 'gonumberfield',
+				fieldLabel: t('Left'),
+				name: 'marginLeft',
+				value: 10
 			}]
-		}, {
-			xtype: 'fieldset',
-			title: t("Blocks"),
-			items: [{
-				xtype: "goblocksfield"
-			}]
+
 		}];
 	}
 });

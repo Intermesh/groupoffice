@@ -93,8 +93,8 @@ class Module extends \GO\Base\Db\ActiveRecord {
 					\go\core\Module::installDependencies($module->moduleManager);
 				}
 
-
-				$module->save();				
+				if(!$module->save())
+					throw new \GO\Base\Exception\Save();
 			}
 		}
 			
@@ -136,7 +136,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 				$this->_moduleManager = \go\core\App::get();
 			}else{
 				$cls = "go\\modules\\" . $this->package ."\\" . $this->name . "\\Module";
-				$this->_moduleManager = new $cls;
+				$this->_moduleManager = $cls::get();
 			}
 		}
 		
@@ -296,13 +296,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function isAllowed() {
-		if(empty(\GO::config()->allowed_modules)) {
-			return true;
-		}
-		$allowedModules = explode(',', \GO::config()->allowed_modules);		
-		$allowedModules = array_merge($allowedModules, ['core', 'links', 'search', 'users', 'modules', 'groups', 'customfields']);
-		
-		return in_array($this->name, $allowedModules);
+		return \GO\Base\ModuleCollection::isAllowed($this->name);
 	}
 	
 	/**

@@ -14,6 +14,7 @@ use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\Environment;
 use go\core\event\Listeners;
+use go\core\fs\File;
 use go\core\jmap;
 use go\core\model;
 use go\core\model\Group;
@@ -21,6 +22,7 @@ use go\core\model\User;
 use go\core\model\UserGroup;
 use go\core\Module;
 use go\core\orm\Entity;
+use go\core\orm\Filters;
 use go\core\util\ClassFinder;
 use go\core\util\Lock;
 use PDOException;
@@ -67,6 +69,31 @@ class Installer {
 	 */
 	public static function isUpgrading() {
 		return self::$isUpgrading || basename($_SERVER['PHP_SELF']) == 'upgrade.php';
+	}
+
+	public function enableGarbageCollection() {
+		$job = model\CronJobSchedule::findByName("GarbageCollection", "core", "core");
+		if(!$job) {
+			$job = $this->createGarbageCollection();
+		}
+
+	}
+
+	private function createGarbageCollection() {
+
+		$module = model\Module::findByName("core", "core");
+
+		$cron = new model\CronJobSchedule();
+		$cron->moduleId = $module->id;
+		$cron->name = "GarbageCollection";
+		$cron->expression = "0 0 * * *";
+		$cron->description = "Garbage collection";
+
+		if(!$cron->save()) {
+			throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
+		}
+
+		return $cron;
 	}
 
 	/**
@@ -130,8 +157,6 @@ class Installer {
 		App::get()->getSettings()->setDefaultGroups([Group::ID_INTERNAL]);
 		App::get()->getSettings()->save();
 
-
-
 		App::get()->setCache(new $cacheCls);
 		Listeners::get()->init();
 
@@ -153,7 +178,12 @@ class Installer {
 			}
 		}
 
-		EntityType::findByName('FieldSet')->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
+		//Allow people to read filters by default
+		model\EntityFilter::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
+		//Allow people to read custom fieldsets by default
+		model\FieldSet::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
+		//groups readble to everyone
+		Group::entityType()->setDefaultAcl([Group::ID_EVERYONE => Acl::LEVEL_READ]);
 	}
 	
 	private function installCoreModule() {
@@ -168,23 +198,9 @@ class Installer {
 
 		//Share core with everyone
 		$module->findAcl()->addGroup(Group::ID_EVERYONE)->save();
-		
-		$cron = new model\CronJobSchedule();
-		$cron->moduleId = $module->id;
-		$cron->name = "GarbageCollection";
-		$cron->expression = "0 * * * *";
-		$cron->description = "Garbage collection";
-		
-		if(!$cron->save()) {
-			throw new Exception("Failed to save cron job: " . var_export($cron->getValidationErrors(), true));
-		}
-		
-		$acl = model\Acl::findById(Group::entityType()->getDefaultAclId());
-		$acl->addGroup(model\Group::ID_EVERYONE);
-		if(!$acl->save()) {
-			throw new \Exception("Could not save default ACL for groups");
-		}
-		
+
+		$this->createGarbageCollection();
+
 		if(!Password::register()) {
 			throw new \Exception("Failed to register Password authenticator");
 		}
@@ -298,7 +314,7 @@ class Installer {
 				}			
 			}
 
-			$mod = new $moduleCls();
+			$mod = $moduleCls::get();
 
 			if (!$mod->isAvailable()) {
 				$unavailable[] = ["package" => $module['package'], "name" => $module['name']];
@@ -321,6 +337,32 @@ class Installer {
 			$stmt = go()->getDbConnection()->update("core_module", ['enabled' => false], $where);
 			$stmt->execute();
 		}
+	}
+
+	private function initLogFile() {
+		$logDir = go()->getDataFolder()->getFolder('log/upgrade/')->create();
+
+
+		static::$logFile = $logDir->getFile(date('Ymd_His') . '.log');
+
+		if(!static::$logFile->isWritable()){
+			throw new \Exception('Fatal error: Could not write to log file');
+		}
+
+		echo "Upgrade output will be logged into: " . static::$logFile->getRelativePath(go()->getDataFolder()) ."\n\n";
+	}
+
+
+	/**
+	 * @var File
+	 */
+	private static $logFile;
+
+
+	private static function upgradeLog($buffer)
+	{
+		self::$logFile->putContents($buffer, FILE_APPEND);
+		return $buffer;
 	}
 
 	public function upgrade() {
@@ -348,21 +390,22 @@ class Installer {
 		if (!$lock->lock()) {
 			throw new \Exception("Upgrade is already in progress");
 		}
+
+		$this->initLogFile();
+		ob_start([static::class, 'upgradeLog'], 128);
 		
 		ini_set("max_execution_time", 0);
 		ini_set("memory_limit", -1);
-		
-
 
 		go()->getDbConnection()->query("SET sql_mode=''");
 		
 		jmap\Entity::$trackChanges = false;
 
 		ActiveRecord::$log_enabled = false;
+
 		
 		go()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
 
-		
 		while (!$this->upgradeModules()) {
 			echo "\n\nA module was refactored. Rerunning...\n\n";			
 		}
@@ -398,7 +441,11 @@ class Installer {
 
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
+
+		$this->enableGarbageCollection();
 		echo "Done!\n";
+
+		ob_end_clean();
 	}
 	
 	/**

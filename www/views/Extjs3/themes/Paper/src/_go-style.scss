@@ -105,7 +105,10 @@ p {
 }
 
 strong { font-weight: $font-weight-m; }
-small { color: color($fg, 'secondary-text'); font-weight: $font-weight-r; font-size:.85em; line-height: 1.2; }
+small {
+	font-weight: $font-weight-r;
+	font-size:.85em; line-height: 1.2;
+}
 
 
 
@@ -272,6 +275,9 @@ a {
 		position:absolute;
 		top: dp(16);
 		left: dp(16);
+	}
+	#go-powered-by {
+		color: white;
 	}
 }
 #motd { // login message of the day
@@ -449,6 +455,9 @@ a {
 
 #mainNorthPanel {
 	height: dp(56);
+	.x-panel-body {
+		min-height: dp(56);
+	}
 	
 	position: relative;
 	color: white;
@@ -462,7 +471,7 @@ a {
 		.x-tab-strip {
 			
 			&-active {
-				border-bottom-color: $cAccent;
+				@include var(border-bottom-color, c-accent);
 				color:white;
 				.x-tab-strip-text{ color:white;}
 			}
@@ -504,7 +513,6 @@ a {
 	position:relative;
 	z-index: 2;
 	background-color: color($bg, 'background') !important;
-	// /color: $cAccent;
 }
 
 // empty state icons
@@ -529,20 +537,16 @@ a {
 
 #secondary-menu {
 	padding-right: dp(56);
-	#start-menu-link {		
-		display:inline-block;
+	#start-menu-link, #search_query {
+		float: left;
 		text-decoration: none;
 		height:dp(40);
-		padding: dp(22) dp(8) dp(8) dp(8);
+		padding: dp(18) dp(8) 0 0;
 		color: white;
 		&:hover,&:active { color: white; }
 	}
 }
-#search_query {
-	float:left;
-	display:block;
-	padding-top: dp(16);	
-}
+
 
 .search-field-wrap {
 	position:absolute;
@@ -622,15 +626,23 @@ a {
 
 		.x-panel-header {
 			color: color($fg,'secondary-text');
-			zoom:.8;
+			>i, .x-tool {
+				transform: scale(.8);
+				margin-top: dp(-4);
+			}
+			.x-tool {
+				transform: scale(.8);
+				margin-top: dp(4);
+			};
 			height: dp(40);
-			line-height: dp(40);
+			//line-height: dp(40);
 	    }
 		.x-panel-header-text {
 			color: color($fg,'secondary-text');
+			font-size: dp(16);
 		}
 		.x-panel-bwrap {
-			padding: dp(8);
+			padding: dp(8) dp(16);
 			em {float:right;}
 		}
 	}
@@ -663,7 +675,7 @@ a {
 	float:left;
 	height: dp(32);
 	padding: dp(2) dp(8);
-	margin-top: dp(20);
+	margin-top: dp(16);
 	margin-right: dp(8);
 	border-radius: dp(16);
 	border: 1px solid color($fg,'line');
@@ -743,7 +755,7 @@ button {
 		width: 100%;
 	}
 
-	.go-detail-view & {
+	.icons &, .go-detail-view-avatar & {
 		//float:left; ?? why?
 		margin-top:dp(4);
 		margin-right: dp(16);
@@ -1120,50 +1132,17 @@ tr.go-grid-row {
 
 //detail view
 .go-detail-view {
-	
-	
-	// .go-detail-view-avatar {
-	// 	text-align: center;
-	// 	.avatar {
-	// 		font-size: dp(154);
-	// 		line-height: dp(120);
 
-	// 		height: dp(120);
-	// 		width: dp(120);
-	// 	}
-	// }
+	small {
+		color: color($fg, 'secondary-text');
+	}
 	
 	.content {
 		padding: dp(16);
 	}
 	
 	@extend %font-body1;
-	/*.x-btn.fab {
-		@extend .z6;
-		position:absolute;
-		box-sizing: border-box;
-		right: dp(32);
-		top:dp(-24);
-		background-color: $cAccent;
-		color:white;
-		width:dp(48);
-		height: dp(48) !important;
-		transition: box-shadow 280ms $curve-standard;
-		border-radius: 50%;
-		button::before {
-			color:white;
-		}
-	}
-	.x-btn-over.fab {
-		@extend .z8;
-	}
-	.x-btn-click.fab {
-		@extend .z12;
-		background-color: color($orange, 700) !important;
-	}*/
-		.x-panel-body {
 
-	}
 
 	> .x-panel-bwrap {
 		> .x-panel-body {
@@ -1195,9 +1174,6 @@ tr.go-grid-row {
 		  padding-top: (9 / 16) * 100%;
 		}
 	}
-	/*.x-tool { margin-top: dp(3);}*/
-
-
 		
 	.xtb-title {
 		@extend %font-title;
@@ -1231,8 +1207,8 @@ tr.go-grid-row {
 	.s11 {width:91.666666%;}
 	.s12 {width:100%;}
 	.pad {
-		padding-left: dp(16);
-		padding-bottom:dp(8)
+		padding: dp(8) dp(16);
+		//padding-bottom:dp(8)
 	}
 
 	label {
@@ -1598,6 +1574,9 @@ table[id^="comments-ext"] b {
 	
 	#mainNorthPanel {
 		height: dp(64);
+		.x-panel-body {
+			min-height: dp(64);
+		}
 	}
 
 }
@@ -1805,8 +1784,6 @@ table[id^="comments-ext"] b {
 		margin-left: dp(-16);
 	}
 	margin-bottom: dp(16);
-	
-
 }
 
 
@@ -1825,9 +1802,6 @@ table[id^="comments-ext"] b {
 
 .go-html-formatted {
 	@extend %font-body1;
-
-
-
 }
 
 //.go-html-formatted div, .go-html-formatted dl, .go-html-formatted dt, .go-html-formatted dd, .go-html-formatted ul, .go-html-formatted ol, .go-html-formatted li, .go-html-formatted h1, .go-html-formatted h2, .go-html-formatted h3, .go-html-formatted h4, .go-html-formatted h5, .go-html-formatted h6, .go-html-formatted pre, .go-html-formatted form, .go-html-formatted fieldset, .go-html-formatted input, .go-html-formatted p, .go-html-formatted blockquote, .go-html-formatted th, .go-html-formatted td, .go-html-formatted span {
@@ -2215,31 +2189,43 @@ table[id^="comments-ext"] b {
 	}
 
 	button, a.button {
+		@extend %font-button;
 		box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
 		transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
 		will-change: box-shadow;
 		min-width: dp(80);
-		font-family: Helvetica, sans-serif;
-		font-size: 0.875rem;
-		font-weight: 500;
-		letter-spacing: 0.04em;
-		color: rgba(255, 255, 255, 0.87);
 		display: inline-block;
 		position: relative;
-		min-width: 64px;
-		height: 36px;
-		padding: 0 16px;
+		min-width: dp(64);
+		height: dp(40);
+		line-height: dp(40);
+		padding: 0 dp(16);
 		border: none;
 		border-radius: 2px;
 		outline: none;
 		@include var(background-color, c-secondary);
-		font-size: 14px;
-		font-weight: 500;
-		line-height: 36px;
-		text-align: center;
+		color: white;
+		//text-align: center;
 		text-decoration: none;
-		text-transform: uppercase;
-		overflow: hidden; }
+		//text-transform: uppercase;
+		overflow: hidden;
+
+		i {
+			margin-right: dp(4);
+		}
+		&:hover {
+			background-color: $cHover;
+			color: color($fg, "text");
+		}
+	}
+
+	.toolbar {
+		button, a.button {
+			box-shadow: none;
+			color: color($fg, "text");
+			background: transparent !important;
+		}
+	}
 
 	h2 {
 		font-size: 1.5rem;
@@ -2290,6 +2276,7 @@ table[id^="comments-ext"] b {
 	*[disabled] {
 		opacity: 0.65;
 		cursor: not-allowed;
+		pointer-events: none;
 	}
 }
 
@@ -2322,4 +2309,34 @@ table[id^="comments-ext"] b {
 	text-align:center;
 	padding: dp(48);
 	color: color($fg, 'secondary-text');
+}
+
+
+//compact header
+body.go-compact {
+	#mainNorthPanel {
+		height: dp(64);
+
+		.x-panel-body {
+			min-height: dp(64);
+		}
+	}
+
+	.go-main-tab-panel {
+		overflow: visible;
+	}
+
+	.go-main-tab-panel.x-tab-panel > .x-tab-panel-header {
+		position: absolute;
+		top: dp(-56);
+		left: dp(224);
+		right: dp(272);
+		width: auto !important;
+		height: 0;
+		overflow: visible;
+	}
+
+	.go-main-tab-panel {
+		bottom: 0;
+	}
 }

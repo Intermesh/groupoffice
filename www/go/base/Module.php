@@ -72,7 +72,16 @@ class Module extends Observable {
 	public function __toString() {
 		return 'legacy/' . $this->getName();
 	}
-	
+
+	/**
+	 * For compatibility with new framework
+	 * @return static
+	 */
+	public static function get() {
+		return new static;
+	}
+
+
 	/**
 	 * Get the absolute filesystem path to the module.
 	 * 

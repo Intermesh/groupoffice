@@ -134,7 +134,7 @@ abstract class AclEntity extends Entity {
 						->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filter) {
 							//Permission level is always added to the main query so that it's always applied with AND
 							static::applyAclToQuery($query, $value, $filter['permissionLevelUserId'] ?? null, $filter['permissionLevelGroups'] ?? null);
-						});
+						}, Acl::LEVEL_READ);
 	}
 
 	/**

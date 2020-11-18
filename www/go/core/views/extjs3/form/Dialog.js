@@ -18,7 +18,6 @@ go.form.Dialog = Ext.extend(go.Window, {
 	buttonAlign: 'left',
 	layout: "fit",
 	showCustomfields:true,
-	closeOnSave: true,
 
 	/**
 	 * If set then the title bar will be appended with ": "+ value of the field.
@@ -35,7 +34,12 @@ go.form.Dialog = Ext.extend(go.Window, {
 	 * Redirect to the entity detail view after save.
 	 */
 	redirectOnSave: true,
-	
+
+	/**
+	 * Close dialog on submit
+	 */
+	closeOnSubmit: true,
+
 	panels : null,
 
 	/**
@@ -95,6 +99,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 			buttons:[
 				'->', 
 				this.saveButton = new Ext.Button({
+					cls: "primary",
 					text: t("Save"),
 					handler: function() {this.submit();},
 					scope: this
@@ -171,6 +176,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 					this.addPanel(pnl);
 				}else
 				{
+					//in case formPanelLayout is set to column
+					fs.columnWidth = 1;
 					items.push(fs);
 				}
 			}, this);
@@ -243,7 +250,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 		var me = this;
 
 		me.loading = true;
-		
+
 		function innerLoad(){
 			me.currentId = id;
 			me.actionStart();
@@ -274,7 +281,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 
 		this.fireEvent("ready", this);
 	},
-	
+
 	delete: function () {
 		
 		Ext.MessageBox.confirm(t("Confirm delete"), t("Are you sure you want to delete this item?"), function (btn) {
@@ -369,14 +376,16 @@ go.form.Dialog = Ext.extend(go.Window, {
 			if(me.redirectOnSave && isNew) {
 				me.entityStore.entity.goto(serverId);
 			}
-			if(me.closeOnSave) {
+
+			if(me.closeOnSubmit) {
 				me.close();
 			}
+
 			return serverId;
 
 		}).catch(function(error) {
 			me.showFirstInvalidField();
-			return error;
+			return Promise.reject(error);
 		}).finally(function() {
 			me.actionComplete();
 		})

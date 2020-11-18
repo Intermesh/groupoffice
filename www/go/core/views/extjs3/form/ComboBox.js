@@ -24,8 +24,7 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		}
 	},
 
-	initComponent: function() {
-
+	preInitComp : function() {
 		if(!this.tpl) {
 			this.tpl =
 				'<tpl for=".">'+
@@ -39,9 +38,19 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 			this.tpl +=	'</tpl>';
 		}
+	},
+
+	initComponent: function() {
+
+		this.preInitComp();
 
 		go.form.ComboBox.superclass.initComponent.call(this);
 
+		this.postInitComp();
+
+	},
+
+	postInitComp : function() {
 		//Set value promise can be used to do stuff after setvalue completed fetching the entity and loaded the store.
 		this.setValuePromise = Promise.resolve(this);
 
@@ -62,7 +71,11 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		}
 	},
 
+
 	addCreateNewRecord: function() {
+		if(!this.isExpanded()) {
+			return;
+		}
 		var text =  this.getRawValue();
 		if(!text) {
 			return;

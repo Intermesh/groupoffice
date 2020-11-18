@@ -164,6 +164,12 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	},
 	
 	internalLoad : function(data) {
+
+		//in case user destroys panel while loading
+		if(this.isDestroyed) {
+			return Promise.resolve(data);
+		}
+
 		this.watchRelations = {};
 		if(this.getTopToolbar()) {
 			this.getTopToolbar().setDisabled(false);
@@ -198,6 +204,11 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 				return me.load(id);
 			});
 		}
+
+		if(this.currentId == id) {
+			return Promise.resolve(this.data);
+		}
+
 		this.currentId = id;
 		this.loading = this.entityStore.single(id).then(function(entity) {
 			try {
@@ -209,7 +220,7 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 			}
 		}).catch(function(e) {
 			console.error(e);
-			Ext.MessageBox.alert(t("Not found"), "The requested page was not found");
+			Ext.MessageBox.alert(t("Error"), e.error);
 		}).finally(function() {
 			me.loading = false;
 		});

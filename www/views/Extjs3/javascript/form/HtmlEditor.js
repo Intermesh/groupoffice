@@ -172,6 +172,8 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 		});
 
+		go.ActivityWatcher.registerDocument(doc);
+
 	},
 
 	debounceTimeout : null,
@@ -190,7 +192,14 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		this.debounceTimeout = setTimeout(function () {
 			me.storeCursorPosition();
 			var h = me.getEditorBody().innerHTML;
-			var anchored = Autolinker.link(h, {stripPrefix: false, stripTrailingSlash: false, className: "normal-link", newWindow: true});
+			var anchored = Autolinker.link(h, {
+				stripPrefix: false,
+				stripTrailingSlash: false,
+				className: "normal-link",
+				newWindow: true,
+				phone: false
+			});
+
 			if(h != anchored) {
 				me.getEditorBody().innerHTML = anchored;
 				me.restoreCursorPosition();
@@ -363,7 +372,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 // 	},
 
 	onPaste: function (e) {
-		var clipboardData = e.clipboardData;
+		var clipboardData = e.clipboardData, me = this;
 		if (clipboardData.items) {
 			//Chrome /safari has clibBoardData.items
 			for (var i = 0, l = clipboardData.items.length; i < l; i++) {
@@ -379,9 +388,15 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 					
 					e.preventDefault();
 					var reader = new FileReader();
-					reader.onload = function (event) {						
-						return this.handleImage(event.target.result);
-					}.bind(this);
+					reader.onload = function (event) {
+						if(Ext.isSafari) {
+							setTimeout(function () { //set timeout was needed to prevent a Safari 14.0 crash :(
+								me.handleImage(event.target.result);
+							}, 100);
+						}else {
+							me.handleImage(event.target.result);
+						}
+					}
 					reader.readAsDataURL(item.getAsFile());
 				}
 			}
@@ -425,7 +440,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 	handleImage: function (src) {
 
-		var imgEl = this.insertImage(src);		
+
 
 		var dataURLtoBlob = function (dataURL, sliceSize) {
 			var b64Data, byteArray, byteArrays, byteCharacters, byteNumbers, contentType, i, m, offset, slice, _ref;
@@ -471,8 +486,10 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 				blob = dataURLtoBlob(dataURL);
 			} catch (_error) {
 			}
-			if (dataURL) {				
+
+			if (dataURL) {
 				var file = new File([blob], "pasted-image." + blob.type.substring(6),{type: blob.type});
+				var imgEl = me.insertImage(src);
 				go.Jmap.upload(file, {
 					success: function(response) {
 						imgEl.setAttribute("src", go.Jmap.downloadUrl(response.blobId));

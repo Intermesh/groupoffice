@@ -142,12 +142,13 @@ class ImportChangesDiff extends DiffState implements IImportChanges {
      *
      * @param string        $id
      * @param int           $flags - read/unread
+     * @param array         $categories
      *
      * @access public
      * @return boolean
      * @throws StatusException
      */
-    public function ImportMessageReadFlag($id, $flags) {
+    public function ImportMessageReadFlag($id, $flags, $categories = array()) {
         //do nothing if it is a dummy folder
         if ($this->folderid == SYNC_FOLDER_TYPE_DUMMY)
             throw new StatusException(sprintf("ImportChangesDiff->ImportMessageReadFlag('%s','%s'): can not be done on a dummy folder", $id, $flags), SYNC_STATUS_SYNCCANNOTBECOMPLETED);

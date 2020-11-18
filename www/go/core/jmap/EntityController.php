@@ -66,6 +66,13 @@ abstract class EntityController extends Controller {
 	}
 
 	/**
+	 * Querying readonly has a slight performance benefit
+	 *
+	 * @var bool
+	 */
+	protected static $getReadOnly = true;
+
+	/**
 	 * Get's the query for the Foo/query JMAP method
 	 *
 	 * @param array $params
@@ -75,7 +82,7 @@ abstract class EntityController extends Controller {
 	protected function getQueryQuery($params) {
 		$cls = $this->entityClass();
 
-		$query = $cls::find($cls::getPrimaryKey(false), true)						
+		$query = $cls::find($cls::getPrimaryKey(false), false)
 						->limit($params['limit'])
 						->offset($params['position']);
 
@@ -100,10 +107,6 @@ abstract class EntityController extends Controller {
 		$cls::sort($query, $sort);
 
 		$query->filter($params['filter']);
-
-		if(!$query->getPermissionLevelFoundInFilters() && is_a($this->entityClass(), AclEntity::class, true)) {
-			$query->filter(["permissionLevel" => Acl::LEVEL_READ]);
-		}
 		
 		//go()->info($query);
 		$query->select($cls::getPrimaryKey(true)); //only select primary key
@@ -331,10 +334,10 @@ abstract class EntityController extends Controller {
 		$cls = $this->entityClass();
 		
 		if(!isset($params['ids'])) {
-			$query = $cls::find($params['properties'], true);
+			$query = $cls::find($params['properties'], static::$getReadOnly);
 		} else
 		{
-			$query = $cls::findByIds($params['ids'], $params['properties'], true);
+			$query = $cls::findByIds($params['ids'], $params['properties'], static::$getReadOnly);
 		}
 		
 		//filter permissions

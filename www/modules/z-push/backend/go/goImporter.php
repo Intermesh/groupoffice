@@ -106,7 +106,7 @@ class GoImporter implements IImportChanges {
 	 * @access public
 	 * @return boolean
 	 */
-	public function ImportMessageReadFlag($id, $flags) {
+	public function ImportMessageReadFlag($id, $flags, $categories = array()) {
 		if (!$this->icc) {
 			ZLog::Write(LOGLEVEL_ERROR, "ImportChangesCombined->ImportMessageReadFlag() icc not configured");
 			return false;

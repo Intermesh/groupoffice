@@ -201,7 +201,7 @@ class Csv extends convert\Csv {
 			return "";
 		}
 
-		return implode(static::$multipleDelimiter, array_column($templateValues['organizations'], 'name'));
+		return implode(static::$multipleDelimiter, $contact->findOrganizations()->selectSingleValue('name')->all());
 	}
 
 }

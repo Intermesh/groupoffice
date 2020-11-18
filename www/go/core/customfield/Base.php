@@ -189,73 +189,75 @@ abstract class Base extends Model {
 		return true;
 	}
 
-    /**
-     * Format data from API to model
-     *
-     * This function is called when the API data is applied to the model with setValues();
-     *
-     * @param mixed $value The value for this field
-     * @param array $values The values to be saved in the custom fields table
-     * @param Entity|ActiveRecord $entity
-     * @return mixed
-     * @see MultiSelect for an advaced example
-     */
-	public function apiToDb($value, &$values, $entity)
-    {
+	/**
+	 * Format data from API to model
+	 *
+	 * This function is called when the API data is applied to the model with setValues();
+	 *
+	 * @param mixed $value The value for this field
+	 * @param \go\core\orm\CustomFieldsModel $values The values to be saved in the custom fields table
+	 * @param Entity|ActiveRecord $entity
+	 * @return mixed
+	 * @see MultiSelect for an advaced example
+	 */
+	public function apiToDb($value, \go\core\orm\CustomFieldsModel $values, $entity)
+	{
 		return $value;
 	}
 
-    /**
-     * Format data from model to API
-     *
-     * This function is called when the data is serialized to JSON
-     *
-     * @param mixed $value The value for this field
-     * @param array $values All the values of the custom fields to be returned to the API
-     * @param Entity|ActiveRecord $entity
-     * @return mixed
-     * @see MultiSelect for an advaced example
-     */
-	public function dbToApi($value, &$values, $entity)
-    {
+	/**
+	 * Format data from model to API
+	 *
+	 * This function is called when the data is serialized to JSON
+	 *
+	 * @param mixed $value The value for this field
+	 * @param \go\core\orm\CustomFieldsModel $values All the values of the custom fields to be returned to the API
+	 * @param Entity|ActiveRecord $entity
+	 * @return mixed
+	 * @see MultiSelect for an advaced example
+	 */
+	public function dbToApi($value, \go\core\orm\CustomFieldsModel $values, $entity)
+	{
 		return $value;
 	}
 
-    /**
-     * Get the data as string
-     * Used for templates or export
-     *
-     * @param mixed $value The value for this field
-     * @param array $values The values inserted in the database
-     * @param Entity|ActiveRecord $entity
-     * @return string
-     */
-	public function dbToText($value, &$values, $entity) {
+	/**
+	 * Get the data as string
+	 * Used for templates or export
+	 *
+	 * @param mixed $value The value for this field
+	 * @param \go\core\orm\CustomFieldsModel $values The values inserted in the database
+	 * @param Entity|ActiveRecord $entity
+	 * @return string
+	 */
+	public function dbToText($value, \go\core\orm\CustomFieldsModel $values, $entity) {
 		return $this->dbToApi($value, $values, $entity);
 	}
 
-    /**
-     * Set the data as string
-     * Used for templates or export
-     *
-     * @param mixed $value The value for this field
-     * @param array $values The values inserted in the database
-     * @param Entity|ActiveRecord $entity
-     * @return string
-     */
-	public function textToDb($value, &$values, $entity) {
+	/**
+	 * Set the data as string
+	 * Used for templates or export
+	 *
+	 * @param mixed $value The value for this field
+	 * @param \go\core\orm\CustomFieldsModel $values The values inserted in the database
+	 * @param Entity|ActiveRecord $entity
+	 * @return string
+	 */
+	public function textToDb($value, \go\core\orm\CustomFieldsModel $values, $entity) {
 		return $this->apiToDb($value, $values, $entity);
 	}
-	
+
 	/**
 	 * Called after the data is saved to API.
-	 * 
-	 * @see MultiSelect for an advaced example
+	 *
 	 * @param mixed $value The value for this field
 	 * @param array $customFieldData The custom fields data
+	 * @param Entity $entity
 	 * @return boolean
+	 * @see MultiSelect for an advaced example
 	 */
-	public function afterSave($value, &$customFieldData) {
+	public function afterSave($value, &$customFieldData, $entity)
+	{
 		
 		return true;
 	}
@@ -267,7 +269,7 @@ abstract class Base extends Model {
 	 * 
 	 * 
 	 */
-	public function validate($value, Field $field,  Entity $model) {
+	public function validate($value, Field $field, $model) {
 		if (!empty($field->requiredCondition)) {
 			if (!$this->validateRequiredCondition($value, $field, $model)) {
                 $model->setValidationError("customFields." . $field->databaseName, ErrorCode::REQUIRED);
@@ -357,16 +359,19 @@ abstract class Base extends Model {
         }
         return true;
     }
-	
+
 	/**
 	 * Called before the data is saved to API.
-	 * 
-	 * @see MultiSelect for an advaced example
+	 *
 	 * @param mixed $value The value for this field
-	 * @param array $record The values inserted in the database
+	 * @param \go\core\orm\CustomFieldsModel $model
+	 * @param Entity $entity
+	 * @param \go\core\orm\CustomFieldsModel $record The values inserted in the database
 	 * @return boolean
+	 * @see MultiSelect for an advaced example
 	 */
-	public function beforeSave($value, &$record) {
+	public function beforeSave($value, \go\core\orm\CustomFieldsModel $model, $entity, &$record)
+	{
 		
 		return true;
 	}

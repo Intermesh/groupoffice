@@ -82,7 +82,7 @@ class Select extends Base {
 		return $this->field->tableName() . "_ibfk_go_" . $this->field->id;
 	}
 	
-	public function dbToText($value, &$values, $entity) {
+	public function dbToText($value, \go\core\orm\CustomFieldsModel $values, $entity) {
 
 		if(empty($value)) {
 			return "";
@@ -95,7 +95,7 @@ class Select extends Base {
 						->single();
 	}
 
-	public function textToDb($value, &$values, $entity) {
+	public function textToDb($value, \go\core\orm\CustomFieldsModel $values, $entity) {
 
 		if(empty($value)) {
 			return null;

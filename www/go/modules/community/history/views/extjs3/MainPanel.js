@@ -30,7 +30,7 @@ Ext.define('go.modules.community.history.MainPanel', {
 		go.modules.community.addressbook.MainPanel.superclass.initComponent.call(this);
 	},
 
-	createGrid : function() {
+	createGrid: function () {
 		this.grid = new go.modules.community.history.LogEntryGrid({
 			forDetailView: false,
 			region: 'center',
@@ -53,7 +53,9 @@ Ext.define('go.modules.community.history.MainPanel', {
 
 		var filter = {};
 
-		filter.entities = this.entityGrid.getSelectionModel().getSelections().map(function(r){ return r.data.entity; });
+		filter.entities = this.entityGrid.getSelectionModel().getSelections().map(function (r) {
+			return r.data.entity;
+		});
 
 		this.grid.store.setFilter('search', filter);
 
@@ -63,13 +65,13 @@ Ext.define('go.modules.community.history.MainPanel', {
 	createFilterPanel: function () {
 		var fakeLinkConfigs = []
 		go.Entities.getAll().forEach(function (m) {
-			if(m.module !== 'history')
-				fakeLinkConfigs.push({id: m.name, entity: m.name, title: m.title });
+			if (m.module !== 'history' && m.name != 'Search')
+				fakeLinkConfigs.push({id: m.name, entity: m.name, title: m.title});
 		});
-		this.entityGrid = new go.links.EntityGrid({
+		this.entityGrid = new go.modules.community.history.TypeGrid({
 			savedSelection: "history",
 			autoHeight: true,
-			entities:fakeLinkConfigs
+			entities: fakeLinkConfigs
 		});
 
 		this.entityGrid.getSelectionModel().on('selectionchange', function (sm) {
@@ -82,59 +84,68 @@ Ext.define('go.modules.community.history.MainPanel', {
 			minHeight: dp(200),
 			autoScroll: true,
 			items: [
-				{xtype:'panel', layout:'anchor',items: [
-					{
-						xtype:'datefield',
-						emptyText: t('from'),
-						anchor: '100%'
-					},{
-						xtype:'datefield',
-						emptyText: t('till'),
-							anchor: '100%'
-					},new go.users.UserCombo({
-						emptyText: t('All users'),
-							allowBlank:true,
-						listeners: {
-							select:function(me, v){
-								this.grid.store.setFilter('creator', {user:v.id}).load();
-							},
-							change: function(me,v) {
-								if(v === null) {
-									this.grid.store.setFilter('creator',null).load();
-								}
-							},
-							scope:this
-						}
-					}),],
+				{
+					xtype: 'panel',
+
+					layout: 'form',
+					items: [
+						{
+							hideLabel: true,
+							xtype: 'godaterangefield',
+							anchor: '100%',
+							listeners: {
+								change: function (me, v) {
+									this.grid.store.setFilter('createdAt', {createdAt: v}).load();
+								},
+								scope: this
+							}
+						}, new go.users.UserCombo({
+							hideLabel: true,
+							emptyText: t('All users'),
+							allowBlank: true,
+							listeners: {
+								select: function (me, v) {
+									this.grid.store.setFilter('creator', {user: v.id}).load();
+								},
+								change: function (me, v) {
+									if (v === null) {
+										this.grid.store.setFilter('creator', null).load();
+									}
+								},
+								scope: this
+							}
+						}),],
 					padding: dp(16)
-				},{
-					title:t('Actions'),
-					defaults: {xtype:'checkbox', listeners: {
-							check:function(cb, checked) {
+				}, {
+					title: t('Actions'),
+					defaults: {
+						xtype: 'checkbox', listeners: {
+							check: function (cb, checked) {
 								var combos = cb.ownerCt.findByType('checkbox');
 								var arr = [];
-								for(var i=0;i<combos.length;i++) {
-									if(combos[i].getValue()) {
+								for (var i = 0; i < combos.length; i++) {
+									if (combos[i].getValue()) {
 										arr.push(combos[i].id);
 									}
 								}
 								//console.log(combos[i].getValue(), combos[i].id);
 								var actionFilter = !arr ? null : {actions: arr};
-								this.grid.store.setFilter('actions',actionFilter).load();
+								this.grid.store.setFilter('actions', actionFilter).load();
 							},
-							scope:this
-						}},
+							scope: this
+						}
+					},
 					padding: '0px ' + dp(16),
 					items: [
-						{id:'create',boxLabel: t('Create')},
-						{id:'update',boxLabel: t('Update')},
-						{id:'delete',boxLabel: t('Delete')},
-						{id:'login',boxLabel: t('Login')},
-						{id:'logout',boxLabel: t('Logout')},
-						{id:'badlogin',boxLabel: t('Bad login')}
+						{id: 'create', boxLabel: t('Create')},
+						{id: 'update', boxLabel: t('Update')},
+						{id: 'delete', boxLabel: t('Delete')},
+						{id: 'login', boxLabel: t('Login')},
+						{id: 'logout', boxLabel: t('Logout')},
+						{id: 'badlogin', boxLabel: t('Bad login')}
 					]
-				},{
-					xtype:'panel',
+				}, {
+					xtype: 'panel',
 					title: t('Types'),
 					items: [this.entityGrid]
 				}

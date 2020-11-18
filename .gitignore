@@ -3,14 +3,13 @@ forum
 .gitmodules
 /nbproject
 /*-license.txt
+/www/*-license.txt
 .idea
 /www/vendor
 /config.php
 /www/config.php
-/www/views/Extjs3/themes/Paper/*.css
-/www/views/Extjs3/themes/Paper/*.css.map
-/www/views/Extjs3/themes/Dark/*.css
-/www/views/Extjs3/themes/Dark/*.css.map
+/**/*.css
+/**/*.css.map
 /config.ini
 /www/config.ini
 /www/promodules
@@ -75,3 +74,4 @@ forum
 lang.csv
 .gitmodules
 /www/branding
+/.project

@@ -1504,11 +1504,10 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			//Don't do these special actions in the special folders
 			if(!$imapMessage->seen && $params['mailbox']!=$account->sent && $params['mailbox']!=$account->trash && $params['mailbox']!=$account->drafts){
 				$linkedModels = $this->_handleAutoLinkTag($imapMessage, $response);
-				$response = $this->_handleInvitations($imapMessage, $params, $response);
-
-				$linkedModels = $this->_handleAutoContactLinkFromSender($imapMessage, $linkedModels);				
-
+				$linkedModels = $this->_handleAutoContactLinkFromSender($imapMessage, $linkedModels);
 			}
+
+			$response = $this->_handleInvitations($imapMessage, $params, $response);
 			
 		}
 		

@@ -63,11 +63,11 @@ if (!empty($_POST)) {
 		];
 
 		App::get()->getInstaller()->install($admin, [
-				new AddressBookModule(), 
-				new NotesModule(),
-				new GAModule(),
-				new CommentsModule(),
-				new BookmarksModule()
+				AddressBookModule::get(),
+				NotesModule::get(),
+				GAModule::get(),
+				CommentsModule::get(),
+				BookmarksModule::get()
 				]);
 
 		//install not yet refactored modules
@@ -76,7 +76,7 @@ if (!empty($_POST)) {
 
 		foreach ($modules as $moduleClass) {
 
-			$moduleController = new $moduleClass;
+			$moduleController = $moduleClass::get();
 			if ($moduleController instanceof core\Module) {
 				continue;
 			}

@@ -110,7 +110,7 @@ class ClassFinder {
 	public function findByParent($name) {
 		return $this->findBy(function($className) use ($name) {
 							$reflection = new ReflectionClass($className);
-							return $reflection->isInstantiable() && ($reflection->isSubclassOf($name) || in_array($name, $reflection->getInterfaceNames()));
+							return !$reflection->isTrait()  && !$reflection->isInterface() && !$reflection->isAbstract() && ($reflection->isSubclassOf($name) || in_array($name, $reflection->getInterfaceNames()));
 						});
 	}
 	
@@ -159,7 +159,7 @@ class ClassFinder {
 
 		$moduleCls= "go\\modules\\". $parts[2]."\\".$parts[3]."\\Module";
 
-		return !class_exists($moduleCls) || (new $moduleCls)->isLicensed();
+		return !class_exists($moduleCls) || $moduleCls::get()->isLicensed();
 	}
 
 	private function folderToClassNames(Folder $folder, $namespace) {	
@@ -182,7 +182,13 @@ class ClassFinder {
 
 				$className = $namespace . '\\'. $name;
 
-				if (!class_exists($className)) {
+				try {
+					if (!class_exists($className)) {
+						continue;
+					}
+				}
+				catch(\Throwable $e) {
+					go()->debug("Class '$className' couldn't be loaded: " . $e->getMessage());
 					continue;
 				}
 

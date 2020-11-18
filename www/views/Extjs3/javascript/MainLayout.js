@@ -346,7 +346,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		var me = this;
 
 		Ext.getBody().mask(t("Loading..."));
-	
+
 		go.Modules.init().then(function() {
 			go.User.loadLegacyModules();
 			Promise.all([
@@ -555,7 +555,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 							<a id="user-menu" class="user-img" style="'+getUserImgStyle()+'"></a>\
 						</div>\
 					</div>',
-					height: dp(64),
+					//height: dp(64),
+					autoHeight: true,
 					titlebar: false,
 					border: false
 				});
@@ -714,8 +715,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 	
 	welcome : function() {
-		if(go.User.id==1 && go.User.logins == 1) {
-			
+		if(go.User.id==1 && go.User.loginCount == 1 && !localStorage.welcomeShown) {
+
+			localStorage.welcomeShown = true;
+
 			Ext.MessageBox.alert(t("Welcome!"), t("Please complete the installation by running through the system settings. Click OK to continue to the system settings dialog."), function() {
 				go.systemsettingsDialog = new go.systemsettings.Dialog();						
 				go.systemsettingsDialog.show();

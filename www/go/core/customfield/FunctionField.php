@@ -3,6 +3,8 @@
 namespace go\core\customfield;
 
 class FunctionField extends Number {
+
+	private static $loopIds = [];
 	
 	//no db field for functions
 	public function onFieldSave() {
@@ -32,33 +34,36 @@ class FunctionField extends Number {
 		return "decimal(19,$decimals) DEFAULT " . $d;
 	}
 
-	public function dbToApi($value, &$values, $entity) {
+	public function dbToApi($value, \go\core\orm\CustomFieldsModel $values, $entity) {
+
 		$f = $this->field->getOption("function");
-		
-		foreach ($values as $key => $value) {
-			if(is_numeric($value)) {
-				$f = str_replace('{' . $key . '}', $value, $f);
-			}
-		}
-		$f = preg_replace('/\{[^}]*\}/', '0', $f);
-		
-		// go()->debug("Function field formula: \$result = " .  $f. ";");
+
+		$f = preg_replace_callback('/\{([^}]*)\}/', function($matches) use($entity){
+			return $entity->getCustomFields(true)->getValue($matches[1]);
+		}, $f);
 
 		if(empty($f)) {
 			return null;
 		}
 
+		//check for infinity @see CustomFieldsModel
+		if(strpos($f, "∞") !== false) {
+			return "∞";
+		}
+
 		$result = null;
 		try {
 			eval("\$result = " . $f . ";");
-		} catch (\ParseError $e) {
-			return null;
+		} catch (\Error $e) {
+			$result = null;
+		} catch(\Exception $e) {
+			$result = null;
 		}
 
 		return $result;
 	}
 
-	public function beforeSave($value, &$record)
+	public function beforeSave($value, \go\core\orm\CustomFieldsModel $model, $entity, &$record)
 	{
 		//remove data because it's not saved to the database
 		unset($record[$this->field->databaseName]);

@@ -1,15 +1,192 @@
 Master
-- Core: array relation with ID's keeps records
-- Core: Module dependencies are respected
-- Business: New finance module
+- Business: New finance and contracts module
 - Projects: new module
 - Tasks: new module
-- Business: New employee management module
 - Time tracking: new module
-- History: new module replacing Activity log
-end master
 
+6.5
+- Core: array relation with ID's keeps records
+- Core: Module dependencies are respected
+- Business: New employee management module
+- History: new module replacing Activity log
+
+end 6.5
+--------
+
+
+
+
+16-11-2020 6.4.191
+- Email: Fixed problem in Thunderbird e-mails that were cut off. Issue #632.
+- Email: Fixed corupted mail body due to XSS filter
+- Studio: set sort direction for ID field
+- Studio: disabled locking and unlocking of studio modules.
+- Studio: fixed (re)generation of ACL entity models
+- Studio: check whether package / module in allowed_modules
+- Core: Custom logo didn't display in Dark theme
+- Projects: fixed default income email template combo not loading
+- Core: Yes or no custom field exports as text
+
+06-11-2020 6.4.190
+- Email: find correct translation string for 'Advanced'
+- Core: Added extra check for post_max_size php.ini setting to GO test script
+- Core: Better rendering of accented capital letters in form fields
+- Core: Fixed regression in permissions tab in module management
+- Core: Ignore missing foreign keys when deleting custom fields
+- Multi instance: Brought back allowed modules tab for instances. Thanks to Pieter van de Ven.
+- Core: Order global search results by id descending to speed up search
+- Core: Logo could be cleaned up by garbage collection
+- Calendar: zooming in could cause events to move to a day ahead
+- Files: Add index on expiry time to speed up portlet
+- ActiveSync: Fixed z-push-admin.php and z-push-top.php CLI commands
+- Core: Welcome message kept reappearing until logout
+- Time tracking: HTML entities were shown as code in edit dialog
+
+6.4.188
+06-11-2020 6.4.189
+- Core: upgrade output is logged
+- Core: When installing module first check if it's not already installed to prevent data loss.
+- Core: invalid allowed_modules string could show incorrect installed/enabled status in the modules section
+- Core: Ignore error when creating a link that already exists
+- Core: demodata error when clicking 'no'
+- Core: welcome message is displayed
+- Core: Custom field type Encrypted text showed hash value
+
+03-11-2020 6.4.188
+- Core: Refactored custom fields to handle functions inside other functions and detect infinite loops for template fields
+  and function fields.
+- Core: Stop CRON execution when upgrade is needed
+- Core: Run GarbageCollection once per day at midnight instead of every hour
+- Core: added more Romanian translations thanks to Safety Broker de Asigurare SRL
+- Projects: Removed projects v1 to v2 upgrade. UPgrade must be done in v6.2.
+- Serverclient: Works when using e-mail as username
+- Core: remove double key and clean up core_customfields_select_option before adding foreign key in upgrade
+- Core: Fixed internationalization of search keywords
+- Custom fields: Only 1 column on mobiles]
+- Projects: Link was not established when creating from other items
+- Billing: Create link to quote and contacts when automatically creating task
+- Projects: Status filter applied to search when not needed
+- Core: Search splits words from text area fields only and not from small fields. So initials in a contact remain intact for example
+
+27-10-2020 6.4.187
+- Core: Set core_acl.ownedBy to 1 when user has been removed.  
+- Core: Cleanup address books and note books on user delete
+
+27-10-2020 6.4.186
+- Core: error on modifiedAt in old framework when saving custom fields
+- Core: Fixed [6.4.185] Error: PDOException with update #623
+
+27-10-2020 6.4.185
+- Calendar: Error when adding event while in read only calendar
+- Custom fields: Could be returned as text
+- Core: optimized search keywords
+- Address book: include notes in search keywords
+- Core: Upgrade form 6.3 was broken due to toggleGarbageCollection()
+- Core: New configuration option to logout users when inactive for more than x number of seconds.
+- Core: Raised size of search cache from 190 chars to 750 chars
+- Core: fixed <br /> tags in error messages 
+- Sieve: make sure result is defined
+- OfficeOnline: Send locale string with country. en_us instead of just en.
+
+23-10-2020 6.4.184
+- Core: Template parse gave error on arrays
+- Core: Chips component error on empty value in custom fields
+
+23-10-2020 6.4.183
+- Email: Fixed download inline image on linked messages
+- Core: Add constraints to acl from core_search
+- Filesearch: raise default index file sizze limit to 10MB
+- Core: Configure secondary and accent color for Paper theme
+- Core: Fixed missing GC cron job Groupoffice #620
+
+22-10-2020 6.4.182
+- Core: some modules couldn't be uninstalled from system settings
+- Core: Fixed too large cc field in e-mail composer
+- Core: Disabled phone number auto linking
+- Email: more user friendly icon and tooltip for CC / BCC submenu
+- Tickets: remove limit on writable ticket store for custom fields
+- Translations: Added Bulgarian translation thanks to Nikolay Stoychev.
+- Timeregistration: Activity name and code visible on ediding time registration
+- Core: Template and function custom field use text values instead of id's of select fields
+- Core: Turn off GarbageCollection while upgrading
+- Studio: Checks for reserved PHP Keywords
+- Studio: Generates commented at and has links to filters
+- Core: Share custom filters with everyone by default on new installations
+
+13-10-2020 6.4.181
+- Core: In system settings, extra filter 'Disabled users', make sortable by change date
+- Core: Custom field of type function could cause error "Division by zero"
+- Core: Fixed safari 14.0 crash on pasting image in HTML editor fields
+- Core: JMAP didn't track change if only custom fields were modified
+- GOTA: Signed jar file
+
+13-10-2020 6.4.180
+- Email: Fixed scroll bars in recipient fields
+- Core: Special download actions for modules were broken
+
+11-10-2020 6.4.179
+- Address book: CSV export broken
+- Core: some modules couldn't be installed from system settings
+- Core: fixed dismiss all button in notifications panel
+
+10-10-2020 6.4.178
+- ActiveSync: Invalid date string in message source caused sync loop
+
+09-10-2020 6.4.177
+- Core: Custom fields error in old framework
+
+09-10-2020 6.4.176
+- Address book: If module setting 'restrict to admins' is on, restrtict import/export to both admins and users with 'manage' permissions
+- Address book: Added color back in to contacts
+- Core: Custom fields saved as text to search cache
+- Core: New template custom field: https://groupoffice.readthedocs.io/en/latest/system-settings/custom-fields.html#template-field
+- Studio: Only users with "Manage" permissions on the module may edit and create.
+- Core: Users have auto generated avatar with color and initials
+- Email: Font colors sometimes not working
+- Email: Add unknown recipients dialog didn't show up anymore
+
+06-10-2020 6.4.175
+- Core: Dark theme showed e-mail text in light font colors.
+- Core: notification style improved
+- Studio: Supports fixing the package name by setting $config['business'] = [ 'studio' =>  [ 'package' => 'foo']];
+- Multi instance: Creates studio package folder and sets it in the instance config
+
+
+
+05-10-2020 6.4.174
+- Core: sort comments explicitly by creation date
+- Core: Added Romaian holidays and translations. Thanks to safetybroker.ro 
+- Projects: Added finance report with date filter showing all costs, hours, income and budgets
+- Files: Fixed blob ID appearing in files after overwrite
+- Core: Date columns included time stamp T00:00:00 which lead to date changing when in a negative time zone.
+- Core: fixed Multi select custom field / chips component rendered small list.
+- Core: prevent spell check on text fields and enable on text area's
+- Core: Fixed: 6.4.70 user:department value #490 by adding it to user account dialog
+- Calendar: Added missing charset and method to calendar invites
+- ActiveSync: Fixed problem where some attachments didn't show on iphone/iOS
+
+
+01-10-2020 6.4.173
+- Core: Fixed shifting in date fields
+- Core: Speed up 6.3 to 6.4 upgrade
+- Core: allowed modules can work with packages now. eg. $config['allowed_modules'] = ['legacy/*', 'community/*', 'business/newsletters'];
+- Core: Toggle notifications when icon is clicked
+- Core: Optimized (custom field) filter loading
+- Address book: New setting to restrict export to administrators
+- ActiveSync: Set USE_FULLEMAIL_FOR_LOGIN back to the default value (true)
+- Core: Test script checks whether modules subdirectory is writable if Professional License available
+- Studio: return user friendly feedback if module directory not writable;
+- Address book: Unlinking organization updates search cache
+- Email: When links were removed they were no longer removed when there are no links left
+- Studio: Replace permissions panel with share panel
+- Studio: Unlock a studio module upon opening the wizard after confirm
+- E-mail: Always process calendar invites. (not just when message is unread)
+
+25-09-2020 6.4.172
 - Timeregistration: When changing the start time, the end time will change instead of the duration
+- ActiveSync: Upgraded z-push to 2.5.2 and fixed e-mail sending problem on iOS 14.0. You might need to correct the email address in your iOS account too!
+- ActiveSync: Fixed no results when searching All folders. It will search inbox only in that case for performance reasons. We'll fix this later.
+- Core: Restore correct height of windows when closing in collapsed state
 
 21-09-2020 6.4.171
 - Release in GitHub
@@ -68,13 +245,6 @@ end master
 - Email: Workaround if message has invalid From header
 - Core: fixed render bug in link browser window
 - Files: Added permission checks to compress functions
-- Files: Added permission checks to compress functions
-- SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
-- Calendar: Missing resource admin email #201919703
-- Calendar: Category permissions  #202020841
-- Tickets: Only messages from agent are sent to CC contact #201919432
-- Calender: Bug changing "this and future events" #202021084
-- Calendar: No notification when a participant is removed #202021083
 - Core: Upgrade from 6.3 failed if comments module was not installed.
 - SMIME: fixed error in linked email with inline attachments
 - Core: Prevent combo from expanding when opening dialogs
@@ -1181,8 +1351,14 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Calendasr: Show unconfirmed holidays
 - Projects: Send company id when selecting contact
 
+28-09-2020 6.3.94
+- Assistant: removed install sql that could cause:
+    Exception in /usr/share/groupoffice/go/base/Module.php at line 298:
+    SQL query failed: UPDATE `fs_filehandlers` SET cls =
+    'GO\\Assistant\\Filehandler\\Assistant' WHERE
+    cls='GO\\Gota\\Filehandler\\Gota'
 
-
+28-09-2020 6.3.93
 - Files: Added permission checks to compress functions
 - SMIME: Check OCSP locally if smime_root_cert_location is set in config.php
 - Calendar: Missing resource admin email #201919703
@@ -1190,7 +1366,17 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Tickets: Only messages from agent are sent to CC contact #201919432
 - Calender: Bug changing "this and future events" #202021084
 - Calendar: No notification when a participant is removed #202021083
+- Core: Workaround Safari 14.0 hang with 100% cpu usage
 
+16-07-2020 6.3.92
+- Core: upgrade problem with trigger
+
+07-07-2020 6.3.91
+- Calendar: Fix for "No participant found for this event"
+- Core: Start with create trigger in 6.2 upgrade to avoid problems when it's not allowed later on.
+
+05-06-2020 6.3.90
+- Core: Check if db is in invalid state (partially upgraded to 6.3) before upgraded
 - Sieve: Fixed bug where sieve dialog showed folders of other account
 - Files: Assistant installation replaces GOTA file handlers
 - Core: Removed NO_AUTO_CREATE_USER from sql_mode because it doesn't work in Mysql 8 anymore and it wasn't needed anyway.
@@ -1225,7 +1411,6 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Billing: Fixed total not always updating in expense dialog
 - Projects: Send contact ID when creating project from e-mail
 - Tasks: Fixed link to project after cancel
-
 11-10-2019 6.3.83
 - Core: Working week didn't accept half hours
 - Time Tracking: Sort time tracking activities by name
@@ -8026,6 +8211,7 @@ First release including:
 - E-mail client
 - Addressbook
 - Scheduler
-- Project management (alpha)﻿
+- Project management (alpha)
+
 
 

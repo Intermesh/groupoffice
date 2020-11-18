@@ -55,6 +55,7 @@ return array (
   array (
     'birthday' => 'Verjaardag',
     'anniversary' => 'Trouwdag',
+	  "action" => "Actie"
   ),
   'Star' => 'Favoriet',
   'Add group' => 'Groep toevoegen',

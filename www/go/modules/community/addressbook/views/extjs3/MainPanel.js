@@ -203,6 +203,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 					menu: [{
 							iconCls: 'ic-cloud-upload',
 							text: t("Import"),
+							disabled: !go.Modules.isAvailable("community","addressbook",go.permissionLevels.manage) && go.Modules.get("community", "addressbook").settings.restrictExportToAdmins,
 							handler: function() {
 								go.util.importFile(
 												'Contact', 
@@ -367,6 +368,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 							},
 							scope: this
 						}, {
+							disabled: !go.Modules.isAvailable("community","addressbook",50,go.User) && go.Modules.get("community", "addressbook").settings.restrictExportToAdmins,
 							iconCls: 'ic-cloud-download',
 							text: t("Export"),
 							menu: [

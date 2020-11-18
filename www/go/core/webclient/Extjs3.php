@@ -188,8 +188,8 @@ class Extjs3 {
 	 */
 	public function getRelativeUrl() {
 		$path = dirname($_SERVER['SCRIPT_NAME']); // /index.php or /install/*.php
-
-		if(basename($path) == 'install') {
+		$firstParent = basename($path);
+		if($firstParent == 'install' || $firstParent == 'api') {
 			$path = dirname($path);
 		}
 

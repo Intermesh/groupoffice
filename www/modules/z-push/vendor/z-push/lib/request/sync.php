@@ -418,7 +418,7 @@ class Sync extends RequestProcessor {
                     }
 
                     // limit items to be synchronized to the mobiles if configured
-                    $maxAllowed = self::$deviceManager->GetFilterType($spa->GetFolderId());
+                    $maxAllowed = self::$deviceManager->GetFilterType($spa->GetFolderId(), $spa->GetBackendFolderId());
                     if ($maxAllowed > SYNC_FILTERTYPE_ALL &&
                         (!$spa->HasFilterType() || $spa->GetFilterType() == SYNC_FILTERTYPE_ALL || $spa->GetFilterType() > $maxAllowed)) {
                             ZLog::Write(LOGLEVEL_DEBUG, sprintf("HandleSync(): FilterType applied globally or specifically, using value: %s", $maxAllowed));
@@ -841,10 +841,13 @@ class Sync extends RequestProcessor {
                     $setupExporter = false;
                 }
 
+                // force exporter run if there is a saved status
+                if ($setupExporter && self::$deviceManager->HasFolderSyncStatus($spa->GetFolderId())) {
+                    ZLog::Write(LOGLEVEL_DEBUG, sprintf("Sync(): forcing exporter setup for '%s' as a sync status is saved - ignoring backend folder stats", $spa->GetFolderId()));
+                }
                 // compare the folder statistics if the backend supports this
-                if ($setupExporter && self::$backend->HasFolderStats()) {
+                elseif ($setupExporter && self::$backend->HasFolderStats()) {
                     // check if the folder stats changed -> if not, don't setup the exporter, there are no changes!
-
                     $newFolderStat = self::$backend->GetFolderStat(ZPush::GetAdditionalSyncFolderStore($spa->GetBackendFolderId()), $spa->GetBackendFolderId());
                     if ($newFolderStat !== false && ! $spa->IsExporterRunRequired($newFolderStat, true)) {
                         $changecount = 0;

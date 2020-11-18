@@ -208,8 +208,8 @@ class Column {
 				if ($value instanceof DateTime || $value instanceof DateTimeImmutable) {
 					return $value;
 				} else {
-					$dt = new GoDateTime($value);
-					$dt->setTimezone(new DateTimeZone("UTC")); //UTC
+					$dt = new GoDateTime($value, new DateTimeZone("UTC"));
+					$dt->hasTime = false;
 					return $dt;
 				}
 				
@@ -279,8 +279,14 @@ class Column {
 					return null;
 				}
 
-				return $value instanceof GoDateTime ? $value: new GoDateTime($value, new DateTimeZone("UTC"));
-				
+				if(!($value instanceof GoDateTime)) {
+					$value = new GoDateTime($value, new DateTimeZone("UTC"));
+				}
+
+				$value->hasTime = $this->dbType == 'datetime';
+
+				return $value;
+
 			default:
 				return $value;
 		}

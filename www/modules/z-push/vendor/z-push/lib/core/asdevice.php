@@ -692,7 +692,20 @@ class ASDevice extends StateObject {
             }
         }
         if (is_array($this->backend2folderidCache) && isset($this->backend2folderidCache[$backendid])) {
-            return $this->backend2folderidCache[$backendid];
+            // Use cached version only if the folderOrigin matches - ZP-1449
+            if (Utils::GetFolderOriginFromId($this->backend2folderidCache[$backendid]) == $folderOrigin) {
+                return $this->backend2folderidCache[$backendid];
+            }
+            // if we have a different origin, we need to actively search for all synchronized folders, as they might be synched with a different origin
+            // the short-id is only used if the folder is being synchronized (in contentdata) - else any chached (temporarily) ids are NOT used
+            else {
+                foreach ($this->contentData as $folderid => $data) {
+                    if (isset($data[self::FOLDERBACKENDID]) && $data[self::FOLDERBACKENDID] == $backendid) {
+                        ZLog::Write(LOGLEVEL_DEBUG, sprintf("ASDevice->GetFolderIdForBackendId(): found backendid in contentdata but with different folder type. Lookup '%s' - synchronized id '%s'", $folderOrigin, $folderid));
+                        return $folderid;
+                    }
+                }
+            }
         }
 
         // nothing found? Then it's a new one, get and add it
