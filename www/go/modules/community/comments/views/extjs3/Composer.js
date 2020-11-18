@@ -68,13 +68,16 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			region:"east",
 			tooltip: t('Send'),
 			iconCls: 'ic-send',
-			handler: function(){ 
-				this.submit();
+			handler: function(){
+				this.submit().then(function(){
+					this.reset(); // otherwise it will update the second time
+				}.bind(this));
 				this.textField.reset();
 				this.chips.reset();
 				this.textField.setHeight(this.minComposerHeight);
 				// this.loadLabels();
 				this.textField.syncValue();
+
 				// this.textfield.focus();
 			},
 			scope: this
