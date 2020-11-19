@@ -207,7 +207,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 							handler: function() {
 								go.util.importFile(
 												'Contact', 
-												".csv, .vcf, text/vcard, .json",
+												".csv, .vcf, text/vcard, .json, .xlsx",
 												{addressBookId: this.addAddressBookId},
 												{
 													// These fields can be selected to update contacts if ID or e-mail matches
@@ -374,7 +374,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 							menu: [
 								{
 									text: 'vCard',
-									iconCls: 'ic-contacts',
+									iconCls: 'filetype filetype-vcf',
 									handler: function() {
 										go.util.exportToFile(
 														'Contact',
@@ -382,9 +382,19 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 														'vcf');
 									},
 									scope: this
+								}, {
+									text: 'XLSX',
+									iconCls: 'filetype filetype-xls',
+									handler: function() {
+										go.util.exportToFile(
+											'Contact',
+											Object.assign(go.util.clone(this.grid.store.baseParams), this.grid.store.lastOptions.params, {limit: 0, position: 0}),
+											'xlsx');
+									},
+									scope: this
 								},{
 									text: 'CSV',
-									iconCls: 'ic-description',
+									iconCls: 'filetype filetype-csv',
 									handler: function() {
 										go.util.exportToFile(
 														'Contact',
@@ -392,7 +402,19 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 														'csv');
 									},
 									scope: this
-								}, '-',
+								},
+								{
+									iconCls: 'filetype filetype-json',
+									text: 'JSON',
+									handler: function() {
+										go.util.exportToFile(
+											'Contact',
+											Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
+											'json');
+									},
+									scope: this
+								},
+								'-',
 								{
 									iconCls: 'ic-print',
 									text: t("Labels"),
@@ -407,17 +429,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 										dlg.show();
 
 									}
-								},
-								{
-									text: 'JSON',
-									handler: function() {
-										go.util.exportToFile(
-														'Contact',
-														Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
-														'json');
-									},
-									scope: this
 								}
+
 							]							
 						},
 						"-",

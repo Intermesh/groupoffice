@@ -803,11 +803,16 @@ abstract class EntityController extends Controller {
 		$params = $this->paramsImport($params);
 		
 		$blob = Blob::findById($params['blobId']);	
-		
-		$converter = $this->findConverter((new File($blob->name))->getExtension());
 
-    $file = $blob->getFile()->copy(File::tempFile('csv'));
-    $file->convertToUtf8();
+		$extension = (new File($blob->name))->getExtension();
+		$converter = $this->findConverter($extension);
+
+		if($extension == 'csv') {
+			$file = $blob->getFile()->copy(File::tempFile($extension));
+			$file->convertToUtf8();
+		} else{
+			$file = $blob->getFile();
+		}
 
     $response = $converter->importFile($file, $this->entityClass(), $params);
 		
@@ -829,10 +834,17 @@ abstract class EntityController extends Controller {
 		
 		$blob = Blob::findById($params['blobId']);
 
-		$file = $blob->getFile()->copy(File::tempFile('csv'));
-    $file->convertToUtf8();
+		$extension = (new File($blob->name))->getExtension();
+		$converter = $this->findConverter($extension);
 
-		$converter = $this->findConverter((new File($blob->name))->getExtension());
+		if($extension == 'csv') {
+			$file = $blob->getFile()->copy(File::tempFile($extension));
+			$file->convertToUtf8();
+		} else{
+			$file = $blob->getFile();
+		}
+
+		$converter = $this->findConverter($extension);
 		
 		$response['goHeaders'] = $converter->getEntityMapping($this->entityClass());
 		$response['csvHeaders'] = $converter->getCsvHeaders($file);
@@ -856,7 +868,7 @@ abstract class EntityController extends Controller {
 		$cls = $this->entityClass();		
 		foreach($cls::converters() as $converter) {
 			if($converter::supportsExtension($extension)) {
-				return new $converter;
+				return new $converter($extension);
 			}
 		}
 		

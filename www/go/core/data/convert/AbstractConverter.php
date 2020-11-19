@@ -58,6 +58,8 @@ use Traversable;
 abstract class AbstractConverter {
 
 
+
+
 	/**
 	 * The index number of the import
 	 *
@@ -77,8 +79,16 @@ abstract class AbstractConverter {
 	 * @var string
 	 */
 	protected $entityClass;
+
+	/**
+	 * The extension provided by the client.
+	 *
+	 * @var string
+	 */
+	protected $extension;
 	
-	public function __construct() {
+	public function __construct($extension) {
+		$this->extension = strtolower($extension);
 		$this->init();
 	}
 	
@@ -118,7 +128,9 @@ abstract class AbstractConverter {
 	 * 
 	 * @return string eg. "csv"
 	 */
-	abstract public function getFileExtension();
+	public function getFileExtension() {
+		return $this->extension;
+	}
 
 
   /**

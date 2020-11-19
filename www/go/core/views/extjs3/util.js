@@ -614,7 +614,7 @@ go.util =  (function () {
 					Ext.getBody().mask(t("Importing..."));
 
 
-					if(response.name.toLowerCase().substr(-3) == 'csv') {
+					if(response.name.toLowerCase().substr(-3) == 'csv' || response.name.toLowerCase().substr(-4) == 'xlsx') {
 						Ext.getBody().unmask();
 
 						var dlg = new go.import.CsvMappingDialog({

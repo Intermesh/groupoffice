@@ -13,6 +13,9 @@ use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\orm\Relation;
 use go\core\util\DateTime as GoDateTime;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Row;
+use PhpOffice\PhpSpreadsheet\Worksheet\RowIterator;
 use Sabre\VObject\Property\VCard\DateTime;
 
 /**
@@ -77,6 +80,29 @@ class Csv extends AbstractConverter {
 	 */
 	protected $tempFile;
 
+	/**
+	 * @var Spreadsheet
+	 */
+	protected $spreadsheet;
+
+	/**
+	 * Row index while exporting
+	 * @var int
+	 */
+	protected $spreadSheetIndex = 1;
+	/**
+	 * @var RowIterator
+	 */
+	protected $spreadsheetRowIterator;
+
+	/**
+	 * @inheritDoc
+	 */
+	public static function supportedExtensions()
+	{
+		return ['csv', 'xlsx'];
+	}
+
 	protected function init()
 	{
 		parent::init();
@@ -93,12 +119,33 @@ class Csv extends AbstractConverter {
 	{
 		$this->tempFile = File::tempFile($this->getFileExtension());
 		$this->fp = $this->tempFile->open('w+');
+
+		if($this->extension != 'csv') {
+			$this->spreadsheet = new Spreadsheet();
+			$this->spreadSheetIndex = 1;
+		}
+	}
+
+
+	protected function arrayToSpreadSheet($index, $array) {
+		for($colIndex = 0, $count = count($array);$colIndex < $count; $colIndex++) {
+			//add 1 to index for headers
+			$this->spreadsheet->getActiveSheet()->setCellValueByColumnAndRow($colIndex + 1, $index, $array[$colIndex]);
+		}
+	}
+
+	protected function writeRecord($array) {
+		if($this->extension == 'csv') {
+			fputcsv($this->fp, $array, $this->delimiter, $this->enclosure);
+		} else{
+			$this->arrayToSpreadSheet($this->spreadSheetIndex++, $array);
+		}
 	}
 
 	protected function exportEntity(Entity $entity) {
 
 		if ($this->index == 0) {
-			fputcsv($this->fp, array_column($this->getHeaders($entity), 'name'), $this->delimiter, $this->enclosure);
+			$this->writeRecord(array_column($this->getHeaders($entity), 'name'));
 		}
 
 		$headers = $this->getHeaders($entity);
@@ -110,15 +157,20 @@ class Csv extends AbstractConverter {
 
 		$record = [];
 		foreach($headers as $header) {
-			$record[$header['name']] = $this->getValue($entity, $templateValues, $header['name']);
+			$record[] = $this->getValue($entity, $templateValues, $header['name']);
 		}
 
-		fputcsv($this->fp, $record, $this->delimiter, $this->enclosure);
+		$this->writeRecord($record);
 	}
 
 
 	protected function finishExport()
 	{
+		if($this->extension != 'csv') {
+			$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->spreadsheet);
+			$writer->save($this->tempFile->getPath());
+		}
+
 		$cls = $this->entityClass;
 		$blob = Blob::fromTmp($this->tempFile);
 		$blob->name = $cls::entityType()->getName() . "-" . date('Y-m-d-H:i:s') . '.'. $this->getFileExtension();
@@ -413,9 +465,7 @@ class Csv extends AbstractConverter {
 
 
 
-	public function getFileExtension(): string {
-		return 'csv';
-	}
+
 	
 	private function recordIsEmpty(array $record) {
 		foreach($record as $v) {
@@ -430,17 +480,19 @@ class Csv extends AbstractConverter {
 
 	protected function initImport(File $file)
 	{
-		$this->fp = $file->open('r');
-		$this->delimiter = static::sniffDelimiter($file);
+		if($this->extension == 'csv') {
+			$this->fp = $file->open('r');
+			$this->delimiter = static::sniffDelimiter($file);
+		} else{
+			$reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+			$this->spreadsheet = $reader->load($file->getPath());
+			$this->spreadsheet->setActiveSheetIndex(0);
+			$this->spreadsheetRowIterator = $this->spreadsheet->getActiveSheet()->getRowIterator();
+		}
 
 		if(isset($params['updateBy'])) {
 			$this->updateBy = $params['updateBy'];
 		}
-
-		if(!isset($this->importParams['mapping'])) {
-			throw new Exception("Mapping is required");
-		}
-
 	}
 
 	protected $record;
@@ -449,16 +501,46 @@ class Csv extends AbstractConverter {
 	{
 		if($this->index == 0) {
 			//skip headers
-			$headers = fgetcsv($this->fp, 0, $this->delimiter, $this->enclosure);
+			$headers = $this->readRecord();
 		}
-		$this->record = fgetcsv($this->fp, 0, $this->delimiter, $this->enclosure);
+		$this->record = $this->readRecord();
 
 		return $this->record !== false;
 	}
 
+	protected function readRecord() {
+		if($this->extension != 'csv') {
+			/**
+			 * @var Row $row
+			 */
+
+			if(!$this->spreadsheetRowIterator->valid()) {
+				return false;
+			}
+
+			$row = $this->spreadsheetRowIterator->current();
+			$this->spreadsheetRowIterator->next();
+			if(!$row) {
+				return false;
+			}
+
+			$cellIterator = $row->getCellIterator();
+			$cellIterator->setIterateOnlyExistingCells(FALSE); // This loops through all cells,
+			$cells = [];
+			foreach ($cellIterator as $cell) {
+				$cells[] = $cell->getValue();
+			}
+			return $cells;
+		} else{
+			return fgetcsv($this->fp, 0, $this->delimiter, $this->enclosure);
+		}
+	}
+
 	protected function finishImport()
 	{
-		fclose($this->fp);
+		if($this->extension == 'csv') {
+			fclose($this->fp);
+		}
 	}
 
 
@@ -466,6 +548,10 @@ class Csv extends AbstractConverter {
    * @inheritDoc
    */
 	protected function importEntity() {
+
+		if(!isset($this->importParams['mapping'])) {
+			throw new Exception("Mapping is required");
+		}
 		
 		if($this->recordIsEmpty($this->record)) {
 			return false;
@@ -647,12 +733,9 @@ class Csv extends AbstractConverter {
 	 */
 	public function getCsvHeaders(File $file) {
 
-		$this->delimiter = static::sniffDelimiter($file);
+		$this->initImport($file);
+		$headers = $this->readRecord();
 
-		$fp = $file->open('r');
-
-		$headers = fgetcsv($fp, 0, $this->delimiter, $this->enclosure);
-		
 		if(!$headers) {
 			throw new Exception("Could not read CSV file");
 		}
@@ -660,11 +743,5 @@ class Csv extends AbstractConverter {
 		return $headers;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	public static function supportedExtensions()
-	{
-		return ['csv'];
-	}
+
 }

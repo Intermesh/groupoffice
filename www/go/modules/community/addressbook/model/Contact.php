@@ -3,6 +3,7 @@ namespace go\modules\community\addressbook\model;
 
 use Exception;
 use go\core\acl\model\AclItemEntity;
+use go\core\data\convert\Xlsx;
 use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\model\Link;

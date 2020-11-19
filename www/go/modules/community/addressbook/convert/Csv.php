@@ -21,8 +21,16 @@ class Csv extends convert\Csv {
 		if(!$hasNext && $this->organizations) {
 			//go to file again for contacts
 			$this->organizations = false;
-			rewind($this->fp);
-			fgetcsv($this->fp); //skip headers
+
+			if($this->extension == 'csv') {
+				rewind($this->fp);
+			}else{
+				$this->spreadsheetRowIterator->rewind();
+			}
+
+			//read headers
+			$this->readRecord();
+
 			return parent::nextImportRecord();
 		} else {
 			return $hasNext;
