@@ -42,7 +42,7 @@ class EntityFilter extends AclOwnerEntity {
 	}
 	
 	public function getFilter() {
-		return empty($this->filter) ? [] : json_decode($this->filter);
+		return empty($this->filter) ? [] : json_decode($this->filter, true);
 	}
 	
 	public function setFilter($filter) {

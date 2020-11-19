@@ -190,7 +190,7 @@ go.Modules.register("community", "addressbook", {
 				name: 'actiondate',
 				multiple: false,
 				type: 'date'
-			}, ,{
+			},{
 				title: t("Date of birth"),
 				name: 'dateofbirth',
 				multiple: false,

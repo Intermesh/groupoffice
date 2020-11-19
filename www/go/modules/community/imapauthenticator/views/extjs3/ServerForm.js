@@ -4,6 +4,18 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 	width: dp(400),
 	height: dp(600),
 	autoScroll: true,
+
+	initComponent: function() {
+		this.supr().initComponent.call(this);
+
+		this.formPanel.on("beforesubmit", function(form, values) {
+			if(this.formPanel.getForm().findField('smtpUseUserCredentials').getValue()) {
+				values.smtpUsername = null;
+				values.smtpPassword = null;
+			}
+		}, this);
+	},
+
 	initFormItems: function () {
 
 	
@@ -15,7 +27,7 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 				},
 				items: [{
 
-						hint: t("Enter the domains this imap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used.", "imapauthenticator"),
+						hint: t("Enter the domains this imap server should be used to authenticate. Users must login with their e-mail address and if the domain matches this profile it will be used."),
 						xtype: "gridfield",
 						name: "domains",
 						store: new Ext.data.JsonStore({
@@ -48,13 +60,13 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 					{
 						xtype: 'textfield',
 						name: 'imapHostname',
-						fieldLabel: t("Hostname", "imapauthenticator"),
+						fieldLabel: t("Hostname"),
 						required: true
 					}, {
 						xtype: 'numberfield',
 						decimals: 0,
 						name: 'imapPort',
-						fieldLabel: t("Port", "imapauthenticator"),
+						fieldLabel: t("Port"),
 						required: true,
 						value: 143
 					}, {
@@ -83,9 +95,9 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 					}, {
 						xtype: 'xcheckbox',
 						hideLabel: true,
-						boxLabel: t('Remove domain from username', 'imapauthenticator'),
+						boxLabel: t('Remove domain from username'),
 						name: 'removeDomainFromUsername',
-						hint: t("Users must login with their full e-mail adress. Enable this option if the IMAP excepts the username without domain.")
+						hint: t("Users must login with their full e-mail adress. Enable this option if the IMAP expects. the username without domain.")
 					}]
 			}, {
 				title: 'SMTP Server',
@@ -106,9 +118,9 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 					}, {
 						xtype: 'xcheckbox',
 						hideLabel: true,
-						boxLabel: t('Use authentication', 'imapauthenticator'),
+						boxLabel: t('Use IMAP credentials'),
 						name: 'smtpUseUserCredentials',
-						hint: t("Enable this if the SMTP server credentials are identical to the IMAP server.", "imapauthenticator"),
+						hint: t("Enable this if the SMTP server credentials are identical to the IMAP server."),
 						listeners: {
 							check: function (checkbox, checked) {
 								this.formPanel.getForm().findField('smtpUsername').setDisabled(checked);
@@ -151,10 +163,10 @@ go.modules.community.imapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 					}]
 			}, {
 				xtype: 'fieldset',
-				title: t("User options", "imapauthenticator"),
+				title: t("User options"),
 				items: [
 					new go.form.multiselect.Field({
-						hint: t("Users will automatically be added to these groups", "imapauthenticator"),
+						hint: t("Users will automatically be added to these groups"),
 						name: "groups",
 						idField: "groupId",
 						displayField: "name",
