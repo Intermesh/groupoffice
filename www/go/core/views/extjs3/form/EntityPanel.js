@@ -88,6 +88,12 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		return this;
 	},
 
+	reset: function() {
+		this.currentId = null
+		this.entity = null;
+		this.getForm().reset();
+	},
+
 	submit: function (cb, scope) {
 
 		if (!this.isValid()) {

@@ -80,11 +80,11 @@ class Server extends Entity {
 	
 	
 	public function getPassword() {
-		return \go\core\util\Crypt::decrypt($this->password);
+		return isset($this->password) ? \go\core\util\Crypt::decrypt($this->password) : null;
 	}
 	
 	public function setPassword($value) {
-		$this->password = \go\core\util\Crypt::encrypt($value);
+		$this->password = !empty($value) ? \go\core\util\Crypt::encrypt($value) : null;
 	}
 	
 	protected static function defineMapping() {

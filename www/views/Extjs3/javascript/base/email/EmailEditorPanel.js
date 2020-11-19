@@ -409,13 +409,15 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 				var items = [],
 					selections = GO.selectFileBrowser.getSelectedGridRecords();
 				for (var i = 0; i < selections.length; i++) {
+					// the name is the full path when searching
+					var name = selections[i].data.name.substr(selections[i].data.name.lastIndexOf('/')+1);
 					items.push({
 						human_size: Ext.util.Format.fileSize(selections[i].data.size),
 						extension: selections[i].data.extension,
 						size: selections[i].data.size,
 						type: selections[i].data.type,
-						name: selections[i].data.name,
-						fileName: selections[i].data.name,
+						name: name,
+						fileName: name,
 						from_file_storage: true,
 						tmp_file: selections[i].data.path
 					});

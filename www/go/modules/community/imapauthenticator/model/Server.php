@@ -28,11 +28,11 @@ class Server extends Entity {
 	
 	
 	public function getSmtpPassword() {
-		return \go\core\util\Crypt::decrypt($this->smtpPassword);
+		return isset($this->smtpPassword) ? \go\core\util\Crypt::decrypt($this->smtpPassword) : null;
 	}
 	
 	public function setSmtpPassword($value) {
-		$this->smtpPassword = \go\core\util\Crypt::encrypt($value);
+		$this->smtpPassword = !empty($value) ? \go\core\util\Crypt::encrypt($value) : null;
 	}
 	
 	public $smtpUseUserCredentials= false;

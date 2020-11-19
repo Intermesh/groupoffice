@@ -4,7 +4,18 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 	width: dp(600),
 	height: dp(600),
 	autoScroll: true,
-	
+
+	initComponent: function() {
+		this.supr().initComponent.call(this);
+
+		this.formPanel.on("beforesubmit", function(form, values) {
+			if(!this.formPanel.getForm().findField('ldapUseAuthentication').getValue()) {
+				values.username = null;
+				values.password = null;
+			}
+		}, this);
+	},
+
 	onLoad : function() {
 				
 		this.createEmailCheckbox.setValue(!GO.util.empty(this.formPanel.getForm().findField('imapHostname').getValue()));
@@ -12,6 +23,7 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 		
 		go.modules.community.ldapauthenticator.ServerForm.superclass.onLoad.call(this);
 	},
+
 	initFormItems: function () {
 
 
@@ -324,7 +336,7 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						required: true,
 						value: "(objectClass=Group)",
 						hint: t("For Microsoft ActiveDirectory use '(objectCategory=group)'")
-					},  
+					}
 				]
 			}
 		];
