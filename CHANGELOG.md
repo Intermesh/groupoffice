@@ -1,3 +1,7 @@
+- Comments: Fixed bug when adding two comments without opening another item would overwrite the first.
+- Address book: Filter contacts based on a project filter
+- ldapauthenticator: Fixed disabling authentication in LDAP server profile
+
 16-11-2020 6.4.191
 - Email: Fixed problem in Thunderbird e-mails that were cut off. Issue #632.
 - Email: Fixed corupted mail body due to XSS filter
