@@ -425,7 +425,7 @@ go.util =  (function () {
 					go.util.downloadFile(go.Jmap.downloadUrl(response.blobId));
 				}
 			}
-		});
+		})
 	},
 
 	/**
@@ -638,7 +638,7 @@ go.util =  (function () {
 								Ext.getBody().unmask();
 
 								if (!success) {
-									Ext.MessageBox.alert(t("Error"), response.errors.join("<br />"));
+									Ext.MessageBox.alert(t("Error"), response.message);
 								} else {
 									var msg = t("Imported {count} items").replace('{count}', response.count) + ". ";
 

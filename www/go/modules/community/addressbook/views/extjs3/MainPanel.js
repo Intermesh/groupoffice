@@ -207,7 +207,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 							handler: function() {
 								go.util.importFile(
 												'Contact', 
-												".csv, .vcf, text/vcard",
+												".csv, .vcf, text/vcard, .json",
 												{addressBookId: this.addAddressBookId},
 												{
 													// These fields can be selected to update contacts if ID or e-mail matches
@@ -407,17 +407,17 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 										dlg.show();
 
 									}
+								},
+								{
+									text: 'JSON',
+									handler: function() {
+										go.util.exportToFile(
+														'Contact',
+														Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
+														'json');
+									},
+									scope: this
 								}
-//								{
-//									text: 'JSON',
-//									handler: function() {
-//										go.util.exportToFile(
-//														'Contact', 
-//														Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
-//														'application/json');									
-//									},
-//									scope: this
-//								}
 							]							
 						},
 						"-",

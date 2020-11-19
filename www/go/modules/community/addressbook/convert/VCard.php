@@ -72,12 +72,12 @@ class VCard extends AbstractConverter {
 	 */
 	
 	public function export(Entity $contact) {
-		
+
 		$vcard = $this->getVCard($contact);
 
 		$vcard->LANGUAGE = go()->getSettings()->language;
 		$vcard->PRODID = '-//Intermesh//NONSGML Group-Office ' . go()->getVersion() . '//EN';
-		
+
 		$vcard->N = $contact->isOrganization ? [$contact->name] : [$contact->lastName, $contact->firstName, $contact->middleName, $contact->prefixes, $contact->suffixes];
 		$vcard->FN = $contact->name;
 		$vcard->REV = $contact->modifiedAt->getTimestamp();
@@ -130,12 +130,12 @@ class VCard extends AbstractConverter {
 
 		$vcard->NOTE = (string) $contact->notes;
 		$vcard->{"X-GO-GENDER"} = (string) $contact->gender;
-		
+
 
 		$blob = isset($contact->photoBlobId) ? Blob::findById($contact->photoBlobId) : false;
 		if ($blob && $blob->getFile()->exists()) {
 			//Attepted this for vcard 4.0 version
-			//$vcard->add('PHOTO', "data:" . $blob->type . ";base64," . base64_encode($blob->getFile()->getContents()));			
+			//$vcard->add('PHOTO', "data:" . $blob->type . ";base64," . base64_encode($blob->getFile()->getContents()));
 			$vcard->add('PHOTO', $blob->getFile()->getContents(), ['TYPE' => $blob->type, 'ENCODING' => 'b']);
 		}
 
@@ -164,10 +164,28 @@ class VCard extends AbstractConverter {
 					return trim($str);
 			}
 	}
-	
-	protected function exportEntity(Entity $entity, $fp, $index, $total) {
+
+	protected function initExport()
+	{
+		$this->tempFile = File::tempFile($this->getFileExtension());
+		$this->fp = $this->tempFile->open('w+');
+	}
+
+	protected function exportEntity(Entity $entity) {
 		$str = $this->export($entity);
-		fputs($fp, $str);
+		fputs($this->fp, $str);
+	}
+
+	protected function finishExport()
+	{
+		$cls = $this->entityClass;
+		$blob = Blob::fromTmp($this->tempFile);
+		$blob->name = $cls::entityType()->getName() . "-" . date('Y-m-d-H:i:s') . '.'. $this->getFileExtension();
+		if(!$blob->save()) {
+			throw new Exception("Couldn't save blob: " . var_export($blob->getValidationErrors(), true));
+		}
+
+		return $blob;
 	}
 
 	/**
@@ -449,41 +467,50 @@ class VCard extends AbstractConverter {
 		return 'vcf';
 	}
 	
-	protected function importEntity($entityClass, $fp, $index, array $params) {
+	protected function importEntity() {
 		//not needed because of import file override
+		$contact = $this->findOrCreateContact($this->card);
+
+		$this->import($this->card, $contact);
+
+		return $contact;
+
 	}
 
-	public function importFile(File $file, $entityClass, $params = []) {
+	private $card;
 
-		$response = [
-				'ids' => [],
-				'errors' => [],
-				'count' => 0
-		];
-		
-		$values = $params['values'] ?? [];
-		
-		if(!isset($values['addressBookId'])) {
-			$values['addressBookId'] = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId();
+	protected function nextImportRecord()
+	{
+		$this->card = $this->splitter->getNext();
+
+		return $this->card != false;
+
+	}
+
+	/**
+	 * @var VCardSplitter
+	 */
+	private $splitter;
+
+	protected $values;
+
+	protected function initImport(File $file)
+	{
+		$this->splitter = new VCardSplitter(StringUtil::cleanUtf8($file->getContents()), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
+		if(!isset( $this->importParams['values']))
+		{
+			$this->importParams['values'] = [];
 		}
 
-		$splitter = new VCardSplitter(StringUtil::cleanUtf8($file->getContents()), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
-
-		while ($vcardComponent = $splitter->getNext()) {			
-			try {
-				$contact = $this->findOrCreateContact($vcardComponent, $values['addressBookId']);
-				$contact->setValues($values);
-				$this->import($vcardComponent, $contact);
-				$response['ids'][] = $contact->id;
-			}
-			catch(\Exception $e) {
-				ErrorHandler::logException($e);
-				$response['errors'][] = "Failed to import card: ". $e->getMessage();
-			}			
-			$response['count']++;
+		if(!isset($this->importParams['values']['addressBookId'])) {
+			$this->importParams['values']['addressBookId'] = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId();
 		}
 
-		return $response;
+	}
+
+	protected function finishImport()
+	{
+		unset($this->splitter);
 	}
 
 	/**
@@ -493,15 +520,16 @@ class VCard extends AbstractConverter {
 	 * @return Contact
 	 * @throws \ReflectionException
 	 */
-	private function findOrCreateContact(VCardComponent $vcardComponent, $addressBookId) {
+	private function findOrCreateContact(VCardComponent $vcardComponent) {
 		$contact = false;
 			if(isset($vcardComponent->uid)) {
-				$contact = Contact::find()->where(['addressBookId' => $addressBookId, 'uid' => (string) $vcardComponent->uid])->single();
+				$contact = Contact::find()->where(['addressBookId' => $this->importParams['values']['addressBookId'], 'uid' => (string) $vcardComponent->uid])->single();
 			}
 			
 			if(!$contact) {
-				$contact = new Contact();				
+				$contact = new Contact();
 			}
+			$contact->setValues($this->importParams['values']);
 			
 			//Serialize data to store vcard
 			$blob = $this->saveBlob($vcardComponent);			
@@ -533,4 +561,6 @@ class VCard extends AbstractConverter {
 	{
 		return ['vcf'];
 	}
+
+
 }

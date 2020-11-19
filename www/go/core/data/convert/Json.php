@@ -1,44 +1,37 @@
 <?php
 namespace go\core\data\convert;
 
+use go\core\fs\Blob;
+use go\core\fs\File;
 use go\core\orm\Entity;
 use go\core\util\JSON as GoJSON;
 
 class Json extends AbstractConverter {	
-	
-	private $entityCls;
-	
-	public function setEntityClass($cls) {
-		$this->entityCls = $cls;
-	}
-	
-	public function import($data, Entity $entity = null) {
-		$props = json_decode($data, true);
-		$cls = $this->entityCls;
-		
-		$e = new $cls;
-		$e->setValues($cls);
-		
-		return $e;
-	}
 
-	public function export(Entity $entity) {
-		$properties = $entity->toArray();
-		return $string = GoJSON::encode($properties, JSON_PRETTY_PRINT);
-	}
+	protected $fp;
+	/**
+	 * @var File
+	 */
+	protected $tempFile;
 
-	protected function exportEntity(Entity $entity, $fp, $index, $total) {
+	protected $data;
+	protected $record;
+
+
+	protected function exportEntity(Entity $entity) {
 				
-		if($index == 0) {
-			fputs($fp, "[\n");
+		if($this->index == 0) {
+			fputs($this->fp, "[\n");
 		}
-		parent::exportEntityToBlob($entity, $fp, $index, $total);
-		
-		if($index == $total - 1) {
-		 fputs($fp, "\n]\n");
+		$properties = $entity->toArray();
+		$string = GoJSON::encode($properties, JSON_PRETTY_PRINT);
+		fputs($this->fp, $string);
+
+		if($this->index == $this->getEntitiesQuery()->getIterator()->rowCount() - 1) {
+		  fputs($this->fp, "\n]\n");
 		} else
 		{
-			fputs($fp, "\n,\n");
+			fputs($this->fp, "\n,\n");
 		}
 	}
 
@@ -46,12 +39,6 @@ class Json extends AbstractConverter {
 		return 'json';
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	protected function importEntity($entityClass, $fp, $index, array $params) {
-		
-	}
 
 	/**
 	 * @inheritDoc
@@ -60,4 +47,53 @@ class Json extends AbstractConverter {
 	{
 		return ['json'];
 	}
+
+	protected function initImport(File $file)
+	{
+		$this->data = GoJSON::decode($file->getContents(), true);
+	}
+
+	protected function nextImportRecord()
+	{
+		$this->record =  array_shift($this->data);
+		unset($this->record['id']);
+		return $this->record != false;
+	}
+
+	protected function importEntity()
+	{
+		$cls = $this->entityClass;
+
+		$e = new $cls;
+		$e->setValues($this->record);
+		if(isset($this->importParams['values'])) {
+			$e->setValues($this->importParams['values']);
+		}
+
+		return $e;
+	}
+
+	protected function finishImport()
+	{
+		//nothing todo
+	}
+
+	protected function initExport()
+	{
+		$this->tempFile = File::tempFile($this->getFileExtension());
+		$this->fp = $this->tempFile->open('w+');
+	}
+
+	protected function finishExport()
+	{
+		$cls = $this->entityClass;
+		$blob = Blob::fromTmp($this->tempFile);
+		$blob->name = $cls::entityType()->getName() . "-" . date('Y-m-d-H:i:s') . '.'. $this->getFileExtension();
+		if(!$blob->save()) {
+			throw new Exception("Couldn't save blob: " . var_export($blob->getValidationErrors(), true));
+		}
+
+		return $blob;
+	}
+
 }

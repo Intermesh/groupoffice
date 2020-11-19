@@ -4,11 +4,13 @@ namespace go\core\data\convert;
 
 use Exception;
 use go\core\event\EventEmitterTrait;
+use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\model\Acl;
 use go\core\model\Field;
 use go\core\orm\Entity;
 use go\core\orm\Property;
+use go\core\orm\Query;
 use go\core\orm\Relation;
 use go\core\util\DateTime as GoDateTime;
 use Sabre\VObject\Property\VCard\DateTime;
@@ -69,6 +71,12 @@ class Csv extends AbstractConverter {
 	 */
 	public $updateBy = null;
 
+	protected $fp;
+	/**
+	 * @var File
+	 */
+	protected $tempFile;
+
 	protected function init()
 	{
 		parent::init();
@@ -81,16 +89,18 @@ class Csv extends AbstractConverter {
 		static::fireEvent(static::EVENT_INIT, $this);
 	}
 
+	protected function initExport()
+	{
+		$this->tempFile = File::tempFile($this->getFileExtension());
+		$this->fp = $this->tempFile->open('w+');
+	}
 
-  /**
-   * Exports an entity to a CSV record array
-   *
-   * @param Entity $entity
-   * @return array
-   * @throws Exception
-   */
-	public function export(Entity $entity) {
-		
+	protected function exportEntity(Entity $entity) {
+
+		if ($this->index == 0) {
+			fputcsv($this->fp, array_column($this->getHeaders($entity), 'name'), $this->delimiter, $this->enclosure);
+		}
+
 		$headers = $this->getHeaders($entity);
 		//set custom fields to text mode
 		if(property_exists($entity, "returnAsText")) {
@@ -102,8 +112,21 @@ class Csv extends AbstractConverter {
 		foreach($headers as $header) {
 			$record[$header['name']] = $this->getValue($entity, $templateValues, $header['name']);
 		}
-		
-		return $record;
+
+		fputcsv($this->fp, $record, $this->delimiter, $this->enclosure);
+	}
+
+
+	protected function finishExport()
+	{
+		$cls = $this->entityClass;
+		$blob = Blob::fromTmp($this->tempFile);
+		$blob->name = $cls::entityType()->getName() . "-" . date('Y-m-d-H:i:s') . '.'. $this->getFileExtension();
+		if(!$blob->save()) {
+			throw new Exception("Couldn't save blob: " . var_export($blob->getValidationErrors(), true));
+		}
+
+		return $blob;
 	}
 	
 	private $customColumns = [];
@@ -388,16 +411,7 @@ class Csv extends AbstractConverter {
       ->single();
   }
 
-	protected function exportEntity(Entity $entity, $fp, $index, $total) {
 
-		if ($index == 0) {
-			fputcsv($fp, array_column($this->getHeaders($entity), 'name'), $this->delimiter, $this->enclosure);
-		}
-
-		$record = $this->export($entity);
-		
-		fputcsv($fp, $record, $this->delimiter, $this->enclosure);
-	}
 
 	public function getFileExtension(): string {
 		return 'csv';
@@ -412,56 +426,75 @@ class Csv extends AbstractConverter {
 		return true;
 	}
 
-	public function importFile(\go\core\fs\File $file, $entityClass, $params = array())
+
+
+	protected function initImport(File $file)
 	{
+		$this->fp = $file->open('r');
 		$this->delimiter = static::sniffDelimiter($file);
 
 		if(isset($params['updateBy'])) {
 			$this->updateBy = $params['updateBy'];
 		}
 
-		return parent::importFile($file, $entityClass, $params);
-	}
-
-  /**
-   * @inheritDoc
-   */
-	protected function importEntity($entityClass, $fp, $index, array $params) {
-
-
-		if($index == 0) {
-			$headers = fgetcsv($fp, 0, $this->delimiter, $this->enclosure);
-		}
-		
-		$record = fgetcsv($fp, 0, $this->delimiter, $this->enclosure);
-		
-		if(!$record || $this->recordIsEmpty($record)) {
-			return false;
-		}
-
-		if(!isset($params['mapping'])) {
+		if(!isset($this->importParams['mapping'])) {
 			throw new Exception("Mapping is required");
 		}
 
-		$values = $this->convertRecordToProperties($record, $params['mapping'], $this->getEntityMapping($entityClass));
+	}
+
+	protected $record;
+
+	protected function nextImportRecord()
+	{
+		if($this->index == 0) {
+			//skip headers
+			$headers = fgetcsv($this->fp, 0, $this->delimiter, $this->enclosure);
+		}
+		$this->record = fgetcsv($this->fp, 0, $this->delimiter, $this->enclosure);
+
+		return $this->record !== false;
+	}
+
+	protected function finishImport()
+	{
+		fclose($this->fp);
+	}
+
+
+	/**
+   * @inheritDoc
+   */
+	protected function importEntity() {
+		
+		if($this->recordIsEmpty($this->record)) {
+			return false;
+		}
+
+		$values = $this->convertRecordToProperties($this->record, $this->importParams['mapping'], $this->getEntityMapping($this->entityClass));
 		if(!$values) {
 			return false;
 		}
 
-		if(isset($params['values'])) {
-			$values = array_merge($values, $params['values']);
-		}
-
-		$entity = $this->createEntity($entityClass, $values);
+		$entity = $this->createEntity($values);
 		$values = $this->importCustomColumns($entity, $values);
 		unset($values['id']);
+
+		if(isset($this->importParams['values'])) {
+			$values = array_merge($values, $this->importParams['values']);
+		}
 
 		$this->setValues($entity, $values);
 
 		return $entity;
 	}
 
-	protected function createEntity($entityClass, $values) {
+	protected function createEntity( $values) {
+
+		$entityClass = $this->entityClass;
+
+
+
 		$entity = false;
 		//lookup entity by id if given
 		if($this->updateBy == 'id' && !empty($values['id'])) {
