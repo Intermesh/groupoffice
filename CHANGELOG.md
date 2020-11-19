@@ -1,3 +1,4 @@
+16-11-2020 6.4.192
 - Comments: Fixed bug when adding two comments without opening another item would overwrite the first.
 - Address book: Filter contacts based on a project filter
 - ldapauthenticator: Fixed disabling authentication in LDAP server profile
