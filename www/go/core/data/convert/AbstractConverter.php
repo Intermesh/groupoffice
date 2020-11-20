@@ -72,7 +72,7 @@ abstract class AbstractConverter {
 	 *
 	 * @var array
 	 */
-	protected $importParams;
+	protected $clientParams;
 
 	/**
 	 * The class name of the entity we're importing
@@ -86,9 +86,15 @@ abstract class AbstractConverter {
 	 * @var string
 	 */
 	protected $extension;
-	
-	public function __construct($extension) {
+
+	/**
+	 * AbstractConverter constructor.
+	 * @param string $extension eg. "csv"
+	 * @param string $entityClass The entity class model. eg. go\modules\community\addressbook\model\Contact
+	 */
+	public function __construct($extension, $entityClass) {
 		$this->extension = strtolower($extension);
+		$this->entityClass = $entityClass;
 		$this->init();
 	}
 	
@@ -137,16 +143,15 @@ abstract class AbstractConverter {
    * Read file and import them into Group-Office
    *
    * @param File $file the source file
-   * @param string $entityClass The entity class model. eg. go\modules\community\addressbook\model\Contact
    * @param array $params Extra import parameters. By default this can only hold 'values' which is a key value array that will be set on each model.
    * @return array ['count', 'errors', 'success']
    * @throws Exception
    */
-	public final function importFile(File $file, $entityClass, $params = array()) {
+	public final function importFile(File $file, $params = array()) {
 		$response = ['count' => 0, 'errors' => [], 'success' => true];
 
-		$this->importParams = $params;
-		$this->entityClass = $entityClass;
+		$this->clientParams = $params;
+
 		$this->initImport($file);
 
 		$this->index = 0;
@@ -235,10 +240,10 @@ abstract class AbstractConverter {
 	 * @return Blob
 	 * @throws Exception
 	 */
-	public final function exportToBlob(Query $entities) {
+	public final function exportToBlob(Query $entities, array $params = []) {
 
+		$this->clientParams = $params;
 		$this->entitiesQuery = $entities;
-		$this->entityClass = $entities->getModel();
 		$this->initExport();
 		//	$total = $entities->getIterator()->rowCount();
 

@@ -814,13 +814,20 @@ abstract class EntityController extends Controller {
 			$file = $blob->getFile();
 		}
 
-    $response = $converter->importFile($file, $this->entityClass(), $params);
+    $response = $converter->importFile($file, $params);
 		
 		if(!$response) {
 			throw new Exception("Invalid response from import converter");
 		}
 		
 		return $response;
+	}
+
+
+	protected function defaultExportColumns($params) {
+		$converter = $this->findConverter($params['extension']);
+
+		return $converter->getEntityMapping();
 	}
 	
 	/**
@@ -846,7 +853,7 @@ abstract class EntityController extends Controller {
 
 		$converter = $this->findConverter($extension);
 		
-		$response['goHeaders'] = $converter->getEntityMapping($this->entityClass());
+		$response['goHeaders'] = $converter->getEntityMapping();
 		$response['csvHeaders'] = $converter->getCsvHeaders($file);
 		
 		if(!$response) {
@@ -868,7 +875,7 @@ abstract class EntityController extends Controller {
 		$cls = $this->entityClass();		
 		foreach($cls::converters() as $converter) {
 			if($converter::supportsExtension($extension)) {
-				return new $converter($extension);
+				return new $converter($extension, $this->entityClass());
 			}
 		}
 		
@@ -899,10 +906,8 @@ abstract class EntityController extends Controller {
 		$convertor = $this->findConverter($params['extension']);
 				
 		$entities = $this->getGetQuery($params);
-		
-		$cls = $this->entityClass();
 
-		$blob = $convertor->exportToBlob($entities);
+		$blob = $convertor->exportToBlob($entities, $params);
 		
 		return ['blobId' => $blob->id, 'blob' => $blob->toArray()];
 	}

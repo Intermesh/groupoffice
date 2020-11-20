@@ -29,7 +29,12 @@ use Sabre\VObject\Splitter\VCard as VCardSplitter;
  */
 class VCard extends AbstractConverter {
 
-	
+	public function __construct($extension, $entityClass)
+	{
+		parent::__construct('vcf', Contact::class);
+	}
+
+
 	const EMPTY_NAME = '(no name)';
 
 	/**
@@ -497,13 +502,13 @@ class VCard extends AbstractConverter {
 	protected function initImport(File $file)
 	{
 		$this->splitter = new VCardSplitter(StringUtil::cleanUtf8($file->getContents()), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
-		if(!isset( $this->importParams['values']))
+		if(!isset( $this->clientParams['values']))
 		{
-			$this->importParams['values'] = [];
+			$this->clientParams['values'] = [];
 		}
 
-		if(!isset($this->importParams['values']['addressBookId'])) {
-			$this->importParams['values']['addressBookId'] = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId();
+		if(!isset($this->clientParams['values']['addressBookId'])) {
+			$this->clientParams['values']['addressBookId'] = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId();
 		}
 
 	}
@@ -523,13 +528,13 @@ class VCard extends AbstractConverter {
 	private function findOrCreateContact(VCardComponent $vcardComponent) {
 		$contact = false;
 			if(isset($vcardComponent->uid)) {
-				$contact = Contact::find()->where(['addressBookId' => $this->importParams['values']['addressBookId'], 'uid' => (string) $vcardComponent->uid])->single();
+				$contact = Contact::find()->where(['addressBookId' => $this->clientParams['values']['addressBookId'], 'uid' => (string) $vcardComponent->uid])->single();
 			}
 			
 			if(!$contact) {
 				$contact = new Contact();
 			}
-			$contact->setValues($this->importParams['values']);
+			$contact->setValues($this->clientParams['values']);
 			
 			//Serialize data to store vcard
 			$blob = $this->saveBlob($vcardComponent);			

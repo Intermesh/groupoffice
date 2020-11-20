@@ -12,7 +12,7 @@ use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
-use go\modules\community\addressbook\convert\Csv;
+use go\modules\community\addressbook\convert\Spreadsheet;
 use go\modules\community\addressbook\convert\VCard;
 use function GO;
 use go\core\mail\Message;
@@ -699,7 +699,7 @@ class Contact extends AclItemEntity {
 	 * @inheritDoc
 	 */
 	public static function converters() {
-		return array_merge(parent::converters(), [VCard::class, Csv::class]);
+		return array_merge(parent::converters(), [VCard::class, Spreadsheet::class]);
 	}
 	
 	public function getUid() {

@@ -10,7 +10,7 @@ use go\core\orm\Entity;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\Group;
 
-class Csv extends convert\Csv {	
+class Spreadsheet extends convert\Spreadsheet {
 
 	private $organizations = true;
 
@@ -55,8 +55,8 @@ class Csv extends convert\Csv {
 
 	protected function createEntity($values)
 	{
-		if(isset($this->importParams['values'])) {
-			$values = array_merge($values, $this->importParams['values']);
+		if(isset($this->clientParams['values'])) {
+			$values = array_merge($values, $this->clientParams['values']);
 		}
 
 		$entityClass = $this->entityClass;
@@ -109,7 +109,7 @@ class Csv extends convert\Csv {
 		$contact->groups = [];
 
 		$groups = !empty($groups) ? explode(static::$multipleDelimiter, $groups) : [];
-		$addressBookId = $contact->addressBookId ?? $this->importParams['values']['addressBookId'];
+		$addressBookId = $contact->addressBookId ?? $this->clientParams['values']['addressBookId'];
 		if(empty($addressBookId)) {
 			throw new Exception("No address book ID set");
 		}
@@ -118,7 +118,7 @@ class Csv extends convert\Csv {
 			if(!$group) {
 				$group = new Group();
 				$group->name = $groupName;
-				$group->addressBookId = $contact->addressBookId ?? $this->importParams['values']['addressBookId'];
+				$group->addressBookId = $contact->addressBookId ?? $this->clientParams['values']['addressBookId'];
 				if(!$group->save()) {
 					throw new Exception("Could not save group");
 				}
@@ -179,7 +179,7 @@ class Csv extends convert\Csv {
 	
 	protected function importOrganizations(Contact $contact, $organizationNames, array &$values) {
 
-		$addressBookId = $contact->addressBookId ?? $this->importParams['values']['addressBookId'];
+		$addressBookId = $contact->addressBookId ?? $this->clientParams['values']['addressBookId'];
 		if(empty($addressBookId)) {
 			throw new Exception("No address book ID set");
 		}

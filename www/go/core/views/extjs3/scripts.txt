@@ -258,6 +258,7 @@ filter/variabletypes/string.js
 filter/variabletypes/select.js
 
 import/CsvMappingDialog.js
+import/SpreadSheetExportGrid.js
 
 smtp/AccountDialog.js
 smtp/GridPanel.js

@@ -11,7 +11,7 @@ use go\core\orm\Entity;
 use go\modules\community\notes\model\Note;
 
 
-class Csv extends convert\Csv
+class Spreadsheet extends convert\Spreadsheet
 {
 	public static $excludeHeaders = [ 'password', 'images'];
 

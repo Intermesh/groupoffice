@@ -400,32 +400,69 @@ go.util =  (function () {
 	 */
 	exportToFile: function (entity, queryParams, extension, params) {
 		
-		Ext.getBody().mask(t("Exporting..."));
-		var promise = go.Jmap.request({
-			method: entity + "/query",
-			params: queryParams
-		});
-		
-		go.Jmap.request({
-			method: entity + "/export",
-			params: {
+
+
+		function doExport(columns) {
+			Ext.getBody().mask(t("Exporting..."));
+			const promise = go.Jmap.request({
+				method: entity + "/query",
+				params: queryParams
+			});
+
+			let params = {
 				extension: extension,
 				"#ids": {
 					resultOf: promise.callId,
 					path: "/ids"
 				}
-			},
-			scope: this,
-			callback: function (options, success, response) {
-				Ext.getBody().unmask();
-				if(!success) {
-					Ext.MessageBox.alert(t("Error"), response.message);				
-				} else
-				{
-					go.util.downloadFile(go.Jmap.downloadUrl(response.blobId));
-				}
 			}
-		})
+
+			if(columns)
+			{
+				params.columns = columns;
+			}
+
+			return go.Jmap.request({
+				method: entity + "/export",
+				params: params
+			}).then(function (response) {
+				go.util.downloadFile(go.Jmap.downloadUrl(response.blobId));
+			}).catch(function(response) {
+				Ext.MessageBox.alert(t("Error"), response.message);
+			}).finally(function() {
+				Ext.getBody().unmask();
+			})
+		}
+
+		if(extension == 'csv' || extension == 'xlsx') {
+			const spreadSheetExportGrid = new go.import.SpreadSheetExportGrid({
+				entityStore: entity
+			});
+
+			const win = new go.Window({
+				modal: true,
+				layout: "fit",
+				title: t("Select columns"),
+				height: dp(600),
+				width: dp(400),
+				items: [spreadSheetExportGrid],
+				buttons: [
+					'->',
+					{
+						text: t("Export"),
+						handler: function() {
+							doExport(spreadSheetExportGrid.getSelection())
+							win.close();
+						}
+					}
+				]
+			});
+			win.show();
+		} else
+		{
+			doExport();
+		}
+
 	},
 
 	/**

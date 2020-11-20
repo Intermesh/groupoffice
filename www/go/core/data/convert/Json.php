@@ -66,8 +66,8 @@ class Json extends AbstractConverter {
 
 		$e = new $cls;
 		$e->setValues($this->record);
-		if(isset($this->importParams['values'])) {
-			$e->setValues($this->importParams['values']);
+		if(isset($this->clientParams['values'])) {
+			$e->setValues($this->clientParams['values']);
 		}
 
 		return $e;

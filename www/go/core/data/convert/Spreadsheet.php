@@ -13,7 +13,9 @@ use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\orm\Relation;
 use go\core\util\DateTime as GoDateTime;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Spreadsheet as PhpSpreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Font;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use PhpOffice\PhpSpreadsheet\Worksheet\RowIterator;
 use Sabre\VObject\Property\VCard\DateTime;
@@ -38,7 +40,7 @@ use Sabre\VObject\Property\VCard\DateTime;
  * 	]
  * ]
  */
-class Csv extends AbstractConverter {
+class Spreadsheet extends AbstractConverter {
 
 	use EventEmitterTrait;
 
@@ -81,7 +83,7 @@ class Csv extends AbstractConverter {
 	protected $tempFile;
 
 	/**
-	 * @var Spreadsheet
+	 * @var PhpSpreadsheet
 	 */
 	protected $spreadsheet;
 
@@ -121,7 +123,7 @@ class Csv extends AbstractConverter {
 		$this->fp = $this->tempFile->open('w+');
 
 		if($this->extension != 'csv') {
-			$this->spreadsheet = new Spreadsheet();
+			$this->spreadsheet = new PhpSpreadsheet();
 			$this->spreadSheetIndex = 1;
 		}
 	}
@@ -167,8 +169,28 @@ class Csv extends AbstractConverter {
 	protected function finishExport()
 	{
 		if($this->extension != 'csv') {
+
+			$headerStyle = [
+				'font' => [
+					'bold' => true,
+					'color' => ['argb' => 'ffffff']
+				],
+				'fill' => [
+					// SOLID FILL
+					'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+					'color' => ['argb' => '0277bd']
+				]
+			];
+			foreach($this->spreadsheet->getActiveSheet()->getColumnIterator() as $col) {
+				$style = $this->spreadsheet->getActiveSheet()->getStyle($col->getColumnIndex() . "1");
+				$style->applyFromArray($headerStyle);
+
+				$this->spreadsheet->getActiveSheet()->getColumnDimension($col->getColumnIndex())->setAutoSize(true);
+			}
+
 			$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->spreadsheet);
 			$writer->save($this->tempFile->getPath());
+
 		}
 
 		$cls = $this->entityClass;
@@ -308,23 +330,22 @@ class Csv extends AbstractConverter {
 		return $record;
 	}
 
-	public function getEntityMapping($entityCls) {
-		return $this->internalGetHeaders($entityCls, true);
+	public function getEntityMapping() {
+		return $this->internalGetHeaders(true);
 	}
 
   /**
    * Get all the CSV field headers
    *
    * Sub properties are delimnited with a . For example "emailAddresses.email".
-   * Multiple values are separated by " ::: ". For example "email1 ::: email2"
-   * @param string $entityCls
-   * @return string[]
+   *
+   * @return array[] [['name' => 'id', 'label' => "ID", 'many' => false], ...]
    * @throws Exception
    */
-	public final function getHeaders($entityCls) {
+	public final function getHeaders() {
 		
 		if(!isset($this->headers)) {
-			$this->headers = $this->internalGetHeaders($entityCls);
+			$this->headers = $this->internalGetHeaders();
 		}
 		
 		return $this->headers;		
@@ -339,18 +360,36 @@ class Csv extends AbstractConverter {
 	 * @return string[]
 	 * @throws Exception
 	 */
-	protected function internalGetHeaders($entityCls, $forMapping = false) {
+	protected function internalGetHeaders($forMapping = false) {
+
+		$entityCls = $this->entityClass;
+
 		//Write headers
 		$properties = $entityCls::getMapping()->getProperties();
-		$headers = [
-			['name' => 'id', 'label' => "ID", 'many' => false]
-		];
+
+		if($forMapping) {
+			$headers = ['id' =>	['name' => 'id', 'label' => "ID", 'many' => false]];
+		}else{
+			if(!empty($this->clientParams['columns']) && !in_array("id", $this->clientParams['columns'])) {
+				$headers = [];
+			} else {
+				$headers = [
+					['name' => 'id', 'label' => "ID", 'many' => false]
+				];
+			}
+		}
 
 		foreach($properties as $name => $value) {
 			//Skip system data
 			if(in_array($name, array_merge(['createdAt', 'createdBy', 'ownedBy', 'modifiedAt','aclId','filesFolderId', 'modifiedBy'], array_keys($this->customColumns)))){
 				continue;
 			}
+
+			//client specified which columns to export
+			if(!empty($this->clientParams['columns']) && !in_array($name, $this->clientParams['columns'])) {
+				continue;
+			}
+
 			$headers = $this->addSubHeaders($headers, $name, $value, false, $forMapping);
 		}
 		if(method_exists($entityCls, 'getCustomFields')) {
@@ -361,6 +400,10 @@ class Csv extends AbstractConverter {
 				if($forMapping) {
 					$customFieldProps[$field->databaseName] = ['name' => $field->databaseName, 'label' => $field->name, 'many' => false];
 				} else{
+					//client specified which columns to export
+					if(!empty($this->clientParams['columns']) && !in_array($field->databaseName, $this->clientParams['columns'])) {
+						continue;
+					}
 					$headers[] =  ['name' => 'customFields.' . $field->databaseName, 'label' => $field->name, 'many' => false];
 				}
 			}
@@ -373,7 +416,10 @@ class Csv extends AbstractConverter {
 		if($forMapping) {
 			return array_merge($headers, $this->customColumns);
 		} else{
-			return array_merge($headers, array_values($this->customColumns));
+			return array_merge($headers, array_filter(array_values($this->customColumns), function($col) {
+				//client specified which columns to export
+				return empty($this->clientParams['columns']) || in_array($col['name'], $this->clientParams['columns']);
+			}));
 		}
 	}
 	
@@ -549,7 +595,7 @@ class Csv extends AbstractConverter {
    */
 	protected function importEntity() {
 
-		if(!isset($this->importParams['mapping'])) {
+		if(!isset($this->clientParams['mapping'])) {
 			throw new Exception("Mapping is required");
 		}
 		
@@ -557,7 +603,7 @@ class Csv extends AbstractConverter {
 			return false;
 		}
 
-		$values = $this->convertRecordToProperties($this->record, $this->importParams['mapping'], $this->getEntityMapping($this->entityClass));
+		$values = $this->convertRecordToProperties($this->record, $this->clientParams['mapping'], $this->getEntityMapping($this->entityClass));
 		if(!$values) {
 			return false;
 		}
@@ -566,8 +612,8 @@ class Csv extends AbstractConverter {
 		$values = $this->importCustomColumns($entity, $values);
 		unset($values['id']);
 
-		if(isset($this->importParams['values'])) {
-			$values = array_merge($values, $this->importParams['values']);
+		if(isset($this->clientParams['values'])) {
+			$values = array_merge($values, $this->clientParams['values']);
 		}
 
 		$this->setValues($entity, $values);
