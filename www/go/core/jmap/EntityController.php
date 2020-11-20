@@ -827,7 +827,13 @@ abstract class EntityController extends Controller {
 	protected function defaultExportColumns($params) {
 		$converter = $this->findConverter($params['extension']);
 
-		return $converter->getEntityMapping();
+		$mapping = $converter->getEntityMapping();
+		if(isset($mapping['customFields'])) {
+			$mapping = array_merge($mapping, $mapping['customFields']['properties']);
+			unset($mapping['customFields']);
+		}
+
+		return $mapping;
 	}
 	
 	/**
