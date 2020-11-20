@@ -3,5 +3,5 @@
 namespace go\core\model;
 
 abstract class CronJob {
-	abstract function run();
+	abstract public function run();
 }
