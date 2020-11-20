@@ -185,7 +185,8 @@ class Spreadsheet extends AbstractConverter {
 				$style = $this->spreadsheet->getActiveSheet()->getStyle($col->getColumnIndex() . "1");
 				$style->applyFromArray($headerStyle);
 
-				$this->spreadsheet->getActiveSheet()->getColumnDimension($col->getColumnIndex())->setAutoSize(true);
+				$colDim = $this->spreadsheet->getActiveSheet()->getColumnDimension($col->getColumnIndex());
+				$colDim->setAutoSize(true);
 			}
 
 			$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->spreadsheet);

@@ -373,7 +373,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 							text: t("Export"),
 							menu: [
 								{
-									text: 'vCard',
+									text: 'vCard (Virtual Contact File)',
 									iconCls: 'filetype filetype-vcf',
 									handler: function() {
 										go.util.exportToFile(
@@ -383,7 +383,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 									},
 									scope: this
 								}, {
-									text: 'XLSX',
+									text: 'Microsoft Excel',
 									iconCls: 'filetype filetype-xls',
 									handler: function() {
 										go.util.exportToFile(
@@ -393,7 +393,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 									},
 									scope: this
 								},{
-									text: 'CSV',
+									text: 'Comma Separated Values',
 									iconCls: 'filetype filetype-csv',
 									handler: function() {
 										go.util.exportToFile(
