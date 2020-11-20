@@ -23,7 +23,8 @@ go.import.SpreadSheetExportGrid = Ext.extend(go.grid.GridPanel, {
 			tbar: [{xtype: "selectallcheckbox"}],
 			store: new go.data.Store({
 				fields: ['name', 'label'],
-				id: "name"
+				id: "name",
+				remoteSort: false
 			}),
 			selModel: selModel,
 			columns: [
@@ -40,7 +41,7 @@ go.import.SpreadSheetExportGrid = Ext.extend(go.grid.GridPanel, {
 			]
 		});
 
-		config.store.sort('name', 'ASC');
+
 
 		this.supr().constructor.call(this, config);
 
@@ -61,6 +62,7 @@ go.import.SpreadSheetExportGrid = Ext.extend(go.grid.GridPanel, {
 			}
 
 			config.store.loadData({records: records});
+			config.store.sort('name', 'ASC');
 		});
 
 		this.getSelectionModel().on('selectionchange', function (sm) {
