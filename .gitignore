@@ -17,7 +17,6 @@ forum
 /tests/data
 /www/go/modules/*
 !/www/go/modules/community
-!/www/go/modules/core
 /www/modules/*
 !/www/modules/addressbook
 !/www/modules/sync

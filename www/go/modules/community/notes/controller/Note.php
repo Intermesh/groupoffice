@@ -103,4 +103,12 @@ class Note extends EntityController {
 	{
 		return $this->defaultImportCSVMapping($params);
 	}
+
+	/**
+	 * @param $params
+	 * @return array
+	 */
+	public function exportColumns($params) {
+		return $this->defaultExportColumns($params);
+	}
 }

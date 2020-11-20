@@ -1,13 +1,13 @@
 <?php
 namespace go\core\convert;
 
-use go\core\data\convert\Csv;
+use go\core\data\convert\Spreadsheet;
 use go\core\model\Module;
 use go\core\orm\Entity;
 use go\modules\community\serverclient\model\MailDomain;
 use go\modules\community\serverclient\Module as GoModule;
 
-class UserCsv extends Csv {
+class UserSpreadsheet extends Spreadsheet {
 
 	public static $excludeHeaders = ['syncSettings', 'taskSettings', 'notesSettings', 'addressBookSettings', 'calendarSettings', 'emailSettings', 'googleauthenticator'];
 

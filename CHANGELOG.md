@@ -10,6 +10,7 @@ Master
 - Business: New employee management module
 - History: new module replacing Activity log
 - Comments: Editable date field
+- Core: Support xlsx files for import and export
 
 end 6.5
 --------

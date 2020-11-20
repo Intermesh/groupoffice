@@ -3,6 +3,7 @@ namespace go\modules\community\addressbook\model;
 
 use Exception;
 use go\core\acl\model\AclItemEntity;
+use go\core\data\convert\Xlsx;
 use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\model\Link;
@@ -11,7 +12,7 @@ use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
-use go\modules\community\addressbook\convert\Csv;
+use go\modules\community\addressbook\convert\Spreadsheet;
 use go\modules\community\addressbook\convert\VCard;
 use function GO;
 use go\core\mail\Message;
@@ -698,7 +699,7 @@ class Contact extends AclItemEntity {
 	 * @inheritDoc
 	 */
 	public static function converters() {
-		return array_merge(parent::converters(), [VCard::class, Csv::class]);
+		return array_merge(parent::converters(), [VCard::class, Spreadsheet::class]);
 	}
 	
 	public function getUid() {

@@ -121,4 +121,11 @@ class User extends EntityController {
 	public function importCsvMapping($params) {
 		return $this->defaultImportCSVMapping($params);
 	}
+	/**
+	 * @param $params
+	 * @return array
+	 */
+	public function exportColumns($params) {
+		return $this->defaultExportColumns($params);
+	}
 }

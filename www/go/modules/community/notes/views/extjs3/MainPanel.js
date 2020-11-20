@@ -229,7 +229,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						handler: function() {
 							go.util.importFile(
 								'Note',
-								'.csv',
+								'.csv, .xlsx, .json',
 								{},
 								{}
 							);
@@ -238,12 +238,46 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					},{
 						iconCls: 'ic-cloud-download',
 						text: t("Export"),
-						handler: function() {
-							go.util.exportToFile(
-								'Note',
-								Object.assign(go.util.clone(this.noteGrid.store.baseParams), this.noteGrid.store.lastOptions.params, {limit: 0, position: 0}),
-								'csv');
-						},
+						menu: [{
+							text: 'Microsoft Excel',
+							iconCls: 'filetype filetype-xls',
+							handler: function() {
+								go.util.exportToFile(
+									'Note',
+									Object.assign(go.util.clone(this.noteGrid.store.baseParams), this.noteGrid.store.lastOptions.params, {
+										limit: 0,
+										position: 0
+									}),
+									"xlsx");
+							},
+							scope: this
+						},{
+							text: 'Comma Separated Values',
+							iconCls: 'filetype filetype-csv',
+							handler: function () {
+								go.util.exportToFile(
+									'Note',
+									Object.assign(go.util.clone(this.noteGrid.store.baseParams), this.noteGrid.store.lastOptions.params, {
+										limit: 0,
+										position: 0
+									}),
+									'csv');
+							},
+							scope: this
+						},{
+							iconCls: 'filetype filetype-json',
+							text: 'JSON',
+							handler: function() {
+								go.util.exportToFile(
+									'Note',
+									Object.assign(go.util.clone(this.noteGrid.store.baseParams), this.noteGrid.store.lastOptions.params, {
+										limit: 0,
+										position: 0
+									}),
+									'json');
+							},
+							scope: this
+						}],
 						scope: this
 
 					}]

@@ -3,7 +3,7 @@
 namespace go\modules\community\dev\cli\controller;
 
 use go\core\Controller;
-use go\core\data\convert\Csv;
+use go\core\data\convert\Spreadsheet;
 use go\core\Environment;
 use go\core\fs\Blob;
 use go\core\fs\File;
@@ -52,7 +52,7 @@ class Language extends Controller {
 			throw new \Exception("File not found " . $path);
 		}		
 
-		$this->delimiter = Csv::sniffDelimiter($file);
+		$this->delimiter = Spreadsheet::sniffDelimiter($file);
 
 		$this->handle = $file->open("r");
 
