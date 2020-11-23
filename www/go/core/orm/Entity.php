@@ -642,7 +642,11 @@ abstract class Entity extends Property {
 					$query->join('comments_comment', 'comment', 'comment.entityId = ' . $query->getTableAlias() . '.id AND comment.entityTypeId=' . static::entityType()->getId());
 				}
 
-				$criteria->where('comment.modifiedAt', $comparator, $value);
+				$tag = ":commentedAt" . uniqid();
+
+				$query->having('MAX(comment.modifiedAt) ' . $comparator . ' ' . $tag)
+					->bind($tag, $value->format(\go\core\db\Column::DATETIME_FORMAT))
+					->groupBy(['id']);
 			});
 
 
