@@ -771,11 +771,7 @@
 	//    @extend .z2;
 	//    background-color: color($grey, 200);
 	//  }
-	&.x-btn-focus, &.x-btn-over {
-		transition: background-color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-		@include var(background-color, c-primary-tp);
 
-	}
 	&.primary {
 		@include var('background-color', c-secondary);
 		color: white;
@@ -787,7 +783,14 @@
 		//.x-btn-text {
 			color: $cDanger;
 		//}
-	} 
+	}
+
+	&.x-btn-focus, &.x-btn-over {
+		transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+		@include var(background-color, c-accent);
+		color: white;
+	}
+
 	&-icon-small-top {
 		height: dp(56);
 		.x-btn-text { padding-top: dp(40) !important; }
