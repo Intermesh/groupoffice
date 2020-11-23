@@ -1,3 +1,7 @@
+6.4.193
+- Studio: minor bugfix upon first generating new module
+- Studio: regenerate several backend files on frontend regeneration
+
 16-11-2020 6.4.192
 - Comments: Fixed bug when adding two comments without opening another item would overwrite the first.
 - Address book: Filter contacts based on a project filter
