@@ -2149,11 +2149,11 @@ table[id^="comments-ext"] b {
 }
 
 .go-button {
+	display: inline-block;
 	@extend .x-btn;
 	min-height: dp(32);
 	line-height: dp(24);
-	padding-left: dp(8);
-	padding-right: dp(8);
+	padding: 2px dp(8);
 
 	&:hover, &:focus {
 		transition: all 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
