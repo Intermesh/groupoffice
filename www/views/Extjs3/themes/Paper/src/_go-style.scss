@@ -2148,6 +2148,25 @@ table[id^="comments-ext"] b {
 	display: none;
 }
 
+.go-button {
+	display: inline-block;
+	@extend .x-btn;
+	min-height: dp(32);
+	line-height: dp(24);
+	padding: 2px dp(8);
+
+	&:hover, &:focus {
+		transition: all 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+		@include var(background-color, c-primary-tp);
+	}
+
+	&.primary {
+		&:hover, &:focus {
+			transition: all 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+			@include var(background-color, c-accent);
+		}
+	}
+}
 
 .go-page {
 	background: color($bg, 'dialog');
@@ -2188,33 +2207,10 @@ table[id^="comments-ext"] b {
 	}
 
 	button, a.button {
-		@extend %font-button;
-		box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
-		transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
-		will-change: box-shadow;
-		min-width: dp(80);
-		display: inline-block;
-		position: relative;
-		min-width: dp(64);
-		height: dp(40);
-		line-height: dp(40);
-		padding: 0 dp(16);
-		border: none;
-		border-radius: 2px;
-		outline: none;
-		@include var(background-color, c-secondary);
-		color: white;
-		//text-align: center;
-		text-decoration: none;
-		//text-transform: uppercase;
-		overflow: hidden;
+		@extend .go-button;
 
 		i {
 			margin-right: dp(4);
-		}
-		&:hover {
-			background-color: $cHover;
-			color: color($fg, "text");
 		}
 	}
 

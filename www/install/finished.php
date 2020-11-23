@@ -10,11 +10,13 @@ require('header.php');
 <section>
 	<form method="POST" action="" onsubmit="submitButton.disabled = true;">
 		<fieldset>
-				<h2>Installation complete!</h2>
-				<p>Thank you for installing Group-Office.</p>				
+            <h2>Installation complete!</h2>
+            <p>Thank you for installing Group-Office.</p>
+
+            <button class="primary right" name="submitButton" type="submit"><?= go()->t('Continue'); ?></button>
 		</fieldset>
 
-		<button name="submitButton" type="submit"><?= go()->t('Continue'); ?></button>
+
 	</form>
 
 </section>

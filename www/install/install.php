@@ -168,9 +168,11 @@ require('header.php');
 				<label>Confirm</label>
 				<input type="password" name="passwordConfirm" pattern=".{6,}" title="Minimum length is 6 chars"  value="<?= $_POST['passwordConfirm'] ?? ""; ?>" required />				
 			</p>
+
+            <button class="right primary" name="submitButton" type="submit">Install</button>
 		</fieldset>
 
-		<button name="submitButton" type="submit">Install</button>
+
 	</form>
 
 </section>
