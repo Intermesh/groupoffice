@@ -4,6 +4,7 @@
 - Files: Detail views could reload with home folder after uploading files in the popup browser
 - Billing: Address display as per country settings
 - Core: Fixed UK address standard
+- Core: HTML fields auto grow with content
 
 16-11-2020 6.4.192
 - Comments: Fixed bug when adding two comments without opening another item would overwrite the first.

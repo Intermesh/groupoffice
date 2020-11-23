@@ -79,20 +79,30 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		GO.form.HtmlEditor.superclass.initComponent.apply(this);
 
 		this.on('afterrender', function() {
-			if(this.toolbarHidden) {
+			if(this.grow && this.growMinHeight < dp(36)) {
 				this.tb.hide();
 			}
 		}, this);
 		this.on('initialize', function(){
 
-			if(Ext.isEmpty(this.emptyText)) {
-				return;
+			if(this.grow) {
+
+
+
+				this.doGrow();
+				this.on("sync", this.doGrow, this);
 			}
+
+			// if(Ext.isEmpty(this.emptyText)) {
+			// 	return;
+			// }
 			// Ext.EventManager.on(this.getEditorBody(),{
 			// 	focus:this.handleEmptyText,
 			// 	blur:this.applyEmptyText,
 			// 	scope:this
 			// });
+
+
 
 		},this);
 
@@ -557,13 +567,64 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		GO.form.HtmlEditor.superclass.setValue.call(this, value);
 	},
 
-//	syncValue: function(){
-//		//In BasicForm.js this method is called by EXT
-//		// When using the editor in sourceEdit then it may not call the syncValue function
-//		if(!this.sourceEditMode){			
-//			GO.form.HtmlEditor.superclass.syncValue.call(this);
-//		}
-//	},	
+	/**
+	 * Automatically grow field with content
+	 */
+	grow: false,
+
+	/**
+	 * Minimum height for field
+	 */
+	growMinHeight: dp(30),
+
+	/**
+	 * Maximum height for field
+	 */
+	growMaxHeight: dp(480),
+
+	// syncValue: function(){
+	// 	//In BasicForm.js this method is called by EXT
+	// 	// When using the editor in sourceEdit then it may not call the syncValue function
+	// 	if(!this.sourceEditMode){
+	// 		GO.form.HtmlEditor.superclass.syncValue.call(this);
+	//
+	// 	}
+	// },
+
+	doGrow : function() {
+		var body = this.getEditorBody();
+
+		body.style.height = 'auto';
+		body.style.display = 'inline-block';
+
+		body.style.minHeight =  this.growMinHeight + "px";
+		body.style.padding = dp(6) + "px " + dp(8) + "px";
+		body.style.boxSizing = "border-box";
+		body.style.width = "100%";
+		body.style.lineHeight = dp(20) + "px";
+
+		var h =  Math.max(this.growMinHeight, body.offsetHeight); // 400  max height
+
+		if(h > 36) {
+			this.tb.show();
+			//workaround for combo
+			if(this.tb.items.itemAt(0).wrap) {
+				this.tb.items.itemAt(0).wrap.dom.style.width = "100px";
+			}
+			this.tb.doLayout();
+		} else {
+			this.tb.hide();
+		}
+
+		h +=  this.tb.el.getHeight();
+
+		if(h > this.growMaxHeight) {
+			h = this.growMaxHeight;
+		}
+
+		this.setHeight(h);
+
+	},
 
 //	correctify: function(full, prefix, letter){
 //		var regex = /([:\?]\s+)(.)/g;
