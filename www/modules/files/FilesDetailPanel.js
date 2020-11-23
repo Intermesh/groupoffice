@@ -83,15 +83,15 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			})
 		];
 		
-		this.browseBtn.on('closefilebrowser', function(btn, folderId) {
-			this.folderId = folderId;
-			this.store.load({
-				params: {
-					limit: 10,
-					folder_id: this.folderId
-				}
-			});
-		}, this);
+		// this.browseBtn.on('closefilebrowser', function(btn, folderId) {
+		// 	this.folderId = folderId;
+		// 	this.store.load({
+		// 		params: {
+		// 			limit: 10,
+		// 			folder_id: this.folderId
+		// 		}
+		// 	});
+		// }, this);
 
 
 		go.modules.files.FilesDetailPanel.superclass.initComponent.call(this);
@@ -297,24 +297,8 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 		}
 	},
 
-	onLoad: function (dv) {
-
-		// this.browseBtn.model_name = dv.model_name || dv.entity || dv.entityStore.entity.name;
-		// this.browseBtn.setId(dv.data.id);
-
-		this.detailView = dv;
-
-		this.folderId = dv.data.files_folder_id == undefined ? dv.data.filesFolderId : dv.data.files_folder_id;
-
-		//this.setVisible(this.folderId != undefined);
-
-		this.uploadBtn.setDisabled(dv.data.permissionLevel < go.permissionLevels.write);
-		if(dv.data.permissionLevel < go.permissionLevels.write) {
-			this.dataView.emptyText = "<p class='pad'>" + t("No items found") + '</p>';
-		} else
-		{
-			this.dataView.emptyText = '<div class="go-dropzone">'+t('Drop files here')+'</div>';
-		}
+	load : function(folderId) {
+		this.folderId = folderId;
 
 		if (this.folderId) {
 			this.browseBtn.setDisabled(false);
@@ -327,9 +311,25 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 		} else {
 			this.store.removeAll();
 			this.browseBtn.setText(t("Browse files", "files"));
-			this.browseBtn.setDisabled(dv.data.permissionLevel < go.permissionLevels.write);
+			this.browseBtn.setDisabled(this.detailView.data.permissionLevel < go.permissionLevels.write);
 		}
+	},
+
+	onLoad: function (dv) {
+
+		this.detailView = dv;
+
+		this.uploadBtn.setDisabled(dv.data.permissionLevel < go.permissionLevels.write);
+		if(dv.data.permissionLevel < go.permissionLevels.write) {
+			this.dataView.emptyText = "<p class='pad'>" + t("No items found") + '</p>';
+		} else
+		{
+			this.dataView.emptyText = '<div class="go-dropzone">'+t('Drop files here')+'</div>';
+		}
+
+		this.load(dv.data.files_folder_id == undefined ? dv.data.filesFolderId : dv.data.files_folder_id);
 	}
 
 });
 
+Ext.reg("filesdetailpanel", go.modules.files.FilesDetailPanel);

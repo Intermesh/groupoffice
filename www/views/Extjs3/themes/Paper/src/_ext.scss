@@ -771,14 +771,15 @@
 	//    @extend .z2;
 	//    background-color: color($grey, 200);
 	//  }
-	&.x-btn-focus, &.x-btn-over {
-		transition: background-color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-		@include var(background-color, c-primary-tp);
 
-	}
 	&.primary {
 		@include var('background-color', c-secondary);
 		color: white;
+
+		&.x-btn-focus, &.x-btn-over {
+			transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+			@include var(background-color, c-accent);
+		}
 	}
 	&.danger {
 		&.x-btn-focus, &.x-btn-over {
@@ -787,7 +788,13 @@
 		//.x-btn-text {
 			color: $cDanger;
 		//}
-	} 
+	}
+
+	&.x-btn-focus, &.x-btn-over {
+		transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+		@include var(background-color, c-primary-tp);
+	}
+
 	&-icon-small-top {
 		height: dp(56);
 		.x-btn-text { padding-top: dp(40) !important; }
@@ -2536,20 +2543,27 @@ body.x-body-masked .x-window-plain .x-window-mc {
 	border-radius: dp(4);
 	border:1px solid color($fg, 'track');
 }
-.x-html-editor-tb .x-toolbar {
-	height: dp(40);
-	background-color: transparent;
-	.x-toolbar-cell {
-		padding:0;
+.x-html-editor-tb {
+	.x-toolbar {
+		height: dp(40);
+		background-color: transparent;
+
+		.x-toolbar-cell {
+			padding: 0;
+		}
+
+		.x-btn {
+			font-size: .8em;
+		}
 	}
-	.x-btn {
-		font-size:.8em;
+	//.x-toolbar-left {
+	//	padding-left: 0;
+	//}
+
+	.x-btn-text {
+		background-image: none; //url(wysiwyg.gif);
+		color: color($fg, 'secondary-text');
 	}
-	
-}
-.x-html-editor-tb .x-btn-text {
-	background-image: none; //url(wysiwyg.gif);
-	color: color($fg, 'secondary-text');
 }
 
 // ####################

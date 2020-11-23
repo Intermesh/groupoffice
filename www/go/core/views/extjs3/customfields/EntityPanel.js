@@ -62,7 +62,8 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 				"->",
 				{
 					iconCls: 'ic-add',
-					tooltip: t('Add field set'),
+					cls: "primary",
+					text: t('Add field set'),
 					handler: function (e, toolEl) {
 						var dlg = this.createFieldSetDialog();
 						dlg.setValues({entity: this.entity});
@@ -104,11 +105,12 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 					sortable: false,
 					dataIndex: "databaseName",
 					renderer: function (v, meta, record) {
+
 						if (record.data.isFieldSet) {
-							return '<button class="icon" ext:qtip="' + t("Add field") + '">add</button><button class="icon">more_vert</button>';
+							return '<div class="x-toolbar"><button class="go-button primary" title="' + t("Add field") + '"><i class="icon">add</i></button><button class="go-button"><i class="icon">more_vert</i></button></div>';
 						} else
 						{
-							return "<button class='icon'>more_vert</button>";
+							return '<div class="x-toolbar"><button class="go-button"><i class="icon">more_vert</i></button></div>';
 						}
 					}
 				}
@@ -121,7 +123,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 			listeners: {
 				scope: this,
 				rowclick: function (grid, rowIndex, e) {
-					if (e.target.tagName !== "BUTTON") {
+					if (e.target.tagName !== "I") {
 						return false;
 					}
 

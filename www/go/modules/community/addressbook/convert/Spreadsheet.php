@@ -10,29 +10,31 @@ use go\core\orm\Entity;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\Group;
 
-class Csv extends convert\Csv {	
+class Spreadsheet extends convert\Spreadsheet {
 
 	private $organizations = true;
 
-	/**
-	 * @inheritDoc
-	 */
-	public function importFile(File $file, $entityClass, $params = array())
+	protected function nextImportRecord()
 	{
-		$contacts = parent::importFile($file, $entityClass, $params);
-		if(!$contacts['success']) {
-			return false;
+		$hasNext = parent::nextImportRecord();
+
+		if(!$hasNext && $this->organizations) {
+			//go to file again for contacts
+			$this->organizations = false;
+
+			if($this->extension == 'csv') {
+				rewind($this->fp);
+			}else{
+				$this->spreadsheetRowIterator->rewind();
+			}
+
+			//read headers
+			$this->readRecord();
+
+			return parent::nextImportRecord();
+		} else {
+			return $hasNext;
 		}
-
-		$this->organizations = false;
-
-		$orgs = parent::importFile($file, $entityClass, $params);
-
-		return [
-			'count' => ($contacts['count'] + $orgs['count']), 
-			'errors' => array_merge($contacts['errors'], $orgs['errors']), 
-			'success' => ($orgs['success'] && $contacts['success'])
-		];
 	}
 
 	/**
@@ -40,9 +42,9 @@ class Csv extends convert\Csv {
 	 *
 	 * @inheritDoc
 	 */
-	protected function importEntity($entityClass, $fp, $index, array $params)
+	protected function importEntity()
 	{
-		$contact = parent::importEntity($entityClass, $fp, $index, $params);
+		$contact = parent::importEntity();
 
 		if(!$contact) {
 			return false;
@@ -51,8 +53,14 @@ class Csv extends convert\Csv {
 		return $contact->isOrganization == $this->organizations ? $contact : false;
 	}
 
-	protected function createEntity($entityClass, $values)
+	protected function createEntity($values)
 	{
+		if(isset($this->clientParams['values'])) {
+			$values = array_merge($values, $this->clientParams['values']);
+		}
+
+		$entityClass = $this->entityClass;
+
 		$entity = false;
 		//lookup entity by id if given
 		if($this->updateBy == 'id' && !empty($values['id'])) {
@@ -77,6 +85,7 @@ class Csv extends convert\Csv {
 		if(!$entity) {
 			$entity = new $entityClass;
 		}
+
 		return $entity;
 	}
 
@@ -100,7 +109,7 @@ class Csv extends convert\Csv {
 		$contact->groups = [];
 
 		$groups = !empty($groups) ? explode(static::$multipleDelimiter, $groups) : [];
-		$addressBookId = $contact->addressBookId ?? $values['addressBookId'];
+		$addressBookId = $contact->addressBookId ?? $this->clientParams['values']['addressBookId'];
 		if(empty($addressBookId)) {
 			throw new Exception("No address book ID set");
 		}
@@ -109,7 +118,7 @@ class Csv extends convert\Csv {
 			if(!$group) {
 				$group = new Group();
 				$group->name = $groupName;
-				$group->addressBookId = $contact->addressBookId ?? $values['addressBookId'];
+				$group->addressBookId = $contact->addressBookId ?? $this->clientParams['values']['addressBookId'];
 				if(!$group->save()) {
 					throw new Exception("Could not save group");
 				}
@@ -170,7 +179,7 @@ class Csv extends convert\Csv {
 	
 	protected function importOrganizations(Contact $contact, $organizationNames, array &$values) {
 
-		$addressBookId = $contact->addressBookId ?? $values['addressBookId'];
+		$addressBookId = $contact->addressBookId ?? $this->clientParams['values']['addressBookId'];
 		if(empty($addressBookId)) {
 			throw new Exception("No address book ID set");
 		}

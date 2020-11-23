@@ -4,13 +4,20 @@ namespace go\core\data\convert;
 
 use Exception;
 use go\core\event\EventEmitterTrait;
+use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\model\Acl;
 use go\core\model\Field;
 use go\core\orm\Entity;
 use go\core\orm\Property;
+use go\core\orm\Query;
 use go\core\orm\Relation;
 use go\core\util\DateTime as GoDateTime;
+use PhpOffice\PhpSpreadsheet\Spreadsheet as PhpSpreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Font;
+use PhpOffice\PhpSpreadsheet\Worksheet\Row;
+use PhpOffice\PhpSpreadsheet\Worksheet\RowIterator;
 use Sabre\VObject\Property\VCard\DateTime;
 
 /**
@@ -33,7 +40,7 @@ use Sabre\VObject\Property\VCard\DateTime;
  * 	]
  * ]
  */
-class Csv extends AbstractConverter {
+class Spreadsheet extends AbstractConverter {
 
 	use EventEmitterTrait;
 
@@ -69,6 +76,35 @@ class Csv extends AbstractConverter {
 	 */
 	public $updateBy = null;
 
+	protected $fp;
+	/**
+	 * @var File
+	 */
+	protected $tempFile;
+
+	/**
+	 * @var PhpSpreadsheet
+	 */
+	protected $spreadsheet;
+
+	/**
+	 * Row index while exporting
+	 * @var int
+	 */
+	protected $spreadSheetIndex = 1;
+	/**
+	 * @var RowIterator
+	 */
+	protected $spreadsheetRowIterator;
+
+	/**
+	 * @inheritDoc
+	 */
+	public static function supportedExtensions()
+	{
+		return ['csv', 'xlsx'];
+	}
+
 	protected function init()
 	{
 		parent::init();
@@ -81,16 +117,39 @@ class Csv extends AbstractConverter {
 		static::fireEvent(static::EVENT_INIT, $this);
 	}
 
+	protected function initExport()
+	{
+		$this->tempFile = File::tempFile($this->getFileExtension());
+		$this->fp = $this->tempFile->open('w+');
 
-  /**
-   * Exports an entity to a CSV record array
-   *
-   * @param Entity $entity
-   * @return array
-   * @throws Exception
-   */
-	public function export(Entity $entity) {
-		
+		if($this->extension != 'csv') {
+			$this->spreadsheet = new PhpSpreadsheet();
+			$this->spreadSheetIndex = 1;
+		}
+	}
+
+
+	protected function arrayToSpreadSheet($index, $array) {
+		for($colIndex = 0, $count = count($array);$colIndex < $count; $colIndex++) {
+			//add 1 to index for headers
+			$this->spreadsheet->getActiveSheet()->setCellValueByColumnAndRow($colIndex + 1, $index, $array[$colIndex]);
+		}
+	}
+
+	protected function writeRecord($array) {
+		if($this->extension == 'csv') {
+			fputcsv($this->fp, $array, $this->delimiter, $this->enclosure);
+		} else{
+			$this->arrayToSpreadSheet($this->spreadSheetIndex++, $array);
+		}
+	}
+
+	protected function exportEntity(Entity $entity) {
+
+		if ($this->index == 0) {
+			$this->writeRecord(array_column($this->getHeaders($entity), 'name'));
+		}
+
 		$headers = $this->getHeaders($entity);
 		//set custom fields to text mode
 		if(property_exists($entity, "returnAsText")) {
@@ -100,10 +159,49 @@ class Csv extends AbstractConverter {
 
 		$record = [];
 		foreach($headers as $header) {
-			$record[$header['name']] = $this->getValue($entity, $templateValues, $header['name']);
+			$record[] = $this->getValue($entity, $templateValues, $header['name']);
 		}
-		
-		return $record;
+
+		$this->writeRecord($record);
+	}
+
+
+	protected function finishExport()
+	{
+		if($this->extension != 'csv') {
+
+			$headerStyle = [
+				'font' => [
+					'bold' => true,
+					'color' => ['argb' => 'ffffff']
+				],
+				'fill' => [
+					// SOLID FILL
+					'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+					'color' => ['argb' => '0277bd']
+				]
+			];
+			foreach($this->spreadsheet->getActiveSheet()->getColumnIterator() as $col) {
+				$style = $this->spreadsheet->getActiveSheet()->getStyle($col->getColumnIndex() . "1");
+				$style->applyFromArray($headerStyle);
+
+				$colDim = $this->spreadsheet->getActiveSheet()->getColumnDimension($col->getColumnIndex());
+				$colDim->setAutoSize(true);
+			}
+
+			$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($this->spreadsheet);
+			$writer->save($this->tempFile->getPath());
+
+		}
+
+		$cls = $this->entityClass;
+		$blob = Blob::fromTmp($this->tempFile);
+		$blob->name = $cls::entityType()->getName() . "-" . date('Y-m-d-H:i:s') . '.'. $this->getFileExtension();
+		if(!$blob->save()) {
+			throw new Exception("Couldn't save blob: " . var_export($blob->getValidationErrors(), true));
+		}
+
+		return $blob;
 	}
 	
 	private $customColumns = [];
@@ -233,23 +331,22 @@ class Csv extends AbstractConverter {
 		return $record;
 	}
 
-	public function getEntityMapping($entityCls) {
-		return $this->internalGetHeaders($entityCls, true);
+	public function getEntityMapping() {
+		return $this->internalGetHeaders(true);
 	}
 
   /**
    * Get all the CSV field headers
    *
    * Sub properties are delimnited with a . For example "emailAddresses.email".
-   * Multiple values are separated by " ::: ". For example "email1 ::: email2"
-   * @param string $entityCls
-   * @return string[]
+   *
+   * @return array[] [['name' => 'id', 'label' => "ID", 'many' => false], ...]
    * @throws Exception
    */
-	public final function getHeaders($entityCls) {
+	public final function getHeaders() {
 		
 		if(!isset($this->headers)) {
-			$this->headers = $this->internalGetHeaders($entityCls);
+			$this->headers = $this->internalGetHeaders();
 		}
 		
 		return $this->headers;		
@@ -264,18 +361,36 @@ class Csv extends AbstractConverter {
 	 * @return string[]
 	 * @throws Exception
 	 */
-	protected function internalGetHeaders($entityCls, $forMapping = false) {
+	protected function internalGetHeaders($forMapping = false) {
+
+		$entityCls = $this->entityClass;
+
 		//Write headers
 		$properties = $entityCls::getMapping()->getProperties();
-		$headers = [
-			['name' => 'id', 'label' => "ID", 'many' => false]
-		];
+
+		if($forMapping) {
+			$headers = ['id' =>	['name' => 'id', 'label' => "ID", 'many' => false]];
+		}else{
+			if(!empty($this->clientParams['columns']) && !in_array("id", $this->clientParams['columns'])) {
+				$headers = [];
+			} else {
+				$headers = [
+					['name' => 'id', 'label' => "ID", 'many' => false]
+				];
+			}
+		}
 
 		foreach($properties as $name => $value) {
 			//Skip system data
 			if(in_array($name, array_merge(['createdAt', 'createdBy', 'ownedBy', 'modifiedAt','aclId','filesFolderId', 'modifiedBy'], array_keys($this->customColumns)))){
 				continue;
 			}
+
+			//client specified which columns to export
+			if(!empty($this->clientParams['columns']) && !in_array($name, $this->clientParams['columns'])) {
+				continue;
+			}
+
 			$headers = $this->addSubHeaders($headers, $name, $value, false, $forMapping);
 		}
 		if(method_exists($entityCls, 'getCustomFields')) {
@@ -286,6 +401,10 @@ class Csv extends AbstractConverter {
 				if($forMapping) {
 					$customFieldProps[$field->databaseName] = ['name' => $field->databaseName, 'label' => $field->name, 'many' => false];
 				} else{
+					//client specified which columns to export
+					if(!empty($this->clientParams['columns']) && !in_array($field->databaseName, $this->clientParams['columns'])) {
+						continue;
+					}
 					$headers[] =  ['name' => 'customFields.' . $field->databaseName, 'label' => $field->name, 'many' => false];
 				}
 			}
@@ -298,7 +417,10 @@ class Csv extends AbstractConverter {
 		if($forMapping) {
 			return array_merge($headers, $this->customColumns);
 		} else{
-			return array_merge($headers, array_values($this->customColumns));
+			return array_merge($headers, array_filter(array_values($this->customColumns), function($col) {
+				//client specified which columns to export
+				return empty($this->clientParams['columns']) || in_array($col['name'], $this->clientParams['columns']);
+			}));
 		}
 	}
 	
@@ -388,20 +510,9 @@ class Csv extends AbstractConverter {
       ->single();
   }
 
-	protected function exportEntity(Entity $entity, $fp, $index, $total) {
 
-		if ($index == 0) {
-			fputcsv($fp, array_column($this->getHeaders($entity), 'name'), $this->delimiter, $this->enclosure);
-		}
 
-		$record = $this->export($entity);
-		
-		fputcsv($fp, $record, $this->delimiter, $this->enclosure);
-	}
 
-	public function getFileExtension(): string {
-		return 'csv';
-	}
 	
 	private function recordIsEmpty(array $record) {
 		foreach($record as $v) {
@@ -412,56 +523,111 @@ class Csv extends AbstractConverter {
 		return true;
 	}
 
-	public function importFile(\go\core\fs\File $file, $entityClass, $params = array())
+
+
+	protected function initImport(File $file)
 	{
-		$this->delimiter = static::sniffDelimiter($file);
+		if($this->extension == 'csv') {
+			$this->fp = $file->open('r');
+			$this->delimiter = static::sniffDelimiter($file);
+		} else{
+			$reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+			$this->spreadsheet = $reader->load($file->getPath());
+			$this->spreadsheet->setActiveSheetIndex(0);
+			$this->spreadsheetRowIterator = $this->spreadsheet->getActiveSheet()->getRowIterator();
+		}
 
 		if(isset($params['updateBy'])) {
 			$this->updateBy = $params['updateBy'];
 		}
-
-		return parent::importFile($file, $entityClass, $params);
 	}
 
-  /**
+	protected $record;
+
+	protected function nextImportRecord()
+	{
+		if($this->index == 0) {
+			//skip headers
+			$headers = $this->readRecord();
+		}
+		$this->record = $this->readRecord();
+
+		return $this->record !== false;
+	}
+
+	protected function readRecord() {
+		if($this->extension != 'csv') {
+			/**
+			 * @var Row $row
+			 */
+
+			if(!$this->spreadsheetRowIterator->valid()) {
+				return false;
+			}
+
+			$row = $this->spreadsheetRowIterator->current();
+			$this->spreadsheetRowIterator->next();
+			if(!$row) {
+				return false;
+			}
+
+			$cellIterator = $row->getCellIterator();
+			$cellIterator->setIterateOnlyExistingCells(FALSE); // This loops through all cells,
+			$cells = [];
+			foreach ($cellIterator as $cell) {
+				$cells[] = $cell->getValue();
+			}
+			return $cells;
+		} else{
+			return fgetcsv($this->fp, 0, $this->delimiter, $this->enclosure);
+		}
+	}
+
+	protected function finishImport()
+	{
+		if($this->extension == 'csv') {
+			fclose($this->fp);
+		}
+	}
+
+
+	/**
    * @inheritDoc
    */
-	protected function importEntity($entityClass, $fp, $index, array $params) {
+	protected function importEntity() {
 
-
-		if($index == 0) {
-			$headers = fgetcsv($fp, 0, $this->delimiter, $this->enclosure);
+		if(!isset($this->clientParams['mapping'])) {
+			throw new Exception("Mapping is required");
 		}
 		
-		$record = fgetcsv($fp, 0, $this->delimiter, $this->enclosure);
-		
-		if(!$record || $this->recordIsEmpty($record)) {
+		if($this->recordIsEmpty($this->record)) {
 			return false;
 		}
 
-		if(!isset($params['mapping'])) {
-			throw new Exception("Mapping is required");
-		}
-
-		$values = $this->convertRecordToProperties($record, $params['mapping'], $this->getEntityMapping($entityClass));
+		$values = $this->convertRecordToProperties($this->record, $this->clientParams['mapping'], $this->getEntityMapping($this->entityClass));
 		if(!$values) {
 			return false;
 		}
 
-		if(isset($params['values'])) {
-			$values = array_merge($values, $params['values']);
-		}
-
-		$entity = $this->createEntity($entityClass, $values);
+		$entity = $this->createEntity($values);
 		$values = $this->importCustomColumns($entity, $values);
 		unset($values['id']);
+
+		if(isset($this->clientParams['values'])) {
+			$values = array_merge($values, $this->clientParams['values']);
+		}
 
 		$this->setValues($entity, $values);
 
 		return $entity;
 	}
 
-	protected function createEntity($entityClass, $values) {
+	protected function createEntity( $values) {
+
+		$entityClass = $this->entityClass;
+
+
+
 		$entity = false;
 		//lookup entity by id if given
 		if($this->updateBy == 'id' && !empty($values['id'])) {
@@ -614,12 +780,9 @@ class Csv extends AbstractConverter {
 	 */
 	public function getCsvHeaders(File $file) {
 
-		$this->delimiter = static::sniffDelimiter($file);
+		$this->initImport($file);
+		$headers = $this->readRecord();
 
-		$fp = $file->open('r');
-
-		$headers = fgetcsv($fp, 0, $this->delimiter, $this->enclosure);
-		
 		if(!$headers) {
 			throw new Exception("Could not read CSV file");
 		}
@@ -627,11 +790,5 @@ class Csv extends AbstractConverter {
 		return $headers;
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	public static function supportedExtensions()
-	{
-		return ['csv'];
-	}
+
 }

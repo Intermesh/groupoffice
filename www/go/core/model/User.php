@@ -12,7 +12,7 @@ use go\core\App;
 use go\core\auth\Method;
 use go\core\auth\Password;
 use go\core\auth\PrimaryAuthenticator;
-use go\core\convert\UserCsv;
+use go\core\convert\UserSpreadsheet;
 use go\core\db\Criteria;
 use go\core\mail\Message;
 use go\core\orm\Query;
@@ -913,7 +913,7 @@ class User extends Entity {
 	 */
 	public static function converters()
 	{
-		return array_merge(parent::converters(), [UserCsv::class]);
+		return array_merge(parent::converters(), [UserSpreadsheet::class]);
 	}
 
 	/**

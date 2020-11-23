@@ -280,6 +280,7 @@ $btn-icon : (
 //.btn-email:before  {@extend %icon; content: 'email';}
 //button.btn-email { background-image: none !important;}
 
+//Images coming from https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/tree/master/Papirus/16x16/mimetypes
 $filetype: (
 	//null: link,
 	eml: eml,
@@ -301,9 +302,10 @@ $filetype: (
 	txt: txt,
 	ppt: (odp, pps, ppsx, ppt, pptx),
 	html: (html, htm),
-	xls: (ods,xls,xlsx,xlsm),
+	xls: (ods,xls,xlsx,xlsm,csv),
 	php: php,
 	js: js,
+				json: json,
 	sql: sql,
 	xml: xml,
 	kdbx: kdbx

@@ -35,7 +35,8 @@
     "league/oauth2-server": "^8.1",
     "guzzlehttp/psr7": "^1.6",
     "guzzlehttp/guzzle": "@stable",
-    "steverhoades/oauth2-openid-connect-server": "^1.2"
+    "steverhoades/oauth2-openid-connect-server": "^1.2",
+    "phpoffice/phpspreadsheet": "^1.15"
   },
   "license": "AGPL",
   "authors": [

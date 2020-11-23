@@ -46,22 +46,19 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				'categoryId', 
 				'categoryName',
 				'entityId', 
-				{name: 'createdAt', type: 'date'}, 
+				{name: 'createdAt', type: 'date'},
+				{name: 'date', type: 'date'},
 				{name: 'modifiedAt', type: 'date'}, 
 				'modifiedBy',
 				'createdBy', 
 				{name: "creator", type: "relation"},
+				{name: "modifier", type: "relation"},
 				'text',
 				{name: "permissionLevel", type: "int"},
 				{name: "labels", type: "relation"}
 			],
 			entityStore: "Comment",
-			remoteSort: true,
-			sortInfo: {
-				field: "createdAt",
-				direction: 'ASC'
-
-			}
+			remoteSort: true
 		});
 		
 		this.store.on('load', function(store,records,options) {		
@@ -170,11 +167,29 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 					displayName: t("Unknown user")
 				};
 			}
+
+
+			var qtip = t('{author} wrote at {date}')
+				.replace('{author}', Ext.util.Format.htmlEncode(creator.displayName))
+				.replace('{date}', Ext.util.Format.date(r.get('createdAt'),go.User.dateTimeFormat));
+
+			if(r.get('createdAt') != r.get('modifiedAt')) {
+
+				var modifier = r.get("modifier");
+				if(!modifier) {
+					modifier = {
+						displayName: t("Unknown user")
+					};
+				}
+
+				qtip += "<br>" + t("Edited by {author} at {date}")
+					.replace('{author}', Ext.util.Format.htmlEncode(modifier.displayName))
+					.replace('{date}', Ext.util.Format.date(r.get('modifiedAt'),go.User.dateTimeFormat));
+			}
+
 			var avatar = {
 				xtype:'box',
-				autoEl: {tag: 'span','ext:qtip': t('{author} wrote at {date}')
-					.replace('{author}', Ext.util.Format.htmlEncode(creator.displayName))
-					.replace('{date}', Ext.util.Format.date(r.get('createdAt'),go.User.dateTimeFormat))},
+				autoEl: {tag: 'span','ext:qtip': qtip},
 				cls: 'photo '+mineCls
 			};
 
@@ -192,8 +207,8 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				items: [{
 						xtype:'box',
 						autoEl: 'h6',
-						hidden: prevStr == go.util.Format.date(r.get('createdAt')),
-						html: go.util.Format.date(r.get('createdAt'))
+						hidden: prevStr == go.util.Format.date(r.get('date')),
+						html: go.util.Format.date(r.get('date'))
 					},{
 						xtype:'container',
 						items: [avatar,readMore]
@@ -209,7 +224,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				}
 
 			}, this);},this);
-			prevStr = go.util.Format.date(r.get('createdAt'));
+			prevStr = go.util.Format.date(r.get('date'));
 		}, this);
 		
 		this.doLayout();
