@@ -1444,7 +1444,7 @@ abstract class Property extends Model {
 		$this->removeRelated($relation, $models, $modified[$relation->name][1]);		
 		
 		$this->{$relation->name} = [];
-		foreach ($models as $newProp) {
+		foreach ($models as $mapKey => $newProp) {
 			
 			if($newProp === null) {
 				//deleted model
@@ -1457,6 +1457,11 @@ abstract class Property extends Model {
 			}
 			
 			$this->applyRelationKeys($relation, $newProp);
+
+			foreach ($this->mapKeyToValues($mapKey, $relation) as $propName => $value) {
+				$newProp->$propName = $value;
+			}
+
 			if (!$newProp->internalSave()) {
 				$this->relatedValidationErrors = $newProp->getValidationErrors();
 				return false;
@@ -1465,8 +1470,8 @@ abstract class Property extends Model {
 			$this->savedPropertyRelations[] = $newProp;
 			$this->relatedValidationErrorIndex++;
 			
-			$key = $this->buildMapKey($newProp, $relation);
-			$this->{$relation->name}[$key] = $newProp;
+			//$key = $this->buildMapKey($newProp, $relation);
+			$this->{$relation->name}[$mapKey] = $newProp;
 		}
 
 		//If the array is empty then set it to null because an empty array will be converted to an array in JSON while a map should be an object.
