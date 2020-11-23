@@ -2205,6 +2205,44 @@ abstract class Property extends Model {
 		return $v;
 	}
 
+	/**
+	 * By the default the primary key of the first mapped table is used.
+	 * If you're composing a complex model or extended model you might need to override this
+	 * to allow a key from multiple tables.
+	 *
+	 * @example
+	 * ```
+	 *
+	 * protected static function defineMapping()
+	 * {
+	 * 	return parent::defineMapping()
+	 * 		->addTable("business_finance_contact_business", "biz", ["c.id" => "biz.contactId"])
+	 * 		->setQuery((new Query())
+	 * 		->select('min(doc.expiresAt) AS expiresAt', true)
+	 * 		->join(
+	 * 		"business_finance_document",
+	 * 		"doc",
+	 * 		"doc.organizationId = c.id AND doc.businessId = biz.businessId AND doc.type = '". FinanceDocument::TYPE_SALES_INVOICE ."'",
+	 * 		"INNER")
+	 * 		->groupBy(['c.id'])
+	 * 	  );
+	 * 	}
+	 *
+	 * 	protected static function definePrimaryKey()
+	 * 	{
+	 * 	  return ['id', 'businessId'];
+	 * 	}
+	 *
+	 * ```
+	 * @return string[]
+	 * @throws Exception
+	 */
+	protected static function definePrimaryKey() {
+		$tables = static::getMapping()->getTables();
+		$primaryTable = array_shift($tables);
+		return $primaryTable->getPrimaryKey();
+	}
+
   /**
    * Get the primary key column names.
    *
@@ -2214,16 +2252,18 @@ abstract class Property extends Model {
    * @return string[]
    * @throws Exception
    */
-	public static function getPrimaryKey($withTableAlias = false) {
-		$tables = static::getMapping()->getTables();
-		$primaryTable = array_shift($tables);
-		$keys = $primaryTable->getPrimaryKey();
+	public static final function getPrimaryKey($withTableAlias = false) {
+
+		$keys = static::definePrimaryKey();
+
 		if(!$withTableAlias) {
 			return $keys;
 		}
+
 		$keysWithAlias = [];
 		foreach($keys as $key) {
-			$keysWithAlias[] = $primaryTable->getAlias() . '.' . $key;
+			$alias = static::getMapping()->getColumn($key)->table->getAlias();
+			$keysWithAlias[] = $alias . '.' . $key;
 		}
 		return $keysWithAlias;
 	}
