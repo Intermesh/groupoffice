@@ -6,6 +6,7 @@ GO.files.openDetailViewFileBrowser = function () {
 	if(!dv) {
 		dv = this.findParentByType("displaypanel") || this.findParentByType("tmpdetailview"); //for legacy modules
 	}
+	var folder_id;
 
 	GO.request({
 		url: 'files/folder/checkModelFolder',
@@ -21,7 +22,7 @@ GO.files.openDetailViewFileBrowser = function () {
 			fb.model_name = dv.model_name || dv.entity || dv.entityStore.entity.name;
 			fb.model_id = dv.data.id;
 
-			this.folderId = result.files_folder_id;
+			folderId = result.files_folder_id;
 
 			//hack to update entity store
 			var store = go.Db.store(fb.model_name);
@@ -30,17 +31,16 @@ GO.files.openDetailViewFileBrowser = function () {
 				//store.saveState();
 			}
 
-
 			//reload display panel on close
-
 			GO.files.fileBrowserWin.on('hide', function () {
 
 				fb.model_id = null;
 				fb.model = null;
-				//debugger;
-				this.fireEvent("closefilebrowser", this);
 
-				dv.reload();
+				var filesDetailPanels = dv.findByType("filesdetailpanel");
+				filesDetailPanels.forEach(function(fdp) {
+					fdp.load(folderId);
+				});
 			}, this, {single: true});
 		},
 		scope: this

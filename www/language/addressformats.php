@@ -32,8 +32,7 @@ $af['FR']='{address_no} {address}
 {zip} {city}
 {state} {country}';
 
-$af['GB']='{address}
-{address_no}
+$af['GB']='{address_no} {address}
 {city}
 {state}
 {zip}
