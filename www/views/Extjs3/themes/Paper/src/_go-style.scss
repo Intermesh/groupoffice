@@ -2156,9 +2156,15 @@ table[id^="comments-ext"] b {
 	padding-right: dp(8);
 
 	&:hover, &:focus {
-		transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
-		@include var(background-color, c-accent);
-		color: white;
+		transition: all 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+		@include var(background-color, c-primary-tp);
+	}
+
+	&.primary {
+		&:hover, &:focus {
+			transition: all 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+			@include var(background-color, c-accent);
+		}
 	}
 }
 
