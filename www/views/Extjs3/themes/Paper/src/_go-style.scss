@@ -2208,17 +2208,15 @@ table[id^="comments-ext"] b {
 
 	button, a.button {
 		@extend .go-button;
-
 		i {
 			margin-right: dp(4);
 		}
 	}
 
 	.toolbar {
+		padding: dp(16) 0;
 		button, a.button {
-			box-shadow: none;
-			color: color($fg, "text");
-			background: transparent !important;
+			border: 0;
 		}
 	}
 
