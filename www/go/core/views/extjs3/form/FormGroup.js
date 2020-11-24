@@ -15,6 +15,12 @@
 								}
 							},
  *	itemCfg: {
+ *		listeners: {
+ *		  setvalue: function(formContainer, v) {
+ *		  	//example how to alter fields when loading data
+ *		  	formContainer.findField('text').doSomething(v);
+ *		  }
+ *		},
  *		items: [{
  *				xtype: "hidden",
  *				name: "id"
