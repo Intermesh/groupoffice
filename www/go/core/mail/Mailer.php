@@ -2,8 +2,8 @@
 
 namespace go\core\mail;
 
-use go\core\App;
 use go\core\model\SmtpAccount;
+use GO\Email\Model\Account;
 
 /**
  * Sends mail messages
@@ -25,6 +25,12 @@ class Mailer {
 	 * @var SmtpAccount
 	 */
 	private $smtpAccount;
+
+	/**
+	 * @var Account
+	 */
+	private $emailAccount;
+
 	/**
 	 * Create a new mail message
 	 * @return \go\core\mail\Message
@@ -41,6 +47,20 @@ class Mailer {
 	 */
 	public function setSmtpAccount(SmtpAccount $account) {
 		$this->smtpAccount = $account;
+
+		$this->emailAccount = null;
+		return $this;
+	}
+
+	/**
+	 * Set an e-mail account for sending
+	 *
+	 * @param Account $account
+	 * @return $this
+	 */
+	public function setEmailAccount(Account $account) {
+		$this->emailAccount = $account;
+		$this->smtpAccount = null;
 
 		return $this;
 	}
@@ -97,22 +117,25 @@ class Mailer {
 			}
 			
 			return $o;
-		}
+		} else if (isset($this->emailAccount)) {
+			return \GO\Email\Transport::newGoInstance($this->emailAccount);
+		} else {
 
-		$o = new \Swift_SmtpTransport(
-			go()->getSettings()->smtpHost, 
-			go()->getSettings()->smtpPort, 
-			go()->getSettings()->smtpEncryption
-		);
-		if(!empty(go()->getSettings()->smtpUsername)){
-			$o->setUsername(go()->getSettings()->smtpUsername)
-				->setPassword(go()->getSettings()->decryptSmtpPassword());
-		}		
-		
-		if(!go()->getSettings()->smtpEncryptionVerifyCertificate) {
-			$o->setStreamOptions(array('ssl' => array('allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name'  => false)));
+			$o = new \Swift_SmtpTransport(
+				go()->getSettings()->smtpHost,
+				go()->getSettings()->smtpPort,
+				go()->getSettings()->smtpEncryption
+			);
+			if (!empty(go()->getSettings()->smtpUsername)) {
+				$o->setUsername(go()->getSettings()->smtpUsername)
+					->setPassword(go()->getSettings()->decryptSmtpPassword());
+			}
+
+			if (!go()->getSettings()->smtpEncryptionVerifyCertificate) {
+				$o->setStreamOptions(array('ssl' => array('allow_self_signed' => true, 'verify_peer' => false, 'verify_peer_name' => false)));
+			}
+
+			return $o;
 		}
-		
-		return $o;
 	}
 }
