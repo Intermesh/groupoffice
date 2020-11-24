@@ -23,10 +23,6 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 		});
 
 		go.form.FormContainer.superclass.initComponent.call(this);
-
-
-
-
 	},
 
 	getName: function () {
@@ -55,8 +51,9 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 			}
 		};
 
-		this.items.each(fn);
-
+		if(this.items) {
+			this.items.each(fn);
+		}
 		
 		return fields;
 	},
@@ -112,6 +109,8 @@ go.form.FormContainer = Ext.extend(Ext.Container, {
 				// field.originalValue = field.getValue();
 			}
 		}
+
+		this.fireEvent("setvalue", this, v);
 
 	},
 
