@@ -30,13 +30,15 @@ class Script extends Controller {
 
 	public function createLotsOfData()
 	{
+//		go()->getDbConnection()->enableTransactions = false;
+//		go()->getDbConnection()->exec("SET autocommit=0");
 		Entity::$trackChanges = false;
 		Module::$enabled = false;
 		go()->getDebugger()->enabled = false;
 
 		$addressBook = AddressBook::find()->single();
 
-		for ($i = 5000; $i < 500000; $i++) {
+		for ($i = 7000; $i < 500000; $i++) {
 			echo $i . "\n";
 			$company = new Contact();
 			$company->isOrganization = true;
@@ -87,7 +89,9 @@ Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium dolor
 			}
 
 
-			Link::create($contact, $company);
+			Link::create($contact, $company, null, false);
 		}
+
+//		go()->getDbConnection()->exec("COMMIT");
 	}
 }
