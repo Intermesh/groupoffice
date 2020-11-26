@@ -345,7 +345,11 @@ class EntityType implements \go\core\data\ArrayableInterface {
    * @return bool
    * @throws Exception
    */
-	public function changes($changedEntities) {		
+	public function changes($changedEntities) {
+
+		if(!jmap\Entity::$trackChanges) {
+			return true;
+		}
 		
 		go()->getDbConnection()->beginTransaction();
 		
@@ -406,6 +410,9 @@ class EntityType implements \go\core\data\ArrayableInterface {
    * @throws Exception
    */
 	public function change(jmap\Entity $entity, $isDeleted = false) {
+		if(!jmap\Entity::$trackChanges) {
+			return true;
+		}
 		$this->highestModSeq = $this->nextModSeq();
 
 		$record = [

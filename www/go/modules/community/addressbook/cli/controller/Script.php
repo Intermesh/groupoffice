@@ -36,9 +36,10 @@ class Script extends Controller {
 
 		$addressBook = AddressBook::find()->single();
 
-		for ($i = 0; $i < 5; $i++) {
+		for ($i = 0; $i < 50000; $i++) {
 			echo $i . "\n";
 			$company = new Contact();
+			$company->isOrganization = true;
 			$company->addressBookId = $addressBook->id;
 			$company->name = "Acme" . $i;
 			$company->phoneNumbers[0] = (new PhoneNumber())->setValues(['number' => "(555)" . $i, 'type' => PhoneNumber::TYPE_MOBILE]);
