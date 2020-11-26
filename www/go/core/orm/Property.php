@@ -410,15 +410,22 @@ abstract class Property extends Model {
 	private function trackModifications() {
 		//Watch db cols and relations
 
-		$watch = array_keys($this->getMapping()->getProperties());
+		$cacheKey = static::class .'-trackModifications';
 
-		$watch = array_filter($watch, function($p) {
-			return in_array($p, $this->fetchProperties);
-		});
+		$watch = go()->getCache()->get($cacheKey);
+		if($watch === null) {
+			$watch = array_keys($this->getMapping()->getProperties());
 
-		//watch other props
-		$watch = array_merge($watch, static::getRequiredProperties());
-		$watch = array_unique($watch);
+//			$watch = array_filter($watch, function ($p) {
+//				return in_array($p, $this->fetchProperties);
+//			});
+
+			//watch other props
+			$watch = array_merge($watch, static::getRequiredProperties());
+			$watch = array_unique($watch);
+
+			go()->getCache()->set($cacheKey, $watch);
+		}
 
 		foreach ($watch as $propName) {
 			$v = $this->$propName;
