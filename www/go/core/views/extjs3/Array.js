@@ -13,13 +13,27 @@ Ext.applyIf(Array.prototype, {
 	
 	/**
 	 * Get array of all values that are not present in the given array
-	 * 
+	 * Opposite of intersect()
+	 *
 	 * @param {Array} a
 	 * @returns {Array}
 	 */
 	diff : function(a) {
     return this.filter(function(i) {
 			return a.indexOf(i) === -1;
+		});
+	},
+
+	/**
+	 * Get array of all values that are present in the given array
+	 * Opposite of diff()
+	 *
+	 * @param {Array} a
+	 * @returns {Array}
+	 */
+	intersect : function(a) {
+		return this.filter(function(i) {
+			return a.indexOf(i) !== -1;
 		});
 	},
 	
