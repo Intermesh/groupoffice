@@ -903,11 +903,16 @@ abstract class Property extends Model {
 		if(!is_array($properties)) {
 			$properties = [$properties];
 		}
+
+		if(empty($properties)) {
+			$properties = array_keys($this->oldProps);
+		}
+
 		$modified = [];
-		foreach ($this->oldProps as $key => $oldValue) {		
-			if (!empty($properties) && !in_array($key, $properties)) {
-				continue;
-			}
+
+		foreach($properties as $key) {
+
+			$oldValue = $this->oldProps[$key];
 			
 			$newValue = $this->{$key};
 			
@@ -1913,7 +1918,7 @@ abstract class Property extends Model {
    * @return bool
    */
 	private function tableIsModified(MappedTable $table) {
-		return $this->isModified(array_keys($table->getColumns()));
+		return $this->isModified(array_keys($table->getMappedColumns()));
 	}
 
   /**
