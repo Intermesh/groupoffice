@@ -516,7 +516,7 @@ abstract class Entity extends Property {
 		$cacheKey = 'entity-type-' . $cls;
 
 		$t = go()->getCache()->get($cacheKey);
-		if($t) {
+		if($t !== null) {
 			return $t;
 		}
 	

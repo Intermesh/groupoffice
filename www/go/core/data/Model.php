@@ -46,7 +46,7 @@ abstract class Model implements ArrayableInterface, JsonSerializable {
 		$cacheKey = 'api-props-' . static::class;
 		
 		$ret = App::get()->getCache()->get($cacheKey);
-		if ($ret) {
+		if ($ret !== null) {
 			return $ret;
 		}
 
