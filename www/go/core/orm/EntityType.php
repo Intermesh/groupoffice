@@ -234,7 +234,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	private static function getCache() {
 		$cache = go()->getCache()->get('entity-types');
 
-		if(!$cache) {
+		if($cache === null) {
 			$cache= [
 				'id' => [],
 				'name' => [],

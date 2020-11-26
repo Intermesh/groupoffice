@@ -25,6 +25,7 @@ end 6.5
 - Billing: Address display as per country settings
 - Core: Fixed UK address standard
 - Core: HTML fields auto grow with content
+- Core: Fixed date range with commentedat filter
 
 16-11-2020 6.4.192
 - Comments: Fixed bug when adding two comments without opening another item would overwrite the first.

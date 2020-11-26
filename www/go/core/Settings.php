@@ -30,7 +30,7 @@ abstract class Settings extends Model {
 
 	  if(!isset(self::$instance[$cls])) {
       $instance = static::dbIsReady() ? go()->getCache()->get($cls) : false;
-      if ($instance) {
+      if ($instance !== null) {
         self::$instance[$cls] = $instance;
         return $instance;
       }

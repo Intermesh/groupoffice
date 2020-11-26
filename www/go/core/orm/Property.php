@@ -475,7 +475,7 @@ abstract class Property extends Model {
 		$cacheKey = 'mapping-' . $cls;
 		
 		self::$mapping[$cls] = go()->getCache()->get($cacheKey);
-		if(!self::$mapping[$cls]) {			
+		if(self::$mapping[$cls] === null) {
 			self::$mapping[$cls] = static::defineMapping();			
 			if(!static::fireEvent(self::EVENT_MAPPING, self::$mapping[$cls])) {
 				throw new Exception("Mapping event failed!");
@@ -1071,7 +1071,7 @@ abstract class Property extends Model {
 
 		$cols = go()->getCache()->get($cacheKey);
 
-		if($cols) {
+		if($cols !== null) {
 			return $cols;
 		}
 		
