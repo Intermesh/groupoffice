@@ -491,9 +491,9 @@ class EntityType implements \go\core\data\ArrayableInterface {
    */
 	public function nextModSeq() {
 		
-		if($this->modSeqIncremented) {
-			return $this->highestModSeq;
-		}
+//		if($this->modSeqIncremented) {
+//			return $this->highestModSeq;
+//		}
 		/*
 		 * START TRANSACTION
 		 * SELECT counter_field FROM child_codes FOR UPDATE;
@@ -515,7 +515,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 										\go\core\orm\Query::normalize(["id" => $this->id])->tableAlias('entity')
 						)->execute(); //mod seq is a global integer that is incremented on any entity update
 	
-		$this->modSeqIncremented = true;
+		//$this->modSeqIncremented = true;
 		
 		$this->highestModSeq = $modSeq;
 		
