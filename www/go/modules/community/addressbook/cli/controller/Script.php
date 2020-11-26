@@ -36,7 +36,7 @@ class Script extends Controller {
 
 		$addressBook = AddressBook::find()->single();
 
-		for ($i = 0; $i < 50000; $i++) {
+		for ($i = 5000; $i < 500000; $i++) {
 			echo $i . "\n";
 			$company = new Contact();
 			$company->isOrganization = true;
