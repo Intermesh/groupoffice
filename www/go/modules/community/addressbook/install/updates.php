@@ -114,3 +114,10 @@ $updates['202010080821'][] = function() {
 	$m = new go\modules\community\addressbook\install\Migrate63to64();
 	$m->addColor();
 };
+
+
+$updates['202011271105'][] = "ALTER TABLE `addressbook_contact` ADD INDEX(`name`);";
+$updates['202011271105'][] = "ALTER TABLE `addressbook_contact` ADD INDEX(`modifiedAt`);";
+$updates['202011271105'][] = "ALTER TABLE `addressbook_contact` ADD INDEX(`lastName`);";
+
+$updates['202011271105'][] = "update addressbook_contact set lastName = name where isOrganization = true;";
