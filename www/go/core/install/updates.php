@@ -783,3 +783,13 @@ $updates['202011261716'][] = "ALTER TABLE `core_search_word`
   ADD CONSTRAINT `core_search_word_ibfk_1` FOREIGN KEY (`searchId`) REFERENCES `core_search` (`id`) ON DELETE CASCADE;";
 
 $updates['202011261716'][] = "TRUNCATE core_search";
+
+
+
+$updates['202011261716'][] = function() {
+
+	//run build search cache on cron immediately. This job will deactivate itself.
+	\go\core\cron\BuildSearchCache::install("* * * * *");
+
+	echo "NOTE: Search cache will be rebuilt by a scheduled task. This may take a lot of time.";
+};

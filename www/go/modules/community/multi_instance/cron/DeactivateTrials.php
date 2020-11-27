@@ -8,7 +8,7 @@ use go\core\model\CronJob;
 
 class DeactivateTrials extends CronJob {
 	
-	public function run() {
+	public function run(\go\core\model\CronJobSchedule $schedule) {
 		$expiredTrials = Instance::find()		
 						->selectSingleValue('id')
 						->where('isTrial', '=', true)

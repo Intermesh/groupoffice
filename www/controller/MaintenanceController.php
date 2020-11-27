@@ -342,8 +342,6 @@ class MaintenanceController extends AbstractController {
 			exit("Already running!");
 		}
 
-		\go\core\jmap\Entity::$trackChanges = false;
-		
 		if(!$this->isCli()){
 			echo '<pre>';
 		}
