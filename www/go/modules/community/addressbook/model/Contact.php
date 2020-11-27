@@ -259,7 +259,12 @@ class Contact extends AclItemEntity {
    * @var string
    */
 	public $color;
-	
+
+	/** @var int */
+	protected $age;
+
+	/** @var string */
+	protected $addressBook;
 	
 	/**
 	 * Starred by the current user or not.
@@ -372,7 +377,7 @@ class Contact extends AclItemEntity {
 						->addArray('emailAddresses', EmailAddress::class, ['id' => 'contactId'])
 						->addArray('addresses', Address::class, ['id' => 'contactId'])
 						->addArray('urls', Url::class, ['id' => 'contactId'])
-						->addScalar('groups', 'addressbook_contact_group', ['id' => 'contactId']);						
+						->addScalar('groups', 'addressbook_contact_group', ['id' => 'contactId']);
 	}
 	
 	public function setNameFromParts() {
@@ -440,7 +445,14 @@ class Contact extends AclItemEntity {
 										->add("addressBookId", function(Criteria $criteria, $value) {
 											$criteria->andWhere('addressBookId', '=', $value);
 										})
-										->add("groupId", function(Criteria $criteria, $value, Query $query) {
+			->add("addressBookIds", function(Criteria $criteria, $value) {
+				if(count($value) > 0) {
+					$criteria->andWhere('addressBookId IN (' .  implode(',',$value). ')');
+
+				}
+			})
+
+			->add("groupId", function(Criteria $criteria, $value, Query $query) {
 											$query->join('addressbook_contact_group', 'g', 'g.contactId = c.id');
 											
 											$criteria->andWhere('g.groupId', '=', $value);
@@ -603,7 +615,7 @@ class Contact extends AclItemEntity {
 											if(!$query->isJoined('addressbook_date', 'date')) {
 												$query->join('addressbook_date', 'date', 'date.contactId = c.id', "INNER");
 											}
-											
+
 											$tag = ':bday'.uniqid();
 											$criteria->where('date.type', '=', Date::TYPE_BIRTHDAY)
 																->andWhere('DATE_ADD(date.date, 
@@ -1034,6 +1046,40 @@ class Contact extends AclItemEntity {
 	}
 
 	/**
+	 * Find a birthday, calculate diff in years
+	 *
+	 * @return int
+	 */
+	public function getAge() {
+		$bday = $this->getBirthday();
+		if($bday === '') {
+			return 0;
+		}
+		$date = new DateTime($bday);
+		$diff = $date->diff(new DateTime());
+		return $diff->y;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAddressBook() {
+		return AddressBook::findById($this->addressBookId)->name;
+	}
+
+	/**
+	 * @return DateTime|string
+	 */
+	public function getBirthday()
+	{
+		$oBDay = $this->findDateByType(Date::TYPE_BIRTHDAY, false);
+		if($oBDay) {
+			return $oBDay->date;
+		}
+		return '';
+	}
+
+	/**
 	 * Because we've implemented the getter method "getOrganizationIds" the contact
 	 * modSeq must be incremented when a link between two contacts is deleted or
 	 * created.
@@ -1248,4 +1294,5 @@ class Contact extends AclItemEntity {
 	  }
 	  return parent::check();
   }
+
 }
