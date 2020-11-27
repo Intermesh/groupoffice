@@ -194,7 +194,6 @@ CREATE TABLE `core_search` (
   `name` varchar(100) DEFAULT NULL,
   `description` varchar(190) NOT NULL DEFAULT '',
   `entityTypeId` int(11) NOT NULL,
-  `keywords` VARCHAR(750) NULL,
   `filter` VARCHAR(50) NULL DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
   `aclId` int(11) NOT NULL
@@ -875,9 +874,7 @@ ALTER TABLE `core_email_template_attachment`
   ADD CONSTRAINT `core_email_template_attachment_ibfk_2` FOREIGN KEY (`emailTemplateId`) REFERENCES `core_email_template` (`id`) ON DELETE CASCADE;
 
 
-ALTER TABLE `core_search` ADD INDEX(`keywords`);
 ALTER TABLE `core_change` ADD INDEX(`entityId`);
-
 
 CREATE TABLE `core_auth_allow_group` (
   `id` int(11) NOT NULL,
@@ -1050,3 +1047,18 @@ ALTER TABLE `core_pdf_template`
 ALTER TABLE `core_search` ADD  FOREIGN KEY (`aclId`) REFERENCES `core_acl`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 ALTER TABLE `core_acl` ADD FOREIGN KEY (`ownedBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
+
+
+CREATE TABLE `core_search_word` (
+  `searchId` int(11) NOT NULL,
+  `word` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE `core_search_word`
+  ADD PRIMARY KEY (`word`,`searchId`),
+  ADD KEY `searchId` (`searchId`);
+
+
+ALTER TABLE `core_search_word`
+  ADD CONSTRAINT `core_search_word_ibfk_1` FOREIGN KEY (`searchId`) REFERENCES `core_search` (`id`) ON DELETE CASCADE;

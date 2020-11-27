@@ -187,9 +187,11 @@ require('header.php');
 					<label>Database port</label>
 					<input type="text" name="dbPort" value="<?=$_POST['dbPort'] ?? 3306;?>" required />					
 				</p>
+
+                <button class="primary right" name="submitButton"><?= go()->t('Continue'); ?></button>
 			</fieldset>
 
-			<button name="submitButton"><?= go()->t('Continue'); ?></button>
+
 			</form>
 		</section>
 

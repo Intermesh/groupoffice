@@ -313,7 +313,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 														language: {label: t("Language")},
 														jobTitle: {label: t("Job title")},
 														uid: {label: t("UUID")},
-														starred: {label: t("Starred")},
+														//starred: {label: t("Starred")},
 
 														"emailAddresses": {
 															label: t("E-mail address"),

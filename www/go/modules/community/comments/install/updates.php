@@ -127,6 +127,6 @@ $updates['202003261139'][] = function() {
 	}
 };
 
-$updates['202011161602'][] = "ALTER TABLE `comments_comment` ADD `date` DATETIME NOT NULL AFTER `createdAt`;";
+$updates['202011161602'][] = "ALTER TABLE `comments_comment` ADD `date` DATETIME NULL AFTER `createdAt`;";
 $updates['202011161602'][] = "update `comments_comment` set `date` = createdAt;";
 $updates['202011161602'][] = "ALTER TABLE `comments_comment` ADD INDEX(`date`);";

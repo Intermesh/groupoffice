@@ -411,10 +411,7 @@ abstract class Property extends Model {
 		//Watch db cols and relations
 
 		$watch = array_keys($this->getMapping()->getProperties());
-
-		$watch = array_filter($watch, function($p) {
-			return in_array($p, $this->fetchProperties);
-		});
+		$watch = array_intersect($watch, $this->fetchProperties);
 
 		//watch other props
 		$watch = array_merge($watch, static::getRequiredProperties());
@@ -475,7 +472,7 @@ abstract class Property extends Model {
 		$cacheKey = 'mapping-' . $cls;
 		
 		self::$mapping[$cls] = go()->getCache()->get($cacheKey);
-		if(!self::$mapping[$cls]) {			
+		if(self::$mapping[$cls] === null) {
 			self::$mapping[$cls] = static::defineMapping();			
 			if(!static::fireEvent(self::EVENT_MAPPING, self::$mapping[$cls])) {
 				throw new Exception("Mapping event failed!");
@@ -642,10 +639,8 @@ abstract class Property extends Model {
 		
 		$props = go()->getCache()->get($cacheKey);
 		
-		if(!$props) {
-			$props = array_filter(static::getReadableProperties(), function($propName) {
-				return !in_array($propName, static::atypicalApiProperties());
-			});
+		if($props === null) {
+			$props = array_diff(static::getReadableProperties(), static::atypicalApiProperties());
 
 			go()->getCache()->set($cacheKey, $props);
 		}
@@ -811,11 +806,13 @@ abstract class Property extends Model {
 
   /**
    *
+   * It's not possible to use fetchproperties to determine if they need to be joined. Because the props
+   * can also be used in the where or order by part of the query.
+   *
    * @param array $tables
    * @param Query $query
    *
    * @throws Exception
-   * @todo implement fetch properties
    */
 	private static function joinAdditionalTables(array $tables, Query $query) {
 		$first = array_shift($tables);
@@ -903,11 +900,20 @@ abstract class Property extends Model {
 		if(!is_array($properties)) {
 			$properties = [$properties];
 		}
+
+		if(empty($properties)) {
+			$properties = array_keys($this->oldProps);
+		} else{
+
+			//only check fetched properties
+			$properties = array_intersect($properties, $this->fetchProperties);
+		}
+
 		$modified = [];
-		foreach ($this->oldProps as $key => $oldValue) {		
-			if (!empty($properties) && !in_array($key, $properties)) {
-				continue;
-			}
+
+		foreach($properties as $key) {
+
+			$oldValue = $this->oldProps[$key] ?? null;
 			
 			$newValue = $this->{$key};
 			
@@ -1071,7 +1077,7 @@ abstract class Property extends Model {
 
 		$cols = go()->getCache()->get($cacheKey);
 
-		if($cols) {
+		if($cols !== null) {
 			return $cols;
 		}
 		
@@ -1913,7 +1919,7 @@ abstract class Property extends Model {
    * @return bool
    */
 	private function tableIsModified(MappedTable $table) {
-		return $this->isModified(array_keys($table->getColumns()));
+		return $this->isModified(array_keys($table->getMappedColumns()));
 	}
 
   /**

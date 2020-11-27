@@ -66,6 +66,8 @@ class Disk implements CacheInterface {
 
 	/**
 	 * Get a value from the cache
+	 *
+	 * Make sure to do a strict check on null to check if it existed. $value === null.
 	 * 
 	 * @param string $key 
 	 * @return mixed null if it doesn't exist

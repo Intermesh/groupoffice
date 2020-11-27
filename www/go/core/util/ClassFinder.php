@@ -28,7 +28,7 @@ class ClassFinder {
 	public static function getDefaultNamespaces() {		
 		$ns = go()->getCache()->get("class-finder-default-namespaces");
 		
-		if(!$ns) {
+		if($ns === null) {
 			$ns = ['go\\core'];		
 			
 			$modules = Module::find()->where(['enabled' => true]);

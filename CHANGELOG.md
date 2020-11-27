@@ -11,6 +11,8 @@ Master
 - History: new module replacing Activity log
 - Comments: Editable date field
 - Core: Support xlsx files for import and export
+- Address book: Removed starred functionality for performance reasons
+- Core: New global search design to improve performance on larger databases
 
 end 6.5
 --------
@@ -25,6 +27,7 @@ end 6.5
 - Billing: Address display as per country settings
 - Core: Fixed UK address standard
 - Core: HTML fields auto grow with content
+- Core: Fixed date range with commentedat filter
 
 16-11-2020 6.4.192
 - Comments: Fixed bug when adding two comments without opening another item would overwrite the first.

@@ -1,0 +1,51 @@
+Return-Path: <hu.alexander@web.de>
+Delivered-To: linda@group-office.com
+Received: from localhost (localhost [127.0.0.1])
+	by smtp.group-office.com (Postfix) with ESMTP id 1FD69108B67
+	for <linda@group-office.com>; Fri, 13 Jul 2018 13:58:11 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at smtp.group-office.com
+Received: from smtp.group-office.com ([127.0.0.1])
+	by localhost (smtp.group-office.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id aAIdXuR9Cnik for <linda@group-office.com>;
+	Fri, 13 Jul 2018 13:58:10 +0200 (CEST)
+Received: from mout.web.de (mout.web.de [217.72.192.78])
+	by smtp.group-office.com (Postfix) with ESMTPS id 03BBB108B64
+	for <linda@group-office.com>; Fri, 13 Jul 2018 13:58:09 +0200 (CEST)
+Authentication-Results: smtp.group-office.com; dmarc=none header.from=web.de
+Received: from zbook ([87.138.202.93]) by smtp.web.de (mrweb102
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0MWRzK-1fXzLv0uZW-00XcS3 for
+ <linda@group-office.com>; Fri, 13 Jul 2018 13:58:09 +0200
+From: "Alexander Hu" <hu.alexander@web.de>
+To: <linda@group-office.com>
+Subject: test
+Date: Fri, 13 Jul 2018 13:57:10 +0200
+Message-ID: <!&!AAAAAAAAAAAYAAAAAAAAAENzv3v0LbBEsQn1midpPTjCgAAAEAAAABNm4QSxPCRClBCd7ODYwJkBAAAAAA==@web.de>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 15.0
+Thread-Index: AdQaoJ3JFDOefYXsSJSNPr2W/mrZAA==
+Content-Language: de
+X-Provags-ID: V03:K1:XX8jmZY71pwl2rPw5tqcSTnb0+QRji4zid8qvwin0qUQytnsvq0
+ ZqZcRxMoAfafWTf6x5oU8/1y4HhDiFCwAg8U2ATqf3os8EIYjXITKNYLFFcAkT7T7yKTSV3
+ uak5S0TMBRfouKzWXhkQZhqA9RLC/Qdyc+uY9B712QFK9hBhooHJvUEqqoxSRBEY9IxOvTn
+ 7teoj00gEGIZUrFBmVTrQ==
+X-UI-Out-Filterresults: notjunk:1;V01:K0:DJUvsXbuM0E=:B0ObelVlsSOA3pBRF4EnkY
+ PmLR6oOhlpWLS4KTNEzsETgKGxqPxfJLdtKfO1EE+z73bLXyY3lYYeDa1YoI5HX5h6/s3AsJU
+ vvWg1i1/lBTA+1vgAiVEveQB4ypzJbGBUunM6a3zhQsWgAGGfKguWgCFHHYzhoo1SCZTWMyH8
+ f9d1bB9ItIs1Eis8J+Cio8EFb9XxlHrTnM6VAo8TbNC6mG5ir36OJ15ZHi+uJn7j3QyQ/yBvg
+ 9q7QlkdDVvvyDEDc8wvLXeb/n0aNZD90XGwnpitzwNNdkqj/tsIBM4rxyQdypbbyEbsKvlDe5
+ dBnQXrlZr3vHTceQI/XHyUvafjJeMQEELDmS695zFzXy6O33jj+EIWe1ld7Ck4PKneM7/ncoW
+ NFbFv/nlzeA93DLcbjMTgi4Ptp1pHwKo6KjWHNR57OB/b3gLFpAb2sJA06P3e8GTB1FMckdRA
+ bgqghaI/uEvqGQcAchl7c3sutQRoYCZYiTX8Nmws+1Afbg+T7ZXrixevC0kJmIeKl1dt54a1e
+ CRiuWiH9Yj3tvx4ln85VsdUc2mm5HE+rqHZOlK+ItUIScn1TjqrFZkhe1+Eu7Bdx5rtBVnYD1
+ oxlOKPVy+Msrx31TbTJT3V3VEjKb4jQHvRD2T/JGkk4s5+UeWUatYcZvsphJkPjlkbI96z9RR
+ jE0rCfAJSzICCwJvWcGQlilgqClnNqFkuTgyJBFmXBOcuURRKSQt3RSo5ZpayveIUPU1w9Isr
+ 5zU4JTJfZbZjROCPB7xflAZNnNZvenAtY3fwHinpBOQJxZf10guvy80jemen/iabTDJo0wmfB
+ zG3nH1YD1OxP4bf6d1YwYJqSCTqPc1UDXd5Ms/eUHLH+eOy9mXh3bvmyYlcUfTPm49CDlwq
+
+
+
+
+

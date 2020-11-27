@@ -36,7 +36,7 @@ class Installer {
 	
 	use event\EventEmitterTrait;
 	
-	const MIN_UPGRADABLE_VERSION = "6.3.58";
+	const MIN_UPGRADABLE_VERSION = "6.4.191";
 	
 	const EVENT_UPGRADE = 'upgrade';
 
@@ -397,7 +397,8 @@ class Installer {
 		ini_set("max_execution_time", 0);
 		ini_set("memory_limit", -1);
 
-		go()->getDbConnection()->query("SET sql_mode=''");
+		//Don't be strict in upgrade mode
+		go()->getDbConnection()->exec("SET sql_mode=''");
 		
 		jmap\Entity::$trackChanges = false;
 

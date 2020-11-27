@@ -34,7 +34,7 @@ class GarbageCollection extends CronJob {
 
 	const EVENT_RUN = 'run';
 	
-	public function run() {
+	public function run(\go\core\model\CronJobSchedule $schedule) {
 		$this->blobs();
 		$this->change();
 		$this->links();

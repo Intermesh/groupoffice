@@ -12,6 +12,8 @@ use go\modules\community\history\model\LogEntry;
 class Module extends core\Module
 {
 
+	public static $enabled = true;
+
 	public function getAuthor() {
 		return "Intermesh BV <info@intermesh.nl>";
 	}
@@ -25,6 +27,10 @@ class Module extends core\Module
 	}
 
 	static function logActiveRecord(ActiveRecord $record, $action) {
+
+		if(!self::$enabled) {
+			return;
+		}
 
 		//hacky but works for old code
 		if(!$record->aclField()) {
@@ -66,6 +72,10 @@ class Module extends core\Module
 	}
 
 	private static function logEntity(Entity $entity, $action) {
+		if(!self::$enabled) {
+			return;
+		}
+
 		if($entity instanceof LogEntry || $entity instanceof core\model\Search  || $entity instanceof core\model\CronJobSchedule) {
 			return;
 		}

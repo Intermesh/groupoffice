@@ -54,7 +54,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	private $fetchMode;
 	private $forUpdate;
 	private $tableName;
-	private $calcFoundRows;
+	private $calcFoundRows = false;
+	private $noCache = false;
 
 	public function getTableAlias() {
 		return isset($this->tableAlias) ? $this->tableAlias : 't';
@@ -113,6 +114,10 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 
 	public function getCalcFoundRows() {
 		return $this->calcFoundRows;
+	}
+
+	public function getNoCache() {
+		return $this->noCache;
 	}
 
 	public function getFetchMode() {
@@ -275,6 +280,19 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 */
 	public function calcFoundRows($v = true) {
 		$this->calcFoundRows = $v;
+
+		return $this;
+	}
+
+	/**
+	 * Use SQL_NO_CACHE
+	 *
+	 * @param bool $v
+	 *
+	 * @return static
+	 */
+	public function noCache($v = true) {
+		$this->noCache = $v;
 
 		return $this;
 	}

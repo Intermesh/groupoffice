@@ -587,6 +587,15 @@ abstract class Module extends Singleton {
 	}
 
 	/**
+	 * Check if the module has been installed
+	 *
+	 * @return bool
+	 */
+	public function isInstalled() {
+		return $this->getModel() != false;
+	}
+
+	/**
 	 * Check if this module is installed, available and licensed
 	 * 
 	 * @return bool

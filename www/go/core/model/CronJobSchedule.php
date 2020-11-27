@@ -128,7 +128,7 @@ class CronJobSchedule extends Entity {
 		
 		try {
 			$cron = new $cls;			
-			$cron->run();
+			$cron->run($this);
 			
 		} catch (Exception $ex) {			
 			$errorString = \go\core\ErrorHandler::logException($ex);		

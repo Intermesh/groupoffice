@@ -213,4 +213,9 @@ ALTER TABLE `addressbook_user_settings`
 
 ALTER TABLE `addressbook_addressbook` ADD FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
 
-ALTER TABLE `addressbook_contact` ADD INDEX(`isOrganization`)
+ALTER TABLE `addressbook_contact` ADD INDEX(`isOrganization`);
+
+
+ALTER TABLE `addressbook_contact` ADD INDEX(`name`);
+ALTER TABLE `addressbook_contact` ADD INDEX(`modifiedAt`);
+ALTER TABLE `addressbook_contact` ADD INDEX(`lastName`);

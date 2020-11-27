@@ -21,7 +21,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'creator', type: "relation"},
 				{name: 'modifier', type: "relation"},
 				{name: 'addressbook', type: "relation"},
-				'starred',
+				// 'starred',
 				'permissionLevel',
 				'photoBlobId',
 				"isOrganization",
@@ -52,7 +52,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				{
 					width: dp(48),
 					id: "index",
-					dataIndex: "starred",
+					dataIndex: "name",
 					sortable: false,
 					draggable: false,
 					hideable: false,
@@ -60,10 +60,10 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 
 						var sortBy = record.data.isOrganization ? "name" : go.User.addressBookSettings.sortBy;						
 
-						if(rowIndex === 0 && value) {
-							return '<div class="icon ic-star go-addressbook-star"></div>';
-						} else
-						{
+						// if(rowIndex === 0 && value) {
+						// 	return '<div class="icon ic-star go-addressbook-star"></div>';
+						// } else
+						// {
 							if(value) {
 								return "";
 							}
@@ -85,7 +85,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 							if(!lastRecord || !lastRecord.data[lastSortBy] || lastRecord.data[lastSortBy].substr(0, 1).toUpperCase() !== char) {
 								return "<h3>" + char + "</h3>";
 							}
-						}
+						// }
 						
 						return "";
 					}
@@ -297,13 +297,13 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 //				showPreview: true,
 				getRowClass: function (record, rowIndex, p, store) {					
 					
-					if(rowIndex === 0 && record.get("starred")) {							
-						return '';
-					} else
-					{
-						if(record.get("starred")) {
-							return "";
-						}
+					// if(rowIndex === 0 && record.get("starred")) {
+					// 	return '';
+					// } else
+					// {
+					// 	if(record.get("starred")) {
+					// 		return "";
+					// 	}
 
 						var lastRecord = rowIndex > 0 ? grid.store.getAt(rowIndex - 1) : false;
 						var char = record.data.name.substr(0, 1);
@@ -311,7 +311,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 							return 'go-addressbook-index-row';
 						}
 						return "";
-					}
+					// }
 				}
 			},
 			autoExpandColumn: 'name',
