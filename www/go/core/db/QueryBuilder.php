@@ -159,7 +159,7 @@ class QueryBuilder {
 			$sql .= ' ' . $build['sql'];
 			$this->buildBindParameters = array_merge($this->buildBindParameters, $build['params']);
 		} else {
-			if(ArrayUtil::isAssociative($data)) {
+			if(!array_key_exists(0, $data)) {
 				$data = [$data];
 			}
 			if(empty($columns)) {
@@ -445,10 +445,12 @@ class QueryBuilder {
 			throw new Exception("Alias '" . $tableAlias . "'  not found in the aliasMap for " . $column);
 		}
 
-		if ($this->aliasMap[$tableAlias]->getColumn($column) == null) {
+		$col = $this->aliasMap[$tableAlias]->getColumn($column);
+		$col = $this->aliasMap[$tableAlias]->getColumn($column);
+		if ($col === null) {
 			throw new Exception("Column '" . $column . "' not found in table " . $this->aliasMap[$tableAlias]->getName());
 		}
-		return $this->aliasMap[$tableAlias]->getColumn($column);
+		return $col;
 	}
 
 	private function buildGroupBy() {
