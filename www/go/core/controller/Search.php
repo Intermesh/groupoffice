@@ -31,10 +31,11 @@ class Search extends EntityController {
 		if($isEmailModuleAvailable && $optionEnabled == "1") {
 			$selectQueryContact .= ', NULL as priority';
 		}
-		$query->select($selectQueryContact)
-						->from('core_user', 'u')
+		$query->from('core_user', 'u')
 						->join('core_group', 'g', 'u.id = g.isUserGroupFor');
+		Acl::applyToQuery($query, 'g.aclId');
 
+		$query->select($selectQueryContact);
 
 		if (!empty($q)) {
 			$query->where(
@@ -44,7 +45,7 @@ class Search extends EntityController {
 						);
 		}
 
-		Acl::applyToQuery($query, 'g.aclId');
+
 
 		if (Module::isAvailableFor("community", "addressbook")) {
 
