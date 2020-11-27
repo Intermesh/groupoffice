@@ -397,7 +397,8 @@ class Installer {
 		ini_set("max_execution_time", 0);
 		ini_set("memory_limit", -1);
 
-		go()->getDbConnection()->query("SET sql_mode=''");
+		//Don't be strict in upgrade mode
+		go()->getDbConnection()->exec("SET sql_mode=''");
 		
 		jmap\Entity::$trackChanges = false;
 

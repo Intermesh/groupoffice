@@ -14,7 +14,7 @@ const INSTALL_NEW = 0;
 const INSTALL_UPGRADE = 1;
 const INSTALL_NONE = 2;
 
-$installDb = INSTALL_UPGRADE;
+$installDb = INSTALL_NONE;
 
 $autoLoader = require(__DIR__ . "/../www/vendor/autoload.php");
 $autoLoader->add('go\\', __DIR__);
@@ -111,7 +111,9 @@ try {
 	  go()->getInstaller()->upgrade();
 
     $mod = \go\modules\community\test\Module::get();
-    $mod->install();
+    if(!$mod->isInstalled()) {
+	    $mod->install();
+    }
 
   }else {
 		go()->rebuildCache();

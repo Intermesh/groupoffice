@@ -73,7 +73,7 @@ class ContactTest extends TestCase {
     $contact->emailAddresses[0] = (new EmailAddress())->setValues(['email' => 'john@doe.test', 'type' => EmailAddress::TYPE_HOME]);  
     $contact->addresses[0] = $a = new Address();		
     
-    $contact->setStarred(true);
+//    $contact->setStarred(true);
 
     $a->street =	"Street";
     $a->street2 = "1";

@@ -903,13 +903,17 @@ abstract class Property extends Model {
 
 		if(empty($properties)) {
 			$properties = array_keys($this->oldProps);
+		} else{
+
+			//only check fetched properties
+			$properties = array_intersect($properties, $this->fetchProperties);
 		}
 
 		$modified = [];
 
 		foreach($properties as $key) {
 
-			$oldValue = $this->oldProps[$key];
+			$oldValue = $this->oldProps[$key] ?? null;
 			
 			$newValue = $this->{$key};
 			
