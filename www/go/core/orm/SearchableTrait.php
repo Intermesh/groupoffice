@@ -42,18 +42,25 @@ trait SearchableTrait {
 	/**
 	 * Split text by non word characters to get useful search keywords.
 	 * @param $text
-	 * @return array|false|string[]
+	 * @return string[]
 	 */
 	public static function splitTextKeywords($text) {
 
+		if(empty($text)) {
+			return [];
+		}
+
 		//Split on non word chars followed by whitespace or end of string. This wat initials like J.K. or french dates
 		//01.01.2020 can be found too.
-		$keywords = mb_split('[^\w\-_\+\\\\\/:](\s|$)*', mb_strtolower($text), -1);
+//		$keywords = mb_split('[^\w\-_\+\\\\\/:](\s|$)*', mb_strtolower($text), -1);
+		$text= preg_replace('/[^\w\-_\+\\\\\/\s:@]/', '', mb_strtolower($text));
+		$keywords = mb_split("\s+", $text);
 
 		//filter small words
 		$keywords = array_filter($keywords, function($word) {
-			return strlen($word) > 2;
+			return strlen($word) > 1;
 		});
+
 
 		return $keywords;
 	}
