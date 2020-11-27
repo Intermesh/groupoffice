@@ -86,9 +86,9 @@ abstract class EntityController extends Controller {
 						->limit($params['limit'])
 						->offset($params['position']);
 
-		if($params['calculateTotal']) {
-			$query->calcFoundRows();
-		}
+//		if($params['calculateTotal']) {
+//			$query->calcFoundRows();
+//		}
 		
 		/* @var $query Query */
 
@@ -207,16 +207,27 @@ abstract class EntityController extends Controller {
 			];
 
 			if ($p['calculateTotal']) {
-				// $totalQuery = clone $idsQuery;
-				// $response['total'] = $totalQuery
-				// 								->selectSingleValue("count(distinct " . $totalQuery->getTableAlias() . ".id)")
-				// 								->orderBy([], false)
-				// 								->groupBy([])
-				// 								->limit(1)
-				// 								->offset(0)
-				// 								->single();
 
-				$response['total'] = go()->getDbConnection()->query("SELECT FOUND_ROWS()")->fetch(PDO::FETCH_COLUMN, 0);
+				if($idsQuery->getCalcFoundRows()) {
+					$response['total'] = go()->getDbConnection()->query("SELECT FOUND_ROWS()")->fetch(PDO::FETCH_COLUMN, 0);
+				} else{
+					 $totalQuery = clone $idsQuery;
+
+					 if(count($idsQuery->getGroupBy())) {
+					 	$totalQuery->selectSingleValue("count(distinct " . $totalQuery->getTableAlias() . ".id)");
+					 } else{
+						 //count(*) can be used because we use a subquery in AclItemEntity::applyAclToQuery()
+						 $totalQuery->selectSingleValue("count(*)");
+					 }
+
+					 $response['total'] = $totalQuery
+
+					 								->orderBy([], false)
+					 								->groupBy([])
+					 								->limit(1)
+					 								->offset(0)
+					 								->single();
+				}
 			}
 		}catch(PDOException $e) {
 

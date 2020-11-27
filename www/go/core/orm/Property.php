@@ -806,11 +806,13 @@ abstract class Property extends Model {
 
   /**
    *
+   * It's not possible to use fetchproperties to determine if they need to be joined. Because the props
+   * can also be used in the where or order by part of the query.
+   *
    * @param array $tables
    * @param Query $query
    *
    * @throws Exception
-   * @todo implement fetch properties
    */
 	private static function joinAdditionalTables(array $tables, Query $query) {
 		$first = array_shift($tables);

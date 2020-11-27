@@ -412,6 +412,10 @@ class QueryBuilder {
 			$select .= "SQL_CALC_FOUND_ROWS ";
 		}
 
+		if ($this->query->getNoCache()) {
+			$select .= "SQL_NO_CACHE ";
+		}
+
 		if ($this->query->getDistinct()) {
 			$select .= "DISTINCT ";
 		}
@@ -678,6 +682,10 @@ class QueryBuilder {
 		if ($query->getTableAlias() == 't' && $this->getQuery()->getTableAlias() == 't') {
 			$query->tableAlias('sub');
 		}
+
+		//not possible in sub query
+		$query->noCache(false);
+		$query->calcFoundRows(false);
 
 		$builder = new QueryBuilder($this->conn);
 		$builder->aliasMap = $this->aliasMap;
