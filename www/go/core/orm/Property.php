@@ -639,10 +639,8 @@ abstract class Property extends Model {
 		
 		$props = go()->getCache()->get($cacheKey);
 		
-		if(!$props) {
-			$props = array_filter(static::getReadableProperties(), function($propName) {
-				return !in_array($propName, static::atypicalApiProperties());
-			});
+		if($props === null) {
+			$props = array_diff(static::getReadableProperties(), static::atypicalApiProperties());
 
 			go()->getCache()->set($cacheKey, $props);
 		}

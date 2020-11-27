@@ -782,7 +782,17 @@ abstract class Entity extends Property {
 		$columns = static::textFilterColumns();
 
 		if(static::useSearchableTraitForSearch($query)) {
-			$columns[] = 'search.keywords';
+			$i = 0;
+
+			$words = SearchableTrait::splitTextKeywords($expression);
+
+			foreach($words as $word) {
+				$query->join("core_search_word", 'w'.$i, 'w'.$i.'.searchId = search.id');
+				$criteria->where('w'.$i.'.word', 'LIKE', $word . '%');
+				$i++;
+			}
+
+			return $criteria;
 		}
 
 		if(empty($columns)) {

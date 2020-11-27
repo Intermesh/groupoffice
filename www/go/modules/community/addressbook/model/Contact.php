@@ -987,7 +987,7 @@ class Contact extends AclItemEntity {
 		}
 
 		if(!empty($this->notes)) {
-			$keywords = array_merge($keywords, self::splitTextKeywords($this->notes));
+			$keywords[] = $this->notes;
 		}
 
 		return $keywords;

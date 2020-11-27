@@ -5,6 +5,7 @@ namespace go\modules\community\addressbook\cli\controller;
 use go\core\Controller;
 use go\core\jmap\Entity;
 use go\core\model\Link;
+use go\core\model\User;
 use go\core\orm\LoggingTrait;
 use go\core\orm\Property;
 use go\modules\community\addressbook\install\Migrate63to64;
@@ -28,7 +29,25 @@ class Script extends Controller {
     $m->fixMissing();
   }
 
-	public function createLotsOfData()
+  public function createLotsOfUsers() {
+	  Entity::$trackChanges = false;
+	  Module::$enabled = false;
+	  go()->getDebugger()->enabled = false;
+
+	  for($i = 0; $i < 100; $i++) {
+	  	echo $i ."\n";
+	  	$user = new User();
+	  	$user->username = $user->displayName = uniqid();
+	  	$user->email = $user->recoveryEmail = $user->username . '@intermesh.localhost';
+	  	$user->setPassword($user->username);
+	  	if(!$user->save()) {
+			  var_dump($user->getValidationErrors());
+			  exit();
+		  }
+	  }
+  }
+
+	public function createLotsOfContacts()
 	{
 //		go()->getDbConnection()->enableTransactions = false;
 //		go()->getDbConnection()->exec("SET autocommit=0");
@@ -38,12 +57,12 @@ class Script extends Controller {
 
 		$addressBook = AddressBook::find()->single();
 
-		for ($i = 7000; $i < 500000; $i++) {
+		for ($i = 0; $i < 500000; $i++) {
 			echo $i . "\n";
 			$company = new Contact();
 			$company->isOrganization = true;
 			$company->addressBookId = $addressBook->id;
-			$company->name = "Acme" . $i;
+			$company->name = uniqid();
 			$company->phoneNumbers[0] = (new PhoneNumber())->setValues(['number' => "(555)" . $i, 'type' => PhoneNumber::TYPE_MOBILE]);
 			$company->emailAddresses[0] = (new EmailAddress())->setValues(['email' => 'john' . $i . '@doe.test', 'type' => EmailAddress::TYPE_HOME]);
 			$company->addresses[0] = $a = new Address();
@@ -66,7 +85,7 @@ Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium dolor
 
 			$contact = new Contact();
 			$contact->addressBookId = $addressBook->id;
-			$contact->firstName = "John";
+			$contact->firstName = ucfirst(uniqid());
 			$contact->lastName = "Doe " . $i;
 			$contact->phoneNumbers[0] = (new PhoneNumber())->setValues(['number' => "(555)" .  $i, 'type' => PhoneNumber::TYPE_MOBILE]);
 			$contact->emailAddresses[0] = (new EmailAddress())->setValues(['email' => 'john' . $i . '@doe.test', 'type' => EmailAddress::TYPE_HOME]);

@@ -271,13 +271,13 @@ trait CustomFieldsTrait {
 				}
 			} else if (!empty($v) && is_string($v)) {
 
-				$split = $field->getDataType() instanceof TextArea;
-
-				if ($split) {
-					$keywords = array_merge($keywords, SearchableTrait::splitTextKeywords($v));
-				} else {
+//				$split = $field->getDataType() instanceof TextArea;
+//
+//				if ($split) {
+//					$keywords = array_merge($keywords, SearchableTrait::splitTextKeywords($v));
+//				} else {
 					$keywords[] = $v;
-				}
+//				}
 
 			}
 		}

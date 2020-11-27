@@ -3677,13 +3677,35 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$search->entityId = $this->id;
 		$search->setAclId(!empty($attr['aclId']) ? $attr['aclId'] : $this->findAclId());
 		//$search->createdAt = \DateTime::createFromFormat("U", $this->mtime);		
-		$search->setKeywords($this->getSearchCacheKeywords($this->localizedName.','.implode(',', $attr)));
+		//$search->setKeywords($this->getSearchCacheKeywords($this->localizedName.','.implode(',', $attr)));
 		
 		//todo cut lengths
 		
+
+
+
+		$keywords = $this->getSearchCacheKeywords($this->localizedName.','.implode(',', $attr));
+		$keywords = array_filter($keywords, function($word) {
+			return strlen($word) > 2;
+		});
+
+		//$search->setKeywords(implode(' ', $keywords));
+		$isNew = $search->isNew();
 		if(!$search->save()) {
 			throw new \Exception("Could not save search cache!");
 		}
+
+		if(!$isNew) {
+			go()->getDbConnection()->delete('core_search_word', ['searchId' => $search->id])->execute();
+		}
+
+		$keywords = array_map(function ($word) use ($search){
+			return ['searchId' => $search->id, 'word'=> $word];
+		}, $keywords);
+
+		return go()->getDbConnection()->insertIgnore(
+			'core_search_word',$keywords
+		)->execute();
 
 //		//GO::debug($attr);
 //
@@ -3810,11 +3832,11 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 				if(is_string($value) && ($attr['gotype']=='textfield' || $attr['gotype']=='customfield' || $attr['gotype']=='textarea') && !in_array($value,$keywords)){
 					if(!empty($value)) {
-						if($attr['gotype'] == 'textarea') {
-							$keywords = array_merge($keywords, SearchableTrait::splitTextKeywords($value));
-						} else {
+//						if($attr['gotype'] == 'textarea') {
+//							$keywords = array_merge($keywords, SearchableTrait::splitTextKeywords($value));
+//						} else {
 							$keywords[] = $value;
-						}
+//						}
 					}
 				}
 			}
@@ -3839,15 +3861,12 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			}
 		}
 
-		$keywords = $prepend.','.implode(',',$keywords);
-
-
-		// Remove duplicate and empty entries
-		$arr = explode(',', $keywords);
-		$arr = array_filter(array_unique($arr), function($item){
-			return $item != '';
-		});
-		return implode(' ', $arr);
+		$arr = SearchableTrait::splitTextKeywords($prepend);
+		foreach($keywords as $keyword) {
+			$arr = array_merge($arr, SearchableTrait::splitTextKeywords($keyword));
+		}
+		$keywords = array_unique($arr);
+		return $keywords;
 	}
 
 	protected function beforeSave(){

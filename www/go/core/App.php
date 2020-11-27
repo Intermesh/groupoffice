@@ -85,6 +85,9 @@ use const GO_CONFIG_FILE;
 		protected function __construct() {
 			date_default_timezone_set("UTC");
 
+			mb_internal_encoding("UTF-8");
+			mb_regex_encoding("UTF-8");
+
 			$this->errorHandler = new ErrorHandler();
 			$this->initCompatibility();
 

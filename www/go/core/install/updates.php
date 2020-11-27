@@ -766,92 +766,20 @@ $updates['202011021149'][] = "CREATE TABLE `core_alert` (
     ON DELETE RESTRICT
     ON UPDATE NO ACTION);";
 
-//--
-//-- Table structure for table `core_pdf_block`
-//--
-//
-//                       CREATE TABLE `core_pdf_block` (
-//`id` bigint(20) UNSIGNED NOT NULL,
-//  `pdfTemplateId` bigint(20) UNSIGNED NOT NULL,
-//  `x` int(11) DEFAULT NULL,
-//  `y` int(11) DEFAULT NULL,
-//  `width` int(11) DEFAULT NULL,
-//  `height` int(11) DEFAULT NULL,
-//  `align` enum('L','C','R','J') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'L',
-//  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
-//  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text'
-//) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-//
-//-- --------------------------------------------------------
-//
-//--
-//-- Table structure for table `core_pdf_template`
-//--
-//
-//                       CREATE TABLE `core_pdf_template` (
-//`id` bigint(20) UNSIGNED NOT NULL,
-//  `moduleId` int(11) NOT NULL,
-//  `key` varchar(20) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
-//  `language` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'en',
-//  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-//  `stationaryBlobId` binary(40) DEFAULT NULL,
-//  `landscape` tinyint(1) NOT NULL DEFAULT 0,
-//  `pageSize` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'A4',
-//  `measureUnit` enum('mm','pt','cm','in') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'mm',
-//  `marginTop` decimal(19,4) NOT NULL DEFAULT 10.0000,
-//  `marginRight` decimal(19,4) NOT NULL DEFAULT 10.0000,
-//  `marginBottom` decimal(19,4) NOT NULL DEFAULT 10.0000,
-//  `marginLeft` decimal(19,4) NOT NULL DEFAULT 10.0000
-//) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-//
-//--
-//-- Indexes for dumped tables
-//--
-//
-//               --
-//-- Indexes for table `core_pdf_block`
-//--
-//               ALTER TABLE `core_pdf_block`
-//  ADD PRIMARY KEY (`id`) USING BTREE,
-//  ADD KEY `pdfTemplateId` (`pdfTemplateId`);
-//
-//--
-//-- Indexes for table `core_pdf_template`
-//--
-//               ALTER TABLE `core_pdf_template`
-//  ADD PRIMARY KEY (`id`),
-//  ADD KEY `moduleId` (`moduleId`),
-//  ADD KEY `stationaryBlobId` (`stationaryBlobId`);
-//
-//--
-//-- AUTO_INCREMENT for dumped tables
-//--
-//
-//                      --
-//-- AUTO_INCREMENT for table `core_pdf_block`
-//--
-//                      ALTER TABLE `core_pdf_block`
-//  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-//
-//--
-//-- AUTO_INCREMENT for table `core_pdf_template`
-//--
-//                      ALTER TABLE `core_pdf_template`
-//  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-//
-//--
-//-- Constraints for dumped tables
-//--
-//
-//                   --
-//-- Constraints for table `core_pdf_block`
-//--
-//                   ALTER TABLE `core_pdf_block`
-//  ADD CONSTRAINT `core_pdf_block_ibfk_1` FOREIGN KEY (`pdfTemplateId`) REFERENCES `core_pdf_template` (`id`) ON DELETE CASCADE;
-//
-//--
-//-- Constraints for table `core_pdf_template`
-//--
-//                   ALTER TABLE `core_pdf_template`
-//  ADD CONSTRAINT `core_pdf_template_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE,
-//  ADD CONSTRAINT `core_pdf_template_ibfk_2` FOREIGN KEY (`stationaryBlobId`) REFERENCES `core_blob` (`id`);
+$updates['202011261716'][] = "ALTER TABLE `core_search` DROP `keywords`";
+
+$updates['202011261716'][] = "CREATE TABLE `core_search_word` (
+`searchId` int(11) NOT NULL,
+  `word` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
+$updates['202011261716'][] = "ALTER TABLE `core_search_word`
+  ADD PRIMARY KEY (`word`,`searchId`),
+  ADD KEY `searchId` (`searchId`);";
+
+
+$updates['202011261716'][] = "ALTER TABLE `core_search_word`
+  ADD CONSTRAINT `core_search_word_ibfk_1` FOREIGN KEY (`searchId`) REFERENCES `core_search` (`id`) ON DELETE CASCADE;";
+
+$updates['202011261716'][] = "TRUNCATE core_search";
