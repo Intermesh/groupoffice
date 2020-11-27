@@ -228,7 +228,9 @@ trait SearchableTrait {
 					echo ".";
 
 				} catch (\Exception $e) {
-					//echo $e->getMessage();
+					echo $m->id() . ' '. $m->title() ."\n";
+					echo $e->getMessage();
+					echo $e->getTraceAsString();
 					\go\core\ErrorHandler::logException($e);
 					echo "E";
 					$offset++;
