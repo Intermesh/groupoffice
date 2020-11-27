@@ -766,6 +766,8 @@ $updates['202011021149'][] = "CREATE TABLE `core_alert` (
     ON DELETE RESTRICT
     ON UPDATE NO ACTION);";
 
+
+$updates['202011261716'][] = "TRUNCATE core_search";
 $updates['202011261716'][] = "ALTER TABLE `core_search` DROP `keywords`";
 
 $updates['202011261716'][] = "CREATE TABLE `core_search_word` (
@@ -782,7 +784,7 @@ $updates['202011261716'][] = "ALTER TABLE `core_search_word`
 $updates['202011261716'][] = "ALTER TABLE `core_search_word`
   ADD CONSTRAINT `core_search_word_ibfk_1` FOREIGN KEY (`searchId`) REFERENCES `core_search` (`id`) ON DELETE CASCADE;";
 
-$updates['202011261716'][] = "TRUNCATE core_search";
+
 
 
 
