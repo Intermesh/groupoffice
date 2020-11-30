@@ -411,25 +411,60 @@ class Folder extends FileSystemObject {
 	/**
 	 * Find files and folder matching a regular expression pattern
 	 * 
-	 * @param string $regex
+	 * @param array|string $config If string is given then it's used as $config['regex'].
+	 *  $config is an array that can have:
+	 *  regex: then name must match this with preg_match();
+	 *  older: Return files if the file wasn't modified after the given DateTime object
+	 *  newer: Return files if the file was modified after the given DateTime object
+	 *  empty: Return empty folders
+	 *
 	 * @param boolean $findFolders
 	 * @param boolean $findFiles
 	 * @return FileSystemObject[]
 	 */
-	public function find($regex, $findFolders = true, $findFiles = true) {
+	public function find($config, $findFolders = true, $findFiles = true) {
 		$result = [];
+
+		if(!is_array($config)) {
+			$config = ['regex' => $config];
+		}
 		
 		foreach($this->getChildren($findFiles, true) as $child) {
 			$isFolder = $child->isFolder();
-			if(($findFolders || !$isFolder) && preg_match($regex, $child->getName())) {
-				$result[] = $child;
+
+			if($isFolder) {
+				//Do exists check for broken links
+				if(!$findFolders || !$child->exists()) {
+					continue;
+				}
+
+				$children = $child->find($config, $findFolders, $findFiles);
+
+				if(
+					(empty($config['empty']) || empty($hildren)) &&
+					(!isset($config['regex']) || preg_match($config['regex'], $child->getName()))
+				){
+					$result[] = $child;
+				}
+
+				$result = array_merge($result, $children);
+
+			} else {
+				if($findFiles &&
+					(!isset($config['regex']) || preg_match($config['regex'], $child->getName())) &&
+					(!isset($config['older']) || $child->getModifiedAt() < $config['older'])  &&
+					(!isset($config['newer']) || $child->getModifiedAt() > $config['newer'])
+				) {
+					$result[] = $child;
+				}
+
 			}
-			if($isFolder && $child->exists()) { //Do exists check for broken links
-				$result = array_merge($result, $child->find($regex, $findFolders, $findFiles));
-			}
+
+
 		}
 		
 		return $result;
 	}
+
 
 }
