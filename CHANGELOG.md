@@ -1,4 +1,4 @@
-6.4.193
+30-11-2020 6.4.193
 - Studio: minor bugfix upon first generating new module
 - Studio: regenerate several backend files on frontend regeneration
 - Files: Detail views could reload with home folder after uploading files in the popup browser
