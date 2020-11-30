@@ -41,11 +41,16 @@ class GarbageCollection extends CronJob {
 
 		Token::collectGarbage();
 		OauthAccessToken::collectGarbage();
-		$this->tmpFiles();
+		//$this->tmpFiles();
 
 		$this->fireEvent(self::EVENT_RUN);
 	}
 
+	/**
+	 * Disabled because apache has isolated tmp folder
+	 *
+	 * @throws \go\core\exception\ConfigurationException
+	 */
 	private function tmpFiles() {
 		$garbage =go()->getTmpFolder()->find(
 			[
