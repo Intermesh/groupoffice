@@ -514,19 +514,31 @@ class File extends FileSystemObject {
 		}
 	}
 
-  /**
-   * Create the file
-   *
-   * @param boolean $createPath Create the folders for this file also?
-   * @return self|bool $successfull
-   * @throws Exception
-   */
-	public function touch($createPath = false) {
+	/**
+	 * Create the file
+	 *
+	 * @param boolean $createPath Create the folders for this file also?
+	 * @param int $time The touch time. If time is not supplied, the current system time is used.
+	 * @param int $atime If present, the access time of the given filename is set to the value of atime. Otherwise, it is set to the value passed to the time parameter. If neither are present, the current system time is used.
+	 * @return self|bool $successful
+	 * @throws Exception
+	 */
+	public function touch($createPath = false, $time = null, $atime = null) {
 		if ($createPath){
 			$this->getFolder()->create();
 		}
 
-		if (touch($this->getPath())) {
+		if(isset($time)) {
+			if(isset($atime)) {
+				$success = touch($this->getPath(), $time, $atime);
+			} else{
+				$success = touch($this->getPath(), $time);
+			}
+		}else{
+			$success = touch($this->getPath());
+		}
+
+		if ($success) {
 			return $this;
 		} else {
 			return false;

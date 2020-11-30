@@ -49,6 +49,12 @@ $lang = GO::language()->getLanguage(); ?>
 	?>
 	<style>
         <?php
+
+        if(go()->getSettings()->logoId) {
+            //blob id is not used by script but added only for caching.
+            echo ".go-app-logo, #go-logo {background-image: url(" . go()->getSettings()->URL . "api/page.php/core/logo) !important}";
+        }
+
         if(GO::view()->getTheme()->getName() == 'Paper') {
             if(go()->getSettings()->primaryColor) {
                 ?>
@@ -77,10 +83,7 @@ $lang = GO::language()->getLanguage(); ?>
             }
 
 
-            if(go()->getSettings()->logoId) {
-                    //blob id is not used by script but added only for caching.
-                    echo ".go-app-logo, #go-logo {background-image: url(" . go()->getSettings()->URL . "api/page.php/core/logo) !important}";
-            }
+
 		}
 		?>
 	</style>

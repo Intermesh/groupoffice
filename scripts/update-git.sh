@@ -17,6 +17,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $DIR/../;
 
 # pull promodules
+echo "Pulling promodules"
 cd  www/promodules
 git pull
 
@@ -25,7 +26,7 @@ cd ../go/modules
 
 for line in $(ls -1 -d */);
 do
-  if [ "$line" != "community/" ]; then
+  if [ -d "$line/.git" ]; then
 
     echo "Pulling $line"
     cd $line
@@ -37,6 +38,9 @@ done
 # pull main github repo
 cd ../../
 #git reset --hard
+
+echo "Pulling main repository"
+
 git pull
 
 echo `pwd`
