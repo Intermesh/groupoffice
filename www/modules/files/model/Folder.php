@@ -1494,7 +1494,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		$folder = empty($entity->filesFolderId) ? null : $this->findByPk($entity->filesFolderId);
 		if($folder) {
 
-			$existingPath = $folder->getPath();
+			$existingPath = \go\core\util\StringUtil::normalize($folder->getPath());
 			if($existingPath != $filesPath) {
 				$newFolder = $this->mergeEntityFolders($folder, $existingPath, $filesPath);
 				$newFolder->visible = 0;

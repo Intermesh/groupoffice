@@ -5,7 +5,7 @@ return array (
   'Domains' => 'Tartományok',
   'Validate certificate' => 'Érvényesítse a tanúsítványt',
   'Remove domain from username' => 'Távolítsuk domaint felhasználónév',
-  'Users must login with their full e-mail adress. Enable this option if the IMAP excepts the username without domain.' => 'A felhasználóknak meg kell jelentkezned azok teljes e-mail címét. Jelölje be ezt az opciót, ha az IMAP EXCEPTS a felhasználónév tartománynév nélküli.',
+  'Users must login with their full e-mail address. Enable this option if the IMAP expects the username without domain.' => 'A felhasználóknak meg kell jelentkezned azok teljes e-mail címét. Jelölje be ezt az opciót, ha az IMAP EXCEPTS a felhasználónév tartománynév nélküli.',
   'Use authentication' => 'Hitelesítés használatával',
   'Enable this if the SMTP server credentials are identical to the IMAP server.' => 'Engedélyezze ezt, ha az SMTP szerver oldali azonosak az IMAP szerverhez.',
   'User options' => 'Felhasználói beállítások',

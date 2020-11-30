@@ -30,6 +30,8 @@ interface CacheInterface {
 
 	/**
 	 * Get a value from the cache
+	 *
+	 * Make sure to do a strict check on null to check if it existed. $value === null.
 	 * 
 	 * @param string $key
 	 * @return mixed Stored value or NULL if not found  

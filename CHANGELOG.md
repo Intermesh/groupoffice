@@ -1,8 +1,29 @@
+30-11-2020 6.4.193
+- Studio: minor bugfix upon first generating new module
+- Studio: regenerate several backend files on frontend regeneration
+- Files: Detail views could reload with home folder after uploading files in the popup browser
+- Billing: Address display as per country settings
+- Core: Fixed UK address standard
+- Core: HTML fields auto grow with content
+- Core: Fixed date range with commentedat filter
+- dockwiki: correct path in module description to INSTALL.TXT
+- ActiveSync: Was generating unnecessary temporary files
 
+16-11-2020 6.4.192
+- Comments: Fixed bug when adding two comments without opening another item would overwrite the first.
+- Address book: Filter contacts based on a project filter
+- ldapauthenticator: Fixed disabling authentication in LDAP server profile
+
+16-11-2020 6.4.191
+- Email: Fixed problem in Thunderbird e-mails that were cut off. Issue #632.
+- Email: Fixed corupted mail body due to XSS filter
 - Studio: set sort direction for ID field
 - Studio: disabled locking and unlocking of studio modules.
 - Studio: fixed (re)generation of ACL entity models
 - Studio: check whether package / module in allowed_modules
+- Core: Custom logo didn't display in Dark theme
+- Projects: fixed default income email template combo not loading
+- Core: Yes or no custom field exports as text
 
 06-11-2020 6.4.190
 - Email: find correct translation string for 'Advanced'
