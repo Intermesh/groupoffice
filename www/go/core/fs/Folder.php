@@ -70,6 +70,24 @@ class Folder extends FileSystemObject {
 	}
 
 	/**
+	 * Check if folder is empty
+	 *
+	 * @return bool
+	 */
+	public function isEmpty() {
+
+		$handle = opendir($this->getPath());
+		while (false !== ($entry = readdir($handle))) {
+			if ($entry != "." && $entry != "..") {
+				closedir($handle);
+				return FALSE;
+			}
+		}
+		closedir($handle);
+		return TRUE;
+	}
+
+	/**
 	 * Get folder directory listing.
 	 *
 	 * @param boolean $includeFiles
@@ -78,7 +96,7 @@ class Folder extends FileSystemObject {
 	 * @return File[]|Folder[]|array[]
 	 */
 	public function getChildren($includeFiles = true, $includeFolders = true) {
-		if (!$dir = @opendir($this->path)) {
+		if (!$dir = opendir($this->path)) {
 			return []; // Return an empty array to prevent crashing foreach() loops
 		}
 
@@ -422,13 +440,13 @@ class Folder extends FileSystemObject {
 	 * @param boolean $findFiles
 	 * @return FileSystemObject[]
 	 */
-	public function find($config, $findFolders = true, $findFiles = true) {
+	public function find($config = [], $findFolders = true, $findFiles = true) {
 		$result = [];
 
 		if(!is_array($config)) {
 			$config = ['regex' => $config];
 		}
-		
+
 		foreach($this->getChildren($findFiles, true) as $child) {
 			$isFolder = $child->isFolder();
 
@@ -438,18 +456,17 @@ class Folder extends FileSystemObject {
 					continue;
 				}
 
-				$children = $child->find($config, $findFolders, $findFiles);
-
 				if(
-					(empty($config['empty']) || empty($hildren)) &&
+					(empty($config['empty']) || $child->isEmpty()) &&
 					(!isset($config['regex']) || preg_match($config['regex'], $child->getName()))
 				){
 					$result[] = $child;
 				}
 
-				$result = array_merge($result, $children);
+				$result = array_merge($result, $child->find($config, $findFolders, $findFiles));
 
 			} else {
+				$m = $child->getModifiedAt();
 				if($findFiles &&
 					(!isset($config['regex']) || preg_match($config['regex'], $child->getName())) &&
 					(!isset($config['older']) || $child->getModifiedAt() < $config['older'])  &&
