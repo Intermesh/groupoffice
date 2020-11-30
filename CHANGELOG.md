@@ -28,6 +28,9 @@ end 6.5
 - Core: Fixed UK address standard
 - Core: HTML fields auto grow with content
 - Core: Fixed date range with commentedat filter
+- dockwiki: correct path in module description to INSTALL.TXT
+- ActiveSync: Was generating unnecessary temporary files
+- Core: Garbage collection cleans up temporary files
 
 16-11-2020 6.4.192
 - Comments: Fixed bug when adding two comments without opening another item would overwrite the first.
