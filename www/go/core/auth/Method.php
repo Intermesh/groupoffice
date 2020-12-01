@@ -50,7 +50,7 @@ class Method extends Entity {
 		
 		$authenticators = go()->getCache()->get("authenticators");
 		
-		if(!$authenticators) {
+		if($authenticators === null) {
 			$classFinder = new \go\core\util\ClassFinder();
 			$authenticators = $classFinder->findByParent(BaseAuthenticator::class);
 

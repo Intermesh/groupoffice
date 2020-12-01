@@ -1,4 +1,6 @@
-6.4.193
+- ActiveSync: Default address book was not used for syncing
+
+30-11-2020 6.4.193
 - Studio: minor bugfix upon first generating new module
 - Studio: regenerate several backend files on frontend regeneration
 - Files: Detail views could reload with home folder after uploading files in the popup browser
@@ -6,6 +8,8 @@
 - Core: Fixed UK address standard
 - Core: HTML fields auto grow with content
 - Core: Fixed date range with commentedat filter
+- dockwiki: correct path in module description to INSTALL.TXT
+- ActiveSync: Was generating unnecessary temporary files
 
 16-11-2020 6.4.192
 - Comments: Fixed bug when adding two comments without opening another item would overwrite the first.
