@@ -1,4 +1,5 @@
 - ActiveSync: Default address book was not used for syncing
+- E-mail: Fixed issue: no default search field in email search #634 (sort error)
 
 30-11-2020 6.4.193
 - Studio: minor bugfix upon first generating new module
