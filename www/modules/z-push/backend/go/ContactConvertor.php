@@ -453,7 +453,7 @@ class ContactConvertor {
 			->join('sync_addressbook_user', 'su', 'su.addressBookId = a.id')
 			->filter(['permissionLevel' => Acl::LEVEL_WRITE])
 			->where('su.userId', '=', go()->getAuthState()->getUserId())
-			->orderBy(['su.isDefault' => 'ASC'])
+			->orderBy(['su.isDefault' => 'DESC'])
 			->single();
 
 		if (!$addressbook)
