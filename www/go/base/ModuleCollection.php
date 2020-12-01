@@ -63,7 +63,7 @@ class ModuleCollection extends Model\ModelCollection{
 			$name = $package . "/" . $name;
 			return in_array($name, self::$allowedModules) || in_array($package . "/*", self::$allowedModules);
 		} else{
-			return in_array($name, self::$allowedModules) || in_array(  "legacy/*", self::$allowedModules);
+			return in_array($name, self::$allowedModules) || in_array('legacy/' . $name, self::$allowedModules) || in_array(  "legacy/*", self::$allowedModules);
 		}
 
 	}

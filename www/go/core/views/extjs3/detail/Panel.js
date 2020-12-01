@@ -160,7 +160,9 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	},
 
 	reload: function () {
-		this.load(this.currentId);
+		var id = this.currentId;
+		this.currentId = null;
+		this.load(id);
 	},
 	
 	internalLoad : function(data) {

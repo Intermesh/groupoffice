@@ -45,7 +45,7 @@ if(strstr($scriptPath, '/home/govhosts')) {
 * Consult LICENSE file for details
 ************************************************/
 
-require_once 'vendor/autoload.php';
+require_once 'vendor/z-push/vendor/autoload.php';
 
 /************************************************
  * MAIN

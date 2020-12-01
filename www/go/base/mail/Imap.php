@@ -2002,17 +2002,12 @@ class Imap extends ImapBodyStruct {
 	 * @return <type>
 	 */
 
-	public function find_body_parts($struct, $type='text', $subtype='html', &$parts=false) {
+	public function find_body_parts($struct, $type='text', $subtype='html', &$parts=array('text_found'=>false, 'parts'=>array())) {
+
 		if (!is_array($struct) || empty($struct)) {
 			return $parts;
 		}
 
-//		\GO::debug($struct);
-
-		if(!$parts)
-		{
-			$parts=array('text_found'=>false, 'parts'=>array());
-		}
 		$imgs  =array('jpg','jpeg','gif','png','bmp');
 		foreach ($struct as $id => $vals) {
 

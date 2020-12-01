@@ -356,16 +356,6 @@ class Message extends \Swift_Message{
 				}elseif(isset($part->body))
 				{
 					//attachment
-
-					$this->_tmpDir =\GO::config()->tmpdir.'attachments/'.  uniqid().'/';
-
-					if(!is_dir($this->_tmpDir ))
-						mkdir($this->_tmpDir , 0755, true);
-
-					//unset($part->body);
-					//var_dump($part);
-					//exit();
-
 					if(!empty($part->ctype_parameters['name']))
 					{
 						$filename = $part->ctype_parameters['name'];
@@ -380,9 +370,6 @@ class Message extends \Swift_Message{
 						$filename=uniqid(time());
 					}
 
-					$tmp_file = $this->_tmpDir .$filename;
-					file_put_contents($tmp_file, $part->body);
-
 					if(!isset($part->ctype_primary)) {
             $part->ctype_primary = 'text';
           }
@@ -395,7 +382,7 @@ class Message extends \Swift_Message{
           //only embed if we can find the content-id in the body
 					if(isset($part->headers['content-id']) && ($content_id=trim($part->headers['content-id'],' <>')) && strpos($this->_loadedBody, $content_id) !== false)
 					{
-						$img = \Swift_EmbeddedFile::fromPath($tmp_file);
+						$img = new \Swift_EmbeddedFile($part->body, $filename, $mime_type);
 						$img->setContentType($mime_type);
 						
 						//Only set valid ID's. Iphone sends invalid content ID's sometimes.
@@ -406,8 +393,7 @@ class Message extends \Swift_Message{
 						$this->embed($img);
 					}else
 					{
-					//echo $tmp_file."\n";
-						$attachment = \Swift_Attachment::fromPath($tmp_file,$mime_type);
+						$attachment = new \Swift_Attachment($part->body, $filename,$mime_type);
 						$this->attach($attachment);
 					}
 				}
@@ -468,11 +454,7 @@ class Message extends \Swift_Message{
 		foreach($allMatches as $matches){
 			if($matches[2]=='base64'){
 				$extension = $matches[1];
-				$tmpFile = \GO\Base\Fs\File::tempFile('', $extension);
-				$tmpFile->putContents(base64_decode($matches[3]));
-
-				$img = \Swift_EmbeddedFile::fromPath($tmpFile->path());
-				$img->setContentType($tmpFile->mimeType());
+				$img = new \Swift_EmbeddedFile(base64_decode($matches[3]), uniqid() . '.'. $extension);
 				$contentId = $this->embed($img);
 
 				$body = str_replace($matches[0],'src="'.$contentId, $body);

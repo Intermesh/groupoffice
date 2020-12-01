@@ -1406,7 +1406,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 		
 		$this->file_storage_path = rtrim($this->file_storage_path, '/').'/';
 		$this->tmpdir = rtrim($this->tmpdir, '/').'/';
-		
 
 //		if($this->info_log=="")
 //			$this->info_log =$this->file_storage_path.'log/info.log';

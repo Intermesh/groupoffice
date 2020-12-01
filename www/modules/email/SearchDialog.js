@@ -224,6 +224,7 @@ GO.email.SearchDialog = function(config){
 
 			config.grid.searchField.resetButton.setDisabled(false);
 			config.grid.searchField.triggerField.setDisabled(true);
+
 			config.grid.searchField.updateView();
 			config.store.load();
 			

@@ -127,7 +127,7 @@ class Language {
 			$cacheKey = $isoCode .'-'.$package.'-'.$module;
 
 			$this->data[$package][$module] = go()->getCache()->get($cacheKey);
-			if($this->data[$package][$module]) {
+			if($this->data[$package][$module] !== null) {
 				return;
 			}
 			
@@ -253,7 +253,7 @@ class Language {
 	 */
 	public function getLanguages() {
 		$languages = go()->getCache()->get('languages');
-		if($languages) {
+		if($languages !== null) {
 			return $languages;
 		}
 

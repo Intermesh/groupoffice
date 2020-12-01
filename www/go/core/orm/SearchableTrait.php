@@ -74,7 +74,7 @@ trait SearchableTrait {
 		$search->name = $this->title();
 		$search->description = $this->getSearchDescription();
 		$search->filter = $this->getSearchFilter();
-		$search->modifiedAt = $this->modifiedAt;
+		$search->modifiedAt = property_exists($this, 'modifiedAt') ? $this->modifiedAt : new \DateTime();
 		
 //		$search->createdAt = $this->createdAt;
 		

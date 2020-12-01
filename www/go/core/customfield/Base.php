@@ -404,7 +404,7 @@ abstract class Base extends Model {
 		
 		$types = go()->getCache()->get("customfield-types");
 		
-		if(!$types) {
+		if($types === null) {
 			$classFinder = new ClassFinder();
 			$classes = $classFinder->findByParent(self::class);
 

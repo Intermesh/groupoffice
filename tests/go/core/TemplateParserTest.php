@@ -66,5 +66,11 @@ class TemplateParserTest extends \PHPUnit\Framework\TestCase
 
 		$this->assertEquals($a->zipCode, $str);
 
+		$tpl = '[assign address1 = contact.addresses | filter:type:"postal" | first]{{address1.zipCode}}[assign address = contact]{{address.addresses[0].zipCode}}';
+
+		$str = $tplParser->parse($tpl);
+
+		$this->assertEquals($a->zipCode.$a->zipCode, $str);
+
 	}
 }

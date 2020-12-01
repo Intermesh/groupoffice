@@ -225,7 +225,23 @@ function test_system(){
 	$test['fatal']=false;
 
 	$tests[]=$test;
-	
+
+	$test['name']='Post max size';
+	$test['showSuccessFeedback'] = false;
+	$test['pass']= ini_return_bytes(ini_get('post_max_size')) >= 21 * 1024 * 1024;
+	$test['feedback']='Warning: The post_max_size php.ini value is lower than 21MB ('.ini_get('post_max_size').').  We recommend to settings this to at least 21MB';
+	$test['fatal']=false;
+
+	$tests[]=$test;
+
+	$test['name']='Post max size > File upload size';
+	$test['showSuccessFeedback'] = false;
+	$test['pass']= ini_return_bytes(ini_get('post_max_size')) >= ini_return_bytes(ini_get('upload_max_filesize'));
+	$test['feedback']='Warning: The post_max_size php.ini value should be higher than the upload_max_filesize php.ini value';
+	$test['fatal']=false;
+
+	$tests[]=$test;
+
 
 	$test['name']='Safe mode';
 	$test['showSuccessFeedback'] = false;

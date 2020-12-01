@@ -395,7 +395,8 @@
 		@extend %font-data;
 		color: color($fg, 'text');
 		min-height: dp(32);
-		line-height: dp(18);
+		line-height: dp(20);
+		//line-height: dp(18);
 		transition: border-color 100ms linear, box-shadow 225ms linear;
 		border-radius: dp(4);
 		&.x-item-disabled {
@@ -2521,20 +2522,27 @@ body.x-body-masked .x-window-plain .x-window-mc {
 	border-radius: dp(4);
 	border:1px solid color($fg, 'track');
 }
-.x-html-editor-tb .x-toolbar {
-	height: dp(40);
-	background-color: transparent;
-	.x-toolbar-cell {
-		padding:0;
+.x-html-editor-tb {
+	.x-toolbar {
+		height: dp(40);
+		background-color: transparent;
+
+		.x-toolbar-cell {
+			padding: 0;
+		}
+
+		.x-btn {
+			font-size: .8em;
+		}
 	}
-	.x-btn {
-		font-size:.8em;
+	//.x-toolbar-left {
+	//	padding-left: 0;
+	//}
+
+	.x-btn-text {
+		background-image: none; //url(wysiwyg.gif);
+		color: color($fg, 'secondary-text');
 	}
-	
-}
-.x-html-editor-tb .x-btn-text {
-	background-image: none; //url(wysiwyg.gif);
-	color: color($fg, 'secondary-text');
 }
 
 // ####################
