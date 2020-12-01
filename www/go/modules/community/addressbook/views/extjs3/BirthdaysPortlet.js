@@ -8,6 +8,8 @@ go.modules.community.addressbook.BirthdaysPortlet = function (config) {
 		arAddressBookIds.push(item.addressBookId);
 	}, this);
 
+	config.addressBookIds = arAddressBookIds;
+
 	config.store = new go.data.GroupingStore({
 		autoDestroy: true,
 		fields: [
@@ -17,22 +19,22 @@ go.modules.community.addressbook.BirthdaysPortlet = function (config) {
 			'birthday',
 			'age',
 			'photoBlobId',
-			'addressbook'
+			'addressBook'
 		],
 		entityStore: "Contact",
 		autoLoad: false,
 		sortInfo: {
-			field: 'addressBookId',
+			field: 'birthday',
 			direction: 'ASC'
 		},
-		groupField: 'addressBookId',
+		groupField: 'addressBook',
 		remoteGroup: true,
 		remoteSort: true
 	});
 
-	config.store.setFilter('addressBookIds', {addressBookIds: arAddressBookIds})
+	config.store.setFilter('addressBookIds', {addressBookIds: config.addressBookIds})
 		.setFilter('isOrganisation', {isOrganization: false})
-		// .setFilter('birthday', {birthday: '< 30 days'});
+		.setFilter('birthday', {birthday: '< 30 days'});
 	config.store.load().then(function (result) {
 		this.store.data = result;
 		if (this.rendered) {
@@ -63,8 +65,7 @@ go.modules.community.addressbook.BirthdaysPortlet = function (config) {
 			}
 		}, {
 			header: t("Address book", "addressbook"),
-			// dataIndex: 'addressBookId',
-			dataIndex: 'addressbook',
+			dataIndex: 'addressBook',
 			sortable: true
 		}, {
 			header: t("Birthday", "addressbook"),
@@ -122,44 +123,15 @@ GO.mainLayout.onReady(function () {
 			tools: [{
 				id: 'gear',
 				handler: function () {
-					var fld = new go.form.multiselect.Field({
-						idField: "id",
-						displayField: "name",
-						entityStore: "AddressBook",
-						hideLabel: true,
-						title: t("Address books", "community", "addressbook")
-
-					});
-					// fld.getSelectionModel().selectRows(birthdaysGrid.arAddressBookIds);
-					if (!this.selectAddressbookWin) {
-						// 	TODO: Refactor into go.form.multiselect.Field
-						// this.selectAddressbookWin = new go.form.multiselect.Window({
-						// 	field: fld,
-						// 	name: "syncSettings.addressBooks",
-						// 	listeners: {
-						// 		hide: function() {
-						// 			debugger;
-						// 			birthdaysGrid.store.reload();
-						// 		},
-						// 		scope: this
-						// 	}
-						// });
-						this.selectAddressbookWin = new GO.base.model.multiselect.dialog({
-							url: 'addressbook/portlet',
-							columns: [{header: t("Name"), dataIndex: 'name', sortable: true}],
-							fields: ['id', 'name'],
-							title: t("Birthdays", "addressbook"),
-							model_id: 0,
-							addAttributes: {userId: GO.settings.user_id},
-							listeners: {
-								hide: function () {
-									birthdaysGrid.store.reload();
-								},
-								scope: this
-							}
-						});
-					}
-					this.selectAddressbookWin.show();
+					var dlg = new go.modules.community.addressbook.BirthdaysPortletSettingsDialog({
+						listeners: {
+							hide: function () {
+								birthdaysGrid.store.reload();
+							},
+							scope: this
+						}
+					})
+					dlg.load(go.User.id).show();
 				}
 			}, {
 				id: 'close',
