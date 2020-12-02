@@ -429,10 +429,10 @@ go.form.Dialog = Ext.extend(go.Window, {
 				return true;
 			}
 		});
-
-		fieldSet.show();
-		fieldSet.setDisabled(false);
-
+		if(fieldSet) {
+			fieldSet.show();
+			fieldSet.setDisabled(false);
+		}
 
 		// Focus make server side errors dissappear 
 		// firstFieldWithError.focus();
