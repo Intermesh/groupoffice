@@ -32,7 +32,8 @@ go.Modules.register("core", 'core', {
 				group: {store: "Group", fk:'groupId'}
 			}
 		},
-		'OauthClient'
+		'OauthClient',
+		'SpreadSheetExport'
 	],
 
 	userSettingsPanels: [

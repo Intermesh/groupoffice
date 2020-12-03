@@ -89,6 +89,9 @@ go.data.StoreTrait = {
 		var entity; 
 		if(Ext.isString(config.entityStore)) {
 			entity = go.Entities.get(config.entityStore);
+			if(!entity) {
+				throw "Entity '" + config.entityStore + "' is not defined!";
+			}
 		} else
 		{
 			entity = config.entityStore.entity;

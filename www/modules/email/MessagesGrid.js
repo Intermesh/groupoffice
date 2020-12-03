@@ -168,7 +168,14 @@ GO.email.MessagesGrid = function(config){
 			defaults: {
 				checked: false,
 				listeners: {
+					beforecheckchange: function(item, checked) {
+
+						if (!item.value) {
+							return false;
+						}
+					},
 					checkchange: function(item, checked) {
+
 
 						if(checked) {
 							this.searchType.setValue(item.value);
@@ -218,6 +225,7 @@ GO.email.MessagesGrid = function(config){
 				text:  t("Recipient (CC)", "email"),
 				icon: 'send'
 			}, "-", {
+				group: "none",
 				iconCls: 'ic-more',
 				text: t("Advanced", "email"),
 				handler: function(){

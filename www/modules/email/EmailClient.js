@@ -131,6 +131,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			delete(store.baseParams['search']);
 		} else if(this.searchDialog.hasSearch) {
 			this.resetSearch();
+			this.searchField.triggerField.setValue('[' + t("Advanced", "email") + ']');
 		}
 		if(GO.email.search_query) {
 			this.searchDialog.hasSearch = false;

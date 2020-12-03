@@ -23,8 +23,9 @@ go.modules.comments.CommentForm = Ext.extend(go.form.Dialog, {
 					name: 'text',
 					fieldLabel: "",
 					hideLabel: true,
-					anchor: '100% -' + dp(40),
-					allowBlank: false
+					anchor: '100%',
+					allowBlank: false,
+					grow: true
 				})
 			]
 		}

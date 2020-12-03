@@ -1,10 +1,12 @@
 go.detail.ReadMore = Ext.extend(Ext.Container, {	
 	initComponent: function() {
-		this.items =  [{
+		this.contentConfig = this.contentConfig || {};
+
+		this.items =  [Ext.apply(this.contentConfig,{
 			xtype: 'box',
 			itemId: 'content',
 			cls: 'content',
-		}, {
+		}), {
 			xtype: "container",
 			cls: "more",
 			items: [{

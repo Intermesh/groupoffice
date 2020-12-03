@@ -267,7 +267,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	getUpdates: function (cb, scope) {
 
 		var me = this;
-		
+
 		return me.getState().then(function(state){
 			
 			console.log("getUpdates", me.entity.name, state);
@@ -279,24 +279,10 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				}
 				return Promise.reject("No state yet");
 			}
-			
-			//we need the initial request promise for the callId.
-			var promise = go.Jmap.request({
-				method: me.entity.name + "/changes",
-				params: {
-					sinceState: me.state
-				}
-			});
-			
-			promise.then(function(response) {
-				if(response.removed) {
-					for(var i = 0, l = response.removed.length; i < l; i++) {
-						me._destroy(response.removed[i]);
-					}
-				}
-				
-				return me.setState(response.newState).then(function(){
-					if(response.hasMoreChanges) {
+
+			function finishChanges(changes) {
+				return me.setState(changes.newState).then(function(){
+					if(changes.hasMoreChanges) {
 						return me.getUpdates(cb, scope);
 					} else
 					{
@@ -304,9 +290,52 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 							cb.call(scope || me, me, true);
 						}
 
+						me._fireChanges();
+
 						return true;
 					}
 				}, me);
+			}
+			
+			return go.Jmap.request({
+				method: me.entity.name + "/changes",
+				params: {
+					sinceState: me.state
+				}
+			}).then(function(changes) {
+
+				if(changes.removed) {
+					for(var i = 0, l = changes.removed.length; i < l; i++) {
+						me._destroy(changes.removed[i]);
+					}
+				}
+
+				//only update items we had already fetched
+				const knownIds = Object.values(me.data).column("id");
+				const updatedIds = changes.changed.intersect(knownIds);
+
+				if(updatedIds.length) {
+					return go.Jmap.request({
+						method: me.entity.name + "/get",
+						params: {
+							ids: updatedIds
+						}
+					}).then(function(get) {
+						if(go.util.empty(get.list)) {
+							console.warn("No items in response: ", get);
+							return;
+						}
+						for(var i = 0,l = get.list.length;i < l; i++) {
+							me._add(get.list[i], true);
+						}
+
+						return finishChanges(changes);
+
+					})
+				} else {
+					return finishChanges(changes);
+				}
+
 			}).catch(function(response) {
 				return me.clearState().then(function(response) {
 					if(cb) {
@@ -316,27 +345,6 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				});
 			});
 
-			var getPromise = go.Jmap.request({
-				method: me.entity.name + "/get",
-				params: {
-					"#ids": {
-						resultOf: promise.callId,
-						path: '/changed'
-					}
-				}
-			}).then(function(response) {
-				if(go.util.empty(response.list)) {
-					console.warn("No items in response: ", response);
-					return;
-				}
-				for(var i = 0,l = response.list.length;i < l; i++) {
-					me._add(response.list[i], true);
-				}
-
-				me._fireChanges();
-			});
-
-			return Promise.all([promise, getPromise]);
 		});
 
 	},
@@ -647,7 +655,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 *
 	 * @example
 	 *
-	 * go.Db.store("Note").save({name: "Test"}, 1).then(function(){});
+	 * go.Db.store("Note").save({name: "Test"}, 1).then(function(entity){});
 	 *
 	 * @param entity
 	 * @param {string} id

@@ -53,7 +53,7 @@ class Listeners extends Singleton {
 
 		$this->listeners = App::get()->getCache()->get('listeners-2');
 
-		if($this->listeners) {
+		if($this->listeners !== null) {
 			return;
 		}		
 

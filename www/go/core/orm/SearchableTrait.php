@@ -42,13 +42,27 @@ trait SearchableTrait {
 	/**
 	 * Split text by non word characters to get useful search keywords.
 	 * @param $text
-	 * @return array|false|string[]
+	 * @return string[]
 	 */
 	public static function splitTextKeywords($text) {
-		mb_internal_encoding("UTF-8");
-		mb_regex_encoding("UTF-8");
-//		$split = preg_split('/[^\w\-_\+\\\\\/:]/', mb_strtolower($text), 0, PREG_SPLIT_NO_EMPTY);
-		return mb_split('[^\w\-_\+\\\\\/:]', mb_strtolower($text), -1);
+
+		if(empty($text)) {
+			return [];
+		}
+
+		//Split on non word chars followed by whitespace or end of string. This wat initials like J.K. or french dates
+		//01.01.2020 can be found too.
+//		$keywords = mb_split('[^\w\-_\+\\\\\/:](\s|$)*', mb_strtolower($text), -1);
+		$text= preg_replace('/[^\w\-_\+\\\\\/\s:@]/', '', mb_strtolower($text));
+		$keywords = mb_split("\s+", $text);
+
+		//filter small words
+		$keywords = array_filter($keywords, function($word) {
+			return strlen($word) > 1;
+		});
+
+
+		return $keywords;
 	}
 
 	/**
@@ -80,7 +94,7 @@ trait SearchableTrait {
 		
 		$keywords = $this->getSearchKeywords();
 		if(!isset($keywords)) {
-			$keywords = array_merge([$search->name], self::splitTextKeywords($search->description));
+			$keywords = array_merge(self::splitTextKeywords($search->name), self::splitTextKeywords($search->description));
 		}
 
 		$links = (new Query())
@@ -100,15 +114,31 @@ trait SearchableTrait {
 			$keywords = array_merge($keywords, $this->getCustomFieldsSearchKeywords());
 		}
 
-		$keywords = array_unique($keywords);
-		
-		$search->setKeywords(implode(' ', $keywords));
-		
+		$arr = [];
+		foreach($keywords as $keyword) {
+			$arr = array_merge($arr, self::splitTextKeywords($keyword));
+		}
+
+		$keywords = array_unique($arr);
+
+		//$search->setKeywords(implode(' ', $keywords));
+		$isNew = $search->isNew();
 		if(!$search->internalSave()) {
 			throw new \Exception("Could not save search cache: " . var_export($search->getValidationErrors(), true));
 		}
-		
-		return true;
+
+		if(!$isNew) {
+			go()->getDbConnection()->delete('core_search_word', ['searchId' => $search->id])->execute();
+		}
+
+		$keywords = array_map(function ($word) use ($search){
+			return ['searchId' => $search->id, 'word'=> $word];
+		}, $keywords);
+
+		return go()->getDbConnection()->insertIgnore(
+			'core_search_word',$keywords
+		)->execute();
+
 	}
 
 
@@ -198,7 +228,9 @@ trait SearchableTrait {
 					echo ".";
 
 				} catch (\Exception $e) {
+					echo $m->id() . ' '. $m->title() ."\n";
 					echo $e->getMessage();
+					echo $e->getTraceAsString();
 					\go\core\ErrorHandler::logException($e);
 					echo "E";
 					$offset++;

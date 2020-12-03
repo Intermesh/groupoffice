@@ -110,7 +110,7 @@ class Blob extends orm\Entity {
 	public static function getReferences() {
 		
 		$refs = go()->getCache()->get("blob-refs");
-		if(!$refs) {
+		if($refs === null) {
 			$dbName = go()->getDatabase()->getName();
 			go()->getDbConnection()->exec("USE information_schema");
 			

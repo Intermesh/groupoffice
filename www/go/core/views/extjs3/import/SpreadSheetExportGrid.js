@@ -62,23 +62,11 @@ go.import.SpreadSheetExportGrid = Ext.extend(go.grid.GridPanel, {
 			}
 
 			config.store.loadData({records: records});
-			config.store.sort('name', 'ASC');
+			config.store.sort('label', 'ASC');
 		});
-
-		this.getSelectionModel().on('selectionchange', function (sm) {
-			this.saveSelection();
-		}, this, {buffer: 1}); //add buffer because it clears selection first
-
-		config.store.on("load", function() {
-			this.loadSelection();
-		}, this);
-
 	},
 
-	saveSelection: function () {
 
-		Ext.state.Manager.set("export-grid-selected-" + this.entityStore, this.getSelection());
-	},
 
 	getSelection: function() {
 		var selected = this.getSelectionModel().getSelections();
@@ -87,8 +75,8 @@ go.import.SpreadSheetExportGrid = Ext.extend(go.grid.GridPanel, {
 		});
 	},
 
-	loadSelection: function () {
-		var ids = Ext.state.Manager.get("export-grid-selected-" + this.entityStore);
+	loadSelection: function (ids) {
+
 		if (!ids) {
 			return;
 		}
@@ -102,7 +90,7 @@ go.import.SpreadSheetExportGrid = Ext.extend(go.grid.GridPanel, {
 		});
 
 		this.getSelectionModel().suspendEvents(false);
-		this.getSelectionModel().selectRecords(records, true);
+		this.getSelectionModel().selectRecords(records, false);
 		this.getSelectionModel().resumeEvents();
 
 	}

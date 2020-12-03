@@ -36,15 +36,34 @@ class GarbageCollection extends CronJob {
 
 	const EVENT_RUN = 'run';
 	
-	public function run() {
+	public function run(\go\core\model\CronJobSchedule $schedule) {
 		$this->blobs();
 		$this->change();
 		$this->links();
 
 		Token::collectGarbage();
 		OauthAccessToken::collectGarbage();
+		//$this->tmpFiles();
 
 		$this->fireEvent(self::EVENT_RUN);
+	}
+
+	/**
+	 * Disabled because apache has isolated tmp folder
+	 *
+	 * @throws \go\core\exception\ConfigurationException
+	 */
+	private function tmpFiles() {
+		$garbage =go()->getTmpFolder()->find(
+			[
+				'older' => new DateTime("-1 day"),
+				'empty' => true
+			]
+		);
+
+		foreach($garbage as $item) {
+			$item->delete();
+		}
 	}
 
 	private function blobs() {

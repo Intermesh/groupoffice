@@ -258,22 +258,22 @@ class Contact extends AclItemEntity {
 	public $color;
 	
 	
-	/**
-	 * Starred by the current user or not.
-	 * 
-	 * Should not be false but null for ordering. Records might be missing.
-	 * 
-	 * @var boolean 
-	 */
-	protected $starred = null;
-
-	public function getStarred() {
-		return !!$this->starred;
-	}
-
-	public function setStarred($starred) {
-		$this->starred = empty($starred) ? null : true;
-	}
+//	/**
+//	 * Starred by the current user or not.
+//	 *
+//	 * Should not be false but null for ordering. Records might be missing.
+//	 *
+//	 * @var boolean
+//	 */
+//	protected $starred = null;
+//
+//	public function getStarred() {
+//		return !!$this->starred;
+//	}
+//
+//	public function setStarred($starred) {
+//		$this->starred = empty($starred) ? null : true;
+//	}
 
 	protected static function getRequiredProperties() {	
 		$p = parent::getRequiredProperties();
@@ -363,7 +363,7 @@ class Contact extends AclItemEntity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable("addressbook_contact", 'c')
-						->addUserTable("addressbook_contact_star", "s", ['id' => 'contactId'])
+//						->addUserTable("addressbook_contact_star", "s", ['id' => 'contactId'])
 						->addArray('dates', Date::class, ['id' => 'contactId'])
 						->addArray('phoneNumbers', PhoneNumber::class, ['id' => 'contactId'])
 						->addArray('emailAddresses', EmailAddress::class, ['id' => 'contactId'])
@@ -673,12 +673,12 @@ class Contact extends AclItemEntity {
 			$sort['name'] = $sort['firstName'];
 			unset($sort['firstName']);
 		}
-		if(isset($sort['lastName'])) {
-			$dir = $sort['lastName'] == 'ASC' ? 'ASC' : 'DESC';
-			$sort[] = new Expression("IF(c.isOrganization, c.name, c.lastName) " . $dir);
-			unset($sort['lastName'], $sort['lastName']);
-			$sort['firstName'] = $dir;
-		}
+//		if(isset($sort['lastName'])) {
+//			$dir = $sort['lastName'] == 'ASC' ? 'ASC' : 'DESC';
+//			$sort[] = new Expression("IF(c.isOrganization, c.name, c.lastName) " . $dir);
+//			unset($sort['lastName'], $sort['lastName']);
+//			$sort['firstName'] = $dir;
+//		}
 
 		if(isset($sort['birthday'])) {
 			$query->join('addressbook_date', 'birthdaySort', 'birthdaySort.contactId = c.id and birthdaySort.type="birthday"', 'LEFT');
@@ -817,7 +817,8 @@ class Contact extends AclItemEntity {
 		}
 
 		if($this->isOrganization) {
-			$this->firstName = $this->lastName = $this->middleName = $this->prefixes = $this->suffixes = null;
+			$this->firstName =  $this->middleName = $this->prefixes = $this->suffixes = null;
+			$this->lastName = $this->name;
 		}
 		
 		if($this->isNew() && !isset($this->addressBookId)) {
@@ -987,7 +988,7 @@ class Contact extends AclItemEntity {
 		}
 
 		if(!empty($this->notes)) {
-			$keywords = array_merge($keywords, self::splitTextKeywords($this->notes));
+			$keywords[] = $this->notes;
 		}
 
 		return $keywords;

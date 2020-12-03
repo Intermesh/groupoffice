@@ -52,9 +52,96 @@ abstract class AclItemEntity extends AclEntity {
 	 */
 	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
 
-		$alias = self::joinAclEntity($query);
+		/**
+		 * SELECT SQL_CALC_FOUND_ROWS SQL_NO_CACHE c.id
+		FROM `addressbook_contact` `c`
+		where exists (select id from `addressbook_addressbook` `a`
+		INNER JOIN `core_acl_group` `acl_g` ON
+		acl_g.aclId = a.aclId
+		INNER JOIN `core_user_group` `acl_u` ON
+		acl_u.groupId = acl_g.groupId AND acl_u.userId=1
+		where a.id=c.addressBookId
+		)
+		ORDER BY `c`.`modifiedAt` DESC
 
-		Acl::applyToQuery($query, $alias, $level, $userId, $groups);
+		LIMIT 200,40
+		 *
+		 * 1.6s
+		 *
+		 *
+		 *
+		 * SELECT SQL_CALC_FOUND_ROWS SQL_NO_CACHE c.id
+		FROM `addressbook_contact` `c`
+		where addressBookId in (select id from `addressbook_addressbook` `a`
+		INNER JOIN `core_acl_group` `acl_g` ON
+		acl_g.aclId = a.aclId
+		INNER JOIN `core_user_group` `acl_u` ON
+		acl_u.groupId = acl_g.groupId AND acl_u.userId=1)
+		ORDER BY `c`.`modifiedAt` DESC
+
+		LIMIT 200,40
+		 *
+		 * 1.5s
+		 *
+		 *
+		 *
+		 * SELECT SQL_CALC_FOUND_ROWS SQL_NO_CACHE c.id
+		FROM `addressbook_contact` `c`
+		INNER JOIN `addressbook_addressbook` `a` ON
+		c.addressBookId = a . id
+		INNER JOIN `core_acl_group` `acl_g` ON
+		acl_g.aclId = a.aclId
+		INNER JOIN `core_user_group` `acl_u` ON
+		acl_u.groupId = acl_g.groupId AND acl_u.userId=1
+		GROUP BY `c`.`id`
+
+		ORDER BY `c`.`modifiedAt` DESC
+		LIMIT 200,40
+		 *
+		 * 2.6s
+		 */
+
+
+		//Old way (3rd query above)
+//		$alias = self::joinAclEntity($query);
+//		Acl::applyToQuery($query, $alias, $level, $userId, $groups);
+
+		//using where exists
+		$cls = static::aclEntityClass();
+
+		/* @var $cls Entity */
+
+		$subQuery = $cls::find();
+
+
+		if(!isset($fromAlias)) {
+			$fromAlias = $query->getTableAlias();
+		}
+
+		//Exists
+//		$subQuery->selectSingleValue($subQuery->getTableAlias() . '.id');
+//		foreach (static::aclEntityKeys() as $from => $to) {
+//			$column = $cls::getMapping()->getColumn($to);
+//
+//			$subQuery->where($fromAlias . '.' . $from . ' = ' . $column->table->getAlias() . ' . '. $to);
+//			$subQuery->filter(['permissionLevel' => Acl::LEVEL_READ]);
+//			$subQuery->groupBy([])->select('id');
+//		}
+//
+//		$query->whereExists($subQuery);
+
+		//where in
+
+		foreach (static::aclEntityKeys() as $from => $to) {
+			$column = $cls::getMapping()->getColumn($to);
+
+			$subQuery->filter(['permissionLevel' => Acl::LEVEL_READ]);
+			$subQuery->select($column->table->getAlias() . ' . '. $to);
+			$subQuery->groupBy([]);
+			$query->where($fromAlias . '.' . $from, 'IN', $subQuery);
+			break;
+		}
+
 		
 		return $query;
 	}
@@ -116,7 +203,7 @@ abstract class AclItemEntity extends AclEntity {
 			if(!$aclColumn) {
 				throw new Exception("Column 'aclId' is required for AclEntity '$cls'");
 			}
-			
+
 			return $column->table->getAlias() . '.' . $cls::$aclColumnName;
 		}
 	}	

@@ -173,23 +173,27 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				.replace('{author}', Ext.util.Format.htmlEncode(creator.displayName))
 				.replace('{date}', Ext.util.Format.date(r.get('createdAt'),go.User.dateTimeFormat));
 
-			if(r.get('createdAt') != r.get('modifiedAt')) {
+			var modifier = r.get("modifier");
+			if(!modifier) {
+				modifier = {
+					displayName: t("Unknown user")
+				};
+			}
+			if(r.get('createdAt').getTime() != r.get('modifiedAt').getTime()) {
 
-				var modifier = r.get("modifier");
-				if(!modifier) {
-					modifier = {
-						displayName: t("Unknown user")
-					};
-				}
-
-				qtip += "<br>" + t("Edited by {author} at {date}")
+				qtip += "\n" + t("Edited by {author} at {date}")
 					.replace('{author}', Ext.util.Format.htmlEncode(modifier.displayName))
 					.replace('{date}', Ext.util.Format.date(r.get('modifiedAt'),go.User.dateTimeFormat));
 			}
 
+			if(r.get('createdAt').getTime() != r.get('date').getTime()) {
+				qtip += "\n" + t("The date was changed to {date}")
+					.replace('{date}', Ext.util.Format.date(r.get('date'),go.User.dateTimeFormat));
+			}
+
 			var avatar = {
 				xtype:'box',
-				autoEl: {tag: 'span','ext:qtip': qtip},
+				autoEl: {tag: 'span'},
 				cls: 'photo '+mineCls
 			};
 
@@ -211,6 +215,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 						html: go.util.Format.date(r.get('date'))
 					},{
 						xtype:'container',
+						autoEl: {tag: 'div','title': qtip},
 						items: [avatar,readMore]
 					}
 				]

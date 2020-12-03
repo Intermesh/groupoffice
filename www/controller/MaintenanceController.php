@@ -11,6 +11,8 @@ use Exception;
 use GO;
 use GO\Base\Controller\AbstractController;
 use GO\Base\Db\PDO;
+use go\core\auth\TemporaryState;
+use go\modules\community\history\Module;
 use PDOException;
 use ReflectionClass;
 use go\core\util\ClassFinder;
@@ -332,20 +334,26 @@ class MaintenanceController extends AbstractController {
 			throw new \GO\Base\Exception\AccessDenied();
 		
 		GO::setIgnoreAclPermissions(true);
+		GO::session()->runAsRoot();
+
+		go()->setAuthState(new TemporaryState(1));
+
+		\go\core\jmap\Entity::$trackChanges = false;
+		Module::$enabled = false;
+		go()->getDebugger()->enabled = false;
 		
 		if(!$this->lockAction()) {
 			exit("Already running!");
 		}
 
-		\go\core\jmap\Entity::$trackChanges = false;
-		
 		if(!$this->isCli()){
 			echo '<pre>';
 		}
 		
 		if(!empty($params['reset'])) {
 			echo "Resetting cache!\n";
-			go()->getDbConnection()->query("truncate core_search");
+			go()->getDbConnection()->exec("truncate core_search");
+			go()->getDbConnection()->exec("truncate core_search_word");
 		}
 		
 		echo "Checking search cache\n\n";
@@ -411,6 +419,7 @@ class MaintenanceController extends AbstractController {
 		$this->lockAction();
 
 		\go\core\jmap\Entity::$trackChanges = false;
+		Module::$enabled = false;
 		
 		$response = array();
 		

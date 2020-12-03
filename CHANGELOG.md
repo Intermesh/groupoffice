@@ -11,6 +11,9 @@ Master
 - History: new module replacing Activity log
 - Comments: Editable date field
 - Core: Support xlsx files for import and export
+- Core: Save export column presets 
+- Address book: Removed starred functionality for performance reasons
+- Core: New global search design to improve performance on larger databases
 
 end 6.5
 --------
@@ -19,12 +22,20 @@ end 6.5
 
 
 6.4.193
+- ActiveSync: Default address book was not used for syncing
+- E-mail: Fixed issue: no default search field in email search #634 (sort error)
+- Core: Required condition in custom fields supports multiple conditions with AND and OR
+
+30-11-2020 6.4.193
 - Studio: minor bugfix upon first generating new module
 - Studio: regenerate several backend files on frontend regeneration
 - Files: Detail views could reload with home folder after uploading files in the popup browser
 - Billing: Address display as per country settings
 - Core: Fixed UK address standard
 - Core: HTML fields auto grow with content
+- Core: Fixed date range with commentedat filter
+- dockwiki: correct path in module description to INSTALL.TXT
+- ActiveSync: Was generating unnecessary temporary files
 
 16-11-2020 6.4.192
 - Comments: Fixed bug when adding two comments without opening another item would overwrite the first.

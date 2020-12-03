@@ -7,6 +7,7 @@ use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\orm\EntityType;
 use go\core\orm\Query;
+use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\core\db\Expression;
@@ -30,8 +31,14 @@ class Search extends AclOwnerEntity {
 		//don't call parent as it's messes up core_acl references!
 		return true;
 	}
-		
-	
+
+	protected static function getDefaultFetchProperties()
+	{
+		//Acl prop is not needed for search results
+		return array_diff(parent::getDefaultFetchProperties(), ['acl']);
+	}
+
+
 	public function getEntity() {
 		return $this->entity;
 	}
@@ -68,17 +75,17 @@ class Search extends AclOwnerEntity {
 	public $name;
 	public $description;
 	public $filter;
-	protected $keywords;
-
-	public function setKeywords($keywords) {
-		$this->keywords = $keywords;
-	}
+//	protected $keywords;
+//
+//	public function setKeywords($keywords) {
+//		$this->keywords = $keywords;
+//	}
 	
 	protected function internalValidate() {
 		
 		$this->name = StringUtil::cutString($this->name, $this->getMapping()->getColumn('name')->length, false);
 		$this->description = StringUtil::cutString($this->description, $this->getMapping()->getColumn('description')->length);		
-		$this->keywords = StringUtil::cutString($this->keywords, $this->getMapping()->getColumn('keywords')->length, true, "");
+		//$this->keywords = StringUtil::cutString($this->keywords, $this->getMapping()->getColumn('keywords')->length, true, "");
 		
 		return parent::internalValidate();
 	}
@@ -150,19 +157,31 @@ class Search extends AclOwnerEntity {
 						})
 						->add('text', function(Criteria $criteria, $value, Query $query) {
 
-							$criteria->andWhere(
-								(new Criteria())
-								->orWhere('keywords','like', '%' . preg_replace('/\\s/', '%', $value) . '%')
-							);
+//							$criteria->andWhere(
+//								(new Criteria())
+//								->orWhere('keywords','like', '%' . preg_replace('/\\s/', '%', $value) . '%')
+//							);
 
-							// $value = static::convertQuery($value);
+							$i = 0;
 
-							// $criteria->where('MATCH (s.name, s.keywords) AGAINST (:keyword1 IN BOOLEAN MODE)')
-							// ->bind(':keyword1', $value);
-							// //->bind(':keyword2', $value);
+							$words = SearchableTrait::splitTextKeywords($value);
 
-							// // Order by relevance
-							// //$query->orderBy([new Expression('MATCH (s.name, s.keywords) AGAINST (:keyword2 IN BOOLEAN MODE) DESC')]);
+							$words = array_unique($words);
+
+							foreach($words as $word) {
+								$query->join("core_search_word", 'w'.$i, 'w'.$i.'.searchId = s.id');
+								$criteria->where('w'.$i.'.word', 'LIKE', $word . '%');
+								$i++;
+							}
+
+//							 $value = static::convertQuery($value);
+//
+//							 $criteria->where('MATCH (s.keywords) AGAINST (:keyword1 IN BOOLEAN MODE)')
+//							 ->bind(':keyword1', $value)
+//							 ->bind(':keyword2', $value);
+//
+//							 // Order by relevance
+//							 $query->orderBy([new Expression('MATCH (s.keywords) AGAINST (:keyword2 IN BOOLEAN MODE) DESC')]);
 						});					
 	}
 
@@ -175,31 +194,31 @@ class Search extends AclOwnerEntity {
 		return parent::sort($query, $sort);
 	}
 
-	// public static function convertQuery($value) {
+	 public static function convertQuery($value) {
 
-	// 		//first occuring quote type will be used for tokenizing.
-	// 		$doublepos = strpos($value, '"');
-	// 		$singlepos = strpos($value, "'");							
-	// 		$quote = '"';
-	// 		if($singlepos !== false && $singlepos > $doublepos) {
-	// 			$quote = "'";
-	// 		}
+	 		//first occuring quote type will be used for tokenizing.
+	 		$doublepos = strpos($value, '"');
+	 		$singlepos = strpos($value, "'");
+	 		$quote = '"';
+	 		if($singlepos !== false && $singlepos > $doublepos) {
+	 			$quote = "'";
+	 		}
 
-	// 		//https://stackoverflow.com/questions/2202435/php-explode-the-string-but-treat-words-in-quotes-as-a-single-word
-	// 		preg_match_all('/'.$quote.'(?:\\\\.|[^\\\\'.$quote.'])*'.$quote.'|\S+/', $value, $tokens);
+	 		//https://stackoverflow.com/questions/2202435/php-explode-the-string-but-treat-words-in-quotes-as-a-single-word
+	 		preg_match_all('/'.$quote.'(?:\\\\.|[^\\\\'.$quote.'])*'.$quote.'|\S+/', $value, $tokens);
 
-	// 		$str = "";
+	 		$str = "";
 
-	// 		foreach($tokens[0] as $token) {				
+	 		foreach($tokens[0] as $token) {
 					
-	// 				if(substr($token, -1,1) !== $quote) {
-	// 					$token = $token .= '*';
-	// 				}
-	// 				$str .= '+' . $token . ' ';
-	// 		}
+	 				if(substr($token, -1,1) !== $quote) {
+	 					$token = $token .= '*';
+	 				}
+	 				$str .= '+' . $token . ' ';
+	 		}
 
-	// 		return $str;
-	// }
+	 		return $str;
+	 }
 	
 	
 	// protected static function textFilterColumns() {

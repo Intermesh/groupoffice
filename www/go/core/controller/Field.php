@@ -18,7 +18,7 @@ class Field extends EntityController {
 	}
 	
 	private function checkEnabledModule(\go\core\orm\Query $query) {
-		return $query->join('core_customfields_field_set', 'fieldset', 'fieldset.id = f.fieldSetId')
+		return $query->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId')
 						->join('core_entity', 'e', 'e.id = fs.entityId')
 						->join('core_module', 'm', 'm.id = e.moduleId')
 						->where(['m.enabled' => true]);
