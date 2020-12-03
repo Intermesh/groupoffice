@@ -437,27 +437,10 @@ go.util =  (function () {
 		}
 
 		if(extension == 'csv' || extension == 'xlsx') {
-			const spreadSheetExportGrid = new go.import.SpreadSheetExportGrid({
-				entityStore: entity
-			});
-
-			const win = new go.Window({
-				modal: true,
-				layout: "fit",
-				title: t("Select columns"),
-				height: dp(600),
-				width: dp(400),
-				items: [spreadSheetExportGrid],
-				buttons: [
-					'->',
-					{
-						text: t("Export"),
-						handler: function() {
-							doExport(spreadSheetExportGrid.getSelection())
-							win.close();
-						}
-					}
-				]
+			const win = new go.import.ColumnSelectDialog({
+				entity: entity,
+				handler: doExport,
+				scope: this
 			});
 			win.show();
 		} else

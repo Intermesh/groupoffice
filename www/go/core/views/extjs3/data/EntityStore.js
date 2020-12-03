@@ -655,7 +655,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 *
 	 * @example
 	 *
-	 * go.Db.store("Note").save({name: "Test"}, 1).then(function(){});
+	 * go.Db.store("Note").save({name: "Test"}, 1).then(function(entity){});
 	 *
 	 * @param entity
 	 * @param {string} id

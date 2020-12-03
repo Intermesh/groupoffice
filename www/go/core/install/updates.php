@@ -795,3 +795,28 @@ $updates['202011261716'][] = function() {
 
 	echo "NOTE: Search cache will be rebuilt by a scheduled task. This may take a lot of time.";
 };
+
+
+$updates['202012031223'][] = "CREATE TABLE `core_spreadsheet_export` (
+`id` int(10) UNSIGNED NOT NULL,
+  `userId` int(11) NOT NULL,
+  `entityTypeId` int(11) NOT NULL,
+  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `columns` text COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
+$updates['202012031223'][] = "ALTER TABLE `core_spreadsheet_export`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `userId` (`userId`),
+  ADD KEY `entityTypeId` (`entityTypeId`),
+  ADD KEY `name` (`name`);";
+
+
+$updates['202012031223'][] = "ALTER TABLE `core_spreadsheet_export`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;";
+
+
+$updates['202012031223'][] = "ALTER TABLE `core_spreadsheet_export`
+  ADD CONSTRAINT `core_spreadsheet_export_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_spreadsheet_export_ibfk_2` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;";
