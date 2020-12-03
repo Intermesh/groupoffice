@@ -42,6 +42,9 @@ class TemplateField extends TextArea {
 		return parent::dbToApi($value, $values, $entity);
 	}
 
+	public function hasColumn() {
+		return false;
+	}
 
 }
 
