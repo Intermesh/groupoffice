@@ -640,7 +640,7 @@ abstract class Entity extends Property {
 
 				$tag = ":commentedAt" . uniqid();
 
-				$query->having('MAX(comment.modifiedAt) ' . $comparator . ' ' . $tag)
+				$query->having('MAX(comment.date) ' . $comparator . ' ' . $tag)
 					->bind($tag, $value->format(\go\core\db\Column::DATETIME_FORMAT))
 					->groupBy(['id']);
 			});
