@@ -11,6 +11,7 @@ Master
 - History: new module replacing Activity log
 - Comments: Editable date field
 - Core: Support xlsx files for import and export
+- Core: Save export column presets 
 - Address book: Removed starred functionality for performance reasons
 - Core: New global search design to improve performance on larger databases
 
