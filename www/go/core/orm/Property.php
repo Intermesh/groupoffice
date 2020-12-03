@@ -711,18 +711,27 @@ abstract class Property extends Model {
 	 * @throws Exception
 	 */
 	protected static function internalFindById($id, array $properties = [], $readOnly = false) {
-		$tables = static::getMapping()->getTables();
-		$primaryTable = array_shift($tables);
-		$keys = $primaryTable->getPrimaryKey();
-		
-		$query = static::internalFind($properties, $readOnly);		
-		
-		//Used count check here because a customer managed to get negative ID's in the database.
-		$ids = count($keys) == 1 ? [$id] : explode('-', $id);
-		$keys = array_combine($keys, $ids);
+		$query = static::internalFind($properties, $readOnly);
+		$keys = static::idToPrimaryKeys($id);
 		$query->where($keys);
 		
 		return $query->single();
+	}
+
+	/**
+	 * Changes the string key "1-2" into ['primaryKey1' => 1', 'primaryKey2' => '2]
+	 *
+	 * @param string $id eg. "1-2"
+	 * @return array eg. ['primaryKey1' => 1', 'primaryKey2' => '2]
+	 * @throws Exception
+	 */
+	public static function idToPrimaryKeys($id) {
+		$primaryTable = static::getMapping()->getPrimaryTable();
+
+		//Used count check here because a customer managed to get negative ID's in the database.
+		$keys = $primaryTable->getPrimaryKey();
+		$ids = count($keys) == 1 ? [$id] : explode('-', $id);
+		return array_combine($keys, $ids);
 	}
 
   /**
