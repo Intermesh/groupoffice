@@ -141,4 +141,8 @@ $updates['202012041036'][] = "ALTER TABLE `notes_note` CHANGE `createdBy` `creat
 $updates['202012041036'][] = "update notes_note set createdBy = null where createdBy not in (select id from core_user);";
 $updates['202012041036'][] = "ALTER TABLE `notes_note` ADD FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";
 
+$updates['202012041036'][] = "ALTER TABLE `notes_note` CHANGE `modifiedBy` `modifiedBy` INT(11) NULL;";
+$updates['202012041036'][] = "update notes_note set modifiedBy = null where modifiedBy not in (select id from core_user);";
+$updates['202012041036'][] = "ALTER TABLE `notes_note` ADD FOREIGN KEY (`modifiedBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";
+
 

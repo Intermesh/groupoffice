@@ -8,7 +8,7 @@ CREATE TABLE `notes_note` (
   `id` int(11) NOT NULL,
   `noteBookId` int(11) NOT NULL,
   `createdBy` int(11) NULL,
-  `modifiedBy` int(11) NOT NULL,
+  `modifiedBy` int(11) NULL,
   `name` varchar(100) NOT NULL,
   `content` text,
   `filesFolderId` int(11) DEFAULT NULL,
@@ -134,3 +134,4 @@ ALTER TABLE `notes_note_image`
 
 ALTER TABLE `notes_note_book` ADD FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
 ALTER TABLE `notes_note` ADD FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
+ALTER TABLE `notes_note` ADD FOREIGN KEY (`modifiedBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
