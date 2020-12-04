@@ -20,6 +20,9 @@ end 6.5
 
 
 
+04-12-2020 6.4.195
+- Billing: license error
+
 04-12-2020 6.4.194
 - ActiveSync: Default address book was not used for syncing
 - E-mail: Fixed issue: no default search field in email search #634 (sort error)
