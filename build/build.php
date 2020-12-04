@@ -415,7 +415,7 @@ class Builder {
 }
 
 
-$builder = new Builder();
+$builder = new Builder($config);
 
 if(isset($argv[1])) {
 	$builder->branch = $argv[1];
