@@ -6,6 +6,8 @@ use go\core\Controller;
 use go\core\db\Query;
 use go\core\db\Table;
 use go\core\fs\Blob;
+use go\core\model\CronJobSchedule;
+use go\core\model\Module;
 use go\core\util\DateTime;
 use function GO;
 
@@ -16,12 +18,18 @@ class System extends Controller {
 	 * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php core/System/runCron --module=ldapauthenticatior --package=community --name=Sync
 	 */
 	public function runCron($name, $module = "core", $package = "core") {
-		$cls = $package == "core" ?
-			"go\\core\\cron\\".$name : 
-			"go\\modules\\" . $package ."\\".$module."\\cron\\".$name;
+
+		$module = Module::findByName($package, $module);
+
+		$schedule = new CronJobSchedule();
+		$schedule->moduleId =$module->id;
+		$schedule->name = $name;
+		$schedule->expression = "* * * * *";
+
+		$cls = $schedule->getCronClass();
 		
 		$o = new $cls;
-		$o->run();
+		$o->run($schedule);
 	}
 
 	/**
