@@ -2,6 +2,7 @@ forum
 .vscode
 .gitmodules
 /nbproject
+/build/vendor
 /build/config.php
 /build/deploy
 /*-license.txt
