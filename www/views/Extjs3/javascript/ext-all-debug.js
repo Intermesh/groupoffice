@@ -5534,33 +5534,33 @@ Ext.onReady = Ext.EventManager.onDocumentReady;
         cssFloat: true
     });
 
-    var supportTests = function(){
-            var div = document.createElement('div'),
-                doc = document,
-                view,
-                last;
-
-            div.innerHTML = '<div style="height:30px;width:50px;"><div style="height:20px;width:20px;"></div></div><div style="float:left;background-color:transparent;">';
-            doc.body.appendChild(div);
-            last = div.lastChild;
-
-            if((view = doc.defaultView)){
-                if(view.getComputedStyle(div.firstChild.firstChild, null).marginRight != '0px'){
-                    supports.correctRightMargin = false;
-                }
-                if(view.getComputedStyle(last, null).backgroundColor != 'transparent'){
-                    supports.correctTransparentColor = false;
-                }
-            }
-            supports.cssFloat = !!last.style.cssFloat;
-            doc.body.removeChild(div);
-    };
-
-    if (Ext.isReady) {
-        supportTests();
-    } else {
-        Ext.onReady(supportTests);
-    }
+    // var supportTests = function(){
+    //         var div = document.createElement('div'),
+    //             doc = document,
+    //             view,
+    //             last;
+		//
+    //         div.innerHTML = '<div style="height:30px;width:50px;"><div style="height:20px;width:20px;"></div></div><div style="float:left;background-color:transparent;">';
+    //         doc.body.appendChild(div);
+    //         last = div.lastChild;
+		//
+    //         if((view = doc.defaultView)){
+    //             if(view.getComputedStyle(div.firstChild.firstChild, null).marginRight != '0px'){
+    //                 supports.correctRightMargin = false;
+    //             }
+    //             if(view.getComputedStyle(last, null).backgroundColor != 'transparent'){
+    //                 supports.correctTransparentColor = false;
+    //             }
+    //         }
+    //         supports.cssFloat = !!last.style.cssFloat;
+    //         doc.body.removeChild(div);
+    // };
+		//
+    // if (Ext.isReady) {
+    //     supportTests();
+    // } else {
+    //     Ext.onReady(supportTests);
+    // }
 })();
 
 
