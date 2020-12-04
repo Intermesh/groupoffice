@@ -1,0 +1,15 @@
+#!/bin/sh
+
+. /usr/share/debconf/confmodule
+. /usr/share/dbconfig-common/dpkg/postrm
+dbc_go groupoffice $@
+
+
+if [ "$1" = "purge" ]; then
+    rm -f /etc/groupoffice/conf.php
+    if which ucf >/dev/null 2>&1; then
+    	ucf --purge /etc/groupoffice/conf.php
+    fi
+    db_purge
+fi
+

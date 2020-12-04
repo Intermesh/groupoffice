@@ -1,0 +1,6 @@
+usr/share/groupoffice usr/share
+usr/share/doc/groupoffice/config.php.tpl usr/share/doc/groupoffice
+etc/apache2/conf-available/groupoffice.conf etc/apache2/conf-available
+etc/cron.d/groupoffice-cron etc/cron.d
+etc/groupoffice etc/groupoffice
+

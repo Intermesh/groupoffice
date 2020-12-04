@@ -1,0 +1,40 @@
+Source: groupoffice
+Section: web
+Priority: extra
+Maintainer: Merijn Schering <mschering@intermesh.nl> 
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.2
+Homepage: http://www.group-office.com
+
+Package: groupoffice
+Architecture: all
+Depends: libapache2-mod-php (>=7),	
+	apache2,
+	mariadb-server | mysql-server,
+	php-mysql,
+	php-gd,
+	php-cli,
+	php-curl,
+	php-xsl,
+	php-xml,
+	php-mbstring,
+	php-intl,
+	unzip,
+	tar,
+	zip,
+	tnef,
+	${misc:Depends},
+	${perl:Depends},
+	dbconfig-common,
+	ucf (>= 0.28)
+Conflicts: groupoffice-com,
+	groupoffice-pro,
+	groupoffice-billing,
+	groupoffice-documents
+Description: Group-Office groupware and CRM
+ Group-Office is a web based groupware and CRM application
+ Take your office online. Share projects, calendars, files and e-mail online 
+ with co-workers and clients. Easy to use and fully customizable, Group-Office 
+ takes online collaboration to the next level.
+
+

@@ -2,6 +2,8 @@ forum
 .vscode
 .gitmodules
 /nbproject
+/build/config.php
+/build/deploy
 /*-license.txt
 /www/*-license.txt
 .idea

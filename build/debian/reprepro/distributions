@@ -1,0 +1,33 @@
+Description: The Group-Office groupware repository
+Origin: Intermesh BV
+SignWith: yes
+Codename: 63-php-70
+Components: main
+Architectures: i386 amd64
+
+SignWith: yes
+Codename: 63-php-71
+Components: main
+Architectures: i386 amd64
+
+
+SignWith: yes
+Codename: 64-php-70
+Components: main
+Architectures: i386 amd64
+
+SignWith: yes
+Codename: 64-php-71
+Components: main
+Architectures: i386 amd64
+
+
+SignWith: yes
+Codename: sixfive
+Components: main
+Architectures: i386 amd64
+
+SignWith: yes
+Codename: one
+Components: main
+Architectures: i386 amd64
