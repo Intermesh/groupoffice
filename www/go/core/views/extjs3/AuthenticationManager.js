@@ -193,6 +193,8 @@ go.AuthenticationManager = (function () {
 
 		login : function() {
 			this.loginPanel = new go.login.LoginPanel();
+
+			this.loginPanel.render(document.body);
 		},
 
 		onAuthenticated: function (result) {

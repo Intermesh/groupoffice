@@ -100,13 +100,14 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						me.onAuthentication(); // <- start Group-Office
 					} else {
 						go.User.clearAccessToken();
-						
+
 						me.fireEvent("boot", me);
 						go.Router.check();
 					}
 				});
 			} else {
 				me.fireEvent("boot", me); // In the router there is an event attached.
+
 				go.Router.check();
 			}
 				
@@ -411,7 +412,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		GO.checker = new GO.Checker();
 
-		this.fireReady();				
+		this.fireReady();
 
 		//Ext need to know where this charting swf file is in order to draw charts
 //		Ext.chart.Chart.CHART_URL = 'views/Extjs3/ext/resources/charts.swf';

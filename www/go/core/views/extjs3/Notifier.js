@@ -1,11 +1,13 @@
 go.Notifier = {
 
-	messageCt: Ext.DomHelper.insertFirst(document.body, {id: 'message-ct'}, true),
+	messageCt: null,
 	showStatusBar: false,
 	notificationArea: null,
 	init: function(notificationArea) {
 
 		var me = this;
+
+		this.messageCt = Ext.DomHelper.insertFirst(document.body, {id: 'message-ct'}, true);
 
 		this.notificationArea = notificationArea;
 
@@ -235,6 +237,9 @@ go.Notifier = {
 	 * @returns The created Ext.Panel
 	 */
 	flyout: function(msg) {
+		if(!this.messageCt) {
+			this.messageCt = Ext.DomHelper.insertFirst(document.body, {id: 'message-ct'}, true);
+		}
 		msg.renderTo = this.messageCt;
 		msg.html = msg.description || msg.html; // backward compat
 		var msgCtr = new Ext.Panel(msg);
