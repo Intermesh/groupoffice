@@ -1,3 +1,4 @@
+04-12-2020 6.4.194
 - ActiveSync: Default address book was not used for syncing
 - E-mail: Fixed issue: no default search field in email search #634 (sort error)
 - Core: Required condition in custom fields supports multiple conditions with AND and OR
