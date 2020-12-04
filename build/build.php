@@ -111,7 +111,6 @@ class Builder {
         $this->github = $config['github'];
         $this->ioncubePassword = $config['ioncubePassword'];
 
-        $this->sourceDir = dirname(__DIR__);
 	}
 
 	public function build() {
