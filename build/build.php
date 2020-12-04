@@ -251,7 +251,7 @@ class Builder {
 
         $module = 'billing';
         run($this->encoder ." ". $this->encoderOptions. ' --replace-target --encode "*.inc" ' .
-            '--copy "vendor/" --with-license documents-' . $this->branch . '-license.txt ' .
+            '--copy "vendor/" --with-license billing-' . $this->branch . '-license.txt ' .
             '--passphrase bs'. $this->ioncubePassword . $this->branch . ' ' . $this->sourceDir . '/promodules/' . $module . ' ' .
             '--into ' . $this->buildDir . "/" . $this->packageName . '/modules');
 
