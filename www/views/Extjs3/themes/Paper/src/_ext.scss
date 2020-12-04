@@ -121,16 +121,16 @@
 	background-color:$black-87-opacity;
 }
 
-.x-shadow {
-	display:none;
-	+ .x-window { @extend .z24;}
-	+ .x-dd-drag-proxy { @extend .z4;}
-	+ .x-combo-list {@extend .z2;}
-	+ .x-menu {@extend .z2;}
-	+ * {
-		//@extend .z1;
-	}
-}
+//.x-shadow {
+//	display:none;
+//	+ .x-window { @extend .z24;}
+//	+ .x-dd-drag-proxy { @extend .z4;}
+//	+ .x-combo-list {@extend .z2;}
+//	+ .x-menu {@extend .z2;}
+//	+ * {
+//		//@extend .z1;
+//	}
+//}
 .x-window-proxy + .x-window { @extend .z24;}
 
 //todo
@@ -1639,6 +1639,7 @@ td.grid-hd-group-cell {
 	a { color:inherit;}
 }
 .x-dd-drag-proxy {
+	@extend .z4;
 	background-color:color($bg,'card');
 	line-height: dp(40);
 
@@ -2069,6 +2070,7 @@ td.x-date-mp-sep {
 // ### MENU ###
 // ############
 .x-menu{
+	@extend .z2;
 	border-radius: $borderRadius;
 	background-color:color($bg,'card');
 	opacity: 1;
@@ -2284,6 +2286,7 @@ $menuScrollerSize : dp(4);
 // ### COMBO LIST ###
 // ##################
 .x-combo-list {
+	@extend .z2;
 	@extend %font-body1;
 	border: 1px solid color($fg, 'line');
 	border-radius: $borderRadius;
