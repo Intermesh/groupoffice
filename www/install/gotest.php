@@ -128,8 +128,8 @@ function test_system(){
 	
 	$test['name']='PHP version';
 	$test['showSuccessFeedback'] = false;
-	$test['pass']=function_exists('version_compare') && version_compare( phpversion(), "7.0", ">=");
-	$test['feedback']='Fatal error: Your PHP version is too old to run '.$product_name.'. PHP 7.0 or higher is required';
+	$test['pass']=function_exists('version_compare') && version_compare( phpversion(), "7.3", ">=");
+	$test['feedback']='Fatal error: Your PHP version is too old to run '.$product_name.'. PHP 7.3 or higher is required';
 	$test['fatal']=true;
 
 //	$tests[]=$test;
