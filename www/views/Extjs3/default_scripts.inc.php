@@ -3,8 +3,8 @@
 use GO\Base\Util\Crypt;
 use go\core\fs\File;
 use go\core\fs\Folder;
-use go\core\Module;
 use go\core\jmap\Response;
+use go\core\Module;
 use go\core\webclient\Extjs3;
 
 /**
@@ -154,9 +154,14 @@ if ($cacheFile->exists()) {
 				
 				
 			}
+			$pkg = $module->package ? $module->package : "legacy";
 			
-			$scripts[] = $module->package ? 'Ext.ns("go.modules.' . $module->package . '.' . $module->name . '");' : 'Ext.ns("GO.' . $module->name  . '");';
+			$js = $module->package ? 'Ext.ns("go.modules.' . $module->package . '.' . $module->name . '");' : 'Ext.ns("GO.' . $module->name  . '");';
+            $js .= "go.module = '" . $module->name . "';";
+            $js .= "go.package = '" . $pkg . "';";
+            $js .= "go.Translate.setModule('" . $pkg . "', '" .$module->name . "');";
 
+			$scripts[] = $js;
 
 			$bundleFile = new File($module->moduleManager->path(). 'views/extjs3/scripts.js');
 			if($bundleFile->exists()) {
@@ -202,64 +207,18 @@ if ($cacheFile->exists()) {
 
 		if (GO::config()->debug) {
 			if (is_string($script)) {
-//        $js .=  $script ."\n;\n";
 				echo '<script type="text/javascript">' . $script . '</script>' . "\n";
 			} else if ($script instanceof File) {
-        $relPath = substr($script->getPath(), $strip);
-        $parts = explode('/', $relPath);
+                $relPath = substr($script->getPath(), $strip);
+                $parts = explode('/', $relPath);
 
-        $relPath = $baseUrl . $relPath;
-//        $js .= "\n//source: ".$relPath ."\n";
-				
-				$js = "";
-        if($parts[0] == 'go' && $parts[1] == 'modules') {
-					//for t() function to auto detect module package and name
-          $js .= "go.module = '".$parts[3]."';";
-          $js .= "go.package = '".$parts[2]."';";
-          $js .= "go.Translate.setModule('".$parts[2]."', '" .$parts[3]. "');";   
-        } else if($parts[0] == 'modules')
-        {
-					//for t() function to auto detect module package and name
-          $js .= "go.module = '".$parts[1]."';";
-          $js .= "go.package = 'legacy';";
-          $js .= "go.Translate.setModule('legacy', '" .$parts[1]. "');";   
-				}
-				
+                $relPath = $baseUrl . $relPath;
 
-				if(!empty($js)) {
-					echo '<script type="text/javascript">';
-					echo $js;				
-					echo "</script>\n";
-				}
-//        $js .= $script->getContents()."\n;\n";
-//        
-//     
 				echo '<script type="text/javascript" src="'.$relPath. '?mtime='.$script->getModifiedAt()->format("U").'"></script>' . "\n";
 			}
-//      else if($script instanceof \go\core\util\Url) {
-//				echo '<script type="text/javascript" src="'.$script.'"></script>' . "\n";
-//			}
-		} else {      
-      
-			if($script instanceof File) {
-				$relPath = substr($script->getPath(), $strip);
-				$parts = explode('/', $relPath);
-				$js = "";
-				if($parts[0] == 'go' && $parts[1] == 'modules') {
-					$js .= "go.module = '".$parts[3]."';";
-					$js .= "go.package = '".$parts[2]."';";
-					$js .= "go.Translate.setModule('".$parts[2]."', '" .$parts[3]. "');";   
-				} else if($parts[0] == 'modules')
-				{
-					$js .= "go.module = '".$parts[1]."';";
-					$js .= "go.package = 'legacy';";
-					$js .= "go.Translate.setModule('legacy', '" .$parts[1]. "');";   
-				}
 
-				if(!empty($js)) {
-					$minify->add($js);   
-				}
-			}
+		} else {      
+
 			$minify->add($script);
 		}
 	}
