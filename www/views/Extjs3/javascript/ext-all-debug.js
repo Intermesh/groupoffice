@@ -2860,8 +2860,7 @@ Ext.Element.addMethods(function(){
 
         
         getStyle : function(){
-            return view && view.getComputedStyle ?
-                function(prop){
+            return function(prop){
                     var el = this.dom,
                         v,
                         cs,
@@ -2888,27 +2887,28 @@ Ext.Element.addMethods(function(){
                         out = 'transparent';
                     }
                     return out;
-                } :
-                function(prop){
-                    var el = this.dom,
-                        m,
-                        cs;
-
-                    if(el == document) return null;
-                    if (prop == 'opacity') {
-                        if (el.style.filter.match) {
-                            if(m = el.style.filter.match(opacityRe)){
-                                var fv = parseFloat(m[1]);
-                                if(!isNaN(fv)){
-                                    return fv ? fv / 100 : 0;
-                                }
-                            }
-                        }
-                        return 1;
-                    }
-                    prop = chkCache(prop);
-                    return el.style[prop] || ((cs = el.currentStyle) ? cs[prop] : null);
-                };
+                } ;
+                // :
+                // function(prop){
+                //     var el = this.dom,
+                //         m,
+                //         cs;
+								//
+                //     if(el == document) return null;
+                //     if (prop == 'opacity') {
+                //         if (el.style.filter.match) {
+                //             if(m = el.style.filter.match(opacityRe)){
+                //                 var fv = parseFloat(m[1]);
+                //                 if(!isNaN(fv)){
+                //                     return fv ? fv / 100 : 0;
+                //                 }
+                //             }
+                //         }
+                //         return 1;
+                //     }
+                //     prop = chkCache(prop);
+                //     return el.style[prop] || ((cs = el.currentStyle) ? cs[prop] : null);
+                // };
         }(),
 
         
@@ -6065,7 +6065,7 @@ Ext.apply(Ext, function(){
         },
 
         
-        useShims: E.isIE6 || (E.isMac && E.isGecko2),
+        useShims: false,//E.isIE6 || (E.isMac && E.isGecko2),
 
         
         
@@ -12186,6 +12186,9 @@ Ext.Layer = function(config, existingEl){
     config = config || {};
     var dh = Ext.DomHelper,
         cp = config.parentEl, pel = cp ? Ext.getDom(cp) : document.body;
+
+    //Merijn
+		config.shadow = false;
         
     if (existingEl) {
         this.dom = Ext.getDom(existingEl);
