@@ -719,7 +719,7 @@ Ext.override(Ext.Element, {
      */
 	,
 	isBorderBox : function(){
-        return this.isStyle('box-sizing', 'border-box') || Ext.isBorderBox || Ext.isForcedBorderBox || noBoxAdjust[(this.dom.tagName || "").toLowerCase()];
+        return true;//this.isStyle('box-sizing', 'border-box') || Ext.isBorderBox || Ext.isForcedBorderBox || noBoxAdjust[(this.dom.tagName || "").toLowerCase()];
    },
 	print: function(config) {
 
