@@ -6,6 +6,8 @@ use Exception;
 use go\core\fs\File;
 use go\core\jmap\Request;
 use go\core\model\Module;
+use go\core\model\User;
+use go\modules\community\addressbook\model\Address;
 
 class Language {
 
@@ -87,6 +89,54 @@ class Language {
 		}
 
 		return isset($this->af[$isoCode]) ? $this->af[$isoCode] : $this->af['default'];
+	}
+
+	private static $defaultCountryIso;
+
+	private static function isDefaultCountry($countryCode) {
+		if(!isset(self::$defaultCountryIso)) {
+			$user = go()->getAuthState()->getUser(['timezone']);
+			if(!$user) {
+				$user = User::findById(1, ['timezone']);
+			}
+			self::$defaultCountryIso = $user->getCountry();
+//			$countries = go()->t('countries');
+//			self::$defaultCountryText = $countries[self::$defaultCountryIso] ?? "";
+		}
+
+		return self::$defaultCountryIso == $countryCode;
+	}
+
+
+	/**
+	 * Format an address
+	 *
+	 * @param $countryCode
+	 * @param $address array with street, street2, city, zipCode and state
+	 * @return string
+	 */
+	public function formatAddress($countryCode, $address)
+	{
+		if (empty($address['street']) && empty($address['city']) && empty($address['state'])) {
+			return "";
+		}
+		$format = go()->getLanguage()->getAddressFormat($countryCode);
+
+		$format = str_replace('{address}', $address['street'], $format);
+		$format = str_replace('{address_no}', $address['street2'], $format);
+		$format = str_replace('{city}', $address['city'], $format);
+		$format = str_replace('{zip}', $address['zipCode'], $format);
+		$format = str_replace('{state}', $address['state'], $format);
+
+		if (self::isDefaultCountry($countryCode)) {
+			$format = str_replace('{country}', "", $format);
+		}else{
+			$countries = go()->t('countries');
+			$country = $countries[$countryCode] ?? "";
+			$format = str_replace('{country}', $country, $format);
+		}
+
+		return preg_replace("/\n+/", "\n", $format);
 	}
 
 	/**
