@@ -121,7 +121,7 @@ class Builder
 	public function build()
 	{
 		$this->pullSource();
-		$this->version = explode(".", require($this->sourceDir . "/www/version.php"))[2];
+		$this->version = explode(".", require(dirname(__DIR__) . "/www/version.php"))[2];
 
 		//$this->packageName = "groupoffice-" . $this->branch . "." . $this->version;
 
