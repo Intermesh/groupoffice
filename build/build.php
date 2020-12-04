@@ -290,7 +290,7 @@ class Builder {
 
         run($this->encoder ." ". $this->encoderOptions . ' --replace-target --encode "*.inc" ' .
             '--with-license groupoffice-pro-' . $this->branch . '-license.txt ' .
-            '--passphrase go' . $this->ioncubePassword   . $this->branch . ' ' . $this->sourceDir . '/groupoffice/www/licensechecks/groupoffice-pro.php ' .
+            '--passphrase go' . $this->ioncubePassword   . $this->branch . ' ' . dirname(__DIR__) . '/www/licensechecks/groupoffice-pro.php ' .
             '--into ' . $this->buildDir . "/" . $this->packageName . '/licensechecks');
 
         //business package
