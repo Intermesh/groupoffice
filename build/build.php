@@ -148,7 +148,7 @@ class Builder
 
 			$this->buildFromSource();
 
-			if ($this->branch == 'master' || $this->branch == '6.5') {
+			if ($this->branch == 'master') {
 				echo "Skipping SourceForge upload and Debian package because we're building master\n";
 			} else {
 				//$this->createGithubRelease();
