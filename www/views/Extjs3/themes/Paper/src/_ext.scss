@@ -131,7 +131,7 @@
 //		//@extend .z1;
 //	}
 //}
-.x-window-proxy + .x-window { @extend .z24;}
+//.x-window-proxy + .x-window { @extend .z24;}
 
 //todo
 .x-spotlight {
@@ -2471,6 +2471,7 @@ $menuScrollerSize : dp(4);
 // ### WINDOW ###
 // ##############
 .x-window{
+	@extend .z24;
 	background-color:color($bg,'dialog');
 	border-radius: $borderRadius;
 	overflow:hidden;
