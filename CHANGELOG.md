@@ -20,6 +20,14 @@ end 6.5
 
 
 
+07-12-2020 6.4.196
+- Startpage: bugfix when removing a portlet for the second time
+- Email: Fixed download / save bug with multiple inline attachments
+- Email: User department in email template 
+- Core: Fixed rare upgrade from 6.3 problem. Make custom select field bigger to make sure the new int will fit
+- Core: Removed ID from custom fields to fix rendering of second window.
+- Core: Fixed problem in oath server for rocket.chat login
+
 04-12-2020 6.4.195
 - Billing: license error
 
@@ -36,8 +44,8 @@ end 6.5
 - Billing: Address display as per country settings
 - Core: Fixed UK address standard
 - Core: HTML fields auto grow with content
-- Core: Fixed date range with commentedat filter
-- dockwiki: correct path in module description to INSTALL.TXT
+- Core: Fixed date range with commentedAt filter
+- docuwiki: correct path in module description to INSTALL.TXT
 - ActiveSync: Was generating unnecessary temporary files
 
 16-11-2020 6.4.192
