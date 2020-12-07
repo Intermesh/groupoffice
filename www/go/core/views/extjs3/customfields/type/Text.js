@@ -105,61 +105,6 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 		}, config);
 	},
 
-	// /**
-	//  *
-	//  * @param field
-	//  * @returns {boolean}
-	//  * @private
-	//  */
-	// _changeRelatedFieldsVisibility: function(field) {
-	// 	// if (!field.relatedFields) {
-	// 	// 	return false;
-	// 	// }
-	// 	//
-	// 	// // relatedFields are populated in FormFieldSet. The validation of this field can affect visibility of other fields
-	// 	// // using this fields value in the requiredCondition
-	// 	// Ext.each(field.relatedFields, function(relatedField) {
-	// 	// 	relatedField.validate();
-	// 	// }, field);
-	// },
-
-	/**
-	 * @param customField
-	 * @returns {*}
-	 * @deprecated (apparently so, is never being used in core, business or professional 6.4);
-	 */
-	/*
-	getRequiredConditionField: function(customField) {
-		var condition = customField.field.relatedFieldCondition,
-			form = this.findParentByType('form').getForm(),
-			conditionParts,
-			field, fieldName;
-
-		if (Ext.isEmpty(condition)) {
-			return false;
-		}
-
-		if (condition.includes('is empty')) {
-			condition = condition.replace('is empty', '');
-			fieldName = condition.trim(' ');
-			field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
-		} else if (condition.includes('is not empty')) {
-			condition = condition.replace('is not empty', '');
-			fieldName = condition.trim(' ');
-			field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
-		} else {
-			conditionParts = condition.split(' ');
-			if (conditionParts.length === 3) { //valid condition
-				field = form.findField(conditionParts[0]) || form.findField('customFields.' + conditionParts[0]);
-				if (!field) {
-					field = form.findField(conditionParts[2]) || form.findField('customFields.' + conditionParts[2]);
-				}
-			}
-		}
-
-		return field;
-	},
-	*/
 
 	/**
 	 * Required condition validator
@@ -412,4 +357,3 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	
 });
 
-// go.customfields.CustomFields.registerType(new go.customfields.type.Text());
