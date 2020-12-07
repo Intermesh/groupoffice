@@ -1,2 +1,2 @@
 <?php
-return "6.5.4";
+return "6.5.5";

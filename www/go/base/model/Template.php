@@ -237,6 +237,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 			$attributes[$tagPrefix . 'email3'] = isset($contact->emailAddresses[2]) ? $contact->emailAddresses[2]->email :  "";
 
 			$attributes[$tagPrefix . 'function'] = $contact->jobTitle;
+			$attributes[$tagPrefix . 'department'] = $contact->department;
 
 			foreach($contact->phoneNumbers as $p) {
 				switch($p->type) {

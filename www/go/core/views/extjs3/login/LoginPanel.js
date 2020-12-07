@@ -1,6 +1,5 @@
 go.login.LoginPanel = Ext.extend(Ext.Container, {
 	id: "login",
-	renderTo: document.body,
 	initComponent: function () {
 
 		this.languageContainer = new Ext.Container({

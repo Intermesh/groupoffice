@@ -29,7 +29,7 @@ use Sabre\VObject\Splitter\VCard as VCardSplitter;
  */
 class VCard extends AbstractConverter {
 
-	public function __construct($extension, $entityClass)
+	public function __construct()
 	{
 		parent::__construct('vcf', Contact::class);
 	}

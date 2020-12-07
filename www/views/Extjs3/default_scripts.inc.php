@@ -83,7 +83,7 @@ echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?l
 
 ?>
 
-<script type="text/javascript" nonce="<?= Response::get()->getCspNonce(); ?>">
+<script type="text/javascript">
 
 	Ext.namespace("GO");
 

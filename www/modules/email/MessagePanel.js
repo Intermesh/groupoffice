@@ -651,7 +651,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 		}
 
 	},
-	onImageContextMenu : function (e, target){
+	onImageContextMenu : function (e, target) {
 
 		if(target.tagName != "IMG") {
 			return;

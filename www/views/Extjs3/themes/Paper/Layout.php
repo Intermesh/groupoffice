@@ -18,6 +18,13 @@ $lang = GO::language()->getLanguage(); ?>
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <link rel="apple-touch-icon" sizes="180x180" href="<?= GO::view()->getTheme()->getUrl(); ?>img/favicon/apple-touch-icon.png">
 
+	<?php
+
+	require(GO::config()->root_path.'views/Extjs3/default_scripts.inc.php');
+
+	go()->fireEvent(App::EVENT_SCRIPTS);
+	?>
+
     <?php
 	if(!empty(GO::config()->favicon)) {
 		echo '<link href="'. GO::config()->favicon.'" rel="shortcut icon" type="image/x-icon">';
@@ -96,13 +103,8 @@ $lang = GO::language()->getLanguage(); ?>
 	<div id="sound"></div>
     <div id="paper"></div>
 	<!--Putting scripts in div will speed up developer tools because they don't have to show all those nodes-->
-	<div id="scripts-container">
-		<?php 
-		
-		require(GO::config()->root_path.'views/Extjs3/default_scripts.inc.php');
-		
-		go()->fireEvent(App::EVENT_SCRIPTS);
-		?>
-	</div>
+<!--	<div id="scripts-container">-->
+<!--		-->
+<!--	</div>-->
 </body>
 </html>

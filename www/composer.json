@@ -32,11 +32,12 @@
     "html2text/html2text": "^4.1",
     "sabre/vobject": "^4.2",
     "phpseclib/mcrypt_compat": "^1.0",
-    "league/oauth2-server": "^8.1",
+    "league/oauth2-server": "8.1.1",
     "guzzlehttp/psr7": "^1.6",
     "guzzlehttp/guzzle": "@stable",
-    "steverhoades/oauth2-openid-connect-server": "^1.2",
-    "phpoffice/phpspreadsheet": "^1.15"
+    "steverhoades/oauth2-openid-connect-server": "1.2.0",
+    "phpoffice/phpspreadsheet": "^1.15",
+    "lcobucci/jwt": "3.3.3"
   },
   "license": "AGPL",
   "authors": [

@@ -241,11 +241,11 @@ class Builder
 		}
 
 
-		$module = 'billing';
-		run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" ' .
-			'--copy "vendor/" --with-license documents-' . $this->branch . '-license.txt ' .
-			'--passphrase bs' . $this->ioncubePassword . $this->branch . ' ' . $this->sourceDir . '/promodules/' . $module . ' ' .
-			'--into ' . $this->buildDir . "/" . $this->packageName . '/modules');
+        $module = 'billing';
+        run($this->encoder ." ". $this->encoderOptions. ' --replace-target --encode "*.inc" ' .
+            '--copy "vendor/" --with-license billing-' . $this->branch . '-license.txt ' .
+            '--passphrase bs'. $this->ioncubePassword . $this->branch . ' ' . $this->sourceDir . '/promodules/' . $module . ' ' .
+            '--into ' . $this->buildDir . "/" . $this->packageName . '/modules');
 
 
 		run($this->encoder . " " . $this->encoderOptions . ' --replace-target --license-check script ' . $this->sourceDir . '/promodules/professional ' .
