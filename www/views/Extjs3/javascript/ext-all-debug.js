@@ -2572,7 +2572,7 @@ Ext.Element.addMethods(function(){
 	
 	    
 	    down : function(selector, returnDom){
-	        var n = DQ.selectNode(" > " + selector, this.dom);
+	        var n = DQ.jsSelect(" > " + selector, this.dom)[0];
 	        return returnDom ? n : GET(n);
 	    },
 	
