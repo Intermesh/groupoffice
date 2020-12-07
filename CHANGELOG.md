@@ -2,6 +2,9 @@
 - Startpage: bugfix when removing a portlet for the second time
 - Email: Fixed download / save bug with multiple inline attachments
 - Email: User department in email template 
+- Core: Fixed rare upgrade from 6.3 problem. Make custom select field bigger to make sure the new int will fit
+- Core: Removed ID from custom fields to fix rendering of second window.
+- Core: Fixed problem in oath server for rocket.chat login
 
 04-12-2020 6.4.195
 - Billing: license error
