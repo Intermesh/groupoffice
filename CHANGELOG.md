@@ -1,3 +1,6 @@
+6.4.196
+- Startpage: bugfix when removing a portlet for the second time
+
 04-12-2020 6.4.195
 - Billing: license error
 
@@ -14,8 +17,8 @@
 - Billing: Address display as per country settings
 - Core: Fixed UK address standard
 - Core: HTML fields auto grow with content
-- Core: Fixed date range with commentedat filter
-- dockwiki: correct path in module description to INSTALL.TXT
+- Core: Fixed date range with commentedAt filter
+- docuwiki: correct path in module description to INSTALL.TXT
 - ActiveSync: Was generating unnecessary temporary files
 
 16-11-2020 6.4.192
