@@ -414,7 +414,7 @@ class Installer {
 		echo "Rebuilding cache\n";
 
 		//reset new cache
-		$cls = go()->getConfig()['core']['general']['cache'];
+		$cls = go()->getConfig()['cache'];
 		go()->setCache(new $cls);
 
 		go()->rebuildCache();
