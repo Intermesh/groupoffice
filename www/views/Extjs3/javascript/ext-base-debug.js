@@ -2031,7 +2031,12 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
         },
 
         // This function should ALWAYS be called from Ext.EventManager
-        addListener: function(el, eventName, fn) {
+        addListener: function(el, eventName, fn, opt) {
+
+            if(!opt) {
+                opt = {capture: false}
+            }
+
             el = Ext.getDom(el);
             if (el && fn) {
                 if (eventName == UNLOAD) {
@@ -2041,7 +2046,7 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
                     unloadListeners[el.id].push([eventName, fn]);
                     return fn;
                 }
-                return doAdd(el, eventName, fn, false);
+                return doAdd(el, eventName, fn, opt);
             }
             return false;
         },

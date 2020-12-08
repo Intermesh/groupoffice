@@ -5011,13 +5011,13 @@ Ext.EventManager = function(){
      }
 
     
-    function addListener(el, ename, fn, task, wrap, scope){
+    function addListener(el, ename, fn, task, wrap, scope, opt){
         el = Ext.getDom(el);
         var id = getId(el),
             es = Ext.elCache[id].events,
             wfn;
 
-        wfn = E.on(el, ename, wrap);
+        wfn = E.on(el, ename, wrap, opt);
         es[ename] = es[ename] || [];
 
         
@@ -5218,7 +5218,7 @@ Ext.EventManager = function(){
             h = createBuffered(h, o, task);
         }
 
-        addListener(el, ename, fn, task, h, scope);
+        addListener(el, ename, fn, task, h, scope, o.passive ? {passive: true} : false);
         return h;
     }
 
@@ -30260,7 +30260,7 @@ Ext.TabPanel = Ext.extend(Ext.Panel,  {
             contextmenu: this.onStripContextMenu
         });
         if(this.enableTabScroll){
-            this.mon(this.strip, 'mousewheel', this.onWheel, this);
+            this.mon(this.strip, 'mousewheel', this.onWheel, this, {passive: true});
         }
     },
 
@@ -30775,7 +30775,7 @@ Ext.TabPanel = Ext.extend(Ext.Panel,  {
 
     onWheel : function(e){
         var d = e.getWheelDelta()*this.wheelIncrement*-1;
-        e.stopEvent();
+       // e.stopEvent();
 
         var pos = this.getScrollPos(),
             newpos = pos + d,
