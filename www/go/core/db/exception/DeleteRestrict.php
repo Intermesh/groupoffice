@@ -1,5 +1,5 @@
 <?php
-namespace go\core\db\Exception;
+namespace go\core\db\exception;
 
 use Exception;
 use go\core\orm\Record;

@@ -7,7 +7,8 @@ use GO;
 use GO\Base\Observable;
 use go\core\auth\State as AuthState;
 use go\core\cache\CacheInterface;
-use go\core\db\Connection;
+	use go\core\cache\Memcached;
+	use go\core\db\Connection;
 use go\core\db\Database;
 use go\core\db\Query;
 use go\core\db\Table;
@@ -386,28 +387,18 @@ use const GO_CONFIG_FILE;
 								"name" => $config['product_name'] ?? "GroupOffice"
 							],						
 					],
-					
-//					"package" => [
-//							"name" => [
-//									"foo" => 'bar'
-//							]
-//					]
+
 			]))->mergeRecursive($config)->getArray();
 			
-			if(!isset($this->config['core']['general']['cache'])) {
+			if(!isset($this->config['cache'])) {
 				if(cache\Apcu::isSupported()) {
-					$this->config['core']['general']['cache'] = cache\Apcu::class;
+					$this->config['cache'] = cache\Apcu::class;
 				} else
 				{
-					$this->config['core']['general']['cache'] = cache\Disk::class;
+					$this->config['cache'] = cache\Disk::class;
 				}
 			}
 
-			// if(isset($cacheKey)) {
-			// 	$this->config['cacheTime'] = time();
-			// 	apcu_store($cacheKey, $this->config);
-			// }
-			
 			if(Request::get()->getHeader('X-Debug') == "1") {
 				$this->config['core']['general']['debug'] = true;
 			}
@@ -475,7 +466,7 @@ use const GO_CONFIG_FILE;
 		 */
 		public function getCache() {
 			if (!isset($this->cache)) {				
-				$cls = $this->getConfig()['core']['general']['cache'];
+				$cls = $this->getConfig()['cache'];
 				// go()->log("Using cache: " . $cls);
 				$this->cache = new $cls;
 			}
