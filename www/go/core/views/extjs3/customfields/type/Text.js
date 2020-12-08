@@ -36,7 +36,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	},
 	
 	/**
-	 * Returns config oject to create the form field 
+	 * Returns config object to create the form field
 	 * 
 	 * @param {object} customfield customfield Field entity from custom fields
 	 * @param {object} config Extra config options to apply to the form field
@@ -45,32 +45,32 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	createFormFieldConfig : function( customfield, config) {
 		config = config || {};
 
-		if (!GO.util.empty(customfield.options.validationRegex)) {
+		var required = customfield.required;
 
-			if (!GO.util.empty(customfield.options.validationModifiers))
+		if (!go.util.empty(customfield.options.validationRegex)) {
+
+			if (!go.util.empty(customfield.options.validationModifiers)) {
 				config.regex = new RegExp(customfield.options.validationRegex, customfield.options.validationModifiers);
-			else
+			} else {
 				config.regex = new RegExp(customfield.options.validationRegex);
+			}
 		}
 
-		if (!GO.util.empty(customfield.hint)) {
+		if (!go.util.empty(customfield.hint)) {
 			config.hint = customfield.hint;
 		}
 
 		var fieldLabel = customfield.name;
 
-		if (!GO.util.empty(customfield.prefix))
+		if (!go.util.empty(customfield.prefix)) {
 			fieldLabel = fieldLabel + ' (' + customfield.prefix + ')';
-
-		if (!GO.util.empty(customfield.required)) {
-			fieldLabel += '*';
 		}
 
 		if (customfield.options.maxLength) {
 			config.maxLength = customfield.options.maxLength;
 		}
 
-		if (!GO.util.empty(customfield.relatedFieldCondition)) {
+		if (!go.util.empty(customfield.relatedFieldCondition)) {
 			config.checkRequiredCondition = this.checkRequiredCondition;
 			if (customfield.type === 'Select') {
 				config.validate = function () {
@@ -84,7 +84,6 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 				}
 			} else {
 				config.validateValue = function () {
-
 					this.checkRequiredCondition.call(this, customfield, this);
 					return Ext.form.Field.prototype.validateValue.apply(this);
 				}
@@ -95,71 +94,16 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			xtype: 'textfield',
 			serverFormats: false, //for backwards compatibility with old framework. Can be removed when all is refactored.
 			name: 'customFields.' + customfield.databaseName,
-			fieldLabel: fieldLabel,
+			fieldLabel: fieldLabel + (required ? '*' : ''),
 			anchor: '100%',
-			allowBlank: !customfield.required,
+			allowBlank: !required,
 			value: customfield.default,
 			hidden: customfield.conditionallyHidden || false,
 			conditionallyHidden: customfield.conditionallyHidden || false,
 			conditionallyRequired: customfield.conditionallyRequired || false
 		}, config);
-
-		//ALTER TABLE `core_customfields_field`
-		// ADD `conditionallyHidden` tinyint(1) NOT NULL DEFAULT '0' AFTER `requiredCondition`;
 	},
 
-	// /**
-	//  *
-	//  * @param field
-	//  * @returns {boolean}
-	//  * @private
-	//  */
-	// _changeRelatedFieldsVisibility: function(field) {
-	// 	// if (!field.relatedFields) {
-	// 	// 	return false;
-	// 	// }
-	// 	//
-	// 	// // relatedFields are populated in FormFieldSet. The validation of this field can affect visibility of other fields
-	// 	// // using this fields value in the requiredCondition
-	// 	// Ext.each(field.relatedFields, function(relatedField) {
-	// 	// 	relatedField.validate();
-	// 	// }, field);
-	// },
-
-	/**
-	 * @param customField
-	 * @returns {*}
-	 */
-	getRequiredConditionField: function(customField) {
-		var condition = customField.field.relatedFieldCondition,
-			form = this.findParentByType('form').getForm(),
-			conditionParts,
-			field, fieldName;
-
-		if (Ext.isEmpty(condition)) {
-			return false;
-		}
-
-		if (condition.includes('is empty')) {
-			condition = condition.replace('is empty', '');
-			fieldName = condition.trim(' ');
-			field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
-		} else if (condition.includes('is not empty')) {
-			condition = condition.replace('is not empty', '');
-			fieldName = condition.trim(' ');
-			field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
-		} else {
-			conditionParts = condition.split(' ');
-			if (conditionParts.length === 3) { //valid condition
-				field = form.findField(conditionParts[0]) || form.findField('customFields.' + conditionParts[0]);
-				if (!field) {
-					field = form.findField(conditionParts[2]) || form.findField('customFields.' + conditionParts[2]);
-				}
-			}
-		}
-
-		return field;
-	},
 
 	/**
 	 * Required condition validator
@@ -167,85 +111,103 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	 * @param customfield
 	 */
 	checkRequiredCondition: function (customfield) {
-
 		this.requiredConditionMatches = false;
 
-		var condition = customfield.relatedFieldCondition,
+		var arConditions,
+			condition,
+			conditionType = null,
 			form,
 			conditionParts,
-			isEmptyCondition = false,
-			isNotEmptyCondition = false,
+			match = true,
 			field, fieldName, operator,
 			value, fieldValue;
 
-		if (Ext.isEmpty(condition)) {
+		if (Ext.isEmpty(customfield.relatedFieldCondition)) {
 			return false;
 		}
 
 		form = this.findParentByType('form').getForm();
+		arConditions = customfield.relatedFieldCondition.split(/\ (AND|OR)\ /);
 
-		if (condition.includes('is empty')) {
-			isEmptyCondition = true;
-			condition = condition.replace('is empty', '');
-			fieldName = condition.trim(' ');
-			field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
-		} else if (condition.includes('is not empty')) {
-			isNotEmptyCondition = true;
-			condition = condition.replace('is not empty', '');
-			fieldName = condition.trim(' ');
-			field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
-		} else {
-			conditionParts = condition.split(' ');
-			if (conditionParts.length > 2) { //valid condition
-				fieldName = conditionParts.shift();
-				operator = conditionParts.shift();
+		for (var ii=0,il=arConditions.length;ii<il;ii++) {
+			var	isEmptyCondition = false, isNotEmptyCondition = false;
+
+			condition = arConditions[ii];
+			if(condition === "AND" || condition === 'OR') {
+				conditionType = condition;
+				continue;
+			}
+			if (condition.includes('is empty')) {
+				isEmptyCondition = true;
+				condition = condition.replace('is empty', '');
+				fieldName = condition.trim();
 				field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
-				value = conditionParts.join(" ").trim();
+			} else if (condition.includes('is not empty')) {
+				isNotEmptyCondition = true;
+				condition = condition.replace('is not empty', '');
+				fieldName = condition.trim();
+				field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
+			} else {
+				conditionParts = condition.split(' ');
+				if (conditionParts.length > 2) { //valid condition
+					fieldName = conditionParts.shift();
+					operator = conditionParts.shift();
+					field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
+					value = conditionParts.join(" ").trim();
+				}
 			}
-		}
-
-		if (!field) {
-			return false;
-		}
-
-		fieldValue = field.getRawValue ? field.getRawValue() : field.getValue();
-
-
-		if (field.xtype === 'xcheckbox' || field.xtype === 'checkbox') {
-			fieldValue = fieldValue | 0;
-			if(value === "true") {
-				value = 1;
-			} else if(value === "false") {
-				value = 0;
+			if (!field) {
+				return false;
 			}
-		}
 
+			fieldValue = field.getRawValue ? field.getRawValue() : field.getValue();
 
-		console.log(fieldValue, value, operator);
+			if (field.xtype === 'xcheckbox' || field.xtype === 'checkbox') {
+				fieldValue = fieldValue | 0;
+				if(value == "true") {
+					value = 1;
+				} else if(value == "false") {
+					value = 0;
+				}
+			}
 
-		if (isEmptyCondition) {
-			this.requiredConditionMatches = !Ext.isEmpty(fieldValue);
-		} else if (isNotEmptyCondition) {
-			this.requiredConditionMatches = Ext.isEmpty(fieldValue);
-		} else {
-			switch (operator) {
-				case '=':
-				case '==':
-					this.requiredConditionMatches = (fieldValue == value);
+			// console.log(fieldValue, value, operator);
+
+			if (isEmptyCondition) {
+				match = !Ext.isEmpty(fieldValue);
+			} else if (isNotEmptyCondition) {
+				match = Ext.isEmpty(fieldValue);
+			} else {
+				switch (operator) {
+					case '=':
+					case '==':
+						match = (fieldValue == value);
+						break;
+					case '>':
+						match = (fieldValue > value);
+						break;
+					case '<':
+						match = (fieldValue < value);
+						break
+				}
+			}
+			switch (conditionType) {
+				case 'AND':
+					this.requiredConditionMatches = (this.requiredConditionMatches && match);
 					break;
-				case '>':
-					this.requiredConditionMatches = (fieldValue > value);
+				case 'OR':
+					this.requiredConditionMatches = (this.requiredConditionMatches || match);
 					break;
-				case '<':
-					this.requiredConditionMatches = (fieldValue < value);
-					break
+				default:
+					this.requiredConditionMatches = match;
 			}
 		}
 
 		var customFieldCmp = this;
-
 		if(customfield.conditionallyRequired) {
 			customFieldCmp.allowBlank = !this.requiredConditionMatches;
+			customfield.allowBlank = !this.requiredConditionMatches;
+			customfield.fieldLabel = customfield.name + (!customfield.allowBlank ?'*' : '');
 			if (this.xtype === 'treeselectfield') {
 				this.items.itemAt(0).allowBlank = !this.requiredConditionMatches;
 			}
@@ -394,4 +356,3 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	
 });
 
-// go.customfields.CustomFields.registerType(new go.customfields.type.Text());

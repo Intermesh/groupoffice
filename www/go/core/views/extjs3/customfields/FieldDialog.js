@@ -140,11 +140,23 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 						hint: "eg. 'nameOfStandardOrCustomField = test'",
 						listeners: {
 							valid: function(elm) {
+								// TODO: Clean out duplicated code
 								var value = elm.getValue();
 								if(!Ext.isEmpty(value)) {
-									var re=/(={1,2}|<|>)/;
-									var arVal = String(value).split(re);
-									elm.setRawValue(arVal[0].trim() + " " + arVal[1]  + " " + arVal[2].trim());
+									var strRawValue = ""
+
+									var reConditions=/(={1,2}|<|>)/,reAdjuncts=/\ (AND|OR)\ /;
+									var arSubConditions = String(value).split(reAdjuncts);
+									for(var i=0,l=arSubConditions.length;i<l;i++) {
+										var strCond = arSubConditions[i];
+										if (strCond === "AND" || strCond === "OR") {
+											strRawValue += (" " + strCond + " ");
+											continue;
+										}
+										var arVal = String(strCond).split(reConditions);
+										strRawValue += (arVal[0].trim() + " " + arVal[1] + " " + arVal[2].trim());
+									}
+									elm.setRawValue(strRawValue);
 								}
 							},
 							scope: this
@@ -154,10 +166,20 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 							if(Ext.isEmpty(value)) {
 								return true;
 							}
-							var re=/(={1,2}|<|>)/;
-							var arVal = String(value).split(re);
-							if(arVal.length !== 3) {
-								return t('The value was not formatted correctly');
+							// TODO: Clean out duplicated code
+
+							var reConditions=/(={1,2}|<|>)/,reAdjuncts=/\ (AND|OR)\ /;
+							var arSubConditions = String(value).split(reAdjuncts);
+							for(var i=0,l=arSubConditions.length;i<l;i++) {
+								var strCond = arSubConditions[i];
+								if(strCond === "AND" || strCond === "OR") {
+									continue;
+								}
+								var arVal = String(strCond).split(reConditions);
+								if(arVal.length !== 3) {
+									return t('The value was not formatted correctly');
+								}
+
 							}
 
 							return true;

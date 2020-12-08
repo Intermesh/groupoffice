@@ -329,7 +329,9 @@ class Field extends AclItemEntity {
 		}
 		
 		return parent::internalDelete($query);
-}
+	}
+
+	private $tableName;
 
   /**
    * Get the table name this field is stored in.
@@ -338,14 +340,18 @@ class Field extends AclItemEntity {
    * @throws Exception
    */
 	public function tableName() {
-		$fieldSet = FieldSet::findById($this->fieldSetId);
-		$entityName = $fieldSet->getEntity();
-		$entityType = EntityType::findByName($entityName);
-		if(!$entityType) {
-			throw new Exception("EntityType '$entityName' not found for custom field ".$this->name.' ('. $this->id.')');
+		if(!isset($this->tableName)) {
+			$fieldSet = FieldSet::findById($this->fieldSetId);
+			$entityName = $fieldSet->getEntity();
+			$entityType = EntityType::findByName($entityName);
+			if (!$entityType) {
+				throw new Exception("EntityType '$entityName' not found for custom field " . $this->name . ' (' . $this->id . ')');
+			}
+			$entityCls = $entityType->getClassName();
+			$this->tableName = $entityCls::customFieldsTableName(); //From customfieldstrait
 		}
-		$entityCls = $entityType->getClassName();
-		return $entityCls::customFieldsTableName(); //From customfieldstrait
+
+		return $this->tableName;
 	}
 	
 	protected static function defineFilters() {
