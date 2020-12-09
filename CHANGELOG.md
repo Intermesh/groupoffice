@@ -1,3 +1,6 @@
+6.4.197
+- Core: Begfix in cronjobs new FW
+
 07-12-2020 6.4.196
 - Startpage: bugfix when removing a portlet for the second time
 - Email: Fixed download / save bug with multiple inline attachments
