@@ -585,6 +585,34 @@ function test_system(){
 				$test['feedback'] = 'Fatal error: the file_storage_path setting in config.php is not writable. You must correct this or ' . $product_name . ' will not run.';
 				$test['fatal'] = false;
 				$tests[] = $test;
+			}
+
+			$conn = go()->getDbConnection();
+			if($conn) {
+				if(go()->getDatabase()->isMariaDB()) {
+					$test['name'] = 'MariaDB version';
+					$test['showSuccessFeedback'] = false;
+					$test['pass'] =  version_compare( go()->getDatabase()->getVersion(), "10.0.5", ">=");
+					$test['feedback'] = "MariaDB 10.0.5 or greater is required";
+					$test['fatal'] = true;
+					$tests[] = $test;
+
+				} else{
+					$test['name'] = 'Buggy MySQL version';
+					$test['showSuccessFeedback'] = false;
+					$test['pass'] =  go()->getDatabase()->getVersion() != "8.0.22";
+					$test['feedback'] = "MySQL 8.0.22 has a bug which causes Group-Office to mailfunction: https://bugs.mysql.com/bug.php?id=101575";
+					$test['fatal'] = true;
+					$tests[] = $test;
+
+					$test['name'] = 'MySQL version';
+					$test['showSuccessFeedback'] = false;
+					$test['pass'] =  version_compare(go()->getDatabase()->getVersion(), "5.7.0", ">=");
+					$test['feedback'] = "MySQL 5.7.0 or greater is required";
+					$test['fatal'] = true;
+					$tests[] = $test;
+				}
+
 
 				$test['name'] = 'Cronjob';
 				$test['showSuccessFeedback'] = false;
@@ -594,7 +622,7 @@ function test_system(){
 				$tests[] = $test;
 			}
 		} catch(Exception $e) {
-
+			//var_dump($e);
 		}
 	}
 	

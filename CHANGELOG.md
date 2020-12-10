@@ -23,6 +23,7 @@ end 6.5
 6.4.197
 - Core: Bugfix in cronjobs new FW
 - Multi instance: All modules were always checked
+- Core: Check MySQL / MariaDB server version. MySQL 8.0.22 has a bug which causes problems.
 
 07-12-2020 6.4.196
 - Startpage: bugfix when removing a portlet for the second time
