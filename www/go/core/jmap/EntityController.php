@@ -392,12 +392,13 @@ abstract class EntityController extends Controller {
 		$result['list'] = [];
 		$result['notFound'] = [];
 
-		$useCache = !empty(go()->getConfig()['cacheEntities']);
+//		$useCache = !empty(go()->getConfig()['cacheEntities']);
 
 		foreach($p['ids'] as $id) {
 
-			$arr = $useCache ? $this->getEntityArrayFromCache($id, $p['properties']) : $this->getEntityArray($id, $p['properties']);
+//			$arr = $useCache ? $this->getEntityArrayFromCache($id, $p['properties']) : $this->getEntityArray($id, $p['properties']);
 
+			$arr = $this->getEntityArray($id, $p['properties']);
 			if(!$arr) {
 				$result['notFound'][] = $id;
 			} else {
@@ -419,27 +420,28 @@ abstract class EntityController extends Controller {
 		return $e->toArray($properties);
 	}
 
-	private function getEntityArrayFromCache($id, $properties) {
-		$key = $this->entityClass() . '-toArray-' . $id;
-		$arr = go()->getCache()->get($key);
-
-		if(!$arr) {
-			$e = $this->getEntity($id);
-			if(!$e) {
-				return false;
-			} else {
-				$arr = $e->toArray();
-				$arr['id'] = $e->id();
-				go()->getCache()->set($key, $arr);
-			}
-		}
-
-		if(!empty($properties)) {
-			$arr = array_intersect_key($arr, array_flip($properties));
-		}
-
-		return $arr;
-	}
+	// Caching doesn't work because entities can contain user specific props like user tables and getPermissionLevel()
+//	private function getEntityArrayFromCache($id, $properties) {
+//		$key = $this->entityClass() . '-toArray-' . $id;
+//		$arr = go()->getCache()->get($key);
+//
+//		if(!$arr) {
+//			$e = $this->getEntity($id);
+//			if(!$e) {
+//				return false;
+//			} else {
+//				$arr = $e->toArray();
+//				$arr['id'] = $e->id();
+//				go()->getCache()->set($key, $arr);
+//			}
+//		}
+//
+//		if(!empty($properties)) {
+//			$arr = array_intersect_key($arr, array_flip($properties));
+//		}
+//
+//		return $arr;
+//	}
 	
 	/**
 	 * Takes the request arguments, validates them and fills it with defaults.
