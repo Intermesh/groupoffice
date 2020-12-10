@@ -10,6 +10,18 @@ class Database {
 
 	private $conn;
 
+	/**
+	 *
+	 * MariaDB:
+	 * 10.5.8-MariaDB-1:10.5.8+maria~focal
+	 *
+	 * Mysql:
+	 * 8.0.22
+	 *
+	 * @var string
+	 */
+	private $version;
+
 	public function __construct(Connection $conn = null) {
 		$this->conn = $conn ?? go()->getDbConnection();
 	}
@@ -22,6 +34,30 @@ class Database {
 	 */
 	public function hasTable($name) {
 		return in_array($name, $this->getTableNames());
+	}
+
+	private function queryVersion() {
+		if(!isset($this->version)) {
+			$this->version = go()->getDbConnection()->query("SELECT VERSION()")->fetchColumn(0);
+		}
+
+		return $this->version;
+	}
+
+	public function isMariaDB() {
+		return stristr($this->queryVersion(), 'mariadb');
+	}
+
+	/**
+	 *
+	 * @return string eg. 10.0.2
+	 */
+	public function getVersion() {
+		if($this->isMariaDB()) {
+			return explode('-', $this->queryVersion())[0];
+		} else{
+			return $this->queryVersion();
+		}
 	}
 	
 	

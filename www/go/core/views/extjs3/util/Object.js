@@ -79,8 +79,9 @@
             var ret;
 
             parts.forEach(function(part) {
-                ret = obj = traverse(obj, part);
+                ret = obj = traverse(obj, part, {});
             });
+
 
             traverse(obj, last, value);
 
