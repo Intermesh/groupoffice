@@ -1,3 +1,5 @@
+6.4.197
+- Core: Bugfix in cronjobs new FW
 - Multi instance: All modules were always checked
 
 07-12-2020 6.4.196
