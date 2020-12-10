@@ -191,6 +191,8 @@ abstract class Settings extends Model {
 			}
 		}
 
+		$this->oldData = (array) $this;
+
 		go()->getCache()->set(static::class, $this);
 		
 		return true;
