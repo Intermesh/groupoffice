@@ -166,7 +166,7 @@ class Message extends \Swift_Message{
 			try{
 				$this->addTo($email, $personal);
 			} catch (Exception $e){
-				trigger_error('Failed to add receipient address: '.$e);
+				\go\core\ErrorHandler::logException($e);
 			}
 		}
 		
@@ -176,7 +176,7 @@ class Message extends \Swift_Message{
 			try{
 				$this->addCc($email, $personal);
 			} catch (Exception $e){
-				trigger_error('Failed to add CC address: '.$e);
+				\go\core\ErrorHandler::logException($e);
 			}
 		}
 		
@@ -186,7 +186,7 @@ class Message extends \Swift_Message{
 			try{
 				$this->addBcc($email, $personal);
 			} catch (Exception $e){
-				trigger_error('Failed to add BCC address: '.$e);
+				\go\core\ErrorHandler::logException($e);
 			}
 		}
 

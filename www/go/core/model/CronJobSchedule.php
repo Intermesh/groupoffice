@@ -157,21 +157,28 @@ class CronJobSchedule extends Entity {
 	 */
 	public static function runNext() {
 
-		$job = self::find()->where('enabled', '=', true)
+		$jobs = self::find()->where('enabled', '=', true)
 						->andWhere((new Criteria())
 							->andWhere('nextRunAt', '<=', new DateTime())
 							->orWhere('nextRunAt', 'IS', null)
 						)
-						->orderBy(['nextRunAt' => 'ASC'])->single();
-
-		if ($job) {
-			$job->run();
-
-			return true;
-		} else {
-			go()->debug("No cron job to run a this time");
+						->orderBy(['nextRunAt' => 'ASC'])->all();
+		if(count($jobs) === 0) {
 			return false;
 		}
+		foreach($jobs as $job) {
+			$job->run();
+		}
+		return true;
+
+//		if ($job) {
+//			$job->run();
+//
+//			return true;
+//		} else {
+//			go()->debug("No cron job to run a this time");
+//			return false;
+//		}
 	}
 
 	/**

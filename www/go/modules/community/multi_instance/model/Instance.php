@@ -676,7 +676,7 @@ class Instance extends Entity {
 				];
 			}
 			if ($checkAllowed) {
-				$avMod['allowed'] = \GO\Base\ModuleCollection::isAllowed($avMod['module'], $avMod['package']);
+				$avMod['allowed'] = \GO\Base\ModuleCollection::isAllowed($avMod['module'], $avMod['package'], $instanceConfig['allowed_modules']);
 			} else {
 				$avMod['allowed'] = true;
 			}
