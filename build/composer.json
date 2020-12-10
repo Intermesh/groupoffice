@@ -1,0 +1,15 @@
+{
+  "name": "intermesh/release-groupoffice",
+  "description": "Group-Office release script",
+  "require": {
+    "knplabs/github-api": "^2.15",
+    "php-http/guzzle6-adapter": "^2.0"
+  },
+  "license": "AGPL",
+  "authors": [
+    {
+      "name": "Merijn Schering",
+      "email": "mschering@intermesh.nl"
+    }
+  ]
+}

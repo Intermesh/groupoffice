@@ -1,11 +1,13 @@
 <?php
 require('../vendor/autoload.php');
+\go\core\App::get();
 
 ini_set('zlib.output_compression', 0);
 ini_set('implicit_flush', 1);
 
 
 require("gotest.php");
+
 if(!systemIsOk()) {
 	header("Location: test.php");
 	exit();

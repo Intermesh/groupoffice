@@ -451,6 +451,9 @@ class Installer {
 		$this->enableGarbageCollection();
 		echo "Done!\n";
 
+		ob_flush();
+		flush();
+
 		ob_end_clean();
 	}
 	

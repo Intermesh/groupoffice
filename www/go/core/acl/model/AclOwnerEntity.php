@@ -368,9 +368,10 @@ abstract class AclOwnerEntity extends AclEntity {
 	 */
 	public static function check()
 	{
-		$tables = static::getMapping()->getTables();
-		$table = array_values($tables)[0]->getName();
+		$table = static::getMapping()->getPrimaryTable();
 
+
+		//set owner and entity properties of acl
 		$aclColumn = static::getMapping()->getColumn(static::$aclColumnName);
 
 		$updates = [
@@ -379,9 +380,19 @@ abstract class AclOwnerEntity extends AclEntity {
 			'acl.usedIn' => $aclColumn->table->getName() . '.' . static::$aclColumnName
 			];
 
-		$hasCreatedBy = static::getMapping()->getColumn('createdBy');
+		$createdByColumn = static::getMapping()->getColumn('createdBy');
 
-		if($hasCreatedBy) {
+		if($createdByColumn) {
+
+			//correct deleted users. Created by sometimes doesn't have a correct foreign key
+
+			go()->getDbConnection()->update(
+				$table->getName(),
+				['createdBy' => $createdByColumn->nullAllowed ? null : 1],
+				(new Query())
+					->where("id not in (select id from core_user)"))
+				->execute();
+
 			$updates['acl.ownedBy'] = new Expression('coalesce(entity.createdBy, 1)');
 		}
 
@@ -390,7 +401,7 @@ abstract class AclOwnerEntity extends AclEntity {
       $updates,
       (new Query())
         ->tableAlias('acl')
-        ->join($table, 'entity', 'entity.' . static::$aclColumnName . ' = acl.id'));
+        ->join($table->getName(), 'entity', 'entity.' . static::$aclColumnName . ' = acl.id'));
   
 		if(!$stmt->execute()) {
 			throw new Exception("Could not update ACL");

@@ -9,6 +9,7 @@ ini_set('implicit_flush', 1);
 try {
 	
 	require('../vendor/autoload.php');
+	\go\core\App::get();
 
 	require("gotest.php");
 	if(!systemIsOk()) {
