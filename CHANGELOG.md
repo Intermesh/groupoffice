@@ -3,7 +3,7 @@
 - Multi instance: All modules were always checked
 - Core: Check MySQL / MariaDB server version. MySQL 8.0.22 has a bug which causes problems.
 - Core: Some CSV files could not be imported.
-
+- Core: Don't log 404 not found as errors
 
 07-12-2020 6.4.196
 - Startpage: bugfix when removing a portlet for the second time
