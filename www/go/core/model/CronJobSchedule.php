@@ -167,6 +167,7 @@ class CronJobSchedule extends Entity {
 			return false;
 		}
 		foreach($jobs as $job) {
+			go()->debug("Running " . $job->name);
 			$job->run();
 		}
 		return true;

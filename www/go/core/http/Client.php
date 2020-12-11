@@ -2,6 +2,7 @@
 namespace go\core\http;
 
 use go\core\fs\File;
+use go\core\util\JSON;
 
 class Client {
 
@@ -67,13 +68,45 @@ class Client {
     ];
   }
 
-  public function post($url, array $params) {
-    $params = array_merge($this->baseParams, $params);
+	/**
+	 * POST JSON body
+	 *
+	 * @param string $url
+	 * @param array $data
+	 * @return array
+	 * @throws \Exception
+	 */
+  public function postJson($url, $data) {
+  	$str = JSON::encode($data);
+
+  	$this->setOption(CURLOPT_HTTPHEADER, array(
+			  'Content-Type: application/json; charset=utf-8',
+			  'Content-Length: ' . strlen($str)
+		  )
+	  );
+
+  	$response =  $this->post($url, $str);
+  	$response['body'] = JSON::decode($response['body']);
+
+  	return $response;
+  }
+
+	/**
+	 * @param $url
+	 * @param array|string $data Array of HTTP post fields or string for RAW body.
+	 * @return array
+	 * @throws \Exception
+	 */
+  public function post($url, $data) {
+  	if(is_array($data)) {
+		  $data = array_merge($this->baseParams, $data);
+		  $this->setOption(CURLOPT_CUSTOMREQUEST, "POST");
+	  } else{
+		  $this->setOption(CURLOPT_POST, true);
+	  }
     
     $this->initRequest($url);
-
-    $this->setOption(CURLOPT_POST, true);
-		$this->setOption(CURLOPT_POSTFIELDS, $params);
+		$this->setOption(CURLOPT_POSTFIELDS, $data);
 		
     $body = curl_exec($this->getCurl());
 		
