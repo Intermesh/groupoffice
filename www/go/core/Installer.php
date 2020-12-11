@@ -414,12 +414,14 @@ class Installer {
 		echo "Rebuilding cache\n";
 
 		//reset new cache
-		$cls = go()->getConfig()['core']['general']['cache'];
+		$cls = go()->getConfig()['cache'];
 		go()->setCache(new $cls);
 
-		go()->rebuildCache();
+
 		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
 		App::get()->getSettings()->save();
+
+		go()->rebuildCache();
 		
 		echo "Registering all entities\n";		
 		$modules = model\Module::find()->where(['enabled' => true])->all();
@@ -445,6 +447,9 @@ class Installer {
 
 		$this->enableGarbageCollection();
 		echo "Done!\n";
+
+		ob_flush();
+		flush();
 
 		ob_end_clean();
 	}

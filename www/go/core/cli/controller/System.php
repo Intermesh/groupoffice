@@ -1,6 +1,7 @@
 <?php
 namespace go\core\cli\controller;
 
+use go\core\cache\None;
 use go\core\Controller;
 use go\core\db\Query;
 use go\core\db\Table;
@@ -37,6 +38,9 @@ class System extends Controller {
 	 * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php core/System/upgrade
 	 */
 	public function upgrade() {
+
+		go()->setCache(new None());
+
 		go()->getInstaller()->isValidDb();
 		go()->setCache(new \go\core\cache\None());	
 		Table::destroyInstances();

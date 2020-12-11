@@ -4,13 +4,12 @@ namespace go\core\cache;
 
 use Exception;
 use go\core\App;
-use go\core\cache\CacheInterface;
 use go\core\ErrorHandler;
 use go\core\fs\File;
 
 /**
  * Cache implementation that uses serialized objects in files on disk.
- * The cache is persistent accross requests.
+ * The cache is persistent across requests.
  * 
  * @copyright (c) 2014, Intermesh BV http://www.intermesh.nl
  * @author Merijn Schering <mschering@intermesh.nl>

@@ -961,6 +961,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if(!GO::user())
 			return false;
 
+		if(GO::user()->isAdmin()) {
+			return \GO\Base\Model\Acl::MANAGE_PERMISSION;
+		}
+
 		//if($this->isNew && !$this->joinAclField){
 		if(empty($this->{$this->aclField()}) && !$this->isJoinedAclField){
 			return $this->getPermissionLevelForNewModel();

@@ -112,7 +112,7 @@ class Router{
 			$params = array_merge($_REQUEST, \GO::request()->post);
 		}
 						
-		$r = !empty($params['r']) ?  explode('/', $params['r']): array();		
+		$r = !empty($params['r']) ?  explode('/', $params['r']): array();
 		$this->_r=isset($params['r']) ? $params['r'] : "";
 					
 		if(\GO::config()->debug || \GO::config()->debug_log){
@@ -151,9 +151,15 @@ class Router{
 		$controllerClass.='Controller\\'.$controller.'Controller';
 		
 		if(preg_match('/[^A-Za-z0-9_\\\\]+/', $controllerClass, $matches)){
-			$err = "Only these charactes are allowed in controller names: A-Za-z0-9_";
-			echo $err;
-			trigger_error($err, E_USER_ERROR);
+			//throw new \Exception("Only these charactes are allowed in controller names: A-Za-z0-9_");
+			header("HTTP/1.0 404 Not Found");
+			header("Status: 404 Not Found");
+
+			$errorMsg = "Controller('".Util\StringHelper::encodeHtml($controllerClass)."') not found";
+
+			echo '<h1>404 Not found</h1>';
+			echo '<p>'.$errorMsg.'</p>';
+			exit();
 		}
 		
 		$this->_action=$action;		
@@ -172,9 +178,7 @@ class Router{
 
 			echo '<h1>404 Not found</h1>';
 			echo '<p>'.$errorMsg.'</p>';
-			
-			if(\GO::config()->debug)
-				trigger_error($errorMsg, E_USER_ERROR);
+			exit();
 		}
 		
 		try{
@@ -191,9 +195,6 @@ class Router{
 
 			echo '<h1>404 Not found</h1>';
 			echo '<p>'.$errorMsg.'</p>';
-
-			if(\GO::config()->debug)
-				trigger_error($errorMsg, E_USER_ERROR);
 		}
 	}
 	
