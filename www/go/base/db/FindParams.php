@@ -242,6 +242,10 @@ class FindParams{
 	 * @return FindParams 
 	 */
 	public function join($tableName, $criteria, $tableAlias = false, $type='INNER'){
+
+		if(is_string($criteria)) {
+			$criteria = (new FindCriteria())->addRawCondition($criteria);
+		}
 				
 		if(!isset($this->_params['join']))
 			$this->_params['join']='';

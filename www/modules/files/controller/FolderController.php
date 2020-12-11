@@ -7,6 +7,7 @@ use Exception;
 use GO;
 use GO\Base\Exception\AccessDenied;
 use go\core\fs\Blob;
+use go\core\orm\SearchableTrait;
 use GO\Files\Model\Folder;
 
 class FolderController extends \GO\Base\Controller\AbstractModelController {
@@ -875,11 +876,11 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			$response['success'] = true;
 
-			$queryStr = !empty($params['query']) ? '%'.$params['query'].'%' : '%';
+			$queryStr = !empty($params['query']) ? $params['query'] : '';
 			$limit = !empty($params['limit']) ? $params['limit'] : 30;
 			$start = !empty($params['start']) ? $params['start'] : 0;
 
-			$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.aclId', 'sc.aclId', '=', false);
+			$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.aclId', 's.aclId', '=', false);
 
 			$aclWhereCriteria = \GO\Base\Db\FindCriteria::newInstance()
 					->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id), "a", false);
@@ -888,24 +889,21 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					->select('t.*')
 					->ignoreAcl()
 					->joinCustomFields()
-					->joinModel(array(
-						'model'=>'GO\Base\Model\SearchCacheRecord',
-						'localTableAlias'=>'t',
-						'localField'=>'id',
-						'foreignField'=>'entityId',
-						'tableAlias'=>'sc'
-					))
+					->join("core_search", "s.entityId = t.id AND s.entityTypeId = " . \GO\Files\Model\File::entityType()->getId(), "s")
+
 					->join(\GO\Base\Model\AclUsersGroups::model()->tableName(), $aclJoinCriteria, 'a', 'INNER')->debugSql()
-					->criteria(
-						\GO\Base\Db\FindCriteria::newInstance()
-							->addCondition('entityTypeId', \GO::getModel('GO\Files\Model\File')->modelTypeId(),  '=', 'sc', true)
-							->mergeWith(
-								\GO\Base\Db\FindCriteria::newInstance()
-									->addCondition('name', $queryStr, 'LIKE', 'sc', false)
-									->addCondition('keywords', $queryStr, 'LIKE', 'sc', false)
-							)
-							->mergeWith($aclWhereCriteria)
-					);
+					->criteria($aclWhereCriteria);
+
+			$i = 0;
+
+			$words = SearchableTrait::splitTextKeywords($queryStr);
+
+			foreach($words as $word) {
+
+				$findParams->join("core_search_word", 'w'.$i.'.searchId = s.id', 'w'.$i);
+				$findParams->getCriteria()->addCondition('word', $word . '%', 'LIKE', 'w'.$i);
+				$i++;
+			}
 			
 			if(isset($params['sort'])){
 
