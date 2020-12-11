@@ -703,4 +703,5 @@ class Instance extends Entity {
 		$this->setInstanceConfig($config);
 
 	}
+
 }
