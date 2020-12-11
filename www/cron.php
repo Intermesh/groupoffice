@@ -5,6 +5,18 @@ if(!empty($argv[1])) {
 
 require('GO.php');
 
+//The server manager calls cron via HTTP because it doesn't know the document root when running
+//multiple versions of GO.v It passes ?exec=1 to make it run on the command line.
+if(!empty($_GET['exec'])) {
+	$cmd = __FILE__ . " " . App::findConfigFile() . " &> /dev/null &";
+	//echo $cmd . "\n";
+	exec($cmd, $output, $result);
+	if($result !==  0) {
+		throw new Exception("Failed to run CRON with command: " . $cmd );
+	}
+	exit();
+}
+
 //new framework
 \go\modules\core\core\model\CronJobSchedule::runNext();
 
