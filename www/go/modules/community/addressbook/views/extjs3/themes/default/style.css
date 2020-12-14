@@ -1,12 +1,12 @@
 .go-addressbook-url.homepage:before {
   display: inline-block;
-  font-family: 'Material Icons';
+  font-family: "Material Icons";
   font-weight: normal;
   font-style: normal;
   font-size: 21px;
   /* Preferred icon size */
   /*	max-width: dp(24);
-	max-height: dp(24);*/
+  	max-height: dp(24);*/
   color: inherit;
   width: auto;
   height: auto;
@@ -20,43 +20,32 @@
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: 'liga'; }
+  font-feature-settings: "liga";
+}
 
 .go-module-icon-addressbook, .go-menu-icon-addressbook {
-  background: url("resources/addressbook.png"); }
+  background: url("resources/addressbook.png");
+}
 
 .go-addressbook-star {
-  color: #febf35; }
+  color: #febf35;
+}
 
 .go-addressbook-index-row:not(:first-child):before {
-  content: '';
+  content: "";
   top: -7px;
   position: absolute;
   width: 100%;
   display: block;
-  border-top: 1px solid rgba(0, 0, 0, 0.12); }
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
 
 .go-addressbook-index-row:not(:first-child) {
-<<<<<<< HEAD
-  border-top: 7px solid transparent;
-  margin-top: 7px;
-  box-shadow: 0px -1px 0 rgba(0, 0, 0, 0.12); }
-=======
   margin-top: 14px;
-<<<<<<< HEAD
   position: relative;
 }
->>>>>>> 50384002c6e8a46acbac32f7a8542dd05be99cec
 
 .go-addressbook-name-panel {
-<<<<<<< HEAD
-  padding: 14px; }
-  .go-addressbook-name-panel h4 {
-    top: -14px;
-    left: 49px; }
-  .go-addressbook-name-panel .go-addressbook-star {
-    margin-top: -7px; }
-=======
   padding: 14px;
 }
 .go-addressbook-name-panel h4, .go-addressbook-name-panel h3 {
@@ -65,26 +54,17 @@
 .go-addressbook-name-panel .go-addressbook-star {
   margin-top: -7px;
 }
->>>>>>> a24def39460d6cf71ac67e5b78601e5b6e388584
-=======
-  position: relative; }
-
-.go-addressbook-name-panel {
-  padding: 14px; }
-  .go-addressbook-name-panel h4, .go-addressbook-name-panel h3 {
-    margin: 0; }
-  .go-addressbook-name-panel .go-addressbook-star {
-    margin-top: -7px; }
->>>>>>> aa4fa5d8265c67d6d641441546d2f0fab8477529
 
 .go-addressbook-name {
   position: absolute;
   top: 14px;
-  right: 14px; }
+  right: 14px;
+}
 
 .go-addressbook-url-panel {
   text-align: right;
-  line-height: 17.5px; }
+  line-height: 17.5px;
+}
 
 .go-addressbook-url {
   height: 17.5px;
@@ -93,30 +73,35 @@
   background-position: center;
   background-size: contain;
   display: inline-block;
-  border-radius: 1px; }
-  .go-addressbook-url.linkedin {
-    background-image: url("resources/linkedin.png"); }
-  .go-addressbook-url.facebook {
-    background-image: url("resources/facebook.png"); }
-  .go-addressbook-url.twitter {
-    background-image: url("resources/twitter.png"); }
-  .go-addressbook-url.homepage {
-    background-color: #243a80;
-    border-radius: 2px; }
-    .go-addressbook-url.homepage:before {
-      font-size: 17.5px;
-      content: "home";
-      vertical-align: baseline;
-      line-height: inherit;
-      color: white; }
+  border-radius: 1px;
+}
+.go-addressbook-url.linkedin {
+  background-image: url("resources/linkedin.png");
+}
+.go-addressbook-url.facebook {
+  background-image: url("resources/facebook.png");
+}
+.go-addressbook-url.twitter {
+  background-image: url("resources/twitter.png");
+}
+.go-addressbook-url.homepage {
+  background-color: #243a80;
+  border-radius: 2px;
+}
+.go-addressbook-url.homepage:before {
+  font-size: 17.5px;
+  content: "home";
+  vertical-align: baseline;
+  line-height: inherit;
+  color: white;
+}
 
 .go-ab-avatar {
-  margin-right: 14px; }
+  margin-right: 14px;
+}
 
 .avatar.organization {
-  background-image: none; }
-<<<<<<< HEAD
-=======
+  background-image: none;
+}
 
 /*# sourceMappingURL=style.css.map */
->>>>>>> aa4fa5d8265c67d6d641441546d2f0fab8477529
