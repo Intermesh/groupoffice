@@ -382,9 +382,6 @@ go.modules.community.addressbook.typeStoreData = function (langKey) {
 	return types;
 };
 
-//go.Db.store("User");
-
-
 Ext.onReady(function () {
 	if (!go.modules.business || !go.modules.business.newsletters) {
 		return;

@@ -246,7 +246,6 @@ go.form.Dialog = Ext.extend(go.Window, {
 	},
 
 	load: function (id) {
-		
 		var me = this;
 
 		me.loading = true;
