@@ -3,6 +3,7 @@ namespace go\core\orm;
 
 use go\core\customfield\Html;
 use go\core\customfield\TextArea;
+use go\core\db\Criteria;
 use go\core\db\Query;
 
 /**
@@ -63,6 +64,26 @@ trait SearchableTrait {
 
 
 		return $keywords;
+	}
+
+	public static function addCriteria(Criteria $criteria, Query $query, $searchPhrase) {
+		$i = 0;
+		$words = SearchableTrait::splitTextKeywords($searchPhrase);
+		$words = array_unique($words);
+
+		foreach($words as $word) {
+			$query->join("core_search_word", 'w'.$i, 'w'.$i.'.searchId = search.id');
+			//$query->join("core_search_word_reverse", 'wr'.$i, 'wr'.$i.'.searchId = s.id');
+
+			$c = new Criteria();
+			$c
+				->where('w'.$i.'.word', 'LIKE', $word . '%')
+				->orWhere('w'.$i.'.drow', 'LIKE', strrev($word) . '%');
+
+			$criteria->where($c);
+
+			$i++;
+		}
 	}
 
 	/**
