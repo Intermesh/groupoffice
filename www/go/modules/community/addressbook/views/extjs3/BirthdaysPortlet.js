@@ -2,34 +2,45 @@ go.modules.community.addressbook.BirthdaysPortlet = function (config) {
 	if (!config) {
 		config = {};
 	}
-
 	config.id = 'su-birthdays-grid';
+	var arAddressBookIds = [];
+	Ext.iterate(go.User.birthdayPortletAddressBooks, function (item, idx, o) {
+		arAddressBookIds.push(item.addressBookId);
+	}, this);
 
-	var reader = new Ext.data.JsonReader({
-		totalProperty: 'total',
-		root: 'results',
-		fields: ['addressBookId', 'addressbook', 'photoBlobId', 'name', 'birthday', 'age'],
-		id: 'name'
-	});
+	config.addressBookIds = arAddressBookIds;
 
-	config.store = new Ext.data.GroupingStore({
-		url: GO.url('addressbook/portlet/birthdays'),
-		reader: reader,
+	config.store = new go.data.GroupingStore({
+		autoDestroy: true,
+		fields: [
+			'id',
+			'addressBookId',
+			'name',
+			'birthday',
+			'age',
+			'photoBlobId',
+			'addressBook'
+		],
+		entityStore: "Contact",
+		autoLoad: false,
 		sortInfo: {
-			field: 'addressBookId',
+			field: 'birthday',
 			direction: 'ASC'
 		},
-		groupField: 'addressBookId',
+		groupField: 'addressBook',
 		remoteGroup: true,
 		remoteSort: true
 	});
 
-	config.store.on('load', function () {
-		//do layout on Startpage
-		if (this.rendered)
+	config.store.setFilter('addressBookIds', {addressBookIds: config.addressBookIds})
+		.setFilter('isOrganisation', {isOrganization: false})
+		.setFilter('birthday', {birthday: '< 30 days'});
+	config.store.load().then(function (result) {
+		this.store.data = result;
+		if (this.rendered) {
 			this.ownerCt.ownerCt.ownerCt.doLayout();
+		}
 	}, this);
-
 
 	config.paging = false,
 		config.autoExpandColumn = 'birthday-portlet-name-col';
@@ -42,7 +53,7 @@ go.modules.community.addressbook.BirthdaysPortlet = function (config) {
 			dataIndex: 'photoBlobId',
 
 			renderer: function (value, metaData, record) {
-				return  go.util.avatar(record.get('name'), record.data.photoBlobId, null);
+				return go.util.avatar(record.get('name'), record.data.photoBlobId, null);
 			}
 		}, {
 			id: 'birthday-portlet-name-col',
@@ -54,21 +65,20 @@ go.modules.community.addressbook.BirthdaysPortlet = function (config) {
 			}
 		}, {
 			header: t("Address book", "addressbook"),
-			// dataIndex: 'addressBookId',
-			dataIndex: 'addressbook',
+			dataIndex: 'addressBook',
 			sortable: true
 		}, {
 			header: t("Birthday", "addressbook"),
 			dataIndex: 'birthday',
 			width: 100,
-			sortable: true,
-			renderer: function(value, metaData, record) {
+			sortable: false,
+			renderer: function (value, metaData, record) {
 				return go.util.Format.date(value);
 			}
 		}, {
 			header: t("Age"),
 			dataIndex: 'age',
-			sartable: false,
+			sortable: false,
 			width: 100
 		}];
 	config.view = new Ext.grid.GroupingView({
@@ -83,7 +93,7 @@ go.modules.community.addressbook.BirthdaysPortlet = function (config) {
 
 };
 
-Ext.extend(go.modules.community.addressbook.BirthdaysPortlet, GO.grid.GridPanel, {
+Ext.extend(go.modules.community.addressbook.BirthdaysPortlet, go.grid.GridPanel, {
 
 	saveListenerAdded: false,
 
@@ -107,29 +117,21 @@ GO.mainLayout.onReady(function () {
 
 		GO.summary.portlets['portlet-birthdays'] = new GO.summary.Portlet({
 			id: 'portlet-birthdays',
-			//iconCls: 'go-module-icon-tasks',
+			iconCls: 'ic-cake',
 			title: t("Upcoming birthdays", "addressbook"),
 			layout: 'fit',
 			tools: [{
 				id: 'gear',
 				handler: function () {
-					if (!this.selectAddressbookWin) {
-						this.selectAddressbookWin = new GO.base.model.multiselect.dialog({
-							url: 'addressbook/portlet',
-							columns: [{header: t("Name"), dataIndex: 'name', sortable: true}],
-							fields: ['id', 'name'],
-							title: t("Birthdays", "addressbook"),
-							model_id: 0,
-							addAttributes: {userId: GO.settings.user_id},
-							listeners: {
-								hide: function () {
-									birthdaysGrid.store.reload();
-								},
-								scope: this
-							}
-						});
-					}
-					this.selectAddressbookWin.show();
+					var dlg = new go.modules.community.addressbook.BirthdaysPortletSettingsDialog({
+						listeners: {
+							hide: function () {
+								birthdaysGrid.store.reload();
+							},
+							scope: this
+						}
+					})
+					dlg.load(go.User.id).show();
 				}
 			}, {
 				id: 'close',
