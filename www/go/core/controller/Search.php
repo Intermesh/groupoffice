@@ -101,7 +101,12 @@ class Search extends EntityController {
 	public function query($params) {
 		return $this->defaultQuery($params);
 	}
-	
+
+	protected function getQueryQuery($params)
+	{
+		return parent::getQueryQuery($params)->groupBy([])->distinct();
+	}
+
 	/**
 	 * Handles the Foo entity's Foo/get command
 	 * 

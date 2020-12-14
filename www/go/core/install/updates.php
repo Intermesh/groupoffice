@@ -820,3 +820,8 @@ $updates['202012031223'][] = "ALTER TABLE `core_spreadsheet_export`
 $updates['202012031223'][] = "ALTER TABLE `core_spreadsheet_export`
   ADD CONSTRAINT `core_spreadsheet_export_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_spreadsheet_export_ibfk_2` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;";
+
+
+$updates['202012141145'][] = "ALTER TABLE `core_search_word` ADD `drow` VARCHAR(100) NOT NULL AFTER `word`;";
+$updates['202012141145'][] = "update `core_search_word` set drow = reverse (word)";
+$updates['202012141145'][] = "ALTER TABLE `core_search_word` ADD INDEX(`drow`);";

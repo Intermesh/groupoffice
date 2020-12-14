@@ -131,8 +131,8 @@ trait SearchableTrait {
 			go()->getDbConnection()->delete('core_search_word', ['searchId' => $search->id])->execute();
 		}
 
-		$keywords = array_map(function ($word) use ($search){
-			return ['searchId' => $search->id, 'word'=> $word];
+		$keywords = array_map(function ($word) use ($search) {
+			return ['searchId' => $search->id, 'word'=> $word, 'drow' => strrev($word)];
 		}, $keywords);
 
 		return go()->getDbConnection()->insertIgnore(

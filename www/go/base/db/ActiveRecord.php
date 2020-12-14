@@ -3704,7 +3704,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 		$keywords = array_map(function ($word) use ($search){
-			return ['searchId' => $search->id, 'word'=> $word];
+			return ['searchId' => $search->id, 'word'=> $word, 'drow' => strrev($word)];
 		}, $keywords);
 
 		return go()->getDbConnection()->insertIgnore(

@@ -170,9 +170,19 @@ class Search extends AclOwnerEntity {
 
 							foreach($words as $word) {
 								$query->join("core_search_word", 'w'.$i, 'w'.$i.'.searchId = s.id');
-								$criteria->where('w'.$i.'.word', 'LIKE', $word . '%');
+								//$query->join("core_search_word_reverse", 'wr'.$i, 'wr'.$i.'.searchId = s.id');
+
+								$c = new Criteria();
+								$c
+									->where('w'.$i.'.word', 'LIKE', $word . '%')
+									->orWhere('w'.$i.'.drow', 'LIKE', strrev($word) . '%');
+
+								$criteria->where($c);
+
 								$i++;
 							}
+
+
 
 //							 $value = static::convertQuery($value);
 //
@@ -187,11 +197,8 @@ class Search extends AclOwnerEntity {
 
 	public static function sort(\go\core\orm\Query $query, array $sort)
 	{
-		if(empty($sort)) {
-			$sort['s.id'] = 'DESC'; //sort by id is fast. Sorting by modified at is slow
-		}
-
-		return parent::sort($query, $sort);
+		//no sorting. Too big tables!
+		return $query;
 	}
 
 	 public static function convertQuery($value) {
