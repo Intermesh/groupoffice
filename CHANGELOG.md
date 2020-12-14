@@ -6,6 +6,7 @@
 - Core: Don't log 404 not found as errors
 - Multi instance: Use http to execute instance cron so it supports different versions
 - Core: Made entity selection behave more user friendly
+- Filesearch: Extensions for OCR can be configured. See https://groupoffice.readthedocs.io/using/file-search.html
 
 07-12-2020 6.4.196
 - Startpage: bugfix when removing a portlet for the second time
