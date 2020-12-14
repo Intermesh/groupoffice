@@ -1,10 +1,9 @@
 
 go.modules.community.addressbook.BirthdaysPortletSettingsDialog = Ext.extend(go.form.Dialog, {
-	stateId: 'addressbook-birthday-portlet-settings-dialog',
 	title: t("Address books"),
 	entityStore: "User",
-	width: dp(320),
-	height: dp(200),
+	width: dp(500),
+	height: dp(500),
 	modal: true,
 	collapsible: false,
 	maximizable: false,

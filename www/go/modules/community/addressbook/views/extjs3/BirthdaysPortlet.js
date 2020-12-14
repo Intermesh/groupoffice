@@ -1,7 +1,7 @@
 go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel, {
 
 	initComponent : function() {
-		this.id = 'su-birthdays-grid';
+		this.id = 'addressbook-birthdays-portlet';
 
 		//this.addressBookIds = go.User.birthdayPortletAddressBooks;
 
