@@ -1,4 +1,5 @@
 6.4.197
+- Address book: Re-implemented birthday portlet for address book
 - Core: Bugfix in cronjobs new FW
 - Multi instance: All modules were always checked
 - Addressbook: add optional column 'gender' in grid.  

@@ -68,7 +68,7 @@ class Module extends core\Module {
 	public static function onMap(Mapping $mapping)
 	{
 		$mapping->addHasOne('addressBookSettings', UserSettings::class, ['id' => 'userId'], true);
-		$mapping->addArray('birthdayPortletAddressBooks', AddressBookPortletBirthday::class, ['id' => 'userId']);
+		$mapping->addScalar('birthdayPortletAddressBooks', "addressbook_portlet_birthday", ['id' => 'userId']);
 	}
 
 	public static function onUserDelete(core\db\Query $query) {

@@ -1,102 +1,128 @@
-go.modules.community.addressbook.BirthdaysPortlet = function (config) {
-	if (!config) {
-		config = {};
-	}
-	config.id = 'su-birthdays-grid';
-	var arAddressBookIds = [];
-	Ext.iterate(go.User.birthdayPortletAddressBooks, function (item, idx, o) {
-		arAddressBookIds.push(item.addressBookId);
-	}, this);
+go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel, {
 
-	config.addressBookIds = arAddressBookIds;
+	initComponent : function() {
+		this.id = 'su-birthdays-grid';
 
-	config.store = new go.data.GroupingStore({
-		autoDestroy: true,
-		fields: [
-			'id',
-			'addressBookId',
-			'name',
-			'birthday',
-			'age',
-			'photoBlobId',
-			'addressBook'
-		],
-		entityStore: "Contact",
-		autoLoad: false,
-		sortInfo: {
-			field: 'birthday',
-			direction: 'ASC'
-		},
-		groupField: 'addressBook',
-		remoteGroup: true,
-		remoteSort: true
-	});
+		//this.addressBookIds = go.User.birthdayPortletAddressBooks;
 
-	config.store.setFilter('addressBookIds', {addressBookIds: config.addressBookIds})
-		.setFilter('isOrganisation', {isOrganization: false})
-		.setFilter('birthday', {birthday: '< 30 days'});
-	config.store.load().then(function (result) {
-		this.store.data = result;
-		if (this.rendered) {
-			this.ownerCt.ownerCt.ownerCt.doLayout();
-		}
-	}, this);
+		this.store = new go.data.GroupingStore({
+			autoDestroy: true,
+			fields: [
+				'id',
+				'addressBookId',
+				'name',
+				'birthday',
+				'age',
+				'photoBlobId',
+				'dates',
+				{name: "addressbook", type: "relation"},
+				{name: 'addressbookName', mapping: "addressbook.name"},
+			],
+			entityStore: "Contact",
+			autoLoad: false,
+			sortInfo: {
+				field: 'birthday',
+				direction: 'ASC'
+			},
+			groupField: 'addressbookName',
+			remoteGroup: true,
+			remoteSort: true
+		});
 
-	config.paging = false,
-		config.autoExpandColumn = 'birthday-portlet-name-col';
-	config.autoExpandMax = 2500;
-	config.enableColumnHide = false;
-	config.enableColumnMove = false;
-	config.columns = [
-		{
-			header: '',
-			dataIndex: 'photoBlobId',
-
-			renderer: function (value, metaData, record) {
-				return go.util.avatar(record.get('name'), record.data.photoBlobId, null);
+		this.store.setFilter('addressBookIds', {addressBookIds: go.User.birthdayPortletAddressBooks})
+			.setFilter('isOrganisation', {isOrganization: false})
+			.setFilter('birthday', {birthday: '< 30 days'});
+		this.store.load().then(function (result) {
+			// this.store.data = result;
+			if (this.rendered) {
+				this.ownerCt.ownerCt.ownerCt.doLayout();
 			}
-		}, {
-			id: 'birthday-portlet-name-col',
-			header: t("Name"),
-			dataIndex: 'name',
-			sortable: false,
-			renderer: function (value, metaData, record) {
-				return '<a href="#contact/' + record.json.id + '">' + value + '</a>';
-			}
-		}, {
-			header: t("Address book", "addressbook"),
-			dataIndex: 'addressBook',
-			sortable: true
-		}, {
-			header: t("Birthday", "addressbook"),
-			dataIndex: 'birthday',
-			width: 100,
-			sortable: false,
-			renderer: function (value, metaData, record) {
-				return go.util.Format.date(value);
-			}
-		}, {
-			header: t("Age"),
-			dataIndex: 'age',
-			sortable: false,
-			width: 100
-		}];
-	config.view = new Ext.grid.GroupingView({
-		scrollOffset: 2,
-		hideGroupedColumn: true
-	});
-	config.sm = new Ext.grid.RowSelectionModel();
-	config.loadMask = true;
-	config.autoHeight = true;
+		}, this);
 
-	go.modules.community.addressbook.BirthdaysPortlet.superclass.constructor.call(this, config);
+		this.paging = false;
+		this.autoExpandColumn = 'birthday-portlet-name-col';
+		this.autoExpandMax = 2500;
+		this.enableColumnHide = false;
+		this.enableColumnMove = false;
 
-};
+		this.columns = [
+			{
+				header: '',
+				dataIndex: 'photoBlobId',
 
-Ext.extend(go.modules.community.addressbook.BirthdaysPortlet, go.grid.GridPanel, {
+				renderer: function (value, metaData, record) {
+					return go.util.avatar(record.get('name'), record.data.photoBlobId, null);
+				}
+			}, {
+				id: 'birthday-portlet-name-col',
+				header: t("Name"),
+				dataIndex: 'name',
+				sortable: false,
+				renderer: function (value, metaData, record) {
+					return '<a href="#contact/' + record.json.id + '">' + value + '</a>';
+				}
+			}, {
+				header: t("Address book"),
+				dataIndex: 'addressbookName',
+				sortable: true
+			}, {
+				id: 'birthday',
+				header: t('dateTypes')['birthday'],
+				sortable: true,
+				dataIndex: "birthday",
+				renderer: function(v, meta, record) {
+
+					var bday = "";
+					record.data.dates.forEach(function(date) {
+						if(date.type == "birthday") {
+							bday = date.date;
+						}
+					});
+
+					return go.util.Format.date(bday);
+				},
+				hidden: true
+			}, {
+				header: t("Age"),
+				dataIndex: 'age',
+				sortable: false,
+				width: 100,
+				renderer: function(v, meta, record) {
+
+					var birthDate;
+					record.data.dates.forEach(function(date) {
+						if(date.type == "birthday") {
+							birthDate = new Date(date.date);
+						}
+					});
+
+					var today = new Date();
+					var age = today.getFullYear() - birthDate.getFullYear();
+					// var m = today.getMonth() - birthDate.getMonth();
+					// if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+					// 	age--;
+					// }
+					return age;
+
+				}
+			}];
+		this.view = new Ext.grid.GroupingView({
+			scrollOffset: 2,
+			hideGroupedColumn: true
+		});
+		this.sm = new Ext.grid.RowSelectionModel();
+		this.loadMask = true;
+		this.autoHeight = true;
+
+
+		this.supr().initComponent.call(this);
+	},
 
 	saveListenerAdded: false,
 
+	initCustomFields : function() {
+
+	},
 	afterRender: function () {
 		go.modules.community.addressbook.BirthdaysPortlet.superclass.afterRender.call(this);
 
@@ -126,7 +152,10 @@ GO.mainLayout.onReady(function () {
 					var dlg = new go.modules.community.addressbook.BirthdaysPortletSettingsDialog({
 						listeners: {
 							hide: function () {
-								birthdaysGrid.store.reload();
+								setTimeout(function() {
+									birthdaysGrid.store.setFilter('addressBookIds', {addressBookIds: go.User.birthdayPortletAddressBooks})
+									birthdaysGrid.store.reload();
+								})
 							},
 							scope: this
 						}

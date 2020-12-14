@@ -60,7 +60,9 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 
 			me.fireEvent("load", this);
 		});
-		
+
+
+
 
     //Ext.apply(GO.settings, session.oldSettings);
 		
@@ -146,3 +148,12 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		return !Ext.isEmpty(this.username);
 	}
 }));
+
+// Update go.User when it's edited
+Ext.onReady(function(){
+	go.Db.store("User").on("changes", function(store, added, changed, deleted){
+		if(changed[go.User.id]) {
+			Ext.apply(go.User, changed[go.User.id]);
+		}
+	});
+})

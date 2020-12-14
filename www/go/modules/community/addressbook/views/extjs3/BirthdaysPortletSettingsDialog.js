@@ -9,6 +9,7 @@ go.modules.community.addressbook.BirthdaysPortletSettingsDialog = Ext.extend(go.
 	collapsible: false,
 	maximizable: false,
 	layout: 'fit',
+	showCustomfields: false,
 
 	initFormItems: function() {
 		var items = [
@@ -19,12 +20,12 @@ go.modules.community.addressbook.BirthdaysPortletSettingsDialog = Ext.extend(go.
 						layout: "form",
 						items: [
 							this.addressBookMultiSelect = new go.form.multiselect.Field({
+								valueIsId: true,
 								idField: 'addressBookId',
 								displayField: 'name',
 								entityStore: 'AddressBook',
 								name: 'birthdayPortletAddressBooks',
 								hideLabel: true,
-								valueIsId: false,
 								emptyText: t("Please select..."),
 								pageSize: 50,
 								fields: ['id', 'name'],
@@ -41,5 +42,5 @@ go.modules.community.addressbook.BirthdaysPortletSettingsDialog = Ext.extend(go.
 		];
 
 		return items;
-	},
+	}
 });
