@@ -20,7 +20,8 @@ end 6.5
 
 
 
-6.4.197
+14-12-2020 6.4.197
+- Calendar: Error with very small holiday booking of for example 0.01 hour.
 - Core: Updated Norwegian translation
 - Address book: Re-implemented birthday portlet for address book
 - Core: Bugfix in cronjobs new FW
