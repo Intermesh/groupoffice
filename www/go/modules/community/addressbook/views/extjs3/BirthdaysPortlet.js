@@ -80,8 +80,7 @@ go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel
 					});
 
 					return go.util.Format.date(bday);
-				},
-				hidden: true
+				}
 			}, {
 				header: t("Age"),
 				dataIndex: 'age',

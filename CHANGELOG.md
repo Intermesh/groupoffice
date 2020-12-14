@@ -1,3 +1,6 @@
+14-12-2020 6.4.198
+- Address book: Birthday column was hidden in portlet
+
 14-12-2020 6.4.197
 - Calendar: Error with very small holiday booking of for example 0.01 hour.
 - Core: Updated Norwegian translation
