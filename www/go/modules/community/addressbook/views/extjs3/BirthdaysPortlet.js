@@ -57,10 +57,10 @@ go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel
 				id: 'birthday-portlet-name-col',
 				header: t("Name"),
 				dataIndex: 'name',
-				sortable: false,
-				renderer: function (value, metaData, record) {
-					return '<a href="#contact/' + record.json.id + '">' + value + '</a>';
-				}
+				sortable: false
+				// renderer: function (value, metaData, record) {
+				// 	return '<a href="#contact/' + record.json.id + '">' + value + '</a>';
+				// }
 			}, {
 				header: t("Address book"),
 				dataIndex: 'addressbookName',
@@ -116,6 +116,11 @@ go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel
 
 
 		this.supr().initComponent.call(this);
+
+		this.on("rowclick", function(grid, index, e) {
+			go.Entities.get("Contact").goto(grid.store.getAt(index).id);
+		}, this);
+
 	},
 
 	saveListenerAdded: false,
