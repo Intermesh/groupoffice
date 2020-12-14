@@ -1,6 +1,7 @@
 6.4.197
 - Core: Bugfix in cronjobs new FW
 - Multi instance: All modules were always checked
+- Addressbook: add optional column 'gender' in grid.  
 - Core: Check MySQL / MariaDB server version. MySQL 8.0.22 has a bug which causes problems.
 - Core: Some CSV files could not be imported.
 - Core: Don't log 404 not found as errors
