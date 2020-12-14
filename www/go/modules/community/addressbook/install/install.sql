@@ -219,3 +219,17 @@ ALTER TABLE `addressbook_contact` ADD INDEX(`isOrganization`);
 ALTER TABLE `addressbook_contact` ADD INDEX(`name`);
 ALTER TABLE `addressbook_contact` ADD INDEX(`modifiedAt`);
 ALTER TABLE `addressbook_contact` ADD INDEX(`lastName`);
+ALTER TABLE `addressbook_contact` ADD INDEX(`isOrganization`);
+
+CREATE TABLE IF NOT EXISTS `addressbook_portlet_birthday` (
+    `id` int(11) UNSIGNED NOT NULL,
+    `userId` int(11) NOT NULL,
+    `addressBookId` int(11) NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
+ALTER TABLE `addressbook_portlet_birthday`
+    ADD CONSTRAINT `addressbook_portlet_birthday_fk1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+    ADD CONSTRAINT `addressbook_portlet_birthday_fk2` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`);
+
+CREATE UNIQUE INDEX `address_book_portlet_unq1` ON `addressbook_portlet_birthday`(`userId`, `addressBookId`);

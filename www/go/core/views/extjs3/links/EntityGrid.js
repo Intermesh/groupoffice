@@ -51,7 +51,10 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 		}, this);
 
 		Ext.apply(config, {
-			tbar: [{xtype: "selectallcheckbox"}],
+			tbar: [this.selectAllCb = new go.grid.SelectAllCheckbox({
+				selectFirst: false,
+				xtype: "selectallcheckbox"
+			})],
 			store: new Ext.data.ArrayStore({
 				fields: ['id', 'entity', 'name', 'filter', 'iconCls'],
 				data: data,
@@ -112,6 +115,7 @@ go.links.EntityGrid = Ext.extend(go.grid.GridPanel, {
 		
 		this.getSelectionModel().suspendEvents(false);
 		this.getSelectionModel().selectRecords(records, true);
+		this.selectAllCb.checkChecked();
 		this.getSelectionModel().resumeEvents();
 
 	}
