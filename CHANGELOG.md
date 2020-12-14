@@ -5,6 +5,7 @@
 - Core: Some CSV files could not be imported.
 - Core: Don't log 404 not found as errors
 - Multi instance: Use http to execute instance cron so it supports different versions
+- Core: Made entity selection behave more user friendly
 
 07-12-2020 6.4.196
 - Startpage: bugfix when removing a portlet for the second time
