@@ -139,4 +139,7 @@ Følgende endringer er foretatt av %s:
   'Create folder' => 'Opprett mappe',
   'File info' => 'Filinformasjon',
   'Email files' => 'Send filer',
+  'Browse {total} files' => 'Bla igjennom {total} filer',
+  'Browse files' => 'Bla igjennom',
+  'No items found' => 'Ingen elementer',
 );
