@@ -1,3 +1,6 @@
+15-12-2020 6.4.201
+- Core: Fixed permission denied error when linking
+
 15-12-2020 6.4.200
 - Address book: Fixed problem with 6.3 upgrade
 
