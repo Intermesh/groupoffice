@@ -54,7 +54,7 @@ done
 composer update --no-dev -o
 
 if [ -z "$CONFIG" ]; then
-  echo Not upgrading database because no config file was passed. eg. ./update-git.sh /etc/groupoffice/multi_instance/manage.group-office.com/config.php
+  echo NOTE: Not upgrading database because no config file was passed. eg. ./update-git.sh /etc/groupoffice/multi_instance/manage.group-office.com/config.php
   exit 1
 else
   sudo -u www-data php cli.php core/System/upgrade -c=$CONFIG
