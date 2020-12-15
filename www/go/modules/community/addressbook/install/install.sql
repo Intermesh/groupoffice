@@ -213,4 +213,12 @@ ALTER TABLE `addressbook_user_settings`
 
 ALTER TABLE `addressbook_addressbook` ADD FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
 
-ALTER TABLE `addressbook_contact` ADD INDEX(`isOrganization`)
+ALTER TABLE `addressbook_contact` ADD INDEX(`isOrganization`);
+
+CREATE TABLE IF NOT EXISTS `addressbook_portlet_birthday` (
+    `userId` int(11) NOT NULL, `addressBookId` int(11) NOT NULL, PRIMARY KEY (`userId`, `addressBookId`) )
+    ENGINE=InnoDB;
+
+ALTER TABLE `addressbook_portlet_birthday`
+    ADD CONSTRAINT `addressbook_portlet_birthday_fk1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+    ADD CONSTRAINT `addressbook_portlet_birthday_fk2` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`);

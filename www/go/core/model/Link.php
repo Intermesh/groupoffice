@@ -265,8 +265,7 @@ class Link extends Entity
 		$reverse['description'] = $this->description;
 		$reverse['createdAt'] = $this->createdAt;
 		
-		if($this->isNew()) {			
-			$this->updateDataFromSearch();
+		if($this->isNew()) {
 			return App::get()->getDbConnection()->insertIgnore('core_link', $reverse)->execute();
 		}
 
@@ -274,20 +273,6 @@ class Link extends Entity
 			['description' => $this->description],
 			['toId' => $this->fromId, 'toEntityTypeId' => $this->fromEntityTypeId, 'fromId' => $this->toId, 'fromEntityTypeId' => $this->toEntityTypeId]
 		)->execute();
-	}
-
-	private function updateDataFromSearch() {
-		//make sure the description and name are set so they are returned to the client
-		if(!isset($this->toSearchId) || !isset($this->aclId)) {
-			$search = Search::find()->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
-			if(!$search) {
-				throw new \Exception("Could not find entity from search cache. Please run System settings -> Tools -> Update search index");
-			}
-			$this->toDescription = $search->description;
-			$this->toName = $search->name;
-			$this->toSearchId = $search->id;
-			$this->aclId = $search->findAclId();
-		}
 	}
 	
 	protected static function internalDelete(Query $query) {		
@@ -316,10 +301,6 @@ class Link extends Entity
 	 * @return int
 	 */
 	public function getPermissionLevel() {
-		if($this->isNew()) {			
-			$this->updateDataFromSearch();
-		}
-
 		if(!isset($this->permissionLevel)) {
 			$this->permissionLevel = Acl::getUserPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId());
 		}

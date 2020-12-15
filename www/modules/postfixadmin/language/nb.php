@@ -8,7 +8,7 @@ return array (
   'Aliases' => 'Aliaser',
   'Max quota (MB)' => 'Maks kvote (MB)',
   'Mailbox' => 'Mailboks',
-  'Mailboxes' => 'Mailbokser',
+  'Mailboxes' => 'Mailkontoer',
   'Username' => 'Brukernavn',
   'Password' => 'Passord',
   'Confirm password' => 'Bekreft passord',
@@ -48,4 +48,5 @@ return array (
   'Date' => 'Date',
   'Maildir' => 'Maildir',
   'Cache' => 'Cache',
+  'Ok' => 'OK',
 );
