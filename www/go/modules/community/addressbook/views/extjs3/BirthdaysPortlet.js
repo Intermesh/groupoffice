@@ -3,9 +3,7 @@ go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel
 	initComponent : function() {
 		this.id = 'addressbook-birthdays-portlet';
 
-		//this.addressBookIds = go.User.birthdayPortletAddressBooks;
-
-		this.store = new go.data.GroupingStore({
+		this.store = new go.data.Store({
 			autoDestroy: true,
 			fields: [
 				'id',
@@ -21,23 +19,14 @@ go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel
 			entityStore: "Contact",
 			autoLoad: false,
 			sortInfo: {
-				field: 'birthday',
+				field: 'upcomingBirthday',
 				direction: 'ASC'
-			},
-			groupField: 'addressbookName',
-			remoteGroup: true,
-			remoteSort: true
+			}
 		});
 
 		this.store.setFilter('addressBookIds', {addressBookIds: go.User.birthdayPortletAddressBooks})
 			.setFilter('isOrganisation', {isOrganization: false})
-			.setFilter('birthday', {birthday: '< 30 days'});
-		this.store.load().then(function (result) {
-			// this.store.data = result;
-			if (this.rendered) {
-				this.ownerCt.ownerCt.ownerCt.doLayout();
-			}
-		}, this);
+			.setFilter('birthday', {birthday: 'now..30 days'});
 
 		this.paging = false;
 		this.autoExpandColumn = 'birthday-portlet-name-col';
@@ -58,17 +47,14 @@ go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel
 				header: t("Name"),
 				dataIndex: 'name',
 				sortable: false
-				// renderer: function (value, metaData, record) {
-				// 	return '<a href="#contact/' + record.json.id + '">' + value + '</a>';
-				// }
 			}, {
 				header: t("Address book"),
 				dataIndex: 'addressbookName',
-				sortable: true
+				sortable: false
 			}, {
 				id: 'birthday',
 				header: t('dateTypes')['birthday'],
-				sortable: true,
+				sortable: false,
 				dataIndex: "birthday",
 				renderer: function(v, meta, record) {
 
@@ -105,14 +91,10 @@ go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel
 
 				}
 			}];
-		this.view = new Ext.grid.GroupingView({
-			scrollOffset: 2,
-			hideGroupedColumn: true
-		});
+
 		this.sm = new Ext.grid.RowSelectionModel();
 		this.loadMask = true;
 		this.autoHeight = true;
-
 
 		this.supr().initComponent.call(this);
 
@@ -122,21 +104,14 @@ go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel
 
 	},
 
-	saveListenerAdded: false,
-
 	initCustomFields : function() {
 
 	},
+
 	afterRender: function () {
 		go.modules.community.addressbook.BirthdaysPortlet.superclass.afterRender.call(this);
 
-		Ext.TaskMgr.start({
-			run: function () {
-				this.store.load();
-			},
-			scope: this,
-			interval: 960000
-		});
+		this.store.load();
 	}
 });
 

@@ -106,10 +106,9 @@ abstract class EntityController extends Controller {
 		
 		$cls::sort($query, $sort);
 
-		$query->filter($params['filter']);
-		
-		//go()->info($query);
 		$query->select($cls::getPrimaryKey(true)); //only select primary key
+
+		$query->filter($params['filter']);
 		
 		return $query;
 	}

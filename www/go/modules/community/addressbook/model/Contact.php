@@ -603,18 +603,20 @@ class Contact extends AclItemEntity {
 											$criteria->where('actionDate.type', '=', Date::TYPE_ACTION)
 												->andWhere('actionDate.date',$comparator, $value);
 										})
-						->addDate("birthday", function(Criteria $criteria, $comparator, $value, Query $query) {
-							if(!$query->isJoined('addressbook_date', 'bdate')) {
-								$query->join('addressbook_date', 'bdate', 'bdate.contactId = c.id', "INNER");
-							}
+										->addDate("birthday", function(Criteria $criteria, $comparator, $value, Query $query) {
+											if(!$query->isJoined('addressbook_date', 'bdate')) {
+												$query->join('addressbook_date', 'bdate', 'bdate.contactId = c.id AND bdate.type = "'.Date::TYPE_BIRTHDAY .'"', "INNER");
+											}
 
-							$tag = ':bday'.uniqid();
-							$criteria->where('bdate.type', '=', Date::TYPE_BIRTHDAY)
-								->andWhere('DATE_ADD(bdate.date,
-											INTERVAL YEAR(CURDATE())-YEAR(bdate.date)
-															 + IF(DAYOFYEAR(CURDATE()) > DAYOFYEAR(bdate.date),1,0)
-										YEAR)  
-							' . $comparator . $tag)->bind($tag, $value->format(Column::DATE_FORMAT));
+											$date = $value->format(Column::DATE_FORMAT);
+
+											$query->select("IF (STR_TO_DATE(CONCAT(YEAR('$date'), '/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e') >= '$date', "
+												."STR_TO_DATE(CONCAT(YEAR('$date'), '/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e') , "
+												."STR_TO_DATE(CONCAT(YEAR('$date') + 1,'/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e')) as upcomingBirthday", true);
+
+											$query->having('upcomingBirthday '. $comparator .' "' . $date . '"');
+											$query->orderBy(['upcomingBirthday' => 'ASC']);
+
 										})->add('userGroupId', function(Criteria $criteria, $value, Query $query) {
 											$query->join('core_user_group', 'ug', 'ug.userId = c.goUserId');
 											$criteria->where(['ug.groupId' => $value]);
