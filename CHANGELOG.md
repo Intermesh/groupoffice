@@ -1,3 +1,7 @@
+15-12-2020 6.4.199
+- Address book: Birthday portlet query improved
+- Core: Fixed error on new link
+
 14-12-2020 6.4.198
 - Address book: Birthday column was hidden in portlet
 
