@@ -6,10 +6,7 @@ set -e
 
 CONFIG=$1
 
-if [ -z "$CONFIG" ]; then
-  echo Please pass config file. eg. ./update-git.sh /etc/groupoffice/multi_instance/manage.group-office.com/config.php
-  exit 1
-fi
+
 
 SASS=sassc
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -55,5 +52,12 @@ do
 done
 
 composer update --no-dev -o
-sudo -u www-data php cli.php core/System/upgrade -c=$CONFIG
+
+if [ -z "$CONFIG" ]; then
+  echo Not upgrading database because no config file was passed. eg. ./update-git.sh /etc/groupoffice/multi_instance/manage.group-office.com/config.php
+  exit 1
+else
+  sudo -u www-data php cli.php core/System/upgrade -c=$CONFIG
+fi
+
 
