@@ -96,6 +96,11 @@ go.modules.community.addressbook.BirthdaysPortlet = Ext.extend(go.grid.GridPanel
 		this.loadMask = true;
 		this.autoHeight = true;
 
+		this.viewConfig =	{
+			emptyText: '<i>cake</i><p>' + t("No items to display") + '</p>'
+		};
+
+
 		this.supr().initComponent.call(this);
 
 		this.on("rowclick", function(grid, index, e) {
