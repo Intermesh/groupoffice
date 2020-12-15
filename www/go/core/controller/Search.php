@@ -104,7 +104,7 @@ class Search extends EntityController {
 
 	protected function getQueryQuery($params)
 	{
-		return parent::getQueryQuery($params)->groupBy([])->distinct();
+		return parent::getQueryQuery($params)->groupBy([])->distinct()->select("search.id");
 	}
 
 	/**
