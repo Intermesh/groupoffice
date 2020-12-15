@@ -301,10 +301,6 @@ class Link extends Entity
 	 * @return int
 	 */
 	public function getPermissionLevel() {
-		if($this->isNew()) {			
-			$this->updateDataFromSearch();
-		}
-
 		if(!isset($this->permissionLevel)) {
 			$this->permissionLevel = Acl::getUserPermissionLevel($this->aclId, App::get()->getAuthState()->getUserId());
 		}
