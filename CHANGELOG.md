@@ -20,6 +20,9 @@ end 6.5
 
 
 
+15-12-2020 6.4.200
+- Address book: Fixed problem with 6.3 upgrade
+
 15-12-2020 6.4.199
 - Address book: Birthday portlet query improved
 - Core: Fixed error on new link
