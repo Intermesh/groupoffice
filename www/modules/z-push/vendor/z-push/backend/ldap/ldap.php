@@ -38,14 +38,24 @@ class BackendLDAP extends BackendDiff {
     public function Logon($username, $domain, $password) {
         $this->user = $username;
         $user_dn = str_replace('%u', $username, LDAP_USER_DN);
-        $this->ldap_link = ldap_connect(LDAP_SERVER, LDAP_SERVER_PORT);
-        ldap_set_option($this->ldap_link, LDAP_OPT_PROTOCOL_VERSION, 3);
-        if (ldap_bind($this->ldap_link, $user_dn, $password)) {
-            ZLog::Write(LOGLEVEL_INFO, sprintf("BackendLDAP->Logon(): User '%s' is authenticated on LDAP", $username));
-            return true;
+
+        // Connect
+        if (defined('LDAP_SERVER_URI')) {
+            $this->ldap_link = ldap_connect(LDAP_SERVER_URI);
+            ldap_set_option($this->ldap_link, LDAP_OPT_PROTOCOL_VERSION, 3);
+
+            // Authenticate
+            if (ldap_bind($this->ldap_link, $user_dn, $password)) {
+                ZLog::Write(LOGLEVEL_INFO, sprintf("BackendLDAP->Logon(): User '%s' is authenticated on LDAP.", $username));
+                return true;
+            }
+            else {
+                ZLog::Write(LOGLEVEL_INFO, sprintf("BackendLDAP->Logon(): User '%s' is not authenticated on LDAP. Error: ", $username, ldap_error($this->ldap_link)));
+                return false;
+            }
         }
         else {
-            ZLog::Write(LOGLEVEL_INFO, sprintf("BackendLDAP->Logon(): User '%s' is not authenticated on LDAP. Error: ", $username, ldap_error($this->ldap_link)));
+            ZLog::Write(LOGLEVEL_ERROR, sprintf("BackendLDAP->Logon(): LDAP server URI is not defined."));
             return false;
         }
     }

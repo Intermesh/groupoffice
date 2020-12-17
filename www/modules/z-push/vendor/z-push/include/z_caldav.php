@@ -273,8 +273,10 @@ class CalDAVClient {
 		$this->xmlResponse = '';
 
 // 		ZLog::Write(LOGLEVEL_DEBUG, sprintf("Request:\n%s\n", $content));
+		ZLog::Write(LOGLEVEL_WBXML, sprintf("CalDAVClient->DoRequest: '%s' request on %s using:\n%s\n", $method, $url, $content));
 		$response					= curl_exec($this->curl);
 // 		ZLog::Write(LOGLEVEL_DEBUG, sprintf("Reponse:\n%s\n", $response));
+		ZLog::Write(LOGLEVEL_WBXML, sprintf("CalDAVClient->DoRequest: Response from %s:\n%s\n", $url, $response));
 		$header_size				= curl_getinfo($this->curl, CURLINFO_HEADER_SIZE);
 		$this->httpResponseCode		= curl_getinfo($this->curl, CURLINFO_HTTP_CODE);
 		$this->httpResponseHeaders	= trim(substr($response, 0, $header_size));
@@ -751,27 +753,36 @@ EOXML;
 
 	/**
 	* Given XML for a calendar query, return an array of the events (/todos) in the
-	* response.  Each event in the array will have a 'href', 'etag' and '$response_type'
-	* part, where the 'href' is relative to the calendar and the '$response_type' contains the
+	* response.  Each event in the array will have a 'href', 'etag' and an optional '$response_type'
+	* part (depending on the flag '$include_data'), where the 'href' is relative to the calendar and 
+	* the '$response_type' contains the
 	* definition of the calendar data in iCalendar format.
 	*
 	* @param string $filter XML fragment which is the <filter> element of a calendar-query
 	* @param string $url The URL of the calendar, or empty/null to use the 'current' calendar_url
+	* @param boolean $include_data Flags whether to request the content-data (the icalendar data) in the response
 	*
 	* @return array An array of the relative URLs, etags, and events from the server.  Each element of the array will
 	*               be an array with 'href', 'etag' and 'data' elements, corresponding to the URL, the server-supplied
 	*               etag (which only varies when the data changes) and the calendar data in iCalendar format.
 	*/
-	function DoCalendarQuery( $filter, $url = null ) {
+	function DoCalendarQuery( $filter, $url = null, $include_data = true ) {
 		if ( !empty($url) ) {
 			$this->SetCalendar($url);
+		}
+		
+		//request the icalendar data if $include_data is true (default)
+		if ( $include_data ) {
+			$prop = '<C:calendar-data/>';
+		} else {
+			$prop = '';
 		}
 
 		$body = <<<EOXML
 <?xml version="1.0" encoding="utf-8" ?>
 <C:calendar-query xmlns:D="DAV:" xmlns:C="urn:ietf:params:xml:ns:caldav">
   <D:prop>
-    <C:calendar-data/>
+    $prop
     <D:getetag/>
   </D:prop>
   $filter
@@ -792,12 +803,15 @@ EOXML;
 					}
 					break;
 				case 'DAV::href':
+					ZLog::Write(LOGLEVEL_WBXML, sprintf("z_caldav->DoCalendarQuery... parsing xml node 'DAV::href'"));
 					$response['href'] = basename( rawurldecode($v['value']) );
 					break;
 				case 'DAV::getetag':
+					ZLog::Write(LOGLEVEL_WBXML, sprintf("z_caldav->DoCalendarQuery... parsing xml node 'DAV::getetag'"));
 					$response['etag'] = preg_replace('/^"?([^"]+)"?/', '$1', $v['value']);
 					break;
 				case 'urn:ietf:params:xml:ns:caldav:calendar-data':
+					ZLog::Write(LOGLEVEL_WBXML, sprintf("z_caldav->DoCalendarQuery... parsing xml node 'urn:ietf:params:xml:ns:caldav:calendar-data'"));
 					$response['data'] = $v['value'];
 					break;
 			}
@@ -805,21 +819,21 @@ EOXML;
 		return $report;
 	}
 
-
 	/**
-	* Get the events in a range from $start to $finish.  The dates should be in the
+	* Get a list of events in a range from $start to $finish.  The dates should be in the
 	* format yyyymmddThhmmssZ and should be in GMT.  The events are returned as an
-	* array of event arrays.  Each event array will have a 'href', 'etag' and 'event'
-	* part, where the 'href' is relative to the calendar and the event contains the
-	* definition of the event in iCalendar format.
+	* array of event parameter arrays. Unlike the original GetEvents, each event array will only contain the 'href' and 'etag' 
+	* parts, where the 'href' is relative to the calendar. 
 	*
 	* @param timestamp $start The start time for the period
 	* @param timestamp $finish The finish time for the period
 	* @param string    $relative_url The URL relative to the base_url specified when the calendar was opened.  Default ''.
 	*
-	* @return array An array of the relative URLs, etags, and events, returned from DoCalendarQuery() @see DoCalendarQuery()
+	* @return array An array of the relative URLs and etags as [['href'], ['etag']]
+	*
+	* This function has been modified from the original GetEvents function; the function has been renamed to prevent regression errors
 	*/
-	function GetEvents( $start = null, $finish = null, $relative_url = null ) {
+	function GetEventsList( $start = null, $finish = null, $relative_url = null ) {
 		$filter = "";
 		if ( isset($start) && isset($finish) ) {
 			$range = "<C:time-range start=\"$start\" end=\"$finish\"/>";
@@ -837,16 +851,16 @@ EOXML;
   </C:filter>
 EOFILTER;
 
-		return $this->DoCalendarQuery($filter, $relative_url);
+		//don't ask for the calendar data
+		return $this->DoCalendarQuery($filter, $relative_url, false);
 	}
 
 
 	/**
-	* Get the todo's in a range from $start to $finish.  The dates should be in the
+	* Get a list of todo's in a range from $start to $finish.  The dates should be in the
 	* format yyyymmddThhmmssZ and should be in GMT.  The events are returned as an
-	* array of event arrays.  Each event array will have a 'href', 'etag' and 'event'
-	* part, where the 'href' is relative to the calendar and the event contains the
-	* definition of the event in iCalendar format.
+	* array of event parameter arrays. Unlike the original GetTodos, each event array will only have 'href' and 'etag'
+	* parts, where the 'href' is relative to the calendar.
 	*
 	* @param timestamp $start The start time for the period
 	* @param timestamp $finish The finish time for the period
@@ -854,9 +868,11 @@ EOFILTER;
 	* @param boolean   $cancelled Whether to include cancelled tasks
 	* @param string    $relative_url The URL relative to the base_url specified when the calendar was opened.  Default ''.
 	*
-	* @return array An array of the relative URLs, etags, and events, returned from DoCalendarQuery() @see DoCalendarQuery()
+	* @return array An array of the relative URLs and etags as [['href'], ['etag']]
+	* 
+	* This function has been modified from the original GetTodos function; the function has been renamed to prevent regression errors
 	*/
-	function GetTodos( $start, $finish, $completed = false, $cancelled = false, $relative_url = null ) {
+	function GetTodosList( $start, $finish, $completed = false, $cancelled = false, $relative_url = null ) {
 
 		if ( $start && $finish ) {
 			$time_range = <<<EOTIME
@@ -885,7 +901,8 @@ EOTIME;
   </C:filter>
 EOFILTER;
 
-		return $this->DoCalendarQuery($filter, $relative_url);
+		//don't ask for the calendar data
+		return $this->DoCalendarQuery($filter, $relative_url, false);
 	}
 
 
@@ -944,11 +961,11 @@ EOFILTER;
         if (!empty($relative_url)) {
             $this->SetCalendar($relative_url);
         }
-
         $hasToken = !$initial && isset($this->synctoken[$this->calendar_url]);
         if ($support_dav_sync) {
             $token = ($hasToken ? $this->synctoken[$this->calendar_url] : "");
 
+			ZLog::Write(LOGLEVEL_WBXML, sprintf("CalDAVClient->GetSync called for %s'%s' with token '%s'", ($initial ? "initial sync of " : ""), $this->calendar_url, $token));
             $body = <<<EOXML
 <?xml version="1.0" encoding="utf-8"?>
 <D:sync-collection xmlns:D="DAV:">
@@ -988,6 +1005,7 @@ EOXML;
                     }
                     elseif ($v['type'] == 'close') {
                         $report[] = $response;
+                        ZLog::Write(LOGLEVEL_WBXML, sprintf("CalDAVClient->GetSync return value includes response: %s",implode("|",$response)));
                     }
                     break;
                 case 'DAV::href':
@@ -1006,6 +1024,7 @@ EOXML;
                     break;
                 case 'DAV::sync-token':
                     $this->synctoken[$this->calendar_url] = $v['value'];
+                    ZLog::Write(LOGLEVEL_DEBUG, sprintf("CalDAVClient->GetSync: Response from '%s' includes sync token: '%s'", $this->calendar_url, $this->synctoken[$this->calendar_url]));
                     break;
             }
         }
@@ -1018,4 +1037,4 @@ EOXML;
         return $report;
     }
 
-}
+};

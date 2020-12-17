@@ -1,12 +1,13 @@
 <?php
 /***********************************************
-* File      :   config.php
+* File      :   badrequestexception.php
 * Project   :   Z-Push
-* Descr     :   LDAP backend configuration file
+* Descr     :   Exception indicating that that some code is not
+*               available which is non-fatal
 *
-* Created   :   27.11.2012
+* Created   :   16.1.2020
 *
-* Copyright 2007 - 2016 Zarafa Deutschland GmbH
+* Copyright 2007 - 2020 Zarafa Deutschland GmbH
 *
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU Affero General Public License, version 3,
@@ -23,15 +24,8 @@
 * Consult LICENSE file for details
 ************************************************/
 
-// **********************
-//  BackendLDAP settings
-// **********************
-
-// LDAP server uri
-define("LDAP_SERVER_URI", "ldap://127.0.0.1:389/");
-
-// LDAP USER DN
-define('LDAP_USER_DN', 'uid=%u,ou=mailaccount,dc=phppush,dc=com');
-
-// LDAP BASE DNS
-define('LDAP_BASE_DNS', 'Contacts:ou=addressbook,uid=%u,ou=mailaccount,dc=phppush,dc=com'); //Multiple values separator is |
+class BadRequestException extends ZPushException {
+    protected $defaultLogLevel = LOGLEVEL_WARN;
+    protected $httpReturnCode = HTTP_CODE_400;
+    protected $httpReturnMessage = "Bad Request";
+}
