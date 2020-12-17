@@ -328,7 +328,6 @@ class Acl extends Entity {
 		}
 
 		$query->join('core_acl_group', 'acl_g', $on)
-			->select('MAX(acl_g.level) as permissionLevel', true)
 			->groupBy(['id']);
 
 		if(!isset($groups)) {

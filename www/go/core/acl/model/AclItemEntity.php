@@ -158,7 +158,7 @@ abstract class AclItemEntity extends AclEntity {
 
 		$keys = [];
 		foreach (static::aclEntityKeys() as $from => $to) {
-			if(!in_array($from, $this->fetchProperties)) {
+			if(!isset($this->{$from})) {
 				throw new Exception("Required property '".static::class."::$from' not fetched");
 			}
 			$keys[$to] = $this->{$from};

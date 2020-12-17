@@ -1,3 +1,6 @@
+- Files: Count in detail panel card could show from last item with files
+- Core: Link count numbers were off when you didn't have permissions 
+
 17-12-2020 6.4.203
 - Multi instance: normalize allowed_modules
 
