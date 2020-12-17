@@ -46,7 +46,7 @@ class Module extends Observable {
 	 * the folder name in the modules folder.
 	 * 
 	 * eg. notes, calendar  etc.
-	 * @return StringHelper 
+	 * @return string
 	 */
 	public function name() {
 		
@@ -61,6 +61,15 @@ class Module extends Observable {
 
 	/**
 	 * For compatibility with new framework
+	 *
+	 * @return string
+	 */
+	public function getName() {
+		return $this->name();
+	}
+
+	/**
+	 * For compatibility with new framework
 	 * @return static
 	 */
 	public static function get() {
@@ -71,7 +80,7 @@ class Module extends Observable {
 	/**
 	 * Get the absolute filesystem path to the module.
 	 * 
-	 * @return StringHelper 
+	 * @return string
 	 */
 	public function path(){
 		return \GO::config()->root_path . 'modules/' . $this->name() . '/';
@@ -113,6 +122,10 @@ class Module extends Observable {
 	
 	public function package(){
 		return self::PACKAGE_COMMUNITY;
+	}
+
+	public function getPackage() {
+		return "legacy";
 	}
 	
 	private function _findIconByTheme($theme){
