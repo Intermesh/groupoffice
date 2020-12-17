@@ -20,6 +20,9 @@ end 6.5
 
 
 
+17-12-2020 6.4.203
+- Multi instance: normalize allowed_modules
+
 17-12-2020 6.4.202
 - Multi instance: Only create studio package folder if module is enabled for the instance.
 - Core: Fixed custom fields not displaying in grid when an entity field was present
