@@ -331,7 +331,6 @@ class Instance extends Entity {
 				throw new Exception("Could not write to config file");
 			}
 
-
 		} catch(\Exception $e) {
 			
 			//cleanup
@@ -348,7 +347,7 @@ class Instance extends Entity {
 
 			$this->getModulePackageFolder()->delete();
 			
-			parent::internalDelete((new Query())->where(['id' => $this->id]));
+			parent::internalDelete((new Query())->from(self::getMapping()->getPrimaryTable()->getName())->where(['id' => $this->id]));
 			
 			throw $e;
 		}
