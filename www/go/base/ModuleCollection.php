@@ -53,6 +53,8 @@ class ModuleCollection extends Model\ModelCollection{
 				self::$allowedModules = self::normalizeAllowedModules(\GO::config()->allowed_modules);
 			}
 			$allowedModules = self::$allowedModules;
+		} else {
+			$allowedModules = self::normalizeAllowedModules($allowedModules);
 		}
 
 		if (empty($allowedModules)) {
