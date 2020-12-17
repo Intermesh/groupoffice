@@ -198,9 +198,9 @@ trait SearchableTrait {
 					echo ".";
 
 				} catch (\Exception $e) {
-					echo $e->getMessage();
+					echo "\nError: ". $e->getMessage() ."\n";
 					\go\core\ErrorHandler::logException($e);
-					echo "E";
+
 					$offset++;
 				}
 			}
