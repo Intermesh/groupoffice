@@ -85,7 +85,7 @@ class Module extends Observable {
 	/**
 	 * Get the absolute filesystem path to the module.
 	 * 
-	 * @return StringHelper 
+	 * @return string
 	 */
 	public function path(){
 		return \GO::config()->root_path . 'modules/' . $this->name() . '/';
@@ -137,7 +137,7 @@ class Module extends Observable {
 	public function getPackage() {
 		return "legacy";
 	}
-	
+
 	private function _findIconByTheme($theme){
 		$path = $this->path();
 		if(file_exists($path.'/themes/'.$theme.'/images/'.$this->name().'.png')){
@@ -251,7 +251,7 @@ class Module extends Observable {
 		return $this->isAvailable();
 	}
 
-	
+
 	/**
 	 * Return false is for some reason this module is not instalable.
 	 * 

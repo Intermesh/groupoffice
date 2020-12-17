@@ -249,11 +249,9 @@ trait SearchableTrait {
 					echo ".";
 
 				} catch (\Exception $e) {
-					echo $m->id() . ' '. $m->title() ."\n";
-					echo $e->getMessage();
-					echo $e->getTraceAsString();
+					echo "Error: " . $m->id() . ' '. $m->title() ." : " . $e->getMessage() ."\n";
 					\go\core\ErrorHandler::logException($e);
-					echo "E";
+
 					$offset++;
 				}
 			}

@@ -3,6 +3,7 @@
 namespace go\core\controller;
 
 use go\core\db\Criteria;
+use go\core\event\EventEmitterTrait;
 use go\core\model\Acl;
 use go\core\orm\Query;
 use go\core\jmap\EntityController;
@@ -11,6 +12,12 @@ use go\core\model\Module;
 use go\core\model;
 
 class Search extends EntityController {
+
+	const EVENT_SEARCH_EMAIL_CONTACTS = "searchemailcontacts";
+
+	const EVENT_SEARCH_EMAIL = "searchemail";
+
+	use EventEmitterTrait;
 
 	protected function entityClass() {
 		return model\Search::class;
@@ -47,6 +54,8 @@ class Search extends EntityController {
 
 
 
+
+
 		if (Module::isAvailableFor("community", "addressbook")) {
 
 			$selectQuery = 'c.id as entityId, "Contact" as entity, e.email, e.type, c.name, c.photoBlobId';
@@ -75,6 +84,7 @@ class Search extends EntityController {
 				);
 			}
 
+			self::fireEvent(self::EVENT_SEARCH_EMAIL_CONTACTS, $contactsQuery, $query);
 
 			$query->union($contactsQuery);
 		}
@@ -85,7 +95,8 @@ class Search extends EntityController {
 		if($isEmailModuleAvailable && $optionEnabled == "1") {
 			$query->orderBy(["priority" => "DESC", "name" => "ASC"]);
 		}
-		go()->debug($query);
+
+		self::fireEvent(self::EVENT_SEARCH_EMAIL, $query);
 		
 		\go\core\jmap\Response::get()->addResponse([
 				'list' => $query->toArray()

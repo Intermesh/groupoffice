@@ -20,6 +20,9 @@ end 6.5
 
 
 
+- Multi instance: Only create studio package folder if module is enabled for the instance.
+- Core: Fixed custom fields not displaying in grid when an entity field was present
+
 15-12-2020 6.4.201
 - Core: Fixed permission denied error when linking
 
