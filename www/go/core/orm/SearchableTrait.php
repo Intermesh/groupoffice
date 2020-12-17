@@ -152,9 +152,10 @@ trait SearchableTrait {
 			go()->getDbConnection()->delete('core_search_word', ['searchId' => $search->id])->execute();
 		}
 
-		$keywords = array_map(function ($word) use ($search) {
+		//array values to make sure index is sequential
+		$keywords = array_values(array_map(function ($word) use ($search) {
 			return ['searchId' => $search->id, 'word'=> $word, 'drow' => strrev($word)];
-		}, $keywords);
+		}, $keywords));
 
 		return go()->getDbConnection()->insertIgnore(
 			'core_search_word',$keywords

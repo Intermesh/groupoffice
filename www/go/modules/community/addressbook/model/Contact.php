@@ -973,7 +973,7 @@ class Contact extends AclItemEntity {
 
 	protected function getSearchKeywords()
 	{
-		$keywords = [$this->name, $this->debtorNumber];
+		$keywords = [$this->name, $this->debtorNumber, $this->jobTitle];
 		foreach($this->emailAddresses as $e) {
 			$keywords[] = $e->email;
 		}
