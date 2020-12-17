@@ -14,19 +14,7 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			remoteSort: true
 		});
 		
-		this.store.on("load", function(store,rs, success) {
-
-			var count = this.store.getTotalCount();
-			var badge = "<span class='badge'>" + count + '</span>';
-			this.setTitle(t("Files", "files") + badge);
-			if(count) {
-				this.browseBtn.setText(t("Browse {total} files", "files").replace("{total}", count));
-			} else
-			{
-				this.browseBtn.setText(t("Browse files", "files"));
-				this.setTitle(t("Files", "files"));
-			}
-		}, this);
+		this.store.on("load", this.onStoreLoad, this);
 		this.store.on('exception',function(store, type, action, options, response) {
 			var data = Ext.decode(response.responseText);
 			if(data && data.feedback) {
@@ -310,8 +298,23 @@ go.modules.files.FilesDetailPanel = Ext.extend(Ext.Panel, {
 			});
 		} else {
 			this.store.removeAll();
-			this.browseBtn.setText(t("Browse files", "files"));
+			this.store.totalLength = 0;
+			this.onStoreLoad();
 			this.browseBtn.setDisabled(this.detailView.data.permissionLevel < go.permissionLevels.write);
+		}
+	},
+
+	onStoreLoad : function() {
+
+		var count = this.store.getTotalCount();
+		var badge = "<span class='badge'>" + count + '</span>';
+		this.setTitle(t("Files", "files") + badge);
+		if(count) {
+			this.browseBtn.setText(t("Browse {total} files", "files").replace("{total}", count));
+		} else
+		{
+			this.browseBtn.setText(t("Browse files", "files"));
+			this.setTitle(t("Files", "files"));
 		}
 	},
 
