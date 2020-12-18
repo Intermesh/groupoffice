@@ -26,27 +26,34 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 	 * @returns {unresolved}
 	 */
 	renderDetailView: function (value, data, customfield) {		
-		var opt = this.findRecursive(value, customfield.dataType.options);		
-		return opt ? opt.text : null;
+		var text = this.findRecursive(value, customfield.dataType.options);
+		return text ? text.substr(3) : null;
+		// return opt ? opt.text : null;
 	},
 
-	findRecursive: function (value, options) {
+	findRecursive: function (value, options, text) {
+		if(!text) {
+			text = "";
+		}
 		var o;
 		for(var i = 0, l = options.length; i < l; i++) {
 			o = options[i];
 			if(o.id == value) {
-				return o;
+
+				text += " > " + o.text;
+
+				return text;
 			}
 
 			if(o.children) {
-				var nested = this.findRecursive(value, o.children);
+				var nested = this.findRecursive(value, o.children, text + " > " + o.text);
 				if(nested) {
 					return nested;
 				}
 			}
 		}
 
-		return false;
+		return null;
 	},
 	
 	/**

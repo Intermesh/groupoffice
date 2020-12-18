@@ -42,6 +42,7 @@ class Select extends Base {
 										->all();
 		
 		foreach($options as &$o) {
+			$o['enabled'] = !!$o['enabled'];
 			$o['children'] = $this->internalGetOptions($o['id']);
 		}
 		
