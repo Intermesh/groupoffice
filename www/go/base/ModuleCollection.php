@@ -53,6 +53,8 @@ class ModuleCollection extends Model\ModelCollection{
 				self::$allowedModules = self::normalizeAllowedModules(\GO::config()->allowed_modules);
 			}
 			$allowedModules = self::$allowedModules;
+		} else {
+			$allowedModules = self::normalizeAllowedModules($allowedModules);
 		}
 
 		if (empty($allowedModules)) {
@@ -119,11 +121,7 @@ class ModuleCollection extends Model\ModelCollection{
 		$classFinder = new \go\core\util\ClassFinder(false);
 		$classFinder->addNamespace("go\\modules");
 		$mods = $classFinder->findByParent(\go\core\Module::class);
-		$mods = array_filter($mods, function($mod) {
-			return static::isAllowed($mod::getName(), $mod::getPackage());
-		});
 		$modules = array_merge($modules, $mods);
-		
 		
 		sort($modules);
 		
@@ -139,7 +137,7 @@ class ModuleCollection extends Model\ModelCollection{
 	 */
 	public function isAvailable($moduleId, $checkModuleAvailabiltiy=true){
 		
-		if(!static::isAllowed($moduleId))
+		if($checkModuleAvailabiltiy && !static::isAllowed($moduleId))
 			return false;
 		
 		$folder = new Fs\Folder(\GO::config()->root_path.'modules/'.$moduleId);

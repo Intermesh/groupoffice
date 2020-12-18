@@ -25,7 +25,7 @@
 define("GO_NO_SESSION", true);
 //require Group-Office framework
 if(!class_exists('GO'))
-	require_once("../../GO.php");
+	require_once(dirname(dirname(__DIR__)) . "/GO.php");
 
 /**********************************************************************************
  *  Default settings

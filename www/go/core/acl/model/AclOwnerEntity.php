@@ -390,7 +390,7 @@ abstract class AclOwnerEntity extends AclEntity {
 				$table->getName(),
 				['createdBy' => $createdByColumn->nullAllowed ? null : 1],
 				(new Query())
-					->where("id not in (select id from core_user)"))
+					->where("createdBy not in (select id from core_user)"))
 				->execute();
 
 			$updates['acl.ownedBy'] = new Expression('coalesce(entity.createdBy, 1)');

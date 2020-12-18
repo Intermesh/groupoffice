@@ -2569,6 +2569,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			return $this->columns[$name];
 	}
 
+	public function hasColumn($name) {
+		return isset($this->columns[$name]);
+	}
+
 	/**
 	 * Checks all the permissions
 	 *
@@ -4778,6 +4782,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 					$this->setNewAcl();
 				else {
 					$user_id = empty($this->user_id) ? 1 : $this->user_id;
+
 					$acl->ownedBy = $user_id;
 					$acl->usedIn = $this->tableName() . '.' . $this->aclField();
 					if($acl->isModified())
@@ -4859,7 +4864,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 						
 					} catch (\Exception $e) {
 						\go\core\ErrorHandler::logException($e);
-						echo "E";
+						echo "\nError: " . $e->getMessage() ."\n";
 						$start++;
 					}
 				}

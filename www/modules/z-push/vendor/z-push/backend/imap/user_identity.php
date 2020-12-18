@@ -131,40 +131,46 @@ function getIdentityFromLdap($username, $domain, $identity, $encode = true) {
 
     $ldap_conn = null;
     try {
-        $ldap_conn = ldap_connect(IMAP_FROM_LDAP_SERVER, IMAP_FROM_LDAP_SERVER_PORT);
-        if ($ldap_conn) {
-            ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getIdentityFromLdap() - Connected to LDAP"));
-            ldap_set_option($ldap_conn, LDAP_OPT_PROTOCOL_VERSION, 3);
-            ldap_set_option($ldap_conn, LDAP_OPT_REFERRALS, 0);
-            $ldap_bind = ldap_bind($ldap_conn, IMAP_FROM_LDAP_USER, IMAP_FROM_LDAP_PASSWORD);
+        if (defined('IMAP_FROM_LDAP_SERVER_URI')) {
+            $ldap_conn = ldap_connect(IMAP_FROM_LDAP_SERVER_URI);
 
-            if ($ldap_bind) {
-                ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getIdentityFromLdap() - Authenticated in LDAP"));
-                $filter = str_replace('#username', $username, str_replace('#domain', $domain, IMAP_FROM_LDAP_QUERY));
-                ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getIdentityFromLdap() - Searching From with filter: %s", $filter));
-                $search = ldap_search($ldap_conn, IMAP_FROM_LDAP_BASE, $filter, unserialize(IMAP_FROM_LDAP_FIELDS));
-                $items = ldap_get_entries($ldap_conn, $search);
-                if ($items['count'] > 0) {
-                    $ret_value = $identity;
-                    ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getIdentityFromLdap() - Found entry in LDAP. Generating From"));
-                    // We get the first object. It's your responsability to make the query unique
-                    foreach (unserialize(IMAP_FROM_LDAP_FIELDS) as $field) {
-                        $ret_value = str_replace('#'.$field, $items[0][$field][0], $ret_value);
+            if ($ldap_conn) {
+                ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getIdentityFromLdap() - Connected to LDAP"));
+                ldap_set_option($ldap_conn, LDAP_OPT_PROTOCOL_VERSION, 3);
+                ldap_set_option($ldap_conn, LDAP_OPT_REFERRALS, 0);
+                $ldap_bind = ldap_bind($ldap_conn, IMAP_FROM_LDAP_USER, IMAP_FROM_LDAP_PASSWORD);
+
+                if ($ldap_bind) {
+                    ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getIdentityFromLdap() - Authenticated in LDAP"));
+                    $filter = str_replace('#username', $username, str_replace('#domain', $domain, IMAP_FROM_LDAP_QUERY));
+                    ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getIdentityFromLdap() - Searching From with filter: %s", $filter));
+                    $search = ldap_search($ldap_conn, IMAP_FROM_LDAP_BASE, $filter, unserialize(IMAP_FROM_LDAP_FIELDS));
+                    $items = ldap_get_entries($ldap_conn, $search);
+                    if ($items['count'] > 0) {
+                        $ret_value = $identity;
+                        ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getIdentityFromLdap() - Found entry in LDAP. Generating From"));
+                        // We get the first object. It's your responsability to make the query unique
+                        foreach (unserialize(IMAP_FROM_LDAP_FIELDS) as $field) {
+                            $ret_value = str_replace('#'.$field, $items[0][$field][0], $ret_value);
+                        }
+                        if ($encode) {
+                            $ret_value = encodeFrom($ret_value);
+                        }
                     }
-                    if ($encode) {
-                        $ret_value = encodeFrom($ret_value);
+                    else {
+                        ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getIdentityFromLdap() - No entry found in LDAP"));
                     }
                 }
                 else {
-                    ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getIdentityFromLdap() - No entry found in LDAP"));
+                    ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getIdentityFromLdap() - Not authenticated in LDAP server"));
                 }
             }
             else {
-                ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getIdentityFromLdap() - Not authenticated in LDAP server"));
+                ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getIdentityFromLdap() - Not connected to LDAP server"));
             }
         }
         else {
-            ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendIMAP->getIdentityFromLdap() - Not connected to LDAP server"));
+            ZLog::Write(LOGLEVEL_WARN, sprintf("BackendIMAP->getIdentityFromLdap() - No LDAP server URI defined"));
         }
     }
     catch(Exception $ex) {

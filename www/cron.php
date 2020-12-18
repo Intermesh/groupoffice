@@ -43,7 +43,7 @@ if(go()->getSettings()->databaseVersion != go()->getVersion()) {
 
 $lock = new \go\core\util\Lock("cron");
 if(!$lock->lock()) {
-    \go\core\ErrorHandler::log("cron.php is locked (already running)");
+    go()->debug("cron.php is locked (already running)");
     exit();
 }
 

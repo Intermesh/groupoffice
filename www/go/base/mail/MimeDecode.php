@@ -318,8 +318,9 @@ class MimeDecode
                     for ($i = 0; $i < count($parts); $i++) {
                         list($part_header, $part_body) = $this->_splitBodyHeader($parts[$i]);
                         $part = $this->_decode($part_header, $part_body, $default_ctype);
-                        if($part === false)
-                            $part = $this->raiseError($this->_error);
+                        if($part === false) {
+	                        throw new \Exception($this->_error);
+                        }
                         $return->parts[] = $part;
                     }
                     break;

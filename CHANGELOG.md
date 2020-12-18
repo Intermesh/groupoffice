@@ -1,3 +1,21 @@
+18-12-2020 6.4.204
+- Files: Count in detail panel card could show from last item with files
+- Core: Link count numbers were off when you didn't have permissions 
+- Carddav: fixed Error: CardDAV - response code 500 #635
+- Address book: Everyone group and all contacts translatable #636
+- Core: Don't change div into p. Hopefully fixes wordpaste can't be undone and disables formatting #633
+- ActiveSync: Wrong if statement fixed in devicemanager
+
+17-12-2020 6.4.203
+- Multi instance: normalize allowed_modules
+
+17-12-2020 6.4.202
+- Multi instance: Only create studio package folder if module is enabled for the instance.
+- Core: Fixed custom fields not displaying in grid when an entity field was present
+- Core: Smaller core_search.keywords key length to fix too large index error.
+- Core: Z-push upgraded to 2.6.1
+- Core: Fixed stringstreamwrapper error with z-push
+
 15-12-2020 6.4.201
 - Core: Fixed permission denied error when linking
 

@@ -952,9 +952,10 @@ class Utils {
      *
      * @param string $filename
      * @param string $data
+     * @param boolean $writeCheck (opt) perform a byte check of the written data
      * @return boolean|int
      */
-    public static function SafePutContents($filename, $data) {
+    public static function SafePutContents($filename, $data, $writeCheck = false) {
         //put the 'tmp' as a prefix (and not suffix) so all glob call will not see temp files
         $tmp = dirname($filename).DIRECTORY_SEPARATOR.'tmp-'.getmypid().'-'.basename($filename);
 
@@ -964,19 +965,41 @@ class Utils {
         $sleep_time = (defined('FILE_STATE_SLEEP') ? FILE_STATE_SLEEP : 100);
         $i = 1;
         while (($i <= $attempts) && (($bytes = file_put_contents($tmp, $data)) === false)) {
-            ZLog::Write(LOGLEVEL_WARN, sprintf("Utils->SafePutContents: Failed on writing data in tmp - attempt: %d - filename: %s", $i, $tmp));
+            ZLog::Write(LOGLEVEL_WARN, sprintf("Utils->SafePutContents: Failed on writing data in tmp filename - attempt: %d - filename: %s", $i, $tmp));
             $i++;
             usleep($sleep_time * 1000);
         }
+        if ($i > $attempts)
+            ZLog::Write(LOGLEVEL_FATAL, sprintf("Utils->SafePutContents: Unable to write data in tmp filename '%s' after %s retries",$tmp, --$i));
         if ($bytes !== false){
             self::FixFileOwner($tmp);
             $i = 1;
             while (($i <= $attempts) && (($res = rename($tmp, $filename)) !== true)) {
-                ZLog::Write(LOGLEVEL_WARN, sprintf("Utils->SafePutContents: Failed on rename - attempt: %d - filename: %s", $i, $tmp));
+                ZLog::Write(LOGLEVEL_WARN, sprintf("Utils->SafePutContents: Failed on renaming tmp filename - attempt: %d - filename: %s", $i, $tmp));
                 $i++;
                 usleep($sleep_time * 1000);
             }
+            if ($i > $attempts)
+                ZLog::Write(LOGLEVEL_FATAL, sprintf("Utils->SafePutContents: Unable to rename tmp filename '%s' after %s retries",$tmp, --$i));
             if ($res !== true) $bytes = false;
+        }
+        // verify the content of the just written file
+        if ($writeCheck === true) {
+            ZLog::Write(LOGLEVEL_DEBUG, sprintf("Utils->SafePutContents: Write check checking written content of %d bytes for filename: %s",$bytes, $filename));
+            $attempts = (defined('FILE_STATE_ATTEMPTS') ? FILE_STATE_ATTEMPTS : 3);
+            $sleep_time = (defined('FILE_STATE_SLEEP') ? FILE_STATE_SLEEP : 100);
+            $i = 1;
+            while (($i <= $attempts) && (strcmp($bytesChecked = self::SafeGetContents($filename, __FUNCTION__, true), $data) !== 0)) {
+                ZLog::Write(LOGLEVEL_WARN, sprintf("Utils->SafePutContents: Write check failed for filename '%s' different content. Expected %d bytes to check found %d bytes - attempt: %d", $filename, $bytes, strlen($bytesChecked), $i));
+                $i++;
+                usleep($sleep_time * 1000);
+            }
+            if ($i > $attempts) {
+                ZLog::Write(LOGLEVEL_FATAL, sprintf("Utils->SafePutContents: Write check failed for filename '%s' different content. Expected %d bytes to check found %d bytes after %d retries", $filename, $bytes, strlen($bytesChecked), --$i));
+            } else {
+                ZLog::Write(LOGLEVEL_DEBUG, sprintf("Utils->SafePutContents: Write correctly checked %d bytes for filename: %s",strlen($bytesChecked), $filename));
+            }
+            $bytes = strlen($bytesChecked);
         }
         return $bytes;
     }
@@ -1406,7 +1429,7 @@ class Utils {
             usleep($sleep_time * 1000);
         }
         if ($i > $attempts)
-            ZLog::Write(LOGLEVEL_FATAL, sprintf("FileStateMachine->%s(): Unable to read filename '%s' after %s retries",$functName, $filename, --$i));
+            ZLog::Write(LOGLEVEL_FATAL, sprintf("FileStateMachine->%s(): Unable to read filename '%s' after %d retries",$functName, $filename, --$i));
 
         return $filecontents;
     }
