@@ -1755,8 +1755,8 @@ GO.email.emailFiles = function(files, detailView) {
 		files = new Array(files);
 	}
 
-	var promise
-	if(detailView.getEmailComposerConfig) {
+	var promise;
+	if(detailView && detailView.getEmailComposerConfig) {
 		promise = detailView.getEmailComposerConfig();
 	} else {
 		promise = Promise.resolve({});

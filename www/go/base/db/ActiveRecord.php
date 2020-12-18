@@ -46,10 +46,7 @@ use go\core\db\Query;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
 use go\core\model\Link;
-use go\core\orm\EntityType;
-use go\core\orm\CustomFieldsTrait;
 use go\core\orm\SearchableTrait;
-use go\core\util\DateTime;
 
 abstract class ActiveRecord extends \GO\Base\Model{
 
@@ -1454,47 +1451,71 @@ abstract class ActiveRecord extends \GO\Base\Model{
     }
 
 		if(!empty($params['searchQuery'])){
-			$where .= " \nAND (";
 
-			if(empty($params['searchQueryFields'])){
-				$searchFields = $this->getFindSearchQueryParamFields('t',$joinCf);
-			}else{
-				$searchFields = $params['searchQueryFields'];
-			}
+			if(!$this->hasLinks()) {
 
+				$params['searchQuery'] = '%' . preg_replace('/[\s*]+/', '%', $params['searchQuery']) . '%';
 
-			if(empty($searchFields))
-				throw new \Exception("No automatic search fields defined for ".$this->className().". Maybe this model has no varchar fields? You can override function getFindSearchQueryParamFields() or you can supply them with FindParams::searchFields()");
+				$where .= " \nAND (";
 
-			//`name` LIKE "test" OR `content` LIKE "test"
-
-			$first = true;
-			foreach($searchFields as $searchField){
-				if($first){
-					$first=false;
-				}else
-				{
-					$where .= ' OR ';
+				if (empty($params['searchQueryFields'])) {
+					$searchFields = $this->getFindSearchQueryParamFields('t', $joinCf);
+				} else {
+					$searchFields = $params['searchQueryFields'];
 				}
-				$where .= $searchField.' LIKE '.$this->getDbConnection()->quote($params['searchQuery'], PDO::PARAM_STR);
-			}
 
-			if($this->primaryKey()=='id'){
-				//Searc on exact ID match too.
-				$idQuery = trim($params['searchQuery'],'% ');
-				if(intval($idQuery)."" === $idQuery){
-					if($first){
-						$first=false;
-					}else
-					{
+
+				if (empty($searchFields))
+					throw new \Exception("No automatic search fields defined for " . $this->className() . ". Maybe this model has no varchar fields? You can override function getFindSearchQueryParamFields() or you can supply them with FindParams::searchFields()");
+
+				//`name` LIKE "test" OR `content` LIKE "test"
+
+				$first = true;
+				foreach ($searchFields as $searchField) {
+					if ($first) {
+						$first = false;
+					} else {
 						$where .= ' OR ';
 					}
+					$where .= $searchField . ' LIKE ' . $this->getDbConnection()->quote($params['searchQuery'], PDO::PARAM_STR);
+				}
 
-					$where .= 't.id='.intval($idQuery);
+				if ($this->primaryKey() == 'id') {
+					//Searc on exact ID match too.
+					$idQuery = trim($params['searchQuery'], '% ');
+					if (intval($idQuery) . "" === $idQuery) {
+						if ($first) {
+							$first = false;
+						} else {
+							$where .= ' OR ';
+						}
+
+						$where .= 't.id=' . intval($idQuery);
+					}
+				}
+
+				$where .= ') ';
+			} else
+			{
+				$joins .= "\nINNER JOIN core_search search ON search.entityId = t.id and search.entityTypeId = " . static::entityType()->getId();
+
+				$i = 0;
+				$words = SearchableTrait::splitTextKeywords($params['searchQuery']);
+				$words = array_unique($words);
+
+				foreach($words as $word) {
+					$joins .= "\nINNER JOIN core_search_word w" . $i . " ON w" . $i . ".searchId = search.id\n";
+
+					//if($i != 0) {
+						$where .= "\nAND";
+					//}
+
+					$where .= '(w'.$i.'.word  LIKE ' . $this->getDbConnection()->quote($word.'%', PDO::PARAM_STR) . ' OR ' .
+						'w'.$i.'.drow LIKE '. $this->getDbConnection()->quote(strrev($word) .'%', PDO::PARAM_STR) . ')';
+
+					$i++;
 				}
 			}
-
-			$where .= ') ';
 		}
 
 		$group="";
@@ -2589,6 +2610,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			return false;
 		else
 			return $this->columns[$name];
+	}
+
+	public function hasColumn($name) {
+		return isset($this->columns[$name]);
 	}
 
 	/**
@@ -3704,7 +3729,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 		$keywords = array_map(function ($word) use ($search){
-			return ['searchId' => $search->id, 'word'=> $word];
+			return ['searchId' => $search->id, 'word'=> $word, 'drow' => strrev($word)];
 		}, $keywords);
 
 		return go()->getDbConnection()->insertIgnore(
@@ -4856,6 +4881,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 					$this->setNewAcl();
 				else {
 					$user_id = empty($this->user_id) ? 1 : $this->user_id;
+
 					$acl->ownedBy = $user_id;
 					$acl->usedIn = $this->tableName() . '.' . $this->aclField();
 					if($acl->isModified())
@@ -4937,7 +4963,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 						
 					} catch (\Exception $e) {
 						\go\core\ErrorHandler::logException($e);
-						echo "E";
+						echo "\nError: " . $e->getMessage() ."\n";
 						$start++;
 					}
 				}

@@ -4,7 +4,7 @@ use go\modules\community\addressbook\Module;
 $updates = [];
 
 $updates['201811272011'][] = function() {
-	\go\core\db\Utils::runSQLFile(\go()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/addressbook/install/install.sql"));
+	\go\core\db\Utils::runSQLFile(\go()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/addressbook/install/upgrade.sql"));
 };
 $updates['201811272011'][] = "DROP TABLE addressbook_contact_custom_fields";
 
@@ -115,6 +115,8 @@ $updates['202010080821'][] = function() {
 	$m->addColor();
 };
 
+$updates['202011241530'][] = 'CREATE TABLE IF NOT EXISTS `addressbook_portlet_birthday` (`userId` int(11) NOT NULL, `addressBookId` int(11) NOT NULL, PRIMARY KEY (`userId`, `addressBookId`) ) ENGINE=InnoDB';
+$updates['202011241530'][] = 'ALTER TABLE `addressbook_portlet_birthday` ADD CONSTRAINT `addressbook_portlet_birthday_fk1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE, ADD CONSTRAINT `addressbook_portlet_birthday_fk2` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`);';
 
 $updates['202011271105'][] = "ALTER TABLE `addressbook_contact` ADD INDEX(`name`);";
 $updates['202011271105'][] = "ALTER TABLE `addressbook_contact` ADD INDEX(`modifiedAt`);";

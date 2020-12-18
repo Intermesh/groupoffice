@@ -106,10 +106,9 @@ abstract class EntityController extends Controller {
 		
 		$cls::sort($query, $sort);
 
-		$query->filter($params['filter']);
-		
-		//go()->info($query);
 		$query->select($cls::getPrimaryKey(true)); //only select primary key
+
+		$query->filter($params['filter']);
 		
 		return $query;
 	}
@@ -367,58 +366,49 @@ abstract class EntityController extends Controller {
    * @throws Exception
    */
 	protected function defaultGet($params) {
-		
+
 		$p = $this->paramsGet($params);
 
 		$result = [
-				'accountId' => $p['accountId'],
-				'state' => $this->getState(),
-				'list' => [],
-				'notFound' => []
+			'accountId' => $p['accountId'],
+			'state' => $this->getState(),
+			'list' => [],
+			'notFound' => []
 		];
-		
+
 		//empty array should return empty result. but ids == null should return all.
 		if(isset($p['ids']) && !count($p['ids'])) {
 			return $result;
 		}
 		go()->getDebugger()->debugTiming('before query');
-
-		if(!isset($p['ids'])) {
-			$p['ids'] = $this->defaultQuery([])['ids'];
-		}
+		$query = $this->getGetQuery($p);
 
 		go()->getDebugger()->debugTiming('after query');
 
+		$foundIds = [];
 		$result['list'] = [];
-		$result['notFound'] = [];
-
-//		$useCache = !empty(go()->getConfig()['cacheEntities']);
-
-		foreach($p['ids'] as $id) {
-
-//			$arr = $useCache ? $this->getEntityArrayFromCache($id, $p['properties']) : $this->getEntityArray($id, $p['properties']);
-
-			$arr = $this->getEntityArray($id, $p['properties']);
-			if(!$arr) {
-				$result['notFound'][] = $id;
-			} else {
-				$result['list'][] = $arr;
-			}
+		foreach($query as $e) {
+			$arr = $e->toArray();
+			$arr['id'] = $e->id();
+			$result['list'][] = $arr;
+			$foundIds[] = $arr['id'];
 
 			go()->getDebugger()->debugTiming('item to array');
 		}
 
+		$result['notFound'] = isset($p['ids']) ? array_values(array_diff($p['ids'], $foundIds)) : [];
+
 		return $result;
 	}
 
-	private function getEntityArray($id, $properties) {
-		$e = $this->getEntity($id, $properties);
-		if(!$e) {
-			return false;
-		}
-
-		return $e->toArray($properties);
-	}
+//	private function getEntityArray($id, $properties) {
+//		$e = $this->getEntity($id, $properties);
+//		if(!$e) {
+//			return false;
+//		}
+//
+//		return $e->toArray($properties);
+//	}
 
 	// Caching doesn't work because entities can contain user specific props like user tables and getPermissionLevel()
 //	private function getEntityArrayFromCache($id, $properties) {

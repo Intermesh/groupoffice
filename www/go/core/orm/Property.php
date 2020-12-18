@@ -1426,9 +1426,9 @@ abstract class Property extends Model {
 		$insertIds = array_diff($new, $old);
 
 		if(!empty($insertIds)) {
-			$data = array_map(function($v) use($key, $where) {
+			$data = array_values(array_map(function($v) use($key, $where) {
 				return array_merge($where, [$key => $v]);
-			}, $insertIds);	
+			}, $insertIds));
 
 			if(!go()->getDbConnection()->insert($relation->tableName, $data)->execute()) {
 				throw new Exception("Could not insert scalar relation ids");

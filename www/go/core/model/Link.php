@@ -3,6 +3,7 @@
 namespace go\core\model;
 
 use GO\Base\Db\ActiveRecord;
+use go\core\acl\model\AclItemEntity;
 use go\core\App;
 use go\core\db\Criteria;
 use go\core\orm\Query;
@@ -37,7 +38,7 @@ use go\core\validate\ErrorCode;
  * 
  * 
  */
-class Link extends Entity
+class Link extends AclItemEntity
 {
 	/**
 	 * The auto increment primary key
@@ -172,7 +173,8 @@ class Link extends Entity
 		$link->toId = $b->id;
 		$link->toEntity = $b->entityType()->getName();
 		$link->toEntityTypeId = $b->entityType()->getId();
-		$link->description = $description;		
+		$link->description = $description;
+		$link->aclId = $a->findAclId();
 		
 		if(!$link->save()) {
 			throw new \Exception("Couldn't create link: ". var_export($link->getValidationErrors(), true));
@@ -281,7 +283,7 @@ class Link extends Entity
 		$reverse['createdAt'] = $this->createdAt;
 		
 		if($this->isNew()) {			
-			$this->updateDataFromSearch();
+//			$this->updateDataFromSearch();
 			return App::get()->getDbConnection()->insertIgnore('core_link', $reverse)->execute();
 		}
 
@@ -291,20 +293,20 @@ class Link extends Entity
 		)->execute();
 	}
 
-	private function updateDataFromSearch() {
-		//make sure the description and name are set so they are returned to the client
-		if(!isset($this->toSearchId) || !isset($this->aclId)) {
-			$search = Search::find()->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
-			if(!$search) {
-				throw new \Exception("Could not find entity from search cache. Please run System settings -> Tools -> Update search index");
-			}
-			$this->toDescription = $search->description;
-			$this->toName = $search->name;
-			$this->toSearchId = $search->id;
-			$this->aclId = $search->findAclId();
-		}
-	}
-	
+//	private function updateDataFromSearch() {
+//		//make sure the aclId, description and name are set so they are returned to the client
+//		if(!isset($this->toSearchId) || !isset($this->aclId)) {
+//			$search = Search::find()->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
+//			if(!$search) {
+//				throw new \Exception("Could not find entity from search cache. Please run System settings -> Tools -> Update search index");
+//			}
+//			$this->toDescription = $search->description;
+//			$this->toName = $search->name;
+//			$this->toSearchId = $search->id;
+//			$this->aclId = $search->findAclId();
+//		}
+//	}
+//
 	protected static function internalDelete(Query $query) {		
 
 		//delete the reverse links
@@ -331,8 +333,9 @@ class Link extends Entity
 	 * @return int
 	 */
 	public function getPermissionLevel() {
-		if($this->isNew()) {			
-			$this->updateDataFromSearch();
+		if(!isset($this->aclId)) {
+			$search = Search::find(['aclId'])->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
+			$this->aclId = $search->findAclId();
 		}
 
 		if(!isset($this->permissionLevel)) {
@@ -399,5 +402,15 @@ class Link extends Entity
 			unset($sort['toEntity']);
 		}
 		return parent::sort($query, $sort);
+	}
+
+	protected static function aclEntityClass()
+	{
+		return Search::class;
+	}
+
+	protected static function aclEntityKeys()
+	{
+		return ['toId' => 'entityId', 'toEntityTypeId' => 'entityTypeId'];
 	}
 }

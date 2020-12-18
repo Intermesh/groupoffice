@@ -1001,7 +1001,7 @@ class DeviceManager {
         // status available or just initialized
         if (isset($currentStatus[ASDevice::FOLDERSYNCSTATUS]) || $statusflag == self::FLD_SYNC_INITIALIZED) {
             // only update if there is a change
-            if ($statusflag !== $currentStatus[ASDevice::FOLDERSYNCSTATUS] && $statusflag != self::FLD_SYNC_COMPLETED) {
+	        if ((!$currentStatus || $statusflag !== $currentStatus[ASDevice::FOLDERSYNCSTATUS]) && $statusflag != self::FLD_SYNC_COMPLETED) {
                 $this->device->SetFolderSyncStatus($folderid, array(ASDevice::FOLDERSYNCSTATUS => $statusflag));
                 ZLog::Write(LOGLEVEL_DEBUG, sprintf("SetFolderSyncStatus(): set %s for %s", $statusflag, $folderid));
             }

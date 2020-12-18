@@ -176,7 +176,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 						 */
 
 						if(me.fireEvent("beforesubmiterror", me, false, null, notSaved[id])) {
-							Ext.MessageBox.alert(t("Error"), t("Sorry, an error occurred") +  ": " + (response.message || "unknown error"));
+							GO.errorDialog.show(t("Sorry, an error occurred") +  ": " + (response.message || "unknown error"));
 						}
 						break;
 				}
@@ -193,7 +193,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 			}
 			me.fireEvent("submit", me, false, null, error);
 
-			console.error(error);
+			GO.errorDialog.show(t("Sorry, an error occurred") +  ": " + (error.message || "unknown error"));
 
 			return Promise.reject(error);
 		}).finally(function() {

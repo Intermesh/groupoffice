@@ -25,3 +25,5 @@ UrlsField.js
 SystemSettingsPanel.js
 DuplicateDialog.js
 LabelsDialog.js
+BirthdaysPortlet.js
+BirthdaysPortletSettingsDialog.js

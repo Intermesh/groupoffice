@@ -9,6 +9,7 @@ use go\core\webclient\CSP;
 use go\modules\community\addressbook\convert\VCard;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\UserSettings;
+use go\modules\community\addressbook\model\AddressBookPortletBirthday;
 use go\core\model\Link;
 use go\core\model\User;
 use go\modules\community\addressbook\model\AddressBook;
@@ -62,10 +63,12 @@ class Module extends core\Module {
 		
 		echo $vcard;
 	}
-	
-	
-	public static function onMap(Mapping $mapping) {
+
+
+	public static function onMap(Mapping $mapping)
+	{
 		$mapping->addHasOne('addressBookSettings', UserSettings::class, ['id' => 'userId'], true);
+		$mapping->addScalar('birthdayPortletAddressBooks', "addressbook_portlet_birthday", ['id' => 'userId']);
 	}
 
 	public static function onUserDelete(core\db\Query $query) {

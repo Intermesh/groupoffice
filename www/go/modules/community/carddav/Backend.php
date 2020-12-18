@@ -134,10 +134,9 @@ class Backend extends AbstractBackend {
 			throw new NotFound();
 		}
 		
+		$blob = isset($contact->vcardBlobId) ? \go\core\fs\Blob::findById($contact->vcardBlobId) : false;
 		
-		$blob = \go\core\fs\Blob::findById($contact->vcardBlobId);
-		
-		if($blob->modifiedAt < $contact->modifiedAt) {
+		if(!$blob || $blob->modifiedAt < $contact->modifiedAt) {
 			//blob won't be deleted if still used
 			$blob->setStaleIfUnused();
 			$c = new VCard();

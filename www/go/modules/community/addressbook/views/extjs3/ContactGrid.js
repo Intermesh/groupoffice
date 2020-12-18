@@ -30,6 +30,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				"dates",
 				"birthday", //dummy
 				"actionDate", //dummy
+				"gender",
 				"streetAddresses",
 				{name: 'organizations', type: "relation"},
 				"jobTitle",
@@ -120,6 +121,21 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 						return '<span class="go-ab-avatar">' + go.util.avatar(record.get('name'), record.data.photoBlobId, icon) + '</span>' + Ext.util.Format.htmlEncode(name);
 
 						// return '<div class="avatar ' + cls + '" style="' + style + '">'+content+'</div>' + Ext.util.Format.htmlEncode(name);
+					}
+				},
+				{
+					hidden: true,
+					header: t('Gender'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'gender',
+					renderer: function (v) {
+						if(v === 'M') {
+							return t("Male", 'addressbook');
+						} else if (v === 'F') {
+							return t("Female", 'addressbook');
+						}
+						return "";
 					}
 				},
 				{

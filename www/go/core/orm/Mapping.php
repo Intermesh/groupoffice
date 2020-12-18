@@ -263,7 +263,7 @@ class Mapping {
 	/**
 	 * Add a scalar relation. For example an array of ID's.
 	 * 
-	 * Note: When an entity with scalar relations is saved it automatically looks for other entities referencing the same scalar relation for trracking changes.
+	 * Note: When an entity with scalar relations is saved it automatically looks for other entities referencing the same scalar relation for tracking changes.
 	 * 
 	 * eg. When a group's users[] change. It will mark all users as changed too because they have a scalar groups[] property.
 	 * 

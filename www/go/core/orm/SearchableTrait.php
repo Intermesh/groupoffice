@@ -3,6 +3,7 @@ namespace go\core\orm;
 
 use go\core\customfield\Html;
 use go\core\customfield\TextArea;
+use go\core\db\Criteria;
 use go\core\db\Query;
 
 /**
@@ -63,6 +64,26 @@ trait SearchableTrait {
 
 
 		return $keywords;
+	}
+
+	public static function addCriteria(Criteria $criteria, Query $query, $searchPhrase) {
+		$i = 0;
+		$words = SearchableTrait::splitTextKeywords($searchPhrase);
+		$words = array_unique($words);
+
+		foreach($words as $word) {
+			$query->join("core_search_word", 'w'.$i, 'w'.$i.'.searchId = search.id');
+			//$query->join("core_search_word_reverse", 'wr'.$i, 'wr'.$i.'.searchId = s.id');
+
+			$c = new Criteria();
+			$c
+				->where('w'.$i.'.word', 'LIKE', $word . '%')
+				->orWhere('w'.$i.'.drow', 'LIKE', strrev($word) . '%');
+
+			$criteria->where($c);
+
+			$i++;
+		}
 	}
 
 	/**
@@ -131,9 +152,14 @@ trait SearchableTrait {
 			go()->getDbConnection()->delete('core_search_word', ['searchId' => $search->id])->execute();
 		}
 
-		$keywords = array_map(function ($word) use ($search){
-			return ['searchId' => $search->id, 'word'=> $word];
-		}, $keywords);
+		if(empty($keywords)) {
+			return true;
+		}
+
+		//array values to make sure index is sequential
+		$keywords = array_values(array_map(function ($word) use ($search) {
+			return ['searchId' => $search->id, 'word'=> $word, 'drow' => strrev($word)];
+		}, $keywords));
 
 		return go()->getDbConnection()->insertIgnore(
 			'core_search_word',$keywords
@@ -228,11 +254,9 @@ trait SearchableTrait {
 					echo ".";
 
 				} catch (\Exception $e) {
-					echo $m->id() . ' '. $m->title() ."\n";
-					echo $e->getMessage();
-					echo $e->getTraceAsString();
+					echo "Error: " . $m->id() . ' '. $m->title() ." : " . $e->getMessage() ."\n";
 					\go\core\ErrorHandler::logException($e);
-					echo "E";
+
 					$offset++;
 				}
 			}

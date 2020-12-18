@@ -20,13 +20,50 @@ end 6.5
 
 
 
-6.4.197
+18-12-2020 6.4.204
+- Files: Count in detail panel card could show from last item with files
+- Core: Link count numbers were off when you didn't have permissions 
+- Carddav: fixed Error: CardDAV - response code 500 #635
+- Address book: Everyone group and all contacts translatable #636
+- Core: Don't change div into p. Hopefully fixes wordpaste can't be undone and disables formatting #633
+- ActiveSync: Wrong if statement fixed in devicemanager
+
+17-12-2020 6.4.203
+- Multi instance: normalize allowed_modules
+
+17-12-2020 6.4.202
+- Multi instance: Only create studio package folder if module is enabled for the instance.
+- Core: Fixed custom fields not displaying in grid when an entity field was present
+- Core: Smaller core_search.keywords key length to fix too large index error.
+- Core: Z-push upgraded to 2.6.1
+- Core: Fixed stringstreamwrapper error with z-push
+
+15-12-2020 6.4.201
+- Core: Fixed permission denied error when linking
+
+15-12-2020 6.4.200
+- Address book: Fixed problem with 6.3 upgrade
+
+15-12-2020 6.4.199
+- Address book: Birthday portlet query improved
+- Core: Fixed error on new link
+
+14-12-2020 6.4.198
+- Address book: Birthday column was hidden in portlet
+
+14-12-2020 6.4.197
+- Calendar: Error with very small holiday booking of for example 0.01 hour.
+- Core: Updated Norwegian translation
+- Address book: Re-implemented birthday portlet for address book
 - Core: Bugfix in cronjobs new FW
 - Multi instance: All modules were always checked
+- Addressbook: add optional column 'gender' in grid.  
 - Core: Check MySQL / MariaDB server version. MySQL 8.0.22 has a bug which causes problems.
 - Core: Some CSV files could not be imported.
 - Core: Don't log 404 not found as errors
 - Multi instance: Use http to execute instance cron so it supports different versions
+- Core: Made entity selection behave more user friendly
+- Filesearch: Extensions for OCR can be configured. See https://groupoffice.readthedocs.io/using/file-search.html
 
 07-12-2020 6.4.196
 - Startpage: bugfix when removing a portlet for the second time

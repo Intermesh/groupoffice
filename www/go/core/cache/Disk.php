@@ -87,15 +87,16 @@ class Disk implements CacheInterface {
 		
 		$serialized = $file->getContents();
 
-		$this->cache[$key] = unserialize($serialized);
-
-		if ($this->cache[$key] === false) {
-			ErrorHandler::log("Could not unserialize cache from file " . $key.' data: '.var_export($serialized, true));			
+		try {
+			$this->cache[$key] = unserialize($serialized);
+		}
+		catch(\Exception $e) {
+			ErrorHandler::log("Could not unserialize cache from file " . $key.' data: '.var_export($serialized, true));
 			$this->delete($key);
 			return null;
-		} else {
-			return $this->cache[$key];
-		}		
+		}
+
+		return $this->cache[$key];
 	}
 
 	/**

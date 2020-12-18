@@ -200,14 +200,30 @@ class Instance extends Entity {
 		
 		if($this->isNew()) {		
 			$this->createInstance();
-		} 
+		}
+
+
+		$instanceConfig = $this->getInstanceConfig();
+		$globalConfig = $this->getGlobalConfig();
+		$mergedConfig = array_merge($globalConfig, $instanceConfig);
+
+		$studioAllowed = \GO\Base\ModuleCollection::isAllowed("studio", "business", $mergedConfig['allowed_modules'] ?? []);
+
+		if($studioAllowed) {
+			if(!$this->getModulePackageFolder()->create()) {
+				throw new Exception("Could not create module package folder in go/modules/*. Please make go/modules writable.");
+			}
+		} else{
+			if($this->getModulePackageFolder()->exists() && $this->getModulePackageFolder()->isEmpty()) {
+				$this->getModulePackageFolder()->delete();
+			}
+		}
 		
 		if($this->isModified(['storageQuota', 'userMax', 'enabled'])) {
-			$config = $this->getInstanceConfig();
-			$config['quota'] = $this->storageQuota / 1024;
-			$config['max_users'] = $this->usersMax;
-			$config['enabled'] = $this->enabled;
-			$this->setInstanceConfig($config);
+			$instanceConfig['quota'] = $this->storageQuota / 1024;
+			$instanceConfig['max_users'] = $this->usersMax;
+			$instanceConfig['enabled'] = $this->enabled;
+			$this->setInstanceConfig($instanceConfig);
 		}
 		
 		//$this->createWelcomeMessage();
@@ -298,10 +314,6 @@ class Instance extends Entity {
 		$databaseCreated = $databaseUserCreated = false;
 		try {
 
-			if(!$this->getModulePackageFolder()->create()) {
-				throw new Exception("Could not create module package folder in go/modules/*. Please make go/modules writable.");
-			}
-
 			if(!$dataFolder->create()) {
 				throw new Exception("Could not create data folder");
 			}
@@ -309,7 +321,6 @@ class Instance extends Entity {
 			if(!$tmpFolder->create()) {
 				throw new Exception("Could not create temporary files folder");
 			}
-
 		
 			$this->createDatabase($dbName);
 			$databaseCreated = true;
@@ -319,7 +330,6 @@ class Instance extends Entity {
 			if(!$configFile->putContents($this->createConfigFile($dbName, $dbUsername, $dbPassword, $tmpFolder->getPath(), $dataFolder->getPath()))) {
 				throw new Exception("Could not write to config file");
 			}
-
 
 		} catch(\Exception $e) {
 			
@@ -337,7 +347,7 @@ class Instance extends Entity {
 
 			$this->getModulePackageFolder()->delete();
 			
-			parent::internalDelete((new Query())->where(['id' => $this->id]));
+			parent::internalDelete((new Query())->from(self::getMapping()->getPrimaryTable()->getName())->where(['id' => $this->id]));
 			
 			throw $e;
 		}
@@ -576,7 +586,10 @@ class Instance extends Entity {
 
 				$instance->mysqldump();
 
-				$instance->getModulePackageFolder()->move($instance->getDataFolder()->getFolder($instance->getStudioPackage() .'_MODULE_PACKAGE'));
+				$modPackageFolder = $instance->getModulePackageFolder();
+				if($modPackageFolder->exists()) {
+					$instance->getModulePackageFolder()->move($instance->getDataFolder()->getFolder($instance->getStudioPackage() . '_MODULE_PACKAGE'));
+				}
 
 				$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php'));
 				$instance->getConfigFile()->getFolder()->delete();
@@ -590,6 +603,7 @@ class Instance extends Entity {
 				$instance->dropDatabaseUser($instance->getDbUser());
 				$instance->dropDatabase($instance->getDbName());
 			}catch(Exception $e) {
+				ErrorHandler::log("Error deleting instance: ". $instance->hostname);
 				ErrorHandler::logException($e);
 
 				go()->getMailer()

@@ -21,7 +21,7 @@ require('GO.php');
 //The server manager calls cron via HTTP because it doesn't know the document root when running
 //multiple versions of GO.v It passes ?exec=1 to make it run on the command line.
 if(!empty($_GET['exec'])) {
-    $cmd = __FILE__ . " " . App::findConfigFile() . " &> /dev/null &";
+    $cmd = __FILE__ . " " . App::findConfigFile() . " > /dev/null 2>/dev/null &";
     //echo $cmd . "\n";
 	exec($cmd, $output, $result);
 	if($result !==  0) {
@@ -43,7 +43,7 @@ if(go()->getSettings()->databaseVersion != go()->getVersion()) {
 
 $lock = new \go\core\util\Lock("cron");
 if(!$lock->lock()) {
-    \go\core\ErrorHandler::log("cron.php is locked (already running)");
+    go()->debug("cron.php is locked (already running)");
     exit();
 }
 

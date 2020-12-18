@@ -1052,18 +1052,20 @@ ALTER TABLE `core_acl` ADD FOREIGN KEY (`ownedBy`) REFERENCES `core_user`(`id`) 
 
 
 CREATE TABLE `core_search_word` (
-  `searchId` int(11) NOT NULL,
-  `word` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
+                                    `searchId` int(11) NOT NULL,
+                                    `word` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+                                    `drow` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 ALTER TABLE `core_search_word`
-  ADD PRIMARY KEY (`word`,`searchId`),
-  ADD KEY `searchId` (`searchId`);
+    ADD PRIMARY KEY (`word`,`searchId`),
+    ADD KEY `searchId` (`searchId`),
+    ADD KEY `drow` (`drow`);
 
 
 ALTER TABLE `core_search_word`
-  ADD CONSTRAINT `core_search_word_ibfk_1` FOREIGN KEY (`searchId`) REFERENCES `core_search` (`id`) ON DELETE CASCADE;
+    ADD CONSTRAINT `core_search_word_ibfk_1` FOREIGN KEY (`searchId`) REFERENCES `core_search` (`id`) ON DELETE CASCADE;
 
 CREATE TABLE `core_spreadsheet_export` (
                                            `id` int(10) UNSIGNED NOT NULL,
