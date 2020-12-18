@@ -3,6 +3,7 @@
 namespace go\core\model;
 
 use GO\Base\Db\ActiveRecord;
+use go\core\acl\model\AclItemEntity;
 use go\core\App;
 use go\core\db\Criteria;
 use go\core\orm\Query;
@@ -37,7 +38,7 @@ use go\core\validate\ErrorCode;
  * 
  * 
  */
-class Link extends Entity
+class Link extends AclItemEntity
 {
 	/**
 	 * The auto increment primary key
@@ -401,5 +402,15 @@ class Link extends Entity
 			unset($sort['toEntity']);
 		}
 		return parent::sort($query, $sort);
+	}
+
+	protected static function aclEntityClass()
+	{
+		return Search::class;
+	}
+
+	protected static function aclEntityKeys()
+	{
+		return ['toId' => 'entityId', 'toEntityTypeId' => 'entityTypeId'];
 	}
 }
