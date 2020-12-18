@@ -427,7 +427,7 @@ class MaintenanceController extends AbstractController {
 			if($params['module']=='base'){
 				$this->_checkCoreModels();
 			}else {
-				if (empty($params['package']) && $params['package'] == 'legacy') {
+				if (empty($params['package']) || $params['package'] == 'legacy') {
 
 					$class = 'GO\\' . ucfirst($params['module']) . '\\' . ucfirst($params['module']) . 'Module';
 					$module = new $class;
