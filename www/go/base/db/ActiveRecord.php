@@ -4877,6 +4877,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 					$this->setNewAcl();
 				else {
 					$user_id = empty($this->user_id) ? 1 : $this->user_id;
+
 					$acl->ownedBy = $user_id;
 					$acl->usedIn = $this->tableName() . '.' . $this->aclField();
 					if($acl->isModified())
