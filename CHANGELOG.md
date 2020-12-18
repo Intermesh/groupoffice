@@ -1,7 +1,10 @@
+18-12-2020 6.4.204
 - Files: Count in detail panel card could show from last item with files
 - Core: Link count numbers were off when you didn't have permissions 
 - Carddav: fixed Error: CardDAV - response code 500 #635
 - Address book: Everyone group and all contacts translatable #636
+- Core: Don't change div into p. Hopefully fixes wordpaste can't be undone and disables formatting #633
+- ActiveSync: Wrong if statement fixed in devicemanager
 
 17-12-2020 6.4.203
 - Multi instance: normalize allowed_modules
