@@ -2569,6 +2569,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			return $this->columns[$name];
 	}
 
+	public function hasColumn($name) {
+		return isset($this->columns[$name]);
+	}
+
 	/**
 	 * Checks all the permissions
 	 *
