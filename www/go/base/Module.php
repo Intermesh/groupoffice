@@ -512,38 +512,38 @@ class Module extends Observable {
 			if($model->isSubclassOf("GO\Base\Db\ActiveRecord")){
 				$m = \GO::getModel($model->getName());
 
-				if($m->hasAttribute('user_id')) {
-					//correct missing user_id values
-					$stmt = go()->getDbConnection()->updateIgnore(
-						$m->tableName(),
-						['user_id' => 1],
-						(new \go\core\orm\Query())
-							->where("user_id not in (select id from core_user)"));
-					$stmt->execute();
-					if($stmt->rowCount()) {
-						echo "Removed " . $stmt->rowCount() . " missing ACL id's\n";
-					}
-				}
-
-				if($m->hasAttribute('acl_id')) {
-					//correct missing user_id values
-					$stmt = go()->getDbConnection()->update(
-						$m->tableName(),
-						['acl_id' => 0],
-						(new \go\core\orm\Query())
-							->where("acl_id not in (select id from core_acl)"));
-
-					$stmt->execute();
-
-					if($stmt->rowCount()) {
-						echo "Removed " . $stmt->rowCount() . " missing ACL id's\n";
-					}
-				}
-				
 				if($m->checkDatabaseSupported()){					
 					
 					echo "Checking ".$model->getName()."\n";
 					flush();
+
+					if($m->hasColumn('user_id')) {
+						//correct missing user_id values
+						$stmt = go()->getDbConnection()->updateIgnore(
+							$m->tableName(),
+							['user_id' => 1],
+							(new \go\core\orm\Query())
+								->where("user_id not in (select id from core_user)"));
+						$stmt->execute();
+						if($stmt->rowCount()) {
+							echo "Changed " . $stmt->rowCount() . " missing user id's into the admin user\n";
+						}
+					}
+
+					if($m->hasColumn('acl_id')) {
+						//correct missing user_id values
+						$stmt = go()->getDbConnection()->update(
+							$m->tableName(),
+							['acl_id' => 0],
+							(new \go\core\orm\Query())
+								->where("acl_id not in (select id from core_acl)"));
+
+						$stmt->execute();
+
+						if($stmt->rowCount()) {
+							echo "Set " . $stmt->rowCount() . " missing ACL id's to zero\n";
+						}
+					}
 					
 					//to avoid memory errors
 					$start = 0;
