@@ -521,7 +521,7 @@ class Module extends Observable {
 							->where("user_id not in (select id from core_user)"));
 					$stmt->execute();
 					if($stmt->rowCount()) {
-						echo "Removed " . $stmt->row->rowCount() . " missing ACL id's\n";
+						echo "Removed " . $stmt->rowCount() . " missing ACL id's\n";
 					}
 				}
 
@@ -536,7 +536,7 @@ class Module extends Observable {
 					$stmt->execute();
 
 					if($stmt->rowCount()) {
-						echo "Removed " . $stmt->row->rowCount() . " missing ACL id's\n";
+						echo "Removed " . $stmt->rowCount() . " missing ACL id's\n";
 					}
 				}
 				
