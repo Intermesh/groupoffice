@@ -5054,45 +5054,45 @@ Ext.EventManager = function(){
         return true;
     }
     
-    function checkReadyState(e){
+    // function checkReadyState(e){
+		//
+    //
+    //     if(DOC.readyState == COMPLETE){
+    //         fireDocReady();
+    //         return true;
+    //     }
+    //     docReadyState || (docReadyProcId = setTimeout(arguments.callee, 2));
+    //     return false;
+    // }
 
-    
-        if(DOC.readyState == COMPLETE){
-            fireDocReady();
-            return true;
-        }
-        docReadyState || (docReadyProcId = setTimeout(arguments.callee, 2));
-        return false;
-    }
+    // var styles;
+    // function checkStyleSheets(e){
+    //     styles || (styles = Ext.query('style, link[rel=stylesheet]'));
+    //     if(styles.length == DOC.styleSheets.length){
+    //         fireDocReady();
+    //         return true;
+    //     }
+    //     docReadyState || (docReadyProcId = setTimeout(arguments.callee, 2));
+    //     return false;
+    // }
 
-    var styles;
-    function checkStyleSheets(e){
-        styles || (styles = Ext.query('style, link[rel=stylesheet]'));
-        if(styles.length == DOC.styleSheets.length){
-            fireDocReady();
-            return true;
-        }
-        docReadyState || (docReadyProcId = setTimeout(arguments.callee, 2));
-        return false;
-    }
-
-    function OperaDOMContentLoaded(e){
-        DOC.removeEventListener(DOMCONTENTLOADED, arguments.callee, false);
-        checkStyleSheets();
-    }
+    // function OperaDOMContentLoaded(e){
+    //     DOC.removeEventListener(DOMCONTENTLOADED, arguments.callee, false);
+    //     checkStyleSheets();
+    // }
 
     function fireDocReady(e){
         if(!docReadyState){
             docReadyState = true; 
 
-            if(docReadyProcId){
-                clearTimeout(docReadyProcId);
-            }
-            if(DETECT_NATIVE) {
+            // if(docReadyProcId){
+            //     clearTimeout(docReadyProcId);
+            // }
+            // if(DETECT_NATIVE) {
                 DOC.removeEventListener(DOMCONTENTLOADED, fireDocReady, false);
-            }
-            
-            E.un(WINDOW, "load", arguments.callee);
+            // }
+            //
+            // E.un(WINDOW, "load", arguments.callee);
         }
         if(docReadyEvent && !Ext.isReady){
             Ext.isReady = true;
@@ -5128,7 +5128,7 @@ Ext.EventManager = function(){
 //            checkReadyState();
 //        }
 //        
-        E.on(WINDOW, "load", fireDocReady);
+//         E.on(WINDOW, "load", fireDocReady);
     }
 
     function createTargeted(h, o){

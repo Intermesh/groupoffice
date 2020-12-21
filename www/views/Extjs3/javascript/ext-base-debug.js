@@ -1941,52 +1941,52 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
     }
 
     // private
-    function _tryPreloadAttach() {
-        var ret = false,
-            notAvail = [],
-            element, i, v, override,
-            tryAgain = !loadComplete || (retryCount > 0);
-
-        if(!locked){
-            locked = true;
-            
-            for(i = 0; i < onAvailStack.length; ++i){
-                v = onAvailStack[i];
-                if(v && (element = doc.getElementById(v.id))){
-                    if(!v.checkReady || loadComplete || element.nextSibling || (doc && doc.body)) {
-                        override = v.override;
-                        element = override ? (override === true ? v.obj : override) : element;
-                        v.fn.call(element, v.obj);
-                        onAvailStack.remove(v);
-                        --i;
-                    }else{
-                        notAvail.push(v);
-                    }
-                }
-            }
-
-            retryCount = (notAvail.length === 0) ? 0 : retryCount - 1;
-
-            if (tryAgain) {
-                startInterval();
-            } else {
-                clearInterval(_interval);
-                _interval = null;
-            }
-            ret = !(locked = false);
-        }
-        return ret;
-    }
+    // function _tryPreloadAttach() {
+    //     var ret = false,
+    //         notAvail = [],
+    //         element, i, v, override,
+    //         tryAgain = !loadComplete || (retryCount > 0);
+    //
+    //     if(!locked){
+    //         locked = true;
+    //
+    //         for(i = 0; i < onAvailStack.length; ++i){
+    //             v = onAvailStack[i];
+    //             if(v && (element = doc.getElementById(v.id))){
+    //                 if(!v.checkReady || loadComplete || element.nextSibling || (doc && doc.body)) {
+    //                     override = v.override;
+    //                     element = override ? (override === true ? v.obj : override) : element;
+    //                     v.fn.call(element, v.obj);
+    //                     onAvailStack.remove(v);
+    //                     --i;
+    //                 }else{
+    //                     notAvail.push(v);
+    //                 }
+    //             }
+    //         }
+    //
+    //         retryCount = (notAvail.length === 0) ? 0 : retryCount - 1;
+    //
+    //         if (tryAgain) {
+    //             startInterval();
+    //         } else {
+    //             clearInterval(_interval);
+    //             _interval = null;
+    //         }
+    //         ret = !(locked = false);
+    //     }
+    //     return ret;
+    // }
 
     // private
-    function startInterval() {
-        if(!_interval){
-            var callback = function() {
-                _tryPreloadAttach();
-            };
-            _interval = setInterval(callback, POLL_INTERVAL);
-        }
-    }
+    // function startInterval() {
+    //     if(!_interval){
+    //         var callback = function() {
+    //             _tryPreloadAttach();
+    //         };
+    //         _interval = setInterval(callback, POLL_INTERVAL);
+    //     }
+    // }
 
     // private
     function getScroll() {
@@ -2018,17 +2018,17 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
 
     var pub =  {
         extAdapter: true,
-        onAvailable : function(p_id, p_fn, p_obj, p_override) {
-            onAvailStack.push({
-                id:         p_id,
-                fn:         p_fn,
-                obj:        p_obj,
-                override:   p_override,
-                checkReady: false });
-
-            retryCount = POLL_RETRYS;
-            startInterval();
-        },
+        // onAvailable : function(p_id, p_fn, p_obj, p_override) {
+        //     onAvailStack.push({
+        //         id:         p_id,
+        //         fn:         p_fn,
+        //         obj:        p_obj,
+        //         override:   p_override,
+        //         checkReady: false });
+        //
+        //     retryCount = POLL_RETRYS;
+        //     startInterval();
+        // },
 
         // This function should ALWAYS be called from Ext.EventManager
         addListener: function(el, eventName, fn, opt) {
@@ -2179,7 +2179,7 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
             for (id in unloadListeners) {
                 ul = unloadListeners[id];
                 for (i = 0, len = ul.length; i < len; i++) {
-                    v = ul[i];
+                    v = ul[i61];
                     if (v) {
                         try{
                             scope = v[ADJ_SCOPE] ? (v[ADJ_SCOPE] === true ? v[OBJ] : v[ADJ_SCOPE]) :  win;
@@ -2204,7 +2204,7 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
         doAdd(win, "load", pub._load);
     }
     doAdd(win, UNLOAD, pub._unload);
-    _tryPreloadAttach();
+   // _tryPreloadAttach();
 
     return pub;
 }();
