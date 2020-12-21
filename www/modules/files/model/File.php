@@ -653,7 +653,7 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 		$old = $this->mtime;
 		$this->mtime = $this->fsFile->mtime();
 		if($this->mtime == $old) {
-			$this->mtime++; //mtime must change for WOPI!
+			$this->mtime += 2; //mtime must change for WOPI!
 		}
 		$this->save();
 		
