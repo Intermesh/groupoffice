@@ -1,3 +1,4 @@
+21-12-2020 6.4.205
 - Address book: Cascade delete portlet settings when address book is deleted
 - Core: Deleting multiple users at once failed
 - Files: Performance enhancement for expired files widget on start page by adding index
