@@ -20,6 +20,11 @@ end 6.5
 
 
 
+21-12-2020 6.4.205
+- Address book: Cascade delete portlet settings when address book is deleted
+- Core: Deleting multiple users at once failed
+- Files: Performance enhancement for expired files widget on start page by adding index
+
 18-12-2020 6.4.204
 - Files: Count in detail panel card could show from last item with files
 - Core: Link count numbers were off when you didn't have permissions 
