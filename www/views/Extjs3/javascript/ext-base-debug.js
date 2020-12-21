@@ -2179,7 +2179,7 @@ Ext.TaskMgr = new Ext.util.TaskRunner();(function(){
             for (id in unloadListeners) {
                 ul = unloadListeners[id];
                 for (i = 0, len = ul.length; i < len; i++) {
-                    v = ul[i61];
+                    v = ul[i];
                     if (v) {
                         try{
                             scope = v[ADJ_SCOPE] ? (v[ADJ_SCOPE] === true ? v[OBJ] : v[ADJ_SCOPE]) :  win;
