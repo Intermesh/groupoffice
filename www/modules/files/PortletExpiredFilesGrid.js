@@ -29,6 +29,10 @@ GO.files.PortletExpiredFilesGrid = Ext.extend(GO.grid.GridPanel, {
 				remoteSort: true,
 				url: GO.url("files/file/expiredList"),
 				id: 'id',
+				sortInfo: {
+					field: "content_expire_date",
+					direction: "ASC"
+				},
 				fields: ['type_id', 'id', 'name', 'type', 'size', 'mtime', 'extension', 'timestamp', 'thumb_url', 'path', 'acl_id', 'locked_user_id', 'locked', 'folder_id', 'permission_level', 'readonly', 'unlock_allowed', 'handler', 'content_expire_date']
 			}),
 			view: new Ext.grid.GridView({
