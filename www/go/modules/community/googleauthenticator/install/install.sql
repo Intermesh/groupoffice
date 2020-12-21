@@ -29,4 +29,4 @@ ALTER TABLE `googleauth_secret`
 -- Beperkingen voor tabel `googleauth_secret`
 --
 ALTER TABLE `googleauth_secret`
-  ADD CONSTRAINT `googleauth_secret_user` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`);
+    ADD CONSTRAINT `googleauth_secret_user` FOREIGN KEY (`userId`) REFERENCES `core_user`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
