@@ -93,7 +93,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					title: record.data.name,
 					iconCls: 'entity '+ico,
 					items: [
-						{xtype:'box',html:'<b>'+record.data.description+'</b><span>'+record.data.local_time+'</span>'}
+						{xtype:'box',html:'<b>'+record.data.text+'</b><span style="float:right">'+record.data.local_time+'</span>'}
 						//{html:record.data.description}
 					],
 					listeners: {

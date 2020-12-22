@@ -160,6 +160,7 @@ go.Notifier = {
 
 	hideNotifications : function() {
 		this.notificationArea.ownerCt.getLayout()['east'].slideIn();
+		this.notificationArea.doLayout();
 	},
 	/**
 	 * For (less obstructive) popup messages from the bottom
