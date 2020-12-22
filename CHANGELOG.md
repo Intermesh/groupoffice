@@ -20,6 +20,9 @@ end 6.5
 
 
 
+22-12-2020 6.4.206
+- Core: Improved file uploading so it can handle larger uploads
+
 21-12-2020 6.4.205
 - Address book: Cascade delete portlet settings when address book is deleted
 - Core: Deleting multiple users at once failed

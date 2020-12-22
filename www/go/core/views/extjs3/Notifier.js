@@ -158,10 +158,12 @@ go.Notifier = {
 
 	showNotifications : function() {
 		this.notificationArea.ownerCt.getLayout()['east'].slideOut();
+		this.notificationArea.doLayout(true);
 	},
 
 	hideNotifications : function() {
 		this.notificationArea.ownerCt.getLayout()['east'].slideIn();
+		// this.notificationArea.doLayout();
 	},
 	/**
 	 * For (less obstructive) popup messages from the bottom
@@ -171,20 +173,15 @@ go.Notifier = {
 		// not implemented: discuss first
 	},
 	remove: function(msg) {
-		if(msg.destroying || msg.isDestroyed) {
-			return;
-		}
 		if(msg.itemId) {
 			delete this._messages[msg.itemId];
 		}
-		msg.destroying = true;
-		if(!msg.el) {
-			msg.destroy();
-		} else {
-			msg.el.animate({opacity: {to: 0}}, 0.2, function () {
-				msg.destroy();
-			});
-		}
+		msg.destroy();
+	},
+
+	removeAll : function() {
+		this.messages = {};
+		this.notifications.removeAll(true);
 	},
 	/**
 	 * A more obstructive flyout message

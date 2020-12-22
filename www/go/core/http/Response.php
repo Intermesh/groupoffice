@@ -270,7 +270,9 @@ class Response extends Singleton{
 		if (isset($data)) {
 			if(is_array($data)) {
 				$data = JSON::encode($data);
-				$this->setContentType('application/json; charset=UTF-8');
+				if(!$this->getHeader('content-type')) {
+					$this->setContentType('application/json; charset=UTF-8');
+				}
 			} 
 			$this->sendHeaders();
 			echo $data;
