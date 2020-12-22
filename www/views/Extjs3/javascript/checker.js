@@ -49,9 +49,10 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			id:'dismiss',
 			qtip: t('Dismiss all'),
 			handler: function() {
-				if(confirm(t('Are you sure you want to dismiss all reminder?'))) {
+				if(confirm(t('Are you sure you want to dismiss all reminders?'))) {
 					this.doTask("dismiss_reminders", 0, this.reminderStore.data.keys);
 					this.reminders.removeAll();
+					go.Notifier.removeAll();
 				}
 			},
 			scope:this

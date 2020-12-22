@@ -135,13 +135,14 @@
 
 		durationSplit : function(seconds) {
 			var hours = Math.floor( seconds / 3600);
-			var minutes = seconds % 3600;
-			var sec = minutes % 60;
+			seconds -= hours * 3600;
+			var minutes = Math.floor( seconds / 60);
+			seconds -= minutes * 60;
 
 			return {
 				hours: hours,
 				minutes: minutes,
-				seconds: sec
+				seconds: seconds
 			};
 		},
 

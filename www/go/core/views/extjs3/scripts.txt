@@ -1,6 +1,7 @@
 polyfills.js
 
 Jmap.js
+Uploader.js
 BrowserStorage.js
 
 
