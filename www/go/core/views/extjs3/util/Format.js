@@ -132,6 +132,34 @@
 			hours = (pad && hours < 10) ? "0"+hours : hours;
 			return hours+':'+minutes;
 		},
+
+		durationSplit : function(seconds) {
+			var hours = Math.floor( seconds / 3600);
+			var minutes = seconds % 3600;
+			var sec = minutes % 60;
+
+			return {
+				hours: hours,
+				minutes: minutes,
+				seconds: sec
+			};
+		},
+
+		timeRemaining : function(seconds) {
+			var d = this.durationSplit(seconds);
+
+			var str = "";
+
+			if(d.hours) {
+				return d.hours + ":" + (d.minutes < 10 ? "0" + d.minutes : d.minutes) + "h";
+			}
+			if(d.minutes) {
+				return d.minutes + "m";
+			}
+
+			return d.seconds + "s";
+		},
+
 		//valid str format is 2:04, 08:00, (19:61 == 20:01)
 		minutes: function(timeStr) {
 			parts = timeStr.split(':');
@@ -141,6 +169,7 @@
 		valuta : function(amount) {
 			return go.User.currency + go.util.Format.number(amount, 2);
 		},
+
 
 		number : function(value, decimals) {
 			if(isNaN(value))
