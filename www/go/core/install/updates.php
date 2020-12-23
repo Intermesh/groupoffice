@@ -743,3 +743,13 @@ $updates['202010261619'][] = "ALTER TABLE `core_acl` ADD FOREIGN KEY (`ownedBy`)
 $updates['202010271619'][] = "UPDATE `core_cron_job` SET `expression` = '0 0 * * *' WHERE `core_cron_job`.`name` = 'GarbageCollection' and moduleId = (select id from core_module where name='core' and package='core')";
 
 $updates['202011021149'][] = "ALTER TABLE core_customfields_select_option DROP FOREIGN KEY core_customfields_select_option_ibfk_2;";
+
+$updates['202012231410'][] = "CREATE TABLE `core_oauth_auth_codes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `clientId` int(11) NOT NULL,
+  `identifier` varchar(128) COLLATE SET ascii COLLATE ascii_bin NOT NULL,
+  `userIdentifier` int(11) NOT NULL,
+  `expiryDateTime` datetime NOT NULL,
+  `nonce` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
