@@ -1,3 +1,5 @@
+- Documenttemplates: Fixed tag generation for entities
+
 22-12-2020 6.4.206
 - Core: Improved file uploading so it can handle larger uploads
 
