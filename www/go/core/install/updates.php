@@ -845,7 +845,7 @@ $updates['202012181215'][] = "update `core_customfields_select_option` set enabl
 $updates['202012231410'][] = "CREATE TABLE `core_oauth_auth_codes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `clientId` int(11) NOT NULL,
-  `identifier` varchar(128) COLLATE SET ascii COLLATE ascii_bin NOT NULL,
+  `identifier` varchar(128) COLLATE ascii_bin NOT NULL,
   `userIdentifier` int(11) NOT NULL,
   `expiryDateTime` datetime NOT NULL,
   `nonce` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
