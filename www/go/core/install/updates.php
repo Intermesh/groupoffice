@@ -744,6 +744,17 @@ $updates['202010271619'][] = "UPDATE `core_cron_job` SET `expression` = '0 0 * *
 
 $updates['202011021149'][] = "ALTER TABLE core_customfields_select_option DROP FOREIGN KEY core_customfields_select_option_ibfk_2;";
 
+$updates['202011021149'][] = "CREATE TABLE `core_oauth_auth_codes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `clientId` int(11) NOT NULL,
+  `identifier` varchar(128) COLLATE SET ascii COLLATE ascii_bin NOT NULL,
+  `userIdentifier` int(11) NOT NULL,
+  `expiryDateTime` datetime NOT NULL,
+  `nonce` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
 $updates['202011021149'][] = "CREATE TABLE `core_alert` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `entityTypeId` INT NOT NULL,
@@ -765,6 +776,7 @@ $updates['202011021149'][] = "CREATE TABLE `core_alert` (
     REFERENCES `core_user` (`id`)
     ON DELETE RESTRICT
     ON UPDATE NO ACTION);";
+
 
 
 $updates['202011261716'][] = "TRUNCATE core_search";
@@ -829,3 +841,13 @@ $updates['202012141145'][] = "ALTER TABLE `core_search_word` ADD INDEX(`drow`);"
 $updates['202012181215'][] = "ALTER TABLE `core_customfields_select_option` ADD `enabled` BOOLEAN NOT NULL DEFAULT TRUE AFTER `text`;";
 
 $updates['202012181215'][] = "update `core_customfields_select_option` set enabled=0, text = REPLACE(text,'** Missing ** ', '') where text like '** Missing **%';";
+
+$updates['202012231410'][] = "CREATE TABLE `core_oauth_auth_codes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `clientId` int(11) NOT NULL,
+  `identifier` varchar(128) COLLATE SET ascii COLLATE ascii_bin NOT NULL,
+  `userIdentifier` int(11) NOT NULL,
+  `expiryDateTime` datetime NOT NULL,
+  `nonce` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
