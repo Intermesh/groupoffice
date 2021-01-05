@@ -1,4 +1,6 @@
+04-01-2021 6.4.207
 - Documenttemplates: Fixed tag generation for entities
+- Timeregistration: Wrong week displayed when clicking the weeks
 
 22-12-2020 6.4.206
 - Core: Improved file uploading so it can handle larger uploads
