@@ -37,8 +37,7 @@
     "guzzlehttp/guzzle": "@stable",
     "steverhoades/oauth2-openid-connect-server": "1.2.0",
     "phpoffice/phpspreadsheet": "^1.15",
-    "lcobucci/jwt": "3.3.3",
-    "spomky-labs/jose": "^7.1"
+    "lcobucci/jwt": "3.3.3"
   },
   "license": "AGPL",
   "authors": [

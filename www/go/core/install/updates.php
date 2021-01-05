@@ -747,7 +747,7 @@ $updates['202011021149'][] = "ALTER TABLE core_customfields_select_option DROP F
 $updates['202011021149'][] = "CREATE TABLE `core_oauth_auth_codes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `clientId` int(11) NOT NULL,
-  `identifier` varchar(128) COLLATE SET ascii COLLATE ascii_bin NOT NULL,
+  `identifier` varchar(128) COLLATE ascii_bin NOT NULL,
   `userIdentifier` int(11) NOT NULL,
   `expiryDateTime` datetime NOT NULL,
   `nonce` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
