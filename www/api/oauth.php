@@ -26,7 +26,6 @@ use League\OAuth2\Server\Exception\OAuthServerException;
 use League\OAuth2\Server\Grant\RefreshTokenGrant;
 use OpenIDConnectServer\ClaimExtractor;
 use Psr\Http\Message\ResponseInterface as ResponseInterfaceAlias;
-use Jose\Factory\JWKFactory;
 
 App::get();
 App::get()->setAuthState(new State());
@@ -383,17 +382,19 @@ class OAuthController {
 				'keys' => [],
 			];
 
-			$key = $this->getPrivateKeyFile()->getContents();
-
-			//create jwk from private key
-			$jwk = JWKFactory::createFromKey($key, null, [
-				'use' => 'sig',
-				'alg' => 'RS256',
-				'kid' => md5($key),
-			]);
+			//create jwk from public key
+			$pubKey = $this->getPublicKeyFile()->getContents();
+			$keyInfo = openssl_pkey_get_details(openssl_pkey_get_public($pubKey));
 
 			//get public key
-			$keys['keys'][] = $jwk->toPublic();
+			$keys['keys'][] =  [
+				'n' => rtrim(str_replace(['+', '/'], ['-', '_'], base64_encode($keyInfo['rsa']['n'])), '='),
+				'e' => rtrim(str_replace(['+', '/'], ['-', '_'], base64_encode($keyInfo['rsa']['e'])), '='),
+				'use' => 'sig',
+				'alg' => 'RS256',
+				'kty' => 'RSA',
+				'kid' => md5($pubKey),
+			];
 
 			//write to body
 			$response->getBody()->write(json_encode($keys, JSON_PRETTY_PRINT));
