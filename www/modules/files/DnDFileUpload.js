@@ -1,10 +1,9 @@
 GO.files.DnDFileUpload = function(doneCallback, element) {
 
+	var uploadCount = 0,
+		blobs = [];
 
 	function upload(nodes, subfolder) {
-		var uploadCount = 0,
-			blobs = [];
-
 		uploadCount += nodes.length;
 		Array.prototype.forEach.call(nodes, function(node, i) {
 			if(node && node.isDirectory) {
@@ -30,6 +29,7 @@ GO.files.DnDFileUpload = function(doneCallback, element) {
 						uploadCount--;
 						if (uploadCount === 0) {
 							doneCallback(blobs);
+							blobs = [];
 						}
 					}
 				});

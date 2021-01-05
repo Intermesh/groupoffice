@@ -402,7 +402,15 @@ class Installer {
 		ini_set("max_execution_time", 0);
 		ini_set("memory_limit", -1);
 
-		go()->getDbConnection()->query("SET sql_mode=''");
+		//don't be strict in upgrade
+		go()->getDbConnection()->exec("SET sql_mode=''");
+
+		//try
+		try {
+			go()->getDbConnection()->exec("SET innodb_strict_mode=0");
+		} catch(Exception $e) {
+			echo "Failed to disable 'innodb_strict_mode': " . $e->getMessage() ."\n";
+		}
 		
 		jmap\Entity::$trackChanges = false;
 

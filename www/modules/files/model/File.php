@@ -652,9 +652,6 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 
 		$old = $this->mtime;
 		$this->mtime = $this->fsFile->mtime();
-		if($this->mtime == $old) {
-			$this->mtime++; //mtime must change for WOPI!
-		}
 		$this->save();
 		
 		$this->fireEvent('replace', array($this, $isUploadedFile));
@@ -670,9 +667,6 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 		$this->fsFile->putContents($data);
 		$old = $this->mtime;
 		$this->mtime = $this->fsFile->mtime();
-		if($this->mtime == $old) {
-			$this->mtime++; //mtime must change for WOPI!
-		}
 		$this->save();
 	}
 
@@ -680,6 +674,8 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 	 * Copy current file to the versioning system.
 	 */
 	public function saveVersion(){
+
+		$this->version++;
 		
 		$this->fireEvent('saveversion', array($this));
 		

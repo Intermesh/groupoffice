@@ -173,12 +173,17 @@ class Criteria {
 			if($count > 1) {
 				$sub = new Criteria();
 				foreach($condition as $colName => $value) {
-					$sub->andWhere($colName, '=', $value);				
+					$op = is_array($value) || $value instanceof Query ? 'IN' : '=';
+					$sub->andWhere($colName, $op, $value);
 				}			
 				$condition = $sub;
 			} else if ($count === 1) {
 				reset($condition);
-				return ["column", $logicalOperator, key($condition), '=', current($condition)];	
+				$value = current($condition);
+
+				//Use "IN" for array values and sub queries
+				$op = is_array($value) || $value instanceof Query ? 'IN' : '=';
+				return ["column", $logicalOperator, key($condition), $op, $value];
 			}
 		} 
 		
