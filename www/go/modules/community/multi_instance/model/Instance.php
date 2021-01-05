@@ -118,6 +118,10 @@ class Instance extends Entity {
 		if($this->isNew()) {
 			$this->hostname = trim(strtolower($this->hostname));
 
+			if(empty($this->hostname)) {
+				$this->setValidationError('hostname', ErrorCode::REQUIRED, 'The hostname field is required');
+			}
+
 			if(!preg_match('/^[a-z0-9-_\.]*$/', $this->hostname)) {
 				$this->setValidationError('hostname', ErrorCode::MALFORMED, 'The hostname was malformed');
 			}
@@ -215,7 +219,7 @@ class Instance extends Entity {
 			}
 		} else{
 			if($this->getModulePackageFolder()->exists() && $this->getModulePackageFolder()->isEmpty()) {
-				$this->getModulePackageFolder()->delete();
+				//$this->getModulePackageFolder()->delete();
 			}
 		}
 		
