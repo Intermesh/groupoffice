@@ -1,3 +1,6 @@
+6.4.208
+- Core: Update several default objects upon username or displayName change
+
 04-01-2021 6.4.207
 - Documenttemplates: Fixed tag generation for entities
 - Timeregistration: Wrong week displayed when clicking the weeks
