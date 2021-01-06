@@ -20,7 +20,8 @@ return [
 				"visit" => "Visit",
 				"postal" => "Postal",
 				"work" => "Work",
-				"home" => "Home"
+				"home" => "Home",
+				"delivery" => 'Delivery'
 		],
 		"dateTypes" => [
 				"birthday" => "Birthday",
