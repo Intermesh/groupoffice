@@ -11,6 +11,7 @@ use go\core\orm\Mapping;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use GO\Tasks\Model\Task;
+use GO\Tasks\Model\Tasklist;
 
 class TasksModule extends \GO\Base\Module {
 	
@@ -18,6 +19,7 @@ class TasksModule extends \GO\Base\Module {
 
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		Link::on(Entity::EVENT_FILTER, static::class, 'onLinkFilter');
+		User::on(User::EVENT_BEFORESAVE, static::class, 'onUserBeforeSave');
 	}
 	
 	public static function initListeners() {		
@@ -43,6 +45,17 @@ class TasksModule extends \GO\Base\Module {
 				->andWhere('task.completion_time','=', 0);
 		});
 		return true;
+	}
+
+	public static function onUserBeforeSave(User $user)
+	{
+		if (!$user->isNew() && $user->isModified('displayName')) {
+			$nb = TaskList::model()->findByPk($user->taskSettings->default_tasklist_id);
+			if ($nb) {
+				$nb->name = $user->displayName;
+				$nb->save();
+			}
+		}
 	}
 	
 	public function autoInstall() {
