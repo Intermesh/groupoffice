@@ -8,6 +8,8 @@ use go\core\http\Request;
 
 require("../vendor/autoload.php");
 
+sleep(2);
+
 try {
 //Create the app with the database connection
 	App::get()->setAuthState(new State());
