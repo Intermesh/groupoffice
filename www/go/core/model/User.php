@@ -682,22 +682,22 @@ class User extends Entity {
 //		if(!isset($this->contact) ){// || $this->isModified(['displayName', 'email', 'avatarId'])) {
 //			$this->contact = $this->getProfile();
 //		}
-		
-		if(!isset($this->contact)) {			
+
+		if (!isset($this->contact)) {
 			return true;
 		}
-		
+
 		$this->contact->photoBlobId = $this->avatarId;
-		if(!isset($this->contact->emailAddresses[0])) {
+		if (!isset($this->contact->emailAddresses[0])) {
 			$this->contact->emailAddresses = [(new \go\modules\community\addressbook\model\EmailAddress())->setValues(['email' => $this->email])];
 		}
-		if(empty($this->contact->name) || $this->isModified(['displayName'])) {
+		if (empty($this->contact->name) || $this->isModified(['displayName'])) {
 			$this->contact->name = $this->displayName;
 			$parts = explode(' ', $this->displayName);
 			$this->contact->firstName = array_shift($parts);
-			$this->contact->lastName = implode(' ', $parts);		
+			$this->contact->lastName = implode(' ', $parts);
 		}
-		
+
 		$this->contact->goUserId = $this->id;
 		return $this->contact->save();
 	}
@@ -719,28 +719,32 @@ class User extends Entity {
 		
 		return null;
 	}
-	
-	private function createPersonalGroup() {
-		if($this->isNew() || $this->isModified('groups')) {				
-			if($this->isNew()){// !in_array($this->getPersonalGroup()->id, $groupIds)) {
+
+	private function createPersonalGroup()
+	{
+		if ($this->isNew() || $this->isModified(['groups', 'username'])) {
+			if ($this->isNew()) {// !in_array($this->getPersonalGroup()->id, $groupIds)) {
 				$personalGroup = new Group();
 				$personalGroup->name = $this->username;
 				$personalGroup->isUserGroupFor = $this->id;
 				$personalGroup->users[] = $this->id;
-				
-				if(!$personalGroup->save()) {
+
+				if (!$personalGroup->save()) {
 					throw new Exception("Could not create home group");
 				}
 
 				$this->personalGroup = $personalGroup;
-			} else
-			{
+			} else {
 				$personalGroup = $this->getPersonalGroup();
+				if ($this->isModified('username')) {
+					$personalGroup->name = $this->username;
+					$personalGroup->save();
+				}
 			}
-			
-			if(!in_array($personalGroup->id, $this->groups)) {			
+
+			if (!in_array($personalGroup->id, $this->groups)) {
 				$this->groups[] = $personalGroup->id;
-			}			
+			}
 		}
 	}
 	

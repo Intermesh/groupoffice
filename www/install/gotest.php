@@ -589,11 +589,14 @@ function test_system(){
 
 			$conn = go()->getDbConnection();
 			if($conn) {
+
+				$dbVersion = go()->getDatabase()->getVersion();
+
 				if(go()->getDatabase()->isMariaDB()) {
 					$test['name'] = 'MariaDB version';
 					$test['showSuccessFeedback'] = false;
-					$test['pass'] =  version_compare( go()->getDatabase()->getVersion(), "10.0.5", ">=");
-					$test['feedback'] = "MariaDB 10.0.5 or greater is required";
+					$test['pass'] =  version_compare( $dbVersion, "10.0.5", ">=");
+					$test['feedback'] = "Your MariaDB version $dbVersion is too old. Version 10.0.5 or greater is required.";
 					$test['fatal'] = true;
 					$tests[] = $test;
 
@@ -605,10 +608,12 @@ function test_system(){
 					$test['fatal'] = true;
 					$tests[] = $test;
 
+
+
 					$test['name'] = 'MySQL version';
 					$test['showSuccessFeedback'] = false;
-					$test['pass'] =  version_compare(go()->getDatabase()->getVersion(), "5.7.0", ">=");
-					$test['feedback'] = "MySQL 5.7.0 or greater is required";
+					$test['pass'] =  version_compare($dbVersion, "5.7.0", ">=");
+					$test['feedback'] = "Your MySQL version $dbVersion is too old. Version 5.7.0 or greater is required.";
 					$test['fatal'] = true;
 					$tests[] = $test;
 				}
