@@ -1,9 +1,0 @@
-{
-	"@metadata": {
-		"authors": [
-			"Purodha"
-		]
-	},
-	"auth_remoteuser-desc": "Määd et automattesche Enlogge vun Metmaachere müjjelesch övver et Säze vun <code lang=\"en\" xml:lang=\"en\">REMOTE_USER</code> en de Ömjävvongsparrameetere.",
-	"auth_remoteuser-wgautherror": "Ed jidd en ander Zosazprojramm, wat [https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:$wgAuth de <code  lang=\"en\" xml:lang=\"en\">wgAuth</code>] benöz. mer kann bloß ei Zohsazprojramm loufe han, wat <code lang=\"en\" xml:lang=\"en\">$wgAuth</code> bruch. Falls keij ander Zosazprojramm doh es, donn di Reih heh onge en di Dattei <code lang=\"en\" xml:lang=\"en\">LocalSettings.php</code> eren koppehre:\n <code lang=\"en\" xml:lang=\"en\">$wgAuth = new Auth_remoteuser();</code>"
-}

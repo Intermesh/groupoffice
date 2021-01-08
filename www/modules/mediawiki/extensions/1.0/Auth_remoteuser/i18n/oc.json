@@ -1,9 +1,0 @@
-{
-	"@metadata": {
-		"authors": [
-			"Cedric31"
-		]
-	},
-	"auth_remoteuser-desc": "Connècta automaticament los utilizaires en utilizant la variabla d’environament <code>REMOTE_USER</code>",
-	"auth_remoteuser-wgautherror": "I a una autra extension qu'utiliza [https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:$wgAuth la variabla <code>wgAuth</code>]. Podètz pas utilizar mai d’una extension qu'utilize <code>$wgAuth</code> a l'encòp. Se i a pas d’autra extension, asseguratz-vos qu’avètz mes la linha seguenta dins vòstre <code>LocalSettings.php</code> :\n <code>$wgAuth = new Auth_remoteuser();</code>"
-}

@@ -1,9 +1,0 @@
-{
-	"@metadata": {
-		"authors": [
-			"Beta16"
-		]
-	},
-	"auth_remoteuser-desc": "Registra automaticamente gli utenti utilizzando la variabile di ambiente <code>REMOTE_USER</code>",
-	"auth_remoteuser-wgautherror": "C'è un'altra estensione che utilizza [https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:$wgAuth la variabile <code>wgAuth</code>]. Non è possibile utilizzare contemporaneamente più di un'estensione con <code>$wgAuth</code>. Se non c'è un'altra estensione, assicurati di aver impostato la seguente riga nel <code>LocalSettings.php</code>:\n <code>$wgAuth = new Auth_remoteuser();</code>"
-}

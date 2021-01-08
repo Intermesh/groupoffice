@@ -1,9 +1,0 @@
-{
-	"@metadata": {
-		"authors": [
-			"Raimond Spekking"
-		]
-	},
-	"auth_remoteuser-desc": "{{desc|name=Auth remoteuser|url=https://www.mediawiki.org/wiki/Extension:Auth_remoteuser}}",
-	"auth_remoteuser-wgautherror": "Error message, if there is another Extension using $wgAuth or $wgAuth isn't set in LocalSettings.php correctly."
-}

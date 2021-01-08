@@ -1,2 +1,0 @@
-modules/mediawiki/views/Extjs3/MainPanel.js
-modules/mediawiki/views/Extjs3/SettingsDialog.js
