@@ -1,9 +1,0 @@
-{
-	"@metadata": {
-		"authors": [
-			"Liuxinyu970226"
-		]
-	},
-	"auth_remoteuser-desc": "自动记载使用<code>REMOTE_USER</code>环境变量的用户",
-	"auth_remoteuser-wgautherror": "这里有另一个使用[https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:$wgAuth <code>wgAuth</code>变量]的扩展。您不能使用多于一个同时使用<code>$wgAuth</code>的扩展。如果这里没有其他扩展，请确保您在您的<code>LocalSettings.php</code>文件中设置如下代码：\n <code>$wgAuth = new Auth_remoteuser();</code>"
-}

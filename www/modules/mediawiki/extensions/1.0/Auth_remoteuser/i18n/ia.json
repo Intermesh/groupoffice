@@ -1,9 +1,0 @@
-{
-	"@metadata": {
-		"authors": [
-			"McDutchie"
-		]
-	},
-	"auth_remoteuser-desc": "Aperi automaticamente le session pro usatores con le variabile de ambiente <code>REMOTE_USER</code>",
-	"auth_remoteuser-wgautherror": "Il ha un altere extension que usa [https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:$wgAuth le variabile <code>wgAuth</code>]. Non es possibile usar plus de un extension que usa <code>$wgAuth</code> al mesme tempore. Si il non ha un altere extension, verifica que le linea sequente es presente in tu <code>LocalSettings.php</code>:\n <code>$wgAuth = new Auth_remoteuser();</code>"
-}

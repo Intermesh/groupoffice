@@ -1,9 +1,0 @@
-{
-	"@metadata": {
-		"authors": [
-			"Xuacu"
-		]
-	},
-	"auth_remoteuser-desc": "Anicia sesión pa los usuarios automáticamente usando la variable d'entornu <code>REMOTE_USER</code>",
-	"auth_remoteuser-wgautherror": "Hai otra estensión usando [https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:$wgAuth la variable <code>wgAuth</code>]. Nun pues usar más d'una estensión qu'utilice <code>$wgAuth</code> al mesmu tiempu. Si nun hai otra estensión, por favor, asegúrate de poner la llinia siguiente nel to <code>LocalSettings.php</code>:\n <code>$wgAuth = new Auth_remoteuser();</code>"
-}

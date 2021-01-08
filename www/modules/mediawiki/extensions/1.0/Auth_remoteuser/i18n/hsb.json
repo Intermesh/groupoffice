@@ -1,8 +1,0 @@
-{
-	"@metadata": {
-		"authors": [
-			"Michawiki"
-		]
-	},
-	"auth_remoteuser-desc": "Zmóžnja awtomatiske přizjewjenje wužiwarjow z pomocu wokolinoweje wariable <code>REMOTE_USER</code>"
-}
