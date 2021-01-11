@@ -187,6 +187,7 @@ users/UserCombo.js
 users/UserSettingsWorkingWeek.js
 users/SelectDialogPanel.js
 
+customfields/ExportDialog.js
 customfields/FormFieldSet.js
 customfields/FieldDialog.js
 customfields/CustomFields.js
