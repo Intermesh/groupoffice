@@ -18,12 +18,17 @@ try {
 
 	if (isset($_GET['url'])) {
 		$tmpFile = \go\core\fs\File::tempFile('tmp');
-		$httpClient = new Client();
-		$response = $httpClient->download($_GET['url'], $tmpFile);
 
-		$blob = Blob::fromTmp($tmpFile);
-		$blob->name = $response['name'];
-		$blob->type = $response['type'];
+		try {
+			$httpClient = new Client();
+			$response = $httpClient->download($_GET['url'], $tmpFile);
+
+			$blob = Blob::fromTmp($tmpFile);
+			$blob->name = $response['name'];
+			$blob->type = $response['type'];
+		} catch(\Exception $e) {
+			throw new \Exception("Failed to download from given URL " .  $_GET['url']);
+		}
 
 	} else {
 
