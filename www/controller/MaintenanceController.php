@@ -352,8 +352,10 @@ class MaintenanceController extends AbstractController {
 		
 		if(!empty($params['reset'])) {
 			echo "Resetting cache!\n";
+			go()->getDbConnection()->exec("set foreign_key_checks=0");
 			go()->getDbConnection()->exec("truncate core_search");
 			go()->getDbConnection()->exec("truncate core_search_word");
+			go()->getDbConnection()->exec("set foreign_key_checks=1");
 		}
 		
 		echo "Checking search cache\n\n";
