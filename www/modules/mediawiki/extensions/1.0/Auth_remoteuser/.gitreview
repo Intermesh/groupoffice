@@ -1,5 +1,0 @@
-[gerrit]
-host=gerrit.wikimedia.org
-port=29418
-project=mediawiki/extensions/Auth_remoteuser.git
-defaultbranch=REL1_26

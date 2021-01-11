@@ -19,7 +19,7 @@ go.Modules.register("community", "bookmarks", {
 			filter: {behaveAsModule: true}
 		}).then(function(response){
 
-			go.Db.store("Bookmark").get(response.ids).then(function(result){
+			return go.Db.store("Bookmark").get(response.ids).then(function(result){
 
 				result.entities.forEach(function(bookmark) {
 					var style = document.createElement('style');

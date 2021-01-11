@@ -399,13 +399,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 					e.preventDefault();
 					var reader = new FileReader();
 					reader.onload = function (event) {
-						if(Ext.isSafari) {
-							setTimeout(function () { //set timeout was needed to prevent a Safari 14.0 crash :(
-								me.handleImage(event.target.result);
-							}, 100);
-						}else {
-							me.handleImage(event.target.result);
-						}
+						me.handleImage(event.target.result);
 					}
 					reader.readAsDataURL(item.getAsFile());
 				}
@@ -499,7 +493,10 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 			if (dataURL) {
 				var file = new File([blob], "pasted-image." + blob.type.substring(6),{type: blob.type});
-				var imgEl = me.insertImage(src);
+
+				var imgEl = me.insertImage(BaseHref + "views/Extjs3/themes/" + go.User.theme + "/img/loading-spinner.gif");
+				imgEl.setAttribute("style", "width: 80px; height: 80px");
+
 				go.Jmap.upload(file, {
 					success: function(response) {
 						imgEl.setAttribute("src", go.Jmap.downloadUrl(response.blobId));
@@ -507,7 +504,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 						me.fireEvent('attach', me, response.blobId, file, imgEl);
 					}
 				});
-				
+
 			}
 		};
 
