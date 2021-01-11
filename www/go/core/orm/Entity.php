@@ -44,7 +44,7 @@ abstract class Entity extends Property {
 	 * 
 	 * @param Entity $entity The entity that will be saved
 	 */
-	const EVENT_BEFORESAVE = 'beforesave';
+	const EVENT_BEFORE_SAVE = 'beforesave';
 	
 	/**
 	 * Fires after the entity has been saved
@@ -247,7 +247,7 @@ abstract class Entity extends Property {
 
 		try {
 			
-			if (!$this->fireEvent(self::EVENT_BEFORESAVE, $this)) {
+			if (!$this->fireEvent(self::EVENT_BEFORE_SAVE, $this)) {
 				$this->rollback();
 				return false;
 			}

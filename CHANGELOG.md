@@ -1,8 +1,11 @@
+- Core: more consistent event handler naming
+
 08-01-2021 6.4.208
 - Core: Update several default objects upon username or displayName change
 - Core: Fixed safari crash on pasting image in html editor by inserting loading spinner first instead of base64 uri
 - Bookmarks: Bookmark modules didn't show up in menu after login. Only when loading it when already logged in.
 - Mediawiki: removed module as it works better with the new OpenID Connect integration:  https://groupoffice.readthedocs.io/en/latest/install/extras/mediawiki.html
+- Addressbook: Added delivery address option
 
 04-01-2021 6.4.207
 - Documenttemplates: Fixed tag generation for entities
