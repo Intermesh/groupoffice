@@ -1,6 +1,7 @@
 - Core: more consistent event handler naming
 - Addressbook: display gender in title if applicable
 - Core: Import and export function for custom fields
+- Core: Fixed small XSS and request forgery vulnerabilities
 
 08-01-2021 6.4.208
 - Core: Update several default objects upon username or displayName change
