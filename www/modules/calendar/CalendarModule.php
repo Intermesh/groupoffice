@@ -25,7 +25,7 @@ class CalendarModule extends \GO\Base\Module{
 	public function defineListeners() {
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		Link::on(Entity::EVENT_FILTER, static::class, 'onLinkFilter');
-		User::on(User::EVENT_BEFORESAVE, static::class, 'onUserBeforeSave');
+		User::on(User::EVENT_BEFORE_SAVE, static::class, 'onUserBeforeSave');
 	}
 	
 	public static function onMap(Mapping $mapping) {

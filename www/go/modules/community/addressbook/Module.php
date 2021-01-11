@@ -43,7 +43,7 @@ class Module extends core\Module {
 		Link::on(Link::EVENT_SAVE, Contact::class, 'onLinkSave');
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		User::on(User::EVENT_BEFORE_DELETE, static::class, 'onUserDelete');
-		User::on(User::EVENT_BEFORESAVE, static::class, 'onUserBeforeSave');
+		User::on(User::EVENT_BEFORE_SAVE, static::class, 'onUserBeforeSave');
 	}
 	
 	public function downloadVCard($contactId) {
