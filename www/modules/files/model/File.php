@@ -76,6 +76,11 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 		return 'folder.acl_id';
 	}
 
+	public function title()
+	{
+		return $this->getPath();
+	}
+
 	/**
 	 * Returns the table name
 	 */
