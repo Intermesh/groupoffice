@@ -72,6 +72,9 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 							scope: this,
 							listeners: {
 								upload: function (response) {
+
+									this.getEl().mask(t("Importing..."));
+
 									go.Jmap.request({
 										method: 'FieldSet/importFromJson',
 										params: {
@@ -79,9 +82,12 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 											blobId: response.blobId
 										},
 										callback: function(request, tmp, response, callId) {
+											this.getEl().unmask();
 											GO.errorDialog.show(response.feedback, t('Import messages'));
-											console.info(response);
-										}
+											this.load();
+
+										},
+										scope: this
 									})
 								},
 								scope: this
