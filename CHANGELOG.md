@@ -18,6 +18,9 @@ Master
 end 6.5
 --------
 
+12-01-2021 6.4.210
+- Core: Fixed constraint error in database check
+
 11-01-2021 6.4.209
 - Core: more consistent event handler naming
 - Addressbook: display gender in title if applicable
