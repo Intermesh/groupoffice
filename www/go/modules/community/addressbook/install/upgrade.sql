@@ -16,7 +16,8 @@ CREATE TABLE `addressbook_addressbook` (
                                            `id` int(11) NOT NULL,
                                            `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
                                            `aclId` int(11) NOT NULL,
-                                           `createdBy` int(11) NOT NULL
+                                           `createdBy` int(11) NOT NULL,
+                                           `filesFolderId` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `addressbook_contact` (

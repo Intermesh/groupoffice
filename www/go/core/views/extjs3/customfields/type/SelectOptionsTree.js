@@ -8,7 +8,6 @@ go.customfields.type.SelectOptionsTree = function(config){
 		animate:false,
 		enableDrag:true,
 		autoScroll: true,
-		title:  t("Options")
 	});
 
 	config.bbar=[ '->',{
@@ -24,7 +23,6 @@ go.customfields.type.SelectOptionsTree = function(config){
 				text: '',				
 				expanded:true,
 				children:[]
-				//iconCls:'ic-'
 			});
 
 			newNode = node.appendChild(newNode);
@@ -78,22 +76,25 @@ Ext.extend(go.customfields.type.SelectOptionsTree, Ext.tree.TreePanel, {
 	setValue : function(options) {
 		// set the root node
     var root = new Ext.tree.AsyncTreeNode({
-        text: 'Root',
-        draggable:false,
-        id:'root',
-        children: this.apiToTree(options),
-				expanded: true
+			text: 'Root',
+			draggable:false,
+			id:'root',
+			children: this.apiToTree(options),
+			expanded: true,
+			checked: true
     });
 
     this.setRootNode(root);
 	},
 	
 	apiToTree : function(options) {
+		// debugger;
 		var me = this;
 		options.forEach(function(o) {
 			o.expanded = true; //always expand or they won't be submitted and thus deleted on the server!
 			o.children = me.apiToTree(o.children);
 			o.serverId = o.id;
+			o.checked = !!o.enabled;
 			delete o.id;
 		});
 		
@@ -116,10 +117,12 @@ Ext.extend(go.customfields.type.SelectOptionsTree, Ext.tree.TreePanel, {
 	
 	treeToAPI : function(node) {
 		var v = [], me = this;
+		// debugger;
 		node.childNodes.forEach(function(child) {
 			v.push({
 				id: child.attributes.serverId || null,
 				text: child.text,
+				enabled: child.attributes.checked,
 				children: me.treeToAPI(child)
 			});
 		});

@@ -1452,7 +1452,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		if(!empty($params['searchQuery'])){
 
-			if(!$this->hasLinks()) {
+			if(!$this->hasLinks() || $this instanceof \GO\Base\Model\User || is_a($this, "\GO\Tickets\Model\Ticket")) {
 
 				$params['searchQuery'] = '%' . preg_replace('/[\s*]+/', '%', $params['searchQuery']) . '%';
 

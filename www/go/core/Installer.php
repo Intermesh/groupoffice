@@ -397,8 +397,15 @@ class Installer {
 		ini_set("max_execution_time", 0);
 		ini_set("memory_limit", -1);
 
-		//Don't be strict in upgrade mode
+		//don't be strict in upgrade
 		go()->getDbConnection()->exec("SET sql_mode=''");
+
+		//try
+		try {
+			go()->getDbConnection()->exec("SET innodb_strict_mode=0");
+		} catch(Exception $e) {
+			echo "Failed to disable 'innodb_strict_mode': " . $e->getMessage() ."\n";
+		}
 		
 		jmap\Entity::$trackChanges = false;
 
@@ -422,7 +429,7 @@ class Installer {
 		App::get()->getSettings()->save();
 
 		go()->rebuildCache();
-		
+
 		echo "Registering all entities\n";		
 		$modules = model\Module::find()->where(['enabled' => true])->all();
 		foreach($modules as $module) {
@@ -611,14 +618,10 @@ class Installer {
 							if (!empty($query))
 								go()->getDbConnection()->query($query);
 						} catch (PDOException $e) {
-							//var_dump($e);		
-							$errorsOccurred = true;						
 
-							if ($e->getCode() == 42000 || $e->getCode() == '42S21' || $e->getCode() == '42S01' || $e->getCode() == '42S22') {
-								//duplicate and drop errors. Ignore those on updates
-								
-								go()->debug("IGNORING: ". $e->getMessage()." from query: ".$query);
-								
+							if ($e->getCode() == 42000 || $e->getCode() == '42S21' || $e->getCode() == '42S01' || $e->getCode() == '42S22' || strstr($e->getMessage(), 'errno: 121 ')) {
+								//duplicate and drop errors. Ignore those on updates.
+								echo "IGNORE: " . $e->getMessage() ."\n";
 							} else {
 
 								echo $e->getCode() . ': '.$e->getMessage() . "\n";

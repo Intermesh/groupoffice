@@ -39,6 +39,7 @@ return array (
     'postal' => 'Postalisch',
     'work' => 'Arbeit',
     'home' => 'Privat',
+    'delivery' => 'Lieferung',
   ),
   'dateTypes' => 
   array (

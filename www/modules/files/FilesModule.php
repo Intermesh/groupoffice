@@ -77,19 +77,17 @@ class FilesModule extends \GO\Base\Module{
 
 		parent::checkDatabase($response);
 	}
-	
-	public static function saveUser($user, $wasNew) {
-		//throw new \Exception($user->getOldAttributeValue('username'));
-		if($wasNew){
-			$folder = Model\Folder::model()->findHomeFolder($user);			
-		}elseif($user->isModified('username')){
-			$folder = Model\Folder::model()->findByPath('users/'.$user->getOldAttributeValue('username'));
-			if($folder)
-			{
-				$folder->name=$user->username;
-				$folder->systemSave=true;
-				//throw new \Exception($folder->path);
-				$folder->save();				
+
+	public static function saveUser($user, $wasNew)
+	{
+		if ($wasNew) {
+			$folder = Model\Folder::model()->findHomeFolder($user);
+		} elseif ($user->isModified('username')) {
+			$folder = Model\Folder::model()->findByPath('users/' . $user->getOldAttributeValue('username'));
+			if ($folder) {
+				$folder->name = $user->username;
+				$folder->systemSave = true;
+				$folder->save();
 			}
 		}
 	}

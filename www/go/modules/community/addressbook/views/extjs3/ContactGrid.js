@@ -65,7 +65,8 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 						// 	return '<div class="icon ic-star go-addressbook-star"></div>';
 						// } else
 						// {
-							if(value) {
+
+							if(!value) {
 								return "";
 							}
 

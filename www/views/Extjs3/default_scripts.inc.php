@@ -54,7 +54,7 @@ $settings['config']['login_message'] = GO::config()->login_message;
 
  
 $settings['state_index'] = 'go';
-$settings['language'] = GO::language()->getLanguage();
+$settings['language'] = go()->getLanguage()->getIsoCode();
 $settings['show_contact_cf_tabs'] = array();
 // $settings['modules'] = [];// GO::view()->exportModules();
 
@@ -88,7 +88,7 @@ echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?l
 	Ext.namespace("GO");
 
 	GO.settings = <?php echo json_encode($settings); ?>;
-	GO.language = "<?php echo GO::config()->language; ?>";
+	GO.language = "<?php echo go()->getLanguage()->getIsoCode(); ?>";
 	GO.calltoTemplate = '<?php echo GO::config()->callto_template; ?>';
 	GO.calltoOpenWindow = <?php echo GO::config()->callto_open_window ? "true" : "false"; ?>;
 	

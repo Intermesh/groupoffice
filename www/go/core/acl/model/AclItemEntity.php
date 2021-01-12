@@ -254,7 +254,7 @@ abstract class AclItemEntity extends AclEntity {
 		$aclEntity = $cls::find()->where($keys)->single();	
 
 		if(!$aclEntity) {
-			throw new Exception("Can't find related ACL entity. The keys must be invalid: " . var_export($keys, true));
+			throw new Exception("Can't find related ACL entity. The keys for class '$cls' must be invalid: " . var_export($keys, true));
 		}
 	
 		return $aclEntity;

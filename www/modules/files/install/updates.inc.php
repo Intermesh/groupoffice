@@ -269,3 +269,7 @@ $updates['202007231658'][] = "update fs_folders set acl_id = (select aclId from 
 $updates['202011061353'][] = "ALTER TABLE `fs_files` ADD INDEX(`mtime`);";
 
 $updates['202011061353'][] = "ALTER TABLE `fs_files` ADD INDEX(`expire_time`);";
+$updates['202011061353'][] = "ALTER TABLE `fs_files` DROP INDEX `expire_time`;";
+$updates['202011061353'][] = "ALTER TABLE `fs_files` ADD INDEX(`content_expire_date`);";
+
+$updates['202101111531'][] = "ALTER TABLE `fs_files` ADD `version` INT UNSIGNED NOT NULL DEFAULT '1' AFTER `content_expire_date`;";

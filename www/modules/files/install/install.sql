@@ -21,7 +21,8 @@ CREATE TABLE `fs_files` (
   `expire_time` int(11) NOT NULL DEFAULT 0,
   `random_code` char(11) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `delete_when_expired` tinyint(1) NOT NULL DEFAULT 0,
-  `content_expire_date` int(11) DEFAULT NULL
+  `content_expire_date` int(11) DEFAULT NULL,
+  `version` INT UNSIGNED NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -281,4 +282,4 @@ CREATE TABLE `fs_folders_custom_fields` (
 
 
 ALTER TABLE `fs_files` ADD INDEX(`mtime`);
-ALTER TABLE `fs_files` ADD INDEX(`expire_time`);
+ALTER TABLE `fs_files` ADD INDEX(`content_expire_date`);

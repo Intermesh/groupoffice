@@ -18,6 +18,7 @@ class Address extends Property {
 	const TYPE_VISIT = "visit";
 	const TYPE_WORK = "work";
 	const TYPE_HOME = "home";
+	const TYPE_DELIVERY = "delivery";
 
 	/**
 	 * 

@@ -461,6 +461,28 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	}
 
 	/**
+	 * Remove joined table
+	 *
+	 * @param string $tableName
+	 * @param string $joinTableAlias If given the alias of the existing join must match too.
+	 * @return static
+	 */
+	public function removeJoin($tableName, $joinTableAlias = null) {
+		$new = [];
+		foreach($this->joins as $join) {
+			if($join['src'] == $tableName && (!isset($joinTableAlias) || $joinTableAlias == $join['joinTableAlias'])) {
+				continue;
+			}
+
+			$new[] = $join;
+		}
+
+		$this->joins = $new;
+
+		return $this;
+	}
+
+	/**
 	 * Skip this number of records
 	 *
 	 * @param int $offset

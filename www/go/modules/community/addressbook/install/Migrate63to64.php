@@ -71,10 +71,16 @@ class Migrate63to64 {
 		// echo $addressBooks ."\n";		
 
 		foreach ($addressBooks as $abRecord) {
-			echo "Migrating addressbook ". $abRecord['name'] . "\n";
+			echo "Migrating addressbook ". $abRecord['name'] . " (" .$abRecord['id'].")\n";
 			flush();
 
-			$addressBook = AddressBook::find()->where(['name'=>$abRecord['name']])->single();
+			if(!empty($abRecord['id'])) {
+				$addressBook = AddressBook::find()->where(['id' => $abRecord['id']])->single();
+			} else {
+				//only for __ORPHANED__
+				$addressBook = AddressBook::find()->where(['name' => $abRecord['name']])->single();
+			}
+
 			if(!$addressBook) {
 				$addressBook = new AddressBook();
 

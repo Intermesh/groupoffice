@@ -744,6 +744,17 @@ $updates['202010271619'][] = "UPDATE `core_cron_job` SET `expression` = '0 0 * *
 
 $updates['202011021149'][] = "ALTER TABLE core_customfields_select_option DROP FOREIGN KEY core_customfields_select_option_ibfk_2;";
 
+$updates['202011021149'][] = "CREATE TABLE `core_oauth_auth_codes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `clientId` int(11) NOT NULL,
+  `identifier` varchar(128) COLLATE ascii_bin NOT NULL,
+  `userIdentifier` int(11) NOT NULL,
+  `expiryDateTime` datetime NOT NULL,
+  `nonce` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
 $updates['202011021149'][] = "CREATE TABLE `core_alert` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `entityTypeId` INT NOT NULL,
@@ -765,6 +776,7 @@ $updates['202011021149'][] = "CREATE TABLE `core_alert` (
     REFERENCES `core_user` (`id`)
     ON DELETE RESTRICT
     ON UPDATE NO ACTION);";
+
 
 
 $updates['202011261716'][] = "TRUNCATE core_search";
@@ -826,11 +838,25 @@ $updates['202012141145'][] = "ALTER TABLE `core_search_word` ADD `drow` VARCHAR(
 $updates['202012141145'][] = "update `core_search_word` set drow = reverse (word)";
 $updates['202012141145'][] = "ALTER TABLE `core_search_word` ADD INDEX(`drow`);";
 
+$updates['202012181215'][] = "ALTER TABLE `core_customfields_select_option` ADD `enabled` BOOLEAN NOT NULL DEFAULT TRUE AFTER `text`;";
+
+$updates['202012181215'][] = "update `core_customfields_select_option` set enabled=0, text = REPLACE(text,'** Missing ** ', '') where text like '** Missing **%';";
+
+$updates['202012231410'][] = "CREATE TABLE `core_oauth_auth_codes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `clientId` int(11) NOT NULL,
+  `identifier` varchar(128) COLLATE ascii_bin NOT NULL,
+  `userIdentifier` int(11) NOT NULL,
+  `expiryDateTime` datetime NOT NULL,
+  `nonce` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
 
 
 // MASTER UPDATES
 
-$updates['202010161128'][] = "CREATE TABLE `core_pdf_block` (
+$updates['202012231410'][] = "CREATE TABLE `core_pdf_block` (
 `id` bigint(20) UNSIGNED NOT NULL,
   `pdfTemplateId` bigint(20) UNSIGNED NOT NULL,
   `x` int(11) DEFAULT NULL,
@@ -842,7 +868,7 @@ $updates['202010161128'][] = "CREATE TABLE `core_pdf_block` (
   `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
-$updates['202010161128'][] = "CREATE TABLE `core_pdf_template` (
+$updates['202012231410'][] = "CREATE TABLE `core_pdf_template` (
 `id` bigint(20) UNSIGNED NOT NULL,
   `moduleId` int(11) NOT NULL,
   `key` varchar(20) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
@@ -858,27 +884,27 @@ $updates['202010161128'][] = "CREATE TABLE `core_pdf_template` (
   `marginLeft` decimal(19,4) NOT NULL DEFAULT 10.0000
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
-$updates['202010161128'][] = "ALTER TABLE `core_pdf_block`
+$updates['202012231410'][] = "ALTER TABLE `core_pdf_block`
   ADD PRIMARY KEY (`id`) USING BTREE,
   ADD KEY `pdfTemplateId` (`pdfTemplateId`);";
 
-$updates['202010161128'][] = "ALTER TABLE `core_pdf_template`
+$updates['202012231410'][] = "ALTER TABLE `core_pdf_template`
   ADD PRIMARY KEY (`id`),
   ADD KEY `moduleId` (`moduleId`),
   ADD KEY `stationaryBlobId` (`stationaryBlobId`);";
 
-$updates['202010161128'][] = "ALTER TABLE `core_pdf_block`
+$updates['202012231410'][] = "ALTER TABLE `core_pdf_block`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;";
 
-$updates['202010161128'][] = "ALTER TABLE `core_pdf_template`
+$updates['202012231410'][] = "ALTER TABLE `core_pdf_template`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;";
 
-$updates['202010161128'][] = "ALTER TABLE `core_pdf_block`
+$updates['202012231410'][] = "ALTER TABLE `core_pdf_block`
   ADD CONSTRAINT `core_pdf_block_ibfk_1` FOREIGN KEY (`pdfTemplateId`) REFERENCES `core_pdf_template` (`id`) ON DELETE CASCADE;";
 
-$updates['202010161128'][] = "ALTER TABLE `core_pdf_template`
+$updates['202012231410'][] = "ALTER TABLE `core_pdf_template`
   ADD CONSTRAINT `core_pdf_template_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_pdf_template_ibfk_2` FOREIGN KEY (`stationaryBlobId`) REFERENCES `core_blob` (`id`);";
 
 
-$updates['202010161128'][] = "ALTER TABLE `core_email_template` ADD `key` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL AFTER `aclId`, ADD `language` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'en' AFTER `key`;";
+$updates['202012231410'][] = "ALTER TABLE `core_email_template` ADD `key` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL AFTER `aclId`, ADD `language` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'en' AFTER `key`;";

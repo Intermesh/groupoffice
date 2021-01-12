@@ -43,6 +43,7 @@ class Module extends core\Module {
 		Link::on(Link::EVENT_SAVE, Contact::class, 'onLinkSave');
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		User::on(User::EVENT_BEFORE_DELETE, static::class, 'onUserDelete');
+		User::on(User::EVENT_BEFORE_SAVE, static::class, 'onUserBeforeSave');
 	}
 	
 	public function downloadVCard($contactId) {
@@ -73,6 +74,17 @@ class Module extends core\Module {
 
 	public static function onUserDelete(core\db\Query $query) {
 		AddressBook::delete(['createdBy' => $query]);
+	}
+
+	public static function onUserBeforeSave(User $user)
+	{
+		if (!$user->isNew() && $user->isModified('displayName')) {
+			$ab = AddressBook::findById($user->addressBookSettings->getDefaultAddressBookId());
+			if ($ab) {
+				$ab->name = $user->displayName;
+				$ab->save();
+			}
+		}
 	}
 
 	protected function afterInstall(\go\core\model\Module $model)

@@ -18,7 +18,33 @@ Master
 end 6.5
 --------
 
+12-01-2021 6.4.210
+- Core: Fixed constraint error in database check
 
+11-01-2021 6.4.209
+- Core: more consistent event handler naming
+- Addressbook: display gender in title if applicable
+- Core: Import and export function for custom fields
+- Core: Fixed small XSS and request forgery vulnerabilities
+
+08-01-2021 6.4.208
+- Core: Update several default objects upon username or displayName change
+- Core: Fixed safari crash on pasting image in html editor by inserting loading spinner first instead of base64 uri
+- Bookmarks: Bookmark modules didn't show up in menu after login. Only when loading it when already logged in.
+- Mediawiki: removed module as it works better with the new OpenID Connect integration:  https://groupoffice.readthedocs.io/en/latest/install/extras/mediawiki.html
+- Addressbook: Added delivery address option
+
+04-01-2021 6.4.207
+- Documenttemplates: Fixed tag generation for entities
+- Timeregistration: Wrong week displayed when clicking the weeks
+
+22-12-2020 6.4.206
+- Core: Improved file uploading so it can handle larger uploads
+
+21-12-2020 6.4.205
+- Address book: Cascade delete portlet settings when address book is deleted
+- Core: Deleting multiple users at once failed
+- Files: Performance enhancement for expired files widget on start page by adding index
 
 18-12-2020 6.4.204
 - Files: Count in detail panel card could show from last item with files

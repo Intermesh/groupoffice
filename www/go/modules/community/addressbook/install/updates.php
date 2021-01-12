@@ -118,6 +118,11 @@ $updates['202010080821'][] = function() {
 $updates['202011241530'][] = 'CREATE TABLE IF NOT EXISTS `addressbook_portlet_birthday` (`userId` int(11) NOT NULL, `addressBookId` int(11) NOT NULL, PRIMARY KEY (`userId`, `addressBookId`) ) ENGINE=InnoDB';
 $updates['202011241530'][] = 'ALTER TABLE `addressbook_portlet_birthday` ADD CONSTRAINT `addressbook_portlet_birthday_fk1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE, ADD CONSTRAINT `addressbook_portlet_birthday_fk2` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`);';
 
+$updates['202011241530'][] = 'ALTER TABLE `addressbook_portlet_birthday` DROP FOREIGN KEY `addressbook_portlet_birthday_fk2`;';
+$updates['202011241530'][] = 'ALTER TABLE `addressbook_portlet_birthday` ADD CONSTRAINT `addressbook_portlet_birthday_fk2` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;';
+
+
+
 $updates['202011271105'][] = "ALTER TABLE `addressbook_contact` ADD INDEX(`name`);";
 $updates['202011271105'][] = "ALTER TABLE `addressbook_contact` ADD INDEX(`modifiedAt`);";
 $updates['202011271105'][] = "ALTER TABLE `addressbook_contact` ADD INDEX(`lastName`);";

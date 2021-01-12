@@ -25,6 +25,7 @@ class CalendarModule extends \GO\Base\Module{
 	public function defineListeners() {
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		Link::on(Entity::EVENT_FILTER, static::class, 'onLinkFilter');
+		User::on(User::EVENT_BEFORE_SAVE, static::class, 'onUserBeforeSave');
 	}
 	
 	public static function onMap(Mapping $mapping) {
@@ -119,5 +120,15 @@ class CalendarModule extends \GO\Base\Module{
 		//Share calendars with internal by default
 		Calendar::entityType()->setDefaultAcl([Group::ID_INTERNAL => Acl::LEVEL_WRITE]);		
 		
+	}
+
+
+	public static function onUserBeforeSave(User $user)
+	{
+		if (!$user->isNew() && $user->isModified('displayName')) {
+			$cal = self::getDefaultCalendar($user->id);
+			$cal->name = $user->displayName;
+			$cal->save();
+		}
 	}
 }

@@ -1,6 +1,7 @@
 polyfills.js
 
 Jmap.js
+Uploader.js
 BrowserStorage.js
 
 
@@ -186,6 +187,7 @@ users/UserGroupGrid.js
 users/UserCombo.js
 users/SelectDialogPanel.js
 
+customfields/ExportDialog.js
 customfields/FormFieldSet.js
 customfields/FieldDialog.js
 customfields/CustomFields.js
