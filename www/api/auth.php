@@ -22,6 +22,10 @@ use go\core\validate\ErrorCode;
  * @throws Exception
  */
 function output($data = [], $status = 200, $statusMsg = null) {
+
+	Response::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+	Response::get()->setHeader('Pragma', 'no-cache');
+
 	Response::get()->setStatus($status, $statusMsg);
 	Response::get()->sendHeaders();
 
