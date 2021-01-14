@@ -753,3 +753,12 @@ $updates['202012231410'][] = "CREATE TABLE `core_oauth_auth_codes` (
   `nonce` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
+$updates['202012231410'][] = function() {
+	foreach(Field::find()->where(['type' => 'Text']) as $field) {
+		//correct default null to default ""
+		$field->forceAlterTable = true;
+		$field->save();
+	}
+};
