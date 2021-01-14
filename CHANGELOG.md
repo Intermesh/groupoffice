@@ -1,5 +1,6 @@
 - Core: Validate theme and language. Don't echo given language string to fix XSS issue
 - Core: Set "samesite=Strict" on all cookies
+- Notes: Improved list style
 
 12-01-2021 6.4.210
 - Core: Fixed constraint error in database check
