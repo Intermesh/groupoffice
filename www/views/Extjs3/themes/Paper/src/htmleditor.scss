@@ -35,3 +35,18 @@ p {
 	margin: dp(16) 0;
 }
 
+ul{
+	display: block;
+	list-style-type: disc;
+	list-style-position: inside;
+	margin: 0;
+	padding: 2px;
+}
+
+ol {
+	display: block;
+	list-style-type: decimal;
+	list-style-position: inside;
+	margin: 0;
+	padding: 2px;
+}
