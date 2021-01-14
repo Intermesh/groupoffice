@@ -14,6 +14,7 @@ Master
 - Core: Save export column presets 
 - Address book: Removed starred functionality for performance reasons
 - Core: New global search design to improve performance on larger databases
+- Documenttemplates: add selectable folder option
 
 end 6.5
 --------
