@@ -3,6 +3,7 @@
 - Notes: Improved list style
 - Core: Custom text fields default to empty string instead of null
 - Projects: Fixed searching in financical screen
+- Address book: State is searchable
 
 12-01-2021 6.4.210
 - Core: Fixed constraint error in database check
