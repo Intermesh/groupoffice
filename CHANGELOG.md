@@ -3,6 +3,8 @@
 - Notes: Improved list style
 - Core: Custom text fields default to empty string instead of null
 - Projects: Fixed searching in financical screen
+- savemailas: Database check corrects link permissions
+- savemailas: Links were not cleaned up when items were removed
 - Address book: State is searchable
 
 12-01-2021 6.4.210
