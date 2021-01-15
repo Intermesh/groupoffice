@@ -70,7 +70,6 @@ try {
 		}
 
 		Response::get()->setCookie('accessToken', $token->accessToken, [
-			'expires' => $expires,
 			"path" => "/",
 			"samesite" => "Strict",
 			"domain" => Request::get()->getHost()
