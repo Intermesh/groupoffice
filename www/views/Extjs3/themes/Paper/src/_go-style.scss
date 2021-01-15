@@ -1832,19 +1832,19 @@ table[id^="comments-ext"] b {
 
    
 .go-html-formatted ul,.go-html-formatted  menu, .go-html-formatted dir {  
-   display: block;  
-   list-style-type: disc;  
-   margin: 1em 2em;
-	 padding: 0 40px;
-   /*-moz-padding-start: 40px;  */
+	display: block;
+	list-style-type: disc;
+	list-style-position: inside;
+	margin: 0;
+	padding: 2px;
  }  
    
 .go-html-formatted ol {  
-   display: block;  
-   list-style-type: decimal;  
-   margin: 1em 2em;
-	 padding: 0 40px;
-   /*-moz-padding-start: 40px;  */
+	display: block;
+	list-style-type: decimal;
+	list-style-position: inside;
+	margin: 0;
+	padding: 2px;
  }  
    
 .go-html-formatted li {  
@@ -1852,7 +1852,7 @@ table[id^="comments-ext"] b {
  }
  
 .go-html-formatted p {  
-   margin:10px 0px;  
+   margin: dp(8) 0px;
  }
 
 .go-html-formatted a:link, .go-html-formatted a:visited, .go-html-formatted a:active{

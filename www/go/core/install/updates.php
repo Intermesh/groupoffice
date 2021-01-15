@@ -754,8 +754,15 @@ $updates['202011021149'][] = "CREATE TABLE `core_oauth_auth_codes` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
+$updates['202012231410'][] = function() {
+	foreach(Field::find()->where(['type' => 'Text']) as $field) {
+		//correct default null to default ""
+		$field->forceAlterTable = true;
+		$field->save();
+	}
+};
 
-$updates['202011021149'][] = "CREATE TABLE `core_alert` (
+$updates['202012231410'][] = "CREATE TABLE `core_alert` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `entityTypeId` INT NOT NULL,
   `entityId` INT NOT NULL,
@@ -779,28 +786,28 @@ $updates['202011021149'][] = "CREATE TABLE `core_alert` (
 
 
 
-$updates['202011261716'][] = "TRUNCATE core_search";
-$updates['202011261716'][] = "ALTER TABLE `core_search` DROP `keywords`";
+$updates['202012231410'][] = "TRUNCATE core_search";
+$updates['202012231410'][] = "ALTER TABLE `core_search` DROP `keywords`";
 
-$updates['202011261716'][] = "CREATE TABLE `core_search_word` (
+$updates['202012231410'][] = "CREATE TABLE `core_search_word` (
 `searchId` int(11) NOT NULL,
   `word` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
 
-$updates['202011261716'][] = "ALTER TABLE `core_search_word`
+$updates['202012231410'][] = "ALTER TABLE `core_search_word`
   ADD PRIMARY KEY (`word`,`searchId`),
   ADD KEY `searchId` (`searchId`);";
 
 
-$updates['202011261716'][] = "ALTER TABLE `core_search_word`
+$updates['202012231410'][] = "ALTER TABLE `core_search_word`
   ADD CONSTRAINT `core_search_word_ibfk_1` FOREIGN KEY (`searchId`) REFERENCES `core_search` (`id`) ON DELETE CASCADE;";
 
 
 
 
 
-$updates['202011261716'][] = function() {
+$updates['202012231410'][] = function() {
 
 	//run build search cache on cron immediately. This job will deactivate itself.
 	\go\core\cron\BuildSearchCache::install("* * * * *");
@@ -809,7 +816,7 @@ $updates['202011261716'][] = function() {
 };
 
 
-$updates['202012031223'][] = "CREATE TABLE `core_spreadsheet_export` (
+$updates['202012231410'][] = "CREATE TABLE `core_spreadsheet_export` (
 `id` int(10) UNSIGNED NOT NULL,
   `userId` int(11) NOT NULL,
   `entityTypeId` int(11) NOT NULL,
@@ -818,29 +825,29 @@ $updates['202012031223'][] = "CREATE TABLE `core_spreadsheet_export` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
 
-$updates['202012031223'][] = "ALTER TABLE `core_spreadsheet_export`
+$updates['202012231410'][] = "ALTER TABLE `core_spreadsheet_export`
   ADD PRIMARY KEY (`id`),
   ADD KEY `userId` (`userId`),
   ADD KEY `entityTypeId` (`entityTypeId`),
   ADD KEY `name` (`name`);";
 
 
-$updates['202012031223'][] = "ALTER TABLE `core_spreadsheet_export`
+$updates['202012231410'][] = "ALTER TABLE `core_spreadsheet_export`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;";
 
 
-$updates['202012031223'][] = "ALTER TABLE `core_spreadsheet_export`
+$updates['202012231410'][] = "ALTER TABLE `core_spreadsheet_export`
   ADD CONSTRAINT `core_spreadsheet_export_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_spreadsheet_export_ibfk_2` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;";
 
 
-$updates['202012141145'][] = "ALTER TABLE `core_search_word` ADD `drow` VARCHAR(100) NOT NULL AFTER `word`;";
-$updates['202012141145'][] = "update `core_search_word` set drow = reverse (word)";
-$updates['202012141145'][] = "ALTER TABLE `core_search_word` ADD INDEX(`drow`);";
+$updates['202012231410'][] = "ALTER TABLE `core_search_word` ADD `drow` VARCHAR(100) NOT NULL AFTER `word`;";
+$updates['202012231410'][] = "update `core_search_word` set drow = reverse (word)";
+$updates['202012231410'][] = "ALTER TABLE `core_search_word` ADD INDEX(`drow`);";
 
-$updates['202012181215'][] = "ALTER TABLE `core_customfields_select_option` ADD `enabled` BOOLEAN NOT NULL DEFAULT TRUE AFTER `text`;";
+$updates['202012231410'][] = "ALTER TABLE `core_customfields_select_option` ADD `enabled` BOOLEAN NOT NULL DEFAULT TRUE AFTER `text`;";
 
-$updates['202012181215'][] = "update `core_customfields_select_option` set enabled=0, text = REPLACE(text,'** Missing ** ', '') where text like '** Missing **%';";
+$updates['202012231410'][] = "update `core_customfields_select_option` set enabled=0, text = REPLACE(text,'** Missing ** ', '') where text like '** Missing **%';";
 
 $updates['202012231410'][] = "CREATE TABLE `core_oauth_auth_codes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -851,3 +858,5 @@ $updates['202012231410'][] = "CREATE TABLE `core_oauth_auth_codes` (
   `nonce` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+

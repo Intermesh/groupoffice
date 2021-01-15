@@ -6,6 +6,7 @@ use GO;
 use GO\Base\Db\ActiveRecord;
 use go\core\data\Model;
 use go\core\db\Criteria;
+use go\core\db\Expression;
 use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\ErrorHandler;
@@ -131,6 +132,12 @@ abstract class Base extends Model {
 			
 			$oldName = $this->field->isModified('databaseName') ? $this->field->getOldValue("databaseName") : $this->field->databaseName;
 			$col = Table::getInstance($table)->getColumn($oldName);
+
+
+			if($col->nullAllowed && stristr($fieldSql, 'NOT NULL')) {
+				//Set null values to the default if it was allowed.
+				go()->getDbConnection()->exec("UPDATE `" . $table . "` SET `" . $oldName . "` = ". go()->getDbConnection()->getPDO()->quote($this->field->getDefault()) ." WHERE `" . $oldName . "` IS NULL");
+			}
 			
 			$sql = "ALTER TABLE `" . $table . "` CHANGE " . Utils::quoteColumnName($oldName) . " " . $quotedDbName . " " . $fieldSql;
 			go()->getDbConnection()->exec($sql);

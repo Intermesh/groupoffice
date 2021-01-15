@@ -29,7 +29,14 @@ class Language {
 		}
 		return $this->isoCode;
 	}
-	
+
+	/**
+	 * Set new language
+	 *
+	 * @param string|null $isoCode when not given it's detected from the browser
+	 * @return string|false Old language setting
+	 * @throws Exception
+	 */
 	public function setLanguage($isoCode = null) {
 		$old = $this->getIsoCode();
 		if(!isset($isoCode)) {
@@ -37,7 +44,8 @@ class Language {
 		}
 		
 		if(!$this->hasLanguage($isoCode)) {
-			throw new \Exception("Invalid language given ".$isoCode);
+			go()->debug("Invalid language given ".$isoCode);
+			return false;
 		}
 		
 		if($isoCode != $this->isoCode) {
