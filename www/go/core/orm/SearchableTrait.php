@@ -3,7 +3,8 @@ namespace go\core\orm;
 
 use go\core\customfield\Html;
 use go\core\customfield\TextArea;
-use go\core\db\Query;
+use go\core\orm\Query;
+use go\core\model\Link;
 
 /**
  * Entities can use this trait to make it show up in the global search function
@@ -125,22 +126,18 @@ trait SearchableTrait {
 		if(!$delSearchStmt->execute()) {
 			return false;
 		}
-		
-		if(!\go()->getDbConnection()
-						->delete('core_link', 
-										(new Query)
-											->where(['fromEntityTypeId' => static::entityType()->getId()])
-											->andWhere('fromId', 'IN', $query)
-										)->execute()) {
+
+		if(!Link::delete((new Query)
+			->where(['fromEntityTypeId' => static::entityType()->getId()])
+			->andWhere('fromId', 'IN', $query)
+		)) {
 			return false;
 		}
-		
-		if(!\go()->getDbConnection()
-						->delete('core_link', 										
-										(new Query)
-											->where(['toEntityTypeId' => static::entityType()->getId()])
-											->andWhere('toId', 'IN', $query)
-										)->execute()) {
+
+		if(!Link::delete((new Query)
+			->where(['toEntityTypeId' => static::entityType()->getId()])
+			->andWhere('toId', 'IN', $query)
+		)) {
 			return false;
 		}
 		

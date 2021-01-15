@@ -1,9 +1,0 @@
-{
-	"@metadata": {
-		"authors": [
-			"IRTC1015"
-		]
-	},
-	"auth_remoteuser-desc": "<code>REMOTE_USER</code> 환경 변수를 사용하여 사용자를 자동으로 로그인하게 합니다",
-	"auth_remoteuser-wgautherror": "[https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:$wgAuth <code>wgAuth</code> 변수]를 사용하는 다른 확장기능이 있습니다. <code>$wgAuth</code>를 사용하는 확장기능은 동시에 하나만 사용할 수 있습니다. 다른 확장기능이 없다면 <code>LocalSettings.php</code>에 다음 줄이 있는지 확인해 주시기 바랍니다:\n <code>$wgAuth = new Auth_remoteuser();</code>"
-}

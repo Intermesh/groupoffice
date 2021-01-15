@@ -15,28 +15,4 @@ class Settings extends core\Settings {
 	public $createPersonalAddressBooks = true;
 
 	public $restrictExportToAdmins = false;
-
-	/**
-	 * @var string
-	 */
-	protected $restrictAutoCompleteInAddressBooks;
-
-	/**
-	 * @param $value
-	 */
-	public function setRestrictAutoCompleteInAddressBooks($value)
-	{
-		$this->restrictAutoCompleteInAddressBooks = implode(',', $value);
-	}
-
-	/**
-	 * @return false|string[]
-	 */
-	public function getRestrictAutoCompleteInAddressBooks()
-	{
-	    if (empty($this->restrictAutoCompleteInAddressBooks)) {
-	        return [];
-        }
-		return explode(',', $this->restrictAutoCompleteInAddressBooks);
-	}
 }

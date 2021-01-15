@@ -31,8 +31,10 @@ return array (
   'emailTypes' => 
   array (
     'work' => 'Werk',
+    'visit' => 'Bezoek',
     'home' => 'Thuis',
     'billing' => 'Factuur',
+	  'delivery' => 'Levering',
   ),
   'phoneTypes' => 
   array (

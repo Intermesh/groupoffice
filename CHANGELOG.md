@@ -1,6 +1,27 @@
-6.4.208
+- Core: Validate theme and language. Don't echo given language string to fix XSS issue
+- Core: Set "samesite=Strict" on all cookies
+- Notes: Improved list style
+- Core: Custom text fields default to empty string instead of null
+- Projects: Fixed searching in financical screen
+- savemailas: Database check corrects link permissions
+- savemailas: Links were not cleaned up when items were removed
+- Address book: State is searchable
+
+12-01-2021 6.4.210
+- Core: Fixed constraint error in database check
+
+11-01-2021 6.4.209
+- Core: more consistent event handler naming
+- Addressbook: display gender in title if applicable
+- Core: Import and export function for custom fields
+- Core: Fixed small XSS and request forgery vulnerabilities
+
+08-01-2021 6.4.208
 - Core: Update several default objects upon username or displayName change
 - Core: Fixed safari crash on pasting image in html editor by inserting loading spinner first instead of base64 uri
+- Bookmarks: Bookmark modules didn't show up in menu after login. Only when loading it when already logged in.
+- Mediawiki: removed module as it works better with the new OpenID Connect integration:  https://groupoffice.readthedocs.io/en/latest/install/extras/mediawiki.html
+- Addressbook: Added delivery address option
 
 04-01-2021 6.4.207
 - Documenttemplates: Fixed tag generation for entities

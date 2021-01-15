@@ -1,9 +1,0 @@
-{
-    "@metadata": {
-        "authors": [
-            "Otheus Shelling"
-        ]
-    },
-    "auth_remoteuser-desc": "Automatically logs-in users using the <code>REMOTE_USER</code> environment variable",
-    "auth_remoteuser-wgautherror": "There is another extension using [https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:$wgAuth the <code>wgAuth</code> variable]. You can't use more than one extension using <code>$wgAuth</code> at the same time. If there isn't another extension, please make sure you set the following line in your <code>LocalSettings.php</code>:\n <code>$wgAuth = new Auth_remoteuser();</code>"
-}

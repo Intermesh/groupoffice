@@ -1,9 +1,0 @@
-{
-	"@metadata": {
-		"authors": [
-			"Metalhead64"
-		]
-	},
-	"auth_remoteuser-desc": "Ermöglicht die automatische Anmeldung von Benutzern mithilfe der <code>REMOTE_USER</code>-Umgebungsvariable",
-	"auth_remoteuser-wgautherror": "Es gibt eine andere Erweiterung, die [https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:$wgAuth die <code>wgAuth</code>-Variable] benutzt. Du kannst gleichzeitig nicht mehr als eine Erweiterung nutzen, die <code>$wgAuth</code> verwendet. Falls es keine andere Erweiterung gibt, stelle bitte sicher, dass du die folgende Zeile in die Datei  <code>LocalSettings.php</code> gesetzt hast:\n <code>$wgAuth = new Auth_remoteuser();</code>"
-}

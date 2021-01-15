@@ -61,6 +61,50 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 			tbar: [
 				"->",
 				{
+					iconCls: 'ic-cloud-upload',
+					tooltip: t('Import fieldsets from JSON-file'),
+					handler: function() {
+						go.util.openFileDialog({
+							multiple: false,
+							accept: ".json",
+							directory: false,
+							autoUpload: true,
+							scope: this,
+							listeners: {
+								upload: function (response) {
+
+									this.getEl().mask(t("Importing..."));
+
+									go.Jmap.request({
+										method: 'FieldSet/importFromJson',
+										params: {
+											entity: this.entity,
+											blobId: response.blobId
+										},
+										callback: function(request, tmp, response, callId) {
+											this.getEl().unmask();
+											GO.errorDialog.show(response.feedback, t('Import messages'));
+											this.load();
+
+										},
+										scope: this
+									})
+								},
+								scope: this
+							}
+						});
+					},
+					scope: this
+				}, {
+					iconCls: 'ic-cloud-download',
+					tooltip: t('Export fieldsets to JSON-file'),
+					handler: function() {
+						var dlg = new go.customfields.ExportDialog();
+						dlg.setEntity(this.entity);
+						dlg.show();
+					},
+					scope: this
+				}, {
 					iconCls: 'ic-add',
 					tooltip: t('Add field set'),
 					handler: function (e, toolEl) {

@@ -514,6 +514,14 @@ class Contact extends AclItemEntity {
 											$criteria->where('adr.country', $comparator, $value);
 											
 										})
+										->addText("state", function(Criteria $criteria, $comparator, $value, Query $query) {
+											if(!$query->isJoined('addressbook_address', 'adr')) {
+												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
+											}
+
+											$criteria->where('adr.state', $comparator, $value);
+
+										})
 										->addText("zip", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_address', 'adr')) {
 												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");

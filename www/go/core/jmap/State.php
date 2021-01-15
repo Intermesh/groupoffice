@@ -132,6 +132,9 @@ class State extends AbstractState {
 		
 		if (!$this->isAuthenticated()) {
 			Response::get()->setStatus(401);
+			Response::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+			Response::get()->setHeader('Pragma', 'no-cache');
+
 			Response::get()->output([
 					"auth" => [
 							"domains" => User::getAuthenticationDomains()

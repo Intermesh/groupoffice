@@ -1,8 +1,0 @@
-{
-	"@metadata": {
-		"authors": [
-			"Arifin.wijaya"
-		]
-	},
-	"auth_remoteuser-desc": "Secara otomatis masuk log pengguna menggunakan variabel lingkungan <code>REMOTE_USER</code>"
-}
