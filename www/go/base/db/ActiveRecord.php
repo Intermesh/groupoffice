@@ -4818,9 +4818,13 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if(!$this->hasLinks() || !$targetModel->hasLinks())
 			return false;
 
-		$stmt = \GO\Base\Model\SearchCacheRecord::model()->findLinks($this);
-		while($searchCacheModel = $stmt->fetch()){
-			$targetModel->link($searchCacheModel, $searchCacheModel->link_description);
+		$links = Link::findLinks($this);
+
+		foreach($links as $link) {
+			$entity = $link->findToEntity();
+			if($entity && !$entity->equals($targetModel)) {
+				Link::create($targetModel, $entity, $link->description);
+			}
 		}
 		return true;
 	}

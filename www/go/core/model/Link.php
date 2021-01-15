@@ -35,7 +35,12 @@ use go\core\validate\ErrorCode;
 				]
 		]);
  * ```
- * 
+ *
+ * Find links for an Entity:
+ *
+ * ```
+ * $links = Link::findLinks($entity);
+ * ```
  * 
  */
 class Link extends AclItemEntity
@@ -101,6 +106,40 @@ class Link extends AclItemEntity
 	 */
 	public function getToEntity() {
 		return $this->toEntity;
+	}
+
+	/**
+	 * Find the entity it links to
+	 *
+	 * @return \go\core\orm\Entity|ActiveRecord
+	 * @throws \Exception
+	 */
+	public function findToEntity() {
+		$e = EntityType::findByName($this->toEntity);
+		$cls = $e->getClassName();
+
+		if(is_a($cls, Entity::class, true)) {
+			return $cls::findById($this->toId);
+		} else{
+			return $cls::model()->findByPk($this->toId);
+		}
+	}
+
+	/**
+	 * Find the entity it links from
+	 *
+	 * @return \go\core\orm\Entity|ActiveRecord
+	 * @throws \Exception
+	 */
+	public function findFromEntity() {
+		$e = EntityType::findByName($this->fromEntity);
+		$cls = $e->getClassName();
+
+		if(is_a($cls, Entity::class, true)) {
+			return $cls::findById($this->fromId);
+		} else{
+			return $cls::model()->findByPk($this->fromId);
+		}
 	}
 
 	
@@ -207,6 +246,19 @@ class Link extends AclItemEntity
 				'toEntityTypeId' => $b->entityType()->getId(),
 				'toId' => $b->id,
 		])->single();
+	}
+
+	/**
+	 * Find a link
+	 *
+	 * @param Entity|ActiveRecord $a
+	 * @return Link[]
+	 */
+	public static function findLinks($a) {
+		return Link::find()->where([
+			'fromEntityTypeId' => $a->entityType()->getId(),
+			'fromId' => $a->id
+		]);
 	}
 	
 	/**
