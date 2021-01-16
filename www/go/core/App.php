@@ -693,7 +693,12 @@ use const GO_CONFIG_FILE;
 			}
 
 			if (!empty($_SERVER['HTTP_HOST'])) {
-				$workingFile = '/etc/groupoffice/multi_instance/' . explode(':', $_SERVER['HTTP_HOST'])[0] . '/' . $name;
+				$domain = explode(':', $_SERVER['HTTP_HOST'])[0];
+
+				//hack for wopi subdomain
+				$domain = str_replace('.wopi.', '.', $domain);
+
+				$workingFile = '/etc/groupoffice/multi_instance/' . $domain . '/' . $name;
 				try {
 					if (file_exists($workingFile)) {
 						return $workingFile;
