@@ -203,7 +203,7 @@ class ClassFinder {
 		}
 
 		foreach ($folder->getFolders() as $folder) {
-			if($folder->getName() !== 'vendor' || substr($folder->getName(), 0, 1) != ".") {
+			if($folder->getName() !== 'vendor' && substr($folder->getName(), 0, 1) != ".") {
 				$classes = array_merge($classes, $this->folderToClassNames($folder, $namespace . '\\' . $folder->getName()));
 			}
 		}
