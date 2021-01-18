@@ -14,6 +14,11 @@ class Module extends core\Module {
 	public function getAuthor() {
 		return "Intermesh BV";
 	}
+
+	public function autoInstall()
+	{
+		return true;
+	}
 	
 	public function defineListeners() {
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');

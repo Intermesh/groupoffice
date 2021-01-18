@@ -158,8 +158,14 @@ class ClassFinder {
 		$parts = explode("\\", $namespace);
 
 		$moduleCls= "go\\modules\\". $parts[2]."\\".$parts[3]."\\Module";
+		try {
+			return !class_exists($moduleCls) || $moduleCls::get()->isLicensed();
+		}
+		catch(\Throwable $e) {
+			go()->debug("Class '$moduleCls' couldn't be loaded: " . $e->getMessage());
+			return false;
+		}
 
-		return !class_exists($moduleCls) || $moduleCls::get()->isLicensed();
 	}
 
 	private function folderToClassNames(Folder $folder, $namespace) {	
@@ -197,7 +203,7 @@ class ClassFinder {
 		}
 
 		foreach ($folder->getFolders() as $folder) {
-			if($folder->getName() !== 'vendor') {
+			if($folder->getName() !== 'vendor' || substr($folder->getName(), 0, 1) != ".") {
 				$classes = array_merge($classes, $this->folderToClassNames($folder, $namespace . '\\' . $folder->getName()));
 			}
 		}

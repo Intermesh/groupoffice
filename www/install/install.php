@@ -64,13 +64,17 @@ if (!empty($_POST)) {
 				'email' => $_POST['email']
 		];
 
-		App::get()->getInstaller()->install($admin, [
-				AddressBookModule::get(),
-				NotesModule::get(),
-				GAModule::get(),
-				CommentsModule::get(),
-				BookmarksModule::get()
-				]);
+
+		$availableModules = core\Module::findAvailable();
+		$installModules = [];
+		foreach($availableModules as $modCls) {
+		    $mod = $modCls::get();
+		    if($mod->autoInstall() && $mod->isInstallable()) {
+		        $installModules[] = $mod;
+            }
+        }
+
+		App::get()->getInstaller()->install($admin, $installModules);
 
 		//install not yet refactored modules
 		GO::$ignoreAclPermissions = true;
