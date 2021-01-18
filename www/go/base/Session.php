@@ -61,10 +61,12 @@ class Session extends Observable{
 			//Avoid session id in url's to prevent session hijacking.
 			ini_set('session.use_only_cookies',1);
 
-			session_set_cookie_params([
-				'httponly' => true,
-				'samesite' => 'Strict'
-			]);
+			if(version_compare(phpversion(), "7.3.0") > -1) {
+				session_set_cookie_params([
+					'httponly' => true,
+					'samesite' => 'Strict'
+				]);
+			}
 
 			if(Util\Http::isHttps()) {
 				ini_set('session.cookie_secure',1);

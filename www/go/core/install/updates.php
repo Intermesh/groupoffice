@@ -755,10 +755,13 @@ $updates['202011021149'][] = "CREATE TABLE `core_oauth_auth_codes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
 $updates['202012231410'][] = function() {
-	foreach(Field::find()->where(['type' => 'Text']) as $field) {
-		//correct default null to default ""
-		$field->forceAlterTable = true;
-		$field->save();
+	$allEntities = EntityType::findAll();
+	foreach($allEntities as $e) {
+		foreach (Field::findByEntity($e->getId())->where(['type' => 'Text']) as $field) {
+			//correct default null to default ""
+			$field->forceAlterTable = true;
+			$field->save();
+		}
 	}
 };
 
