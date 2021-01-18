@@ -1,3 +1,6 @@
+18-01-2021 6.4.212
+- Fix 6.4.211 - ErrorException in latest release #657 It happened in php < 7.3
+
 18-01-2021 6.4.211
 - Core: Validate theme and language. Don't echo given language string to fix XSS issue
 - Core: Set "samesite=Strict" on all cookies
