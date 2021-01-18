@@ -756,9 +756,12 @@ $updates['202012231410'][] = "CREATE TABLE `core_oauth_auth_codes` (
 
 
 $updates['202012231410'][] = function() {
-	foreach(Field::find()->where(['type' => 'Text']) as $field) {
-		//correct default null to default ""
-		$field->forceAlterTable = true;
-		$field->save();
+	$allEntities = EntityType::findAll();
+	foreach($allEntities as $e) {
+		foreach (Field::findByEntity($e->getId())->where(['type' => 'Text']) as $field) {
+			//correct default null to default ""
+			$field->forceAlterTable = true;
+			$field->save();
+		}
 	}
 };
