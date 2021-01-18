@@ -204,6 +204,23 @@ class Response extends Singleton{
 		$this->setHeader("Expires", $expires->format('D, d M Y H:i:s'));
 	}
 
+	public function setCookie($name, $value, $options = []) {
+
+		if(version_compare(phpversion(), "7.3.0") > -1) {
+			setcookie($name, $value, $options);
+		} else{
+			if(!isset($options['path'])) {
+				$options['path'] = "";
+			}
+			if(isset($options['samesite'])) {
+				$options['path'] .= '; samesite=' . $options['samesite'];
+			}
+			setcookie($name, $value, $options['expires'] ?? 0, $options['path'] ?? "", $options['domain'] ?? "", $options['secure'] ?? false, $options['httponly'] ?? false);
+		}
+
+
+	}
+
 	/**
 	 * Check if the client cache is up to date
 	 * 

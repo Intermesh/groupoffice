@@ -1127,29 +1127,35 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		return $folder->id;
 	}
 
-
-	protected function checkEntityFolder($params) {
-		$cls = $params['model'];
-
+	/**
+	 * @param array $params
+	 * @return array
+	 * @throws AccessDenied
+	 */
+	protected function checkEntityFolder($params)
+	{
 		$entityType = \go\core\orm\EntityType::findByName($params['model']);
 		$cls = $entityType->getClassName();
 
 		$entity = $cls::findById($params['id']);
-		
+
 		$folder = Folder::model()->findForEntity($entity);
 		return [
-				"success" => true,
-				"files_folder_id" => $folder->id
+			"success" => true,
+			"files_folder_id" => $folder->id,
+			"path" =>  $folder->path
 		];
 	}
 
 	/**
 	 * check if a model folder exists
 	 *
-	 * @param type $params
-	 * @return type
+	 * @param array $params
+	 * @return array
+	 * @throws Exception
 	 */
-	protected function actionCheckModelFolder($params) {
+	protected function actionCheckModelFolder($params)
+	{
 
 		$cls = $params['model'];
 		$entityType = \go\core\orm\EntityType::findByName($params['model']);
@@ -1164,11 +1170,23 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$obj = new $cls(false);
 		$model = $obj->findByPk($params['id'],false, true);
 
-		$response['success'] = true;
-		$response['files_folder_id'] = $this->checkModelFolder($model, true, !empty($params['mustExist']));
-		return $response;
+		$folderId =  $this->checkModelFolder($model, true, !empty($params['mustExist']));
+		$folder = Folder::model()->findByPk($folderId);
+
+		return [
+			'success' => true,
+			'files_folder_id' => $folderId,
+			'path' => $folder->path
+		];
 	}
 
+	/**
+	 * @param GO\Base\Db\ActiveRecord $model
+	 * @param false $saveModel
+	 * @param false $mustExist
+	 * @return bool|int|mixed|string|null
+	 * @throws AccessDenied
+	 */
 	public function checkModelFolder(\GO\Base\Db\ActiveRecord $model, $saveModel=false, $mustExist=false) {
 		$oldAllowDeletes = \GO\Base\Fs\File::setAllowDeletes(false);
 	
@@ -1192,7 +1210,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			if ($saveModel && $model->isModified())
 				$model->save(true);
-		}elseif ($model->alwaysCreateFilesFolder() || $mustExist) {
+		} elseif ($model->alwaysCreateFilesFolder() || $mustExist) {
 			
 			GO::debug('Folder does not exist in database. Will create it.');
 		
@@ -1208,8 +1226,9 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				$model->save(true);
 		}
 
-		if(empty($model->files_folder_id))
-			$model->files_folder_id=0;
+		if (empty($model->files_folder_id)) {
+			$model->files_folder_id = 0;
+		}
 
 		 \GO\Base\Fs\File::setAllowDeletes($oldAllowDeletes);
 		 

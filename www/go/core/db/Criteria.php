@@ -380,6 +380,16 @@ class Criteria {
 		
 		return $this;
 	}
+
+	public static $bindTag = 0;
+
+	/**
+	 * Generate unique tag to use in {@see bind()}
+	 * @return string
+	 */
+	public function bindTag() {
+		return 'qp' . self::$bindTag++;
+	}
 	
 	/**
 	 * Check if the criteria object holds conditions

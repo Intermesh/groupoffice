@@ -200,6 +200,27 @@ class Extjs3 {
 		return go()->getEnvironment()->getInstallPath();
 	}
 
+	/**
+	 * Get available theme names as array
+	 *
+	 * @return string[]
+	 * @throws \go\core\exception\ConfigurationException
+	 */
+	public function getThemes() {
+		$themes = go()->getCache()->get("themes");
+		if($themes == null) {
+			$themes = [];
+			$themeFolders = go()->getEnvironment()->getInstallFolder()->getFolder('views/Extjs3/themes')->getFolders();
+			foreach($themeFolders as $themeFolder) {
+				$themes[] = $themeFolder->getName();
+			}
+
+			go()->getCache()->set("themes", $themes);
+		}
+
+		return $themes;
+	}
+
 	private $theme;
 
 	public function getTheme() {

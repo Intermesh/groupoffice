@@ -35,7 +35,12 @@ class Module extends core\Module {
 		return "Intermesh BV <info@intermesh.nl>";
 	}
 
-	
+	public function autoInstall()
+	{
+		return true;
+	}
+
+
 	public function defineListeners() {
 		parent::defineListeners();
 		
