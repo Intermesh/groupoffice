@@ -36,9 +36,7 @@ abstract class Module extends Singleton {
 	 * @return self|false
 	 */
 	public static function findByName($moduleName) {
-		$classFinder = new ClassFinder(false);
-		$classFinder->addNamespace("go\\modules");
-		$mods = $classFinder->findByParent(self::class);
+		$mods = self::findAvailable();
 		
 		foreach($mods as $mod) {
 			if($mod::getName() == $moduleName) {
@@ -49,6 +47,34 @@ abstract class Module extends Singleton {
 		return false;
 	}
 
+
+	/**
+	 * Find available module class names
+	 *
+	 * @return string[] eg. ['go\modules\community\addressbook\Module', 'go\modules\community\notes\Module']
+	 */
+	public static function findAvailable() {
+		//for new framework
+		$classFinder = new \go\core\util\ClassFinder(false);
+		$classFinder->addNamespace("go\\modules");
+
+		return $classFinder->findByParent(\go\core\Module::class);
+	}
+
+	/**
+	 * Returns if this module will be installed by default
+	 *
+	 * @return bool
+	 */
+	public function autoInstall() {
+		return false;
+	}
+
+	/**
+	 * Check if this module can be installed.
+	 *
+	 * @return bool
+	 */
 	public function isInstallable() {
 		return $this->isLicensed();
 	}
@@ -60,6 +86,11 @@ abstract class Module extends Singleton {
 		return null;
 	}
 
+	/**
+	 * Is this module licensed?
+	 *
+	 * @return bool
+	 */
 	public function isLicensed() {
 		
 		$lic = $this->requiredLicense();

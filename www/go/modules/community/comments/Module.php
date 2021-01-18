@@ -15,6 +15,11 @@ class Module extends core\Module {
 	public function getAuthor() {
 		return "Intermesh BV";
 	}
+
+	public function autoInstall()
+	{
+		return true;
+	}
 	
 	public function defineListeners() {
 		GarbageCollection::on(GarbageCollection::EVENT_RUN, static::class, 'garbageCollection');

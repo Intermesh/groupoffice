@@ -28,6 +28,8 @@ namespace GO\Base\Model;
 use GO;
 use GO\Base\Db\ActiveRecord;
 use go\core\App;
+use go\core\jmap\Entity;
+use go\core\orm\Property;
 use go\core\orm\StateManager;
 use GO\Log\Model\Log;
 
@@ -75,6 +77,10 @@ class AclUsersGroups extends ActiveRecord {
 		if($this->aclItem){
 			$this->aclItem->touch();
 		}
+
+		if(!Entity::$trackChanges){
+			return true;
+		}
 		
 		$success = App::get()->getDbConnection()
 							->update('core_acl_group_changes', 
@@ -105,6 +111,10 @@ class AclUsersGroups extends ActiveRecord {
 			}
 		
 			$this->aclItem->touch();
+		}
+
+		if(!Entity::$trackChanges){
+			return true;
 		}
 		
 		$success = App::get()->getDbConnection()
