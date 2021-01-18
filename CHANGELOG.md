@@ -7,6 +7,7 @@
 - savemailas: Links were not cleaned up when items were removed
 - Address book: State is searchable
 - Documenttypes: fixed bug in link grid.
+- Core: fixed notice in DateTime utility class
 
 12-01-2021 6.4.210
 - Core: Fixed constraint error in database check
