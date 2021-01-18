@@ -1,3 +1,6 @@
+18-01-2021 6.4.213
+- Core: Fix for updating custom fields of disabled modules
+
 18-01-2021 6.4.212
 - Fix 6.4.211 - ErrorException in latest release #657 It happened in php < 7.3
 
