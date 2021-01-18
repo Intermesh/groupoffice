@@ -134,9 +134,12 @@ abstract class Module extends Singleton {
 			}
 
 			go()->getDbConnection()->pauseTransactions();
+
+			self::installDependencies($this);
+
 			$this->installDatabase();
 			go()->getDbConnection()->resumeTransactions();
-					
+
 			go()->rebuildCache(true);
 
 			go()->getDbConnection()->beginTransaction();
@@ -145,6 +148,7 @@ abstract class Module extends Singleton {
 			$model->name = static::getName();
 			$model->package = static::getPackage();
 			$model->version = $this->getUpdateCount();
+			$model->checkDepencencies = false;
 
 			if(!$model->save()) {
 				$this->rollBack();
@@ -170,6 +174,8 @@ abstract class Module extends Singleton {
 		} catch(Exception $e) {			
 			$this->rollBack();
 			throw $e;
+		} finally {
+			go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
 		}
 		
 		return $model;
