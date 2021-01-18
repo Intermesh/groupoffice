@@ -78,9 +78,14 @@ class Select extends Base {
 		$sql = "ALTER TABLE `" . $this->field->tableName() . "` DROP CONSTRAINT `" . $this->getConstraintName() . "`;";
 		return go()->getDbConnection()->exec($sql);
 	}
-	
-	private function getConstraintName() {
-		return $this->field->tableName() . "_ibfk_go_" . $this->field->id;
+
+	private function getConstraintName()
+	{
+		$strName = $this->field->tableName() . "_ibfk_go_" . $this->field->id;
+		if (strlen($strName) > 64) { // Constraint names are restricted to 64 characters!
+			$strName = str_replace('_custom_fields_', '_cf_', $strName);
+		}
+		return $strName;
 	}
 	
 	public function dbToText($value, \go\core\orm\CustomFieldsModel $values, $entity) {
