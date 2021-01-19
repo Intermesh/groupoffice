@@ -1,4 +1,5 @@
 18-01-2021 6.4.213
+- Wopi: Alternative WOPI client uri couldn't be disabled
 - Core: Fix for updating custom fields of disabled modules
 
 18-01-2021 6.4.212
