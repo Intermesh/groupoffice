@@ -478,6 +478,12 @@ class Contact extends AclItemEntity {
 										->addText("name", function(Criteria $criteria, $comparator, $value) {											
 											$criteria->where('name', $comparator, $value);
 										})
+										->addText("firstName", function(Criteria $criteria, $comparator, $value) {
+											$criteria->where('firstName', $comparator, $value);
+										})
+										->addText("lastName", function(Criteria $criteria, $comparator, $value) {
+											$criteria->where('firstName', $comparator, $value);
+										})
 										->addText("jobTitle", function(Criteria $criteria, $comparator, $value) {
 											$criteria->where('jobTitle', $comparator, $value);
 										})
