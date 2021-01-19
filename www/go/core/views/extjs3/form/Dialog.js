@@ -317,7 +317,16 @@ go.form.Dialog = Ext.extend(go.Window, {
 	focus: function () {		
 		this.formPanel.focus();
 	},
-	
+
+	/**
+	 * Override to do stuff before submitting to server
+	 *
+	 * for example to send an additional value:
+	 *
+	 * this.formPanel.values.foo = 'bar';
+	 *
+	 * @returns {boolean}
+	 */
 	onBeforeSubmit: function() {
 		return true;
 	},
@@ -331,6 +340,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 		}
 		
 		if(!this.onBeforeSubmit()) {
+
+			console.warn("onBeforeSubmit returned false");
 			return;
 		}
 
