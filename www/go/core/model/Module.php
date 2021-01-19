@@ -3,6 +3,7 @@ namespace go\core\model;
 
 use Exception;
 use go\core;
+use go\core\db\Criteria;
 use go\core\model\Acl;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\App;
@@ -114,7 +115,17 @@ class Module extends AclOwnerEntity {
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable('core_module', 'm');
 	}
-	
+
+	protected static function defineFilters() {
+		return parent::defineFilters()->add("enabled", function(Criteria $criteria, $value) {
+			if($value === null) {
+				return;
+			}
+			$criteria->andWhere('enabled', '=', (bool) $value);
+		});
+	}
+
+
 	private $module;
 
 	
