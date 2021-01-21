@@ -764,6 +764,7 @@ CREATE TABLE IF NOT EXISTS `go_templates` (
   `name` varchar(100) DEFAULT NULL,
   `acl_id` int(11) NOT NULL DEFAULT 0,
   `content` longblob NOT NULL,
+  `filename` varchar(100) DEFAULT NULL,
   `extension` varchar(4) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
