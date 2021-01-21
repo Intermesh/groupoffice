@@ -202,6 +202,13 @@ class Blob extends orm\Entity {
 		$blob->name = $file->getName();
 		$blob->tmpFile = $file->getPath();
 		$blob->type = $file->getContentType();
+
+		if(strlen($blob->type) > 127) {
+			go()->warn("Invalid content type given: " . $blob->type);
+
+			$blob->type = 'application/octet-stream';
+		}
+
 		$blob->modifiedAt = $file->getModifiedAt();
 		$blob->removeFile = $removeFile;
 		return $blob;
