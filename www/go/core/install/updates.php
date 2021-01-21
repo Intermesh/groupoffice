@@ -863,3 +863,4 @@ $updates['202012231410'][] = "CREATE TABLE `core_oauth_auth_codes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
 
+$updates['202101191010'][] = "ALTER TABLE `go_templates` ADD COLUMN `filename` VARCHAR(100) NULL DEFAULT NULL AFTER `content`";

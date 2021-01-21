@@ -95,7 +95,19 @@ go.Modules.register("community", "addressbook", {
 				type: "string",
 				multiple: true
 			},
+			{
+				name: 'lastName',
+				title: t("Last name"),
+				type: "string",
+				multiple: true
+			},
 
+			{
+				name: 'firstName',
+				title: t("First name"),
+				type: "string",
+				multiple: true
+			},
 			{
 				title: t("Notes"),
 				name: 'notes',

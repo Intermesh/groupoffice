@@ -15,21 +15,6 @@
  * @copyright Copyright Intermesh BV.
  * @author <<FIRST_NAME>> <<LAST_NAME>> <<EMAIL>>@intermesh.nl
  */
- 
-/**
- * The Template model
- *
- * @package GO.modules.addressbook.model
- * @property string $extension
- * @property string $content
- * @property int $acl_id
- * @property string $name
- * @property int $type
- * @property int $user_id
- * @property int $id
- * @property int $acl_write
- */
-
 
 namespace GO\Base\Model;
 
@@ -37,6 +22,20 @@ namespace GO\Base\Model;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\Date;
 
+/**
+ *  The Template model
+ *
+ * @package GO.modules.addressbook.model
+ * @property string $extension
+ * @property string $content
+ * @property int $acl_id
+ * @property string $name
+ * @property string $filename
+ * @property int $type
+ * @property int $user_id
+ * @property int $id
+ * @property int $acl_write
+ */
 class Template extends \GO\Base\Db\ActiveRecord{
 	
 	const TYPE_EMAIL=0;
