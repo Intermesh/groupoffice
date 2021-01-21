@@ -60,25 +60,8 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					
 						this.namePanel = new Ext.BoxComponent({
 							style: "display: table;height:100%;",
-							tpl: new Ext.XTemplate('<div style="vertical-align: middle;display:table-cell;"><h3 <tpl if="color">style=\"color: #{color};\"</tpl>>{[this.displayName(values)]}</h3><h4>{jobTitle} <tpl if="values.department">- {department}</tpl></h4></div>',
-								{
-									displayName: function(v) {
-										var strRet = "";
-
-										if(v.prefixes) {
-											strRet += v.prefixes + "&nbsp;";
-										} else if(v.gender) {
-											strRet += t('sirMadam')[v.gender] + "&nbsp;";
-										}
-										strRet += v.name;
-										if(v.suffixes) {
-											strRet += '&nbsp;' + v.suffixes;
-										}
-										return strRet;
-									}
-								}
-							)
-						}),
+							tpl: '<div style="vertical-align: middle;display:table-cell;"><h3 <tpl if="color">style=\"color: #{color};\"</tpl>><tpl if="prefixes">{prefixes} </tpl>{name}<tpl if="suffixes"> {suffixes}</tpl></h3><h4>{jobTitle} <tpl if="values.department">- {department}</tpl></h4></div>'
+						}),						
 						this.urlPanel = new Ext.BoxComponent({
 							flex: 1,
 							cls: 'go-addressbook-url-panel',
