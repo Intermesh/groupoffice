@@ -1,3 +1,4 @@
+19-01-2021 6.4.214
 - Core: Work around strange content type longer than 127 chars
 - Addressbook: Revert display gender in title if applicable and added gender icon
 - Projects: Bug where external fee was recorded for projects with type fixed fee.
