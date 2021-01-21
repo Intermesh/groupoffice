@@ -1,9 +1,6 @@
 <?php
 namespace go\core\orm;
 
-use go\core\customfield\Html;
-use go\core\customfield\TextArea;
-use go\core\orm\Query;
 use go\core\model\Link;
 
 /**
