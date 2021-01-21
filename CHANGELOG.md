@@ -1,5 +1,7 @@
 - Core: Work around strange content type longer than 127 chars
 - Addressbook: Revert display gender in title if applicable and added gender icon
+- Projects: Bug where external fee was recorded for projects with type fixed fee.
+
 18-01-2021 6.4.213
 - Wopi: Alternative WOPI client uri couldn't be disabled
 - Core: Fix for updating custom fields of disabled modules
