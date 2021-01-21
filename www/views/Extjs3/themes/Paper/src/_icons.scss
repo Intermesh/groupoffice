@@ -1334,3 +1334,29 @@ $material-icons : (
 		margin-right: dp(8);
 	}
 }
+
+.ic-gender-male {
+	display: inline-block;
+	height: dp(24);
+	width: dp(24);
+
+	//background-size: contain;
+	//background-repeat: no-repeat;
+	background-color: color($fg, 'icon');
+	mask-image: url(#{$resourcePath}img/icon/gender-male.svg);
+	-webkit-mask-image: url(#{$resourcePath}img/icon/gender-male.svg);
+}
+
+
+.ic-gender-female {
+	display: inline-block;
+	height: dp(24);
+	width: dp(24);
+	//background-image: url(#{$resourcePath}img/icon/gender-female.svg);
+	//background-size: contain;
+	//background-repeat: no-repeat;
+	background-color: color($fg, 'icon');
+
+	mask-image: url(#{$resourcePath}img/icon/gender-female.svg);
+	-webkit-mask-image: url(#{$resourcePath}img/icon/gender-female.svg);
+}

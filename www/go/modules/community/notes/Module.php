@@ -17,6 +17,11 @@ class Module extends core\Module {
 		return "Intermesh BV";
 	}
 
+	public function autoInstall()
+	{
+		return true;
+	}
+
 	
 	protected function afterInstall(ModuleModel $model) {	
 		

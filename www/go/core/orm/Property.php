@@ -1907,7 +1907,7 @@ abstract class Property extends Model {
 
 		if (!empty($column->length)){				
 			if(StringUtil::length($value) > $column->length) {
-				$this->setValidationError($column->name, ErrorCode::MALFORMED, 'Length can\'t be greater than ' . $column->length);
+				$this->setValidationError($column->name, ErrorCode::MALFORMED, 'Length can\'t be greater than ' . $column->length . '. Value given: ' . $value);
 				return false;
 			}
 		}

@@ -36,8 +36,12 @@ class DateTime extends PHPDateTime implements ArrayableInterface, \JsonSerializa
 		return self::$currentUser;
 	}
 
-	public function toUserFormat($withTime = false) {
-
+	public function toUserFormat($withTime = false)
+	{
+		// In case a user is not logged in
+		if( empty(self::currentUser()) || empty(self::currentUser()->dateFormat)) {
+			return $withTime ? $this->format(self::FORMAT_API) : $this->format(self::FORMAT_API_DATE_ONLY);
+		}
 		$f = self::currentUser()->dateFormat;
 		if($withTime) {
 			$date = clone $this;

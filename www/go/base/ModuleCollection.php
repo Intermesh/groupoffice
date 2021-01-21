@@ -118,11 +118,8 @@ class ModuleCollection extends Model\ModelCollection{
 		}
 		
 		//for new framework
-		$classFinder = new \go\core\util\ClassFinder(false);
-		$classFinder->addNamespace("go\\modules");
-		$mods = $classFinder->findByParent(\go\core\Module::class);
+		$mods = \go\core\Module::findAvailable();
 		$modules = array_merge($modules, $mods);
-		
 		sort($modules);
 		
 		return $modules;		

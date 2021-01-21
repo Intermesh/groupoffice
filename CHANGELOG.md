@@ -1,3 +1,16 @@
+19-01-2021 6.4.214
+- Core: Work around strange content type longer than 127 chars
+- Addressbook: Revert display gender in title if applicable and added gender icon
+- Projects: Bug where external fee was recorded for projects with type fixed fee.
+
+18-01-2021 6.4.213
+- Wopi: Alternative WOPI client uri couldn't be disabled
+- Core: Fix for updating custom fields of disabled modules
+
+18-01-2021 6.4.212
+- Fix 6.4.211 - ErrorException in latest release #657 It happened in php < 7.3
+
+18-01-2021 6.4.211
 - Core: Validate theme and language. Don't echo given language string to fix XSS issue
 - Core: Set "samesite=Strict" on all cookies
 - Notes: Improved list style
@@ -6,6 +19,8 @@
 - savemailas: Database check corrects link permissions
 - savemailas: Links were not cleaned up when items were removed
 - Address book: State is searchable
+- Documenttypes: fixed bug in link grid.
+- Core: fixed notice in DateTime utility class
 
 12-01-2021 6.4.210
 - Core: Fixed constraint error in database check
