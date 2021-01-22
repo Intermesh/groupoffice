@@ -1,8 +1,10 @@
 <?php
 namespace go\modules\community\comments\model;
 
+use Egulias\EmailValidator\Exception\ExpectingCTEXT;
 use go\core\fs\Blob;
 use go\core\model\Acl;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\util\DateTime;
@@ -69,6 +71,8 @@ class Comment extends Entity {
 	 *
 	 * @param mixed $entity "note", Entity $note or Entitytype instance
 	 * @throws \Exception
+	 *
+	 * @return self
 	 */
 	public function setEntity($entity) {
 
@@ -76,7 +80,7 @@ class Comment extends Entity {
 			$this->entityTypeId = $entity->entityType()->getId();
 			$this->entity = $entity->entityType()->getName();
 			$this->entityId = $entity->id;
-			return;
+			return $this;
 		}
 		
 		if(!($entity instanceof EntityType)) {
@@ -84,6 +88,8 @@ class Comment extends Entity {
 		}	
 		$this->entity = $entity->getName();
 		$this->entityTypeId = $entity->getId();
+
+		return $this;
 	}
 	
 	protected static function defineFilters() {
@@ -122,6 +128,19 @@ class Comment extends Entity {
 		} else {
 			return $cls::findById($this->entityId);					
 		}
+	}
+
+	/**
+	 * @param $entity
+	 * @param array $properties
+	 * @return Query|Comment[]
+	 * @throws \Exception
+	 */
+	public static function findFor($entity, $properties = []) {
+		$entityTypeId = $entity->entityType()->getId();
+		$entityId = $entity->id;
+
+		return self::find($properties)->where(['entityTypeId' => $entityTypeId, 'entityId' => $entityId]);
 	}
 
 	/**
@@ -189,5 +208,30 @@ class Comment extends Entity {
 		} else {
 			return $this->id;
 		}
+	}
+
+
+	/**
+	 * Copy comments from one entity to another.
+	 *
+	 * @param Entity|ActiveRecord $from
+	 * @param Entity|ActiveRecord  $to
+	 * @return bool
+	 * @throws SaveException
+	 */
+	public static function copyTo($from, $to) {
+		go()->getDbConnection()->beginTransaction();
+		try {
+			foreach (Comment::findFor($from) as $comment) {
+				if (!$comment->copy()->setEntity($to)->save()) {
+					throw new SaveException();
+				}
+			}
+		} catch(\Exception $e) {
+			go()->getDbConnection()->rollBack();
+			throw $e;
+		}
+
+		return go()->getDbConnection()->commit();
 	}
 }

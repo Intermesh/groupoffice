@@ -929,7 +929,7 @@ abstract class Entity extends Property {
 	}
 
 	/**
-	 * Copy the entity
+	 * Copy the entity. The copy is not saved to the database.
 	 *
 	 * @return static
 	 * @throws Exception
