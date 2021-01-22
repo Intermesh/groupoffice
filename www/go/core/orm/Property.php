@@ -403,21 +403,44 @@ abstract class Property extends Model {
 		return implode('-', $id);
 	}
 
+	/**
+	 * Get all properties to check when saving and using isModified()
+	 *
+	 * By default all non-static public and protected properties + dynamically mapped properties.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	private function watchProperties() {
+
+		$cacheKey = 'watch-props-' . static::class;
+
+		$ret = App::get()->getCache()->get($cacheKey);
+		if ($ret !== null) {
+			return $ret;
+		}
+
+		$p = array_keys(static::getMapping()->getProperties());
+
+		$reflectionObject = new ReflectionClass(static::class);
+		$props = $reflectionObject->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
+		foreach ($props as $prop) {
+			if (!$prop->isStatic()) {
+				$p[] = $prop->getName();
+			}
+		}
+
+		App::get()->getCache()->set($cacheKey, $p);
+
+		return array_unique($p);
+	}
+
   /**
    * Copies all properties so isModified() can detect changes.
    * @throws Exception
    */
 	private function trackModifications() {
-		//Watch db cols and relations
-
-		$watch = array_keys($this->getMapping()->getProperties());
-		$watch = array_intersect($watch, $this->fetchProperties);
-
-		//watch other props
-		$watch = array_merge($watch, static::getRequiredProperties());
-		$watch = array_unique($watch);
-
-		foreach ($watch as $propName) {
+		foreach ($this->watchProperties() as $propName) {
 			$v = $this->$propName;
 			$this->oldProps[$propName] = is_object($v) ? clone $v : $v;
 		}
@@ -541,9 +564,9 @@ abstract class Property extends Model {
 		$prop = static::getMapping()->getProperty($name);
 		if($prop) {
 			if(!isset($this->dynamicProperties[$name])) {
-				if($prop instanceof Relation && !in_array($name, $this->fetchProperties)) {
-					throw new Exception("Relation '$name' was not fetched so can't be accessed");
-				}
+//				if($prop instanceof Relation && !in_array($name, $this->fetchProperties)) {
+//					throw new Exception("Relation '$name' was not fetched so can't be accessed");
+//				}
 				$this->dynamicProperties[$name] = null;
 			}
 			return $this->dynamicProperties[$name];
@@ -1924,7 +1947,7 @@ abstract class Property extends Model {
 
 		if (!empty($column->length)){				
 			if(StringUtil::length($value) > $column->length) {
-				$this->setValidationError($column->name, ErrorCode::MALFORMED, 'Length can\'t be greater than ' . $column->length);
+				$this->setValidationError($column->name, ErrorCode::MALFORMED, 'Length can\'t be greater than ' . $column->length . '. Value given: ' . $value);
 				return false;
 			}
 		}

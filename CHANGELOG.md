@@ -1,3 +1,4 @@
+
 Master
 - Business: New finance and contracts module
 - Projects: new module
@@ -11,13 +12,26 @@ Master
 - History: new module replacing Activity log
 - Comments: Editable date field
 - Core: Support xlsx files for import and export
-- Core: Save export column presets 
+- Core: Save export column presets
 - Address book: Removed starred functionality for performance reasons
 - Core: New global search design to improve performance on larger databases
 - Documenttemplates: add selectable folder option
 
 end 6.5
 --------
+
+
+19-01-2021 6.4.214
+- Core: Work around strange content type longer than 127 chars
+- Addressbook: Revert display gender in title if applicable and added gender icon
+- Projects: Bug where external fee was recorded for projects with type fixed fee.
+
+18-01-2021 6.4.213
+- Wopi: Alternative WOPI client uri couldn't be disabled
+- Core: Fix for updating custom fields of disabled modules
+
+18-01-2021 6.4.212
+- Fix 6.4.211 - ErrorException in latest release #657 It happened in php < 7.3
 
 18-01-2021 6.4.211
 - Core: Validate theme and language. Don't echo given language string to fix XSS issue

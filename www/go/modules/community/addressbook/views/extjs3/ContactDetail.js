@@ -60,25 +60,13 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					
 						this.namePanel = new Ext.BoxComponent({
 							style: "display: table;height:100%;",
-							tpl: new Ext.XTemplate('<div style="vertical-align: middle;display:table-cell;"><h3 <tpl if="color">style=\"color: #{color};\"</tpl>>{[this.displayName(values)]}</h3><h4>{jobTitle} <tpl if="values.department">- {department}</tpl></h4></div>',
-								{
-									displayName: function(v) {
-										var strRet = "";
-
-										if(v.prefixes) {
-											strRet += v.prefixes + "&nbsp;";
-										} else if(v.gender) {
-											strRet += t('sirMadam')[v.gender] + "&nbsp;";
-										}
-										strRet += v.name;
-										if(v.suffixes) {
-											strRet += '&nbsp;' + v.suffixes;
-										}
-										return strRet;
-									}
-								}
-							)
-						}),
+							tpl: '<div style="vertical-align: middle;display:table-cell;">' +
+								'<h3 <tpl if="color">style=\"color: #{color};\"</tpl>>' +
+								'<tpl if="prefixes">{prefixes} </tpl>{name}<tpl if="suffixes"> {suffixes}</tpl>' +
+								'</h3>' +
+								'<h4>{jobTitle} <tpl if="values.department">- {department}</tpl></h4>' +
+								'</div>'
+						}),						
 						this.urlPanel = new Ext.BoxComponent({
 							flex: 1,
 							cls: 'go-addressbook-url-panel',
@@ -237,8 +225,35 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					</div>	</tpl>'
 				},	{
 					xtype: "box",
-					tpl: '<div class="icons"><hr class="indent"><tpl for="addressbook"><p><i class="icon label">import_contacts</i><span>{name}</span>	<label>{[t("Address book")]}</label>\</p></tpl></div>'
+					tpl: '<div class="icons">' +
+						'<hr class="indent">' +
+						'<tpl for="addressbook">' +
+							'<p class="s6">' +
+								'<i class="icon label">import_contacts</i>' +
+								'<span>{name}</span>	' +
+								'<label>'+ t("Address book") + '</label>' +
+							'</p>' +
+						'</tpl>' +
+
+						'<tpl if="gender == \'M\'">' +
+							'<p class="s6">' +
+								'<i class="label ic-gender-male"></i>' +
+								'<span>' + t("Male") + '</span>' +
+								'<label>'+ t("Gender") + '</label>' +
+							'</p>' +
+						'</tpl>'+
+
+						'<tpl if="gender == \'F\'">' +
+							'<p>' +
+								'<i class="label ic-gender-female"></i>' +
+								'<span>' + t("Female") + '</span>' +
+								'<label>'+ t("Gender") + '</label>' +
+							'</p>' +
+						'</tpl>'+
+
+						'</div>'
 				},{
+
 					title: t('Company'),
 					onLoad: function (dv) {
 						this.setVisible(dv.data.IBAN || dv.data.vatNo || dv.data.vatReverseCharge || dv.data.registrationNumber || dv.data.debtorNumber);
