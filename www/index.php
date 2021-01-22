@@ -67,7 +67,7 @@ try {
 
 			Response::get()->setCookie('accessToken', $token->accessToken, [
 				"path" => "/",
-				"samesite" => "Strict",
+				"samesite" => "Lax",
 				"domain" => Request::get()->getHost()
 			]);
 
