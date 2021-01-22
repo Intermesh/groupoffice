@@ -32,12 +32,21 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 	private $oldData;
 	private $customFieldsIsNew;
 
+
+	private $returnAsText = false;
+
 	/**
-	 * Set the default return type of @see getCustomFields()
+	 * Set the default return type of @param bool $value
 	 *
-	 * @var bool
+	 * @return CustomFieldsModel
+	 * @see getCustomFields()
 	 */
-	public $returnAsText = false;
+	public function returnAsText(bool $value = true)
+	{
+		$this->returnAsText = $value;
+
+		return $this;
+	}
 
 	public function __construct($entity)
 	{

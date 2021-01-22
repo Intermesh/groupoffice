@@ -52,7 +52,8 @@ trait CustomFieldsTrait {
 			$this->customFieldsModel = new CustomFieldsModel($this);
 		}
 
-		$this->customFieldsModel->returnAsText = $asText;
+		$this->customFieldsModel->returnAsText($asText);
+
 		return $this->customFieldsModel;
 	}
 

@@ -1,5 +1,5 @@
 <?php
-\go\core\App::get()->setCache(new \go\core\cache\None());
+\go\core\App::get();
 require('../views/Extjs3/themes/Paper/pageHeader.php');
 
 if(is_dir("/etc/groupoffice/" . $_SERVER['HTTP_HOST'])) {

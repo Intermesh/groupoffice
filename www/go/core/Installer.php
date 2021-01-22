@@ -133,7 +133,7 @@ class Installer {
 		
 		$this->installGroups();
 
-		$this->installAdminUser($adminValues);		
+		$admin = $this->installAdminUser($adminValues);
 
 		$this->installCoreModule();
 				
@@ -153,6 +153,7 @@ class Installer {
 			$installModule->install();
 		}
 
+		App::get()->getSettings()->systemEmail = $admin->email;
 		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
 		App::get()->getSettings()->setDefaultGroups([Group::ID_INTERNAL]);
 		App::get()->getSettings()->save();
@@ -224,6 +225,8 @@ class Installer {
 		if (!$admin->save()) {
 			throw new Exception("Failed to create admin user: " . var_export($admin->getValidationErrors(), true));
 		}
+
+		return $admin;
 	}
 	
 	private function installGroups() {
