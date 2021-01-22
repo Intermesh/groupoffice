@@ -185,7 +185,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 				}
 				me.fireEvent("submit", me, false, null, notSaved[id]);
 
-				return Promise.reject(notSaved[id]);
+				return Promise.reject(response);
 			}
 		}, me).catch(function(error){
 			if(cb) {

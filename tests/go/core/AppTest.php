@@ -3,6 +3,7 @@
 namespace go\core;
 
 use GO\Base\Model\Module;
+use go\core\model\User;
 use go\core\util\ClassFinder;
 
 class AppTest extends \PHPUnit\Framework\TestCase
@@ -13,6 +14,8 @@ class AppTest extends \PHPUnit\Framework\TestCase
 		$success = App::get()->getSettings()->save();
 
 		$this->assertEquals(true, $success);
+
+		go()->getSettings()->systemEmail == User::findById(1)->email;
 	}
 
 

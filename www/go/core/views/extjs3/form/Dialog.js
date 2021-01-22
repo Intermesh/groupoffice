@@ -380,7 +380,9 @@ go.form.Dialog = Ext.extend(go.Window, {
 	showFirstInvalidField : function() {
 
 		var firstFieldWithError = this.formPanel.form.items.find(function(item) {
-			return item.isValid && !item.isValid(true);
+			//activeError is set when markInvalid() is used. We use it when marking server errors. isValid() does
+			// client side validation.
+			return item.activeError || (item.isValid && !item.isValid(true));
 		});
 
 		console.log("Field with error", firstFieldWithError);

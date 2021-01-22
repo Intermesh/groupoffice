@@ -1566,7 +1566,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	}
 	
 	public function getdebug_email() {
-		return go()->getSettings()->debugEmail;
+		return null;
 	}
 	
 	public function gepassword_min_length() {
