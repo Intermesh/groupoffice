@@ -64,7 +64,7 @@ class Session extends Observable{
 			if(version_compare(phpversion(), "7.3.0") > -1) {
 				session_set_cookie_params([
 					'httponly' => true,
-					'samesite' => 'Strict'
+					'samesite' => 'Lax'
 				]);
 			}
 
