@@ -246,13 +246,6 @@ class Instance extends Entity {
 		$this->copySystemSettings();		
 		
 		$this->save();
-
-		//call to clear cache
-		$c = new \go\core\http\Client();
-		$result = $c->get("http://" . $this->hostname . '/install/upgrade.php?confirm=1');
-		if($result['status'] != 200) {
-			ErrorHandler::log("Failed to run cron on instance " . $this->hostname);
-		}
 	}
 	
 	private function copySystemSettings() {
