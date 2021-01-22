@@ -242,9 +242,7 @@ class Instance extends Entity {
 	
 	private function copySystemSettings() {
 		$core = go()->getSettings()->toArray();
-		$groups = \go\core\model\Settings::get()->toArray();
-		$users = \go\core\model\Settings::get()->toArray();
-		
+
 		$coreModuleId = (new \go\core\db\Query)
 						->setDbConnection($this->getInstanceDbConnection())
 						->selectSingleValue('id')
