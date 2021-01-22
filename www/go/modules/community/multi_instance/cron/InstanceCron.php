@@ -13,6 +13,7 @@ class InstanceCron extends CronJob {
 		$c = new \go\core\http\Client();
 		foreach(\go\modules\community\multi_instance\model\Instance::find() as $instance) {		
 			go()->debug("Running cron for ". $instance->getConfigFile()->getPath());
+
 			$result = $c->get("http://" . $instance->hostname . '/cron.php?exec=1');
 			if($result['status'] != 200) {
 				ErrorHandler::log("Failed to run cron on instance " . $instance->hostname);

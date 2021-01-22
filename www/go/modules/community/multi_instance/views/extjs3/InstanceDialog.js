@@ -81,6 +81,12 @@ go.modules.community.multi_instance.InstanceDialog = Ext.extend(go.form.Dialog, 
 
 	onBeforeSubmit: function() {
 		var m = [];
+
+		var modified = this.allowedModulesPanel.store.getModifiedRecords();
+		if(modified.length == 0) {
+			return true;
+		}
+
 		this.allowedModulesPanel.store.each(function(record) {
 			if (record.data.allowed) {
 				m.push(record.data.package + "/" + record.data.module)

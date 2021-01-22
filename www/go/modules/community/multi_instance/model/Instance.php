@@ -230,18 +230,58 @@ class Instance extends Entity {
 		
 		return true;	
 	}
-	
-	
+
+	/**
+	 * Called by install/install.php when installed from server manager
+	 *
+	 * @throws Exception
+	 */
 	public function onInstall() {
 		$this->createWelcomeMessage();
 		
 		$this->copySystemSettings();		
 		
 		$this->save();
+
+		//call to clear cache
+		$c = new \go\core\http\Client();
+		$result = $c->get("http://" . $this->hostname . '/install/upgrade.php?confirm=1');
+		if($result['status'] != 200) {
+			ErrorHandler::log("Failed to run cron on instance " . $this->hostname);
+		}
 	}
 	
 	private function copySystemSettings() {
 		$core = go()->getSettings()->toArray();
+
+		$valuesToCopy = array (
+			0 => 'locale',
+			1 => 'primaryColorTransparent',
+			4 => 'language',
+			7 => 'smtpHost',
+			8 => 'smtpPort',
+			9 => 'smtpUsername',
+			10 => 'smtpEncryption',
+			11 => 'smtpEncryptionVerifyCertificate',
+			15 => 'passwordMinLength',
+			16 => 'logoutWhenInactive',
+			19 => 'syncChangesMaxAge',
+			22 => 'primaryColor',
+			23 => 'secondaryColor',
+			24 => 'accentColor',
+			25 => 'logoId',
+			26 => 'defaultTimezone',
+			27 => 'defaultDateFormat',
+			28 => 'defaultTimeFormat',
+			29 => 'defaultCurrency',
+			30 => 'defaultFirstWeekday',
+			31 => 'userAddressBookId',
+			32 => 'defaultListSeparator',
+			33 => 'defaultTextSeparator',
+			34 => 'defaultThousandSeparator',
+			35 => 'defaultDecimalSeparator',
+			36 => 'defaultShortDateInList',
+		);
 
 		$coreModuleId = (new \go\core\db\Query)
 						->setDbConnection($this->getInstanceDbConnection())
@@ -249,13 +289,10 @@ class Instance extends Entity {
 						->from('core_module')
 						->where(['package'=>'core', 'name'=>'core'])->single();
 		
-		foreach($core as $name => $value) {
-			if($name === "databaseVersion" || $name === "title" || $name === "URL") {
-				continue;
-			}
-			
+		foreach($valuesToCopy as $name) {
+
 			$this->getInstanceDbConnection()
-							->replace('core_setting', ['name' => $name, 'value' => $value, "moduleId" => $coreModuleId])->execute();
+							->replace('core_setting', ['name' => $name, 'value' => $core[$name], "moduleId" => $coreModuleId])->execute();
 		}
 	}	
 	
@@ -657,7 +694,7 @@ class Instance extends Entity {
 		$modules = self::getAvailableModules();
 		$instanceConfig = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
 		$checkAllowed = false;
-		if (array_key_exists('allowed_modules', $instanceConfig) && is_array($instanceConfig['allowed_modules'])) {
+		if (array_key_exists('allowed_modules', $instanceConfig)) {
 			$checkAllowed = true;
 		}
 		$returnMods = [];
