@@ -537,6 +537,7 @@ use const GO_CONFIG_FILE;
 			Listeners::get()->init();
 
 			$this->resetSyncState();
+
 			go()->getSettings()->cacheClearedAt = time();
 			go()->getSettings()->save();
 			

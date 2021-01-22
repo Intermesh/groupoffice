@@ -266,7 +266,6 @@ class Instance extends Entity {
 			22 => 'primaryColor',
 			23 => 'secondaryColor',
 			24 => 'accentColor',
-			25 => 'logoId',
 			26 => 'defaultTimezone',
 			27 => 'defaultDateFormat',
 			28 => 'defaultTimeFormat',

@@ -45,7 +45,10 @@ abstract class Settings extends Model {
 
 		return self::$instance[$cls];
 	}
-	
+
+	public static function flushCache() {
+		self::$instance = [];
+	}
 
 	protected function getModuleId() {
 		$moduleId = (new Query)
