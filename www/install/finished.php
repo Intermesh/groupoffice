@@ -5,6 +5,12 @@ if($_SERVER['REQUEST_METHOD'] == "POST") {
 }
 require('../vendor/autoload.php');
 require('header.php');
+
+if(go()->getConfig()['core']['general']['servermanager']) {
+	exec("php ".\go\core\Environment::get()->getInstallFolder() .'/go/modules/community/multi_instance/oninstall.php '.go()->getConfig()['core']['general']['servermanager']. ' '.explode(':',$_SERVER['HTTP_HOST'])[0], $output, $ret);
+	go()->rebuildCache();
+}
+
 ?>
 
 <section>
