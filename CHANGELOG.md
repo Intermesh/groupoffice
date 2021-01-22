@@ -1,3 +1,4 @@
+22-01-2021 6.4.215
 - Address book: Fixed deduplicate function
 
 19-01-2021 6.4.214
