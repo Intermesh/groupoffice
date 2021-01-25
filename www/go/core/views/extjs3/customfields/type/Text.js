@@ -72,6 +72,9 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 
 		if (!go.util.empty(customfield.relatedFieldCondition)) {
 			config.checkRequiredCondition = this.checkRequiredCondition;
+			config.getConditionString = this.getConditionString;
+			config.getFormValue = this.getFormValue;
+
 			if (customfield.type === 'Select') {
 				config.validate = function () {
 					this.checkRequiredCondition.call(this, customfield);
@@ -104,6 +107,89 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 		}, config);
 	},
 
+	/**
+	 * Try to get a field value from the current form
+	 *
+	 * @param {string} fieldName
+	 * @returns {string}
+	 */
+	getFormValue: function (fieldName) {
+		var form = this.findParentByType('form').getForm();
+		var field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
+		if (!field) {
+			console.warn("Field" + fieldName + ' not found in string.');
+			return ''; // As yet, return an empty string if a field is not found
+		}
+		fieldValue = field.getRawValue ? field.getRawValue() : field.getValue();
+
+		if (field.xtype === 'xcheckbox' || field.xtype === 'checkbox') {
+			fieldValue = fieldValue | 0;
+			if (value === "true") {
+				value = '1';
+			} else if (value === "false") {
+				value = '0';
+			}
+		}
+		return String(fieldValue);
+	},
+
+	/**
+	 * Break a condition string into conditions and grouped subconditions
+	 *
+	 * @param {string} conditionString
+	 * @returns {array}
+	 */
+	getConditionString: function(conditionString) {
+		// Old version: just split by AND or OR
+		// return conditionString.split(/\ (AND|OR)\ /);
+
+		// Start:
+		// "(Single_select = Third option OR My_checkbox = 1) AND (status_id = Test status 1 OR status_id = Test status 2)";
+		conditionString = conditionString.replace(/\sAND\s/g, ' && ')
+			.replace(/\sOR\s/g, ' || ')
+			.replace(/\s=\s/g,' == ');
+
+		// conditionString = "(Single_select == Third option || My_checkbox == 1) && (status_id == Test status 1 || status_id == Test status 2)"
+		var arOperators = ['==', '<', '>', '>=', '<=', '!='], arCnd = conditionString.split(' '),
+			arLogicalOperators = ['&&', '||'];
+
+		for (var ii = 0, il = arCnd.length; ii < il; ii++) {
+			var currWord = arCnd[ii], prevIdx = ii - 1, nextIdx = ii + 1, prefix = '', postfix = '';
+			if (arOperators.indexOf(currWord) > -1) {
+				var prevWord = String(arCnd[prevIdx]);
+				if (prevWord.charAt(0) === '(') {
+					prefix = '(';
+					prevWord = prevWord.substr(1);
+				}
+				arCnd[prevIdx] = prefix + 'this.getFormValue("' + prevWord + '")';
+				arCnd[nextIdx] = '"' + arCnd[nextIdx];
+			} else if (arLogicalOperators.indexOf(currWord) > -1) {
+				var prevWord = String(arCnd[prevIdx]);
+				if (prevWord.indexOf(')') === prevWord.length - 1) {
+					postfix = ')';
+					prevWord = prevWord.substring(0, prevWord.length - 1);
+				}
+				arCnd[prevIdx] = prevWord + '"' + postfix;
+			} else if (ii === il - 1) {
+				if (currWord.indexOf(')') === currWord.length - 1) {
+					postfix = ')';
+					currWord = currWord.substring(0, currWord.length - 1);
+				}
+				arCnd[ii] = currWord + '"' + postfix;
+			}
+		}
+		conditionString = arCnd.join(' ');
+
+		// Getting there
+		// (this.getFormValue("Single_select") == "Third option" || this.getFormValue("My_checkbox") == "1") && (this.getFormValue("status_id") == "Test status 1" || this.getFormValue("status_id") == "Test status 2")
+		// TODO: Build support for 'is empty' and 'is not empty'
+		console.log(conditionString);
+
+		// var matchingSubConds = conditionString.matchAll(/\((.*?)\)/g);
+
+		var arRet = [];
+		return arRet;
+	},
 
 	/**
 	 * Required condition validator
@@ -127,8 +213,10 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 		}
 
 		form = this.findParentByType('form').getForm();
-		arConditions = customfield.relatedFieldCondition.split(/\ (AND|OR)\ /);
 
+		strConditionString = this.getConditionString(customfield.relatedFieldCondition); //customfield.relatedFieldCondition.split(/\ (AND|OR)\ /);
+		console.log(strConditionString);
+		return;
 		for (var ii=0,il=arConditions.length;ii<il;ii++) {
 			var	isEmptyCondition = false, isNotEmptyCondition = false;
 
@@ -227,6 +315,7 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 
 		return this.requiredConditionMatches;
 	},
+
 	
 	/**
 	 * Return's a form field to render
