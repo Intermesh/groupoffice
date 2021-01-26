@@ -239,7 +239,7 @@ try {
 		Response::get()->setCookie('accessToken', $token->accessToken, [
 			'expires' => $expires,
 			"path" => "/",
-			"samesite" => "Strict",
+			"samesite" => "Lax",
 			"domain" => Request::get()->getHost()
 		]);
 
