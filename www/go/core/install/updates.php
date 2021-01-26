@@ -759,7 +759,6 @@ $updates['202012231410'][] = function() {
 	foreach($allEntities as $e) {
 		foreach (Field::findByEntity($e->getId())->where(['type' => 'Text']) as $field) {
 			//correct default null to default ""
-			$field->forceAlterTable = true;
 			$field->save();
 		}
 	}

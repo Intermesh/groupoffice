@@ -21,6 +21,8 @@ end 6.5
 --------
 
 
+- Core: Always update custom field table
+
 22-01-2021 6.4.215
 - Address book: Fixed deduplicate function
 
