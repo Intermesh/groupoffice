@@ -584,7 +584,11 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 				throw new Exception("Could not execute statement. Error code: ". $stmt->errorCode());
 			}
 		} catch(Exception $e) {
-			go()->error("SQL FAILED: " . $this->__toString());
+			try {
+				go()->error("SQL FAILED: " . $this->__toString());
+			} catch(Exception $e2) {
+				go()->error("SQL FAILED AND FAILED TO BUILD STRING " . $e2->getMessage());
+			}
 			
 			throw $e;
 		}

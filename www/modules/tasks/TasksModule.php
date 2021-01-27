@@ -32,16 +32,16 @@ class TasksModule extends \GO\Base\Module {
 
 	public static function onLinkFilter(Filters $filters) {
 		$filters->add('completedTasks', function(Criteria $criteria, $value, Query $query, array $filter){
-			$query->join('ta_tasks', 'task', 's.entityId = task.id');
+			$query->join('ta_tasks', 'task', 'search.entityId = task.id');
 			$criteria
-				->where('s.entityTypeId', '=', Task::model()->modelTypeId())
+				->where('search.entityTypeId', '=', Task::model()->modelTypeId())
 				->andWhere('task.completion_time','>', 0);
 		});
 
 		$filters->add('incompleteTasks', function(Criteria $criteria, $value, Query $query, array $filter){
-			$query->join('ta_tasks', 'task', 's.entityId = task.id');
+			$query->join('ta_tasks', 'task', 'search.entityId = task.id');
 			$criteria
-				->where('s.entityTypeId', '=', Task::model()->modelTypeId())
+				->where('search.entityTypeId', '=', Task::model()->modelTypeId())
 				->andWhere('task.completion_time','=', 0);
 		});
 		return true;
