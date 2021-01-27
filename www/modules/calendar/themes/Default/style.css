@@ -522,17 +522,23 @@ background-color:#f6f6f6;
 }
 
 .x-viewGrid-event-container {
-	background-color:#ebf1e2;
 	text-align:left;
-	cursor:default;
-	border:1px solid #C0C0C0;
-	margin:1px;
-	padding:1px 2px;
-	border-radius: 6px;
-	-moz-border-radius: 6px;
+	cursor:pointer;
+	margin:0 4px 1px 0;
+	background-color:rgba(23,126,163,.16);
+	color: #000;
+	overflow: hidden;
+	padding-left:8px;
+	position:relative;
+	border-radius: 2px;
 	-moz-outline:none;
 	outline:none;
+	line-height: 19px;
 }
+.x-viewGrid-event-container {
+
+}
+
 
 .x-viewGrid-event-proxy {
 	text-align:left;
