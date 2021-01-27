@@ -108,7 +108,8 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	},
 
 	/**
-	 * Try to get a field value from the current form
+	 * Try to get a field value from the current form element. If a form element does not exist, merely return an empty
+	 * string. Maybe give an alert if a field does not exist?
 	 *
 	 * @param {string} fieldName
 	 * @returns {string}
@@ -117,20 +118,20 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 		var form = this.findParentByType('form').getForm();
 		var field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
 		if (!field) {
-			console.warn("Field" + fieldName + ' not found in string.');
+			console.warn("Field" + fieldName + ' not found in string.'); // TODO: Alert?
 			return ''; // As yet, return an empty string if a field is not found
 		}
-		fieldValue = field.getRawValue ? field.getRawValue() : field.getValue();
+		var fieldValue = field.getRawValue ? field.getRawValue() : field.getValue();
 
 		if (field.xtype === 'xcheckbox' || field.xtype === 'checkbox') {
 			fieldValue = fieldValue | 0;
-			if (value === "true") {
-				value = '1';
-			} else if (value === "false") {
-				value = '0';
+			if (fieldValue === "true") {
+				fieldValue = '1';
+			} else if (fieldValue === "false") {
+				fieldValue = '0';
 			}
 		}
-		return String(fieldValue);
+		return String(fieldValue); // TODO: Actually string?
 	},
 
 	/**
@@ -140,16 +141,10 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	 * @returns {array}
 	 */
 	getConditionString: function(conditionString) {
-		// Old version: just split by AND or OR
-		// return conditionString.split(/\ (AND|OR)\ /);
-
-		// Start:
-		// "(Single_select = Third option OR My_checkbox = 1) AND (status_id = Test status 1 OR status_id = Test status 2)";
 		conditionString = conditionString.replace(/\sAND\s/g, ' && ')
 			.replace(/\sOR\s/g, ' || ')
 			.replace(/\s=\s/g,' == ');
 
-		// conditionString = "(Single_select == Third option || My_checkbox == 1) && (status_id == Test status 1 || status_id == Test status 2)"
 		var arOperators = ['==', '<', '>', '>=', '<=', '!='], arCnd = conditionString.split(' '),
 			arLogicalOperators = ['&&', '||'];
 
@@ -169,26 +164,42 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 					postfix = ')';
 					prevWord = prevWord.substring(0, prevWord.length - 1);
 				}
-				arCnd[prevIdx] = prevWord + '"' + postfix;
+				if(prevWord !== 'empty') {
+					postfix = '"' + postfix;
+				}
+				arCnd[prevIdx] = prevWord + postfix;
 			} else if (ii === il - 1) {
 				if (currWord.indexOf(')') === currWord.length - 1) {
 					postfix = ')';
 					currWord = currWord.substring(0, currWord.length - 1);
 				}
-				arCnd[ii] = currWord + '"' + postfix;
+				// Catch is empty / is not empty conditions
+				if(currWord !== 'empty') {
+					currWord = currWord + '"';
+				}
+				arCnd[ii] = currWord + postfix;
 			}
 		}
 		conditionString = arCnd.join(' ');
 
-		// Getting there
-		// (this.getFormValue("Single_select") == "Third option" || this.getFormValue("My_checkbox") == "1") && (this.getFormValue("status_id") == "Test status 1" || this.getFormValue("status_id") == "Test status 2")
-		// TODO: Build support for 'is empty' and 'is not empty'
-		console.log(conditionString);
+		var reNotEmptyCondition = new RegExp(/(?<fldName>\w+) is not empty/, 'g'),
+			match = reNotEmptyCondition.exec(conditionString);
+		do {
+			if(match !== null) { // Y THO
+				conditionString = conditionString.replace(reNotEmptyCondition, '!Ext.isEmpty(this.getFormValue("' + match.groups.fldName + '"))');
+			}
+		} while ((match = reNotEmptyCondition.exec(conditionString)) !== null);
 
-		// var matchingSubConds = conditionString.matchAll(/\((.*?)\)/g);
+		var reEmptyCondition = new RegExp(/(?<fldName>\w+) is empty/, 'g'),
+			rematch = reEmptyCondition.exec(conditionString);
+		do {
+			if(rematch !== null) { // Y THO
+				conditionString = conditionString.replace(reEmptyCondition, 'Ext.isEmpty(this.getFormValue("' + rematch.groups.fldName + '"))');
 
-		var arRet = [];
-		return arRet;
+			}
+		} while ((rematch = reEmptyCondition.exec(conditionString)) !== null);
+
+		return "return ("+conditionString + ");";
 	},
 
 	/**
@@ -198,104 +209,27 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	 */
 	checkRequiredCondition: function (customfield) {
 		this.requiredConditionMatches = false;
-
-		var arConditions,
-			condition,
-			conditionType = null,
-			form,
-			conditionParts,
-			match = true,
-			field, fieldName, operator,
-			value, fieldValue;
-
 		if (Ext.isEmpty(customfield.relatedFieldCondition)) {
 			return false;
 		}
 
-		form = this.findParentByType('form').getForm();
+		// Debug code. Todo: remove when done
+		// console.log('----');
+		// console.log(customfield.name);
 
-		strConditionString = this.getConditionString(customfield.relatedFieldCondition); //customfield.relatedFieldCondition.split(/\ (AND|OR)\ /);
-		console.log(strConditionString);
-		return;
-		for (var ii=0,il=arConditions.length;ii<il;ii++) {
-			var	isEmptyCondition = false, isNotEmptyCondition = false;
+		var strConditionString = this.getConditionString(customfield.relatedFieldCondition);
+		// console.log(strConditionString);
 
-			condition = arConditions[ii];
-			if(condition === "AND" || condition === 'OR') {
-				conditionType = condition;
-				continue;
-			}
-			if (condition.includes('is empty')) {
-				isEmptyCondition = true;
-				condition = condition.replace('is empty', '');
-				fieldName = condition.trim();
-				field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
-			} else if (condition.includes('is not empty')) {
-				isNotEmptyCondition = true;
-				condition = condition.replace('is not empty', '');
-				fieldName = condition.trim();
-				field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
-			} else {
-				conditionParts = condition.split(' ');
-				if (conditionParts.length > 2) { //valid condition
-					fieldName = conditionParts.shift();
-					operator = conditionParts.shift();
-					field = form.findField(fieldName) || form.findField('customFields.' + fieldName);
-					value = conditionParts.join(" ").trim();
-				}
-			}
-			if (!field) {
-				return false;
-			}
+		var func =  new Function(strConditionString);
+		this.requiredConditionMatches = func.call(this);
 
-			fieldValue = field.getRawValue ? field.getRawValue() : field.getValue();
-
-			if (field.xtype === 'xcheckbox' || field.xtype === 'checkbox') {
-				fieldValue = fieldValue | 0;
-				if(value == "true") {
-					value = 1;
-				} else if(value == "false") {
-					value = 0;
-				}
-			}
-
-			// console.log(fieldValue, value, operator);
-
-			if (isEmptyCondition) {
-				match = !Ext.isEmpty(fieldValue);
-			} else if (isNotEmptyCondition) {
-				match = Ext.isEmpty(fieldValue);
-			} else {
-				switch (operator) {
-					case '=':
-					case '==':
-						match = (fieldValue == value);
-						break;
-					case '>':
-						match = (fieldValue > value);
-						break;
-					case '<':
-						match = (fieldValue < value);
-						break
-				}
-			}
-			switch (conditionType) {
-				case 'AND':
-					this.requiredConditionMatches = (this.requiredConditionMatches && match);
-					break;
-				case 'OR':
-					this.requiredConditionMatches = (this.requiredConditionMatches || match);
-					break;
-				default:
-					this.requiredConditionMatches = match;
-			}
-		}
+		// console.log(this.requiredConditionMatches);
 
 		var customFieldCmp = this;
-		if(customfield.conditionallyRequired) {
+		if (customfield.conditionallyRequired) {
 			customFieldCmp.allowBlank = !this.requiredConditionMatches;
 			customfield.allowBlank = !this.requiredConditionMatches;
-			customfield.fieldLabel = customfield.name + (!customfield.allowBlank ?'*' : '');
+			customfield.fieldLabel = customfield.name + (this.requiredConditionMatches ? '*' : '');
 			if (this.xtype === 'treeselectfield') {
 				this.items.itemAt(0).allowBlank = !this.requiredConditionMatches;
 			}

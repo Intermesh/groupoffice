@@ -146,6 +146,8 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 									var strRawValue = ""
 
 									var reConditions=/(={1,2}|<|>)/,reAdjuncts=/\ (AND|OR)\ /;
+									var reEmptyCondition = /^\w+\ is empty$/,reNotEmptyCondition = /^\w+\ is not empty$/;
+
 									var arSubConditions = String(value).split(reAdjuncts);
 									for(var i=0,l=arSubConditions.length;i<l;i++) {
 										var strCond = arSubConditions[i];
@@ -154,7 +156,11 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 											continue;
 										}
 										var arVal = String(strCond).split(reConditions);
-										strRawValue += (arVal[0].trim() + " " + arVal[1] + " " + arVal[2].trim());
+										if(arVal.length === 3) {
+											strRawValue += (arVal[0].trim() + " " + arVal[1] + " " + arVal[2].trim());
+										} else if(strCond.match(reEmptyCondition) || strCond.match(reNotEmptyCondition)) {
+											strRawValue += strCond.replace(/\s{2,}/, ' ').trim(); // remove duplicate spaces
+										}
 									}
 									elm.setRawValue(strRawValue);
 								}
@@ -169,14 +175,17 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 							// TODO: Clean out duplicated code
 
 							var reConditions=/(={1,2}|<|>)/,reAdjuncts=/\ (AND|OR)\ /;
+							var reEmptyCondition = /^\w+\ is empty$/;
+							var reNotEmptyCondition = /^\w+\ is not empty$/;
 							var arSubConditions = String(value).split(reAdjuncts);
 							for(var i=0,l=arSubConditions.length;i<l;i++) {
 								var strCond = arSubConditions[i];
 								if(strCond === "AND" || strCond === "OR") {
 									continue;
 								}
+
 								var arVal = String(strCond).split(reConditions);
-								if(arVal.length !== 3) {
+								if(arVal.length !== 3 && !strCond.match(reEmptyCondition) && !strCond.match(reNotEmptyCondition)) {
 									return t('The value was not formatted correctly');
 								}
 
