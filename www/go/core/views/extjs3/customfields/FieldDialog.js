@@ -7,6 +7,10 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 	initComponent: function () {
 		go.customfields.FieldDialog.superclass.initComponent.call(this);
 
+		this.formPanel.on("beforesubmit", function (form, values) {
+			values.forceAlterTable = true;
+		}, this);
+
 		this.formPanel.on("load", function (form, entity) {
 			var types = go.customfields.CustomFields.getTypes();
 			form.getForm().findField('typeLabel').setValue(types[entity.type] ? types[entity.type].label : entity.type);
@@ -26,6 +30,7 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 		};
 
 	},
+
 	initFormItems: function () {
 		return [{
 			columnWidth: .5,
