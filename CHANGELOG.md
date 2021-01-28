@@ -1,4 +1,6 @@
+- Core: It was impossible to resize the last grid column
 - Core: Always update custom field table
+- Time registration: Invalid encoding when using quotes in the decription
 
 22-01-2021 6.4.215
 - Address book: Fixed deduplicate function
