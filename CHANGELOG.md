@@ -1,4 +1,8 @@
+28-01-2021 6.4.216
+- Core: It was impossible to resize the last grid column
 - Core: Always update custom field table
+- Time registration: Invalid encoding when using quotes in the decription
+- LDAP: Sync failed because user was not fetched completely in LDAP sync
 
 22-01-2021 6.4.215
 - Address book: Fixed deduplicate function

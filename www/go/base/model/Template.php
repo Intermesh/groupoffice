@@ -206,7 +206,8 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	public static function getContactAttributes(Contact $contact, $tagPrefix = 'contact:', $companyTagPrefix = 'company:'){
 		$attributes[$tagPrefix . 'salutation'] = $contact->getSalutation();
 		$attributes[$tagPrefix . 'sirmadam']=$contact->gender=="M" ? \GO::t('sir') : \GO::t('madam');
-		
+		$attributes[$tagPrefix . 'title'] = $contact->prefixes;
+		$attributes[$tagPrefix . 'suffixes'] = $contact->suffixes;
 		$attributes[$tagPrefix . 'first_name'] = $contact->firstName;
 		$attributes[$tagPrefix . 'middle_name'] = $contact->middleName;
 		$attributes[$tagPrefix . 'last_name'] = $contact->lastName;

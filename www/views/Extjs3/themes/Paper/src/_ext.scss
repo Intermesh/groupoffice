@@ -1219,10 +1219,11 @@
 			border-right: 1px solid color($fg, 'divider');
 			//border-image: linear-gradient(to bottom, transparent, color($fg, 'line')) 1 100%;
 			height: dp(32);
-			
-			&.x-grid3-cell-last {
-				border-right: 0;
-			}
+
+			//This made resizing impossible
+			//&.x-grid3-cell-last {
+			//	border-right: 0;
+			//}
 			&.x-grid3-hd-over.x-grid3-sortable { 
 				cursor:pointer; 
 				@include var(color, c-primary); 

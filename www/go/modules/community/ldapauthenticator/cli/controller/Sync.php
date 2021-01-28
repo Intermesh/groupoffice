@@ -82,7 +82,7 @@ class Sync extends Controller {
         continue;
       }
 
-      $user = User::find(['id', 'username', 'email', 'recoveryEmail', 'displayName', 'avatarId'])->where(['username' => $username]);
+      $user = User::find()->where(['username' => $username]);
       
       if(!empty($record->mail[0])) {
         $user->orWhere(['email' => $record->mail[0]]);

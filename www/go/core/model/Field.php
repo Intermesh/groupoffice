@@ -123,6 +123,14 @@ class Field extends AclItemEntity {
 	private $unique;
 	private $uniqueModified = false;
 
+
+	/**
+	 * When true alter table is performed on save
+	 *
+	 * @var bool
+	 */
+	public $forceAlterTable = false;
+
 	private $dataType;
 	
 	
@@ -275,6 +283,11 @@ class Field extends AclItemEntity {
 	protected function internalSave() {
 		if(!parent::internalSave()) {
 			return false;
+		}
+
+		$modified = $this->forceAlterTable || $this->isNew() || $this->uniqueModified || $this->defaultModified || $this->getDataType()->isModified() || $this->isModified(['databaseName', 'options', 'required']);
+		if(!$modified) {
+			return true;
 		}
 
 		try {
