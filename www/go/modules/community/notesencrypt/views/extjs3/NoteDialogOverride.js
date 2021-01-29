@@ -10,6 +10,12 @@ Ext.onReady(function() {
 				content = go.modules.community.notes.stripTag(content);
 				if(!go.modules.community.notes.isUsingOldEncryption(content)) {
 
+					if(!crypto.subtle) {
+						GO.errorDialog.show(t("Cryptographic functions are not available. Please run Group-Office with SSL."));
+						this.close();
+						return;
+					}
+
 
 					//check if data was just decrypted in detail view
 					if(go.modules.community.notes.decrypted[entityValues.id]) {
@@ -74,7 +80,15 @@ Ext.onReady(function() {
 					fieldLabel: 'Encrypt content',
 					submit:false,
 					listeners: {
+
 						check: function(obj,checked) {
+
+							if(checked && !crypto.subtle) {
+								GO.errorDialog.show(t("Cryptographic functions are not available. Please run Group-Office with SSL."));
+								obj.setValue(false);
+								return false;
+							}
+
 							contentField.submit = !checked;
 							this.passwordField.setVisible(checked);
 							this.confirmPasswordField.setVisible(checked);
@@ -114,11 +128,15 @@ Ext.onReady(function() {
 						if(!go.modules.community.notes.decrypted || !go.modules.community.notes.decrypted[this.currentId]) {
 							go.modules.community.notes.decrypted = {};
 						}
-						go.modules.community.notes.decrypted[this.currentId] = {};
-						go.modules.community.notes.decrypted[this.currentId].content = plaintext;
-						go.modules.community.notes.decrypted[this.currentId].password = password;
 
-						go.modules.community.notes.NoteDialog.superclass.submit.call(this);
+						var me = this;
+
+						go.modules.community.notes.NoteDialog.superclass.submit.call(this).then(function() {
+							debugger;
+							go.modules.community.notes.decrypted[me.currentId] = {};
+							go.modules.community.notes.decrypted[me.currentId].content = plaintext;
+							go.modules.community.notes.decrypted[me.currentId].password = password;
+						});
 					}.bind(this));
 				}
 

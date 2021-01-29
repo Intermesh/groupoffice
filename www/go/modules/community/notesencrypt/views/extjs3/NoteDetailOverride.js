@@ -11,11 +11,19 @@ Ext.onReady(function() {
 			if (!this.data.content || !go.modules.community.notes.isEncrypted(this.data.content)) {
 				return;
 			}
+
+
+
 			this.originalData = this.data.content;
 			this.data.content = t("Encrypted data");
 			var item = this.items.item(0);
 			item.update(this.data);
 			item.onLoad(this);
+
+			if(!crypto.subtle) {
+				GO.errorDialog.show(t("Cryptographic functions are not available. Please run Group-Office with SSL."));
+				return;
+			}
 
 			var me = this;
 			var contentStripped = go.modules.community.notes.stripTag(this.originalData);
