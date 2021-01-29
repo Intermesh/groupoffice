@@ -1,4 +1,5 @@
 - Address book / carddav: Import of vcard v4.0 failed on photos.
+- Notes crypto: Check if crypto is supported by browser. Only works on SSL enabled sites.
 
 28-01-2021 6.4.216
 - Core: It was impossible to resize the last grid column
