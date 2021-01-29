@@ -17,6 +17,25 @@
 	editable: true,
 	selectOnFocus: true,
 	forceSelection: true,
+	listeners: {
+
+		//example of handling default value missing
+		valuenotfound: function(cmp, id) {
+			if(id == go.User.notesSettings.defaultNoteBookId) {
+
+				GO.errorDialog.show("Your default notebook wasn't found. Please select a notebook and it will be set as default.");
+
+				cmp.setValue(null);
+
+				cmp.on('change', function(cmp, id) {
+					go.Db.store("User").save({
+						notesSettings: {defaultNoteBookId: id}
+					}, go.User.id);
+				}, {single: true});
+			}
+		},
+		scope: this
+	},
 	store: {
 		xtype: "gostore",
 		fields: ['id', 'name'],
