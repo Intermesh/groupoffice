@@ -208,9 +208,12 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 					me.store.on("load", function() {
 						go.form.ComboBox.superclass.setValue.call(me, value);
+
+						me.fireEvent("valuenotfound", this, value);
 					}, me, {single: true});
 					me.store.loadData({records:[data]}, true);
 					//go.form.ComboBox.superclass.setValue.call(me, value);
+
 					resolve(me);
 				});
 			} else
@@ -225,6 +228,8 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 							text = r.data[me.displayField];
 					 }else if(Ext.isDefined(me.valueNotFoundText)){
 							text = me.valueNotFoundText;
+
+						 me.fireEvent("valuenotfound", this, value);
 					 }
 				}
 				me.lastSelectionText = text;

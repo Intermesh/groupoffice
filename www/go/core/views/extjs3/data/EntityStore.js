@@ -864,7 +864,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	/**
 	 * Query the API for a sorted / filtered list of entity id's
 	 * 
-	 * @param {object} params
+	 * @param {object} params {@link https://jmap.io/spec-core.html#query
 	 * @param {function} cb
 	 * @param {object} scope
 	 * @returns {String} Client call ID
