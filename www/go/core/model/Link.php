@@ -184,14 +184,18 @@ class Link extends AclItemEntity
 										->addTable('core_link', 'l')
 										->setQuery(
 														(new Query())
-														->select("eFrom.clientName AS fromEntity, eTo.clientName AS toEntity, s.name as toName, s.description as toDescription, s.aclId, s.id as toSearchId")
+														->select("eFrom.clientName AS fromEntity, eTo.clientName AS toEntity, search.name as toName, search.description as toDescription, search.aclId, search.id as toSearchId")
 														->join('core_entity', 'eFrom', 'eFrom.id = l.fromEntityTypeId')
 														->join('core_entity', 'eTo', 'eTo.id = l.toEntityTypeId')
-														->join('core_search', 's', 's.entityId = l.toId AND s.entityTypeId = l.toEntityTypeId')
+														->join('core_search', 'search', 'search.entityId = l.toId AND search.entityTypeId = l.toEntityTypeId')
 		);
 	}
-	
-	
+
+	protected static function useSearchableTraitForSearch(Query $query)
+	{
+		return true;
+	}
+
 	/**
 	 * Create a link between two entities
 	 * 
@@ -377,9 +381,7 @@ class Link extends AclItemEntity
 	
 	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
 		$level = Acl::LEVEL_READ;
-		Acl::applyToQuery($query, 's.aclId', $level, $userId, $groups);
-		
-		return $query;
+		return parent::applyAclToQuery($query, $level, $userId, $groups);
 	}
 	/**
 	 * Get the permission level of the current user
@@ -439,15 +441,12 @@ class Link extends AclItemEntity
 						});
 					
 	}
-	
-	protected static function textFilterColumns() {
-		return ['s.keywords'];
-	}
+
 
 	public static function sort(\go\core\orm\Query $query, array $sort)
 	{
 		if(isset($sort['modifiedAt'])) {
-			$sort['s.modifiedAt'] = $sort['modifiedAt'];
+			$sort['search.modifiedAt'] = $sort['modifiedAt'];
 			unset($sort['modifiedAt']);
 		}
 

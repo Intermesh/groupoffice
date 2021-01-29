@@ -71,6 +71,7 @@ abstract class AclEntity extends Entity {
 		$aclTableAlias = static::getAclEntityTableAlias();
 
 		$query = static::find()
+						->calcFoundRows()
 						->fetchMode(PDO::FETCH_ASSOC)
 						->select($aclTableAlias . '.aclId')
 						->select(static::getPrimaryKey(true), true)
@@ -82,13 +83,13 @@ abstract class AclEntity extends Entity {
 		if($isAclItem) {
 			static::joinAclEntity($query);
 		}
-		
-		$query = $query->execute();
+		$stmt = $query->execute();
 
+		$result['totalChanges'] += $query->foundRows();
 
 		//we don't need entities here. Just a list of id's.
 		$i = 0;
-		foreach($query as $entity) {				
+		foreach($stmt as $entity) {
 			$aclId = $entity['aclId'];
 			unset($entity['aclId']);
 			$id = count($entity) > 1 ? implode("-", $entity) : array_shift($entity);
@@ -114,7 +115,7 @@ abstract class AclEntity extends Entity {
 			
 		}
 		
-		if($query->rowCount() > $maxChanges) {
+		if($stmt->rowCount() > $maxChanges) {
 			$states[2]['offset'] += $maxChanges;
 			$result['hasMoreChanges'] = true;
 			$result['newState'] = static::intermediateState($states);

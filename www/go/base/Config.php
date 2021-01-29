@@ -892,7 +892,7 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 * Callto: link template
 	 */
 
-	var $callto_template='callto:{phone}';
+	var $callto_template='tel://{phone}';
 
 	/**
 	 * Open a new new window when a phone number is clicked

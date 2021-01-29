@@ -485,17 +485,20 @@ abstract class Entity  extends OrmEntity {
 			'oldState' => $sinceState,
 			'newState' => null,
 			'hasMoreChanges' => false,
+			'totalChanges' => 0,//unofficial response but we use it to process no more than 100000 changes. A resync is
+			//more efficient in the webclient in that case.
 			'changed' => [],
 			'removed' => []
 		];		
 			
 		$userChanges = static::getUserChangesQuery($states[1]['modSeq']);
 			
-		$changes = static::getEntityChangesQuery($states[0]['modSeq'])
+		$changesQuery = static::getEntityChangesQuery($states[0]['modSeq'])
 						->union($userChanges)
 						->offset($states[1]['offset'])
-						->limit($maxChanges + 1)
-						->execute();
+						->limit($maxChanges + 1);
+		$changes = $changesQuery->execute();
+
 		
 		$count = 0;
 		foreach ($changes as $change) {
@@ -510,8 +513,10 @@ abstract class Entity  extends OrmEntity {
 				break;
 			}
 		}
+
+		$result['totalChanges'] = $changesQuery->foundRows();
 		
-		if($changes->rowCount() > $maxChanges){
+		if($result['totalChanges'] > $maxChanges){
 			
 			$states[1]['offset'] += $maxChanges;
 			
@@ -589,6 +594,7 @@ abstract class Entity  extends OrmEntity {
 	protected static function getEntityChangesQuery($sinceModSeq) {
     return (new Query)
             ->select('entityId,max(destroyed) AS destroyed')
+	          ->calcFoundRows()
             ->from('core_change', 'change')
             ->fetchMode(PDO::FETCH_ASSOC)
             ->groupBy(['entityId'])

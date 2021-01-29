@@ -17,6 +17,25 @@
 	editable: true,
 	selectOnFocus: true,
 	forceSelection: true,
+	listeners: {
+
+		//example of handling default value missing
+		valuenotfound: function(cmp, id) {
+			if(id == go.User.notesSettings.defaultNoteBookId) {
+
+				GO.errorDialog.show("Your default notebook wasn't found. Please select a notebook and it will be set as default.");
+
+				cmp.setValue(null);
+
+				cmp.on('change', function(cmp, id) {
+					go.Db.store("User").save({
+						notesSettings: {defaultNoteBookId: id}
+					}, go.User.id);
+				}, {single: true});
+			}
+		},
+		scope: this
+	},
 	store: {
 		xtype: "gostore",
 		fields: ['id', 'name'],
@@ -208,9 +227,12 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 					me.store.on("load", function() {
 						go.form.ComboBox.superclass.setValue.call(me, value);
+
+						me.fireEvent("valuenotfound", this, value);
 					}, me, {single: true});
 					me.store.loadData({records:[data]}, true);
 					//go.form.ComboBox.superclass.setValue.call(me, value);
+
 					resolve(me);
 				});
 			} else
@@ -225,6 +247,8 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 							text = r.data[me.displayField];
 					 }else if(Ext.isDefined(me.valueNotFoundText)){
 							text = me.valueNotFoundText;
+
+						 me.fireEvent("valuenotfound", this, value);
 					 }
 				}
 				me.lastSelectionText = text;

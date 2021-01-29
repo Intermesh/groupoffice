@@ -123,6 +123,7 @@ class Field extends AclItemEntity {
 	private $unique;
 	private $uniqueModified = false;
 
+
 	/**
 	 * When true alter table is performed on save
 	 *
@@ -288,7 +289,7 @@ class Field extends AclItemEntity {
 		if(!$modified) {
 			return true;
 		}
-		
+
 		try {
 			go()->getDbConnection()->pauseTransactions();
 			$this->getDataType()->onFieldSave();

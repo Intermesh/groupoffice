@@ -35,16 +35,16 @@ class CalendarModule extends \GO\Base\Module{
 
 	public static function onLinkFilter(Filters $filters) {
 		$filters->add('pastEvents', function(Criteria $criteria, $value, Query $query, array $filter){
-			$query->join('cal_events', 'e', 's.entityId = e.id');
+			$query->join('cal_events', 'e', 'search.entityId = e.id');
 			$criteria
-				->where('s.entityTypeId', '=', Event::model()->modelTypeId())
+				->where('search.entityTypeId', '=', Event::model()->modelTypeId())
 				->andWhere('e.start_time','<', time());
 		});
 
 		$filters->add('forthComingEvents', function(Criteria $criteria, $value, Query $query, array $filter){
-			$query->join('cal_events', 'e', 's.entityId = e.id');
+			$query->join('cal_events', 'e', 'search.entityId = e.id');
 			$criteria
-				->where('s.entityTypeId', '=', Event::model()->modelTypeId())
+				->where('search.entityTypeId', '=', Event::model()->modelTypeId())
 				->andWhere('e.start_time','>=', time());
 		});
 		return true;

@@ -88,6 +88,9 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	private static function getDateFormat() {
 	  if(!isset(self::$dateFormat)) {
 	    $user = go()->getAuthState()->getUser(['dateFormat', 'timeFormat']);
+	    if(!$user) {
+	    	$user = \go\core\model\User::findById(1, ['dateFormat', 'timeFormat']);
+	    }
       self::$dateFormat = isset($user) ? $user->dateFormat : 'd-m-Y';
       self::$timeFormat = isset($user) ? $user->timeFormat : 'H:i';
     }
@@ -205,7 +208,8 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	public static function getContactAttributes(Contact $contact, $tagPrefix = 'contact:', $companyTagPrefix = 'company:'){
 		$attributes[$tagPrefix . 'salutation'] = $contact->getSalutation();
 		$attributes[$tagPrefix . 'sirmadam']=$contact->gender=="M" ? \GO::t('sir') : \GO::t('madam');
-		
+		$attributes[$tagPrefix . 'title'] = $contact->prefixes;
+		$attributes[$tagPrefix . 'suffixes'] = $contact->suffixes;
 		$attributes[$tagPrefix . 'first_name'] = $contact->firstName;
 		$attributes[$tagPrefix . 'middle_name'] = $contact->middleName;
 		$attributes[$tagPrefix . 'last_name'] = $contact->lastName;

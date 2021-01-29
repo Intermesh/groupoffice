@@ -116,11 +116,12 @@ abstract class Base extends Model {
 		}
 		
 		$table = $this->field->tableName();
-		
-		
+
+		$oldName = !$this->field->isNew() && $this->field->isModified('databaseName') ? $this->field->getOldValue("databaseName") : $this->field->databaseName;
+
 		$quotedDbName = Utils::quoteColumnName($this->field->databaseName);
 		
-		if ($this->field->isNew()) {
+		if ($this->field->isNew() || !go()->getDatabase()->getTable($table)->hasColumn($oldName)) {
 			$sql = "ALTER TABLE `" . $table . "` ADD " . $quotedDbName . " " . $fieldSql . ";";
 			go()->getDbConnection()->exec($sql);
 			if($this->field->getUnique()) {
@@ -128,11 +129,8 @@ abstract class Base extends Model {
 				go()->getDbConnection()->exec($sql);
 			}			
 		} else {
-			
-			
-			$oldName = $this->field->isModified('databaseName') ? $this->field->getOldValue("databaseName") : $this->field->databaseName;
-			$col = Table::getInstance($table)->getColumn($oldName);
 
+			$col = go()->getDatabase()->getTable($table)->getColumn($oldName);
 
 			if($col->nullAllowed && stristr($fieldSql, 'NOT NULL')) {
 				//Set null values to the default if it was allowed.

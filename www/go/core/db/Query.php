@@ -116,6 +116,15 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 		return $this->calcFoundRows;
 	}
 
+	/**
+	 * When calcFoundERows() is used this function will return the total found rows.
+	 *
+	 * @return int
+	 */
+	public function foundRows() {
+		return (int) go()->getDbConnection()->query("SELECT FOUND_ROWS()")->fetch(PDO::FETCH_COLUMN, 0);
+	}
+
 	public function getNoCache() {
 		return $this->noCache;
 	}
@@ -584,7 +593,11 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 				throw new Exception("Could not execute statement. Error code: ". $stmt->errorCode());
 			}
 		} catch(Exception $e) {
-			go()->error("SQL FAILED: " . $this->__toString());
+			try {
+				go()->error("SQL FAILED: " . $this->__toString());
+			} catch(Exception $e2) {
+				go()->error("SQL FAILED AND FAILED TO BUILD STRING " . $e2->getMessage());
+			}
 			
 			throw $e;
 		}

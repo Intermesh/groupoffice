@@ -135,7 +135,7 @@ abstract class AclItemEntity extends AclEntity {
 		foreach (static::aclEntityKeys() as $from => $to) {
 			$column = $cls::getMapping()->getColumn($to);
 
-			$subQuery->filter(['permissionLevel' => Acl::LEVEL_READ]);
+			$subQuery->filter(['permissionLevel' => $level]);
 			$subQuery->select($column->table->getAlias() . ' . '. $to);
 			$subQuery->groupBy([]);
 			$query->where($fromAlias . '.' . $from, 'IN', $subQuery);
@@ -190,8 +190,9 @@ abstract class AclItemEntity extends AclEntity {
 			$keys[] = $fromAlias . '.' . $from . ' = ' . $column->table->getAlias() . ' . '. $to;
 		}
 
-		$query->join($column->table->getName(), $column->table->getAlias(), implode(' AND ', $keys));
-		
+		if(!$query->isJoined($column->table->getName(), $column->table->getAlias())) {
+			$query->join($column->table->getName(), $column->table->getAlias(), implode(' AND ', $keys));
+		}
 		
 		//If this is another AclItemEntity then recurse
 		if(is_a($cls, AclItemEntity::class, true)) {

@@ -153,10 +153,11 @@ GO.mainLayout.on('render', function () {
 		window.onerror = function (message, source, lineno, colno, error) {
 			GO.errorDialog.show(t("An error occurred. More details can be found in the console.") + "<br /><br />" + message);
 		}
-
-		window.addEventListener('unhandledrejection', function (event) {
-			console.error(event.reason);
-			GO.errorDialog.show(t("An error occurred. More details can be found in the console."));
-		});
 	}
+
+	window.addEventListener('unhandledrejection', function (event) {
+		console.error(event.reason);
+		var txt = event.reason.message || event.reason.detail || t("An error occurred. More details can be found in the console.");
+		GO.errorDialog.show(txt);
+	});
 });

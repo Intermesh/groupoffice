@@ -258,6 +258,20 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 						allowBlank: false,
 						listeners: {
 							scope: this,
+							valuenotfound: function(cmp, id) {
+								if(id == go.User.addressBookSettings.defaultAddressBookId) {
+
+									GO.errorDialog.show("Your default address book wasn't found. Please select an address book and it will be set as default.");
+
+									cmp.setValue(null);
+
+									cmp.on('change', function(cmp, id) {
+										go.Db.store("User").save({
+											addressBookSettings: {defaultAddressBookId: id}
+										}, go.User.id);
+									}, {single: true});
+								}
+							},
 							change: function(cmp, id) {
 								go.customfields.CustomFields.filterFieldSets(this.formPanel);
 								this.organizationsField.allowNew.addressBookId = id;

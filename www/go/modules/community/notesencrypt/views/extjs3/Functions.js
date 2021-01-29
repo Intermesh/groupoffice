@@ -1,8 +1,7 @@
-var iv = "";
-
 "use strict";
 
 go.modules.community.notes.aesGcmDecrypt = function (ciphertext, password) {
+
 	var pwUtf8 = new TextEncoder().encode(password);
 	return crypto.subtle.digest('SHA-256', pwUtf8).then(function (pwHash) {
 		var iv = ciphertext.slice(0, 24).match(/.{2}/g).map(function (byte) {
@@ -53,14 +52,20 @@ go.modules.community.notes.stripTag = function(data) {
 "use strict";
 
 go.modules.community.notes.aesGcmEncrypt = function (plaintext, password) {
+
+	if(!crypto.subtle) {
+		GO.errorDialog.show(t("Cryptographic functions are not available. Please run Group-Office with SSL."));
+		return false;
+	}
+
 	var ivHex = "";
 	var ctBase64 = "";
 	var pwUtf8 = new TextEncoder().encode(password);
 	return crypto.subtle.digest('SHA-256', pwUtf8).then(function (pwHash) {
-		this.iv = crypto.getRandomValues(new Uint8Array(12));
+		var iv = crypto.getRandomValues(new Uint8Array(12));
 		var alg = {
 			name: 'AES-GCM',
-			iv: this.iv
+			iv: iv
 		};
 		return crypto.subtle.importKey('raw', pwHash, alg, false, ['encrypt']).then(function (key) {
 			var ptUint8 = new TextEncoder().encode(plaintext);
@@ -70,7 +75,7 @@ go.modules.community.notes.aesGcmEncrypt = function (plaintext, password) {
 					return String.fromCharCode(byte);
 				}).join('');
 				var ctBase64 = btoa(ctStr);
-				var ivHex = Array.from(this.iv).map(function (b) {
+				var ivHex = Array.from(iv).map(function (b) {
 					return ('00' + b.toString(16)).slice(-2);
 				}).join('');
 				var result = ivHex + ctBase64;
