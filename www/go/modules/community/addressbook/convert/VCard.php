@@ -235,7 +235,7 @@ class VCard extends AbstractConverter {
 	public function import(VCardComponent $vcardComponent, Entity $entity = null)
 	{
 		if ($vcardComponent->VERSION != "3.0") {
-			$vcardComponent->convert(\Sabre\VObject\Document::VCARD30);
+			$vcardComponent = $vcardComponent->convert(\Sabre\VObject\Document::VCARD30);
 		}
 
 		if (!isset($entity)) {
