@@ -1,3 +1,4 @@
+29-01-2021 6.4.217
 - Address book / carddav: Import of vcard v4.0 failed on photos.
 - Notes crypto: Check if crypto is supported by browser. Only works on SSL enabled sites.
 
