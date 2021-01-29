@@ -148,7 +148,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 
 				switch (notSaved[id].type) {
 					case "forbidden":
-						Ext.MessageBox.alert(t("Access denied"), t("Sorry, you don't have permissions to update this item"));
+						response.message = t("Sorry, you don't have permissions to update this item");
 						break;
 
 					default:
@@ -158,26 +158,6 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 						if(!response.message) {
 							response.message = firstErrorMsg;
 						}
-
-						/**
-						 * 
-						 * You can cancel the error message with me event:
-						 * 
-						 * initComponent: function() {
-						 * 	go.modules.business.wopi.ServiceDialog.superclass.initComponent.call(me);
-						 * 
-						 * 	me.formPanel.on("beforesubmiterror", function(form, success, id, error) {			
-						 * 		if(error.validationErrors.type) {
-						 * 			Ext.MessageBox.alert(t("Error"), t("You can only add one service of the same type"));
-						 * 			return false; //return false to cancel default error message
-						 * 		}
-						 * 	}, me);
-						 * },
-						 */
-
-						if(me.fireEvent("beforesubmiterror", me, false, null, notSaved[id])) {
-							GO.errorDialog.show(t("Sorry, an error occurred") +  ": " + (response.message || "unknown error"));
-						}
 						break;
 				}
 				if(cb) {
@@ -185,6 +165,13 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 				}
 				me.fireEvent("submit", me, false, null, notSaved[id]);
 
+				//unhandled rejection will finally be handled in www/go/core/views/extjs3/Module.js it will show the error dialog.
+				//to prevent this from happening use an override in the dialog submit:
+				//  submit: function() {
+				// 		return this.supr().submit.call(this).catch(function(error) {
+				// 			GO.errorDialog.show("Oopsie");
+				// 		})
+				// 	}
 				return Promise.reject(response);
 			}
 		}, me).catch(function(error){
@@ -192,8 +179,6 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 				cb.call(scope, me, false, null);
 			}
 			me.fireEvent("submit", me, false, null, error);
-
-			GO.errorDialog.show(t("Sorry, an error occurred") +  ": " + (error.message || "unknown error"));
 
 			return Promise.reject(error);
 		}).finally(function() {
