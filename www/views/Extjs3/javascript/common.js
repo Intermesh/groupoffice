@@ -267,7 +267,7 @@ GO.request = function(config){
 				if(config.fail){
 					config.fail.call(config.scope, response, options, result);
 				} else {
-					Ext.Msg.alert(t("Error"), result.feedback);
+					GO.errorDialog.show(result.feedback);
 				}
 			}else 
 			{

@@ -83,6 +83,19 @@ Ext.extend(GO.email.SelectAccount, GO.form.ComboBox, {
 					this.store.add(currentRecord);
 					GO.email.SelectAccount.superclass.setValue.call(this, id);
 				},
+				fail: function(response, options, result) {
+					var result = Ext.decode(response.responseText);
+					if(!result) {
+						GO.errorDialog.show("An error occured on the server. The console shows details.");
+						return;
+					}
+					if(result.exceptionClass == "GO\\Base\\Exception\\NotFound") {
+						console.error(result);
+						return;
+					}
+
+					GO.errorDialog.show(result.feedback);
+				},
 				scope: this
 			});
 		} else
