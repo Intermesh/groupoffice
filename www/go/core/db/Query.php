@@ -116,6 +116,15 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 		return $this->calcFoundRows;
 	}
 
+	/**
+	 * When calcFoundERows() is used this function will return the total found rows.
+	 *
+	 * @return int
+	 */
+	public function foundRows() {
+		return (int) go()->getDbConnection()->query("SELECT FOUND_ROWS()")->fetch(PDO::FETCH_COLUMN, 0);
+	}
+
 	public function getNoCache() {
 		return $this->noCache;
 	}

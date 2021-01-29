@@ -208,7 +208,7 @@ abstract class EntityController extends Controller {
 			if ($p['calculateTotal']) {
 
 				if($idsQuery->getCalcFoundRows()) {
-					$response['total'] = go()->getDbConnection()->query("SELECT FOUND_ROWS()")->fetch(PDO::FETCH_COLUMN, 0);
+					$response['total'] = $idsQuery->foundRows();
 				} else{
 					 $totalQuery = clone $idsQuery;
 
