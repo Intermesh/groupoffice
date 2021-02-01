@@ -357,6 +357,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 		var me = this;
 		return this.formPanel.submit().then(function(serverId) {
 
+			me.currentId = serverId;
+
 			me.onSubmit(true, serverId);
 			me.fireEvent("submit", this, true, serverId);
 

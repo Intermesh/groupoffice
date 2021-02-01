@@ -148,10 +148,14 @@ class Builder {
 				echo "Skipping SourceForge upload and Debian package because we're building master\n";
 			} else
 			{
-				$this->createGithubRelease();
-				$this->sendTarToSF();
 				$this->buildDebianPackage();
+
+                $this->createGithubRelease();
+
 				$this->addToDebianRepository();
+
+				$this->sendTarToSF();
+
 			}
 		}
 	}
@@ -325,6 +329,8 @@ class Builder {
 
 	private function sendTarToSF() {
 
+	    echo "Creating SourceForge.net release....\n\n";
+
 		cd($this->buildDir);
 
 
@@ -336,6 +342,7 @@ class Builder {
 
 	private function createGithubRelease() {
 
+	    echo "Creating GitHub release....\n\n";
 
 		$client = new \Github\Client();
 		$client->authenticate($this->github['PERSONAL_ACCESS_TOKEN'], null, \Github\Client::AUTH_ACCESS_TOKEN);

@@ -322,6 +322,7 @@ border-collapse:collapse;
 	background-color:#ffffcc;
 	color:#000;
 	overflow: hidden;
+	width: inherit;
 	border-radius: 2px;
 	-moz-outline:none;
 	outline:none;
