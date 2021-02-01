@@ -329,6 +329,8 @@ class Builder {
 
 	private function sendTarToSF() {
 
+	    echo "Creating SourceForge.net release....\n\n";
+
 		cd($this->buildDir);
 
 
@@ -340,6 +342,7 @@ class Builder {
 
 	private function createGithubRelease() {
 
+	    echo "Creating GitHub release....\n\n";
 
 		$client = new \Github\Client();
 		$client->authenticate($this->github['PERSONAL_ACCESS_TOKEN'], null, \Github\Client::AUTH_ACCESS_TOKEN);
