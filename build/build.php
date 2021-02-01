@@ -383,6 +383,8 @@ class Builder {
 
 	private function buildDebianPackage() {
 
+	    cd($this->buildDir);
+
 		$tpl = '{package} ({version}-'.$this->variant.') ' . $this->distro . '; urgency=medium
 
   * Changes can be found in /usr/share/groupoffice/changelog.md
