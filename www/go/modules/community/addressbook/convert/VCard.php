@@ -471,6 +471,9 @@ class VCard extends AbstractConverter {
 
 		while ($vcardComponent = $splitter->getNext()) {			
 			try {
+				if ($vcardComponent->VERSION != "3.0") {
+					$vcardComponent = $vcardComponent->convert(\Sabre\VObject\Document::VCARD30);
+				}
 				$contact = $this->findOrCreateContact($vcardComponent, $values['addressBookId']);
 				$contact->setValues($values);
 				$this->import($vcardComponent, $contact);
