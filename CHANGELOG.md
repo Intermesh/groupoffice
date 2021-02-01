@@ -1,4 +1,5 @@
 - Calendar: Fixed render bug in allday table view with extremely long titles
+- Calendar: View always assigned color per calendar even when not enabled.
 
 29-01-2021 6.4.217
 - Address book / carddav: Import of vcard v4.0 failed on photos.
