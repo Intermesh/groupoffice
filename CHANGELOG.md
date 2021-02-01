@@ -1,5 +1,7 @@
+01-02-2021 6.4.218
 - Calendar: Fixed render bug in allday table view with extremely long titles
 - Calendar: View always assigned color per calendar even when not enabled.
+- Carddav: Problem with vcard 2.1 imports.
 - Core: Install problem when folder wasn't writable.
 
 29-01-2021 6.4.217
