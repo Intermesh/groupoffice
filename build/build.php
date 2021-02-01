@@ -148,10 +148,14 @@ class Builder {
 				echo "Skipping SourceForge upload and Debian package because we're building master\n";
 			} else
 			{
-				$this->createGithubRelease();
-				$this->sendTarToSF();
 				$this->buildDebianPackage();
+
+                $this->createGithubRelease();
+
 				$this->addToDebianRepository();
+
+				$this->sendTarToSF();
+
 			}
 		}
 	}
