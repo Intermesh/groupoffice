@@ -379,7 +379,9 @@ class Link extends AclItemEntity
 	
 	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
 		$level = Acl::LEVEL_READ;
-		return parent::applyAclToQuery($query, $level, $userId, $groups);
+		//return parent::applyAclToQuery($query, $level, $userId, $groups);
+		Acl::applyToQuery($query, 'search.aclId', $level, $userId, $groups);
+		return $query;
 	}
 	/**
 	 * Get the permission level of the current user
