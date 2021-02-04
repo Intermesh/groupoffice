@@ -1,4 +1,6 @@
 - Time registration: better handling of job lists upon preselected projectid
+- Core: better handling of required native time fields in Firefox
+- Projects2: Upped the limit for  project statuses in project dialog.
 
 01-02-2021 6.4.218
 - Calendar: Fixed render bug in allday table view with extremely long titles

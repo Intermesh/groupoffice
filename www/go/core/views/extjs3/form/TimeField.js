@@ -1,7 +1,15 @@
 go.form.TimeField = Ext.extend(Ext.form.TextField, {
-	width: dp(90),
+	width: dp(96),
 	defaultAutoCreate : {tag: 'input', type: 'time', size: '20', autocomplete: 'off'},
 	inMinutes: false,
+
+	initComponent: function() {
+		if(!this.allowBlank) {
+			// https://bugzilla.mozilla.org/show_bug.cgi?id=1479708
+			// Disable clear button if a field is required
+			this.defaultAutoCreate.required = true;
+		}
+	},
 
 	onBlur: function() {
 
