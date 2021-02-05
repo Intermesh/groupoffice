@@ -66,6 +66,11 @@ class Group extends AclOwnerEntity {
 								$criteria->andWhere(['isUserGroupFor' => null]);	
 							}
 						})
+						->add('hideGroups', function(Criteria $criteria, $value) {
+							if($value) {
+								$criteria->andWhere('isUserGroupFor','IS NOT', null);
+							}
+						})
 						->add('excludeEveryone', function(Criteria $criteria, $value) {
 							if($value) {
 								$criteria->andWhere('id', '!=', Group::ID_EVERYONE);

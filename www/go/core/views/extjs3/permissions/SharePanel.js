@@ -42,6 +42,10 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 				field: 'name',
 				direction: 'ASC'
 			},
+			filters: {
+				hideUsers: {hideUsers: true},
+				hideGroups: {hideGroups: false}
+			},
 			fields: [
 				'id', 
 				'name', 
@@ -77,7 +81,29 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 
 		Ext.apply(this, {		
 			plugins: [checkColumn],
-			tbar: [
+			tbar: [{
+				xtype: "button",
+				enableToggle: true,
+				pressed: false,
+				iconCls: 'ic-account-box',
+				tooltip: t("Show users"),
+				toggleHandler: function(btn, pressed) {
+					this.store.setFilter("hideUsers", {hideUsers: !pressed});
+					this.store.load();
+				},
+				scope: this
+			},{
+				xtype: "button",
+				enableToggle: true,
+				pressed: true,
+				iconCls: 'ic-group-work',
+				tooltip: t("Show groups"),
+				toggleHandler: function(btn, pressed) {
+					this.store.setFilter("hideGroups", {hideGroups: !pressed});
+					this.store.load();
+				},
+				scope: this
+			},
 			'->', 
 				{
 					xtype: 'tbsearch',
@@ -321,6 +347,9 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		if(this.store.filters.tbsearch || options.selectedLoaded || options.paging) {
 			this.store.setFilter('exclude', null);
 			return true;
+		} else
+		{
+			this.store.removeAll();
 		}
 		
 		go.Db.store("Group").get(this.getSelectedGroupIds(), function(entities) {

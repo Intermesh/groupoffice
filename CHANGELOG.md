@@ -7,6 +7,7 @@
 - Timeregistration: Dialog size is saved.
 - Billing: Invoice dialog size is saved
 - Email: Acccount dialog size is saved.
+- Core: Enable disable users in share panel
 
 01-02-2021 6.4.218
 - Calendar: Fixed render bug in allday table view with extremely long titles
