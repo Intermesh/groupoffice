@@ -402,7 +402,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		
 		// Show the file inside the browser or give it as a download
 		$inline = true; // Defaults to show inside the browser
-		if(isset($params['inline']) && (bool) $params['inline'] === false) {
+		if(isset($params['inline']) && ((bool) $params['inline'] === false) || $params['inline'] == 'false') {
 			$inline = false;
 		}
 

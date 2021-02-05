@@ -326,23 +326,35 @@ class File extends FileSystemObject {
 		$r = \go\core\http\Response::get();
 	
 		if($sendHeaders) {
-			$disp = $inline ? 'inline' : 'attachment';
-
-			$r->setHeader('Content-Type', $this->getContentType());
-			$r->setHeader('Content-Disposition', $disp . '; filename="' . $this->getName() . '"');
-			$r->setHeader('Content-Transfer-Encoding', 'binary');
-
-			if ($useCache) {				
-				$r->setHeader('Cache-Control', 'PRIVATE');
-				$r->removeHeader('Pragma');
-
-				$r->setModifiedAt($this->getModifiedAt());
-				$r->setETag($this->getMd5Hash());
-				$r->abortIfCached();
-			}		
-			
 			foreach($headers as $name => $value) {
 				$r->setHeader($name, $value);
+			}
+
+			if(!$r->hasHeader('Content-Type')) {
+				$r->setHeader('Content-Type', $this->getContentType());
+			}
+
+			if(!$r->hasHeader('Content-Disposition')) {
+				$disp = $inline ? 'inline' : 'attachment';
+				$r->setHeader('Content-Disposition', $disp . '; filename="' . $this->getName() . '"');
+			}
+			if(!$r->hasHeader('Content-Transfer-Encoding')) {
+				$r->setHeader('Content-Transfer-Encoding', 'binary');
+			}
+
+			if ($useCache) {
+				if(!$r->hasHeader('Cache-Control')) {
+					$r->setHeader('Cache-Control', 'PRIVATE');
+				}
+				$r->removeHeader('Pragma');
+
+				if(!$r->hasHeader('Last-Modified')) {
+					$r->setModifiedAt($this->getModifiedAt());
+				}
+				if(!$r->hasHeader('Etag')) {
+					$r->setETag($this->getMd5Hash());
+				}
+				$r->abortIfCached();
 			}
 		}		
 		
@@ -350,20 +362,21 @@ class File extends FileSystemObject {
 			throw new Exception("Could not output file because output has already been sent. Turn off output buffering to find out where output has been started.");
 		}
 
-		// $handle = fopen($this->getPath(), "rb");
+		while (ob_get_level()) ob_end_clean();
 
-		// if (!is_resource($handle)) {
-		// 	throw new Exception("Could not read file");
-		// }
-		
+		ini_set('zlib.output_compression', 0);
+
 		$r->sendHeaders();
 
-		readfile($this->getPath());
+		$handle = $this->open('rb');
 
-		// while (!feof($handle)) {
-		// 	echo fread($handle, 1024);
-		// 	// flush();
-		// }
+		if (!is_resource($handle))
+			throw new \Exception("Could not read file");
+
+		while (!feof($handle)) {
+			echo fread($handle, 1024);
+			flush();
+		}
 	}
 	
 	/**
