@@ -40,7 +40,7 @@ class Connection {
 	 * 
 	 * @var bool 
 	 */
-	public $debug = false;
+	public $debug = true;
 	
 	public function __construct($dsn, $username, $password) {
 		$this->dsn = $dsn;
