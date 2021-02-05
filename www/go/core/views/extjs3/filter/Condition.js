@@ -4,14 +4,14 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 	layout: "column",
 
 	initComponent: function () {
-		this.filters = Object.values(go.Entities.get(this.entity).filters);
-		this.filters.push({
+		this.filters = go.Entities.get(this.entity).filters;
+		this.filters['subconditions'] = {
 			name: "subconditions",
 			title: t("Sub conditions"),
 			type: go.filter.types.subconditions
-		});
+		};
 
-		this.filters.columnSort('title');
+		//this.filters.columnSort('title');
 
 		this.items = [this.createFilterCombo()];		
 		
@@ -27,7 +27,8 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 			store: new Ext.data.JsonStore({
 				fields: ['name', 'title'],
 				root: 'data',
-				data: {data: this.filters}
+				data: {data: Object.values(this.filters)},
+				remoteSort: false
 			}),
 			valueField: 'name',
 			displayField: 'title',
@@ -43,11 +44,14 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 //				change: this.onFieldChange
 			}
 		});
+
+		this.filterCombo.store.sort('title');
 		
 		return this.filterCombo;
 	},
 	
 	onFieldSelect : function(combo, record, index) {
+
 		this.items.each(function(i) {
 			if(i === this.filterCombo) {
 				return;
@@ -56,7 +60,7 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 			this.remove(i, true);
 		}, this);
 		
-		this.switchCondition(this.filters[index]);
+		this.switchCondition(this.filters[record.data.name]);
 		
 		this.doLayout();
 		
@@ -65,10 +69,7 @@ go.filter.Condition = Ext.extend(go.form.FormContainer, {
 	setValue : function(v) {		
 		
 		if(v) {
-			var filter = this.filters.find(function(f) {
-				return v.name == f.name
-			});
-
+			var filter = this.filters[v.name];
 			if(!filter) {
 				return;
 			}
