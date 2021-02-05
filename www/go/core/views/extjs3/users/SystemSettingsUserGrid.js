@@ -154,7 +154,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 						handler: function() {
 							go.util.importFile(
 											'User',
-											".csv",
+											".csv, .json, .xlsx",
 											{},
 											{
 												labels: {
