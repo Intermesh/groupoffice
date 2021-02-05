@@ -61,9 +61,12 @@ class Group extends AclOwnerEntity {
 	
 	protected static function defineFilters() {
 		return parent::defineFilters()
-						->add('hideUsers', function(Criteria $criteria, $value) {
+						->add('hideUsers', function(Criteria $criteria, $value, Query $query) {
 							if($value) {
 								$criteria->andWhere(['isUserGroupFor' => null]);	
+							} else {
+								$query->join('core_user', 'user', 'user.id = g.isUserGroupFor', 'LEFT');
+								$criteria->where('(user.enabled is null or user.enabled = 1)');
 							}
 						})
 						->add('hideGroups', function(Criteria $criteria, $value) {
