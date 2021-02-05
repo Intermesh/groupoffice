@@ -104,20 +104,15 @@ go.Notifier = {
 			},
 			hidden: msg.persistent
 		}];
-		if(key) {
-			msg.itemId = key;
+		if(!key) {
+			key = 'notify-' + Ext.id();
 		}
-
-		//makes it fly out
-		// msg.renderTo = this.messageCt;
+		msg.itemId = key;
 
 		var msgPanel = new Ext.Panel(msg);
 
-
 		this.notifications.add(msgPanel);
 		this.notifications.doLayout();
-
-
 
 		if(msg.removeAfter) {
 			setTimeout(function () {
@@ -157,8 +152,27 @@ go.Notifier = {
 	},
 
 	showNotifications : function() {
+
+		//added here to make sure it comes last
+		if(!this.notificationArea.tools['close']) {
+			this.notificationArea.addTool({
+				id: "close",
+				tooltip: t("Close"),
+				handler: function () {
+					go.Notifier.hideNotifications();
+				}
+			});
+		}
+
 		this.notificationArea.ownerCt.getLayout()['east'].slideOut();
 		this.notificationArea.doLayout(true);
+	},
+
+	hasMessages: function() {
+		for(var id in this._messages) {
+			return true;
+		}
+		return false;
 	},
 
 	hideNotifications : function() {
@@ -180,8 +194,11 @@ go.Notifier = {
 	},
 
 	removeAll : function() {
-		this.messages = {};
-		this.notifications.removeAll(true);
+		for(var id in this._messages) {
+			if(!this._messages[id].persistent) {
+				this.remove(this._messages[id]);
+			}
+		}
 	},
 	/**
 	 * A more obstructive flyout message

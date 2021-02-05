@@ -2,7 +2,9 @@
 
 namespace go\core\fs;
 
-class MetaData extends \go\core\orm\Property {
+use go\core\data\Model;
+
+class MetaData extends Model {
 	
 	protected $blob;
 	public $blobId;
@@ -62,24 +64,6 @@ class MetaData extends \go\core\orm\Property {
 		}
 	}
 	
-	private function reader() {
-		if(!isset($this->reader)) {
-			if (!file_exists($filename) || !is_readable($filename) || ($fd = fopen($filename, 'rb')) === false) {
-            throw new \Exception('IOError: Unable to open file for reading: ' . $filename);
-			}
-		
-			if (!is_resource($fd) || !in_array(get_resource_type($fd), array('stream'))) {
-				throw new \Exception('IOError: Invalid resource type (only resources of type stream are supported)');
-			}
-			$this->reader = $fd;
-			$offset = ftell($this->reader);
-			fseek($this->reader, 0, SEEK_END);
-			$this->size = ftell($this->reader);
-			fseek($this->reader, $offset);
-		}
-		return $this->reader;
-	}
-	
 	public  function extractExif($path) {
 		$exif = exif_read_data($path, 'IFD0');
 		echo $exif===false ? "No header data found.<br />\n" : "Image contains headers<br />\n";
@@ -115,5 +99,5 @@ class MetaData extends \go\core\orm\Property {
 		return $this;
 	}
 
-	
+
 }

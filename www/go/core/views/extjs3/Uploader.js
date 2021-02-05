@@ -129,11 +129,10 @@
 
 			var notification, me = this;
 
-
-
-			if(!go.Notifier.notificationsVisible()) {
+			if(!go.Notifier.notificationsVisible() || me.notificationsTimeout) {
 				//show only if uploading for more than 1s
-				setTimeout(function() {
+				me.notificationsTimeout = setTimeout(function() {
+					me.notificationsTimeout = null;
 					if (me.uploadQueue.items.length > me.uploadQueue.finished) {
 						go.Notifier.showNotifications();
 						notification = me.getNotification();

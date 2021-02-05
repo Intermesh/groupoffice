@@ -666,6 +666,7 @@ a {
 	i.entity::before{margin-top: dp(-22);}
 }
 .notificationArea {
+	z-index: 1000000 !important;
 	@include var('background-color', c-primary);
 	.x-panel-header,.x-panel-header-text { border-top:0; color:white; }
 }
