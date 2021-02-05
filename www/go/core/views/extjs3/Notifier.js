@@ -150,6 +150,18 @@ go.Notifier = {
 	},
 
 	showNotifications : function() {
+
+		//added here to make sure it comes last
+		if(!this.notificationArea.tools['close']) {
+			this.notificationArea.addTool({
+				id: "close",
+				tooltip: t("Close"),
+				handler: function () {
+					go.Notifier.hideNotifications();
+				}
+			});
+		}
+
 		this.notificationArea.ownerCt.getLayout()['east'].slideOut();
 		this.notificationArea.doLayout(true);
 	},
