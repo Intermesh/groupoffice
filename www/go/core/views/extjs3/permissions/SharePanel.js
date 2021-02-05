@@ -42,6 +42,10 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 				field: 'name',
 				direction: 'ASC'
 			},
+			filters: {
+				hideUsers: {hideUsers: true},
+				hideGroups: {hideGroups: false}
+			},
 			fields: [
 				'id', 
 				'name', 
@@ -77,7 +81,29 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 
 		Ext.apply(this, {		
 			plugins: [checkColumn],
-			tbar: [
+			tbar: [{
+				xtype: "button",
+				enableToggle: true,
+				pressed: false,
+				iconCls: 'ic-account-box',
+				tooltip: t("Show users"),
+				toggleHandler: function(btn, pressed) {
+					this.store.setFilter("hideUsers", {hideUsers: !pressed});
+					this.store.load();
+				},
+				scope: this
+			},{
+				xtype: "button",
+				enableToggle: true,
+				pressed: true,
+				iconCls: 'ic-group-work',
+				tooltip: t("Show groups"),
+				toggleHandler: function(btn, pressed) {
+					this.store.setFilter("hideGroups", {hideGroups: !pressed});
+					this.store.load();
+				},
+				scope: this
+			},
 			'->', 
 				{
 					xtype: 'tbsearch',
@@ -194,7 +220,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			record.set('level', null);
 			this.value[record.data.id] = null;
 		}
-		
+
 		this._isDirty = true;
 	},
 
@@ -312,7 +338,14 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	},
 	
 	getSelectedGroupIds : function() {
-		return Object.keys(this.value).map(function(id) { return parseInt(id);});
+		//return Object.keys(this.value).map(function(id) { return parseInt(id);});
+		var groupIds = [];
+		for(var id in this.value) {
+			if(this.value[id]) {
+				groupIds.push(parseInt(id));
+			}
+		}
+		return groupIds;
 	},
 	
 	onBeforeStoreLoad : function(store, options) {
@@ -321,13 +354,17 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		if(this.store.filters.tbsearch || options.selectedLoaded || options.paging) {
 			this.store.setFilter('exclude', null);
 			return true;
+		} else
+		{
+			var selectedGroupIds = this.getSelectedGroupIds();
+			this.store.removeAll();
 		}
 		
-		go.Db.store("Group").get(this.getSelectedGroupIds(), function(entities) {
+		go.Db.store("Group").get(selectedGroupIds, function(entities) {
 			this.store.loadData({records: entities}, true);
 			this.store.sortData();
 			this.store.setFilter('exclude', {
-				exclude: this.getSelectedGroupIds()
+				exclude: selectedGroupIds
 			});
 			var me = this;
 			this.store.load({

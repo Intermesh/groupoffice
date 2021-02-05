@@ -526,6 +526,7 @@ GO.email.AccountDialog = function(config) {
 		modal : false,
 		height: dp(616),
 		width : dp(1008),
+		stateId: 'email-account-dialog',
 		closeAction : 'hide',
 		title : t("E-mail Account", "email"),
 
