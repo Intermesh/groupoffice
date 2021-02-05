@@ -4,6 +4,9 @@
 - Core: Large downloads hung in browser
 - Core: Wrong input field when selecting filter with autocomplete
 - Projects2: Replaced invalid end time filter with due time
+- Timeregistration: Dialog size is saved.
+- Billing: Invoice dialog size is saved
+- Email: Acccount dialog size is saved.
 
 01-02-2021 6.4.218
 - Calendar: Fixed render bug in allday table view with extremely long titles
