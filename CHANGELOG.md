@@ -12,6 +12,7 @@
 - Contacts / Sync: Changed company delimiter into | to avoid problems with names containing the delimiter.
 - Studio: Enable ACL entities by default
 - Studio: Make add / import / export permissions more consistent
+- Comments: prevent entering empty comments
 
 01-02-2021 6.4.218
 - Calendar: Fixed render bug in allday table view with extremely long titles
