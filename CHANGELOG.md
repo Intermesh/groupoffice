@@ -13,6 +13,7 @@
 - Studio: Enable ACL entities by default
 - Studio: Make add / import / export permissions more consistent
 - Comments: prevent entering empty comments
+- Core: minor fix in DE translation
 
 01-02-2021 6.4.218
 - Calendar: Fixed render bug in allday table view with extremely long titles
