@@ -142,7 +142,7 @@ class ContactConvertor {
 							->selectSingleValue('name')
 							->all();
 			
-			$message->companyname = implode(', ', $companies);
+			$message->companyname = implode(' | ', $companies);
 		} else
 		{
 			$message->companyname = $contact->name;
@@ -394,7 +394,7 @@ class ContactConvertor {
 	
 	private function setOrganizations(SyncContact $message, Contact $contact) {
 
-		$asOrganizationNames = empty($message->companyname) ? [] : array_map('trim', explode(",", $message->companyname));
+		$asOrganizationNames = empty($message->companyname) ? [] : array_map('trim', explode("|", $message->companyname));
 		
 		ZLog::Write(LOGLEVEL_DEBUG, "Organizations: ".$message->companyname);
 		

@@ -9,6 +9,7 @@
 - Email: Acccount dialog size is saved.
 - Core: Enable disable users in share panel
 - Email: Sort by last e-mail time didn't always work
+- Contacts / Sync: Changed company delimiter into | to avoid problems with names containing the delimiter.
 
 01-02-2021 6.4.218
 - Calendar: Fixed render bug in allday table view with extremely long titles
