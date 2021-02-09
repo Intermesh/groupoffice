@@ -1,3 +1,6 @@
+09-02-2021 6.3.96
+- Core: Fixed migrating user visibility when upgrading from v6.2
+
 13-10-2020 6.3.95
 - GOTA: certificate renewed
 

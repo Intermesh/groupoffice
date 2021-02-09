@@ -7,9 +7,9 @@ App::get()->getCache()->flush(false);
 
 App::get()->getDatabase()->setUtf8();
 
-$qs[] = "DROP TRIGGER IF EXISTS `Create ACL`;";
-$qs[] = "CREATE TRIGGER `__test__` BEFORE INSERT ON `go_users` FOR EACH ROW set NEW.lastlogin = NOW();";
-$qs[] = "DROP TRIGGER IF EXISTS `__test__`;";
+//$qs[] = "DROP TRIGGER IF EXISTS `Create ACL`;";
+//$qs[] = "CREATE TRIGGER `__test__` BEFORE INSERT ON `go_users` FOR EACH ROW set NEW.lastlogin = NOW();";
+//$qs[] = "DROP TRIGGER IF EXISTS `__test__`;";
 
 $qs[] = "DROP TABLE IF EXISTS `go_mail_counter`;";
 $qs[] = function () {
@@ -114,14 +114,10 @@ $qs[] = "ALTER TABLE `go_acl` CHANGE `group_id` `groupId` INT(11) NOT NULL DEFAU
 $qs[] = "ALTER TABLE `go_acl` CHANGE `acl_id` `aclId` INT(11) NOT NULL;";
 $qs[] = "ALTER TABLE `go_groups` CHANGE `name` `name` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;";
 
-$qs[] = "CREATE TRIGGER `Create ACL` BEFORE INSERT ON `go_groups` FOR EACH ROW BEGIN INSERT INTO `go_acl_items` (`ownedBy`, `description`) VALUES (NEW.createdBy, 'go_groups.aclId'); set NEW.aclId = (SELECT last_insert_id()); END";
-$qs[] = "insert into go_groups (name, createdBy, isUserGroupFor) select username,id,id from go_users;";
-$qs[] = "DROP TRIGGER `Create ACL`;";
-
+$qs[] = "insert into go_groups (name, createdBy, isUserGroupFor, aclId) select username,id,id, acl_id from go_users;";
+$qs[] = "ALTER TABLE `go_users` DROP `acl_id`;";
 
 $qs[] = "ALTER TABLE `go_acl` DROP PRIMARY KEY;";
-$qs[] = "insert into `go_acl` (groupId, aclId, level) select id,aclId,50 from go_groups where isUserGroupFor is not null;";
-$qs[] = "insert into `go_acl` (groupId, aclId, level) select '1',aclId,50 from go_groups where isUserGroupFor is not null;";
 $qs[] = "ALTER TABLE `go_groups` CHANGE `createdBy` `createdBy` INT(11) NOT NULL;";
 $qs[] = "update `go_acl` a set groupId = (select id from go_groups where isUserGroupFor = a.user_id) where user_id > 0; ";
 $qs[] = "ALTER TABLE `go_acl` DROP `user_id`;";
@@ -141,8 +137,6 @@ $qs[] = "ALTER TABLE `go_groups` ADD FOREIGN KEY (`aclId`) REFERENCES `go_acl_it
 $qs[] = "ALTER TABLE `go_groups` ADD FOREIGN KEY (`isUserGroupFor`) REFERENCES `go_users`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 $qs[] = "ALTER TABLE `go_acl` ADD FOREIGN KEY (`aclId`) REFERENCES `go_acl_items`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 
-
-$qs[] = "ALTER TABLE `go_users` DROP `acl_id`;";
 $qs[] = "RENAME TABLE `go_acl` TO `core_acl_group`;";
 $qs[] = "RENAME TABLE `go_acl_items` TO `core_acl`;";
 $qs[] = "CREATE TABLE `core_acl_group_changes` (
@@ -156,10 +150,7 @@ $qs[] = "ALTER TABLE `core_acl_group_changes`
   ADD PRIMARY KEY (`aclId`,`groupId`);";
 
 $qs[] = "insert `core_acl_group_changes` select aclId, groupId, 1, null from core_acl_group";
-
-
 $qs[] = "ALTER TABLE `core_acl_group_changes` ADD FOREIGN KEY (`aclId`) REFERENCES `core_acl`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT; ALTER TABLE `core_acl_group_changes` ADD FOREIGN KEY (`groupId`) REFERENCES `go_groups`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
-
 
 $qs[] = 'RENAME TABLE `cf_categories` TO `core_customfields_field_set`;';
 $qs[] = 'ALTER TABLE `core_customfields_field_set` CHANGE `extends_model` `extendsModel` VARCHAR(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;';
