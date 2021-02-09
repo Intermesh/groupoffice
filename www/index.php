@@ -92,6 +92,18 @@ if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){
 } catch(Exception $e) {
   
   if(($e instanceof PDOException || $e instanceof ConfigurationException) &&  !Request::get()->isXHR() && (empty($_REQUEST['r']) || $_REQUEST['r'] != 'maintenance/upgrade')) {
+
+	  $msg = \go\core\ErrorHandler::logException($e);
+
+	  if(go()->getDebugger()->enabled) {
+
+		  echo "DEBUGGER: Showing error message because debug is enabled. Normally we would have redirected to install. I you're doing a freah install and your database is empty then you can safely ignore this.:<br /><br />";
+		  echo $msg;
+		  echo "<pre>" . $e->getTraceAsString() . "</pre>";
+		  echo '<br /><br /><a href="install">Click here to launch the installer</a>';
+		  exit();
+	  }
+
     header('Location: install/');				
     exit();
   } else
