@@ -1,6 +1,6 @@
 delete from ab_addressbooks where user_id not in (select id from go_users);
-delete from ab_contacts where id not in (select id from ab_addressbooks);
-delete from ab_companies where id not in (select id from ab_addressbooks);
+delete from ab_contacts where addressbook_id not in (select id from ab_addressbooks);
+delete from ab_companies where addressbook_id not in (select id from ab_addressbooks);
 
 delete from ab_addresslists where user_id not in (select id from go_users);
 delete from ab_addresslist_companies where addresslist_id not in (select id from ab_addresslists);
@@ -40,9 +40,8 @@ delete from fb_acl where user_id not in (select id from go_users);
 delete from fs_bookmarks where user_id not in (select id from go_users);
 delete from fs_bookmarks where folder_id not in (select id from fs_folders);
 
-delete from no_categories where id not in (select id from no_categories);
+delete from no_categories where user_id not in (select id from go_users);
 delete from no_notes where category_id not in (select id from no_categories);
-
 
 delete from su_notes where user_id not in (select id from go_users);
 delete from su_rss_feeds where user_id not in (select id from go_users);
