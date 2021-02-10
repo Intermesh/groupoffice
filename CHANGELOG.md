@@ -17,6 +17,7 @@
 - Address book: Users need manage permissions on the module to create address books.
 - Notes: Users need manage permissions on the module to create notebooks.
 - Files: Make file portlets remind state
+- Billing: bugfix import new organizations using product import
 
 01-02-2021 6.4.218
 - Calendar: Fixed render bug in allday table view with extremely long titles
