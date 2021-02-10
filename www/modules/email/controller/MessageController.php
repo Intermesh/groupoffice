@@ -380,9 +380,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			if(empty($record['subject']))
 				$record['subject']=GO::t("No subject", "email");
 			else
-				$record['subject'] = htmlspecialchars($record['subject'],ENT_COMPAT,'UTF-8');
-
-
+				$record['subject'] =  htmlspecialchars(str_replace('&euro;', '€', $record['subject']),ENT_COMPAT,'UTF-8');
 
 			$response["results"][]=$record;
 		}
@@ -1510,8 +1508,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$response = $this->_handleInvitations($imapMessage, $params, $response);
 			
 		}
-		
-		$response['isInSpamFolder']=$this->_getSpamMoveMailboxName($params['uid'],$params['mailbox'],$account->id);
+        $response['subject'] =  htmlspecialchars(str_replace('&euro;', '€', $response['subject']),ENT_COMPAT,'UTF-8');
+
+        $response['isInSpamFolder']=$this->_getSpamMoveMailboxName($params['uid'],$params['mailbox'],$account->id);
 		$response = $this->_getContactInfo($imapMessage, $params, $response, $account);
 
 		// START Handle the links div in the email display panel		

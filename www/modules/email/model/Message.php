@@ -367,7 +367,7 @@ abstract class Message extends \GO\Base\Model {
 		}
 
 		if($useHtmlSpecialChars){
-			$response['subject'] = htmlspecialchars($this->subject,ENT_COMPAT,'UTF-8');
+            $response['subject'] = htmlspecialchars(str_replace('&euro;', '€', $this->subject),ENT_COMPAT,'UTF-8');
 		} else {
 			$response['subject'] = $this->subject;
 		}
