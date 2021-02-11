@@ -66,6 +66,11 @@ class System extends Controller {
 
 	}
 
+	/**
+	 * Finds tables not present in any of the install.sql files.
+	 *
+	 * @return array
+	 */
 	private function getUnknownTables() {
 		$sqls = go()->getEnvironment()->getInstallFolder()->find('/.*\.sql/', false, true);
 		$installSql = "";
@@ -75,6 +80,7 @@ class System extends Controller {
 		$unknown = [];
 
 		foreach(go()->getDatabase()->getTables() as $table) {
+			//Custom fields create tables for multiselect
 			if(strstr($table->getName(), 'core_customfields_multiselect') === false && strstr($installSql, $table->getName()) === false) {
 				$unknown[] = $table;
 			}
