@@ -81,7 +81,7 @@ try {
 	} 
 } catch (Exception $e) {
 
-	http_send_status(500);
+	header("Status: 500 Internal server error");
 
 	echo "<b>Error:</b> ". ErrorHandler::logException($e)."\n\n";
 	
