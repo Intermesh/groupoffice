@@ -797,28 +797,28 @@ $updates['202102111534'][] = "CREATE TABLE `core_alert` (
 
 
 
-$updates['202012231410'][] = "TRUNCATE core_search";
-$updates['202012231410'][] = "ALTER TABLE `core_search` DROP `keywords`";
+$updates['202102111534'][] = "TRUNCATE core_search";
+$updates['202102111534'][] = "ALTER TABLE `core_search` DROP `keywords`";
 
-$updates['202012231410'][] = "CREATE TABLE `core_search_word` (
+$updates['202102111534'][] = "CREATE TABLE `core_search_word` (
 `searchId` int(11) NOT NULL,
   `word` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
 
-$updates['202012231410'][] = "ALTER TABLE `core_search_word`
+$updates['202102111534'][] = "ALTER TABLE `core_search_word`
   ADD PRIMARY KEY (`word`,`searchId`),
   ADD KEY `searchId` (`searchId`);";
 
 
-$updates['202012231410'][] = "ALTER TABLE `core_search_word`
+$updates['202102111534'][] = "ALTER TABLE `core_search_word`
   ADD CONSTRAINT `core_search_word_ibfk_1` FOREIGN KEY (`searchId`) REFERENCES `core_search` (`id`) ON DELETE CASCADE;";
 
 
 
 
 
-$updates['202012231410'][] = function() {
+$updates['202102111534'][] = function() {
 
 	//run build search cache on cron immediately. This job will deactivate itself.
 	\go\core\cron\BuildSearchCache::install("* * * * *");
@@ -827,7 +827,7 @@ $updates['202012231410'][] = function() {
 };
 
 
-$updates['202012231410'][] = "CREATE TABLE `core_spreadsheet_export` (
+$updates['202102111534'][] = "CREATE TABLE `core_spreadsheet_export` (
 `id` int(10) UNSIGNED NOT NULL,
   `userId` int(11) NOT NULL,
   `entityTypeId` int(11) NOT NULL,
@@ -836,31 +836,31 @@ $updates['202012231410'][] = "CREATE TABLE `core_spreadsheet_export` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
 
-$updates['202012231410'][] = "ALTER TABLE `core_spreadsheet_export`
+$updates['202102111534'][] = "ALTER TABLE `core_spreadsheet_export`
   ADD PRIMARY KEY (`id`),
   ADD KEY `userId` (`userId`),
   ADD KEY `entityTypeId` (`entityTypeId`),
   ADD KEY `name` (`name`);";
 
 
-$updates['202012231410'][] = "ALTER TABLE `core_spreadsheet_export`
+$updates['202102111534'][] = "ALTER TABLE `core_spreadsheet_export`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;";
 
 
-$updates['202012231410'][] = "ALTER TABLE `core_spreadsheet_export`
+$updates['202102111534'][] = "ALTER TABLE `core_spreadsheet_export`
   ADD CONSTRAINT `core_spreadsheet_export_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_spreadsheet_export_ibfk_2` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;";
 
 
-$updates['202012231410'][] = "ALTER TABLE `core_search_word` ADD `drow` VARCHAR(100) NOT NULL AFTER `word`;";
-$updates['202012231410'][] = "update `core_search_word` set drow = reverse (word)";
-$updates['202012231410'][] = "ALTER TABLE `core_search_word` ADD INDEX(`drow`);";
+$updates['202102111534'][] = "ALTER TABLE `core_search_word` ADD `drow` VARCHAR(100) NOT NULL AFTER `word`;";
+$updates['202102111534'][] = "update `core_search_word` set drow = reverse (word)";
+$updates['202102111534'][] = "ALTER TABLE `core_search_word` ADD INDEX(`drow`);";
 
-$updates['202012231410'][] = "ALTER TABLE `core_customfields_select_option` ADD `enabled` BOOLEAN NOT NULL DEFAULT TRUE AFTER `text`;";
+$updates['202102111534'][] = "ALTER TABLE `core_customfields_select_option` ADD `enabled` BOOLEAN NOT NULL DEFAULT TRUE AFTER `text`;";
 
-$updates['202012231410'][] = "update `core_customfields_select_option` set enabled=0, text = REPLACE(text,'** Missing ** ', '') where text like '** Missing **%';";
+$updates['202102111534'][] = "update `core_customfields_select_option` set enabled=0, text = REPLACE(text,'** Missing ** ', '') where text like '** Missing **%';";
 
-$updates['202012231410'][] = "CREATE TABLE `core_oauth_auth_codes` (
+$updates['202102111534'][] = "CREATE TABLE `core_oauth_auth_codes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `clientId` int(11) NOT NULL,
   `identifier` varchar(128) COLLATE ascii_bin NOT NULL,
@@ -871,4 +871,13 @@ $updates['202012231410'][] = "CREATE TABLE `core_oauth_auth_codes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
 
-$updates['202101191010'][] = "ALTER TABLE `go_templates` ADD COLUMN `filename` VARCHAR(100) NULL DEFAULT NULL AFTER `content`";
+$updates['202102111534'][] = "ALTER TABLE `go_templates` ADD COLUMN `filename` VARCHAR(100) NULL DEFAULT NULL AFTER `content`";
+$updates['202102111534'][] = "ALTER TABLE `go_templates` ADD COLUMN `filename` VARCHAR(100) NULL DEFAULT NULL AFTER `content`";
+
+
+$updates['202102111534'][] = "delete from go_state where user_id not in (select id from core_user);";
+
+$updates['202102111534'][] = "alter table go_state
+	add constraint go_state_core_user_id_fk
+		foreign key (user_id) references core_user (id)
+			on delete cascade;";
