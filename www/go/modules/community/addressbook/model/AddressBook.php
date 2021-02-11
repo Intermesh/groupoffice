@@ -4,6 +4,7 @@ namespace go\modules\community\addressbook\model;
 use go\core\fs\File;
 use go\core\orm\Query;
 use go\modules\community\addressbook\Module;
+use go\core\model\Acl;
 
 /**
  * Address book model
