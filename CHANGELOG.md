@@ -19,6 +19,7 @@
 - Files: Make file portlets remind state
 - Billing: bugfix import new organizations using product import
 - Core: Filter didn't save when date changed
+- Core: Reload grid after adjusting filters
 
 01-02-2021 6.4.218
 - Calendar: Fixed render bug in allday table view with extremely long titles
