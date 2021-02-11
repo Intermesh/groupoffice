@@ -48,6 +48,8 @@ $updates['202102111534'][] = "alter table su_visible_calendars
 		foreign key (user_id) references core_user (id)
 			on delete cascade;";
 
+$updates['202102111534'][] = "CREATE TABLE IF NOT EXISTS `su_visible_lists` ( `user_id` int(11) NOT NULL, `tasklist_id` int(11) NOT NULL ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+
 $updates['202102111534'][] = "alter table su_visible_lists
 	add constraint su_visible_lists_core_user_id_fk
 		foreign key (user_id) references core_user (id)
@@ -61,6 +63,7 @@ $updates['202102111534'][] = "alter table su_latest_read_announcement_records
 	add constraint su_latest_read_announcement_records_core_user_id_fk
 		foreign key (user_id) references core_user (id)
 			on delete cascade;";
+
 
 $updates['202102111534'][] = "alter table su_latest_read_announcement_records
 	add constraint su_latest_read_announcement_records_su_announcements_id_fk
