@@ -626,9 +626,9 @@ class Installer {
 								go()->getDbConnection()->query($query);
 						} catch (PDOException $e) {
 							//var_dump($e);		
-							$errorsOccurred = true;						
+							$errorsOccurred = true;
 
-							if ($e->getCode() == 42000 || $e->getCode() == '42S21' || $e->getCode() == '42S01' || $e->getCode() == '42S22') {
+							if ($e->getCode() == 42000 || $e->getCode() == '42S21' || $e->getCode() == '42S01' || $e->getCode() == '42S22' || strstr($e->getMessage(), 'errno: 121 ')) {
 								//duplicate and drop errors. Ignore those on updates
 								
 								go()->debug("IGNORING: ". $e->getMessage()." from query: ".$query);
