@@ -80,6 +80,9 @@ try {
 
 	} 
 } catch (Exception $e) {
+
+	http_send_status(500);
+
 	echo "<b>Error:</b> ". ErrorHandler::logException($e)."\n\n";
 	
 	if(go()->getDebugger()->enabled) {
