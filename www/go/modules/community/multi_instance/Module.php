@@ -91,7 +91,7 @@ class Module extends \go\core\Module {
 		if(!$failed) {
 			echo "All OK!\n";
 		} else{
-			echo "WARNING: There are $failed number of failed upgrades. Please investigate!\n";
+			echo "\n\nWARNING: There are $failed number of failed upgrades. Please investigate!\n\n";
 		}
 	}
 
