@@ -1106,8 +1106,3 @@ alter table go_state
     add constraint go_state_core_user_id_fk
         foreign key (user_id) references core_user (id)
             on delete cascade;
-
-alter table go_settings
-    add constraint go_settings_core_user_id_fk
-        foreign key (user_id) references core_user (id)
-            on delete cascade;
