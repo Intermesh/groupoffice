@@ -88,7 +88,7 @@ ALTER TABLE `notes_note_book`
 -- Beperkingen voor tabel `notes_note`
 --
 ALTER TABLE `notes_note`
-  ADD CONSTRAINT `notes_note_ibfk_1` FOREIGN KEY (`noteBookId`) REFERENCES `notes_note_book` (`id`) ON DELETE RESTRICT;
+  ADD CONSTRAINT `notes_note_ibfk_1` FOREIGN KEY (`noteBookId`) REFERENCES `notes_note_book` (`id`) ON DELETE CASCADE;
 
 --
 -- Beperkingen voor tabel `notes_note_book`
