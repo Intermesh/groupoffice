@@ -55,7 +55,7 @@ $updates['202102111534'][] = "alter table su_visible_lists
 
 
 $updates['202102111534'][] = "delete from su_latest_read_announcement_records where user_id not in (select id from core_user);";
-$updates['202102111534'][] = "delete from su_latest_read_announcement_records where announcment_id not in (select id from su_announcements);";
+$updates['202102111534'][] = "delete from su_latest_read_announcement_records where announcement_id not in (select id from su_announcements);";
 
 $updates['202102111534'][] = "alter table su_latest_read_announcement_records
 	add constraint su_latest_read_announcement_records_core_user_id_fk
