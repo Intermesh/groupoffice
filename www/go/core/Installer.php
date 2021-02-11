@@ -641,6 +641,8 @@ class Installer {
 								echo "Module: " . $module->name . "\n";
 								echo "Module installed version: " . $module->version . "\n";
 								echo "Module source version: " . $counts[$moduleId] . "\n";
+
+								http_send_status(500);
 								
 								die("ABORTING: Please contact support");
 							}
