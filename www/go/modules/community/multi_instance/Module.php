@@ -77,7 +77,7 @@ class Module extends \go\core\Module {
 			flush();
 			$success = $instance->upgrade();
 
-			echo $success ? "SUCCESS" : "FAILED";
+			echo $success ? "ok" : "!!! FAILED !!!";
 
 			echo "\n";
 			
