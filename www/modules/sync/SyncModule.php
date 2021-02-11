@@ -25,26 +25,24 @@ class SyncModule extends Module{
 	public function defineListeners() {
 
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
-		// User::on(User::EVENT_SAVE, static::class, 'onUserSave');
-		// User::on(User::EVENT_BEFORE_SAVE, static::class, 'onUserBeforeSave');
 	}
-	
 
 	public static function onMap(Mapping $mapping) {
 		$mapping->addHasOne('syncSettings', UserSettings::class, ['id' => 'user_id'], true);
-		
 	}
 
-	
-	// public static function onUserSave(User $user) {
-	// 	if($user->isNew()) {
+	/**
+	 * Include Z-Push to use the Z-Push classes in update scripts for example
+	 *
+	 * @throws FatalMisconfigurationException
+	 */
+	public static function requireZPush() {
+		define("GO_CONFIG_FILE", \go\core\App::findConfigFile());
+		define('ZPUSH_CONFIG', go()->getEnvironment()->getInstallPath() . '/modules/z-push/config.php');
+		require_once go()->getEnvironment()->getInstallPath() . '/modules/z-push/vendor/z-push/vendor/autoload.php';
+		require_once (go()->getEnvironment()->getInstallPath() . '/modules/z-push/backend/go/autoload.php');
+		require_once (ZPUSH_CONFIG);
+		\ZPush::CheckConfig();
+	}
 
-	// 		if(!model\Module::isAvailableFor('community', 'sync', $user->id)) {
-	// 			return true;
-	// 		}
-
-	// 		$legacyUser = GOUser::model()->findByPk($user->id);
-	// 		Settings::model()->findForUser($legacyUser);
-	// 	}
-	// }
 }

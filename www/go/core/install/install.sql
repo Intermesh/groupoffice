@@ -1100,3 +1100,14 @@ ALTER TABLE `core_spreadsheet_export`
 ALTER TABLE `core_spreadsheet_export`
     ADD CONSTRAINT `core_spreadsheet_export_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
     ADD CONSTRAINT `core_spreadsheet_export_ibfk_2` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;
+
+
+alter table go_state
+    add constraint go_state_core_user_id_fk
+        foreign key (user_id) references core_user (id)
+            on delete cascade;
+
+alter table go_settings
+    add constraint go_settings_core_user_id_fk
+        foreign key (user_id) references core_user (id)
+            on delete cascade;

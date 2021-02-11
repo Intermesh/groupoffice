@@ -2,6 +2,9 @@
 
 class GoSyncUtils {
 
+
+
+
 	/**
 	 * Get the Group-Office Sync settings for the given user
 	 * If no user is given then it will take the settings for the current user

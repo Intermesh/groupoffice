@@ -131,18 +131,21 @@ $updates['202003261139'][] = function() {
 };
 
 $updates['202006091038'][] = "ALTER TABLE `notes_note_book` CHANGE `fileFolderId` `filesFolderId` INT(11) NULL DEFAULT NULL;";
+$updates['202102111108'][] = "alter table notes_note drop foreign key notes_note_ibfk_1;";
 
-$updates['202012041036'][] = "ALTER TABLE `notes_note_book` CHANGE `createdBy` `createdBy` INT(11) NULL;";
-$updates['202012041036'][] = "update notes_note_book set createdBy = null where createdBy not in (select id from core_user);";
-$updates['202012041036'][] = "ALTER TABLE `notes_note_book` ADD FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";
+$updates['202102111108'][] = "alter table notes_note
+	add constraint notes_note_ibfk_1
+		foreign key (noteBookId) references notes_note_book (id)
+			on delete cascade;";
 
-
-$updates['202012041036'][] = "ALTER TABLE `notes_note` CHANGE `createdBy` `createdBy` INT(11) NULL;";
-$updates['202012041036'][] = "update notes_note set createdBy = null where createdBy not in (select id from core_user);";
-$updates['202012041036'][] = "ALTER TABLE `notes_note` ADD FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";
-
-$updates['202012041036'][] = "ALTER TABLE `notes_note` CHANGE `modifiedBy` `modifiedBy` INT(11) NULL;";
-$updates['202012041036'][] = "update notes_note set modifiedBy = null where modifiedBy not in (select id from core_user);";
-$updates['202012041036'][] = "ALTER TABLE `notes_note` ADD FOREIGN KEY (`modifiedBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";
-
+//Intentianlly blank!
+$updates['202012041036'][] = "";
+$updates['202012041036'][] = "";
+$updates['202012041036'][] = "";
+$updates['202012041036'][] = "";
+$updates['202012041036'][] = "";
+$updates['202012041036'][] = "";
+$updates['202012041036'][] = "";
+$updates['202012041036'][] = "";
+$updates['202012041036'][] = "";
 

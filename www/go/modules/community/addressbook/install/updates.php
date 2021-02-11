@@ -121,6 +121,7 @@ $updates['202011241530'][] = 'ALTER TABLE `addressbook_portlet_birthday` ADD CON
 $updates['202011241530'][] = 'ALTER TABLE `addressbook_portlet_birthday` DROP FOREIGN KEY `addressbook_portlet_birthday_fk2`;';
 $updates['202011241530'][] = 'ALTER TABLE `addressbook_portlet_birthday` ADD CONSTRAINT `addressbook_portlet_birthday_fk2` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;';
 
+$updates['202102101145'][] = 'ALTER TABLE addressbook_addressbook RENAME INDEX acid TO aclId ;';
 
 
 $updates['202011271105'][] = "ALTER TABLE `addressbook_contact` ADD INDEX(`name`);";

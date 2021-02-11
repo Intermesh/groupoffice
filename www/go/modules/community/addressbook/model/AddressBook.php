@@ -74,6 +74,11 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 						->addScalar('groups', 'addressbook_group', ['id' => 'addressBookId']);
 	}
 
+	protected function canCreate()
+	{
+		return \go\core\model\Module::findByName('community', 'addressbook')->hasPermissionLevel(Acl::LEVEL_MANAGE);
+	}
+
 
 	public function buildFilesPath() {
 

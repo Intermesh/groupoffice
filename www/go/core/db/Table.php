@@ -377,6 +377,17 @@ class Table {
 	public function getPrimaryKey() {		
 		return $this->pk;
 	}
+
+	/**
+	 * Backup's this table in the same name plus _bak_ . date(Ymd_His)
+	 */
+	public function backup() {
+		$tableName = $this->getName() . "_bak_" . date("Ymd_His");
+		go()->getDbConnection()->exec(
+			"CREATE TABLE `" . $tableName . "` LIKE `" . $this->getName() . "`;");
+
+		go()->getDbConnection()->exec("INSERT INTO `$tableName` SELECT * FROM `" . $this->getName() . "`");
+	}
 	
 	// /**
 	//  * Truncate the table

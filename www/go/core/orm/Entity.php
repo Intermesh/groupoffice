@@ -60,6 +60,10 @@ abstract class Entity extends Property {
 	 * @param Query $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
 	 *  So you can do for example: go()->getDbConnection()->delete('another_table', (new Query()->where('id', 'in' $query)) or
 	 *  fetch the entities: $entities = $cls::find()->mergeWith(clone $query);
+	 *
+	 * Please beware that altering the query object can cause problems in the delete process.
+	 *  You might need to use "clone $query".
+	 *
 	 * @param string $cls The static class name the function was called on.
 	 */
 	const EVENT_BEFORE_DELETE = 'beforedelete';

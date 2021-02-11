@@ -431,14 +431,15 @@ class Folder extends FileSystemObject {
 	 * 
 	 * @param array|string $config If string is given then it's used as $config['regex'].
 	 *  $config is an array that can have:
-	 *  regex: then name must match this with preg_match();
+	 *  regex: then name must match this with preg_match(); eg '/.*\.sql/'
 	 *  older: Return files if the file wasn't modified after the given DateTime object
 	 *  newer: Return files if the file was modified after the given DateTime object
 	 *  empty: Return empty folders
 	 *
+	 *
 	 * @param boolean $findFolders
 	 * @param boolean $findFiles
-	 * @return FileSystemObject[]
+	 * @return File[]|Folder[]
 	 */
 	public function find($config = [], $findFolders = true, $findFiles = true) {
 		$result = [];
@@ -452,11 +453,12 @@ class Folder extends FileSystemObject {
 
 			if($isFolder) {
 				//Do exists check for broken links
-				if(!$findFolders || !$child->exists()) {
+				if(!$child->exists()) {
 					continue;
 				}
 
 				if(
+					$findFolders &&
 					(empty($config['empty']) || $child->isEmpty()) &&
 					(!isset($config['regex']) || preg_match($config['regex'], $child->getName()))
 				){
@@ -469,8 +471,8 @@ class Folder extends FileSystemObject {
 				$m = $child->getModifiedAt();
 				if($findFiles &&
 					(!isset($config['regex']) || preg_match($config['regex'], $child->getName())) &&
-					(!isset($config['older']) || $child->getModifiedAt() < $config['older'])  &&
-					(!isset($config['newer']) || $child->getModifiedAt() > $config['newer'])
+					(!isset($config['older']) || $m < $config['older'])  &&
+					(!isset($config['newer']) || $m > $config['newer'])
 				) {
 					$result[] = $child;
 				}

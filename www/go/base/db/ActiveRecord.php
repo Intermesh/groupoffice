@@ -4888,6 +4888,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 					$acl->ownedBy = $user_id;
 					$acl->usedIn = $this->tableName() . '.' . $this->aclField();
+					$acl->entityTypeId = $this->entityType()->getId();
+					$acl->entityId = $this->id;
 					if($acl->isModified())
 						$acl->save();
 				}
