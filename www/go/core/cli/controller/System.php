@@ -6,6 +6,7 @@ use go\core\Controller;
 use go\core\db\Query;
 use go\core\db\Table;
 use go\core\db\Utils;
+use go\core\event\EventEmitterTrait;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\model\Module;
@@ -14,6 +15,10 @@ use function GO;
 
 
 class System extends Controller {
+
+	use EventEmitterTrait;
+
+	const EVENT_CLEANUP = 'cleanup';
 	
 	/**
 	 * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php core/System/runCron --module=ldapauthenticatior --package=community --name=Sync
@@ -63,9 +68,9 @@ class System extends Controller {
 
 		$this->cleanupAcls();
 
-		if(Module::isInstalled("legacy", "files")) {
-			\GO\Files\FilesModule::cleanup();
-		}
+
+
+		$this->fireEvent(self::EVENT_CLEANUP);
 
 		$this->reportUnknownTables();
 

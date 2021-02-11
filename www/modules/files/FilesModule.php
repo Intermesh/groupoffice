@@ -39,6 +39,7 @@ class FilesModule extends \GO\Base\Module{
 		$c = new \GO\Core\Controller\BatchEditController();
 		
 		$c->addListener('store', "GO\Files\FilesModule", "afterBatchEditStore");
+
 	}
 	
 
