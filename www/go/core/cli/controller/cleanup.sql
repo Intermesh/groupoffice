@@ -17,7 +17,7 @@ delete from em_accounts where user_id not in (select id from core_user);
 delete from em_aliases where account_id not in (select id from em_accounts);
 delete from em_accounts_collapsed where account_id not in (select id from em_accounts);
 delete from em_accounts_sort where account_id not in (select id from em_accounts);
-delete from em_contacts_last_mail_times where contact_id not in (select id from ab_contacts);
+delete from em_contacts_last_mail_times where contact_id not in (select id from addressbook_contact);
 delete from em_filters where account_id not in (select id from em_accounts);
 delete from em_folders where account_id not in (select id from em_accounts);
 delete from em_folders_expanded where folder_id not in (select id from em_folders);

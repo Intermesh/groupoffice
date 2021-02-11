@@ -8,6 +8,7 @@ use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\fs\Blob;
 use go\core\fs\File;
+use go\core\model\Module;
 use go\core\util\DateTime;
 use function GO;
 
@@ -49,18 +50,33 @@ class System extends Controller {
 	 */
 	public function cleanup() {
 
+		echo "This script will delete unused data from your database.\n".
+		 "Please confirm with 'y' that you have made a BACKUP and you wish to continue [y/N].\n";
+		$confirm = trim(fgets(STDIN));     // Read the input
+		if($confirm != "y") {
+			echo "Aborted. $confirm\n";
+			exit();
+		}
+
 		echo "Cleaning up....\n";
 		//Utils::runSQLFile(new File(__DIR__ . '/cleanup.sql'), true);
 
-		//$this->reportUnknownTables();
-
 		$this->cleanupAcls();
+
+		if(Module::isInstalled("legacy", "files")) {
+			\GO\Files\FilesModule::cleanup();
+		}
+
+		$this->reportUnknownTables();
 
 	}
 
 	private function cleanupAcls() {
 
 		echo "Cleaning up unused ACL's\n";
+
+//		go()->getDatabase()->getTable('core_acl')->backup();
+//		go()->getDatabase()->getTable('core_acl_group')->backup();
 
 		go()->getDbConnection()->exec("update core_acl set usedIn = null, entityTypeId = null, entityId = null");
 		go()->getDbConnection()->exec("update core_acl set usedIn = 'core_entity.defaultAclId' where id in (select defaultAclId from core_entity)");
@@ -79,7 +95,7 @@ class System extends Controller {
 	}
 
 	private function reportUnknownTables(){
-		$unknown = $this->getUnknownTables();
+		$unknown = $this->findUnknownTables();
 
 		if(count($unknown)) {
 			echo "Some unknown tables where found. Please consider removing these:\n\n";
