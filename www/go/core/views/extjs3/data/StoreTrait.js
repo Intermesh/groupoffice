@@ -171,7 +171,10 @@ go.data.StoreTrait = {
 					o.params.limit = this.lastOptions.params.position + (this.lastOptions.limit || this.baseParams.limit || 20);
 				}
 
-				this.load(o);
+				var me = this;
+				this.load(o).then(function() {
+					me.fireEvent("changes", me);
+				});
 				return;
 			}
 		}		
@@ -193,7 +196,11 @@ go.data.StoreTrait = {
 				o.params.limit = this.lastOptions.params.position + (this.lastOptions.limit || this.baseParams.limit || 20);
 			}
 
-			this.load(o);
+			var me = this;
+			this.load(o).then(function() {
+				me.fireEvent("changes", me);
+			})
+			return;
 		}
 		
 		for(var i = 0, l = destroyed.length; i < l; i++) {
@@ -202,6 +209,8 @@ go.data.StoreTrait = {
 				this.remove(record);
 			}
 		}
+
+		this.fireEvent("changes", this);
 	},
 
   /**
