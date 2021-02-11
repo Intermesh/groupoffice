@@ -635,16 +635,15 @@ class Installer {
 								
 							} else {
 
-								echo $e->getCode() . ': '.$e->getMessage() . "\n";
-								echo "Query: " . $query . "\n";
-								echo "Package: " . ($module->package ?? "legacy") . "\n";
-								echo "Module: " . $module->name . "\n";
-								echo "Module installed version: " . $module->version . "\n";
-								echo "Module source version: " . $counts[$moduleId] . "\n";
+								$msg = $e->getCode() . ': '.$e->getMessage() . "\n".
+								  "Query: " . $query . "\n".
+								  "Package: " . ($module->package ?? "legacy") . "\n".
+								  "Module: " . $module->name . "\n".
+								  "Module installed version: " . $module->version . "\n".
+								  "Module source version: " . $counts[$moduleId] . "\n".
+									"ABORTING: Please contact support";
 
-								http_send_status(500);
-								
-								die("ABORTING: Please contact support");
+								throw new Exception($msg);
 							}
 						}
 					}
