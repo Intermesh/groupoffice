@@ -50,8 +50,35 @@ class System extends Controller {
 	public function cleanup() {
 
 		echo "Cleaning up....\n";
-		Utils::runSQLFile(new File(__DIR__ . '/cleanup.sql'), true);
+		//Utils::runSQLFile(new File(__DIR__ . '/cleanup.sql'), true);
 
+		//$this->reportUnknownTables();
+
+		$this->cleanupAcls();
+
+	}
+
+	private function cleanupAcls() {
+
+		echo "Cleaning up unused ACL's\n";
+
+		go()->getDbConnection()->exec("update core_acl set usedIn = null, entityTypeId = null, entityId = null");
+		go()->getDbConnection()->exec("update core_acl set usedIn = 'core_entity.defaultAclId' where id in (select defaultAclId from core_entity)");
+
+		echo "Checking database\n";
+		$mc = new \GO\Core\Controller\MaintenanceController();
+		$mc->run("checkDatabase");
+
+		go()->getDbConnection()->exec(
+			"update core_acl a inner join fs_folders f on f.acl_id = a.id set usedIn = 'fs_folders.acl_id', entityTypeId = ". \GO\Files\Model\Folder::entityType()->getId() .
+			", entityId = f.id where usedIn is null"
+		);
+
+		go()->getDbConnection()->exec("delete from core_acl where usedIn is null");
+
+	}
+
+	private function reportUnknownTables(){
 		$unknown = $this->getUnknownTables();
 
 		if(count($unknown)) {
@@ -63,7 +90,6 @@ class System extends Controller {
 
 			echo "\n\n---\n\n";
 		}
-
 	}
 
 	/**
@@ -71,7 +97,7 @@ class System extends Controller {
 	 *
 	 * @return array
 	 */
-	private function getUnknownTables() {
+	private function findUnknownTables() {
 		$sqls = go()->getEnvironment()->getInstallFolder()->find('/.*\.sql/', false, true);
 		$installSql = "";
 		foreach($sqls as $s) {
