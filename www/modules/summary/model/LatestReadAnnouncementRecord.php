@@ -54,7 +54,7 @@ class LatestReadAnnouncementRecord extends \GO\Base\Db\ActiveRecord {
 			$latestReadAnnouncementRecord->announcement_id = $latestAnnouncementModel->id;
 			$latestReadAnnouncementRecord->announcement_ctime = $latestAnnouncementModel->ctime;
 		} else {
-			$latestReadAnnouncementRecord->announcement_id = 0;
+			$latestReadAnnouncementRecord->announcement_id = null;
 			$latestReadAnnouncementRecord->announcement_ctime = 0;
 		}
 		$latestReadAnnouncementRecord->save();

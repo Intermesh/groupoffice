@@ -965,6 +965,72 @@ END;
 		return $htmlToText->get_text($link_list);
 	}
 
+	private static function extractStyles($html) {
+
+		preg_match_all("'<style[^>]*>(.*?)</style>'usi", $html, $matches);
+		$css = "";
+		foreach($matches[1] as $match) {
+			$css .= $match ."\n\n";
+		}
+
+		return self::prefixCSSSelectors($css);
+	}
+
+	private static function prefixCSSSelectors($css, $prefix = '.go-html-formatted') {
+		# Wipe all block comments
+		$css = preg_replace('!/\*.*?\*/!s', '', $css);
+
+		$parts = explode('}', $css);
+		$mediaQueryStarted = false;
+
+		foreach($parts as &$part)
+		{
+			$part = trim($part); # Wht not trim immediately .. ?
+			if(empty($part)) continue;
+			else # This else is also required
+			{
+				$partDetails = explode('{', $part);
+				if(substr_count($part, "{")==2)
+				{
+					$mediaQuery = $partDetails[0]."{";
+					$partDetails[0] = $partDetails[1];
+					$mediaQueryStarted = true;
+				}
+
+				$subParts = explode(',', $partDetails[0]);
+				foreach($subParts as &$subPart)
+				{
+					if(trim($subPart)==="@font-face") continue;
+					else $subPart = $prefix . ' ' . trim($subPart);
+				}
+
+				if(substr_count($part,"{")==2)
+				{
+					$part = $mediaQuery."\n".implode(', ', $subParts)."{".$partDetails[2];
+				}
+				elseif(empty($part[0]) && $mediaQueryStarted)
+				{
+					$mediaQueryStarted = false;
+					$part = implode(', ', $subParts)."{".$partDetails[2]."}\n"; //finish media query
+				}
+				else
+				{
+					if(isset($partDetails[1]))
+					{   # Sometimes, without this check,
+						# there is an error-notice, we don't need that..
+						$part = implode(', ', $subParts)."{".$partDetails[1];
+					}
+				}
+
+				unset($partDetails, $mediaQuery, $subParts); # Kill those three ..
+			}   unset($part); # Kill this one as well
+		}
+
+		# Finish with the whole new prefixed string/file in one line
+		return(preg_replace('/\s+/',' ',implode("} ", $parts)));
+
+	}
+
 	/**
 	 * Convert Dangerous HTML to safe HTML for display inside of Group-Office
 	 *
@@ -996,6 +1062,8 @@ END;
 //			else
 //				$html = substr($html, $body_startpos);
 //		}
+
+		$styles = self::extractStyles($html);
 		
 		$html = preg_replace("'</[\s]*([\w]*)[\s]*>'u","</$1>", $html);
 		
@@ -1054,7 +1122,7 @@ END;
 		if(\GO::user() && \GO::user()->show_smilies)
 			$html = StringHelper::replaceEmoticons($html,true);
 
-		return $html;
+		return "<style>" . $styles . '</style>' . $html;
 	}
 	
 	

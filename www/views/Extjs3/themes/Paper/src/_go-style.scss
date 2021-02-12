@@ -1838,7 +1838,7 @@ table[id^="comments-ext"] b {
 	list-style-type: disc;
 	list-style-position: inside;
 	margin: 0;
-	padding: 2px;
+	padding: 0 0 0 2em;
  }  
    
 .go-html-formatted ol {  
@@ -1846,7 +1846,11 @@ table[id^="comments-ext"] b {
 	list-style-type: decimal;
 	list-style-position: inside;
 	margin: 0;
-	padding: 2px;
+	padding: 0 0 0 2em;
+
+	ol {
+		list-style-type: lower-alpha;
+	}
  }  
    
 .go-html-formatted li {  

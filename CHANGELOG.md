@@ -48,6 +48,8 @@ end 6.5
 - Core: User delete didn't cleanup everything
 - Core: Custom fields with required condition supports grouping with OR now (A is true AND (B OR C))
 - Addressbook: URL's were not changed into valid URL's when entered incomplete
+- Email: Extract css from head style and prefix
+- Email: Restored list style in email and notes
 
 01-02-2021 6.4.218
 - Calendar: Fixed render bug in allday table view with extremely long titles
