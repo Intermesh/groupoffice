@@ -1,4 +1,4 @@
-11-02-2021 6.4.219
+12-02-2021 6.4.219
 - Time registration: better handling of job lists upon preselected projectid
 - Core: better handling of required native time fields in Firefox
 - Projects2: Upped the limit for  project statuses in project dialog.
