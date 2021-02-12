@@ -28,6 +28,8 @@
 - Email: Extract css from head style and prefix
 - Email: Restored list style in email and notes
 - Core: Fixed cmd+b/i/u in html editor on MacOS
+- Email: Include style in head
+
 
 01-02-2021 6.4.218
 - Calendar: Fixed render bug in allday table view with extremely long titles
