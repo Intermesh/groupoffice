@@ -462,6 +462,11 @@ class Link extends AclItemEntity
 		return Search::class;
 	}
 
+	protected function getAclEntity()
+	{
+		return $this->findFromEntity();
+	}
+
 	protected static function aclEntityKeys()
 	{
 		return ['toId' => 'entityId', 'toEntityTypeId' => 'entityTypeId'];
