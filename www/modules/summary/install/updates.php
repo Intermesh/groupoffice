@@ -72,4 +72,5 @@ $updates['202102111534'][] = "alter table su_latest_read_announcement_records
 
 
 
+$updates['202102111534'][] = "alter table su_latest_read_announcement_records modify announcement_id int default null null;";
 

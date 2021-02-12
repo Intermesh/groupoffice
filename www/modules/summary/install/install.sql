@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `su_visible_calendars` (
 DROP TABLE IF EXISTS `su_latest_read_announcement_records`;
 CREATE TABLE IF NOT EXISTS `su_latest_read_announcement_records` (
   `user_id` int(11) NOT NULL,
-  `announcement_id` int(11) NOT NULL DEFAULT '0',
+  `announcement_id` int(11) NULL DEFAULT NULL,
 	`announcement_ctime` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY  (`user_id`)
 ) ENGINE=InnoDB;
