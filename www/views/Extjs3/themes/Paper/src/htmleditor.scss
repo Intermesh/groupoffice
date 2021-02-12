@@ -40,7 +40,7 @@ ul{
 	list-style-type: disc;
 	list-style-position: inside;
 	margin: 0;
-	padding: 2px;
+	padding: 0 0 0 2em;
 }
 
 ol {
@@ -48,5 +48,9 @@ ol {
 	list-style-type: decimal;
 	list-style-position: inside;
 	margin: 0;
-	padding: 2px;
+	padding: 0 0 0 2em;
+
+	ol {
+		list-style-type: lower-alpha;
+	}
 }
