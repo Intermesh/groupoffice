@@ -71,7 +71,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 							flex: 1,
 							cls: 'go-addressbook-url-panel',
 							xtype: "box",
-							tpl: '<tpl for="urls">&nbsp;&nbsp;<a target="_blank" href="{url}" class="go-addressbook-url {type}"></a></tpl>'
+							tpl: '<tpl for="urls">&nbsp;&nbsp;<a target="_blank" href="{[go.modules.community.addressbook.Utils.transformUrl(values.url, values.type)]}" class="go-addressbook-url {type}"></a></tpl>'
 						})
 					]
 					
