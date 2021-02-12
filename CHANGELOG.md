@@ -24,6 +24,7 @@
 - Core: Added cleanup CLI action
 - Core: User delete didn't cleanup everything
 - Core: Custom fields with required condition supports grouping with OR now (A is true AND (B OR C))
+- Addressbook: URL's were not changed into valid URL's when entered incomplete
 
 01-02-2021 6.4.218
 - Calendar: Fixed render bug in allday table view with extremely long titles
