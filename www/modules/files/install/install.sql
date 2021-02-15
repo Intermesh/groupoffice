@@ -283,3 +283,14 @@ CREATE TABLE `fs_folders_custom_fields` (
 
 ALTER TABLE `fs_files` ADD INDEX(`mtime`);
 ALTER TABLE `fs_files` ADD INDEX(`content_expire_date`);
+
+
+alter table fs_bookmarks
+    add constraint fs_bookmarks_core_user_id_fk
+        foreign key (user_id) references core_user (id)
+            on delete cascade;
+
+alter table fs_bookmarks
+    add constraint fs_bookmarks_fs_folders_folder_id_fk
+        foreign key (folder_id) references fs_folders (id)
+            on delete cascade;

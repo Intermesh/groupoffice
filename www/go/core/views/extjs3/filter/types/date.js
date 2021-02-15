@@ -208,19 +208,30 @@ go.filter.types.date = Ext.extend(Ext.Panel, {
 		}
 	},
 	validate: function() {
-		return this.valueField.validate() && this.operatorCombo.validate();
+		return this.valueField.validate() && this.operatorCombo.validate() && this.dateField.validate();
 	},
 	markInvalid : function() {
-		return this.valueField.markInvalid();
+		return this.valueField.markInvalid() && this.dateField.markInvalid();
 	},
 	clearInvalid : function() {
-		return this.valueField.clearInvalid();
+		return this.valueField.clearInvalid() && this.dateField.clearInvalid();
 	},
 	isDirty : function() {
-		return this.valueField.isDirty() || this.operatorCombo.isDirty();
+		if(this.operatorCombo.isDirty()) {
+			return true;
+		}
+		if(this.valueField.isVisible() && this.valueField.isDirty()) {
+			return true;
+		}
+
+		if(this.dateField.isVisible() && this.dateField.isDirty()) {
+			return true;
+		}
+
+		return false;
 	},
 	isValid : function(preventMark){
-		return this.valueField.isValid(preventMark) && this.operatorCombo.isValid(preventMark);
+		return this.valueField.isValid(preventMark) && this.operatorCombo.isValid(preventMark) && this.dateField.isValid(preventMark);
 	}
 
 });

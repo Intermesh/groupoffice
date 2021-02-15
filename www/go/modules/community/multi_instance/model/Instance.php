@@ -663,7 +663,7 @@ class Instance extends Entity {
 
 		//echo $response['body'];
 
-		return $response['status'] == 200;
+		return strstr($response['body'], '<div id="success">') !== false;
 	}
 
 	private static $availableModules;

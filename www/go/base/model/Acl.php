@@ -348,10 +348,7 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 		
 		if(empty($this->ownedBy))
 			$this->ownedBy = 1;
-		
-		if(empty($this->usedIn))
-			$this->usedIn='unknown';
-		
+
 		if($this->usedIn!='readonly'){
 			$this->addGroup(\GO::config()->group_root, Acl::MANAGE_PERMISSION);
 			if($this->ownedBy != 1) { //not for admin

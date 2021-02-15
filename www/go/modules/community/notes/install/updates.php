@@ -131,3 +131,9 @@ $updates['202003261139'][] = function() {
 };
 
 $updates['202006091038'][] = "ALTER TABLE `notes_note_book` CHANGE `fileFolderId` `filesFolderId` INT(11) NULL DEFAULT NULL;";
+$updates['202102111108'][] = "alter table notes_note drop foreign key notes_note_ibfk_1;";
+
+$updates['202102111108'][] = "alter table notes_note
+	add constraint notes_note_ibfk_1
+		foreign key (noteBookId) references notes_note_book (id)
+			on delete cascade;";

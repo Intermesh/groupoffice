@@ -1,3 +1,4 @@
+12-02-2021 6.4.219
 - Time registration: better handling of job lists upon preselected projectid
 - Core: better handling of required native time fields in Firefox
 - Projects2: Upped the limit for  project statuses in project dialog.
@@ -9,6 +10,26 @@
 - Email: Acccount dialog size is saved.
 - Core: Enable disable users in share panel
 - Email: Sort by last e-mail time didn't always work
+- Contacts / Sync: Changed company delimiter into | to avoid problems with names containing the delimiter.
+- Studio: Enable ACL entities by default
+- Studio: Make add / import / export permissions more consistent
+- Comments: prevent entering empty comments
+- Core: minor fix in DE translation
+- Address book: Users need manage permissions on the module to create address books.
+- Notes: Users need manage permissions on the module to create notebooks.
+- Files: Make file portlets remind state
+- Billing: bugfix import new organizations using product import
+- Core: Filter didn't save when date changed
+- Core: Reload grid after adjusting filters
+- Core: Added cleanup CLI action
+- Core: User delete didn't cleanup everything
+- Core: Custom fields with required condition supports grouping with OR now (A is true AND (B OR C))
+- Addressbook: URL's were not changed into valid URL's when entered incomplete
+- Email: Extract css from head style and prefix
+- Email: Restored list style in email and notes
+- Core: Fixed cmd+b/i/u in html editor on MacOS
+- Email: Include style in head
+
 
 01-02-2021 6.4.218
 - Calendar: Fixed render bug in allday table view with extremely long titles

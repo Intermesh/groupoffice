@@ -1396,7 +1396,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Sub conditions' => 'Nebenbedingungen',
   'Emtpy' => 'Leer',
   'Download spreadsheet to translate' => 'Tabelle zum übersetzen herunterladen',
-  'The full URL to GroupOffice.' => 'The full URL to Nuesperling.',
+  'The full URL to GroupOffice.' => 'Die vollständige URL zu GroupOffice.',
   'Enable maintenance mode' => 'Wartungsmodus aktivieren',
   'When maintenance mode is enabled only administrators can login' => 'Wenn der Wartungsmodus aktiviert ist, können sich nur Administratoren anmelden',
   'Allowed groups' => 'Erlaubte Gruppen',

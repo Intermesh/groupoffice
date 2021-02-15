@@ -15,6 +15,7 @@ GO.files.PortletExpiredFilesGrid = Ext.extend(GO.grid.GridPanel, {
 	initComponent: function () {
 
 		Ext.apply(this, {
+			stateId: 'portlet-expired-files',
 			layout: 'fit',
 			height: 300,
 			paging: true,

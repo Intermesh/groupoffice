@@ -56,8 +56,12 @@ abstract class Entity extends Property {
 	/**
 	 * Fires before the entity has been deleted
 	 *
-	 * @param $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
-	 *  So you can do for example: go()->getDbConnection()->delete('another_table', (new Query()->where('id', 'in' $query))
+	 * @param $query The query argument that selects the entities to delete. The query is also populated with
+	 *  "select id from `primary_table`". Please beware that altering the query object can cause problems in the delete process.
+	 *  You might need to use "clone $query".
+	 *
+	 *  So you can do for example:
+	 *  go()->getDbConnection()->delete('another_table', (new Query()->where('id', 'in' $query))
 	 */
 	const EVENT_BEFORE_DELETE = 'beforedelete';
 	

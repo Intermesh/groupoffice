@@ -17,6 +17,7 @@ use GO\Base\Fs\Folder;
 use Exception;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
+use go\core\webclient\Extjs3;
 
 
 //make sure temp dir exists
@@ -587,16 +588,13 @@ class Message extends \Swift_Message{
 				}
 			}
 			$params['htmlbody']=$this->_fixRelativeUrls($params['htmlbody']);
+
+			$style = preg_replace("'/\*.*\*/'", "", file_get_contents(Extjs3::get()->getThemePath() . 'htmleditor.css'));
 						
 			$htmlTop = '<html>
 <head>
 <style type="text/css">
-body,p,td,div,span{
-	'.\GO::config()->html_editor_font.'
-};
-body p{
-	margin:0px;
-}
+'.$style.'
 </style>
 </head>
 <body>';

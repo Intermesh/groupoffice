@@ -1,7 +1,15 @@
 @import 'base';
-@import 'lato';
 body, html {
-	@extend %font-body1;
+	font-family: Lato, Verdana, Arial, sans-serif;
+	font-size: sp(16);
+	color: color($fg, 'text');
+	font-weight: $font-weight-r;
+	line-height: dp(24);
+
+	@media print {
+		font-size: 12px;
+		line-height: 18px;
+	}
 	color: color($fg, 'text');
 	text-rendering: optimizeLegibility;
 	-webkit-tap-highlight-color: transparent;
@@ -40,7 +48,7 @@ ul{
 	list-style-type: disc;
 	list-style-position: inside;
 	margin: 0;
-	padding: 2px;
+	padding: 0 0 0 2em;
 }
 
 ol {
@@ -48,5 +56,11 @@ ol {
 	list-style-type: decimal;
 	list-style-position: inside;
 	margin: 0;
-	padding: 2px;
+	padding: 0 0 0 2em;
+	> ol {
+		list-style-type: lower-alpha;
+		> ol {
+			list-style-type: lower-roman;
+		}
+	}
 }

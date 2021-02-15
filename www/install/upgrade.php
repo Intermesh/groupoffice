@@ -77,9 +77,12 @@ try {
 			echo "</pre></div>";
 		}
 
+		//Used by multi instance to check success
+		echo '<div id="success"></div>';
 
 	} 
 } catch (Exception $e) {
+	
 	echo "<b>Error:</b> ". ErrorHandler::logException($e)."\n\n";
 	
 	if(go()->getDebugger()->enabled) {
