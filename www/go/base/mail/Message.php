@@ -588,8 +588,11 @@ class Message extends \Swift_Message{
 				}
 			}
 			$params['htmlbody']=$this->_fixRelativeUrls($params['htmlbody']);
-
-			$style = preg_replace("'/\*.*\*/'", "", file_get_contents(Extjs3::get()->getThemePath() . 'htmleditor.css'));
+			if(file_exists(Extjs3::get()->getThemePath() . 'htmleditor.css')) {
+				$style = preg_replace("'/\*.*\*/'", "", file_get_contents(Extjs3::get()->getThemePath() . 'htmleditor.css'));
+			} else {
+				$style = preg_replace("'/\*.*\*/'", "", file_get_contents(Extjs3::get()->getBasePath() . '/views/Extjs3/themes/Paper/htmleditor.css'));
+			}
 						
 			$htmlTop = '<html>
 <head>
