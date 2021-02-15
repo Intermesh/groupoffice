@@ -10,7 +10,7 @@ require('../vendor/autoload.php');
 require('header.php');
 
 if(go()->getConfig()['core']['general']['servermanager']) {
-	$cls = $this->getConfig()['cache'];
+	$cls = go()->getConfig()['cache'];
     go()->setCache(new $cls);
 	exec("php ".\go\core\Environment::get()->getInstallFolder() .'/go/modules/community/multi_instance/oninstall.php '.go()->getConfig()['core']['general']['servermanager']. ' '.explode(':',$_SERVER['HTTP_HOST'])[0], $output, $ret);
 	Settings::flushCache();
