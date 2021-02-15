@@ -105,9 +105,22 @@ Ext.extend(GO.site.MainPanel, Ext.Panel,{
 	}
 });
 
-GO.moduleManager.addModule('site', GO.site.MainPanel, {
-	title : t("Website Manager", "site"),
-	iconCls : 'go-tab-icon-site'
+// GO.moduleManager.addModule('site', GO.site.MainPanel, {
+// 	title : t("Website Manager", "site"),
+// 	iconCls : 'go-tab-icon-site'
+// });
+
+go.Modules.register("legacy", 'site', {
+	mainPanel: GO.site.MainPanel,
+	title : t("Website Manager", "calendar"),
+	iconCls : 'go-tab-icon-site',
+	entities: [{
+		name: "Site"
+		// customFields: {
+		// 	fieldSetDialog: "GO.site.CustomFieldSetDialog"
+		// }
+	}]
+
 });
 
 
