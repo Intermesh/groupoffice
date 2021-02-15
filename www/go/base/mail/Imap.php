@@ -1894,16 +1894,23 @@ class Imap extends ImapBodyStruct {
 			array_shift($result);
 		}
 		$status = $this->check_response($result, true);
+		array_pop($result);
+
+		$r = [];
+		while($line = array_shift($result)) {
+			$r = array_merge($r, $line);
+		}
+
 		$response = array();
-		if (!isset($result[0][4])) {
+		if (!isset($r[4])) {
 			$status = false;
 		}
 		if ($status) {
-			if (strtoupper($result[0][4]) == 'UID') {
-				$response = array_slice($result[0], 7, -1);
+			if (strtoupper($r[4]) == 'UID') {
+				$response = array_slice($r, 7, -1);
 			}
 			else {
-				$response = array_slice($result[0], 5, -1);
+				$response = array_slice($r, 5, -1);
 			}
 			$response = $this->split_toplevel_result($response);
 			if (count($response) > 1) {
