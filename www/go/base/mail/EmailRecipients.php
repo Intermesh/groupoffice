@@ -271,7 +271,12 @@ class EmailRecipients{
 				throw new \Exception("Address ".$this->_buffer." is not valid");
 			}else
 			{
-				$this->addRecipient($this->_buffer, $this->_personal);
+				$email = $this->_buffer;
+				if(!\GO\Base\Util\StringHelper::validate_email($email)) {
+					$email = 'unknown@unknown.domain';
+					$this->_personal = $this->_buffer;
+				}
+				$this->addRecipient($email, $this->_personal);
 			}
 		}
 		$this->_buffer = '';
