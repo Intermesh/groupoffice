@@ -1,6 +1,7 @@
 - Projects2: Added status filter to projects report
 - Email: Fixed display of e-mail with very large structures
 - Address book: Company Registration Number wasn't migrated
+- Comments: Fixed comments running out of display
 
 12-02-2021 6.4.219
 - Time registration: better handling of job lists upon preselected projectid

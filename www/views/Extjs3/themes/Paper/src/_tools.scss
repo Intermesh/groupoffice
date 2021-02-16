@@ -47,10 +47,7 @@
 			background-color: transparent;
 			@include var(color, c-primary);
 			margin: 0 auto;
-			border-style: solid;
-			border-color: color($fg, "divider");
-			border-width: dp(1) dp(1) 0;
-			border-radius: $borderRadius;
+			border: 0;
 		}
 
 	}

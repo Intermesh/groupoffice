@@ -1923,6 +1923,23 @@ table[id^="comments-ext"] b {
 }
 
 .go-messages {
+
+	.text-crop {
+		.more {
+			border-bottom-left-radius: dp(8);
+			border-bottom-right-radius: dp(8);
+
+			background-image: none;
+			background-color: color($bg, 'status-bar');
+			padding-top: dp(16);
+		}
+
+		&.mine {
+			.more {
+				background-color: rgba-to-rgb($cPrimaryTp);
+			}
+		}
+	}
 	padding: 0 dp(8);
 	h6 {
 		@extend %font-caption;
@@ -1962,7 +1979,9 @@ table[id^="comments-ext"] b {
 					border: 0;
 					border-left: dp(16) solid $cPrimaryTp;
 					border-bottom: dp(16) solid transparent;
+
 				}
+
 			}
 		}
 		> div { // message		
@@ -1979,6 +1998,7 @@ table[id^="comments-ext"] b {
 				margin-right: dp(56);
 				margin-left: 0; // reset
 				background-color: $cPrimaryTp;
+
 				//float:right;
 			}
 		}
