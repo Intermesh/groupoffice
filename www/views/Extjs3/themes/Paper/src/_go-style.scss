@@ -1936,11 +1936,11 @@ table[id^="comments-ext"] b {
 		padding-bottom:dp(8);
 		span.photo {
 			@extend .avatar;
-			position:absolute;
-			top: 0;
+			//position:absolute;
+			//top: 0;
 			margin-top:0 !important;
-			margin-right: dp(8);
-			
+			margin-right: dp(16);
+			float: left;
 			text-align: center;
 			&:after {
 				content: '';
@@ -1954,8 +1954,9 @@ table[id^="comments-ext"] b {
 			}
 			&.mine {
 				margin-right:0;
-				margin-left: dp(8);
-				right:0;
+				margin-left: dp(16);
+				//right:0;
+				float: right;
 				&:after {
 					left: dp(-16);
 					border: 0;
@@ -1966,8 +1967,9 @@ table[id^="comments-ext"] b {
 		}
 		> div { // message		
 			border-radius: dp(8);
-			display:inline-block;
-			margin-left: dp(56);
+			//display:inline-block;
+			//margin-left: dp(56);
+			overflow:hidden;
 			max-width: 100%;
 			background-color: color($bg, 'status-bar');
 			.content {
@@ -1977,7 +1979,7 @@ table[id^="comments-ext"] b {
 				margin-right: dp(56);
 				margin-left: 0; // reset
 				background-color: $cPrimaryTp;
-				float:right;
+				//float:right;
 			}
 		}
 		
