@@ -267,7 +267,7 @@ class ImapMailbox extends \GO\Base\Model {
 		$imap = $this->getAccount()->openImapConnection($this->name);
 		$success = true;
 		foreach ($imap->get_folders($this->_account->trash) as $folder) {
-			if($folder['name'] == $this->_account->trash) {
+			if($folder['name'] == $this->_account->trash || empty($folder['name'])) {
 				continue;
 			}
 			$success = $success &&$imap->delete_folder($folder['name']);
