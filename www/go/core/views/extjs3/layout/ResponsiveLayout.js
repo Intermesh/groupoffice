@@ -29,7 +29,8 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 	
 
 	onLayout: function (ct, target) {
-		if (!this.initialized)	{			
+		if (!this.initialized)	{
+
 			ct.addClass('go-layout-responsive');			
 			this.initialized = true;
 
@@ -37,7 +38,11 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 			this.activeItem = this.container.getComponent(this.activeItem);			
 			
 			//make sure border layout is initialized
-			go.layout.ResponsiveLayout.superclass.onLayout.call(this, ct, target);		
+			go.layout.ResponsiveLayout.superclass.onLayout.call(this, ct, target);
+
+			ct.on('resize', function() { // when mobile orientation changes
+				this.setItemSize(this.activeItem, this.getLayoutTargetSize());
+			}, this)
 
 			//Needed to make modification in Ext.layout.BorderLayout.SplitRegion.onSplitMove too.
 			ct.items.each(function (i) {
