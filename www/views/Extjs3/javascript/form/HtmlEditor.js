@@ -8,8 +8,7 @@ GO.form.HtmlEditor = function (config) {
 	Ext.applyIf(config, {
 		border: false,
 		enableFont: false,
-		headingsMenu: true,
-		style: GO.settings.html_editor_font
+		headingsMenu: true
 	});
 
 	config.plugins = config.plugins || [];

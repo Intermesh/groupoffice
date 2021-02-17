@@ -401,12 +401,6 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 */
 	var $allow_duplicate_email = false;
 
-	/**
-	 * The font used in all HTML editor including the E-mail editor
-	 *
-	 * @var StringHelper
-	 */
-	public $html_editor_font = 'font-size:14px;font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";';
 
 	/**
 	 * The default font to be used in the generated PDF files.

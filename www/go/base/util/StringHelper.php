@@ -969,8 +969,12 @@ END;
 
 		preg_match_all("'<style[^>]*>(.*?)</style>'usi", $html, $matches);
 		$css = "";
-		foreach($matches[1] as $match) {
-			$css .= $match ."\n\n";
+		for($i = 0, $l = count($matches[0]); $i < $l; $i++) {
+
+			//don't add the style added by group-office inline because it will double up.
+			if(!strstr($matches[0][$i], 'groupoffice-email-style')) {
+				$css .= $matches[1][$i] . "\n\n";
+			}
 		}
 
 		return self::prefixCSSSelectors($css);
