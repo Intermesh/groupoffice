@@ -965,7 +965,7 @@ END;
 		return $htmlToText->get_text($link_list);
 	}
 
-	private static function extractStyles($html) {
+	private static function extractStyles($html, $prefix) {
 
 		preg_match_all("'<style[^>]*>(.*?)</style>'usi", $html, $matches);
 		$css = "";
@@ -977,7 +977,7 @@ END;
 			}
 		}
 
-		return self::prefixCSSSelectors($css);
+		return self::prefixCSSSelectors($css, '.'.$prefix);
 	}
 
 	private static function prefixCSSSelectors($css, $prefix = '.go-html-formatted') {
@@ -1067,7 +1067,9 @@ END;
 //				$html = substr($html, $body_startpos);
 //		}
 
-		$styles = self::extractStyles($html);
+		$prefix = 'msg-' . uniqid();
+
+		$styles = self::extractStyles($html, $prefix);
 		
 		$html = preg_replace("'</[\s]*([\w]*)[\s]*>'u","</$1>", $html);
 		
@@ -1126,7 +1128,10 @@ END;
 		if(\GO::user() && \GO::user()->show_smilies)
 			$html = StringHelper::replaceEmoticons($html,true);
 
-		return "<style>" . $styles . '</style>' . $html;
+		if(!empty($styles)) {
+			$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="'.$prefix.'">'. $html .'</div>';
+		}
+		return $html;
 	}
 	
 	
@@ -1277,7 +1282,7 @@ END;
 // Match style attributes
 				'#(<[^>]*+[\x00-\x20\"\'\/])*style=[^>]*(expression|behavior)[^>]*>?#iUu',
 // Match unneeded tags
-				'#</*(applet|meta|xml|blink|link|style|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base)\s[^>]*>?#i'
+				'#</*(applet|meta|xml|blink|link|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base)\s[^>]*>?#i'
 		);
 
 		foreach ($patterns as $pattern) {
