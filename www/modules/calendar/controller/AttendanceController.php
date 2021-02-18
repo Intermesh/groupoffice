@@ -18,7 +18,7 @@ class AttendanceController extends AbstractController{
 		
 		$participant=$event->getParticipantOfCalendar();
 		if(!$participant) {
-			$name = $event->calendar->user->displayName . ' (' . $event->calendar->user->email . ')';
+			$name = $event->calendar->user->name . ' (' . $event->calendar->user->email . ')';
 			throw new Exception(str_replace('{name}', $name, "{name} was not invited for this event"));
 		}
 		

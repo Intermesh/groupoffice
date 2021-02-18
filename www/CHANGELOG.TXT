@@ -1,4 +1,5 @@
 - Calendar: using the accept / decline links showed incorrect sender in message to organizer
+- Calendar: Fixed 'User was not invited for this event' when participant was added to an exception in the recurring series.
 
 17-11-2020 6.2.132
 - Groups: Users could see read only groups in the manage area
