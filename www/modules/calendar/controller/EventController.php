@@ -1788,7 +1788,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		}
 		
 		if($event){
-			$event->replyToOrganizer();
+			$event->replyToOrganizer(false, $participant, false);
 		}else {
 			$participant->event->replyToOrganizer(false, $participant, false);
 		}

@@ -1,3 +1,5 @@
+- Calendar: using the accept / decline links showed incorrect sender in message to organizer
+
 17-11-2020 6.2.132
 - Groups: Users could see read only groups in the manage area
 - Email: Fixed problem in Thunderbird e-mails that were cut off. Issue #632.
