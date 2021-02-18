@@ -1,3 +1,4 @@
+18-02-2021 6.2.133
 - Calendar: using the accept / decline links showed incorrect sender in message to organizer
 - Calendar: Fixed 'User was not invited for this event' when participant was added to an exception in the recurring series.
 
