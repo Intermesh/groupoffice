@@ -293,7 +293,7 @@ class StringHelper {
 		if($source_charset == 'UNICODE')
 			$source_charset = 'UTF-8';
 		
-		
+
 		
 		$str = str_replace("€","&euro;", $str);
 		
@@ -302,9 +302,9 @@ class StringHelper {
 			$c = iconv($source_charset, 'UTF-8//IGNORE', $str);
 		} catch(\ErrorException $e) {
 			//Does not always work. We suppress the:
-			//Notice:  iconv() [function.iconv]: Detected an illegal character in input string in /var/www/community/trunk/www/classes/String.class.inc.php on line 31		
+			//Notice:  iconv() [function.iconv]: Detected an illegal character in input string in /var/www/community/trunk/www/classes/String.class.inc.php on line 31
 		}
-		
+
 		if(!empty($c))
 		{
 			$str=$c;
@@ -985,7 +985,7 @@ END;
 		
 		$to_removed_array = array (
 		"'<!DOCTYPE[^>]*>'usi",
-		"'<!--.*-->'Uusi",
+
 		"'<html[^>]*>'usi",
 		"'</html>'usi",
 		"'<body[^>]*>'usi",
@@ -1017,6 +1017,7 @@ END;
 		//"'<select[^>]*>.*?</select>'usi",
 		//"'<textarea[^>]*>.*?</textarea>'usi",
 		"'</form>'usi"
+		"'<!--.*-->'Uusi"
 		);
 
 		$html = preg_replace($to_removed_array, '', $html);
@@ -1334,7 +1335,7 @@ END;
 				$array_allow[] = $characters_allow[$i];
 			}
 		}
-		
+
 		// Generate array of disallowed characters.
 		$characters_disallow = explode(',', $characters_disallow);
 
@@ -1359,7 +1360,7 @@ END;
 		// removing the disallowed characters.
 		reset($array_allow);
     $array_allow = array_values($array_allow);
-		
+
 		$password = '';
 		while (strlen($password) < $password_length) {
 			$character = mt_rand(0, count($array_allow) - 1);

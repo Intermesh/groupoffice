@@ -2273,7 +2273,7 @@ The following is the error message:
 			//find if an event for this exception already exists.
 			$exceptionDate = $this->exception_for_event_id!=0 ? $this->start_time : false;			
 			$existing = Event::model()->findByUuid($this->uuid, 0, $calendar->id, $exceptionDate);
-			
+
 			if(!$existing){				
 			
 				//ignore acl permissions because we allow users to schedule events directly when they have access through
@@ -2345,7 +2345,7 @@ The following is the error message:
 		if($this->is_organizer)
 			return false;
 		
-		return Event::model()->findSingleByAttributes(array('uuid'=>$this->uuid, 'is_organizer'=>1));
+		return Event::model()->findSingleByAttributes(array('uuid'=>$this->uuid, 'is_organizer'=>1, 'start_time' => $this->start_time));
 	}
 	
 	/**
