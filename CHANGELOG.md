@@ -6,6 +6,7 @@
 - Address book: Address books are searchable
 - Notes: Note books are searchable
 - Email: Added $config['debugEmail'] for sending all mail to a debugging address.
+- Comments: Fixed removeAllRanges() of null error.
 
 12-02-2021 6.4.219
 - Time registration: better handling of job lists upon preselected projectid
