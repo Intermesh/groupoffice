@@ -1587,13 +1587,13 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if($params['mailbox'] === $account->sent) {
 			$contact = (!empty($response['to']) && !empty($response['to'][0]['email'])) ?
 				\go\modules\community\addressbook\model\Contact::find(['id', 'photoBlobId', 'isOrganization', 'name', 'addressBookId', 'color'])
-					->filter(['email' => $response['to'][0]['email'], 'permissionLevel' => \go\core\model\Acl::LEVEL_READ])
+					->filter(['email' => $response['to'][0]['email'], 'permissionLevel' => \go\core\model\Acl::LEVEL_WRITE])
 					->single()
 				: false;
 		} else {
 			$contact = !empty($response['sender']) ?
 				\go\modules\community\addressbook\model\Contact::find(['id', 'photoBlobId', 'isOrganization', 'name', 'addressBookId', 'color'])
-					->filter(['email' => $response['sender'], 'permissionLevel' => \go\core\model\Acl::LEVEL_READ])
+					->filter(['email' => $response['sender'], 'permissionLevel' => \go\core\model\Acl::LEVEL_WRITE])
 					->single()
 				: false;
 		}
