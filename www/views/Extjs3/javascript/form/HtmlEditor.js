@@ -558,7 +558,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 	setValue: function (value) {
 
-		if (this.win && Ext.isChrome) {
+		if (this.win && Ext.isChrome && this.activated) {
 
 			//set cursor position on top
 			var range = this.win.document.createRange();
@@ -567,8 +567,10 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 			var sel = this.win.document.getSelection();
 
-			sel.removeAllRanges();
-			sel.addRange(range);
+			if(sel) {
+				sel.removeAllRanges();
+				sel.addRange(range);
+			}
 		}
 		GO.form.HtmlEditor.superclass.setValue.call(this, value);
 	},
