@@ -30,4 +30,9 @@ class NoteBook extends AclOwnerEntity {
 
 		return parent::internalDelete($query);
 	}
+
+	protected static function textFilterColumns()
+	{
+		return ['name'];
+	}
 }

@@ -3,6 +3,8 @@
 - Address book: Company Registration Number wasn't migrated
 - Comments: Fixed comments running out of display
 - E-mail: Smarter CSS prefixing
+- Address book: Address books are searchable
+- Notes: Note books are searchable
 
 12-02-2021 6.4.219
 - Time registration: better handling of job lists upon preselected projectid

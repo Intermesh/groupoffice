@@ -9,7 +9,12 @@ go.tree.EntityLoader = Ext.extend(Ext.tree.TreeLoader, {
 	textTpl: '{name}',
 	secondaryTextTpl: '',
 	
-	constructor : function(config) {		
+	constructor : function(config) {
+
+		Ext.applyIf(this, go.data.FilterTrait);
+
+		this.initFilters();
+
 		go.tree.EntityLoader.superclass.constructor.call(this, config);
 		this.initEntityStore();
 		

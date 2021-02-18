@@ -30,7 +30,7 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(go.tree.EntityLoader, {
 	},
 	
 	getParams: function(node) {
-		return {sort: [{property: "name", isAscending: true }]};
+		return Ext.apply({sort: [{property: "name", isAscending: true }]}, this.baseParams);
 	},
 
 	handleResponse : function(r) {
