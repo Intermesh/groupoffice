@@ -1016,7 +1016,7 @@ END;
 		//"'<input[^>]*>'usi",
 		//"'<select[^>]*>.*?</select>'usi",
 		//"'<textarea[^>]*>.*?</textarea>'usi",
-		"'</form>'usi"
+		"'</form>'usi",
 		"'<!--.*-->'Uusi"
 		);
 
