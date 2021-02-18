@@ -762,7 +762,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		
 //		$response['data']['has_other_participants']=$model->hasOtherParticipants(\GO::user()->id);
 		
-		$response['data']['user_name']=$model->user ? $model->user->name : "Unknown";
+		$response['data']['user_name']=$model->user ? $model->user->displayName : "Unknown";
 		
 		if(empty($params['id'])){
 			$participantModel = $model->getDefaultOrganizerParticipant();
@@ -1871,7 +1871,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		}
 		
 		if($event){
-			$event->replyToOrganizer();
+			$event->replyToOrganizer(false, $participant, false);
 		}else {
 			$participant->event->replyToOrganizer(false, $participant, false);
 		}
