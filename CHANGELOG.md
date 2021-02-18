@@ -1,4 +1,4 @@
-12-02-2021 6.4.220
+18-02-2021 6.4.220
 - Projects2: Added status filter to projects report
 - Email: Fixed display of e-mail with very large structures
 - Address book: Company Registration Number wasn't migrated
@@ -9,6 +9,7 @@
 - Email: Added $config['debugEmail'] for sending all mail to a debugging address.
 - Comments: Fixed removeAllRanges() of null error.
 - Projects: Added some missing filters
+- Calendar: Fixed some issues with invitations.
 
 12-02-2021 6.4.219
 - Time registration: better handling of job lists upon preselected projectid
