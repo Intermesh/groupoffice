@@ -62,12 +62,12 @@ class Mailer {
 	 */
 	public function send($message, &$failedRecipients = null) {
 		
-//		if(!empty(go()->getSettings()->debugEmail)){
-//			$message->setTo(go()->getSettings()->debugEmail);
-//			$message->setBcc(array());
-//			$message->setCc(array());
-//			go()->warn("E-mail debugging is enabled in the Group-Office configuration. All emails are send to: ".go()->getSettings()->debugEmail);
-//		}
+		if(!empty(go()->getConfig()['debugEmail'])){
+			$message->setTo(go()->getConfig()['debugEmail']);
+			$message->setBcc(array());
+			$message->setCc(array());
+			go()->warn("E-mail debugging is enabled in the Group-Office configuration. All emails are send to: ".go()->getConfig()['debugEmail']);
+		}
 		
 		return $this->swift()->send($message, $failedRecipients);
 	}

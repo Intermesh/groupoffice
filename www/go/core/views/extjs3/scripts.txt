@@ -7,6 +7,7 @@ BrowserStorage.js
 
 data/JmapProxy.js
 data/EntityStoreProxy.js
+data/FilterTrait.js
 data/StoreTrait.js
 data/Store.js
 data/GroupingStore.js

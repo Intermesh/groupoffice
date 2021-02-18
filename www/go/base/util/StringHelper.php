@@ -293,7 +293,7 @@ class StringHelper {
 		if($source_charset == 'UNICODE')
 			$source_charset = 'UTF-8';
 		
-		
+
 		
 		$str = str_replace("€","&euro;", $str);
 		
@@ -302,9 +302,9 @@ class StringHelper {
 			$c = iconv($source_charset, 'UTF-8//IGNORE', $str);
 		} catch(\Exception $e) {
 			//Does not always work. We suppress the:
-			//Notice:  iconv() [function.iconv]: Detected an illegal character in input string in /var/www/community/trunk/www/classes/String.class.inc.php on line 31		
+			//Notice:  iconv() [function.iconv]: Detected an illegal character in input string in /var/www/community/trunk/www/classes/String.class.inc.php on line 31
 		}
-		
+
 		if(!empty($c))
 		{
 			$str=$c;
@@ -965,15 +965,19 @@ END;
 		return $htmlToText->get_text($link_list);
 	}
 
-	private static function extractStyles($html) {
+	private static function extractStyles($html, $prefix) {
 
 		preg_match_all("'<style[^>]*>(.*?)</style>'usi", $html, $matches);
 		$css = "";
-		foreach($matches[1] as $match) {
-			$css .= $match ."\n\n";
+		for($i = 0, $l = count($matches[0]); $i < $l; $i++) {
+
+			//don't add the style added by group-office inline because it will double up.
+			if(!strstr($matches[0][$i], 'groupoffice-email-style')) {
+				$css .= $matches[1][$i] . "\n\n";
+			}
 		}
 
-		return self::prefixCSSSelectors($css);
+		return self::prefixCSSSelectors($css, '.'.$prefix);
 	}
 
 	private static function prefixCSSSelectors($css, $prefix = '.go-html-formatted') {
@@ -1063,8 +1067,10 @@ END;
 //				$html = substr($html, $body_startpos);
 //		}
 
-		$styles = self::extractStyles($html);
-		
+		$prefix = 'msg-' . uniqid();
+
+		$styles = self::extractStyles($html, $prefix);
+
 		$html = preg_replace("'</[\s]*([\w]*)[\s]*>'u","</$1>", $html);
 		
 		$to_removed_array = array (
@@ -1122,7 +1128,10 @@ END;
 		if(\GO::user() && \GO::user()->show_smilies)
 			$html = StringHelper::replaceEmoticons($html,true);
 
-		return "<style>" . $styles . '</style>' . $html;
+		if(!empty($styles)) {
+			$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="'.$prefix.'">'. $html .'</div>';
+		}
+		return $html;
 	}
 	
 	
@@ -1273,7 +1282,7 @@ END;
 // Match style attributes
 				'#(<[^>]*+[\x00-\x20\"\'\/])*style=[^>]*(expression|behavior)[^>]*>?#iUu',
 // Match unneeded tags
-				'#</*(applet|meta|xml|blink|link|style|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base)\s[^>]*>?#i'
+				'#</*(applet|meta|xml|blink|link|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base)\s[^>]*>?#i'
 		);
 
 		foreach ($patterns as $pattern) {
@@ -1420,7 +1429,7 @@ END;
 				$array_allow[] = $characters_allow[$i];
 			}
 		}
-		
+
 		// Generate array of disallowed characters.
 		$characters_disallow = explode(',', $characters_disallow);
 
@@ -1445,7 +1454,7 @@ END;
 		// removing the disallowed characters.
 		reset($array_allow);
     $array_allow = array_values($array_allow);
-		
+
 		$password = '';
 		while (strlen($password) < $password_length) {
 			$character = mt_rand(0, count($array_allow) - 1);

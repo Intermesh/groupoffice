@@ -39,10 +39,9 @@ class System extends Controller {
 	 */
 	public function upgrade() {
 
+		go()->rebuildCache();
 		go()->setCache(new None());
-
 		go()->getInstaller()->isValidDb();
-		go()->setCache(new \go\core\cache\None());	
 		Table::destroyInstances();
 		\GO::session()->runAsRoot();	
 		date_default_timezone_set("UTC");

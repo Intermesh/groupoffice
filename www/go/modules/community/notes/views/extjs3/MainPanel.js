@@ -137,6 +137,8 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					xtype: 'tbtitle',
 					text: t('Notebooks')
 				}, '->', {
+					xtype: "tbsearch"
+				},{
 					disabled: !go.Modules.isAvailable("community", "notes", go.permissionLevels.manage),
 					iconCls: 'ic-add',
 					tooltip: t('Add'),

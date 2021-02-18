@@ -23,6 +23,8 @@ use go\core\db\Table;
 update addressbook_contact n set filesFolderId = (select files_folder_id from ab_contacts o where o.id=n.id) where n.filesFolderId = null ;
 update addressbook_contact n set filesFolderId = (select files_folder_id from ab_companies o where o.id = (n.id - (select max(id) from ab_contacts)) ) where n.filesFolderId = null ;
 
+update addressbook_contact n set registrationNumber = (select crn from ab_companies o where o.id = (n.id - (select max(id) from ab_contacts)) ) where n.registrationNumber = null ;
+
 
 update comments_comment n set entityTypeId=(select id from core_entity where name='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = 3;
 
@@ -814,6 +816,7 @@ class Migrate63to64 {
 
 			$contact->IBAN = $r['iban'];
 			$contact->BIC = $r['bank_bic'];
+			$contact->registrationNumber = $r['crn'];
 
 			$contact->vatNo = $r['vat_no'];
 

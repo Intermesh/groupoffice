@@ -184,6 +184,8 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			headingsMenu: false,
 			anchor: '100% '+anchorHeight,
 			plugins:this.initHtmlEditorPlugins(),
+			//this font is applied here because it must match the one in htmleditor.scss. Ext will copy this style to the body tag.
+			style: "font: " + dp(16) + "px  Helvetica, Arial, sans-serif",
 			getFontStyle :  function() {
 				return GO.form.HtmlEditor.prototype.getFontStyle.call(this) + ';color: black';
 			},

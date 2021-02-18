@@ -53,29 +53,20 @@ CREATE TABLE IF NOT EXISTS `site_content` (
   UNIQUE KEY `slug` (`slug`,`site_id`)
 ) ENGINE=InnoDB;
 
--- --------------------------------------------------------
 
---
--- Tabelstructuur voor tabel `cf_site_sites`
---
 
-DROP TABLE IF EXISTS `cf_site_sites`;
-CREATE TABLE IF NOT EXISTS `cf_site_sites` (
-  `model_id` int(11) NOT NULL,
-  PRIMARY KEY (`model_id`)
-) ENGINE=InnoDB;
+CREATE TABLE `site_content_custom_fields` (
+   `id` int(11) NOT NULL,
+   PRIMARY KEY (`id`),
+   CONSTRAINT `site_content_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `site_content` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
 
---
--- Tabelstructuur voor tabel `cf_site_content`
---
-
-DROP TABLE IF EXISTS `cf_site_content`;
-CREATE TABLE IF NOT EXISTS `cf_site_content` (
-  `model_id` int(11) NOT NULL,
-  PRIMARY KEY (`model_id`)
-) ENGINE=InnoDB;
+CREATE TABLE `site_sites_custom_fields` (
+    `id` int(11) NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `site_sites_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `site_sites` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=COMPACT;
 
 -- --------------------------------------------------------
 

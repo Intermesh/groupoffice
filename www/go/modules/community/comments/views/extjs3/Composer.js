@@ -141,6 +141,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		var h = Math.min(this.ownerCt.growMaxHeight, this.ownerCt.commentsContainer.getEl().dom.scrollHeight + this.getHeight() + headerHeight + dp(8));
 		this.ownerCt.setHeight(h);
 		this.ownerCt.doLayout();
+		this.ownerCt.scrollDown();
 	},
 	
 	initEntity : function(entityId,entity, section) {
