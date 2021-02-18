@@ -1,3 +1,4 @@
+12-02-2021 6.4.220
 - Projects2: Added status filter to projects report
 - Email: Fixed display of e-mail with very large structures
 - Address book: Company Registration Number wasn't migrated
