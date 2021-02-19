@@ -25,4 +25,3 @@ class ImageViewer implements FilehandlerInterface{
 		return 'GO.files.showImageViewer({id:'.$file->id.'});';
 	}
 }
-?>
