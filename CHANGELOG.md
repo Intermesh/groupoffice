@@ -21,6 +21,9 @@ end 6.5
 --------
 
 
+20-02-2021 6.4.221
+- Files: Fixed error in getDefaultHandler method
+
 18-02-2021 6.4.220
 - Projects2: Added status filter to projects report
 - Email: Fixed display of e-mail with very large structures
