@@ -83,10 +83,12 @@ trait SearchableTrait {
 
 		$links = (new Query())
 			->select('description')
+			->distinct()
 			->from('core_link')
 			->where('(toEntityTypeId = :e1 AND toId = :e2)')
-			->orWhere('(fromEntityTypeId = :e3 AND fromId = :e4)')
-			->bind([':e1' => static::entityType()->getId(), ':e2' => $this->id, ':e3' => static::entityType()->getId(), ':e4' => $this->id ]);
+			//->orWhere('(fromEntityTypeId = :e3 AND fromId = :e4)')
+			->bind([':e1' => static::entityType()->getId(), ':e2' => $this->id]);
+				//':e3' => static::entityType()->getId(), ':e4' => $this->id ]);
 		foreach($links->all() as $link) {
 			if(!empty($link['description']) && is_string($link['description'])) {
 				$keywords[] = $link['description'];
