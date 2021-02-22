@@ -46,15 +46,12 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 				i.on('show', this.onPanelShow, this);
 				i.wideWidth = i.width;		
 			}, this);
+			ct.on('resize', function() { // when mobile orientation changes
+				ct.doLayout();
+			}, this)
 		}
 		
 		var willBeWide = window.innerWidth > this.triggerWidth;
-
-		ct.on('resize', function() { // when mobile orientation changes
-			if(!willBeWide) {
-				this.setItemSize(this.activeItem, this.getLayoutTargetSize());
-			}
-		}, this)
 
 		this.setChildWidths(ct);
 		
@@ -135,7 +132,6 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 		}
 		
 		this.activeItem.show();
-		
 	},
 	
 	setChildWidths : function(ct) {
