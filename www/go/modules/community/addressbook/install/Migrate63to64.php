@@ -621,18 +621,33 @@ class Migrate63to64 {
 
 
 			$address = new Address();
-			$address->type = Address::TYPE_HOME;
-			$address->countryCode = isset($r['country']) && \go\core\validate\CountryCode::validate(strtoupper($r['country'])) ? strtoupper($r['country']) : null;
-			$address->state = $r['state'] ?? null;
-			$address->city = $r['city'] ?? null;
-			$address->zipCode = $r['zip'] ?? null;
-			$address->street = $r['address'] ?? null;
-			$address->street2 = $r['address_no'] ?? null;
-			$address->latitude = $r['latitude'] ?? null;
-			$address->longitude = $r['longitude'] ?? null;
-			$address->cutPropertiesToColumnLength();
+			if(!empty($r['country']) && \go\core\validate\CountryCode::validate(strtoupper($r['country'])))
+				$address->countryCode = strtoupper($r['country']);
+
+			if(!empty($r['state']))
+				$address->state = $r['state'];
+
+			if(!empty($r['city']))
+				$address->city = $r['city'];
+
+			if(!empty($r['zip']))
+				$address->zipCode = $r['zip'];
+
+			if(!empty($r['address']))
+				$address->street = $r['address'];
+
+			if(!empty($r['address_no']))
+				$address->street2 = $r['address_no'];
+
+			if(!empty($r['latitude']))
+				$address->latitude = $r['latitude'];
+
+			if(!empty($r['longitude']))
+				$address->longitude = $r['longitude'];
 
 			if ($address->isModified()) {
+				$address->type = Address::TYPE_HOME;
+				$address->cutPropertiesToColumnLength();
 				$contact->addresses[] = $address;
 			}
 
@@ -767,34 +782,66 @@ class Migrate63to64 {
 
 
 			$address = new Address();
-			$address->type = Address::TYPE_VISIT;
-			$address->countryCode = isset($r['country']) && \go\core\validate\CountryCode::validate(strtoupper($r['country'])) ? strtoupper($r['country']) : null;
-			$address->state =!empty($r['state']) ?$r['state'] : null;
-			$address->city = !empty($r['city']) ?$r['city'] : null;
-			$address->zipCode = !empty($r['zip']) ?$r['zip'] : null;
-			$address->street = !empty($r['address']) ?$r['address'] : null;
-			$address->street2 = !empty($r['address_no']) ?$r['address_no'] : null;
-			$address->latitude = !empty($r['latitude']) ? $r['latitude'] : null;
-			$address->longitude = !empty($r['longitude']) ?$r['longitude'] : null;
-			$address->cutPropertiesToColumnLength();
+
+			if(!empty($r['country']) && \go\core\validate\CountryCode::validate(strtoupper($r['country'])))
+				$address->countryCode = strtoupper($r['country']);
+
+			if(!empty($r['state']))
+				$address->state = $r['state'];
+
+			if(!empty($r['city']))
+				$address->city = $r['city'];
+
+			if(!empty($r['zip']))
+				$address->zipCode = $r['zip'];
+
+			if(!empty($r['address']))
+				$address->street = $r['address'];
+
+			if(!empty($r['address_no']))
+				$address->street2 = $r['address_no'];
+
+			if(!empty($r['latitude']))
+				$address->latitude = $r['latitude'];
+
+			if(!empty($r['longitude']))
+				$address->longitude = $r['longitude'];
 
 			if ($address->isModified()) {
+				$address->cutPropertiesToColumnLength();
+				$address->type = Address::TYPE_VISIT;
 				$contact->addresses[] = $address;
 			}
 
 			$address = new Address();
-			$address->type = Address::TYPE_POSTAL;
-			$address->countryCode = isset($r['post_country']) && \go\core\validate\CountryCode::validate(strtoupper($r['post_country'])) ? strtoupper($r['post_country']) : null;
-      $address->state =!empty($r['post_state']) ?$r['post_state'] : null;
-      $address->city = !empty($r['post_city']) ?$r['post_city'] : null;
-      $address->zipCode = !empty($r['post_zip']) ?$r['post_zip'] : null;
-      $address->street = !empty($r['post_address']) ?$r['post_address'] : null;
-      $address->street2 = !empty($r['post_address_no']) ?$r['post_address_no'] : null;
-      $address->latitude = !empty($r['post_latitude']) ? $r['post_latitude'] : null;
-      $address->longitude = !empty($r['post_longitude']) ?$r['post_longitude'] : null;
-			$address->cutPropertiesToColumnLength();
+
+			if(!empty($r['country']) && \go\core\validate\CountryCode::validate(strtoupper($r['post_country'])))
+				$address->countryCode = strtoupper($r['post_country']);
+
+			if(!empty($r['post_state']))
+				$address->state = $r['post_state'];
+
+			if(!empty($r['post_city']))
+				$address->city = $r['post_city'];
+
+			if(!empty($r['post_zip']))
+				$address->zipCode = $r['post_zip'];
+
+			if(!empty($r['post_address']))
+				$address->street = $r['post_address'];
+
+			if(!empty($r['post_address_no']))
+				$address->street2 = $r['post_address_no'];
+
+			if(!empty($r['post_latitude']))
+				$address->latitude = $r['post_latitude'];
+
+			if(!empty($r['post_longitude']))
+				$address->longitude = $r['post_longitude'];
 
 			if ($address->isModified()) {
+				$address->cutPropertiesToColumnLength();
+				$address->type = Address::TYPE_POSTAL;
 				$contact->addresses[] = $address;
 			}
 
