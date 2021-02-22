@@ -95,16 +95,18 @@ GO.email.MessagesGrid = function(config){
 			cls: 'go-paging-tb',
 			store: config.store,
 			pageSize: parseInt(GO.settings['max_rows_list']),
-			displayInfo: true,
-			displayMsg: t("Total: {2}"),
+			//displayInfo: true,
+			//displayMsg: t("Total: {2}"),
 			emptyMsg: t("No items to display")
 		});
-		
+	config.bbar.refresh.setVisible(false);
+
 	config.autoExpandColumn='message';
 
-	config.view = new Ext.grid.GroupingView({
+	config.view = new go.grid.GroupingView({
 		groupTextTpl:'{group}',
 		emptyText: t("No items to display"),
+		totalDisplay: true,
 		getRowClass:function(row, index) {
 			return (row.data.seen == '0') ? 'ml-unseen-row' : 'ml-seen-row';
 		}		
@@ -388,7 +390,7 @@ GO.email.MessagesGrid = function(config){
 
 }
 
-Ext.extend(GO.email.MessagesGrid, GO.grid.GridPanel,{
+Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 	
 	show : function()
 	{

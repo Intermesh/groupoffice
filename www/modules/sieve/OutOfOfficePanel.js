@@ -63,7 +63,7 @@ GO.sieve.OutOfOfficePanel = Ext.extend(Ext.Panel,{
 		
 		this.scheduleFieldset = new Ext.form.FieldSet({
 			title: t("Schedule", "sieve"),
-			height:130,
+			autoHeight: true,
 			collapsed: false,
 			labelWidth: 180,
 			items:[this.scheduleText,this.scheduleActivateField,this.scheduleDeactivateField]

@@ -278,10 +278,15 @@ abstract class Property extends Model {
 					$this->{$relation->name} = $prop;					
 				break;
 
-				case Relation::TYPE_SCALAR:					
-					$stmt =$this->queryScalar($where, $relation);
-					$scalar = $stmt->fetchAll();
-					$stmt->closeCursor();
+				case Relation::TYPE_SCALAR:
+
+					if($this->isNew()) {
+						$scalar = [];
+					} else {
+						$stmt = $this->queryScalar($where, $relation);
+						$scalar = $stmt->fetchAll();
+						$stmt->closeCursor();
+					}
 					$this->{$relation->name} = $scalar;
 				break;
 			}
@@ -1253,11 +1258,13 @@ abstract class Property extends Model {
 	private function saveRelatedHasOne(Relation $relation) {
 		
 		//remove old model if it's replaced
-		$modified = $this->getModified([$relation->name]);
-		if (isset($modified[$relation->name][1])) {
-			if (!$modified[$relation->name][1]->internalDelete((new Query)->where($modified[$relation->name][1]->primaryKeyValues()))) {
-				$this->relatedValidationErrors = $modified[$relation->name][1]->getValidationErrors();
-				return false;
+		if(!$this->isNew()) {
+			$modified = $this->getModified([$relation->name]);
+			if (isset($modified[$relation->name][1])) {
+				if (!$modified[$relation->name][1]->internalDelete((new Query)->where($modified[$relation->name][1]->primaryKeyValues()))) {
+					$this->relatedValidationErrors = $modified[$relation->name][1]->getValidationErrors();
+					return false;
+				}
 			}
 		}
 
@@ -1469,8 +1476,10 @@ abstract class Property extends Model {
 		//copy for overloaded properties because __get can't return by reference because we also return null sometimes.
 		$models = $this->{$relation->name} ?? [];		
 		$this->relatedValidationErrorIndex = 0;
-		
-		$this->removeRelated($relation, $models, $modified[$relation->name][1]);		
+
+		if(!$this->isNew()) {
+			$this->removeRelated($relation, $models, $modified[$relation->name][1]);
+		}
 		
 		$this->{$relation->name} = [];
 		foreach ($models as $newProp) {

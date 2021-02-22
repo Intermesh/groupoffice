@@ -528,7 +528,9 @@ use const GO_CONFIG_FILE;
 			
 			if($onDestruct) {				
 				$this->rebuildCacheOnDestruct = $onDestruct;
-			}			
+			}
+
+			$this->rebuildCacheOnDestruct = false;
 			
 			\GO::clearCache(); //legacy
 
@@ -752,7 +754,11 @@ use const GO_CONFIG_FILE;
 			go()->getDbConnection()->update('core_entity', ['highestModSeq' => 0])->execute();
 			go()->getDbConnection()->exec("TRUNCATE TABLE core_change");
 			go()->getDbConnection()->exec("TRUNCATE TABLE core_acl_group_changes");
+
+			// Disable keys otherwise this might take very long!
+			go()->getDbConnection()->exec("SET unique_checks=0; SET foreign_key_checks=0;");
 			go()->getDbConnection()->insert('core_acl_group_changes', (new Query())->select("null, aclId, groupId, '0', null")->from("core_acl_group"))->execute();
+			go()->getDbConnection()->exec("SET unique_checks=1; SET foreign_key_checks=1;");
 		}
 
 		/**

@@ -21,8 +21,15 @@ end 6.5
 --------
 
 
+23-02-2021 6.4.222
+- Core: Fixed mobile screen orientation in responsive layout
+- Core: Fixed creating thumbnails of some GIF files
+- Core: small UI improvements for mobile compatability
+- Address book: Much faster migration from v6.3
+
 20-02-2021 6.4.221
 - Files: Fixed error in getDefaultHandler method
+- Core: set ScrollLoader page size to limit from parameters
 
 18-02-2021 6.4.220
 - Projects2: Added status filter to projects report

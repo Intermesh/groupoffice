@@ -22,6 +22,7 @@ Modules.js
 
 panels/ScrollLoader.js
 grid/GridView.js
+grid/GroupingView.js
 grid/GridTrait.js
 grid/plugin/Sortable.js
 grid/GridPanel.js

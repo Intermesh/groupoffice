@@ -142,7 +142,7 @@ class Link extends AclItemEntity
 		}
 	}
 
-	
+
 	public function setToEntity($entityName) {
 		$e = EntityType::findByName($entityName);
 		$this->toEntity = $e->getName();
@@ -233,7 +233,7 @@ class Link extends AclItemEntity
 	 * @param Entity|ActiveRecord  $b
 	 * @return boolean
 	 */
-	public static function exists($a, $b) {
+	public static function linkExists($a, $b) {
 		return static::findLink($a, $b) !== false;
 	}
 	/**
@@ -264,7 +264,7 @@ class Link extends AclItemEntity
 			'fromId' => $a->id
 		]);
 	}
-	
+
 	/**
 	 * Delete a link between two entities
 	 * 
@@ -389,9 +389,12 @@ class Link extends AclItemEntity
 	 * @return int
 	 */
 	public function getPermissionLevel() {
-		if(!isset($this->aclId)) {
-			$search = Search::find(['aclId'])->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
-			$this->aclId = $search->findAclId();
+		if($this->isNew() && empty($this->aclId)) {
+			$e = $this->findToEntity();
+			if(!$e) {
+				throw new \Exception("Could not find to entity in link");
+			}
+			$this->aclId = $e->findAclId();
 		}
 
 		if(!isset($this->permissionLevel)) {

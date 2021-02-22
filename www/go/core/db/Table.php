@@ -258,7 +258,6 @@ class Table {
 	private function processIndexes($tableName) {
 		$query = "SHOW INDEXES FROM `" . $tableName . "`";
 
-		$stmt = $this->conn->query($query);
 		$unique = [];
 
 		//group keys;

@@ -1,11 +1,13 @@
 <?php
 namespace go\core\cli\controller;
 
+use GO\Base\Observable;
 use go\core\cache\None;
 use go\core\Controller;
 use go\core\db\Table;
 use go\core\event\EventEmitterTrait;
 use go\core\model\CronJobSchedule;
+use go\core\event\Listeners;
 use go\core\model\Module;
 
 use function GO;
@@ -39,7 +41,9 @@ class System extends Controller {
 	 */
 	public function upgrade() {
 
-		go()->rebuildCache();
+		Observable::cacheListeners();
+		Listeners::get()->init();
+
 		go()->setCache(new None());
 		go()->getInstaller()->isValidDb();
 		Table::destroyInstances();
