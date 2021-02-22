@@ -28,7 +28,11 @@ go.panels.ScrollLoader = {
 			}, this, {single: true});
 
 			this.store.on("load", function(store, records, o){
+				// Set page size to limit parameter
 				var limit = o.params && o.params.limit ? o.params.limit: this.pageSize;
+				if(limit !== this.pageSize) {
+					this.pageSize = limit;
+				}
 				this.allRecordsLoaded = (records.length < limit);
 				//If this element or any parent is hidden then  this.el.dom.offsetParent == null
 				if(this.rendered && this.el.dom.offsetParent) {

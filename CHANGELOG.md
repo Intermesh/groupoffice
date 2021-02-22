@@ -5,6 +5,7 @@
 
 20-02-2021 6.4.221
 - Files: Fixed error in getDefaultHandler method
+- Core: set ScrollLoader page size to limit from parameters
 
 18-02-2021 6.4.220
 - Projects2: Added status filter to projects report
