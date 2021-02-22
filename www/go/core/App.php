@@ -523,7 +523,9 @@ use const GO_CONFIG_FILE;
 			
 			if($onDestruct) {				
 				$this->rebuildCacheOnDestruct = $onDestruct;
-			}			
+			}
+
+			$this->rebuildCacheOnDestruct = false;
 			
 			\GO::clearCache(); //legacy
 

@@ -142,6 +142,8 @@ class Migrate63to64 {
 		}
 
 		Entity::$checkFilesFolder = true;
+		// to speed things up
+		Contact::$updateSearch = true;
 	}
 
   /**
