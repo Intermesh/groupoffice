@@ -1,3 +1,8 @@
+*-02-2021 6.4.222
+- Core: Fixed mobile screen orientation in responsive layout
+- Core: Fixed creating thumbnails of some GIF files
+- Core: small UI improvements for mobile compatability
+
 20-02-2021 6.4.221
 - Files: Fixed error in getDefaultHandler method
 
