@@ -165,6 +165,7 @@ Module.js
 
 cron/Stores.js
 cron/CronDialog.js
+cron/NewCronDialog.js
 cron/ParametersPanel.js
 cron/PeriodGrid.js
 cron/SystemSettingsCronGrid.js
