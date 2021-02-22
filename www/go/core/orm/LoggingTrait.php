@@ -2,23 +2,24 @@
 namespace go\core\orm;
 
 use Exception;
+use go\core\Installer;
 use go\core\model\Log;
 use go\core\model\Module;
 
 trait LoggingTrait {
 
-	private static $enabled = true;
+	//private static $enabled = true;
 
 	public static function enable() {
-		static::$enabled = true;
+		//self::$enabled = true;
 	}
 
 	public static function disable() {
-		static::$enabled = false;
+		//self::$enabled = false;
 	}
 
 	public static function isEnabled() {
-		return static::$enabled;
+		return !Installer::isInProgress();
 	}
 
 
@@ -113,7 +114,7 @@ trait LoggingTrait {
 	 */
 	protected function log($action) {
 
-		if(!self::$enabled) {
+		if(!self::isEnabled()) {
 			return true;
 		}
 	
@@ -144,7 +145,7 @@ trait LoggingTrait {
 
 	protected static function logDelete(Query $query) {
 
-		if(!self::$enabled) {
+		if(!self::isEnabled()) {
 			return true;
 		}
 
