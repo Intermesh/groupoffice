@@ -102,6 +102,23 @@ class Link extends AclItemEntity
 	public function getToEntity() {
 		return $this->toEntity;
 	}
+
+	/**
+	 * Find the entity it links to
+	 *
+	 * @return \go\core\orm\Entity|ActiveRecord
+	 * @throws \Exception
+	 */
+	public function findToEntity() {
+		$e = EntityType::findByName($this->toEntity);
+		$cls = $e->getClassName();
+
+		if(is_a($cls, Entity::class, true)) {
+			return $cls::findById($this->toId);
+		} else{
+			return $cls::model()->findByPk($this->toId);
+		}
+	}
 	
 	public function setToEntity($entityName) {
 		$e = EntityType::findByName($entityName);
@@ -174,7 +191,7 @@ class Link extends AclItemEntity
 	 * @param Entity|ActiveRecord  $b
 	 * @return boolean
 	 */
-	public static function exists($a, $b) {
+	public static function linkExists($a, $b) {
 		return static::findLink($a, $b) !== false;
 	}
 	/**
@@ -267,7 +284,7 @@ class Link extends AclItemEntity
 		$reverse['createdAt'] = $this->createdAt;
 		
 		if($this->isNew()) {			
-			$this->updateDataFromSearch();
+			//$this->updateDataFromSearch();
 			return App::get()->getDbConnection()->insertIgnore('core_link', $reverse)->execute();
 		}
 
@@ -277,19 +294,19 @@ class Link extends AclItemEntity
 		)->execute();
 	}
 
-	private function updateDataFromSearch() {
-		//make sure the aclId, description and name are set so they are returned to the client
-		if(!isset($this->toSearchId) || !isset($this->aclId)) {
-			$search = Search::find()->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
-			if(!$search) {
-				throw new \Exception("Could not find entity from search cache. Please run System settings -> Tools -> Update search index");
-			}
-			$this->toDescription = $search->description;
-			$this->toName = $search->name;
-			$this->toSearchId = $search->id;
-			$this->aclId = $search->findAclId();
-		}
-	}
+//	private function updateDataFromSearch() {
+//		//make sure the aclId, description and name are set so they are returned to the client
+//		if(!isset($this->toSearchId) || !isset($this->aclId)) {
+//			$search = Search::find()->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
+//			if(!$search) {
+//				throw new \Exception("Could not find entity from search cache. Please run System settings -> Tools -> Update search index");
+//			}
+//			$this->toDescription = $search->description;
+//			$this->toName = $search->name;
+//			$this->toSearchId = $search->id;
+//			$this->aclId = $search->findAclId();
+//		}
+//	}
 	
 	protected static function internalDelete(Query $query) {		
 
@@ -317,8 +334,12 @@ class Link extends AclItemEntity
 	 * @return int
 	 */
 	public function getPermissionLevel() {
-		if($this->isNew()) {			
-			$this->updateDataFromSearch();
+		if($this->isNew() && empty($this->aclId)) {
+			$e = $this->findToEntity();
+			if(!$e) {
+				throw new \Exception("Could not find to entity in link");
+			}
+			$this->aclId = $e->findAclId();
 		}
 
 		if(!isset($this->permissionLevel)) {

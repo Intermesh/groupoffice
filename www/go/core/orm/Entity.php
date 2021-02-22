@@ -151,6 +151,41 @@ abstract class Entity extends Property {
 		return static::internalFindById($id, $properties, $readOnly);
 	}
 
+	private static $existingIds = [];
+
+	/**
+	 * Check if an ID exists in the database in the most efficient way. It also caches the result
+	 * during the same request.
+	 *
+	 * @param $id
+	 * @return bool
+	 * @throws Exception
+	 */
+	public static function exists($id)
+	{
+
+		if(empty($id)) {
+			return false;
+		}
+
+		$key = static::class . ":" .$id;
+
+		if(in_array($key, self::$existingIds)) {
+			return true;
+		}
+		$user = go()->getDbConnection()
+			->selectSingleValue('id')
+			->from(self::getMapping()->getPrimaryTable()->getName())
+			->where('id', '=', $id)->single();
+
+		if($user) {
+			self::$existingIds[] = $key;
+		}
+
+		return $user != false;
+
+	}
+
 	/**
 	 * Find entities by ids.
 	 *

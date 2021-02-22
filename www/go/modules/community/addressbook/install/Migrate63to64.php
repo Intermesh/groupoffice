@@ -45,6 +45,9 @@ class Migrate63to64 {
 		Table::destroyInstances();
 
 		Entity::$checkFilesFolder = false;
+
+		// to speed things up
+		Contact::$updateSearch = false;
 		
 		$this->countries = go()->t('countries');
 		
@@ -336,7 +339,8 @@ class Migrate63to64 {
 		\go\core\db\Table::destroyInstances();
 	}
 	
-	public function migrateCompanyLinksAndComments() {		
+	public function migrateCompanyLinksAndComments() {
+
 		echo "Migrating links\n";
 		flush();
 		$companyEntityType =  (new Query)
@@ -389,18 +393,20 @@ class Migrate63to64 {
 			go()->getDbConnection()->exec("update comments_comment n set entityTypeId=(select id from core_entity where clientName='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = (select id from core_entity where clientName='Company');");
 		}
 
+		go()->getDbConnection()
+			->update("core_search",
+				[
+					'entityTypeId' => Contact::entityType()->getId(),
+					'entityId' => new \go\core\db\Expression('entityId + ' . $this->getCompanyIdIncrement())
+				],
+				['entityTypeId' => $companyEntityType->getId()])
+			->execute();
+
+
 		go()->getDbConnection()->delete("core_entity", ['clientName' => "Company"])->execute();
 
 		go()->getDbConnection()->commit();
-		
-//		go()->getDbConnection()
-//						->update("core_search", 
-//										[
-//												'entityTypeId' => Contact::entityType()->getId(),
-//												'entityId' => new \go\core\db\Expression('entityId + ' . $this->getCompanyIdIncrement())
-//										], 
-//										['entityTypeId' => $companyEntityType->getId()])
-//						->execute();
+
 	}
 	
 	public function migrateCustomField() {
@@ -441,6 +447,9 @@ class Migrate63to64 {
 		}
 		return $this->companyIdIncrement;
 	}
+
+
+
 
 
 	private function copyContacts(AddressBook $addressBook, $orphans = false) {
@@ -649,8 +658,8 @@ class Migrate63to64 {
 
 			$contact->createdAt = new DateTime("@" . $r['ctime']);
 			$contact->modifiedAt = new DateTime("@" . $r['mtime']);
-			$contact->createdBy = \go\core\model\User::findById($r['user_id'], ['id']) ? $r['user_id'] : 1;
-			$contact->modifiedBy = \go\core\model\User::findById($r['muser_id'], ['id']) ? $r['muser_id'] : 1;			
+			$contact->createdBy = \go\core\model\User::exists($r['user_id']) ? $r['user_id'] : 1;
+			$contact->modifiedBy = \go\core\model\User::exists($r['muser_id']) ? $r['muser_id'] : 1;
 			$contact->goUserId = empty($r['go_user_id']) || !\go\core\model\User::findById($r['go_user_id'], ['id']) || Contact::findForUser($r['go_user_id'], ['id']) ? null : $r['go_user_id'];
 
 			if ($r['photo']) {
@@ -811,8 +820,8 @@ class Migrate63to64 {
 
 			$contact->createdAt = new DateTime("@" . $r['ctime']);
 			$contact->modifiedAt = new DateTime("@" . $r['mtime']);
-			$contact->createdBy = \go\core\model\User::findById($r['user_id'], ['id']) ? $r['user_id'] : 1;
-			$contact->modifiedBy = \go\core\model\User::findById($r['muser_id'], ['id']) ? $r['muser_id'] : 1;
+			$contact->createdBy = \go\core\model\User::exists($r['user_id']) ? $r['user_id'] : 1;
+			$contact->modifiedBy = \go\core\model\User::exists($r['muser_id']) ? $r['muser_id'] : 1;
 
 			$contact->IBAN = $r['iban'];
 			$contact->BIC = $r['bank_bic'];
