@@ -20,7 +20,7 @@ go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
 							name: "passwordMinLength",
 							decimals: 0,
 							value: 6,
-							width: dp(48)
+							width: dp(72)
 						},
 						this.domainCombo,
 						{
@@ -30,7 +30,7 @@ go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
 							name: "logoutWhenInactive",
 							decimals: 0,
 							value: 0,
-							width: dp(48)
+							width: dp(72)
 						}
 					]
 			},
