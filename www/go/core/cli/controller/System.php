@@ -1,12 +1,14 @@
 <?php
 namespace go\core\cli\controller;
 
+use GO\Base\Observable;
 use go\core\cache\None;
 use go\core\Controller;
 use go\core\db\Query;
 use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
+use go\core\event\Listeners;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\model\Module;
@@ -37,7 +39,9 @@ class System extends Controller {
 	 */
 	public function upgrade() {
 
-		go()->rebuildCache();
+		Observable::cacheListeners();
+		Listeners::get()->init();
+
 		go()->setCache(new None());
 		go()->getInstaller()->isValidDb();
 		Table::destroyInstances();

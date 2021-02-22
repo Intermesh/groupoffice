@@ -353,38 +353,22 @@ class Migrate63to64 {
 			return;
 		}
 		
-//		go()->getDbConnection()
-//						->delete(
-//										'core_link', 
-//										(new \go\core\db\Query)
-//										->where(['fromEntityTypeId' => Contact::entityType()->getId()])
-//										->andWhere('fromId', 'NOT IN', Contact::find()->select('id'))
-//										)->execute();
-//		
-//		go()->getDbConnection()
-//						->delete(
-//										'core_link', 
-//										(new \go\core\db\Query)
-//										->where(['toEntityTypeId' => Contact::entityType()->getId()])
-//										->andWhere('toId', 'NOT IN', Contact::find()->select('id'))
-//										)->execute();
-		
 		go()->getDbConnection()->beginTransaction();
 		go()->getDbConnection()
-						->update("core_link", 
+						->update("core_link",
 										[
 												'fromEntityTypeId' => Contact::entityType()->getId(),
 												'fromId' => new \go\core\db\Expression('fromId + ' . $this->getCompanyIdIncrement())
-										], 
+										],
 										['fromEntityTypeId' => $companyEntityType['id']])
 						->execute();
-		
+
 		go()->getDbConnection()
-						->update("core_link", 
+						->update("core_link",
 										[
 												'toEntityTypeId' => Contact::entityType()->getId(),
 												'toId' => new \go\core\db\Expression('toId + ' . $this->getCompanyIdIncrement())
-										], 
+										],
 										['toEntityTypeId' => $companyEntityType['id']])
 						->execute();
 
@@ -399,7 +383,7 @@ class Migrate63to64 {
 					'entityTypeId' => Contact::entityType()->getId(),
 					'entityId' => new \go\core\db\Expression('entityId + ' . $this->getCompanyIdIncrement())
 				],
-				['entityTypeId' => $companyEntityType->getId()])
+				['entityTypeId' => $companyEntityType['id']])
 			->execute();
 
 
