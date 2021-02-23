@@ -822,6 +822,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	addGridHandlers : function(grid)
 	{
 		grid.on("rowcontextmenu", function(grid, rowIndex, e) {
+			e.stopEvent();
 			var coords = e.getXY();
 
 			var selectedMailboxFolder = this.treePanel.getSelectionModel().getSelectedNode();
