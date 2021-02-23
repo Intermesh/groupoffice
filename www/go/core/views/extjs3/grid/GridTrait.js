@@ -56,6 +56,16 @@ go.grid.GridTrait = {
 		if(this.multiSelectToolbarEnabled && this.getTopToolbar() && !this.getSelectionModel().singleSelect) {
 			this.initMultiSelectToolbar();
 		}
+
+		//select row when action button is clicked
+		if(this.getView().actionConfig) {
+
+			this.on('viewready', function(){
+				this.getView().actionBtn.on('click', function(btn) {
+					this.getSelectionModel().selectRow(btn.rowIndex);
+				}, this);
+			}, this, {single: true});
+		}
 	},
 
 	initMultiSelectToolbar : function() {

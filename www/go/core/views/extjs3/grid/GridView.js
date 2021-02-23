@@ -98,11 +98,16 @@ Ext.define('go.grid.GridView', {
 				cls: "primary",
 				style: "position:absolute; z-index: 99999999; left: -9999999; top: -9999999",
 				renderTo: this.el,
-				handler: this.actionConfig.hander,
+				handler: this.actionConfig.handler,
 				scope: this.actionConfig.scope,
 				menu: this.actionConfig.menu
 			});
-			this.scroller.dom.addEventListener("scroll", () => this.actionBtn.hide());
+			this.scroller.dom.addEventListener("scroll", () => {
+				this.actionBtn.hide()
+				if(this.actionBtn.menu) {
+					this.actionBtn.menu.hide();
+				}
+			});
 		}
 	},
 
@@ -112,6 +117,9 @@ Ext.define('go.grid.GridView', {
 		}
 
 		this.actionBtn.show();
+  	if(this.actionBtn.menu) {
+			this.actionBtn.menu.hide();
+		}
 
   	var rowEl = Ext.get(this.getRow(rowIndex));
 
