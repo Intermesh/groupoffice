@@ -54,6 +54,7 @@ class CronJobSchedule extends Entity {
 
 		if (isset($this->expression) && !CronExpression::isValidExpression($this->expression)) {
 			$this->setValidationError('expression', ErrorCode::MALFORMED);
+			return false;
 		}
 		
 		if($this->isModified('name')) {

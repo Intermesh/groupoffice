@@ -12,18 +12,21 @@ go.cron.NewCronDialog = Ext.extend(go.form.Dialog, {
 
 	initFormItems: function () {
 		return [{
+			xtype: "fieldset",
+			items: [{
 				xtype: 'textfield',
 				fieldLabel: t('Description'),
 				name: 'description'
-			},{
+			}, {
 				xtype: 'textfield',
 				fieldLabel: t('Expression'),
 				name: 'expression'
-			},{
+			}, {
 				xtype: 'checkbox',
 				fieldLabel: t('Enabled'),
 				name: 'enabled'
-			}];
+			}]
+		}];
 	}
 });
 
