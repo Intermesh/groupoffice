@@ -391,7 +391,9 @@ GO.email.MessagesGrid = function(config){
 }
 
 Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
-	
+
+	deleteSelected: GO.grid.GridPanel.prototype.deleteSelected,
+
 	show : function()
 	{
 		if(GO.email.messagesGrid.store.baseParams['unread'] === 1 || GO.email.messagesGrid.store.baseParams['unread'] === true){

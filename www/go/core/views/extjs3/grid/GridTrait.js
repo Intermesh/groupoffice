@@ -15,6 +15,10 @@ go.grid.GridTrait = {
 
 	multiSelectToolbarEnabled: true,
 
+	moveDirection: 'up',
+
+	lastSelectedIndex: false,
+
 	initGridTrait : function() {
 		if (!this.keys)
 		{
@@ -203,6 +207,12 @@ go.grid.GridTrait = {
 	//It buffers keyboard actions and it doesn't fire when ctrl or shift is used for multiselection
 	initNav : function() {
 		this.addEvents({navigate: true});
+
+		this.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
+			this.moveDirection = this.lastSelectedIndex !== false && this.lastSelectedIndex < this.getSelectionModel().lastActive ? 'down' : 'up';
+			this.lastSelectedIndex =  rowIndex;
+		}, this);
+
 		this.on('rowclick', function(grid, rowIndex, e){			
 
 			if(!e.ctrlKey && !e.shiftKey)
@@ -225,7 +235,7 @@ go.grid.GridTrait = {
 				}
 			}			
 		}, this, {
-			buffer: 100
+			buffer: 300
 		});
 	},
 	
@@ -278,15 +288,45 @@ go.grid.GridTrait = {
 			
 		}, this);
 	},
+
+	selectNextAfterDelete : function() {
+
+		var index = -1;
+
+		if(this.getSelectionModel().lastActive) {
+			index = this.moveDirection == 'up' ? this.getSelectionModel().lastActive - 1 : this.getSelectionModel().lastActive;
+		}
+
+		if(index > -1 && index < this.store.getCount()) {
+			this.getSelectionModel().selectRow(index);
+		} else
+		{
+			this.moveDirection == 'up' ? this.getSelectionModel().selectFirstRow() : this.getSelectionModel().selectLastRow();
+		}
+
+		var record = this.getSelectionModel().getSelected();
+
+		if(record) {
+			var rowIndex = this.store.indexOf(record);
+			this.fireEvent('navigate', this, rowIndex, record);
+		}
+	},
 	
 	doDelete : function(selectedRecords) {
 
 		var me = this;
 		this.getEl().mask(t("Deleting..."));
 
+
+
 		var prom = this.getStore().entityStore.set({
 			destroy:  selectedRecords.column("id")
 		}).then(function(result){
+
+			setTimeout(function() {
+				me.selectNextAfterDelete();
+			});
+
 			if(!result.notDestroyed) {
 				return;
 			}
