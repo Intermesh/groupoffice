@@ -79,7 +79,9 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			tbar: [{
 					xtype: "tbtitle",
 					text: t("Address books")
-				}, '->', {
+				}, '->',{
+					xtype: "tbsearch"
+				}, {
 					disabled: !go.Modules.isAvailable("community", "addressbook", go.permissionLevels.manage),
 					iconCls: 'ic-add',
 					tooltip: t("Add"),

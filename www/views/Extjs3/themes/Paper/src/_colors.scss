@@ -5,6 +5,13 @@
 	@return map-get($color,$hue);
 }
 
+/*
+ * Convert transparent color to hex value by given background
+ */
+@function rgba-to-rgb($rgba, $background: #fff) {
+	@return mix(rgb(red($rgba), green($rgba), blue($rgba)), $background, alpha($rgba) * 100%);
+}
+
 $black-87-opacity: rgba(black, 0.87) !default;
 $white-87-opacity: rgba(white, 0.87) !default;
 
@@ -81,6 +88,8 @@ $bg: (
 $cPrimary: rgb(36, 58, 128) !default;
 $cPrimaryTp:	rgba(36, 58, 128, 0.16) !default;
 $cHeaderBg: 	$cPrimary !default;
+
+
 
 $cSecondary: rgb(104, 159, 56) !default;
 $cAccent:		#ff9100 !default;

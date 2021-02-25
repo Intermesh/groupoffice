@@ -295,22 +295,22 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 
 		var form = this.findParentByType("entityform");
 
-		if(!form) {
-			return;
-		}
-		this.value = form.entityStore.entity.defaultAcl;
+		if(form) {
+			this.value = form.entityStore.entity.defaultAcl;
 
-		form.on("load", function(f, v) {
-			this.setDisabled(v.permissionLevel < go.permissionLevels.manage);
-		}, this);
+			form.on("load", function(f, v) {
+				this.setDisabled(v.permissionLevel < go.permissionLevels.manage);
+			}, this);
+		}
+
 
 		//Check form currentId becuase when form is loading then it will load the store on setValue later.
 		//Set timeout is used to make sure the check will follow after a load call.
 		var me = this;
 		setTimeout(function() {
-			if(!go.util.empty(me.value) && !form.currentId) {				
+			//if(!go.util.empty(me.value) && !form.currentId) {
 				me.store.load().catch(function(){}); //ignore failed load becuase onBeforeStoreLoad can return false
-			}
+			//}
 		}, 0);		
 	},
 	
@@ -334,7 +334,10 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	setValue: function (groups) {
 		this._isDirty = false;		
 		this.value = groups;
-		this.store.load().catch(function(){}); //ignore failed load becuase onBeforeStoreLoad can return false
+		if(this.rendered) {
+			this.store.load().catch(function () {
+			}); //ignore failed load becuase onBeforeStoreLoad can return false
+		}
 	},
 	
 	getSelectedGroupIds : function() {
@@ -359,6 +362,8 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			var selectedGroupIds = this.getSelectedGroupIds();
 			this.store.removeAll();
 		}
+
+		this.getEl().mask(t("Loading.."));
 		
 		go.Db.store("Group").get(selectedGroupIds, function(entities) {
 			this.store.loadData({records: entities}, true);
@@ -373,7 +378,9 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 			}).then(function() {
 				//when reload is called by SSE we need this removed.
 				delete me.store.lastOptions.selectedLoaded;
-			});
+			}).finally(function() {
+				me.getEl().unmask();
+			})
 		}, this);
 		
 		return false;

@@ -27,3 +27,4 @@ class Inline implements FilehandlerInterface{
 		return 'go.util.viewFile("'.$file->getDownloadUrl(false, true).'");';
 	}
 }
+

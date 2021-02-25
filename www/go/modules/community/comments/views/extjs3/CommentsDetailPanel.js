@@ -151,19 +151,16 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 		var badge = "<span class='badge'>" + this.store.getTotalCount() + '</span>';
 		this.setTitle(t("Comments") + badge);
-		this.composer.textField.setValue('');
 		var prevStr;
-		var initScrollHeight = (this.store.getCount() == this.commentsContainer.pageSize) ? 0 : this.commentsContainer.getEl().dom.scrollHeight,
-			 initScrollTop = this.commentsContainer.getEl().dom.scrollTop;
+	//	this.initScrollHeight = (this.store.getCount() == this.commentsContainer.pageSize) ? 0 : this.commentsContainer.getEl().dom.scrollHeight;
+		 this.initScrollTop = this.commentsContainer.getEl().dom.scrollTop;
 
 		this.commentsContainer.removeAll();
 
 		this.store.each(function(r) {
 			
 			var labelText ='', mineCls = r.get("createdBy") == go.User.id ? 'mine' : '';
-			var readMore = new go.detail.ReadMore({
-				cls: 'go-html-formatted ' + mineCls
-			});
+
 			var creator = r.get("creator");
 			if(!creator) {
 				creator = {
@@ -182,10 +179,18 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 			for(var i = 0, l = r.data.labels.length; i < l; i++){
 				labelText += '<i class="icon" title="' + r.data.labels[i].name + '" style="color: #' + r.data.labels[i].color + '">label</i>';
-			} 
-			
+			}
+
+			var readMore = new go.detail.ReadMore({
+				cls: 'go-html-formatted ' + mineCls
+			});
 			readMore.setText(r.get('text'));
 			readMore.insert(1, {xtype:'box',html:labelText, cls: 'tags ' +mineCls});
+
+			// var readMore = new Ext.BoxComponent({
+			// 	cls: 'go-html-formatted ' + mineCls,
+			// 	html: "<div class='content'>" + r.get('text') + "</div><div class='tags "+mineCls+"'>"+labelText+"</div>"
+			// });
 			this.commentsContainer.add({
 				xtype:"container",
 				cls:'go-messages',
@@ -220,11 +225,15 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		var _this = this;
 		setTimeout(function(){
 			
-			var scroll = _this.commentsContainer.getEl();
+
 			_this.body.setHeight(Math.max(50,Math.min(_this.growMaxHeight,height + _this.composer.getHeight())));
 			_this.doLayout();
-			scroll.scroll("b", initScrollTop + (scroll.dom.scrollHeight));
+			_this.scrollDown();
 		});
 
+	},
+	scrollDown : function() {
+		var scroll = this.commentsContainer.getEl();
+		scroll.scroll("b", this.initScrollTop + (scroll.dom.scrollHeight));
 	}
 });

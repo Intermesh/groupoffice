@@ -84,7 +84,8 @@ class Module extends core\Module {
 	public static function onUserBeforeSave(User $user)
 	{
 		if (!$user->isNew() && $user->isModified('displayName')) {
-			$ab = AddressBook::findById($user->addressBookSettings->getDefaultAddressBookId());
+			$oldName = $user->getOldValue('displayName');
+			$ab = AddressBook::find()->where(['createdBy' => $user->id, 'name' => $oldName])->single();
 			if ($ab) {
 				$ab->name = $user->displayName;
 				$ab->save();

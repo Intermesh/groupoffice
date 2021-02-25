@@ -831,7 +831,8 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 				$classes = \GO\Files\FilesModule::getAllFileHandlers();
 				foreach($classes as $class){
 
-					$fileHandler = new $class;
+//					$fileHandler = new $class->name;
+					$fileHandler = new $class();
 					if($fileHandler->isDefault($this)){
 						self::$defaultHandlers[$ex]= $fileHandler;
 						break;

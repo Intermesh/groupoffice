@@ -1,6 +1,6 @@
 @import 'base';
 body, html {
-	font-family: Lato, Verdana, Arial, sans-serif;
+	font-family: Helvetica, Arial, sans-serif;
 	font-size: sp(16);
 	color: color($fg, 'text');
 	font-weight: $font-weight-r;
@@ -40,7 +40,7 @@ code {
 }
 
 p {
-	margin: dp(16) 0;
+	margin: 0;
 }
 
 ul{

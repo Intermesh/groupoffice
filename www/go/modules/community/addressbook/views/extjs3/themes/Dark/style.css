@@ -1,3 +1,6 @@
+/*
+ * Convert transparent color to hex value by given background
+ */
 .go-addressbook-url.homepage:before {
   display: inline-block;
   font-family: "Material Icons";
@@ -63,6 +66,10 @@
 
 .go-addressbook-url-panel {
   text-align: right;
+  position: absolute;
+  display: inline-block;
+  right: 7px;
+  float: right;
   line-height: 17.5px;
 }
 

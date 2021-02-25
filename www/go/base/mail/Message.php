@@ -590,10 +590,12 @@ class Message extends \Swift_Message{
 			$params['htmlbody']=$this->_fixRelativeUrls($params['htmlbody']);
 
 			$style = preg_replace("'/\*.*\*/'", "", file_get_contents(Extjs3::get()->getThemePath() . 'htmleditor.css'));
-						
+
+//			$style .= 'body,p,td,div,span{	'.\GO::config()->html_editor_font.'};';
+
 			$htmlTop = '<html>
 <head>
-<style type="text/css">
+<style type="text/css" id="groupoffice-email-style">
 '.$style.'
 </style>
 </head>

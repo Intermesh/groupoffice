@@ -447,10 +447,10 @@ GO.email.AccountDialog = function(config) {
 
 	var items = [
 		propertiesTab,
-		serverTab, 
-		this.permissionsTab,
+		serverTab,
 		this.filterGrid,
-		this.labelsTab
+		this.labelsTab,
+		this.permissionsTab
 	];
 	
 	this.propertiesPanel = new Ext.form.FormPanel({

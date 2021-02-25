@@ -9,6 +9,8 @@ use go\core\model\Link;
  * @property array $customFields 
  */
 trait SearchableTrait {
+
+	public static $updateSearch = true;
 	
 	/**
 	 * The description in the search results
@@ -57,6 +59,11 @@ trait SearchableTrait {
 	 * @throws \Exception
 	 */
 	public function saveSearch($checkExisting = true) {
+
+		if(!static::$updateSearch) {
+			return true;
+		}
+
 		$search = $checkExisting ? \go\core\model\Search::find()->where('entityTypeId','=', static::entityType()->getId())->andWhere('entityId', '=', $this->id)->single() : false;
 		if(!$search) {
 			$search = new \go\core\model\Search();
@@ -83,10 +90,12 @@ trait SearchableTrait {
 
 		$links = (new Query())
 			->select('description')
+			->distinct()
 			->from('core_link')
 			->where('(toEntityTypeId = :e1 AND toId = :e2)')
-			->orWhere('(fromEntityTypeId = :e3 AND fromId = :e4)')
-			->bind([':e1' => static::entityType()->getId(), ':e2' => $this->id, ':e3' => static::entityType()->getId(), ':e4' => $this->id ]);
+			//->orWhere('(fromEntityTypeId = :e3 AND fromId = :e4)')
+			->bind([':e1' => static::entityType()->getId(), ':e2' => $this->id]);
+				//':e3' => static::entityType()->getId(), ':e4' => $this->id ]);
 		foreach($links->all() as $link) {
 			if(!empty($link['description']) && is_string($link['description'])) {
 				$keywords[] = $link['description'];

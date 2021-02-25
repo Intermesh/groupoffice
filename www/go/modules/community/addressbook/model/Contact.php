@@ -812,10 +812,6 @@ class Contact extends AclItemEntity {
 			//We need the auto increment ID for the UID so we need to save again if this is a new contact
 			$this->getUid();
 			$this->getUri();
-
-			if(!$this->saveUri()) {
-				return false;
-			}
 		}
 
 		if($this->isOrganization && $this->isModified(['name']) && !$this->updateEmployees()) {

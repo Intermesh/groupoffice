@@ -305,26 +305,7 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 	 * paging toolbar.
 	 */
 	paging : false,
-	
-	
-//	selectNextAfterDelete : function(){		
-//		var old = this.lastSelectedIndex;
-//		if(this.currentSelectedIndex>this.lastSelectedIndex){			
-//			//return value is always false somehow so we check with getSelected
-//			this.getSelectionModel().selectRow(this.currentSelectedIndex);
-//			
-//			if(!this.getSelectionModel().getSelected())				
-//				this.getSelectionModel().selectLastRow();
-//		}else
-//		{
-//			//return value is always false somehow so we check with getSelected
-//			this.getSelectionModel().selectRow(this.currentSelectedIndex-1);			
-//			if(!this.getSelectionModel().getSelected())
-//				this.getSelectionModel().selectFirstRow();
-//		}
-//		
-//		this.lastSelectedIndex=old;
-//	},
+
 	selectNextAfterDelete : function(selectNext){	
 
 		switch(selectNext){
@@ -336,37 +317,12 @@ GO.grid.GridPanel =Ext.extend(Ext.grid.GridPanel, {
 				this.getSelectionModel().selectFirstRow();
 				break;
 				
-			default:			
-				//console.log("DEFAULT");
-				//this.getSelectionModel().selectRecords([selectNext]);	
+			default:
 				var index = this.store.indexOfId(selectNext.id);
-//				console.log(index);
 				this.getSelectionModel().selectRow(index);
 				break;
 		}
-//		if(!GO.util.empty(selectNext)){
-//			console.log("NIET LEEG");
-//			this.getSelectionModel().selectRecords([selectNext]);
-//		} else {
-//			console.log("LEEG");
-//			this.getSelectionModel().selectFirstRow();
-//			var old = this.lastSelectedIndex;
-//			if(this.currentSelectedIndex>this.lastSelectedIndex){			
-//				//return value is always false somehow so we check with getSelected
-//				this.getSelectionModel().selectRow(this.currentSelectedIndex);
-//
-//				if(!this.getSelectionModel().getSelected())				
-//					this.getSelectionModel().selectLastRow();
-//			}else
-//			{
-//				//return value is always false somehow so we check with getSelected
-//				this.getSelectionModel().selectRow(this.currentSelectedIndex-1);			
-//				if(!this.getSelectionModel().getSelected())
-//					this.getSelectionModel().selectFirstRow();
-//			}
-//
-//			this.lastSelectedIndex=old;
-//		}
+
 	},
 
 	/**
