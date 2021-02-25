@@ -118,12 +118,8 @@ class SavedMessage extends ComposerMessage {
 		$this->setAttributes($attributes);
 		
 		$this->_getParts($structure);
-		
-		//$this->_loadedBody=  \GO\Base\Util\StringHelper::clean_utf8($this->_loadedBody);
-		//
-		//$this->_loadedBody = str_replace("\x80","€", $this->_loadedBody);
-		//TODO make style rules valid in the container.
-		$this->_loadedBody=\GO\Base\Util\StringHelper::sanitizeHtml($this->_loadedBody);
+
+		$this->_loadedBody = $this->_loadedBody;
 	}
 	
 	private function _getTempDir(){

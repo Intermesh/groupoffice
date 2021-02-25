@@ -382,8 +382,17 @@ class Migrate63to64 {
 		go()->getDbConnection()
 			->update("core_search",
 				[
+					'filter' => 'isContact'
+				],
+				['entityTypeId' => Contact::entityType()->getId()])
+			->execute();
+
+		go()->getDbConnection()
+			->update("core_search",
+				[
 					'entityTypeId' => Contact::entityType()->getId(),
-					'entityId' => new \go\core\db\Expression('entityId + ' . $this->getCompanyIdIncrement())
+					'entityId' => new \go\core\db\Expression('entityId + ' . $this->getCompanyIdIncrement()),
+					'filter' => 'isOrganization'
 				],
 				['entityTypeId' => $companyEntityType['id']])
 			->execute();
