@@ -1,3 +1,5 @@
+- Multi instance: Fixed delete issue when temp dir was in use
+
 25-02-2021 6.4.223
 - LDAP: Sync users with different domain than configured in profile and bug with ActiveDirectory group sync fixed.
 - Email: Fixed e-mail display from Amazon with body inside head !? :(
