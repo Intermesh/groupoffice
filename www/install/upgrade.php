@@ -9,6 +9,7 @@ use go\core\jmap\Entity;
 
 
 if(PHP_SAPI == 'cli') {
+	chdir(__DIR__);
 	function parseArgs() {
 		global $argv;
 
