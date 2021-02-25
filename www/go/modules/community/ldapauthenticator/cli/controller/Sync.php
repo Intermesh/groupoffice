@@ -390,7 +390,7 @@ class Sync extends Controller {
 
 		$accountResult = Record::find($ldapConn, $searchDn, $query);
     $record = $accountResult->fetch();
-    
-		return ['username' => $this->getGOUserName($record, $server), 'email' => $record->mail[0]];
+    //Sometimes mail record doesn't exist. It can't find users by mail address in that case
+		return ['username' => $this->getGOUserName($record, $server), 'email' => $record->mail[0] ?? null];
 	}
 }
