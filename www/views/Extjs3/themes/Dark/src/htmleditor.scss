@@ -1,15 +1,22 @@
 @import 'config';
 @import '../../Paper/src/base';
-@import '../../Paper/src/lato';
+
 body, html {
-	@extend %font-body1;
-	color: color($fg, 'text');
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: sp(16);
+	color: black;
+	font-weight: $font-weight-r;
+	line-height: dp(24);
+
+	@media print {
+		font-size: 12px;
+		line-height: 18px;
+	}
 	text-rendering: optimizeLegibility;
 	-webkit-tap-highlight-color: transparent;
 	-webkit-touch-callout: none;
 	height: 100%;
 }
-
 button, html, input, select, textarea {
 	font-family: $font-family;
 }
