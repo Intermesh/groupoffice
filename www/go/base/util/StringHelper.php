@@ -1072,6 +1072,13 @@ END;
 		$styles = self::extractStyles($html, $prefix);
 
 		$html = preg_replace("'</[\s]*([\w]*)[\s]*>'u","</$1>", $html);
+
+		//strip everything above <body first. This fixes a mail from Amazon that had the body inside the head section :(
+		$bodyPos = stripos($html, '<body');
+
+		if($bodyPos) {
+			$html = self::substr($html, $bodyPos);
+		}
 		
 		$to_removed_array = array (
 		"'<!DOCTYPE[^>]*>'usi",
@@ -1084,6 +1091,7 @@ END;
 		"'<title>.*?</title>'usi",
 		"'<head[^>]*>.*?</head>'usi",
 		"'<head[^>]*>'usi",
+			"'</head[^>]*>'usi",
 		"'<base[^>]*>'usi",
 		"'<meta[^>]*>'usi",
 		"'<bgsound[^>]*>'usi",
@@ -1110,10 +1118,9 @@ END;
 		);
 
 		$html = preg_replace($to_removed_array, '', $html);
-		
-		//Remove any attribute starting with "on" or xmlns. Had to do this always becuase many mails contain weird tags like online="1". 
+		//Remove any attribute starting with "on" or xmlns. Had to do this always becuase many mails contain weird tags like online="1".
 		//These were detected as xss attacks by detectXSS().
-		$html = preg_replace('#(<[^>]+?[\x00-\x20"\'])(?:on|xmlns)[a-z]+[^>]*+>#iu', '$1>', $html);
+		$html = preg_replace('#(<[^>]+?[\x00-\x20"\'])(?:on|xmlns)[^>\s]+([^>]*+>)#iu', '$1$2', $html);
 	
 		//remove high z-indexes
 		$matched_tags = array();
