@@ -71,9 +71,11 @@ Ext.onReady(function() {
 			this.passwordField.setVisible(false);
 			this.confirmPasswordField.setVisible(false);
 
-			this.formPanel.ownerCt.doLayout();
+			//this.formPanel.ownerCt.doLayout();
 			var contentField = this.find('name', 'content')[0];
-			this.findByType("fieldset")[0].items.insert(2,this.checkEncrypt = new Ext.form.Checkbox(
+			var firstFieldSet = this.findByType("fieldset")[0];
+			firstFieldSet.items.itemAt(1).anchor = '0 -120';
+			firstFieldSet.items.insert(2,this.checkEncrypt = new Ext.form.Checkbox(
 				{
 					xtype: 'checkbox',
 					name: 'encryptcheck',

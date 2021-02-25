@@ -16,26 +16,7 @@ go.modules.community.notes.NoteDialog = Ext.extend(go.form.Dialog, {
 		var items = [{
 				xtype: 'fieldset',
 				anchor: fieldSetAnchor,
-				items: [new go.modules.community.notes.NoteBookCombo({
-					value: go.User.notesSettings.defaultNoteBookId,
-					listeners: {
-						valuenotfound: function(cmp, id) {
-							if(id == go.User.notesSettings.defaultNoteBookId) {
-
-								GO.errorDialog.show("Your default notebook wasn't found. Please select a notebook and it will be set as default.");
-
-								cmp.setValue(null);
-
-								cmp.on('change', function(cmp, id) {
-									go.Db.store("User").save({
-										notesSettings: {defaultNoteBookId: id}
-									}, go.User.id);
-								}, {single: true});
-							}
-						},
-						scope: this
-					}
-				}),
+				items: [
 					{
 						xtype: 'textfield',
 						name: 'name',
@@ -57,7 +38,26 @@ go.modules.community.notes.NoteDialog = Ext.extend(go.form.Dialog, {
 								this.submit();
 							}
 						}
-					}]
+					},new go.modules.community.notes.NoteBookCombo({
+						value: go.User.notesSettings.defaultNoteBookId,
+						listeners: {
+							valuenotfound: function(cmp, id) {
+								if(id == go.User.notesSettings.defaultNoteBookId) {
+
+									GO.errorDialog.show("Your default notebook wasn't found. Please select a notebook and it will be set as default.");
+
+									cmp.setValue(null);
+
+									cmp.on('change', function(cmp, id) {
+										go.Db.store("User").save({
+											notesSettings: {defaultNoteBookId: id}
+										}, go.User.id);
+									}, {single: true});
+								}
+							},
+							scope: this
+						}
+					})]
 			}
 		];
 

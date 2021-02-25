@@ -18,6 +18,7 @@ go.grid.GridTrait = {
 	moveDirection: 'up',
 
 	lastSelectedIndex: false,
+	currentSelectedIndex: false,
 
 	initGridTrait : function() {
 		if (!this.keys)
@@ -219,8 +220,10 @@ go.grid.GridTrait = {
 		this.addEvents({navigate: true});
 
 		this.getSelectionModel().on('rowselect', function (sm, rowIndex, record) {
-			this.moveDirection = this.lastSelectedIndex !== false && this.lastSelectedIndex < this.getSelectionModel().lastActive ? 'down' : 'up';
-			this.lastSelectedIndex =  rowIndex;
+			if(this.currentSelectedIndex != this.lastSelectedIndex) {
+				this.lastSelectedIndex = this.currentSelectedIndex;
+			}
+			this.currentSelectedIndex = rowIndex;
 		}, this);
 
 		this.on('rowclick', function(grid, rowIndex, e){			
@@ -303,9 +306,7 @@ go.grid.GridTrait = {
 
 		var index = -1;
 
-		if(this.getSelectionModel().lastActive) {
-			index = this.moveDirection == 'up' ? this.getSelectionModel().lastActive - 1 : this.getSelectionModel().lastActive;
-		}
+		index = this.moveDirection == 'up' ? this.currentSelectedIndex - 1 : this.currentSelectedIndex;
 
 		if(index > -1 && index < this.store.getCount()) {
 			this.getSelectionModel().selectRow(index);
@@ -327,7 +328,15 @@ go.grid.GridTrait = {
 		var me = this;
 		this.getEl().mask(t("Deleting..."));
 
-
+		//set to first record to make navigation work properly after delete
+		this.moveDirection = this.lastSelectedIndex !== false && this.lastSelectedIndex < this.currentSelectedIndex ? 'down' : 'up';
+		selectedRecords.forEach(function(r) {
+			var rowIndex =  this.getStore().indexOf(r);
+			// console.warn(r, rowIndex);
+			if(rowIndex < this.currentSelectedIndex) {
+				this.currentSelectedIndex = rowIndex;
+			}
+		}, this);
 
 		var prom = this.getStore().entityStore.set({
 			destroy:  selectedRecords.column("id")

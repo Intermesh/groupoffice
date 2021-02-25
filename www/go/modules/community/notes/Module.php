@@ -62,7 +62,8 @@ class Module extends core\Module {
 	public static function onUserBeforeSave(User $user)
 	{
 		if (!$user->isNew() && $user->isModified('displayName')) {
-			$nb = NoteBook::findById($user->notesSettings->getDefaultNoteBookId());
+			$oldName = $user->getOldValue('displayName');
+			$nb = NoteBook::find()->where(['createdBy' => $user->id, 'name' => $oldName])->single();
 			if ($nb) {
 				$nb->name = $user->displayName;
 				$nb->save();
