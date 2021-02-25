@@ -7,6 +7,55 @@ use go\core\util\Lock;
 use GO\Base\Db\ActiveRecord;
 use go\core\jmap\Entity;
 
+
+if(PHP_SAPI == 'cli') {
+	function parseArgs() {
+		global $argv;
+
+		//array_shift($argv);
+		$out = array();
+		$count = count($argv);
+		if ($count > 1) {
+			for ($i = 1; $i < $count; $i++) {
+				$arg = $argv[$i];
+				if (substr($arg, 0, 2) == '--') {
+					$eqPos = strpos($arg, '=');
+					if ($eqPos === false) {
+						$key = substr($arg, 2);
+						$out[$key] = isset($out[$key]) ? $out[$key] : true;
+					} else {
+						$key = substr($arg, 2, $eqPos - 2);
+						$out[$key] = substr($arg, $eqPos + 1);
+					}
+				} else if (substr($arg, 0, 1) == '-') {
+					if (substr($arg, 2, 1) == '=') {
+						$key = substr($arg, 1, 1);
+						$out[$key] = substr($arg, 3);
+					} else {
+						$chars = str_split(substr($arg, 1));
+						foreach ($chars as $char) {
+							$key = $char;
+							$out[$key] = isset($out[$key]) ? $out[$key] : true;
+						}
+					}
+				} else {
+					$out[] = $arg;
+				}
+			}
+		}
+		return $out;
+	}
+
+	$args = parseArgs();
+	if(!empty($args["c"])) {
+		define("GO_CONFIG_FILE", $args['c']);
+	}
+} else{
+	$args = $_GET;
+}
+
+
+
 /**
  * 
  * @return int 62 for 6.2 db and 63 for 6.3 or higher.
@@ -90,7 +139,7 @@ function checkLicenses($is62 = false) {
 			$unavailable[] = $module['name'];
 		}		
 	}
-	if(isset($_GET['ignore']) && count($unavailable)) {
+	if(isset($args['ignore']) && count($unavailable)) {
 		if($is62) {
 			GO()->getDbConnection()->query("update go_modules set enabled=0 where id IN ('".implode("', '",$unavailable)."')");
 		} else {
@@ -103,6 +152,11 @@ function checkLicenses($is62 = false) {
 		. "<ul style=\"font-size:1.5em\"><li>" . implode("</li><li>", $unavailable) . "</li></ul>"
 		. "Please install the license file(s) and refresh this page or disable these modules.\n"
 		. "If you continue the incompatible modules will be disabled.\n\n";
+
+		if(PHP_SAPI == 'cli') {
+			echo "\n\nPass --ignore to continue\n";
+		}
+
 		return false;
 	}
 	
@@ -112,21 +166,20 @@ function checkLicenses($is62 = false) {
 
 
 try {
-	
+
 	require('../vendor/autoload.php');
-	
-	require("gotest.php");
-	if(!systemIsOk()) {
-		header("Location: test.php");
-		exit();
+
+	if (PHP_SAPI != 'cli') {
+		require("gotest.php");
+		if (!systemIsOk()) {
+			header("Location: test.php");
+			exit();
+		}
+
+		require('header.php');
+
+		echo "<section><div class=\"card\"><h2>Upgrading Group-Office</h2><pre>";
 	}
-
-	
-
-	
-	require('header.php');
-	
-	echo "<section><div class=\"card\"><h2>Upgrading Group-Office</h2><pre>";
 	
 	App::get();
 
@@ -342,27 +395,36 @@ try {
 
 		echo "Done!\n";
 
-		echo "</pre></div>";
+		if(PHP_SAPI != 'cli') {
+			echo "</pre></div>";
 
-		echo '<a class="button" href="../">Continue</a>';
+			echo '<a class="button" href="../">Continue</a>';
+		}
 
 
 		if(GO()->getDebugger()->enabled) {
 			echo "<div style=\"clear:both;margin-bottom:20px;\"></div><div class=\"card\"><h2>Debugger output</h2><pre>" . implode("\n", GO()->getDebugger()->getEntries()) . "</pre></div>";
 		}
 
-		echo "</section>";
+		if(PHP_SAPI != 'cli') {
+			echo "</section>";
+		}
 
 	} else {
-		echo '<a class="button" href="?ignore=modules">Disable &amp; Continue</a>';
-		echo "</pre></div></section>";
+		if(PHP_SAPI != 'cli') {
+			echo '<a class="button" href="?ignore=modules">Disable &amp; Continue</a>';
+			echo "</pre></div></section>";
+		}
 	}
 } catch (\Exception $e) {
 	echo "<b>Error:</b> ".$e->getMessage()."\n\n";;
 	
 	echo $e->getTraceAsString();
-	
-	echo "</pre></div></section>";
+	if(PHP_SAPI != 'cli') {
+		echo "</pre></div></section>";
+	}
 }
 
-require('footer.php');
+if(PHP_SAPI != 'cli') {
+	require('footer.php');
+}

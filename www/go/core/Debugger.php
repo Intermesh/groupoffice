@@ -188,10 +188,7 @@ class Debugger {
 				$debugLog->putContents($entry."\n", FILE_APPEND);
 			}
 		}
-		
-		if(Environment::get()->isCli()) {
-			echo $entry . "\n";
-		}
+
 		
 		$this->entries[] = $entry;
 		

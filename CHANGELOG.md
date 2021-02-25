@@ -1,3 +1,7 @@
+26-02-2021 6.3.97
+- Core: Upgrade is possible via command line:
+   php upgrade.php -c=/etc/groupoffice/config.php
+
 09-02-2021 6.3.96
 - Core: Fixed migrating user visibility when upgrading from v6.2
 
