@@ -1,3 +1,5 @@
+- Email: Fixed e-mail display from Amazon with body inside head !? :(
+
 23-02-2021 6.4.222
 - Core: Fixed mobile screen orientation in responsive layout
 - Core: Fixed creating thumbnails of some GIF files
