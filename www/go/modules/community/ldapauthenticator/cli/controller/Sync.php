@@ -152,6 +152,7 @@ class Sync extends Controller {
       string(6) "dc=com"
     }*/
 
+	  //try to determine domain that fits the user best
     $domain = "";
     foreach($dn as $v) {
       if(substr($v, 0, 3) == 'dc=') {
@@ -173,11 +174,9 @@ class Sync extends Controller {
       $domain = $mailDomain;
     }
 
+    //fall back on the first if no domain was found from dn or mail address.
     if(!in_array($domain, $this->domains)) {
-      $err = "Domain '$domain' from '$username' is not listed in the authenticator domains: " . implode(', ', $this->domains);
-      $this->output("Error: ". $err ."\n");
-      go()->debug($err);
-      return false;
+      $domain = $this->domains[0];
     }
 
     go()->debug("GO username should be: " . $username . '@' . $domain);
