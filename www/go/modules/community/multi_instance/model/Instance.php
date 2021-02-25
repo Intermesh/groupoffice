@@ -609,7 +609,17 @@ class Instance extends Entity {
 
 		foreach($instances as $instance) {
 			try {
-				$instance->getTempFolder()->delete();
+				//load instance config just before moving the config file. Moving the config file disables
+				// the installation and prevents further changes.
+				$instance->getInstanceConfig();
+				$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php'));
+
+				try {
+					$instance->getTempFolder()->delete();
+				}catch(Exception $e) {
+					//ignore because a running sync process might have filled up the temp dir again.
+					ErrorHandler::log("Could not delete temp folder: " . $e->getMessage());
+				}
 
 				$instance->mysqldump();
 
@@ -618,7 +628,6 @@ class Instance extends Entity {
 					$instance->getModulePackageFolder()->move($instance->getDataFolder()->getFolder($instance->getStudioPackage() . '_MODULE_PACKAGE'));
 				}
 
-				$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php'));
 				$instance->getConfigFile()->getFolder()->delete();
 
 				$dest = $instance->getTrashFolder()->getFolder($instance->getDataFolder()->getName());
