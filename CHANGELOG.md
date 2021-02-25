@@ -1,4 +1,7 @@
+25-02-2021 6.4.223
+- LDAP: Sync users with different domain than configured in profile and bug with ActiveDirectory group sync fixed.
 - Email: Fixed e-mail display from Amazon with body inside head !? :(
+- Address book & Notes: Renaming of user display name could renamed their default address book and note book even if it was a public one.
 
 23-02-2021 6.4.222
 - Core: Fixed mobile screen orientation in responsive layout
