@@ -5,16 +5,17 @@ use go\core\orm\Query;
 
 $updates['201911061630'][] = function() {
 
-	go()->getDbConnection()
-		->delete('core_entity', (new Query)->where(['clientName' => 'Task']))->execute();
+	// Merijn: this can't be good because destroys all links
+//	go()->getDbConnection()
+//		->delete('core_entity', (new Query)->where(['clientName' => 'Task']))->execute();
+//
+//	go()->getDbConnection()
+//		->delete('core_entity', (new Query)->where(['clientName' => 'Tasklist']))->execute();
+//
+//	go()->getDbConnection()
+//		->delete('core_module', (new Query)->where(['name' => 'tasks']))->execute();
 
-	go()->getDbConnection()
-		->delete('core_entity', (new Query)->where(['clientName' => 'Tasklist']))->execute();
-
-	go()->getDbConnection()
-		->delete('core_module', (new Query)->where(['name' => 'tasks']))->execute();
-
-	\go\core\db\Utils::runSQLFile(\GO()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/tasks/install/install.sql"));
+	\go\core\db\Utils::runSQLFile(\GO()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/tasks/install/upgrade.sql"));
 };
 
 // insert function
@@ -145,12 +146,3 @@ $updates['201911061630'][] = function(){
 		GO()->getDbConnection()->insert('tasks_alert', $data)->execute();
 	}
 };
-
-
-// $updates['201905241125'][] = 'update core_module set package=\'community\', version=0, sort_order = sort_order + 100 where name=\'tasks\'';
-
-
-// $updates['201905241053'][] = function() {
-// 	\go\modules\community\bookmarks\controller\Bookmark::updateLogos();
-// };
-
