@@ -1,3 +1,9 @@
+26-02-2021 6.4.224
+- Multi instance: Fixed delete issue when temp dir was in use
+- Email: Fixed light text color in outgoing mails when using Dark theme
+- Email: Fixed email display issue with unicode in head of HTML
+- Core: Updated German language
+
 25-02-2021 6.4.223
 - LDAP: Sync users with different domain than configured in profile and bug with ActiveDirectory group sync fixed.
 - Email: Fixed e-mail display from Amazon with body inside head !? :(

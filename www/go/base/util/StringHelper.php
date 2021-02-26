@@ -1049,35 +1049,18 @@ END;
 		//needed for very large strings when data is embedded in the html with an img tag
 		ini_set('pcre.backtrack_limit', (int)ini_get( 'pcre.backtrack_limit' )+ 1000000 );
 
-		//don't do this because it will mess up <pre></pre> tags
-		//$html = str_replace("\r", '', $html);
-		//$html = str_replace("\n",' ', $html);
+		$prefix = 'msg-' . uniqid();
+		$styles = self::extractStyles($html, $prefix);
 
 		//remove strange white spaces in tags first
 		//sometimes things like this happen <style> </ style >
-		
-		
-//		Doesn't work well because some mails hav body tags all over the place :(
-//		$body_startpos = stripos($html, '<body');
-//		$body_endpos = strripos($html, '</body');
-//		if($body_startpos){
-//			if($body_endpos)
-//				$html = substr($html, $body_startpos, $body_endpos-$body_startpos);
-//			else
-//				$html = substr($html, $body_startpos);
-//		}
-
-		$prefix = 'msg-' . uniqid();
-
-		$styles = self::extractStyles($html, $prefix);
-
 		$html = preg_replace("'</[\s]*([\w]*)[\s]*>'u","</$1>", $html);
 
 		//strip everything above <body first. This fixes a mail from Amazon that had the body inside the head section :(
 		$bodyPos = stripos($html, '<body');
 
 		if($bodyPos) {
-			$html = self::substr($html, $bodyPos);
+			$html = substr($html, $bodyPos);
 		}
 		
 		$to_removed_array = array (

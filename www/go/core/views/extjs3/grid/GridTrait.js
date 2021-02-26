@@ -307,6 +307,8 @@ go.grid.GridTrait = {
 			this.fireEvent('navigate', this, rowIndex, record);
 		}
 	},
+
+
 	
 	doDelete : function(selectedRecords) {
 
