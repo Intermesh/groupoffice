@@ -131,4 +131,5 @@ return array (
   'Ok' => 'OK',
   'Filters' => 'Filter',
   'autoReplyMessage' => 'Automatische Antwort Nachricht',
+  'Senders will only be notified periodically. You can set the number of days below.' => 'Die Absender werden nur periodisch benachrichtigt. Sie können die Anzahl der Tage unten einstellen.',
 );
