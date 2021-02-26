@@ -1,3 +1,6 @@
+26-02-2021 6.3.98
+- Core: Fixed issue with command line upgrade not accepting --ignore
+
 26-02-2021 6.3.97
 - Core: Upgrade is possible via command line:
    php upgrade.php -c=/etc/groupoffice/config.php
