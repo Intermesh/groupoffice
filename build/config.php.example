@@ -1,0 +1,10 @@
+<?php
+
+return [
+	'ioncubePassword' => 'secret',
+	'github' => [
+		'PERSONAL_ACCESS_TOKEN' => "secret",
+		'USERNAME' => 'intermesh',
+		'REPOSITORY' => 'groupoffice'
+	]
+];

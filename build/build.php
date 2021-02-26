@@ -44,6 +44,7 @@ function cd($dir)
 
 class Builder
 {
+    public $test = false;
 
 	private $majorVersion = "6.5";
 
@@ -148,11 +149,11 @@ class Builder
 
             $this->buildDebianPackage();
 
-//                $this->createGithubRelease();
-
-            $this->addToDebianRepository();
-
-//				$this->sendTarToSF();
+            if(!$this->test) {
+	            $this->createGithubRelease();
+	            $this->addToDebianRepository();
+	            $this->sendTarToSF();
+            }
 
 
 		}
@@ -387,3 +388,8 @@ class Builder
 
 $builder = new Builder($config);
 $builder->build();
+
+if (isset($argv[1]) && $argv[1] == "test") {
+	$builder->test = true;
+}
+
