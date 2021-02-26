@@ -172,7 +172,7 @@ class Builder
 		cd($this->sourceDir);
 
 		if (!is_dir($this->sourceDir . "/promodules")) {
-			run("git clone " . $this->proRepos);
+			run("git clone " . $this->proRepos . " -b " .$this->gitBranch);
 		}
 
 		cd($this->sourceDir . "/promodules");
@@ -183,7 +183,7 @@ class Builder
 
 		cd($this->sourceDir);
 		if (!is_dir($this->sourceDir . "/business")) {
-			run("git clone git@git.intermesh.nl:groupoffice/business.git");
+			run("git clone git@git.intermesh.nl:groupoffice/business.git -b " .$this->gitBranch);
 		}
 
 		cd($this->sourceDir . "/business");
