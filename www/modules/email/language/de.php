@@ -334,4 +334,7 @@ Settings -> Accounts -> Double click account -> Folders.' => 'Ihre Mailbox ist v
   'Sort on last contact mail time' => 'Nach letzter Kontakt-Mail-Zeit sortieren',
   'Show from field by default' => 'Standardmäßig aus Feld anzeigen',
   'Search items' => 'Elemente durchsuchen',
+  'Add recipients' => 'Empfänger hinzufügen',
+  'Are you sure that you would like to import this VCard?' => 'Sind Sie sicher, dass Sie diese VCard importieren möchten?',
+  'Importing...' => 'Importiere…',
 );
