@@ -1,3 +1,4 @@
+set foreign_key_checks =0;
 -- -----------------------------------------------------
 -- Table `tasks_tasklist`
 -- -----------------------------------------------------
@@ -6,10 +7,11 @@ CREATE TABLE IF NOT EXISTS `tasks_tasklist` (
   `role` TINYINT(2) UNSIGNED NULL DEFAULT NULL,
   `name` VARCHAR(100) NOT NULL,
   `description` VARCHAR(255) NULL,
-  `createdBy` INT(11) NOT NULL,
+  `createdBy` INT(11) default NULL,
   `aclId` INT(11) NOT NULL,
   `version` INT(10) UNSIGNED NOT NULL DEFAULT 1,
   `ownerId` INT(11) NOT NULL DEFAULT 1,
+  `filesFolderId` INT(11) DEFAULT null,
   PRIMARY KEY (`id`),
   INDEX `fkCreatedBy` (`createdBy` ASC),
   INDEX `fkAcl` (`aclId` ASC),
@@ -33,11 +35,11 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   `tasklistId` INT(11) UNSIGNED NOT NULL,
   `groupId` INT UNSIGNED NULL DEFAULT NULL,
   `responsibleUserId` INT(11) NOT NULL,
-  `createdBy` INT(11) NOT NULL,
+  `createdBy` INT(11) default NULL,
   `createdAt` DATETIME NOT NULL,
   `modifiedAt` DATETIME NOT NULL,
-  `modifiedBy` INT(11) NOT NULL DEFAULT 0,
-  `filesFolderId` INT(11) NOT NULL DEFAULT 0,
+  `modifiedBy` INT(11) NULL DEFAULT null,
+  `filesFolderId` INT(11) DEFAULT null,
   `due` DATE NULL,
   `start` DATE NULL,
   `estimatedDuration` VARCHAR(20) NULL,
@@ -68,12 +70,12 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
     REFERENCES `tasks_tasklist` (`id`),
   CONSTRAINT `tasks_task_ibfk_2`
     FOREIGN KEY (`createdBy`)
-    REFERENCES `core_user` (`id`)
-    CONSTRAINT `tasks_task_groupId`
-  FOREIGN KEY (`groupId`)
-   REFERENCES `tasks_tasklist_group` (`id`)
-   ON DELETE SET NULL
-   ON UPDATE CASCADE)
+    REFERENCES `core_user` (`id`),
+  CONSTRAINT `tasks_task_groupId`
+    FOREIGN KEY (`groupId`)
+    REFERENCES `tasks_tasklist_group` (`id`)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
