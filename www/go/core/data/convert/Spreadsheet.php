@@ -458,7 +458,7 @@ class Spreadsheet extends AbstractConverter {
 				}
 
 				//$subheader = $header . '.' . $name ;
-				$props = $this->addSubHeaders($props, $name, $value, false);
+				$props = $this->addSubHeaders($props, $name, $value, false, $forMapping);
 			}
 
 			$headers[$header] = ['name' => $header, 'label' => null, 'many' => $prop->type != Relation::TYPE_HAS_ONE, 'properties' => $props, 'grouped' => true];

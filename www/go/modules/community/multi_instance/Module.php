@@ -72,15 +72,26 @@ class Module extends \go\core\Module {
 		echo "\nUpgrading all instances\n";
 		echo "-------------------------------\n\n";
 
+		$failed = 0;
+
 		foreach(Instance::find() as $instance) {
 			echo "Upgrading instance: " . $instance->hostname . ": ";
 			flush();
 			$success = $instance->upgrade();
 
-			echo $success ? "SUCCESS" : "FAILED";
+			echo $success ? "ok" : "!!! FAILED !!!";
+
+			if(!$success) {
+				$failed++;
+			}
 
 			echo "\n";
-			
+		}
+
+		if(!$failed) {
+			echo "All OK!\n";
+		} else{
+			echo "\n\nWARNING: There are $failed failed upgrades. Please investigate!\n\n";
 		}
 	}
 

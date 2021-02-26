@@ -385,6 +385,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 				autoUpload: true,
 				listeners: {
 					uploadComplete: function(blobs) {
+						blobs = this.transformBlobs(blobs);
 						this.sendOverwrite({upload:true,blobs:Ext.encode(blobs)});
 					},
 					scope: this
@@ -404,7 +405,8 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 				directory: true,
 				autoUpload: true,
 				listeners: {
-				    uploadComplete: function(blobs){
+					uploadComplete: function(blobs){
+						blobs = this.transformBlobs(blobs);
 						this.sendOverwrite({upload:true,blobs:Ext.encode(blobs)});
 					},
 					scope:this
@@ -715,6 +717,7 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 
 	this.cardPanel.on('afterrender', function() {
 		GO.files.DnDFileUpload(function (blobs) {
+			blobs = this.transformBlobs(blobs);
 			this.sendOverwrite({upload: true, blobs: Ext.encode(blobs)});
 		}.bind(this), this.cardPanel.body)();
 	},this);
@@ -889,6 +892,17 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 //	pasteMode : 'cut',
 
 	path : '',
+
+
+	transformBlobs : function(blobs) {
+		return blobs.map(function(b)  {
+			return {
+				subfolder: b.subfolder,
+				name: b.name,
+				id: b.id
+			};
+		});
+	},
 
         _enableFilesContextMenuButtons : function(enable) {
             this.filesContextMenu.cutButton.setDisabled(!enable);

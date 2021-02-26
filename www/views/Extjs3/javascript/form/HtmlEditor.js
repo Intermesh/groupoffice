@@ -8,8 +8,7 @@ GO.form.HtmlEditor = function (config) {
 	Ext.applyIf(config, {
 		border: false,
 		enableFont: false,
-		headingsMenu: true,
-		style: GO.settings.html_editor_font
+		headingsMenu: true
 	});
 
 	config.plugins = config.plugins || [];
@@ -184,6 +183,16 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 		go.ActivityWatcher.registerDocument(doc);
 
+		//other browsers are already registered in parent function
+		if(Ext.isGecko) {
+			Ext.EventManager.on(doc, 'keydown', this.fixKeys, this);
+		}
+
+	},
+
+	applyCommand : function(e){
+
+		//implemented in fixKeys
 	},
 
 	debounceTimeout : null,
@@ -549,7 +558,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 	setValue: function (value) {
 
-		if (this.win && Ext.isChrome) {
+		if (this.win && Ext.isChrome && this.activated) {
 
 			//set cursor position on top
 			var range = this.win.document.createRange();
@@ -558,8 +567,10 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 			var sel = this.win.document.getSelection();
 
-			sel.removeAllRanges();
-			sel.addRange(range);
+			if(sel) {
+				sel.removeAllRanges();
+				sel.addRange(range);
+			}
 		}
 		GO.form.HtmlEditor.superclass.setValue.call(this, value);
 	},
@@ -729,58 +740,49 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	// 	return String.format('<html><head><meta name="SKYPE_TOOLBAR" content="SKYPE_TOOLBAR_PARSER_COMPATIBLE" /><style type="text/css">' + this.getEditorFrameStyle() + '</style></head><body></body></html>', this.iframePad, h);
 	// },
 	fixKeys: function () { // load time branching for fastest keydown performance
-		if (Ext.isIE) {
+
 			return function (e) {
-				var k = e.getKey(),
-								doc = this.getDoc(),
-								r;
-				if (k == e.TAB) {
-					e.stopEvent();
-					r = doc.selection.createRange();
-					if (r) {
-						r.collapse(true);
-						r.pasteHTML('&nbsp;&nbsp;&nbsp;&nbsp;');
-						this.deferFocus();
-					}
-				} else if (k == e.ENTER) {
-					//                    r = doc.selection.createRange();
-					//                    if(r){
-					//                        var target = r.parentElement();
-					//                        if(!target || target.tagName.toLowerCase() != 'li'){
-					//                            e.stopEvent();
-					//                            r.pasteHTML('<br />');
-					//                            r.collapse(false);
-					//                            r.select();
-					//                        }
-					//                    }
-				}
-			};
-		} else if (Ext.isWebKit) {
-			return function (e) {
+
 				var k = e.getKey(), doc = this.getDoc();
 				if (k == e.TAB) {
-					e.stopEvent();
-					this.execCmd('InsertText', '\t');
+					e.preventDefault();
+					if (doc.queryCommandState('insertorderedlist') || doc.queryCommandState('insertunorderedlist')) {
+						this.execCmd(e.shiftKey ? 'outdent' : 'indent');
+					}else {
+						this.execCmd('InsertText', '\t');
+					}
 					this.deferFocus();
-				}else if(k == e.ENTER){
-					// if (doc.queryCommandState('insertorderedlist') || doc.queryCommandState('insertunorderedlist')) {
-					// 	return;
-					// }
-					// e.stopEvent();
-					//
-					//
-					// //make sure last child is a br otherwise it will go wrong!
-					// console.warn(doc.lastElementChild.tagName.toLowerCase());
-					// if(!doc.lastElementChild.tagName.toLowerCase() == "br") {
-					// 	console.warn("added br")
-					// 	doc.appendChild(doc.createElement("br"));
-					// }
-					//
-					// this.execCmd('InsertHtml','<br />');
-					// this.deferFocus();
+				}else if(Ext.isMac){
+
+					if(e.ctrlKey){
+						var c = e.getCharCode(), cmd;
+
+						if(c > 0) {
+							c = String.fromCharCode(c).toLowerCase();
+
+							switch(c){
+								case 'b':
+									cmd = 'bold';
+									break;
+								case 'i':
+									cmd = 'italic';
+									break;
+								case 'u':
+									cmd = 'underline';
+									break;
+							}
+							if(cmd){
+								this.win.focus();
+								this.execCmd(cmd);
+								this.deferFocus();
+								e.preventDefault();
+							}
+						}
+					}
+
 				}
 			};
-		}
+
 	}(),
 
 	//Overwritten to fix font size bug in chrome

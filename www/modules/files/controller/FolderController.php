@@ -1241,6 +1241,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 	protected function actionProcessUploadQueue($params) {
 
+		GO::setMaxExecutionTime(3600);
+
 		$response['success'] = true;
 
 		if (!isset($params['overwrite']))
@@ -1273,7 +1275,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				// its a json object with blob data
 				$blob = $tmpfile;
 
-				$tmpfile = Blob::buildPath($blob->blobId);
+				$tmpfile = Blob::buildPath($blob->id);
 			} else{
 				unset($blob);
 			}
@@ -1299,7 +1301,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 						}
 					}
 					$filename = $blob->name;
-					$removeBlob = $this->removeBlob($blob->blobId);
+					$removeBlob = $this->removeBlob($blob->id);
 				}else{
 					$removeBlob = false;
 				}

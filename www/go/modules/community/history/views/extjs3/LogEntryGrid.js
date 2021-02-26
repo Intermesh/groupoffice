@@ -178,14 +178,12 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 			}),
 			viewConfig: {
 				emptyText: '<i>description</i><p>' + t("Item was never modified",'community','history') + '</p>',
-				totalDisplay: true
+				totalDisplay: false //heavy impact on performance
 			},
 			columns: cols
 		});
 
 		this.callParent();
-
-		this.on('afterrender',function(){this.store.load();},this);
 
 		this.on('cellclick', this.onCellClick, this);
 	}

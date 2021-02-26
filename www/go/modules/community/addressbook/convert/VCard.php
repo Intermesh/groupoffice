@@ -488,6 +488,10 @@ class VCard extends AbstractConverter {
 	{
 		$this->card = $this->splitter->getNext();
 
+		if ($this->card->VERSION != "3.0") {
+			$this->card = $this->card->convert(\Sabre\VObject\Document::VCARD30);
+		}
+
 		return $this->card != false;
 
 	}

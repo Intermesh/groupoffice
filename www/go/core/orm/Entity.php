@@ -60,6 +60,10 @@ abstract class Entity extends Property {
 	 * @param Query $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
 	 *  So you can do for example: go()->getDbConnection()->delete('another_table', (new Query()->where('id', 'in' $query)) or
 	 *  fetch the entities: $entities = $cls::find()->mergeWith(clone $query);
+	 *
+	 * Please beware that altering the query object can cause problems in the delete process.
+	 *  You might need to use "clone $query".
+	 *
 	 * @param string $cls The static class name the function was called on.
 	 */
 	const EVENT_BEFORE_DELETE = 'beforedelete';
@@ -176,6 +180,41 @@ abstract class Entity extends Property {
 	public static final function findById($id, array $properties = [], $readOnly = false) {
 
 		return static::internalFindById($id, $properties, $readOnly);
+	}
+
+	private static $existingIds = [];
+
+	/**
+	 * Check if an ID exists in the database in the most efficient way. It also caches the result
+	 * during the same request.
+	 *
+	 * @param $id
+	 * @return bool
+	 * @throws Exception
+	 */
+	public static function exists($id)
+	{
+
+		if(empty($id)) {
+			return false;
+		}
+
+		$key = static::class . ":" .$id;
+
+		if(in_array($key, self::$existingIds)) {
+			return true;
+		}
+		$user = go()->getDbConnection()
+			->selectSingleValue('id')
+			->from(self::getMapping()->getPrimaryTable()->getName())
+			->where('id', '=', $id)->single();
+
+		if($user) {
+			self::$existingIds[] = $key;
+		}
+
+		return $user != false;
+
 	}
 
 	/**

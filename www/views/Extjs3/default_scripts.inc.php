@@ -52,14 +52,9 @@ $settings['config']['encode_callto_link'] = GO::config()->encode_callto_link;
 $settings['config']['login_message'] = GO::config()->login_message;
 
 
- 
 $settings['state_index'] = 'go';
 $settings['language'] = go()->getLanguage()->getIsoCode();
 $settings['show_contact_cf_tabs'] = array();
-// $settings['modules'] = [];// GO::view()->exportModules();
-
-$settings['upload_quickselect'] = GO::config()->upload_quickselect;
-$settings['html_editor_font'] = GO::config()->html_editor_font;
 
 
 $root_uri = GO::config()->debug ? GO::config()->host : GO::config()->root_path;

@@ -40,4 +40,6 @@ return array (
   'You can also type in your own url, please make sure you add http(s):// to it to make the url work.' => 'Sie können auch Ihre eigene URL eingeben. Bitte stellen Sie sicher, dass Sie http (s): // hinzufügen, damit die URL funktioniert.',
   'Open in new window' => 'In neuem Fenster öffnen',
   'Meta tags are a great way for webmasters to provide search engines with information about their sites.' => 'Metatags sind eine gute Möglichkeit für Webmaster, Suchmaschinen Informationen über ihre Websites bereitzustellen.',
+  'Meta' => 'Metadaten',
+  'Global properties' => 'Globale Einstellungen',
 );

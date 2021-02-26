@@ -11,4 +11,5 @@ return array (
   'Users will automatically be added to these groups' => 'Benutzer werden diesen Gruppen automatisch hinzugefügt',
   'IMAP Authenticator' => 'IMAP Authentifizierung',
   'Domains' => 'Domänen',
+  'Use IMAP credentials' => 'IMAP Zugangsdaten benutzen',
 );

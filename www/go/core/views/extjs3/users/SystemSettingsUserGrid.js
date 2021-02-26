@@ -154,7 +154,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 						handler: function() {
 							go.util.importFile(
 											'User',
-											".csv",
+											".csv, .json, .xlsx",
 											{},
 											{
 												labels: {
@@ -171,12 +171,40 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					}, {
 						iconCls: 'ic-cloud-download',
 						text: t("Export"),
-						handler: function() {
-							go.util.exportToFile(
-											'User',
-											Object.assign(this.store.baseParams, this.store.lastOptions.params, {limit: 0, position: 0}),
-											'csv');
-						},
+						menu: [
+							{
+								text: 'Microsoft Excel',
+								iconCls: 'filetype filetype-xls',
+								handler: function() {
+									go.util.exportToFile(
+										'User',
+										Object.assign(go.util.clone(this.store.baseParams), this.store.lastOptions.params, {limit: 0, position: 0}),
+										'xlsx');
+								},
+								scope: this
+							},{
+								text: 'Comma Separated Values',
+								iconCls: 'filetype filetype-csv',
+								handler: function() {
+									go.util.exportToFile(
+										'User',
+										Object.assign(go.util.clone(this.store.baseParams), this.store.lastOptions.params, {limit: 0, position: 0}),
+										'csv');
+								},
+								scope: this
+							},
+							{
+								iconCls: 'filetype filetype-json',
+								text: 'JSON',
+								handler: function() {
+									go.util.exportToFile(
+										'User',
+										Ext.apply(this.store.baseParams, this.store.lastOptions.params, {limit: 0, start: 0}),
+										'json');
+								},
+								scope: this
+							}
+						],
 						scope: this
 					}
 				]

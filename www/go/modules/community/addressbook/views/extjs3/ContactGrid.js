@@ -4,6 +4,10 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 	cls: 'x-grid3-no-row-borders',
 	initComponent: function () {
 
+		if(!this.enabledColumns) {
+			this.enabledColumns = ['name', 'organizations'];
+		}
+
 		if(!go.User.addressBookSettings) {
 			go.User.addressBookSettings = {
 				sortBy: "firstName"
@@ -105,6 +109,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					header: t('Name'),
 					sortable: true,
 					dataIndex: go.User.addressBookSettings.sortBy,
+					hidden: this.enabledColumns.indexOf('name') == -1,
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 
 						var icon = record.data.isOrganization ? '<i class="icon">business</i>' : null;
@@ -125,7 +130,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					}
 				},
 				{
-					hidden: true,
+					hidden: this.enabledColumns.indexOf('gender') == -1,
 					header: t('Gender'),
 					width: dp(160),
 					sortable: true,
@@ -145,6 +150,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: false,
 					dataIndex: "organizations",
 					width: dp(300),
+					hidden: this.enabledColumns.indexOf('organizations') == -1,
 					renderer: function (organizations, meta, record) {
 						return organizations.column("name").join(", ");
 					}
@@ -158,7 +164,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 						return v.name;
 					},
 					width: dp(200),
-					hidden: true
+					hidden: this.enabledColumns.indexOf('addressbook') == -1
 				},
 				{
 					xtype: "datecolumn",
@@ -167,11 +173,12 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'createdAt',
-					hidden: true
+
+					hidden: this.enabledColumns.indexOf('createdAt') == -1
 				},
 				{
 					xtype: "datecolumn",
-					hidden: true,
+					hidden: this.enabledColumns.indexOf('modifiedAt') == -1,
 					id: 'modifiedAt',
 					header: t('Modified at'),
 					width: dp(160),
@@ -179,7 +186,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'modifiedAt'
 				},
 				{
-					hidden: true,
+					hidden: this.enabledColumns.indexOf('creator') == -1,
 					header: t('Created by'),
 					width: dp(160),
 					sortable: true,
@@ -189,7 +196,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					}
 				},
 				{
-					hidden: true,
+					hidden: this.enabledColumns.indexOf('modifier') == -1,
 					header: t('Modified by'),
 					width: dp(160),
 					sortable: true,
@@ -198,37 +205,37 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 						return v ? v.displayName : "-";
 					}
 				}, {
-					hidden: true,
+					hidden: this.enabledColumns.indexOf('jobTitle') == -1,
 					header: t('Job title'),
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'jobTitle'
 				}, {
-					hidden: true,
+					hidden: this.enabledColumns.indexOf('department') == -1,
 					header: t('Department'),
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'department'
 				},  {
-					hidden: true,
+					hidden: this.enabledColumns.indexOf('registrationNumber') == -1,
 					header: t('Registration number'),
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'registrationNumber'
 				},{
-					hidden: true,
+					hidden: this.enabledColumns.indexOf('debtorNumber') == -1,
 					header: t('Debtor number'),
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'debtorNumber'
 				}, {
-					hidden: true,
+					hidden: this.enabledColumns.indexOf('IBAN') == -1,
 					header: "IBAN",
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'IBAN'
 				}, {
-					hidden: true,
+					hidden: this.enabledColumns.indexOf('vatNo') == -1,
 					header: t("VAT number"),
 					width: dp(160),
 					sortable: true,
@@ -240,7 +247,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: false,
 					dataIndex: "phoneNumbers",
 					width: dp(300),
-					hidden: true,
+					hidden: this.enabledColumns.indexOf('phoneNumbers') == -1,
 					renderer: function (phoneNumbers, meta, record) {
 						return phoneNumbers.column("number").join(", ");
 					}
@@ -251,7 +258,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					sortable: false,
 					dataIndex: "emailAddresses",
 					width: dp(300),
-					hidden: true,
+					hidden: this.enabledColumns.indexOf('emailAddresses') == -1,
 					renderer: function (emailAddresses, meta, record) {
 						return emailAddresses.column("email").join(", ");
 					}
@@ -260,13 +267,13 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					header: t('First name'),
 					sortable: true,
 					dataIndex: "firstName",
-					hidden: true
+					hidden: this.enabledColumns.indexOf('firstName') == -1,
 				},{
 					id: 'lastName',
 					header: t('Last name'),
 					sortable: true,
 					dataIndex: "lastName",
-					hidden: true
+					hidden: this.enabledColumns.indexOf('lastName') == -1,
 				},{
 					id: 'birthday',
 					header: t('dateTypes')['birthday'],
@@ -285,7 +292,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 
 						return go.util.Format.date(bday);
 					},
-					hidden: true
+					hidden: this.enabledColumns.indexOf('birthday') == -1,
 				},{
 					id: 'actionDate',
 					header: t('Action date'),
@@ -304,7 +311,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 
 						return go.util.Format.date(bday);
 					},
-					hidden: true
+					hidden: this.enabledColumns.indexOf('actionDate') == -1,
 				}
 			],
 			viewConfig: {

@@ -787,13 +787,8 @@ abstract class EntityController extends Controller {
 		$p = $this->paramsGetUpdates($params);	
 		$cls = $this->entityClass();		
 		
-		try {
-			$result = $cls::getChanges($p['sinceState'], $p['maxChanges']);		
-		} catch (CannotCalculateChanges $e) {
-			$result["message"] = $e->getMessage();
-			go()->warn($e->getMessage());
-		}
-		
+		$result = $cls::getChanges($p['sinceState'], $p['maxChanges']);
+
 		$result['accountId'] = $p['accountId'];
 
 		return $result;

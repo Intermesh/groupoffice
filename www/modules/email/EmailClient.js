@@ -822,6 +822,14 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 	addGridHandlers : function(grid)
 	{
 		grid.on("rowcontextmenu", function(grid, rowIndex, e) {
+			e.stopEvent();
+			this.rowClicked=true;
+			var sm = grid.getSelectionModel();
+			if(sm.isSelected(rowIndex) !== true) {
+				sm.clearSelections();
+				sm.selectRow(rowIndex);
+			}
+
 			var coords = e.getXY();
 
 			var selectedMailboxFolder = this.treePanel.getSelectionModel().getSelectedNode();
@@ -859,8 +867,7 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 			}
 		}, this);
 
-		//this.messagesGrid.getSelectionModel().on("rowselect",function(sm, rowIndex, r){
-		grid.on("delayedrowselect",function(grid, rowIndex, r){
+		grid.on('navigate', function (sm, rowIndex, r) {
 			if(r.data['uid']!=this.messagePanel.uid)
 			{
 				//this.messagePanel.uid=r.data['uid'];
@@ -873,7 +880,23 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 					this.markAsRead.defer(2000, this, [r.data.uid, r.data['mailbox'], this.account_id]);
 				}
 			}
-		}, this);
+		},this)
+
+		// grid.getSelectionModel().on('selectionchange', function(grid, rowIndex, r){
+		// 	if(r.data['uid']!=this.messagePanel.uid)
+		// 	{
+		// 		//this.messagePanel.uid=r.data['uid'];
+		// 		//this.messagePanel.loadMessage(r.data.uid, this.mailbox, this.account_id);
+		// 		this.messagePanel.loadMessage(r.data.uid, r.data['mailbox'], this.account_id);
+		// 		this.messagePanel.show();
+		// 		if(!r.data.seen && this.messagesGrid.store.reader.jsonData.permission_level > GO.permissionLevels.read){
+		// 			//set read with 2 sec delay.
+		// 			//this.markAsRead.defer(2000, this, [r.data.uid, this.mailbox, this.account_id]);
+		// 			this.markAsRead.defer(2000, this, [r.data.uid, r.data['mailbox'], this.account_id]);
+		// 		}
+		// 	}
+		// }, this, {buffer: 1})
+		//this.messagesGrid.getSelectionModel().on("rowselect",function(sm, rowIndex, r){
 	},
 
 	markAsRead : function(uid, mailbox, account_id){

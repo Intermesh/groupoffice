@@ -16,6 +16,7 @@ GO.files.PortletFolderBrowserGrid = Ext.extend(GO.grid.GridPanel, {
 
 		Ext.applyIf(this, {
 			layout: 'fit',
+			stateId: 'portlet-folder-browser-grid',
 			split: true,
 			paging: true,
 			autoExpandColumn: 'name',

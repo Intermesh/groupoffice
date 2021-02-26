@@ -28,6 +28,10 @@ Ext.define('go.modules.community.history.MainPanel', {
 		];
 
 		go.modules.community.addressbook.MainPanel.superclass.initComponent.call(this);
+
+		this.grid.on('viewready', function() {
+			this.dateRangeField.setThisWeek();
+		}, this);
 	},
 
 	createGrid: function () {
@@ -89,7 +93,7 @@ Ext.define('go.modules.community.history.MainPanel', {
 
 					layout: 'form',
 					items: [
-						{
+						this.dateRangeField = new go.form.DateRangeField({
 							hideLabel: true,
 							xtype: 'godaterangefield',
 							anchor: '100%',
@@ -99,7 +103,7 @@ Ext.define('go.modules.community.history.MainPanel', {
 								},
 								scope: this
 							}
-						}, new go.users.UserCombo({
+						}), new go.users.UserCombo({
 							hideLabel: true,
 							emptyText: t('All users'),
 							allowBlank: true,

@@ -80,6 +80,7 @@ class ErrorHandler {
 	 * Send a messaqe to the error log
 	 */
 	public static function log($str) {
+		go()->error($str);
 		return error_log($str, 0);
 	}
 

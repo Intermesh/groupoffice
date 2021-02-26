@@ -113,7 +113,7 @@ ALTER TABLE `addressbook_address`
 
 ALTER TABLE `addressbook_addressbook`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `acid` (`aclId`),
+  ADD KEY `aclId` (`aclId`),
   ADD KEY `createdBy` (`createdBy`);
 
 ALTER TABLE `addressbook_contact`

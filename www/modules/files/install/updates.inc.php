@@ -273,3 +273,19 @@ $updates['202011061353'][] = "ALTER TABLE `fs_files` DROP INDEX `expire_time`;";
 $updates['202011061353'][] = "ALTER TABLE `fs_files` ADD INDEX(`content_expire_date`);";
 
 $updates['202101111531'][] = "ALTER TABLE `fs_files` ADD `version` INT UNSIGNED NOT NULL DEFAULT '1' AFTER `content_expire_date`;";
+
+
+$updates['202102111534'][] = "delete from fs_bookmarks where user_id not in (select id from core_user);";
+$updates['202102111534'][] = "delete from fs_bookmarks where folder_id not in (select id from fs_folders);";
+
+$updates['202102111534'][] = "alter table fs_bookmarks
+	add constraint fs_bookmarks_core_user_id_fk
+		foreign key (user_id) references core_user (id)
+			on delete cascade;";
+
+$updates['202102111534'][] = "alter table fs_bookmarks
+	add constraint fs_bookmarks_fs_folders_folder_id_fk
+		foreign key (folder_id) references fs_folders (id)
+			on delete cascade;";
+
+

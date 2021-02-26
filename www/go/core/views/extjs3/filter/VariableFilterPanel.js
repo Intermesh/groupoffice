@@ -27,7 +27,7 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 	loadFilters : function() {
 		var entityStore = go.Db.store("EntityFilter"), me = this;
 
-		entityStore.query({
+		return entityStore.query({
 			filter: {
 				entity: this.entity,
 				type: "variable"

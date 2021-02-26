@@ -150,11 +150,16 @@ class Builder
 
 			if ($this->branch == 'master') {
 				echo "Skipping SourceForge upload and Debian package because we're building master\n";
-			} else {
-				//$this->createGithubRelease();
-				//$this->sendTarToSF();
+			} else
+			{
 				$this->buildDebianPackage();
+
+//                $this->createGithubRelease();
+
 				$this->addToDebianRepository();
+
+//				$this->sendTarToSF();
+
 			}
 		}
 	}
@@ -314,12 +319,24 @@ class Builder
 
 	}
 
-	private function createGithubRelease()
-	{
+	private function sendTarToSF() {
+
+	    echo "Creating SourceForge.net release....\n\n";
+
+		cd($this->buildDir);
 
 
-		$client = new Client();
-		$client->authenticate($this->github['PERSONAL_ACCESS_TOKEN'], null, Client::AUTH_ACCESS_TOKEN);
+		run("scp " . $this->packageName . ".tar.gz mschering@frs.sourceforge.net:/home/frs/project/group-office/$this->branch/");
+	}
+
+	private function createGithubRelease() {
+
+		echo "Creating GitHub release....\n\n";
+
+	    cd($this->buildDir);
+
+		$client = new \Github\Client();
+		$client->authenticate($this->github['PERSONAL_ACCESS_TOKEN'], null, \Github\Client::AUTH_ACCESS_TOKEN);
 
 		$tagName = 'v' . $this->branch . "." . $this->version;
 		$branch = $this->branch . ".x";
@@ -342,14 +359,6 @@ class Builder
 
 	}
 
-	private function sendTarToSF()
-	{
-
-		cd($this->buildDir);
-
-
-		run("scp " . $this->packageName . ".tar.gz mschering@frs.sourceforge.net:/home/frs/project/group-office/$this->branch/");
-	}
 
 //	private function tag() {
 //		cd($this->sourceDir . "/promodules");

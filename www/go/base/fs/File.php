@@ -327,6 +327,8 @@ class File extends Base{
 		if(ob_get_contents() != '') {			
 			throw new \Exception("Could not output file because output has already been sent. Turn off output buffering to find out where output has been started.");
 		}
+		while (ob_get_level()) ob_end_clean();
+		ini_set('zlib.output_compression', 0);
 		
 		$handle = fopen($this->path(), "rb");
 

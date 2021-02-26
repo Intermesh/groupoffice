@@ -26,6 +26,7 @@ go.Modules.register("core", 'core', {
 		'SmtpAccount',
 		'EmailTemplate',
 		'PdfTemplate',
+		'CronJobSchedule',
 		{
 			name: 'AuthAllowGroup',
 			relations: {

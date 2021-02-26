@@ -762,7 +762,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		
 //		$response['data']['has_other_participants']=$model->hasOtherParticipants(\GO::user()->id);
 		
-		$response['data']['user_name']=$model->user ? $model->user->name : "Unknown";
+		$response['data']['user_name']=$model->user ? $model->user->displayName : "Unknown";
 		
 		if(empty($params['id'])){
 			$participantModel = $model->getDefaultOrganizerParticipant();
@@ -913,6 +913,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		return $response;
 	}
 
+	private $overrideColors = true;
 	/**
 	 *
 	 * @param type $params
@@ -926,6 +927,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			'CC00FF','FF00CC','CC99FF','FB0404','FF6600',
 			'C43B3B','996600','66FF99','999999','00FFFF'
 		);
+
+		$this->overrideColors = true;
 		
 		$this->_uuidEvents=array();
 		
@@ -962,6 +965,10 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				$calendars=array();
 				foreach($calendarModels as $calendar){
 					$calendars[]=$calendar->id;
+				}
+
+				if(!$view->owncolor) {
+					$this->overrideColors = false;
 				}
 		}else
 		{
@@ -1016,7 +1023,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 					$colorIndex=0;
 
 
-				if($response['calendar_count'] > 1){
+				if($response['calendar_count'] > 1 && $this->overrideColors){
 					$background = $calendar->getColor(\GO::user()->id);
 
 
@@ -1487,7 +1494,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			
 			// If you are showing more than one calendar, then change the display 
 			// color of the current event to the color of the calendar it belongs to.
-			if($response['calendar_count'] > 1){
+			if($response['calendar_count'] > 1 && $this->overrideColors){
 				$background = $calendar->getColor(\GO::user()->id);
 				if(empty($background))
 					$background = $calendar->displayColor;				
@@ -1864,7 +1871,7 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		}
 		
 		if($event){
-			$event->replyToOrganizer();
+			$event->replyToOrganizer(false, $participant, false);
 		}else {
 			$participant->event->replyToOrganizer(false, $participant, false);
 		}

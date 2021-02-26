@@ -155,6 +155,18 @@ class Response extends Singleton{
 	}
 
 	/**
+	 * Check if header is set
+	 *
+	 * @param $name
+	 * @return bool
+	 */
+	public function hasHeader($name) {
+		$name = strtolower($name);
+
+		return isset($this->headers[$name]);
+	}
+
+	/**
 	 * Set HTTP status header
 	 * 
 	 * @param int $httpCode

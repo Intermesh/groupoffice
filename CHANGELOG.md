@@ -21,6 +21,81 @@ end 6.5
 --------
 
 
+26-02-2021 6.4.224
+- Multi instance: Fixed delete issue when temp dir was in use
+- Email: Fixed light text color in outgoing mails when using Dark theme
+- Email: Fixed email display issue with unicode in head of HTML
+- Core: Updated German language
+
+25-02-2021 6.4.223
+- LDAP: Sync users with different domain than configured in profile and bug with ActiveDirectory group sync fixed.
+- Email: Fixed e-mail display from Amazon with body inside head !? :(
+- Address book & Notes: Renaming of user display name could renamed their default address book and note book even if it was a public one.
+- Core: Fixed select after delete when selecting multiple records
+- Notes encrypt: UI issue with notes encrypt
+
+23-02-2021 6.4.222
+- Core: Fixed mobile screen orientation in responsive layout
+- Core: Fixed creating thumbnails of some GIF files
+- Core: small UI improvements for mobile compatability
+- Address book: Much faster migration from v6.3
+
+20-02-2021 6.4.221
+- Files: Fixed error in getDefaultHandler method
+- Core: set ScrollLoader page size to limit from parameters
+
+18-02-2021 6.4.220
+- Projects2: Added status filter to projects report
+- Email: Fixed display of e-mail with very large structures
+- Address book: Company Registration Number wasn't migrated
+- Comments: Fixed comments running out of display
+- E-mail: Smarter CSS prefixing
+- Address book: Address books are searchable
+- Notes: Note books are searchable
+- Email: Added $config['debugEmail'] for sending all mail to a debugging address.
+- Comments: Fixed removeAllRanges() of null error.
+- Projects: Added some missing filters
+- Calendar: Fixed some issues with invitations.
+
+12-02-2021 6.4.219
+- Time registration: better handling of job lists upon preselected projectid
+- Core: better handling of required native time fields in Firefox
+- Projects2: Upped the limit for  project statuses in project dialog.
+- Core: Large downloads hung in browser
+- Core: Wrong input field when selecting filter with autocomplete
+- Projects2: Replaced invalid end time filter with due time
+- Timeregistration: Dialog size is saved.
+- Billing: Invoice dialog size is saved
+- Email: Acccount dialog size is saved.
+- Core: Enable disable users in share panel
+- Email: Sort by last e-mail time didn't always work
+- Contacts / Sync: Changed company delimiter into | to avoid problems with names containing the delimiter.
+- Studio: Enable ACL entities by default
+- Studio: Make add / import / export permissions more consistent
+- Comments: prevent entering empty comments
+- Core: minor fix in DE translation
+- Address book: Users need manage permissions on the module to create address books.
+- Notes: Users need manage permissions on the module to create notebooks.
+- Files: Make file portlets remind state
+- Billing: bugfix import new organizations using product import
+- Core: Filter didn't save when date changed
+- Core: Reload grid after adjusting filters
+- Core: Added cleanup CLI action
+- Core: User delete didn't cleanup everything
+- Core: Custom fields with required condition supports grouping with OR now (A is true AND (B OR C))
+- Addressbook: URL's were not changed into valid URL's when entered incomplete
+- Email: Extract css from head style and prefix
+- Email: Restored list style in email and notes
+- Core: Fixed cmd+b/i/u in html editor on MacOS
+- Email: Include style in head
+
+
+01-02-2021 6.4.218
+- Calendar: Fixed render bug in allday table view with extremely long titles
+- Calendar: View always assigned color per calendar even when not enabled.
+- Carddav: Problem with vcard 2.1 imports.
+- Core: Install problem when folder wasn't writable.
+
 29-01-2021 6.4.217
 - Address book / carddav: Import of vcard v4.0 failed on photos.
 - Notes crypto: Check if crypto is supported by browser. Only works on SSL enabled sites.
@@ -88,7 +163,7 @@ end 6.5
 
 18-12-2020 6.4.204
 - Files: Count in detail panel card could show from last item with files
-- Core: Link count numbers were off when you didn't have permissions 
+- Core: Link count numbers were off when you didn't have permissions
 - Carddav: fixed Error: CardDAV - response code 500 #635
 - Address book: Everyone group and all contacts translatable #636
 - Core: Don't change div into p. Hopefully fixes wordpaste can't be undone and disables formatting #633
@@ -123,7 +198,7 @@ end 6.5
 - Address book: Re-implemented birthday portlet for address book
 - Core: Bugfix in cronjobs new FW
 - Multi instance: All modules were always checked
-- Addressbook: add optional column 'gender' in grid.  
+- Addressbook: add optional column 'gender' in grid.
 - Core: Check MySQL / MariaDB server version. MySQL 8.0.22 has a bug which causes problems.
 - Core: Some CSV files could not be imported.
 - Core: Don't log 404 not found as errors
@@ -134,7 +209,7 @@ end 6.5
 07-12-2020 6.4.196
 - Startpage: bugfix when removing a portlet for the second time
 - Email: Fixed download / save bug with multiple inline attachments
-- Email: User department in email template 
+- Email: User department in email template
 - Core: Fixed rare upgrade from 6.3 problem. Make custom select field bigger to make sure the new int will fit
 - Core: Removed ID from custom fields to fix rendering of second window.
 - Core: Fixed problem in oath server for rocket.chat login
@@ -147,7 +222,7 @@ end 6.5
 - E-mail: Fixed issue: no default search field in email search #634 (sort error)
 - Core: Required condition in custom fields supports multiple conditions with AND and OR
 - Core: Fixed database check ACL error by correcting invalid "createdBy" values
- 
+
 30-11-2020 6.4.193
 - Studio: minor bugfix upon first generating new module
 - Studio: regenerate several backend files on frontend regeneration
@@ -217,7 +292,7 @@ end 6.5
 - Core: Search splits words from text area fields only and not from small fields. So initials in a contact remain intact for example
 
 27-10-2020 6.4.187
-- Core: Set core_acl.ownedBy to 1 when user has been removed.  
+- Core: Set core_acl.ownedBy to 1 when user has been removed.
 - Core: Cleanup address books and note books on user delete
 
 27-10-2020 6.4.186
@@ -232,7 +307,7 @@ end 6.5
 - Core: Upgrade form 6.3 was broken due to toggleGarbageCollection()
 - Core: New configuration option to logout users when inactive for more than x number of seconds.
 - Core: Raised size of search cache from 190 chars to 750 chars
-- Core: fixed <br /> tags in error messages 
+- Core: fixed <br /> tags in error messages
 - Sieve: make sure result is defined
 - OfficeOnline: Send locale string with country. en_us instead of just en.
 
@@ -303,7 +378,7 @@ end 6.5
 
 05-10-2020 6.4.174
 - Core: sort comments explicitly by creation date
-- Core: Added Romaian holidays and translations. Thanks to safetybroker.ro 
+- Core: Added Romaian holidays and translations. Thanks to safetybroker.ro
 - Projects: Added finance report with date filter showing all costs, hours, income and budgets
 - Files: Fixed blob ID appearing in files after overwrite
 - Core: Date columns included time stamp T00:00:00 which lead to date changing when in a negative time zone.
@@ -402,7 +477,7 @@ end 6.5
 - Billing: Fixed the PDF template tax totals when printing costs
 - Time registration: Timer button will use Notification area to save/show the timer
 - Time registration: new time insert dialog. (small date field as this is already set in the new view)
-- Time registration: Drag-n-Drop to move / set duration / holt Alt-n-Drag to copy / Click Add time + Hold-n-drag to set duration 
+- Time registration: Drag-n-Drop to move / set duration / holt Alt-n-Drag to copy / Click Add time + Hold-n-drag to set duration
 - Core: Added authorisation check to SSE
 - Customfields: fix User customfield will display in the detail field when not empty
 - Files: added Folder customfield to be displayable in the grid.
@@ -413,7 +488,7 @@ end 6.5
 - Core: Fixed bug to enable deleting comment
 - Core: Better link color in dark theme
 - Bookmarks: fixed bug deleting bookmark categories
-- Customfields: Several bugfixes import and export from projects  
+- Customfields: Several bugfixes import and export from projects
 - Customfields: Improved layout and define columns for showing custom fields net to eachother.
 - Core: Fixed display of relation fields in legacy modules
 - Core: Fixed error handling in grid delete
@@ -459,7 +534,7 @@ end 6.5
 
 13-07-2020 6.4.157
 - Core: Added some common file type icons
-- Core: new config option $config['frameAncestors'] = 'http://examplea.com https/exampleb.com'; to allow Group-Office in 
+- Core: new config option $config['frameAncestors'] = 'http://examplea.com https/exampleb.com'; to allow Group-Office in
         a frame.
 - LDAP auth: Use e-mail for mail username works for SMTP too
 - Core: Auto link URL's and emails in html editor and html rendering
@@ -472,10 +547,10 @@ end 6.5
 - Core: Fixed custom fields saving new select box.
 - Core: Custom fields, generate database name as per MariaDB naming conventions.
 - Address book: Update search cache of employees when changing company name
-- LDAP Auth: Added option to login to IMAP server with email instead of username 
+- LDAP Auth: Added option to login to IMAP server with email instead of username
 - Core: Added complete rebuild search cache option.
 - Core: Fixed broken link display in e-mail
-- Core: Set security headers: 
+- Core: Set security headers:
     	- X-Frame-Options: SAMEORIGIN
         - Content-Security-Policy
     	- X-Content-Type-Options: nosniff
@@ -521,7 +596,7 @@ end 6.5
 15-06-2020 6.4.150
 - Tickets: Search unseen only and fix missing domain in email
 - Email: Error on some ICS attachments or calendar invites
-  			
+
 11-06-2020 6.4.149
 - Calendar: missing go-hidden class showed calendar accept links not intended for GO
 - Calendar: Use email account for sending invites
@@ -552,15 +627,15 @@ end 6.5
 - Newsletters: Sometimes errors were reported with an incorrect email address
 - Email: Aliases didn't show without manage permissions
 - Address book / core: Database check fixes mapping of files folders in address book
-- Address book: Upgrade from 6.3 to 6.4 could cause lost mapping of files folder. 
+- Address book: Upgrade from 6.3 to 6.4 could cause lost mapping of files folder.
 
 25-05-2020 6.4.143
 - Core: error when loading more items in link browser fixed
 - Address book: Added organization city and organization country to contact filters
 - Address book: Improved simple text search by using global search cache
-- Calendar: add 'send email' dialog to context menu actions on appointments 
+- Calendar: add 'send email' dialog to context menu actions on appointments
 - Address book: Address books searching and sorting in the combo when editing contacts
-- Core: filters can have sub groups making complex filters possibl. For example where conditionA and not conditionB 
+- Core: filters can have sub groups making complex filters possibl. For example where conditionA and not conditionB
 - Core: Disable cron jobs failing due to uninstalled modules
 
 20-05-2020 6.4.142
@@ -773,7 +848,7 @@ end 6.5
 
 10-02-2020 6.4.113
 - Core: Don't encode installation files with ioncube.
-- Core: Support fixed dates in date filters 
+- Core: Support fixed dates in date filters
 
 07-02-2020 6.4.112
 - Core: Fixed bugs in group dialog with loading and changing users when deselecting
@@ -843,7 +918,7 @@ end 6.5
 - Core: support cmd + backspace on macos for deleting in grids
 - Core: Fixed small prints in Firefox
 - Filters: Some filters were not working with "NOT"
-- Filters: Sort combo alpabetically 
+- Filters: Sort combo alpabetically
 - Address book: A manual sort was required after changing sorting by last or first name
 - Address book: Fixed missing contact fields in templates (email, company post address)
 - Leave days: Year summary didn't show if you had hours from last year but no new hours
@@ -876,10 +951,10 @@ end 6.5
 - Core: Focus on first invalid field and tab when save fails
 
 13-01-2020 6.4.101
-- Core: cron will run even though another instance of the cron process is still running. 
+- Core: cron will run even though another instance of the cron process is still running.
 - Newsletters: When cron runs check if newsletters has been active in the past minute. If not then start sending.
 - Addressbook: Fixed bug in company custom fields migration
- 
+
 13-01-2020 6.4.100
 - Core: Fixed problem where list could load older request results
 - Newsletters: Send email to address list owner when someone unsubscribes
@@ -953,7 +1028,7 @@ end 6.5
 - Files: Fixed file not found bug when downloading files
 - Core: Fixed missing back button on small screens for system settings dialog and user settings dialog
 - Newsletters: Unable to add new recipients when last recipient was removed
-- Custom fields: Hidden custom fields could show in detail view 
+- Custom fields: Hidden custom fields could show in detail view
 
 10-12-2019 6.4.92
 - Address book: Add contact was broken
@@ -976,7 +1051,7 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Postfix admin: Auto grow alias field
 - Core: "Login enabled" checkbox visible when using IMAP or LDAP authentication
 - Email: Fixed error in sieve disconnect
-- EMail: Added new header X-Group-Office-Title: Group-Office 
+- EMail: Added new header X-Group-Office-Title: Group-Office
 - Core: Cleaned up EntityStore code
 - Address book: Sorry, an unexpected error occurred: The contact groups must match with the addressBookId. Group ID: 10 belongs to 3 and the contact belongs to 1
 - Projects: Removed broken natural sort and added created and modified at columns
@@ -1106,7 +1181,7 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Address book: City missing from contact in templates
 - LDAP Authenticator: Also match users based on e-mail address
 - Address book: Put organizations on top in contact detail view
-- Hoilidays: removed "From" boxLabel 
+- Hoilidays: removed "From" boxLabel
 - Projects: Fixed undefined index contact_id error when creating project from mail
 - E-mail: Pass contact ID and don't search by email for e-mail templates
 
@@ -1251,7 +1326,7 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 
 10-09-2019 6.4.52
 - Billing: Fixed group summary gross total in PDF.
-- Caldav: events with status needs-action were not synced. Change status to needs-action to tentative as needs-action is not a valid vevent status. 
+- Caldav: events with status needs-action were not synced. Change status to needs-action to tentative as needs-action is not a valid vevent status.
 - Carddav: Create with vcard 4.0 format was broken (davdroid)
 - Core: Added user import with ability to create mailbox on mailserver too
 - Serverclient: Fixed missing domain checkboxes in user dialog
@@ -1358,8 +1433,8 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Address book: Search in email by default too
 
 12-08-2019 6.4.37
-- Calendar: Fixed Error in 
-  /usr/share/groupoffice/modules/calendar/model/Participant.php at line 408: 
+- Calendar: Fixed Error in
+  /usr/share/groupoffice/modules/calendar/model/Participant.php at line 408:
   Call to undefined method go\\modules\\community\\addressbook\\model\\Contact::link()
 - Core: Custom fields migration fixes
 - Core: Fixed upload screen missing style
@@ -1451,13 +1526,13 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 - Core: Object values were always posted even if they weren't dirty (Problem with acl's)
 
 01-07-2019 6.4.25
-- Core: Simplified search. All words will be used with AND instead of OR. A wildcard will be placed after each word. 
+- Core: Simplified search. All words will be used with AND instead of OR. A wildcard will be placed after each word.
 - Core: Fixed upgrade error can't find module core/groups
 - Comments: Fixed comment permissions and label editing
 - Core: Loading mask could stick sometimes
 - Email: Click on email from list that has just been deleted elsewhere forever show the Loading ... pop-up #425
-- Emailcomposer: Insert inline image in composer through the upload button 
-  opened a file chooser in which you could only choose folders. 
+- Emailcomposer: Insert inline image in composer through the upload button
+  opened a file chooser in which you could only choose folders.
   This is now changed to be able to choose (image)files.
 - Address book: Fixed "function" and "first_name" in email templates
 - Core: Fixed downloading language translation file from system settings
@@ -1498,6 +1573,12 @@ https://groupoffice.readthedocs.io/en/latest/using/connect-a-device/connect-a-de
 
 - Calendasr: Show unconfirmed holidays
 - Projects: Send company id when selecting contact
+
+09-02-2021 6.3.96
+- Core: Fixed migrating user visibility when upgrading from v6.2
+
+13-10-2020 6.3.95
+- GOTA: certificate renewed
 
 28-09-2020 6.3.94
 - Assistant: removed install sql that could cause:

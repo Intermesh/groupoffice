@@ -73,3 +73,24 @@ $updates['201901191547'][] = "DELETE FROM `sync_addressbook_user` where userId n
 
 //$updates['201901191547'][] = "ALTER TABLE `sync_addressbook_user` ADD FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
 $updates['201901191547'][] = "ALTER TABLE `sync_addressbook_user` ADD FOREIGN KEY (`userId`) REFERENCES `core_user`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;";
+
+$updates['202102081135'][] = function() {
+
+	echo "Resync contacts on all devices\n";
+
+	try {
+		\GO\Sync\SyncModule::requireZPush();
+
+		$devices = \ZPush::GetStateMachine()->GetAllDevices();
+		/** @var ASDevice $device */
+		foreach ($devices as $device) {
+			$users = \ZPushAdmin::ListUsers($device);
+			foreach ($users as $user) {
+				echo "Resync $user - $device\n";
+				\ZPushAdmin::ResyncFolder($user, $device, 'c/GroupOfficeContacts');
+			}
+		}
+	} catch(Exception $e) {
+		echo "Z-push not loaded: " . $e->getMessage() . "\n";
+	}
+};

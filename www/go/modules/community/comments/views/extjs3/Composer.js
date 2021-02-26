@@ -71,7 +71,11 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			tooltip: t('Send'),
 			iconCls: 'ic-send',
 			handler: function(){
-				this.submit().then(function(){
+				if (Ext.isEmpty(this.textField.getValue())) {
+					this.textField.focus();
+					return false;
+				}
+				this.submit().then(function () {
 					this.reset(); // otherwise it will update the second time
 					this.textField.setHeight(this.minComposerHeight);
 					this.textField.syncValue();
@@ -137,6 +141,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		var h = Math.min(this.ownerCt.growMaxHeight, this.ownerCt.commentsContainer.getEl().dom.scrollHeight + this.getHeight() + headerHeight + dp(8));
 		this.ownerCt.setHeight(h);
 		this.ownerCt.doLayout();
+		this.ownerCt.scrollDown();
 	},
 	
 	initEntity : function(entityId,entity, section) {

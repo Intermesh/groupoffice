@@ -13,6 +13,9 @@ go.data.StoreTrait = {
 
   	//created this because grouping store must share this.
 	setup : function() {
+
+		Ext.applyIf(this, go.data.FilterTrait);
+
 		if(!this.baseParams) {
 			this.baseParams = {};
 		}
@@ -70,16 +73,7 @@ go.data.StoreTrait = {
 		}, this);
 	},
 	
-	initFilters : function() {
-		//JMAP remote filters. Used by setFilter()
-		if(this.filters) {
-			for(var name in this.filters) {
-				this.setFilter(name, this.filters[name]);
-			}
-		} else {
-			this.filters = {};
-		}
-	},
+
   
   addCustomFields : function(config) {
 		if(!config.entityStore) {
@@ -174,7 +168,10 @@ go.data.StoreTrait = {
 					o.params.limit = this.lastOptions.params.position + (this.lastOptions.limit || this.baseParams.limit || 20);
 				}
 
-				this.load(o);
+				var me = this;
+				this.load(o).then(function() {
+					me.fireEvent("changes", me);
+				});
 				return;
 			}
 		}		
@@ -196,7 +193,11 @@ go.data.StoreTrait = {
 				o.params.limit = this.lastOptions.params.position + (this.lastOptions.limit || this.baseParams.limit || 20);
 			}
 
-			this.load(o);
+			var me = this;
+			this.load(o).then(function() {
+				me.fireEvent("changes", me);
+			})
+			return;
 		}
 		
 		for(var i = 0, l = destroyed.length; i < l; i++) {
@@ -205,6 +206,8 @@ go.data.StoreTrait = {
 				this.remove(record);
 			}
 		}
+
+		this.fireEvent("changes", this);
 	},
 
   /**
@@ -221,62 +224,7 @@ go.data.StoreTrait = {
 	
 	removeById : function(id) {
 		this.remove(this.getById(id));
-  },
+  }
 
-	/**
-	 * Same as set filter but keeps existing filter values if set
-	 *
-	 * @param cmpId
-	 * @param filter
-	 * @returns {go.data.StoreTrait}
-	 */
-	patchFilter : function(cmpId, filter) {
-		var f = this.getFilter(cmpId);
-		if(!f) {
-			f = {};
-		}
-		return this.setFilter(cmpId, Ext.apply(f, filter));
-	},
-  
-  /**
-	 * Set a filter object for a component
-	 * 
-	 * @param {string} cmpId
-	 * @param {object} filter if null is given it's removed
-	 * @returns {this}
-	 */
-	setFilter : function(cmpId, filter) {
-		if(filter === null) {
-			delete this.filters[cmpId];
-		} else
-		{
-			this.filters[cmpId] = filter;
-		}		
 
-		var conditions = [];
-		for(var cmpId in this.filters) {
-			conditions.push(this.filters[cmpId]);
-		}
-
-		switch(conditions.length) {
-			case 0:
-				delete this.baseParams.filter;
-				break;
-			case 1:
-				this.baseParams.filter = conditions[0];
-				break;
-			default:
-				this.baseParams.filter = {
-					operator: "AND",
-					conditions: conditions
-				};
-				break;
-		}
-		
-		return this;
-	},
-	
-	getFilter : function(name) {
-		return this.filters[name];
-	}
 };
