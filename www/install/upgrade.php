@@ -113,7 +113,7 @@ function checkLicenses($is62 = false) {
 					->all();
 	}
 	
-	$unavailable = ['test'];
+	$unavailable = [];
 	foreach($modules as $module) {
 		
 		if(isset($module['package']) && $module['package'] != 'legacy') {
