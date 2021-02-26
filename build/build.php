@@ -387,9 +387,11 @@ class Builder
 
 
 $builder = new Builder($config);
-$builder->build();
+
 
 if (isset($argv[1]) && $argv[1] == "test") {
 	$builder->test = true;
 }
+
+$builder->build();
 
