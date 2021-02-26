@@ -113,7 +113,7 @@ function checkLicenses($is62 = false) {
 					->all();
 	}
 	
-	$unavailable = [];
+	$unavailable = ['test'];
 	foreach($modules as $module) {
 		
 		if(isset($module['package']) && $module['package'] != 'legacy') {
@@ -140,12 +140,13 @@ function checkLicenses($is62 = false) {
 			$unavailable[] = $module['name'];
 		}		
 	}
-	if(isset($args['ignore']) && count($unavailable)) {
+	if(isset($GLOBALS['args']['ignore']) && count($unavailable)) {
 		if($is62) {
 			GO()->getDbConnection()->query("update go_modules set enabled=0 where id IN ('".implode("', '",$unavailable)."')");
 		} else {
 			GO()->getDbConnection()->query("update core_module set enabled=0 where name IN ('".implode("', '",$unavailable)."')");	
 		}
+
 	} elseif(count($unavailable)) {
 
 		echo "The following modules are not available because they're missing on disk\n"
