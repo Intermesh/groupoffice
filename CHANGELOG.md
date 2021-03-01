@@ -1,5 +1,6 @@
 6.4.225
 - Core: fixed order of address fields in UK addresses. Thanks Jonny C
+- Core : bugfix in AclEntity::getChanges() method
 
 26-02-2021 6.4.224
 - Multi instance: Fixed delete issue when temp dir was in use

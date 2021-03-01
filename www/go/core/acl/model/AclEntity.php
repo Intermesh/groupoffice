@@ -78,8 +78,9 @@ abstract class AclEntity extends Entity {
 						->offset($states[2]['offset'])
 						->limit($maxChanges + 1);
 
-
-		if($isAclItem) {
+		// Checks whether current class is a ACL Owner entity. If not, join with ACL owner entity
+		$isAclOwnerEntity = is_a(static::aclEntityClass(), AclOwnerEntity::class, true);
+		if ($isAclItem && !$isAclOwnerEntity) {
 			static::joinAclEntity($query);
 		}
 		
