@@ -6,6 +6,7 @@ use GO\Base\Db\ActiveRecord;
 use go\core\acl\model\AclItemEntity;
 use go\core\App;
 use go\core\db\Criteria;
+use go\core\db\Query as DbQuery;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
@@ -151,8 +152,20 @@ class Link extends AclItemEntity
 														->join('core_search', 's', 's.entityId = l.toId AND s.entityTypeId = l.toEntityTypeId')
 		);
 	}
-	
-	
+
+	/**
+	 * Overridden because the Acl entity Search is already joined in defineMapping()
+	 *
+	 * @param DbQuery $query
+	 * @param null $fromAlias
+	 * @return string
+	 */
+	public static function joinAclEntity(DbQuery $query, $fromAlias = null)
+	{
+		return 's.aclId';
+	}
+
+
 	/**
 	 * Create a link between two entities
 	 * 
