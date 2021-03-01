@@ -294,8 +294,8 @@ class StringHelper {
 			$source_charset = 'UTF-8';
 		
 
-		
-		$str = str_replace("€","&euro;", $str);
+//		wtf?
+//		$str = str_replace("€","&euro;", $str);
 		
 		$source_charset = self::fixCharset($source_charset);
 		try {
