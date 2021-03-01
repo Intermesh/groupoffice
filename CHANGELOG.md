@@ -3,6 +3,7 @@
 - Core : bugfix in AclEntity::getChanges() method
 - Core: catch spaces in function CFs, preventing errors
 - Billing: Added optional fields description and short description to products grid in catalogue
+- Email: Fixed &euro; shown in subject instead of €
 
 26-02-2021 6.4.224
 - Multi instance: Fixed delete issue when temp dir was in use
