@@ -63,8 +63,6 @@ abstract class AclEntity extends Entity {
 
 			return $result;
 		}
-			
-		$entityType = static::entityType();		
 
 		$isAclItem = is_a(static::class, AclItemEntity::class, true);			
 
