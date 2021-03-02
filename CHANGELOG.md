@@ -6,6 +6,7 @@
 - Core: Link/changes could lead to double join of core_search s
 - Core: Improved list style in HTML editor and SHIFT + ENTER in lists inserts line break
   instead of new list item.
+- Calendar: Fixed crash of calendar when deleting the selected view.
 
 26-02-2021 6.4.224
 - Multi instance: Fixed delete issue when temp dir was in use
