@@ -745,11 +745,11 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 				var k = e.getKey(), doc = this.getDoc();
 				if(
-					e.shiftKey && k == e.ENTER &&
+					Ext.isWebKit && e.shiftKey && k == e.ENTER &&
 					(doc.queryCommandState('insertorderedlist') || doc.queryCommandState('insertunorderedlist'))
 				) {
 					e.stopEvent();
-					this.execCmd('InsertHtml','<br /><br />');
+					this.execCmd('InsertHtml',Ext.isGecko ? '<br />' : '<br /><br />');
 					this.deferFocus();
 				} else if (k == e.TAB) {
 					e.preventDefault();
