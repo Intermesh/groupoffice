@@ -1840,71 +1840,70 @@ table[id^="comments-ext"] b {
 	}
 }
 
+/**
+ * Resets ExtJS style to normal HTML defaults for displaying the HTML editor values or e-mails
+ */
 .go-html-formatted {
+
 	@extend %font-body1;
-}
 
-//.go-html-formatted div, .go-html-formatted dl, .go-html-formatted dt, .go-html-formatted dd, .go-html-formatted ul, .go-html-formatted ol, .go-html-formatted li, .go-html-formatted h1, .go-html-formatted h2, .go-html-formatted h3, .go-html-formatted h4, .go-html-formatted h5, .go-html-formatted h6, .go-html-formatted pre, .go-html-formatted form, .go-html-formatted fieldset, .go-html-formatted input, .go-html-formatted p, .go-html-formatted blockquote, .go-html-formatted th, .go-html-formatted td, .go-html-formatted span {
-//    font: inherit;
-//}
+	blockquote {
+		display: block;
+		margin: 1em 40px;
+		pading: 0px 10px;
+	}
 
-.go-html-formatted  blockquote {  
-  display: block;  
-  margin: 1em 40px;  
-  pading:0px 10px;
-}
+	td {
+		display: table-cell;
+	}
 
-.go-html-formatted td {   
-   display: table-cell;  
-/*   vertical-align: inherit;  
-   text-align: inherit; */
- }  
-   
-.go-html-formatted th {  
-   display: table-cell;  
-   vertical-align: inherit;  
-   font-weight: bold;  
-   padding: 1px;  
- }
+	th {
+		display: table-cell;
+		vertical-align: inherit;
+		font-weight: bold;
+		padding: 1px;
+	}
 
-   
-.go-html-formatted ul,.go-html-formatted  menu, .go-html-formatted dir {  
-	display: block;
-	list-style-type: disc;
-	list-style-position: inside;
-	margin: 0;
-	padding: 0 0 0 2em;
- }  
-   
-.go-html-formatted ol {  
-	display: block;
-	list-style-type: decimal;
-	list-style-position: inside;
-	margin: 0;
-	padding: 0 0 0 2em;
+	ul, menu, dir {
+		display: block;
+		list-style-type: disc;
+		list-style-position: outside;
+		margin: 0;
+		padding: 0 0 0 2em;
+	}
 
-	> ol {
-		list-style-type: lower-alpha;
+	ol {
+		display: block;
+		list-style-type: decimal;
+		list-style-position: outside;
+		margin: 0;
+		padding: 0 0 0 2em;
+
 		> ol {
-			list-style-type: lower-roman;
+			list-style-type: lower-alpha;
+
+			> ol {
+				list-style-type: lower-roman;
+			}
 		}
 	}
- }  
-   
-.go-html-formatted li {  
-   display: list-item;  
- }
- 
-.go-html-formatted p {  
-   margin: dp(8) 0px;
- }
 
-.go-html-formatted a:link, .go-html-formatted a:visited, .go-html-formatted a:active{
-	text-decoration:underline;
-	color: $cAnchor;
-}
-.go-html-formatted a:visited{
-	color:purple;
+	li {
+		display: list-item;
+	}
+
+	p {
+		margin: dp(8) 0px;
+	}
+
+	a:link, a:visited, a:active {
+		text-decoration: underline;
+		color: $cAnchor;
+	}
+
+	a:visited {
+		color: purple;
+	}
 }
 
 .normal-link {

@@ -18,15 +18,15 @@ body, html {
 	height: 100%;
 }
 button, html, input, select, textarea {
-	font-family: $font-family;
+	font-family: Helvetica, Arial, sans-serif;
 }
 
-h1 { @extend %font-display1; }
-h2 { @extend %font-headline; }
-h3 { @extend %font-title; }
-h4 { @extend %font-subheading; }
-h5 { @extend %font-subheading-dense; }
-h6 { @extend %font-data-head; }
+h1 { @extend %font-display1; font-family: Helvetica, Arial, sans-serif;}
+h2 { @extend %font-headline; font-family: Helvetica, Arial, sans-serif;}
+h3 { @extend %font-title; font-family: Helvetica, Arial, sans-serif;}
+h4 { @extend %font-subheading; font-family: Helvetica, Arial, sans-serif;}
+h5 { @extend %font-subheading-dense; font-family: Helvetica, Arial, sans-serif;}
+h6 { @extend %font-data-head; font-family: Helvetica, Arial, sans-serif;}
 
 code {
 	border: 1px solid color($fg, 'line');
@@ -41,5 +41,27 @@ code {
 
 p {
 	margin: dp(16) 0;
+}
+
+ul{
+	display: block;
+	list-style-type: disc;
+	list-style-position: outside;
+	margin: 0;
+	padding: 0 0 0 2em;
+}
+
+ol {
+	display: block;
+	list-style-type: decimal;
+	list-style-position: outside;
+	margin: 0;
+	padding: 0 0 0 2em;
+	> ol {
+		list-style-type: lower-alpha;
+		> ol {
+			list-style-type: lower-roman;
+		}
+	}
 }
 

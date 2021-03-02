@@ -744,7 +744,14 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 			return function (e) {
 
 				var k = e.getKey(), doc = this.getDoc();
-				if (k == e.TAB) {
+				if(
+					e.shiftKey && k == e.ENTER &&
+					(doc.queryCommandState('insertorderedlist') || doc.queryCommandState('insertunorderedlist'))
+				) {
+					e.stopEvent();
+					this.execCmd('InsertHtml','<br /><br />');
+					this.deferFocus();
+				} else if (k == e.TAB) {
 					e.preventDefault();
 					if (doc.queryCommandState('insertorderedlist') || doc.queryCommandState('insertunorderedlist')) {
 						this.execCmd(e.shiftKey ? 'outdent' : 'indent');
