@@ -21,6 +21,15 @@ end 6.5
 --------
 
 
+6.4.225
+- Core: fixed order of address fields in UK addresses. Thanks Jonny C
+- Core: catch spaces in function CFs, preventing errors
+- Billing: Added optional fields description and short description to products grid in catalogue
+- Email: Fixed &euro; shown in subject instead of €
+- Core: Link/changes could lead to double join of core_search s
+- Core: Improved list style in HTML editor and SHIFT + ENTER in lists inserts line break
+  instead of new list item.
+
 26-02-2021 6.4.224
 - Multi instance: Fixed delete issue when temp dir was in use
 - Email: Fixed light text color in outgoing mails when using Dark theme
