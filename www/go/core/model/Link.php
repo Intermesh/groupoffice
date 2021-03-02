@@ -190,6 +190,12 @@ class Link extends AclItemEntity
 		);
 	}
 
+	/**
+	 * Override because it should not join core_search because we already do this in the mapping
+	 *
+	 * @param Query $query
+	 * @return bool
+	 */
 	protected static function useSearchableTraitForSearch(Query $query)
 	{
 		return true;
