@@ -1,4 +1,4 @@
-6.4.225
+03-03-2021 6.4.225
 - Core: fixed order of address fields in UK addresses. Thanks Jonny C
 - Core: catch spaces in function CFs, preventing errors
 - Billing: Added optional fields description and short description to products grid in catalogue
