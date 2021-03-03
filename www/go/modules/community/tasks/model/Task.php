@@ -87,7 +87,8 @@ class Task extends AclItemEntity {
 
 	public $color;
 
-	public $status;
+	//The scheduling status
+	//public $status = 'confirmed';
 
 	/**
      * If present, this object represents one occurrence of a

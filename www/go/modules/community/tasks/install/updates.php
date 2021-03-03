@@ -27,7 +27,7 @@ $updates['201911061630'][] = function(){
 		$data = [];
 		$data['createdBy'] = $row["user_id"];
 		$data['tasklistId'] = $row["tasklist_id"];
-		GO()->getDbConnection()->insert('tasks_portlet_tasklist', $data)->execute();
+		GO()->getDbConnection()->insertIgnore('tasks_portlet_tasklist', $data)->execute();
 	}
 
 	$stmt =\GO::getDbConnection()->query("SELECT * FROM ta_tasks_custom_fields");
@@ -43,25 +43,26 @@ $updates['201911061630'][] = function(){
 	while($row = $stmt->fetch()){
 		$data = [];
 		$data['id'] = $row["id"];
+		$data['role'] = 1;
 		$data['name'] = $row["name"];
 		$data['createdBy'] = $row["user_id"];
 		$data['aclId'] = $row["acl_id"];
 		$data['filesFolderId'] = $row["files_folder_id"];
 		$data['version'] = $row["version"];
-		GO()->getDbConnection()->insert('tasks_tasklist', $data)->execute();
+		GO()->getDbConnection()->insertIgnore('tasks_tasklist', $data)->execute();
 	}
 
-	$stmt =\GO::getDbConnection()->query("SELECT * FROM ta_settings");
-
-	while($row = $stmt->fetch()){
-		$data = [];
-		$data['createdBy'] = $row["user_id"];
-		$data['reminderDays'] = $row["reminder_days"];
-		$data['reminderTime'] = $row["reminder_time"];
-		$data['remind'] = $row["remind"];
-		$data['defaultTasklistId'] = $row["default_tasklist_id"];
-		GO()->getDbConnection()->insert('tasks_settings', $data)->execute();
-	}
+//	$stmt =\GO::getDbConnection()->query("SELECT * FROM ta_settings");
+//
+//	while($row = $stmt->fetch()){
+//		$data = [];
+//		$data['createdBy'] = $row["user_id"];
+//		$data['reminderDays'] = $row["reminder_days"];
+//		$data['reminderTime'] = $row["reminder_time"];
+//		$data['remind'] = $row["remind"];
+//		$data['defaultTasklistId'] = $row["default_tasklist_id"];
+//		GO()->getDbConnection()->insert('tasks_settings', $data)->execute();
+//	}
 
 	$stmt =\GO::getDbConnection()->query("SELECT * FROM ta_categories");
 
@@ -70,7 +71,7 @@ $updates['201911061630'][] = function(){
 		$data['id'] = $row["id"];
 		$data['name'] = $row["name"];
 		$data['createdBy'] = $row["user_id"];
-		GO()->getDbConnection()->insert('tasks_category', $data)->execute();
+		GO()->getDbConnection()->insertIgnore('tasks_category', $data)->execute();
 	}
 
 	$stmt =\GO::getDbConnection()->query("SELECT * FROM ta_tasks");
@@ -88,14 +89,16 @@ $updates['201911061630'][] = function(){
 		$data['modifiedBy'] = $row["muser_id"];
 		$data['start'] = DateTime::createFromFormat( 'U', $row["start_time"]);
 		$data['due'] = DateTime::createFromFormat( 'U', $row["due_time"]);
-		$data['completed'] = DateTime::createFromFormat( 'U', $row["completion_time"]);
+		if(!empty($row["completion_time"])) {
+			$data['progress'] = \go\modules\community\tasks\model\Progress::Completed;
+		}
+		$data['progressUpdated'] =  DateTime::createFromFormat( 'U', $row["completion_time"]);
 		$data['title'] = $row["name"];
 		$data['description'] = $row["description"];
 		$data['recurrenceRule'] = str_replace($needles,$haystack,$row["rrule"]);
 		$data['filesFolderId'] = $row["files_folder_id"];
 		$data['priority'] = $row["priority"];
-		$data['percentageComplete'] = $row["percentage_complete"];
-		$data['projectId'] = $row["project_id"];
+		$data['percentComplete'] = $row["percentage_complete"];
 
 		$rrule = new Rrule();
 		$rrule->readIcalendarRruleString($row["start_time"], $row['rrule']);
@@ -124,7 +127,7 @@ $updates['201911061630'][] = function(){
 		}
 
 		$data['recurrenceRule'] = json_encode($recurrencePattern);
-		GO()->getDbConnection()->insert('tasks_task', $data)->execute();
+		GO()->getDbConnection()->insertIgnore('tasks_task', $data)->execute();
 	}
 
 	$stmt =\GO::getDbConnection()->query("SELECT id,category_id FROM ta_tasks");
@@ -133,16 +136,16 @@ $updates['201911061630'][] = function(){
 		$data = [];
 		$data['taskId'] = $row["id"];
 		$data['categoryId'] = $row["category_id"];
-		GO()->getDbConnection()->insert('tasks_task_category', $data)->execute();
+		GO()->getDbConnection()->insertIgnore('tasks_task_category', $data)->execute();
 	}
 
-	$stmt =\GO::getDbConnection()->query("SELECT id,reminder FROM ta_tasks");
+	$stmt =\GO::getDbConnection()->query("SELECT id,reminder,user_id FROM ta_tasks");
 
 	while($row = $stmt->fetch()) {
 		$data = [];
 		$data['taskId'] = $row["id"];
-		$data['remindDate'] = DateTime::createFromFormat( 'U', $row["reminder"]);
-		$data['remindTime'] = DateTime::createFromFormat( 'U', $row["reminder"])->format('H:i:s');
-		GO()->getDbConnection()->insert('tasks_alert', $data)->execute();
+		$data['userId'] = $row['user_id'];
+		$data['when'] = DateTime::createFromFormat( 'U', $row["reminder"]);
+		GO()->getDbConnection()->insertIgnore('tasks_alert', $data)->execute();
 	}
 };

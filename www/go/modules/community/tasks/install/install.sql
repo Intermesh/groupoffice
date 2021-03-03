@@ -105,7 +105,7 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `tasks_alert` (
   `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `when` DATETIME NOT NULL,
-  `acknowledged` DATETIME NOT NULL,
+  `acknowledged` DATETIME DEFAULT NULL,
   `relatedTo` TEXT NULL,
   `action` SMALLINT(2) NOT NULL DEFAULT 1,
   `offset` VARCHAR(45) NULL,
@@ -243,7 +243,6 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `tasks_default_alert` (
   `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `when` DATETIME NOT NULL,
-  `acknowledged` DATETIME NOT NULL,
   `relatedTo` TEXT NULL,
   `action` SMALLINT(2) NOT NULL DEFAULT 1,
   `offset` VARCHAR(45) NULL,
