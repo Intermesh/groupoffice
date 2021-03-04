@@ -771,26 +771,27 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$bccAddresses = array();
 			$emailAddresses = array_merge($toAddresses,$ccAddresses);
 			$emailAddresses = array_merge($emailAddresses,$bccAddresses);
+			$emailAddresses = array_keys($emailAddresses);
 
-			foreach ($emailAddresses as $emailAddress => $fullName) {
 
-				$contact = Contact::findByEmail($emailAddress)->orderBy(['c.goUserId' => 'DESC'])->single();
+			$contacts = Contact::findByEmail($emailAddresses)->filter(['permissionLevel' => Acl::READ_PERMISSION]);
+			foreach($contacts as $contact) {
 
-				if($contact) {
-					$contactLastMailTimeModel = ContactMailTime::model()->findSingleByAttributes(array(
-						'contact_id' => $contact->id,
-						'user_id' => GO::user()->id
-					));
 
-					if (!$contactLastMailTimeModel) {
-						$contactLastMailTimeModel = new ContactMailTime();
-						$contactLastMailTimeModel->contact_id = $contact->id;
-						$contactLastMailTimeModel->user_id = GO::user()->id;
-					}
+				$contactLastMailTimeModel = ContactMailTime::model()->findSingleByAttributes(array(
+					'contact_id' => $contact->id,
+					'user_id' => GO::user()->id
+				));
 
-					$contactLastMailTimeModel->last_mail_time = time();
-					$contactLastMailTimeModel->save();
+				if (!$contactLastMailTimeModel) {
+					$contactLastMailTimeModel = new ContactMailTime();
+					$contactLastMailTimeModel->contact_id = $contact->id;
+					$contactLastMailTimeModel->user_id = GO::user()->id;
 				}
+
+				$contactLastMailTimeModel->last_mail_time = time();
+				$contactLastMailTimeModel->save();
+
 
 
 			}
