@@ -1486,8 +1486,12 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if(!$plaintext){
 
 			if($params['mailbox']!=$account->sent && $params['mailbox']!=$account->drafts) {
-				$response = $this->_blockImages($params, $response);
+
 				$response = $this->_checkXSS($params, $response);
+			}
+
+			if($params['mailbox'] == $account->spam) {
+				$response = $this->_blockImages($params, $response);
 			}
 
 			//Don't do these special actions in the special folders
