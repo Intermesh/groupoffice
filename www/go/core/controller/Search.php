@@ -68,7 +68,7 @@ class Search extends EntityController {
 							->join("addressbook_email_address", "e", "e.contactId=c.id");
 
 			if($isEmailModuleAvailable && $optionEnabled == "1") {
-				$contactsQuery->join("em_contacts_last_mail_times", "em", "em.contact_id=c.id","LEFT");
+				$contactsQuery->join("em_contacts_last_mail_times", "em", "em.contact_id = c.id AND em.user_id = " . go()->getAuthState()->getUserId(),"LEFT");
 			}
 
 
