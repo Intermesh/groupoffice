@@ -1,3 +1,6 @@
+- Email: Fixed sort contacts on last mail time noty always updating
+- Calendar: Fixed invalid reply to meeting request
+
 03-03-2021 6.4.225
 - Core: fixed order of address fields in UK addresses. Thanks Jonny C
 - Core: catch spaces in function CFs, preventing errors
