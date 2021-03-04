@@ -179,7 +179,25 @@ $updates["201806051638"][] ="ALTER TABLE `core_user` CHANGE `decimal_separator` 
 $updates["201806051638"][] ="ALTER TABLE `core_user` CHANGE `first_weekday` `firstWeekday` TINYINT(4) NOT NULL DEFAULT '0';";
 $updates["201806051638"][] ="ALTER TABLE `core_user` CHANGE `list_separator` `listSeparator` CHAR(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT ';';";
 $updates["201806051638"][] ="ALTER TABLE `core_user` CHANGE `text_separator` `textSeparator` CHAR(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '\"';";
-$updates["201806051638"][] ="ALTER TABLE `core_user` ADD UNIQUE(`username`);";
+$updates["201806051638"][] = function() {
+
+	//deduplicate users by adding -1 to duplicates
+	$sql = "update core_user u inner join (
+	    select id, username, count(*) as count
+	    from core_user
+	    group by username
+	) u2 on u.username=u2.username
+	set u.username = concat(u.username, '-', u.id)
+	where u2.count > 1 and u2.id != u.id;";
+
+	$stmt = go()->getDbConnection()->query($sql);
+	$duplicates = $stmt->rowCount();
+	if($duplicates > 0) {
+		echo "\n\n*** WARNING ***: Deduplicated $duplicates users by appending their ID\n\n";
+	}
+
+	go()->getDbConnection()->query("ALTER TABLE `core_user` ADD UNIQUE(`username`);");
+};
 
 $updates['201806141530'][] = "ALTER TABLE `cf_core_user` CHANGE `model_id` `id` INT(11) NOT NULL DEFAULT '0';";
 $updates['201806141530'][] = 'RENAME TABLE `cf_core_user` TO `core_user_custom_fields`;';

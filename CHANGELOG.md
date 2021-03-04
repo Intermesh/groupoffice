@@ -1,3 +1,6 @@
+17-01-2022 6.3.99
+- Core: Added a query to deduplicate usernames before adding unique constraint
+
 26-02-2021 6.3.98
 - Core: Fixed issue with command line upgrade not accepting --ignore
 
