@@ -109,24 +109,9 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		
 		try {
 
-			//attempt login using security class inherited from index.php
-			
-			$user = \go\core\model\User::find(['id', 'username', 'password', 'enabled'])->where(['username' => $username])->single();
-			/* @var $user User */
-
-			if(!$user || !$user->enabled) {
+			if(!$user = \go\core\auth\Authenticate::passwordLogin($username, $password)) {
 				return false;
 			}
-
-			if(!$user->checkPassword($password)) {
-				return false;
-			}			
-
-			$state = new go\core\auth\TemporaryState();
-			$state->setUserId($user->id);
-			\go()->setAuthState($state);		
-
-			$this->oldLogin($user);	
 			
 			if(!GO::modules()->sync) {
 				ZLog::Write(LOGLEVEL_INFO, 'User '. $user->username .' logged on but has no access to the sync module');
