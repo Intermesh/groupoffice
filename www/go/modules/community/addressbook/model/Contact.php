@@ -420,8 +420,8 @@ class Contact extends AclItemEntity {
    * @return static[]|Query
    * @throws Exception
    */
-	public static function findByEmail($email) {
-		return static::find()
+	public static function findByEmail($email, $properties = []) {
+		return static::find($properties)
 						->join("addressbook_email_address", "e", "e.contactId = c.id")
 						->groupBy(['c.id'])
 						->where(['e.email' => $email]);
