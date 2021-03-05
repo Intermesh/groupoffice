@@ -1,3 +1,5 @@
+- Calendar: Fixed display of select boxes in event details
+
 05-03-2021 6.4.226
 - Email: Fixed sort contacts on last mail time noty always updating
 - Calendar: Fixed invalid reply to meeting request
