@@ -1060,9 +1060,7 @@ END;
 		$bodyPos = stripos($html, '<body');
 
 		if($bodyPos) {
-			//replace body with div so style is preserved
-			$html = "<div" . substr($html, $bodyPos + 5);
-			$html = str_ireplace("</body>", "</div>", $html);
+			$html = substr($html, $bodyPos);
 		}
 		
 		$to_removed_array = array (
