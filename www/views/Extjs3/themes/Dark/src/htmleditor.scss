@@ -1,7 +1,7 @@
 @import 'config';
 @import '../../Paper/src/base';
 
-* {
+body, p, span, div {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: sp(16);
 	color: black;
