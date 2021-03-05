@@ -103,13 +103,17 @@ abstract class AclItemEntity extends AclEntity {
 			$keys[] = $fromAlias . '.' . $from . ' = ' . $column->table->getAlias() . ' . '. $to;
 		}
 
-		if($query->isJoined($column->table->getName(), $column->table->getAlias())) {
-			throw new \Exception(
-				"The ACL owner table `". $column->table->getName() .
-				"` was already joined with alias `" .  $column->table->getAlias() .
-				"` in class " . static::class . ". If you joined this table via defineMapping() then override the method joinAclEntity() and return '" . $column->table->getAlias() . '.' . $cls::$aclColumnName ."'.") ;
+		// Override didn't work because on delete it did need to be joined.
+//		if($query->isJoined($column->table->getName(), $column->table->getAlias())) {
+//			throw new \Exception(
+//				"The ACL owner table `". $column->table->getName() .
+//				"` was already joined with alias `" .  $column->table->getAlias() .
+//				"` in class " . static::class . ". If you joined this table via defineMapping() then override the method joinAclEntity() and return '" . $column->table->getAlias() . '.' . $cls::$aclColumnName ."'.") ;
+//		}
+
+		if(!$query->isJoined($column->table->getName(), $column->table->getAlias())) {
+			$query->join($column->table->getName(), $column->table->getAlias(), implode(' AND ', $keys));
 		}
-		$query->join($column->table->getName(), $column->table->getAlias(), implode(' AND ', $keys));
 		
 		
 		//If this is another AclItemEntity then recurse
