@@ -15,11 +15,9 @@ use GO\Base\Model\Acl;
 
 use GO\Base\Mail\Imap;
 use go\core\model\Acl as GoAcl;
-use go\core\util\ArrayObject;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\Settings;
-use go\modules\community\addressbook\Module;
-use GO\Email\Model\ContactMailTime;
+
 
 class MessageController extends \GO\Base\Controller\AbstractController {
 
@@ -771,28 +769,19 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$bccAddresses = array();
 			$emailAddresses = array_merge($toAddresses,$ccAddresses);
 			$emailAddresses = array_merge($emailAddresses,$bccAddresses);
-
-			foreach ($emailAddresses as $emailAddress => $fullName) {
-
-				$contact = Contact::findByEmail($emailAddress)->orderBy(['c.goUserId' => 'DESC'])->single();
-
-				if($contact) {
-					$contactLastMailTimeModel = ContactMailTime::model()->findSingleByAttributes(array(
-						'contact_id' => $contact->id,
-						'user_id' => GO::user()->id
-					));
-
-					if (!$contactLastMailTimeModel) {
-						$contactLastMailTimeModel = new ContactMailTime();
-						$contactLastMailTimeModel->contact_id = $contact->id;
-						$contactLastMailTimeModel->user_id = GO::user()->id;
-					}
-
-					$contactLastMailTimeModel->last_mail_time = time();
-					$contactLastMailTimeModel->save();
-				}
+			$emailAddresses = array_keys($emailAddresses);
 
 
+			$contacts = Contact::findByEmail($emailAddresses)->filter(['permissionLevel' => Acl::READ_PERMISSION])->selectSingleValue('c.id');
+			foreach($contacts as $contactId) {
+
+				go()->getDbConnection()->replace(
+					'em_contacts_last_mail_times',
+					[
+						'contact_id' => $contactId,
+						'user_id' => go()->getAuthState()->getUserId(),
+						'last_mail_time' => time()
+					])->execute();
 			}
 		}
 
@@ -1497,8 +1486,12 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if(!$plaintext){
 
 			if($params['mailbox']!=$account->sent && $params['mailbox']!=$account->drafts) {
-				$response = $this->_blockImages($params, $response);
+
 				$response = $this->_checkXSS($params, $response);
+			}
+
+			if($params['mailbox'] == $account->spam) {
+				$response = $this->_blockImages($params, $response);
 			}
 
 			//Don't do these special actions in the special folders

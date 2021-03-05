@@ -1060,10 +1060,13 @@ END;
 		$bodyPos = stripos($html, '<body');
 
 		if($bodyPos) {
-			$html = substr($html, $bodyPos);
+			//replace body with div so style is preserved
+			$html = "<div" . substr($html, $bodyPos + 5);
+			$html = str_ireplace("</body>", "</div>", $html);
 		}
 		
 		$to_removed_array = array (
+			"'<!--.*-->'Uusi",
 		"'<!DOCTYPE[^>]*>'usi",
 		"'<html[^>]*>'usi",
 		"'</html>'usi",
@@ -1097,7 +1100,7 @@ END;
 		//"'<select[^>]*>.*?</select>'usi",
 		//"'<textarea[^>]*>.*?</textarea>'usi",
 		"'</form>'usi",
-		"'<!--.*-->'Uusi",
+
 		);
 
 		$html = preg_replace($to_removed_array, '', $html);
