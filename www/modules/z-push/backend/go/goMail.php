@@ -114,12 +114,9 @@ class goMail extends GoBaseBackendDiff {
 
 			$bpReturnType = GoSyncUtils::getBodyPreferenceMatch($contentparameters->GetBodyPreference(), array(SYNC_BODYPREFERENCE_MIME, SYNC_BODYPREFERENCE_PLAIN, SYNC_BODYPREFERENCE_HTML));		
 			ZLog::Write(LOGLEVEL_DEBUG, 'goMail->GetMessage::bpReturnType = '.$bpReturnType);
-			
 
 			 if (Request::GetProtocolVersion() >= 12.0) {
-				 
 
-				 
 				$message->asbody = new SyncBaseBody();
 				$asBodyData = null;
 				switch ($bpReturnType) {
