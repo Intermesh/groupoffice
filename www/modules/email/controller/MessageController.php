@@ -1397,6 +1397,10 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$oldMessage = $message->toOutputArray($html,false,true);
 
+		if(!empty($oldMessage['smime_encrypted'])) {
+			$response['sendParams']['encrypt_smime'] = true;
+		}
+
 		// Fix for array_merge functions on lines below when the $response['data']['inlineAttachments'] and $response['data']['attachments'] do not exist
 		if(empty($response['data']['inlineAttachments']))
 			$response['data']['inlineAttachments'] = array();
