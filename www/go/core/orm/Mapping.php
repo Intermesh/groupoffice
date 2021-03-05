@@ -325,6 +325,28 @@ class Mapping {
 	public function getColumn($propName) {
 		return $this->columns[$propName] ?? false;
 	}
+
+	/**
+	 * Get all columns in the mapping
+	 *
+	 * @return Column[]
+	 */
+	public function getColumns() {
+		return array_values($this->columns);
+	}
+
+	/**
+	 * Get column names
+	 *
+	 * @return string[]
+	 */
+	public function getColumnNames() {
+		$names =  array_map(function($c) {
+			return $c->name;
+		}, $this->getColumns());
+
+		return $names;
+	}
 	
 	/**
 	 * Check if a property name is mapped
