@@ -75,6 +75,11 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		
 		switch(cfg.entity) {
 			case 'Project':
+				this.on("load", function() {
+					var p = this.formPanel.getForm().findField("project_id");
+					p.setValue(cfg.data.id);
+					p.setRemoteText(cfg.data.name);
+				}, this, {single: true});
 			case "Contact":				
 				this.formPanel.getForm().findField("name").setValue(cfg.data.name);
 			break;
@@ -103,12 +108,6 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		//tmpfiles on the server ({name:'Name',tmp_file:/tmp/name.ext} will be attached)
 		this.formPanel.baseParams.tmp_files = config.tmp_files ? Ext.encode(config.tmp_files) : '';
 
-		if(config.projectName)
-			this.formPanel.baseParams.project_name=config.projectName;
-		else
-			delete this.formPanel.baseParams.project_name;
-		
-		delete this.link_config;
 		this.formPanel.form.reset();
 
 		//		this.formPanel.form.findField('remind').setValue(!GO.util.empty(GO.tasks.remind));
@@ -126,9 +125,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 		var params = {};
 		if (!GO.util.empty(config.tasklist_id))
 			params.tasklist_id=config.tasklist_id;
-		
-		if (config.link_config && config.link_config.model_name=="GO\\Projects\\Model\\Project")
-			params.project_id=config.link_config.model_id;	
+
 		
 		// this.selectTaskList.container.up('div.x-form-item').setDisplayed(false);
 
@@ -150,14 +147,7 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 				this.selectTaskList.setRemoteText(action.result.remoteComboTexts.tasklist_id);
 
 				if(this.selectProject){
-					if(config.link_config && config.link_config.model_name=="GO\\Projects2\\Model\\Project"){			
-
-						this.selectProject.setValue(config.link_config.model_id);
-						this.selectProject.setRemoteText(config.link_config.text);
-					}else
-					{
-						this.selectProject.setRemoteText(action.result.remoteComboTexts.project_id);
-					}
+					this.selectProject.setRemoteText(action.result.remoteComboTexts.project_id);
 				}
 			
 				var startDate = this.formPanel.form.findField('start_time');
@@ -176,6 +166,8 @@ Ext.extend(GO.tasks.TaskDialog, Ext.util.Observable, {
 				}
 					
 				this.formPanel.form.clearInvalid();
+
+				this.fireEvent("load", this, action);
 					
 			},
 			failure : function(form, action) {

@@ -3,6 +3,7 @@
 - Core: Fixed {product_name} replacement in language export
 - SMIME: Include encrypted content in reply and enable encryption
 - Email: In some cases an error occurred because a link was attempted to a read only organization
+- Projects: Creating task from project fills in project field
 
 03-03-2021 6.4.225
 - Core: fixed order of address fields in UK addresses. Thanks Jonny C
