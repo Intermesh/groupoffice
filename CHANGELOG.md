@@ -21,10 +21,14 @@ end 6.5
 --------
 
 
+05-03-2021 6.4.226
 - Email: Fixed sort contacts on last mail time noty always updating
 - Calendar: Fixed invalid reply to meeting request
 - Core: Fixed {product_name} replacement in language export
 - SMIME: Include encrypted content in reply and enable encryption
+- Email: In some cases an error occurred because a link was attempted to a read only organization
+- Projects: Creating task from project fills in project field
+- Email: Fixed 6.4.224 Problem displaying some email content #675
 
 03-03-2021 6.4.225
 - Core: fixed order of address fields in UK addresses. Thanks Jonny C
