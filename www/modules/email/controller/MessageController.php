@@ -1869,7 +1869,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			foreach($contacts as $contact) {
 				/** @var Contact $contact */
 				if(!$contact->isOrganization) {
-					foreach($contact->findOrganizations(['id', 'addressBookId', 'name']) as $o) {
+					foreach($contact->findOrganizations(['id', 'addressBookId', 'name'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]) as $o) {
 						$contacts[] = $o;
 					}
 				}
