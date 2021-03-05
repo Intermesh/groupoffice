@@ -1160,7 +1160,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$oldMessage = $message->toOutputArray(true,false,true);
 			
 			if(!empty($oldMessage['smime_encrypted'])) {
-				$oldMessage['htmlbody'] = '***';
+				$response['sendParams']['encrypt_smime'] = true;
 			}
 			
 			

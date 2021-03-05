@@ -1,6 +1,7 @@
 - Email: Fixed sort contacts on last mail time noty always updating
 - Calendar: Fixed invalid reply to meeting request
 - Core: Fixed {product_name} replacement in language export
+- SMIME: Include encrypted content in reply and enable encryption
 
 03-03-2021 6.4.225
 - Core: fixed order of address fields in UK addresses. Thanks Jonny C
