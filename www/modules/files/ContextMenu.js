@@ -228,8 +228,9 @@ GO.files.FilesContextMenu = function(config)
 		scope: this
 	});
 
+	config['items'] = [this.openButton, this.openWithButton, this.downloadButton, '-'];
+
 	if (go.Modules.isAvailable("business", "fileconverter")) {
-		config['items'] = [this.openButton, this.openWithButton, this.downloadButton, '-'];
 		config['items'].push(this.saveAsPdf);
 		config['items'].push(this.downloadAsPdf);
 		config['items'].push('-');
