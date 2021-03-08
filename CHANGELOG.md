@@ -1,4 +1,5 @@
 - Calendar: Fixed display of select boxes in event details
+- Billing: load statues by book_id in orderstatus dialog
 
 05-03-2021 6.4.226
 - Email: Fixed sort contacts on last mail time noty always updating
