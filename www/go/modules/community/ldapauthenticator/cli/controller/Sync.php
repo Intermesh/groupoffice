@@ -86,7 +86,7 @@ class Sync extends Controller {
       
       if(!empty($record->mail[0])) {
         $user->orWhere(['email' => $record->mail[0]]);
-      }      
+      }
       $user = $user->single();
 
       if (!$user) {
@@ -96,7 +96,7 @@ class Sync extends Controller {
         $user->username = $username;
         
       } else {
-        $this->output("User '" . $username . "' exists");    
+        $this->output("User '" . $username . "' exists");
       }
 
       Module::ldapRecordToUser($username, $record, $user);

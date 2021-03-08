@@ -67,8 +67,13 @@ class Authenticator extends PrimaryAuthenticator {
 		}
 		
 		$connection = $server->connect();
+
+		$query = $server->usernameAttribute . "=" . $ldapUsername;
+		if($server->loginUsersQuery) {
+			$query = '(&'.$server->loginUsersQuery."($query))";
+		}
 		
-		$record = Record::find($connection, $server->peopleDN, $server->usernameAttribute . "=" . $ldapUsername)->fetch();
+		$record = Record::find($connection, $server->peopleDN, $query)->fetch();
 		
 		if(!$record) {
 			return false;

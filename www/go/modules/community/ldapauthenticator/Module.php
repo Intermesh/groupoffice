@@ -32,6 +32,24 @@ class Module extends core\Module implements DomainProvider {
 						->all();
 	}
 
+	public static function mappedValues(Record $record) {
+		$cfg = go()->getConfig();
+		if(empty($cfg['ldapMapping'])) {
+			return [];
+		}
+		$mapping = $cfg['ldapMapping'];
+		foreach($mapping as $local => $ldap) {
+			if(is_callable($ldap)) {
+				$mapping[$local] = $ldap($record);
+			} else if(isset($record->{$ldap})) {
+				$mapping[$local] = $record->{$ldap}[0];
+			} else {
+				unset($mapping[$local]);
+			}
+		}
+		return $mapping;
+	}
+
 
 	public static function ldapRecordToUser($username, Record $record, User $user) {
 
@@ -56,7 +74,44 @@ class Module extends core\Module implements DomainProvider {
 
 		$user->displayName = $record->cn[0];		
 		$user->email = $record->mail[0];
-		$user->recoveryEmail = isset($record->mail[1]) ? $record->mail[1] : $record->mail[0];		
+		$user->recoveryEmail = isset($record->mail[1]) ? $record->mail[1] : $record->mail[0];
+
+		$values = self::mappedValues($record);
+
+		if(isset($values['diskQuota'])) $user->disk_quota = $values['diskQuota'];
+		if(isset($values['recoveryEmail'])) $user->recoveryEmail = $values['recoveryEmail'];
+		if(isset($values['enabled'])) $user->enabled = $values['enabled'];
+
+		if(\go\core\model\Module::findByName('community', 'addressbook')) {
+			$attrs = new \stdClass();
+			if(isset($values['firstName'])) $attrs->firstName = $values['firstName'];
+			if(isset($values['middleName'])) $attrs->firstName = $values['middleName'];
+			if(isset($values['lastName'])) $attrs->lastName = $values['lastName'];
+			if(isset($values['prefixes'])) $attrs->prefixes = $values['prefixes'];
+			if(isset($values['department'])) $attrs->department = $values['department'];
+			if(isset($values['sex'])) $attrs->gender = $values['sex'];
+
+			$phoneNbs = [];
+			if(isset($values['workPhone'])) $phoneNbs[] = (new \go\modules\community\addressbook\model\PhoneNumber())->setValues(['number' => $values['workPhone'], 'type' => 'work']);
+			if(isset($values['workFax'])) $phoneNbs[] = (new \go\modules\community\addressbook\model\PhoneNumber())->setValues(['number' => $values['workFax'], 'type' => 'workfax']);
+			if(!empty($phoneNbs)) $attrs->phoneNumbers = $phoneNbs;
+
+			if(isset($values['email'])) $attrs->emailAddresses = [(new \go\modules\community\addressbook\model\EmailAddress())->setValues(['email' => $values['email']])];
+
+			$addrAttrs = [];
+			if(!empty($values['street'])) $addrAttrs['street'] = $values['street'];
+			if(!empty($values['zipCode'])) $addrAttrs['zipCode'] = $values['zipCode'];
+			if(!empty($values['city'])) $addrAttrs['city'] = $values['city'];
+			if(!empty($values['country'])) $addrAttrs['country'] = $values['country'];
+			if(!empty($addrAttrs)) {
+				$addrAttrs['type'] = 'home';
+				if(!empty($phoneNbs)) $attrs->addresses = [(new \go\modules\community\addressbook\model\Address())->setValues($addrAttrs)];
+			}
+			$attrs = (array)$attrs;
+			if(!empty($attrs)) {
+				$user->setProfile($attrs);
+			}
+		}
 
 		return $user;
 	}
