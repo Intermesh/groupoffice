@@ -2356,3 +2356,61 @@ body.go-compact {
 		bottom: 0;
 	}
 }
+
+
+.x-view-tiles {
+	padding: dp(2);
+	display: grid;
+	text-align:center;
+	align-content: start;
+	background-color: color($bg,'card');
+	/* define the number of grid columns */
+	grid-gap: dp(4);
+	grid-template-columns: repeat( auto-fill, minmax(dp(216), 1fr));
+	> div.tile {
+		position:relative;
+		outline: 2px solid color($fg,'divider');
+		height: dp(232);
+		background-color: color($bg,'card');
+	}
+
+	span.corner {
+		@extend %font-caption;
+		position:absolute;
+		line-height: dp(12);
+		padding: dp(2) dp(6);
+		top:0;
+		right:0;
+		border-left: 1px solid color($fg,'line');
+		border-bottom: 1px solid color($fg,'line');
+		background-color: color($bg, 'status-bar');
+		display:inline-block;
+		border-bottom-left-radius: $borderRadius;
+	}
+
+	div.text {
+		@extend .ellipsis;
+		padding: 0 dp(16);
+	}
+	.thumb {
+		margin: dp(16);
+		height: dp(80);
+		background-position: center center;
+		background-repeat: no-repeat;
+		background-size:contain;
+	}
+}
+
+.go-module-tile {
+	input {display:block;
+		font-size: 11px;
+		height: 11px;
+		padding: 2px;
+		width: dp(50);
+		min-height: dp(24);
+	}
+}
+
+#startMenu .x-menu-item-icon {
+	height: dp(26);
+}

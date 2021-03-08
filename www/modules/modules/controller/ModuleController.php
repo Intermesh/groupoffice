@@ -13,31 +13,31 @@ use GO\Base\Model\Acl;
 use GO\Base\Data\JsonResponse;
 
 class ModuleController extends AbstractJsonController{
-	
+
 	protected function allowWithoutModuleAccess() {
 		return array('permissionsstore');
 	}
-	
-	protected function ignoreAclPermissions() {		
+
+	protected function ignoreAclPermissions() {
 		return array('*');
 	}
-	
-	
+
+
 	protected function actionDelete($id){
 		$module = Module::model()->findByPk($id);
 		$module->delete();
-		
+
 		echo json_encode(array('success'=>true));
 	}
-	
-	
+
+
 	protected function actionUpdate($id) {
 		if($id === 'users' && $_POST['enabled'] == 'false') {
 			throw new \Exception('This module is required');
 		}
-		
+
 		$module = Module::install($id);
-		
+
 		if($_POST['enabled'] == 'false') {
 			$modMan = $module->moduleManager;
 			if ($modMan) {
@@ -46,7 +46,7 @@ class ModuleController extends AbstractJsonController{
 				}
 			}
 		}
-		
+
 		if($_POST['enabled'] == 'true') {
 			$modMan = $module->moduleManager;
 			if ($modMan) {
@@ -56,25 +56,25 @@ class ModuleController extends AbstractJsonController{
 			}
 		}
 		unset($_POST['id']);
-		$module->setAttributes($_POST);		
+		$module->setAttributes($_POST);
 		$module->save();
-		
-		
+
+
 		go()->rebuildCache(true);
-		
+
 		echo $this->renderSubmit($module);
 	}
-	
 
-	
+
+
 	protected function actionStore($params){
-		
+
 		$response=new JsonResponse(array('success'=>true));
-		
+
 		$modules = GO::modules()->getAvailableModules(true);
-		
+
 		$availableModules=array();
-						
+
 		foreach($modules as $moduleClass){
 
 			$module = $moduleClass::get();
@@ -82,10 +82,19 @@ class ModuleController extends AbstractJsonController{
 			if(!GO\Base\ModuleCollection::isAllowed($module->getName(), $module->getPackage())) {
 				continue;
 			}
-			
+
 			if($module instanceof \go\core\Module) {
 
 				$model = \go\core\model\Module::findByName($module->getPackage(), $module->getName(), null);
+				if(isset($params['isInstalled']) && $params['isInstalled'] == 'true' && !$model) {
+					continue;
+				}
+				if(isset($params['isInstalled']) && $params['isInstalled'] == 'false' && !empty($model)) {
+					continue;
+				}
+				if(!empty($params['query']) && stripos($module->getName(),$params['query'])===false && stripos($module->getDescription(), $params['query'])===false) {
+					continue;
+				}
 
 				$availableModules[ucfirst($module->getPackage()) . $module->getName()] = array(
 					'id' => $model ? $model->id : null,
@@ -103,15 +112,24 @@ class ModuleController extends AbstractJsonController{
 					'not_installable'=> !$module->isInstallable(),
 					'sort_order' => ($model && $model->sort_order)?$model->sort_order:''
 				);
-			
+
 
 			} else
 			{
-				
+
 				$model = GO::modules()->isInstalled($module->name(), false);
-				
-				$availableModules[$module->package().$module->name()] = array(					
-						'id' => $model ? $model->id : null,
+				if(isset($params['isInstalled']) && $params['isInstalled'] == 'true' && !$model) {
+					continue;
+				}
+				if(isset($params['isInstalled']) && $params['isInstalled'] == 'false' && $model) {
+					continue;
+				}
+				if(!empty($params['query']) && stripos($module->localizedName(),$params['query'])===false && stripos($module->description(), $params['query'])===false) {
+					continue;
+				}
+
+				$availableModules[$module->package().$module->name()] = array(
+					'id' => $model ? $model->id : null,
 					'name'=>$module->name(),
 					'localizedName' => $module->localizedName(),
 					'author'=>$module->author(),
@@ -125,61 +143,61 @@ class ModuleController extends AbstractJsonController{
 					'enabled'=>$model && $model->enabled,
 					'not_installable'=> !$module->isInstallable(),
 					'sort_order' => ($model && $model->sort_order)?$model->sort_order:''
-			);
+				);
 			}
 		}
-		
-		ksort($availableModules);		
-		
-		
+
+		ksort($availableModules);
+
+
 		$response['has_license']=GO::scriptCanBeDecoded() || GO::config()->product_name!='GroupOffice';
-						
-		$response['results']=array_values($availableModules);		
+
+		$response['results']=array_values($availableModules);
 		$response['total']=count($response['results']);
-		
+
 		echo $response;
 	}
-	
-	
+
+
 	protected function actionAvailableModulesStore($params){
-		
+
 		$response=new JsonResponse(array('results','success'=>true));
-		
+
 		$modules = GO::modules()->getAvailableModules();
-		
+
 		$availableModules=array();
-						
-		foreach($modules as $moduleClass){		
-			
+
+		foreach($modules as $moduleClass){
+
 			$module = new $moduleClass;//call_user_func($moduleClase();			
-			
+
 			if($module instanceof \go\core\Module) {
-				$availableModules[$module->name()] = array(						
-						'name'=>$module->getName(),
-						'package'=>$module->getPackage()						
+				$availableModules[$module->name()] = array(
+					'name'=>$module->getName(),
+					'package'=>$module->getPackage()
 				);
 			} else
 			{
 				$availableModules[$module->name()] = array(
-						'id'=>$module->name(),
-						'name'=>$module->name(),
-						'package'=>null,
-						'description'=>$module->description(),
-						'icon'=>$module->icon()
+					'id'=>$module->name(),
+					'name'=>$module->name(),
+					'package'=>null,
+					'description'=>$module->description(),
+					'icon'=>$module->icon()
 				);
 			}
 		}
-		
-		ksort($availableModules);		
-		
+
+		ksort($availableModules);
+
 		$response['results']=array_values($availableModules);
-		
+
 		$response['total']=count($response['results']);
-		
+
 		echo $response;
 	}
-	
-	
+
+
 //	protected function actionInstall($params){
 //		
 //		$response =new JsonResponse(array('success'=>true,'results'=>array()));
@@ -211,10 +229,10 @@ class ModuleController extends AbstractJsonController{
 //				
 //		echo $response;
 //	}
-	
+
 	public function actionPermissionsStore($params) {
-		
-		
+
+
 		//check access to users or groups module. Because we allow this action without
 		//access to the modules module		
 		if ($params['paramIdType']=='groupId'){
@@ -224,7 +242,7 @@ class ModuleController extends AbstractJsonController{
 			if(!GO::modules()->users)
 				throw new \GO\Base\Exception\AccessDenied();
 		}
-			
+
 		$response = new JsonResponse(array(
 			'success' => true,
 			'results' => array(),
@@ -232,11 +250,11 @@ class ModuleController extends AbstractJsonController{
 		));
 		$modules = array();
 		$mods = GO::modules()->getAllModules();
-			
+
 		while ($module=array_shift($mods)) {
 			$permissionLevel = 0;
 			$usersGroupPermissionLevel = false;
-			if (empty($params['id'])) {				
+			if (empty($params['id'])) {
 				$aclUsersGroup = $module->acl->hasGroup(GO::config()->group_everyone); // everybody group
 				$permissionLevel=$usersGroupPermissionLevel=$aclUsersGroup ? $aclUsersGroup->level : 0;
 			} else {
@@ -246,17 +264,17 @@ class ModuleController extends AbstractJsonController{
 					$permissionLevel=$aclUsersGroup ? $aclUsersGroup->level : 0;
 				} else {
 					//when looking from the users module
-					$permissionLevel = Acl::getUserPermissionLevel($module->acl_id, $params['id']);					
+					$permissionLevel = Acl::getUserPermissionLevel($module->acl_id, $params['id']);
 					$usersGroupPermissionLevel= Acl::getUserPermissionLevel($module->acl_id, $params['id'], true);
 				}
 			}
-			
+
 			$translated = GO::t("name",  $module->name, $module->package);
-			
+
 			// Module permissions only support read permission and manage permission:
 			if (Acl::hasPermission($permissionLevel,Acl::CREATE_PERMISSION))
-				$permissionLevel = Acl::MANAGE_PERMISSION;			
-			
+				$permissionLevel = Acl::MANAGE_PERMISSION;
+
 			$modules[$translated]= array(
 				'id' => $module->name,
 				'name' => $translated,
@@ -269,30 +287,30 @@ class ModuleController extends AbstractJsonController{
 		ksort($modules);
 
 		$response['results'] = array_values($modules);
-		
+
 		echo $response;
 	}
-	
-	
+
+
 	/**
 	 * Checks default models for this module for each user.
-	 * 
-	 * @param array $params 
+	 *
+	 * @param array $params
 	 */
 	public function actionCheckDefaultModels($params) {
-		
+
 		GO::session()->closeWriting();
-		
+
 
 		GO::setMaxExecutionTime(120);
-		
+
 //		GO::$disableModelCache=true;
 		$module = Module::model()->findByName($params['moduleId']);
 		if($module->package) {
 			return ['success' => true];
 		}
 
-		
+
 		//only do when modified
 		if(strtotime($module->acl->modifiedAt)>time()-120){
 
@@ -306,40 +324,40 @@ class ModuleController extends AbstractJsonController{
 					}
 				}
 			}
-	//		GO::debug(count($users));
+			//		GO::debug(count($users));
 
 			$module->acl->getAuthorizedUsers($module->acl_id, Acl::READ_PERMISSION, array("\\GO\\Modules\\Controller\\ModuleController","checkDefaultModelCallback"), array($models));
 		}
-		
+
 //		if(class_exists("GO_Professional_LicenseCheck")){
 //			$lc = new GO_Professional_LicenseCheck();
 //			$lc->checkProModules(true);
 //		}
 		echo new JsonResponse(array('success'=>true));
 	}
-	
-	public static function checkDefaultModelCallback($user, $models){		
+
+	public static function checkDefaultModelCallback($user, $models){
 		foreach ($models as $model){
-			$model->getDefault($user);		
+			$model->getDefault($user);
 		}
 	}
-	
-	
+
+
 	public function actionUpdateModuleModel($id=false){
-		
+
 		$response = array();
-		
+
 		if($id && GO::request()->isPost()){
-			
+
 			$postData = GO::request()->post['module'];
-			
+
 			$module = Module::model()->findByPk($postData['id']);
-			
+
 			if($module){
-				
+
 				// For now only set the sort_order, other attributes can be added later.
 				$module->sort_order = $postData['sort_order'];
-				
+
 				if($module->save()){
 					$response['success'] = true;
 				} else {
@@ -372,4 +390,3 @@ class ModuleController extends AbstractJsonController{
 //	}
 
 }
-
