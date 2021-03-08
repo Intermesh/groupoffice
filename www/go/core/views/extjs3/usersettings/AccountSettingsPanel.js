@@ -47,7 +47,8 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						name: 'username',
 						fieldLabel: t("Username"),
 						needPasswordForChange: true,
-						allowBlank: false
+						allowBlank: false,
+						autocomplete: "off"
 					}),
 					this.displayNameField = new Ext.form.TextField({
 						fieldLabel: t('Display name','users','core'),
