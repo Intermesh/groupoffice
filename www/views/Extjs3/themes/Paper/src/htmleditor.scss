@@ -1,31 +1,18 @@
 @import 'base';
-body, html {
+body, p, span, div {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: sp(16);
 	color: color($fg, 'text');
 	font-weight: $font-weight-r;
 	line-height: dp(24);
-
-	@media print {
-		font-size: 12px;
-		line-height: 18px;
-	}
-	text-rendering: optimizeLegibility;
-	-webkit-tap-highlight-color: transparent;
-	-webkit-touch-callout: none;
-	height: 100%;
 }
 
-button, html, input, select, textarea {
-	font-family: Helvetica, Arial, sans-serif;
-}
-
-h1 { @extend %font-display1; font-family: Helvetica, Arial, sans-serif;}
-h2 { @extend %font-headline; font-family: Helvetica, Arial, sans-serif;}
-h3 { @extend %font-title; font-family: Helvetica, Arial, sans-serif;}
-h4 { @extend %font-subheading; font-family: Helvetica, Arial, sans-serif;}
-h5 { @extend %font-subheading-dense; font-family: Helvetica, Arial, sans-serif;}
-h6 { @extend %font-data-head; font-family: Helvetica, Arial, sans-serif;}
+h1 { @extend %font-display1;}
+h2 { @extend %font-headline;}
+h3 { @extend %font-title;}
+h4 { @extend %font-subheading;}
+h5 { @extend %font-subheading-dense;}
+h6 { @extend %font-data-head;}
 
 code {
 	border: 1px solid color($fg, 'line');

@@ -543,7 +543,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 						foreach($contacts as $contact) {
 							/** @var Contact $contact */
 							if(!$contact->isOrganization) {
-								foreach($contact->findOrganizations(['id', 'addressBookId', 'name']) as $o) {
+								foreach($contact->findOrganizations(['id', 'addressBookId', 'name'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]) as $o) {
 									$contacts[] = $o;
 								}
 							}
@@ -1160,7 +1160,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$oldMessage = $message->toOutputArray(true,false,true);
 			
 			if(!empty($oldMessage['smime_encrypted'])) {
-				$oldMessage['htmlbody'] = '***';
+				$response['sendParams']['encrypt_smime'] = true;
 			}
 			
 			
@@ -1397,6 +1397,10 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$oldMessage = $message->toOutputArray($html,false,true);
 
+		if(!empty($oldMessage['smime_encrypted'])) {
+			$response['sendParams']['encrypt_smime'] = true;
+		}
+
 		// Fix for array_merge functions on lines below when the $response['data']['inlineAttachments'] and $response['data']['attachments'] do not exist
 		if(empty($response['data']['inlineAttachments']))
 			$response['data']['inlineAttachments'] = array();
@@ -1486,8 +1490,12 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if(!$plaintext){
 
 			if($params['mailbox']!=$account->sent && $params['mailbox']!=$account->drafts) {
-				$response = $this->_blockImages($params, $response);
+
 				$response = $this->_checkXSS($params, $response);
+			}
+
+			if($params['mailbox'] == $account->spam) {
+				$response = $this->_blockImages($params, $response);
 			}
 
 			//Don't do these special actions in the special folders
@@ -1861,7 +1869,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			foreach($contacts as $contact) {
 				/** @var Contact $contact */
 				if(!$contact->isOrganization) {
-					foreach($contact->findOrganizations(['id', 'addressBookId', 'name']) as $o) {
+					foreach($contact->findOrganizations(['id', 'addressBookId', 'name'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]) as $o) {
 						$contacts[] = $o;
 					}
 				}

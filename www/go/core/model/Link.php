@@ -154,19 +154,6 @@ class Link extends AclItemEntity
 	}
 
 	/**
-	 * Overridden because the Acl entity Search is already joined in defineMapping()
-	 *
-	 * @param DbQuery $query
-	 * @param null $fromAlias
-	 * @return string
-	 */
-	public static function joinAclEntity(DbQuery $query, $fromAlias = null)
-	{
-		return 's.aclId';
-	}
-
-
-	/**
 	 * Create a link between two entities
 	 * 
 	 * @param Entity|ActiveRecord $a
