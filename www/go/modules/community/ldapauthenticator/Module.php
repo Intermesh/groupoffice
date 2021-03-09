@@ -85,7 +85,7 @@ class Module extends core\Module implements DomainProvider {
 		if(\go\core\model\Module::findByName('community', 'addressbook')) {
 			$attrs = new \stdClass();
 			if(isset($values['firstName'])) $attrs->firstName = $values['firstName'];
-			if(isset($values['middleName'])) $attrs->firstName = $values['middleName'];
+			if(isset($values['middleName'])) $attrs->middleName = $values['middleName'];
 			if(isset($values['lastName'])) $attrs->lastName = $values['lastName'];
 			if(isset($values['prefixes'])) $attrs->prefixes = $values['prefixes'];
 			if(isset($values['department'])) $attrs->department = $values['department'];
