@@ -22,6 +22,11 @@ use go\core\validate\ErrorCode;
  */
 class Authenticate {
 
+	/**
+	 * Cache password logins for this number of seconds to
+	 */
+	const CACHE_PASSWORD_LOGIN = 60;
+
 	private $primaryAuthenticators;
 	private $secondaryAuthenticators;
 
@@ -97,6 +102,8 @@ class Authenticate {
 	}
 
 
+
+
 	/**
 	 * Does the password authentication.
 	 *
@@ -109,6 +116,12 @@ class Authenticate {
 	 * @throws \Exception
 	 */
 	public function passwordLogin($username, $password) {
+
+		$cacheKey = 'login-' . md5($username. '|' . $password);
+
+		if($user = go()->getCache()->get($cacheKey)) {
+			return $user;
+		}
 
 		$authenticator = $this->getPrimaryAuthenticatorForUser($username);
 
@@ -138,6 +151,8 @@ class Authenticate {
 		if(go()->getSettings()->maintenanceMode && !$user->isAdmin()) {
 			throw new Forbidden(go()->t("You're account has been disabled."));
 		}
+
+		go()->getCache()->set($cacheKey, $user, true, self::CACHE_PASSWORD_LOGIN);
 
 		return $user;
 
