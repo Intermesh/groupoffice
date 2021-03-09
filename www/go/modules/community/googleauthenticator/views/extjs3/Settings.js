@@ -76,7 +76,11 @@ Ext.onReady(function () {
 				}
 				go.Db.store("User").save(data, user.id).then(function() {
 					callback.call(this,user.id);
-				}).catch(function() {
+				}).catch(function(error) {
+					if(error.message && !error.response) {
+						GO.errorDialog.show(error.message);
+					}
+
 					// When the password is not correct, call itself again to try again
 					me.disableAuthenticator(user, callback);
 				});
@@ -107,7 +111,7 @@ Ext.onReady(function () {
 		},
 
 		requestSecret : function(user, callback){
-				var me = this;
+			var me = this;
 
 			function execute(currentPassword){
 				var data = {
@@ -120,9 +124,14 @@ Ext.onReady(function () {
 				}
 				go.Db.store("User").save(data ,user.id).then( function (options, success, response) {
 					callback.call(this,user.id);
-				}).catch(function() {
+				}).catch(function(error) {
+
 					// When the password is not correct, call itself again to try again
 					me.requestSecret(user, callback);
+
+					if(error.message && !error.response) {
+						GO.errorDialog.show(error.message);
+					}
 				})
 			}
 
