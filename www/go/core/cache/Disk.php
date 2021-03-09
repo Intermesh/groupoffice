@@ -55,13 +55,18 @@ class Disk implements CacheInterface {
 		$key = str_replace('\\', '-', $key);
 
 		if($persist) {
-			$file = $this->folder->getFile($key);			
-			if(!$file->putContents(serialize($value))) {
+			$file = $this->folder->getFile($key);
+			if($ttl) {
+				$data = $value;
+			} else{
+				$data = ['e' => time() + $ttl, "v" => $value];
+			}
+			if(!$file->putContents(serialize($data))) {
 				throw new \Exception("Could not write to cache!");
 			}
 		}
 		
-		$this->cache[$key] = ['e' => $ttl ? time() + $ttl : null, "v" => $value];
+		$this->cache[$key] = $value;
 	}
 
 	/**
@@ -90,7 +95,7 @@ class Disk implements CacheInterface {
 
 		try {
 			$v = unserialize($serialized);
-			if(isset($v['expires'])) {
+			if(is_array($v) && isset($v['e'])) {
 				if($v['expires'] < time()) {
 					$this->delete($key);
 					return null;
