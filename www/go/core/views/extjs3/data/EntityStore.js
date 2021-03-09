@@ -701,7 +701,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					return response.created[id];
 				} else
 				{
-					return Promise.reject(response);
+					return Promise.reject({message: t("Failed to save"), response: response});
 				}
 			} else
 			{
@@ -709,7 +709,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					return response.updated[id];
 				} else
 				{
-					return Promise.reject(response);
+					return Promise.reject({message: t("Failed to save"), response: response});
 				}
 			}
 		});

@@ -574,6 +574,12 @@
 			border-left: 1px solid transparent;
 		}
 	}
+
+	&.x-item-disabled {
+		.x-form-field {
+			background-color: color($bg, 'background');
+		}
+	}
 }
 .x-trigger-wrap-focus .x-form-trigger {
 	@include var(color, c-primary);

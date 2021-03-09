@@ -9,6 +9,8 @@ use GO\Base\Model\AbstractUserDefaultModel;
 use GO\Base\Model\User as LegacyUser;
 use GO\Base\Util\Http;
 use go\core\App;
+use go\core\auth\Authenticate;
+use go\core\auth\BaseAuthenticator;
 use go\core\auth\Method;
 use go\core\auth\Password;
 use go\core\auth\PrimaryAuthenticator;
@@ -328,28 +330,27 @@ class User extends Entity {
    * @return boolean
    * @throws Exception
    */
-	public function checkPassword($password) {		
-		
-		$authenticator = $this->getPrimaryAuthenticator();
-		if(!isset($authenticator)) {
-			throw new Exception("No primary authenticator found!");
-		}
-		$success = $authenticator->authenticate($this->username, $password);		
+	public function checkPassword($password) {
+
+		$auth = new Authenticate();
+		$success = $auth->passwordLogin($this->username, $password);
+
 		if($success) {
 			$this->passwordVerified = true;
 		}
-		return $success;
+		return $success !== false;
 	}
 	
 	/**
-	 * needed because password is protected
+	 * Needed because password is protected
+	 *
 	 * @param string $password
 	 * @return boolean
 	 */
 	public function passwordVerify($password) {
 		return password_verify($password, $this->password);
 	}
-	
+
 	private $plainPassword;
 	
 	public function plainPassword() {
@@ -572,35 +573,28 @@ class User extends Entity {
 		return $this->isAdmin();
 	}
 
-	private static $authMethods;
-
-	public static function findAuthMethods() {
-		if(!isset(self::$authMethods)) {
-			self::$authMethods = Method::find()->orderBy(['sortOrder' => 'DESC']);
-		}
-		return self::$authMethods;
-	}
 
 	/**
 	 * Get available authentication methods
 	 * 
-	 * @return Method[]
+	 * @return BaseAuthenticator[]
 	 */
-	public function getAuthenticationMethods() {
+	public function getAuthenticators() {
 
-		$methods = [];
+		$authenticators = [];
 
-		$authMethods = self::findAuthMethods();
+		$auth = new Authenticate();
+		$primary = $auth->getPrimaryAuthenticatorForUser($this->username);
 
-		foreach ($authMethods as $authMethod) {
-			$authenticator = $authMethod->getAuthenticator();
+		$authenticators[] = $primary;
 
-			if ($authenticator && $authenticator::isAvailableFor($this->username)) {
-				$methods[] = $authMethod;
+		foreach ($auth->getSecondaryAuthenticatorsForUser($this->username) as $authenticator) {
+			if ($authenticator::isAvailableFor($this->username)) {
+				$authenticators[] = $authenticator;
 			}
 		}
 
-		return $methods;
+		return $authenticators;
 	}
 
   /**
@@ -701,24 +695,7 @@ class User extends Entity {
 		$this->contact->goUserId = $this->id;
 		return $this->contact->save();
 	}
-	
-	/**
-	 * Gets the user's primary authenticator class. Usually this is 
-	 * \go\core\auth\Password but can also be implemented by the LDAP or 
-	 * IMAP authenticator modules.
-	 * 
-	 * @return PrimaryAuthenticator
-	 */
-	public function getPrimaryAuthenticator() {
-		foreach($this->getAuthenticationMethods() as $method) {
-			$authenticator = $method->getAuthenticator();
-			if ($authenticator instanceof PrimaryAuthenticator) {
-				return $authenticator;
-			}			
-		}	
-		
-		return null;
-	}
+
 
 	private function createPersonalGroup()
 	{

@@ -16,6 +16,7 @@
 namespace go\core\dav\auth;
 
 use GO;
+use go\core\auth\Authenticate;
 use go\core\auth\TemporaryState;
 use go\core\model\Module;
 use go\core\model\User;
@@ -33,29 +34,23 @@ class BasicBackend extends AbstractBasic {
 	}
 	
 	protected function validateUserPass($username, $password) {
-		
-		$user = User::find(['id', 'username', 'password'])->where(['username' => $username, 'enabled' => true])->single();
-		/* @var $user User */		
+
+		$auth = new Authenticate();
+		$user = $auth->passwordLogin($username, $password);
 		if(!$user) {
-			return false;
-		}
-		
-		if(!$user->checkPassword($password)) {
 			return false;
 		}
 		
 		if(!Module::isAvailableFor($this->checkModulePackage, $this->checkModulePermission, $user->id)) {
 			throw new Forbidden("Module " .$this->checkModulePackage . '/' . $this->checkModulePermission . " not available");
 		}
-		
+
 		$state = new TemporaryState();
-		$state->setUserId($user->id);		
+		$state->setUserId($user->id);
 		go()->setAuthState($state);
 
 		go()->debug("Authentication success: ". $user->username);
-
-		$this->user = $user;		
-
+		$this->user = $user;
 		return true;
 	}
 	
