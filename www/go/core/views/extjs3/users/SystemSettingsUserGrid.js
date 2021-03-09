@@ -33,7 +33,7 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 			'displayName',
 			'avatarId',
 			'loginCount',
-			'authenticationMethods',
+			'authenticators',
 			'personalGroup',
 			'enabled',
 			{name: 'createdAt', type: 'date'},
@@ -96,11 +96,11 @@ go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 					var result = '';
 
 					for(var i = 0, method; method = v[i]; i++) {
-						result += '<i title="'+method.name+'" class="icon go-module-icon-'+method.id+'"></i> ';
+						result += '<i title="'+method+'" class="icon go-module-icon-'+method+'"></i> ';
 					}
 					return result;
 				},
-				dataIndex: 'authenticationMethods'
+				dataIndex: 'authenticators'
 			},{
 				header: "ID",
 				width: dp(100),

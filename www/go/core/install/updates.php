@@ -881,3 +881,6 @@ $updates['202102111534'][] = "alter table go_state
 	add constraint go_state_core_user_id_fk
 		foreign key (user_id) references core_user (id)
 			on delete cascade;";
+
+
+$updates['202102111534'][] = "alter table core_auth_token change `passedMethods` `passedAuthenticators` varchar(190) null;";
