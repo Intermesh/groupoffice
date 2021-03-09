@@ -401,8 +401,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 		if (record.data.isFieldSet) {
 			var dlg = this.createFieldSetDialog();
 			dlg.load(record.data.fieldSetId).show();
-		} else
-		{
+		} else {
 			var dlg = go.customfields.CustomFields.getType(record.data.type).getDialog();
 			dlg.load(record.data.fieldId).show();
 		}

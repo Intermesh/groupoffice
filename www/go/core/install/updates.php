@@ -881,3 +881,5 @@ $updates['202102111534'][] = "alter table go_state
 	add constraint go_state_core_user_id_fk
 		foreign key (user_id) references core_user (id)
 			on delete cascade;";
+
+$updates['202103091517'][] = "ALTER TABLE `core_customfields_select_option` ADD COLUMN `sortOrder` INT(11) UNSIGNED DEFAULT 0 AFTER `text`;";

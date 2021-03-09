@@ -148,20 +148,20 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 				if(!e.altKey) {
 					me.remove(dragItem, true);
-
 					if (dropRow.rowIndex > data.dragIndex) {
 						dropRow.rowIndex--;
 					}
-
-				} else
-				{
+				} else {
 					//todo id configurable?
 					delete v.id;
 				}
 
 				var p = me.addPanel(false, dropRow.rowIndex);
 				p.formField.setValue(v);
-
+				if(v.sortOrder) {
+					// Trigger an update upon saving
+					me.dirty = true;
+				}
 				me.items.each(function(i, rowIndex) {
 					i.rowIndex = rowIndex;
 				});

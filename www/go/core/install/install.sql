@@ -137,6 +137,7 @@ CREATE TABLE `core_customfields_select_option` (
   `fieldId` int(11) NOT NULL,
   `parentId` int(11) DEFAULT NULL,
   `text` varchar(255) DEFAULT NULL,
+  `sortOrder` int(11) UNSIGNED DEFAULT 0,
   `enabled` BOOLEAN NOT NULL DEFAULT TRUE
 ) ENGINE=InnoDB;
 

@@ -39,6 +39,7 @@ class Select extends Base {
 										->select("*")
 										->from('core_customfields_select_option')
 										->where(['fieldId' => $this->field->id, 'parentId' => $parentId])
+										->orderBy(['sortOrder' => 'ASC'])
 										->all();
 		
 		foreach($options as &$o) {
@@ -141,11 +142,12 @@ class Select extends Base {
 	protected $savedOptionIds = [];
 	
 	protected function internalSaveOptions($options, $parentId = null) {
-		
-		foreach ($options as $o) {
+
+		foreach ($options as $oIdx => $o) {
 
 			$o['parentId'] = $parentId;
 			$o['fieldId'] = $this->field->id;
+			$o['sortOrder'] = $oIdx;
 			
 			$children = $o['children'] ?? [];
 			unset($o['children']);

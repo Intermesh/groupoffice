@@ -60,8 +60,12 @@ go.customfields.type.MultiSelect = Ext.extend(go.customfields.type.Text, {
 			data: customfield.dataType,
 			id: 'id',
 			root: "options",
-			fields:['id','text'],
-			remoteSort:true
+			fields:['id','text','sortOrder'],
+			sortInfo: {
+				'field': 'sortOrder',
+				'direction': 'ASC'
+			},
+			remoteSort:false
 		});
 		return c;
 	},

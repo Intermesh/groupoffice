@@ -52,7 +52,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		});
 	},
 	
-	getValues : function (dirtyOnly) {	
+	getValues : function (dirtyOnly) {
 		var v = {};
 		for(var name in this.values) {
 			if(!dirtyOnly || this.entity == null || !go.util.isEqual(this.entity[name], this.values[name])) {
