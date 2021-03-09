@@ -35,13 +35,19 @@ class BasicBackend extends AbstractBasic {
 	
 	protected function validateUserPass($username, $password) {
 
-		if(!$user = Authenticate::passwordLogin($username, $password)) {
+		$auth = new Authenticate();
+		$user = $auth->passwordLogin($username, $password);
+		if(!$user) {
 			return false;
 		}
 		
 		if(!Module::isAvailableFor($this->checkModulePackage, $this->checkModulePermission, $user->id)) {
 			throw new Forbidden("Module " .$this->checkModulePackage . '/' . $this->checkModulePermission . " not available");
 		}
+
+		$state = new TemporaryState();
+		$state->setUserId($user->id);
+		go()->setAuthState($state);
 
 		go()->debug("Authentication success: ". $user->username);
 		$this->user = $user;

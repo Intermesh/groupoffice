@@ -4,6 +4,8 @@
 //// This line hsould be in php.ini to completly avoid the $HTTP_RAW_POST_DATA depricated message
 //ini_set('always_populate_raw_post_data', -1);
 //
+use go\core\auth\Authenticate;
+use go\core\auth\TemporaryState;
 
 
 /**
@@ -109,9 +111,15 @@ class BackendGO extends Backend implements IBackend, ISearchProvider {
 		
 		try {
 
-			if(!$user = \go\core\auth\Authenticate::passwordLogin($username, $password)) {
+			$auth = new Authenticate();
+			$user = $auth->passwordLogin($username, $password);
+			if(!$user) {
 				return false;
 			}
+
+			$state = new TemporaryState();
+			$state->setUserId($user->id);
+			go()->setAuthState($state);
 			
 			if(!GO::modules()->sync) {
 				ZLog::Write(LOGLEVEL_INFO, 'User '. $user->username .' logged on but has no access to the sync module');
