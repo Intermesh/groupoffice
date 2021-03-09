@@ -42,8 +42,9 @@ class Disk implements CacheInterface {
 	 * @param string $key
 	 * @param mixed $value Will be serialized
 	 * @param boolean $persist Cache must be available in next requests. Use false of it's just for this script run.
+	 * @param int $ttl Time to live in seconds
 	 */
-	public function set($key, $value, $persist = true) {
+	public function set($key, $value, $persist = true, $ttl = 0) {
 
 		//go()->debug("CACHE: ". $key);
 		//don't set false values because unserialize returns false on failure.
@@ -60,7 +61,7 @@ class Disk implements CacheInterface {
 			}
 		}
 		
-		$this->cache[$key] = $value;
+		$this->cache[$key] = ['e' => $ttl ? time() + $ttl : null, "v" => $value];
 	}
 
 	/**
@@ -88,7 +89,16 @@ class Disk implements CacheInterface {
 		$serialized = $file->getContents();
 
 		try {
-			$this->cache[$key] = unserialize($serialized);
+			$v = unserialize($serialized);
+			if(isset($v['expires'])) {
+				if($v['expires'] < time()) {
+					$this->delete($key);
+					return null;
+				} else{
+					$v = $v['v'];
+				}
+			}
+			$this->cache[$key] = $v;
 		}
 		catch(\Exception $e) {
 			ErrorHandler::log("Could not unserialize cache from file " . $key.' data: '.var_export($serialized, true));
