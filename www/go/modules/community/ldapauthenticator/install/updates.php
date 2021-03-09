@@ -41,5 +41,3 @@ $updates['202007021707'][] = "ALTER TABLE `ldapauth_server` ADD `imapUseEmailFor
 $updates['202007021707'][] = "ALTER TABLE `ldapauth_server` ADD `followReferrals` BOOLEAN NOT NULL DEFAULT TRUE AFTER `ldapVerifyCertificate`, ADD `protocolVersion` TINYINT UNSIGNED NOT NULL DEFAULT '3' AFTER `followReferrals`;";
 
 $updates['202007271145'][] = "ALTER TABLE `ldapauth_server` CHANGE `syncUsersQuery` `syncUsersQuery` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL, CHANGE `syncGroupsQuery` `syncGroupsQuery` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;";
-
-$updates['202102251030'][] = "ALTER TABLE `ldapauth_server` ADD COLUMN `loginUsersQuery` TEXT CHARACTER SET utf8mb4 COLLATE 'utf8mb4_unicode_ci' NOT NULL DEFAULT '' AFTER `syncUsersQuery`;";

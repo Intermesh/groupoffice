@@ -38,7 +38,6 @@ class Server extends Entity {
 
 	public $syncUsers = false;
 	public $syncUsersQuery;
-	public $loginUsersQuery;
 	public $syncGroups = false;
 	public $syncGroupsQuery;
 

@@ -69,8 +69,8 @@ class Authenticator extends PrimaryAuthenticator {
 		$connection = $server->connect();
 
 		$query = $server->usernameAttribute . "=" . $ldapUsername;
-		if($server->loginUsersQuery) {
-			$query = '(&'.$server->loginUsersQuery."($query))";
+		if($server->syncUsersQuery) {
+			$query = '(&'.$server->syncUsersQuery."($query))";
 		}
 		
 		$record = Record::find($connection, $server->peopleDN, $query)->fetch();
