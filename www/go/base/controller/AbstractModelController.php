@@ -203,15 +203,20 @@ class AbstractModelController extends AbstractController {
 	 * Action to load a single record.
 	 */
 	protected function actionLoad($params) {
-		
-		//$modelName::model() does not work on php 5.2!
-		
+
 		$model = $this->getModelFromParams($params);
 		
 		$response = array();
+		$minPermissionLevel = \GO\Base\Model\Acl::WRITE_PERMISSION;
+		if(isset($params['permissionLevel'])) {
+			$minPermissionLevel = $params['permissionLevel'];
+		} elseif($model->isNew()) {
+			$minPermissionLevel = \GO\Base\Model\Acl::CREATE_PERMISSION;
+		}
 		
-		if(!$model->checkPermissionLevel($model->isNew?\GO\Base\Model\Acl::CREATE_PERMISSION:\GO\Base\Model\Acl::WRITE_PERMISSION))
+		if(!$model->checkPermissionLevel($minPermissionLevel)) {
 			throw new \GO\Base\Exception\AccessDenied();
+		}
 		
 		$response = $this->beforeLoad($response, $model, $params);
 

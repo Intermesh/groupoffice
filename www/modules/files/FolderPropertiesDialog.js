@@ -253,11 +253,12 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 			this.render(Ext.getBody());
 
 		this.suspendCheckEvent = true;
-		
+
 		this.formPanel.form.load({
 			url: GO.url('files/folder/load'),
 			params: {
-				id: folder_id
+				id: folder_id,
+				permissionLevel: go.permissionLevels.read
 			},			
 			success: function(form, action) {
 
