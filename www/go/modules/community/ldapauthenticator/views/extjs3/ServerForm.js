@@ -137,7 +137,7 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						value: "uid",
 						required: true,
 						hint: t("Use 'samaccountname' for Microsoft ActiveDirectory.")
-					}, 
+					},
 					{
 						xtype:"checkbox",
 						hideLabel: true,
