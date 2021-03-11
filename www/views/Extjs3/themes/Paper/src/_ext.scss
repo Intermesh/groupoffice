@@ -512,10 +512,10 @@
 	
 	&-helptext {
 		@extend %font-caption;
-		/*white-space: pre-wrap;*/
+		white-space: pre-wrap;
 		line-height: 1.6em;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		//overflow: hidden;
+		//text-overflow: ellipsis;
 	}
 	
 }
