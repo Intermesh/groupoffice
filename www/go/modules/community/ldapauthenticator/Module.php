@@ -39,7 +39,7 @@ class Module extends core\Module implements DomainProvider {
 		}
 		$mapping = $cfg['ldapMapping'];
 		foreach($mapping as $local => $ldap) {
-			if(is_callable($ldap)) {
+			if($ldap instanceof \Closure) {
 				$mapping[$local] = $ldap($record);
 			} else if(isset($record->{$ldap})) {
 				$mapping[$local] = $record->{$ldap}[0];
@@ -81,35 +81,50 @@ class Module extends core\Module implements DomainProvider {
 		if(isset($values['diskQuota'])) $user->disk_quota = $values['diskQuota'];
 		if(isset($values['recoveryEmail'])) $user->recoveryEmail = $values['recoveryEmail'];
 		if(isset($values['enabled'])) $user->enabled = $values['enabled'];
+		if(isset($values['email'])) $user->email = $values['email'];
+		if(isset($values['recoveryEmail'])) $user->recoveryEmail = $values['recoveryEmail'];
+		if(isset($values['displayName'])) $user->displayName = $values['displayName'];
+
+		unset($values['enabled'], $values['recoveryEmail'], $values['diskQuota'], $values['recoveryEmail'], $values['displayName']);
 
 		if(\go\core\model\Module::findByName('community', 'addressbook')) {
-			$attrs = new \stdClass();
-			if(isset($values['firstName'])) $attrs->firstName = $values['firstName'];
-			if(isset($values['middleName'])) $attrs->middleName = $values['middleName'];
-			if(isset($values['lastName'])) $attrs->lastName = $values['lastName'];
-			if(isset($values['prefixes'])) $attrs->prefixes = $values['prefixes'];
-			if(isset($values['department'])) $attrs->department = $values['department'];
-			if(isset($values['sex'])) $attrs->gender = $values['sex'];
 
 			$phoneNbs = [];
-			if(isset($values['workPhone'])) $phoneNbs[] = (new \go\modules\community\addressbook\model\PhoneNumber())->setValues(['number' => $values['workPhone'], 'type' => 'work']);
-			if(isset($values['workFax'])) $phoneNbs[] = (new \go\modules\community\addressbook\model\PhoneNumber())->setValues(['number' => $values['workFax'], 'type' => 'workfax']);
-			if(!empty($phoneNbs)) $attrs->phoneNumbers = $phoneNbs;
+			if(isset($values['workPhone'])){
+				$phoneNbs[] = ['number' => $values['workPhone'], 'type' => 'work'];
+				unset($values['workPhone']);
+			}
+			if(isset($values['workFax'])) {
+				$phoneNbs[] = ['number' => $values['workFax'], 'type' => 'workfax'];
+				unset($values['workFax']);
+			}
 
-			if(isset($values['email'])) $attrs->emailAddresses = [(new \go\modules\community\addressbook\model\EmailAddress())->setValues(['email' => $values['email']])];
+			if(!empty($phoneNbs)) {
+				$values['phoneNumbers'] = $phoneNbs;
+			}
+
+			if(isset($values['email'])) {
+				$values['emailAddresses'] = [['email' => $values['email']]];
+				unset($values['email']);
+			}
 
 			$addrAttrs = [];
 			if(!empty($values['street'])) $addrAttrs['street'] = $values['street'];
+			if(!empty($values['street2'])) $addrAttrs['street2'] = $values['street2'];
 			if(!empty($values['zipCode'])) $addrAttrs['zipCode'] = $values['zipCode'];
 			if(!empty($values['city'])) $addrAttrs['city'] = $values['city'];
 			if(!empty($values['country'])) $addrAttrs['country'] = $values['country'];
 			if(!empty($addrAttrs)) {
 				$addrAttrs['type'] = 'home';
-				if(!empty($phoneNbs)) $attrs->addresses = [(new \go\modules\community\addressbook\model\Address())->setValues($addrAttrs)];
+				$values['addresses'] = $addrAttrs;
 			}
-			$attrs = (array)$attrs;
-			if(!empty($attrs)) {
-				$user->setProfile($attrs);
+			unset($values['street'],$values['street2'],$values['zipCode'],$values['city'],$values['country'] );
+
+			if(!empty($values)) {
+				if(isset($blob)) {
+					$values['photoBlobId'] = $blob->id;
+				}
+				$user->setProfile($values);
 			}
 		}
 
