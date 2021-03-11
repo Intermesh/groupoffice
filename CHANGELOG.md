@@ -1,5 +1,5 @@
 
-Master
+Finance branch
 - Business: New finance module
 - Projects: new module
 - Tasks: new module
@@ -16,6 +16,9 @@ Master
 - Address book: Removed starred functionality for performance reasons
 - Core: New global search design to improve performance on larger databases
 - Documenttemplates: add selectable folder option
+- Core: Default authentication domain is appended automatically when local user isn't available. This allows ldap users
+  to login with their username without appending or selecting a domain. Removed the domain combo because it's no longer
+  needed with this change.
 
 end 6.5
 --------
