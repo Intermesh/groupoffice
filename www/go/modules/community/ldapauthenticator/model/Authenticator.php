@@ -53,7 +53,7 @@ class Authenticator extends PrimaryAuthenticator {
 		return Server::find()
 						->join('ldapauth_server_domain', 'd', 's.id = d.serverId')
 						->where(['d.name' => $domain])
-						->orWhere(['d.name' => '*'])
+						//->orWhere(['d.name' => '*'])
 						->single();
 	}	
 	
