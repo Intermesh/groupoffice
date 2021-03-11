@@ -841,23 +841,16 @@ class User extends Entity {
 	 * @throws \go\core\exception\ConfigurationException
 	 */
 	public static function getAuthenticationDomains() {
-		
-		$domains = go()->getCache()->get("authentication-domains");
-		if(is_array($domains)) {
-			return $domains;
+		$classes = go()->getCache()->get("authentication-domains-providers");
+		if(!is_array($classes)) {
+			$classFinder = new \go\core\util\ClassFinder();
+			$classes = $classFinder->findByParent(\go\core\auth\DomainProvider::class);
+			go()->getCache()->set("authentication-domains-providers", $classes);
 		}
-		
-		
-		$classFinder = new \go\core\util\ClassFinder();
-		$classes = $classFinder->findByParent(\go\core\auth\DomainProvider::class);
-		
 		$domains = [];
 		foreach($classes as $cls) {
 			$domains = array_merge($domains, $cls::getDomainNames());
 		}
-		
-		go()->getCache()->set("authentication-domains", $domains);
-		
 		return $domains;		
 	}
 	

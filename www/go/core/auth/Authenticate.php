@@ -102,7 +102,21 @@ class Authenticate {
 	}
 
 
-
+	/**
+	 * Checks if this user was created in the database and not by an authenticator like LDAP or IMAP
+	 *
+	 * @param $username
+	 * @return bool
+	 * @throws \Exception
+	 */
+	private function isLocalUser($username) {
+		return go()->getDbConnection()
+			->selectSingleValue('id')
+			->from('core_auth_password', 'p')
+			->join('core_user', 'u', 'u.id=p.userId')
+			->where('username', '=', explode('@', $username)[0])
+			->single() != null;
+	}
 
 	/**
 	 * Does the password authentication.
@@ -116,6 +130,11 @@ class Authenticate {
 	 * @throws \Exception
 	 */
 	public function passwordLogin($username, $password) {
+
+		// When the user is local don't use
+		if(!$this->isLocalUser($username) && !strstr($username, '@') && go()->getSettings()->defaultAuthenticationDomain) {
+			$username .= '@' . go()->getSettings()->defaultAuthenticationDomain;
+		}
 
 		$cacheKey = 'login-' . md5($username. '|' . $password);
 
