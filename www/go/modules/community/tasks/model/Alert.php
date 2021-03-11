@@ -71,6 +71,25 @@ class Alert extends Property {
         return null;
     }
 
+    public function at($task) {
+		if(isset($this->offset) && $task) {
+			$offset = $this->offset;
+			$date = ($this->relativeTo == 'due') ? clone $task->due : clone $task->start;
+			if($offset[0] == '-'){
+				$date->sub(new DateInterval(substr(1,$offset)));
+				return $date;
+			} else if($offset[0] == '+'){
+				$offset = substr(1,$offset);
+			}
+			$date->add(new DateInterval($offset));
+			return $date;
+		}
+		 if(isset($this->when)) {
+			 return $this->when;
+		 }
+		return null;
+	 }
+
     /**
      * OffsetTrigger
      *  - offset = SignedDuration Defines the offset at which to trigger the alert relative to

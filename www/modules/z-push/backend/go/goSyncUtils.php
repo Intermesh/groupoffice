@@ -436,4 +436,163 @@ class GoSyncUtils {
 		return $recur;
 	}
 
+	/**
+	 * Parse a RRULE
+	 * @param string $rrulestr
+	 * @param string $type "task" or "event"
+	 */
+	public static function ParseRecurrence($rrulestr, $type) {
+		$recurrence = new SyncRecurrence();
+		if ($type == "task") {
+			$recurrence = new SyncTaskRecurrence();
+		}
+		$rrules = explode(";", $rrulestr);
+		foreach ($rrules as $rrule) {
+			$rule = explode("=", $rrule);
+			switch ($rule[0]) {
+				case "FREQ":
+					switch ($rule[1]) {
+						case "DAILY":
+							$recurrence->type = "0";
+							break;
+						case "WEEKLY":
+							$recurrence->type = "1";
+							break;
+						case "MONTHLY":
+							$recurrence->type = "2";
+							break;
+						case "YEARLY":
+							$recurrence->type = "5";
+					}
+					break;
+
+				case "UNTIL":
+					$recurrence->until = TimezoneUtil::MakeUTCDate($rule[1]);
+					break;
+
+				case "COUNT":
+					$recurrence->occurrences = $rule[1];
+					break;
+
+				case "INTERVAL":
+					$recurrence->interval = $rule[1];
+					break;
+
+				case "BYDAY":
+					$dval = 0;
+					$days = explode(",", $rule[1]);
+					foreach ($days as $day) {
+						if ($recurrence->type == "2") {
+							if (strlen($day) > 2) {
+								$recurrence->weekofmonth = intval($day);
+								$day = substr($day,-2);
+							}
+							else {
+								$recurrence->weekofmonth = 1;
+							}
+							$recurrence->type = "3";
+						}
+						switch ($day) {
+							case "SU":$dval += 1;
+								break;
+							case "MO":$dval += 2;
+								break;
+							case "TU":$dval += 4;
+								break;
+							case "WE":$dval += 8;
+								break;
+							case "TH":$dval += 16;
+								break;
+							case "FR":$dval += 32;
+								break;
+							case "SA":$dval += 64;
+								break;
+						}
+					}
+					$recurrence->dayofweek = $dval;
+					break;
+
+				//Only 1 BYMONTHDAY is supported, so BYMONTHDAY=2,3 will only include 2
+				case "BYMONTHDAY":
+					$days = explode(",", $rule[1]);
+					$recurrence->dayofmonth = $days[0];
+					break;
+
+				case "BYMONTH":
+					$recurrence->monthofyear = $rule[1];
+					break;
+
+				default:
+					ZLog::Write(LOGLEVEL_DEBUG, sprintf("BackendCalDAV->_ParseRecurrence(): '%s' is not yet supported.", $rule[0]));
+			}
+		}
+		return $recurrence;
+	}
+
+	/**
+	 * @param object $rec ActiveSync format rrule
+	 * @param bool $allday
+	 * @return array JMAP format array of rrule
+	 */
+	public static function GenerateRecurrence($rec, $allday = true) {
+		$rrule = [];
+		if (isset($rec->type)) {
+			$freq = "";
+			switch ($rec->type) {
+				case "0":
+					$freq = "DAILY";
+					break;
+				case "1":
+					$freq = "WEEKLY";
+					break;
+				case "2":
+				case "3":
+					$freq = "MONTHLY";
+					break;
+				case "5":
+					$freq = "YEARLY";
+					break;
+			}
+			$rrule['frequency'] = $freq;
+		}
+		if (isset($rec->until)) {
+			$rrule['until'] = gmdate($allday ? "Ymd" : "Ymd\THis\Z", $rec->until);
+		}
+		if (isset($rec->occurrences)) {
+			$rrule['count'] = $rec->occurrences;
+		}
+		if (isset($rec->interval)) {
+			$rrule['interval'] = $rec->interval;
+		}
+		if (isset($rec->dayofweek)) {
+			$week = '';
+			if (isset($rec->weekofmonth)) {
+				$week = $rec->weekofmonth;
+			}
+			$days = [];
+			if (($rec->dayofweek & 1) == 1)
+				$days[] = $week . "SU";
+			if (($rec->dayofweek & 2) == 2)
+				$days[] = $week . "MO";
+			if (($rec->dayofweek & 4) == 4)
+				$days[] = $week . "TU";
+			if (($rec->dayofweek & 8) == 8)
+				$days[] = $week . "WE";
+			if (($rec->dayofweek & 16) == 16)
+				$days[] = $week . "TH";
+			if (($rec->dayofweek & 32) == 32)
+				$days[] = $week . "FR";
+			if (($rec->dayofweek & 64) == 64)
+				$days[] = $week . "SA";
+			$rrule['byDay'] = $days;
+		}
+		if (isset($rec->dayofmonth)) {
+			$rrule['byMonthDay'] = explode(',',$rec->dayofmonth);
+		}
+		if (isset($rec->monthofyear)) {
+			$rrule['byMonth'] = explode(',',$rec->monthofyear);
+		}
+		return $rrule;
+	}
+
 }

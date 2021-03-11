@@ -8,8 +8,10 @@ use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\orm\Entity;
 use go\core\util\StringUtil;
+use go\modules\community\tasks\model\Recurrence;
 use go\modules\community\tasks\model\Task;
 use Sabre\VObject\Component\VCalendar as VCalendarComponent;
+use Sabre\VObject\Property\ICalendar\Recur;
 use Sabre\VObject\Reader;
 use Sabre\VObject\Splitter\ICalendar as VCalendarSplitter;
 
@@ -54,72 +56,29 @@ class VCalendar extends AbstractConverter {
 	 * @param task $task
 	 */
 	public function export(Task $task) {
-		$rrule = $task->getRecurrenceRule();
-		$newrrule = "";
-
-		if(is_array($rrule)) {
-			foreach($rrule as $key => $value) {
-				switch($key) {
-					case "frequency":
-						$newrrule .= "FREQ=" . $value . ";";
-					break;
-					case "interval":
-					case "until":
-					case "count":
-						$newrrule .= strtoupper($key) . "=" . $value . ";";
-					break;
-					case "byDay":
-						$allDays = "";
-						if(is_array($value)) {
-							$itemCount = count($value);
-							$count = 0;
-							foreach($value as $days) {
-								$day = $days["day"];
-								$position = $days["position"];
-
-								if($position != -1) {
-									$day = $position . $day;
-								}
-
-								if(++$count === $itemCount) {
-									$allDays .= $day;
-								} else {
-									$allDays .= $day . ",";
-								}
-								
-							}
-						}
-						if(!empty($allDays)) {
-							$newrrule .= "BYDAY=" . $allDays . ";";
-						}
-
-
-					break;
-				}
-			}
-		}
 
 		$vtodo = $this->getVTodo($task);
-		$vtodo->RRULE = $newrrule;
+		$rule = $task->getRecurrenceRule();
+		if($rule) {
+			$rrule = Recurrence::fromArray($rule, $task->start);
+			$vtodo->RRULE = $rrule->toString();
+		}
+		$vtodo->RRULE = $rrule->toString();
 		$vtodo->UID = $task->getUid();
 		$vtodo->SUMMARY = $task->title;
 		$vtodo->PRIORITY = $task->priority;
 		$vtodo->DTSTART = $task->start;
 		$vtodo->DUE = $task->due;
+		$vtodo->DESCRIPTION = $task->description;
 
 		if(is_array($task->categories)) {
-			$data = [];
-			foreach($task->categories as $category) {
-				$results = go()->getDbConnection()->select("name")->from("task_category")->where('id=' . $category);
-
-				foreach($results as $result) {
-					$data[] = $result["name"];
-				}
-			}
-			$vtodo->CATEGORIES = $data;
+			$vtodo->CATEGORIES = go()->getDbConnection()->select("name")
+				->from("tasks_category")
+				->where(['id' => $task->categories])
+				->fetchMode(\PDO::FETCH_COLUMN)
+				->execute();
 		}
 
-		$vtodo->DESCRIPTION = $task->description;
 		return $vtodo->serialize();
 	}
 	
@@ -133,7 +92,6 @@ class VCalendar extends AbstractConverter {
 	protected function importEntity($entityClass, $fp, $index, array $params){
 		$t = "";
 	}
-	
 
 	protected function internalExport($fp, $entities, $total) {
 
@@ -174,93 +132,41 @@ class VCalendar extends AbstractConverter {
 		$splitter = new VCalendarSplitter(StringUtil::cleanUtf8($contents), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 
 		while ($VCalendarComponent = $splitter->getNext()) {
-			
-			$uid = (string)$VCalendarComponent->VTODO->UID;
-			$priority = (string)$VCalendarComponent->VTODO->PRIORITY;
-			$summary = (string)$VCalendarComponent->VTODO->SUMMARY;
-			$start = $VCalendarComponent->VTODO->DTSTART;
-			$due = $VCalendarComponent->VTODO->DUE;
-			$description = (string)$VCalendarComponent->VTODO->DESCRIPTION;
-			$categories = (string)$VCalendarComponent->VTODO->CATEGORIES;
-			$rrule = (string)$VCalendarComponent->VTODO->RRULE;
-			$kvArr = [];
-			$rruleSplit = explode(";",$rrule);
-			if(is_array($rruleSplit)) {
-				foreach($rruleSplit as $keyValues) {
-					$rruleKeyValues = explode("=",$keyValues);
-					$key = $rruleKeyValues[0];
-					$value = $rruleKeyValues[1];
-					switch($key) {
-						case "FREQ":
-							$kvArr["frequency"] = $value;
-						break;
-						case "INTERVAL":
-						case "COUNT":
-							$kvArr[strtolower($key)] = (int)$value;
-						break;
-						case "UNTIL":
-							$kvArr[strtolower($key)] = $value;
-						break;
-						case "BYDAY":
-							$allDays = [];
-							$daysArr = explode(",",$value);
 
-							if(is_array($daysArr)) {
-								foreach($daysArr as $day) {
-									// contains the day and position
-									if(strlen($day) > 2) {
-										$allDays["day"] = substr($day,1,2);
-										$allDays["position"] = substr($day,0,1);
-									} else {
-										$allDays["day"] = substr($day,0,2);
-										$allDays["position"] = -1;
-									}
-									
-									$byDaysArr[] = $allDays;
+			$todo = $VCalendarComponent->VTODO;
+			$categories = explode(",",(string)$todo->CATEGORIES);
+			$rule = new Recurrence((string)$todo->RRULE, $todo->DTSTART);
 
-									if(!empty($allDays)) {
-										$kvArr["byDay"] = $byDaysArr;
-										$kvArr["bySetPosition"] = $allDays["position"];
-									}
-								}
-							}
-
-						break;
-					}
-				}
-			}
-			
-			$taskValues = [
-				"uid" => $uid,
-				"tasklistId" => $tasklistId,
-				"start" => $start,
-				"due" => $due,
-				"title" => $summary,
-				"description" => $description,
-				"priority" => $priority
-			];
-			
 			try {
 				$task = $this->findTask($VCalendarComponent, $tasklistId);
 				// no task found
 				if(!$task) {
 					$task = new Task();
-					$encodedRrule = json_encode($kvArr);
-					$task->setRecurrenceRuleEncoded($encodedRrule);
-					$task->setValues($taskValues);
+					$task->setValues([
+						"uid" => (string)$todo->UID,
+						"tasklistId" => $tasklistId,
+						"start" => $todo->DTSTART,
+						'recurrenceRule' => $rule->toArray(),
+						"due" => $todo->DUE,
+						"title" => (string)$todo->SUMMARY,
+						"description" => (string)$todo->DESCRIPTION,
+						"priority" => (string)$todo->PRIORITY
+					]);
 					$task->save();
-					$taskId = $task->id;
-					$categoryNames = explode(",",$categories);
-					foreach($categoryNames as $categoryName) {
-						$categoryId = (int) go()->getDbConnection()->selectSingleValue('id')->from('task_category')->where(['name' => $categoryName])->execute()->fetch();
-						if($categoryId > 0) {
-							$data = [
-								'taskId'=> $taskId,
-								'categoryId'=>$categoryId
-							];
-							go()->getDbConnection()->insert("task_task_category", $data)->execute();
-						}
+
+					$categories = (string)$todo->CATEGORIES;
+					if(!empty($categories)) {
+						$sql = "INSERT INTO tasks_task_category (taskId, categoryId) SELECT $task->id , `id` FROM tasks_category WHERE `name` IN ( $categories )";
+						go()->getDbConnection()->query($sql)->execute();
 					}
+//					$categoryNames = explode(",",$categories);
+//					foreach($categoryNames as $categoryName) {
+//						$categoryId = (int) go()->getDbConnection()->selectSingleValue('id')->from('tasks_category')->where(['name' => $categoryName])->execute()->fetch();
+//						if($categoryId > 0) {
+//							$data = ['taskId'=> $task->id, 'categoryId'=>$categoryId];
+//							go()->getDbConnection()->insert("tasks_task_category", $data)->execute();
+//						}
+//					}
 				} else {
 					continue;
 				}

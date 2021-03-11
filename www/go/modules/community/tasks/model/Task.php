@@ -304,39 +304,17 @@ class Task extends AclItemEntity {
 		}
 	}
 
-	protected function parseToRRULE($rrule) {
-		if(isset($rrule->until)) {
-			$rrule->until = str_replace(['-',':'], ['',''], $rrule->until);
-		}
-
-		if(isset($rrule->bySetPosition)) {
-			$rrule->bySetPos = $rrule->bySetPosition;
-		}
-
-		if(empty($rrule->byDay)) {
-			unset($rrule->byDay);
-		} else {
-			foreach($rrule->byDay as $key => $value) {
-				$position = $value->position ?? '';
-				$rrule->byDay->{$key} = $position . $value->day;
-			}
-		}
-
-		$rrule->FREQ = $rrule->frequency;
-
-		unset($rrule->bySetPosition);
-		unset($rrule->frequency);
-		return (array)$rrule;
-	}
-
 	/**
 	 * @return \DateTime
 	 */
 	protected function getNextRecurrence($rrule){
-		$rRuleIt = new \GO\Base\Util\Icalendar\RRuleIterator($this->parseToRRULE($rrule), $this->start);
-		$rRuleIt->next();
-		$nextTime = $rRuleIt->current();
-		return $nextTime;
+		$rule = Recurrence::fromArray($rrule, $this->start);
+		$rule->next();
+		return $rule->current();
+//		$rRuleIt = new \GO\Base\Util\Icalendar\RRuleIterator($this->parseToRRULE($rrule), $this->start);
+//		$rRuleIt->next();
+//		$nextTime = $rRuleIt->current();
+//		return $nextTime;
 	}
 
 	public static function sort(Query $query, array $sort)
