@@ -1208,8 +1208,9 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					
 			$model->files_folder_id = $this->_checkExistingModelFolder($model, $folder, $mustExist);
 
-			if ($saveModel && $model->isModified())
+			if ($saveModel && $model->isModified()) {
 				$model->save(true);
+			}
 		} elseif ($model->alwaysCreateFilesFolder() || $mustExist) {
 			
 			GO::debug('Folder does not exist in database. Will create it.');
