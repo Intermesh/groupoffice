@@ -1,6 +1,8 @@
 - Tickets: Added open/close options to ticketsgrid context menu
 - Calendar: Fixed display of select boxes in event details
 - Billing: load statues by book_id in orderstatus dialog
+- LDAP: Fixed delete users and groups
+- LDAP: Validate users and groups queries before save
 
 05-03-2021 6.4.226
 - Email: Fixed sort contacts on last mail time noty always updating
