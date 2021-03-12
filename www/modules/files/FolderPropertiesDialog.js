@@ -257,8 +257,7 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 		this.formPanel.form.load({
 			url: GO.url('files/folder/load'),
 			params: {
-				id: folder_id,
-				permissionLevel: go.permissionLevels.read
+				id: folder_id
 			},			
 			success: function(form, action) {
 
@@ -346,13 +345,19 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 	setPermission : function(is_someones_home_dir, permission_level, readonly)
 	{
 		//readonly flag is set for project, contact, company etc. folders.
-			
 		var form = this.formPanel.form;
 		form.findField('name').setDisabled(is_someones_home_dir || readonly || permission_level<GO.permissionLevels.write);
 		form.findField('share').setDisabled(is_someones_home_dir || readonly || permission_level<GO.permissionLevels.manage);
 		form.findField('apply_state').setDisabled(permission_level<GO.permissionLevels.manage && !GO.settings.has_admin_permission);
-		if(!this.readPermissionsTab.disabled)
+		if(!this.readPermissionsTab.disabled) {
 			this.readPermissionsTab.setDisabled(!is_someones_home_dir && readonly);
+		}
+
+		form.items.each(function(itm){
+			if(itm.name.substring(0,13) === 'customFields.') {
+				form.findField(itm.name).setDisabled(is_someones_home_dir || readonly || permission_level<GO.permissionLevels.write);
+			}
+		},this);
 
 		this.commentsPanel.setDisabled(readonly || permission_level<GO.permissionLevels.write);
 		
