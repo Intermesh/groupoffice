@@ -36,6 +36,7 @@ go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 				
 			],
 			entityStore: "Group"
+		});
 
 
 		Ext.apply(this, {
