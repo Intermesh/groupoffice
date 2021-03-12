@@ -27,10 +27,15 @@ end 6.5
 12-03-2021 6.4.227
 - Tickets: Added open/close options to ticketsgrid context menu
 - Calendar: Fixed display of select boxes in event details
+- Calendar: Invite didn't work if address was not found due due to case-sensitity
 - Billing: load statues by book_id in orderstatus dialog
 - LDAP: Fixed delete users and groups
 - LDAP: Validate users and groups queries before save
 - Projects: New custom field for selecting projects
+- New OnlyOffice module (Experimental)
+- Files: new module to convert documents to PDF with libreoffice online API
+- Studio: Fixed fields showing ID's instead of text in search results
+- Studio: Search fields for description didn't load
 
 05-03-2021 6.4.226
 - Email: Fixed sort contacts on last mail time noty always updating
@@ -50,6 +55,7 @@ end 6.5
 - Core: Improved list style in HTML editor and SHIFT + ENTER in lists inserts line break
   instead of new list item.
 - Calendar: Fixed crash of calendar when deleting the selected view.
+- Projects2: User setting to select project when starting timer.
 
 26-02-2021 6.4.224
 - Multi instance: Fixed delete issue when temp dir was in use
