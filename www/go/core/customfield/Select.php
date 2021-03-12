@@ -144,7 +144,9 @@ class Select extends Base {
 	protected function internalSaveOptions($options, $parentId = null) {
 
 		foreach ($options as $oIdx => $o) {
-
+			if(isset($o['allowChildren'])) {
+				unset($o['allowChildren']);
+			}
 			$o['parentId'] = $parentId;
 			$o['fieldId'] = $this->field->id;
 			$o['sortOrder'] = $oIdx;
