@@ -1693,4 +1693,14 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		echo $this->render('delete', array('model' => $model));
 	}
+
+	/**
+	 * @param $model
+	 * @return mixed
+	 */
+	protected function checkLoadPermissionLevel($model)
+	{
+		return $model->checkPermissionLevel($model->isNew() ?\GO\Base\Model\Acl::CREATE_PERMISSION : \GO\Base\Model\Acl::READ_PERMISSION);
+	}
+
 }

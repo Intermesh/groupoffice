@@ -207,17 +207,11 @@ class AbstractModelController extends AbstractController {
 		$model = $this->getModelFromParams($params);
 		
 		$response = array();
-		$minPermissionLevel = \GO\Base\Model\Acl::WRITE_PERMISSION;
-		if(isset($params['permissionLevel'])) {
-			$minPermissionLevel = $params['permissionLevel'];
-		} elseif($model->isNew()) {
-			$minPermissionLevel = \GO\Base\Model\Acl::CREATE_PERMISSION;
-		}
-		
-		if(!$model->checkPermissionLevel($minPermissionLevel)) {
+
+		if(!$this->checkLoadPermissionLevel($model)){
 			throw new \GO\Base\Exception\AccessDenied();
 		}
-		
+
 		$response = $this->beforeLoad($response, $model, $params);
 
 		$response['data'] = !empty($response['data']) ? array_merge($response['data'],$model->getAttributes()) : $model->getAttributes();
@@ -1331,5 +1325,13 @@ class AbstractModelController extends AbstractController {
 			
 			
 	}
-	
+
+	/**
+	 * @param $model
+	 * @return mixed
+	 */
+	protected function checkLoadPermissionLevel($model)
+	{
+		return $model->checkPermissionLevel($model->isNew() ?\GO\Base\Model\Acl::CREATE_PERMISSION : \GO\Base\Model\Acl::WRITE_PERMISSION);
+	}
 }
