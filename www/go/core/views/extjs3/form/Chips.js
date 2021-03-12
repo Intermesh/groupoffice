@@ -203,6 +203,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		} else
 		{
 			var me = this;
+			me.dataView.store.removeAll();
 			values.forEach(function(v){
 				var index = me.comboStore.find(me.valueField, v);
 				
