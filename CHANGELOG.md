@@ -7,6 +7,8 @@
 - Projects: New custom field for selecting projects
 - New OnlyOffice module (Experimental)
 - Files: new module to convert documents to PDF with libreoffice online API
+- Studio: Fixed fields showing ID's instead of text in search results
+- Studio: Search fields for description didn't load
 
 05-03-2021 6.4.226
 - Email: Fixed sort contacts on last mail time noty always updating
