@@ -4,6 +4,7 @@
 - Billing: load statues by book_id in orderstatus dialog
 - LDAP: Fixed delete users and groups
 - LDAP: Validate users and groups queries before save
+- Projects: New custom field for selecting projects
 
 05-03-2021 6.4.226
 - Email: Fixed sort contacts on last mail time noty always updating
