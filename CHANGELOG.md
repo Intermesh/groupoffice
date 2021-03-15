@@ -1,3 +1,5 @@
+- Core: fix for faulty headers appearing multiple times. This could break ActiveSync.
+
 12-03-2021 6.4.227
 - Tickets: Added open/close options to ticketsgrid context menu
 - Calendar: Fixed display of select boxes in event details
