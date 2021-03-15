@@ -1,6 +1,7 @@
 - Core: fix for faulty headers appearing multiple times. This could break ActiveSync.
 - ActiveSync: Fix for images sent with iPhone not showing correctly
 - Core: Custom field tabs disabled bug fixed
+- LDAP: Domain was accidentally included in username to server
 
 12-03-2021 6.4.227
 - Tickets: Added open/close options to ticketsgrid context menu
