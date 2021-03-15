@@ -172,8 +172,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 				return;
 			}
 			ct.items.each(function(i) {
-				var w = v || i.disabled;
-				setDisabled(i, w);
+				setDisabled(i, v);
 			});
 		}
 
