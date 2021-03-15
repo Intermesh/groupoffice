@@ -304,6 +304,10 @@ class Message extends \Swift_Message{
 	
 	private function _getParts($structure, $part_number_prefix='')
 	{
+		// Apple sends contentID's that SwiftMailer doesn't like. So we replace them with new onces but we have to replace
+		// this in the body too.
+
+		$cidReplacements = [];
 		if (isset($structure->parts))
 		{
 			//$part_number=0;
@@ -366,13 +370,17 @@ class Message extends \Swift_Message{
 					{
 						$img = new \Swift_EmbeddedFile($part->body, $filename, $mime_type);
 						$img->setContentType($mime_type);
-						
+
 						//Only set valid ID's. Iphone sends invalid content ID's sometimes.
 						if (preg_match('/^.+@.+$/D',$content_id))
 						{
 							$img->setId($content_id);
+							$this->embed($img);
+						} else{
+							$this->embed($img);
+							$cidReplacements[$content_id] = $img->getId();
 						}
-						$this->embed($img);
+
 					}else
 					{
 						$attachment = new \Swift_Attachment($part->body, $filename,$mime_type);
@@ -400,6 +408,10 @@ class Message extends \Swift_Message{
 				$text_part = $structure->body;
 			}
 			$this->_loadedBody .= $text_part;
+		}
+
+		foreach($cidReplacements as $old => $new) {
+			$this->_loadedBody = str_replace($old, $new, $this->_loadedBody);
 		}
 	}
 	
