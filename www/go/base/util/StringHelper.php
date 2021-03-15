@@ -294,8 +294,8 @@ class StringHelper {
 			$source_charset = 'UTF-8';
 		
 
-		
-		$str = str_replace("€","&euro;", $str);
+//		wtf?
+//		$str = str_replace("€","&euro;", $str);
 		
 		$source_charset = self::fixCharset($source_charset);
 		try {
@@ -982,7 +982,7 @@ END;
 
 	private static function prefixCSSSelectors($css, $prefix = '.go-html-formatted') {
 		# Wipe all block comments
-		$css = preg_replace('!/\*.*?\*/!s', '', $css);
+//		$css = preg_replace('!/\*.*?\*/!s', '', $css);
 
 		$parts = explode('}', $css);
 		$mediaQueryStarted = false;
@@ -1049,12 +1049,16 @@ END;
 		//needed for very large strings when data is embedded in the html with an img tag
 		ini_set('pcre.backtrack_limit', (int)ini_get( 'pcre.backtrack_limit' )+ 1000000 );
 
-		$prefix = 'msg-' . uniqid();
-		$styles = self::extractStyles($html, $prefix);
 
 		//remove strange white spaces in tags first
 		//sometimes things like this happen <style> </ style >
 		$html = preg_replace("'</[\s]*([\w]*)[\s]*>'u","</$1>", $html);
+		//remove comments because they might interfere
+		$html = preg_replace("'<!--.*-->'Uusi", "", $html);
+		$html = preg_replace('!/\*.*?\*/!s', '', $html);
+
+		$prefix = 'msg-' . uniqid();
+		$styles = self::extractStyles($html, $prefix);
 
 		//strip everything above <body first. This fixes a mail from Amazon that had the body inside the head section :(
 		$bodyPos = stripos($html, '<body');
@@ -1097,7 +1101,7 @@ END;
 		//"'<select[^>]*>.*?</select>'usi",
 		//"'<textarea[^>]*>.*?</textarea>'usi",
 		"'</form>'usi",
-		"'<!--.*-->'Uusi",
+
 		);
 
 		$html = preg_replace($to_removed_array, '', $html);

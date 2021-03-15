@@ -91,20 +91,18 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 			if(go.User.accessToken){
 				Ext.Ajax.defaultHeaders.Authorization = 'Bearer ' + go.User.accessToken;
-				go.User.authenticate(function(data, options, success, response){
+				go.User.authenticate().then((user) => {
 					
-					if(success) {
-						me.on('render', function() {
-							me.fireEvent('boot', me);
-						}, me, {single:true});
-						me.onAuthentication(); // <- start Group-Office
-					} else {
-						go.User.clearAccessToken();
+					me.on('render', function() {
+						me.fireEvent('boot', me);
+					}, me, {single:true});
+					me.onAuthentication(); // <- start Group-Office
+				}).catch(() => {
+					go.User.clearAccessToken();
 
-						me.fireEvent("boot", me);
-						go.Router.check();
-					}
-				});
+					me.fireEvent("boot", me);
+					go.Router.check();
+				})
 			} else {
 				me.fireEvent("boot", me); // In the router there is an event attached.
 

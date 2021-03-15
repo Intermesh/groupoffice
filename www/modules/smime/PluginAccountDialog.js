@@ -101,6 +101,7 @@ GO.moduleManager.onModuleReady('email',function(){
 					this.deleteCert.setDisabled(!action.result.cert);
 					this.downloadButton.setDisabled(!action.result.cert);
 				} else {
+					this.uploadFile.clearQueue();
 					this.smimePanel.setDisabled(false);
 					this.alwaysSignCheckbox.setDisabled(!action.result.data.cert);
 					this.deleteCert.setDisabled(!action.result.data.cert);

@@ -263,7 +263,6 @@ class ContactConvertor {
 	 */
 	private function buildHasManyValues($m, $message) {		
 		$v = [];
-		$firstPropName = array_values($m)[0];
 		$found = false;
 		foreach($m as $goProp => $asProp) {
 			$v[$goProp] = $message->$asProp;

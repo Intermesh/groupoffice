@@ -141,7 +141,7 @@ abstract class Message extends \GO\Base\Model {
 
 		//workaround for invalid from
 		if(!$this->attributes['from']->getAddress()) {
-			$this->attributes['from'] = 	new \GO\Base\Mail\EmailRecipients("unknown@unkonwn.domain");
+			$this->attributes['from'] = 	new \GO\Base\Mail\EmailRecipients("unknown@unknown.domain");
 		}
 		$this->attributes['reply_to'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['reply_to']));
 

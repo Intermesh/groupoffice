@@ -28,7 +28,7 @@ class Message extends \Swift_Message {
 		$this->setFrom(go()->getSettings()->systemEmail,go()->getSettings()->title);
 
     $headers = $this->getHeaders();
-    $headers->addTextHeader("X-Group-Office-Title", go()->getSettings()->title);
+		$headers->addTextHeader("X-Mailer", "Group-Office (" . go()->getVersion() . ")");
 	}
 
 	/**

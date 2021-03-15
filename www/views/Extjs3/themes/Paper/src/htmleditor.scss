@@ -1,31 +1,18 @@
 @import 'base';
-body, html {
+body, p, span, div {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: sp(16);
 	color: color($fg, 'text');
 	font-weight: $font-weight-r;
 	line-height: dp(24);
-
-	@media print {
-		font-size: 12px;
-		line-height: 18px;
-	}
-	text-rendering: optimizeLegibility;
-	-webkit-tap-highlight-color: transparent;
-	-webkit-touch-callout: none;
-	height: 100%;
 }
 
-button, html, input, select, textarea {
-	font-family: $font-family;
-}
-
-h1 { @extend %font-display1; }
-h2 { @extend %font-headline; }
-h3 { @extend %font-title; }
-h4 { @extend %font-subheading; }
-h5 { @extend %font-subheading-dense; }
-h6 { @extend %font-data-head; }
+h1 { @extend %font-display1;}
+h2 { @extend %font-headline;}
+h3 { @extend %font-title;}
+h4 { @extend %font-subheading;}
+h5 { @extend %font-subheading-dense;}
+h6 { @extend %font-data-head;}
 
 code {
 	border: 1px solid color($fg, 'line');
@@ -45,7 +32,7 @@ p {
 ul{
 	display: block;
 	list-style-type: disc;
-	list-style-position: inside;
+	list-style-position: outside;
 	margin: 0;
 	padding: 0 0 0 2em;
 }
@@ -53,7 +40,7 @@ ul{
 ol {
 	display: block;
 	list-style-type: decimal;
-	list-style-position: inside;
+	list-style-position: outside;
 	margin: 0;
 	padding: 0 0 0 2em;
 	> ol {

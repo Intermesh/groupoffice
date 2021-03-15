@@ -94,35 +94,37 @@ abstract class Entity extends Property {
 	 */
 	const EVENT_SORT = "sort";
 
-  /**
-   * Find entities
-   *
-   * Returns a query object that's also directly iterable:
-   *
-   * @exanple
-   * ````
-   * $notes = Note::find()->where(['name' => 'Foo']);
-   *
-   * foreach($notes as $note) {
-   *  echo $note->name;
-   * }
-   *
-   * ```
-   *
-   * For a single value do:
-   *
-   * @exanple
-   * ````
-   * $note = Note::find()->where(['name' => 'Foo'])->single();
-   *
-   * ```
-   *
-   * For more details see the Criteria::where() function description
-   *
-   * @return static[]|Query
-   * @throws Exception
-   * @see Criteria::where()
-   */
+	/**
+	 * Find entities
+	 *
+	 * Returns a query object that's also directly iterable:
+	 *
+	 * @param array $properties Specify the columns for optimal performance. You can also use the mapping to only fetch table columns Note::getMapping()->getColumnNames()
+	 * @param bool $readOnly Readonly has less overhead
+	 * @return static[]|Query
+	 * @throws Exception
+	 * @example
+	 * ````
+	 * $notes = Note::find()->where(['name' => 'Foo']);
+	 *
+	 * foreach($notes as $note) {
+	 *  echo $note->name;
+	 * }
+	 *
+	 * ```
+	 *
+	 * For a single value do:
+	 *
+	 * @exanple
+	 * ````
+	 * $note = Note::find()->where(['name' => 'Foo'])->single();
+	 *
+	 * ```
+	 *
+	 * For more details see the Criteria::where() function description
+	 *
+	 * @see Criteria::where()
+	 */
 	public static final function find(array $properties = [], $readOnly = false) {
 		
 		if(count($properties) && !isset($properties[0])) {

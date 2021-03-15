@@ -15,11 +15,9 @@ use GO\Base\Model\Acl;
 
 use GO\Base\Mail\Imap;
 use go\core\model\Acl as GoAcl;
-use go\core\util\ArrayObject;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\Settings;
-use go\modules\community\addressbook\Module;
-use GO\Email\Model\ContactMailTime;
+
 
 class MessageController extends \GO\Base\Controller\AbstractController {
 
@@ -545,7 +543,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 						foreach($contacts as $contact) {
 							/** @var Contact $contact */
 							if(!$contact->isOrganization) {
-								foreach($contact->findOrganizations(['id', 'addressBookId', 'name']) as $o) {
+								foreach($contact->findOrganizations(['id', 'addressBookId', 'name'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]) as $o) {
 									$contacts[] = $o;
 								}
 							}
@@ -771,28 +769,19 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$bccAddresses = array();
 			$emailAddresses = array_merge($toAddresses,$ccAddresses);
 			$emailAddresses = array_merge($emailAddresses,$bccAddresses);
-
-			foreach ($emailAddresses as $emailAddress => $fullName) {
-
-				$contact = Contact::findByEmail($emailAddress)->orderBy(['c.goUserId' => 'DESC'])->single();
-
-				if($contact) {
-					$contactLastMailTimeModel = ContactMailTime::model()->findSingleByAttributes(array(
-						'contact_id' => $contact->id,
-						'user_id' => GO::user()->id
-					));
-
-					if (!$contactLastMailTimeModel) {
-						$contactLastMailTimeModel = new ContactMailTime();
-						$contactLastMailTimeModel->contact_id = $contact->id;
-						$contactLastMailTimeModel->user_id = GO::user()->id;
-					}
-
-					$contactLastMailTimeModel->last_mail_time = time();
-					$contactLastMailTimeModel->save();
-				}
+			$emailAddresses = array_keys($emailAddresses);
 
 
+			$contacts = Contact::findByEmail($emailAddresses)->filter(['permissionLevel' => Acl::READ_PERMISSION])->selectSingleValue('c.id');
+			foreach($contacts as $contactId) {
+
+				go()->getDbConnection()->replace(
+					'em_contacts_last_mail_times',
+					[
+						'contact_id' => $contactId,
+						'user_id' => go()->getAuthState()->getUserId(),
+						'last_mail_time' => time()
+					])->execute();
 			}
 		}
 
@@ -1171,7 +1160,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$oldMessage = $message->toOutputArray(true,false,true);
 			
 			if(!empty($oldMessage['smime_encrypted'])) {
-				$oldMessage['htmlbody'] = '***';
+				$response['sendParams']['encrypt_smime'] = true;
 			}
 			
 			
@@ -1408,6 +1397,10 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$oldMessage = $message->toOutputArray($html,false,true);
 
+		if(!empty($oldMessage['smime_encrypted'])) {
+			$response['sendParams']['encrypt_smime'] = true;
+		}
+
 		// Fix for array_merge functions on lines below when the $response['data']['inlineAttachments'] and $response['data']['attachments'] do not exist
 		if(empty($response['data']['inlineAttachments']))
 			$response['data']['inlineAttachments'] = array();
@@ -1497,8 +1490,12 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		if(!$plaintext){
 
 			if($params['mailbox']!=$account->sent && $params['mailbox']!=$account->drafts) {
-				$response = $this->_blockImages($params, $response);
+
 				$response = $this->_checkXSS($params, $response);
+			}
+
+			if($params['mailbox'] == $account->spam) {
+				$response = $this->_blockImages($params, $response);
 			}
 
 			//Don't do these special actions in the special folders
@@ -1656,6 +1653,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 					->select('email')
 					->criteria(GO\Base\Db\FindCriteria::newInstance()->addCondition('account_id' , $imapMessage->account->id))
 			)->fetchAll(\PDO::FETCH_COLUMN, 0);
+
+			// for case insensitive match
+			$aliases = array_map('strtolower', $aliases);
 
 			$emailFound = false;
 			if(isset($vevent->attendee)) {
@@ -1872,7 +1872,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			foreach($contacts as $contact) {
 				/** @var Contact $contact */
 				if(!$contact->isOrganization) {
-					foreach($contact->findOrganizations(['id', 'addressBookId', 'name']) as $o) {
+					foreach($contact->findOrganizations(['id', 'addressBookId', 'name'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]) as $o) {
 						$contacts[] = $o;
 					}
 				}

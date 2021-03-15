@@ -2,8 +2,9 @@ go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
 	initComponent: function () {
 		this.domainCombo = GO.SystemSettingsDomainCombo = new go.login.DomainCombo({
 			fieldLabel: t("Default domain"),
-			hidden: GO.authenticationDomains.length === 0,
-			hiddenName: "defaultAuthenticationDomain"
+			// hidden: go.User.session.auth.domains.authenticationDomains.length === 0,
+			hiddenName: "defaultAuthenticationDomain",
+			hint: t("Users can login without this domain behind the username. Note that if the user exists in the Group-Office database it will take precedence.")
 		});		
 		
 		Ext.apply(this, {

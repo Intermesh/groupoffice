@@ -2,6 +2,7 @@
 
 namespace go\modules\community\dev	\controller;
 
+use go\core\cache\None;
 use go\core\Controller;
 use go\core\Environment;
 use go\core\fs\Blob;
@@ -26,14 +27,18 @@ class Language extends Controller {
 	}
 
 	public function export($params) {
+
+		go()->getLanguage()->initExport();
 		go()->getLanguage()->setLanguage($params['language']);
 
 //for checking arrays() in english translation
 		$this->en = new LangModel();
+		$this->en->initExport();
 		$this->en->setLanguage("en");
 
 //to check if intermesh has defined it as a core translation
 		$this->nl = new LangModel();
+		$this->nl->initExport();
 		$this->nl->setLanguage("nl");
 
 		$rootFolder = Environment::get()->getInstallFolder();

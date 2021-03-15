@@ -346,11 +346,6 @@ class CertificateController extends \GO\Base\Controller\AbstractController {
 			throw new \Exception( "OSCP request failed");
 		}
 
-		//Response:
-		//OSCP:	/tmp/groupoffice/1/15795372755e25d37b05b00: good
-		//This Update: Jan 20 16:21:15 2020 GMT
-		//Next Update: Jan 24 16:21:15 2020 GMT
-		return stristr($output[0], 'good');
 		return $issuerPemFile;
 	}
 

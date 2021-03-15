@@ -1,6 +1,6 @@
 
-Master
-- Business: New finance and contracts module
+Finance branch
+- Business: New finance module
 - Projects: new module
 - Tasks: new module
 - Time tracking: new module
@@ -16,10 +16,53 @@ Master
 - Address book: Removed starred functionality for performance reasons
 - Core: New global search design to improve performance on larger databases
 - Documenttemplates: add selectable folder option
+- Core: Default authentication domain is appended automatically when local user isn't available. This allows ldap users
+  to login with their username without appending or selecting a domain. Removed the domain combo because it's no longer
+  needed with this change.
 
 end 6.5
 --------
 
+
+15-03-2021 6.4.228
+- Core: fix for faulty headers appearing multiple times. This could break ActiveSync.
+- ActiveSync: Fix for images sent with iPhone not showing correctly
+- Core: Custom field tabs disabled bug fixed
+- LDAP: Domain was accidentally included in username to server
+- Files: Set notifications on read only folders is possible now.
+
+12-03-2021 6.4.227
+- Tickets: Added open/close options to ticketsgrid context menu
+- Calendar: Fixed display of select boxes in event details
+- Calendar: Invite didn't work if address was not found due due to case-sensitity
+- Billing: load statues by book_id in orderstatus dialog
+- LDAP: Fixed delete users and groups
+- LDAP: Validate users and groups queries before save
+- Projects: New custom field for selecting projects
+- New OnlyOffice module (Experimental)
+- Files: new module to convert documents to PDF with libreoffice online API
+- Studio: Fixed fields showing ID's instead of text in search results
+- Studio: Search fields for description didn't load
+
+05-03-2021 6.4.226
+- Email: Fixed sort contacts on last mail time noty always updating
+- Calendar: Fixed invalid reply to meeting request
+- Core: Fixed {product_name} replacement in language export
+- SMIME: Include encrypted content in reply and enable encryption
+- Email: In some cases an error occurred because a link was attempted to a read only organization
+- Projects: Creating task from project fills in project field
+- Email: Fixed 6.4.224 Problem displaying some email content #675
+
+03-03-2021 6.4.225
+- Core: fixed order of address fields in UK addresses. Thanks Jonny C
+- Core: catch spaces in function CFs, preventing errors
+- Billing: Added optional fields description and short description to products grid in catalogue
+- Email: Fixed &euro; shown in subject instead of €
+- Core: Link/changes could lead to double join of core_search s
+- Core: Improved list style in HTML editor and SHIFT + ENTER in lists inserts line break
+  instead of new list item.
+- Calendar: Fixed crash of calendar when deleting the selected view.
+- Projects2: User setting to select project when starting timer.
 
 26-02-2021 6.4.224
 - Multi instance: Fixed delete issue when temp dir was in use

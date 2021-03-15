@@ -27,7 +27,7 @@ go.AuthenticationManager = (function () {
 		 * 
 		 * @type {Array} string
 		 */
-		userMethods: [],
+		userAuthenticators: [],
 		
 		rememberLogin:false,
 
@@ -78,18 +78,12 @@ go.AuthenticationManager = (function () {
 				url: this.getAuthUrl(),
 				jsonData: clientData,
 				callback: function (options, success, response) {
-
-
 					var result = Ext.decode(response.responseText);
-
 					if(result.debug) {
 						go.Jmap.processDebugResponse(result.debug, 'auth');
-					} else {
-						debugger;
 					}
-
           
-          this.userMethods = result.methods || [];
+          this.userAuthenticators = result.authenticators || [];
 					this.loginToken = result.loginToken;
 					this.username = result.username;
 					
@@ -149,13 +143,13 @@ go.AuthenticationManager = (function () {
 			}
 		},
 
-		doAuthentication: function (methods, cb, scope) {
+		doAuthentication: function (authenticators, cb, scope) {
 
 			var loginData = {
 				loginToken: this.loginToken, //while the user is authenticating only loginToken is set 
 				accessToken: this.accessToken, //after authentication the access token is retrieved. It can be stored for remembering the login when a user closes the browser.
 				rememberLogin: this.rememberLogin,
-				methods: methods
+				authenticators: authenticators
 			};
 
 			Ext.Ajax.request({
@@ -163,8 +157,6 @@ go.AuthenticationManager = (function () {
 				jsonData: loginData,
 				callback: function (options, success, response) {
 					var result = response.responseText ? Ext.decode(response.responseText) : {}, me = this;
-
-									
 					
 					if(!success) {
 						switch(response.status) {
@@ -183,6 +175,9 @@ go.AuthenticationManager = (function () {
 						this.onAuthenticated(result).then(function() {
 							cb.call(scope || me, me, success, result);	
 						});
+					} else
+					{
+						cb.call(scope || me, me, success, result);
 					}
 
 				},
@@ -208,7 +203,7 @@ go.AuthenticationManager = (function () {
 
 			var me = this;
 
-			return go.User.loadSession(result).then(function() {
+			return go.User.onLoad(result).then(function() {
 				me.fireEvent("authenticated", me, result);
 
 				if(go.User.theme != GO.settings.config.theme) {

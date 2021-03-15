@@ -512,10 +512,10 @@
 	
 	&-helptext {
 		@extend %font-caption;
-		/*white-space: pre-wrap;*/
+		white-space: pre-wrap;
 		line-height: 1.6em;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		//overflow: hidden;
+		//text-overflow: ellipsis;
 	}
 	
 }
@@ -572,6 +572,12 @@
 	.x-trigger-noedit {
 		+ .x-form-twin-triggers, + .x-form-trigger {
 			border-left: 1px solid transparent;
+		}
+	}
+
+	&.x-item-disabled {
+		.x-form-field {
+			background-color: color($bg, 'background');
 		}
 	}
 }

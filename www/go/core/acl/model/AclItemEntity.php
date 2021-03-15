@@ -190,9 +190,18 @@ abstract class AclItemEntity extends AclEntity {
 			$keys[] = $fromAlias . '.' . $from . ' = ' . $column->table->getAlias() . ' . '. $to;
 		}
 
+		// Override didn't work because on delete it did need to be joined.
+//		if($query->isJoined($column->table->getName(), $column->table->getAlias())) {
+//			throw new \Exception(
+//				"The ACL owner table `". $column->table->getName() .
+//				"` was already joined with alias `" .  $column->table->getAlias() .
+//				"` in class " . static::class . ". If you joined this table via defineMapping() then override the method joinAclEntity() and return '" . $column->table->getAlias() . '.' . $cls::$aclColumnName ."'.") ;
+//		}
+
 		if(!$query->isJoined($column->table->getName(), $column->table->getAlias())) {
 			$query->join($column->table->getName(), $column->table->getAlias(), implode(' AND ', $keys));
 		}
+		
 		
 		//If this is another AclItemEntity then recurse
 		if(is_a($cls, AclItemEntity::class, true)) {
@@ -252,7 +261,7 @@ abstract class AclItemEntity extends AclEntity {
 			$keys[$to] = $this->{$from};
 		}
 
-		$aclEntity = $cls::find()->where($keys)->single();	
+		$aclEntity = $cls::find($cls::getMapping()->getColumnNames())->where($keys)->single();
 
 		if(!$aclEntity) {
 			throw new Exception("Can't find related ACL entity. The keys for class '$cls' must be invalid: " . var_export($keys, true));

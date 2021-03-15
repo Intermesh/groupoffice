@@ -153,41 +153,31 @@ class State extends AbstractState {
 	}
 
 	public function getSession() {
-			
-		// $user = $this->getToken()->getUser();
-
-		$cacheKey = 'session-' . $this->getToken()->accessToken;
-
-		$response = go()->getCache()->get($cacheKey);
-		
-		if(!$response) {
-			$response = [
-				'version' => go()->getVersion(),
-				'cacheClearedAt' => go()->getSettings()->cacheClearedAt,
-				// 'username' => $user->username,
-				'accounts' => ['1'=> [
-					'name'=>'Virtual',
-					'isPrimary' => true,
-					'isReadOnly' => false,
-					'hasDataFor' => []
-				]],
-				"auth" => [
-							"domains" => User::getAuthenticationDomains()
-				],
-				'capabilities' => Capabilities::get(),
-				'apiUrl' => $this->getApiUrl(),
-				'downloadUrl' => $this->getDownloadUrl("{blobId}"),
-				'pageUrl' => $this->getPageUrl(),
-				'uploadUrl' => $this->getUploadUrl(),
-				'eventSourceUrl' => $this->getEventSourceUrl(),
-				'userId' => $this->getUserId(),
-				
-			];
-			go()->getCache()->set($cacheKey, $response);
-		}
+		$response = [
+			'version' => go()->getVersion(),
+			'cacheClearedAt' => go()->getSettings()->cacheClearedAt,
+			// 'username' => $user->username,
+			'accounts' => ['1'=> [
+				'name'=>'Virtual',
+				'isPrimary' => true,
+				'isReadOnly' => false,
+				'hasDataFor' => []
+			]],
+			"auth" => [
+						"domains" => User::getAuthenticationDomains()
+			],
+			'capabilities' => Capabilities::get(),
+			'apiUrl' => $this->getApiUrl(),
+			'downloadUrl' => $this->getDownloadUrl("{blobId}"),
+			'pageUrl' => $this->getPageUrl(),
+			'uploadUrl' => $this->getUploadUrl(),
+			'eventSourceUrl' => $this->getEventSourceUrl(),
+			'userId' => $this->getUserId(),
+		];
 
 		//todo optimize
 		$response['state'] = OldState::model()->getFullClientState($this->getUserId());
+
 		return $response;
 	}
 	

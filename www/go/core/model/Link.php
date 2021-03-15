@@ -7,6 +7,7 @@ use go\core\acl\model\AclItemEntity;
 use go\core\App;
 use go\core\db\Criteria;
 use go\core\orm\exception\SaveException;
+use go\core\db\Query as DbQuery;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
@@ -191,10 +192,17 @@ class Link extends AclItemEntity
 		);
 	}
 
+	/**
+	 * Override because it should not join core_search because we already do this in the mapping
+	 *
+	 * @param Query $query
+	 * @return bool
+	 */
 	protected static function useSearchableTraitForSearch(Query $query)
 	{
 		return true;
 	}
+
 
 	/**
 	 * Create a link between two entities

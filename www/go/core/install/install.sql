@@ -41,7 +41,7 @@ CREATE TABLE `core_auth_token` (
   `lastActiveAt` datetime NOT NULL,
   `remoteIpAddress` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `userAgent` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `passedMethods` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+  `passedAuthenticators` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE `core_blob` (
@@ -137,6 +137,7 @@ CREATE TABLE `core_customfields_select_option` (
   `fieldId` int(11) NOT NULL,
   `parentId` int(11) DEFAULT NULL,
   `text` varchar(255) DEFAULT NULL,
+  `sortOrder` int(11) UNSIGNED DEFAULT 0,
   `enabled` BOOLEAN NOT NULL DEFAULT TRUE
 ) ENGINE=InnoDB;
 
