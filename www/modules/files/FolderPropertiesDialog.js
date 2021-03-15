@@ -353,11 +353,14 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 			this.readPermissionsTab.setDisabled(!is_someones_home_dir && readonly);
 		}
 
-		form.items.each(function(itm){
-			if(itm.name.substring(0,13) === 'customFields.') {
-				form.findField(itm.name).setDisabled(is_someones_home_dir || readonly || permission_level<GO.permissionLevels.write);
-			}
-		},this);
+		//Use set timeout here because the load event will filter custom field tabs and will re-enable them
+		setTimeout(function() {
+			form.items.each(function(itm){
+				if(itm.name.substring(0,13) === 'customFields.') {
+					form.findField(itm.name).setDisabled(is_someones_home_dir || readonly || permission_level<GO.permissionLevels.write);
+				}
+			});
+		})
 
 		this.commentsPanel.setDisabled(readonly || permission_level<GO.permissionLevels.write);
 		
