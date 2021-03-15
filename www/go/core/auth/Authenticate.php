@@ -138,8 +138,9 @@ class Authenticate {
 
 		$cacheKey = 'login-' . md5($username. '|' . $password);
 
-		if($user = go()->getCache()->get($cacheKey)) {
-			return $user;
+		if($cache = go()->getCache()->get($cacheKey)) {
+			$this->usedPasswordAuthenticator = $cache[1];
+			return $cache[0];
 		}
 
 		$authenticator = $this->getPrimaryAuthenticatorForUser($username);
@@ -171,7 +172,7 @@ class Authenticate {
 			throw new Forbidden(go()->t("You're account has been disabled."));
 		}
 
-		go()->getCache()->set($cacheKey, $user, true, self::CACHE_PASSWORD_LOGIN);
+		go()->getCache()->set($cacheKey, [$user, $authenticator], true, self::CACHE_PASSWORD_LOGIN);
 
 		return $user;
 
