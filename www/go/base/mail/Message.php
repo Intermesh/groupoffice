@@ -132,25 +132,6 @@ class Message extends \Swift_Message{
 		if(!empty($structure->headers['subject'])){
 			$this->setSubject($structure->headers['subject']);
 		}
-		
-		if(isset($structure->headers['disposition-notification-to']))
-		{
-			//$mail->ConfirmReadingTo = $structure->headers['disposition-notification-to'];
-		}
-		
-		
-		//fix for [20150125 05:43:24] PHP Warning: strpos() expects parameter 1 to be string, array given in /usr/share/groupoffice/go/base/mail/Message.php on line 105
-		if(isset($structure->headers['to']) && is_array($structure->headers['to'])){
-			$structure->headers['to'] = implode(',', $structure->headers['to']);
-		}
-		
-		if(isset($structure->headers['cc']) && is_array($structure->headers['cc'])){
-			$structure->headers['cc'] = implode(',', $structure->headers['cc']);
-		}
-		
-		if(isset($structure->headers['bcc']) && is_array($structure->headers['bcc'])){
-			$structure->headers['bcc'] = implode(',', $structure->headers['bcc']);
-		}
 
 		$to = isset($structure->headers['to']) && strpos($structure->headers['to'],'undisclosed')===false ? $structure->headers['to'] : '';
 		$cc = isset($structure->headers['cc']) && strpos($structure->headers['cc'],'undisclosed')===false ? $structure->headers['cc'] : '';
@@ -162,7 +143,7 @@ class Message extends \Swift_Message{
 		$bcc = str_replace('mailto:','', $bcc);
 	
 		$toList = new EmailRecipients($to);
-		$to =$toList->getAddresses();
+		$to = $toList->getAddresses();
 		foreach($to as $email=>$personal){
 			try{
 				$this->addTo($email, $personal);
@@ -191,8 +172,8 @@ class Message extends \Swift_Message{
 			}
 		}
 
-		if(isset($structure->headers['from'])){
-			
+		if(isset($structure->headers['from'])) {
+
 			$fromList = new EmailRecipients(str_replace('mailto:','',$structure->headers['from']));
 			$from =$fromList->getAddress();
 		
