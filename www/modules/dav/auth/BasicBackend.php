@@ -19,7 +19,6 @@ use GO;
 use GO\Base\Model\Module;
 use go\core\auth\Authenticate;
 use go\core\auth\TemporaryState;
-use go\core\model\User;
 use Sabre\DAV\Auth\Backend\AbstractBasic;
 use Sabre\DAV\Exception\Forbidden;
 use Sabre\HTTP\RequestInterface;
@@ -52,9 +51,15 @@ class BasicBackend extends AbstractBasic {
 //	For basic auth
 	protected function validateUserPass($username, $password) {
 
-		if(!$this->user = Authenticate::passwordLogin($username, $password)) {
+		$auth = new Authenticate();
+		$this->user = $auth->passwordLogin($username, $password);
+		if(!$this->user) {
 			return false;
 		}
+
+		$state = new TemporaryState();
+		$state->setUserId($this->user->id);
+		go()->setAuthState($state);
 		
 		$davModule = Module::model()->findByName($this->checkModuleAccess, false, true);
 		if(!$davModule || !\GO\Base\Model\Acl::getUserPermissionLevel($davModule->aclId, $this->user->id))
