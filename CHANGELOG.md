@@ -1,3 +1,7 @@
+- Core: Prevent multiple chips options to be displayed multiple times
+- Core: Multiselect option store will self-destruct
+- Projects2: prevent filling contact and customer ids from previous projects
+
 15-03-2021 6.4.228
 - Core: fix for faulty headers appearing multiple times. This could break ActiveSync.
 - ActiveSync: Fix for images sent with iPhone not showing correctly
