@@ -42,7 +42,7 @@ class Task extends AclItemEntity {
 	public $groupId;
 
     /** @var int */
-    public $projectId = 0;
+    public $projectId ;
 
 	/** @var int */
 	public $createdBy;
@@ -54,10 +54,10 @@ class Task extends AclItemEntity {
 	public $modifiedAt;
 
 	/** @var int */
-	public $modifiedBy = 0;
+	public $modifiedBy;
 
     /** @var int */
-    public $filesFolderId = 0;
+    public $filesFolderId;
 
     /** @var DateTime due date (when this should be finished) */
     public $due;
@@ -229,7 +229,7 @@ class Task extends AclItemEntity {
 	}
 
 	protected function internalSave() {
-		if(!empty($this->recurrenceRule) && $this->percentageComplete == 100) {
+		if(!empty($this->recurrenceRule) && $this->percentComplete == 100) {
 			$next = $this->getNextRecurrence($this->getRecurrenceRule());
 			if($next) {
 				$this->createNewTask($next);

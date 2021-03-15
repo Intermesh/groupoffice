@@ -8,9 +8,11 @@ use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\orm\Entity;
 use go\core\util\StringUtil;
+use go\modules\community\tasks\model\Category;
 use go\modules\community\tasks\model\Recurrence;
 use go\modules\community\tasks\model\Task;
 use Sabre\VObject\Component\VCalendar as VCalendarComponent;
+use Sabre\VObject\Component\VTimeZone;
 use Sabre\VObject\Property\ICalendar\Recur;
 use Sabre\VObject\Reader;
 use Sabre\VObject\Splitter\ICalendar as VCalendarSplitter;
@@ -30,34 +32,24 @@ class VCalendar extends AbstractConverter {
 	const EMPTY_NAME = '(no name)';
 
 	/**
-	 * 
-	 * @param Task $task
-	 * @return VCalendarComponent
-	 */
-	private function getVTodo(Task $task) {
-		
-		if ($task->vcalendarBlobId) {
-			//task has a stored VCalendar 
-			$blob = Blob::findById($task->vcalendarBlobId);
-			$VCalendar = Reader::read($blob->getFile()->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);			
-			
-			if($VCalendar->VTODO) {
-				return $VCalendar->VTODO;
-			}
-		} 
-		
-		$calendar = new \Sabre\VObject\Component\VCalendar();
-		return $calendar->createComponent('VTODO');
-	
-	}
-
-	/**
 	 * Parse an Event object to a VObject
 	 * @param task $task
 	 */
 	public function export(Task $task) {
 
-		$vtodo = $this->getVTodo($task);
+		if ($task->vcalendarBlobId) {
+			//task has a stored VCalendar
+			$blob = Blob::findById($task->vcalendarBlobId);
+			$VCalendar = Reader::read($blob->getFile()->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
+
+			if($VCalendar->VTODO) {
+				return $VCalendar->VTODO;
+			}
+		}
+
+		$calendar = new \Sabre\VObject\Component\VCalendar();
+		$vtodo = $calendar->createComponent('VTODO');
+
 		$rule = $task->getRecurrenceRule();
 		if($rule) {
 			$rrule = Recurrence::fromArray($rule, $task->start);
@@ -81,24 +73,37 @@ class VCalendar extends AbstractConverter {
 
 		return $vtodo->serialize();
 	}
-	
 
-	
-	protected function exportEntity(Entity $entity, $fp, $index, $total) {
-		$str = $this->export($entity);
-		fputs($fp, $str);
+	private $tempFile;
+	private $fp;
+	protected function initExport()
+	{
+		$this->tempFile = File::tempFile($this->getFileExtension());
+		$this->fp = $this->tempFile->open('w+');
+		fputs($this->fp, "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Intermesh//NONSGML Group-Office ".go()->getVersion()."//EN\r\n");
+		fputs($this->fp, (new VTimezone())->serialize());
 	}
 
-	protected function importEntity($entityClass, $fp, $index, array $params){
-		$t = "";
+	protected function finishExport()
+	{
+		fputs($this->fp, "END:VCALENDAR\r\n");
+
+		$cls = $this->entityClass;
+		$blob = Blob::fromTmp($this->tempFile);
+		$blob->name = $cls::entityType()->getName() . "-" . date('Y-m-d-H:i:s') . '.'. $this->getFileExtension();
+		if(!$blob->save()) {
+			throw new Exception("Couldn't save blob: " . var_export($blob->getValidationErrors(), true));
+		}
+
+		return $blob;
 	}
+
+	protected function exportEntity(Entity $entity) {
+		fputs($this->fp, $this->export($entity));
+	}
+
 
 	protected function internalExport($fp, $entities, $total) {
-
-		$this->vcalendar =  new VCalendarComponent();
-		$this->vcalendar->LANGUAGE = go()->getSettings()->language;
-		$this->vcalendar->PRODID = '-//Intermesh//NONSGML Group-Office ' . go()->getVersion() . '//EN';
-
 		fputs($fp, "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Intermesh//NONSGML Group-Office ".go()->getVersion()."//EN\r\n");
 
 		$t = new \GO\Base\VObject\VTimezone();
@@ -106,7 +111,7 @@ class VCalendar extends AbstractConverter {
 
 		$i = 0;
 		foreach($entities as $entity) {
-			$this->exportEntity($entity, $fp, $i, $total);
+			fputs($fp, $this->export($entity));
 			$i++;
 		}
 
@@ -117,69 +122,108 @@ class VCalendar extends AbstractConverter {
 		return 'ics';
 	}
 
-	public function importFile(File $file, $entityClass, $params = []) {
-
-		$response = [
-				'ids' => [],
-				'errors' => [],
-				'count' => 0
-		];
-		
-		$values = $params['values'] ?? [];
-		$tasklistId = $values['tasklistId'];
+	private $importSplitter;
+	private $currentRecord;
+	protected function initImport(File $file) {
 		$contents = $file->getContents();
-		
-		$splitter = new VCalendarSplitter(StringUtil::cleanUtf8($contents), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
+		$this->importSplitter = new VCalendarSplitter(StringUtil::cleanUtf8($contents), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 
-		while ($VCalendarComponent = $splitter->getNext()) {
-
-			$todo = $VCalendarComponent->VTODO;
-			$categories = explode(",",(string)$todo->CATEGORIES);
-			$rule = new Recurrence((string)$todo->RRULE, $todo->DTSTART);
-
-			try {
-				$task = $this->findTask($VCalendarComponent, $tasklistId);
-				// no task found
-				if(!$task) {
-					$task = new Task();
-					$task->setValues([
-						"uid" => (string)$todo->UID,
-						"tasklistId" => $tasklistId,
-						"start" => $todo->DTSTART,
-						'recurrenceRule' => $rule->toArray(),
-						"due" => $todo->DUE,
-						"title" => (string)$todo->SUMMARY,
-						"description" => (string)$todo->DESCRIPTION,
-						"priority" => (string)$todo->PRIORITY
-					]);
-					$task->save();
-
-					$categories = (string)$todo->CATEGORIES;
-					if(!empty($categories)) {
-						$sql = "INSERT INTO tasks_task_category (taskId, categoryId) SELECT $task->id , `id` FROM tasks_category WHERE `name` IN ( $categories )";
-						go()->getDbConnection()->query($sql)->execute();
-					}
-//					$categoryNames = explode(",",$categories);
-//					foreach($categoryNames as $categoryName) {
-//						$categoryId = (int) go()->getDbConnection()->selectSingleValue('id')->from('tasks_category')->where(['name' => $categoryName])->execute()->fetch();
-//						if($categoryId > 0) {
-//							$data = ['taskId'=> $task->id, 'categoryId'=>$categoryId];
-//							go()->getDbConnection()->insert("tasks_task_category", $data)->execute();
-//						}
-//					}
-				} else {
-					continue;
-				}
-
-			}
-			catch(\Exception $e) {
-				ErrorHandler::logException($e);
-				$response['errors'][] = "Failed to import vcalendar: ". $e->getMessage();
-			}			
-			$response['count']++;
-		}
-		return $response;
 	}
+	protected function nextImportRecord() {
+		$this->currentRecord = $this->importSplitter->getNext();
+		return !empty($this->currenRecord);
+	}
+	protected function importEntity() {
+		$vcal = $this->currentRecord;
+		$todo = $vcal->VTODO;
+		$tasklistId = $this->clientParams['tasklistId'];
+		$categoryIds = Category::find()->selectSingleValue('id')
+			->where('name', 'IN', explode(",",(string)$todo->CATEGORIES))
+			->all();
+		$rule = new Recurrence((string)$todo->RRULE, $todo->DTSTART);
+
+		$task = $this->findTask($todo, $tasklistId);
+		// no task found
+		if(!$task) {
+			$task = new Task();
+			$task->setValues([
+				"uid" => (string)$todo->UID,
+				"tasklistId" => $tasklistId,
+				"start" => $todo->DTSTART,
+				'recurrenceRule' => $rule->toArray(),
+				"due" => $todo->DUE,
+				"title" => (string)$todo->SUMMARY,
+				"description" => (string)$todo->DESCRIPTION,
+				"priority" => (string)$todo->PRIORITY,
+				"categories" => $categoryIds
+			]);
+		}
+		return $task;
+	}
+
+//	public function importFile(File $file, $entityClass, $params = []) {
+//
+//		$response = [
+//				'ids' => [],
+//				'errors' => [],
+//				'count' => 0
+//		];
+//
+//		$values = $params['values'] ?? [];
+//		$tasklistId = $values['tasklistId'];
+//		$contents = $file->getContents();
+//
+//		$splitter = new VCalendarSplitter(StringUtil::cleanUtf8($contents), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
+//
+//		while ($VCalendarComponent = $splitter->getNext()) {
+//
+//			$todo = $VCalendarComponent->VTODO;
+//			$categories = explode(",",(string)$todo->CATEGORIES);
+//			$rule = new Recurrence((string)$todo->RRULE, $todo->DTSTART);
+//
+//			try {
+//				$task = $this->findTask($VCalendarComponent, $tasklistId);
+//				// no task found
+//				if(!$task) {
+//					$task = new Task();
+//					$task->setValues([
+//						"uid" => (string)$todo->UID,
+//						"tasklistId" => $tasklistId,
+//						"start" => $todo->DTSTART,
+//						'recurrenceRule' => $rule->toArray(),
+//						"due" => $todo->DUE,
+//						"title" => (string)$todo->SUMMARY,
+//						"description" => (string)$todo->DESCRIPTION,
+//						"priority" => (string)$todo->PRIORITY
+//					]);
+//					$task->save();
+//
+//					$categories = (string)$todo->CATEGORIES;
+//					if(!empty($categories)) {
+//						$sql = "INSERT INTO tasks_task_category (taskId, categoryId) SELECT $task->id , `id` FROM tasks_category WHERE `name` IN ( $categories )";
+//						go()->getDbConnection()->query($sql)->execute();
+//					}
+////					$categoryNames = explode(",",$categories);
+////					foreach($categoryNames as $categoryName) {
+////						$categoryId = (int) go()->getDbConnection()->selectSingleValue('id')->from('tasks_category')->where(['name' => $categoryName])->execute()->fetch();
+////						if($categoryId > 0) {
+////							$data = ['taskId'=> $task->id, 'categoryId'=>$categoryId];
+////							go()->getDbConnection()->insert("tasks_task_category", $data)->execute();
+////						}
+////					}
+//				} else {
+//					continue;
+//				}
+//
+//			}
+//			catch(\Exception $e) {
+//				ErrorHandler::logException($e);
+//				$response['errors'][] = "Failed to import vcalendar: ". $e->getMessage();
+//			}
+//			$response['count']++;
+//		}
+//		return $response;
+//	}
 	
 	/**
 	 * 

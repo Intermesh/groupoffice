@@ -53,10 +53,14 @@ class goTask extends GoBaseBackendDiff {
 		$task = Task::findById($id);
 		$message = new SyncTask();
 		if ($task) {
-			$message->startdate = $task->start->format("U");
-			$message->utcstartdate = $this->makeUTCDate($task->start);
-			$message->duedate = $task->due->format("U");
-			$message->utcduedate = $this->makeUTCDate($task->due);
+			if($task->start) {
+				$message->startdate = $task->start->format("U");
+				$message->utcstartdate = $this->makeUTCDate($task->start);
+			}
+			if($task->due) {
+				$message->duedate = $task->due->format("U");
+				$message->utcduedate = $this->makeUTCDate($task->due);
+			}
 			$message->complete = in_array($task->getProgress(), [Progress::Completed, Progress::Completed]) ? 1 : 0;
 			if($message->complete) $message->datecompleted = $task->progressUpdated->format("U");
 			$message->reminderset = empty($task->alerts) ? 0 : 1;
@@ -81,7 +85,7 @@ class goTask extends GoBaseBackendDiff {
 
 			$rule = $task->getRecurrenceRule();
 			if(!empty($rule)) {
-				$message->recurrence = GoSyncUtils::ParseRecurrence(Recurrence::fromArray($rule, $task->start)->toString());
+				$message->recurrence = GoSyncUtils::ParseRecurrence(Recurrence::fromArray((array)$rule, $task->start)->toString(), 'task');
 			}
 
 			// HACKS
@@ -215,8 +219,8 @@ class goTask extends GoBaseBackendDiff {
 			return [];
 
 		return Task::find()
-			->select('c.id, UNIX_TIMESTAMP(c.modifiedAt) AS `mod`, "1" AS flags')
-			->join("sync_tasklist_user", "u", "u.tasklist_id = c.tasklistId")
+			->select('task.id, UNIX_TIMESTAMP(task.modifiedAt) AS `mod`, "1" AS flags')
+			->join("sync_tasklist_user", "u", "u.tasklist_id = task.tasklistId")
 			->andWhere('u.user_id', '=', go()->getAuthState()->getUserId())
 			->fetchMode(PDO::FETCH_ASSOC)
 			->filter(["permissionLevel" => Acl::LEVEL_READ])

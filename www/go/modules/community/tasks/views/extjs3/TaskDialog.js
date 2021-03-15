@@ -74,26 +74,28 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 										scope : this
 									}
 								}]},
-							{columnWidth: .35, items:[new go.form.ComboBox({
-									hiddenName : 'status',
-									triggerAction : 'all',
-									editable : false,
-									selectOnFocus : true,
-									forceSelection : true,
-									fieldLabel : t("Status"),
-									mode : 'local',
-									width:dp(150),
-									value : 'confirmed',
-									valueField : 'value',
-									displayField : 'text',
-									store : new Ext.data.SimpleStore({
-										fields : ['value', 'text'],
-										data : [
-											['confirmed', t("Confirmed")],
-											['cancelled', t("Cancelled")],
-											['tentative', t("Tentative")]]
-									})
-								}),new go.form.ComboBox({
+							{columnWidth: .35, items:[
+								// new go.form.ComboBox({
+								// 	hiddenName : 'status',
+								// 	triggerAction : 'all',
+								// 	editable : false,
+								// 	selectOnFocus : true,
+								// 	forceSelection : true,
+								// 	fieldLabel : t("Status"),
+								// 	mode : 'local',
+								// 	width:dp(150),
+								// 	value : 'confirmed',
+								// 	valueField : 'value',
+								// 	displayField : 'text',
+								// 	store : new Ext.data.SimpleStore({
+								// 		fields : ['value', 'text'],
+								// 		data : [
+								// 			['confirmed', t("Confirmed")],
+								// 			['cancelled', t("Cancelled")],
+								// 			['tentative', t("Tentative")]]
+								// 	})
+								// }),
+									new go.form.ComboBox({
 									hiddenName : 'progress',
 									triggerAction : 'all',
 									editable : false,
@@ -114,6 +116,11 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 											['needs-action', t("Needs action")],
 											['cancelled', t("Cancelled")]]
 									})
+								}),new go.users.UserCombo({
+									fieldLabel: t('Responsible'),
+									hiddenName: 'responsibleUserId',
+										anchor:'90%',
+										allowBlank: true
 								})
 								]},
 							{columnWidth: .3, items:[{

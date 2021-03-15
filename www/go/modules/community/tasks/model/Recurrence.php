@@ -95,7 +95,7 @@ class Recurrence extends \Sabre\VObject\Recur\RRuleIterator {
 	 * @param $start datetime start of task
 	 * @return Recurrence
 	 */
-	static function fromArray($rule, $start) {
+	static function fromArray(array $rule, $start) {
 		$me = new self(null, $start);
 		foreach(['frequency', 'interval', 'count',
 					  'byMonth', 'byYearDay', 'byWeekNo', 'byMonthDay'] as $key) {

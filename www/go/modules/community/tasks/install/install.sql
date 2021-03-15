@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   `uid` VARCHAR(190) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NOT NULL DEFAULT '',
   `tasklistId` INT(11) UNSIGNED NOT NULL,
   `groupId` INT UNSIGNED NULL DEFAULT NULL,
-  `responsibleUserId` INT(11) NOT NULL,
+  `responsibleUserId` INT(11) DEFAULT NULL,
   `createdBy` INT(11) default NULL,
   `createdAt` DATETIME NOT NULL,
   `modifiedAt` DATETIME NOT NULL,
