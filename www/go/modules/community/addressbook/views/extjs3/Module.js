@@ -95,7 +95,19 @@ go.Modules.register("community", "addressbook", {
 				type: "string",
 				multiple: true
 			},
+			{
+				name: 'lastName',
+				title: t("Last name"),
+				type: "string",
+				multiple: true
+			},
 
+			{
+				name: 'firstName',
+				title: t("First name"),
+				type: "string",
+				multiple: true
+			},
 			{
 				title: t("Notes"),
 				name: 'notes',
@@ -126,6 +138,11 @@ go.Modules.register("community", "addressbook", {
 			}, {
 				name: 'city',
 				title: t("City"),
+				type: "string",
+				multiple: true
+			}, {
+				name: 'state',
+				title: t("State"),
 				type: "string",
 				multiple: true
 			}, {
@@ -190,7 +207,7 @@ go.Modules.register("community", "addressbook", {
 				name: 'actiondate',
 				multiple: false,
 				type: 'date'
-			}, ,{
+			},{
 				title: t("Date of birth"),
 				name: 'dateofbirth',
 				multiple: false,
@@ -381,9 +398,6 @@ go.modules.community.addressbook.typeStoreData = function (langKey) {
 	}
 	return types;
 };
-
-//go.Db.store("User");
-
 
 Ext.onReady(function () {
 	if (!go.modules.business || !go.modules.business.newsletters) {

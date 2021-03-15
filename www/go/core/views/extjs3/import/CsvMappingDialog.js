@@ -295,12 +295,14 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 	
 	createCombo : function(config) {
 		return Ext.apply(config,{
-				xtype: "gocombo",
-				displayField:'name',
-				valueField:	'index',
-				mode: 'local',
-				triggerAction: 'all',
-				editable:false
+			xtype: "gocombo",
+			displayField:'name',
+			valueField:	'index',
+			mode: 'local',
+			triggerAction: 'all',
+			editable:true,
+			forceSelecton : true,
+			typeAhead: true
 			});
 	},
 	doImport: function() {

@@ -1,9 +1,0 @@
-{
-	"@metadata": {
-		"authors": [
-			"Bjankuloski06"
-		]
-	},
-	"auth_remoteuser-desc": "Автоматски заведува корисници со околинската променлива <code>REMOTE_USER</code>",
-	"auth_remoteuser-wgautherror": "[https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:$wgAuth Променливата <code>wgAuth</code>] се користи во друг додаток. Може да се користи само во еден. Ако нема друг додаток, проверете дали во вашиот <code>LocalSettings.php</code> го имате зададено следнио ред:\n <code>$wgAuth = new Auth_remoteuser();</code>"
-}

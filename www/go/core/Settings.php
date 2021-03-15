@@ -29,8 +29,8 @@ abstract class Settings extends Model {
     $cls = static::class;
 
 	  if(!isset(self::$instance[$cls])) {
-      $instance = static::dbIsReady() ? go()->getCache()->get($cls) : false;
-      if ($instance) {
+      $instance = static::dbIsReady() ? go()->getCache()->get($cls) : null;
+      if ($instance !== null) {
         self::$instance[$cls] = $instance;
         return $instance;
       }
@@ -45,7 +45,10 @@ abstract class Settings extends Model {
 
 		return self::$instance[$cls];
 	}
-	
+
+	public static function flushCache() {
+		self::$instance = [];
+	}
 
 	protected function getModuleId() {
 		$moduleId = (new Query)
@@ -190,6 +193,8 @@ abstract class Settings extends Model {
 				$this->update($name, $value);
 			}
 		}
+
+		$this->oldData = (array) $this;
 
 		go()->getCache()->set(static::class, $this);
 		

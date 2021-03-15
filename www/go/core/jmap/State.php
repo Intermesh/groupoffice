@@ -72,7 +72,7 @@ class State extends AbstractState {
 			}
 
 			$this->token = go()->getCache()->get('token-' . $tokenStr);
-			if($this->token) {
+			if($this->token !== null) {
 				$this->token->activity();
 				return $this->token;
 			}
@@ -132,6 +132,9 @@ class State extends AbstractState {
 		
 		if (!$this->isAuthenticated()) {
 			Response::get()->setStatus(401);
+			Response::get()->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+			Response::get()->setHeader('Pragma', 'no-cache');
+
 			Response::get()->output([
 					"auth" => [
 							"domains" => User::getAuthenticationDomains()
@@ -150,41 +153,31 @@ class State extends AbstractState {
 	}
 
 	public function getSession() {
-			
-		// $user = $this->getToken()->getUser();
-
-		$cacheKey = 'session-' . $this->getToken()->accessToken;
-
-		$response = go()->getCache()->get($cacheKey);
-		
-		if(!$response) {
-			$response = [
-				'version' => go()->getVersion(),
-				'cacheClearedAt' => go()->getSettings()->cacheClearedAt,
-				// 'username' => $user->username,
-				'accounts' => ['1'=> [
-					'name'=>'Virtual',
-					'isPrimary' => true,
-					'isReadOnly' => false,
-					'hasDataFor' => []
-				]],
-				"auth" => [
-							"domains" => User::getAuthenticationDomains()
-				],
-				'capabilities' => Capabilities::get(),
-				'apiUrl' => $this->getApiUrl(),
-				'downloadUrl' => $this->getDownloadUrl("{blobId}"),
-				'pageUrl' => $this->getPageUrl(),
-				'uploadUrl' => $this->getUploadUrl(),
-				'eventSourceUrl' => $this->getEventSourceUrl(),
-				'userId' => $this->getUserId(),
-				
-			];
-			go()->getCache()->set($cacheKey, $response);
-		}
+		$response = [
+			'version' => go()->getVersion(),
+			'cacheClearedAt' => go()->getSettings()->cacheClearedAt,
+			// 'username' => $user->username,
+			'accounts' => ['1'=> [
+				'name'=>'Virtual',
+				'isPrimary' => true,
+				'isReadOnly' => false,
+				'hasDataFor' => []
+			]],
+			"auth" => [
+						"domains" => User::getAuthenticationDomains()
+			],
+			'capabilities' => Capabilities::get(),
+			'apiUrl' => $this->getApiUrl(),
+			'downloadUrl' => $this->getDownloadUrl("{blobId}"),
+			'pageUrl' => $this->getPageUrl(),
+			'uploadUrl' => $this->getUploadUrl(),
+			'eventSourceUrl' => $this->getEventSourceUrl(),
+			'userId' => $this->getUserId(),
+		];
 
 		//todo optimize
 		$response['state'] = OldState::model()->getFullClientState($this->getUserId());
+
 		return $response;
 	}
 	

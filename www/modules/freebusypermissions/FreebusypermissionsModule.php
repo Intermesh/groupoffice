@@ -52,8 +52,8 @@ class FreebusypermissionsModule extends \GO\Base\Module{
 		if(!$fbAcl){
 			
 			$acl = new \GO\Base\Model\Acl();
-			$acl->user_id = $userId;
-			$acl->description = Model\FreeBusyAcl::model()->tableName();
+			$acl->ownedBy = $userId;
+			$acl->usedIn = Model\FreeBusyAcl::model()->tableName();
 			$acl->save();
 			
 			if($acl){

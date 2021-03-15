@@ -1,9 +1,0 @@
-{
-	"@metadata": {
-		"authors": [
-			"Alirezaaa"
-		]
-	},
-	"auth_remoteuser-desc": "به طور خودکار کاربرانی را که از متغیر محیطی <code>REMOTE_USER</code> استفاده می‌کنند ثبت می‌کند",
-	"auth_remoteuser-wgautherror": "افزونه دیگری است که از [https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:$wgAuth متغیر <code>wgAuth</code>] استفاده می‌کند. شما نمی‌توانید همزمان بیشتر از یک افزونه که از <code>$wgAuth</code> استفاده می‌کند استفاده کنید. اگر افزونه دیگری نیست، لطفاً مطمئن شوید که خط زیر را در <code>LocalSettings.php</code> خود قرار دادید:\n <code>$wgAuth = new Auth_remoteuser();</code>"
-}

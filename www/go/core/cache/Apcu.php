@@ -1,12 +1,10 @@
 <?php
 namespace go\core\cache;
 
-use go\core\cache\CacheInterface;
-
 
 /**
  * Cache implementation that uses serialized objects in files on disk.
- * The cache is persistent accross requests.
+ * The cache is persistent across requests.
  * 
  * @copyright (c) 2014, Intermesh BV http://www.intermesh.nl
  * @author Merijn Schering <mschering@intermesh.nl>
@@ -42,11 +40,12 @@ class Apcu implements CacheInterface {
 	 * @param string $key
 	 * @param mixed $value Will be serialized
 	 * @param boolean $persist Cache must be available in next requests. Use false of it's just for this script run.
+	 * @param int $ttl Time to live in seconds
 	 */
-	public function set($key, $value, $persist = true) {
+	public function set($key, $value, $persist = true, $ttl = 0) {
 
 		if(PHP_SAPI === 'cli') {
-			return $this->getDiskCache()->set($key, $value, $persist);
+			return $this->getDiskCache()->set($key, $value, $persist, $ttl);
 		}
 
 		//don't set false values because unserialize returns false on failure.
@@ -56,7 +55,7 @@ class Apcu implements CacheInterface {
 
 
 		if($persist) {
-			apcu_store($this->prefix . '-' .$key, $value);
+			apcu_store($this->prefix . '-' .$key, $value, $ttl);
 		}
 		
 		$this->cache[$key] = $value;
@@ -64,6 +63,8 @@ class Apcu implements CacheInterface {
 
 	/**
 	 * Get a value from the cache
+	 *
+	 * Make sure to do a strict check on null to check if it existed. $value === null.
 	 * 
 	 * @param string $key 
 	 * @return mixed null if it doesn't exist

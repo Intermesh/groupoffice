@@ -9,6 +9,47 @@ use go\core\orm\EntityType;
 use go\core\orm\Query;
 use go\core\acl\model\AclOwnerEntity;
 
+/**
+ * Class LogEntry
+ * @package go\modules\community\history\model
+ * SELECT SQL_NO_CACHE l.id
+FROM `history_log_entry` `l`
+INNER JOIN `core_acl_group` `acl_g` ON
+acl_g.aclId = l.aclId
+INNER JOIN `core_user_group` `acl_u` ON
+acl_u.groupId = acl_g.groupId AND acl_u.userId=44
+GROUP BY `l`.`id`
+
+ORDER BY `l`.`id` DESC
+LIMIT 0,40
+
+
+SELECT SQL_NO_CACHE l.id
+FROM `history_log_entry` `l`
+where aclId in (
+select acl_g.aclId from `core_acl_group` `acl_g`
+INNER JOIN `core_user_group` `acl_u` ON
+acl_u.groupId = acl_g.groupId AND acl_u.userId=44
+)
+
+ORDER BY `l`.`id` DESC
+LIMIT 0,40
+
+
+SELECT SQL_NO_CACHE l.id
+FROM `history_log_entry` `l`
+where exists (select acl_g.aclId from `core_acl_group` `acl_g`
+INNER JOIN `core_user_group` `acl_u` ON
+(acl_u.groupId = acl_g.groupId AND acl_u.userId=44) where acl_g.aclId = l.aclId)
+
+ORDER BY `l`.`id` DESC
+LIMIT 0,40
+
+
+ALTER TABLE `history_log_entry` ADD INDEX(`createdAt`);
+
+ *
+ */
 class LogEntry extends AclOwnerEntity {
 
 	static private $actionMap = [

@@ -1344,8 +1344,14 @@ Ext.extend(GO.calendar.MainPanel, Ext.Panel, {
 			
 				record = this.viewsStore.getById(config.view_id);
 
-				config.merge=record.get('merge');
-				config.owncolor=record.get('owncolor');
+				if(record) {
+					config.merge = record.get('merge');
+					config.owncolor = record.get('owncolor');
+				} else
+				{
+					delete config.view_id;
+					delete this.state.view_id;
+				}
 			}
 		}
 

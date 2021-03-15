@@ -40,7 +40,6 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 	
 	buildForm : function () {
 
-
 		this.usersStore = new Ext.data.JsonStore({
 			baseParams: {
 				reminder_id : 0
@@ -53,22 +52,20 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 			remoteSort:true
 		});
 
-		this.usersGrid = new GO.grid.GridPanel( {
+		this.usersGrid = new GO.grid.GridPanel({
 			disabled:true,
 			layout:'fit',
 			title:t("Users"),
 			tbar:[{
-				iconCls: 'btn-delete',
+				iconCls: 'ic-delete',
 				text: t("Delete"),
-				cls: 'x-btn-text-icon',
 				handler: function(){
 					this.usersGrid.deleteSelected();
 				},
 				scope: this
 			},{
-				iconCls: 'btn-add',
+				iconCls: 'ic-add',
 				text: t("Add users", "reminders"),
-				cls: 'x-btn-text-icon',
 				handler: function(){
 
 					if(!this.selectUsersWindow){
@@ -92,9 +89,8 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 				},
 				scope: this
 			},{
-				iconCls: 'btn-add',
+				iconCls: 'ic-add',
 				text: t("Add user groups", "reminders"),
-				cls: 'x-btn-text-icon',
 				handler: function(){
 					if(!this.selectGroupsWindow){
 						this.selectGroupsWindow = new GO.dialog.SelectGroups({
@@ -143,8 +139,7 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 				anchor: '100%',
 				fieldLabel: t("Name"),
 				allowBlank:false
-			}
-			,{
+			},{
 				xtype : 'compositefield',
 				fieldLabel:t("Time", "reminders"),
 				anchor: '100%',

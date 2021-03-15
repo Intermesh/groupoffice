@@ -37,35 +37,50 @@ class ModuleCollection extends Model\ModelCollection{
 
 		parent::__construct($model);
 	}
-	
-	public static function isAllowed($name, $package = null){
-		
-		if(!isset(self::$allowedModules)) {
-			if(!empty(\GO::config()->allowed_modules)) {
-				if(!is_array(\GO::config()->allowed_modules)) {
-					self::$allowedModules = explode(',', \GO::config()->allowed_modules);
-				} else{
-					self::$allowedModules = \GO::config()->allowed_modules;
-				}
-				self::$allowedModules = array_merge(self::$allowedModules, ['core/core']);
-				
-			} else
-			{
-				self::$allowedModules = [];
+
+	/**
+	 * Check if a given module is allowed
+	 *
+	 * @param string $name
+	 * @param string $package
+	 * @param string|array $allowedModules If not given the current configuration file is used.
+	 * @return bool
+	 */
+	public static function isAllowed($name, $package = null, $allowedModules = null){
+
+		if(!isset($allowedModules)) {
+			if (!isset(self::$allowedModules)) {
+				self::$allowedModules = self::normalizeAllowedModules(\GO::config()->allowed_modules);
 			}
+			$allowedModules = self::$allowedModules;
+		} else {
+			$allowedModules = self::normalizeAllowedModules($allowedModules);
 		}
 
-		if(empty(self::$allowedModules)) {
+		if (empty($allowedModules)) {
 			return true;
 		}
 
-		if(isset($package)) {
+		if(isset($package) && $package != "legacy") {
 			$name = $package . "/" . $name;
-			return in_array($name, self::$allowedModules) || in_array($package . "/*", self::$allowedModules);
+			return in_array($name, $allowedModules) || in_array($package . "/*", $allowedModules);
 		} else{
-			return in_array($name, self::$allowedModules) || in_array('legacy/' . $name, self::$allowedModules) || in_array(  "legacy/*", self::$allowedModules);
+			return in_array($name, $allowedModules) || in_array('legacy/' . $name, $allowedModules) || in_array(  "legacy/*", $allowedModules);
+		}
+	}
+
+	private static function normalizeAllowedModules($allowedModules) {
+		if( empty($allowedModules)) {
+			return [];
 		}
 
+		if(!is_array($allowedModules)) {
+			$allowedModules = explode(',', $allowedModules);
+		}
+
+		$allowedModules[] = 'core/core';
+
+		return $allowedModules;
 	}
 	
 	/**
@@ -103,15 +118,8 @@ class ModuleCollection extends Model\ModelCollection{
 		}
 		
 		//for new framework
-		$classFinder = new \go\core\util\ClassFinder(false);
-		$classFinder->addNamespace("go\\modules");
-		$mods = $classFinder->findByParent(\go\core\Module::class);
-		$mods = array_filter($mods, function($mod) {
-			return static::isAllowed($mod::getName(), $mod::getPackage());
-		});
+		$mods = \go\core\Module::findAvailable();
 		$modules = array_merge($modules, $mods);
-		
-		
 		sort($modules);
 		
 		return $modules;		
@@ -126,7 +134,7 @@ class ModuleCollection extends Model\ModelCollection{
 	 */
 	public function isAvailable($moduleId, $checkModuleAvailabiltiy=true){
 		
-		if(!static::isAllowed($moduleId))
+		if($checkModuleAvailabiltiy && !static::isAllowed($moduleId))
 			return false;
 		
 		$folder = new Fs\Folder(\GO::config()->root_path.'modules/'.$moduleId);

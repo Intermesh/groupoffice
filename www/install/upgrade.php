@@ -9,6 +9,7 @@ ini_set('implicit_flush', 1);
 try {
 	
 	require('../vendor/autoload.php');
+	\go\core\App::get();
 
 	require("gotest.php");
 	if(!systemIsOk()) {
@@ -43,8 +44,8 @@ try {
 
 
 		
-		echo "</p></div>";
-		echo '<a class="button" href="?confirmed=1">Upgrade database</a>';
+		echo '</p><a class="right button primary" href="?confirmed=1">Upgrade database</a></div>';
+	
 	} elseif (!isset($_GET['ignore']) && count($unavailable)) {
 	
 		echo "<h2>". go()->t("Upgrade Group-Office") ."</h2>";
@@ -54,10 +55,10 @@ try {
 		. "<ul style=\"font-size:1.5em\"><li>" . implode("</li><li>", array_map(function($a){return ($a['package'] ?? "legacy") .'/'.$a['name'];}, $unavailable)) . "</li></ul>\n"
 		. "<p>Please install the license file(s) and refresh this page or disable these modules.\n"
 		. "If you continue the incompatible modules will be disabled.</p>";
-		
-		
+
+		echo '<a class="right button primary" href="?ignore=modules&confirmed=1">Disable &amp; Continue</a>';
+
 		echo "</div>";
-		echo '<a class="button" href="?ignore=modules&confirmed=1">Disable &amp; Continue</a>';
 
 	} else
 	{
@@ -66,9 +67,11 @@ try {
 
 		go()->getInstaller()->upgrade();	
 
-		echo "</pre></div>";
+		echo "</pre>";
+		echo '<a class="button right primary" href="../">' . go()->t('Continue') . '</a>';
 
-		echo '<a class="button" href="../">' . go()->t('Continue') . '</a>';
+		echo "</div>";
+
 
 		if(go()->getDebugger()->enabled) {
 			echo "<div style=\"clear:both;margin-bottom:20px;\"></div><div class=\"card\"><h2>Debugger output</h2><pre style=\"max-height: 600px; overflow:scroll;\">" ;
@@ -76,9 +79,12 @@ try {
 			echo "</pre></div>";
 		}
 
+		//Used by multi instance to check success
+		echo '<div id="success"></div>';
 
 	} 
 } catch (Exception $e) {
+	
 	echo "<b>Error:</b> ". ErrorHandler::logException($e)."\n\n";
 	
 	if(go()->getDebugger()->enabled) {

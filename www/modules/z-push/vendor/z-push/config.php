@@ -35,6 +35,9 @@
     // Try to set unlimited timeout
     define('SCRIPT_TIMEOUT', 0);
 
+    // This should be solved on THE webserver level if there are proxies
+    // between mobile client and Z-Push.
+    // IMPORTANT: This setting will be deprecated in Z-Push 2.7.0.
     // Use a custom header to determinate the remote IP of a client.
     // By default, the server provided REMOTE_ADDR is used. If the header here set
     // is available, the provided value will be used, else REMOTE_ADDR is maintained.
@@ -275,7 +278,24 @@
 /**********************************************************************************
  *  Backend settings
  */
-    // the backend data provider
+    // The backend data provider.
+    // Leave this value empty and Z-Push will autoload a backend. The sequence of autoload is:
+    // BackendKopano, BackendCombined, BackendIMAP, BackendVCardDir, BackendMaildir.
+    // If BackendKopano is not installed, Z-Push will load BackendCombined. If BackendCombined
+    // also is not installed, Z-Push will load BackendIMAP and so on.
+    // If you prefer explicitly configure a backend provider, currently possible values are:
+    // BackendKopano     -  to use with the Kopano groupware. Syncs emails, calendar items,
+    //                      contacts, tasks and notes or any combination of the listed items.
+    // BackendCombined   -  combine multiple backends for different items, e.g.
+    //                      BackendIMAP for emails, BackendCalDAV for calendar items,
+    //                      BackendCardDAV for contacts etc. You can configure what backend
+    //                      syncs which items in /etc/combined.conf.php.
+    // BackendIMAP       -  to sync emails with an IMAP server.
+    // BackendCalDAV     -  to sync calendar items and / or tasks with a CalDAV server.
+    // BackendCardDAV    -  to sync contacts with a CardDAV server.
+    // BackendMaildir    -  to sync emails from a Maildir.
+    // BackendStickyNote -  to sync notes with a Postgres server.
+    // BackendVCardDir   -  to sync contacts with vcard folder.
     define('BACKEND_PROVIDER', '');
 
 /**********************************************************************************

@@ -120,6 +120,10 @@ p {
 	margin: dp(16) 0;
 }
 
+.go-message-panel {
+	padding: dp(16);
+}
+
 
 /*#window-container, #viewport {
 	position: absolute;
@@ -662,6 +666,7 @@ a {
 	i.entity::before{margin-top: dp(-22);}
 }
 .notificationArea {
+	z-index: 1000000 !important;
 	@include var('background-color', c-primary);
 	.x-panel-header,.x-panel-header-text { border-top:0; color:white; }
 }
@@ -1079,6 +1084,7 @@ tr.go-grid-row {
 			height: dp(24);
 			position: absolute;
 			color: color($fg, 'icon');
+
 		}
 
 		.avatar {
@@ -1207,8 +1213,8 @@ tr.go-grid-row {
 	.s11 {width:91.666666%;}
 	.s12 {width:100%;}
 	.pad {
-		padding: dp(8) dp(16);
-		//padding-bottom:dp(8)
+		padding-left: dp(16);
+		padding-bottom:dp(8)
 	}
 
 	label {
@@ -1368,7 +1374,7 @@ table.display-panel {
 		border-bottom: 1px solid color($fg, 'line');
 	}
 
-	table {
+	table { 
 		td:first-child {
 			padding-left: 0;
 		}
@@ -1436,7 +1442,6 @@ table[id^="comments-ext"] b {
 .x-column.go-form-panel .x-panel-body,
 .x-form-label-left.go-form-panel > div > .x-panel-body,
 .go-form-panel .x-panel-body,
-.go-form-panel.x-menu-plain,
 .go-error-dialog{
 	padding: dp(8) dp(16);
 }
@@ -1621,9 +1626,9 @@ table[id^="comments-ext"] b {
 }
 
 
-.x-btn.raised{
-	border: dp(1) solid color($fg, "line");
-}
+//.x-btn.raised{
+//	border: dp(1) solid color($fg, "line");
+//}
 
 
 .go-links-detail {
@@ -1800,64 +1805,70 @@ table[id^="comments-ext"] b {
 	}
 }
 
+/**
+ * Resets ExtJS style to normal HTML defaults for displaying the HTML editor values or e-mails
+ */
 .go-html-formatted {
+
 	@extend %font-body1;
-}
 
-//.go-html-formatted div, .go-html-formatted dl, .go-html-formatted dt, .go-html-formatted dd, .go-html-formatted ul, .go-html-formatted ol, .go-html-formatted li, .go-html-formatted h1, .go-html-formatted h2, .go-html-formatted h3, .go-html-formatted h4, .go-html-formatted h5, .go-html-formatted h6, .go-html-formatted pre, .go-html-formatted form, .go-html-formatted fieldset, .go-html-formatted input, .go-html-formatted p, .go-html-formatted blockquote, .go-html-formatted th, .go-html-formatted td, .go-html-formatted span {
-//    font: inherit;
-//}
+	blockquote {
+		display: block;
+		margin: 1em 40px;
+		pading: 0px 10px;
+	}
 
-.go-html-formatted  blockquote {  
-  display: block;  
-  margin: 1em 40px;  
-  pading:0px 10px;
-}
+	td {
+		display: table-cell;
+	}
 
-.go-html-formatted td {   
-   display: table-cell;  
-/*   vertical-align: inherit;  
-   text-align: inherit; */
- }  
-   
-.go-html-formatted th {  
-   display: table-cell;  
-   vertical-align: inherit;  
-   font-weight: bold;  
-   padding: 1px;  
- }
+	th {
+		display: table-cell;
+		vertical-align: inherit;
+		font-weight: bold;
+		padding: 1px;
+	}
 
-   
-.go-html-formatted ul,.go-html-formatted  menu, .go-html-formatted dir {  
-   display: block;  
-   list-style-type: disc;  
-   margin: 1em 2em;
-	 padding: 0 40px;
-   /*-moz-padding-start: 40px;  */
- }  
-   
-.go-html-formatted ol {  
-   display: block;  
-   list-style-type: decimal;  
-   margin: 1em 2em;
-	 padding: 0 40px;
-   /*-moz-padding-start: 40px;  */
- }  
-   
-.go-html-formatted li {  
-   display: list-item;  
- }
- 
-.go-html-formatted p {  
-   margin:10px 0px;  
- }
+	ul, menu, dir {
+		display: block;
+		list-style-type: disc;
+		list-style-position: outside;
+		margin: 0;
+		padding: 0 0 0 2em;
+	}
 
-.go-html-formatted a:link, .go-html-formatted a:visited, .go-html-formatted a:active{
-	text-decoration:underline;
-	color: $cAnchor;
-}
-.go-html-formatted a:visited{
-	color:purple;
+	ol {
+		display: block;
+		list-style-type: decimal;
+		list-style-position: outside;
+		margin: 0;
+		padding: 0 0 0 2em;
+
+		> ol {
+			list-style-type: lower-alpha;
+
+			> ol {
+				list-style-type: lower-roman;
+			}
+		}
+	}
+
+	li {
+		display: list-item;
+	}
+
+	p {
+		margin: dp(8) 0px;
+	}
+
+	a:link, a:visited, a:active {
+		text-decoration: underline;
+		color: $cAnchor;
+	}
+
+	a:visited {
+		color: purple;
+	}
 }
 
 .normal-link {
@@ -1876,6 +1887,23 @@ table[id^="comments-ext"] b {
 }
 
 .go-messages {
+
+	.text-crop {
+		.more {
+			border-bottom-left-radius: dp(8);
+			border-bottom-right-radius: dp(8);
+
+			background-image: none;
+			background-color: color($bg, 'status-bar');
+			padding-top: dp(16);
+		}
+
+		&.mine {
+			.more {
+				background-color: rgba-to-rgb($cPrimaryTp);
+			}
+		}
+	}
 	padding: 0 dp(8);
 	h6 {
 		@extend %font-caption;
@@ -1889,11 +1917,11 @@ table[id^="comments-ext"] b {
 		padding-bottom:dp(8);
 		span.photo {
 			@extend .avatar;
-			position:absolute;
-			top: 0;
+			//position:absolute;
+			//top: 0;
 			margin-top:0 !important;
-			margin-right: dp(8);
-			
+			margin-right: dp(16);
+			float: left;
 			text-align: center;
 			&:after {
 				content: '';
@@ -1907,20 +1935,24 @@ table[id^="comments-ext"] b {
 			}
 			&.mine {
 				margin-right:0;
-				margin-left: dp(8);
-				right:0;
+				margin-left: dp(16);
+				//right:0;
+				float: right;
 				&:after {
 					left: dp(-16);
 					border: 0;
 					border-left: dp(16) solid $cPrimaryTp;
 					border-bottom: dp(16) solid transparent;
+
 				}
+
 			}
 		}
 		> div { // message		
 			border-radius: dp(8);
-			display:inline-block;
-			margin-left: dp(56);
+			//display:inline-block;
+			//margin-left: dp(56);
+			overflow:hidden;
 			max-width: 100%;
 			background-color: color($bg, 'status-bar');
 			.content {
@@ -1930,7 +1962,8 @@ table[id^="comments-ext"] b {
 				margin-right: dp(56);
 				margin-left: 0; // reset
 				background-color: $cPrimaryTp;
-				float:right;
+
+				//float:right;
 			}
 		}
 		
@@ -2149,6 +2182,25 @@ table[id^="comments-ext"] b {
 	display: none;
 }
 
+.go-button {
+	display: inline-block;
+	@extend .x-btn;
+	min-height: dp(32);
+	line-height: dp(24);
+	padding: 2px dp(8);
+
+	&:hover, &:focus {
+		transition: all 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+		@include var(background-color, c-primary-tp);
+	}
+
+	&.primary {
+		&:hover, &:focus {
+			transition: all 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+			@include var(background-color, c-accent);
+		}
+	}
+}
 
 .go-page {
 	background: color($bg, 'dialog');
@@ -2189,42 +2241,7 @@ table[id^="comments-ext"] b {
 	}
 
 	button, a.button {
-		@extend %font-button;
-		box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
-		transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1);
-		will-change: box-shadow;
-		min-width: dp(80);
-		display: inline-block;
-		position: relative;
-		min-width: dp(64);
-		height: dp(40);
-		line-height: dp(40);
-		padding: 0 dp(16);
-		border: none;
-		border-radius: 2px;
-		outline: none;
-		@include var(background-color, c-secondary);
-		color: white;
-		//text-align: center;
-		text-decoration: none;
-		//text-transform: uppercase;
-		overflow: hidden;
-
-		i {
-			margin-right: dp(4);
-		}
-		&:hover {
-			background-color: $cHover;
-			color: color($fg, "text");
-		}
-	}
-
-	.toolbar {
-		button, a.button {
-			box-shadow: none;
-			color: color($fg, "text");
-			background: transparent !important;
-		}
+		@extend .go-button;
 	}
 
 	h2 {
@@ -2276,7 +2293,6 @@ table[id^="comments-ext"] b {
 	*[disabled] {
 		opacity: 0.65;
 		cursor: not-allowed;
-		pointer-events: none;
 	}
 }
 

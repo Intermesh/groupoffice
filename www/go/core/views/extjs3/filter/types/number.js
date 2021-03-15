@@ -117,7 +117,7 @@ go.filter.types.number = Ext.extend(Ext.Panel, {
 			case 'less':				
 				return '< ' + v;
 				
-			case 'lessorqual':				
+			case 'lessorequal':
 				return '<= ' + v;
 		}
 	},

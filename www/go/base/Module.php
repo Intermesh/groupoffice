@@ -85,7 +85,7 @@ class Module extends Observable {
 	/**
 	 * Get the absolute filesystem path to the module.
 	 * 
-	 * @return StringHelper 
+	 * @return string
 	 */
 	public function path(){
 		return \GO::config()->root_path . 'modules/' . $this->name() . '/';
@@ -137,7 +137,7 @@ class Module extends Observable {
 	public function getPackage() {
 		return "legacy";
 	}
-	
+
 	private function _findIconByTheme($theme){
 		$path = $this->path();
 		if(file_exists($path.'/themes/'.$theme.'/images/'.$this->name().'.png')){
@@ -251,7 +251,7 @@ class Module extends Observable {
 		return $this->isAvailable();
 	}
 
-	
+
 	/**
 	 * Return false is for some reason this module is not instalable.
 	 * 
@@ -511,11 +511,39 @@ class Module extends Observable {
 		foreach($models as $model){	
 			if($model->isSubclassOf("GO\Base\Db\ActiveRecord")){
 				$m = \GO::getModel($model->getName());
-				
+
 				if($m->checkDatabaseSupported()){					
 					
 					echo "Checking ".$model->getName()."\n";
 					flush();
+
+					if($m->hasColumn('user_id')) {
+						//correct missing user_id values
+						$stmt = go()->getDbConnection()->updateIgnore(
+							$m->tableName(),
+							['user_id' => 1],
+							(new \go\core\orm\Query())
+								->where("user_id not in (select id from core_user)"));
+						$stmt->execute();
+						if($stmt->rowCount()) {
+							echo "Changed " . $stmt->rowCount() . " missing user id's into the admin user\n";
+						}
+					}
+
+					if($m->hasColumn('acl_id')) {
+						//correct missing user_id values
+						$stmt = go()->getDbConnection()->update(
+							$m->tableName(),
+							['acl_id' => 0],
+							(new \go\core\orm\Query())
+								->where("acl_id not in (select id from core_acl)"));
+
+						$stmt->execute();
+
+						if($stmt->rowCount()) {
+							echo "Set " . $stmt->rowCount() . " missing ACL id's to zero\n";
+						}
+					}
 					
 					//to avoid memory errors
 					$start = 0;

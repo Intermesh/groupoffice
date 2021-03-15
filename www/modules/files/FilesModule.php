@@ -21,11 +21,13 @@
 
 namespace GO\Files;
 
+use go\core\model\User;
 use go\core\util\ClassFinder;
 use GO\Files\Filehandler\FilehandlerInterface;
 use GO\Base\Util\ReflectionClass;
 use go\core\Module;
 use go\core\model\Module as GoModule;
+use GO\Files\Model\Folder;
 
 class FilesModule extends \GO\Base\Module{	
 	
@@ -37,6 +39,7 @@ class FilesModule extends \GO\Base\Module{
 		$c = new \GO\Core\Controller\BatchEditController();
 		
 		$c->addListener('store', "GO\Files\FilesModule", "afterBatchEditStore");
+
 	}
 	
 
@@ -77,19 +80,33 @@ class FilesModule extends \GO\Base\Module{
 
 		parent::checkDatabase($response);
 	}
-	
-	public static function saveUser($user, $wasNew) {
-		//throw new \Exception($user->getOldAttributeValue('username'));
-		if($wasNew){
-			$folder = Model\Folder::model()->findHomeFolder($user);			
-		}elseif($user->isModified('username')){
-			$folder = Model\Folder::model()->findByPath('users/'.$user->getOldAttributeValue('username'));
-			if($folder)
-			{
-				$folder->name=$user->username;
-				$folder->systemSave=true;
-				//throw new \Exception($folder->path);
-				$folder->save();				
+
+
+	public static function cleanup() {
+
+		echo "Cleaning up home folders...\n";
+		$users = Folder::model()->findByPath('users');
+
+		foreach($users->folders as $folder) {
+
+			$user = User::find(['id','username'])->where('username', '=', $folder->name)->single();
+			if(!$user) {
+				echo "Deleting: " . $folder->name . "\n";
+				$folder->delete(true);
+			}
+		}
+	}
+
+	public static function saveUser($user, $wasNew)
+	{
+		if ($wasNew) {
+			$folder = Model\Folder::model()->findHomeFolder($user);
+		} elseif ($user->isModified('username')) {
+			$folder = Model\Folder::model()->findByPath('users/' . $user->getOldAttributeValue('username'));
+			if ($folder) {
+				$folder->name = $user->username;
+				$folder->systemSave = true;
+				$folder->save();
 			}
 		}
 	}

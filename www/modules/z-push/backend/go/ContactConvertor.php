@@ -1,8 +1,10 @@
 <?php
 
 use GO\Base\Util\StringHelper;
-use go\core\model\Acl;
 use go\core\fs\Blob;
+use go\core\mail\RecipientList;
+use go\core\model\Acl;
+use go\core\model\Link;
 use go\modules\community\addressbook\model\Address;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\addressbook\model\Contact;
@@ -10,8 +12,6 @@ use go\modules\community\addressbook\model\Date;
 use go\modules\community\addressbook\model\EmailAddress;
 use go\modules\community\addressbook\model\PhoneNumber;
 use go\modules\community\addressbook\model\Url;
-use go\core\model\Link;
-use go\core\mail\RecipientList;
 
 /**
  * Contact convertor class
@@ -142,7 +142,7 @@ class ContactConvertor {
 							->selectSingleValue('name')
 							->all();
 			
-			$message->companyname = implode(', ', $companies);
+			$message->companyname = implode(' | ', $companies);
 		} else
 		{
 			$message->companyname = $contact->name;
@@ -263,7 +263,6 @@ class ContactConvertor {
 	 */
 	private function buildHasManyValues($m, $message) {		
 		$v = [];
-		$firstPropName = array_values($m)[0];
 		$found = false;
 		foreach($m as $goProp => $asProp) {
 			$v[$goProp] = $message->$asProp;
@@ -394,7 +393,7 @@ class ContactConvertor {
 	
 	private function setOrganizations(SyncContact $message, Contact $contact) {
 
-		$asOrganizationNames = empty($message->companyname) ? [] : array_map('trim', explode(",", $message->companyname));
+		$asOrganizationNames = empty($message->companyname) ? [] : array_map('trim', explode("|", $message->companyname));
 		
 		ZLog::Write(LOGLEVEL_DEBUG, "Organizations: ".$message->companyname);
 		
@@ -448,12 +447,13 @@ class ContactConvertor {
 	 * @throws Exception
 	 */
 	public function getDefaultAddressBook() {
-		
+
 		$addressbook = AddressBook::find()
-						->join('sync_addressbook_user', 'su', 'su.addressBookId = a.id')
-						->filter(['permissionLevel' => Acl::LEVEL_WRITE])
-						->where('su.userId', '=', go()->getAuthState()->getUserId())
-						->single();
+			->join('sync_addressbook_user', 'su', 'su.addressBookId = a.id')
+			->filter(['permissionLevel' => Acl::LEVEL_WRITE])
+			->where('su.userId', '=', go()->getAuthState()->getUserId())
+			->orderBy(['su.isDefault' => 'DESC'])
+			->single();
 
 		if (!$addressbook)
 			throw new Exception("FATAL: No default addressbook configured");

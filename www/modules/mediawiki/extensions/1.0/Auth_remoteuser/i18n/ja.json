@@ -1,8 +1,0 @@
-{
-	"@metadata": {
-		"authors": [
-			"Shirayuki"
-		]
-	},
-	"auth_remoteuser-desc": "<code>REMOTE_USER</code> 環境変数を使用して利用者を自動的にログインさせる"
-}

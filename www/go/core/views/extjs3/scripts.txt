@@ -1,11 +1,13 @@
 polyfills.js
 
 Jmap.js
+Uploader.js
 BrowserStorage.js
 
 
 data/JmapProxy.js
 data/EntityStoreProxy.js
+data/FilterTrait.js
 data/StoreTrait.js
 data/Store.js
 data/GroupingStore.js
@@ -20,6 +22,7 @@ Modules.js
 
 panels/ScrollLoader.js
 grid/GridView.js
+grid/GroupingView.js
 grid/GridTrait.js
 grid/plugin/Sortable.js
 grid/GridPanel.js
@@ -164,6 +167,7 @@ Module.js
 
 cron/Stores.js
 cron/CronDialog.js
+cron/NewCronDialog.js
 cron/ParametersPanel.js
 cron/PeriodGrid.js
 cron/SystemSettingsCronGrid.js
@@ -187,6 +191,7 @@ users/UserGroupGrid.js
 users/UserCombo.js
 users/SelectDialogPanel.js
 
+customfields/ExportDialog.js
 customfields/FormFieldSet.js
 customfields/FieldDialog.js
 customfields/CustomFields.js
@@ -248,6 +253,7 @@ filter/types/date.js
 filter/types/select.js
 filter/types/subconditions.js
 filter/FilterGrid.js
+filter/FilterCombo.js
 filter/FilterDialog.js
 filter/FilterAddButton.js
 filter/VariableFilterPanel.js
@@ -258,6 +264,8 @@ filter/variabletypes/string.js
 filter/variabletypes/select.js
 
 import/CsvMappingDialog.js
+import/SpreadSheetExportGrid.js
+import/ColumnSelectDialog.js
 
 smtp/AccountDialog.js
 smtp/GridPanel.js

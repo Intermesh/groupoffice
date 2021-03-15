@@ -141,7 +141,7 @@ abstract class Message extends \GO\Base\Model {
 
 		//workaround for invalid from
 		if(!$this->attributes['from']->getAddress()) {
-			$this->attributes['from'] = 	new \GO\Base\Mail\EmailRecipients("unknown@unkonwn.domain");
+			$this->attributes['from'] = 	new \GO\Base\Mail\EmailRecipients("unknown@unknown.domain");
 		}
 		$this->attributes['reply_to'] = new \GO\Base\Mail\EmailRecipients(\GO\Base\Util\StringHelper::clean_utf8($this->attributes['reply_to']));
 
@@ -405,7 +405,12 @@ abstract class Message extends \GO\Base\Model {
 			$a = $att->getAttributes();
 
 			//add unique token for detecting precense of inline attachment when we submit the message in handleFormInput
-			$a['token']=md5($a['tmp_file']);
+			if(isset($a['tmp_file']) && $a['tmp_file']) {
+				$a['token']=md5($a['tmp_file']);
+			} else {
+				// Sometimes $a['tmp_file'] is empty. In the case of multiple attachments, only the last attachment will be available
+				$a['token'] = md5($a['content_id']);
+			}
 			$a['url'] .= '&amp;token='.$a['token'];
 			
 			if ($html && !empty($a['content_id']))

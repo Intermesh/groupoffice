@@ -17,6 +17,7 @@ use GO\Base\Fs\Folder;
 use Exception;
 use go\core\ErrorHandler;
 use go\core\fs\Blob;
+use go\core\webclient\Extjs3;
 
 
 //make sure temp dir exists
@@ -50,7 +51,7 @@ class Message extends \Swift_Message{
 		parent::__construct($subject, $body, $contentType, $charset);
 
     $headers = $this->getHeaders();
-    $headers->addTextHeader("X-Group-Office-Title", go()->getSettings()->title);
+    $headers->addTextHeader("X-Mailer", "Group-Office (" . go()->getVersion() . ")");
 
 		// See Mailer.php at line 105 for header encoding
 		if(GO::config()->swift_email_body_force_to_base64) {
@@ -131,25 +132,6 @@ class Message extends \Swift_Message{
 		if(!empty($structure->headers['subject'])){
 			$this->setSubject($structure->headers['subject']);
 		}
-		
-		if(isset($structure->headers['disposition-notification-to']))
-		{
-			//$mail->ConfirmReadingTo = $structure->headers['disposition-notification-to'];
-		}
-		
-		
-		//fix for [20150125 05:43:24] PHP Warning: strpos() expects parameter 1 to be string, array given in /usr/share/groupoffice/go/base/mail/Message.php on line 105
-		if(isset($structure->headers['to']) && is_array($structure->headers['to'])){
-			$structure->headers['to'] = implode(',', $structure->headers['to']);
-		}
-		
-		if(isset($structure->headers['cc']) && is_array($structure->headers['cc'])){
-			$structure->headers['cc'] = implode(',', $structure->headers['cc']);
-		}
-		
-		if(isset($structure->headers['bcc']) && is_array($structure->headers['bcc'])){
-			$structure->headers['bcc'] = implode(',', $structure->headers['bcc']);
-		}
 
 		$to = isset($structure->headers['to']) && strpos($structure->headers['to'],'undisclosed')===false ? $structure->headers['to'] : '';
 		$cc = isset($structure->headers['cc']) && strpos($structure->headers['cc'],'undisclosed')===false ? $structure->headers['cc'] : '';
@@ -161,12 +143,12 @@ class Message extends \Swift_Message{
 		$bcc = str_replace('mailto:','', $bcc);
 	
 		$toList = new EmailRecipients($to);
-		$to =$toList->getAddresses();
+		$to = $toList->getAddresses();
 		foreach($to as $email=>$personal){
 			try{
 				$this->addTo($email, $personal);
 			} catch (Exception $e){
-				trigger_error('Failed to add receipient address: '.$e);
+				\go\core\ErrorHandler::logException($e);
 			}
 		}
 		
@@ -176,7 +158,7 @@ class Message extends \Swift_Message{
 			try{
 				$this->addCc($email, $personal);
 			} catch (Exception $e){
-				trigger_error('Failed to add CC address: '.$e);
+				\go\core\ErrorHandler::logException($e);
 			}
 		}
 		
@@ -186,12 +168,12 @@ class Message extends \Swift_Message{
 			try{
 				$this->addBcc($email, $personal);
 			} catch (Exception $e){
-				trigger_error('Failed to add BCC address: '.$e);
+				\go\core\ErrorHandler::logException($e);
 			}
 		}
 
-		if(isset($structure->headers['from'])){
-			
+		if(isset($structure->headers['from'])) {
+
 			$fromList = new EmailRecipients(str_replace('mailto:','',$structure->headers['from']));
 			$from =$fromList->getAddress();
 		
@@ -322,6 +304,10 @@ class Message extends \Swift_Message{
 	
 	private function _getParts($structure, $part_number_prefix='')
 	{
+		// Apple sends contentID's that SwiftMailer doesn't like. So we replace them with new onces but we have to replace
+		// this in the body too.
+
+		$cidReplacements = [];
 		if (isset($structure->parts))
 		{
 			//$part_number=0;
@@ -356,16 +342,6 @@ class Message extends \Swift_Message{
 				}elseif(isset($part->body))
 				{
 					//attachment
-
-					$this->_tmpDir =\GO::config()->tmpdir.'attachments/'.  uniqid().'/';
-
-					if(!is_dir($this->_tmpDir ))
-						mkdir($this->_tmpDir , 0755, true);
-
-					//unset($part->body);
-					//var_dump($part);
-					//exit();
-
 					if(!empty($part->ctype_parameters['name']))
 					{
 						$filename = $part->ctype_parameters['name'];
@@ -380,9 +356,6 @@ class Message extends \Swift_Message{
 						$filename=uniqid(time());
 					}
 
-					$tmp_file = $this->_tmpDir .$filename;
-					file_put_contents($tmp_file, $part->body);
-
 					if(!isset($part->ctype_primary)) {
             $part->ctype_primary = 'text';
           }
@@ -395,19 +368,22 @@ class Message extends \Swift_Message{
           //only embed if we can find the content-id in the body
 					if(isset($part->headers['content-id']) && ($content_id=trim($part->headers['content-id'],' <>')) && strpos($this->_loadedBody, $content_id) !== false)
 					{
-						$img = \Swift_EmbeddedFile::fromPath($tmp_file);
+						$img = new \Swift_EmbeddedFile($part->body, $filename, $mime_type);
 						$img->setContentType($mime_type);
-						
+
 						//Only set valid ID's. Iphone sends invalid content ID's sometimes.
 						if (preg_match('/^.+@.+$/D',$content_id))
 						{
 							$img->setId($content_id);
+							$this->embed($img);
+						} else{
+							$this->embed($img);
+							$cidReplacements[$content_id] = $img->getId();
 						}
-						$this->embed($img);
+
 					}else
 					{
-					//echo $tmp_file."\n";
-						$attachment = \Swift_Attachment::fromPath($tmp_file,$mime_type);
+						$attachment = new \Swift_Attachment($part->body, $filename,$mime_type);
 						$this->attach($attachment);
 					}
 				}
@@ -432,6 +408,10 @@ class Message extends \Swift_Message{
 				$text_part = $structure->body;
 			}
 			$this->_loadedBody .= $text_part;
+		}
+
+		foreach($cidReplacements as $old => $new) {
+			$this->_loadedBody = str_replace($old, $new, $this->_loadedBody);
 		}
 	}
 	
@@ -468,11 +448,7 @@ class Message extends \Swift_Message{
 		foreach($allMatches as $matches){
 			if($matches[2]=='base64'){
 				$extension = $matches[1];
-				$tmpFile = \GO\Base\Fs\File::tempFile('', $extension);
-				$tmpFile->putContents(base64_decode($matches[3]));
-
-				$img = \Swift_EmbeddedFile::fromPath($tmpFile->path());
-				$img->setContentType($tmpFile->mimeType());
+				$img = new \Swift_EmbeddedFile(base64_decode($matches[3]), uniqid() . '.'. $extension);
 				$contentId = $this->embed($img);
 
 				$body = str_replace($matches[0],'src="'.$contentId, $body);
@@ -605,16 +581,17 @@ class Message extends \Swift_Message{
 				}
 			}
 			$params['htmlbody']=$this->_fixRelativeUrls($params['htmlbody']);
-						
+
+			if(file_exists(Extjs3::get()->getThemePath() . 'htmleditor.css')) {
+				$style = preg_replace("'/\*.*\*/'", "", file_get_contents(Extjs3::get()->getThemePath() . 'htmleditor.css'));
+			} else {
+				$style = preg_replace("'/\*.*\*/'", "", file_get_contents(Extjs3::get()->getBasePath() . '/views/Extjs3/themes/Paper/htmleditor.css'));
+			}
+
 			$htmlTop = '<html>
 <head>
-<style type="text/css">
-body,p,td,div,span{
-	'.\GO::config()->html_editor_font.'
-};
-body p{
-	margin:0px;
-}
+<style type="text/css" id="groupoffice-email-style">
+'.$style.'
 </style>
 </head>
 <body>';

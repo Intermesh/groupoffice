@@ -67,7 +67,6 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 					});
 
 					this.salutationField.on('specialkey', function (field, e) {
-
 						// e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,
 						// e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN
 						if (e.getKey() == e.TAB) {
@@ -90,7 +89,8 @@ go.modules.community.addressbook.NameField = Ext.extend(Ext.form.TextField, {
 	},
 	focusNextEl : function() {
 		var found = false;
-		this.ownerCt.items.each(function(item) {
+		var entityForm = this.findParentByType("entityform");
+		entityForm.form.items.each(function(item) {
 			if(found) {
 				item.focus();
 				return false;

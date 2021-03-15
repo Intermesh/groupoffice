@@ -2,6 +2,9 @@
 
 class GoSyncUtils {
 
+
+
+
 	/**
 	 * Get the Group-Office Sync settings for the given user
 	 * If no user is given then it will take the settings for the current user
@@ -90,7 +93,7 @@ class GoSyncUtils {
 	public static function createASBodyForMessage($model, $attribute, $sbReturnType = SYNC_BODYPREFERENCE_HTML) {
 
 		$sbBody = new SyncBaseBody();
-		
+
 		$asBodyData = \GO\Base\Util\StringHelper::normalizeCrlf($model->$attribute);
 
 		if(!isset($asBodyData)) {
@@ -103,11 +106,10 @@ class GoSyncUtils {
 			
 			$sbBody->type = SYNC_BODYPREFERENCE_HTML;
 
-			$asBodyData = \GO\Base\Util\StringHelper::text_to_html($model->$attribute);
+			$asBodyData = \GO\Base\Util\StringHelper::text_to_html($asBodyData);
 		} else {
 			
 			$sbBody->type = SYNC_BODYPREFERENCE_PLAIN;
-			$asBodyData = \GO\Base\Util\StringHelper::normalizeCrlf($model->$attribute);
 		}
 		ZLog::Write(LOGLEVEL_DEBUG, $asBodyData);
 

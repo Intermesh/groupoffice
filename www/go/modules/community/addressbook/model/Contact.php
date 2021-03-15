@@ -3,6 +3,7 @@ namespace go\modules\community\addressbook\model;
 
 use Exception;
 use go\core\acl\model\AclItemEntity;
+use go\core\data\convert\Xlsx;
 use go\core\db\Column;
 use go\core\db\Criteria;
 use go\core\model\Link;
@@ -11,7 +12,7 @@ use go\core\orm\Query;
 use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
-use go\modules\community\addressbook\convert\Csv;
+use go\modules\community\addressbook\convert\Spreadsheet;
 use go\modules\community\addressbook\convert\VCard;
 use function GO;
 use go\core\mail\Message;
@@ -257,22 +258,22 @@ class Contact extends AclItemEntity {
 	public $color;
 	
 	
-	/**
-	 * Starred by the current user or not.
-	 * 
-	 * Should not be false but null for ordering. Records might be missing.
-	 * 
-	 * @var boolean 
-	 */
-	protected $starred = null;
-
-	public function getStarred() {
-		return !!$this->starred;
-	}
-
-	public function setStarred($starred) {
-		$this->starred = empty($starred) ? null : true;
-	}
+//	/**
+//	 * Starred by the current user or not.
+//	 *
+//	 * Should not be false but null for ordering. Records might be missing.
+//	 *
+//	 * @var boolean
+//	 */
+//	protected $starred = null;
+//
+//	public function getStarred() {
+//		return !!$this->starred;
+//	}
+//
+//	public function setStarred($starred) {
+//		$this->starred = empty($starred) ? null : true;
+//	}
 
 	protected static function getRequiredProperties() {	
 		$p = parent::getRequiredProperties();
@@ -362,13 +363,13 @@ class Contact extends AclItemEntity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable("addressbook_contact", 'c')
-						->addUserTable("addressbook_contact_star", "s", ['id' => 'contactId'])
+//						->addUserTable("addressbook_contact_star", "s", ['id' => 'contactId'])
 						->addArray('dates', Date::class, ['id' => 'contactId'])
 						->addArray('phoneNumbers', PhoneNumber::class, ['id' => 'contactId'])
 						->addArray('emailAddresses', EmailAddress::class, ['id' => 'contactId'])
 						->addArray('addresses', Address::class, ['id' => 'contactId'])
 						->addArray('urls', Url::class, ['id' => 'contactId'])
-						->addScalar('groups', 'addressbook_contact_group', ['id' => 'contactId']);						
+						->addScalar('groups', 'addressbook_contact_group', ['id' => 'contactId']);
 	}
 	
 	public function setNameFromParts() {
@@ -436,7 +437,14 @@ class Contact extends AclItemEntity {
 										->add("addressBookId", function(Criteria $criteria, $value) {
 											$criteria->andWhere('addressBookId', '=', $value);
 										})
-										->add("groupId", function(Criteria $criteria, $value, Query $query) {
+			->add("addressBookIds", function(Criteria $criteria, $value) {
+				if(count($value) > 0) {
+					$criteria->andWhere('addressBookId IN (' .  implode(',',$value). ')');
+
+				}
+			})
+
+			->add("groupId", function(Criteria $criteria, $value, Query $query) {
 											$query->join('addressbook_contact_group', 'g', 'g.contactId = c.id');
 											
 											$criteria->andWhere('g.groupId', '=', $value);
@@ -470,6 +478,12 @@ class Contact extends AclItemEntity {
 										->addText("name", function(Criteria $criteria, $comparator, $value) {											
 											$criteria->where('name', $comparator, $value);
 										})
+										->addText("firstName", function(Criteria $criteria, $comparator, $value) {
+											$criteria->where('firstName', $comparator, $value);
+										})
+										->addText("lastName", function(Criteria $criteria, $comparator, $value) {
+											$criteria->where('firstName', $comparator, $value);
+										})
 										->addText("jobTitle", function(Criteria $criteria, $comparator, $value) {
 											$criteria->where('jobTitle', $comparator, $value);
 										})
@@ -494,6 +508,14 @@ class Contact extends AclItemEntity {
 											
 											$criteria->where('adr.country', $comparator, $value);
 											
+										})
+										->addText("state", function(Criteria $criteria, $comparator, $value, Query $query) {
+											if(!$query->isJoined('addressbook_address', 'adr')) {
+												$query->join('addressbook_address', 'adr', 'adr.contactId = c.id', "LEFT");
+											}
+
+											$criteria->where('adr.state', $comparator, $value);
+
 										})
 										->addText("zip", function(Criteria $criteria, $comparator, $value, Query $query) {
 											if(!$query->isJoined('addressbook_address', 'adr')) {
@@ -596,17 +618,19 @@ class Contact extends AclItemEntity {
 												->andWhere('actionDate.date',$comparator, $value);
 										})
 										->addDate("birthday", function(Criteria $criteria, $comparator, $value, Query $query) {
-											if(!$query->isJoined('addressbook_date', 'date')) {
-												$query->join('addressbook_date', 'date', 'date.contactId = c.id', "INNER");
+											if(!$query->isJoined('addressbook_date', 'bdate')) {
+												$query->join('addressbook_date', 'bdate', 'bdate.contactId = c.id AND bdate.type = "'.Date::TYPE_BIRTHDAY .'"', "INNER");
 											}
-											
-											$tag = ':bday'.uniqid();
-											$criteria->where('date.type', '=', Date::TYPE_BIRTHDAY)
-																->andWhere('DATE_ADD(date.date, 
-																		INTERVAL YEAR(CURDATE())-YEAR(date.date)
-																						 + IF(DAYOFYEAR(CURDATE()) > DAYOFYEAR(date.date),1,0)
-																		YEAR)  
-																' . $comparator . $tag)->bind($tag, $value->format(Column::DATE_FORMAT));
+
+											$date = $value->format(Column::DATE_FORMAT);
+
+											$query->select("IF (STR_TO_DATE(CONCAT(YEAR('$date'), '/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e') >= '$date', "
+												."STR_TO_DATE(CONCAT(YEAR('$date'), '/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e') , "
+												."STR_TO_DATE(CONCAT(YEAR('$date') + 1,'/', MONTH(bdate.date), '/', DAY(bdate.date)),'%Y/%c/%e')) as upcomingBirthday", true);
+
+											$query->having('upcomingBirthday '. $comparator .' "' . $date . '"');
+											$query->orderBy(['upcomingBirthday' => 'ASC']);
+
 										})->add('userGroupId', function(Criteria $criteria, $value, Query $query) {
 											$query->join('core_user_group', 'ug', 'ug.userId = c.goUserId');
 											$criteria->where(['ug.groupId' => $value]);
@@ -672,18 +696,24 @@ class Contact extends AclItemEntity {
 			$sort['name'] = $sort['firstName'];
 			unset($sort['firstName']);
 		}
-		if(isset($sort['lastName'])) {
-			$dir = $sort['lastName'] == 'ASC' ? 'ASC' : 'DESC';
-			$sort[] = new Expression("IF(c.isOrganization, c.name, c.lastName) " . $dir);
-			unset($sort['lastName'], $sort['lastName']);
-			$sort['firstName'] = $dir;
-		}
+//		if(isset($sort['lastName'])) {
+//			$dir = $sort['lastName'] == 'ASC' ? 'ASC' : 'DESC';
+//			$sort[] = new Expression("IF(c.isOrganization, c.name, c.lastName) " . $dir);
+//			unset($sort['lastName'], $sort['lastName']);
+//			$sort['firstName'] = $dir;
+//		}
 
 		if(isset($sort['birthday'])) {
 			$query->join('addressbook_date', 'birthdaySort', 'birthdaySort.contactId = c.id and birthdaySort.type="birthday"', 'LEFT');
 			$sort['birthdaySort.date'] = $sort['birthday'];
 			unset($sort['birthday']);
 		};
+
+		if(isset($sort['addressBook'])) {
+			$query->join('addressbook_addressbook', 'abSort', 'abSort.id = c.addressBookId', 'INNER');
+			$sort['abSort.name'] = $sort['addressBook'];
+			unset($sort['addressBook']);
+		}
 
 		if(isset($sort['actionDate'])) {
 			$query->join('addressbook_date', 'actionDateSort', 'actionDateSort.contactId = c.id and actionDateSort.type="action"', 'LEFT');
@@ -698,7 +728,7 @@ class Contact extends AclItemEntity {
 	 * @inheritDoc
 	 */
 	public static function converters() {
-		return array_merge(parent::converters(), [VCard::class, Csv::class]);
+		return array_merge(parent::converters(), [VCard::class, Spreadsheet::class]);
 	}
 	
 	public function getUid() {
@@ -777,10 +807,6 @@ class Contact extends AclItemEntity {
 			//We need the auto increment ID for the UID so we need to save again if this is a new contact
 			$this->getUid();
 			$this->getUri();
-
-			if(!$this->saveUri()) {
-				return false;
-			}
 		}
 
 		if($this->isOrganization && $this->isModified(['name']) && !$this->updateEmployees()) {
@@ -816,7 +842,8 @@ class Contact extends AclItemEntity {
 		}
 
 		if($this->isOrganization) {
-			$this->firstName = $this->lastName = $this->middleName = $this->prefixes = $this->suffixes = null;
+			$this->firstName =  $this->middleName = $this->prefixes = $this->suffixes = null;
+			$this->lastName = $this->name;
 		}
 		
 		if($this->isNew() && !isset($this->addressBookId)) {
@@ -956,7 +983,7 @@ class Contact extends AclItemEntity {
 
 	protected function getSearchKeywords()
 	{
-		$keywords = [$this->name, $this->debtorNumber];
+		$keywords = [$this->name, $this->debtorNumber, $this->jobTitle];
 		foreach($this->emailAddresses as $e) {
 			$keywords[] = $e->email;
 		}
@@ -986,7 +1013,7 @@ class Contact extends AclItemEntity {
 		}
 
 		if(!empty($this->notes)) {
-			$keywords = array_merge($keywords, self::splitTextKeywords($this->notes));
+			$keywords[] = $this->notes;
 		}
 
 		return $keywords;
@@ -1027,6 +1054,40 @@ class Contact extends AclItemEntity {
 	
 	public function setSalutation($v) {
 		$this->salutation = $v;
+	}
+
+	/**
+	 * Find a birthday, calculate diff in years
+	 *
+	 * @return int
+	 */
+	public function getAge() {
+		$bday = $this->getBirthday();
+		if($bday === '') {
+			return 0;
+		}
+		$date = new DateTime($bday);
+		$diff = $date->diff(new DateTime());
+		return $diff->y;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAddressBook() {
+		return AddressBook::findById($this->addressBookId)->name;
+	}
+
+	/**
+	 * @return DateTime|string
+	 */
+	public function getBirthday()
+	{
+		$oBDay = $this->findDateByType(Date::TYPE_BIRTHDAY, false);
+		if($oBDay) {
+			return $oBDay->date;
+		}
+		return '';
 	}
 
 	/**
@@ -1245,4 +1306,5 @@ class Contact extends AclItemEntity {
 	  }
 	  return parent::check();
   }
+
 }

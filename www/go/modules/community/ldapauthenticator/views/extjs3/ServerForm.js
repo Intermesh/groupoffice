@@ -4,7 +4,18 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 	width: dp(600),
 	height: dp(600),
 	autoScroll: true,
-	
+
+	initComponent: function() {
+		this.supr().initComponent.call(this);
+
+		this.formPanel.on("beforesubmit", function(form, values) {
+			if(!this.formPanel.getForm().findField('ldapUseAuthentication').getValue()) {
+				values.username = null;
+				values.password = null;
+			}
+		}, this);
+	},
+
 	onLoad : function() {
 				
 		this.createEmailCheckbox.setValue(!GO.util.empty(this.formPanel.getForm().findField('imapHostname').getValue()));
@@ -12,6 +23,7 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 		
 		go.modules.community.ldapauthenticator.ServerForm.superclass.onLoad.call(this);
 	},
+
 	initFormItems: function () {
 
 
@@ -125,13 +137,23 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						value: "uid",
 						required: true,
 						hint: t("Use 'samaccountname' for Microsoft ActiveDirectory.")
-					}, 
+					},
 					{
 						xtype:"checkbox",
 						hideLabel: true,
 						name: 'loginWithEmail',
 						boxLabel: t("Login with e-mail address")						
-					},{
+					},
+					{
+						xtype: 'textarea',
+						grow: true,
+						name: 'syncUsersQuery',
+						fieldLabel: t("User query"),
+						required: true,
+						value: "(objectClass=InetOrgPerson)",
+						hint: t("For Microsoft ActiveDirectory use '(objectCategory=InetOrgPerson)'")
+					},
+					{
 						xtype: 'textfield',
 						name: 'peopleDN',
 						fieldLabel: "peopleDN",
@@ -142,7 +164,7 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						xtype: 'textfield',
 						name: 'groupsDN',
 						fieldLabel: "groupsDN",
-						value: "ou=groups,dc=example,dc=com",
+						value: "ou=people,dc=example,dc=com",
 						hint: t("For Microsoft ActiveDirectory it's typically 'cn=Groups,dc=example,dc=com'."),
 						required: true
 					},this.createEmailCheckbox = new Ext.form.Checkbox({
@@ -302,14 +324,6 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						hideLabel: true,
 						boxLabel: t('Synchronize users'),
 						name: 'syncUsers'
-					},{
-						xtype: 'textarea',
-						grow: true,
-						name: 'syncUsersQuery',
-						fieldLabel: t("User query"),
-						required: true,
-						value: "(objectClass=InetOrgPerson)",
-						hint: t("For Microsoft ActiveDirectory use '(objectCategory=InetOrgPerson)'")
 					},  {
 						xtype: 'checkbox',
 						checked: false,
@@ -324,7 +338,7 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						required: true,
 						value: "(objectClass=Group)",
 						hint: t("For Microsoft ActiveDirectory use '(objectCategory=group)'")
-					},  
+					}
 				]
 			}
 		];

@@ -245,7 +245,7 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 	 * 
 	 * @return StringHelper The complete expression 
 	 */
-	private function _buildExpression(){
+	public function _buildExpression(){
 		$expression = '';
 	
 		$expression .= $this->minutes;

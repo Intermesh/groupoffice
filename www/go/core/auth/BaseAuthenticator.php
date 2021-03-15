@@ -7,7 +7,7 @@ use go\core\db\Query;
 use go\core\model\Module;
 use go\core\validate\ValidationTrait;
 
-abstract class BaseAuthenticator {
+abstract class BaseAuthenticator implements \JsonSerializable {
 	
 	use ValidationTrait;
 	
@@ -21,12 +21,18 @@ abstract class BaseAuthenticator {
 	public static function id() {
 		return strtolower(substr(static::class, strrpos(static::class, "\\") + 1));
 	}
-	
-	protected function internalValidate() {
-		
+
+	public function jsonSerialize ()
+	{
+		return static::id();
 	}
 
-	/**
+
+	protected function internalValidate() {
+
+	}
+
+		/**
 	 * Register the authenticator in the database
 	 * 
 	 * @throws Exception

@@ -104,52 +104,35 @@ GO.sieve.SieveGrid = function(config){
 	config.enableDragDrop=true;
 	config.ddGroup='SieveFilterDD';
 
-	config.tbar=[{
-			iconCls: 'btn-add',
-			text: t("Add"),
-			cls: 'x-btn-text-icon',
-			handler: function(){
-	    	this.sieveDialog.show(-1,this.selectScript.getValue(),this.store.baseParams.account_id);
-			},
-			scope: this
-		},{
-			iconCls: 'btn-delete',
-			text: t("Delete"),
-			cls: 'x-btn-text-icon',
-			handler:function(){this.deleteSelected();},
-				scope: this
-		},
+	config.tbar=[
 		t("Filterset:", "sieve"),
 		this.selectScript,{
 			iconCls: 'btn-extra',
-			text: t("Activate filterset", "sieve"),
-			cls: 'x-btn-text-icon',
+			text: t("Activate", "sieve"),
 			handler: function(){
-				
+
 				this.selectScript.store.load({
 					params:{
-						set_active_script_name: this.selectScript.getValue()						
+						set_active_script_name: this.selectScript.getValue()
 					},
 					callback:function(){
 						this.selectScript.setValue(this.selectScript.getValue());
 					},
 					scope:this
 				});
-//				GO.request({
-//				 url: 'sieve/sieve/setActiveScript',
-//				 scope:this,
-//				 params: {
-//					 
-//					 account_id: this.store.baseParams.account_id
-//				 },
-//				 success: function(){
-//					 this.selectScript.store.reload();
-//					 this.setSelectedScript();
-//					 this.selectScript.setRawValue(this.selectScript.getRawValue() + ' ('+t("Active", "sieve")+')');
-//					 this.store.reload();
-//				 }
-//				},this);
 			},
+			scope: this
+		}, '->',{
+			iconCls: 'ic-add',
+			tooltip: t("Add"),
+			handler: function(){
+	    		this.sieveDialog.show(-1,this.selectScript.getValue(),this.store.baseParams.account_id);
+			},
+			scope: this
+		},{
+			iconCls: 'ic-delete',
+			tooltip: t("Delete"),
+			handler:function(){this.deleteSelected();},
 			scope: this
 		}];
 	GO.sieve.SieveGrid.superclass.constructor.call(this, config);

@@ -75,11 +75,13 @@ class ModuleController extends AbstractJsonController{
 		
 		$availableModules=array();
 						
-		foreach($modules as $moduleClass){		
-			
+		foreach($modules as $moduleClass){
+
 			$module = $moduleClass::get();
-			
-			
+
+			if(!GO\Base\ModuleCollection::isAllowed($module->getName(), $module->getPackage())) {
+				continue;
+			}
 			
 			if($module instanceof \go\core\Module) {
 

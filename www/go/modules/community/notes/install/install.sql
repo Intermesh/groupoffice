@@ -7,8 +7,8 @@
 CREATE TABLE `notes_note` (
   `id` int(11) NOT NULL,
   `noteBookId` int(11) NOT NULL,
-  `createdBy` int(11) NOT NULL,
-  `modifiedBy` int(11) NOT NULL,
+  `createdBy` int(11) NULL,
+  `modifiedBy` int(11) NULL,
   `name` varchar(100) NOT NULL,
   `content` text,
   `filesFolderId` int(11) DEFAULT NULL,
@@ -26,7 +26,7 @@ CREATE TABLE `notes_note` (
 CREATE TABLE `notes_note_book` (
   `id` int(11) NOT NULL,
   `deletedAt` datetime DEFAULT NULL,
-  `createdBy` int(11) NOT NULL,
+  `createdBy` int(11) NULL,
   `aclId` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `filesFolderId` int(11) DEFAULT NULL
@@ -88,7 +88,7 @@ ALTER TABLE `notes_note_book`
 -- Beperkingen voor tabel `notes_note`
 --
 ALTER TABLE `notes_note`
-  ADD CONSTRAINT `notes_note_ibfk_1` FOREIGN KEY (`noteBookId`) REFERENCES `notes_note_book` (`id`) ON DELETE RESTRICT;
+  ADD CONSTRAINT `notes_note_ibfk_1` FOREIGN KEY (`noteBookId`) REFERENCES `notes_note_book` (`id`) ON DELETE CASCADE;
 
 --
 -- Beperkingen voor tabel `notes_note_book`
@@ -131,3 +131,7 @@ ALTER TABLE `notes_note_image`
 ALTER TABLE `notes_note_image`
   ADD CONSTRAINT `notes_note_image_ibfk_1` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`),
   ADD CONSTRAINT `notes_note_image_ibfk_2` FOREIGN KEY (`noteId`) REFERENCES `notes_note` (`id`) ON DELETE CASCADE;
+
+ALTER TABLE `notes_note_book` ADD FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
+ALTER TABLE `notes_note` ADD FOREIGN KEY (`createdBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
+ALTER TABLE `notes_note` ADD FOREIGN KEY (`modifiedBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;

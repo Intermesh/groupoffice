@@ -174,7 +174,7 @@ class ZPushAutodiscover {
         }
 
         if (strcasecmp($xml->Request->AcceptableResponseSchema, ZPushAutodiscover::ACCEPTABLERESPONSESCHEMAMOBILESYNC) != 0) {
-            throw new FatalException(sprintf('Request for a responseschema that is not supported (only mobilesync is supported): %s', $xml->Request->AcceptableResponseSchema));
+            throw new BadRequestException(sprintf('Request for a responseschema that is not supported (only mobilesync is supported): %s', $xml->Request->AcceptableResponseSchema));
         }
 
         return $xml;

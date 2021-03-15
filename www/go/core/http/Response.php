@@ -155,6 +155,18 @@ class Response extends Singleton{
 	}
 
 	/**
+	 * Check if header is set
+	 *
+	 * @param $name
+	 * @return bool
+	 */
+	public function hasHeader($name) {
+		$name = strtolower($name);
+
+		return isset($this->headers[$name]);
+	}
+
+	/**
 	 * Set HTTP status header
 	 * 
 	 * @param int $httpCode
@@ -202,6 +214,23 @@ class Response extends Singleton{
 
 	public function setExpires(DateTime $expires = null) {
 		$this->setHeader("Expires", $expires->format('D, d M Y H:i:s'));
+	}
+
+	public function setCookie($name, $value, $options = []) {
+
+		if(version_compare(phpversion(), "7.3.0") > -1) {
+			setcookie($name, $value, $options);
+		} else{
+			if(!isset($options['path'])) {
+				$options['path'] = "";
+			}
+			if(isset($options['samesite'])) {
+				$options['path'] .= '; samesite=' . $options['samesite'];
+			}
+			setcookie($name, $value, $options['expires'] ?? 0, $options['path'] ?? "", $options['domain'] ?? "", $options['secure'] ?? false, $options['httponly'] ?? false);
+		}
+
+
 	}
 
 	/**
@@ -270,7 +299,9 @@ class Response extends Singleton{
 		if (isset($data)) {
 			if(is_array($data)) {
 				$data = JSON::encode($data);
-				$this->setContentType('application/json; charset=UTF-8');
+				if(!$this->getHeader('content-type')) {
+					$this->setContentType('application/json; charset=UTF-8');
+				}
 			} 
 			$this->sendHeaders();
 			echo $data;

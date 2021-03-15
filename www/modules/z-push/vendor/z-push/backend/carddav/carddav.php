@@ -797,7 +797,7 @@ class BackendCardDAV extends BackendDiff implements ISearchProvider {
             // TODO the limiting of the searchresults could be refactored into Utils as it's probably used more than once
             $querycnt = $xml_vcards->count();
             //do not return more results as requested in range
-            $querylimit = (($rangeend + 1) < $querycnt) ? ($rangeend + 1) : $querycnt == 0 ? 1 : $querycnt;
+            $querylimit = (($rangeend + 1) < $querycnt) ? ($rangeend + 1) : ($querycnt == 0 ? 1 : $querycnt);
             $items['range'] = $rangestart.'-'.($querylimit - 1);
             $items['searchtotal'] = $querycnt;
 

@@ -122,6 +122,15 @@ class Field extends AclItemEntity {
 	private $defaultModified = false;
 	private $unique;
 	private $uniqueModified = false;
+
+
+	/**
+	 * When true alter table is performed on save
+	 *
+	 * @var bool
+	 */
+	public $forceAlterTable = false;
+
 	private $dataType;
 	
 	
@@ -276,11 +285,11 @@ class Field extends AclItemEntity {
 			return false;
 		}
 
-		$modified = $this->isNew() || $this->uniqueModified || $this->defaultModified || $this->getDataType()->isModified() || $this->isModified(['databaseName', 'options', 'required']);
+		$modified = $this->forceAlterTable || $this->isNew() || $this->uniqueModified || $this->defaultModified || $this->getDataType()->isModified() || $this->isModified(['databaseName', 'options', 'required']);
 		if(!$modified) {
 			return true;
 		}
-		
+
 		try {
 			go()->getDbConnection()->pauseTransactions();
 			$this->getDataType()->onFieldSave();
@@ -329,7 +338,9 @@ class Field extends AclItemEntity {
 		}
 		
 		return parent::internalDelete($query);
-}
+	}
+
+	private $tableName;
 
   /**
    * Get the table name this field is stored in.
@@ -338,14 +349,18 @@ class Field extends AclItemEntity {
    * @throws Exception
    */
 	public function tableName() {
-		$fieldSet = FieldSet::findById($this->fieldSetId);
-		$entityName = $fieldSet->getEntity();
-		$entityType = EntityType::findByName($entityName);
-		if(!$entityType) {
-			throw new Exception("EntityType '$entityName' not found for custom field ".$this->name.' ('. $this->id.')');
+		if(!isset($this->tableName)) {
+			$fieldSet = FieldSet::findById($this->fieldSetId);
+			$entityName = $fieldSet->getEntity();
+			$entityType = EntityType::findByName($entityName);
+			if (!$entityType) {
+				throw new Exception("EntityType '$entityName' not found for custom field " . $this->name . ' (' . $this->id . ')');
+			}
+			$entityCls = $entityType->getClassName();
+			$this->tableName = $entityCls::customFieldsTableName(); //From customfieldstrait
 		}
-		$entityCls = $entityType->getClassName();
-		return $entityCls::customFieldsTableName(); //From customfieldstrait
+
+		return $this->tableName;
 	}
 	
 	protected static function defineFilters() {
@@ -366,7 +381,8 @@ class Field extends AclItemEntity {
 		if(!is_numeric($entityTypeId)) {
 			$entityTypeId = EntityType::findByName($entityTypeId)->getId();
 		}
-		return static::find()->where(['fs.entityId' => $entityTypeId])->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId');
+		return static::find()->where(['fs.entityId' => $entityTypeId])
+			->join('core_customfields_field_set', 'fs', 'fs.id = f.fieldSetId');
 	}
 
 

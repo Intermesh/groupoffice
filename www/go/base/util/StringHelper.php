@@ -293,18 +293,18 @@ class StringHelper {
 		if($source_charset == 'UNICODE')
 			$source_charset = 'UTF-8';
 		
-		
-		
-		$str = str_replace("€","&euro;", $str);
+
+//		wtf?
+//		$str = str_replace("€","&euro;", $str);
 		
 		$source_charset = self::fixCharset($source_charset);
 		try {
 			$c = iconv($source_charset, 'UTF-8//IGNORE', $str);
 		} catch(\Exception $e) {
 			//Does not always work. We suppress the:
-			//Notice:  iconv() [function.iconv]: Detected an illegal character in input string in /var/www/community/trunk/www/classes/String.class.inc.php on line 31		
+			//Notice:  iconv() [function.iconv]: Detected an illegal character in input string in /var/www/community/trunk/www/classes/String.class.inc.php on line 31
 		}
-		
+
 		if(!empty($c))
 		{
 			$str=$c;
@@ -965,6 +965,76 @@ END;
 		return $htmlToText->get_text($link_list);
 	}
 
+	private static function extractStyles($html, $prefix) {
+
+		preg_match_all("'<style[^>]*>(.*?)</style>'usi", $html, $matches);
+		$css = "";
+		for($i = 0, $l = count($matches[0]); $i < $l; $i++) {
+
+			//don't add the style added by group-office inline because it will double up.
+			if(!strstr($matches[0][$i], 'groupoffice-email-style')) {
+				$css .= $matches[1][$i] . "\n\n";
+			}
+		}
+
+		return self::prefixCSSSelectors($css, '.'.$prefix);
+	}
+
+	private static function prefixCSSSelectors($css, $prefix = '.go-html-formatted') {
+		# Wipe all block comments
+//		$css = preg_replace('!/\*.*?\*/!s', '', $css);
+
+		$parts = explode('}', $css);
+		$mediaQueryStarted = false;
+
+		foreach($parts as &$part)
+		{
+			$part = trim($part); # Wht not trim immediately .. ?
+			if(empty($part)) continue;
+			else # This else is also required
+			{
+				$partDetails = explode('{', $part);
+				if(substr_count($part, "{")==2)
+				{
+					$mediaQuery = $partDetails[0]."{";
+					$partDetails[0] = $partDetails[1];
+					$mediaQueryStarted = true;
+				}
+
+				$subParts = explode(',', $partDetails[0]);
+				foreach($subParts as &$subPart)
+				{
+					if(trim($subPart)==="@font-face") continue;
+					else $subPart = $prefix . ' ' . trim($subPart);
+				}
+
+				if(substr_count($part,"{")==2)
+				{
+					$part = $mediaQuery."\n".implode(', ', $subParts)."{".$partDetails[2];
+				}
+				elseif(empty($part[0]) && $mediaQueryStarted)
+				{
+					$mediaQueryStarted = false;
+					$part = implode(', ', $subParts)."{".$partDetails[2]."}\n"; //finish media query
+				}
+				else
+				{
+					if(isset($partDetails[1]))
+					{   # Sometimes, without this check,
+						# there is an error-notice, we don't need that..
+						$part = implode(', ', $subParts)."{".$partDetails[1];
+					}
+				}
+
+				unset($partDetails, $mediaQuery, $subParts); # Kill those three ..
+			}   unset($part); # Kill this one as well
+		}
+
+		# Finish with the whole new prefixed string/file in one line
+		return(preg_replace('/\s+/',' ',implode("} ", $parts)));
+
+	}
+
 	/**
 	 * Convert Dangerous HTML to safe HTML for display inside of Group-Office
 	 *
@@ -979,25 +1049,23 @@ END;
 		//needed for very large strings when data is embedded in the html with an img tag
 		ini_set('pcre.backtrack_limit', (int)ini_get( 'pcre.backtrack_limit' )+ 1000000 );
 
-		//don't do this because it will mess up <pre></pre> tags
-		//$html = str_replace("\r", '', $html);
-		//$html = str_replace("\n",' ', $html);
 
 		//remove strange white spaces in tags first
 		//sometimes things like this happen <style> </ style >
-		
-		
-//		Doesn't work well because some mails hav body tags all over the place :(
-//		$body_startpos = stripos($html, '<body');
-//		$body_endpos = strripos($html, '</body');
-//		if($body_startpos){
-//			if($body_endpos)
-//				$html = substr($html, $body_startpos, $body_endpos-$body_startpos);
-//			else
-//				$html = substr($html, $body_startpos);
-//		}
-		
 		$html = preg_replace("'</[\s]*([\w]*)[\s]*>'u","</$1>", $html);
+		//remove comments because they might interfere
+		$html = preg_replace("'<!--.*-->'Uusi", "", $html);
+		$html = preg_replace('!/\*.*?\*/!s', '', $html);
+
+		$prefix = 'msg-' . uniqid();
+		$styles = self::extractStyles($html, $prefix);
+
+		//strip everything above <body first. This fixes a mail from Amazon that had the body inside the head section :(
+		$bodyPos = stripos($html, '<body');
+
+		if($bodyPos) {
+			$html = substr($html, $bodyPos);
+		}
 		
 		$to_removed_array = array (
 		"'<!DOCTYPE[^>]*>'usi",
@@ -1010,6 +1078,7 @@ END;
 		"'<title>.*?</title>'usi",
 		"'<head[^>]*>.*?</head>'usi",
 		"'<head[^>]*>'usi",
+			"'</head[^>]*>'usi",
 		"'<base[^>]*>'usi",
 		"'<meta[^>]*>'usi",
 		"'<bgsound[^>]*>'usi",
@@ -1032,14 +1101,13 @@ END;
 		//"'<select[^>]*>.*?</select>'usi",
 		//"'<textarea[^>]*>.*?</textarea>'usi",
 		"'</form>'usi",
-		"'<!--.*-->'Uusi",
+
 		);
 
 		$html = preg_replace($to_removed_array, '', $html);
-		
-		//Remove any attribute starting with "on" or xmlns. Had to do this always becuase many mails contain weird tags like online="1". 
+		//Remove any attribute starting with "on" or xmlns. Had to do this always becuase many mails contain weird tags like online="1".
 		//These were detected as xss attacks by detectXSS().
-		$html = preg_replace('#(<[^>]+?[\x00-\x20"\'])(?:on|xmlns)[a-z]+[^>]*+>#iu', '$1>', $html);
+		$html = preg_replace('#(<[^>]+?[\x00-\x20"\'])(?:on|xmlns)[^>\s]+([^>]*+>)#iu', '$1$2', $html);
 	
 		//remove high z-indexes
 		$matched_tags = array();
@@ -1054,6 +1122,9 @@ END;
 		if(\GO::user() && \GO::user()->show_smilies)
 			$html = StringHelper::replaceEmoticons($html,true);
 
+		if(!empty($styles)) {
+			$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="'.$prefix.'">'. $html .'</div>';
+		}
 		return $html;
 	}
 	
@@ -1205,7 +1276,7 @@ END;
 // Match style attributes
 				'#(<[^>]*+[\x00-\x20\"\'\/])*style=[^>]*(expression|behavior)[^>]*>?#iUu',
 // Match unneeded tags
-				'#</*(applet|meta|xml|blink|link|style|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base)\s[^>]*>?#i'
+				'#</*(applet|meta|xml|blink|link|script|embed|object|iframe|frame|frameset|ilayer|layer|bgsound|title|base)\s[^>]*>?#i'
 		);
 
 		foreach ($patterns as $pattern) {
@@ -1352,7 +1423,7 @@ END;
 				$array_allow[] = $characters_allow[$i];
 			}
 		}
-		
+
 		// Generate array of disallowed characters.
 		$characters_disallow = explode(',', $characters_disallow);
 
@@ -1377,7 +1448,7 @@ END;
 		// removing the disallowed characters.
 		reset($array_allow);
     $array_allow = array_values($array_allow);
-		
+
 		$password = '';
 		while (strlen($password) < $password_length) {
 			$character = mt_rand(0, count($array_allow) - 1);

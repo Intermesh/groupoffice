@@ -103,7 +103,7 @@ class Router {
 
   private function emitPsr7Response(ResponseInterface $response){
 	  if (headers_sent()) {
-		  throw new RuntimeException('Headers were already sent. The response could not be emitted!');
+		  throw new \RuntimeException('Headers were already sent. The response could not be emitted!');
 	  }
 
 // Step 1: Send the "status line".

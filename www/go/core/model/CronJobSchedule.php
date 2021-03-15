@@ -54,6 +54,7 @@ class CronJobSchedule extends Entity {
 
 		if (isset($this->expression) && !CronExpression::isValidExpression($this->expression)) {
 			$this->setValidationError('expression', ErrorCode::MALFORMED);
+			return false;
 		}
 		
 		if($this->isModified('name')) {
@@ -128,7 +129,7 @@ class CronJobSchedule extends Entity {
 		
 		try {
 			$cron = new $cls;			
-			$cron->run();
+			$cron->run($this);
 			
 		} catch (Exception $ex) {			
 			$errorString = \go\core\ErrorHandler::logException($ex);		
@@ -157,21 +158,29 @@ class CronJobSchedule extends Entity {
 	 */
 	public static function runNext() {
 
-		$job = self::find()->where('enabled', '=', true)
+		$jobs = self::find()->where('enabled', '=', true)
 						->andWhere((new Criteria())
 							->andWhere('nextRunAt', '<=', new DateTime())
 							->orWhere('nextRunAt', 'IS', null)
 						)
-						->orderBy(['nextRunAt' => 'ASC'])->single();
-
-		if ($job) {
-			$job->run();
-
-			return true;
-		} else {
-			go()->debug("No cron job to run a this time");
+						->orderBy(['nextRunAt' => 'ASC'])->all();
+		if(count($jobs) === 0) {
 			return false;
 		}
+		foreach($jobs as $job) {
+			go()->debug("Running " . $job->name);
+			$job->run();
+		}
+		return true;
+
+//		if ($job) {
+//			$job->run();
+//
+//			return true;
+//		} else {
+//			go()->debug("No cron job to run a this time");
+//			return false;
+//		}
 	}
 
 	/**

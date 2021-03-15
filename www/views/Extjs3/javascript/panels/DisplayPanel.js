@@ -589,8 +589,8 @@ Ext.extend(GO.DisplayPanel, Ext.Panel,{
 	},
 	
 	reload : function(){
-		if(this.data.id)
-			this.load(this.data.id, true);
+		if(this.model_id)
+			this.load(this.model_id, true);
 	},
 	
 	editHandler : function(){

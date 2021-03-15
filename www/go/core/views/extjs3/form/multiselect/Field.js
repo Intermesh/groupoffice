@@ -186,7 +186,8 @@ go.form.multiselect.Field = Ext.extend(go.grid.GridPanel, {
 		}, this);
 	},
 	
-	getValue: function () {		
+	getValue: function () {
+
 		var records = this.store.getRange(), v = [];
 		for(var i = 0, l = records.length; i < l; i++) {
 			if(this.valueIsId) {

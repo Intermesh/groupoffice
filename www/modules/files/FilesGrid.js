@@ -11,6 +11,7 @@ GO.files.FilesGrid = function(config) {
 	config.ddGroup = 'FilesDD';
 	
 	config.viewConfig = {
+		emptyText: '<div class="go-dropzone">'+t('Drop files here')+'</div>',
 		getRowClass: function(record, rowIndex, rowParams, store) {
 
 			if(GO.files.isContentExpired(record.json.content_expire_date)){

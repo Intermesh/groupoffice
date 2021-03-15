@@ -25,7 +25,6 @@ $dataFolder = new \go\core\fs\Folder(__DIR__ . '/data');
 $config = parse_ini_file(__DIR__ . '/config.ini', true);
 $config['general']['dataPath'] = $dataFolder->getPath();
 $config['general']['tmpPath'] = $dataFolder->getFolder('tmp')->getPath();
-$config['general']["cache"] = \go\core\cache\Apcu::class;
 $config['branding']['name'] = 'Group-Office';
 
 if($installDb == INSTALL_NEW || $installDb == INSTALL_UPGRADE) {
@@ -51,7 +50,7 @@ if($installDb == INSTALL_NEW || $installDb == INSTALL_UPGRADE) {
 //Install fresh DB
 App::get(); //for autoload
 try {
-	go()->setConfig(["core" => $config]);
+	go()->setConfig(["core" => $config, 'cache' => \go\core\cache\Apcu::class]);
 	//App::get()->getCache()->flush(false);
 	
 	if($installDb == INSTALL_NEW) {
@@ -97,11 +96,11 @@ try {
 		echo "Done\n\n";
 	} else if($installDb == INSTALL_UPGRADE) {
     echo "Running upgrade: ";
-	  $importCmd = 'mysql -h ' .  escapeshellarg($dsn['options']['host']) . ' -u '.escapeshellarg($config['db']['username']) . ' -p'.escapeshellarg($config['db']['password']).' groupoffice_phpunit < ' . __DIR__ . '/upgradetest/go63.sql';
+	  $importCmd = 'mysql -h ' .  escapeshellarg($dsn['options']['host']) . ' -u '.escapeshellarg($config['db']['username']) . ' -p'.escapeshellarg($config['db']['password']).' groupoffice_phpunit < ' . __DIR__ . '/upgradetest/go64.sql';
     echo "Running: " . $importCmd . "\n";
 	  system($importCmd);
 
-	  $copyCmd = 'cp -r ' . __DIR__ . '/upgradetest/go63data/* ' . $dataFolder->getPath();
+	  $copyCmd = 'cp -r ' . __DIR__ . '/upgradetest/go64data/* ' . $dataFolder->getPath();
 	  echo "Running: " . $copyCmd . "\n";
 	  system($copyCmd);
 
@@ -111,11 +110,12 @@ try {
 	  go()->getInstaller()->upgrade();
 
     $mod = \go\modules\community\test\Module::get();
-    $mod->install();
+    if(!$mod->isInstalled()) {
+	    $mod->install();
+    }
 
-  }else {
-		go()->rebuildCache();
-	}
+  }
+	go()->rebuildCache();
 
 	go()->setAuthState(new State());
 

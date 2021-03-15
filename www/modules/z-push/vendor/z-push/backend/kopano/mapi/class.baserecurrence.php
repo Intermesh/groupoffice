@@ -1125,12 +1125,12 @@
                                         // Set date on the first day of the last month
                                         $occenddate -= (gmdate("j", $occenddate )-1) * 24 * 60 * 60;
                                     }
-
+                                    $dayofweek = gmdate("w", $occenddate);
                                     for($i = 0; $i < 7; $i++) {
-                                        if( $nday == 5 && (1<<( (gmdate("w", $occenddate)-$i)%7) ) & $weekdays) {
+                                        if($nday == 5 && (($dayofweek-$i)%7) >= 0&& (1<<(($dayofweek-$i)%7) ) & $weekdays) {
                                             $occenddate -= $i * 24 * 60 * 60;
                                             break;
-                                        }else if($nday != 5 && (1<<( (gmdate("w", $occenddate)+$i)%7) ) & $weekdays) {
+                                        }else if($nday != 5 && (1<<(($dayofweek+$i)%7) ) & $weekdays) {
                                             $occenddate +=  ($i + (($nday-1) *7)) * 24 * 60 * 60;
                                             break;
                                         }

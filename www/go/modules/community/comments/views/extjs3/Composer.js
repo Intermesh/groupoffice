@@ -40,6 +40,8 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 
 		this.textField = new go.form.HtmlEditor({
 			iframePad: 0,
+			grow: true,
+			growMin: dp(32),
 			//enableColors: false,
 			enableFont: false,
 			enableFontSize: false,
@@ -68,14 +70,16 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			region:"east",
 			tooltip: t('Send'),
 			iconCls: 'ic-send',
-			handler: function(){ 
-				this.submit();
-				this.textField.reset();
-				this.chips.reset();
-				this.textField.setHeight(this.minComposerHeight);
-				// this.loadLabels();
-				this.textField.syncValue();
-				// this.textfield.focus();
+			handler: function(){
+				if (Ext.isEmpty(this.textField.getValue())) {
+					this.textField.focus();
+					return false;
+				}
+				this.submit().then(function () {
+					this.reset(); // otherwise it will update the second time
+					this.textField.setHeight(this.minComposerHeight);
+					this.textField.syncValue();
+				}.bind(this));
 			},
 			scope: this
 		});
@@ -119,29 +123,9 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 	},
 
 	onSync : function(me) {
-		//me.onResize();
-		var body = me.getEditorBody(),
-		composer = this;
-		body.style.height = 'auto';
-		body.style.display = 'inline-block';
+		var composer = this;
 
-		body.style.minHeight =  dp(32);
-		body.style.padding = dp(8);
-		body.style.boxSizing = "border-box";
-		body.style.width = "100%";
-		
 		setTimeout(function() {
-			var h =  Math.max(composer.minComposerHeight,Math.min(body.offsetHeight - dp(16), me.boxMaxHeight)); // 400  max height
-			if(h > 36) {
-				me.tb.show();
-				//workaround for combo
-				me.tb.items.itemAt(0).wrap.dom.style.width = "100px";
-				me.tb.doLayout();
-			} else {
-				me.tb.hide();
-			}
-			//set height of this.middleBox
-			me.setHeight(h + me.tb.el.getHeight());
 			composer.grow();
 		}, 0);
 	},
@@ -157,10 +141,8 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		var h = Math.min(this.ownerCt.growMaxHeight, this.ownerCt.commentsContainer.getEl().dom.scrollHeight + this.getHeight() + headerHeight + dp(8));
 		this.ownerCt.setHeight(h);
 		this.ownerCt.doLayout();
-
+		this.ownerCt.scrollDown();
 	},
-
-
 	
 	initEntity : function(entityId,entity, section) {
 		this.setValues({

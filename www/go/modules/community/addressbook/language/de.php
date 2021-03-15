@@ -39,6 +39,7 @@ return array (
     'postal' => 'Postalisch',
     'work' => 'Arbeit',
     'home' => 'Privat',
+    'delivery' => 'Lieferung',
   ),
   'dateTypes' => 
   array (
@@ -124,4 +125,9 @@ return array (
   'Top' => 'Oben',
   'Bottom' => 'Unten',
   'Font' => 'Zeichensatz',
+  'Upcoming birthdays' => 'Anstehende Geburtstage',
+  'Action date' => 'Aktionsdatum',
+  'Photo blob ID' => 'Foto-Blob-ID',
+  'Restrict export to administrators' => 'Export auf Administratoren beschränken',
+  'Date of birth' => 'Geburtstag',
 );

@@ -20,4 +20,12 @@ return array (
   'User query' => 'Benutzerabfrage',
   'Synchronize groups' => 'Gruppen synchronisieren',
   'Group query' => 'Gruppenabfrage',
+  'Follow referrals' => 'Verweisen folgen',
+  'For older Microsoft ActiveDirectory installation this has to be disabled' => 'Bei älteren Microsoft ActiveDirectory-Installationen muss dies deaktiviert werden',
+  'Use \'samaccountname\' for Microsoft ActiveDirectory.' => 'Verwenden Sie \'samaccountname\' für Microsoft ActiveDirectory.',
+  'For Microsoft ActiveDirectory it\'s typically \'cn=Users,dc=example,dc=com\'.' => 'Bei Microsoft ActiveDirectory ist es typischerweise \'cn=Users,dc=example,dc=com\'.',
+  'For Microsoft ActiveDirectory it\'s typically \'cn=Groups,dc=example,dc=com\'.' => 'Für Microsoft ActiveDirectory ist es typischerweise \'cn=Gruppen,dc=example,dc=com\'.',
+  'Use e-mail instead of LDAP username as IMAP username' => 'E-Mail statt LDAP-Benutzername als IMAP-Benutzername verwenden',
+  'For Microsoft ActiveDirectory use \'(objectCategory=InetOrgPerson)\'' => 'Für Microsoft ActiveDirectory verwenden Sie \'(objectCategory=InetOrgPerson)\'.',
+  'For Microsoft ActiveDirectory use \'(objectCategory=group)\'' => 'Für Microsoft ActiveDirectory verwenden Sie \'(objectCategory=group)\'.',
 );

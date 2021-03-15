@@ -16,4 +16,6 @@ return array (
   'User query' => 'Gebruikers query',
   'Synchronize groups' => 'Synchroniseer groepen',
   'Group query' => 'Groepen query',
+	'Login query' => 'Inlog query',
+	'Extra query for user authentication eg' => 'Extra query voor gebruikers authenticatie bijv'
 );

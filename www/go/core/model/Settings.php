@@ -217,14 +217,6 @@ class Settings extends core\Settings {
 	public $smtpEncryptionVerifyCertificate = true;
 	
 	/**
-	 * If set then all system notifications go to this email address
-	 * 
-	 * @var string 
-	 */
-	public $debugEmail = null;
-	
-	
-	/**
 	 * When maintenance mode is enabled, only admin users can login.
 	 * @var boolean 
 	 */

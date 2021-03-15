@@ -72,15 +72,26 @@ class Module extends \go\core\Module {
 		echo "\nUpgrading all instances\n";
 		echo "-------------------------------\n\n";
 
+		$failed = 0;
+
 		foreach(Instance::find() as $instance) {
 			echo "Upgrading instance: " . $instance->hostname . ": ";
 			flush();
 			$success = $instance->upgrade();
 
-			echo $success ? "SUCCESS" : "FAILED";
+			echo $success ? "ok" : "!!! FAILED !!!";
+
+			if(!$success) {
+				$failed++;
+			}
 
 			echo "\n";
-			
+		}
+
+		if(!$failed) {
+			echo "All OK!\n";
+		} else{
+			echo "\n\nWARNING: There are $failed failed upgrades. Please investigate!\n\n";
 		}
 	}
 
@@ -124,7 +135,7 @@ class Module extends \go\core\Module {
 		$tld = substr($_SERVER['HTTP_HOST'], strpos($_SERVER['HTTP_HOST'], '.') + 1);
 
 		$replacements = [
-			'{docroot}' => $version == 'DEFAULT' ? go()->getEnvironment()->getInstallFolder()->getPath() : '/usr/local/share/groupoffice-' . $version,
+			'{docroot}' => $version == 'DEFAULT' ? go()->getEnvironment()->getInstallFolder()->getPath() : '/usr/local/share/groupoffice-' . $version . '/www',
 			'{aliases}' => $version == 'DEFAULT' ? '*.' . $tld .' ' .$this->implode($hostnames) : $this->implode($hostnames),
 			'{tld}' => $tld,
 			'{servername}' => strtolower(str_replace('.', '', $version)) . '.' . $tld,

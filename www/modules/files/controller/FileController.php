@@ -3,6 +3,7 @@
 
 namespace GO\Files\Controller;
 
+use GO\Base\Exception\AccessDenied;
 use GO\Base\Exception\NotFound;
 use GO\Files\Model\File;
 use go\core\fs\Blob;
@@ -402,7 +403,7 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		
 		// Show the file inside the browser or give it as a download
 		$inline = true; // Defaults to show inside the browser
-		if(isset($params['inline']) && (bool) $params['inline'] === false) {
+		if(isset($params['inline']) && ((bool) $params['inline'] === false || $params['inline'] == 'false')) {
 			$inline = false;
 		}
 
@@ -554,8 +555,87 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			
 		}
 	}
-	
-	
-	
+
+	/**
+	 * @param $params
+	 * @throws AccessDenied
+	 * @throws \go\core\exception\NotFound
+	 */
+	public function actionConvert($params)
+	{
+		$fileId = !empty($params['id']) ? $params['id'] : 0;
+		$format = !empty($params['format']) ? $params['format'] : 'pdf';
+
+		//check if file exists
+		$fileRecord = \GO\Files\Model\File::model()->findByPk($fileId);
+		if (!$fileRecord) {
+			throw new \go\core\exception\NotFound();
+		}
+
+		//check user permissions
+		if (!\GO::user() || !$fileRecord->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
+			throw new AccessDenied();
+		}
+
+		$nameWithoutExtension = $fileRecord->fsFile->nameWithoutExtension();
+		$outputFileName = $nameWithoutExtension . '.' . $format;
+
+		//create temporary file
+		$tmpFile = \GO\Base\Fs\File::tempFile();
+
+		//convert file -> put output to temporary
+		$fileRecord->convertTo($tmpFile, $format);
+
+		$outputFileRecord = $fileRecord->folder->addFilesystemFile($tmpFile, true, $outputFileName);
+		if (!$outputFileRecord) {
+			throw new Exception('File move error from: '. $tmpFile->path() . ' to '. $fileRecord->folder->getFullPath());
+		}
+
+		$response['file'] = $outputFileRecord->getAttributes();
+		$response['success'] = true;
+
+		return $response;
+	}
+
+	/**
+	 * @param $params
+	 * @throws AccessDenied
+	 * @throws \go\core\exception\NotFound
+	 */
+	public function actionConvertAndDownload($params)
+	{
+		$fileId = !empty($params['id']) ? $params['id'] : 0;
+		$format = !empty($params['format']) ? $params['format'] : 'pdf';
+
+		//check if file exists
+		$fileRecord = \GO\Files\Model\File::model()->findByPk($fileId);
+		if (!$fileRecord) {
+			throw new \go\core\exception\NotFound();
+		}
+
+		//check user permissions
+		if (!\GO::user() || !$fileRecord->checkPermissionLevel(\GO\Base\Model\Acl::READ_PERMISSION)) {
+			throw new AccessDenied();
+		}
+
+		//create temporary file
+		$tmpFile = \GO\Base\Fs\File::tempFile();
+
+		//convert file -> put output to temporary
+		$fileRecord->convertTo($tmpFile, $format);
+
+		//get pdf file name
+		$nameWithoutExtension = $fileRecord->fsFile->nameWithoutExtension();
+		$outputFileName = $nameWithoutExtension . '.' . $format;
+
+		//override previous headers because tempoary
+		$extraHeaders = [
+			'Content-Disposition' => 'inline; filename="' . $outputFileName . '"',
+		];
+
+		//download
+		\GO\Base\Util\Http::outputDownloadHeaders($tmpFile, true, !empty($params['cache']), $extraHeaders);
+		$tmpFile->output();
+	}
 }
 

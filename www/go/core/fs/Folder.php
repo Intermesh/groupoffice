@@ -70,6 +70,24 @@ class Folder extends FileSystemObject {
 	}
 
 	/**
+	 * Check if folder is empty
+	 *
+	 * @return bool
+	 */
+	public function isEmpty() {
+
+		$handle = opendir($this->getPath());
+		while (false !== ($entry = readdir($handle))) {
+			if ($entry != "." && $entry != "..") {
+				closedir($handle);
+				return FALSE;
+			}
+		}
+		closedir($handle);
+		return TRUE;
+	}
+
+	/**
 	 * Get folder directory listing.
 	 *
 	 * @param boolean $includeFiles
@@ -78,7 +96,7 @@ class Folder extends FileSystemObject {
 	 * @return File[]|Folder[]|array[]
 	 */
 	public function getChildren($includeFiles = true, $includeFolders = true) {
-		if (!$dir = @opendir($this->path)) {
+		if (!$dir = opendir($this->path)) {
 			return []; // Return an empty array to prevent crashing foreach() loops
 		}
 
@@ -411,25 +429,61 @@ class Folder extends FileSystemObject {
 	/**
 	 * Find files and folder matching a regular expression pattern
 	 * 
-	 * @param string $regex
+	 * @param array|string $config If string is given then it's used as $config['regex'].
+	 *  $config is an array that can have:
+	 *  regex: then name must match this with preg_match(); eg '/.*\.sql/'
+	 *  older: Return files if the file wasn't modified after the given DateTime object
+	 *  newer: Return files if the file was modified after the given DateTime object
+	 *  empty: Return empty folders
+	 *
+	 *
 	 * @param boolean $findFolders
 	 * @param boolean $findFiles
-	 * @return FileSystemObject[]
+	 * @return File[]|Folder[]
 	 */
-	public function find($regex, $findFolders = true, $findFiles = true) {
+	public function find($config = [], $findFolders = true, $findFiles = true) {
 		$result = [];
-		
+
+		if(!is_array($config)) {
+			$config = ['regex' => $config];
+		}
+
 		foreach($this->getChildren($findFiles, true) as $child) {
 			$isFolder = $child->isFolder();
-			if(($findFolders || !$isFolder) && preg_match($regex, $child->getName())) {
-				$result[] = $child;
+
+			if($isFolder) {
+				//Do exists check for broken links
+				if(!$child->exists()) {
+					continue;
+				}
+
+				if(
+					$findFolders &&
+					(empty($config['empty']) || $child->isEmpty()) &&
+					(!isset($config['regex']) || preg_match($config['regex'], $child->getName()))
+				){
+					$result[] = $child;
+				}
+
+				$result = array_merge($result, $child->find($config, $findFolders, $findFiles));
+
+			} else {
+				$m = $child->getModifiedAt();
+				if($findFiles &&
+					(!isset($config['regex']) || preg_match($config['regex'], $child->getName())) &&
+					(!isset($config['older']) || $m < $config['older'])  &&
+					(!isset($config['newer']) || $m > $config['newer'])
+				) {
+					$result[] = $child;
+				}
+
 			}
-			if($isFolder && $child->exists()) { //Do exists check for broken links
-				$result = array_merge($result, $child->find($regex, $findFolders, $findFiles));
-			}
+
+
 		}
 		
 		return $result;
 	}
+
 
 }

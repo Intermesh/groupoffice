@@ -83,7 +83,10 @@ class Common {
 		if(empty($address) && empty($city) && empty($state)){
 			return "";
 		}
-		
+
+		$countries = \GO::t('countries');
+		$strCountry = isset($countries[$isoCountry]) ? $countries[$isoCountry] : $isoCountry;
+
 		require(GO::config()->root_path . 'language/addressformats.php');
 
 		$format = isset($af[$isoCountry]) ? $af[$isoCountry] : $af['default'];
@@ -93,7 +96,7 @@ class Common {
 		$format= str_replace('{city}', $city, $format);
 		$format= str_replace('{zip}', $zip, $format);
 		$format= str_replace('{state}', $state, $format);
-		$format= str_replace('{country}', \GO::t($isoCountry,'base','countries'), $format);
+		$format= str_replace('{country}', $strCountry, $format);
 
 		return preg_replace("/(\r\n)+|(\n|\r)+/", "\n", $format);
 	}

@@ -246,7 +246,6 @@ go.form.Dialog = Ext.extend(go.Window, {
 	},
 
 	load: function (id) {
-		
 		var me = this;
 
 		me.loading = true;
@@ -339,13 +338,21 @@ go.form.Dialog = Ext.extend(go.Window, {
 	focus: function () {		
 		this.formPanel.focus();
 	},
-	
+
+	/**
+	 * Override to do stuff before submitting to server
+	 *
+	 * for example to send an additional value:
+	 *
+	 * this.formPanel.values.foo = 'bar';
+	 *
+	 * @returns {boolean}
+	 */
 	onBeforeSubmit: function() {
 		return true;
 	},
 
 	submit: function () {
-
 		//When form is submnitted with enter key the validation errors of the field having focus is not disabled if we
 		// don't give something else focus.
 		if(this.saveButton) {
@@ -353,6 +360,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 		}
 		
 		if(!this.onBeforeSubmit()) {
+
+			console.warn("onBeforeSubmit returned false");
 			return;
 		}
 
@@ -394,7 +403,9 @@ go.form.Dialog = Ext.extend(go.Window, {
 	showFirstInvalidField : function() {
 
 		var firstFieldWithError = this.formPanel.form.items.find(function(item) {
-			return item.isValid && !item.isValid(true);
+			//activeError is set when markInvalid() is used. We use it when marking server errors. isValid() does
+			// client side validation.
+			return item.activeError || (item.isValid && !item.isValid(true));
 		});
 
 		console.log("Field with error", firstFieldWithError);
@@ -429,10 +440,10 @@ go.form.Dialog = Ext.extend(go.Window, {
 				return true;
 			}
 		});
-
-		fieldSet.show();
-		fieldSet.setDisabled(false);
-
+		if(fieldSet) {
+			fieldSet.show();
+			fieldSet.setDisabled(false);
+		}
 
 		// Focus make server side errors dissappear 
 		// firstFieldWithError.focus();

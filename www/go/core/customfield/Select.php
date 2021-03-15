@@ -39,9 +39,11 @@ class Select extends Base {
 										->select("*")
 										->from('core_customfields_select_option')
 										->where(['fieldId' => $this->field->id, 'parentId' => $parentId])
+										->orderBy(['sortOrder' => 'ASC'])
 										->all();
 		
 		foreach($options as &$o) {
+			$o['enabled'] = !!$o['enabled'];
 			$o['children'] = $this->internalGetOptions($o['id']);
 		}
 		
@@ -77,9 +79,14 @@ class Select extends Base {
 		$sql = "ALTER TABLE `" . $this->field->tableName() . "` DROP CONSTRAINT `" . $this->getConstraintName() . "`;";
 		return go()->getDbConnection()->exec($sql);
 	}
-	
-	private function getConstraintName() {
-		return $this->field->tableName() . "_ibfk_go_" . $this->field->id;
+
+	private function getConstraintName()
+	{
+		$strName = $this->field->tableName() . "_ibfk_go_" . $this->field->id;
+		if (strlen($strName) > 64) { // Constraint names are restricted to 64 characters!
+			$strName = str_replace('_custom_fields_', '_cf_', $strName);
+		}
+		return $strName;
 	}
 	
 	public function dbToText($value, \go\core\orm\CustomFieldsModel $values, $entity) {
@@ -135,11 +142,14 @@ class Select extends Base {
 	protected $savedOptionIds = [];
 	
 	protected function internalSaveOptions($options, $parentId = null) {
-		
-		foreach ($options as $o) {
 
+		foreach ($options as $oIdx => $o) {
+			if(isset($o['allowChildren'])) {
+				unset($o['allowChildren']);
+			}
 			$o['parentId'] = $parentId;
 			$o['fieldId'] = $this->field->id;
+			$o['sortOrder'] = $oIdx;
 			
 			$children = $o['children'] ?? [];
 			unset($o['children']);

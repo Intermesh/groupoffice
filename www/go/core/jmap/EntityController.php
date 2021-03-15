@@ -86,9 +86,9 @@ abstract class EntityController extends Controller {
 						->limit($params['limit'])
 						->offset($params['position']);
 
-		if($params['calculateTotal']) {
-			$query->calcFoundRows();
-		}
+//		if($params['calculateTotal']) {
+//			$query->calcFoundRows();
+//		}
 		
 		/* @var $query Query */
 
@@ -106,10 +106,9 @@ abstract class EntityController extends Controller {
 		
 		$cls::sort($query, $sort);
 
-		$query->filter($params['filter']);
-		
-		//go()->info($query);
 		$query->select($cls::getPrimaryKey(true)); //only select primary key
+
+		$query->filter($params['filter']);
 		
 		return $query;
 	}
@@ -207,16 +206,27 @@ abstract class EntityController extends Controller {
 			];
 
 			if ($p['calculateTotal']) {
-				// $totalQuery = clone $idsQuery;
-				// $response['total'] = $totalQuery
-				// 								->selectSingleValue("count(distinct " . $totalQuery->getTableAlias() . ".id)")
-				// 								->orderBy([], false)
-				// 								->groupBy([])
-				// 								->limit(1)
-				// 								->offset(0)
-				// 								->single();
 
-				$response['total'] = go()->getDbConnection()->query("SELECT FOUND_ROWS()")->fetch(PDO::FETCH_COLUMN, 0);
+				if($idsQuery->getCalcFoundRows()) {
+					$response['total'] = $idsQuery->foundRows();
+				} else{
+					 $totalQuery = clone $idsQuery;
+
+					 if(count($idsQuery->getGroupBy())) {
+					 	$totalQuery->selectSingleValue("count(distinct " . $totalQuery->getTableAlias() . ".id)");
+					 } else{
+						 //count(*) can be used because we use a subquery in AclItemEntity::applyAclToQuery()
+						 $totalQuery->selectSingleValue("count(*)");
+					 }
+
+					 $response['total'] = $totalQuery
+
+					 								->orderBy([], false)
+					 								->groupBy([])
+					 								->limit(1)
+					 								->offset(0)
+					 								->single();
+				}
 			}
 		}catch(PDOException $e) {
 
@@ -356,40 +366,72 @@ abstract class EntityController extends Controller {
    * @throws Exception
    */
 	protected function defaultGet($params) {
-		
+
 		$p = $this->paramsGet($params);
 
 		$result = [
-				'accountId' => $p['accountId'],
-				'state' => $this->getState(),
-				'list' => [],
-				'notFound' => []
+			'accountId' => $p['accountId'],
+			'state' => $this->getState(),
+			'list' => [],
+			'notFound' => []
 		];
-		
+
 		//empty array should return empty result. but ids == null should return all.
 		if(isset($p['ids']) && !count($p['ids'])) {
 			return $result;
 		}
 		go()->getDebugger()->debugTiming('before query');
-		$query = $this->getGetQuery($p);		
+		$query = $this->getGetQuery($p);
 
 		go()->getDebugger()->debugTiming('after query');
-		
+
 		$foundIds = [];
 		$result['list'] = [];
 		foreach($query as $e) {
 			$arr = $e->toArray();
 			$arr['id'] = $e->id();
-			$result['list'][] = $arr; 
+			$result['list'][] = $arr;
 			$foundIds[] = $arr['id'];
 
 			go()->getDebugger()->debugTiming('item to array');
 		}
 
 		$result['notFound'] = isset($p['ids']) ? array_values(array_diff($p['ids'], $foundIds)) : [];
-				
+
 		return $result;
 	}
+
+//	private function getEntityArray($id, $properties) {
+//		$e = $this->getEntity($id, $properties);
+//		if(!$e) {
+//			return false;
+//		}
+//
+//		return $e->toArray($properties);
+//	}
+
+	// Caching doesn't work because entities can contain user specific props like user tables and getPermissionLevel()
+//	private function getEntityArrayFromCache($id, $properties) {
+//		$key = $this->entityClass() . '-toArray-' . $id;
+//		$arr = go()->getCache()->get($key);
+//
+//		if(!$arr) {
+//			$e = $this->getEntity($id);
+//			if(!$e) {
+//				return false;
+//			} else {
+//				$arr = $e->toArray();
+//				$arr['id'] = $e->id();
+//				go()->getCache()->set($key, $arr);
+//			}
+//		}
+//
+//		if(!empty($properties)) {
+//			$arr = array_intersect_key($arr, array_flip($properties));
+//		}
+//
+//		return $arr;
+//	}
 	
 	/**
 	 * Takes the request arguments, validates them and fills it with defaults.
@@ -745,13 +787,8 @@ abstract class EntityController extends Controller {
 		$p = $this->paramsGetUpdates($params);	
 		$cls = $this->entityClass();		
 		
-		try {
-			$result = $cls::getChanges($p['sinceState'], $p['maxChanges']);		
-		} catch (CannotCalculateChanges $e) {
-			$result["message"] = $e->getMessage();
-			go()->warn($e->getMessage());
-		}
-		
+		$result = $cls::getChanges($p['sinceState'], $p['maxChanges']);
+
 		$result['accountId'] = $p['accountId'];
 
 		return $result;
@@ -803,19 +840,37 @@ abstract class EntityController extends Controller {
 		$params = $this->paramsImport($params);
 		
 		$blob = Blob::findById($params['blobId']);	
-		
-		$converter = $this->findConverter((new File($blob->name))->getExtension());
 
-    $file = $blob->getFile()->copy(File::tempFile('csv'));
-    $file->convertToUtf8();
+		$extension = (new File($blob->name))->getExtension();
+		$converter = $this->findConverter($extension);
 
-    $response = $converter->importFile($file, $this->entityClass(), $params);
+		if($extension == 'csv') {
+			$file = $blob->getFile()->copy(File::tempFile($extension));
+			$file->convertToUtf8();
+		} else{
+			$file = $blob->getFile();
+		}
+
+    $response = $converter->importFile($file, $params);
 		
 		if(!$response) {
 			throw new Exception("Invalid response from import converter");
 		}
 		
 		return $response;
+	}
+
+
+	protected function defaultExportColumns($params) {
+		$converter = $this->findConverter($params['extension']);
+
+		$mapping = $converter->getEntityMapping();
+		if(isset($mapping['customFields'])) {
+			$mapping = array_merge($mapping, $mapping['customFields']['properties']);
+			unset($mapping['customFields']);
+		}
+
+		return $mapping;
 	}
 	
 	/**
@@ -829,12 +884,19 @@ abstract class EntityController extends Controller {
 		
 		$blob = Blob::findById($params['blobId']);
 
-		$file = $blob->getFile()->copy(File::tempFile('csv'));
-    $file->convertToUtf8();
+		$extension = (new File($blob->name))->getExtension();
+		$converter = $this->findConverter($extension);
 
-		$converter = $this->findConverter((new File($blob->name))->getExtension());
+		if($extension == 'csv') {
+			$file = $blob->getFile()->copy(File::tempFile($extension));
+			$file->convertToUtf8();
+		} else{
+			$file = $blob->getFile();
+		}
+
+		$converter = $this->findConverter($extension);
 		
-		$response['goHeaders'] = $converter->getEntityMapping($this->entityClass());
+		$response['goHeaders'] = $converter->getEntityMapping();
 		$response['csvHeaders'] = $converter->getCsvHeaders($file);
 		
 		if(!$response) {
@@ -856,7 +918,7 @@ abstract class EntityController extends Controller {
 		$cls = $this->entityClass();		
 		foreach($cls::converters() as $converter) {
 			if($converter::supportsExtension($extension)) {
-				return new $converter;
+				return new $converter($extension, $this->entityClass());
 			}
 		}
 		
@@ -887,11 +949,8 @@ abstract class EntityController extends Controller {
 		$convertor = $this->findConverter($params['extension']);
 				
 		$entities = $this->getGetQuery($params);
-		
-		$cls = $this->entityClass();
-		$name = $cls::entityType()->getName();
-		
-		$blob = $convertor->exportToBlob($name, $entities);
+
+		$blob = $convertor->exportToBlob($entities, $params);
 		
 		return ['blobId' => $blob->id, 'blob' => $blob->toArray()];
 	}

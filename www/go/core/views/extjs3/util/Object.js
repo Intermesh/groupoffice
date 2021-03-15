@@ -15,16 +15,17 @@
             part = part.replace(/\[[0-9]*\]/, "");
 
             if (!obj[part] || !Ext.isArray(obj[part])) {
-                if(Ext.isDefined(value)) {
+                //if(Ext.isDefined(value)) {
                     obj[part] = [];
-                } else
-                {
-                    return null;
-                }
+                // } else
+                // {
+                //     return null;
+                // }
             }
 
             if(arrayIndex === "") {
                 arrayIndex = obj[part].length;
+                obj[part].push({});
             }
             if(!obj[part][arrayIndex]) {
                 if(Ext.isDefined(value)) {
@@ -81,6 +82,7 @@
             parts.forEach(function(part) {
                 ret = obj = traverse(obj, part);
             });
+
 
             traverse(obj, last, value);
 

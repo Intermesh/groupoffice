@@ -7,8 +7,10 @@ use go\core\ErrorHandler;
 use go\core\fs\Blob;
 use go\core\fs\File;
 use go\core\jmap\EntityController;
+use go\core\model\Acl;
 use go\core\orm\Entity;
 use go\core\orm\Query;
+use setasign\Fpdi\PdfParser\Type\PdfBoolean;
 use Traversable;
 
 /**
@@ -54,8 +56,45 @@ use Traversable;
  * @see EntityController::export()
  */
 abstract class AbstractConverter {
-	
-	public function __construct() {
+
+
+
+
+	/**
+	 * The index number of the import
+	 *
+	 * @var int
+	 */
+	protected $index;
+
+	/**
+	 * Extra parameters sent by the client for importing
+	 *
+	 * @var array
+	 */
+	protected $clientParams;
+
+	/**
+	 * The class name of the entity we're importing
+	 * @var string
+	 */
+	protected $entityClass;
+
+	/**
+	 * The extension provided by the client.
+	 *
+	 * @var string
+	 */
+	protected $extension;
+
+	/**
+	 * AbstractConverter constructor.
+	 * @param string $extension eg. "csv"
+	 * @param string $entityClass The entity class model. eg. go\modules\community\addressbook\model\Contact
+	 */
+	public function __construct($extension, $entityClass) {
+		$this->extension = strtolower($extension);
+		$this->entityClass = $entityClass;
 		$this->init();
 	}
 	
@@ -86,7 +125,8 @@ abstract class AbstractConverter {
 	 * @return string eg, JSON or CSV
 	 */
 	public function getName() {
-		return array_pop(explode("\\", static::class));
+		$classParts = explode("\\", static::class);
+		return array_pop($classParts);
 	}
 	
 	/**
@@ -94,30 +134,35 @@ abstract class AbstractConverter {
 	 * 
 	 * @return string eg. "csv"
 	 */
-	abstract public function getFileExtension();
+	public function getFileExtension() {
+		return $this->extension;
+	}
+
 
   /**
    * Read file and import them into Group-Office
    *
    * @param File $file the source file
-   * @param string $entityClass The entity class model. eg. go\modules\community\addressbook\model\Contact
    * @param array $params Extra import parameters. By default this can only hold 'values' which is a key value array that will be set on each model.
    * @return array ['count', 'errors', 'success']
    * @throws Exception
    */
-	public function importFile(File $file, $entityClass, $params = array()) {
-		$response = ['count' => 0, 'errors' => [], 'success' => true];		
+	public final function importFile(File $file, $params = array()) {
+		$response = ['count' => 0, 'errors' => [], 'success' => true];
+
+		$this->clientParams = $params;
+
+		$this->initImport($file);
+
+		$this->index = 0;
 		
-		$fp = $file->open('r');
-		
-		$index = 0;
-		
-		while(!feof($fp)) {		
+		while($this->nextImportRecord()) {
+
 			try {
 
 				go()->getDbConnection()->beginTransaction();
 
-				$entity = $this->importEntity($entityClass, $fp, $index++, $params);
+				$entity = $this->importEntity();
 				
 				//ignore when false is returned. This is not an error. But intentional. Like CSV skipping a blank line for example.
 				if($entity === false) {
@@ -129,28 +174,47 @@ abstract class AbstractConverter {
 
 				if($entity->hasValidationErrors()) {
 					go()->getDbConnection()->rollBack();
-					$response['errors'][] = "Item ". $index . ": ". var_export($entity->getValidationErrors(), true);				
+					$response['errors'][] = "Item ". $this->index . ": ". var_export($entity->getValidationErrors(), true);
 				} elseif($this->afterSave($entity)) {
 					go()->getDbConnection()->commit();
 					$response['count']++;
 				} else{
 					go()->getDbConnection()->rollBack();
-					$response['errors'][] = "Item ". $index . ": Import afterSave returned false";				
+					$response['errors'][] = "Item ". $this->index . ": Import afterSave returned false";
 				}				
 			}
 			catch(Exception $e) {
 				go()->getDbConnection()->rollBack();
 				ErrorHandler::logException($e);
-				$response['errors'][] = "Item ". $index . ": ".$e->getMessage();
+				$response['errors'][] = "Item ". $this->index . ": ".$e->getMessage();
 			}
+
+			$this->index++;
 		}
+
+		$this->finishImport();
 		
 		return $response;
 	}
 
-	protected function afterSave(Entity $entity) {
-		return true;
+	/**
+	 * Setup file reader
+	 *
+	 * @param File $file
+	 */
+	abstract protected function initImport(File $file);
+
+	/**
+	 * Reads next record from file. Returns true on success or false when done.
+	 *
+	 * @return bool
+	 */
+	abstract protected function nextImportRecord();
+
+	protected function finishImport() {
+
 	}
+
 
 	/**
 	 * Handle's the import. 
@@ -158,25 +222,40 @@ abstract class AbstractConverter {
 	 * It must read from the $fp file pointer and return the entity object. The entity is not saved yet.
 	 * 
 	 * When false is returned the result will be ignored. For example when you want to skip a CSV line because it's empty.
-	 * 
-	 * @param Entity $entityClass
-	 * @param resource $fp
-	 * @param int $index
-	 * @param array $params
+	 *
 	 * @return Entity|false
 	 */
-	abstract protected function importEntity($entityClass, $fp, $index, array $params);
-	
-	abstract protected function exportEntity(Entity $entity, $fp, $index, $total);
-		
-	
-	protected function internalExport($fp, $entities, $total) {
-		$i = 0;
+	abstract protected function importEntity();
+
+
+
+	/** start of export */
+
+
+	/**
+	 * Export entities to a blob
+	 *
+
+	 * @param Query|array $entities
+	 * @return Blob
+	 * @throws Exception
+	 */
+	public final function exportToBlob(Query $entities, array $params = []) {
+
+		$this->clientParams = $params;
+		$this->entitiesQuery = $entities;
+		$this->initExport();
+		//	$total = $entities->getIterator()->rowCount();
+
+		$this->index = 0;
 		foreach($entities as $entity) {
-			$this->exportEntity($entity, $fp, $i, $total);
-			$i++;
+			$this->exportEntity($entity);
+			$this->index++;
 		}
-  }
+
+		return $this->finishExport();
+
+	}
 
   /**
    * @var Query
@@ -184,38 +263,38 @@ abstract class AbstractConverter {
   private $entitiesQuery;
 
   /**
+   * The query used for exporting entities
+   *
    * @return Query
    */
 	protected function getEntitiesQuery(){
 	  return $this->entitiesQuery;
   }
 
-  /**
-   * Export entities to a blob
-   *
-   * @param $name
-   * @param Query|array $entities
-   * @return Blob
-   * @throws Exception
-   */
-	public final function exportToBlob($name, Query $entities) {		
-		$tempFile = File::tempFile($this->getFileExtension());
-		$fp = $tempFile->open('w+');
+	/**
+	 * Initialize the import. For example create temporary file and open it.
+	 *
+	 * @return void
+	 */
+	abstract protected function initExport();
 
-		$this->entitiesQuery = $entities;
-		
-		$total = $entities->getIterator()->rowCount();
-		
-		$this->internalExport($fp, $entities, $total);
-		
-		fclose($fp);
-		
-		$blob = Blob::fromTmp($tempFile);
-		$blob->name = $name."-" . date('Y-m-d-H:i:s') . '.'. $this->getFileExtension();
-		if(!$blob->save()) {
-			throw new Exception("Couldn't save blob: " . var_export($blob->getValidationErrors(), true));
-		}
-		
-		return $blob;
+	protected function afterSave(Entity $entity) {
+		return true;
 	}
+
+	/**
+	 * Export the given entity
+	 *
+	 * @param Entity $entity
+	 * @return bool
+	 */
+	abstract protected function exportEntity(Entity $entity);
+
+	/**
+	 * Finish the export retuning a Blob with the data
+	 *
+	 * @return Blob
+	 */
+	abstract protected function finishExport();
+
 }

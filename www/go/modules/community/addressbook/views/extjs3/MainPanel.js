@@ -79,7 +79,10 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			tbar: [{
 					xtype: "tbtitle",
 					text: t("Address books")
-				}, '->', {
+				}, '->',{
+					xtype: "tbsearch"
+				}, {
+					disabled: !go.Modules.isAvailable("community", "addressbook", go.permissionLevels.manage),
 					iconCls: 'ic-add',
 					tooltip: t("Add"),
 					handler: function () {
@@ -207,7 +210,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 							handler: function() {
 								go.util.importFile(
 												'Contact', 
-												".csv, .vcf, text/vcard",
+												".csv, .vcf, text/vcard, .json, .xlsx",
 												{addressBookId: this.addAddressBookId},
 												{
 													// These fields can be selected to update contacts if ID or e-mail matches
@@ -313,7 +316,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 														language: {label: t("Language")},
 														jobTitle: {label: t("Job title")},
 														uid: {label: t("UUID")},
-														starred: {label: t("Starred")},
+														//starred: {label: t("Starred")},
 
 														"emailAddresses": {
 															label: t("E-mail address"),
@@ -373,8 +376,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 							text: t("Export"),
 							menu: [
 								{
-									text: 'vCard',
-									iconCls: 'ic-contacts',
+									text: 'vCard (Virtual Contact File)',
+									iconCls: 'filetype filetype-vcf',
 									handler: function() {
 										go.util.exportToFile(
 														'Contact',
@@ -382,9 +385,19 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 														'vcf');
 									},
 									scope: this
+								}, {
+									text: 'Microsoft Excel',
+									iconCls: 'filetype filetype-xls',
+									handler: function() {
+										go.util.exportToFile(
+											'Contact',
+											Object.assign(go.util.clone(this.grid.store.baseParams), this.grid.store.lastOptions.params, {limit: 0, position: 0}),
+											'xlsx');
+									},
+									scope: this
 								},{
-									text: 'CSV',
-									iconCls: 'ic-description',
+									text: 'Comma Separated Values',
+									iconCls: 'filetype filetype-csv',
 									handler: function() {
 										go.util.exportToFile(
 														'Contact',
@@ -392,7 +405,19 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 														'csv');
 									},
 									scope: this
-								}, '-',
+								},
+								{
+									iconCls: 'filetype filetype-json',
+									text: 'JSON',
+									handler: function() {
+										go.util.exportToFile(
+											'Contact',
+											Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
+											'json');
+									},
+									scope: this
+								},
+								'-',
 								{
 									iconCls: 'ic-print',
 									text: t("Labels"),
@@ -408,16 +433,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 
 									}
 								}
-//								{
-//									text: 'JSON',
-//									handler: function() {
-//										go.util.exportToFile(
-//														'Contact', 
-//														Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0}),
-//														'application/json');									
-//									},
-//									scope: this
-//								}
+
 							]							
 						},
 						"-",

@@ -150,19 +150,20 @@ class Reminder extends \GO\Base\Db\ActiveRecord {
 	 * @return bool 
 	 */
 	public function removeUser($userId) {
-		
+
 		$model = $this->hasUser($userId);
-		if($model){
-			if(!$model->delete())
-				return  false;
+		if ($model) {
+			if (!$model->delete()) {
+				return false;
+			}
 		}
-				
+
 		$this->fireEvent('dismiss', array($this, $userId));
-		
+
 		//delete the reminder if it doesn't have users anymore.
-		if(!$this->hasUsers())
+		if (!$this->hasUsers()) {
 			$this->delete();
-				
+		}
 			
 		return true;		
 	}

@@ -1448,7 +1448,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 
 		//$html .= '<tr><td colspan="2">&nbsp;</td></tr>';
 
-		$cfRecord = $this->getCustomFields()->toArray();
+		$cfRecord = $this->getCustomFields()->returnAsText(true)->toArray();
 
 		if (!empty($cfRecord)) {
 		$fieldsets = \go\core\model\FieldSet::find()->filter(['entities' => ['Event']]);
@@ -2311,7 +2311,7 @@ The following is the error message:
 			//find if an event for this exception already exists.
 			$exceptionDate = $this->exception_for_event_id!=0 ? $this->start_time : false;			
 			$existing = Event::model()->findByUuid($this->uuid, 0, $calendar->id, $exceptionDate);
-			
+
 			if(!$existing){				
 			
 				//ignore acl permissions because we allow users to schedule events directly when they have access through
@@ -2378,7 +2378,7 @@ The following is the error message:
 		if($this->is_organizer)
 			return false;
 		
-		return Event::model()->findSingleByAttributes(array('uuid'=>$this->uuid, 'is_organizer'=>1));
+		return Event::model()->findSingleByAttributes(array('uuid'=>$this->uuid, 'is_organizer'=>1, 'start_time' => $this->start_time));
 	}
 	
 	/**
@@ -2551,7 +2551,7 @@ The following is the error message:
 			$a = new Swift_Attachment($ics, \GO\Base\Fs\File::stripInvalidChars($this->name) . '.ics', 'text/calendar; METHOD="REPLY"');
 			$a->setEncoder(new Swift_Mime_ContentEncoder_PlainContentEncoder("8bit"));
 			$a->setDisposition("inline");
-			$a->setContentType("text/calendar;method=CANCEL;charset=utf-8");
+			$a->setContentType("text/calendar;method=REPLY;charset=utf-8");
 			$message->attach($a);
 			
 			//for outlook 2003 compatibility

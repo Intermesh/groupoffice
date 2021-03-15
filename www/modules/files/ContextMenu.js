@@ -41,6 +41,36 @@ GO.files.FilesContextMenu = function(config)
 		},
 		scope: this
 	});
+
+	this.saveAsPdf = new Ext.menu.Item({
+		iconCls: 'ic-compare-arrows',
+		text: t("Save as PDF"),
+		handler: function () {
+			GO.request({
+				url: 'files/file/convert',
+				params: {
+					id: this.records[0].data.id,
+					format: 'pdf',
+				},
+				success: function (action, response, result) {
+					var filesModule = GO.mainLayout.getModulePanel('files');
+					if (filesModule && filesModule.gridStore){
+						filesModule.gridStore.reload();
+					}
+				}
+			});
+		},
+		scope: this
+	});
+
+	this.downloadAsPdf = new Ext.menu.Item({
+		iconCls: 'ic-file-download',
+		text: t("Download as PDF"),
+		handler: function () {
+			go.util.downloadFile(GO.url("files/file/convertAndDownload", {id: this.records[0].data.id, format: 'pdf'}));
+		},
+		scope: this
+	});
 	
 	this.openWithButton = new Ext.menu.Item({
 		text: t("Open with", "files"),
@@ -198,7 +228,13 @@ GO.files.FilesContextMenu = function(config)
 		scope: this
 	});
 
-	config['items']=[this.openButton, this.openWithButton, this.downloadButton,'-'];
+	config['items'] = [this.openButton, this.openWithButton, this.downloadButton, '-'];
+
+	if (go.Modules.isAvailable("business", "fileconverter")) {
+		config['items'].push(this.saveAsPdf);
+		config['items'].push(this.downloadAsPdf);
+		config['items'].push('-');
+	}
 
 	config['items'].push(this.lockButton);
 	config['items'].push(this.unlockButton);
@@ -312,7 +348,11 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 			this.unlockButton.setVisible(!forFileSearchModule);
 			this.downloadSelectedFilesButton.setVisible(!forFileSearchModule);
 			this.compressButton.setVisible(!forFileSearchModule);
-			
+			if (go.Modules.isAvailable("business", "fileconverter")) {
+				this.downloadAsPdf.setVisible(!forFileSearchModule);
+				this.saveAsPdf.setVisible(!forFileSearchModule);
+			}
+
 		} else {
 		
 			if(clickedAt)
@@ -323,6 +363,27 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 			if(records.length=='1')
 			{
 				extension = records[0].data.extension;
+
+				switch (extension) {
+					case 'doc':
+					case 'docx':
+					case 'txt':
+					case 'xls':
+					case 'xlsx':
+					case 'ppt':
+					case 'pptx':
+					case 'ods':
+					case 'odt':
+					case 'odp':
+						if (go.Modules.isAvailable("business", "fileconverter")) {
+							this.saveAsPdf.show();
+							this.downloadAsPdf.show();
+						}
+						break;
+					default:
+						this.saveAsPdf.hide();
+						this.downloadAsPdf.hide();
+				}
 
 				switch(extension)
 				{
@@ -427,6 +488,9 @@ Ext.extend(GO.files.FilesContextMenu, Ext.menu.Menu,{
 				this.downloadButton.hide();
 				this.openWithButton.hide();
 				this.openButton.hide();
+
+				this.saveAsPdf.hide();
+				this.downloadAsPdf.hide();
 
 				this.createDownloadLinkButton.hide();
 

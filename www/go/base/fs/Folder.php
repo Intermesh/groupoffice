@@ -284,7 +284,7 @@ class Folder extends Base {
 			} else {
 				throw new \Exception("Could not create folder " . $this->path);
 			}
-		} catch(Exception $e) {
+		} catch(\Exception $e) {
 			throw new \Exception("Could not create folder '" . $this->path . "' " .$e->getMessage());
 		}
 	}

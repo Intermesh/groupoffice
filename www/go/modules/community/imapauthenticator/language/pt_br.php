@@ -6,7 +6,7 @@ return array (
   'Domains' => 'Domínios',
   'Validate certificate' => 'Validar certificado',
   'Remove domain from username' => 'Remover domínio do username',
-  'Users must login with their full e-mail adress. Enable this option if the IMAP excepts the username without domain.' => 'Os usuários devem realizar login com o endereço de e-mail completo. Ative esta opção se o IMAP espera o nome de usuário sem domínio.',
+  'Users must login with their full e-mail address. Enable this option if the IMAP expects the username without domain.' => 'Os usuários devem realizar login com o endereço de e-mail completo. Ative esta opção se o IMAP espera o nome de usuário sem domínio.',
   'Use authentication' => 'Usar autenticação',
   'Enable this if the SMTP server credentials are identical to the IMAP server.' => 'Habilite esta opção se as credenciais do servidor SMTP são idênticas às do servidor IMAP.',
   'User options' => 'Opções do usuário',

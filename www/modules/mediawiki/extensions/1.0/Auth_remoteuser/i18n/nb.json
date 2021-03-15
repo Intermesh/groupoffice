@@ -1,9 +1,0 @@
-{
-	"@metadata": {
-		"authors": [
-			"Chameleon222"
-		]
-	},
-	"auth_remoteuser-desc": "Logg inn brukere som bruker miljøvariabelen <code>REMOTE_USER</code> automatisk",
-	"auth_remoteuser-wgautherror": "Det er en annen utvidelse som bruker  [https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:$wgAuth variabelen <code>wgAuth</code>]. Du kan ikke bruke mer enn en utvidelse som bruker <code>$wgAuth</code> samtidig. Dersom det ikke finnes en annen utvidelse så se til at du setter den følgende linjen i din <code>LocalSettings.php</code>:\n<code>$wgAuth = new Auth_remoteuser();</code>"
-}

@@ -5,18 +5,13 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		if(!this.accessToken) {
 			return;
 		}
-		var me = this;
-		go.Jmap.get(function(data, options, success, response){
-			if(data) {
-				
-				me.loadSession(data).then(function() {
-					cb.call(scope, data, options, success, response);
-				});
-			} else {
-				cb.call(scope, data, options, success, response);
-			}
-			
-		}, this);		
+		return this.load();
+	},
+
+	load : function() {
+		return go.Jmap.get().then((data) => {
+			return this.onLoad(data);
+		});
 	},
 	
 	clearAccessToken : function() {
@@ -34,11 +29,13 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		Ext.Ajax.defaultHeaders.Authorization = 'Bearer ' + accessToken;
 		
 	},
-  
-  loadSession : function(session) {
+
+	onLoad : function(session) {
 		console.warn(session);
 
 		go.Jmap.capabilities = session.capabilities;
+
+		this.session = session;
 
     this.apiUrl = session.apiUrl;
     this.downloadUrl = session.downloadUrl;
@@ -50,21 +47,19 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 
 		GO.settings.state = session.state;
 
-		var me = this;
 		// Ext.apply(this, session.user);
-		return go.Db.store("User").single(session.userId).then(function(user) {
-			Ext.apply(me, user);
+		return go.Db.store("User").single(session.userId).then((user) => {
+			Ext.apply(this, user);
 			// me.firstWeekDay = parseInt(user.firstWeekday);
-			me.legacySettings(user);
+			this.legacySettings(user);
 
+			go.ActivityWatcher.activity();
 			go.ActivityWatcher.init(GO.settings.config.logoutWhenInactive);
 
-			me.fireEvent("load", this);
-		});
-		
+			this.fireEvent("load", this);
 
-    //Ext.apply(GO.settings, session.oldSettings);
-		
+			return this;
+		});
 		
 	},
 	
@@ -147,3 +142,12 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		return !Ext.isEmpty(this.username);
 	}
 }));
+
+// Update go.User when it's edited
+Ext.onReady(function(){
+	go.Db.store("User").on("changes", function(store, added, changed, deleted){
+		if(changed[go.User.id]) {
+			Ext.apply(go.User, changed[go.User.id]);
+		}
+	});
+})

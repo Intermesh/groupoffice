@@ -41,7 +41,7 @@ CREATE TABLE `core_auth_token` (
   `lastActiveAt` datetime NOT NULL,
   `remoteIpAddress` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `userAgent` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `passedMethods` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL
+  `passedAuthenticators` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE `core_blob` (
@@ -136,7 +136,9 @@ CREATE TABLE `core_customfields_select_option` (
   `id` int(11) NOT NULL,
   `fieldId` int(11) NOT NULL,
   `parentId` int(11) DEFAULT NULL,
-  `text` varchar(255) DEFAULT NULL
+  `text` varchar(255) DEFAULT NULL,
+  `sortOrder` int(11) UNSIGNED DEFAULT 0,
+  `enabled` BOOLEAN NOT NULL DEFAULT TRUE
 ) ENGINE=InnoDB;
 
 CREATE TABLE `core_entity` (
@@ -194,7 +196,6 @@ CREATE TABLE `core_search` (
   `name` varchar(100) DEFAULT NULL,
   `description` varchar(190) NOT NULL DEFAULT '',
   `entityTypeId` int(11) NOT NULL,
-  `keywords` VARCHAR(750) NULL,
   `filter` VARCHAR(50) NULL DEFAULT NULL,
   `modifiedAt` datetime DEFAULT NULL,
   `aclId` int(11) NOT NULL
@@ -764,6 +765,7 @@ CREATE TABLE IF NOT EXISTS `go_templates` (
   `name` varchar(100) DEFAULT NULL,
   `acl_id` int(11) NOT NULL DEFAULT 0,
   `content` longblob NOT NULL,
+  `filename` varchar(100) DEFAULT NULL,
   `extension` varchar(4) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
@@ -877,9 +879,7 @@ ALTER TABLE `core_email_template_attachment`
   ADD CONSTRAINT `core_email_template_attachment_ibfk_2` FOREIGN KEY (`emailTemplateId`) REFERENCES `core_email_template` (`id`) ON DELETE CASCADE;
 
 
-ALTER TABLE `core_search` ADD INDEX(`keywords`);
 ALTER TABLE `core_change` ADD INDEX(`entityId`);
-
 
 CREATE TABLE `core_auth_allow_group` (
   `id` int(11) NOT NULL,
@@ -920,6 +920,16 @@ CREATE TABLE `core_oauth_access_token` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
+
+CREATE TABLE `core_oauth_auth_codes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `clientId` int(11) NOT NULL,
+  `identifier` varchar(128) COLLATE ascii_bin NOT NULL,
+  `userIdentifier` int(11) NOT NULL,
+  `expiryDateTime` datetime NOT NULL,
+  `nonce` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Table structure for table `core_oauth_client`
@@ -1056,3 +1066,50 @@ ALTER TABLE `core_pdf_template`
 ALTER TABLE `core_search` ADD  FOREIGN KEY (`aclId`) REFERENCES `core_acl`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 
 ALTER TABLE `core_acl` ADD FOREIGN KEY (`ownedBy`) REFERENCES `core_user`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;
+
+
+CREATE TABLE `core_search_word` (
+                                    `searchId` int(11) NOT NULL,
+                                    `word` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+                                    `drow` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE `core_search_word`
+    ADD PRIMARY KEY (`word`,`searchId`),
+    ADD KEY `searchId` (`searchId`),
+    ADD KEY `drow` (`drow`);
+
+
+ALTER TABLE `core_search_word`
+    ADD CONSTRAINT `core_search_word_ibfk_1` FOREIGN KEY (`searchId`) REFERENCES `core_search` (`id`) ON DELETE CASCADE;
+
+CREATE TABLE `core_spreadsheet_export` (
+                                           `id` int(10) UNSIGNED NOT NULL,
+                                           `userId` int(11) NOT NULL,
+                                           `entityTypeId` int(11) NOT NULL,
+                                           `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+                                           `columns` text COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+ALTER TABLE `core_spreadsheet_export`
+    ADD PRIMARY KEY (`id`),
+    ADD KEY `userId` (`userId`),
+    ADD KEY `entityTypeId` (`entityTypeId`),
+    ADD KEY `name` (`name`);
+
+
+ALTER TABLE `core_spreadsheet_export`
+    MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+
+ALTER TABLE `core_spreadsheet_export`
+    ADD CONSTRAINT `core_spreadsheet_export_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+    ADD CONSTRAINT `core_spreadsheet_export_ibfk_2` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;
+
+
+alter table go_state
+    add constraint go_state_core_user_id_fk
+        foreign key (user_id) references core_user (id)
+            on delete cascade;

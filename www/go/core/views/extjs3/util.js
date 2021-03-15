@@ -392,6 +392,8 @@ go.util =  (function () {
 	/**
 	 * Export an entity to a file
 	 *
+	 * @see go.modules.community.addressbook.MainPanel for an example
+	 *
 	 * @param {string} entity eg. "Contact"
 	 * @param {string} queryParams eg. Ext.apply(this.grid.store.baseParams, this.grid.store.lastOptions.params, {limit: 0, start: 0})
 	 * @param {string} extension eg "vcf", "csv" or "json"
@@ -400,205 +402,63 @@ go.util =  (function () {
 	 */
 	exportToFile: function (entity, queryParams, extension, params) {
 		
-		Ext.getBody().mask(t("Exporting..."));
-		var promise = go.Jmap.request({
-			method: entity + "/query",
-			params: queryParams
-		});
-		
-		go.Jmap.request({
-			method: entity + "/export",
-			params: {
+
+
+		function doExport(columns) {
+			Ext.getBody().mask(t("Exporting..."));
+			const promise = go.Jmap.request({
+				method: entity + "/query",
+				params: queryParams
+			});
+
+			let params = {
 				extension: extension,
 				"#ids": {
 					resultOf: promise.callId,
 					path: "/ids"
 				}
-			},
-			scope: this,
-			callback: function (options, success, response) {
-				Ext.getBody().unmask();
-				if(!success) {
-					Ext.MessageBox.alert(t("Error"), response.message);				
-				} else
-				{
-					go.util.downloadFile(go.Jmap.downloadUrl(response.blobId));
-				}
 			}
-		});
+
+			if(columns)
+			{
+				params.columns = columns;
+			}
+
+			return go.Jmap.request({
+				method: entity + "/export",
+				params: params
+			}).then(function (response) {
+				go.util.downloadFile(go.Jmap.downloadUrl(response.blobId));
+			}).catch(function(response) {
+				Ext.MessageBox.alert(t("Error"), response.message);
+			}).finally(function() {
+				Ext.getBody().unmask();
+			})
+		}
+
+		if(extension == 'csv' || extension == 'xlsx') {
+			const win = new go.import.ColumnSelectDialog({
+				entity: entity,
+				handler: doExport,
+				scope: this
+			});
+			win.show();
+		} else
+		{
+			doExport();
+		}
+
 	},
 
 	/**
 	 * Import a file
+	 *
+	 * @see go.modules.community.addressbook.MainPanel for an example
 	 * 
 	 * @param {string} entity eg. "Contact"
 	 * @param {string} accept File types to accept. eg. ".csv, .vcf, text/vcard",
 	 * @param {object} values Extra values to apply to all imported items. eg. {addressBookId: 1}
 	 * @param {object} options Options that can be used by importers. For CSV you can provide labels. {labels: {propName: "Label"}}
-	 *
-	 * @example
-	 *
-	 * go.util.importFile(
-												'Contact',
-												".csv, .vcf, text/vcard",
-												{addressBookId: this.addAddressBookId},
-												{
-													// These fields can be selected to update contacts if ID or e-mail matches
-													lookupFields: {'id' : "ID", 'email': 'E-mail'},
-
-													// This hash map is used to aid in auto selecting the right mappings. Key is possible header in CSV and value is property name in Group-Office
-													aliases : {
-														"Given name": "firstName",
-														"First name": "firstName",
-
-														"Middle name": "middleName",
-
-														"Family Name": "lastName",
-														"Last Name": "lastName",
-
-														"Job Title": "jobTitle",
-														"Suffix": "suffixes",
-														"Web page" : {field: "urls[].url", fixed: {"type": "homepage"}},
-														"Birthday" : {field: "dates[].date", fixed: {"type": "birthday"}},
-														"Anniversary" : {field: "dates[].date", fixed: {"type": "anniversary"}},
-
-														"E-mail 1 - Value": {field: "emailAddresses[].email", related: {"type": "E-mail 1 - Type"}},
-														"email": {field: "emailAddresses[].email", fixed: {"type": "work"}},
-														"E-mail Address": {field: "emailAddresses[].email", fixed: {"type": "work"}},
-														"E-mail 2 Address": {field: "emailAddresses[].email", fixed: {"type": "work"}},
-														"E-mail 3 Address": {field: "emailAddresses[].email", fixed: {"type": "work"}},
-
-														"Primary Phone": {field: "phoneNumbers[].number", fixed: {"type": "work"}},
-														"Home Phone": {field: "phoneNumbers[].number", fixed: {"type": "home"}},
-														"Home Phone 2": {field: "phoneNumbers[].number", fixed: {"type": "home"}},
-
-														"Business Phone": {field: "phoneNumbers[].number", fixed: {"type": "work"}},
-														"Business Phone 2": {field: "phoneNumbers[].number", fixed: {"type": "work"}},
-
-														"Mobile Phone": {field: "phoneNumbers[].number", fixed: {"type": "mobile"}},
-														"Pager": {field: "phoneNumbers[].number", fixed: {"type": "other"}},
-														"Home Fax": {field: "phoneNumbers[].number", fixed: {"type": "fax"}},
-
-														"Other Phone": {field: "phoneNumbers[].number", fixed: {"type": "other"}},
-														"Other Fax": {field: "phoneNumbers[].number", fixed: {"type": "fax"}},
-
-														"Home Street": {
-															field: "addresses[].street",
-															fixed: {type: "home"},
-															related: {
-																street2: "Home Street 2",
-																city: "Home City",
-																state: "Home State",
-																zipCode: "Home Postal Code",
-																country: "Home Country"
-															}
-														},
-														"Business Street": {
-															field: "addresses[].street",
-															fixed: {type: "work"},
-								  							related: {
-																street2: "Business Street 2",
-																city: "Business City",
-																state: "Business State",
-																zipCode: "Business Postal Code",
-																country: "Business Country"
-
-															}
-														},
-														"Other Street": {
-															field: "addresses[].street",
-															fixed: {type: "other"},
-															related: {
-																street2: "Other Street 2",
-																city: "Other City",
-																state: "Other State",
-																zipCode: "Other Postal Code",
-																country: "Other Country"
-
-															}
-														},
-
-														"Company" : "organizations"
-													},
-
-													// Fields with labels and possible subproperties.
-													// For example e-mail and type of an array of e-mail addresses should be grouped together.
-													fields: {
-														prefixes: {label: t("Prefixes")},
-														initials: {label: t("Initials")},
-														salutation: {label: t("Salutation")},
-														color: {label: t("Color")},
-														firstName: {label: t("First name")},
-														middleName: {label: t("Middle name")},
-														lastName: {label: t("Last name")},
-														name: {label: t("Name")},
-														suffixes: {label: t("Suffixes")},
-														gender: {label: t("Gender")},
-														notes: {label: t("Notes")},
-														isOrganization: {label: t("Is organization")},
-														IBAN: {label: t("IBAN")},
-														registrationNumber: {label: t("Registration number")},
-														vatNo: {label: t("VAT number")},
-														vatReverseCharge: {label: t("Reverse charge VAT")},
-														debtorNumber: {label: t("Debtor number")},
-														photoBlobId: {label: t("Photo blob ID")},
-														language: {label: t("Language")},
-														jobTitle: {label: t("Job title")},
-														uid: {label: t("UUID")},
-														starred: {label: t("Starred")},
-
-														"emailAddresses": {
-															label: t("E-mail address"),
-															properties: {
-																"email": {label: "E-mail"},
-																"type": {label: t("Type")}
-															}
-														},
-
-														"dates": {
-															label: t("Dates"),
-															properties: {
-																"date": {label: "Date"},
-																"type": {label: t("Type")}
-															}
-														},
-
-														"dates": {
-															label: t("Phone numbers"),
-															properties: {
-																"number": {label: "Number"},
-																"type": {label: t("Type")}
-															}
-														},
-
-														"urls": {
-															label: t("URL's"),
-															properties: {
-																"url": {label: "URL"},
-																"type": {label: t("Type")}
-															}
-														},
-
-														"addresses": {
-															label: t("Addresses"),
-															properties: {
-																"type": {label: t("Type")},
-																"street": {label: t("Street")},
-																"street 2": {label: t("Street 2")},
-																"zipCode": {label: t("ZIP code")},
-																"city": {label: t("City")},
-																"state": {label: t("state")},
-																"country": {label: t("Country")},
-																"countryCode": {label: t("Country code")},
-																"latitude": {label: t("Latitude")},
-																"longitude": {label: t("Longitude")}
-															}
-														}
-
-													}
-												});
-	 *
-	 *
 	 *
 	 * @return {void}
 	 */
@@ -614,7 +474,7 @@ go.util =  (function () {
 					Ext.getBody().mask(t("Importing..."));
 
 
-					if(response.name.toLowerCase().substr(-3) == 'csv') {
+					if(response.name.toLowerCase().substr(-3) == 'csv' || response.name.toLowerCase().substr(-4) == 'xlsx') {
 						Ext.getBody().unmask();
 
 						var dlg = new go.import.CsvMappingDialog({
@@ -638,7 +498,7 @@ go.util =  (function () {
 								Ext.getBody().unmask();
 
 								if (!success) {
-									Ext.MessageBox.alert(t("Error"), response.errors.join("<br />"));
+									Ext.MessageBox.alert(t("Error"), response.message);
 								} else {
 									var msg = t("Imported {count} items").replace('{count}', response.count) + ". ";
 

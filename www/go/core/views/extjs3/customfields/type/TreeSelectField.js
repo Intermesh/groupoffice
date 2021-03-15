@@ -44,17 +44,40 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 	
 	
 
-	createCombo: function (options) {		
-		
+	createCombo: function (options) {
+
 		var store = new Ext.data.JsonStore({
 			data: {root: options},
 			id: 'id',
 			root: "root",
-			fields: [{name: 'id', type: "int"}, 'text'],
+			fields: [{name: 'id', type: "int"}, 'text', 'enabled'],
 			remoteSort: true
 		});
 
 		return {
+			//Override so that disabled values are in the store but may not be selected.
+			doQuery : function(q, forceAll){
+				q = Ext.isEmpty(q) ? '' : q;
+
+				if(forceAll === true || (q.length >= this.minChars)){
+					if(this.lastQuery !== q){
+						this.lastQuery = q;
+
+							this.selectedIndex = -1;
+							if(forceAll){
+								this.store.filter('enabled', true);
+							}else{
+
+								this.store.filter([{property: 'enabled', value: true}, {property: this.displayField, value: q}]);
+							}
+							this.onLoad();
+					}else{
+						this.selectedIndex = -1;
+						this.onLoad();
+					}
+				}
+			},
+
 			submit: false,
 			anchor: "100%",
 			xtype: 'gocombo',

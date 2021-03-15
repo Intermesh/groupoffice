@@ -116,7 +116,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	protected function getPath(){
 		
 		if(!empty($this->package)) {
-			if($this->package == "core") {
+			if($this->package == "core" && $this->name == "core") {
 				return \GO::config()->root_path . 'go/core/';
 			} else
 			{

@@ -3,18 +3,34 @@
 namespace go\core;
 
 use Exception;
+use go\core\cache\None;
 use go\core\fs\File;
 use go\core\jmap\Request;
 use go\core\model\Module;
 
 class Language {
-
 	/**
 	 *
 	 * @var string eg "en-US".
 	 */
 	private $isoCode;
 	private $data = [];
+
+	/**
+	 * Replace {product_name} with Group-Office or $config['product_name']
+	 *
+	 * Exporting language disables this.
+	 *
+	 * @var bool
+	 */
+	private $replaceProductName = true;
+
+
+	public function initExport() {
+		$this->replaceProductName = false;
+		$this->data = [];
+		go()->setCache(new None());
+	}
 
 
 	
@@ -29,7 +45,14 @@ class Language {
 		}
 		return $this->isoCode;
 	}
-	
+
+	/**
+	 * Set new language
+	 *
+	 * @param string|null $isoCode when not given it's detected from the browser
+	 * @return string|false Old language setting
+	 * @throws Exception
+	 */
 	public function setLanguage($isoCode = null) {
 		$old = $this->getIsoCode();
 		if(!isset($isoCode)) {
@@ -37,7 +60,8 @@ class Language {
 		}
 		
 		if(!$this->hasLanguage($isoCode)) {
-			throw new \Exception("Invalid language given ".$isoCode);
+			go()->debug("Invalid language given ".$isoCode);
+			return false;
 		}
 		
 		if($isoCode != $this->isoCode) {
@@ -127,7 +151,7 @@ class Language {
 			$cacheKey = $isoCode .'-'.$package.'-'.$module;
 
 			$this->data[$package][$module] = go()->getCache()->get($cacheKey);
-			if($this->data[$package][$module]) {
+			if($this->data[$package][$module] !== null) {
 				return;
 			}
 			
@@ -153,8 +177,6 @@ class Language {
 			if ($file->exists()) {
 				$langData->mergeRecursive($this->loadFile($file));
 			}
-			
-			$productName = go()->getConfig()['core']['branding']['name'];
 
 			foreach ($langData as $key => $translation) {
 				
@@ -166,13 +188,13 @@ class Language {
 				$langData[$key]  = $this->replaceBrand($langData[$key]);
 			}
 
-			$this->data[$package][$module] = $langData->getArray();	
-			go()->getCache()->set($cacheKey, $this->data[$package][$module]);		
+			$this->data[$package][$module] = $langData->getArray();
+			go()->getCache()->set($cacheKey, $this->data[$package][$module]);
 		}
 	}
 
 	private function replaceBrand($str) {
-		$productName = go()->getConfig()['core']['branding']['name'];
+		$productName = $this->replaceProductName ? go()->getConfig()['core']['branding']['name'] : "{product_name}";
 		return str_replace(
 			[
 				"{product_name}",
@@ -253,7 +275,7 @@ class Language {
 	 */
 	public function getLanguages() {
 		$languages = go()->getCache()->get('languages');
-		if($languages) {
+		if($languages !== null) {
 			return $languages;
 		}
 

@@ -11,6 +11,8 @@ if (isset($args['c'])) {
 	define("GO_CONFIG_FILE", $args['c']);
 }
 
+
+
 require_once($root.'vendor/autoload.php');
 
 //Initialize new framework
@@ -18,6 +20,12 @@ use go\core\App;
 use go\core\jmap\State;
 
 App::get()->setAuthState(new State());
+
+if(!empty($args['debug'])) {
+	go()->getDebugger()->output = true;
+	go()->getDebugger()->enable(false);
+	GO::config()->debug = true;
+}
 
 
 

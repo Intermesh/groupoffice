@@ -11,6 +11,8 @@ use Exception;
 use GO;
 use GO\Base\Controller\AbstractController;
 use GO\Base\Db\PDO;
+use go\core\auth\TemporaryState;
+use go\modules\community\history\Module;
 use PDOException;
 use ReflectionClass;
 use go\core\util\ClassFinder;
@@ -332,20 +334,28 @@ class MaintenanceController extends AbstractController {
 			throw new \GO\Base\Exception\AccessDenied();
 		
 		GO::setIgnoreAclPermissions(true);
+		GO::session()->runAsRoot();
+
+		go()->setAuthState(new TemporaryState(1));
+
+		\go\core\jmap\Entity::$trackChanges = false;
+		Module::$enabled = false;
+		go()->getDebugger()->enabled = false;
 		
 		if(!$this->lockAction()) {
 			exit("Already running!");
 		}
 
-		\go\core\jmap\Entity::$trackChanges = false;
-		
 		if(!$this->isCli()){
 			echo '<pre>';
 		}
 		
 		if(!empty($params['reset'])) {
 			echo "Resetting cache!\n";
-			go()->getDbConnection()->query("truncate core_search");
+			go()->getDbConnection()->exec("set foreign_key_checks=0");
+			go()->getDbConnection()->exec("truncate core_search");
+			go()->getDbConnection()->exec("truncate core_search_word");
+			go()->getDbConnection()->exec("set foreign_key_checks=1");
 		}
 		
 		echo "Checking search cache\n\n";
@@ -411,6 +421,7 @@ class MaintenanceController extends AbstractController {
 		$this->lockAction();
 
 		\go\core\jmap\Entity::$trackChanges = false;
+		Module::$enabled = false;
 		
 		$response = array();
 		
@@ -427,14 +438,14 @@ class MaintenanceController extends AbstractController {
 			if($params['module']=='base'){
 				$this->_checkCoreModels();
 			}else {
-				if (empty($params['package']) && $params['package'] == 'legacy') {
+				if (empty($params['package']) || $params['package'] == 'legacy') {
 
 					$class = 'GO\\' . ucfirst($params['module']) . '\\' . ucfirst($params['module']) . 'Module';
-					$module = new $class;
+					$module = $class::get();
 					$module->checkDatabase($response);
 				} else {
 					$class = 'go\\modules\\' . $params['package'] . '\\' . $params['module'] . '\\Module';
-					$module = new $class;
+					$module = $class::get();
 					$module->checkDatabase($response);
 				}
 			}
@@ -476,6 +487,36 @@ class MaintenanceController extends AbstractController {
 		$classes=\GO::findClasses('model');
 		foreach($classes as $model){
 			if($model->isSubclassOf('GO\Base\Db\ActiveRecord') && !$model->isAbstract()){
+
+				$m = \GO::getModel($model->getName());
+
+				if($m->hasColumn('user_id')) {
+					//correct missing user_id values
+					$stmt = go()->getDbConnection()->updateIgnore(
+						$m->tableName(),
+						['user_id' => 1],
+						(new \go\core\orm\Query())
+							->where("user_id not in (select id from core_user)"));
+					$stmt->execute();
+					if($stmt->rowCount()) {
+						echo "Changed " . $stmt->rowCount() . " missing user id's into the admin user\n";
+					}
+				}
+
+				if($m->hasColumn('acl_id')) {
+					//correct missing user_id values
+					$stmt = go()->getDbConnection()->update(
+						$m->tableName(),
+						['acl_id' => 0],
+						(new \go\core\orm\Query())
+							->where("acl_id not in (select id from core_acl)"));
+
+					$stmt->execute();
+
+					if($stmt->rowCount()) {
+						echo "Set " . $stmt->rowCount() . " missing ACL id's to zero\n";
+					}
+				}
 		
 				echo "Processing ".$model->getName()."\n";
 				flush();

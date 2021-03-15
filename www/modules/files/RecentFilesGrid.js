@@ -1,4 +1,5 @@
-GO.files.RecentFilesGrid = Ext.extend(GO.grid.GridPanel,{	
+GO.files.RecentFilesGrid = Ext.extend(GO.grid.GridPanel,{
+	stateId: 'portlet-recent-files',
 	constructor : function(config){
 		
 		config=config||{};

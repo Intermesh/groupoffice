@@ -20,10 +20,10 @@ require('header.php');
 			require('gotest.php'); 
 			$ok = output_system_test();
 			?>
-			
+            <button class="primary right" name="submitButton" type="submit" <?php echo $ok ? "" : "disabled"; ?>><?= go()->t('Continue'); ?></button>
 		</fieldset>
 
-		<button name="submitButton" type="submit" <?php echo $ok ? "" : "disabled"; ?>><?= go()->t('Continue'); ?></button>
+
 	</form>
 
 </section>

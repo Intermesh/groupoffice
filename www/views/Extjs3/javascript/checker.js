@@ -49,9 +49,10 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			id:'dismiss',
 			qtip: t('Dismiss all'),
 			handler: function() {
-				if(confirm(t('Are you sure you want to dismiss all reminder?'))) {
+				if(confirm(t('Are you sure you want to dismiss all reminders?'))) {
 					this.doTask("dismiss_reminders", 0, this.reminderStore.data.keys);
 					this.reminders.removeAll();
+					go.Notifier.removeAll();
 				}
 			},
 			scope:this
@@ -93,7 +94,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					title: record.data.name,
 					iconCls: 'entity '+ico,
 					items: [
-						{xtype:'box',html:'<b>'+record.data.description+'</b><span>'+record.data.local_time+'</span>'}
+						{xtype:'box',html:'<b>'+record.data.text+'</b><span style="float:right">'+record.data.local_time+'</span>'}
 						//{html:record.data.description}
 					],
 					listeners: {
@@ -160,7 +161,9 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 				GO.checker.lastCount = this.reminderStore.getCount();
 
 				if(!GO.checker.lastCount){
-					go.Notifier.hideNotifications();
+					if(!go.Notifier.hasMessages()) {
+						go.Notifier.hideNotifications();
+					}
 					go.Notifier.toggleIcon('reminder', false);
 				}
 

@@ -278,10 +278,15 @@ abstract class Property extends Model {
 					$this->{$relation->name} = $prop;					
 				break;
 
-				case Relation::TYPE_SCALAR:					
-					$stmt =$this->queryScalar($where, $relation);
-					$scalar = $stmt->fetchAll();
-					$stmt->closeCursor();
+				case Relation::TYPE_SCALAR:
+
+					if($this->isNew()) {
+						$scalar = [];
+					} else {
+						$stmt = $this->queryScalar($where, $relation);
+						$scalar = $stmt->fetchAll();
+						$stmt->closeCursor();
+					}
 					$this->{$relation->name} = $scalar;
 				break;
 			}
@@ -403,24 +408,44 @@ abstract class Property extends Model {
 		return implode('-', $id);
 	}
 
+	/**
+	 * Get all properties to check when saving and using isModified()
+	 *
+	 * By default all non-static public and protected properties + dynamically mapped properties.
+	 *
+	 * @return array
+	 * @throws Exception
+	 */
+	private function watchProperties() {
+
+		$cacheKey = 'watch-props-' . static::class;
+
+		$ret = App::get()->getCache()->get($cacheKey);
+		if ($ret !== null) {
+			return $ret;
+		}
+
+		$p = array_keys(static::getMapping()->getProperties());
+
+		$reflectionObject = new ReflectionClass(static::class);
+		$props = $reflectionObject->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED);
+		foreach ($props as $prop) {
+			if (!$prop->isStatic()) {
+				$p[] = $prop->getName();
+			}
+		}
+
+		App::get()->getCache()->set($cacheKey, $p);
+
+		return array_unique($p);
+	}
+
   /**
    * Copies all properties so isModified() can detect changes.
    * @throws Exception
    */
 	private function trackModifications() {
-		//Watch db cols and relations
-
-		$watch = array_keys($this->getMapping()->getProperties());
-
-		$watch = array_filter($watch, function($p) {
-			return in_array($p, $this->fetchProperties);
-		});
-
-		//watch other props
-		$watch = array_merge($watch, static::getRequiredProperties());
-		$watch = array_unique($watch);
-
-		foreach ($watch as $propName) {
+		foreach ($this->watchProperties() as $propName) {
 			$v = $this->$propName;
 			$this->oldProps[$propName] = is_object($v) ? clone $v : $v;
 		}
@@ -475,7 +500,7 @@ abstract class Property extends Model {
 		$cacheKey = 'mapping-' . $cls;
 		
 		self::$mapping[$cls] = go()->getCache()->get($cacheKey);
-		if(!self::$mapping[$cls]) {			
+		if(self::$mapping[$cls] === null) {
 			self::$mapping[$cls] = static::defineMapping();			
 			if(!static::fireEvent(self::EVENT_MAPPING, self::$mapping[$cls])) {
 				throw new Exception("Mapping event failed!");
@@ -544,9 +569,9 @@ abstract class Property extends Model {
 		$prop = static::getMapping()->getProperty($name);
 		if($prop) {
 			if(!isset($this->dynamicProperties[$name])) {
-				if($prop instanceof Relation && !in_array($name, $this->fetchProperties)) {
-					throw new Exception("Relation '$name' was not fetched so can't be accessed");
-				}
+//				if($prop instanceof Relation && !in_array($name, $this->fetchProperties)) {
+//					throw new Exception("Relation '$name' was not fetched so can't be accessed");
+//				}
 				$this->dynamicProperties[$name] = null;
 			}
 			return $this->dynamicProperties[$name];
@@ -642,10 +667,8 @@ abstract class Property extends Model {
 		
 		$props = go()->getCache()->get($cacheKey);
 		
-		if(!$props) {
-			$props = array_filter(static::getReadableProperties(), function($propName) {
-				return !in_array($propName, static::atypicalApiProperties());
-			});
+		if($props === null) {
+			$props = array_diff(static::getReadableProperties(), static::atypicalApiProperties());
 
 			go()->getCache()->set($cacheKey, $props);
 		}
@@ -811,11 +834,13 @@ abstract class Property extends Model {
 
   /**
    *
+   * It's not possible to use fetchproperties to determine if they need to be joined. Because the props
+   * can also be used in the where or order by part of the query.
+   *
    * @param array $tables
    * @param Query $query
    *
    * @throws Exception
-   * @todo implement fetch properties
    */
 	private static function joinAdditionalTables(array $tables, Query $query) {
 		$first = array_shift($tables);
@@ -903,11 +928,20 @@ abstract class Property extends Model {
 		if(!is_array($properties)) {
 			$properties = [$properties];
 		}
+
+		if(empty($properties)) {
+			$properties = array_keys($this->oldProps);
+		} else{
+
+			//only check fetched properties
+			$properties = array_intersect($properties, $this->fetchProperties);
+		}
+
 		$modified = [];
-		foreach ($this->oldProps as $key => $oldValue) {		
-			if (!empty($properties) && !in_array($key, $properties)) {
-				continue;
-			}
+
+		foreach($properties as $key) {
+
+			$oldValue = $this->oldProps[$key] ?? null;
 			
 			$newValue = $this->{$key};
 			
@@ -1071,7 +1105,7 @@ abstract class Property extends Model {
 
 		$cols = go()->getCache()->get($cacheKey);
 
-		if($cols) {
+		if($cols !== null) {
 			return $cols;
 		}
 		
@@ -1224,11 +1258,13 @@ abstract class Property extends Model {
 	private function saveRelatedHasOne(Relation $relation) {
 		
 		//remove old model if it's replaced
-		$modified = $this->getModified([$relation->name]);
-		if (isset($modified[$relation->name][1])) {
-			if (!$modified[$relation->name][1]->internalDelete((new Query)->where($modified[$relation->name][1]->primaryKeyValues()))) {
-				$this->relatedValidationErrors = $modified[$relation->name][1]->getValidationErrors();
-				return false;
+		if(!$this->isNew()) {
+			$modified = $this->getModified([$relation->name]);
+			if (isset($modified[$relation->name][1])) {
+				if (!$modified[$relation->name][1]->internalDelete((new Query)->where($modified[$relation->name][1]->primaryKeyValues()))) {
+					$this->relatedValidationErrors = $modified[$relation->name][1]->getValidationErrors();
+					return false;
+				}
 			}
 		}
 
@@ -1411,9 +1447,9 @@ abstract class Property extends Model {
 		$insertIds = array_diff($new, $old);
 
 		if(!empty($insertIds)) {
-			$data = array_map(function($v) use($key, $where) {
+			$data = array_values(array_map(function($v) use($key, $where) {
 				return array_merge($where, [$key => $v]);
-			}, $insertIds);	
+			}, $insertIds));
 
 			if(!go()->getDbConnection()->insert($relation->tableName, $data)->execute()) {
 				throw new Exception("Could not insert scalar relation ids");
@@ -1440,8 +1476,10 @@ abstract class Property extends Model {
 		//copy for overloaded properties because __get can't return by reference because we also return null sometimes.
 		$models = $this->{$relation->name} ?? [];		
 		$this->relatedValidationErrorIndex = 0;
-		
-		$this->removeRelated($relation, $models, $modified[$relation->name][1]);		
+
+		if(!$this->isNew()) {
+			$this->removeRelated($relation, $models, $modified[$relation->name][1]);
+		}
 		
 		$this->{$relation->name} = [];
 		foreach ($models as $newProp) {
@@ -1904,7 +1942,7 @@ abstract class Property extends Model {
 
 		if (!empty($column->length)){				
 			if(StringUtil::length($value) > $column->length) {
-				$this->setValidationError($column->name, ErrorCode::MALFORMED, 'Length can\'t be greater than ' . $column->length);
+				$this->setValidationError($column->name, ErrorCode::MALFORMED, 'Length can\'t be greater than ' . $column->length . '. Value given: ' . $value);
 				return false;
 			}
 		}
@@ -1916,7 +1954,7 @@ abstract class Property extends Model {
    * @return bool
    */
 	private function tableIsModified(MappedTable $table) {
-		return $this->isModified(array_keys($table->getColumns()));
+		return $this->isModified(array_keys($table->getMappedColumns()));
 	}
 
   /**

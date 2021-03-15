@@ -234,7 +234,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	private static function getCache() {
 		$cache = go()->getCache()->get('entity-types');
 
-		if(!$cache) {
+		if($cache === null) {
 			$cache= [
 				'id' => [],
 				'name' => [],
@@ -345,7 +345,11 @@ class EntityType implements \go\core\data\ArrayableInterface {
    * @return bool
    * @throws Exception
    */
-	public function changes($changedEntities) {		
+	public function changes($changedEntities) {
+
+		if(!jmap\Entity::$trackChanges) {
+			return true;
+		}
 		
 		go()->getDbConnection()->beginTransaction();
 		
@@ -406,6 +410,9 @@ class EntityType implements \go\core\data\ArrayableInterface {
    * @throws Exception
    */
 	public function change(jmap\Entity $entity, $isDeleted = false) {
+		if(!jmap\Entity::$trackChanges) {
+			return true;
+		}
 		$this->highestModSeq = $this->nextModSeq();
 
 		$record = [
@@ -484,9 +491,9 @@ class EntityType implements \go\core\data\ArrayableInterface {
    */
 	public function nextModSeq() {
 		
-		if($this->modSeqIncremented) {
-			return $this->highestModSeq;
-		}
+//		if($this->modSeqIncremented) {
+//			return $this->highestModSeq;
+//		}
 		/*
 		 * START TRANSACTION
 		 * SELECT counter_field FROM child_codes FOR UPDATE;
@@ -508,7 +515,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 										\go\core\orm\Query::normalize(["id" => $this->id])->tableAlias('entity')
 						)->execute(); //mod seq is a global integer that is incremented on any entity update
 	
-		$this->modSeqIncremented = true;
+		//$this->modSeqIncremented = true;
 		
 		$this->highestModSeq = $modSeq;
 		

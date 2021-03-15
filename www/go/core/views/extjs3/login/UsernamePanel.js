@@ -2,6 +2,7 @@
 
 go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 
+	layout: "fit",
 	initComponent: function () {
 
 
@@ -46,19 +47,15 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 		];
 
 
-		if (GO.authenticationDomains.length) {
-			this.domainCombo = new go.login.DomainCombo({			
-				itemCls: "go-login-domain",
-				value: localStorage.getItem("authentication-domain") || GO.authenticationDomainDefault				
-			});
-			
-			items.splice(0, 0, this.domainCombo);
-		}
-
 		//nested panel is required so that submit button is inside form. 
 		//Otherwise firefox won't prompt to save password and all browsers won't handle "enter" to submit
 		var panel = new Ext.Panel({
 			id: 'usernameCheck',
+			layout: "vbox",
+			layoutConfig: {
+				align: "stretch",
+				pack: "center"
+			},
 			bbar: [
 				this.forgotBtn = new Ext.Button({
 					cls: "go-login-forgot-username",
@@ -75,7 +72,8 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 					cls: "primary"
 				})
 			],
-			items: [{
+			items: [
+				{
 					xtype: "fieldset",
 					items: items
 				}
@@ -83,7 +81,6 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 		});
 
 		this.items = [panel];
-		this.layout = "fit";
 
 		go.login.UsernamePanel.superclass.initComponent.call(this);
 	},
@@ -125,13 +122,7 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 		this.submitting = true;
 		this.getEl().mask();
 		
-		var username = this.usernameField.getValue(), domain = this.domainCombo ? this.domainCombo.getValue() : "";
-		
-		if(domain) {
-			username += '@' + domain;
-		}
-		
-		localStorage.setItem("authentication-domain", domain);
+		var username = this.usernameField.getValue();
 
 		go.AuthenticationManager.getAvailableMethods(username, this.passwordField.getValue(), function (authMan, success, result) {
 			this.getEl().unmask();

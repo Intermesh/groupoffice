@@ -1,11 +1,13 @@
 go.Notifier = {
 
-	messageCt: Ext.DomHelper.insertFirst(document.body, {id: 'message-ct'}, true),
+	messageCt: null,
 	showStatusBar: false,
 	notificationArea: null,
 	init: function(notificationArea) {
 
 		var me = this;
+
+		this.messageCt = Ext.DomHelper.insertFirst(document.body, {id: 'message-ct'}, true);
 
 		this.notificationArea = notificationArea;
 
@@ -102,20 +104,15 @@ go.Notifier = {
 			},
 			hidden: msg.persistent
 		}];
-		if(key) {
-			msg.itemId = key;
+		if(!key) {
+			key = 'notify-' + Ext.id();
 		}
-
-		//makes it fly out
-		// msg.renderTo = this.messageCt;
+		msg.itemId = key;
 
 		var msgPanel = new Ext.Panel(msg);
 
-
 		this.notifications.add(msgPanel);
 		this.notifications.doLayout();
-
-
 
 		if(msg.removeAfter) {
 			setTimeout(function () {
@@ -155,11 +152,32 @@ go.Notifier = {
 	},
 
 	showNotifications : function() {
+
+		//added here to make sure it comes last
+		if(!this.notificationArea.tools['close']) {
+			this.notificationArea.addTool({
+				id: "close",
+				tooltip: t("Close"),
+				handler: function () {
+					go.Notifier.hideNotifications();
+				}
+			});
+		}
+
 		this.notificationArea.ownerCt.getLayout()['east'].slideOut();
+		this.notificationArea.doLayout(true);
+	},
+
+	hasMessages: function() {
+		for(var id in this._messages) {
+			return true;
+		}
+		return false;
 	},
 
 	hideNotifications : function() {
 		this.notificationArea.ownerCt.getLayout()['east'].slideIn();
+		// this.notificationArea.doLayout();
 	},
 	/**
 	 * For (less obstructive) popup messages from the bottom
@@ -169,19 +187,17 @@ go.Notifier = {
 		// not implemented: discuss first
 	},
 	remove: function(msg) {
-		if(msg.destroying || msg.isDestroyed) {
-			return;
-		}
 		if(msg.itemId) {
 			delete this._messages[msg.itemId];
 		}
-		msg.destroying = true;
-		if(!msg.el) {
-			msg.destroy();
-		} else {
-			msg.el.animate({opacity: {to: 0}}, 0.2, function () {
-				msg.destroy();
-			});
+		msg.destroy();
+	},
+
+	removeAll : function() {
+		for(var id in this._messages) {
+			if(!this._messages[id].persistent) {
+				this.remove(this._messages[id]);
+			}
 		}
 	},
 	/**
@@ -235,6 +251,9 @@ go.Notifier = {
 	 * @returns The created Ext.Panel
 	 */
 	flyout: function(msg) {
+		if(!this.messageCt) {
+			this.messageCt = Ext.DomHelper.insertFirst(document.body, {id: 'message-ct'}, true);
+		}
 		msg.renderTo = this.messageCt;
 		msg.html = msg.description || msg.html; // backward compat
 		var msgCtr = new Ext.Panel(msg);

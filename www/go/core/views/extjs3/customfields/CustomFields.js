@@ -6,7 +6,7 @@
 		fieldSets: null,
 		fields: null,
 		
-		//init is called in GO.MainLayout.onAuthneticatiojn so custom fields are 
+		//init is called in GO.MainLayout.onAuthentication so custom fields are
 		//always available when modules render.
 		init : function(cb, scope) {
 			

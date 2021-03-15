@@ -34,6 +34,7 @@ function errorHander($e) {
 
 			echo "DEBUGGER: Showing error message because debug is enabled. Normally we would have redirected to install. I you're doing a freah install and your database is empty then you can safely ignore this.:<br /><br />";
 			echo $msg;
+			echo "<pre>" . $e->getTraceAsString() . "</pre>";
 			echo '<br /><br /><a href="install">Click here to launch the installer</a>';
 			exit();
 		}
@@ -63,11 +64,20 @@ try {
 		$token = Token::find()->where('accessToken', '=', $_POST['accessToken'])->single();
 		if($token) {
 			$token->setAuthenticated();
-			setcookie('accessToken', $token->accessToken, null, "/", Request::get()->getHost(), false, false);
+
+			Response::get()->setCookie('accessToken', $token->accessToken, [
+				"path" => "/",
+				"samesite" => "Lax",
+				"domain" => Request::get()->getHost()
+			]);
+
 		} else
 		{
 			unset($_POST['accessToken']);
 		}
+
+
+
 		date_default_timezone_set($old);
 	}
 
