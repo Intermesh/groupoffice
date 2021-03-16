@@ -5,6 +5,8 @@ namespace go\core\auth;
 use go\core\App;
 use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
+use go\core\exception\Unavaiable;
+use go\core\exception\Unavailable;
 use go\core\jmap\State;
 use go\core\model\AuthAllowGroup;
 use go\core\model\Token;
@@ -169,7 +171,7 @@ class Authenticate {
 		}
 
 		if(go()->getSettings()->maintenanceMode && !$user->isAdmin()) {
-			throw new Forbidden(go()->t("You're account has been disabled."));
+			throw new Unavailable(go()->t("Service unavailable. Maintenance mode is enabled."));
 		}
 
 		go()->getCache()->set($cacheKey, [$user, $authenticator], true, self::CACHE_PASSWORD_LOGIN);
