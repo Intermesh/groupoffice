@@ -122,6 +122,11 @@ try {
 				output(["error" => "Invalid token given"], 400, "Invalid token given");
 			}
 
+			//for backwards compatibility. Assistant uses this.
+			if(!isset($data['authenticators']) && isset($data['methods'])) {
+				$data['authenticators'] = $data['methods'];
+			}
+
 			$testedAuthenticators = $token->validateSecondaryAuthenticators($data['authenticators'] ?? []);
 
 			$authenticators = array_map(function($o) {
