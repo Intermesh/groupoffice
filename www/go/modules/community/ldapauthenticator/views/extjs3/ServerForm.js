@@ -143,7 +143,17 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						hideLabel: true,
 						name: 'loginWithEmail',
 						boxLabel: t("Login with e-mail address")						
-					},{
+					},
+					{
+						xtype: 'textarea',
+						grow: true,
+						name: 'syncUsersQuery',
+						fieldLabel: t("User query"),
+						required: true,
+						value: "(objectClass=InetOrgPerson)",
+						hint: t("For Microsoft ActiveDirectory use '(objectCategory=InetOrgPerson)'")
+					},
+					{
 						xtype: 'textfield',
 						name: 'peopleDN',
 						fieldLabel: "peopleDN",
@@ -154,7 +164,7 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						xtype: 'textfield',
 						name: 'groupsDN',
 						fieldLabel: "groupsDN",
-						value: "ou=groups,dc=example,dc=com",
+						value: "ou=people,dc=example,dc=com",
 						hint: t("For Microsoft ActiveDirectory it's typically 'cn=Groups,dc=example,dc=com'."),
 						required: true
 					},this.createEmailCheckbox = new Ext.form.Checkbox({
@@ -314,14 +324,6 @@ go.modules.community.ldapauthenticator.ServerForm = Ext.extend(go.form.Dialog, {
 						hideLabel: true,
 						boxLabel: t('Synchronize users'),
 						name: 'syncUsers'
-					},{
-						xtype: 'textarea',
-						grow: true,
-						name: 'syncUsersQuery',
-						fieldLabel: t("User query"),
-						required: true,
-						value: "(objectClass=InetOrgPerson)",
-						hint: t("For Microsoft ActiveDirectory use '(objectCategory=InetOrgPerson)'")
 					},  {
 						xtype: 'checkbox',
 						checked: false,

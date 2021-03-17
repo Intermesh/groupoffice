@@ -178,13 +178,14 @@ abstract class Settings extends Model {
 		
 		return $props;
 	}
+
+	protected function isModified($name) {
+		return !array_key_exists($name, $this->oldData) && isset($this->$name) || $this->$name != $this->oldData[$name];
+	}
 	
 	public function save() {
 
-		$new = (array) $this;
-		
 		foreach($this->getSettingProperties() as $name => $value) {
-			
 			if(!array_key_exists($name, $this->oldData) || $value != $this->oldData[$name]) {
 				if(in_array($name, $this->readOnlyKeys)) {
 					throw new Forbidden(static::class . ':' . $name . " can't be changed because it's defined in the configuration file on the server.");

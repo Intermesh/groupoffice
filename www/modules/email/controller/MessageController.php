@@ -1654,6 +1654,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 					->criteria(GO\Base\Db\FindCriteria::newInstance()->addCondition('account_id' , $imapMessage->account->id))
 			)->fetchAll(\PDO::FETCH_COLUMN, 0);
 
+			// for case insensitive match
+			$aliases = array_map('strtolower', $aliases);
+
 			$emailFound = false;
 			if(isset($vevent->attendee)) {
 				foreach ($vevent->attendee as $vattendee) {

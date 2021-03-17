@@ -33,8 +33,6 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 			}		
 		});
 		
-		
-		
 		go.login.LoginDialog.superclass.initComponent.call(this);
 
 		this.on('render', function() {

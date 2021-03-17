@@ -203,7 +203,7 @@ go.AuthenticationManager = (function () {
 
 			var me = this;
 
-			return go.User.loadSession(result).then(function() {
+			return go.User.onLoad(result).then(function() {
 				me.fireEvent("authenticated", me, result);
 
 				if(go.User.theme != GO.settings.config.theme) {
