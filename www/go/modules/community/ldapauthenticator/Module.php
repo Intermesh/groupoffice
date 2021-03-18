@@ -176,6 +176,8 @@ class Module extends core\Module implements DomainProvider {
 				}
 
 				$values['organizationIds'] = [$org->id];
+			} else{
+				$values['organizationIds'] = [];
 			}
 
 			//strip out unsupported properies.
