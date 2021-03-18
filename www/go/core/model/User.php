@@ -861,7 +861,7 @@ class User extends Entity {
 	private $contact;
 	
 	public function getProfile() {
-		if(!Module::findByName('community', 'addressbook')) {
+		if(!Module::isInstalled('community', 'addressbook')) {
 			return null;
 		}
 		
@@ -875,7 +875,7 @@ class User extends Entity {
 	}
 	
 	public function setProfile($values) {
-		if(!Module::findByName('community', 'addressbook')) {
+		if(!Module::isInstalled('community', 'addressbook')) {
 			throw new Exception("Can't set profile without address book module.");
 		}
 		
