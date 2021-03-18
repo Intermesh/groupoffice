@@ -50,10 +50,10 @@ class TasksModule extends \GO\Base\Module {
 	public static function onUserBeforeSave(User $user)
 	{
 		if (!$user->isNew() && $user->isModified('displayName')) {
-			$nb = TaskList::model()->findByPk($user->taskSettings->default_tasklist_id);
+			$nb = TaskList::model()->findByPk($user->taskSettings->default_tasklist_id, false, true);
 			if ($nb) {
 				$nb->name = $user->displayName;
-				$nb->save();
+				$nb->save(true);
 			}
 		}
 	}
