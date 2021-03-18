@@ -327,6 +327,8 @@ class Builder {
 	        if (is_dir($this->sourceDir . '/business/' . $moduleName . '/install')) {
                 run('cp -r ' . $this->sourceDir . '/business/' . $moduleName . '/install/* ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/install/');
             }
+
+	        run ('cp ' . $moduleFile .' ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/');
         }
 
         run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/.git*');
