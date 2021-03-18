@@ -120,9 +120,9 @@ class Module extends core\Module implements DomainProvider {
 		if(isset($values['recoveryEmail'])) $user->recoveryEmail = $values['recoveryEmail'];
 		if(isset($values['enabled'])) $user->enabled = $values['enabled'];
 		if(isset($values['email'])) $user->email = $values['email'];
-		if(isset($values['displayName'])) $user->displayName = $values['displayName'];
+		if(isset($values['displayName'])) $user->displayName = $values['name'] = $values['displayName'];
 
-		if(\go\core\model\Module::findByName('community', 'addressbook')) {
+		if(\go\core\model\Module::isInstalled('community', 'addressbook')) {
 
 			$phoneNbs = [];
 			if(isset($values['homePhone'])){
