@@ -159,7 +159,7 @@ class Module extends core\Module implements DomainProvider {
 				$values['addresses'] = [$addrAttrs];
 			}
 
-			if(isset($values['organization'])) {
+			if(!empty($values['organization'])) {
 
 				$org = Contact::find(['id'])->where([
 					'name' => $values['organization'],
