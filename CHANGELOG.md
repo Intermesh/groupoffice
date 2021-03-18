@@ -24,6 +24,8 @@ end 6.5
 --------
 
 
+18-03-2021 6.4.229
+- Core: Business Module.php files were encoded. This stopped Group-Office from running without Ioncube.
 - Core: Prevent multiple chips options to be displayed multiple times
 - Core: Multiselect option store will self-destruct
 - Projects2: prevent filling contact and customer ids from previous projects
