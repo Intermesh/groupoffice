@@ -128,7 +128,7 @@ class CalendarModule extends \GO\Base\Module{
 		if (!$user->isNew() && $user->isModified('displayName')) {
 			$cal = self::getDefaultCalendar($user->id);
 			$cal->name = $user->displayName;
-			$cal->save();
+			$cal->save(true);
 		}
 	}
 }
