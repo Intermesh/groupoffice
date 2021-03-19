@@ -1,4 +1,5 @@
 - Email: SMIME decrypted content in reply too when plaintext is enabled
+- Core: List navigation after delete could move in wrong direction
 
 18-03-2021 6.4.229
 - Core: Business Module.php files were encoded. This stopped Group-Office from running without Ioncube.

@@ -300,6 +300,14 @@ go.grid.GridTrait = {
 			this.moveDirection == 'up' ? this.getSelectionModel().selectFirstRow() : this.getSelectionModel().selectLastRow();
 		}
 
+		//make sure moveDirections stays the same after delete
+		if(this.moveDirection == 'up') {
+			this.lastSelectedIndex = this.currentSelectedIndex + 1;
+		} else
+		{
+			this.lastSelectedIndex = this.currentSelectedIndex - 1;
+		}
+
 		var record = this.getSelectionModel().getSelected();
 
 		if(record) {
