@@ -3522,12 +3522,15 @@ abstract class ActiveRecord extends \GO\Base\Model{
 					GO::debug("Fixing linked e-mail acl's because relation ".$arr[0]." changed.");
 
 					$stmt = \GO\Savemailas\Model\LinkedEmail::model()->findLinks($this);
-					while($linkedEmail = $stmt->fetch()){
+					if($stmt->rowCount()) {
+						$aclId = $this->findAclId();
+						while ($linkedEmail = $stmt->fetch()) {
 
-						GO::debug("Updating ".$linkedEmail->subject);
+							GO::debug("Updating " . $linkedEmail->subject);
 
-						$linkedEmail->acl_id=$this->findAclId();
-						$linkedEmail->save();
+							$linkedEmail->acl_id = $aclId;
+							$linkedEmail->save();
+						}
 					}
 				}
 			}
@@ -4771,7 +4774,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 *
 	 * selects all contacts linked to the $noteModel
 	 *
-	 * @param ActiveRecord $model
+	 * @param ActiveRecord|Entity $model
 	 * @param FindParams $findParams
 	 * @return ActiveStatement
 	 */
@@ -4783,9 +4786,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$joinCriteria = FindCriteria::newInstance()
 						->addCondition('fromId', $model->id,'=','l')
-						->addCondition('fromEntityTypeId', $model->modelTypeId(),'=','l')
+						->addCondition('fromEntityTypeId', $model->entityType()->getId(),'=','l')
 						->addRawCondition("t.id", "l.toId")
-						->addCondition('toEntityTypeId', $this->modelTypeId(),'=','l');
+						->addCondition('toEntityTypeId', $this->entityType()->getId(),'=','l');
 
 		$findParams->join("core_link", $joinCriteria, 'l');
 
