@@ -296,6 +296,8 @@ class Module extends AclOwnerEntity {
 		
 		return $query->single() !== false;
 	}
+
+	private static $modulesByName = [];
 	
 	/**
 	 * Find a module by package and name
@@ -309,13 +311,23 @@ class Module extends AclOwnerEntity {
 		if($package == "legacy") {
 			$package = null;
 		}
+
+		$cache = $package."/". $name;
+		if(isset(self::$modulesByName[$cache])) {
+			return self::$modulesByName[$cache];
+		}
+
 		$query = static::find()->where(['package' => $package, 'name' => $name]);
 
 		if(isset($enabled)) {
 			$query->andWhere(['enabled' => $enabled]);
 		}
 
-		return $query->single();
+		$mod = $query->single();
+
+		self::$modulesByName[$cache] = $mod;
+
+		return $mod;
 	}
 
 	/**

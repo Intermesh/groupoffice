@@ -191,9 +191,9 @@ try {
 
 			break;
 	}
-}catch(Unavailable $e) {
+}catch(Forbidden $e) {
 	output([], 403, $e->getMessage());
-} catch (Forbidden $e) {
+} catch (Unavailable $e) {
 	output([], 503, $e->getMessage());
 } catch (Exception $e) {
 	ErrorHandler::logException($e);

@@ -3707,11 +3707,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$search->setAclId(!empty($attr['aclId']) ? $attr['aclId'] : $this->findAclId());
 		//$search->createdAt = \DateTime::createFromFormat("U", $this->mtime);		
 		//$search->setKeywords($this->getSearchCacheKeywords($this->localizedName.','.implode(',', $attr)));
-		
-		//todo cut lengths
-		
-
-
 
 		$keywords = $this->getSearchCacheKeywords($this->localizedName.','.implode(',', $attr));
 		$keywords = array_filter($keywords, function($word) {
@@ -3825,14 +3820,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		} else if(!empty($this->columns[$attributeName]['length']) && \GO\Base\Util\StringHelper::length($this->_attributes[$attributeName]) > $this->columns[$attributeName]['length']){
 			$this->_attributes[$attributeName]=\GO\Base\Util\StringHelper::substr($this->_attributes[$attributeName], 0, $this->columns[$attributeName]['length']);
 		}
-	}
-
-	public function getCachedSearchRecord(){
-		$model = \GO\Base\Model\SearchCacheRecord::model()->findByPk(array('model_id'=>$this->pk, 'model_type_id'=>$this->modelTypeId()));
-		if($model)
-			return $model;
-		else
-			return $this->cacheSearchRecord ();
 	}
 
 	/**

@@ -1206,9 +1206,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 			
 			$oldMessage = $message->toOutputArray(false,false,true);
-			
+
 			if(!empty($oldMessage['smime_encrypted'])) {
-				$oldMessage['plainbody'] = '***';
+				$response['sendParams']['encrypt_smime'] = true;
 			}
 			
 			$response['data']['plainbody'] .= "\n\n" . $replyText . "\n" . $this->_quoteText($oldMessage['plainbody']);

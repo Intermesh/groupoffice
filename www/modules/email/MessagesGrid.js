@@ -426,7 +426,7 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 	},
 	toggleUnread : function(item, pressed)
 	{
-		this.setIconClass(pressed ? 'ic-email' : 'ic-markunread-mailbox');
+		this.setIconClass(pressed ? 'ic-email' : 'ic-mark-as-unread');
 		this.setTooltip(pressed ? t("Show all", "email") : t("Show unread", "email"));
 		GO.email.messagesGrid.store.baseParams['unread']=pressed ? 1 : 0;
 
