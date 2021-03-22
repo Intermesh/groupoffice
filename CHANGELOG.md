@@ -1,3 +1,4 @@
+- Core: Make Account settings > Groups scrollable for non-admin users
 - Email: SMIME decrypted content in reply too when plaintext is enabled
 - Core: List navigation after delete could move in wrong direction
 
