@@ -134,7 +134,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 									forceSelection: true,
 									fieldLabel: t("Priority"),
 									mode: 'local',
-									value: 1,
+									value: 5,
 									valueField: 'value',
 									displayField: 'text',
 									store: new Ext.data.SimpleStore({

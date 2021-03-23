@@ -118,10 +118,10 @@ class Task extends AclItemEntity {
 	public $freeBusyStatus = 'free';
 
 	/** @var string public , private, secret */
-    public $privacy = 'public';
+	public $privacy = 'public';
 
-    public $replyTo;
-    public $participants;
+   public $replyTo;
+   public $participants;
 
 	/** @var int between 0 and 100 */
 	public $percentComplete = 0;
@@ -229,7 +229,25 @@ class Task extends AclItemEntity {
 	}
 
 	protected function internalSave() {
-		if(!empty($this->recurrenceRule) && $this->percentComplete == 100) {
+
+		if($this->isNew()) {
+		    $this->uid = \go\core\util\UUID::v4();
+      }
+
+		if($this->progress == Progress::Completed) {
+			$this->percentComplete = 100;
+		}
+		if($this->percentComplete == 100) {
+			$this->progress = Progress::Completed;
+		} else if($this->percentComplete > 0 && $this->progress == Progress::NeedsAction) {
+			$this->progress = Progress::InProcess;
+		}
+
+		if($this->isModified('progress')){
+			$this->progressUpdated = new DateTime();
+		}
+
+		if(!empty($this->recurrenceRule) && $this->progress == Progress::Completed) {
 			$next = $this->getNextRecurrence($this->getRecurrenceRule());
 			if($next) {
 				$this->createNewTask($next);
@@ -237,10 +255,6 @@ class Task extends AclItemEntity {
 				$this->recurrenceRule = null;
 			}
 		}
-
-		if($this->isNew()) {
-		    $this->uid = \go\core\util\UUID::v4();
-        }
 
 		// if alert can be based on start / due of task check those properties as well
 		if($this->isModified('alerts') ||
@@ -274,27 +288,30 @@ class Task extends AclItemEntity {
 		}
 	}
 
-	protected function createNewTask(\DateTime $next) {
-		$nextTask = new Task();
+	protected function createNewTask(\DateTimeInterface $next) {
+
 		$values = $this->toArray();
+		unset($values['id']);
+		unset($values['progress']);
+		unset($values['percentComplete']);
+		unset($values['progressUpdated']);
+		unset($values['freeBusyStatus']);
+
+		$nextTask = new Task();
 		$nextTask->setValues($values);
 		$rrule = $this->getRecurrenceRule();
 			
 		if(!empty($rrule->count)) {
 			$rrule->count--;
-			if($rrule->count > 0) {
-				$nextTask->setRecurrenceRule($rrule);
-			} else{
-				$nextTask->recurrenceRule = null;
-			}
+			$nextTask->setRecurrenceRule($rrule->count > 0 ? $rrule : null);
+		} else if($rrule->until) {
+			$nextTask->setRecurrenceRule($rrule->until > $next ? $rrule : null);
 		} else{
 			$nextTask->setRecurrenceRule($rrule);
 		}
 
-		$this->recurrenceRule = "";
-		
-		$nextTask->percentageComplete = 0;
-		$nextTask->id = NULL;
+		$this->recurrenceRule = null;
+
 		$diff = $this->start->diff($next);
 		$nextTask->start = $next;
 		$nextTask->due->add($diff);
@@ -308,13 +325,9 @@ class Task extends AclItemEntity {
 	 * @return \DateTime
 	 */
 	protected function getNextRecurrence($rrule){
-		$rule = Recurrence::fromArray($rrule, $this->start);
+		$rule = Recurrence::fromArray((array)$rrule, $this->start);
 		$rule->next();
 		return $rule->current();
-//		$rRuleIt = new \GO\Base\Util\Icalendar\RRuleIterator($this->parseToRRULE($rrule), $this->start);
-//		$rRuleIt->next();
-//		$nextTime = $rRuleIt->current();
-//		return $nextTime;
 	}
 
 	public static function sort(Query $query, array $sort)
@@ -323,7 +336,7 @@ class Task extends AclItemEntity {
 			$query->join('tasks_tasklist_group', 'listGroup', 'listGroup.id = task.groupId', 'LEFT');
 			$sort['listGroup.sortOrder'] = $sort['groupOrder'];
 			unset($sort['groupOrder']);
-		};
+		}
 
 		return parent::sort($query, $sort);
 	}

@@ -2356,3 +2356,13 @@ body.go-compact {
 		bottom: 0;
 	}
 }
+
+.go-progressbar{
+	height:dp(16);
+	border:1px solid color($fg,'line');
+	background-color:color($bg,'card');
+	> div { // indicator
+		background-color:$cPrimary;
+		height:100%;
+	}
+}

@@ -14,17 +14,17 @@ namespace go\modules\community\tasks\model;
  */
 abstract class Progress
 {
-    const NeedsAction = 'needs-action'; // Indicates the task needs action.
-    const InProcess = 'in-progress';    // Indicates the task is in process.
-    const Completed = 'completed';      // Indicates the task is completed.
-    const Failed = 'failed';            // Indicates the task failed.
-    const Cancelled = 'cancelled';      // Indicates the task was cancelled.
+    const NeedsAction = 1; // Indicates the task needs action.
+    const InProcess = 2;    // Indicates the task is in process.
+    const Completed = 3;      // Indicates the task is completed.
+    const Failed = 4;            // Indicates the task failed.
+    const Cancelled = 5;      // Indicates the task was cancelled.
 
 	static $db = [
-		1 => self::NeedsAction,
-		2 => self::InProcess,
-		3 => self::Completed,
-		4 => self::Failed,
-		5 => self::Cancelled
+		self::NeedsAction => 'needs-action',
+		self::InProcess => 'in-progress',
+		self::Completed => 'complete',
+		self::Failed => 'failed',
+		self::Cancelled => 'cancelled'
 	];
 }
