@@ -105,4 +105,13 @@ class Environment extends Singleton {
 		return dirname(dirname(__DIR__));
 	}
 
+	/**
+	 * Check if the Ioncube loader has been installed.
+	 *
+	 * @return bool
+	 */
+	public function hasIoncube() {
+		return extension_loaded('ionCube Loader');
+	}
+
 }

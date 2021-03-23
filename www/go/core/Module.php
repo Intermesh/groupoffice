@@ -10,6 +10,7 @@ use go\core\fs\Folder;
 use go\core\model;
 use go\core\jmap\Entity;
 use go\core\util\ClassFinder;
+use go\modules\business\license\model\License;
 use function GO;
 
 /**
@@ -93,28 +94,16 @@ abstract class Module extends Singleton {
 	 */
 	public function isLicensed() {
 		
-		$lic = $this->requiredLicense();
-		if(!isset($lic)) {
+		$license = $this->requiredLicense();
+		if(!isset($license)) {
 			return true;
 		}
 
-		$file = go()->getEnvironment()->getInstallFolder()->getFile('licensechecks/'.$lic. '.php');
-
-		//Check if file is encoded
-		$data = $file->getContents(0, 100);
-		if(strpos($data, '<?php //004fb') === false) {	
-			return true;
-		}
-
-		if(!extension_loaded('ionCube Loader')) {
+		if(!go()->getEnvironment()->hasIoncube()) {
 			return false;
 		}
 
-		if(!go()->getEnvironment()->getInstallFolder()->getFile($lic . '-' . substr(go()->getVersion(), 0, 3) .'-license.txt')->exists()) {
-			return false;
-		}
-
-		return require($file->getPath());
+		return License::has($license);
 		
 	}
 

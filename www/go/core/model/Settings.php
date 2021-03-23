@@ -450,7 +450,15 @@ class Settings extends core\Settings {
 	 * Default setting for users to have short date and times in lists.
 	 * @var boolean
 	 */
-	public $defaultShortDateInList = true;	
+	public $defaultShortDateInList = true;
+
+
+	/**
+	 * License for Group-Office
+	 *
+	 * @var string
+	 */
+	public $license = null;
 	
 	/**
 	 * New users will be member of these groups

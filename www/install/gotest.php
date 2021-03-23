@@ -548,34 +548,17 @@ function test_system(){
 
 		if($ioncubeWorks)
 		{
-			$bHasProfessionalLicense = \GO::scriptCanBeDecoded('Professional');
-
-			$test['name']='Professional license';
-			$test['showSuccessFeedback'] = false;
-	//		if(!file_exists(GO::config()->root_path.'groupoffice-pro-'.\GO::config()->getMajorVersion().'-license.txt')){
-	//			$test['feedback']='Warning: There\'s no license file "groupoffice-pro-'.\GO::config()->getMajorVersion().'-license.txt" in the root of Group-Office. The professional modules will not be enabled.';
-	//			$test['fatal']=false;
-	//			$test['pass']=false;
-	//		}else
-			$test['feedback']='';
-			$test['fatal']=false;
-			$test['pass'] = !$bHasProfessionalLicense;
-
 			$tests[]=$test;
 
-			if ($bHasProfessionalLicense) {
-				$moduleFolder = Environment::get()->getInstallFolder()->getFolder('go' . DIRECTORY_SEPARATOR . 'modules');
-				$test['name'] = 'Modules directory writable';
-				$test['showSuccessFeedback'] = false;
-				$test['fatal'] = false;
-				$test['pass'] = $moduleFolder->isWritable();
-				$test['feedback'] = 'Warning: Modules subdirectory is not writable. You will not be able to use GroupOffice Studio.';
-				$tests[] = $test;
-			}
+			$moduleFolder = Environment::get()->getInstallFolder()->getFolder('go' . DIRECTORY_SEPARATOR . 'modules');
+			$test['name'] = 'Modules directory writable';
+			$test['showSuccessFeedback'] = false;
+			$test['fatal'] = false;
+			$test['pass'] = $moduleFolder->isWritable();
+			$test['feedback'] = 'Warning: Modules subdirectory is not writable. You will not be able to use GroupOffice Studio.';
+			$tests[] = $test;
 
 		}
-
-
 
 		try {
 			if (GO\Base\Db\Utils::tableExists('core_module')) {
