@@ -148,12 +148,12 @@ class ClassFinder {
 		return $r;
 	}
 
-	private function canBeDecoded(File $file, $namespace) {
+	public static function canBeDecoded(File $file) {
 
 		if(go()->getEnvironment()->hasIoncube()) {
 			return true;
 		} else{
-			return !$this->fileIsEncoded($file);
+			return !static::fileIsEncoded($file);
 		}
 //		//check for pro license on business package
 //		if(!$this->fileIsEncoded($file) {
@@ -178,14 +178,13 @@ class ClassFinder {
 
 	}
 
-	private function fileIsEncoded(File $file) {
+	public static function fileIsEncoded(File $file) {
 		//Check if file is encoded
 		$data = $file->getContents(0, 20);
 		return strpos($data, '<?php //004fb') !== false;
 	}
 
-	private function folderToClassNames(Folder $folder, $namespace) {	
-
+	private function folderToClassNames(Folder $folder, $namespace) {
 		$classes = [];
 		foreach ($folder->getFiles() as $file) {
 
@@ -198,7 +197,7 @@ class ClassFinder {
 					continue;
 				}
 
-				if(!$this->canBeDecoded($file, $namespace)) {
+				if(!static::canBeDecoded($file)) {
 					continue;
 				}
 

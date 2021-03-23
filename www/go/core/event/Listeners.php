@@ -73,16 +73,12 @@ class Listeners extends Singleton {
 		EventEmitterTrait::$disableEvents = true;
 
 		foreach (Module::find()->where(['enabled' => true]) as $module) { /* @var $module Module */
-			
-			if(!isset($module->package)) {//backwards compatibility hack. Remove once refactored.
 
-				$file = \go\core\Environment::get()->getInstallFolder()->getPath() . '/modules/'.$module->name. '/' . ucfirst($module->name).'Module.php';
-				
-				if(!file_exists($file)) {
-					continue;
-				}
-				
-//				require_once($file);
+			if(!$module->isAvailable()) {
+				continue;
+			}
+
+			if(!isset($module->package)) {//backwards compatibility hack. Remove once refactored.
 				
 				$cls = "GO\\" . ucfirst($module->name) . "\\" . ucfirst($module->name).'Module';
 				if(!class_exists($cls)) {
@@ -94,10 +90,7 @@ class Listeners extends Singleton {
 				}
 				continue;
 			}
-			
-			if(!$module->isAvailable()) {
-				continue;
-			}						
+
 			$module->module()->defineListeners();
 		}
 

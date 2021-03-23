@@ -236,6 +236,9 @@ abstract class Module extends Singleton {
 		}
 		
 		$moduleModel = $this->getModel();
+		if(!$moduleModel) {
+			throw new Exception("Module not installed " . static::class);
+		}
 		foreach($entities as $entity) {
 			$type = $entity::entityType();
 			if(!$type) {

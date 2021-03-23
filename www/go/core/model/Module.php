@@ -45,6 +45,9 @@ class Module extends AclOwnerEntity {
 
 		if($this->isModified(['enabled']) || $this->isNew()) {
 
+			//set cache
+			self::$modulesByName[$this->package .'/'.$this->name] = $this;
+
 			if($this->enabled) {
 				if($this->checkDepencencies) {
 					core\Module::installDependencies($this->module());
@@ -155,9 +158,18 @@ class Module extends AclOwnerEntity {
 		return "\\go\\modules\\" . $this->package ."\\" . $this->name ."\\Module";
 	}
 
+	/**
+	 * Get the folder of the module
+	 *
+	 * @return core\fs\Folder
+	 */
 	public function folder() {
 		$root = go()->getEnvironment()->getInstallFolder();
-		return $root->getFolder("/go/modules/" . $this->package ."/" . $this->name ."/");
+		if(!isset($this->package)) {
+			return $root->getFolder("/modules/" . $this->name . "/");
+		} else {
+			return $root->getFolder("/go/modules/" . $this->package . "/" . $this->name . "/");
+		}
 	}	
 	
 	/**
@@ -167,8 +179,12 @@ class Module extends AclOwnerEntity {
 	 */
 	public function isAvailable() {
 		
-		
 		if(!isset($this->package)) {
+			$moduleFile = $this->folder()->getFile(ucfirst($this->name) . "Module.php");
+			if(!$moduleFile->exists() || !core\util\ClassFinder::canBeDecoded($moduleFile)) {
+				return false;
+			}
+
 			//if module has not been refactored yet package is not set. 
 			//handle this with old class
 			$cls = "GO\\" . ucfirst($this->name) . "\\" . ucfirst($this->name) .'Module';
@@ -177,15 +193,20 @@ class Module extends AclOwnerEntity {
 			}
 			
 			return (new $cls)->isAvailable();
+		}else {
+			if ($this->package == "core" && $this->name == "core") {
+				return true;
+			}
+
+			$moduleFile = $this->folder()->getFile("Module.php");
+			if(!$moduleFile->exists() || !core\util\ClassFinder::canBeDecoded($moduleFile)) {
+				return false;
+			}
+
+			//todo, how to handle licenses for future packages?
+			$cls = $this->getModuleClass();
+			return class_exists($cls) && $cls::get()->isLicensed();
 		}
-		
-		if($this->package == "core" && $this->name == "core") {
-			return true;
-		}
-		
-		//todo, how to handle licenses for future packages?
-		$cls = $this->getModuleClass();
-		return class_exists($cls) && $cls::get()->isLicensed();
 	}
 
 	/**
