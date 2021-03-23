@@ -48,7 +48,7 @@ class Builder
 
 	private $majorVersion = "6.5";
 
-	private $gitBranch = 'master';
+	private $gitBranch = 'license';
 
 	/**
 	 *
