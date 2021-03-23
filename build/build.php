@@ -258,7 +258,7 @@ class Builder
 
 			$moduleFile = $this->sourceDir . '/business/' . $moduleName . '/Module.php';
 
-			if (strpos(file_get_contents($moduleFile), "requiredLicense") === false) {
+			if (file_exists($moduleFile) && strpos(file_get_contents($moduleFile), "requiredLicense") === false) {
 				throw new Exception($moduleFile . " must contain a 'requiredLicense()' function override.");
 			}
 
