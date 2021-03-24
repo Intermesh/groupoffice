@@ -7,6 +7,8 @@ views/Extjs3/javascript/vendor/chartist-plugin-fill-donut.js
 views/Extjs3/javascript/vendor/chartist-plugin-accessibility.js
 views/Extjs3/javascript/vendor/promise-polyfill.js
 
+views/Extjs3/javascript/vendor/ckeditor4/ckeditor.js
+
 go/core/views/extjs3/namespaces.js
 go/core/views/extjs3/Translate.js
 

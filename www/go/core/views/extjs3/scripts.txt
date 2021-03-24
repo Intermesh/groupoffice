@@ -60,6 +60,7 @@ form/RecurrenceFieldset.js
 form/KeyValueEditorGrid.js
 form/DateRangeField.js
 form/SelectField.js
+form/CKEditor.js
 
 modules/ModulePanel.js
 
