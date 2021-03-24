@@ -2,7 +2,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 	initComponent: function () {
 		this.checkColumn = new GO.grid.CheckColumn({
 			id:'progress',
-			dataIndex: 'percentageComplete',
+			dataIndex: 'progress',
 			hideInExport:true,
 			header: '<i class="icon ic-check"></i>',
 			width: dp(56),
@@ -17,41 +17,22 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					disabledCls = ' x-item-disabled';
 
 				return String.format('<div class="x-grid3-check-col{0}' + disabledCls + '" {1}></div>',
-					v==100 ? '-on' : '',
+					(v=='completed' || v =='cancelled') ? '-on' : '',
 					record.json.color ? 'style="color:#'+record.json.color+'"' : '');
 			}
 		});
 
-		this.checkColumn.on('change', function(record, checked){
-			this.store.reload({
-				callback:function(){
-					var update = {}, id = record.data.id;
-					// task completed
-					if(checked) {
-						update[id] = {progress: 'completed'};
-						// check for another task
-						// go.Jmap.request({
-						// 	method: "community/task/Task/repeatTask",
-						// 	params: {
-						// 		id: id
-						// 	},
-						// 	callback: function(options, success, result) {
-						// 		// this.websiteTitle.setValue(result.title);
-						// 		// this.websiteDescription.setValue(result.description);
-						// 		// thumbExample.getEl().dom.style.backgroundImage = 'url(' + go.Jmap.downloadUrl(result.logo) + ')';
-						// 		// this.thumbField.setValue(result.logo);
-						// 		// this.el.unmask();								
-						// 	},
-						// 	scope: this
-						// });
-					} else {
-						update[id] = {progress: 'needs-action'};
-					}
+		this.checkColumn.on('change', function(record){
+			// this.store.reload({
+			// 	callback:function(){
 					// update task
-					go.Db.store("Task").set({update: update});
-				},
-				scope:this
+			var wasComplete = record.json.progress == 'completed' || record.json.progress == 'cancelled';
+			go.Db.store("Task").set({update: {
+				[record.data.id]: {progress: (!wasComplete ? 'completed' : 'needs-action')}}
 			});
+			// 	},
+			// 	scope:this
+			// });
 		}, this);
 
 		// without reload
@@ -109,13 +90,21 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 						return v;
 					}
 				},{
-					header: t('Responsible'),
+					xtype:"datecolumn",
+					id: 'start',
+					dateOnly: true,
+					header: t('Start at'),
 					width: dp(160),
 					sortable: true,
-					dataIndex: 'responsible',
-					renderer: function(v) {
-						return v ? go.util.avatar(v.displayName,v.avatarId)+' '+v.displayName : "-";
-					}
+					dataIndex: 'start'
+				},{
+					xtype:"datecolumn",
+					id: 'due',
+					dateOnly: true,
+					header: t('Due at'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'due',
 				},{
 					width:dp(112),
 					header: t("% complete", "tasks"),
@@ -124,21 +113,14 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 						return '<div class="go-progressbar"><div style="width:'+Math.ceil(value)+'%"></div></div>';
 					}
 				},{
-					xtype:"datecolumn",
-					id: 'start',
-					header: t('Start at'),
+					header: t('Responsible'),
 					width: dp(160),
 					sortable: true,
-					dataIndex: 'start'
+					dataIndex: 'responsible',
+					renderer: function(v) {
+						return v ? go.util.avatar(v.displayName,v.avatarId)+' '+v.displayName : "-";
+					}
 				},{
-					xtype:"datecolumn",
-					id: 'due',
-					header: t('Due at'),
-					width: dp(160),
-					sortable: true,
-					dataIndex: 'due',
-				},
-				{
 					xtype:"datecolumn",
 					id: 'createdAt',
 					header: t('Created at'),

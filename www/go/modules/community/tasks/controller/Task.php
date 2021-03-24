@@ -30,6 +30,10 @@ class Task extends EntityController {
 	public function export($params) {
 		return $this->defaultExport($params);
 	}
+
+	public function exportColumns($params) {
+		return $this->defaultExportColumns($params);
+	}
 	
 	public function import($params) {
 		return $this->defaultImport($params);

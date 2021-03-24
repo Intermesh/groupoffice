@@ -800,7 +800,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				if(response.created) {
 					for(clientId in response.created) {
 						//merge client data with server defaults.
-						entity = Ext.apply(params.create[clientId], response.created[clientId] || {});
+						entity = Ext.apply(params.create ? (params.create[clientId] || {}) : {}, response.created[clientId] || {});
 						me._add(entity, true);
 					}
 				}

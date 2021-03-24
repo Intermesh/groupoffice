@@ -485,16 +485,24 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				foreach ($tasks as $task) {
 					//$davTask = DavTask::model()->findByPk($task->id);
 					$blob = Blob::findById($task->vcalendarBlobId);
-					$VCalendar = Reader::read($blob->getFile()->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
-					$data = $VCalendar->serialize();
-
+					if(!$blob) {
+						// make one
+						$converter = new VCalendar();
+						$data = $converter->export($task);
+						$blob = Blob::fromString($data);
+						$task->vcalendarBlobId = $blob->id;
+					} else {
+						$data = $blob->getFile()->getContents();
+//						$VCalendar = Reader::read($blob->getFile()->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
+//						$data = $VCalendar->serialize();
+					}
 					$objects[] = array(
 						'id' => $task->id,
 						'uri' => $task->getUri(),
 						'calendardata' => $data,
 						'calendarid' => 'c:'.$calendarId,
 						'lastmodified' => $task->modifiedAt->getTimestamp(),
-						'etag'=>'"' .$task->etag().'"'
+						'etag' => '"' . $task->vcalendarBlobId . '"'
 					);
 				}
 			}

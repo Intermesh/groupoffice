@@ -28,6 +28,10 @@ use function GuzzleHttp\json_encode;
  */
 class VCalendar extends AbstractConverter {
 
+	public function __construct()
+	{
+		parent::__construct('ics', Task::class);
+	}
 	
 	const EMPTY_NAME = '(no name)';
 
@@ -52,10 +56,10 @@ class VCalendar extends AbstractConverter {
 
 		$rule = $task->getRecurrenceRule();
 		if($rule) {
-			$rrule = Recurrence::fromArray($rule, $task->start);
+			$rrule = Recurrence::fromArray((array)$rule, $task->start);
 			$vtodo->RRULE = $rrule->toString();
 		}
-		$vtodo->RRULE = $rrule->toString();
+
 		$vtodo->UID = $task->getUid();
 		$vtodo->SUMMARY = $task->title;
 		$vtodo->PRIORITY = $task->priority;
@@ -63,11 +67,11 @@ class VCalendar extends AbstractConverter {
 		$vtodo->DUE = $task->due;
 		$vtodo->DESCRIPTION = $task->description;
 
-		if(is_array($task->categories)) {
+		if(!empty($task->categories) && is_array($task->categories)) {
 			$vtodo->CATEGORIES = go()->getDbConnection()->select("name")
 				->from("tasks_category")
 				->where(['id' => $task->categories])
-				->fetchMode(\PDO::FETCH_COLUMN)
+				->fetchMode(\PDO::FETCH_COLUMN, 0)
 				->execute();
 		}
 
@@ -81,7 +85,7 @@ class VCalendar extends AbstractConverter {
 		$this->tempFile = File::tempFile($this->getFileExtension());
 		$this->fp = $this->tempFile->open('w+');
 		fputs($this->fp, "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Intermesh//NONSGML Group-Office ".go()->getVersion()."//EN\r\n");
-		fputs($this->fp, (new VTimezone())->serialize());
+		fputs($this->fp, (new \GO\Base\VObject\VTimezone())->serialize());
 	}
 
 	protected function finishExport()
@@ -131,25 +135,25 @@ class VCalendar extends AbstractConverter {
 	}
 	protected function nextImportRecord() {
 		$this->currentRecord = $this->importSplitter->getNext();
-		return !empty($this->currenRecord);
+		return $this->currentRecord;
 	}
 	protected function importEntity() {
 		$vcal = $this->currentRecord;
 		$todo = $vcal->VTODO;
-		$tasklistId = $this->clientParams['tasklistId'];
+		$tasklistId = $this->clientParams['values']['tasklistId'];
 		$categoryIds = Category::find()->selectSingleValue('id')
 			->where('name', 'IN', explode(",",(string)$todo->CATEGORIES))
 			->all();
-		$rule = new Recurrence((string)$todo->RRULE, $todo->DTSTART);
+		$rule = new Recurrence((string)$todo->RRULE, $todo->DTSTART->getDateTime());
 
-		$task = $this->findTask($todo, $tasklistId);
+		$task = $this->findTask($vcal, $tasklistId);
 		// no task found
 		if(!$task) {
 			$task = new Task();
 			$task->setValues([
 				"uid" => (string)$todo->UID,
 				"tasklistId" => $tasklistId,
-				"start" => $todo->DTSTART,
+				"start" => $todo->DTSTART->getDateTime(),
 				'recurrenceRule' => $rule->toArray(),
 				"due" => $todo->DUE,
 				"title" => (string)$todo->SUMMARY,

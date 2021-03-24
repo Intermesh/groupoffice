@@ -58,7 +58,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 							nowYmd = now.format("Y-m-d");
 							this.taskGrid.store.setFilter("tasklist", {
 								due: nowYmd,
-								percentComplete: 0
+								complete: false
 							});
 							break;
 
@@ -345,7 +345,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 											go.util.exportToFile(
 												'Task',
 												Ext.apply(this.taskGrid.store.baseParams, this.taskGrid.store.lastOptions.params, {limit: 0, start: 0}),
-												'text/vcalendar');
+												'ics');
 										},
 										scope: this
 									},{
@@ -355,7 +355,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 											go.util.exportToFile(
 												'Task',
 												Ext.apply(this.taskGrid.store.baseParams, this.taskGrid.store.lastOptions.params, {limit: 0, start: 0}),
-												'text/csv');
+												'csv');
 										},
 										scope: this
 									}
@@ -422,6 +422,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						}
 					}),
 					this.addTaskButton = new Ext.Button({
+						disabled: true,
 						iconCls: 'ic-add',
 						cls:'primary',
 						handler:function(){

@@ -120,7 +120,7 @@ class goTask extends GoBaseBackendDiff {
 				return;
 
 			$task = new Task();
-			$task->tasklist_id = $tasklist->id;
+			$task->tasklistId = $tasklist->id;
 		} else {
 			ZLog::Write(LOGLEVEL_DEBUG, "Found task");
 		}
@@ -138,12 +138,12 @@ class goTask extends GoBaseBackendDiff {
 			$task->title = $message->subject;
 
 		if (isset($message->importance)) // GO = [1-9] AS = [0-2]
-			$task->priority = $message->importance > 1 ? 9 : ($message->importance < 1 ? 1 : 6);
+			$task->priority = $message->importance > 1 ? 9 : ($message->importance < 1 ? 1 : 5);
 
 		$task->description = GoSyncUtils::getBodyFromMessage($message);
 
 		if (isset($message->complete)) {
-			$task->setProgress($message->complete == '0' ? Progress::NeedsAction : Progress::Completed);
+			$task->setProgress($message->complete == '0' ? 'needs-action' : 'completed');
 		}
 
 		if ($message->reminderset && $message->remindertime) {

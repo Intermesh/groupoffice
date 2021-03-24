@@ -23,7 +23,7 @@ abstract class Progress
 	static $db = [
 		self::NeedsAction => 'needs-action',
 		self::InProcess => 'in-progress',
-		self::Completed => 'complete',
+		self::Completed => 'completed',
 		self::Failed => 'failed',
 		self::Cancelled => 'cancelled'
 	];

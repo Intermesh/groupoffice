@@ -208,7 +208,7 @@ class Task extends AclItemEntity {
 				}
 			})->add('categories', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
-					$query->join("task_task_category","categories","task.id = categories.taskId")
+					$query->join("tasks_task_category","categories","task.id = categories.taskId")
 					->where(['categories.categoryId' => $value]);
 				}
 			})->addDate("start", function(Criteria $criteria, $comparator, $value) {
@@ -217,6 +217,8 @@ class Task extends AclItemEntity {
 				$criteria->where(['due' => $value]);
 			})->add('percentComplete', function(Criteria $criteria, $value) {
 				$criteria->where(['percentComplete' => $value]);
+			})->add('complete', function(Criteria $criteria, $value) {
+				$criteria->where('progress', $value?'=':'!=',Progress::Completed);
 			})->addDate("late", function(Criteria $criteria, $comparator, $value) {
 				$criteria->where('due', '<', $value);
 			})->addDate("future", function(Criteria $criteria, $comparator, $value) {
@@ -237,10 +239,12 @@ class Task extends AclItemEntity {
 		if($this->progress == Progress::Completed) {
 			$this->percentComplete = 100;
 		}
-		if($this->percentComplete == 100) {
-			$this->progress = Progress::Completed;
-		} else if($this->percentComplete > 0 && $this->progress == Progress::NeedsAction) {
-			$this->progress = Progress::InProcess;
+		if($this->isModified('percentComplete')) {
+			if ($this->percentComplete == 100) {
+				$this->progress = Progress::Completed;
+			} else if ($this->percentComplete > 0 && $this->progress == Progress::NeedsAction) {
+				$this->progress = Progress::InProcess;
+			}
 		}
 
 		if($this->isModified('progress')){
@@ -264,6 +268,7 @@ class Task extends AclItemEntity {
 
 		return parent::internalSave();
 	}
+
 
 	private function updateAlerts() {
 		$entityType = EntityType::findByName('Task');
@@ -304,7 +309,7 @@ class Task extends AclItemEntity {
 		if(!empty($rrule->count)) {
 			$rrule->count--;
 			$nextTask->setRecurrenceRule($rrule->count > 0 ? $rrule : null);
-		} else if($rrule->until) {
+		} else if(!empty($rrule->until)) {
 			$nextTask->setRecurrenceRule($rrule->until > $next ? $rrule : null);
 		} else{
 			$nextTask->setRecurrenceRule($rrule);
@@ -312,10 +317,11 @@ class Task extends AclItemEntity {
 
 		$this->recurrenceRule = null;
 
-		$diff = $this->start->diff($next);
 		$nextTask->start = $next;
-		$nextTask->due->add($diff);
-
+		if(!empty($nextTask->due)) {
+			$diff = $this->start->diff($next);
+			$nextTask->due->add($diff);
+		}
 		if(!$nextTask->save()) {
 			throw new \Exception("Could not save next task: ". var_export($nextTask->getValidationErrors(), true));
 		}

@@ -56,8 +56,10 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 									fieldLabel : t("Start"),
 									listeners : {
 										setvalue : function(me,val) {
-											console.log(val);
 											me.nextSibling().setMinValue(val);
+											if(!Ext.isEmpty(val)) {
+												this.recurrenceField.setStartDate(Ext.isDate(val) ? val : Date.parseDate(val, me.format));
+											}
 											this.recurrenceField.setDisabled(Ext.isEmpty(val));
 										},
 										scope : this
