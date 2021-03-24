@@ -26,6 +26,14 @@ use go\core\jmap\Entity;
 abstract class AclItemEntity extends AclEntity {
 
 	/**
+	 * Fires when the ACL has changed.
+	 *
+	 * Not when changes were made to the acl but when the complete list has been replaced when for example
+	 * a contact has been moved to another address book.	 *
+	 */
+	const EVENT_ACL_CHANGED = 'aclchanged';
+
+	/**
 	 * Get the {@see AclOwnerEntity} or {@see AclItemEntity} class name that it 
 	 * depends on.
 	 * 
@@ -270,15 +278,32 @@ abstract class AclItemEntity extends AclEntity {
 		return $aclEntity;
 	}
 
+	private function isAclChanged()
+	{
+		return $this->isModified(array_keys(static::aclEntityKeys()));
+	}
+
+	protected function internalSave()
+	{
+		if(!$this->isNew() && $this->isAclChanged()) {
+			static::fireEvent(self::EVENT_ACL_CHANGED, $this);
+		}
+
+		return parent::internalSave();
+	}
+
+	/**
+	 * @inheritDoc
+	 */
 	public function getPermissionLevel() {
 
 		if(!isset($this->permissionLevel)) {
 			$aclEntity = $this->getAclEntity();
-		
-			$this->permissionLevel = $aclEntity->getPermissionLevel(); 
+
+			$this->permissionLevel = $aclEntity->getPermissionLevel();
 		}
 
-		return $this->permissionLevel;		
+		return $this->permissionLevel;
 	}
 
 	/**
@@ -297,7 +322,13 @@ abstract class AclItemEntity extends AclEntity {
 
 		return $cls::findAcls();
 	}
-	
+
+	/**
+	 * Find the ACL id that holds the permissions for this item
+	 *
+	 * @return int
+	 * @throws Exception
+	 */
 	public function findAclId() {
 		return $this->getAclEntity()->findAclId();
 	}

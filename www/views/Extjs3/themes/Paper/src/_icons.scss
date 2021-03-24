@@ -3,11 +3,11 @@
 	font-family: 'Material Icons';
 	font-style: normal;
 	font-weight: 400;
-	src: url(#{$resourcePath}fonts/MaterialIcons-Regular.eot);// IE9 compat modes
+	//src: url(#{$resourcePath}fonts/MaterialIcons-Regular.eot);// IE9 compat modes
 	src: local("Material Icons"), 
 		local("MaterialIcons-Regular"), 
 		url(#{$resourcePath}fonts/MaterialIcons-Regular.woff2) format("woff2"), // Super Modern
-		url(#{$resourcePath}fonts/MaterialIcons-Regular.woff) format("woff"),  // Pretty Modern
+		//url(#{$resourcePath}fonts/MaterialIcons-Regular.woff) format("woff"),  // Pretty Modern
 		url(#{$resourcePath}fonts/MaterialIcons-Regular.ttf) format("truetype"); // Android, Safari, iOS
 }
 // #################
@@ -870,6 +870,7 @@ $material-icons : (
 	mail,
 	mail_outline,
 	map,
+	mark_as_unread,
 	markunread,
 	markunread_mailbox,
 	memory,

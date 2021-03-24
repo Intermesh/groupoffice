@@ -46,7 +46,9 @@ GO.files.FilesContextMenu = function(config)
 		iconCls: 'ic-compare-arrows',
 		text: t("Save as PDF"),
 		handler: function () {
+
 			GO.request({
+				maskEl: Ext.getBody(),
 				url: 'files/file/convert',
 				params: {
 					id: this.records[0].data.id,

@@ -492,8 +492,6 @@ class Settings extends core\Settings {
 				$blob->save();
 			}
 		}
-
-
 		
 		//for old framework config caching in GO\Base\Config
 		if(isset($_SESSION)) {
@@ -503,6 +501,10 @@ class Settings extends core\Settings {
 		//Make sure URL has trailing slash
 		if(isset($this->URL)) {
 			$this->URL = rtrim($this->URL, '/ ').'/';
+		}
+
+		if($this->isModified('maintenanceMode') && $this->maintenanceMode) {
+			Token::logoutEveryoneButAdmins();
 		}
 		
 		return parent::save();

@@ -49,12 +49,18 @@ class Module extends AclOwnerEntity {
 				if($this->checkDepencencies) {
 					core\Module::installDependencies($this->module());
 				}
-			}else if ($this->checkDepencencies) {
-				$mods = core\Module::getModulesThatDependOn($this->module());
-				if(!empty($mods)) {
-					$this->setValidationError('name', ErrorCode::DEPENDENCY_NOT_SATISFIED, 	sprintf(\GO::t("You cannot delete the current module, because the following (installed) modules depend on it: %s."),implode(', ',$mods)));
+				self::$modulesByName[$this->package.'/'.$this->name] = $this;
+			}else
+			{
+				unset(self::$modulesByName[$this->package.'/'.$this->name]);
 
-					return false;
+				if ($this->checkDepencencies) {
+					$mods = core\Module::getModulesThatDependOn($this->module());
+					if (!empty($mods)) {
+						$this->setValidationError('name', ErrorCode::DEPENDENCY_NOT_SATISFIED, sprintf(\GO::t("You cannot delete the current module, because the following (installed) modules depend on it: %s."), implode(', ', $mods)));
+
+						return false;
+					}
 				}
 			}
 		}
@@ -255,6 +261,9 @@ class Module extends AclOwnerEntity {
 	protected static function internalDelete(Query $query) {
 
 		$query->andWhere('package != "core"');
+
+		//clear cache
+		self::$modulesByName = [];
 		
 		return parent::internalDelete($query);
 	}
@@ -296,6 +305,8 @@ class Module extends AclOwnerEntity {
 		
 		return $query->single() !== false;
 	}
+
+	private static $modulesByName = [];
 	
 	/**
 	 * Find a module by package and name
@@ -309,13 +320,23 @@ class Module extends AclOwnerEntity {
 		if($package == "legacy") {
 			$package = null;
 		}
+
+		$cache = $package."/". $name;
+		if(isset(self::$modulesByName[$cache])) {
+			return self::$modulesByName[$cache];
+		}
+
 		$query = static::find()->where(['package' => $package, 'name' => $name]);
 
 		if(isset($enabled)) {
 			$query->andWhere(['enabled' => $enabled]);
 		}
 
-		return $query->single();
+		$mod = $query->single();
+
+		self::$modulesByName[$cache] = $mod;
+
+		return $mod;
 	}
 
 	/**

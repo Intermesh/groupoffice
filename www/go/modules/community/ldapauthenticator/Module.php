@@ -4,6 +4,7 @@ namespace go\modules\community\ldapauthenticator;
 use go\core\auth\DomainProvider;
 use go\core\db\Query;
 use go\core;
+use go\modules\community\addressbook\model\Contact;
 use go\modules\community\ldapauthenticator\model\Authenticator;
 use go\core\model\Module as CoreModule;
 use go\core\ldap\Record;
@@ -35,7 +36,44 @@ class Module extends core\Module implements DomainProvider {
 	public static function mappedValues(Record $record) {
 		$cfg = go()->getConfig();
 		if(empty($cfg['ldapMapping'])) {
-			return [];
+			$cfg['ldapMapping'] = [
+				'enabled' => function($record) {
+					//return $record->ou[0] != 'Delivering Crew';
+					return true;
+				},
+				'diskQuota' => function($record) {
+					//return 1024 * 1024 * 1024;
+					return null;
+				},
+				'email' => 'mail',
+				'recoveryEmail' => 'mail',
+				'displayName' => 'cn',
+				'firstName' => 'givenname',
+				'lastName' => 'sn',
+				'initials' => 'initials',
+
+				'jobTitle' => 'title',
+				'department' => 'department',
+				'notes' => 'info',
+
+//				'addressType' => function($record) {
+//					return \go\modules\community\addressbook\model\Address::TYPE_WORK;
+//				},
+				'street' => 'street',
+				'zipCode' => 'postalCode',
+				'city' => 'l',
+				'state' => 's',
+//				'countryCode' => function($record) {
+//					return "NL";
+//				},
+
+				'homePhone' => 'homePhone',
+				'mobile' => 'mobile',
+				'workFax' => 'facsimiletelephonenumber',
+				'workPhone' => 'telephonenumber',
+
+				'organization' => 'organizationname'
+				];
 		}
 		$mapping = $cfg['ldapMapping'];
 		foreach($mapping as $local => $ldap) {
@@ -82,21 +120,22 @@ class Module extends core\Module implements DomainProvider {
 		if(isset($values['recoveryEmail'])) $user->recoveryEmail = $values['recoveryEmail'];
 		if(isset($values['enabled'])) $user->enabled = $values['enabled'];
 		if(isset($values['email'])) $user->email = $values['email'];
-		if(isset($values['recoveryEmail'])) $user->recoveryEmail = $values['recoveryEmail'];
-		if(isset($values['displayName'])) $user->displayName = $values['displayName'];
+		if(isset($values['displayName'])) $user->displayName = $values['name'] = $values['displayName'];
 
-		unset($values['enabled'], $values['recoveryEmail'], $values['diskQuota'], $values['recoveryEmail'], $values['displayName']);
-
-		if(\go\core\model\Module::findByName('community', 'addressbook')) {
+		if(\go\core\model\Module::isInstalled('community', 'addressbook')) {
 
 			$phoneNbs = [];
+			if(isset($values['homePhone'])){
+				$phoneNbs[] = ['number' => $values['homePhone'], 'type' => 'work'];
+			}
 			if(isset($values['workPhone'])){
 				$phoneNbs[] = ['number' => $values['workPhone'], 'type' => 'work'];
-				unset($values['workPhone']);
+			}
+			if(isset($values['mobile'])){
+				$phoneNbs[] = ['number' => $values['mobile'], 'type' => 'mobile'];
 			}
 			if(isset($values['workFax'])) {
 				$phoneNbs[] = ['number' => $values['workFax'], 'type' => 'workfax'];
-				unset($values['workFax']);
 			}
 
 			if(!empty($phoneNbs)) {
@@ -105,7 +144,6 @@ class Module extends core\Module implements DomainProvider {
 
 			if(isset($values['email'])) {
 				$values['emailAddresses'] = [['email' => $values['email']]];
-				unset($values['email']);
 			}
 
 			$addrAttrs = [];
@@ -113,12 +151,38 @@ class Module extends core\Module implements DomainProvider {
 			if(!empty($values['street2'])) $addrAttrs['street2'] = $values['street2'];
 			if(!empty($values['zipCode'])) $addrAttrs['zipCode'] = $values['zipCode'];
 			if(!empty($values['city'])) $addrAttrs['city'] = $values['city'];
+			if(!empty($values['state'])) $addrAttrs['state'] = $values['state'];
 			if(!empty($values['country'])) $addrAttrs['country'] = $values['country'];
+			if(!empty($values['countryCode'])) $addrAttrs['countryCode'] = $values['countryCode'];
+			if(!empty($values['type'])) $addrAttrs['type'] = $values['addressType'];
 			if(!empty($addrAttrs)) {
-				$addrAttrs['type'] = 'home';
-				$values['addresses'] = $addrAttrs;
+				$values['addresses'] = [$addrAttrs];
 			}
-			unset($values['street'],$values['street2'],$values['zipCode'],$values['city'],$values['country'] );
+
+			if(!empty($values['organization'])) {
+
+				$org = Contact::find(['id'])->where([
+					'name' => $values['organization'],
+					'isOrganization' => true]
+				)->single();
+				if(!$org) {
+					$org = new Contact();
+					$org->name = $values['organization'];
+					$org->isOrganization = true;
+					$org->addressBookId = go()->getSettings()->userAddressBook()->id;
+					if(!$org->save())  {
+						throw new \Exception("Could not save organization");
+					}
+				}
+
+				$values['organizationIds'] = [$org->id];
+			} else{
+				$values['organizationIds'] = [];
+			}
+
+			//strip out unsupported properies.
+			$props = Contact::getApiProperties();
+			$values = array_intersect_key($values, $props);
 
 			if(!empty($values)) {
 				if(isset($blob)) {
