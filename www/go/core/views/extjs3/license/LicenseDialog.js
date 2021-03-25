@@ -25,10 +25,20 @@ go.license.LicenseDialog = Ext.extend(go.Window, {
 					{
 						xtype: "box",
 						autoEl: "p",
-						html: t('Try all the features for free and obtain a 60 day trial license from <a target="_blank" class="normal-link" href="https://www.group-office.com">group-office.com</a>. Register for an account and get your license now.')
-					}, this.licenseKeyField = new Ext.form.TextArea({
+						html: t('Try all the features for free and obtain a 60 day trial license from <a target="_blank" class="normal-link" href="https://www.group-office.com">www.group-office.com</a>. Register for an account and get your license now.')
+					},
+					{
+						xtype: "button",
+						text: t("Get license now"),
+						cls: "primary",
+						handler: function() {
+							window.open('https://www.group-office.com/30-day-trial?hostname=' + document.domain + '&version=' + go.User.session.version ,'_blank');
+						}
+					},
 
-						anchor: "100% -" + dp(88),
+					this.licenseKeyField = new Ext.form.TextArea({
+
+						anchor: "100% -" + dp(120),
 						xtype: "textarea",
 						fieldLabel: t("License key"),
 						allowBlank: false,
