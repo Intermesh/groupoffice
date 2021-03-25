@@ -722,18 +722,24 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 	
 	welcome : function() {
-		if(go.User.id==1 && go.User.loginCount == 1 && !localStorage.welcomeShown) {
 
-			localStorage.welcomeShown = true;
-
-			Ext.MessageBox.alert(t("Welcome!"), t("Please complete the installation by running through the system settings. Click OK to continue to the system settings dialog."), function() {
-				go.systemsettingsDialog = new go.systemsettings.Dialog();						
-				go.systemsettingsDialog.show();
-			});
-		}
 		if(go.User.id == 1)
 		{
 			const coreMod = go.Modules.get("core", "core");
+
+			if(!coreMod.settings.welcomeShown) {
+				Ext.MessageBox.alert(t("Welcome!"), t("Please complete the installation by running through the system settings. Click OK to continue to the system settings dialog."), () => {
+
+					go.Db.store("Module").save({
+						settings: {
+							welcomeShown: true
+						}
+					}, coreMod.id);
+
+					go.systemsettingsDialog = new go.systemsettings.Dialog();
+					go.systemsettingsDialog.show();
+				});
+			}
 
 			if(!coreMod.settings.licenseDenied && !coreMod.settings.license) {
 				const licenseDialog = new go.license.LicenseDialog();

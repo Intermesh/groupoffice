@@ -267,6 +267,10 @@ class Module extends Observable {
 	 * @return bool
 	 */
 	public function isInstalled() {
+		return $this->getModel() != false;
+	}
+
+	public function getModel() {
 		return \GO::modules()->isInstalled($this->getName(), false);
 	}
 	

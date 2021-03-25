@@ -469,6 +469,14 @@ class Settings extends core\Settings {
 	 * @var bool
 	 */
 	public $licenseDenied = false;
+
+
+	/**
+	 * Set to true when the welcome dialog has been presented and the user denied.
+	 *
+	 * @var bool
+	 */
+	public $welcomeShown = false;
 	
 	/**
 	 * New users will be member of these groups
@@ -534,14 +542,20 @@ class Settings extends core\Settings {
 
 	protected function internalValidate()
 	{
-		if($this->isModified('license') && isset($this->license)) {
-			$data = License::getLicenseData();
-			if(!$data) {
-				throw new \Exception("License data was corrupted");
+		if($this->isModified('license')) {
+			if(isset($this->license)) {
+				$data = License::getLicenseData();
+				if (!$data) {
+					throw new \Exception("License data was corrupted");
+				}
+
+				if (!License::validate($data)) {
+					throw new \Exception(License::$validationError);
+				}
 			}
 
-			if(!License::validate($data)) {
-				throw new \Exception(License::$validationError);
+			if(go()->getInstaller()->disableUnavailableModules()){
+				go()->rebuildCache();
 			}
 		}
 

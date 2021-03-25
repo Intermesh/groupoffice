@@ -38,14 +38,21 @@ class Module extends EntityController {
 
 			$moduleController = $moduleClass::get();
 
-			if ($moduleController->autoInstall() && !$moduleController->isInstalled() && $moduleController->isInstallable()) {
-				if ($moduleController instanceof \go\core\Module) {
-					if($moduleController->requiredLicense()) {
-						$moduleController->install();
-					}
+			if ($moduleController->autoInstall() && $moduleController->isInstallable()) {
+				if($moduleController->isInstalled()) {
+					$model = $moduleController->getModel();
+					$model->enabled = true;
+					$model->save();
+
 				} else {
-					if ($moduleController->appCenter() && !\GO\Base\Model\Module::install($moduleController->name())) {
-						throw new \Exception("Could not save module " . $moduleController->name());
+					if ($moduleController instanceof \go\core\Module) {
+						if ($moduleController->requiredLicense()) {
+							$moduleController->install();
+						}
+					} else {
+						if ($moduleController->appCenter() && !\GO\Base\Model\Module::install($moduleController->name())) {
+							throw new \Exception("Could not save module " . $moduleController->name());
+						}
 					}
 				}
 			}
