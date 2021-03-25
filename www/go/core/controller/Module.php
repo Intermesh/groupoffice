@@ -42,7 +42,11 @@ class Module extends EntityController {
 				if($moduleController->isInstalled()) {
 					$model = $moduleController->getModel();
 					$model->enabled = true;
-					$model->save();
+					try {
+						$model->save();
+					} catch(\Throwable $e) {
+						go()->log($e);
+					}
 
 				} else {
 					if ($moduleController instanceof \go\core\Module) {
