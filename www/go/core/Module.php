@@ -609,7 +609,7 @@ abstract class Module extends Singleton {
 	public function getModel() {
 
 		if(!$this->model) {
-			$this->model = model\Module::findByName($this->getPackage(), $this->getName());
+			$this->model = model\Module::findByName($this->getPackage(), $this->getName(), null);
 		}
 
 		return $this->model;
@@ -632,7 +632,7 @@ abstract class Module extends Singleton {
 	public function isAvailable() {
 
 		$model = $this->getModel();
-		if(!$model) {
+		if(!$model || $model->enabled == false) {
 			return false;
 		}
 

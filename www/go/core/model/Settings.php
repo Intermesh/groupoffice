@@ -6,9 +6,12 @@ use GO;
 use go\core;
 use go\core\http\Request;
 use go\core\util\Crypt;
+use go\modules\business\license\model\License;
 use go\modules\community\addressbook\model\AddressBook;
 
 class Settings extends core\Settings {
+
+	use core\validate\ValidationTrait;
 	
 	protected function __construct() {
 		parent::__construct();
@@ -499,6 +502,10 @@ class Settings extends core\Settings {
 	
 	public function save() {
 
+		if(!$this->internalValidate()){
+			return false;
+		}
+
 		if(isset($this->logoId)) {
 			//todo settings should have real columns with real keys?
 			$blob = core\fs\Blob::findById($this->logoId);
@@ -523,5 +530,21 @@ class Settings extends core\Settings {
 		}
 		
 		return parent::save();
+	}
+
+	protected function internalValidate()
+	{
+		if($this->isModified('license') && isset($this->license)) {
+			$data = License::getLicenseData();
+			if(!$data) {
+				throw new \Exception("License data was corrupted");
+			}
+
+			if(!License::validate($data)) {
+				throw new \Exception(License::$validationError);
+			}
+		}
+
+		return true;
 	}
 }

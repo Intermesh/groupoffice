@@ -335,20 +335,22 @@ class Module extends AclOwnerEntity {
 
 		$cache = $package."/". $name;
 		if(isset(self::$modulesByName[$cache])) {
-			return self::$modulesByName[$cache];
+			$mod = self::$modulesByName[$cache];
+		} else {
+
+			$query = static::find()->where(['package' => $package, 'name' => $name]);
+
+			$mod = $query->single();
+
+			self::$modulesByName[$cache] = $mod;
 		}
 
-		$query = static::find()->where(['package' => $package, 'name' => $name]);
 
 		if(isset($enabled)) {
-			$query->andWhere(['enabled' => $enabled]);
+			return $mod->enabled == $enabled ? $mod : false;
+		} else{
+			return $mod;
 		}
-
-		$mod = $query->single();
-
-		self::$modulesByName[$cache] = $mod;
-
-		return $mod;
 	}
 
 	/**

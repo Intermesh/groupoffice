@@ -4,7 +4,7 @@ go.license.LicenseDialog = Ext.extend(go.Window, {
 	width: dp(600),
 	height: dp(400),
 	layout:'fit',
-	title: t("License"),
+	title: t("Register"),
 	maximized: false,
 	modal: true,
 	cls: "go-license-dialog",
@@ -93,7 +93,13 @@ go.license.LicenseDialog = Ext.extend(go.Window, {
 							license: this.licenseKeyField.getValue()
 						}
 					}, coreModule.id).then(() => {
-						this.close();
+
+						return go.Jmap.request({method: "Module/installLicensed"}).then(() => {
+							//this.close();
+
+							go.reload();
+						})
+
 					}).finally(() => {
 						this.getEl().unmask();
 					});

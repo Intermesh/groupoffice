@@ -260,6 +260,15 @@ class Module extends Observable {
 	public function isInstallable(){
 		return true;
 	}
+
+	/**
+	 * Check if the module has been installed
+	 *
+	 * @return bool
+	 */
+	public function isInstalled() {
+		return \GO::modules()->isInstalled($this->getName(), false);
+	}
 	
 	/**
 	 * Find the module manager class by id.
