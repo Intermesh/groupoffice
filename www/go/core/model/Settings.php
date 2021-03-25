@@ -459,6 +459,13 @@ class Settings extends core\Settings {
 	 * @var string
 	 */
 	public $license = null;
+
+	/**
+	 * Set to true when the license dialog has been presented and the user denied.
+	 *
+	 * @var bool
+	 */
+	public $licenseDenied = false;
 	
 	/**
 	 * New users will be member of these groups

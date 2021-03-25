@@ -653,6 +653,14 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						this.aboutDialog.show();
 					},
 					scope: this
+				},{
+					iconCls: 'ic-app-registration',
+					text: t("Register"),
+					handler: function () {
+						const licenseDialog = new go.license.LicenseDialog();
+						licenseDialog.show();
+					},
+					scope: this
 				},
 				'-',
 				{
@@ -722,8 +730,15 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				go.systemsettingsDialog = new go.systemsettings.Dialog();						
 				go.systemsettingsDialog.show();
 			});
-			
-			
+		}
+		if(go.User.id == 1)
+		{
+			const coreMod = go.Modules.get("core", "core");
+
+			if(!coreMod.settings.licenseDenied && !coreMod.settings.license) {
+				const licenseDialog = new go.license.LicenseDialog();
+				licenseDialog.show();
+			}
 		}
 	},
 //
