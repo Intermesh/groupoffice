@@ -129,3 +129,5 @@ $updates['202011271105'][] = "ALTER TABLE `addressbook_contact` ADD INDEX(`modif
 $updates['202011271105'][] = "ALTER TABLE `addressbook_contact` ADD INDEX(`lastName`);";
 
 $updates['202011271105'][] = "update addressbook_contact set lastName = name where isOrganization = true;";
+
+$updates['202103261053'][] = "ALTER TABLE `addressbook_user_settings` ADD (`rememberLastItem` TINYINT(1) DEFAULT 0, `lastAddressBookId` INT(11) NULL DEFAULT NULL, `displayAllContactsByDefault` TINYINT(1) DEFAULT 1);";

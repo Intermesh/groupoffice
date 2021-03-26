@@ -105,10 +105,21 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		});
 		
 		
-		//because the root node is not visible it will auto expand on render.
+		//because the root node is not visible it will auto expand on render. This depends on the user address book settings
 		this.addressBookTree.getRootNode().on('expand', function (node) {
-			//when expand is done we'll select the first node. This will trigger a selection change. which will load the grid below.
-			this.addressBookTree.getSelectionModel().select(node.firstChild);
+			var abSettings = go.User.addressBookSettings, abNode = null;
+			if (abSettings.displayAllContactsByDefault) {
+				//when expand is done we'll select the first node. This will trigger a selection change. which will load the grid below.
+				this.addressBookTree.getSelectionModel().select(node.firstChild);
+			} else if (abSettings.rememberLastItem && abSettings.lastAddressBookId > 0) {
+				abNode = node.findChild('id', 'AddressBook-' + abSettings.lastAddressBookId);
+			} else {
+				abNode = node.findChild('id', 'AddressBook-' + abSettings.defaultAddressBookId);
+			}
+			if (abNode) {
+				this.addressBookTree.getSelectionModel().select(abNode);
+			}
+
 		}, this);
 
 		//load the grid on selection change.
@@ -121,9 +132,19 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			if (node.id === "all") {
 				this.setAddressBookId(null);
 			} else if (node.attributes.entity.name === "AddressBook") {
-				this.setAddressBookId(node.attributes.data.id);
-			} else
-			{
+				var addressBookId = node.attributes.data.id, abSettings = go.User.addressBookSettings;
+				this.setAddressBookId(addressBookId);
+				if(abSettings.rememberLastItem && abSettings.lastAddressBookId != addressBookId) {
+					debugger;
+					var update = {};
+					update[go.User.id] = {'addressBookSettings': {
+						lastAddressBookId:addressBookId
+					}};
+					go.Db.store("User").set({
+						'update': update
+					});
+				}
+			} else {
 				this.setGroupId(node.attributes.data.id, node.attributes.data.addressBookId);
 			}
 		}, this);
@@ -569,15 +590,13 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				addressBookId: addressBookId
 			});
 			
-		} else
-		{
+		} else {
 			this.grid.store.setFilter("addressbooks", null);
 			
 			var firstAbNode = this.addressBookTree.getRootNode().childNodes[1];
 			if (firstAbNode) {
 				this.addAddressBookId = go.User.addressBookSettings && go.User.addressBookSettings.defaultAddressBookId ? go.User.addressBookSettings.defaultAddressBookId : firstAbNode.attributes.data.id;
-			} else
-			{
+			} else {
 				this.addButton.setDisabled(true);
 			}
 		}

@@ -7,6 +7,7 @@ use go\core\orm\Property;
 use go\modules\community\addressbook\model\Settings as AddresBookModuleSettings;
 use go\core\model;
 use go\core\model\Acl;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class UserSettings extends Property {
 
@@ -24,8 +25,40 @@ class UserSettings extends Property {
 	 */
 	protected $defaultAddressBookId;
 
+	/**
+	 * Remember last selected item option
+	 * @var boolean
+	 */
+	protected $rememberLastItem;
+
+	/**
+	 * Last selected item
+	 * @var int
+	 */
+	protected $lastAddressBookId;
+
+	protected $displayAllContactsByDefault;
+
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable("addressbook_user_settings", "abs");
+	}
+
+	public function getRememberLastItem() :bool
+	{
+		return (boolean) $this->rememberLastItem;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function getDisplayAllContactsByDefault() :bool
+	{
+		return (boolean) $this->displayAllContactsByDefault;
+	}
+
+	public function getLastAddressBookId()
+	{
+		return $this->lastAddressBookId;
 	}
 
 	public function getDefaultAddressBookId() {
@@ -60,8 +93,24 @@ class UserSettings extends Property {
 		
 	}
 
-	public function setDefaultAddressBookId($id) {
+	public function setDefaultAddressBookId($id)
+	{
 		$this->defaultAddressBookId = $id;
+	}
+
+	public function setRememberLastItem(bool $value)
+	{
+		$this->rememberLastItem = $value;
+	}
+
+	public function setDisplayAllContactsByDefault(bool $value)
+	{
+		$this->displayAllContactsByDefault = $value;
+	}
+
+	public function setLastAddressBookId(?int $addressBookId = null)
+	{
+		$this->lastAddressBookId = $addressBookId;
 	}
 
 	public function getSortBy() {
