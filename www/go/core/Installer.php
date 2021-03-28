@@ -150,7 +150,9 @@ class Installer {
 		$this->installEmailTemplate();
 
 		foreach ($installModules as $installModule) {
-			$installModule->install();
+			if(!$installModule->isInstalled()) {
+				$installModule->install();
+			}
 		}
 
 		App::get()->getSettings()->systemEmail = $admin->email;

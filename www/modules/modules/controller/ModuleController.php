@@ -288,6 +288,9 @@ class ModuleController extends AbstractJsonController{
 		
 //		GO::$disableModelCache=true;
 		$module = Module::model()->findByName($params['moduleId']);
+		if(!$module) {
+			throw new \GO\Base\Exception\NotFound();
+		}
 		if($module->package) {
 			return ['success' => true];
 		}

@@ -653,14 +653,6 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						this.aboutDialog.show();
 					},
 					scope: this
-				},{
-					iconCls: 'ic-app-registration',
-					text: t("Register"),
-					handler: function () {
-						const licenseDialog = new go.license.LicenseDialog();
-						licenseDialog.show();
-					},
-					scope: this
 				},
 				'-',
 				{
@@ -675,6 +667,17 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			})
 		});
 
+		if(go.Modules.get("core", "core").settings.readOnlyKeys.indexOf('license') == -1) {
+			this.userMenuLink.menu.insert(6, {
+				iconCls: 'ic-app-registration',
+				text: t("Register"),
+				handler: function () {
+					const licenseDialog = new go.license.LicenseDialog();
+					licenseDialog.show();
+				},
+				scope: this
+			});
+		}
 
 		if(go.User.isAdmin) {
 			this.userMenuLink.menu.insert(3, {

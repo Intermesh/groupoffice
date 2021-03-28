@@ -116,15 +116,17 @@ abstract class Module extends Singleton {
 	 */
 	public final function install() {
 
-		try{
+		if(model\Module::findByName($this->getPackage(), $this->getName(), null)) {
+			throw new \Exception("This module has already been installed!");
+		}
 
-			if(model\Module::findByName($this->getPackage(), $this->getName(), null)) {
-				throw new \Exception("This module has already been installed!");
-			}
+		try{
 
 			go()->getDbConnection()->pauseTransactions();
 
 			self::installDependencies($this);
+
+			go()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=0;");
 
 			$this->installDatabase();
 			go()->getDbConnection()->resumeTransactions();
@@ -427,7 +429,7 @@ abstract class Module extends Singleton {
 			if (!$installed) {
 
 				if($dependency instanceof self) {
-					if (!$dependency->install()) {
+					if (!$dependency->isInstallable() || !$dependency->install()) {
 						throw new Exception("Could not install '" . get_class($dependency) . "'");
 					}
 				} else{

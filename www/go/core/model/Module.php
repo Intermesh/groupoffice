@@ -345,6 +345,9 @@ class Module extends AclOwnerEntity {
 			self::$modulesByName[$cache] = $mod;
 		}
 
+		if(!$mod) {
+			return false;
+		}
 
 		if(isset($enabled)) {
 			return $mod->enabled == $enabled ? $mod : false;
