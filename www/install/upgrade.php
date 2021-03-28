@@ -52,7 +52,7 @@ try {
 
 		echo "<p>The following modules are not available because they're missing on disk\n"
 		. "or you've got an <b>invalid or missing license file</b>: </p>"
-		. "<ul style=\"font-size:1.5em\"><li>" . implode("</li><li>", array_map(function($a){return ($a['package'] ?? "legacy") .'/'.$a['name'];}, $unavailable)) . "</li></ul>\n"
+		. "<ul><li>" . implode("</li><li>", array_map(function($a){return ($a['package'] ?? "legacy") .'/'.$a['name'];}, $unavailable)) . "</li></ul>\n"
 		. "<p>Please install the license file(s) and refresh this page or disable these modules.\n"
 		. "If you continue the incompatible modules will be disabled.</p>";
 

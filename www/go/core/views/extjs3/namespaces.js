@@ -28,6 +28,7 @@ Ext.namespace("go.search");
 Ext.namespace('go.toolbar');
 Ext.namespace('go.filter');
 Ext.namespace('go.chart');
+Ext.namespace('go.license');
 Ext.ns("go.filter.types");
 Ext.ns("go.filter.variabletypes");
 Ext.ns("go.customfields.filter");

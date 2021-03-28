@@ -30,7 +30,7 @@ function errorHander($e) {
 		
 		$msg = ErrorHandler::logException($e);
 
-		if(go()->getDebugger()->enabled) {
+		if(go()->getDebugger()->enabled || headers_sent()) {
 
 			echo "DEBUGGER: Showing error message because debug is enabled. Normally we would have redirected to install. I you're doing a freah install and your database is empty then you can safely ignore this.:<br /><br />";
 			echo $msg;
@@ -82,8 +82,8 @@ try {
 	}
 
 	//check if GO is installed
-	if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){	
-		
+	if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){
+
 //		if(GO::user() && isset($_SESSION['GO_SESSION']['after_login_url'])){
 //			$url = GO::session()->values['after_login_url'];
 //			unset(GO::session()->values['after_login_url']);
@@ -107,6 +107,8 @@ try {
 		}
 	}
 
+	GO::router()->runController();
+
 } catch(Error $e) {
   errorHander($e);  
 } catch(Exception $e) {
@@ -114,4 +116,4 @@ try {
 }
 
 
-GO::router()->runController();
+
