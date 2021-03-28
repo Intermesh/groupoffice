@@ -25,14 +25,14 @@ go.license.LicenseDialog = Ext.extend(go.Window, {
 					{
 						xtype: "box",
 						autoEl: "p",
-						html: t('Try all the features for free and obtain a 60 day trial license from <a target="_blank" class="normal-link" href="https://www.group-office.com">www.group-office.com</a>. Register for an account and get your license now.')
+						html: t('Install your purchased license or try all the features for free and obtain a 60 day trial license from <a target="_blank" class="normal-link" href="https://www.group-office.com">www.group-office.com</a>. Register for an account and get your license now.')
 					},
 					{
 						xtype: "button",
 						text: t("Get license now"),
 						cls: "primary",
 						handler: function() {
-							window.open('https://www.group-office.com/30-day-trial?hostname=' + document.domain + '&version=' + go.User.session.version ,'_blank');
+							window.open('https://www.group-office.com/30-day-trial?hostname=' + document.domain + '&majorVersion=' + go.User.session.version ,'_blank');
 						}
 					},
 
