@@ -24,8 +24,10 @@ end 6.5
 --------
 
 
+- Core: Make Account settings > Groups scrollable for non-admin users
 - Email: SMIME decrypted content in reply too when plaintext is enabled
 - Core: List navigation after delete could move in wrong direction
+- Core: update acl's of linked emails when acl id changes (ie. move contact to another address book)
 
 18-03-2021 6.4.229
 - Core: Business Module.php files were encoded. This stopped Group-Office from running without Ioncube.
