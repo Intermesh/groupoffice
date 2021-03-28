@@ -180,7 +180,7 @@ abstract class Settings extends Model {
 	}
 
 	protected function isModified($name) {
-		return (!array_key_exists($name, $this->oldData) && isset($this->$name)) || (isset($name) && $this->$name != $this->oldData[$name]);
+		return (!array_key_exists($name, $this->oldData) && isset($this->$name)) || (isset($this->$name) && $this->$name != $this->oldData[$name]);
 	}
 	
 	public function save() {
