@@ -164,7 +164,6 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 	},
 	
 	setFilterVisible : function(v) {
-
 		//disable recursive so validators don't apply on hidden items
 		function setDisabled(ct, v) {
 			ct.setDisabled(v);

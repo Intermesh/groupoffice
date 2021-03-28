@@ -58,6 +58,7 @@ go.customfields.type.MultiSelect = Ext.extend(go.customfields.type.Text, {
 		c.displayField = 'text';		
 		c.comboStore = new Ext.data.JsonStore({
 			data: customfield.dataType,
+			autoDestroy: true,
 			id: 'id',
 			root: "options",
 			fields:['id','text'],

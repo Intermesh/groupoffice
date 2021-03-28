@@ -1206,9 +1206,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 			
 			$oldMessage = $message->toOutputArray(false,false,true);
-			
+
 			if(!empty($oldMessage['smime_encrypted'])) {
-				$oldMessage['plainbody'] = '***';
+				$response['sendParams']['encrypt_smime'] = true;
 			}
 			
 			$response['data']['plainbody'] .= "\n\n" . $replyText . "\n" . $this->_quoteText($oldMessage['plainbody']);
@@ -1653,6 +1653,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 					->select('email')
 					->criteria(GO\Base\Db\FindCriteria::newInstance()->addCondition('account_id' , $imapMessage->account->id))
 			)->fetchAll(\PDO::FETCH_COLUMN, 0);
+
+			// for case insensitive match
+			$aliases = array_map('strtolower', $aliases);
 
 			$emailFound = false;
 			if(isset($vevent->attendee)) {

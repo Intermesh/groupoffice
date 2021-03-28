@@ -186,7 +186,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	},
 	
 	setValue: function (values) {
-		
+
 		if(!values) {
 			values = this.map ? {} : [];
 		}
@@ -200,13 +200,14 @@ go.form.Chips = Ext.extend(Ext.Container, {
 					this.dataView.store.loadData({records: entities}, true);
 					this._isDirty = false;
 			}, this);
-		} else
-		{
+		} else {
 			var me = this;
+			// 	me.dataView.store.removeAll();
 			values.forEach(function(v){
 				var index = me.comboStore.find(me.valueField, v);
-				
-				if(index > -1) {
+				var dataViewIndex = me.dataView.store.find(me.valueField,v);
+				// Prevent double dataview rendering in certain edge cases
+				if(index > -1 && dataViewIndex === -1) {
 					me.dataView.store.add([me.comboStore.getAt(index)]);
 				}
 			});
