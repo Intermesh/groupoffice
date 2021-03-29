@@ -32,7 +32,7 @@ go.license.LicenseDialog = Ext.extend(go.Window, {
 						text: t("Get license now"),
 						cls: "primary",
 						handler: function() {
-							window.open('https://www.group-office.com/30-day-trial?hostname=' + document.domain + '&majorVersion=' + go.User.session.version ,'_blank');
+							window.open('https://www.group-office.com/30-day-trial?hostname=' + document.domain + '&version=' + go.User.session.version ,'_blank');
 						}
 					},
 
