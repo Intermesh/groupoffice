@@ -1,3 +1,5 @@
+
+- Billing: Hide projects tab in report if no projects module available
 - Email: hide context menu 'Delete sender from' if no items available 
 - Core: Make Account settings > Groups scrollable for non-admin users
 - Email: SMIME decrypted content in reply too when plaintext is enabled
