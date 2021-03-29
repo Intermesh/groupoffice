@@ -327,7 +327,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		menu: {
 			items: deleteSendersItems
 		},
-		multiple:true
+		multiple:true,
+		hidden: (deleteSendersItems.length === 0)
 	}];
 
 	if(GO.email.saveAsItems && GO.email.saveAsItems.length) {
