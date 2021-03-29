@@ -475,7 +475,8 @@ class Instance extends Entity {
 			try {
 				include($this->getConfigFile()->getPath());
 			} catch(Exception $e) {
-				throw new \Exception("config file missing for instance : " . $this->hostname);
+				ErrorHandler::log("Config file missing for instance : " . $this->hostname);
+				$config = [];
 			}
 			$this->instanceConfig = $config;
 		}		
@@ -737,13 +738,8 @@ class Instance extends Entity {
 	public function getAllowedModules()
 	{
 		$modules = self::getAvailableModules();
-		try {
-			$instanceConfig = $this->getInstanceConfig();
-		}catch(Exception $e) {
-			ErrorHandler::logException($e);
-			$instanceConfig = [];
-		}
-		$instanceConfig = array_merge($this->getGlobalConfig(), $instanceConfig);
+
+		$instanceConfig = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
 		$checkAllowed = false;
 		if (array_key_exists('allowed_modules', $instanceConfig)) {
 			$checkAllowed = true;
