@@ -38,6 +38,10 @@ if (!empty($_POST)) {
 	    $error = $e->getMessage();
     }
 
+} else{
+    if(!empty(go()->getSettings()->license) && !\go\modules\business\license\model\License::isValid()) {
+	    $error = \go\modules\business\license\model\License::$validationError;
+    }
 }
 
 require('header.php');
