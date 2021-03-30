@@ -22,7 +22,7 @@ abstract class Controller {
 		}
 
 		if(!$this->getModulePermissionLevel()) {
-			throw new Exception(403, "Forbidden");
+			throw new Exception(403, "Forbidden, you don't have access to this module.");
 		}
 	}
 
