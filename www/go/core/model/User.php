@@ -797,7 +797,7 @@ class User extends Entity {
 		go()->getDbConnection()->beginTransaction();
 
 		go()->getDbConnection()->delete('go_settings', (new Query)->where('user_id', 'in', $query))->execute();
-		go()->getDbConnection()->delete('go_reminders', (new Query)->where('user_id', 'in', $query))->execute();
+		//go()->getDbConnection()->delete('go_reminders', (new Query)->where('user_id', 'in', $query))->execute();
 		go()->getDbConnection()->delete('go_reminders_users', (new Query)->where('user_id', 'in', $query))->execute();
 
 		Group::delete( (new Query)->where('isUserGroupFor', 'in', $query));
