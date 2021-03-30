@@ -29,6 +29,9 @@ GO.email.AccountsGrid = function(config){
 		sortInfo:{field: 'email', direction: "ASC"}
 	});	
 	config.paging=true;
+
+	var actions = this.initRowActions();
+	config.plugins = [actions];
 	
 	var columnModel = new Ext.grid.ColumnModel({
 		defaults:{
@@ -51,7 +54,7 @@ GO.email.AccountsGrid = function(config){
 		},{
 			header:'SMTP',
 			dataIndex: 'smtp_host'
-		}]
+		},actions]
 	});
 	
 	config.cm=columnModel;
@@ -62,35 +65,17 @@ GO.email.AccountsGrid = function(config){
 		emptyText: t("No items to display")		
 	});
 
-	config.tbar = [{
-		iconCls: 'ic-add',
-		text: t("Add"),
-		handler: function(){
-			
-			this.showAccountDialog();
-		},
-		scope: this,
-		disabled: !GO.settings.modules.email.write_permission
-	},{
-		iconCls: 'ic-delete',
-		text: t("Delete"),
-		handler: function(){
-			this.deleteSelected({
-				callback: function(){
-					if(GO.email.aliasesStore.loaded)
-					{
-						GO.email.aliasesStore.reload();
-					}
-					this.fireEvent('delete', this);
-				},
-				scope: this
-			});
-		},
-		scope:this,
-		disabled: !GO.settings.modules.email.write_permission
-	},'->', {
+	config.tbar = ['->', {
 		xtype:'tbsearch',
 		store:config.store
+	},{
+		iconCls: 'ic-add',
+		tooltip: t('Add'),
+		disabled: !GO.settings.modules.email.write_permission,
+		handler: function (e, toolEl) {
+			this.showAccountDialog();
+		},
+		scope: this
 	}];
 	
 	config.sm=new Ext.grid.RowSelectionModel();
@@ -111,17 +96,82 @@ GO.email.AccountsGrid = function(config){
 
 	this.on('rowdblclick', function(grid, rowIndex){
 		var record = grid.getStore().getAt(rowIndex);
-	
 		this.showAccountDialog(record.data.id);
-
 	}, this);
 
 };
 
 Ext.extend(GO.email.AccountsGrid, GO.grid.GridPanel,{
 	showAccountDialog : function(account_id){
-
-		
 		this.accountDialog.show(account_id);
+	},
+
+	initRowActions: function () {
+
+		var actions = new Ext.ux.grid.RowActions({
+			menuDisabled: true,
+			hideable: false,
+			draggable: false,
+			fixed: true,
+			header: '',
+			hideMode: 'display',
+			keepSelection: true,
+
+			actions: [{
+				iconCls: 'ic-more-vert'
+			}]
+		});
+
+		actions.on({
+			action: function (grid, record, action, row, col, e, target) {
+				this.showMoreMenu(record, e);
+			},
+			scope: this
+		});
+
+		return actions;
+
+	},
+
+	showMoreMenu: function (record, e) {
+		if (!this.moreMenu) {
+			this.moreMenu = new Ext.menu.Menu({
+				items: [
+					{
+						itemId: "view",
+						iconCls: 'ic-edit',
+						text: t("Edit"),
+						handler: function () {
+							this.showAccountDialog(this.moreMenu.record.id);
+						},
+						scope: this
+					},
+					"-",
+					{
+						itemId: "delete",
+						iconCls: 'ic-delete',
+						text: t("Delete"),
+						handler: function () {
+							this.getSelectionModel().selectRecords([this.moreMenu.record]);
+							this.deleteSelected({
+								callback: function(){
+									if(GO.email.aliasesStore.loaded)
+									{
+										GO.email.aliasesStore.reload();
+									}
+									this.fireEvent('delete', this);
+								},
+								scope: this
+							});
+						},
+						scope: this
+					},
+				]
+			})
+		}
+
+		this.moreMenu.record = record;
+
+		this.moreMenu.showAt(e.getXY());
 	}
 });
