@@ -60,13 +60,14 @@ go.form.CKEditor = Ext.extend(Ext.form.TextArea, {
 
             me.editor.on('paste', function (evt) {
                 var dataTransfer = evt.data.dataTransfer,
+                    filesCount = dataTransfer.getFilesCount(),
                     file;
 
-                if(!dataTransfer.getFilesCount()) {
+                if(!filesCount) {
                     return;
                 }
 
-                for (var i=0; i < dataTransfer.getFilesCount(); i++) {
+                for (var i=0; i < filesCount; i++) {
                     file = dataTransfer.getFile(i);
                     go.Jmap.upload(file, {
                         success: function(response) {
