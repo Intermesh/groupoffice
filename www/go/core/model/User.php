@@ -358,6 +358,8 @@ class User extends Entity {
 	}
 
 	public function setPassword($password) {
+		$this->recoveryHash = null;
+		$this->recoverySendAt = null;
 		$this->plainPassword = $password;
 	}
 
