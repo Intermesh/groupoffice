@@ -1,4 +1,4 @@
-6.5.38
+01-04-2021 6.5.38
 - Core: array relation with ID's keeps records
 - Core: Module dependencies are respected
 - Business: New employee management module
