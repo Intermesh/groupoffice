@@ -1,11 +1,4 @@
-
-Finance branch
-- Business: New finance module
-- Projects: new module
-- Tasks: new module
-- Time tracking: new module
-
-6.5
+6.5.38
 - Core: array relation with ID's keeps records
 - Core: Module dependencies are respected
 - Business: New employee management module
@@ -19,9 +12,13 @@ Finance branch
 - Core: Default authentication domain is appended automatically when local user isn't available. This allows ldap users
   to login with their username without appending or selecting a domain. Removed the domain combo because it's no longer
   needed with this change.
+- Core: Smaller header bar
 
-end 6.5
---------
+
+------
+
+
+
 
 
 - Email: Preseve body style attributes
