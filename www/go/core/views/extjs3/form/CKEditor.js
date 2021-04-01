@@ -58,17 +58,20 @@ go.form.CKEditor = Ext.extend(Ext.form.TextArea, {
                 me.fireEvent('editorChange', me.editor, me.editor.getData());
             });
 
+            me.editor.latestTransferId = null;
             me.editor.on('paste', function (evt) {
-                var dataTransfer = evt.data.dataTransfer,
+                var dataObj = evt.data,
+                    dataTransfer = dataObj.dataTransfer,
                     filesCount = dataTransfer.getFilesCount(),
                     file;
 
-                if(!filesCount) {
+                if(!filesCount || me.editor.latestTransferId === dataTransfer.id) {
                     return;
                 }
 
                 for (var i=0; i < filesCount; i++) {
                     file = dataTransfer.getFile(i);
+
                     go.Jmap.upload(file, {
                         success: function(response) {
                             if (file.type.match(/^image\//)) {
@@ -82,6 +85,9 @@ go.form.CKEditor = Ext.extend(Ext.form.TextArea, {
                         scope: this,
                     });
                 }
+
+                me.editor.latestTransferId = dataTransfer.id
+                evt.stop();
             });
 
         }, this);
