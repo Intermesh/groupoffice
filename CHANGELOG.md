@@ -1,3 +1,4 @@
+01-04-2021 6.4.230
 - Email: Preseve body style attributes
 - Billing: Hide projects tab in report if no projects module available
 - Email: hide context menu 'Delete sender from' if no items available 
