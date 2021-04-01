@@ -977,7 +977,15 @@ END;
 			}
 		}
 
-		return self::prefixCSSSelectors($css, '.'.$prefix);
+		$style = self::prefixCSSSelectors($css, '.'.$prefix);
+
+		//apply body style on root element
+		$bodyStyle = self::extractBodyStyle($html);
+		if(!empty($bodyStyle)) {
+			$style = '.'.$prefix . ' {' . $bodyStyle . "};\n";
+		}
+
+		return $style;
 	}
 
 	private static function prefixCSSSelectors($css, $prefix = '.go-html-formatted') {
@@ -1035,6 +1043,27 @@ END;
 
 	}
 
+	private static function extractBodyStyle($html) {
+		$style = "padding: 14px;";
+
+		if(!preg_match("'<body [^>]*>'usi", $html, $matches)) {
+			return $style;
+		}
+
+		$bodyEl = new \SimpleXMLElement($matches[0] . '</body>');
+		$attr = $bodyEl->attributes();
+
+		if(isset($attr['bgcolor'])) {
+			$style .= "background-color: " . $attr['bgcolor'] .";";
+		}
+
+		if(isset($attr['style'])) {
+			$style .= $attr['style'];
+		}
+
+		return $style;
+	}
+
 	/**
 	 * Convert Dangerous HTML to safe HTML for display inside of Group-Office
 	 *
@@ -1044,7 +1073,7 @@ END;
 	 * @access public
 	 * @return StringHelper HTML formatted string
 	 */
-	public static function sanitizeHtml($html) {
+	public static function sanitizeHtml($html, $preserveHtmlStyle = true) {
 	
 		//needed for very large strings when data is embedded in the html with an img tag
 		ini_set('pcre.backtrack_limit', (int)ini_get( 'pcre.backtrack_limit' )+ 1000000 );
@@ -1057,8 +1086,10 @@ END;
 		$html = preg_replace("'<!--.*-->'Uusi", "", $html);
 		$html = preg_replace('!/\*.*?\*/!s', '', $html);
 
-		$prefix = 'msg-' . uniqid();
-		$styles = self::extractStyles($html, $prefix);
+		if($preserveHtmlStyle) {
+			$prefix = 'groupoffice-msg-' . uniqid();
+			$styles = self::extractStyles($html, $prefix);
+		}
 
 		//strip everything above <body first. This fixes a mail from Amazon that had the body inside the head section :(
 		$bodyPos = stripos($html, '<body');
@@ -1125,6 +1156,7 @@ END;
 		if(!empty($styles)) {
 			$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="'.$prefix.'">'. $html .'</div>';
 		}
+
 		return $html;
 	}
 	
