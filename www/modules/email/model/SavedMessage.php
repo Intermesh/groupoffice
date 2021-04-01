@@ -189,7 +189,7 @@ class SavedMessage extends ComposerMessage {
 					$body = \GO\Base\Util\StringHelper::clean_utf8($part->body, $charset);
 					
 					if (stripos($part->ctype_secondary, 'plain') !== false) {
-						$body = nl2br($body);
+						$body = '<div class="msg">' . nl2br($body) . '</div>';
 					} else {
 						$body = \GO\Base\Util\StringHelper::convertLinks($body);
 						$body = \GO\Base\Util\StringHelper::sanitizeHtml($body, $preserveHtmlStyle);

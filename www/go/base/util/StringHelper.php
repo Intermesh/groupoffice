@@ -1044,7 +1044,7 @@ END;
 	}
 
 	private static function extractBodyStyle($html) {
-		$style = "padding: 14px;";
+		$style = "";
 
 		if(!preg_match("'<body [^>]*>'usi", $html, $matches)) {
 			return $style;
@@ -1154,7 +1154,9 @@ END;
 			$html = StringHelper::replaceEmoticons($html,true);
 
 		if(!empty($styles)) {
-			$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="'.$prefix.'">'. $html .'</div>';
+			$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="msg '.$prefix.'">'. $html .'</div>';
+		} else if($preserveHtmlStyle) {
+			$html = '<div class="msg">'. $html .'</div>';
 		}
 
 		return $html;
