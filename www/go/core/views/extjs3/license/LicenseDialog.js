@@ -2,7 +2,7 @@
 
 go.license.LicenseDialog = Ext.extend(go.Window, {
 	width: dp(600),
-	height: dp(400),
+	height: dp(460),
 	layout:'fit',
 	title: t("Register"),
 	maximized: false,
@@ -38,7 +38,7 @@ go.license.LicenseDialog = Ext.extend(go.Window, {
 
 					this.licenseKeyField = new Ext.form.TextArea({
 
-						anchor: "100% -" + dp(120),
+						anchor: "100% -" + dp(160),
 						xtype: "textarea",
 						fieldLabel: t("License key"),
 						allowBlank: false,
