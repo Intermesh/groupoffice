@@ -38,7 +38,7 @@ go.form.CKEditor = Ext.extend(Ext.form.TextArea, {
                             'Source',
                         ]
                     },
-                ]
+                ],
             });
 
             me.editor = CKEDITOR.replace(me.el.id, me.editorConfig);
@@ -54,8 +54,33 @@ go.form.CKEditor = Ext.extend(Ext.form.TextArea, {
                 me.fireEvent("editorReady", me, me.editor);
             });
 
-            me.editor.on('change', function() {
+            me.editor.on('change', function () {
                 me.fireEvent('editorChange', me.editor, me.editor.getData());
+            });
+
+            me.editor.on('paste', function (evt) {
+                var dataTransfer = evt.data.dataTransfer,
+                    file;
+
+                if(!dataTransfer.getFilesCount()) {
+                    return;
+                }
+
+                for (var i=0; i < dataTransfer.getFilesCount(); i++) {
+                    file = dataTransfer.getFile(i);
+                    go.Jmap.upload(file, {
+                        success: function(response) {
+                            if (file.type.match(/^image\//)) {
+                                evt.data.dataValue = '<img style="max-width: 100%" src="' + go.Jmap.downloadUrl(response.blobId, true) + '" alt="' + file.name + '" />';
+                            } else {
+                                evt.data.dataValue = '<a href="' + go.Jmap.downloadUrl(response.blobId) + '">' + file.name + '</a>';
+                            }
+                            evt.data.type = 'html';
+                            me.editor.fire( 'paste', evt.data );
+                        },
+                        scope: this,
+                    });
+                }
             });
 
         }, this);
@@ -83,7 +108,7 @@ go.form.CKEditor = Ext.extend(Ext.form.TextArea, {
         if (!this.el) {
             this.defaultAutoCreate = {
                 tag: 'textarea',
-                style:"width:100%;height:100%;",
+                style: "width:100%;height:100%;",
                 autocomplete: 'off'
             };
         }
