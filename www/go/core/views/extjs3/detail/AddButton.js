@@ -82,6 +82,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 
 						GO.documenttemplates.templateDocumentDialog.entity = this.getEntity();
 						GO.documenttemplates.templateDocumentDialog.entityId = this.getEntityId();
+						GO.documenttemplates.templateDocumentDialog.folderId = this.detailView.data.files_folder_id;
 
 						GO.documenttemplates.templateDocumentDialog.show();//.show(this.entityId, this.entity);
 
