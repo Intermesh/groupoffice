@@ -1,3 +1,6 @@
+02-04-2021 6.4.231
+- Email: Fixed could not parse XML error
+
 01-04-2021 6.4.230
 - Email: Preseve body style attributes
 - Billing: Hide projects tab in report if no projects module available
