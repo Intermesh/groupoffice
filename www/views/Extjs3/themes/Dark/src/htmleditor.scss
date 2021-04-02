@@ -1,25 +1,20 @@
 @import 'config';
 @import '../../Paper/src/base';
-@import '../../Paper/src/lato';
-body, html {
-	@extend %font-body1;
-	color: color($fg, 'text');
-	text-rendering: optimizeLegibility;
-	-webkit-tap-highlight-color: transparent;
-	-webkit-touch-callout: none;
-	height: 100%;
+
+body, p, span, div {
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: sp(16);
+	color: black;
+	font-weight: $font-weight-r;
+	line-height: dp(24);
 }
 
-button, html, input, select, textarea {
-	font-family: $font-family;
-}
-
-h1 { @extend %font-display1; }
-h2 { @extend %font-headline; }
-h3 { @extend %font-title; }
-h4 { @extend %font-subheading; }
-h5 { @extend %font-subheading-dense; }
-h6 { @extend %font-data-head; }
+h1 { @extend %font-display1;}
+h2 { @extend %font-headline;}
+h3 { @extend %font-title;}
+h4 { @extend %font-subheading;}
+h5 { @extend %font-subheading-dense;}
+h6 { @extend %font-data-head;}
 
 code {
 	border: 1px solid color($fg, 'line');
@@ -34,5 +29,27 @@ code {
 
 p {
 	margin: dp(16) 0;
+}
+
+ul{
+	display: block;
+	list-style-type: disc;
+	list-style-position: outside;
+	margin: 0;
+	padding: 0 0 0 2em;
+}
+
+ol {
+	display: block;
+	list-style-type: decimal;
+	list-style-position: outside;
+	margin: 0;
+	padding: 0 0 0 2em;
+	> ol {
+		list-style-type: lower-alpha;
+		> ol {
+			list-style-type: lower-roman;
+		}
+	}
 }
 

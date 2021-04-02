@@ -113,6 +113,7 @@ go.modules.community.addressbook.DuplicateDialog = Ext.extend(go.Window, {
 
   createGrid: function () {
     this.grid = new go.modules.community.addressbook.ContactGrid({
+      enabledColumns: ['name', 'organizations', 'emailAddresses', 'phoneNumbers', 'addressbook'],
       stateId: 'contact-duplicate',
       region: 'center',
       tbar: [

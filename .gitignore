@@ -2,6 +2,9 @@ forum
 .vscode
 .gitmodules
 /nbproject
+/build/vendor
+/build/config.php
+/build/deploy
 /*-license.txt
 /www/*-license.txt
 .idea
@@ -17,7 +20,6 @@ forum
 /tests/data
 /www/go/modules/*
 !/www/go/modules/community
-!/www/go/modules/core
 /www/modules/*
 !/www/modules/addressbook
 !/www/modules/sync

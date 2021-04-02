@@ -11,6 +11,76 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 
 	autoWidth: false,
 
+	setToday :  function() {
+		var todayStart = (new Date()).clearTime();
+		this.startDatePicker.setValue(todayStart);
+		this.endDatePicker.setValue(todayStart);
+		this.onEndDateSelect();
+	},
+
+	setYesterday :  function() {
+		var todayStart = (new Date()).clearTime(),
+			yesterdayStart = new Date(todayStart).add(Date.DAY, -1);
+		this.startDatePicker.setValue(yesterdayStart);
+		this.endDatePicker.setValue(yesterdayStart);
+		this.onEndDateSelect();
+	},
+
+	setThisWeek :  function() {
+		var todayStart = (new Date()).clearTime(),
+			thisWeekStart = (new Date(todayStart)).add(Date.DAY, (todayStart.format('N') - 1) * -1),
+			thisWeekEnd = (new Date(thisWeekStart)).add(Date.DAY, 6);
+		this.startDatePicker.setValue(thisWeekStart);
+		this.endDatePicker.setValue(thisWeekEnd);
+		this.onEndDateSelect();
+	},
+
+	setLastWeek :  function() {
+		var todayStart = (new Date()).clearTime(),
+			lastWeekStart = (new Date(todayStart)).add(Date.DAY, (todayStart.format('N') + 6) * -1),
+			lastWeekEnd = (new Date(lastWeekStart)).add(Date.DAY, 6);
+		this.startDatePicker.setValue(lastWeekStart);
+		this.endDatePicker.setValue(lastWeekEnd);
+		this.onEndDateSelect();
+	},
+
+	setThisMonth :  function() {
+		var todayStart = (new Date()).clearTime(),
+			thisMonthStart = new Date(todayStart.getFullYear(), todayStart.getMonth(), 1),
+			thisMonthEnd = new Date(todayStart.getFullYear(), todayStart.getMonth() + 1, 1).add(Date.DAY, -1);
+		this.startDatePicker.setValue(thisMonthStart);
+		this.endDatePicker.setValue(thisMonthEnd);
+		this.onEndDateSelect();
+	},
+
+	setLastMonth :  function() {
+		var todayStart = (new Date()).clearTime(),
+			lastMonthStart = new Date(todayStart.getFullYear(), todayStart.getMonth()-1, 1),
+			lastMonthEnd = new Date(todayStart.getFullYear(), todayStart.getMonth(), 1).add(Date.DAY, -1);
+		this.startDatePicker.setValue(lastMonthStart);
+		this.endDatePicker.setValue(lastMonthEnd);
+		this.onEndDateSelect();
+	},
+
+	setThisYear :  function() {
+		var todayStart = (new Date()).clearTime(),
+			thisYearStart = new Date(todayStart.getFullYear() , 0, 1),
+			thisYearEnd = new Date(todayStart.getFullYear() +1 , 0, 1).add(Date.DAY, -1);
+		this.startDatePicker.setValue(thisYearStart);
+		this.endDatePicker.setValue(thisYearEnd);
+		this.onEndDateSelect();
+	},
+
+	setLastYear :  function() {
+		var todayStart = (new Date()).clearTime(),
+			lastYearStart = new Date(todayStart.getFullYear() , 0, 1),
+			lastYearEnd = new Date(todayStart.getFullYear() +1 , 0, 1).add(Date.DAY, -1);
+		this.startDatePicker.setValue(lastYearStart);
+		this.endDatePicker.setValue(lastYearEnd);
+		this.onEndDateSelect();
+	},
+
+
 	initComponent: function() {
 
 		var me = this;
@@ -24,74 +94,41 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 		});
 		this.endDatePicker.on("select", this.onEndDateSelect, this);
 
-		var todayStart = (new Date()).clearTime(),
-			todayEnd = new Date(todayStart).add(Date.DAY, 1),
-			yesterdayStart = new Date(todayStart).add(Date.DAY, -1),
 
-			thisWeekStart = (new Date(todayStart)).add(Date.DAY, (todayStart.format('N') - 1) * -1),
-			thisWeekEnd = (new Date(thisWeekStart)).add(Date.DAY, 6),
-
-		 	thisMonthStart = new Date(todayStart.getFullYear(), todayStart.getMonth(), 1),
-		 	thisMonthEnd = new Date(todayStart.getFullYear(), todayStart.getMonth() + 1, 1).add(Date.DAY, -1),
-
-		 	lastMonthStart = new Date(todayStart.getFullYear(), todayStart.getMonth()-1, 1),
-		 	lastMonthEnd = new Date(todayStart.getFullYear(), todayStart.getMonth(), 1).add(Date.DAY, -1)
-
-			thisYearStart = new Date(todayStart.getFullYear() , 0, 1),
-			thisYearEnd = new Date(todayStart.getFullYear() +1 , 0, 1).add(Date.DAY, -1),
-
-			lastYearStart = new Date(todayStart.getFullYear() - 1, 0, 1),
-			lastYearEnd = new Date(todayStart.getFullYear(), 0, 1).add(Date.DAY, -1);
 
 		this.menu = new Ext.menu.Menu({
 			cls: "x-menu-no-icons",
 			items: [{
 				text: t("Today"),
-				start: todayStart,
-				end: todayStart,
-				handler: this.setDateRange,
+				handler: this.setToday,
 				scope: this
 			},{
 				text: t("Yesterday"),
-				start: yesterdayStart,
-				end: yesterdayStart,
-				handler: this.setDateRange,
+				handler: this.setYesterday,
 				scope: this
 			},{
 				text: t("This week"),
-				start: thisWeekStart,
-				end: thisWeekEnd,
-				handler: this.setDateRange,
+				handler: this.setThisWeek,
 				scope: this
 			},{
 				text: t("Last week"),
-				start: thisWeekStart.add(Date.DAY, -7),
-				end: thisWeekEnd.add(Date.DAY, -7),
-				handler: this.setDateRange,
+				handler: this.setLastWeek,
 				scope: this
 			},{
 				text: t("This month"),
-				start: thisMonthStart,
-				end: thisMonthEnd,
-				handler: this.setDateRange,
+				handler: this.setThisMonth,
 				scope: this
 			},{
 				text: t("Last month"),
-				start: lastMonthStart,
-				end: lastMonthEnd,
-				handler: this.setDateRange,
+				handler: this.setLastMonth,
 				scope: this
 			},{
 				text: t("This year"),
-				start: thisYearStart,
-				end: thisYearEnd,
-				handler: this.setDateRange,
+				handler: this.setThisYear,
 				scope: this
 			},{
 				text: t("Last year"),
-				start: lastYearStart,
-				end: lastYearEnd,
-				handler: this.setDateRange,
+				handler: this.setLastYear,
 				scope: this
 			}, {
 				text: t("Custom"),
@@ -136,11 +173,9 @@ go.form.DateRangeField = Ext.extend(Ext.Button, {
 		this.supr().initComponent.call(this);
 	},
 
-	setDateRange: function(btn) {
-		this.startDatePicker.setValue(btn.start);
-		this.endDatePicker.setValue(btn.end);
-		this.onEndDateSelect();
-	},
+	// setDateRange: function(btn) {
+	//
+	// },
 
 	getName: function () {
 		return this.name;

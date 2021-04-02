@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `history_log_entry` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `action` INT NULL,
-  `description` VARCHAR(192),
+  `description` VARCHAR(384),
   `changes` TEXT NULL,
   `createdAt` DATETIME NULL,
   `createdBy` INT NULL,
@@ -29,3 +29,5 @@ CREATE TABLE IF NOT EXISTS `history_log_entry` (
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
+
+ALTER TABLE `history_log_entry` ADD INDEX(`entityId`);

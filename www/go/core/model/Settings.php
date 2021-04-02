@@ -217,14 +217,6 @@ class Settings extends core\Settings {
 	public $smtpEncryptionVerifyCertificate = true;
 	
 	/**
-	 * If set then all system notifications go to this email address
-	 * 
-	 * @var string 
-	 */
-	public $debugEmail = null;
-	
-	
-	/**
 	 * When maintenance mode is enabled, only admin users can login.
 	 * @var boolean 
 	 */
@@ -500,8 +492,6 @@ class Settings extends core\Settings {
 				$blob->save();
 			}
 		}
-
-
 		
 		//for old framework config caching in GO\Base\Config
 		if(isset($_SESSION)) {
@@ -511,6 +501,10 @@ class Settings extends core\Settings {
 		//Make sure URL has trailing slash
 		if(isset($this->URL)) {
 			$this->URL = rtrim($this->URL, '/ ').'/';
+		}
+
+		if($this->isModified('maintenanceMode') && $this->maintenanceMode) {
+			Token::logoutEveryoneButAdmins();
 		}
 		
 		return parent::save();

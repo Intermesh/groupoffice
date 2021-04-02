@@ -25,3 +25,4 @@ class Download implements FilehandlerInterface{
 		return 'GO.files.downloadFile("'.$file->id.'");';
 	}
 }
+

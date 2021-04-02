@@ -3,11 +3,11 @@
 	font-family: 'Material Icons';
 	font-style: normal;
 	font-weight: 400;
-	src: url(#{$resourcePath}fonts/MaterialIcons-Regular.eot);// IE9 compat modes
+	//src: url(#{$resourcePath}fonts/MaterialIcons-Regular.eot);// IE9 compat modes
 	src: local("Material Icons"), 
 		local("MaterialIcons-Regular"), 
 		url(#{$resourcePath}fonts/MaterialIcons-Regular.woff2) format("woff2"), // Super Modern
-		url(#{$resourcePath}fonts/MaterialIcons-Regular.woff) format("woff"),  // Pretty Modern
+		//url(#{$resourcePath}fonts/MaterialIcons-Regular.woff) format("woff"),  // Pretty Modern
 		url(#{$resourcePath}fonts/MaterialIcons-Regular.ttf) format("truetype"); // Android, Safari, iOS
 }
 // #################
@@ -280,6 +280,7 @@ $btn-icon : (
 //.btn-email:before  {@extend %icon; content: 'email';}
 //button.btn-email { background-image: none !important;}
 
+//Images coming from https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/tree/master/Papirus/16x16/mimetypes
 $filetype: (
 	//null: link,
 	eml: eml,
@@ -301,9 +302,10 @@ $filetype: (
 	txt: txt,
 	ppt: (odp, pps, ppsx, ppt, pptx),
 	html: (html, htm),
-	xls: (ods,xls,xlsx,xlsm),
+	xls: (ods,xls,xlsx,xlsm,csv),
 	php: php,
 	js: js,
+				json: json,
 	sql: sql,
 	xml: xml,
 	kdbx: kdbx
@@ -868,6 +870,7 @@ $material-icons : (
 	mail,
 	mail_outline,
 	map,
+	mark_as_unread,
 	markunread,
 	markunread_mailbox,
 	memory,
@@ -1339,4 +1342,30 @@ $material-icons : (
 		content: 'print';
 		margin-right: dp(8);
 	}
+}
+
+.ic-gender-male {
+	display: inline-block;
+	height: dp(24);
+	width: dp(24);
+
+	//background-size: contain;
+	//background-repeat: no-repeat;
+	background-color: color($fg, 'icon');
+	mask-image: url(#{$resourcePath}img/icon/gender-male.svg);
+	-webkit-mask-image: url(#{$resourcePath}img/icon/gender-male.svg);
+}
+
+
+.ic-gender-female {
+	display: inline-block;
+	height: dp(24);
+	width: dp(24);
+	//background-image: url(#{$resourcePath}img/icon/gender-female.svg);
+	//background-size: contain;
+	//background-repeat: no-repeat;
+	background-color: color($fg, 'icon');
+
+	mask-image: url(#{$resourcePath}img/icon/gender-female.svg);
+	-webkit-mask-image: url(#{$resourcePath}img/icon/gender-female.svg);
 }

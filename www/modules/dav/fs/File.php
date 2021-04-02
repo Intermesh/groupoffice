@@ -132,7 +132,9 @@ class File extends \Sabre\DAV\FS\File {
 	public function delete() {
 		$this->checkWritePermission(true);
 		$file = \GO\Files\Model\File::model()->findByPath($this->relpath);
-		$file->delete();
+		if($file) {
+			$file->delete();
+		}
 	}
 
 	/**

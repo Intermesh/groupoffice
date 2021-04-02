@@ -29,8 +29,8 @@ abstract class Settings extends Model {
     $cls = static::class;
 
 	  if(!isset(self::$instance[$cls])) {
-      $instance = static::dbIsReady() ? go()->getCache()->get($cls) : false;
-      if ($instance) {
+      $instance = static::dbIsReady() ? go()->getCache()->get($cls) : null;
+      if ($instance !== null) {
         self::$instance[$cls] = $instance;
         return $instance;
       }
@@ -45,7 +45,10 @@ abstract class Settings extends Model {
 
 		return self::$instance[$cls];
 	}
-	
+
+	public static function flushCache() {
+		self::$instance = [];
+	}
 
 	protected function getModuleId() {
 		$moduleId = (new Query)
@@ -175,13 +178,14 @@ abstract class Settings extends Model {
 		
 		return $props;
 	}
+
+	protected function isModified($name) {
+		return !array_key_exists($name, $this->oldData) && isset($this->$name) || $this->$name != $this->oldData[$name];
+	}
 	
 	public function save() {
 
-		$new = (array) $this;
-		
 		foreach($this->getSettingProperties() as $name => $value) {
-			
 			if(!array_key_exists($name, $this->oldData) || $value != $this->oldData[$name]) {
 				if(in_array($name, $this->readOnlyKeys)) {
 					throw new Forbidden(static::class . ':' . $name . " can't be changed because it's defined in the configuration file on the server.");
@@ -190,6 +194,8 @@ abstract class Settings extends Model {
 				$this->update($name, $value);
 			}
 		}
+
+		$this->oldData = (array) $this;
 
 		go()->getCache()->set(static::class, $this);
 		

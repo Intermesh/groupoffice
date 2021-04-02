@@ -31,8 +31,10 @@ return array (
   'emailTypes' => 
   array (
     'work' => 'Werk',
+    'visit' => 'Bezoek',
     'home' => 'Thuis',
     'billing' => 'Factuur',
+	  'delivery' => 'Levering',
   ),
   'phoneTypes' => 
   array (
@@ -120,4 +122,8 @@ return array (
   'Failed to add contacts to the group' => 'Fout bij het toevoegen van contacten aan de groep',
   'Information' => 'Informatie',
   'Name bank' => 'Naam bank',
+	'Upcoming birthdays' => 'Komende verjaardagen',
+	'Birthday' => 'Verjaardag',
+	'Birthdays' => 'Verjaardagen',
+	'Age' => 'Leeftijd'
 );

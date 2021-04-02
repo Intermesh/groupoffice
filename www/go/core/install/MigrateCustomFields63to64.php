@@ -18,6 +18,19 @@ class MigrateCustomFields63to64 {
 	const TREE_SELECT_OPTION_INCREMENT = 100000;
 
 	private static $TREE_SELECT_OPTION_MISSING_ID = 200000;
+
+
+	private function resizeSelectCol(Field $field) {
+		$dbCol = go()->getDatabase()->getTable($field->tableName())->getColumn($field->databaseName);
+		if($dbCol->length < 10) {
+			$dbCol->dataType = $dbCol->dbType . '(' . 10 . ')';
+			$colDef = $dbCol->getCreateSQL();
+
+			$sql = "ALTER TABLE `" . $field->tableName() . "` CHANGE `".$dbCol->name."` `".$dbCol->name."` " . $colDef;
+			go()->getDbConnection()->exec($sql);
+		}
+
+	}
 	
 	public function migrateEntity($entityName) {
 		
@@ -36,12 +49,17 @@ class MigrateCustomFields63to64 {
 		$fields = Field::findByEntity($entityType->getId());
 
 		foreach ($fields as $field) {
+
+			/* @var Field $field */
 			
 			echo $field->id . ' - '.$field->type ."\n";
 			flush();
 			
 			switch ($field->type) {
 				case "Select":
+
+						$this->resizeSelectCol($field);
+
 						if($field->getOption('multiselect')) {
 							$this->updateMultiSelect($field);
 						} else
@@ -51,6 +69,8 @@ class MigrateCustomFields63to64 {
 					break;
 
 				case "Treeselect":
+					$this->resizeSelectCol($field);
+
 						$this->updateTreeSelect($field);
 					break;
 				

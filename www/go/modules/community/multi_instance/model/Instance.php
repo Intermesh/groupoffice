@@ -118,6 +118,10 @@ class Instance extends Entity {
 		if($this->isNew()) {
 			$this->hostname = trim(strtolower($this->hostname));
 
+			if(empty($this->hostname)) {
+				$this->setValidationError('hostname', ErrorCode::REQUIRED, 'The hostname field is required');
+			}
+
 			if(!preg_match('/^[a-z0-9-_\.]*$/', $this->hostname)) {
 				$this->setValidationError('hostname', ErrorCode::MALFORMED, 'The hostname was malformed');
 			}
@@ -200,22 +204,42 @@ class Instance extends Entity {
 		
 		if($this->isNew()) {		
 			$this->createInstance();
-		} 
+		}
+
+
+		$instanceConfig = $this->getInstanceConfig();
+		$globalConfig = $this->getGlobalConfig();
+		$mergedConfig = array_merge($globalConfig, $instanceConfig);
+
+		$studioAllowed = \GO\Base\ModuleCollection::isAllowed("studio", "business", $mergedConfig['allowed_modules'] ?? []);
+
+		if($studioAllowed) {
+			if(!$this->getModulePackageFolder()->create()) {
+				throw new Exception("Could not create module package folder in go/modules/*. Please make go/modules writable.");
+			}
+		} else{
+			if($this->getModulePackageFolder()->exists() && $this->getModulePackageFolder()->isEmpty()) {
+				//$this->getModulePackageFolder()->delete();
+			}
+		}
 		
 		if($this->isModified(['storageQuota', 'userMax', 'enabled'])) {
-			$config = $this->getInstanceConfig();
-			$config['quota'] = $this->storageQuota / 1024;
-			$config['max_users'] = $this->usersMax;
-			$config['enabled'] = $this->enabled;
-			$this->setInstanceConfig($config);
+			$instanceConfig['quota'] = $this->storageQuota / 1024;
+			$instanceConfig['max_users'] = $this->usersMax;
+			$instanceConfig['enabled'] = $this->enabled;
+			$this->setInstanceConfig($instanceConfig);
 		}
 		
 		//$this->createWelcomeMessage();
 		
 		return true;	
 	}
-	
-	
+
+	/**
+	 * Called by install/install.php when installed from server manager
+	 *
+	 * @throws Exception
+	 */
 	public function onInstall() {
 		$this->createWelcomeMessage();
 		
@@ -226,22 +250,45 @@ class Instance extends Entity {
 	
 	private function copySystemSettings() {
 		$core = go()->getSettings()->toArray();
-		$groups = \go\core\model\Settings::get()->toArray();
-		$users = \go\core\model\Settings::get()->toArray();
-		
+
+		$valuesToCopy = array (
+			0 => 'locale',
+			1 => 'primaryColorTransparent',
+			4 => 'language',
+			7 => 'smtpHost',
+			8 => 'smtpPort',
+			9 => 'smtpUsername',
+			10 => 'smtpEncryption',
+			11 => 'smtpEncryptionVerifyCertificate',
+			15 => 'passwordMinLength',
+			16 => 'logoutWhenInactive',
+			19 => 'syncChangesMaxAge',
+			22 => 'primaryColor',
+			23 => 'secondaryColor',
+			24 => 'accentColor',
+			26 => 'defaultTimezone',
+			27 => 'defaultDateFormat',
+			28 => 'defaultTimeFormat',
+			29 => 'defaultCurrency',
+			30 => 'defaultFirstWeekday',
+			31 => 'userAddressBookId',
+			32 => 'defaultListSeparator',
+			33 => 'defaultTextSeparator',
+			34 => 'defaultThousandSeparator',
+			35 => 'defaultDecimalSeparator',
+			36 => 'defaultShortDateInList',
+		);
+
 		$coreModuleId = (new \go\core\db\Query)
 						->setDbConnection($this->getInstanceDbConnection())
 						->selectSingleValue('id')
 						->from('core_module')
 						->where(['package'=>'core', 'name'=>'core'])->single();
 		
-		foreach($core as $name => $value) {
-			if($name === "databaseVersion" || $name === "title" || $name === "URL") {
-				continue;
-			}
-			
+		foreach($valuesToCopy as $name) {
+
 			$this->getInstanceDbConnection()
-							->replace('core_setting', ['name' => $name, 'value' => $value, "moduleId" => $coreModuleId])->execute();
+							->replace('core_setting', ['name' => $name, 'value' => $core[$name], "moduleId" => $coreModuleId])->execute();
 		}
 	}	
 	
@@ -298,10 +345,6 @@ class Instance extends Entity {
 		$databaseCreated = $databaseUserCreated = false;
 		try {
 
-			if(!$this->getModulePackageFolder()->create()) {
-				throw new Exception("Could not create module package folder in go/modules/*. Please make go/modules writable.");
-			}
-
 			if(!$dataFolder->create()) {
 				throw new Exception("Could not create data folder");
 			}
@@ -309,7 +352,6 @@ class Instance extends Entity {
 			if(!$tmpFolder->create()) {
 				throw new Exception("Could not create temporary files folder");
 			}
-
 		
 			$this->createDatabase($dbName);
 			$databaseCreated = true;
@@ -319,7 +361,6 @@ class Instance extends Entity {
 			if(!$configFile->putContents($this->createConfigFile($dbName, $dbUsername, $dbPassword, $tmpFolder->getPath(), $dataFolder->getPath()))) {
 				throw new Exception("Could not write to config file");
 			}
-
 
 		} catch(\Exception $e) {
 			
@@ -337,7 +378,7 @@ class Instance extends Entity {
 
 			$this->getModulePackageFolder()->delete();
 			
-			parent::internalDelete((new Query())->where(['id' => $this->id]));
+			parent::internalDelete((new Query())->from(self::getMapping()->getPrimaryTable()->getName())->where(['id' => $this->id]));
 			
 			throw $e;
 		}
@@ -572,13 +613,25 @@ class Instance extends Entity {
 
 		foreach($instances as $instance) {
 			try {
-				$instance->getTempFolder()->delete();
+				//load instance config just before moving the config file. Moving the config file disables
+				// the installation and prevents further changes.
+				$instance->getInstanceConfig();
+				$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php'));
+
+				try {
+					$instance->getTempFolder()->delete();
+				}catch(Exception $e) {
+					//ignore because a running sync process might have filled up the temp dir again.
+					ErrorHandler::log("Could not delete temp folder: " . $e->getMessage());
+				}
 
 				$instance->mysqldump();
 
-				$instance->getModulePackageFolder()->move($instance->getDataFolder()->getFolder($instance->getStudioPackage() .'_MODULE_PACKAGE'));
+				$modPackageFolder = $instance->getModulePackageFolder();
+				if($modPackageFolder->exists()) {
+					$instance->getModulePackageFolder()->move($instance->getDataFolder()->getFolder($instance->getStudioPackage() . '_MODULE_PACKAGE'));
+				}
 
-				$instance->getConfigFile()->move($instance->getDataFolder()->getFile('config.php'));
 				$instance->getConfigFile()->getFolder()->delete();
 
 				$dest = $instance->getTrashFolder()->getFolder($instance->getDataFolder()->getName());
@@ -590,6 +643,7 @@ class Instance extends Entity {
 				$instance->dropDatabaseUser($instance->getDbUser());
 				$instance->dropDatabase($instance->getDbName());
 			}catch(Exception $e) {
+				ErrorHandler::log("Error deleting instance: ". $instance->hostname);
 				ErrorHandler::logException($e);
 
 				go()->getMailer()
@@ -622,7 +676,7 @@ class Instance extends Entity {
 
 		//echo $response['body'];
 
-		return $response['status'] == 200;
+		return strstr($response['body'], '<div id="success">') !== false;
 	}
 
 	private static $availableModules;
@@ -645,7 +699,7 @@ class Instance extends Entity {
 		$modules = self::getAvailableModules();
 		$instanceConfig = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
 		$checkAllowed = false;
-		if (array_key_exists('allowed_modules', $instanceConfig) && is_array($instanceConfig['allowed_modules'])) {
+		if (array_key_exists('allowed_modules', $instanceConfig)) {
 			$checkAllowed = true;
 		}
 		$returnMods = [];
@@ -676,7 +730,7 @@ class Instance extends Entity {
 				];
 			}
 			if ($checkAllowed) {
-				$avMod['allowed'] = \GO\Base\ModuleCollection::isAllowed($avMod['module'], $avMod['package']);
+				$avMod['allowed'] = \GO\Base\ModuleCollection::isAllowed($avMod['module'], $avMod['package'], $instanceConfig['allowed_modules']);
 			} else {
 				$avMod['allowed'] = true;
 			}
@@ -703,4 +757,5 @@ class Instance extends Entity {
 		$this->setInstanceConfig($config);
 
 	}
+
 }

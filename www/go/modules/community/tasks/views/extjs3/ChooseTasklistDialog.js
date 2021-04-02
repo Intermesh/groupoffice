@@ -25,7 +25,7 @@ go.modules.community.tasks.ChooseTasklistDialog = Ext.extend(Ext.Window, {
                 } else {
                     go.util.importFile(
                         'Task', 
-                        "text/vcalendar,text/csv",
+                        ".ics,.csv",
                         { tasklistId: this.chooseTasklistGrid.selectedId },
                         {},
                         {
@@ -37,9 +37,7 @@ go.modules.community.tasks.ChooseTasklistDialog = Ext.extend(Ext.Window, {
                                 description: t("description"),
                                 status: t("status"),
                                 priority: t("priority"),
-                                percentageComplete: t("percentage completed"),
-                                "alerts.remindDate": t("remind date"),
-                                "alerts.remindTime": t("remind time"),
+                                percentComplete: t("percentage completed"),
                                 categories: t("categories")
 
                             }

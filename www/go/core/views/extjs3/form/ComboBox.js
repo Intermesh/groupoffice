@@ -4,7 +4,51 @@
  * This will automatically load entities if a go.data.Store is used so it can 
  * display the text.
  * 
- * @type |||
+ * @example
+ * go.modules.community.addressbook.AddresBookCombo = Ext.extend(go.form.ComboBox, {
+	fieldLabel: t("Address book"),
+	hiddenName: 'addressBookId',
+	anchor: '100%',
+	emptyText: t("Please select..."),
+	pageSize: 50,
+	valueField: 'id',
+	displayField: 'name',
+	triggerAction: 'all',
+	editable: true,
+	selectOnFocus: true,
+	forceSelection: true,
+	listeners: {
+
+		//example of handling default value missing
+		valuenotfound: function(cmp, id) {
+			if(id == go.User.notesSettings.defaultNoteBookId) {
+
+				GO.errorDialog.show("Your default notebook wasn't found. Please select a notebook and it will be set as default.");
+
+				cmp.setValue(null);
+
+				cmp.on('change', function(cmp, id) {
+					go.Db.store("User").save({
+						notesSettings: {defaultNoteBookId: id}
+					}, go.User.id);
+				}, {single: true});
+			}
+		},
+		scope: this
+	},
+	store: {
+		xtype: "gostore",
+		fields: ['id', 'name'],
+		entityStore: "AddressBook",
+		filters: {
+			default: {
+					permissionLevel: go.permissionLevels.write
+			}
+		}
+	}
+});
+
+Ext.reg("addressbookcombo", go.modules.community.addressbook.AddresBookCombo);
  */
 go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	value: null,
@@ -103,12 +147,16 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 	createNew : function(record) {
 
-		var data = record.data;
+		var entity = record.data;
 		if(Ext.isObject(this.allowNew)) {
-			Ext.apply(data, this.allowNew);
+			Ext.apply(entity, this.allowNew);
 		}
-		var create = {"newid" : data}, me = this;
 
+		if(this.fireEvent("beforecreatenew", this, entity) === false) {
+			return;
+		}
+
+		var create = {"newid" : entity}, me = this;
 		//reset store and prevent onChanges call.
 
 		me.collapse();
@@ -179,9 +227,12 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 					me.store.on("load", function() {
 						go.form.ComboBox.superclass.setValue.call(me, value);
+
+						me.fireEvent("valuenotfound", this, value);
 					}, me, {single: true});
 					me.store.loadData({records:[data]}, true);
 					//go.form.ComboBox.superclass.setValue.call(me, value);
+
 					resolve(me);
 				});
 			} else
@@ -196,6 +247,8 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 							text = r.data[me.displayField];
 					 }else if(Ext.isDefined(me.valueNotFoundText)){
 							text = me.valueNotFoundText;
+
+						 me.fireEvent("valuenotfound", this, value);
 					 }
 				}
 				me.lastSelectionText = text;

@@ -95,16 +95,18 @@ GO.email.MessagesGrid = function(config){
 			cls: 'go-paging-tb',
 			store: config.store,
 			pageSize: parseInt(GO.settings['max_rows_list']),
-			displayInfo: true,
-			displayMsg: t("Total: {2}"),
+			//displayInfo: true,
+			//displayMsg: t("Total: {2}"),
 			emptyMsg: t("No items to display")
 		});
-		
+	config.bbar.refresh.setVisible(false);
+
 	config.autoExpandColumn='message';
 
-	config.view = new Ext.grid.GroupingView({
+	config.view = new go.grid.GroupingView({
 		groupTextTpl:'{group}',
 		emptyText: t("No items to display"),
+		totalDisplay: true,
 		getRowClass:function(row, index) {
 			return (row.data.seen == '0') ? 'ml-unseen-row' : 'ml-seen-row';
 		}		
@@ -168,7 +170,14 @@ GO.email.MessagesGrid = function(config){
 			defaults: {
 				checked: false,
 				listeners: {
+					beforecheckchange: function(item, checked) {
+
+						if (!item.value) {
+							return false;
+						}
+					},
 					checkchange: function(item, checked) {
+
 
 						if(checked) {
 							this.searchType.setValue(item.value);
@@ -218,6 +227,7 @@ GO.email.MessagesGrid = function(config){
 				text:  t("Recipient (CC)", "email"),
 				icon: 'send'
 			}, "-", {
+				group: "none",
 				iconCls: 'ic-more',
 				text: t("Advanced", "email"),
 				handler: function(){
@@ -380,8 +390,10 @@ GO.email.MessagesGrid = function(config){
 
 }
 
-Ext.extend(GO.email.MessagesGrid, GO.grid.GridPanel,{
-	
+Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
+
+	deleteSelected: GO.grid.GridPanel.prototype.deleteSelected,
+
 	show : function()
 	{
 		if(GO.email.messagesGrid.store.baseParams['unread'] === 1 || GO.email.messagesGrid.store.baseParams['unread'] === true){
@@ -414,7 +426,7 @@ Ext.extend(GO.email.MessagesGrid, GO.grid.GridPanel,{
 	},
 	toggleUnread : function(item, pressed)
 	{
-		this.setIconClass(pressed ? 'ic-email' : 'ic-markunread-mailbox');
+		this.setIconClass(pressed ? 'ic-email' : 'ic-mark-as-unread');
 		this.setTooltip(pressed ? t("Show all", "email") : t("Show unread", "email"));
 		GO.email.messagesGrid.store.baseParams['unread']=pressed ? 1 : 0;
 

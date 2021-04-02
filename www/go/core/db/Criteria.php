@@ -173,12 +173,17 @@ class Criteria {
 			if($count > 1) {
 				$sub = new Criteria();
 				foreach($condition as $colName => $value) {
-					$sub->andWhere($colName, '=', $value);				
+					$op = is_array($value) || $value instanceof Query ? 'IN' : '=';
+					$sub->andWhere($colName, $op, $value);
 				}			
 				$condition = $sub;
 			} else if ($count === 1) {
 				reset($condition);
-				return ["column", $logicalOperator, key($condition), '=', current($condition)];	
+				$value = current($condition);
+
+				//Use "IN" for array values and sub queries
+				$op = is_array($value) || $value instanceof Query ? 'IN' : '=';
+				return ["column", $logicalOperator, key($condition), $op, $value];
 			}
 		} 
 		
@@ -319,7 +324,7 @@ class Criteria {
    * @param String|array|Criteria $column
    * @param string $operator =, !=, IN, NOT IN etc. Defaults to '=' OR 'IN' (for arrays)
    * @param mixed $value
-	 * @return static
+	 * @return $this
 	 */
 	public function orWhere($column, $operator = null, $value = null) {
 		$this->where[] = $this->internalWhere($column, $operator, $value, 'OR');
@@ -356,7 +361,7 @@ class Criteria {
 	 * @param string|array $tag eg. ":userId" or [':userId' => 1]
 	 * @param mixed $value
 	 * @param int $pdoType {@see \PDO} Autodetected based on the type of $value if omitted.
-	 * @return static
+	 * @return $this
 	 */
 	public function bind($tag, $value = null, $pdoType = null) {
 		
@@ -374,6 +379,16 @@ class Criteria {
 		$this->bindParameters[] = ['paramTag' => $tag, 'value' => $value, 'pdoType' => $pdoType];
 		
 		return $this;
+	}
+
+	public static $bindTag = 0;
+
+	/**
+	 * Generate unique tag to use in {@see bind()}
+	 * @return string
+	 */
+	public function bindTag() {
+		return 'qp' . self::$bindTag++;
 	}
 	
 	/**

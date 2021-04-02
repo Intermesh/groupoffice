@@ -42,7 +42,7 @@ class Task extends AclItemEntity {
 	public $groupId;
 
     /** @var int */
-    public $projectId = 0;
+    public $projectId ;
 
 	/** @var int */
 	public $createdBy;
@@ -54,10 +54,10 @@ class Task extends AclItemEntity {
 	public $modifiedAt;
 
 	/** @var int */
-	public $modifiedBy = 0;
+	public $modifiedBy;
 
     /** @var int */
-    public $filesFolderId = 0;
+    public $filesFolderId;
 
     /** @var DateTime due date (when this should be finished) */
     public $due;
@@ -87,7 +87,8 @@ class Task extends AclItemEntity {
 
 	public $color;
 
-	public $status;
+	//The scheduling status
+	//public $status = 'confirmed';
 
 	/**
      * If present, this object represents one occurrence of a
@@ -117,10 +118,10 @@ class Task extends AclItemEntity {
 	public $freeBusyStatus = 'free';
 
 	/** @var string public , private, secret */
-    public $privacy = 'public';
+	public $privacy = 'public';
 
-    public $replyTo;
-    public $participants;
+   public $replyTo;
+   public $participants;
 
 	/** @var int between 0 and 100 */
 	public $percentComplete = 0;
@@ -207,7 +208,7 @@ class Task extends AclItemEntity {
 				}
 			})->add('categories', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
-					$query->join("task_task_category","categories","task.id = categories.taskId")
+					$query->join("tasks_task_category","categories","task.id = categories.taskId")
 					->where(['categories.categoryId' => $value]);
 				}
 			})->addDate("start", function(Criteria $criteria, $comparator, $value) {
@@ -216,6 +217,8 @@ class Task extends AclItemEntity {
 				$criteria->where(['due' => $value]);
 			})->add('percentComplete', function(Criteria $criteria, $value) {
 				$criteria->where(['percentComplete' => $value]);
+			})->add('complete', function(Criteria $criteria, $value) {
+				$criteria->where('progress', $value?'=':'!=',Progress::Completed);
 			})->addDate("late", function(Criteria $criteria, $comparator, $value) {
 				$criteria->where('due', '<', $value);
 			})->addDate("future", function(Criteria $criteria, $comparator, $value) {
@@ -228,7 +231,27 @@ class Task extends AclItemEntity {
 	}
 
 	protected function internalSave() {
-		if(!empty($this->recurrenceRule) && $this->percentageComplete == 100) {
+
+		if($this->isNew()) {
+		    $this->uid = \go\core\util\UUID::v4();
+      }
+
+		if($this->progress == Progress::Completed) {
+			$this->percentComplete = 100;
+		}
+		if($this->isModified('percentComplete')) {
+			if ($this->percentComplete == 100) {
+				$this->progress = Progress::Completed;
+			} else if ($this->percentComplete > 0 && $this->progress == Progress::NeedsAction) {
+				$this->progress = Progress::InProcess;
+			}
+		}
+
+		if($this->isModified('progress')){
+			$this->progressUpdated = new DateTime();
+		}
+
+		if(!empty($this->recurrenceRule) && $this->progress == Progress::Completed) {
 			$next = $this->getNextRecurrence($this->getRecurrenceRule());
 			if($next) {
 				$this->createNewTask($next);
@@ -236,10 +259,6 @@ class Task extends AclItemEntity {
 				$this->recurrenceRule = null;
 			}
 		}
-
-		if($this->isNew()) {
-		    $this->uid = \go\core\util\UUID::v4();
-        }
 
 		// if alert can be based on start / due of task check those properties as well
 		if($this->isModified('alerts') ||
@@ -249,6 +268,7 @@ class Task extends AclItemEntity {
 
 		return parent::internalSave();
 	}
+
 
 	private function updateAlerts() {
 		$entityType = EntityType::findByName('Task');
@@ -273,69 +293,47 @@ class Task extends AclItemEntity {
 		}
 	}
 
-	protected function createNewTask(\DateTime $next) {
-		$nextTask = new Task();
+	protected function createNewTask(\DateTimeInterface $next) {
+
 		$values = $this->toArray();
+		unset($values['id']);
+		unset($values['progress']);
+		unset($values['percentComplete']);
+		unset($values['progressUpdated']);
+		unset($values['freeBusyStatus']);
+
+		$nextTask = new Task();
 		$nextTask->setValues($values);
 		$rrule = $this->getRecurrenceRule();
 			
 		if(!empty($rrule->count)) {
 			$rrule->count--;
-			if($rrule->count > 0) {
-				$nextTask->setRecurrenceRule($rrule);
-			} else{
-				$nextTask->recurrenceRule = null;
-			}
+			$nextTask->setRecurrenceRule($rrule->count > 0 ? $rrule : null);
+		} else if(!empty($rrule->until)) {
+			$nextTask->setRecurrenceRule($rrule->until > $next ? $rrule : null);
 		} else{
 			$nextTask->setRecurrenceRule($rrule);
 		}
 
-		$this->recurrenceRule = "";
-		
-		$nextTask->percentageComplete = 0;
-		$nextTask->id = NULL;
-		$diff = $this->start->diff($next);
-		$nextTask->start = $next;
-		$nextTask->due->add($diff);
+		$this->recurrenceRule = null;
 
+		$nextTask->start = $next;
+		if(!empty($nextTask->due)) {
+			$diff = $this->start->diff($next);
+			$nextTask->due->add($diff);
+		}
 		if(!$nextTask->save()) {
 			throw new \Exception("Could not save next task: ". var_export($nextTask->getValidationErrors(), true));
 		}
-	}
-
-	protected function parseToRRULE($rrule) {
-		if(isset($rrule->until)) {
-			$rrule->until = str_replace(['-',':'], ['',''], $rrule->until);
-		}
-
-		if(isset($rrule->bySetPosition)) {
-			$rrule->bySetPos = $rrule->bySetPosition;
-		}
-
-		if(empty($rrule->byDay)) {
-			unset($rrule->byDay);
-		} else {
-			foreach($rrule->byDay as $key => $value) {
-				$position = $value->position ?? '';
-				$rrule->byDay->{$key} = $position . $value->day;
-			}
-		}
-
-		$rrule->FREQ = $rrule->frequency;
-
-		unset($rrule->bySetPosition);
-		unset($rrule->frequency);
-		return (array)$rrule;
 	}
 
 	/**
 	 * @return \DateTime
 	 */
 	protected function getNextRecurrence($rrule){
-		$rRuleIt = new \GO\Base\Util\Icalendar\RRuleIterator($this->parseToRRULE($rrule), $this->start);
-		$rRuleIt->next();
-		$nextTime = $rRuleIt->current();
-		return $nextTime;
+		$rule = Recurrence::fromArray((array)$rrule, $this->start);
+		$rule->next();
+		return $rule->current();
 	}
 
 	public static function sort(Query $query, array $sort)
@@ -344,7 +342,7 @@ class Task extends AclItemEntity {
 			$query->join('tasks_tasklist_group', 'listGroup', 'listGroup.id = task.groupId', 'LEFT');
 			$sort['listGroup.sortOrder'] = $sort['groupOrder'];
 			unset($sort['groupOrder']);
-		};
+		}
 
 		return parent::sort($query, $sort);
 	}

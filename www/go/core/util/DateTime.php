@@ -3,6 +3,7 @@ namespace go\core\util;
 
 use DateTime as PHPDateTime;
 use go\core\data\ArrayableInterface;
+use go\core\model\User;
 
 class DateTime extends PHPDateTime implements ArrayableInterface, \JsonSerializable {
 
@@ -32,12 +33,19 @@ class DateTime extends PHPDateTime implements ArrayableInterface, \JsonSerializa
 	private static function currentUser() {
 		if(!isset(self::$currentUser)) {
 			self::$currentUser = go()->getAuthState()->getUser(['dateFormat', 'timezone', 'timeFormat' ]);
+			if(!self::$currentUser) {
+				self::$currentUser = User::findById(1, ['dateFormat', 'timezone', 'timeFormat' ], true);
+			}
 		}
 		return self::$currentUser;
 	}
 
-	public function toUserFormat($withTime = false) {
-
+	public function toUserFormat($withTime = false)
+	{
+		// In case a user is not logged in
+		if( empty(self::currentUser()) || empty(self::currentUser()->dateFormat)) {
+			return $withTime ? $this->format(self::FORMAT_API) : $this->format(self::FORMAT_API_DATE_ONLY);
+		}
 		$f = self::currentUser()->dateFormat;
 		if($withTime) {
 			$date = clone $this;

@@ -7,6 +7,7 @@ use Exception;
 use GO;
 use GO\Base\Exception\AccessDenied;
 use go\core\fs\Blob;
+use go\core\orm\SearchableTrait;
 use GO\Files\Model\Folder;
 
 class FolderController extends \GO\Base\Controller\AbstractModelController {
@@ -875,11 +876,11 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 			$response['success'] = true;
 
-			$queryStr = !empty($params['query']) ? '%'.$params['query'].'%' : '%';
+			$queryStr = !empty($params['query']) ? $params['query'] : '';
 			$limit = !empty($params['limit']) ? $params['limit'] : 30;
 			$start = !empty($params['start']) ? $params['start'] : 0;
 
-			$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.aclId', 'sc.aclId', '=', false);
+			$aclJoinCriteria = \GO\Base\Db\FindCriteria::newInstance()->addRawCondition('a.aclId', 's.aclId', '=', false);
 
 			$aclWhereCriteria = \GO\Base\Db\FindCriteria::newInstance()
 					->addInCondition("groupId", \GO\Base\Model\User::getGroupIds(\GO::user()->id), "a", false);
@@ -888,24 +889,21 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					->select('t.*')
 					->ignoreAcl()
 					->joinCustomFields()
-					->joinModel(array(
-						'model'=>'GO\Base\Model\SearchCacheRecord',
-						'localTableAlias'=>'t',
-						'localField'=>'id',
-						'foreignField'=>'entityId',
-						'tableAlias'=>'sc'
-					))
+					->join("core_search", "s.entityId = t.id AND s.entityTypeId = " . \GO\Files\Model\File::entityType()->getId(), "s")
+
 					->join(\GO\Base\Model\AclUsersGroups::model()->tableName(), $aclJoinCriteria, 'a', 'INNER')->debugSql()
-					->criteria(
-						\GO\Base\Db\FindCriteria::newInstance()
-							->addCondition('entityTypeId', \GO::getModel('GO\Files\Model\File')->modelTypeId(),  '=', 'sc', true)
-							->mergeWith(
-								\GO\Base\Db\FindCriteria::newInstance()
-									->addCondition('name', $queryStr, 'LIKE', 'sc', false)
-									->addCondition('keywords', $queryStr, 'LIKE', 'sc', false)
-							)
-							->mergeWith($aclWhereCriteria)
-					);
+					->criteria($aclWhereCriteria);
+
+			$i = 0;
+
+			$words = SearchableTrait::splitTextKeywords($queryStr);
+
+			foreach($words as $word) {
+
+				$findParams->join("core_search_word", 'w'.$i.'.searchId = s.id', 'w'.$i);
+				$findParams->getCriteria()->addCondition('word', $word . '%', 'LIKE', 'w'.$i);
+				$i++;
+			}
 			
 			if(isset($params['sort'])){
 
@@ -1129,29 +1127,35 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		return $folder->id;
 	}
 
-
-	protected function checkEntityFolder($params) {
-		$cls = $params['model'];
-
+	/**
+	 * @param array $params
+	 * @return array
+	 * @throws AccessDenied
+	 */
+	protected function checkEntityFolder($params)
+	{
 		$entityType = \go\core\orm\EntityType::findByName($params['model']);
 		$cls = $entityType->getClassName();
 
 		$entity = $cls::findById($params['id']);
-		
+
 		$folder = Folder::model()->findForEntity($entity);
 		return [
-				"success" => true,
-				"files_folder_id" => $folder->id
+			"success" => true,
+			"files_folder_id" => $folder->id,
+			"path" =>  $folder->path
 		];
 	}
 
 	/**
 	 * check if a model folder exists
 	 *
-	 * @param type $params
-	 * @return type
+	 * @param array $params
+	 * @return array
+	 * @throws Exception
 	 */
-	protected function actionCheckModelFolder($params) {
+	protected function actionCheckModelFolder($params)
+	{
 
 		$cls = $params['model'];
 		$entityType = \go\core\orm\EntityType::findByName($params['model']);
@@ -1166,11 +1170,23 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$obj = new $cls(false);
 		$model = $obj->findByPk($params['id'],false, true);
 
-		$response['success'] = true;
-		$response['files_folder_id'] = $this->checkModelFolder($model, true, !empty($params['mustExist']));
-		return $response;
+		$folderId =  $this->checkModelFolder($model, true, !empty($params['mustExist']));
+		$folder = Folder::model()->findByPk($folderId);
+
+		return [
+			'success' => true,
+			'files_folder_id' => $folderId,
+			'path' => $folder->path
+		];
 	}
 
+	/**
+	 * @param GO\Base\Db\ActiveRecord $model
+	 * @param false $saveModel
+	 * @param false $mustExist
+	 * @return bool|int|mixed|string|null
+	 * @throws AccessDenied
+	 */
 	public function checkModelFolder(\GO\Base\Db\ActiveRecord $model, $saveModel=false, $mustExist=false) {
 		$oldAllowDeletes = \GO\Base\Fs\File::setAllowDeletes(false);
 	
@@ -1192,9 +1208,10 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					
 			$model->files_folder_id = $this->_checkExistingModelFolder($model, $folder, $mustExist);
 
-			if ($saveModel && $model->isModified())
+			if ($saveModel && $model->isModified()) {
 				$model->save(true);
-		}elseif ($model->alwaysCreateFilesFolder() || $mustExist) {
+			}
+		} elseif ($model->alwaysCreateFilesFolder() || $mustExist) {
 			
 			GO::debug('Folder does not exist in database. Will create it.');
 		
@@ -1210,8 +1227,9 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				$model->save(true);
 		}
 
-		if(empty($model->files_folder_id))
-			$model->files_folder_id=0;
+		if (empty($model->files_folder_id)) {
+			$model->files_folder_id = 0;
+		}
 
 		 \GO\Base\Fs\File::setAllowDeletes($oldAllowDeletes);
 		 
@@ -1223,6 +1241,8 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 	}
 
 	protected function actionProcessUploadQueue($params) {
+
+		GO::setMaxExecutionTime(3600);
 
 		$response['success'] = true;
 
@@ -1256,7 +1276,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 				// its a json object with blob data
 				$blob = $tmpfile;
 
-				$tmpfile = Blob::buildPath($blob->blobId);
+				$tmpfile = Blob::buildPath($blob->id);
 			} else{
 				unset($blob);
 			}
@@ -1282,7 +1302,7 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 						}
 					}
 					$filename = $blob->name;
-					$removeBlob = $this->removeBlob($blob->blobId);
+					$removeBlob = $this->removeBlob($blob->id);
 				}else{
 					$removeBlob = false;
 				}
@@ -1691,4 +1711,14 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		echo $this->render('delete', array('model' => $model));
 	}
+
+	/**
+	 * @param $model
+	 * @return mixed
+	 */
+	protected function checkLoadPermissionLevel($model)
+	{
+		return $model->checkPermissionLevel($model->isNew() ?\GO\Base\Model\Acl::CREATE_PERMISSION : \GO\Base\Model\Acl::READ_PERMISSION);
+	}
+
 }

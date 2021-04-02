@@ -2,6 +2,8 @@
 namespace go\core\model;
 
 use DateInterval;
+use go\core\auth\BaseAuthenticator;
+use go\core\auth\SecondaryAuthenticator;
 use go\core\Environment;
 use go\core\auth\Method;
 use go\core\http\Request;
@@ -70,7 +72,7 @@ class Token extends Entity {
 	 * Example: (password,googleauth)
 	 * @var string 
 	 */
-	protected $passedMethods;
+	protected $passedAuthenticators;
 	
 	/**
 	 * A date interval for the lifetime of a token
@@ -93,7 +95,7 @@ class Token extends Entity {
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-		->addTable('core_auth_token');
+		->addTable('core_auth_token', 'token');
 	}
 	
 	protected function init() {
@@ -318,55 +320,56 @@ class Token extends Entity {
 	/**
 	 * Add the given method to the passed method list.
 	 * 
-	 * @param Method $method
+	 * @param BaseAuthenticator $authenticator
 	 * @return boolean
 	 */
-	public function addPassedMethod(Method $method){
-		$method = $method->id;
-		$methods = $this->getPassedMethods();
+	public function addPassedAuthenticator(BaseAuthenticator $authenticator){
+		$id = $authenticator::id();
+		$methods = $this->getPassedAuthenticators();
 		
-		if(!in_array($method,$methods)){
-			$methods[] = $method;
+		if(!in_array($id,$methods)){
+			$methods[] = $id;
 		
-			$this->passedMethods = trim(implode('|',$methods),'|');
+			$this->passedAuthenticators = trim(implode('|',$methods),'|');
 		}
 		return true;
 	}
 	
 	/**
-	 * Set the given methods as passed
+	 * Set the given authenticator ID's as passed
 	 * 
-	 * @param string[] $methods
+	 * @param string[] $authenticators
 	 * @return boolean
 	 */
-	public function setPassedMethods($methods){
-		$this->passedMethods = trim(implode('|',$methods),'|');
+	public function setPassedAuthenticator($authenticators){
+		$this->passedAuthenticators = trim(implode('|',$authenticators),'|');
 		return $this->save();
 	}
 	
 	/**
-	 * Get the list of passed methods from the table column
+	 * Get the list of passed authenticator ID's
 	 * 
 	 * @return string[]
 	 */
-	public function getPassedMethods(){
-		return explode('|',$this->passedMethods);
+	public function getPassedAuthenticators(){
+		return empty($this->passedAuthenticators) ? [] : explode('|', $this->passedAuthenticators);
 	}
 	
 	/**
-	 * 
-	 * @return Method[]
+	 * Get authenticators that need to be validated to login
+	 *
+	 * @return BaseAuthenticator[]
 	 */
-	public function getPendingAuthenticationMethods(){
+	public function getPendingAuthenticators(){
 		
 		$pending = [];
 		
-		$authMethods = $this->getUser()->getAuthenticationMethods();
-		$finishedAuthMethods = $this->getPassedMethods(); // array('password','googleauthenticator');
+		$authenticators = $this->getUser(User::getMapping()->getColumnNames())->getAuthenticators();
+		$finishedAuthMethods = $this->getPassedAuthenticators(); // array('password','googleauthenticator');
 		
-		foreach($authMethods as $authMethod){
-			if(!in_array($authMethod->id,$finishedAuthMethods)){
-				$pending[] = $authMethod;
+		foreach($authenticators as $authenticator){
+			if(!in_array($authenticator::id(), $finishedAuthMethods)){
+				$pending[] = $authenticator;
 			}	
 		}
 		
@@ -378,30 +381,25 @@ class Token extends Entity {
 	 * First checks every method, then determine if login is successful by 
 	 * checking if all needed login methods are passed.
 	 * 
-	 * @param array $methods
-	 * @return boolean
+	 * @param array $data
+	 * @return SecondaryAuthenticator[]
 	 */
-	public function authenticateMethods(array $methods) {
+	public function validateSecondaryAuthenticators(array $data) {
 		
-		$authenticators = [];		
-		$authMethods = $this->getPendingAuthenticationMethods();
-		$pending = false;
-		foreach($authMethods as $authMethod){
-			if(!in_array($authMethod->id, array_keys($methods))) {
-				$pending = true;
+		$response = [];
+		$authenticators = $this->getPendingAuthenticators();
+
+		foreach($authenticators as $authenticator){
+			if(!in_array($authenticator::id(), array_keys($data))) {
 				continue;
 			}
-			$authenticator = $authMethod->getAuthenticator();
-			$authenticators[$authMethod->id] = $authenticator;
-			if($authenticator->authenticate($this, $methods[$authMethod->id])){
-				$this->addPassedMethod($authMethod);
-			} else
-			{
-				$pending = true;
+			$response[] = $authenticator;
+			if($authenticator->authenticate($this, $data[$authenticator::id()])){
+				$this->addPassedAuthenticator($authenticator);
 			}
 		}
 
-		return $authenticators;
+		return $response;
 	}
 
 	public static function collectGarbage() {
@@ -438,7 +436,19 @@ class Token extends Entity {
 
 		return $this->classPermissionLevels[$cls];
 	}
-  
+
+
+	/**
+	 * Destroys all tokens except
+	 * @return bool
+	 * @throws \Exception
+	 */
+	public static function logoutEveryoneButAdmins() {
+		$admins = (new Query)->select('userId')->from('core_user_group')->where('groupId', '=', Group::ID_ADMINS);
+		return self::delete((new Query)
+			->where('expiresAt', '!=', null)
+			->where('userId', 'NOT IN ', $admins));
+	}
 
 	
 	

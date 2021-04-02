@@ -18,4 +18,6 @@ return array (
   'Note book' => 'Kategori',
   'Filters' => 'Filtere',
   'Add test' => 'Ny test',
+  'Encrypted data' => 'Kryptert',
+  'Enter password to decrypt' => 'Angi passord for å dekryptere',
 );

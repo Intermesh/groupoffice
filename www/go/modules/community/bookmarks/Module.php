@@ -16,6 +16,11 @@ class Module extends core\Module {
 		return "Intermesh BV <info@intermesh.nl>";
 	}
 
+	public function autoInstall()
+	{
+		return true;
+	}
+
 	protected function afterInstall(GoModule $model) {
 		
 		if(!$model->findAcl()

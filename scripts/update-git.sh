@@ -6,10 +6,7 @@ set -e
 
 CONFIG=$1
 
-if [ -z "$CONFIG" ]; then
-  echo Please pass config file. eg. ./update-git.sh /etc/groupoffice/multi_instance/manage.group-office.com/config.php
-  exit 1
-fi
+
 
 SASS=sassc
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -17,6 +14,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd $DIR/../;
 
 # pull promodules
+echo "Pulling promodules"
 cd  www/promodules
 git pull
 
@@ -25,7 +23,7 @@ cd ../go/modules
 
 for line in $(ls -1 -d */);
 do
-  if [ "$line" != "community/" ]; then
+  if [ -d "$line/.git" ]; then
 
     echo "Pulling $line"
     cd $line
@@ -37,6 +35,9 @@ done
 # pull main github repo
 cd ../../
 #git reset --hard
+
+echo "Pulling main repository"
+
 git pull
 
 echo `pwd`
@@ -50,6 +51,13 @@ do
 	$SASS $line $replace3;
 done
 
-composer update --no-dev -o
-sudo -u www-data php cli.php core/System/upgrade -c=$CONFIG
+composer update -n --no-dev -o
+
+if [ -z "$CONFIG" ]; then
+  echo NOTE: Not upgrading database because no config file was passed. eg. ./update-git.sh /etc/groupoffice/multi_instance/manage.group-office.com/config.php
+  exit 1
+else
+  sudo -u www-data php cli.php core/System/upgrade -c=$CONFIG
+fi
+
 

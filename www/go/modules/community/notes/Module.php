@@ -17,6 +17,11 @@ class Module extends core\Module {
 		return "Intermesh BV";
 	}
 
+	public function autoInstall()
+	{
+		return true;
+	}
+
 	
 	protected function afterInstall(ModuleModel $model) {	
 		
@@ -43,6 +48,7 @@ class Module extends core\Module {
 	public function defineListeners() {
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		User::on(User::EVENT_BEFORE_DELETE, static::class, 'onUserDelete');
+		User::on(User::EVENT_BEFORE_SAVE, static::class, 'onUserBeforeSave');
 	}
 	
 	public static function onMap(Mapping $mapping) {
@@ -51,6 +57,18 @@ class Module extends core\Module {
 
 	public static function onUserDelete(core\db\Query $query) {
 		NoteBook::delete(['createdBy' => $query]);
+	}
+
+	public static function onUserBeforeSave(User $user)
+	{
+		if (!$user->isNew() && $user->isModified('displayName')) {
+			$oldName = $user->getOldValue('displayName');
+			$nb = NoteBook::find()->where(['createdBy' => $user->id, 'name' => $oldName])->single();
+			if ($nb) {
+				$nb->name = $user->displayName;
+				$nb->save();
+			}
+		}
 	}
 
 }

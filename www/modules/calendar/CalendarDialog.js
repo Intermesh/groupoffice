@@ -92,24 +92,30 @@ GO.calendar.CalendarDialog = function(config)
 		]
 	});
 
-	if(go.Modules.isAvailable("legacy", "tasks"))
+	if(go.Modules.isAvailable("community", "tasks"))
 	{
-		this.tasklistsTab = new GO.base.model.multiselect.panel({
-      title:t("Visible tasklists", "tasks"),
-      url:'calendar/calendarTasklist',
-      columns:[{header: t("Title"), dataIndex: 'name'}],
-      fields:['id','name'],
-      model_id:0
-    });
+		// this.tasklistsTab = new GO.base.model.multiselect.panel({
+		//   title:t("Visible tasklists", "tasks"),
+		//   url:'calendar/calendarTasklist',
+		//   columns:[{header: t("Title"), dataIndex: 'name'}],
+		//   fields:['id','name'],
+		//   model_id:0
+		// });
 		
-		this.selectTasklist = new GO.form.ComboBoxReset({
-			fieldLabel:'CalDAV '+t("Tasklist", "tasks"),
-				store:new GO.data.JsonStore({
-				url: GO.url('tasks/tasklist/store'),
-				baseParams: {'permissionLevel': GO.permissionLevels.write},
-				fields:['id','name','user_name'],
-				remoteSort:true
-			}),
+		this.selectTasklist = new go.form.ComboBoxReset({
+			fieldLabel:'CalDAV '+t("Tasklist",'tasks', 'community'),
+			store: {
+				xtype: 'gostore',
+				fields: ['id','name','user_name'],
+				entityStore: 'Tasklist',
+				baseParams: {'permissionLevel': GO.permissionLevels.write}
+			},
+			// store:new GO.data.JsonStore({
+			// 	url: GO.url('tasks/tasklist/store'),
+			// 	baseParams: {'permissionLevel': GO.permissionLevels.write},
+			// 	fields:['id','name','user_name'],
+			// 	remoteSort:true
+			// }),
 			displayField: 'name',
 			valueField: 'id',
 			triggerAction:'all',

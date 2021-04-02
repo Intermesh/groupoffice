@@ -173,19 +173,17 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 		Ext.applyIf(this,{
 			store: new go.data.Store({
 				fields: [{name:'createdAt',type:'date'},'id', 'entity', 'action','changes','createdBy', 'description',{name: 'creator', type: "relation"}],
-				baseParams: {sort: [{property: "createdAt", isAscending:false}]},
+				baseParams: {sort: [{property: "id", isAscending:false}]},
 				entityStore: "LogEntry"
 			}),
 			viewConfig: {
 				emptyText: '<i>description</i><p>' + t("Item was never modified",'community','history') + '</p>',
-				totalDisplay: true
+				totalDisplay: false //heavy impact on performance
 			},
 			columns: cols
 		});
 
 		this.callParent();
-
-		this.on('afterrender',function(){this.store.load();},this);
 
 		this.on('cellclick', this.onCellClick, this);
 	}

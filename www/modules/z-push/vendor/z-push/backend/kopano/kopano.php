@@ -1202,7 +1202,8 @@ class BackendKopano implements IBackend, ISearchProvider {
                 $response->to = $to;
                 $response->status = SYNC_RESOLVERECIPSSTATUS_SUCCESS;
 
-                $recipient = $this->resolveRecipient($to, $maxAmbiguousRecipients);
+                // do not expand distlists here
+                $recipient = $this->resolveRecipient($to, $maxAmbiguousRecipients, false);
                 if (is_array($recipient) && !empty($recipient)) {
                     $response->recipientcount = 0;
                     foreach ($recipient as $entry) {
@@ -1727,7 +1728,17 @@ class BackendKopano implements IBackend, ISearchProvider {
         $foldercount = mapi_table_getrowcount($hierarchy);
 
         $storeProps = mapi_getprops($this->store, array(PR_MESSAGE_SIZE_EXTENDED));
-        $storesize = isset($storeProps[PR_MESSAGE_SIZE_EXTENDED]) ? $storeProps[PR_MESSAGE_SIZE_EXTENDED] : 0;
+
+        // Disable the sending of the storesize parameter to KOE.
+        // In case this parameter is greater than 0 then KOE will reduce the synched data window basing on thresholds and
+        // displays a dialog message.
+        if (defined('DISABLE_KOE_STORESIZE_LIMIT') && DISABLE_KOE_STORESIZE_LIMIT === true) {
+            ZLog::Write(LOGLEVEL_DEBUG, sprintf("KopanoBackend->GetUserStoreInfo(): KOE storesize limit handling is DISABLED."));
+            $storesize = 0;
+        }
+        else {
+            $storesize = isset($storeProps[PR_MESSAGE_SIZE_EXTENDED]) ? $storeProps[PR_MESSAGE_SIZE_EXTENDED] : 0;
+        }
 
         $userDetails = $this->GetUserDetails($this->impersonateUser ?: $this->mainUser);
         $userStoreInfo->SetData($foldercount, $storesize, $userDetails['fullname'], $userDetails['emailaddress']);
@@ -2288,11 +2299,12 @@ class BackendKopano implements IBackend, ISearchProvider {
      *
      * @param string $to
      * @param int $maxAmbiguousRecipients
+     * @param boolean $expandDistlist
      *
      * @return SyncResolveRecipient|boolean
      */
-    private function resolveRecipient($to, $maxAmbiguousRecipients) {
-        $recipient = $this->resolveRecipientGAL($to, $maxAmbiguousRecipients);
+    private function resolveRecipient($to, $maxAmbiguousRecipients, $expandDistlist = true) {
+        $recipient = $this->resolveRecipientGAL($to, $maxAmbiguousRecipients, $expandDistlist);
 
         if ($recipient !== false) {
             return $recipient;
@@ -2312,9 +2324,10 @@ class BackendKopano implements IBackend, ISearchProvider {
      *
      * @param string $to
      * @param int $maxAmbiguousRecipients
+     * @param boolean $expandDistlist
      * @return array|boolean
      */
-    private function resolveRecipientGAL($to, $maxAmbiguousRecipients) {
+    private function resolveRecipientGAL($to, $maxAmbiguousRecipients, $expandDistlist = true) {
         ZLog::Write(LOGLEVEL_WBXML, sprintf("Kopano->resolveRecipientGAL(): Resolving recipient '%s' in GAL", $to));
         $addrbook = $this->getAddressbook();
         // FIXME: create a function to get the adressbook contentstable
@@ -2355,14 +2368,20 @@ class BackendKopano implements IBackend, ISearchProvider {
                     continue;
                 }
                 if ($abentries[$i][PR_OBJECT_TYPE] == MAPI_DISTLIST) {
-                    // dist lists must be expanded into their members
-                    ZLog::Write(LOGLEVEL_DEBUG, sprintf("Kopano->resolveRecipientGAL(): '%s' is a dist list. Expand it to members.", $to));
-                    $distList = mapi_ab_openentry($addrbook, $abentries[$i][PR_ENTRYID]);
-                    $distListContent = mapi_folder_getcontentstable($distList);
-                    $distListMembers = mapi_table_queryallrows($distListContent, array(PR_ENTRYID, PR_DISPLAY_NAME, PR_EMS_AB_TAGGED_X509_CERT));
-                    for ($j = 0, $nrDistListMembers = mapi_table_getrowcount($distListContent); $j < $nrDistListMembers; $j++) {
-                        ZLog::Write(LOGLEVEL_WBXML, sprintf("Kopano->resolveRecipientGAL(): distlist's '%s' member", $to, $distListMembers[$j][PR_DISPLAY_NAME]));
-                        $recipientGal[] = $this->createResolveRecipient(SYNC_RESOLVERECIPIENTS_TYPE_GAL, $to, $distListMembers[$j], $nrDistListMembers);
+                    // check whether to expand dist list
+                    if ($expandDistlist) {
+                        ZLog::Write(LOGLEVEL_DEBUG, sprintf("Kopano->resolveRecipientGAL(): '%s' is a dist list. Expand it to members.", $to));
+                        $distList = mapi_ab_openentry($addrbook, $abentries[$i][PR_ENTRYID]);
+                        $distListContent = mapi_folder_getcontentstable($distList);
+                        $distListMembers = mapi_table_queryallrows($distListContent, array(PR_ENTRYID, PR_DISPLAY_NAME, PR_EMS_AB_TAGGED_X509_CERT));
+                        for ($j = 0, $nrDistListMembers = mapi_table_getrowcount($distListContent); $j < $nrDistListMembers; $j++) {
+                            ZLog::Write(LOGLEVEL_WBXML, sprintf("Kopano->resolveRecipientGAL(): distlist's '%s' member", $to, $distListMembers[$j][PR_DISPLAY_NAME]));
+                            $recipientGal[] = $this->createResolveRecipient(SYNC_RESOLVERECIPIENTS_TYPE_GAL, $to, $distListMembers[$j], $nrDistListMembers);
+                        }
+                    }
+                    else {
+                        ZLog::Write(LOGLEVEL_DEBUG, sprintf("Kopano->resolveRecipientGAL(): '%s' is a dist list, but return it as is.", $to));
+                        $recipientGal[] = $this->createResolveRecipient(SYNC_RESOLVERECIPIENTS_TYPE_GAL, $abentries[$i][PR_SMTP_ADDRESS], $abentries[$i]);
                     }
                 }
                 elseif ($abentries[$i][PR_OBJECT_TYPE] == MAPI_MAILUSER) {
@@ -2624,7 +2643,8 @@ class BackendKopano implements IBackend, ISearchProvider {
                             $endSlot--;
                         }
 
-                        for ($i = $startSlot; $i <= $endSlot; $i++) {
+                        // the endslot may be higher than the requested timeslots, in such case ignore free-busy unnecessary slots
+                        for ($i = $startSlot, $l = (($endSlot > $timeslots) ? ($timeslots - 1) : $endSlot); $i <= $l; $i++) {
                             // only set the new slot's free busy status if it's higher than the current one
                             if ($blockItem['status'] > $mergedFreeBusy[$i]) {
                                 $mergedFreeBusy[$i] = $blockItem['status'];
@@ -2697,6 +2717,9 @@ class BackendKopano implements IBackend, ISearchProvider {
         if (isset($enabledFeatures[PR_EC_DISABLED_FEATURES]) && is_array($enabledFeatures[PR_EC_DISABLED_FEATURES])) {
             $mobileDisabled = in_array(self::MOBILE_ENABLED, $enabledFeatures[PR_EC_DISABLED_FEATURES]);
             $outlookDisabled = in_array(self::OUTLOOK_ENABLED, $enabledFeatures[PR_EC_DISABLED_FEATURES]);
+            $deviceId = Request::GetDeviceID();
+            // Checks for deviceId present in zarafaDisabledFeatures LDAP array attribute. Check is performed case insensitive.
+            $deviceIdDisabled = ( ($deviceId !==null) && in_array($deviceId, array_map('strtolower', $enabledFeatures[PR_EC_DISABLED_FEATURES])) )? true : false;
             if ($mobileDisabled && $outlookDisabled) {
                 throw new FatalException("User is disabled for Z-Push.");
             }
@@ -2705,6 +2728,9 @@ class BackendKopano implements IBackend, ISearchProvider {
             }
             elseif (!Request::IsOutlook() && $mobileDisabled && Request::GetDeviceType() !== "webservice" && Request::GetDeviceType() !== false) {
                 throw new FatalException("User is disabled for mobile device usage with Z-Push.");
+            }
+            elseif ($deviceIdDisabled) {
+                throw new FatalException(sprintf("User has deviceId %s disabled for usage with Z-Push.", $deviceId));
             }
         }
         return true;

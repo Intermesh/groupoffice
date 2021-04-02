@@ -5,12 +5,10 @@
  * Group-Office license along with Group-Office. See the file /LICENSE.TXT
  * 
  * If you have questions write an e-mail to info@intermesh.nl
- * 
- * @version $Id: MainPanel.js 19225 2015-06-22 15:07:34Z wsmits $
+ *
  * @copyright Copyright Intermesh
  * @author Merijn Schering <mschering@intermesh.nl>
  */
-
 go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	title: t("Tasks"),
 	layout: 'responsive',
@@ -42,13 +40,13 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			store: new Ext.data.ArrayStore({
 				fields: ['name', 'icon', 'inputValue'],
 				data: [
-					[t("Today", "tasks"), 'content_paste', 'active'],
-					[t("Due in seven days", "tasks"), 'filter_7', 'sevendays'],
-					[t("Overdue", "tasks"), 'schedule', 'overdue'],
-					[t("Incomplete tasks", "tasks"), 'assignment_late', 'incomplete'],
-					[t("Completed", "tasks"), 'assignment_turned_in', 'completed'],
-					[t("Future tasks", "tasks"), 'assignment_return', 'future'],
-					[t("All", "tasks"), 'assignment', 'all'],
+					[t("Today"), 'content_paste', 'active'],
+					[t("Due in seven days"), 'filter_7', 'sevendays'],
+					[t("Overdue"), 'schedule', 'overdue'],
+					[t("Incomplete tasks"), 'assignment_late', 'incomplete'],
+					[t("Completed"), 'assignment_turned_in', 'completed'],
+					[t("Future tasks"), 'assignment_return', 'future'],
+					[t("All"), 'assignment', 'all'],
 				]
 			}),
 			listeners: {
@@ -60,7 +58,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 							nowYmd = now.format("Y-m-d");
 							this.taskGrid.store.setFilter("tasklist", {
 								due: nowYmd,
-								percentComplete: 0
+								complete: false
 							});
 							break;
 
@@ -173,7 +171,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			split: true,
 			tbar: [{
 					xtype: 'tbtitle',
-					text: t('Categories',"tasks")
+					text: t('Categories')
 				}, '->', {
 					//disabled: go.Modules.get("community", 'notes').permissionLevel < go.permissionLevels.write,
 					iconCls: 'ic-add',
@@ -202,7 +200,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			split: true,
 			tbar: [{
 					xtype: 'tbtitle',
-					text: t('Tasklist',"tasks")
+					text: t('Tasklist')
 				}, '->', {
 					//disabled: go.Modules.get("community", 'notes').permissionLevel < go.permissionLevels.write,
 					iconCls: 'ic-add',
@@ -238,14 +236,18 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.tasksStore = new go.data.Store({
 			fields: [
 				'id', 
-				'title', 
+				'title',
+				'start',
+				'due',
 				'description', 
-				'repeatEndTime', 
+				'repeatEndTime',
+				{name: 'responsible', type: 'relation'},
 				{name: 'createdAt', type: 'date'}, 
 				{name: 'modifiedAt', type: 'date'}, 
 				{name: 'creator', type: "relation"},
 				{name: 'modifier', type: "relation"},
-				'percentComplete'
+				'percentComplete',
+				'progress'
 			],
 			entityStore: "Task"
 		});
@@ -310,6 +312,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						disabled: true,
 						iconCls: 'ic-add',
 						tooltip: t('Add'),
+						cls: 'primary',
 						handler: function (btn) {
 							var dlg = new go.modules.community.tasks.TaskDialog();
 							dlg.show();
@@ -342,7 +345,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 											go.util.exportToFile(
 												'Task',
 												Ext.apply(this.taskGrid.store.baseParams, this.taskGrid.store.lastOptions.params, {limit: 0, start: 0}),
-												'text/vcalendar');
+												'ics');
 										},
 										scope: this
 									},{
@@ -352,7 +355,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 											go.util.exportToFile(
 												'Task',
 												Ext.apply(this.taskGrid.store.baseParams, this.taskGrid.store.lastOptions.params, {limit: 0, start: 0}),
-												'text/csv');
+												'csv');
 										},
 										scope: this
 									}
@@ -389,7 +392,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				},
 				items:[this.taskNameTextField = new Ext.form.TextField({
 					enableKeyEvents: true,
-					emptyText: t("Add a task...", "tasks"),
+					emptyText: t("Add a task..."),
 
 					flex:1,
 					listeners: {
@@ -405,7 +408,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				}),
 					this.taskDateField = new go.form.DateField({
 						value: new Date(),
-						fieldLabel:t("Due date", "tasks"),
+						fieldLabel:t("Due date"),
 						enableKeyEvents: true,
 						listeners: {
 							scope: this,
@@ -419,7 +422,9 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						}
 					}),
 					this.addTaskButton = new Ext.Button({
+						disabled: true,
 						iconCls: 'ic-add',
+						cls:'primary',
 						handler:function(){
 							go.Db.store("Task").set({
 								create: {"client-id-1" : {

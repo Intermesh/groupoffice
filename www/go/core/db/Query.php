@@ -54,7 +54,8 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	private $fetchMode;
 	private $forUpdate;
 	private $tableName;
-	private $calcFoundRows;
+	private $calcFoundRows = false;
+	private $noCache = false;
 
 	public function getTableAlias() {
 		return isset($this->tableAlias) ? $this->tableAlias : 't';
@@ -113,6 +114,19 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 
 	public function getCalcFoundRows() {
 		return $this->calcFoundRows;
+	}
+
+	/**
+	 * When calcFoundERows() is used this function will return the total found rows.
+	 *
+	 * @return int
+	 */
+	public function foundRows() {
+		return (int) go()->getDbConnection()->query("SELECT FOUND_ROWS()")->fetch(PDO::FETCH_COLUMN, 0);
+	}
+
+	public function getNoCache() {
+		return $this->noCache;
 	}
 
 	public function getFetchMode() {
@@ -275,6 +289,19 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	 */
 	public function calcFoundRows($v = true) {
 		$this->calcFoundRows = $v;
+
+		return $this;
+	}
+
+	/**
+	 * Use SQL_NO_CACHE
+	 *
+	 * @param bool $v
+	 *
+	 * @return static
+	 */
+	public function noCache($v = true) {
+		$this->noCache = $v;
 
 		return $this;
 	}
@@ -443,6 +470,28 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	}
 
 	/**
+	 * Remove joined table
+	 *
+	 * @param string $tableName
+	 * @param string $joinTableAlias If given the alias of the existing join must match too.
+	 * @return static
+	 */
+	public function removeJoin($tableName, $joinTableAlias = null) {
+		$new = [];
+		foreach($this->joins as $join) {
+			if($join['src'] == $tableName && (!isset($joinTableAlias) || $joinTableAlias == $join['joinTableAlias'])) {
+				continue;
+			}
+
+			$new[] = $join;
+		}
+
+		$this->joins = $new;
+
+		return $this;
+	}
+
+	/**
 	 * Skip this number of records
 	 *
 	 * @param int $offset
@@ -544,7 +593,11 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 				throw new Exception("Could not execute statement. Error code: ". $stmt->errorCode());
 			}
 		} catch(Exception $e) {
-			go()->error("SQL FAILED: " . $this->__toString());
+			try {
+				go()->error("SQL FAILED: " . $this->__toString());
+			} catch(Exception $e2) {
+				go()->error("SQL FAILED AND FAILED TO BUILD STRING " . $e2->getMessage());
+			}
 			
 			throw $e;
 		}

@@ -184,6 +184,8 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 			headingsMenu: false,
 			anchor: '100% '+anchorHeight,
 			plugins:this.initHtmlEditorPlugins(),
+			//this font is applied here because it must match the one in htmleditor.scss. Ext will copy this style to the body tag.
+			style: "font: " + dp(16) + "px  Helvetica, Arial, sans-serif",
 			getFontStyle :  function() {
 				return GO.form.HtmlEditor.prototype.getFontStyle.call(this) + ';color: black';
 			},
@@ -409,13 +411,15 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 				var items = [],
 					selections = GO.selectFileBrowser.getSelectedGridRecords();
 				for (var i = 0; i < selections.length; i++) {
+					// the name is the full path when searching
+					var name = selections[i].data.name.substr(selections[i].data.name.lastIndexOf('/')+1);
 					items.push({
 						human_size: Ext.util.Format.fileSize(selections[i].data.size),
 						extension: selections[i].data.extension,
 						size: selections[i].data.size,
 						type: selections[i].data.type,
-						name: selections[i].data.name,
-						fileName: selections[i].data.name,
+						name: name,
+						fileName: name,
 						from_file_storage: true,
 						tmp_file: selections[i].data.path
 					});

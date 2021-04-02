@@ -15,21 +15,6 @@
  * @copyright Copyright Intermesh BV.
  * @author <<FIRST_NAME>> <<LAST_NAME>> <<EMAIL>>@intermesh.nl
  */
- 
-/**
- * The Template model
- *
- * @package GO.modules.addressbook.model
- * @property string $extension
- * @property string $content
- * @property int $acl_id
- * @property string $name
- * @property int $type
- * @property int $user_id
- * @property int $id
- * @property int $acl_write
- */
-
 
 namespace GO\Base\Model;
 
@@ -37,6 +22,20 @@ namespace GO\Base\Model;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\Date;
 
+/**
+ *  The Template model
+ *
+ * @package GO.modules.addressbook.model
+ * @property string $extension
+ * @property string $content
+ * @property int $acl_id
+ * @property string $name
+ * @property string $filename
+ * @property int $type
+ * @property int $user_id
+ * @property int $id
+ * @property int $acl_write
+ */
 class Template extends \GO\Base\Db\ActiveRecord{
 	
 	const TYPE_EMAIL=0;
@@ -89,6 +88,9 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	private static function getDateFormat() {
 	  if(!isset(self::$dateFormat)) {
 	    $user = go()->getAuthState()->getUser(['dateFormat', 'timeFormat']);
+	    if(!$user) {
+	    	$user = \go\core\model\User::findById(1, ['dateFormat', 'timeFormat']);
+	    }
       self::$dateFormat = isset($user) ? $user->dateFormat : 'd-m-Y';
       self::$timeFormat = isset($user) ? $user->timeFormat : 'H:i';
     }
@@ -206,7 +208,8 @@ class Template extends \GO\Base\Db\ActiveRecord{
 	public static function getContactAttributes(Contact $contact, $tagPrefix = 'contact:', $companyTagPrefix = 'company:'){
 		$attributes[$tagPrefix . 'salutation'] = $contact->getSalutation();
 		$attributes[$tagPrefix . 'sirmadam']=$contact->gender=="M" ? \GO::t('sir') : \GO::t('madam');
-		
+		$attributes[$tagPrefix . 'title'] = $contact->prefixes;
+		$attributes[$tagPrefix . 'suffixes'] = $contact->suffixes;
 		$attributes[$tagPrefix . 'first_name'] = $contact->firstName;
 		$attributes[$tagPrefix . 'middle_name'] = $contact->middleName;
 		$attributes[$tagPrefix . 'last_name'] = $contact->lastName;
@@ -237,6 +240,7 @@ class Template extends \GO\Base\Db\ActiveRecord{
 			$attributes[$tagPrefix . 'email3'] = isset($contact->emailAddresses[2]) ? $contact->emailAddresses[2]->email :  "";
 
 			$attributes[$tagPrefix . 'function'] = $contact->jobTitle;
+			$attributes[$tagPrefix . 'department'] = $contact->department;
 
 			foreach($contact->phoneNumbers as $p) {
 				switch($p->type) {

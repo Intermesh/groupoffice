@@ -34,7 +34,13 @@
 				"color"
 			],
 			sortInfo :{field: "name", direction: "ASC"},
-			entityStore: "Contact"
+			entityStore: "Contact",
+			filters: {
+				default: {
+						permissionLevel: go.permissionLevels.write
+				}
+			}
+
 		});
  *
  * //Inserting records will trigger server update too:
@@ -69,6 +75,10 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		
 		config = config || {};
 		config.root = "records";
+
+		if(!config.fields) {
+			throw "'fields' are required for a Store";
+		}
 
 		Ext.applyIf(this, go.data.StoreTrait);
 		

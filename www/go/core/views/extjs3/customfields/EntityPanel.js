@@ -61,8 +61,53 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 			tbar: [
 				"->",
 				{
+					iconCls: 'ic-cloud-upload',
+					tooltip: t('Import fieldsets from JSON-file'),
+					handler: function() {
+						go.util.openFileDialog({
+							multiple: false,
+							accept: ".json",
+							directory: false,
+							autoUpload: true,
+							scope: this,
+							listeners: {
+								upload: function (response) {
+
+									this.getEl().mask(t("Importing..."));
+
+									go.Jmap.request({
+										method: 'FieldSet/importFromJson',
+										params: {
+											entity: this.entity,
+											blobId: response.blobId
+										},
+										callback: function(request, tmp, response, callId) {
+											this.getEl().unmask();
+											GO.errorDialog.show(response.feedback, t('Import messages'));
+											this.load();
+
+										},
+										scope: this
+									})
+								},
+								scope: this
+							}
+						});
+					},
+					scope: this
+				}, {
+					iconCls: 'ic-cloud-download',
+					tooltip: t('Export fieldsets to JSON-file'),
+					handler: function() {
+						var dlg = new go.customfields.ExportDialog();
+						dlg.setEntity(this.entity);
+						dlg.show();
+					},
+					scope: this
+				}, {
 					iconCls: 'ic-add',
-					tooltip: t('Add field set'),
+					cls: "primary",
+					text: t('Add field set'),
 					handler: function (e, toolEl) {
 						var dlg = this.createFieldSetDialog();
 						dlg.setValues({entity: this.entity});
@@ -104,11 +149,12 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 					sortable: false,
 					dataIndex: "databaseName",
 					renderer: function (v, meta, record) {
+
 						if (record.data.isFieldSet) {
-							return '<button class="icon" ext:qtip="' + t("Add field") + '">add</button><button class="icon">more_vert</button>';
+							return '<div class="x-toolbar"><button class="go-button primary" title="' + t("Add field") + '"><i class="icon">add</i></button><button class="go-button"><i class="icon">more_vert</i></button></div>';
 						} else
 						{
-							return "<button class='icon'>more_vert</button>";
+							return '<div class="x-toolbar"><button class="go-button"><i class="icon">more_vert</i></button></div>';
 						}
 					}
 				}
@@ -121,7 +167,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 			listeners: {
 				scope: this,
 				rowclick: function (grid, rowIndex, e) {
-					if (e.target.tagName !== "BUTTON") {
+					if (e.target.tagName !== "I") {
 						return false;
 					}
 
@@ -355,8 +401,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 		if (record.data.isFieldSet) {
 			var dlg = this.createFieldSetDialog();
 			dlg.load(record.data.fieldSetId).show();
-		} else
-		{
+		} else {
 			var dlg = go.customfields.CustomFields.getType(record.data.type).getDialog();
 			dlg.load(record.data.fieldId).show();
 		}

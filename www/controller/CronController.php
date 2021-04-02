@@ -20,6 +20,10 @@
 namespace GO\Core\Controller;
 
 
+use Cron\CronExpression;
+use GO\Base\Util\Date;
+use go\core\model\CronJobSchedule;
+
 class CronController extends \GO\Base\Controller\AbstractJsonController{
 
 	protected function allowGuests() {
@@ -92,9 +96,11 @@ class CronController extends \GO\Base\Controller\AbstractJsonController{
 			return $model->isRunning()?\GO::t("Running", "cron"):$model->active;
 		});
 		$colModel->formatColumn('error', '$model->error');
+		$colModel->formatColumn('expression', '$model->_buildExpression()');
 		
 		$store = new \GO\Base\Data\DbStore('GO\Base\Cron\CronJob',$colModel, $params, \GO\Base\Db\FindParams::newInstance()->select('*'));
 		$store->defaultSort = 'name';
+		$store->limit = 0;
 		
 		$response =  $this->renderStore($store);	
 		if(!\GO::cronIsRunning()){
@@ -102,9 +108,45 @@ class CronController extends \GO\Base\Controller\AbstractJsonController{
 			$response['feedback']=$message;
 			//throw new \GO\Base\Exception\NoCron(); <-- will not load grid
 		}
+
+		$response['results'] = array_merge($response['results'], $this->getNewCronJobs());
 		
 		
 		echo $response;
+	}
+
+	private function getNewCronJobs() {
+		//['id','name','active','minutes', 'hours','error', 'monthdays', 'months',
+		// 'weekdays','years','job','nextrun','lastrun','completedat'],
+
+		$jobs = [];
+
+		foreach(CronJobSchedule::find() as $job) {
+
+			$expression = CronExpression::factory($job->expression);
+
+			$record = [
+				'id' => "new:" . $job->id,
+				'name' => $job->description,
+				'active' => $job->enabled,
+				'expression' => $job->expression,
+				'minutes' => $expression->getExpression(CronExpression::MINUTE),
+				'hours' => $expression->getExpression(CronExpression::HOUR),
+				'monthdays' => $expression->getExpression(CronExpression::DAY),
+				'months' => $expression->getExpression(CronExpression::MONTH),
+				'weekdays' => $expression->getExpression(CronExpression::WEEKDAY),
+				'years' =>  $expression->getExpression(CronExpression::YEAR),
+				'job' => $job->getCronClass(),
+				'nextrun' => $job->nextRunAt ? Date::get_timestamp($job->nextRunAt->format("U")) : "-",
+				'lastrun' => $job->runningSince ? Date::get_timestamp($job->runningSince->format("U")) : "-",
+				'completedat' => $job->lastRunAt ?  Date::get_timestamp($job->lastRunAt->format("U")) : "-",
+				'error' => $job->lastError
+
+			];
+			$jobs[] = $record;
+		};
+
+		return $jobs;
 	}
 	
 	

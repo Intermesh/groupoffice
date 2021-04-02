@@ -46,7 +46,6 @@ go.Relations = {
 		var key = this.resolveKey(relation.path + relation.fk, entity), me = this;
 
 		if(!key) {
-			console.warn("No key found for relation '" + this.entityStore.entity.name + "." +relName + "'", relation, entity);
       me.applyRelationEntity(relation.path + relName, entity, null);
 			return Promise.resolve(null);
 		}		
@@ -141,6 +140,7 @@ go.Relations = {
 		if(!data) {
 			return null;
 		}
+
 		var parts = key.split("."), part;
 						
 		for(var i = 0, l = parts.length; i < l; i++) {
@@ -154,6 +154,8 @@ go.Relations = {
 			} else
 			{
 				if(!Ext.isDefined(data[p])) {
+					console.warn("No key found for relation '" + this.entityStore.entity.name + "." +key + "'", data);
+
 					return null;
 				}
 				data = data[p];

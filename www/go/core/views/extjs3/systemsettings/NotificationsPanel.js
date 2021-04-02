@@ -74,43 +74,11 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 							boxLabel: t("Verify SSL certificate")							
 						}
 					]
-				}, {
-					xtype: "fieldset",
-					title: t('Debug'),					
-					items: [{
-							xtype: 'xcheckbox',
-							name: "enableEmailDebug",
-							submit: false,
-							hideLabel: true,
-							boxLabel: t("Send all system notifications to the specified e-mail address"),
-							listeners: {
-								check: function (checkbox, checked) {
-									this.getForm().findField('debugEmail').setReadOnly(!checked);
-								},
-								scope: this
-							}
-						}, {
-							xtype: 'textfield',
-							name: 'debugEmail',
-							readOnly: true,
-							fieldLabel: t("E-mail"),
-							width: dp(240)
-						}]
 				}]
 		});
 
 		go.systemsettings.NotificationsPanel.superclass.initComponent.call(this);		
 		
-	},
-	
-	onSubmit: function (cb, scope) {
-		
-		//clear debug mail on save
-		if(!this.getForm().findField('enableEmailDebug').checked) {
-			this.getForm().findField('debugEmail').setValue('');
-		}
-		
-		go.systemsettings.NotificationsPanel.superclass.onSubmit.call(this, cb, scope);
 	},
 	
 	afterRender: function() {
@@ -120,7 +88,6 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 		var f = this.getForm();
 		
 		f.findField('smtpEncryptionVerifyCertificate').setDisabled(!f.findField('smtpEncryption').getValue());
-		f.findField("enableEmailDebug").setValue(!GO.util.empty(f.findField('debugEmail').getValue()));
 	},
 
 	sendTestMessage : function() {

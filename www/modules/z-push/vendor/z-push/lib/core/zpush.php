@@ -303,10 +303,10 @@ class ZPush {
             }
             elseif (!is_numeric(DELETION_RATIO_THR) || DELETION_RATIO_THR <= 0) {
                 throw new FatalMisconfigurationException("The DELETION_RATIO_THR value must be a number higher than 0.");
-            } 
+            }
             elseif (!is_int(DELETION_COUNT_THR) || DELETION_COUNT_THR < 1) {
                 throw new FatalMisconfigurationException("The DELETION_COUNT_THR value must be a number higher than 0.");
-            }     
+            }
             elseif (!is_int(DELETION_COUNT_LIMIT) || DELETION_COUNT_LIMIT <= DELETION_COUNT_THR) {
                 throw new FatalMisconfigurationException("The DELETION_COUNT_LIMIT value must be a positive number higher than DELETION_COUNT_THR.");
             }
@@ -318,7 +318,7 @@ class ZPush {
         }
         if ((defined('FILE_STATE_SLEEP')) && (!is_int(FILE_STATE_SLEEP) || FILE_STATE_SLEEP < 1)) {
             throw new FatalMisconfigurationException("The FILE_STATE_SLEEP value must be a number higher than 0.");
-        }   
+        }
         if (defined('FILE_STATE_WRITE_ATTEMPTS') || defined('FILE_STATE_WRITE_SLEEP')){
             throw new FatalMisconfigurationException("The configuration parameter 'FILE_STATE_WRITE_ATTEMPTS' and 'FILE_STATE_WRITE_SLEEP' were deprecated in favor of 'FILE_STATE_ATTEMPTS' and 'FILE_STATE_SLEEP'. Please update your configuration.");
         }
@@ -329,7 +329,7 @@ class ZPush {
         }
         if ((defined('FILE_STATE_WRITE_SLEEP')) && (!is_int(FILE_STATE_WRITE_SLEEP) || FILE_STATE_WRITE_SLEEP < 1)) {
             throw new FatalMisconfigurationException("The FILE_STATE_WRITE_SLEEP value must be a number higher than 0.");
-        }        
+        }
 
         return true;
     }
@@ -803,7 +803,6 @@ class ZPush {
      */
     static public function PrintZPushLegal($message = "", $additionalMessage = "") {
         ZLog::Write(LOGLEVEL_DEBUG,"ZPush::PrintZPushLegal()");
-        $zpush_version = @constant('ZPUSH_VERSION');
 
         if ($message)
             $message = "<h3>". $message . "</h3>";
@@ -819,7 +818,6 @@ class ZPush {
         <body>
         <font face="verdana">
         <h2>Z-Push - Open Source ActiveSync</h2>
-        <b>Version $zpush_version</b><br>
         $message $additionalMessage
         <br><br>
         More information about Z-Push can be found at:<br>

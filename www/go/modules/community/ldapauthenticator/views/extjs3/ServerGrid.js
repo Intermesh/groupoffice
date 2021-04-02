@@ -60,12 +60,7 @@ go.modules.community.ldapauthenticator.ServerGrid = Ext.extend(go.grid.GridPanel
 	
 	//This reloads the domains combo after changes. 
 	entityStore: "LdapAuthServer",	
-	onChanges: function(store, added, changed, destroyed) {
-		
-		if(Object.keys(changed).length || destroyed.length) {
-				GO.SystemSettingsDomainCombo.reloadDomains();
-		}
-	},
+
 
 	initRowActions: function () {
 

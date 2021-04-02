@@ -9,7 +9,6 @@ CategoryDialog.js
 TaskDetail.js
 TasklistDialog.js
 TaskDialog.js
-RecurrencePanel.js
 AlertFields.js
 ChooseTasklistDialog.js
 ChooseTasklistGrid.js

@@ -278,25 +278,25 @@ class Acl extends Entity {
 		}
 
 		// WHERE in
-		// $subQuery = (new Query)
-		// 				->select('aclId')
-		// 				->from('core_acl_group', 'acl_g');
-						
-						
-		// if(isset($groups)) {
-		// 	$subQuery->andWhere('acl_g.groupId', 'IN', $groups);
-		// } else {
-		// 	$subQuery->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
-		// 		->andWhere([
-		// 			'acl_u.userId' => $userId			
-		// 					]);
-		// 	}
+		 $subQuery = (new Query)
+		 				->select('aclId')
+		 				->from('core_acl_group', 'acl_g');
 
-		// if($level != self::LEVEL_READ) {			
-		// 	$subQuery->andWhere('acl_g.level', '>=', $level);
-		// }
-		
-		// $query->where($column, 'IN', $subQuery);
+
+		 if(isset($groups)) {
+		 	$subQuery->andWhere('acl_g.groupId', 'IN', $groups);
+		 } else {
+		 	$subQuery->join('core_user_group', 'acl_u' , 'acl_u.groupId = acl_g.groupId')
+		 		->andWhere([
+		 			'acl_u.userId' => $userId
+		 					]);
+		 	}
+
+		 if($level != self::LEVEL_READ) {
+		 	$subQuery->andWhere('acl_g.level', '>=', $level);
+		 }
+
+		 $query->where($column, 'IN', $subQuery);
 
 		//where exists
 		// $subQuery = (new Query)
@@ -318,22 +318,21 @@ class Acl extends Entity {
 
 
 		// join
-		$on =  'acl_g.aclId = ' . $column;
-		if($level != self::LEVEL_READ) {
-			$on .= ' AND level >= ' .$level;
-		}
-
-		if(isset($groups)) {
-			$on = (new Criteria)->where($on)->andWhere('acl_g.groups', 'IN', $groups);
-		}
-
-		$query->join('core_acl_group', 'acl_g', $on)
-			->select('MAX(acl_g.level) as permissionLevel', true)
-			->groupBy(['id']);
-
-		if(!isset($groups)) {
-			$query->join('core_user_group', 'acl_u', 'acl_u.groupId = acl_g.groupId AND acl_u.userId=' . $userId);
-		}
+//		$on =  'acl_g.aclId = ' . $column;
+//		if($level != self::LEVEL_READ) {
+//			$on .= ' AND level >= ' .$level;
+//		}
+//
+//		if(isset($groups)) {
+//			$on = (new Criteria)->where($on)->andWhere('acl_g.groups', 'IN', $groups);
+//		}
+//
+//		$query->join('core_acl_group', 'acl_g', $on)
+//			->groupBy(['id']);
+//
+//		if(!isset($groups)) {
+//			$query->join('core_user_group', 'acl_u', 'acl_u.groupId = acl_g.groupId AND acl_u.userId=' . $userId);
+//		}
 		
 	}
 	

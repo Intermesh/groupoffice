@@ -6,6 +6,7 @@ use GO;
 use GO\Base\Db\ActiveRecord;
 use go\core\data\Model;
 use go\core\db\Criteria;
+use go\core\db\Expression;
 use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\ErrorHandler;
@@ -115,11 +116,12 @@ abstract class Base extends Model {
 		}
 		
 		$table = $this->field->tableName();
-		
-		
+
+		$oldName = !$this->field->isNew() && $this->field->isModified('databaseName') ? $this->field->getOldValue("databaseName") : $this->field->databaseName;
+
 		$quotedDbName = Utils::quoteColumnName($this->field->databaseName);
 		
-		if ($this->field->isNew()) {
+		if ($this->field->isNew() || !go()->getDatabase()->getTable($table)->hasColumn($oldName)) {
 			$sql = "ALTER TABLE `" . $table . "` ADD " . $quotedDbName . " " . $fieldSql . ";";
 			go()->getDbConnection()->exec($sql);
 			if($this->field->getUnique()) {
@@ -127,10 +129,13 @@ abstract class Base extends Model {
 				go()->getDbConnection()->exec($sql);
 			}			
 		} else {
-			
-			
-			$oldName = $this->field->isModified('databaseName') ? $this->field->getOldValue("databaseName") : $this->field->databaseName;
-			$col = Table::getInstance($table)->getColumn($oldName);
+
+			$col = go()->getDatabase()->getTable($table)->getColumn($oldName);
+
+			if($col->nullAllowed && stristr($fieldSql, 'NOT NULL')) {
+				//Set null values to the default if it was allowed.
+				go()->getDbConnection()->exec("UPDATE `" . $table . "` SET `" . $oldName . "` = ". go()->getDbConnection()->getPDO()->quote($this->field->getDefault()) ." WHERE `" . $oldName . "` IS NULL");
+			}
 			
 			$sql = "ALTER TABLE `" . $table . "` CHANGE " . Utils::quoteColumnName($oldName) . " " . $quotedDbName . " " . $fieldSql;
 			go()->getDbConnection()->exec($sql);
@@ -404,7 +409,7 @@ abstract class Base extends Model {
 		
 		$types = go()->getCache()->get("customfield-types");
 		
-		if(!$types) {
+		if($types === null) {
 			$classFinder = new ClassFinder();
 			$classes = $classFinder->findByParent(self::class);
 

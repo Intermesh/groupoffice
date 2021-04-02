@@ -1,47 +1,38 @@
 go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 	initComponent: function () {
 		this.checkColumn = new GO.grid.CheckColumn({
-			id:'percentageComplete',
-			dataIndex: 'percentageComplete',			
+			id:'progress',
+			dataIndex: 'progress',
 			hideInExport:true,
 			header: '<i class="icon ic-check"></i>',
 			width: dp(56),
 			hideable:false,
 			menuDisabled: true,
 			sortable:false,
-			groupable:false
+			groupable:false,
+			renderer: function (v, p, record) {
+				p.css += ' x-grid3-check-col-td';
+				var disabledCls = '';
+				if (this.isDisabled(record))
+					disabledCls = ' x-item-disabled';
+
+				return String.format('<div class="x-grid3-check-col{0}' + disabledCls + '" {1}></div>',
+					(v=='completed' || v =='cancelled') ? '-on' : '',
+					record.json.color ? 'style="color:#'+record.json.color+'"' : '');
+			}
 		});
 
-		this.checkColumn.on('change', function(record, checked){
-			this.store.reload({
-				callback:function(){
-					var update = {}, id = record.data.id;
-					// task completed
-					if(checked) {
-						update[id] = {percentageComplete: 100};
-						// check for another task
-						// go.Jmap.request({
-						// 	method: "community/task/Task/repeatTask",
-						// 	params: {
-						// 		id: id
-						// 	},
-						// 	callback: function(options, success, result) {
-						// 		// this.websiteTitle.setValue(result.title);
-						// 		// this.websiteDescription.setValue(result.description);
-						// 		// thumbExample.getEl().dom.style.backgroundImage = 'url(' + go.Jmap.downloadUrl(result.logo) + ')';
-						// 		// this.thumbField.setValue(result.logo);
-						// 		// this.el.unmask();								
-						// 	},
-						// 	scope: this
-						// });
-					} else {
-						update[id] = {percentageComplete: 0};
-					}
+		this.checkColumn.on('change', function(record){
+			// this.store.reload({
+			// 	callback:function(){
 					// update task
-					go.Db.store("Task").set({update: update});
-				},
-				scope:this
+			var wasComplete = record.json.progress == 'completed' || record.json.progress == 'cancelled';
+			go.Db.store("Task").set({update: {
+				[record.data.id]: {progress: (!wasComplete ? 'completed' : 'needs-action')}}
 			});
+			// 	},
+			// 	scope:this
+			// });
 		}, this);
 
 		// without reload
@@ -63,18 +54,73 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					id: 'id',
 					hidden: true,
 					header: 'ID',
-					width: dp(40),
+					width: dp(35),
 					sortable: true,
 					dataIndex: 'id'
+				},{
+					id: 'icons',
+					width: dp(60),
+					renderer: function(v,m,rec) {
+						var icons = [];
+						if(rec.json.recurrenceRule) {
+							icons.push('repeat');
+						}
+						if(rec.json.priority < 5) {
+							icons.push('low_priority');
+						}
+						if(rec.json.priority > 5) {
+							icons.push('priority_high');
+						}
+						if(rec.json.filesFolderId) {
+							icons.push('attachment');
+						}
+						return icons.map(i => '<i class="icon small">'+i+'</i>').join('');
+					}
 				},
 				{
 					id: 'title',
 					header: t('Title'),
 					width: dp(75),
 					sortable: true,
-					dataIndex: 'title'
-				},
-				{
+					dataIndex: 'title',
+					renderer: function(v,m,r) {
+						if(r.json.color) {
+							m.style += 'color:#'+r.json.color+';';
+						}
+						return v;
+					}
+				},{
+					xtype:"datecolumn",
+					id: 'start',
+					dateOnly: true,
+					header: t('Start at'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'start'
+				},{
+					xtype:"datecolumn",
+					id: 'due',
+					dateOnly: true,
+					header: t('Due at'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'due',
+				},{
+					width:dp(112),
+					header: t("% complete", "tasks"),
+					dataIndex: 'percentComplete',
+					renderer:function (value, meta, rec, row, col, store){
+						return '<div class="go-progressbar"><div style="width:'+Math.ceil(value)+'%"></div></div>';
+					}
+				},{
+					header: t('Responsible'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'responsible',
+					renderer: function(v) {
+						return v ? go.util.avatar(v.displayName,v.avatarId)+' '+v.displayName : "-";
+					}
+				},{
 					xtype:"datecolumn",
 					id: 'createdAt',
 					header: t('Created at'),

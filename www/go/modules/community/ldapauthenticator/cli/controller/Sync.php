@@ -2,6 +2,7 @@
 namespace go\modules\community\ldapauthenticator\cli\controller;
 
 use go\core\Controller;
+use go\core\orm\Query;
 use go\modules\community\ldapauthenticator\model\Server;
 use go\core\exception\NotFound;
 use go\core\ldap\Record;
@@ -57,7 +58,7 @@ class Sync extends Controller {
 
     $connection = $server->connect();
 
-    if (!empty($server->username)) {
+    if (!empty($xserver->username)) {
 			if (!$connection->bind($server->username, $server->getPassword())) {				
 				throw new \Exception("Invalid password given for '".$server->username."'");
 			} else
@@ -66,7 +67,7 @@ class Sync extends Controller {
 			}
 		}
 
-    $usersInLDAP = [1];
+    $usersInLDAP = [];
 
     $this->domains  = array_map(function($d) {return $d->name;}, $server->domains);
 		
@@ -82,11 +83,11 @@ class Sync extends Controller {
         continue;
       }
 
-      $user = User::find(['id', 'username', 'email', 'recoveryEmail', 'displayName', 'avatarId'])->where(['username' => $username]);
+      $user = User::find()->where(['username' => $username]);
       
       if(!empty($record->mail[0])) {
         $user->orWhere(['email' => $record->mail[0]]);
-      }      
+      }
       $user = $user->single();
 
       if (!$user) {
@@ -96,7 +97,7 @@ class Sync extends Controller {
         $user->username = $username;
         
       } else {
-        $this->output("User '" . $username . "' exists");    
+        $this->output("User '" . $username . "' exists");
       }
 
       Module::ldapRecordToUser($username, $record, $user);
@@ -152,6 +153,7 @@ class Sync extends Controller {
       string(6) "dc=com"
     }*/
 
+	  //try to determine domain that fits the user best
     $domain = "";
     foreach($dn as $v) {
       if(substr($v, 0, 3) == 'dc=') {
@@ -173,11 +175,9 @@ class Sync extends Controller {
       $domain = $mailDomain;
     }
 
+    //fall back on the first if no domain was found from dn or mail address.
     if(!in_array($domain, $this->domains)) {
-      $err = "Domain '$domain' from '$username' is not listed in the authenticator domains: " . implode(', ', $this->domains);
-      $this->output("Error: ". $err ."\n");
-      go()->debug($err);
-      return false;
+      $domain = $this->domains[0];
     }
 
     go()->debug("GO username should be: " . $username . '@' . $domain);
@@ -205,13 +205,31 @@ class Sync extends Controller {
       if ($percentageToDelete > $maxDeletePercentage)
         throw new \Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
 
+	    $deleteIds = [];
       foreach($users as $user) {
         if (!in_array($user->id, $usersInLDAP)) {
           $this->output("Deleting " . $user->username . "\n");
-          if (!$dryRun)
-            $user->delete();
+          $deleteIds[] = $user->id;
         }
       }
+
+	    if(!empty($deleteIds) && !$dryRun) {
+		    User::delete(['id' => $deleteIds]);
+	    }
+
+	    //clean up links of removed groups
+	    $deleteQuery = (new Query())
+		    ->where(['serverId' => $this->serverId]);
+
+	    if (!empty($usersInLDAP)) {
+		    $deleteQuery->andWhere('userId', 'NOT IN', $usersInLDAP);
+	    }
+
+	    go()->getDbConnection()
+		    ->delete(
+			    'ldapauth_server_user_sync',
+			    $deleteQuery
+		    )->execute();
     }
   }
   
@@ -248,14 +266,17 @@ class Sync extends Controller {
 			}
 		}
 
-    $groupsInLDAP = [Group::ID_ADMINS, Group::ID_EVERYONE, Group::ID_INTERNAL];
-		
+    $groupsInLDAP = [];
+
+
 		$records = Record::find($connection, $server->groupsDN, $server->syncGroupsQuery);
     
     $i = 0;
     foreach($records as $record) {
       $i++;
       $name = $record->cn[0];
+
+      go()->debug($record->getAttributes());
 
       if (empty($name)) {
         throw new \Exception("Empty group name in LDAP record!");
@@ -297,7 +318,7 @@ class Sync extends Controller {
 
       if (!$dryRun) {
         if(!$group->save()) {
-          throw new \Excpetion("Could not save group");
+          throw new \Exception("Could not save group");
         }
 
         go()->getDbConnection()
@@ -310,7 +331,11 @@ class Sync extends Controller {
 			$groupsInLDAP[] = $group->id;
 		}
 
-		if ($delete) {
+    if(!$dryRun) {
+
+    }
+
+	  if ($delete) {
 			$this->deleteGroups($groupsInLDAP, $maxDeletePercentage, $dryRun);
 		}
 
@@ -340,13 +365,33 @@ class Sync extends Controller {
       if ($percentageToDelete > $maxDeletePercentage)
         throw new \Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
 
-      
+      $deleteIds = [];
       foreach($groups as $group) {
         if (!in_array($group->id, $groupsInLDAP)) {
           $this->output("Deleting " . $group->name);
-          if (!$dryRun)
-            $group->delete();
+
+	        $deleteIds[] = $group->id;
         }
+      }
+
+      if(!$dryRun) {
+	      if(!empty($deleteIds)) {
+		      Group::delete(['id' => $deleteIds]);
+	      }
+
+	      //clean up links of removed groups
+	      $deleteQuery = (new Query())
+		      ->where(['serverId' => $this->serverId]);
+
+	      if (!empty($groupsInLDAP)) {
+		      $deleteQuery->andWhere('groupId', 'NOT IN', $groupsInLDAP);
+	      }
+
+	      go()->getDbConnection()
+		      ->delete(
+			      'ldapauth_server_group_sync',
+			      $deleteQuery
+		      )->execute();
       }
     }
   }
@@ -391,7 +436,7 @@ class Sync extends Controller {
 
 		$accountResult = Record::find($ldapConn, $searchDn, $query);
     $record = $accountResult->fetch();
-    
-		return ['username' => $this->getGOUserName($record, $server), 'email' => $record->mail[0]];
+    //Sometimes mail record doesn't exist. It can't find users by mail address in that case
+		return ['username' => $this->getGOUserName($record, $server), 'email' => $record->mail[0] ?? null];
 	}
 }

@@ -77,6 +77,9 @@ class ItemOperations extends RequestProcessor {
             WBXMLDecoder::ResetInWhile("itemOperationsOperation");
             while(WBXMLDecoder::InWhile("itemOperationsOperation")) {
                 if ($fetch) {
+                    // Save all OPTIONS into a ContentParameters object
+                    $operation["cpo"] = new ContentParameters();
+
                     if(self::$decoder->getElementStartTag(SYNC_ITEMOPERATIONS_STORE)) {
                         $operation['store'] = self::$decoder->getElementContent();
                         if(!self::$decoder->getElementEndTag())
@@ -116,8 +119,6 @@ class ItemOperations extends RequestProcessor {
                         //bodypartpreference
                         //rm:RightsManagementSupport
 
-                        // Save all OPTIONS into a ContentParameters object
-                        $operation["cpo"] = new ContentParameters();
                         WBXMLDecoder::ResetInWhile("itemOperationsOptions");
                         while(WBXMLDecoder::InWhile("itemOperationsOptions")) {
                             while (self::$decoder->getElementStartTag(SYNC_AIRSYNCBASE_BODYPREFERENCE)) {

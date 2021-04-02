@@ -21,62 +21,52 @@
  	
  	var state  = Ext.state.Manager.get('summary-active-portlets');
  	
- 	if(state)
- 	{
+ 	if(state) {
  		state=Ext.decode(state);
- 		if(!state[0] || state[0].col=='undefined')
-	 	{
+ 		if(!state[0] || state[0].col=='undefined') {
 	 		state=false;
 	 	}
- 	} 	
+ 	}
  	
- 	
- 	if(!state)
- 	{
+ 	if(!state) {
  		this.activePortlets=['portlet-announcements', 'portlet-tasks', 'portlet-calendar','portlet-note'];
  		state=[{id:'portlet-announcements', col:0},{id:'portlet-tasks', col:0},{id:'portlet-calendar', col:1},{id:'portlet-note', col:1}];
  	}
- 	this.activePortlets=[];
- 	for(var i=0;i<state.length;i++)
- 	{	
+ 	this.activePortlets = [];
+ 	for(var i=0,l=state.length;i<l;i++) {
  		this.activePortlets.push(state[i].id);
  	}
  	
  	
- 	this.columns=[/*{
+ 	this.columns = [/*{
 				columnWidth:.33,
 	      style:'padding:10px 0 10px 10px',
 	      border:false
 	  	},*/
 	  	{
-				columnWidth:.5,
-				mobile: {
-					columnWidth: 1,
-				},
-	      style:'padding:10px 0 10px 10px',
-	      border:false
+			columnWidth:.5,
+			mobile: {
+				columnWidth: 1,
+			},
+			style:'padding:10px 0 10px 10px',
+			border:false
 	  	},
 	  	{
-				columnWidth:.5,
-				mobile: {
-					columnWidth: 1,
-				},
-	      style:'padding:10px 10px 10px 10px',
-	      border:false
+			columnWidth:.5,
+			mobile: {
+				columnWidth: 1,
+			},
+			style:'padding:10px 10px 10px 10px',
+			border:false
 	  	}];
-	  	
-	
+
 	//var portletsPerCol = Math.ceil(this.activePortlets.length/this.columns.length);
-	  	
-  
+
  // var portletsInCol=0;
  // var colIndex=0;
   
-	for(var p=0;p<state.length;p++)
-  {  	
-
-  	if(GO.summary.portlets[state[p].id] || GO.summary.portlets[state[p].portletType])
-  	{
+		for(var p=0;p<state.length;p++) {
+	  	    if(GO.summary.portlets[state[p].id] || GO.summary.portlets[state[p].portletType]) {
 			
 	  	//var index = Math.ceil((p+1)/portletsPerCol)-1;
 	  	
@@ -86,69 +76,59 @@
   			colIndex++;
 	  	}*/
 	  	  	
-	  	var column = this.columns[state[p].col]; 
+	  	        var column = this.columns[state[p].col];
 			
-			if(state[p].multiple){
-				var portlet = new GO.summary.Portlet(GO.summary.portlets[state[p].portletType]);
-				portlet.id = state[p].id;
-			}else
-			{
-				var portlet = GO.summary.portlets[state[p].id];
-			}
+				if(state[p].multiple){
+					var portlet = new GO.summary.Portlet(GO.summary.portlets[state[p].portletType]);
+					portlet.id = state[p].id;
+				} else {
+					var portlet = GO.summary.portlets[state[p].id];
+				}
+
+				portlet.mainPanel = this;
 			
-			portlet.mainPanel = this;
-			
-			if(state[p].settings){
-				portlet.settings = state[p].settings;
-			}
-			
-			
-			portlet.on('remove_portlet', function(portlet){
-	  		portlet.ownerCt.remove(portlet, false);	 
-	  		portlet.hide(); 		
-	  		this.saveActivePortlets();
-	  	}, this);
+				if(state[p].settings){
+					portlet.settings = state[p].settings;
+				}
 			
 			
-	  	if(!column.items)
-	  	{
-	  		column.items=[portlet];
-	  	}else
-	  	{
-	  		column.items.push(portlet);
-	  	}
-	  	//portletsInCol++;
-  	}	
-  }
+				portlet.on('remove_portlet', function(portlet){
+		            portlet.ownerCt.remove(portlet, false);
+		            portlet.hide();
+		            this.saveActivePortlets();
+	  	    }, this, {single: true});
+			
+			
+	  	    if(!column.items) {
+	  		    column.items=[portlet];
+	  	    } else {
+	  		    column.items.push(portlet);
+	  	    }
+	  	    //portletsInCol++;
+		}
+    }
   
-  this.availablePortletsStore = new Ext.data.JsonStore({		
-			id: 'id',   
+	this.availablePortletsStore = new Ext.data.JsonStore({
+		id: 'id',
 	    root: 'portlets',
 	    fields: ['id', 'title', 'iconCls', 'portletType', 'multiple']
 	});
 	
-	for(var p in GO.summary.portlets)
-  {
-  	if(typeof(GO.summary.portlets[p])=='object')
-  	{
-  		
-
-	  	
-	  	var indexOf = this.activePortlets.indexOf(p);
-	  	if(indexOf==-1 || GO.summary.portlets[p].multiple)
-	  	{
-	  		this.availablePortlets.push(GO.summary.portlets[p]);
-	  	}
-  	}
-  }	
-  config.items=this.columns;
+	for(var p in GO.summary.portlets) {
+  	    if(typeof(GO.summary.portlets[p])=='object') {
+		  	var indexOf = this.activePortlets.indexOf(p);
+		  	if(indexOf==-1 || GO.summary.portlets[p].multiple) {
+	  		    this.availablePortlets.push(GO.summary.portlets[p]);
+	  	    }
+  	    }
+    }
+    config.items = this.columns;
   
-  if(!config.items)
-  {
-  	config.html = t("You don't have any items on your start page.", "summary");
-  }
+    if(!config.items)  {
+    	config.html = t("You don't have any items on your start page.", "summary");
+    }
 
-  var tbarItems = [{
+    var tbarItems = [{
 	 	xtype:'htmlcomponent',
 		html:t("Start page", "summary"),
 		cls:'go-module-title-tbar'
@@ -160,57 +140,50 @@
 		scope: this
     }];
 
-  if(GO.settings.modules.summary.write_permission)
-  {
-	  tbarItems.push({
-	  	text: t("Manage announcements", "summary"),
-	  	iconCls:'btn-settings',
-	  	handler: function(){
-	  		if(!this.manageAnnouncementsWindow)
-	  		{
-	  			
-	  			this.manageAnnouncementsWindow = new go.Window({
-	  				layout:'fit',
-	  				items:this.announcementsGrid =  new GO.summary.AnnouncementsGrid(),
-	  				width:700,
-	  				height:400,
-	  				title:t("Announcements", "summary"),
-	  				closeAction:'hide',
-	  				buttons:[{
-							text: t("Close"),
-							handler: function(){this.manageAnnouncementsWindow.hide();},
-							scope:this
+	if(GO.settings.modules.summary.write_permission) {
+		tbarItems.push({
+	  	    text: t("Manage announcements", "summary"),
+			iconCls:'btn-settings',
+			handler: function(){
+	  		    if( !this.manageAnnouncementsWindow) {
+	  			    this.manageAnnouncementsWindow = new go.Window({
+		                layout:'fit',
+		                items:this.announcementsGrid =  new GO.summary.AnnouncementsGrid(),
+		                width:700,
+		                height:400,
+		                title:t("Announcements", "summary"),
+		                closeAction:'hide',
+		                buttons:[{
+								text: t("Close"),
+								handler: function(){this.manageAnnouncementsWindow.hide();},
+								scope:this
 						}],
 						listeners:{
 							show: function(){
-								if(!this.announcementsGrid.store.loaded)
-								{
+								if(!this.announcementsGrid.store.loaded) {
 									this.announcementsGrid.store.load();
 								}							
 							},
 							scope:this
 						}
-	  			});
+	  			    });
 	  			
-	  			this.announcementsGrid.store.on('load',function(){
-	  				this.announcementsGrid.store.on('load',function(){
-	  					GO.summary.announcementsPanel.store.load();		
-	  				}, this);
-	  			}, this);
-	  			
-	  		}
-	  		
-	  		this.manageAnnouncementsWindow.show();
-	  	},
-	  	scope: this
-	  });
+	  			    this.announcementsGrid.store.on('load',function(){
+	  				    this.announcementsGrid.store.on('load',function(){
+	  					    GO.summary.announcementsPanel.store.load();
+	  				    }, this);
+	  			    }, this);
+	            }
+	  		    this.manageAnnouncementsWindow.show();
+	  	    },
+	  	    scope: this
+	    });
 	} 
 
-this.tbar=new Ext.Toolbar({
-      cls:'go-head-tb',
-      items:tbarItems
-  });
-
+	this.tbar=new Ext.Toolbar({
+		cls:'go-head-tb',
+		items:tbarItems
+	});
   
 	GO.summary.MainPanel.superclass.constructor.call(this,config);
 	
@@ -223,35 +196,27 @@ Ext.extend(GO.summary.MainPanel, GO.summary.Portal, {
 	activePortlets : Array(),
 	availablePortlets : Array(),
 	
-	saveActivePortlets : function(){
-		
+	saveActivePortlets : function() {
 		this.activePortlets = [];
 		var state = [];
-		for(var c=0;c<this.items.items.length;c++)
-		{
+		for(var c=0;c<this.items.items.length;c++) {
 			var col = this.items.items[c];
-			for(var p=0;p<col.items.items.length;p++)
-			{
+			for(var p=0;p<col.items.items.length;p++) {
 				var id = col.items.items[p].id;
 				this.activePortlets.push(id);
-				
 				state.push({id: id, col: c, portletType: col.items.items[p].portletType, multiple: col.items.items[p].multiple, settings: col.items.items[p].settings});
 			}
 		}
 		
 		this.availablePortlets=[];
-		for(var p in GO.summary.portlets)
-	  {
-	  	if(typeof(GO.summary.portlets[p])=='object' && (this.activePortlets.indexOf(p)==-1 || GO.summary.portlets[p].multiple))
-	  	{	  		
-	  		this.availablePortlets.push(GO.summary.portlets[p]);
-	  	}
-	  }  
+		for(var p in GO.summary.portlets) {
+	  	    if(typeof(GO.summary.portlets[p])=='object' && (this.activePortlets.indexOf(p) == -1 || GO.summary.portlets[p].multiple)) {
+	  		    this.availablePortlets.push(GO.summary.portlets[p]);
+	  	    }
+	    }
 	  
 		this.availablePortletsStore.loadData({portlets: this.availablePortlets});
-		
-	  Ext.state.Manager.set('summary-active-portlets', Ext.encode(state));
-	
+		Ext.state.Manager.set('summary-active-portlets', Ext.encode(state));
 	},
 	
 	
@@ -314,10 +279,10 @@ Ext.extend(GO.summary.MainPanel, GO.summary.Portal, {
 		portlet.mainPanel = this;
 		
 		portlet.on('remove_portlet', function(portlet){
-	  		portlet.ownerCt.remove(portlet, false);	 
+	  		portlet.ownerCt.remove(portlet, false);
 	  		portlet.hide(); 		
 	  		this.saveActivePortlets();
-	  	}, this);
+	  	}, this, {single: true});
 		
 		this.items.items[0].add(portlet);
 		if(this.rendered) {

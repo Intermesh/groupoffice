@@ -335,7 +335,7 @@ class DbStore extends AbstractStore {
 		//Correction: users can't live without the wildcard at the start.
 
 		if (!empty($this->query))
-			$findParams->searchQuery('%' . preg_replace('/[\s*]+/', '%', $this->query) . '%');
+			$findParams->searchQuery($this->query);
 
 		if (isset($this->limit))
 			$findParams->limit($this->limit);

@@ -80,9 +80,9 @@ class Image {
 	private function transperancy() {
 		if ($this->image_type == IMAGETYPE_GIF || $this->image_type == IMAGETYPE_PNG) {
 			$trnprt_indx = imagecolortransparent($this->original_image);
-
+			$palletsize = imagecolorstotal($this->original_image);
 			// If we have a specific transparent color
-			if ($trnprt_indx >= 0) {
+			if ($trnprt_indx >= 0 && $trnprt_indx < $palletsize) {
 
 				// Get the original image's transparent color's RGB values
 				$trnprt_color = imagecolorsforindex($this->original_image, $trnprt_indx);

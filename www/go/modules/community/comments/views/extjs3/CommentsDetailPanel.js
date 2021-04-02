@@ -46,22 +46,19 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				'categoryId', 
 				'categoryName',
 				'entityId', 
-				{name: 'createdAt', type: 'date'}, 
+				{name: 'createdAt', type: 'date'},
+				{name: 'date', type: 'date'},
 				{name: 'modifiedAt', type: 'date'}, 
 				'modifiedBy',
 				'createdBy', 
 				{name: "creator", type: "relation"},
+				{name: "modifier", type: "relation"},
 				'text',
 				{name: "permissionLevel", type: "int"},
 				{name: "labels", type: "relation"}
 			],
 			entityStore: "Comment",
-			remoteSort: true,
-			sortInfo: {
-				field: "createdAt",
-				direction: 'ASC'
-
-			}
+			remoteSort: true
 		});
 		
 		this.store.on('load', function(store,records,options) {		
@@ -151,30 +148,49 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 		var badge = "<span class='badge'>" + this.store.getTotalCount() + '</span>';
 		this.setTitle(t("Comments") + badge);
-		this.composer.textField.setValue('');
 		var prevStr;
-		var initScrollHeight = (this.store.getCount() == this.commentsContainer.pageSize) ? 0 : this.commentsContainer.getEl().dom.scrollHeight,
-			 initScrollTop = this.commentsContainer.getEl().dom.scrollTop;
+	//	this.initScrollHeight = (this.store.getCount() == this.commentsContainer.pageSize) ? 0 : this.commentsContainer.getEl().dom.scrollHeight;
+		 this.initScrollTop = this.commentsContainer.getEl().dom.scrollTop;
 
 		this.commentsContainer.removeAll();
 
 		this.store.each(function(r) {
 			
 			var labelText ='', mineCls = r.get("createdBy") == go.User.id ? 'mine' : '';
-			var readMore = new go.detail.ReadMore({
-				cls: 'go-html-formatted ' + mineCls
-			});
+
 			var creator = r.get("creator");
 			if(!creator) {
 				creator = {
 					displayName: t("Unknown user")
 				};
 			}
+
+
+			var qtip = t('{author} wrote at {date}')
+				.replace('{author}', Ext.util.Format.htmlEncode(creator.displayName))
+				.replace('{date}', Ext.util.Format.date(r.get('createdAt'),go.User.dateTimeFormat));
+
+			var modifier = r.get("modifier");
+			if(!modifier) {
+				modifier = {
+					displayName: t("Unknown user")
+				};
+			}
+			if(r.get('createdAt').getTime() != r.get('modifiedAt').getTime()) {
+
+				qtip += "\n" + t("Edited by {author} at {date}")
+					.replace('{author}', Ext.util.Format.htmlEncode(modifier.displayName))
+					.replace('{date}', Ext.util.Format.date(r.get('modifiedAt'),go.User.dateTimeFormat));
+			}
+
+			if(r.get('createdAt').getTime() != r.get('date').getTime()) {
+				qtip += "\n" + t("The date was changed to {date}")
+					.replace('{date}', Ext.util.Format.date(r.get('date'),go.User.dateTimeFormat));
+			}
+
 			var avatar = {
 				xtype:'box',
-				autoEl: {tag: 'span','ext:qtip': t('{author} wrote at {date}')
-					.replace('{author}', Ext.util.Format.htmlEncode(creator.displayName))
-					.replace('{date}', Ext.util.Format.date(r.get('createdAt'),go.User.dateTimeFormat))},
+				autoEl: {tag: 'span'},
 				cls: 'photo '+mineCls
 			};
 
@@ -182,20 +198,29 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 			for(var i = 0, l = r.data.labels.length; i < l; i++){
 				labelText += '<i class="icon" title="' + r.data.labels[i].name + '" style="color: #' + r.data.labels[i].color + '">label</i>';
-			} 
-			
+			}
+
+			var readMore = new go.detail.ReadMore({
+				cls: 'go-html-formatted ' + mineCls
+			});
 			readMore.setText(r.get('text'));
 			readMore.insert(1, {xtype:'box',html:labelText, cls: 'tags ' +mineCls});
+
+			// var readMore = new Ext.BoxComponent({
+			// 	cls: 'go-html-formatted ' + mineCls,
+			// 	html: "<div class='content'>" + r.get('text') + "</div><div class='tags "+mineCls+"'>"+labelText+"</div>"
+			// });
 			this.commentsContainer.add({
 				xtype:"container",
 				cls:'go-messages',
 				items: [{
 						xtype:'box',
 						autoEl: 'h6',
-						hidden: prevStr == go.util.Format.date(r.get('createdAt')),
-						html: go.util.Format.date(r.get('createdAt'))
+						hidden: prevStr == go.util.Format.date(r.get('date')),
+						html: go.util.Format.date(r.get('date'))
 					},{
 						xtype:'container',
+						autoEl: {tag: 'div','title': qtip},
 						items: [avatar,readMore]
 					}
 				]
@@ -209,7 +234,7 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 				}
 
 			}, this);},this);
-			prevStr = go.util.Format.date(r.get('createdAt'));
+			prevStr = go.util.Format.date(r.get('date'));
 		}, this);
 		
 		this.doLayout();
@@ -220,11 +245,15 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 		var _this = this;
 		setTimeout(function(){
 			
-			var scroll = _this.commentsContainer.getEl();
+
 			_this.body.setHeight(Math.max(50,Math.min(_this.growMaxHeight,height + _this.composer.getHeight())));
 			_this.doLayout();
-			scroll.scroll("b", initScrollTop + (scroll.dom.scrollHeight));
+			_this.scrollDown();
 		});
 
+	},
+	scrollDown : function() {
+		var scroll = this.commentsContainer.getEl();
+		scroll.scroll("b", this.initScrollTop + (scroll.dom.scrollHeight));
 	}
 });

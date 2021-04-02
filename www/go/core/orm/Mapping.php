@@ -263,7 +263,7 @@ class Mapping {
 	/**
 	 * Add a scalar relation. For example an array of ID's.
 	 * 
-	 * Note: When an entity with scalar relations is saved it automatically looks for other entities referencing the same scalar relation for trracking changes.
+	 * Note: When an entity with scalar relations is saved it automatically looks for other entities referencing the same scalar relation for tracking changes.
 	 * 
 	 * eg. When a group's users[] change. It will mark all users as changed too because they have a scalar groups[] property.
 	 * 
@@ -339,6 +339,28 @@ class Mapping {
 	 */
 	public function getColumn($propName) {
 		return $this->columns[$propName] ?? false;
+	}
+
+	/**
+	 * Get all columns in the mapping
+	 *
+	 * @return Column[]
+	 */
+	public function getColumns() {
+		return array_values($this->columns);
+	}
+
+	/**
+	 * Get column names
+	 *
+	 * @return string[]
+	 */
+	public function getColumnNames() {
+		$names =  array_map(function($c) {
+			return $c->name;
+		}, $this->getColumns());
+
+		return $names;
 	}
 	
 	/**

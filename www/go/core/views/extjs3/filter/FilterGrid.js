@@ -53,30 +53,37 @@ go.filter.FilterGrid = Ext.extend(go.grid.GridPanel, {
 		
 		this.getSelectionModel().on({
 			selectionchange: function () {
-
-				var selected = this.getSelectionModel().getSelections();
-
-				if(!selected.length) {
-					this.filterStore.setFilter("user", null);
-				} else
-				{								
-
-					var filter = {
-						operator: "AND",
-						conditions: []
-					};
-
-					selected.forEach(function(record) {
-						filter.conditions.push(record.get('filter'));
-					});
-
-					this.filterStore.setFilter("user", filter);
-				}					
-				this.filterStore.load();
+				this.applyFilters();
 			},
 			scope: this
 		});
+
+		this.store.on("changes", function() {
+			this.applyFilters();
+		}, this);
 		
+	},
+
+	applyFilters : function() {
+		var selected = this.getSelectionModel().getSelections();
+
+		if(!selected.length) {
+			this.filterStore.setFilter("user", null);
+		} else
+		{
+
+			var filter = {
+				operator: "AND",
+				conditions: []
+			};
+
+			selected.forEach(function(record) {
+				filter.conditions.push(record.get('filter'));
+			});
+
+			this.filterStore.setFilter("user", filter);
+		}
+		this.filterStore.load();
 	},
 
 	initRowActions: function () {

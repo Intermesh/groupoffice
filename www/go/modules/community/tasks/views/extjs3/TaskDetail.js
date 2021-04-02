@@ -5,6 +5,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 	entityStore: "Task",
 	width:dp(400),
 	stateId: 'ta-tasks-detail',
+	relations: ["tasklist", "responsible"],
 
 	initComponent: function () {
 
@@ -13,22 +14,26 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 
 		Ext.apply(this, {
 			items: [{
-				tpl: '<h3 class="title s8">{title}</h3>\
+				tpl: new Ext.XTemplate('<h3 class="title s8">{title}</h3>\
 					<h4 style="text-transform:uppercase; float:right; padding:12px 8px 0 0;">{[go.modules.community.tasks.progress[values.progress]]}</h4>\
-					<p class="s6 pad">\
-					<label>'+t("Starts at")+'</label>\
-					<span>{[fm.date(values.start)]}</span><br><br>\
-					<label>'+t("Tasklist")+'</label>\
-					<span>{[fm.date(values.start)]}</span><br><br>\
-					<label>'+t('Email')+'</label><span>{tasklistId}</span><br><br>\
+					<div class="go-progressbar" style="clear:both"><div style="width:{[Math.ceil(values.percentComplete)]}%"></div></div>\
+				<p class="s6 pad">\
+					<label>'+t("Start at")+'</label><span>{[go.util.Format.date(values.start) || "-"]}</span><br><br>\
+					<label>'+t("Tasklist")+'</label><span><tpl for="tasklist">{name}</tpl></span><br><br>\
+					<tpl if="values.recurrenceRule"><label>'+t('Recurrence')+'</label><span>{[this.rruleToText(values.recurrenceRule)]}</span><br><br></tpl>\
 				</p>\
 				<p class="s6">\
-					\<label>'+t("Due at")+'</label>\
-					<span>{[fm.date(values.due)]}</span><br><br>\
+					<label>'+t("Due at")+'</label><span>{[go.util.Format.date(values.due) || "-"]}</span><br><br>\
+					<tpl if="values.responsible"><label>'+t("Responsible")+'</label><span>{[go.util.avatar(values.responsible.displayName, values.responsible.avatarId)]} {[values.responsible.displayName]}</span><br><br></tpl>\
 				</p><tpl if="!GO.util.empty(description)"><p class="s12 pad">\
 					<label>'+t('Description')+'</label>\
 					<span>{description}</span>\
-				</p></tpl>'
+				</p></tpl>',{
+					rruleToText: function(rrule) {
+						var fieldDummy = new go.form.RecurrenceField();
+						return fieldDummy.parseRule(rrule);
+					}
+				})
 			}]
 		});
 		
@@ -38,6 +43,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 		this.addComments();
 		this.addLinks();
 		this.addFiles();
+		this.add(new go.detail.CreateModifyPanel());
 	},
 
 	onLoad: function () {

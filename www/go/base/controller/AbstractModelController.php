@@ -203,16 +203,15 @@ class AbstractModelController extends AbstractController {
 	 * Action to load a single record.
 	 */
 	protected function actionLoad($params) {
-		
-		//$modelName::model() does not work on php 5.2!
-		
+
 		$model = $this->getModelFromParams($params);
 		
 		$response = array();
-		
-		if(!$model->checkPermissionLevel($model->isNew?\GO\Base\Model\Acl::CREATE_PERMISSION:\GO\Base\Model\Acl::WRITE_PERMISSION))
+
+		if(!$this->checkLoadPermissionLevel($model)){
 			throw new \GO\Base\Exception\AccessDenied();
-		
+		}
+
 		$response = $this->beforeLoad($response, $model, $params);
 
 		$response['data'] = !empty($response['data']) ? array_merge($response['data'],$model->getAttributes()) : $model->getAttributes();
@@ -1326,5 +1325,13 @@ class AbstractModelController extends AbstractController {
 			
 			
 	}
-	
+
+	/**
+	 * @param $model
+	 * @return mixed
+	 */
+	protected function checkLoadPermissionLevel($model)
+	{
+		return $model->checkPermissionLevel($model->isNew() ?\GO\Base\Model\Acl::CREATE_PERMISSION : \GO\Base\Model\Acl::WRITE_PERMISSION);
+	}
 }

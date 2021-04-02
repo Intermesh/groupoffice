@@ -23,6 +23,8 @@ use go\core\db\Table;
 update addressbook_contact n set filesFolderId = (select files_folder_id from ab_contacts o where o.id=n.id) where n.filesFolderId = null ;
 update addressbook_contact n set filesFolderId = (select files_folder_id from ab_companies o where o.id = (n.id - (select max(id) from ab_contacts)) ) where n.filesFolderId = null ;
 
+update addressbook_contact n set registrationNumber = (select crn from ab_companies o where o.id = (n.id - (select max(id) from ab_contacts)) ) where n.registrationNumber = null ;
+
 
 update comments_comment n set entityTypeId=(select id from core_entity where name='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = 3;
 
@@ -43,6 +45,9 @@ class Migrate63to64 {
 		Table::destroyInstances();
 
 		Entity::$checkFilesFolder = false;
+
+		// to speed things up
+		Contact::$updateSearch = false;
 		
 		$this->countries = go()->t('countries');
 		
@@ -71,10 +76,16 @@ class Migrate63to64 {
 		// echo $addressBooks ."\n";		
 
 		foreach ($addressBooks as $abRecord) {
-			echo "Migrating addressbook ". $abRecord['name'] . "\n";
+			echo "Migrating addressbook ". $abRecord['name'] . " (" .$abRecord['id'].")\n";
 			flush();
 
-			$addressBook = AddressBook::find()->where(['name'=>$abRecord['name']])->single();
+			if(!empty($abRecord['id'])) {
+				$addressBook = AddressBook::find()->where(['id' => $abRecord['id']])->single();
+			} else {
+				//only for __ORPHANED__
+				$addressBook = AddressBook::find()->where(['name' => $abRecord['name']])->single();
+			}
+
 			if(!$addressBook) {
 				$addressBook = new AddressBook();
 
@@ -131,6 +142,8 @@ class Migrate63to64 {
 		}
 
 		Entity::$checkFilesFolder = true;
+		// to speed things up
+		Contact::$updateSearch = true;
 	}
 
   /**
@@ -328,7 +341,8 @@ class Migrate63to64 {
 		\go\core\db\Table::destroyInstances();
 	}
 	
-	public function migrateCompanyLinksAndComments() {		
+	public function migrateCompanyLinksAndComments() {
+
 		echo "Migrating links\n";
 		flush();
 		$companyEntityType =  (new Query)
@@ -341,38 +355,22 @@ class Migrate63to64 {
 			return;
 		}
 		
-//		go()->getDbConnection()
-//						->delete(
-//										'core_link', 
-//										(new \go\core\db\Query)
-//										->where(['fromEntityTypeId' => Contact::entityType()->getId()])
-//										->andWhere('fromId', 'NOT IN', Contact::find()->select('id'))
-//										)->execute();
-//		
-//		go()->getDbConnection()
-//						->delete(
-//										'core_link', 
-//										(new \go\core\db\Query)
-//										->where(['toEntityTypeId' => Contact::entityType()->getId()])
-//										->andWhere('toId', 'NOT IN', Contact::find()->select('id'))
-//										)->execute();
-		
 		go()->getDbConnection()->beginTransaction();
 		go()->getDbConnection()
-						->update("core_link", 
+						->update("core_link",
 										[
 												'fromEntityTypeId' => Contact::entityType()->getId(),
 												'fromId' => new \go\core\db\Expression('fromId + ' . $this->getCompanyIdIncrement())
-										], 
+										],
 										['fromEntityTypeId' => $companyEntityType['id']])
 						->execute();
-		
+
 		go()->getDbConnection()
-						->update("core_link", 
+						->update("core_link",
 										[
 												'toEntityTypeId' => Contact::entityType()->getId(),
 												'toId' => new \go\core\db\Expression('toId + ' . $this->getCompanyIdIncrement())
-										], 
+										],
 										['toEntityTypeId' => $companyEntityType['id']])
 						->execute();
 
@@ -381,18 +379,29 @@ class Migrate63to64 {
 			go()->getDbConnection()->exec("update comments_comment n set entityTypeId=(select id from core_entity where clientName='Contact'), entityId = (entityId + (select max(id) from ab_contacts)) where entityTypeId = (select id from core_entity where clientName='Company');");
 		}
 
+		go()->getDbConnection()
+			->update("core_search",
+				[
+					'filter' => 'isContact'
+				],
+				['entityTypeId' => Contact::entityType()->getId()])
+			->execute();
+
+		go()->getDbConnection()
+			->update("core_search",
+				[
+					'entityTypeId' => Contact::entityType()->getId(),
+					'entityId' => new \go\core\db\Expression('entityId + ' . $this->getCompanyIdIncrement()),
+					'filter' => 'isOrganization'
+				],
+				['entityTypeId' => $companyEntityType['id']])
+			->execute();
+
+
 		go()->getDbConnection()->delete("core_entity", ['clientName' => "Company"])->execute();
 
 		go()->getDbConnection()->commit();
-		
-//		go()->getDbConnection()
-//						->update("core_search", 
-//										[
-//												'entityTypeId' => Contact::entityType()->getId(),
-//												'entityId' => new \go\core\db\Expression('entityId + ' . $this->getCompanyIdIncrement())
-//										], 
-//										['entityTypeId' => $companyEntityType->getId()])
-//						->execute();
+
 	}
 	
 	public function migrateCustomField() {
@@ -433,6 +442,9 @@ class Migrate63to64 {
 		}
 		return $this->companyIdIncrement;
 	}
+
+
+
 
 
 	private function copyContacts(AddressBook $addressBook, $orphans = false) {
@@ -620,18 +632,33 @@ class Migrate63to64 {
 
 
 			$address = new Address();
-			$address->type = Address::TYPE_HOME;
-			$address->countryCode = isset($r['country']) && \go\core\validate\CountryCode::validate(strtoupper($r['country'])) ? strtoupper($r['country']) : null;
-			$address->state = $r['state'] ?? null;
-			$address->city = $r['city'] ?? null;
-			$address->zipCode = $r['zip'] ?? null;
-			$address->street = $r['address'] ?? null;
-			$address->street2 = $r['address_no'] ?? null;
-			$address->latitude = $r['latitude'] ?? null;
-			$address->longitude = $r['longitude'] ?? null;
-			$address->cutPropertiesToColumnLength();
+			if(!empty($r['country']) && \go\core\validate\CountryCode::validate(strtoupper($r['country'])))
+				$address->countryCode = strtoupper($r['country']);
+
+			if(!empty($r['state']))
+				$address->state = $r['state'];
+
+			if(!empty($r['city']))
+				$address->city = $r['city'];
+
+			if(!empty($r['zip']))
+				$address->zipCode = $r['zip'];
+
+			if(!empty($r['address']))
+				$address->street = $r['address'];
+
+			if(!empty($r['address_no']))
+				$address->street2 = $r['address_no'];
+
+			if(!empty($r['latitude']))
+				$address->latitude = $r['latitude'];
+
+			if(!empty($r['longitude']))
+				$address->longitude = $r['longitude'];
 
 			if ($address->isModified()) {
+				$address->type = Address::TYPE_HOME;
+				$address->cutPropertiesToColumnLength();
 				$contact->addresses[] = $address;
 			}
 
@@ -641,8 +668,8 @@ class Migrate63to64 {
 
 			$contact->createdAt = new DateTime("@" . $r['ctime']);
 			$contact->modifiedAt = new DateTime("@" . $r['mtime']);
-			$contact->createdBy = \go\core\model\User::findById($r['user_id'], ['id']) ? $r['user_id'] : 1;
-			$contact->modifiedBy = \go\core\model\User::findById($r['muser_id'], ['id']) ? $r['muser_id'] : 1;			
+			$contact->createdBy = \go\core\model\User::exists($r['user_id']) ? $r['user_id'] : 1;
+			$contact->modifiedBy = \go\core\model\User::exists($r['muser_id']) ? $r['muser_id'] : 1;
 			$contact->goUserId = empty($r['go_user_id']) || !\go\core\model\User::findById($r['go_user_id'], ['id']) || Contact::findForUser($r['go_user_id'], ['id']) ? null : $r['go_user_id'];
 
 			if ($r['photo']) {
@@ -766,34 +793,66 @@ class Migrate63to64 {
 
 
 			$address = new Address();
-			$address->type = Address::TYPE_VISIT;
-			$address->countryCode = isset($r['country']) && \go\core\validate\CountryCode::validate(strtoupper($r['country'])) ? strtoupper($r['country']) : null;
-			$address->state =!empty($r['state']) ?$r['state'] : null;
-			$address->city = !empty($r['city']) ?$r['city'] : null;
-			$address->zipCode = !empty($r['zip']) ?$r['zip'] : null;
-			$address->street = !empty($r['address']) ?$r['address'] : null;
-			$address->street2 = !empty($r['address_no']) ?$r['address_no'] : null;
-			$address->latitude = !empty($r['latitude']) ? $r['latitude'] : null;
-			$address->longitude = !empty($r['longitude']) ?$r['longitude'] : null;
-			$address->cutPropertiesToColumnLength();
+
+			if(!empty($r['country']) && \go\core\validate\CountryCode::validate(strtoupper($r['country'])))
+				$address->countryCode = strtoupper($r['country']);
+
+			if(!empty($r['state']))
+				$address->state = $r['state'];
+
+			if(!empty($r['city']))
+				$address->city = $r['city'];
+
+			if(!empty($r['zip']))
+				$address->zipCode = $r['zip'];
+
+			if(!empty($r['address']))
+				$address->street = $r['address'];
+
+			if(!empty($r['address_no']))
+				$address->street2 = $r['address_no'];
+
+			if(!empty($r['latitude']))
+				$address->latitude = $r['latitude'];
+
+			if(!empty($r['longitude']))
+				$address->longitude = $r['longitude'];
 
 			if ($address->isModified()) {
+				$address->cutPropertiesToColumnLength();
+				$address->type = Address::TYPE_VISIT;
 				$contact->addresses[] = $address;
 			}
 
 			$address = new Address();
-			$address->type = Address::TYPE_POSTAL;
-			$address->countryCode = isset($r['post_country']) && \go\core\validate\CountryCode::validate(strtoupper($r['post_country'])) ? strtoupper($r['post_country']) : null;
-      $address->state =!empty($r['post_state']) ?$r['post_state'] : null;
-      $address->city = !empty($r['post_city']) ?$r['post_city'] : null;
-      $address->zipCode = !empty($r['post_zip']) ?$r['post_zip'] : null;
-      $address->street = !empty($r['post_address']) ?$r['post_address'] : null;
-      $address->street2 = !empty($r['post_address_no']) ?$r['post_address_no'] : null;
-      $address->latitude = !empty($r['post_latitude']) ? $r['post_latitude'] : null;
-      $address->longitude = !empty($r['post_longitude']) ?$r['post_longitude'] : null;
-			$address->cutPropertiesToColumnLength();
+
+			if(!empty($r['country']) && \go\core\validate\CountryCode::validate(strtoupper($r['post_country'])))
+				$address->countryCode = strtoupper($r['post_country']);
+
+			if(!empty($r['post_state']))
+				$address->state = $r['post_state'];
+
+			if(!empty($r['post_city']))
+				$address->city = $r['post_city'];
+
+			if(!empty($r['post_zip']))
+				$address->zipCode = $r['post_zip'];
+
+			if(!empty($r['post_address']))
+				$address->street = $r['post_address'];
+
+			if(!empty($r['post_address_no']))
+				$address->street2 = $r['post_address_no'];
+
+			if(!empty($r['post_latitude']))
+				$address->latitude = $r['post_latitude'];
+
+			if(!empty($r['post_longitude']))
+				$address->longitude = $r['post_longitude'];
 
 			if ($address->isModified()) {
+				$address->cutPropertiesToColumnLength();
+				$address->type = Address::TYPE_POSTAL;
 				$contact->addresses[] = $address;
 			}
 
@@ -803,11 +862,12 @@ class Migrate63to64 {
 
 			$contact->createdAt = new DateTime("@" . $r['ctime']);
 			$contact->modifiedAt = new DateTime("@" . $r['mtime']);
-			$contact->createdBy = \go\core\model\User::findById($r['user_id'], ['id']) ? $r['user_id'] : 1;
-			$contact->modifiedBy = \go\core\model\User::findById($r['muser_id'], ['id']) ? $r['muser_id'] : 1;
+			$contact->createdBy = \go\core\model\User::exists($r['user_id']) ? $r['user_id'] : 1;
+			$contact->modifiedBy = \go\core\model\User::exists($r['muser_id']) ? $r['muser_id'] : 1;
 
 			$contact->IBAN = $r['iban'];
 			$contact->BIC = $r['bank_bic'];
+			$contact->registrationNumber = $r['crn'];
 
 			$contact->vatNo = $r['vat_no'];
 

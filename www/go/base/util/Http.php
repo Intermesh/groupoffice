@@ -237,7 +237,8 @@ class Http {
 				header('Content-Length: ' . $file->size());
 			
 			header("Last-Modified: " . gmdate("D, d M Y H:i:s", $file->mtime())." GMT");
-			header("ETag: " . $file->md5Hash());
+			//Made very large downloads fail
+			//header("ETag: " . $file->md5Hash());
 		}
 		
 		foreach($extraHeaders as $header=>$value){

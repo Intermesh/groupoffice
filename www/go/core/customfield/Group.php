@@ -33,9 +33,14 @@ class Group extends Base {
 		$sql = "ALTER TABLE `" . $this->field->tableName() . "` ADD CONSTRAINT `" . $this->getConstraintName() . "` FOREIGN KEY (" . Utils::quoteColumnName($this->field->databaseName) . ") REFERENCES `core_group`(`id`) ON DELETE SET NULL ON UPDATE RESTRICT;";			
 		go()->getDbConnection()->query($sql);
 	}
-	
-	private function getConstraintName() {
-		return $this->field->tableName() . "_ibfk_go_" . $this->field->id;
+
+	private function getConstraintName()
+	{
+		$strName = $this->field->tableName() . "_ibfk_go_" . $this->field->id;
+		if (strlen($strName) > 64) { // Constraint names are restricted to 64 characters!
+			$strName = str_replace('_custom_fields_', '_cf_', $strName);
+		}
+		return $strName;
 	}
 	
 	public function onFieldDelete() {

@@ -10,12 +10,22 @@ use PDOException;
 
 class Utils {
 
-	public static function runSQLFile(File $file) {
+	/**
+	 * Run all queries of a given SQL file
+	 *
+	 * @param File $file
+	 * @param false $verbose
+	 * @throws Exception
+	 */
+	public static function runSQLFile(File $file, $verbose = false) {
 		$queries = self::getSqlQueries($file);
 
 		try {
 			for ($i = 0, $c = count($queries); $i < $c; $i++) {
 				if(!empty($queries[$i])) {
+					if($verbose) {
+						echo "Executing SQL: " . $queries[$i] ."\n";
+					}
 					App::get()->getDbConnection()->exec($queries[$i]);
 				}
 			}

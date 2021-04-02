@@ -110,20 +110,17 @@ class Blob extends orm\Entity {
 	public static function getReferences() {
 		
 		$refs = go()->getCache()->get("blob-refs");
-		if(!$refs) {
+		if($refs === null) {
 			$dbName = go()->getDatabase()->getName();
 			go()->getDbConnection()->exec("USE information_schema");
 			
 			try {
 				//somehow bindvalue didn't work here
 				$sql = "SELECT `TABLE_NAME` as `table`, `COLUMN_NAME` as `column` FROM `KEY_COLUMN_USAGE` where table_schema=" . go()->getDbConnection()->getPDO()->quote($dbName) . " and referenced_table_name='core_blob' and referenced_column_name = 'id'";
-				$stmt = go()->getDbConnection()->getPDO()->query($sql);
+				$stmt = go()->getDbConnection()->query($sql);
 				$refs = $stmt->fetchAll(\PDO::FETCH_ASSOC);		
 			}
 			finally{
-				if($dbName == 'information_schema') {
-					throw new Exception("HUH");
-				}
 				go()->getDbConnection()->exec("USE `" . $dbName . "`");		
 			}	
 			
@@ -202,6 +199,13 @@ class Blob extends orm\Entity {
 		$blob->name = $file->getName();
 		$blob->tmpFile = $file->getPath();
 		$blob->type = $file->getContentType();
+
+		if(strlen($blob->type) > 127) {
+			go()->warn("Invalid content type given: " . $blob->type);
+
+			$blob->type = 'application/octet-stream';
+		}
+
 		$blob->modifiedAt = $file->getModifiedAt();
 		$blob->removeFile = $removeFile;
 		return $blob;
@@ -425,6 +429,7 @@ class Blob extends orm\Entity {
 		$disp = $inline ? 'inline' : 'attachment';
 
 		$this->getFile()->output(true, true, [
+			'ETag' => $this->id,
 			'Content-Type' => $this->type, 
 			"Expires" => (new DateTime("1 year"))->format("D, j M Y H:i:s"),
 			'Content-Disposition' => $disp . ';filename="' . $this->name . '"'

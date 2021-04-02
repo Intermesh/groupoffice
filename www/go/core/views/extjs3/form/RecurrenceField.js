@@ -29,12 +29,20 @@ go.form.RecurrenceField = Ext.extend(Ext.form.TriggerField, {
     setValue : function(rule){
         if(Ext.isObject(rule))
             this.rule = rule;
-        return go.form.RecurrenceField.superclass.setValue.call(this, this.parseRule(rule));
+        else
+            this.rule = null;
+        return this.supr().setValue.call(this, this.parseRule(rule));
+    },
+    isDirty : function() {
+        if(this.disabled || !this.rendered) {
+            return false;
+        }
+        return this.parseRule(this.getValue()) !== this.parseRule(this.originalValue);
     },
 
     /**
-     * Change an RRule object int o human readable text
-     * @param {object} recurrenceRule
+     * Change an RRule object into human readable text
+     * @param {object} recurrenceRule as in jmap spec
      * @returns {string} flat text
      */
     parseRule: function(obj) {
@@ -80,8 +88,7 @@ go.form.RecurrenceField = Ext.extend(Ext.form.TriggerField, {
 
     setStartDate: function(date) {
         this.startDate = date.clone();
-        var m = date.getMonth();
-        for(var i = 0; m == date.getMonth(); date = date.add('d', -7)) {
+        for(var i = 0,m = date.getMonth(); m == date.getMonth(); date = date.add('d', -7)) {
             i++;
         }
         this.weekOfMonth = i;
@@ -104,20 +111,25 @@ go.form.RecurrenceField = Ext.extend(Ext.form.TriggerField, {
         if(this.menu == null){
             this.menu = new Ext.menu.Menu({
                 cls: 'x-menu-no-icons',
+                defaults: {
+                    handler: function(item, ev) {
+                        this.setValue(item.rrule);
+                    },scope:this
+                },
                 items: [
                     {text: t('Not recurring'), rrule: null},
                     '-',
-                    {text: t('Daily'), rrule: {freq: 'daily'} },
-                    {text: t('Weekly') + ' ' +t('at ')+this.startDate.format('l'), rrule: {freq: 'weekly'} },
-                    {text: t('Monthly')+ ' ' +t('at day')+' '+this.startDate.format('j'), rrule: {freq:'monthly', bysetpos:1} },
-                    {text: t('Monthly')+ ' ' +t('at the')+' '+this.getSuffix()+ ' '+this.startDate.format('l'), rrule: {freq:'monthly', bysetpos:2} },
-                    {text: t('Annually')+ ' ' +t('at ')+this.startDate.format('j F'), rrule: {freq:'yearly'} },
-                    {text: t('Each working day'), rrule: {freq:'weekly', byDay: [{day:'mo'},{day:'tu'},{day:'we'},{day:'th'},{day:'fr'}]} },
+                    {text: t('Daily'), rrule: {frequency: 'daily'} },
+                    {text: t('Weekly') + ' ' +t('at ')+this.startDate.format('l'), rrule: {frequency: 'weekly'} },
+                    {text: t('Monthly')+ ' ' +t('at day')+' '+this.startDate.format('j'), rrule: {frequency:'monthly', byMonthDay:[this.startDate.format('j')]} },
+                    {text: t('Monthly')+ ' ' +t('at the')+' '+this.getSuffix()+ ' '+this.startDate.format('l'), rrule: {frequency:'monthly', byDay:[{day:this._day(),nthOfPeriod:this.weekOfMonth}]} },
+                    {text: t('Annually')+ ' ' +t('at ')+this.startDate.format('j F'), rrule: {frequency:'yearly'} },
+                    {text: t('Each working day'), rrule: {frequency:'weekly', byDay: [{day:'mo'},{day:'tu'},{day:'we'},{day:'th'},{day:'fr'}]} },
                     '-',
                     {text: t('Customize')+'...', handler: function() {
                         var dlg = this.customRuleDialog();
-                        dlg.load(this.rule || {frequency:'weekly'});
                         dlg.show();
+                        dlg.load(this.rule || {frequency:'weekly'});
                     },scope:this},
                 ]
             });
@@ -203,7 +215,7 @@ go.form.RecurrenceField = Ext.extend(Ext.form.TriggerField, {
             },
             setValue: function(days) {
                 this.value = days;
-                for(var i=0; i < days.length; i++) {
+                for(var i = 0; i < days.length; i++) {
                     for(var j = 0; j < 7; j++) {
                         this.items.items[j].toggle(false);
                         if(this.items.items[j].day == days[i].day){
@@ -219,10 +231,10 @@ go.form.RecurrenceField = Ext.extend(Ext.form.TriggerField, {
             validate: function(){return true;},
             isDirty: function() {
                 return true;
-                if(this.disabled || !this.rendered) {
-                    return false;
-                }
-                return JSON.stringify(this.getValue()) !== JSON.stringify(this.originalValue);
+                // if(this.disabled || !this.rendered) {
+                //     return false;
+                // }
+                // return JSON.stringify(this.getValue()) !== JSON.stringify(this.originalValue);
             },
             reset : function(){
                 this.setValue(this.originalValue);
@@ -310,7 +322,7 @@ go.form.RecurrenceField = Ext.extend(Ext.form.TriggerField, {
                             fields : ['value', 'text'],
                             data : [
                                 ['byMonthDay', this.startDate.format('jS')],
-                                ['byWeekDay', this.getSuffix()+ ' '+this.startDate.format('l')]
+                                ['byDay', this.getSuffix()+ ' '+this.startDate.format('l')]
                             ]
                         })
                     },
@@ -379,19 +391,28 @@ go.form.RecurrenceField = Ext.extend(Ext.form.TriggerField, {
                 ]
             }],
             load: function(rrule) {
-                customWindow.on('afterRender',function() {
+                //customWindow.on('afterRender',function() {
                     var form = customWindow.findByType('form')[0].getForm();
-                    form.setValues(rrule);
-                    customWindow.changeFrequency(rrule.frequency)
-                    if(rrule.until) {
-                        form.findField('endsRatio').setValue('until');
-                        form.setValues({until:rrule.until});
+
+                    if(rrule.frequency) {
+                        form.setValues(rrule);
+                        customWindow.changeFrequency(rrule.frequency);
+                        if (rrule.until) {
+                            form.findField('endsRatio').setValue('until');
+                            form.setValues({until: rrule.until});
+                        }
+                        if (rrule.count) {
+                            form.findField('endsRatio').setValue('count');
+                            form.setValues({count: rrule.count});
+                        }
+                        if(rrule.byDay) {
+                            form.findField('monthlyOptions').setValue('byDay')
+                        }
+                        if(rrule.byMonthDay) {
+                            form.findField('monthlyOptions').setValue('byMonthDay')
+                        }
                     }
-                    if(rrule.count) {
-                        form.findField('endsRatio').setValue('count');
-                        form.setValues({count:rrule.count});
-                    }
-                },this);
+                //},this);
 
             },
             changeFrequency: function(f){
@@ -431,7 +452,7 @@ go.form.RecurrenceField = Ext.extend(Ext.form.TriggerField, {
                             case 'byMonthDay':
                                 rule.byMonthDay = [parseInt(this.startDate.format('j'))];
                                 break;
-                            case 'byWeekDay':
+                            case 'byDay':
                                 rule.byDay = [{day:this._day(),nthOfPeriod:this.weekOfMonth}];
                                 break;
                         }

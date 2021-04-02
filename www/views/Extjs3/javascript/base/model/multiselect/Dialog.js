@@ -5,14 +5,17 @@ GO.base.model.multiselect.dialog = function(config){
 			url:config.url,
 			columns:config.columns,
 			fields:config.fields,
-			model_id:config.model_id
-		});
+			model_id:config.model_id,
+			addAttributes:config.addAttributes
+
+	});
 		
 	delete config.url;
 	delete config.columns;
 	delete config.fields;
 	delete config.model_id;
-	
+	delete config.addAttributes;
+
 	
 	Ext.apply(this, config);
 	

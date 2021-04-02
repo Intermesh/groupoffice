@@ -11,7 +11,7 @@ use go\core\orm\SearchableTrait;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
-use go\modules\community\notes\convert\Csv;
+use go\modules\community\notes\convert\Spreadsheet;
 
 class Note extends AclItemEntity {
 
@@ -122,6 +122,6 @@ class Note extends AclItemEntity {
 	 */
 	public static function converters()
 	{
-		return array_merge(parent::converters(), [Csv::class]);
+		return array_merge(parent::converters(), [Spreadsheet::class]);
 	}
 }

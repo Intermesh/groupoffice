@@ -12,7 +12,7 @@ go.toolbar.SearchField = Ext.extend(GO.form.ComboBoxMulti, {
 /**
  * Search button
  *
- * When used inside a go.grid.GridPanel component it will lookup the store and bind the entity automatically.
+ * When used inside a go.grid.GridPanel or TreePanel with an go.tree.EntityLoader component it will lookup the store and bind the entity automatically.
  * The entity filters can be used using the advanced filter syntax
  *
  * @example
@@ -24,7 +24,9 @@ go.toolbar.SearchField = Ext.extend(GO.form.ComboBoxMulti, {
 					],
 					listeners: {
 						scope: this,
-						search: function(btn, query, filters) {
+						search: function(btn, query) {
+
+						var filters = go.util.Filters.parseQueryString(q, go.Db.store("AddressBook").entity.filters);
 							this.storeFilter.setFilter("tbsearch", filters);
 							this.storeFilter.load();
 						},
@@ -74,7 +76,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 			
 		//this.filters = go.util.Filters.normalize(config.filters || ['text']);
 		
-		if(this.onwnerCt) {
+		if(this.ownerCt) {
 			this.lookupStore();
 		} else{
 			this.on('added', function() {
@@ -119,6 +121,8 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	
 
 	lookupStore : function() {
+
+
 		if(!this.store) {			
 			//try to find store if this button it part of a grid.
 			var grid = this.findParentByType('grid');
@@ -126,8 +130,31 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 				this.store = grid.store;			
 			}
 		}
-
 		this.bindStore(this.store);
+
+
+		if(!this.tree) {
+			this.tree = this.findParentByType('treepanel');
+			if(this.tree && !this.tree.getLoader().entityStore) {
+				this.tree = null;
+			}
+		}
+
+		if(this.tree) {
+			this.on({
+				scope: this,
+				reset: function() {
+					this.tree.getLoader().setFilter("tbsearch", null);
+					this.tree.getRootNode().reload();
+				},
+				search: function(tb, q) {
+					var filters = go.util.Filters.parseQueryString(q,  this.tree.getLoader().entityStore.entity.filters);
+					this.tree.getLoader().setFilter("tbsearch", filters);
+					this.tree.getRootNode().reload();
+				}
+			});
+			return;
+		}
 	
 
 	},
@@ -189,16 +216,18 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	 * @return {Boolean}
 	 */
 	hasActiveSearch : function(){
-		
-		var isActive = false;
-		
-		if(this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) {
-			isActive = !GO.util.empty(this.store.filters.tbsearch);
-		} else {
-			isActive = !GO.util.empty(this.store.baseParams.query);
-		}
 
-		return isActive;
+		return this.triggerField.getValue() != "";
+		
+		// var isActive = false;
+		//
+		// if(this.store instanceof go.data.Store || this.store instanceof go.data.GroupingStore) {
+		// 	isActive = !GO.util.empty(this.store.filters.tbsearch);
+		// } else {
+		// 	isActive = !GO.util.empty(this.store.baseParams.query);
+		// }
+		//
+		// return isActive;
 	},
 	
 	/**

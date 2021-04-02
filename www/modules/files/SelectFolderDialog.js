@@ -2,8 +2,9 @@ GO.files.SelectFolderDialog = Ext.extend(GO.Window, {
 	
 	initComponent : function(){
 		
-		if(!this.scope)
-			this.scope=this;
+		if(!this.scope) {
+			this.scope = this;
+		}
 		
 		this.layout='fit';
 		this.title=t("Select folder...", "files");
@@ -18,11 +19,13 @@ GO.files.SelectFolderDialog = Ext.extend(GO.Window, {
 		this.buttons=[
 			{
 				text: t("Ok"),				        						
-				handler: function(){
+				handler: function() {
 					var sm = this.foldersTree.getSelectionModel();
 					var selectedFolderNode = sm.getSelectedNode();
-					if(!selectedFolderNode)
-						alert('Fout');
+					if(!selectedFolderNode) {
+						Ext.msg.alert(t('Error'), t('Sorry, something went wrong'));
+						return false;
+					}
 					this.handler.call(this.scope, this, selectedFolderNode.attributes.path,selectedFolderNode);
 					this.hide();
 				}, 

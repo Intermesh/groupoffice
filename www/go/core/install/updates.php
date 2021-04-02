@@ -718,28 +718,6 @@ $updates['202006041416'][] = "ALTER TABLE `core_oauth_access_token`
   ADD CONSTRAINT `core_oauth_access_token_ibfk_2` FOREIGN KEY (`userIdentifier`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_oauth_access_token_ibfk_3` FOREIGN KEY (`clientId`) REFERENCES `core_oauth_client` (`id`) ON DELETE CASCADE;";
 
-$updates['202006111515'][] = "CREATE TABLE `core_alert` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `entityTypeId` INT NOT NULL,
-  `entityId` INT NOT NULL,
-  `userId` INT NOT NULL,
-  `triggerAt` DATETIME NOT NULL,
-  `sentAt` DATETIME NULL,
-  `alertId` INT NOT NULL,
-  `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `fk_alert_entityType_idx` (`entityTypeId` ASC),
-  INDEX `fk_alert_user_idx` (`userId` ASC),
-  CONSTRAINT `fk_alert_entityType`
-    FOREIGN KEY (`entityTypeId`)
-    REFERENCES `core_entity` (`id`)
-    ON DELETE CASCADE
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_alert_user`
-    FOREIGN KEY (`userId`)
-    REFERENCES `core_user` (`id`)
-    ON DELETE RESTRICT
-    ON UPDATE NO ACTION);";
 $updates['202006191648'][] = "ALTER TABLE `core_customfields_field` ADD `hiddenInGrid` BOOLEAN NOT NULL DEFAULT TRUE AFTER `options`;";
 $updates['202006191648'][] = "ALTER TABLE `core_entity_filter` ADD `type` ENUM('fixed','variable') NOT NULL DEFAULT 'fixed' AFTER `aclId`;";
 $updates['202006191648'][] = "ALTER TABLE `core_entity_filter` CHANGE `filter` `filter` TEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL;";
@@ -766,7 +744,36 @@ $updates['202010271619'][] = "UPDATE `core_cron_job` SET `expression` = '0 0 * *
 
 $updates['202011021149'][] = "ALTER TABLE core_customfields_select_option DROP FOREIGN KEY core_customfields_select_option_ibfk_2;";
 
-$updates['202011021149'][] = "CREATE TABLE `core_alert` (
+$updates['202011021149'][] = "CREATE TABLE `core_oauth_auth_codes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `clientId` int(11) NOT NULL,
+  `identifier` varchar(128) COLLATE ascii_bin NOT NULL,
+  `userIdentifier` int(11) NOT NULL,
+  `expiryDateTime` datetime NOT NULL,
+  `nonce` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+$updates['202012231410'][] = function() {
+	$allEntities = EntityType::findAll();
+	foreach($allEntities as $e) {
+		foreach (Field::findByEntity($e->getId())->where(['type' => 'Text']) as $field) {
+			//correct default null to default ""
+			$field->forceAlterTable = true;
+			$field->save();
+		}
+	}
+};
+
+$updates['202102111534'][] = "delete from go_state where user_id not in (select id from core_user);";
+
+$updates['202102111534'][] = "alter table go_state
+	add constraint go_state_core_user_id_fk
+		foreign key (user_id) references core_user (id)
+			on delete cascade;";
+
+
+$updates['202102111534'][] = "CREATE TABLE `core_alert` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `entityTypeId` INT NOT NULL,
   `entityId` INT NOT NULL,
@@ -790,57 +797,91 @@ $updates['202011021149'][] = "CREATE TABLE `core_alert` (
 
 
 
-// MASTER UPDATES
+$updates['202102111534'][] = "TRUNCATE core_search";
+$updates['202102111534'][] = "ALTER TABLE `core_search` DROP `keywords`";
 
-$updates['202010161128'][] = "CREATE TABLE `core_pdf_block` (
-`id` bigint(20) UNSIGNED NOT NULL,
-  `pdfTemplateId` bigint(20) UNSIGNED NOT NULL,
-  `x` int(11) DEFAULT NULL,
-  `y` int(11) DEFAULT NULL,
-  `width` int(11) DEFAULT NULL,
-  `height` int(11) DEFAULT NULL,
-  `align` enum('L','C','R','J') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'L',
-  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text'
+$updates['202102111534'][] = "CREATE TABLE `core_search_word` (
+`searchId` int(11) NOT NULL,
+  `word` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
-$updates['202010161128'][] = "CREATE TABLE `core_pdf_template` (
-`id` bigint(20) UNSIGNED NOT NULL,
-  `moduleId` int(11) NOT NULL,
-  `key` varchar(20) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
-  `language` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'en',
-  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `stationaryBlobId` binary(40) DEFAULT NULL,
-  `landscape` tinyint(1) NOT NULL DEFAULT 0,
-  `pageSize` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'A4',
-  `measureUnit` enum('mm','pt','cm','in') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'mm',
-  `marginTop` decimal(19,4) NOT NULL DEFAULT 10.0000,
-  `marginRight` decimal(19,4) NOT NULL DEFAULT 10.0000,
-  `marginBottom` decimal(19,4) NOT NULL DEFAULT 10.0000,
-  `marginLeft` decimal(19,4) NOT NULL DEFAULT 10.0000
+
+$updates['202102111534'][] = "ALTER TABLE `core_search_word`
+  ADD PRIMARY KEY (`word`,`searchId`),
+  ADD KEY `searchId` (`searchId`);";
+
+
+$updates['202102111534'][] = "ALTER TABLE `core_search_word`
+  ADD CONSTRAINT `core_search_word_ibfk_1` FOREIGN KEY (`searchId`) REFERENCES `core_search` (`id`) ON DELETE CASCADE;";
+
+
+
+
+
+$updates['202102111534'][] = function() {
+
+	//run build search cache on cron immediately. This job will deactivate itself.
+	\go\core\cron\BuildSearchCache::install("* * * * *");
+
+	echo "NOTE: Search cache will be rebuilt by a scheduled task. This may take a lot of time.";
+};
+
+
+$updates['202102111534'][] = "CREATE TABLE `core_spreadsheet_export` (
+`id` int(10) UNSIGNED NOT NULL,
+  `userId` int(11) NOT NULL,
+  `entityTypeId` int(11) NOT NULL,
+  `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `columns` text COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
-$updates['202010161128'][] = "ALTER TABLE `core_pdf_block`
-  ADD PRIMARY KEY (`id`) USING BTREE,
-  ADD KEY `pdfTemplateId` (`pdfTemplateId`);";
 
-$updates['202010161128'][] = "ALTER TABLE `core_pdf_template`
+$updates['202102111534'][] = "ALTER TABLE `core_spreadsheet_export`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `moduleId` (`moduleId`),
-  ADD KEY `stationaryBlobId` (`stationaryBlobId`);";
-
-$updates['202010161128'][] = "ALTER TABLE `core_pdf_block`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;";
-
-$updates['202010161128'][] = "ALTER TABLE `core_pdf_template`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;";
-
-$updates['202010161128'][] = "ALTER TABLE `core_pdf_block`
-  ADD CONSTRAINT `core_pdf_block_ibfk_1` FOREIGN KEY (`pdfTemplateId`) REFERENCES `core_pdf_template` (`id`) ON DELETE CASCADE;";
-
-$updates['202010161128'][] = "ALTER TABLE `core_pdf_template`
-  ADD CONSTRAINT `core_pdf_template_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `core_pdf_template_ibfk_2` FOREIGN KEY (`stationaryBlobId`) REFERENCES `core_blob` (`id`);";
+  ADD KEY `userId` (`userId`),
+  ADD KEY `entityTypeId` (`entityTypeId`),
+  ADD KEY `name` (`name`);";
 
 
-$updates['202010161128'][] = "ALTER TABLE `core_email_template` ADD `key` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL AFTER `aclId`, ADD `language` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'en' AFTER `key`;";
+$updates['202102111534'][] = "ALTER TABLE `core_spreadsheet_export`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;";
+
+
+$updates['202102111534'][] = "ALTER TABLE `core_spreadsheet_export`
+  ADD CONSTRAINT `core_spreadsheet_export_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_spreadsheet_export_ibfk_2` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;";
+
+
+$updates['202102111534'][] = "ALTER TABLE `core_search_word` ADD `drow` VARCHAR(100) NOT NULL AFTER `word`;";
+$updates['202102111534'][] = "update `core_search_word` set drow = reverse (word)";
+$updates['202102111534'][] = "ALTER TABLE `core_search_word` ADD INDEX(`drow`);";
+
+$updates['202102111534'][] = "ALTER TABLE `core_customfields_select_option` ADD `enabled` BOOLEAN NOT NULL DEFAULT TRUE AFTER `text`;";
+
+$updates['202102111534'][] = "update `core_customfields_select_option` set enabled=0, text = REPLACE(text,'** Missing ** ', '') where text like '** Missing **%';";
+
+$updates['202102111534'][] = "CREATE TABLE `core_oauth_auth_codes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `clientId` int(11) NOT NULL,
+  `identifier` varchar(128) COLLATE ascii_bin NOT NULL,
+  `userIdentifier` int(11) NOT NULL,
+  `expiryDateTime` datetime NOT NULL,
+  `nonce` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+
+$updates['202102111534'][] = "ALTER TABLE `go_templates` ADD COLUMN `filename` VARCHAR(100) NULL DEFAULT NULL AFTER `content`";
+$updates['202102111534'][] = "ALTER TABLE `go_templates` ADD COLUMN `filename` VARCHAR(100) NULL DEFAULT NULL AFTER `content`";
+
+
+$updates['202102111534'][] = "delete from go_state where user_id not in (select id from core_user);";
+
+$updates['202102111534'][] = "alter table go_state
+	add constraint go_state_core_user_id_fk
+		foreign key (user_id) references core_user (id)
+			on delete cascade;";
+
+
+$updates['202102111534'][] = "alter table core_auth_token change `passedMethods` `passedAuthenticators` varchar(190) null;";
+$updates['202103091517'][] = "ALTER TABLE `core_customfields_select_option` ADD COLUMN `sortOrder` INT(11) UNSIGNED DEFAULT 0 AFTER `text`;";

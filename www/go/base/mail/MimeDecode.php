@@ -215,11 +215,36 @@ class MimeDecode
 				if ($structure === false) {
 						$structure = $this->raiseError($this->_error);
 				}
-       
-        return $structure;
+
+
+//		    //fix for [20150125 05:43:24] PHP Warning: strpos() expects parameter 1 to be string, array given in /usr/share/groupoffice/go/base/mail/Message.php on line 105
+//		    // this happens when there are multiple to headers !?
+//		    if(isset($structure->headers['to']) && is_array($structure->headers['to'])){
+//			    $structure->headers['to'] = implode(',', $structure->headers['to']);
+//		    }
+//
+//		    if(isset($structure->headers['cc']) && is_array($structure->headers['cc'])){
+//			    $structure->headers['cc'] = implode(',', $structure->headers['cc']);
+//		    }
+//
+//		    if(isset($structure->headers['bcc']) && is_array($structure->headers['bcc'])){
+//			    $structure->headers['bcc'] = implode(',', $structure->headers['bcc']);
+//		    }
+//
+//		    if(is_array($structure->headers['from'])) {
+//			    $structure->headers['from'] = implode(',', $structure->headers['from']);
+//		    }
+//
+//		    if(is_array($structure->headers['date'])) {
+//			    $structure->headers['date'] = $structure->headers['date'][0];
+//		    }
+	    return $structure;
     }
 
-    /**
+    const SINGLE_HEADERS = ['subject', 'to', 'from', 'cc', 'bcc', 'from', 'date', 'message-id', 'content-type'];
+
+
+	/**
      * Performs the decoding. Decodes the body string passed to it
      * If it finds certain content-types it will call itself in a
      * recursive fashion
@@ -237,15 +262,20 @@ class MimeDecode
 
         foreach ($headers as $value) {
             $value['value'] = $this->_decode_headers ? $this->_decodeHeader($value['value']) : $value['value'];
-            if (isset($return->headers[strtolower($value['name'])]) AND !is_array($return->headers[strtolower($value['name'])])) {
-                $return->headers[strtolower($value['name'])]   = array($return->headers[strtolower($value['name'])]);
-                $return->headers[strtolower($value['name'])][] = $value['value'];
-
-            } elseif (isset($return->headers[strtolower($value['name'])])) {
-                $return->headers[strtolower($value['name'])][] = $value['value'];
-
+            $name = strtolower($value['name']);
+            if (isset($return->headers[$name])) {
+            	if(in_array($name, self::SINGLE_HEADERS)) {
+            		go()->warn("Header '"  . $name . "' is allowed only once.");
+            		continue;
+	            }
+            	if(!is_array($return->headers[$name])) {
+                $return->headers[$name]   = array($return->headers[$name]);
+                $return->headers[$name][] = $value['value'];
+	            } else {
+		            $return->headers[$name][] = $value['value'];
+	            }
             } else {
-                $return->headers[strtolower($value['name'])] = $value['value'];
+                $return->headers[$name] = $value['value'];
             }
         }
 
@@ -318,8 +348,9 @@ class MimeDecode
                     for ($i = 0; $i < count($parts); $i++) {
                         list($part_header, $part_body) = $this->_splitBodyHeader($parts[$i]);
                         $part = $this->_decode($part_header, $part_body, $default_ctype);
-                        if($part === false)
-                            $part = $this->raiseError($this->_error);
+                        if($part === false) {
+	                        throw new \Exception($this->_error);
+                        }
                         $return->parts[] = $part;
                     }
                     break;

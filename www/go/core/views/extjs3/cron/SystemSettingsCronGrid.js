@@ -68,7 +68,7 @@ go.cron.SystemSettingsCronGrid = Ext.extend(GO.grid.GridPanel,{
 			}),
 			store: go.cron.cronStore,
 			border: false,
-			paging:true,
+			paging:false,
 			view:new Ext.grid.GridView({
 				emptyText: t("No items to display")
 			}),
@@ -91,47 +91,13 @@ go.cron.SystemSettingsCronGrid = Ext.extend(GO.grid.GridPanel,{
 					width:250
 				},
 				{
-					header: t("Minutes", "cron"),
-					dataIndex: 'minutes',
+					header: t("Expression", "cron"),
+					dataIndex: 'expression',
 					sortable: true,
 					width:100
 				},
-				{
-					header: t("Hours", "cron"),
-					dataIndex: 'hours',
-					sortable: true,
-					width:100
-				},
-				{
-					header: t("Month days", "cron"),
-					dataIndex: 'monthdays',
-					sortable: true,
-					width:100
-				},
-				{
-					header: t("Months", "cron"),
-					dataIndex: 'months',
-					sortable: true,
-					width:100
-				},
-				{
-					header: t("Week days", "cron"),
-					dataIndex: 'weekdays',
-					sortable: true,
-					width:100
-				},
-				//				{
-				//					header: t("Years", "cron"),
-				//					dataIndex: 'years',
-				//					sortable: true,
-				//					width:100
-				//				},
-				{
-					header: t("Job", "cron"),
-					dataIndex: 'job',
-					sortable: true,
-					width:250
-				},
+
+
 				{
 					header: t("Next run", "cron"),
 					dataIndex: 'nextrun',
@@ -154,6 +120,12 @@ go.cron.SystemSettingsCronGrid = Ext.extend(GO.grid.GridPanel,{
 					dataIndex: 'error',
 					maxLength:20,
 					renderer: GO.grid.ColumnRenderers.Text
+				},
+				{
+					header: t("Job", "cron"),
+					dataIndex: 'job',
+					sortable: true,
+					width:250
 				}
 				]
 			})
@@ -178,5 +150,18 @@ go.cron.SystemSettingsCronGrid = Ext.extend(GO.grid.GridPanel,{
 	deleteSelected : function(){
 		go.cron.SystemSettingsCronGrid.superclass.deleteSelected.call(this);
 		this.changed=true;
-	}	
+	}	,
+
+	showEditDialog : function(id, config, record){
+
+		var parts = (id+"").split(":");
+		if(parts[0] == "new") {
+			var dlg = new go.cron.NewCronDialog();
+			dlg.load(parts[1]).show();
+		} else {
+
+			go.cron.SystemSettingsCronGrid.superclass.showEditDialog.call(this, id, config, record);
+		}
+
+	}
 });

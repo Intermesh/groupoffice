@@ -484,8 +484,8 @@ Ext.ux.form.HtmlEditor.Word = Ext.extend(Ext.util.Observable, {
         });
 
         // keep the divs in paragraphs
-        wordPaste = wordPaste.replace(/<div[^>]*>/g, "<p>");
-        wordPaste = wordPaste.replace(/<\/?div[^>]*>/g, "</p>");
+        // wordPaste = wordPaste.replace(/<div[^>]*>/g, "<p>");
+        // wordPaste = wordPaste.replace(/<\/?div[^>]*>/g, "</p>");
         return wordPaste;
 
     },

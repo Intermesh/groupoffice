@@ -7,6 +7,7 @@ CREATE TABLE `comments_attachment` (
 CREATE TABLE `comments_comment` (
   `id` int(11) NOT NULL,
   `createdAt` datetime NOT NULL,
+  `date` DATETIME NOT NULL,
   `entityId` int(11) NOT NULL,
   `entityTypeId` int(11) NOT NULL,
   `createdBy` int(11) DEFAULT NULL,
@@ -86,3 +87,5 @@ ALTER TABLE `comments_comment_image`
 ALTER TABLE `comments_comment_image`
   ADD CONSTRAINT `comments_comment_image_ibfk_1` FOREIGN KEY (`blobId`) REFERENCES `core_blob` (`id`),
   ADD CONSTRAINT `comments_comment_image_ibfk_2` FOREIGN KEY (`commentId`) REFERENCES `comments_comment` (`id`) ON DELETE CASCADE;
+
+  ALTER TABLE `comments_comment` ADD INDEX(`date`);

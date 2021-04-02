@@ -3,8 +3,10 @@
 namespace go\core\model;
 
 use GO\Base\Db\ActiveRecord;
+use go\core\acl\model\AclItemEntity;
 use go\core\App;
 use go\core\db\Criteria;
+use go\core\db\Query as DbQuery;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
@@ -34,10 +36,15 @@ use go\core\validate\ErrorCode;
 				]
 		]);
  * ```
- * 
+ *
+ * Find links for an Entity:
+ *
+ * ```
+ * $links = Link::findLinks($entity);
+ * ```
  * 
  */
-class Link extends Entity
+class Link extends AclItemEntity
 {
 	/**
 	 * The auto increment primary key
@@ -102,7 +109,41 @@ class Link extends Entity
 		return $this->toEntity;
 	}
 
-	
+	/**
+	 * Find the entity it links to
+	 *
+	 * @return \go\core\orm\Entity|ActiveRecord
+	 * @throws \Exception
+	 */
+	public function findToEntity() {
+		$e = EntityType::findByName($this->toEntity);
+		$cls = $e->getClassName();
+
+		if(is_a($cls, Entity::class, true)) {
+			return $cls::findById($this->toId);
+		} else{
+			return $cls::model()->findByPk($this->toId);
+		}
+	}
+
+	/**
+	 * Find the entity it links from
+	 *
+	 * @return \go\core\orm\Entity|ActiveRecord
+	 * @throws \Exception
+	 */
+	public function findFromEntity() {
+		$e = EntityType::findByName($this->fromEntity);
+		$cls = $e->getClassName();
+
+		if(is_a($cls, Entity::class, true)) {
+			return $cls::findById($this->fromId);
+		} else{
+			return $cls::model()->findByPk($this->fromId);
+		}
+	}
+
+
 	public function setToEntity($entityName) {
 		$e = EntityType::findByName($entityName);
 		$this->toEntity = $e->getName();
@@ -142,14 +183,25 @@ class Link extends Entity
 										->addTable('core_link', 'l')
 										->setQuery(
 														(new Query())
-														->select("eFrom.clientName AS fromEntity, eTo.clientName AS toEntity, s.name as toName, s.description as toDescription, s.aclId, s.id as toSearchId")
+														->select("eFrom.clientName AS fromEntity, eTo.clientName AS toEntity, search.name as toName, search.description as toDescription, search.aclId, search.id as toSearchId")
 														->join('core_entity', 'eFrom', 'eFrom.id = l.fromEntityTypeId')
 														->join('core_entity', 'eTo', 'eTo.id = l.toEntityTypeId')
-														->join('core_search', 's', 's.entityId = l.toId AND s.entityTypeId = l.toEntityTypeId')
+														->join('core_search', 'search', 'search.entityId = l.toId AND search.entityTypeId = l.toEntityTypeId')
 		);
 	}
-	
-	
+
+	/**
+	 * Override because it should not join core_search because we already do this in the mapping
+	 *
+	 * @param Query $query
+	 * @return bool
+	 */
+	protected static function useSearchableTraitForSearch(Query $query)
+	{
+		return true;
+	}
+
+
 	/**
 	 * Create a link between two entities
 	 * 
@@ -172,7 +224,8 @@ class Link extends Entity
 		$link->toId = $b->id;
 		$link->toEntity = $b->entityType()->getName();
 		$link->toEntityTypeId = $b->entityType()->getId();
-		$link->description = $description;		
+		$link->description = $description;
+		$link->aclId = $a->findAclId();
 		
 		if(!$link->save()) {
 			throw new \Exception("Couldn't create link: ". var_export($link->getValidationErrors(), true));
@@ -188,7 +241,7 @@ class Link extends Entity
 	 * @param Entity|ActiveRecord  $b
 	 * @return boolean
 	 */
-	public static function exists($a, $b) {
+	public static function linkExists($a, $b) {
 		return static::findLink($a, $b) !== false;
 	}
 	/**
@@ -206,7 +259,20 @@ class Link extends Entity
 				'toId' => $b->id,
 		])->single();
 	}
-	
+
+	/**
+	 * Find a link
+	 *
+	 * @param Entity|ActiveRecord $a
+	 * @return Link[]
+	 */
+	public static function findLinks($a) {
+		return Link::find()->where([
+			'fromEntityTypeId' => $a->entityType()->getId(),
+			'fromId' => $a->id
+		]);
+	}
+
 	/**
 	 * Delete a link between two entities
 	 * 
@@ -281,7 +347,7 @@ class Link extends Entity
 		$reverse['createdAt'] = $this->createdAt;
 		
 		if($this->isNew()) {			
-			$this->updateDataFromSearch();
+//			$this->updateDataFromSearch();
 			return App::get()->getDbConnection()->insertIgnore('core_link', $reverse)->execute();
 		}
 
@@ -291,20 +357,20 @@ class Link extends Entity
 		)->execute();
 	}
 
-	private function updateDataFromSearch() {
-		//make sure the description and name are set so they are returned to the client
-		if(!isset($this->toSearchId) || !isset($this->aclId)) {
-			$search = Search::find()->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
-			if(!$search) {
-				throw new \Exception("Could not find entity from search cache. Please run System settings -> Tools -> Update search index");
-			}
-			$this->toDescription = $search->description;
-			$this->toName = $search->name;
-			$this->toSearchId = $search->id;
-			$this->aclId = $search->findAclId();
-		}
-	}
-	
+//	private function updateDataFromSearch() {
+//		//make sure the aclId, description and name are set so they are returned to the client
+//		if(!isset($this->toSearchId) || !isset($this->aclId)) {
+//			$search = Search::find()->where(['entityId' => $this->toId, 'entityTypeId' => $this->toEntityTypeId])->single();
+//			if(!$search) {
+//				throw new \Exception("Could not find entity from search cache. Please run System settings -> Tools -> Update search index");
+//			}
+//			$this->toDescription = $search->description;
+//			$this->toName = $search->name;
+//			$this->toSearchId = $search->id;
+//			$this->aclId = $search->findAclId();
+//		}
+//	}
+//
 	protected static function internalDelete(Query $query) {		
 
 		//delete the reverse links
@@ -321,8 +387,8 @@ class Link extends Entity
 	
 	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
 		$level = Acl::LEVEL_READ;
-		Acl::applyToQuery($query, 's.aclId', $level, $userId, $groups);
-		
+		//return parent::applyAclToQuery($query, $level, $userId, $groups);
+		Acl::applyToQuery($query, 'search.aclId', $level, $userId, $groups);
 		return $query;
 	}
 	/**
@@ -331,8 +397,12 @@ class Link extends Entity
 	 * @return int
 	 */
 	public function getPermissionLevel() {
-		if($this->isNew()) {			
-			$this->updateDataFromSearch();
+		if($this->isNew() && empty($this->aclId)) {
+			$e = $this->findToEntity();
+			if(!$e) {
+				throw new \Exception("Could not find to entity in link");
+			}
+			$this->aclId = $e->findAclId();
 		}
 
 		if(!isset($this->permissionLevel)) {
@@ -382,15 +452,12 @@ class Link extends Entity
 						});
 					
 	}
-	
-	protected static function textFilterColumns() {
-		return ['s.keywords'];
-	}
+
 
 	public static function sort(\go\core\orm\Query $query, array $sort)
 	{
 		if(isset($sort['modifiedAt'])) {
-			$sort['s.modifiedAt'] = $sort['modifiedAt'];
+			$sort['search.modifiedAt'] = $sort['modifiedAt'];
 			unset($sort['modifiedAt']);
 		}
 
@@ -399,5 +466,20 @@ class Link extends Entity
 			unset($sort['toEntity']);
 		}
 		return parent::sort($query, $sort);
+	}
+
+	protected static function aclEntityClass()
+	{
+		return Search::class;
+	}
+
+	protected function getAclEntity()
+	{
+		return $this->findFromEntity();
+	}
+
+	protected static function aclEntityKeys()
+	{
+		return ['toId' => 'entityId', 'toEntityTypeId' => 'entityTypeId'];
 	}
 }

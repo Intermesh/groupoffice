@@ -36,6 +36,7 @@ class IpcMemcachedProvider implements IIpcProvider {
     private $isDownUntil;
     private $wasDown;
     private $reconnectCount;
+    private $globalMutex;
 
     /**
      * Instance of memcached class
@@ -52,6 +53,7 @@ class IpcMemcachedProvider implements IIpcProvider {
      * @param int $allocate
      * @param string $class
      * @param string $serverKey
+     * @param boolean $globalMutex (opt)    When true, it configures a single server pool taking the first one from MEMCACHED_SERVERS.
      */
     public function __construct($type, $allocate, $class, $serverKey) {
         $this->type = $type;
@@ -59,6 +61,7 @@ class IpcMemcachedProvider implements IIpcProvider {
         $this->serverKey = $serverKey;
         $this->maxWaitCycles = round(MEMCACHED_MUTEX_TIMEOUT * 1000 / MEMCACHED_BLOCK_WAIT)+1;
         $this->logWaitCycles = round($this->maxWaitCycles/5);
+        $this->globalMutex = (strcmp($allocate, 'globalmutex') === 0) ? true : false;
 
         // not used, but required by function signature
         unset($allocate, $class);
@@ -82,7 +85,11 @@ class IpcMemcachedProvider implements IIpcProvider {
      * @return void
      */
     private function init() {
-        $this->memcached = new Memcached(md5(MEMCACHED_SERVERS) . $this->reconnectCount++);
+        if ($this->globalMutex === false) {
+            $this->memcached = new Memcached(md5(MEMCACHED_SERVERS) . $this->reconnectCount++);
+        } else{
+            $this->memcached = new Memcached('globalmutex' . $this->reconnectCount++);
+        }
         $this->memcached->setOptions(array(
             // setting a short timeout, to better kope with failed nodes
             Memcached::OPT_CONNECT_TIMEOUT => MEMCACHED_TIMEOUT,
@@ -104,8 +111,15 @@ class IpcMemcachedProvider implements IIpcProvider {
 
         // with persistent connections, only add servers, if they not already added!
         if (!count($this->memcached->getServerList())) {
-            foreach(explode(',', MEMCACHED_SERVERS) as $host_port) {
-                list($host,$port) = explode(':', trim($host_port));
+            if ($this->globalMutex === false) {
+                foreach(explode(',', MEMCACHED_SERVERS) as $host_port) {
+                    list($host,$port) = explode(':', trim($host_port));
+                    $this->memcached->addServer($host, $port);
+                }
+            } else{
+                $memcachedServersList = explode(',', MEMCACHED_SERVERS);
+                //get the first configured server
+                list($host,$port) = explode(':', trim($memcachedServersList[0]));
                 $this->memcached->addServer($host, $port);
             }
         }

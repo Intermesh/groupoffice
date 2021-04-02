@@ -24,6 +24,11 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					detailView.avatar.update(go.util.avatar(detailView.data.name, detailView.data.photoBlobId, icon))
 				},
 				items:[
+				// 	{
+				// 	cls: 'go-addressbook-url-panel',
+				// 	xtype: "box",
+				// 	tpl: '<tpl for="urls">&nbsp;&nbsp;<a target="_blank" href="{[go.modules.community.addressbook.Utils.transformUrl(values.url, values.type)]}" class="go-addressbook-url {type}"></a></tpl>'
+				// },
 				{
 					xtype: 'container',
 					layout: "hbox",
@@ -59,18 +64,20 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 						}),
 					
 						this.namePanel = new Ext.BoxComponent({
-							style: "display: table;height:100%;",
-							tpl: '<div style="vertical-align: middle;display:table-cell;"><h3 <tpl if="color">style=\"color: #{color};\"</tpl>><tpl if="prefixes">{prefixes} </tpl>{name}<tpl if="suffixes"> {suffixes}</tpl></h3><h4>{jobTitle} <tpl if="values.department">- {department}</tpl></h4></div>'
-						}),						
-						this.urlPanel = new Ext.BoxComponent({
+							style: "height:100%;",
 							flex: 1,
-							cls: 'go-addressbook-url-panel',
-							xtype: "box",
-							tpl: '<tpl for="urls">&nbsp;&nbsp;<a target="_blank" href="{url}" class="go-addressbook-url {type}"></a></tpl>'
+							tpl: '<div class="go-addressbook-url-panel"><tpl for="urls">&nbsp;&nbsp;<a target="_blank" href="{[go.modules.community.addressbook.Utils.transformUrl(values.url, values.type)]}" class="go-addressbook-url {type}"></a></tpl></div>'+
+								'<div style="vertical-align: middle;display:table-cell;">' +
+								'<h3 <tpl if="color">style=\"color: #{color};\"</tpl>>' +
+								'<tpl if="prefixes">{prefixes} </tpl>{name}<tpl if="suffixes"> {suffixes}</tpl>' +
+								'</h3>' +
+								'<h4>{jobTitle} <tpl if="values.department">- {department}</tpl></h4>' +
+								'</div>'
 						})
+
 					]
 					
-				}, 				
+				},
 
 				this.emailAddresses = new Ext.BoxComponent({
 					xtype: "box",
@@ -220,8 +227,35 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					</div>	</tpl>'
 				},	{
 					xtype: "box",
-					tpl: '<div class="icons"><hr class="indent"><tpl for="addressbook"><p><i class="icon label">import_contacts</i><span>{name}</span>	<label>{[t("Address book")]}</label>\</p></tpl></div>'
+					tpl: '<div class="icons">' +
+						'<hr class="indent">' +
+						'<tpl for="addressbook">' +
+							'<p class="s6">' +
+								'<i class="icon label">import_contacts</i>' +
+								'<span>{name}</span>	' +
+								'<label>'+ t("Address book") + '</label>' +
+							'</p>' +
+						'</tpl>' +
+
+						'<tpl if="gender == \'M\'">' +
+							'<p class="s6">' +
+								'<i class="label ic-gender-male"></i>' +
+								'<span>' + t("Male") + '</span>' +
+								'<label>'+ t("Gender") + '</label>' +
+							'</p>' +
+						'</tpl>'+
+
+						'<tpl if="gender == \'F\'">' +
+							'<p>' +
+								'<i class="label ic-gender-female"></i>' +
+								'<span>' + t("Female") + '</span>' +
+								'<label>'+ t("Gender") + '</label>' +
+							'</p>' +
+						'</tpl>'+
+
+						'</div>'
 				},{
+
 					title: t('Company'),
 					onLoad: function (dv) {
 						this.setVisible(dv.data.IBAN || dv.data.vatNo || dv.data.vatReverseCharge || dv.data.registrationNumber || dv.data.debtorNumber);
@@ -276,7 +310,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 
 		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < go.permissionLevels.write);
 		this.deleteItem.setDisabled(this.data.permissionLevel < go.permissionLevels.writeAndDelete);
-		this.starItem.setIconClass(this.data.starred ? "ic-star" : "ic-star-border");
+		// this.starItem.setIconClass(this.data.starred ? "ic-star" : "ic-star-border");
 		go.modules.community.addressbook.ContactDetail.superclass.onLoad.call(this);
 	},
 
@@ -308,20 +342,20 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 			this.moreMenu ={
 				iconCls: 'ic-more-vert',
 				menu: [
-					this.starItem = new Ext.menu.Item({
-						iconCls: "ic-star",
-						text: t("Star"),
-						handler: function () {
-							var update = {};
-							update[this.currentId] = {starred: this.data.starred ? null : true};
-							
-							go.Db.store("Contact").set({
-								update: update
-							});
-						},
-						scope: this
-					}),
-					'-',
+					// this.starItem = new Ext.menu.Item({
+					// 	iconCls: "ic-star",
+					// 	text: t("Star"),
+					// 	handler: function () {
+					// 		var update = {};
+					// 		update[this.currentId] = {starred: this.data.starred ? null : true};
+					//
+					// 		go.Db.store("Contact").set({
+					// 			update: update
+					// 		});
+					// 	},
+					// 	scope: this
+					// }),
+					// '-',
 					{
 						iconCls: "ic-print",
 						text: t("Print"),

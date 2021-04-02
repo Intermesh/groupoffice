@@ -60,6 +60,10 @@ abstract class Entity extends Property {
 	 * @param Query $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
 	 *  So you can do for example: go()->getDbConnection()->delete('another_table', (new Query()->where('id', 'in' $query)) or
 	 *  fetch the entities: $entities = $cls::find()->mergeWith(clone $query);
+	 *
+	 * Please beware that altering the query object can cause problems in the delete process.
+	 *  You might need to use "clone $query".
+	 *
 	 * @param string $cls The static class name the function was called on.
 	 */
 	const EVENT_BEFORE_DELETE = 'beforedelete';
@@ -90,35 +94,37 @@ abstract class Entity extends Property {
 	 */
 	const EVENT_SORT = "sort";
 
-  /**
-   * Find entities
-   *
-   * Returns a query object that's also directly iterable:
-   *
-   * @exanple
-   * ````
-   * $notes = Note::find()->where(['name' => 'Foo']);
-   *
-   * foreach($notes as $note) {
-   *  echo $note->name;
-   * }
-   *
-   * ```
-   *
-   * For a single value do:
-   *
-   * @exanple
-   * ````
-   * $note = Note::find()->where(['name' => 'Foo'])->single();
-   *
-   * ```
-   *
-   * For more details see the Criteria::where() function description
-   *
-   * @return static[]|Query
-   * @throws Exception
-   * @see Criteria::where()
-   */
+	/**
+	 * Find entities
+	 *
+	 * Returns a query object that's also directly iterable:
+	 *
+	 * @param array $properties Specify the columns for optimal performance. You can also use the mapping to only fetch table columns Note::getMapping()->getColumnNames()
+	 * @param bool $readOnly Readonly has less overhead
+	 * @return static[]|Query
+	 * @throws Exception
+	 * @example
+	 * ````
+	 * $notes = Note::find()->where(['name' => 'Foo']);
+	 *
+	 * foreach($notes as $note) {
+	 *  echo $note->name;
+	 * }
+	 *
+	 * ```
+	 *
+	 * For a single value do:
+	 *
+	 * @exanple
+	 * ````
+	 * $note = Note::find()->where(['name' => 'Foo'])->single();
+	 *
+	 * ```
+	 *
+	 * For more details see the Criteria::where() function description
+	 *
+	 * @see Criteria::where()
+	 */
 	public static final function find(array $properties = [], $readOnly = false) {
 		
 		if(count($properties) && !isset($properties[0])) {
@@ -149,6 +155,41 @@ abstract class Entity extends Property {
 	public static final function findById($id, array $properties = [], $readOnly = false) {
 
 		return static::internalFindById($id, $properties, $readOnly);
+	}
+
+	private static $existingIds = [];
+
+	/**
+	 * Check if an ID exists in the database in the most efficient way. It also caches the result
+	 * during the same request.
+	 *
+	 * @param $id
+	 * @return bool
+	 * @throws Exception
+	 */
+	public static function exists($id)
+	{
+
+		if(empty($id)) {
+			return false;
+		}
+
+		$key = static::class . ":" .$id;
+
+		if(in_array($key, self::$existingIds)) {
+			return true;
+		}
+		$user = go()->getDbConnection()
+			->selectSingleValue('id')
+			->from(self::getMapping()->getPrimaryTable()->getName())
+			->where('id', '=', $id)->single();
+
+		if($user) {
+			self::$existingIds[] = $key;
+		}
+
+		return $user != false;
+
 	}
 
 	/**
@@ -512,7 +553,7 @@ abstract class Entity extends Property {
 		$cacheKey = 'entity-type-' . $cls;
 
 		$t = go()->getCache()->get($cacheKey);
-		if($t) {
+		if($t !== null) {
 			return $t;
 		}
 	
@@ -638,7 +679,11 @@ abstract class Entity extends Property {
 					$query->join('comments_comment', 'comment', 'comment.entityId = ' . $query->getTableAlias() . '.id AND comment.entityTypeId=' . static::entityType()->getId());
 				}
 
-				$criteria->where('comment.modifiedAt', $comparator, $value);
+				$tag = ":commentedAt" . uniqid();
+
+				$query->having('MAX(comment.date) ' . $comparator . ' ' . $tag)
+					->bind($tag, $value->format(\go\core\db\Column::DATETIME_FORMAT))
+					->groupBy(['id']);
 			});
 
 
@@ -778,7 +823,8 @@ abstract class Entity extends Property {
 		$columns = static::textFilterColumns();
 
 		if(static::useSearchableTraitForSearch($query)) {
-			$columns[] = 'search.keywords';
+			SearchableTrait::addCriteria( $criteria, $query, $expression);
+			return $criteria;
 		}
 
 		if(empty($columns)) {

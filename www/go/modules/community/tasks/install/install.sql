@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   `uid` VARCHAR(190) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NOT NULL DEFAULT '',
   `tasklistId` INT(11) UNSIGNED NOT NULL,
   `groupId` INT UNSIGNED NULL DEFAULT NULL,
-  `responsibleUserId` INT(11) NOT NULL,
+  `responsibleUserId` INT(11) DEFAULT NULL,
   `createdBy` INT(11) default NULL,
   `createdAt` DATETIME NOT NULL,
   `modifiedAt` DATETIME NOT NULL,
@@ -105,7 +105,7 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `tasks_alert` (
   `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `when` DATETIME NOT NULL,
-  `acknowledged` DATETIME NOT NULL,
+  `acknowledged` DATETIME DEFAULT NULL,
   `relatedTo` TEXT NULL,
   `action` SMALLINT(2) NOT NULL DEFAULT 1,
   `offset` VARCHAR(45) NULL,
@@ -243,7 +243,6 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `tasks_default_alert` (
   `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `when` DATETIME NOT NULL,
-  `acknowledged` DATETIME NOT NULL,
   `relatedTo` TEXT NULL,
   `action` SMALLINT(2) NOT NULL DEFAULT 1,
   `offset` VARCHAR(45) NULL,

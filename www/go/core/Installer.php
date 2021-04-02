@@ -36,7 +36,7 @@ class Installer {
 	
 	use event\EventEmitterTrait;
 	
-	const MIN_UPGRADABLE_VERSION = "6.3.58";
+	const MIN_UPGRADABLE_VERSION = "6.4.191";
 	
 	const EVENT_UPGRADE = 'upgrade';
 
@@ -133,7 +133,7 @@ class Installer {
 		
 		$this->installGroups();
 
-		$this->installAdminUser($adminValues);		
+		$admin = $this->installAdminUser($adminValues);
 
 		$this->installCoreModule();
 				
@@ -153,6 +153,7 @@ class Installer {
 			$installModule->install();
 		}
 
+		App::get()->getSettings()->systemEmail = $admin->email;
 		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
 		App::get()->getSettings()->setDefaultGroups([Group::ID_INTERNAL]);
 		App::get()->getSettings()->save();
@@ -224,6 +225,8 @@ class Installer {
 		if (!$admin->save()) {
 			throw new Exception("Failed to create admin user: " . var_export($admin->getValidationErrors(), true));
 		}
+
+		return $admin;
 	}
 	
 	private function installGroups() {
@@ -397,7 +400,15 @@ class Installer {
 		ini_set("max_execution_time", 0);
 		ini_set("memory_limit", -1);
 
-		go()->getDbConnection()->query("SET sql_mode=''");
+		//don't be strict in upgrade
+		go()->getDbConnection()->exec("SET sql_mode=''");
+
+		//try
+		try {
+			go()->getDbConnection()->exec("SET innodb_strict_mode=0");
+		} catch(Exception $e) {
+			echo "Failed to disable 'innodb_strict_mode': " . $e->getMessage() ."\n";
+		}
 		
 		jmap\Entity::$trackChanges = false;
 
@@ -413,13 +424,15 @@ class Installer {
 		echo "Rebuilding cache\n";
 
 		//reset new cache
-		$cls = go()->getConfig()['core']['general']['cache'];
+		$cls = go()->getConfig()['cache'];
 		go()->setCache(new $cls);
 
-		go()->rebuildCache();
+
 		App::get()->getSettings()->databaseVersion = App::get()->getVersion();
 		App::get()->getSettings()->save();
-		
+
+		go()->rebuildCache();
+
 		echo "Registering all entities\n";		
 		$modules = model\Module::find()->where(['enabled' => true])->all();
 		foreach($modules as $module) {
@@ -444,6 +457,9 @@ class Installer {
 
 		$this->enableGarbageCollection();
 		echo "Done!\n";
+
+		ob_flush();
+		flush();
 
 		ob_end_clean();
 	}
@@ -605,24 +621,21 @@ class Installer {
 							if (!empty($query))
 								go()->getDbConnection()->query($query);
 						} catch (PDOException $e) {
-							//var_dump($e);		
-							$errorsOccurred = true;						
 
-							if ($e->getCode() == 42000 || $e->getCode() == '42S21' || $e->getCode() == '42S01' || $e->getCode() == '42S22') {
-								//duplicate and drop errors. Ignore those on updates
-								
-								go()->debug("IGNORING: ". $e->getMessage()." from query: ".$query);
-								
+							if ($e->getCode() == 42000 || $e->getCode() == '42S21' || $e->getCode() == '42S01' || $e->getCode() == '42S22' || strstr($e->getMessage(), 'errno: 121 ')) {
+								//duplicate and drop errors. Ignore those on updates.
+								echo "IGNORE: " . $e->getMessage() ."\n";
 							} else {
 
-								echo $e->getCode() . ': '.$e->getMessage() . "\n";
-								echo "Query: " . $query . "\n";
-								echo "Package: " . ($module->package ?? "legacy") . "\n";
-								echo "Module: " . $module->name . "\n";
-								echo "Module installed version: " . $module->version . "\n";
-								echo "Module source version: " . $counts[$moduleId] . "\n";
-								
-								die("ABORTING: Please contact support");
+								$msg = $e->getCode() . ': '.$e->getMessage() . "\n".
+								  "Query: " . $query . "\n".
+								  "Package: " . ($module->package ?? "legacy") . "\n".
+								  "Module: " . $module->name . "\n".
+								  "Module installed version: " . $module->version . "\n".
+								  "Module source version: " . $counts[$moduleId] . "\n".
+									"ABORTING: Please contact support";
+
+								throw new Exception($msg);
 							}
 						}
 					}

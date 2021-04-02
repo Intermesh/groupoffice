@@ -4,7 +4,7 @@ namespace GO\Smime;
 
 
 class SmimeModule extends \GO\Base\Module{
-	public static function initListeners() {		
+	public static function initListeners() {
 		$accountController = new \GO\Email\Controller\AccountController();
 		$accountController->addListener('load', "GO\Smime\EventHandlers", "loadAccount");
 		$accountController->addListener('submit', "GO\Smime\EventHandlers", "submitAccount");

@@ -267,8 +267,12 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	getUpdates: function (cb, scope) {
 
 		var me = this;
-		
-		return me.getState().then(function(state){
+
+		if(me.getUpdatesPromise) {
+			return me.getUpdatesPromise;
+		}
+
+		me.getUpdatesPromise = me.getState().then(function(state){
 			
 			console.log("getUpdates", me.entity.name, state);
 		
@@ -279,24 +283,22 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				}
 				return Promise.reject("No state yet");
 			}
-			
-			//we need the initial request promise for the callId.
-			var promise = go.Jmap.request({
-				method: me.entity.name + "/changes",
-				params: {
-					sinceState: me.state
-				}
-			});
-			
-			promise.then(function(response) {
-				if(response.removed) {
-					for(var i = 0, l = response.removed.length; i < l; i++) {
-						me._destroy(response.removed[i]);
-					}
-				}
-				
-				return me.setState(response.newState).then(function(){
-					if(response.hasMoreChanges) {
+
+			function finishChanges(changes) {
+				return me.setState(changes.newState).then(function(){
+					if(changes.hasMoreChanges) {
+
+						//unofficial response but we use it to process no more than 100000 changes. A resync is
+						//more efficient in the webclient in that case.
+						if(changes.totalChanges > 10000) {
+							console.error("Too many changes " + changes.totalChanges + " > 10000 ");
+							return me.clearState().then(function(response) {
+								if(cb) {
+									cb.call(scope || me, me, false);
+								}
+								return Promise.reject({type: "cannotcalculatechanges", detail: "Too many changes"})
+							});
+						}
 						return me.getUpdates(cb, scope);
 					} else
 					{
@@ -304,9 +306,52 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 							cb.call(scope || me, me, true);
 						}
 
+						me._fireChanges();
+
 						return true;
 					}
 				}, me);
+			}
+			
+			return go.Jmap.request({
+				method: me.entity.name + "/changes",
+				params: {
+					sinceState: me.state
+				}
+			}).then(function(changes) {
+
+				if(changes.removed) {
+					for(var i = 0, l = changes.removed.length; i < l; i++) {
+						me._destroy(changes.removed[i]);
+					}
+				}
+
+				//only update items we had already fetched
+				const knownIds = Object.values(me.data).column("id");
+				const updatedIds = changes.changed.intersect(knownIds);
+
+				if(updatedIds.length) {
+					return go.Jmap.request({
+						method: me.entity.name + "/get",
+						params: {
+							ids: updatedIds
+						}
+					}).then(function(get) {
+						if(go.util.empty(get.list)) {
+							console.warn("No items in response: ", get);
+							return;
+						}
+						for(var i = 0,l = get.list.length;i < l; i++) {
+							me._add(get.list[i], true);
+						}
+
+						return finishChanges(changes);
+
+					})
+				} else {
+					return finishChanges(changes);
+				}
+
 			}).catch(function(response) {
 				return me.clearState().then(function(response) {
 					if(cb) {
@@ -316,28 +361,11 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				});
 			});
 
-			var getPromise = go.Jmap.request({
-				method: me.entity.name + "/get",
-				params: {
-					"#ids": {
-						resultOf: promise.callId,
-						path: '/changed'
-					}
-				}
-			}).then(function(response) {
-				if(go.util.empty(response.list)) {
-					console.warn("No items in response: ", response);
-					return;
-				}
-				for(var i = 0,l = response.list.length;i < l; i++) {
-					me._add(response.list[i], true);
-				}
-
-				me._fireChanges();
-			});
-
-			return Promise.all([promise, getPromise]);
+		}).finally(function() {
+			me.getUpdatesPromise = null;
 		});
+
+		return me.getUpdatesPromise;
 
 	},
 	
@@ -647,7 +675,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 *
 	 * @example
 	 *
-	 * go.Db.store("Note").save({name: "Test"}, 1).then(function(){});
+	 * go.Db.store("Note").save({name: "Test"}, 1).then(function(entity){});
 	 *
 	 * @param entity
 	 * @param {string} id
@@ -673,7 +701,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					return response.created[id];
 				} else
 				{
-					return Promise.reject(response);
+					return Promise.reject({message: t("Failed to save"), response: response});
 				}
 			} else
 			{
@@ -681,7 +709,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					return response.updated[id];
 				} else
 				{
-					return Promise.reject(response);
+					return Promise.reject({message: t("Failed to save"), response: response});
 				}
 			}
 		});
@@ -772,7 +800,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				if(response.created) {
 					for(clientId in response.created) {
 						//merge client data with server defaults.
-						entity = Ext.apply(params.create[clientId], response.created[clientId] || {});
+						entity = Ext.apply(params.create ? (params.create[clientId] || {}) : {}, response.created[clientId] || {});
 						me._add(entity, true);
 					}
 				}
@@ -856,7 +884,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	/**
 	 * Query the API for a sorted / filtered list of entity id's
 	 * 
-	 * @param {object} params
+	 * @param {object} params {@link https://jmap.io/spec-core.html#query
 	 * @param {function} cb
 	 * @param {object} scope
 	 * @returns {String} Client call ID

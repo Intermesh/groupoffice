@@ -5,10 +5,10 @@ go.search.Panel = Ext.extend(Ext.Panel, {
 		this.grid = new go.links.LinkGrid({
 			hideHeaders: true,
 			region: "center",
-			sortInfo: {
-				field: 'id', //faster than modifiedAt
-				direction: 'DESC'
-			},
+			// sortInfo: {
+			// 	field: 'id', //faster than modifiedAt
+			// 	direction: 'DESC'
+			// },
 			listeners: {
 				click: function () {
 					this.gotoSelected();

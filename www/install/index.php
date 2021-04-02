@@ -14,9 +14,11 @@ require('header.php');
 		<fieldset>
 				<h2><?= go()->t('Install Group-Office'); ?></h2>
 				<p><?= go()->t('Thank you for installing Group-Office.'); ?></p>
+
+            <button class="primary right" name="submitButton" type="submit"><?= go()->t('Continue'); ?></button>
 		</fieldset>
 
-		<button name="submitButton" type="submit"><?= go()->t('Continue'); ?></button>
+
 	</form>
 
 </section>

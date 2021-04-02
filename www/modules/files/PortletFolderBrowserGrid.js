@@ -16,6 +16,7 @@ GO.files.PortletFolderBrowserGrid = Ext.extend(GO.grid.GridPanel, {
 
 		Ext.applyIf(this, {
 			layout: 'fit',
+			stateId: 'portlet-folder-browser-grid',
 			split: true,
 			paging: true,
 			autoExpandColumn: 'name',
@@ -30,6 +31,7 @@ GO.files.PortletFolderBrowserGrid = Ext.extend(GO.grid.GridPanel, {
 				},
 				id: 'type_id',
 				remoteSort: true,
+				autoDestroy: true,
 				fields: ['type_id', 'id', 'name', 'type', 'size', 'mtime', 'extension', 'timestamp', 'thumb_url', 'path', 'acl_id', 'locked_user_id', 'locked', 'folder_id', 'permission_level', 'readonly', 'unlock_allowed', 'handler']
 			}),
 			view: new Ext.grid.GridView({

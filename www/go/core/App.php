@@ -7,7 +7,8 @@ use GO;
 use GO\Base\Observable;
 use go\core\auth\State as AuthState;
 use go\core\cache\CacheInterface;
-use go\core\db\Connection;
+	use go\core\cache\Memcached;
+	use go\core\db\Connection;
 use go\core\db\Database;
 use go\core\db\Query;
 use go\core\db\Table;
@@ -84,6 +85,9 @@ use const GO_CONFIG_FILE;
 
 		protected function __construct() {
 			date_default_timezone_set("UTC");
+
+			mb_internal_encoding("UTF-8");
+			mb_regex_encoding("UTF-8");
 
 			$this->errorHandler = new ErrorHandler();
 			$this->initCompatibility();
@@ -383,28 +387,18 @@ use const GO_CONFIG_FILE;
 								"name" => $config['product_name'] ?? "GroupOffice"
 							],						
 					],
-					
-//					"package" => [
-//							"name" => [
-//									"foo" => 'bar'
-//							]
-//					]
+
 			]))->mergeRecursive($config)->getArray();
 			
-			if(!isset($this->config['core']['general']['cache'])) {
+			if(!isset($this->config['cache'])) {
 				if(cache\Apcu::isSupported()) {
-					$this->config['core']['general']['cache'] = cache\Apcu::class;
+					$this->config['cache'] = cache\Apcu::class;
 				} else
 				{
-					$this->config['core']['general']['cache'] = cache\Disk::class;
+					$this->config['cache'] = cache\Disk::class;
 				}
 			}
 
-			// if(isset($cacheKey)) {
-			// 	$this->config['cacheTime'] = time();
-			// 	apcu_store($cacheKey, $this->config);
-			// }
-			
 			if(Request::get()->getHeader('X-Debug') == "1") {
 				$this->config['core']['general']['debug'] = true;
 			}
@@ -472,7 +466,7 @@ use const GO_CONFIG_FILE;
 		 */
 		public function getCache() {
 			if (!isset($this->cache)) {				
-				$cls = $this->getConfig()['core']['general']['cache'];
+				$cls = $this->getConfig()['cache'];
 				// go()->log("Using cache: " . $cls);
 				$this->cache = new $cls;
 			}
@@ -523,12 +517,20 @@ use const GO_CONFIG_FILE;
 		}
 		
 		private $rebuildCacheOnDestruct = false;
-		
+
+		/**
+		 * Destroys all cache and reinitializes event listeners and sync state.
+		 *
+		 * @param false $onDestruct
+		 * @throws ConfigurationException
+		 */
 		public function rebuildCache($onDestruct = false) {
 			
 			if($onDestruct) {				
 				$this->rebuildCacheOnDestruct = $onDestruct;
-			}			
+			}
+
+			$this->rebuildCacheOnDestruct = false;
 			
 			\GO::clearCache(); //legacy
 
@@ -543,6 +545,7 @@ use const GO_CONFIG_FILE;
 			Listeners::get()->init();
 
 			$this->resetSyncState();
+
 			go()->getSettings()->cacheClearedAt = time();
 			go()->getSettings()->save();
 			
@@ -704,7 +707,12 @@ use const GO_CONFIG_FILE;
 			}
 
 			if (!empty($_SERVER['HTTP_HOST'])) {
-				$workingFile = '/etc/groupoffice/multi_instance/' . explode(':', $_SERVER['HTTP_HOST'])[0] . '/' . $name;
+				$domain = explode(':', $_SERVER['HTTP_HOST'])[0];
+
+				//hack for wopi subdomain
+				$domain = str_replace('.wopi.', '.', $domain);
+
+				$workingFile = '/etc/groupoffice/multi_instance/' . $domain . '/' . $name;
 				try {
 					if (file_exists($workingFile)) {
 						return $workingFile;
@@ -746,7 +754,11 @@ use const GO_CONFIG_FILE;
 			go()->getDbConnection()->update('core_entity', ['highestModSeq' => 0])->execute();
 			go()->getDbConnection()->exec("TRUNCATE TABLE core_change");
 			go()->getDbConnection()->exec("TRUNCATE TABLE core_acl_group_changes");
+
+			// Disable keys otherwise this might take very long!
+			go()->getDbConnection()->exec("SET unique_checks=0; SET foreign_key_checks=0;");
 			go()->getDbConnection()->insert('core_acl_group_changes', (new Query())->select("null, aclId, groupId, '0', null")->from("core_acl_group"))->execute();
+			go()->getDbConnection()->exec("SET unique_checks=1; SET foreign_key_checks=1;");
 		}
 
 		/**

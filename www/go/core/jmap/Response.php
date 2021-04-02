@@ -17,6 +17,8 @@ class Response extends \go\core\http\Response {
 	public function __construct() {
 		parent::__construct();
 		$this->setHeader('Content-Type', 'application/json;charset=utf-8');
+		$this->setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+		$this->setHeader('Pragma', 'no-cache');
 	}
 
 	protected function sendSecurityHeaders()

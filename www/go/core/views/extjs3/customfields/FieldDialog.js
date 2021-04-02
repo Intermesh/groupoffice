@@ -7,6 +7,10 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 	initComponent: function () {
 		go.customfields.FieldDialog.superclass.initComponent.call(this);
 
+		this.formPanel.on("beforesubmit", function (form, values) {
+			values.forceAlterTable = true;
+		}, this);
+
 		this.formPanel.on("load", function (form, entity) {
 			var types = go.customfields.CustomFields.getTypes();
 			form.getForm().findField('typeLabel').setValue(types[entity.type] ? types[entity.type].label : entity.type);
@@ -26,6 +30,7 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 		};
 
 	},
+
 	initFormItems: function () {
 		return [{
 			columnWidth: .5,
@@ -140,11 +145,29 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 						hint: "eg. 'nameOfStandardOrCustomField = test'",
 						listeners: {
 							valid: function(elm) {
+								// TODO: Clean out duplicated code
 								var value = elm.getValue();
 								if(!Ext.isEmpty(value)) {
-									var re=/(={1,2}|<|>)/;
-									var arVal = String(value).split(re);
-									elm.setRawValue(arVal[0].trim() + " " + arVal[1]  + " " + arVal[2].trim());
+									var strRawValue = ""
+
+									var reConditions=/(={1,2}|<|>)/,reAdjuncts=/\ (AND|OR)\ /;
+									var reEmptyCondition = /^\w+\ is empty$/,reNotEmptyCondition = /^\w+\ is not empty$/;
+
+									var arSubConditions = String(value).split(reAdjuncts);
+									for(var i=0,l=arSubConditions.length;i<l;i++) {
+										var strCond = arSubConditions[i];
+										if (strCond === "AND" || strCond === "OR") {
+											strRawValue += (" " + strCond + " ");
+											continue;
+										}
+										var arVal = String(strCond).split(reConditions);
+										if(arVal.length === 3) {
+											strRawValue += (arVal[0].trim() + " " + arVal[1] + " " + arVal[2].trim());
+										} else if(strCond.match(reEmptyCondition) || strCond.match(reNotEmptyCondition)) {
+											strRawValue += strCond.replace(/\s{2,}/, ' ').trim(); // remove duplicate spaces
+										}
+									}
+									elm.setRawValue(strRawValue);
 								}
 							},
 							scope: this
@@ -154,10 +177,23 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 							if(Ext.isEmpty(value)) {
 								return true;
 							}
-							var re=/(={1,2}|<|>)/;
-							var arVal = String(value).split(re);
-							if(arVal.length !== 3) {
-								return t('The value was not formatted correctly');
+							// TODO: Clean out duplicated code
+
+							var reConditions=/(={1,2}|<|>)/,reAdjuncts=/\ (AND|OR)\ /;
+							var reEmptyCondition = /^\w+\ is empty$/;
+							var reNotEmptyCondition = /^\w+\ is not empty$/;
+							var arSubConditions = String(value).split(reAdjuncts);
+							for(var i=0,l=arSubConditions.length;i<l;i++) {
+								var strCond = arSubConditions[i];
+								if(strCond === "AND" || strCond === "OR") {
+									continue;
+								}
+
+								var arVal = String(strCond).split(reConditions);
+								if(arVal.length !== 3 && !strCond.match(reEmptyCondition) && !strCond.match(reNotEmptyCondition)) {
+									return t('The value was not formatted correctly');
+								}
+
 							}
 
 							return true;

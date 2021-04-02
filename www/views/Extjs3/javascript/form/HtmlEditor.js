@@ -8,8 +8,7 @@ GO.form.HtmlEditor = function (config) {
 	Ext.applyIf(config, {
 		border: false,
 		enableFont: false,
-		headingsMenu: true,
-		style: GO.settings.html_editor_font
+		headingsMenu: true
 	});
 
 	config.plugins = config.plugins || [];
@@ -79,20 +78,30 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 		GO.form.HtmlEditor.superclass.initComponent.apply(this);
 
 		this.on('afterrender', function() {
-			if(this.toolbarHidden) {
+			if(this.grow && this.growMinHeight < dp(36)) {
 				this.tb.hide();
 			}
 		}, this);
 		this.on('initialize', function(){
 
-			if(Ext.isEmpty(this.emptyText)) {
-				return;
+			if(this.grow) {
+
+
+
+				this.doGrow();
+				this.on("sync", this.doGrow, this);
 			}
+
+			// if(Ext.isEmpty(this.emptyText)) {
+			// 	return;
+			// }
 			// Ext.EventManager.on(this.getEditorBody(),{
 			// 	focus:this.handleEmptyText,
 			// 	blur:this.applyEmptyText,
 			// 	scope:this
 			// });
+
+
 
 		},this);
 
@@ -174,6 +183,16 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 		go.ActivityWatcher.registerDocument(doc);
 
+		//other browsers are already registered in parent function
+		if(Ext.isGecko) {
+			Ext.EventManager.on(doc, 'keydown', this.fixKeys, this);
+		}
+
+	},
+
+	applyCommand : function(e){
+
+		//implemented in fixKeys
 	},
 
 	debounceTimeout : null,
@@ -389,13 +408,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 					e.preventDefault();
 					var reader = new FileReader();
 					reader.onload = function (event) {
-						if(Ext.isSafari) {
-							setTimeout(function () { //set timeout was needed to prevent a Safari 14.0 crash :(
-								me.handleImage(event.target.result);
-							}, 100);
-						}else {
-							me.handleImage(event.target.result);
-						}
+						me.handleImage(event.target.result);
 					}
 					reader.readAsDataURL(item.getAsFile());
 				}
@@ -489,7 +502,10 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 			if (dataURL) {
 				var file = new File([blob], "pasted-image." + blob.type.substring(6),{type: blob.type});
-				var imgEl = me.insertImage(src);
+
+				var imgEl = me.insertImage(BaseHref + "views/Extjs3/themes/" + go.User.theme + "/img/loading-spinner.gif");
+				imgEl.setAttribute("style", "width: 80px; height: 80px");
+
 				go.Jmap.upload(file, {
 					success: function(response) {
 						imgEl.setAttribute("src", go.Jmap.downloadUrl(response.blobId));
@@ -497,7 +513,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 						me.fireEvent('attach', me, response.blobId, file, imgEl);
 					}
 				});
-				
+
 			}
 		};
 
@@ -542,7 +558,7 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 	setValue: function (value) {
 
-		if (this.win && Ext.isChrome) {
+		if (this.win && Ext.isChrome && this.activated) {
 
 			//set cursor position on top
 			var range = this.win.document.createRange();
@@ -551,19 +567,72 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 
 			var sel = this.win.document.getSelection();
 
-			sel.removeAllRanges();
-			sel.addRange(range);
+			if(sel) {
+				sel.removeAllRanges();
+				sel.addRange(range);
+			}
 		}
 		GO.form.HtmlEditor.superclass.setValue.call(this, value);
 	},
 
-//	syncValue: function(){
-//		//In BasicForm.js this method is called by EXT
-//		// When using the editor in sourceEdit then it may not call the syncValue function
-//		if(!this.sourceEditMode){			
-//			GO.form.HtmlEditor.superclass.syncValue.call(this);
-//		}
-//	},	
+	/**
+	 * Automatically grow field with content
+	 */
+	grow: false,
+
+	/**
+	 * Minimum height for field
+	 */
+	growMinHeight: dp(30),
+
+	/**
+	 * Maximum height for field
+	 */
+	growMaxHeight: dp(480),
+
+	// syncValue: function(){
+	// 	//In BasicForm.js this method is called by EXT
+	// 	// When using the editor in sourceEdit then it may not call the syncValue function
+	// 	if(!this.sourceEditMode){
+	// 		GO.form.HtmlEditor.superclass.syncValue.call(this);
+	//
+	// 	}
+	// },
+
+	doGrow : function() {
+		var body = this.getEditorBody();
+
+		body.style.height = 'auto';
+		body.style.display = 'inline-block';
+
+		body.style.minHeight =  this.growMinHeight + "px";
+		body.style.padding = dp(6) + "px " + dp(8) + "px";
+		body.style.boxSizing = "border-box";
+		body.style.width = "100%";
+		body.style.lineHeight = dp(20) + "px";
+
+		var h =  Math.max(this.growMinHeight, body.offsetHeight); // 400  max height
+
+		if(h > 36) {
+			this.tb.show();
+			//workaround for combo
+			if(this.tb.items.itemAt(0).wrap) {
+				this.tb.items.itemAt(0).wrap.dom.style.width = "100px";
+			}
+			this.tb.doLayout();
+		} else {
+			this.tb.hide();
+		}
+
+		h +=  this.tb.el.getHeight();
+
+		if(h > this.growMaxHeight) {
+			h = this.growMaxHeight;
+		}
+
+		this.setHeight(h);
+
+	},
 
 //	correctify: function(full, prefix, letter){
 //		var regex = /([:\?]\s+)(.)/g;
@@ -671,58 +740,56 @@ Ext.extend(GO.form.HtmlEditor, Ext.form.HtmlEditor, {
 	// 	return String.format('<html><head><meta name="SKYPE_TOOLBAR" content="SKYPE_TOOLBAR_PARSER_COMPATIBLE" /><style type="text/css">' + this.getEditorFrameStyle() + '</style></head><body></body></html>', this.iframePad, h);
 	// },
 	fixKeys: function () { // load time branching for fastest keydown performance
-		if (Ext.isIE) {
+
 			return function (e) {
-				var k = e.getKey(),
-								doc = this.getDoc(),
-								r;
-				if (k == e.TAB) {
-					e.stopEvent();
-					r = doc.selection.createRange();
-					if (r) {
-						r.collapse(true);
-						r.pasteHTML('&nbsp;&nbsp;&nbsp;&nbsp;');
-						this.deferFocus();
-					}
-				} else if (k == e.ENTER) {
-					//                    r = doc.selection.createRange();
-					//                    if(r){
-					//                        var target = r.parentElement();
-					//                        if(!target || target.tagName.toLowerCase() != 'li'){
-					//                            e.stopEvent();
-					//                            r.pasteHTML('<br />');
-					//                            r.collapse(false);
-					//                            r.select();
-					//                        }
-					//                    }
-				}
-			};
-		} else if (Ext.isWebKit) {
-			return function (e) {
+
 				var k = e.getKey(), doc = this.getDoc();
-				if (k == e.TAB) {
+				if(
+					Ext.isWebKit && e.shiftKey && k == e.ENTER &&
+					(doc.queryCommandState('insertorderedlist') || doc.queryCommandState('insertunorderedlist'))
+				) {
 					e.stopEvent();
-					this.execCmd('InsertText', '\t');
+					this.execCmd('InsertHtml',Ext.isGecko ? '<br />' : '<br /><br />');
 					this.deferFocus();
-				}else if(k == e.ENTER){
-					// if (doc.queryCommandState('insertorderedlist') || doc.queryCommandState('insertunorderedlist')) {
-					// 	return;
-					// }
-					// e.stopEvent();
-					//
-					//
-					// //make sure last child is a br otherwise it will go wrong!
-					// console.warn(doc.lastElementChild.tagName.toLowerCase());
-					// if(!doc.lastElementChild.tagName.toLowerCase() == "br") {
-					// 	console.warn("added br")
-					// 	doc.appendChild(doc.createElement("br"));
-					// }
-					//
-					// this.execCmd('InsertHtml','<br />');
-					// this.deferFocus();
+				} else if (k == e.TAB) {
+					e.preventDefault();
+					if (doc.queryCommandState('insertorderedlist') || doc.queryCommandState('insertunorderedlist')) {
+						this.execCmd(e.shiftKey ? 'outdent' : 'indent');
+					}else {
+						this.execCmd('InsertText', '\t');
+					}
+					this.deferFocus();
+				}else if(Ext.isMac){
+
+					if(e.ctrlKey){
+						var c = e.getCharCode(), cmd;
+
+						if(c > 0) {
+							c = String.fromCharCode(c).toLowerCase();
+
+							switch(c){
+								case 'b':
+									cmd = 'bold';
+									break;
+								case 'i':
+									cmd = 'italic';
+									break;
+								case 'u':
+									cmd = 'underline';
+									break;
+							}
+							if(cmd){
+								this.win.focus();
+								this.execCmd(cmd);
+								this.deferFocus();
+								e.preventDefault();
+							}
+						}
+					}
+
 				}
 			};
-		}
+
 	}(),
 
 	//Overwritten to fix font size bug in chrome

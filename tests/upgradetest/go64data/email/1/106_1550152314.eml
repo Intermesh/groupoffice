@@ -1,0 +1,64 @@
+Return-Path: <admin@intermesh.localhost>
+Delivered-To: admin@intermesh.localhost
+Received: from 137e2fcb3b7e.ec2.internal
+	by 44c9cbb6bdeb (Dovecot) with LMTP id XZXXJ3pyZVzcAQAA0Lkn9w
+	for <admin@intermesh.localhost>; Thu, 14 Feb 2019 13:51:54 +0000
+Received: from localhost (unknown [172.18.0.10])
+	by 137e2fcb3b7e.ec2.internal (Postfix) with ESMTP id 8F62387241
+	for <admin@intermesh.localhost>; Thu, 14 Feb 2019 13:51:54 +0000 (UTC)
+Message-ID: <eabf9bc2af94f2514cb79ea5b4a9ebbc@localhost>
+Date: Thu, 14 Feb 2019 14:51:54 +0100
+Subject: test
+From: Admin <admin@intermesh.localhost>
+To: System Administrator <admin@intermesh.localhost>
+MIME-Version: 1.0
+Content-Type: multipart/alternative;
+ boundary="_=_swift_1550152314_73d1b814eb914b27d4d5ed0a6ddc29cb_=_"
+
+
+
+
+--_=_swift_1550152314_73d1b814eb914b27d4d5ed0a6ddc29cb_=_
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+Dear Mr / Ms,
+
+
+
+Met vriendelijke groet
+
+
+System Administrator
+Intermesh
+
+--_=_swift_1550152314_73d1b814eb914b27d4d5ed0a6ddc29cb_=_
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<style type=3D"text/css">
+body,p,td,div,span{
+	font-size:14px;font-family: -apple-system, BlinkMacSystemFont, "Segoe UI=
+", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI =
+Emoji", "Segoe UI Symbol"; color: #212121;
+};
+body p{
+	margin:0px;
+}
+</style>
+</head>
+<body>Dear Mr / Ms,<br>
+<br>
+<br>
+<br>
+Met vriendelijke groet<br>
+<br>
+<br>
+System Administrator<br>
+Intermesh<br>
+</body></html>
+
+--_=_swift_1550152314_73d1b814eb914b27d4d5ed0a6ddc29cb_=_--
+

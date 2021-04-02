@@ -77,6 +77,18 @@ class SmimeMessage extends Message
 		
 		$this->recipcerts=$recipcerts;	
 	}
+
+	private function _restoreHeaders() {
+		$headers = $this->getHeaders();
+
+		foreach($this->restore_headers as $h) {
+			$headers->set($h);
+		}
+
+		$this->restore_headers = [];
+	}
+
+	private $restore_headers = [];
 	
 	private function _saveHeaders(){	
 		if(!$this->saved_headers){		
@@ -100,6 +112,7 @@ class SmimeMessage extends Message
 			 */
 			$headers = $this->getHeaders();
 
+
 			$headers->removeAll('MIME-Version');
 	//		$headers->removeAll('Content-Type');
 
@@ -112,7 +125,8 @@ class SmimeMessage extends Message
 				$name = $header->getFieldName();
 
 				if(!in_array($name, $ignored_headers)){
-					$this->saved_headers[$name]=$header->getFieldBody();							
+					$this->saved_headers[$name]=$header->getFieldBody();
+					$this->restore_headers[] = $header;
 					$headers->removeAll($name);
 				}
 			}
@@ -210,6 +224,8 @@ class SmimeMessage extends Message
 			$this->_doEncrypt();
 		}
 
+		$this->_restoreHeaders();
+
 		return \GO\Base\Util\StringHelper::normalizeCrlf(file_get_contents($this->tempout));
 	}
 	
@@ -245,7 +261,9 @@ class SmimeMessage extends Message
 			
 			$is->write($line);
 		}
-		fclose($fp);	
+		fclose($fp);
+
+		$this->_restoreHeaders();
 		
     return;
   }

@@ -12,6 +12,11 @@ class LogEntry extends jmap\EntityController
 		return model\LogEntry::class;
 	}
 
+	protected function getQueryQuery($params)
+	{
+		return parent::getQueryQuery($params)->removeJoin('core_entity', 'e');
+	}
+
 	public function query($params) {
 		return $this->defaultQuery($params);
 	}

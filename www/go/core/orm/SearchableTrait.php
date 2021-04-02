@@ -1,9 +1,8 @@
 <?php
 namespace go\core\orm;
 
-use go\core\customfield\Html;
-use go\core\customfield\TextArea;
-use go\core\db\Query;
+use go\core\db\Criteria;
+use go\core\model\Link;
 
 /**
  * Entities can use this trait to make it show up in the global search function
@@ -11,6 +10,8 @@ use go\core\db\Query;
  * @property array $customFields 
  */
 trait SearchableTrait {
+
+	public static $updateSearch = true;
 	
 	/**
 	 * The description in the search results
@@ -42,13 +43,47 @@ trait SearchableTrait {
 	/**
 	 * Split text by non word characters to get useful search keywords.
 	 * @param $text
-	 * @return array|false|string[]
+	 * @return string[]
 	 */
 	public static function splitTextKeywords($text) {
-		mb_internal_encoding("UTF-8");
-		mb_regex_encoding("UTF-8");
-//		$split = preg_split('/[^\w\-_\+\\\\\/:]/', mb_strtolower($text), 0, PREG_SPLIT_NO_EMPTY);
-		return mb_split('[^\w\-_\+\\\\\/:]', mb_strtolower($text), -1);
+
+		if(empty($text)) {
+			return [];
+		}
+
+		//Split on non word chars followed by whitespace or end of string. This wat initials like J.K. or french dates
+		//01.01.2020 can be found too.
+//		$keywords = mb_split('[^\w\-_\+\\\\\/:](\s|$)*', mb_strtolower($text), -1);
+		$text= preg_replace('/[^\w\-_\+\\\\\/\s:@]/', '', mb_strtolower($text));
+		$keywords = mb_split("\s+", $text);
+
+		//filter small words
+		$keywords = array_filter($keywords, function($word) {
+			return strlen($word) > 1;
+		});
+
+
+		return $keywords;
+	}
+
+	public static function addCriteria(Criteria $criteria, Query $query, $searchPhrase) {
+		$i = 0;
+		$words = SearchableTrait::splitTextKeywords($searchPhrase);
+		$words = array_unique($words);
+
+		foreach($words as $word) {
+			$query->join("core_search_word", 'w'.$i, 'w'.$i.'.searchId = search.id');
+			//$query->join("core_search_word_reverse", 'wr'.$i, 'wr'.$i.'.searchId = s.id');
+
+			$c = new Criteria();
+			$c
+				->where('w'.$i.'.word', 'LIKE', $word . '%')
+				->orWhere('w'.$i.'.drow', 'LIKE', strrev($word) . '%');
+
+			$criteria->where($c);
+
+			$i++;
+		}
 	}
 
 	/**
@@ -59,6 +94,11 @@ trait SearchableTrait {
 	 * @throws \Exception
 	 */
 	public function saveSearch($checkExisting = true) {
+
+		if(!static::$updateSearch) {
+			return true;
+		}
+
 		$search = $checkExisting ? \go\core\model\Search::find()->where('entityTypeId','=', static::entityType()->getId())->andWhere('entityId', '=', $this->id)->single() : false;
 		if(!$search) {
 			$search = new \go\core\model\Search();
@@ -80,15 +120,17 @@ trait SearchableTrait {
 		
 		$keywords = $this->getSearchKeywords();
 		if(!isset($keywords)) {
-			$keywords = array_merge([$search->name], self::splitTextKeywords($search->description));
+			$keywords = array_merge(self::splitTextKeywords($search->name), self::splitTextKeywords($search->description));
 		}
 
 		$links = (new Query())
 			->select('description')
+			->distinct()
 			->from('core_link')
 			->where('(toEntityTypeId = :e1 AND toId = :e2)')
-			->orWhere('(fromEntityTypeId = :e3 AND fromId = :e4)')
-			->bind([':e1' => static::entityType()->getId(), ':e2' => $this->id, ':e3' => static::entityType()->getId(), ':e4' => $this->id ]);
+			//->orWhere('(fromEntityTypeId = :e3 AND fromId = :e4)')
+			->bind([':e1' => static::entityType()->getId(), ':e2' => $this->id]);
+				//':e3' => static::entityType()->getId(), ':e4' => $this->id ]);
 		foreach($links->all() as $link) {
 			if(!empty($link['description']) && is_string($link['description'])) {
 				$keywords[] = $link['description'];
@@ -100,15 +142,36 @@ trait SearchableTrait {
 			$keywords = array_merge($keywords, $this->getCustomFieldsSearchKeywords());
 		}
 
-		$keywords = array_unique($keywords);
-		
-		$search->setKeywords(implode(' ', $keywords));
-		
+		$arr = [];
+		foreach($keywords as $keyword) {
+			$arr = array_merge($arr, self::splitTextKeywords($keyword));
+		}
+
+		$keywords = array_unique($arr);
+
+		//$search->setKeywords(implode(' ', $keywords));
+		$isNew = $search->isNew();
 		if(!$search->internalSave()) {
 			throw new \Exception("Could not save search cache: " . var_export($search->getValidationErrors(), true));
 		}
-		
-		return true;
+
+		if(!$isNew) {
+			go()->getDbConnection()->delete('core_search_word', ['searchId' => $search->id])->execute();
+		}
+
+		if(empty($keywords)) {
+			return true;
+		}
+
+		//array values to make sure index is sequential
+		$keywords = array_values(array_map(function ($word) use ($search) {
+			return ['searchId' => $search->id, 'word'=> $word, 'drow' => strrev($word)];
+		}, $keywords));
+
+		return go()->getDbConnection()->insertIgnore(
+			'core_search_word',$keywords
+		)->execute();
+
 	}
 
 
@@ -125,22 +188,18 @@ trait SearchableTrait {
 		if(!$delSearchStmt->execute()) {
 			return false;
 		}
-		
-		if(!\go()->getDbConnection()
-						->delete('core_link', 
-										(new Query)
-											->where(['fromEntityTypeId' => static::entityType()->getId()])
-											->andWhere('fromId', 'IN', $query)
-										)->execute()) {
+
+		if(!Link::delete((new Query)
+			->where(['fromEntityTypeId' => static::entityType()->getId()])
+			->andWhere('fromId', 'IN', $query)
+		)) {
 			return false;
 		}
-		
-		if(!\go()->getDbConnection()
-						->delete('core_link', 										
-										(new Query)
-											->where(['toEntityTypeId' => static::entityType()->getId()])
-											->andWhere('toId', 'IN', $query)
-										)->execute()) {
+
+		if(!Link::delete((new Query)
+			->where(['toEntityTypeId' => static::entityType()->getId()])
+			->andWhere('toId', 'IN', $query)
+		)) {
 			return false;
 		}
 		
@@ -198,9 +257,9 @@ trait SearchableTrait {
 					echo ".";
 
 				} catch (\Exception $e) {
-					echo $e->getMessage();
+					echo "Error: " . $m->id() . ' '. $m->title() ." : " . $e->getMessage() ."\n";
 					\go\core\ErrorHandler::logException($e);
-					echo "E";
+
 					$offset++;
 				}
 			}
