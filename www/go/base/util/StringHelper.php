@@ -22,6 +22,8 @@
 namespace GO\Base\Util;
 
 
+use go\core\ErrorHandler;
+
 class StringHelper {
 	
 	/**
@@ -1050,7 +1052,13 @@ END;
 			return $style;
 		}
 
-		$bodyEl = new \SimpleXMLElement($matches[0] . '</body>');
+		try {
+			$bodyEl = new \SimpleXMLElement($matches[0] . '</body>');
+		} catch (\Exception $e) {
+			ErrorHandler::logException($e);
+			go()->warn("Could not parse XML: " . $matches[0] . '</body>');
+		}
+
 		$attr = $bodyEl->attributes();
 
 		if(isset($attr['bgcolor'])) {
