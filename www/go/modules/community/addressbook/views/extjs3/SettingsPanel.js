@@ -1,4 +1,3 @@
-
 /* global go, Ext */
 
 go.modules.community.addressbook.SettingsPanel = Ext.extend(Ext.Panel, {
@@ -11,47 +10,72 @@ go.modules.community.addressbook.SettingsPanel = Ext.extend(Ext.Panel, {
 		//The account dialog is an go.form.Dialog that loads the current User as entity.
 		this.items = [{
 			xtype: "fieldset",
-			title:t(" Disylay options for address books", "tasks"),
+			title: t("Display options for address books", "addressbook", "community"),
 			items: [
-				this.allContactsCB = new Ext.form.Checkbox({
-					name: "addressBookSettings.displayAllContactsByDefault",
-					fieldLabel: t("All contacts", 'addressbook', 'communtiy'),
-					allowBlank: true,
-					id: 'allContactsByDefault',
-					hint: t("Display all contacts in address book by default", 'addressbook', 'community'),
-					// listeners: {
-					// 	check: function (checkbox, checked) {
-					// 		if(checked) {
-					// 			Ext.getCmp('rememberLastItem').setChecked(!checked).disable();
-					// 		} else {
-					// 			Ext.getCmp('rememberLastItem').setChecked(!checked).enable();
-					// 		}
-					// 	}
-					// }
-				}),
 				this.addressBookCombo = {
 					xtype: "addressbookcombo",
 					hiddenName: "addressBookSettings.defaultAddressBookId",
 					fieldLabel: t("Default address book"),
 					allowBlank: true,
-					id: 'defaultAddressBookId',
-					hint: t("Default address book to be opened unless overridden")
+					id: 'defaultAddressBookId'
 				},
-				this.rememberLastItemCB = new Ext.form.Checkbox({
-					id: 'rememberLastItem',
-					name: "addressBookSettings.rememberLastItem",
-					fieldLabel: t("Remember last selected item"),
-					allowBlank: true,
-					hint: t("Remember last selected address book when reopening the address book module", 'addressbook', 'community'),
-					// listeners: {
-					// 	check: function (checkbox, checked) {
-					// 		if(checked) {
-					// 			Ext.getCmp('allContactsByDefault').setChecked(!checked).disable();
-					// 		} else {
-					// 			Ext.getCmp('allContactsByDefault').setChecked(!checked).enable();
-					// 		}
-					// 	}
-					// }
+				this.defaultAddressBookOptions = new Ext.form.RadioGroup({
+					allowBlank: false,
+					fieldLabel: t("Default behavior for address books", 'addressbook', 'community'),
+					name: 'addressBookSettings.defaultAddressBookOptions',
+					columns: 1,
+					listeners: {
+						'beforerender': function (elm) {
+							if (me.rememberLastItemHiddenCB.checked) {
+								me.rememberLastItemOption.setValue(true);
+							} else if (me.displayAllContactsCB.checked) {
+								me.allContactsOption.setValue(true);
+							} else {
+								me.defaultAddressBookOption.setValue(true);
+							}
+						},
+						'change': function (elm, rb) {
+							var acbd = false, rli = false;
+							if (rb.id === 'allContactsByDefault') {
+								acbd = true;
+							} else if (rb.id === 'rememberLastItem') {
+								rli = true;
+							}
+							me.displayAllContactsCB.setValue(acbd);
+							me.rememberLastItemHiddenCB.setValue(rli);
+							elm.render();
+						}
+					},
+					items: [
+						this.allContactsOption = new Ext.form.Radio({
+							boxLabel: t("Start in All contacts", 'addressbook', 'communtiy'),
+							id: 'allContactsByDefault',
+							name: 'addressBookOptions',
+							hint: t("Display all contacts in address book by default", 'addressbook', 'community')
+						}),
+						this.defaultAddressBookOption = new Ext.form.Radio({
+							id: 'defaultAddressBookByDefault',
+							boxLabel: t("Start in Default Address Book"),
+							name: 'addressBookOptions',
+							hint: t("Remember last selected address book when reopening the address book module", 'addressbook', 'community')
+						}),
+						this.rememberLastItemOption = new Ext.form.Radio({
+							id: 'rememberLastItem',
+							boxLabel: t("Remeber last selected item"),
+							name: 'addressBookOptions',
+							hint: t("Remember last selected address book when reopening the address book module", 'addressbook', 'community')
+						})
+					]
+				}),
+				this.rememberLastItemHiddenCB = new Ext.form.Checkbox({
+					hidden: true,
+					name: 'addressBookSettings.rememberLastItem',
+					fieldLabel: 'rememberLastItem'
+				}),
+				this.displayAllContactsCB = new Ext.form.Checkbox({
+					hidden: true,
+					name: 'addressBookSettings.displayAllContactsByDefault',
+					fieldLabel: 'displayAllContactsByDefault'
 				})
 
 				// , {
@@ -72,20 +96,25 @@ go.modules.community.addressbook.SettingsPanel = Ext.extend(Ext.Panel, {
 				// 	displayField: 'display',
 				// 	value: 'name'
 				// }
-			]}
+			]
+		}
 		];
 		go.modules.community.addressbook.SettingsPanel.superclass.initComponent.call(this);
+	},
+
+	onSubmitStart: function (value) {
+		delete value.addressBookSettings.defaultAddressBookOptions;
 	},
 
 	onLoadStart: function (userId) {
 
 	},
 
-	onLoadComplete : function(action) {
+	onLoadComplete: function (action) {
 
 	},
 
-	onSubmitComplete : function(){
+	onSubmitComplete: function () {
 
 	}
 
