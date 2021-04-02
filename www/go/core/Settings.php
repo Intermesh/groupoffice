@@ -30,7 +30,7 @@ abstract class Settings extends Model {
 
 	  if(!isset(self::$instance[$cls])) {
       $instance = static::dbIsReady() ? go()->getCache()->get($cls) : null;
-      if ($instance !== null) {
+      if ($instance) {
         self::$instance[$cls] = $instance;
         return $instance;
       }
@@ -180,7 +180,7 @@ abstract class Settings extends Model {
 	}
 
 	protected function isModified($name) {
-		return !array_key_exists($name, $this->oldData) && isset($this->$name) || $this->$name != $this->oldData[$name];
+		return (!array_key_exists($name, $this->oldData) && isset($this->$name)) || (isset($this->$name) && $this->$name != $this->oldData[$name]);
 	}
 	
 	public function save() {

@@ -196,7 +196,6 @@ $app-icons: (
 }
 
 .message-body {
-	padding: dp(16);
 	background-color: white;
 	position: relative;	
 	
@@ -208,6 +207,10 @@ $app-icons: (
 		margin-left:36.0pt;
 		margin-bottom:.0001pt;
 		font-size:11.0pt;
+	}
+
+	.msg {
+		padding: dp(16);
 	}
 }
 

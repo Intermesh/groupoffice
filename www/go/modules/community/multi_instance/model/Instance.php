@@ -176,7 +176,7 @@ class Instance extends Entity {
 		return go()->getDataFolder()->getFolder('multi_instance/' . $this->hostname);
 	}
 	
-	private function getTrashFolder() {
+	public static function getTrashFolder() {
 		return go()->getDataFolder()->getFolder('multi_instance/_trash_')->create();
 	}
 	
@@ -228,6 +228,7 @@ class Instance extends Entity {
 			$instanceConfig['max_users'] = $this->usersMax;
 			$instanceConfig['enabled'] = $this->enabled;
 			$this->setInstanceConfig($instanceConfig);
+			$this->writeConfig();
 		}
 		
 		//$this->createWelcomeMessage();
@@ -336,9 +337,17 @@ class Instance extends Entity {
 	
 	
 	private function createInstance() {
-		$dbName =  $this->getDbName();
-		$dbUsername = $this->getDbUser();	
-		$dbPassword = bin2hex(random_bytes(8));
+
+		$instanceConfig = $this->getInstanceConfig();
+
+		$instanceConfig['db_name'] = $this->getDbName();
+		if(!isset($instanceConfig['db_user'])) {
+			$instanceConfig['db_user'] = $this->getDbUser();
+		}
+		if(!isset($instanceConfig['db_pass'])) {
+			$instanceConfig['db_pass'] = bin2hex(random_bytes(8));
+		}
+
 		$dataFolder = $this->getDataFolder();
 		$tmpFolder = $this->getTempFolder();	
 		$configFile = $this->getConfigFile();
@@ -353,14 +362,28 @@ class Instance extends Entity {
 				throw new Exception("Could not create temporary files folder");
 			}
 		
-			$this->createDatabase($dbName);
+			$this->createDatabase($instanceConfig['db_name']);
 			$databaseCreated = true;
-			$this->createDatabaseUser($dbName, $dbUsername, $dbPassword);
+			$this->createDatabaseUser($instanceConfig['db_name'], $instanceConfig['db_user'], $instanceConfig['db_pass']);
 			$databaseUserCreated = true;
-			
-			if(!$configFile->putContents($this->createConfigFile($dbName, $dbUsername, $dbPassword, $tmpFolder->getPath(), $dataFolder->getPath()))) {
-				throw new Exception("Could not write to config file");
+
+
+			if(!isset($instanceConfig['db_host'])) {
+				$dsn = \go\core\db\Utils::parseDSN(go()->getConfig()['core']['db']['dsn']);
+				$instanceConfig['db_host'] = $dsn['options']['host'];
 			}
+
+			$instanceConfig['tmpdir'] = $tmpFolder->getPath();
+			$instanceConfig['file_storage_path'] = $dataFolder->getPath();
+			$instanceConfig['servermanager'] = go()->findConfigFile();
+			$instanceConfig['business'] = [
+				'studio' => [
+					'package' => $this->getStudioPackage()
+				]
+			];
+
+			$this->setInstanceConfig($instanceConfig);
+			$this->writeConfig();
 
 		} catch(\Exception $e) {
 			
@@ -369,11 +392,11 @@ class Instance extends Entity {
 			$dataFolder->delete();
 			$configFile->getFolder()->delete();
 			if($databaseCreated) {
-				$this->dropDatabase($dbName);
+				$this->dropDatabase($instanceConfig['db_name']);
 			}
 
 			if($databaseUserCreated) {
-				$this->dropDatabaseUser($dbUsername);
+				$this->dropDatabaseUser($instanceConfig['db_user']);
 			}
 
 			$this->getModulePackageFolder()->delete();
@@ -412,34 +435,34 @@ class Instance extends Entity {
 		go()->getDbConnection()->query('FLUSH PRIVILEGES');		
 	}
 	
-	private function createConfigFile($dbName, $dbUsername, $dbPassword, $tmpPath, $dataPath) {
-		
-		$tpl = Module::getFolder()->getFile('config.php.tpl');
-		
-		$dsn = \go\core\db\Utils::parseDSN(go()->getConfig()['core']['db']['dsn']);
-
-		
-		return str_replace([
-				'{dbHost}',
-				'{dbName}',
-				'{dbUsername}',
-				'{dbPassword}',
-				'{tmpPath}',
-				'{dataPath}',
-				'{servermanager}',
-				'{studioPackage}',
-		], [
-				$dsn['options']['host'],
-				$dbName,
-				$dbUsername,
-				$dbPassword,
-				$tmpPath,
-				$dataPath,
-				go()->findConfigFile(),
-				$this->getStudioPackage()
-		],
-		$tpl->getContents());		
-	}
+//	private function createConfigFile($dbName, $dbUsername, $dbPassword, $tmpPath, $dataPath) {
+//
+//		$tpl = Module::getFolder()->getFile('config.php.tpl');
+//
+//		$dsn = \go\core\db\Utils::parseDSN(go()->getConfig()['core']['db']['dsn']);
+//
+//
+//		return str_replace([
+//				'{dbHost}',
+//				'{dbName}',
+//				'{dbUsername}',
+//				'{dbPassword}',
+//				'{tmpPath}',
+//				'{dataPath}',
+//				'{servermanager}',
+//				'{studioPackage}',
+//		], [
+//				$dsn['options']['host'],
+//				$dbName,
+//				$dbUsername,
+//				$dbPassword,
+//				$tmpPath,
+//				$dataPath,
+//				go()->findConfigFile(),
+//				$this->getStudioPackage()
+//		],
+//		$tpl->getContents());
+//	}
 	
 	private $instanceDbConn;
 	
@@ -452,21 +475,26 @@ class Instance extends Entity {
 			try {
 				include($this->getConfigFile()->getPath());
 			} catch(Exception $e) {
-				throw new \Exception("config file missing for instance : " . $this->hostname);
+				ErrorHandler::log("Config file missing for instance : " . $this->hostname);
+				$config = [];
 			}
 			$this->instanceConfig = $config;
 		}		
 		return $this->instanceConfig;
 	}
 	
-	private function setInstanceConfig($config) {
-		$this->getConfigFile()->putContents("<?php\n\$config = " . var_export($config, true) . ";\n");
-		
+	public function setInstanceConfig($config) {
+		$this->instanceConfig = $config;
+	}
+
+	private function writeConfig() {
+		if(!$this->getConfigFile()->putContents("<?php\n\$config = " . var_export($this->getInstanceConfig(), true) . ";\n")) {
+			throw new \Exception("Could not write to config.php file");
+		}
+
 		if(function_exists("opcache_invalidate")) {
 			opcache_invalidate($this->getConfigFile()->getPath());
 		}
-		
-		$this->instanceConfig = $config;
 	}
 	
 	private function getGlobalConfig() {
@@ -606,6 +634,19 @@ class Instance extends Entity {
 		
 		return true;
 	}
+
+	public function restoreDump(File $dumpFile) {
+		$c = $this->getInstanceConfig();
+		$cmd = "mysql --host=" . ($c['db_host'] ?? "localhost") . " --port=" . ($c['db_port'] ?? 3306) . " --user=" . $c['db_user'] . " --password=" . $c['db_pass'] . " " . $c['db_name'] . " < \"" . $dumpFile->getPath() . "\"";
+		//go()->debug($cmd);
+		exec($cmd, $output, $retVar);
+
+		if($retVar != 0) {
+			throw new Exception("Mysqldump error: " .$retVar ." : ". implode("\n", $output));
+		}
+
+		return true;
+	}
 	
 	protected static function internalDelete(Query $query) {
 
@@ -634,7 +675,7 @@ class Instance extends Entity {
 
 				$instance->getConfigFile()->getFolder()->delete();
 
-				$dest = $instance->getTrashFolder()->getFolder($instance->getDataFolder()->getName());
+				$dest = self::getTrashFolder()->getFolder($instance->getDataFolder()->getName());
 				if ($dest->exists()) {
 					$dest = $dest->getParent()->getFolder($instance->getDataFolder()->getName() . '-' . uniqid());
 				}
@@ -697,6 +738,7 @@ class Instance extends Entity {
 	public function getAllowedModules()
 	{
 		$modules = self::getAvailableModules();
+
 		$instanceConfig = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
 		$checkAllowed = false;
 		if (array_key_exists('allowed_modules', $instanceConfig)) {
@@ -755,6 +797,7 @@ class Instance extends Entity {
 		$config = $this->getInstanceConfig();
 		$config['allowed_modules'] = $allowedModules;
 		$this->setInstanceConfig($config);
+		$this->writeConfig();
 
 	}
 
