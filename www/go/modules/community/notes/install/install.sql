@@ -103,9 +103,12 @@ ALTER TABLE `notes_note_custom_fields`
   ADD CONSTRAINT `notes_note_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `notes_note` (`id`) ON DELETE CASCADE;
 
 CREATE TABLE `notes_user_settings` (
-  `userId` int(11) NOT NULL,
-  `defaultNoteBookId` int(11) DEFAULT NULL
+   `userId` int(11) NOT NULL,
+   `defaultNoteBookId` int(11) DEFAULT NULL,
+   `rememberLastItems` tinyint(1) DEFAULT 0,
+   `lastNoteBookIds` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 
 ALTER TABLE `notes_user_settings`

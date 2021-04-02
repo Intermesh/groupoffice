@@ -135,7 +135,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				var addressBookId = node.attributes.data.id, abSettings = go.User.addressBookSettings;
 				this.setAddressBookId(addressBookId);
 				if(abSettings.rememberLastItem && abSettings.lastAddressBookId != addressBookId) {
-					debugger;
 					var update = {};
 					update[go.User.id] = {'addressBookSettings': {
 						lastAddressBookId:addressBookId
@@ -660,8 +659,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 
 				updates[c.id] = contact;
 			});
-
-			//console.log(updates);
 
 			if (removeFromGrid) {
 				me.grid.store.remove(e.source.dragData.selections);

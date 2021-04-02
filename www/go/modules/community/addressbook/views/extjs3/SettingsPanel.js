@@ -20,12 +20,13 @@ go.modules.community.addressbook.SettingsPanel = Ext.extend(Ext.Panel, {
 					id: 'defaultAddressBookId'
 				},
 				this.defaultAddressBookOptions = new Ext.form.RadioGroup({
-					allowBlank: false,
+					allowBlank: true,
+					validationEvent: false,
 					fieldLabel: t("Default behavior for address books", 'addressbook', 'community'),
 					name: 'addressBookSettings.defaultAddressBookOptions',
 					columns: 1,
 					listeners: {
-						'beforerender': function (elm) {
+						'added': function (elm, ownerCt, index) {
 							if (me.rememberLastItemHiddenCB.checked) {
 								me.rememberLastItemOption.setValue(true);
 							} else if (me.displayAllContactsCB.checked) {
@@ -43,7 +44,6 @@ go.modules.community.addressbook.SettingsPanel = Ext.extend(Ext.Panel, {
 							}
 							me.displayAllContactsCB.setValue(acbd);
 							me.rememberLastItemHiddenCB.setValue(rli);
-							elm.render();
 						}
 					},
 					items: [
@@ -103,7 +103,9 @@ go.modules.community.addressbook.SettingsPanel = Ext.extend(Ext.Panel, {
 	},
 
 	onSubmitStart: function (value) {
-		delete value.addressBookSettings.defaultAddressBookOptions;
+		if(value && value.addressBookSettings) {
+			delete value.addressBookSettings.defaultAddressBookOptions;
+		}
 	},
 
 	onLoadStart: function (userId) {
@@ -117,6 +119,5 @@ go.modules.community.addressbook.SettingsPanel = Ext.extend(Ext.Panel, {
 	onSubmitComplete: function () {
 
 	}
-
 });
 

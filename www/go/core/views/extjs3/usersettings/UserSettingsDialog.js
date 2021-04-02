@@ -192,7 +192,6 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 * 
 	 */
 	submit : function(){
-		
 		// loop through child panels and call onSubmitStart function if available
 		var valid = true;
 		this.tabPanel.items.each(function(tab) {
