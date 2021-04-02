@@ -36,19 +36,38 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 {
 	private $_cachedCalendars;
 
-	private $background_colors = array('F0AE67','FFCC00','FFFF00','CCFF00','66FF00',
-		'00FFCC','00CCFF','0066FF','95C5D3','6704FB',
-		'CC00FF','FF00CC','CC99FF','FB0404','FF6600',
-		'C43B3B','996600','66FF99','999999','00FFFF');
+	private function fromBlob(Task $task) {
+		$blob = $task->vcalendarBlobId ? Blob::findById($task->vcalendarBlobId) : null;
+		if(!$blob || $blob->modifiedAt < $task->modifiedAt) {
+			// task to vtodo
+			$parser = new VCalendar();
+			$data = $parser->export($task);
+			$blob = Blob::fromString($data);
+			$blob->type = 'text/vcalendar';
+			$blob->name = $task->getUri();
+			$blob->modifiedAt = $task->modifiedAt;
+			if(!$blob->save()) {
+				throw new \Exception("could not save VCalendar blob for task '" . $task->id() . "'. Validation error: " . $blob->getValidationErrorsAsString());
+			}
 
-	private $colorIndex=-1;
-
-	private function nextBackgroundColor(){
-		$this->colorIndex++;
-		if(!isset($this->background_colors[$this->colorIndex])){
-			$this->colorIndex=0;
+			if(isset($task->vcalendarBlobId)) {
+				$old = Blob::findById($task->vcalendarBlobId);
+				$old->setStaleIfUnused();
+			}
+			if(!$blob->save()) {
+				throw new \Exception("could not save VCalendar blob");
+			}
+			$task->vcalendarBlobId = $blob->id;
+			$task->save();
+		} else {
+			$data = $blob->getFile()->getContents();
 		}
-		return $this->background_colors[$this->colorIndex];
+		return $data; /* "BEGIN:VCALENDAR\r\n".
+			"VERSION:2.0\r\n".
+			"PRODID:-//Intermesh//NONSGML Group-Office ".go()->getVersion()."//EN\r\n".
+			(new \GO\Base\VObject\VTimezone())->serialize().
+			$data.
+			"END:VCALENDAR\r\n";*/
 	}
 
 	/**
@@ -129,11 +148,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 	private function _modelToDAVCalendar(Calendar $calendar, $principalUri){
 
-		// BEFORE DAV SYNC
-//		$db = new db();
-//		$db->query("SELECT max(mtime) AS mtime, COUNT(*) AS count FROM cal_events WHERE calendar_id=?", 'i', $gocal['id']);
-//		$r = $db->next_record();
-
 		$findParams = FindParams::newInstance()
 			->select('version')
 			->single()
@@ -144,33 +158,15 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 		$r = Calendar::model()->find($findParams);
 
 		$supportedComponents = array('VEVENT');
-//		$ctagCount = $r->count;
-//		$ctagMtime = $r->mtime;
 		$version = $calendar->version;
 		if($calendar->tasklist_id>0) {
 			$supportedComponents[]='VTODO';
 
-//			$findParams = FindParams::newInstance()
-//				->select('version')
-//				->single()
-//				->criteria(FindCriteria::newInstance()->addCondition('id', $calendar->tasklist_id));
-//			$t = \GO\Tasks\Model\Tasklist::model()->find($findParams);
 			$tasklist = Tasklist::find()->select('version')->where(['id'=>$calendar->tasklist_id])->single();
 			if($tasklist) {
 				$version += $tasklist->version;
 			}
-//			$ctagCount += $t->count;
-//			$ctagMtime = max(array($ctagMtime, $t->mtime));
-
 		}
-
-//		if (isset(GO::config()->caldav_max_months_old))
-//			$ctag = $ctagCount . ':' . $ctagMtime . ':' . GO::config()->caldav_max_months_old;
-//		else
-//			$ctag = $ctagCount . ':' . $ctagMtime;
-//		$ctag = $version;
-//		if(\GO::config()->debug)
-//			$ctag=time();
 
 		\GO::debug("Version: ".$version);
 
@@ -246,11 +242,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	 * @return bool|array
 	 */
 	public function updateCalendar($calendarId, \Sabre\DAV\PropPatch $properties) {
-
-//		\GO::debug($properties);
-
-//		throw new Sabre\DAV\Exception\Forbidden();
-
 		return true;
 	}
 
@@ -294,25 +285,14 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	 * Get the event by DAV client URI
 	 *
 	 * @param StringHelper $uri
-	 * @return \GO\Calendar\Model\Event
+	 * @return Task
 	 */
 	private function getTaskByUri($uri, $calendarId){
-		//$this->db->query("SELECT e.* FROM cal_events e INNER JOIN dav_events d ON d.id=e.id WHERE d.uri=?","s",$uri);
-
-		$joinCriteria = FindCriteria::newInstance()
-			->addRawCondition('t.id', 'd.id');
-
-		$whereCriteria = FindCriteria::newInstance()
-			->addModel(DavTask::model(),'d')
-			->addCondition('tasklist_id', $calendarId)
-			->addCondition('uri', $uri,'=','d');
-
-		$findParams = FindParams::newInstance()
-			->single()
-			->join(DavTask::model()->tableName(),$joinCriteria, 'd')
-			->criteria($whereCriteria);
-
-		return \GO\Tasks\Model\Task::model()->find($findParams);
+		$uid = str_replace('.ics', '',$uri);
+		return Task::find()
+			->join('cal_calendars', 'c','c.tasklist_id = task.tasklistId')
+			->where(['c.id' => $calendarId, 'task.uid' => $uid])
+			->single();
 	}
 
 
@@ -454,22 +434,8 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 			if($tasklist) {
 
-//				$whereCriteria = FindCriteria::newInstance()
-//					->addModel(\GO\Tasks\Model\Task::model())
-//					->addCondition('tasklist_id', $calendar->tasklist_id)
-//					->mergeWith(FindCriteria::newInstance()
-//						->addModel(\GO\Tasks\Model\Task::model())
-//						->addCondition('completion_time', 0)
-//						->addCondition('due_time', \GO\Base\Util\Date::date_add(time(), 0, \GO::config()->caldav_max_months_old),'>','t',false));
-//
-//				$findParams = \GO\Base\Db\FindParams::newInstance()
-//					->select('t.*')
-//					->ignoreAcl()
-//					->criteria($whereCriteria);
-//
-//				$stmt = \GO\Tasks\Model\Task::model()->find($findParams);
-				$monthsOld = \GO::config()->caldav_max_months_old;
-				$monthsOld = 0 - $monthsOld;
+//				$monthsOld = \GO::config()->caldav_max_months_old;
+//				$monthsOld = 0 - $monthsOld;
 
 				$tasks = Task::find()
 					->where(['tasklistId'=>$calendar->tasklist_id])
@@ -478,24 +444,8 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 				\GO::debug("Found ".count($tasks)." tasks");
 
-
-				//			$sql = "SELECT * FROM ta_tasks WHERE tasklist_id=? AND (completion_time=0 OR due_time>?)";
-				//			$count = $this->tasks->query($sql, 'ii', array($calendar['tasklist_id'], Date::date_add(time(),0,\GO::config()->caldav_max_months_old)));
-
 				foreach ($tasks as $task) {
-					//$davTask = DavTask::model()->findByPk($task->id);
-					$blob = Blob::findById($task->vcalendarBlobId);
-					if(!$blob) {
-						// make one
-						$converter = new VCalendar();
-						$data = $converter->export($task);
-						$blob = Blob::fromString($data);
-						$task->vcalendarBlobId = $blob->id;
-					} else {
-						$data = $blob->getFile()->getContents();
-//						$VCalendar = Reader::read($blob->getFile()->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
-//						$data = $VCalendar->serialize();
-					}
+					$data = $this->fromBlob($task);
 					$objects[] = array(
 						'id' => $task->id,
 						'uri' => $task->getUri(),
@@ -622,47 +572,14 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			return $object;
 		}
 		else {
-			$calendar = GO\Calendar\Model\Calendar::model()->findByPk($calendarId, false, true);
-			//$calendar = $this->cal->get_calendar($calendarId);
+//			$calendar = GO\Calendar\Model\Calendar::model()->findByPk($calendarId, false, true);
+//			$uid = str_replace('.ics', '',$objectUri);
 
-//			$sql = "SELECT e.*, d.uri, d.mtime AS client_mtime, d.data  FROM ta_tasks e INNER JOIN dav_tasks d ON d.id=e.id WHERE d.uri=?";// AND e.tasklist_id=?";
-//			$this->tasks->query($sql, 's', array($objectUri));
-//			$task = $this->tasks->next_record();
-
-//			$whereCriteria = FindCriteria::newInstance()
-//				->addModel(\GO\Tasks\Model\Task::model())
-//				->addModel(DavTask::model(),'d')
-//				//->addCondition('tasklist_id', $calendarId) //Not necessary with the inner join on dav_tasks
-//				->addCondition('uri', $objectUri,'=','d');
-//
-//			$joinCriteria = FindCriteria::newInstance()
-//				->addRawCondition('t.id', 'd.id');
-//
-//			$findParams = FindParams::newInstance()
-//				->single()
-//				->select("t.*, d.uri, d.mtime AS client_mtime, d.data")
-//				->criteria($whereCriteria)
-//				->join(DavTask::model()->tableName(), $joinCriteria,'d', 'LEFT');
-//			$task = \GO\Tasks\Model\Task::model()->find($findParams);
-			$uid = str_replace('.vcf', '',$objectUri);
-			$task = Task::find()->where(['uid'=>$uid, 'tasklistId'=>$calendar->tasklist_id])->single();
+			$task = $this->getTaskByUri($objectUri, $calendarId);
 
 			if ($task) {
-
 				\GO::debug('Found task');
-
-				if(!empty($task->vcalendarBlobId)) {
-					//task has a stored VCalendar
-					$blob = Blob::findById($task->vcalendarBlobId);
-					$VCalendar = Reader::read($blob->getFile()->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
-					$data = $VCalendar->serialize();
-				} else {
-					$parser = new VCalendar();
-					$data = $parser->export($task);
-				}
-
-				\GO::debug($data);
-
+				$data = $this->fromBlob($task);
 				$object = array(
 					'id' => $task->id,
 					'uri' => $task->getUri(),
@@ -671,7 +588,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 					'lastmodified' => $task->modifiedAt->getTimestamp(),
 					'etag'=>'"' .$task->etag().'"'
 				);
-
 
 				return $object;
 			}
@@ -737,34 +653,17 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				//store calendar data because we need to reply with the exact client data
 
 
-			}else { // VTODO
+			} else { // VTODO
 				$calendar = Calendar::model()->findByPk($calendarId);
-//				$vcalendar = \GO\Base\VObject\Reader::read($calendarData);
-//
-//				$task = new Task();
+				$vcalendar = \GO\Base\VObject\Reader::read($calendarData);
 				$parser = new VCalendar();
-				$tasks = $parser->tasksFromVTodo($calendarData, $calendar->tasklist_id);
-
-
-
-				$blob = Blob::fromString($calendarData);
-				$blob->save();
-				$task = $tasks[0];
-				$task->vcalendarBlobId = $blob->id;
+				$task = $parser->vtodoToTask($vcalendar, $calendar->tasklist_id);
 				$task->setUri($objectUri);
 				if($task->save()){
 					return $task->etag();
 				} else {
 					throw new \Exception(var_export($task->getValidationErrors(),true));
 				}
-
-//				$task = new \GO\Tasks\Model\Task();
-//				$task->setUri($objectUri);
-//				$task->importVObject($vcalendar->vtodo[0], array('tasklist_id'=>$calendar->tasklist_id,'uuid'=>$uuid));
-//
-//				CaldavModule::saveTask($task, false, $vcalendar->serialize());
-
-
 			}
 		}catch(\GO\Base\Exception\AccessDenied $e){
 //			\GO::debug($e);
@@ -788,9 +687,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	public function updateCalendarObject($calendarId, $objectUri, $calendarData) {
 
 		\GO::debug("updateCalendarObject($calendarId,$objectUri,[data])");
-
 		\GO::debug($calendarData);
-
 
 		try{
 
@@ -888,23 +785,14 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				\GO::debug('item is a task');
 
 				$vcalendar = \GO\Base\VObject\Reader::read($calendarData);
+				$task = $this->getTaskByUri($objectUri, $calendarId);
 
 
 				$parser = new VCalendar();
-				$tasks = $parser->tasksFromVTodo($calendarData, $calendar->tasklist_id);
-				if($tasks[0]->save()){
-					return $tasks[0]->etag();
+				$task = $parser->vtodoToTask($vcalendar, $calendar->tasklist_id, $task);
+				if($task->save()){
+					return $task->etag();
 				}
-
-				//$task = $this->getTaskByUri($objectUri, $calendar->tasklist_id);
-
-
-//				$task->importVObject($vcalendar->vtodo[0]);
-//
-//				$davTask = DavTask::model()->findByPk($task->id);
-//				CaldavModule::saveTask($task, $davTask, $vcalendar->serialize());
-//
-//				return $task->getETag();
 			}
 
 		}catch(\GO\Base\Exception\AccessDenied $e){
@@ -915,9 +803,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			throw new Exception\Forbidden('Validation errors: '.$e->getMessage());
 		}	catch(\Exception $e){
 			\go\core\ErrorHandler::logException($e);
-
 			return false;
-
 		}
 	}
 

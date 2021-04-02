@@ -54,6 +54,7 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   `privacy` VARCHAR(7) NULL DEFAULT 'public',
   `percentComplete` TINYINT(4) NOT NULL DEFAULT 0,
   `uri` VARCHAR(190) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NULL DEFAULT NULL,
+  `vcalendarBlobId` BINARY(40) NULL,
   PRIMARY KEY (`id`),
   INDEX `list_id` (`tasklistId` ASC),
   INDEX `rrule` (`recurrenceRule`(191) ASC),
@@ -62,6 +63,7 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   INDEX `createdBy` (`createdBy` ASC),
   INDEX `filesFolderId` (`filesFolderId` ASC),
   INDEX `tasks_task_groupId_idx` (`groupId` ASC),
+  INDEX `tasks_vcalendar_blob_idx` (`vcalendarBlobId` ASC),
   CONSTRAINT `fkModifiedBy`
     FOREIGN KEY (`modifiedBy`)
     REFERENCES `core_user` (`id`),
@@ -75,10 +77,16 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
     FOREIGN KEY (`groupId`)
     REFERENCES `tasks_tasklist_group` (`id`)
     ON DELETE SET NULL
-    ON UPDATE CASCADE)
+    ON UPDATE CASCADE,
+  CONSTRAINT `tasks_vcalendar_blob`
+    FOREIGN KEY (`vcalendarBlobId`)
+    REFERENCES `core_blob` (`id`)
+    ON DELETE SET NULL
+    ON UPDATE SET NULL)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
+
 
 
 -- -----------------------------------------------------

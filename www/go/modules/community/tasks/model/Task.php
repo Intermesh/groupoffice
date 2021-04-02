@@ -347,6 +347,9 @@ class Task extends AclItemEntity {
 		return parent::sort($query, $sort);
 	}
 
+	public function etag() {
+		return $this->vcalendarBlobId;
+	}
 
 	public function getUid() {
 		return $this->uid;		
@@ -358,7 +361,7 @@ class Task extends AclItemEntity {
 
 	public function getUri() {
 		if(!isset($this->uri)) {
-			$this->uri = $this->getUid() . '.vcf';
+			$this->uri = $this->getUid() . '.ics';
 		}
 
 		return $this->uri;
