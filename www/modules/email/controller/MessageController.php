@@ -888,7 +888,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			} catch (\GO\Base\Exception\AccessDenied $e) {
 				$templateContent = "";
 			}
-			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($templateContent);
+			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($templateContent, false);
 			
 			$unsetSubject = empty($message->subject);
 			

@@ -7,6 +7,10 @@ go.print = function(tmpl, data) {
 
 };
 
+go.reload = function() {
+	window.location.replace(window.location.pathname);
+};
+
 go.Colors = [
 	'C62828', 'AD1457', '6A1B9A', '4527A0', '283593', '1565C0', '0277BD', '00838F',
 	'00695C', '2E7D32', '558B2F', '9E9D24', 'F9A825', 'FF8F00', 'EF6C00', '424242'];

@@ -150,7 +150,9 @@ class Installer {
 		$this->installEmailTemplate();
 
 		foreach ($installModules as $installModule) {
-			$installModule->install();
+			if(!$installModule->isInstalled()) {
+				$installModule->install();
+			}
 		}
 
 		App::get()->getSettings()->systemEmail = $admin->email;
@@ -328,6 +330,12 @@ class Installer {
 		
 	}
 
+	/**
+	 * Disable modules that are no longer available
+	 *
+	 * @return bool true if modules were disabled
+	 * @throws Exception
+	 */
 	public function disableUnavailableModules() {
 
 		$unavailable = $this->getUnavailableModules();
@@ -339,7 +347,11 @@ class Installer {
 			}
 			$stmt = go()->getDbConnection()->update("core_module", ['enabled' => false], $where);
 			$stmt->execute();
+
+			return $stmt->rowCount() > 0;
 		}
+
+		return false;
 	}
 
 	private function initLogFile() {

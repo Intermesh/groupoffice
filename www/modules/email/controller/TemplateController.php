@@ -65,7 +65,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 	protected function afterLoad(&$response, &$model, &$params) {
 		
 		// create message model from client's content field, turned into HTML format
-		$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($model->content);
+		$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($model->content, false);
 	
 		$html = empty($params['content_type']) || $params['content_type']=='html';
 		

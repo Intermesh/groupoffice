@@ -14,6 +14,7 @@ use go\core\model\User;
 use go\core\model\Log;
 use go\core\jmap\Request;
 use go\core\http\Response;
+use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
 
 /**
@@ -206,7 +207,10 @@ class Authenticate {
 	}
 
 	public function recovery($hash) {
-		$oneHourAgo = (new DateTime())->modify('-1 hour');
+		if(empty($hash)) {
+			return false;
+		}
+		$oneHourAgo = new DateTime('-1 hour');
 		$user = User::find()
 			->where('recoveryHash = :hash AND recoverySendAt > :time')
 			->bind([
