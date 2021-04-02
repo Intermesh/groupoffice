@@ -1,3 +1,6 @@
+02-04-2021 6.5.39
+- Email: Fixed could not parse XML error
+
 01-04-2021 6.5.38
 - Core: array relation with ID's keeps records
 - Core: Module dependencies are respected
