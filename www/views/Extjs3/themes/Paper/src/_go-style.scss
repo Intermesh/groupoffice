@@ -1584,6 +1584,10 @@ table[id^="comments-ext"] b {
 		}
 	}
 
+	.x-grid3-row .ux-row-action {
+		opacity: 1;
+	}
+
 }
 
 @media screen and (max-width: 1000px) {
@@ -2200,6 +2204,13 @@ table[id^="comments-ext"] b {
 			@include var(background-color, c-accent);
 		}
 	}
+
+	&.accent {
+		&:hover, &:focus {
+			transition: all 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+			@include var(background-color, c-primary);
+		}
+	}
 }
 
 .go-page {
@@ -2242,6 +2253,7 @@ table[id^="comments-ext"] b {
 
 	button, a.button {
 		@extend .go-button;
+		text-decoration: none;
 	}
 
 	h2 {
@@ -2267,23 +2279,21 @@ table[id^="comments-ext"] b {
 		color: #666;
 	}
 
-	input:not([type=checkbox]):not([type=radio]) {
-		color: rgba(0, 0, 0, 0.87);
+	textarea, input:not([type=checkbox]):not([type=radio]) {
+
+		@extend %font-data;
+		color: color($fg, 'text');
+		min-height: dp(32);
+		line-height: dp(20);
+		//line-height: dp(18);
+		transition: border-color 100ms linear, box-shadow 225ms linear;
+		border-radius: dp(4);
 		width: 100%;
-		padding: 0 0 8px;
-		border: none;
-		transition: background-color 180ms cubic-bezier(0.4, 0, 0.2, 1), transform 180ms cubic-bezier(0.4, 0, 0.2, 1);
-		border-bottom: 2px solid rgba(0, 0, 0, 0.12);
-		background: none;
-		font-size: inherit;
-		-webkit-appearance: none; }
-	input:focus {
-		outline: none;
-		border-bottom: 2px solid #212121; }
-	input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active {
-		transition: background-color 5000s ease-in-out 0s, color 5000s ease-in-out 0s;
-		transition-delay: background-color 5000s, color 5000s;
-		-webkit-text-fill-color: #2a2a2a;
+		background-color:color($bg, 'box');
+		border: 1px solid color($fg, 'track');
+		display: inline-block;
+		padding: dp(6) dp(8);
+
 	}
 
 	pre {

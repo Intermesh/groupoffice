@@ -99,7 +99,8 @@ try {
 			} else {
 
 				if (empty($data['username']) || empty($data['password'])) {
-					output(["error" => "Bad request"], 400, "Bad request");
+					$msg = "Missing arguments 'username' and 'password' for authenticatoin.";
+					output(["error" => $msg], 400, $msg);
 				}
 
 				$user = $auth->passwordLogin($data['username'], $data['password']);

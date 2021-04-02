@@ -87,8 +87,13 @@ if (!empty($_POST)) {
 				continue;
 			}
 			if ($moduleController->autoInstall() && $moduleController->isInstallable()) {
-                if(!Module::install($moduleController->name())) {
-                    throw new \Exception("Could not save module " . $moduleController->name());
+			    try {
+                    Module::install($moduleController->name());
+                }
+                catch(\Exception $e) {
+			        //could be a license error due to an unlicensed module depending
+                  //on a licensed module
+			        core\ErrorHandler::logException($e);
                 }
 			}
 		}
