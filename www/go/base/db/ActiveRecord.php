@@ -3522,12 +3522,15 @@ abstract class ActiveRecord extends \GO\Base\Model{
 					GO::debug("Fixing linked e-mail acl's because relation ".$arr[0]." changed.");
 
 					$stmt = \GO\Savemailas\Model\LinkedEmail::model()->findLinks($this);
-					while($linkedEmail = $stmt->fetch()){
+					if($stmt->rowCount()) {
+						$aclId = $this->findAclId();
+						while ($linkedEmail = $stmt->fetch()) {
 
-						GO::debug("Updating ".$linkedEmail->subject);
+							GO::debug("Updating " . $linkedEmail->subject);
 
-						$linkedEmail->acl_id=$this->findAclId();
-						$linkedEmail->save();
+							$linkedEmail->acl_id = $aclId;
+							$linkedEmail->save();
+						}
 					}
 				}
 			}
@@ -3707,11 +3710,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$search->setAclId(!empty($attr['aclId']) ? $attr['aclId'] : $this->findAclId());
 		//$search->createdAt = \DateTime::createFromFormat("U", $this->mtime);		
 		//$search->setKeywords($this->getSearchCacheKeywords($this->localizedName.','.implode(',', $attr)));
-		
-		//todo cut lengths
-		
-
-
 
 		$keywords = $this->getSearchCacheKeywords($this->localizedName.','.implode(',', $attr));
 		$keywords = array_filter($keywords, function($word) {
@@ -3825,14 +3823,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		} else if(!empty($this->columns[$attributeName]['length']) && \GO\Base\Util\StringHelper::length($this->_attributes[$attributeName]) > $this->columns[$attributeName]['length']){
 			$this->_attributes[$attributeName]=\GO\Base\Util\StringHelper::substr($this->_attributes[$attributeName], 0, $this->columns[$attributeName]['length']);
 		}
-	}
-
-	public function getCachedSearchRecord(){
-		$model = \GO\Base\Model\SearchCacheRecord::model()->findByPk(array('model_id'=>$this->pk, 'model_type_id'=>$this->modelTypeId()));
-		if($model)
-			return $model;
-		else
-			return $this->cacheSearchRecord ();
 	}
 
 	/**
@@ -4784,7 +4774,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 *
 	 * selects all contacts linked to the $noteModel
 	 *
-	 * @param ActiveRecord $model
+	 * @param ActiveRecord|Entity $model
 	 * @param FindParams $findParams
 	 * @return ActiveStatement
 	 */
@@ -4796,9 +4786,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		$joinCriteria = FindCriteria::newInstance()
 						->addCondition('fromId', $model->id,'=','l')
-						->addCondition('fromEntityTypeId', $model->modelTypeId(),'=','l')
+						->addCondition('fromEntityTypeId', $model->entityType()->getId(),'=','l')
 						->addRawCondition("t.id", "l.toId")
-						->addCondition('toEntityTypeId', $this->modelTypeId(),'=','l');
+						->addCondition('toEntityTypeId', $this->entityType()->getId(),'=','l');
 
 		$findParams->join("core_link", $joinCriteria, 'l');
 

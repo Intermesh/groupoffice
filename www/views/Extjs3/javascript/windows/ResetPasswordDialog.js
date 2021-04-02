@@ -119,7 +119,7 @@ Ext.extend(GO.dialog.ResetPasswordDialog, GO.Window, {
 					msg: t("Your password has been changed"),
 					buttons: Ext.Msg.OK,
 					fn: function() {
-						document.location = GO.url();
+						go.reload();
 					}
 				});
 			},

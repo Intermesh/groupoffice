@@ -1,11 +1,4 @@
-
-Finance branch
-- Business: New finance module
-- Projects: new module
-- Tasks: new module
-- Time tracking: new module
-
-6.5
+01-04-2021 6.5.38
 - Core: array relation with ID's keeps records
 - Core: Module dependencies are respected
 - Business: New employee management module
@@ -19,10 +12,29 @@ Finance branch
 - Core: Default authentication domain is appended automatically when local user isn't available. This allows ldap users
   to login with their username without appending or selecting a domain. Removed the domain combo because it's no longer
   needed with this change.
+- Core: Smaller header bar
 
-end 6.5
---------
 
+------
+
+
+
+
+
+01-04-2021 6.4.230
+- Email: Preseve body style attributes
+- Billing: Hide projects tab in report if no projects module available
+- Email: hide context menu 'Delete sender from' if no items available
+- Core: Make Account settings > Groups scrollable for non-admin users
+- Email: SMIME decrypted content in reply too when plaintext is enabled
+- Core: List navigation after delete could move in wrong direction
+- Core: update acl's of linked emails when acl id changes (ie. move contact to another address book)
+
+18-03-2021 6.4.229
+- Core: Business Module.php files were encoded. This stopped Group-Office from running without Ioncube.
+- Core: Prevent multiple chips options to be displayed multiple times
+- Core: Multiselect option store will self-destruct
+- Projects2: prevent filling contact and customer ids from previous projects
 
 15-03-2021 6.4.228
 - Core: fix for faulty headers appearing multiple times. This could break ActiveSync.

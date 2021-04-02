@@ -787,6 +787,16 @@
 			@include var(background-color, c-accent);
 		}
 	}
+
+	&.accent {
+		@include var('background-color', c-accent);
+		color: white;
+
+		&.x-btn-focus, &.x-btn-over {
+			transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+			@include var(background-color, c-primary);
+		}
+	}
 	&.danger {
 		&.x-btn-focus, &.x-btn-over {
 			@include var(background-color, c-primary-tp);

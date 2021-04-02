@@ -888,7 +888,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			} catch (\GO\Base\Exception\AccessDenied $e) {
 				$templateContent = "";
 			}
-			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($templateContent);
+			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($templateContent, false);
 			
 			$unsetSubject = empty($message->subject);
 			
@@ -1206,9 +1206,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 			
 			$oldMessage = $message->toOutputArray(false,false,true);
-			
+
 			if(!empty($oldMessage['smime_encrypted'])) {
-				$oldMessage['plainbody'] = '***';
+				$response['sendParams']['encrypt_smime'] = true;
 			}
 			
 			$response['data']['plainbody'] .= "\n\n" . $replyText . "\n" . $this->_quoteText($oldMessage['plainbody']);

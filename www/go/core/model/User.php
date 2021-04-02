@@ -358,6 +358,8 @@ class User extends Entity {
 	}
 
 	public function setPassword($password) {
+		$this->recoveryHash = null;
+		$this->recoverySendAt = null;
 		$this->plainPassword = $password;
 	}
 
@@ -797,7 +799,7 @@ class User extends Entity {
 		go()->getDbConnection()->beginTransaction();
 
 		go()->getDbConnection()->delete('go_settings', (new Query)->where('user_id', 'in', $query))->execute();
-		go()->getDbConnection()->delete('go_reminders', (new Query)->where('user_id', 'in', $query))->execute();
+		//go()->getDbConnection()->delete('go_reminders', (new Query)->where('user_id', 'in', $query))->execute();
 		go()->getDbConnection()->delete('go_reminders_users', (new Query)->where('user_id', 'in', $query))->execute();
 
 		Group::delete( (new Query)->where('isUserGroupFor', 'in', $query));
@@ -861,7 +863,7 @@ class User extends Entity {
 	private $contact;
 	
 	public function getProfile() {
-		if(!Module::findByName('community', 'addressbook')) {
+		if(!Module::isInstalled('community', 'addressbook')) {
 			return null;
 		}
 		
@@ -875,7 +877,7 @@ class User extends Entity {
 	}
 	
 	public function setProfile($values) {
-		if(!Module::findByName('community', 'addressbook')) {
+		if(!Module::isInstalled('community', 'addressbook')) {
 			throw new Exception("Can't set profile without address book module.");
 		}
 		

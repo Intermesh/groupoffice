@@ -27,9 +27,9 @@ class SavedMessage extends ComposerMessage {
 	 * @param StringHelper $mimeData MIME data string
 	 * @return SavedMessage 
 	 */
-	public function createFromMimeData($mimeData) {
+	public function createFromMimeData($mimeData, $preserveHtmlStyle = true) {
 		$m = new SavedMessage();		
-		$m->setMimeData($mimeData);
+		$m->setMimeData($mimeData, $preserveHtmlStyle);
 		return $m;
 	}
 
@@ -40,7 +40,7 @@ class SavedMessage extends ComposerMessage {
 	 * @param bookean $isTempFile Indicates if path it relative from tmpdir or file_storage_path
 	 * @return SavedMessage
 	 */
-	public function createFromMimeFile($path, $isTempFile=false) {
+	public function createFromMimeFile($path, $isTempFile=false, $preserveHtmlStyle = true) {
 		
 		$fullPath = $isTempFile ? \GO::config()->tmpdir.$path : \GO::config()->file_storage_path.$path;
 		
@@ -52,7 +52,7 @@ class SavedMessage extends ComposerMessage {
 		
 		$mimeData = $file->contents();
 		
-		return $this->createFromMimeData($mimeData);
+		return $this->createFromMimeData($mimeData, $preserveHtmlStyle);
 	}
 	
 	/**
@@ -60,7 +60,7 @@ class SavedMessage extends ComposerMessage {
 	 * @param StringHelper $mimeData The MIME data string.
 	 * @return SavedMessage 
 	 */
-	public function setMimeData($mimeData) {
+	public function setMimeData($mimeData, $preserveHtmlStyle = true) {
 	
 //		if (!empty($path))
 //			$attributes['path'] = $path;
@@ -117,7 +117,7 @@ class SavedMessage extends ComposerMessage {
 		
 		$this->setAttributes($attributes);
 		
-		$this->_getParts($structure);
+		$this->_getParts($structure, "", $preserveHtmlStyle);
 
 		$this->_loadedBody = $this->_loadedBody;
 	}
@@ -164,7 +164,7 @@ class SavedMessage extends ComposerMessage {
 //		}
 //	}
 
-	private function _getParts($structure, $part_number_prefix='') {
+	private function _getParts($structure, $part_number_prefix='', $preserveHtmlStyle = true) {
 				
 		if (isset($structure->parts)) {
 			$structure->ctype_primary = strtolower($structure->ctype_primary);
@@ -189,10 +189,10 @@ class SavedMessage extends ComposerMessage {
 					$body = \GO\Base\Util\StringHelper::clean_utf8($part->body, $charset);
 					
 					if (stripos($part->ctype_secondary, 'plain') !== false) {
-						$body = nl2br($body);
+						$body = '<div class="msg">' . nl2br($body) . '</div>';
 					} else {
 						$body = \GO\Base\Util\StringHelper::convertLinks($body);
-						$body = \GO\Base\Util\StringHelper::sanitizeHtml($body);
+						$body = \GO\Base\Util\StringHelper::sanitizeHtml($body, $preserveHtmlStyle);
 						$body = $body;
 					}
 					$this->_loadedBody .= $body;

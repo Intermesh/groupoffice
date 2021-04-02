@@ -95,7 +95,7 @@ class Token extends Entity {
 	
 	protected static function defineMapping() {
 		return parent::defineMapping()
-		->addTable('core_auth_token');
+		->addTable('core_auth_token', 'token');
 	}
 	
 	protected function init() {
@@ -436,7 +436,19 @@ class Token extends Entity {
 
 		return $this->classPermissionLevels[$cls];
 	}
-  
+
+
+	/**
+	 * Destroys all tokens except
+	 * @return bool
+	 * @throws \Exception
+	 */
+	public static function logoutEveryoneButAdmins() {
+		$admins = (new Query)->select('userId')->from('core_user_group')->where('groupId', '=', Group::ID_ADMINS);
+		return self::delete((new Query)
+			->where('expiresAt', '!=', null)
+			->where('userId', 'NOT IN ', $admins));
+	}
 
 	
 	

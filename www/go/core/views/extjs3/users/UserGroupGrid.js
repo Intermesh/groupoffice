@@ -42,6 +42,14 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 							return me.value.indexOf(data.id) > -1;
 						}
 					}
+				},
+				{
+					name: 'disabled',
+					type: {
+						convert: function(v) {
+							return !go.User.isAdmin;
+						}
+					}
 				}
 //				{name: 'user', type: go.data.types.User, key: 'isUserGroupFor'},
 			],
@@ -104,8 +112,6 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 
 		go.users.UserGroupGrid.superclass.initComponent.call(this);		
 
-		this.setDisabled(!go.User.isAdmin);
-
 		this.on('render', function() {
 			if(!this.store.loaded && !this.store.loading) {
 				this.store.load();
@@ -116,8 +122,7 @@ go.users.UserGroupGrid = Ext.extend(go.grid.GridPanel, {
 	onCheckChange : function(record, newValue) {
 		if(newValue) {
 			this.value.push(record.id);
-		} else
-		{
+		} else {
 			this.value.splice(this.value.indexOf(record.id), 1);
 		}
 		this._isDirty = true;

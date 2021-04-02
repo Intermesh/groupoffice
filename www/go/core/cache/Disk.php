@@ -96,7 +96,7 @@ class Disk implements CacheInterface {
 		try {
 			$v = unserialize($serialized);
 			if(is_array($v) && isset($v['e'])) {
-				if($v['expires'] < time()) {
+				if($v['e'] < time()) {
 					$this->delete($key);
 					return null;
 				} else{
@@ -106,7 +106,7 @@ class Disk implements CacheInterface {
 			$this->cache[$key] = $v;
 		}
 		catch(\Exception $e) {
-			ErrorHandler::log("Could not unserialize cache from file " . $key.' data: '.var_export($serialized, true));
+			ErrorHandler::log("Could not unserialize cache from file " . $key.' error: '. $e->getMessage());
 			$this->delete($key);
 			return null;
 		}
