@@ -1053,20 +1053,24 @@ END;
 		}
 
 		try {
-			$bodyEl = new \SimpleXMLElement($matches[0] . '</body>');
+			$d = new \DOMDocument();
+			$d->loadHTML("<html>" . $matches[0] . '</body></html>');
+			$bodyEls = $d->getElementsByTagName('body');
+			if(!$bodyEls->length) {
+				return $style;
+			}
+			$bodyEl = $bodyEls->item(0);
 		} catch (\Exception $e) {
 			ErrorHandler::logException($e);
-			go()->warn("Could not parse XML: " . $matches[0] . '</body>');
+			return $style;
 		}
 
-		$attr = $bodyEl->attributes();
-
-		if(isset($attr['bgcolor'])) {
-			$style .= "background-color: " . $attr['bgcolor'] .";";
+		if($bodyEl->hasAttribute("bgcolor")) {
+			$style .= "background-color: " . $bodyEl->getAttribute("bgcolor").";";
 		}
 
-		if(isset($attr['style'])) {
-			$style .= $attr['style'];
+		if($bodyEl->hasAttribute("style")) {
+			$style .= $bodyEl->getAttribute("style");
 		}
 
 		return $style;
