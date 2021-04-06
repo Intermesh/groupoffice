@@ -1,10 +1,12 @@
+6.5.41
+- Tasks: Fixed link to project
+
 06-04-2021 6.5.40
 - Core: Notification open in your face to bring more attention
 - Core: Closing desktop notification will dismiss reminder in Group-Office too.
 - Core: Closing/dismiss reminder in Group-Office will close desktop notification.
 - History: Fix error when comments module not enabled
 - Core: Removed duplicate queries from updates script
-- Tasks: Fixed link to project
 
 02-04-2021 6.5.39
 - Email: Fixed could not parse XML error
