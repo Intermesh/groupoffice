@@ -14,12 +14,10 @@ go.modules.comments.CommentForm = Ext.extend(go.form.Dialog, {
 					name: "date",
 					fieldLabel: t("Date")
 				},
-				new go.form.HtmlEditor({
-					enableFont: false,
-					enableFontSize: false,
-					enableAlignments: false,
-					//enableSourceEdit: false,
-					//plugins: [go.form.HtmlEditor.emojiPlugin],
+				new go.form.CKEditor({
+					editorConfig: {
+						removeButtons: 'Format,Font,FontSize,JustifyLeft,JustifyCenter,JustifyRight,JustifyBlock',
+					},
 					name: 'text',
 					fieldLabel: "",
 					hideLabel: true,

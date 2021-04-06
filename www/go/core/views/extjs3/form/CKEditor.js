@@ -6,6 +6,21 @@ go.form.CKEditor = Ext.extend(Ext.form.TextArea, {
 
     editor: null,
 
+    constructor: function(config) {
+
+        config = config || {};
+        config.editorConfig = config.editorConfig || {};
+
+        if (config.grow) {
+            config.editorConfig.extraPlugins = 'autogrow';
+            config.editorConfig.autoGrow_minHeight = 200;
+            config.editorConfig.autoGrow_maxHeight = 600;
+            config.editorConfig.autoGrow_bottomSpace = 50;
+        }
+
+        go.form.CKEditor.superclass.constructor.call(this, config);
+    },
+
     /**
      *
      */
@@ -15,6 +30,7 @@ go.form.CKEditor = Ext.extend(Ext.form.TextArea, {
 
         this.addEvents({
             editorReady: true,
+            attach: true,
         });
 
         this.on('afterrender', function () {
@@ -27,6 +43,7 @@ go.form.CKEditor = Ext.extend(Ext.form.TextArea, {
                     {
                         name: 'go',
                         items: [
+                            'Format',
                             'Undo', 'Redo', '-',
                             'Bold', 'Italic', 'Underline', '-',
                             'TextColor', 'BGColor',
@@ -47,15 +64,35 @@ go.form.CKEditor = Ext.extend(Ext.form.TextArea, {
 
             me.editor.on("instanceReady", function (ev) {
 
+                //copy paste via word button
+                me.editor.on("beforeCommandExec", function (event) {
+                    // Show the paste dialog for the paste buttons and right-click paste
+                    if (event.data.name === "paste") {
+                        event.editor._.forcePasteDialog = true;
+                    }
+                    // Don't show the paste dialog for Ctrl+Shift+V
+                    if (event.data.name === "pastetext" && event.data.commandData.from === "keystrokeHandler") {
+                        event.cancel();
+                    }
+                });
+
+                //keydown - submit
+                me.editor.on('key', function (evt) {
+                    if (Ext.EventObject.ctrlKey && Ext.EventObject.ENTER === evt.data.domEvent.$.keyCode) {
+                        this.fireEvent('ctrlenter', this);
+                    }
+                }, me);
+
+                //change
+                me.editor.on('change', function () {
+                    me.fireEvent('editorChange', me.editor, me.editor.getData());
+                });
+
                 //resize
                 me.editor.resize(me.lastSize.width, me.lastSize.height);
 
                 //fire ready
                 me.fireEvent("editorReady", me, me.editor);
-            });
-
-            me.editor.on('change', function () {
-                me.fireEvent('editorChange', me.editor, me.editor.getData());
             });
 
             me.editor.latestTransferId = null;
@@ -65,22 +102,23 @@ go.form.CKEditor = Ext.extend(Ext.form.TextArea, {
                     filesCount = dataTransfer.getFilesCount(),
                     file;
 
-                if(!filesCount || me.editor.latestTransferId === dataTransfer.id) {
+                if (!filesCount || me.editor.latestTransferId === dataTransfer.id) {
                     return;
                 }
 
-                for (var i=0; i < filesCount; i++) {
+                for (var i = 0; i < filesCount; i++) {
                     file = dataTransfer.getFile(i);
 
                     go.Jmap.upload(file, {
-                        success: function(response) {
+                        success: function (response) {
                             if (file.type.match(/^image\//)) {
                                 evt.data.dataValue = '<img style="max-width: 100%" src="' + go.Jmap.downloadUrl(response.blobId, true) + '" alt="' + file.name + '" />';
                             } else {
-                                evt.data.dataValue = '<a href="' + go.Jmap.downloadUrl(response.blobId) + '">' + file.name + '</a>';
+                                //evt.data.dataValue = '<a href="' + go.Jmap.downloadUrl(response.blobId) + '">' + file.name + '</a>';
                             }
                             evt.data.type = 'html';
-                            me.editor.fire( 'paste', evt.data );
+                            me.editor.fire('paste', evt.data);
+                            me.fireEvent('attach', me, response, file)
                         },
                         scope: this,
                     });
@@ -106,6 +144,13 @@ go.form.CKEditor = Ext.extend(Ext.form.TextArea, {
             go.form.CKEditor.superclass.setValue.call(this, value);
             this.fireEvent('change', this, value);
         }, this, {buffer: 1000});
+
+        //editor resize
+        this.on('resize', function (field, adjWidth, adjHeight) {
+            if (this.editor && this.editor.status === 'ready') {
+                this.editor.resize(adjWidth || this.container.getWidth(), adjHeight || this.container.getHeight());
+            }
+        }, this);
     },
 
     /**
@@ -149,6 +194,10 @@ go.form.CKEditor = Ext.extend(Ext.form.TextArea, {
         if (!Ext.isEmpty(CKEDITOR.instances[this.editorId])) {
             delete CKEDITOR.instances[this.editorId];
         }
+
+        delete this.editorConfig;
+        delete this.editorId;
+        delete this.editor;
     },
 
     /**

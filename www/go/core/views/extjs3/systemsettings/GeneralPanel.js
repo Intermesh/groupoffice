@@ -75,7 +75,7 @@ go.systemsettings.GeneralPanel = Ext.extend(go.systemsettings.Panel, {
 							}
 						}, 
 						{
-							xtype: "xhtmleditor",
+							xtype: "ckeditor",
 							anchor: "100%",
 							height: dp(200),
 							name: 'loginMessage',

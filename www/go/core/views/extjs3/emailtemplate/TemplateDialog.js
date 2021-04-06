@@ -36,8 +36,7 @@ go.emailtemplate.TemplateDialog = Ext.extend(go.form.Dialog, {
 					fieldLabel: t("Subject")
 				}, {
 					anchor: "100% -" + dp(96),
-					xtype: 'xhtmleditor',
-					plugins: [new GO.plugins.HtmlEditorImageInsert()],
+					xtype: 'ckeditor',
 					name: 'body',
 					hideLabel: true,
 					listeners: {

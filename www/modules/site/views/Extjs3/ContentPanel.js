@@ -184,17 +184,6 @@ GO.site.ContentPanel = Ext.extend(Ext.form.FormPanel, {
 			this.slugField.setValue(this.formatSlug(field.getValue()));
 		}, this);
 
-//		
-//		this.editor = new GO.form.HtmlEditor({
-//			hideLabel:true,
-//			name: 'content',
-//			anchor: '100% -80',
-//			allowBlank:true,
-//			enableLinks:false,
-//			fieldLabel: t("Content", "site"),
-//			plugins:this.initHtmlEditorPlugins()
-//		});
-
 		this.editor = new Ext.form.TextArea({
 			hideLabel: true,
 			style: 'font-family: "Lucida Console", Monaco, monospace;padding:10px;line-height:16px;',

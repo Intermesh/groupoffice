@@ -177,26 +177,18 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		
 		var anchorHeight = config.enableSubjectField ? "-" + dp(32) : "100%";
 
-
-		this.htmlEditor = new GO.form.HtmlEditor({
-			name:'htmlbody',
+		this.htmlEditor = new go.form.CKEditor({
+			name: 'htmlbody',
 			hideLabel: true,
-			headingsMenu: false,
-			anchor: '100% '+anchorHeight,
-			plugins:this.initHtmlEditorPlugins(),
-			//this font is applied here because it must match the one in htmleditor.scss. Ext will copy this style to the body tag.
-			style: "font: " + dp(16) + "px  Helvetica, Arial, sans-serif",
-			getFontStyle :  function() {
-				return GO.form.HtmlEditor.prototype.getFontStyle.call(this) + ';color: black';
+			editorConfig: {
+				removeButtons: 'Format',
 			},
-
-			getEditorFrameStyle : function() {
-				return GO.form.HtmlEditor.prototype.getEditorFrameStyle.call(this) + ' body {background-color: white}';
-			}
+			style: "font: " + dp(16) + "px  Helvetica, Arial, sans-serif",
+			anchor: '100% ' + anchorHeight,
 		});
 
 		this.htmlEditor.on('attach', this.htmlEditorAttach, this);
-		
+
 		this.textEditor = new Ext.form.TextArea({
 			name: 'plainbody',
 			anchor : '100% '+anchorHeight,
@@ -314,21 +306,6 @@ Ext.extend(GO.base.email.EmailEditorPanel, Ext.Panel, {
 		
 		this.htmlEditor.syncSize();
 		this.ownerCt.doLayout();
-	},
-
-	initHtmlEditorPlugins : function(htmlEditorConfig) {		
-		// optional image attachment
-		var imageInsertPlugin = new GO.plugins.HtmlEditorImageInsert();
-		imageInsertPlugin.on('insert', function(plugin, path, isTempFile, token) {
-			this.inlineAttachments.push({
-				tmp_file : path,
-				from_file_storage : !isTempFile,
-				token:token
-			});				
-			this.setInlineAttachments(this.inlineAttachments);	
-		}, this);
-	
-		return [imageInsertPlugin, go.form.HtmlEditor.emojiPlugin];
 	},
 	
 	getHtmlEditor : function() {

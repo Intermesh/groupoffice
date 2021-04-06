@@ -25,13 +25,12 @@ go.modules.community.notes.NoteDialog = Ext.extend(go.form.Dialog, {
 						allowBlank: false
 					},
 					{
-						xtype: 'xhtmleditor',
+						xtype: 'ckeditor',
 						name: 'content',
 						fieldLabel: "",
 						hideLabel: true,
 						anchor: '0 -90',
 						allowBlank: false,
-						plugins: [new GO.plugins.HtmlEditorImageInsert(), go.form.HtmlEditor.emojiPlugin],
 						listeners: {
 							scope: this,
 							ctrlenter: function() {

@@ -193,7 +193,7 @@ GO.reminders.ReminderDialog = Ext.extend(GO.dialog.TabbedFormDialog , {
 				selectOnFocus : true,
 				forceSelection : true
 			},{
-				xtype:'xhtmleditor',
+				xtype:'ckeditor',
 				name:'text',
 				fieldLabel:t("Text", "reminders"),
 				anchor:'100% -105'

@@ -15,7 +15,7 @@ go.modules.comments.QuickaddForm = Ext.extend(Ext.form.FormPanel, {
 			items:[
 				new go.modules.comments.CategoryCombo(),
 				{
-					xtype: 'xhtmleditor',
+					xtype: 'ckeditor',
 					name: 'text',
 					fieldLabel: "",
 					hideLabel: true,

@@ -38,7 +38,7 @@ go.customfields.type.Html = Ext.extend(go.customfields.type.Text, {
 	 */
 	createFormFieldConfig: function (customfield, config) {
 		var config = go.customfields.type.Html.superclass.createFormFieldConfig.call(this, customfield, config);
-		config.xtype = "xhtmleditor";
+		config.xtype = "ckeditor";
 		config.grow = true;
 
 		return config;
