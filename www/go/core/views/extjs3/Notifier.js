@@ -44,8 +44,8 @@ go.Notifier = {
 			}
 			return;
 		}
-		for(var icon in this._icons[key]) {
-			if(!icon.hidden) return;
+		for(var icon in this._icons) {
+			if(!this._icons[icon].hidden) return;
 		}
 		this.statusBar.hide();
 	},

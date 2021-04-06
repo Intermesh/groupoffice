@@ -49,11 +49,15 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			id:'dismiss',
 			qtip: t('Dismiss all'),
 			handler: function() {
-				if(confirm(t('Are you sure you want to dismiss all reminders?'))) {
-					this.doTask("dismiss_reminders", 0, this.reminderStore.data.keys);
-					this.reminders.removeAll();
-					go.Notifier.removeAll();
-				}
+				Ext.MessageBox.confirm(t("Confirm"), t('Are you sure you want to dismiss all reminders?'), function(btn){
+					if(btn=='yes') {
+						this.doTask("dismiss_reminders", 0, this.reminderStore.data.keys);
+						this.reminders.removeAll();
+						go.Notifier.removeAll();
+
+						go.Notifier.toggleIcon('reminder', false);
+					}
+				}, this);
 			},
 			scope:this
 		});
@@ -175,8 +179,9 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			},
 			callback: function(){
 				for (var i = 0; i < reminderIds.length;  i++) {
-					this.reminderStore.remove(reminderIds[i]);
+					this.reminderStore.remove(this.reminderStore.getById(reminderIds[i]));
 				}
+
 				GO.checker.lastCount = this.reminderStore.getCount();
 
 				if(!GO.checker.lastCount){
