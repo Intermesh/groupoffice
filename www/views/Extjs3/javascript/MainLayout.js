@@ -581,7 +581,13 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					layout: 'border',
 					split: false,
 					border: false,
-					items: [topPanel, this.tabPanel, notificationArea]
+					items: [{
+						region: "center",
+						layout: "border",
+						split: false,
+						border: false,
+						items: [topPanel, this.tabPanel]
+					},  notificationArea]
 				});
 
 

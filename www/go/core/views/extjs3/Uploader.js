@@ -151,7 +151,7 @@
 					persistent: false,
 					iconCls: 'ic-file-upload',
 					title: t('Upload failed'),
-					html:'<b>'+file.name+'</b><p class="danger">' +t('File size exceeds the maximum of {max}.').replace('{max}', go.util.humanFileSize(go.Jmap.capabilities.maxSizeUpload)) + '</p>'
+					description:'<b>'+file.name+'</b><p class="danger">' +t('File size exceeds the maximum of {max}.').replace('{max}', go.util.humanFileSize(go.Jmap.capabilities.maxSizeUpload)) + '</p>'
 				});
 				return;
 			}
@@ -276,7 +276,7 @@
 						persistent: false,
 						iconCls: 'ic-file-upload',
 						title: t('Upload failed'),
-						html: text
+						description: text
 					});
 
 					if(uploadNotification) {

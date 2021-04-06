@@ -20,7 +20,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			run: this.checkForNotifications,
 			scope:this,
 			interval: GO.settings.config.checker_interval*1000
-						 // interval: 5000 // debug / test config
+			// 			 interval: 5000 // debug / test config
 		});
 		this.initReminders();
 	},
@@ -71,8 +71,12 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			remoteSort: true,
 			remoteGroup: true
 		});
+
+		var me = this;
+
 		this.reminderStore.on('load',function(store, records) {
 			this.reminders.removeAll();
+
 			records.forEach(function(record) {
 
 				var snoozeMenuItems = [];
@@ -88,8 +92,8 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 				});
 
 				var ico = record.data.iconCls.split('\\').pop();
-				var reminderPanel;
-				this.reminders.add(reminderPanel = new Ext.Panel({
+				var reminderPanel = new Ext.Panel({
+					id: 'go-reminder-pnl-' + record.data.id,
 					record: record,
 					title: record.data.name,
 					iconCls: 'entity '+ico,
@@ -129,7 +133,22 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 						},
 						scope: this
 					}]
-				}))
+				});
+
+				reminderPanel.notification = go.Notifier.notify({
+						body: record.data.time,
+						title: record.data.name,
+						data: record.data,
+						tag: "reminder-" + record.data.id,
+						onclose: function (e) {
+							var reminderId = e.currentTarget.data.id;
+
+							me.doTask("dismiss_reminders", 0, [reminderId], reminderPanel);
+						}
+					}
+				);
+
+				this.reminders.add(reminderPanel );
 
 				snoozeMenu.items.each(function(i) {
 					i.setHandler(function(item){ this.doTask("snooze_reminders", item.value, [record.data.id], reminderPanel); }, this);
@@ -137,7 +156,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 			}, this);
 
-			go.Notifier.notificationArea.doLayout();
+			this.reminders.doLayout();
 
 		},this);
 
@@ -167,7 +186,17 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					go.Notifier.toggleIcon('reminder', false);
 				}
 
+				if(!reminderPanel) {
+					reminderPanel = Ext.getCmp('go-reminder-pnl-' + reminderIds[0]);
+				}
+
+				if(reminderPanel.notification) {
+					reminderPanel.notification.close();
+				}
+
 				reminderPanel && reminderPanel.destroy();
+
+
 			}, scope: this
 		});
 	},
@@ -216,6 +245,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 	handleReminderResponse : function(storeData){
 //		this.fireEvent('check', this, data);
 		var hasReminders = (storeData.total && storeData.total > 0);
+		var me = this;
 		go.Notifier.toggleIcon('reminder',hasReminders);
 
 		if(!hasReminders) return;
@@ -228,32 +258,30 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 		this.lastCount = this.reminderStore.getCount();
 
-		if(!GO.util.empty(GO.settings.popup_reminders)){
-			if (!("Notification" in window)) {
-				if(GO.util.isMobileOrTablet()) {
-					return;
-				}
-				GO.reminderPopup = GO.util.popup({
-					width:400,
-					height:400,
-					url:GO.url("reminder/display"),
-					target:'groupofficeReminderPopup',
-					position:'br',
-					closeOnFocus:false
-				});
-			} else {
-				var text = '';
+		// if(!GO.util.empty(GO.settings.popup_reminders)){
+		// 	if (!("Notification" in window)) {
+		// 		if(GO.util.isMobileOrTablet()) {
+		// 			return;
+		// 		}
+		// 		GO.reminderPopup = GO.util.popup({
+		// 			width:400,
+		// 			height:400,
+		// 			url:GO.url("reminder/display"),
+		// 			target:'groupofficeReminderPopup',
+		// 			position:'br',
+		// 			closeOnFocus:false
+		// 		});
+		// 	} else {
+		//
+		// 		// for (var i = 0, l = storeData.results.length; i < l; i++) {
+		// 		// 	var rem = storeData.results[i];
+		// 		//
+		// 		// }
+		//
+		// 	}
+		// }
 
-				for (var i = 0, l = storeData.results.length; i < l; i++) {
-					var rem = storeData.results[i];
-					text += '['+rem.time+'] ' + rem.type+': '+rem.name + "\n";
-				}
-
-				//console.log(storeData);
-
-				go.Notifier.notify({iconCls: "ic-notifications",text: text, title: t("Reminders")});
-			}
-		}
+		go.Notifier.showNotifications();
 		go.Notifier.playSound('message-new-email', 'reminder');
 
 	},

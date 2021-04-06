@@ -1277,7 +1277,7 @@ GO.mainLayout.onReady(function(){
 			return;
 		}
 
-		go.Notifier.toggleIcon('email',data.email_status.total_unseen > 0);
+		//go.Notifier.toggleIcon('email',data.email_status.total_unseen > 0);
 		GO.mainLayout.setNotification('email',data.email_status.total_unseen,'green');
 
 		var ep = GO.mainLayout.getModulePanel('email');
@@ -1305,26 +1305,15 @@ GO.mainLayout.onReady(function(){
 		var title = t("New email"),
 			text = t("You have %d unread email(s)").replace('%d', data.email_status.total_unseen);
 
-		if (GO.settings.popup_emails) {
-			go.Notifier.notify({
-				title: title,
-				text: text,
-				iconCls: 'ic-email',
-				icon: 'views/Extjs3/themes/Paper/img/notify/email.png'
-			});
-		}
-		go.Notifier.msg({
-			sound: 'message-new-email',
-			iconCls: 'ic-email',
-			items:[{xtype:'box',html:'<b>'+text+'</b>'}],
+		go.Notifier.notify({
 			title: title,
-			handler: function(){
-				GO.mainLayout.openModule('email');
-			}
-		}, 'email');
+			description: text,
+			iconCls: 'ic-email',
+			icon: 'views/Extjs3/themes/Paper/img/notify/email.png',
+			tag: "email"
+		});
 
-
-
+		go.Notifier.playSound('message-new-email', 'email');
 
 	});
 
