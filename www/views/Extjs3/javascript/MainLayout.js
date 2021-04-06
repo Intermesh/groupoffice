@@ -667,6 +667,17 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 			})
 		});
 
+		if(go.Modules.get("core", "core").settings.readOnlyKeys.indexOf('license') == -1) {
+			this.userMenuLink.menu.insert(6, {
+				iconCls: 'ic-app-registration',
+				text: t("Register"),
+				handler: function () {
+					const licenseDialog = new go.license.LicenseDialog();
+					licenseDialog.show();
+				},
+				scope: this
+			});
+		}
 
 		if(go.User.isAdmin) {
 			this.userMenuLink.menu.insert(3, {
@@ -714,16 +725,29 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	},
 	
 	welcome : function() {
-		if(go.User.id==1 && go.User.loginCount == 1 && !localStorage.welcomeShown) {
 
-			localStorage.welcomeShown = true;
+		if(go.User.id == 1)
+		{
+			const coreMod = go.Modules.get("core", "core");
 
-			Ext.MessageBox.alert(t("Welcome!"), t("Please complete the installation by running through the system settings. Click OK to continue to the system settings dialog."), function() {
-				go.systemsettingsDialog = new go.systemsettings.Dialog();						
-				go.systemsettingsDialog.show();
-			});
-			
-			
+			if(!coreMod.settings.welcomeShown) {
+				Ext.MessageBox.alert(t("Welcome!"), t("Please complete the installation by running through the system settings. Click OK to continue to the system settings dialog."), () => {
+
+					go.Db.store("Module").save({
+						settings: {
+							welcomeShown: true
+						}
+					}, coreMod.id);
+
+					go.systemsettingsDialog = new go.systemsettings.Dialog();
+					go.systemsettingsDialog.show();
+				});
+			}
+
+			if(!coreMod.settings.licenseDenied && !coreMod.settings.license) {
+				const licenseDialog = new go.license.LicenseDialog();
+				licenseDialog.show();
+			}
 		}
 	},
 //

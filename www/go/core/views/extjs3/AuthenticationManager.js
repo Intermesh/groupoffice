@@ -136,7 +136,7 @@ go.AuthenticationManager = (function () {
 						method: "DELETE",
 						callback: function() {
 							go.User.clearAccessToken();
-							document.location = BaseHref;
+							go.reload();
 						}
 					});
 				});
@@ -207,7 +207,7 @@ go.AuthenticationManager = (function () {
 				me.fireEvent("authenticated", me, result);
 
 				if(go.User.theme != GO.settings.config.theme) {
-					document.location = document.location;
+					go.reload();
 					return;
 				}
 			
