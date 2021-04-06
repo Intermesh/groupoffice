@@ -32,7 +32,7 @@ Ext.define('go.modules.community.history.HistoryDetailPanel',{
 			})
 		];
 
-		go.modules.comments.CommentsDetailPanel.superclass.initComponent.call(this);
+		go.modules.community.history.HistoryDetailPanel.superclass.initComponent.call(this);
 	},
 
 	onLoad: function (dv) {
