@@ -1,6 +1,7 @@
 6.5.40
 
 - History: Fix error when comments module not enabled
+- Core: Removed duplicate queries from updates script
 
 02-04-2021 6.5.39
 - Email: Fixed could not parse XML error
