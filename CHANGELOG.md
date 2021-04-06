@@ -1,3 +1,5 @@
+- OnlyOffice: Only office only worked in root of domain
+
 02-04-2021 6.4.231
 - Email: Fixed could not parse XML error
 
