@@ -44,8 +44,8 @@ go.Notifier = {
 			}
 			return;
 		}
-		for(var icon in this._icons[key]) {
-			if(!icon.hidden) return;
+		for(var icon in this._icons) {
+			if(!this._icons[icon].hidden) return;
 		}
 		this.statusBar.hide();
 	},
@@ -72,7 +72,7 @@ go.Notifier = {
 	msg: function (msg, key) {
 
 		if(!this.notifications) {
-			this.notify({title:msg.title, text: msg.description});
+			this.flyout({title:msg.title, description: msg.description});
 			return; // not initializes (happens after login)
 		}
 
@@ -142,7 +142,7 @@ go.Notifier = {
 			this._messages[msg.itemId] = msgPanel;
 		}
 
-		//this.showNotifications();
+		this.showNotifications();
 		
 		return msgPanel;
 	},
@@ -201,9 +201,11 @@ go.Notifier = {
 		}
 	},
 	/**
-	 * A more obstructive flyout message
-	 * Will use a desktop notification if permission if granted
-	 * {title,body,icon}
+	 * Create a desktop notification if permitted
+	 *
+	 * {title,description,icon, tag}
+	 *
+	 * @link https://developer.mozilla.org/en-US/docs/Web/API/notification
 	 * @param storeData
 	 */
 	notify: function(msg){
@@ -212,34 +214,44 @@ go.Notifier = {
 		}
 
 		var title = msg.title || t("Reminders");
-		var icon = msg.icon || 'views/Extjs3/themes/Paper/img/notify/reminder.png';
-		icon = window.location.pathname + icon;
 
-		msg.text = msg.text || msg.description;
+		msg.icon = msg.icon || GO.settings.config.full_url + 'views/Extjs3/themes/Paper/img/notify/reminder.png';
+		msg.body = msg.description || msg.body;
+		delete msg.title;
 
 		try {
 			switch(Notification.permission) {
 				case 'denied':
-					this.flyout(msg);
+					//this.flyout(msg);
+
 					break;
 
 				case 'default':
 					var me = this;
 					Notification.requestPermission(function (permission) { // ask first
 						if (permission === "granted") {
-							new Notification(title, {body: msg.text, icon: icon});
+							var notification = new Notification(title, msg);
+							if(notification && msg.onclose) {
+								notification.onclose = msg.onclose;
+							}
 						} else {
-							me.flyout(msg);
+
 						}
 					});
 					break;
 				case 'granted':
-					new Notification(title,{body: msg.text, icon: icon});
+					var notification = new Notification(title,msg);
 			}
 		} catch (e) {
 			/* ignore failure on mobiles */
-			this.flyout(msg);
+			//this.flyout(msg);
 		}
+
+		if(notification && msg.onclose) {
+			notification.onclose = msg.onclose;
+		}
+
+		return notification;
 
 	},
 
@@ -255,7 +267,7 @@ go.Notifier = {
 			this.messageCt = Ext.DomHelper.insertFirst(document.body, {id: 'message-ct'}, true);
 		}
 		msg.renderTo = this.messageCt;
-		msg.html = msg.description || msg.html; // backward compat
+		msg.html = msg.description; // backward compat
 		var msgCtr = new Ext.Panel(msg);
 
 		var me = this;
