@@ -765,12 +765,9 @@ $updates['202012231410'][] = function() {
 	}
 };
 
-$updates['202102111534'][] = "delete from go_state where user_id not in (select id from core_user);";
+$updates['202102111534'][] = ""; // Intentionally left blank
 
-$updates['202102111534'][] = "alter table go_state
-	add constraint go_state_core_user_id_fk
-		foreign key (user_id) references core_user (id)
-			on delete cascade;";
+$updates['202102111534'][] = ""; // Intentionally left blank
 
 
 $updates['202102111534'][] = "CREATE TABLE `core_alert` (
@@ -871,7 +868,17 @@ $updates['202102111534'][] = "CREATE TABLE `core_oauth_auth_codes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
 
+$updates['202102111534'][] = "";
 $updates['202102111534'][] = "ALTER TABLE `go_templates` ADD COLUMN `filename` VARCHAR(100) NULL DEFAULT NULL AFTER `content`";
+
+
+$updates['202102111534'][] = "delete from go_state where user_id not in (select id from core_user);";
+
+$updates['202102111534'][] = "alter table go_state
+	add constraint go_state_core_user_id_fk
+		foreign key (user_id) references core_user (id)
+			on delete cascade;";
+
 
 $updates['202102111534'][] = "alter table core_auth_token change `passedMethods` `passedAuthenticators` varchar(190) null;";
 $updates['202103091517'][] = "ALTER TABLE `core_customfields_select_option` ADD COLUMN `sortOrder` INT(11) UNSIGNED DEFAULT 0 AFTER `text`;";
