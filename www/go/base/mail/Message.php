@@ -383,6 +383,14 @@ class Message extends \Swift_Message{
 
 					}else
 					{
+
+						foreach($part->ctype_parameters as $name => $value) {
+							if($name == 'name') {
+								continue;
+							}
+							$mime_type .= ';' . $name . '=' . $value;
+						}
+
 						$attachment = new \Swift_Attachment($part->body, $filename,$mime_type);
 						$this->attach($attachment);
 					}
