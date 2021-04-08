@@ -1,4 +1,5 @@
 6.5.41
+- Core: Ignore duplicate constraint error of MySQL on upgrade
 - Tasks: Fixed link to project
 
 06-04-2021 6.5.40
