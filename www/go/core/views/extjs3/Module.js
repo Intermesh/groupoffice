@@ -143,9 +143,16 @@ GO.mainLayout.on('render', function () {
 
 	//Prevent browser nav on file drop.
 	document.addEventListener("dragover",function(e){
+		if(!e.dataTransfer || !e.dataTransfer.items.length || e.dataTransfer.items[0].kind != 'file') {
+			return;
+		}
+		e.dataTransfer.dropEffect = "none";
 		e.preventDefault();
 	},false);
 	document.addEventListener("drop",function(e){
+		if(!e.dataTransfer || !e.dataTransfer.items.length || e.dataTransfer.items[0].kind != 'file') {
+			return;
+		}
 		e.preventDefault();
 	},false);
 

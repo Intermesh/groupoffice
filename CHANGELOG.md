@@ -3,6 +3,7 @@
 - Tasks: Fixed link to project
 - Projects: Project analyzer couldn't be installed due to invalid depencency
 - Calendar: Fixed unauthorized error on calendar accept from external participant
+- Core: Allow drag and drop of text in UI
 
 06-04-2021 6.5.40
 - Core: Notification open in your face to bring more attention
