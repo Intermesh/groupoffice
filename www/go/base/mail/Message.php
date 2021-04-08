@@ -363,7 +363,7 @@ class Message extends \Swift_Message{
             $part->ctype_secondary = 'plain';
           }
 
-					$mime_type = $part->ctype_primary.'/'.$part->ctype_secondary;
+					$mime_type = $this->buildContentType($part);
 
           //only embed if we can find the content-id in the body
 					if(isset($part->headers['content-id']) && ($content_id=trim($part->headers['content-id'],' <>')) && strpos($this->_loadedBody, $content_id) !== false)
@@ -383,14 +383,6 @@ class Message extends \Swift_Message{
 
 					}else
 					{
-
-						foreach($part->ctype_parameters as $name => $value) {
-							if($name == 'name') {
-								continue;
-							}
-							$mime_type .= ';' . $name . '=' . $value;
-						}
-
 						$attachment = new \Swift_Attachment($part->body, $filename,$mime_type);
 						$this->attach($attachment);
 					}
@@ -421,6 +413,18 @@ class Message extends \Swift_Message{
 		foreach($cidReplacements as $old => $new) {
 			$this->_loadedBody = str_replace($old, $new, $this->_loadedBody);
 		}
+	}
+
+	private function buildContentType($part) {
+		$mime_type = $part->ctype_primary.'/'.$part->ctype_secondary;
+		foreach($part->ctype_parameters as $name => $value) {
+			if($name == 'name') {
+				continue;
+			}
+			$mime_type .= ';' . $name . '=' . $value;
+		}
+
+		return $mime_type;
 	}
 	
 	private function _hasHtmlPart($structure){
