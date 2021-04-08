@@ -634,9 +634,17 @@ class Installer {
 								go()->getDbConnection()->query($query);
 						} catch (PDOException $e) {
 
-							if ($e->getCode() == 42000 || $e->getCode() == '42S21' || $e->getCode() == '42S01' || $e->getCode() == '42S22' || strstr($e->getMessage(), 'errno: 121 ')) {
+							if (
+								$e->getCode() == '42000' ||
+								$e->getCode() == '42S21' || //duplicate col
+								$e->getCode() == '42S01' || //table exists
+								$e->getCode() == '42S22' || //col not found
+								strstr($e->getMessage(), 'errno: 121 ') || // (errno: 121 "Duplicate key on write or update")
+								strstr($e->getMessage(), ' 1826 ')) { //HY000: SQLSTATE[HY000]: General error: 1826 Duplicate foreign key constraint
+
 								//duplicate and drop errors. Ignore those on updates.
 								echo "IGNORE: " . $e->getMessage() ."\n";
+
 							} else {
 
 								$msg = $e->getCode() . ': '.$e->getMessage() . "\n".
