@@ -145,6 +145,9 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 						data: record.data,
 						tag: "reminder-" + record.data.id,
 						onclose: function (e) {
+							if(!e.currentTarget || !e.currentTarget.data) {
+								return;
+							}
 							var reminderId = e.currentTarget.data.id;
 
 							me.doTask("dismiss_reminders", 0, [reminderId], reminderPanel);
