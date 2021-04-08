@@ -156,6 +156,13 @@ abstract class EntityController extends Controller {
 				throw new InvalidArguments("Parameter 'filter' must be an array");
 			}
 		}
+
+		$cls = $this->entityClass();
+
+		// Make sure permissions are filtered
+		if(empty($params['filter']['permissionLevel']) && $cls::getFilters()->hasFilter('permissionLevel')) {
+			$params['filter']['permissionLevel'] = Acl::LEVEL_READ;
+		}
 		
 		if(!isset($params['accountId'])) {
 			$params['accountId'] = null;
