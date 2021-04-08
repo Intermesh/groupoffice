@@ -2,6 +2,7 @@
 - Core: Ignore duplicate constraint error of MySQL on upgrade
 - Tasks: Fixed link to project
 - Projects: Project analyzer couldn't be installed due to invalid depencency
+- Calendar: Fixed unauthorized error on calendar accept from external participant
 
 06-04-2021 6.5.40
 - Core: Notification open in your face to bring more attention
