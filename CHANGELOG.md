@@ -7,6 +7,7 @@
 - Sync: Add method=request to calendar invite email
 - Core: Improved notifications UI and onclose handler in safari
 - Carddav: Fixed broken auth
+- Calendar: fall back on user language if holiday scheme not assigned
 
 06-04-2021 6.5.40
 - Core: Notification open in your face to bring more attention
