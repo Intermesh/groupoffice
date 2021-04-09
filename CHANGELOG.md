@@ -1,4 +1,4 @@
-6.5.41
+09-04-2021 6.5.41
 - Core: Ignore duplicate constraint error of MySQL on upgrade
 - Tasks: Fixed link to project
 - Projects: Project analyzer couldn't be installed due to invalid depencency
@@ -41,6 +41,8 @@
 
 
 
+
+- OnlyOffice: Only office only worked in root of domain
 
 02-04-2021 6.4.231
 - Email: Fixed could not parse XML error
