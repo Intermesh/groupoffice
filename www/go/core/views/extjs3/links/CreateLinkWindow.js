@@ -28,6 +28,8 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 		}
 
 		this.grid.store.setFilter('search', filter);
+
+		go.searchLinkFilter = v;
 		
 		this.grid.store.load();
 	},
@@ -122,6 +124,11 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 	
 	focus : function() {
 		this.searchField.focus();
+
+		if(go.searchLinkFilter) {
+			this.searchField.setValue(go.searchLinkFilter);
+			this.search(go.searchLinkFilter);
+		}
 	},
 
 	link: function () {
