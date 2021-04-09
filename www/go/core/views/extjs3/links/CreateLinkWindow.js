@@ -117,18 +117,21 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 			]
 		});
 
-
-
 		go.links.CreateLinkWindow.superclass.initComponent.call(this);
+
+		//wait for entity selection
+		this.entityGrid.on("viewready", function() {
+			if(go.searchLinkFilter) {
+				this.searchField.setValue(go.searchLinkFilter);
+				this.search(go.searchLinkFilter);
+			}
+		}, this);
 	},
 	
 	focus : function() {
 		this.searchField.focus();
 
-		if(go.searchLinkFilter) {
-			this.searchField.setValue(go.searchLinkFilter);
-			this.search(go.searchLinkFilter);
-		}
+
 	},
 
 	link: function () {
