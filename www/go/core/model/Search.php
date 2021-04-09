@@ -144,7 +144,7 @@ class Search extends AclOwnerEntity {
 								if(is_string($e)) {
 									$e = ['name' => $e];
 								}
-								$w = ['e.clientName' => $e['name']];
+								$w = ['entityTypeId' =>  EntityType::findByName($e['name'])->getId()];
 								if(isset($e['filter'])) {
 									$w['filter'] = $e['filter'];
 								}
