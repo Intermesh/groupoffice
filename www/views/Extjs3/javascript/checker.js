@@ -68,7 +68,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			reader: new Ext.data.JsonReader({
 				totalProperty: "count",
 				root: "results",
-				fields:['id','name','description','model_id','model_name','model_type_id',
+				fields:['id','name','model_id','model_name','model_type_id',
 					'type','local_time', 'iconCls','time','snooze_time','text']
 			}),
 			groupField: 'type',
@@ -103,7 +103,6 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					iconCls: 'entity '+ico,
 					items: [
 						{xtype:'box',html:'<b>'+record.data.text+'</b><span style="float:right">'+record.data.local_time+'</span>'}
-						//{html:record.data.description}
 					],
 					listeners: {
 						'afterrender': function(me) {
@@ -139,18 +138,18 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					}]
 				});
 
+				let notifyBody = record.data.time;
+
+				if(record.data.text) {
+					notifyBody += ": " + record.data.text;
+				}
+
 				reminderPanel.notification = go.Notifier.notify({
-						body: record.data.time,
+						body: notifyBody,
 						title: record.data.name,
-						data: record.data,
 						tag: "reminder-" + record.data.id,
 						onclose: function (e) {
-							if(!e.currentTarget || !e.currentTarget.data) {
-								return;
-							}
-							var reminderId = e.currentTarget.data.id;
-
-							me.doTask("dismiss_reminders", 0, [reminderId], reminderPanel);
+							me.doTask("dismiss_reminders", 0, [record.data.id], reminderPanel);
 						}
 					}
 				);
