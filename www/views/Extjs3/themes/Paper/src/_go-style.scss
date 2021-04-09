@@ -595,6 +595,11 @@ a {
 		padding: 0 0 0 dp(8);
 		background-color: rgba(255,255,255,0.1);
 		color: white;
+
+		&::placeholder {
+			color: #dedede;
+			font-style: italic;
+		}
 		
 		&.x-form-invalid {
 			background-color: #e57373;
@@ -632,7 +637,7 @@ a {
 			color: color($fg,'secondary-text');
 			>i, .x-tool {
 				transform: scale(.8);
-				margin-top: dp(-4);
+				margin-top: dp(12);
 			}
 			.x-tool {
 				transform: scale(.8);
@@ -645,9 +650,8 @@ a {
 			color: color($fg,'secondary-text');
 			font-size: dp(16);
 		}
-		.x-panel-bwrap {
+		.x-panel-body {
 			padding: dp(8) dp(16);
-			em {float:right;}
 		}
 	}
 }

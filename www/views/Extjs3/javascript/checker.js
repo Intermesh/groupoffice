@@ -9,6 +9,8 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 	initComponent: function() {
 		this.addEvents({'alert' : true});
+
+
 		GO.Checker.superclass.initComponent.call(this);
 	},
 
@@ -20,9 +22,11 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			run: this.checkForNotifications,
 			scope:this,
 			interval: GO.settings.config.checker_interval*1000
-			// 			 interval: 5000 // debug / test config
+			// 			 interval: 10000 // debug / test config
 		});
 		this.initReminders();
+
+		this.notifiedReminders = {};
 	},
 
 	initReminders: function() {
@@ -99,11 +103,9 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 				var reminderPanel = new Ext.Panel({
 					id: 'go-reminder-pnl-' + record.data.id,
 					record: record,
-					title: record.data.name,
-					iconCls: 'entity '+ico,
-					items: [
-						{xtype:'box',html:'<b>'+record.data.text+'</b><span style="float:right">'+record.data.local_time+'</span>'}
-					],
+					title: record.data.local_time + " - " + record.data.type + ": " + record.data.name,
+					iconCls: 'entity ' + ico,
+					html: record.data.text,
 					listeners: {
 						'afterrender': function(me) {
 							var clickHandler = function (el){
@@ -122,7 +124,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 						}
 					},
-					buttonAlign: 'left',
+					buttonAlign: 'right',
 					buttons: [{
 						iconCls : 'ic-timer',
 						text: t("Snooze"),
@@ -138,21 +140,22 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					}]
 				});
 
-				let notifyBody = record.data.time;
+				//don't replace reminder because onclose will fire when replacing it.
+				const reminderId = "reminder-" + record.data.id;
+				if(!this.notifiedReminders[reminderId]) {
 
-				if(record.data.text) {
-					notifyBody += ": " + record.data.text;
-				}
-
-				reminderPanel.notification = go.Notifier.notify({
-						body: notifyBody,
-						title: record.data.name,
-						tag: "reminder-" + record.data.id,
-						onclose: function (e) {
-							me.doTask("dismiss_reminders", 0, [record.data.id], reminderPanel);
+					reminderPanel.notification = go.Notifier.notify({
+							body: record.data.text,
+							title: record.data.local_time + " - " + record.data.type + ": " + record.data.name,
+							tag: "reminder-" + record.data.id,
+							onclose: function (e) {
+								me.doTask("dismiss_reminders", 0, [record.data.id], reminderPanel);
+							}
 						}
-					}
-				);
+					);
+
+					this.notifiedReminders[reminderId] = true;
+				}
 
 				this.reminders.add(reminderPanel );
 

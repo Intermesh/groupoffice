@@ -5178,11 +5178,11 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 * @param int $vtime The time that will be displayed in the reminder
 	 * @return \GO\Base\Model\Reminder
 	 */
-	public function addReminder($name, $time, $user_id, $vtime=null){
+	public function addReminder($name, $time, $user_id, $vtime=null, $text = null){
 
 		$userModel = \GO\Base\Model\User::model()->findByPk($user_id, false, true);
 		if (!empty($userModel) && !$userModel->no_reminders) {
-			$reminder = \GO\Base\Model\Reminder::newInstance($name, $time, $this->className(), $this->pk, $vtime);
+			$reminder = \GO\Base\Model\Reminder::newInstance($name, $time, $this->className(), $this->pk, $vtime, $text);
 			$reminder->setForUser($user_id);
 
 			return $reminder;
