@@ -160,11 +160,11 @@ class Search extends AclOwnerEntity {
 						});					
 	}
 
-	public static function sort(\go\core\orm\Query $query, array $sort)
-	{
-		//no sorting. Too big tables!
-		return $query;
-	}
+//	public static function sort(\go\core\orm\Query $query, array $sort)
+//	{
+//		//no sorting. Too big tables!
+//		return $query;
+//	}
 
 //	 public static function convertQuery($value) {
 //
