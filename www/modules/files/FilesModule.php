@@ -50,10 +50,7 @@ class FilesModule extends \GO\Base\Module{
 		
 		while($user = $stmt->fetch()){
 			$folder = Model\Folder::model()->findHomeFolder($user);
-			//$folder->syncFilesystem();
-			
-			//$folder = Model\Folder::model()->findByPath('users/'.$user->username, true);
-			
+
 			//In some cases the acl id of the home folder was copied from the user. We will correct that here.
 			if(!$folder->acl){
 				$folder->setNewAcl($user->id);				
@@ -102,7 +99,7 @@ class FilesModule extends \GO\Base\Module{
 		if ($wasNew) {
 			$folder = Model\Folder::model()->findHomeFolder($user);
 		} elseif ($user->isModified('username')) {
-			$folder = Model\Folder::model()->findByPath('users/' . $user->getOldAttributeValue('username'));
+			$folder = Model\Folder::model()->findByPath(\GO\Files\Model\Folder::getUserHomePath($user->getOldAttributeValue('username')));
 			if ($folder) {
 				$folder->name = $user->username;
 				$folder->systemSave = true;
@@ -112,7 +109,7 @@ class FilesModule extends \GO\Base\Module{
 	}
 	
 	public static function deleteUser($user) {
-		$folder = Model\Folder::model()->findByPath('users/'.$user->username, true);
+		$folder = Model\Folder::model()->findByPath(\GO\Files\Model\Folder::getUserHomePath($user->username), true);
 		if($folder)
 			$folder->delete(true);
 	}

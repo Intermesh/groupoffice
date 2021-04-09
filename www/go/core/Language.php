@@ -261,7 +261,7 @@ class Language {
 	 */
 	private function findLangOverride($lang, $package, $module) {
 
-		$folder = go()->getDataFolder()->getFolder('users/admin/language/' . $package . '/' .$module);
+		$folder = go()->getDataFolder()->getFolder(\GO\Files\Model\Folder::getUserHomePath("admin") . '/language/' . $package . '/' .$module);
 		
 		return $folder->getFile($lang . '.php');
 	}
