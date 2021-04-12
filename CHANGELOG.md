@@ -1,3 +1,4 @@
+12-04-2021 6.4.232
 - OnlyOffice: Only office only worked in root of domain
 - Address book: Save name column width
 - Projects: Save time entry grid state in edit dialog of project
