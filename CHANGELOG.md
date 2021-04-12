@@ -1,3 +1,7 @@
+6.4.244
+- Email: preserve links when forwarding emails
+- Email: bugfix when creating links
+
 12-04-2021 6.4.232
 - OnlyOffice: Only office only worked in root of domain
 - Address book: Save name column width

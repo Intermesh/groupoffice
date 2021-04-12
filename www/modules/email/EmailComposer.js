@@ -367,7 +367,8 @@ GO.email.EmailComposer = function(config) {
 	'->',
 		this.createLinkButton = new go.links.CreateLinkButton({
 			text: "",
-			iconCls: "ic-link"
+			iconCls: "ic-link",
+			disableEditableDescription: true
 		})
 	];
 

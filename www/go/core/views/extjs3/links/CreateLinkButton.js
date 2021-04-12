@@ -107,7 +107,8 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 				filter: {}
 			}
 		});
-		
+
+		this.disableEditableDescription = this.disableEditableDescription || false;
 		this.linkGrid = new go.grid.EditorGridPanel({
 			name: 'linkGrid',
 			clicktToEdit: 1,
@@ -132,7 +133,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 					sortable: false,
 					dataIndex: "description",
 					width: dp(200),
-					editable: true,
+					editable: !this.disableEditableDescription,
 					hidable: false,
 					editor: new Ext.form.TextField({
 						allowBlank: true,

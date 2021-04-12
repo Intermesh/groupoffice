@@ -635,15 +635,16 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				iconCls: 'ic-forward',
 				text: t("Forward", "email"),
 				handler: function(){
+					var comp;
 					if (!this._permissionDelegated) {
-						GO.email.showComposer({
+						comp = GO.email.showComposer({
 							uid: this.messagePanel.uid,
 							task: 'forward',
 							mailbox: this.messagePanel.mailbox,
 							account_id: this.account_id
 						});
 					} else {
-						GO.email.showComposer({
+						comp = GO.email.showComposer({
 							uid: this.messagePanel.uid,
 							task: 'forward',
 							mailbox: this.messagePanel.mailbox,
@@ -651,6 +652,9 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 							delegated_cc_enabled: true
 						});
 					}
+					this.messagePanel.data.links.forEach(function(link) {
+						comp.createLinkButton.addLink(link.entity, link.entityId);
+					});
 				},
 				scope: this
 			}),'->',
