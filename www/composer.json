@@ -17,7 +17,7 @@
     "ext-calendar": "*",
     "ext-xml": "*",
     "ext-intl": "*",
-    "sabre/dav": "3.2.*",
+    "sabre/dav": "4.1.*",
     "ext-json": "*",
     "ext-openssl": "*",
     "swiftmailer/swiftmailer": "@stable",
