@@ -107,6 +107,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				{
 					id: 'name',
 					header: t('Name'),
+					width: dp(300),
 					sortable: true,
 					dataIndex: go.User.addressBookSettings.sortBy,
 					hidden: this.enabledColumns.indexOf('name') == -1,
@@ -338,7 +339,6 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					// }
 				}
 			},
-			autoExpandColumn: 'name',
 			// config options for stateful behavior
 			stateful: true,
 			stateId: 'contact-grid'
