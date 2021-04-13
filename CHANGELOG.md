@@ -1,6 +1,7 @@
 - Core: Upgraded to sabre dav 4.1
 - Carddav: Authentication didn't work case insensitive
 - Core: Templates could inject div with style causing incorrect styling
+- Core: Safari could ask for notifications for each reminders shown
 
 09-04-2021 6.5.41
 - Core: Ignore duplicate constraint error of MySQL on upgrade

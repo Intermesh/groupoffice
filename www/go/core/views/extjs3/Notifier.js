@@ -237,7 +237,7 @@
 
 			msg.icon = msg.icon || GO.settings.config.full_url + 'views/Extjs3/themes/Paper/img/notify/reminder.png';
 			msg.body = msg.description || msg.body;
-			delete msg.title;
+			//delete msg.title;
 
 			try {
 				switch(Notification.permission) {
@@ -247,16 +247,8 @@
 						break;
 
 					case 'default':
-						var me = this;
-						Notification.requestPermission(function (permission) { // ask first
-							if (permission === "granted") {
-								var notification = new Notification(title, msg);
-								if(notification && msg.onclose) {
-									notification.onclose = msg.onclose;
-								}
-							} else {
-
-							}
+						this.requestNotifyPermission().then((permission) => {
+							this.notify(msg);
 						});
 						break;
 					case 'granted':
@@ -273,6 +265,30 @@
 
 			return notification;
 
+		},
+
+		notifyRequest: null,
+
+		/**
+		 *
+		 * @returns {Promise<NotificationPermission>}
+		 */
+		requestNotifyPermission : function() {
+
+			if(!this.notifyRequest) {
+				//Safari doesn't support this :(
+				if(!Ext.isSafari) {
+					this.notifyRequest = Notification.requestPermission();
+				} else
+				{
+					this.notifyRequest = new Promise((resolve, reject) => {
+						Notification.requestPermission((permission) => {
+							resolve(permission);
+						})
+					})
+				}
+			}
+			return this.notifyRequest;
 		},
 
 		/**
