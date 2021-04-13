@@ -185,17 +185,25 @@ COLLATE = utf8mb4_unicode_ci;
 -- -----------------------------------------------------
 -- Table `tasks_task_custom_fields`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `tasks_task_custom_fields` (
-  `id` INT(11) UNSIGNED NOT NULL,
-  PRIMARY KEY (`id`),
-  CONSTRAINT `fk_tasks_task_custom_field1`
-    FOREIGN KEY (`id`)
-    REFERENCES `tasks_task` (`id`)
-    ON DELETE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_unicode_ci;
+--  CREATE TABLE IF NOT EXISTS `tasks_task_custom_fields` (
+--   `id` INT(11) UNSIGNED NOT NULL,
+--   PRIMARY KEY (`id`),
+--   CONSTRAINT `fk_tasks_task_custom_field1`
+--     FOREIGN KEY (`id`)
+--     REFERENCES `tasks_task` (`id`)
+--     ON DELETE CASCADE)
+-- ENGINE = InnoDB
+--  DEFAULT CHARACTER SET = utf8mb4
+--  COLLATE = utf8mb4_unicode_ci;
 
+DROP TABLE IF EXISTS tasks_task_custom_fields;
+CREATE TABLE tasks_task_custom_fields LIKE ta_tasks_custom_fields;
+INSERT INTO tasks_task_custom_fields SELECT * FROM ta_tasks_custom_fields;
+
+ALTER TABLE tasks_task_custom_fields CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL;
+
+ALTER TABLE `tasks_task_custom_fields`
+    ADD CONSTRAINT `tasks_task_custom_fields_ibfk_1` FOREIGN KEY (`id`) REFERENCES `tasks_task` (`id`) ON DELETE CASCADE;
 
 -- -----------------------------------------------------
 -- Table `tasks_tasklist_group`
