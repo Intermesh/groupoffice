@@ -264,7 +264,7 @@ class SavedMessage extends ComposerMessage {
 				$text_part = nl2br($text_part);
 			}else{
 				$text_part = \GO\Base\Util\StringHelper::convertLinks($text_part);
-				$text_part = \GO\Base\Util\StringHelper::sanitizeHtml($text_part);
+				$text_part = \GO\Base\Util\StringHelper::sanitizeHtml($text_part, $preserveHtmlStyle);
 			}
 			
 			$this->_loadedBody .= $text_part;
