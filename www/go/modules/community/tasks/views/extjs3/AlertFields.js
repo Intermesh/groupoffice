@@ -3,6 +3,7 @@ go.modules.community.tasks.AlertFields = Ext.extend(go.form.FormGroup, {
     name: "alerts",
     hideLabel: true,
     iconCls: 'ic-alert',
+    mapKey: 'id',
 
     // this will add dp(16) padding between rows.
     pad: true,
@@ -11,21 +12,16 @@ go.modules.community.tasks.AlertFields = Ext.extend(go.form.FormGroup, {
     itemCfg: {
         anchor: "100%",
         items: [{
-            anchor: "100%",
-            xtype: "compositefield",
+            xtype: "formcontainer",
+            name: "trigger",
             hideLabel: true,
-            items: [
-                {
-                    xtype: 'datefield',
-                    name: 'remindDate',
-                    fieldLabel: t("Date"),
-                    width: dp(140)
-                }, {
-                    xtype: 'nativetimefield',
-                    name: 'remindTime',
-                    fieldLabel: t("Time"),
-                    flex:1
-                }]
+            items: [{
+                anchor: "100%",
+                fieldLabel: t("When"),
+                xtype: "datetimefield",
+                name: 'when',
+                hideLabel: true
+            }]
         }]
     }
 });

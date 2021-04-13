@@ -22,6 +22,9 @@ class Alert extends Property {
 	/** @var int PK to task this Alert belongs to */
 	public $taskId;
 
+	/** @var @var int PK alert are saved per user (UserProperty) */
+	public $userId;
+
 	/**
      * Defines a specific UTC date-time when the alert is triggered.
      * Wen using a OffsetTrigger this will still be set
@@ -60,13 +63,13 @@ class Alert extends Property {
 
     public function getTrigger() {
         if(isset($this->offset)) {
-            return (object)[
+            return [
                 'offset' => $this->offset,
                 'relativeTo' => $this->relativeTo ?? 'start'
             ];
         }
         if(isset($this->when)) {
-            return (object)['when'=>$this->when];
+            return ['when'=>$this->when->format('c')];
         }
         return null;
     }
@@ -100,17 +103,18 @@ class Alert extends Property {
      * @params $value OffsetTrigger|AbsoluteTrigger
      */
     public function setTrigger($value) {
-        if(isset($value->offset)) {
+    	$this->userId = go()->getUserId();
+        if(isset($value['offset'])) {
             $task = Task::findById($this->taskId);
-            $this->offset = $value->offset;
-            $this->relativeTo = $value->relativeTo;
-            $relDate = clone ($value->relativeTo === 'end' ? $task->due : $task->start);
-            $this->when = $relDate->add(new \DateInterval($value->offset));
+            $this->offset = $value['offset'];
+            $this->relativeTo = $value['relativeTo'];
+            $relDate = clone ($value['relativeTo'] === 'end' ? $task->due : $task->start);
+            $this->when = $relDate->add(new \DateInterval($value['offset']));
         }
-        if(isset($value->when)) {
+        if(isset($value['when'])) {
             $this->offset = null;
             $this->relativeTo = null;
-            $this->when = new \DateTime($value->when);
+            $this->when = new \DateTime($value['when']);
         }
     }
 

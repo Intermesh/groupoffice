@@ -59,3 +59,5 @@ $updates['201911061630'][] = function(){
 	}
 
 };
+
+$updates['202101011630'][] = "ALTER TABLE `tasks_task` CHANGE COLUMN `description` `description` TEXT NULL DEFAULT '';";

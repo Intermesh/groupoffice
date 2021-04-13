@@ -260,13 +260,15 @@ class Task extends AclItemEntity {
 			}
 		}
 
+		$success = parent::internalSave();
+
 		// if alert can be based on start / due of task check those properties as well
 		if($this->isModified('alerts') ||
-           $this->isModified('useDefaultAlerts')) {
+			$this->isModified('useDefaultAlerts')) {
 			$this->updateAlerts();
 		}
 
-		return parent::internalSave();
+		return $success;
 	}
 
 
@@ -283,7 +285,7 @@ class Task extends AclItemEntity {
 		foreach($this->alerts as $alert) {
 			$notify = new \go\core\model\Alert();
 			$notify->alertId = $alert->id;
-			$notify->triggerAt = $alert->when;
+			$notify->triggerAt = $alert->at($this);
 			$notify->userId = $tasklist->ownerId;
 			$notify->entityId =  $this->id;
 			$notify->entityTypeId = $entityType->getId();
