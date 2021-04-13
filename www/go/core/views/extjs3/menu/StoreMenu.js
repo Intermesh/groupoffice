@@ -82,19 +82,21 @@ go.menu.StoreMenu = Ext.extend(Ext.menu.Menu, {
   },
 
   updateMenuItems: function () {
+
+    this.removeAll();
     if (this.rendered) {
-      this.removeAll();
       this.el.sync();
-
-      var records = this.store.getRange();
-
-      for (var i = 0, len = records.length; i < len; i++) {     
-        var item = this.createItem(records[i], i);
-        this.add(item);
-      }
-
-      this.fireEvent('load', this, records);
     }
+
+    var records = this.store.getRange();
+
+    for (var i = 0, len = records.length; i < len; i++) {
+      var item = this.createItem(records[i], i);
+      this.add(item);
+    }
+
+    this.fireEvent('load', this, records);
+
   },
 
   createItem : function(record, index) {
