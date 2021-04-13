@@ -202,6 +202,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 			items : []
 		});
 
-		return propertiesPanel;//this.tabPanel;
+		return [propertiesPanel];//this.tabPanel;
 	}
 });

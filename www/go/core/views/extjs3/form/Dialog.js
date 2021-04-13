@@ -132,7 +132,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 	},
 	
 	createFormPanel : function() {
-		
+
 		var items = this.initFormItems() || [];
 		
 		if(this.showCustomfields){
@@ -163,7 +163,6 @@ go.form.Dialog = Ext.extend(go.Window, {
 		if(go.Entities.get(this.entityStore).customFields) {
 			var fieldsets = go.customfields.CustomFields.getFormFieldSets(this.entityStore);
 			fieldsets.forEach(function(fs) {
-				//console.log(fs);
 				if(fs.fieldSet.isTab) {
 					fs.title = null;
 					fs.collapsible = false;
@@ -174,8 +173,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 						items: [fs]
 					});
 					this.addPanel(pnl);
-				}else
-				{
+				} else {
 					//in case formPanelLayout is set to column
 					fs.columnWidth = 1;
 					items.push(fs);
