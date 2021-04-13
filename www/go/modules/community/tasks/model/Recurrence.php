@@ -116,7 +116,8 @@ class Recurrence extends \Sabre\VObject\Recur\RRuleIterator {
 
 		if(!empty($rule['byDay'])) {
 			foreach($rule['byDay'] as $key => $nday) {
-				if(is_array($nday)) {
+				if(is_object($nday) || is_array($nday)) {
+					$nday = (array)$nday;
 					$position = $nday['nthOfPeriod'] ?? '';
 					$me->byDay[$key] = $position . strtoupper($nday['day']);
 				} else {

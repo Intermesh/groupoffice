@@ -74,6 +74,9 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 						if(rec.json.filesFolderId) {
 							icons.push('attachment');
 						}
+						if(!Ext.isEmpty(rec.json.alerts)) {
+							icons.push('alarm');
+						}
 						return icons.map(i => '<i class="icon small">'+i+'</i>').join('');
 					}
 				},

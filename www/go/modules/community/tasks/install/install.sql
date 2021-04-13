@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   `progress` TINYINT(2) NOT NULL DEFAULT 1,
   `progressUpdated` DATETIME NULL DEFAULT NULL,
   `title` VARCHAR(255) NOT NULL,
-  `description` TEXT NULL DEFAULT NULL,
+  `description` TEXT NULL DEFAULT '',
   `color` CHAR(6) NULL,
   `recurrenceRule` VARCHAR(400) NULL DEFAULT NULL,
   `priority` INT(11) NOT NULL DEFAULT 1,

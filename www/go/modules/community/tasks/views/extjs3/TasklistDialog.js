@@ -23,6 +23,7 @@ go.modules.community.tasks.TasklistDialog = Ext.extend(go.form.Dialog, {
 			},new go.users.UserCombo({
 				fieldLabel: t('Owner'),
 				hiddenName: 'ownerId',
+				value: go.User.id
 			})]
 		}];
 	},

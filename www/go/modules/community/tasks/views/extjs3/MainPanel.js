@@ -394,17 +394,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					enableKeyEvents: true,
 					emptyText: t("Add a task..."),
 
-					flex:1,
-					listeners: {
-						scope: this,
-						keyup: function(text, t) {
-							if(this.taskDateField.getValue() != null && this.taskNameTextField.getValue() != "") {
-								this.addTaskButton.setDisabled(false);
-							} else {
-								this.addTaskButton.setDisabled(true);
-							}
-						}
-					}
+					flex:1
 				}),
 					this.taskDateField = new go.form.DateField({
 						value: new Date(),
