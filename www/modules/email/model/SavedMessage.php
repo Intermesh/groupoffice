@@ -252,7 +252,7 @@ class SavedMessage extends ComposerMessage {
 
 				//$part_number++;
 				if (isset($part->parts)) {
-					$this->_getParts($part, $part_number_prefix . $part_number . '.');
+					$this->_getParts($part, $part_number_prefix . $part_number . '.', $preserveHtmlStyle);
 				}
 			}
 		} elseif (isset($structure->body)) {			
