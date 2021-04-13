@@ -775,6 +775,14 @@ abstract class Entity extends Property {
 		static::defineFilters()->apply($query, $filter);
 		return $query;
 	}
+
+	/**
+	 * @return Filters
+	 * @throws Exception
+	 */
+	public static function getFilters() {
+		return static::defineFilters();
+	}
 	
 	/**
 	 * Return columns to search on with the "text" filter. {@see filter()}

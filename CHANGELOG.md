@@ -1,3 +1,30 @@
+- Core: Upgraded to sabre dav 4.1
+- Carddav: Authentication didn't work case insensitive
+- Core: Templates could inject div with style causing incorrect styling
+- Core: Safari could ask for notifications for each reminders shown
+- Newsletters: Templates menu didn't load
+
+09-04-2021 6.5.41
+- Core: Ignore duplicate constraint error of MySQL on upgrade
+- Tasks: Fixed link to project
+- Projects: Project analyzer couldn't be installed due to invalid depencency
+- Calendar: Fixed unauthorized error on calendar accept from external participant
+- Core: Allow drag and drop of text in UI
+- Sync: Add method=request to calendar invite email
+- Core: Improved notifications UI and onclose handler in safari
+- Carddav: Fixed broken auth
+- Calendar: fall back on user language if holiday scheme not assigned
+
+06-04-2021 6.5.40
+- Core: Notification open in your face to bring more attention
+- Core: Closing desktop notification will dismiss reminder in Group-Office too.
+- Core: Closing/dismiss reminder in Group-Office will close desktop notification.
+- History: Fix error when comments module not enabled
+- Core: Removed duplicate queries from updates script
+
+02-04-2021 6.5.39
+- Email: Fixed could not parse XML error
+
 01-04-2021 6.5.38
 - Core: array relation with ID's keeps records
 - Core: Module dependencies are respected
@@ -20,6 +47,14 @@
 
 
 
+
+12-04-2021 6.4.232
+- OnlyOffice: Only office only worked in root of domain
+- Address book: Save name column width
+- Projects: Save time entry grid state in edit dialog of project
+
+02-04-2021 6.4.231
+- Email: Fixed could not parse XML error
 
 01-04-2021 6.4.230
 - Email: Preseve body style attributes

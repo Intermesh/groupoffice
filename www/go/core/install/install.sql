@@ -246,8 +246,6 @@ CREATE TABLE `core_user` (
   `disk_quota` bigint(20) DEFAULT NULL,
   `disk_usage` bigint(20) NOT NULL DEFAULT 0,
   `mail_reminders` tinyint(1) NOT NULL DEFAULT 0,
-  `popup_reminders` tinyint(1) NOT NULL DEFAULT 0,
-  `popup_emails` tinyint(1) NOT NULL DEFAULT 0,
   `holidayset` varchar(10) DEFAULT NULL,
   `sort_email_addresses_by_time` tinyint(1) NOT NULL DEFAULT 0,
   `no_reminders` tinyint(1) NOT NULL DEFAULT 0,

@@ -144,7 +144,7 @@ class Search extends AclOwnerEntity {
 								if(is_string($e)) {
 									$e = ['name' => $e];
 								}
-								$w = ['e.clientName' => $e['name']];
+								$w = ['entityTypeId' =>  EntityType::findByName($e['name'])->getId()];
 								if(isset($e['filter'])) {
 									$w['filter'] = $e['filter'];
 								}
@@ -160,11 +160,11 @@ class Search extends AclOwnerEntity {
 						});					
 	}
 
-	public static function sort(\go\core\orm\Query $query, array $sort)
-	{
-		//no sorting. Too big tables!
-		return $query;
-	}
+//	public static function sort(\go\core\orm\Query $query, array $sort)
+//	{
+//		//no sorting. Too big tables!
+//		return $query;
+//	}
 
 //	 public static function convertQuery($value) {
 //

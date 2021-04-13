@@ -54,14 +54,15 @@ trait SearchableTrait {
 		//Split on non word chars followed by whitespace or end of string. This wat initials like J.K. or french dates
 		//01.01.2020 can be found too.
 //		$keywords = mb_split('[^\w\-_\+\\\\\/:](\s|$)*', mb_strtolower($text), -1);
-		$text= preg_replace('/[^\w\-_\+\\\\\/\s:@]/', '', mb_strtolower($text));
+		$text = preg_replace('/[^\w\-_\+\\\\\/\s:@]/', '', mb_strtolower($text));
+		$text = preg_replace('/[-]+/', '-', $text);
+		$text = preg_replace('/[_]+/', '_', $text);
 		$keywords = mb_split("\s+", $text);
 
 		//filter small words
 		$keywords = array_filter($keywords, function($word) {
-			return strlen($word) > 1;
+			return strlen($word) > 2;
 		});
-
 
 		return $keywords;
 	}

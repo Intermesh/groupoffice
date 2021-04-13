@@ -9,6 +9,8 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 	initComponent: function() {
 		this.addEvents({'alert' : true});
+
+
 		GO.Checker.superclass.initComponent.call(this);
 	},
 
@@ -20,9 +22,11 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			run: this.checkForNotifications,
 			scope:this,
 			interval: GO.settings.config.checker_interval*1000
-						 // interval: 5000 // debug / test config
+			// 			 interval: 10000 // debug / test config
 		});
 		this.initReminders();
+
+		this.notifiedReminders = {};
 	},
 
 	initReminders: function() {
@@ -49,11 +53,15 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			id:'dismiss',
 			qtip: t('Dismiss all'),
 			handler: function() {
-				if(confirm(t('Are you sure you want to dismiss all reminders?'))) {
-					this.doTask("dismiss_reminders", 0, this.reminderStore.data.keys);
-					this.reminders.removeAll();
-					go.Notifier.removeAll();
-				}
+				Ext.MessageBox.confirm(t("Confirm"), t('Are you sure you want to dismiss all reminders?'), function(btn){
+					if(btn=='yes') {
+						this.doTask("dismiss_reminders", 0, this.reminderStore.data.keys);
+						this.reminders.removeAll();
+						go.Notifier.removeAll();
+
+						go.Notifier.toggleIcon('reminder', false);
+					}
+				}, this);
 			},
 			scope:this
 		});
@@ -64,15 +72,19 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			reader: new Ext.data.JsonReader({
 				totalProperty: "count",
 				root: "results",
-				fields:['id','name','description','model_id','model_name','model_type_id',
+				fields:['id','name','model_id','model_name','model_type_id',
 					'type','local_time', 'iconCls','time','snooze_time','text']
 			}),
 			groupField: 'type',
 			remoteSort: true,
 			remoteGroup: true
 		});
+
+		var me = this;
+
 		this.reminderStore.on('load',function(store, records) {
 			this.reminders.removeAll();
+
 			records.forEach(function(record) {
 
 				var snoozeMenuItems = [];
@@ -88,15 +100,12 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 				});
 
 				var ico = record.data.iconCls.split('\\').pop();
-				var reminderPanel;
-				this.reminders.add(reminderPanel = new Ext.Panel({
+				var reminderPanel = new Ext.Panel({
+					id: 'go-reminder-pnl-' + record.data.id,
 					record: record,
-					title: record.data.name,
-					iconCls: 'entity '+ico,
-					items: [
-						{xtype:'box',html:'<b>'+record.data.text+'</b><span style="float:right">'+record.data.local_time+'</span>'}
-						//{html:record.data.description}
-					],
+					title: record.data.local_time + " - " + record.data.type + ": " + record.data.name,
+					iconCls: 'entity ' + ico,
+					html: record.data.text,
 					listeners: {
 						'afterrender': function(me) {
 							var clickHandler = function (el){
@@ -115,7 +124,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 						}
 					},
-					buttonAlign: 'left',
+					buttonAlign: 'right',
 					buttons: [{
 						iconCls : 'ic-timer',
 						text: t("Snooze"),
@@ -129,7 +138,26 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 						},
 						scope: this
 					}]
-				}))
+				});
+
+				//don't replace reminder because onclose will fire when replacing it.
+				const reminderId = "reminder-" + record.data.id;
+				if(!this.notifiedReminders[reminderId]) {
+
+					reminderPanel.notification = go.Notifier.notify({
+							body: record.data.text,
+							title: record.data.local_time + " - " + record.data.type + ": " + record.data.name,
+							tag: "reminder-" + record.data.id,
+							onclose: function (e) {
+								me.doTask("dismiss_reminders", 0, [record.data.id], reminderPanel);
+							}
+						}
+					);
+
+					this.notifiedReminders[reminderId] = true;
+				}
+
+				this.reminders.add(reminderPanel );
 
 				snoozeMenu.items.each(function(i) {
 					i.setHandler(function(item){ this.doTask("snooze_reminders", item.value, [record.data.id], reminderPanel); }, this);
@@ -137,7 +165,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 			}, this);
 
-			go.Notifier.notificationArea.doLayout();
+			this.reminders.doLayout();
 
 		},this);
 
@@ -156,8 +184,9 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			},
 			callback: function(){
 				for (var i = 0; i < reminderIds.length;  i++) {
-					this.reminderStore.remove(reminderIds[i]);
+					this.reminderStore.remove(this.reminderStore.getById(reminderIds[i]));
 				}
+
 				GO.checker.lastCount = this.reminderStore.getCount();
 
 				if(!GO.checker.lastCount){
@@ -167,7 +196,17 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					go.Notifier.toggleIcon('reminder', false);
 				}
 
+				if(!reminderPanel) {
+					reminderPanel = Ext.getCmp('go-reminder-pnl-' + reminderIds[0]);
+				}
+
+				if(reminderPanel.notification) {
+					reminderPanel.notification.close();
+				}
+
 				reminderPanel && reminderPanel.destroy();
+
+
 			}, scope: this
 		});
 	},
@@ -216,6 +255,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 	handleReminderResponse : function(storeData){
 //		this.fireEvent('check', this, data);
 		var hasReminders = (storeData.total && storeData.total > 0);
+		var me = this;
 		go.Notifier.toggleIcon('reminder',hasReminders);
 
 		if(!hasReminders) return;
@@ -228,32 +268,30 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 		this.lastCount = this.reminderStore.getCount();
 
-		if(!GO.util.empty(GO.settings.popup_reminders)){
-			if (!("Notification" in window)) {
-				if(GO.util.isMobileOrTablet()) {
-					return;
-				}
-				GO.reminderPopup = GO.util.popup({
-					width:400,
-					height:400,
-					url:GO.url("reminder/display"),
-					target:'groupofficeReminderPopup',
-					position:'br',
-					closeOnFocus:false
-				});
-			} else {
-				var text = '';
+		// if(!GO.util.empty(GO.settings.popup_reminders)){
+		// 	if (!("Notification" in window)) {
+		// 		if(GO.util.isMobileOrTablet()) {
+		// 			return;
+		// 		}
+		// 		GO.reminderPopup = GO.util.popup({
+		// 			width:400,
+		// 			height:400,
+		// 			url:GO.url("reminder/display"),
+		// 			target:'groupofficeReminderPopup',
+		// 			position:'br',
+		// 			closeOnFocus:false
+		// 		});
+		// 	} else {
+		//
+		// 		// for (var i = 0, l = storeData.results.length; i < l; i++) {
+		// 		// 	var rem = storeData.results[i];
+		// 		//
+		// 		// }
+		//
+		// 	}
+		// }
 
-				for (var i = 0, l = storeData.results.length; i < l; i++) {
-					var rem = storeData.results[i];
-					text += '['+rem.time+'] ' + rem.type+': '+rem.name + "\n";
-				}
-
-				//console.log(storeData);
-
-				go.Notifier.notify({iconCls: "ic-notifications",text: text, title: t("Reminders")});
-			}
-		}
+		go.Notifier.showNotifications();
 		go.Notifier.playSound('message-new-email', 'reminder');
 
 	},

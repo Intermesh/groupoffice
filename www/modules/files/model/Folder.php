@@ -76,6 +76,16 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		return parent::init();
 	}
 
+	public static function getUserHomePath($username, $full = false) {
+		if(isset(go()->getConfig()['userHomePath'])) {
+			$path = str_replace('{username}', $username, go()->getConfig()['userHomePath']);
+		} else{
+			$path = 'users/' . $username;
+		}
+
+		return $full ? \GO::config()->file_storage_path . $path : $path;
+	}
+
 
 	protected function getCacheAttributes() {
 
@@ -679,7 +689,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function findHomeFolder($user){
 
-		$folder = Folder::model()->findByPath('users/'.$user->username, true);
+		$folder = Folder::model()->findByPath(\GO\Files\Model\Folder::getUserHomePath($user->username), true);
 
 		if(empty($folder->acl_id)){
 				$folder->setNewAcl($user->id);

@@ -469,7 +469,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 	}
 	
 	public function buildFilesPath() {
-		return 'users/'.$this->username;
+		return \GO\Files\Model\Folder::getUserHomePath($this->username);
 	}
 	
 	protected function beforeSave(){

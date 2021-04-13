@@ -252,7 +252,7 @@ class SavedMessage extends ComposerMessage {
 
 				//$part_number++;
 				if (isset($part->parts)) {
-					$this->_getParts($part, $part_number_prefix . $part_number . '.');
+					$this->_getParts($part, $part_number_prefix . $part_number . '.', $preserveHtmlStyle);
 				}
 			}
 		} elseif (isset($structure->body)) {			
@@ -264,7 +264,7 @@ class SavedMessage extends ComposerMessage {
 				$text_part = nl2br($text_part);
 			}else{
 				$text_part = \GO\Base\Util\StringHelper::convertLinks($text_part);
-				$text_part = \GO\Base\Util\StringHelper::sanitizeHtml($text_part);
+				$text_part = \GO\Base\Util\StringHelper::sanitizeHtml($text_part, $preserveHtmlStyle);
 			}
 			
 			$this->_loadedBody .= $text_part;

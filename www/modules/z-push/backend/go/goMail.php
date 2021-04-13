@@ -137,8 +137,8 @@ class goMail extends GoBaseBackendDiff {
 							ZLog::Write(LOGLEVEL_DEBUG, 'Recreating MIME source');
 							
 							try{
-							$sendMessage = \GO\Base\Mail\Message::newInstance()->loadMimeMessage($source, true);
-							$asBodyData = $sendMessage->toString();
+								$sendMessage = \GO\Base\Mail\Message::newInstance()->loadMimeMessage($source, true);
+								$asBodyData = $sendMessage->toString();
 							} catch (Exception $e){
 								ZLog::Write(LOGLEVEL_ERROR, "Failed to recreate mime source. Falling back to original mime. Subject: ".$imapMessage->subject." Exception: ".$e->getMessage());
 								$asBodyData = $source;
