@@ -260,20 +260,13 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
-
-INSERT INTO gastouder_evaluation (`year`, `status`, `familyId`)
-SELECT 2019 as year, 3 as status, u.id as familyId -- col_559 as opmerking, col_560 as datum
-FROM ab_contacts c JOIN cf_ab_contacts cf ON c.id = cf.model_id JOIN core_user u ON u.id = c.go_user_id
-    JOIN gastouder_family f ON u.id = f.id
-WHERE cf.col_558 = 1;
-
 INSERT INTO tasks_portlet_tasklist (`createdBy`, `tasklistId`)
     SELECT user_id, tasklist_id FROM ta_portlet_tasklists;
-INSERT INTO tasks_tasks_custom_field (`id`)
+INSERT INTO tasks_task_custom_fields (`id`)
     SELECT id FROM ta_tasks_custom_fields;
 INSERT INTO tasks_tasklist (`id`, `role`, `name`, `createdBy`, `aclId`, `filesFolderId`, `version`)
     SELECT id, '1', `name`, user_id, acl_id, files_folder_id, version FROM ta_tasklists;
-INSERT INTO tasks_category (`id`, `name`, `createdAt`)
+INSERT INTO tasks_category (`id`, `name`, `createdBy`)
     SELECT id, `name`, user_id FROM ta_categories;
 INSERT INTO tasks_task (id,uid,tasklistId,createdBy, createdAt, modifiedAt, modifiedBy, `start`, due, progress, progressUpdated,
                         title, description, filesFolderId, priority, percentComplete)
