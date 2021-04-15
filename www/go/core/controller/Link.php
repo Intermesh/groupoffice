@@ -29,7 +29,17 @@ class Link extends EntityController {
 		
 		return $p;
 	}
-	
+
+	protected function getQueryQuery($params)
+	{
+		$q = parent::getQueryQuery($params)
+			->removeJoin('core_entity', 'eFrom')
+			->removeJoin('core_entity', 'eTo')
+			->groupBy([])->distinct();
+
+		return $q;
+	}
+
 	/**
 	 * Handles the Foo entity's Foo/query command
 	 * 
