@@ -72,9 +72,10 @@ trait SearchableTrait {
 		$words = SearchableTrait::splitTextKeywords($searchPhrase);
 		$words = array_unique($words);
 
+		//$query->noCache();
+
 		foreach($words as $word) {
 			$query->join("core_search_word", 'w'.$i, 'w'.$i.'.searchId = search.id');
-			//$query->join("core_search_word_reverse", 'wr'.$i, 'wr'.$i.'.searchId = s.id');
 
 			$c = new Criteria();
 			$c
