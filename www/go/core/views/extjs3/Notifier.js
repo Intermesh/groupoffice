@@ -1,6 +1,15 @@
 (function() {
 	//User interaction is required for sounds to autoplay
-	function setInteracted() {
+	function setInteracted(e) {
+		console.log(e);
+
+		if(e instanceof KeyboardEvent) {
+			var keyCode = e.which ? e.which : e.keyCode;
+
+			if(keyCode == 18 || keyCode == 91 || keyCode == 17|| keyCode == 16|| keyCode == 20) {
+				return;
+			}
+		}
 		go.Notifier.userInteracted();
 
 		window.removeEventListener("scroll", setInteracted);
