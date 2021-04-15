@@ -18,7 +18,7 @@ require("../vendor/autoload.php");
 App::get()->setAuthState(new State());
 
 if(!App::get()->setAuthState(new State())->getAuthState()->isAuthenticated()) {
-	http_response_code(403);
+	http_response_code(401);
 	exit("Unauthorized.");
 }
 

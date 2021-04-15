@@ -22,6 +22,8 @@
 namespace GO\Base\Util;
 
 
+use go\core\ErrorHandler;
+
 class StringHelper {
 	
 	/**
@@ -977,7 +979,15 @@ END;
 			}
 		}
 
-		return self::prefixCSSSelectors($css, '.'.$prefix);
+		$style = self::prefixCSSSelectors($css, '.'.$prefix);
+
+		//apply body style on root element
+		$bodyStyle = self::extractBodyStyle($html);
+		if(!empty($bodyStyle)) {
+			$style = '.'.$prefix . ' {' . $bodyStyle . "};\n";
+		}
+
+		return $style;
 	}
 
 	private static function prefixCSSSelectors($css, $prefix = '.go-html-formatted') {
@@ -1035,6 +1045,37 @@ END;
 
 	}
 
+	private static function extractBodyStyle($html) {
+		$style = "";
+
+		if(!preg_match("'<body [^>]*>'usi", $html, $matches)) {
+			return $style;
+		}
+
+		try {
+			$d = new \DOMDocument();
+			$d->loadHTML("<html>" . $matches[0] . '</body></html>');
+			$bodyEls = $d->getElementsByTagName('body');
+			if(!$bodyEls->length) {
+				return $style;
+			}
+			$bodyEl = $bodyEls->item(0);
+		} catch (\Exception $e) {
+			ErrorHandler::logException($e);
+			return $style;
+		}
+
+		if($bodyEl->hasAttribute("bgcolor")) {
+			$style .= "background-color: " . $bodyEl->getAttribute("bgcolor").";";
+		}
+
+		if($bodyEl->hasAttribute("style")) {
+			$style .= $bodyEl->getAttribute("style");
+		}
+
+		return $style;
+	}
+
 	/**
 	 * Convert Dangerous HTML to safe HTML for display inside of Group-Office
 	 *
@@ -1044,7 +1085,7 @@ END;
 	 * @access public
 	 * @return StringHelper HTML formatted string
 	 */
-	public static function sanitizeHtml($html) {
+	public static function sanitizeHtml($html, $preserveHtmlStyle = true) {
 	
 		//needed for very large strings when data is embedded in the html with an img tag
 		ini_set('pcre.backtrack_limit', (int)ini_get( 'pcre.backtrack_limit' )+ 1000000 );
@@ -1057,8 +1098,10 @@ END;
 		$html = preg_replace("'<!--.*-->'Uusi", "", $html);
 		$html = preg_replace('!/\*.*?\*/!s', '', $html);
 
-		$prefix = 'msg-' . uniqid();
-		$styles = self::extractStyles($html, $prefix);
+		if($preserveHtmlStyle) {
+			$prefix = 'groupoffice-msg-' . uniqid();
+			$styles = self::extractStyles($html, $prefix);
+		}
 
 		//strip everything above <body first. This fixes a mail from Amazon that had the body inside the head section :(
 		$bodyPos = stripos($html, '<body');
@@ -1123,8 +1166,11 @@ END;
 			$html = StringHelper::replaceEmoticons($html,true);
 
 		if(!empty($styles)) {
-			$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="'.$prefix.'">'. $html .'</div>';
+			$html = '<style id="groupoffice-extracted-style">' . $styles . '</style><div class="msg '.$prefix.'">'. $html .'</div>';
+		} else if($preserveHtmlStyle) {
+			$html = '<div class="msg">'. $html .'</div>';
 		}
+
 		return $html;
 	}
 	

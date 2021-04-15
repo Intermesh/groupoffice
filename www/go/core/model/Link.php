@@ -365,7 +365,10 @@ class Link extends AclItemEntity
 							$crtiteria->where('fromId', '=', $value);
 						})
 						->add('entity', function (Criteria $criteria, $value){
-							$criteria->where(['eFrom.clientName' => $value]);		
+
+							$e = EntityType::findByName($value);
+
+							$criteria->where(['l.fromEntityTypeId' => $e->getId()]);
 						})
 						->add('entities', function (Criteria $criteria, $value){
 							// Entity filter consist out of name => "Contact" and an optional "filter" => "isOrganization"
@@ -376,7 +379,8 @@ class Link extends AclItemEntity
 							$sub = (new Criteria);
 
 							foreach($value as $e) {
-								$w = ['eTo.clientName' => $e['name']];
+								$et = EntityType::findByName($e['name']);
+								$w = ['l.toEntityTypeId' => $et->getId()];
 								if(isset($e['filter'])) {
 									$w['filter'] = $e['filter'];
 								}

@@ -159,6 +159,13 @@ abstract class EntityController extends Controller {
 		}
 		
 		$params['calculateTotal'] = !empty($params['calculateTotal']) ? true : false;
+
+		$params['calculateHasMore'] = !empty($params['calculateHasMore']) && $params['limit'] > 0 ? true : false;
+
+		//a faster alternative to calculateTotal just indicating that there are more entities. We do that by selecting one more than required.
+		if($params['calculateHasMore']) {
+			$params['limit']++;
+		}
 		
 		return $params;
 	}
@@ -194,6 +201,10 @@ abstract class EntityController extends Controller {
 				$ids[] = $count ? $record[0] : implode('-', $record);
 			}
 
+			if($p['calculateHasMore'] && count($ids) > $params['limit']) {
+				$hasMore = !!array_pop($ids);
+			}
+
 			$response = [
 				'accountId' => $p['accountId'],
 				'state' => $state,
@@ -201,6 +212,10 @@ abstract class EntityController extends Controller {
 				'notfound' => [],
 				'canCalculateUpdates' => false
 			];
+
+			if(isset($hasMore)) {
+				$response['hasMore'] = $hasMore;
+			}
 
 			if ($p['calculateTotal']) {
 				// $totalQuery = clone $idsQuery;

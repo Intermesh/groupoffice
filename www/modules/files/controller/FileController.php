@@ -159,6 +159,26 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		return parent::actionDisplay($params);
 	}
 
+	private function isAnimatedGif($filename) {
+		if(!($fh = @fopen($filename, 'rb')))
+			return false;
+		$count = 0;
+		//an animated gif contains multiple "frames", with each frame having a
+		//header made up of:
+		// * a static 4-byte sequence (\x00\x21\xF9\x04)
+		// * 4 variable bytes
+		// * a static 2-byte sequence (\x00\x2C)
+
+		// We read through the file til we reach the end of the file, or we've found
+		// at least 2 frame headers
+		while(!feof($fh) && $count < 2) {
+			$chunk = fread($fh, 1024 * 100); //read 100kb at a time
+			$count += preg_match_all('#\x00\x21\xF9\x04.{4}\x00[\x2C\x21]#s', $chunk, $matches);
+		}
+
+		fclose($fh);
+		return $count > 1;
+	}
 	
 	protected function afterDisplay(&$response, &$model, &$params) {
 
@@ -182,9 +202,13 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 		
 		$response['data']['url']=\GO::url('files/file/download',array('id'=>$model->id), false, true);
 
-		if ($model->fsFile->isImage())
-			$response['data']['thumbnail_url'] = $model->thumbURL;
-		else
+		if ($model->fsFile->isImage()) {
+			if($response['data']['extension'] == 'gif' && $this->isAnimatedGif(\GO::config()->file_storage_path . $model->path)) {
+				$response['data']['thumbnail_url'] = $model->getDownloadURL(false);
+			} else {
+				$response['data']['thumbnail_url'] = $model->thumbURL;
+			}
+		}else
 			$response['data']['thumbnail_url'] = "";
 		
 		$response['data']['handler']='startjs:function(){'.$model->getDefaultHandler()->getHandler($model).'}:endjs';

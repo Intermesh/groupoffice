@@ -638,7 +638,12 @@ go.util =  (function () {
 								Ext.getBody().unmask();
 
 								if (!success) {
-									Ext.MessageBox.alert(t("Error"), response.errors.join("<br />"));
+									if(response.message) {
+										Ext.MessageBox.alert(t("Error"), response.message);
+									} else {
+										Ext.MessageBox.alert(t("Error"), response.errors.join("<br />"));
+									}
+
 								} else {
 									var msg = t("Imported {count} items").replace('{count}', response.count) + ". ";
 

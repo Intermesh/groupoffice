@@ -1,3 +1,22 @@
+6.4.244
+- Email: preserve links when forwarding emails
+- Email: bugfix when creating links
+- Carddav: Fixed carddav problem when logged in with letters in different case than stored in database.
+- Smime: Fixed from showing unknown@unknown.domain
+- Core: Creating new linked item could do expensive unnecessary request
+
+12-04-2021 6.4.232
+- OnlyOffice: Only office only worked in root of domain
+- Address book: Save name column width
+- Projects: Save time entry grid state in edit dialog of project
+
+02-04-2021 6.4.231
+- Email: Fixed could not parse XML error
+
+01-04-2021 6.4.230
+- Email: Preseve body style attributes
+- Billing: Hide projects tab in report if no projects module available
+- Email: hide context menu 'Delete sender from' if no items available 
 - Core: Make Account settings > Groups scrollable for non-admin users
 - Email: SMIME decrypted content in reply too when plaintext is enabled
 - Core: List navigation after delete could move in wrong direction

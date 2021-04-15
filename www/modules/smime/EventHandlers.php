@@ -98,12 +98,13 @@ class EventHandlers {
 			//this.
 			openssl_pkcs7_verify($outfile->path(), null, "/dev/null", array(), GO::config()->root_path."modules/smime/dummycert.pem", $verifyOutfile->path());
 
-			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData(
-							$verifyOutfile->getContents());
+			$mime = $verifyOutfile->getContents();
+			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($mime);
 			
 			//remove temp files
 			$outfile->delete();
 			$verifyOutfile->delete();
+			unset($mime);
 
 			$newResponse = $message->toOutputArray(true);
 			
@@ -221,6 +222,9 @@ class EventHandlers {
 					unset($newResponse['to']);					
 					unset($newResponse['to_string']);
 					unset($newResponse['cc']);
+					unset($newResponse['from']);
+					unset($newResponse['full_from']);
+					unset($newResponse['sender']);
 					
 					foreach($newResponse as $key=>$value){
 						if(!empty($value) || $key=='attachments')

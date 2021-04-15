@@ -265,7 +265,7 @@ go.Jmap = {
 	request: function (options) {
 		if(!options.method) {
 			throw "method is required";
-		}		
+		}
 
 		if (this.timeout) {
 			clearTimeout(this.timeout);
