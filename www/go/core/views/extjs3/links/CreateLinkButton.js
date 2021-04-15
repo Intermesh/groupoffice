@@ -303,6 +303,8 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 		this.newLinks = [];		
 		this.linkGrid.store.removeAll();
 		this.linkGrid.store.setFilter("link", null);
+		this.linkGrid.store.loaded = false; //otherwise changes will reload with all links in request when this button is
+		//hidden and reused.
 		this.setCount(0);		
 		//this.menu.un("show", this.load);
 	},
