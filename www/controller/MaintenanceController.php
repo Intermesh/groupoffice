@@ -327,12 +327,14 @@ class MaintenanceController extends AbstractController {
 
 		$queries[] = "drop index acl_id on core_search;";
 		$queries[] = "drop index core_search_entityTypeId_filter_modifiedAt_aclId_index on core_search;";
-		$queries[] = "drop index entityId on core_search;";
-		$queries[] = "drop index entityTypeId on core_search;";
 		$queries[] = "drop index moduleId on core_search;";
 
 		$queries[] = "alter table core_search_word drop foreign key core_search_word_ibfk_1;";
 		$queries[] = "drop index searchId on core_search_word;";
+
+		//this one wont be deleted before indexing because its important for querying missing entities
+//		$c->exec("create index entityId
+//    on core_search (entityTypeId, entityId);");
 
 		foreach($queries as $query) {
 			try {
@@ -360,9 +362,6 @@ class MaintenanceController extends AbstractController {
 
 		$c->exec("create index core_search_entityTypeId_filter_modifiedAt_aclId_index
     on core_search (entityTypeId, filter, modifiedAt, aclId);");
-
-		$c->exec("create index entityTypeId
-    on core_search (entityTypeId);");
 
 		$c->exec("create index moduleId
     on core_search (moduleId);");
