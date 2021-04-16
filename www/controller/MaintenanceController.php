@@ -412,6 +412,8 @@ class MaintenanceController extends AbstractController {
 		go()->getDbConnection()->exec("SET unique_checks=0; SET foreign_key_checks=0; SET autocommit=0");
 
 		$this->removeSearchCacheKeys();
+
+		go()->getDbConnection()->exec("commit");
 		
 		if(!empty($params['reset'])) {
 			echo "Resetting cache!\n";

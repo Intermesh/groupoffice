@@ -895,4 +895,4 @@ $updates['202104161227'][] = "create index core_search_entityTypeId_filter_modif
 $updates['202104161227'][] = "ALTER TABLE `core_search_word`
   DROP `drow`;";
 
-$updates['202104161227'][] = "ALTER TABLE core_search` DROP INDEX `entityTypeId`";
+$updates['202104161227'][] = "ALTER TABLE `core_search` DROP INDEX `entityTypeId`";
