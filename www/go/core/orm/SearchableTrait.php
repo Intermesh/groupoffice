@@ -330,7 +330,7 @@ trait SearchableTrait {
 		}
 
 
-		go()->getDbConnection()->commit();
+		go()->getDbConnection()->exec("commit");
 
 
 	}
