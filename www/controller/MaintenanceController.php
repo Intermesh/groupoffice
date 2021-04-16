@@ -417,8 +417,8 @@ class MaintenanceController extends AbstractController {
 		
 		if(!empty($params['reset'])) {
 			echo "Resetting cache!\n";
-			go()->getDbConnection()->exec("truncate core_search");
 			go()->getDbConnection()->exec("truncate core_search_word");
+			go()->getDbConnection()->exec("truncate core_search");
 		}
 		
 		echo "Checking search cache\n\n";
