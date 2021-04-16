@@ -57,6 +57,12 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	private $calcFoundRows = false;
 	private $noCache = false;
 
+	private $indexHintList;
+
+	public function getIndexHintList() {
+		return $this->indexHintList;
+	}
+
 	public function getTableAlias() {
 		return isset($this->tableAlias) ? $this->tableAlias : 't';
 	}
@@ -440,6 +446,19 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 				'joinTableAlias' => $joinTableAlias,
 				'type' => $type
 		];
+
+		return $this;
+	}
+
+	/**
+	 * Specify index hints for mysql
+	 *
+	 * @see https://dev.mysql.com/doc/refman/8.0/en/index-hints.html
+	 * @param string $hintList eg. "USE INDEX (col1_index,col2_index)"
+	 * @return $this
+	 */
+	public function useIndex($hintList) {
+		$this->indexHintList = $hintList;
 
 		return $this;
 	}

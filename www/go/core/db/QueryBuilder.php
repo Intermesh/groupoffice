@@ -342,6 +342,11 @@ class QueryBuilder {
 			$select .= ' `' . $this->tableAlias . "`";
 		}
 
+		$hintList = $query->getIndexHintList();
+		if($hintList) {
+			$select .= " " . $hintList;
+		}
+
 		$where = $this->buildWhere($this->query->getWhere(), $prefix);
 
 		if (!empty($where)) {

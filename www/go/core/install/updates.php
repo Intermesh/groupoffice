@@ -887,3 +887,10 @@ $updates['202103091517'][] = "ALTER TABLE `core_customfields_select_option` ADD 
 $updates['202104061227'][] = "alter table core_user drop column popup_reminders;";
 
 $updates['202104061227'][] = "alter table core_user drop column popup_emails;";
+
+$updates['202104061227'][] = "ALTER TABLE core_search DROP INDEX `filter`;";
+$updates['202104061227'][] = "create index core_search_entityTypeId_filter_modifiedAt_aclId_index
+    on core_search (entityTypeId, filter, modifiedAt, aclId);";
+
+$updates['202104061227'][] = "ALTER TABLE `core_search_word`
+  DROP `drow`;";

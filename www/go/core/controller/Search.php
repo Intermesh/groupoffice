@@ -116,10 +116,10 @@ class Search extends EntityController {
 	protected function getQueryQuery($params)
 	{
 		return parent::getQueryQuery($params)
-			->groupBy([])
-			->distinct()
-			->select("search.id")
-			->removeJoin('core_entity', 'e');
+				->useIndex("use index(PRIMARY, core_search_entityTypeId_filter_modifiedAt_aclId_index)")
+				->groupBy([])
+				->select("search.id")
+				->removeJoin('core_entity', 'e');
 	}
 
 	/**
