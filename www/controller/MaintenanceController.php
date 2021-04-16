@@ -369,8 +369,8 @@ class MaintenanceController extends AbstractController {
 		$c->exec("create index moduleId
     on core_search (moduleId);");
 
-		$c->exec("alter table core_search add constraint entityId
-    unique (entityId, entityTypeId);");
+//		$c->exec("alter table core_search add constraint entityId
+//    unique (entityId, entityTypeId);");
 
 		$c->exec("alter table core_search add constraint core_search_ibfk_1
     foreign key (entityTypeId) references core_entity (id)
