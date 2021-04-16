@@ -3,6 +3,7 @@ namespace go\core\orm;
 
 use go\core\db\Criteria;
 use go\core\model\Link;
+use go\core\model\Search;
 
 /**
  * Entities can use this trait to make it show up in the global search function
@@ -268,15 +269,18 @@ trait SearchableTrait {
 	 */
 	private static function queryMissingSearchCache($cls, $offset = 0) {
 		
-		$limit = 100;
+		$limit = 1000;
 			
 		$query = $cls::find();
 		/* @var $query \go\core\db\Query */
 		$query->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . $cls::entityType()->getId(), "LEFT");
 		$query->andWhere('search.id IS NULL')
+
+//			$query->where('id', 'not in', Search::find()->selectSingleValue('entityId')->where('entityTypeId', '=', $cls::entityType()->getId()))
 							->limit($limit)
 							->offset($offset);
-		
+
+
 		return $query->execute();
 	}
 	

@@ -12,6 +12,7 @@ use GO;
 use GO\Base\Controller\AbstractController;
 use GO\Base\Db\PDO;
 use go\core\auth\TemporaryState;
+use go\core\db\Table;
 use go\core\db\Utils;
 use go\modules\community\history\Module;
 use PDOException;
@@ -344,6 +345,8 @@ class MaintenanceController extends AbstractController {
 				//ignore
 			}
 		}
+
+		Table::destroyInstances();
 	}
 
 	private function addSearchCacheKeys() {

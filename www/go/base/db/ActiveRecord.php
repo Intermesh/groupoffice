@@ -4935,7 +4935,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$entityTypeId = static::entityType()->getId();
 		
 			$start = 0;
-			$limit = 100;
+			$limit = 1000;
 			
 			$findParams = FindParams::newInstance()
 							->ignoreAcl()
