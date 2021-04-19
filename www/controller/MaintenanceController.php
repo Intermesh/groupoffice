@@ -376,7 +376,8 @@ class MaintenanceController extends AbstractController {
     foreign key (entityTypeId) references core_entity (id)
         on delete cascade;");
 
-		//todo fails in intermesh db
+		//Todo fix orphan acl id's
+		$c->exec("delete from core_search where aclId not in (select id from core_acl);");
 		$c->exec("alter table core_search add constraint core_search_ibfk_2
     foreign key (aclId) references core_acl (id)
         on delete cascade;");

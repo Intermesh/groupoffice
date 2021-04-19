@@ -896,11 +896,11 @@ $updates['202104161227'][] = "ALTER TABLE `core_search_word`
   DROP `drow`;";
 
 $updates['202104161227'][] = "ALTER TABLE `core_search` DROP INDEX `entityTypeId`";
-//
-//$updates['202104161227'][] = function() {
-//
-//	//run build search cache on cron immediately. This job will deactivate itself.
-//	\go\core\cron\BuildSearchCache::install("* * * * *");
-//
-//	echo "NOTE: Search cache will be rebuilt by a scheduled task. This may take a lot of time.";
-//};
+
+$updates['202104161227'][] = function() {
+
+	//run build search cache on cron immediately. This job will deactivate itself.
+	\go\core\cron\BuildSearchCache::install("* * * * *");
+
+	echo "NOTE: Search cache will be rebuilt by a scheduled task. This may take a lot of time.";
+};
