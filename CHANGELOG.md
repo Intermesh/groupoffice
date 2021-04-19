@@ -4,6 +4,7 @@
 - Core: Safari could ask for notifications for each reminders shown
 - Newsletters: Templates menu didn't load
 - Projects2: bugfix in duplicate project dialog
+- Email: remember dimensions attachment save as dialog
 
 09-04-2021 6.5.41
 - Core: Ignore duplicate constraint error of MySQL on upgrade
