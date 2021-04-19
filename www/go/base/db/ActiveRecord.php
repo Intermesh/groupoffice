@@ -1510,7 +1510,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 						$where .= "\nAND";
 					//}
 
-					$where .= 'w'.$i.'.word  LIKE ' . $this->getDbConnection()->quote($word.'%', PDO::PARAM_STR) . " ";
+					$where .= ' w'.$i.'.word  LIKE ' . $this->getDbConnection()->quote($word.'%', PDO::PARAM_STR) . " ";
 
 					$i++;
 				}
