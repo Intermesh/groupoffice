@@ -457,7 +457,7 @@ class MaintenanceController extends AbstractController {
 		$this->addSearchCacheKeys();
 
 
-		go()->getDbConnection()->exec("SET unique_checks=1; SET foreign_key_checks=1; autocommit=1");
+		go()->getDbConnection()->exec("SET unique_checks=1; SET foreign_key_checks=1; SET autocommit=1");
 
 		echo "Resettings JMAP sync state\n";
 		go()->rebuildCache();
