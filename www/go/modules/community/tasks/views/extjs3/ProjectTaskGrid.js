@@ -2,22 +2,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 	if (!config) {
 		config = {};
 	}
-	var checkColumn = new GO.grid.CheckColumn({ // TODO: Do we need this?
-		width: dp(64),
-		dataIndex: 'selected',
-		hideable: false,
-		sortable: false,
-		menuDisabled: true,
-		listeners: {
-			change: this.onCheckChange,
-			scope: this
-		},
-		isDisabled: function (record) {
-			return record.data.id === 1;
-		}
-	});
 	var summary = new Ext.grid.GridSummary();
-
 	var addTimeRegAction = '';
 
 	if (go.Modules.isAvailable("legacy", "timeregistration2")) {
@@ -40,7 +25,8 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 					case 'ic-alarm-add':
 
 						if (!this.timeEntryDialog) {
-							// TODO: Refactor this as well?
+							// TODO: Refactor to JMAP
+							/*
 							this.timeEntryDialog = new GO.projects2.TimeEntryDialog({
 								id: 'pm-timeentry-dialog-grid'
 							});
@@ -58,13 +44,15 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 									scope: this
 								});
 							}, this);
+
+							 */
 						}
 
 
 						this.timeEntryDialog.show(0, {
 							loadParams: {
 								task_id: record.data.id,
-								project_id: record.data.project_id
+								project_id: record.data.projectId
 							}
 						});
 						break;
@@ -85,11 +73,11 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 	this.selectResource = new GO.projects2.SelectResource();
 
 	this.selectResource.store.on('load', function () {
-		this.setDisabled(!this._tasksPanelEnabled || this.selectResource.store.getCount() == 0);
+		this.setDisabled(!this._tasksPanelEnabled || this.selectResource.store.getCount() === 0);
 	}, this)
 
 	var fields = {
-		fields: ['id', 'parent_description', 'project_id', 'user_id', 'percentage_complete', 'duration', 'hours_booked', 'due_date', 'auto_date', 'description', 'sort_order', 'hours_over_budget', 'late', 'parent_id', 'has_children'],
+		fields: ['id', 'group.name', 'projectId', 'responsibleUserId', 'percentageComplete', 'estimatedDuration', 'hoursBooked', 'due', 'start', 'description' , 'groupId'],
 		columns: [{
 			id: 'start',
 			header: t('Start'),
@@ -97,23 +85,17 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 			dataIndex: 'start',
 			menuDisabled: true,
 			hideable: false,
+			editor: new go.form.DateField({
+				format:go.User.date_format,
+				emptyText:'Auto'
+			}),
+			summaryType: 'count',
+			summaryRenderer:function(value){
+				return value+' '+t("Jobs", "projects2");
+			},
+
 			renderer: function (name, cell, record) {
-				/* Old code
-						metaData.css='';
-		if(record.data.late)
-			metaData.css='projects-late';
-
-		if(GO.util.empty(value))
-			return record.data.auto_date;
-
-
-		var str=typeof(value.dateFormat)=='undefined' ? value : value.dateFormat(GO.settings.date_format);
-
-		str += '<span class="pm-task-manual-date">&nbsp;[M]</span>';
-
-		return str;
-				 */
-				return typeof (value.dateFormat) == 'undefined' ? value : value.dateFormat(go.User.dateFormat);
+				return go.util.Format.date(name);
 			}
 
 		}, {
@@ -123,25 +105,37 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 			dataIndex: 'due',
 			menuDisabled: true,
 			hideable: false,
+			editor: new go.form.DateField({
+				format:go.User.date_format,
+				emptyText:'Auto'
+			}),
+			summaryType: 'count',
+			summaryRenderer:function(value){
+				return value+' '+t("Jobs", "projects2");
+			},
+
 			renderer: function (name, cell, record) {
-				/* Old code
-						metaData.css='';
-		if(record.data.late)
-			metaData.css='projects-late';
-
-		if(GO.util.empty(value))
-			return record.data.auto_date;
-
-
-		var str=typeof(value.dateFormat)=='undefined' ? value : value.dateFormat(GO.settings.date_format);
-
-		str += '<span class="pm-task-manual-date">&nbsp;[M]</span>';
-
-		return str;
-				 */
-				return typeof (value.dateFormat) == 'undefined' ? value : value.dateFormat(go.User.dateFormat);
+				if(Ext.isEmpty(name)) {
+					return '';
+				}
+				return go.util.Format.date(name);
 			}
 
+		},{
+			id: 'title',
+			header: t('Title'),
+			sortable: false,
+			dataIndex: 'title',
+			menuDisabled: true,
+			hideable: false,
+			editor: new Ext.grid.GridEditor(
+				this.titleField = new Ext.form.TextField({
+					allowBlank: false,
+					fieldLabel: t("Title")
+				}), {
+					autoSize: false
+				}),
+			renderer: go.util.nl2br
 		}, {
 			id: 'description',
 			header: t('Description'),
@@ -158,7 +152,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 				}), {
 					autoSize: false
 				}),
-			renderer: GO.util.nl2br
+			renderer: go.util.nl2br
 		}, {
 			id: 'percentComplete',
 			header: t("Percent complete", 'tasks', 'community'),
@@ -166,25 +160,25 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 			menuDisabled: true,
 			width: dp(260),
 			hideable: false,
-			editor: new Ext.grid.GridEditor(new GO.form.NumberField({minValue: 0, maxValue: 100, decimals: 0})),
+			editor: new Ext.grid.GridEditor(new go.form.NumberField({minValue: 0, maxValue: 100, decimals: 0})),
 			renderer: function (value, meta, rec, row, col, store) {
 				return '<div class="pm-progressbar">' +
 					'<div class="pm-progress-indicator" style="width:' + Math.ceil(GO.util.unlocalizeNumber(value)) + '%"></div>' +
 					'</div>';
 			}
-		}, {
+		},/* {
 			header: t("Duration", "projects2"),
-			dataIndex: 'duration',
+			dataIndex: 'estimatedDuration',
 			summaryType: 'sum',
 			hidden: true,
 			width: dp(64),
 			editor: new Ext.grid.GridEditor(new go.form.NumberField())
-		}, {
+		},*/ {
 			header: t("Hours booked", "projects2"),
-			dataIndex: 'hours_booked',
+			dataIndex: 'hoursBooked',
 			width: dp(72),
 			renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
-				// TODO
+				// TODO?
 				// if(record.data.hours_over_budget) {
 				// 	metaData.css = 'projects-late';
 				// }
@@ -192,16 +186,25 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 			},
 			summaryType: 'sum'
 		}, {
+			id: 'employee',
 			width: dp(72),
 			header: t("Employee", "projects2"),
-			dataIndex: 'user_id',
+			dataIndex: 'responsibleUserId',
 			renderer: this.renderResource.createDelegate(this),
 			editor: new Ext.grid.GridEditor(this.selectResource)
 		}, {
+			id: 'groupId',
 			header: "Group",
-			hidden: true,
+			hidden: false,
 			hideable: false,
-			dataIndex: 'parent_description',
+			dataIndex: 'groupId',
+			renderer: function(value, metaData, record, rowIndex, colIndex, ds) {
+				if(Ext.isEmpty(value)) {
+					return '';
+				}
+				return record.data.group[record.data.tasklistId].name;//record.data.group[record.tasklistId].name;
+			},
+
 			groupable: true
 		}]
 	};
@@ -212,40 +215,42 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 
 	fields.columns.push()
 
-	config.store = new go.data.Store({
-		sortInfo: {
-			field: 'name',
-			direction: 'ASC'
-		},
-		remoteSort: false,
-		baseParams: {
-			limit: 0,
-			tasklistId: this.tasklistId
-		},
+	config.store = new go.data.GroupingStore({
 		fields: [
 			'id',
 			'title',
+			'groupId',
 			'description',
 			'percentComplete',
 			'color',
 			'start',
 			'due',
-			'progress'
+			'progress',
+			'responsibleUserId',
+			'tasklistId',
+			'group'
 		],
-
+		sortInfo: {
+			field: 'start',
+			direction: 'ASC'
+		},
+		remoteSort: true,
+		remoteGroup: true,
+		filters: {
+			projectId: this.projectId
+		},
+		groupField: 'groupId',
 		entityStore: "Task"
 	});
 
-	var columnModel = new Ext.grid.ColumnModel({
+	config.cm = new Ext.grid.ColumnModel({
 		defaults: {
 			sortable: false,
 			groupable: false
 		},
 		columns: fields.columns
 	});
-
-	config.cm = columnModel;
-	config.view = new Ext.grid.GroupingView({
+	config.view = new go.grid.GroupingView({
 		emptyText: t("Tasks", "tasks", "community"),
 		hideGroupedColumn: true,
 		showGroupName: false
@@ -262,7 +267,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 		scope: this
 	}, {
 		iconCls: 'ic-delete',
-		tooltip: t("Delete"),
+		text: t("Delete"),
 		handler: function () {
 			this.deleteSelected();
 		},
@@ -302,8 +307,8 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 
 		var selections = sm.getSelections();
 
-		for (var i = 0; i < selections.length; i++) {
-			if (selections[i].data.parent_id > 0) {
+		for (var ii = 0,il=selections.length; ii < il; ii++) {
+			if (selections[ii].data.groupId > 0) {
 				this.ungroupButton.setDisabled(false);
 			} else {
 				this.groupButton.setDisabled(false);
@@ -314,31 +319,136 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 
 
 Ext.extend(go.modules.community.tasks.ProjectTaskGrid, go.grid.EditorGridPanel, {
-	project_id: 0,
+	projectId: 0,
 	disabled: true,
-	_recordsDeleted: false,
 	_tasksPanelEnabled: false,
 
 	setProjectId: function (projectId, tasksPanelEnabled) {
-		this.projectId = this.store.baseParams.projectId = projectId;
+		tasksPanelEnabled = tasksPanelEnabled || false;
+		this.projectId = projectId;
 
 		this._tasksPanelEnabled = tasksPanelEnabled;
 
-		this.selectResource.setProjectId(this.projectId);
+		if (tasksPanelEnabled) {
+			this.selectResource.setProjectId(this.projectId);
+		}
 
 		this.setDisabled(!this._tasksPanelEnabled || !this.projectId || this.selectResource.store.getCount() == 0);
 
-		// if (this._tasksPanelEnabled)
-		// 	this.expand();
-		// else
-		// 	this.collapse();
-		//
 		if (projectId) {
-			this.store.load();
+			this.store.setFilter('projectId', {projectId: this.projectId}).load();
+				// .then(function(result) {
+				// 	console.log(result);
+				// });
 		} else {
 			this.store.removeAll();
 		}
-		this._recordsDeleted = false;
+	},
+
+	deleteSelected : function(){
+		var selectedRows = this.selModel.getSelections();
+		if(selectedRows.length > 0) {
+			Ext.MessageBox.confirm(t('Confirm'), t('Are you sure you wish to remove the selected task(s)?'), function(btn){
+				if(btn !== 'yes') {
+					return;
+				}
+				var params = {};
+				params.destroy = []
+				for(var ii=0, il=selectedRows.length;ii<il;ii++) {
+					params.destroy.push(selectedRows[ii].id);
+				}
+				go.Db.store("Task").set(params);
+
+			});
+		}
+
+	},
+
+	addNewRow: function (groupName) {
+		this.stopEditing();
+		var description = groupName || "",
+			index = this.store.getCount(),
+			sm = this.getSelectionModel(),
+			rows = sm.getSelections(),
+			tasklistId = 0, // TODO: get tasklistId if no tasks available
+			groupId = null,
+			user_id,
+			parent_description = t("Ungrouped", "projects2");
+
+		if (rows.length > 0) {
+			index = this.store.indexOf(rows[rows.length - 1]) + 1;
+		}
+
+		if (description) {
+			index = 0; // If there is a description, then this is a group task.
+			// todo: get current GroupId
+		}
+		var previousRecord = this.store.getAt(index - 1);
+		if (previousRecord) {
+			tasklistId = previousRecord.data.tasklistId;
+			user_id = previousRecord.data.responsibleUserId;
+		} else {
+
+			var resource = this.selectResource.store.find('user_id', user_id);
+			if (resource === -1) {
+				var firstRecord = this.selectResource.store.getAt(0);
+				user_id = firstRecord.id;
+			}
+		}
+
+		var e = {};
+		e['new_' + tasklistId + '_' + this.store.getCount()] = {
+			description: description,
+			start: '',
+			due: '',
+			responsibleUserId: user_id,
+			title: t('New task', 'tasks'),
+			estimatedDuration: GO.util.numberFormat(1),
+			percentComplete: 0,
+			tasklistId: tasklistId,
+			groupId: groupId
+		};
+
+		go.Db.store('Task').set({create: e});
+
+		var colIndex = this.getColumnModel().getIndexById('title');
+
+		sm.selectRow(index);
+		this.startEditing(index, colIndex);
+
+		return index;
+
+	},
+
+	/**
+	 * Since saving directly into a grouping store does not work, we manually get the changes and create our own JMAP call
+	 * TODO? Refactor delete function into this function as well?
+	 */
+	save: function() {
+		if(!this.isDirty()) {
+			Ext.MessageBox.alert(t('Nothing to save'), t('No changes have been made'));
+			return;
+		}
+		var queue = {},
+			rs = this.store.getModifiedRecords(),
+			hasChanges = false;
+		queue.create = {};
+		queue.update = {};
+		for(var r,i = 0;r = rs[i]; i++){
+			if(!r.isValid()) {
+				continue;
+			}
+			hasChanges = true;
+			var change = {}, attr;
+			for(attr in r.modified) {
+				change[attr] = r.data[attr];
+			}
+			queue[r.phantom?'create':'update'][r.id] = change;
+		}
+		if(!hasChanges) {
+			return;
+		}
+		go.Db.store("Task").set(queue);
 	},
 
 	renderResource: function (value, p, record, rowIndex, colIndex, ds) {
@@ -346,10 +456,9 @@ Ext.extend(go.modules.community.tasks.ProjectTaskGrid, go.grid.EditorGridPanel, 
 		var ce = cm.getCellEditor(colIndex, rowIndex);
 
 		var val = '';
-
-		var record = ce.field.store.getById(value);
-		if (record !== undefined) {
-			val = record.get("user_name");
+		var userRecord = ce.field.store.getById(value);
+		if (userRecord !== undefined) {
+			val = userRecord.get("user_name");
 		}
 		return val;
 	},
@@ -399,31 +508,29 @@ Ext.extend(go.modules.community.tasks.ProjectTaskGrid, go.grid.EditorGridPanel, 
 	startEditing: function (row, col) {
 		go.modules.community.tasks.ProjectTaskGrid.superclass.startEditing.call(this, row, col);
 
-		//expand combo when editing
-		if (this.activeEditor) {
+		//expand combo when editing TODO: Test whether still needed
+		if (this.activeEditor && this.activeEditor.field.onTriggerClick) {
 			this.activeEditor.field.onTriggerClick();
 		}
 	},
-
-	onCheckChange: function (record, newValue) {
-		// if (newValue) {
-		// 	record.set('level', this.addLevel);
-		// 	this.value[record.data.id] = record.data.level;
-		// } else {
-		// 	record.set('level', null);
-		// 	this.value[record.data.id] = null;
-		// }
-
-		this._isDirty = true;
-	},
-
-	afterEdit: function (e) {
-		// this.value[e.record.id] = e.record.data.level;
-		this._isDirty = true;
+	// afterEdit: function (e) {
+		// 	debugger;
+		// 	this.value[e.record.id] = e.record.data.level;
+		// this._isDirty = true;
+	// },
+	onEditComplete : function(ed, value, startValue){
+		go.modules.community.tasks.ProjectTaskGrid.superclass.onEditComplete.call(this, ed, value, startValue);
+		// if(ed.col==5 && ed.row==this.store.getCount()-1)
+		// 	this.addNewRow();
+		if(value !== startValue) {
+			this._isDirty = true;
+		}
 	},
 
 	afterRender: function () {
+		// TODO: Do we need this handler anyway?
 		go.modules.community.tasks.ProjectTaskGrid.superclass.afterRender.call(this);
+
 
 		var form = this.findParentByType("entityform");
 
@@ -436,8 +543,9 @@ Ext.extend(go.modules.community.tasks.ProjectTaskGrid, go.grid.EditorGridPanel, 
 		}
 
 		form.on("load", function (f, v) {
-			this.setDisabled(v.permissionLevel < go.permissionLevels.manage); // TODO: determine correct level
+			this.setDisabled(v.permissionLevel < go.permissionLevels.manage);
 		}, this);
+
 
 		//Check form currentId becuase when form is loading then it will load the store on setValue later.
 		//Set timeout is used to make sure the check will follow after a load call.
@@ -448,6 +556,36 @@ Ext.extend(go.modules.community.tasks.ProjectTaskGrid, go.grid.EditorGridPanel, 
 			}
 		}, 0);
 	},
+
+	groupSelection: function(groupName) {
+		// TODO;
+	},
+
+	showToGroupDialog: function () {
+		// TODO: Refactor into JMAP
+		if (!this.toGroupDialog) {
+			this.toGroupDialog = new GO.projects2.ToGroupDialog(); // TODO: tasks?
+			this.toGroupDialog = new go.modules.community.tasks.TasklistGroupDialog();
+			this.toGroupDialog.on('groupName', function (groupName) {
+				this.groupSelection(groupName);
+			}, this);
+		}
+		this.toGroupDialog.show();
+
+	},
+
+	ungroupSelection: function () {
+		var selectedRows = this.selModel.getSelections();
+
+		for (var ii = 0, il=selectedRows.length; ii < il; ii++) {
+			selectedRows[ii].set('groupId', null);
+		}
+
+		this.save();
+		this.ungroupButton.setDisabled(true);
+		this.groupButton.setDisabled(false);
+	},
+
 
 	isFormField: true,
 

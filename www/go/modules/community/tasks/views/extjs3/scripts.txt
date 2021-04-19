@@ -13,3 +13,4 @@ AlertFields.js
 ChooseTasklistDialog.js
 ChooseTasklistGrid.js
 ProjectTaskGrid.js
+TasklistGroupDialog.js

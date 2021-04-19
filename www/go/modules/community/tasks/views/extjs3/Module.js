@@ -4,7 +4,8 @@ go.Modules.register("community", "tasks", {
 	entities: ["TaskCategory","PortletTasklist","Settings",{
 		name: "Tasklist",
 		relations: {
-			creator: {store: "User", fk: "createdBy"}
+			creator: {store: "User", fk: "createdBy"},
+			groups: {name: 'Groups'}
 		}
 	},{
 		name: "Task",
@@ -23,7 +24,8 @@ go.Modules.register("community", "tasks", {
 			modifier: {store: "User", fk: "modifiedBy"},
 			responsible: {store: 'User', fk: 'responsibleUserId'},
 			tasklist: {store: 'Tasklist', fk: 'tasklistId'}
-		},
+
+		}
 	}],
 	initModule: function () {}
 });

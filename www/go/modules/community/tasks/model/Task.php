@@ -150,6 +150,7 @@ class Task extends AclItemEntity {
 			->addTable("tasks_task", "task")
 			->addUserTable("tasks_task_user", "ut", ['id' => 'taskId'])
 			->addMap('alerts', Alert::class, ['id' => 'taskId'])
+			->addMap('group', TasklistGroup::class, ['groupId' => 'id'])
 			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId']);
 	}
 
@@ -227,7 +228,16 @@ class Task extends AclItemEntity {
 				$criteria->where('due', '>=', $value);
 			})->addDate("nextWeekEnd", function(Criteria $criteria, $comparator, $value) {
 				$criteria->where('due', '<=', $value);
+			})
+			->add('projectId', function(Criteria $criteria, $value, Query $query, array $filter){
+				if(!empty($value)) {
+					$query->join('tasks_tasklist','tl','task.tasklistId = tl.id')
+						->join('pr2_project_tasklist', 'prt', 'prt.tasklist_id = tl.id')
+						->groupBy(['task.id'])
+						->where(['prt.project_id' => $value]);
+				}
 			});
+
 	}
 
 	protected function internalSave() {

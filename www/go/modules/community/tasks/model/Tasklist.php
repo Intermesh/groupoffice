@@ -8,6 +8,9 @@
 namespace go\modules\community\tasks\model;
 
 use go\core\acl\model\AclOwnerEntity;
+use go\core\db\Criteria;
+use go\core\orm\Query;
+use GO\Projects2\Model\ProjectEntity;
 
 /**
  * Tasklist model
@@ -15,12 +18,14 @@ use go\core\acl\model\AclOwnerEntity;
 class Tasklist extends AclOwnerEntity
 {
 
+	const List = 1;
 	const Board = 2;
+	const Project = 3;
 
 	const Roles = [
-		1 => 'list',
-		2 => 'board',
-		3 => 'project'
+		self::List => 'list',
+		self::Board => 'board',
+		self::Project => 'project'
 	];
 
 	/** @var int */
@@ -67,6 +72,18 @@ class Tasklist extends AclOwnerEntity
 			->addTable("tasks_tasklist", "tasklist")
 			->addUserTable('tasks_tasklist_user', "ut", ['id' => 'tasklistId'])
 			->addArray('groups', TasklistGroup::class, ['id' => 'tasklistId'], ['orderBy'=>'sortOrder']);
+//			->addHasOne('project', ProjectEntity::class, ['id' => 'tasklist_id'] ); // TODO Query object?
+	}
+
+	protected static function defineFilters() {
+		return parent::defineFilters()
+			->add('projectId', function(Criteria $criteria, $value, Query $query, array $filter){
+				if(!empty($value)) {
+					$query->join('pr2_project_tasklist', 'prt', 'prt.tasklist_id = tasklist.id')
+						->groupBy(['tasklist.id'])
+						->where(['prt.project_id' => $value]);
+				}
+			});
 	}
 
 	protected function internalSave()
