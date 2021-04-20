@@ -43,7 +43,7 @@ function output($data = [], $status = 200, $statusMsg = null) {
 
 try {
 //Create the app with the config.php file
-	App::get();
+	App::get()->setAuthState(new State());
 	go()->getDebugger()->group("auth");
 	$auth = new Authenticate();
 
