@@ -14,6 +14,11 @@ class Module extends core\Module
 
 	public static $enabled = true;
 
+	public function autoInstall()
+	{
+		return true;
+	}
+
 	public function getAuthor() {
 		return "Intermesh BV <info@intermesh.nl>";
 	}
@@ -112,6 +117,13 @@ class Module extends core\Module
 			$log->changes = null;
 		}
 
+		$l = LogEntry::getMapping()->getColumn('changes')->length;
+		if(mb_strlen($log->changes) > $l) {
+			foreach($changes as $key => $v) {
+				$changes[$key] = '... changes were too big to log ...';
+			}
+			$log->changes = json_encode($changes);
+		}
 
 		if(!$log->save()) {
 			throw new \Exception ("Could not save log: " . var_export($log->getValidationErrors(), true));

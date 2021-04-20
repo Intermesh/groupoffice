@@ -40,7 +40,6 @@ class Installer {
 	
 	const EVENT_UPGRADE = 'upgrade';
 
-	private static $isInProgress = false;
 	private static $isInstalling = false;
 	private static $isUpgrading = false;
 
@@ -102,7 +101,7 @@ class Installer {
 	 * @param Module[] $installModules
 	 * @throws Exception
 	 */
-	public function install(array $adminValues = [], $installModules = []) {
+	public function install(array $adminValues = [], $installModules = null) {
 
 		ini_set("max_execution_time", 0);
 		
@@ -113,7 +112,6 @@ class Installer {
 		App::get()->setCache(new None());
 
 
-		self::$isInProgress = true;
 		self::$isInstalling = true;
 
 		ActiveRecord::$log_enabled = false;
@@ -149,6 +147,10 @@ class Installer {
 		
 		$this->installEmailTemplate();
 
+		if(!isset($installModules)) {
+			$installModules = $this->getAutoInstallModules();
+		}
+
 		foreach ($installModules as $installModule) {
 			if(!$installModule->isInstalled()) {
 				$installModule->install();
@@ -166,6 +168,22 @@ class Installer {
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
 		App::get()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
+	}
+
+	/**
+	 * @return \go\core\Module[]
+	 */
+	private function getAutoInstallModules() {
+		$availableModules = \go\core\Module::findAvailable();
+		$installModules = [];
+		foreach($availableModules as $modCls) {
+			$mod = $modCls::get();
+			if($mod->autoInstall() && $mod->isInstallable()) {
+				$installModules[] = $mod;
+			}
+		}
+
+		return $installModules;
 	}
 	
 	
@@ -381,7 +399,6 @@ class Installer {
 	}
 
 	public function upgrade() {
-		self::$isInProgress = true;
 		self::$isUpgrading = true;
 
 		go()->setAuthState((new TemporaryState())->setUserId(1));

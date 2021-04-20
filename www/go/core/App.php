@@ -20,7 +20,8 @@ use go\core\exception\ConfigurationException;
 use go\core\jmap\Request;
 use go\core\jmap\State;
 use go\core\mail\Mailer;
-use go\core\webclient\Extjs3;
+	use go\core\orm\Property;
+	use go\core\webclient\Extjs3;
 use go\core\model\Settings;
 use const GO_CONFIG_FILE;
 
@@ -536,6 +537,7 @@ use const GO_CONFIG_FILE;
 
 			go()->getCache()->flush(false);
 			Table::destroyInstances();
+			Property::clearCache();
 
 			$webclient = Extjs3::get();
 			$webclient->flushCache();
