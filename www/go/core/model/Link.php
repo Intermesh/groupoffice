@@ -367,6 +367,9 @@ class Link extends AclItemEntity
 						->add('entity', function (Criteria $criteria, $value){
 
 							$e = EntityType::findByName($value);
+							if(!$e) {
+								throw new \Exception("Entity type " . $value .' not found');
+							}
 
 							$criteria->where(['l.fromEntityTypeId' => $e->getId()]);
 						})
@@ -380,6 +383,9 @@ class Link extends AclItemEntity
 
 							foreach($value as $e) {
 								$et = EntityType::findByName($e['name']);
+								if(!$et) {
+									throw new \Exception("Entity type " . $e['name'] .' not found');
+								}
 								$w = ['l.toEntityTypeId' => $et->getId()];
 								if(isset($e['filter'])) {
 									$w['filter'] = $e['filter'];
