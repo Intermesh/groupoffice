@@ -76,7 +76,7 @@ class EventHandlers {
 		}
 	}
 
-	public static function toOutputArray(array &$response, \GO\Email\Model\ImapMessage $imapMessage) {
+	public static function toOutputArray(array &$response, \GO\Email\Model\ImapMessage $imapMessage, $html) {
 		
 		if($imapMessage->content_type == 'application/x-pkcs7-mime')
 			$imapMessage->content_type = 'application/pkcs7-mime';
@@ -218,7 +218,7 @@ class EventHandlers {
 					}					
 					
 					$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($outfile->getContents());
-					$newResponse = $message->toOutputArray(true);
+					$newResponse = $message->toOutputArray($html);
 					unset($newResponse['to']);					
 					unset($newResponse['to_string']);
 					unset($newResponse['cc']);
