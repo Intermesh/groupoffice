@@ -337,18 +337,24 @@
 				return;
 			}
 
-
-
 			var path = 'views/Extjs3/themes/Paper/sounds/'+(filename || 'dialog-question');
 
 			var audio = new Audio(path + ".mp3");
 
 			if(this._userInteracted) {
-				audio.play();
+				audio.play()
+					.catch((e) => {
+						console.warn("Could not play notifier sound: " + e.message);
+					});
 			}else
 			{
 				this.userInteracted = this.userInteracted.createSequence(function() {
-					audio.play();
+
+					audio.play()
+						.catch((e) => {
+							console.warn("Could not play notifier sound: " + e.message);
+						});
+
 				});
 			}
 

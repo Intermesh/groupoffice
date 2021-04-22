@@ -5,6 +5,10 @@
 - Newsletters: Templates menu didn't load
 - Projects2: bugfix in duplicate project dialog
 - Email: remember dimensions attachment save as dialog
+- History: Handle error when log entry was too big to save
+- Core: Optimized search performance
+- Core: Fixed Safari error: The request is not allowed by the user agent in the current context when auto play was set
+  to never.
 
 09-04-2021 6.5.41
 - Core: Ignore duplicate constraint error of MySQL on upgrade
