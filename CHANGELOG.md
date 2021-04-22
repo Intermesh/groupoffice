@@ -1,4 +1,4 @@
-6.4.244
+22-04-2021 6.4.233
 - Email: preserve links when forwarding emails
 - Email: bugfix when creating links
 - Carddav: Fixed carddav problem when logged in with letters in different case than stored in database.
@@ -7,6 +7,7 @@
 - Calendar: fix behavior of delete button in list view
 - Core: $config['allow_themes'] was broken
 - Billing: Contact not displayed in grid
+- Email: Block external images for all folders
 
 12-04-2021 6.4.232
 - OnlyOffice: Only office only worked in root of domain
