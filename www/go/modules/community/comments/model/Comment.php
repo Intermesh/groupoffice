@@ -1,8 +1,10 @@
 <?php
 namespace go\modules\community\comments\model;
 
+use go\core\acl\model\AclItemEntity;
 use go\core\fs\Blob;
 use go\core\model\Acl;
+use go\core\model\Search;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\util\DateTime;
@@ -12,7 +14,7 @@ use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\db\Criteria;
 
-class Comment extends Entity {
+class Comment extends AclItemEntity {
 
 	public $id;
 	
@@ -122,43 +124,6 @@ class Comment extends Entity {
 		}
 	}
 
-	/**
-	 * Get the permission level of the current user
-	 * 
-	 * @return int
-	 */
-	public function getPermissionLevel() {
-
-		if(go()->getAuthState()->isAdmin()) {
-			return Acl::LEVEL_MANAGE;
-		}
-
-		if($this->isNew()) {
-			return $this->findEntity()->getPermissionLevel() ? Acl::LEVEL_WRITE : false;
-		}
-
-		if($this->createdBy == go()->getAuthState()->getUserId()) {
-			return Acl::LEVEL_MANAGE;
-		}
-
-		return $this->findEntity()->hasPermissionLevel(Acl::LEVEL_READ) ? Acl::LEVEL_WRITE : false;
-		
-	}
-	
-	/**
-	 * Applies conditions to the query so that only entities with the given permission level are fetched.
-	 * 
-	 * @param Query $query
-	 * @param int $level
-	 * @param int $userId Leave to null for the current user
-	 * @return Query $query;
-	 */
-	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
-		
-		return $query;
-	}
-	
-
 	protected function internalValidate()
 	{
 		if($this->isModified(['text']) && StringUtil::detectXSS($this->text)) {
@@ -172,5 +137,15 @@ class Comment extends Entity {
 	{
 		$this->images = Blob::parseFromHtml($this->text);
 		return parent::internalSave();
+	}
+
+	protected static function aclEntityClass()
+	{
+		return Search::class;
+	}
+
+	protected static function aclEntityKeys()
+	{
+		return ['entityId' => 'entityId', 'entityTypeId' => 'entityTypeId'];
 	}
 }
