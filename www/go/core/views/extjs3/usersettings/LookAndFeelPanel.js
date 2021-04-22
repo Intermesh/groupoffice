@@ -31,28 +31,9 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			title: t('Global','users','core'),
 			labelWidth:dp(160),
 			defaults: { 
-				anchor: "100%",
+				anchor: "100%"
 			},
 			items:[
-				this.themeCombo = new Ext.form.ComboBox({
-					fieldLabel: t("Theme", "users", "core"),
-					name: 'theme',
-					store: new GO.data.JsonStore({
-						url: GO.url('core/themes'),
-						fields:['theme','label'],
-						remoteSort: true,
-						autoLoad:true
-					}),
-					visible:GO.settings.config.allow_themes,
-					displayField:'label',
-					valueField: 'theme',		
-					mode:'local',
-					triggerAction:'all',
-					editable: false,
-					selectOnFocus:true,
-					forceSelection: true,
-					value: GO.settings.config.theme
-				}),
 				this.startModuleField = new GO.form.ComboBox({
 					fieldLabel: t("Start in module", "users", "core"),
 					name: 'start_module_name',
@@ -121,7 +102,30 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				}
 			]
 		});
-		
+
+		if(GO.settings.config.allow_themes) {
+			this.globalFieldset.insert(9, this.themeCombo = new Ext.form.ComboBox({
+				fieldLabel: t("Theme", "users", "core"),
+				name: 'theme',
+				store: new GO.data.JsonStore({
+					url: GO.url('core/themes'),
+					fields:['theme','label'],
+					remoteSort: true,
+					autoLoad:true
+				}),
+				visible:GO.settings.config.allow_themes,
+				displayField:'label',
+				valueField: 'theme',
+				mode:'local',
+				triggerAction:'all',
+				editable: false,
+				selectOnFocus:true,
+				forceSelection: true,
+				value: GO.settings.config.theme
+			}));
+		}
+
+
 		this.regionFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(160),
 			defaults: { anchor: "100%" },

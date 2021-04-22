@@ -5,6 +5,7 @@
 - Smime: Fixed from showing unknown@unknown.domain
 - Core: Creating new linked item could do expensive unnecessary request
 - Calendar: fix behavior of delete button in list view
+- Core: $config['allow_themes'] was broken
 
 12-04-2021 6.4.232
 - OnlyOffice: Only office only worked in root of domain
