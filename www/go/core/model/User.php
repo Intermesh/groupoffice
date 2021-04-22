@@ -175,7 +175,7 @@ class User extends Entity {
 	public $timezone;
 	public $start_module;
 	public $language;
-	public $theme;
+	protected $theme;
 	public $firstWeekday;
 	public $sort_name;
 	
@@ -957,6 +957,19 @@ class User extends Entity {
 				}
 			}
 			$rec->save();
+		}
+	}
+
+
+	public function setTheme($v) {
+		$this->theme = $v;
+	}
+
+	public function getTheme() {
+		if(!go()->getConfig()['allow_themes']) {
+			return go()->getConfig()['theme'];
+		} else {
+			return $this->theme;
 		}
 	}
 }
