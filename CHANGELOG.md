@@ -9,6 +9,7 @@
 - Core: Optimized search performance
 - Core: Fixed Safari error: The request is not allowed by the user agent in the current context when auto play was set
   to never.
+- Core: dismiss all notifications lead to error when notifications were denied
 
 09-04-2021 6.5.41
 - Core: Ignore duplicate constraint error of MySQL on upgrade

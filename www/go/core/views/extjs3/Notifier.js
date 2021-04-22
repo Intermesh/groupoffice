@@ -1,7 +1,6 @@
 (function() {
 	//User interaction is required for sounds to autoplay
 	function setInteracted(e) {
-		console.log(e);
 
 		if(e instanceof KeyboardEvent) {
 			var keyCode = e.which ? e.which : e.keyCode;
@@ -236,10 +235,11 @@
 		 *
 		 * @link https://developer.mozilla.org/en-US/docs/Web/API/notification
 		 * @param storeData
+		 * @return Promise<Notification>
 		 */
 		notify: function(msg){
 			if (!("Notification" in window)) {
-				return;
+				return Promise.reject("Notifications not supported");
 			}
 
 			var title = msg.title || t("Reminders");
@@ -251,13 +251,12 @@
 			try {
 				switch(Notification.permission) {
 					case 'denied':
-						//this.flyout(msg);
-
+						return Promise.reject("Notifications are denied");
 						break;
 
 					case 'default':
-						this.requestNotifyPermission().then((permission) => {
-							this.notify(msg);
+						return this.requestNotifyPermission().then((permission) => {
+							return this.notify(msg);
 						});
 						break;
 					case 'granted':
@@ -272,7 +271,7 @@
 				notification.onclose = msg.onclose;
 			}
 
-			return notification;
+			return Promise.resolve(notification);
 
 		},
 

@@ -1315,6 +1315,8 @@ GO.mainLayout.onReady(function(){
 			iconCls: 'ic-email',
 			icon: 'views/Extjs3/themes/Paper/img/notify/email.png',
 			tag: "email"
+		}).catch((e) => {
+			//ignore failure
 		});
 
 		go.Notifier.playSound('message-new-email', 'email');
