@@ -8,6 +8,7 @@
 - Core: $config['allow_themes'] was broken
 - Billing: Contact not displayed in grid
 - Email: Block external images for all folders
+- OnlyOffice: Works for Open Document formats now
 
 12-04-2021 6.4.232
 - OnlyOffice: Only office only worked in root of domain
