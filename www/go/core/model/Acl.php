@@ -420,12 +420,12 @@ class Acl extends Entity {
 	 * @return Query
 	 */
 	public static function areGranted($userId, Query $acls = null) {
-		$query = (new Query())						
+		$query = (new Query())
+						->distinct()
 						->selectSingleValue('ag.aclId')
 						->from('core_acl_group', 'ag')
 						->join('core_user_group', 'ug', 'ag.groupId = ug.groupId')
-						->where('ug.userId', '=', $userId)
-						->groupBy(['ag.aclId']);
+						->where('ug.userId', '=', $userId);
 		
 		if(isset($acls)) {
 			$query->andWhere('ag.aclId', 'IN', $acls);
@@ -445,6 +445,7 @@ class Acl extends Entity {
 	public static function wereGranted($userId, $sinceState, Query $acls = null) {
 		$query = (new Query())
 						->selectSingleValue('agc.aclId')
+						->distinct()
 						->from('core_acl_group_changes', 'agc')
 						->join('core_user_group', 'ugc', 'agc.groupId = ugc.groupId')
 						->where('ugc.userId', '=', $userId)
@@ -453,8 +454,7 @@ class Acl extends Entity {
 										(new Criteria())
 										->where('agc.revokeModSeq', 'IS', NULL)
 										->orWhere('agc.revokeModSeq', '>', $sinceState)
-										)
-						->groupBy(['agc.aclId']);
+										);
 		
 		if(isset($acls)) {
 			$query->andWhere('agc.aclId', 'IN', $acls);

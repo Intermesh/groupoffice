@@ -520,7 +520,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 						if(!$linkedEmail){
 							$linkedEmail = new \GO\Savemailas\Model\LinkedEmail();
 							$linkedEmail->setAttributes($attributes);
-							$linkedEmail->save();
+							$linkedEmail->save(true);
 						}
 
 
@@ -562,7 +562,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 								if(!$linkedEmail){
 									$linkedEmail = new \GO\Savemailas\Model\LinkedEmail();
 									$linkedEmail->setAttributes($attributes);
-									$linkedEmail->save();
+									$linkedEmail->save(true);
 								}
 
 								$linkedEmail->link($contact);
