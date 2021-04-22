@@ -33,7 +33,16 @@ abstract class AclEntity extends Entity {
 		
 		return $changes;
 	}
-	
+
+	protected static function getEntityChangesQuery($sinceModSeq)
+	{
+		$query = parent::getEntityChangesQuery($sinceModSeq);
+
+		Acl::applyToQuery($query, 'change.aclId');
+
+		return $query;
+	}
+
 	public static function getChanges($sinceState, $maxChanges) {
 		//state has entity modseq and acl modseq so we can detect permission changes
 		$states = static::parseState($sinceState);
