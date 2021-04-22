@@ -104,7 +104,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 		});
 
 		if(GO.settings.config.allow_themes) {
-			this.globalFieldset.insert(9, this.themeCombo = new Ext.form.ComboBox({
+			this.globalFieldset.insert(0, this.themeCombo = new Ext.form.ComboBox({
 				fieldLabel: t("Theme", "users", "core"),
 				name: 'theme',
 				store: new GO.data.JsonStore({
