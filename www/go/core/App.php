@@ -355,7 +355,10 @@ use const GO_CONFIG_FILE;
 			
 			$this->config = (new util\ArrayObject([
 					"frameAncestors" => $config['frameAncestors'] ?? "",
+					"theme" => "Paper",
+					"allow_themes" => true,
 					"core" => [
+
 							"general" => [
 									"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
 									"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
