@@ -62,7 +62,6 @@ use go\core\db\Query;
  * @property int $last_password_change
  * @property boolean $force_password_change
  *
- * @method User findByPk();
  *
  * @property Boolean $sort_email_addresses_by_time
  */

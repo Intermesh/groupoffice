@@ -1373,7 +1373,10 @@ GO.email.saveAttachment = function(attachment,panel)
 	{
 		if(!GO.files.saveAsDialog)
 		{
-			GO.files.saveAsDialog = new GO.files.SaveAsDialog();
+			GO.files.saveAsDialog = new GO.files.SaveAsDialog({
+				stateId: 'email-save-as',
+				stateful: true
+			});
 		}
 		GO.files.saveAsDialog.show({
 			folder_id : 0,
