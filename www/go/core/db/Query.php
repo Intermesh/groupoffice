@@ -438,13 +438,14 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    * @return static
    * @throws Exception
    */
-	public function join($tableName, $joinTableAlias, $on, $type = 'INNER') {
+	public function join($tableName, $joinTableAlias, $on, $type = 'INNER', $indexHint = null) {
 
 		$this->joins[] = [
 				'src' => $tableName,
 				'on' => Criteria::normalize($on),
 				'joinTableAlias' => $joinTableAlias,
-				'type' => $type
+				'type' => $type,
+				'indexHint' => $indexHint
 		];
 
 		return $this;
