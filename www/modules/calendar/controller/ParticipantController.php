@@ -233,7 +233,7 @@ class ParticipantController extends \GO\Base\Controller\AbstractModelController 
 				
 				if(!empty($row['user_id'])){
 					
-					$user = \GO\Base\Model\User::model()->findByPk($row['user_id']);
+					$user = \GO\Base\Model\User::model()->findByPk($row['user_id'], false,true);
 					if ($user){
 						$participant = new \GO\Calendar\Model\Participant();
 						$participant->user_id=$user->id;
