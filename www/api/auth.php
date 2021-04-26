@@ -10,6 +10,7 @@ use go\core\jmap\State;
 use go\core\model\Token;
 use go\core\jmap\Request;
 use go\core\http\Response;
+use go\core\model\User;
 use go\core\validate\ErrorCode;
 
 /**
@@ -182,7 +183,11 @@ try {
 				}
 			}
 
+
 			if (!empty($validationErrors)) {
+				$user = $token->getUser();
+				User::fireEvent(User::EVENT_BADLOGIN, $user->username, $user);
+
 				$response['errors'] = $validationErrors;
 				output($response, 400, "Validation errors occurred");
 			} else {

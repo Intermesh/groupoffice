@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS `history_log_entry` (
   `aclId` INT NULL,
   `removeAcl` TINYINT(1) NOT NULL DEFAULT 0,
   `entityTypeId` INT NOT NULL,
-  `entityId` INT NOT NULL,
+  `entityId` INT DEFAULT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_log_entry_core_user_idx` (`createdBy` ASC),
   INDEX `fk_log_entry_core_acl1_idx` (`aclId` ASC),
