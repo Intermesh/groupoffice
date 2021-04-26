@@ -657,7 +657,9 @@ class Installer {
 								$e->getCode() == '42S01' || //table exists
 								$e->getCode() == '42S22' || //col not found
 								strstr($e->getMessage(), 'errno: 121 ') || // (errno: 121 "Duplicate key on write or update")
-								strstr($e->getMessage(), ' 1826 ')) { //HY000: SQLSTATE[HY000]: General error: 1826 Duplicate foreign key constraint
+								strstr($e->getMessage(), ' 1826 ') || //HY000: SQLSTATE[HY000]: General error: 1826 Duplicate foreign key constraint
+								strstr($e->getMessage(), ' 1022 ') //Integrity constraint violation: 1022 Can't write; duplicate key in table '#sql-509_19b'/
+								) {
 
 								//duplicate and drop errors. Ignore those on updates.
 								echo "IGNORE: " . $e->getMessage() ."\n";
