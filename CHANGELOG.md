@@ -1,4 +1,4 @@
-6.5.43
+26-04-2021 6.5.43
 - Core: Create empty password field upon user import if necessary
 - Core: Bad logins and logins were not logged
 - Address book: limit address books to 1000 in tree.
@@ -64,6 +64,10 @@
 
 
 6.4.244
+- Email: remember dimensions attachment save as dialog
+- Calendar: Fixed availability check and added more buttons to improve usability
+- Email: Save as task was missing
+
 22-04-2021 6.4.233
 - Email: preserve links when forwarding emails
 - Email: bugfix when creating links
@@ -74,6 +78,7 @@
 - Core: $config['allow_themes'] was broken
 - Billing: Contact not displayed in grid
 - Email: Block external images for all folders
+- OnlyOffice: Works for Open Document formats now
 
 12-04-2021 6.4.232
 - OnlyOffice: Only office only worked in root of domain

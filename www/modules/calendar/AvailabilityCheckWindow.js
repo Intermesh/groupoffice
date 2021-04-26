@@ -80,7 +80,7 @@ GO.calendar.AvailabilityCheckWindow = function(config) {
 
 			'<tpl for=".">',
 			'<tr>',
-			'<td>{name}</td>',
+			'<td><tpl if="strong"><b></tpl>{name}<tpl if="strong"></b></tpl></td>',
 			'<tpl if="this.hasFreeBusy(freebusy)">',
 			'<tpl for="freebusy">',
 			'<td id="time{time}"class="time {[values.busy == 1 ? "busy" : "free"]}"></td>',
@@ -95,7 +95,7 @@ GO.calendar.AvailabilityCheckWindow = function(config) {
 	this.dataView = new Ext.DataView({
 				store : new GO.data.JsonStore({
 							url : GO.url('calendar/participant/freeBusyInfo'),						
-							fields : ['name', 'email', 'freebusy'],
+							fields : ['name', 'email', 'freebusy', 'strong'],
 							baseParams : {
 								event_id:0,
 								date: '',
