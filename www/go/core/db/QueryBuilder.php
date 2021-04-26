@@ -867,6 +867,9 @@ class QueryBuilder {
 			$join .= '`' . $config['joinTableAlias'] . '` ';
 		}
 
+		if (!empty($config['indexHint'])) {
+			$join .=  $config['indexHint'] . ' ';
+		}
 
 		//import new params
 		$this->buildBindParameters = array_merge($this->buildBindParameters, $config['on']->getBindParameters());
