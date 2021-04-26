@@ -1,4 +1,5 @@
 - Email: remember dimensions attachment save as dialog
+- Calendar: Fixed availability check and added more buttons to improve usability
 
 22-04-2021 6.4.233
 - Email: preserve links when forwarding emails
