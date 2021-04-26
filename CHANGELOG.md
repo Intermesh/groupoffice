@@ -1,3 +1,6 @@
+6.5.43
+- Core: Create empty password field upon user import if necessary
+
 22-04-2021 6.5.42
 - Core: Upgraded to sabre dav 4.1
 - Carddav: Authentication didn't work case insensitive

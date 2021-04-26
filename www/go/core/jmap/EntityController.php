@@ -873,7 +873,7 @@ abstract class EntityController extends Controller {
 			$file = $blob->getFile();
 		}
 
-    $response = $converter->importFile($file, $params);
+		$response = $converter->importFile($file, $params);
 		
 		if(!$response) {
 			throw new Exception("Invalid response from import converter");
