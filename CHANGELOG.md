@@ -1,7 +1,6 @@
 6.5.43
 - Core: Create empty password field upon user import if necessary
 - Core: Bad logins and logins were not logged
-- Email: Save as task was missing
 
 22-04-2021 6.5.42
 - Core: Upgraded to sabre dav 4.1
