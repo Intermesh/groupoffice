@@ -1510,8 +1510,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 						$where .= "\nAND";
 					//}
 
-					$where .= '(w'.$i.'.word  LIKE ' . $this->getDbConnection()->quote($word.'%', PDO::PARAM_STR) . ' OR ' .
-						'w'.$i.'.drow LIKE '. $this->getDbConnection()->quote(strrev($word) .'%', PDO::PARAM_STR) . ')';
+					$where .= ' w'.$i.'.word  LIKE ' . $this->getDbConnection()->quote($word.'%', PDO::PARAM_STR) . " ";
 
 					$i++;
 				}
@@ -3716,6 +3715,10 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			return strlen($word) > 2;
 		});
 
+		if($this->hasAttribute('id') && !in_array($this->id, $keywords)) {
+			$keywords[] = $this->id;
+		}
+
 		//$search->setKeywords(implode(' ', $keywords));
 		$isNew = $search->isNew();
 		if(!$search->save()) {
@@ -3727,7 +3730,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 		$keywords = array_map(function ($word) use ($search){
-			return ['searchId' => $search->id, 'word'=> $word, 'drow' => strrev($word)];
+			return ['searchId' => $search->id, 'word'=> $word];
 		}, $keywords);
 
 		return go()->getDbConnection()->insertIgnore(
@@ -3883,6 +3886,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$arr = SearchableTrait::splitTextKeywords($prepend);
 		foreach($keywords as $keyword) {
 			$arr = array_merge($arr, SearchableTrait::splitTextKeywords($keyword));
+		}
+		if($this->hasAttribute('id')) {
+			$keywords[] = $this->id;
 		}
 		$keywords = array_unique($arr);
 		return $keywords;
@@ -4928,7 +4934,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			$entityTypeId = static::entityType()->getId();
 		
 			$start = 0;
-			$limit = 100;
+			$limit = 1000;
 			
 			$findParams = FindParams::newInstance()
 							->ignoreAcl()

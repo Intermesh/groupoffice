@@ -22,10 +22,12 @@ use go\core\model\Module;
 use go\core\model\User;
 use Sabre\DAV\Auth\Backend\AbstractBasic;
 use Sabre\DAV\Exception\Forbidden;
+use Sabre\HTTP\RequestInterface;
+use Sabre\HTTP\ResponseInterface;
 
 class BasicBackend extends AbstractBasic {
 	
-	private $user;
+	protected $user;
 	private $checkModulePermission = 'dav';
 	private $checkModulePackage = 'legacy';
 	
@@ -57,5 +59,15 @@ class BasicBackend extends AbstractBasic {
 	public function checkModulePermission($package, $module) {
 		$this->checkModulePermission = $module;
 		$this->checkModulePackage = $package;
+	}
+
+	public function check(RequestInterface $request, ResponseInterface $response)
+	{
+		$result = parent::check($request, $response);
+
+		if($this->user) {
+			$result[1] = $this->principalPrefix . $this->user->username; // fix case insensitive login
+		}
+		return $result;
 	}
 }

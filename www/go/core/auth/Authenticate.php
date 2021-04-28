@@ -149,6 +149,9 @@ class Authenticate {
 		$authenticator = $this->getPrimaryAuthenticatorForUser($username);
 
 		if(!$authenticator) {
+
+			User::fireEvent(User::EVENT_BADLOGIN, $username, null);
+
 			return false;
 		}
 
@@ -157,6 +160,9 @@ class Authenticate {
 		go()->log("Trying: " . get_class($authenticator));
 
 		if (!$user = $authenticator->authenticate($username, $password)) {
+
+			User::fireEvent(User::EVENT_BADLOGIN, $username, $user ? $user : null);
+
 			return false;
 		}
 

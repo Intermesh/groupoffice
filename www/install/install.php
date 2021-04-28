@@ -64,17 +64,7 @@ if (!empty($_POST)) {
 				'email' => $_POST['email']
 		];
 
-
-		$availableModules = core\Module::findAvailable();
-		$installModules = [];
-		foreach($availableModules as $modCls) {
-		    $mod = $modCls::get();
-		    if($mod->autoInstall() && $mod->isInstallable()) {
-		        $installModules[] = $mod;
-            }
-        }
-
-		App::get()->getInstaller()->install($admin, $installModules);
+		App::get()->getInstaller()->install($admin);
 
 		//install not yet refactored modules
 		GO::$ignoreAclPermissions = true;

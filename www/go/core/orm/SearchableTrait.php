@@ -3,6 +3,7 @@ namespace go\core\orm;
 
 use go\core\db\Criteria;
 use go\core\model\Link;
+use go\core\model\Search;
 
 /**
  * Entities can use this trait to make it show up in the global search function
@@ -60,28 +61,80 @@ trait SearchableTrait {
 		$keywords = mb_split("\s+", $text);
 
 		//filter small words
-		$keywords = array_filter($keywords, function($word) {
-			return strlen($word) > 2;
-		});
+		if(count($keywords) > 1) {
+			$keywords = array_filter($keywords, function ($word) {
+				return strlen($word) > 2;
+			});
+		}
 
 		return $keywords;
 	}
 
+	/**
+	 * Split numbers into multipe partials so we can match them using an index
+	 * eg.
+	 *
+	 * ticket no
+	 *
+	 * 2002-12341234
+	 *
+	 * Will be found on:
+	 *
+	 * 002-12341234
+	 * 02-12341234
+	 * 2-12341234
+	 * -12341234
+	 * 12341234
+	 * 2341234
+	 * 341234
+	 * 41234
+	 * 1234
+	 * 234
+	 *
+	 * this is faster then searchgin for
+	 *
+	 * %234 because it can't use an index
+	 *
+	 * @param $number
+	 * @param int $minSearchLength
+	 * @return array
+	 */
+	public static function numberToKeywords($number, $minSearchLength = 3) {
+		$keywords = [$number];
+
+		while(strlen($number) > $minSearchLength) {
+			$number = substr($number, 1);
+			$keywords[] = $number;
+		}
+
+		return $keywords;
+
+	}
+
+	/**
+	 * Prepares the query for a search
+	 *
+	 * @param Criteria $criteria
+	 * @param Query $query
+	 * @param $searchPhrase
+	 * @throws \Exception
+	 */
 	public static function addCriteria(Criteria $criteria, Query $query, $searchPhrase) {
 		$i = 0;
 		$words = SearchableTrait::splitTextKeywords($searchPhrase);
 		$words = array_unique($words);
 
+
+		//$query->noCache();
+
 		foreach($words as $word) {
-			$query->join("core_search_word", 'w'.$i, 'w'.$i.'.searchId = search.id');
-			//$query->join("core_search_word_reverse", 'wr'.$i, 'wr'.$i.'.searchId = s.id');
+			$query->join(
+				"core_search_word",
+				'w'.$i, 'w'.$i.'.searchId = search.id',
+				'INNER'
+			);
 
-			$c = new Criteria();
-			$c
-				->where('w'.$i.'.word', 'LIKE', $word . '%')
-				->orWhere('w'.$i.'.drow', 'LIKE', strrev($word) . '%');
-
-			$criteria->where($c);
+			$criteria->where('w'.$i.'.word', 'LIKE', $word . '%');
 
 			$i++;
 		}
@@ -150,6 +203,10 @@ trait SearchableTrait {
 
 		$keywords = array_unique($arr);
 
+		if(!empty($this->id) && !in_array($this->id, $keywords)) {
+			$keywords[] = $this->id;
+		}
+
 		//$search->setKeywords(implode(' ', $keywords));
 		$isNew = $search->isNew();
 		if(!$search->internalSave()) {
@@ -166,7 +223,7 @@ trait SearchableTrait {
 
 		//array values to make sure index is sequential
 		$keywords = array_values(array_map(function ($word) use ($search) {
-			return ['searchId' => $search->id, 'word'=> $word, 'drow' => strrev($word)];
+			return ['searchId' => $search->id, 'word'=> $word];
 		}, $keywords));
 
 		return go()->getDbConnection()->insertIgnore(
@@ -215,15 +272,18 @@ trait SearchableTrait {
 	 */
 	private static function queryMissingSearchCache($cls, $offset = 0) {
 		
-		$limit = 100;
+		$limit = 1000;
 			
 		$query = $cls::find();
 		/* @var $query \go\core\db\Query */
 		$query->join("core_search", "search", "search.entityId = ".$query->getTableAlias() . ".id AND search.entityTypeId = " . $cls::entityType()->getId(), "LEFT");
 		$query->andWhere('search.id IS NULL')
+
+//			$query->where('id', 'not in', Search::find()->selectSingleValue('entityId')->where('entityTypeId', '=', $cls::entityType()->getId()))
 							->limit($limit)
 							->offset($offset);
-		
+
+
 		return $query->execute();
 	}
 	
@@ -238,6 +298,8 @@ trait SearchableTrait {
 			->andWhere('entityId', 'NOT IN', $cls::find()->selectSingleValue($cls::getMapping()->getPrimaryTable()->getAlias() . '.id'))
 		);
 		$stmt->execute();
+
+		go()->getDbConnection()->exec("commit");
 
 		echo "Deleted ". $stmt->rowCount() . " entries\n";
 
@@ -265,10 +327,15 @@ trait SearchableTrait {
 				}
 			}
 			echo "\n";
+			go()->getDbConnection()->exec("commit");
 
 			$stmt = self::queryMissingSearchCache($cls, $offset);
 		}
-	
+
+
+		go()->getDbConnection()->exec("commit");
+
+
 	}
 	
 	public static function rebuildSearch() {

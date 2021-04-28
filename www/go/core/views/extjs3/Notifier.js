@@ -1,6 +1,14 @@
 (function() {
 	//User interaction is required for sounds to autoplay
-	function setInteracted() {
+	function setInteracted(e) {
+
+		if(e instanceof KeyboardEvent) {
+			var keyCode = e.which ? e.which : e.keyCode;
+
+			if(keyCode == 18 || keyCode == 91 || keyCode == 17|| keyCode == 16|| keyCode == 20) {
+				return;
+			}
+		}
 		go.Notifier.userInteracted();
 
 		window.removeEventListener("scroll", setInteracted);
@@ -227,10 +235,11 @@
 		 *
 		 * @link https://developer.mozilla.org/en-US/docs/Web/API/notification
 		 * @param storeData
+		 * @return Promise<Notification>
 		 */
 		notify: function(msg){
 			if (!("Notification" in window)) {
-				return;
+				return Promise.reject("Notifications not supported");
 			}
 
 			var title = msg.title || t("Reminders");
@@ -242,13 +251,12 @@
 			try {
 				switch(Notification.permission) {
 					case 'denied':
-						//this.flyout(msg);
-
+						return Promise.reject("Notifications are denied");
 						break;
 
 					case 'default':
-						this.requestNotifyPermission().then((permission) => {
-							this.notify(msg);
+						return this.requestNotifyPermission().then((permission) => {
+							return this.notify(msg);
 						});
 						break;
 					case 'granted':
@@ -263,7 +271,7 @@
 				notification.onclose = msg.onclose;
 			}
 
-			return notification;
+			return Promise.resolve(notification);
 
 		},
 
@@ -328,18 +336,24 @@
 				return;
 			}
 
-
-
 			var path = 'views/Extjs3/themes/Paper/sounds/'+(filename || 'dialog-question');
 
 			var audio = new Audio(path + ".mp3");
 
 			if(this._userInteracted) {
-				audio.play();
+				audio.play()
+					.catch((e) => {
+						console.warn("Could not play notifier sound: " + e.message);
+					});
 			}else
 			{
 				this.userInteracted = this.userInteracted.createSequence(function() {
-					audio.play();
+
+					audio.play()
+						.catch((e) => {
+							console.warn("Could not play notifier sound: " + e.message);
+						});
+
 				});
 			}
 

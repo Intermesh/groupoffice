@@ -144,7 +144,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 				const reminderId = "reminder-" + record.data.id;
 				if(!this.notifiedReminders[reminderId]) {
 
-					reminderPanel.notification = go.Notifier.notify({
+					go.Notifier.notify({
 							body: record.data.text,
 							title: record.data.local_time + " - " + record.data.type + ": " + record.data.name,
 							tag: "reminder-" + record.data.id,
@@ -152,7 +152,11 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 								me.doTask("dismiss_reminders", 0, [record.data.id], reminderPanel);
 							}
 						}
-					);
+					).then((notification) => {
+						reminderPanel.notification = notification
+					}).catch((e) => {
+						//ignore failure
+					});
 
 					this.notifiedReminders[reminderId] = true;
 				}
@@ -200,11 +204,14 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					reminderPanel = Ext.getCmp('go-reminder-pnl-' + reminderIds[0]);
 				}
 
-				if(reminderPanel.notification) {
-					reminderPanel.notification.close();
-				}
+				if(reminderPanel) {
 
-				reminderPanel && reminderPanel.destroy();
+					if (reminderPanel.notification) {
+						reminderPanel.notification.close();
+					}
+
+					reminderPanel.destroy();
+				}
 
 
 			}, scope: this

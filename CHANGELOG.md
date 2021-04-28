@@ -1,8 +1,26 @@
+6.5.44
+- Core: minor bugfix in folder properties dialog
+
+26-04-2021 6.5.43
+- Core: Create empty password field upon user import if necessary
+- Core: Bad logins and logins were not logged
+- Address book: limit address books to 1000 in tree.
+- Core: Ignore duplicate key error on mysql when upgrading
+
+
+22-04-2021 6.5.42
 - Core: Upgraded to sabre dav 4.1
 - Carddav: Authentication didn't work case insensitive
 - Core: Templates could inject div with style causing incorrect styling
 - Core: Safari could ask for notifications for each reminders shown
 - Newsletters: Templates menu didn't load
+- Projects2: bugfix in duplicate project dialog
+- Email: remember dimensions attachment save as dialog
+- History: Handle error when log entry was too big to save
+- Core: Optimized search performance
+- Core: Fixed Safari error: The request is not allowed by the user agent in the current context when auto play was set
+  to never.
+- Core: dismiss all notifications lead to error when notifications were denied
 
 09-04-2021 6.5.41
 - Core: Ignore duplicate constraint error of MySQL on upgrade
@@ -47,6 +65,23 @@
 
 
 
+
+6.4.244
+- Email: remember dimensions attachment save as dialog
+- Calendar: Fixed availability check and added more buttons to improve usability
+- Email: Save as task was missing
+
+22-04-2021 6.4.233
+- Email: preserve links when forwarding emails
+- Email: bugfix when creating links
+- Carddav: Fixed carddav problem when logged in with letters in different case than stored in database.
+- Smime: Fixed from showing unknown@unknown.domain
+- Core: Creating new linked item could do expensive unnecessary request
+- Calendar: fix behavior of delete button in list view
+- Core: $config['allow_themes'] was broken
+- Billing: Contact not displayed in grid
+- Email: Block external images for all folders
+- OnlyOffice: Works for Open Document formats now
 
 12-04-2021 6.4.232
 - OnlyOffice: Only office only worked in root of domain

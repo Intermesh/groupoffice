@@ -20,7 +20,8 @@ use go\core\exception\ConfigurationException;
 use go\core\jmap\Request;
 use go\core\jmap\State;
 use go\core\mail\Mailer;
-use go\core\webclient\Extjs3;
+	use go\core\orm\Property;
+	use go\core\webclient\Extjs3;
 use go\core\model\Settings;
 use const GO_CONFIG_FILE;
 
@@ -359,7 +360,10 @@ use const GO_CONFIG_FILE;
 			
 			$this->config = (new util\ArrayObject([
 					"frameAncestors" => $config['frameAncestors'] ?? "",
+					"theme" => "Paper",
+					"allow_themes" => true,
 					"core" => [
+
 							"general" => [
 									"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
 									"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
@@ -536,6 +540,7 @@ use const GO_CONFIG_FILE;
 
 			go()->getCache()->flush(false);
 			Table::destroyInstances();
+			Property::clearCache();
 
 			$webclient = Extjs3::get();
 			$webclient->flushCache();

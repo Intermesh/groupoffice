@@ -2,6 +2,7 @@
 namespace GO\Base\Model;
 
 use GO;
+use go\modules\business\license\exception\LicenseException;
 
 /*
  * Copyright Intermesh BV.
@@ -79,6 +80,7 @@ class Module extends \GO\Base\Db\ActiveRecord {
 			$module->name=$name;
 
 			if(!$ignoreDependentModule) {
+
 				\go\core\Module::installDependencies($module->moduleManager);
 			}
 
@@ -178,7 +180,11 @@ class Module extends \GO\Base\Db\ActiveRecord {
 			if(!$this->enabled) {
 				$this->_checkDependencies();
 			} else {
-				\go\core\Module::installDependencies($this->moduleManager);
+				try {
+					\go\core\Module::installDependencies($this->moduleManager);
+				} catch(LicenseException $e) {
+					return false;
+				}
 			}
 		}
 		return parent::beforeSave();

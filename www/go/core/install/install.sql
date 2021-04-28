@@ -528,8 +528,10 @@ ALTER TABLE `core_search`
   ADD UNIQUE KEY `entityId` (`entityId`,`entityTypeId`),
   ADD KEY `acl_id` (`aclId`),
   ADD KEY `moduleId` (`moduleId`),
-  ADD KEY `entityTypeId` (`entityTypeId`),
-  ADD KEY `filter` (`filter`);
+  ADD KEY `entityTypeId` (`entityTypeId`);
+
+create index core_search_entityTypeId_filter_modifiedAt_aclId_index
+    on core_search (entityTypeId, filter, modifiedAt, aclId);
 
 
 ALTER TABLE `core_setting`
@@ -1062,15 +1064,13 @@ ALTER TABLE `core_acl` ADD FOREIGN KEY (`ownedBy`) REFERENCES `core_user`(`id`) 
 
 CREATE TABLE `core_search_word` (
                                     `searchId` int(11) NOT NULL,
-                                    `word` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-                                    `drow` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
+                                    `word` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 ALTER TABLE `core_search_word`
     ADD PRIMARY KEY (`word`,`searchId`),
-    ADD KEY `searchId` (`searchId`),
-    ADD KEY `drow` (`drow`);
+    ADD KEY `searchId` (`searchId`);
 
 
 ALTER TABLE `core_search_word`

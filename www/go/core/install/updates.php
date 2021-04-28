@@ -887,3 +887,20 @@ $updates['202103091517'][] = "ALTER TABLE `core_customfields_select_option` ADD 
 $updates['202104061227'][] = "alter table core_user drop column popup_reminders;";
 
 $updates['202104061227'][] = "alter table core_user drop column popup_emails;";
+
+$updates['202104161227'][] = "ALTER TABLE core_search DROP INDEX `filter`;";
+$updates['202104161227'][] = "create index core_search_entityTypeId_filter_modifiedAt_aclId_index
+    on core_search (entityTypeId, filter, modifiedAt, aclId);";
+
+$updates['202104161227'][] = "ALTER TABLE `core_search_word`
+  DROP `drow`;";
+
+$updates['202104161227'][] = "ALTER TABLE `core_search` DROP INDEX `entityTypeId`";
+
+$updates['202104161227'][] = function() {
+
+	//run build search cache on cron immediately. This job will deactivate itself.
+	\go\core\cron\BuildSearchCache::install("* * * * *", true);
+
+	echo "NOTE: Search cache will be rebuilt by a scheduled task. This may take a lot of time.";
+};

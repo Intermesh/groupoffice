@@ -71,7 +71,10 @@ GO.email.LinkAttachmentDialog = Ext.extend(go.links.CreateLinkWindow,{
 
 	saveToItem : function(record,files_folder_id){
 		if(!GO.files.saveAsDialog){
-			GO.files.saveAsDialog = new GO.files.SaveAsDialog();
+			GO.files.saveAsDialog = new GO.files.SaveAsDialog({
+				stateId: 'email-link-attach',
+				stateful: true
+			});
 		}
 		
 		this.getEl().unmask();

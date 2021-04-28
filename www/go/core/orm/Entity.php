@@ -479,6 +479,9 @@ abstract class Entity extends Property {
 	
 	/**
 	 * Get the permission level of the current user
+	 *
+	 * Note: when overriding this function you also need to override applyAclToQuery() so that queries return only
+	 * readable entities.
 	 * 
 	 * @return int
 	 */

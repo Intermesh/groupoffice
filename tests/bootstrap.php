@@ -64,13 +64,9 @@ try {
 		];
 
 		$installer = go()->getInstaller();
-		$installer->install($admin, [
-				\go\modules\community\notes\Module::get(),
-				\go\modules\community\test\Module::get(),
-				\go\modules\community\addressbook\Module::get(),
-				\go\modules\community\comments\Module::get(),
-				]);
+		$installer->install($admin);
 
+		\go\modules\community\test\Module::get()->install();
 
 		//install not yet refactored modules
 		GO::$ignoreAclPermissions = true;

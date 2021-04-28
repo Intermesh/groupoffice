@@ -5,18 +5,18 @@ namespace go\base\mail;
 use PHPUnit\Framework\TestCase;
 
 class MessageTest extends TestCase {
-//	public function testLoadMime() {
-//
-//		$mime = file_get_contents(dirname(__DIR__,3) . '/static/invite.eml');
-//		$message = new \GO\Base\Mail\Message();
-//		$message->loadMimeMessage($mime);
-//
-//		$this->assertEquals("Invitation: test", $message->getSubject());
-//
+	public function testLoadMime() {
+
+		$mime = file_get_contents(dirname(__DIR__,3) . '/static/invite.eml');
+		$message = new \GO\Base\Mail\Message();
+		$message->loadMimeMessage($mime);
+
+		$this->assertEquals("Invitation: test", $message->getSubject());
+
 //		echo $message->toString();
-//
-//
-//	}
+
+
+	}
 
 	public function testLoadMime2() {
 
@@ -24,10 +24,9 @@ class MessageTest extends TestCase {
 		$message = new \GO\Base\Mail\Message();
 		$message->loadMimeMessage($mime);
 
-	//	$this->assertEquals(3, count($message->getChildren()));
+		$this->assertEquals(2, count($message->getChildren()));
 
-		echo $message->toString();
-
+//		echo $message->toString();
 
 	}
 }
