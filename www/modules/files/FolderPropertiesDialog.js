@@ -356,6 +356,9 @@ Ext.extend(GO.files.FolderPropertiesDialog, GO.Window, {
 		//Use set timeout here because the load event will filter custom field tabs and will re-enable them
 		setTimeout(function() {
 			form.items.each(function(itm){
+				if (!itm.name) {
+					return;
+				}
 				if(itm.name.substring(0,13) === 'customFields.') {
 					form.findField(itm.name).setDisabled(is_someones_home_dir || readonly || permission_level<GO.permissionLevels.write);
 				}

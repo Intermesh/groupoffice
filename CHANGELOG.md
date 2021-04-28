@@ -1,3 +1,6 @@
+6.5.44
+- Core: minor bugfix in folder properties dialog
+
 26-04-2021 6.5.43
 - Core: Create empty password field upon user import if necessary
 - Core: Bad logins and logins were not logged
