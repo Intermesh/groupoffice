@@ -1447,14 +1447,15 @@ table[id^="comments-ext"] b {
 	border-bottom: 1px solid color($fg, 'line');
 }
 
-.x-window.go-form-panel .x-panel-body, 
-.x-window.go-form-panel .x-window-body, 
+.x-window.go-form-panel .x-panel-body,
+.x-window.go-form-panel .x-window-body,
 .x-column.go-form-panel .x-panel-body,
 .x-form-label-left.go-form-panel > div > .x-panel-body,
-.go-form-panel .x-panel-body,
-
-.go-error-dialog{
+.go-form-panel .x-panel-body, .go-error-dialog{
 	padding: dp(8) dp(16);
+}
+
+.go-error-dialog {
 	font-size: dp(14);
 	font-family: monospace;
 	line-height: 1.4em;

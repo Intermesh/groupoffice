@@ -3,6 +3,7 @@
 - Core: Firefox hung on Notification request. Saying "This site slows down your browser"
 - Billing: Report browse failed when projects module wasn't installed.
 - Newsletters: Improved error dialog
+- Office Only: Use 'view' action for read only documents
 
 26-04-2021 6.5.43
 - Core: Create empty password field upon user import if necessary
