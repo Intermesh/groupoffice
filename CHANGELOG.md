@@ -1,3 +1,6 @@
+29-04-2021 6.5.45
+- Core: Minor change in requesting notifications
+
 29-04-2021 6.5.44
 - Core: minor bugfix in folder properties dialog
 - Core: Firefox hung on Notification request. Saying "This site slows down your browser"
