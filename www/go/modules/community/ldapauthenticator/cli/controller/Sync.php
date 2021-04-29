@@ -238,7 +238,9 @@ class Sync extends Controller {
   private function output($str) {
     go()->debug($str);
 
-    echo $str . "\n";
+    if(!go()->getEnvironment()->isCron()) {
+	    echo $str . "\n";
+    }
   }
 
   /**

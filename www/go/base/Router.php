@@ -162,9 +162,9 @@ class Router{
 			exit();
 		}
 		
-		$this->_action=$action;		
+		$this->_action=$action;
 		
-		
+
 		if(!class_exists($controllerClass)){
 			if(!headers_sent()){
 				header("HTTP/1.0 404 Not Found");
