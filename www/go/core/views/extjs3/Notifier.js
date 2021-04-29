@@ -286,10 +286,10 @@
 			if(!this.notifyRequest) {
 				this.notifyRequest = new Promise((resolve, reject) => {
 
-					Ext.MessageBox.confirm(t("Confirm"), t("Do you want Group-Office to set notifications on your desktop?"), () => {
+					Ext.MessageBox.alert(t("Setup notifications"), t("Please choose if you'd like to allow desktop notifications by Group-Office after pressing 'Ok'."), (btn) => {
 						Notification.requestPermission((permission) => {
 							resolve(permission);
-						})
+						});
 					})
 				});
 			}
