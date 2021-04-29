@@ -185,8 +185,10 @@ class Router{
 			$this->_controller = new $controllerClass;
 			$this->_controller->run($action, $params);		
 		}catch(Exception\NotFound $e){
-			header("HTTP/1.0 404 Not Found");
-			header("Status: 404 Not Found");
+			if(PHP_SAPI != 'cli') {
+				header("HTTP/1.0 404 Not Found");
+				header("Status: 404 Not Found");
+			}
 			
 			if(empty($_SERVER['QUERY_STRING']))
 				$_SERVER['QUERY_STRING']="[EMPTY QUERY_STRING]";
