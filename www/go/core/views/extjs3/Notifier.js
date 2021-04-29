@@ -284,17 +284,14 @@
 		requestNotifyPermission : function() {
 
 			if(!this.notifyRequest) {
-				//Safari doesn't support this :(
-				if(!Ext.isSafari) {
-					this.notifyRequest = Notification.requestPermission();
-				} else
-				{
-					this.notifyRequest = new Promise((resolve, reject) => {
+				this.notifyRequest = new Promise((resolve, reject) => {
+
+					Ext.MessageBox.confirm(t("Confirm"), t("Do you want Group-Office to set notifications on your desktop?"), () => {
 						Notification.requestPermission((permission) => {
 							resolve(permission);
 						})
 					})
-				}
+				});
 			}
 			return this.notifyRequest;
 		},

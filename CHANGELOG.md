@@ -1,5 +1,6 @@
 6.5.44
 - Core: minor bugfix in folder properties dialog
+- Core: Firefox hung on Notification request. Saying "This site slows down your browser"
 
 26-04-2021 6.5.43
 - Core: Create empty password field upon user import if necessary
