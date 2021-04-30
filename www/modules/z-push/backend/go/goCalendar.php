@@ -594,17 +594,18 @@ class goCalendar extends GoBaseBackendDiff {
 		$params = \GO\Base\Db\FindParams::newInstance()
 						->ignoreAcl()
 						->select('t.id,t.mtime,t.private,t.calendar_id')
-						->joinModel(array(
-								'model' => 'GO\Sync\Model\UserCalendar',
-								'tableAlias' => 'ua',
-								'localTableAlias' => 't',
-								'localField' => 'calendar_id',
-								'foreignField' => 'calendar_id'
-						))
+//						->joinModel(array(
+//								'model' => 'GO\Sync\Model\UserCalendar',
+//								'tableAlias' => 'ua',
+//								'localTableAlias' => 't',
+//								'localField' => 'calendar_id',
+//								'foreignField' => 'calendar_id'
+//						))
 						->criteria(
 						\GO\Base\Db\FindCriteria::newInstance()
-						->addCondition('user_id', \GO::user()->id, '=', 'ua')
-						->addCondition('exception_for_event_id', 0)
+							->addCondition('calendar_id', $folderid)
+//							->addCondition('user_id', \GO::user()->id, '=', 'ua')
+							->addCondition('exception_for_event_id', 0)
 										);
 
 		if (!empty($cutoffdate)) {
@@ -647,14 +648,15 @@ class goCalendar extends GoBaseBackendDiff {
 	 */
 	public function GetFolder($id) {
 
-		if ($id != BackendGoConfig::CALENDARBACKENDFOLDER) {
+		$calendar = \GO\Calendar\Model\Calendar::model()->findByPk($id);
+		if(!$calendar) {
 			return false;
 		}
 
 		$folder = new SyncFolder();
 		$folder->serverid = $id;
 		$folder->parentid = "0";
-		$folder->displayname = 'Calendar';
+		$folder->displayname = $calendar->name;
 		$folder->type = SYNC_FOLDER_TYPE_APPOINTMENT;
 
 		return $folder;
@@ -667,8 +669,20 @@ class goCalendar extends GoBaseBackendDiff {
 	 */
 	public function GetFolderList() {
 		$folders = array();
-		$folder = $this->StatFolder(BackendGoConfig::CALENDARBACKENDFOLDER);
-		$folders[] = $folder;
+
+		$params = \GO\Base\Db\FindParams::newInstance()
+			->ignoreAcl()
+			->join(\GO\Sync\Model\UserCalendar::model()->tableName(), \GO\Base\Db\FindCriteria::newInstance()
+				->addCondition('id', 's.calendar_id', '=', 't', true, true)
+				->addCondition('user_id', \GO::user()->id, '=', 's')
+				, 's');
+
+		$calendars = \GO\Calendar\Model\Calendar::model()->find($params);
+		foreach($calendars as $calendar) {
+			$folder = $this->StatFolder($calendar->id);
+
+			$folders[] = $folder;
+		}
 
 		return $folders;
 	}
@@ -678,7 +692,7 @@ class goCalendar extends GoBaseBackendDiff {
 
 		
 		$params = \GO\Base\Db\FindParams::newInstance()
-						->ignoreAcl()->debugSql()
+						->ignoreAcl()
 						->single(true, true)
 						->select('count(*) AS count, max(mtime) AS lastmtime')
 						->join(\GO\Sync\Model\UserCalendar::model()->tableName(), \GO\Base\Db\FindCriteria::newInstance()
