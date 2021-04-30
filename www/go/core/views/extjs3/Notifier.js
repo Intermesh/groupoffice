@@ -337,6 +337,8 @@
 
 			var audio = new Audio(path + ".mp3");
 
+
+
 			if(this._userInteracted) {
 				audio.play()
 					.catch((e) => {
