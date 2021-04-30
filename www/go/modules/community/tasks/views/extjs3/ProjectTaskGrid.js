@@ -30,25 +30,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 							this.timeEntryDialog = new go.modules.community.tasks.TimeEntryDialog({
 								id: 'pm-timeentry-dialog-grid'
 							});
-							/*
-							this.timeEntryDialog.on('submit', function () {
-								GO.request({
-									url: 'projects2/task/save',
-									method: 'POST',
-									params: {
-										project_id: this.project_id,
-										data: Ext.encode(this.getGridData())
-									},
-									success: function (response, options, result) {
-										this.store.load();
-									},
-									scope: this
-								});
-							}, this);
-
-							 */
 						}
-
 
 						this.timeEntryDialog.show(0, {
 							loadParams: {
@@ -57,7 +39,6 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 							}
 						});
 						break;
-
 				}
 			}
 		}, this);
@@ -81,7 +62,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 		fields: ['id', 'group.name', 'projectId', 'responsibleUserId', 'percentageComplete', 'estimatedDuration', 'timeBooked', 'due', 'start', 'description' , 'groupId'],
 		columns: [{
 			id: 'start',
-			header: t('Start'),
+			header: t('Start', 'tasks', 'community'),
 			sortable: false,
 			dataIndex: 'start',
 			menuDisabled: true,
@@ -92,7 +73,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 			}),
 			summaryType: 'count',
 			summaryRenderer:function(value){
-				return value+' '+t("Jobs", "projects2");
+				return t("Total") + ': ' + value;
 			},
 
 			renderer: function (name, cell, record) {
@@ -101,7 +82,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 
 		}, {
 			id: 'due',
-			header: t('Due'),
+			header: t('Due', 'tasks','community'),
 			sortable: false,
 			dataIndex: 'due',
 			menuDisabled: true,
@@ -110,10 +91,6 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 				format:go.User.date_format,
 				emptyText:'Auto'
 			}),
-			summaryType: 'count',
-			summaryRenderer:function(value){
-				return value+' '+t("Jobs", "projects2");
-			},
 
 			renderer: function (name, cell, record) {
 				if(Ext.isEmpty(name)) {
@@ -167,48 +144,42 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 					'<div class="pm-progress-indicator" style="width:' + Math.ceil(GO.util.unlocalizeNumber(value)) + '%"></div>' +
 					'</div>';
 			}
-		},/* {
-			header: t("Duration", "projects2"),
+		}, {
+			header: t("Estimated duration", "tasks", 'community'),
 			dataIndex: 'estimatedDuration',
 			summaryType: 'sum',
 			hidden: true,
 			width: dp(64),
-			editor: new Ext.grid.GridEditor(new go.form.NumberField())
-		},*/ {
-			header: t("Hours booked", "projects2"),
+			editor: new Ext.grid.GridEditor(new go.form.NumberField()),
+			renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
+				if(parseInt(value) > 0) {
+					return go.util.Format.duration(value);
+				}
+				return '';
+			}
+		}, {
+			header: t("Hours booked", "tasks", 'community'),
 			dataIndex: 'timeBooked',
 			width: dp(72),
 			renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
-				debugger;
-				// TODO?
-				// if(record.data.hours_over_budget) {
-				// 	metaData.css = 'projects-late';
-				// }
-				return value;
+				if(parseInt(value) > 0) {
+					var v = parseInt(value);
+					if(parseInt(record.data.estimatedDuration) > 0 && v > parseInt(record.data.estimatedDuration) ) {
+						metaData.css = 'projects-late';
+					}
+					return go.util.Format.duration(v);
+				}
+				return '';
 			},
 			summaryType: 'sum'
 		}, {
 			id: 'employee',
 			width: dp(72),
-			header: t("Employee", "projects2"),
+			header: t("Employee", "business", 'business'),
 			dataIndex: 'responsibleUserId',
 			renderer: this.renderResource.createDelegate(this),
 			editor: new Ext.grid.GridEditor(this.selectResource)
-		}/*, {
-			id: 'groupId',
-			header: "Group",
-			hidden: false,
-			hideable: false,
-			dataIndex: 'groupId',
-			renderer: function(value, metaData, record, rowIndex, colIndex, ds) {
-				if(Ext.isEmpty(value)) {
-					return '';
-				}
-				return record.data.group[record.data.tasklistId].name;//record.data.group[record.tasklistId].name;
-			},
-
-			groupable: true
-		}*/]
+		}]
 	};
 	if (go.Modules.isAvailable("legacy", "timeregistration2")) {
 		fields.columns.push(addTimeRegAction);
@@ -229,6 +200,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 			'due',
 			'progress',
 			'responsibleUserId',
+			'estimatedDuration',
 			'tasklistId',
 			'group',
 			'timeBooked'
@@ -275,21 +247,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 			this.deleteSelected();
 		},
 		scope: this
-	},/* Disabled until further notice. Not sure whether needed anymore'-', this.ungroupButton = new Ext.Button({
-		text: t("Ungroup", "projects2"),
-		disabled: true,
-		handler: function () {
-			this.ungroupSelection();
-		},
-		scope: this
-	}), this.groupButton = new Ext.Button({
-		text: t("Group", "projects2"),
-		disabled: true,
-		handler: function () {
-			this.showToGroupDialog();
-		},
-		scope: this
-	}),*/ '->', {
+	},'->', {
 		iconCls: 'ic-save',
 		text: t("Save"),
 		handler: function () {
@@ -303,22 +261,6 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 	this.addEvents({
 		'saved': true
 	});
-
-	// Temporarily disabled because unclear whether task grouping is still valid
-	// this.getSelectionModel().on('selectionchange', function (sm) {
-		// this.ungroupButton.setDisabled(true);
-		// this.groupButton.setDisabled(true);
-		//
-		// var selections = sm.getSelections();
-		//
-		// for (var ii = 0,il=selections.length; ii < il; ii++) {
-		// 	if (selections[ii].data.groupId > 0) {
-		// 		this.ungroupButton.setDisabled(false);
-		// 	} else {
-		// 		this.groupButton.setDisabled(false);
-		// 	}
-		// }
-	// }, this);
 };
 
 
@@ -341,9 +283,6 @@ Ext.extend(go.modules.community.tasks.ProjectTaskGrid, go.grid.EditorGridPanel, 
 
 		if (projectId) {
 			this.store.setFilter('projectId', {projectId: this.projectId}).load();
-				// .then(function(result) {
-				// 	console.log(result);
-				// });
 		} else {
 			this.store.removeAll();
 		}
@@ -376,8 +315,7 @@ Ext.extend(go.modules.community.tasks.ProjectTaskGrid, go.grid.EditorGridPanel, 
 			rows = sm.getSelections(),
 			tasklistId = 0, // TODO: get tasklistId if no tasks available
 			groupId = null,
-			user_id,
-			parent_description = t("Ungrouped", "projects2");
+			user_id
 
 		if (rows.length > 0) {
 			index = this.store.indexOf(rows[rows.length - 1]) + 1;
@@ -385,7 +323,6 @@ Ext.extend(go.modules.community.tasks.ProjectTaskGrid, go.grid.EditorGridPanel, 
 
 		if (description) {
 			index = 0; // If there is a description, then this is a group task.
-			// todo: get current GroupId
 		}
 		var previousRecord = this.store.getAt(index - 1);
 		if (previousRecord) {
@@ -407,7 +344,7 @@ Ext.extend(go.modules.community.tasks.ProjectTaskGrid, go.grid.EditorGridPanel, 
 			due: '',
 			responsibleUserId: user_id,
 			title: t('New task', 'tasks'),
-			estimatedDuration: GO.util.numberFormat(1),
+			estimatedDuration: 60,
 			percentComplete: 0,
 			tasklistId: tasklistId,
 			groupId: groupId
@@ -421,12 +358,10 @@ Ext.extend(go.modules.community.tasks.ProjectTaskGrid, go.grid.EditorGridPanel, 
 		this.startEditing(index, colIndex);
 
 		return index;
-
 	},
 
 	/**
 	 * Since saving directly into a grouping store does not work, we manually get the changes and create our own JMAP call
-	 * TODO? Refactor delete function into this function as well?
 	 */
 	save: function() {
 		if(!this.isDirty()) {
@@ -467,31 +402,6 @@ Ext.extend(go.modules.community.tasks.ProjectTaskGrid, go.grid.EditorGridPanel, 
 		return val;
 	},
 
-	reset: function () {
-		this.setValue([]);
-		this.dirty = false;
-	},
-
-	setValue: function (groups) {
-		this._isDirty = false;
-		this.value = groups || {};
-		this.store.load().catch(function () {
-		}); //ignore failed load becuase onBeforeStoreLoad can return false
-	},
-
-	onBeforeStoreLoad: function (store, options) {
-		//don't add selected on search
-		if (this.store.filters.tbsearch || options.selectedLoaded || options.paging) {
-			this.store.setFilter('exclude', null);
-			return true;
-		}
-		return false;
-	},
-
-	getValue: function () {
-		return this.value;
-	},
-
 	markInvalid: function (msg) {
 		this.getEl().addClass('x-form-invalid');
 		Ext.form.MessageTargets.qtip.mark(this, msg);
@@ -512,89 +422,16 @@ Ext.extend(go.modules.community.tasks.ProjectTaskGrid, go.grid.EditorGridPanel, 
 	startEditing: function (row, col) {
 		go.modules.community.tasks.ProjectTaskGrid.superclass.startEditing.call(this, row, col);
 
-		//expand combo when editing TODO: Test whether still needed
+		//expand combo when editing
 		if (this.activeEditor && this.activeEditor.field.onTriggerClick) {
 			this.activeEditor.field.onTriggerClick();
 		}
 	},
-	// afterEdit: function (e) {
-		// 	debugger;
-		// 	this.value[e.record.id] = e.record.data.level;
-		// this._isDirty = true;
-	// },
 	onEditComplete : function(ed, value, startValue){
 		go.modules.community.tasks.ProjectTaskGrid.superclass.onEditComplete.call(this, ed, value, startValue);
-		// if(ed.col==5 && ed.row==this.store.getCount()-1)
-		// 	this.addNewRow();
 		if(value !== startValue) {
 			this._isDirty = true;
 		}
-	},
-
-	afterRender: function () {
-		// TODO: Do we need this handler anyway?
-		go.modules.community.tasks.ProjectTaskGrid.superclass.afterRender.call(this);
-
-
-		var form = this.findParentByType("entityform");
-
-		if (!form) {
-			return;
-		}
-
-		if (!this.store.loaded) {
-			this.store.load();
-		}
-
-		form.on("load", function (f, v) {
-			this.setDisabled(v.permissionLevel < go.permissionLevels.manage);
-		}, this);
-
-
-		//Check form currentId becuase when form is loading then it will load the store on setValue later.
-		//Set timeout is used to make sure the check will follow after a load call.
-		var me = this;
-		setTimeout(function () {
-			if (!go.util.empty(me.value) && !form.currentId) {
-				me.store.load();
-			}
-		}, 0);
-	},
-
-	groupSelection: function(groupName) {
-		// TODO;
-	},
-
-	showToGroupDialog: function () {
-		// TODO: Refactor into JMAP
-		if (!this.toGroupDialog) {
-			this.toGroupDialog = new GO.projects2.ToGroupDialog(); // TODO: tasks?
-			this.toGroupDialog = new go.modules.community.tasks.TasklistGroupDialog();
-			this.toGroupDialog.on('groupName', function (groupName) {
-				this.groupSelection(groupName);
-			}, this);
-		}
-		this.toGroupDialog.show();
-
-	},
-
-	ungroupSelection: function () {
-		var selectedRows = this.selModel.getSelections();
-
-		for (var ii = 0, il=selectedRows.length; ii < il; ii++) {
-			selectedRows[ii].set('groupId', null);
-		}
-
-		this.save();
-		this.ungroupButton.setDisabled(true);
-		this.groupButton.setDisabled(false);
-	},
-
-
-	isFormField: true,
-
-	getName: function () {
-		return this.name;
 	},
 
 	_isDirty: false,

@@ -38,7 +38,11 @@ return [
 	"Start" => 'Start',
 	"Due" => 'Verloopt',
 	"Percent complete" => 'Percentage compleet',
+	'Estimated duration' => 'Geschatte duur',
+	'Hours booked' => 'Geboekte uren',
 	'Add alert' => 'Alert toevoegen',
 	"Progress" => 'Voortgang',
-	"Continue task" => 'Taak voortzetten'
+	"Continue task" => 'Taak voortzetten',
+	'Nothing to save' => 'Niets om op te slaan',
+	'No changes have been made' => 'Er zijn geen veranderingen aangebracht.'
 ];
