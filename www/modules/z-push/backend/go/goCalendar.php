@@ -708,7 +708,7 @@ class goCalendar extends GoBaseBackendDiff {
 		$lastmtime = isset($record->lastmtime) ? $record->lastmtime : 0;
 		$newstate = 'M'.$lastmtime.':C'.$record->count;
 		
-		ZLog::Write(LOGLEVEL_DEBUG,'goCalendar->getNotification() State: '.$newstate);
+		ZLog::Write(LOGLEVEL_DEBUG,'goCalendar->getNotification('.$folder.') State: '.$newstate);
 
 		return $newstate;
 	}

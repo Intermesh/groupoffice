@@ -197,8 +197,18 @@ class goContact extends GoBaseBackendDiff {
 	}
 	
 	public function getNotification($folder = null) {
-		Contact::entityType()->clearCache();
-		return Contact::getState();
+		$record = Contact::find()
+			->fetchMode(PDO::FETCH_ASSOC)
+			->select('COALESCE(count(*), 0) AS count, COALESCE(max(modifiedAt), 0) AS modifiedAt')
+//						->join("sync_user_note_book", 's', 'n.noteBookId = s.noteBookId')
+//						->where(['s.userId' => go()->getUserId()])
+			->where('c.addressBookId','=',$folder)
+			->single();
+
+		$newstate = 'M'.$record['modifiedAt'].':C'.$record['count'];
+		ZLog::Write(LOGLEVEL_DEBUG,'goContact->getNotification('.$folder.') State: '.$newstate);
+
+		return $newstate;
 	}
 
 }
