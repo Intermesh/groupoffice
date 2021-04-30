@@ -489,13 +489,13 @@ class goCalendar extends GoBaseBackendDiff {
 					return $this->StatMessage($folderid, $id);
 				}
 			} else {
-				$calendar = GoSyncUtils::getUserSettings()->getDefaultCalendar();
-
-				if (!$calendar)
-					throw new \Exception("FATAL: No default calendar configured");
+//				$calendar = GoSyncUtils::getUserSettings()->getDefaultCalendar();
+//
+//				if (!$calendar)
+//					throw new \Exception("FATAL: No default calendar configured");
 
 				$event = new \GO\Calendar\Model\Event();
-				$event->calendar_id = $calendar->id;
+				$event->calendar_id = $folderid;//$calendar->id;
 			}
 
 			$event = $this->_handleAppointment($message, $event);
@@ -695,10 +695,12 @@ class goCalendar extends GoBaseBackendDiff {
 						->ignoreAcl()
 						->single(true, true)
 						->select('count(*) AS count, max(mtime) AS lastmtime')
-						->join(\GO\Sync\Model\UserCalendar::model()->tableName(), \GO\Base\Db\FindCriteria::newInstance()
-						->addCondition('calendar_id', 's.calendar_id', '=', 't', true, true)
-						->addCondition('user_id', \GO::user()->id, '=', 's')
-						, 's');
+						->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('calendar_id', $folder));
+
+//						->join(\GO\Sync\Model\UserCalendar::model()->tableName(), \GO\Base\Db\FindCriteria::newInstance()
+//						->addCondition('calendar_id', 's.calendar_id', '=', 't', true, true)
+//						->addCondition('user_id', \GO::user()->id, '=', 's')
+//						, 's');
 		
 
 		$record = \GO\Calendar\Model\Event::model()->find($params);
