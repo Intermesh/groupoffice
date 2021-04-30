@@ -14,3 +14,5 @@ ChooseTasklistDialog.js
 ChooseTasklistGrid.js
 ProjectTaskGrid.js
 TasklistGroupDialog.js
+TimeEntryDialog.js
+ProjectTaskCombo.js

@@ -87,6 +87,8 @@ class Task extends AclItemEntity {
 
 	public $color;
 
+	protected $timeBooked;
+
 	//The scheduling status
 	//public $status = 'confirmed';
 
@@ -136,6 +138,12 @@ class Task extends AclItemEntity {
 
 	/** @var int */
 	public $vcalendarBlobId;
+	/**
+	 * The users in this group
+	 *
+	 * @var int[]
+	 */
+	public $hours;
 
 	protected static function aclEntityClass(){
 		return Tasklist::class;
@@ -148,10 +156,31 @@ class Task extends AclItemEntity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 			->addTable("tasks_task", "task")
+//			->setQuery((new Query())->select('SUM(prh.duration) AS timeBooked')
+//				->join('pr2_hours', 'prh','task.id=prh.task_id','LEFT')
+//			)
 			->addUserTable("tasks_task_user", "ut", ['id' => 'taskId'])
 			->addMap('alerts', Alert::class, ['id' => 'taskId'])
 			->addMap('group', TasklistGroup::class, ['groupId' => 'id'])
-			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId']);
+			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId'])
+			->addScalar('hours', 'pr2_hours', ['id' => 'task_id']);
+	}
+
+	public function getTimeBooked()
+	{
+		$booked = 0;
+		if(count($this->hours) > 0) {
+			$record = (new \go\core\db\Query())
+				->select('SUM(duration) as timeBooked')
+				->from('pr2_hours')
+				->where('id IN ('. implode(',',$this->hours) . ')')
+				->single();
+			if($record) {
+				$booked = $record['timeBooked'];
+			}
+		}
+
+		return $booked;
 	}
 
 	public static function converters() {

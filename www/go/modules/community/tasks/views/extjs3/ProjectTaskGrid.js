@@ -26,10 +26,11 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 
 						if (!this.timeEntryDialog) {
 							// TODO: Refactor to JMAP
-							/*
-							this.timeEntryDialog = new GO.projects2.TimeEntryDialog({
+
+							this.timeEntryDialog = new go.modules.community.tasks.TimeEntryDialog({
 								id: 'pm-timeentry-dialog-grid'
 							});
+							/*
 							this.timeEntryDialog.on('submit', function () {
 								GO.request({
 									url: 'projects2/task/save',
@@ -52,7 +53,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 						this.timeEntryDialog.show(0, {
 							loadParams: {
 								task_id: record.data.id,
-								project_id: record.data.projectId
+								project_id: this.projectId
 							}
 						});
 						break;
@@ -77,7 +78,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 	}, this)
 
 	var fields = {
-		fields: ['id', 'group.name', 'projectId', 'responsibleUserId', 'percentageComplete', 'estimatedDuration', 'hoursBooked', 'due', 'start', 'description' , 'groupId'],
+		fields: ['id', 'group.name', 'projectId', 'responsibleUserId', 'percentageComplete', 'estimatedDuration', 'timeBooked', 'due', 'start', 'description' , 'groupId'],
 		columns: [{
 			id: 'start',
 			header: t('Start'),
@@ -175,9 +176,10 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 			editor: new Ext.grid.GridEditor(new go.form.NumberField())
 		},*/ {
 			header: t("Hours booked", "projects2"),
-			dataIndex: 'hoursBooked',
+			dataIndex: 'timeBooked',
 			width: dp(72),
 			renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
+				debugger;
 				// TODO?
 				// if(record.data.hours_over_budget) {
 				// 	metaData.css = 'projects-late';
@@ -192,7 +194,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 			dataIndex: 'responsibleUserId',
 			renderer: this.renderResource.createDelegate(this),
 			editor: new Ext.grid.GridEditor(this.selectResource)
-		}, {
+		}/*, {
 			id: 'groupId',
 			header: "Group",
 			hidden: false,
@@ -206,7 +208,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 			},
 
 			groupable: true
-		}]
+		}*/]
 	};
 	if (go.Modules.isAvailable("legacy", "timeregistration2")) {
 		fields.columns.push(addTimeRegAction);
@@ -228,7 +230,8 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 			'progress',
 			'responsibleUserId',
 			'tasklistId',
-			'group'
+			'group',
+			'timeBooked'
 		],
 		sortInfo: {
 			field: 'start',
@@ -272,7 +275,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 			this.deleteSelected();
 		},
 		scope: this
-	}, '-', this.ungroupButton = new Ext.Button({
+	},/* Disabled until further notice. Not sure whether needed anymore'-', this.ungroupButton = new Ext.Button({
 		text: t("Ungroup", "projects2"),
 		disabled: true,
 		handler: function () {
@@ -286,7 +289,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 			this.showToGroupDialog();
 		},
 		scope: this
-	}), '->', {
+	}),*/ '->', {
 		iconCls: 'ic-save',
 		text: t("Save"),
 		handler: function () {
@@ -301,20 +304,21 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 		'saved': true
 	});
 
-	this.getSelectionModel().on('selectionchange', function (sm) {
-		this.ungroupButton.setDisabled(true);
-		this.groupButton.setDisabled(true);
-
-		var selections = sm.getSelections();
-
-		for (var ii = 0,il=selections.length; ii < il; ii++) {
-			if (selections[ii].data.groupId > 0) {
-				this.ungroupButton.setDisabled(false);
-			} else {
-				this.groupButton.setDisabled(false);
-			}
-		}
-	}, this);
+	// Temporarily disabled because unclear whether task grouping is still valid
+	// this.getSelectionModel().on('selectionchange', function (sm) {
+		// this.ungroupButton.setDisabled(true);
+		// this.groupButton.setDisabled(true);
+		//
+		// var selections = sm.getSelections();
+		//
+		// for (var ii = 0,il=selections.length; ii < il; ii++) {
+		// 	if (selections[ii].data.groupId > 0) {
+		// 		this.ungroupButton.setDisabled(false);
+		// 	} else {
+		// 		this.groupButton.setDisabled(false);
+		// 	}
+		// }
+	// }, this);
 };
 
 
