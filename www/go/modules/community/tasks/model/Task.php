@@ -156,9 +156,6 @@ class Task extends AclItemEntity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 			->addTable("tasks_task", "task")
-//			->setQuery((new Query())->select('SUM(prh.duration) AS timeBooked')
-//				->join('pr2_hours', 'prh','task.id=prh.task_id','LEFT')
-//			)
 			->addUserTable("tasks_task_user", "ut", ['id' => 'taskId'])
 			->addMap('alerts', Alert::class, ['id' => 'taskId'])
 			->addMap('group', TasklistGroup::class, ['groupId' => 'id'])

@@ -2,6 +2,7 @@
 
 use GO\Base\Util\Icalendar\Rrule;
 use go\core\orm\Query;
+use go\modules\community\tasks\install\Migrator;
 
 $updates['201911061630'][] = function() {
 	\go\core\db\Utils::runSQLFile(\GO()->getEnvironment()->getInstallFolder()->getFile("go/modules/community/tasks/install/upgrade.sql"));
@@ -61,3 +62,7 @@ $updates['201911061630'][] = function(){
 };
 
 $updates['202101011630'][] = "ALTER TABLE `tasks_task` CHANGE COLUMN `description` `description` TEXT NULL DEFAULT '';";
+$updates['202104301506'][] = function() {
+	$m = new Migrator();
+	$m->job2task();
+};
