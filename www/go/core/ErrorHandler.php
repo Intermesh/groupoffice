@@ -105,7 +105,10 @@ class ErrorHandler {
 		
 		echo "\n" . $errorString . " at ".date(DateTime::FORMAT_API)."\n\n";	
 			
-		if(go()->getDebugger()->enabled) {			
+		if(go()->getDebugger()->enabled) {
+
+			echo $e->getTraceAsString() ."\n";
+
 			echo "\n\nDebug dump: \n\n";			
 			App::get()->getDebugger()->printEntries();
 		}
