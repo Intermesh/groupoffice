@@ -1,4 +1,6 @@
 - OnlyOffice: Fixed OnlyOffice printing, download as and editing tables, images etc.
+- ActiveSync: Support multiple calendars, address books and task lists.
+- ActiveSync: Create task lsits and calendars from mobile device.
 
 29-04-2021 6.5.45
 - Core: Minor change in requesting notifications
