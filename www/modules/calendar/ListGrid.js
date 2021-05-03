@@ -51,6 +51,8 @@ GO.calendar.ListGrid = function(config)
 			'ctime',
 			'mtime',
 			'username',
+			'user_id',
+			'is_organizer',
 			'musername',
 			'resources',
 			'model_name'
