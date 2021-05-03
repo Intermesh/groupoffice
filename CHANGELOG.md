@@ -1,3 +1,4 @@
+- Core: Added support for default subfolder for document templates
 - OnlyOffice: Fixed OnlyOffice printing, download as and editing tables, images etc.
 - ActiveSync: Support multiple calendars, address books and task lists.
 - ActiveSync: Create task lsits and calendars from mobile device.
