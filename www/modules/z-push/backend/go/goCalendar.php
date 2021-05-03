@@ -467,6 +467,43 @@ class goCalendar extends GoBaseBackendDiff {
 		return $event;
 	}
 
+
+	public function ChangeFolder($folderid, $oldid, $displayname, $type)
+	{
+		if(!empty($oldid)) {
+
+			//remove t/ from the folder ? Shouldn't this already have been done by the combined backend wrapper?
+			$oldid = substr($oldid, 2);
+
+			$calendar = \GO\Calendar\Model\Calendar::model()->findByPk($oldid);
+			if(!$calendar) {
+				ZLog::Write(LOGLEVEL_DEBUG, "Calendar with $oldid not found");
+				return false;
+			}
+		} else{
+			$calendar = new \GO\Calendar\Model\Calendar();
+		}
+
+		$calendar->name = $displayname;
+		if(!$calendar->save()) {
+			ZLog::Write(LOGLEVEL_DEBUG, "Calendar with $displayname could not be created");
+			return false;
+		}
+
+		if(empty($oldid)) {
+			$ut = new \GO\Sync\Model\UserCalendar();
+			$ut->user_id = GO::user()->id;
+			$ut->calendar_id = $calendar->id;
+
+			if(!$ut->save()) {
+				ZLog::Write(LOGLEVEL_DEBUG, "Calendar with $displayname could not be added to sync profile");
+				return false;
+			}
+		}
+
+		return $this->StatFolder($calendar->id);
+	}
+
 	/**
 	 * Save the information from the phone to Group-Office.
 	 * 
