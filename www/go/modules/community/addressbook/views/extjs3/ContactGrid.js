@@ -19,6 +19,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				'id',
 				'name',
 				'firstName',
+				'middleName',
 				'lastName',
 				{name: 'createdAt', type: 'date'},
 				{name: 'modifiedAt', type: 'date'},
@@ -117,6 +118,9 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 						var sortBy = go.User.addressBookSettings.sortBy, name;
 						if(!record.data.isOrganization && sortBy == 'lastName' && !go.util.empty(record.data.lastName)) {
 							name = record.data.lastName + ', ' + record.data.firstName;
+							if(!go.util.empty(record.data.middleName)) {
+								name += " " + record.data.middleName;
+							}
 						} else{
 							name = record.get('name');
 						}

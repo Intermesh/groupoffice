@@ -4,6 +4,8 @@
 - ActiveSync: Create task lsits and calendars from mobile device.
 - Core: Fixed "Change in requesting notifications stops Firefox working #690"
 - Core: UI could break when dragging some windows out of the viewport
+- Core: remove old log module entry
+- Address book: Middle name was missing when sorting names by last name.
 
 29-04-2021 6.5.45
 - Core: Minor change in requesting notifications
