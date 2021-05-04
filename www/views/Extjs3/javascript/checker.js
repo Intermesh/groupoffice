@@ -155,7 +155,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					).then((notification) => {
 						reminderPanel.notification = notification
 					}).catch((e) => {
-						//ignore failure
+						console.warn("Notification failed: " + e);
 					});
 
 					this.notifiedReminders[reminderId] = true;
