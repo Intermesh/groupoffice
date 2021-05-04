@@ -9,6 +9,9 @@ namespace go\modules\community\tasks\model;
 
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
+use go\core\orm\Property;
+use go\core\orm\Query;
+use GO\Projects2\Model\ProjectEntity;
 
 /**
  * Tasklist model
@@ -93,6 +96,33 @@ class Tasklist extends AclOwnerEntity
 			}
 		}
 		return parent::internalSave();
+	}
+
+	public static function saveForProject(int $projectId)
+	{
+		$id = self::find(['id'])
+			->selectSingleValue("tasklist.id")
+			->filter(['projectId' => $projectId])
+			->single();
+
+		if (!empty($id)) {
+			go()->getDebugger()->debug('tasklist ' . $id . ' found for project ' . $projectId);
+		} else {
+			$project = ProjectEntity::findById($projectId, ['name', 'user_id']);
+
+			// Create a new tasklist record
+			$tl = new Tasklist();
+			$tl->name = go()->t('Task list') . ' ' . $project->name;
+			$tl->setRole('project');
+			$tl->createdBy = go()->getUserId();
+			$tl->ownerId = $project->user_id;
+			$tl->save();
+			if (!go()->getDbConnection()->insert('pr2_project_tasklist', ['tasklist_id' => $tl->id, 'project_id' => $projectId])->execute()) {
+				throw new \Exception("could not save project tasklist pivot table");
+			}
+
+		}
+
 	}
 
 }

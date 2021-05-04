@@ -16,6 +16,11 @@ class Task extends EntityController {
 	}	
 
 	public function query($params) {
+		if (go()->getModule(null, 'projects2'))
+			if(isset($params['filter']) && isset($params['filter']['projectId'])) {
+			// TODO: Do the tasklist thingy
+			model\Tasklist::saveForProject($params['filter']['projectId']);
+		}
 		return $this->defaultQuery($params);
 	}
 
