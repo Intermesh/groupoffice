@@ -66,24 +66,21 @@ class Tasklist extends AclOwnerEntity
 
 	public $groups = [];
 
+	protected static function defineFilters()
+	{
+		return parent::defineFilters()
+			->add('role', function (Criteria $criteria, $value) {
+				$roleID = array_search($value, self::Roles, true);
+				$criteria->where(['role' => $roleID]);
+			});
+	}
+
 	protected static function defineMapping()
 	{
 		return parent::defineMapping()
 			->addTable("tasks_tasklist", "tasklist")
 			->addUserTable('tasks_tasklist_user', "ut", ['id' => 'tasklistId'])
 			->addArray('groups', TasklistGroup::class, ['id' => 'tasklistId'], ['orderBy'=>'sortOrder']);
-//			->addHasOne('project', ProjectEntity::class, ['id' => 'tasklist_id'] ); // TODO Query object?
-	}
-
-	protected static function defineFilters() {
-		return parent::defineFilters()
-			->add('projectId', function(Criteria $criteria, $value, Query $query, array $filter){
-				if(!empty($value)) {
-					$query->join('pr2_project_tasklist', 'prt', 'prt.tasklist_id = tasklist.id')
-						->groupBy(['tasklist.id'])
-						->where(['prt.project_id' => $value]);
-				}
-			});
 	}
 
 	protected function internalSave()

@@ -168,6 +168,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 					},
 					this.recurrenceField = new go.form.RecurrenceField({
 						name: 'recurrenceRule',
+						hidden: this.hideRecurrence,
 						disabled: true,
 					}),
 					{xtype:'hidden', name: 'tasklistId'},

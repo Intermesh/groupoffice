@@ -1,16 +1,15 @@
 /**
- *
+ * Shortcut class for static dropdown select fields
  * @example
  * ```
  * {
-						xtype: 'selectfield',
-						name: 'encryption',
-						fieldLabel: t('Encryption'),
-						options: [['tls', 'TLS'], ['ssl', 'SSL'], [null, 'None']],
-						value: 'tls'
-					}
-
- ```
+ *     xtype: 'selectfield',
+ *     hiddenName: 'encryption',
+ *     fieldLabel: t('Encryption'),
+ *     options: [['tls', 'TLS'], ['ssl', 'SSL'], [null, 'None']],
+ *     value: 'tls'
+ * }
+ * ```
  */
 go.form.SelectField = Ext.extend(go.form.ComboBox, {
 
