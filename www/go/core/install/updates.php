@@ -904,3 +904,6 @@ $updates['202104161227'][] = function() {
 
 	echo "NOTE: Search cache will be rebuilt by a scheduled task. This may take a lot of time.";
 };
+
+
+$updates['202105041513'][] = "delete from core_module where name='log' and package is null";
