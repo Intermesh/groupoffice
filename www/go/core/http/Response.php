@@ -279,6 +279,7 @@ class Response extends Singleton{
 		$this->setHeader("X-Content-Type-Options","nosniff");
 		$this->setHeader("Strict-Transport-Security","max-age=31536000");
 		$this->setHeader("X-XSS-Protection", "1;mode=block");
+		$this->setHeader('X-Robots-Tag', 'noindex');
 	}
 
 	public function sendHeaders() {		

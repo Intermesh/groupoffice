@@ -90,6 +90,11 @@ class LogEntry extends AclOwnerEntity {
 			);
 	}
 
+	public static function loggable()
+	{
+		return false;
+	}
+
 	protected static function textFilterColumns()
 	{
 		return ['description'];

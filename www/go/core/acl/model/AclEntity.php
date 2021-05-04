@@ -33,7 +33,16 @@ abstract class AclEntity extends Entity {
 		
 		return $changes;
 	}
-	
+
+	protected static function getEntityChangesQuery($sinceModSeq)
+	{
+		$query = parent::getEntityChangesQuery($sinceModSeq);
+
+		Acl::applyToQuery($query, 'change.aclId');
+
+		return $query;
+	}
+
 	public static function getChanges($sinceState, $maxChanges) {
 		//state has entity modseq and acl modseq so we can detect permission changes
 		$states = static::parseState($sinceState);
@@ -133,7 +142,7 @@ abstract class AclEntity extends Entity {
 						->add("permissionLevel", function(Criteria $criteria, $value, Query $query, $filter) {
 							//Permission level is always added to the main query so that it's always applied with AND
 							static::applyAclToQuery($query, $value, $filter['permissionLevelUserId'] ?? null, $filter['permissionLevelGroups'] ?? null);
-						}, Acl::LEVEL_READ);
+						});
 	}
 
 	/**

@@ -297,10 +297,21 @@ class Table {
 	 * Get index information by name
 	 * 
 	 * @link https://dev.mysql.com/doc/refman/8.0/en/show-index.html
+	 * @param string $name
 	 * @return array
 	 */
 	public function getIndex($name) {
 		return $this->indexes[strtolower($name)];
+	}
+
+	/**
+	 * Check if table has an index by the given name
+	 *
+	 * @param string $name
+	 * @return bool
+	 */
+	public function hasIndex($name) {
+		return isset($this->indexes[strtolower($name)]);
 	}
 
 	

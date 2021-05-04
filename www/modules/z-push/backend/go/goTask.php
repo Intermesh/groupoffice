@@ -1,12 +1,5 @@
 <?php
 
-use go\core\model\Module;
-use go\modules\community\tasks\model\Task;
-use go\modules\community\tasks\model\Progress;
-use go\modules\community\tasks\model\Recurrence;
-use go\modules\community\tasks\model\Alert;
-use go\core\model\Acl;
-
 class goTask extends GoBaseBackendDiff {
 
 //	public function ChangeFolder($folderid, $oldid, $displayname, $type) {
@@ -23,19 +16,13 @@ class goTask extends GoBaseBackendDiff {
 	public function DeleteMessage($folderid, $id, $contentparameters) {
 		ZLog::Write(LOGLEVEL_DEBUG, 'goTask->DeleteMessage(' . $folderid . ',' . $id . ')');
 
-		$task = Task::findById($id);
+		$task = \GO\Tasks\Model\Task::model()->findByPk($id);
 
-		if (!$task) {
-			return true;
-		} else if($task->getPermissionLevel() < Acl::LEVEL_DELETE){
-			throw new StatusException(SYNC_ITEMOPERATIONSSTATUS_DL_ACCESSDENIED);
+		if ($task && $task->checkPermissionLevel(\GO\Base\Model\Acl::DELETE_PERMISSION)) {
+			return $task->delete();
 		} else {
-			return $task->delete($task->primaryKeyValues()); // This throws an error when the task is read only
+			return true;
 		}
-	}
-
-	private function makeUTCDate($date) {
-		return $date->format('U'); // todo in UTC
 	}
 
 	/**
@@ -50,26 +37,30 @@ class goTask extends GoBaseBackendDiff {
 	 * @return \SyncTask
 	 */
 	public function GetMessage($folderid, $id, $contentparameters) {
-		$task = Task::findById($id);
+
+		$task = \GO\Tasks\Model\Task::model()->findByPk($id);
+
 		$message = new SyncTask();
+
 		if ($task) {
-			if($task->start) {
-				$message->startdate = $task->start->format("U");
-				$message->utcstartdate = $this->makeUTCDate($task->start);
-			}
-			if($task->due) {
-				$message->duedate = $task->due->format("U");
-				$message->utcduedate = $this->makeUTCDate($task->due);
-			}
-			$message->complete = in_array($task->getProgress(), [Progress::Completed, Progress::Completed]) ? 1 : 0;
-			if($message->complete) $message->datecompleted = $task->progressUpdated->format("U");
-			$message->reminderset = empty($task->alerts) ? 0 : 1;
-			if($message->reminderset) $message->remindertime = $task->alerts[0]->at($task)->format("U");
-			$message->subject = $task->title;
-			// GO = [1-9] AS = [0-2]
-			$message->importance = $task->priority > 6 ? 2 : ($task->priority < 6 ? 0 : 1) ;
+
+			$message->startdate = $task->start_time;
+			$message->duedate = $task->due_time;
+			$message->complete = ($task->status == "COMPLETED") ? 1 : 0;
+			$message->reminderset = empty($task->reminder) ? 0 : 1;
+
+			$startTimeEls = getdate($task->start_time);
+			$endTimeFullEls = getdate($task->due_time);
+
+			$message->utcstartdate = gmmktime($startTimeEls['hours'], $startTimeEls['minutes'], $startTimeEls['seconds'], $startTimeEls['mon'], $startTimeEls['mday'], $startTimeEls['year']);
+			$message->utcduedate = gmmktime($endTimeFullEls['hours'], $endTimeFullEls['minutes'], $endTimeFullEls['seconds'], $endTimeFullEls['mon'], $endTimeFullEls['mday'], $endTimeFullEls['year']);
+
+			$message->subject = $task->name;
+			$message->importance = $task->priority;
+			//$message->completion = $task->percentage_complete;
 
 			$bpReturnType = GoSyncUtils::getBodyPreferenceMatch($contentparameters->GetBodyPreference());
+
 			if (Request::GetProtocolVersion() >= 12.0) {
 				$message->asbody = GoSyncUtils::createASBodyForMessage($task, 'description', $bpReturnType);
 			} else {
@@ -77,24 +68,29 @@ class goTask extends GoBaseBackendDiff {
 				$message->bodysize = strlen($message->body);
 				$message->bodytruncated = 0;
 			}
-			switch ($task->privacy) {
-				case "public": $message->sensitivity = "0"; break;
-				case "private":$message->sensitivity = "2"; break;
-				case "secret": $message->sensitivity = "3"; break;
-			}
 
-			$rule = $task->getRecurrenceRule();
-			if(!empty($rule)) {
-				$message->recurrence = GoSyncUtils::ParseRecurrence(Recurrence::fromArray((array)$rule, $task->start)->toString(), 'task');
-			}
+			if (!empty($task->completion_time))
+				$message->datecompleted = $task->completion_time;
 
-			// HACKS
+			if (!empty($task->rrule))
+				$message->recurrence = GoSyncUtils::exportRecurrence($task);
+
+			if (!empty($task->reminder))
+				$message->remindertime = $task->reminder;
+
 			if (!isset($message->body) || strlen($message->body) == 0)
 				$message->body = " ";
 			// when set the task to complete using the WebAccess, the dateComplete property is not set correctly
 			if ($message->complete == 1 && !isset($message->datecompleted))
 				$message->datecompleted = time();
+
+//			$message->rtf;
+//			$message->categories;
+//			$message->sensitivity;
+//			$message->regenerate;
+//			$message->deadoccur;
 		}
+
 		return $message;
 	}
 
@@ -110,82 +106,78 @@ class goTask extends GoBaseBackendDiff {
 	 */
 	public function ChangeMessage($folderid, $id, $message, $contentParameters) {
 
-		$task = empty($id) ? false : Task::findById($id);
 
-		if (!$task) {
-			$tasklist = GoSyncUtils::getUserSettings()->getDefaultTasklist();
+		try {
 
-			if (!$tasklist)
-				ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2TASK::EXCEPTION ~~ '. "FATAL: No default tasklist configured");
-				return;
+			$task = \GO\Tasks\Model\Task::model()->findByPk($id);
 
-			$task = new Task();
-			$task->tasklistId = $tasklist->id;
-		} else {
-			ZLog::Write(LOGLEVEL_DEBUG, "Found task");
-		}
+			if (!$task) {
+//				$tasklist = GoSyncUtils::getUserSettings()->getDefaultTasklist();
+//
+//				if (!$tasklist)
+//					throw new \Exception("FATAL: No default tasklist configured");
 
-		if (isset($message->startdate))
-			$task->start = new DateTime($message->startdate);
-
-		if (isset($message->duedate))
-			$task->due = new DateTime($message->duedate);
-
-		if (isset($message->datecompleted))
-			$task->progressUpdated = new DateTime($message->datecompleted);
-
-		if (isset($message->subject))
-			$task->title = $message->subject;
-
-		if (isset($message->importance)) // GO = [1-9] AS = [0-2]
-			$task->priority = $message->importance > 1 ? 9 : ($message->importance < 1 ? 1 : 5);
-
-		$task->description = GoSyncUtils::getBodyFromMessage($message);
-
-		if (isset($message->complete)) {
-			$task->setProgress($message->complete == '0' ? 'needs-action' : 'completed');
-		}
-
-		if ($message->reminderset && $message->remindertime) {
-			$alert = new Alert();
-			$alert->setTrigger(['when' => gmdate("Ymd\THis\Z", $message->remindertime)]);
-			$task->alerts = [$alert];
-		}
-
-		if (isset($message->recurrence)) {
-			$rrule = Recurrence::fromArray(GoSyncUtils::GenerateRecurrence($message->recurrence));
-			$task->start = $message->recurrence->start;
-			$task->setRecurrenceRule($rrule->toArray());
-		}
-		if (isset($message->sensitivity)) {
-			switch ($message->sensitivity) {
-				case "0": $task->privacy = 'public'; break;
-				case "2": $task->privacy = 'private'; break;
-				case "3": $task->privacy = 'secret'; break;
+				$task = new \GO\Tasks\Model\Task();
+				$task->tasklist_id = $folderid;
 			}
+
+			if (isset($message->startdate))
+				$task->start_time = $message->startdate;
+
+			if (isset($message->duedate))
+				$task->due_time = $message->duedate;
+
+			if (isset($message->datecompleted))
+				$task->completion_time = $message->datecompleted;
+
+			if (isset($message->subject))
+				$task->name = $message->subject;
+
+			if (isset($message->importance))
+				$task->priority = $message->importance;
+
+			$task->description = GoSyncUtils::getBodyFromMessage($message);
+
+			if (isset($message->complete) && $message->complete)
+				$task->status = \GO\Tasks\Model\Task::STATUS_COMPLETED;
+
+			$task->reminder = isset($message->remindertime) ? $message->remindertime : 0;
+
+			if (isset($message->recurrence)) {
+				if (!empty($message->recurrence->until))
+					$task->repeat_end_time = $message->recurrence->until;
+				$task->start_time = $message->recurrence->start;
+				$task->rrule = GoSyncUtils::importRecurrence($message->recurrence, $task->due_time);
+			}
+
+			//		$message->utcduedate;
+			//    $message->regenerate;
+			//    $message->deadoccur;
+			//    $message->reminderset;
+			//    $message->sensitivity;
+			//    $message->utcstartdate;
+			//    $message->rtf;
+			//    $message->categories;
+
+			$task->cutAttributeLengths();
+
+			// When a task is created on today, then the start time needs to be fixed.
+			if ($task->start_time > $task->due_time) {
+				$task->start_time = $task->due_time;
+			}
+
+			if (!$task->save()) {
+				ZLog::Write(LOGLEVEL_WARN, 'ZPUSH2TASK::Could not save ' . $task->id);
+				ZLog::Write(LOGLEVEL_WARN, var_export($task->getAttributes('raw'), true));
+				ZLog::Write(LOGLEVEL_WARN, var_export($task->getValidationErrors(), true));
+				return false;
+			}
+			$id = $task->id;
+		} catch (\Exception $e) {
+			ZLog::Write(LOGLEVEL_FATAL, 'ZPUSH2TASK::EXCEPTION ~~ ' . (string) $e);
 		}
 
-		//		$message->utcduedate;
-		//    $message->regenerate;
-		//    $message->deadoccur;
-		//    $message->reminderset;
-		//    $message->sensitivity;
-		//    $message->utcstartdate;
-		//    $message->rtf;
-		//    $message->categories;
-
-		// When a task is created on today, then the start time needs to be fixed.
-		if ($task->start > $task->due) {
-			$task->start = $task->due;
-		}
-
-		if (!$task->save()) {
-			ZLog::Write(LOGLEVEL_WARN, 'ZPUSH2TASK::Could not save ' . $task->id);
-			ZLog::Write(LOGLEVEL_WARN, var_export($task->getValidationErrors(), true));
-			return false;
-		}
-
-		return $this->StatMessage($folderid, $task->id);
+		return $this->StatMessage($folderid, $id);
 	}
 
 	/**
@@ -196,12 +188,19 @@ class goTask extends GoBaseBackendDiff {
 	 * @return array
 	 */
 	public function StatMessage($folderid, $id) {
-		$task = Task::findById($id);
-		return $task ? [
-			'id' => $task->id,
-			'flags' => '1',
-			'mod' => $task->modifiedAt->format("U")
-		] : false;
+
+		$task = \GO\Tasks\Model\Task::model()->findByPk($id);
+
+		$stat = false;
+
+		if ($task) {
+			$stat = array();
+			$stat["id"] = $task->id;
+			$stat["flags"] = 1;
+			$stat["mod"] = $task->mtime;
+		}
+
+		return $stat;
 	}
 
 	/**
@@ -213,19 +212,80 @@ class goTask extends GoBaseBackendDiff {
 	 */
 	public function GetMessageList($folderid, $cutoffdate) {
 
-		ZLog::Write(LOGLEVEL_DEBUG, "GetMessageList($folderid, $cutoffdate)");
+		$messages = array();
+		if (\GO::modules()->tasks) {
 
-		if (!Module::isInstalled('community', 'tasks'))
-			return [];
+			$params = \GO\Base\Db\FindParams::newInstance()
+					  ->ignoreAcl()
+					  ->select('t.id,t.mtime')
+					  ->criteria(
+					  	\GO\Base\Db\FindCriteria::newInstance()
+									->addCondition('tasklist_id', $folderid)
+							    ->addCondition('completion_time', 0)
+					  );
 
-		return Task::find()
-			->select('task.id, UNIX_TIMESTAMP(task.modifiedAt) AS `mod`, "1" AS flags')
-			->join("sync_tasklist_user", "u", "u.tasklist_id = task.tasklistId")
-			->andWhere('u.user_id', '=', go()->getAuthState()->getUserId())
-			->fetchMode(PDO::FETCH_ASSOC)
-			->filter(["permissionLevel" => Acl::LEVEL_READ])
-			->all();
+//					  ->join(\GO\Sync\Model\UserTasklist::model()->tableName(), \GO\Base\Db\FindCriteria::newInstance()
+//					  ->addCondition('tasklist_id', 's.tasklist_id', '=', 't', true, true)
+//					  ->addCondition('user_id', \GO::user()->id, '=', 's')
+//					  , 's');
+
+			if (!empty($cutoffdate)) {
+				ZLog::Write(LOGLEVEL_DEBUG, 'Client sent cutoff date for tasks: ' . \GO\Base\Util\Date::get_timestamp($cutoffdate));
+
+				$params->getCriteria()->mergeWith(\GO\Base\Db\FindCriteria::newInstance()
+					->addCondition('due_time', $cutoffdate, '>=')
+				);
+			}
+
+			$stmt = \GO\Tasks\Model\Task::model()->find($params);
+
+			while ($task = $stmt->fetch()) {
+				$message = array();
+				$message['id'] = $task->id;
+				$message['flags'] = 1;
+				$message['mod'] = $task->mtime;
+				$messages[] = $message;
+			}
+		}
+
+		return $messages;
 	}
+
+	 public function ChangeFolder($folderid, $oldid, $displayname, $type)
+	 {
+		if(!empty($oldid)) {
+
+		  //remove t/ from the folder ? Shouldn't this already have been done by the combined backend wrapper?
+		  $oldid = substr($oldid, 2);
+
+		  $tasklist = \GO\Tasks\Model\Tasklist::model()->findByPk($oldid);
+		  if(!$tasklist) {
+			  ZLog::Write(LOGLEVEL_DEBUG, "Tasklist with $oldid not found");
+			  return false;
+		  }
+		} else{
+		  $tasklist = new \GO\Tasks\Model\Tasklist();
+		}
+
+		$tasklist->name = $displayname;
+		if(!$tasklist->save()) {
+		 ZLog::Write(LOGLEVEL_DEBUG, "Tasklist with $displayname could not be created");
+		 return false;
+		}
+
+		if(empty($oldid)) {
+		 $ut = new \GO\Sync\Model\UserTasklist();
+		 $ut->user_id = GO::user()->id;
+		 $ut->tasklist_id = $tasklist->id;
+
+		 if(!$ut->save()) {
+			 ZLog::Write(LOGLEVEL_DEBUG, "Tasklist with $displayname could not be added to sync profile");
+			 return false;
+		 }
+		}
+
+		return $this->StatFolder($tasklist->id);
+	 }
 
 	/**
 	 * Get the syncFolder that is attached to the given id
@@ -235,15 +295,15 @@ class goTask extends GoBaseBackendDiff {
 	 */
 	public function GetFolder($id) {
 
-		if ($id != BackendGoConfig::TASKSBACKENDFOLDER) {
-			ZLog::Write(LOGLEVEL_WARN, "Task folder '$id' not found");
+		$tasklist = \GO\Tasks\Model\Tasklist::model()->findByPk($id);
+		if(!$tasklist) {
 			return false;
 		}
 
 		$folder = new SyncFolder();
 		$folder->serverid = $id;
 		$folder->parentid = "0";
-		$folder->displayname = 'Tasks';
+		$folder->displayname = $tasklist->name;
 		$folder->type = SYNC_FOLDER_TYPE_TASK;
 
 		return $folder;
@@ -255,14 +315,45 @@ class goTask extends GoBaseBackendDiff {
 	 * @return array
 	 */
 	public function GetFolderList() {
-		$folder = $this->StatFolder(BackendGoConfig::TASKSBACKENDFOLDER);
-		return [$folder];
+		$folders = array();
+
+		$params = \GO\Base\Db\FindParams::newInstance()
+			->ignoreAcl()
+			->join(\GO\Sync\Model\UserTasklist::model()->tableName(), \GO\Base\Db\FindCriteria::newInstance()
+				->addCondition('id', 's.tasklist_id', '=', 't', true, true)
+				->addCondition('user_id', \GO::user()->id, '=', 's')
+				, 's');
+
+		$tasklists = \GO\Tasks\Model\Tasklist::model()->find($params);
+		foreach($tasklists as $tasklist) {
+			$folder = $this->StatFolder($tasklist->id);
+
+			$folders[] = $folder;
+		}
+
+		return $folders;
 	}
 
 	public function getNotification($folder = null) {
-		ZLog::Write(LOGLEVEL_DEBUG, 'goTask->getNotification()');
-		Task::entityType()->clearCache();
-		return Task::getState();
+
+		$params = \GO\Base\Db\FindParams::newInstance()
+				  ->ignoreAcl()
+				  ->single(true, true)
+				  ->select('count(*) AS count, max(mtime) AS lastmtime')
+					->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('tasklist_id', $folder));
+//				  ->join(\GO\Sync\Model\UserTasklist::model()->tableName(), \GO\Base\Db\FindCriteria::newInstance()
+//				  ->addCondition('tasklist_id', 's.tasklist_id', '=', 't', true, true)
+//				  ->addCondition('user_id', \GO::user()->id, '=', 's')
+//				  , 's');
+
+		$record = \GO\Tasks\Model\Task::model()->find($params);
+
+		$lastmtime = isset($record->lastmtime) ? $record->lastmtime : 0;
+		$newstate = 'M' . $lastmtime . ':C' . $record->count;
+
+		ZLog::Write(LOGLEVEL_DEBUG, 'goTask->getNotification() State: ' . $newstate);
+
+		return $newstate;
 	}
 
 }

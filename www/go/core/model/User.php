@@ -33,10 +33,24 @@ class User extends Entity {
 
 	const ID_SUPER_ADMIN = 1;
 
+	/**
+	 * Fires on login
+	 *
+	 * @param User $user
+	 */
 	const EVENT_LOGIN = 'login';
 
+	/**
+	 * Fires on logout
+	 *
+	 * @param User $user
+	 */
 	const EVENT_LOGOUT = 'logout';
 
+	/**
+	 * @param string $username
+	 * @param User $user Can be null
+	 */
 	const EVENT_BADLOGIN = 'badlogin';
 	
 	public $validatePassword = true;
@@ -175,7 +189,7 @@ class User extends Entity {
 	public $timezone;
 	public $start_module;
 	public $language;
-	public $theme;
+	protected $theme;
 	public $firstWeekday;
 	public $sort_name;
 	
@@ -659,7 +673,7 @@ class User extends Entity {
 		if($this->archive) {
 			$this->archiveUser();
 		}
-		
+
 		return true;		
 	}
 	
@@ -957,6 +971,19 @@ class User extends Entity {
 				}
 			}
 			$rec->save();
+		}
+	}
+
+
+	public function setTheme($v) {
+		$this->theme = $v;
+	}
+
+	public function getTheme() {
+		if(!go()->getConfig()['allow_themes']) {
+			return go()->getConfig()['theme'];
+		} else {
+			return $this->theme;
 		}
 	}
 }

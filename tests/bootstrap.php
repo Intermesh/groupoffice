@@ -14,7 +14,7 @@ const INSTALL_NEW = 0;
 const INSTALL_UPGRADE = 1;
 const INSTALL_NONE = 2;
 
-$installDb = INSTALL_NEW;
+$installDb = INSTALL_NONE;
 
 $autoLoader = require(__DIR__ . "/../www/vendor/autoload.php");
 $autoLoader->add('go\\', __DIR__);
@@ -64,13 +64,9 @@ try {
 		];
 
 		$installer = go()->getInstaller();
-		$installer->install($admin, [
-				\go\modules\community\notes\Module::get(),
-				\go\modules\community\test\Module::get(),
-				\go\modules\community\addressbook\Module::get(),
-				\go\modules\community\comments\Module::get(),
-				]);
+		$installer->install($admin);
 
+		\go\modules\community\test\Module::get()->install();
 
 		//install not yet refactored modules
 		GO::$ignoreAclPermissions = true;

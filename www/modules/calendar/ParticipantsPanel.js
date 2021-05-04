@@ -97,6 +97,14 @@ GO.calendar.ParticipantsPanel = function(eventDialog, config) {
 			}
 		},
 		"->",
+		this.checkAvailabilityButton = new Ext.Button({
+			iconCls : 'ic-event-available',
+			text : t("Check availability", "calendar"),
+			handler : function() {
+				this.eventDialog.checkAvailability();
+			},
+			scope : this
+		}),
 	{
 		iconCls : 'btn-add',
 		tooltip : t("Add"),

@@ -1173,11 +1173,14 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$folderId =  $this->checkModelFolder($model, true, !empty($params['mustExist']));
 		$folder = Folder::model()->findByPk($folderId);
 
-		return [
+		$response = [
 			'success' => true,
 			'files_folder_id' => $folderId,
 			'path' => $folder->path
 		];
+		$this->fireEvent('afterCheckModelFolder', [$model, $folder, &$response]);
+
+		return $response;
 	}
 
 	/**

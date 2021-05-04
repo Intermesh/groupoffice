@@ -1040,6 +1040,16 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 			//layout:'accordion',
 			forceLayout:true,
 			autoScroll:true,
+			tbar: [
+				this.checkAvailabilityButton = new Ext.Button({
+					iconCls : 'ic-event-available',
+					text : t("Check availability", "calendar"),
+					handler : function() {
+						this.checkAvailability();
+					},
+					scope : this
+				})
+			],
 //			layoutConfig:{
 //				titleCollapse:true,
 //				animate:false,
@@ -1227,7 +1237,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				this.endTime.setValue(time.add(Date.MILLI, elapsed).format(GO.settings.time_format));
 				
 				this.tabPanel.setActiveTab(0);
-				this.reloadAvailability();
+				this.participantsPanel.reloadAvailability();
 				this.availabilityWindow.hide();
 			}, this);
 		}

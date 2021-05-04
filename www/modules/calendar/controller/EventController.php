@@ -949,11 +949,11 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		else
 			$startTime = date('Y-m-d h:m',time());
 		
-		if(!empty($params['end_time']))
+		if(!empty($params['end_time'])) {
 			$endTime = $params['end_time'];
-		else
-			$endTime = date('Y-m-d h:m',strtotime(date("Y-m-d", strtotime($startTime)) . " +3 months"));
-		
+		} else {
+			$endTime = date('Y-m-d h:m', strtotime(date("Y-m-d", strtotime($startTime)) . " +3 months"));
+		}
 		// Check for the given calendars if they have events in the given period
 		if(!empty($params['view_id'])){
 				$view = \GO\Calendar\Model\View::model()->findByPk($params['view_id']);
@@ -1003,9 +1003,9 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			// Get the calendar model that $calendarIdis used for these events
 			try{
 				$calendar = \GO\Calendar\Model\Calendar::model()->findByPk($calendarId);
-				if(!$calendar)
+				if(!$calendar) {
 					throw new \GO\Base\Exception\NotFound();
-				
+				}
 				$calendarModels[]=$calendar;
 				
 				
@@ -1017,10 +1017,11 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 
 				// Set the colors for each calendar
 				$calendar->displayColor = $colors[$colorIndex];
-				if($colorIndex < count($colors)-1)
+				if($colorIndex < count($colors)-1) {
 					$colorIndex++;
-				else
-					$colorIndex=0;
+				} else {
+					$colorIndex = 0;
+				}
 
 
 				if($response['calendar_count'] > 1 && $this->overrideColors){
@@ -1281,12 +1282,15 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		$resultCount = 0;
 
 		
-		if(!$calendar->user && empty($calendar->user->holidayset))
+		if(!$calendar->user && empty($calendar->user->holidayset)) {
 			return $response;
-		
-		
-		//$holidays = \GO\Base\Model\Holiday::model()->getHolidaysInPeriod($startTime, $endTime, $calendar->user->language);
-		$holidays = \GO\Base\Model\Holiday::model()->getHolidaysInPeriod($startTime, $endTime, $calendar->user->holidayset);
+		}
+
+		$userLocale = $calendar->user->holidayset; // Use explicitly set holidayset by default
+		if (empty($userLocale)) {
+			$userLocale = $calendar->user->language; // Fall back on the selected language.
+		}
+		$holidays = \GO\Base\Model\Holiday::model()->getHolidaysInPeriod($startTime, $endTime, $userLocale);
 
 		if($holidays){
 			while($holiday = $holidays->fetch()){ 
@@ -1703,8 +1707,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		//update participant statuses from main event if possible
 		$organizerEvent = $event->getOrganizerEvent();
 		if($organizerEvent) {
-			\GO::getDbConnection()->query("DELETE FROM cal_participants WHERE event_id = ".$event->id);
-			\GO::getDbConnection()->query("INSERT INTO cal_participants (event_id, name, email, user_id, contact_id, status, last_modified, is_organizer, role) SELECT '".$event->id."', name, email, user_id, contact_id, status, last_modified, is_organizer, role FROM cal_participants p2 WHERE p2.event_id = ".$organizerEvent->id);
+			\GO::getDbConnection()->query("DELETE FROM cal_participants WHERE event_id = ".$event->id." AND user_id !=".\go()->getUserId());
+			\GO::getDbConnection()->query("INSERT INTO cal_participants (event_id, name, email, user_id, contact_id, status, last_modified, is_organizer, role) SELECT '".$event->id."', name, email, user_id, contact_id, status, last_modified, is_organizer, role FROM cal_participants p2 WHERE p2.event_id = ".$organizerEvent->id." AND user_id !=".\go()->getUserId());
 		}
 
 //		if(!$participant)

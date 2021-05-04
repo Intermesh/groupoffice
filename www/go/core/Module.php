@@ -10,6 +10,7 @@ use go\core\fs\Folder;
 use go\core\model;
 use go\core\jmap\Entity;
 use go\core\util\ClassFinder;
+use go\modules\business\license\exception\LicenseException;
 use go\modules\business\license\model\License;
 use function GO;
 
@@ -406,7 +407,7 @@ abstract class Module extends Singleton {
 			$manager = new $cls;
 
 			if(!$manager->isLicensed()) {
-				throw new Exception("Module $dependency is not licensed!");
+				throw new LicenseException("Module $dependency is not licensed!");
 			}
 
 			if(!in_array($manager, $resolved)) {

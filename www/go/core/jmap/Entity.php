@@ -38,6 +38,16 @@ abstract class Entity  extends OrmEntity {
 
 
 	/**
+	 * Returns true if the entity should be logged in the history module
+	 *
+	 * @return bool
+	 */
+	public static function loggable() {
+		return true;
+	}
+
+
+	/**
 	 * Get the current state of this entity
 	 *
 	 * This is the modSeq of the main entity joined with a ":" char with user

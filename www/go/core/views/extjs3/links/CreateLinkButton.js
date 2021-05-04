@@ -107,7 +107,8 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 				filter: {}
 			}
 		});
-		
+
+		this.disableEditableDescription = this.disableEditableDescription || false;
 		this.linkGrid = new go.grid.EditorGridPanel({
 			name: 'linkGrid',
 			clicktToEdit: 1,
@@ -132,7 +133,7 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 					sortable: false,
 					dataIndex: "description",
 					width: dp(200),
-					editable: true,
+					editable: !this.disableEditableDescription,
 					hidable: false,
 					editor: new Ext.form.TextField({
 						allowBlank: true,
@@ -302,6 +303,8 @@ go.links.CreateLinkButton = Ext.extend(Ext.Button, {
 		this.newLinks = [];		
 		this.linkGrid.store.removeAll();
 		this.linkGrid.store.setFilter("link", null);
+		this.linkGrid.store.loaded = false; //otherwise changes will reload with all links in request when this button is
+		//hidden and reused.
 		this.setCount(0);		
 		//this.menu.un("show", this.load);
 	},

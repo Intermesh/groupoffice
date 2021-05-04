@@ -20,13 +20,21 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 		go.detail.addButton.superclass.initComponent.call(this);
 		
 		
-		if(go.Modules.isAvailable("legacy", "comments")) {
+		if(go.Modules.isAvailable("legacy", "workflow")) {
 			//todo, refactor comments so this is also a linkable entity
 			this.menu.add(	{
-				iconCls: 'ic-comment',
-				text: t("Comment"),
+				iconCls: 'go-module-icon-workflow',
+				text: t("Workflow"),
 				scope: this,
-				handler: this.addComment
+				handler: function() {
+					var modelDialog = new GO.workflow.ModelDialog();
+					modelDialog.closeAction = "close";
+
+					modelDialog.addBaseParam('model_id', this.getEntityId());
+					modelDialog.addBaseParam('model_name',  this.getEntity());
+
+					modelDialog.show();
+				}
 			});
 		}
 		
@@ -82,6 +90,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 
 						GO.documenttemplates.templateDocumentDialog.entity = this.getEntity();
 						GO.documenttemplates.templateDocumentDialog.entityId = this.getEntityId();
+						GO.documenttemplates.templateDocumentDialog.folderId = this.detailView.data.files_folder_id;
 
 						GO.documenttemplates.templateDocumentDialog.show();//.show(this.entityId, this.entity);
 
@@ -103,22 +112,7 @@ go.detail.addButton = Ext.extend(Ext.Button, {
 			this.setDisabled(pl < go.permissionLevels.write);
 		}, this);
 	},
-	addComment : function () {
-		var dv = this.detailView;
-		
-		var dlg = GO.comments.showCommentDialog(0, {
-			link_config: {
-				model_name:  dv.model_name || dv.entity || dv.entityStore.entity.name,
-				model_id: this.getEntityId() //model_id is from old display panel
 
-			}
-		});
-
-		dlg.on('hide', function(){
-			this.detailView.reload();
-		}, this, {single: true});
-	},
-			
 			
 	findCreateLinkButton : function(window) {
 		

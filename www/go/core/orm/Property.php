@@ -486,6 +486,12 @@ abstract class Property extends Model {
 
 	private static $mapping;
 
+
+
+	public static function clearCache() {
+		self::$mapping = [];
+	}
+
   /**
    * Returns the mapping object that is defined in defineMapping()
    *

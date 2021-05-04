@@ -22,7 +22,7 @@ abstract class CronJob {
 
 		$name = substr( static::class, strrpos(static::class, '\\') + 1);
 
-		if(!$replace || ($cron = CronJobSchedule::find()->where(['moduleId' => $module->id, 'name' => $name])->single())) {
+		if(!$replace || (!$cron = CronJobSchedule::find()->where(['moduleId' => $module->id, 'name' => $name])->single())) {
 			$cron = new CronJobSchedule();
 		}
 
