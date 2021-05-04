@@ -1,5 +1,9 @@
+- Calendar: fix behaviour of copy button in list view
+
+29-04-2021 6.4.234
 - Email: remember dimensions attachment save as dialog
 - Calendar: Fixed availability check and added more buttons to improve usability
+- Email: Save as task was missing
 
 22-04-2021 6.4.233
 - Email: preserve links when forwarding emails

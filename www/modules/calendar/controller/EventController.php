@@ -1703,8 +1703,8 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		//update participant statuses from main event if possible
 		$organizerEvent = $event->getOrganizerEvent();
 		if($organizerEvent) {
-			\GO::getDbConnection()->query("DELETE FROM cal_participants WHERE event_id = ".$event->id);
-			\GO::getDbConnection()->query("INSERT INTO cal_participants (event_id, name, email, user_id, contact_id, status, last_modified, is_organizer, role) SELECT '".$event->id."', name, email, user_id, contact_id, status, last_modified, is_organizer, role FROM cal_participants p2 WHERE p2.event_id = ".$organizerEvent->id);
+			\GO::getDbConnection()->query("DELETE FROM cal_participants WHERE event_id = ".$event->id." AND user_id !=".\go()->getUserId());
+			\GO::getDbConnection()->query("INSERT INTO cal_participants (event_id, name, email, user_id, contact_id, status, last_modified, is_organizer, role) SELECT '".$event->id."', name, email, user_id, contact_id, status, last_modified, is_organizer, role FROM cal_participants p2 WHERE p2.event_id = ".$organizerEvent->id." AND user_id !=".\go()->getUserId());
 		}
 
 //		if(!$participant)
