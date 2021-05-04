@@ -46,6 +46,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					[t("Incomplete tasks"), 'assignment_late', 'incomplete'],
 					[t("Completed"), 'assignment_turned_in', 'completed'],
 					[t("Future tasks"), 'assignment_return', 'future'],
+					[t("Unplanned"), 'event_busy', 'unplanned'],
 					[t("All"), 'assignment', 'all'],
 				]
 			}),
@@ -104,8 +105,12 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 								percentComplete: 0
 							});
 							break;
-
 						case 6:
+							this.taskGrid.store.setFilter('tasklist',{
+								unplanned: true
+							});
+							break;
+						case 7: // all
 							this.taskGrid.store.setFilter("tasklist", null);
 							break;
 					}

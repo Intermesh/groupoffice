@@ -25,6 +25,7 @@ return [
 	'Choose a tasklist' => 'Kies een takenlijst',
 	'In progress' => 'Bezig',
 	'Completed' => 'Voltooid',
+	'Unplanned' => 'Niet gepland',
 	'Failed' => 'Mislukt',
 	'Needs action' => 'Actie nodig',
 	'Cancelled' => 'Geannuleerd',

@@ -9,8 +9,6 @@ namespace go\modules\community\tasks\model;
 
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
-use go\core\orm\Query;
-use GO\Projects2\Model\ProjectEntity;
 
 /**
  * Tasklist model
