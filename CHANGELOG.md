@@ -1,3 +1,6 @@
+6.5.47
+- Several PT-BR language corrections
+
 04-05-2021 6.5.46
 - Core: Added support for default subfolder for document templates
 - OnlyOffice: Fixed OnlyOffice printing, download as and editing tables, images etc.
