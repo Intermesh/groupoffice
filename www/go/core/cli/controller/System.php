@@ -29,11 +29,17 @@ class System extends Controller {
 		$schedule->moduleId =$module->id;
 		$schedule->name = $name;
 		$schedule->expression = "* * * * *";
+		$schedule->description = "Temporary CLI job " . uniqid();
 
 		$cls = $schedule->getCronClass();
-		
-		$o = new $cls;
-		$o->run($schedule);
+
+		try {
+			$o = new $cls;
+			$o->run($schedule);
+		} finally {
+			CronJobSchedule::delete($schedule->primaryKeyValues());
+		}
+
 	}
 
 	/**
