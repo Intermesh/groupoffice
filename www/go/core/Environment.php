@@ -21,12 +21,21 @@ class Environment extends Singleton {
 	}
 	
 	/**
-	 * Check if we are ran with the Command Line Interface
+	 * Check if we are executed with the Command Line Interface
 	 * 
 	 * @return boolean
 	 */
 	public function isCli() {
 		return PHP_SAPI === 'cli';
+	}
+
+	/**
+	 * Check if we are executed within the cron environment
+	 *
+	 * @return boolean
+	 */
+	public function isCron() {
+		return basename($_SERVER['PHP_SELF']) == 'cron.php';
 	}
 
 	/**

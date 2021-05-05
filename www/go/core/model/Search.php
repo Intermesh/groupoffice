@@ -23,6 +23,12 @@ class Search extends AclOwnerEntity {
 	protected $entity;
 	protected $moduleId;
 
+	public static function loggable()
+	{
+		return false;
+	}
+
+
 	public static function check()
 	{
 		//remove search cache with invalid aclId's. Can happen in old framework.

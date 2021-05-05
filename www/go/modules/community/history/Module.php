@@ -81,6 +81,10 @@ class Module extends core\Module
 			return;
 		}
 
+		if(!$entity::loggable()) {
+			return;
+		}
+
 		if($entity instanceof LogEntry || $entity instanceof core\model\Search  || $entity instanceof core\model\CronJobSchedule) {
 			return;
 		}

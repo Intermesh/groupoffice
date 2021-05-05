@@ -242,6 +242,11 @@
 				return Promise.reject("Notifications not supported");
 			}
 
+
+			if(!window.isSecureContext) {
+				return Promise.reject("Notifications only work in secure context");
+			}
+
 			var title = msg.title || t("Reminders");
 
 			msg.icon = msg.icon || GO.settings.config.full_url + 'views/Extjs3/themes/Paper/img/notify/reminder.png';
@@ -284,17 +289,14 @@
 		requestNotifyPermission : function() {
 
 			if(!this.notifyRequest) {
-				//Safari doesn't support this :(
-				if(!Ext.isSafari) {
-					this.notifyRequest = Notification.requestPermission();
-				} else
-				{
-					this.notifyRequest = new Promise((resolve, reject) => {
+				this.notifyRequest = new Promise((resolve, reject) => {
+
+					Ext.MessageBox.alert(t("Setup notifications"), t("Please choose if you'd like to allow desktop notifications by Group-Office after pressing 'Ok'."), (btn) => {
 						Notification.requestPermission((permission) => {
 							resolve(permission);
-						})
+						});
 					})
-				}
+				});
 			}
 			return this.notifyRequest;
 		},
@@ -339,6 +341,8 @@
 			var path = 'views/Extjs3/themes/Paper/sounds/'+(filename || 'dialog-question');
 
 			var audio = new Audio(path + ".mp3");
+
+
 
 			if(this._userInteracted) {
 				audio.play()

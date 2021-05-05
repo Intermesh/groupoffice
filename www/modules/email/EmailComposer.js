@@ -642,11 +642,6 @@ GO.email.EmailComposer = function(config) {
 			
 		}, this);
 		
-	
-
-	var focusFn = function() {
-		this.toCombo.focus();
-	};
 
 	GO.email.EmailComposer.superclass.constructor.call(this, {
 		title : t("Compose an e-mail message", "email"),
@@ -658,10 +653,8 @@ GO.email.EmailComposer = function(config) {
 		maximizable : true,
 		collapsible : true,
 		animCollapse : false,
-		//plain : true,
 		closeAction : 'hide',
 		buttonAlign : 'center',
-		focus : focusFn.createDelegate(this),
 		tbar : tbar,
 		items : this.formPanel
 	});
@@ -683,6 +676,14 @@ GO.email.EmailComposer = function(config) {
 };
 
 Ext.extend(GO.email.EmailComposer, GO.Window, {
+
+	focus: function() {
+		if (this.toCombo.getValue() == '') {
+			this.toCombo.focus();
+		} else {
+			this.emailEditor.focus();
+		}
+	},
 
 	stateId : 'email-composer',
 	
@@ -1292,11 +1293,7 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		GO.email.EmailComposer.superclass.show.call(this);
 
 
-		if (this.toCombo.getValue() == '') {
-			this.toCombo.focus();
-		} else {
-			this.emailEditor.focus();
-		}
+		this.focus();
 
 		if(this.showConfig.entity && this.showConfig.entityId) {
 			this.setLinkEntity(config);

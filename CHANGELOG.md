@@ -1,5 +1,25 @@
-6.5.44
+6.5.47
+- Several PT-BR language corrections
+
+04-05-2021 6.5.46
+- Core: Added support for default subfolder for document templates
+- OnlyOffice: Fixed OnlyOffice printing, download as and editing tables, images etc.
+- ActiveSync: Support multiple calendars, address books and task lists.
+- ActiveSync: Create task lsits and calendars from mobile device.
+- Core: Fixed "Change in requesting notifications stops Firefox working #690"
+- Core: UI could break when dragging some windows out of the viewport
+- Core: remove old log module entry
+- Address book: Middle name was missing when sorting names by last name.
+
+29-04-2021 6.5.45
+- Core: Minor change in requesting notifications
+
+29-04-2021 6.5.44
 - Core: minor bugfix in folder properties dialog
+- Core: Firefox hung on Notification request. Saying "This site slows down your browser"
+- Billing: Report browse failed when projects module wasn't installed.
+- Newsletters: Improved error dialog
+- Office Only: Use 'view' action for read only documents
 
 26-04-2021 6.5.43
 - Core: Create empty password field upon user import if necessary
@@ -67,6 +87,9 @@
 
 
 6.4.244
+- Calendar: fix behaviour of copy button in list view
+
+29-04-2021 6.4.234
 - Email: remember dimensions attachment save as dialog
 - Calendar: Fixed availability check and added more buttons to improve usability
 - Email: Save as task was missing

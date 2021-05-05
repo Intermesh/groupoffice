@@ -1168,10 +1168,9 @@ class goMail extends GoBaseBackendDiff {
 			if ($status) {
 				$state = "M:" . $status['messages'] . "-U:" . $status['unseen'];
 			}
-			
-			
-			ZLog::Write(LOGLEVEL_DEBUG,'State: '.$state);
-			
+
+			ZLog::Write(LOGLEVEL_DEBUG,'goMail->getNotification('.$f.') State: '.$state);
+
 			//disconnect from imap because otherwise we may exceed the max number of connections
 			$imap->disconnect();
 		}
