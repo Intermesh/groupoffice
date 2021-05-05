@@ -900,7 +900,9 @@ $updates['202104161227'][] = "ALTER TABLE `core_search` DROP INDEX `entityTypeId
 $updates['202104161227'][] = function() {
 
 	go()->getDbConnection()->exec("truncate core_search_word");
+	go()->getDbConnection()->exec("SET foreign_key_checks = 0;");
 	go()->getDbConnection()->exec("truncate core_search");
+	go()->getDbConnection()->exec("SET foreign_key_checks = 1;");
 
 	//run build search cache on cron immediately. This job will deactivate itself.
 	\go\core\cron\BuildSearchCache::install("* * * * *", true);
