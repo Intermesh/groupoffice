@@ -33,9 +33,7 @@ class FilesModule extends \GO\Base\Module{
 	
 	
 	public static function initListeners() {
-		\GO\Base\Model\User::model()->addListener('save', "GO\Files\FilesModule", "saveUser");
-		\GO\Base\Model\User::model()->addListener('delete', "GO\Files\FilesModule", "deleteUser");
-		
+
 		$c = new \GO\Core\Controller\BatchEditController();
 		
 		$c->addListener('store', "GO\Files\FilesModule", "afterBatchEditStore");
@@ -94,26 +92,14 @@ class FilesModule extends \GO\Base\Module{
 		}
 	}
 
-	public static function saveUser($user, $wasNew)
-	{
-		if ($wasNew) {
-			$folder = Model\Folder::model()->findHomeFolder($user);
-		} elseif ($user->isModified('username')) {
-			$folder = Model\Folder::model()->findByPath(\GO\Files\Model\Folder::getUserHomePath($user->getOldAttributeValue('username')));
-			if ($folder) {
-				$folder->name = $user->username;
-				$folder->systemSave = true;
-				$folder->save();
-			}
-		}
-	}
-	
+
+
 	public static function deleteUser($user) {
-		$folder = Model\Folder::model()->findByPath(\GO\Files\Model\Folder::getUserHomePath($user->username), true);
+		$folder = Model\Folder::model()->findByPath($user->homeDir);
 		if($folder)
 			$folder->delete(true);
 	}
-	
+
 	public function autoInstall() {
 		return true;
 	}

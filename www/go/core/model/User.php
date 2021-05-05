@@ -23,6 +23,7 @@ use go\core\jmap\Entity;
 use go\core\orm\CustomFieldsTrait;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
+use GO\Files\Model\Folder;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\notes\model\NoteBook;
 
@@ -171,6 +172,15 @@ class User extends Entity {
 	 * @var string
 	 */
 	public $textSeparator;
+
+	/**
+	 * Home directory of the user
+	 *
+	 * eg. users/admin
+	 *
+	 * @var string
+	 */
+	public $homeDir;
 	
 	
 	public $max_rows_list;
@@ -444,6 +454,10 @@ class User extends Entity {
 	}
 	
 	protected function internalValidate() {
+
+		if(!isset($this->homeDir)) {
+			$this->homeDir = "users/" . $this->username;
+		}
 		
 		if($this->isModified('groups')) {	
 			
@@ -674,8 +688,43 @@ class User extends Entity {
 			$this->archiveUser();
 		}
 
+		$this->changeHomeDir();
+
 		return true;		
 	}
+
+	private function changeHomeDir() {
+		if(!$this->isModified("homeDir") || !Module::isInstalled('legacy', 'files')) {
+			return;
+		}
+
+		$oldDir = $this->getOldValue('homeDir');
+		if(!$oldDir) {
+			return;
+		}
+
+		$folder = Folder::model()->findByPath($oldDir);
+		if(!$folder) {
+			return;
+		}
+
+		$parent = dirname($this->homeDir);
+		if(empty($parent)) {
+			throw new \Exception("Invalid home directory. It must be a parent directory like users/username");
+		}
+
+		$dest = Folder::model()->findByPath($parent, true);
+
+		$folder->name = basename($this->homeDir);
+		$folder->parent_id=$dest->id;
+		$folder->systemSave = true;
+
+		if(!$folder->save(true)) {
+			throw new Exception("Failed to move home dir from " . $oldDir . "  to " .$this->homeDir);
+		}
+	}
+
+
 	
 	/**
 	 * Hash a password for users

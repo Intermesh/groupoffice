@@ -689,7 +689,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 	 */
 	public function findHomeFolder($user){
 
-		$folder = Folder::model()->findByPath(\GO\Files\Model\Folder::getUserHomePath($user->username), true);
+		$folder = Folder::model()->findByPath($user->homeDir, true);
 
 		if(empty($folder->acl_id)){
 				$folder->setNewAcl($user->id);
