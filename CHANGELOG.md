@@ -1,5 +1,7 @@
 6.5.47
-- Several PT-BR language corrections
+- Core: Several PT-BR language corrections
+- Core: Search cache is trunctated on upgrade and rebuilt by cron
+- Core: DB indexes are no longer removed by build search index
 
 04-05-2021 6.5.46
 - Core: Added support for default subfolder for document templates
