@@ -46,6 +46,7 @@ use go\core\db\Query;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
 use go\core\model\Link;
+use go\core\model\User;
 use go\core\orm\SearchableTrait;
 
 abstract class ActiveRecord extends \GO\Base\Model{
@@ -1771,7 +1772,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 	private function _appendAclJoin($findParams, $aclJoinProps){
 
-
+		if(User::isAdminById($findParams['userId'])) {
+			return "";
+		}
 
 		$sql = "\nINNER JOIN core_acl_group ON (`".$aclJoinProps['table']."`.`".$aclJoinProps['attribute']."` = core_acl_group.aclId";
 		if(isset($findParams['permissionLevel']) && $findParams['permissionLevel']>\GO\Base\Model\Acl::READ_PERMISSION){

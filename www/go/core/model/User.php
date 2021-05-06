@@ -594,6 +594,17 @@ class User extends Entity {
 			->where(['groupId' => Group::ID_ADMINS, 'userId' => $this->id])->single() !== false;
 	}
 
+	public static function isAdminById($userId) {
+		if($userId == User::ID_SUPER_ADMIN) {
+			return true;
+		}
+
+		return (new Query)
+				->select('*')
+				->from('core_user_group')
+				->where(['groupId' => Group::ID_ADMINS, 'userId' => $userId])->single() !== false;
+	}
+
   /**
    * Alias for making isAdmin() a public property
    * @return bool
