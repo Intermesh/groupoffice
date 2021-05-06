@@ -90,8 +90,8 @@ class Tasklist extends AclOwnerEntity
 			if (empty($this->groups)) {
 
 				$this->setValue('groups', [
-					'#1' => ['name' => go()->t('Todo')],
-					'#2' => ['name' => go()->t('Finished'), 'sortOrder' => 1, 'progressChange' => Progress::Completed]
+					'#1' => ['name' => go()->t('In progress','community', 'tasks'), 'progressChange' => Progress::InProcess],
+					'#2' => ['name' => go()->t('Completed','community', 'tasks'), 'progressChange' => Progress::Completed]
 				]);
 			}
 		}
