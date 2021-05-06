@@ -1,4 +1,5 @@
 6.5.47
+- History: Add remote IP address
 - Core: Several PT-BR language corrections
 - Core: Search cache is trunctated on upgrade and rebuilt by cron
 - Core: DB indexes are no longer removed by build search index
