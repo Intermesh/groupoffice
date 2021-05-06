@@ -89,6 +89,9 @@ class System extends Controller {
 
 	private function cleanupAcls() {
 
+		// for memory problems
+		go()->getDebugger()->disabled = false;
+
 		echo "Cleaning up unused ACL's\n";
 
 //		go()->getDatabase()->getTable('core_acl')->backup();
@@ -97,9 +100,18 @@ class System extends Controller {
 		go()->getDbConnection()->exec("update core_acl set usedIn = null, entityTypeId = null, entityId = null");
 		go()->getDbConnection()->exec("update core_acl set usedIn = 'core_entity.defaultAclId' where id in (select defaultAclId from core_entity)");
 
+
 		echo "Checking database\n";
-		$mc = new \GO\Core\Controller\MaintenanceController();
-		$mc->run("checkDatabase");
+
+		$modules = Module::find();
+
+		foreach($modules as $module) {
+			if(!$module->isAvailable()) {
+				continue;
+			}
+			echo "Checking module ". ($modules->package ?? "legacy") . "/" .$module->name ."\n";
+			$module->module()->checkAcls();
+		}
 
 		echo "\n\n";
 
@@ -109,9 +121,9 @@ class System extends Controller {
 			", entityId = f.id where usedIn is null"
 		);
 
-		$deleteCount = go()->getDbConnection()->exec("delete from core_acl where usedIn is null");
+	//	$deleteCount = go()->getDbConnection()->exec("delete from core_acl where usedIn is null");
 
-		echo "Delete " . $deleteCount ." unused ACL's\n";
+		//echo "Delete " . $deleteCount ." unused ACL's\n";
 
 	}
 

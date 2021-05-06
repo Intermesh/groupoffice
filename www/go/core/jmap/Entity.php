@@ -179,6 +179,10 @@ abstract class Entity  extends OrmEntity {
 	{
 		parent::check();
 
+		static::checkFiles();
+	}
+
+	protected static function checkFiles() {
 		if(property_exists(static::class, 'filesFolderId') && Module::isInstalled('legacy', 'files')) {
 			$tables = static::getMapping()->getTables();
 			$table = array_values($tables)[0]->getName();

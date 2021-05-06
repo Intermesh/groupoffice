@@ -492,6 +492,8 @@ class MaintenanceController extends AbstractController {
 
 		\go\core\jmap\Entity::$trackChanges = false;
 		Module::$enabled = false;
+
+		\GO\Base\Db\ActiveRecord::$updateSearch = false;
 		
 		$response = array();
 		
