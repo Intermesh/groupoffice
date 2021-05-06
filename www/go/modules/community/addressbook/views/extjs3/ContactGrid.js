@@ -274,6 +274,12 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: "firstName",
 					hidden: this.enabledColumns.indexOf('firstName') == -1,
 				},{
+					id: 'middleName',
+					header: t('Middle name'),
+					sortable: true,
+					dataIndex: "middleName",
+					hidden: this.enabledColumns.indexOf('middleName') == -1,
+				},{
 					id: 'lastName',
 					header: t('Last name'),
 					sortable: true,
