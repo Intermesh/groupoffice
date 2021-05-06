@@ -4,6 +4,8 @@ namespace go\modules\community\history\model;
 
 use GO\Base\Db\ActiveRecord;
 use go\core\db\Criteria;
+use go\core\http\Request;
+use go\core\http\Response;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
 use go\core\orm\Query;
@@ -80,6 +82,15 @@ class LogEntry extends AclOwnerEntity {
 	protected $entity;
 
 	public $description;
+
+	public $remoteIp;
+
+	protected function init()
+	{
+		if($this->isNew()) {
+			$this->remoteIp = Request::get()->getRemoteIpAddress();
+		}
+	}
 
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable('history_log_entry', 'l')
@@ -172,5 +183,10 @@ class LogEntry extends AclOwnerEntity {
 
 	public function setAclId($aclId) {
 		$this->aclId = $aclId;
+	}
+
+	protected static function checkAcl()
+	{
+		//don't update acl records usedin is history
 	}
 }
