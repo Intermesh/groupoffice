@@ -1,4 +1,4 @@
-6.5.47
+10-05-2021 6.5.47
 - History: Add remote IP address
 - Core: Several PT-BR language corrections
 - Core: Search cache is truncated on upgrade and rebuilt by cron
@@ -97,7 +97,10 @@
 
 
 6.4.244
+10-05-2021 6.4.235
 - Calendar: fix behaviour of copy button in list view
+- Billing: Fixed error "Incorrect integer valie for 'order_at_supplier'"
+- Leavedays: Fixed calendar conflict check
 
 29-04-2021 6.4.234
 - Email: remember dimensions attachment save as dialog
