@@ -9,6 +9,7 @@
 - Core: Select text when focusing search fields
 - Leavedays: Fixed holiday conflict check
 - LDAPauth: fixed default values for compatibility with some mysql servers
+- Caldav: Wrong module was checked for permissions
 
 04-05-2021 6.5.46
 - Core: Added support for default subfolder for document templates
