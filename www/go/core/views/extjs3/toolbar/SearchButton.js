@@ -346,7 +346,7 @@ go.toolbar.SearchButton = Ext.extend(Ext.Toolbar.Button, {
 	showSearchBar: function () {
 		this.searchToolBar.setWidth(this.ownerCt.getWidth());
 		this.searchToolBar.setVisible(true);		
-		this.searchToolBar.items.get(1).focus(); 
+		this.searchToolBar.items.get(1).focus(true); 
 	},
 
 	handler: function() {
