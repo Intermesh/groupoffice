@@ -1,4 +1,7 @@
 - Calendar: fix behaviour of copy button in list view
+- Billing: Fixed error "Incorrect integer valie for 'order_at_supplier'"
+- Leavedays: Fixed calendar conflict check
+
 
 29-04-2021 6.4.234
 - Email: remember dimensions attachment save as dialog
