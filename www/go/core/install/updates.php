@@ -923,3 +923,11 @@ $updates['202105041513'][] = "delete from core_acl_group where groupId = 1;";
 $updates['202105041513'][] = "delete from core_module where name='timeregistration' and package is null";
 $updates['202105041513'][] = "delete from core_module where name='search' and package is null";
 $updates['202105041513'][] = "delete from core_module where name='phpcustomfield' and package is null";
+
+$updates['202105041513'][] = "delete from core_module where name='ipwhitelist' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='wopicollabora' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='wopioffice365' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='tfs' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='phpbb3' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='voip' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='voippro' and package is null";
