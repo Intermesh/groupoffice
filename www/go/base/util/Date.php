@@ -366,6 +366,10 @@ class Date {
 	 * @return Formatted time based on the user's time display preferences
 	 */
 	public static function formatTime($time){
+		if(empty($time)) {
+			return null;
+		}
+
 		$timeFormat = \GO::user() ? \GO::user()->time_format : \GO::config()->default_time_format;
 		return date($timeFormat, strtotime($time));
 	}
@@ -377,6 +381,9 @@ class Date {
 	 * @return DB time like: '16:00:00' or '5:20:01'
 	 */
 	public static function toDbTime($time){
+		if(empty($time)) {
+			return null;
+		}
 		return date('H:i:s', strtotime($time));
 	}
 
