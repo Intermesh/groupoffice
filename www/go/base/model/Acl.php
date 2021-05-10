@@ -114,7 +114,7 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 	 */
 	public static function getUserPermissionLevel($aclId, $userId=false, $checkGroupPermissionOnly=false) {
 		
-		if(\go\core\model\User::isAdminById($userId)) {
+		if(\go\core\model\User::isAdminById($userId ? $userId : \GO::user()->id)) {
 			return self::MANAGE_PERMISSION;
 		}
 		
