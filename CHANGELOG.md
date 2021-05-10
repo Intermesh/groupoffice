@@ -7,6 +7,8 @@
 - Core: Keep scroll posistion when toggling modules
 - Core: Remove all "Admin" group entries from ACL and handle admin permissions programmatically. This slims down the Acl table.
 - Core: Select text when focusing search fields
+- Leavedays: Fixed holiday conflict check
+- LDAPauth: fixed default values for compatibility with some mysql servers
 
 04-05-2021 6.5.46
 - Core: Added support for default subfolder for document templates
