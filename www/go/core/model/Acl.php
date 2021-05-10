@@ -74,24 +74,9 @@ class Acl extends Entity {
 						->addTable('core_acl')
 						->addArray('groups', AclGroup::class, ['id' => 'aclId']);
 	}
+
 	
-	protected function internalValidate() {
-		
-		if($this->isModified(['groups']) && !$this->hasAdmins()) {
-			$this->setValidationError('groups', ErrorCode::FORBIDDEN, "You can't change the admin permissions");
-		}
-			
-		return parent::internalValidate();
-	}
-		
-	
-	protected function internalSave() {		
-		
-		$adminLevel = $this->hasGroup(Group::ID_ADMINS);
-		if($adminLevel < self::LEVEL_MANAGE) {
-			$this->removeGroup(Group::ID_ADMINS);
-			$this->addGroup(Group::ID_ADMINS, self::LEVEL_MANAGE);
-		}
+	protected function internalSave() {
 
 		if(!isset($this->ownedBy)) {
 			$this->ownedBy = User::ID_SUPER_ADMIN;
@@ -112,16 +97,6 @@ class Acl extends Entity {
 		}
 		
 		return $this->logChanges();		
-	}
-	
-	private function hasAdmins() {
-		foreach($this->groups as $group) {
-			if($group->groupId == Group::ID_ADMINS) {				
-				return $group->level == Acl::LEVEL_MANAGE;
-			}
-		}
-
-		return false;
 	}
 	
 	private function logChanges() {
@@ -270,10 +245,20 @@ class Acl extends Entity {
 	public static function applyToQuery(Query $query, $column, $level = self::LEVEL_READ, $userId = null, $groups = null) {
 
 		if(!isset($userId)) {
+
+			// no acl for admins
+			if(go()->getAuthState()->isAdmin()) {
+				return;
+			}
+
 			$userId = App::get()->getAuthState() ? App::get()->getAuthState()->getUserId() : false;
 
 			if(!$userId) {
 				throw new Forbidden("Authorization required");
+			}
+		} else{
+			if(User::isAdminById($userId)) {
+				return;
 			}
 		}
 
@@ -346,6 +331,10 @@ class Acl extends Entity {
 	 * @return int See the self::LEVEL_* constants
 	 */
 	public static function getUserPermissionLevel($aclId, $userId) {
+
+		if(\go\core\model\User::isAdminById($userId)) {
+			return self::LEVEL_MANAGE;
+		}
 		
 		$cacheKey = $aclId . "-" . $userId;
 		if(!isset(self::$permissionLevelCache[$cacheKey])) {

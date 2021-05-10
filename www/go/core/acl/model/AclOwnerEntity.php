@@ -382,14 +382,13 @@ abstract class AclOwnerEntity extends AclEntity {
 	 */
 	public static function check()
 	{
-		static::checkAcl();
+		static::checkAcls();
 
 		parent::check();
 	}
 
-	protected static function checkAcl() {
+	public static function checkAcls() {
 		$table = static::getMapping()->getPrimaryTable();
-
 
 		//set owner and entity properties of acl
 		$aclColumn = static::getMapping()->getColumn(static::$aclColumnName);

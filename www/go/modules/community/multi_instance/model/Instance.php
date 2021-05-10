@@ -305,12 +305,12 @@ class Instance extends Entity {
 			
 			$aclId = $this->getInstanceDbConnection()->getPDO()->lastInsertId();
 			
-			$this->getInstanceDbConnection()
-							->insert("core_acl_group", [
-									'aclId' => $aclId,
-									'groupId' => 1,
-									'level' => 50
-							])->execute();
+//			$this->getInstanceDbConnection()
+//							->insert("core_acl_group", [
+//									'aclId' => $aclId,
+//									'groupId' => 1,
+//									'level' => 50
+//							])->execute();
 			
 			$this->getInstanceDbConnection()
 							->insert("core_acl_group", [

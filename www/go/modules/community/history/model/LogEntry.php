@@ -6,6 +6,7 @@ use GO\Base\Db\ActiveRecord;
 use go\core\db\Criteria;
 use go\core\http\Request;
 use go\core\http\Response;
+use go\core\db\Expression;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
 use go\core\orm\Query;
@@ -89,6 +90,31 @@ class LogEntry extends AclOwnerEntity {
 	{
 		if($this->isNew()) {
 			$this->remoteIp = Request::get()->getRemoteIpAddress();
+		}
+	}
+
+	public static function checkAcls()
+	{
+		$table = static::getMapping()->getPrimaryTable();
+
+		//set owner and entity properties of acl
+		$aclColumn = static::getMapping()->getColumn(static::$aclColumnName);
+
+		$updates = [
+			'acl.entityTypeId' => static::entityType()->getId(),
+			'acl.entityId' => new Expression('entity.id'),
+			'acl.usedIn' => $aclColumn->table->getName() . '.' . static::$aclColumnName
+		];
+
+		$stmt = go()->getDbConnection()->update(
+			'core_acl',
+			$updates,
+			(new Query())
+				->tableAlias('acl')
+				->join($table->getName(), 'entity', 'entity.' . static::$aclColumnName . ' = acl.id AND removeAcl = true and action='  . self::$actionMap['delete']));
+
+		if(!$stmt->execute()) {
+			throw new Exception("Could not update ACL");
 		}
 	}
 
