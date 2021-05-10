@@ -240,7 +240,6 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 
 		if($wasNew){
 			if($this->usedIn!='readonly'){
-				$this->addGroup(\GO::config()->group_root, Acl::MANAGE_PERMISSION);
 				if($this->ownedBy != 1) { //not for admin
 					$userGroup = Group::model()->findSingleByAttribute('isUserGroupFor', $this->ownedBy);
 					if($userGroup) {

@@ -130,11 +130,6 @@ class AclGroupController extends \GO\Base\Controller\AbstractMultiSelectModelCon
 			// Only admins may edit the set of linked groups.
 			if(!$params['currentUserHasManagePermission'])
 					throw new \GO\Base\Exception\AccessDenied();
-			foreach ($delKeys as $delKey) {
-				if ($delKey==\GO::config()->group_root) {
-					throw new \Exception(\GO::t("You can't change the permissions of the admin group"));
-				}
-			}
 		} else {
 			return false;
 		}

@@ -1772,7 +1772,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 	private function _appendAclJoin($findParams, $aclJoinProps){
 
-		if(User::isAdminById($findParams['userId'])) {
+		if(empty($findParams['ignoreAdminGroup']) && User::isAdminById($findParams['userId'])) {
 			return "";
 		}
 
@@ -1782,13 +1782,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 		$groupIds = \GO\Base\Model\User::getGroupIds($findParams['userId']);
-
-		if(!empty($findParams['ignoreAdminGroup'])){
-			$key = array_search(GO::config()->group_root, $groupIds);
-			if($key!==false)
-				unset($groupIds[$key]);
-		}
-
 
 		$sql .= " AND core_acl_group.groupId IN (".implode(',',$groupIds).")) ";
 
