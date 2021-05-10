@@ -50,6 +50,9 @@ class Language extends Controller {
 
 		$this->handle = $csvFile->open('w+');
 
+		//add UTF-8 BOM char for excel to recognize UTF-8 in the CSV
+		fputs($this->handle, chr(239) . chr(187) . chr(191));
+
 		fputcsv($this->handle, [
 				"package",
 				"module",

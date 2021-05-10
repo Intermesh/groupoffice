@@ -125,6 +125,9 @@ class Spreadsheet extends AbstractConverter {
 		if($this->extension != 'csv') {
 			$this->spreadsheet = new PhpSpreadsheet();
 			$this->spreadSheetIndex = 1;
+		}else{
+			//add UTF-8 BOM char for excel to recognize UTF-8 in the CSV
+			fputs($this->fp, chr(239) . chr(187) . chr(191));
 		}
 	}
 
