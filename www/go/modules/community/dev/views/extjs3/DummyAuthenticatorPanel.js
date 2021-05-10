@@ -47,7 +47,7 @@ go.modules.community.dev.DummyAuthenticatorPanel = Ext.extend(go.login.BaseLogin
 			]
 		});
 
-		go.googleauthenticator.GoogleauthenticatorPanel.superclass.initComponent.call(this);
+		go.modules.community.dev.DummyAuthenticatorPanel.superclass.initComponent.call(this);
 	}
 });
 
