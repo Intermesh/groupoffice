@@ -71,7 +71,7 @@ class Language extends Controller {
 		foreach ($packageFolders as $packageFolder) {
 			foreach ($packageFolder->getFolders() as $moduleFolder) {
 				
-				if(!$moduleFolder->exists()){
+				if($moduleFolder->isLink() && !$moduleFolder->getLinkTarget()){
 					//broken symlink
 					continue;
 				}
