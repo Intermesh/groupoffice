@@ -43,7 +43,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 					iconCls: 'ic-refresh',
 					tooltip: t("Refresh"),
 					handler: function() {
-						this.store.load();
+						this.store.reload();
 					},
 					scope: this
 				},{
@@ -287,13 +287,14 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 
 				if (!responseParams.success) {
 					GO.errorDialog.show(responseParams.feedback);
-					this.store.load();
+
 				}else{
 					if(responseParams.id){
 						record.set('id', responseParams.id);
 					}
 					record.commit();
 				}
+				this.store.reload();
 			}
 		});
 	},
@@ -332,7 +333,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 					Ext.MessageBox.alert(t("Error"), msg);
 
 				}
-				this.store.load();
+				this.store.reload();
 
 			}, this);
 		} else

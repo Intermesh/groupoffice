@@ -917,3 +917,7 @@ $updates['202105041513'][] = "alter table core_user
 	add homeDir varchar(190) not null;";
 
 $updates['202105041513'][] = "update core_user set homeDir=concat('users/', username);";
+
+$updates['202105041513'][] = "delete from core_module where name='timeregistration' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='search' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='phpcustomfield' and package is null";
