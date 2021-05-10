@@ -116,7 +116,12 @@ class goNote extends GoBaseBackendDiff {
 			}
 		}
 
-		$note->name	= !empty($message->subject) ? $message->subject : StringUtil::cutString(strip_tags($note->content), 20);
+		if(!empty($message->subject))
+		{
+			$note->name	=  $message->subject;
+		} else if($note->isNew()) {
+			$note->name = StringUtil::cutString(strip_tags($note->content), 20);
+		}
 
 		$note->cutPropertiesToColumnLength();
 
