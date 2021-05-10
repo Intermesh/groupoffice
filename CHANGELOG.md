@@ -1,9 +1,11 @@
 6.5.47
 - History: Add remote IP address
 - Core: Several PT-BR language corrections
-- Core: Search cache is trunctated on upgrade and rebuilt by cron
+- Core: Search cache is truncated on upgrade and rebuilt by cron
 - Core: DB indexes are no longer removed by build search index
 - Files: User home dir is a user propery which can also be mapped with LDAP authentication
+- Core: Keep scroll posistion when toggling modules
+- Core: Remove all "Admin" group entries from ACL and handle admin permissions programmatically. This slims down the Acl table.
 
 04-05-2021 6.5.46
 - Core: Added support for default subfolder for document templates
