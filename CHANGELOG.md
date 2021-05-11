@@ -1,5 +1,7 @@
 - Files: Don't show all shares to admins by default
 - Core: Add UTF-8 BOM character to CSV exports so Excel recognizes it as UTF-8
+- Tickets: Ticket dialog can select users too
+- Core: Some bugs came from removing admin from acl's. for example email showing all accounts for admin.
 
 10-05-2021 6.5.47
 - History: Add remote IP address
