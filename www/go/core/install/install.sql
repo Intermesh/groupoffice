@@ -251,7 +251,8 @@ CREATE TABLE `core_user` (
   `no_reminders` tinyint(1) NOT NULL DEFAULT 0,
   `last_password_change` int(11) NOT NULL DEFAULT 0,
   `force_password_change` tinyint(1) NOT NULL DEFAULT 0,
-  `homeDir` varchar (190) not null
+  `homeDir` varchar (190) not null,
+  `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB;
 
 CREATE TABLE `core_user_custom_fields` (
