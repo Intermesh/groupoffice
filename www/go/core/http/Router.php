@@ -90,7 +90,7 @@ class Router {
       ErrorHandler::logException($e);      
     } catch(\Exception $e) {
 	    if(!headers_sent()) {
-		    Response::get()->setStatus(500, $e->getMessage());
+		    Response::get()->setStatus(500, str_replace("\n", " - ",$e->getMessage()));
 	    }
 
       echo '<h1>' . $e->getMessage() .'</h1>';

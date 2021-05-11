@@ -300,16 +300,24 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 				->mergeWith(
 					\GO\Base\Db\FindCriteria::newInstance()
 						->addCondition('first_date', $event->end_time, '<=')
-						->addCondition('last_date', $event->start_time, '>=','t',false)
+						->addRawCondition('(t.last_date + 86400) >=' . intval($event->start_time))
 				);
+			$findParams->debugSql();
 
 			$stmt = Leaveday::model()->find($findParams);
+
 			foreach($stmt as $item) {
 				// Now we have to take the start time and duration of the leave day into account. These are saved in
 				// a peculiar way, so we have to make a hack.
-				$itemStartTime = (new DateTime())->setTimeStamp($item->first_date);
-				$tsItemStart = GODate::to_unixtime($itemStartTime->format('Y-m-d'). ' '. $item->from_time. ':00');
-				$tsItemEnd = GODate::dateTime_add($tsItemStart,0, (($item->n_hours + $item->n_nat_holiday_hours) * 60));
+
+				if(!empty($item->from_time)) {
+					$itemStartTime = (new DateTime())->setTimeStamp($item->first_date);
+					$tsItemStart = GODate::to_unixtime($itemStartTime->format('Y-m-d') . ' ' . $item->from_time . ':00');
+					$tsItemEnd = GODate::dateTime_add($tsItemStart, 0, (($item->n_hours + $item->n_nat_holiday_hours) * 60));
+				} else{
+					$tsItemStart = $item->first_date;
+					$tsItemEnd = GODate::dateTime_add($item->first_date, 0, 0, 0, 1);
+				}
 				if($tsItemStart < $event->end_time && $tsItemEnd > $event->start_time) {
 					$num_conflicts++;
 				}

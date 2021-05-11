@@ -51,7 +51,7 @@ if (!\GO::modules()->isInstalled('caldav')){
 //{
 	$authBackend = new \GO\Dav\Auth\BasicBackend();
 //}
-$authBackend->checkModuleAccess='caldav';
+$authBackend->checkModulePermission('legacy','caldav');
 $calendarBackend = new \GO\Caldav\CalendarsBackend();
 $principalBackend = new \GO\Dav\DavAcl\PrincipalBackend();
 

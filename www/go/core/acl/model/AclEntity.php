@@ -44,19 +44,18 @@ abstract class AclEntity extends Entity {
 	}
 
 	public static function getChanges($sinceState, $maxChanges) {
-		//state has entity modseq and acl modseq so we can detect permission changes
-		$states = static::parseState($sinceState);
-		
-		
-		$result = parent::getChanges($sinceState, $maxChanges);	
-		$result['oldState'] = $sinceState;
-		
-		if($result['hasMoreChanges']) {			
-			//allready at max
+
+		$result = parent::getChanges($sinceState, $maxChanges);
+
+		//return is admin because ACL's don't apply to admins or when we're at the max of changes
+		if(go()->getAuthState()->isAdmin() || $result['hasMoreChanges']) {
 			return $result;
 		}
 		
-		$maxChanges -= (count($result['changed']) + count($result['removed']));		
+		$maxChanges -= (count($result['changed']) + count($result['removed']));
+
+		//state has entity modseq and acl modseq so we can detect permission changes
+		$states = static::parseState($sinceState);
 		
 		//Detect permission changes for AclItemEntities. For example notes that depend on notebook permissions.		
 		$acls = static::findAcls();	

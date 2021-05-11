@@ -43,7 +43,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 					iconCls: 'ic-refresh',
 					tooltip: t("Refresh"),
 					handler: function() {
-						this.store.load();
+						this.store.reload();
 					},
 					scope: this
 				},{
@@ -287,13 +287,16 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 
 				if (!responseParams.success) {
 					GO.errorDialog.show(responseParams.feedback);
-					this.store.load();
+
 				}else{
 					if(responseParams.id){
 						record.set('id', responseParams.id);
 					}
 					record.commit();
 				}
+				this.store.load({
+					keepScrollPosition: true
+				});
 			}
 		});
 	},
@@ -314,7 +317,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 			};
 			go.Db.store("Module").set(params, function(options, success, response) {
 				this.getEl().unmask();
-				if(success && response.updated && response.updated[record.data.id]){
+				if(success && response.updated && (record.data.id in response.updated)){
 					if(record.data.enabled && record.isModified("enabled")) {						
 						// record.set('aclId', response['created'][record.data.id].aclId);
 						this.showPermissions(record.data.name, record.data.package, t(record.data.name, record.data.name), record.data.aclId);
@@ -332,7 +335,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 					Ext.MessageBox.alert(t("Error"), msg);
 
 				}
-				this.store.load();
+				this.store.load({
+					keepScrollPosition: true
+				});
 
 			}, this);
 		} else
@@ -359,7 +364,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 
 						Ext.MessageBox.alert(t("Error"), msg);
 					}
-					this.store.load();
+					this.store.load({
+						keepScrollPosition: true
+					});
 				},
 				scope: this
 			});

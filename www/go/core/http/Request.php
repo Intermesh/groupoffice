@@ -299,6 +299,27 @@ class Request extends Singleton{
     return $this->host;
 	}
 
+	/**
+	 * The URI which was given in order to access this page; for instance, '/index.html'.
+	 *
+	 * @return string
+	 */
+	public function getUri() {
+		return $_SERVER['REQUEST_URI'];
+	}
+
+	/**
+	 * Get full URL
+	 *
+	 * @return string
+	 */
+	public function getFullUrl() {
+		$url =  $this->isHttps() ? 'https://' : 'http://';
+		$url .= $this->getHost(false) . $this->getUri();
+
+		return $url;
+	}
+
 //	/**
 //	 * Get port number of request
 //	 *

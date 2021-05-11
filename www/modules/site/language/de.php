@@ -42,4 +42,5 @@ return array (
   'Meta tags are a great way for webmasters to provide search engines with information about their sites.' => 'Metatags sind eine gute Möglichkeit für Webmaster, Suchmaschinen Informationen über ihre Websites bereitzustellen.',
   'Meta' => 'Metadaten',
   'Global properties' => 'Globale Einstellungen',
+  'Template' => 'Vorlage',
 );

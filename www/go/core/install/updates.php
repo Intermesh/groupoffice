@@ -900,7 +900,9 @@ $updates['202104161227'][] = "ALTER TABLE `core_search` DROP INDEX `entityTypeId
 $updates['202104161227'][] = function() {
 
 	go()->getDbConnection()->exec("truncate core_search_word");
+	go()->getDbConnection()->exec("SET foreign_key_checks = 0;");
 	go()->getDbConnection()->exec("truncate core_search");
+	go()->getDbConnection()->exec("SET foreign_key_checks = 1;");
 
 	//run build search cache on cron immediately. This job will deactivate itself.
 	\go\core\cron\BuildSearchCache::install("* * * * *", true);
@@ -910,3 +912,22 @@ $updates['202104161227'][] = function() {
 
 
 $updates['202105041513'][] = "delete from core_module where name='log' and package is null";
+
+$updates['202105041513'][] = "alter table core_user
+	add homeDir varchar(190) not null;";
+
+$updates['202105041513'][] = "update core_user set homeDir=concat('users/', username);";
+
+$updates['202105041513'][] = "delete from core_acl_group where groupId = 1;";
+
+$updates['202105041513'][] = "delete from core_module where name='timeregistration' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='search' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='phpcustomfield' and package is null";
+
+$updates['202105041513'][] = "delete from core_module where name='ipwhitelist' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='wopicollabora' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='wopioffice365' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='tfs' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='phpbb3' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='voip' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='voippro' and package is null";

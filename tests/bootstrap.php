@@ -14,7 +14,7 @@ const INSTALL_NEW = 0;
 const INSTALL_UPGRADE = 1;
 const INSTALL_NONE = 2;
 
-$installDb = INSTALL_NONE;
+$installDb = INSTALL_NEW;
 
 $autoLoader = require(__DIR__ . "/../www/vendor/autoload.php");
 $autoLoader->add('go\\', __DIR__);
@@ -50,7 +50,7 @@ if($installDb == INSTALL_NEW || $installDb == INSTALL_UPGRADE) {
 //Install fresh DB
 App::get(); //for autoload
 try {
-	go()->setConfig(["core" => $config, 'cache' => \go\core\cache\Apcu::class]);
+	go()->setConfig(['allow_themes' => true, "core" => $config, 'cache' => \go\core\cache\Apcu::class]);
 	//App::get()->getCache()->flush(false);
 	
 	if($installDb == INSTALL_NEW) {

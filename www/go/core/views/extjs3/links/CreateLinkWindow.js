@@ -124,14 +124,13 @@ go.links.CreateLinkWindow = Ext.extend(go.Window, {
 			if(go.searchLinkFilter) {
 				this.searchField.setValue(go.searchLinkFilter);
 				this.search(go.searchLinkFilter);
+				this.searchField.focus(true);
 			}
 		}, this);
 	},
 	
 	focus : function() {
-		this.searchField.focus();
-
-
+		this.searchField.focus(true);
 	},
 
 	link: function () {

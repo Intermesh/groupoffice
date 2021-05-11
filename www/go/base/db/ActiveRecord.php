@@ -46,6 +46,7 @@ use go\core\db\Query;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
 use go\core\model\Link;
+use go\core\model\User;
 use go\core\orm\SearchableTrait;
 
 abstract class ActiveRecord extends \GO\Base\Model{
@@ -1771,7 +1772,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 	private function _appendAclJoin($findParams, $aclJoinProps){
 
-
+		if(empty($findParams['ignoreAdminGroup']) && User::isAdminById($findParams['userId'])) {
+			return "";
+		}
 
 		$sql = "\nINNER JOIN core_acl_group ON (`".$aclJoinProps['table']."`.`".$aclJoinProps['attribute']."` = core_acl_group.aclId";
 		if(isset($findParams['permissionLevel']) && $findParams['permissionLevel']>\GO\Base\Model\Acl::READ_PERMISSION){
@@ -1779,13 +1782,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		}
 
 		$groupIds = \GO\Base\Model\User::getGroupIds($findParams['userId']);
-
-		if(!empty($findParams['ignoreAdminGroup'])){
-			$key = array_search(GO::config()->group_root, $groupIds);
-			if($key!==false)
-				unset($groupIds[$key]);
-		}
-
 
 		$sql .= " AND core_acl_group.groupId IN (".implode(',',$groupIds).")) ";
 
@@ -3663,6 +3659,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		return isset($this->name) ? $this->getModule().'/' . \GO\Base\Fs\Base::stripInvalidChars($this->name) : false;
 	}
 
+	public static $updateSearch = true;
+
 	/**
 	 * Put this model in the go_search_cache table as a \GO\Base\Model\SearchCacheRecord so it's searchable and linkable.
 	 * Generally you don't need to do this. It's called from the save function automatically when getCacheAttributes is overridden.
@@ -3673,7 +3671,7 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	public function cacheSearchRecord(){
 
 		//don't do this on datbase checks.
-		if(GO::router()->getControllerAction()=='checkdatabase')
+		if(!self::$updateSearch)
 			return false;
 
 		$attr = $this->getCacheAttributes();
@@ -4864,6 +4862,32 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		return $class->methodIsOverridden('checkDatabase');
 	}
 
+
+
+	public function checkAcl($save = true) {
+		if($this->aclField() && (!$this->isJoinedAclField || $this instanceof \GO\Files\Model\Folder)) {
+			if (!($this instanceof \GO\Files\Model\Folder) || (!$this->readonly && $this->acl_id > 0)) {
+				$acl = $this->acl;
+				if (!$acl) {
+					$this->setNewAcl();
+
+					if ($save) {
+						$this->save();
+					}
+				} else {
+					$user_id = empty($this->user_id) ? 1 : $this->user_id;
+
+					$acl->ownedBy = $user_id;
+					$acl->usedIn = $this->tableName() . '.' . $this->aclField();
+					$acl->entityTypeId = $this->entityType()->getId();
+					$acl->entityId = $this->id;
+					if ($acl->isModified())
+						$acl->save();
+				}
+			}
+		}
+	}
+
 	/**
 	 * A function that checks the consistency with the database.
 	 * Generally this is called by r=maintenance/checkDabase
@@ -4874,47 +4898,33 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		echo "Checking ".(is_array($this->pk)?implode(',',$this->pk):$this->pk)." ".$this->className()."\n";
 		flush();
 
-		if($this->aclField() && (!$this->isJoinedAclField || $this instanceof \GO\Files\Model\Folder)) {
-			if (!($this instanceof \GO\Files\Model\Folder) || (!$this->readonly && $this->acl_id > 0)) {
-				$acl = $this->acl;
-				if (!$acl)
-					$this->setNewAcl();
-				else {
-					$user_id = empty($this->user_id) ? 1 : $this->user_id;
+		$this->checkAcl(false);
 
-					$acl->ownedBy = $user_id;
-					$acl->usedIn = $this->tableName() . '.' . $this->aclField();
-					$acl->entityTypeId = $this->entityType()->getId();
-					$acl->entityId = $this->id;
-					if($acl->isModified())
-						$acl->save();
-				}
-			}
-		}
-
-		if ($this->hasFiles() && GO::modules()->isInstalled('files')) {
+		if ( $this->hasFiles() && GO::modules()->isInstalled('files')) {
 			//ACL must be generated here.
 			$fc = new \GO\Files\Controller\FolderController();
 			$this->files_folder_id = $fc->checkModelFolder($this);
 		}
 
+
 		//normalize crlf
-		foreach($this->columns as $field=>$attr){
-			if(($attr['gotype']=='textfield' || $attr['gotype']=='textarea') && !empty($this->_attributes[$field])){
-				$this->$field=\GO\Base\Util\StringHelper::normalizeCrlf($this->_attributes[$field], "\n");
+		foreach ($this->columns as $field => $attr) {
+			if (($attr['gotype'] == 'textfield' || $attr['gotype'] == 'textarea') && !empty($this->_attributes[$field])) {
+				$this->$field = \GO\Base\Util\StringHelper::normalizeCrlf($this->_attributes[$field], "\n");
 			}
 		}
 
 		//fill in empty required attributes that have defaults
-		$defaults=$this->getDefaultAttributes();
-		foreach($this->columns as $field=>$attr){
-			if($attr['required'] && empty($this->$field) && isset($defaults[$field])){
-				$this->$field=$defaults[$field];
+		$defaults = $this->getDefaultAttributes();
+		foreach ($this->columns as $field => $attr) {
+			if ($attr['required'] && empty($this->$field) && isset($defaults[$field])) {
+				$this->$field = $defaults[$field];
 
-				echo "Setting default value ".$this->className().":".$this->id." $field=".$defaults[$field]."\n";
+				echo "Setting default value " . $this->className() . ":" . $this->id . " $field=" . $defaults[$field] . "\n";
 
 			}
 		}
+
 
 		if($this->isModified())
 			$this->save();

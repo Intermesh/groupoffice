@@ -1,5 +1,18 @@
-6.5.47
-- Several PT-BR language corrections
+- Files: Don't show all shares to admins by default
+- Core: Add UTF-8 BOM character to CSV exports so Excel recognizes it as UTF-8
+
+10-05-2021 6.5.47
+- History: Add remote IP address
+- Core: Several PT-BR language corrections
+- Core: Search cache is truncated on upgrade and rebuilt by cron
+- Core: DB indexes are no longer removed by build search index
+- Files: User home dir is a user propery which can also be mapped with LDAP authentication
+- Core: Keep scroll posistion when toggling modules
+- Core: Remove all "Admin" group entries from ACL and handle admin permissions programmatically. This slims down the Acl table.
+- Core: Select text when focusing search fields
+- Leavedays: Fixed holiday conflict check
+- LDAPauth: fixed default values for compatibility with some mysql servers
+- Caldav: Wrong module was checked for permissions
 
 04-05-2021 6.5.46
 - Core: Added support for default subfolder for document templates
@@ -87,7 +100,10 @@
 
 
 6.4.244
+10-05-2021 6.4.235
 - Calendar: fix behaviour of copy button in list view
+- Billing: Fixed error "Incorrect integer valie for 'order_at_supplier'"
+- Leavedays: Fixed calendar conflict check
 
 29-04-2021 6.4.234
 - Email: remember dimensions attachment save as dialog
