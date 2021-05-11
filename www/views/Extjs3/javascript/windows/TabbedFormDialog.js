@@ -305,7 +305,7 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 				return true;
 		});
 		if(firstField)
-			firstField.focus();		
+			firstField.focus(true);
 	},
 	
 	refreshActiveDisplayPanels : function(){
