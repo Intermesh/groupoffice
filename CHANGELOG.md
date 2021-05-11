@@ -1,3 +1,8 @@
+11-05-2021 6.5.49
+- Core: Fixed fresh manual install
+- Projects: Error on time tracking PDF report
+- Projects: Finance report doesn't show projects with no data anymore
+
 11-05-2021 6.5.48
 - Files: Don't show all shares to admins by default
 - Core: Add UTF-8 BOM character to CSV exports so Excel recognizes it as UTF-8
