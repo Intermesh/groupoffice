@@ -89,6 +89,17 @@ class Task extends AclItemEntity {
 
 	protected $timeBooked;
 
+	/**
+	 * @var string
+	 * @todo this is an override for Humble. This is probably not the right spot for this. Discuss interanlly
+	 */
+	protected $displayName;
+	/**
+	 * @var string
+	 * @todo this is an override for Humble. This is probably not the right spot for this. Discuss internally.
+	 */
+	protected $projectName;
+
 	//The scheduling status
 	//public $status = 'confirmed';
 
@@ -402,4 +413,20 @@ class Task extends AclItemEntity {
 	public function setUri($uri) {
 		$this->uri = $uri;
 	}
+
+	public function getUserDisplayName()
+	{
+		return $this->displayName;
+	}
+
+	public function getProjectName()
+	{
+		return $this->projectName;
+	}
+
+	public function getProjectId()
+	{
+		return $this->projectId;
+	}
+
 }
