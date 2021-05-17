@@ -2,6 +2,7 @@
 - Time registration: sort employee combo by name
 - Addressbook: Correct counts in select contact dialog
 - Addressbook: Better pefromance on large database
+- Core: Fixed about dialog.
 
 11-05-2021 6.5.49
 - Core: Fixed fresh manual install
