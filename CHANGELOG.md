@@ -1,3 +1,7 @@
+6.4.236
+- Core: Better handling of zero-values in numeric custom fields
+- Core: Fixed zero values of numeric custom fields in function CF
+
 10-05-2021 6.4.235
 - Calendar: fix behaviour of copy button in list view
 - Billing: Fixed error "Incorrect integer valie for 'order_at_supplier'"

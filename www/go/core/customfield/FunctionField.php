@@ -39,7 +39,7 @@ class FunctionField extends Number {
 		$f = $this->field->getOption("function");
 
 		$f = preg_replace_callback('/\{([^}]*)\}/', function($matches) use($entity){
-			return $entity->getCustomFields(true)->getValue(trim($matches[1]));
+			return $entity->getCustomFields(true)->getValue(trim($matches[1])) ?? 0;
 		}, $f);
 
 		if(empty($f)) {
