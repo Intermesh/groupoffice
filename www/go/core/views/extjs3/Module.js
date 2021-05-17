@@ -143,9 +143,16 @@ GO.mainLayout.on('render', function () {
 
 	//Prevent browser nav on file drop.
 	document.addEventListener("dragover",function(e){
+		if(!e.dataTransfer || !e.dataTransfer.items.length || e.dataTransfer.items[0].kind != 'file') {
+			return;
+		}
+		e.dataTransfer.dropEffect = "none";
 		e.preventDefault();
 	},false);
 	document.addEventListener("drop",function(e){
+		if(!e.dataTransfer || !e.dataTransfer.items.length || e.dataTransfer.items[0].kind != 'file') {
+			return;
+		}
 		e.preventDefault();
 	},false);
 
@@ -157,8 +164,15 @@ GO.mainLayout.on('render', function () {
 	}
 
 	window.addEventListener('unhandledrejection', function (event) {
-		console.error(event.reason);
-		var txt = event.reason.message || event.reason.detail || t("An error occurred. More details can be found in the console.");
+
+		if(Ext.isObject(event.reason)) {
+			var txt = event.reason.message || event.reason.detail || t("An error occurred. More details can be found in the console.");
+		} else if(Ext.isString(event.reason)) {
+			var txt = event.reason;
+		} else
+		{
+			var txt = t("An error occurred. More details can be found in the console.");
+		}
 		GO.errorDialog.show(txt);
 	});
 });

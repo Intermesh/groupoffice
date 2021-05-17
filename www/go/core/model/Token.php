@@ -260,6 +260,8 @@ class Token extends Entity {
 		$this->oldLogin();
 
 		$this->classPermissionLevels = [];
+
+		User::fireEvent(User::EVENT_LOGIN, $user);
 		
 		// Create accessToken and set expire time
 		return true;						

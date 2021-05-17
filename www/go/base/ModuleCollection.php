@@ -283,7 +283,7 @@ class ModuleCollection extends Model\ModelCollection{
 		$stmt = $this->model->find($findParams);
 		$modules = array();
 		while($module = $stmt->fetch()){
-			if(static::isAllowed($module->name, $module->package) && $module->isAvailable())
+			if($module->isAvailable())
 				$modules[]=$module;
 		}
 		

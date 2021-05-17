@@ -30,13 +30,20 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(go.tree.EntityLoader, {
 	},
 	
 	getParams: function(node) {
-		return Ext.apply({sort: [{property: "name", isAscending: true }]}, this.baseParams);
+		return Ext.apply({limit: 1000, sort: [{property: "name", isAscending: true }]}, this.baseParams);
 	},
 
 	handleResponse : function(r) {
 		r.responseData.unshift({
+			leaf: true,
+			iconCls: "ic-star",
+			text: t("Starred", "addressbook", "community"),
+			id: "starred"
+		});
+
+		r.responseData.unshift({
 						leaf: true,
-						iconCls: "ic-star",
+						iconCls: "ic-select-all",
 						text: t("All contacts", "addressbook", "community"),
 						id: "all"
 				});

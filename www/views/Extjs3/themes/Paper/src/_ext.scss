@@ -2374,17 +2374,29 @@ $menuScrollerSize : dp(4);
 		border: 0;
 		border-top: 1px solid color($fg, 'divider');
 		padding: 0 dp(8) 0 dp(14);
-     height: dp(48);
-     line-height: dp(48);
-     //background-color:$cPrimary;
+		height: dp(48);
+		line-height: dp(48);
 		&-text {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space:nowrap;
 			@extend %font-title;
-			//padding-left: dp(8);
+			display: block;
+			line-height: dp(48);
 		}
-      .x-border-panel > & {
+		.x-border-panel > & {
 			background-color: transparent;
-      }
+    }
+
+		.x-panel-inline-icon {
+			float: left;
+		}
 	}
+
+	&-footer {
+		padding: dp(8) 0;
+	}
+
 	&-icon::before { 
 		@extend %icon;		
 		//margin-top: dp(-4);

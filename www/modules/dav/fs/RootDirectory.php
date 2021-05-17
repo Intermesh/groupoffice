@@ -33,7 +33,7 @@ class RootDirectory extends Sabre\DAV\FS\Directory{
 	public function getChildren() {
 		
 		$children = array();
-		$children[] = new Directory('users/' . GO::user()->username);
+		$children[] = new Directory(GO::user()->homeDir);
 		$children[] = new SharedDirectory();
 	
 		
@@ -63,7 +63,7 @@ class RootDirectory extends Sabre\DAV\FS\Directory{
 			
 			switch($name){
 				case GO::user()->username:
-					return new Directory('users/' . GO::user()->username);
+					return new Directory(GO::user()->homeDir);
 					break;
 				
 				case 'Shared':

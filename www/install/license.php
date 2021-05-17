@@ -1,6 +1,7 @@
 <?php
 require('../vendor/autoload.php');
 \go\core\App::get();
+\go()->setCache(new \go\core\cache\None());
 
 ini_set('zlib.output_compression', 0);
 ini_set('implicit_flush', 1);

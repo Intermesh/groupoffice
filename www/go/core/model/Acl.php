@@ -74,24 +74,9 @@ class Acl extends Entity {
 						->addTable('core_acl')
 						->addArray('groups', AclGroup::class, ['id' => 'aclId']);
 	}
+
 	
-	protected function internalValidate() {
-		
-		if($this->isModified(['groups']) && !$this->hasAdmins()) {
-			$this->setValidationError('groups', ErrorCode::FORBIDDEN, "You can't change the admin permissions");
-		}
-			
-		return parent::internalValidate();
-	}
-		
-	
-	protected function internalSave() {		
-		
-		$adminLevel = $this->hasGroup(Group::ID_ADMINS);
-		if($adminLevel < self::LEVEL_MANAGE) {
-			$this->removeGroup(Group::ID_ADMINS);
-			$this->addGroup(Group::ID_ADMINS, self::LEVEL_MANAGE);
-		}
+	protected function internalSave() {
 
 		if(!isset($this->ownedBy)) {
 			$this->ownedBy = User::ID_SUPER_ADMIN;
@@ -112,16 +97,6 @@ class Acl extends Entity {
 		}
 		
 		return $this->logChanges();		
-	}
-	
-	private function hasAdmins() {
-		foreach($this->groups as $group) {
-			if($group->groupId == Group::ID_ADMINS) {				
-				return $group->level == Acl::LEVEL_MANAGE;
-			}
-		}
-
-		return false;
 	}
 	
 	private function logChanges() {
@@ -270,10 +245,20 @@ class Acl extends Entity {
 	public static function applyToQuery(Query $query, $column, $level = self::LEVEL_READ, $userId = null, $groups = null) {
 
 		if(!isset($userId)) {
+
+			// no acl for admins
+			if(go()->getAuthState()->isAdmin()) {
+				return;
+			}
+
 			$userId = App::get()->getAuthState() ? App::get()->getAuthState()->getUserId() : false;
 
 			if(!$userId) {
 				throw new Forbidden("Authorization required");
+			}
+		} else{
+			if(User::isAdminById($userId)) {
+				return;
 			}
 		}
 
@@ -346,6 +331,10 @@ class Acl extends Entity {
 	 * @return int See the self::LEVEL_* constants
 	 */
 	public static function getUserPermissionLevel($aclId, $userId) {
+
+		if(\go\core\model\User::isAdminById($userId)) {
+			return self::LEVEL_MANAGE;
+		}
 		
 		$cacheKey = $aclId . "-" . $userId;
 		if(!isset(self::$permissionLevelCache[$cacheKey])) {
@@ -420,12 +409,12 @@ class Acl extends Entity {
 	 * @return Query
 	 */
 	public static function areGranted($userId, Query $acls = null) {
-		$query = (new Query())						
+		$query = (new Query())
+						->distinct()
 						->selectSingleValue('ag.aclId')
 						->from('core_acl_group', 'ag')
 						->join('core_user_group', 'ug', 'ag.groupId = ug.groupId')
-						->where('ug.userId', '=', $userId)
-						->groupBy(['ag.aclId']);
+						->where('ug.userId', '=', $userId);
 		
 		if(isset($acls)) {
 			$query->andWhere('ag.aclId', 'IN', $acls);
@@ -445,6 +434,7 @@ class Acl extends Entity {
 	public static function wereGranted($userId, $sinceState, Query $acls = null) {
 		$query = (new Query())
 						->selectSingleValue('agc.aclId')
+						->distinct()
 						->from('core_acl_group_changes', 'agc')
 						->join('core_user_group', 'ugc', 'agc.groupId = ugc.groupId')
 						->where('ugc.userId', '=', $userId)
@@ -453,8 +443,7 @@ class Acl extends Entity {
 										(new Criteria())
 										->where('agc.revokeModSeq', 'IS', NULL)
 										->orWhere('agc.revokeModSeq', '>', $sinceState)
-										)
-						->groupBy(['agc.aclId']);
+										);
 		
 		if(isset($acls)) {
 			$query->andWhere('agc.aclId', 'IN', $acls);

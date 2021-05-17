@@ -5,7 +5,9 @@ use GO\Base\Observable;
 use go\core\cache\None;
 use go\core\Controller;
 use go\core\db\Table;
+use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
+use go\core\fs\File;
 use go\core\model\CronJobSchedule;
 use go\core\event\Listeners;
 use go\core\model\Module;
@@ -29,11 +31,17 @@ class System extends Controller {
 		$schedule->moduleId =$module->id;
 		$schedule->name = $name;
 		$schedule->expression = "* * * * *";
+		$schedule->description = "Temporary CLI job " . uniqid();
 
 		$cls = $schedule->getCronClass();
-		
-		$o = new $cls;
-		$o->run($schedule);
+
+		try {
+			$o = new $cls;
+			$o->run($schedule);
+		} finally {
+			CronJobSchedule::delete($schedule->primaryKeyValues());
+		}
+
 	}
 
 	/**
@@ -56,7 +64,7 @@ class System extends Controller {
 
 
 	/**
-	 *  docker-compose exec --user www-data groupoffice-64 php ./www/cli.php core/System/cleanup
+	 *  docker-compose exec --user www-data groupoffice php ./www/cli.php core/System/cleanup
 	 */
 	public function cleanup() {
 
@@ -69,11 +77,9 @@ class System extends Controller {
 		}
 
 		echo "Cleaning up....\n";
-		//Utils::runSQLFile(new File(__DIR__ . '/cleanup.sql'), true);
+		Utils::runSQLFile(new File(__DIR__ . '/cleanup.sql'), true);
 
 		$this->cleanupAcls();
-
-
 
 		$this->fireEvent(self::EVENT_CLEANUP);
 
@@ -83,6 +89,9 @@ class System extends Controller {
 
 	private function cleanupAcls() {
 
+		// for memory problems
+		go()->getDebugger()->disabled = false;
+
 		echo "Cleaning up unused ACL's\n";
 
 //		go()->getDatabase()->getTable('core_acl')->backup();
@@ -91,16 +100,30 @@ class System extends Controller {
 		go()->getDbConnection()->exec("update core_acl set usedIn = null, entityTypeId = null, entityId = null");
 		go()->getDbConnection()->exec("update core_acl set usedIn = 'core_entity.defaultAclId' where id in (select defaultAclId from core_entity)");
 
-		echo "Checking database\n";
-		$mc = new \GO\Core\Controller\MaintenanceController();
-		$mc->run("checkDatabase");
 
+		echo "Checking database\n";
+
+		$modules = Module::find();
+
+		foreach($modules as $module) {
+			if(!$module->isAvailable()) {
+				continue;
+			}
+			echo "Checking module ". ($modules->package ?? "legacy") . "/" .$module->name ."\n";
+			$module->module()->checkAcls();
+		}
+
+		echo "\n\n";
+
+		//hack for folders which are skipped in the checkDatabase
 		go()->getDbConnection()->exec(
 			"update core_acl a inner join fs_folders f on f.acl_id = a.id set usedIn = 'fs_folders.acl_id', entityTypeId = ". \GO\Files\Model\Folder::entityType()->getId() .
 			", entityId = f.id where usedIn is null"
 		);
 
-		go()->getDbConnection()->exec("delete from core_acl where usedIn is null");
+	//	$deleteCount = go()->getDbConnection()->exec("delete from core_acl where usedIn is null");
+
+		//echo "Delete " . $deleteCount ." unused ACL's\n";
 
 	}
 

@@ -439,7 +439,7 @@ abstract class Message extends \GO\Base\Model {
 		$response['links'] = [];
 		
 		
-		$this->fireEvent('tooutputarray', array(&$response, $this));
+		$this->fireEvent('tooutputarray', array(&$response, $this, $html));
 
 		return $response;
 	}

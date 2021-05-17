@@ -197,10 +197,11 @@ class Sync extends Controller {
 		$this->output("Users in Group-Office: " . $totalInGO);
     $this->output("Users in LDAP: " . $totalInLDAP);
 
-    $percentageToDelete = $totalInGO > 0 ? round((1 - $totalInLDAP / $totalInGO) * 100) : 0;		
+    $percentageToDelete = $totalInGO > 0 ? round((1 - $totalInLDAP / $totalInGO) * 100, 2) : 0;
+
+	  $this->output("Delete percentage: " . $percentageToDelete . "%, Max: " . $maxDeletePercentage .'%');
 
     if($percentageToDelete > 0) {
-      $this->output("Delete percentage: " . $percentageToDelete . "%\n");
 
       if ($percentageToDelete > $maxDeletePercentage)
         throw new \Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
@@ -238,7 +239,9 @@ class Sync extends Controller {
   private function output($str) {
     go()->debug($str);
 
-    echo $str . "\n";
+    if(!go()->getEnvironment()->isCron()) {
+	    echo $str . "\n";
+    }
   }
 
   /**
@@ -357,11 +360,10 @@ class Sync extends Controller {
 		$this->output("Groups in Group-Office: " . $totalInGO);
     $this->output("Groups in LDAP: " . $totalInLDAP);
     
-    $percentageToDelete = $totalInGO > 0 ? round((1 - $totalInLDAP / $totalInGO) * 100) : 0;		
+    $percentageToDelete = $totalInGO > 0 ? round((1 - $totalInLDAP / $totalInGO) * 100, 2) : 0;
+	  $this->output("Delete percentage: " . $percentageToDelete . "%, Max: " . $maxDeletePercentage .'%');
 
     if($percentageToDelete > 0) {
-      $this->output("Delete percentage: " . $percentageToDelete . "%");
-
       if ($percentageToDelete > $maxDeletePercentage)
         throw new \Exception("Delete Aborted because script was about to delete more then $maxDeletePercentage% of the groups (" . $percentageToDelete . "%, " . ($totalInGO - $totalInLDAP) . " groups)\n");
 

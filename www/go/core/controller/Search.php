@@ -3,6 +3,7 @@
 namespace go\core\controller;
 
 use go\core\db\Criteria;
+use go\core\ErrorHandler;
 use go\core\event\EventEmitterTrait;
 use go\core\model\Acl;
 use go\core\orm\Query;
@@ -115,7 +116,20 @@ class Search extends EntityController {
 
 	protected function getQueryQuery($params)
 	{
-		return parent::getQueryQuery($params)->groupBy([])->distinct()->select("search.id");
+		$hasIndex = go()->getDatabase()->getTable('core_search')->hasIndex("core_search_entityTypeId_filter_modifiedAt_aclId_index");
+
+		$query = parent::getQueryQuery($params)
+				->groupBy([])
+				->select("search.id")
+				->removeJoin('core_entity', 'e');
+
+		if($hasIndex) {
+			$query->useIndex("use index(PRIMARY, core_search_entityTypeId_filter_modifiedAt_aclId_index)");
+		} else{
+			ErrorHandler::log("Index core_search_entityTypeId_filter_modifiedAt_aclId_index is missing. If search cache is rebuilding then this is normal.");
+		}
+
+		return $query;
 	}
 
 	/**

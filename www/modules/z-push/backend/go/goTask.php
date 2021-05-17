@@ -112,13 +112,13 @@ class goTask extends GoBaseBackendDiff {
 			$task = \GO\Tasks\Model\Task::model()->findByPk($id);
 
 			if (!$task) {
-				$tasklist = GoSyncUtils::getUserSettings()->getDefaultTasklist();
-
-				if (!$tasklist)
-					throw new \Exception("FATAL: No default tasklist configured");
+//				$tasklist = GoSyncUtils::getUserSettings()->getDefaultTasklist();
+//
+//				if (!$tasklist)
+//					throw new \Exception("FATAL: No default tasklist configured");
 
 				$task = new \GO\Tasks\Model\Task();
-				$task->tasklist_id = $tasklist->id;
+				$task->tasklist_id = $folderid;
 			}
 
 			if (isset($message->startdate))
@@ -218,11 +218,24 @@ class goTask extends GoBaseBackendDiff {
 			$params = \GO\Base\Db\FindParams::newInstance()
 					  ->ignoreAcl()
 					  ->select('t.id,t.mtime')
-					  ->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('completion_time', 0))
-					  ->join(\GO\Sync\Model\UserTasklist::model()->tableName(), \GO\Base\Db\FindCriteria::newInstance()
-					  ->addCondition('tasklist_id', 's.tasklist_id', '=', 't', true, true)
-					  ->addCondition('user_id', \GO::user()->id, '=', 's')
-					  , 's');
+					  ->criteria(
+					  	\GO\Base\Db\FindCriteria::newInstance()
+									->addCondition('tasklist_id', $folderid)
+							    ->addCondition('completion_time', 0)
+					  );
+
+//					  ->join(\GO\Sync\Model\UserTasklist::model()->tableName(), \GO\Base\Db\FindCriteria::newInstance()
+//					  ->addCondition('tasklist_id', 's.tasklist_id', '=', 't', true, true)
+//					  ->addCondition('user_id', \GO::user()->id, '=', 's')
+//					  , 's');
+
+			if (!empty($cutoffdate)) {
+				ZLog::Write(LOGLEVEL_DEBUG, 'Client sent cutoff date for tasks: ' . \GO\Base\Util\Date::get_timestamp($cutoffdate));
+
+				$params->getCriteria()->mergeWith(\GO\Base\Db\FindCriteria::newInstance()
+					->addCondition('due_time', $cutoffdate, '>=')
+				);
+			}
 
 			$stmt = \GO\Tasks\Model\Task::model()->find($params);
 
@@ -238,6 +251,42 @@ class goTask extends GoBaseBackendDiff {
 		return $messages;
 	}
 
+	 public function ChangeFolder($folderid, $oldid, $displayname, $type)
+	 {
+		if(!empty($oldid)) {
+
+		  //remove t/ from the folder ? Shouldn't this already have been done by the combined backend wrapper?
+		  $oldid = substr($oldid, 2);
+
+		  $tasklist = \GO\Tasks\Model\Tasklist::model()->findByPk($oldid);
+		  if(!$tasklist) {
+			  ZLog::Write(LOGLEVEL_DEBUG, "Tasklist with $oldid not found");
+			  return false;
+		  }
+		} else{
+		  $tasklist = new \GO\Tasks\Model\Tasklist();
+		}
+
+		$tasklist->name = $displayname;
+		if(!$tasklist->save()) {
+		 ZLog::Write(LOGLEVEL_DEBUG, "Tasklist with $displayname could not be created");
+		 return false;
+		}
+
+		if(empty($oldid)) {
+		 $ut = new \GO\Sync\Model\UserTasklist();
+		 $ut->user_id = GO::user()->id;
+		 $ut->tasklist_id = $tasklist->id;
+
+		 if(!$ut->save()) {
+			 ZLog::Write(LOGLEVEL_DEBUG, "Tasklist with $displayname could not be added to sync profile");
+			 return false;
+		 }
+		}
+
+		return $this->StatFolder($tasklist->id);
+	 }
+
 	/**
 	 * Get the syncFolder that is attached to the given id
 	 *
@@ -246,17 +295,15 @@ class goTask extends GoBaseBackendDiff {
 	 */
 	public function GetFolder($id) {
 
-		if ($id != BackendGoConfig::TASKSBACKENDFOLDER) {
-
-			ZLog::Write(LOGLEVEL_WARN, "Task folder '$id' not found");
-
+		$tasklist = \GO\Tasks\Model\Tasklist::model()->findByPk($id);
+		if(!$tasklist) {
 			return false;
 		}
 
 		$folder = new SyncFolder();
 		$folder->serverid = $id;
 		$folder->parentid = "0";
-		$folder->displayname = 'Tasks';
+		$folder->displayname = $tasklist->name;
 		$folder->type = SYNC_FOLDER_TYPE_TASK;
 
 		return $folder;
@@ -269,8 +316,20 @@ class goTask extends GoBaseBackendDiff {
 	 */
 	public function GetFolderList() {
 		$folders = array();
-		$folder = $this->StatFolder(BackendGoConfig::TASKSBACKENDFOLDER);
-		$folders[] = $folder;
+
+		$params = \GO\Base\Db\FindParams::newInstance()
+			->ignoreAcl()
+			->join(\GO\Sync\Model\UserTasklist::model()->tableName(), \GO\Base\Db\FindCriteria::newInstance()
+				->addCondition('id', 's.tasklist_id', '=', 't', true, true)
+				->addCondition('user_id', \GO::user()->id, '=', 's')
+				, 's');
+
+		$tasklists = \GO\Tasks\Model\Tasklist::model()->find($params);
+		foreach($tasklists as $tasklist) {
+			$folder = $this->StatFolder($tasklist->id);
+
+			$folders[] = $folder;
+		}
 
 		return $folders;
 	}
@@ -281,10 +340,11 @@ class goTask extends GoBaseBackendDiff {
 				  ->ignoreAcl()
 				  ->single(true, true)
 				  ->select('count(*) AS count, max(mtime) AS lastmtime')
-				  ->join(\GO\Sync\Model\UserTasklist::model()->tableName(), \GO\Base\Db\FindCriteria::newInstance()
-				  ->addCondition('tasklist_id', 's.tasklist_id', '=', 't', true, true)
-				  ->addCondition('user_id', \GO::user()->id, '=', 's')
-				  , 's');
+					->criteria(\GO\Base\Db\FindCriteria::newInstance()->addCondition('tasklist_id', $folder));
+//				  ->join(\GO\Sync\Model\UserTasklist::model()->tableName(), \GO\Base\Db\FindCriteria::newInstance()
+//				  ->addCondition('tasklist_id', 's.tasklist_id', '=', 't', true, true)
+//				  ->addCondition('user_id', \GO::user()->id, '=', 's')
+//				  , 's');
 
 		$record = \GO\Tasks\Model\Task::model()->find($params);
 

@@ -5,6 +5,7 @@ namespace go\core\acl\model;
 use Exception;
 use go\core\exception\Forbidden;
 use go\core\model\Acl;
+use go\core\model\User;
 use go\core\orm\Query;
 use go\core\db\Query as DbQuery;
 use go\core\jmap\EntityController;
@@ -60,6 +61,9 @@ abstract class AclItemEntity extends AclEntity {
 	 */
 	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
 
+		if(User::isAdminById($userId ?? go()->getAuthState()->getUserId())) {
+			return;
+		}
 		/**
 		 * SELECT SQL_CALC_FOUND_ROWS SQL_NO_CACHE c.id
 		FROM `addressbook_contact` `c`

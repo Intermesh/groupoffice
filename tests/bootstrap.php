@@ -50,7 +50,7 @@ if($installDb == INSTALL_NEW || $installDb == INSTALL_UPGRADE) {
 //Install fresh DB
 App::get(); //for autoload
 try {
-	go()->setConfig(["core" => $config, 'cache' => \go\core\cache\Apcu::class]);
+	go()->setConfig(['allow_themes' => true, "core" => $config, 'cache' => \go\core\cache\Apcu::class]);
 	//App::get()->getCache()->flush(false);
 	
 	if($installDb == INSTALL_NEW) {
@@ -64,13 +64,9 @@ try {
 		];
 
 		$installer = go()->getInstaller();
-		$installer->install($admin, [
-				\go\modules\community\notes\Module::get(),
-				\go\modules\community\test\Module::get(),
-				\go\modules\community\addressbook\Module::get(),
-				\go\modules\community\comments\Module::get(),
-				]);
+		$installer->install($admin);
 
+		\go\modules\community\test\Module::get()->install();
 
 		//install not yet refactored modules
 		GO::$ignoreAclPermissions = true;

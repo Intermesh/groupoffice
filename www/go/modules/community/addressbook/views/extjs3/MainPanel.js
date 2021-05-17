@@ -129,7 +129,13 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				return;
 			}
 
+			this.grid.store.setFilter("starred", null);
+
 			if (node.id === "all") {
+				this.setAddressBookId(null);
+			} else if (node.id === "starred") {
+
+				this.grid.store.setFilter("starred", {starred: true});
 				this.setAddressBookId(null);
 			} else if (node.attributes.entity.name === "AddressBook") {
 				var addressBookId = node.attributes.data.id, abSettings = go.User.addressBookSettings;

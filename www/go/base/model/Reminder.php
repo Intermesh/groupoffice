@@ -72,13 +72,14 @@ class Reminder extends \GO\Base\Db\ActiveRecord {
 	 * 
 	 * @return Reminder 
 	 */
-	public static function newInstance($name, $time, $model_name='', $model_id=0, $vtime=null){
+	public static function newInstance($name, $time, $model_name='', $model_id=0, $vtime=null, $text = null){
 		$r = new Reminder();
 		$r->name=	\GO\Base\Util\StringHelper::cut_string($name, 100);
 		$r->time=$time;
 		$r->vtime=$vtime;
 		$r->model_type_id=\GO::getModel($model_name)->modelTypeId();
 		$r->model_id=$model_id;
+		$r->text = $text;
 		$r->save();
 		
 		return $r;

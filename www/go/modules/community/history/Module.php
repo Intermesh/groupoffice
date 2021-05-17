@@ -14,6 +14,11 @@ class Module extends core\Module
 
 	public static $enabled = true;
 
+	public function autoInstall()
+	{
+		return true;
+	}
+
 	public function getAuthor() {
 		return "Intermesh BV <info@intermesh.nl>";
 	}
@@ -76,6 +81,10 @@ class Module extends core\Module
 			return;
 		}
 
+		if(!$entity::loggable()) {
+			return;
+		}
+
 		if($entity instanceof LogEntry || $entity instanceof core\model\Search  || $entity instanceof core\model\CronJobSchedule) {
 			return;
 		}
@@ -112,6 +121,13 @@ class Module extends core\Module
 			$log->changes = null;
 		}
 
+		$l = LogEntry::getMapping()->getColumn('changes')->length;
+		if(mb_strlen($log->changes) > $l) {
+			foreach($changes as $key => $v) {
+				$changes[$key] = '... changes were too big to log ...';
+			}
+			$log->changes = json_encode($changes);
+		}
 
 		if(!$log->save()) {
 			throw new \Exception ("Could not save log: " . var_export($log->getValidationErrors(), true));
@@ -124,18 +140,24 @@ class Module extends core\Module
 		$log->description = $user->username . ' [' . core\http\Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('login');
 		$log->changes = null;
-		$log->setAclId($user->findAclId());
-		$log->save();
+		if(!$log->save()){
+			throw new \Exception("Could not save log");
+		}
 	}
 
-	public static function onBadLogin(User $user) {
+	public static function onBadLogin($username, User $user = null) {
 		$log = new LogEntry();
-		$log->setEntity($user);
-		$log->description = $user->username . ' [' . core\http\Request::get()->getRemoteIpAddress() . ']';
+		if(isset($user)) {
+			$log->setEntity($user);
+		} else{
+			$log->entityTypeId = User::entityType()->getId();
+		}
+		$log->description = $username. ' [' . core\http\Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('badlogin');
 		$log->changes = null;
-		$log->setAclId($user->findAclId());
-		$log->save();
+		if(!$log->save()){
+			throw new \Exception("Could not save log");
+		}
 	}
 
 	public static function onLogout(User $user) {
@@ -144,7 +166,8 @@ class Module extends core\Module
 		$log->description = $user->username . ' [' . core\http\Request::get()->getRemoteIpAddress() . ']';
 		$log->setAction('logout');
 		$log->changes = null;
-		$log->setAclId($user->findAclId());
-		$log->save();
+		if(!$log->save()){
+			throw new \Exception("Could not save log");
+		}
 	}
 }

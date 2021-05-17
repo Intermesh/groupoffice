@@ -24,53 +24,18 @@ use Sabre\DAV\Exception\Forbidden;
 use Sabre\HTTP\RequestInterface;
 use Sabre\HTTP\ResponseInterface;
 
-class BasicBackend extends AbstractBasic {
-	
-	private $user;
-	public $checkModuleAccess='dav';
-	
-	public function __construct() {
-		$this->setRealm(GO::config()->product_name);
-	}
-	
+class BasicBackend extends \go\core\dav\auth\BasicBackend {
+
 	public function check(RequestInterface $request, ResponseInterface $response) {
 		$result = parent::check($request, $response);
 		
-		if($result[0]==true) {
-			
-			GO::debug("Login basicauth successfull as ".$this->user->username);
-			
+		if($result[0] == true) {
 			GO::session()->setCurrentUser($this->user->id);
 		}
-		if($this->user) {
-			$result[1] = $this->principalPrefix . $this->user->username; // fix case insensitive login
-		}
+
 		return $result;
 	}
 
-//	For basic auth
-	protected function validateUserPass($username, $password) {
-
-		$auth = new Authenticate();
-		$this->user = $auth->passwordLogin($username, $password);
-		if(!$this->user) {
-			return false;
-		}
-
-		$state = new TemporaryState();
-		$state->setUserId($this->user->id);
-		go()->setAuthState($state);
-		
-		$davModule = Module::model()->findByName($this->checkModuleAccess, false, true);
-		if(!$davModule || !\GO\Base\Model\Acl::getUserPermissionLevel($davModule->aclId, $this->user->id))
-		{
-			$errorMsg = "No '".$this->checkModuleAccess."' module access for user '".$this->user->username."'";
-			\GO::debug($errorMsg);
-			throw new Forbidden($errorMsg);
-		}
-
-		return true;
-	}
 	
 	/**
 	 * for old framework to work in GO::session()

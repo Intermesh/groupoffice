@@ -505,6 +505,47 @@ class Module extends Observable {
 			}
 		}
 	}
+
+	public function checkAcls() {
+		$models=$this->getModels();
+
+		foreach($models as $model) {
+			if ($model->isSubclassOf("GO\Base\Db\ActiveRecord")) {
+
+
+				$m = \GO::getModel($model->getName());
+
+				if(!$m->aclField()) {
+					continue;
+				}
+
+				echo "Checking " . $model->getName() . "\n";
+				flush();
+
+				//to avoid memory errors
+				$start = 0;
+
+				//per thousands to keep memory low
+				$stmt = $m->find(array(
+					'ignoreAcl'=>true,
+					'start' => $start,
+					'limit' => 1000
+				));
+
+				while($stmt->rowCount()) {
+					$stmt->callOnEach('checkAcl', true);
+
+					$stmt = $m->find(array(
+						'ignoreAcl'=>true,
+						'start' => $start+=1000,
+						'limit' => 1000
+					));
+				}
+
+				unset($stmt);
+			}
+		}
+	}
 	
 	/**
 	 * This function is called when a database check is performed

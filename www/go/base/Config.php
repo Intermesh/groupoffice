@@ -153,9 +153,8 @@ var $billing_clear_payment_method_on_duplicate = true;
 	 */
 	var $debug_log = false;
 
+	var $email_enable_labels = true;
 
-
-	
 
 	/**
 	 * Set the number of days the database log will contain until it will be dumped to a CSV file on disk.

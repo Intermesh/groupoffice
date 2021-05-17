@@ -520,7 +520,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 						if(!$linkedEmail){
 							$linkedEmail = new \GO\Savemailas\Model\LinkedEmail();
 							$linkedEmail->setAttributes($attributes);
-							$linkedEmail->save();
+							$linkedEmail->save(true);
 						}
 
 
@@ -562,7 +562,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 								if(!$linkedEmail){
 									$linkedEmail = new \GO\Savemailas\Model\LinkedEmail();
 									$linkedEmail->setAttributes($attributes);
-									$linkedEmail->save();
+									$linkedEmail->save(true);
 								}
 
 								$linkedEmail->link($contact);
@@ -1494,9 +1494,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$response = $this->_checkXSS($params, $response);
 			}
 
-			if($params['mailbox'] == $account->spam) {
+//			if($params['mailbox'] == $account->spam) {
 				$response = $this->_blockImages($params, $response);
-			}
+//			}
 
 			//Don't do these special actions in the special folders
 			if(!$imapMessage->seen && $params['mailbox']!=$account->sent && $params['mailbox']!=$account->trash && $params['mailbox']!=$account->drafts){

@@ -351,7 +351,6 @@ GO.grid.CalendarGrid = Ext.extend(Ext.Panel, {
 				}, true);
 				
 			if(dtStr==nowStr){
-//			if(day==2){
 				this.theWeekDay=day;
 				this.todaysHeading = heading;
 			}

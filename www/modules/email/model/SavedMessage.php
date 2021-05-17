@@ -189,11 +189,10 @@ class SavedMessage extends ComposerMessage {
 					$body = \GO\Base\Util\StringHelper::clean_utf8($part->body, $charset);
 					
 					if (stripos($part->ctype_secondary, 'plain') !== false) {
-						$body = '<div class="msg">' . nl2br($body) . '</div>';
+						$body = $preserveHtmlStyle ? '<div class="msg">' . nl2br($body) . '</div>' : nl2br($body);
 					} else {
 						$body = \GO\Base\Util\StringHelper::convertLinks($body);
 						$body = \GO\Base\Util\StringHelper::sanitizeHtml($body, $preserveHtmlStyle);
-						$body = $body;
 					}
 					$this->_loadedBody .= $body;
 				} elseif ($part->ctype_primary == 'multipart') {
@@ -252,7 +251,7 @@ class SavedMessage extends ComposerMessage {
 
 				//$part_number++;
 				if (isset($part->parts)) {
-					$this->_getParts($part, $part_number_prefix . $part_number . '.');
+					$this->_getParts($part, $part_number_prefix . $part_number . '.', $preserveHtmlStyle);
 				}
 			}
 		} elseif (isset($structure->body)) {			
@@ -264,7 +263,7 @@ class SavedMessage extends ComposerMessage {
 				$text_part = nl2br($text_part);
 			}else{
 				$text_part = \GO\Base\Util\StringHelper::convertLinks($text_part);
-				$text_part = \GO\Base\Util\StringHelper::sanitizeHtml($text_part);
+				$text_part = \GO\Base\Util\StringHelper::sanitizeHtml($text_part, $preserveHtmlStyle);
 			}
 			
 			$this->_loadedBody .= $text_part;

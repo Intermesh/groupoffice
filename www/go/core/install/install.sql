@@ -246,13 +246,12 @@ CREATE TABLE `core_user` (
   `disk_quota` bigint(20) DEFAULT NULL,
   `disk_usage` bigint(20) NOT NULL DEFAULT 0,
   `mail_reminders` tinyint(1) NOT NULL DEFAULT 0,
-  `popup_reminders` tinyint(1) NOT NULL DEFAULT 0,
-  `popup_emails` tinyint(1) NOT NULL DEFAULT 0,
   `holidayset` varchar(10) DEFAULT NULL,
   `sort_email_addresses_by_time` tinyint(1) NOT NULL DEFAULT 0,
   `no_reminders` tinyint(1) NOT NULL DEFAULT 0,
   `last_password_change` int(11) NOT NULL DEFAULT 0,
-  `force_password_change` tinyint(1) NOT NULL DEFAULT 0
+  `force_password_change` tinyint(1) NOT NULL DEFAULT 0,
+  `homeDir` varchar (190) not null
 ) ENGINE=InnoDB;
 
 CREATE TABLE `core_user_custom_fields` (
@@ -530,8 +529,10 @@ ALTER TABLE `core_search`
   ADD UNIQUE KEY `entityId` (`entityId`,`entityTypeId`),
   ADD KEY `acl_id` (`aclId`),
   ADD KEY `moduleId` (`moduleId`),
-  ADD KEY `entityTypeId` (`entityTypeId`),
-  ADD KEY `filter` (`filter`);
+  ADD KEY `entityTypeId` (`entityTypeId`);
+
+create index core_search_entityTypeId_filter_modifiedAt_aclId_index
+    on core_search (entityTypeId, filter, modifiedAt, aclId);
 
 
 ALTER TABLE `core_setting`
@@ -1064,15 +1065,13 @@ ALTER TABLE `core_acl` ADD FOREIGN KEY (`ownedBy`) REFERENCES `core_user`(`id`) 
 
 CREATE TABLE `core_search_word` (
                                     `searchId` int(11) NOT NULL,
-                                    `word` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-                                    `drow` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
+                                    `word` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 ALTER TABLE `core_search_word`
     ADD PRIMARY KEY (`word`,`searchId`),
-    ADD KEY `searchId` (`searchId`),
-    ADD KEY `drow` (`drow`);
+    ADD KEY `searchId` (`searchId`);
 
 
 ALTER TABLE `core_search_word`

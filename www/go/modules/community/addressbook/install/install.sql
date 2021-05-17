@@ -231,3 +231,10 @@ CREATE TABLE IF NOT EXISTS `addressbook_portlet_birthday` (
 ALTER TABLE `addressbook_portlet_birthday`
     ADD CONSTRAINT `addressbook_portlet_birthday_fk1` FOREIGN KEY (`userId`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
     ADD CONSTRAINT `addressbook_portlet_birthday_fk2` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`) ON DELETE CASCADE;
+
+
+create index addressbook_contact_addressBookId_lastName_index
+    on addressbook_contact (addressBookId, lastName);
+
+create index addressbook_contact_addressBookId_name_index
+    on addressbook_contact (addressBookId, name);

@@ -11,12 +11,12 @@ class UserSpreadsheet extends Spreadsheet {
 
 	public static $excludeHeaders = ['syncSettings', 'taskSettings', 'notesSettings', 'addressBookSettings', 'calendarSettings', 'emailSettings', 'googleauthenticator'];
 
-  protected function init()
-  {
-    parent::init();
+	protected function init()
+	{
+		parent::init();
 
-    $this->addColumn('createEmailAccount', go()->t("Create E-mail account"));
-  }
+		$this->addColumn('createEmailAccount', go()->t("Create E-mail account"));
+	}
 
   public function exportCreateEmailAccount(Entity $entity, array $templateValues, $columnName) {
     if(!Module::isInstalled('community', 'serverclient')) {
@@ -49,17 +49,28 @@ class UserSpreadsheet extends Spreadsheet {
     $this->postFixAdminPassword = $values['password'];
   }
 
-  protected $postFixAdminDomain = false;
-  protected $postFixAdminPassword = false;
+	protected $postFixAdminDomain = false;
+	protected $postFixAdminPassword = false;
 
-  protected function afterSave(Entity $entity)
-  {
-    if($this->postFixAdminDomain) {
-      $postfixAdmin = new MailDomain($this->postFixAdminPassword);
-      $postfixAdmin->addMailbox($entity, $this->postFixAdminDomain);
-      $postfixAdmin->addAccount($entity, $this->postFixAdminDomain);    
-    }
+	/**
+	 * @param Entity $entity
+	 * @return bool
+	 * @throws \Exception
+	 */
+	protected function afterSave(Entity $entity)
+	{
+		if ($this->postFixAdminDomain) {
+			$postfixAdmin = new MailDomain($this->postFixAdminPassword);
+			$postfixAdmin->addMailbox($entity, $this->postFixAdminDomain);
+			$postfixAdmin->addAccount($entity, $this->postFixAdminDomain);
+		}
 
-    return true;
-  }
+		$stmt = go()->getDbConnection()->query("SELECT count(*) AS `userCnt` FROM `core_auth_password` WHERE `userId` = " . $entity->id);
+		$rec = $stmt->fetch();
+		if (!$rec || $rec['userCnt'] === 0) {
+			go()->getDbConnection()->insert('core_auth_password', ['userId' => $entity->id, 'password' => ''])->execute();
+		}
+
+		return true;
+	}
 }

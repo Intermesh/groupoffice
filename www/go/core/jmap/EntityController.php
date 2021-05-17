@@ -109,7 +109,11 @@ abstract class EntityController extends Controller {
 		$query->select($cls::getPrimaryKey(true)); //only select primary key
 
 		$query->filter($params['filter']);
-		
+
+		// Only return readable ID's
+		if($cls::getFilters()->hasFilter('permissionLevel') &&  !$cls::getFilters()->isUsed('permissionLevel')) {
+			$query->filter(['permissionLevel' => Acl::LEVEL_READ]);
+		}
 		return $query;
 	}
 	
@@ -156,12 +160,21 @@ abstract class EntityController extends Controller {
 				throw new InvalidArguments("Parameter 'filter' must be an array");
 			}
 		}
-		
+
+		$cls = $this->entityClass();
+
 		if(!isset($params['accountId'])) {
 			$params['accountId'] = null;
 		}
 		
 		$params['calculateTotal'] = !empty($params['calculateTotal']) ? true : false;
+
+		$params['calculateHasMore'] = !empty($params['calculateHasMore']) && $params['limit'] > 0 ? true : false;
+
+		//a faster alternative to calculateTotal just indicating that there are more entities. We do that by selecting one more than required.
+		if($params['calculateHasMore']) {
+			$params['limit']++;
+		}
 		
 		return $params;
 	}
@@ -197,6 +210,10 @@ abstract class EntityController extends Controller {
 				$ids[] = $count ? $record[0] : implode('-', $record);
 			}
 
+			if($p['calculateHasMore'] && count($ids) > $params['limit']) {
+				$hasMore = !!array_pop($ids);
+			}
+
 			$response = [
 				'accountId' => $p['accountId'],
 				'state' => $state,
@@ -204,6 +221,10 @@ abstract class EntityController extends Controller {
 				'notfound' => [],
 				'canCalculateUpdates' => false
 			];
+
+			if(isset($hasMore)) {
+				$response['hasMore'] = $hasMore;
+			}
 
 			if ($p['calculateTotal']) {
 
@@ -851,7 +872,7 @@ abstract class EntityController extends Controller {
 			$file = $blob->getFile();
 		}
 
-    $response = $converter->importFile($file, $params);
+		$response = $converter->importFile($file, $params);
 		
 		if(!$response) {
 			throw new Exception("Invalid response from import converter");

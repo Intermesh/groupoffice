@@ -7,6 +7,7 @@ use go\core\cache\None;
 use go\core\fs\File;
 use go\core\jmap\Request;
 use go\core\model\Module;
+use go\core\model\User;
 
 class Language {
 	/**
@@ -174,7 +175,7 @@ class Language {
 			}
 
 			$file = $this->findLangOverride($isoCode, $package, $module);
-			if ($file->exists()) {
+			if ($file && $file->exists()) {
 				$langData->mergeRecursive($this->loadFile($file));
 			}
 
@@ -261,7 +262,12 @@ class Language {
 	 */
 	private function findLangOverride($lang, $package, $module) {
 
-		$folder = go()->getDataFolder()->getFolder('users/admin/language/' . $package . '/' .$module);
+		if(Installer::isInstalling()) {
+			return false;
+		}
+		$admin = User::findById(1, ['homeDir']);
+
+		$folder = go()->getDataFolder()->getFolder($admin->homeDir. '/language/' . $package . '/' .$module);
 		
 		return $folder->getFile($lang . '.php');
 	}

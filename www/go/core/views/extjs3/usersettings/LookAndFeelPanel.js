@@ -31,28 +31,9 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			title: t('Global','users','core'),
 			labelWidth:dp(160),
 			defaults: { 
-				anchor: "100%",
+				anchor: "100%"
 			},
 			items:[
-				this.themeCombo = new Ext.form.ComboBox({
-					fieldLabel: t("Theme", "users", "core"),
-					name: 'theme',
-					store: new GO.data.JsonStore({
-						url: GO.url('core/themes'),
-						fields:['theme','label'],
-						remoteSort: true,
-						autoLoad:true
-					}),
-					visible:GO.settings.config.allow_themes,
-					displayField:'label',
-					valueField: 'theme',		
-					mode:'local',
-					triggerAction:'all',
-					editable: false,
-					selectOnFocus:true,
-					forceSelection: true,
-					value: GO.settings.config.theme
-				}),
 				this.startModuleField = new GO.form.ComboBox({
 					fieldLabel: t("Start in module", "users", "core"),
 					name: 'start_module_name',
@@ -121,7 +102,30 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 				}
 			]
 		});
-		
+
+		if(GO.settings.config.allow_themes) {
+			this.globalFieldset.insert(0, this.themeCombo = new Ext.form.ComboBox({
+				fieldLabel: t("Theme", "users", "core"),
+				name: 'theme',
+				store: new GO.data.JsonStore({
+					url: GO.url('core/themes'),
+					fields:['theme','label'],
+					remoteSort: true,
+					autoLoad:true
+				}),
+				visible:GO.settings.config.allow_themes,
+				displayField:'label',
+				valueField: 'theme',
+				mode:'local',
+				triggerAction:'all',
+				editable: false,
+				selectOnFocus:true,
+				forceSelection: true,
+				value: GO.settings.config.theme
+			}));
+		}
+
+
 		this.regionFieldset = new Ext.form.FieldSet({
 			labelWidth:dp(160),
 			defaults: { anchor: "100%" },
@@ -308,68 +312,7 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 			labelWidth:dp(160),
 			title: t('Notifications','users','core'),
 			items:[
-				this.cbPopupReminders = new Ext.ux.form.XCheckbox({
-					hideLabel: true,
-					boxLabel: t("Show a popup window when a reminder becomes active", "users", "core"),
-					name: 'popup_reminders',
-					listeners: {
-						check: function(cb,checked) {
-							if(checked) {
-								var options = {
-									body: t("Desktop notifications active"),
-									icon: 'views/Extjs3/themes/Group-Office/images/groupoffice.ico'
-								}
-								// Let's check if the browser supports notifications
 
-								if (!("Notification" in window)) {
-									// Browser does not support desktop notification and will show a popup instead
-								} else if (Notification.permission !== 'granted' && (Notification.permission !== 'denied' || Notification.permission === "default")) {
-									Notification.requestPermission(function (permission) {
-									// If the user accepts, let's create a notification
-									try {
-										if (permission === "granted") {
-											var notification = new Notification(t("Desktop notifications active"), options);
-											return true;
-										}
-									} catch(e) {
-										// ignore failure on android
-									}
-									cb.setValue(false);
-
-									});
-								}
-							} 
-						}
-					}
-				}),
-				this.cbPopupEmailNotifications = new Ext.ux.form.XCheckbox({
-					hideLabel: true,
-					boxLabel: t("Show a popup window when an e-mail arrives", "users", "core"),
-					name: 'popup_emails',
-					listeners: {
-						check: function (cb, checked) {
-							if (checked) {
-								var options = {
-									body: t("Desktop notifications active"),
-									icon: 'views/Extjs3/themes/Group-Office/images/groupoffice.ico'
-								}
-								// Let's check if the browser supports notifications
-								if (!("Notification" in window)) {
-									// Browser does not support desktop notification and will show a popup instead
-								} else if (Notification.permission !== 'granted' && (Notification.permission !== 'denied' || Notification.permission === "default")) {
-									Notification.requestPermission(function (permission) {
-										// If the user accepts, let's create a notification
-										if (permission === "granted") {
-											var notification = new Notification(t("Desktop notifications active"), options);
-										} else {
-											cb.setValue(false);
-										}
-									});
-								}
-							}
-						}
-					}
-				}),
 				this.cbEmailReminders = new Ext.ux.form.XCheckbox({
 					hideLabel: true,
 					boxLabel: t("Mail reminders", "users", "core"),

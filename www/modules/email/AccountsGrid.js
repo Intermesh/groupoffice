@@ -151,6 +151,7 @@ Ext.extend(GO.email.AccountsGrid, GO.grid.GridPanel,{
 						itemId: "delete",
 						iconCls: 'ic-delete',
 						text: t("Delete"),
+						disabled: !GO.settings.modules.email.write_permission,
 						handler: function () {
 							this.getSelectionModel().selectRecords([this.moreMenu.record]);
 							this.deleteSelected({
