@@ -5,6 +5,9 @@
 - Addressbook: Correct counts in select contact dialog
 - Addressbook: Better pefromance on large database
 - Core: Fixed about dialog.
+- Projects: Supplier company name not shown in expense budget grid
+- Address book: Brought back starred function but as folder now
+- Email: Work around if label is called "labels"
 
 11-05-2021 6.5.49
 - Core: Fixed fresh manual install
