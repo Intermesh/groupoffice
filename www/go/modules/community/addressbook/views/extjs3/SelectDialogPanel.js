@@ -87,6 +87,8 @@ go.modules.community.addressbook.SelectDialogPanel = Ext.extend(Ext.Panel, {
 			}
 		});
 
+		this.grid.getView().totalDisplay = false;
+
 		if(this.mode == 'email') {
 			this.grid.store.setFilter("required", {
 				hasEmailAddresses: true
