@@ -1,5 +1,6 @@
+17-05-2021 6.5.50
 - Core: save 0-values correctly for numeric Custom FIelds
-- Core: bugfix in function custom fields and zero values   
+- Core: bugfix in function custom fields and zero values
 - Projects: sort employees by name
 - Time registration: sort employee combo by name
 - Addressbook: Correct counts in select contact dialog
@@ -119,6 +120,10 @@
 
 
 6.4.244
+6.4.236
+- Core: Better handling of zero-values in numeric custom fields
+- Core: Fixed zero values of numeric custom fields in function CF
+
 10-05-2021 6.4.235
 - Calendar: fix behaviour of copy button in list view
 - Billing: Fixed error "Incorrect integer valie for 'order_at_supplier'"
