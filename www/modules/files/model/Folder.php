@@ -1501,7 +1501,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 
 		$filesPath = $entity->buildFilesPath();	
 
-		$folder = empty($entity->filesFolderId) ? null : $this->findByPk($entity->filesFolderId);
+		$folder = empty($entity->filesFolderId) ? null : $this->findByPk($entity->filesFolderId, false, true);
 		if($folder) {
 
 			$existingPath = \go\core\util\StringUtil::normalize($folder->getPath());
