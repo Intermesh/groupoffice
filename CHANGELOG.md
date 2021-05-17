@@ -1,3 +1,5 @@
+- Core: save 0-values correctly for numeric Custom FIelds
+- Core: bugfix in function custom fields and zero values   
 - Projects: sort employees by name
 - Time registration: sort employee combo by name
 - Addressbook: Correct counts in select contact dialog
