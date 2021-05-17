@@ -271,16 +271,17 @@ class Task extends AclItemEntity {
 
 	}
 
-	protected function internalSave() {
+	protected function internalSave()
+	{
 
-		if($this->isNew()) {
-		    $this->uid = \go\core\util\UUID::v4();
-      }
+		if ($this->isNew()) {
+			$this->uid = \go\core\util\UUID::v4();
+		}
 
-		if($this->progress == Progress::Completed) {
+		if ($this->progress == Progress::Completed) {
 			$this->percentComplete = 100;
 		}
-		if($this->isModified('percentComplete')) {
+		if ($this->isModified('percentComplete')) {
 			if ($this->percentComplete == 100) {
 				$this->progress = Progress::Completed;
 			} else if ($this->percentComplete > 0 && $this->progress == Progress::NeedsAction) {
@@ -288,13 +289,13 @@ class Task extends AclItemEntity {
 			}
 		}
 
-		if($this->isModified('progress')){
+		if ($this->isModified('progress')) {
 			$this->progressUpdated = new DateTime();
 		}
 
-		if(!empty($this->recurrenceRule) && $this->progress == Progress::Completed) {
+		if (!empty($this->recurrenceRule) && $this->progress == Progress::Completed) {
 			$next = $this->getNextRecurrence($this->getRecurrenceRule());
-			if($next) {
+			if ($next) {
 				$this->createNewTask($next);
 			} else {
 				$this->recurrenceRule = null;
@@ -304,7 +305,7 @@ class Task extends AclItemEntity {
 		$success = parent::internalSave();
 
 		// if alert can be based on start / due of task check those properties as well
-		if($this->isModified('alerts') ||
+		if ($this->isModified('alerts') ||
 			$this->isModified('useDefaultAlerts')) {
 			$this->updateAlerts();
 		}
