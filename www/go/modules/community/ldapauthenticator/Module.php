@@ -76,7 +76,7 @@ class Module extends core\Module implements DomainProvider {
 
 //				'homeDir' => function($record) {
 //					//relative path from group-office file_storage_path
-//					return "ldap_homes/" . $record->uid[0];
+//					return "ldap_homes/" . $record->uid[0] . "/files";
 //				}
 				];
 		}
