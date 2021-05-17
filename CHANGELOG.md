@@ -1,3 +1,6 @@
+- Projects: sort employees by name
+- Time registration: sort employee combo by name
+
 11-05-2021 6.5.49
 - Core: Fixed fresh manual install
 - Projects: Error on time tracking PDF report
