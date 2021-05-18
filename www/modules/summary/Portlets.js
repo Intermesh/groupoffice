@@ -13,13 +13,14 @@
 GO.summary.portlets=[];
 
 GO.mainLayout.onReady(function(){
-	var rssTabPanel = new Ext.TabPanel({doLayoutOnTabChange:true});
+	var rssTabPanel = new Ext.TabPanel({doLayoutOnTabChange:true, autoHeight: true});
 	
 	GO.summary.portlets['portlet-rss-reader']=new GO.summary.Portlet({
 		id: 'portlet-rss-reader',
 		//iconCls: 'rss-icon',
 		title: t("News", "summary"),
-		layout:'fit',
+		autoHeight: true,
+
 		tools: [{
 			id: 'gear',
 			handler: function(){
@@ -76,6 +77,7 @@ GO.mainLayout.onReady(function(){
 												if(i != 'remove')
 												{
 													rssTabPanel.add(new GO.portlets.rssFeedPortlet({
+														autoHeight: true,
 														feed_id: responseParams.data[i].id,
 														feed: responseParams.data[i].url,
 														title: responseParams.data[i].title,
@@ -121,8 +123,7 @@ GO.mainLayout.onReady(function(){
 				panel.removePortlet();
 			}
 		}],
-		items: rssTabPanel,
-		height:300
+		items: rssTabPanel
 	});
 
 	GO.summary.portlets['portlet-rss-reader'].on('render',function(){
@@ -152,6 +153,7 @@ GO.mainLayout.onReady(function(){
 					{
 						for(var i=0;i<rssTabPanels.results.length;i++){
 							rssTabPanel.add(new GO.portlets.rssFeedPortlet({
+								autoHeight: true,
 								feed_id: rssTabPanels.results[i].id,
 								feed: rssTabPanels.results[i].url,
 								title: rssTabPanels.results[i].title,
