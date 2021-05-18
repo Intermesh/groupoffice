@@ -790,7 +790,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		$folder = $this->findByPath('tmp', true);
 		if($folder->acl_id != Acl::getReadOnlyAclId()){
 			$folder->acl_id = Acl::getReadOnlyAclId();
-			$folder->save();
+			$folder->save(true);
 		}
 		return $this->findByPath('tmp/' . $userId, true);
 	}
