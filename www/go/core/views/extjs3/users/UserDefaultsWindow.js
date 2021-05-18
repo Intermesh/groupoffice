@@ -133,7 +133,7 @@ go.users.UserDefaultsWindow = Ext.extend(go.Window, {
 							name: 'defaultConfirmOnMove',
 							hideLabel: true,
 							boxLabel: t('Show confirmation dialog on move'),
-							hint: t("Moving item when dragging will ask form confirmation on drop when this is on")
+							hint: t("When this is on and items are moved by dragging, confirmation is requested")
 						},
 						new go.form.multiselect.Field({
 							valueIsId: true,

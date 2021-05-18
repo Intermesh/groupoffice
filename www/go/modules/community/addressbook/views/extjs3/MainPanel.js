@@ -616,7 +616,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		var removeFromGrid = false, me = this;
 
 		//loop through dragged grid records
-		if (!go.User.confirmOnMove || confirm(t('Are you sure you want to move the item(s)'))) {
+
+		function cb() {
 			go.Db.store("Contact").get(e.source.dragData.selections.map(function (r) {
 				return r.id
 			})).then(function (result) {
@@ -658,6 +659,10 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				})
 			});
 		}
+
+		go.User.confirmOnMove ?
+			Ext.Msg.confirm(t('Confirm'), t('Are you sure you want to move the item(s)?'), function(btn) { if(btn == 'yes') cb.call(this)}, this) :
+			cb.call(this);
 
 
 

@@ -186,7 +186,7 @@ class User extends Entity {
 	 * When true the user interface will show a confirm dialog before moving item with drag and drop
 	 * @var bool
 	 */
-	public $defaultConfirmOnMove = false;
+	public $confirmOnMove;
 	
 	
 	public $max_rows_list;
