@@ -2104,12 +2104,50 @@ GO.request({
 	});
 }
 
+/**
+ * @example:
+ *
+ * {
+				id:this.records[0].data.id,
+				all:'1' //show all handlers instead of using the default
+			}
+ *
+ * @param config
+ */
 GO.files.openFile = function(config)
 {		
 	if(!GO.files.openFileWindow){
 		GO.files.openFileWindow =  new GO.files.OpenFileWindow();
 	}
 	GO.files.openFileWindow.show(config);
+}
+
+GO.files.openEmailAttachment = function(attachment, panel, choosehandler)
+{
+	var params = {
+		account_id: panel.account_id,
+		mailbox: panel.mailbox,
+		uid: panel.uid,
+		number: attachment.number,
+		uuencoded_partnumber: attachment.uuencoded_partnumber,
+		encoding: attachment.encoding,
+		type: attachment.type,
+		subtype: attachment.subtype,
+		filename: attachment.name,
+		charset: attachment.charset,
+		sender: panel.data.sender, //for gnupg and smime,
+		filepath: panel.data.path ? panel.data.path : ''
+	}
+	GO.request({
+		url: "files/file/saveAttachmentToTmp",
+		params: params,
+		success: function(response, options, result) {
+			GO.files.openFile({
+				id: result.data.id,
+				all: choosehandler ? "1" : "0"
+			});
+		}
+	})
 }
 
 

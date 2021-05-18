@@ -5,6 +5,8 @@ namespace GO\Files\Controller;
 
 use GO\Base\Exception\AccessDenied;
 use GO\Base\Exception\NotFound;
+use go\core\http\Client;
+use GO\Email\Model\Account;
 use GO\Files\Model\File;
 use go\core\fs\Blob;
 use go\core\fs\File as GoFile;
@@ -318,6 +320,37 @@ class FileController extends \GO\Base\Controller\AbstractModelController {
 			$fh->save();
 		
 		return parent::beforeSubmit($response, $model, $params);
+	}
+
+	protected function actionSaveAttachmentToTmp($params) {
+
+		$tmpFolder = \GO\Files\Model\Folder::model()->tmpFolder();
+		foreach($tmpFolder->files as $file) {
+			$file->delete(true);
+		}
+
+		$params['filename'] = \GO\Base\Fs\File::stripInvalidChars($params['filename']);
+		$file = new \GO\Base\Fs\File(\GO::config()->file_storage_path . $tmpFolder->path.'/'.$params['filename']);
+
+		if(empty($params['tmp_file'])){
+			$account = Account::model()->findByPk($params['account_id']);
+			$imap = $account->openImapConnection($params['mailbox']);
+			if(!$imap->save_to_file($params['uid'], $file->path(), $params['number'], $params['encoding'], true)) {
+				throw new Exception("Could not save file from IMAP");
+			}
+		}else
+		{
+			$tmpfile = new \GO\Base\Fs\File(\GO::config()->tmpdir.$params['tmp_file']);
+			$file = $tmpfile->copy($file->parent(), $params['filename']);
+			if(!$file) {
+				throw new Exception("IO error");
+			}
+		}
+		$dbFile = $tmpFolder->hasFile($file->name());
+		if(!$dbFile) {
+			$dbFile = $tmpFolder->addFile($file->name(), true);
+		}
+		return ['success' => true, 'data' => $dbFile->getAttributes()];
 	}
 	
 	protected function actionHandlers($params){
