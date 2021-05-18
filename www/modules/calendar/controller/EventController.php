@@ -2081,10 +2081,14 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		$response = array( 'success' => true );
 
 
-		$account = Account::model()->findByPk($params['account_id']);
-		$imap = $account->openImapConnection($params['mailbox']);
-		$data = $imap->get_message_part_decoded($params['uid'], $params['number'], $params['encoding'], false, true, false);
-
+		if(!empty($params['file_id'])) {
+			$file = \GO\Files\Model\File::model()->findByPk($params['file_id']);
+			$data = $file->fsFile->getContents();
+		}else{
+			$account = Account::model()->findByPk($params['account_id']);
+			$imap = $account->openImapConnection($params['mailbox']);
+			$data = $imap->get_message_part_decoded($params['uid'], $params['number'], $params['encoding'], false, true, false);
+		}
 		$vcal = \GO\Base\VObject\Reader::read($data);
 
 		$vevents = $vcal->select("VEVENT");
