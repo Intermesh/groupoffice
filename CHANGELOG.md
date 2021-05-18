@@ -6,6 +6,7 @@
 - Core: Added Mongolian (Монгол хэл) translation
 - Calendar: All categories are visible (even with permission) #700
 - Billing: Without manage permissions, you couldn't see totals. This was removed.
+- Email: Don't change invalid email addresses into "unknown@unknown.domain"
 
 17-05-2021 6.5.50
 - Core: save 0-values correctly for numeric Custom FIelds
