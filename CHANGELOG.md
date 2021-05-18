@@ -2,6 +2,7 @@
 - Email: When opening attachments it's saved to a temporary file so it can be opened by
   file module integrations like OnlyOffice, Microsoft office online, libreoffice etc.
 - Core: Fixed safari 14.1 wrong button color when button was disabled previously
+- Start page: Auto height for news portlet
 
 17-05-2021 6.5.50
 - Core: save 0-values correctly for numeric Custom FIelds
