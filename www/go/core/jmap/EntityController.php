@@ -211,6 +211,21 @@ abstract class EntityController extends Controller {
 				$ids[] = $count ? $record[0] : implode('-', $record);
 			}
 
+			// check if ID has data
+			if(count($ids) == 0){
+				// Get data for addressbook
+				if(isset($params['filter']['addressBookId'])){
+					$contactIds = (new Query)
+						->select('contactId')
+						->from('addressbook_filter_contact_map')
+						->where(['addressBookId' => $params['filter']['addressBookId']])
+						->all();
+					foreach ($contactIds as $key => $contactId) {	
+						$ids[] = $contactId['contactId'];
+					}
+				}
+			}
+
 			if($p['calculateHasMore'] && count($ids) > $params['limit']) {
 				$hasMore = !!array_pop($ids);
 			}
@@ -612,6 +627,43 @@ abstract class EntityController extends Controller {
 			}
 
 			if ($entity->save()) {
+				
+				// save address book
+				if(isset($properties['filter'])){
+					$addressBook = new \go\modules\community\addressbook\model\AddressBook();
+					$addressBook->name = '~ '.$properties['name'];
+					$addressBook->salutationTemplate = 'Dear [if {{contact.prefixes}}]{{contact.prefixes}}[else][if !{{contact.gender}}]Ms./Mr.[else][if {{contact.gender}}=="M"]Mr.[else]Ms.[/if][/if][/if][if {{contact.middleName}}] {{contact.middleName}}[/if] {{contact.lastName}}';
+					$addressBook->aclId = $properties['acl'][2];
+					
+					$addressBook->save();
+					
+					$arr['sort'] = [];
+					$subarr['property'] = 'name';
+					$subarr['isAscending'] = 1;
+					array_push($arr['sort'],$subarr);
+					$arr['calculateTotal'] = 1;
+					$arr['limit'] = 40; 
+					
+					$opr = $properties['filter']['operator'];
+					$condition = $properties['filter']['conditions'];
+					$flArr['operator'] = $opr;
+					$flArr['conditions'] = $condition;
+					$properties['filter']['conditions'] = [];
+					array_push($properties['filter']['conditions'], $flArr);
+					$arr['filter'] = $properties['filter'];
+					
+					$cont =  new \go\modules\community\addressbook\controller\Contact();
+					$fl = $cont->query($arr);
+	
+					// Iterate through all IDs
+					foreach ($fl['ids'] as $key => $id) {
+						
+						$customFilter = new \go\modules\community\addressbook\model\CustomFilter();
+						$customFilter->addressBookId = $addressBook->id;
+						$customFilter->contactId = $id;
+						$customFilter->save();
+					}
+				}
 
 				//refetch from server when mapping has a query object.
 				if($entity::getMapping()->getQuery() != null) {

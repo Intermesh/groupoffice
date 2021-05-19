@@ -97,7 +97,11 @@ CREATE TABLE `addressbook_url` (
                                    `url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
+CREATE TABLE `addressbook_filter_contact_map`(
+                                `id` int(11) NOT NULL,
+                                `addressBookId` INT(11) DEFAULT NULL,
+                                `contactId` INT(11) DEFAULT NULL
+)ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = COMPACT;
 
 ALTER TABLE `addressbook_address`
     ADD KEY `contactId` (`contactId`);
@@ -109,12 +113,12 @@ ALTER TABLE `addressbook_addressbook`
 
 ALTER TABLE `addressbook_contact`
     ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `goUserId` (`goUserId`),
-  ADD KEY `owner` (`createdBy`),
-  ADD KEY `photoBlobId` (`photoBlobId`),
-  ADD KEY `addressBookId` (`addressBookId`),
-  ADD KEY `modifiedBy` (`modifiedBy`),
-  ADD KEY `vcardBlobId` (`vcardBlobId`);
+    ADD UNIQUE KEY `goUserId` (`goUserId`),
+    ADD KEY `owner` (`createdBy`),
+    ADD KEY `photoBlobId` (`photoBlobId`),
+    ADD KEY `addressBookId` (`addressBookId`),
+    ADD KEY `modifiedBy` (`modifiedBy`),
+    ADD KEY `vcardBlobId` (`vcardBlobId`);
 
 ALTER TABLE `addressbook_contact_custom_fields`
     ADD PRIMARY KEY (`id`);
@@ -143,7 +147,10 @@ ALTER TABLE `addressbook_phone_number`
 ALTER TABLE `addressbook_url`
     ADD KEY `contactId` (`contactId`);
 
-
+ALTER TABLE `addressbook_filter_contact_map`
+    ADD PRIMARY KEY (`id`),
+    ADD KEY 'addressBookId' ('addressBookId')
+    ADD KEY 'contactId' ('contactId');
 
 ALTER TABLE `addressbook_addressbook`
     MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
@@ -154,6 +161,8 @@ ALTER TABLE `addressbook_contact`
 ALTER TABLE `addressbook_group`
     MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
+ALTER TABLE `addressbook_filter_contact_map`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `addressbook_address`
     ADD CONSTRAINT `addressbook_address_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
@@ -195,3 +204,9 @@ ALTER TABLE `addressbook_phone_number`
 ALTER TABLE `addressbook_url`
     ADD CONSTRAINT `addressbook_url_ibfk_1` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`) ON DELETE CASCADE;
 
+ALTER TABLE `addressbook_filter_contact_map`
+    MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `addressbook_filter_contact_map`
+    ADD CONSTRAINT `addressBookId` FOREIGN KEY (`addressBookId`) REFERENCES `addressbook_addressbook` (`id`),
+    ADD CONSTRAINT `contactId` FOREIGN KEY (`contactId`) REFERENCES `addressbook_contact` (`id`);
