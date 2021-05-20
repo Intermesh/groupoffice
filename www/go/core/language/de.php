@@ -1479,4 +1479,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Bottom' => 'Unten',
   '{finished} of {total}' => '{finished} von {total}',
   'files' => 'Dateien',
+	"When this is on and items are moved by dragging, confirmation is requested" => "Wenn diese Option aktiviert ist und Einträge durch Ziehen verschoben werden, wird eine Bestätigung angefordert",
+	"Show confirmation dialog on move" => "Zeige Bestätigungsdialog beim Verschieben",
+	"Are you sure you want to move the item(s)?" => 'Sind Sie sicher, dass Sie die Einträge verschieben möchten?'
 );

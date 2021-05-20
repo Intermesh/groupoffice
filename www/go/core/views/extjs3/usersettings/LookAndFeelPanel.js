@@ -99,6 +99,12 @@ go.usersettings.LookAndFeelPanel = Ext.extend(Ext.Panel, {
 					hideLabel: true,
 					boxLabel: t("Capital after punctuation"),
 					name: 'auto_punctuation'
+				},{
+					xtype: 'xcheckbox',
+					name: 'confirmOnMove',
+					hideLabel: true,
+					boxLabel: t('Show confirmation dialog on move'),
+					hint: t("When this is on and items are moved by dragging, confirmation is requested")
 				}
 			]
 		});

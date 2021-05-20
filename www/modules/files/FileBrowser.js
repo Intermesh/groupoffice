@@ -125,8 +125,9 @@ GO.files.FileBrowser = function(config){
 			record.data['type_id']='d:'+e.data.node.id;
 			var selections = [record];
 		}
-
-		this.paste('cut', e.target.id, selections);
+		go.User.confirmOnMove ?
+			Ext.Msg.confirm(t('Confirm'), t('Are you sure you want to move the item(s)?'), function(btn) { if(btn == 'yes') this.paste('cut', e.target.id, selections);}, this) :
+			this.paste('cut', e.target.id, selections);
 	},
 	this);
 
@@ -676,7 +677,9 @@ this.filesContextMenu = new GO.files.FilesContextMenu();
 	}, this);
 
 	this.thumbsPanel.on('drop', function(targetID, dragRecords){
-		this.paste('cut', targetID, dragRecords);
+		go.User.confirmOnMove ?
+			Ext.Msg.confirm(t('Confirm'), t('Are you sure you want to move the item(s)?'), function(btn) { if(btn == 'yes') this.paste('cut', targetID, dragRecords);}, this) :
+			this.paste('cut', targetID, dragRecords);
 	}, this);
 
 	this.cardPanel = new Ext.Panel({
@@ -1622,7 +1625,9 @@ Ext.extend(GO.files.FileBrowser, Ext.Panel,{
 						return false;
 					}
 				}
-				this.paste('cut', dropRecord.data.id, data.selections);
+				go.User.confirmOnMove ?
+					Ext.Msg.confirm(t('Confirm'), t('Are you sure you want to move the item(s)?'), function(btn) { if(btn == 'yes') this.paste('cut', dropRecord.data.id, data.selections);}, this) :
+					this.paste('cut', dropRecord.data.id, data.selections);
 			}
 		}else
 		{
