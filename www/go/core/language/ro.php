@@ -613,7 +613,7 @@ Password: %s',
   'Send' => 'Trimite',
   'An e-mail with instructions has been sent to your e-mail address.' => 'Un e-mail cu instrucțiuni a fost trimis la adresa dvs. de e-mail.',
   'Domain' => 'Domeniu',
-  'product_name' => 'Group-Office',
+
   'Reset password' => 'Resetează parola',
   'Loading' => 'Se încarcă…',
   'Change' => 'Schimbare',

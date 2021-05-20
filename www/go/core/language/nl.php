@@ -931,7 +931,7 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Encryption' => 'Encryptie',
   'Hostname' => 'Servernaam',
   'Port' => 'Poort',
-  'product_name' => 'GroupOffice',
+
   'Text with ' => 
   array (
     '{1}' => 'Tekst met [{1}] fout(en)',

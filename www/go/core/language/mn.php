@@ -885,7 +885,6 @@ return array (
   'Send' => 'илгээх',
   'Recovery e-mail sent' => 'Сэргээх имэйлийг илгээсэн',
   'An e-mail with instructions has been sent to your e-mail address.' => 'Таны имэйл хаяг руу зааварчилгаа бүхий имэйлийг илгээсэн болно.',
-  'product_name' => 'Бүтээгдэхүүний нэр',
   'Warning! Debug mode enabled' => 'Анхаар! Debug горим идэвхитэй байна.',
   'Use $config' => 
   array (

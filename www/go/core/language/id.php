@@ -609,7 +609,6 @@ return array (
   'A server error occurred.' => 'Terjadi kesalahan server.',
   'Recovery e-mail sent' => 'Email pemulihan terkirim',
   'An e-mail with instructions has been sent to your e-mail address.' => 'Email berisi instruksi telah dikirim ke alamat email Anda.',
-  'product_name' => 'product_name',
   'Warning! Debug mode enabled' => 'Peringatan! Mode debug diaktifkan',
   'Use $config' => 
   array (

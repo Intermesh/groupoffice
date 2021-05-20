@@ -1439,7 +1439,6 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'You can\' t archive yourself' => 'Sie können sich nicht selbst archivieren',
   'Show users' => 'Benutzer zeigen',
   'Show groups' => 'Gruppen zeigen',
-  'product_name' => '{product_name}',
   'Users can login without this domain behind the username. Note that if the user exists in the Group-Office database it will take precedence.' => 'Users can login without this domain behind the username. Note that if the user exists in the {product_name} database it will take precedence.',
   'Last week' => 'Letzte Woche',
   'This year' => 'Dieses Jahr',
