@@ -1,4 +1,5 @@
 - Address book: Fixed import skipping row and updating records by id or email
+- Core: If link panel has more than 5 items it shows count 5+ instead of 5 when collapsed now
 
 18-05-2021 6.5.51
 - Onlyoffice: Open documents in read only mode when not having manage permissions for the module
