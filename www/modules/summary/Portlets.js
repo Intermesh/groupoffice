@@ -154,6 +154,7 @@ GO.mainLayout.onReady(function(){
 						for(var i=0;i<rssTabPanels.results.length;i++){
 							rssTabPanel.add(new GO.portlets.rssFeedPortlet({
 								autoHeight: true,
+								style:'max-height: 600px;overflow-y:auto;',
 								feed_id: rssTabPanels.results[i].id,
 								feed: rssTabPanels.results[i].url,
 								title: rssTabPanels.results[i].title,
