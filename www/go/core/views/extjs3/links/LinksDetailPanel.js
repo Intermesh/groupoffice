@@ -32,7 +32,11 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 					if(!this.origTitle) {
 						this.origTitle = this.title;
 					}
-					var badge = "<span class='badge'>" + this.store.getTotalCount() + "</span>";
+					var count = this.store.getTotalCount();
+					if(this.store.hasMore) {
+						count += '+';
+					}
+					var badge = "<span class='badge'>" + count + "</span>";
 					this.setTitle(this.origTitle + badge);
 				},
 				scope: this

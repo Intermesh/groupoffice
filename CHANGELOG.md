@@ -1,3 +1,5 @@
+- Address book: Fixed import skipping row and updating records by id or email
+
 18-05-2021 6.5.51
 - Onlyoffice: Open documents in read only mode when not having manage permissions for the module
 - Email: When opening attachments it's saved to a temporary file so it can be opened by
