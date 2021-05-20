@@ -91,7 +91,7 @@ class PushDispatcher
 		foreach($alerts as $alert) {
 			$data = $alert->toArray();
 			$data['entityType'] = $this->entityTypes[$alert->entityTypeId];
-			unset($data['enittyTypeId']);
+			unset($data['entityTypeId']);
 			$this->sendMessage('alert', $data);
 			$alert->sentAt = new \DateTime();
 			$alert->save();

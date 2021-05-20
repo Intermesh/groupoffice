@@ -41,7 +41,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 		if(!$blob || $blob->modifiedAt < $task->modifiedAt) {
 			// task to vtodo
 			$parser = new VCalendar();
-			$data = $parser->export($task);
+			$data = $parser->exportCalendar($task);
 			$blob = Blob::fromString($data);
 			$blob->type = 'text/vcalendar';
 			$blob->name = $task->getUri();
@@ -437,8 +437,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 //				$monthsOld = \GO::config()->caldav_max_months_old;
 //				$monthsOld = 0 - $monthsOld;
 
-				$tasks = Task::find()
-					->where(['tasklistId'=>$calendar->tasklist_id])
+				$tasks = Task::find()->filter(['tasklistId', $calendar->tasklist_id])
 					//->andWhere('due > (NOW() - INTERVAL '.$monthsOld.' MONTH)') // DUE can be NULL
 					->all();
 
@@ -929,7 +928,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 			if($calendar->tasklist_id>0)
 			{
-				$result['added'] = array_merge($result['added'],  Task::find(['uri'])->where(['tasklistId'=>$calendar->tasklist_id])->execute()->fetchColumn());
+				$result['added'] = array_merge($result['added'],  Task::find(['uri'])->filter(['tasklistId'=>$calendar->tasklist_id])->execute()->fetchColumn());
 			}
 		}
 		return $result;
