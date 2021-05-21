@@ -10,6 +10,7 @@ namespace go\modules\community\tasks\model;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Expression;
 use go\core\orm\CustomFieldsTrait;
+use go\core\model\User;
 use go\core\orm\EntityType;
 use go\core\orm\SearchableTrait;
 use go\core\db\Criteria;
@@ -172,6 +173,7 @@ class Task extends AclItemEntity {
 			->addMap('group', TasklistGroup::class, ['groupId' => 'id'])
 			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId'])
 			->addScalar('hours', 'pr2_hours', ['id' => 'task_id']);
+//			->addScalar('responsibleUser', 'core_user',['responsibleUserId' => 'id']);
 	}
 
 	public function getTimeBooked()
@@ -300,6 +302,10 @@ class Task extends AclItemEntity {
 			} else {
 				$this->recurrenceRule = null;
 			}
+		}
+		// If a task is saved for a project, check whether an actual task list exists.
+		if(isset($this->projectId) && empty($this->tasklistId)) {
+			Tasklist::saveForProject($this->projectId);
 		}
 
 		$success = parent::internalSave();

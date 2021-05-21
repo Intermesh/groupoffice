@@ -174,7 +174,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 					{xtype:'hidden', name: 'tasklistId'},
 					{xtype:'hidden', name: 'groupId'},
 					{
-						xtype:'chips',
 						xtype: "chips",
 						entityStore: "TaskCategory",
 						displayField: "name",

@@ -4,30 +4,42 @@
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
  */
+
 namespace go\modules\community\tasks\controller;
 
 use go\core\jmap\EntityController;
 use go\modules\community\tasks\model;
 
-class Tasklist extends EntityController {
+class Tasklist extends EntityController
+{
 
-    protected function entityClass() {
-        return model\Tasklist::class;
-    }
+	protected function entityClass()
+	{
+		return model\Tasklist::class;
+	}
 
-    public function query($params) {
-        return $this->defaultQuery($params);
-    }
+	public function query($params)
+	{
+		if (go()->getModule(null, 'projects2')) {
+			if (isset($params['filter']) && isset($params['filter']['projectId']) && is_int($params['filter']['projectId'])) {
+				model\Tasklist::saveForProject($params['filter']['projectId']);
+			}
+		}
+		return $this->defaultQuery($params);
+	}
 
-    public function get($params) {
-        return $this->defaultGet($params);
-    }
+	public function get($params)
+	{
+		return $this->defaultGet($params);
+	}
 
-    public function set($params) {
-        return $this->defaultSet($params);
-    }
+	public function set($params)
+	{
+		return $this->defaultSet($params);
+	}
 
-    public function changes($params) {
-        return $this->defaultChanges($params);
-    }
+	public function changes($params)
+	{
+		return $this->defaultChanges($params);
+	}
 }

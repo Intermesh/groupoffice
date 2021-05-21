@@ -140,7 +140,12 @@ class Router {
 
 			//Very ugly hack
 			if($entityType->getName() == "Project") {
-				$controllerClass = "go\\modules\\business\\projects\\controller\\Project";
+				// JH Added to the ugly hack. Need a bit of JMAP for the old projects as well
+				if(go()->getModule('business', 'projects')) {
+					$controllerClass = "go\\modules\\business\\projects\\controller\\Project";
+				} else {
+					$controllerClass = 'GO\\Projects2\\Controller\\ProjectEntityController';
+				}
 			} else {
 				$controllerClass = str_ireplace("model", "controller", $entityType->getClassName());
 			}
