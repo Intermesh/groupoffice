@@ -239,11 +239,14 @@ class Task extends AclItemEntity {
 			->add('tasklistId', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
 					$criteria->where(['tasklistId' => $value]);
-				} else if(!$query->isJoined("tasks_tasklist", "listsonly") ){
-					$query->join("tasks_tasklist", "listsonly", "task.tasklistId = listsonly.id")
-						->where(['listsonly.role' => Tasklist::List]);
 				}
 			}, [])
+			->add('role', function(Criteria $criteria, $value, Query $query) {
+				if(!$query->isJoined("tasks_tasklist", "listsonly") ){
+					$query->join("tasks_tasklist", "listsonly", "task.tasklistId = listsonly.id");
+				}
+				$criteria->where(['listsonly.role' => $value]);
+			})
 			->add('categories', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
 					$query->join("tasks_task_category","categories","task.id = categories.taskId")

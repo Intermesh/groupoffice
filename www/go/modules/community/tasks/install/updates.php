@@ -20,44 +20,45 @@ $updates['201911061630'][] = function(){
 
 // insert function
 $updates['201911061630'][] = function(){
+// MS: Is this code still relevant?
 
-	$stmt =\GO::getDbConnection()->query("SELECT * FROM ta_tasks");
-
-	while($row = $stmt->fetch()) {
-		$needles = ["COUNT","UNTIL","INTERVAL","FREQ","BYDAY"];
-		$haystack = ["count","until","interval","frequency","byDay"];
-		$data = [];
-		$data['recurrenceRule'] = str_replace($needles,$haystack,$row["rrule"]);
-
-		$rrule = new Rrule();
-		$rrule->readIcalendarRruleString($row["start_time"], $row['rrule']);
-
-		$days = $rrule->byday;
-		$newDays = [];
-		foreach($days as $day) {
-			$day = str_replace($rrule->bysetpos,"",$day);
-			$newDays[] = ['day' => $day, 'position' => $rrule->bysetpos];
-		}
-
-		$rrule->byday = $newDays;
-
-		$recurrencePattern = [
-			'frequency' => $rrule->freq,
-			'bySetPosition' => $rrule->bysetpos,
-			'interval' => $rrule->interval,
-			'byDay' =>  $rrule->byday
-		];
-
-		if($rrule->until) {
-			$rrule->until = DateTime::createFromFormat( 'U', $rrule->until);
-			$recurrencePattern['until'] = $rrule->until;
-		} else {
-			$recurrencePattern['count'] = $rrule->count;
-		}
-
-		$data['recurrenceRule'] = json_encode($recurrencePattern);
-		GO()->getDbConnection()->insertIgnore('tasks_task', $data)->execute();
-	}
+//	$stmt =\GO::getDbConnection()->query("SELECT * FROM ta_tasks");
+//
+//	while($row = $stmt->fetch()) {
+//		$needles = ["COUNT","UNTIL","INTERVAL","FREQ","BYDAY"];
+//		$haystack = ["count","until","interval","frequency","byDay"];
+//		$data = [];
+//		$data['recurrenceRule'] = str_replace($needles,$haystack,$row["rrule"]);
+//
+//		$rrule = new Rrule();
+//		$rrule->readIcalendarRruleString($row["start_time"], $row['rrule']);
+//
+//		$days = $rrule->byday;
+//		$newDays = [];
+//		foreach($days as $day) {
+//			$day = str_replace($rrule->bysetpos,"",$day);
+//			$newDays[] = ['day' => $day, 'position' => $rrule->bysetpos];
+//		}
+//
+//		$rrule->byday = $newDays;
+//
+//		$recurrencePattern = [
+//			'frequency' => $rrule->freq,
+//			'bySetPosition' => $rrule->bysetpos,
+//			'interval' => $rrule->interval,
+//			'byDay' =>  $rrule->byday
+//		];
+//
+//		if($rrule->until) {
+//			$rrule->until = DateTime::createFromFormat( 'U', $rrule->until);
+//			$recurrencePattern['until'] = $rrule->until;
+//		} else {
+//			$recurrencePattern['count'] = $rrule->count;
+//		}
+//
+//		$data['recurrenceRule'] = json_encode($recurrencePattern);
+//		GO()->getDbConnection()->insertIgnore('tasks_task', $data)->execute();
+//	}
 
 };
 
