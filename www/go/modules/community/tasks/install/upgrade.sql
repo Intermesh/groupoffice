@@ -270,8 +270,7 @@ COLLATE = utf8mb4_unicode_ci;
 
 INSERT INTO tasks_portlet_tasklist (`createdBy`, `tasklistId`)
     SELECT user_id, tasklist_id FROM ta_portlet_tasklists;
-INSERT INTO tasks_task_custom_fields (`id`)
-    SELECT id FROM ta_tasks_custom_fields;
+
 INSERT INTO tasks_tasklist (`id`, `role`, `name`, `createdBy`, `aclId`, `filesFolderId`, `version`)
     SELECT id, '1', `name`, user_id, acl_id, files_folder_id, version FROM ta_tasklists;
 INSERT INTO tasks_category (`id`, `name`, `createdBy`)
@@ -282,8 +281,8 @@ INSERT INTO tasks_task (id,uid,tasklistId,createdBy, createdAt, modifiedAt, modi
        completion_time, `name`, description, files_folder_id, priority, percentage_complete FROM ta_tasks;
 INSERT INTO tasks_task_category (taskId,categoryId)
     SELECT id,category_id FROM ta_tasks;
-INSERT INTO tasks_alert (taskIs, userId, `when`)
-    SELECT id,reminder,user_id FROM ta_tasks
+INSERT INTO tasks_alert (taskId, userId, `when`)
+    SELECT id,reminder,user_id FROM ta_tasks;
 
 
 

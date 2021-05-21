@@ -12,7 +12,7 @@ $updates['201911061630'][] = function(){
 	$stmt =\GO::getDbConnection()->query("SELECT id, rrule,`start_time` FROM ta_tasks WHERE rrule != ''");
 
 	while($row = $stmt->fetch()) {
-		$rrule = new \go\modules\community\tasks\model\Recurrence($row['rrule'], new DateTime($row["start_time"]));
+		$rrule = new \go\modules\community\tasks\model\Recurrence($row['rrule'], new DateTime("@" . $row["start_time"]));
 		$data = ['recurrenceRule' => json_encode($rrule->toArray())];
 		go()->getDbConnection()->updateIgnore('tasks_task', $data, ['id'=>$row['id']])->execute();
 	}
