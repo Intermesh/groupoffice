@@ -157,6 +157,13 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 		}];
 
 		if(!this.forDetailView) {
+
+			cols.push({
+				id: "IP",
+				header: "IP",
+				dataIndex: "remoteIp"
+			});
+
 			cols.splice(1,0, {
 				header: t('Name'),
 				dataIndex: 'description',
@@ -172,7 +179,17 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 
 		Ext.applyIf(this,{
 			store: new go.data.Store({
-				fields: [{name:'createdAt',type:'date'},'id', 'entity', 'action','changes','createdBy', 'description',{name: 'creator', type: "relation"}],
+				fields: [
+					{name:'createdAt',type:'date'},
+					'id',
+					'entity',
+					'action',
+					'changes',
+					'createdBy',
+					'description',
+					{name: 'creator', type: "relation"},
+					'remoteIp'
+				],
 				baseParams: {sort: [{property: "id", isAscending:false}]},
 				entityStore: "LogEntry"
 			}),

@@ -72,8 +72,8 @@ class Debugger {
 	
 	public function __construct() {
 		try {
-			if(!empty(go()->getConfig()['core']['general']['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug')) {
-				$this->enable(go()->getConfig()['core']['general']['debugLog']);
+			if(!empty(go()->getConfig()['debug']) && (!isset($_REQUEST['r']) || $_REQUEST['r']!='core/debug')) {
+				$this->enable(go()->getConfig()['debug_log']);
 			}
 
 		} catch (\go\core\exception\ConfigurationException $e) {

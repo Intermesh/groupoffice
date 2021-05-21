@@ -382,8 +382,13 @@ abstract class AclOwnerEntity extends AclEntity {
 	 */
 	public static function check()
 	{
-		$table = static::getMapping()->getPrimaryTable();
+		static::checkAcls();
 
+		parent::check();
+	}
+
+	public static function checkAcls() {
+		$table = static::getMapping()->getPrimaryTable();
 
 		//set owner and entity properties of acl
 		$aclColumn = static::getMapping()->getColumn(static::$aclColumnName);
@@ -392,7 +397,7 @@ abstract class AclOwnerEntity extends AclEntity {
 			'acl.entityTypeId' => static::entityType()->getId(),
 			'acl.entityId' => new Expression('entity.id'),
 			'acl.usedIn' => $aclColumn->table->getName() . '.' . static::$aclColumnName
-			];
+		];
 
 		$createdByColumn = static::getMapping()->getColumn('createdBy');
 
@@ -411,17 +416,14 @@ abstract class AclOwnerEntity extends AclEntity {
 		}
 
 		$stmt = go()->getDbConnection()->update(
-      'core_acl', 
-      $updates,
-      (new Query())
-        ->tableAlias('acl')
-        ->join($table->getName(), 'entity', 'entity.' . static::$aclColumnName . ' = acl.id'));
-  
+			'core_acl',
+			$updates,
+			(new Query())
+				->tableAlias('acl')
+				->join($table->getName(), 'entity', 'entity.' . static::$aclColumnName . ' = acl.id'));
+
 		if(!$stmt->execute()) {
 			throw new Exception("Could not update ACL");
 		}
-
-		parent::check();
 	}
-
 }

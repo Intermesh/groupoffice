@@ -109,7 +109,11 @@ abstract class EntityController extends Controller {
 		$query->select($cls::getPrimaryKey(true)); //only select primary key
 
 		$query->filter($params['filter']);
-		
+
+		// Only return readable ID's
+		if($cls::getFilters()->hasFilter('permissionLevel') &&  !$cls::getFilters()->isUsed('permissionLevel')) {
+			$query->filter(['permissionLevel' => Acl::LEVEL_READ]);
+		}
 		return $query;
 	}
 	
@@ -159,11 +163,6 @@ abstract class EntityController extends Controller {
 
 		$cls = $this->entityClass();
 
-		// Make sure permissions are filtered
-		if(empty($params['filter']['permissionLevel']) && $cls::getFilters()->hasFilter('permissionLevel')) {
-			$params['filter']['permissionLevel'] = Acl::LEVEL_READ;
-		}
-		
 		if(!isset($params['accountId'])) {
 			$params['accountId'] = null;
 		}

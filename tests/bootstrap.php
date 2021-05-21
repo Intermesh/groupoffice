@@ -14,7 +14,7 @@ const INSTALL_NEW = 0;
 const INSTALL_UPGRADE = 1;
 const INSTALL_NONE = 2;
 
-$installDb = INSTALL_NONE;
+$installDb = INSTALL_NEW;
 
 $autoLoader = require(__DIR__ . "/../www/vendor/autoload.php");
 $autoLoader->add('go\\', __DIR__);
@@ -22,18 +22,16 @@ $autoLoader->add('go\\', __DIR__);
 $dataFolder = new \go\core\fs\Folder(__DIR__ . '/data');
 
 
-$config = parse_ini_file(__DIR__ . '/config.ini', true);
-$config['general']['dataPath'] = $dataFolder->getPath();
-$config['general']['tmpPath'] = $dataFolder->getFolder('tmp')->getPath();
-$config['branding']['name'] = 'Group-Office';
+require(__DIR__ . "/config.php");
+$config['file_storage_path'] = $dataFolder->getPath();
+$config['tmpdir'] = $dataFolder->getFolder('tmp')->getPath();
 
 if($installDb == INSTALL_NEW || $installDb == INSTALL_UPGRADE) {
 	$dataFolder->delete();
 	$dataFolder->create();
 
 	//connect to server without database
-	$dsn = \go\core\db\Utils::parseDSN($config['db']['dsn']);	
-	$pdo = new PDO('mysql:host='. $dsn['options']['host'], $config['db']['username'], $config['db']['password']);
+	$pdo = new PDO('mysql:host='. $config['db_host'], $config['db_user'], $config['db_pass']);
 
 	try {
 		echo "Dropping database 'groupoffice-phpunit'\n";
@@ -50,9 +48,10 @@ if($installDb == INSTALL_NEW || $installDb == INSTALL_UPGRADE) {
 //Install fresh DB
 App::get(); //for autoload
 try {
-	go()->setConfig(["core" => $config, 'cache' => \go\core\cache\Apcu::class]);
-	//App::get()->getCache()->flush(false);
-	
+	$c = new core\util\ArrayObject(go()->getConfig());
+	$c->mergeRecursive($config);
+	go()->setConfig($c->getArray());
+
 	if($installDb == INSTALL_NEW) {
 
 	  echo "Running install\n";

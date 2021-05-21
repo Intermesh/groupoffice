@@ -763,7 +763,6 @@ return array (
   'Current password required' => 'Mot de passe actuel requis',
   'Change search condition' => 'Changer les conditions de recherche',
   'Domain' => 'Domaine',
-  'product_name' => 'GroupOffice',
   'Use $config' => 
   array (
     '\'debug\'' => 'Utilisez la variable $config[\'debug\'] = true; seulement en cas de développement ou de résolution de problémes. Cela va ralentir l\'exécution de " +t(product_name',

@@ -1,7 +1,65 @@
+20-05-2021 6.5.52
+- Address book: Fixed import skipping row and updating records by id or email
+- Core: If link panel has more than 5 items it shows count 5+ instead of 5 when collapsed now
+- Core: New option for users to confirm move of contacts, projects and files.
+- Address book: Add read only address books to birthday portlet
+
+18-05-2021 6.5.51
+- Onlyoffice: Open documents in read only mode when not having manage permissions for the module
+- Email: When opening attachments it's saved to a temporary file so it can be opened by
+  file module integrations like OnlyOffice, Microsoft office online, libreoffice etc.
+- Core: Fixed safari 14.1 wrong button color when button was disabled previously
+- Start page: Auto height for news portlet
+- Core: Added Mongolian (Монгол хэл) translation
+- Calendar: All categories are visible (even with permission) #700
+- Billing: Without manage permissions, you couldn't see totals. This was removed.
+- Email: Don't change invalid email addresses into "unknown@unknown.domain"
+
+17-05-2021 6.5.50
+- Core: save 0-values correctly for numeric Custom FIelds
+- Core: bugfix in function custom fields and zero values
+- Projects: sort employees by name
+- Time registration: sort employee combo by name
+- Addressbook: Correct counts in select contact dialog
+- Addressbook: Better pefromance on large database
+- Core: Fixed about dialog.
+- Projects: Supplier company name not shown in expense budget grid
+- Address book: Brought back starred function but as folder now
+- Email: Work around if label is called "labels"
+
+11-05-2021 6.5.49
+- Core: Fixed fresh manual install
+- Projects: Error on time tracking PDF report
+- Projects: Finance report doesn't show projects with no data anymore
+
+11-05-2021 6.5.48
+- Files: Don't show all shares to admins by default
+- Core: Add UTF-8 BOM character to CSV exports so Excel recognizes it as UTF-8
+- Tickets: Ticket dialog can select users too
+- Core: Some bugs came from removing admin from acl's. for example email showing all accounts for admin.
+
+10-05-2021 6.5.47
+- History: Add remote IP address
+- Core: Several PT-BR language corrections
+- Core: Search cache is truncated on upgrade and rebuilt by cron
+- Core: DB indexes are no longer removed by build search index
+- Files: User home dir is a user propery which can also be mapped with LDAP authentication
+- Core: Keep scroll posistion when toggling modules
+- Core: Remove all "Admin" group entries from ACL and handle admin permissions programmatically. This slims down the Acl table.
+- Core: Select text when focusing search fields
+- Leavedays: Fixed holiday conflict check
+- LDAPauth: fixed default values for compatibility with some mysql servers
+- Caldav: Wrong module was checked for permissions
+
+04-05-2021 6.5.46
 - Core: Added support for default subfolder for document templates
 - OnlyOffice: Fixed OnlyOffice printing, download as and editing tables, images etc.
 - ActiveSync: Support multiple calendars, address books and task lists.
 - ActiveSync: Create task lsits and calendars from mobile device.
+- Core: Fixed "Change in requesting notifications stops Firefox working #690"
+- Core: UI could break when dragging some windows out of the viewport
+- Core: remove old log module entry
+- Address book: Middle name was missing when sorting names by last name.
 
 29-04-2021 6.5.45
 - Core: Minor change in requesting notifications
@@ -79,6 +137,15 @@
 
 
 6.4.244
+6.4.236
+- Core: Better handling of zero-values in numeric custom fields
+- Core: Fixed zero values of numeric custom fields in function CF
+
+10-05-2021 6.4.235
+- Calendar: fix behaviour of copy button in list view
+- Billing: Fixed error "Incorrect integer valie for 'order_at_supplier'"
+- Leavedays: Fixed calendar conflict check
+
 29-04-2021 6.4.234
 - Email: remember dimensions attachment save as dialog
 - Calendar: Fixed availability check and added more buttons to improve usability

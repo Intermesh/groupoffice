@@ -127,10 +127,10 @@ class Module extends core\Module {
 			return false;
 		}
 
-		$roAcl = Acl::getReadOnlyAcl();
-		$folder = Folder::model()->findByPath('addressbook', true, ['acl_id' => $roAcl->id]);
-		if($folder->acl_id != $roAcl->id) {
-			$folder->acl_id = $roAcl->id;
+		$roAclId = Acl::getReadOnlyAclId();
+		$folder = Folder::model()->findByPath('addressbook', true, ['acl_id' => $roAclId]);
+		if($folder->acl_id != $roAclId) {
+			$folder->acl_id = $roAclId;
 			$folder->save(true);
 		}
 

@@ -22,10 +22,10 @@ class UserLogFile extends \GO\Base\Fs\File{
 		$userFolderModel = \GO\Files\Model\Folder::model()->findHomeFolder(\GO::user());
 
 		if (empty($userFolderModel)) {
-			$userFolder = new \GO\Base\Fs\Folder(\GO\Files\Model\Folder::getUserHomePath(\GO::user()->username, true));
+			$userFolder = new \GO\Base\Fs\Folder(\GO::config()->file_storage_path . \GO::user()->username);
 			$userFolder->create();
 			$userFolderModel = new \GO\Files\Model\Folder();
-			$userFolderModel->findByPath(\GO\Files\Model\Folder::getUserHomePath(\GO::user()->username),true);
+			$userFolderModel->findByPath(\GO::user()->username,true);
 		}
 		
 		parent::__construct(

@@ -2,7 +2,7 @@
 require('../vendor/autoload.php');
 \go\core\App::get();
 
-if($_SERVER['REQUEST_METHOD'] == "POST" || go()->getConfig()['core']['general']['servermanager']) {
+if($_SERVER['REQUEST_METHOD'] == "POST" || go()->getConfig()['servermanager']) {
 	header('Location: configfile.php');
 	exit();	
 }

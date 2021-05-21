@@ -1084,7 +1084,7 @@ Jeśli nie wysyłełeś prośby o zmianę hasła to skasuj tą wiadomość.',
   'Bad username or password' => 'Nieprawidłowy użytkownik lub hasło',
   'Enter your email address' => 'Wpisz adres e-mail',
   'Recovery e-mail sent' => 'Wiadomość odzyskiwania hasła została wysłana',
-  'product_name' => 'GroupOffice',
+
   'Reset password' => 'Zresetuj hasło',
   'Loading' => 'Trwa ładowanie',
   'Change' => 'Zmień',

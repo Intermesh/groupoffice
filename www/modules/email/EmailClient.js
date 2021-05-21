@@ -1316,7 +1316,7 @@ GO.mainLayout.onReady(function(){
 			icon: 'views/Extjs3/themes/Paper/img/notify/email.png',
 			tag: "email"
 		}).catch((e) => {
-			//ignore failure
+			console.warn("Notification failed: " + e);
 		});
 
 		go.Notifier.playSound('message-new-email', 'email');
@@ -1405,6 +1405,8 @@ GO.email.saveAttachment = function(attachment,panel)
 		});
 	}
 
+
+
 GO.email.openAttachment = function(attachment, panel, forceDownload)
 	{
 		if(!panel)
@@ -1413,39 +1415,21 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 		if(!attachment)
 			return false;
 
-		var params = {
-			action:'attachment',
-			account_id: panel.account_id,
-			mailbox: panel.mailbox,
-			uid: panel.uid,
-			number: attachment.number,
-			uuencoded_partnumber: attachment.uuencoded_partnumber,
-			encoding: attachment.encoding,
-			type: attachment.type,
-			subtype: attachment.subtype,
-			filename:attachment.name,
-			charset:attachment.charset,
-			sender:panel.data.sender, //for gnupg and smime,
-			filepath:panel.data.path ? panel.data.path : '' //In some cases encrypted messages are temporary stored on disk so the handlers must use that to fetch the data.
+		if(forceDownload) {
+			attachment.url += '&inline=0';
+			go.util.downloadFile(attachment.url);
+			return;
 		}
 
-		var url_params = '?';
-		for(var name in params){
-			url_params+= name+'='+encodeURIComponent(params[name])+'&';
+		if(go.Modules.isAvailable('legacy', 'files')) {
+			return GO.files.openEmailAttachment(attachment, panel, false);
 		}
-		url_params = url_params.substring(0,url_params.length-1);
 
 		if(!forceDownload && (attachment.mime=='message/rfc822' || attachment.mime=='application/eml'))
 		{
 			GO.email.showMessageAttachment(0, params);
 		}else
 		{
-			if(forceDownload) {
-				attachment.url += '&inline=0';
-				go.util.downloadFile(attachment.url);
-				return;
-			}
-
 			switch(attachment.extension)
 			{
 				case 'ics':

@@ -242,6 +242,11 @@
 				return Promise.reject("Notifications not supported");
 			}
 
+
+			if(!window.isSecureContext) {
+				return Promise.reject("Notifications only work in secure context");
+			}
+
 			var title = msg.title || t("Reminders");
 
 			msg.icon = msg.icon || GO.settings.config.full_url + 'views/Extjs3/themes/Paper/img/notify/reminder.png';

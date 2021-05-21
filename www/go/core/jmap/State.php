@@ -152,6 +152,23 @@ class State extends AbstractState {
 		return $url;
 	}
 
+	public function getPageUrl() {
+		return $this->getBaseUrl(). "/page.php";
+	}
+	
+	public function getApiUrl() {
+		return $this->getBaseUrl() . '/jmap.php';
+	}
+	
+	public function getUploadUrl() {
+		return $this->getBaseUrl(). '/upload.php';
+	}
+	
+	public function getEventSourceUrl() {
+		return go()->getConfig()['sseEnabled'] ? $this->getBaseUrl() . '/sse.php' : null;
+	}
+
+
 	public function getSession() {
 		$response = [
 			'version' => go()->getVersion(),

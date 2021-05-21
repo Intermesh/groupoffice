@@ -3,6 +3,7 @@
 namespace go\core;
 
 use Exception;
+use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Utils;
 use go\core\exception\NotFound;
 use go\core\fs\File;
@@ -628,18 +629,19 @@ abstract class Module extends Singleton {
 	}
 
 	/**
-	 * Check if this module is installed, available and licensed
+	 * Check if this module is allowed via config.php and licensed.
+	 *
+	 * It does not check it's installed!
 	 * 
 	 * @return bool
 	 */
 	public function isAvailable() {
 
-		$model = $this->getModel();
-		if(!$model || $model->enabled == false) {
+		if(!\GO\Base\ModuleCollection::isAllowed($this->getName(), $this->getPackage())) {
 			return false;
 		}
 
-		return $model->isAvailable();
+		return $this->isLicensed();
 	}
 	
 	/**
@@ -662,6 +664,15 @@ abstract class Module extends Singleton {
 		foreach($entities as $entity) {
 			echo "Checking " . $entity . "\n";
 			$entity::check();
+			echo "Done\n";
+		}
+	}
+
+	public function checkAcls() {
+		$entities = $this->getClassFinder()->findByParent(AclOwnerEntity::class);
+		foreach($entities as $entity) {
+			echo "Checking " . $entity . "\n";
+			$entity::checkAcls();
 			echo "Done\n";
 		}
 	}

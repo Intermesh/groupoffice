@@ -310,7 +310,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 
 		this.getTopToolbar().getComponent("edit").setDisabled(this.data.permissionLevel < go.permissionLevels.write);
 		this.deleteItem.setDisabled(this.data.permissionLevel < go.permissionLevels.writeAndDelete);
-		// this.starItem.setIconClass(this.data.starred ? "ic-star" : "ic-star-border");
+		this.starItem.setIconClass(this.data.starred ? "ic-star" : "ic-star-border");
 		go.modules.community.addressbook.ContactDetail.superclass.onLoad.call(this);
 	},
 
@@ -342,20 +342,20 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 			this.moreMenu ={
 				iconCls: 'ic-more-vert',
 				menu: [
-					// this.starItem = new Ext.menu.Item({
-					// 	iconCls: "ic-star",
-					// 	text: t("Star"),
-					// 	handler: function () {
-					// 		var update = {};
-					// 		update[this.currentId] = {starred: this.data.starred ? null : true};
-					//
-					// 		go.Db.store("Contact").set({
-					// 			update: update
-					// 		});
-					// 	},
-					// 	scope: this
-					// }),
-					// '-',
+					this.starItem = new Ext.menu.Item({
+						iconCls: "ic-star",
+						text: t("Star"),
+						handler: function () {
+							var update = {};
+							update[this.currentId] = {starred: this.data.starred ? null : true};
+
+							go.Db.store("Contact").set({
+								update: update
+							});
+						},
+						scope: this
+					}),
+					'-',
 					{
 						iconCls: "ic-print",
 						text: t("Print"),

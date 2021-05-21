@@ -409,6 +409,20 @@ go.grid.GridTrait = {
 				this.headerMenu.add(item)
 			}
 		}
+		//Sort menu alphabetically
+		this.headerMenu.items.sort("ASC", function(a, b){
+			// Use toUpperCase() to ignore character casing
+			var colA = a.text.toUpperCase();
+			var colB = b.text.toUpperCase();
+
+			var comparison = 0;
+			if (colA > colB) {
+				comparison = 1;
+			} else if (colA < colB) {
+				comparison = -1;
+			}
+			return comparison;
+		});
 		this.headerMenu.show(el, "tr-br?")
 	}
 }

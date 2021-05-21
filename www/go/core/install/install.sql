@@ -250,7 +250,9 @@ CREATE TABLE `core_user` (
   `sort_email_addresses_by_time` tinyint(1) NOT NULL DEFAULT 0,
   `no_reminders` tinyint(1) NOT NULL DEFAULT 0,
   `last_password_change` int(11) NOT NULL DEFAULT 0,
-  `force_password_change` tinyint(1) NOT NULL DEFAULT 0
+  `force_password_change` tinyint(1) NOT NULL DEFAULT 0,
+  `homeDir` varchar (190) not null,
+  `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB;
 
 CREATE TABLE `core_user_custom_fields` (

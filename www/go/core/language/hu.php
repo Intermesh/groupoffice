@@ -858,7 +858,7 @@ Minden jog fenntartva.<br />
   'A server error occurred.' => 'Szerverhiba történt.',
   'Recovery e-mail sent' => 'Recovery küldött e-mail',
   'An e-mail with instructions has been sent to your e-mail address.' => 'Elküldtünk egy e-mailt utasításokkal a megadott e-mail címre.',
-  'product_name' => 'termék név',
+
   'Warning! Debug mode enabled' => 'Figyelem! Debug mód engedélyezve',
   'Use $config' => 
   array (
