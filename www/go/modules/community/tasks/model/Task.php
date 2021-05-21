@@ -240,7 +240,16 @@ class Task extends AclItemEntity {
 		return $this->description;
 	}
 
+	public static function filter(Query $query, array $filter) {
+		if(empty($filter['tasklistId'])) {
+			$query->join("tasks_tasklist", "tasklist", "task.tasklistId = tasklist.id")
+				->where(['tasklist.role' => Tasklist::List]);
+		}
+		return parent::filter($query, $filter);
+	}
+
 	protected static function defineFilters() {
+
 		return parent::defineFilters()
 			->add('tasklistId', function(Criteria $criteria, $value) {
 				if(!empty($value)) {

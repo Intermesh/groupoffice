@@ -73,9 +73,9 @@ class VCalendar extends AbstractConverter {
 				->fetchMode(\PDO::FETCH_COLUMN, 0)
 				->execute();
 		}
-		$calendar->add($vtodo);
-
-		return $calendar->serialize();
+		return $vtodo->serialize();
+//		$calendar->add($vtodo);
+//		return $calendar->serialize();
 	}
 
 	private $tempFile;
@@ -103,23 +103,24 @@ class VCalendar extends AbstractConverter {
 	}
 
 	protected function exportEntity(Entity $entity) {
-		fputs($this->fp, $this->export($entity));
+		$data = $this->export($entity);
+		fputs($this->fp, $data);
 	}
 
+	// used in caldav (has 1 calendar wrapped per item)
+	public function exportCalendar(Task $task) {
+		$result = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Intermesh//NONSGML Group-Office ".go()->getVersion()."//EN\r\n";
+		$result .= (new \GO\Base\VObject\VTimezone())->serialize();
+		$result .= $this->export($task);
+		return $result . "END:VCALENDAR\r\n";
+	}
 
 	protected function internalExport($fp, $entities, $total) {
-		fputs($fp, "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Intermesh//NONSGML Group-Office ".go()->getVersion()."//EN\r\n");
 
-		$t = new \GO\Base\VObject\VTimezone();
-		fputs($fp, $t->serialize());
-
-		$i = 0;
 		foreach($entities as $entity) {
 			fputs($fp, $this->export($entity));
-			$i++;
+			//$i++;
 		}
-
-		fputs($fp, "END:VCALENDAR\r\n");
 	}
 
 	public function getFileExtension() {
