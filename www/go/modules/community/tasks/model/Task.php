@@ -16,6 +16,7 @@ use go\core\orm\SearchableTrait;
 use go\core\db\Criteria;
 use go\core\orm\Query;
 use go\core\util\DateTime;
+use go\modules\community\tasks\convert\VCalendar;
 
 /**
  * Task model
@@ -42,8 +43,8 @@ class Task extends AclItemEntity {
 	/** @var int used for the kanban groups */
 	public $groupId;
 
-    /** @var int */
-    public $projectId ;
+  /** @var int */
+  public $projectId ;
 
 	/** @var int */
 	public $createdBy;
@@ -57,20 +58,20 @@ class Task extends AclItemEntity {
 	/** @var int */
 	public $modifiedBy;
 
-    /** @var int */
-    public $filesFolderId;
+  /** @var int */
+  public $filesFolderId;
 
-    /** @var DateTime due date (when this should be finished) */
-    public $due;
+  /** @var DateTime due date (when this should be finished) */
+  public $due;
 
 	/** @var DateTime local date when this task will be started */
 	public $start;
 
 	/** @var Duration Estimated positive duration the task takes to complete. */
-    public $estimatedDuration;
+  public $estimatedDuration;
 
-    /** @var Progress Defines the progress of this task */
-    protected $progress = Progress::NeedsAction;
+  /** @var Progress Defines the progress of this task */
+  protected $progress = Progress::NeedsAction;
 
 	/** @var DateTime When the "progress" of either the task or a specific participant was last updated. */
 	public $progressUpdated;
@@ -116,14 +117,14 @@ class Task extends AclItemEntity {
      */
 	//public $recurrenceId;
 
-    /** @var Recurrence */
-    protected $recurrenceRule;
+  /** @var Recurrence */
+  protected $recurrenceRule;
 
-    /** @var DateTime[PatchObject] map of recurrenceId => Task */
-    //protected $recurrenceOverrides;
+  /** @var DateTime[PatchObject] map of recurrenceId => Task */
+  //protected $recurrenceOverrides;
 
-    /** @var boolean only set in recurrenceOverrides */
-    //protected $excluded;
+  /** @var boolean only set in recurrenceOverrides */
+  //protected $excluded;
 
 	/** @var int [0-9] 1 = highest priority, 9 = lowest, 0 = undefined */
 	public $priority = 0;
@@ -194,11 +195,7 @@ class Task extends AclItemEntity {
 	}
 
 	public static function converters() {
-		$arr = parent::converters();
-		$arr['text/calendar'] = \go\modules\community\tasks\convert\VCalendar::class;
-		$arr['text/vcalendar'] = \go\modules\community\tasks\convert\VCalendar::class;
-		$arr['text/csv'] = \go\modules\community\tasks\convert\Csv::class;
-		return $arr;
+		return array_merge(parent::converters(), [VCalendar::class, Spreadsheet::class]);
 	}
 
 	public function getRecurrenceRule() {
@@ -232,30 +229,22 @@ class Task extends AclItemEntity {
 		return ['title', 'description'];
 	}
 
-	protected function getSearchName() {
-		return $this->title;
-	}
-
 	protected function getSearchDescription(){
 		return $this->description;
-	}
-
-	public static function filter(Query $query, array $filter) {
-		if(empty($filter['tasklistId'])) {
-			$query->join("tasks_tasklist", "tasklist", "task.tasklistId = tasklist.id")
-				->where(['tasklist.role' => Tasklist::List]);
-		}
-		return parent::filter($query, $filter);
 	}
 
 	protected static function defineFilters() {
 
 		return parent::defineFilters()
-			->add('tasklistId', function(Criteria $criteria, $value) {
+			->add('tasklistId', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
 					$criteria->where(['tasklistId' => $value]);
+				} else if(!$query->isJoined("tasks_tasklist", "listsonly") ){
+					$query->join("tasks_tasklist", "listsonly", "task.tasklistId = listsonly.id")
+						->where(['listsonly.role' => Tasklist::List]);
 				}
-			})->add('categories', function(Criteria $criteria, $value, Query $query) {
+			}, [])
+			->add('categories', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {
 					$query->join("tasks_task_category","categories","task.id = categories.taskId")
 					->where(['categories.categoryId' => $value]);
