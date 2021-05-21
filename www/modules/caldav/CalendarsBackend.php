@@ -41,7 +41,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 		if(!$blob || $blob->modifiedAt < $task->modifiedAt) {
 			// task to vtodo
 			$parser = new VCalendar();
-			$data = $parser->exportCalendar($task);
+			$data = $parser->export($task);
 			$blob = Blob::fromString($data);
 			$blob->type = 'text/vcalendar';
 			$blob->name = $task->getUri();
@@ -62,12 +62,14 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 		} else {
 			$data = $blob->getFile()->getContents();
 		}
-		return $data; /* "BEGIN:VCALENDAR\r\n".
-			"VERSION:2.0\r\n".
-			"PRODID:-//Intermesh//NONSGML Group-Office ".go()->getVersion()."//EN\r\n".
-			(new \GO\Base\VObject\VTimezone())->serialize().
-			$data.
-			"END:VCALENDAR\r\n";*/
+		return $this->wrapCalendar($data);
+	}
+
+	// used in caldav (has 1 calendar wrapped per item)
+	public function wrapCalendar($vtodoText) {
+		$begin = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Intermesh//NONSGML Group-Office ".go()->getVersion()."//EN\r\n";
+		$timezone = (new \GO\Base\VObject\VTimezone())->serialize();
+		return $begin.$timezone .$vtodoText. "END:VCALENDAR\r\n";
 	}
 
 	/**
@@ -122,7 +124,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			}
 		}
 
-		\GO::debug($this->_cachedCalendars[$principalUri]);
+		//\GO::debug($this->_cachedCalendars[$principalUri]);
 
 		return $this->_cachedCalendars[$principalUri];
 	}
@@ -291,7 +293,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 		$uid = str_replace('.ics', '',$uri);
 		return Task::find()
 			->join('cal_calendars', 'c','c.tasklist_id = task.tasklistId')
-			->where(['c.id' => $calendarId, 'task.uid' => $uid])
+			->where(['c.id' => $calendarId, 'task.uri' => $uri])
 			->single();
 	}
 
@@ -354,7 +356,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	 */
 	public function getCalendarObjects($calendarId) {
 		\GO::debug("c:getCalendarObjects($calendarId)");
-
+		$log = '';
 		//weird bug?
 		if(!\GO::user()) {
 			throw new Exception\NotAuthenticated();
@@ -413,7 +415,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				if(!$davEvent || $davEvent->mtime != $event->mtime){
 					$davEvent = CaldavModule::saveEvent($event, $davEvent);
 				}
-
+				$log .= " $event->id, $davEvent->uri \n";
 				$objects[] = array(
 					'id' => $event->id,
 					'uri' => $davEvent->uri,
@@ -437,7 +439,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 //				$monthsOld = \GO::config()->caldav_max_months_old;
 //				$monthsOld = 0 - $monthsOld;
 
-				$tasks = Task::find()->filter(['tasklistId', $calendar->tasklist_id])
+				$tasks = Task::find()->filter(['tasklistId' => $calendar->tasklist_id])
 					//->andWhere('due > (NOW() - INTERVAL '.$monthsOld.' MONTH)') // DUE can be NULL
 					->all();
 
@@ -445,6 +447,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 				foreach ($tasks as $task) {
 					$data = $this->fromBlob($task);
+					$log .= " $task->id, ".$task->getUri()." \n";
 					$objects[] = array(
 						'id' => $task->id,
 						'uri' => $task->getUri(),
@@ -457,7 +460,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			}
 		}
 
-		//\GO::debug($objects);
+		\GO::debug($log);
 
 		return $objects;
 	}
@@ -549,15 +552,10 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 		if ($event) {
 
-			\GO::debug('Found event');
-
+			\GO::debug('Found event '.$objectUri);
 			$data = ($event->mtime==$event->client_mtime && !empty($event->data)) ? $event->data : $this->exportCalendarEvent($event);
-			\GO::debug($event->mtime==$event->client_mtime ? "Returning client data (mtime)" : "Returning server data (mtime)");
-
-
-//			$data = $this->exportCalendarEvent($event);
-
-			\GO::debug($data);
+			//\GO::debug($event->mtime==$event->client_mtime ? "Returning client data (mtime)" : "Returning server data (mtime)");
+			//\GO::debug($data);
 
 			$object = array(
 				'id' => $event->id,
@@ -577,7 +575,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			$task = $this->getTaskByUri($objectUri, $calendarId);
 
 			if ($task) {
-				\GO::debug('Found task');
+				\GO::debug('Found task '.$objectUri);
 				$data = $this->fromBlob($task);
 				$object = array(
 					'id' => $task->id,
@@ -591,7 +589,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				return $object;
 			}
 		}
-		throw new Sabre\DAV\Exception\NotFound('File not found');
+		throw new Sabre\DAV\Exception\NotFound('File not found '.$objectUri);
 	}
 
 	/**
@@ -928,7 +926,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 
 			if($calendar->tasklist_id>0)
 			{
-				$result['added'] = array_merge($result['added'],  Task::find(['uri'])->filter(['tasklistId'=>$calendar->tasklist_id])->execute()->fetchColumn());
+				$result['added'] = array_merge($result['added'],  Task::find(['uri'])->filter(['tasklistId' => $calendar->tasklist_id])->execute()->fetchColumn());
 			}
 		}
 		return $result;

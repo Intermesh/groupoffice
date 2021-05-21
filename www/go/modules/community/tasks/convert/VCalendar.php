@@ -107,14 +107,6 @@ class VCalendar extends AbstractConverter {
 		fputs($this->fp, $data);
 	}
 
-	// used in caldav (has 1 calendar wrapped per item)
-	public function exportCalendar(Task $task) {
-		$result = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Intermesh//NONSGML Group-Office ".go()->getVersion()."//EN\r\n";
-		$result .= (new \GO\Base\VObject\VTimezone())->serialize();
-		$result .= $this->export($task);
-		return $result . "END:VCALENDAR\r\n";
-	}
-
 	protected function internalExport($fp, $entities, $total) {
 
 		foreach($entities as $entity) {
@@ -165,7 +157,7 @@ class VCalendar extends AbstractConverter {
 			$task = new Task();
 		}
 		$mtime = new DateTime();
-		$blob = Blob::fromString($vcal->serialize());
+		$blob = Blob::fromString($todo->serialize());
 		$blob->type = 'text/vcalendar';
 		$blob->name = ($vcal->uid ?? 'nouid' ) . '.ics';
 		$blob->modifiedAt = $mtime;
@@ -182,7 +174,7 @@ class VCalendar extends AbstractConverter {
 			"due" => $todo->DUE,
 			"title" => (string)$todo->SUMMARY,
 			"description" => (string)$todo->DESCRIPTION,
-			"priority" => (string)$todo->PRIORITY ?? 5,
+			"priority" => !empty((string)$todo->PRIORITY) ? intval((string)$todo->PRIORITY) : 5, // default normal
 			"categories" => $categoryIds,
 			"vcalendarBlobId" => $blob->id
 		]);
