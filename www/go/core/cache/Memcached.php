@@ -33,7 +33,7 @@ class Memcached implements CacheInterface {
 	private $mem;
 	
 	public function __construct() {
-		$this->prefix = go()->getConfig()['core']['db']['name'];
+		$this->prefix = go()->getConfig()['db_name'];
 		$this->mem = new \Memcached();
 
 		if(!isset(go()->getConfig()['cacheMemcachedHost'])) {

@@ -21,6 +21,8 @@ use go\core\jmap\Request;
 use go\core\jmap\State;
 use go\core\mail\Mailer;
 	use go\core\orm\Property;
+	use go\core\util\ArrayObject;
+	use go\core\util\ArrayUtil;
 	use go\core\webclient\Extjs3;
 use go\core\model\Settings;
 use const GO_CONFIG_FILE;
@@ -184,7 +186,7 @@ use const GO_CONFIG_FILE;
 		 * @throws ConfigurationException
 		 */
 		public function getDataFolder() {
-			return new Folder($this->getConfig()['core']['general']['dataPath']);
+			return new Folder($this->getConfig()['file_storage_path']);
 		}
 
 		private $storageQuota;
@@ -197,10 +199,10 @@ use const GO_CONFIG_FILE;
 		 */
 		public function getStorageQuota() {
 			if(!isset($this->storageQuota)) {
-				$this->storageQuota = $this->getConfig()['core']['limits']['storageQuota'];
+				$this->storageQuota = $this->getConfig()['quota'];
 				if(empty($this->storageQuota)) {
 					try {
-						$this->storageQuota = disk_total_space($this->getConfig()['core']['general']['dataPath']);
+						$this->storageQuota = disk_total_space($this->getConfig()['file_storage_path']);
 					}
 					catch(\Exception $e) {
 						go()->warn("Could not determine total disk space: ". $e->getMessage());
@@ -222,10 +224,10 @@ use const GO_CONFIG_FILE;
 		 */
 		public function getStorageFreeSpace() {
 			if(!isset($this->storageFreeSpace)) {
-				$quota = $this->getConfig()['core']['limits']['storageQuota'];
+				$quota = $this->getConfig()['quota'];
 				if(empty($quota)) {
 					try {
-						$this->storageFreeSpace = disk_free_space($this->getConfig()['core']['general']['dataPath']);
+						$this->storageFreeSpace = disk_free_space($this->getConfig()['file_storage_path']);
 					}
 					catch(\Exception $e) {
 						go()->warn("Could not determine free disk space: ". $e->getMessage());
@@ -248,7 +250,7 @@ use const GO_CONFIG_FILE;
 		 * @throws ConfigurationException
 		 */
 		public function getTmpFolder() {
-			return new Folder($this->getConfig()['core']['general']['tmpPath']);
+			return new Folder($this->getConfig()['tmpdir']);
 		}
 
 		private $config;
@@ -316,20 +318,8 @@ use const GO_CONFIG_FILE;
 
 
     /**
-     * Get the configuration data
+     * Get the configuration data from config.php and globalconfig.inc.php
      *
-     * ```
-     *
-     * "general" => [
-     * "dataPath" => "/foo/bar"
-     * ],
-     * "db" => [
-     * "dsn" => 'mysql:host=localhost;dbname=groupoffice,
-     * "username" => "user",
-     * "password" => "secret"
-     * ]
-     * ]
-     * ```
      * @return array
      * @throws ConfigurationException
      */
@@ -352,60 +342,52 @@ use const GO_CONFIG_FILE;
 			// 	}
 			// }
 			
-			$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
+			//$config = array_merge($this->getGlobalConfig(), $this->getInstanceConfig());
+
+			//defaults
+			$config = new ArrayObject([
+				"frameAncestors" => "",
+				"theme" => "Paper",
+				"allow_themes" => true,
+				"file_storage_path" => '/home/groupoffice',
+				"tmpdir" => sys_get_temp_dir() . '/groupoffice',
+				"debug" => false,
+				"debugEmail" => false,
+				"servermanager" => false,
+				"sseEnabled" => true,
+				"max_users" => 0,
+				'quota' => 0,
+				"allowed_modules" => "",
+				"product_name" => "Group-Office",
+
+				"db_host" => "localhost",
+				"db_port" => 3306,
+				"db_name" => "groupoffice",
+				"db_user" => "groupoffice",
+				"db_pass" => ""
+			]);
+
+			$config->mergeRecursive($this->getGlobalConfig());
+			$config->mergeRecursive($this->getInstanceConfig());
 
 			if(!isset($config['debug_log'])) {
 				$config['debug_log'] = !empty($config['debug']);
 			}
 			
-			$this->config = (new util\ArrayObject([
-					"frameAncestors" => $config['frameAncestors'] ?? "",
-					"theme" => "Paper",
-					"allow_themes" => true,
-					"core" => [
-
-							"general" => [
-									"dataPath" => $config['file_storage_path'] ?? '/home/groupoffice', //TODO default should be /var/lib/groupoffice
-									"tmpPath" => $config['tmpdir'] ?? sys_get_temp_dir() . '/groupoffice',
-									"debug" => $config['debug'] ?? null,
-									"debugLog" => $config['debug_log'],
-									
-									"servermanager" => $config['servermanager'] ?? false,
-
-									"sseEnabled" => $config['sseEnabled'] ?? true
-							],
-							"db" => [
-									"host" => ($config['db_host'] ?? "localhost"),
-									"port" => $config['db_port'] ?? 3306,
-									"name" => $config['db_name'] ?? 'groupoffice',
-									"dsn" => 'mysql:host=' . ($config['db_host'] ?? "localhost") . ';port=' . ($config['db_port'] ?? 3306) . ';dbname=' . ($config['db_name'] ?? "groupoffice-com"),
-									"username" => $config['db_user'] ?? "groupoffice",
-									"password" => $config['db_pass'] ?? ""
-							],
-							"limits" => [
-									"maxUsers" => $config['max_users'] ?? 0,
-									"storageQuota" => $config['quota'] ?? 0,
-									"allowedModules" => $config['allowed_modules'] ?? ""
-							],
-							"branding" => [
-								"name" => $config['product_name'] ?? "GroupOffice"
-							],						
-					],
-
-			]))->mergeRecursive($config)->getArray();
-			
-			if(!isset($this->config['cache'])) {
+			if(!isset($config['cache'])) {
 				if(cache\Apcu::isSupported()) {
-					$this->config['cache'] = cache\Apcu::class;
+					$config['cache'] = cache\Apcu::class;
 				} else
 				{
-					$this->config['cache'] = cache\Disk::class;
+					$config['cache'] = cache\Disk::class;
 				}
 			}
 
 			if(Request::get()->getHeader('X-Debug') == "1") {
-				$this->config['core']['general']['debug'] = true;
+				$config['debug'] = true;
 			}
+
+			$this->config = $config->getArray();
 
 			$this->initTCPDF();
 
@@ -416,9 +398,7 @@ use const GO_CONFIG_FILE;
 		 * The TCPDF cache path must be set before autoloading it from vendor.
 		 */
 		private function initTCPDF() {
-
-			define("K_PATH_CACHE", $this->config['core']['general']['tmpPath'] . "/");
-
+			define("K_PATH_CACHE", $this->config['tmpdir'] . "/");
 		}
 
 		/**
@@ -427,11 +407,11 @@ use const GO_CONFIG_FILE;
 		 * @return Connection
 		 */
 		public function getDbConnection() {
-
 			if (!isset($this->dbConnection)) {
-				$db = $this->getConfig()['core']['db'];
+				$config = $this->getConfig();
+				$dsn = 'mysql:host=' . $config['db_host'] . ';port=' . $config['db_port']  . ';dbname=' . $config['db_name'];
 				$this->dbConnection = new Connection(
-								$db['dsn'], $db['username'], $db['password']
+					$dsn, $config['db_user'], $config['db_pass']
 				);
 			}
 			return $this->dbConnection;

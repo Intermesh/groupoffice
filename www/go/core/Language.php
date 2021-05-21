@@ -195,7 +195,7 @@ class Language {
 	}
 
 	private function replaceBrand($str) {
-		$productName = $this->replaceProductName ? go()->getConfig()['core']['branding']['name'] : "{product_name}";
+		$productName = $this->replaceProductName ? go()->getConfig()['product_name'] : "{product_name}";
 		return str_replace(
 			[
 				"{product_name}",

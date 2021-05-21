@@ -537,14 +537,14 @@ class User extends Entity {
 	}
 	
 	private function maxUsersReached() {
-	  if(empty(go()->getConfig()['core']['limits']['maxUsers'])) {
+	  if(empty(go()->getConfig()['max_users'])) {
 	    return false;
     }
 
 		$stmt = go()->getDbConnection()->query("SELECT count(*) AS count FROM `core_user` WHERE enabled = 1");
 		$record = $stmt->fetch();
 		$countActive = $record['count'];
-		return $countActive >= go()->getConfig()['core']['limits']['maxUsers'];
+		return $countActive >= go()->getConfig()['max_users'];
 	}
 
 	private static function count() {
