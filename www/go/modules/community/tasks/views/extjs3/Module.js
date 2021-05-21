@@ -37,3 +37,9 @@ go.modules.community.tasks.progress = {
 	'failed': t('Failed'),
 	'cancelled' : t('Cancelled')
 };
+
+go.modules.community.tasks.listTypes = {
+	List : 1,
+	Board : 2,
+	Project : 3
+}

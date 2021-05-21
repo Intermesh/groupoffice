@@ -164,7 +164,9 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		//load task lists and select the first
 		this.tasklistsGrid.getStore().load({
 			callback: function (store) {
-				//this.tasklistsGrid.getSelectionModel().selectRow(0);
+
+				//todo load from settings (Joachims project must be done)
+				this.tasklistsGrid.getSelectionModel().selectRow(0);
 			},
 			scope: this
 		});
@@ -464,6 +466,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.addButton.setDisabled(!this.addTasklistId);
 		this.addTaskButton.setDisabled(!this.addTasklistId)
 		this.taskGrid.store.setFilter("tasklist", {tasklistId: ids});
+		this.taskGrid.store.setFilter("role", ids.length == 0 ? {role:  go.modules.community.tasks.listTypes.List} : null);
 		this.taskGrid.store.load();
 		this.categoriesGrid.store.load();
 	},
