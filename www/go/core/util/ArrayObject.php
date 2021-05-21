@@ -67,7 +67,7 @@ class ArrayObject extends \ArrayObject implements JsonSerializable {
 	 */
 	public function mergeRecursive($arr) {
 		foreach ($arr as $key => $value) {
-			if (is_array($value) && isset($this[$key])) {				
+			if (is_array($value) && is_array($this[$key])) {
 				$this[$key] = new self($this[$key]);
 				$this[$key]->mergeRecursive($value);
 			} else {
