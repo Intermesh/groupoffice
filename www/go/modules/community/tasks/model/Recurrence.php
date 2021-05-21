@@ -2,6 +2,7 @@
 namespace go\modules\community\tasks\model;
 
 use DateTimeInterface;
+use go\core\util\DateTime;
 use Sabre\VObject\DateTimeParser;
 
 class Recurrence extends \Sabre\VObject\Recur\RRuleIterator {
@@ -92,10 +93,10 @@ class Recurrence extends \Sabre\VObject\Recur\RRuleIterator {
 	/**
 	 * Create rrule itterator from JSON rule format
 	 * @param $rule json data
-	 * @param $start datetime start of task
+	 * @param $start DateTime start of task
 	 * @return Recurrence
 	 */
-	static function fromArray(array $rule, $start) {
+	static function fromArray(array $rule, DateTime $start) {
 		$me = new self(null, $start);
 		foreach(['frequency', 'interval', 'count',
 					  'byMonth', 'byYearDay', 'byWeekNo', 'byMonthDay'] as $key) {

@@ -36,7 +36,7 @@ class Backend extends AbstractBackend {
 		$vcardComp = Reader::read($cardData, Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
 		
 		$contact = new Contact();
-		$contact->addressBookId = $addressBookId;
+		$contact->addressBookId = (int) $addressBookId;
 		$contact->setUid((string) $vcardComp->uid);
 		$contact->setUri($cardUri);
 		

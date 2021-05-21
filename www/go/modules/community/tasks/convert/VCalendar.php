@@ -9,10 +9,13 @@ use go\core\fs\File;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
+use go\modules\community\addressbook\model\Contact;
 use go\modules\community\tasks\model\Category;
+use go\modules\community\tasks\model\Progress;
 use go\modules\community\tasks\model\Recurrence;
 use go\modules\community\tasks\model\Task;
 use Sabre\VObject\Component\VCalendar as VCalendarComponent;
+use Sabre\VObject\Component\VCard as VCardComponent;
 use Sabre\VObject\Component\VTimeZone;
 use Sabre\VObject\Property\ICalendar\Recur;
 use Sabre\VObject\Reader;
@@ -36,34 +39,66 @@ class VCalendar extends AbstractConverter {
 	
 	const EMPTY_NAME = '(no name)';
 
+
+	/**
+	 *
+	 * @param Task $task
+	 * @return VCalendar
+	 */
+
+	private function getVCalendar(Task $task) {
+
+		if ($task->vcalendarBlobId) {
+			//Contact has a stored VCard
+			$blob = Blob::findById($task->vcalendarBlobId);
+			$file = $blob->getFile();
+			if($file->exists()) {
+				$vcalendar = Reader::read($file->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
+
+				return $vcalendar;
+			}
+		}
+
+		$calendar = new \Sabre\VObject\Component\VCalendar();
+		$vtodo = $calendar->createComponent('VTODO');
+		$calendar->add($vtodo);
+
+		return $calendar;
+	}
+
 	/**
 	 * Parse an Event object to a VObject
 	 * @param task $task
 	 */
 	public function export(Task $task) {
+		$calendar = $this->getVCalendar($task);
+		$vtodo = $calendar->vtodo;
 
-		if ($task->vcalendarBlobId) {
-			//task has a stored VCalendar
-			$blob = Blob::findById($task->vcalendarBlobId);
-			return $blob->getFile()->getContents();
-		}
-
-		$calendar = new \Sabre\VObject\Component\VCalendar();
-		$vtodo = $calendar->createComponent('VTODO');
+		$vtodo->dtstamp = new DateTime('now', new \DateTimeZone('utc'));
+		$vtodo->{"last-modified"} = $task->modifiedAt;
+		$vtodo->CREATED = $task->createdAt;
 
 		$rule = $task->getRecurrenceRule();
-		if($rule) {
+
+		if($rule && !empty($task->start)) {
 			$rrule = Recurrence::fromArray((array)$rule, $task->start);
 			$vtodo->RRULE = $rrule->toString();
 		}
 
 		$vtodo->UID = $task->getUid();
 		$vtodo->SUMMARY = $task->title;
-		$vtodo->PRIORITY = $task->priority;
-		if(!empty($task->start))
-			$vtodo->DTSTART = $task->start;
-		if(!empty($task->due))
-			$vtodo->DUE = $task->due;
+//		$vtodo->PRIORITY = $task->priority;
+		$vtodo->remove("PRIORITY");
+		if(!empty($task->start)) {
+			$vtodo->add('DTSTART', $task->start, ['VALUE' => 'DATE']);
+		}else {
+			$vtodo->remove("DTSTART");
+		}
+		if(!empty($task->due)) {
+			$vtodo->add('DUE', $task->due, ['VALUE' => 'DATE']);
+		} else{
+			$vtodo->remove("DUE");
+		}
 		$vtodo->DESCRIPTION = $task->description;
 
 		if(!empty($task->categories) && is_array($task->categories)) {
@@ -73,7 +108,24 @@ class VCalendar extends AbstractConverter {
 				->fetchMode(\PDO::FETCH_COLUMN, 0)
 				->execute();
 		}
-		return $vtodo->serialize();
+
+		$vtodo->status = strtoupper($task->getProgress());
+		if($vtodo->status == "COMPLETED") {
+			$vtodo->add('COMPLETED', $task->progressUpdated, ['VALUE' => 'DATE']);
+		} else{
+			$vtodo->remove("COMPLETED");
+		}
+
+		if(!empty($task->percentComplete)) {
+			$vtodo->{"PERCENT-COMPLETE"} = $task->percentComplete;
+		} else{
+			$vtodo->remove("PERCENT-COMPLETE");
+		}
+
+		//MS:: TODO VALARM
+
+		//todo export needs one vcalendar but breaks caldav
+		return $calendar->serialize();
 //		$calendar->add($vtodo);
 //		return $calendar->serialize();
 	}
@@ -156,28 +208,67 @@ class VCalendar extends AbstractConverter {
 		if($task === null) {
 			$task = new Task();
 		}
-		$mtime = new DateTime();
-		$blob = Blob::fromString($todo->serialize());
+
+		if($todo->{"last-modified"}) {
+			$modifiedAt = $todo->{"last-modified"}->getDateTime();
+		}else if($vcal->dtstamp) {
+			$modifiedAt = $todo->dtstamp->getDateTime();
+		} else {
+			$modifiedAt = new DateTime();
+		}
+
+
+		$blob = Blob::fromString($vcal->serialize());
 		$blob->type = 'text/vcalendar';
 		$blob->name = ($vcal->uid ?? 'nouid' ) . '.ics';
-		$blob->modifiedAt = $mtime;
+		$blob->modifiedAt = $modifiedAt;
 		if(!$blob->save()) {
 			throw new \Exception("could not save VCalendar blob");
 		}
+
 		// no task found
 		$task->setValues([
-			"uid" => (string)$todo->UID,
-			"tasklistId" => $tasklistId,
+			"uid" => (string) $todo->UID,
+			"tasklistId" => (int) $tasklistId, //int is important
 			"start" => $todo->DTSTART,
-			"modifiedAt" => $mtime,
+			"modifiedAt" => $modifiedAt,
 			'recurrenceRule' => $rule,
 			"due" => $todo->DUE,
-			"title" => (string)$todo->SUMMARY,
-			"description" => (string)$todo->DESCRIPTION,
-			"priority" => !empty((string)$todo->PRIORITY) ? intval((string)$todo->PRIORITY) : 5, // default normal
+			"title" => (string) $todo->SUMMARY,
+			"description" => (string) $todo->DESCRIPTION,
+			"priority" => !empty((string) $todo->PRIORITY) ? intval((string) $todo->PRIORITY) : 5, // default normal
 			"categories" => $categoryIds,
-			"vcalendarBlobId" => $blob->id
+			"vcalendarBlobId" => $blob->id,
 		]);
+
+		if($todo->STATUS) {
+			$task->setProgress(strtolower($todo->STATUS));
+		}
+
+		if($todo->duration){
+			//TODO test
+//			$duration = \GO\Base\VObject\Reader::parseDuration($vcal->duration);
+			$task->due = clone $task->start;
+			$task->due->add(new \DateInterval($todo->duration));
+		}
+
+		if($todo->completed) {
+			$task->setProgress("completed");
+			$task->progressUpdated = $todo->completed->getDateTime();
+		}
+
+		if(!empty($todo->{"percent-complete"})) {
+			$task->percentComplete = (int) $todo->{"percent-complete"}->getValue();
+		}
+
+//		TODO alarms
+//		if($vobject->valarm && $vobject->valarm->trigger){
+//			$date = $vobject->valarm->getEffectiveTriggerTime();
+//			if($date) {
+//				$this->reminder = $date->format('U');
+//			}
+//		}
+
 
 		return $task;
 	}

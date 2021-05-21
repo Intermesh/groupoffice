@@ -42,6 +42,9 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			// task to vtodo
 			$parser = new VCalendar();
 			$data = $parser->export($task);
+
+			go()->debug("CalendarsBackend::fromBlob() : " .$data);
+
 			$blob = Blob::fromString($data);
 			$blob->type = 'text/vcalendar';
 			$blob->name = $task->getUri();
@@ -62,15 +65,10 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 		} else {
 			$data = $blob->getFile()->getContents();
 		}
-		return $this->wrapCalendar($data);
+		return $data;
 	}
 
-	// used in caldav (has 1 calendar wrapped per item)
-	public function wrapCalendar($vtodoText) {
-		$begin = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Intermesh//NONSGML Group-Office ".go()->getVersion()."//EN\r\n";
-		$timezone = (new \GO\Base\VObject\VTimezone())->serialize();
-		return $begin.$timezone .$vtodoText. "END:VCALENDAR\r\n";
-	}
+
 
 	/**
 	 * Get the user model by principal URI
@@ -164,13 +162,10 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 		if($calendar->tasklist_id>0) {
 			$supportedComponents[]='VTODO';
 
-			$tasklist = Tasklist::find()->select('version')->where(['id'=>$calendar->tasklist_id])->single();
-			if($tasklist) {
-				$version += $tasklist->version;
-			}
+			$version .= "-" . Task::getState();
 		}
 
-		\GO::debug("Version: ".$version);
+//		\GO::debug("Version: ".$version);
 
 		$tz = new \GO\Base\VObject\VTimezone();
 
@@ -420,9 +415,10 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 					'id' => $event->id,
 					'uri' => $davEvent->uri,
 					'calendardata' => $davEvent->data,
-					'calendarid' => 'c:'.$calendarId,
+					'calendarid' => $calendarId,
 					'lastmodified' => $event->mtime,
-					'etag'=>'"' . date('Ymd H:i:s', $event->mtime). '-'.$event->id.'"'
+					'etag'=>'"' . date('Ymd H:i:s', $event->mtime). '-'.$event->id.'"',
+					'size' => strlen($davEvent->data)
 				);
 
 			}
@@ -452,9 +448,10 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 						'id' => $task->id,
 						'uri' => $task->getUri(),
 						'calendardata' => $data,
-						'calendarid' => 'c:'.$calendarId,
+						'calendarid' => $calendarId,
 						'lastmodified' => $task->modifiedAt->getTimestamp(),
-						'etag' => '"' . $task->vcalendarBlobId . '"'
+						'etag' => $task->etag(),
+						'size' => strlen($data)
 					);
 				}
 			}
@@ -555,7 +552,7 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			\GO::debug('Found event '.$objectUri);
 			$data = ($event->mtime==$event->client_mtime && !empty($event->data)) ? $event->data : $this->exportCalendarEvent($event);
 			//\GO::debug($event->mtime==$event->client_mtime ? "Returning client data (mtime)" : "Returning server data (mtime)");
-			//\GO::debug($data);
+			\GO::debug($data);
 
 			$object = array(
 				'id' => $event->id,
@@ -577,13 +574,14 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 			if ($task) {
 				\GO::debug('Found task '.$objectUri);
 				$data = $this->fromBlob($task);
+				go()->debug($data);
 				$object = array(
 					'id' => $task->id,
 					'uri' => $task->getUri(),
 					'calendardata' => $data,
 					'calendarid' => $calendarId,
 					'lastmodified' => $task->modifiedAt->getTimestamp(),
-					'etag'=>'"' .$task->etag().'"'
+					'etag' => $task->etag()
 				);
 
 				return $object;
@@ -602,7 +600,8 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	 */
 	public function createCalendarObject($calendarId, $objectUri, $calendarData) {
 
-		\GO::debug("createCalendarObject($calendarId,$objectUri,$calendarData)");
+		\GO::debug("createCalendarObject($calendarId,$objectUri,[data)");
+		\GO::debug($calendarData);
 
 		try{
 

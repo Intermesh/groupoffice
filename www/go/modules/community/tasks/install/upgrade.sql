@@ -30,55 +30,62 @@ COLLATE = utf8mb4_unicode_ci;
 -- Table `tasks_task`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `tasks_task` (
-  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `uid` VARCHAR(190) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NOT NULL DEFAULT '',
-  `tasklistId` INT(11) UNSIGNED NOT NULL,
-  `groupId` INT UNSIGNED NULL DEFAULT NULL,
-  `responsibleUserId` INT(11) DEFAULT NULL,
-  `createdBy` INT(11) default NULL,
-  `createdAt` DATETIME NOT NULL,
-  `modifiedAt` DATETIME NOT NULL,
-  `modifiedBy` INT(11) NULL DEFAULT null,
-  `filesFolderId` INT(11) DEFAULT null,
-  `due` DATE NULL,
-  `start` DATE NULL,
-  `estimatedDuration` VARCHAR(20) NULL,
-  `progress` TINYINT(2) NOT NULL DEFAULT 1,
-  `progressUpdated` DATETIME NULL DEFAULT NULL,
-  `title` VARCHAR(255) NOT NULL,
-  `description` TEXT NULL DEFAULT NULL,
-  `color` CHAR(6) NULL,
-  `recurrenceRule` VARCHAR(400) NULL DEFAULT NULL,
-  `priority` INT(11) NOT NULL DEFAULT 1,
-  `freeBusyStatus` CHAR(4) NULL DEFAULT 'busy',
-  `privacy` VARCHAR(7) NULL DEFAULT 'public',
-  `percentComplete` TINYINT(4) NOT NULL DEFAULT 0,
-  `uri` VARCHAR(190) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `list_id` (`tasklistId` ASC),
-  INDEX `rrule` (`recurrenceRule`(191) ASC),
-  INDEX `uuid` (`uid` ASC),
-  INDEX `fkModifiedBy` (`modifiedBy` ASC),
-  INDEX `createdBy` (`createdBy` ASC),
-  INDEX `filesFolderId` (`filesFolderId` ASC),
-  INDEX `tasks_task_groupId_idx` (`groupId` ASC),
-  CONSTRAINT `fkModifiedBy`
-    FOREIGN KEY (`modifiedBy`)
-    REFERENCES `core_user` (`id`),
-  CONSTRAINT `tasks_task_ibfk_1`
-    FOREIGN KEY (`tasklistId`)
-    REFERENCES `tasks_tasklist` (`id`),
-  CONSTRAINT `tasks_task_ibfk_2`
-    FOREIGN KEY (`createdBy`)
-    REFERENCES `core_user` (`id`),
-  CONSTRAINT `tasks_task_groupId`
-    FOREIGN KEY (`groupId`)
-    REFERENCES `tasks_tasklist_group` (`id`)
-    ON DELETE SET NULL
-    ON UPDATE CASCADE)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_unicode_ci;
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `uid` VARCHAR(190) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NOT NULL DEFAULT '',
+    `tasklistId` INT(11) UNSIGNED NOT NULL,
+    `groupId` INT UNSIGNED NULL DEFAULT NULL,
+    `responsibleUserId` INT(11) DEFAULT NULL,
+    `createdBy` INT(11) default NULL,
+    `createdAt` DATETIME NOT NULL,
+    `modifiedAt` DATETIME NOT NULL,
+    `modifiedBy` INT(11) NULL DEFAULT null,
+    `filesFolderId` INT(11) DEFAULT null,
+    `due` DATE NULL,
+    `start` DATE NULL,
+    `estimatedDuration` VARCHAR(20) NULL,
+    `progress` TINYINT(2) NOT NULL DEFAULT 1,
+    `progressUpdated` DATETIME NULL DEFAULT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `description` TEXT NULL DEFAULT '',
+    `color` CHAR(6) NULL,
+    `recurrenceRule` VARCHAR(400) NULL DEFAULT NULL,
+    `priority` INT(11) NOT NULL DEFAULT 1,
+    `freeBusyStatus` CHAR(4) NULL DEFAULT 'busy',
+    `privacy` VARCHAR(7) NULL DEFAULT 'public',
+    `percentComplete` TINYINT(4) NOT NULL DEFAULT 0,
+    `uri` VARCHAR(190) CHARACTER SET 'ascii' COLLATE 'ascii_bin' NULL DEFAULT NULL,
+    `vcalendarBlobId` BINARY(40) NULL,
+    PRIMARY KEY (`id`),
+    INDEX `list_id` (`tasklistId` ASC),
+    INDEX `rrule` (`recurrenceRule`(191) ASC),
+    INDEX `uuid` (`uid` ASC),
+    INDEX `fkModifiedBy` (`modifiedBy` ASC),
+    INDEX `createdBy` (`createdBy` ASC),
+    INDEX `filesFolderId` (`filesFolderId` ASC),
+    INDEX `tasks_task_groupId_idx` (`groupId` ASC),
+    INDEX `tasks_vcalendar_blob_idx` (`vcalendarBlobId` ASC),
+    CONSTRAINT `fkModifiedBy`
+        FOREIGN KEY (`modifiedBy`)
+            REFERENCES `core_user` (`id`),
+    CONSTRAINT `tasks_task_ibfk_1`
+        FOREIGN KEY (`tasklistId`)
+            REFERENCES `tasks_tasklist` (`id`),
+    CONSTRAINT `tasks_task_ibfk_2`
+        FOREIGN KEY (`createdBy`)
+            REFERENCES `core_user` (`id`),
+    CONSTRAINT `tasks_task_groupId`
+        FOREIGN KEY (`groupId`)
+            REFERENCES `tasks_tasklist_group` (`id`)
+            ON DELETE SET NULL
+            ON UPDATE CASCADE,
+    CONSTRAINT `tasks_vcalendar_blob`
+        FOREIGN KEY (`vcalendarBlobId`)
+            REFERENCES `core_blob` (`id`)
+            ON DELETE SET NULL
+            ON UPDATE SET NULL)
+    ENGINE = InnoDB
+    DEFAULT CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_unicode_ci;
 
 
 -- -----------------------------------------------------
@@ -277,7 +284,7 @@ INSERT INTO tasks_category (`id`, `name`, `createdBy`)
     SELECT id, `name`, user_id FROM ta_categories;
 INSERT INTO tasks_task (id,uid,tasklistId,createdBy, createdAt, modifiedAt, modifiedBy, `start`, due, progress, progressUpdated,
                         title, description, filesFolderId, priority, percentComplete)
-    SELECT id, uuid, tasklist_id, user_id, ctime, mtime, muser_id, start_time, due_time, IF(completion_time, 3, 1) as progress,
+    SELECT id, uuid, tasklist_id, user_id, from_unixtime(ctime), from_unixtime(mtime), muser_id, from_unixtime(start_time), from_unixtime(due_time), IF(completion_time, 3, 1) as progress,
        completion_time, `name`, description, files_folder_id, priority, percentage_complete FROM ta_tasks;
 INSERT INTO tasks_task_category (taskId,categoryId)
     SELECT id,category_id FROM ta_tasks;

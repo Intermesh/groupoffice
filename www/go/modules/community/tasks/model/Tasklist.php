@@ -76,6 +76,11 @@ class Tasklist extends AclOwnerEntity
 			});
 	}
 
+	protected static function textFilterColumns()
+	{
+		return ['name'];
+	}
+
 	protected static function defineMapping()
 	{
 		return parent::defineMapping()
