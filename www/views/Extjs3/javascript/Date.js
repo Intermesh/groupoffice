@@ -52,7 +52,7 @@ Ext.apply(Date.prototype, {
 			return this.format("Y-m-d");
 		} else
 		{
-			return this.format('c');
+			return this.toISOString();
 		}
 	}
 

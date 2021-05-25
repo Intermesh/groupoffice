@@ -34,6 +34,13 @@
 	
 	go.util.Format = {
 
+		/**
+		 * Parse a UTC date string and transform to the users's timezone
+		 *
+		 * @param v eg. "2021-05-25T11:00+00:00"
+		 * @param format
+		 * @return {boolean|*|Date}
+		 */
 		parseDateUserTZ: function(v, format) {
 			var date = Date.parseDate(v, format);
 			if(!date) {
@@ -44,6 +51,12 @@
 				
 		},
 
+		/**
+		 * Change date object to user timezone
+		 *
+		 * @param date
+		 * @return {Date|*}
+		 */
 		dateToUserTZ : function(date) {
 			if(Ext.isIE) {
 				//sigh
@@ -59,6 +72,13 @@
 			return new Date(local);		
 		},
 
+		/**
+		 * Change date object to browser's timezone so it will send a correct iso string
+		 * to the server. eg. "2021-05-25T04:00:00+02:00".
+		 *
+		 * @param v
+		 * @return {Date|*}
+		 */
 		dateToBrowserTZ : function(v) {		
 			
 			if(Ext.isIE) {
@@ -66,7 +86,7 @@
 				return v;
 			}
 
-			var local = v.toLocaleString("en-US", {timeZone: go.User.timezone});					
+			var local = this.dateToUserTZ(v);
 			var time = v.getTime();
 			 
 			var diff = time - new Date(local).getTime();

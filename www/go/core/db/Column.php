@@ -6,6 +6,7 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
+use go\core\customfield\Date;
 use go\core\util\DateTime as GoDateTime;
 
 /**
@@ -233,7 +234,7 @@ class Column {
 		}
 		
 		switch ($this->dbType) {
-			case 'datetime':				
+			case 'datetime':
 				return $value->format(self::DATETIME_FORMAT);
 
 			case 'date':
