@@ -85,7 +85,9 @@ class PushDispatcher
 
 		$alerts = Alert::find()->where('userId','=', go()->getUserId())
 			->andWhere('triggerAt', '<', $start)
-			->andWhere('sentAt', 'IS', null)->all();
+			->andWhere('sentAt', 'IS', null);
+
+		//$sql = (string) $alerts;
 
 		//$this->sendMessage('test', ['alerts'=>$alerts, 'start'=>$start, 'end'=>$end]);
 		foreach($alerts as $alert) {
