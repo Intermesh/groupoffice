@@ -104,6 +104,10 @@
 				return; // not initializes (happens after login)
 			}
 
+			if(msg.id && !key) {
+				key = msg.id;
+			}
+
 			if(msg.sound) {
 				this.playSound(msg.sound, key);
 			}
@@ -139,6 +143,14 @@
 
 			var msgPanel = new Ext.Panel(msg);
 
+			if(msg.itemId) {
+				// debugger;
+				if(this._messages[msg.itemId]) {
+					this._messages[msg.itemId].destroy();
+				}
+				this._messages[msg.itemId] = msgPanel;
+			}
+
 			this.notifications.add(msgPanel);
 			this.notifications.doLayout();
 
@@ -163,12 +175,7 @@
 				return msgPanel;
 			};
 
-			if(msg.itemId) {
-				if(this._messages[msg.itemId]) {
-					this._messages[msg.itemId].destroy();
-				}
-				this._messages[msg.itemId] = msgPanel;
-			}
+
 
 			this.showNotifications();
 
@@ -219,6 +226,14 @@
 				delete this._messages[msg.itemId];
 			}
 			msg.destroy();
+		},
+
+		removeById(msgId) {
+			if(!this._messages[msgId]) {
+				return false;
+			}
+			this._messages[msgId].destroy();
+			delete this._messages[msgId];
 		},
 
 		removeAll : function() {

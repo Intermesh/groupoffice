@@ -197,7 +197,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					if(!go.Notifier.hasMessages()) {
 						go.Notifier.hideNotifications();
 					}
-					go.Notifier.toggleIcon('reminder', false);
+					// go.Notifier.toggleIcon('reminder', false);
 				}
 
 				if(!reminderPanel) {
@@ -263,7 +263,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 //		this.fireEvent('check', this, data);
 		var hasReminders = (storeData.total && storeData.total > 0);
 		var me = this;
-		go.Notifier.toggleIcon('reminder',hasReminders);
+		// go.Notifier.toggleIcon('reminder',hasReminders);
 
 		if(!hasReminders) return;
 

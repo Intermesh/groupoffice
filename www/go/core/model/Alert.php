@@ -2,23 +2,36 @@
 
 namespace go\core\model;
 
-use go\core\orm\Entity;
+use go\core\acl\model\SingleOwnerEntity;
+use go\core\orm\EntityType;
 
-class Alert extends Entity
+class Alert extends SingleOwnerEntity
 {
 	public $id;
 
-	public $entityTypeId;
+	protected $entityTypeId;
+
 	public $entityId;
+
+	public $title;
+	public $body;
 
 	public $userId;
 	public $triggerAt;
-	public $sentAt;
+
 	public $recurrenceId;
 	public $alertId;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
 			->addTable("core_alert", "alert");
+	}
+
+	public function getEntity() {
+		return EntityType::findById($this->entityTypeId)->getName();
+	}
+
+	public function setEntity($name) {
+		$this->entityTypeId = EntityType::findByName($name)->getId();
 	}
 }

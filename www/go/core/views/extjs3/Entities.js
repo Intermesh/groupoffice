@@ -92,7 +92,7 @@ go.Entities = (function () {
 		 * goto: Navigates to the contact
 		 * 
 		 * @param {string} name
-		 * @returns {entities|EntityManagerL#1.entities}
+		 * @returns {go.Entity}
 		 */
     get: function (name) {      
       return entities[name.toLowerCase()];      

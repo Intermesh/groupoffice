@@ -9,6 +9,7 @@ namespace go\modules\community\tasks\model;
 
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Expression;
+use go\core\model\Alert;
 use go\core\orm\CustomFieldsTrait;
 use go\core\model\User;
 use go\core\orm\EntityType;
@@ -342,25 +343,36 @@ class Task extends AclItemEntity {
 
 	private function updateAlerts() {
 		$entityType = EntityType::findByName('Task');
+
 		if(!$this->isNew()) {
-			$query = \go\core\model\Alert::find()->andWhere(['entityTypeId' => $entityType->getId(), 'entityId' => $this->id]);
-//			if(!empty($this->recurrenceRule)) {
-//				$query->andWhere(['recurrenceId' => $this->id]);
-//			}
-			\go\core\model\Alert::internalDelete($query);
+			\go\core\model\Alert::delete([
+				'entityTypeId' => $entityType->getId(),
+				'entityId' => $this->id,
+				'userId' => go()->getAuthState()->getUserId()
+			]);
 		}
-		$tasklist = Tasklist::findById($this->tasklistId);
+
 		foreach($this->alerts as $alert) {
-			$notify = new \go\core\model\Alert();
-			$notify->alertId = $alert->id;
-			$notify->triggerAt = $alert->at($this);
-			$notify->userId = $tasklist->ownerId;
-			$notify->entityId =  $this->id;
-			$notify->entityTypeId = $entityType->getId();
-			if(!$notify->save()) {
-				throw new \Exception(var_export($notify->getValidationErrors(),true));
+
+			$coreAlert = $this->createAlert($alert->at($this));
+			$coreAlert->alertId = $alert->id;
+			if(!$coreAlert->save()) {
+				throw new \Exception(var_export($coreAlert->getValidationErrors(),true));
 			}
 		}
+	}
+
+	public static function dismissAlerts(\go\core\db\Query $query)
+	{
+		$alertIds = Alert::find()->mergeWith($query)->selectSingleValue('id');
+
+		go()->getDbConnection()->update(
+			'tasks_alert', ['acknowledged' => new DateTime()],
+			(new Query)->where('alertId' , 'in', $alertIds)
+		)->execute();
+
+		//TODO
+		Task::entityType()->changes();
 	}
 
 	protected function createNewTask(\DateTimeInterface $next) {

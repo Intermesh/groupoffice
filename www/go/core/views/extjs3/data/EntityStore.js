@@ -327,8 +327,12 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				}
 
 				//only update items we had already fetched
-				const knownIds = Object.values(me.data).column("id");
-				const updatedIds = changes.changed.intersect(knownIds);
+				if(!me.isComplete) {
+					const knownIds = Object.values(me.data).column("id");
+					var updatedIds = changes.changed.intersect(knownIds);
+				} else {
+					var updatedIds = changes.changed;
+				}
 
 				if(updatedIds.length) {
 					return go.Jmap.request({

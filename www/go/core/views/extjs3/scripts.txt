@@ -287,3 +287,5 @@ chart/PieChart.js
 
 
 license/LicenseDialog.js
+
+Alert.js

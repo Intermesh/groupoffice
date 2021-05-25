@@ -5,11 +5,13 @@ namespace go\core\jmap;
 use Exception;
 use go\core\Installer;
 use go\core\fs\File;
+use go\core\model\Alert;
 use go\core\model\Module;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\orm\Entity as OrmEntity;
+use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use PDO;
 use go\core\orm\EntityType;
@@ -329,7 +331,7 @@ abstract class Entity  extends OrmEntity {
   }
 
   /**
-   * Delete's the entitiy. Implements change logging for sync.
+   * Delete's the entiyy. Implements change logging for sync.
    *
    * @param Query $query The query to select entities in the delete statement
    * @return boolean
@@ -347,6 +349,8 @@ abstract class Entity  extends OrmEntity {
 				return false;
 			}
 		}
+
+		static::dismissAlerts($query);
 
 		if(!parent::internalDelete($query)) {
 			return false;
@@ -684,4 +688,37 @@ abstract class Entity  extends OrmEntity {
 
 		return $arr;
 	}
+
+	/**
+	 * @param DateTime $triggerAt
+	 * @return \go\core\model\Alert
+	 * @throws Exception
+	 */
+	public function createAlert(DateTime $triggerAt) {
+		$alert = new \go\core\model\Alert();
+
+		$alert->triggerAt = $triggerAt;
+		$alert->userId = go()->getAuthState()->getUserId();
+		$alert->entityId =  $this->id;
+		$alert->entityTypeId = static::entityType()->getId();
+
+		return $alert;
+	}
+
+
+
+
+	/**
+	 * Called when reminders are deleted / dismissed
+	 *
+	 * To find alerts that are deleted use:
+	 *
+	 * Alert::find()->mergeWith($query);
+	 *
+	 * @param \go\core\db\Query $query
+	 */
+	public static function dismissAlerts(\go\core\db\Query $query) {
+
+	}
+
 }

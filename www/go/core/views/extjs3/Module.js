@@ -2,6 +2,12 @@ go.Modules.register("core", 'core', {
 	title: t("Core"),
 	entities: [
 		{
+			name: 'Alert',
+			relations: {
+				user: {store: "User", fk:'userId'}
+			}
+		},
+		{
 			name: 'Group',
 			relations: {
 				users: {store: "User", fk: "users"},
