@@ -25,8 +25,6 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 					case 'ic-alarm-add':
 
 						if (!this.timeEntryDialog) {
-							// TODO: Refactor to JMAP
-
 							this.timeEntryDialog = new go.modules.community.tasks.TimeEntryDialog({
 								id: 'pm-timeentry-dialog-grid'
 							});
@@ -144,20 +142,22 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 					'<div class="pm-progress-indicator" style="width:' + Math.ceil(GO.util.unlocalizeNumber(value)) + '%"></div>' +
 					'</div>';
 			}
-		}, {
+		},
+		{
 			header: t("Estimated duration", "tasks", 'community'),
 			dataIndex: 'estimatedDuration',
 			summaryType: 'sum',
 			hidden: true,
 			width: dp(64),
-			editor: new Ext.grid.GridEditor(new go.form.NumberField()),
+			editor: new Ext.grid.GridEditor(new go.form.TimeField({inMinutes: true})),
 			renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
 				if(parseInt(value) > 0) {
 					return go.util.Format.duration(value);
 				}
 				return '';
 			}
-		}, {
+		},
+		{
 			header: t("Hours booked", "tasks", 'community'),
 			dataIndex: 'timeBooked',
 			width: dp(72),
