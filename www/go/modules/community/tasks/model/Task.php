@@ -33,7 +33,7 @@ class Task extends AclItemEntity {
 	/** @var string global unique id for invites and sync  */
 	protected $uid = '';
 
-	protected $userId;
+//	protected $userId;
 
 	/** @var int The list this Task belongs to */
 	public $tasklistId;

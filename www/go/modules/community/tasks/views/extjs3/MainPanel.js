@@ -156,11 +156,11 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		go.modules.community.tasks.MainPanel.superclass.initComponent.call(this);
 		this.on("afterrender", this.runModule, this);
-		this.taskGrid.store.load();
-		this.categoriesGrid.store.load();
 	},
 	
 	runModule : function() {
+		this.categoriesGrid.store.load();
+
 		//load task lists and select the first
 		this.tasklistsGrid.getStore().load({
 			callback: function (store) {
