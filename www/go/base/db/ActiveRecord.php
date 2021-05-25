@@ -3643,7 +3643,8 @@ ORDER BY `book`.`name` ASC ,`order`.`btime` DESC
 	public function cacheSearchRecord(){
 
 		//don't do this on datbase checks.
-		if(GO::router()->getControllerAction()=='checkdatabase')
+		$action = GO::router()->getControllerAction();
+		if($action=='checkdatabase' || $action=='upgrade')
 			return;
 
 		$attr = $this->getCacheAttributes();
