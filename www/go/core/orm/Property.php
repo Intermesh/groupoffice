@@ -12,6 +12,7 @@ use go\core\db\Statement;
 use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
 use go\core\fs\Blob;
+use go\core\model\User;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
@@ -350,6 +351,10 @@ abstract class Property extends Model {
 
 			foreach($where as $field => $value) {
 				$query->andWhere($field . '= :'.$field);
+			}
+
+			if(is_a($relation->entityName, UserProperty::class, true)){
+				$query->andWhere('userId', '=', go()->getAuthState()->getUserId() ?? null);
 			}
 
 			if(!empty($relation->orderBy)) {
@@ -1621,14 +1626,13 @@ abstract class Property extends Model {
 		// }
 		
 		try {
-			if ($recordIsNew) {				
-				
+			if ($recordIsNew) {
 				
 				foreach($table->getConstantValues() as $colName => $value) {
 					$modifiedForTable[$colName] = $value;
 				}
 
-				if(empty($modifiedForTable)) {
+				if(empty($modifiedForTable) && (!$table->isUserTable || !static::getMapping()->hasUserTableRelation())) {
 					//if there's no primary key we might get here.
 					return true;
 				}
@@ -1639,7 +1643,7 @@ abstract class Property extends Model {
 					$modifiedForTable[$to] = $this->{$from};
 				}
 
-				if($table->isUserTable) {
+				if($table->isUserTable || $this instanceof UserProperty) {
 					$modifiedForTable["userId"] = go()->getUserId();
 				}
 
