@@ -130,6 +130,7 @@ class Alert extends UserProperty
 			$this->offset = null;
 			$this->relativeTo = null;
 			$this->when = new \DateTime($value['when']);
+			$this->when->setTimeZone(new \DateTimeZone("UTC"));
 		}
 	}
 
