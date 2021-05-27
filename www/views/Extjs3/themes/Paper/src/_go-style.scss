@@ -2272,6 +2272,17 @@ table[id^="comments-ext"] b {
 	button, a.button {
 		@extend .go-button;
 		text-decoration: none;
+
+		i {
+			margin-right: dp(4);
+		}
+	}
+
+	.toolbar {
+		padding: dp(16) 0;
+		button, a.button {
+			border: 0;
+		}
 	}
 
 	h2 {

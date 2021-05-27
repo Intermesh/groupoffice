@@ -1,14 +1,27 @@
 <?php
 namespace go\core\model;
 
+use GO\Base\Mail\SmimeMessage;
 use go\core\db\Criteria;
 use go\core\fs\Blob;
 use go\core\acl\model\AclOwnerEntity;
+use go\core\TemplateParser;
 use go\core\validate\ErrorCode;
+use go\modules\community\addressbook\model\EmailAddress;
 
 /**
- * Newsletter model
+ * E-mail template model
  *
+ * @example
+ * ```
+ * $template = EmailTemplate::find()
+ * ->filter([
+ *  'module' => ['name' => 'contracts', 'package' => 'business'],
+ *  'key' => null,
+ *  'language' => 'en'
+ * ])
+ * ->single();
+ *```
  * @copyright (c) 2019, Intermesh BV http://www.intermesh.nl
  * @author Merijn Schering <mschering@intermesh.nl>
  * @license http://www.gnu.org/licenses/agpl-3.0.html AGPLv3
@@ -147,5 +160,43 @@ class EmailTemplate extends AclOwnerEntity
 		}
 
 		return $array;
+	}
+
+	/**
+	 * Create message from this template
+	 *
+	 * @param TemplateParser $templateParser
+	 * @return \go\core\mail\Message
+	 * @throws \go\core\exception\ConfigurationException
+	 */
+	public function toMessage(TemplateParser $templateParser) {
+  	$message = go()->getMailer()->compose();
+		$subject = $templateParser->parse($this->subject);
+		$body = $templateParser->parse($this->body);
+
+		$message->setSubject($subject)
+			->setBody($body, 'text/html');
+
+		foreach($this->attachments as $attachment) {
+			$blob = Blob::findById($attachment->blobId);
+
+			if($attachment->inline) {
+				$img = Swift_EmbeddedFile::fromPath($blob->getFile()->getPath());
+				$img->setContentType($blob->type);
+				$img->setFilename($attachment->name);
+				$contentId = $message->embed($img);
+
+				$body = Blob::replaceSrcInHtml($body, $blob->id, $contentId);
+			}
+
+			if($attachment->attachment) {
+				$a = Swift_Attachment::fromPath($blob->getFile()->getPath());
+				$a->setContentType($blob->type);
+				$a->setFilename($attachment->name);
+				$message->attach($a);
+			}
+		}
+
+		return $message;
 	}
 }

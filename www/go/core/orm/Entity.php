@@ -133,6 +133,33 @@ abstract class Entity extends Property {
 		return static::internalFind($properties, $readOnly);
 	}
 
+
+	/**
+	 * Find or create an entity
+	 *
+	 * @param string $id
+	 * @param array $values Values to apply if it needs to be created.
+	 * @return static
+	 * @throws \Exception
+	 */
+	public static function findOrCreate($id, $values = []) {
+
+		$entity = static::findById($id);
+		if($entity) {
+			return $entity;
+		}
+
+		$entity = new static();
+		$entity->setValues(static::idToPrimaryKeys($id));
+		$entity->setValues($values);
+
+		if(!$entity->save()) {
+			throw new \Exception("Couldn't save  '" . static::class . "' : " . $entity->getValidationErrorsAsString());
+		}
+
+		return $entity;
+	}
+
 	/**
 	 * Find by ID's.
 	 *
@@ -954,7 +981,7 @@ abstract class Entity extends Property {
 	}
 
 	/**
-	 * Copy the entity
+	 * Copy the entity. The copy is not saved to the database.
 	 *
 	 * @return static
 	 * @throws Exception

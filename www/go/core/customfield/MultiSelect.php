@@ -180,8 +180,7 @@ class MultiSelect extends Select {
 				$query->join('core_customfields_select_option', $alias, $alias . '.id = '.$joinAlias. '.optionId', 'left');
 				$criteria->where($alias . '.text', $comparator, $value);
 			}
-			$query->orderBy([$alias . '.sortOrder' => 'ASC']);
-			
+
 		});
 	}
 

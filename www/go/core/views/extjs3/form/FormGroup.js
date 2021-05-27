@@ -15,6 +15,12 @@
 								}
 							},
  *	itemCfg: {
+ *		listeners: {
+ *		  setvalue: function(formContainer, v) {
+ *		  	//example how to alter fields when loading data
+ *		  	formContainer.findField('text').doSomething(v);
+ *		  }
+ *		},
  *		items: [{
  *				xtype: "hidden",
  *				name: "id"
@@ -395,7 +401,7 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 
 		this.items.each(function(wrap, index) {
 
-			var item = wrap.formField.getValue();
+			var item = wrap.formField;
 			// if(this.sortColumn) {
 			// 	item[this.sortColumn] = index;
 			// }
@@ -407,12 +413,13 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 			if(this.mapKey) {
 				// TODO make minimal PatchObject
 				//if(wrap.formField.isDirty()) {
-					v[wrap.formField.key || Ext.id()] = item;
+					v[wrap.formField.key || Ext.id()] = item.getValue();
 				//}
 			} else {
-				v.push(item);
+				v.push(item.getValue());
 			}
 		}, this);
+
 		if(this.mapKey) {
 			this.markDeleted.forEach(function(key) { v[key] = null; });
 		}

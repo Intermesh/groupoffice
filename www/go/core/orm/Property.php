@@ -750,18 +750,27 @@ abstract class Property extends Model {
 	 * @throws Exception
 	 */
 	protected static function internalFindById($id, array $properties = [], $readOnly = false) {
-		$tables = static::getMapping()->getTables();
-		$primaryTable = array_shift($tables);
-		$keys = $primaryTable->getPrimaryKey();
-		
-		$query = static::internalFind($properties, $readOnly);		
-		
-		//Used count check here because a customer managed to get negative ID's in the database.
-		$ids = count($keys) == 1 ? [$id] : explode('-', $id);
-		$keys = array_combine($keys, $ids);
+		$query = static::internalFind($properties, $readOnly);
+		$keys = static::idToPrimaryKeys($id);
 		$query->where($keys);
 		
 		return $query->single();
+	}
+
+	/**
+	 * Changes the string key "1-2" into ['primaryKey1' => 1', 'primaryKey2' => '2]
+	 *
+	 * @param string $id eg. "1-2"
+	 * @return array eg. ['primaryKey1' => 1', 'primaryKey2' => '2]
+	 * @throws Exception
+	 */
+	public static function idToPrimaryKeys($id) {
+		$primaryTable = static::getMapping()->getPrimaryTable();
+
+		//Used count check here because a customer managed to get negative ID's in the database.
+		$keys = $primaryTable->getPrimaryKey();
+		$ids = count($keys) == 1 ? [$id] : explode('-', $id);
+		return array_combine($keys, $ids);
 	}
 
   /**
@@ -1493,7 +1502,7 @@ abstract class Property extends Model {
 		}
 		
 		$this->{$relation->name} = [];
-		foreach ($models as $newProp) {
+		foreach ($models as $mapKey => $newProp) {
 			
 			if($newProp === null) {
 				//deleted model
@@ -1506,6 +1515,11 @@ abstract class Property extends Model {
 			}
 			
 			$this->applyRelationKeys($relation, $newProp);
+
+			foreach ($this->mapKeyToValues($mapKey, $relation) as $propName => $value) {
+				$newProp->$propName = $value;
+			}
+
 			if (!$newProp->internalSave()) {
 				$this->relatedValidationErrors = $newProp->getValidationErrors();
 				return false;
@@ -1514,8 +1528,8 @@ abstract class Property extends Model {
 			$this->savedPropertyRelations[] = $newProp;
 			$this->relatedValidationErrorIndex++;
 			
-			$key = $this->buildMapKey($newProp, $relation);
-			$this->{$relation->name}[$key] = $newProp;
+			//$key = $this->buildMapKey($newProp, $relation);
+			$this->{$relation->name}[$mapKey] = $newProp;
 		}
 
 		//If the array is empty then set it to null because an empty array will be converted to an array in JSON while a map should be an object.
@@ -2248,6 +2262,44 @@ abstract class Property extends Model {
 		return $v;
 	}
 
+	/**
+	 * By the default the primary key of the first mapped table is used.
+	 * If you're composing a complex model or extended model you might need to override this
+	 * to allow a key from multiple tables.
+	 *
+	 * @example
+	 * ```
+	 *
+	 * protected static function defineMapping()
+	 * {
+	 * 	return parent::defineMapping()
+	 * 		->addTable("business_finance_contact_business", "biz", ["c.id" => "biz.contactId"])
+	 * 		->setQuery((new Query())
+	 * 		->select('min(doc.expiresAt) AS expiresAt', true)
+	 * 		->join(
+	 * 		"business_finance_document",
+	 * 		"doc",
+	 * 		"doc.organizationId = c.id AND doc.businessId = biz.businessId AND doc.type = '". FinanceDocument::TYPE_SALES_INVOICE ."'",
+	 * 		"INNER")
+	 * 		->groupBy(['c.id'])
+	 * 	  );
+	 * 	}
+	 *
+	 * 	protected static function definePrimaryKey()
+	 * 	{
+	 * 	  return ['id', 'businessId'];
+	 * 	}
+	 *
+	 * ```
+	 * @return string[]
+	 * @throws Exception
+	 */
+	protected static function definePrimaryKey() {
+		$tables = static::getMapping()->getTables();
+		$primaryTable = array_shift($tables);
+		return $primaryTable->getPrimaryKey();
+	}
+
   /**
    * Get the primary key column names.
    *
@@ -2257,16 +2309,18 @@ abstract class Property extends Model {
    * @return string[]
    * @throws Exception
    */
-	public static function getPrimaryKey($withTableAlias = false) {
-		$tables = static::getMapping()->getTables();
-		$primaryTable = array_shift($tables);
-		$keys = $primaryTable->getPrimaryKey();
+	public static final function getPrimaryKey($withTableAlias = false) {
+
+		$keys = static::definePrimaryKey();
+
 		if(!$withTableAlias) {
 			return $keys;
 		}
+
 		$keysWithAlias = [];
 		foreach($keys as $key) {
-			$keysWithAlias[] = $primaryTable->getAlias() . '.' . $key;
+			$alias = static::getMapping()->getColumn($key)->table->getAlias();
+			$keysWithAlias[] = $alias . '.' . $key;
 		}
 		return $keysWithAlias;
 	}

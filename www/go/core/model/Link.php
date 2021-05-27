@@ -6,12 +6,14 @@ use GO\Base\Db\ActiveRecord;
 use go\core\acl\model\AclItemEntity;
 use go\core\App;
 use go\core\db\Criteria;
+use go\core\orm\exception\SaveException;
 use go\core\db\Query as DbQuery;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
+use go\modules\community\comments\model\Comment;
 
 /**
  * Link model
@@ -261,7 +263,7 @@ class Link extends AclItemEntity
 	}
 
 	/**
-	 * Find a link
+	 * Find all links for a given entity
 	 *
 	 * @param Entity|ActiveRecord $a
 	 * @return Link[]
@@ -491,5 +493,33 @@ class Link extends AclItemEntity
 	protected static function aclEntityKeys()
 	{
 		return ['toId' => 'entityId', 'toEntityTypeId' => 'entityTypeId'];
+	}
+
+	/**
+	 * Copy comments from one entity to another.
+	 *
+	 * @param Entity|ActiveRecord $from
+	 * @param Entity|ActiveRecord  $to
+	 * @return bool
+	 * @throws SaveException
+	 */
+	public static function copyTo($from, $to) {
+		go()->getDbConnection()->beginTransaction();
+		try {
+			foreach (Link::findLinks($from) as $link) {
+				$copy = $link->copy();
+				$copy->fromEntityTypeId = $to::entityType()->getId();
+				$copy->fromId = $to->id;
+
+				if (!$copy->save()) {
+					throw new SaveException();
+				}
+			}
+		} catch(\Exception $e) {
+			go()->getDbConnection()->rollBack();
+			throw $e;
+		}
+
+		return go()->getDbConnection()->commit();
 	}
 }

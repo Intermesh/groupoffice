@@ -126,7 +126,10 @@ class Listeners extends Singleton {
 		//recurse up to the parents until the class is found that uses the eventemitter trait.
 		//This way you can use go\core\orm\Entity::on(EVENT_SAVE) for all entities.
 
-		if($calledClass != $traitUser && $event != Property::EVENT_MAPPING) {
+		// An exception is made for Property::EVENT_MAPPING because sometimes you don't want to inherit all the
+		// dynamic properties in an extended model.
+
+		if($calledClass != $traitUser) { // && $event != Property::EVENT_MAPPING) {
 			$parent = get_parent_class($calledClass);
 			if($parent) {
 				return $this->fireEvent($parent, $traitUser, $event, $args);

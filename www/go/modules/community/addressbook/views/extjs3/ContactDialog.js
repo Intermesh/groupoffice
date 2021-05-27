@@ -93,68 +93,63 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 
 		this.addPanel(this.businessPanel = new Ext.Panel({
 			title: t("Business"),
-			items: [{
+			items: [
+				{
 					xtype: "fieldset",
 					defaults: {
 						anchor: "-20",
 					},
+					title: t("Information"),
 					items: [
+						this.registrationNumberField = new Ext.form.TextField({
+							xtype: "textfield",
+							name: "registrationNumber",
+							fieldLabel: t("Registration number")
+						}),
 						{
-							xtype: "fieldset",
-							defaults: {
-								anchor: "-20",
-							},
-							title: t("Information"),
-							items: [
-								this.registrationNumberField = new Ext.form.TextField({
-									xtype: "textfield",
-									name: "registrationNumber",
-									fieldLabel: t("Registration number")
-								}),
-								{
-									xtype: "textfield",
-									name: "debtorNumber",
-									fieldLabel: t("Customer number")
-								}
-							]
-						},
-						{
-							xtype: "fieldset",
-							defaults: {
-								anchor: "-20",
-							},
-							title: t("Bank details"),
-							items: [
-								{
-									xtype: "textfield",
-									name: "nameBank",
-									fieldLabel: t("Name bank")
-								},
-								{
-									xtype: "textfield",
-									name: "IBAN",
-									fieldLabel: t("IBAN")
-								},
-								{
-									xtype: "textfield",
-									name: "BIC",
-									fieldLabel: t("BIC")
-								},
-								{
-									xtype: "xcheckbox",
-									name: "vatReverseCharge",
-									hideLabel: true,
-									boxLabel: t("Reverse charge VAT")
-								},
-								{
-									xtype: "textfield",
-									name: "vatNo",
-									fieldLabel: t("VAT number")
-								}
-							]
+							xtype: "textfield",
+							name: "debtorNumber",
+							fieldLabel: t("Customer number")
 						}
 					]
-				}]
+				},
+				{
+					xtype: "fieldset",
+					defaults: {
+						anchor: "-20",
+					},
+					title: t("Bank details"),
+					items: [
+						{
+							xtype: "textfield",
+							name: "nameBank",
+							fieldLabel: t("Name bank")
+						},
+						{
+							xtype: "textfield",
+							name: "IBAN",
+							fieldLabel: t("IBAN")
+						},
+						{
+							xtype: "textfield",
+							name: "BIC",
+							fieldLabel: t("BIC")
+						},
+						{
+							xtype: "xcheckbox",
+							name: "vatReverseCharge",
+							hideLabel: true,
+							boxLabel: t("Reverse charge VAT")
+						},
+						{
+							xtype: "textfield",
+							name: "vatNo",
+							fieldLabel: t("VAT number")
+						}
+					]
+				}
+			]
+
 
 		}));
 		var items = [this.infoFieldSet = new Ext.form.FieldSet({
