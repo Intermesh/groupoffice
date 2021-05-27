@@ -529,7 +529,10 @@ abstract class Property extends Model {
    * @return string eg. "1" or with multiple keys: "1-2"
    * @throws Exception
    */
-	public function id() {		
+	public function id() {
+		if(property_exists($this, 'id')) {
+			return $this->id;
+		}
 		$keys = $this->primaryKeyValues();
 		if(empty($keys)) {
 			return false;
