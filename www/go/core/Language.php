@@ -9,7 +9,6 @@ use go\core\jmap\Request;
 use go\core\model\Module;
 use go\core\model\User;
 use go\modules\community\addressbook\model\Address;
-use go\core\model\User;
 
 class Language {
 	/**
