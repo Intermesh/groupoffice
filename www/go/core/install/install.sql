@@ -995,8 +995,6 @@ CREATE TABLE `core_alert` (
   `triggerAt` DATETIME NOT NULL,
   `alertId` INT NOT NULL,
   `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
-  title varchar(190) null,
-  body text null,
   PRIMARY KEY (`id`),
   INDEX `dk_alert_entityType_idx` (`entityTypeId` ASC),
   INDEX `fk_alert_user_idx` (`userId` ASC),
@@ -1010,7 +1008,6 @@ CREATE TABLE `core_alert` (
     REFERENCES `core_user` (`id`)
     ON DELETE RESTRICT
     ON UPDATE NO ACTION);
-
 
 
 CREATE TABLE `core_pdf_block` (

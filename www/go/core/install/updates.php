@@ -934,8 +934,3 @@ $updates['202105041513'][] = "delete from core_module where name='voippro' and p
 
 $updates['202105111132'][] = "ALTER TABLE `core_user` ADD COLUMN `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0 AFTER `homeDir`;";
 
-$updates['202105251048'][] = 'alter table core_alert
-	add title varchar(190) null';
-
-$updates['202105251048'][] = 'alter table core_alert
-	add body text null;';

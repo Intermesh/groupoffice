@@ -9,7 +9,7 @@ namespace go\modules\community\tasks\model;
 
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Expression;
-use go\core\model\Alert;
+use go\core\model\Alert as CoreAlert;
 use go\core\orm\CustomFieldsTrait;
 use go\core\model\User;
 use go\core\orm\EntityType;
@@ -345,7 +345,7 @@ class Task extends AclItemEntity {
 		$entityType = EntityType::findByName('Task');
 
 		if(!$this->isNew()) {
-			\go\core\model\Alert::delete([
+			CoreAlert::delete([
 				'entityTypeId' => $entityType->getId(),
 				'entityId' => $this->id,
 				'userId' => go()->getAuthState()->getUserId()
@@ -362,17 +362,31 @@ class Task extends AclItemEntity {
 		}
 	}
 
-	public static function dismissAlerts(\go\core\db\Query $query)
+	/**
+	 * @param Alert[] $alerts
+	 * @throws \Exception
+	 */
+	public static function dismissAlerts(array $alerts)
 	{
-		$alertIds = Alert::find()->mergeWith($query)->selectSingleValue('id');
+		$alertIds = [];
+
+		foreach($alerts as $alert) {
+			$alertIds[] = $alert->alertId;
+		}
 
 		go()->getDbConnection()->update(
 			'tasks_alert', ['acknowledged' => new DateTime()],
-			(new Query)->where('alertId' , 'in', $alertIds)
+			(new Query)->where('id' , 'in', $alertIds)
 		)->execute();
 
-		//TODO
-		Task::entityType()->changes();
+		$changes = Task::find()
+			->select("task.id, tl.aclId, '0'")
+			->join("tasks_tasklist", "tl", "tl.id = task.taskListId")
+			->join("tasks_alert", "a", "a.taskId = task.id")
+			->where('a.id' , 'in', $alertIds)
+			->groupBy(['task.id']);
+
+		Task::entityType()->changes($changes);
 	}
 
 	protected function createNewTask(\DateTimeInterface $next) {

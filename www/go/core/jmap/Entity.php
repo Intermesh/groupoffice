@@ -350,8 +350,6 @@ abstract class Entity  extends OrmEntity {
 			}
 		}
 
-		static::dismissAlerts($query);
-
 		if(!parent::internalDelete($query)) {
 			return false;
 		}		
@@ -690,11 +688,13 @@ abstract class Entity  extends OrmEntity {
 	}
 
 	/**
-	 * @param DateTime $triggerAt
+	 * Create an alert for this entity
+	 *
+	 * @param \DateTime $triggerAt
 	 * @return \go\core\model\Alert
 	 * @throws Exception
 	 */
-	public function createAlert(DateTime $triggerAt) {
+	public function createAlert(\DateTime $triggerAt) {
 		$alert = new \go\core\model\Alert();
 
 		$alert->triggerAt = $triggerAt;
@@ -705,19 +705,13 @@ abstract class Entity  extends OrmEntity {
 		return $alert;
 	}
 
-
-
-
 	/**
 	 * Called when reminders are deleted / dismissed
 	 *
-	 * To find alerts that are deleted use:
 	 *
-	 * Alert::find()->mergeWith($query);
-	 *
-	 * @param \go\core\db\Query $query
+	 * @param Alert[] $alerts
 	 */
-	public static function dismissAlerts(\go\core\db\Query $query) {
+	public static function dismissAlerts(array $alerts) {
 
 	}
 
