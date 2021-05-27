@@ -20,7 +20,17 @@
 	window.addEventListener("click", setInteracted);
 	window.addEventListener("keydown", setInteracted);
 
-	go.Notifier = {
+	var Notifier = Ext.extend(Ext.util.Observable, {
+
+		constructor: function() {
+
+
+			this.supr().constructor.call(this);
+
+			this.addEvents({
+				"beforeshow" : true
+			});
+		},
 
 		_userInteracted: false,
 		messageCt: null,
@@ -51,6 +61,8 @@
 
 			this.notifications = new Ext.Container({cls: 'notifications'});
 			this.notificationArea.insert(0,this.notifications);
+
+			this.notifiedAlerts = {};
 		},
 
 		_messages: {},
@@ -93,23 +105,40 @@
 			return this._messages[key] || null;
 		},
 
+		updateStatusIcons: function() {
+			let active = [];
+			for(let id in this._messages) {
+				if(this._messages[id].statusIcon && active.indexOf(this._messages[id].statusIcon) == -1) {
+					active.push(this._messages[id].statusIcon);
+				}
+			}
+
+			for(let key in  this._icons) {
+				this.toggleIcon(key, active.indexOf(key) > -1);
+			}
+		},
+
 		/**
-		 * Put a message into the notification area (fallback to notify())
-		 * @param msg {title, description, iconCls, removeAfter (ms)}
+		 * Put a message into the notification area
+		 *
+		 * @param msg {title, description, iconCls, notificationBody}
 		 */
-		msg: function (msg, key) {
+		msg: function (msg, itemId) {
 
 			if(!this.notifications) {
 				this.flyout({title:msg.title, description: msg.description});
 				return; // not initializes (happens after login)
 			}
 
-			if(msg.id && !key) {
-				key = msg.id;
+			if(itemId) {
+				msg.itemId = itemId;
+			}
+			if(!msg.itemId) {
+				msg.itemId = 'notify-' + Ext.id();
 			}
 
 			if(msg.sound) {
-				this.playSound(msg.sound, key);
+				this.playSound(msg.sound, msg.itemId);
 			}
 			if(msg.handler) {
 				msg.listeners = msg.listeners || {};
@@ -124,45 +153,41 @@
 			}
 
 			//msg.renderTo = this.messageCt;
-			msg.html = msg.description || msg.html; // backward compat
-			var me = this;
-			msg.tools = [{
-				id: 'close',
-				handler: function (e, toolEl, panel) {
-					if(key) {
-						delete me._messages[key];
+			msg.html = msg.description || msg.html || msg.body; // backward compat
+
+			var msgPanel = Ext.create(msg, "panel");
+
+			if(!msgPanel.tools || !msgPanel.getTool('close')) {
+				msgPanel.addTool({
+					id: "close",
+					tooltip: t("Close"),
+					visible: !msg.persistent,
+					handler: function (e, toolEl, panel, tc) {
+						panel.destroy();
 					}
-					me.remove(panel);
-				},
-				hidden: msg.persistent
-			}];
-			if(!key) {
-				key = 'notify-' + Ext.id();
+				});
 			}
-			msg.itemId = key;
 
-			var msgPanel = new Ext.Panel(msg);
+			if(this._messages[msg.itemId]) {
+				this._messages[msg.itemId].destroy();
+			}
+			this._messages[msg.itemId] = msgPanel;
 
-			if(msg.itemId) {
-				// debugger;
-				if(this._messages[msg.itemId]) {
-					this._messages[msg.itemId].destroy();
+			msgPanel.on("destroy", function(msg) {
+
+				//close the desktop notification if set
+				if(msgPanel.notification){
+					msgPanel.notification.close();
 				}
-				this._messages[msg.itemId] = msgPanel;
-			}
 
-			this.notifications.add(msgPanel);
-			this.notifications.doLayout();
+				delete this._messages[msg.itemId];
+				this.updateStatusIcons();
 
-			if(msg.removeAfter) {
-				setTimeout(function () {
-					if(msg.itemId) {
-						delete me._messages[msg.itemId];
-					}
-					me.remove(msgPanel);
-				}, msg.removeAfter);
-			}
+			}, this);
+
 			msgPanel.setPersistent = function(bool) {
+
+				msgPanel.persistent = bool;
 
 				if(!msgPanel.rendered) {
 					msgPanel.on("render", function() {
@@ -175,9 +200,37 @@
 				return msgPanel;
 			};
 
+			if(msgPanel.notificationBody && !this.notifiedAlerts[msgPanel.itemId]) {
+				//create desktop notification
+				go.Notifier.notify({
+						body: msgPanel.notificationBody,
+						title: msgPanel.title,
+						tag: msgPanel.itemId,
+						onclose: function (e) {
+							// close group-office notification too.
+							msgPanel.destroy();
+						}
+					}
+				).then((notification) => {
+					// set Desktop.Notification on Group-Office notification so we can close it when closing it in GO.
+					msgPanel.notification = notification
+				}).catch((e) => {
+					console.warn("Notification failed: " + e);
+				});
 
+				this.notifiedAlerts[msgPanel.itemId] = true;
+			}
+
+			if(this.fireEvent("beforenotify", this, msgPanel) === false) {
+				return false;
+			}
+
+			this.notifications.add(msgPanel);
+			this.notifications.doLayout();
 
 			this.showNotifications();
+
+			this.updateStatusIcons();
 
 			return msgPanel;
 		},
@@ -190,6 +243,20 @@
 
 			//added here to make sure it comes last
 			if(!this.notificationArea.tools['close']) {
+
+				this.notificationArea.addTool({
+					id:'dismiss',
+					qtip: t('Dismiss all'),
+					handler: function() {
+						Ext.MessageBox.confirm(t("Confirm"), t('Are you sure you want to dismiss all notifications?'), function(btn){
+							if(btn=='yes') {
+								go.Notifier.removeAll();
+							}
+						}, this);
+					},
+					scope:this
+				});
+
 				this.notificationArea.addTool({
 					id: "close",
 					tooltip: t("Close"),
@@ -377,6 +444,8 @@
 			}
 
 		}
-	};
+	});
+
+	go.Notifier = new Notifier();
 
 })();

@@ -51,6 +51,12 @@ class Module extends \go\core\Module {
 	}
 
 	public static function checkUrl() {
+
+		//Skip localhost for development
+		if(Request::get()->getHost() === 'localhost') {
+			return;
+		}
+
 		$configUrl = go()->getSettings()->URL;
 		$p = parse_url($configUrl, PHP_URL_HOST);
 

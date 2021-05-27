@@ -24,6 +24,8 @@ class Alert extends SingleOwnerEntity
 	public $recurrenceId;
 	public $alertId;
 
+	protected $data;
+
 	protected static function defineMapping() {
 		return parent::defineMapping()
 			->addTable("core_alert", "alert");
@@ -35,6 +37,24 @@ class Alert extends SingleOwnerEntity
 
 	public function setEntity($name) {
 		$this->entityTypeId = EntityType::findByName($name)->getId();
+	}
+
+	/**
+	 * Get arbitrary notification data
+	 *
+	 * @return array
+	 */
+	public function getData() {
+		return empty($this->data) ? [] : json_decode($this->data, true);
+	}
+
+	/**
+	 * Set arbitrary notification data
+	 *
+	 * @param $data
+	 */
+	public function setData(array $data) {
+		$this->data = json_encode(array_merge($this->getData(), $data));
 	}
 
 	protected static function internalDelete(Query $query)

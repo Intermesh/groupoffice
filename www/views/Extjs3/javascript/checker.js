@@ -31,7 +31,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 	initReminders: function() {
 
-		go.Notifier.addStatusIcon('reminder', 'ic-notifications');
+
 		var checkerSnoozeTimes = [
 			[300,'5 '+t("Minutes")],
 			[600, '10 '+t("Minutes")],
@@ -49,22 +49,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			[6*86400, '6 '+t("Days")],
 			[7*86400, '7 '+t("Days")]
 		];
-		go.Notifier.notificationArea.addTool({
-			id:'dismiss',
-			qtip: t('Dismiss all'),
-			handler: function() {
-				Ext.MessageBox.confirm(t("Confirm"), t('Are you sure you want to dismiss all reminders?'), function(btn){
-					if(btn=='yes') {
-						this.doTask("dismiss_reminders", 0, this.reminderStore.data.keys);
-						this.reminders.removeAll();
-						go.Notifier.removeAll();
 
-						go.Notifier.toggleIcon('reminder', false);
-					}
-				}, this);
-			},
-			scope:this
-		});
 
 		this.reminders = new Ext.Container({cls: 'notifications', layout: "anchor", defaults: {anchor: "100%"}});
 

@@ -995,6 +995,7 @@ CREATE TABLE `core_alert` (
   `triggerAt` DATETIME NOT NULL,
   `alertId` INT NOT NULL,
   `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
+  `data` text null,
   PRIMARY KEY (`id`),
   INDEX `dk_alert_entityType_idx` (`entityTypeId` ASC),
   INDEX `fk_alert_user_idx` (`userId` ASC),

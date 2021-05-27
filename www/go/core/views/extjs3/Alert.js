@@ -1,66 +1,90 @@
 (function(){
 
-	GO.mainLayout.on('render', function () {
+	const Alerts = Ext.extend(Ext.util.Observable, {
 
-		go.Notifier.addStatusIcon('reminder', 'ic-notifications');
+		constructor : function() {
 
-		go.Db.store("Alert").all().then(showAlerts);
+			this.supr().constructor.call(this);
 
-		go.Db.store("Alert").on("changes", (store, added, changed, destroyed) => {
-			destroyed.forEach((id) => {
-				go.Notifier.removeById("core-alert-" + id);
+			this.addEvents({
+				"beforeshow" : true
+			});
+			go.Notifier.addStatusIcon('reminder', 'ic-notifications');
+
+			go.Db.store("Alert").all().then((alerts) => {
+				alerts.forEach((alert) => {
+					this.show(alert);
+				});
 			});
 
-			for(let id in added) {
-				showAlert(added[id]);
+			go.Db.store("Alert").on("changes", (store, added, changed, destroyed) => {
+				destroyed.forEach((id) => {
+					go.Notifier.removeById("core-alert-" + id);
+				});
+
+				for(let id in added) {
+					this.show(added[id]);
+				}
+
+				for(let id in changed) {
+					this.show(changed[id]);
+				}
+			});
+		},
+
+		show : function(alert) {
+			const now = new Date();
+
+			if(new Date(alert.triggerAt) > now) {
+				go.Notifier.removeById('core-alert-' + alert.id);
+				return;
 			}
 
-			for(let id in changed) {
-				showAlert(changed[id]);
-			}
-		});
+			go.Db.store(alert.entity).single(alert.entityId).then((entity) => {
+
+				const panelCfg = {
+					statusIcon: 'reminder',
+					itemId: 'core-alert-' + alert.id,
+					title: entity.title || entity.name || entity.description,
+					html: go.util.Format.dateTime(alert.triggerAt),
+					iconCls: 'entity ' + alert.entity,
+					buttonAlign: "right",
+					listeners: {
+						destroy: () => {
+							go.Db.store("Alert").destroy(alert.id);
+						}
+					},
+					buttons: [{
+						text: t("Open"),
+						handler: () => {
+							go.Entities.get(alert.entity).goto(alert.entityId);
+							go.Notifier.hideNotifications();
+						}
+					}, {
+						text: t("Dismiss"),
+						handler: (btn) => {
+							pnl.destroy();
+						}
+					}]
+				};
+
+				panelCfg.notificationBody = panelCfg.html;
+
+				//Modules can use this to cancel or modify the alert
+				if(this.fireEvent('beforeshow', this, alert, entity, panelCfg) === false) {
+					return;
+				}
+
+				const pnl = go.Notifier.msg(panelCfg);
+			});
+		}
+	})
+
+
+
+	GO.mainLayout.on('render', function () {
+		go.Alerts = new Alerts();
 	});
 
-	showAlerts = function(alerts) {
 
-		go.Notifier.toggleIcon('reminder', true);
-
-		alerts.forEach((alert) => {
-			showAlert(alert);
-		});
-	}
-
-	showAlert = function(alert) {
-		const now = new Date();
-
-		if(new Date(alert.triggerAt) > now) {
-			go.Notifier.removeById('core-alert-' + alert.id);
-			return;
-		}
-
-		go.Db.store(alert.entity).single(alert.entityId).then((entity) => {
-
-			const pnl = {
-				id: 'core-alert-' + alert.id,
-				title: entity.title,
-				html: go.util.Format.dateTime(alert.triggerAt),
-				iconCls: 'entity ' + alert.entity,
-				buttonAlign: "right",
-				buttons: [{
-					text: t("Open"),
-					handler: () => {
-						go.Entities.get(alert.entity).goto(alert.entityId);
-						go.Notifier.hideNotifications();
-					}
-				}, {
-					text: t("Dismiss"),
-					handler: () => {
-						go.Db.store("Alert").destroy(alert.id);
-					}
-				}]
-			};
-
-			go.Notifier.msg(pnl);
-		});
-	}
 })();
