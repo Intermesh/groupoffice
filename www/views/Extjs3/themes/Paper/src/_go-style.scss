@@ -595,6 +595,11 @@ a {
 		padding: 0 0 0 dp(8);
 		background-color: rgba(255,255,255,0.1);
 		color: white;
+
+		&::placeholder {
+			color: #dedede;
+			font-style: italic;
+		}
 		
 		&.x-form-invalid {
 			background-color: #e57373;
@@ -632,7 +637,7 @@ a {
 			color: color($fg,'secondary-text');
 			>i, .x-tool {
 				transform: scale(.8);
-				margin-top: dp(-4);
+				margin-top: dp(12);
 			}
 			.x-tool {
 				transform: scale(.8);
@@ -645,9 +650,8 @@ a {
 			color: color($fg,'secondary-text');
 			font-size: dp(16);
 		}
-		.x-panel-bwrap {
+		.x-panel-body {
 			padding: dp(8) dp(16);
-			em {float:right;}
 		}
 	}
 }
@@ -666,9 +670,15 @@ a {
 	i.entity::before{margin-top: dp(-22);}
 }
 .notificationArea {
-	z-index: 1000000 !important;
+	//higher than window 9003 and lower than menu's 15000
+	z-index: 10000 !important;
 	@include var('background-color', c-primary);
-	.x-panel-header,.x-panel-header-text { border-top:0; color:white; }
+	.x-panel-header,.x-panel-header-text {
+		border-top:0; color:white;
+		.x-tool:hover {
+			color: color($grey-material, 300);
+		}
+	}
 }
 @keyframes blink {
 	0% {opacity: 0;}
@@ -1437,19 +1447,27 @@ table[id^="comments-ext"] b {
 	border-bottom: 1px solid color($fg, 'line');
 }
 
-.x-window.go-form-panel .x-panel-body, 
-.x-window.go-form-panel .x-window-body, 
+.x-window.go-form-panel .x-panel-body,
+.x-window.go-form-panel .x-window-body,
 .x-column.go-form-panel .x-panel-body,
 .x-form-label-left.go-form-panel > div > .x-panel-body,
-.go-form-panel .x-panel-body,
-.go-error-dialog{
+.go-form-panel .x-panel-body, .go-error-dialog{
 	padding: dp(8) dp(16);
 }
+
 .go-error-dialog {
-	font-size: 10px;
+	font-size: dp(14);
 	font-family: monospace;
 	line-height: 1.4em;
+	white-space: nowrap;
+
+	.x-panel-body {
+		padding: dp(8);
+		border: 1px solid color($fg, 'line');
+		background-color: color($bg, 'card');
+	}
 }
+
 #container { // error container
 	margin: dp(24);
 	padding: dp(16);

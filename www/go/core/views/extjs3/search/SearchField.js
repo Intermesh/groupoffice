@@ -2,7 +2,7 @@
 go.search.SearchField = Ext.extend(Ext.form.TriggerField,{  
   hideLabel: true,
   anchor: "100%",
-  placeholder: t("Search"),
+  placeholder: t("Search") + "...",
   validationEvent: false,
   validateOnBlur: false,
   triggerClass: 'x-form-clear-trigger',

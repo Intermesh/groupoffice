@@ -877,7 +877,7 @@ Se non hai richiesto una nuova password ti preghiamo di eliminare questo messagg
 	'Capital after punctuation' => 'Maiuscola automatica dopo punto.',
 	'Date format' => 'Formato data',
 	'Time format' => 'Formato ora',
-	'product_name' => 'GroupOffice',
+
 	'Apply to all' => 'Applica a tutti',
 	'Are you sure you want to reset all group permissions? This can\'t be undone.' => 'Sicuro di voler resettare tutti i permessi del gruppo? Questa azione è irreversibile!',
 	'Working week' => 'Giorni lavorativi della settimana',

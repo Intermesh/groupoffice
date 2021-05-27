@@ -23,6 +23,7 @@ use go\core\jmap\Entity;
 use go\core\orm\CustomFieldsTrait;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
+use GO\Files\Model\Folder;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\notes\model\NoteBook;
 
@@ -33,10 +34,24 @@ class User extends Entity {
 
 	const ID_SUPER_ADMIN = 1;
 
+	/**
+	 * Fires on login
+	 *
+	 * @param User $user
+	 */
 	const EVENT_LOGIN = 'login';
 
+	/**
+	 * Fires on logout
+	 *
+	 * @param User $user
+	 */
 	const EVENT_LOGOUT = 'logout';
 
+	/**
+	 * @param string $username
+	 * @param User $user Can be null
+	 */
 	const EVENT_BADLOGIN = 'badlogin';
 	
 	public $validatePassword = true;
@@ -157,6 +172,21 @@ class User extends Entity {
 	 * @var string
 	 */
 	public $textSeparator;
+
+	/**
+	 * Home directory of the user
+	 *
+	 * eg. users/admin
+	 *
+	 * @var string
+	 */
+	public $homeDir;
+
+	/**
+	 * When true the user interface will show a confirm dialog before moving item with drag and drop
+	 * @var bool
+	 */
+	public $confirmOnMove;
 	
 	
 	public $max_rows_list;
@@ -175,7 +205,7 @@ class User extends Entity {
 	public $timezone;
 	public $start_module;
 	public $language;
-	public $theme;
+	protected $theme;
 	public $firstWeekday;
 	public $sort_name;
 	
@@ -297,6 +327,7 @@ class User extends Entity {
 			$this->firstWeekday = (int) $s->defaultFirstWeekday;
 			$this->currency = $s->defaultCurrency;
 			$this->shortDateInList = (bool) $s->defaultShortDateInList;
+			$this->confirmOnMove = (bool) $s->defaultConfirmOnMove;
 			$this->listSeparator = $s->defaultListSeparator;
 			$this->textSeparator = $s->defaultTextSeparator;
 			$this->thousandsSeparator = $s->defaultThousandSeparator;
@@ -430,6 +461,10 @@ class User extends Entity {
 	}
 	
 	protected function internalValidate() {
+
+		if(!isset($this->homeDir)) {
+			$this->homeDir = "users/" . $this->username;
+		}
 		
 		if($this->isModified('groups')) {	
 			
@@ -502,14 +537,14 @@ class User extends Entity {
 	}
 	
 	private function maxUsersReached() {
-	  if(empty(go()->getConfig()['core']['limits']['maxUsers'])) {
+	  if(empty(go()->getConfig()['max_users'])) {
 	    return false;
     }
 
 		$stmt = go()->getDbConnection()->query("SELECT count(*) AS count FROM `core_user` WHERE enabled = 1");
 		$record = $stmt->fetch();
 		$countActive = $record['count'];
-		return $countActive >= go()->getConfig()['core']['limits']['maxUsers'];
+		return $countActive >= go()->getConfig()['max_users'];
 	}
 
 	private static function count() {
@@ -564,6 +599,17 @@ class User extends Entity {
 			->select('*')
 			->from('core_user_group')
 			->where(['groupId' => Group::ID_ADMINS, 'userId' => $this->id])->single() !== false;
+	}
+
+	public static function isAdminById($userId) {
+		if($userId == User::ID_SUPER_ADMIN) {
+			return true;
+		}
+
+		return (new Query)
+				->select('*')
+				->from('core_user_group')
+				->where(['groupId' => Group::ID_ADMINS, 'userId' => $userId])->single() !== false;
 	}
 
   /**
@@ -659,9 +705,44 @@ class User extends Entity {
 		if($this->archive) {
 			$this->archiveUser();
 		}
-		
+
+		$this->changeHomeDir();
+
 		return true;		
 	}
+
+	private function changeHomeDir() {
+		if(!$this->isModified("homeDir") || !Module::isInstalled('legacy', 'files')) {
+			return;
+		}
+
+		$oldDir = $this->getOldValue('homeDir');
+		if(!$oldDir) {
+			return;
+		}
+
+		$folder = Folder::model()->findByPath($oldDir);
+		if(!$folder) {
+			return;
+		}
+
+		$parent = dirname($this->homeDir);
+		if(empty($parent)) {
+			throw new \Exception("Invalid home directory. It must be a parent directory like users/username");
+		}
+
+		$dest = Folder::model()->findByPath($parent, true);
+
+		$folder->name = basename($this->homeDir);
+		$folder->parent_id=$dest->id;
+		$folder->systemSave = true;
+
+		if(!$folder->save(true)) {
+			throw new Exception("Failed to move home dir from " . $oldDir . "  to " .$this->homeDir);
+		}
+	}
+
+
 	
 	/**
 	 * Hash a password for users
@@ -957,6 +1038,19 @@ class User extends Entity {
 				}
 			}
 			$rec->save();
+		}
+	}
+
+
+	public function setTheme($v) {
+		$this->theme = $v;
+	}
+
+	public function getTheme() {
+		if(!go()->getConfig()['allow_themes']) {
+			return go()->getConfig()['theme'];
+		} else {
+			return $this->theme;
 		}
 	}
 }

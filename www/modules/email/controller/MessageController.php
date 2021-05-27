@@ -6,6 +6,7 @@ namespace GO\Email\Controller;
 use GO;
 use GO\Base\Exception\AccessDenied;
 
+use go\core\ErrorHandler;
 use go\core\model\User;
 use GO\Email\Model\Account;
 use GO\Email\Model\Alias;
@@ -520,7 +521,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 						if(!$linkedEmail){
 							$linkedEmail = new \GO\Savemailas\Model\LinkedEmail();
 							$linkedEmail->setAttributes($attributes);
-							$linkedEmail->save();
+							$linkedEmail->save(true);
 						}
 
 
@@ -562,7 +563,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 								if(!$linkedEmail){
 									$linkedEmail = new \GO\Savemailas\Model\LinkedEmail();
 									$linkedEmail->setAttributes($attributes);
-									$linkedEmail->save();
+									$linkedEmail->save(true);
 								}
 
 								$linkedEmail->link($contact);
@@ -1494,9 +1495,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$response = $this->_checkXSS($params, $response);
 			}
 
-			if($params['mailbox'] == $account->spam) {
+//			if($params['mailbox'] == $account->spam) {
 				$response = $this->_blockImages($params, $response);
-			}
+//			}
 
 			//Don't do these special actions in the special folders
 			if(!$imapMessage->seen && $params['mailbox']!=$account->sent && $params['mailbox']!=$account->trash && $params['mailbox']!=$account->drafts){
@@ -2043,12 +2044,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$folder = \GO\Files\Model\Folder::model()->findByPk($params['folder_id']);
 
 		if(!$folder){
-			trigger_error("GO\Email\Controller\Message::actionSaveAttachment(".$params['folder_id'].") folder not found", E_USER_WARNING);
+			ErrorHandler::log("GO\Email\Controller\Message::actionSaveAttachment(".$params['folder_id'].") folder not found", E_USER_WARNING);
 			throw new \GO\Base\Exception\NotFound("Specified folder not found");
-		}
-		
-		if(!$folder->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)) {
-			throw new \GO\Base\Exception\AccessDenied();
 		}
 
 		$params['filename'] = \GO\Base\Fs\File::stripInvalidChars($params['filename']);		

@@ -19,7 +19,7 @@ class Apcu implements CacheInterface {
 	private $disk;
 	
 	public function __construct() {
-		$this->prefix = go()->getConfig()['core']['db']['name'];
+		$this->prefix = go()->getConfig()['db_name'];
 	}
 
 

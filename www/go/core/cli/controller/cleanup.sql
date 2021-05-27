@@ -1,7 +1,6 @@
 delete from core_group where isUserGroupFor is not null and isUserGroupFor not in (select id from core_user);
-delete from go_reminders where user_id not in (select id from core_user);
 delete from go_reminders_users where user_id not in (select id from core_user);
-delete from go_reminders where user_id not in (select reminder_id from go_reminders_users);
+delete from go_reminders where id not in (select reminder_id from go_reminders_users);
 delete from go_settings where user_id > 0 && user_id not in (select id from core_user);
 delete from go_working_weeks where user_id not in (select id from core_user);
 

@@ -52,7 +52,7 @@ class TemplateController extends \GO\Base\Controller\AbstractModelController{
 	}
 	
 	protected function afterSubmit(&$response, &$model, &$params, $modifiedAttributes) {
-		$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($model->content);
+		$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($model->content, false);
 		$response['htmlbody'] = $message->getHtmlBody();
 		
 		// reset the temp folder created by the core controller

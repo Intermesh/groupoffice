@@ -931,7 +931,7 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
   'Encryption' => 'Encryptie',
   'Hostname' => 'Servernaam',
   'Port' => 'Poort',
-  'product_name' => 'GroupOffice',
+
   'Text with ' => 
   array (
     '{1}' => 'Tekst met [{1}] fout(en)',
@@ -1131,4 +1131,7 @@ Als u niet om een nieuw wachtwoord heeft gevraagd verwijder dan deze e-mail.',
 	'Show as tab' => 'Toon als tab',
 	'Checked' => 'Aangevinkt',
 	'Archiving a user will disable them and make their items invisible. Are you sure?' => 'Wanneer u een gebruiker archiveert, kan deze niet meer inloggen en worden alle opgeslagen gegevens onzichtbaar gemaakt. Weet u zeker dat u dit wilt doen?',
+	"When this is on and items are moved by dragging, confirmation is requested" => "Als dit aan staat en items worden verplaatst middels slepen, wordt bevestiging gevraagt",
+	"Show confirmation dialog on move" => "Toon bevestiging dialog bij verplaatsen",
+	"Are you sure you want to move the item(s)?" => 'Weet je zeker dat je de item(s) wilt verplaatsen?'
 );

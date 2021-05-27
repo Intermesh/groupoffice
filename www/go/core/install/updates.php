@@ -765,12 +765,9 @@ $updates['202012231410'][] = function() {
 	}
 };
 
-$updates['202102111534'][] = "delete from go_state where user_id not in (select id from core_user);";
+$updates['202102111534'][] = ""; // Intentionally left blank
 
-$updates['202102111534'][] = "alter table go_state
-	add constraint go_state_core_user_id_fk
-		foreign key (user_id) references core_user (id)
-			on delete cascade;";
+$updates['202102111534'][] = ""; // Intentionally left blank
 
 
 $updates['202102111534'][] = "CREATE TABLE `core_alert` (
@@ -871,7 +868,7 @@ $updates['202102111534'][] = "CREATE TABLE `core_oauth_auth_codes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
 
-$updates['202102111534'][] = "ALTER TABLE `go_templates` ADD COLUMN `filename` VARCHAR(100) NULL DEFAULT NULL AFTER `content`";
+$updates['202102111534'][] = "";
 $updates['202102111534'][] = "ALTER TABLE `go_templates` ADD COLUMN `filename` VARCHAR(100) NULL DEFAULT NULL AFTER `content`";
 
 
@@ -886,9 +883,65 @@ $updates['202102111534'][] = "alter table go_state
 $updates['202102111534'][] = "alter table core_auth_token change `passedMethods` `passedAuthenticators` varchar(190) null;";
 $updates['202103091517'][] = "ALTER TABLE `core_customfields_select_option` ADD COLUMN `sortOrder` INT(11) UNSIGNED DEFAULT 0 AFTER `text`;";
 
+
+$updates['202104061227'][] = "alter table core_user drop column popup_reminders;";
+
+$updates['202104061227'][] = "alter table core_user drop column popup_emails;";
+
+$updates['202104161227'][] = "ALTER TABLE core_search DROP INDEX `filter`;";
+$updates['202104161227'][] = "create index core_search_entityTypeId_filter_modifiedAt_aclId_index
+    on core_search (entityTypeId, filter, modifiedAt, aclId);";
+
+$updates['202104161227'][] = "ALTER TABLE `core_search_word`
+  DROP `drow`;";
+
+$updates['202104161227'][] = "ALTER TABLE `core_search` DROP INDEX `entityTypeId`";
+
+$updates['202104161227'][] = function() {
+
+	go()->getDbConnection()->exec("truncate core_search_word");
+	go()->getDbConnection()->exec("SET foreign_key_checks = 0;");
+	go()->getDbConnection()->exec("truncate core_search");
+	go()->getDbConnection()->exec("SET foreign_key_checks = 1;");
+
+	//run build search cache on cron immediately. This job will deactivate itself.
+	\go\core\cron\BuildSearchCache::install("* * * * *", true);
+
+	echo "NOTE: Search cache will be rebuilt by a scheduled task. This may take a lot of time.";
+};
+
+
+$updates['202105041513'][] = "delete from core_module where name='log' and package is null";
+
+$updates['202105041513'][] = "alter table core_user
+	add homeDir varchar(190) not null;";
+
+$updates['202105041513'][] = "update core_user set homeDir=concat('users/', username);";
+
+$updates['202105041513'][] = "delete from core_acl_group where groupId = 1;";
+
+$updates['202105041513'][] = "delete from core_module where name='timeregistration' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='search' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='phpcustomfield' and package is null";
+
+$updates['202105041513'][] = "delete from core_module where name='ipwhitelist' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='wopicollabora' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='wopioffice365' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='tfs' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='phpbb3' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='voip' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='voippro' and package is null";
+
+$updates['202105111132'][] = "ALTER TABLE `core_user` ADD COLUMN `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0 AFTER `homeDir`;";
+
+
+
+
+
+
 // MASTER UPDATES
 
-$updates['202102111534'][] = "CREATE TABLE `core_pdf_block` (
+$updates['202105271703'][] = "CREATE TABLE `core_pdf_block` (
 `id` bigint(20) UNSIGNED NOT NULL,
   `pdfTemplateId` bigint(20) UNSIGNED NOT NULL,
   `x` int(11) DEFAULT NULL,
@@ -900,7 +953,7 @@ $updates['202102111534'][] = "CREATE TABLE `core_pdf_block` (
   `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
-$updates['202102111534'][] = "CREATE TABLE `core_pdf_template` (
+$updates['202105271703'][] = "CREATE TABLE `core_pdf_template` (
 `id` bigint(20) UNSIGNED NOT NULL,
   `moduleId` int(11) NOT NULL,
   `key` varchar(20) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
@@ -916,27 +969,27 @@ $updates['202102111534'][] = "CREATE TABLE `core_pdf_template` (
   `marginLeft` decimal(19,4) NOT NULL DEFAULT 10.0000
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
-$updates['202102111534'][] = "ALTER TABLE `core_pdf_block`
+$updates['202105271703'][] = "ALTER TABLE `core_pdf_block`
   ADD PRIMARY KEY (`id`) USING BTREE,
   ADD KEY `pdfTemplateId` (`pdfTemplateId`);";
 
-$updates['202102111534'][] = "ALTER TABLE `core_pdf_template`
+$updates['202105271703'][] = "ALTER TABLE `core_pdf_template`
   ADD PRIMARY KEY (`id`),
   ADD KEY `moduleId` (`moduleId`),
   ADD KEY `stationaryBlobId` (`stationaryBlobId`);";
 
-$updates['202102111534'][] = "ALTER TABLE `core_pdf_block`
+$updates['202105271703'][] = "ALTER TABLE `core_pdf_block`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;";
 
-$updates['202102111534'][] = "ALTER TABLE `core_pdf_template`
+$updates['202105271703'][] = "ALTER TABLE `core_pdf_template`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;";
 
-$updates['202102111534'][] = "ALTER TABLE `core_pdf_block`
+$updates['202105271703'][] = "ALTER TABLE `core_pdf_block`
   ADD CONSTRAINT `core_pdf_block_ibfk_1` FOREIGN KEY (`pdfTemplateId`) REFERENCES `core_pdf_template` (`id`) ON DELETE CASCADE;";
 
-$updates['202102111534'][] = "ALTER TABLE `core_pdf_template`
+$updates['202105271703'][] = "ALTER TABLE `core_pdf_template`
   ADD CONSTRAINT `core_pdf_template_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_pdf_template_ibfk_2` FOREIGN KEY (`stationaryBlobId`) REFERENCES `core_blob` (`id`);";
 
 
-$updates['202102111534'][] = "ALTER TABLE `core_email_template` ADD `key` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL AFTER `aclId`, ADD `language` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'en' AFTER `key`;";
+$updates['202105271703'][] = "ALTER TABLE `core_email_template` ADD `key` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL AFTER `aclId`, ADD `language` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'en' AFTER `key`;";

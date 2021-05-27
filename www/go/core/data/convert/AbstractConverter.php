@@ -167,6 +167,7 @@ abstract class AbstractConverter {
 				//ignore when false is returned. This is not an error. But intentional. Like CSV skipping a blank line for example.
 				if($entity === false) {
 					go()->getDbConnection()->rollBack();
+					$this->index++;
 					continue;
 				}			
 

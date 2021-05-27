@@ -11774,7 +11774,7 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
             this.focusTask.delay(Ext.isNumber(delay) ? delay : 10);
             return this;
         }
-        if(this.rendered && !this.isDestroyed){
+        if(this.rendered && !this.isDestroyed && this.el.isInViewport()){
             this.el.focus();
             if(selectText === true){
                 this.el.dom.select();

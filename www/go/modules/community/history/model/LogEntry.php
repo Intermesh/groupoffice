@@ -4,6 +4,9 @@ namespace go\modules\community\history\model;
 
 use GO\Base\Db\ActiveRecord;
 use go\core\db\Criteria;
+use go\core\http\Request;
+use go\core\http\Response;
+use go\core\db\Expression;
 use go\core\jmap\Entity;
 use go\core\orm\EntityType;
 use go\core\orm\Query;
@@ -81,6 +84,40 @@ class LogEntry extends AclOwnerEntity {
 
 	public $description;
 
+	public $remoteIp;
+
+	protected function init()
+	{
+		if($this->isNew()) {
+			$this->remoteIp = Request::get()->getRemoteIpAddress();
+		}
+	}
+
+	public static function checkAcls()
+	{
+		$table = static::getMapping()->getPrimaryTable();
+
+		//set owner and entity properties of acl
+		$aclColumn = static::getMapping()->getColumn(static::$aclColumnName);
+
+		$updates = [
+			'acl.entityTypeId' => static::entityType()->getId(),
+			'acl.entityId' => new Expression('entity.id'),
+			'acl.usedIn' => $aclColumn->table->getName() . '.' . static::$aclColumnName
+		];
+
+		$stmt = go()->getDbConnection()->update(
+			'core_acl',
+			$updates,
+			(new Query())
+				->tableAlias('acl')
+				->join($table->getName(), 'entity', 'entity.' . static::$aclColumnName . ' = acl.id AND removeAcl = true and action='  . self::$actionMap['delete']));
+
+		if(!$stmt->execute()) {
+			throw new Exception("Could not update ACL");
+		}
+	}
+
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable('history_log_entry', 'l')
 			->setQuery(
@@ -88,6 +125,11 @@ class LogEntry extends AclOwnerEntity {
 					->select("e.clientName AS entity")
 					->join('core_entity', 'e', 'e.id = l.entityTypeId')
 			);
+	}
+
+	public static function loggable()
+	{
+		return false;
 	}
 
 	protected static function textFilterColumns()
@@ -167,5 +209,10 @@ class LogEntry extends AclOwnerEntity {
 
 	public function setAclId($aclId) {
 		$this->aclId = $aclId;
+	}
+
+	protected static function checkAcl()
+	{
+		//don't update acl records usedin is history
 	}
 }

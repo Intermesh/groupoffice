@@ -112,7 +112,7 @@ class FolderController extends \GO\Base\Controller\AbstractController {
 		if(array_key_exists('trashable', $params) && intval($params['trashable']) === 0) {
 			// The 'Trash' mailbox has the flag 'noinferiors' enabled. The end user was warned, we can safely delete
 			$success = $mailbox->delete();
-		} elseif(strpos($params['mailbox'],$account->trash) !== 0 && !empty($account->trash)) {
+		} elseif(!empty($account->trash) && strpos($params['mailbox'],$account->trash) !== 0) {
 			$targetMailbox = new \GO\Email\Model\ImapMailbox($account, ["name" => $account->trash]);
 
 			if($targetMailbox->getHasChildren()) {

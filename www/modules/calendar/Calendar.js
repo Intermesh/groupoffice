@@ -2453,3 +2453,17 @@ GO.calendar.showInfo = function (eventId) {
 	eventPanel.load(eventId);
 	
 }
+
+GO.calendar.importIcs = function(config) {
+	GO.calendar.showEventDialog({
+		url: GO.url('calendar/event/loadICS'),
+		params: {
+			file_id: config.id
+			// account_id: panel.account_id,
+			// mailbox: panel.mailbox,
+			// uid: panel.uid,
+			// number: attachment.number,
+			// encoding: attachment.encoding
+		}
+	});
+}

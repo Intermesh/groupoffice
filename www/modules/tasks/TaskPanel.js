@@ -27,8 +27,8 @@ GO.tasks.TaskPanel = Ext.extend(GO.DisplayPanel,{
 	initComponent : function() {
 		
 		this.loadUrl=('tasks/task/display');
-	
-		this.template = 			
+
+		this.template =
 				'<table class="display-panel" cellpadding="0" cellspacing="0" border="0">'+
 					'<tr>'+
 						'<td colspan="2"><h3>{name}</h3></td>'+
@@ -50,15 +50,14 @@ GO.tasks.TaskPanel = Ext.extend(GO.DisplayPanel,{
 						'<td>{status_text}</td>'+
 					'</tr>';
 				
-				if(go.Modules.isAvailable("legacy", "projects2")){
-					this.template +=
-					'<tpl if="project_name">'+
+				if(go.Modules.isAvailable("legacy", "projects2")) {
+					this.template += '<tpl if="project_name">'+
 						'<tr>'+
 							'<td>'+t("Project", "projects2")+':</td>'+
-							'<td><a  onclick="GO.linkHandlers[\'GO\\\\\\\\Projects2\\\\\\\\Model\\\\\\\\Project\'].call(this, {project_id});">{project_name}</a></td>'+
+							'<td><a class="normal_link"  onclick="GO.tasks.TaskPanel.openProject({project_id});">{project_name:raw}</a></td>' +
 						'</tr>'+
 					'</tpl>';
-				} 
+				}
 					
 				this.template +=
 					'<tpl if="!GO.util.empty(description)">'+
@@ -107,4 +106,14 @@ GO.tasks.TaskPanel = Ext.extend(GO.DisplayPanel,{
 		this.add(go.customfields.CustomFields.getDetailPanels("Task"));
 
 	}
-});			
+
+
+});
+GO.tasks.TaskPanel.openProject = function(projectId) {
+	debugger;
+	var win = new go.links.LinkDetailWindow({
+		entity: 'Project'
+	});
+
+	win.load(projectId);
+};

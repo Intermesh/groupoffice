@@ -62,8 +62,8 @@ use go\modules\business\business\model\EmployeeAgreement;
  * @property string $digest
  * @property int $last_password_change
  * @property boolean $force_password_change
+ * @property string $homeDir
  *
- * @method User findByPk();
  *
  * @property Boolean $sort_email_addresses_by_time
  */
@@ -467,10 +467,7 @@ class User extends \GO\Base\Db\ActiveRecord {
 
 		return parent::validate();
 	}
-	
-	public function buildFilesPath() {
-		return 'users/'.$this->username;
-	}
+
 	
 	protected function beforeSave(){
 		

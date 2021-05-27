@@ -695,10 +695,10 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		p[op] = {};
 		p[op][id] = entity;
 
-		return this.set(p).then(function(response) {
+		return this.set(p).then((response) => {
 			if(op == 'create') {
 				if(response.created && id in response.created) {
-					return response.created[id];
+					return this.single(id);
 				} else
 				{
 					return Promise.reject({message: t("Failed to save"), response: response});
@@ -706,7 +706,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 			} else
 			{
 				if(response.updated && id in response.updated) {
-					return response.updated[id];
+					return this.single(id);
 				} else
 				{
 					return Promise.reject({message: t("Failed to save"), response: response});

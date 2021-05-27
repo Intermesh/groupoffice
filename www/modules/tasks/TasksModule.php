@@ -19,7 +19,7 @@ class TasksModule extends \GO\Base\Module {
 
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		Link::on(Entity::EVENT_FILTER, static::class, 'onLinkFilter');
-		User::on(User::EVENT_BEFORE_SAVE, static::class, 'onUserBeforeSave');
+		User::on(User::EVENT_SAVE, static::class, 'onUserBeforeSave');
 	}
 	
 	public static function initListeners() {		

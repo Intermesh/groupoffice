@@ -70,6 +70,8 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 
 		promise.then(function (response) {
 
+			me.store.hasMore = response.hasMore;
+
 			var getPromise = me.entityStore.get(response.ids).then(function(result) {
 
 				//check if request wasn't replaced

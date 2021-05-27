@@ -1,4 +1,5 @@
 polyfills.js
+Element.js
 
 Jmap.js
 Uploader.js

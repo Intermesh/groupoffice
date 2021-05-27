@@ -72,7 +72,12 @@ class Module extends core\Module implements DomainProvider {
 				'workFax' => 'facsimiletelephonenumber',
 				'workPhone' => 'telephonenumber',
 
-				'organization' => 'organizationname'
+				'organization' => 'organizationname',
+
+//				'homeDir' => function($record) {
+//					//relative path from group-office file_storage_path
+//					return "ldap_homes/" . $record->uid[0] . "/files";
+//				}
 				];
 		}
 		$mapping = $cfg['ldapMapping'];
@@ -121,6 +126,7 @@ class Module extends core\Module implements DomainProvider {
 		if(isset($values['enabled'])) $user->enabled = $values['enabled'];
 		if(isset($values['email'])) $user->email = $values['email'];
 		if(isset($values['displayName'])) $user->displayName = $values['name'] = $values['displayName'];
+		if(isset($values['homeDir'])) $user->homeDir = $values['homeDir'];
 
 		if(\go\core\model\Module::isInstalled('community', 'addressbook')) {
 

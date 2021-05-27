@@ -10,6 +10,7 @@ try {
 	
 	require('../vendor/autoload.php');
 	\go\core\App::get();
+	\go()->setCache(new \go\core\cache\None());
 
 	require("gotest.php");
 	if(!systemIsOk()) {
@@ -22,7 +23,7 @@ try {
 		exit();
 	}
 
-	go()->setCache(new \go\core\cache\None());
+
 
 	require('header.php');
 

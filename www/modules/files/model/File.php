@@ -16,6 +16,7 @@
 namespace GO\Files\Model;
 
 use GO;
+use go\core\model\Module;
 use go\modules\community\history\model\LogEntry;
 use go\core\exception\NotFound;
 

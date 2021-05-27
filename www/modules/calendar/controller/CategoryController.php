@@ -16,11 +16,21 @@ class CategoryController extends \GO\Base\Controller\AbstractModelController {
 		$groupIds = \GO\Base\Model\User::getGroupIds(\GO::user()->id);
 		
 		$storeCriteria = $storeParams->getCriteria();
-		$storeParams->joinAclFieldTable();
-		
+		//$storeParams->joinAclFieldTable();
+
+
+		$joinUserGroupCriteria = \GO\Base\Db\FindCriteria::newInstance()
+			->addInCondition('groupId', $groupIds, 'acl',false);
+
+		$joinCriteria = \GO\Base\Db\FindCriteria::newInstance()
+			->addCondition('acl_id','acl.aclId','=','t',true,true)
+			->mergeWith($joinUserGroupCriteria);
+
+		$storeParams->join('core_acl_group', $joinCriteria,'acl','LEFT');
+
 		if(!empty($params['global_categories']) && !empty($params['calendar_id'])){
 			$storeCriteria->addCondition('calendar_id', 0,'=','t',false);
-			//$storeCriteria->addCondition('acl_id', NULL,'IS NOT','go_acl');
+			$storeCriteria->addCondition('aclId', NULL,'IS NOT','acl');
 			
 			$storeCriteria->addCondition('calendar_id', $params['calendar_id'],'=','t',false);
 		} elseif(!empty($params['calendar_id'])) {
