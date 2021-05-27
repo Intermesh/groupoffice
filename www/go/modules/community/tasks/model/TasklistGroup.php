@@ -4,6 +4,7 @@
 namespace go\modules\community\tasks\model;
 
 use go\core\orm\Property;
+use go\core\validate\ErrorCode;
 
 class TasklistGroup extends Property
 {
@@ -22,11 +23,29 @@ class TasklistGroup extends Property
 	protected $sortOrder;
 
 	/** @var Progress if set the progress of a task will change when the task goes into this column */
-	public $progressChange;
+	protected $progressChange;
 
 	protected static function defineMapping()
 	{
 		return parent::defineMapping()
 			->addTable("tasks_tasklist_group", "group");
+	}
+
+	public function getProgressChange() {
+		return $this->progressChange ? Progress::$db[$this->progressChange] : null;
+	}
+
+	public function setProgressChange($value) {
+		if($value == null) {
+			$this->progressChange = null;
+			return;
+		}
+
+
+		$key = array_search($value, Progress::$db, true);
+		if($key === false) {
+			$this->setValidationError('progress', ErrorCode::INVALID_INPUT, 'Incorrect Progress value for task: ' . $value);
+		} else
+			$this->progressChange = $key;
 	}
 }

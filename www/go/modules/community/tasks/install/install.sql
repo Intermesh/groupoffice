@@ -214,6 +214,7 @@ CREATE TABLE IF NOT EXISTS `tasks_tasklist_group` (
   `color` CHAR(6) NULL,
   `sortOrder` SMALLINT(2) UNSIGNED NOT NULL DEFAULT 0,
   `tasklistId` INT(11) UNSIGNED NOT NULL,
+  `progressChange` TINYINT(2) NULL,
   PRIMARY KEY (`id`, `tasklistId`),
   INDEX `fk_tasks_column_tasks_tasklist1_idx` (`tasklistId` ASC),
   CONSTRAINT `fk_tasks_column_tasks_tasklist1`

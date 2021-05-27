@@ -218,7 +218,7 @@ class Task extends AclItemEntity {
 	public function setProgress($value) {
 		$key = array_search($value, Progress::$db, true);
 		if($key === false) {
-			$this->setValidationError('progress', 10, 'Incorrect Progress value for task');
+			$this->setValidationError('progress', ErrorCode::INVALID_INPUT, 'Incorrect Progress value for task: ' . $value);
 		} else
 			$this->progress = $key;
 	}
@@ -437,6 +437,7 @@ class Task extends AclItemEntity {
 		if(isset($sort['groupOrder'])) {
 			$query->join('tasks_tasklist_group', 'listGroup', 'listGroup.id = task.groupId', 'LEFT');
 			$sort['listGroup.sortOrder'] = $sort['groupOrder'];
+			$sort['id'] = "ASC";
 			unset($sort['groupOrder']);
 		}
 

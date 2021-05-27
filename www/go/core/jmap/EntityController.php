@@ -196,19 +196,21 @@ abstract class EntityController extends Controller {
 		
 		$p = $this->paramsQuery($params);
 		$idsQuery = $this->getQueryQuery($p);
-		$idsQuery->fetchMode(PDO::FETCH_NUM);
+		$idsQuery->fetchMode(PDO::FETCH_COLUMN, 0);
 		
 		$state = $this->getState();
 		
 		$ids = [];		
 
 		try {
-			foreach ($idsQuery as $record) {
-				if (!isset($count)) {
-					$count = count($record);
-				}
-				$ids[] = $count ? $record[0] : implode('-', $record);
-			}
+//			foreach ($idsQuery as $record) {
+//				if (!isset($count)) {
+//					$count = count($record);
+//				}
+//				$ids[] = $count ? $record[0] : implode('-', $record);
+//			}
+
+			$ids = $idsQuery->all();
 
 			if($p['calculateHasMore'] && count($ids) > $params['limit']) {
 				$hasMore = !!array_pop($ids);
