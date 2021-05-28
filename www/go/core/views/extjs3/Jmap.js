@@ -232,6 +232,7 @@ go.Jmap = {
 					if(store) {
 						(function(store) {
 							store.getState().then(function(state) {
+								// console.warn(store.entity.name, state);
 								if(!state || state == data[store.entity.name]) {
 									//don't fetch updates if there's no state yet because it never was used in that case.
 									return;

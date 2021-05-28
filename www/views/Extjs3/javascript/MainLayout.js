@@ -713,10 +713,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		this.welcome();
 
-		// Start in 10s to give the browser some time to boot other requests.
+		// Start in 5s to give the browser some time to boot other requests.
 		setTimeout(function() {
 			go.Jmap.sse();
-		},10000);
+		},5000);
 		
 	},
 	

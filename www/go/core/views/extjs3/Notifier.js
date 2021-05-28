@@ -295,6 +295,13 @@
 			msg.destroy();
 		},
 
+		getById : function(msgId) {
+			if(!this._messages[msgId]) {
+				return false;
+			}
+			return this._messages[msgId];
+		},
+
 		removeById(msgId) {
 			if(!this._messages[msgId]) {
 				return false;

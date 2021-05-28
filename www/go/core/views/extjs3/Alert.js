@@ -11,6 +11,10 @@
 			});
 			go.Notifier.addStatusIcon('reminder', 'ic-notifications');
 
+
+		},
+
+		init : function() {
 			go.Db.store("Alert").all().then((alerts) => {
 				alerts.forEach((alert) => {
 					this.show(alert);
@@ -19,7 +23,12 @@
 
 			go.Db.store("Alert").on("changes", (store, added, changed, destroyed) => {
 				destroyed.forEach((id) => {
-					go.Notifier.removeById("core-alert-" + id);
+					const panel = go.Notifier.getById("core-alert-" + id);
+					//to prevent a destroy action to the server because it's already destroyed
+					if(panel) {
+						panel.destroyedByChanges = true;
+						panel.destroy();
+					}
 				});
 
 				for(let id in added) {
@@ -42,7 +51,7 @@
 
 			go.Db.store(alert.entity).single(alert.entityId).then((entity) => {
 
-				const panelCfg = {
+				const c = {
 					statusIcon: 'reminder',
 					itemId: 'core-alert-' + alert.id,
 					title: entity.title || entity.name || entity.description,
@@ -50,8 +59,10 @@
 					iconCls: 'entity ' + alert.entity,
 					buttonAlign: "right",
 					listeners: {
-						destroy: () => {
-							go.Db.store("Alert").destroy(alert.id);
+						destroy: (panel) => {
+							if(!panel.destroyedByChanges) {
+								go.Db.store("Alert").destroy(alert.id);
+							}
 						}
 					},
 					buttons: [{
@@ -68,22 +79,27 @@
 					}]
 				};
 
-				panelCfg.notificationBody = panelCfg.html;
+				c.notificationBody = c.html;
+
+				const alertConfig = {alert: alert, entity: entity, panelPromise: Promise.resolve(c)};
 
 				//Modules can use this to cancel or modify the alert
-				if(this.fireEvent('beforeshow', this, alert, entity, panelCfg) === false) {
+				if(this.fireEvent('beforeshow', this, alertConfig) === false) {
 					return;
 				}
 
-				const pnl = go.Notifier.msg(panelCfg);
+				alertConfig.panelPromise.then((panelCfg) => {
+					go.Notifier.msg(panelCfg);
+				});
+
 			});
 		}
 	})
 
-
+	go.Alerts = new Alerts();
 
 	GO.mainLayout.on('render', function () {
-		go.Alerts = new Alerts();
+		go.Alerts.init();
 	});
 
 

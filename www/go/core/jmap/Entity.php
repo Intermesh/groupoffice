@@ -3,16 +3,12 @@
 namespace go\core\jmap;
 
 use Exception;
-use go\core\Installer;
-use go\core\fs\File;
 use go\core\model\Alert;
 use go\core\model\Module;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\orm\Entity as OrmEntity;
-use go\core\util\DateTime;
-use go\core\util\StringUtil;
 use PDO;
 use go\core\orm\EntityType;
 use go\core\acl\model\AclOwnerEntity;

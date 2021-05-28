@@ -993,7 +993,7 @@ CREATE TABLE `core_alert` (
   `entityId` INT NOT NULL,
   `userId` INT NOT NULL,
   `triggerAt` DATETIME NOT NULL,
-  `alertId` INT NOT NULL,
+    tag varchar(50) null,
   `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
   `data` text null,
   PRIMARY KEY (`id`),
@@ -1009,6 +1009,9 @@ CREATE TABLE `core_alert` (
     REFERENCES `core_user` (`id`)
     ON DELETE RESTRICT
     ON UPDATE NO ACTION);
+
+create unique index core_alert_entityTypeId_entityId_tag_uindex
+    on core_alert (entityTypeId, entityId, tag);
 
 
 CREATE TABLE `core_pdf_block` (

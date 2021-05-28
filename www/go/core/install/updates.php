@@ -996,3 +996,10 @@ $updates['202105271703'][] = "ALTER TABLE `core_pdf_template`
 
 
 $updates['202105271703'][] = "ALTER TABLE `core_email_template` ADD `key` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL AFTER `aclId`, ADD `language` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'en' AFTER `key`;";
+
+
+$updates['202105281703'][] = "alter table core_alert change alertId tag varchar(50) null;";
+$updates['202105281703'][] = "create unique index core_alert_entityTypeId_entityId_tag_uindex
+	on core_alert (entityTypeId, entityId, tag);
+";
+

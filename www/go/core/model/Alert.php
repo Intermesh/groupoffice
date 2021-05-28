@@ -22,7 +22,7 @@ class Alert extends SingleOwnerEntity
 	public $triggerAt;
 
 	public $recurrenceId;
-	public $alertId;
+	public $tag;
 
 	protected $data;
 
@@ -51,10 +51,26 @@ class Alert extends SingleOwnerEntity
 	/**
 	 * Set arbitrary notification data
 	 *
-	 * @param $data
+	 * @param array $data
+	 * @return Alert
 	 */
 	public function setData(array $data) {
 		$this->data = json_encode(array_merge($this->getData(), $data));
+
+		return $this;
+	}
+
+	protected function internalSave()
+	{
+		if($this->isNew() && isset($this->tag)) {
+			//skip dismiss action below in internal delete
+			parent::delete([
+				'entityTypeId' => $this->entityTypeId,
+				'entityId' => $this->entityId,
+				'tag' => $this->tag
+			]);
+		}
+		return parent::internalSave();
 	}
 
 	protected static function internalDelete(Query $query)

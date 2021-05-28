@@ -13,6 +13,7 @@ use go\core\model\Alert as CoreAlert;
 use go\core\orm\CustomFieldsTrait;
 use go\core\model\User;
 use go\core\orm\EntityType;
+use go\core\orm\exception\SaveException;
 use go\core\orm\SearchableTrait;
 use go\core\db\Criteria;
 use go\core\orm\Query;
@@ -329,6 +330,22 @@ class Task extends AclItemEntity {
 			Tasklist::saveForProject($this->projectId);
 		}
 
+		if($this->isModified('responsibleUserId')) {
+
+			if (isset($this->responsibleUserId)) {
+				$alert = $this->createAlert(new \DateTime())
+					->setValue('userId', $this->responsibleUserId)
+					->setValue('tag', 'task-assigned-' . $this->id)
+					->setData(['type' => 'assigned', 'assignedBy' => go()->getAuthState()->getUserId()]);
+
+				if (!$alert->save()) {
+					throw new SaveException($alert);
+				}
+			} else{
+				CoreAlert::delete(['tag' => 'task-assigned-' . $this->id]);
+			}
+		}
+
 		$success = parent::internalSave();
 
 		// if alert can be based on start / due of task check those properties as well
@@ -342,20 +359,12 @@ class Task extends AclItemEntity {
 
 
 	private function updateAlerts() {
-		$entityType = EntityType::findByName('Task');
-
-		if(!$this->isNew()) {
-			CoreAlert::delete([
-				'entityTypeId' => $entityType->getId(),
-				'entityId' => $this->id,
-				'userId' => go()->getAuthState()->getUserId()
-			]);
+		if(!isset($this->alerts)){
+			return;
 		}
-
 		foreach($this->alerts as $alert) {
-
 			$coreAlert = $this->createAlert($alert->at($this));
-			$coreAlert->alertId = $alert->id;
+			$coreAlert->tag = $alert->id;
 			if(!$coreAlert->save()) {
 				throw new \Exception(var_export($coreAlert->getValidationErrors(),true));
 			}
@@ -371,7 +380,7 @@ class Task extends AclItemEntity {
 		$alertIds = [];
 
 		foreach($alerts as $alert) {
-			$alertIds[] = $alert->alertId;
+			$alertIds[] = $alert->tag;
 		}
 
 		go()->getDbConnection()->update(

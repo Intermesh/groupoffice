@@ -1506,22 +1506,23 @@ abstract class Property extends Model {
 		
 		$this->{$relation->name} = [];
 		foreach ($models as $mapKey => $newProp) {
-			
+
 			if($newProp === null) {
 				//deleted model
 				continue;
 			}
-			
+
 			//Check for invalid input
 			if(!($newProp instanceof Property)) {
 				throw new Exception("Invalid value given for '". $relation->name ."'. Should be a GO\Orm\Property");
 			}
-			
+
 			$this->applyRelationKeys($relation, $newProp);
 
-			foreach ($this->mapKeyToValues($mapKey, $relation) as $propName => $value) {
-				$newProp->$propName = $value;
-			}
+			// This wen't bad when creating new map values with "ext-gen1" as key.
+//			foreach ($this->mapKeyToValues($mapKey, $relation) as $propName => $value) {
+//				$newProp->$propName = $value;
+//			}
 
 			if (!$newProp->internalSave()) {
 				$this->relatedValidationErrors = $newProp->getValidationErrors();
