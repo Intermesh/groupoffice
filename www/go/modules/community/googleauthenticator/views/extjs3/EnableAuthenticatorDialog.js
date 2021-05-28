@@ -1,5 +1,5 @@
 go.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(go.form.Dialog, {
-	title:t('Enable Google authenticator', 'googleauthenticator'),
+	title:t('Enable Google authenticator'),
 	iconCls: 'ic-security',
 	modal:true,
 	entityStore:"User",
@@ -30,8 +30,8 @@ go.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(go.form.Dialog, {
 		this.secretField = new Ext.form.TextField({
 			readOnly:true,
 			name:'googleauthenticator.secret',
-			fieldLabel: t('Secret', 'googleauthenticator'),
-			hint: t('Secret key for manual input', 'googleauthenticator')
+			fieldLabel: t('Secret'),
+			hint: t('Secret key for manual input')
 		});
 			
 		this.verifyField = new Ext.form.TextField({
@@ -46,7 +46,7 @@ go.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(go.form.Dialog, {
 				labelWidth: dp(64),
 				items: [
 					new Ext.Container({
-						html: t('Scan the QR code below with the Google authenticator app on your mobile device, after that fill in the field below with the code generated in the app.', 'googleauthenticator')
+						html: t('Scan the QR code below with the Google authenticator app on your mobile device, after that fill in the field below with the code generated in the app.')
 					}),
 					this.QRcomponent,
 					this.secretField,

@@ -193,12 +193,14 @@ abstract class EntityController extends Controller {
    */
 	protected function defaultQuery($params) {
 
+		$state = $this->getState();
+
+		//enable SQL debugging here
+		go()->getDbConnection()->debug = go()->getDebugger()->enabled;
 		
 		$p = $this->paramsQuery($params);
 		$idsQuery = $this->getQueryQuery($p);
 		$idsQuery->fetchMode(PDO::FETCH_COLUMN, 0);
-		
-		$state = $this->getState();
 		
 		$ids = [];		
 
@@ -403,10 +405,8 @@ abstract class EntityController extends Controller {
 		if(isset($p['ids']) && !count($p['ids'])) {
 			return $result;
 		}
-		go()->getDebugger()->debugTiming('before query');
-		$query = $this->getGetQuery($p);
 
-		go()->getDebugger()->debugTiming('after query');
+		$query = $this->getGetQuery($p);
 
 		$foundIds = [];
 		$result['list'] = [];
@@ -415,8 +415,6 @@ abstract class EntityController extends Controller {
 			$arr['id'] = $e->id();
 			$result['list'][] = $arr;
 			$foundIds[] = $arr['id'];
-
-			go()->getDebugger()->debugTiming('item to array');
 		}
 
 		$result['notFound'] = isset($p['ids']) ? array_values(array_diff($p['ids'], $foundIds)) : [];
