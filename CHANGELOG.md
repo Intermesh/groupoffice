@@ -1,4 +1,5 @@
 - Google authenticator: Translations didn't work in this module
+- Core: Fixed disabled checkbox for enabling modules in group dialog
 
 20-05-2021 6.5.52
 - Address book: Fixed import skipping row and updating records by id or email

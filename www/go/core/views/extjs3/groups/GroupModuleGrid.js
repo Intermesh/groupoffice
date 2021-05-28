@@ -29,6 +29,9 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 			listeners: {
 				change: this.onCheckChange,
 				scope: this
+			},
+			isDisabled : function(record) {
+				return record.data.package === "core";
 			}
 		});
 		
