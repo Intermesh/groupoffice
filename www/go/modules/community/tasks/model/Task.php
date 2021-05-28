@@ -158,7 +158,7 @@ class Task extends AclItemEntity {
 	 *
 	 * @var int[]
 	 */
-	public $hours;
+//	public $hours;
 
 	protected static function aclEntityClass(){
 		return Tasklist::class;
@@ -174,27 +174,27 @@ class Task extends AclItemEntity {
 			->addUserTable("tasks_task_user", "ut", ['id' => 'taskId'])
 			->addMap('alerts', Alert::class, ['id' => 'taskId'])
 			->addMap('group', TasklistGroup::class, ['groupId' => 'id'])
-			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId'])
-			->addScalar('hours', 'pr2_hours', ['id' => 'task_id']);
+			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId']);
+//			->addScalar('hours', 'pr2_hours', ['id' => 'task_id']);
 //			->addScalar('responsibleUser', 'core_user',['responsibleUserId' => 'id']);
 	}
 
-	public function getTimeBooked()
-	{
-		$booked = 0;
-		if(count($this->hours) > 0) {
-			$record = (new \go\core\db\Query())
-				->select('SUM(duration) as timeBooked')
-				->from('pr2_hours')
-				->where('id IN ('. implode(',',$this->hours) . ')')
-				->single();
-			if($record) {
-				$booked = $record['timeBooked'];
-			}
-		}
-
-		return $booked;
-	}
+//	public function getTimeBooked()
+//	{
+//		$booked = 0;
+//		if(count($this->hours) > 0) {
+//			$record = (new \go\core\db\Query())
+//				->select('SUM(duration) as timeBooked')
+//				->from('pr2_hours')
+//				->where('id IN ('. implode(',',$this->hours) . ')')
+//				->single();
+//			if($record) {
+//				$booked = $record['timeBooked'];
+//			}
+//		}
+//
+//		return $booked;
+//	}
 
 	public static function converters() {
 		return array_merge(parent::converters(), [VCalendar::class, Spreadsheet::class]);
