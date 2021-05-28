@@ -9,6 +9,7 @@ namespace go\modules\community\tasks\model;
 
 use go\core\orm\Property;
 use go\core\orm\UserProperty;
+use go\core\util\DateTime;
 
 /**
  * Representing alerts/reminders to display or send to the user for this calendar object.
@@ -83,7 +84,7 @@ class Alert extends UserProperty
 			];
 		}
 		if (isset($this->when)) {
-			return ['when' => $this->when->format('c')];
+			return ['when' => $this->when];
 		}
 		return null;
 	}
@@ -129,9 +130,23 @@ class Alert extends UserProperty
 		if (isset($value['when'])) {
 			$this->offset = null;
 			$this->relativeTo = null;
-			$this->when = new \DateTime($value['when']);
+			$this->when = new DateTime($value['when']);
 			$this->when->setTimeZone(new \DateTimeZone("UTC"));
 		}
+	}
+
+	/**
+	 * Set specific alarm time
+	 *
+	 * @param DateTime $when
+	 * @return $this
+	 */
+	public function when(\DateTimeInterface $when) {
+		$this->offset = null;
+		$this->relativeTo = null;
+		$this->when = $when;
+
+		return $this;
 	}
 
 }

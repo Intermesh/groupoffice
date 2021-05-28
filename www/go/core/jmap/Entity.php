@@ -686,11 +686,11 @@ abstract class Entity  extends OrmEntity {
 	/**
 	 * Create an alert for this entity
 	 *
-	 * @param \DateTime $triggerAt
+	 * @param \DateTimeInterface $triggerAt
 	 * @return \go\core\model\Alert
 	 * @throws Exception
 	 */
-	public function createAlert(\DateTime $triggerAt) {
+	public function createAlert(\DateTimeInterface $triggerAt) {
 		$alert = new \go\core\model\Alert();
 
 		$alert->triggerAt = $triggerAt;

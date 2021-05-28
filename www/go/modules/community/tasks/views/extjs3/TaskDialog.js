@@ -142,9 +142,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 									store: new Ext.data.SimpleStore({
 										fields: ['value', 'text'],
 										data: [
-											[1, t("Low")],
-											[5, t("Normal")],
-											[8, t("High")]
+											[9, t("Low")],
+											[0, t("Normal")],
+											[1, t("High")]
 										]
 									})
 								},new Ext.form.SliderField({

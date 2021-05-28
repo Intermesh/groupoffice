@@ -65,11 +65,13 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 						if(rec.json.recurrenceRule) {
 							icons.push('repeat');
 						}
-						if(rec.json.priority < 5) {
-							icons.push('low_priority');
-						}
-						if(rec.json.priority > 5) {
-							icons.push('priority_high');
+						if(rec.json.priority != 0) {
+							if (rec.json.priority < 5) {
+								icons.push('priority_high');
+							}
+							if (rec.json.priority > 5) {
+								icons.push('low_priority');
+							}
 						}
 						if(rec.json.filesFolderId) {
 							icons.push('attachment');

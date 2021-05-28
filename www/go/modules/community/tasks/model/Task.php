@@ -26,6 +26,11 @@ use go\modules\community\tasks\convert\VCalendar;
  */
 class Task extends AclItemEntity {
 
+	const PRIORITY_LOW = 9;
+	const PRIORITY_HIGH = 1;
+	const PRIORITY_NORMAL = 0;
+
+
 	use SearchableTrait;
 	use CustomFieldsTrait;
 	
@@ -130,7 +135,7 @@ class Task extends AclItemEntity {
   //protected $excluded;
 
 	/** @var int [0-9] 1 = highest priority, 9 = lowest, 0 = undefined */
-	public $priority = 0;
+	public $priority = self::PRIORITY_NORMAL;
 
 	/** @var string free or busy */
 	public $freeBusyStatus = 'free';
@@ -468,6 +473,10 @@ class Task extends AclItemEntity {
 
 	public function getUid() {
 		return $this->uid;		
+	}
+
+	public function setUid($uid) {
+		$this->uid = $uid;
 	}
 
 	public function hasUid() {
