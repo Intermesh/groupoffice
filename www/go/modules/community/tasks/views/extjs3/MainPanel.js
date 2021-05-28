@@ -57,7 +57,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						case 0: // tasks today
 							var now = new Date(),
 							nowYmd = now.format("Y-m-d");
-							this.taskGrid.store.setFilter("tasklist", {
+							this.taskGrid.store.setFilter("status", {
 								due: nowYmd,
 								complete: false
 							});
@@ -69,30 +69,30 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 							nowYmd = now.format("Y-m-d");
 							nextWeekYmd = nextWeek.format("Y-m-d");
-							this.taskGrid.store.setFilter("tasklist", {
+							this.taskGrid.store.setFilter("status", {
 								nextWeekStart: now,
 								nextWeekEnd: nextWeekYmd,
-								percentComplete: 0
+								percentComplete: "<100"
 							});
 							break;
 
 						case 2: // tasks too late
 							var now = new Date(),
 							nowYmd = now.format("Y-m-d");
-							this.taskGrid.store.setFilter('tasklist',{
+							this.taskGrid.store.setFilter('status',{
 								late: nowYmd,
-								percentComplete: 0
+								percentComplete: "<100"
 							});
 							break;
 
 						case 3: // non completed tasks
-							this.taskGrid.store.setFilter("tasklist", {
-								percentComplete: 0
+							this.taskGrid.store.setFilter("status", {
+								percentComplete: "<100"
 							});
 							break;
 
 						case 4: // completed tasks
-							this.taskGrid.store.setFilter("tasklist", {
+							this.taskGrid.store.setFilter("status", {
 								percentComplete: 100
 							});
 						break;
@@ -100,18 +100,18 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						case 5: // future tasks
 							var now = new Date(),
 							nowYmd = now.format("Y-m-d");
-							this.taskGrid.store.setFilter('tasklist',{
+							this.taskGrid.store.setFilter('status',{
 								future: nowYmd,
-								percentComplete: 0
+								percentComplete: "<100"
 							});
 							break;
 						case 6:
-							this.taskGrid.store.setFilter('tasklist',{
+							this.taskGrid.store.setFilter('status',{
 								unplanned: true
 							});
 							break;
 						case 7: // all
-							this.taskGrid.store.setFilter("tasklist", null);
+							this.taskGrid.store.setFilter("status", null);
 							break;
 					}
 					this.taskGrid.store.load();
