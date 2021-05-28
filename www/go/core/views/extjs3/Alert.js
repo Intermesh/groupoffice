@@ -74,7 +74,7 @@
 					}, {
 						text: t("Dismiss"),
 						handler: (btn) => {
-							pnl.destroy();
+							btn.findParentByType("panel").destroy();
 						}
 					}]
 				};

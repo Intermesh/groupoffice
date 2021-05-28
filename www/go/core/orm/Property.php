@@ -12,11 +12,13 @@ use go\core\db\Statement;
 use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
 use go\core\fs\Blob;
+use go\core\model\Alert as CoreAlert;
 use go\core\model\User;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\validate\ValidationTrait;
+use go\modules\community\tasks\model\Task;
 use PDO;
 use PDOException;
 use ReflectionClass;
@@ -919,7 +921,16 @@ abstract class Property extends Model {
 	 * Get all the modified properties with their new and old values.
 	 * 
 	 * Only database columns and relations are tracked. Not the getters and setters.
-	 * 
+	 *
+	 * @example getting removed id's from array properry
+	 *
+	 * ```
+	 * foreach($modified[1] as $model) {
+			if(!in_array($model, $modified[0])) {
+				CoreAlert::delete(['entityTypeId' => Task::entityType()->getId(), 'tag' => $model->id]);
+			}
+	  }
+	 * ```
 	 * @param array|string $properties If given only these properties will be checked for modifications.
 	 * @return array ["propName" => [newval, oldval]]
 	 */

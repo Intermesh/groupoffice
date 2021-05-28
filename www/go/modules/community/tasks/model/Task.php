@@ -342,23 +342,32 @@ class Task extends AclItemEntity {
 					throw new SaveException($alert);
 				}
 			} else{
-				CoreAlert::delete(['tag' => 'task-assigned-' . $this->id]);
+				CoreAlert::delete(['entityTypeId' => Task::entityType()->getId(), 'tag' => 'task-assigned-' . $this->id]);
 			}
 		}
 
 		$success = parent::internalSave();
 
 		// if alert can be based on start / due of task check those properties as well
-		if ($this->isModified('alerts') ||
-			$this->isModified('useDefaultAlerts')) {
-			$this->updateAlerts();
+		$modified = $this->getModified('alerts');
+		if (!empty($modified)) {
+			$this->updateAlerts($modified['alerts']);
 		}
 
 		return $success;
 	}
 
 
-	private function updateAlerts() {
+	private function updateAlerts($modified) {
+
+		if(isset($modified[1])) {
+			foreach ($modified[1] as $model) {
+				if (!in_array($model, $modified[0])) {
+					CoreAlert::delete(['entityTypeId' => Task::entityType()->getId(), 'tag' => $model->id]);
+				}
+			}
+		}
+
 		if(!isset($this->alerts)){
 			return;
 		}
