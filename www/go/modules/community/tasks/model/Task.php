@@ -180,27 +180,29 @@ class Task extends AclItemEntity {
 			->addUserTable("tasks_task_user", "ut", ['id' => 'taskId'])
 			->addMap('alerts', Alert::class, ['id' => 'taskId'])
 			->addMap('group', TasklistGroup::class, ['groupId' => 'id'])
+			->addScalar('hours', 'pr2_hours', ['id' => 'task_id']) // TODO: Refactor into projects2 or planner module
 			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId']);
-//			->addScalar('hours', 'pr2_hours', ['id' => 'task_id']);
-//			->addScalar('responsibleUser', 'core_user',['responsibleUserId' => 'id']);
 	}
 
-//	public function getTimeBooked()
-//	{
-//		$booked = 0;
-//		if(count($this->hours) > 0) {
-//			$record = (new \go\core\db\Query())
-//				->select('SUM(duration) as timeBooked')
-//				->from('pr2_hours')
-//				->where('id IN ('. implode(',',$this->hours) . ')')
-//				->single();
-//			if($record) {
-//				$booked = $record['timeBooked'];
-//			}
-//		}
-//
-//		return $booked;
-//	}
+	// TODO: Refactor properly, since this should be part of projects IF AND ONLY IF tasks were to be enabled too.
+	/*
+	public function getTimeBooked()
+	{
+		$booked = 0;
+		if(count($this->hours) > 0) {
+			$record = (new \go\core\db\Query())
+				->select('SUM(duration) as timeBooked')
+				->from('pr2_hours')
+				->where('id IN ('. implode(',',$this->hours) . ')')
+				->single();
+			if($record) {
+				$booked = $record['timeBooked'];
+			}
+		}
+
+		return $booked;
+	}
+	*/
 
 	public static function converters() {
 		return array_merge(parent::converters(), [VCalendar::class, Spreadsheet::class]);
