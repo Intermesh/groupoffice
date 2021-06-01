@@ -2,6 +2,8 @@
 - Google authenticator: Translations didn't work in this module
 - Core: Fixed disabled checkbox for enabling modules in group dialog
 - Calendar: [Views] Click on a view then the My calendar button generate an error #703
+- Address book: Select contacts with read permission only in contact custom field
+- Core: ACL panel could show error when no permissions were set
 
 20-05-2021 6.5.52
 - Address book: Fixed import skipping row and updating records by id or email
