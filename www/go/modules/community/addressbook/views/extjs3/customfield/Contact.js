@@ -55,6 +55,7 @@ go.modules.community.addressbook.customfield.Contact = Ext.extend(go.customfield
 		c.xtype = "contactcombo";
 		c.isOrganization = customfield.options.isOrganization; 
 		c.hiddenName = c.name;
+		c.permissionLevel = go.permissionLevels.read;
 
 		if(!go.util.empty(customfield.options.addressBookId)) {
 			c.addressBookId = customfield.options.addressBookId;
