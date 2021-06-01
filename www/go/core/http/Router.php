@@ -7,6 +7,18 @@ use Psr\Http\Message\ResponseInterface;
 
 /**
  * Simple RESTful router
+ *
+ * It works with:
+ *
+ * script.php/edit/1/1
+ *
+ * Or access pretty with /script/edit/1/1 with an alias:
+ *
+ * Alias /script script.php
+ *
+ * Or with a rewrite rule:
+ *
+ * RewriteRule ^/script(.*)$ script.php [E=PATH_INFO:/$1]
  * 
  * @example
  * ```

@@ -4,6 +4,7 @@
 - Calendar: [Views] Click on a view then the My calendar button generate an error #703
 - Address book: Select contacts with read permission only in contact custom field
 - Core: ACL panel could show error when no permissions were set
+- Core: Always move permissions panel to the end in dialogs
 
 20-05-2021 6.5.52
 - Address book: Fixed import skipping row and updating records by id or email
