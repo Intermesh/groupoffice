@@ -458,7 +458,13 @@ class Acl extends Entity {
 	 * 
 	 * @return static
 	 */
-	public static function getReadOnlyAcl(){
+	public static function getReadOnlyAclId(){
+
+		$id = go()->getCache()->get('readonlyaclid');
+
+		if($id) {
+			return $id;
+		}
 		
 		$acl = static::find()->where(['usedIn' => 'readonly'])->single();
 		
@@ -471,7 +477,9 @@ class Acl extends Entity {
 				throw new \Exception("Couldn't save read only acl: " . var_export($acl->getValidationErrors(), true));
 			}
 		}
-		
-		return $acl;
+
+		go()->getCache()->set('readonlyaclid', $acl->id);
+
+		return $acl->id;
 	}
 }

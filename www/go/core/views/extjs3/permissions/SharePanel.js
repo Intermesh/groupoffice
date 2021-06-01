@@ -52,7 +52,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 					name: 'level', 
 					type: {
 						convert: function (v, data) {							
-							return me.value[data.id];
+							return me.value ? me.value[data.id] : null;
 						}
 					}
 				},
@@ -209,7 +209,10 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	},
 	
 	onCheckChange : function(record, newValue) {
-		if(newValue) {			
+		if(this.value == null) {
+			this.value = {};
+		}
+		if(newValue) {
 			record.set('level', this.addLevel);
 			this.value[record.data.id] = record.data.level;
 		} else

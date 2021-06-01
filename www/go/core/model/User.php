@@ -181,6 +181,12 @@ class User extends Entity {
 	 * @var string
 	 */
 	public $homeDir;
+
+	/**
+	 * When true the user interface will show a confirm dialog before moving item with drag and drop
+	 * @var bool
+	 */
+	public $confirmOnMove;
 	
 	
 	public $max_rows_list;
@@ -321,6 +327,7 @@ class User extends Entity {
 			$this->firstWeekday = (int) $s->defaultFirstWeekday;
 			$this->currency = $s->defaultCurrency;
 			$this->shortDateInList = (bool) $s->defaultShortDateInList;
+			$this->confirmOnMove = (bool) $s->defaultConfirmOnMove;
 			$this->listSeparator = $s->defaultListSeparator;
 			$this->textSeparator = $s->defaultTextSeparator;
 			$this->thousandsSeparator = $s->defaultThousandSeparator;
@@ -530,14 +537,14 @@ class User extends Entity {
 	}
 	
 	private function maxUsersReached() {
-	  if(empty(go()->getConfig()['core']['limits']['maxUsers'])) {
+	  if(empty(go()->getConfig()['max_users'])) {
 	    return false;
     }
 
 		$stmt = go()->getDbConnection()->query("SELECT count(*) AS count FROM `core_user` WHERE enabled = 1");
 		$record = $stmt->fetch();
 		$countActive = $record['count'];
-		return $countActive >= go()->getConfig()['core']['limits']['maxUsers'];
+		return $countActive >= go()->getConfig()['max_users'];
 	}
 
 	private static function count() {

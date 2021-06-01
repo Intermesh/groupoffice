@@ -17,6 +17,8 @@ class Filters {
 	
 	private $filters = [];
 
+	private $usedFilters = [];
+
 	const NO_DEFAULT = '__NO_DEFAULT__';
 
 	
@@ -65,6 +67,15 @@ class Filters {
 
 		$this->internalApply($query, $f, $criteria);
 
+	}
+
+	/**
+	 * Check if filter was used by last apply() call
+	 *
+	 * @return boolean
+	 */
+	public function isUsed($name) {
+		return in_array(strtolower($name), $this->usedFilters);
 	}
 
 	/**

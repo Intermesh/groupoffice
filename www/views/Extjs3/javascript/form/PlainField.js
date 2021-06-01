@@ -71,6 +71,11 @@ GO.form.PlainField = Ext.extend(Ext.form.Field, {
 	getValue : function(){
 		return this.value;
 	},
+
+	focus : function() {
+		//overridden because selectText is not supported
+		GO.form.PlainField.superclass.focus.call(this);
+	},
 	
 	setValue : function(v){
 		

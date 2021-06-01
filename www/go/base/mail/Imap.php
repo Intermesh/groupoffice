@@ -1611,7 +1611,9 @@ class Imap extends ImapBodyStruct {
 								while (isset($vals[$i + $n]) && $vals[$i + $n] != ')') {
 									$prop = str_replace('-','_',strtolower(substr($vals[$i + $n],1)));
 									//\GO::debug($prop);
-									if(isset($message[$prop])) {
+
+									//It can be a user named a label $labels
+									if(isset($message[$prop]) && $prop != 'labels') {
 										$message[$prop]=true;
 									} else {
 										$message['labels'][] = strtolower($vals[$i + $n]);

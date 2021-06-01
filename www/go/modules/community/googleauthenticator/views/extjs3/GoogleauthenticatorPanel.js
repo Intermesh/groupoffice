@@ -9,7 +9,7 @@ go.googleauthenticator.GoogleauthenticatorPanel = Ext.extend(go.login.BaseLoginP
 
 		this.secretField = new Ext.form.TextField({
 			itemId: 'googleauthenticator_code',
-			fieldLabel: t('Code', 'googleauthenticator'),
+			fieldLabel: t('Code'),
 			name: 'googleauthenticator_code',
 			allowBlank: false,
 			anchor: '100%',

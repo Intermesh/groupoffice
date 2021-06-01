@@ -169,7 +169,7 @@ class State extends AbstractState {
 	}
 	
 	public function getEventSourceUrl() {
-		return go()->getConfig()['core']['general']['sseEnabled'] ? $this->getBaseUrl() . '/sse.php' : null;
+		return go()->getConfig()['sseEnabled'] ? $this->getBaseUrl() . '/sse.php' : null;
 	}
 
 

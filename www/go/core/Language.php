@@ -175,7 +175,7 @@ class Language {
 			}
 
 			$file = $this->findLangOverride($isoCode, $package, $module);
-			if ($file->exists()) {
+			if ($file && $file->exists()) {
 				$langData->mergeRecursive($this->loadFile($file));
 			}
 
@@ -195,7 +195,7 @@ class Language {
 	}
 
 	private function replaceBrand($str) {
-		$productName = $this->replaceProductName ? go()->getConfig()['core']['branding']['name'] : "{product_name}";
+		$productName = $this->replaceProductName ? go()->getConfig()['product_name'] : "{product_name}";
 		return str_replace(
 			[
 				"{product_name}",
@@ -262,6 +262,9 @@ class Language {
 	 */
 	private function findLangOverride($lang, $package, $module) {
 
+		if(Installer::isInstalling()) {
+			return false;
+		}
 		$admin = User::findById(1, ['homeDir']);
 
 		$folder = go()->getDataFolder()->getFolder($admin->homeDir. '/language/' . $package . '/' .$module);

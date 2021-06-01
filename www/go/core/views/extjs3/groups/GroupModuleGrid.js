@@ -31,7 +31,7 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 				scope: this
 			},
 			isDisabled : function(record) {
-				return record.data.id === 1;
+				return record.data.package === "core";
 			}
 		});
 		

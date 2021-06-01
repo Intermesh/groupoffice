@@ -258,22 +258,22 @@ class Contact extends AclItemEntity {
 	public $color;
 	
 	
-//	/**
-//	 * Starred by the current user or not.
-//	 *
-//	 * Should not be false but null for ordering. Records might be missing.
-//	 *
-//	 * @var boolean
-//	 */
-//	protected $starred = null;
-//
-//	public function getStarred() {
-//		return !!$this->starred;
-//	}
-//
-//	public function setStarred($starred) {
-//		$this->starred = empty($starred) ? null : true;
-//	}
+	/**
+	 * Starred by the current user or not.
+	 *
+	 * Should not be false but null for ordering. Records might be missing.
+	 *
+	 * @var boolean
+	 */
+	protected $starred = null;
+
+	public function getStarred() {
+		return !!$this->starred;
+	}
+
+	public function setStarred($starred) {
+		$this->starred = empty($starred) ? null : true;
+	}
 
 	protected static function getRequiredProperties() {	
 		$p = parent::getRequiredProperties();
@@ -363,7 +363,7 @@ class Contact extends AclItemEntity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 						->addTable("addressbook_contact", 'c')
-//						->addUserTable("addressbook_contact_star", "s", ['id' => 'contactId'])
+						->addUserTable("addressbook_contact_star", "s", ['id' => 'contactId'])
 						->addArray('dates', Date::class, ['id' => 'contactId'])
 						->addArray('phoneNumbers', PhoneNumber::class, ['id' => 'contactId'])
 						->addArray('emailAddresses', EmailAddress::class, ['id' => 'contactId'])
@@ -437,14 +437,18 @@ class Contact extends AclItemEntity {
 										->add("addressBookId", function(Criteria $criteria, $value) {
 											$criteria->andWhere('addressBookId', '=', $value);
 										})
-			->add("addressBookIds", function(Criteria $criteria, $value) {
-				if(count($value) > 0) {
-					$criteria->andWhere('addressBookId IN (' .  implode(',',$value). ')');
+										->add("starred", function(Criteria $criteria, $value) {
+											$criteria->andWhere('starred', '=', $value);
 
-				}
-			})
+										})
+										->add("addressBookIds", function(Criteria $criteria, $value) {
+											if(count($value) > 0) {
+												$criteria->andWhere('addressBookId IN (' .  implode(',',$value). ')');
 
-			->add("groupId", function(Criteria $criteria, $value, Query $query) {
+											}
+										})
+
+										->add("groupId", function(Criteria $criteria, $value, Query $query) {
 											$query->join('addressbook_contact_group', 'g', 'g.contactId = c.id');
 											
 											$criteria->andWhere('g.groupId', '=', $value);
@@ -460,12 +464,15 @@ class Contact extends AclItemEntity {
 											$criteria->andWhere('isOrganization', '=', (bool) $value);
 										})
 										->add("hasEmailAddresses", function(Criteria $criteria, $value, Query $query) {
+//
+//											if(!$query->isJoined('addressbook_email_address', 'e')) {
+//												$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "LEFT")
+//													->groupBy(['c.id']);
+//											}
 
-											if(!$query->isJoined('addressbook_email_address', 'e')) {
-												$query->join('addressbook_email_address', 'e', 'e.contactId = c.id', "LEFT");
-											}
+											$criteria->andWhere('c.id in (select contactId from addressbook_email_address)');
 
-											$criteria->andWhere('e.email', $value ? 'IS NOT' : 'IS', null);
+//											$criteria->andWhere('e.email', $value ? 'IS NOT' : 'IS', null);
 										})
 
 										->addText("email", function(Criteria $criteria, $comparator, $value, Query $query) {

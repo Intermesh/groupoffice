@@ -1439,7 +1439,6 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'You can\' t archive yourself' => 'Sie können sich nicht selbst archivieren',
   'Show users' => 'Benutzer zeigen',
   'Show groups' => 'Gruppen zeigen',
-  'product_name' => '{product_name}',
   'Users can login without this domain behind the username. Note that if the user exists in the Group-Office database it will take precedence.' => 'Users can login without this domain behind the username. Note that if the user exists in the {product_name} database it will take precedence.',
   'Last week' => 'Letzte Woche',
   'This year' => 'Dieses Jahr',
@@ -1479,4 +1478,7 @@ Sollten Sie kein neues Kennwort angefordert haben, können Sie diese Nachricht e
   'Bottom' => 'Unten',
   '{finished} of {total}' => '{finished} von {total}',
   'files' => 'Dateien',
+	"When this is on and items are moved by dragging, confirmation is requested" => "Wenn diese Option aktiviert ist und Einträge durch Ziehen verschoben werden, wird eine Bestätigung angefordert",
+	"Show confirmation dialog on move" => "Zeige Bestätigungsdialog beim Verschieben",
+	"Are you sure you want to move the item(s)?" => 'Sind Sie sicher, dass Sie die Einträge verschieben möchten?'
 );

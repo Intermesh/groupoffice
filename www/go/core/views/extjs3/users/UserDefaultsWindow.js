@@ -128,6 +128,13 @@ go.users.UserDefaultsWindow = Ext.extend(go.Window, {
 					title: t("Other"),
 					xtype: "fieldset",
 					items: [
+						{
+							xtype: 'xcheckbox',
+							name: 'defaultConfirmOnMove',
+							hideLabel: true,
+							boxLabel: t('Show confirmation dialog on move'),
+							hint: t("When this is on and items are moved by dragging, confirmation is requested")
+						},
 						new go.form.multiselect.Field({
 							valueIsId: true,
 							hint: t("Users will automatically be added to these groups", "users", "core"),

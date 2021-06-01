@@ -35,8 +35,15 @@ go.modules.community.addressbook.TreeLoader = Ext.extend(go.tree.EntityLoader, {
 
 	handleResponse : function(r) {
 		r.responseData.unshift({
+			leaf: true,
+			iconCls: "ic-star",
+			text: t("Starred", "addressbook", "community"),
+			id: "starred"
+		});
+
+		r.responseData.unshift({
 						leaf: true,
-						iconCls: "ic-star",
+						iconCls: "ic-select-all",
 						text: t("All contacts", "addressbook", "community"),
 						id: "all"
 				});

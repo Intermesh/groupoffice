@@ -128,7 +128,7 @@ GO.mainLayout.onReady(function () {
 		GO.summary.portlets['portlet-birthdays'] = new GO.summary.Portlet({
 			id: 'portlet-birthdays',
 			iconCls: 'ic-cake',
-			title: t("Upcoming birthdays", "addressbook"),
+			title: t("Upcoming birthdays", "addressbook", "community"),
 			layout: 'fit',
 			tools: [{
 				id: 'gear',

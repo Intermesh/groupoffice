@@ -1,5 +1,49 @@
+- Business: Wrong time format in agreement dialog
+- Google authenticator: Translations didn't work in this module
+- Core: Fixed disabled checkbox for enabling modules in group dialog
+- Calendar: [Views] Click on a view then the My calendar button generate an error #703
+- Address book: Select contacts with read permission only in contact custom field
+- Core: ACL panel could show error when no permissions were set
+
+20-05-2021 6.5.52
+- Address book: Fixed import skipping row and updating records by id or email
+- Core: If link panel has more than 5 items it shows count 5+ instead of 5 when collapsed now
+- Core: New option for users to confirm move of contacts, projects and files.
+- Address book: Add read only address books to birthday portlet
+
+18-05-2021 6.5.51
+- Onlyoffice: Open documents in read only mode when not having manage permissions for the module
+- Email: When opening attachments it's saved to a temporary file so it can be opened by
+  file module integrations like OnlyOffice, Microsoft office online, libreoffice etc.
+- Core: Fixed safari 14.1 wrong button color when button was disabled previously
+- Start page: Auto height for news portlet
+- Core: Added Mongolian (Монгол хэл) translation
+- Calendar: All categories are visible (even with permission) #700
+- Billing: Without manage permissions, you couldn't see totals. This was removed.
+- Email: Don't change invalid email addresses into "unknown@unknown.domain"
+
+17-05-2021 6.5.50
+- Core: save 0-values correctly for numeric Custom FIelds
+- Core: bugfix in function custom fields and zero values
+- Projects: sort employees by name
+- Time registration: sort employee combo by name
+- Addressbook: Correct counts in select contact dialog
+- Addressbook: Better pefromance on large database
+- Core: Fixed about dialog.
+- Projects: Supplier company name not shown in expense budget grid
+- Address book: Brought back starred function but as folder now
+- Email: Work around if label is called "labels"
+
+11-05-2021 6.5.49
+- Core: Fixed fresh manual install
+- Projects: Error on time tracking PDF report
+- Projects: Finance report doesn't show projects with no data anymore
+
+11-05-2021 6.5.48
 - Files: Don't show all shares to admins by default
 - Core: Add UTF-8 BOM character to CSV exports so Excel recognizes it as UTF-8
+- Tickets: Ticket dialog can select users too
+- Core: Some bugs came from removing admin from acl's. for example email showing all accounts for admin.
 
 10-05-2021 6.5.47
 - History: Add remote IP address
@@ -100,6 +144,10 @@
 
 
 6.4.244
+6.4.236
+- Core: Better handling of zero-values in numeric custom fields
+- Core: Fixed zero values of numeric custom fields in function CF
+
 10-05-2021 6.4.235
 - Calendar: fix behaviour of copy button in list view
 - Billing: Fixed error "Incorrect integer valie for 'order_at_supplier'"

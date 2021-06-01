@@ -113,15 +113,16 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 	 * @return int Permission level. See constants in Acl for values. 
 	 */
 	public static function getUserPermissionLevel($aclId, $userId=false, $checkGroupPermissionOnly=false) {
-		
-		if(\go\core\model\User::isAdminById($userId ? $userId : \GO::user()->id)) {
-			return self::MANAGE_PERMISSION;
-		}
-		
 		//only ignore when no explicit user is checked. Otherwise you can never check the real permissionlevel when \GO::$ignoreAclPermissions is set to true.
 		if(\GO::$ignoreAclPermissions && $userId===false)
 			return self::MANAGE_PERMISSION;
-		
+
+		if( \GO::user() && \go\core\model\User::isAdminById($userId ? $userId : \GO::user()->id)) {
+
+			return $aclId == \go\core\model\Acl::getReadOnlyAclId() ? self::READ_PERMISSION : self::MANAGE_PERMISSION ;
+
+		}
+
 		if($userId===false){
 			if(\GO::user())
 				$userId=\GO::user()->id;

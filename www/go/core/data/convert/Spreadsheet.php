@@ -540,8 +540,8 @@ class Spreadsheet extends AbstractConverter {
 			$this->spreadsheetRowIterator = $this->spreadsheet->getActiveSheet()->getRowIterator();
 		}
 
-		if(isset($params['updateBy'])) {
-			$this->updateBy = $params['updateBy'];
+		if(isset($this->clientParams['updateBy'])) {
+			$this->updateBy = $this->clientParams['updateBy'];
 		}
 	}
 

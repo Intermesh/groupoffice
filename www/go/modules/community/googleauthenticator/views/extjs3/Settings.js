@@ -13,7 +13,7 @@ Ext.onReady(function () {
 		entityStore:"User",
 		currentUser: null,
 		labelWidth: dp(152),
-		title: t('Google authenticator', 'googleauthenticator'),
+		title: t('Google authenticator'),
 		
 		onChanges : function(entityStore, added, changed, destroyed) {
 			if(this.currentUser && changed[this.currentUser.id] && ("googleauthenticator" in changed[this.currentUser.id])){
@@ -23,7 +23,7 @@ Ext.onReady(function () {
 		
 		initComponent: function() {
 			this.enableAuthenticatorBtn = new Ext.Button({
-				text:t('Enable google authenticator', 'googleauthenticator'),
+				text:t('Enable google authenticator'),
 				hidden:false,
 				handler:function(){	
 					var me = this;
@@ -36,7 +36,7 @@ Ext.onReady(function () {
 			});
 			
 			this.disableAuthenticatorBtn = new Ext.Button({
-				text:t('Disable google authenticator', 'googleauthenticator'),
+				text:t('Disable google authenticator'),
 				hidden:true,
 				handler:function(){
 					var me = this;
@@ -93,8 +93,8 @@ Ext.onReady(function () {
 			} else {
 				var passwordPrompt = new go.PasswordPrompt({
 					width: dp(450),
-					text: t("When disabling Google autenticator this step will be removed from the login process.", 'googleauthenticator') + "<br><br>" + t("Provide your current password to disable Google authenticator.", 'googleauthenticator'),
-					title: t('Disable Google authenticator', 'googleauthenticator'),
+					text: t("When disabling Google autenticator this step will be removed from the login process.") + "<br><br>" + t("Provide your current password to disable Google authenticator."),
+					title: t('Disable Google authenticator'),
 					listeners: {
 						'ok': function(value){
 							execute.call(this,value);
@@ -142,8 +142,8 @@ Ext.onReady(function () {
 			} else {
 				var passwordPrompt = new go.PasswordPrompt({
 					width: dp(450),
-					text: t("Provide your current password before you can enable Google authenticator.", 'googleauthenticator'),
-					title: t('Enable Google authenticator', 'googleauthenticator'),
+					text: t("Provide your current password before you can enable Google authenticator."),
+					title: t('Enable Google authenticator'),
 					iconCls: 'ic-security',
 					listeners: {
 						'ok': function (password) {

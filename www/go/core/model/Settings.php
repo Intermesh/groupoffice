@@ -224,6 +224,12 @@ class Settings extends core\Settings {
 	 * @var boolean 
 	 */
 	public $maintenanceMode = false;
+
+	/**
+	 * When true the user interface will show a confirm dialog before moving item with drag and drop
+	 * @var bool
+	 */
+	public $defaultConfirmOnMove = false;
 	
 	
 	/**

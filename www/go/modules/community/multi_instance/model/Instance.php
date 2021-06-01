@@ -367,10 +367,8 @@ class Instance extends Entity {
 			$this->createDatabaseUser($instanceConfig['db_name'], $instanceConfig['db_user'], $instanceConfig['db_pass']);
 			$databaseUserCreated = true;
 
-
 			if(!isset($instanceConfig['db_host'])) {
-				$dsn = \go\core\db\Utils::parseDSN(go()->getConfig()['core']['db']['dsn']);
-				$instanceConfig['db_host'] = $dsn['options']['host'];
+				$instanceConfig['db_host'] = go()->getConfig()['db_host'];
 			}
 
 			$instanceConfig['tmpdir'] = $tmpFolder->getPath();
