@@ -43,7 +43,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 */
 	changedIds : null,
 	
-	// Set to true when all dasta has been fetched from server
+	// Set to true when all data has been fetched from server
 	isComplete : false,
 	
 	constructor : function(config) {

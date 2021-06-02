@@ -35,6 +35,7 @@ return [
 	'% compelete' => '% compleet',
 	'Due at' => 'Verloopt op',
 	"Start at" => 'Start op',
+	'Start time' => 'Begintijd',
 	"Responsible" => 'Verantwoordelijke',
 	"Start" => 'Start',
 	"Due" => 'Verloopt',

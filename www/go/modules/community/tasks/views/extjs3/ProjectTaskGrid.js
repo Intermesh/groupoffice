@@ -233,6 +233,27 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 	config.sm = new Ext.grid.RowSelectionModel();
 	config.loadMask = true;
 
+	config.SearchField = new go.SearchField({
+		handler: function(field, v){
+			this.search(v);
+		},
+		emptyText: null,
+		width: 250,
+		scope: this
+	});
+	config.employeeFilter = new GO.projects2.SelectResource({
+		listeners: {
+			'select': function(cm, record, index) {
+				this.store.setFilter('responsibleUserId', {'responsibleUserId': record.id}).load();
+			},
+			scope: this
+		},
+		emptyText: t('Employee', 'business', 'business'),
+		width: 250,
+		scope: this
+
+	});
+
 	config.tbar = [{
 		iconCls: 'ic-add',
 		text: t("Add"),
@@ -247,7 +268,11 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 			this.deleteSelected();
 		},
 		scope: this
-	},'->', {
+	},
+		// Search bar
+		config.SearchField,
+		config.employeeFilter
+	,'->', {
 		iconCls: 'ic-save',
 		text: t("Save"),
 		handler: function () {
@@ -438,5 +463,9 @@ Ext.extend(go.modules.community.tasks.ProjectTaskGrid, go.grid.EditorGridPanel, 
 
 	isDirty: function () {
 		return this._isDirty || this.store.getModifiedRecords().length > 0;
+	},
+	search: function(v) {
+		this.store.setFilter("search", {text: v}).load();
 	}
+
 });

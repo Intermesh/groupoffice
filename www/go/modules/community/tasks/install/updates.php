@@ -68,5 +68,6 @@ $updates['202104301506'][] = function() {
 	$m->job2task();
 };
 
-
 $updates['202105211543'][] = "ALTER TABLE `tasks_task`  ADD `progressChange` TINYINT(2) NULL";
+
+$updates['202106011409'][] = "ALTER TABLE `tasks_task` ADD COLUMN IF NOT EXISTS `startTime` TIME NULL DEFAULT NULL";

@@ -97,7 +97,8 @@ class Task extends AclItemEntity {
 
 	public $color;
 
-	protected $timeBooked;
+	public $startTime;
+
 
 	/**
 	 * @var string
@@ -184,26 +185,6 @@ class Task extends AclItemEntity {
 			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId']);
 	}
 
-	// TODO: Refactor properly, since this should be part of projects IF AND ONLY IF tasks were to be enabled too.
-	/*
-	public function getTimeBooked()
-	{
-		$booked = 0;
-		if(count($this->hours) > 0) {
-			$record = (new \go\core\db\Query())
-				->select('SUM(duration) as timeBooked')
-				->from('pr2_hours')
-				->where('id IN ('. implode(',',$this->hours) . ')')
-				->single();
-			if($record) {
-				$booked = $record['timeBooked'];
-			}
-		}
-
-		return $booked;
-	}
-	*/
-
 	public static function converters() {
 		return array_merge(parent::converters(), [VCalendar::class, Spreadsheet::class]);
 	}
@@ -237,6 +218,20 @@ class Task extends AclItemEntity {
 
 	protected static function textFilterColumns() {
 		return ['title', 'description'];
+	}
+
+	protected function getSearchKeywords()
+	{
+		$keywords = [$this->title, $this->description];
+		if($this->responsibleUserId) {
+			$rUser = User::findById($this->responsibleUserId);
+			$keywords[] = $rUser->displayName;
+		}
+		if($this->tasklistId) {
+			$tasklist = TaskList::findById($this->tasklistId);
+			$keywords[] = $tasklist->name;
+		}
+		return $keywords;
 	}
 
 	protected function getSearchDescription(){
@@ -288,6 +283,10 @@ class Task extends AclItemEntity {
 				$criteria->where('due', '<=', $value);
 			})->add('unplanned', function(Criteria $criteria, $value) {
 				$criteria->where('start', $value?'IS':'IS NOT',null);
+			})->add('responsibleUserId', function(Criteria $criteria, $value){
+				if(!empty($value)) {
+					$criteria->where('responsibleUserId', '=',$value);
+				}
 			});
 
 	}
@@ -337,7 +336,9 @@ class Task extends AclItemEntity {
 			Tasklist::saveForProject($this->projectId);
 		}
 
-		if($this->isModified('responsibleUserId')) {
+		$success = parent::internalSave();
+
+		if($success && $this->isModified('responsibleUserId')) {
 
 			if (isset($this->responsibleUserId)) {
 				$alert = $this->createAlert(new \DateTime())
@@ -352,8 +353,6 @@ class Task extends AclItemEntity {
 				CoreAlert::delete(['entityTypeId' => Task::entityType()->getId(), 'tag' => 'task-assigned-' . $this->id]);
 			}
 		}
-
-		$success = parent::internalSave();
 
 		// if alert can be based on start / due of task check those properties as well
 		$modified = $this->getModified('alerts');
