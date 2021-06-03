@@ -1,8 +1,8 @@
 go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 	initComponent: function () {
 		this.checkColumn = new GO.grid.CheckColumn({
-			id:'progress',
-			dataIndex: 'progress',
+			id:'complete',
+			dataIndex: 'complete',
 			hideInExport:true,
 			header: '<i class="icon ic-check"></i>',
 			width: dp(56),
@@ -17,35 +17,28 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					disabledCls = ' x-item-disabled';
 
 				return String.format('<div class="x-grid3-check-col{0}' + disabledCls + '" {1}></div>',
-					(v=='completed' || v =='cancelled') ? '-on' : '',
+					v ? '-on' : '',
 					record.json.color ? 'style="color:#'+record.json.color+'"' : '');
 			}
 		});
 
 		this.checkColumn.on('change', function(record){
-			// this.store.reload({
-			// 	callback:function(){
-					// update task
+
 			var wasComplete = record.json.progress == 'completed' || record.json.progress == 'cancelled';
 			go.Db.store("Task").set({update: {
 				[record.data.id]: {progress: (!wasComplete ? 'completed' : 'needs-action')}}
 			});
-			// 	},
-			// 	scope:this
-			// });
+
 		}, this);
 
-		// without reload
-		// this.checkColumn.on('change', function(record, checked){
-		// 	var update = {}, id = record.data.id;
-		// 	if(checked) {
-		// 		update[id] = {percentageComplete: 100};
-		// 	} else {
-		// 		update[id] = {percentageComplete: 0};
-		// 	}
+		const startRenderer = function(v, meta, record) {
 
-		// 	go.Db.store("Task").set({update: update});
-		// }, this);
+			if(record.data.due && record.data.due.format("Ymd") < (new Date).format("Ymd")) {
+				meta.css = "danger";
+			}
+
+			return go.util.Format.date(v);
+		};
 
 		Ext.apply(this, {		
 			columns: [
@@ -57,30 +50,6 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(35),
 					sortable: true,
 					dataIndex: 'id'
-				},{
-					id: 'icons',
-					width: dp(60),
-					renderer: function(v,m,rec) {
-						var icons = [];
-						if(rec.json.recurrenceRule) {
-							icons.push('repeat');
-						}
-						if(rec.json.priority != 0) {
-							if (rec.json.priority < 5) {
-								icons.push('priority_high');
-							}
-							if (rec.json.priority > 5) {
-								icons.push('low_priority');
-							}
-						}
-						if(rec.json.filesFolderId) {
-							icons.push('attachment');
-						}
-						if(!Ext.isEmpty(rec.json.alerts)) {
-							icons.push('alarm');
-						}
-						return icons.map(i => '<i class="icon small">'+i+'</i>').join('');
-					}
 				},
 				{
 					id: 'title',
@@ -88,10 +57,36 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(75),
 					sortable: true,
 					dataIndex: 'title',
-					renderer: function(v,m,r) {
-						if(r.json.color) {
-							m.style += 'color:#'+r.json.color+';';
+					renderer: function(v,m,rec) {
+						if(rec.json.color) {
+							m.style += 'color:#'+rec.json.color+';';
 						}
+
+						return v;
+					}
+				},{
+					id: 'icons',
+					width: dp(60),
+					renderer: function(v,m,rec) {
+						var v = "";
+						if(rec.json.priority != 0) {
+							if (rec.json.priority < 5) {
+								v += '<i class="icon small orange">priority_high</i>';
+							}
+							if (rec.json.priority > 5) {
+								v += '<i class="icon small blue">low_priority</i>';
+							}
+						}
+						if(rec.json.recurrenceRule) {
+							v += '<i class="icon small">repeat</i>';
+						}
+						if(rec.json.filesFolderId) {
+							v += '<i class="icon small">attachment</i>';
+						}
+						if(!Ext.isEmpty(rec.json.alerts)) {
+							v += '<i class="icon small">alarm</i>';
+						}
+
 						return v;
 					}
 				},{
@@ -101,7 +96,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					header: t('Start at'),
 					width: dp(160),
 					sortable: true,
-					dataIndex: 'start'
+					dataIndex: 'start',
+					renderer: startRenderer
 				},{
 					xtype:"datecolumn",
 					id: 'due',
@@ -110,20 +106,22 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(160),
 					sortable: true,
 					dataIndex: 'due',
+					renderer: startRenderer,
+					hidden: true
+				},{
+					header: t('Responsible'),
+					width: dp(240),
+					sortable: true,
+					dataIndex: 'responsible',
+					renderer: function(v) {
+						return v ? go.util.avatar(v.displayName,v.avatarId)+' '+v.displayName : "-";
+					}
 				},{
 					width:dp(112),
 					header: t("% complete", "tasks"),
 					dataIndex: 'percentComplete',
 					renderer:function (value, meta, rec, row, col, store){
 						return '<div class="go-progressbar"><div style="width:'+Math.ceil(value)+'%"></div></div>';
-					}
-				},{
-					header: t('Responsible'),
-					width: dp(160),
-					sortable: true,
-					dataIndex: 'responsible',
-					renderer: function(v) {
-						return v ? go.util.avatar(v.displayName,v.avatarId)+' '+v.displayName : "-";
 					}
 				},{
 					xtype:"datecolumn",
@@ -141,7 +139,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					header: t('Modified at'),
 					width: dp(160),
 					sortable: true,
-					dataIndex: 'modifiedAt'
+					dataIndex: 'modifiedAt',
+					hidden: true
 				},
 				{	
 					hidden: true,
@@ -151,7 +150,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'creator',
 					renderer: function(v) {
 						return v ? v.displayName : "-";
-					}
+					},
+					hidden: true
 				},
 				{	
 					hidden: true,
@@ -161,7 +161,8 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: 'modifier',
 					renderer: function(v) {
 						return v ? v.displayName : "-";
-					}
+					},
+					hidden: true
 				}
 			],
 			viewConfig: {

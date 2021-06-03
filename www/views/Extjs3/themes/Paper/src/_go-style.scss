@@ -770,10 +770,14 @@ button {
 		width: 100%;
 	}
 
-	.icons &, .go-detail-view-avatar & {
+	.icons &, .go-detail-view-avatar &{
 		//float:left; ?? why?
 		margin-top:dp(4);
 		margin-right: dp(16);
+	}
+
+	.x-grid3-cell-inner & {
+		margin-right: dp(8);
 	}
 	
 	.x-btn {
@@ -1695,10 +1699,11 @@ table[id^="comments-ext"] b {
 		@extend %icon;
 		float: right;
 	}
-	&.success { background-color: lighten($cSuccess, 55%);  }
-	&.danger { background-color: lighten($cDanger,45%);}
-	&.warning { background-color: lighten($cWarning, 47%);}
-	&.summary { background-color: color($bg, 'background'); }
+	//looks ugly in tasks.
+	//&.success { background-color: lighten($cSuccess, 55%);  }
+	//&.danger { background-color: lighten($cDanger,45%);}
+	//&.warning { background-color: lighten($cWarning, 47%);}
+	//&.summary { background-color: color($bg, 'background'); }
 }
 
 

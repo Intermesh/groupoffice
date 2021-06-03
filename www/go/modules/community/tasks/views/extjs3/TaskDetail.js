@@ -16,7 +16,6 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 			items: [{
 				tpl: new Ext.XTemplate('<h3 class="title s8">{title}</h3>\
 					<h4 style="text-transform:uppercase; float:right; padding:12px 8px 0 0;">{[go.modules.community.tasks.progress[values.progress]]}</h4>\
-					<div class="go-progressbar" style="clear:both"><div style="width:{[Math.ceil(values.percentComplete)]}%"></div></div>\
 				<p class="s6 pad">\
 					<label>'+t("Start at")+'</label><span>{[go.util.Format.date(values.start) || "-"]}</span><br><br>\
 					<label>'+t("Tasklist")+'</label><span><tpl for="tasklist">{name}</tpl></span><br><br>\
@@ -25,7 +24,12 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				<p class="s6">\
 					<label>'+t("Due at")+'</label><span>{[go.util.Format.date(values.due) || "-"]}</span><br><br>\
 					<tpl if="values.responsible"><label>'+t("Responsible")+'</label><span>{[go.util.avatar(values.responsible.displayName, values.responsible.avatarId)]} {[values.responsible.displayName]}</span><br><br></tpl>\
-				</p><tpl if="!GO.util.empty(description)"><p class="s12 pad">\
+				</p>\
+				<div class="s6 pad">\
+					<label>'+t("Progress")+'</label>\
+					<div class="go-progressbar" style="clear:both"><div style="width:{[Math.ceil(values.percentComplete)]}%"></div></div><br><br>\
+				</div>\
+				<tpl if="!GO.util.empty(description)"><p class="s12 pad">\
 					<label>'+t('Description')+'</label>\
 					<span>{description}</span>\
 				</p></tpl>',{

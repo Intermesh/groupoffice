@@ -35,91 +35,20 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			}]
 		});
 
-		var filterPanel = new go.NavMenu({
+		this.filterPanel = new go.NavMenu({
 			region:'north',
 			store: new Ext.data.ArrayStore({
 				fields: ['name', 'icon', 'inputValue'],
 				data: [
-					[t("Today"), 'content_paste', 'active'],
-					[t("Due in seven days"), 'filter_7', 'sevendays'],
-					[t("Overdue"), 'schedule', 'overdue'],
-					[t("Incomplete tasks"), 'assignment_late', 'incomplete'],
+					[t("Today"), 'content_paste', 'today'],
 					[t("Completed"), 'assignment_turned_in', 'completed'],
-					[t("Future tasks"), 'assignment_return', 'future'],
-					[t("Unplanned"), 'event_busy', 'unplanned'],
+					[t("Unscheduled"), 'event_busy', 'unscheduled'],
+					[t("Scheduled"), 'event_busy', 'scheduled'],
 					[t("All"), 'assignment', 'all'],
 				]
-			}),
-			listeners: {
-				selectionchange: function(view, nodes) {
-					switch(nodes[0].viewIndex) {
-
-						case 0: // tasks today
-							var now = new Date(),
-							nowYmd = now.format("Y-m-d");
-							this.taskGrid.store.setFilter("status", {
-								due: nowYmd,
-								complete: false
-							});
-							break;
-
-						case 1: // ends this week
-							var now = new Date();
-							var nextWeek = now.add(Date.DAY, 7);
-
-							nowYmd = now.format("Y-m-d");
-							nextWeekYmd = nextWeek.format("Y-m-d");
-							this.taskGrid.store.setFilter("status", {
-								nextWeekStart: now,
-								nextWeekEnd: nextWeekYmd,
-								percentComplete: "<100"
-							});
-							break;
-
-						case 2: // tasks too late
-							var now = new Date(),
-							nowYmd = now.format("Y-m-d");
-							this.taskGrid.store.setFilter('status',{
-								late: nowYmd,
-								percentComplete: "<100"
-							});
-							break;
-
-						case 3: // non completed tasks
-							this.taskGrid.store.setFilter("status", {
-								percentComplete: "<100"
-							});
-							break;
-
-						case 4: // completed tasks
-							this.taskGrid.store.setFilter("status", {
-								percentComplete: 100
-							});
-						break;
-
-						case 5: // future tasks
-							var now = new Date(),
-							nowYmd = now.format("Y-m-d");
-							this.taskGrid.store.setFilter('status',{
-								future: nowYmd,
-								percentComplete: "<100"
-							});
-							break;
-						case 6:
-							this.taskGrid.store.setFilter('status',{
-								unplanned: true
-							});
-							break;
-						case 7: // all
-							this.taskGrid.store.setFilter("status", null);
-							break;
-					}
-					this.taskGrid.store.load();
-					// var record = view.store.getAt(nodes[0].viewIndex);
-				},
-				scope: this
-			}
+			})
 		});
+
 
 		this.sidePanel = new Ext.Panel({
 			width: dp(300),
@@ -129,7 +58,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			split: true,
 			autoScroll: true,
 			items: [
-				filterPanel,
+				this.filterPanel,
 				this.tasklistsGrid,
 				this.categoriesGrid
 			]
@@ -161,6 +90,14 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	runModule : function() {
 		this.categoriesGrid.store.load();
 
+
+		this.filterPanel.on("afterrender", () => {
+			this.filterPanel.selectRange(0,0);
+			this.setStatusFilter("today");
+			this.filterPanel.on("selectionchange", this.onStatusSelectionChange, this);
+		});
+
+
 		//load task lists and select the first
 		this.tasklistsGrid.getStore().load({
 			callback: function (store) {
@@ -170,6 +107,76 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			},
 			scope: this
 		});
+	},
+
+	onStatusSelectionChange: function(view, nodes) {
+
+		const rec = view.store.getAt(nodes[0].viewIndex);
+		this.setStatusFilter(rec.data.inputValue);
+		this.taskGrid.store.load();
+	},
+
+
+	setStatusFilter : function(inputValue) {
+		switch(inputValue) {
+
+			case "today": // tasks today
+				const now = new Date(),
+					nowYmd = now.format("Y-m-d");
+
+				this.taskGrid.store.setFilter("status", {
+					start: "<=" + nowYmd,
+					complete: false
+				});
+
+				break;
+
+			// case 2: // tasks too late
+			// 	var now = new Date(),
+			// 	nowYmd = now.format("Y-m-d");
+			// 	this.taskGrid.store.setFilter('status',{
+			// 		late: nowYmd,
+			// 		percentComplete: "<100"
+			// 	});
+			// 	break;
+
+			// case 3: // non completed tasks
+			// 	this.taskGrid.store.setFilter("status", {
+			// 		percentComplete: "<100"
+			// 	});
+			// 	break;
+
+			case "completed": // completed tasks
+				this.taskGrid.store.setFilter("status", {
+					complete: true
+				});
+				break;
+
+			// case 5: // future tasks
+			// 	var now = new Date(),
+			// 	nowYmd = now.format("Y-m-d");
+			// 	this.taskGrid.store.setFilter('status',{
+			// 		future: nowYmd,
+			// 		percentComplete: "<100"
+			// 	});
+			// 	break;
+			case "unscheduled":
+				this.taskGrid.store.setFilter('status',{
+					scheduled: false
+				});
+				break;
+
+			case "scheduled":
+				this.taskGrid.store.setFilter('status',{
+					scheduled: true
+				});
+				break;
+
+
+			case "all": // all
+				this.taskGrid.store.setFilter("status", null);
+				break;
+		}
 	},
 	
 	createCategoriesGrid: function() {
@@ -244,8 +251,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			fields: [
 				'id', 
 				'title',
-				'start',
-				'due',
+				{name: 'start', type: "date"},
+				{name: 'due', type: "date"},
 				'description', 
 				'repeatEndTime',
 				{name: 'responsible', type: 'relation'},
@@ -254,7 +261,12 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				{name: 'creator', type: "relation"},
 				{name: 'modifier', type: "relation"},
 				'percentComplete',
-				'progress'
+				'progress',{
+					name: "complete",
+					convert: function(v, data) {
+						return data.progress == 'completed';
+					}
+				}
 			],
 			entityStore: "Task"
 		});

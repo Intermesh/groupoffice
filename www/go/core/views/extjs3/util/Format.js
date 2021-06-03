@@ -282,6 +282,10 @@
 			return Ext.util.Format.date(v, GO.settings.date_format + " " + GO.settings.time_format);
 		},
 
+		shortDateTimeHTML: function(v) {
+			'<span style="cursor:pointer" title="' + go.util.Format.dateTime(v) + '">' + go.util.Format.userDateTime(v) + '</span>'
+		},
+
 		shortDateTime: function (v, showTime, longNotation) {
 			
 			showTime?showTime:null;

@@ -265,23 +265,15 @@ class Task extends AclItemEntity {
 					->where(['categories.categoryId' => $value]);
 				}
 			})->addDate("start", function(Criteria $criteria, $comparator, $value) {
-				$criteria->where(['start' => $value]);
+				$criteria->where('start',$comparator,$value);
 			})->addDate("due", function(Criteria $criteria, $comparator, $value) {
-				$criteria->where(['due' => $value]);
+				$criteria->where('due', $comparator, $value);
 			})->addNumber('percentComplete', function(Criteria $criteria, $comparator, $value) {
 				$criteria->where('percentComplete', $comparator, $value);
 			})->add('complete', function(Criteria $criteria, $value) {
-				$criteria->where('progress', $value?'=':'!=',Progress::Completed);
-			})->addDate("late", function(Criteria $criteria, $comparator, $value) {
-				$criteria->where('due', '<', $value);
-			})->addDate("future", function(Criteria $criteria, $comparator, $value) {
-				$criteria->where('start', '>', $value);
-			})->addDate("nextWeekStart", function(Criteria $criteria, $comparator, $value) {
-				$criteria->where('due', '>=', $value);
-			})->addDate("nextWeekEnd", function(Criteria $criteria, $comparator, $value) {
-				$criteria->where('due', '<=', $value);
-			})->add('unplanned', function(Criteria $criteria, $value) {
-				$criteria->where('start', $value?'IS':'IS NOT',null);
+				$criteria->where('progress', $value ? '=' : '!=', Progress::Completed);
+			})->add('scheduled', function(Criteria $criteria, $value) {
+				$criteria->where('start', $value ? 'IS NOT' : 'IS',null);
 			})->add('responsibleUserId', function(Criteria $criteria, $value){
 				if(!empty($value)) {
 					$criteria->where('responsibleUserId', '=',$value);
