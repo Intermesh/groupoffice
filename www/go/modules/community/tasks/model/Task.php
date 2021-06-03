@@ -181,7 +181,6 @@ class Task extends AclItemEntity {
 			->addUserTable("tasks_task_user", "ut", ['id' => 'taskId'])
 			->addMap('alerts', Alert::class, ['id' => 'taskId'])
 			->addMap('group', TasklistGroup::class, ['groupId' => 'id'])
-			->addScalar('hours', 'pr2_hours', ['id' => 'task_id']) // TODO: Refactor into projects2 or planner module
 			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId']);
 	}
 
