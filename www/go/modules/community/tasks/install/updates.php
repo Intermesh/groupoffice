@@ -71,3 +71,20 @@ $updates['202104301506'][] = function() {
 $updates['202105211543'][] = "ALTER TABLE `tasks_task`  ADD `progressChange` TINYINT(2) NULL";
 
 $updates['202106011409'][] = "ALTER TABLE `tasks_task` ADD COLUMN IF NOT EXISTS `startTime` TIME NULL DEFAULT NULL";
+
+
+//alter table sync_tasklist_user change tasklist_id tasklistId int auto_increment;
+//
+//alter table sync_tasklist_user change user_id userId int default 0 not null;
+//
+//alter table sync_tasklist_user change default_tasklist isDefault boolean default 0 not null;
+//
+//alter table sync_tasklist_user
+//	add constraint sync_tasklist_user_core_user_id_fk
+//		foreign key (userId) references core_user (id)
+//			on delete cascade;
+//
+//alter table sync_tasklist_user
+//	add constraint sync_tasklist_user_tasks_tasklist_id_fk
+//		foreign key (tasklistId) references tasks_tasklist (id)
+//			on delete cascade;
