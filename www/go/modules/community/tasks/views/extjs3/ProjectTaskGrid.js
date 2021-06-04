@@ -26,14 +26,16 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 
 						if (!this.timeEntryDialog) {
 							this.timeEntryDialog = new go.modules.community.tasks.TimeEntryDialog({
-								id: 'pm-timeentry-dialog-grid'
+								id: 'pm-timeentry-dialog-grid',
+
 							});
 						}
 
 						this.timeEntryDialog.show(0, {
 							loadParams: {
 								task_id: record.data.id,
-								project_id: this.projectId
+								project_id: this.projectId,
+								user_id: record.data.responsibleUserId
 							}
 						});
 						break;
@@ -57,7 +59,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 	}, this)
 
 	var fields = {
-		fields: ['id', 'group.name', 'projectId', 'responsibleUserId', 'percentageComplete', 'estimatedDuration', 'timeBooked', 'due', 'start', 'description' , 'groupId'],
+		fields: ['id', 'projectId', 'responsibleUserId', 'percentageComplete', 'estimatedDuration', 'timeBooked', 'due', 'start', 'description'],
 		columns: [{
 			id: 'start',
 			header: t('Start', 'tasks', 'community'),
@@ -159,7 +161,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 		},
 		{
 			header: t("Hours booked", "tasks", 'community'),
-			dataIndex: 'timeBooked',
+			dataIndex: 'hours.timeBooked',
 			width: dp(72),
 			renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
 				if(parseInt(value) > 0) {
@@ -203,7 +205,8 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 			'estimatedDuration',
 			'tasklistId',
 			'group',
-			'timeBooked'
+			'freeBusyStatus',
+			'hours.timeBooked'
 		],
 		sortInfo: {
 			field: 'start',
