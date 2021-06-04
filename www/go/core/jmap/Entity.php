@@ -690,13 +690,14 @@ abstract class Entity  extends OrmEntity {
 	 * @return \go\core\model\Alert
 	 * @throws Exception
 	 */
-	public function createAlert(\DateTimeInterface $triggerAt) {
+	public function createAlert(\DateTimeInterface $triggerAt, $tag) {
 		$alert = new \go\core\model\Alert();
 
 		$alert->triggerAt = $triggerAt;
 		$alert->userId = go()->getAuthState()->getUserId();
 		$alert->entityId =  $this->id;
 		$alert->entityTypeId = static::entityType()->getId();
+		$alert->tag = $tag;
 
 		return $alert;
 	}

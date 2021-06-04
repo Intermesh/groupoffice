@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\comments\model;
 
+use GO\Base\Exception\Save;
 use go\core\acl\model\AclItemEntity;
 use go\core\fs\Blob;
 use go\core\model\Acl;
@@ -195,8 +196,35 @@ class Comment extends AclItemEntity {
 
 	protected function internalSave()
 	{
+
+		if($this->isNew()) {
+			$this->createAlerts();
+		}
 		$this->images = Blob::parseFromHtml($this->text);
 		return parent::internalSave();
+	}
+
+	private function createAlerts() {
+		$entity = $this->findEntity();
+		$aclId = $entity->findAclId();
+		if(!$aclId) {
+			return;
+		}
+
+		$userIds = go()->getDbConnection()->selectSingleValue('userId')
+			->from('core_user_group', 'ug')
+			->join('core_acl_group', 'ag', 'ag.groupId = ug.groupId')
+			->where('ag.aclId', '=', $aclId);
+
+		foreach($userIds as $userId) {
+			$alert = $entity->createAlert(new DateTime(), 'comment-' . $entity::entityType()->getName().'-'.$entity->id())
+				->setValue('userId', $userId)
+				->setData(['type' => 'comment', 'createdBy' => go()->getAuthState()->getUserId()]);
+
+			if(!$alert->save()) {
+				throw new SaveException($alert);
+			}
+		}
 	}
 
 	public function title()

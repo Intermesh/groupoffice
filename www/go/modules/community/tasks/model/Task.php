@@ -344,9 +344,8 @@ class Task extends AclItemEntity {
 		if($success && $this->isModified('responsibleUserId')) {
 
 			if (isset($this->responsibleUserId)) {
-				$alert = $this->createAlert(new \DateTime())
+				$alert = $this->createAlert(new \DateTime(), 'task-assigned-' . $this->id)
 					->setValue('userId', $this->responsibleUserId)
-					->setValue('tag', 'task-assigned-' . $this->id)
 					->setData(['type' => 'assigned', 'assignedBy' => go()->getAuthState()->getUserId()]);
 
 				if (!$alert->save()) {
@@ -381,8 +380,7 @@ class Task extends AclItemEntity {
 			return;
 		}
 		foreach($this->alerts as $alert) {
-			$coreAlert = $this->createAlert($alert->at($this));
-			$coreAlert->tag = $alert->id;
+			$coreAlert = $this->createAlert($alert->at($this), $alert->id);
 			if(!$coreAlert->save()) {
 				throw new \Exception(var_export($coreAlert->getValidationErrors(),true));
 			}

@@ -11,8 +11,23 @@ go.Modules.register('community', 'comments', {
 		}
 	}, 
 	"CommentLabel"],
-	initModule: function () {	
-		
+	initModule: function () {
+		go.Alerts.on("beforeshow", function(alerts, alertConfig) {
+			const alert = alertConfig.alert;
+			if(alert.data && alert.data.type == "comment") {
+
+
+				//replace panel promise
+				alertConfig.panelPromise = alertConfig.panelPromise.then((panelCfg) => {
+					return go.Db.store("User").single(alert.data.createdBy).then((creator) =>{
+						panelCfg.html += ": " + t("A comment was made by {creator}").replace("{creator}", creator.displayName);
+						panelCfg.notificationBody = panelCfg.html;
+						return panelCfg;
+					});
+
+				});
+			}
+		});
 	}
 });
 
