@@ -290,7 +290,6 @@ go.modules.community.tasks.TimeEntryDialog = Ext.extend(GO.dialog.TabbedFormDial
 								items: [
 									this.includeBreak = new Ext.ux.form.XCheckbox({
 										name: 'include_break',
-										//xtype: 'xcheckbox',
 										listeners: {
 											scope: this,
 											check: function (self, checked) {
@@ -348,7 +347,25 @@ go.modules.community.tasks.TimeEntryDialog = Ext.extend(GO.dialog.TabbedFormDial
 			autoScroll: true,
 			items: items
 		});
+		this.on("submit", function(dlg, success, serverId) {
+			// Find a task ID
+			var values = this.formPanel.getForm().getValues(false);
+			var taskId = values['task_id'], duration = values['duration_human'];
 
+			// Retrieve task
+			go.Db.store('Task').single(taskId).then(function(task) {
+				// Update duration; fire up the store
+				var durationMinutes = go.util.Format.minutes(duration);
+				var percentComplete = Math.min(100, Math.round(((durationMinutes / task.estimatedDuration) * 100) ));
+				var update = {};
+				update[taskId] = {percentComplete: percentComplete}
+				go.Db.store('Task').set({update: update});
+			});
+
+			// Set progress to 100% or a percentage based on duration of hours registration
+
+
+		});
 		this.addPanel(this.formPanel);
 
 	}
