@@ -1,4 +1,12 @@
+- Business: Wrong time format in agreement dialog
 - Google authenticator: Translations didn't work in this module
+- Core: Fixed disabled checkbox for enabling modules in group dialog
+- Calendar: [Views] Click on a view then the My calendar button generate an error #703
+- Address book: Select contacts with read permission only in contact custom field
+- Core: ACL panel could show error when no permissions were set
+- Core: Always move permissions panel to the end in dialogs
+- Office online / libreoffice: Open documents read only when not having write permissions for the service.
+- E-mail: Fixed mail showing partial content when HTML structure was not following correct standards
 
 20-05-2021 6.5.52
 - Address book: Fixed import skipping row and updating records by id or email

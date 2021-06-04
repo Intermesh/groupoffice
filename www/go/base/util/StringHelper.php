@@ -1103,13 +1103,6 @@ END;
 			$styles = self::extractStyles($html, $prefix);
 		}
 
-		//strip everything above <body first. This fixes a mail from Amazon that had the body inside the head section :(
-		$bodyPos = stripos($html, '<body');
-
-		if($bodyPos) {
-			$html = substr($html, $bodyPos);
-		}
-		
 		$to_removed_array = array (
 		"'<!DOCTYPE[^>]*>'usi",
 		"'<html[^>]*>'usi",
