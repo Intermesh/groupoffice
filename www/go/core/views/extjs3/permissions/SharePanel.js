@@ -186,10 +186,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		this.store.on("beforeload", this.onBeforeStoreLoad, this);
 		
 		go.permissions.SharePanel.superclass.initComponent.call(this);
-		
-		this.on("beforeedit", function(e) {
-			return e.record.data.id !== 1; //cancel edit for admins group
-		}, this);
+
 
 
 		this.on("cellclick", function(grid, rowIndex, columnIndex, e) {
