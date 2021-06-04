@@ -24,6 +24,19 @@ class UserSettings extends Property {
 	 */
 	protected $defaultNoteBookId;
 
+	/**
+	 * @var bool
+	 */
+	protected $rememberLastItems;
+
+	/** @var string */
+	protected $lastNoteBookIds;
+
+	/**
+	 * @return \go\core\orm\Mapping
+	 * @throws \ReflectionException
+	 */
+
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable("notes_user_settings", "abs");
 	}
@@ -64,5 +77,43 @@ class UserSettings extends Property {
 		$this->defaultNoteBookId = $id;
 	}
 
-	
+
+	/**
+	 * @return bool
+	 */
+	public function getRememberLastItems(): bool
+	{
+		return (bool)$this->rememberLastItems;
+	}
+
+	/**
+	 * @param bool $value
+	 */
+	public function setRememberLastItems(bool $value)
+	{
+		$this->rememberLastItems = $value;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getLastNoteBookIds(): array
+	{
+		if (strlen($this->lastNoteBookIds)) {
+			return explode(',', $this->lastNoteBookIds);
+		}
+		return [$this->getDefaultNoteBookId()]; // The default notebook id makes sense in this case
+	}
+
+	/**
+	 * @param array|null $ids
+	 */
+	public function setLastNoteBookIds(?array $ids = null)
+	{
+		if (is_array($ids) && count($ids) > 0) {
+			$this->lastNoteBookIds = implode(',', $ids);
+		} else {
+			$this->lastNoteBookIds = '';
+		}
+	}
 }

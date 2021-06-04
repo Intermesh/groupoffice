@@ -79,20 +79,31 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		//load note books and select the first
 		this.noteBookGrid.getStore().load({
 			callback: function (store) {
-				var index = this.noteBookGrid.store.indexOfId(go.User.notesSettings.defaultNoteBookId);
-				if(index == -1) {
-					index = 0;
+				var userSettings = go.User.notesSettings, indexes = [];
+				if (userSettings.rememberLastItems && userSettings.lastNoteBookIds.length > 0) {
+					for(var ii=0,il=userSettings.lastNoteBookIds.length;ii<il;ii++) {
+						var currId = parseInt(userSettings.lastNoteBookIds[ii]);
+						var index = this.noteBookGrid.store.indexOfId(currId);
+						if (index === -1) {
+							index = 0;
+						}
+						indexes.push(index);
+					}
+				} else {
+					var index = this.noteBookGrid.store.indexOfId(parseInt(userSettings.defaultNoteBookId));
+					if (index === -1) {
+						index = 0;
+					}
+					indexes.push(index);
 				}
-
-				this.noteBookGrid.getSelectionModel().selectRow(index);
+				this.noteBookGrid.getSelectionModel().selectRows(indexes);
 			},
 			scope: this
 		});
 	},
 
 	createFilterPanel: function () {
-		
-		
+
 		return new Ext.Panel({
 			region: "center",
 			minHeight: dp(200),
@@ -315,8 +326,21 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		this.addButton.setDisabled(!this.addNoteBookId);
 		
-		this.noteGrid.store.setFilter("notebooks", {noteBookId: ids});;
+		this.noteGrid.store.setFilter("notebooks", {noteBookId: ids});
 		this.noteGrid.store.load();
+		var currNoteBookIds = ids.sort(function(a,b){return a-b});
+		var userSettings = go.User.notesSettings;
+		if(userSettings.rememberLastItems && userSettings.lastNoteBookIds.join(',') !== currNoteBookIds.join(',')) {
+			var update = {};
+			update[go.User.id] = {
+				'notesSettings': {
+					lastNoteBookIds: currNoteBookIds
+				}
+			};
+			go.Db.store("User").set({
+				'update': update
+			});
+		}
 	},
 	
 	onNoteGridDblClick : function (grid, rowIndex, e) {

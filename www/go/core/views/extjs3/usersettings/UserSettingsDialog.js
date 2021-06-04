@@ -155,7 +155,6 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	},
 	
 	loadModulePanels : function() {
-    
 		var available = go.Modules.getAvailable(), pnl,pnlCls, config, i, i1, l, l2;
 		for(i = 0, l = available.length; i < l; i++) {
 			config = go.Modules.getConfig(available[i].package, available[i].name);
@@ -193,7 +192,6 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 * 
 	 */
 	submit : function(){
-		
 		// loop through child panels and call onSubmitStart function if available
 		var valid = true;
 		this.tabPanel.items.each(function(tab) {

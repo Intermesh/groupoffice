@@ -104,7 +104,10 @@ CREATE TABLE `addressbook_url` (
 
 CREATE TABLE `addressbook_user_settings` (
   `userId` int(11) NOT NULL,
-  `defaultAddressBookId` int(11) DEFAULT NULL
+  `defaultAddressBookId` int(11) DEFAULT NULL,
+  `rememberLastItem` TINYINT(1) DEFAULT 0,
+  `lastAddressBookId` INT(11) NULL DEFAULT NULL,
+  `displayAllContactsByDefault` TINYINT(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
 
 
