@@ -89,7 +89,6 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			width:dp(1100),
 			height:dp(800),
 			layout:'responsive',
-			closeAction:'hide',
 			items: [
 				this.navMenu,
 				this.formPanel

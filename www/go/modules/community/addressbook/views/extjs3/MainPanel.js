@@ -108,10 +108,12 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		//because the root node is not visible it will auto expand on render. This depends on the user address book settings
 		this.addressBookTree.getRootNode().on('expand', function (node) {
 			var abSettings = go.User.addressBookSettings, abNode = null;
-			if (abSettings.displayAllContactsByDefault) {
+			if (abSettings.startIn == "allcontacts") {
 				//when expand is done we'll select the first node. This will trigger a selection change. which will load the grid below.
 				this.addressBookTree.getSelectionModel().select(node.firstChild);
-			} else if (abSettings.rememberLastItem && abSettings.lastAddressBookId > 0) {
+			} else if (abSettings.startIn == "starred") {
+				abNode = node.findChild('id', 'starred');
+			} else if (abSettings.startIn == "remember" && abSettings.lastAddressBookId > 0) {
 				abNode = node.findChild('id', 'AddressBook-' + abSettings.lastAddressBookId);
 			} else {
 				abNode = node.findChild('id', 'AddressBook-' + abSettings.defaultAddressBookId);
@@ -140,7 +142,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			} else if (node.attributes.entity.name === "AddressBook") {
 				var addressBookId = node.attributes.data.id, abSettings = go.User.addressBookSettings;
 				this.setAddressBookId(addressBookId);
-				if(abSettings.rememberLastItem && abSettings.lastAddressBookId != addressBookId) {
+				if(abSettings.startIn == "remember" && abSettings.lastAddressBookId != addressBookId) {
 					var update = {};
 					update[go.User.id] = {'addressBookSettings': {
 						lastAddressBookId:addressBookId

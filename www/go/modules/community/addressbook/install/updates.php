@@ -131,7 +131,6 @@ $updates['202011271105'][] = "ALTER TABLE `addressbook_contact` ADD INDEX(`lastN
 $updates['202011271105'][] = "update addressbook_contact set lastName = name where isOrganization = true;";
 
 
-$updates['202103261053'][] = "ALTER TABLE `addressbook_user_settings` ADD (`rememberLastItem` TINYINT(1) DEFAULT 0, `lastAddressBookId` INT(11) NULL DEFAULT NULL, `displayAllContactsByDefault` TINYINT(1) DEFAULT 1);";
 
 $updates['202105171220'][] = "create index addressbook_contact_addressBookId_lastName_index
 	on addressbook_contact (addressBookId, lastName);";
@@ -139,3 +138,9 @@ $updates['202105171220'][] = "create index addressbook_contact_addressBookId_las
 $updates['202105171220'][] = "create index addressbook_contact_addressBookId_name_index
 	on addressbook_contact (addressBookId, name);";
 
+
+
+$updates['202106041641'][] = "ALTER TABLE `addressbook_user_settings` ADD `lastAddressBookId` INT(11) null;";
+
+$updates['202106041641'][] = "alter table addressbook_user_settings
+	add startIn enum('allcontacts', 'starred', 'default', 'remember') default 'allcontacts' not null;";

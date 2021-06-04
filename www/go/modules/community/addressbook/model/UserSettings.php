@@ -25,40 +25,21 @@ class UserSettings extends Property {
 	 */
 	protected $defaultAddressBookId;
 
+
 	/**
-	 * Remember last selected item option
-	 * @var boolean
+	 * @var string
 	 */
-	protected $rememberLastItem;
+	public $startIn;
 
 	/**
 	 * Last selected item
 	 * @var int
 	 */
-	protected $lastAddressBookId;
+	public $lastAddressBookId;
 
-	protected $displayAllContactsByDefault;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable("addressbook_user_settings", "abs");
-	}
-
-	public function getRememberLastItem() :bool
-	{
-		return (boolean) $this->rememberLastItem;
-	}
-
-	/**
-	 * @return bool
-	 */
-	public function getDisplayAllContactsByDefault() :bool
-	{
-		return (boolean) $this->displayAllContactsByDefault;
-	}
-
-	public function getLastAddressBookId()
-	{
-		return $this->lastAddressBookId;
 	}
 
 	public function getDefaultAddressBookId() {
@@ -98,20 +79,7 @@ class UserSettings extends Property {
 		$this->defaultAddressBookId = $id;
 	}
 
-	public function setRememberLastItem(bool $value)
-	{
-		$this->rememberLastItem = $value;
-	}
 
-	public function setDisplayAllContactsByDefault(bool $value)
-	{
-		$this->displayAllContactsByDefault = $value;
-	}
-
-	public function setLastAddressBookId(?int $addressBookId = null)
-	{
-		$this->lastAddressBookId = $addressBookId;
-	}
 
 	public function getSortBy() {
 		return User::findById($this->userId, ['sort_name'])->sort_name == 'first_name' ? 'name' : 'lastName';
