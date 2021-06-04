@@ -27,7 +27,7 @@ class UserSettings extends Property {
 	/**
 	 * @var bool
 	 */
-	protected $rememberLastItems;
+	public $rememberLastItems;
 
 	/** @var string */
 	protected $lastNoteBookIds;
@@ -78,21 +78,6 @@ class UserSettings extends Property {
 	}
 
 
-	/**
-	 * @return bool
-	 */
-	public function getRememberLastItems(): bool
-	{
-		return (bool)$this->rememberLastItems;
-	}
-
-	/**
-	 * @param bool $value
-	 */
-	public function setRememberLastItems(bool $value)
-	{
-		$this->rememberLastItems = $value;
-	}
 
 	/**
 	 * @return array

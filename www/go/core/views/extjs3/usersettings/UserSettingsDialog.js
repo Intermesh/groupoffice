@@ -196,12 +196,14 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		this.tabPanel.items.each(function(tab) {
 			if(tab.onValidate){
 				if(!tab.onValidate()) {
+					console.debug("Invalid form tab:", tab);
 					valid = false;					
 				}
 			}
 		},this);
 		
 		if (!valid || !this.formPanel.getForm().isValid()) {
+			console.debug("UserSettings form invalid");
 			return;
 		}
 		
