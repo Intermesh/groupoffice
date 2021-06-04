@@ -1,7 +1,6 @@
 Module.js
 MainPanel.js
 TasklistsGrid.js
-TaskCombo.js
 TaskGrid.js
 ContinueTaskDialog.js
 CategoriesGrid.js
@@ -16,3 +15,6 @@ ProjectTaskGrid.js
 TasklistGroupDialog.js
 TimeEntryDialog.js
 ProjectTaskCombo.js
+TaskLinkDetail.js
+TasklistCombo.js
+

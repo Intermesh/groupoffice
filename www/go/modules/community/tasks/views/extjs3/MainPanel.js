@@ -247,34 +247,10 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	
 	createTaskGrid : function() {
 
-		this.tasksStore = new go.data.Store({
-			fields: [
-				'id', 
-				'title',
-				{name: 'start', type: "date"},
-				{name: 'due', type: "date"},
-				'description', 
-				'repeatEndTime',
-				{name: 'responsible', type: 'relation'},
-				{name: 'createdAt', type: 'date'}, 
-				{name: 'modifiedAt', type: 'date'}, 
-				{name: 'creator', type: "relation"},
-				{name: 'modifier', type: "relation"},
-				'percentComplete',
-				'progress',{
-					name: "complete",
-					convert: function(v, data) {
-						return data.progress == 'completed';
-					}
-				}
-			],
-			entityStore: "Task"
-		});
-
 		this.taskGrid = new go.modules.community.tasks.TaskGrid({
-			store: this.tasksStore,
+
 			region: 'center',
-			tbar: new Ext.Toolbar({items:[
+			tbar: [
 					{
 						cls: 'go-narrow',
 						iconCls: "ic-menu",
@@ -286,47 +262,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					},
 					'->',
 					{
-						xtype: 'tbsearch',
-						store: this.tasksStore,
-						filters: [
-							'text',
-							'name',
-							'content',
-							{name: 'modified', multiple: false},
-							{name: 'created', multiple: false}
-						],
-						listeners: {
-							scope: this,
-							search: function(btn, query, filters) {
-								//this.taskGrid.store.baseParams
-								var filters =  [
-									'text',
-									'name',
-									'content',
-									{name: 'modified', multiple: false},
-									{name: 'created', multiple: false}
-								];
-
-
-								this.taskGrid.store.setFilter("tbsearch", filters);
-								this.taskGrid.store.load();
-							},
-							reset: function() {
-								this.taskGrid.store.setFilter("tbsearch", null);
-								this.taskGrid.store.load();
-							}
-						}
+						xtype: 'tbsearch'
 					},
-					// {
-					// 	xtype: 'tbsearch',
-					// 	filters: [
-					// 		// 'text',
-					// 		'title'
-					// 		// 'content',
-					// 		// {name: 'modified', multiple: false},
-					// 		// {name: 'created', multiple: false}
-					// 	]
-					// },
 					this.addButton = new Ext.Button({
 						disabled: true,
 						iconCls: 'ic-add',
@@ -402,7 +339,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						]
 					}
 
-				]}),
+				],
 			bbar: new Ext.Toolbar({
 				layout:'hbox',
 				layoutConfig: {
@@ -412,11 +349,18 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				items:[this.taskNameTextField = new Ext.form.TextField({
 					enableKeyEvents: true,
 					emptyText: t("Add a task..."),
-
-					flex:1
+					flex:1,
+					listeners: {
+						specialkey: (field, e) => {
+							// e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,
+							// e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN
+							if (e.getKey() == e.ENTER) {
+								this.createTask();
+							}
+						}
+					}
 				}),
 					this.taskDateField = new go.form.DateField({
-						value: new Date(),
 						fieldLabel:t("Due date"),
 						enableKeyEvents: true,
 						listeners: {
@@ -426,24 +370,21 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 							},
 							select: function(field,date) {
 								this.checkValues();
+							},
+							specialkey: (field, e) => {
+								// e.HOME, e.END, e.PAGE_UP, e.PAGE_DOWN,
+								// e.TAB, e.ESC, arrow keys: e.LEFT, e.RIGHT, e.UP, e.DOWN
+								if (e.getKey() == e.ENTER) {
+									this.addTaskButton.handler.call(this);
+								}
 							}
-
 						}
 					}),
 					this.addTaskButton = new Ext.Button({
 						disabled: true,
 						iconCls: 'ic-add',
 						cls:'primary',
-						handler:function(){
-							go.Db.store("Task").set({
-								create: {"client-id-1" : {
-										title: this.taskNameTextField.getValue(),
-										start: this.taskDateField.getValue(),
-										tasklistId: this.addTasklistId
-
-									}}
-							});
-						},
+						handler: this.createTask,
 						scope: this
 					})
 				]
@@ -461,6 +402,21 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		
 	
 	},
+
+	createTask : function() {
+
+		go.Db.store("Task").set({
+			create: {"client-id-1" : {
+					title: this.taskNameTextField.getValue(),
+					start: this.taskDateField.getValue(),
+					tasklistId: this.addTasklistId
+				}}
+		}).then (() => {
+				this.taskNameTextField.reset();
+		});
+
+	},
+
 	onTasklistSelectionChange : function (sm) {
 		var ids = [];
 

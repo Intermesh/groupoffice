@@ -1,5 +1,30 @@
 go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 	initComponent: function () {
+
+		this.store = new go.data.Store({
+			fields: [
+				'id',
+				'title',
+				{name: 'start', type: "date"},
+				{name: 'due', type: "date"},
+				'description',
+				'repeatEndTime',
+				{name: 'responsible', type: 'relation'},
+				{name: 'createdAt', type: 'date'},
+				{name: 'modifiedAt', type: 'date'},
+				{name: 'creator', type: "relation"},
+				{name: 'modifier', type: "relation"},
+				'percentComplete',
+				'progress',{
+					name: "complete",
+					convert: function(v, data) {
+						return data.progress == 'completed';
+					}
+				}
+			],
+			entityStore: "Task"
+		});
+
 		this.checkColumn = new GO.grid.CheckColumn({
 			id:'complete',
 			dataIndex: 'complete',
@@ -40,7 +65,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			return go.util.Format.date(v);
 		};
 
-		Ext.apply(this, {		
+		Ext.applyIf(this, {
 			columns: [
 				this.checkColumn,
 				{

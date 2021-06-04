@@ -159,7 +159,7 @@ class Task extends AclItemEntity {
 	public $alerts = [];
 
 	/** @var int */
-	public $vcalendarBlobId;
+	protected $vcalendarBlobId;
 	/**
 	 * The users in this group
 	 *

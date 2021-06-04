@@ -41,31 +41,6 @@ class VCalendar extends AbstractConverter {
 	const EMPTY_NAME = '(no name)';
 
 
-	/**
-	 *
-	 * @param Task $task
-	 * @return VCalendar
-	 */
-
-	private function getVCalendar(Task $task) {
-
-		if ($task->vcalendarBlobId) {
-			//Contact has a stored VCard
-			$blob = Blob::findById($task->vcalendarBlobId);
-			$file = $blob->getFile();
-			if($file->exists()) {
-				$vcalendar = Reader::read($file->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
-
-				return $vcalendar;
-			}
-		}
-
-		$calendar = new \Sabre\VObject\Component\VCalendar();
-		$vtodo = $calendar->createComponent('VTODO');
-		$calendar->add($vtodo);
-
-		return $calendar;
-	}
 
 	/**
 	 * Parse an Event object to a VObject
@@ -74,7 +49,25 @@ class VCalendar extends AbstractConverter {
 	 * @param task $task
 	 */
 	public function export(Task $task) {
-		$calendar = $this->getVCalendar($task);
+		if ($task->vcalendarBlobId) {
+			//Contact has a stored VCard
+			$blob = Blob::findById($task->vcalendarBlobId);
+			$file = $blob->getFile();
+			if($file->exists()) {
+				$calendar = Reader::read($file->open("r"), Reader::OPTION_FORGIVING + Reader::OPTION_IGNORE_INVALID_LINES);
+				if($blob->modifiedAt >= $task->modifiedAt) {
+					return $calendar->serialize();
+				}
+			}
+		}
+
+		if(!isset($calendar)) {
+			$calendar = new \Sabre\VObject\Component\VCalendar();
+			$vtodo = $calendar->createComponent('VTODO');
+			$calendar->add($vtodo);
+		}
+
+
 		$vtodo = $calendar->vtodo;
 
 		$vtodo->dtstamp = new DateTime('now', new \DateTimeZone('utc'));

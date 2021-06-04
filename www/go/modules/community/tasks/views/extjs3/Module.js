@@ -17,6 +17,17 @@ go.Modules.register("community", "tasks", {
 
 			linkDetail: function () {
 				return new go.modules.community.tasks.TaskDetail();
+			},
+
+			linkDetailCards : function() {
+				return [new go.modules.community.tasks.TaskLinkDetail({
+					link: {
+						title: t("Tasks"),
+						iconCls: 'icon ic-check',
+						entity: "Task",
+						filter: null
+					}
+				})]
 			}
 		}],
 		relations: {

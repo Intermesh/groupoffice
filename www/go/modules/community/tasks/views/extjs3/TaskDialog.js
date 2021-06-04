@@ -136,7 +136,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 									forceSelection: true,
 									fieldLabel: t("Priority"),
 									mode: 'local',
-									value: 5,
+									value: 0,
 									valueField: 'value',
 									displayField: 'text',
 									store: new Ext.data.SimpleStore({
@@ -171,7 +171,6 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						hidden: this.hideRecurrence,
 						disabled: true,
 					}),
-					{xtype:'hidden', name: 'tasklistId'},
 					{xtype:'hidden', name: 'groupId'},
 					{
 						xtype: "chips",
@@ -186,6 +185,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						//allowBlank : false,
 						fieldLabel : t("Description")
 					},
+					new go.modules.community.tasks.TasklistCombo(),
 					new go.modules.community.tasks.AlertFields()
 				]
 			}]

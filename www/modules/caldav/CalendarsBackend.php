@@ -15,6 +15,7 @@
 
 namespace GO\Caldav;
 use go\core\fs\Blob;
+use go\core\util\DateTime;
 use go\modules\community\tasks\convert\VCalendar;
 use go\modules\community\tasks\model\Task;
 use go\modules\community\tasks\model\Tasklist;
@@ -39,6 +40,11 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 	private function fromBlob(Task $task) {
 		$blob = $task->vcalendarBlobId ? Blob::findById($task->vcalendarBlobId) : null;
 		if(!$blob || $blob->modifiedAt < $task->modifiedAt) {
+
+			//Important to set exactly the same modifiedAt on both blob and contact.
+			//We compare these to check if vcards need to be updated.
+			//utc timezone is required because we're in old framework using user defined timezone as default.
+			$task->modifiedAt = new DateTime('now', new \DateTimeZone('utc'));
 			// task to vtodo
 			$parser = new VCalendar();
 			$data = $parser->export($task);
@@ -53,13 +59,6 @@ class CalendarsBackend extends Sabre\CalDAV\Backend\AbstractBackend
 				throw new \Exception("could not save VCalendar blob for task '" . $task->id() . "'. Validation error: " . $blob->getValidationErrorsAsString());
 			}
 
-			if(isset($task->vcalendarBlobId)) {
-				$old = Blob::findById($task->vcalendarBlobId);
-				$old->setStaleIfUnused();
-			}
-			if(!$blob->save()) {
-				throw new \Exception("could not save VCalendar blob");
-			}
 			$task->vcalendarBlobId = $blob->id;
 			$task->save();
 		} else {

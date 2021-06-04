@@ -745,7 +745,7 @@ abstract class EntityController extends Controller {
 				continue;
 			}
 
-			$doDestroy[] = $id;
+			$doDestroy[] = $entity->id();
 		}
 		$cls = $this->entityClass();
 

@@ -400,7 +400,7 @@ go.grid.GridTrait = {
 			column = cm.getColumnAt(i);
 			if (column.hideable !== false) {
 				item = new Ext.menu.CheckItem({
-					 text: cm.getOrgColumnHeader(i),
+					 text: cm.getOrgColumnHeader(i) + "",
 					 itemId: "col-" + cm.getColumnId(i),
 					 checked: !cm.isHidden(i),
 					 hideOnClick: false,
