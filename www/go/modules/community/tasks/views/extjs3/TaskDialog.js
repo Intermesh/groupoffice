@@ -97,30 +97,14 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								// 			['tentative', t("Tentative")]]
 								// 	})
 								// }),
-									new go.form.ComboBox({
-									hiddenName : 'progress',
-									triggerAction : 'all',
-									editable : false,
-									selectOnFocus : true,
-									forceSelection : true,
-									fieldLabel : t("Progress"),
-									mode : 'local',
-									value : 'needs-action',
-									width:dp(150),
-									valueField : 'value',
-									displayField : 'text',
-									store : new Ext.data.SimpleStore({
-										fields : ['value', 'text'],
-										data : [
-											['completed', t("Completed")],
-											['failed', t("Failed")],
-											['in-progress', t("In Progress")],
-											['needs-action', t("Needs action")],
-											['cancelled', t("Cancelled")]]
+									new go.modules.community.tasks.ProgressCombo ({
+										width:dp(150),
+
+										value : 'needs-action'
 									})
-								}),new go.users.UserCombo({
-									fieldLabel: t('Responsible'),
-									hiddenName: 'responsibleUserId',
+									,new go.users.UserCombo({
+										fieldLabel: t('Responsible'),
+										hiddenName: 'responsibleUserId',
 										anchor:'90%',
 										allowBlank: true
 								})

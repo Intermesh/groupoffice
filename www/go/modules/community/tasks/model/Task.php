@@ -278,6 +278,18 @@ class Task extends AclItemEntity {
 				if(!empty($value)) {
 					$criteria->where('responsibleUserId', '=',$value);
 				}
+			})
+			->add('progress', function(Criteria $criteria, $value){
+				if(!empty($value)) {
+					if(!is_array($value)) {
+						$value = [$value];
+					}
+					$value = array_map(function($el) {
+						$key = array_search($el, Progress::$db, true);
+						return $key;
+					}, $value);
+					$criteria->where('progress', '=',$value);
+				}
 			});
 
 	}

@@ -38,13 +38,13 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.filterPanel = new go.NavMenu({
 			region:'north',
 			store: new Ext.data.ArrayStore({
-				fields: ['name', 'icon', 'inputValue'],
+				fields: ['name', 'icon', 'iconCls', 'inputValue'],
 				data: [
-					[t("Today"), 'content_paste', 'today'],
-					[t("Completed"), 'assignment_turned_in', 'completed'],
-					[t("Unscheduled"), 'event_busy', 'unscheduled'],
-					[t("Scheduled"), 'event_busy', 'scheduled'],
-					[t("All"), 'assignment', 'all'],
+					[t("Today"), 'content_paste', 'green', 'today'],
+					[t("Completed"), 'assignment_turned_in', 'grey', 'completed'],
+					[t("Unscheduled"), 'event_busy', 'blue','unscheduled'],
+					[t("Scheduled"), 'events', 'orange', 'scheduled'],
+					[t("All"), 'assignment', 'red', 'all'],
 				]
 			})
 		});
@@ -54,13 +54,22 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			width: dp(300),
 			cls: 'go-sidenav',
 			region: "west",
-			layout:'anchor',
+			layout:"border",
 			split: true,
-			autoScroll: true,
+
 			items: [
-				this.filterPanel,
+				{
+					autoScroll: true,
+					region: "center",
+					layout:'anchor',
+					items:[
+						this.filterPanel,
+						this.categoriesGrid,
+						this.createFilterPanel()
+					]
+				},
 				this.tasklistsGrid,
-				this.categoriesGrid
+
 			]
 		});
 
@@ -178,7 +187,43 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				break;
 		}
 	},
-	
+
+	createFilterPanel: function () {
+
+
+		return new Ext.Panel({
+			region: "center",
+			minHeight: dp(200),
+			autoScroll: true,
+			tbar: [
+				{
+					xtype: 'tbtitle',
+					text: t("Filters")
+				},
+				'->',
+				{
+					xtype: 'filteraddbutton',
+					entity: 'Task'
+				}
+			],
+			items: [
+				{
+					xtype: 'filtergrid',
+					filterStore: this.taskGrid.store,
+					entity: "Task"
+				},
+				{
+					xtype: 'variablefilterpanel',
+					filterStore: this.taskGrid.store,
+					entity: "Task"
+				}
+			]
+		});
+
+
+	},
+
+
 	createCategoriesGrid: function() {
 		this.categoriesGrid = new go.modules.community.tasks.CategoriesGrid({
 			autoHeight: true,
@@ -210,7 +255,9 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	},
 	createTasklistGrid : function() {
 		this.tasklistsGrid = new go.modules.community.tasks.TasklistsGrid({
-			autoHeight: true,
+			region: "south",
+			height: dp(300),
+			multiSelectToolbarEnabled : false,
 			split: true,
 			tbar: [{
 					xtype: 'tbtitle',
