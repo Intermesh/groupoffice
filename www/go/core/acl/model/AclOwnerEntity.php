@@ -145,13 +145,14 @@ abstract class AclOwnerEntity extends AclEntity {
 	 * ]);
 	 * ```
 	 */
-	public function setAcl($acl) {		
+	public function setAcl(array $acl)
+	{
 		$this->setAcl = $acl;		
 	}
 
 	/**
-	 * Permissions are set via AclOwnerEntity models through setAcl(). When this propery is used it will configure the Acl models.
-	 * This permission is not checked in the controller as usal but checked on save here.
+	 * Permissions are set via AclOwnerEntity models through setAcl(). When this property is used it will configure the Acl models.
+	 * This permission is not checked in the controller as usual but checked on save here.
 	 * @throws Exception
 	 * @return void
 	 */
