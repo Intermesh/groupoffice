@@ -31,8 +31,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 		this.addLinks();
 		this.addComments();
 		this.addFiles();
-
-		this.add(new go.detail.CreateModifyPanel());
+		this.addHistory();
 	},
 
 	decrypt: function () {

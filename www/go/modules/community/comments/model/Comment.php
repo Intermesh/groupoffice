@@ -211,15 +211,25 @@ class Comment extends AclItemEntity {
 			return;
 		}
 
+		$excerpt = StringUtil::cutString(strip_tags($this->text), 50);
+
 		$userIds = go()->getDbConnection()->selectSingleValue('userId')
 			->from('core_user_group', 'ug')
 			->join('core_acl_group', 'ag', 'ag.groupId = ug.groupId')
 			->where('ag.aclId', '=', $aclId);
 
 		foreach($userIds as $userId) {
-			$alert = $entity->createAlert(new DateTime(), 'comment-' . $entity::entityType()->getName().'-'.$entity->id())
-				->setValue('userId', $userId)
-				->setData(['type' => 'comment', 'createdBy' => go()->getAuthState()->getUserId()]);
+
+			if($userId == go()->getAuthState()->getUserId()) {
+				continue;
+			}
+
+			$alert = $entity->createAlert(new DateTime(), 'comment', $userId)
+				->setData([
+					'type' => 'comment',
+					'createdBy' => go()->getAuthState()->getUserId(),
+					'excerpt' => $excerpt
+				]);
 
 			if(!$alert->save()) {
 				throw new SaveException($alert);

@@ -20,7 +20,7 @@ go.Modules.register('community', 'comments', {
 				//replace panel promise
 				alertConfig.panelPromise = alertConfig.panelPromise.then((panelCfg) => {
 					return go.Db.store("User").single(alert.data.createdBy).then((creator) =>{
-						panelCfg.html += ": " + t("A comment was made by {creator}").replace("{creator}", creator.displayName);
+						panelCfg.html += ": " + t("A comment was made by {creator}").replace("{creator}", creator.displayName) + "<br /><br /><i>"+alert.data.excerpt+"</i>";
 						panelCfg.notificationBody = panelCfg.html;
 						return panelCfg;
 					});

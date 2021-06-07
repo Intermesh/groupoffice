@@ -1010,9 +1010,8 @@ CREATE TABLE `core_alert` (
     ON DELETE RESTRICT
     ON UPDATE NO ACTION);
 
-create unique index core_alert_entityTypeId_entityId_tag_uindex
-    on core_alert (entityTypeId, entityId, tag);
-
+create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
+    on core_alert (entityTypeId, entityId, tag, userId);
 
 CREATE TABLE `core_pdf_block` (
   `id` bigint(20) UNSIGNED NOT NULL,

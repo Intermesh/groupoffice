@@ -67,7 +67,8 @@ class Alert extends SingleOwnerEntity
 			parent::delete([
 				'entityTypeId' => $this->entityTypeId,
 				'entityId' => $this->entityId,
-				'tag' => $this->tag
+				'tag' => $this->tag,
+				'userId' => $this->userId
 			]);
 		}
 		return parent::internalSave();

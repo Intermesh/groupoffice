@@ -770,7 +770,12 @@ button {
 		width: 100%;
 	}
 
-	.icons &, .go-detail-view-avatar &{
+	.go-detail-view & {
+		margin-top:dp(8);
+		margin-right: dp(8);
+	}
+
+	.icons &, .go-detail-view-avatar &{ // used in address book
 		//float:left; ?? why?
 		margin-top:dp(4);
 		margin-right: dp(16);
@@ -912,6 +917,7 @@ hr {
 
 .status {
 	@extend %font-subheading-dense;
+	text-transform:uppercase;
 	padding-left: dp(8);
 	padding-right: dp(8);
 	background-color: color($bg, 'background');
@@ -1213,6 +1219,7 @@ tr.go-grid-row {
 	.s1,.s2,.s3,.s4,.s5,.s6,.s7,.s8,.s9,.s10,.s11,.s12{
 		display:block;
 		float:left;
+		padding: 0 dp(16) dp(8) dp(16);
 	}
 	.s1 {width: 8.333333%;}
 	.s2 {width:16.666666%;}
@@ -1227,8 +1234,8 @@ tr.go-grid-row {
 	.s11 {width:91.666666%;}
 	.s12 {width:100%;}
 	.pad {
-		padding-left: dp(16);
-		padding-bottom:dp(8)
+		//padding-left: dp(16);
+		//padding-bottom:dp(8)
 	}
 
 	label {
@@ -1291,6 +1298,13 @@ tr.go-grid-row {
 
 	h3.title {
 		padding: dp(16);
+		margin: 0;
+	}
+
+	.status {
+
+		float:right;
+		margin: dp(12) dp(16);
 	}
 }
 
@@ -2402,7 +2416,8 @@ body.go-compact {
 }
 
 .go-progressbar{
-	height:dp(16);
+	height:dp(12);
+	margin: dp(8) 0;
 	border:1px solid color($fg,'line');
 	background-color:color($bg,'card');
 	> div { // indicator

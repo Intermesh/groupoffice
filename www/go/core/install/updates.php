@@ -999,7 +999,7 @@ $updates['202105271703'][] = "ALTER TABLE `core_email_template` ADD `key` VARCHA
 
 
 $updates['202105281703'][] = "alter table core_alert change alertId tag varchar(50) null;";
-$updates['202105281703'][] = "create unique index core_alert_entityTypeId_entityId_tag_uindex
-	on core_alert (entityTypeId, entityId, tag);
+$updates['202105281703'][] = "create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
+	on core_alert (entityTypeId, entityId, tag, userId);
 ";
 

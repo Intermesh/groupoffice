@@ -283,7 +283,7 @@
 		},
 
 		shortDateTimeHTML: function(v) {
-			'<span style="cursor:pointer" title="' + go.util.Format.dateTime(v) + '">' + go.util.Format.userDateTime(v) + '</span>'
+			return '<span style="cursor:pointer" title="' + go.util.Format.dateTime(v) + '">' + go.util.Format.userDateTime(v) + '</span>';
 		},
 
 		shortDateTime: function (v, showTime, longNotation) {
