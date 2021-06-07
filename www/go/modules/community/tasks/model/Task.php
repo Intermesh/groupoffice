@@ -497,6 +497,7 @@ class Task extends AclItemEntity {
 		$this->uri = $uri;
 	}
 
+	// TODO: Refactor these functions into proper property classes within Humble Planner
 	public function getUserDisplayName()
 	{
 		return $this->displayName;
@@ -511,5 +512,5 @@ class Task extends AclItemEntity {
 	{
 		return $this->projectId;
 	}
-
+	// END TODO
 }
