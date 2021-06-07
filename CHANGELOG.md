@@ -1,3 +1,7 @@
+07-06-2021 6.5.54
+- Core: Disk cache didn't work for entries that should live forever and cached
+    expiring cache forever. This also caused old passwords to work until cache was flushed.
+
 07-06-2021 6.5.53
 - Business: Wrong time format in agreement dialog
 - Google authenticator: Translations didn't work in this module
