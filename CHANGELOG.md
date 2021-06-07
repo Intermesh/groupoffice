@@ -1,3 +1,4 @@
+07-06-2021 6.5.53
 - Business: Wrong time format in agreement dialog
 - Google authenticator: Translations didn't work in this module
 - Core: Fixed disabled checkbox for enabling modules in group dialog
