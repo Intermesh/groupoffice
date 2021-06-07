@@ -687,19 +687,40 @@ abstract class Entity  extends OrmEntity {
 	 * Create an alert for this entity
 	 *
 	 * @param \DateTimeInterface $triggerAt
+	 * @param string $tag A unique tag for this entity and user. It will replace existing ones.
+	 * @param int $userId The user this alert is for. Defaults to current user.
 	 * @return \go\core\model\Alert
 	 * @throws Exception
 	 */
-	public function createAlert(\DateTimeInterface $triggerAt, $tag) {
+	public function createAlert(\DateTimeInterface $triggerAt,
+	                            $tag,
+	                            $userId = null) {
 		$alert = new \go\core\model\Alert();
 
 		$alert->triggerAt = $triggerAt;
-		$alert->userId = go()->getAuthState()->getUserId();
+		$alert->userId = $userId ?? go()->getAuthState()->getUserId();
 		$alert->entityId =  $this->id;
 		$alert->entityTypeId = static::entityType()->getId();
 		$alert->tag = $tag;
 
 		return $alert;
+	}
+
+	/**
+	 * Delete an alert
+	 *
+	 * @param string $tag A unique tag for this entity and user. It will replace existing ones.
+	 * @param int $userId The user this alert is for. Defaults to current user.
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function deleteAlert($tag, $userId = null) {
+		return Alert::delete([
+			'entityTypeId' => self::entityType()->getId(),
+			'entityId' => $this->id,
+			'tag' => $tag,
+			'userId' => $userId ?? go()->getAuthState()->getUserId()
+		]);
 	}
 
 	/**

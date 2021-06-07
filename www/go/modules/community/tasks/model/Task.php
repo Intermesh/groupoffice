@@ -344,15 +344,20 @@ class Task extends AclItemEntity {
 		if($success && $this->isModified('responsibleUserId')) {
 
 			if (isset($this->responsibleUserId)) {
-				$alert = $this->createAlert(new \DateTime(), 'task-assigned-' . $this->id)
-					->setValue('userId', $this->responsibleUserId)
-					->setData(['type' => 'assigned', 'assignedBy' => go()->getAuthState()->getUserId()]);
 
-				if (!$alert->save()) {
-					throw new SaveException($alert);
+				if($this->responsibleUserId != go()->getUserId()) {
+					$alert = $this->createAlert(new \DateTime(), 'assigned', $this->responsibleUserId)
+						->setData([
+							'type' => 'assigned',
+							'assignedBy' => go()->getAuthState()->getUserId()
+						]);
+
+					if (!$alert->save()) {
+						throw new SaveException($alert);
+					}
 				}
 			} else{
-				CoreAlert::delete(['entityTypeId' => Task::entityType()->getId(), 'tag' => 'task-assigned-' . $this->id]);
+				$this->deleteAlert('assigned', $this->getOldValue('responsibleUserId'));
 			}
 		}
 
@@ -371,7 +376,7 @@ class Task extends AclItemEntity {
 		if(isset($modified[1])) {
 			foreach ($modified[1] as $model) {
 				if (!in_array($model, $modified[0])) {
-					CoreAlert::delete(['entityTypeId' => Task::entityType()->getId(), 'tag' => $model->id]);
+					$this->deleteAlert($model->id);
 				}
 			}
 		}

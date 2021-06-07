@@ -51,12 +51,14 @@
 
 			go.Db.store(alert.entity).single(alert.entityId).then((entity) => {
 
+				const iconCls = go.Entities.getLinkIcon(alert.entity);
+
 				const c = {
 					statusIcon: 'reminder',
 					itemId: 'core-alert-' + alert.id,
 					title: entity.title || entity.name || entity.description,
 					html: go.util.Format.dateTime(alert.triggerAt),
-					iconCls: 'entity ' + alert.entity,
+					iconCls: iconCls,
 					buttonAlign: "right",
 					listeners: {
 						destroy: (panel) => {
@@ -65,11 +67,14 @@
 							}
 						}
 					},
+					handler: () => {
+						go.Entities.get(alert.entity).goto(alert.entityId);
+						go.Notifier.hideNotifications();
+					},
 					buttons: [{
 						text: t("Open"),
-						handler: () => {
-							go.Entities.get(alert.entity).goto(alert.entityId);
-							go.Notifier.hideNotifications();
+						handler: (btn) => {
+							btn.findParentByType("panel").handler();
 						}
 					}, {
 						text: t("Dismiss"),
