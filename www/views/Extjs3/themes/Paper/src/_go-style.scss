@@ -2416,7 +2416,8 @@ body.go-compact {
 }
 
 .go-progressbar{
-	height:dp(16);
+	height:dp(12);
+	margin: dp(8) 0;
 	border:1px solid color($fg,'line');
 	background-color:color($bg,'card');
 	> div { // indicator
