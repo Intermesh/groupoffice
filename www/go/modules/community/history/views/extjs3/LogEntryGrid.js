@@ -132,7 +132,7 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 			dataIndex: 'creator',
 			width:300,
 			renderer: function (v) {
-				return v ? v.displayName : "-";
+				return v ? go.util.avatar(v.displayName,v.avatarId)+' '+v.displayName : "-";
 			}
 		},{
 			header: t('Changes'),

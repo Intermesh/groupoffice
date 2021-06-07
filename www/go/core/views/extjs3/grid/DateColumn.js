@@ -4,7 +4,7 @@ go.grid.DateColumn = Ext.extend(Ext.grid.Column, {
 	align: "right",
 	dateOnly: false,
 	constructor: function(cfg){
-		Ext.grid.DateColumn.superclass.constructor.call(this, cfg);
+
 
 		var me = this;
 		if(!cfg.renderer) {
@@ -16,6 +16,8 @@ go.grid.DateColumn = Ext.extend(Ext.grid.Column, {
 				return go.util.Format.shortDateTimeHTML(v);
 			};
 		}
+
+		Ext.grid.DateColumn.superclass.constructor.call(this, cfg);
 		
 		this.resizable = !go.User.shortDateInList;
 		if(this.dateOnly) {

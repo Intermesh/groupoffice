@@ -251,6 +251,9 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	addHistory : function() {
 		if (go.Modules.isAvailable("community", "history")) {
 			this.add(new go.modules.community.history.HistoryDetailPanel());
+		} else
+		{
+			this.add(new go.detail.CreateModifyPanel());
 		}
 	},
 });
