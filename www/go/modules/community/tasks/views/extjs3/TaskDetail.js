@@ -3,7 +3,6 @@
 go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 	
 	entityStore: "Task",
-	width:dp(400),
 	stateId: 'ta-tasks-detail',
 	relations: ["tasklist", "responsible"],
 

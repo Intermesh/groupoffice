@@ -471,6 +471,14 @@ class Task extends AclItemEntity {
 			unset($sort['groupOrder']);
 		}
 
+		if(isset($sort['tasklist'])) {
+
+			$query->join("tasks_tasklist", "list", "list.id = task.tasklistId");
+			$sort['list.name'] = $sort['tasklist'];
+
+			unset($sort['tasklist']);
+		}
+
 		return parent::sort($query, $sort);
 	}
 

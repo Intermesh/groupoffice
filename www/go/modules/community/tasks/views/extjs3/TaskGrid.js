@@ -1,7 +1,9 @@
 go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 	initComponent: function () {
 
-		this.store = new go.data.Store({
+		this.store = new go.data.GroupingStore({
+			groupField: 'tasklist',
+			remoteGroup:true,
 			fields: [
 				'id',
 				'title',
@@ -14,6 +16,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				{name: 'modifiedAt', type: 'date'},
 				{name: 'creator', type: "relation"},
 				{name: 'modifier', type: "relation"},
+				{name: 'tasklist', type: "relation"},
 				'percentComplete',
 				'progress',{
 					name: "complete",
@@ -65,7 +68,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			return go.util.Format.date(v);
 		};
 
-		Ext.applyIf(this, {
+		Ext.apply(this, {
 			columns: [
 				this.checkColumn,
 				{
@@ -79,7 +82,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				{
 					id: 'title',
 					header: t('Title'),
-					width: dp(75),
+					width: dp(300),
 					sortable: true,
 					dataIndex: 'title',
 					renderer: function(v,m,rec) {
@@ -178,6 +181,17 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					},
 					hidden: true
 				},
+				{
+					hidden: true,
+					header: t('Tasklist'),
+					width: dp(160),
+					sortable: true,
+					dataIndex: 'tasklist',
+					renderer: function(v) {
+						return v ? v.name : "-";
+					},
+					hidden: true
+				},
 				{	
 					hidden: true,
 					header: t('Modified by'),
@@ -190,13 +204,22 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					hidden: true
 				}
 			],
-			viewConfig: {
-				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>'
-			},
+			// viewConfig: {
+			// 	emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>'
+			// },
 			autoExpandColumn: 'title',
 			// config options for stateful behavior
 			stateful: true,
 			stateId: 'tasks-grid'
+		});
+
+		this.view = new go.grid.GroupingView({
+			emptyText: '<i>description</i><p>' +t("No items to display") + '</p>',
+			hideGroupedColumn: true,
+			showGroupName: false,
+			groupRenderer: function(v, dummy, r, rowIndex, colIndex, ds) {
+				return v.name;
+			}
 		});
 
 		go.modules.community.tasks.TaskGrid.superclass.initComponent.call(this);
