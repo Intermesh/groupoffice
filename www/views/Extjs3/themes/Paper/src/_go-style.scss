@@ -1929,6 +1929,10 @@ table[id^="comments-ext"] b {
 
 .go-messages {
 
+	.avatar {
+		margin: 0;
+	}
+
 	.text-crop {
 		.more {
 			border-bottom-left-radius: dp(8);
