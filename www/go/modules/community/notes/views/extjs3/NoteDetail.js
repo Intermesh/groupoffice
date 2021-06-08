@@ -19,7 +19,7 @@ go.modules.community.notes.NoteDetail = Ext.extend(go.detail.Panel, {
 					this.setTitle(Ext.util.Format.htmlEncode(detailView.data.name));
 					// this.items.itemAt(0).setText();
 				},
-				tpl: "<div class='pad go-html-formatted'>{content:raw}</div>"
+				tpl: "<div class='s12 go-html-formatted'>{content:raw}</div>"
 
 			}]
 		});

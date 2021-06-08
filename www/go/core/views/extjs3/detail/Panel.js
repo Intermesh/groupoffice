@@ -39,6 +39,8 @@ go.detail.Panel = Ext.extend(Ext.Panel, {
 	
 	entityStore: null,
 
+	width: dp(500),
+
 	initComponent: function () {
 		go.detail.Panel.superclass.initComponent.call(this, arguments);			
 
