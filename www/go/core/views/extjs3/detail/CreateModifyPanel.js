@@ -1,7 +1,7 @@
 go.detail.CreateModifyPanel = Ext.extend(Ext.Panel, {
 	title: t("Info"),
 	collapsible: true,
-	entityStore: "User",
+	entityStore: "UserDisplay",
 	cUserId: null,
 	mUserId: null,
 	tpl: new Ext.XTemplate('<div class="s6 pad"><div class="icons">\

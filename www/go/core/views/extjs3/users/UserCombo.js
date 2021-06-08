@@ -15,7 +15,7 @@
 		store: {
 			xtype: 'gostore',
 			fields: ['id', 'displayName', 'username', 'avatarId'],
-			entityStore: "User"
+			entityStore: "UserDisplay"
 		},
 		tpl: new Ext.XTemplate('<tpl for=".">\
 			<div class="x-combo-list-item">\

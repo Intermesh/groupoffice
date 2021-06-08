@@ -30,6 +30,7 @@ go.Entities = (function () {
 					entity.isAclOwner = serverInfo.isAclOwner;
 					entity.defaultAcl = serverInfo.defaultAcl;	
 				} else {
+					console.warn("Removing client entity " + entity.name + " because it's not know by the server.");
 					delete entities[entity.name.toLowerCase()];
 				}
 				

@@ -14,7 +14,7 @@ go.Db = (function() {
 			
 			var entity = go.Entities.get(lcname);
 			if(!entity) {
-				console.debug("'" + lcname + "' is not a registered store. Registered entities: ", go.Entities.getAll());
+				console.debug("'" + entityName + "' is not a registered store. Registered entities: ", go.Entities.getAll().column('name'));
 				return false;
 			}
 		

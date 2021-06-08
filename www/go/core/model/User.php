@@ -708,6 +708,10 @@ class User extends Entity {
 
 		$this->changeHomeDir();
 
+		if($this->isModified(['username', 'displayName', 'avatarId', 'email'])) {
+			UserDisplay::entityType()->changes([[$this->id, $this->findAclId(), 0]]);
+		}
+
 		return true;		
 	}
 

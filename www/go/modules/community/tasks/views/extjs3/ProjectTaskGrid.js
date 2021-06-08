@@ -188,7 +188,6 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 	}
 	config.hideCollapseTool = true;
 
-	fields.columns.push()
 
 	config.store = new go.data.GroupingStore({
 		fields: [
