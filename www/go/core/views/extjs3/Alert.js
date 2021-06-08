@@ -15,30 +15,24 @@
 		},
 
 		init : function() {
-			go.Db.store("Alert").all().then((alerts) => {
-				alerts.forEach((alert) => {
-					this.show(alert);
+
+			this.store = new go.data.Store({
+				entityStore: "Alert",
+				fields: ['id', 'entity', 'entityId', 'data', 'tag', 'triggerAt', 'userId'],
+				filters: {
+					user: {userId: go.User.id}
+				}
+			});
+
+			this.store.on("load", () => {
+				this.store.getRange().forEach((rec) => {
+					this.show(rec.data);
 				});
 			});
 
-			go.Db.store("Alert").on("changes", (store, added, changed, destroyed) => {
-				destroyed.forEach((id) => {
-					const panel = go.Notifier.getById("core-alert-" + id);
-					//to prevent a destroy action to the server because it's already destroyed
-					if(panel) {
-						panel.destroyedByChanges = true;
-						panel.destroy();
-					}
-				});
 
-				for(let id in added) {
-					this.show(added[id]);
-				}
+			this.store.load();
 
-				for(let id in changed) {
-					this.show(changed[id]);
-				}
-			});
 		},
 
 		show : function(alert) {

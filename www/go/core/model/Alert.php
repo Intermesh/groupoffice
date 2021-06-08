@@ -4,6 +4,7 @@ namespace go\core\model;
 
 use go\core\acl\model\SingleOwnerEntity;
 
+use go\core\db\Criteria;
 use go\core\orm\EntityType;
 use go\core\orm\Query;
 
@@ -37,6 +38,14 @@ class Alert extends SingleOwnerEntity
 
 	public function setEntity($name) {
 		$this->entityTypeId = EntityType::findByName($name)->getId();
+	}
+
+	protected static function defineFilters()
+	{
+		return parent::defineFilters()
+			->add('userId', function(Criteria $criteria, $value) {
+				$criteria->where('userId', '=', $value);
+			});
 	}
 
 	/**
@@ -95,4 +104,5 @@ class Alert extends SingleOwnerEntity
 
 		return parent::internalDelete($query);
 	}
+
 }
