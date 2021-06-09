@@ -9,7 +9,6 @@ go.Db = (function() {
 		 * @returns {Boolean|go.data.EntityStore}
 		 */
 		store: function (entityName) {
-			
 			lcname = entityName.toLowerCase();
 			
 			var entity = go.Entities.get(lcname);

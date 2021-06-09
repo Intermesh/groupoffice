@@ -46,5 +46,6 @@ return [
 	"Progress" => 'Voortgang',
 	"Continue task" => 'Taak voortzetten',
 	'Nothing to save' => 'Niets om op te slaan',
-	'No changes have been made' => 'Er zijn geen veranderingen aangebracht.'
+	'No changes have been made' => 'Er zijn geen veranderingen aangebracht.',
+	'Duration' => 'Duur'
 ];

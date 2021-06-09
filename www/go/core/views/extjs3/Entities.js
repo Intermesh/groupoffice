@@ -17,8 +17,8 @@ go.Entities = (function () {
 		 * Called in mainlayout after authentication and loading of custom fields and modules.
 		 */
 		init : function() {
-			go.Entities.getAll().forEach(function(entity) {			
-				var module = go.Modules.get(entity.package, entity.module),			
+			go.Entities.getAll().forEach(function(entity) {
+				var module = go.Modules.get(entity.package, entity.module),
 					serverInfo = module.entities[entity.name];
 
 				if(serverInfo) {
@@ -56,57 +56,57 @@ go.Entities = (function () {
      * go.Db.store("name")]
      * go.Entities.get(name)
      * 
-		 * @param {object} cfg
-		 * 
+	 * @param {object} cfg
+	 *
      * @returns {undefined}
      */
-    register: function (cfg) {	
-			if(!cfg.name) {
-				throw "Invalid entity registered. 'name' property is required.";
-			}
-			
-			var lcName = cfg.name.toLowerCase();
-			
-      if(entities[lcName]) {
-        throw "Entity name is already registered by module " +entities[lcName]['package'] + "/" + entities[lcName]['module'];
-      }
-		      
-      entities[lcName] = new go.Entity(cfg);	
-    },
+	register: function (cfg) {
+		if(!cfg.name) {
+			throw "Invalid entity registered. 'name' property is required.";
+		}
 
-		/**
-		 * Get entity object
-		 * 
-		 * An entiy has these properties:
-		 * 
-		 * name: "Contact"
-		 * module: "addressbook",
-		 * package: "community",
-		 * customfields: true | {customFieldSetDialog: "class"}
-		 * files: true
-		 * isAclOwner: true
-		 * defaultsPanel: "class"
-		 * 
-		 * Functions:
-		 * 
-		 * getRouterPath : "contact/1"
-		 * goto: Navigates to the contact
-		 * 
-		 * @param {string} name
-		 * @returns {go.Entity}
-		 */
-    get: function (name) {      
-      return entities[name.toLowerCase()];      
+		var lcName = cfg.name.toLowerCase();
+
+		if(entities[lcName]) {
+			throw "Entity name is already registered by module " +entities[lcName]['package'] + "/" + entities[lcName]['module'];
+	    }
+
+		entities[lcName] = new go.Entity(cfg);
+	},
+
+	/**
+	 * Get entity object
+	 *
+	 * An entity has these properties:
+	 *
+	 * name: "Contact"
+	 * module: "addressbook",
+	 * package: "community",
+	 * customfields: true | {customFieldSetDialog: "class"}
+	 * files: true
+	 * isAclOwner: true
+	 * defaultsPanel: "class"
+	 *
+	 * Functions:
+	 *
+	 * getRouterPath : "contact/1"
+	 * goto: Navigates to the contact
+	 *
+	 * @param {string} name
+	 * @returns {go.Entity}
+	 */
+	get: function (name) {
+      return entities[name.toLowerCase()];
     },
     
-		/**
-		 * Get all entity objects
-		 * 
-		 * This function will check module availability for the current user.
-		 * 
-		 * @see get(); 
-		 * @returns {Object[]}
-		 */
+	/**
+	 * Get all entity objects
+	 *
+	 * This function will check module availability for the current user.
+	 *
+	 * @see get();
+	 * @returns {Object[]}
+	 */
     getAll: function() {
 			var e = [], entity;
       for(entity in entities) {

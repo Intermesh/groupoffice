@@ -397,7 +397,8 @@ class Module extends AclOwnerEntity {
 	 * Returns all module entities with info
 	 * @return EntityType[]
 	 */
-	public function getEntities() {		
+	public function getEntities() :array
+	{
 		$es = [];
 
 		foreach(core\orm\EntityType::findAll((new core\orm\Query)->where(['moduleId' => $this->id])) as $e) {
