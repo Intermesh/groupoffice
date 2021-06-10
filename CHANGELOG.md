@@ -2,6 +2,7 @@
 - E-mail: Fixed security problem where users could view last opened attachment of another user.
 - Calendar: Fixed [Invitation] Error when responding #706
 - Core: Fixed: [Custom filed] Error in selection field #708
+- Email: attached messages were not opened without savemailas module anymore. Fixed eml downloaded #709.
 
 07-06-2021 6.5.54
 - Core: Disk cache didn't work for entries that should live forever and cached
