@@ -70,6 +70,17 @@ go.grid.GridTrait = {
 				}, this);
 			}, this, {single: true});
 		}
+
+		if(this.autoHeight && this.maxHeight) {
+			this.store.on("load" , ()  => {
+				this.getView().scroller.setStyle({
+
+					overflow: 'auto',
+					position: 'initial',
+					"max-height": this.maxHeight + "px"
+				});
+			});
+		}
 	},
 
 	initMultiSelectToolbar : function() {
