@@ -1,21 +1,12 @@
-go.modules.community.tasks.ProgressCombo = Ext.extend(go.form.ComboBox,{
+go.modules.community.tasks.ProgressCombo = Ext.extend(go.form.SelectField,{
 	hiddenName : 'progress',
-	triggerAction : 'all',
-	editable : false,
-	selectOnFocus : true,
-	forceSelection : true,
 	fieldLabel : t("Progress"),
-	mode : 'local',
-	valueField : 'value',
-	displayField : 'text',
-	store : {
-		xtype: "simplestore",
-		fields : ['value', 'text'],
-		data : [
+	options : [
 			['completed', t("Completed")],
 			['failed', t("Failed")],
 			['in-progress', t("In Progress")],
 			['needs-action', t("Needs action")],
-			['cancelled', t("Cancelled")]]
-	}
+			['cancelled', t("Cancelled")]
+		]
+
 });

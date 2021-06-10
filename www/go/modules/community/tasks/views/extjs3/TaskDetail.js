@@ -26,7 +26,7 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				</p>\
 				<div class="s12 pad">\
 					<label>'+t("Progress")+'</label>\
-					<div class="go-progressbar" style="clear:both"><div style="width:{[Math.ceil(values.percentComplete)]}%"></div></div><br><br>\
+					<div class="go-progressbar" style="clear:both"><div style="width:{[Math.ceil(values.percentComplete)]}%"></div></div>\
 				</div>\
 				<tpl if="!GO.util.empty(description)"><p class="s12 pad">\
 					<label>'+t('Description')+'</label>\

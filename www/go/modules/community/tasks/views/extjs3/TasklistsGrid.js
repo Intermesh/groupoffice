@@ -31,7 +31,11 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.grid.GridPanel, {
 			store: new go.data.Store({
 				fields: ['id', 'name'],
 				entityStore: "Tasklist",
-				baseParams: {filter: {role: 'list'}}
+				baseParams: {filter: {role: 'list'}},
+				sortInfo: {
+					field: 'name',
+					direction: 'ASC'
+				}
 			}),
 			selModel: selModel,
 			plugins: [actions],

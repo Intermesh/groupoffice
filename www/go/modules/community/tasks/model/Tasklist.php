@@ -99,13 +99,16 @@ class Tasklist extends AclOwnerEntity
 
 	protected function internalSave()
 	{
-		if ($this->isNew() && $this->role == self::Board) {
-			if (empty($this->groups)) {
+		if ($this->isNew()) {
 
-				$this->setValue('groups', [
-					'#1' => ['name' => go()->t('In progress','community', 'tasks'), 'progressChange' => Progress::$db[Progress::InProcess]],
-					'#2' => ['name' => go()->t('Completed','community', 'tasks'), 'progressChange' => Progress::$db[Progress::Completed]]
-				]);
+			if($this->role == self::Board) {
+				if (empty($this->groups)) {
+
+					$this->setValue('groups', [
+						'#1' => ['name' => go()->t('In progress', 'community', 'tasks'), 'progressChange' => Progress::$db[Progress::InProcess]],
+						'#2' => ['name' => go()->t('Completed', 'community', 'tasks'), 'progressChange' => Progress::$db[Progress::Completed]]
+					]);
+				}
 			}
 
 			//If this tasklist is for a project then take over the ACL
