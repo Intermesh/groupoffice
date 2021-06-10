@@ -1,3 +1,6 @@
+10-06-2021 6.5.55
+- E-mail: Fixed security problem where users could view last opened attachment of another user.
+
 07-06-2021 6.5.54
 - Core: Disk cache didn't work for entries that should live forever and cached
     expiring cache forever. This also caused old passwords to work until cache was flushed.
