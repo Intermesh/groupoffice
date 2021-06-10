@@ -789,6 +789,15 @@
 			@include var(background-color, c-primary);
 		}
 	}
+
+	&.primary-icon {
+		@include var('color', c-secondary);
+	}
+
+	&.accent-icon {
+		@include var('color', c-accent);
+	}
+
 	&.danger {
 		&.x-btn-focus, &.x-btn-over {
 			@include var(background-color, c-primary-tp);
