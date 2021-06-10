@@ -145,28 +145,28 @@ class Comment extends AclItemEntity {
 		return self::find($properties)->where(['entityTypeId' => $entityTypeId, 'entityId' => $entityId]);
 	}
 
-//	/**
-//	 * Get the permission level of the current user
-//	 *
-//	 * @return int
-//	 */
-//	public function getPermissionLevel() {
-//
-//		if(go()->getAuthState()->isAdmin()) {
-//			return Acl::LEVEL_MANAGE;
-//		}
-//
-//		if($this->isNew()) {
-//			return $this->findEntity()->getPermissionLevel() ? Acl::LEVEL_WRITE : false;
-//		}
-//
-//		if($this->createdBy == go()->getAuthState()->getUserId()) {
-//			return Acl::LEVEL_MANAGE;
-//		}
-//
-//		return $this->findEntity()->hasPermissionLevel(Acl::LEVEL_READ) ? Acl::LEVEL_WRITE : false;
-//
-//	}
+	/**
+	 * Get the permission level of the current user
+	 *
+	 * @return int
+	 */
+	public function getPermissionLevel() {
+
+		if(go()->getAuthState()->isAdmin()) {
+			return Acl::LEVEL_MANAGE;
+		}
+
+		if($this->isNew()) {
+			return $this->findEntity()->getPermissionLevel() ? Acl::LEVEL_WRITE : false;
+		}
+
+		if($this->createdBy == go()->getAuthState()->getUserId()) {
+			return Acl::LEVEL_MANAGE;
+		}
+
+		return $this->findEntity()->hasPermissionLevel(Acl::LEVEL_READ) ? Acl::LEVEL_WRITE : false;
+
+	}
 	
 	/**
 	 * Applies conditions to the query so that only entities with the given permission level are fetched.
