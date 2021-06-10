@@ -334,10 +334,6 @@ class Task extends AclItemEntity {
 				$this->recurrenceRule = null;
 			}
 		}
-		// If a task is saved for a project, check whether an actual task list exists.
-		if(isset($this->projectId) && empty($this->tasklistId)) {
-			Tasklist::saveForProject($this->projectId);
-		}
 
 		$success = parent::internalSave();
 

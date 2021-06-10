@@ -20,11 +20,6 @@ class Tasklist extends EntityController
 
 	public function query($params)
 	{
-		if (go()->getModule(null, 'projects2')) {
-			if (isset($params['filter']) && isset($params['filter']['projectId']) && is_int($params['filter']['projectId'])) {
-				model\Tasklist::saveForProject($params['filter']['projectId']);
-			}
-		}
 		return $this->defaultQuery($params);
 	}
 

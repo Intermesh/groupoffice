@@ -213,14 +213,12 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			stateId: 'tasks-grid'
 		});
 
-		this.view = new go.grid.GroupingView({
-			emptyText: '<i>description</i><p>' +t("No items to display") + '</p>',
-			hideGroupedColumn: true,
-			showGroupName: false,
-			groupRenderer: function(v, dummy, r, rowIndex, colIndex, ds) {
-				return v.name;
-			}
-		});
+		if(!this.view) {
+			this.view = new go.grid.GroupingView({
+				emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
+				hideGroupedColumn: true
+			});
+		}
 
 		go.modules.community.tasks.TaskGrid.superclass.initComponent.call(this);
 	}

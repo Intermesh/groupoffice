@@ -68,13 +68,20 @@ class Tasklist extends AclOwnerEntity
 
 	public $groups = [];
 
+	public $projectId = null;
+
 	protected static function defineFilters()
 	{
 		return parent::defineFilters()
 			->add('role', function (Criteria $criteria, $value) {
 				$roleID = array_search($value, self::Roles, true);
 				$criteria->where(['role' => $roleID]);
+			})
+			->add('projectId', function (Criteria $criteria, $value) {
+
+				$criteria->where(['projectId' => $value]);
 			});
+
 	}
 
 	protected static function textFilterColumns()
@@ -100,36 +107,15 @@ class Tasklist extends AclOwnerEntity
 					'#2' => ['name' => go()->t('Completed','community', 'tasks'), 'progressChange' => Progress::$db[Progress::Completed]]
 				]);
 			}
+
+			//If this tasklist is for a project then take over the ACL
+			if(isset($this->projectId)) {
+				$project = ProjectEntity::findById($this->projectId, ['id', 'acl_id']);
+				$this->aclId = $project->acl_id;
+			}
 		}
 		return parent::internalSave();
 	}
 
-	public static function saveForProject(int $projectId)
-	{
-		$id = self::find(['id'])
-			->selectSingleValue("tasklist.id")
-			->filter(['projectId' => $projectId])
-			->single();
-
-		if (!empty($id)) {
-			go()->getDebugger()->debug('tasklist ' . $id . ' found for project ' . $projectId);
-		} else {
-			$project = ProjectEntity::findById($projectId, ['name', 'user_id', 'acl_id']);
-
-			// Create a new tasklist record
-			$tl = new Tasklist();
-			$tl->name = go()->t('Task list') . ' ' . $project->name;
-			$tl->setRole('project');
-			$tl->createdBy = go()->getUserId();
-			$tl->ownerId = $project->user_id;
-			$tl->aclId = $project->acl_id;
-			$tl->save();
-			if (!go()->getDbConnection()->insert('pr2_project_tasklist', ['tasklist_id' => $tl->id, 'project_id' => $projectId])->execute()) {
-				throw new \Exception("could not save project tasklist pivot table");
-			}
-
-		}
-
-	}
 
 }

@@ -213,10 +213,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 		},
 		remoteSort: true,
 		remoteGroup: true,
-		filters: {
-			projectId: this.projectId
-		},
-		groupField: 'groupId',
+		// groupField: 'groupId',
 		entityStore: "Task"
 	});
 
@@ -260,7 +257,23 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 		iconCls: 'ic-add',
 		text: t("Add"),
 		handler: function () {
-			this.addNewRow();
+
+			go.Db.store('Project').single(this.projectId).then((project) => {
+				if(project.tasklistId) {
+					this.tasklistId = project.tasklistId;
+					return project;
+				}
+
+				return go.Db.store('Project').save({
+					createTaskList: true
+				}, project.id).then((project) => {
+					this.tasklistId = project.tasklistId;
+					return project;
+				})
+
+			}).then(() =>{
+				this.addNewRow();
+			})
 		},
 		scope: this
 	}, {
@@ -294,6 +307,7 @@ go.modules.community.tasks.ProjectTaskGrid = function (config) {
 Ext.extend(go.modules.community.tasks.ProjectTaskGrid, go.grid.EditorGridPanel, {
 	projectId: 0,
 	disabled: true,
+
 	_tasksPanelEnabled: false,
 
 	setProjectId: function (projectId, tasksPanelEnabled) {
@@ -309,7 +323,14 @@ Ext.extend(go.modules.community.tasks.ProjectTaskGrid, go.grid.EditorGridPanel, 
 		this.setDisabled(!this._tasksPanelEnabled || !this.projectId || this.selectResource.store.getCount() == 0);
 
 		if (projectId) {
-			this.store.setFilter('projectId', {projectId: this.projectId}).load();
+			go.Db.store('Project').single(this.projectId).then((project) => {
+				if(project.tasklistId) {
+					this.store.setFilter('tasklistId', {tasklistId: project.tasklistId}).load();
+				} else
+				{
+					this.store.removeAll();
+				}
+			});
 		} else {
 			this.store.removeAll();
 		}
@@ -340,7 +361,7 @@ Ext.extend(go.modules.community.tasks.ProjectTaskGrid, go.grid.EditorGridPanel, 
 			index = this.store.getCount(),
 			sm = this.getSelectionModel(),
 			rows = sm.getSelections(),
-			tasklistId = 0, // TODO: get tasklistId if no tasks available
+			tasklistId = this.tasklistId, // TODO: get tasklistId if no tasks available
 			groupId = null,
 			user_id
 
@@ -353,7 +374,7 @@ Ext.extend(go.modules.community.tasks.ProjectTaskGrid, go.grid.EditorGridPanel, 
 		}
 		var previousRecord = this.store.getAt(index - 1);
 		if (previousRecord) {
-			tasklistId = previousRecord.data.tasklistId;
+		//	tasklistId = previousRecord.data.tasklistId;
 			user_id = previousRecord.data.responsibleUserId;
 		} else {
 

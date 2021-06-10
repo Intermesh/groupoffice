@@ -1,25 +1,24 @@
 go.modules.community.tasks.TaskLinkDetail = Ext.extend(go.modules.community.tasks.TaskGrid,{
 	autoHeight: true,
+	maxHeight: dp(300),
 	title: t("Tasks"),
 	collapsible: true,
 	initComponent: function() {
 
-		this.viewConfig = {
+		this.view = new go.grid.GroupingView({
 			emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
 			totalDisplay: false,
 			actionConfig: {
 				scope: this,
 				menu: this.initMoreMenu()
-			}
-		};
+			},
+			hideGroupedColumn: true,
+			showGroupName: false
+		});
 
 		this.supr().initComponent.call(this);
 
-		this.on("viewready" , ()  => {
-			this.autoHeight = false;
-			this.getView().scroller.setStyle("max-height", "300px");
-			this.getView().scroller.setStyle("overflow-y", "auto");
-		});
+
 
 		this.store.on("datachanged", function () {
 			this.setVisible(this.store.getCount() > 0);

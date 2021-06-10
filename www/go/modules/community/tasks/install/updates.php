@@ -73,18 +73,24 @@ $updates['202105211543'][] = "ALTER TABLE `tasks_task`  ADD `progressChange` TIN
 $updates['202106011409'][] = "ALTER TABLE `tasks_task` ADD COLUMN IF NOT EXISTS `startTime` TIME NULL DEFAULT NULL";
 
 
-//alter table sync_tasklist_user change tasklist_id tasklistId int auto_increment;
+
+
+//TODO!!!!
+//$updates['202106101432'][] = "alter table sync_tasklist_user change tasklist_id tasklistId int auto_increment;";
 //
-//alter table sync_tasklist_user change user_id userId int default 0 not null;
+//$updates['202106101432'][] = "alter table sync_tasklist_user change user_id userId int default 0 not null;";
 //
-//alter table sync_tasklist_user change default_tasklist isDefault boolean default 0 not null;
+//$updates['202106101432'][] = "alter table sync_tasklist_user change default_tasklist isDefault boolean default 0 not null;";
 //
-//alter table sync_tasklist_user
+//$updates['202106101432'][] = "alter table sync_tasklist_user
 //	add constraint sync_tasklist_user_core_user_id_fk
 //		foreign key (userId) references core_user (id)
-//			on delete cascade;
+//			on delete cascade;";
 //
-//alter table sync_tasklist_user
+//$updates['202106101432'][] = "alter table sync_tasklist_user
 //	add constraint sync_tasklist_user_tasks_tasklist_id_fk
 //		foreign key (tasklistId) references tasks_tasklist (id)
-//			on delete cascade;
+//			on delete cascade;";
+
+$updates['202106101432'][] = "alter table tasks_tasklist
+	add projectId int null;";
