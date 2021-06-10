@@ -432,7 +432,7 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
    * ```
    *
    * @param string|\go\core\db\Query $tableName The record class name or sub query to join
-   * @param string $joinTableAlias Leave empty for none.
+   * @param mixed $joinTableAlias Leave empty for none.
    * @param Criteria|array|string $on The criteria used in the ON clause {@see Criteria::normalize()}
    * @param string $type The join type. INNER, LEFT or RIGHT
    * @return static
