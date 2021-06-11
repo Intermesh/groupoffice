@@ -2396,8 +2396,39 @@ $menuScrollerSize : dp(4);
 	position:relative;
 	width:dp(32);
 	height:dp(32);
+	border-radius: $borderRadius;
+
+	&.primary {
+		@include var('background-color', c-secondary);
+		color: white;
+
+		&:hover {
+			transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+			@include var(background-color, c-accent);
+		}
+	}
+
+	&.accent {
+		@include var('background-color', c-accent);
+		color: white;
+
+		&:hover {
+			transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+			@include var(background-color, c-primary);
+		}
+	}
+
+	&.primary-icon {
+		@include var('color', c-secondary);
+	}
+
+	&.accent-icon {
+		@include var('color', c-accent);
+	}
+
 	&:hover {
-		@include var(color, c-primary);
+		transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+		@include var(background-color, c-primary-tp);
 	}
 //	border-radius: 50%;
 //	transition: background 250ms linear;

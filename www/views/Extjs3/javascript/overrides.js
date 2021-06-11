@@ -1069,6 +1069,42 @@ Ext.override(Ext.Panel, {
 		}
 		
 		this.panelInitComponent.call(this);
+
+		this.toolsMenu();
+	},
+
+
+
+	toolsMenu : function() {
+
+		if(!this.tools) {
+			return;
+		}
+
+		this.toolsMenus = {};
+
+		this.tools.forEach((tool) => {
+
+			if (tool.menu) {
+
+				tool.handler = function(event, toolEl, panel) {
+					if (!panel.toolsMenus[tool.id]) {
+						panel.toolsMenus[tool.id] = new Ext.menu.Menu({
+							items: tool.menu
+						})
+					}
+					panel.toolsMenus[tool.id].ownerCt = panel;
+					panel.toolsMenus[tool.id].show(toolEl, 'tl-bl?');
+				}
+			}
+		});
+
+
+		this.on('destroy', () => {
+			for(let id in this.toolsMenus) {
+				this.toolsMenus[id].destroy();
+			}
+		});
 	},
 	
 	stateEvents: ['collapse', 'expand'],
