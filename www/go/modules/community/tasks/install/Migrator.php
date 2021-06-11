@@ -14,16 +14,6 @@ class Migrator
 	{
 		echo "Migrating project jobs to tasks" . PHP_EOL . PHP_EOL;
 		// foreach pr2_tasks record:
-
-		// remewber id
-		// project_id > projectId
-		// user_id > responsibleUserId
-		// percentage_complete -> percentComplete
-		// duration -> estimatedDuration
-		// due_date -> due
-		// description -> title
-		// parent_id -> tasxs_task_group? TODO Discuss internally, groupId?
-		// has_children: ?
 		$counter = 0;
 		go()->getDbConnection()->beginTransaction();
 		$query = go()->getDbConnection()
@@ -39,9 +29,10 @@ class Migrator
 	        if($record['project_id'] > 0) {
 		        $projectId = $record['project_id'];
 		        $project = ProjectEntity::findById($projectId);
+		        // If for some reason there are more task lists, just select the first task list
 		        $prt = go()->getDbConnection()
-			        ->select('tasklist_id')
-			        ->from('pr2_project_tasklist')
+			        ->select('id')
+			        ->from('tasks_tasklist')
 			        ->where('project_id = ' . $projectId)
 			        ->single();
 		        if($prt) {
@@ -52,14 +43,12 @@ class Migrator
 				        'name' => $project->name,
 				        'createdBy'=> $project->user_id,
 				        'aclId' => $project->findAclId(),
+				        'projectId' => $projectId,
 				        'version'=> 1,
 				        'ownerId' => $project->user_id
 			        ];
 		        	go()->getDbConnection()->insert('tasks_tasklist', $arFlds)->execute();
 		        	$tasklistId = go()->getDbConnection()->getPDO()->lastInsertId();
-		        	go()->getDbConnection()
-				        ->insert('pr2_project_tasklist', ['project_id' => $projectId, 'tasklist_id' => $tasklistId])
-			            ->execute();
 		        }
 	        } else {
 	        	$counter++;
@@ -99,7 +88,6 @@ class Migrator
         }
 
 		go()->getDbConnection()->commit();
-//		go()->getDbConnection()->rollBack();
 		echo PHP_EOL . PHP_EOL . 'Done migrating project jobs to tasks';
 	}
 }
