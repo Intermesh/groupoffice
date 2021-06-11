@@ -148,7 +148,7 @@ Ext.define('go.grid.GridView', {
 
 		}
 
-		if(!e.within(this.actionBtn.el, true)) {
+		if(this.actionBtn && !e.within(this.actionBtn.el, true)) {
 			this.actionBtn.hide();
 		}
 
