@@ -705,7 +705,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					return this.single(id);
 				} else
 				{
-					return Promise.reject({message: t("Failed to save"), response: response});
+					return Promise.reject({message: t("Failed to save"), response: response, error: response.notCreated[id] || null});
 				}
 			} else
 			{
@@ -713,7 +713,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					return this.single(id);
 				} else
 				{
-					return Promise.reject({message: t("Failed to save"), response: response});
+					return Promise.reject({message: t("Failed to save"), response: response, error: response.notUpdated[id] || null});
 				}
 			}
 		});
@@ -724,13 +724,25 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 *
 	 * Shortcut for this.set().
 	 *
+	 * @example
+	 * ```
+	 * Ext.MessageBox.confirm(t("Delete"), t("Are you sure you want to delete this item?"), function (btn) {
+
+			if (btn == "yes") {
+				go.Db.store("Tasklist").destroy(tasklistId).catch((result) => {
+					GO.errorDialog.show(result.error.description);
+				});
+			}
+		}, this);
+	 * ```
+	 *
 	 * @param {int} id
 	 * @returns {Promise<object>}
 	 */
 	destroy : function(id) {
 		return this.set( {destroy: [id]}).then(function(response) {
 			if(response.destroyed.indexOf(id) == -1) {
-				return Promise.reject(response);
+				return Promise.reject({message: t("Failed to delete"), response: response, error: response.notDestroyed[id] || null});
 			} else {
 				return true;
 			}
