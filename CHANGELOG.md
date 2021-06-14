@@ -1,3 +1,4 @@
+- Projects2: Fixed jobs combo in time entry dialog
 - Core: User field combo doesn't show disabled users anymore.
 
 10-06-2021 6.5.56
