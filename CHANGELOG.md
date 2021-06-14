@@ -1,3 +1,21 @@
+- Projects2: Fixed jobs combo in time entry dialog
+- Core: User field combo doesn't show disabled users anymore.
+
+10-06-2021 6.5.56
+- Core: Disk cache didn't work for entries that should live forever and cached
+    expiring cache forever. This also caused old passwords to work until cache was flushed.
+
+10-06-2021 6.5.55
+- E-mail: Fixed security problem where users could view last opened attachment of another user.
+- Calendar: Fixed [Invitation] Error when responding #706
+- Core: Fixed: [Custom filed] Error in selection field #708
+- Email: attached messages were not opened without savemailas module anymore. Fixed eml downloaded #709.
+
+07-06-2021 6.5.54
+- Core: Disk cache didn't work for entries that should live forever and cached
+    expiring cache forever. This also caused old passwords to work until cache was flushed.
+- Business: sort employees by User displayName by default
+
 07-06-2021 6.5.53
 - Business: Wrong time format in agreement dialog
 - Google authenticator: Translations didn't work in this module
@@ -149,8 +167,10 @@
 
 6.4.244
 6.4.236
+14-06-2021 6.4.236
 - Core: Better handling of zero-values in numeric custom fields
 - Core: Fixed zero values of numeric custom fields in function CF
+- Projects: Options to delete and duplicate recursively
 
 10-05-2021 6.4.235
 - Calendar: fix behaviour of copy button in list view

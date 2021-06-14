@@ -11776,7 +11776,7 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
         }
         if(this.rendered && !this.isDestroyed && this.el.isInViewport()){
             this.el.focus();
-            if(selectText === true){
+            if(selectText === true && this.el.dom.select){
                 this.el.dom.select();
             }
         }

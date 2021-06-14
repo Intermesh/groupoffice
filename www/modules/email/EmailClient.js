@@ -1421,15 +1421,29 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 			return;
 		}
 
-		if(go.Modules.isAvailable('legacy', 'files')) {
-			return GO.files.openEmailAttachment(attachment, panel, false);
-		}
+
 
 		if(!forceDownload && (attachment.mime=='message/rfc822' || attachment.mime=='application/eml'))
 		{
-			GO.email.showMessageAttachment(0, params);
+			GO.email.showMessageAttachment(0, {
+				action:'attachment',
+				account_id: panel.account_id,
+				mailbox: panel.mailbox,
+				uid: panel.uid,
+				number: attachment.number,
+				uuencoded_partnumber: attachment.uuencoded_partnumber,
+				encoding: attachment.encoding,
+				type: attachment.type,
+				subtype: attachment.subtype,
+				filename:attachment.name,
+				charset:attachment.charset,
+				sender:panel.data.sender, //for gnupg and smime,
+				filepath:panel.data.path ? panel.data.path : '' //In some cases encrypted messages are temporary stored on disk so the handlers must use that to fetch the data.
+			});
 		}else
 		{
+
+
 			switch(attachment.extension)
 			{
 				case 'ics':
@@ -1516,7 +1530,11 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 
 				default:
 
-					go.util.viewFile(attachment.url);
+					if(go.Modules.isAvailable('legacy', 'files')) {
+						return GO.files.openEmailAttachment(attachment, panel, false);
+					} else {
+						go.util.viewFile(attachment.url);
+					}
 
 					break;
 			}

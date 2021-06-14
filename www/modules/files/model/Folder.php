@@ -787,12 +787,15 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 			$userId = go()->getAuthState()->getUserId();
 		}
 
-		$folder = $this->findByPath('tmp', true);
-		if($folder->acl_id != Acl::getReadOnlyAclId()){
-			$folder->acl_id = Acl::getReadOnlyAclId();
-			$folder->save(true);
+		$folder = $this->findByPath('tmp/' . $userId, true);
+		if(!$folder->acl_id || Acl::getUserPermissionLevel($folder->acl_id, $userId) != Acl::LEVEL_MANAGE) {
+			$folder->setNewAcl($userId);
+			if(!$folder->save()) {
+				throw new \Exception("Could not create temporary folder");
+			}
 		}
-		return $this->findByPath('tmp/' . $userId, true);
+
+		return $folder;
 	}
 
 	/**
