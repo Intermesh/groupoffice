@@ -1,3 +1,5 @@
+- Core: User field combo doesn't show disabled users anymore.
+
 10-06-2021 6.5.56
 - Core: Disk cache didn't work for entries that should live forever and cached
     expiring cache forever. This also caused old passwords to work until cache was flushed.
