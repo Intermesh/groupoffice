@@ -1,3 +1,6 @@
+14-06-2021 6.4.237
+- Projects: Invalid update query made upgrade halt
+
 14-06-2021 6.4.236
 - Core: Better handling of zero-values in numeric custom fields
 - Core: Fixed zero values of numeric custom fields in function CF
