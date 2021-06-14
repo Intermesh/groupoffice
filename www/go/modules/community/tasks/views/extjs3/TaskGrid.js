@@ -162,7 +162,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				},
 				{					
 					xtype:"datecolumn",
-					hidden: false,
+					// hidden: false,
 					id: 'modifiedAt',
 					header: t('Modified at'),
 					width: dp(160),
@@ -171,7 +171,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					hidden: true
 				},
 				{	
-					hidden: true,
+					// hidden: true,
 					header: t('Created by'),
 					width: dp(160),
 					sortable: true,
@@ -182,7 +182,6 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					hidden: true
 				},
 				{
-					hidden: true,
 					header: t('Tasklist'),
 					width: dp(160),
 					sortable: true,
@@ -193,7 +192,6 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					hidden: true
 				},
 				{	
-					hidden: true,
 					header: t('Modified by'),
 					width: dp(160),
 					sortable: true,
