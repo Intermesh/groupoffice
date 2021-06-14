@@ -15,7 +15,12 @@
 		store: {
 			xtype: 'gostore',
 			fields: ['id', 'displayName', 'username', 'avatarId'],
-			entityStore: "UserDisplay"
+			entityStore: "UserDisplay",
+			filter: {
+				default: {
+					showDisabled: false
+				}
+			}
 		},
 		tpl: new Ext.XTemplate('<tpl for=".">\
 			<div class="x-combo-list-item">\

@@ -127,7 +127,7 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 	{
 		try {
 			$val = $this->getValue($name);
-		} catch(Exception $e) {
+		} catch(\Exception $e) {
 			return false;
 		}
 		return isset($val);

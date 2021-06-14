@@ -119,7 +119,6 @@ class SavedMessage extends ComposerMessage {
 		
 		$this->_getParts($structure, "", $preserveHtmlStyle);
 
-		$this->_loadedBody = $this->_loadedBody;
 	}
 	
 	private function _getTempDir(){
@@ -165,7 +164,7 @@ class SavedMessage extends ComposerMessage {
 //	}
 
 	private function _getParts($structure, $part_number_prefix='', $preserveHtmlStyle = true) {
-				
+				$this->_loadedBody = "";
 		if (isset($structure->parts)) {
 			$structure->ctype_primary = strtolower($structure->ctype_primary);
 			$structure->ctype_secondary = strtolower($structure->ctype_secondary);
