@@ -417,11 +417,13 @@ class Message extends \Swift_Message{
 
 	private function buildContentType($part) {
 		$mime_type = $part->ctype_primary.'/'.$part->ctype_secondary;
-		foreach($part->ctype_parameters as $name => $value) {
-			if($name == 'name') {
-				continue;
+		if(!empty($part->ctype_parameters)) {
+			foreach ($part->ctype_parameters as $name => $value) {
+				if ($name == 'name') {
+					continue;
+				}
+				$mime_type .= ';' . $name . '=' . $value;
 			}
-			$mime_type .= ';' . $name . '=' . $value;
 		}
 
 		return $mime_type;
