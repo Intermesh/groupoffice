@@ -1,5 +1,7 @@
-- Projects2: Fixed jobs combo in time entry dialog
+15-06-2021 6.5.57
+- Projects: Fixed jobs combo in time entry dialog
 - Core: User field combo doesn't show disabled users anymore.
+- Projects: duplicate and delete recursively
 
 10-06-2021 6.5.56
 - Core: Disk cache didn't work for entries that should live forever and cached
