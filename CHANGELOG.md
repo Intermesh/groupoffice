@@ -1,3 +1,6 @@
+15-06-2021 6.5.58
+- Projects: fixed upgrade error
+
 15-06-2021 6.5.57
 - Projects: Fixed jobs combo in time entry dialog
 - Core: User field combo doesn't show disabled users anymore.
