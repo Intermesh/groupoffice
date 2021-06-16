@@ -21,6 +21,10 @@
 namespace GO\Calendar\Controller;
 
 
+use GO\Base\Db\ActiveRecord;
+use GO\Calendar\Model\Event;
+use GO\Email\Model\Account;
+
 class EventController extends \GO\Base\Controller\AbstractModelController {
 
 	protected $model = 'GO\Calendar\Model\Event';
@@ -1951,6 +1955,41 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 		
 		echo "END:VCALENDAR\r\n";
 		
+	}
+
+	public function actionLoadICS($params) {
+
+		$response = array( 'success' => true );
+
+
+		if(!empty($params['file_id'])) {
+			$file = \GO\Files\Model\File::model()->findByPk($params['file_id']);
+			$data = $file->fsFile->getContents();
+		}else{
+			$account = Account::model()->findByPk($params['account_id']);
+			$imap = $account->openImapConnection($params['mailbox']);
+			$data = $imap->get_message_part_decoded($params['uid'], $params['number'], $params['encoding'], false, true, false);
+		}
+		$vcal = \GO\Base\VObject\Reader::read($data);
+
+		$vevents = $vcal->select("VEVENT");
+
+		$vevent = array_shift($vevents);
+
+		$event = new Event();
+		$event->importVObject( $vevent, array(), true);
+
+		$response['data'] = $event->getAttributes();
+		$response['data']['permission_level']=$event->getPermissionLevel();
+		$response['data']['write_permission']=true;
+		//$response['data']['customFields'] = $event->getCustomFields()->toArray();
+		$response['success'] = true;
+
+		$response = $this->_loadComboTexts($response, $event);
+
+		$this->afterLoad($response, $event, $params);
+
+		return $response;
 	}
 	
 }

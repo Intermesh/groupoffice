@@ -238,7 +238,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 
 		this.setEventId(config.event_id);	
 		
-		var params = {};
+		var params = config.params || {};
 		
 		if(!config.event_id){
 			
@@ -278,7 +278,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 		//if (config.event_id > 0) {
 			this.formPanel.load({
 				params:params,
-				url : GO.url('calendar/event/load'),
+				url : config.url || GO.url('calendar/event/load'),
 				waitMsg:GO.lang.waitMsgLoad,
 				success : function(form, action) {
 					//this.win.show();
