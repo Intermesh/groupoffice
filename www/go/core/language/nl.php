@@ -49,6 +49,7 @@ Uw inloggegevens zijn:
 Gebruikersnaam: {username};
 Wachtwoord: {password}',
   'Manage' => 'Beheren',
+  'mayManage' => 'Beheren',
   'Module name' => 'Module naam',
   'User has access to' => 'Gebruiker heeft toegang tot',
   'User is member of' => 'Gebruiker is lid van',

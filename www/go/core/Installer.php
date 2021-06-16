@@ -472,11 +472,17 @@ class Installer {
 	
 		// Make sure core module is accessible for everyone
 		$module  = GoCoreModule::findByName("core", "core");
-		$acl = $module->findAcl();
-		if(!$acl->hasGroup(Group::ID_EVERYONE)) {
-			$acl->addGroup(Group::ID_EVERYONE);
-			$acl->save();
+		if(!isset($module->permisions[Group::ID_EVERYONE])) {
+			$everyone = new model\Permission();
+			$everyone->groupId = Group::ID_EVERYONE;
+			$module->permissions[Group::ID_EVERYONE] = $everyone;
+			$module->save();
 		}
+//		$acl = $module->findAcl();
+//		if(!$acl->hasGroup(Group::ID_EVERYONE)) {
+//			$acl->addGroup(Group::ID_EVERYONE);
+//			$acl->save();
+//		}
 
 		$this->fireEvent(static::EVENT_UPGRADE);
 

@@ -1107,3 +1107,20 @@ alter table go_state
     add constraint go_state_core_user_id_fk
         foreign key (user_id) references core_user (id)
             on delete cascade;
+
+CREATE TABLE `core_permission` (
+  `moduleId` INT NOT NULL,
+  `groupId` INT NOT NULL,
+  `rights` BIGINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`moduleId`, `groupId`),
+  INDEX `fk_permission_group_idx` (`groupId` ASC),
+  CONSTRAINT `fk_permission_module`
+      FOREIGN KEY (`moduleId`)
+          REFERENCES `core_module` (`id`)
+          ON DELETE CASCADE
+          ON UPDATE NO ACTION,
+  CONSTRAINT `fk_permission_group`
+      FOREIGN KEY (`groupId`)
+          REFERENCES `core_group` (`id`)
+          ON DELETE CASCADE
+          ON UPDATE NO ACTION);

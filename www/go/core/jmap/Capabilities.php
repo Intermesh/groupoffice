@@ -3,9 +3,10 @@ namespace go\core\jmap;
 
 use go\core\Environment;
 use go\core\Singleton;
+use go\core\SingletonTrait;
 
-class Capabilities extends Singleton {
-	
+class Capabilities extends \stdClass {
+	use SingletonTrait;
 	/**
 	 * The maximum file size, in bytes, that the server will accept for a 
 	 * single file upload (for any purpose).
@@ -28,4 +29,5 @@ class Capabilities extends Singleton {
 		$this->maxSizeUpload = Environment::get()->getMaxUploadSize();
 		$this->maxSizeRequest = Environment::configToBytes(ini_get('post_max_size'));
 	}
+
 }

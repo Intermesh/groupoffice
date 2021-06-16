@@ -4,14 +4,13 @@ namespace go\core\model;
 use Exception;
 use go\core;
 use go\core\db\Criteria;
-use go\core\model\Acl;
-use go\core\acl\model\AclOwnerEntity;
+use go\core\jmap\Entity;
 use go\core\App;
 use go\core\orm\Query;
 use go\core\Settings;
 use go\core\validate\ErrorCode;
 
-class Module extends AclOwnerEntity {
+class Module extends Entity {
 	public $id;
 	public $name;
 	public $package;
@@ -20,13 +19,20 @@ class Module extends AclOwnerEntity {
 	public $version;
 	public $enabled;
 
+	// for backwards compatibility
+	public function getPermissionLevel() {
+		if(go()->getAuthState()->isAdmin())
+			return 50;
 
-	/**
-	 * This is here for compatibility with old modules management page that's not refactored yet. Remove when refactored.
-	 * @deprecated
-	 */
-	public function getAclId() {
-		return $this->aclId;
+		$groupedRights = "SELECT BIT_OR(rights) as rights FROM core_permission WHERE groupId IN (SELECT groupId from core_user_group WHERE userId = ".go()->getAuthState()->getUserId().") AND moduleId = ".$this->id.";";
+		$rights = go()->getDbConnection()->query($groupedRights)->fetch(\PDO::FETCH_COLUMN);
+		if($rights < 2) {
+			return 10;
+		}
+		if($rights >= 3) {
+			return 50;
+		}
+		return 0;
 	}
 
 	protected function canCreate()
@@ -85,18 +91,19 @@ class Module extends AclOwnerEntity {
 			go()->rebuildCache();
 		}
 
+		// TODO: do groups needs modules or can we set multiple module with new group permissions
 		//When module groups change the groups change too. Because the have a "modules" property.
-		$aclChanges = $this->getAclChanges();
-		if(!empty($aclChanges)) {
-			Group::entityType()
-				->changes(
-					go()->getDbConnection()
-						->select('id as entityId, aclId, "0" as destroyed')
-						->from('core_group')
-						->where('id', 'IN', array_keys($aclChanges)
-					)
-				);
-		}
+//		$aclChanges = $this->getAclChanges();
+//		if(!empty($aclChanges)) {
+//			Group::entityType()
+//				->changes(
+//					go()->getDbConnection()
+//						->select('id as entityId, aclId, "0" as destroyed')
+//						->from('core_group')
+//						->where('id', 'IN', array_keys($aclChanges)
+//					)
+//				);
+//		}
 		
 		return true;
 	}
@@ -122,7 +129,8 @@ class Module extends AclOwnerEntity {
 	
 
 	protected static function defineMapping() {
-		return parent::defineMapping()->addTable('core_module', 'm');
+		return parent::defineMapping()->addTable('core_module', 'm')
+			->addMap('permissions', Permission::class, ['id'=>'moduleId']);
 	}
 
 	protected static function defineFilters() {
@@ -304,6 +312,22 @@ class Module extends AclOwnerEntity {
 		}
 		
 		return $available;
+	}
+
+	/**
+	 * @param $rights int bitwise rights
+	 * @return array permission name => true for on / false for off
+	 */
+	public function may($rights) {
+		$module = $this->module();
+		$capabilities = $module->getRights();
+		$result = [];
+		foreach($capabilities as $str => $bit) {
+			if(go()->getAuthState()->isAdmin() ||  ($rights & $bit)) {
+				$result[$str] = true;
+			}
+		}
+		return $result;
 	}
 	
 	/**

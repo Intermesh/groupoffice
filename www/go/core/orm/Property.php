@@ -109,6 +109,11 @@ abstract class Property extends Model {
 	protected $readOnly = false;
 
 	/**
+	 * @var Entity a reference to the entity this property belongs to
+	 */
+	protected $ownerEntity = null;
+
+	/**
 	 * Constructor
 	 *
 	 * @param boolean $isNew Indicates if this model is saved to the database.
@@ -116,7 +121,7 @@ abstract class Property extends Model {
 	 * @param bool $readOnly Entities can be fetched readonly to improve performance
 	 * @throws Exception
 	 */
-	public function __construct($isNew = true, $fetchProperties = [], $readOnly = false) {
+	public function __construct($isNew = true, $fetchProperties = [], $readOnly = false, $ownerEntity = null) {
 		$this->isNew = $isNew;
 
 		if (empty($fetchProperties)) {
@@ -125,6 +130,7 @@ abstract class Property extends Model {
 
 		$this->fetchProperties = $fetchProperties;
 		$this->readOnly = $readOnly;
+		$this->ownerEntity = $ownerEntity;
 		$this->selectedProperties = array_unique(array_merge($this->getRequiredProperties(), $this->fetchProperties));
 
 		$this->initDatabaseColumns($this->isNew);
@@ -224,7 +230,7 @@ abstract class Property extends Model {
 						$prop = null;
 					} else
 					{
-						$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly);
+						$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
 						$prop = $stmt->fetch();
 						$stmt->closeCursor();	
 						if(!$prop) {
@@ -245,7 +251,7 @@ abstract class Property extends Model {
 						$prop = [];
 					} else
 					{
-						$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly);
+						$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
 
 						$prop = $stmt->fetchAll();
 						$stmt->closeCursor();	
@@ -260,7 +266,7 @@ abstract class Property extends Model {
 						$prop = null;
 					} else
 					{
-						$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly);
+						$stmt = $this->queryRelation($cls, $where, $relation, $this->readOnly, $this);
 						$prop = $stmt->fetchAll();
 						$stmt->closeCursor();	
 						if(empty($prop)) {
@@ -336,7 +342,7 @@ abstract class Property extends Model {
    * @return Statement|mixed
    * @throws Exception
    */
-	private static function queryRelation($cls, array $where, Relation $relation, $readOnly) {
+	private static function queryRelation($cls, array $where, Relation $relation, $readOnly, $ownerEntity) {
 
 		$cacheKey = static::class.':'.$relation->name;
 
@@ -346,7 +352,7 @@ abstract class Property extends Model {
 
       /** @var Query $query */
       /** @var self $cls */
-      $query = $cls::internalFind([], $readOnly);
+      $query = $cls::internalFind([], $readOnly, $ownerEntity);
 
 			foreach($where as $field => $value) {
 				$query->andWhere($field . '= :'.$field);
@@ -691,7 +697,7 @@ abstract class Property extends Model {
 	 * @return static|Query
 	 * @throws Exception
 	 */
-	protected static function internalFind(array $fetchProperties = [], $readOnly = false) {
+	protected static function internalFind(array $fetchProperties = [], $readOnly = false, $ownerEntity = null) {
 
 		$cacheKey = static::class . '-' . implode("-", $fetchProperties);
 		$cacheKey = $readOnly ? $cacheKey . '-ro' : $cacheKey . '-rw';
@@ -714,7 +720,7 @@ abstract class Property extends Model {
 
 		$query = (new Query())
 						->from($tables[$mainTableName]->getName(), $tables[$mainTableName]->getAlias())						
-						->setModel(static::class, $fetchProperties, $readOnly);
+						->setModel(static::class, $fetchProperties, $readOnly, $ownerEntity);
 
 		self::joinAdditionalTables($tables, $query);
 		self::buildSelect($query, $fetchProperties, $readOnly);
@@ -749,7 +755,7 @@ abstract class Property extends Model {
 		$primaryTable = array_shift($tables);
 		$keys = $primaryTable->getPrimaryKey();
 		
-		$query = static::internalFind($properties, $readOnly);		
+		$query = static::internalFind($properties, $readOnly);
 		
 		//Used count check here because a customer managed to get negative ID's in the database.
 		$ids = count($keys) == 1 ? [$id] : explode('-', $id);
@@ -946,6 +952,7 @@ abstract class Property extends Model {
 		$modified = [];
 
 		foreach($properties as $key) {
+			if($key === 'ownerEntity') continue;
 
 			$oldValue = $this->oldProps[$key] ?? null;
 			
@@ -2204,6 +2211,7 @@ abstract class Property extends Model {
 
 		if (is_array($value)) {
 			$o = new $cls;
+			$o->ownerEntity = $this;
 			/** @var self $o */
 			$o->setValues($value);
 

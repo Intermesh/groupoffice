@@ -9,7 +9,7 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 
 		this.fields = config.fields;
 		this.method = config.method;
-		
+
 		go.data.JmapProxy.superclass.constructor.call(this, Ext.apply(config, {
 			url: go.Jmap.getApiUrl() //we don't need this url but ext complains about it if it's missing
 		}));
@@ -59,21 +59,52 @@ go.data.JmapProxy = Ext.extend(Ext.data.HttpProxy, {
 
 	onRead: function (action, o, response) {
 
-		var result = o.reader.readRecords(response);
+		var result;
 
-		if (result.success === false) {
-			// @deprecated: fire old loadexception for backwards-compat.
-			// TODO remove
-			this.fireEvent('loadexception', this, o, response);
+		this.preFetchEntities(response.records, function(){
+			result = o.reader.readRecords(response);
 
-			// Get DataReader read-back a response-object to pass along to exception event
-			var res = o.reader.readResponse(action, response);
-			this.fireEvent('exception', this.store, 'remote', action, o, res, null);
-		} else {
-			this.fireEvent('load', this.store, o, o.request.arg);
+			if (result.success === false) {
+				// @deprecated: fire old loadexception for backwards-compat.
+				// TODO remove
+				this.fireEvent('loadexception', this, o, response);
+
+				// Get DataReader read-back a response-object to pass along to exception event
+				var res = o.reader.readResponse(action, response);
+				this.fireEvent('exception', this.store, 'remote', action, o, res, null);
+			} else {
+				this.fireEvent('load', this.store, o, o.request.arg);
+			}
+			o.request.callback.call(o.request.scope, result, o.request.arg, result.success);
+		}, this);
+	},
+
+	// for promise field
+	preFetchEntities: function(records, cb, scope) {
+		var promiseFields = go.data.EntityStoreProxy.prototype.getPromiseFields.call(this);
+
+		if (!promiseFields.length) {
+			cb.call(scope);
+			return;
 		}
-		o.request.callback.call(o.request.scope, result, o.request.arg, result.success);
-		
+
+		var promises = [];
+
+		records.forEach(function (record) {
+
+			promiseFields.forEach(function(f) {
+				promises.push(f.promise(record).then(function(data) {
+					go.util.Object.applyPath(record, f.name, data);
+				}));
+			});
+
+		}, this);
+
+		Promise.all(promises).catch(function(e) {
+			console.error(e);
+		}).finally(function(){
+			cb.call(scope);
+		});
 	}
 });
 

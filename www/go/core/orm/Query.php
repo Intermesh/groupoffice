@@ -33,12 +33,12 @@ class Query extends DbQuery {
    * @param bool $readOnly Entity's will be read only. This improves performance.
    * @return $this
    */
-	public function setModel($cls, $fetchProperties = [], $readOnly = false) {
+	public function setModel($cls, $fetchProperties = [], $readOnly = false, $ownerEntity = null) {
 		$this->model = $cls;
 		$this->fetchProperties = $fetchProperties;
 		$this->readOnly = $readOnly;
 
-		return $this->fetchMode(PDO::FETCH_CLASS, $this->model, [false, $this->fetchProperties, $this->readOnly]);
+		return $this->fetchMode(PDO::FETCH_CLASS, $this->model, [false, $this->fetchProperties, $this->readOnly, $ownerEntity]);
 	}
 	
 	/**

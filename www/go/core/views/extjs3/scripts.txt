@@ -242,6 +242,7 @@ search/SearchField.js
 
 modules/SystemSettingsModuleGrid.js
 modules/PermissionsWindow.js
+modules/GroupRights.js
 
 
 filter/Conditions.js

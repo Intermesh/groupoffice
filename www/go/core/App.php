@@ -97,6 +97,21 @@ use const GO_CONFIG_FILE;
 
 			//more code to initialize at the bottom of this file as it depends on this class being constructed
 		}
+
+		/**
+		 * Capabilities of core module
+		 * @see SystemSettingsModuleGrid.js this array is duplicated because client doens't know core module
+		 */
+		protected function rights() {
+			return [
+				'mayViewUsers',
+				'mayChangeUsers',
+				'mayViewGroups',
+				'mayChangeGroups',
+				'mayViewCustomFields',
+				'mayChangeCustomFields'
+			];
+		}
 		
 		/**
 		 * Required for app being a go\core extend

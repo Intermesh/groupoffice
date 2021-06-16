@@ -80,11 +80,11 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 			items: [
 				this.selectMenu,
 				this.tabPanel
-			],
-			buttons:[
-				this.saveButton
 			]
 		});
+
+		if(go.User.isAdmin)
+			Ext.apply(this, {buttons:[this.saveButton]});
 
 
 		this.tools = [{
@@ -113,20 +113,27 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 			'submitStart' : true,
 			'submitComplete' : true
 		});
-		
-		this.addPanel(go.systemsettings.GeneralPanel);
-		this.addPanel(go.systemsettings.AppearancePanel);
-		this.addPanel(go.systemsettings.NotificationsPanel);
-		this.addPanel(go.systemsettings.AuthenticationPanel);
-		this.addPanel(go.defaultpermissions.SystemSettingsPanel);
-		this.addPanel(go.customfields.SystemSettingsPanel);
-		this.addPanel(go.users.SystemSettingsUserGrid);
-		this.addPanel(go.groups.SystemSettingsGroupGrid);
-		this.addPanel(go.modules.SystemSettingsModuleGrid);
-		this.addPanel(go.tools.SystemSettingsTools);
-		this.addPanel(go.oauth.SystemSettingsPanel);
-		this.addPanel(go.cron.SystemSettingsCronGrid, null, 'divider');
 
+		if(go.User.isAdmin) {
+			this.addPanel(go.systemsettings.GeneralPanel);
+			this.addPanel(go.systemsettings.AppearancePanel);
+			this.addPanel(go.systemsettings.NotificationsPanel);
+			this.addPanel(go.systemsettings.AuthenticationPanel);
+			this.addPanel(go.defaultpermissions.SystemSettingsPanel);
+		}
+		let c = go.User.capabilities['go:core:core'] || {};
+		if(c.mayViewCustomFields)
+			this.addPanel(go.customfields.SystemSettingsPanel);
+		if(c.mayViewUsers)
+			this.addPanel(go.users.SystemSettingsUserGrid);
+		if(c.mayViewGroups)
+			this.addPanel(go.groups.SystemSettingsGroupGrid);
+		if(go.User.isAdmin) {
+			this.addPanel(go.modules.SystemSettingsModuleGrid);
+			this.addPanel(go.tools.SystemSettingsTools);
+			this.addPanel(go.oauth.SystemSettingsPanel);
+			this.addPanel(go.cron.SystemSettingsCronGrid, null, 'divider');
+		}
 
 		this.loadModulePanels();
 		

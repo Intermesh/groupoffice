@@ -373,8 +373,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	
 	addDefaultRoutes : function() {
 		var me = this;
-
-		if(go.User.isAdmin) {
+		var c = go.User.capabilities['go:core:core'] || {};
+		if(c.mayViewUsers || c.mayViewGroups || c.mayViewCustomFields) {
 			go.Router.add(/systemsettings\/?([a-z0-9-_]*)?/i, function(tabId) {		
 				me.openSystemSettings().setActiveItem(tabId);
 			});
@@ -677,7 +677,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		if(go.User.isAdmin) {
 
-			if(go.Modules.get("core", "core").settings.readOnlyKeys.indexOf('license') == -1) {
+			if (go.Modules.get("core", "core").settings.readOnlyKeys.indexOf('license') == -1) {
 				this.userMenuLink.menu.insert(6, {
 					iconCls: 'ic-app-registration',
 					text: t("Register"),
@@ -688,7 +688,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					scope: this
 				});
 			}
-
+		}
+		var c = go.User.capabilities['go:core:core'] || {};
+		if(c.mayViewUsers || c.mayViewGroups || c.mayViewCustomFields) {
 			this.userMenuLink.menu.insert(3, {
 				text: t("System settings"),
 				iconCls: 'ic-settings',

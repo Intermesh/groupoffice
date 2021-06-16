@@ -54,6 +54,15 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 						window.open('https://www.group-office.com/shop/');					
 					},
 					scope: this
+				},{
+					text:t('Permissions'),
+					iconCls: 'ic-group',
+					handler: function() {
+						const corePermissionDlg = new go.modules.GroupRights();
+						go.Db.store('Module').single(1).then((core) =>
+							corePermissionDlg.show(core, ['mayViewUsers', 'mayChangeUsers', 'mayViewGroups', 'mayChangeGroups', 'mayViewCustomFields', 'mayChangeCustomFields'])
+						)
+					}
 				},
 
 
@@ -206,10 +215,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 			header: '',
 			hideMode: 'display',
 			keepSelection: true,
-			actions: [				
-				{
-					iconCls: 'ic-more-vert'					
-				}]
+			actions: [{
+				iconCls: 'ic-more-vert'
+			}]
 		});
 
 		actions.on({
@@ -421,17 +429,31 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 			this.moreMenu = new Ext.menu.Menu({
 				items: [
 					{
+					// 	itemId: "editz",
+					// 	iconCls: 'ic-share',
+					// 	text: t("Permissions"),
+					// 	handler: function() {
+					// 		var record =this.moreMenu.record;
+					//
+					// 	},
+					// 	scope: this
+					// },{
 						itemId: "edit",
 						iconCls: 'ic-share',
 						text: t("Permissions"),
 						handler: function() {
-							var record =this.moreMenu.record;
-							this.showPermissions(record.data.name, record.data.package, t(record.data.name, record.data.name), record.data.aclId);
+							const r = this.moreMenu.record;
+							if(!r.json.rights) {
+								this.showPermissions(r.data.name, r.data.package, t(r.data.name, r.data.name), r.data.aclId);
+							} else {
+								const dlg = new go.modules.GroupRights();
+								go.Db.store('Module').single(r.data.id).then((module) =>
+									dlg.show(module, r.json.rights)
+								);
+							}
 						},
-						scope: this						
-					},
-					"-",
-					{
+						scope: this
+					}, "-", {
 						itemId: "delete",
 						iconCls: 'ic-delete',
 						text: t("Delete"),

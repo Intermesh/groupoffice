@@ -371,6 +371,24 @@ abstract class Module extends Singleton {
 	abstract function getAuthor();
 
 	/**
+	 * The names of the properties that can be set as permission. The value will be a label (to be translated by client)
+	 * When this is not overriden there are no extra permissions. Groups van still be added
+	 * @return array name => label
+	 */
+	public function getRights() {
+		$types = $this->rights();
+		$result = [];
+		foreach($types as $i => $name) {
+			$result[$name] = pow(2, $i);
+		}
+		return $result;
+	}
+
+	// default backwards compatible
+	protected function rights() {
+		return ['mayManage'];
+	}
+	/**
 	 * Get dependent modules.
 	 * 
 	 * @return array[] eg. ["community/notes"]

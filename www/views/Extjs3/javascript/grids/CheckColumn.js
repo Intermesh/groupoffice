@@ -75,3 +75,4 @@ GO.grid.CheckColumn = Ext.extend(Ext.grid.Column, {
 	init: Ext.emptyFn
 });
 
+Ext.grid.Column.types.checkcolumn = GO.grid.CheckColumn;

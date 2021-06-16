@@ -121,8 +121,8 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 					menuDisabled: true,
 					hideable: false
 				},{
-					id: 'level',
-					header : t("Level"),
+					id: 'permissions',
+					header : t("Permissions"),
 					dataIndex : 'level',
 					menuDisabled:true,
 					editor : levelCombo,

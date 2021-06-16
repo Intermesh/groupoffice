@@ -933,3 +933,26 @@ $updates['202105041513'][] = "delete from core_module where name='voip' and pack
 $updates['202105041513'][] = "delete from core_module where name='voippro' and package is null";
 
 $updates['202105111132'][] = "ALTER TABLE `core_user` ADD COLUMN `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0 AFTER `homeDir`;";
+
+$udpates['202106021420'][] = "CREATE TABLE `core_permission` (
+  `moduleId` INT NOT NULL,
+  `groupId` INT NOT NULL,
+  `rights` BIGINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`moduleId`, `groupId`),
+  INDEX `fk_permission_group_idx` (`groupId` ASC),
+  CONSTRAINT `fk_permission_module`
+      FOREIGN KEY (`moduleId`)
+          REFERENCES `core_module` (`id`)
+          ON DELETE CASCADE
+          ON UPDATE NO ACTION,
+  CONSTRAINT `fk_permission_group`
+      FOREIGN KEY (`groupId`)
+          REFERENCES `core_group` (`id`)
+          ON DELETE CASCADE
+          ON UPDATE NO ACTION);";
+
+$updates['202106091111'][] = "INSERT IGNORE INTO core_permission (groupId, rights, moduleId) SELECT ag.groupId, IF(ag.level > 10, 3,1), a.entityId FROM core_acl_group ag 
+join core_acl a on a.id = ag.aclId 
+join core_entity e on e.id = a.entityTypeId
+WHERE e.name = 'Module';";
+// migratie module permission to action permission
