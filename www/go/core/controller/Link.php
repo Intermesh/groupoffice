@@ -33,8 +33,8 @@ class Link extends EntityController {
 	protected function getQueryQuery($params)
 	{
 		$q = parent::getQueryQuery($params)
-			->removeJoin('core_entity', 'eFrom')
-			->removeJoin('core_entity', 'eTo')
+//			->removeJoin('core_entity', 'eFrom')
+//			->removeJoin('core_entity', 'eTo')
 			->groupBy([])->distinct();
 
 		return $q;
