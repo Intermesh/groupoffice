@@ -94,7 +94,8 @@ class ModuleController extends AbstractJsonController{
 					'author'=>$module->getAuthor(),
 					'description'=>$module->getDescription(),
 					'icon'=>$module->getIcon(),
-					'aclId'=>$model ? $model->getAclId() : 0,
+					'rights'=>array_keys($module->getRights()),
+					//'aclId'=>$model ? $model->getAclId() : 0,
 
 					'localizedPackage'=>ucfirst($module->getPackage()),
 					'package'=>$module->getPackage(),
