@@ -10,6 +10,7 @@ namespace go\modules\community\tasks\model;
 use go\core\acl\model\AclItemEntity;
 use go\core\db\Expression;
 use go\core\model\Alert as CoreAlert;
+use go\core\model\Module;
 use go\core\orm\CustomFieldsTrait;
 use go\core\model\User;
 use go\core\orm\EntityType;
@@ -160,12 +161,13 @@ class Task extends AclItemEntity {
 
 	/** @var int */
 	protected $vcalendarBlobId;
+
 	/**
-	 * The users in this group
+	 * Hours booked
 	 *
-	 * @var int[]
+	 * @var double
 	 */
-//	public $hours;
+	protected $hoursBooked;
 
 	protected static function aclEntityClass(){
 		return Tasklist::class;
@@ -176,12 +178,19 @@ class Task extends AclItemEntity {
 	}
 
 	protected static function defineMapping() {
-		return parent::defineMapping()
+		$mapping = parent::defineMapping()
 			->addTable("tasks_task", "task")
 			->addUserTable("tasks_task_user", "ut", ['id' => 'taskId'])
 			->addMap('alerts', Alert::class, ['id' => 'taskId'])
 			->addMap('group', TasklistGroup::class, ['groupId' => 'id'])
 			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId']);
+
+		if(Module::isInstalled("legacy", "projects")) {
+			$mapping->getQuery()->select('COALESCE(SUM(prh.duration), 0) AS hoursBooked')
+				->groupBy(['prh.task_id']);
+		}
+
+		return $mapping;
 	}
 
 	public static function converters() {
@@ -201,6 +210,10 @@ class Task extends AclItemEntity {
 
 	public function getProgress() {
 		return Progress::$db[$this->progress];
+	}
+
+	public function getHoursBooked() {
+		return $this->hoursBooked;
 	}
 
 	public function setProgress($value) {
@@ -253,9 +266,17 @@ class Task extends AclItemEntity {
 					$criteria->where(['tasklistId' => $value]);
 				}
 			}, [])
+			->add('projectId', function(Criteria $criteria, $value, Query $query) {
+				if(!empty($value)) {
+					if(!$query->isJoined("tasks_tasklist", "tasklist") ){
+						$query->join("tasks_tasklist", "tasklist", "task.tasklistId = tasklist.id");
+					}
+					$criteria->where(['tasklist.projectId' => $value]);
+				}
+			})
 			->add('role', function(Criteria $criteria, $value, Query $query) {
-				if(!$query->isJoined("tasks_tasklist", "listsonly") ){
-					$query->join("tasks_tasklist", "listsonly", "task.tasklistId = listsonly.id");
+				if(!$query->isJoined("tasks_tasklist", "tasklist") ){
+					$query->join("tasks_tasklist", "tasklist", "task.tasklistId = tasklist.id");
 				}
 				$criteria->where(['listsonly.role' => $value]);
 			})
@@ -469,8 +490,10 @@ class Task extends AclItemEntity {
 
 		if(isset($sort['tasklist'])) {
 
-			$query->join("tasks_tasklist", "list", "list.id = task.tasklistId");
-			$sort['list.name'] = $sort['tasklist'];
+			if(!$query->isJoined("tasks_tasklist", "tasklist")) {
+				$query->join("tasks_tasklist", "tasklist", "tasklist.id = task.tasklistId");
+			}
+			$sort['tasklist.name'] = $sort['tasklist'];
 
 			unset($sort['tasklist']);
 		}

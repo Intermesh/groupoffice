@@ -17,4 +17,5 @@ TimeEntryDialog.js
 ProjectTaskCombo.js
 TaskLinkDetail.js
 TasklistCombo.js
+TaskCombo.js
 ProgressCombo.js

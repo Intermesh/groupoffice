@@ -1,5 +1,5 @@
 go.modules.community.tasks.TasklistCombo = Ext.extend(go.form.ComboBox, {
-	fieldLabel: t("Tasklist","tasks"),
+	fieldLabel: t("Tasklist"),
 	hiddenName: 'tasklistId',
 	anchor: '100%',
 	emptyText: t("Please select..."),
