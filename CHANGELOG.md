@@ -1,3 +1,5 @@
+- Addressbook: Added index to optimize contact combobox load
+
 15-06-2021 6.5.58
 - Projects: fixed upgrade error
 
