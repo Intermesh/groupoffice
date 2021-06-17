@@ -135,3 +135,8 @@ $updates['202105171220'][] = "create index addressbook_contact_addressBookId_las
 
 $updates['202105171220'][] = "create index addressbook_contact_addressBookId_name_index
 	on addressbook_contact (addressBookId, name);";
+
+
+
+$updates['202106171331'][] = "create index addressbook_contact_isOrganization_index
+	on addressbook_contact (isOrganization);";

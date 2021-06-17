@@ -235,3 +235,7 @@ create index addressbook_contact_addressBookId_lastName_index
 
 create index addressbook_contact_addressBookId_name_index
     on addressbook_contact (addressBookId, name);
+
+
+create index addressbook_contact_isOrganization_index
+    on addressbook_contact (isOrganization);
