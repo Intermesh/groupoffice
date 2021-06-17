@@ -45,8 +45,10 @@ function errorHander($e) {
   {
 		echo "<h1>Fatal error</h1>";
 		echo "<pre>";
-    echo $e->getMessage();		
-		//echo $e->getTraceAsString();
+    echo $e->getMessage();
+	  if(go()->getDebugger()->enabled) {
+		  echo $e->getTraceAsString();
+	  }
 		echo "</pre>";
   }
 }
