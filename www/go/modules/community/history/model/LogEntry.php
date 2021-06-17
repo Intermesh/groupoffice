@@ -188,6 +188,11 @@ class LogEntry extends AclOwnerEntity {
 		return array_flip(self::$actionMap)[$this->action];
 	}
 
+	/**
+	 * Entity name
+	 *
+	 * @return @string
+	 */
 	public function getEntity() {
 		return $this->entity;
 	}
