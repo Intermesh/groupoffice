@@ -140,7 +140,12 @@ $updates['202105171220'][] = "create index addressbook_contact_addressBookId_nam
 
 
 
-$updates['202106041641'][] = "ALTER TABLE `addressbook_user_settings` ADD `lastAddressBookId` INT(11) null;";
+$updates['202106171331'][] = "create index addressbook_contact_isOrganization_index
+	on addressbook_contact (isOrganization);";
 
-$updates['202106041641'][] = "alter table addressbook_user_settings
+
+
+$updates['202106171331'][] = "ALTER TABLE `addressbook_user_settings` ADD `lastAddressBookId` INT(11) null;";
+
+$updates['202106171331'][] = "alter table addressbook_user_settings
 	add startIn enum('allcontacts', 'starred', 'default', 'remember') default 'allcontacts' not null;";

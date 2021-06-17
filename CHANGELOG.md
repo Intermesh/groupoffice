@@ -1,5 +1,16 @@
-- Projects2: Fixed jobs combo in time entry dialog
+17-06-2021 6.5.59
+- Addressbook: Added index to optimize contact combobox load
+- Billing: Fixed findAclId() on bool error on new error when create task was activated
+- History: Only log history log entery failus to system log
+- Core: Custom filter sub sub conditions didn't work.
+
+15-06-2021 6.5.58
+- Projects: fixed upgrade error
+
+15-06-2021 6.5.57
+- Projects: Fixed jobs combo in time entry dialog
 - Core: User field combo doesn't show disabled users anymore.
+- Projects: duplicate and delete recursively
 
 10-06-2021 6.5.56
 - Core: Disk cache didn't work for entries that should live forever and cached

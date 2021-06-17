@@ -107,7 +107,7 @@ class Router {
 			Response::get()->addResponse([
 					'error', $error
 			]);
-		} catch (CoreException $e) {
+		} catch (\Throwable $e) {
 			$error = ["message" => $e->getMessage()];
 			
 			if(go()->getDebugger()->enabled) {

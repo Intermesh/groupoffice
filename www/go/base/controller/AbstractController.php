@@ -435,7 +435,7 @@ abstract class AbstractController extends Observable {
 
 			$this->view->render('Exception', array('response'=>$response));
 		}
-		catch (Exception $e) {
+		catch (\Throwable $e) {
 			
 			GO::debug("EXCEPTION: ".(string) $e);
 			
