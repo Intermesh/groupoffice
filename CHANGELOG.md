@@ -1,5 +1,7 @@
 - Addressbook: Added index to optimize contact combobox load
 - Billing: Fixed findAclId() on bool error on new error when create task was activated
+- History: Only log history log entery failus to system log
+- Core: Custom filter sub sub conditions didn't work.
 
 15-06-2021 6.5.58
 - Projects: fixed upgrade error

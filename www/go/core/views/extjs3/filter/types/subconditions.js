@@ -7,45 +7,14 @@ go.filter.SubConditionsDialog = Ext.extend(go.Window, {
 	initComponent: function () {
 
 		this.items = [{
-			xtype: "fieldset",
-			items: [
-			this.conditionsField = new go.form.FormContainer({
-					xtype: "formcontainer",
-					//name: "filter",
-					hideLabel: true,
-					items: [
-						{
-							xtype: "radiogroup",
-							name: 'operator',
-							value: "AND",
-							items: [{
-								xtype: "radio",
-								inputValue: "AND",
-								boxLabel: t("Match ALL of the conditions")
-							}, {
-								xtype: "radio",
-								inputValue: "OR",
-								boxLabel: t("Match ANY of the conditions")
-							}, {
-								xtype: "radio",
-								inputValue: "NOT",
-								boxLabel: t("Match NONE of the conditions")
-							}]
-						}, {
-							xtype: "filterconditions",
-							name: "conditions",
-							entity: this.entity
-						}
-					]
-			})]
-		}
-		];
+			xtype: "filterfieldset",
+			entity: this.entity
+		}];
 
 		this.buttons = [{
 			text: t("Ok"),
 			handler: function() {
-				console.warn(this.conditionsField.getValue());
-				this.typeCmp.setValue(this.conditionsField.getValue());
+				this.typeCmp.setValue(this.items.itemAt(0).conditionsField.getValue());
 				this.close();
 			},
 			scope: this
@@ -57,7 +26,6 @@ go.filter.SubConditionsDialog = Ext.extend(go.Window, {
 	}
 });
 
-Ext.reg("filterfieldset", go.filter.FieldSet);
 
 
 go.filter.types.subconditions = Ext.extend(Ext.Button, {
@@ -74,7 +42,7 @@ go.filter.types.subconditions = Ext.extend(Ext.Button, {
 			typeCmp: this
 		});
 
-		dlg.conditionsField.setValue(this.value);
+		dlg.items.itemAt(0).conditionsField.setValue(this.value);
 		dlg.show();
 
 	},
