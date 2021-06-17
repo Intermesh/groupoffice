@@ -57,6 +57,11 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 	collapseOnSelect: true,
 
+	/**
+	 * Group on this field
+	 */
+	groupField: false,
+
 	// private
 	onSelect : function(record, index){
 		if(this.fireEvent('beforeselect', this, record, index) !== false){
@@ -71,8 +76,16 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 	preInitComp : function() {
 		if(!this.tpl) {
 			this.tpl =
-				'<tpl for=".">'+
-				'<div class="x-combo-list-item" title="{[fm.htmlEncode(values[\'' + this.displayField + '\'] || \'\' )]}">';
+				'<tpl for=".">';
+				if(this.groupField) {
+					this.tpl += '<tpl>{[this.resetCurrentKey()]}</tpl>'+
+					'<tpl for=".">'+
+					'<tpl if="this.shouldShowHeader(go.util.Object.fetchPath(values, \'' + this.groupField + '\'))">' +
+					'<div class="x-combo-list-group">{[this.showHeader(go.util.Object.fetchPath(values, \'' + this.groupField + '\'))]}</div>' +
+					'</tpl>' ;
+				}
+
+			this.tpl +=	'<div class="x-combo-list-item" title="{[fm.htmlEncode(values[\'' + this.displayField + '\'] || \'\' )]}">';
 
 			if(this.allowNew) {
 				this.tpl += '<tpl if="!values.' + this.valueField + '"><b>' + t("Create new") + ':</b> </tpl>';
@@ -81,6 +94,24 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 			this.tpl += '{[fm.htmlEncode(values["' + this.displayField + '"] || "" )]}</div>';
 
 			this.tpl +=	'</tpl>';
+
+
+			if(this.groupField) {
+				this.tpl = new Ext.XTemplate( this.tpl, {
+					shouldShowHeader: function(header){
+						console.warn(header);
+						return this.currentKey !== header;
+					},
+					showHeader: function(header){
+						this.currentKey = header;
+						return this.currentKey;
+					},
+					resetCurrentKey: function() {
+						this.currentKey=null;
+						return '';
+					}
+				});
+			}
 		}
 	},
 
