@@ -64,8 +64,11 @@ $updates['201911061630'][] = function(){
 
 $updates['202101011630'][] = "ALTER TABLE `tasks_task` CHANGE COLUMN `description` `description` TEXT NULL DEFAULT '';";
 $updates['202104301506'][] = function() {
-	$m = new Migrator();
-	$m->job2task();
+
+	if(\go\core\model\Module::isInstalled('legacy', 'projects2')) {
+		$m = new Migrator();
+		$m->job2task();
+	}
 };
 
 $updates['202105211543'][] = "ALTER TABLE `tasks_task`  ADD `progressChange` TINYINT(2) NULL";
