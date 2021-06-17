@@ -295,12 +295,10 @@ abstract class EntityController extends Controller {
 		$transformed = [];
 
 		foreach ($sort as $s) {
-			if(is_array($s) && isset($s['property'])) {
-				$transformed[$s['property']] = (isset($s['isAscending']) && $s['isAscending']===false) ? 'DESC' : 'ASC';
-			} else { // for backward compatibility
-				$parts = explode(' ', $s);
-				$transformed[$parts[0]] = $parts[1] ?? 'ASC';
+			if(!isset($s['property'])) {
+				throw new Exception("'sort' parameter is invalid.");
 			}
+			$transformed[$s['property']] = (isset($s['isAscending']) && $s['isAscending']===false) ? 'DESC' : 'ASC';
 		}
 		
 		return $transformed;		
