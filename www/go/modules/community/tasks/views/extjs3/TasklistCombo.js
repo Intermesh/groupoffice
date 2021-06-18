@@ -22,3 +22,5 @@ go.modules.community.tasks.TasklistCombo = Ext.extend(go.form.ComboBox, {
 		}
 	}
 });
+
+Ext.reg('tasklistcombo', go.modules.community.tasks.TasklistCombo );

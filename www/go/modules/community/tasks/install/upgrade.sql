@@ -291,6 +291,18 @@ INSERT INTO tasks_task_category (taskId,categoryId)
 INSERT INTO tasks_alert (taskId, userId, `when`)
     SELECT id,reminder,user_id FROM ta_tasks;
 
+create table if not exists tasks_user_settings
+(
+    userId int null,
+    defaultTasklistId int null,
+    rememberLastItems tinyint null,
+    lastTasklistIds varchar(255) null,
+    constraint tasks_user_settings_pk
+        primary key (userId),
+    constraint tasks_user_settings_core_user_id_fk
+        foreign key (userId) references core_user (id)
+            on update cascade
+);
 
 
 

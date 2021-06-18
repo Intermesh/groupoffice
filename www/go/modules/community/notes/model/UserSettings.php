@@ -4,9 +4,7 @@ namespace go\modules\community\notes\model;
 
 use go\core\model\User;
 use go\core\orm\Property;
-use go\modules\community\Notebook\model\Settings as AddresBookModuleSettings;
 use go\core\model;
-use go\core\model\Acl;
 
 class UserSettings extends Property {
 

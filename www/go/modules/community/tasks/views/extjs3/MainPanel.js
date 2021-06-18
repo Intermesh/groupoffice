@@ -68,7 +68,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						this.createFilterPanel()
 					]
 				},
-				this.tasklistsGrid,
+				this.tasklistsGrid
 
 			]
 		});
@@ -93,29 +93,35 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		];
 
 		go.modules.community.tasks.MainPanel.superclass.initComponent.call(this);
+
 		this.on("afterrender", this.runModule, this);
 	},
 	
 	runModule : function() {
 		this.categoriesGrid.store.load();
 
-
 		this.filterPanel.on("afterrender", () => {
 			this.filterPanel.selectRange(0,0);
 			this.setStatusFilter("today");
 			this.filterPanel.on("selectionchange", this.onStatusSelectionChange, this);
+
+			this.setDefaultSelection();
+			this.tasklistsGrid.store.load();
+			this.taskGrid.store.load();
 		});
 
+	},
 
-		//load task lists and select the first
-		this.tasklistsGrid.getStore().load({
-			callback: function (store) {
+	setDefaultSelection : function() {
+		let selectedListIds = [];
+		if(go.User.tasksSettings.rememberLastItems && go.User.tasksSettings.lastTasklistIds) {
+			selectedListIds = go.User.tasksSettings.lastTasklistIds;
+		}
+		if(!selectedListIds.length && go.User.tasksSettings.defaultTasklistId) {
+			selectedListIds.push(go.User.tasksSettings.defaultTasklistId);
+		}
 
-				//todo load from settings (Joachims project must be done)
-				this.tasklistsGrid.getSelectionModel().selectRow(0);
-			},
-			scope: this
-		});
+		this.tasklistsGrid.setDefaultSelection(selectedListIds);
 	},
 
 	onStatusSelectionChange: function(view, nodes) {
@@ -258,6 +264,9 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			region: "south",
 			height: dp(300),
 
+			filteredStore: this.taskGrid.store,
+			filterName: 'tasklistId',
+
 			split: true,
 			tbar: [{
 					xtype: 'tbtitle',
@@ -282,7 +291,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			}
 		});
 
-		this.tasklistsGrid.getSelectionModel().on('selectionchange', this.onTasklistSelectionChange, this, {buffer: 1}); //add buffer because it clears selection first
+		this.tasklistsGrid.on('selectionchange', this.onTasklistSelectionChange, this, {buffer: 1}); //add buffer because it clears selection first
 	},
 	checkValues: function() {
 		if(this.taskDateField.getValue() != null && this.taskNameTextField.getValue() != "") {
@@ -464,26 +473,30 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	},
 
-	onTasklistSelectionChange : function (sm) {
-		var ids = [];
+	onTasklistSelectionChange : function (ids, sm) {
 
 		this.addTasklistId = false;
 
 		Ext.each(sm.getSelections(), function (r) {
-			ids.push(r.id);
 			if (!this.addTasklistId && r.json.permissionLevel >= go.permissionLevels.write) {
-			// is dit goed? r.get('permissionLevel')
-			// if (!this.addTasklistId && r.get('permissionLevel') >= go.permissionLevels.write) {
 				this.addTasklistId = r.id;
 			}
 		}, this);
 
 		this.addButton.setDisabled(!this.addTasklistId);
 		this.addTaskButton.setDisabled(!this.addTasklistId)
-		this.taskGrid.store.setFilter("tasklist", {tasklistId: ids});
+
 		this.taskGrid.store.setFilter("role", ids.length == 0 ? {role:  go.modules.community.tasks.listTypes.List} : null);
-		this.taskGrid.store.load();
-		this.categoriesGrid.store.load();
+
+		if(go.User.tasksSettings.rememberLastItems && go.User.tasksSettings.lastTasklistIds.join(",") != ids.join(",")) {
+
+			go.Db.store("User").save({
+				tasksSettings: {
+					lastTasklistIds: ids
+				}
+			}, go.User.id);
+
+		}
 	},
 	onCategorySelectionChange : function (sm) {
 		var ids = [];

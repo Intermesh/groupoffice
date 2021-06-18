@@ -268,3 +268,17 @@ CREATE TABLE IF NOT EXISTS `tasks_default_alert` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
+
+
+create table tasks_user_settings
+(
+    userId int null,
+    defaultTasklistId int null,
+    rememberLastItems tinyint null,
+    lastTasklistIds varchar(255) null,
+    constraint tasks_user_settings_pk
+        primary key (userId),
+    constraint tasks_user_settings_core_user_id_fk
+        foreign key (userId) references core_user (id)
+            on update cascade
+);

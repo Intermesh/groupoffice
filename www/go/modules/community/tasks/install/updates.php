@@ -97,3 +97,17 @@ $updates['202106011409'][] = "ALTER TABLE `tasks_task` ADD COLUMN IF NOT EXISTS 
 
 $updates['202106101432'][] = "alter table tasks_tasklist
 	add projectId int null;";
+
+$updates['202106181401'][] = "create table if not exists tasks_user_settings
+(
+    userId int null,
+    defaultTasklistId int null,
+    rememberLastItems tinyint null,
+    lastTasklistIds varchar(255) null,
+    constraint tasks_user_settings_pk
+        primary key (userId),
+    constraint tasks_user_settings_core_user_id_fk
+        foreign key (userId) references core_user (id)
+            on update cascade
+);
+";
