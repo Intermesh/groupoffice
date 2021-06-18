@@ -1,3 +1,5 @@
+- Tickets / Projects: Entity names of Type could conflict in database
+
 17-06-2021 6.5.59
 - Addressbook: Added index to optimize contact combobox load
 - Billing: Fixed findAclId() on bool error on new error when create task was activated
