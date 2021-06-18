@@ -46855,7 +46855,7 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
 
     
     syncHeaderScroll : function() {
-console.warn('sync');
+
         var innerHd    = this.innerHd,
             scrollLeft = this.scroller.dom.scrollLeft;
         
