@@ -232,6 +232,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	createCategoriesGrid: function() {
 		this.categoriesGrid = new go.modules.community.tasks.CategoriesGrid({
+			filterName: "categories",
+			filteredStore: this.taskGrid.store,
 			autoHeight: true,
 			split: true,
 			tbar: [{
@@ -257,8 +259,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			}
 		});
 
-		this.categoriesGrid.getSelectionModel().on('selectionchange', this.onCategorySelectionChange, this, {buffer: 1}); //add buffer because it clears selection first
 	},
+
 	createTasklistGrid : function() {
 		this.tasklistsGrid = new go.modules.community.tasks.TasklistsGrid({
 			region: "south",
@@ -498,23 +500,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		}
 	},
-	onCategorySelectionChange : function (sm) {
-		var ids = [];
 
-		this.categoryId = false;
-
-		Ext.each(sm.getSelections(), function (r) {
-			ids.push(r.id);
-			if (!this.addTasklistId && r.json.permissionLevel >= go.permissionLevels.write) {
-			// is dit goed? r.get('permissionLevel')
-			// if (!this.addTasklistId && r.get('permissionLevel') >= go.permissionLevels.write) {
-				this.categoryId = r.id;
-			}
-		}, this);
-		this.taskGrid.store.setFilter("categories", {categories: ids});
-		this.taskGrid.store.load();
-		this.categoriesGrid.store.load();
-	},
 	
 	onTaskGridDblClick : function (grid, rowIndex, e) {
 

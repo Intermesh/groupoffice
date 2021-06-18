@@ -52,6 +52,7 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 		go.NavGrid.superclass.initComponent.call(this);
 
 		this.store.on("load", this.onStoreLoad, this);
+		this.store.on("datachanged", this.onStoreDataChanged, this);
 		this.getSelectionModel().on('selectionchange', this.onSelectionChange, this, {buffer: 1}); //add buffer because it clears selection first
 	},
 
@@ -59,12 +60,22 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 		this.filteredStore.setFilter(this.getId(), {[this.filterName]: selectedListIds});
 	},
 
+	onStoreDataChanged : function() {
+		this.selectAllToolbar.setVisible(this.store.getCount() > 1);
+	},
+
 	onStoreLoad: function(store, records, opts) {
 
-		this.selectAllToolbar.setVisible(this.store.getCount() > 1);
-
 		//mark selected records in the filter as seleted in the selection model
-		let selected = [], filter = this.filteredStore.getFilter(this.getId())[this.filterName];
+		let selected = [], filter = this.filteredStore.getFilter(this.getId());
+
+		if(filter) {
+			filter = filter[this.filterName] || [];
+		} else
+		{
+			filter = [];
+		}
+
 		records.forEach((record) => {
 			if(filter.indexOf(record.id) > -1) {
 				selected.push(record);
@@ -128,7 +139,7 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 		}
 
 		this.moreMenu.record = record;
-		this.fireEvent('beforeshowmenu', this, this.moreMenu, record);
+		this.fireEvent('beforeshowmenu', this.moreMenu, record);
 
 		this.moreMenu.showAt(e.getXY());
 	}
