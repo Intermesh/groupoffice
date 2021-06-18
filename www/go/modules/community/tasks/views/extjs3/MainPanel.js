@@ -106,6 +106,9 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			this.filterPanel.on("selectionchange", this.onStatusSelectionChange, this);
 
 			this.setDefaultSelection();
+
+
+
 			this.tasklistsGrid.store.load();
 			this.taskGrid.store.load();
 		});
@@ -121,7 +124,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			selectedListIds.push(go.User.tasksSettings.defaultTasklistId);
 		}
 
-		this.tasklistsGrid.setDefaultSelection(selectedListIds);
+		this.tasklistsGrid.setDefaultSelection(selectedListIds)
+		this.checkCreateTaskList();
 	},
 
 	onStatusSelectionChange: function(view, nodes) {
@@ -293,7 +297,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			}
 		});
 
-		this.tasklistsGrid.on('selectionchange', this.onTasklistSelectionChange, this, {buffer: 1}); //add buffer because it clears selection first
+		this.tasklistsGrid.on('selectionchange', this.onTasklistSelectionChange, this); //add buffer because it clears selection first
 	},
 	checkValues: function() {
 		if(this.taskDateField.getValue() != null && this.taskNameTextField.getValue() != "") {
@@ -477,16 +481,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	onTasklistSelectionChange : function (ids, sm) {
 
-		this.addTasklistId = false;
-
-		Ext.each(sm.getSelections(), function (r) {
-			if (!this.addTasklistId && r.json.permissionLevel >= go.permissionLevels.write) {
-				this.addTasklistId = r.id;
-			}
-		}, this);
-
-		this.addButton.setDisabled(!this.addTasklistId);
-		this.addTaskButton.setDisabled(!this.addTasklistId)
+		this.checkCreateTaskList();
 
 		this.taskGrid.store.setFilter("role", ids.length == 0 ? {role:  go.modules.community.tasks.listTypes.List} : null);
 
@@ -499,6 +494,23 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			}, go.User.id);
 
 		}
+	},
+
+	checkCreateTaskList: function() {
+
+		this.addTasklistId = false;
+
+		go.Db.store("Tasklist").get(this.tasklistsGrid.getSelectedIds()).then((result) => {
+
+			result.entities.forEach((tasklist) => {
+				if (!this.addTasklistId && tasklist.permissionLevel >= go.permissionLevels.write) {
+					this.addTasklistId = tasklist.id;
+				}
+			});
+
+			this.addButton.setDisabled(!this.addTasklistId);
+			this.addTaskButton.setDisabled(!this.addTasklistId)
+		});
 	},
 
 	

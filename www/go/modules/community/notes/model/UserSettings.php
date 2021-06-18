@@ -5,6 +5,7 @@ namespace go\modules\community\notes\model;
 use go\core\model\User;
 use go\core\orm\Property;
 use go\core\model;
+use go\core\util\JSON;
 
 class UserSettings extends Property {
 
@@ -82,8 +83,8 @@ class UserSettings extends Property {
 	 */
 	public function getLastNoteBookIds(): array
 	{
-		if (strlen($this->lastNoteBookIds)) {
-			return explode(',', $this->lastNoteBookIds);
+		if (!empty($this->lastNoteBookIds)) {
+			return JSON::decode($this->lastNoteBookIds);
 		}
 		return [$this->getDefaultNoteBookId()]; // The default notebook id makes sense in this case
 	}
@@ -93,10 +94,7 @@ class UserSettings extends Property {
 	 */
 	public function setLastNoteBookIds(?array $ids = null)
 	{
-		if (is_array($ids) && count($ids) > 0) {
-			$this->lastNoteBookIds = implode(',', $ids);
-		} else {
-			$this->lastNoteBookIds = '';
-		}
+		$this->lastNoteBookIds = JSON::encode($ids);
+
 	}
 }

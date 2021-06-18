@@ -1,10 +1,14 @@
-
-
+/**
+ * Navigation grid
+ *
+ * See go.modules.community.tasks.TasklistsGrid for an example
+ */
 go.NavGrid = Ext.extend(go.grid.GridPanel,{
 	viewConfig: {
 		scrollOffset: 0,
 		forceFit: true,
-		autoFill: true
+		autoFill: true,
+		totalDisplay: false
 	},
 	multiSelectToolbarEnabled : false,
 	hideHeaders: true,
@@ -60,6 +64,14 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 		this.filteredStore.setFilter(this.getId(), {[this.filterName]: selectedListIds});
 	},
 
+	getSelectedIds: function() {
+		const f = this.filteredStore.getFilter(this.getId());
+		if(!f) {
+			return [];
+		}
+		return f[this.filterName] || [];
+	},
+
 	onStoreDataChanged : function() {
 		this.selectAllToolbar.setVisible(this.store.getCount() > 1);
 	},
@@ -67,17 +79,10 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 	onStoreLoad: function(store, records, opts) {
 
 		//mark selected records in the filter as seleted in the selection model
-		let selected = [], filter = this.filteredStore.getFilter(this.getId());
-
-		if(filter) {
-			filter = filter[this.filterName] || [];
-		} else
-		{
-			filter = [];
-		}
+		let selected = [], selectedIds = this.getSelectedIds();
 
 		records.forEach((record) => {
-			if(filter.indexOf(record.id) > -1) {
+			if(selectedIds.indexOf(record.id) > -1) {
 				selected.push(record);
 			}
 		});
