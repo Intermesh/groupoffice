@@ -92,19 +92,21 @@ abstract class EntityController extends Controller {
 		
 		/* @var $query Query */
 
-		$sort = $this->transformSort($params['sort']);		
-
-		if(!empty($query->getGroupBy())) {
-			//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)		
-			$keys = $cls::getPrimaryKey();
-			foreach($keys as $key) {
-				if(!isset($sort[$key])) {
-					$sort[$key] = 'ASC';
-				}
-			}
-		}
+		$sort = $this->transformSort($params['sort']);
 		
 		$cls::sort($query, $sort);
+
+		if(!empty($query->getGroupBy())) {
+			//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)
+			$keys = $cls::getPrimaryKey();
+			$pkSort = [];
+			foreach($keys as $key) {
+				if(!isset($sort[$key])) {
+					$pkSort[$key] = 'ASC';
+				}
+			}
+			$query->orderBy($pkSort, true);
+		}
 
 		$query->select($cls::getPrimaryKey(true)); //only select primary key
 
