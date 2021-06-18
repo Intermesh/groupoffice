@@ -5,6 +5,7 @@ go.modules.community.tasks.CategoriesGrid = Ext.extend(go.grid.GridPanel, {
 		autoFill: true
 	},
 	hideHeaders: true,
+	multiSelectToolbarEnabled : false,
 	initComponent: function () {
 
 		var actions = this.initRowActions();
@@ -18,8 +19,9 @@ go.modules.community.tasks.CategoriesGrid = Ext.extend(go.grid.GridPanel, {
 					items: this.tbar, 
 					xtype: 'toolbar'
 				},
-				new Ext.Toolbar({
-					items:[{xtype: "selectallcheckbox"}]
+				this.selectAllToolbar = new Ext.Toolbar({
+					items:[{xtype: "selectallcheckbox"}],
+					hidden: true
 				})
 			]
 		};
@@ -53,6 +55,10 @@ go.modules.community.tasks.CategoriesGrid = Ext.extend(go.grid.GridPanel, {
 		});
 
 		go.modules.community.tasks.CategoriesGrid.superclass.initComponent.call(this);
+
+		this.store.on("load", () => {
+			this.selectAllToolbar.setVisible(this.store.getCount() > 1);
+		});
 	},
 
 	initRowActions: function () {

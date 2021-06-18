@@ -189,7 +189,7 @@ class Task extends AclItemEntity {
 			$mapping->setQuery((new \go\core\db\Query())
 				->join('pr2_hours', 'prh', 'prh.task_id = task.id', 'left')
 				->select('COALESCE(SUM(prh.duration), 0) AS hoursBooked')
-				->groupBy(['prh.task_id'])
+				->groupBy(['task.id'])
 			);
 		}
 

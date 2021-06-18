@@ -257,7 +257,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.tasklistsGrid = new go.modules.community.tasks.TasklistsGrid({
 			region: "south",
 			height: dp(300),
-			multiSelectToolbarEnabled : false,
+
 			split: true,
 			tbar: [{
 					xtype: 'tbtitle',

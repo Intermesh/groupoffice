@@ -4,6 +4,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.grid.GridPanel, {
 		forceFit: true,
 		autoFill: true
 	},
+	multiSelectToolbarEnabled : false,
 	hideHeaders: true,
 	initComponent: function () {
 
@@ -54,7 +55,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.grid.GridPanel, {
 			],
 
 			stateful: true,
-			stateId: 'note-books-grid'
+			stateId: 'task-lists-grid'
 		});
 
 		go.modules.community.tasks.TasklistsGrid.superclass.initComponent.call(this);
