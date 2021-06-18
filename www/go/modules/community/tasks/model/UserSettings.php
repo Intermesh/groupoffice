@@ -3,6 +3,7 @@
 namespace go\modules\community\tasks\model;
 
 use go\core\model\User;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Property;
 use go\core\model;
 use go\core\util\JSON;
@@ -55,7 +56,7 @@ class UserSettings extends Property {
 			$tasklist->createdBy = $this->userId;
 			$tasklist->name = User::findById($this->userId, ['displayName'])->displayName;
 			if(!$tasklist->save()) {
-				throw new \Exception("Could not create default Note book");
+				throw new SaveException($tasklist);
 			}
 		}
 

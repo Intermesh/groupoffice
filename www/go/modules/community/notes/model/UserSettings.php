@@ -3,6 +3,7 @@
 namespace go\modules\community\notes\model;
 
 use go\core\model\User;
+use go\core\orm\exception\SaveException;
 use go\core\orm\Property;
 use go\core\model;
 use go\core\util\JSON;
@@ -49,19 +50,15 @@ class UserSettings extends Property {
 			return null;
 		}
 
-		// if(AddresBookModuleSettings::get()->createPersonalNoteBooks){
-			$noteBook = NoteBook::find()->where('createdBy', '=', $this->userId)->single();
-			if(!$noteBook) {
-				$noteBook = new NoteBook();
-				$noteBook->createdBy = $this->userId;
-				$noteBook->name = User::findById($this->userId, ['displayName'])->displayName;
-				if(!$noteBook->save()) {
-					throw new \Exception("Could not create default Note book");
-				}
+		$noteBook = NoteBook::find()->where('createdBy', '=', $this->userId)->single();
+		if(!$noteBook) {
+			$noteBook = new NoteBook();
+			$noteBook->createdBy = $this->userId;
+			$noteBook->name = User::findById($this->userId, ['displayName'])->displayName;
+			if(!$noteBook->save()) {
+				throw new SaveException($noteBook);
 			}
-		// } else {
-		// 	$noteBook = NoteBook::find(['id'])->filter(['permissionLevel' => Acl::LEVEL_WRITE, 'permissionLevelUserId' => $this->userId])->single();			
-		// }
+		}
 
 		if($noteBook) {
 			$this->defaultNoteBookId = $noteBook->id;
