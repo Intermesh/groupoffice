@@ -2197,16 +2197,16 @@ table[id^="comments-ext"] b {
 }
 
 
-.go-user-settings-dlg {
-	.x-panel-header-text {
-		@extend %font-subheading;
-	}
-	.x-toolbar {
-		.xtb-title {
-			@extend %font-subheading;
-		}
-	}
-}
+//.go-user-settings-dlg {
+//	.x-panel-header-text {
+//		@extend %font-subheading;
+//	}
+//	.x-toolbar {
+//		.xtb-title {
+//			@extend %font-subheading;
+//		}
+//	}
+//}
 
 .x-dd-over {
 	position:relative;
@@ -2428,5 +2428,11 @@ body.go-compact {
 	> div { // indicator
 		background-color:$cPrimary;
 		height:100%;
+	}
+}
+
+.go-multiselect-field {
+	.x-toolbar-left {
+		padding-left: dp(4);
 	}
 }
