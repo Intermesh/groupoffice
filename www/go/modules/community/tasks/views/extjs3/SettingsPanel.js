@@ -2,7 +2,7 @@
 
 go.modules.community.tasks.SettingsPanel = Ext.extend(Ext.Panel, {
 	title: t("Tasks"),
-	iconCls: 'ic-todo',
+	iconCls: 'ic-check',
 	labelWidth: 125,
 	layout: "form",
 	initComponent: function () {

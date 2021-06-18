@@ -91,7 +91,9 @@
 					go.Notifier.msg(panelCfg);
 				});
 
-			});
+			}).catch((reason) => {
+				console.warn("Alert for unknown entity", reason);
+			})
 		}
 	})
 

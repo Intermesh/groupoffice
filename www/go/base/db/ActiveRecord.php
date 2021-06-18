@@ -5624,4 +5624,14 @@ abstract class ActiveRecord extends \GO\Base\Model{
 			'userId' => $userId ?? go()->getAuthState()->getUserId()
 		]);
 	}
+
+	/**
+	 * Called when reminders are deleted / dismissed
+	 *
+	 *
+	 * @param Alert[] $alerts
+	 */
+	public static function dismissAlerts(array $alerts) {
+
+	}
 }
