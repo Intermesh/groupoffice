@@ -67,6 +67,7 @@ modules/ModulePanel.js
 
 SearchField.js
 NavMenu.js
+NavGrid.js
 Notifier.js
 
 toolbar/SearchButton.js
