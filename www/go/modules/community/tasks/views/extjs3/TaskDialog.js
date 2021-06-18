@@ -49,7 +49,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 							labelAlign:'top'
 						},
 						items:[
-							{columnWidth: .35, items:[{
+							{
+								columnWidth: .35,
+								items:[{
 									xtype:'datefield',
 									name : 'start',
 									itemId: 'start',
@@ -75,41 +77,29 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 										},
 										scope : this
 									}
-								}]},
-							{columnWidth: .35, items:[
-								// new go.form.ComboBox({
-								// 	hiddenName : 'status',
-								// 	triggerAction : 'all',
-								// 	editable : false,
-								// 	selectOnFocus : true,
-								// 	forceSelection : true,
-								// 	fieldLabel : t("Status"),
-								// 	mode : 'local',
-								// 	width:dp(150),
-								// 	value : 'confirmed',
-								// 	valueField : 'value',
-								// 	displayField : 'text',
-								// 	store : new Ext.data.SimpleStore({
-								// 		fields : ['value', 'text'],
-								// 		data : [
-								// 			['confirmed', t("Confirmed")],
-								// 			['cancelled', t("Cancelled")],
-								// 			['tentative', t("Tentative")]]
-								// 	})
-								// }),
+								}]
+							},
+							{
+								columnWidth: .35,
+								items:[
 									new go.modules.community.tasks.ProgressCombo ({
 										width:dp(150),
 
 										value : 'needs-action'
 									})
-									,new go.users.UserCombo({
-										fieldLabel: t('Responsible'),
-										hiddenName: 'responsibleUserId',
-										anchor:'90%',
-										allowBlank: true
-								})
-								]},
-							{columnWidth: .3, items:[{
+									,
+									{
+										name: "estimatedDuration",
+										xtype: "numberfield",
+										width:dp(150),
+										fieldLabel: t("Estimated duration")
+									}
+
+								]
+							},
+							{
+								columnWidth: .3,
+								items:[{
 									xtype:'combo',
 									name: 'priority_text',
 									hiddenName: 'priority',
@@ -150,6 +140,12 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 								]}
 						]
 					},
+					new go.users.UserCombo({
+						fieldLabel: t('Responsible'),
+						hiddenName: 'responsibleUserId',
+						anchor:'100%',
+						allowBlank: true
+					}),
 					this.recurrenceField = new go.form.RecurrenceField({
 						name: 'recurrenceRule',
 						hidden: this.hideRecurrence,

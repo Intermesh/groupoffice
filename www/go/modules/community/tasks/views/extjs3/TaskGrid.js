@@ -1,4 +1,9 @@
 go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
+	autoExpandColumn: 'title',
+	// config options for stateful behavior
+	stateful: true,
+	stateId: 'tasks-grid',
+
 	initComponent: function () {
 
 		this.store = new go.data.GroupingStore({
@@ -23,7 +28,9 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					convert: function(v, data) {
 						return data.progress == 'completed';
 					}
-				}
+				},
+				'estimatedDuration',
+				'hoursBooked'
 			],
 			entityStore: "Task"
 		});
@@ -68,8 +75,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 			return go.util.Format.date(v);
 		};
 
-		Ext.apply(this, {
-			columns: [
+		this.columns = [
 				this.checkColumn,
 				{
 					id: 'id',
@@ -201,15 +207,36 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					},
 					hidden: true
 				}
-			],
-			// viewConfig: {
-			// 	emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>'
-			// },
-			autoExpandColumn: 'title',
-			// config options for stateful behavior
-			stateful: true,
-			stateId: 'tasks-grid'
-		});
+			];
+
+		if(this.forProject) {
+			this.columns.push({
+					header: t("Estimated duration", ),
+					dataIndex: 'estimatedDuration',
+					width: dp(64),
+					renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
+						if(parseInt(value) > 0) {
+							return go.util.Format.duration(value * 60);
+						}
+						return '';
+					}
+				},
+				{
+					header: t("Hours booked", "tasks", 'community'),
+					dataIndex: 'hoursBooked',
+					width: dp(72),
+					renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
+						if(parseInt(value) > 0) {
+							var v = parseInt(value);
+							if(parseInt(record.data.estimatedDuration) > 0 && v > parseInt(record.data.estimatedDuration) ) {
+								metaData.css = 'projects-late';
+							}
+							return go.util.Format.duration(v);
+						}
+						return '';
+					}
+				});
+		}
 
 		if(!this.view) {
 			this.view = new go.grid.GroupingView({

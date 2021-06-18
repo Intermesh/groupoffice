@@ -185,9 +185,12 @@ class Task extends AclItemEntity {
 			->addMap('group', TasklistGroup::class, ['groupId' => 'id'])
 			->addScalar('categories', 'tasks_task_category', ['id' => 'taskId']);
 
-		if(Module::isInstalled("legacy", "projects")) {
-			$mapping->getQuery()->select('COALESCE(SUM(prh.duration), 0) AS hoursBooked')
-				->groupBy(['prh.task_id']);
+		if(Module::isInstalled("legacy", "projects2")) {
+			$mapping->setQuery((new \go\core\db\Query())
+				->join('pr2_hours', 'prh', 'prh.task_id = task.id', 'left')
+				->select('COALESCE(SUM(prh.duration), 0) AS hoursBooked')
+				->groupBy(['prh.task_id'])
+			);
 		}
 
 		return $mapping;

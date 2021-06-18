@@ -11,10 +11,7 @@ TaskDialog.js
 AlertFields.js
 ChooseTasklistDialog.js
 ChooseTasklistGrid.js
-ProjectTaskGrid.js
 TasklistGroupDialog.js
-TimeEntryDialog.js
-ProjectTaskCombo.js
 TaskLinkDetail.js
 TasklistCombo.js
 TaskCombo.js
