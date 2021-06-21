@@ -1,5 +1,6 @@
 - Tickets / Projects: Entity names of Type could conflict in database
 - Core: Fixed horizontal scrolling in grids with autoHeight: true
+- Tickets : Type combobox HTML entities render correctly now
 
 17-06-2021 6.5.59
 - Addressbook: Added index to optimize contact combobox load
