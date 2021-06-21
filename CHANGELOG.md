@@ -1,3 +1,5 @@
+- Calendar: hide custom fieldset data in details when no read permissions (Github #704)
+
 17-06-2021 6.5.60
 - Tickets / Projects: Entity names of Type could conflict in database
 - Core: Fixed horizontal scrolling in grids with autoHeight: true
