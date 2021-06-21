@@ -134,6 +134,14 @@ class EntityType implements \go\core\data\ArrayableInterface {
 
 			return $e;
 		}
+
+		if(go()->getDebugger()->enabled) {
+			//do extra check if entity type belongs to the module
+			$module = Module::findByClass($className);
+			if($c['models'][$c['name'][$clientName]]->moduleId != $module->id) {
+				throw new Exception("Entity $className conflicts with : " .$c['models'][$c['name'][$clientName]]->getClassName() .". Please return unique client name with getClientName()");
+			}
+		}
 		return $c['models'][$c['name'][$clientName]] ?? false;
 	}
 
