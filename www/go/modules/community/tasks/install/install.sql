@@ -66,13 +66,15 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   INDEX `tasks_vcalendar_blob_idx` (`vcalendarBlobId` ASC),
   CONSTRAINT `fkModifiedBy`
     FOREIGN KEY (`modifiedBy`)
-    REFERENCES `core_user` (`id`),
+    REFERENCES `core_user` (`id`)
+    ON DELETE SET NULL,
   CONSTRAINT `tasks_task_ibfk_1`
     FOREIGN KEY (`tasklistId`)
-    REFERENCES `tasks_tasklist` (`id`),
+    REFERENCES `tasks_tasklist` (`id`) on delete cascade,
   CONSTRAINT `tasks_task_ibfk_2`
     FOREIGN KEY (`createdBy`)
-    REFERENCES `core_user` (`id`),
+    REFERENCES `core_user` (`id`)
+    ON DELETE SET NULL,
   CONSTRAINT `tasks_task_groupId`
     FOREIGN KEY (`groupId`)
     REFERENCES `tasks_tasklist_group` (`id`)
@@ -81,13 +83,16 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
   CONSTRAINT `tasks_vcalendar_blob`
     FOREIGN KEY (`vcalendarBlobId`)
     REFERENCES `core_blob` (`id`)
-    ON DELETE SET NULL
+    ON DELETE RESTRICT
     ON UPDATE SET NULL)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
-
+alter table tasks_task
+    add constraint tasks_task_ibfk_1
+        foreign key (tasklistId) references tasks_tasklist (id)
+            on update cascade;
 
 -- -----------------------------------------------------
 -- Table `tasks_task_user`

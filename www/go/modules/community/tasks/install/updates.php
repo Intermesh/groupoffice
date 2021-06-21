@@ -95,3 +95,11 @@ $updates['202106181401'][] = "create table if not exists tasks_user_settings
             on update cascade
 );
 ";
+
+
+$updates['202106181401'][] = "alter table tasks_task drop foreign key tasks_task_ibfk_1;";
+
+$updates['202106181401'][] = "alter table tasks_task
+	add constraint tasks_task_ibfk_1
+		foreign key (tasklistId) references tasks_tasklist (id)
+			on DELETE cascade;";
