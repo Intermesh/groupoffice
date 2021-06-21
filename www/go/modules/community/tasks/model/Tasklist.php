@@ -40,7 +40,7 @@ class Tasklist extends AclOwnerEntity
 	protected $role;
 
 	public function getRole() {
-		return self::Roles[$this->role];
+		return self::Roles[$this->role] ?? 'list';
 	}
 
 	public function setRole($value) {
