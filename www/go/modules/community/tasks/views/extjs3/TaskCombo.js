@@ -11,7 +11,7 @@ go.modules.community.tasks.TaskCombo = Ext.extend(go.form.ComboBox, {
 	editable: true,
 	selectOnFocus: true,
 	forceSelection: true,
-	allowBlank: false,
+	allowBlank: true,
 	store: {
 		xtype: "gostore",
 		fields: ['id', 'title', {name: "tasklist", type: "relation"}],

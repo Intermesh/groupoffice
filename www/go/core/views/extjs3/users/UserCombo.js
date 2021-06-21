@@ -22,7 +22,7 @@
 				}
 			}
 		},
-		tpl: new Ext.XTemplate('<tpl for=".">\
+		tpl: '<tpl for=".">\
 			<div class="x-combo-list-item">\
 				<div class="user">\
 					 <tpl if="!avatarId"><div class="avatar"></div></tpl>\
@@ -32,7 +32,12 @@
 					 </div>\
 				 </div>\
 			 </div>\
-			</tpl>')
+			</tpl>',
+
+		initComponent: function() {
+			this.value = go.User.id;
+			this.supr().initComponent.call(this);
+		}
 	};
 
 	go.users.UserCombo = Ext.extend(go.form.ComboBox, cfg);
