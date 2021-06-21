@@ -150,7 +150,7 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 								if(!Ext.isEmpty(value)) {
 									var strRawValue = ""
 
-									var reConditions=/(={1,2}|<|>)/,reAdjuncts=/\ (AND|OR)\ /;
+									var reConditions=/(={1,2}|<|>|\!=|>=|<=)/,reAdjuncts=/\ (AND|OR)\ /;
 									var reEmptyCondition = /^\w+\ is empty$/,reNotEmptyCondition = /^\w+\ is not empty$/;
 
 									var arSubConditions = String(value).split(reAdjuncts);
@@ -179,7 +179,7 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 							}
 							// TODO: Clean out duplicated code
 
-							var reConditions=/(={1,2}|<|>)/,reAdjuncts=/\ (AND|OR)\ /;
+							var reConditions=/(={1,2}|<|>|\!=|>=|<=)/,reAdjuncts=/\ (AND|OR)\ /;
 							var reEmptyCondition = /^\w+\ is empty$/;
 							var reNotEmptyCondition = /^\w+\ is not empty$/;
 							var arSubConditions = String(value).split(reAdjuncts);
