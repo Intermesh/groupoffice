@@ -66,8 +66,8 @@ class Settings extends \GO\Base\Db\ActiveRecord{
 	public function relations() {
     
     return array(
-				'addressbooks' => array('type'=>self::MANY_MANY, 'model'=>'GO\Addressbook\Model\Addressbook', 'field'=>'user_id', 'linkModel' => 'GO\Sync\Model\UserAddressbook'),
-				//'tasklists' => array('type'=>self::MANY_MANY, 'model'=>'GO\Tasks\Model\Tasklist', 'field'=>'user_id', 'linkModel' => 'GO\Sync\Model\UserTasklist'),
+//				'addressbooks' => array('type'=>self::MANY_MANY, 'model'=>'GO\Addressbook\Model\Addressbook', 'field'=>'user_id', 'linkModel' => 'GO\Sync\Model\UserAddressbook'),
+//				'tasklists' => array('type'=>self::MANY_MANY, 'model'=>'GO\Tasks\Model\Tasklist', 'field'=>'user_id', 'linkModel' => 'GO\Sync\Model\UserTasklist'),
 				'calendars' => array('type'=>self::MANY_MANY, 'model'=>'GO\Calendar\Model\Calendar', 'field'=>'user_id', 'linkModel'=> 'GO\Sync\Model\UserCalendar'),
 				//'noteCategories' => array('type'=>self::MANY_MANY, 'model'=>'GO\Notes\Model\Category', 'field'=>'user_id', 'linkModel' => 'GO\Sync\Model\UserNoteCategory'),
 				'calendar' => array('type'=>self::BELONGS_TO, 'model'=>'GO\Calendar\Model\Calendar', 'field'=>'calendar_id'),

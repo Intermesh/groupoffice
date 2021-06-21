@@ -94,3 +94,19 @@ $updates['202102081135'][] = function() {
 		echo "Z-push not loaded: " . $e->getMessage() . "\n";
 	}
 };
+
+$updates['202106101432'][] = "alter table sync_tasklist_user change tasklist_id tasklistId int(11) unsigned auto_increment;";
+
+$updates['202106101432'][] = "alter table sync_tasklist_user change user_id userId int(11) default 0 not null;";
+
+$updates['202106101432'][] = "alter table sync_tasklist_user change default_tasklist isDefault boolean default 0 not null;";
+
+$updates['202106101432'][] = "alter table sync_tasklist_user
+	add constraint sync_tasklist_user_core_user_id_fk
+		foreign key (userId) references core_user (id)
+			on delete cascade;";
+
+$updates['202106101432'][] = "alter table sync_tasklist_user
+	add constraint sync_tasklist_user_tasks_tasklist_id_fk
+		foreign key (tasklistId) references tasks_tasklist (id)
+			on delete cascade;";

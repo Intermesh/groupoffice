@@ -19,6 +19,12 @@ go.modules.community.tasks.TaskLinkDetail = Ext.extend(go.modules.community.task
 		this.supr().initComponent.call(this);
 
 
+		this.on('rowdblclick', (grid, rowIndex) => {
+
+			const record = grid.store.getAt(rowIndex);
+
+			this.open(record.id);
+		});
 
 		this.store.on("datachanged", function () {
 			this.setVisible(this.store.getCount() > 0);
@@ -97,12 +103,23 @@ go.modules.community.tasks.TaskLinkDetail = Ext.extend(go.modules.community.task
 					//
 					// win.load(this.linkMoreMenu.record.data.toId);
 					const record = this.store.getAt(item.parentMenu.rowIndex);
-					go.Entities.get("Task").goto(record.data.id);
+					//go.Entities.get("Task").goto(record.data.id);
+					this.open(id);
+
 
 				},
 				scope: this
 			}]
 		};
 	},
+
+	open : (id) => {
+
+		const win = new go.links.LinkDetailWindow({
+			entity: "Task"
+		});
+
+		win.load(id);
+	}
 
 });

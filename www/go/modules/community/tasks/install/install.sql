@@ -272,9 +272,9 @@ COLLATE = utf8mb4_unicode_ci;
 
 create table tasks_user_settings
 (
-    userId int null,
-    defaultTasklistId int null,
-    rememberLastItems tinyint null,
+    userId int(11) null,
+    defaultTasklistId int(11) null,
+    rememberLastItems tinyint(1) null,
     lastTasklistIds varchar(255) null,
     constraint tasks_user_settings_pk
         primary key (userId),

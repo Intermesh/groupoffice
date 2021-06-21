@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `sync_settings` (
 
 DROP TABLE IF EXISTS `sync_tasklist_user`;
 CREATE TABLE IF NOT EXISTS `sync_tasklist_user` (
-  `tasklist_id` int(11) NOT NULL AUTO_INCREMENT,
+  `tasklist_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL DEFAULT '0',
   `default_tasklist` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`tasklist_id`,`user_id`),

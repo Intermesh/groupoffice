@@ -78,22 +78,6 @@ $updates['202106011409'][] = "ALTER TABLE `tasks_task` ADD COLUMN IF NOT EXISTS 
 
 
 
-//TODO!!!!
-//$updates['202106101432'][] = "alter table sync_tasklist_user change tasklist_id tasklistId int auto_increment;";
-//
-//$updates['202106101432'][] = "alter table sync_tasklist_user change user_id userId int default 0 not null;";
-//
-//$updates['202106101432'][] = "alter table sync_tasklist_user change default_tasklist isDefault boolean default 0 not null;";
-//
-//$updates['202106101432'][] = "alter table sync_tasklist_user
-//	add constraint sync_tasklist_user_core_user_id_fk
-//		foreign key (userId) references core_user (id)
-//			on delete cascade;";
-//
-//$updates['202106101432'][] = "alter table sync_tasklist_user
-//	add constraint sync_tasklist_user_tasks_tasklist_id_fk
-//		foreign key (tasklistId) references tasks_tasklist (id)
-//			on delete cascade;";
 
 $updates['202106101432'][] = "alter table tasks_tasklist
 	add projectId int null;";
@@ -101,8 +85,8 @@ $updates['202106101432'][] = "alter table tasks_tasklist
 $updates['202106181401'][] = "create table if not exists tasks_user_settings
 (
     userId int null,
-    defaultTasklistId int null,
-    rememberLastItems tinyint null,
+    defaultTasklistId int(11) null,
+    rememberLastItems tinyint(1) null,
     lastTasklistIds varchar(255) null,
     constraint tasks_user_settings_pk
         primary key (userId),
