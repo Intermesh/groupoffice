@@ -96,6 +96,20 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 
 				this.filter(form.getValues());
 				form.isValid();
+
+
+
+				form.getForm().items.each( (field) => {
+					field.on('change', (field) => {
+						form.getForm().isValid();
+						this.filter(form.getValues());
+					});
+					field.on('check', (field, checked) => {
+						field.isValid();
+					});
+
+				});
+
 			} else {
 
 
@@ -114,27 +128,29 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 
 					return true;
 				});
+
+				form.getForm().items.each( (field) => {
+					field.on('change', (field) => {
+						form.getForm().isValid();
+						this.filter(form.getForm().getFieldValues());
+					});
+					field.on('check', (field, checked) => {
+						field.isValid();
+					});
+
+				});
 			}
 
+
+		}
+
+		if (form.getXType() != "entityform") {
 			form.getForm().on("actioncomplete", function (f, action) {
 				if (action.type === "load") {
 					this.filter(f.getFieldValues());
 					f.isValid(); //needed for conditionally hidden
 				}
 			}, this);
-
-
-
-			form.getForm().items.each( (field) => {
-				field.on('change', (field) => {
-					form.isValid();
-					this.filter(form.getValues());
-				});
-				field.on('check', (field, checked) => {
-					field.isValid();
-				});
-
-			});
 		}
 
 	},

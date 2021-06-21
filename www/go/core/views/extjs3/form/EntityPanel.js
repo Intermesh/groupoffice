@@ -42,7 +42,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 			this.entity = entity;
 
 			this.on('setvalues', () => {
-				this.fireEvent("load", this, v);
+				this.fireEvent("load", this, entity);
 			}, this, {single: true});
 
 			this.setValues(entity, true);
