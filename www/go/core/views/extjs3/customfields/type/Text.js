@@ -313,6 +313,10 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 		return {
 			name: "customFields." + field.databaseName,
 			type: this.getFieldType(),
+			mapping: function(obj) {
+				//required for customfields starting with numbers. It's no longer possible to create them but existing customers might have them.
+				return obj.customFields[field.databaseName];
+			},
 			customField: field,
 			customFieldType: this,
 			columnxtype: this.getColumnXType()
