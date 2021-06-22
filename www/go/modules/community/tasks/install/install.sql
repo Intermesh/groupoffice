@@ -168,7 +168,8 @@ CREATE TABLE IF NOT EXISTS `tasks_portlet_tasklist` (
     ON DELETE CASCADE,
   CONSTRAINT `tasks_portlet_tasklist_ibfk_2`
     FOREIGN KEY (`tasklistId`)
-    REFERENCES `tasks_tasklist` (`id`))
+    REFERENCES `tasks_tasklist` (`id`)
+        ON DELETE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;

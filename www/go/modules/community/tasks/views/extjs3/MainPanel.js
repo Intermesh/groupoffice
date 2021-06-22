@@ -278,6 +278,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					xtype: 'tbtitle',
 					text: t('Tasklist')
 				}, '->', {
+					xtype: "tbsearch"
+				},{
 					//disabled: go.Modules.get("community", 'notes').permissionLevel < go.permissionLevels.write,
 					iconCls: 'ic-add',
 					tooltip: t('Add'),

@@ -7,7 +7,7 @@ go.modules.community.tasks.TasklistsGrid = Ext.extend(go.NavGrid, {
 			store: new go.data.Store({
 				fields: ['id', 'name'],
 				entityStore: "Tasklist",
-				baseParams: {filter: {role: 'list'}},
+				filters: {role: {role: 'list'}},
 				sortInfo: {
 					field: 'name',
 					direction: 'ASC'
