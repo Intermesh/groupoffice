@@ -117,16 +117,6 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 		go.Translate.runFrom(this.entityStore.entity.package, this.entityStore.entity.module, () => {
 			go.data.Store.superclass.loadRecords.call(this, o, options, success);
 		});
-		// const currentModule = go.Translate.module;
-		// const currentPackage = go.Translate.package;
-		//
-		// go.Translate.module = this.entityStore.entity.module;
-		// go.Translate.package = this.entityStore.entity.package;
-		//
-		// go.data.Store.superclass.loadRecords.call(this, o, options, success);
-		//
-		// go.Translate.module = currentModule;
-		// go.Translate.package = currentPackage;
 	},
 	
 	sort : function(fieldName, dir) {
