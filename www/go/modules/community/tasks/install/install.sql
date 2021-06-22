@@ -278,8 +278,8 @@ COLLATE = utf8mb4_unicode_ci;
 create table tasks_user_settings
 (
     userId int(11) null,
-    defaultTasklistId int(11) null,
-    rememberLastItems tinyint(1) null,
+    defaultTasklistId int(11) unsigned null,
+    rememberLastItems boolean not null default false,
     lastTasklistIds varchar(255) null,
     constraint tasks_user_settings_pk
         primary key (userId),
@@ -287,3 +287,8 @@ create table tasks_user_settings
         foreign key (userId) references core_user (id)
             on delete cascade
 );
+
+alter table tasks_user_settings
+    add constraint tasks_user_settings_tasks_tasklist_id_fk
+        foreign key (defaultTasklistId) references tasks_tasklist (id)
+            on delete set null;

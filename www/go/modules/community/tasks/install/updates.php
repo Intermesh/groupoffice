@@ -89,8 +89,8 @@ $updates['202106101432'][] = "alter table tasks_tasklist
 $updates['202106181401'][] = "create table if not exists tasks_user_settings
 (
     userId int null,
-    defaultTasklistId int(11) null,
-    rememberLastItems tinyint(1) null,
+    defaultTasklistId int(11) unsigned null,
+    rememberLastItems boolean not null default false,
     lastTasklistIds varchar(255) null,
     constraint tasks_user_settings_pk
         primary key (userId),
@@ -107,3 +107,9 @@ $updates['202106181401'][] = "alter table tasks_task
 	add constraint tasks_task_ibfk_1
 		foreign key (tasklistId) references tasks_tasklist (id)
 			on DELETE cascade;";
+
+$updates['202106181401'][] = "alter table tasks_user_settings
+	add constraint tasks_user_settings_tasks_tasklist_id_fk
+		foreign key (defaultTasklistId) references tasks_tasklist (id)
+			on delete set null;";
+
