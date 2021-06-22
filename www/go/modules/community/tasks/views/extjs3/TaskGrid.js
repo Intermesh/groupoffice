@@ -30,7 +30,7 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					}
 				},
 				'estimatedDuration',
-				'hoursBooked'
+				'timeBooked'
 			],
 			entityStore: "Task"
 		});
@@ -216,14 +216,14 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 					width: dp(64),
 					renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
 						if(parseInt(value) > 0) {
-							return go.util.Format.duration(value * 60);
+							return go.util.Format.duration(value);
 						}
 						return '';
 					}
 				},
 				{
 					header: t("Hours booked", "tasks", 'community'),
-					dataIndex: 'hoursBooked',
+					dataIndex: 'timeBooked',
 					width: dp(72),
 					renderer: function (value, metaData, record, rowIndex, colIndex, ds) {
 						if(parseInt(value) > 0) {

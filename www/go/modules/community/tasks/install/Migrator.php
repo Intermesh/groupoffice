@@ -4,6 +4,7 @@
 namespace go\modules\community\tasks\install;
 
 use go\core\model\User;
+use go\modules\community\tasks\model\Progress;
 use go\modules\community\tasks\model\Tasklist;
 use GO\Projects2\Model\ProjectEntity;
 use go\core\util\DateTime;
@@ -33,10 +34,10 @@ class Migrator
 		        $prt = go()->getDbConnection()
 			        ->select('id')
 			        ->from('tasks_tasklist')
-			        ->where('project_id = ' . $projectId)
+			        ->where('projectId = ' . $projectId)
 			        ->single();
 		        if($prt) {
-		        	$tasklistId = $prt['tasklist_id'];
+		        	$tasklistId = $prt['id'];
 		        } else {
 		        	$arFlds = [
 		        		'role' => Tasklist::Project,
@@ -68,7 +69,8 @@ class Migrator
         		'tasklistId' => $tasklistId,
 		        'responsibleUserId' => $record['user_id'],
 		        'percentComplete' => $record['percentage_complete'],
-		        'estimatedDuration' => $record['duration'],
+		        'estimatedDuration' => $record['duration'] * 60, //from minutes to seconds
+		        'progress' => $record['percentage_complete'] == 100 ? Progress::Completed : Progress::NeedsAction,
 		        'createdBy' => User::ID_SUPER_ADMIN,
 		        'createdAt' => new DateTime(),
 		        'due' => !empty($due) ? $ts : null,

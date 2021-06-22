@@ -76,10 +76,10 @@ class Task extends AclItemEntity {
 	/** @var DateTime local date when this task will be started */
 	public $start;
 
-	/** @var Duration Estimated positive duration the task takes to complete. */
+	/** @var int Duration Estimated duration in seconds the task takes to complete. */
   public $estimatedDuration;
 
-  /** @var Progress Defines the progress of this task */
+  /** @var int Progress Defines the progress of this task */
   protected $progress = Progress::NeedsAction;
 
 	/** @var DateTime When the "progress" of either the task or a specific participant was last updated. */
@@ -163,11 +163,11 @@ class Task extends AclItemEntity {
 	protected $vcalendarBlobId;
 
 	/**
-	 * Hours booked
+	 * Time booked in seconds
 	 *
-	 * @var double
+	 * @var int
 	 */
-	protected $hoursBooked;
+	protected $timeBooked;
 
 	protected static function aclEntityClass(){
 		return Tasklist::class;
@@ -188,7 +188,7 @@ class Task extends AclItemEntity {
 		if(Module::isInstalled("legacy", "projects2")) {
 			$mapping->setQuery((new \go\core\db\Query())
 				->join('pr2_hours', 'prh', 'prh.task_id = task.id', 'left')
-				->select('COALESCE(SUM(prh.duration), 0) AS hoursBooked')
+				->select('COALESCE(SUM(prh.duration) * 3600, 0) AS timeBooked')
 				->groupBy(['task.id'])
 			);
 		}
@@ -215,8 +215,8 @@ class Task extends AclItemEntity {
 		return Progress::$db[$this->progress];
 	}
 
-	public function getHoursBooked() {
-		return $this->hoursBooked;
+	public function getTimeBooked() {
+		return $this->timeBooked;
 	}
 
 	public function setProgress($value) {
@@ -281,7 +281,7 @@ class Task extends AclItemEntity {
 				if(!$query->isJoined("tasks_tasklist", "tasklist") ){
 					$query->join("tasks_tasklist", "tasklist", "task.tasklistId = tasklist.id");
 				}
-				$criteria->where(['listsonly.role' => $value]);
+				$criteria->where(['tasklist.role' => $value]);
 			})
 			->add('categories', function(Criteria $criteria, $value, Query $query) {
 				if(!empty($value)) {

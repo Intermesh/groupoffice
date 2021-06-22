@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `tasks_tasklist` (
   `version` INT(10) UNSIGNED NOT NULL DEFAULT 1,
   `ownerId` INT(11) NOT NULL DEFAULT 1,
   `filesFolderId` INT(11) DEFAULT null,
+  projectId int null,
   PRIMARY KEY (`id`),
   INDEX `fkCreatedBy` (`createdBy` ASC),
   INDEX `fkAcl` (`aclId` ASC),
@@ -42,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
     `filesFolderId` INT(11) DEFAULT null,
     `due` DATE NULL,
     `start` DATE NULL,
-    `estimatedDuration` VARCHAR(20) NULL,
+     estimatedDuration int null comment 'Duration in seconds',
     `progress` TINYINT(2) NOT NULL DEFAULT 1,
     `progressUpdated` DATETIME NULL DEFAULT NULL,
     `title` VARCHAR(255) NOT NULL,
@@ -303,7 +304,7 @@ create table if not exists tasks_user_settings
         primary key (userId),
     constraint tasks_user_settings_core_user_id_fk
         foreign key (userId) references core_user (id)
-            on update cascade
+            on delete cascade
 );
 
 

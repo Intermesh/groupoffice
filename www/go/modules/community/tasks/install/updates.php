@@ -12,9 +12,13 @@ $updates['201911061630'][] = function(){
 	$stmt =\GO::getDbConnection()->query("SELECT id, rrule,`start_time` FROM ta_tasks WHERE rrule != ''");
 
 	while($row = $stmt->fetch()) {
-		$rrule = new \go\modules\community\tasks\model\Recurrence($row['rrule'], new DateTime("@" . $row["start_time"]));
-		$data = ['recurrenceRule' => json_encode($rrule->toArray())];
-		go()->getDbConnection()->updateIgnore('tasks_task', $data, ['id'=>$row['id']])->execute();
+		try {
+			$rrule = new \go\modules\community\tasks\model\Recurrence($row['rrule'], new DateTime("@" . $row["start_time"]));
+			$data = ['recurrenceRule' => json_encode($rrule->toArray())];
+			go()->getDbConnection()->updateIgnore('tasks_task', $data, ['id' => $row['id']])->execute();
+		} catch(Exception $e) {
+			echo "RRULE Exception:  " . $e->getMessage() ."\n";
+		}
 	}
 };
 
@@ -92,7 +96,7 @@ $updates['202106181401'][] = "create table if not exists tasks_user_settings
         primary key (userId),
     constraint tasks_user_settings_core_user_id_fk
         foreign key (userId) references core_user (id)
-            on update cascade
+            on delete cascade
 );
 ";
 
