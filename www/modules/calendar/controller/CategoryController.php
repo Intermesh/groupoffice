@@ -3,6 +3,8 @@
 namespace GO\Calendar\Controller;
 
 
+use go\core\model\User;
+
 class CategoryController extends \GO\Base\Controller\AbstractModelController {
 
 	protected $model = 'GO\Calendar\Model\Category';
@@ -19,30 +21,31 @@ class CategoryController extends \GO\Base\Controller\AbstractModelController {
 		//$storeParams->joinAclFieldTable();
 
 
-		$joinUserGroupCriteria = \GO\Base\Db\FindCriteria::newInstance()
-			->addInCondition('groupId', $groupIds, 'acl',false);
-
-		$joinCriteria = \GO\Base\Db\FindCriteria::newInstance()
-			->addCondition('acl_id','acl.aclId','=','t',true,true)
-			->mergeWith($joinUserGroupCriteria);
-
-		$storeParams->join('core_acl_group', $joinCriteria,'acl','LEFT');
-
 		if(!empty($params['global_categories']) && !empty($params['calendar_id'])){
+			$joinUserGroupCriteria = \GO\Base\Db\FindCriteria::newInstance()
+				->addInCondition('groupId', $groupIds, 'acl',false);
+
+			$joinCriteria = \GO\Base\Db\FindCriteria::newInstance()
+				->addCondition('acl_id','acl.aclId','=','t',true,true)
+				->mergeWith($joinUserGroupCriteria);
+
+			$storeParams->join('core_acl_group', $joinCriteria,'acl','LEFT');
+			$storeParams->ignoreAcl();
+
 			$storeCriteria->addCondition('calendar_id', 0,'=','t',false);
 			$storeCriteria->addCondition('aclId', NULL,'IS NOT','acl');
 			
 			$storeCriteria->addCondition('calendar_id', $params['calendar_id'],'=','t',false);
+
 		} elseif(!empty($params['calendar_id'])) {
 			$storeCriteria->addCondition('calendar_id', $params['calendar_id']);
+			$storeParams->ignoreAcl();
 		} elseif(!empty($params['fetch_all'])) {
 			
 		} else {
 			$storeCriteria->addCondition('calendar_id', 0);
 		}
-		
-		$storeParams->ignoreAcl();
-		
+
 		return parent::beforeStoreStatement($response, $params, $store, $storeParams);
 	}
 }

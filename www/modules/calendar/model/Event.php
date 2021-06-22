@@ -1454,6 +1454,9 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		$fieldsets = \go\core\model\FieldSet::find()->filter(['entities' => ['Event']]);
 
 			foreach($fieldsets as $fieldset) {
+				if($fieldset->getPermissionLevel() < \GO\Base\Model\Acl::READ_PERMISSION) {
+					continue;
+				}
 				$html .= '<tr><td colspan="2"><b>'.($fieldset->name).'</td></tr>';
 
 				$fields = \go\core\model\Field::find()->where(['fieldSetId' => $fieldset->id]);
