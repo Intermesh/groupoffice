@@ -13,7 +13,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	title: t("Tasks"),
 	layout: 'responsive',
 	layoutConfig: {
-		triggerWidth: 1000
+		triggerWidth: 1200
 	},
 
 	initComponent: function () {
@@ -28,8 +28,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				cls: 'go-narrow',
 				iconCls: "ic-arrow-back",
 				handler: function () {
-					//this.westPanel.show();
-					go.Router.goto("task");
+					go.Router.goto("tasks");
 				},
 				scope: this
 			}]
@@ -56,6 +55,18 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			region: "west",
 			layout:"border",
 			split: true,
+			tbar: new Ext.Toolbar({
+				cls: 'go-narrow',
+				items: ["->",  {
+
+					iconCls: "ic-arrow-forward",
+					tooltip: t("Tasks"),
+					handler: function () {
+						this.centerPanel.show();
+					},
+					scope: this
+				}]
+			}),
 
 			items: [
 				{
@@ -76,11 +87,13 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		this.items = [
 			this.centerPanel = new Ext.Panel({
-				layout:'border',
+				layout:'responsive',
 				stateId: "go-tasks-west",
 				region: "center",
 				split: true,
-
+				layoutConfig: {
+					triggerWidth: 1000
+				},
 				width: dp(700),
 				narrowWidth: dp(300),
 				height:dp(800), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
@@ -320,7 +333,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						iconCls: "ic-menu",
 						handler: function () {
 //						this.westPanel.getLayout().setActiveItem(this.noteBookGrid);
-							this.tasklistsGrid.show();
+							this.sidePanel.show();
 						},
 						scope: this
 					},
@@ -335,10 +348,9 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 						cls: 'primary',
 						handler: function (btn) {
 							var dlg = new go.modules.community.tasks.TaskDialog();
-							dlg.show();
 							dlg.setValues({
 								tasklistId: this.addTasklistId
-							});
+							}).show();
 						},
 						scope: this
 					}),

@@ -72,7 +72,9 @@ class Migrator
 		        'estimatedDuration' => $record['duration'] * 60, //from minutes to seconds
 		        'progress' => $record['percentage_complete'] == 100 ? Progress::Completed : Progress::NeedsAction,
 		        'createdBy' => User::ID_SUPER_ADMIN,
+		        'modifiedBy' => User::ID_SUPER_ADMIN,
 		        'createdAt' => new DateTime(),
+		        'modifiedAt' => new DateTime(),
 		        'due' => !empty($due) ? $ts : null,
 		        'title' => $record['description'],
 		        'description' => ''

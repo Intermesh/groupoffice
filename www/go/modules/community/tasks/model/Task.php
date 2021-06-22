@@ -188,7 +188,7 @@ class Task extends AclItemEntity {
 		if(Module::isInstalled("legacy", "projects2")) {
 			$mapping->setQuery((new \go\core\db\Query())
 				->join('pr2_hours', 'prh', 'prh.task_id = task.id', 'left')
-				->select('COALESCE(SUM(prh.duration) * 3600, 0) AS timeBooked')
+				->select('COALESCE(SUM(prh.duration) * 60, 0) AS timeBooked')
 				->groupBy(['task.id'])
 			);
 		}

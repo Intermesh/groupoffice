@@ -1550,12 +1550,12 @@ table[id^="comments-ext"] b {
 
 .go-layout-responsive {
 	
-	.x-btn.go-narrow {
+	.go-narrow {
 		display: none;
 	}
 	
 	&.go-narrow {
-		.x-btn.go-narrow {
+		.go-narrow {
 			display: block;
 		}
 		.x-layout-split {
