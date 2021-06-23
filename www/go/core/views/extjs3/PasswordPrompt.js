@@ -15,6 +15,16 @@ go.PasswordPrompt = Ext.extend(go.Window, {
 				this.passwordFieldset = new Ext.form.FieldSet({
 //					labelWidth: dp(120),
 					items: [
+						//Add a hidden submit button so the form will submit on enter
+						new Ext.Button({
+							hidden: true,
+							hideMode: "offsets",
+							type: "submit",
+							handler: function() {
+								this.okPressed();
+							},
+							scope: this
+						}),
 						this.passwordText = new Ext.Container({
 							html: this.text,
 							style: {
@@ -26,15 +36,9 @@ go.PasswordPrompt = Ext.extend(go.Window, {
 							hideLabel:true,
 							name: 'password',
 							inputType: 'password',
+							autocomplete: "current-password",
 							allowBlank: false,
-							anchor: '100%',
-							listeners: {
-								afterrender: function(cmp) {
-									cmp.el.set({
-										autocomplete: "current-password"
-									});
-								}
-							}
+							anchor: '100%'
 						})
 					]
 				})
@@ -49,11 +53,6 @@ go.PasswordPrompt = Ext.extend(go.Window, {
 			],
 			buttons: [{
 					text: t("Continue"),
-					handler: this.okPressed,
-					scope: this
-				}],
-			keys: [{
-					key: Ext.EventObject.ENTER,
 					handler: this.okPressed,
 					scope: this
 				}]

@@ -218,30 +218,10 @@ class Builder
 	{
 		foreach ($this->proModules as $module) {
 			run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" --exclude "Site*Controller.php" ' .
-				'--copy "vendor/" --with-license groupoffice-pro-' . $this->majorVersion . '-license.txt ' .
-				'--passphrase go' . $this->ioncubePassword . $this->majorVersion . ' ' . $this->sourceDir . '/promodules/' . $module . ' ' .
+				'--copy "vendor/" ' . $this->sourceDir . '/promodules/' . $module . ' ' .
 				'--into ' . $this->buildDir . "/" . $this->packageName . '/modules');
 		}
 
-		$documentsModules = ["workflow", "filesearch"];
-
-		foreach ($documentsModules as $module) {
-			run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" ' .
-				'--copy "vendor/" --with-license documents-' . $this->majorVersion . '-license.txt ' .
-				'--passphrase do' . $this->ioncubePassword . $this->majorVersion . ' ' . $this->sourceDir . '/promodules/' . $module . ' ' .
-				'--into ' . $this->buildDir . "/" . $this->packageName . '/modules');
-		}
-
-
-        $module = 'billing';
-        run($this->encoder ." ". $this->encoderOptions. ' --replace-target --encode "*.inc" ' .
-            '--copy "vendor/" --with-license billing-' . $this->majorVersion . '-license.txt ' .
-            '--passphrase bs'. $this->ioncubePassword . $this->majorVersion . ' ' . $this->sourceDir . '/promodules/' . $module . ' ' .
-            '--into ' . $this->buildDir . "/" . $this->packageName . '/modules');
-
-
-		run($this->encoder . " " . $this->encoderOptions . ' --replace-target --license-check script ' . $this->sourceDir . '/promodules/professional ' .
-			'--into ' . $this->buildDir . "/" . $this->packageName . '/modules');
 
 		run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" ' . $this->sourceDir . '/promodules/tickets/model ' .
 			'--into ' . $this->buildDir . "/" . $this->packageName . '/modules/tickets/');
@@ -255,30 +235,15 @@ class Builder
 			if (is_dir($this->sourceDir . '/promodules/' . $module . '/language')) {
 				run('cp ' . $this->sourceDir . '/promodules/' . $module . '/language/* ' . $this->buildDir . "/" . $this->packageName . '/modules/' . $module . '/language/');
 			}
-
-			if (is_dir($this->sourceDir . '/promodules/' . $module . '/install')) {
-				run('cp -r ' . $this->sourceDir . '/promodules/' . $module . '/install/* ' . $this->buildDir . "/" . $this->packageName . '/modules/' . $module . '/install/');
-			}
-
-			if (file_exists($this->sourceDir . '/promodules/' . $module . '/' . ucfirst($module) . 'Module.php')) {
-				run('cp ' . $this->sourceDir . '/promodules/' . $module . '/' . ucfirst($module) . 'Module.php ' . $this->buildDir . "/" . $this->packageName . '/modules/' . $module . '/');
-			}
 		}
 
-		run('cp ' . $this->sourceDir . '/promodules/professional/Module.php ' . $this->buildDir . "/" . $this->packageName . '/modules/professional');
 		run('cp ' . $this->sourceDir . '/promodules/projects2/report/* ' . $this->buildDir . "/" . $this->packageName . '/modules/projects2/report/');
 		run('cp ' . $this->sourceDir . '/promodules/billing/Pdf.php ' . $this->buildDir . "/" . $this->packageName . '/modules/billing/Pdf.php');
 
 
-		run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" ' .
-			'--with-license groupoffice-pro-' . $this->majorVersion . '-license.txt ' .
-			'--passphrase go' . $this->ioncubePassword . $this->majorVersion . ' ' . dirname(__DIR__) . '/www/licensechecks/groupoffice-pro.php ' .
-			'--into ' . $this->buildDir . "/" . $this->packageName . '/licensechecks');
-
 		//business package
 		run($this->encoder . " " . $this->encoderOptions . ' --replace-target --encode "*.inc" ' .
-			'--with-license groupoffice-pro-' . $this->majorVersion . '-license.txt ' .
-			'--passphrase go' . $this->ioncubePassword . $this->majorVersion . ' ' . $this->sourceDir . '/business ' .
+			$this->sourceDir . '/business ' .
 			'--into ' . $this->buildDir . "/" . $this->packageName . '/go/modules');
 
 		$businessDir = new DirectoryIterator($this->sourceDir . '/business');
@@ -293,14 +258,20 @@ class Builder
 
 			$moduleFile = $this->sourceDir . '/business/' . $moduleName . '/Module.php';
 
-			if (strpos(file_get_contents($moduleFile), "requiredLicense") === false) {
+			if (file_exists($moduleFile) && strpos(file_get_contents($moduleFile), "requiredLicense") === false) {
 				throw new Exception($moduleFile . " must contain a 'requiredLicense()' function override.");
 			}
 
-			run('cp ' . $moduleFile . ' ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/');
-			run('cp ' . $this->sourceDir . '/business/' . $moduleName . '/language/* ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/language/');
-			run('cp -r ' . $this->sourceDir . '/business/' . $moduleName . '/install/* ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/install/');
-		}
+	        if (is_dir($this->sourceDir . '/business/' . $moduleName . '/language')) {
+                run('cp ' . $this->sourceDir . '/business/' . $moduleName . '/language/* ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/language/');
+            }
+
+	        if (is_dir($this->sourceDir . '/business/' . $moduleName . '/install')) {
+                run('cp -r ' . $this->sourceDir . '/business/' . $moduleName . '/install/* ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/install/');
+            }
+
+	        //run ('cp ' . $moduleFile .' ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/' . $moduleName . '/');
+        }
 
 		run('rm -rf ' . $this->buildDir . "/" . $this->packageName . '/go/modules/business/.git*');
 

@@ -13,7 +13,7 @@ Ext.onReady(function () {
 		entityStore:"User",
 		currentUser: null,
 		labelWidth: dp(152),
-		title: t('Google authenticator', 'googleauthenticator'),
+		title: t('Google authenticator'),
 		
 		onChanges : function(entityStore, added, changed, destroyed) {
 			if(this.currentUser && changed[this.currentUser.id] && ("googleauthenticator" in changed[this.currentUser.id])){
@@ -23,7 +23,7 @@ Ext.onReady(function () {
 		
 		initComponent: function() {
 			this.enableAuthenticatorBtn = new Ext.Button({
-				text:t('Enable google authenticator', 'googleauthenticator'),
+				text:t('Enable google authenticator'),
 				hidden:false,
 				handler:function(){	
 					var me = this;
@@ -36,7 +36,7 @@ Ext.onReady(function () {
 			});
 			
 			this.disableAuthenticatorBtn = new Ext.Button({
-				text:t('Disable google authenticator', 'googleauthenticator'),
+				text:t('Disable google authenticator'),
 				hidden:true,
 				handler:function(){
 					var me = this;
@@ -68,22 +68,21 @@ Ext.onReady(function () {
 			var me = this;
 			
 			function execute(currentPassword){
-				var params = {"update": {}},
-					data = {
+				var data = {
 						googleauthenticator: null
 					};
 				if(currentPassword) {
 					data.currentPassword = currentPassword;
 				}
-				params.update[user.id] = data;
-
-				go.Db.store("User").set(params, function (options, success, response) {
-					if (success && !GO.util.empty(response.updated)) {
-						callback.call(this,user.id);
-					} else {
-						// When the password is not correct, call itself again to try again
-						me.disableAuthenticator(user, callback);
+				go.Db.store("User").save(data, user.id).then(function() {
+					callback.call(this,user.id);
+				}).catch(function(error) {
+					if(error.message && !error.response) {
+						GO.errorDialog.show(error.message);
 					}
+
+					// When the password is not correct, call itself again to try again
+					me.disableAuthenticator(user, callback);
 				});
 			}
 			
@@ -94,8 +93,8 @@ Ext.onReady(function () {
 			} else {
 				var passwordPrompt = new go.PasswordPrompt({
 					width: dp(450),
-					text: t("When disabling Google autenticator this step will be removed from the login process.", 'googleauthenticator') + "<br><br>" + t("Provide your current password to disable Google authenticator.", 'googleauthenticator'),
-					title: t('Disable Google authenticator', 'googleauthenticator'),
+					text: t("When disabling Google autenticator this step will be removed from the login process.") + "<br><br>" + t("Provide your current password to disable Google authenticator."),
+					title: t('Disable Google authenticator'),
 					listeners: {
 						'ok': function(value){
 							execute.call(this,value);
@@ -112,32 +111,43 @@ Ext.onReady(function () {
 		},
 
 		requestSecret : function(user, callback){
-				var me = this;
-			
+			var me = this;
+
+			function execute(currentPassword){
+				var data = {
+					googleauthenticator: {
+						requestSecret:true
+					}
+				};
+				if(currentPassword) {
+					data.currentPassword = currentPassword;
+				}
+				go.Db.store("User").save(data ,user.id).then( function (options, success, response) {
+					callback.call(this,user.id);
+				}).catch(function(error) {
+
+					// When the password is not correct, call itself again to try again
+					me.requestSecret(user, callback);
+
+					if(error.message && !error.response) {
+						GO.errorDialog.show(error.message);
+					}
+				})
+			}
+
+			// If the user is an admin then no password needs to be given (Except when the admin is changing it's own account
+			if (go.User.isAdmin && user.id != go.User.id) {
+				execute.call(this);
+				return;
+			} else {
 				var passwordPrompt = new go.PasswordPrompt({
 					width: dp(450),
-					text: t("Provide your current password before you can enable Google authenticator.", 'googleauthenticator'),
-					title: t('Enable Google authenticator', 'googleauthenticator'),
+					text: t("Provide your current password before you can enable Google authenticator."),
+					title: t('Enable Google authenticator'),
 					iconCls: 'ic-security',
 					listeners: {
-						'ok': function(value){
-							var params = {"update": {}};
-							params.update[user.id] = {
-								currentPassword: value,
-								googleauthenticator: {
-									requestSecret:true
-								}
-							};
-
-							go.Db.store("User").set(params, function (options, success, response) {
-								if (success && !GO.util.empty(response.updated)) {
-									// When password is checked successfully, then show the QR dialog
-									callback.call(this,user.id);
-								} else {
-									// When the password is not correct, call itself again to try again
-									me.requestSecret(user, callback);
-								}
-							});
+						'ok': function (password) {
+							execute(password);
 						},
 						'cancel': function () {
 							return false;
@@ -146,6 +156,7 @@ Ext.onReady(function () {
 					}
 				});
 				passwordPrompt.show();
+			}
 		}
 	});
 	

@@ -64,17 +64,7 @@ if (!empty($_POST)) {
 				'email' => $_POST['email']
 		];
 
-
-		$availableModules = core\Module::findAvailable();
-		$installModules = [];
-		foreach($availableModules as $modCls) {
-		    $mod = $modCls::get();
-		    if($mod->autoInstall() && $mod->isInstallable()) {
-		        $installModules[] = $mod;
-            }
-        }
-
-		App::get()->getInstaller()->install($admin, $installModules);
+		App::get()->getInstaller()->install($admin);
 
 		//install not yet refactored modules
 		GO::$ignoreAclPermissions = true;
@@ -87,8 +77,13 @@ if (!empty($_POST)) {
 				continue;
 			}
 			if ($moduleController->autoInstall() && $moduleController->isInstallable()) {
-                if(!Module::install($moduleController->name())) {
-                    throw new \Exception("Could not save module " . $moduleController->name());
+			    try {
+                    Module::install($moduleController->name());
+                }
+                catch(\Exception $e) {
+			        //could be a license error due to an unlicensed module depending
+                  //on a licensed module
+			        core\ErrorHandler::logException($e);
                 }
 			}
 		}

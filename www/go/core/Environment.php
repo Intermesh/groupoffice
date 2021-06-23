@@ -21,12 +21,21 @@ class Environment extends Singleton {
 	}
 	
 	/**
-	 * Check if we are ran with the Command Line Interface
+	 * Check if we are executed with the Command Line Interface
 	 * 
 	 * @return boolean
 	 */
 	public function isCli() {
 		return PHP_SAPI === 'cli';
+	}
+
+	/**
+	 * Check if we are executed within the cron environment
+	 *
+	 * @return boolean
+	 */
+	public function isCron() {
+		return basename($_SERVER['PHP_SELF']) == 'cron.php';
 	}
 
 	/**
@@ -103,6 +112,15 @@ class Environment extends Singleton {
 	 */
 	public function getInstallPath() {
 		return dirname(dirname(__DIR__));
+	}
+
+	/**
+	 * Check if the Ioncube loader has been installed.
+	 *
+	 * @return bool
+	 */
+	public function hasIoncube() {
+		return extension_loaded('ionCube Loader');
 	}
 
 }

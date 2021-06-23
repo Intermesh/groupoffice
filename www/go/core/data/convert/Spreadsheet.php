@@ -125,6 +125,9 @@ class Spreadsheet extends AbstractConverter {
 		if($this->extension != 'csv') {
 			$this->spreadsheet = new PhpSpreadsheet();
 			$this->spreadSheetIndex = 1;
+		}else{
+			//add UTF-8 BOM char for excel to recognize UTF-8 in the CSV
+			fputs($this->fp, chr(239) . chr(187) . chr(191));
 		}
 	}
 
@@ -537,8 +540,8 @@ class Spreadsheet extends AbstractConverter {
 			$this->spreadsheetRowIterator = $this->spreadsheet->getActiveSheet()->getRowIterator();
 		}
 
-		if(isset($params['updateBy'])) {
-			$this->updateBy = $params['updateBy'];
+		if(isset($this->clientParams['updateBy'])) {
+			$this->updateBy = $this->clientParams['updateBy'];
 		}
 	}
 
@@ -575,7 +578,7 @@ class Spreadsheet extends AbstractConverter {
 			$cellIterator->setIterateOnlyExistingCells(FALSE); // This loops through all cells,
 			$cells = [];
 			foreach ($cellIterator as $cell) {
-				$cells[] = $cell->getValue();
+				$cells[] = (string) $cell->getValue();
 			}
 			return $cells;
 		} else{

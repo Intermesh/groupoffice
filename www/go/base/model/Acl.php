@@ -113,13 +113,16 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 	 * @return int Permission level. See constants in Acl for values. 
 	 */
 	public static function getUserPermissionLevel($aclId, $userId=false, $checkGroupPermissionOnly=false) {
-		
-		
-		
 		//only ignore when no explicit user is checked. Otherwise you can never check the real permissionlevel when \GO::$ignoreAclPermissions is set to true.
 		if(\GO::$ignoreAclPermissions && $userId===false)
 			return self::MANAGE_PERMISSION;
-		
+
+		if( \GO::user() && \go\core\model\User::isAdminById($userId ? $userId : \GO::user()->id)) {
+
+			return $aclId == \go\core\model\Acl::getReadOnlyAclId() ? self::READ_PERMISSION : self::MANAGE_PERMISSION ;
+
+		}
+
 		if($userId===false){
 			if(\GO::user())
 				$userId=\GO::user()->id;
@@ -238,7 +241,6 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 
 		if($wasNew){
 			if($this->usedIn!='readonly'){
-				$this->addGroup(\GO::config()->group_root, Acl::MANAGE_PERMISSION);
 				if($this->ownedBy != 1) { //not for admin
 					$userGroup = Group::model()->findSingleByAttribute('isUserGroupFor', $this->ownedBy);
 					if($userGroup) {
@@ -329,6 +331,8 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 										,'a')
 						->order('a.level')
 						->group('t.id'));
+
+		$users = [];
 		
 		while($user = $stmt->fetch()) {				
 			if($callback){
@@ -350,7 +354,6 @@ class Acl extends \GO\Base\Db\ActiveRecord {
 			$this->ownedBy = 1;
 
 		if($this->usedIn!='readonly'){
-			$this->addGroup(\GO::config()->group_root, Acl::MANAGE_PERMISSION);
 			if($this->ownedBy != 1) { //not for admin
 				$group = Group::model()->findSingleByAttribute('isUserGroupFor', $this->ownedBy);
 				if(empty($group)) {

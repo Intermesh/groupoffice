@@ -327,7 +327,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 		menu: {
 			items: deleteSendersItems
 		},
-		multiple:true
+		multiple:true,
+		hidden: (deleteSendersItems.length === 0)
 	}];
 
 	if(GO.email.saveAsItems && GO.email.saveAsItems.length) {
@@ -634,15 +635,16 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 				iconCls: 'ic-forward',
 				text: t("Forward", "email"),
 				handler: function(){
+					var comp;
 					if (!this._permissionDelegated) {
-						GO.email.showComposer({
+						comp = GO.email.showComposer({
 							uid: this.messagePanel.uid,
 							task: 'forward',
 							mailbox: this.messagePanel.mailbox,
 							account_id: this.account_id
 						});
 					} else {
-						GO.email.showComposer({
+						comp = GO.email.showComposer({
 							uid: this.messagePanel.uid,
 							task: 'forward',
 							mailbox: this.messagePanel.mailbox,
@@ -650,6 +652,9 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 							delegated_cc_enabled: true
 						});
 					}
+					this.messagePanel.data.links.forEach(function(link) {
+						comp.createLinkButton.addLink(link.entity, link.entityId);
+					});
 				},
 				scope: this
 			}),'->',
@@ -1276,7 +1281,7 @@ GO.mainLayout.onReady(function(){
 			return;
 		}
 
-		go.Notifier.toggleIcon('email',data.email_status.total_unseen > 0);
+		//go.Notifier.toggleIcon('email',data.email_status.total_unseen > 0);
 		GO.mainLayout.setNotification('email',data.email_status.total_unseen,'green');
 
 		var ep = GO.mainLayout.getModulePanel('email');
@@ -1304,26 +1309,17 @@ GO.mainLayout.onReady(function(){
 		var title = t("New email"),
 			text = t("You have %d unread email(s)").replace('%d', data.email_status.total_unseen);
 
-		if (GO.settings.popup_emails) {
-			go.Notifier.notify({
-				title: title,
-				text: text,
-				iconCls: 'ic-email',
-				icon: 'views/Extjs3/themes/Paper/img/notify/email.png'
-			});
-		}
-		go.Notifier.msg({
-			sound: 'message-new-email',
-			iconCls: 'ic-email',
-			items:[{xtype:'box',html:'<b>'+text+'</b>'}],
+		go.Notifier.notify({
 			title: title,
-			handler: function(){
-				GO.mainLayout.openModule('email');
-			}
-		}, 'email');
+			description: text,
+			iconCls: 'ic-email',
+			icon: 'views/Extjs3/themes/Paper/img/notify/email.png',
+			tag: "email"
+		}).catch((e) => {
+			console.warn("Notification failed: " + e);
+		});
 
-
-
+		go.Notifier.playSound('message-new-email', 'email');
 
 	});
 
@@ -1368,7 +1364,10 @@ GO.email.saveAttachment = function(attachment,panel)
 	{
 		if(!GO.files.saveAsDialog)
 		{
-			GO.files.saveAsDialog = new GO.files.SaveAsDialog();
+			GO.files.saveAsDialog = new GO.files.SaveAsDialog({
+				stateId: 'email-save-as',
+				stateful: true
+			});
 		}
 		GO.files.saveAsDialog.show({
 			folder_id : 0,
@@ -1406,6 +1405,8 @@ GO.email.saveAttachment = function(attachment,panel)
 		});
 	}
 
+
+
 GO.email.openAttachment = function(attachment, panel, forceDownload)
 	{
 		if(!panel)
@@ -1414,38 +1415,34 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 		if(!attachment)
 			return false;
 
-		var params = {
-			action:'attachment',
-			account_id: panel.account_id,
-			mailbox: panel.mailbox,
-			uid: panel.uid,
-			number: attachment.number,
-			uuencoded_partnumber: attachment.uuencoded_partnumber,
-			encoding: attachment.encoding,
-			type: attachment.type,
-			subtype: attachment.subtype,
-			filename:attachment.name,
-			charset:attachment.charset,
-			sender:panel.data.sender, //for gnupg and smime,
-			filepath:panel.data.path ? panel.data.path : '' //In some cases encrypted messages are temporary stored on disk so the handlers must use that to fetch the data.
+		if(forceDownload) {
+			attachment.url += '&inline=0';
+			go.util.downloadFile(attachment.url);
+			return;
 		}
 
-		var url_params = '?';
-		for(var name in params){
-			url_params+= name+'='+encodeURIComponent(params[name])+'&';
-		}
-		url_params = url_params.substring(0,url_params.length-1);
+
 
 		if(!forceDownload && (attachment.mime=='message/rfc822' || attachment.mime=='application/eml'))
 		{
-			GO.email.showMessageAttachment(0, params);
+			GO.email.showMessageAttachment(0, {
+				action:'attachment',
+				account_id: panel.account_id,
+				mailbox: panel.mailbox,
+				uid: panel.uid,
+				number: attachment.number,
+				uuencoded_partnumber: attachment.uuencoded_partnumber,
+				encoding: attachment.encoding,
+				type: attachment.type,
+				subtype: attachment.subtype,
+				filename:attachment.name,
+				charset:attachment.charset,
+				sender:panel.data.sender, //for gnupg and smime,
+				filepath:panel.data.path ? panel.data.path : '' //In some cases encrypted messages are temporary stored on disk so the handlers must use that to fetch the data.
+			});
 		}else
 		{
-			if(forceDownload) {
-				attachment.url += '&inline=0';
-				go.util.downloadFile(attachment.url);
-				return;
-			}
+
 
 			switch(attachment.extension)
 			{
@@ -1533,7 +1530,11 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 
 				default:
 
-					go.util.viewFile(attachment.url);
+					if(go.Modules.isAvailable('legacy', 'files')) {
+						return GO.files.openEmailAttachment(attachment, panel, false);
+					} else {
+						go.util.viewFile(attachment.url);
+					}
 
 					break;
 			}

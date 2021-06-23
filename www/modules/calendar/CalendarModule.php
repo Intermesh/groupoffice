@@ -25,7 +25,7 @@ class CalendarModule extends \GO\Base\Module{
 	public function defineListeners() {
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		Link::on(Entity::EVENT_FILTER, static::class, 'onLinkFilter');
-		User::on(User::EVENT_BEFORE_SAVE, static::class, 'onUserBeforeSave');
+		User::on(User::EVENT_SAVE, static::class, 'onUserBeforeSave');
 	}
 	
 	public static function onMap(Mapping $mapping) {
@@ -128,7 +128,7 @@ class CalendarModule extends \GO\Base\Module{
 		if (!$user->isNew() && $user->isModified('displayName')) {
 			$cal = self::getDefaultCalendar($user->id);
 			$cal->name = $user->displayName;
-			$cal->save();
+			$cal->save(true);
 		}
 	}
 }

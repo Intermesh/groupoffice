@@ -260,6 +260,19 @@ class Module extends Observable {
 	public function isInstallable(){
 		return true;
 	}
+
+	/**
+	 * Check if the module has been installed
+	 *
+	 * @return bool
+	 */
+	public function isInstalled() {
+		return $this->getModel() != false;
+	}
+
+	public function getModel() {
+		return \GO::modules()->isInstalled($this->getName(), false);
+	}
 	
 	/**
 	 * Find the module manager class by id.
@@ -489,6 +502,47 @@ class Module extends Observable {
 				//$response[] = "Processing ".$model->getName()."\n";
 				$stmt = \GO::getModel($model->getName())->rebuildSearchCache();
 			
+			}
+		}
+	}
+
+	public function checkAcls() {
+		$models=$this->getModels();
+
+		foreach($models as $model) {
+			if ($model->isSubclassOf("GO\Base\Db\ActiveRecord")) {
+
+
+				$m = \GO::getModel($model->getName());
+
+				if(!$m->aclField()) {
+					continue;
+				}
+
+				echo "Checking " . $model->getName() . "\n";
+				flush();
+
+				//to avoid memory errors
+				$start = 0;
+
+				//per thousands to keep memory low
+				$stmt = $m->find(array(
+					'ignoreAcl'=>true,
+					'start' => $start,
+					'limit' => 1000
+				));
+
+				while($stmt->rowCount()) {
+					$stmt->callOnEach('checkAcl', true);
+
+					$stmt = $m->find(array(
+						'ignoreAcl'=>true,
+						'start' => $start+=1000,
+						'limit' => 1000
+					));
+				}
+
+				unset($stmt);
 			}
 		}
 	}

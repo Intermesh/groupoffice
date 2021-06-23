@@ -55,3 +55,18 @@ $updates['201806010710'][] = 'update `pa_mailboxes` set homedir = maildir;';
 
 $updates['202007131017'][] = "update `pa_mailboxes` set `password` = concat('{PLAIN-MD5}', `password`) WHERE `password` NOT LIKE '{%' AND `password` NOT LIKE '$%'";
 
+
+$updates['202104301055'][] = "drop index address on pa_aliases;";
+
+$updates['202104301055'][] = "create unique index address
+    on pa_aliases (address);";
+
+
+$updates['202104301055'][] = "drop index username on pa_mailboxes;";
+
+$updates['202104301055'][] = "create unique index username
+    on pa_mailboxes (username);";
+$updates['202104301055'][] = "drop index domain on pa_domains";
+
+$updates['202104301055'][] = "create unique index domain
+             	on pa_domains (domain)";

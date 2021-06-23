@@ -155,11 +155,16 @@ EOT;
 	 * @return array
 	 * @throws \Exception
 	 */
-	public function loadVCS( array $params) :array
+	public function loadVCF( array $params) :array
 	{
-		$account = Account::model()->findByPk($params['account_id']);
-		$imap = $account->openImapConnection($params['mailbox']);
-		$data = $imap->get_message_part_decoded($params['uid'], $params['number'], $params['encoding'], false, true, false);
+		if(!empty($params['fileId'])) {
+			$file = \GO\Files\Model\File::model()->findByPk($params['fileId']);
+			$data = $file->fsFile->getContents();
+		} else {
+			$account = Account::model()->findByPk($params['account_id']);
+			$imap = $account->openImapConnection($params['mailbox']);
+			$data = $imap->get_message_part_decoded($params['uid'], $params['number'], $params['encoding'], false, true, false);
+		}
 
 		$vcard = \GO\Base\VObject\Reader::read($data);
 		$importer = new VCard();

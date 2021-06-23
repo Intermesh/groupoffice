@@ -765,12 +765,9 @@ $updates['202012231410'][] = function() {
 	}
 };
 
-$updates['202102111534'][] = "delete from go_state where user_id not in (select id from core_user);";
+$updates['202102111534'][] = ""; // Intentionally left blank
 
-$updates['202102111534'][] = "alter table go_state
-	add constraint go_state_core_user_id_fk
-		foreign key (user_id) references core_user (id)
-			on delete cascade;";
+$updates['202102111534'][] = ""; // Intentionally left blank
 
 
 $updates['202102111534'][] = "CREATE TABLE `core_alert` (
@@ -871,7 +868,7 @@ $updates['202102111534'][] = "CREATE TABLE `core_oauth_auth_codes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
 
 
-$updates['202102111534'][] = "ALTER TABLE `go_templates` ADD COLUMN `filename` VARCHAR(100) NULL DEFAULT NULL AFTER `content`";
+$updates['202102111534'][] = "";
 $updates['202102111534'][] = "ALTER TABLE `go_templates` ADD COLUMN `filename` VARCHAR(100) NULL DEFAULT NULL AFTER `content`";
 
 
@@ -881,3 +878,58 @@ $updates['202102111534'][] = "alter table go_state
 	add constraint go_state_core_user_id_fk
 		foreign key (user_id) references core_user (id)
 			on delete cascade;";
+
+
+$updates['202102111534'][] = "alter table core_auth_token change `passedMethods` `passedAuthenticators` varchar(190) null;";
+$updates['202103091517'][] = "ALTER TABLE `core_customfields_select_option` ADD COLUMN `sortOrder` INT(11) UNSIGNED DEFAULT 0 AFTER `text`;";
+
+
+$updates['202104061227'][] = "alter table core_user drop column popup_reminders;";
+
+$updates['202104061227'][] = "alter table core_user drop column popup_emails;";
+
+$updates['202104161227'][] = "ALTER TABLE core_search DROP INDEX `filter`;";
+$updates['202104161227'][] = "create index core_search_entityTypeId_filter_modifiedAt_aclId_index
+    on core_search (entityTypeId, filter, modifiedAt, aclId);";
+
+$updates['202104161227'][] = "ALTER TABLE `core_search_word`
+  DROP `drow`;";
+
+$updates['202104161227'][] = "ALTER TABLE `core_search` DROP INDEX `entityTypeId`";
+
+$updates['202104161227'][] = function() {
+
+	go()->getDbConnection()->exec("truncate core_search_word");
+	go()->getDbConnection()->exec("SET foreign_key_checks = 0;");
+	go()->getDbConnection()->exec("truncate core_search");
+	go()->getDbConnection()->exec("SET foreign_key_checks = 1;");
+
+	//run build search cache on cron immediately. This job will deactivate itself.
+	\go\core\cron\BuildSearchCache::install("* * * * *", true);
+
+	echo "NOTE: Search cache will be rebuilt by a scheduled task. This may take a lot of time.";
+};
+
+
+$updates['202105041513'][] = "delete from core_module where name='log' and package is null";
+
+$updates['202105041513'][] = "alter table core_user
+	add homeDir varchar(190) not null;";
+
+$updates['202105041513'][] = "update core_user set homeDir=concat('users/', username);";
+
+$updates['202105041513'][] = "delete from core_acl_group where groupId = 1;";
+
+$updates['202105041513'][] = "delete from core_module where name='timeregistration' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='search' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='phpcustomfield' and package is null";
+
+$updates['202105041513'][] = "delete from core_module where name='ipwhitelist' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='wopicollabora' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='wopioffice365' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='tfs' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='phpbb3' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='voip' and package is null";
+$updates['202105041513'][] = "delete from core_module where name='voippro' and package is null";
+
+$updates['202105111132'][] = "ALTER TABLE `core_user` ADD COLUMN `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0 AFTER `homeDir`;";

@@ -183,8 +183,24 @@ go.form.Dialog = Ext.extend(go.Window, {
 			}, this);
 		}
 	},
+
+	movePermissionsPanelToEnd : function() {
+		const sharePanelIndex = this.panels.findIndex((el) => {
+			return el instanceof go.permissions.SharePanel;
+		});
+
+		if(sharePanelIndex === -1) {
+			return;
+		}
+
+		//move to end
+		this.panels.push(this.panels.splice(sharePanelIndex, 1)[0]);
+
+	},
 	
 	createTabPanel : function(items) {
+
+		this.movePermissionsPanelToEnd();
 		
 		if(items.length) {
 			this.panels.unshift(this.mainPanel = new Ext.Panel({
@@ -353,7 +369,6 @@ go.form.Dialog = Ext.extend(go.Window, {
 	},
 
 	submit: function () {
-
 		//When form is submnitted with enter key the validation errors of the field having focus is not disabled if we
 		// don't give something else focus.
 		if(this.saveButton) {

@@ -272,10 +272,10 @@ class EmailRecipients{
 			}else
 			{
 				$email = $this->_buffer;
-				if(!\GO\Base\Util\StringHelper::validate_email($email)) {
-					$email = 'unknown@unknown.domain';
-					$this->_personal = $this->_buffer;
-				}
+//				if(!\GO\Base\Util\StringHelper::validate_email($email)) {
+//					$email = 'unknown@unknown.domain';
+//					$this->_personal = $this->_buffer;
+//				}
 				$this->addRecipient($email, $this->_personal);
 			}
 		}

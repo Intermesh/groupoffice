@@ -1,4 +1,5 @@
 polyfills.js
+Element.js
 
 Jmap.js
 Uploader.js
@@ -282,3 +283,6 @@ pdftemplate/BlocksField.js
 chart/ChartComponent.js
 chart/LineChart.js
 chart/PieChart.js
+
+
+license/LicenseDialog.js

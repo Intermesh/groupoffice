@@ -115,17 +115,21 @@ class Version extends \GO\Base\Db\ActiveRecord {
 	protected function beforeDelete() {
 		
 		$file = $this->getFilesystemFile();
-		
-		if($file->delete()) {
-			
-			$quotaUser = $this->file->folder->quotaUser;
-			if($quotaUser) {
-				$quotaUser->calculatedDiskUsage(0 - $this->size_bytes)->save(true); //user quota
-			}
-			
-			\GO::config()->save_setting("file_storage_usage", \GO::config()->get_setting('file_storage_usage', 0, 0) - $this->size_bytes);
+
+		$old = \GO\Base\Fs\File::setAllowDeletes(true);
+		try {
+			$file->delete();
+		} finally {
+			\GO\Base\Fs\File::setAllowDeletes($old);
 		}
 		
+		$quotaUser = $this->file->folder->quotaUser;
+		if($quotaUser) {
+			$quotaUser->calculatedDiskUsage(0 - $this->size_bytes)->save(true); //user quota
+		}
+
+		\GO::config()->save_setting("file_storage_usage", \GO::config()->get_setting('file_storage_usage', 0, 0) - $this->size_bytes);
+
 		return parent::beforeDelete();
 	}
 	

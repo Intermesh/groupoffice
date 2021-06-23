@@ -20,10 +20,7 @@ go.login.LoginPanel = Ext.extend(Ext.Container, {
 			]
 		});
 
-		var htmlText = 'Powered by ' + t('product_name');
-		if (t('product_name') == 'GroupOffice') {
-			htmlText = htmlText + ' - <a target="_blank" href="https://www.group-office.com">https://www.group-office.com</a>';
-		}
+		var htmlText = 'Powered by Group-Office - <a target="_blank" href="https://www.group-office.com">https://www.group-office.com</a>';
 
 		this.items = [{
 				xtype: 'box',

@@ -778,7 +778,7 @@ Se você não solicitou uma nova senha por favor ignore esta mensagem.',
   'Enter your email address' => 'Digite seu endereço de e-mail',
   'A server error occurred.' => 'Ocorreu um erro de servidor.',
   'Recovery e-mail sent' => 'E-mail de recuperação enviado',
-  'product_name' => 'GroupOffice',
+
   'Use $config[\'debug\']=true; only with development and problem solving. It slows " + t(\'product_nameUse $config ' => 
   array (
     '\'debug\'' => 'Use $config [\'debug\']=true somente para desenvolvimento e solução de problemas. Ele torna mais lento o " + t (\'product_name',

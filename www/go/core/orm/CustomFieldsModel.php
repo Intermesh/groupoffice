@@ -127,7 +127,7 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 	{
 		try {
 			$val = $this->getValue($name);
-		} catch(Exception $e) {
+		} catch(\Exception $e) {
 			return false;
 		}
 		return isset($val);
@@ -221,7 +221,9 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 		foreach($columns as $name => $column) {
 			if(array_key_exists($name, $data)) {
 				if(empty($data[$name]) && $column->nullAllowed ) {
-					$data[$name] = null;
+					if(!is_numeric($data[$name]) || (int) $data[$name] !== 0) {
+						$data[$name] = null;
+					}
 				} else {
 					$data[$name] = $column->normalizeInput($data[$name]);
 				}

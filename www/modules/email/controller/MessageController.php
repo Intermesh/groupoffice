@@ -6,6 +6,7 @@ namespace GO\Email\Controller;
 use GO;
 use GO\Base\Exception\AccessDenied;
 
+use go\core\ErrorHandler;
 use go\core\model\User;
 use GO\Email\Model\Account;
 use GO\Email\Model\Alias;
@@ -520,7 +521,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 						if(!$linkedEmail){
 							$linkedEmail = new \GO\Savemailas\Model\LinkedEmail();
 							$linkedEmail->setAttributes($attributes);
-							$linkedEmail->save();
+							$linkedEmail->save(true);
 						}
 
 
@@ -543,7 +544,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 						foreach($contacts as $contact) {
 							/** @var Contact $contact */
 							if(!$contact->isOrganization) {
-								foreach($contact->findOrganizations(['id', 'addressBookId', 'name']) as $o) {
+								foreach($contact->findOrganizations(['id', 'addressBookId', 'name'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]) as $o) {
 									$contacts[] = $o;
 								}
 							}
@@ -562,7 +563,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 								if(!$linkedEmail){
 									$linkedEmail = new \GO\Savemailas\Model\LinkedEmail();
 									$linkedEmail->setAttributes($attributes);
-									$linkedEmail->save();
+									$linkedEmail->save(true);
 								}
 
 								$linkedEmail->link($contact);
@@ -888,7 +889,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			} catch (\GO\Base\Exception\AccessDenied $e) {
 				$templateContent = "";
 			}
-			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($templateContent);
+			$message = \GO\Email\Model\SavedMessage::model()->createFromMimeData($templateContent, false);
 			
 			$unsetSubject = empty($message->subject);
 			
@@ -1160,7 +1161,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			$oldMessage = $message->toOutputArray(true,false,true);
 			
 			if(!empty($oldMessage['smime_encrypted'])) {
-				$oldMessage['htmlbody'] = '***';
+				$response['sendParams']['encrypt_smime'] = true;
 			}
 			
 			
@@ -1206,9 +1207,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			}
 			
 			$oldMessage = $message->toOutputArray(false,false,true);
-			
+
 			if(!empty($oldMessage['smime_encrypted'])) {
-				$oldMessage['plainbody'] = '***';
+				$response['sendParams']['encrypt_smime'] = true;
 			}
 			
 			$response['data']['plainbody'] .= "\n\n" . $replyText . "\n" . $this->_quoteText($oldMessage['plainbody']);
@@ -1397,6 +1398,10 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 
 		$oldMessage = $message->toOutputArray($html,false,true);
 
+		if(!empty($oldMessage['smime_encrypted'])) {
+			$response['sendParams']['encrypt_smime'] = true;
+		}
+
 		// Fix for array_merge functions on lines below when the $response['data']['inlineAttachments'] and $response['data']['attachments'] do not exist
 		if(empty($response['data']['inlineAttachments']))
 			$response['data']['inlineAttachments'] = array();
@@ -1490,9 +1495,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$response = $this->_checkXSS($params, $response);
 			}
 
-			if($params['mailbox'] == $account->spam) {
+//			if($params['mailbox'] == $account->spam) {
 				$response = $this->_blockImages($params, $response);
-			}
+//			}
 
 			//Don't do these special actions in the special folders
 			if(!$imapMessage->seen && $params['mailbox']!=$account->sent && $params['mailbox']!=$account->trash && $params['mailbox']!=$account->drafts){
@@ -1649,6 +1654,9 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 					->select('email')
 					->criteria(GO\Base\Db\FindCriteria::newInstance()->addCondition('account_id' , $imapMessage->account->id))
 			)->fetchAll(\PDO::FETCH_COLUMN, 0);
+
+			// for case insensitive match
+			$aliases = array_map('strtolower', $aliases);
 
 			$emailFound = false;
 			if(isset($vevent->attendee)) {
@@ -1865,7 +1873,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 			foreach($contacts as $contact) {
 				/** @var Contact $contact */
 				if(!$contact->isOrganization) {
-					foreach($contact->findOrganizations(['id', 'addressBookId', 'name']) as $o) {
+					foreach($contact->findOrganizations(['id', 'addressBookId', 'name'])->filter(['permissionLevel' => GoAcl::LEVEL_WRITE]) as $o) {
 						$contacts[] = $o;
 					}
 				}
@@ -2036,12 +2044,8 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$folder = \GO\Files\Model\Folder::model()->findByPk($params['folder_id']);
 
 		if(!$folder){
-			trigger_error("GO\Email\Controller\Message::actionSaveAttachment(".$params['folder_id'].") folder not found", E_USER_WARNING);
+			ErrorHandler::log("GO\Email\Controller\Message::actionSaveAttachment(".$params['folder_id'].") folder not found", E_USER_WARNING);
 			throw new \GO\Base\Exception\NotFound("Specified folder not found");
-		}
-		
-		if(!$folder->checkPermissionLevel(\GO\Base\Model\Acl::WRITE_PERMISSION)) {
-			throw new \GO\Base\Exception\AccessDenied();
 		}
 
 		$params['filename'] = \GO\Base\Fs\File::stripInvalidChars($params['filename']);		

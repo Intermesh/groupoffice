@@ -11774,9 +11774,9 @@ Ext.extend(Ext.Component, Ext.util.Observable, {
             this.focusTask.delay(Ext.isNumber(delay) ? delay : 10);
             return this;
         }
-        if(this.rendered && !this.isDestroyed){
+        if(this.rendered && !this.isDestroyed && this.el.isInViewport()){
             this.el.focus();
-            if(selectText === true){
+            if(selectText === true && this.el.dom.select){
                 this.el.dom.select();
             }
         }
@@ -46855,6 +46855,7 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
 
     
     syncHeaderScroll : function() {
+
         var innerHd    = this.innerHd,
             scrollLeft = this.scroller.dom.scrollLeft;
         
@@ -47246,10 +47247,16 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
         
         if (grid.autoHeight) {
             scrollStyle = scroller.dom.style;
-            scrollStyle.overflow = 'visible';
+            scrollStyle.overflow = 'auto';
             
             if (Ext.isWebKit) {
-                scrollStyle.position = 'static';
+               // scrollStyle.position = 'static';
+            }
+	this.el.setWidth(gridWidth);
+scroller.setWidth(gridWidth);
+            
+            if (this.innerHd) {
+                this.innerHd.style.width = (gridWidth) + "px";
             }
         } else {
             this.el.setSize(gridWidth, gridHeight);

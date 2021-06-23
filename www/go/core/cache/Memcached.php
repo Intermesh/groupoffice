@@ -33,7 +33,7 @@ class Memcached implements CacheInterface {
 	private $mem;
 	
 	public function __construct() {
-		$this->prefix = go()->getConfig()['core']['db']['name'];
+		$this->prefix = go()->getConfig()['db_name'];
 		$this->mem = new \Memcached();
 
 		if(!isset(go()->getConfig()['cacheMemcachedHost'])) {
@@ -51,8 +51,9 @@ class Memcached implements CacheInterface {
 	 * @param string $key
 	 * @param mixed $value Will be serialized
 	 * @param boolean $persist Cache must be available in next requests. Use false of it's just for this script run.
+	 * @param int $ttl Time to live in seconds
 	 */
-	public function set($key, $value, $persist = true) {
+	public function set($key, $value, $persist = true, $ttl = 0) {
 
 		//don't set false values because unserialize returns false on failure.
 		if ($key === false) {
@@ -61,7 +62,7 @@ class Memcached implements CacheInterface {
 
 
 		if($persist) {
-			$this->mem->add($this->prefix . '-' .$key, $value);
+			$this->mem->add($this->prefix . '-' .$key, $value, $ttl);
 		}
 		
 		$this->cache[$key] = $value;

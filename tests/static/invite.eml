@@ -1,0 +1,207 @@
+Return-Path: <admin@intermesh.localhost>
+Delivered-To: elmer@intermesh.localhost
+Received: from 564353ad0ff4.ec2.internal
+	by ca63592ff0b5 with LMTP
+	id 0HS3Jou/bmAFAQAA55YeFA
+	(envelope-from <admin@intermesh.localhost>)
+	for <elmer@intermesh.localhost>; Thu, 08 Apr 2021 08:32:11 +0000
+Received: from host.docker.internal (unknown [172.26.0.9])
+	by 564353ad0ff4.ec2.internal (Postfix) with ESMTP id 816EB1637B0
+	for <elmer@intermesh.localhost>; Thu,  8 Apr 2021 08:32:11 +0000 (UTC)
+Message-ID: <9e8b164a5a344a7bdefdc87fe8ad3c3b@host.docker.internal>
+Date: Thu, 08 Apr 2021 10:32:11 +0200
+Subject: Invitation: test
+From: System Admin <admin@intermesh.localhost>
+To: Elmer Fudd <elmer@intermesh.localhost>
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+ boundary="_=_swift_1617870731_f1adb791accbe73938db66bfd40bbf3a_=_"
+X-Mailer: Group-Office (6.5.40)
+
+
+
+
+--_=_swift_1617870731_f1adb791accbe73938db66bfd40bbf3a_=_
+Content-Type: multipart/alternative;
+ boundary="_=_swift_1617870731_d288195f045a80e57fdf7b7d81b264c6_=_"
+
+
+--_=_swift_1617870731_d288195f045a80e57fdf7b7d81b264c6_=_
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+You are invited for the following event:=20
+
+
+
+
+		Subject:
+		test
+
+
+		Calendar:
+		System Administrator
+
+
+		Starts at:
+		08-04-2021 10:45
+
+
+		Ends at:
+		08-04-2021 11:45
+
+
+		Status:
+		Confirmed
+
+
+		Meeting rooms
+
+
+
+
+
+
+
+
+
+		Participant
+		Status
+		Organizer
+
+
+		System Admin=C2=A0
+		Accepted=C2=A0
+		Yes
+
+
+		Elmer Fudd=C2=A0
+		Not responded yet=C2=A0
+	=09
+
+
+		Demo User=C2=A0
+		Not responded yet=C2=A0
+	=09
+
+
+		test=C2=A0
+		Not responded yet=C2=A0
+	=09
+
+
+		John Doe=C2=A0
+		Not responded yet=C2=A0
+	=09
+
+
+
+
+
+
+Only use the links below if your mail client does not support
+calendaring functions.
+
+
+
+Do you accept this event?
+
+Accept [1]=C2=A0|=C2=A0Decline [2]
+
+Open calendar [3]
+
+Links:
+------
+[1]
+http://host.docker.internal:8000/index.php?r=3Dcalendar/event/invitation&id=
+=3D428&accept=3D1&email=3Delmer%40intermesh.localhost&participantToken=
+=3D697769859c43bb1ade02499f2367f077
+[2]
+http://host.docker.internal:8000/index.php?r=3Dcalendar/event/invitation=
+&id=3D428&accept=3D0&email=3Delmer%40intermesh.localhost&participantTo=
+ken=3D697769859c43bb1ade02499f2367f077
+[3]
+http://host.docker.internal:8000/?r=3D&f=3DeyJtIjoiY2FsZW5kYXIiLCJmIjoib3Bl=
+bkNhbGVuZGFyIiwicCI6eyJ1bml4dGltZSI6MTYxNzg3MTUwMH19
+
+--_=_swift_1617870731_d288195f045a80e57fdf7b7d81b264c6_=_
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<p>You are invited for the following event: </p><table id=3D"event-3aa54ec=
+0-0f8c-56f4-9c2d-0e945c5e1767"><tr><td>Subject:</td><td>test</td></tr><t=
+r><td>Calendar:</td><td>System Administrator</td></tr><tr><td>Starts at:=
+</td><td>08-04-2021 10:45</td></tr><tr><td>Ends at:</td><td>08-04-2021 1=
+1:45</td></tr><tr><td>Status:</td><td>Confirmed</td></tr><tr><td colspan=
+=3D"2"><b>Meeting rooms</td></tr></table><table><tr><td colspan=3D"3"><b=
+r /></td></tr><tr><td><b>Participant</b></td><td><b>Status</b></td><td><=
+b>Organizer</b></td></tr><tr><td>System Admin&nbsp;</td><td>Accepted&nbs=
+p;</td><td>Yes</td></tr><tr><td>Elmer Fudd&nbsp;</td><td>Not responded y=
+et&nbsp;</td><td></td></tr><tr><td>Demo User&nbsp;</td><td>Not responded=
+ yet&nbsp;</td><td></td></tr><tr><td>test&nbsp;</td><td>Not responded ye=
+t&nbsp;</td><td></td></tr><tr><td>John Doe&nbsp;</td><td>Not responded y=
+et&nbsp;</td><td></td></tr></table><div class=3D"go-hidden"><p><br /><b>On=
+ly use the links below if your mail client does not support calendaring =
+functions.</b></p><p>Do you accept this event?</p><a href=3D"http://host.d=
+ocker.internal:8000/index.php?r=3Dcalendar/event/invitation&id=3D428&acc=
+ept=3D1&email=3Delmer%40intermesh.localhost&participantToken=3D697769859c4=
+3bb1ade02499f2367f077">Accept</a>&nbsp;|&nbsp;<a href=3D"http://host.docke=
+r.internal:8000/index.php?r=3Dcalendar/event/invitation&id=3D428&accept=3D=
+0&email=3Delmer%40intermesh.localhost&participantToken=3D697769859c43bb1=
+ade02499f2367f077">Decline</a></div><br /><a href=3D"http://host.docker.in=
+ternal:8000/?r=3D&f=3DeyJtIjoiY2FsZW5kYXIiLCJmIjoib3BlbkNhbGVuZGFyIiwicC=
+I6eyJ1bml4dGltZSI6MTYxNzg3MTUwMH19">Open calendar</a>
+
+--_=_swift_1617870731_d288195f045a80e57fdf7b7d81b264c6_=_--
+
+
+--_=_swift_1617870731_f1adb791accbe73938db66bfd40bbf3a_=_
+Content-Type: text/calendar;method=REQUEST;charset=utf-8; name=test.ics
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline; filename=test.ics
+
+BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:-//Intermesh//NONSGML Group-Office 6.5.40//EN
+METHOD:REQUEST
+BEGIN:VTIMEZONE
+TZID:Europe/Amsterdam
+BEGIN:STANDARD
+DTSTART:19701025T020000
+RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=10
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:19700329T010000
+RRULE:FREQ=YEARLY;BYDAY=-1SU;BYMONTH=3
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+END:DAYLIGHT
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTAMP:20210408T083211Z
+UID:3aa54ec0-0f8c-56f4-9c2d-0e945c5e1767
+LAST-MODIFIED:20210408T083209Z
+CREATED:20210408T083209Z
+SUMMARY:test
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/Amsterdam:20210408T104500
+DTEND;TZID=Europe/Amsterdam:20210408T114500
+ORGANIZER;CN=System Admin;RSVP=true;PARTSTAT=ACCEPTED:mailto:admin@intermes
+ h.localhost
+ATTENDEE;CN=Elmer Fudd;RSVP=true;PARTSTAT=NEEDS-ACTION:mailto:elmer@interme
+ sh.localhost
+ATTENDEE;CN=Demo User;RSVP=true;PARTSTAT=NEEDS-ACTION:mailto:demo@group-off
+ ice.com
+ATTENDEE;CN=test;RSVP=true;PARTSTAT=NEEDS-ACTION:mailto:test@intermesh.loca
+ lhost
+ATTENDEE;CN=John Doe;RSVP=true;PARTSTAT=NEEDS-ACTION:mailto:johndoe@interme
+ sh.nl
+END:VEVENT
+END:VCALENDAR
+
+
+--_=_swift_1617870731_f1adb791accbe73938db66bfd40bbf3a_=_--
+

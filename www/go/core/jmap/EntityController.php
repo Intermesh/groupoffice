@@ -109,7 +109,11 @@ abstract class EntityController extends Controller {
 		$query->select($cls::getPrimaryKey(true)); //only select primary key
 
 		$query->filter($params['filter']);
-		
+
+		// Only return readable ID's
+		if($cls::getFilters()->hasFilter('permissionLevel') &&  !$cls::getFilters()->isUsed('permissionLevel')) {
+			$query->filter(['permissionLevel' => Acl::LEVEL_READ]);
+		}
 		return $query;
 	}
 	
@@ -156,12 +160,21 @@ abstract class EntityController extends Controller {
 				throw new InvalidArguments("Parameter 'filter' must be an array");
 			}
 		}
-		
+
+		$cls = $this->entityClass();
+
 		if(!isset($params['accountId'])) {
 			$params['accountId'] = null;
 		}
 		
 		$params['calculateTotal'] = !empty($params['calculateTotal']) ? true : false;
+
+		$params['calculateHasMore'] = !empty($params['calculateHasMore']) && $params['limit'] > 0 ? true : false;
+
+		//a faster alternative to calculateTotal just indicating that there are more entities. We do that by selecting one more than required.
+		if($params['calculateHasMore']) {
+			$params['limit']++;
+		}
 		
 		return $params;
 	}
@@ -180,12 +193,14 @@ abstract class EntityController extends Controller {
    */
 	protected function defaultQuery($params) {
 
+		$state = $this->getState();
+
+		//enable SQL debugging here
+		go()->getDbConnection()->debug = go()->getDebugger()->enabled;
 		
 		$p = $this->paramsQuery($params);
 		$idsQuery = $this->getQueryQuery($p);
 		$idsQuery->fetchMode(PDO::FETCH_NUM);
-		
-		$state = $this->getState();
 		
 		$ids = [];		
 
@@ -197,6 +212,10 @@ abstract class EntityController extends Controller {
 				$ids[] = $count ? $record[0] : implode('-', $record);
 			}
 
+			if($p['calculateHasMore'] && count($ids) > $params['limit']) {
+				$hasMore = !!array_pop($ids);
+			}
+
 			$response = [
 				'accountId' => $p['accountId'],
 				'state' => $state,
@@ -204,6 +223,10 @@ abstract class EntityController extends Controller {
 				'notfound' => [],
 				'canCalculateUpdates' => false
 			];
+
+			if(isset($hasMore)) {
+				$response['hasMore'] = $hasMore;
+			}
 
 			if ($p['calculateTotal']) {
 
@@ -380,10 +403,8 @@ abstract class EntityController extends Controller {
 		if(isset($p['ids']) && !count($p['ids'])) {
 			return $result;
 		}
-		go()->getDebugger()->debugTiming('before query');
-		$query = $this->getGetQuery($p);
 
-		go()->getDebugger()->debugTiming('after query');
+		$query = $this->getGetQuery($p);
 
 		$foundIds = [];
 		$result['list'] = [];
@@ -392,8 +413,6 @@ abstract class EntityController extends Controller {
 			$arr['id'] = $e->id();
 			$result['list'][] = $arr;
 			$foundIds[] = $arr['id'];
-
-			go()->getDebugger()->debugTiming('item to array');
 		}
 
 		$result['notFound'] = isset($p['ids']) ? array_values(array_diff($p['ids'], $foundIds)) : [];
@@ -851,7 +870,7 @@ abstract class EntityController extends Controller {
 			$file = $blob->getFile();
 		}
 
-    $response = $converter->importFile($file, $params);
+		$response = $converter->importFile($file, $params);
 		
 		if(!$response) {
 			throw new Exception("Invalid response from import converter");

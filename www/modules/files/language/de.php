@@ -144,4 +144,7 @@ The following changes were made by %s:
   'Create folder' => 'Ordner erstellen',
   'Please open the upload program and upload your files. Click \'Yes\' when the upload is done.' => 'Bitte öffnen Sie das Upload-Programm und laden Sie Ihre Dateien hoch. Klicken Sie auf \'Ja\', wenn der Upload abgeschlossen ist.',
   'No items found' => 'Keine Einträge gefunden',
+  'Save as PDF' => 'Als PDF speichern',
+  'Download as PDF' => 'Als PDF laden',
+  'Sorry, something went wrong' => 'Sorry, irgendwas ist schief gelaufen',
 );

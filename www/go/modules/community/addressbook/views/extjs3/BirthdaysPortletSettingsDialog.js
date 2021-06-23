@@ -27,12 +27,8 @@ go.modules.community.addressbook.BirthdaysPortletSettingsDialog = Ext.extend(go.
 								hideLabel: true,
 								emptyText: t("Please select..."),
 								pageSize: 50,
-								fields: ['id', 'name'],
-								storeBaseParams: {
-									filter: {
-										permissionLevel: go.permissionLevels.write
-									}
-								}
+								fields: ['id', 'name']
+
 							})
 						]
 					}

@@ -23,7 +23,7 @@ GO.files.SelectFolderDialog = Ext.extend(GO.Window, {
 					var sm = this.foldersTree.getSelectionModel();
 					var selectedFolderNode = sm.getSelectedNode();
 					if(!selectedFolderNode) {
-						Ext.msg.alert(t('Error'), t('Sorry, something went wrong'));
+						Ext.MessageBox.alert(t('Error'), t('Sorry, something went wrong'));
 						return false;
 					}
 					this.handler.call(this.scope, this, selectedFolderNode.attributes.path,selectedFolderNode);

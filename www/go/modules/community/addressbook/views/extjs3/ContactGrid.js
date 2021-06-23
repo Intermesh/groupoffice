@@ -19,6 +19,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				'id',
 				'name',
 				'firstName',
+				'middleName',
 				'lastName',
 				{name: 'createdAt', type: 'date'},
 				{name: 'modifiedAt', type: 'date'},
@@ -107,6 +108,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 				{
 					id: 'name',
 					header: t('Name'),
+					width: dp(300),
 					sortable: true,
 					dataIndex: go.User.addressBookSettings.sortBy,
 					hidden: this.enabledColumns.indexOf('name') == -1,
@@ -116,6 +118,9 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 						var sortBy = go.User.addressBookSettings.sortBy, name;
 						if(!record.data.isOrganization && sortBy == 'lastName' && !go.util.empty(record.data.lastName)) {
 							name = record.data.lastName + ', ' + record.data.firstName;
+							if(!go.util.empty(record.data.middleName)) {
+								name += " " + record.data.middleName;
+							}
 						} else{
 							name = record.get('name');
 						}
@@ -269,6 +274,12 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					dataIndex: "firstName",
 					hidden: this.enabledColumns.indexOf('firstName') == -1,
 				},{
+					id: 'middleName',
+					header: t('Middle name'),
+					sortable: true,
+					dataIndex: "middleName",
+					hidden: this.enabledColumns.indexOf('middleName') == -1,
+				},{
 					id: 'lastName',
 					header: t('Last name'),
 					sortable: true,
@@ -338,7 +349,6 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					// }
 				}
 			},
-			autoExpandColumn: 'name',
 			// config options for stateful behavior
 			stateful: true,
 			stateId: 'contact-grid'

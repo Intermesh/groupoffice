@@ -28,6 +28,8 @@
 namespace GO\Base;
 
 use GO\Base\Model\Acl;
+use go\core\fs\File;
+use go\core\util\ClassFinder;
 
 class ModuleCollection extends Model\ModelCollection{
 	
@@ -143,6 +145,10 @@ class ModuleCollection extends Model\ModelCollection{
 		$moduleClassPath = $folder->path().'/'.$ucfirst.'Module.php';
 		
 		if(!file_exists($moduleClassPath)){
+			return false;
+		}
+
+		if(!ClassFinder::canBeDecoded(new File($moduleClassPath))) {
 			return false;
 		}
 
@@ -277,7 +283,7 @@ class ModuleCollection extends Model\ModelCollection{
 		$stmt = $this->model->find($findParams);
 		$modules = array();
 		while($module = $stmt->fetch()){
-			if(static::isAllowed($module->name, $module->package) && $module->isAvailable())
+			if($module->isAvailable())
 				$modules[]=$module;
 		}
 		

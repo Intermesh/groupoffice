@@ -19,7 +19,7 @@ class TasksModule extends \GO\Base\Module {
 
 		User::on(Property::EVENT_MAPPING, static::class, 'onMap');
 		Link::on(Entity::EVENT_FILTER, static::class, 'onLinkFilter');
-		User::on(User::EVENT_BEFORE_SAVE, static::class, 'onUserBeforeSave');
+		User::on(User::EVENT_SAVE, static::class, 'onUserBeforeSave');
 	}
 	
 	public static function initListeners() {		
@@ -50,10 +50,10 @@ class TasksModule extends \GO\Base\Module {
 	public static function onUserBeforeSave(User $user)
 	{
 		if (!$user->isNew() && $user->isModified('displayName')) {
-			$nb = TaskList::model()->findByPk($user->taskSettings->default_tasklist_id);
+			$nb = TaskList::model()->findByPk($user->taskSettings->default_tasklist_id, false, true);
 			if ($nb) {
 				$nb->name = $user->displayName;
-				$nb->save();
+				$nb->save(true);
 			}
 		}
 	}

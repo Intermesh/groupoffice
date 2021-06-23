@@ -86,9 +86,6 @@ echo '<script type="text/javascript" src="' . GO::view()->getUrl() . 'lang.php?l
 	GO.language = "<?php echo go()->getLanguage()->getIsoCode(); ?>";
 	GO.calltoTemplate = '<?php echo GO::config()->callto_template; ?>';
 	GO.calltoOpenWindow = <?php echo GO::config()->callto_open_window ? "true" : "false"; ?>;
-	
-	GO.authenticationDomains = <?php echo json_encode(go\core\model\User::getAuthenticationDomains()); ?>;
-	GO.authenticationDomainDefault = "<?php echo go()->getSettings()->defaultAuthenticationDomain; ?>";
 <?php
 if (isset(GO::session()->values['security_token'])) {
 	echo 'GO.securityToken="' . GO::session()->values['security_token'] . '";';

@@ -16,7 +16,9 @@
 namespace GO\Files\Model;
 
 use GO;
+use go\core\model\Module;
 use go\modules\community\history\model\LogEntry;
+use go\core\exception\NotFound;
 
 /**
  * The File model
@@ -872,5 +874,21 @@ class File extends \GO\Base\Db\ActiveRecord implements \GO\Base\Mail\SwiftAttach
 		}
 		
 		return $attachment;
+	}
+
+	/**
+	 * @param GO\Base\Fs\File $outputFile
+	 * @param string $format
+	 * @throws NotFound
+	 */
+	public function convertTo(\GO\Base\Fs\File $outputFile, $format = 'pdf')
+	{
+		$converterModule = go()->getModule('business', 'fileconverter');
+		if (!$converterModule) {
+			throw new NotFound('Converter module is not available');
+		}
+
+		$service = \go\modules\business\fileconverter\Module::getAvailableService();
+		$service->convert($this->fsFile, $outputFile, $format);
 	}
 }

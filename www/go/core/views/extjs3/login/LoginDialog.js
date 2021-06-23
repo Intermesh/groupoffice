@@ -33,8 +33,6 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 			}		
 		});
 		
-		
-		
 		go.login.LoginDialog.superclass.initComponent.call(this);
 
 		this.on('render', function() {
@@ -64,7 +62,7 @@ go.login.LoginDialog = Ext.extend(go.Window, {
 				return;
 			}
 
-			while(next < this.items.length && go.AuthenticationManager.userMethods.indexOf(nextItem.id) == -1) {
+			while(next < this.items.length && go.AuthenticationManager.userAuthenticators.indexOf(nextItem.id) == -1) {
 				next++;
 				this.next(next);
 			}

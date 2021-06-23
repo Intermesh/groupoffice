@@ -117,6 +117,7 @@ class MultiSelect extends Select {
 							->join("core_customfields_select_option", "o", "o.id = ms.optionId")
 							->from($this->getMultiSelectTableName(), 'ms')
 							->where(['id' => $entity->id])
+							->orderBy(['o.sortOrder' => 'ASC'])
 							->all());
 	}
 
@@ -130,9 +131,10 @@ class MultiSelect extends Select {
 
 		$ids = (new Query())
 							->selectSingleValue("id")							
-							->from("core_customfields_select_option")
+							->from("core_customfields_select_option", 'o')
 							->where(['text' => $texts])
 							->andWhere(['fieldId' => $this->field->id])
+							->orderBy(['o.sortOrder' => 'ASC'])
 							->all();
 
 		if(count($ids) != count($texts)) {
@@ -177,8 +179,8 @@ class MultiSelect extends Select {
 				$alias = 'opt_' . uniqid();
 				$query->join('core_customfields_select_option', $alias, $alias . '.id = '.$joinAlias. '.optionId', 'left');
 				$criteria->where($alias . '.text', $comparator, $value);
-			}	
-			
+			}
+
 		});
 	}
 

@@ -5,6 +5,7 @@ namespace go\core\acl\model;
 use Exception;
 use go\core\exception\Forbidden;
 use go\core\model\Acl;
+use go\core\model\User;
 use go\core\orm\Query;
 use go\core\db\Query as DbQuery;
 use go\core\jmap\EntityController;
@@ -24,6 +25,14 @@ use go\core\jmap\Entity;
  * @see AclOwnerEntity
  */
 abstract class AclItemEntity extends AclEntity {
+
+	/**
+	 * Fires when the ACL has changed.
+	 *
+	 * Not when changes were made to the acl but when the complete list has been replaced when for example
+	 * a contact has been moved to another address book.	 *
+	 */
+	const EVENT_ACL_CHANGED = 'aclchanged';
 
 	/**
 	 * Get the {@see AclOwnerEntity} or {@see AclItemEntity} class name that it 
@@ -52,6 +61,9 @@ abstract class AclItemEntity extends AclEntity {
 	 */
 	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
 
+		if(User::isAdminById($userId ?? go()->getAuthState()->getUserId())) {
+			return;
+		}
 		/**
 		 * SELECT SQL_CALC_FOUND_ROWS SQL_NO_CACHE c.id
 		FROM `addressbook_contact` `c`
@@ -190,13 +202,17 @@ abstract class AclItemEntity extends AclEntity {
 			$keys[] = $fromAlias . '.' . $from . ' = ' . $column->table->getAlias() . ' . '. $to;
 		}
 
-		if($query->isJoined($column->table->getName(), $column->table->getAlias())) {
-			throw new \Exception(
-				"The ACL owner table `". $column->table->getName() .
-				"` was already joined with alias `" .  $column->table->getAlias() .
-				"` in class " . static::class . ". If you joined this table via defineMapping() then override the method joinAclEntity() and return '" . $column->table->getAlias() . '.' . $cls::$aclColumnName ."'.") ;
+		// Override didn't work because on delete it did need to be joined.
+//		if($query->isJoined($column->table->getName(), $column->table->getAlias())) {
+//			throw new \Exception(
+//				"The ACL owner table `". $column->table->getName() .
+//				"` was already joined with alias `" .  $column->table->getAlias() .
+//				"` in class " . static::class . ". If you joined this table via defineMapping() then override the method joinAclEntity() and return '" . $column->table->getAlias() . '.' . $cls::$aclColumnName ."'.") ;
+//		}
+
+		if(!$query->isJoined($column->table->getName(), $column->table->getAlias())) {
+			$query->join($column->table->getName(), $column->table->getAlias(), implode(' AND ', $keys));
 		}
-		$query->join($column->table->getName(), $column->table->getAlias(), implode(' AND ', $keys));
 		
 		
 		//If this is another AclItemEntity then recurse
@@ -257,7 +273,7 @@ abstract class AclItemEntity extends AclEntity {
 			$keys[$to] = $this->{$from};
 		}
 
-		$aclEntity = $cls::find()->where($keys)->single();	
+		$aclEntity = $cls::find($cls::getMapping()->getColumnNames())->where($keys)->single();
 
 		if(!$aclEntity) {
 			throw new Exception("Can't find related ACL entity. The keys for class '$cls' must be invalid: " . var_export($keys, true));
@@ -266,15 +282,32 @@ abstract class AclItemEntity extends AclEntity {
 		return $aclEntity;
 	}
 
+	private function isAclChanged()
+	{
+		return $this->isModified(array_keys(static::aclEntityKeys()));
+	}
+
+	protected function internalSave()
+	{
+		if(!$this->isNew() && $this->isAclChanged()) {
+			static::fireEvent(self::EVENT_ACL_CHANGED, $this);
+		}
+
+		return parent::internalSave();
+	}
+
+	/**
+	 * @inheritDoc
+	 */
 	public function getPermissionLevel() {
 
 		if(!isset($this->permissionLevel)) {
 			$aclEntity = $this->getAclEntity();
-		
-			$this->permissionLevel = $aclEntity->getPermissionLevel(); 
+
+			$this->permissionLevel = $aclEntity->getPermissionLevel();
 		}
 
-		return $this->permissionLevel;		
+		return $this->permissionLevel;
 	}
 
 	/**
@@ -293,7 +326,13 @@ abstract class AclItemEntity extends AclEntity {
 
 		return $cls::findAcls();
 	}
-	
+
+	/**
+	 * Find the ACL id that holds the permissions for this item
+	 *
+	 * @return int
+	 * @throws Exception
+	 */
 	public function findAclId() {
 		return $this->getAclEntity()->findAclId();
 	}

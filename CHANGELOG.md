@@ -1,11 +1,169 @@
+- Calendar: hide custom fieldset data in details when no read permissions (Github #704)
+- Calendar: Fixed visibility issue with categories for non-admin manage user permissions (Github #705)
+- Tickets: fixed HTML entity render bug in ticket panel
 
-Master
-- Business: New finance module
-- Projects: new module
-- Tasks: new module
-- Time tracking: new module
+17-06-2021 6.5.60
+- Tickets / Projects: Entity names of Type could conflict in database
+- Core: Fixed horizontal scrolling in grids with autoHeight: true
+- Tickets : Type combobox HTML entities render correctly now
+- Core: fixed required condition in custom fields with != in the condition and updates when form fields change
 
-6.5
+17-06-2021 6.5.59
+- Addressbook: Added index to optimize contact combobox load
+- Billing: Fixed findAclId() on bool error on new error when create task was activated
+- History: Only log history log entery failus to system log
+- Core: Custom filter sub sub conditions didn't work.
+
+15-06-2021 6.5.58
+- Projects: fixed upgrade error
+
+15-06-2021 6.5.57
+- Projects: Fixed jobs combo in time entry dialog
+- Core: User field combo doesn't show disabled users anymore.
+- Projects: duplicate and delete recursively
+
+10-06-2021 6.5.56
+- Core: Disk cache didn't work for entries that should live forever and cached
+    expiring cache forever. This also caused old passwords to work until cache was flushed.
+
+10-06-2021 6.5.55
+- E-mail: Fixed security problem where users could view last opened attachment of another user.
+- Calendar: Fixed [Invitation] Error when responding #706
+- Core: Fixed: [Custom filed] Error in selection field #708
+- Email: attached messages were not opened without savemailas module anymore. Fixed eml downloaded #709.
+
+07-06-2021 6.5.54
+- Core: Disk cache didn't work for entries that should live forever and cached
+    expiring cache forever. This also caused old passwords to work until cache was flushed.
+- Business: sort employees by User displayName by default
+
+07-06-2021 6.5.53
+- Business: Wrong time format in agreement dialog
+- Google authenticator: Translations didn't work in this module
+- Core: Fixed disabled checkbox for enabling modules in group dialog
+- Calendar: [Views] Click on a view then the My calendar button generate an error #703
+- Address book: Select contacts with read permission only in contact custom field
+- Core: ACL panel could show error when no permissions were set
+- Core: Always move permissions panel to the end in dialogs
+- Office online / libreoffice: Open documents read only when not having write permissions for the service.
+- E-mail: Fixed mail showing partial content when HTML structure was not following correct standards
+
+20-05-2021 6.5.52
+- Address book: Fixed import skipping row and updating records by id or email
+- Core: If link panel has more than 5 items it shows count 5+ instead of 5 when collapsed now
+- Core: New option for users to confirm move of contacts, projects and files.
+- Address book: Add read only address books to birthday portlet
+
+18-05-2021 6.5.51
+- Onlyoffice: Open documents in read only mode when not having manage permissions for the module
+- Email: When opening attachments it's saved to a temporary file so it can be opened by
+  file module integrations like OnlyOffice, Microsoft office online, libreoffice etc.
+- Core: Fixed safari 14.1 wrong button color when button was disabled previously
+- Start page: Auto height for news portlet
+- Core: Added Mongolian (Монгол хэл) translation
+- Calendar: All categories are visible (even with permission) #700
+- Billing: Without manage permissions, you couldn't see totals. This was removed.
+- Email: Don't change invalid email addresses into "unknown@unknown.domain"
+
+17-05-2021 6.5.50
+- Core: save 0-values correctly for numeric Custom FIelds
+- Core: bugfix in function custom fields and zero values
+- Projects: sort employees by name
+- Time registration: sort employee combo by name
+- Addressbook: Correct counts in select contact dialog
+- Addressbook: Better pefromance on large database
+- Core: Fixed about dialog.
+- Projects: Supplier company name not shown in expense budget grid
+- Address book: Brought back starred function but as folder now
+- Email: Work around if label is called "labels"
+
+11-05-2021 6.5.49
+- Core: Fixed fresh manual install
+- Projects: Error on time tracking PDF report
+- Projects: Finance report doesn't show projects with no data anymore
+
+11-05-2021 6.5.48
+- Files: Don't show all shares to admins by default
+- Core: Add UTF-8 BOM character to CSV exports so Excel recognizes it as UTF-8
+- Tickets: Ticket dialog can select users too
+- Core: Some bugs came from removing admin from acl's. for example email showing all accounts for admin.
+
+10-05-2021 6.5.47
+- History: Add remote IP address
+- Core: Several PT-BR language corrections
+- Core: Search cache is truncated on upgrade and rebuilt by cron
+- Core: DB indexes are no longer removed by build search index
+- Files: User home dir is a user propery which can also be mapped with LDAP authentication
+- Core: Keep scroll posistion when toggling modules
+- Core: Remove all "Admin" group entries from ACL and handle admin permissions programmatically. This slims down the Acl table.
+- Core: Select text when focusing search fields
+- Leavedays: Fixed holiday conflict check
+- LDAPauth: fixed default values for compatibility with some mysql servers
+- Caldav: Wrong module was checked for permissions
+
+04-05-2021 6.5.46
+- Core: Added support for default subfolder for document templates
+- OnlyOffice: Fixed OnlyOffice printing, download as and editing tables, images etc.
+- ActiveSync: Support multiple calendars, address books and task lists.
+- ActiveSync: Create task lsits and calendars from mobile device.
+- Core: Fixed "Change in requesting notifications stops Firefox working #690"
+- Core: UI could break when dragging some windows out of the viewport
+- Core: remove old log module entry
+- Address book: Middle name was missing when sorting names by last name.
+
+29-04-2021 6.5.45
+- Core: Minor change in requesting notifications
+
+29-04-2021 6.5.44
+- Core: minor bugfix in folder properties dialog
+- Core: Firefox hung on Notification request. Saying "This site slows down your browser"
+- Billing: Report browse failed when projects module wasn't installed.
+- Newsletters: Improved error dialog
+- Office Only: Use 'view' action for read only documents
+
+26-04-2021 6.5.43
+- Core: Create empty password field upon user import if necessary
+- Core: Bad logins and logins were not logged
+- Address book: limit address books to 1000 in tree.
+- Core: Ignore duplicate key error on mysql when upgrading
+
+
+22-04-2021 6.5.42
+- Core: Upgraded to sabre dav 4.1
+- Carddav: Authentication didn't work case insensitive
+- Core: Templates could inject div with style causing incorrect styling
+- Core: Safari could ask for notifications for each reminders shown
+- Newsletters: Templates menu didn't load
+- Projects2: bugfix in duplicate project dialog
+- Email: remember dimensions attachment save as dialog
+- History: Handle error when log entry was too big to save
+- Core: Optimized search performance
+- Core: Fixed Safari error: The request is not allowed by the user agent in the current context when auto play was set
+  to never.
+- Core: dismiss all notifications lead to error when notifications were denied
+
+09-04-2021 6.5.41
+- Core: Ignore duplicate constraint error of MySQL on upgrade
+- Tasks: Fixed link to project
+- Projects: Project analyzer couldn't be installed due to invalid depencency
+- Calendar: Fixed unauthorized error on calendar accept from external participant
+- Core: Allow drag and drop of text in UI
+- Sync: Add method=request to calendar invite email
+- Core: Improved notifications UI and onclose handler in safari
+- Carddav: Fixed broken auth
+- Calendar: fall back on user language if holiday scheme not assigned
+
+06-04-2021 6.5.40
+- Core: Notification open in your face to bring more attention
+- Core: Closing desktop notification will dismiss reminder in Group-Office too.
+- Core: Closing/dismiss reminder in Group-Office will close desktop notification.
+- History: Fix error when comments module not enabled
+- Core: Removed duplicate queries from updates script
+
+02-04-2021 6.5.39
+- Email: Fixed could not parse XML error
+
+01-04-2021 6.5.38
 - Core: array relation with ID's keeps records
 - Core: Module dependencies are respected
 - Business: New employee management module
@@ -16,14 +174,98 @@ Master
 - Address book: Removed starred functionality for performance reasons
 - Core: New global search design to improve performance on larger databases
 - Documenttemplates: add selectable folder option
+- Core: Default authentication domain is appended automatically when local user isn't available. This allows ldap users
+  to login with their username without appending or selecting a domain. Removed the domain combo because it's no longer
+  needed with this change.
+- Core: Smaller header bar
 
-end 6.5
---------
+
+------
 
 
+
+
+
+6.4.244
+6.4.236
+14-06-2021 6.4.236
+- Core: Better handling of zero-values in numeric custom fields
+- Core: Fixed zero values of numeric custom fields in function CF
+- Projects: Options to delete and duplicate recursively
+
+10-05-2021 6.4.235
+- Calendar: fix behaviour of copy button in list view
+- Billing: Fixed error "Incorrect integer valie for 'order_at_supplier'"
+- Leavedays: Fixed calendar conflict check
+
+29-04-2021 6.4.234
+- Email: remember dimensions attachment save as dialog
+- Calendar: Fixed availability check and added more buttons to improve usability
+- Email: Save as task was missing
+
+22-04-2021 6.4.233
+- Email: preserve links when forwarding emails
+- Email: bugfix when creating links
+- Carddav: Fixed carddav problem when logged in with letters in different case than stored in database.
+- Smime: Fixed from showing unknown@unknown.domain
+- Core: Creating new linked item could do expensive unnecessary request
+- Calendar: fix behavior of delete button in list view
+- Core: $config['allow_themes'] was broken
+- Billing: Contact not displayed in grid
+- Email: Block external images for all folders
+- OnlyOffice: Works for Open Document formats now
+
+12-04-2021 6.4.232
+- OnlyOffice: Only office only worked in root of domain
+- Address book: Save name column width
+- Projects: Save time entry grid state in edit dialog of project
+
+02-04-2021 6.4.231
+- Email: Fixed could not parse XML error
+
+01-04-2021 6.4.230
+- Email: Preseve body style attributes
+- Billing: Hide projects tab in report if no projects module available
+- Email: hide context menu 'Delete sender from' if no items available
+- Core: Make Account settings > Groups scrollable for non-admin users
+- Email: SMIME decrypted content in reply too when plaintext is enabled
+- Core: List navigation after delete could move in wrong direction
+- Core: update acl's of linked emails when acl id changes (ie. move contact to another address book)
+
+18-03-2021 6.4.229
+- Core: Business Module.php files were encoded. This stopped Group-Office from running without Ioncube.
+- Core: Prevent multiple chips options to be displayed multiple times
+- Core: Multiselect option store will self-destruct
+- Projects2: prevent filling contact and customer ids from previous projects
+
+15-03-2021 6.4.228
+- Core: fix for faulty headers appearing multiple times. This could break ActiveSync.
+- ActiveSync: Fix for images sent with iPhone not showing correctly
+- Core: Custom field tabs disabled bug fixed
+- LDAP: Domain was accidentally included in username to server
+- Files: Set notifications on read only folders is possible now.
+
+12-03-2021 6.4.227
+- Tickets: Added open/close options to ticketsgrid context menu
+- Calendar: Fixed display of select boxes in event details
+- Calendar: Invite didn't work if address was not found due due to case-sensitity
+- Billing: load statues by book_id in orderstatus dialog
+- LDAP: Fixed delete users and groups
+- LDAP: Validate users and groups queries before save
+- Projects: New custom field for selecting projects
+- New OnlyOffice module (Experimental)
+- Files: new module to convert documents to PDF with libreoffice online API
+- Studio: Fixed fields showing ID's instead of text in search results
+- Studio: Search fields for description didn't load
+
+05-03-2021 6.4.226
 - Email: Fixed sort contacts on last mail time noty always updating
 - Calendar: Fixed invalid reply to meeting request
 - Core: Fixed {product_name} replacement in language export
+- SMIME: Include encrypted content in reply and enable encryption
+- Email: In some cases an error occurred because a link was attempted to a read only organization
+- Projects: Creating task from project fills in project field
+- Email: Fixed 6.4.224 Problem displaying some email content #675
 
 03-03-2021 6.4.225
 - Core: fixed order of address fields in UK addresses. Thanks Jonny C
@@ -34,6 +276,7 @@ end 6.5
 - Core: Improved list style in HTML editor and SHIFT + ENTER in lists inserts line break
   instead of new list item.
 - Calendar: Fixed crash of calendar when deleting the selected view.
+- Projects2: User setting to select project when starting timer.
 
 26-02-2021 6.4.224
 - Multi instance: Fixed delete issue when temp dir was in use

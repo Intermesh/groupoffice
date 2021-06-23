@@ -89,6 +89,7 @@ GO.moduleManager.onModuleReady('calendar',function(){
 		}),
 	
 		clearGrids : function(config){
+			// debugger;
 			var selectGrid, clearGrids=[];
 			if(this.view_id>0){
 				selectGrid = this.viewsList;
@@ -106,7 +107,10 @@ GO.moduleManager.onModuleReady('calendar',function(){
 
 				if(this.group_id==1){
 					selectGrid = this.calendarListPanel.getLayout().activeItem;
-	//				selectGrid = this.calendarList;				
+					if(!selectGrid.applyFilter) {
+						//when views or resources was selected
+						selectGrid = this.calendarList;
+					}
 					this.resourcesList.getSelectionModel().clearSelections();
 
 					selectGrid.expand();

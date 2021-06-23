@@ -14,6 +14,7 @@
 go.cron.SystemSettingsCronGrid = Ext.extend(GO.grid.GridPanel,{
 	changed : false,
 	iconCls: 'ic-schedule',
+	stateId: 'system-settings-cron-grid',
 	
 	initComponent : function(){
 		
@@ -99,22 +100,22 @@ go.cron.SystemSettingsCronGrid = Ext.extend(GO.grid.GridPanel,{
 
 
 				{
+					xtype: 'datecolumn',
 					header: t("Next run", "cron"),
 					dataIndex: 'nextrun',
-					sortable: true,
-					width: dp(140)
+					sortable: true
 				},
 				{
+					xtype: 'datecolumn',
 					header: t("Last run", "cron"),
 					dataIndex: 'lastrun',
-					sortable: true,
-					width: dp(140)
+					sortable: true
 				},
 				{
+					xtype: 'datecolumn',
 					header: t("Completed at", "cron"),
 					dataIndex: 'completedat',
-					sortable: true,
-					width: dp(140)
+					sortable: true
 				},{
 					header: t("Error", "cron"),
 					dataIndex: 'error',

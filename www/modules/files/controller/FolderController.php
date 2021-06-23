@@ -1173,11 +1173,14 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 		$folderId =  $this->checkModelFolder($model, true, !empty($params['mustExist']));
 		$folder = Folder::model()->findByPk($folderId);
 
-		return [
+		$response = [
 			'success' => true,
 			'files_folder_id' => $folderId,
 			'path' => $folder->path
 		];
+		$this->fireEvent('afterCheckModelFolder', [$model, $folder, &$response]);
+
+		return $response;
 	}
 
 	/**
@@ -1208,8 +1211,9 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 					
 			$model->files_folder_id = $this->_checkExistingModelFolder($model, $folder, $mustExist);
 
-			if ($saveModel && $model->isModified())
+			if ($saveModel && $model->isModified()) {
 				$model->save(true);
+			}
 		} elseif ($model->alwaysCreateFilesFolder() || $mustExist) {
 			
 			GO::debug('Folder does not exist in database. Will create it.');
@@ -1710,4 +1714,14 @@ class FolderController extends \GO\Base\Controller\AbstractModelController {
 
 		echo $this->render('delete', array('model' => $model));
 	}
+
+	/**
+	 * @param $model
+	 * @return mixed
+	 */
+	protected function checkLoadPermissionLevel($model)
+	{
+		return $model->checkPermissionLevel($model->isNew() ?\GO\Base\Model\Acl::CREATE_PERMISSION : \GO\Base\Model\Acl::READ_PERMISSION);
+	}
+
 }

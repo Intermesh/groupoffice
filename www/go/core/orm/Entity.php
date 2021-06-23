@@ -94,35 +94,37 @@ abstract class Entity extends Property {
 	 */
 	const EVENT_SORT = "sort";
 
-  /**
-   * Find entities
-   *
-   * Returns a query object that's also directly iterable:
-   *
-   * @exanple
-   * ````
-   * $notes = Note::find()->where(['name' => 'Foo']);
-   *
-   * foreach($notes as $note) {
-   *  echo $note->name;
-   * }
-   *
-   * ```
-   *
-   * For a single value do:
-   *
-   * @exanple
-   * ````
-   * $note = Note::find()->where(['name' => 'Foo'])->single();
-   *
-   * ```
-   *
-   * For more details see the Criteria::where() function description
-   *
-   * @return static[]|Query
-   * @throws Exception
-   * @see Criteria::where()
-   */
+	/**
+	 * Find entities
+	 *
+	 * Returns a query object that's also directly iterable:
+	 *
+	 * @param array $properties Specify the columns for optimal performance. You can also use the mapping to only fetch table columns Note::getMapping()->getColumnNames()
+	 * @param bool $readOnly Readonly has less overhead
+	 * @return static[]|Query
+	 * @throws Exception
+	 * @example
+	 * ````
+	 * $notes = Note::find()->where(['name' => 'Foo']);
+	 *
+	 * foreach($notes as $note) {
+	 *  echo $note->name;
+	 * }
+	 *
+	 * ```
+	 *
+	 * For a single value do:
+	 *
+	 * @exanple
+	 * ````
+	 * $note = Note::find()->where(['name' => 'Foo'])->single();
+	 *
+	 * ```
+	 *
+	 * For more details see the Criteria::where() function description
+	 *
+	 * @see Criteria::where()
+	 */
 	public static final function find(array $properties = [], $readOnly = false) {
 		
 		if(count($properties) && !isset($properties[0])) {
@@ -477,6 +479,9 @@ abstract class Entity extends Property {
 	
 	/**
 	 * Get the permission level of the current user
+	 *
+	 * Note: when overriding this function you also need to override applyAclToQuery() so that queries return only
+	 * readable entities.
 	 * 
 	 * @return int
 	 */
@@ -578,6 +583,8 @@ abstract class Entity extends Property {
 
   private static $filters = [];
 
+
+
   /**
    * Defines JMAP filters
    *
@@ -609,109 +616,105 @@ abstract class Entity extends Property {
    */
 	protected static function defineFilters() {
 
-		$cls = static::class;
+		$filters = new Filters();
 
-		if(!isset(self::$filters[$cls])) {
+		$filters->add('text', function (Criteria $criteria, $value, Query $query) {
+			if (!is_array($value)) {
+				$value = [$value];
+			}
 
-			self::$filters[$cls] = new Filters();
-
-			self::$filters[$cls]->add('text', function (Criteria $criteria, $value, Query $query) {
-				if (!is_array($value)) {
-					$value = [$value];
+			foreach ($value as $q) {
+				if (!empty($q)) {
+					static::search($criteria, $q, $query);
 				}
-
-				foreach ($value as $q) {
-					if (!empty($q)) {
-						static::search($criteria, $q, $query);
-					}
-				}
-			})
-				->add('exclude', function (Criteria $criteria, $value) {
-					if (!empty($value)) {
-						$criteria->andWhere('id', 'NOT IN', $value);
-					}
-				});
-
-			if (static::getMapping()->getColumn('modifiedAt')) {
-				self::$filters[$cls]->addDate("modifiedAt", function (Criteria $criteria, $comparator, $value) {
-					$criteria->where('modifiedAt', $comparator, $value);
-				});
 			}
-
-
-			if (static::getMapping()->getColumn('modifiedBy')) {
-				self::$filters[$cls]->addText("modifiedBy", function (Criteria $criteria, $comparator, $value, Query $query) {
-					if (!$query->isJoined('core_user', 'modifier')) {
-						$query->join('core_user', 'modifier', 'modifier.id = ' . $query->getTableAlias() . '.modifiedBy');
-					}
-
-					$criteria->where('modifier.displayName', $comparator, $value);
-				});
-			}
-
-			if (static::getMapping()->getColumn('createdAt')) {
-				self::$filters[$cls]->addDate("createdAt", function (Criteria $criteria, $comparator, $value) {
-					$criteria->where('createdAt', $comparator, $value);
-				});
-			}
-
-
-			if (static::getMapping()->getColumn('createdBy')) {
-				self::$filters[$cls]->addText("createdBy", function (Criteria $criteria, $comparator, $value, Query $query) {
-					if (!$query->isJoined('core_user', 'creator')) {
-						$query->join('core_user', 'creator', 'creator.id = ' . $query->getTableAlias() . '.createdBy');
-					}
-
-					$criteria->where('creator.displayName', $comparator, $value);
-				});
-			}
-
-			self::defineLegacyFilters(self::$filters[$cls]);
-
-			if (method_exists(static::class, 'defineCustomFieldFilters')) {
-				static::defineCustomFieldFilters(self::$filters[$cls]);
-			}
-
-			self::$filters[$cls]->addDate('commentedAt', function (Criteria $criteria, $comparator, $value, Query $query) {
-				if (!$query->isJoined('comments_comment', 'comment')) {
-					$query->join('comments_comment', 'comment', 'comment.entityId = ' . $query->getTableAlias() . '.id AND comment.entityTypeId=' . static::entityType()->getId());
-				}
-
-				$tag = ":commentedAt" . uniqid();
-
-				$query->having('MAX(comment.date) ' . $comparator . ' ' . $tag)
-					->bind($tag, $value->format(\go\core\db\Column::DATETIME_FORMAT))
-					->groupBy(['id']);
-			});
-
-
-			/*
-				find all items with link to:
-
-			link : {
-				entity: "Contact",
-				id: 1
-			}
-
-			or leave id empty to find items that link to any contact
-
-			*/
-			self::$filters[$cls]->add("link", function (Criteria $criteria, $value, Query $query) {
-				$linkAlias = 'link_' . uniqid();
-				$on = $query->getTableAlias() . '.id =  ' . $linkAlias . '.toId  AND ' . $linkAlias . '.toEntityTypeId = ' . static::entityType()->getId() . ' AND ' . $linkAlias . '.fromEntityTypeId = ' . EntityType::findByName($value['entity'])->getId();
-
-				$query->join('core_link', $linkAlias, $on, "LEFT");
-				$criteria->where('toId', '!=', null);
-
-				if (!empty($value['id'])) {
-					$criteria->andWhere('fromId', '=', $value['id']);
+		})
+			->add('exclude', function (Criteria $criteria, $value) {
+				if (!empty($value)) {
+					$criteria->andWhere('id', 'NOT IN', $value);
 				}
 			});
 
-			static::fireEvent(self::EVENT_FILTER, self::$filters[$cls]);
+		if (static::getMapping()->getColumn('modifiedAt')) {
+			$filters->addDate("modifiedAt", function (Criteria $criteria, $comparator, $value) {
+				$criteria->where('modifiedAt', $comparator, $value);
+			});
 		}
+
+
+		if (static::getMapping()->getColumn('modifiedBy')) {
+			$filters->addText("modifiedBy", function (Criteria $criteria, $comparator, $value, Query $query) {
+				if (!$query->isJoined('core_user', 'modifier')) {
+					$query->join('core_user', 'modifier', 'modifier.id = ' . $query->getTableAlias() . '.modifiedBy');
+				}
+
+				$criteria->where('modifier.displayName', $comparator, $value);
+			});
+		}
+
+		if (static::getMapping()->getColumn('createdAt')) {
+			$filters->addDate("createdAt", function (Criteria $criteria, $comparator, $value) {
+				$criteria->where('createdAt', $comparator, $value);
+			});
+		}
+
+
+		if (static::getMapping()->getColumn('createdBy')) {
+			$filters->addText("createdBy", function (Criteria $criteria, $comparator, $value, Query $query) {
+				if (!$query->isJoined('core_user', 'creator')) {
+					$query->join('core_user', 'creator', 'creator.id = ' . $query->getTableAlias() . '.createdBy');
+				}
+
+				$criteria->where('creator.displayName', $comparator, $value);
+			});
+		}
+
+		self::defineLegacyFilters($filters);
+
+		if (method_exists(static::class, 'defineCustomFieldFilters')) {
+			static::defineCustomFieldFilters($filters);
+		}
+
+		$filters->addDate('commentedAt', function (Criteria $criteria, $comparator, $value, Query $query) {
+			if (!$query->isJoined('comments_comment', 'comment')) {
+				$query->join('comments_comment', 'comment', 'comment.entityId = ' . $query->getTableAlias() . '.id AND comment.entityTypeId=' . static::entityType()->getId());
+			}
+
+			$tag = ":commentedAt" . uniqid();
+
+			$query->having('MAX(comment.date) ' . $comparator . ' ' . $tag)
+				->bind($tag, $value->format(\go\core\db\Column::DATETIME_FORMAT))
+				->groupBy(['id']);
+		});
+
+
+		/*
+			find all items with link to:
+
+		link : {
+			entity: "Contact",
+			id: 1
+		}
+
+		or leave id empty to find items that link to any contact
+
+		*/
+		$filters->add("link", function (Criteria $criteria, $value, Query $query) {
+			$linkAlias = 'link_' . uniqid();
+			$on = $query->getTableAlias() . '.id =  ' . $linkAlias . '.toId  AND ' . $linkAlias . '.toEntityTypeId = ' . static::entityType()->getId() . ' AND ' . $linkAlias . '.fromEntityTypeId = ' . EntityType::findByName($value['entity'])->getId();
+
+			$query->join('core_link', $linkAlias, $on, "LEFT");
+			$criteria->where('toId', '!=', null);
+
+			if (!empty($value['id'])) {
+				$criteria->andWhere('fromId', '=', $value['id']);
+			}
+		});
+
+		static::fireEvent(self::EVENT_FILTER, $filters);
 		
-		return self::$filters[$cls];
+		
+		return $filters;
 	}
 
 	/**
@@ -770,8 +773,22 @@ abstract class Entity extends Property {
    */
 
 	public static function filter(Query $query, array $filter) {
-		static::defineFilters()->apply($query, $filter);
+		static::getFilters()->apply($query, $filter);
 		return $query;
+	}
+
+	/**
+	 * @return Filters
+	 * @throws Exception
+	 */
+	public static function getFilters() {
+		$cls = static::class;
+
+		if(!isset(self::$filters[$cls])) {
+			self::$filters[$cls] = static::defineFilters();
+		}
+
+		return self::$filters[$cls];
 	}
 	
 	/**

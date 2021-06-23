@@ -47,7 +47,10 @@ go.grid.GridTrait = {
 			if(response.message == "unsupportedSort") {
 				console.warn("Clearing invalid sort state:", store.sortInfo);
 				store.sortInfo = {};
-				store.reload();
+				//caused infinite loop while developing
+				if(!GO.debug) {
+					store.reload();
+				}
 
 				//cancel further exception handling
 				return false;
@@ -315,6 +318,14 @@ go.grid.GridTrait = {
 			this.moveDirection == 'up' ? this.getSelectionModel().selectFirstRow() : this.getSelectionModel().selectLastRow();
 		}
 
+		//make sure moveDirections stays the same after delete
+		if(this.moveDirection == 'up') {
+			this.lastSelectedIndex = this.currentSelectedIndex + 1;
+		} else
+		{
+			this.lastSelectedIndex = this.currentSelectedIndex - 1;
+		}
+
 		var record = this.getSelectionModel().getSelected();
 
 		if(record) {
@@ -401,6 +412,20 @@ go.grid.GridTrait = {
 				this.headerMenu.add(item)
 			}
 		}
+		//Sort menu alphabetically
+		this.headerMenu.items.sort("ASC", function(a, b){
+			// Use toUpperCase() to ignore character casing
+			var colA = a.text.toUpperCase();
+			var colB = b.text.toUpperCase();
+
+			var comparison = 0;
+			if (colA > colB) {
+				comparison = 1;
+			} else if (colA < colB) {
+				comparison = -1;
+			}
+			return comparison;
+		});
 		this.headerMenu.show(el, "tr-br?")
 	}
 }

@@ -57,7 +57,7 @@ go.customfields.type.Select = Ext.extend(go.customfields.type.Text, {
 	},
 	
 	/**
-	 * Returns config oject to create the form field 
+	 * Returns config object to create the form field
 	 * 
 	 * @param {object} customfield customfield Field entity from custom fields
 	 * @param {object} config Extra config options to apply to the form field

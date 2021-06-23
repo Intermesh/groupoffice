@@ -56,7 +56,8 @@ class SharedRootFolder extends \GO\Base\Db\ActiveRecord {
 
 		$findParams = new \GO\Base\Db\FindParams();
 
-		$findParams->getCriteria()
+		$findParams->ignoreAdminGroup()
+						->getCriteria()
 						->addModel(Folder::model())
 						->addCondition('visible', 1);
 //						->addCondition('user_id', $user_id, '!=');

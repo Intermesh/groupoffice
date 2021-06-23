@@ -40,7 +40,6 @@ class Installer {
 	
 	const EVENT_UPGRADE = 'upgrade';
 
-	private static $isInProgress = false;
 	private static $isInstalling = false;
 	private static $isUpgrading = false;
 
@@ -102,7 +101,7 @@ class Installer {
 	 * @param Module[] $installModules
 	 * @throws Exception
 	 */
-	public function install(array $adminValues = [], $installModules = []) {
+	public function install(array $adminValues = [], $installModules = null) {
 
 		ini_set("max_execution_time", 0);
 		
@@ -113,7 +112,6 @@ class Installer {
 		App::get()->setCache(new None());
 
 
-		self::$isInProgress = true;
 		self::$isInstalling = true;
 
 		ActiveRecord::$log_enabled = false;
@@ -149,8 +147,14 @@ class Installer {
 		
 		$this->installEmailTemplate();
 
+		if(!isset($installModules)) {
+			$installModules = $this->getAutoInstallModules();
+		}
+
 		foreach ($installModules as $installModule) {
-			$installModule->install();
+			if(!$installModule->isInstalled()) {
+				$installModule->install();
+			}
 		}
 
 		App::get()->getSettings()->systemEmail = $admin->email;
@@ -164,6 +168,22 @@ class Installer {
 		//phpunit tests will use change tracking after install
 		jmap\Entity::$trackChanges = true;
 		App::get()->getDbConnection()->exec("SET FOREIGN_KEY_CHECKS=1;");
+	}
+
+	/**
+	 * @return \go\core\Module[]
+	 */
+	private function getAutoInstallModules() {
+		$availableModules = \go\core\Module::findAvailable();
+		$installModules = [];
+		foreach($availableModules as $modCls) {
+			$mod = $modCls::get();
+			if($mod->autoInstall() && $mod->isInstallable()) {
+				$installModules[] = $mod;
+			}
+		}
+
+		return $installModules;
 	}
 	
 	
@@ -328,6 +348,12 @@ class Installer {
 		
 	}
 
+	/**
+	 * Disable modules that are no longer available
+	 *
+	 * @return bool true if modules were disabled
+	 * @throws Exception
+	 */
 	public function disableUnavailableModules() {
 
 		$unavailable = $this->getUnavailableModules();
@@ -339,7 +365,11 @@ class Installer {
 			}
 			$stmt = go()->getDbConnection()->update("core_module", ['enabled' => false], $where);
 			$stmt->execute();
+
+			return $stmt->rowCount() > 0;
 		}
+
+		return false;
 	}
 
 	private function initLogFile() {
@@ -369,7 +399,6 @@ class Installer {
 	}
 
 	public function upgrade() {
-		self::$isInProgress = true;
 		self::$isUpgrading = true;
 
 		go()->setAuthState((new TemporaryState())->setUserId(1));
@@ -622,9 +651,19 @@ class Installer {
 								go()->getDbConnection()->query($query);
 						} catch (PDOException $e) {
 
-							if ($e->getCode() == 42000 || $e->getCode() == '42S21' || $e->getCode() == '42S01' || $e->getCode() == '42S22' || strstr($e->getMessage(), 'errno: 121 ')) {
+							if (
+								$e->getCode() == '42000' ||
+								$e->getCode() == '42S21' || //duplicate col
+								$e->getCode() == '42S01' || //table exists
+								$e->getCode() == '42S22' || //col not found
+								strstr($e->getMessage(), 'errno: 121 ') || // (errno: 121 "Duplicate key on write or update")
+								strstr($e->getMessage(), ' 1826 ') || //HY000: SQLSTATE[HY000]: General error: 1826 Duplicate foreign key constraint
+								strstr($e->getMessage(), ' 1022 ') //Integrity constraint violation: 1022 Can't write; duplicate key in table '#sql-509_19b'/
+								) {
+
 								//duplicate and drop errors. Ignore those on updates.
 								echo "IGNORE: " . $e->getMessage() ."\n";
+
 							} else {
 
 								$msg = $e->getCode() . ': '.$e->getMessage() . "\n".

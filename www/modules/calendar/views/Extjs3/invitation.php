@@ -20,12 +20,12 @@ $this->render('externalHeader');
 
 if ($participant->status == \GO\Calendar\Model\Participant::STATUS_ACCEPTED) {
 	?>
-	<p><?php echo \GO::t("You have accepted the event.", "calendar"); ?></p>		
+	<h2><?php echo \GO::t("You have accepted the event.", "calendar"); ?></h2>
 	<?php
 	}else
 	{
 	?>
-	<p><?php echo \GO::t("You have declined the event.", "calendar"); ?></p>
+	<h2><?php echo \GO::t("You have declined the event.", "calendar"); ?></h2>
 	<?php
 }
 

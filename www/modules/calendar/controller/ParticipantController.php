@@ -211,7 +211,8 @@ class ParticipantController extends \GO\Base\Controller\AbstractModelController 
 		}
 		
 		// Create Participants header row
-		$row['name'] = '<b>'.\GO::t("Participants", "calendar").'</b>';
+		$row['strong'] = true;
+		$row['name'] = \GO::t("Participants", "calendar");
 		$row['email'] = '';
 		$row['freebusy'] = array();
 		
@@ -222,67 +223,62 @@ class ParticipantController extends \GO\Base\Controller\AbstractModelController 
 		}
 
 		$response['results'][] = $row;
+
+		$participants = !empty($params['participantData']) ? json_decode($params['participantData'], true) : [];
 		
 		// Create a participant row for every participant
-		if(!empty($params['participantData'])){
-			$participants = json_decode($params['participantData'], true);
-			
-			foreach($participants as $row){
-				
-				$row['freebusy'] = array();
-				
-				if(!empty($row['user_id'])){
-					
-					$user = \GO\Base\Model\User::model()->findByPk($row['user_id']);
-					if ($user){
-						$participant = new \GO\Calendar\Model\Participant();
-						$participant->user_id=$user->id;
-						$participant->name=$user->name;
-						$participant->email=$user->email;
-						$participant->event_id=$event_id;
-						
-						if ($participant->hasFreeBusyAccess()){
-							$freebusy = $participant->getFreeBusyInfo($daystart, $dayend);
-							foreach ($freebusy as $min => $busy) {
-								if ($busy == 1) {
-									$merged_free_busy_participants[$min] = 1;
-									$merged_free_busy_all[$min] = 1;
-								}
-								$row['freebusy'][] = array('time' => date('G:i', mktime(0, $min)),'busy' => $busy);
+
+		$participants = json_decode($params['participantData'], true);
+
+		foreach($participants as $row){
+
+			$row['freebusy'] = array();
+
+			if(!empty($row['user_id'])){
+
+				$user = \GO\Base\Model\User::model()->findByPk($row['user_id'], false,true);
+				if ($user){
+					$participant = new \GO\Calendar\Model\Participant();
+					$participant->user_id=$user->id;
+					$participant->name=$user->name;
+					$participant->email=$user->email;
+					$participant->event_id=$event_id;
+
+					if ($participant->hasFreeBusyAccess()){
+						$freebusy = $participant->getFreeBusyInfo($daystart, $dayend);
+						foreach ($freebusy as $min => $busy) {
+							if ($busy == 1) {
+								$merged_free_busy_participants[$min] = 1;
+								$merged_free_busy_all[$min] = 1;
 							}
+							$row['freebusy'][] = array('time' => date('G:i', mktime(0, $min)),'busy' => $busy);
 						}
 					}
 				}
-				$response['results'][] = $row;
 			}
+			$row['strong'] = false;
+			$response['results'][] = $row;
 		}
-	
-		// Create the together row
-		$row['name'] = \GO::t("All participants together", "calendar");
-		$row['email'] = '';
-		$row['freebusy'] = array();
 
-		foreach ($merged_free_busy_participants as $min => $busy) {
-			$row['freebusy'][] = array(
+		if(count($participants) > 1) {
+			// Create the together row
+			$row['strong'] = false;
+			$row['name'] = \GO::t("All participants together", "calendar");
+			$row['email'] = '';
+			$row['freebusy'] = array();
+
+			foreach ($merged_free_busy_participants as $min => $busy) {
+				$row['freebusy'][] = array(
 					'time' => date(\GO::user()->time_format, mktime(0, $min)),
 					'busy' => $busy);
-		}
+			}
 
-		$response['results'][] = $row;
+			$response['results'][] = $row;
+		}
 		
 		// And now for the resources...
-		
-		$resource['name'] = '<b>'.\GO::t("Resources", "calendar").'</b>';
-		$resource['email'] = '';
-		$resource['freebusy'] = array();
 
-		for ($min=0; $min < 1440; $min+=15) {
-			$resource['freebusy'][] = array(
-					'time' => date(\GO::user()->time_format, mktime(0, $min)),
-					'busy' => false);
-		}
-		
-		$response['results'][] = $resource;
+
 		
 		
 		$merged_free_busy_resources = array();
@@ -300,53 +296,73 @@ class ParticipantController extends \GO\Base\Controller\AbstractModelController 
 				)
 				->order('name','ASC')
 		);
-		
-		foreach ($calendarsStmt as $resourceCalModel) {
-			
-			$resource['name'] = $resourceCalModel->name;
-			$resource['email'] = $resourceCalModel->user->email;
+
+		if($calendarsStmt->rowCount() > 0) {
+			$resource['strong'] = true;
+			$resource['name'] = \GO::t("Resources", "calendar");
+			$resource['email'] = '';
 			$resource['freebusy'] = array();
-			
-			$freebusy = $resourceCalModel->getFreeBusyInfo($daystart);
-			foreach ($freebusy as $min => $busy) {
-				if ($busy == 1) {
-					$merged_free_busy_resources[$min] = 1;
-					$merged_free_busy_all[$min] = 1;
-				}
+
+			for ($min = 0; $min < 1440; $min += 15) {
 				$resource['freebusy'][] = array(
-					'time' => date('G:i', mktime(0, $min)),
+					'time' => date(\GO::user()->time_format, mktime(0, $min)),
+					'busy' => false);
+			}
+
+			$response['results'][] = $resource;
+
+
+			foreach ($calendarsStmt as $resourceCalModel) {
+				$resource['strong'] = false;
+				$resource['name'] = $resourceCalModel->name;
+				$resource['email'] = $resourceCalModel->user->email;
+				$resource['freebusy'] = array();
+
+				$freebusy = $resourceCalModel->getFreeBusyInfo($daystart);
+				foreach ($freebusy as $min => $busy) {
+					if ($busy == 1) {
+						$merged_free_busy_resources[$min] = 1;
+						$merged_free_busy_all[$min] = 1;
+					}
+					$resource['freebusy'][] = array(
+						'time' => date('G:i', mktime(0, $min)),
+						'busy' => $busy);
+				}
+
+				$response['results'][] = $resource;
+			}
+		}
+		
+		if($calendarsStmt->rowCount() > 1) {
+			$resource['name'] = \GO::t("All resources together", "calendar");
+			$resource['email'] = '';
+			$resource['freebusy'] = array();
+
+			foreach ($merged_free_busy_resources as $min => $busy) {
+				$resource['freebusy'][] = array(
+					'time' => date(\GO::user()->time_format, mktime(0, $min)),
 					'busy' => $busy);
 			}
-			
+
 			$response['results'][] = $resource;
 		}
-		
-		
-		$resource['name'] = \GO::t("All resources together", "calendar");
-		$resource['email'] = '';
-		$resource['freebusy'] = array();
 
-		foreach ($merged_free_busy_resources as $min => $busy) {
-			$resource['freebusy'][] = array(
+		if($calendarsStmt->rowCount() > 0) {
+
+			$business['name'] = \GO::t("All together", "calendar");
+			$business['strong'] = true;
+			$business['email'] = '';
+			$business['freebusy'] = array();
+
+			foreach ($merged_free_busy_all as $min => $busy) {
+				$business['freebusy'][] = array(
 					'time' => date(\GO::user()->time_format, mktime(0, $min)),
 					'busy' => $busy);
-		}
-		
-		$response['results'][] = $resource;
-		
-		
-		$business['name'] = '<b>'.\GO::t("All together", "calendar").'</b>';
-		$business['email'] = '';
-		$business['freebusy'] = array();
+			}
 
-		foreach ($merged_free_busy_all as $min => $busy) {
-			$business['freebusy'][] = array(
-					'time' => date(\GO::user()->time_format, mktime(0, $min)),
-					'busy' => $busy);
-		}
-		
 
-		$response['results'][] = $business;
+			$response['results'][] = $business;
+		}
 		
 		return $response;
 	}

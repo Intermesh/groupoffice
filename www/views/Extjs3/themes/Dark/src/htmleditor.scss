@@ -1,15 +1,12 @@
 @import 'config';
 @import '../../Paper/src/base';
 
-body, html {
+body, p, span, div {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: sp(16);
 	color: black;
 	font-weight: $font-weight-r;
 	line-height: dp(24);
-}
-button, html, input, select, textarea {
-	font-family: Helvetica, Arial, sans-serif;
 }
 
 h1 { @extend %font-display1;}

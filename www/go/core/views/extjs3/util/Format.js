@@ -124,12 +124,17 @@
 			return Math.abs(ageDate.getUTCFullYear() - 1970);
 		},
 		
-		duration : function(minutes, pad) {
-			var time = parseInt(minutes);
-			var hours = Math.floor( time / 60);          
-			var minutes = time % 60;
+		duration : function(seconds, pad, showSeconds) {
+			var time = parseInt(seconds);
+			var hours = Math.floor( time / 60 / 60);
+			time -= hours * 3600;
+			var minutes = Math.floor( time / 60);
 			minutes = (minutes < 10) ? "0"+minutes : minutes;
 			hours = (pad && hours < 10) ? "0"+hours : hours;
+			if(showSeconds) {
+				var seconds = time % 60;
+				return hours+':'+minutes+':'+((seconds < 10) ? "0"+seconds : seconds);
+			}
 			return hours+':'+minutes;
 		},
 

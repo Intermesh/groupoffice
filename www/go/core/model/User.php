@@ -9,6 +9,8 @@ use GO\Base\Model\AbstractUserDefaultModel;
 use GO\Base\Model\User as LegacyUser;
 use GO\Base\Util\Http;
 use go\core\App;
+use go\core\auth\Authenticate;
+use go\core\auth\BaseAuthenticator;
 use go\core\auth\Method;
 use go\core\auth\Password;
 use go\core\auth\PrimaryAuthenticator;
@@ -21,6 +23,7 @@ use go\core\jmap\Entity;
 use go\core\orm\CustomFieldsTrait;
 use go\core\util\DateTime;
 use go\core\validate\ErrorCode;
+use GO\Files\Model\Folder;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\notes\model\NoteBook;
 
@@ -31,10 +34,24 @@ class User extends Entity {
 
 	const ID_SUPER_ADMIN = 1;
 
+	/**
+	 * Fires on login
+	 *
+	 * @param User $user
+	 */
 	const EVENT_LOGIN = 'login';
 
+	/**
+	 * Fires on logout
+	 *
+	 * @param User $user
+	 */
 	const EVENT_LOGOUT = 'logout';
 
+	/**
+	 * @param string $username
+	 * @param User $user Can be null
+	 */
 	const EVENT_BADLOGIN = 'badlogin';
 	
 	public $validatePassword = true;
@@ -155,6 +172,21 @@ class User extends Entity {
 	 * @var string
 	 */
 	public $textSeparator;
+
+	/**
+	 * Home directory of the user
+	 *
+	 * eg. users/admin
+	 *
+	 * @var string
+	 */
+	public $homeDir;
+
+	/**
+	 * When true the user interface will show a confirm dialog before moving item with drag and drop
+	 * @var bool
+	 */
+	public $confirmOnMove;
 	
 	
 	public $max_rows_list;
@@ -173,7 +205,7 @@ class User extends Entity {
 	public $timezone;
 	public $start_module;
 	public $language;
-	public $theme;
+	protected $theme;
 	public $firstWeekday;
 	public $sort_name;
 	
@@ -295,6 +327,7 @@ class User extends Entity {
 			$this->firstWeekday = (int) $s->defaultFirstWeekday;
 			$this->currency = $s->defaultCurrency;
 			$this->shortDateInList = (bool) $s->defaultShortDateInList;
+			$this->confirmOnMove = (bool) $s->defaultConfirmOnMove;
 			$this->listSeparator = $s->defaultListSeparator;
 			$this->textSeparator = $s->defaultTextSeparator;
 			$this->thousandsSeparator = $s->defaultThousandSeparator;
@@ -328,28 +361,27 @@ class User extends Entity {
    * @return boolean
    * @throws Exception
    */
-	public function checkPassword($password) {		
-		
-		$authenticator = $this->getPrimaryAuthenticator();
-		if(!isset($authenticator)) {
-			throw new Exception("No primary authenticator found!");
-		}
-		$success = $authenticator->authenticate($this->username, $password);		
+	public function checkPassword($password) {
+
+		$auth = new Authenticate();
+		$success = $auth->passwordLogin($this->username, $password);
+
 		if($success) {
 			$this->passwordVerified = true;
 		}
-		return $success;
+		return $success !== false;
 	}
 	
 	/**
-	 * needed because password is protected
+	 * Needed because password is protected
+	 *
 	 * @param string $password
 	 * @return boolean
 	 */
 	public function passwordVerify($password) {
 		return password_verify($password, $this->password);
 	}
-	
+
 	private $plainPassword;
 	
 	public function plainPassword() {
@@ -357,6 +389,8 @@ class User extends Entity {
 	}
 
 	public function setPassword($password) {
+		$this->recoveryHash = null;
+		$this->recoverySendAt = null;
 		$this->plainPassword = $password;
 	}
 
@@ -427,6 +461,10 @@ class User extends Entity {
 	}
 	
 	protected function internalValidate() {
+
+		if(!isset($this->homeDir)) {
+			$this->homeDir = "users/" . $this->username;
+		}
 		
 		if($this->isModified('groups')) {	
 			
@@ -499,14 +537,14 @@ class User extends Entity {
 	}
 	
 	private function maxUsersReached() {
-	  if(empty(go()->getConfig()['core']['limits']['maxUsers'])) {
+	  if(empty(go()->getConfig()['max_users'])) {
 	    return false;
     }
 
 		$stmt = go()->getDbConnection()->query("SELECT count(*) AS count FROM `core_user` WHERE enabled = 1");
 		$record = $stmt->fetch();
 		$countActive = $record['count'];
-		return $countActive >= go()->getConfig()['core']['limits']['maxUsers'];
+		return $countActive >= go()->getConfig()['max_users'];
 	}
 
 	private static function count() {
@@ -563,6 +601,17 @@ class User extends Entity {
 			->where(['groupId' => Group::ID_ADMINS, 'userId' => $this->id])->single() !== false;
 	}
 
+	public static function isAdminById($userId) {
+		if($userId == User::ID_SUPER_ADMIN) {
+			return true;
+		}
+
+		return (new Query)
+				->select('*')
+				->from('core_user_group')
+				->where(['groupId' => Group::ID_ADMINS, 'userId' => $userId])->single() !== false;
+	}
+
   /**
    * Alias for making isAdmin() a public property
    * @return bool
@@ -572,35 +621,28 @@ class User extends Entity {
 		return $this->isAdmin();
 	}
 
-	private static $authMethods;
-
-	public static function findAuthMethods() {
-		if(!isset(self::$authMethods)) {
-			self::$authMethods = Method::find()->orderBy(['sortOrder' => 'DESC']);
-		}
-		return self::$authMethods;
-	}
 
 	/**
 	 * Get available authentication methods
 	 * 
-	 * @return Method[]
+	 * @return BaseAuthenticator[]
 	 */
-	public function getAuthenticationMethods() {
+	public function getAuthenticators() {
 
-		$methods = [];
+		$authenticators = [];
 
-		$authMethods = self::findAuthMethods();
+		$auth = new Authenticate();
+		$primary = $auth->getPrimaryAuthenticatorForUser($this->username);
 
-		foreach ($authMethods as $authMethod) {
-			$authenticator = $authMethod->getAuthenticator();
+		$authenticators[] = $primary;
 
-			if ($authenticator && $authenticator::isAvailableFor($this->username)) {
-				$methods[] = $authMethod;
+		foreach ($auth->getSecondaryAuthenticatorsForUser($this->username) as $authenticator) {
+			if ($authenticator::isAvailableFor($this->username)) {
+				$authenticators[] = $authenticator;
 			}
 		}
 
-		return $methods;
+		return $authenticators;
 	}
 
   /**
@@ -663,9 +705,44 @@ class User extends Entity {
 		if($this->archive) {
 			$this->archiveUser();
 		}
-		
+
+		$this->changeHomeDir();
+
 		return true;		
 	}
+
+	private function changeHomeDir() {
+		if(!$this->isModified("homeDir") || !Module::isInstalled('legacy', 'files')) {
+			return;
+		}
+
+		$oldDir = $this->getOldValue('homeDir');
+		if(!$oldDir) {
+			return;
+		}
+
+		$folder = Folder::model()->findByPath($oldDir);
+		if(!$folder) {
+			return;
+		}
+
+		$parent = dirname($this->homeDir);
+		if(empty($parent)) {
+			throw new \Exception("Invalid home directory. It must be a parent directory like users/username");
+		}
+
+		$dest = Folder::model()->findByPath($parent, true);
+
+		$folder->name = basename($this->homeDir);
+		$folder->parent_id=$dest->id;
+		$folder->systemSave = true;
+
+		if(!$folder->save(true)) {
+			throw new Exception("Failed to move home dir from " . $oldDir . "  to " .$this->homeDir);
+		}
+	}
+
+
 	
 	/**
 	 * Hash a password for users
@@ -701,24 +778,7 @@ class User extends Entity {
 		$this->contact->goUserId = $this->id;
 		return $this->contact->save();
 	}
-	
-	/**
-	 * Gets the user's primary authenticator class. Usually this is 
-	 * \go\core\auth\Password but can also be implemented by the LDAP or 
-	 * IMAP authenticator modules.
-	 * 
-	 * @return PrimaryAuthenticator
-	 */
-	public function getPrimaryAuthenticator() {
-		foreach($this->getAuthenticationMethods() as $method) {
-			$authenticator = $method->getAuthenticator();
-			if ($authenticator instanceof PrimaryAuthenticator) {
-				return $authenticator;
-			}			
-		}	
-		
-		return null;
-	}
+
 
 	private function createPersonalGroup()
 	{
@@ -820,7 +880,7 @@ class User extends Entity {
 		go()->getDbConnection()->beginTransaction();
 
 		go()->getDbConnection()->delete('go_settings', (new Query)->where('user_id', 'in', $query))->execute();
-		go()->getDbConnection()->delete('go_reminders', (new Query)->where('user_id', 'in', $query))->execute();
+		//go()->getDbConnection()->delete('go_reminders', (new Query)->where('user_id', 'in', $query))->execute();
 		go()->getDbConnection()->delete('go_reminders_users', (new Query)->where('user_id', 'in', $query))->execute();
 
 		Group::delete( (new Query)->where('isUserGroupFor', 'in', $query));
@@ -864,23 +924,16 @@ class User extends Entity {
 	 * @throws \go\core\exception\ConfigurationException
 	 */
 	public static function getAuthenticationDomains() {
-		
-		$domains = go()->getCache()->get("authentication-domains");
-		if(is_array($domains)) {
-			return $domains;
+		$classes = go()->getCache()->get("authentication-domains-providers");
+		if(!is_array($classes)) {
+			$classFinder = new \go\core\util\ClassFinder();
+			$classes = $classFinder->findByParent(\go\core\auth\DomainProvider::class);
+			go()->getCache()->set("authentication-domains-providers", $classes);
 		}
-		
-		
-		$classFinder = new \go\core\util\ClassFinder();
-		$classes = $classFinder->findByParent(\go\core\auth\DomainProvider::class);
-		
 		$domains = [];
 		foreach($classes as $cls) {
 			$domains = array_merge($domains, $cls::getDomainNames());
 		}
-		
-		go()->getCache()->set("authentication-domains", $domains);
-		
 		return $domains;		
 	}
 	
@@ -891,7 +944,7 @@ class User extends Entity {
 	private $contact;
 	
 	public function getProfile() {
-		if(!Module::findByName('community', 'addressbook')) {
+		if(!Module::isInstalled('community', 'addressbook')) {
 			return null;
 		}
 		
@@ -905,7 +958,7 @@ class User extends Entity {
 	}
 	
 	public function setProfile($values) {
-		if(!Module::findByName('community', 'addressbook')) {
+		if(!Module::isInstalled('community', 'addressbook')) {
 			throw new Exception("Can't set profile without address book module.");
 		}
 		
@@ -985,6 +1038,19 @@ class User extends Entity {
 				}
 			}
 			$rec->save();
+		}
+	}
+
+
+	public function setTheme($v) {
+		$this->theme = $v;
+	}
+
+	public function getTheme() {
+		if(!go()->getConfig()['allow_themes']) {
+			return go()->getConfig()['theme'];
+		} else {
+			return $this->theme;
 		}
 	}
 }

@@ -3,6 +3,8 @@ GO.zpushadmin.DevicePanel = Ext.extend(GO.DisplayPanel,{
 	stateId : 'zpa-device-panel',
 	noFileBrowser : true,
 	newMenuButton : false,
+	showLinks: false,
+	showComments: false,
 	
 	createTopToolbar : function(){	
 		var tbar=[];
@@ -139,8 +141,6 @@ GO.zpushadmin.DevicePanel = Ext.extend(GO.DisplayPanel,{
 							'<tpl if="deviceErrors == null">-</tpl>'+
 						'</td>'+
 					'</tr>';
-						
-		Ext.apply(this.templateConfig, GO.linksTemplateConfig);
 		
 		GO.zpushadmin.DevicePanel.superclass.initComponent.call(this);
 	}
