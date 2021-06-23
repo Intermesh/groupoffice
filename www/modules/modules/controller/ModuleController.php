@@ -147,10 +147,10 @@ class ModuleController extends AbstractJsonController{
 			}
 		}
 		
-		ksort($availableModules);		
-		
-		
-		$response['has_license']=GO::scriptCanBeDecoded() || GO::config()->product_name!='GroupOffice';
+		ksort($availableModules);
+
+
+		$response['has_license']=go()->getSettings()->license != null || GO::config()->product_name!='GroupOffice';
 						
 		$response['results']=array_values($availableModules);		
 		$response['total']=count($response['results']);
