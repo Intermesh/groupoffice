@@ -37,7 +37,7 @@ class Tasklist extends AclOwnerEntity
 	public $name;
 
 	/** @var string What kind of list: 'list', 'board' */
-	protected $role;
+	protected $role = self::List;
 
 	public function getRole() {
 		return self::Roles[$this->role] ?? 'list';
