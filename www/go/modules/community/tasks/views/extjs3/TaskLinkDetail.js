@@ -40,14 +40,21 @@ go.modules.community.tasks.TaskLinkDetail = Ext.extend(go.modules.community.task
 			this.setTitle(this.origTitle + badge);
 		}, this);
 
-		go.Db.store("Link").on("changes", (store, added, changed, detroyed) => {
-			if(!this.store.loaded || this.store.loading || !this.store.lastOptions) {
-				return;
-			}
+		go.Db.store("Link").on("changes", this.onLinkChanges, this);
 
-			this.store.reload();
+		this.on('destroy', () => {
+			go.Db.store("Link").un("changes", this.onLinkChanges, this);
 		});
 	},
+
+	onLinkChanges: function(store, added, changed, detroyed)  {
+		if(!this.store.loaded || this.store.loading || !this.store.lastOptions) {
+			return;
+		}
+
+		this.store.reload();
+	},
+
 	onLoad: function (dv) {
 
 		this.detailView = dv;
