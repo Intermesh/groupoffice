@@ -65,9 +65,19 @@ go.grid.GridTrait = {
 		if(this.getView().actionConfig) {
 
 			this.on('viewready', function(){
-				this.getView().actionBtn.on('click', function(btn) {
-					this.getSelectionModel().selectRow(btn.rowIndex);
-				}, this);
+				// this.getView().actionBtn.on('click', function(btn) {
+				// 	//this.getSelectionModel().selectRow(btn.rowIndex);
+				// }, this);
+
+				// this.on('rowclick', (grid, rowIndex, e) => {
+				// 	this.getView().showActionButton(rowIndex);
+				// });
+
+				this.on('rowcontextmenu', (grid, rowIndex, e) => {
+					e.preventDefault();
+					this.getSelectionModel().selectRow(rowIndex);
+					this.getView().showActionButton(rowIndex).showMenu();
+				});
 			}, this, {single: true});
 		}
 
