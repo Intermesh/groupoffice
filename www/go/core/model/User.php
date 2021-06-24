@@ -1079,15 +1079,15 @@ class User extends Entity {
 			->andWhere('expiresAt', '>', new DateTime())
 			->all();
 
-//		foreach($clients as &$client) {
-//			try {
-//				$geo = Geolocation::locate($client['remoteIpAddress']);
-//				$client['countryCode'] = $geo['countryCode'];
-//			} catch(\Exception $e) {
-//				ErrorHandler::logException($e);
-//				$client['countryCode'] = null;
-//			}
-//		}
+		foreach($clients as &$client) {
+			try {
+				$geo = Geolocation::locate($client['remoteIpAddress']);
+				$client['countryCode'] = $geo['countryCode'];
+			} catch(\Exception $e) {
+				ErrorHandler::logException($e);
+				$client['countryCode'] = null;
+			}
+		}
 
 		return $clients;
 	}

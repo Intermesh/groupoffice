@@ -156,9 +156,9 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						},{
 							html: t("Browser")
 						}
-						// ,{
-						// 	html: t("Country")
-						// }
+						,{
+							html: t("Country")
+						}
 						,
 						{
 							width: dp(34)
@@ -185,10 +185,10 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						},{
 							name: "browser"
 						}
-						// ,{
-						// 	submit: false,
-						// 	name: "countryCode"
-						// }
+						,{
+							submit: false,
+							name: "countryCode"
+						}
 						]
 
 					}
