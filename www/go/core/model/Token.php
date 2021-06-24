@@ -65,7 +65,17 @@ class Token extends Entity {
 	 * @var string 
 	 */
 	public $userAgent;
-	
+
+	/**
+	 * @var string
+	 */
+	public $platform;
+
+	/**
+	 * @var string
+	 */
+	public $browser;
+
 	/**
 	 * | separated list of "core_auth" id's that are successfully applied 
 	 * for this token 
@@ -159,6 +169,11 @@ class Token extends Entity {
 		} else {
 			$this->userAgent = 'Unknown';
 		}
+
+		$ua_info = \donatj\UserAgent\parse_user_agent();
+
+		$this->platform = $ua_info['platform'];
+		$this->browser = $ua_info['browser'];
 	}
 	
 	private static function generateToken(){
@@ -451,7 +466,5 @@ class Token extends Entity {
 			->where('expiresAt', '!=', null)
 			->where('userId', 'NOT IN ', $admins));
 	}
-
-	
 	
 }

@@ -933,3 +933,10 @@ $updates['202105041513'][] = "delete from core_module where name='voip' and pack
 $updates['202105041513'][] = "delete from core_module where name='voippro' and package is null";
 
 $updates['202105111132'][] = "ALTER TABLE `core_user` ADD COLUMN `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0 AFTER `homeDir`;";
+
+
+$updates['202105111132'][] = "alter table core_auth_token
+	add platform varchar(190) null after userAgent;";
+
+$updates['202105111132'][] = "alter table core_auth_token
+	add browser varchar(190) null after platform;";
