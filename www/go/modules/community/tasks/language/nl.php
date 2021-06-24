@@ -2,7 +2,7 @@
 return [
 	'name' => 'Taken',
 	'description' => 'Taken module',
-	'Select tasklist' => 'Selecteer takenlijst',
+	'Select task list' => 'Selecteer takenlijst',
 	'Select category' => 'Selecteer categorie',
 	'Task' => 'Taak',
 	'Tasks' => 'Taken',

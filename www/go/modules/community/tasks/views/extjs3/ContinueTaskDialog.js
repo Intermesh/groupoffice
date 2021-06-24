@@ -66,7 +66,7 @@ go.modules.community.tasks.ContinueTaskDialog = Ext.extend(go.form.Dialog, {
 			}),
 			mode:'local',
 			triggerAction:'all',
-			emptyText:t("Select tasklist"),
+			emptyText:t("Select task list"),
 			editable:false,
 			selectOnFocus:true,
 			forceSelection:true,
