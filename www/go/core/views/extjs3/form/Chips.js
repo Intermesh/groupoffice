@@ -275,7 +275,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 			submit: false,
 			hideLabel: true,
 			anchor: '100%',
-			emptyText: t("Please select..."),
+			emptyText: this.emptyText || t("Please select..."),
 			pageSize: this.entityStore ? 50 : this.pageSize,
 			valueField: 'id',
 			displayField: this.displayField,
