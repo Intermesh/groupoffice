@@ -1,7 +1,9 @@
+24-06-2021 6.5.61
 - Core: Show authorized clients in Account page of user settings. Adds ability to logout other clients by users or the admin.
 - Calendar: hide custom fieldset data in details when no read permissions (Github #704)
 - Calendar: Fixed visibility issue with categories for non-admin manage user permissions (Github #705)
 - Tickets: fixed HTML entity render bug in ticket panel
+- Core: Cut too long log entry titles at max length
 
 17-06-2021 6.5.60
 - Tickets / Projects: Entity names of Type could conflict in database
