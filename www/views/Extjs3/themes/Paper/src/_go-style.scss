@@ -436,10 +436,11 @@ a {
 		&:hover button {
 			visibility: visible;;
 		}
+		&:hover {
+			background-color: $cHover;
+		}
 		&.x-view{
-			&-over {
-				background-color: $cHover;
-			}
+
 			&-selected {
 				@include var(color, c-primary);
 				background-color: $cSelected;

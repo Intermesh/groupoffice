@@ -31298,11 +31298,11 @@ Ext.Button = Ext.extend(Ext.BoxComponent, {
         if(!this.disabled){
             var internal = e.within(this.el,  true);
             if(!internal){
-                this.el.addClass('x-btn-over');
-                if(!this.monitoringMouseOver){
-                    this.doc.on('mouseover', this.monitorMouseOver, this);
-                    this.monitoringMouseOver = true;
-                }
+                // this.el.addClass('x-btn-over');
+                // if(!this.monitoringMouseOver){
+                //     this.doc.on('mouseover', this.monitorMouseOver, this);
+                //     this.monitoringMouseOver = true;
+                // }
                 this.fireEvent('mouseover', this, e);
             }
             if(this.isMenuTriggerOver(e, internal)){
@@ -31314,10 +31314,10 @@ Ext.Button = Ext.extend(Ext.BoxComponent, {
     
     monitorMouseOver : function(e){
         if(e.target != this.el.dom && !e.within(this.el)){
-            if(this.monitoringMouseOver){
-                this.doc.un('mouseover', this.monitorMouseOver, this);
-                this.monitoringMouseOver = false;
-            }
+            // if(this.monitoringMouseOver){
+            //     this.doc.un('mouseover', this.monitorMouseOver, this);
+            //     this.monitoringMouseOver = false;
+            // }
             this.onMouseOut(e);
         }
     },
@@ -31325,7 +31325,7 @@ Ext.Button = Ext.extend(Ext.BoxComponent, {
     
     onMouseOut : function(e){
         var internal = e.within(this.el) && e.target != this.el.dom;
-        this.el.removeClass('x-btn-over');
+        // this.el.removeClass('x-btn-over');
         this.fireEvent('mouseout', this, e);
         if(this.isMenuTriggerOut(e, internal)){
             this.fireEvent('menutriggerout', this, this.menu, e);
@@ -33756,13 +33756,13 @@ Ext.tree.TreeEventModel.prototype = {
     initEvents : function(){
         var t = this.tree;
 
-        if(t.trackMouseOver !== false){
-            t.mon(t.innerCt, {
-                scope: this,
-                mouseover: this.delegateOver,
-                mouseout: this.delegateOut
-            });
-        }
+        // if(t.trackMouseOver !== false){
+        //     t.mon(t.innerCt, {
+        //         scope: this,
+        //         mouseover: this.delegateOver,
+        //         mouseout: this.delegateOut
+        //     });
+        // }
         t.mon(t.getTreeEl(), {
             scope: this,
             click: this.delegateClick,
@@ -33790,54 +33790,54 @@ Ext.tree.TreeEventModel.prototype = {
         return t;
     },
 
-    delegateOut : function(e, t){
-        if(!this.beforeEvent(e)){
-            return;
-        }
-        if(e.getTarget('.x-tree-ec-icon', 1)){
-            var n = this.getNode(e);
-            this.onIconOut(e, n);
-            if(n == this.lastEcOver){
-                delete this.lastEcOver;
-            }
-        }
-        if((t = this.getNodeTarget(e)) && !e.within(t, true)){
-            this.onNodeOut(e, this.getNode(e));
-        }
-    },
+    // delegateOut : function(e, t){
+        // if(!this.beforeEvent(e)){
+        //     return;
+        // }
+        // if(e.getTarget('.x-tree-ec-icon', 1)){
+        //     var n = this.getNode(e);
+        //     this.onIconOut(e, n);
+        //     if(n == this.lastEcOver){
+        //         delete this.lastEcOver;
+        //     }
+        // }
+        // if((t = this.getNodeTarget(e)) && !e.within(t, true)){
+        //     this.onNodeOut(e, this.getNode(e));
+        // }
+    // },
+		//
+    // delegateOver : function(e, t){
+        // if(!this.beforeEvent(e)){
+        //     return;
+        // }
+        // if(Ext.isGecko && !this.trackingDoc){
+        //     Ext.getBody().on('mouseover', this.trackExit, this);
+        //     this.trackingDoc = true;
+        // }
+        // if(this.lastEcOver){
+        //     this.onIconOut(e, this.lastEcOver);
+        //     delete this.lastEcOver;
+        // }
+        // if(e.getTarget('.x-tree-ec-icon', 1)){
+        //     this.lastEcOver = this.getNode(e);
+        //    // this.onIconOver(e, this.lastEcOver);
+        // }
+        // if(t = this.getNodeTarget(e)){
+        //     this.onNodeOver(e, this.getNode(e));
+        // }
+    // },
 
-    delegateOver : function(e, t){
-        if(!this.beforeEvent(e)){
-            return;
-        }
-        if(Ext.isGecko && !this.trackingDoc){ 
-            Ext.getBody().on('mouseover', this.trackExit, this);
-            this.trackingDoc = true;
-        }
-        if(this.lastEcOver){ 
-            this.onIconOut(e, this.lastEcOver);
-            delete this.lastEcOver;
-        }
-        if(e.getTarget('.x-tree-ec-icon', 1)){
-            this.lastEcOver = this.getNode(e);
-            this.onIconOver(e, this.lastEcOver);
-        }
-        if(t = this.getNodeTarget(e)){
-            this.onNodeOver(e, this.getNode(e));
-        }
-    },
-
-    trackExit : function(e){
-        if(this.lastOverNode){
-            if(this.lastOverNode.ui && !e.within(this.lastOverNode.ui.getEl())){
-                this.onNodeOut(e, this.lastOverNode);
-            }
-            delete this.lastOverNode;
-            Ext.getBody().un('mouseover', this.trackExit, this);
-            this.trackingDoc = false;
-        }
-
-    },
+    // trackExit : function(e){
+    //     if(this.lastOverNode){
+    //         if(this.lastOverNode.ui && !e.within(this.lastOverNode.ui.getEl())){
+    //             this.onNodeOut(e, this.lastOverNode);
+    //         }
+    //         delete this.lastOverNode;
+    //         Ext.getBody().un('mouseover', this.trackExit, this);
+    //         this.trackingDoc = false;
+    //     }
+		//
+    // },
 
     delegateClick : function(e, t){
         if(this.beforeEvent(e)){
@@ -33889,22 +33889,22 @@ Ext.tree.TreeEventModel.prototype = {
         node.ui.onClick(e);
     },
 
-    onNodeOver : function(e, node){
-        this.lastOverNode = node;
-        node.ui.onOver(e);
-    },
-
-    onNodeOut : function(e, node){
-        node.ui.onOut(e);
-    },
-
-    onIconOver : function(e, node){
-        node.ui.addClass('x-tree-ec-over');
-    },
-
-    onIconOut : function(e, node){
-        node.ui.removeClass('x-tree-ec-over');
-    },
+    // onNodeOver : function(e, node){
+    //     this.lastOverNode = node;
+    //     node.ui.onOver(e);
+    // },
+		//
+    // onNodeOut : function(e, node){
+    //     node.ui.onOut(e);
+    // },
+		//
+    // onIconOver : function(e, node){
+    //     node.ui.addClass('x-tree-ec-over');
+    // },
+		//
+    // onIconOut : function(e, node){
+    //     node.ui.removeClass('x-tree-ec-over');
+    // },
 
     onIconClick : function(e, node){
         node.ui.ecClick(e);
@@ -35521,13 +35521,13 @@ Ext.tree.TreeNodeUI = Ext.extend(Object, {
         }
     },
 
-    onOver : function(e){
-        this.addClass('x-tree-node-over');
-    },
-
-    onOut : function(e){
-        this.removeClass('x-tree-node-over');
-    },
+    // onOver : function(e){
+    //     this.addClass('x-tree-node-over');
+    // },
+		//
+    // onOut : function(e){
+    //     this.removeClass('x-tree-node-over');
+    // },
 
     
     onCheckChange : function(){
@@ -47161,13 +47161,13 @@ Ext.grid.GridView = Ext.extend(Ext.util.Observable, {
             this.hmenu.on('itemclick', this.handleHdMenuClick, this);
         }
 
-        if (grid.trackMouseOver) {
-            this.mainBody.on({
-                scope    : this,
-                mouseover: this.onRowOver,
-                mouseout : this.onRowOut
-            });
-        }
+        // if (grid.trackMouseOver) {
+        //     this.mainBody.on({
+        //         scope    : this,
+        //         mouseover: this.onRowOver,
+        //         mouseout : this.onRowOut
+        //     });
+        // }
 
         if (grid.enableDragDrop || grid.enableDrag) {
             this.dragZone = new Ext.grid.GridDragZone(grid, {
@@ -48201,22 +48201,22 @@ scroller.setWidth(gridWidth);
     },
 
     
-    onRowOver : function(e, target) {
-        var row = this.findRowIndex(target);
-        
-        if (row !== false) {
-            this.addRowClass(row, this.rowOverCls);
-        }
-    },
-
-    
-    onRowOut : function(e, target) {
-        var row = this.findRowIndex(target);
-        
-        if (row !== false && !e.within(this.getRow(row), true)) {
-            this.removeRowClass(row, this.rowOverCls);
-        }
-    },
+    // onRowOver : function(e, target) {
+    //     var row = this.findRowIndex(target);
+    //
+    //     if (row !== false) {
+    //         this.addRowClass(row, this.rowOverCls);
+    //     }
+    // },
+		//
+    //
+    // onRowOut : function(e, target) {
+    //     var row = this.findRowIndex(target);
+    //
+    //     if (row !== false && !e.within(this.getRow(row), true)) {
+    //         this.removeRowClass(row, this.rowOverCls);
+    //     }
+    // },
 
     
     onRowSelect : function(row) {
