@@ -5,9 +5,11 @@ namespace go\core\model;
 use go\core\db\Criteria;
 use go\core\jmap\Entity;
 use go\core\orm\Query;
+use go\core\orm\SearchableTrait;
 
 
 class UserDisplay extends Entity {
+
 
 	/**
 	 * The ID
@@ -36,6 +38,11 @@ class UserDisplay extends Entity {
 	 * @var string
 	 */
 	public $email;
+
+	protected static function textFilterColumns()
+	{
+		return ['username', 'displayName', 'email'];
+	}
 
 
 	protected static function defineMapping() {
