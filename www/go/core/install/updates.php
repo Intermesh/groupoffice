@@ -934,6 +934,14 @@ $updates['202105041513'][] = "delete from core_module where name='voippro' and p
 
 $updates['202105111132'][] = "ALTER TABLE `core_user` ADD COLUMN `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0 AFTER `homeDir`;";
 
+$updates['202105111132'][] = "alter table core_auth_token
+	add platform varchar(190) null after userAgent;";
+
+$updates['202105111132'][] = "alter table core_auth_token
+	add browser varchar(190) null after platform;";
+
+
+
 $updates['202105271510'][] = "alter table core_alert
 	add data text null;";
 
@@ -1002,4 +1010,6 @@ $updates['202105281703'][] = "alter table core_alert change alertId tag varchar(
 $updates['202105281703'][] = "create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
 	on core_alert (entityTypeId, entityId, tag, userId);
 ";
+
+
 

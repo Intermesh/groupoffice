@@ -132,9 +132,74 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 					submit: false,
 					minLength: go.Modules.get("core","core").settings.passwordMinLength,
 					autocomplete: 'new-password'					
-				})
+				}),
+
+
 			]
 		});
+
+		this.authorizedClientsFieldSet = new Ext.form.FieldSet({
+			title: t("Authorized clients"),
+			items: [
+				{
+					xtype: "container",
+					defaults: {
+						flex: 1,
+						xtype: "box"
+					},
+					layout: "hbox",
+					items: [
+						{
+							html: "IP"
+						},{
+							html: t("Platform")
+						},{
+							html: t("Browser")
+						}
+						// ,{
+						// 	html: t("Country")
+						// }
+						,
+						{
+							width: dp(34)
+						}
+					]
+				},
+				this.authorizedClients = new go.form.FormGroup({
+					name: "authorizedClients",
+					hideLabel: true,
+					hideBbar: true,
+					anchor: "100%",
+					itemCfg: {
+						anchor: "100%",
+						layout: "hbox",
+						defaults: {
+							flex: 1,
+							xtype: "plainfield",
+							submit: true
+						},
+						items: [{
+							name: "remoteIpAddress"
+						},{
+							name: "platform"
+						},{
+							name: "browser"
+						}
+						// ,{
+						// 	submit: false,
+						// 	name: "countryCode"
+						// }
+						]
+
+					}
+				}),{
+					xtype: "button",
+					text: t("Logout all"),
+					handler : () => {
+						this.authorizedClients.setValue([]);
+					}
+				}]
+		})
 		
 		
 		if(go.User.isAdmin) {
@@ -150,7 +215,8 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 			items: [
 				this.userFieldset,
 				this.quotaFieldset,
-				this.passwordFieldset
+				this.passwordFieldset,
+				this.authorizedClientsFieldSet
 			].concat(go.customfields.CustomFields.getFormFieldSets("User").filter(function(fs){return !fs.fieldSet.isTab;}))
 		});
 		

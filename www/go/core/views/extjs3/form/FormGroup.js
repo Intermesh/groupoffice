@@ -194,6 +194,11 @@ go.form.FormGroup = Ext.extend(Ext.Panel, {
 	},
 	
 	initBbar: function() {
+
+		if(this.bbar) {
+			return;
+		}
+
 		this.bbar = [
 			Ext.apply(this.btnCfg,{
 				//iconCls: this.addButtonIconCls,

@@ -29,6 +29,8 @@
 namespace GO\Base;
 
 
+use go\core\model\Token;
+
 class Session extends Observable{
 	
 	public $values;
@@ -96,6 +98,12 @@ class Session extends Observable{
 			//this log here causes endless loop and segfaults
 			//$this->_log("security_token");
 			$this->values['security_token']=Util\StringHelper::randomPassword(20,'a-z,A-Z,1-9');				
+		}
+
+		// if access token from new JMAP API connected to this session was detroyed then destroy this session too!
+		// this is set in go/core/model/Token.php
+		if(!empty($this->values['accessToken']) && !Token::findById($this->values['accessToken'])) {
+			$this->values = [];
 		}
 	}
 
