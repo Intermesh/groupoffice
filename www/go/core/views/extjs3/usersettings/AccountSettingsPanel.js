@@ -169,6 +169,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 					name: "authorizedClients",
 					hideLabel: true,
 					hideBbar: true,
+					startWithItem: false,
 					anchor: "100%",
 					itemCfg: {
 						anchor: "100%",
