@@ -1,3 +1,4 @@
+- Core: Show authorized clients in Account page of user settings. Adds ability to logout other clients by users or the admin.
 - Calendar: hide custom fieldset data in details when no read permissions (Github #704)
 - Calendar: Fixed visibility issue with categories for non-admin manage user permissions (Github #705)
 - Tickets: fixed HTML entity render bug in ticket panel
