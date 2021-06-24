@@ -2387,6 +2387,7 @@ body.go-compact {
 
 
 .x-view-tiles {
+	will-change: transform; // fixes chrome bug with choppy scroll
 	padding: dp(2);
 	display: grid;
 	text-align:center;
