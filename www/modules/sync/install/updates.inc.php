@@ -95,6 +95,8 @@ $updates['202102081135'][] = function() {
 	}
 };
 
+$updates['202106101432'][] = ""; //needed for intermesh db??
+
 $updates['202106101432'][] = "alter table sync_tasklist_user change tasklist_id tasklistId int(11) unsigned auto_increment;";
 
 $updates['202106101432'][] = "alter table sync_tasklist_user change user_id userId int(11) default 0 not null;";
