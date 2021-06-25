@@ -652,6 +652,7 @@ class Installer {
 						} catch (PDOException $e) {
 
 							if (
+								$e->getCode() == '23000' ||
 								$e->getCode() == '42000' ||
 								$e->getCode() == '42S21' || //duplicate col
 								$e->getCode() == '42S01' || //table exists
