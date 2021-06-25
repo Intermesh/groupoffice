@@ -23,9 +23,13 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		if(this.submitting) {
 			return;
 		}
-		var entity = added[this.currentId] || changed[this.currentId] || false;
+
 		if(changed.indexOf(this.currentId) > -1) {
-			Ext.MessageBox.alert(t("Warning"), t("The entity has been modified by someone else."));
+			Ext.MessageBox.confirm(t("Warning"), t("The entity has been modified by someone else. Do you want to discard your changes and load the changes in this form?"), (btn) => {
+				if(btn == 'yes') {
+					this.load(this.currentId);
+				}
+			});
 		}		
 	},
 	
