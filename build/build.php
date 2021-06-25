@@ -46,9 +46,9 @@ class Builder
 {
     public $test = false;
 
-	private $majorVersion = "6.5";
+	private $majorVersion = "6.6";
 
-	private $gitBranch = 'master';
+	private $gitBranch = 'tasks';
 
 	/**
 	 *
