@@ -2,9 +2,6 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 	loaded : false,
 	accessToken: go.util.Cookies.get('accessToken'),
 	authenticate: function(cb, scope) {
-		if(!this.accessToken) {
-			return;
-		}
 		return this.load();
 	},
 

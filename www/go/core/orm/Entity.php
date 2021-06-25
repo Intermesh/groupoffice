@@ -411,7 +411,7 @@ abstract class Entity extends Property {
 	/**
 	 * Delete the entity
 	 *
-	 * @param $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
+	 * @param Query|Entity $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
 	 *  So you can do for example: go()->getDbConnection()->delete('another_table', (new Query()->where('id', 'in' $query))
 	 *  Or pass ['id' => $id];
 	 *
@@ -423,6 +423,10 @@ abstract class Entity extends Property {
 	 * @throws Exception
 	 */
 	public static final function delete($query) {
+
+		if($query instanceof Entity) {
+			$query = $query->primaryKeyValues();
+		}
 
 		$query = Query::normalize($query);
 		//Set select for overrides.

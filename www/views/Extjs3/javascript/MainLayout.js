@@ -104,6 +104,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					go.Router.check();
 				})
 			} else {
+
+
+
 				me.fireEvent("boot", me); // In the router there is an event attached.
 
 				go.Router.check();

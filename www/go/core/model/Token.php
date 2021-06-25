@@ -4,9 +4,11 @@ namespace go\core\model;
 use DateInterval;
 use go\core\auth\BaseAuthenticator;
 use go\core\auth\SecondaryAuthenticator;
+use go\core\cron\GarbageCollection;
 use go\core\Environment;
 use go\core\auth\Method;
 use go\core\http\Request;
+use go\core\http\Response;
 use go\core\orm\Query;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
@@ -94,7 +96,7 @@ class Token extends Entity {
 	 * 
 	 * @link http://php.net/manual/en/dateinterval.construct.php
 	 */
-	const LIFETIME = 'P7D';
+	const LIFETIME = 'PT30M';
 	
 	/**
 	 * A date interval for the login lifetime of a token
@@ -419,6 +421,13 @@ class Token extends Entity {
 		return $response;
 	}
 
+	/**
+	 * Called by GarbageCollection cron job
+	 *
+	 * @see GarbageCollection
+	 * @return bool
+	 * @throws \Exception
+	 */
 	public static function collectGarbage() {
 		return static::delete(
 			(new Query)
@@ -465,6 +474,15 @@ class Token extends Entity {
 		return self::delete((new Query)
 			->where('expiresAt', '!=', null)
 			->where('userId', 'NOT IN ', $admins));
+	}
+
+	public function setCookie() {
+		Response::get()->setCookie('accessToken', $this->accessToken, [
+			'expires' => 0,
+			"path" => "/",
+			"samesite" => "Lax",
+			"domain" => Request::get()->getHost()
+		]);
 	}
 	
 }

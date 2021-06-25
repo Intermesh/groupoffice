@@ -41,6 +41,19 @@ function output($data = [], $status = 200, $statusMsg = null) {
 	exit();
 }
 
+function finishLogin(Token $token) {
+	$authState = new State();
+	$authState->setToken($token);
+	go()->setAuthState($authState);
+	$response = $authState->getSession();
+
+	$response['accessToken'] = $token->accessToken;
+
+	$token->setCookie();
+
+	output($response, 201, "Authentication is complete, access token created.");
+}
+
 
 try {
 //Create the app with the config.php file
@@ -146,24 +159,16 @@ try {
 			}
 
 			if ($token->isAuthenticated()) {
-				$authState = new State();
-				$authState->setToken($token);
-				go()->setAuthState($authState);
-				$response = $authState->getSession();
+				if($data['rememberLogin']) {
+					$rememberMe = new \go\core\model\RememberMe();
+					$rememberMe->userId = $token->userId;
+					if(!$rememberMe->save()) {
+						throw new \go\core\orm\exception\SaveException($rememberMe);
+					}
+					$rememberMe->setCookie();
+				}
 
-				$response['accessToken'] = $token->accessToken;
-
-				//Server side cookie worked better on safari. Client side cookies were removed on reboot.
-				$expires = !empty($data['rememberLogin']) ? strtotime("+1 year") : 0;
-
-				Response::get()->setCookie('accessToken', $token->accessToken, [
-					'expires' => $expires,
-					"path" => "/",
-					"samesite" => "Lax",
-					"domain" => Request::get()->getHost()
-				]);
-
-				output($response, 201, "Authentication is complete, access token created.");
+				finishLogin($token);
 			}
 
 			$response = [

@@ -685,6 +685,14 @@ class User extends Entity {
 		
 		if(isset($this->plainPassword)) {
 			$this->password = $this->passwordHash($this->plainPassword);
+
+			if(!$this->isNew()) {
+
+				//remove persistent remember me cookies on password change
+				if(!RememberMe::delete(['userId' => $this->id])) {
+					return false;
+				}
+			}
 		}
 		
 		if(!parent::internalSave()) {

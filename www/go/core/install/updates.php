@@ -1013,3 +1013,20 @@ $updates['202105281703'][] = "create unique index core_alert_entityTypeId_entity
 
 
 
+$updates['202106251508'][] = "create table core_auth_remember_me
+(
+	id int auto_increment,
+    token varchar(190) collate ascii_bin null,
+    series varchar(190) collate ascii_bin null,
+    userId int not null,
+    expiresAt datetime null,
+    constraint core_auth_remember_me_pk
+        primary key (id)
+);";
+
+$updates['202106251508'][] = "create index core_auth_remember_me_series_index
+    on core_auth_remember_me (series);";
+
+$updates['202106251508'][] = "alter table core_auth_remember_me
+    add constraint core_auth_remember_me_core_user_id_fk
+        foreign key (userId) references core_user (id);";

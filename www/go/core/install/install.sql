@@ -1116,3 +1116,22 @@ alter table go_state
     add constraint go_state_core_user_id_fk
         foreign key (user_id) references core_user (id)
             on delete cascade;
+
+
+create table core_auth_remember_me
+(
+    id int auto_increment,
+    token varchar(190) collate ascii_bin null,
+    series varchar(190) collate ascii_bin null,
+    userId int not null,
+    expiresAt datetime null,
+    constraint core_auth_remember_me_pk
+        primary key (id)
+);
+
+create index core_auth_remember_me_series_index
+    on core_auth_remember_me (series);
+
+alter table core_auth_remember_me
+    add constraint core_auth_remember_me_core_user_id_fk
+        foreign key (userId) references core_user (id);
