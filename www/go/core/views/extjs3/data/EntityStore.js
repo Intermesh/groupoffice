@@ -811,7 +811,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				}
 
 				if(cb) {
-					cb.call(scope || me, options, true, response);
+					cb.call(scope || this, options, true, response);
 				}
 
 				this._fireChanges();
