@@ -138,10 +138,10 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 										}
 									}
 								})
-								]}
+							]}
 						]
 					},
-					new go.users.UserCombo({
+					this.userCombo = new go.users.UserCombo({
 						fieldLabel: t('Responsible'),
 						hiddenName: 'responsibleUserId',
 						anchor:'100%',
@@ -166,7 +166,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						//allowBlank : false,
 						fieldLabel : t("Description")
 					},
-					new go.modules.community.tasks.TasklistCombo(),
+					this.tasklistCombo = new go.modules.community.tasks.TasklistCombo(),
 					new go.modules.community.tasks.AlertFields()
 				]
 			}]
