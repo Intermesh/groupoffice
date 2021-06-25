@@ -78,7 +78,7 @@ class Comment extends AclItemEntity {
 	 */
 	public function setEntity($entity) {
 
-		if($entity instanceof Entity) {
+		if($entity instanceof Entity || $entity instanceof ActiveRecord) {
 			$this->entityTypeId = $entity->entityType()->getId();
 			$this->entity = $entity->entityType()->getName();
 			$this->entityId = $entity->id;
@@ -130,6 +130,11 @@ class Comment extends AclItemEntity {
 		} else {
 			return $cls::findById($this->entityId);					
 		}
+	}
+
+	protected function getAclEntity()
+	{
+		return $this->findEntity();
 	}
 
 	/**

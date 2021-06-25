@@ -98,6 +98,11 @@ class Task extends AclItemEntity {
 
 	public $color;
 
+	/**
+	 * Start time in H:m
+	 *
+	 * @var string
+	 */
 	public $startTime;
 
 
@@ -359,9 +364,11 @@ class Task extends AclItemEntity {
 			}
 		}
 
-		$success = parent::internalSave();
+		if(!parent::internalSave()) {
+			return false;
+		}
 
-		if($success && $this->isModified('responsibleUserId')) {
+		if($this->isModified('responsibleUserId')) {
 
 			if (isset($this->responsibleUserId)) {
 
@@ -387,7 +394,7 @@ class Task extends AclItemEntity {
 			$this->updateAlerts($modified['alerts']);
 		}
 
-		return $success;
+		return true;
 	}
 
 
