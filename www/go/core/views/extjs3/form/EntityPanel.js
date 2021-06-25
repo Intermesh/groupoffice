@@ -24,10 +24,8 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 			return;
 		}
 		var entity = added[this.currentId] || changed[this.currentId] || false;
-		if(entity) {			
-			this.entity = entity;
-			//TODO, This will bluntly overwrite user's modification when modified.
-			this.getForm().setValues(entity);
+		if(changed.indexOf(this.currentId) > -1) {
+			Ext.MessageBox.alert(t("Warning"), t("The entity has been modified by someone else."));
 		}		
 	},
 	

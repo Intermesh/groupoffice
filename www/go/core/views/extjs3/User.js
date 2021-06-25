@@ -146,8 +146,10 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 // Update go.User when it's edited
 Ext.onReady(function(){
 	go.Db.store("User").on("changes", function(store, added, changed, deleted){
-		if(changed[go.User.id]) {
-			Ext.apply(go.User, changed[go.User.id]);
+		if(changed.indexOf(go.User.id) > -1) {
+			store.single(go.User.id).then((user) => {
+				Ext.apply(go.User, user);
+			});
 		}
 	});
 })

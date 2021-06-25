@@ -72,58 +72,56 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 * @returns {Promise<T>}
 	 */
 	initState : function() {
-		
-		var me = this;
-		
-		if(me.initialized) {			
-			return me.initialized;
+			
+		if(this.initialized) {			
+			return this.initialized;
 		}
 		
-		me.stateStore = new go.browserStorage.Store(me.entity.name);
-		me.metaStore = new go.browserStorage.Store(me.entity.name + "-meta");
+		this.stateStore = new go.browserStorage.Store(this.entity.name);
+		this.metaStore = new go.browserStorage.Store(this.entity.name + "-meta");
 
-		// me.initialized = this.clearState().then(function() {return Promise.all([			
-		me.initialized = Promise.all([
-			me.metaStore.getItem('notFound').then(function(v) {
-				me.notFound = v || [];
+		// this.initialized = this.clearState().then(function() {return Promise.all([			
+		this.initialized = Promise.all([
+			this.metaStore.getItem('notFound').then((v) => {
+				this.notFound = v || [];
 				return true;
 			}),
-			me.metaStore.getItem('state').then(function(v) {
-				me.state = v;
+			this.metaStore.getItem('state').then((v) => {
+				this.state = v;
 				return true;
 			}),
-			me.metaStore.getItem('isComplete').then(function(v) {
-				me.isComplete = v;
+			this.metaStore.getItem('isComplete').then((v) => {
+				this.isComplete = v;
 				return true;
 			}),
-			me.metaStore.getItem('apiVersion').then(function(v) {
-				me.apiVersion = v;
+			this.metaStore.getItem('apiVersion').then((v) => {
+				this.apiVersion = v;
 				return true;
 			}),
-			me.metaStore.getItem('apiUser').then(function(v) {
-				me.apiUser = v;
+			this.metaStore.getItem('apiUser').then((v) => {
+				this.apiUser = v;
 				return true;
 			})
-		]).then(function() {
-			if(!me.state) {
+		]).then(() => {
+			if(!this.state) {
 				return Promise.all([
-					me.metaStore.setItem("apiVersion", go.User.apiVersion),
-					me.metaStore.setItem("apiUser", go.User.username)
-				]).then(function() {
-					return me.state;
+					this.metaStore.setItem("apiVersion", go.User.apiVersion),
+					this.metaStore.setItem("apiUser", go.User.username)
+				]).then( () => {
+					return this.state;
 				})
-			} else if(me.apiVersion !== go.User.apiVersion || me.apiUser !== go.User.username) {
-				console.warn("API version or username mismatch", me.apiVersion, go.User.apiVersion, me.apiUser, go.User.username);
-				return me.clearState().then(function() {
-					return me.state;
+			} else if(this.apiVersion !== go.User.apiVersion || this.apiUser !== go.User.username) {
+				console.warn("API version or username mismatch", this.apiVersion, go.User.apiVersion, this.apiUser, go.User.username);
+				return this.clearState().then(() => {
+					return this.state;
 				});
 			} else
 			{
-				return me.state;
+				return this.state;
 			}
 		});
 
-		return me.initialized;
+		return this.initialized;
 
 	},
 
@@ -132,8 +130,8 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 */
 	initChanges : function() {
 		this.changes = {
-			added: {},
-			changed: {},
+			added: [],
+			changed: [],
 			destroyed: []
 		};
 	},
@@ -175,19 +173,19 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 		if(this.data[entity.id]) {
 			if(fireChanges) {
-				this.changes.changed[entity.id] = go.util.clone(entity);
+				this.changes.changed.push(entity.id);
 			}
 			Ext.apply(this.data[entity.id], entity);
 		} else
 		{
 			if(fireChanges) {
-				this.changes.added[entity.id] = go.util.clone(entity);
+				this.changes.added.push(entity.id);
 			}
 			this.data[entity.id] = entity;
 		}
 		
 		//remove from not found.
-		var i = this.notFound.indexOf(entity.id);
+		let i = this.notFound.indexOf(entity.id);
 		if(i > -1) {
 			this.notFound.splice(i, 1);
 			this.metaStore.setItem("notFound", this.notFound);
@@ -208,16 +206,15 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		this.stateStore.removeItem(id + "");
 	},
 
+
 	_fireChanges : function() {
-		var me = this;
-		// console.warn('changes', me.entity.name, me.changes.added, me.changes.changed, me.changes.destroyed);
 
 		//Use set timeout so changes event fires after promises when set() is used.
 		//This way when for example a dialog closes the dialog or stores are destroyed before it fires.
 		// Other wise they are destroyed while it fires and this can lead to errors.
-		setTimeout(function() {
-			me.fireEvent('changes', me, me.changes.added, me.changes.changed, me.changes.destroyed);
-			me.initChanges();
+		setTimeout(() => {
+			this.fireEvent('changes', this, this.changes.added, this.changes.changed, this.changes.destroyed);
+			this.initChanges();
 		}, 0);
 
 	},
@@ -229,15 +226,14 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 * @returns {*|Promise<String>}
 	 */
 	setState : function(state) {
-		var me = this;
 		this.state = state;
 
-		var setter = function() {
-			return me.metaStore.setItem("state", state);
+		const setter = () => {
+			return this.metaStore.setItem("state", state);
 		};
 		
 		if(!state) {
-			return me.clearState().then(function() {
+			return this.clearState().then(() => {
 				return setter();
 			});
 		}
@@ -250,9 +246,8 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 * @returns {Promise<String>}
 	 */
 	getState: function() {
-		var me = this;
-		return this.initState().then(function() {
-			return me.state;
+		return this.initState().then(() => {
+			return this.state;
 		});
 	},
 
@@ -266,110 +261,93 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 */
 	getUpdates: function (cb, scope) {
 
-		var me = this;
-
-		if(me.getUpdatesPromise) {
-			return me.getUpdatesPromise;
+		if(this.getUpdatesPromise) {
+			return this.getUpdatesPromise;
 		}
 
-		me.getUpdatesPromise = me.getState().then(function(state){
+		this.getUpdatesPromise = this.getState().then((state) => {
 			
-			console.log("getUpdates", me.entity.name, state);
+			console.log("getUpdates", this.entity.name, state);
 		
 			if(!state) {
 				console.info("No state yet so won't fetch updates");
 				if(cb) {
-					cb.call(scope || me, me, false);
+					cb.call(scope || this, this, false);
 				}
 				return Promise.reject("No state yet");
 			}
 
-			function finishChanges(changes) {
-				return me.setState(changes.newState).then(function(){
+			return go.Jmap.request({
+				method: this.entity.name + "/changes",
+				params: {
+					sinceState: this.state
+				}
+			}).then((changes) => {
+
+				if(changes.removed) {
+					changes.removed.forEach((id) => {
+						delete this.data[id];
+						this.changes.destroyed.push(id);
+						this.stateStore.removeItem(id + "");
+					});
+				}
+
+				if(changes.changed) {
+					changes.changed.forEach((id) => {
+
+						if(id in this.data) {
+							this.changes.changed.push(id);
+						} else {
+							this.changes.added.push(id);
+						}
+						//clear data
+						delete this.data[id];
+						this.stateStore.removeItem(id + "");
+					});
+				}
+
+
+				this.setState(changes.newState).then(() => {
 					if(changes.hasMoreChanges) {
 
 						//unofficial response but we use it to process no more than 100000 changes. A resync is
 						//more efficient in the webclient in that case.
 						if(changes.totalChanges > 10000) {
 							console.error("Too many changes " + changes.totalChanges + " > 10000 ");
-							return me.clearState().then(function(response) {
+							return this.clearState().then((response)  => {
 								if(cb) {
-									cb.call(scope || me, me, false);
+									cb.call(scope || this, this, false);
 								}
 								return Promise.reject({type: "cannotcalculatechanges", detail: "Too many changes"})
 							});
 						}
-						return me.getUpdates(cb, scope);
+						return this.getUpdates(cb, scope);
 					} else
 					{
 						if(cb) {
-							cb.call(scope || me, me, true);
+							cb.call(scope || this, this, true);
 						}
 
-						me._fireChanges();
+						this._fireChanges();
 
 						return true;
 					}
-				}, me);
-			}
-			
-			return go.Jmap.request({
-				method: me.entity.name + "/changes",
-				params: {
-					sinceState: me.state
-				}
-			}).then(function(changes) {
+				});
 
-				if(changes.removed) {
-					for(var i = 0, l = changes.removed.length; i < l; i++) {
-						me._destroy(changes.removed[i]);
-					}
-				}
-
-				//only update items we had already fetched
-				if(!me.isComplete) {
-					const knownIds = Object.values(me.data).column("id");
-					var updatedIds = changes.changed.intersect(knownIds);
-				} else {
-					var updatedIds = changes.changed;
-				}
-
-				if(updatedIds.length) {
-					return go.Jmap.request({
-						method: me.entity.name + "/get",
-						params: {
-							ids: updatedIds
-						}
-					}).then(function(get) {
-						if(go.util.empty(get.list)) {
-							console.warn("No items in response: ", get);
-							return;
-						}
-						for(var i = 0,l = get.list.length;i < l; i++) {
-							me._add(get.list[i], true);
-						}
-
-						return finishChanges(changes);
-
-					})
-				} else {
-					return finishChanges(changes);
-				}
-
-			}).catch(function(response) {
-				return me.clearState().then(function(response) {
+			}).catch((response) => {
+				return this.clearState().then((response) => {
 					if(cb) {
-						cb.call(scope || me, me, false);
+						cb.call(scope || this, this, false);
 					}
 					return response;
 				});
 			});
 
-		}).finally(function() {
-			me.getUpdatesPromise = null;
+		}).finally(() => {
+			this.getUpdatesPromise = null;
 		});
 
-		return me.getUpdatesPromise;
+		return this.getUpdatesPromise;
 
 	},
 	
@@ -381,12 +359,11 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 * @returns {Promise}
 	 */
 	all : function(cb, scope) {
-		var me = this;
 
-		return me.initState().then(function() {
-			if(me.isComplete) {
-				return me.query().then(function(response) {										
-					return me.get(response.ids).then(function(result) {
+		return this.initState().then(()  => {
+			if(this.isComplete) {
+				return this.query().then((response) => {
+					return this.get(response.ids).then( (result) => {
 						if(cb) {
 							cb.call(scope, true, result.entities);
 						}
@@ -397,18 +374,18 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 			} else
 			{
 				return go.Jmap.request({
-					method: me.entity.name + "/get"		
-				}).then(function(response) {
-					
-					me.metaStore.setItem('isComplete', true);
-					me.isComplete = true;
+					method: this.entity.name + "/get"
+				}).then((response) => {
+
+					this.metaStore.setItem('isComplete', true);
+					this.isComplete = true;
 					
 					if(cb) {
 						cb.call(scope, true, response.list);
 					}
 
 					return response.list;
-				}).catch(function(response) {
+				}).catch((response) => {
 					if(cb) {
 						cb.call(scope, false, response);
 					}
@@ -432,15 +409,12 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 */
 	single: function(id) {
 
-		var me = this;
-				
-		// 	return me._getSingleFromServer(id);		
 
-		return this._getSingleFromBrowserStorage(id).then(function(entity) {
+		return this._getSingleFromBrowserStorage(id).then((entity) => {
 			if(entity) {
 				return entity;
 			} else{
-				return me._getSingleFromServer(id);
+				return this._getSingleFromServer(id);
 			}			
 		});
 	},
@@ -455,21 +429,19 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 			return this.pending[id];
 		}
 
-		var me = this;
-
-		if(me.getTimeout) {
-			clearTimeout(me.getTimeout);
+		if(this.getTimeout) {
+			clearTimeout(this.getTimeout);
 		}
-		
-		me.scheduled.push(id);
-		me.scheduledPromises[id] = {};
-		me.pending[id] = new Promise(function(resolve, reject){
-			me.scheduledPromises[id].reject = reject;
-			me.scheduledPromises[id].resolve = resolve;
+
+		this.scheduled.push(id);
+		this.scheduledPromises[id] = {};
+		this.pending[id] = new Promise((resolve, reject) => {
+			this.scheduledPromises[id].reject = reject;
+			this.scheduledPromises[id].resolve = resolve;
 		});
 
-		if(!me.paused) {
-			me.continueGet();
+		if(!this.paused) {
+			this.continueGet();
 		}
 
 		return this.pending[id];
@@ -491,7 +463,6 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 * We don't want that so we temporary pause the execution and continue it when done with indexedDB.
 	 */
 	continueGet: function() {
-		var me = this;
 
 		if(this.paused > 0) {
 			this.paused--;
@@ -502,99 +473,98 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 			return;
 		}
 
-		me.getTimeout = setTimeout(function() {
+		this.getTimeout = setTimeout(() => {
 
-			if(!me.scheduled.length) {
+			if(!this.scheduled.length) {
 				return;
 			}
 			var options = {
-				method: me.entity.name + "/get",
+				method: this.entity.name + "/get",
 				params: {
-					ids: me.scheduled
+					ids: this.scheduled
 				}
 			};
-			go.Jmap.request(options).then(function(response) {
+			go.Jmap.request(options).then((response) => {
 
 				if(!go.util.empty(response.notFound)) {
-					me.notFound = me.notFound.concat(response.notFound);
-					me.metaStore.setItem("notfound", me.notFound);									
+					this.notFound = this.notFound.concat(response.notFound);
+					this.metaStore.setItem("notfound", this.notFound);
 				}
 
 				if(response.list) {
-					for (var i = 0, l = response.list.length; i < l; i++) {
-						me._add(response.list[i], false);
+					for (let i = 0, l = response.list.length; i < l; i++) {
+						this._add(response.list[i], false);
 					}
 				}
 
-				for(var i = 0, l = options.params.ids.length; i < l; i++) {
-					var id = options.params.ids[i];
+				for(let i = 0, l = options.params.ids.length; i < l; i++) {
+					let id = options.params.ids[i];
 
-					delete me.pending[id];
+					delete this.pending[id];
 					if(response.notFound.indexOf(id) > -1) {
 
 						var err = {
 							id: id,
-							entity: me.entity.name,
+							entity: this.entity.name,
 							error: "Not found"
 						};
 
 						console.warn(err);
-						me.scheduledPromises[id].reject(err);	
+						this.scheduledPromises[id].reject(err);
 					} else
 					{
-						if(!me.data[id]) {
+						if(!this.data[id]) {
 							//return Promise.reject("Data not available ???");
-							me.scheduledPromises[id].reject("Data not available ???");
+							this.scheduledPromises[id].reject("Data not available ???");
 						}
-						me.scheduledPromises[id].resolve(go.util.clone(me.data[id]));
+						this.scheduledPromises[id].resolve(go.util.clone(this.data[id]));
 					}
 
-					delete me.scheduledPromises[id];					
+					delete this.scheduledPromises[id];
 				}
 
-				return me.setState(response.state).then(function() {
+				return this.setState(response.state).then(() => {
 					return response;
 				});
-			}).catch(function(response) {
-				for(var i = 0, l = options.params.ids.length; i < l; i++) {
-					var id = options.params.ids[i];
+			}).catch((response) => {
+				for(let i = 0, l = options.params.ids.length; i < l; i++) {
+					let id = options.params.ids[i];
 
-					delete me.pending[id];
-					me.scheduledPromises[id].reject(response);
-					delete me.scheduledPromises[id];
+					delete this.pending[id];
+					this.scheduledPromises[id].reject(response);
+					delete this.scheduledPromises[id];
 				}
 			});
 
-			me.scheduled = [];
-			me.getTimeout = null;
+			this.scheduled = [];
+			this.getTimeout = null;
 		});
 	},
 
 	_getSingleFromBrowserStorage : function(id) {
-		var me = this;
 
 		// check if we already fetched it.
-		if(me.data[id]) {
-			return Promise.resolve(go.util.clone(me.data[id]));
+		if(this.data[id]) {
+			return Promise.resolve(go.util.clone(this.data[id]));
 		}
 		
 		//Pause JMAP requests because indexeddb events will trigger the queue
 		go.Jmap.pause();
 
 		this.pauseGet();
-		return me.initState().then(function() {			
-			return me.stateStore.getItem(id + "").then(function(entity) {
+		return this.initState().then(() => {
+			return this.stateStore.getItem(id + "").then((entity) => {
 				if(!entity) {
 					return null;
-				}				
+				}
 
-				me.data[id] = entity;
+				this.data[id] = entity;
 				return go.util.clone(entity);
 			});
-		}).finally(function(){
+		}).finally(() => {
 
 			go.Jmap.continue();
-			me.continueGet();
+			this.continueGet();
 		});
 	},
 
@@ -634,9 +604,9 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 			}
 		}
 
-		var entities = [], notFound = [], promises = [], order = {};
+		let entities = [], notFound = [], promises = [], order = {};
 
-		ids.forEach(function(id, index) {
+		ids.forEach((id, index) => {
 			//keep order for sorting later
 			order[id] = index;
 			promises.push(this.single(id).then(function(entity) {
@@ -645,9 +615,9 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 				}).catch(function() {
 					notFound.push(id);
 				}));
-		}, this);	
+		});
 
-		return Promise.all(promises).then(function() {
+		return Promise.all(promises).then(() => {
 			entities.sort(function (a, b) {
 					return order[a.id] - order[b.id];
 			});
@@ -664,8 +634,8 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 	findBy : function(fn, scope, startIndex) {
 		startIndex = startIndex || 0;
-		var data = Object.values(this.data);
-		for(var i = startIndex, l = data.length; i < l; i++) {
+		const data = Object.values(this.data);
+		for(let i = startIndex, l = data.length; i < l; i++) {
 			if(fn.call(scope || this, data[i])) {
 				return data[i];
 			}
@@ -686,7 +656,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 * @returns {Promise}
 	 */
 	save : function(entity, id) {
-		var p = {}, op;
+		let p = {}, op;
 
 		if(id) {
 			op = 'update';
@@ -740,7 +710,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 * @returns {Promise<object>}
 	 */
 	destroy : function(id) {
-		return this.set( {destroy: [id]}).then(function(response) {
+		return this.set( {destroy: [id]}).then((response) => {
 			if(response.destroyed.indexOf(id) == -1) {
 				return Promise.reject({message: t("Failed to delete"), response: response, error: response.notDestroyed[id] || null});
 			} else {
@@ -801,44 +771,42 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 		{
 			throw "'destroy' must be an array.";
 		}
-		
-		var me = this;
 
-		return me.initState().then(function() {
-			var options = {
-				method: me.entity.name + "/set",
+		return this.initState().then(() => {
+			const options = {
+				method: this.entity.name + "/set",
 				params: params
 			};
 
-			return go.Jmap.request(options).then(function(response) {
-				var entity, clientId;
+			return go.Jmap.request(options).then((response) => {
+				let entity, clientId;
 
 				if(response.created) {
 					for(clientId in response.created) {
 						//merge client data with server defaults.
 						entity = Ext.apply(params.create ? (params.create[clientId] || {}) : {}, response.created[clientId] || {});
-						me._add(entity, true);
+						this._add(entity, true);
 					}
 				}
 
 				if(response.updated) {
-					for(var serverId in response.updated) {
+					for(let serverId in response.updated) {
 						//server updated something we don't have
-						if(!me.data[serverId]) {
+						if(!this.data[serverId]) {
 							continue;
 						}
 						//merge existing data, with updates from client and server
-						entity = Ext.apply(me.data[serverId], params.update[serverId]);
+						entity = Ext.apply(this.data[serverId], params.update[serverId]);
 						entity = Ext.apply(entity, response.updated[serverId] || {});
-						me._add(entity, true);
+						this._add(entity, true);
 					}
 				}
 
-				me.setState(response.newState);
+				this.setState(response.newState);
 
 				if(response.destroyed) {
-					for(var i =0, l = response.destroyed.length; i < l; i++) {
-						me._destroy(response.destroyed[i]);
+					for(let i =0, l = response.destroyed.length; i < l; i++) {
+						this._destroy(response.destroyed[i]);
 					}
 				}
 
@@ -846,13 +814,13 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					cb.call(scope || me, options, true, response);
 				}
 
-				me._fireChanges();
+				this._fireChanges();
 
 				return response;
-			}).catch(function(error){
-				me.fireEvent("error", options, error);
+			}).catch((error) => {
+				this.fireEvent("error", options, error);
 				if(cb) {
-					cb.call(scope || me, options, false, error);
+					cb.call(scope || this, options, false, error);
 				}
 
 				return Promise.reject(error);
@@ -867,31 +835,31 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 * @returns {Promise<Object>}
 	 */
 	merge: function(ids) {
-		var me = this;
+
 		return go.Jmap.request({
-			method: me.entity.name + '/merge',
+			method: this.entity.name + '/merge',
 			params: {
 				ids: ids
 			},
 			
-		}).then(function(response) {
+		}).then((response) => {
 			if(response.updated) {
 				for(var serverId in response.updated) {
 					//merge existing data, with updates from client and server						
-					entity = Ext.apply(me.data[serverId], response.updated[serverId]);
-					me._add(entity, true);
-				}
-			}
-			
-			me.setState(response.newState);	
-			
-			if(response.destroyed) {
-				for(var i =0, l = response.destroyed.length; i < l; i++) {						
-					me._destroy(response.destroyed[i]);
+					entity = Ext.apply(this.data[serverId], response.updated[serverId]);
+					this._add(entity, true);
 				}
 			}
 
-			me._fireChanges();
+			this.setState(response.newState);
+			
+			if(response.destroyed) {
+				for(let i =0, l = response.destroyed.length; i < l; i++) {
+					this._destroy(response.destroyed[i]);
+				}
+			}
+
+			this._fireChanges();
 
 			return response;
 		});
@@ -906,31 +874,29 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 	 * @returns {String} Client call ID
 	 */
 	query : function(params, cb, scope) {
-		var me = this;
 
 		if(!params || !params.limit) {
-			console.warn(me.entity.name + "/query call without limit");
+			console.warn(this.entity.name + "/query call without limit");
 		}
 
-		var reqProm =  go.Jmap.request({
-				method: me.entity.name + "/query",
+		let reqProm =  go.Jmap.request({
+				method: this.entity.name + "/query",
 				params: params				
 		});
 
-		var retProm = reqProm.then(function(response) {
+		retProm = reqProm.then((response) => {
 
 			//if received state is newer then fetch updates
-			me.getState().then(function(state){
+			this.getState().then((state) => {
 				if(!state) {
-					me.setState(response.state);
+					this.setState(response.state);
 				} else if (response.state !== state) {
-					me.getUpdates();
+					this.getUpdates();
 				}
-
 			});
 
 			if(cb) {
-				cb.call(scope || me, response);
+				cb.call(scope || this, response);
 			}
 
 			return response;

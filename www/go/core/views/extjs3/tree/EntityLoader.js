@@ -37,11 +37,6 @@ go.tree.EntityLoader = Ext.extend(Ext.tree.TreeLoader, {
 				throw "Invalid 'entityStore' property given to component"; 
 			}
 		}
-//		this.entityStore.on('changes',this.onChanges, this);		
-//
-//		this.on('beforedestroy', function() {
-//			this.entityStore.un('changes', this.onChanges, this);
-//		}, this);
 	},	
 	
 	

@@ -86,8 +86,8 @@ function dp(size) {
 		 * Fires when items are added, changed or destroyed in the entitystore.
 		 * 
 		 * @param {go.data.EntityStore} entityStore
-		 * @param {Object[]} added
-		 * @param {Object[]} changed
+		 * @param {int[]} added
+		 * @param {int[]} changed
 		 * @param {int[]} destroyed
 		 * @returns {void}
 		 */

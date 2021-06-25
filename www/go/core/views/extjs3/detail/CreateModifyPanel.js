@@ -52,8 +52,8 @@ go.detail.CreateModifyPanel = Ext.extend(Ext.Panel, {
 		},this);	
 	},
 	
-	onChanges : function(store, added, changed) {		
-		if(added[this.cUserId] || changed[this.cUserId] || added[this.mUserId] || changed[this.mUserId]) {		
+	onChanges : function(store, added, changed) {
+		if(changed.indexOf(this.cUserId) > -1 || changed.indexOf(this.mUserId) > -1) {
 			this.update(this.ownerCt.data); 
 		}
 	}	

@@ -89,7 +89,13 @@ class Alert extends UserProperty
 		return null;
 	}
 
-	public function at($task)
+	/**
+	 * Returns the time this alert occuurs
+	 *
+	 * @param Task $task
+	 * @return DateTime|null
+	 */
+	public function at(Task $task)
 	{
 		if (isset($this->offset) && $task) {
 			$offset = $this->offset;

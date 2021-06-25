@@ -247,16 +247,18 @@ go.Modules = (function () {
 				return;
 			}
 
-			for(var id in changed){
+			changed.forEach((id) => {
 
-				var index = this.entities.findIndex(function(e) {
+				const index = this.entities.findIndex(function(e) {
 					return e.id == id;
 				});
 
-				if(index>-1) {
-					this.entities[index] = changed[id];
+				if(index > -1) {
+					entityStore.single(id).then((module) => {
+						this.entities[index] = module;
+					});
 				}
-			}
+			})
 		},
 		
 		addPanel : function(panels) {

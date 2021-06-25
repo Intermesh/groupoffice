@@ -77,35 +77,36 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 	onAddressBookChanges: function (entityStore, added, changed, destroyed) {
 
 		//reload if added address book is not present in tree yet.
-		var me = this, reload = false, id, nodeId, node;
-		for (id in added) {
-			if (!me.findAddressbookNode(id)) {
-				me.getRootNode().reload();
+		added.forEach((id) => {
+			if (!this.findAddressbookNode(id)) {
+				this.getRootNode().reload();
 				return;
 			}
-		}
-		
-		for (id in changed) {
-			nodeId = "AddressBook-" + id,
-							node = me.getNodeById(nodeId);
+		});
 
-			if (node) {
-				node.attributes.data = changed[id];
+		entityStore.get(changed).then((result) => {
+			result.entities.forEach((addressBook) => {
+				const nodeId = "AddressBook-" + addressBook.id,
+					node = this.getNodeById(nodeId);
 
-				if (changed[id].name) {
-					node.setText(changed[id].name);
+				if (node) {
+					node.attributes.data = addressBook;
+
+					if (addressBook.name) {
+						node.setText(addressBook.name);
+					}
+
+					if (addressBook.groups) {
+						delete node.attributes.children;
+						node.reload();
+					}
 				}
+			});
 
-				if (changed[id].groups) {
-					delete node.attributes.children;
-					node.reload();
-				}
-			}
+		});
 
-		}
-
-		destroyed.forEach(function (id) {
-			var node = me.getNodeById("AddressBook-" + id);
+		destroyed.forEach( (id) => {
+			const node = this.getNodeById("AddressBook-" + id);
 			if (node) {
 				node.destroy();
 			}
@@ -117,30 +118,37 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 			return;
 		}
 
-		var me = this, groupId, reloadAddressBookIds = [];
-		for (groupId in added) {
-			reloadAddressBookIds.push(added[groupId].addressBookId);
-		}
-		for (groupId in changed) {
-			var nodeId = "AddressBookGroup-" + groupId;
-			var node = me.getNodeById(nodeId);
-			if(node) {
-				node.setText(changed[groupId].name);
-			} else
-			{
-				reloadAddressBookIds.push(changed[groupId].addressBookId);
-			}
-		}		
+		const reloadAddressBookIds = [];
 
-		destroyed.forEach(function (groupId) {
-			me.getNodeById("AddressBookGroup-" + groupId).destroy();
+		entityStore.get(added).then((result) => {
+			result.entities.forEach((group) => {
+				reloadAddressBookIds.push(group.addressBookId);
+			});
+		}).then(() => {
+			entityStore.get(changed).then((result) => {
+				result.entities.forEach((group) => {
+					const nodeId = "AddressBookGroup-" + group.id;
+					const node = this.getNodeById(nodeId);
+					if (node) {
+						node.setText(group.name);
+					} else {
+						reloadAddressBookIds.push(group.addressBookId);
+					}
+				});
+
+				reloadAddressBookIds.forEach((addressBookId) => {
+					const abNode = this.getNodeById("AddressBook-" + addressBookId);
+					delete abNode.attributes.children;
+					abNode.reload();
+				});
+
+			})
 		});
 
-		reloadAddressBookIds.forEach(function (addressBookId) {
-			var abNode = me.getNodeById("AddressBook-" + addressBookId);
-			delete abNode.attributes.children;
-			abNode.reload();
+		destroyed.forEach((groupId) => {
+			this.getNodeById("AddressBookGroup-" + groupId).destroy();
 		});
+
 	},
 	
 	showAddressBookMoreMenu: function (node, e) {

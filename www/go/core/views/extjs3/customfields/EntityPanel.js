@@ -202,35 +202,35 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 			if (this.loading || !this.rendered) {
 				return;
 			}
-			var me = this, id, e;
-			
-			Ext.apply(added, changed);
-			
-			for(id in added) {			
-				e = added[id];
 
-				//change for another entity. Skip it.
-				if(e.entity !== me.entity) {						
-					return;
-				}
+			let all = added.concat(changed);
 
-				var record = me.store.getAt(me.store.findBy(function (record) {
-					if (record.data.isFieldSet && record.data.fieldSetId === e.id) {
-						return true;
+			store.get(all).then((result) => {
+				result.entities.forEach((e) => {
+
+					//change for another entity. Skip it.
+					if(e.entity !== this.entity) {
+						return;
 					}
-				}));
 
-				if (!record) {
-					me.load();
-				} else
-				{
-					record.beginEdit();
-					record.set("name", e.name);
-					record.set("sortOrder", e.sortOrder);
-					record.endEdit();
-					record.commit();
-				}
-			};
+					const record = this.store.getAt(me.store.findBy((record) => {
+						if (record.data.isFieldSet && record.data.fieldSetId === e.id) {
+							return true;
+						}
+					}));
+
+					if (!record) {
+						this.load();
+					} else
+					{
+						record.beginEdit();
+						record.set("name", e.name);
+						record.set("sortOrder", e.sortOrder);
+						record.endEdit();
+						record.commit();
+					}
+				});
+			});
 			
 			if(destroyed.length) {
 				this.store.remove(this.store.getRange().filter(function(r) {
@@ -244,39 +244,38 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 				return;
 			}
 
-			var me = this, id, e;
-			
-			Ext.apply(added, changed);
-			
-			for(id in added) {			
-				e = added[id];
-				if(me.store.findBy(function (record) {
-					if (record.data.isFieldSet && record.data.fieldSetId === e.fieldSetId) {
-						return true;
-					}
-				}) === -1) {
-					//fieldset not part of this panel
-					return;
-				}
+			let all = added.concat(changed);
 
-				var record = me.store.getAt(me.store.findBy(function (record) {
-					if (record.data.fieldId === e.id) {
-						return true;
-					}
-				}));
+			store.get(all).then((result) => {
+				result.entities.forEach((e) => {
 
-				if (!record) {
-					me.load();
-				} else
-				{
-					record.beginEdit();
-					record.set("name", e.name);
-					record.set("databaseName", e.databaseName);
-					record.set("sortOrder", e.sortOrder);
-					record.endEdit();
-					record.commit();
-				}
-			};
+					if (this.store.findBy(function (record) {
+						if (record.data.isFieldSet && record.data.fieldSetId === e.fieldSetId) {
+							return true;
+						}
+					}) === -1) {
+						//fieldset not part of this panel
+						return;
+					}
+
+					const record = this.store.getAt(me.store.findBy(function (record) {
+						if (record.data.fieldId === e.id) {
+							return true;
+						}
+					}));
+
+					if (!record) {
+						this.load();
+					} else {
+						record.beginEdit();
+						record.set("name", e.name);
+						record.set("databaseName", e.databaseName);
+						record.set("sortOrder", e.sortOrder);
+						record.endEdit();
+						record.commit();
+					}
+				});
+			});
 			
 			if(destroyed.length) {
 				this.store.remove(this.store.getRange().filter(function(r) {
