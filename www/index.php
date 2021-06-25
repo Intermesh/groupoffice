@@ -64,6 +64,7 @@ try {
 	if(empty($_REQUEST['r']) && PHP_SAPI!='cli'){
 
 
+		//Server manager uses this when directly signing in
 		if(!empty($_POST['accessToken'])) {
 			$old = date_default_timezone_get();
 			date_default_timezone_set('UTC');
@@ -79,11 +80,10 @@ try {
 				unset($_POST['accessToken']);
 			}
 
-
-
 			date_default_timezone_set($old);
 		}
 
+		// Process remember me persistent cookie
 		if(($rememberMe = \go\core\model\RememberMe::verify())) {
 			$rememberMe->setCookie();
 
@@ -95,15 +95,6 @@ try {
 			//for default_scripts.php to pass accessToken to script
 			$_POST['accessToken'] = $token->accessToken;
 		}
-
-
-
-//		if(GO::user() && isset($_SESSION['GO_SESSION']['after_login_url'])){
-//			$url = GO::session()->values['after_login_url'];
-//			unset(GO::session()->values['after_login_url']);
-//			header('Location: '.$url);
-//			exit();
-//		}
 
 		go()->fireEvent(\go\core\App::EVENT_INDEX);
 
