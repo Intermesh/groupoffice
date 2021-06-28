@@ -1,3 +1,4 @@
+28-06-2021 6.4.238
 - Core: fixed required condition in custom fields with != in the condition and updates when form fields change
 - Email: Don't filter XSS if it's from a known contact
 - Tickets: Fix user being able to reopen ticket despite this action being restricted to module manager
