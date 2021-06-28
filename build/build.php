@@ -211,7 +211,7 @@ class Builder
 
 		cd($this->buildDir);
 		run("tar czf " . $this->packageName . ".tar.gz " . $this->packageName);
-		echo "Created " . $this->packageName . ".tar.gz\n";
+		echo "Created " . $this->buildDir . '/'. $this->packageName . ".tar.gz\n";
 	}
 
 	private function encode()
