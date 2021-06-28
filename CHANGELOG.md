@@ -1,3 +1,5 @@
+- Core: fixed required condition in custom fields with != in the condition and updates when form fields change
+
 14-06-2021 6.4.237
 - Projects: Invalid update query made upgrade halt
 
