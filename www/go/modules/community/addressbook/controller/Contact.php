@@ -4,6 +4,7 @@ namespace go\modules\community\addressbook\controller;
 use go\core\exception\Forbidden;
 use go\core\fs\Blob;
 use go\core\fs\File;
+use go\core\http\Exception;
 use go\core\jmap\EntityController;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\model\Acl;
@@ -89,7 +90,9 @@ class Contact extends EntityController {
 	}
 	
 	public function import($params) {
-		return $this->defaultImport($params);
+		if($this->checkPermissionsForAddressBook($params)) {
+			return $this->defaultImport($params);
+		}
 	}
 
 	/**
@@ -173,6 +176,25 @@ EOT;
 		$contact = $importer->import($vcard, $contact);
 		return ['success' => true, 'contactId' => $contact->id];
 
+	}
+
+	/**
+	 * Match address book ID with permissions
+	 *
+	 * @param array $params
+	 * @return bool
+	 * @throws Exception
+	 */
+	private function checkPermissionsForAddressBook(array $params)
+	{
+		if(isset($params['values']) && isset($params['values']['addressBookId'])) {
+			$addressBookId = $params['values']['addressBookId'];
+			$addressBook = model\AddressBook::findById($addressBookId);
+			if(!$addressBook || $addressBook->getPermissionLevel() < Acl::LEVEL_CREATE) {
+				throw new Exception('You do not have create permissions for this address book');
+			}
+		}
+		return true;
 	}
 }
 

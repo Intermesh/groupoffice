@@ -1,5 +1,8 @@
 - Projects2: Fixed duplicate entity name in log
 - Projects2: Display subproject totals if configured in template config
+- Address book: Disable add button if permissions are read only
+- Address book: Disable import / export if menu items permissions are read only
+- Core: Better error message handling in CsvImportDialog
 
 24-06-2021 6.5.61
 - Core: Show authorized clients in Account page of user settings. Adds ability to logout other clients by users or the admin.
