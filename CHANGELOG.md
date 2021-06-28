@@ -1,3 +1,6 @@
+- Projects2: Fixed duplicate entity name in log
+- Projects2: Display subproject totals if configured in template config
+
 24-06-2021 6.5.61
 - Core: Show authorized clients in Account page of user settings. Adds ability to logout other clients by users or the admin.
 - Calendar: hide custom fieldset data in details when no read permissions (Github #704)

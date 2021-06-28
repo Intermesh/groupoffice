@@ -31,7 +31,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 	private $id;
 	private $name;
 	private $moduleId;	
-  private $clientName;
+	private $clientName;
 	private $defaultAclId;
 
 	private static $cache;
@@ -119,7 +119,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			$record = [];
 			$record['moduleId'] = isset($module) ? $module->id : null;
 			$record['name'] = self::classNameToShortName($className);
-      $record['clientName'] = $clientName;
+            $record['clientName'] = $clientName;
 			App::get()->getDbConnection()->insert('core_entity', $record)->execute();
 			$record['id'] = App::get()->getDbConnection()->getPDO()->lastInsertId();
 
