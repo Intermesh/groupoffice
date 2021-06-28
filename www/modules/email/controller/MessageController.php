@@ -1486,10 +1486,11 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		$response['mailbox'] = $params['mailbox'];
 		$response['account_id'] = intval($params['account_id']);
 		$response['do_not_mark_as_read'] = $account->do_not_mark_as_read;
+		$response = $this->_getContactInfo($imapMessage, $params, $response, $account);
 
 		if(!$plaintext){
 
-			if($params['mailbox']!=$account->sent && $params['mailbox']!=$account->drafts) {
+			if(empty($response['sender_contact_id']) && $params['mailbox']!=$account->sent && $params['mailbox']!=$account->drafts) {
 
 				$response = $this->_checkXSS($params, $response);
 			}
@@ -1509,7 +1510,6 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		}
 		
 		$response['isInSpamFolder']=$this->_getSpamMoveMailboxName($params['uid'],$params['mailbox'],$account->id);
-		$response = $this->_getContactInfo($imapMessage, $params, $response, $account);
 
 		// START Handle the links div in the email display panel		
 		if(!$plaintext){
