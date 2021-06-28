@@ -197,9 +197,6 @@
 
 
 
-
-6.4.244
-6.4.236
 28-06-2021 6.4.238
 - Core: fixed required condition in custom fields with != in the condition and updates when form fields change
 - Email: Don't filter XSS if it's from a known contact
