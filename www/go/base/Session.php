@@ -102,7 +102,7 @@ class Session extends Observable{
 
 		// if access token from new JMAP API connected to this session was detroyed then destroy this session too!
 		// this is set in go/core/model/Token.php
-		if(!empty($this->values['accessToken']) && !Token::findById($this->values['accessToken'])) {
+		if(!empty($this->values['accessToken']) && !go()->getCache()->get('token-' . $this->values['accessToken'])) {
 			$this->values = [];
 		}
 	}
