@@ -72,7 +72,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 
 	onAfterRender: function() {
 		//find entity panel
-		var form = this.findParentByType("form");
+		var form = this.findParentByType("form"), me = this;
 
 		this.formTabPanel = this.findParentByType('tabpanel');
 
@@ -99,12 +99,12 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 
 
 
-				form.getForm().items.each( (field) => {
-					field.on('change', (field) => {
+				form.getForm().items.each(function (field)  {
+					field.on('change',function(field) {
 						form.getForm().isValid();
-						this.filter(form.getValues());
+						me.filter(form.getValues());
 					});
-					field.on('check', (field, checked) => {
+					field.on('check', function (field, checked)  {
 						field.isValid();
 					});
 
@@ -129,12 +129,12 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 					return true;
 				});
 
-				form.getForm().items.each( (field) => {
-					field.on('change', (field) => {
+				form.getForm().items.each( function (field) {
+					field.on('change', function (field) {
 						form.getForm().isValid();
 						this.filter(form.getForm().getFieldValues());
 					});
-					field.on('check', (field, checked) => {
+					field.on('check', function(field, checked){
 						field.isValid();
 					});
 

@@ -38,14 +38,16 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	load: function (id, callback, scope) {
 		this.currentId = id;
 
-		this.entityStore.single(id).then((entity) => {
-			this.entity = entity;
+		var me = this;
 
-			this.on('setvalues', () => {
-				this.fireEvent("load", this, entity);
-			}, this, {single: true});
+		this.entityStore.single(id).then(function (entity) {
+			me.entity = entity;
 
-			this.setValues(entity, true);
+			me.on('setvalues', function ()  {
+				me.fireEvent("load", me, entity);
+			}, me, {single: true});
+
+			me.setValues(entity, true);
 			
 			if(callback) {
 				callback.call(scope || me, entity);
@@ -86,14 +88,15 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		this.getForm().trackResetOnLoad = oldReset;
 
 		//combo's can take a while to load.
-		let promises = [];
-		this.getForm().items.each((item) => {
+		var promises = [];
+		this.getForm().items.each(function (item) {
 			if(item.setValuePromise)
 				promises.push(item.setValuePromise);
 		})
 
-		Promise.all(promises).then(() => {
-			this.fireEvent('setvalues', this, v);
+		var me = this;
+		Promise.all(promises).then(function ()  {
+			me.fireEvent('setvalues', me, v);
 		});
 
 		return this;
