@@ -3102,7 +3102,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		/*
 		 * Set some common column values
 		*/
-//GO::debug($this->mtime);
 
 		if($this->dbUpdateRequired()){
 			if(isset($this->columns['mtime']) && (!$this->isModified('mtime') || empty($this->mtime)))//Don't update if mtime was manually set.
@@ -3130,13 +3129,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		if(isset($this->columns['createdBy']) && empty($this->createdBy)) {
 			$this->createdBy = GO::user() ? GO::user()->id : 1;
 		}
-		
-		//user id is set by defaultAttributes now.
-		//do not use empty() here for checking the user id because some times it must be 0. eg. core_acl_group
-//		if(isset($this->columns['user_id']) && !isset($this->user_id)){
-//			$this->user_id=GO::user() ? GO::user()->id : 1;
-//		}
-
 
 		/**
 		 * Useful event for modules. For example custom fields can be loaded or a files folder.
@@ -3176,8 +3168,6 @@ abstract class ActiveRecord extends \GO\Base\Model{
 					$this->{$this->aclOverwrite()} = $this->findRelatedAclModel()->findAclId();
 				}
 			}
-//			if(!$this->isAclOverwritten() && $this->isJoinedAclField)
-//				$this->{$this->aclOverwrite()} = $this->findRelatedAclModel()->findAclId();
 		}
 
 		$this->_trimSpacesFromAttributes();

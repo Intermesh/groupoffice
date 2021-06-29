@@ -322,29 +322,20 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 			callback: function (options, success, response) {
 				this.getEl().unmask();
 				if (!success) {
-					Ext.MessageBox.alert(t("Error"), response.errors.join("<br />"));
-				} else
-				{
-					if (!success) {
+					if(response.errors) {
 						Ext.MessageBox.alert(t("Error"), response.errors.join("<br />"));
-					} else
-					{
-						var msg = t("Imported {count} items").replace('{count}', response.count) + ". ";
-
-						if(response.errors && response.errors.length) {
-							msg += t("{count} items failed to import. A log follows: <br /><br />").replace('{count}', response.errors.length) + response.errors.join("<br />");
-						}
-						
-						Ext.MessageBox.alert(t("Success"), msg);
+					} else {
+						Ext.MessageBox.alert(t("Error"), response.message);
 					}
-
-					this.close();
+				} else {
+					var msg = t("Imported {count} items").replace('{count}', response.count) + ". ";
+					if(response.errors && response.errors.length) {
+						msg += t("{count} items failed to import. A log follows: <br /><br />").replace('{count}', response.errors.length) + response.errors.join("<br />");
+					}
+						
+					Ext.MessageBox.alert(t("Success"), msg);
 				}
 
-				// if (this.callback) {
-				// 	this.callback.call(this.scope || this, response);
-				// }
-				
 				this.close();
 			},
 			scope: this
