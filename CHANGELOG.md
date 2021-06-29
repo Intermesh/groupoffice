@@ -1,3 +1,11 @@
+6.6
+
+Tasks: Completely rewritten module
+Core: Set alternative lost password URL
+Core: Alert system to notify users about comments, assigned tasks etc.
+----
+
+
 28-06-2021 6.5.62
 - Projects2: Fixed duplicate entity name in log
 - Projects2: Display subproject totals if configured in template config
