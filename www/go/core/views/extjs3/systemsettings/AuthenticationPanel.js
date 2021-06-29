@@ -32,6 +32,13 @@ go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
 							decimals: 0,
 							value: 0,
 							width: dp(72)
+						},
+						{
+							xtype:"textfield",
+							fieldLabel: t("Lost password URL"),
+							hint: t("You can set an URL to handle lost passwords in an alternative way"),
+							name: "lostPasswordURL",
+							anchor: "100%"
 						}
 					]
 			},

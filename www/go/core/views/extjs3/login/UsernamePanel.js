@@ -110,6 +110,12 @@ go.login.UsernamePanel = Ext.extend(go.login.BaseLoginPanel, {
 	},
 
 	showForgot: function () {
+
+		if(GO.settings.config.lostPasswordURL) {
+			window.location.replace(GO.settings.config.lostPasswordURL);
+			return;
+		}
+
 		var forgotDlg = new go.login.ForgotDialog();
 		forgotDlg.show();
 	},

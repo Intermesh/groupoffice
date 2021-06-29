@@ -269,6 +269,13 @@ class Settings extends core\Settings {
 	 * @var string
 	 */
 	public $defaultAuthenticationDomain;
+
+	/**
+	 * An alternative URL to handle lost passwords
+	 *
+	 * @var string
+	 */
+	public $lostPasswordURL;
 	
 	
 	/**
