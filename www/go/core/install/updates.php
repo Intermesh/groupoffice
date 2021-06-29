@@ -1030,3 +1030,16 @@ $updates['202106251508'][] = "create index core_auth_remember_me_series_index
 $updates['202106251508'][] = "alter table core_auth_remember_me
     add constraint core_auth_remember_me_core_user_id_fk
         foreign key (userId) references core_user (id);";
+
+$updates['202106291047'][] = "alter table core_auth_remember_me
+    add `remoteIpAddress` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL;";
+
+$updates['202106291047'][] = "alter table core_auth_remember_me
+    add `userAgent` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL";
+
+$updates['202106291047'][] = "alter table core_auth_remember_me
+	add platform varchar(190) null after userAgent;";
+
+$updates['202106291047'][] = "alter table core_auth_remember_me
+	add browser varchar(190) null after platform;";
+

@@ -2,6 +2,7 @@
 namespace go\core\model;
 
 use DateInterval;
+use go\core\Environment;
 use go\core\http\Request;
 use go\core\http\Response;
 use go\core\orm\exception\SaveException;
@@ -43,6 +44,31 @@ class RememberMe extends Entity {
 	 */
 	public $series;
 
+
+	/**
+	 * The remote IP address of the client connecting to the server
+	 *
+	 * @var string
+	 */
+	public $remoteIpAddress;
+
+	/**
+	 * The user agent sent by the client
+	 *
+	 * @var string
+	 */
+	public $userAgent;
+
+	/**
+	 * @var string
+	 */
+	public $platform;
+
+	/**
+	 * @var string
+	 */
+	public $browser;
+
 	
 	/**
 	 * A date interval for the lifetime of a token
@@ -68,9 +94,29 @@ class RememberMe extends Entity {
 		if($this->isNew()) {	
 			$this->setExpiryDate();
 			$this->setNewToken();
+			$this->setClient();
 
 			$this->series = static::generateToken();
 		}
+	}
+
+	private function setClient() {
+		if(isset($_SERVER['REMOTE_ADDR'])) {
+			$this->remoteIpAddress = $_SERVER['REMOTE_ADDR'];
+		}
+
+		if(isset($_SERVER['HTTP_USER_AGENT'])) {
+			$this->userAgent = $_SERVER['HTTP_USER_AGENT'];
+		}else if(Environment::get()->isCli()) {
+			$this->userAgent = 'cli';
+		} else {
+			$this->userAgent = 'Unknown';
+		}
+
+		$ua_info = \donatj\UserAgent\parse_user_agent();
+
+		$this->platform = $ua_info['platform'];
+		$this->browser = $ua_info['browser'];
 	}
 
 	private static function generateToken(){

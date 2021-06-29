@@ -1125,6 +1125,10 @@ create table core_auth_remember_me
     series varchar(190) collate ascii_bin null,
     userId int not null,
     expiresAt datetime null,
+    `remoteIpAddress` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `userAgent` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  platform varchar(190) null,
+  browser varchar(190) null,
     constraint core_auth_remember_me_pk
         primary key (id)
 );

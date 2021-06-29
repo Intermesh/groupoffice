@@ -2,6 +2,7 @@
 namespace go\core\util;
 
 use DateTime as PHPDateTime;
+use DateTimeZone;
 use go\core\data\ArrayableInterface;
 use go\core\model\User;
 
@@ -54,6 +55,21 @@ class DateTime extends PHPDateTime implements ArrayableInterface, \JsonSerializa
 			return $date->format($f);
 		}
 		return $this->format($f);
+	}
+
+	/**
+	 * Overridden becausde it should return static. Apperently this has been fixed in PHP 8
+	 * https://bugs.php.net/bug.php?id=79975
+	 *
+	 * @param string $format
+	 * @param string $datetime
+	 * @param DateTimeZone|null $timezone
+	 * @return PHPDateTime|false|static
+	 * @throws \Exception
+	 */
+	public static function createFromFormat($format, $datetime, DateTimeZone $timezone = null)
+	{
+		return new static("@" . parent::createFromFormat($format, $datetime, $timezone)->format("U"));
 	}
 
 }

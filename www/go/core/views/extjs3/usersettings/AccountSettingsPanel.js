@@ -157,7 +157,7 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 							html: t("Browser")
 						}
 						,{
-							html: t("Country")
+							html: t("Expires At")
 						}
 						,
 						{
@@ -188,7 +188,11 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						}
 						,{
 							submit: false,
-							name: "countryCode"
+							name: "expiresAt",
+							renderer: function(v) {
+								return (new Date(v)).format(go.User.dateFormat+" " + go.User.timeFormat);
+
+							}
 						}
 						]
 

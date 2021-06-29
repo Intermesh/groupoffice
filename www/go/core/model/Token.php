@@ -474,14 +474,17 @@ class Token extends Entity {
 
 	/**
 	 * Destroys all tokens except
+	 *
 	 * @return bool
 	 * @throws \Exception
 	 */
 	public static function logoutEveryoneButAdmins() {
 		$admins = (new Query)->select('userId')->from('core_user_group')->where('groupId', '=', Group::ID_ADMINS);
-		return self::delete((new Query)
+		$q = (new Query)
 			->where('expiresAt', '!=', null)
-			->where('userId', 'NOT IN ', $admins));
+			->where('userId', 'NOT IN ', $admins);
+
+		return self::delete($q) && RememberMe::delete($q);
 	}
 
 	public function setCookie() {
