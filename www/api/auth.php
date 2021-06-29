@@ -159,7 +159,7 @@ try {
 			}
 
 			if ($token->isAuthenticated()) {
-				if($data['rememberLogin']) {
+				if(!empty($data['rememberLogin'])) {
 					$rememberMe = new \go\core\model\RememberMe();
 					$rememberMe->userId = $token->userId;
 					if(!$rememberMe->save()) {
