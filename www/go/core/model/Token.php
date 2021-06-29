@@ -439,6 +439,14 @@ class Token extends Entity {
 	{
 		foreach(self::find()->mergeWith($query)->selectSingleValue('accessToken') as $accessToken) {
 			go()->getCache()->delete('token-' . $accessToken);
+
+			Response::get()->setCookie('accessToken', "", [
+				'expires' => time() - 3600,
+				"path" => "/",
+				"samesite" => "Lax",
+				"domain" => Request::get()->getHost()
+			]);
+
 		}
 
 		return parent::internalDelete($query);

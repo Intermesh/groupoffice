@@ -3,12 +3,14 @@
 namespace go\core\auth;
 
 use go\core\App;
+use go\core\db\Column;
 use go\core\ErrorHandler;
 use go\core\exception\Forbidden;
 use go\core\exception\Unavaiable;
 use go\core\exception\Unavailable;
 use go\core\jmap\State;
 use go\core\model\AuthAllowGroup;
+use go\core\model\RememberMe;
 use go\core\model\Token;
 use go\core\model\User;
 use go\core\model\Log;
@@ -221,7 +223,7 @@ class Authenticate {
 			->where('recoveryHash = :hash AND recoverySendAt > :time')
 			->bind([
 				':hash' => $hash,
-				':time' => $oneHourAgo->format(DateTime::ISO8601)
+				':time' => $oneHourAgo->format(Column::DATETIME_FORMAT)
 			])->single();
 		if (empty($user)) {
 			return false;
@@ -230,6 +232,8 @@ class Authenticate {
 	}
 
 	public function logout() {
+
+		RememberMe::unsetCookie();
 		$state = new \go\core\jmap\State();
 		$token = $state->getToken();
 		if(!$token) {
@@ -240,6 +244,7 @@ class Authenticate {
 
 		$token->oldLogout();
 		Token::delete($token->primaryKeyValues());
+
 
 		return true;
 	}

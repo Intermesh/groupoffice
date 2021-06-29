@@ -2,17 +2,12 @@
 namespace go\core\model;
 
 use DateInterval;
-use go\core\auth\BaseAuthenticator;
-use go\core\auth\SecondaryAuthenticator;
-use go\core\Environment;
-use go\core\auth\Method;
 use go\core\http\Request;
 use go\core\http\Response;
 use go\core\orm\exception\SaveException;
 use go\core\orm\Query;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
-use go\core\model\Module;
 
 class RememberMe extends Entity {
 	
@@ -103,13 +98,23 @@ class RememberMe extends Entity {
 
 	private function setExpiryDate() {
 		$expireDate = new DateTime();
-		$expireDate->add(new DateInterval(Token::LIFETIME));
+		$expireDate->add(new DateInterval(self::LIFETIME));
 		$this->expiresAt = $expireDate;		
 	}
 
 	public function setCookie() {
 		Response::get()->setCookie('goRememberMe', $this->series . ':' . $this->unhashedToken, [
 			'expires' => $this->expiresAt->format("U"),
+			"path" => "/",
+			"samesite" => "Lax",
+			"domain" => Request::get()->getHost(),
+			"httpOnly" => true
+		]);
+	}
+
+	public static function unsetCookie() {
+		Response::get()->setCookie('goRememberMe', "", [
+			'expires' => time() - 3600,
 			"path" => "/",
 			"samesite" => "Lax",
 			"domain" => Request::get()->getHost(),
