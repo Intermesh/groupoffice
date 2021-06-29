@@ -147,14 +147,14 @@ class Query extends Criteria implements IteratorAggregate, JsonSerializable, Arr
 	}
 
 	/**
-	 * Set the table name and alias
+	 * Set the table name / subquery source and alias
 	 * 
-	 * @param string $tableName
+	 * @param string|Query $source Table name or Subquery
 	 * @param string $tableAlias Will default to 't' if not set
 	 * @return $this
 	 */
-	public function from($tableName, $tableAlias = null) {
-		$this->tableName = $tableName;
+	public function from($source, $tableAlias = null) {
+		$this->tableName = $source;
 		return $this->tableAlias($tableAlias);
 	}
 
