@@ -1038,8 +1038,8 @@ $updates['202106291047'][] = "alter table core_auth_remember_me
     add `userAgent` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL";
 
 $updates['202106291047'][] = "alter table core_auth_remember_me
-	add platform varchar(190) null after userAgent;";
+	add platform varchar(190) COLLATE utf8mb4_unicode_ci null after userAgent;";
 
 $updates['202106291047'][] = "alter table core_auth_remember_me
-	add browser varchar(190) null after platform;";
+	add browser varchar(190) COLLATE utf8mb4_unicode_ci null after platform;";
 
