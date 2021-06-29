@@ -7,6 +7,8 @@
 namespace go\modules\community\tasks;
 							
 use go\core;
+use go\core\model;
+use go\core\model\Group;
 use go\core\model\User;
 use go\core\orm\Mapping;
 use go\core\orm\Property;
@@ -30,6 +32,18 @@ class Module extends core\Module {
 
 	public static function onMap(Mapping $mapping) {
 		$mapping->addHasOne('tasksSettings', UserSettings::class, ['id' => 'userId'], true);
+	}
+
+	protected function afterInstall(model\Module $model)
+	{
+		// Share address book module with Internal group
+		if(!$model->findAcl()
+			->addGroup(Group::ID_INTERNAL)
+			->save()) {
+			return false;
+		}
+
+		return parent::afterInstall($model);
 	}
 
 }

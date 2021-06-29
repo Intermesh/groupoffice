@@ -112,7 +112,8 @@ class RememberMe extends Entity {
 			'expires' => $this->expiresAt->format("U"),
 			"path" => "/",
 			"samesite" => "Lax",
-			"domain" => Request::get()->getHost()
+			"domain" => Request::get()->getHost(),
+			"httpOnly" => true
 		]);
 	}
 

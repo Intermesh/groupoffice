@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
     ON DELETE SET NULL,
   CONSTRAINT `tasks_task_ibfk_1`
     FOREIGN KEY (`tasklistId`)
-    REFERENCES `tasks_tasklist` (`id`) on delete cascade,
+    REFERENCES `tasks_tasklist` (`id`) on update cascade,
   CONSTRAINT `tasks_task_ibfk_2`
     FOREIGN KEY (`createdBy`)
     REFERENCES `core_user` (`id`)
@@ -89,10 +89,6 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_unicode_ci;
 
-alter table tasks_task
-    add constraint tasks_task_ibfk_1
-        foreign key (tasklistId) references tasks_tasklist (id)
-            on update cascade;
 
 -- -----------------------------------------------------
 -- Table `tasks_task_user`

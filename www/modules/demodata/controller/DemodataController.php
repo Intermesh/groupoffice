@@ -11,6 +11,8 @@ use go\core\model\Acl;
 use go\core\model\Group;
 use go\core\model\Link;
 use go\core\model\User;
+use go\core\orm\Property;
+use go\core\util\DateTime;
 use go\modules\community\addressbook\model\Address;
 use go\modules\community\addressbook\model\Contact;
 use go\modules\community\addressbook\model\AddressBook;
@@ -20,6 +22,7 @@ use go\modules\community\addressbook\model\Url;
 use go\modules\community\bookmarks\model\Bookmark;
 use go\modules\community\bookmarks\model\Category;
 use go\modules\community\comments\model\Comment;
+use go\modules\community\tasks\model\Task;
 
 class DemodataController extends \GO\Base\Controller\AbstractController {
 	
@@ -342,7 +345,10 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 		// }
 
 
-		
+
+		$demoEntity = $demo;
+		$elmerEntity = $elmer;
+		$lindaEntity = $linda;
 
 		$elmer = GOUser::model()->findSingleByAttribute('username', 'elmer');
 		$demo = GOUser::model()->findSingleByAttribute('username', 'demo');
@@ -539,57 +545,64 @@ class DemodataController extends \GO\Base\Controller\AbstractController {
 		}
 		
 		if(\GO::modules()->tasks){			
-			$task = new \GO\Tasks\Model\Task();
-			$task->tasklist_id=  \GO\Tasks\Model\Tasklist::model()->getDefault($demo)->id;
-			$task->name='Feed the dog';
-			$task->start_time=time();
-			$task->due_time=\GO\Base\Util\Date::date_add(time(),2);
-			$task->save();			
-			
-			
-			$task = new \GO\Tasks\Model\Task();
-			$task->tasklist_id=  \GO\Tasks\Model\Tasklist::model()->getDefault($linda)->id;
-			$task->name='Feed the dog';
-			$task->start_time=time();
-			$task->due_time=\GO\Base\Util\Date::date_add(time(),1);
-			$task->save();			
-			
-			$task = new \GO\Tasks\Model\Task();
-			$task->tasklist_id=  \GO\Tasks\Model\Tasklist::model()->getDefault($elmer)->id;
-			$task->name='Feed the dog';
-			$task->start_time=time();
-			$task->due_time=\GO\Base\Util\Date::date_add(time(),1);
+			$task = new Task();
+			$task->tasklistId=  $demoEntity->tasksSettings->getDefaultTasklistId();
+			$task->title='Feed the dog';
+			$task->start= new DateTime();
+			$task->due = (new DateTime())->add(new \DateInterval("P2D"));
+			$task->responsibleUserId = $demoEntity->id;
 			$task->save();
-			
-			
-			
-			$task = new \GO\Tasks\Model\Task();
-			$task->tasklist_id=  \GO\Tasks\Model\Tasklist::model()->getDefault($demo)->id;
-			$task->name='Prepare meeting';
-			$task->start_time=time();
-			$task->due_time=\GO\Base\Util\Date::date_add(time(),1);
-			$task->save();			
-			$task->link($wile);
-			$task->link($event);
-			
-			
-			$task = new \GO\Tasks\Model\Task();
-			$task->tasklist_id=  \GO\Tasks\Model\Tasklist::model()->getDefault($linda)->id;
-			$task->name='Prepare meeting';
-			$task->start_time=time();
-			$task->due_time=\GO\Base\Util\Date::date_add(time(),1);
-			$task->save();			
-			$task->link($wile);
-			$task->link($event);
-			
-			$task = new \GO\Tasks\Model\Task();
-			$task->tasklist_id=  \GO\Tasks\Model\Tasklist::model()->getDefault($elmer)->id;
-			$task->name='Prepare meeting';
-			$task->start_time=time();
-			$task->due_time=\GO\Base\Util\Date::date_add(time(),1);
+
+
+			$task = new Task();
+			$task->tasklistId=  $lindaEntity->tasksSettings->getDefaultTasklistId();
+			$task->title='Feed the dog';
+			$task->start= new DateTime();
+			$task->due = (new DateTime())->add(new \DateInterval("P2D"));
+			$task->responsibleUserId = $lindaEntity->id;
 			$task->save();
-			$task->link($wile);
-			$task->link($event);
+
+			$task = new Task();
+			$task->tasklistId=  $elmerEntity->tasksSettings->getDefaultTasklistId();
+			$task->title='Feed the dog';
+			$task->start= new DateTime();
+			$task->due = (new DateTime())->add(new \DateInterval("P2D"));
+			$task->responsibleUserId = $elmerEntity->id;
+			$task->save();
+
+
+			$task = new Task();
+			$task->tasklistId=  $demoEntity->tasksSettings->getDefaultTasklistId();
+			$task->title='Prepare meeting with Wile';
+			$task->start= new DateTime();
+			$task->due = (new DateTime())->add(new \DateInterval("P2D"));
+			$task->responsibleUserId = $demoEntity->id;
+			$task->save();
+
+			Link::create($task, $wile);
+
+
+			$task = new Task();
+			$task->tasklistId=  $lindaEntity->tasksSettings->getDefaultTasklistId();
+			$task->title='Prepare meeting with Wile';
+			$task->start= new DateTime();
+			$task->due = (new DateTime())->add(new \DateInterval("P2D"));
+			$task->responsibleUserId = $lindaEntity->id;
+			$task->save();
+
+			Link::create($task, $wile);
+
+			$task = new Task();
+			$task->tasklistId=  $elmerEntity->tasksSettings->getDefaultTasklistId();
+			$task->title='Prepare meeting with Wile';
+			$task->start= new DateTime();
+			$task->due = (new DateTime())->add(new \DateInterval("P2D"));
+			$task->responsibleUserId = $elmerEntity->id;
+			$task->save();
+
+			Link::create($task, $wile);
+
+
 		}
 		
 

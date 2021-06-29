@@ -392,10 +392,7 @@ class GoSyncUtils {
 		$old = date_default_timezone_get();
 		date_default_timezone_set($model->timezone ?? \GO::user()->timezone);
 
-		if ($model instanceof \GO\Tasks\Model\Task)
-			$recur = new SyncTaskRecurrence();
-		else
-			$recur = new SyncRecurrence();
+		$recur = new SyncRecurrence();
 
 		$rrule = new \GO\Base\Util\Icalendar\Rrule();
 		$rrule->readIcalendarRruleString($model->start_time, $model->rrule, false);

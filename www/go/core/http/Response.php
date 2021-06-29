@@ -216,6 +216,24 @@ class Response extends Singleton{
 		$this->setHeader("Expires", $expires->format('D, d M Y H:i:s'));
 	}
 
+	/**
+	 * Set cookie
+	 *
+	 * @param string $name
+	 * @param string $value
+	 * @param array $options eg.
+	 *
+	 * ```
+	 * [
+	 * 'expires' => $this->expiresAt->format("U"),
+	 * "path" => "/",
+	 * "samesite" => "Lax",
+	 * "domain" => Request::get()->getHost(),
+	 * "httpOnly" => true
+	 * ]
+	 * ```
+	 *
+	 */
 	public function setCookie($name, $value, $options = []) {
 
 		if(version_compare(phpversion(), "7.3.0") > -1) {

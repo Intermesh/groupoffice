@@ -64,10 +64,10 @@ class DavEvent extends \GO\Base\Db\ActiveRecord {
 
 		$calendar = Calendar::model()->findByPk($this->calendarId);
 		$version = $calendar->version;
-		if ($calendar->tasklist_id) {
-			$tasklist = \GO\Tasks\Model\Tasklist::model()->findByPk($calendar->tasklist_id);
-			$version += $tasklist->version;
-		}
+//		if ($calendar->tasklist_id) {
+//			$tasklist = \GO\Tasks\Model\Tasklist::model()->findByPk($calendar->tasklist_id);
+//			$version += $tasklist->version;
+//		}
 
 		$objectUri = $this->uri;
 		$stmt = \GO::getDbConnection()->prepare('INSERT INTO dav_calendar_changes (uri, synctoken, calendarid, operation) VALUES (?, ?, ?, ?)');

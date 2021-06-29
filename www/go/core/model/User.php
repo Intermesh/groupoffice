@@ -18,6 +18,7 @@ use go\core\convert\UserSpreadsheet;
 use go\core\customfield\Date;
 use go\core\db\Criteria;
 use go\core\ErrorHandler;
+use go\core\Installer;
 use go\core\mail\Message;
 use go\core\orm\Query;
 use go\core\exception\Forbidden;
@@ -29,6 +30,7 @@ use go\core\validate\ErrorCode;
 use GO\Files\Model\Folder;
 use go\modules\community\addressbook\model\AddressBook;
 use go\modules\community\notes\model\NoteBook;
+use go\modules\community\tasks\model\Tasklist;
 
 
 class User extends Entity {
@@ -719,7 +721,7 @@ class User extends Entity {
 
 		$this->changeHomeDir();
 
-		if($this->isModified(['username', 'displayName', 'avatarId', 'email'])) {
+		if($this->isModified(['username', 'displayName', 'avatarId', 'email']) && !Installer::isInstalling()) {
 			UserDisplay::entityType()->changes([[$this->id, $this->findAclId(), 0]]);
 		}
 
@@ -1043,8 +1045,8 @@ class User extends Entity {
 			$aclIds[] = $noteBook->findAclId();
 			NoteBook::entityType()->change($noteBook);
 		}
-		if ($defTaskListId = $this->taskSettings->default_tasklist_id) {
-			$aclIds[] = \GO\Tasks\Model\Tasklist::model()->findByPk($defTaskListId)->findAclId();
+		if ($defTaskListId = $this->tasksSettings->getDefaultTasklistId()) {
+			$aclIds[] = Tasklist::findById($defTaskListId)->aclId;
 		}
 		if ($calendarId = $this->calendarSettings->calendar_id) {
 			$aclIds[] = \GO\Calendar\Model\Calendar::model()->findByPk($calendarId)->findAclId();

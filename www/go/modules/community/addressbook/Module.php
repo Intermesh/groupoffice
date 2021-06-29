@@ -95,6 +95,7 @@ class Module extends core\Module {
 
 	protected function afterInstall(\go\core\model\Module $model)
 	{
+		// create Shared address book
 		$addressBook = new AddressBook();
 		$addressBook->name = go()->t("Shared");
 		$addressBook->setAcl([
@@ -102,6 +103,7 @@ class Module extends core\Module {
 		]);
 		$addressBook->save();
 
+		// Share address book module with Internal group
 		if(!$model->findAcl()
 						->addGroup(Group::ID_INTERNAL)
 						->save()) {
