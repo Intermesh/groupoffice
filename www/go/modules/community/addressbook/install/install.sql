@@ -105,11 +105,9 @@ CREATE TABLE `addressbook_url` (
 CREATE TABLE `addressbook_user_settings` (
   `userId` int(11) NOT NULL,
   `defaultAddressBookId` int(11) DEFAULT NULL,
-  `rememberLastItem` TINYINT(1) DEFAULT 0,
   `lastAddressBookId` INT(11) NULL DEFAULT NULL,
-  `displayAllContactsByDefault` TINYINT(1) DEFAULT 1
+  startIn enum('allcontacts', 'starred', 'default', 'remember') default 'allcontacts' not null
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPACT;
-
 
 ALTER TABLE `addressbook_address`
   ADD KEY `contactId` (`contactId`);
