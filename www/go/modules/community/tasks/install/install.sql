@@ -283,7 +283,7 @@ create table tasks_user_settings
     constraint tasks_user_settings_core_user_id_fk
         foreign key (userId) references core_user (id)
             on delete cascade
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 alter table tasks_user_settings
     add constraint tasks_user_settings_tasks_tasklist_id_fk
