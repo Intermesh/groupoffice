@@ -204,7 +204,7 @@ class Builder
 		$sassFiles = run('find . -regex ".*/[^_]*\.scss"');
 
 		foreach ($sassFiles as $sassFile) {
-			run("sassc $sassFile " . dirname(dirname($sassFile)) . '/' . str_replace('scss', 'css', basename($sassFile)));
+			run("sass $sassFile " . dirname(dirname($sassFile)) . '/' . str_replace('scss', 'css', basename($sassFile)));
 		}
 
 		$this->encode();
