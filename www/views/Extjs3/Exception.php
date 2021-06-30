@@ -5,7 +5,9 @@ use GO\Base\Util\StringHelper;
 use go\core\App;
 
 if(Http::isAjaxRequest()){
-	$data['response']['debug'] = App::get()->getDebugger()->getEntries();
+	if(App::get()->getDebugger()->enabled) {
+		$data['response']['debug'] = App::get()->getDebugger()->getEntries();
+	}
 	echo $data['response'];
 	
 }elseif(PHP_SAPI=='cli'){
@@ -17,7 +19,7 @@ if(Http::isAjaxRequest()){
 	require("externalHeader.php");
 	echo '<h1>'.GO::t("Error").'</h1>';
 	echo '<p style="color:red">'.  StringHelper::encodeHtml($data['response']['feedback']).'</p>';
-	if(GO::config()->debug){
+	if(App::get()->getDebugger()->enabled){
 		unset($data['response']['feedback']);
 		echo '<h2>Debug info:</h2>';
 		echo '<pre>';

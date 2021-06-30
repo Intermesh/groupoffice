@@ -15,13 +15,16 @@ use go\core\auth\Method;
 use go\core\auth\Password;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\convert\UserSpreadsheet;
+use go\core\customfield\Date;
 use go\core\db\Criteria;
+use go\core\ErrorHandler;
 use go\core\mail\Message;
 use go\core\orm\Query;
 use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
 use go\core\orm\CustomFieldsTrait;
 use go\core\util\DateTime;
+use go\core\util\Geolocation;
 use go\core\validate\ErrorCode;
 use GO\Files\Model\Folder;
 use go\modules\community\addressbook\model\AddressBook;
@@ -708,6 +711,10 @@ class User extends Entity {
 
 		$this->changeHomeDir();
 
+		if(!$this->saveAuthorizedClients()) {
+			return false;
+		}
+
 		return true;		
 	}
 
@@ -1053,4 +1060,61 @@ class User extends Entity {
 			return $this->theme;
 		}
 	}
+
+	/**
+	 * Get authorized clients with ['remoteIpAddress', 'platform', 'browser']
+	 * @return array[]
+	 * @throws Exception
+	 */
+	public function getAuthorizedClients() {
+		$clients =  go()->getDbConnection()
+			->select("remoteIpAddress, platform, browser")
+			->distinct()
+			->from('core_auth_token')
+			->where('userId', '=', $this->id)
+			->andWhere('expiresAt', '>', new DateTime())
+			->all();
+
+//		foreach($clients as &$client) {
+//			try {
+//				$geo = Geolocation::locate($client['remoteIpAddress']);
+//				$client['countryCode'] = $geo['countryCode'];
+//			} catch(\Exception $e) {
+//				ErrorHandler::logException($e);
+//				$client['countryCode'] = null;
+//			}
+//		}
+
+		return $clients;
+	}
+
+	private $authorizedClients;
+
+	public function setAuthorizedClients($clients) {
+		$this->authorizedClients = $clients;
+	}
+
+	private function saveAuthorizedClients() {
+		if(!isset($this->authorizedClients)) {
+			return true;
+		}
+
+		$query = (new Query)
+			->where('userId', '=', $this->id)
+			->andWhere('expiresAt', '>', new DateTime());
+
+		if(!empty($this->authorizedClients)) {
+			$c = new Criteria();
+			foreach ($this->authorizedClients as $client) {
+				unset($client['countryCode']);
+				$c->andWhereNot($client);
+			}
+
+			$query->andWhere($c);
+		}
+
+		return Token::delete($query);
+	}
+
+
 }

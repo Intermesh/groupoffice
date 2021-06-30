@@ -51,8 +51,16 @@ class Module extends core\Module
 		}
 		$log->changes = json_encode($changes);
 
+		$l = LogEntry::getMapping()->getColumn('changes')->length;
+		if(mb_strlen($log->changes) > $l) {
+			foreach($changes as $key => $v) {
+				$changes[$key] = '... changes were too big to log ...';
+			}
+			$log->changes = json_encode($changes);
+		}
+
 		if(!$log->save()) {
-			throw new \Exception("Could not save log");
+			\go\core\ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId ."): " . var_export($log->getValidationErrors(), true));
 		}
 	}
 
@@ -101,6 +109,8 @@ class Module extends core\Module
 			unset($changes['createdBy']);
 			unset($changes['createdAt']);
 			unset($changes['modifiedBy']);
+			unset($changes['permissionLevel']);
+			unset($changes['filesFolderId']);
 
 			if(empty($changes)) {
 				return;
@@ -130,7 +140,7 @@ class Module extends core\Module
 		}
 
 		if(!$log->save()) {
-			throw new \Exception ("Could not save log: " . var_export($log->getValidationErrors(), true));
+			\go\core\ErrorHandler::log("Could not save log for " . $log->getEntity() . " (" . $log->entityId ."): " . var_export($log->getValidationErrors(), true));
 		}
 	}
 

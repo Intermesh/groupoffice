@@ -1,9 +1,64 @@
+28-06-2021 6.5.62
+- Projects2: Fixed duplicate entity name in log
+- Projects2: Display subproject totals if configured in template config
+- Address book: Disable add button if permissions are read only
+- Address book: Disable import / export if menu items permissions are read only
+- Core: Better error message handling in CsvImportDialog
+- Email: colors for priority icons
+- OnlyOffice: Configurable authorization header name
+
+24-06-2021 6.5.61
+- Core: Show authorized clients in Account page of user settings. Adds ability to logout other clients by users or the admin.
+- Calendar: hide custom fieldset data in details when no read permissions (Github #704)
+- Calendar: Fixed visibility issue with categories for non-admin manage user permissions (Github #705)
+- Tickets: fixed HTML entity render bug in ticket panel
+- Core: Cut too long log entry titles at max length
+
+17-06-2021 6.5.60
+- Tickets / Projects: Entity names of Type could conflict in database
+- Core: Fixed horizontal scrolling in grids with autoHeight: true
+- Tickets : Type combobox HTML entities render correctly now
+- Core: fixed required condition in custom fields with != in the condition and updates when form fields change
+
+17-06-2021 6.5.59
+- Addressbook: Added index to optimize contact combobox load
+- Billing: Fixed findAclId() on bool error on new error when create task was activated
+- History: Only log history log entery failus to system log
+- Core: Custom filter sub sub conditions didn't work.
+
+15-06-2021 6.5.58
+- Projects: fixed upgrade error
+
+15-06-2021 6.5.57
+- Projects: Fixed jobs combo in time entry dialog
+- Core: User field combo doesn't show disabled users anymore.
+- Projects: duplicate and delete recursively
+
+10-06-2021 6.5.56
+- Core: Disk cache didn't work for entries that should live forever and cached
+    expiring cache forever. This also caused old passwords to work until cache was flushed.
+
+10-06-2021 6.5.55
+- E-mail: Fixed security problem where users could view last opened attachment of another user.
+- Calendar: Fixed [Invitation] Error when responding #706
+- Core: Fixed: [Custom filed] Error in selection field #708
+- Email: attached messages were not opened without savemailas module anymore. Fixed eml downloaded #709.
+
+07-06-2021 6.5.54
+- Core: Disk cache didn't work for entries that should live forever and cached
+    expiring cache forever. This also caused old passwords to work until cache was flushed.
+- Business: sort employees by User displayName by default
+
+07-06-2021 6.5.53
 - Business: Wrong time format in agreement dialog
 - Google authenticator: Translations didn't work in this module
 - Core: Fixed disabled checkbox for enabling modules in group dialog
 - Calendar: [Views] Click on a view then the My calendar button generate an error #703
 - Address book: Select contacts with read permission only in contact custom field
 - Core: ACL panel could show error when no permissions were set
+- Core: Always move permissions panel to the end in dialogs
+- Office online / libreoffice: Open documents read only when not having write permissions for the service.
+- E-mail: Fixed mail showing partial content when HTML structure was not following correct standards
 
 20-05-2021 6.5.52
 - Address book: Fixed import skipping row and updating records by id or email
@@ -142,11 +197,18 @@
 
 
 
+28-06-2021 6.4.238
+- Core: fixed required condition in custom fields with != in the condition and updates when form fields change
+- Email: Don't filter XSS if it's from a known contact
+- Tickets: Fix user being able to reopen ticket despite this action being restricted to module manager
 
-6.4.244
-6.4.236
+14-06-2021 6.4.237
+- Projects: Invalid update query made upgrade halt
+
+14-06-2021 6.4.236
 - Core: Better handling of zero-values in numeric custom fields
 - Core: Fixed zero values of numeric custom fields in function CF
+- Projects: Options to delete and duplicate recursively
 
 10-05-2021 6.4.235
 - Calendar: fix behaviour of copy button in list view

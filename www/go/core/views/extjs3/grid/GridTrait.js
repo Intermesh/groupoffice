@@ -47,7 +47,10 @@ go.grid.GridTrait = {
 			if(response.message == "unsupportedSort") {
 				console.warn("Clearing invalid sort state:", store.sortInfo);
 				store.sortInfo = {};
-				store.reload();
+				//caused infinite loop while developing
+				if(!GO.debug) {
+					store.reload();
+				}
 
 				//cancel further exception handling
 				return false;

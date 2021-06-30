@@ -1,3 +1,5 @@
+@use "sass:math";
+
 :root {
   --c-primary: #{map-get($vars, c-primary)};
   --c-primary-tp: #{map-get($vars, c-primary-tp)};
@@ -1187,7 +1189,7 @@ tr.go-grid-row {
 		  display: block;
 		  content: "";
 		  width: 100%;
-		  padding-top: (9 / 16) * 100%;
+		  padding-top: math.div(9 , 16) * 100%;
 		}
 	}
 		

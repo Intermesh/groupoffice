@@ -578,7 +578,7 @@ class Spreadsheet extends AbstractConverter {
 			$cellIterator->setIterateOnlyExistingCells(FALSE); // This loops through all cells,
 			$cells = [];
 			foreach ($cellIterator as $cell) {
-				$cells[] = $cell->getValue();
+				$cells[] = (string) $cell->getValue();
 			}
 			return $cells;
 		} else{

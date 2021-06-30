@@ -14,6 +14,11 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 	
 	trackMouseOver: true,
 
+	/**
+	 * Default level when groups are checked
+	 */
+	addLevel: go.permissionLevels.read,
+
 	initComponent: function () {
 		
 		if(!this.value) {
@@ -181,10 +186,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 		this.store.on("beforeload", this.onBeforeStoreLoad, this);
 		
 		go.permissions.SharePanel.superclass.initComponent.call(this);
-		
-		this.on("beforeedit", function(e) {
-			return e.record.data.id !== 1; //cancel edit for admins group
-		}, this);
+
 
 
 		this.on("cellclick", function(grid, rowIndex, columnIndex, e) {
@@ -283,9 +285,7 @@ go.permissions.SharePanel = Ext.extend(go.grid.EditorGridPanel, {
 				};
 				
 		
-		if(!this.addLevel)
-			this.addLevel = go.permissionLevels.read;
-		
+
 		return new go.form.ComboBox(permissionLevelConfig);
 	},
 	

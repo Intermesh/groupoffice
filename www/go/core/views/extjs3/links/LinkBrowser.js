@@ -90,6 +90,18 @@ go.links.LinkBrowser = Ext.extend(go.Window, {
 				},
 				'->',
 				{
+					iconCls: 'ic-add',
+					tooltip: t("Add"),
+					handler: function () {
+						var linkWindow = new go.links.CreateLinkWindow({
+							entityId: this.entityId,
+							entity: this.entity
+						});
+						linkWindow.show();
+					},
+					scope: this
+				},
+				{
 					xtype: 'tbsearch'
 				}			
 			],

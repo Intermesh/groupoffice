@@ -4,7 +4,7 @@ Ext.onReady(function () {
 	Ext.override(go.usersettings.AccountSettingsPanel, {
 		initComponent: go.usersettings.AccountSettingsPanel.prototype.initComponent.createSequence(function () {
 			this.googleAuthenticatorFieldset = new go.googleauthenticator.AuthenticatorSettingsFieldset();
-			this.add(this.googleAuthenticatorFieldset);
+			this.insert(3, this.googleAuthenticatorFieldset);
 			})
 		});
 	});

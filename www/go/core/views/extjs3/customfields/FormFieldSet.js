@@ -65,76 +65,94 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			this.doLayout();
 		}, this);
 
-		this.on("afterrender", function() {
-			//find entity panel
-			var form = this.findParentByType("form");
+		this.on("afterrender", this.onAfterRender, this);
 
-			this.formTabPanel = this.findParentByType('tabpanel');
+		go.customfields.FormFieldSet.superclass.initComponent.call(this);
+	},
 
-			if (!form) {
-				console.error("No go.form.EntityPanel found for filtering");
-				return;
-			}
+	onAfterRender: function() {
+		//find entity panel
+		var form = this.findParentByType("form");
+
+		this.formTabPanel = this.findParentByType('tabpanel');
+
+		if (!form) {
+			console.error("No go.form.EntityPanel found for filtering");
+			return;
+		}
+
+		//Add a beforeaction event listener that will send the custom field data JSON encoded.
+		//The old framework will use this to save custom fields.
+		if (!form.changeListenersAdded) {
+
+			form.changeListenersAdded  = true;
 
 			if (form.getXType() == "entityform") {
-				form.on("load", function () {
-					this.filter(form.getValues());
-				}, this);
 
 				form.on("setvalues", function () {
 					this.filter(form.getValues());
+					form.isValid();
 				}, this);
 
 				this.filter(form.getValues());
+				form.isValid();
+
+
+
+				form.getForm().items.each( (field) => {
+					field.on('change', (field) => {
+						form.getForm().isValid();
+						this.filter(form.getValues());
+					});
+					field.on('check', (field, checked) => {
+						field.isValid();
+					});
+
+				});
+
 			} else {
+
+
 				//Legacy code
 
-				//Add a beforeaction event listener that will send the custom field data JSON encoded.
-				//The old framework will use this to save custom fields.
-				if (!form.legacyParamAdded) {
-					form.getForm().on("beforeaction", function (form, action) {
-						if (action.type !== "submit") {
-							return true;
-						}
-
-						var v = form.getFieldValues();
-						if (v.customFields) {
-							action.options.params = action.options.params || {};
-							action.options.params.customFieldsJSON = Ext.encode(v.customFields);
-						}
-
+				form.getForm().on("beforeaction", function (form, action) {
+					if (action.type !== "submit") {
 						return true;
-					});
-					form.legacyParamAdded = true;
-				}
-
-				form.getForm().on("actioncomplete", function (f, action) {
-					if (action.type === "load") {
-						this.filter(f.getFieldValues());
-						f.isValid(); //needed for conditionally hidden
 					}
-				}, this);
+
+					var v = form.getFieldValues();
+					if (v.customFields) {
+						action.options.params = action.options.params || {};
+						action.options.params.customFieldsJSON = Ext.encode(v.customFields);
+					}
+
+					return true;
+				});
+
+				form.getForm().items.each( (field) => {
+					field.on('change', (field) => {
+						form.getForm().isValid();
+						this.filter(form.getForm().getFieldValues());
+					});
+					field.on('check', (field, checked) => {
+						field.isValid();
+					});
+
+				});
 			}
 
-			/**
-			 * Related fields
-			 */
-			this.items.each(function (cnt) {
-				var f = form.getForm();
-				if(cnt.getXType() === 'container') {
-					cnt.items.each(function(field) {
-						field.on('change', function (field) {
-							f.isValid();
-						});
-						field.on('check', function (field, checked) {
-							f.isValid();
-						});
-					});
+
+		}
+
+		if (form.getXType() != "entityform") {
+			form.getForm().on("actioncomplete", function (f, action) {
+				if (action.type === "load") {
+					this.filter(f.getFieldValues());
+					f.isValid(); //needed for conditionally hidden
 				}
 			}, this);
-		});
+		}
 
-		go.customfields.FormFieldSet.superclass.initComponent.call(this);
 	},
 
 	/**
