@@ -43,6 +43,10 @@ class Tasklist extends AclOwnerEntity
 		return self::Roles[$this->role] ?? 'list';
 	}
 
+	/**
+	 *
+	 * @param string $value ['list'|'board'|'project']
+	 */
 	public function setRole($value) {
 		$key = array_search($value, self::Roles, true);
 		if($key === false) {
@@ -121,4 +125,27 @@ class Tasklist extends AclOwnerEntity
 	}
 
 
+	/**
+	 * Create a task list for a project and return its id
+	 *
+	 * @param int $projectId
+	 * @return int
+	 * @throws \Exception
+	 */
+	public static function createForProject(int $projectId) :int
+	{
+		$project = ProjectEntity::findById($projectId, ['id', 'name', 'acl_id']);
+
+		$tasklist = new self();
+		$tasklist->setRole('project');
+		$tasklist->setValues([
+			'name' => go()->t('Tasklist', 'community','tasks') . ' ' . $project->name,
+			'createdBy' => go()->getUserId(),
+			'aclId' => $project->acl_id,
+			'projectId' => $projectId
+		]);
+		$tasklist->save();
+		return $tasklist->id;
+
+	}
 }

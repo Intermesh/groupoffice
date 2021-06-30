@@ -6,6 +6,7 @@
  */
 namespace go\modules\community\tasks\controller;
 
+use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\modules\community\tasks\model;
 
@@ -46,6 +47,22 @@ class Task extends EntityController {
 
 	public function changes($params) {
 		return $this->defaultChanges($params);
+	}
+
+	protected function create(array $properties)
+	{
+
+		$cls = $this->entityClass();
+
+		/** @var Entity $entity */
+		$entity = new $cls;
+
+		if(isset($properties['projectId']) && isset($properties['tasklistId']) && $properties['tasklistId']  == -1 ) {
+			$properties['tasklistId'] = model\Tasklist::createForProject($properties['projectId']);
+		}
+		$entity->setValues($properties);
+
+		return $entity;
 	}
 }
 
