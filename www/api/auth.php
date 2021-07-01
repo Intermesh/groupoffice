@@ -108,7 +108,21 @@ try {
 				if ($token && $token->isAuthenticated()) {
 					$token->refresh();
 				}
-			} else if (isset($data['loginToken'])) {
+			} else if(isset($data['rememberMeToken'])) {
+				// Process remember me persistent cookie
+				if(($rememberMe = \go\core\model\RememberMe::verify($data['rememberMeToken']))) {
+					$rememberMe->setCookie();
+
+					$token = new Token();
+					$token->userId = $rememberMe->userId;
+					$token->setAuthenticated();
+					$token->setCookie();
+
+					finishLogin($token);
+				} else {
+					output(["error" => "Invalid remember me token"], 400, "Invalid remember me token");
+				}
+			} elseif (isset($data['loginToken'])) {
 				$token = Token::find()->where(['loginToken' => $data['loginToken']])->single();
 			} else {
 

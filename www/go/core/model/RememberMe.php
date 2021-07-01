@@ -175,13 +175,19 @@ class RememberMe extends Entity {
 	 * @return bool|static
 	 * @throws \Exception
 	 */
-	public static function verify() {
+	public static function verify($value = null) {
 
-		if(!isset($_COOKIE['goRememberMe']) || isset($_COOKIE['accessToken'])) {
-			return false;
+		if(!isset($value)) {
+			if(!isset($_COOKIE['goRememberMe']) || isset($_COOKIE['accessToken'])) {
+				return false;
+			}
+			$value = $_COOKIE['goRememberMe'];
+
 		}
 
-		$cookieParts = explode(':', $_COOKIE['goRememberMe']);
+
+
+		$cookieParts = explode(':', $value);
 
 		$rememberMe = static::find()
 			->where('series','=', $cookieParts[0])
