@@ -166,16 +166,16 @@ class Token extends Entity {
 
 		if(isset($_SERVER['HTTP_USER_AGENT'])) {
 			$this->userAgent = $_SERVER['HTTP_USER_AGENT'];
+
+			$ua_info = \donatj\UserAgent\parse_user_agent();
+
+			$this->platform = $ua_info['platform'];
+			$this->browser = $ua_info['browser'];
+
 		}else if(Environment::get()->isCli()) {
-			$this->userAgent = 'cli';
-		} else {
-			$this->userAgent = 'Unknown';
+			$this->userAgent = 'CLI';
 		}
 
-		$ua_info = \donatj\UserAgent\parse_user_agent();
-
-		$this->platform = $ua_info['platform'];
-		$this->browser = $ua_info['browser'];
 	}
 	
 	private static function generateToken(){
