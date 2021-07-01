@@ -181,9 +181,15 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						items: [{
 							name: "remoteIpAddress"
 						},{
-							name: "platform"
+							name: "platform",
+							renderer: function(v) {
+								return v || t("Unknown");
+							}
 						},{
-							name: "browser"
+							name: "browser",
+							renderer: function(v) {
+								return v || t("Unknown");
+							}
 						}
 						// ,{
 						// 	submit: false,
