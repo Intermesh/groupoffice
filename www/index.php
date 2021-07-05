@@ -84,7 +84,7 @@ try {
 		}
 
 		// Process remember me persistent cookie
-		if(($rememberMe = \go\core\model\RememberMe::verify())) {
+		if(!go()->getAuthState()->isAuthenticated() && ($rememberMe = \go\core\model\RememberMe::verify())) {
 			$rememberMe->setCookie();
 
 			$token = new Token();

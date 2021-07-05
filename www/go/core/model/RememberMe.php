@@ -10,6 +10,15 @@ use go\core\orm\Query;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
 
+/**
+ * Class RememberMe
+ *
+ * Remember me implemented like described here:
+ *
+ * https://stackoverflow.com/a/244907
+ *
+ * @package go\core\model
+ */
 class RememberMe extends Entity {
 	
 	/**
@@ -178,14 +187,11 @@ class RememberMe extends Entity {
 	public static function verify($value = null) {
 
 		if(!isset($value)) {
-			if(!isset($_COOKIE['goRememberMe']) || isset($_COOKIE['accessToken'])) {
+			if(!isset($_COOKIE['goRememberMe'])) {
 				return false;
 			}
 			$value = $_COOKIE['goRememberMe'];
-
 		}
-
-
 
 		$cookieParts = explode(':', $value);
 

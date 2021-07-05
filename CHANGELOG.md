@@ -3,6 +3,7 @@
 Tasks: Completely rewritten module
 Core: Set alternative lost password URL
 Core: Alert system to notify users about comments, assigned tasks etc.
+Core: Made "Remember me" more secure by using a special token. (See https://stackoverflow.com/a/244907)
 ----
 
 

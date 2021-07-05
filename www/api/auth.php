@@ -109,7 +109,8 @@ try {
 					$token->refresh();
 				}
 			} else if(isset($data['rememberMeToken'])) {
-				// Process remember me persistent cookie
+				// Process remember me persistent cookie. This is not used by the browser. The browser verifies the remember me token in index.php with a cookie.
+				// The assistant uses this method.
 				if(($rememberMe = \go\core\model\RememberMe::verify($data['rememberMeToken']))) {
 					$rememberMe->setCookie();
 
