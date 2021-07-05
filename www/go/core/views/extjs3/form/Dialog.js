@@ -20,6 +20,11 @@ go.form.Dialog = Ext.extend(go.Window, {
 	showCustomfields:true,
 
 	/**
+	 * When the entity is modified by another user / process ask to load these changes
+	 */
+	loadExternalChanges: true,
+
+	/**
 	 * If set then the title bar will be appended with ": "+ value of the field.
 	 */
 	titleField: "name",
@@ -151,8 +156,9 @@ go.form.Dialog = Ext.extend(go.Window, {
 		} else{
 			items = [this.mainPanel = new Ext.Panel({layout: this.formPanelLayout, autoScroll: true, items: items})];
 		}
-		
+
 		return new go.form.EntityPanel({
+			loadExternalChanges: this.loadExternalChanges,
 			entityStore: this.entityStore,
 			items: items,
 			layout: 'fit'

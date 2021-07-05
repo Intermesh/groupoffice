@@ -151,9 +151,20 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		// When the form is loaded, reset the 'modified' state to NOT modified.
 		this.formPanel.getForm().trackResetOnLoad  = true;
+
+
+		go.Db.store("User").on("changes", (store, added, changed, destroyed) => {
+			if(changed.indexOf(this.currentUserId) > -1) {
+				this.load(this.currentUserId);
+			}
+		});
 	},
 	
 	loadModulePanels : function() {
+
+		if(this.modulePanelsLoaded) {
+			return;
+		}
 		var available = go.Modules.getAvailable(), pnl,pnlCls, config, i, i1, l, l2;
 		for(i = 0, l = available.length; i < l; i++) {
 			config = go.Modules.getConfig(available[i].package, available[i].name);
@@ -170,6 +181,8 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 				}
 			}
 		}
+
+		this.modulePanelsLoaded = true;
 
 		this.doLayout();
 	},

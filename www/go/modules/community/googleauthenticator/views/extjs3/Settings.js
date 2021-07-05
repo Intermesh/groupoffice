@@ -117,7 +117,10 @@ Ext.onReady(function () {
 					data.currentPassword = currentPassword;
 				}
 				go.Db.store("User").save(data ,user.id).then( function (options, success, response) {
-					callback.call(this,user.id);
+					// set timeout so that dialog loads after changes event
+					setTimeout(() => {
+						callback.call(me, user.id);
+					});
 				}).catch(function(error) {
 
 					// When the password is not correct, call itself again to try again
