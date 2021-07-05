@@ -70,9 +70,7 @@ class Session extends Observable{
 				]);
 			}
 
-			if(Util\Http::isHttps()) {
-				ini_set('session.cookie_secure',1);
-			}
+			ini_set('session.cookie_secure', Util\Http::isHttps());
 
 
 			if(isset($_REQUEST['GOSID'])){
