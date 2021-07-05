@@ -289,3 +289,6 @@ alter table tasks_user_settings
     add constraint tasks_user_settings_tasks_tasklist_id_fk
         foreign key (defaultTasklistId) references tasks_tasklist (id)
             on delete set null;
+
+create index tasks_task_progress_index
+    on tasks_task (progress);

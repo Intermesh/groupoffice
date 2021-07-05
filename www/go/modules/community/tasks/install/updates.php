@@ -113,3 +113,7 @@ $updates['202106181401'][] = "alter table tasks_user_settings
 		foreign key (defaultTasklistId) references tasks_tasklist (id)
 			on delete set null;";
 
+$updates['202107051416'][] = "create index tasks_task_progress_index
+	on tasks_task (progress);";
+
+
