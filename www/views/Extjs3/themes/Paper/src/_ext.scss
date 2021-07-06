@@ -446,6 +446,7 @@
 		opacity: 0;
 		+ .x-form-cb-label::before {
 			@extend %checkbox;
+			margin-right: dp(12);
 		}
 		&:checked + .x-form-cb-label::before {
 			content: 'check_box';

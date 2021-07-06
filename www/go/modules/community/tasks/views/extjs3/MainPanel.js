@@ -40,10 +40,11 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				fields: ['name', 'icon', 'iconCls', 'inputValue'],
 				data: [
 					[t("Today"), 'content_paste', 'green', 'today'],
-					[t("Completed"), 'assignment_turned_in', 'grey', 'completed'],
+					[t("All"), 'assignment', 'red', 'all'],
+					// [t("Completed"), 'assignment_turned_in', 'grey', 'completed'],
 					[t("Unscheduled"), 'event_busy', 'blue','unscheduled'],
 					[t("Scheduled"), 'events', 'orange', 'scheduled'],
-					[t("All"), 'assignment', 'red', 'all'],
+
 				]
 			})
 		});
@@ -75,6 +76,24 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					layout:'anchor',
 					items:[
 						this.filterPanel,
+						{
+							xtype: "fieldset",
+							items: [
+								{
+									hideLabel: true,
+									xtype: "checkbox",
+									boxLabel: t("Show completed"),
+									value: false,
+									listeners: {
+										scope: this,
+										check: function(cb, checked) {
+											this.showCompleted(checked);
+											this.taskGrid.store.load();
+										}
+									}
+								}
+							]
+						},
 						this.categoriesGrid,
 						this.createFilterPanel()
 					]
@@ -109,6 +128,10 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		this.on("afterrender", this.runModule, this);
 	},
+
+	showCompleted : function(show) {
+		this.taskGrid.store.setFilter('completed', show ? null : {complete:  false});
+	},
 	
 	runModule : function() {
 		this.categoriesGrid.store.load();
@@ -116,6 +139,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.filterPanel.on("afterrender", () => {
 			this.filterPanel.selectRange(0,0);
 			this.setStatusFilter("today");
+			this.showCompleted(false);
 			this.filterPanel.on("selectionchange", this.onStatusSelectionChange, this);
 
 			this.setDefaultSelection();
@@ -157,8 +181,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 					nowYmd = now.format("Y-m-d");
 
 				this.taskGrid.store.setFilter("status", {
-					start: "<=" + nowYmd,
-					complete: false
+					start: "<=" + nowYmd
 				});
 
 				break;
@@ -178,11 +201,11 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			// 	});
 			// 	break;
 
-			case "completed": // completed tasks
-				this.taskGrid.store.setFilter("status", {
-					complete: true
-				});
-				break;
+			// case "completed": // completed tasks
+			// 	this.taskGrid.store.setFilter("status", {
+			// 		complete: true
+			// 	});
+			// 	break;
 
 			// case 5: // future tasks
 			// 	var now = new Date(),
