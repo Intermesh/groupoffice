@@ -138,7 +138,9 @@ go.customfields.FieldDialog = Ext.extend(go.form.Dialog, {
 					}
 				},
 					{
-						xtype: "textfield",
+						xtype: "textarea",
+						grow: true,
+						height: dp(32),
 						name: "relatedFieldCondition",
 						fieldLabel: t("Required condition"),
 						anchor: "100%",
