@@ -62,7 +62,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 			hideMode: "offsets",
 			type: "submit",
 			handler: function() {
-				this.submit().catch(function(error) {
+				this.submit().catch((error) => {
 					console.error(error);
 				});
 			},
@@ -413,8 +413,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 			return serverId;
 
 		}).catch(function(error) {
-			me.showFirstInvalidField();
-			return Promise.reject(error);
+			const firstError = me.showFirstInvalidField();
+			return Promise.reject(firstError);
 		}).finally(function() {
 			me.actionComplete();
 		})
