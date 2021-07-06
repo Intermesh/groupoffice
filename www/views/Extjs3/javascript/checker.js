@@ -50,9 +50,6 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			[7*86400, '7 '+t("Days")]
 		];
 
-
-		this.reminders = new Ext.Container({cls: 'notifications', layout: "anchor", defaults: {anchor: "100%"}});
-
 		this.reminderStore = new Ext.data.GroupingStore({
 			reader: new Ext.data.JsonReader({
 				totalProperty: "count",
@@ -65,12 +62,16 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 			remoteGroup: true
 		});
 
-		var me = this;
-
 		this.reminderStore.on('load',function(store, records) {
 			//this.reminders.removeAll();
 
 			records.forEach(function(record) {
+
+				const id = 'go-reminder-pnl-' + record.data.id;
+
+				if(go.Notifier.getById(id)) {
+					return;
+				}
 
 				var snoozeMenuItems = [];
 				for(var i = 0; i < checkerSnoozeTimes.length; i++){
@@ -87,7 +88,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 				var ico = record.data.iconCls.split('\\').pop();
 				var reminderPanel = {
 					statusIcon: "reminder",
-					itemId: 'go-reminder-pnl-' + record.data.id,
+					itemId: id,
 					record: record,
 					title: record.data.type,
 					iconCls: 'entity ' + ico,
@@ -96,11 +97,8 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 					listeners: {
 						destroy: (panel) => {
-							if(!panel.destroyedByChanges) {
-								this.doTask("dismiss_reminders", 0, [record.data.id], panel);
-							}
-						},
-
+							this.doTask("dismiss_reminders", 0, [record.data.id], panel);
+						}
 					},
 					handler: () => {
 
@@ -129,45 +127,18 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 				go.Notifier.msg(reminderPanel);
 
-				// //don't replace reminder because onclose will fire when replacing it.
-				// const reminderId = "reminder-" + record.data.id;
-				// if(!this.notifiedReminders[reminderId]) {
-				//
-				// 	go.Notifier.notify({
-				// 			body: record.data.text,
-				// 			title: record.data.local_time + " - " + record.data.type + ": " + record.data.name,
-				// 			tag: "reminder-" + record.data.id,
-				// 			onclose: function (e) {
-				// 				me.doTask("dismiss_reminders", 0, [record.data.id], reminderPanel);
-				// 			}
-				// 		}
-				// 	).then((notification) => {
-				// 		reminderPanel.notification = notification
-				// 	}).catch((e) => {
-				// 		console.warn("Notification failed: " + e);
-				// 	});
-				//
-				// 	this.notifiedReminders[reminderId] = true;
-				// }
-				//
-				// this.reminders.add(reminderPanel );
-
 				snoozeMenu.items.each(function(i) {
 					i.setHandler(function(item){ this.doTask("snooze_reminders", item.value, [record.data.id], reminderPanel); }, this);
 				}, this);
 
 			}, this);
 
-			// this.reminders.doLayout();
-
 		},this);
 
-		go.Notifier.notificationArea.add(this.reminders);
-		// go.Notifier.notificationArea.doLayout();
 
 	},
 
-	doTask : function(task, seconds, reminderIds, reminderPanel) {
+	doTask : function(task, seconds, reminderIds) {
 		Ext.Ajax.request({
 			url: seconds ? GO.url('reminder/snooze') : GO.url('reminder/dismiss'),
 			params: {
@@ -181,27 +152,6 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 				}
 
 				GO.checker.lastCount = this.reminderStore.getCount();
-
-				if(!GO.checker.lastCount){
-					if(!go.Notifier.hasMessages()) {
-						go.Notifier.hideNotifications();
-					}
-					// go.Notifier.toggleIcon('reminder', false);
-				}
-
-				if(!reminderPanel) {
-					reminderPanel = Ext.getCmp('go-reminder-pnl-' + reminderIds[0]);
-				}
-
-				if(reminderPanel) {
-
-					if (reminderPanel.notification) {
-						reminderPanel.notification.close();
-					}
-
-					reminderPanel.destroy();
-				}
-
 
 			}, scope: this
 		});

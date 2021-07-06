@@ -56,9 +56,7 @@
 					buttonAlign: "right",
 					listeners: {
 						destroy: (panel) => {
-							if(!panel.destroyedByChanges) {
-								go.Db.store("Alert").destroy(alert.id);
-							}
+							go.Db.store("Alert").destroy(alert.id);
 						}
 					},
 					handler: () => {

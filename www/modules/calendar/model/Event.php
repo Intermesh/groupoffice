@@ -695,7 +695,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 		
 		if($reminder->model_type_id==Event::model()->modelTypeId()){			
 			$event = Event::model()->findByPk($reminder->model_id);
-			if($event && ($nextTime = $event->getNextReminderTime($reminder->time+$event->reminder))){
+			if($event && $event->isRecurring() && ($nextTime = $event->getNextReminderTime($reminder->time+$event->reminder))){
 				$event->addReminder($event->name, $nextTime, $userId, $nextTime+$event->reminder);								
 			}			
 		}
@@ -735,7 +735,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 				
 		}  else {
 			$nextTime = $this->start_time-$this->reminder;
-			if(true || $nextTime>time())
+			if($nextTime>time())
 				return $nextTime;
 			else
 				return false;

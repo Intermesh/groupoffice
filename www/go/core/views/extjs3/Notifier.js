@@ -143,12 +143,15 @@
 			if(msg.handler) {
 				msg.listeners = msg.listeners || {};
 				msg.listeners.afterrender = function(p){
-					p.el.on('click', function() {
+
+					onClick = () => {
 						//if(GO.util.isMobileOrTablet()) {
-							go.Notifier.hideNotifications();
+						go.Notifier.hideNotifications();
 						//}
 						msg.handler();
-					});
+					};
+					p.body.on('click', onClick);
+					p.header.on('click', onClick);
 				}
 			}
 
@@ -173,17 +176,7 @@
 			}
 			this._messages[msg.itemId] = msgPanel;
 
-			msgPanel.on("destroy", function(msg) {
-
-				//close the desktop notification if set
-				if(msgPanel.notification){
-					msgPanel.notification.close();
-				}
-
-				delete this._messages[msg.itemId];
-				this.updateStatusIcons();
-
-			}, this);
+			msgPanel.on("destroy", this.onMsgDestroy, this);
 
 			msgPanel.setPersistent = function(bool) {
 
@@ -233,6 +226,17 @@
 			this.updateStatusIcons();
 
 			return msgPanel;
+		},
+
+		onMsgDestroy: function(msg) {
+
+			//close the desktop notification if set
+			if(msg.notification){
+				msg.notification.close();
+			}
+
+			delete this._messages[msg.itemId];
+			this.updateStatusIcons();
 		},
 
 		notificationsVisible : function() {
