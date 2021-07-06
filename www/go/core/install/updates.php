@@ -768,19 +768,8 @@ $updates['202012231410'][] = function() {
 
 $updates['202102111534'][] = "delete from go_state where user_id not in (select id from core_user);";
 
-$updates['202102111534'][] = function() {
-
-	//add new updates in this function so it won't merge into 6.5. Add updates in 6.5 at the end too!
-	try {
-		go()->getDbConnection()->exec("alter table go_state
+$updates['202102111534'][] = "alter table go_state
 			add constraint go_state_core_user_id_fk
 			foreign key (user_id) references core_user (id)
-				on delete cascade;");
-	}catch(Exception $e) {
-		echo "ERROR: ". $e->getMessage() ."\n";
-	}
-
-	go()->getDbConnection()->exec("alter table core_customfields_field modify relatedFieldCondition text default '' not null;");
-
-};
+				on delete cascade;";
 
