@@ -1,3 +1,5 @@
+- Timeregistration: Fixed several render errors minutes > seconds
+
 28-06-2021 6.5.62
 - Projects2: Fixed duplicate entity name in log
 - Projects2: Display subproject totals if configured in template config
