@@ -85,6 +85,12 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					items:snoozeMenuItems
 				});
 
+				let body = record.data.local_time + ": " + record.data.name;
+
+				if(record.data.text) {
+					body += "\n" + record.data.text;
+				}
+
 				var ico = record.data.iconCls.split('\\').pop();
 				var reminderPanel = {
 					statusIcon: "reminder",
@@ -92,8 +98,8 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					record: record,
 					title: record.data.type,
 					iconCls: 'entity ' + ico,
-					html: record.data.local_time + ": " + record.data.name,
-					notificationBody:  record.data.local_time + ": " + record.data.name,
+					html: Ext.util.Format.htmlEncode(body),
+					notificationBody:  body,
 
 					listeners: {
 						destroy: (panel) => {
