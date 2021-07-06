@@ -98,7 +98,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 					record: record,
 					title: record.data.type,
 					iconCls: 'entity ' + ico,
-					html: Ext.util.Format.htmlEncode(body),
+					html: Ext.util.Format.nl2br(body),
 					notificationBody:  body,
 
 					listeners: {

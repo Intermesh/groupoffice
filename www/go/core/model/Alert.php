@@ -73,33 +73,41 @@ class Alert extends SingleOwnerEntity
 	{
 		if($this->isNew() && isset($this->tag)) {
 			//skip dismiss action below in internal delete
-			parent::delete([
+			$query = Query::normalize([
 				'entityTypeId' => $this->entityTypeId,
 				'entityId' => $this->entityId,
 				'tag' => $this->tag,
 				'userId' => $this->userId
-			]);
+			])
+				// Skip dismiss update in internalDelete below
+				->setData(['preventDismiss' => true]);
+
+			if(!static::delete($query)) {
+				return false;
+			}
 		}
 		return parent::internalSave();
 	}
 
 	protected static function internalDelete(Query $query)
 	{
-		$alerts = Alert::find()->mergeWith($query);
+		if(empty($query->getData()['preventDismiss'])) {
+			$alerts = Alert::find()->mergeWith($query);
 
-		$grouped = [];
-		foreach($alerts as $alert) {
-			$entityName = $alert->getEntity();
-			if(!isset($grouped[$entityName])) {
-				$grouped[$entityName] = [];
+			$grouped = [];
+			foreach ($alerts as $alert) {
+				$entityName = $alert->getEntity();
+				if (!isset($grouped[$entityName])) {
+					$grouped[$entityName] = [];
+				}
+
+				$grouped[$entityName][] = $alert;
 			}
 
-			$grouped[$entityName][] = $alert;
-		}
-
-		foreach($grouped as $entityName => $alerts) {
-			$cls = EntityType::findByName($entityName)->getClassName();
-			$cls::dismissAlerts($alerts);
+			foreach ($grouped as $entityName => $alerts) {
+				$cls = EntityType::findByName($entityName)->getClassName();
+				$cls::dismissAlerts($alerts);
+			}
 		}
 
 		return parent::internalDelete($query);

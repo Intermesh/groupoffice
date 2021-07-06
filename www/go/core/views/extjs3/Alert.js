@@ -36,10 +36,14 @@
 		},
 
 		show : function(alert) {
-			const now = new Date();
+			const now = new Date(), id = 'core-alert-' + alert.id;
 
 			if(new Date(alert.triggerAt) > now) {
-				go.Notifier.removeById('core-alert-' + alert.id);
+				go.Notifier.removeById(id);
+				return;
+			}
+
+			if(go.Notifier.getById(id)) {
 				return;
 			}
 
@@ -49,7 +53,7 @@
 
 				const c = {
 					statusIcon: 'reminder',
-					itemId: 'core-alert-' + alert.id,
+					itemId: id,
 					title: entity.title || entity.name || entity.description,
 					html: go.util.Format.dateTime(alert.triggerAt),
 					iconCls: iconCls,
@@ -76,7 +80,10 @@
 					}]
 				};
 
-				c.notificationBody = c.html;
+
+				if(!c.notificationBody) {
+					c.notificationBody = c.html;
+				}
 
 				const alertConfig = {alert: alert, entity: entity, panelPromise: Promise.resolve(c)};
 

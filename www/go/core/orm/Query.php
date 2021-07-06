@@ -146,4 +146,31 @@ class Query extends DbQuery {
 		return $this->readOnly;
 	}
 
+	private $data = [];
+
+	/**
+	 * Set arbitrary data to the query object.
+	 *
+	 * Models may implement functionality to do something with it.
+	 *
+	 * @param array $data
+	 * @return $this
+	 */
+	public function setData(array $data) {
+
+		$this->data = array_merge($this->data, $data);
+
+		return $this;
+	}
+
+	/**
+	 * Get the arbitrary data aray
+	 *
+	 * @see setData()
+	 * @return array
+	 */
+	public function getData() {
+		return $this->data;
+	}
+
 }
