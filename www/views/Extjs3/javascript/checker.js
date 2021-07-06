@@ -68,7 +68,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 		var me = this;
 
 		this.reminderStore.on('load',function(store, records) {
-			this.reminders.removeAll();
+			//this.reminders.removeAll();
 
 			records.forEach(function(record) {
 
@@ -85,29 +85,31 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 				});
 
 				var ico = record.data.iconCls.split('\\').pop();
-				var reminderPanel = new Ext.Panel({
-					id: 'go-reminder-pnl-' + record.data.id,
+				var reminderPanel = {
+					statusIcon: "reminder",
+					itemId: 'go-reminder-pnl-' + record.data.id,
 					record: record,
-					title: record.data.local_time + " - " + record.data.type + ": " + record.data.name,
+					title: record.data.type,
 					iconCls: 'entity ' + ico,
-					html: record.data.text,
+					html: record.data.local_time + ": " + record.data.name,
+					notificationBody:  record.data.local_time + ": " + record.data.name,
+
 					listeners: {
-						'afterrender': function(me) {
-							var clickHandler = function (el){
-								var record = me.record.data;
-								if(!record.model_name || !record.model_id) {
-									return;
-								}
-								var parts = record.model_name.split("\\");
-								go.Router.goto(parts[3].toLowerCase()+"/"+record.model_id);
-								go.Notifier.notificationArea.collapse();
-							};
+						destroy: (panel) => {
+							if(!panel.destroyedByChanges) {
+								this.doTask("dismiss_reminders", 0, [record.data.id], panel);
+							}
+						},
 
-							me.body.on('click', clickHandler);
-							me.header.on('click', clickHandler);
+					},
+					handler: () => {
 
-
+						if(!record.data.model_name || !record.data.model_id) {
+							return;
 						}
+						const parts = record.data.model_name.split("\\");
+						go.Router.goto(parts[3].toLowerCase()+"/"+record.data.model_id);
+						go.Notifier.hideNotifications();
 					},
 					buttonAlign: 'right',
 					buttons: [{
@@ -117,36 +119,38 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 						scope: this
 					},{
 						iconCls : 'ic-delete',
-						text:t("Dismiss"),
-						handler: function() {
-							this.doTask("dismiss_reminders", 0, [record.data.id], reminderPanel);
+						text: t("Dismiss"),
+						handler: (btn) => {
+							btn.findParentByType("panel").destroy();
 						},
 						scope: this
 					}]
-				});
+				};
 
-				//don't replace reminder because onclose will fire when replacing it.
-				const reminderId = "reminder-" + record.data.id;
-				if(!this.notifiedReminders[reminderId]) {
+				go.Notifier.msg(reminderPanel);
 
-					go.Notifier.notify({
-							body: record.data.text,
-							title: record.data.local_time + " - " + record.data.type + ": " + record.data.name,
-							tag: "reminder-" + record.data.id,
-							onclose: function (e) {
-								me.doTask("dismiss_reminders", 0, [record.data.id], reminderPanel);
-							}
-						}
-					).then((notification) => {
-						reminderPanel.notification = notification
-					}).catch((e) => {
-						console.warn("Notification failed: " + e);
-					});
-
-					this.notifiedReminders[reminderId] = true;
-				}
-
-				this.reminders.add(reminderPanel );
+				// //don't replace reminder because onclose will fire when replacing it.
+				// const reminderId = "reminder-" + record.data.id;
+				// if(!this.notifiedReminders[reminderId]) {
+				//
+				// 	go.Notifier.notify({
+				// 			body: record.data.text,
+				// 			title: record.data.local_time + " - " + record.data.type + ": " + record.data.name,
+				// 			tag: "reminder-" + record.data.id,
+				// 			onclose: function (e) {
+				// 				me.doTask("dismiss_reminders", 0, [record.data.id], reminderPanel);
+				// 			}
+				// 		}
+				// 	).then((notification) => {
+				// 		reminderPanel.notification = notification
+				// 	}).catch((e) => {
+				// 		console.warn("Notification failed: " + e);
+				// 	});
+				//
+				// 	this.notifiedReminders[reminderId] = true;
+				// }
+				//
+				// this.reminders.add(reminderPanel );
 
 				snoozeMenu.items.each(function(i) {
 					i.setHandler(function(item){ this.doTask("snooze_reminders", item.value, [record.data.id], reminderPanel); }, this);
@@ -154,7 +158,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 			}, this);
 
-			this.reminders.doLayout();
+			// this.reminders.doLayout();
 
 		},this);
 

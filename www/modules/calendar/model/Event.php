@@ -735,7 +735,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 				
 		}  else {
 			$nextTime = $this->start_time-$this->reminder;
-			if($nextTime>time())
+			if(true || $nextTime>time())
 				return $nextTime;
 			else
 				return false;
