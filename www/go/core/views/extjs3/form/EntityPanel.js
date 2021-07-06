@@ -115,7 +115,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	submit: function (cb, scope) {
 
 		if (!this.isValid()) {
-			return;
+			return Promise.reject();
 		}		
 		//get only modified values on existing items, otherwise get all values.
 		var id, params = {}, values = this.getValues(!!this.currentId), me = this;

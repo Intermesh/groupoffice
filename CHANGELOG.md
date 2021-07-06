@@ -1,3 +1,5 @@
+
+
 6.6
 
 Tasks: Completely rewritten module
@@ -6,6 +8,7 @@ Core: Alert system to notify users about comments, assigned tasks etc.
 Core: Made "Remember me" more secure by using a special token. (See https://stackoverflow.com/a/244907)
 ----
 
+- Timeregistration: Fixed several render errors minutes > seconds
 
 28-06-2021 6.5.62
 - Projects2: Fixed duplicate entity name in log
@@ -205,6 +208,10 @@ Core: Made "Remember me" more secure by using a special token. (See https://stac
 
 
 
+
+06-07-2021 6.4.239
+- Timeregistration: Fixed time tracking sums
+- Projects: fixed this.filter() is undefined error
 
 28-06-2021 6.4.238
 - Core: fixed required condition in custom fields with != in the condition and updates when form fields change

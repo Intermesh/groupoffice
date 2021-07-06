@@ -81,6 +81,8 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			return;
 		}
 
+		var me = this;
+
 		//Add a beforeaction event listener that will send the custom field data JSON encoded.
 		//The old framework will use this to save custom fields.
 		if (!form.changeListenersAdded) {
@@ -105,7 +107,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 						this.filter(form.getValues());
 					});
 					field.on('check', (field, checked) => {
-						field.isValid();
+						form.getForm().isValid();
 					});
 
 				});
@@ -132,10 +134,10 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 				form.getForm().items.each( (field) => {
 					field.on('change', (field) => {
 						form.getForm().isValid();
-						this.filter(form.getForm().getFieldValues());
+						me.filter(form.getForm().getFieldValues());
 					});
 					field.on('check', (field, checked) => {
-						field.isValid();
+						form.getForm().isValid();
 					});
 
 				});
