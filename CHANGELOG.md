@@ -1,3 +1,6 @@
+- Timeregistration: Fixed time tracking sums
+- Projects: fixed this.filter() is undefined error
+
 28-06-2021 6.4.238
 - Core: fixed required condition in custom fields with != in the condition and updates when form fields change
 - Email: Don't filter XSS if it's from a known contact
