@@ -7,10 +7,7 @@ GO.mainLayout.on('authenticated', (mainLayout, user, password) => {
 		return;
 	}
 
-
-	const enforceForGroupId = go.Modules.get("community", "googleauthenticator").settings.enforceForGroupId;
-
-	if(!enforceForGroupId || go.User.groups.indexOf(enforceForGroupId) == -1) {
+	if(!go.modules.community.googleauthenticator.isEnforced(user)) {
 		return;
 	}
 
@@ -18,6 +15,12 @@ GO.mainLayout.on('authenticated', (mainLayout, user, password) => {
 
 });
 
+
+go.modules.community.googleauthenticator.isEnforced = (user) => {
+	const enforceForGroupId = go.Modules.get("community", "googleauthenticator").settings.enforceForGroupId;
+
+	return enforceForGroupId && user.groups.indexOf(enforceForGroupId) > -1;
+}
 
 go.modules.community.googleauthenticator.enable = (user, password) => {
 
@@ -49,9 +52,17 @@ go.modules.community.googleauthenticator.enable = (user, password) => {
 
 
 	if(!user.isAdmin && !password) {
+
+		let msg = t("Provide your current password before you can enable Google authenticator.");
+
+		if(go.modules.community.googleauthenticator.isEnforced(user)) {
+
+			msg = "<p class='info'><i class='icon'>info</i> " + t("Your system administrator requires you to setup two factor authentication") + '</p>' + msg;
+		}
+
 		return go.AuthenticationManager.passwordPrompt(
 			t('Enable Google authenticator'),
-			t("Provide your current password before you can enable Google authenticator."))
+			msg)
 
 			.then((password) => {
 				return requestSecret(user, password);
