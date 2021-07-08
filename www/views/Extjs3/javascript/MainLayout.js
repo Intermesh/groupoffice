@@ -327,7 +327,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 		//this.initModule(moduleName);
 	},
 
-	onAuthentication: function () {
+	onAuthentication: function (password) {
 
 		//check if authRedirecUrl was given.
 		var urlParams = new URLSearchParams(window.location.search);
@@ -349,7 +349,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		Ext.getBody().mask(t("Loading..."));
 
-		go.Modules.init().then(function() {
+		return go.Modules.init().then(function() {
 			go.User.loadLegacyModules();
 			Promise.all([
 				go.customfields.CustomFields.init(),				
@@ -358,7 +358,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				go.Entities.init();
 				me.addDefaultRoutes();
 
-				me.fireEvent('authenticated', this);
+				me.fireEvent('authenticated', this, go.User, password);
 
 				me.renderUI();
 				Ext.getBody().unmask();

@@ -52,10 +52,11 @@ go.PasswordPrompt = Ext.extend(go.Window, {
 				this.formPanel
 			],
 			buttons: [{
-					text: t("Continue"),
-					handler: this.okPressed,
-					scope: this
-				}]
+				cls:"primary",
+				text: t("Continue"),
+				handler: this.okPressed,
+				scope: this
+			}]
 		});
 		
 		this.addEvents({

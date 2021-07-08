@@ -1,18 +1,17 @@
-go.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(go.form.Dialog, {
+go.modules.community.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(go.form.Dialog, {
 	title:t('Enable Google authenticator'),
 	iconCls: 'ic-security',
 	modal:true,
 	entityStore:"User",
 	width: 400,
-	height: 500,
+	height: 600,
 	showCustomfields:false,
-
 	initComponent: function () {
 
-		go.googleauthenticator.EnableAuthenticatorDialog.superclass.initComponent.call(this);		
-		var me = this;
-		this.formPanel.on('beforesubmit', function(pnl,values){
-			values.googleauthenticator.secret = me.secretField.getValue();
+		go.modules.community.googleauthenticator.EnableAuthenticatorDialog.superclass.initComponent.call(this);		
+
+		this.formPanel.on('beforesubmit', (pnl,values) => {
+			values.googleauthenticator.secret = this.secretField.getValue();
 		});
 	},
 	focus: function () {		
@@ -31,13 +30,16 @@ go.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(go.form.Dialog, {
 			readOnly:true,
 			name:'googleauthenticator.secret',
 			fieldLabel: t('Secret'),
-			hint: t('Secret key for manual input')
+			hint: t('Secret key for manual input'),
+			anchor: "100%"
+
 		});
 			
 		this.verifyField = new Ext.form.TextField({
 			fieldLabel: t('Verify','googleauthenticator'),
 			name: 'googleauthenticator.verify',
-			allowBlank:false
+			allowBlank:false,
+			anchor: "100%"
 		});
 		
 		var items = [{
@@ -54,11 +56,42 @@ go.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(go.form.Dialog, {
 				]
 		}];
 
+		if(navigator.clipboard && navigator.clipboard.readText) {
+			items.push({
+				cls:"right accent",
+				style: "margin-right: " + dp(16) + "px",
+				xtype: "button",
+				text: t("Paste"),
+				handler: function() {
+					navigator.clipboard.readText().then((clipText) => {
+						this.verifyField.setValue(clipText);
+					}).catch((reason) => {
+						console.error(reason);
+						Ext.MessageBox.alert(t("Sorry"), t("Reading from your clipboard isn't allowed"));
+					});
+				},
+				scope: this
+
+			})
+		}
+
 		return items;
 	},
 	
 	onLoad : function() {
 		this.QRcomponent.setQrBlobId(this.formPanel.entity.googleauthenticator.qrBlobId);
-		go.googleauthenticator.EnableAuthenticatorDialog.superclass.onLoad.call(this);
+		go.modules.community.googleauthenticator.EnableAuthenticatorDialog.superclass.onLoad.call(this);
+
+		const user =  this.getValues()
+		if(go.modules.community.googleauthenticator.isEnforced(user)) {
+			this.formPanel.items.first().insert(0, {
+				xtype: 'box',
+				autoEl: 'p',
+				cls: 'info',
+				html: "<i class='icon'>info</i> " + t("Your system administrator requires you to setup two factor authentication")
+			});
+			this.setHeight(650);
+			this.doLayout();
+		}
 	}
 });

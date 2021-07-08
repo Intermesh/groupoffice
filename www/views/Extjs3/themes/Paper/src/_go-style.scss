@@ -787,7 +787,7 @@ button {
 	.x-grid3-cell-inner & {
 		margin-right: dp(8);
 	}
-	
+
 	.x-btn {
 		border: 0;
 	}
@@ -2437,5 +2437,11 @@ body.go-compact {
 .go-multiselect-field {
 	.x-toolbar-left {
 		padding-left: dp(4);
+	}
+}
+
+.x-form {
+	p {
+		@extend %font-caption;
 	}
 }
