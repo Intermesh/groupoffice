@@ -1,3 +1,4 @@
+08-07-2021 6.5.63
 - Google authenticator: New feature to enforce setup for a user group
 - Timeregistration: Fixed several render errors minutes > seconds
 - Email: Download attachments on iphone fixed
