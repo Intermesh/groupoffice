@@ -59,5 +59,19 @@ go.modules.community.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(
 	onLoad : function() {
 		this.QRcomponent.setQrBlobId(this.formPanel.entity.googleauthenticator.qrBlobId);
 		go.modules.community.googleauthenticator.EnableAuthenticatorDialog.superclass.onLoad.call(this);
+
+		const enforceForGroupId = go.Modules.get("community", "googleauthenticator").settings.enforceForGroupId;
+
+		const user =  this.getValues()
+		if(enforceForGroupId && user.groups.indexOf(enforceForGroupId) > -1) {
+			this.formPanel.items.first().insert(0, {
+				xtype: 'box',
+				autoEl: 'p',
+				cls: 'info',
+				html: "<i class='icon'>info</i> " + t("Your system administrator requires you to setup two factor authentication")
+			});
+
+			this.doLayout();
+		}
 	}
 });

@@ -23,8 +23,7 @@ go.modules.community.googleauthenticator.GoogleauthenticatorPanel = Ext.extend(g
 					xtype: 'fieldset',
 					items: [
 						this.secretText,
-						this.secretField,
-
+						this.secretField
 					]
 				}],
 			bbar: [
