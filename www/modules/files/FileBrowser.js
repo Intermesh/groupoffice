@@ -2129,6 +2129,7 @@ GO.files.openFile = function(config)
 
 GO.files.openEmailAttachment = function(attachment, panel, choosehandler)
 {
+	Ext.getBody().mask(t("Loading..."));
 	var params = {
 		account_id: panel.account_id,
 		mailbox: panel.mailbox,
@@ -2146,7 +2147,11 @@ GO.files.openEmailAttachment = function(attachment, panel, choosehandler)
 	GO.request({
 		url: "files/file/saveAttachmentToTmp",
 		params: params,
+		callback: function() {
+			Ext.getBody().unmask();
+		},
 		success: function(response, options, result) {
+			Ext.getBody().unmask();
 			GO.files.openFile({
 				id: result.data.id,
 				all: choosehandler ? "1" : "0"

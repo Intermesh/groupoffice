@@ -333,7 +333,18 @@ go.util =  (function () {
 		},
 
 		viewFile : function(url) {
-			window.open(url);
+			const win = this.getDownloadTargetWindow();
+			win.focus();
+
+			win.location.replace(url);
+
+		},
+
+		getDownloadTargetWindow : function() {
+			if(!this.downloadTarget || this.downloadTarget.closed) {
+				this.downloadTarget = window.open("", "_blank");
+			}
+			return this.downloadTarget;
 		},
 
 		/**
@@ -342,13 +353,17 @@ go.util =  (function () {
 		 * @param {string} url
 		 */
 		downloadFile: function(url) {
-			if(window.navigator.standalone) {
-				//somehow this is the only way a download works on a web application on the iphone.
-				var win = window.open( "about:blank", "_system");
-				win.focus();
-				win.location = url;
-			} else
-			{
+			// if(Ext.isSafari && GO.util.isMobileOrTablet()) {
+			// 	//somehow this is the only way a download works on a web application on the iphone.
+			// 	const win = this.getDownloadTargetWindow();
+			// 	win.focus();
+			// 	win.location = url;
+			// } else
+			// {
+				// for safari :(
+				if(go.util.downloadTarget)
+					go.util.downloadTarget.close();
+
 				// document.location.href = url; //This causes connection errors with SSE or other simulanous XHR requests
 				if(!downloadFrame) {
 					// downloadFrame = document.createElement('iframe');
@@ -363,7 +378,7 @@ go.util =  (function () {
 				//downloadFrame.src = url;
 				downloadFrame.href = url;
 				downloadFrame.click();
-			}
+			// }
 
 		},
 		

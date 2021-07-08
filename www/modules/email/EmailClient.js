@@ -1408,7 +1408,7 @@ GO.email.saveAttachment = function(attachment,panel)
 
 
 GO.email.openAttachment = function(attachment, panel, forceDownload)
-	{
+{
 		if(!panel)
 			return false;
 
@@ -1529,6 +1529,10 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 					}
 
 				default:
+					if(Ext.isSafari) {
+						//must be opened before any async processes happen
+						go.util.getDownloadTargetWindow();
+					}
 
 					if(go.Modules.isAvailable('legacy', 'files')) {
 						return GO.files.openEmailAttachment(attachment, panel, false);
