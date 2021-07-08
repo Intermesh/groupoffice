@@ -209,21 +209,21 @@ class Builder {
 		run("composer install --no-dev --optimize-autoloader --ignore-platform-reqs");
 
 		cd("views/Extjs3/themes/Paper/src");
-		run("sassc style.scss  ../style.css");
-		run("sassc style-mobile.scss ../style-mobile.css");
+		run("sass --no-source-map style.scss  ../style.css");
+		run("sass --no-source-map style-mobile.scss ../style-mobile.css");
 
 		if(file_exists("htmleditor.scss")) {
-			run("sassc htmleditor.scss ../htmleditor.css");
+			run("sass --no-source-map htmleditor.scss ../htmleditor.css");
 		}
 
 		if(is_dir("../../Dark")) {
 			cd("../../Dark/src");
 
-			run("sassc style.scss  ../style.css");
-			run("sassc style-mobile.scss ../style-mobile.css");
+			run("sass --no-source-map style.scss  ../style.css");
+			run("sass --no-source-map style-mobile.scss ../style-mobile.css");
 			if(file_exists('htmleditor.scss')) {
 
-				run("sassc htmleditor.scss ../htmleditor.css");
+				run("sass --no-source-map htmleditor.scss ../htmleditor.css");
 			}
 
 		}

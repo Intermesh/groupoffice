@@ -103,7 +103,7 @@ CREATE TABLE `core_customfields_field` (
   `type` varchar(100) NOT NULL DEFAULT 'Text',
   `sortOrder` int(11) NOT NULL DEFAULT 0,
   `required` tinyint(1) NOT NULL DEFAULT 0,
-  `relatedFieldCondition` varchar(190) NOT NULL DEFAULT '',
+  `relatedFieldCondition` TEXT NOT NULL DEFAULT '',
   `conditionallyHidden` BOOLEAN NOT NULL DEFAULT FALSE,
   `conditionallyRequired` BOOLEAN NOT NULL DEFAULT FALSE,
   `hint` varchar(190) DEFAULT NULL,

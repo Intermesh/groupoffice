@@ -40,15 +40,18 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 
 		var me = this;
 
-		this.entityStore.single(id).then(function(entity) {
-			me.setValues(entity, true);
+		this.entityStore.single(id).then(function (entity) {
 			me.entity = entity;
+
+			me.on('setvalues', function ()  {
+				me.fireEvent("load", me, entity);
+			}, me, {single: true});
+
+			me.setValues(entity, true);
 			
 			if(callback) {
 				callback.call(scope || me, entity);
 			}
-			
-			me.fireEvent("load", me, entity);
 		});
 	},
 	
@@ -83,8 +86,19 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		this.getForm().trackResetOnLoad = trackReset;
 		this.getForm().setValues(v);
 		this.getForm().trackResetOnLoad = oldReset;
-		
-		this.fireEvent('setvalues', this, v);
+
+		//combo's can take a while to load.
+		var promises = [];
+		this.getForm().items.each(function (item) {
+			if(item.setValuePromise)
+				promises.push(item.setValuePromise);
+		})
+
+		var me = this;
+		Promise.all(promises).then(function ()  {
+			me.fireEvent('setvalues', me, v);
+		});
+
 		return this;
 	},
 

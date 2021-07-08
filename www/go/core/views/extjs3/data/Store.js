@@ -107,6 +107,17 @@ go.data.Store = Ext.extend(Ext.data.JsonStore, {
 			this.loading = old;
 		}
 	},
+
+	loadRecords: function(o, options, success){
+		if(!this.entityStore) {
+			go.data.Store.superclass.loadRecords.call(this, o, options, success);
+			return;
+		}
+
+		go.Translate.runFrom(this.entityStore.entity.package, this.entityStore.entity.module, () => {
+			go.data.Store.superclass.loadRecords.call(this, o, options, success);
+		});
+	},
 	
 	sort : function(fieldName, dir) {
 		//Reload first page data set on sort
