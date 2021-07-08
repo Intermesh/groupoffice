@@ -23,7 +23,8 @@ go.modules.community.googleauthenticator.GoogleauthenticatorPanel = Ext.extend(g
 					xtype: 'fieldset',
 					items: [
 						this.secretText,
-						this.secretField
+						this.secretField,
+
 					]
 				}],
 			bbar: [
@@ -36,11 +37,31 @@ go.modules.community.googleauthenticator.GoogleauthenticatorPanel = Ext.extend(g
 				this.nextButton = new Ext.Button({
 					type: "submit",
 					text: t("Next"),
+					cls: "primary",
 					handler: this.submit,
 					scope: this
 				})
 			]
 		});
+
+		if(navigator.clipboard && navigator.clipboard.readText) {
+			panel.add({
+				cls:"right accent",
+				style: "margin-right: " + dp(16) + "px",
+					xtype: "button",
+					text: t("Paste"),
+					handler: function() {
+						navigator.clipboard.readText().then((clipText) => {
+							this.secretField.setValue(clipText);
+						}).catch((reason) => {
+							console.error(reason);
+							Ext.MessageBox.alert(t("Sorry"), t("Reading from your clipboard isn't allowed"));
+						});
+				},
+				scope: this
+
+			})
+		}
 
 		Ext.apply(this, {
 			layout: "fit",
