@@ -49,6 +49,7 @@ go.modules.GroupRights = Ext.extend(go.Window, {
 							groupName: record.data.name,
 							isUserGroupFor: record.data.isUserGroupFor
 						}));
+						this.module.permissions = this.module.permissions || {};
 						this.module.permissions[record.data.id] = {groupName: record.data.name};
 						//this.gridfield.startEditing(0, 1);
 
