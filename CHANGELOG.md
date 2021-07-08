@@ -8,9 +8,11 @@ Core: Alert system to notify users about comments, assigned tasks etc.
 Core: Made "Remember me" more secure by using a special token. (See https://stackoverflow.com/a/244907)
 ----
 
+08-07-2021 6.5.63
 - Google authenticator: New feature to enforce setup for a user group
 - Timeregistration: Fixed several render errors minutes > seconds
 - Email: Download attachments on iphone fixed
+- Core: Workaround Safari not starting bug: https://bugs.webkit.org/show_bug.cgi?id=226547
 
 28-06-2021 6.5.62
 - Projects2: Fixed duplicate entity name in log
