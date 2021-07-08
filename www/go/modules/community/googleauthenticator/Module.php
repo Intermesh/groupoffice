@@ -44,4 +44,9 @@ class Module extends core\Module {
 		
 		return parent::afterInstall($model);
 	}
+
+	public function getSettings()
+	{
+		return model\Settings::get();
+	}
 }

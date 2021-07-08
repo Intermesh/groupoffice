@@ -203,6 +203,9 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		if(success) {
 			this.submitCount--;
 			if(this.submitCount === 0) {
+
+				this.fireEvent("submit", this);
+
 				this.hide();
 			}
 		}

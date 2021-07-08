@@ -1,4 +1,4 @@
-go.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(go.form.Dialog, {
+go.modules.community.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(go.form.Dialog, {
 	title:t('Enable Google authenticator'),
 	iconCls: 'ic-security',
 	modal:true,
@@ -6,13 +6,12 @@ go.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(go.form.Dialog, {
 	width: 400,
 	height: 500,
 	showCustomfields:false,
-
 	initComponent: function () {
 
-		go.googleauthenticator.EnableAuthenticatorDialog.superclass.initComponent.call(this);		
-		var me = this;
-		this.formPanel.on('beforesubmit', function(pnl,values){
-			values.googleauthenticator.secret = me.secretField.getValue();
+		go.modules.community.googleauthenticator.EnableAuthenticatorDialog.superclass.initComponent.call(this);		
+
+		this.formPanel.on('beforesubmit', (pnl,values) => {
+			values.googleauthenticator.secret = this.secretField.getValue();
 		});
 	},
 	focus: function () {		
@@ -59,6 +58,6 @@ go.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(go.form.Dialog, {
 	
 	onLoad : function() {
 		this.QRcomponent.setQrBlobId(this.formPanel.entity.googleauthenticator.qrBlobId);
-		go.googleauthenticator.EnableAuthenticatorDialog.superclass.onLoad.call(this);
+		go.modules.community.googleauthenticator.EnableAuthenticatorDialog.superclass.onLoad.call(this);
 	}
 });
