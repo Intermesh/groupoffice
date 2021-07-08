@@ -537,9 +537,10 @@ abstract class Entity extends Property {
    * @throws Exception
    */
 	public function findAclId() {
-		$moduleId = static::entityType()->getModuleId();
-		
-		return Module::findById($moduleId)->findAclId();
+		return null;
+//		$moduleId = static::entityType()->getModuleId();
+//
+//		return Module::findById($moduleId)->findAclId();
 	}
 
 
@@ -773,7 +774,6 @@ abstract class Entity extends Property {
    * @return Query
    * @throws Exception
    */
-
 	public static function filter(Query $query, array $filter) {
 		static::defineFilters()->apply($query, $filter);
 		return $query;

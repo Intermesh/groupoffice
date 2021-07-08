@@ -13,7 +13,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 		var reader = new Ext.data.JsonReader({
 			root: 'results',
 			totalProperty: 'total',
-			fields: ['name', 'package', 'localizedPackage', 'localizedName',  'description', 'id', 'sort_order', 'admin_menu', 'aclId', 'icon', 'enabled', 'warning', 'buyEnabled','not_installable', 'isRefactored','installed'],
+			fields: ['name', 'package', 'localizedPackage', 'localizedName',  'description', 'id', 'sort_order', 'admin_menu', 'aclId', 'rights', 'icon', 'enabled', 'warning', 'buyEnabled','not_installable', 'isRefactored','installed'],
 			id: 'name'
 		});
 
@@ -55,7 +55,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 					},
 					scope: this
 				},{
-					text:t('Permissions'),
+					text:t('System') + ' ' +t('Permissions'),
 					iconCls: 'ic-group',
 					handler: function() {
 						const corePermissionDlg = new go.modules.GroupRights();
@@ -109,13 +109,14 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 						scope: this,
 						success: function(response, options, result) {
 
-							if (result.aclId) {
-								record.set('aclId', result.aclId);
+							if (result.id) {
+								//record.set('aclId', result.aclId);
 								record.set('id', result.id);
 								record.set("enabled", checked);
 
 								if (checked) {
-									this.showPermissions(record.data.name,record.data.package,t(record.data.name, record.data.name), record.data.aclId);
+									this.showRights(record.data.id, record.data.rights);
+									//this.showPermissions(record.data.name,record.data.package,t(record.data.name, record.data.name), record.data.aclId);
 									//this.store.load();
 								}
 							}
@@ -196,8 +197,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 		this.on("rowdblclick", function(grid, rowIndex, event) {
 			var moduleRecord = grid.store.getAt(rowIndex);
 
-			if (moduleRecord.data.aclId) {
-				this.showPermissions(moduleRecord.data.name, moduleRecord.data.package, t(moduleRecord.data.name, moduleRecord.data.name), moduleRecord.data.aclId);
+			if (moduleRecord.data.id) {
+				this.showRights(moduleRecord.data.id, moduleRecord.data.rights);
+				//this.showPermissions(moduleRecord.data.name, moduleRecord.data.package, t(moduleRecord.data.name, moduleRecord.data.name), moduleRecord.data.aclId);
 			}
 		}, this);
 
@@ -243,6 +245,13 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 
 		this.store.load();
 
+	},
+
+	showRights: function( id, rights) {
+		const dlg = new go.modules.GroupRights();
+		go.Db.store('Module').single(id).then((module) =>
+			dlg.show(module, rights)
+		);
 	},
 
 	showPermissions: function(moduleId, pkg, name, acl_id) {
@@ -328,7 +337,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 				if(success && response.updated && (record.data.id in response.updated)){
 					if(record.data.enabled && record.isModified("enabled")) {						
 						// record.set('aclId', response['created'][record.data.id].aclId);
-						this.showPermissions(record.data.name, record.data.package, t(record.data.name, record.data.name), record.data.aclId);
+						this.showRights(record.data.id, record.data.rights);
+						//this.showPermissions(record.data.name, record.data.package, t(record.data.name, record.data.name), record.data.aclId);
 					}
 
 					record.commit();
@@ -363,8 +373,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 					if(success && response['list'][0]) {
 						record.set('enabled', true);										
 						record.set('id', response['list'][0].id);
-						record.set('aclId', response['list'][0].aclId);
-						this.showPermissions(record.data.name,record.data.package, t(record.data.name, record.data.name), record.data.aclId);
+						//record.set('aclId', response['list'][0].aclId);
+						this.showRights(record.data.id, record.data.rights);
+						//this.showPermissions(record.data.name,record.data.package, t(record.data.name, record.data.name), record.data.aclId);
 						record.commit();
 					} else
 					{
@@ -443,13 +454,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 						text: t("Permissions"),
 						handler: function() {
 							const r = this.moreMenu.record;
-							if(!r.json.rights) {
-								this.showPermissions(r.data.name, r.data.package, t(r.data.name, r.data.name), r.data.aclId);
-							} else {
-								const dlg = new go.modules.GroupRights();
-								go.Db.store('Module').single(r.data.id).then((module) =>
-									dlg.show(module, r.json.rights)
-								);
+							if(r.data.rights) {
+								this.showRights(r.data.id, r.data.rights);
 							}
 						},
 						scope: this

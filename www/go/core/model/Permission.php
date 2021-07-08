@@ -6,6 +6,10 @@ namespace go\core\model;
 
 use go\core\orm\Property;
 
+/**
+ * Class Permission
+ * @property $ownerEntity \go\core\model\Module
+ */
 class Permission extends Property {
 
 	public $moduleId;
@@ -30,7 +34,7 @@ class Permission extends Property {
 				$rights[$name] = true;
 			}
 		}
-		return $rights;
+		return (object)$rights;
 	}
 
 	// [name => bool] to int
@@ -41,8 +45,8 @@ class Permission extends Property {
 			if(!isset($types[$name])) continue; // do not set invalid permissions
 			if($isTrue) {
 				$this->rights |= $types[$name]; // add
-			} else {
-				$this->rights ^= $types[$name]; // remove
+			//} else {
+			//	$this->rights ^= $types[$name]; // remove
 			}
 		}
 	}

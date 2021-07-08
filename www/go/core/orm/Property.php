@@ -275,6 +275,7 @@ abstract class Property extends Model {
 							$o = [];
 							foreach($prop as $v) {
 								$key = $this->buildMapKey($v, $relation);
+								$v->ownerEntity = $this;
 								$o[$key] = $v;
 							}
 							$prop = $o;

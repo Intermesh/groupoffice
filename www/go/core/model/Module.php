@@ -21,15 +21,22 @@ class Module extends Entity {
 
 	// for backwards compatibility
 	public function getPermissionLevel() {
-		if(go()->getAuthState()->isAdmin())
+		if(\GO::user()->isAdmin())
 			return 50;
 
-		$groupedRights = "SELECT BIT_OR(rights) as rights FROM core_permission WHERE groupId IN (SELECT groupId from core_user_group WHERE userId = ".go()->getAuthState()->getUserId().") AND moduleId = ".$this->id.";";
-		$rights = go()->getDbConnection()->query($groupedRights)->fetch(\PDO::FETCH_COLUMN);
-		if($rights < 2) {
+		$userId = go()->getAuthState()->getUserId();
+		$moduleId = $this->id;
+
+		$groupedRights = "SELECT BIT_OR(rights) as rights FROM core_permission WHERE groupId IN (SELECT groupId from core_user_group WHERE userId = ".$userId.") AND moduleId = ".$moduleId.";";
+
+		$rights = \go()->getDbConnection()->query($groupedRights)->fetch(\PDO::FETCH_COLUMN);
+		if($rights < 1) {
 			return 10;
 		}
-		if($rights >= 3) {
+		if($this->name == 'project2' && $rights == 1) { // a single exception for this compat method
+			return 40;
+		}
+		if($rights >= 1) { // we only have mayManage for old modules
 			return 50;
 		}
 		return 0;
@@ -328,6 +335,14 @@ class Module extends Entity {
 			}
 		}
 		return $result;
+	}
+
+	/**
+	 * @return string[] static list of available rights
+	 */
+	public function getRights() {
+		$module = $this->module();
+		return array_keys($module->getRights());
 	}
 	
 	/**

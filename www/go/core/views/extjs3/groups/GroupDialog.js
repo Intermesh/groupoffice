@@ -9,6 +9,7 @@ go.groups.GroupDialog = Ext.extend(go.form.Dialog, {
 		this.supr().initComponent.call(this);
 
 		this.on('show', function() {
+			this.groupModuleGrid.groupId = this.currentId;
 			if(!this.currentId) {
 				//needed to load the grid.
 				this.groupUserGrid.setValue([]);
@@ -23,10 +24,19 @@ go.groups.GroupDialog = Ext.extend(go.form.Dialog, {
 		}, this);
 	},
 
+	onSubmit: function(success, groupId) {
+		//for(var id in changedModules) {
+		if(success) {
+			let changedModules = this.groupModuleGrid.getValue();
+			go.Db.store('Module').set({update:changedModules});
+		}
+		//}
+	},
+
 	initFormItems: function () {
 
 		this.addPanel(new go.permissions.SharePanel());
-		this.addPanel(new go.groups.GroupModuleGrid());
+		this.addPanel(this.groupModuleGrid = new go.groups.GroupModuleGrid());
 		
 		return [{
 				region: "north",

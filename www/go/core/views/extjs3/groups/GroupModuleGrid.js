@@ -2,24 +2,25 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 	/*
 	 * the form field name
 	 */
-	name: "modules",
-	
-	cls: "go-group-module-grid", 
-	
+	//name: "modules",
+	submit:false,
+
+	cls: "go-group-module-grid",
+
 	clicksToEdit: 1,
-	
+
 	showLevels: true,
 
-  title: t("Modules"),
-  
-  scrollLoader: false,
-	
+	title: t("Modules"),
+
+	scrollLoader: false,
+
 	initComponent: function () {
-		
-		if(!this.value) {
+
+		if (!this.value) {
 			this.value = {};
 		}
-		
+
 		var checkColumn = new GO.grid.CheckColumn({
 			width: dp(64),
 			dataIndex: 'selected',
@@ -30,56 +31,53 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 				change: this.onCheckChange,
 				scope: this
 			},
-			isDisabled : function(record) {
+			isDisabled: function (record) {
 				return record.data.package === "core";
 			}
 		});
-		
+
 		var me = this;
-		
+
 		this.store = new go.data.Store({
 			sortInfo: {
 				field: 'name',
 				direction: 'ASC'
-      },
-      remoteSort: false,
-      baseParams: {
-        limit: 0
-      },
+			},
+			remoteSort: false,
+			baseParams: {
+				limit: 0
+			},
 			fields: [
-        'id', 
-        'name',
-        {
-          name: 'label',
-          type: {
-            convert: function(v, data) {
-              var localized = t('name', data.name, data.package, true);
-              if(localized == 'name') {
-                return data.name;
-              } else{
-                return localized;
-              }
-            }
-          },
-          sortType: Ext.data.SortTypes.asText
-        },
-        'package',         
+				'id',
+				'name',
 				{
-					name: 'level', 
-					type: {
-						convert: function (v, data) {							
-							return me.value[data.id];
-						}
-					}
-				},
-				{
-					name: 'selected', 
+					name: 'label',
 					type: {
 						convert: function (v, data) {
-							return !!me.value[data.id];
+							const localized = t('name', data.name, data.package, true);
+							return (localized === 'name') ? data.name : localized;
 						}
 					},
-					sortType:function(checked) {
+					sortType: Ext.data.SortTypes.asText
+				},
+				'permissions',
+				'package',
+				// {
+				// 	name: 'level',
+				// 	type: {
+				// 		convert: function (v, data) {
+				// 			return me.value[data.id];
+				// 		}
+				// 	}
+				// },
+				{
+					name: 'selected',
+					type: {
+						convert: function (v, data) {
+							return !!(data.permissions && data.permissions[3]);
+						}
+					},
+					sortType: function (checked) {
 						return checked ? 1 : 0;
 					}
 				}
@@ -87,193 +85,219 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 
 			entityStore: "Module"
 		});
-		
-		var levelCombo = this.createLevelCombo();
 
-		Ext.apply(this, {		
+		//var levelCombo = this.createLevelCombo();
+		this.moduleRightsEditor = new go.groups.ModulePermissionCombo({
+			store: new Ext.data.SimpleStore({
+				id: 0,
+				fields: ['id', 'name', 'checked'],
+				data: []
+			})
+		});
+		// var rightsCombo = new go.groups.ModulePermissionCombo({
+		// 	store: new Ext.data.SimpleStore({
+		// 		id:0,
+		// 		fields : ['value', 'text'],
+		// 		data : (this.rights || []).map(v => [t(v), v] )
+		// 	}),
+		// });
+
+		Ext.apply(this, {
 			plugins: [checkColumn],
-			tbar: [
-			'->', 
-				{
-					xtype: 'tbsearch',
-					filters: [
-						'text'					
-					]
+			tbar: ['->', {
+				xtype: 'tbsearch',
+				filters: ['text']
+			}],
+			columns: [{
+				id: 'label',
+				header: t('Name'),
+				sortable: false,
+				dataIndex: 'label',
+				menuDisabled: true,
+				hideable: false,
+				renderer: function (name, cell, record) {
+					return '<div class="mo-title" style="background-image:url(' + go.Jmap.downloadUrl('core/moduleIcon/' + (record.data.package || "legacy") + '/' + record.data.name) + ')">' + name + '</div>';
 				}
-			],
-			columns: [
-				{
-					id: 'label',
-					header: t('Name'),
-					sortable: false,
-					dataIndex: 'label',
-					menuDisabled: true,
-          hideable: false,
-          renderer: function(name, cell, record) {
-            return '<div class="mo-title" style="background-image:url(' + go.Jmap.downloadUrl('core/moduleIcon/'+(record.data.package || "legacy")+'/'+record.data.name)+ ')">' + name +'</div>';
-          }
-          
-				},{
-					id: 'package',
-					header: t('Package'),
-					sortable: false,
-					dataIndex: 'package',
-					menuDisabled: true,
-					hideable: false
-				},{
-					id: 'permissions',
-					header : t("Permissions"),
-					dataIndex : 'level',
-					menuDisabled:true,
-					editor : levelCombo,
-					width: dp(260),
-					hidden: !this.showLevels,
-					hideable: false,
-					renderer:function(v, meta){
-						if(!me.showLevels) {
-							return "";
+			}, {
+				id: 'package',
+				header: t('Package'),
+				sortable: false,
+				dataIndex: 'package',
+				menuDisabled: true,
+				hideable: false
+			}, {
+				id: 'permissions',
+				header: t("Permissions"),
+				dataIndex: 'permissions',
+				menuDisabled: true,
+				editor: this.moduleRightsEditor,
+				width: dp(460),
+				hidden: !this.showLevels,
+				hideable: false,
+				renderer: function (v, meta, record) {
+
+					if (!me.showLevels) {
+						return "";
+					}
+					if (!record.data.permissions) {
+						return t('Unavailable');
+					}
+					meta.style = "position:relative";
+					let result, permissions = [];
+					if (record.data.permissions[me.groupId]) { // when loaded
+						const rights = record.data.permissions[me.groupId].rights;
+						for (var r in rights) {
+							if (rights[r])
+								permissions.push(t(r, record.json.name, record.json.package));
 						}
-						var r = levelCombo.store.getById(v);
-						meta.style="position:relative";
-						return r ? r.get('text') + "<i class='trigger'>arrow_drop_down</i></div>" : v;
-					},
-					sortable: true
+					}
+					result = (!permissions.length) ? t("Use") : permissions.join(', ');
+					//debugger;
+					return result + "<i class='trigger'>arrow_drop_down</i>";
+					//}
+					// var r = levelCombo.store.getById(v);
+					// return r ? r.get('text') + "<i class='trigger'>arrow_drop_down</i></div>" : v;
 				},
-				checkColumn
+				sortable: true
+			}, checkColumn
 			],
 			viewConfig: {
-				emptyText: 	'<i>description</i><p>' +t("No items to display") + '</p>',		
-				scrollOffset: 0		
+				emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
+				scrollOffset: 0
 			},
 			autoExpandColumn: 'label',
 			listeners: {
 				scope: this,
-				afteredit : this.afterEdit
+				'afteredit': this.afterEdit,
+				'beforeedit': this.beforeEdit,
+				'validateedit': this.validateEdit,
 			}
 //			// config options for stateful behavior
 //			stateful: true,
 //			stateId: 'users-grid'
 		});
-		
+
 		this.store.on("beforeload", this.onBeforeStoreLoad, this);
-		
+
 		go.groups.GroupModuleGrid.superclass.initComponent.call(this);
-		
-		this.on("beforeedit", function(e) {
-			return e.record.data.id !== 1; //cancel edit for admins group
-		}, this);
 
 	},
-	
-	startEditing : function(row,  col) {
+
+	startEditing: function (row, col) {
 		go.groups.GroupModuleGrid.superclass.startEditing.call(this, row, col);
-		
-		//expand combo when editing
-		if(this.activeEditor) {
+		if (this.activeEditor) {
+			var record = this.getStore().getAt(row);
+			if (!record.data.permissions) {
+				return;
+			}
+			const rights = record.data.permissions[this.groupId].rights;
+			let permissions = [];
+			for (var r in rights) {
+				if (rights[r])
+					permissions.push(r);
+			}
+			//this.moduleRightsEditor.originalValue = record.data.permissions;
+			this.moduleRightsEditor.selectedItems = permissions;
+
+			var data = (record.json.rights || []).map(v => [v, t(v, record.json.name, record.json.package), rights[v]]);
+			this.activeEditor.field.store.loadData(data);
+			//expand combo when editing
 			this.activeEditor.field.onTriggerClick();
 		}
 	},
-	
-	onCheckChange : function(record, newValue) {
-		if(newValue) {			
-			record.set('level', this.addLevel);
+
+	onCheckChange: function (record, value) {
+		var oldValue = record.data.permissions;
+		if (value) {
+			// change old value
+			record.set('permissions', oldValue);
 			this.value[record.data.id] = record.data.level;
-		} else
-		{
-			record.set('level', null);
+		} else {
+			// remove me from old value
+			record.set('permissions', oldValue);
 			this.value[record.data.id] = null;
 		}
-		
+
 		this._isDirty = true;
 	},
 
-	afterEdit : function(e) {
-		this.value[e.record.id] = e.record.data.level;				
-		this._isDirty = true;
-	},
-	
-	createLevelCombo : function() {
-		var levelData = [];
 
-		this.levelLabels = this.levelLabels || {};
-		
-		if(!this.levelLabels[go.permissionLevels.read])
-			this.levelLabels[go.permissionLevels.read] =t("Use");
-		if(!this.levelLabels[go.permissionLevels.manage])
-			this.levelLabels[go.permissionLevels.manage] =t("Manage");
-		
-		if(!this.levels){
-			this.levels=[
-				go.permissionLevels.read,			
-				go.permissionLevels.manage
-			];
+	beforeEdit: function (e) {
+		if (e.field === 'permissions') { // only edit this field if we have permissions. otherwise use checkbox first
+			return !!(e.record.data.permissions && e.record.data.permissions[this.groupId]);
 		}
-		
-		for(var i=0;i<this.levels.length;i++){			
-			if(!this.levelLabels[this.levels[i]]){
-				alert('Warning: you must define a label for permission level: '+this.levels[i]);
-			}else
-			{
-				levelData.push([this.levels[i],this.levelLabels[this.levels[i]]]);
+		return e.record.data.id !== 1; //cancel edit for admins group
+	},
+
+	// after a cell is edited, but before the value is set in the record
+	validateEdit: function (e) {
+		var setOrUnsetPermissions = this.getParsedPermissions(this.moduleRightsEditor.selectedItems, e.record.json.permissions[this.groupId].rights);
+		e.value = {[this.groupId]: {rights: setOrUnsetPermissions, groupId: this.groupId}};
+	},
+
+	afterEdit: function (e) {
+		this.value = this.value || {};
+		this.value[e.record.id] = {permissions: e.value};
+		console.log(e.value);
+		//this.value[e.record.id] = e.record.data.level;
+		this._isDirty = true;
+	},
+
+	/**
+	 * parse changes from new and old permissions values
+	 * @param {string[]} value
+	 * @param {string[boolean]} original
+	 * @returns {string[boolean]} changes
+	 */
+	getParsedPermissions: function (value, original) {
+		var result = {};
+
+		for (var perm of value) {
+			if (!original[perm])
+				result[perm] = true; // to add
+
+		}
+		for (let right in original) {
+			if (value.indexOf(right) === -1) {
+				//result[right] = false; // to remove
+			} else {
+				result[right] = true;
 			}
 		}
-		
-
-		this.showLevel = (this.hideLevel) ? false : true;			
-
-		var permissionLevelConfig ={
-					store : new Ext.data.SimpleStore({
-						id:0,
-						fields : ['value', 'text'],
-						data : levelData
-					}),
-					valueField : 'value',
-					displayField : 'text',
-					mode : 'local',
-					triggerAction : 'all',
-					editable : false,
-					selectOnFocus : true,
-					forceSelection : true
-				};
-				
-		
-		if(!this.addLevel)
-			this.addLevel = go.permissionLevels.read;
-		
-		return new go.form.ComboBox(permissionLevelConfig);
+		return result;
 	},
-	
-	afterRender : function() {
+
+	afterRender: function () {
 
 		go.groups.GroupModuleGrid.superclass.afterRender.call(this);
 
 		var form = this.findParentByType("entityform");
 
-		if(!form) {
+		if (!form) {
 			return;
 		}
 
-		if(!this.store.loaded) {
+		if (!this.store.loaded) {
 			this.store.load();
-		}		
+		}
 
-		form.on("load", function(f, v) {
+		form.on("load", function (f, v) {
 			this.setDisabled(v.permissionLevel < go.permissionLevels.manage);
 		}, this);
 
 		//Check form currentId becuase when form is loading then it will load the store on setValue later.
 		//Set timeout is used to make sure the check will follow after a load call.
 		var me = this;
-		setTimeout(function() {
-			if(!go.util.empty(me.value) && !form.currentId) {				
+		setTimeout(function () {
+			if (!go.util.empty(me.value) && !form.currentId) {
 				me.store.load();
 			}
-		}, 0);		
+		}, 0);
 	},
-	
+
 	isFormField: true,
 
-	getName: function() {
+	getName: function () {
 		return this.name;
 	},
 
@@ -283,30 +307,30 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 		return this._isDirty || this.store.getModifiedRecords().length > 0;
 	},
 
-	reset : function() {
+	reset: function () {
 		this.setValue([]);
 		this.dirty = false;
 	},
 
-	setValue: function (groups) {		
-		this._isDirty = false;		
+	setValue: function (groups) {
+		this._isDirty = false;
 		this.value = groups || {};
-		this.store.load().catch(function(){}); //ignore failed load becuase onBeforeStoreLoad can return false
+		this.store.load().catch(function () {
+		}); //ignore failed load becuase onBeforeStoreLoad can return false
 	},
-	
-	getSelectedModuleIds : function() {
-		return Object.keys(this.value).map(function(id) { return parseInt(id);});
+
+	getSelectedModuleIds: function () {
+		return Object.keys(this.value).map(parseInt);
 	},
-	
-	onBeforeStoreLoad : function(store, options) {
+
+	onBeforeStoreLoad: function (store, options) {
 
 		//don't add selected on search
-		if(this.store.filters.tbsearch || options.selectedLoaded || options.paging) {
+		if (this.store.filters.tbsearch || options.selectedLoaded || options.paging) {
 			this.store.setFilter('exclude', null);
 			return true;
 		}
-		
-		go.Db.store("Module").get(this.getSelectedModuleIds(), function(entities) {
+		go.Db.store("Module").get(this.getSelectedModuleIds(), function (entities) {
 			this.store.loadData({records: entities}, true);
 			// this.store.sortData();
 			this.store.setFilter('exclude', {
@@ -316,21 +340,21 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 			this.store.load({
 				add: true,
 				selectedLoaded: true
-			}).then(function() {
-        me.store.multiSort([{
-          field: 'selected',
-          direction: 'DESC'
-        },{
-          field: 'label',
-          direction: 'ASC'
-        }]);
-      });
+			}).then(function () {
+				me.store.multiSort([{
+					field: 'selected',
+					direction: 'DESC'
+				}, {
+					field: 'label',
+					direction: 'ASC'
+				}]);
+			});
 		}, this);
-		
+
 		return false;
-	},	
-	
-	getValue: function () {			
+	},
+
+	getValue: function () {
 		return this.value;
 	},
 
@@ -342,12 +366,12 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 		this.getEl().removeClass('x-form-invalid');
 		Ext.form.MessageTargets.qtip.clear(this);
 	},
-	
-	validate : function() {
+
+	validate: function () {
 		return true;
 	},
 
-	isValid: function(preventMark) {
+	isValid: function (preventMark) {
 		return true;
 	}
 });

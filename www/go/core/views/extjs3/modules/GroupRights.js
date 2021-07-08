@@ -32,9 +32,7 @@ go.modules.GroupRights = Ext.extend(go.Window, {
 					fields: ['id', 'name', 'isUserGroupFor'],
 					entityStore: "Group",
 					listeners: {
-						load: function(store, records, options){
-							this.filterUnused(store);
-						},scope:this
+						load: (store) => {this.filterUnused(store);}
 					}
 				},
 				emptyText: t('Add group'),
@@ -89,10 +87,8 @@ go.modules.GroupRights = Ext.extend(go.Window, {
 
 	/**
 	 *
-	 * @param {string} moduleId module name
-	 * @param {string} pkg package name
-	 * @param {string} name name of the module
-	 * @param {object} key value permission name => label eg. {createUser: t('Create user'), changeUser: t('Change user')}
+	 * @param {string} module module name
+	 * @param {string[]} rights package name
 	 */
 	show: function (module, rights) {
 		this.module = module;

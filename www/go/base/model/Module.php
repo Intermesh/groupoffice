@@ -46,6 +46,25 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	{	
 		return parent::model($className);
 	}
+
+	public function getPermissionLevel() {
+		if(\GO::user()->isAdmin())
+			return 50;
+
+		$userId =\GO::user()->id;
+		$moduleId = $this->id;
+
+		$groupedRights = "SELECT BIT_OR(rights) as rights FROM core_permission WHERE groupId IN (SELECT groupId from core_user_group WHERE userId = ".$userId.") AND moduleId = ".$moduleId.";";
+
+		$rights = \go()->getDbConnection()->query($groupedRights)->fetch(\PDO::FETCH_COLUMN);
+		if($rights < 1) {
+			return 10;
+		}
+		if($rights == 1) { // we only have mayManage for old modules
+			return 50;
+		}
+		return 0;
+	}
 	
 	protected function nextSortOrder() {
 		$query = new \go\core\db\Query();			

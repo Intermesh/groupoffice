@@ -951,8 +951,15 @@ $udpates['202106021420'][] = "CREATE TABLE `core_permission` (
           ON DELETE CASCADE
           ON UPDATE NO ACTION);";
 
-$updates['202106091111'][] = "INSERT IGNORE INTO core_permission (groupId, rights, moduleId) SELECT ag.groupId, IF(ag.level > 10, 3,1), a.entityId FROM core_acl_group ag 
+// migratie module acl permission to action permission
+$updates['202106091111'][] = "INSERT IGNORE INTO core_permission (groupId, rights, moduleId) SELECT ag.groupId, IF(ag.level > 10, 1,0), a.entityId FROM core_acl_group ag 
 join core_acl a on a.id = ag.aclId 
 join core_entity e on e.id = a.entityTypeId
 WHERE e.name = 'Module';";
-// migratie module permission to action permission
+// projects2 has finance permissions
+$updates['202106091112'][] = "UPDATE core_permission p
+join core_acl_group ag on ag.groupId = p.groupId
+join core_acl a on a.id = ag.aclId
+join core_module m on a.entityId = m.id
+SET rights = IF(ag.level=10,0,IF(ag.level=40,1,3))
+WHERE a.entityId = p.moduleId AND  m.name = 'projects2';";
