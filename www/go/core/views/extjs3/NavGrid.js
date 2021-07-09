@@ -87,9 +87,19 @@ go.NavGrid = Ext.extend(go.grid.GridPanel,{
 			}
 		});
 
-		this.getSelectionModel().suspendEvents(false)
-		this.getSelectionModel().selectRecords(selected, true);
-		this.getSelectionModel().resumeEvents();
+		const select = () => {
+			this.getSelectionModel().suspendEvents(false)
+			this.getSelectionModel().selectRecords(selected, true);
+			this.getSelectionModel().resumeEvents();
+		}
+
+		if(this.rendered) {
+			select();
+		} else
+		{
+			this.on('render', select);
+		}
+
 
 	},
 

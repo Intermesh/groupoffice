@@ -13,7 +13,84 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 
 		// this.taskCombo = new go.modules.community.tasks.TaskCombo({});
 
-		var propertiesPanel = new Ext.Panel({
+		const start = {
+			xtype:'datefield',
+			name : 'start',
+			itemId: 'start',
+			fieldLabel : t("Start"),
+			listeners : {
+				setvalue : function(me,val) {
+					me.nextSibling().setMinValue(val);
+					if(!Ext.isEmpty(val)) {
+						this.recurrenceField.setStartDate(Ext.isDate(val) ? val : Date.parseDate(val, me.format));
+					}
+					this.recurrenceField.setDisabled(Ext.isEmpty(val));
+				},
+				scope : this
+			}
+		};
+
+		const due = {
+			xtype:'datefield',
+			name : 'due',
+			itemId: 'due',
+			fieldLabel : t("Due"),
+			listeners : {
+				change : function(me,val) {
+					me.previousSibling().setMaxValue(val);
+				},
+				scope : this
+			}
+		};
+
+		const progress = new go.modules.community.tasks.ProgressCombo ({
+			width:dp(150),
+
+			value : 'needs-action'
+		});
+
+		const estimatedDuration = {
+			name: "estimatedDuration",
+			xtype: "nativetimefield",
+			width:dp(150),
+			fieldLabel: t("Estimated duration"),
+			asInteger: true
+		};
+
+		const priority = {
+			xtype: 'combo',
+			name: 'priority_text',
+			hiddenName: 'priority',
+			triggerAction: 'all',
+			editable: false,
+			selectOnFocus: true,
+			width: dp(150),
+			forceSelection: true,
+			fieldLabel: t("Priority"),
+			mode: 'local',
+			value: 0,
+			valueField: 'value',
+			displayField: 'text',
+			store: new Ext.data.SimpleStore({
+				fields: ['value', 'text'],
+				data: [
+					[9, t("Low")],
+					[0, t("Normal")],
+					[1, t("High")]
+				]
+			})
+		}
+		const percentComplete = new Ext.form.SliderField({
+			fieldLabel: t("Percent complete"),
+			flex: 1,
+			name: 'percentComplete',
+			minValue: 0,
+			maxValue: 100,
+			increment: 10,
+			value: 0
+		});
+
+		const propertiesPanel = new Ext.Panel({
 			hideMode : 'offsets',
 			//title : t("Properties"),
 			labelAlign: 'top',
@@ -48,97 +125,31 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 							xtype:'container',
 							labelAlign:'top'
 						},
+						mobile : {
+							items:[
+								{
+									columnWidth: .5,
+									items: [start,due, priority]
+								},
+								{
+									columnWidth: .5,
+									items: [progress, estimatedDuration, percentComplete]
+								}
+							]
+						},
 						items:[
 							{
 								columnWidth: .35,
-								items:[{
-									xtype:'datefield',
-									name : 'start',
-									itemId: 'start',
-									fieldLabel : t("Start"),
-									listeners : {
-										setvalue : function(me,val) {
-											me.nextSibling().setMinValue(val);
-											if(!Ext.isEmpty(val)) {
-												this.recurrenceField.setStartDate(Ext.isDate(val) ? val : Date.parseDate(val, me.format));
-											}
-											this.recurrenceField.setDisabled(Ext.isEmpty(val));
-										},
-										scope : this
-									}
-								},{
-									xtype:'datefield',
-									name : 'due',
-									itemId: 'due',
-									fieldLabel : t("Due"),
-									listeners : {
-										change : function(me,val) {
-											me.previousSibling().setMaxValue(val);
-										},
-										scope : this
-									}
-								}]
+								items: [start,due]
 							},
 							{
 								columnWidth: .35,
-								items:[
-									new go.modules.community.tasks.ProgressCombo ({
-										width:dp(150),
-
-										value : 'needs-action'
-									})
-									,
-									{
-										name: "estimatedDuration",
-										xtype: "nativetimefield",
-										width:dp(150),
-										fieldLabel: t("Estimated duration"),
-										asInteger: true
-									}
-
-								]
+								items: [progress, estimatedDuration]
 							},
 							{
 								columnWidth: .3,
-								items:[{
-									xtype:'combo',
-									name: 'priority_text',
-									hiddenName: 'priority',
-									triggerAction: 'all',
-									editable: false,
-									selectOnFocus: true,
-									width: dp(150),
-									forceSelection: true,
-									fieldLabel: t("Priority"),
-									mode: 'local',
-									value: 0,
-									valueField: 'value',
-									displayField: 'text',
-									store: new Ext.data.SimpleStore({
-										fields: ['value', 'text'],
-										data: [
-											[9, t("Low")],
-											[0, t("Normal")],
-											[1, t("High")]
-										]
-									})
-								},new Ext.form.SliderField({
-									fieldLabel: t("Percent complete"),
-									flex: 1,
-									name: 'percentComplete',
-									minValue: 0,
-									maxValue: 100,
-									increment: 10,
-									value: 0,
-									listeners: {
-										scope: this,
-										change: function (combo, newValue) {
-											// if (newValue == 100)
-											// 	this.taskStatusField.setValue("COMPLETED");
-										}
-									}
-								})
-							]}
+								items: [priority, percentComplete]
+							}
 						]
 					},
 					this.userCombo = new go.users.UserCombo({

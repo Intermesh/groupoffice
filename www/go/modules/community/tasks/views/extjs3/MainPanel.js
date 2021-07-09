@@ -138,17 +138,16 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		this.filterPanel.on("afterrender", () => {
 			this.filterPanel.selectRange(0,0);
-			this.setStatusFilter("today");
-			this.showCompleted(false);
-			this.filterPanel.on("selectionchange", this.onStatusSelectionChange, this);
 
-			this.setDefaultSelection();
-
-
-
-			this.tasklistsGrid.store.load();
-			this.taskGrid.store.load();
 		});
+		this.setStatusFilter("today");
+		this.showCompleted(false);
+		this.filterPanel.on("selectionchange", this.onStatusSelectionChange, this);
+
+		this.setDefaultSelection();
+
+		this.tasklistsGrid.store.load();
+		this.taskGrid.store.load();
 
 	},
 
@@ -304,7 +303,8 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	createTasklistGrid : function() {
 		this.tasklistsGrid = new go.modules.community.tasks.TasklistsGrid({
 			region: "south",
-			height: dp(300),
+			height: dp(200),
+			border: true,
 
 			filteredStore: this.taskGrid.store,
 			filterName: 'tasklistId',

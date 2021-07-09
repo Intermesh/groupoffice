@@ -255,6 +255,7 @@ go.form.RecurrenceField = Ext.extend(Ext.form.TriggerField, {
         var customWindow = new go.Window({
             title: t('Customize recurrence'),
             modal: true,
+            layout: "fit",
             width: dp(376),
             items: [{
                 xtype:'form',
