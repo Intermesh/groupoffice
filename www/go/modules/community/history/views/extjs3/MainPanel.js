@@ -26,8 +26,7 @@ Ext.define('go.modules.community.history.MainPanel', {
 			this.grid, //first is default in narrow mode
 			this.sidePanel
 		];
-
-		go.modules.community.addressbook.MainPanel.superclass.initComponent.call(this);
+		this.callParent();
 
 		this.grid.on('viewready', function() {
 			this.dateRangeField.setThisWeek();
