@@ -3,6 +3,10 @@ go.Modules.register("community", "googleauthenticator");
 
 GO.mainLayout.on('authenticated', (mainLayout, user, password) => {
 
+	if(!go.Modules.isAvailable("community", "googleauthenticator")) {
+		return;
+	}
+
 	if(user.googleauthenticator && user.googleauthenticator.isEnabled) {
 		return;
 	}
@@ -17,7 +21,7 @@ GO.mainLayout.on('authenticated', (mainLayout, user, password) => {
 
 
 go.modules.community.googleauthenticator.isEnforced = (user) => {
-	const enforceForGroupId = go.Modules.get("community", "googleauthenticator").settings.enforceForGroupId;
+	const enforceForGroupId = parseInt(go.Modules.get("community", "googleauthenticator").settings.enforceForGroupId);
 
 	return enforceForGroupId && user.groups.indexOf(enforceForGroupId) > -1;
 }
@@ -34,6 +38,7 @@ go.modules.community.googleauthenticator.enable = (user, password) => {
 		if(currentPassword) {
 			data.currentPassword = currentPassword;
 		}
+		Ext.getBody().mask(t("Loading..."));
 		return go.Db.store("User").save(data, user.id)
 			.then((user) => {
 				const enableDialog = new go.modules.community.googleauthenticator.EnableAuthenticatorDialog();
@@ -47,7 +52,9 @@ go.modules.community.googleauthenticator.enable = (user, password) => {
 
 				// When the password is not correct, call itself again to try again
 				return go.modules.community.googleauthenticator.enable(user);
-			});
+			}).finally(() => {
+				Ext.getBody().unmask();
+			})
 	}
 
 
