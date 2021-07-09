@@ -336,6 +336,9 @@ go.util =  (function () {
 			const win = this.getDownloadTargetWindow();
 			win.focus();
 
+			if(Ext.isSafari && window.navigator.standalone) {
+				url = "filewrap.php?url=" + encodeURIComponent(url);
+			}
 			win.location.replace(url);
 
 		},
@@ -353,13 +356,13 @@ go.util =  (function () {
 		 * @param {string} url
 		 */
 		downloadFile: function(url) {
-			// if(Ext.isSafari && GO.util.isMobileOrTablet()) {
-			// 	//somehow this is the only way a download works on a web application on the iphone.
-			// 	const win = this.getDownloadTargetWindow();
-			// 	win.focus();
-			// 	win.location = url;
-			// } else
-			// {
+			if(Ext.isSafari && window.navigator.standalone) {
+				//somehow this is the only way a download works on a web application on the iphone.
+				const win = this.getDownloadTargetWindow();
+				win.focus();
+				win.location = "filewrap.php?url=" + encodeURIComponent(url);
+			} else
+			{
 				// for safari :(
 				if(go.util.downloadTarget)
 					go.util.downloadTarget.close();
@@ -378,7 +381,7 @@ go.util =  (function () {
 				//downloadFrame.src = url;
 				downloadFrame.href = url;
 				downloadFrame.click();
-			// }
+			}
 
 		},
 		

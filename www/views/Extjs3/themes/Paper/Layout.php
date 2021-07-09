@@ -13,7 +13,7 @@ $lang = GO::language()->getLanguage(); ?>
 	<meta name="HandheldFriendly" content="true"/>
 	<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
 	<meta http-equiv="x-ua-compatible" content="IE=edge">
-	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-capable" content="no">
 	<meta name="apple-mobile-web-app-title" content="<?= go()->getSettings()->title; ?>">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <link rel="apple-touch-icon" sizes="180x180" href="<?= GO::view()->getTheme()->getUrl(); ?>img/favicon/apple-touch-icon.png">
