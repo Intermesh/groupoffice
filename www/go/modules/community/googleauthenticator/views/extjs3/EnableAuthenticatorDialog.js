@@ -90,8 +90,12 @@ go.modules.community.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(
 				cls: 'info',
 				html: "<i class='icon'>info</i> " + t("Your system administrator requires you to setup two factor authentication")
 			});
-			this.setHeight(650);
+			if(!this.maximized) {
+				this.setHeight(650);
+
+			}
 			this.doLayout();
+
 		}
 	}
 });
