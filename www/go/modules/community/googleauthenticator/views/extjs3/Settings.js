@@ -1,6 +1,9 @@
 Ext.onReady(function () {
 	Ext.override(go.usersettings.AccountSettingsPanel, {
 		initComponent: go.usersettings.AccountSettingsPanel.prototype.initComponent.createSequence(function () {
+			if(!go.Modules.isAvailable("community", "googleauthenticator")) {
+				return;
+			}
 			this.googleAuthenticatorFieldset = new go.modules.community.googleauthenticator.AuthenticatorSettingsFieldset();
 			this.insert(3, this.googleAuthenticatorFieldset);
 			})
