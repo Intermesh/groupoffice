@@ -1,3 +1,5 @@
+- MultiInstance: Fixed compatibility issue with MySQL 8+
+
 06-07-2021 6.4.239
 - Timeregistration: Fixed time tracking sums
 - Projects: fixed this.filter() is undefined error
