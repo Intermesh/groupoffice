@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `tasks_tasklist` (
   `version` INT(10) UNSIGNED NOT NULL DEFAULT 1,
   `ownerId` INT(11) NOT NULL DEFAULT 1,
   `filesFolderId` INT(11) DEFAULT null,
+  projectId int null,
   PRIMARY KEY (`id`),
   INDEX `fkCreatedBy` (`createdBy` ASC),
   INDEX `fkAcl` (`aclId` ASC),
