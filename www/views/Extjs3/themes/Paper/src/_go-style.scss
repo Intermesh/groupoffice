@@ -1553,12 +1553,12 @@ table[id^="comments-ext"] b {
 
 .go-layout-responsive {
 	
-	.go-narrow {
+	.x-btn.go-narrow {
 		display: none;
 	}
 	
 	&.go-narrow {
-		.go-narrow {
+		.x-btn.go-narrow {
 			display: block;
 		}
 		.x-layout-split {
@@ -1566,6 +1566,9 @@ table[id^="comments-ext"] b {
 		}
 	}
 
+}
+.go-mobile-split {
+	border-right: 1px solid color($fg, 'line');
 }
 
 /*.go-layout-responsive-item {

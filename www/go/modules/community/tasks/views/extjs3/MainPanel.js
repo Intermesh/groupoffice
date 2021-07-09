@@ -13,7 +13,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	title: t("Tasks"),
 	layout: 'responsive',
 	layoutConfig: {
-		triggerWidth: 1200
+		triggerWidth: 1000
 	},
 
 	initComponent: function () {
@@ -21,17 +21,20 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.createTasklistGrid();	
 		this.createCategoriesGrid();
 
+
+
 		this.taskDetail = new go.modules.community.tasks.TaskDetail({
 			region: 'east',
 			split: true,
-			tbar: [{
-				cls: 'go-narrow',
+			tbar: [this.taskBackButton = new Ext.Button({
+				//cls: 'go-narrow',
+				hidden: true,
 				iconCls: "ic-arrow-back",
 				handler: function () {
 					go.Router.goto("tasks");
 				},
 				scope: this
-			}]
+			})]
 		});
 
 		this.filterPanel = new go.NavMenu({
@@ -50,20 +53,23 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		});
 
 
+
+
 		this.sidePanel = new Ext.Panel({
 			width: dp(300),
 			cls: 'go-sidenav',
 			region: "west",
 			layout:"border",
 			split: true,
-			tbar: new Ext.Toolbar({
-				cls: 'go-narrow',
+			tbar: this.sidePanelTbar = new Ext.Toolbar({
+				//cls: 'go-narrow',
+				hidden: true,
 				items: ["->",  {
 
 					iconCls: "ic-arrow-forward",
 					tooltip: t("Tasks"),
 					handler: function () {
-						this.centerPanel.show();
+						this.taskGrid.show();
 					},
 					scope: this
 				}]
@@ -103,26 +109,33 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			]
 		});
 
+		this.centerPanel = new Ext.Panel({
+			layout:'responsive',
+			stateId: "go-tasks-west",
+			region: "center",
+			listeners: {
+				afterlayout: (panel, layout) => {
+
+					this.sidePanelTbar.setVisible(layout.isNarrow());
+					this.showNavButton.setVisible(layout.isNarrow())
+				}
+			},
+			split: true,
+			narrowWidth: dp(400),
+			items:[
+				this.taskGrid,
+				this.sidePanel
+			]
+		});
 
 		this.items = [
-			this.centerPanel = new Ext.Panel({
-				layout:'responsive',
-				stateId: "go-tasks-west",
-				region: "center",
-				split: true,
-				layoutConfig: {
-					triggerWidth: 1000
-				},
-				width: dp(700),
-				narrowWidth: dp(300),
-				height:dp(800), //this will only work for panels inside another panel with layout=responsive. Not ideal but at the moment the only way I could make it work
-				items:[
-					this.taskGrid,
-					this.taskDetail
-				]
-			}), //first is default in narrow mode
-			this.sidePanel
+			this.centerPanel, //first is default in narrow mode
+			this.taskDetail
 		];
+
+		this.on("afterlayout", (panel, layout) => {
+			this.taskBackButton.setVisible(layout.isNarrow());
+		});
 
 		go.modules.community.tasks.MainPanel.superclass.initComponent.call(this);
 
@@ -348,18 +361,17 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	createTaskGrid : function() {
 
 		this.taskGrid = new go.modules.community.tasks.TaskGrid({
-
+			split: true,
 			region: 'center',
 			tbar: [
-					{
-						cls: 'go-narrow',
+					this.showNavButton = new Ext.Button({
+						hidden: true,
 						iconCls: "ic-menu",
 						handler: function () {
-//						this.westPanel.getLayout().setActiveItem(this.noteBookGrid);
 							this.sidePanel.show();
 						},
 						scope: this
-					},
+					}),
 					'->',
 					{
 						xtype: 'tbsearch'

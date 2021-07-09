@@ -1065,7 +1065,11 @@ Ext.override(Ext.Panel, {
 	initComponent : function() {
 		
 		if(GO.util.isMobileOrTablet()) {
-			this.split = false;			
+			if(this.split) {
+				this.split = false;
+				this.cls = this.cls || "";
+				this.cls += ' go-mobile-split';
+			}
 		}
 		
 		this.panelInitComponent.call(this);

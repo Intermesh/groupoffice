@@ -31,12 +31,12 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 	onLayout: function (ct, target) {
 		if (!this.initialized)	{
 
-			ct.addClass('go-layout-responsive');			
+			ct.addClass('go-layout-responsive go-wide');
 			this.initialized = true;
 
 			//make sure activeitem is normalized to a component
-			this.activeItem = this.container.getComponent(this.activeItem);			
-			
+			this.activeItem = this.container.getComponent(this.activeItem);
+
 			//make sure border layout is initialized
 			go.layout.ResponsiveLayout.superclass.onLayout.call(this, ct, target);
 
@@ -44,17 +44,20 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 			ct.items.each(function (i) {
 				i.on('beforeshow', this.onBeforeShow, this);
 				i.on('show', this.onPanelShow, this);
-				i.wideWidth = i.width;		
+				i.wideWidth = i.width;
 			}, this);
-			ct.on('resize', function() { // when mobile orientation changes
-				ct.doLayout();
-			}, this)
+
+			// this causes a lot of extra doLayouts!
+			// ct.on('resize', function() { // when mobile orientation changes
+			// 	console.warn('yo');
+			// 	ct.doLayout();
+			// }, this)
 		}
-		
+
 		var willBeWide = window.innerWidth > this.triggerWidth;
 
 		this.setChildWidths(ct);
-		
+
 		if (willBeWide) {
 			this.setWideLayout(ct, target);
 		} else
@@ -63,55 +66,56 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 		}
 
 	},
-	
-	isNarrow : function() {
+
+	shouldBeNarrow : function() {
 		return window.innerWidth <= this.triggerWidth;
 	},
-	
+
 	getItemWidth : function(i) {
-		
-		if(i.getLayout && typeof i.getLayout().isNarrow == "function" && i.getLayout().isNarrow()) {
+
+		if(i.getLayout && typeof i.getLayout().shouldBeNarrow == "function" && i.getLayout().shouldBeNarrow()) {
 			return i.initialConfig.narrowWidth || i.wideWith;
 		} else
 		{
 			return i.wideWidth;
 		}
-			
+
 	},
 
 	setWideLayout: function (ct, target) {
-		
+
 		if (this.mode != 'wide') {
 			this.mode = 'wide';
 			ct.removeClass('go-narrow');
-			ct.items.each(function (i) {				
+			ct.addClass('go-wide');
+			ct.items.each(function (i) {
 				if (i.hidden) {
 					i.show();
 				}
 				// i.stateful = true;
-			}, this);		
+			}, this);
 
-			ct.cascade(function(i) {	
-				
+			ct.cascade(function(i) {
+
 				if(i.origStateFul) {
 					i.stateful = i.origStateful;
-				}	
+				}
 				return true;
 			}, this);
-			
+
 			ct.stateful = true;
-		}		
-		
-		go.layout.ResponsiveLayout.superclass.onLayout.call(this, ct, target);		
+		}
+
+		go.layout.ResponsiveLayout.superclass.onLayout.call(this, ct, target);
 
 	},
 
 	setNarrowLayout: function (ct, target) {
-		
+
 //		console.log(ct.getId(), "narrow");
 		//turn into cards
-		ct.stateful = false;		
-	
+		ct.stateful = false;
+
 		if (this.mode != 'narrow') {
 			this.mode = 'narrow';
 
@@ -122,15 +126,16 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 			}, this);
 
 			ct.addClass('go-narrow');
-			
+			ct.removeClass('go-wide');
+
 			ct.items.each(function (i) {
 				if(!i.hidden) {
 					i.hide();
 				}
-			}, this);					
-			
+			}, this);
+
 		}
-		
+
 		this.activeItem.show();
 	},
 	
@@ -184,6 +189,14 @@ go.layout.ResponsiveLayout = Ext.extend(Ext.layout.BorderLayout, {
 				item.getEl().setLeft(0);
 			}
 		}
+	},
+
+	isNarrow: function () {
+		return this.mode == 'narrow';
+	},
+
+	isWide : function() {
+		return this.mode == 'wide';
 	}
 });
 
