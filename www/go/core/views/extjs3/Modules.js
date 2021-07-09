@@ -222,8 +222,9 @@ go.Modules = (function () {
 								
 									//todo panel is only constructed to grab config.title/id
 									var m = new config.mainPanel[i]();
-									//todo GO.moduleManager is deprecated									
-									GO.moduleManager._addModule(config.mainPanel[i].prototype.id, config.mainPanel[i], {title:m.title, package: mod.package}, config.subMenuConfig);
+									console.error("DO SOMETHING ABOUT THIS HORRIBLE THING HERE :)");
+									//todo GO.moduleManager is deprecated
+									GO.moduleManager._addModule(config.mainPanel[i].prototype.id, config.mainPanel[i], {title:config.mainPanel[i].prototype.title, package: mod.package}, config.subMenuConfig);
 								}
 							} else {
 								config.panelConfig.package = mod.package;
