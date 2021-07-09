@@ -423,14 +423,14 @@ class Instance extends Entity {
 	private function dropDatabaseUser($dbUser) {
 		go()->getDbConnection()->query("DROP USER '" . $dbUser . "'@'%'");
 	}
-	
-	private function createDatabaseUser($dbName, $dbUsername, $dbPassword) {
-		$sql = "GRANT ALL PRIVILEGES ON `" . $dbName . "`.*	TO ".
-								"'".$dbUsername."'@'%' ".
-								"IDENTIFIED BY '" . $dbPassword . "' WITH GRANT OPTION";			
 
+	private function createDatabaseUser($dbName, $dbUsername, $dbPassword)
+	{
+		$sql = "CREATE USER '" . $dbUsername . "' IDENTIFIED BY '" . $dbPassword . "'";
 		go()->getDbConnection()->query($sql);
-		go()->getDbConnection()->query('FLUSH PRIVILEGES');		
+		$sql = "GRANT ALL PRIVILEGES ON `" . $dbName . "`.* TO '" . $dbUsername . "'@'%'";
+		go()->getDbConnection()->query($sql);
+		go()->getDbConnection()->query('FLUSH PRIVILEGES');
 	}
 	
 //	private function createConfigFile($dbName, $dbUsername, $dbPassword, $tmpPath, $dataPath) {
