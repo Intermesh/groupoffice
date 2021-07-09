@@ -136,7 +136,10 @@ class Token extends Entity {
 				$this->setExpiryDate();
 			}
 			$this->internalSave();
+			return true;
 		}
+
+		return false;
 	}
 	
 	/**
