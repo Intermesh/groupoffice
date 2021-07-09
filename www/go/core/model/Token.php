@@ -128,7 +128,7 @@ class Token extends Entity {
 	}
 
 	public function activity() {
-		if($this->lastActiveAt < new \DateTime("-5 mins")) {
+		if($this->lastActiveAt < new \DateTime("-1 mins")) {
 			$this->lastActiveAt = new \DateTime();
 
 			//also refresh token
@@ -136,6 +136,9 @@ class Token extends Entity {
 				$this->setExpiryDate();
 			}
 			$this->internalSave();
+
+			go()->getCache()->set('token-' . $this->accessToken, $this);
+
 			return true;
 		}
 

@@ -73,9 +73,7 @@ class State extends AbstractState {
 
 			$this->token = go()->getCache()->get('token-' . $tokenStr);
 			if($this->token !== null) {
-				if($this->token->activity()) {
-					go()->getCache()->set('token-' . $tokenStr, $this->token);
-				}
+				$this->token->activity();
 				return $this->token;
 			}
 		
