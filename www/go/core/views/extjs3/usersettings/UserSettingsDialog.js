@@ -165,7 +165,19 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		if(this.modulePanelsLoaded) {
 			return;
 		}
-		var available = go.Modules.getAvailable(), pnl,pnlCls, config, i, i1, l, l2;
+
+		//always add profile
+		const addressBookModuleInstalled = go.Modules.isInstalled("community", "addressbook");
+		if(addressBookModuleInstalled) {
+			this._addPanelCmp(new go.modules.community.addressbook.SettingsProfilePanel({
+				header: false,
+				loaded: false,
+				submitted: false
+			}));
+		}
+
+		const available = go.Modules.getAvailable();
+		let pnl,pnlCls, config, i, i1, l, l2;
 		for(i = 0, l = available.length; i < l; i++) {
 			config = go.Modules.getConfig(available[i].package, available[i].name);
 			
@@ -176,7 +188,10 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			for(i1 = 0, l2 = config.userSettingsPanels.length; i1 < l2; i1++) {
 				pnlCls = eval(config.userSettingsPanels[i1]);
 				pnl = new pnlCls({header: false, loaded: false, submitted: false});
-				if((pnl.adminOnly && go.User.isAdmin) || (!pnl.adminOnly && go.Modules.isAvailable(available[i].package, available[i].name, go.permissionLevels.read, this.user))) {
+				if(
+					!(addressBookModuleInstalled && pnl instanceof go.modules.community.addressbook.SettingsProfilePanel)
+					&& (pnl.adminOnly && go.User.isAdmin) || (!pnl.adminOnly && go.Modules.isAvailable(available[i].package, available[i].name, go.permissionLevels.read, this.user))
+				) {
 					this._addPanelCmp(pnl);
 				}
 			}

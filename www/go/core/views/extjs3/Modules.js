@@ -6,6 +6,11 @@ go.Modules = (function () {
 		this.registered = {};
 	}, Ext.util.Observable, {
 
+		/**
+		 * Contains all registered modules including those the user has no permissions for.
+		 *
+		 * @var {Object}
+		 */
 		registered: null,
 
 		/**
@@ -127,6 +132,17 @@ go.Modules = (function () {
 		},
 
 		/**
+		 * Check if a module is installed
+		 *
+		 * @param package
+		 * @param name
+		 * @return {boolean}
+		 */
+		isInstalled: function (package, name) {
+			return this.getConfig(package, name) !== false;
+		},
+
+		/**
 		 * Get module entity
 		 * 
 		 * @param {string} package
@@ -149,15 +165,6 @@ go.Modules = (function () {
 			}
 
 			return false;
-		},
-
-		/**
-		 * Get all entities including those the current user has no permission for.
-		 * 
-		 * @returns {Module[]}
-		 */
-		getAll: function () {
-			return this.entities;
 		},
 
 		/**
