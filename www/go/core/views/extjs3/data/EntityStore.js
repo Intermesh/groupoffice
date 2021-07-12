@@ -675,7 +675,12 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					return this.single(id);
 				} else
 				{
-					return Promise.reject({message: t("Failed to save"), response: response, error: response.notCreated[id] || null});
+					let msg = t("Failed to save");
+					if(response.notCreated && id in response.notCreated) {
+						msg = response.notCreated[id].description;
+					}
+
+					return Promise.reject({message: msg, response: response, error: response.notCreated[id] || null});
 				}
 			} else
 			{
@@ -683,7 +688,11 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 					return this.single(id);
 				} else
 				{
-					return Promise.reject({message: t("Failed to save"), response: response, error: response.notUpdated[id] || null});
+					let msg = t("Failed to save");
+					if(response.notUpdated && id in response.notUpdated) {
+						msg = response.notUpdated[id].description;
+					}
+					return Promise.reject({message: msg, response: response, error: response.notUpdated[id] || null});
 				}
 			}
 		});
