@@ -178,7 +178,7 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 
 	createNew : function(record) {
 
-		var entity = record.data;
+		const entity = record.data;
 		if(Ext.isObject(this.allowNew)) {
 			Ext.apply(entity, this.allowNew);
 		}
@@ -187,21 +187,20 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 			return;
 		}
 
-		var create = {"newid" : entity}, me = this;
-		//reset store and prevent onChanges call.
 
-		me.collapse();
-		me.store.loaded = false;
-		me.store.removeAll();
+		this.collapse();
+		this.store.loaded = false;
+		this.store.removeAll();
 		//Clear text input or it will recreate fake record.
-		me.setRawValue("");
+		this.setRawValue("");
 
-		return this.store.entityStore.set({
-			create: create
-		}).then(function(response) {
-			me.setValue(response.created.newid.id);
-			return me.setValuePromise;
-		});
+		return this.store.entityStore.save(entity).then((entity) => {
+			this.setValue(entity.id);
+			return this.setValuePromise;
+		}).catch((error) => {
+			GO.errorDialog.show(error.message);
+			return Promise.reject(error.message);
+		})
 	},
 	
 	resolveEntity : function(value) {
