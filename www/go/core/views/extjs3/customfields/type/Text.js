@@ -215,7 +215,6 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 		}
 
 		var strConditionString = this.getConditionString(customfield.relatedFieldCondition);
-		// console.log(strConditionString);
 
 		var func =  new Function(strConditionString);
 		this.requiredConditionMatches = func.call(this);
