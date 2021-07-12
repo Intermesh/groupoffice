@@ -1,3 +1,5 @@
+- Core: Session could be wrongfully destroyed if token not in cache
+
 12-07-2021 6.5.64
 - History: fixed error message when address book not configured;
 - Multisite: Fixed compatibility issue with MySQL 8
