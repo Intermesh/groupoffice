@@ -5,8 +5,8 @@ go.users.UserDefaultsWindow = Ext.extend(go.Window, {
 	title: t("User settings"),
 	autoScroll: true,
 	modal: true,
-	width: dp(800),
-	height: dp(600),
+	width: dp(900),
+	height: dp(700),
 	layout: 'fit',
 	initComponent: function () {
 
@@ -165,6 +165,7 @@ go.users.UserDefaultsWindow = Ext.extend(go.Window, {
 
 		this.bbar = ['->', {
 				text: t("Save"),
+				cls: "primary",
 				handler: function () {
 					this.submit();
 				},
