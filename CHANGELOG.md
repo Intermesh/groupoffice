@@ -1,4 +1,5 @@
 - Core: Session could be wrongfully destroyed if token not in cache
+- Core: Fixed problem with custom field tabs conditions
 
 12-07-2021 6.5.64
 - History: fixed error message when address book not configured;
