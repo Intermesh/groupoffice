@@ -1349,12 +1349,11 @@ Ext.extend(GO.email.EmailComposer, GO.Window, {
 		this.saveButton.setDisabled(true);
 		this.sendButton.setDisabled(true);
 
-		if (autoSave || this.subjectField.getValue() != ''
-			|| confirm(t("You didn't fill in a subject. Are you sure you want to send this message without a subject?", "email"))) {
-			
+		var strNoSubjectMsg = draft ?
+			t("You didn't fill in a subject. Are you sure you want to save this message without a subject?", "email")
+			: t("You didn't fill in a subject. Are you sure you want to send this message without a subject?", "email");
 
-			// extra sync to make sure all is in there.
-			//this.htmlEditor.syncValue();
+		if (autoSave || this.subjectField.getValue() != '' || confirm(strNoSubjectMsg)) {
 
 			var waitMsg=null;
 			if(!autoSave){

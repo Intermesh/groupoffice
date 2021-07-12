@@ -52,7 +52,7 @@ go.grid.ColumnRenderers = {
 	},
 
 	duration : function(minutes, meta, record, rowIndex, columnIndex, store) {
-		return go.util.Format.duration(minutes);
+		return go.util.Format.duration(minutes * 60);
 	},
 
 	countryCode: function(val, meta, record, rowIndex, columnIndex, store) {

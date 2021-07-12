@@ -90,6 +90,7 @@ return array (
   '{blocked_images} external images were blocked for your security.' => '{blocked_images} externe Bilder wurden aus Sicherheitsgründen blockiert.',
   'Click here to unblock them' => 'Zur Ansicht hier klicken',
   'You didn\'t fill in a subject. Are you sure you want to send this message without a subject?' => 'Sie haben keinen Betreff eingetragen. Sind Sie sicher, dass Ihre Nachricht ohne Betreff gesendet werden soll?',
+  'You didn\'t fill in a subject. Are you sure you want to save this message without a subject?' => 'Sie haben keinen Betreff eingetragen. Sind Sie sicher, dass Ihre Nachricht ohne Betreff gespeichert werden soll?',
   'Search through {product_name}' => '{product_name} durchsuchen',
   'Toggle message window position' => 'Nachrichtenansicht umschalten',
   'Close the upload dialog first or wait for the upload to finish' => 'Schließen Sie zuerst den Upload-Dialog oder warten Sie, bis der Upload beendet ist',

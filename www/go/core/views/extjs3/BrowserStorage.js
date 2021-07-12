@@ -18,7 +18,6 @@ go.browserStorage = {
 		let intervalId;
 		return new Promise((resolve) => {
 			const tryIdb = () => {
-				console.log("tryidb");
 				indexedDB.databases().finally(resolve)
 			};
 
