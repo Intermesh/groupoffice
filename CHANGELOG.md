@@ -1,3 +1,4 @@
+- Email: added confirm message when saving an email without a subject (instead of sending)
 - Core: Session could be wrongfully destroyed if token not in cache
 - Core: Fixed problem with custom field tabs conditions
 - Projects: Fixed missing columns in time tracking export
