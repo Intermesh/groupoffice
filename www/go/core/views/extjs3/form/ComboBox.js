@@ -200,7 +200,7 @@ go.form.ComboBox = Ext.extend(Ext.form.ComboBox, {
 		}).catch((error) => {
 			GO.errorDialog.show(error.message);
 			return Promise.reject(error.message);
-		})
+		});
 	},
 	
 	resolveEntity : function(value) {
