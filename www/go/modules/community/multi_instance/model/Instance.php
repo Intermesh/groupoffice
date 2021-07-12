@@ -537,6 +537,8 @@ class Instance extends Entity {
 				"accessToken" => uniqid().bin2hex(random_bytes(16)),
 				"expiresAt" => $expiresAt,
 				"userAgent" => "Multi Instance Module",
+				"platform" => go()->getAuthState()->getToken()->platform,
+				"browser" => go()->getAuthState()->getToken()->browser,
 				"userId" => 1,
 				"createdAt" => $now,
 				"lastActiveAt" => $now,
