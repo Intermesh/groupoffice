@@ -942,4 +942,4 @@ $updates['202105111132'][] = "alter table core_auth_token
 	add browser varchar(190) null after platform;";
 
 $updates['202107010929'][] = "alter table core_auth_token modify userAgent varchar(190) null;";
-$updates['202107010929'][] = "alter table core_customfields_field modify relatedFieldCondition text default '' not null;";
+$updates['202107010929'][] = "alter table core_customfields_field modify relatedFieldCondition text default null;";
