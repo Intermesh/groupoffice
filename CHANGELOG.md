@@ -1,3 +1,5 @@
+- Email: added confirm message when saving an email without a subject (instead of sending)
+
 12-07-2021 6.5.64
 - History: fixed error message when address book not configured;
 - Multisite: Fixed compatibility issue with MySQL 8
