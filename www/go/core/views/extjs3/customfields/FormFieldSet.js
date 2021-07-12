@@ -87,7 +87,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		//The old framework will use this to save custom fields.
 		if (!form.changeListenersAdded) {
 
-			form.changeListenersAdded  = true;
+			form.changeListenersAdded = true;
 
 			if (form.getXType() == "entityform") {
 
@@ -95,26 +95,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 					this.filter(form.getValues());
 					form.isValid();
 				}, this);
-
-				this.filter(form.getValues());
-				form.isValid();
-
-
-
-				form.getForm().items.each( (field) => {
-					field.on('change', (field) => {
-						form.getForm().isValid();
-						this.filter(form.getValues());
-					});
-					field.on('check', (field, checked) => {
-						form.getForm().isValid();
-					});
-
-				});
-
 			} else {
-
-
 				//Legacy code
 
 				form.getForm().on("beforeaction", function (form, action) {
@@ -131,29 +112,49 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 					return true;
 				});
 
-				form.getForm().items.each( (field) => {
-					field.on('change', (field) => {
-						form.getForm().isValid();
-						me.filter(form.getForm().getFieldValues());
-					});
-					field.on('check', (field, checked) => {
-						form.getForm().isValid();
-					});
+				form.getForm().on("actioncomplete", function (f, action) {
+					if (action.type === "load") {
+						f.isValid(); //needed for conditionally hidden
+					}
+				}, this);
 
-				});
 			}
 
-
+			form.getForm().items.each( (field) => {
+				field.on('change', (field) => {
+					form.getForm().isValid();
+				});
+				field.on('check', (field, checked) => {
+					form.getForm().isValid();
+				});
+			});
 		}
 
-		if (form.getXType() != "entityform") {
+		form.getForm().items.each( (field) => {
+			field.on('change', (field) => {
+				this.filter(form.getValues());
+			});
+		});
+
+
+		if (form.getXType() == "entityform") {
+
+			form.on("setvalues", function () {
+				this.filter(form.getValues());
+			}, this);
+
+			this.filter(form.getValues());
+			form.isValid();
+
+		} else {
 			form.getForm().on("actioncomplete", function (f, action) {
 				if (action.type === "load") {
 					this.filter(f.getFieldValues());
-					f.isValid(); //needed for conditionally hidden
 				}
 			}, this);
 		}
+
+
 
 	},
 
@@ -182,7 +183,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		}		
 		this.setFilterVisible(true);
 	},
-	
+
 	setFilterVisible : function(v) {
 		//disable recursive so validators don't apply on hidden items
 		function setDisabled(ct, v) {
