@@ -75,7 +75,7 @@ class Builder
 	private $variants = [
 	        [
 		        "archiveSuffix" => "",
-			    "name" => "sixfive",
+			    "name" => "sixsix",
 			    "encoderOptions" => "-71 --allow-reflection-all"
 		    ]
 	];
@@ -150,9 +150,10 @@ class Builder
             $this->buildDebianPackage();
 
             if(!$this->test) {
-	            $this->createGithubRelease();
+//	            $this->createGithubRelease();
 	            $this->addToDebianRepository();
-	            $this->sendTarToSF();
+	            $this->addToDebianRepository();
+//	            $this->sendTarToSF();
             }
 
 
