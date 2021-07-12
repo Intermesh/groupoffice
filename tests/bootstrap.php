@@ -81,6 +81,7 @@ try {
 				Module::install($moduleController->name());
 			}
 		}
+		go()->rebuildCache();
 		GO::$ignoreAclPermissions = false;
 
 		echo "Installing demo data\n";

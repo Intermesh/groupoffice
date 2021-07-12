@@ -8,6 +8,11 @@ Core: Alert system to notify users about comments, assigned tasks etc.
 Core: Made "Remember me" more secure by using a special token. (See https://stackoverflow.com/a/244907)
 ----
 
+12-07-2021 6.5.64
+- History: fixed error message when address book not configured;
+- Multisite: Fixed compatibility issue with MySQL 8
+- Core: Fixed invalid install sql for older mysql servers
+
 08-07-2021 6.5.63
 - Google authenticator: New feature to enforce setup for a user group
 - Timeregistration: Fixed several render errors minutes > seconds

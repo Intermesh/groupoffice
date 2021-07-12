@@ -133,7 +133,9 @@ abstract class Module extends Singleton {
 			$this->installDatabase();
 			go()->getDbConnection()->resumeTransactions();
 
-			go()->rebuildCache(true);
+			if(!Installer::isInstalling()) {
+				go()->rebuildCache(true);
+			}
 
 			go()->getDbConnection()->beginTransaction();
 		
@@ -214,8 +216,11 @@ abstract class Module extends Singleton {
 		if(!$model->save()) {
 			return false;
 		}
-		
-		go()->rebuildCache(true);
+
+		if(!Installer::isInstalling()) {
+			go()->rebuildCache(true);
+		}
+
 
 		if(!model\Module::delete(['name' => static::getName(), 'package' => static::getPackage()])) {
 			return false;
