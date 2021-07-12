@@ -1,6 +1,7 @@
-6.5.64
-- History: fixed error message when address bookn not configured;
+12-07-2021 6.5.64
+- History: fixed error message when address book not configured;
 - Multisite: Fixed compatibility issue with MySQL 8
+- Core: Fixed invalid install sql for older mysql servers
 
 08-07-2021 6.5.63
 - Google authenticator: New feature to enforce setup for a user group
