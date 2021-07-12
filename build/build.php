@@ -152,7 +152,6 @@ class Builder
             if(!$this->test) {
 //	            $this->createGithubRelease();
 	            $this->addToDebianRepository();
-	            $this->addToDebianRepository();
 //	            $this->sendTarToSF();
             }
 
