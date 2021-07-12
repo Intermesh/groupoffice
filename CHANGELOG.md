@@ -1,3 +1,4 @@
+12-07-2021 6.5.65
 - Email: added confirm message when saving an email without a subject (instead of sending)
 - Core: Session could be wrongfully destroyed if token not in cache
 - Core: Fixed problem with custom field tabs conditions
