@@ -1,4 +1,5 @@
 - Core: Fixed "required" on Multiselect field
+- Projects2: fix for missing pr2_standard_tasks table in upgrade
 
 12-07-2021 6.5.66
 - Projects2: fix for missing pr2_standard_tasks table in upgrade
