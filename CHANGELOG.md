@@ -8,6 +8,9 @@ Core: Alert system to notify users about comments, assigned tasks etc.
 Core: Made "Remember me" more secure by using a special token. (See https://stackoverflow.com/a/244907)
 ----
 
+- Core: Fixed "required" on Multiselect field
+- Projects2: fix for missing pr2_standard_tasks table in upgrade
+
 12-07-2021 6.5.66
 - Projects2: fix for missing pr2_standard_tasks table in upgrade
 
