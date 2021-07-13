@@ -795,9 +795,8 @@ use const GO_CONFIG_FILE;
 		}
 
 
-		public function demo() {
+		public function demo(Faker\Generator $faker) {
 
-			$faker = Faker\Factory::create();
 
 			for($i = 0; $i < 10; $i++) {
 				echo ".";
