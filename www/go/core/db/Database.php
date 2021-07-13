@@ -10,6 +10,10 @@ class Database {
 
 	private $conn;
 
+	private $name;
+
+	private $user;
+
 	/**
 	 *
 	 * MariaDB:
@@ -102,22 +106,33 @@ class Database {
 	 * @return string eg. "user@localhost"
 	 */
 	public function getUser() {
-		$sql = "SELECT USER();";
-		$stmt = $this->conn->query($sql);
-		$stmt->setFetchMode(PDO::FETCH_COLUMN, 0);
-		return  $stmt->fetch();		
+
+		if(!isset($this->user)) {
+			$sql = "SELECT USER();";
+			$stmt = $this->conn->query($sql);
+			$stmt->setFetchMode(PDO::FETCH_COLUMN, 0);
+			$this->user = $stmt->fetch();
+		}
+		return $this->user;
 	}
-	
+
+
+
 	/**
 	 * Get database name
 	 * 
 	 * @return string
 	 */
 	public function getName() {
-		$sql = "SELECT DATABASE();";
-		$stmt = $this->conn->query($sql);
-		$stmt->setFetchMode(PDO::FETCH_COLUMN, 0);
-		return $stmt->fetch();				
+
+		if(!isset($this->name)) {
+			$sql = "SELECT DATABASE();";
+			$stmt = $this->conn->query($sql);
+			$stmt->setFetchMode(PDO::FETCH_COLUMN, 0);
+			$this->name = $stmt->fetch();
+		}
+
+		return $this->name;
 	}
 	
 	/**

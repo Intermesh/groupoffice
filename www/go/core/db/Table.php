@@ -18,6 +18,17 @@ use PDO;
 class Table {
 
 	private static $cache = [];
+
+	private $name;
+	protected $columns;
+	protected $indexes;
+
+	private $pk = [];
+
+	/**
+	 * @var Connection
+	 */
+	protected $conn;
 	
 	/**
 	 * Get a table instance
@@ -61,16 +72,7 @@ class Table {
 		self::$cache = [];
 	}
 	
-	private $name;
-	protected $columns;	
-	protected $indexes;
 
-	private $pk = [];
-
-	/**
-	 * @var Connection
-	 */
-	private $conn;
 	public function __construct($name, Connection $conn) {
 		$this->name = $name;
 		$this->conn = $conn;
@@ -120,7 +122,6 @@ class Table {
 			$this->columns = $cache['columns'];
 			$this->pk = $cache['pk'];
 			$this->indexes = $cache['indexes'] ?? null;
-			$this->conn = null;
 			return;
 		}	
 		
@@ -135,8 +136,6 @@ class Table {
 
 		$this->processIndexes($this->name);
 
-		//Not needed anymore when we serialize
-		$this->conn = null;
 
 		App::get()->getCache()->set($cacheKey, ['columns' => $this->columns, 'pk' => $this->pk, 'indexes' => $this->indexes]);
 
@@ -398,14 +397,40 @@ class Table {
 
 		go()->getDbConnection()->exec("INSERT INTO `$tableName` SELECT * FROM `" . $this->getName() . "`");
 	}
-	
+
 	// /**
 	//  * Truncate the table
-	//  * 
+	//  *
 	//  * @return boolean
 	//  */
 	// public function truncate() {
 	// 	return $this->conn->query("TRUNCATE TABLE ".$this->getName())->execute();
 	// }
+
+	public function __serialize()
+	{
+		if($this->conn != go()->getDbConnection()) {
+			throw new Exception("Can't serialize tables with custom database connection");
+		}
+
+		return [
+			'name' => $this->name,
+			'columns' => $this->columns,
+			'indexes' => $this->indexes,
+			'pk' => $this->pk
+		];
+
+	}
+
+	public function __unserialize($data)
+	{
+		$this->conn = go()->getDbConnection();
+
+		$this->name = $data['name'];
+		$this->columns = $data['columns'];
+		$this->indexes = $data['indexes'];
+		$this->pk = $data['pk'];
+
+	}
 
 }
