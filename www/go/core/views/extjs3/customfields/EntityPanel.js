@@ -213,7 +213,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 						return;
 					}
 
-					const record = this.store.getAt(me.store.findBy((record) => {
+					const record = this.store.getAt(this.store.findBy((record) => {
 						if (record.data.isFieldSet && record.data.fieldSetId === e.id) {
 							return true;
 						}
@@ -258,7 +258,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 						return;
 					}
 
-					const record = this.store.getAt(me.store.findBy(function (record) {
+					const record = this.store.getAt(this.store.findBy(function (record) {
 						if (record.data.fieldId === e.id) {
 							return true;
 						}
@@ -445,7 +445,7 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 
 	doDelete: function (selectedRecords) {
 
-		var fieldSetIds = [], fieldIds = [], me = this;
+		const fieldSetIds = [], fieldIds = [];
 		selectedRecords.forEach(function (r) {
 			if (r.data.isFieldSet) {
 				fieldSetIds.push(r.data.fieldSetId);
@@ -456,22 +456,22 @@ go.customfields.EntityPanel = Ext.extend(go.grid.GridPanel, {
 		});
 
 		if (fieldSetIds.length) {
-			me.getEl().mask(t("Deleting..."));
+			this.getEl().mask(t("Deleting..."));
 
 			go.Db.store("FieldSet").set({
 				destroy: fieldSetIds
 			}).finally(function() {
-				me.getEl().unmask();
+				this.getEl().unmask();
 			});
 		}
 
 		if (fieldIds.length) {
-			me.getEl().mask(t("Deleting..."));
+			this.getEl().mask(t("Deleting..."));
 
 			go.Db.store("Field").set({
 				destroy: fieldIds
 			}).finally(function() {
-				me.getEl().unmask();
+				this.getEl().unmask();
 			});
 		}
 	},
