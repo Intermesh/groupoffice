@@ -8,9 +8,12 @@ use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
 use go\core\fs\File;
+use go\core\jmap\Entity;
 use go\core\model\CronJobSchedule;
 use go\core\event\Listeners;
 use go\core\model\Module;
+use Faker;
+
 
 use function GO;
 
@@ -164,6 +167,32 @@ class System extends Controller {
 		}
 
 		return $unknown;
+	}
+
+	public function demo() {
+
+		$faker = Faker\Factory::create();
+
+		Entity::$trackChanges = false;
+		\go\modules\community\history\Module::$enabled = false;
+		//go()->getDebugger()->enabled = false;
+
+		$modules = Module::find()->where('name','=', 'tasks');
+
+		foreach($modules as $module) {
+			if(!$module->isAvailable()) {
+				continue;
+			}
+			echo "Creating demo for module ". ($modules->package ?? "legacy") . "/" .$module->name ."\n";
+			$module->module()->demo($faker);
+
+			echo "\n\nDone\n\n";
+		}
+
+		// for resyncing
+		go()->rebuildCache();
+
+		echo "\n\nAll done!\n\n";
 	}
 
 

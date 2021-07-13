@@ -59,7 +59,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			width: dp(300),
 			cls: 'go-sidenav',
 			region: "west",
-			layout:"border",
 			split: true,
 			tbar: this.sidePanelTbar = new Ext.Toolbar({
 				//cls: 'go-narrow',
@@ -75,36 +74,33 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				}]
 			}),
 
-			items: [
+
+			autoScroll: true,
+
+			layout:'anchor',
+			items:[
+				this.filterPanel,
 				{
-					autoScroll: true,
-					region: "center",
-					layout:'anchor',
-					items:[
-						this.filterPanel,
+					xtype: "fieldset",
+					items: [
 						{
-							xtype: "fieldset",
-							items: [
-								{
-									hideLabel: true,
-									xtype: "checkbox",
-									boxLabel: t("Show completed"),
-									value: false,
-									listeners: {
-										scope: this,
-										check: function(cb, checked) {
-											this.showCompleted(checked);
-											this.taskGrid.store.load();
-										}
-									}
+							hideLabel: true,
+							xtype: "checkbox",
+							boxLabel: t("Show completed"),
+							value: false,
+							listeners: {
+								scope: this,
+								check: function(cb, checked) {
+									this.showCompleted(checked);
+									this.taskGrid.store.load();
 								}
-							]
-						},
-						this.categoriesGrid,
-						this.createFilterPanel()
+							}
+						}
 					]
 				},
-				this.tasklistsGrid
+				this.tasklistsGrid,
+				this.categoriesGrid,
+				this.createFilterPanel(),
 
 			]
 		});
@@ -315,9 +311,10 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 	createTasklistGrid : function() {
 		this.tasklistsGrid = new go.modules.community.tasks.TasklistsGrid({
-			region: "south",
-			height: dp(200),
-			border: true,
+
+			maxHeight: dp(400),
+			autoHeight: true,
+			// border: true,
 
 			filteredStore: this.taskGrid.store,
 			filterName: 'tasklistId',
