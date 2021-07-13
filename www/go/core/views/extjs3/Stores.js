@@ -1,6 +1,8 @@
 
 go.Db = (function() {
-	var stores = {};
+
+	const stores = {};
+
 	return {			
 		/**
 		 * Get EntityStore by entity name
@@ -9,9 +11,10 @@ go.Db = (function() {
 		 * @returns {Boolean|go.data.EntityStore}
 		 */
 		store: function (entityName) {
-			lcname = entityName.toLowerCase();
+
+			const lcname = entityName.toLowerCase();
 			
-			var entity = go.Entities.get(lcname);
+			const entity = go.Entities.get(lcname);
 			if(!entity) {
 				console.debug("'" + entityName + "' is not a registered store. Registered entities: ", go.Entities.getAll().column('name'));
 				return false;
@@ -33,7 +36,7 @@ go.Db = (function() {
 		 * @returns {Object[]}
 		 */
 		stores : function() {
-			var all = [];
+			const all = [];
 
 			go.Entities.getAll().forEach(function(e) {
 				all.push(go.Db.store(e.name));

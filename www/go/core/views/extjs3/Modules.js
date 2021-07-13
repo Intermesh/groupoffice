@@ -93,7 +93,7 @@ go.Modules = (function () {
 				return false;
 			}
 
-			var module = this.get(package, name);
+			const module = this.get(package, name);
 			if (!module) {
 				return false;
 			}
@@ -104,7 +104,7 @@ go.Modules = (function () {
 			}
 
 			//if a user is given we must check the groups			
-			for(groupId in module.acl) {
+			for(let groupId in module.acl) {
 				if(module.acl[groupId] >= permissionLevel && user.groups.indexOf(parseInt(groupId)) != -1) {
 					return true;
 				}

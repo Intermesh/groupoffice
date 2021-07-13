@@ -1267,6 +1267,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 });
 
 GO.mainLayout.onReady(function(){
+
+	let countEmailShown;
 	//GO.email.Composer = new GO.email.EmailComposer();
 
 	//contextmenu when an e-mail address is clicked
@@ -1298,14 +1300,14 @@ GO.mainLayout.onReady(function(){
 			}
 		}
 
-		if((!data.email_status.has_new && this.countEmailShown)
+		if((!data.email_status.has_new && countEmailShown)
 			|| data.email_status.total_unseen <= 0
-			|| (this.countEmailShown && this.countEmailShown >= data.email_status.total_unseen)){
+			|| (countEmailShown && countEmailShown >= data.email_status.total_unseen)){
 
-			this.countEmailShown = data.email_status.total_unseen;
+			countEmailShown = data.email_status.total_unseen;
 			return;
 		}
-		this.countEmailShown = data.email_status.total_unseen;
+		countEmailShown = data.email_status.total_unseen;
 		var title = t("New email"),
 			text = t("You have %d unread email(s)").replace('%d', data.email_status.total_unseen);
 
