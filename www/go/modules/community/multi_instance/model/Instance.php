@@ -540,13 +540,17 @@ class Instance extends Entity {
 				"accessToken" => uniqid().bin2hex(random_bytes(16)),
 				"expiresAt" => $expiresAt,
 				"userAgent" => "Multi Instance Module",
-				"platform" => go()->getAuthState()->getToken()->platform,
-				"browser" => go()->getAuthState()->getToken()->browser,
 				"userId" => 1,
 				"createdAt" => $now,
 				"lastActiveAt" => $now,
 				"remoteIpAddress" => $_SERVER['REMOTE_ADDR']
 		];
+
+		if($this->getInstanceDbConnection()->getDatabase()->getTable("core_auth_token")->hasColumn('platform')) {
+			//available since 6.5
+			$data["platform"] = go()->getAuthState()->getToken()->platform;
+			$data["browser"] = go()->getAuthState()->getToken()->browser;
+		}
 		
 		if(!$this->getInstanceDbConnection()->insert('core_auth_token', $data)->execute()) {
 			throw new \Exception("Failed to create access token");
