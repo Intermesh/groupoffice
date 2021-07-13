@@ -38,7 +38,7 @@ class Database {
 
 	private function queryVersion() {
 		if(!isset($this->version)) {
-			$this->version = go()->getDbConnection()->query("SELECT VERSION()")->fetchColumn(0);
+			$this->version = $this->conn->query("SELECT VERSION()")->fetchColumn(0);
 		}
 
 		return $this->version;
@@ -103,7 +103,7 @@ class Database {
 	 */
 	public function getUser() {
 		$sql = "SELECT USER();";
-		$stmt = App::get()->getDbConnection()->query($sql);
+		$stmt = $this->conn->query($sql);
 		$stmt->setFetchMode(PDO::FETCH_COLUMN, 0);
 		return  $stmt->fetch();		
 	}
@@ -115,7 +115,7 @@ class Database {
 	 */
 	public function getName() {
 		$sql = "SELECT DATABASE();";
-		$stmt = App::get()->getDbConnection()->query($sql);
+		$stmt = $this->conn->query($sql);
 		$stmt->setFetchMode(PDO::FETCH_COLUMN, 0);
 		return $stmt->fetch();				
 	}
@@ -128,7 +128,7 @@ class Database {
 	public function setUtf8() {
 		//Set utf8 as collation default
 		$sql = "ALTER DATABASE `" .$this->getName() . "` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";		
-		return App::get()->getDbConnection()->exec($sql) !== false;
+		return $this->conn->exec($sql) !== false;
 	}
 }
 
