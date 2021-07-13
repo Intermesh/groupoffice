@@ -64,16 +64,19 @@ try {
 		$token = Token::find()->where('accessToken', '=', $_POST['accessToken'])->single();
 		if($token) {
 			$token->setAuthenticated();
+
+			Response::get()->setCookie('accessToken', $token->accessToken, [
+				"path" => "/",
+				"samesite" => "Lax",
+				"domain" => Request::get()->getHost()
+			]);
+
 		} else
 		{
 			unset($_POST['accessToken']);
 		}
 
-		Response::get()->setCookie('accessToken', $token->accessToken, [
-			"path" => "/",
-			"samesite" => "Lax",
-			"domain" => Request::get()->getHost()
-		]);
+
 
 		date_default_timezone_set($old);
 	}
