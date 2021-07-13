@@ -91,7 +91,7 @@ class Table {
 	}
 
 	private function getCacheKey() {
-		return 'dbColumns_' . $this->name;
+		return 'dbColumns_' . $this->conn->getDatabase()->getName() . '_' . $this->name;
 	}
 
 	/**
