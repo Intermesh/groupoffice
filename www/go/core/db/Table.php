@@ -422,9 +422,4 @@ class Table {
 //
 //	}
 
-		public function __wakeup()
-		{
-			$this->conn = go()->getDbConnection();
-		}
-
 }
