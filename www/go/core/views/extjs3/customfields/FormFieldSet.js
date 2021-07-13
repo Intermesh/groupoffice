@@ -130,14 +130,16 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			});
 		}
 
-		form.getForm().items.each( (field) => {
-			field.on('change', (field) => {
-				this.filter(form.getValues());
-			});
-		});
+
 
 
 		if (form.getXType() == "entityform") {
+
+			form.getForm().items.each( (field) => {
+				field.on('change', (field) => {
+					this.filter(form.getValues());
+				});
+			});
 
 			form.on("setvalues", function () {
 				this.filter(form.getValues());
@@ -152,6 +154,12 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 					this.filter(f.getFieldValues());
 				}
 			}, this);
+
+			form.getForm().items.each( (field) => {
+				field.on('change', (field) => {
+					this.filter(form.getForm().getValues());
+				});
+			});
 		}
 
 
