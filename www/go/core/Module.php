@@ -115,7 +115,7 @@ abstract class Module extends Singleton {
 		$isEncoded = go()->getCache()->get('source-is-encoded');
 
 		if($isEncoded === null) {
-			$isEncoded = ClassFinder::fileIsEncoded(new File(dirname(__DIR__) . 'modules/business/license/model/License.php'));
+			$isEncoded = ClassFinder::fileIsEncoded(new File(dirname(__DIR__) . '/modules/business/license/model/License.php'));
 			go()->getCache()->set('source-is-encoded', $isEncoded);
 		}
 
