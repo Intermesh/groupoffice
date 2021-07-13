@@ -121,30 +121,30 @@ class MappedTable extends Table {
 		return $this->keys;
 	}
 
-	public function __serialize()
-	{
-		return array_merge(
-			parent::__serialize(),
-			[
-				'alias' => $this->alias,
-				'keys' => $this->keys,
-				'mappedColumns' => $this->mappedColumns,
-				'constantValues' => $this->constantValues,
-				'isUserTable' => $this->isUserTable
-			]
-		);
-	}
-
-	public function __unserialize($data)
-	{
-		$this->alias = $data['alias'];
-		$this->keys = $data['keys'];
-		$this->mappedColumns = $data['mappedColumns'];
-		$this->constantValues = $data['constantValues'];
-		$this->isUserTable = $data['isUserTable'];
-
-		parent::__unserialize($data);
-	}
+//	public function __serialize()
+//	{
+//		return array_merge(
+//			parent::__serialize(),
+//			[
+//				'alias' => $this->alias,
+//				'keys' => $this->keys,
+//				'mappedColumns' => $this->mappedColumns,
+//				'constantValues' => $this->constantValues,
+//				'isUserTable' => $this->isUserTable
+//			]
+//		);
+//	}
+//
+//	public function __unserialize($data)
+//	{
+//		$this->alias = $data['alias'];
+//		$this->keys = $data['keys'];
+//		$this->mappedColumns = $data['mappedColumns'];
+//		$this->constantValues = $data['constantValues'];
+//		$this->isUserTable = $data['isUserTable'];
+//
+//		parent::__unserialize($data);
+//	}
 }
 
 
