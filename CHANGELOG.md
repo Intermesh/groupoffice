@@ -220,9 +220,13 @@
 
 
 
+- MultiInstance: Fixed compatibility issue with MySQL 8+
+- Core: Check invalid characters in username.
+
 06-07-2021 6.4.239
 - Timeregistration: Fixed time tracking sums
 - Projects: fixed this.filter() is undefined error
+- Calendar / core: Fixed setting reminders for all attendees
 
 28-06-2021 6.4.238
 - Core: fixed required condition in custom fields with != in the condition and updates when form fields change
