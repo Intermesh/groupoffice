@@ -84,6 +84,8 @@ class Module extends core\Module {
 				$task->responsibleUserId = $task->createdBy;
 				$task->due = $task->start = $faker->dateTimeBetween("-5 years", "now");
 				$task->tasklistId = $tasklist->id;
+				$task->percentComplete = $faker->randomElement([0, 20, 50, 80, 100]);
+
 				if(!$task->save()) {
 					throw new core\orm\exception\SaveException($task);
 				}
