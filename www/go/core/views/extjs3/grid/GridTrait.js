@@ -202,12 +202,16 @@ go.grid.GridTrait = {
 	
 	//Always enforce room for scrollbar so last column in resizable because of our custom header button.
 	initScrollOffset : function() {
-		
-		if(this.autoHeight || this.getView().scrollOffset === 0) {
+
+		const scrollOffset = Ext.getScrollBarWidth();
+
+		console.warn(scrollOffset);
+
+		if((this.autoHeight && !this.maxHeight) || scrollOffset == 0) {
 			return;
 		}
 		
-		this.getView().scrollOffset = Ext.getScrollBarWidth();
+		this.getView().scrollOffset = scrollOffset;
 		
 	},
 	

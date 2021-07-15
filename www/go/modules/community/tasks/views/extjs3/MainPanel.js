@@ -78,6 +78,9 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			autoScroll: true,
 
 			layout:'anchor',
+			defaults: {
+				anchor: (-1 * Ext.getScrollBarWidth()).toString()
+			},
 			items:[
 				this.filterPanel,
 				{
