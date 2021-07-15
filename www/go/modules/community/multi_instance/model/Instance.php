@@ -426,7 +426,7 @@ class Instance extends Entity {
 	private function dropDatabaseUser($dbUser) {
 		go()->getDbConnection()->query("DROP USER '" . $dbUser . "'@'%'");
 	}
-
+	
 	private function createDatabaseUser($dbName, $dbUsername, $dbPassword)
 	{
 		$sql = "CREATE USER '" . $dbUsername . "' IDENTIFIED BY '" . $dbPassword . "'";
@@ -551,7 +551,7 @@ class Instance extends Entity {
 			$data["platform"] = go()->getAuthState()->getToken()->platform;
 			$data["browser"] = go()->getAuthState()->getToken()->browser;
 		}
-		
+
 		if(!$this->getInstanceDbConnection()->insert('core_auth_token', $data)->execute()) {
 			throw new \Exception("Failed to create access token");
 		}

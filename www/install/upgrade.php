@@ -29,6 +29,11 @@ try {
 
 	echo "<section><div class=\"card\">";
 
+	echo ' <div class="mask-message">
+                <div class="x-mask-loading"></div>
+                Please wait...
+            </div>';
+
 	go()->getInstaller()->isValidDb();
 
 	Table::destroyInstances();
@@ -52,7 +57,7 @@ try {
 		
 		echo '</p>';
 		echo '<a class="button accent" href="license.php">Install license</a>';
-		echo '<a class="right button primary" href="?confirmed=1">Upgrade database</a></div>';
+		echo '<a class="right button primary" href="?confirmed=1" onclick="document.getElementsByClassName(\'card\')[0].classList.add(\'mask\')">Upgrade database</a></div>';
 	
 	} elseif (!isset($_GET['ignore']) && count($unavailable)) {
 	
@@ -65,7 +70,7 @@ try {
 		. "If you continue the incompatible modules will be disabled.</p>";
 
 		echo '<a class="button secondary" href="license.php">Install license</a>';
-		echo '<a class="right button primary" href="?ignore=modules&confirmed=1">Disable &amp; Continue</a>';
+		echo '<a class="right button primary" href="?ignore=modules&confirmed=1" onclick="document.getElementsByClassName(\'card\')[0].classList.add(\'mask\')">Disable &amp; Continue</a>';
 
 		echo "</div>";
 
@@ -77,7 +82,7 @@ try {
 		go()->getInstaller()->upgrade();	
 
 		echo "</pre>";
-		echo '<a class="button right primary" href="../">' . go()->t('Continue') . '</a>';
+		echo '<a class="button right primary" href="../" onclick="document.getElementsByClassName(\'card\')[0].classList.add(\'mask\')">' . go()->t('Continue') . '</a>';
 
 		echo "</div>";
 

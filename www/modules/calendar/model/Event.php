@@ -803,7 +803,8 @@ class Event extends \GO\Base\Db\ActiveRecord {
 					'description'=>$this->description,
 					'rrule'=>$this->rrule,
 					'status'=>$this->status,
-					'repeat_end_time'=>$this->repeat_end_time
+					'repeat_end_time'=>$this->repeat_end_time,
+					'reminder' => $this->reminder
 							);
 			
 			if($this->isModified(array_keys($updateAttr))){

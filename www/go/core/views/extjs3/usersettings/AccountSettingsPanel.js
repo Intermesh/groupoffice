@@ -48,7 +48,9 @@ go.usersettings.AccountSettingsPanel = Ext.extend(Ext.Panel, {
 						fieldLabel: t("Username"),
 						needPasswordForChange: true,
 						allowBlank: false,
-						autocomplete: "off"
+						autocomplete: "off",
+						regex: /^[A-Za-z0-9_\-\.\@]*$/,
+						regexText: t("You have invalid characters in the username") + " (a-z, 0-9, -, _, ., @)."
 					}),
 					this.displayNameField = new Ext.form.TextField({
 						fieldLabel: t('Display name','users','core'),

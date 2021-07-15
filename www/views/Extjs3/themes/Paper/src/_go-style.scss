@@ -2364,6 +2364,35 @@ table[id^="comments-ext"] b {
 		opacity: 0.65;
 		cursor: not-allowed;
 	}
+
+	.mask-message{
+		display: none;
+		position: absolute;
+		height: dp(56);
+		width: dp(200);
+		top: 50%;
+		left: 50%;
+		margin-top: dp(-24);
+		margin-left: dp(-100);
+		background-color: white;
+		border: 1px solid color($fg, 'line');
+		text-align: center;
+		padding: dp(16);
+		border-radius: 4px;
+	}
+
+	.mask {
+		>*:not(.mask-message) {
+			visibility: hidden;
+		}
+		position: relative;
+		background-color: color($bg, 'background');
+		pointer-events: none;
+		.mask-message {
+			display: block;
+		}
+
+	}
 }
 
 

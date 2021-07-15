@@ -21,6 +21,7 @@ use go\core\db\Criteria;
 use go\core\ErrorHandler;
 use go\core\Installer;
 use go\core\mail\Message;
+use go\core\mail\Util;
 use go\core\orm\Query;
 use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
@@ -59,6 +60,8 @@ class User extends Entity {
 	 * @param User $user Can be null
 	 */
 	const EVENT_BADLOGIN = 'badlogin';
+
+	const USERNAME_REGEX = '/[A-Za-z0-9_\-\.@]+/';
 	
 	public $validatePassword = true;
 
@@ -471,7 +474,14 @@ class User extends Entity {
 		if(!isset($this->homeDir)) {
 			$this->homeDir = "users/" . $this->username;
 		}
-		
+
+		if($this->isModified(['username'])) {
+
+			if(!preg_match(self::USERNAME_REGEX, $this->username)) {
+				$this->setValidationError('username', ErrorCode::MALFORMED, go()->t("You have invalid characters in the username") . " (a-z, 0-9, -, _, ., @).");
+			}
+		}
+
 		if($this->isModified('groups')) {	
 			
 			
@@ -512,10 +522,16 @@ class User extends Entity {
 		}
 
 		if($this->isModified(['email'])) {
-			$id = \go\core\model\User::find()->selectSingleValue('id')->where(['email' => $this->email])->single();
-			
-			if($id && $id != $this->id){
-				$this->setValidationError('email', ErrorCode::UNIQUE, 'The e-mail address must be unique in the system');
+
+			if(!Util::validateEmail($this->email)) {
+				$this->setValidationError('email', ErrorCode::MALFORMED);
+			} else {
+
+				$id = \go\core\model\User::find()->selectSingleValue('id')->where(['email' => $this->email])->single();
+
+				if ($id && $id != $this->id) {
+					$this->setValidationError('email', ErrorCode::UNIQUE, 'The e-mail address must be unique in the system');
+				}
 			}
 		}
 
