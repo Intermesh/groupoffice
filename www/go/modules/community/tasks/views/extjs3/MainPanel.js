@@ -69,7 +69,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				}]
 			}),
 
-			autoScroll: true,
 			bodyStyle: 'overflow-y: auto',
 
 			layout:'fitwidth',

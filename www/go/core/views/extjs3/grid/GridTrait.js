@@ -37,7 +37,7 @@ go.grid.GridTrait = {
 		
 		this.initHeaderMenu();
 
-		if(this.scrollLoader) {
+		if(this.scrollLoader && !this.showMoreLoader) {
 			Ext.applyIf(this, go.panels.ScrollLoader);
 			this.initScrollLoader();
 		}
@@ -101,6 +101,8 @@ go.grid.GridTrait = {
 		if(!this.showMoreLoader) {
 			return;
 		}
+
+		this.autoHeight = true;
 
 		this.bbar = new Ext.Toolbar({
 			cls:'go-bbar-load-more',

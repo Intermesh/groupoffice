@@ -34,10 +34,7 @@ go.modules.community.notes.NoteBookGrid = Ext.extend(go.NavGrid, {
 				sortInfo: {
 					field: "name"
 				}
-			}),
-
-			stateful: true,
-			stateId: 'note-books-grid'
+			})
 		});
 
 		go.modules.community.notes.NoteBookGrid.superclass.initComponent.call(this);

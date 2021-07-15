@@ -25,12 +25,12 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.createNoteGrid();
 
 		this.sidePanel = new Ext.Panel({
-			layout: 'border',
+			layout: 'fitwidth',
+			bodyStyle: 'overflow-y: auto',
 			width: dp(300),
 			cls: 'go-sidenav',
 			region: "west",
 			split: true,
-			autoScroll: true,			
 			items: [
 				this.createNoteBookGrid(),
 				this.createFilterPanel()
@@ -132,13 +132,10 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	createNoteBookGrid : function() {
 		this.noteBookGrid = new go.modules.community.notes.NoteBookGrid({
 			region: "north",
-			height: dp(400),
-			minHeight: dp(200),
 			filterName: "noteBookId",
 			filteredStore: this.noteGrid.store,
+			showMoreLoader: true,
 
-			split: true,
-			stateId: "notes-note-book-grid",
 			tbar: [{
 					xtype: 'tbtitle',
 					text: t('Notebooks')
