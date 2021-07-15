@@ -2478,3 +2478,15 @@ body.go-compact {
 		@extend %font-caption;
 	}
 }
+
+
+.x-panel-bbar {
+	.go-bbar-load-more {
+		border-top: 0;
+
+		.x-btn-text {
+			@include var(color, c-primary);
+			font-style: italic;
+		}
+	}
+}

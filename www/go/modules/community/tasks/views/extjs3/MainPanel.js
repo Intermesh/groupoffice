@@ -21,8 +21,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.createTasklistGrid();	
 		this.createCategoriesGrid();
 
-
-
 		this.taskDetail = new go.modules.community.tasks.TaskDetail({
 			region: 'east',
 			split: true,
@@ -52,9 +50,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			})
 		});
 
-
-
-
 		this.sidePanel = new Ext.Panel({
 			width: dp(300),
 			cls: 'go-sidenav',
@@ -74,13 +69,11 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 				}]
 			}),
 
-
 			autoScroll: true,
+			bodyStyle: 'overflow-y: auto',
 
-			layout:'anchor',
-			defaults: {
-				anchor: (-1 * Ext.getScrollBarWidth()).toString()
-			},
+			layout:'fitwidth',
+
 			items:[
 				this.filterPanel,
 				{
@@ -249,7 +242,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 
 		return new Ext.Panel({
-			region: "center",
 			minHeight: dp(200),
 			autoScroll: true,
 			tbar: [
@@ -315,10 +307,6 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	createTasklistGrid : function() {
 		this.tasklistsGrid = new go.modules.community.tasks.TasklistsGrid({
 
-			maxHeight: dp(400),
-			autoHeight: true,
-			// border: true,
-
 			filteredStore: this.taskGrid.store,
 			filterName: 'tasklistId',
 
@@ -350,6 +338,7 @@ go.modules.community.tasks.MainPanel = Ext.extend(go.modules.ModulePanel, {
 
 		this.tasklistsGrid.on('selectionchange', this.onTasklistSelectionChange, this); //add buffer because it clears selection first
 	},
+
 	checkValues: function() {
 		if(this.taskDateField.getValue() != null && this.taskNameTextField.getValue() != "") {
 			this.addTaskButton.setDisabled(false);

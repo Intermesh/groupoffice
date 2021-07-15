@@ -13,6 +13,8 @@ go.grid.GridTrait = {
 	 */
 	scrollLoader: true,
 
+	showMoreLoader: false,
+
 	multiSelectToolbarEnabled: true,
 
 	moveDirection: 'up',
@@ -91,7 +93,46 @@ go.grid.GridTrait = {
 				});
 			});
 		}
+
+
 	},
+
+	initShowMore : function() {
+		if(!this.showMoreLoader) {
+			return;
+		}
+
+		this.bbar = new Ext.Toolbar({
+			cls:'go-bbar-load-more',
+			items: [
+				this.loadMoreButton = new Ext.Button({
+					hidden: true,
+					text: t("Show more..."),
+					handler: () => {
+
+						let o = this.store.lastOptions ? GO.util.clone(this.store.lastOptions) : {};
+						o.add = true;
+						o.params = o.params || {};
+
+						o.params.position = o.params.position || 0;
+						o.params.position += (o.params.limit || this.loadMorePageSize);
+						o.params.limit = this.loadMorePageSize;
+						o.paging = true;
+
+						this.store.load(o);
+					}
+				})
+		]
+		});
+
+		this.store.baseParams.calculateHasMore = true;
+		this.store.baseParams.limit = this.loadMorePageSize;
+		this.store.on('load', (s) => {
+			this.loadMoreButton.setVisible(s.hasMore);
+		});
+	},
+	loadMorePageSize: 20,
+
 
 	initMultiSelectToolbar : function() {
 
@@ -205,9 +246,7 @@ go.grid.GridTrait = {
 
 		const scrollOffset = Ext.getScrollBarWidth();
 
-		console.warn(scrollOffset);
-
-		if((this.autoHeight && !this.maxHeight) || scrollOffset == 0) {
+		if((this.autoHeight && !this.maxHeight) || this.getView().scrollOffset === 0) {
 			return;
 		}
 		

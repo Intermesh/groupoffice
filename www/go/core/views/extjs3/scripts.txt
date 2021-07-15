@@ -74,7 +74,7 @@ toolbar/SearchButton.js
 toolbar/TitleItem.js
 
 layout/ResponsiveLayout.js
-
+layout/FitWidthLayout.js
 
 AuthenticationManager.js
 ActivityWatcher.js
