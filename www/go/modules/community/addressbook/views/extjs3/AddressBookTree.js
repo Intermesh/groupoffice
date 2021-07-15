@@ -8,6 +8,8 @@ go.modules.community.addressbook.AddressBookTree = Ext.extend(Ext.tree.TreePanel
 
 	readOnly: false,
 	scope: null,
+
+	autoHeight: true,
 	
 	initComponent: function () {
 

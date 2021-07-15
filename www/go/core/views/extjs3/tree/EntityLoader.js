@@ -93,12 +93,13 @@ go.tree.EntityLoader = Ext.extend(Ext.tree.TreeLoader, {
 		
 		this.result = this.entityStore.query(params, function (response) {
 			this.entityStore.get(response.ids, function (entities) {
-				var response = {
+				const result = {
 					argument: {callback: callback, node: options.node, scope: scope},
-					responseData: entities.map(this.convertEntityToNode, this)
+					responseData: entities.map(this.convertEntityToNode, this),
+					queryResponse: response
 				};
 				
-				this.handleResponse(response);
+				this.handleResponse(result);
 				
 				this.loading = false;
 			},this);

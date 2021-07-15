@@ -21,7 +21,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			region: "west",
 			split: true,
 			// autoScroll: true,
-			layout: "border",
+			layout: "fitwidth",
+			bodyStyle: 'overflow-y: auto',
 			items: [
 				this.createAddressBookTree(),
 				this.createFilterPanel()
@@ -69,10 +70,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		this.addressBookTree = new go.modules.community.addressbook.AddressBookTree({
 			region:  "north",
 			split: true,
-			containerScroll: true,
-			autoScroll: true,
-			height: dp(300),
-			minHeight: dp(200),
 			enableDrop: true,
 			ddGroup: "addressbook",
 			ddAppendOnly: true,
@@ -101,7 +98,48 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 					},
 					scope: this
 
-				}]
+				}],
+
+			bbar: new Ext.Toolbar({
+				cls: 'go-bbar-load-more',
+				items:[
+					'',
+					this.loadMoreButton = new Ext.Button({
+						hidden: true,
+						text: t("Show more..."),
+						handler: () => {
+
+
+							const loader = this.addressBookTree.getLoader();
+
+							loader.clearOnLoad = false;
+							loader.position += loader.pageSize;
+
+							loader.load(this.addressBookTree.getRootNode(), (node) => {
+								loader.clearOnLoad = true;
+							});
+
+
+							// let o = this.store.lastOptions ? GO.util.clone(this.store.lastOptions) : {};
+							// o.add = true;
+							// o.params = o.params || {};
+							//
+							// o.params.position = o.params.position || 0;
+							// o.params.position += (o.params.limit || this.loadMorePageSize);
+							// o.params.limit = this.loadMorePageSize;
+							// o.paging = true;
+							//
+							// this.store.load(o);
+						}
+					})
+				]
+			})
+		});
+
+		this.addressBookTree.getLoader().on('load', (loader, node, response) => {
+			console.warn(response);
+
+			this.loadMoreButton.setVisible(response.queryResponse.hasMore);
 		});
 		
 		
