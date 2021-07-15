@@ -1,4 +1,5 @@
 - MultiInstance: Fixed compatibility issue with MySQL 8+
+- Core: Check invalid characters in username.
 
 06-07-2021 6.4.239
 - Timeregistration: Fixed time tracking sums
