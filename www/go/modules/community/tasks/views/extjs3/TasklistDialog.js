@@ -13,7 +13,7 @@ go.modules.community.tasks.TasklistDialog = Ext.extend(go.form.Dialog, {
 		{
 			this.height = null;
 			this.autoHeight = true;
-			this.width = dp(400);
+			this.width = dp(600);
 
 		}
 
