@@ -141,8 +141,6 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 			}
 		}
 
-		console.warn(v);
-
 		return v;
 	},
 
@@ -154,8 +152,6 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 	 * @param parent
 	 * @returns {{}}
 	 *
-	 *
-	 * BROKEN!
 	 */
 	transformCsvHeadersToValues : function(goHeaders, fields, parent) {
 		var v = {};
@@ -191,14 +187,17 @@ go.import.CsvMappingDialog = Ext.extend(go.Window, {
 			}
 		};
 
+
 		return v;
 	},
 
 	findSingleCsvIndex : function(h, parent) {
 		var csvIndex = -2;
 		var storeIndex = this.csvStore.findBy(function(r) {
-			var find = r.data.name.toLowerCase();
-			return find == (parent ? parent + "." + h.name : h.name).toLowerCase();
+			var csvHeader = r.data.name.toLowerCase().replace(/[_\-\s]/g, '');
+			var goHeader = (parent ? parent + "." + h.name : h.name).toLowerCase().replace(/[_\-\s]/g, '');
+
+			return csvHeader == goHeader || "customfields." + csvHeader == goHeader;
 		});
 		if(storeIndex > -1){
 			csvIndex = this.csvStore.getAt(storeIndex).data.index;

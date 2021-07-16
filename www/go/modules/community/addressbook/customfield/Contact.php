@@ -115,6 +115,18 @@ class Contact extends Base {
 			->where(['name' => $value])
 			->single();
 
+		if(!$id) {
+			$contact = new model\Contact();
+			$contact->isOrganization = $this->field->getOption('isOrganization');
+			$contact->name = $contact->lastName = $value;
+			$contact->addressBookId = go()->getAuthState()->getUser(['addressBookSettings'])->addressBookSettings->getDefaultAddressBookId();
+			if(!$contact->save()) {
+				throw new \Exception("Could not save contact: " . $contact->getValidationErrorsAsString());
+			}
+
+			$id = $contact->id;
+		}
+
 		return $id;
 	}
 }
