@@ -1009,7 +1009,7 @@ CREATE TABLE `core_alert` (
   CONSTRAINT `fk_alert_user`
     FOREIGN KEY (`userId`)
     REFERENCES `core_user` (`id`)
-    ON DELETE RESTRICT
+    ON DELETE cascade
     ON UPDATE NO ACTION);
 
 create unique index core_alert_entityTypeId_entityId_tag_userId_uindex

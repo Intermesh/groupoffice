@@ -1048,3 +1048,9 @@ $updates['202107010929'][] = "alter table core_auth_remember_me
 	add browser varchar(190) COLLATE utf8mb4_unicode_ci null after platform;";
 
 
+$updates['202107160929'][] = "alter table core_alert drop foreign key fk_alert_user;";
+
+$updates['202107160929'][] = "alter table core_alert
+	add constraint fk_alert_user
+		foreign key (userId) references core_user (id)
+			on delete cascade;";
