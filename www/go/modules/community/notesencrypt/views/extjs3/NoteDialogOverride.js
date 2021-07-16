@@ -96,6 +96,8 @@ Ext.onReady(function() {
 							this.confirmPasswordField.setVisible(checked);
 							this.passwordField.setDisabled(!checked);
 							this.confirmPasswordField.setDisabled(!checked);
+
+							this.doLayout();
 						},
 						scope: this
 					},
