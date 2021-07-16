@@ -528,7 +528,7 @@ abstract class Entity  extends OrmEntity {
 
 		$result['totalChanges'] = $changesQuery->foundRows();
 		
-		if($result['totalChanges'] > $maxChanges){
+		if($changes->rowCount() > $maxChanges && $count){
 			
 			$states[1]['offset'] += $maxChanges;
 			
