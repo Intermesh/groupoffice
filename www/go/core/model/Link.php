@@ -2,6 +2,7 @@
 
 namespace go\core\model;
 
+use Faker\Generator;
 use GO\Base\Db\ActiveRecord;
 use go\core\acl\model\AclItemEntity;
 use go\core\App;
@@ -521,5 +522,24 @@ class Link extends AclItemEntity
 		}
 
 		return go()->getDbConnection()->commit();
+	}
+
+
+	public static function demo(Generator $faker, $model) {
+		$searchCount = go()->getDbConnection()->selectSingleValue('count(*)')
+			->from('core_search')->single();
+
+		$offset = $faker->numberBetween(0, $searchCount);
+		$limit = min($searchCount - $offset, 4);
+
+		$search = Search::find()->limit($limit)->offset($offset);
+
+		foreach($search as $search) {
+			$entity = $search->findEntity();
+			if($entity && !$entity->equals($model)) {
+				Link::create($entity, $model);
+			}
+		}
+
 	}
 }

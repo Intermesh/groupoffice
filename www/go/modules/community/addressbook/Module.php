@@ -229,8 +229,11 @@ class Module extends core\Module {
 				\go\modules\community\comments\Module::demoComments($faker, $company);
 			}
 
+			Link::demo($faker, $contact);
+			Link::demo($faker, $company);
 
-			Link::create($contact, $company, null, false);
+
+			Link::create($contact, $company, null, true);
 		}
 	}
 }

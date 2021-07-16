@@ -1,6 +1,7 @@
 <?php
 namespace go\modules\community\comments;
 
+use GO\Base\Db\ActiveRecord;
 use go\core;
 use go\core\cron\GarbageCollection;
 use go\core\jmap\Entity;
@@ -63,7 +64,14 @@ class Module extends core\Module {
 //		}
 	}
 
-	public static function demoComments(Faker\Generator $faker, Entity $entity) {
+	/**
+	 * Create some demo comments
+	 *
+	 * @param Faker\Generator $faker
+	 * @param Entity|ActiveRecord $entity
+	 * @throws \Exception
+	 */
+	public static function demoComments(Faker\Generator $faker, $entity) {
 
 		gc_collect_cycles();
 

@@ -177,7 +177,7 @@ class System extends Controller {
 		\go\modules\community\history\Module::$enabled = false;
 		//go()->getDebugger()->enabled = false;
 
-		$modules = Module::find()->where('name','=', 'notes');
+		$modules = Module::find();
 
 		foreach($modules as $module) {
 			if(!$module->isAvailable()) {

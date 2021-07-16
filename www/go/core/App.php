@@ -797,6 +797,7 @@ use const GO_CONFIG_FILE;
 
 		public function demo(Faker\Generator $faker) {
 
+return;
 
 			for($i = 0; $i < 10; $i++) {
 				echo ".";

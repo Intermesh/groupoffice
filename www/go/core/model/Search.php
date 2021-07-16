@@ -2,6 +2,8 @@
 
 namespace go\core\model;
 
+use GO\Base\Db\ActiveRecord;
+use go\core\jmap\Entity;
 use go\core\model\Acl;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
@@ -169,6 +171,21 @@ class Search extends AclOwnerEntity {
 						->add('text', function(Criteria $criteria, $value, Query $query) {
 							SearchableTrait::addCriteria( $criteria, $query, $value);
 						});					
+	}
+
+	/**
+	 * Find the entity this comment belongs to.
+	 *
+	 * @return Entity|ActiveRecord
+	 */
+	public function findEntity() {
+		$e = EntityType::findById($this->entityTypeId);
+		$cls = $e->getClassName();
+		if(is_a($cls, ActiveRecord::class, true)) {
+			return $cls::model()->findByPk($this->entityId);
+		} else {
+			return $cls::findById($this->entityId);
+		}
 	}
 
 //	public static function sort(\go\core\orm\Query $query, array $sort)

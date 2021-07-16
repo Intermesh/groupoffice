@@ -96,6 +96,8 @@ class Module extends core\Module {
 				if(core\model\Module::isInstalled("community", "comments")) {
 					\go\modules\community\comments\Module::demoComments($faker, $note);
 				}
+
+				core\model\Link::demo($faker, $note);
 			}
 		}
 

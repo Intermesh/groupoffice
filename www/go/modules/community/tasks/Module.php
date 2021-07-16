@@ -131,6 +131,8 @@ class Module extends core\Module {
 				if(core\model\Module::isInstalled("community", "comments")) {
 					\go\modules\community\comments\Module::demoComments($faker, $task);
 				}
+
+				model\Link::demo($faker, $task);
 			}
 		}
 	}
