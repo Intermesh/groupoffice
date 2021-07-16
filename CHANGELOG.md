@@ -1,6 +1,7 @@
 - Notes: Fixed notes encrypt module error when saving notes
 - Core: Fixed "required" on Multiselect field
 - Projects2: fix for missing pr2_standard_tasks table in upgrade
+- Address book: Fixed name fields showing on organizations
 
 12-07-2021 6.5.66
 - Projects2: fix for missing pr2_standard_tasks table in upgrade
