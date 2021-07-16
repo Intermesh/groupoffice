@@ -32,7 +32,11 @@ go.modules.community.tasks.TaskGrid = Ext.extend(go.grid.GridPanel, {
 				'estimatedDuration',
 				'timeBooked'
 			],
-			entityStore: "Task"
+			entityStore: "Task",
+			sortInfo: {
+				field: "start",
+				direction: "ASC"
+			}
 		});
 
 		this.checkColumn = new GO.grid.CheckColumn({
