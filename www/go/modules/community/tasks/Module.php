@@ -70,6 +70,40 @@ class Module extends core\Module {
 	public function demo(Generator $faker)
 	{
 
+		$titles = [
+			"Finish tasks module",
+			"Call Michael about Energy project",
+			"Order printer paper",
+			"Create functional design",
+			"Create technical design",
+			"Create database design",
+			"Order machine parts",
+			"Order lunch",
+			"Schedule meeting with client",
+			"Discuss design with John",
+			"Fix issue with automatic problem solver",
+			"Prepare Weekly board meeting",
+			"Test two factor authentication",
+			"Perform weekly penetration tests on Group-Office",
+			"Implement Oauth 2.0",
+			"Implement Open ID",
+			"Feature request on autofill email addresses",
+			"Feature request SMIME encryption",
+			"Discuss roadmap for next release",
+			"Buy bigger screens",
+			"Verify backups",
+			"Perform weekly penetration tests on servers",
+			"Prepare quote for solar panels module",
+			"Prepare quote for Wind mill project",
+			"Review graphical designs for Group-Office website",
+			"Design checkout process",
+			"Take out the trash",
+			"Order more coffee",
+		];
+
+		$titleCount = count($titles);
+
+
 		$tasklists = Tasklist::find();
 
 		foreach($tasklists as $tasklist) {
@@ -78,13 +112,17 @@ class Module extends core\Module {
 			for($i = 0; $i < $count; $i ++ ) {
 				echo ".";
 				$task = new Task();
-				$task->title = $faker->sentence(6);
-//				$task->description = $faker->realtext;
+				$task->title = $titles[$faker->numberBetween(0, $titleCount - 1)];
+				$task->description = $faker->realtext;
 				$task->createdBy = $tasklist->createdBy;
 				$task->responsibleUserId = $task->createdBy;
-				$task->due = $task->start = $faker->dateTimeBetween("-5 years", "now");
+				$task->start = $faker->dateTimeBetween("-1 years", "now");
+				$task->due =  $faker->dateTimeBetween($task->start, "now");
 				$task->tasklistId = $tasklist->id;
 				$task->percentComplete = $faker->randomElement([0, 20, 50, 80, 100]);
+
+				$task->createdAt = $faker->dateTimeBetween("-1 years", "now");
+				$task->modifiedAt = $faker->dateTimeBetween($task->createdAt, "now");
 
 				if(!$task->save()) {
 					throw new core\orm\exception\SaveException($task);

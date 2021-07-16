@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS `tasks_task` (
     ON DELETE SET NULL,
   CONSTRAINT `tasks_task_ibfk_1`
     FOREIGN KEY (`tasklistId`)
-    REFERENCES `tasks_tasklist` (`id`) on update cascade,
+    REFERENCES `tasks_tasklist` (`id`) on delete cascade,
   CONSTRAINT `tasks_task_ibfk_2`
     FOREIGN KEY (`createdBy`)
     REFERENCES `core_user` (`id`)

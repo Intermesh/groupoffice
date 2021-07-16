@@ -177,13 +177,13 @@ class System extends Controller {
 		\go\modules\community\history\Module::$enabled = false;
 		//go()->getDebugger()->enabled = false;
 
-		$modules = Module::find()->where('name','=', 'tasks');
+		$modules = Module::find()->where('name','=', 'notes');
 
 		foreach($modules as $module) {
 			if(!$module->isAvailable()) {
 				continue;
 			}
-			echo "Creating demo for module ". ($modules->package ?? "legacy") . "/" .$module->name ."\n";
+			echo "Creating demo for module ". ($module->package ?? "legacy") . "/" .$module->name ."\n";
 			$module->module()->demo($faker);
 
 			echo "\n\nDone\n\n";
