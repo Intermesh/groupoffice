@@ -1850,7 +1850,9 @@ abstract class Property extends Model {
 		$stmt = go()->getDbConnection()->delete($primaryTable->getName(), $query);
 		if(!$stmt->execute()) {			
 			return false;
-		}	
+		}
+
+		go()->debug("Deleted " . $stmt->rowCount() ." models of type " .static::class);
 
 		if(count($blobIds)) {			
 			$blobs = Blob::find()->where('id', '=', $blobIds);
