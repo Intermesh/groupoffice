@@ -1,3 +1,5 @@
+- Calendar: fixed render bug categories combo
+
 19-07-2021 6.5.68
 - Email: fixed attachments opening in the same window
 - Studio: Bugfix - use default Spreadsheet converter class for code generation
