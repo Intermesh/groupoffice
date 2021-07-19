@@ -1,3 +1,4 @@
+19-07-2021 6.5.67
 - Notes: Fixed notes encrypt module error when saving notes
 - Core: Fixed "required" on Multiselect field
 - Projects2: fix for missing pr2_standard_tasks table in upgrade
