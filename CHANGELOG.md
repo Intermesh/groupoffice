@@ -3,6 +3,7 @@
 - Core: custom field of type date was rendered with time in the grid
 - Address book: Lines rendered incorrectly in grid when sorting on last name
 - Address book: Also show contact with last name first in custom field
+- Projects2: Fixed activity type being always mandatory when booking time from projet
 
 19-07-2021 6.5.67
 - Notes: Fixed notes encrypt module error when saving notes
