@@ -636,7 +636,10 @@ GO.dialog.TabbedFormDialog = Ext.extend(GO.Window, {
 
 						if(action.result.validationErrors){
 							for(var field in action.result.validationErrors){
-								form.findField(field).markInvalid(action.result.validationErrors[field]);
+								const c = form.findField(field);
+								if(c) {
+									c.markInvalid(action.result.validationErrors[field]);
+								}
 							}
 						}
 					}

@@ -728,6 +728,9 @@ class EventController extends \GO\Base\Controller\AbstractModelController {
 			$createdRule = $rRule->createJSONOutput();
 
 			$response['data'] = array_merge($response['data'], $createdRule);
+		} else
+		{
+			$response['data']['repeat_forever'] = 1;
 		}
 		
 //		$model->setAttribute('calendar_id', $params['calendar_id']);

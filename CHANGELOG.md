@@ -8,8 +8,24 @@ Core: Alert system to notify users about comments, assigned tasks etc.
 Core: Made "Remember me" more secure by using a special token. (See https://stackoverflow.com/a/244907)
 ----
 
+19-07-2021 6.5.68
+- Email: fixed attachments opening in the same window
+- Studio: Bugfix - use default Spreadsheet converter class for code generation
+- Core: custom field of type date was rendered with time in the grid
+- Address book: Lines rendered incorrectly in grid when sorting on last name
+- Address book: Also show contact with last name first in custom field
+- Projects2: Fixed activity type being always mandatory when booking time from projet
+- Address book: [Event Link Description] Error when adding a description to a link (creating an event) #716
+- Calendar: Fixed [Event - Participants] Issue with "Time is not applicable" #717
+- Calendar: Fixed [Appointment Recurrence] Recurrence is changed to "Forever" after any modification #714
+- Calendar: Fixed right click in view
+- Core: Fixed duplicate entities
+
+19-07-2021 6.5.67
+- Notes: Fixed notes encrypt module error when saving notes
 - Core: Fixed "required" on Multiselect field
 - Projects2: fix for missing pr2_standard_tasks table in upgrade
+- Address book: Fixed name fields showing on organizations
 
 12-07-2021 6.5.66
 - Projects2: fix for missing pr2_standard_tasks table in upgrade

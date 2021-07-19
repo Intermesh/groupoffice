@@ -197,6 +197,9 @@ class Column {
 		switch ($this->dbType) {
 			case 'datetime':
 				if ($value instanceof DateTime || $value instanceof DateTimeImmutable) {
+					if(!($value instanceof GoDateTime)) {
+						$value = new GoDateTime('@' . $value->getTimestamp(), $value->getTimezone());
+					}
 					return $value;
 				} else {
 					$dt = new GoDateTime($value);
@@ -207,6 +210,9 @@ class Column {
 			case 'date':
 				//make sure date is formatted correctly
 				if ($value instanceof DateTime || $value instanceof DateTimeImmutable) {
+					if(!($value instanceof GoDateTime)) {
+						$value = new GoDateTime('@' . $value->getTimestamp(), $value->getTimezone());
+					}
 					return $value;
 				} else {
 					$dt = new GoDateTime($value, new DateTimeZone("UTC"));

@@ -1221,8 +1221,8 @@ class GO{
 	 * @return boolean
 	 */
 	public static function cronIsRunning(){
-		$utc_str = gmdate("M d Y H:i:s", time());
-		$utc = strtotime($utc_str);
+
+		$utc = gmdate("U");
 		return \GO::config()->get_setting('cron_last_run') > $utc-300;
 	}
 	

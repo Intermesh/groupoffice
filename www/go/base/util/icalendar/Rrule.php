@@ -405,7 +405,9 @@ class Rrule extends \GO\Base\Util\Date\RecurrencePattern
 		//$this->shiftDays(false);
 		$days = $this->_byday;
 		
-		$response = array();
+		$response = array(
+			'repeat_forever' => 1
+		);
 		if (isset($this->_freq)) {
 			if (!empty($this->_until)){
 				$response['until'] = \GO\Base\Util\Date::get_timestamp($this->_until, false);

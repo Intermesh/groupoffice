@@ -31,7 +31,7 @@ go.form.RecurrenceFieldset = Ext.extend(Ext.form.FieldSet, {
 	 * {Date} The startDate
 	 */
 	startDate: null,
-		
+
 	initComponent : function(){
 				
 		this.repeatEvery = new GO.form.NumberField({
@@ -132,18 +132,17 @@ go.form.RecurrenceFieldset = Ext.extend(Ext.form.FieldSet, {
 		this.repeatForeverXCheckbox = new Ext.ux.form.XCheckbox({
 			boxLabel : t("Repeat forever"),
 			name : 'repeat_forever',
-			checked: true,
 			width : 'auto',
 			hideLabel : true,
 			listeners : {
 				check : {
-				fn : function(cb, checked){
-					
+					fn : function(cb, checked){
 						if(!checked && !this.repeatUntilDateXCheckbox.getValue() && !this.repeatCountXCheckbox.getValue()) {
 							this.repeatForeverXCheckbox.setValue(true);
 						} else {
 							this.repeatUntilDateXCheckbox.setValue(false);
 							this.repeatCountXCheckbox.setValue(false);
+
 						}
 					},
 					scope : this
@@ -158,14 +157,17 @@ go.form.RecurrenceFieldset = Ext.extend(Ext.form.FieldSet, {
 			hideLabel : true,
 			listeners : {
 				check : {
+
 					fn : function(cb, checked){
-					if(!checked && !this.repeatForeverXCheckbox.getValue() && !this.repeatCountXCheckbox.getValue()) {
+
+
+						if(!checked && !this.repeatForeverXCheckbox.getValue() && !this.repeatCountXCheckbox.getValue()) {
 							this.repeatUntilDateXCheckbox.setValue(true);
 							return;
 						} else {
+
 							this.repeatForeverXCheckbox.setValue(false);
 							this.repeatCountXCheckbox.setValue(false);
-
 							this.repeatEndDate.setDisabled(!checked);
 						}
 					},
@@ -192,14 +194,15 @@ go.form.RecurrenceFieldset = Ext.extend(Ext.form.FieldSet, {
 			hideLabel : true,
 			listeners : {
 				check : {
-					fn : function(cb, checked) {
+
+					fn : function(cb, checked){
+
 						if(!checked && !this.repeatForeverXCheckbox.getValue() && !this.repeatUntilDateXCheckbox.getValue()) {
 							this.repeatCountXCheckbox.setValue(true);
 							return;
 						} else {
 							this.repeatForeverXCheckbox.setValue(false);
 							this.repeatUntilDateXCheckbox.setValue(false);
-
 							this.repeatNumber.setDisabled(!checked);
 						}
 					},
@@ -377,7 +380,7 @@ go.form.RecurrenceFieldset = Ext.extend(Ext.form.FieldSet, {
 			console.warn("Cannot check validity. No startDate given. Please set the startDate with the setStartDate() function.");
 		}
 		
-		if (this.repeatType.getValue() != "" && GO.util.empty(this.repeatEndDate.getValue())) {
+		if (this.repeatType.getValue() != "" && GO.util.empty(this.repeatEndDate.getValue()) && !this.repeatCountXCheckbox.getValue()) {
 			this.repeatForeverXCheckbox.setValue(true);
 		} else if(this.startDate && this.repeatEndDate.getValue() < this.startDate ){
 			this.repeatEndDate.setValue(this.startDate.add(Date.DAY, 1));

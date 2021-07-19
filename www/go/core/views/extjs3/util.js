@@ -344,8 +344,8 @@ go.util =  (function () {
 		},
 
 		getDownloadTargetWindow : function() {
-			if(!this.downloadTarget || this.downloadTarget.closed) {
-				this.downloadTarget = window.open("", "_blank");
+			if(!this.downloadTarget || this.downloadTarget.closed || this.downloadTarget.location != "about:blank") {
+				this.downloadTarget = window.open("about:blank", "_blank");
 			}
 			return this.downloadTarget;
 		},
@@ -361,6 +361,7 @@ go.util =  (function () {
 				const win = this.getDownloadTargetWindow();
 				win.focus();
 				win.location = "filewrap.php?url=" + encodeURIComponent(url);
+
 			} else
 			{
 				// for safari :(

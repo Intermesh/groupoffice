@@ -35,7 +35,9 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 			this.jobTitle.focus();
 		} else
 		{
-			this.nameField.focus();
+			setTimeout(() => {
+				this.nameField.focus();
+			});
 		}
 	},
 
