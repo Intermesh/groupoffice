@@ -551,7 +551,7 @@ class Event extends \GO\Base\Db\ActiveRecord {
 	}
 	
 		public function getRelevantMeetingAttributes(){
-		return array("name","start_time","end_time","location","description","calendar_id","rrule","repeat_end_time");
+		return array("name","start_time","end_time","location","description","calendar_id","rrule","repeat_end_time", "all_day_event");
 	}
 
 	
