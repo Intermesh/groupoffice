@@ -1,5 +1,7 @@
 - Email: fixed attachments opening in the same window
 
+- Studio: Bugfix - use default Spreadsheet converter class for code generation
+
 19-07-2021 6.5.67
 - Notes: Fixed notes encrypt module error when saving notes
 - Core: Fixed "required" on Multiselect field
