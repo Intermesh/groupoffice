@@ -1,3 +1,4 @@
+19-07-2021 6.4.240
 - Billing: Fixed filter 'Books' in project reports
 - MultiInstance: Fixed compatibility issue with MySQL 8+
 - Core: Check invalid characters in username.
