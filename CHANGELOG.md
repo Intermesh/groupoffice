@@ -1,3 +1,4 @@
+- Billing: Fixed filter 'Books' in project reports
 - MultiInstance: Fixed compatibility issue with MySQL 8+
 - Core: Check invalid characters in username.
 
