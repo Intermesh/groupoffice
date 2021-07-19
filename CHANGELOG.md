@@ -1,3 +1,4 @@
+19-07-2021 6.5.68
 - Email: fixed attachments opening in the same window
 - Studio: Bugfix - use default Spreadsheet converter class for code generation
 - Core: custom field of type date was rendered with time in the grid
@@ -7,6 +8,8 @@
 - Address book: [Event Link Description] Error when adding a description to a link (creating an event) #716
 - Calendar: Fixed [Event - Participants] Issue with "Time is not applicable" #717
 - Calendar: Fixed [Appointment Recurrence] Recurrence is changed to "Forever" after any modification #714
+- Calendar: Fixed right click in view
+- Core: Fixed duplicate entities
 
 19-07-2021 6.5.67
 - Notes: Fixed notes encrypt module error when saving notes
