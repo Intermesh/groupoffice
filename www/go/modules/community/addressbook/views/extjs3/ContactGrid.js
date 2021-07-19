@@ -52,6 +52,31 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 		
 		var grid = this;
 
+
+		function getIndexChar(record, rowIndex) {
+			var sortBy = record.data.isOrganization ? "name" : go.User.addressBookSettings.sortBy;
+
+			var sortState = grid.store.getSortState();
+			if(sortState.field != "name" && sortState.field != "firstName"  && sortState.field != "lastName") {
+				return "";
+			}
+
+			//sometimes the field is null.
+			if(!Ext.isString(record.data[sortBy])) {
+				return "";
+			}
+
+			var lastRecord = rowIndex > 0 ? grid.store.getAt(rowIndex - 1) : false;
+			var lastSortBy = !lastRecord || !lastRecord.data.isOrganization ? go.User.addressBookSettings.sortBy : "name" ;
+
+			var char = record.data[sortBy].substr(0, 1).toUpperCase();
+			if(!lastRecord || !lastRecord.data[lastSortBy] || lastRecord.data[lastSortBy].substr(0, 1).toUpperCase() !== char) {
+				return "<h3>" + char + "</h3>";
+			}
+
+			return "";
+		}
+
 		Ext.apply(this, {
 
 			columns: [
@@ -64,37 +89,12 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					hideable: false,
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 
-						var sortBy = record.data.isOrganization ? "name" : go.User.addressBookSettings.sortBy;						
+						if(!value) {
+							return "";
+						}
 
-						// if(rowIndex === 0 && value) {
-						// 	return '<div class="icon ic-star go-addressbook-star"></div>';
-						// } else
-						// {
+						return getIndexChar(record, rowIndex);
 
-							if(!value) {
-								return "";
-							}
-
-							var sortState = store.getSortState();
-							if(sortState.field != "name" && sortState.field != "firstName"  && sortState.field != "lastName") {
-								return "";
-							}
-
-							//sometimes the field is null.
-							if(!Ext.isString(record.data[sortBy])) {
-								return "";
-							}
-							
-							var lastRecord = rowIndex > 0 ? grid.store.getAt(rowIndex - 1) : false;
-							var lastSortBy = !lastRecord || !lastRecord.data.isOrganization ? go.User.addressBookSettings.sortBy : "name" ;						
-
-							var char = record.data[sortBy].substr(0, 1).toUpperCase();
-							if(!lastRecord || !lastRecord.data[lastSortBy] || lastRecord.data[lastSortBy].substr(0, 1).toUpperCase() !== char) {
-								return "<h3>" + char + "</h3>";
-							}
-						// }
-						
-						return "";
 					}
 				},
 				{
@@ -328,25 +328,11 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 			viewConfig: {
 				totalDisplay: true,
 				emptyText: '<i>description</i><p>' + t("No items to display") + '</p>',
-//				enableRowBody: true,
-//				showPreview: true,
-				getRowClass: function (record, rowIndex, p, store) {					
-					
-					// if(rowIndex === 0 && record.get("starred")) {
-					// 	return '';
-					// } else
-					// {
-					// 	if(record.get("starred")) {
-					// 		return "";
-					// 	}
+				getRowClass: function (record, rowIndex, p, store) {
 
-						var lastRecord = rowIndex > 0 ? grid.store.getAt(rowIndex - 1) : false;
-						var char = record.data.name.substr(0, 1);
-						if(!lastRecord || lastRecord.data.name.substr(0, 1) !== char) {
-							return 'go-addressbook-index-row';
-						}
-						return "";
-					// }
+					const char = getIndexChar(record, rowIndex);
+
+					return char ? 'go-addressbook-index-row' : '';
 				}
 			},
 			// config options for stateful behavior
