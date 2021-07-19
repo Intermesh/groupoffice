@@ -1,6 +1,7 @@
 - Email: fixed attachments opening in the same window
 - Studio: Bugfix - use default Spreadsheet converter class for code generation
 - Core: custom field of type date was rendered with time in the grid
+- Address book: Lines rendered incorrectly in grid when sorting on last name
 
 19-07-2021 6.5.67
 - Notes: Fixed notes encrypt module error when saving notes

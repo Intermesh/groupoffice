@@ -17,7 +17,14 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 		this.store = new go.data.Store({
 			fields: [
 				'id',
-				'name',
+				{
+					name: 'name',
+					sortType: Ext.data.SortTypes.asUCString,
+					type: 'string',
+					convert: function(name, data) {
+						return go.modules.community.addressbook.renderName(data);
+					}
+				},
 				'firstName',
 				'middleName',
 				'lastName',
@@ -114,24 +121,14 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 					hidden: this.enabledColumns.indexOf('name') == -1,
 					renderer: function (value, metaData, record, rowIndex, colIndex, store) {
 
-						var icon = record.data.isOrganization ? '<i class="icon">business</i>' : null;
-						var sortBy = go.User.addressBookSettings.sortBy, name;
-						if(!record.data.isOrganization && sortBy == 'lastName' && !go.util.empty(record.data.lastName)) {
-							name = record.data.lastName + ', ' + record.data.firstName;
-							if(!go.util.empty(record.data.middleName)) {
-								name += " " + record.data.middleName;
-							}
-						} else{
-							name = record.get('name');
-						}
+						const icon = record.data.isOrganization ? '<i class="icon">business</i>' : null;
 
 						if(record.get("color")) {
 							metaData.attr = 'style="color: #' + record.get("color") + ';"';
 						}
 
-						return '<span class="go-ab-avatar">' + go.util.avatar(record.get('name'), record.data.photoBlobId, icon) + '</span>' + Ext.util.Format.htmlEncode(name);
+						return '<span class="go-ab-avatar">' + go.util.avatar(value, record.data.photoBlobId, icon) + '</span>' + value;
 
-						// return '<div class="avatar ' + cls + '" style="' + style + '">'+content+'</div>' + Ext.util.Format.htmlEncode(name);
 					}
 				},
 				{
