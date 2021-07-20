@@ -9,7 +9,7 @@
  */
 
 go.form.Dialog = Ext.extend(go.Window, {
-	autoScroll: true,
+	autoScroll: false,
 	width: dp(500),
 	modal: true,
 	maximizable: !GO.util.isMobileOrTablet(),
@@ -167,7 +167,8 @@ go.form.Dialog = Ext.extend(go.Window, {
 			loadExternalChanges: this.loadExternalChanges,
 			entityStore: this.entityStore,
 			items: items,
-			layout: 'fit'
+			layout: 'fit',
+			autoScroll: false
 		});
 	},
 	

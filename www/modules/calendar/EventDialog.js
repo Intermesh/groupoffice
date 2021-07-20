@@ -853,7 +853,7 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 				this.clearLastSearch();
 				this.store.baseParams.calendar_id=calendar_id;
 			},
-			tpl:'<tpl for="."><div class="x-combo-list-item"><div style="float:left;width:20px;margin-right:5px;background-color:#{color}">&nbsp;</div>{name}</div></tpl>'
+			tpl:'<tpl for="."><div class="x-combo-list-item"><div style="float:left;width:20px;margin-right:5px;background-color:#{color}">&nbsp;</div>{[Ext.util.Format.htmlDecode(values.name)]}</div></tpl>'
 		});
 
 		this.selectCategory.on('select', function(combo, record)
