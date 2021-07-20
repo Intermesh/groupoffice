@@ -1,3 +1,6 @@
+20-07-2021 6.5.70
+- History: render issue in changes
+
 20-07-2021 6.5.69
 - Calendar: fixed render bug categories combo
 - Address book: Missing first name and sort combo by last name when showing by last name
