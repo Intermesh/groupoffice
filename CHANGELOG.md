@@ -1,6 +1,8 @@
+20-07-2021 6.5.69
 - Calendar: fixed render bug categories combo
 - Address book: Missing first name and sort combo by last name when showing by last name
 - Projects: Update statement could halt upgrade
+- Core: Fixed rendering of double scrollbars on safari when using custom fields in dialogs.
 
 19-07-2021 6.5.68
 - Email: fixed attachments opening in the same window
