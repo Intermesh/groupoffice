@@ -1,5 +1,6 @@
 - Calendar: fixed render bug categories combo
 - Address book: Missing first name and sort combo by last name when showing by last name
+- Projects: Update statement could halt upgrade
 
 19-07-2021 6.5.68
 - Email: fixed attachments opening in the same window
