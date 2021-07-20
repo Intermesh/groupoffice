@@ -53,7 +53,7 @@ go.modules.community.addressbook.ContactCombo = Ext.extend(go.form.ComboBox, {
 					"photoBlobId", {name: 'organizations', type: "relation"}, 'goUserId', 'phoneNumbers','addresses','emailAddresses','firstName', 'middleName', 'lastName', 'gender', 'color'],
 				entityStore: "Contact",
 				sortInfo: {
-					field: 'firstName',
+					field: go.User.addressBookSettings.sortBy,
 					direction: 'ASC' 
 				},
 				filters: {

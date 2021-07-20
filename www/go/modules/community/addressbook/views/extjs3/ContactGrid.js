@@ -127,7 +127,7 @@ go.modules.community.addressbook.ContactGrid = Ext.extend(go.grid.GridPanel, {
 							metaData.attr = 'style="color: #' + record.get("color") + ';"';
 						}
 
-						return '<span class="go-ab-avatar">' + go.util.avatar(value, record.data.photoBlobId, icon) + '</span>' + value;
+						return '<span class="go-ab-avatar">' + go.util.avatar(value, record.data.photoBlobId, icon) + '</span>' + Ext.util.Format.htmlEncode(record.data.name);
 
 					}
 				},
