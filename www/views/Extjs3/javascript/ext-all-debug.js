@@ -43189,6 +43189,7 @@ Ext.form.BasicForm = Ext.extend(Ext.util.Observable, {
         var valid = true;
         this.items.each(function(f){
            if(!f.validate()){
+           		console.warn("Invalid field: ", f);
                valid = false;
            }
         });
