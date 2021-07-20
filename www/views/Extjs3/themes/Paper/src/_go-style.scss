@@ -1463,9 +1463,12 @@ table[id^="comments-ext"] b {
 	line-height: 1.4em;
 	white-space: nowrap;
 
-	.x-panel-body {
-		padding: dp(8);
-		border: 1px solid color($fg, 'line');
+
+}
+
+.go-text-dialog {
+	.x-window-body {
+		padding: dp(16);
 		background-color: color($bg, 'card');
 	}
 }
