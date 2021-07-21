@@ -18,7 +18,7 @@ use go\core\orm\exception\SaveException;
 use go\core\orm\SearchableTrait;
 use go\core\db\Criteria;
 use go\core\orm\Query;
-use go\core\util\DateTime;
+use go\core\util\{DateTime,Time};
 use go\core\validate\ErrorCode;
 use go\modules\community\tasks\convert\VCalendar;
 
@@ -595,7 +595,7 @@ class Task extends AclItemEntity {
 		$selfEndSecs = 0;
 
 		if(isset($this->startTime)) {
-			$selfStartSecs = $this->timeToSeconds($this->startTime);
+			$selfStartSecs = Time::toSeconds($this->startTime);
 			$selfEndSecs = $selfStartSecs + $this->estimatedDuration;
 		}
 
@@ -603,7 +603,7 @@ class Task extends AclItemEntity {
 			if(!isset($task->startTime)) { // all day task
 				return true;
 			}
-			$theirStartSecs = isset($task->startTime) ? $task->timeToSeconds($task->startTime) : 0;
+			$theirStartSecs = isset($task->startTime) ? Time::toSeconds($task->startTime) : 0;
 			$theirEndSecs = isset($task->startTime) ? $theirStartSecs + $task->estimatedDuration ?? 0 : 0;
 
 			if($theirStartSecs <= $selfEndSecs && $theirEndSecs >= $selfStartSecs) {
@@ -612,14 +612,5 @@ class Task extends AclItemEntity {
 		}
 
 		return false;
-	}
-
-	private function timeToSeconds(string $strStartTime) :int
-	{
-		if(!preg_match('/^\d{1,2}:\d{2}:\d{2}$/', $strStartTime)) {
-			throw new \InvalidArgumentException('Invalid time format');
-		}
-		$arTime = explode(":", $strStartTime);
-		return (intval($arTime[0]) * 3600) + (intval($arTime[1]) * 60) + intval($arTime[2]);
 	}
 }
