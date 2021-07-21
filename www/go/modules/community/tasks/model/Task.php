@@ -330,12 +330,16 @@ class Task extends AclItemEntity {
 				$this->setValidationError('start', ErrorCode::REQUIRED, 'start is required when recurrence rule is set');
 			}
 		}
+
+		if(isset($this->projectId) && $this->hasConflicts()) {
+			$this->setValidationError('start', ErrorCode::CONFLICT, 'this task is in confilict with other tatks');
+		}
+
 		return parent::internalValidate();
 	}
 
 	protected function internalSave()
 	{
-
 		if ($this->isNew()) {
 			$this->uid = \go\core\util\UUID::v4();
 		}
@@ -555,4 +559,67 @@ class Task extends AclItemEntity {
 		return $this->projectId;
 	}
 	// END TODO
+
+	/**
+	 * Try to find conflicting tasks.
+	 *
+	 * A task is considered onflicting when it has a start date and user id and there are other tasks with the same
+	 * responsible userId and start date which are part of a project task list.
+	 *
+	 * @return bool
+	 */
+	public function hasConflicts() :bool
+	{
+		// No start date, no user id or not marked as 'busy'? No problem!
+		if(!isset($this->start) || !isset($this->responsibleUserId) /* || $this->freeBusyStatus == 'free'*/) {
+			return false;
+		}
+		$c = new Criteria();
+		$c->andWhere('task.start', '=', $this->start)
+			->andWhere("task.responsibleUserId", '=', $this->responsibleUserId);
+		if(!$this->isNew()) {
+			$c->andWhere('task.id', '!=', $this->id);
+		}
+		$tasks = self::find(['id','start', 'estimatedDuration','startTime'])
+			->join('tasks_tasklist','tl','task.tasklistId = tl.id')
+			->andWhere($c)
+			->andWhere('tl.role = '. Tasklist::Project)
+			->all();
+
+		// All day tasks are to be considered conflicting by definition
+		if(!isset($this->startTime) && count($tasks) > 0) {
+			return true;
+		}
+
+		$selfStartSecs = 0;
+		$selfEndSecs = 0;
+
+		if(isset($this->startTime)) {
+			$selfStartSecs = $this->timeToSeconds($this->startTime);
+			$selfEndSecs = $selfStartSecs + $this->estimatedDuration;
+		}
+
+		foreach($tasks as $task) {
+			if(!isset($task->startTime)) { // all day task
+				return true;
+			}
+			$theirStartSecs = isset($task->startTime) ? $task->timeToSeconds($task->startTime) : 0;
+			$theirEndSecs = isset($task->startTime) ? $theirStartSecs + $task->estimatedDuration ?? 0 : 0;
+
+			if($theirStartSecs <= $selfEndSecs && $theirEndSecs >= $selfStartSecs) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private function timeToSeconds(string $strStartTime) :int
+	{
+		if(!preg_match('/^\d{1,2}:\d{2}:\d{2}$/', $strStartTime)) {
+			throw new \InvalidArgumentException('Invalid time format');
+		}
+		$arTime = explode(":", $strStartTime);
+		return (intval($arTime[0]) * 3600) + (intval($arTime[1]) * 60) + intval($arTime[2]);
+	}
 }
