@@ -289,3 +289,6 @@ $updates['202102111534'][] = "alter table fs_bookmarks
 			on delete cascade;";
 
 
+$updates['202107120932'][] = "update core_entity set name='FilesTemplate' where name = 'Template' and moduleId = (select id from core_module where name='files' and package is null);";
+
+$updates['202107120932'][] = "update ignore core_entity set name='Template', clientName='FilesTemplate' where name = 'FilesTemplate' and moduleId = (select id from core_module where name='files' and package is null);";

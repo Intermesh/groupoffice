@@ -116,7 +116,9 @@ class Select extends Base {
 						->single();
 
 		if(!$id) {
-			throw new \Exception("Invalid select option text for field '".$this->field->databaseName."': ". $value);
+			//throw new \Exception("Invalid select option text for field '".$this->field->databaseName."': ". $value);
+			go()->getDbConnection()->insert('core_customfields_select_option', ['text'=>$value, 'fieldId' => $this->field->id])->execute();
+			$id = go()->getDbConnection()->getPDO()->lastInsertId();
 		}
 
 		return $id;
@@ -134,7 +136,7 @@ class Select extends Base {
 		if (!empty($this->savedOptionIds)) {	 
 			 $query->andWhere('id', 'not in', $this->savedOptionIds);
 		}
-		$deleteCmd = go()->getDbConnection()->delete('core_customfields_select_option', $query)->execute();
+		go()->getDbConnection()->delete('core_customfields_select_option', $query)->execute();
 		
 		$this->options = null;
 	}

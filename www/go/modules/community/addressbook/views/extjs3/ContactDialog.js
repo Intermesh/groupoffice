@@ -35,7 +35,9 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 			this.jobTitle.focus();
 		} else
 		{
-			this.nameField.focus();
+			setTimeout(() => {
+				this.nameField.focus();
+			});
 		}
 	},
 
@@ -342,13 +344,6 @@ go.modules.community.addressbook.ContactDialog = Ext.extend(go.form.Dialog, {
 				]
 			}
 		];
-
-		var me = this;
-
-		// this.avatarComp.menu.items.item(1).setHandler( this.avatarComp.menu.items.item(1).handler.createSequence(function() {
-		// 	window.open("https://www.google.com/search?q=" + encodeURIComponent(me.getValues()['name']) + "&tbm=isch");
-		// }), this.avatarComp);
-
 
 		this.addPanel(new Ext.Panel({
 			layout: 'fit',

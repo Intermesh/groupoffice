@@ -520,13 +520,14 @@ use const GO_CONFIG_FILE;
 		/**
 		 * Destroys all cache and reinitializes event listeners and sync state.
 		 *
-		 * @param false $onDestruct
+		 * @param boolean $onDestruct
 		 * @throws ConfigurationException
 		 */
 		public function rebuildCache($onDestruct = false) {
 			
 			if($onDestruct) {				
 				$this->rebuildCacheOnDestruct = $onDestruct;
+				return;
 			}
 
 			$this->rebuildCacheOnDestruct = false;

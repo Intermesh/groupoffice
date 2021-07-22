@@ -17,7 +17,6 @@ GO.files.OpenFileWindow = Ext.extend(GO.Window, {
 			var record = dataview.store.getAt(index);			
 			eval(record.data.handler);
 			
-			
 			if(this.rememberCB.getValue()){
 				GO.request({
 					url:'files/file/saveHandler',

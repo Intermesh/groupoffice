@@ -38,17 +38,18 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	load: function (id, callback, scope) {
 		this.currentId = id;
 
-		var me = this;
+		this.entityStore.single(id).then((entity) => {
+			this.entity = entity;
 
-		this.entityStore.single(id).then(function(entity) {
-			me.setValues(entity, true);
-			me.entity = entity;
+			this.on('setvalues', () => {
+				this.fireEvent("load", this, entity);
+			}, this, {single: true});
+
+			this.setValues(entity, true);
 			
 			if(callback) {
 				callback.call(scope || me, entity);
 			}
-			
-			me.fireEvent("load", me, entity);
 		});
 	},
 	
@@ -83,8 +84,18 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 		this.getForm().trackResetOnLoad = trackReset;
 		this.getForm().setValues(v);
 		this.getForm().trackResetOnLoad = oldReset;
-		
-		this.fireEvent('setvalues', this, v);
+
+		//combo's can take a while to load.
+		let promises = [];
+		this.getForm().items.each((item) => {
+			if(item.setValuePromise)
+				promises.push(item.setValuePromise);
+		})
+
+		Promise.all(promises).then(() => {
+			this.fireEvent('setvalues', this, v);
+		});
+
 		return this;
 	},
 
@@ -97,7 +108,7 @@ go.form.EntityPanel = Ext.extend(Ext.form.FormPanel, {
 	submit: function (cb, scope) {
 
 		if (!this.isValid()) {
-			return;
+			return Promise.reject();
 		}		
 		//get only modified values on existing items, otherwise get all values.
 		var id, params = {}, values = this.getValues(!!this.currentId), me = this;

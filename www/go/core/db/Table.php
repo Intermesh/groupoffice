@@ -18,6 +18,19 @@ use PDO;
 class Table {
 
 	private static $cache = [];
+
+	private $name;
+	protected $columns;
+	protected $indexes;
+
+	private $pk = [];
+
+	/**
+	 * @var Connection
+	 */
+	protected $conn;
+
+	protected $dsn;
 	
 	/**
 	 * Get a table instance
@@ -30,6 +43,8 @@ class Table {
 		if(!isset($conn)) {
 			$conn = go()->getDbConnection();
 		}
+
+
 
 		$cacheKey = $conn->getDsn() . '-' . $name;
 		if(!isset(self::$cache[$cacheKey])) {
@@ -61,19 +76,11 @@ class Table {
 		self::$cache = [];
 	}
 	
-	private $name;
-	protected $columns;	
-	protected $indexes;
 
-	private $pk = [];
-
-	/**
-	 * @var Connection
-	 */
-	private $conn;
 	public function __construct($name, Connection $conn) {
 		$this->name = $name;
 		$this->conn = $conn;
+		$this->dsn = $conn->getDsn();
 		$this->init();
 
 		// $this->columns = array_map(function($c) {
@@ -91,7 +98,7 @@ class Table {
 	}
 
 	private function getCacheKey() {
-		return 'dbColumns_' . $this->name;
+		return 'dbColumns_' . $this->dsn . '_' . $this->name;
 	}
 
 	/**
@@ -135,8 +142,8 @@ class Table {
 
 		$this->processIndexes($this->name);
 
-		//Not needed anymore when we serialize
 		$this->conn = null;
+
 
 		App::get()->getCache()->set($cacheKey, ['columns' => $this->columns, 'pk' => $this->pk, 'indexes' => $this->indexes]);
 
@@ -388,24 +395,31 @@ class Table {
 		return $this->pk;
 	}
 
-	/**
-	 * Backup's this table in the same name plus _bak_ . date(Ymd_His)
-	 */
-	public function backup() {
-		$tableName = $this->getName() . "_bak_" . date("Ymd_His");
-		go()->getDbConnection()->exec(
-			"CREATE TABLE `" . $tableName . "` LIKE `" . $this->getName() . "`;");
-
-		go()->getDbConnection()->exec("INSERT INTO `$tableName` SELECT * FROM `" . $this->getName() . "`");
-	}
-	
-	// /**
-	//  * Truncate the table
-	//  * 
-	//  * @return boolean
-	//  */
-	// public function truncate() {
-	// 	return $this->conn->query("TRUNCATE TABLE ".$this->getName())->execute();
-	// }
+	// Only works from php 7.4 and up
+//	public function __serialize()
+//	{
+//		if($this->conn != go()->getDbConnection()) {
+//			throw new Exception("Can't serialize tables with custom database connection");
+//		}
+//
+//		return [
+//			'name' => $this->name,
+//			'columns' => $this->columns,
+//			'indexes' => $this->indexes,
+//			'pk' => $this->pk
+//		];
+//
+//	}
+//
+//	public function __unserialize($data)
+//	{
+//		$this->conn = go()->getDbConnection();
+//
+//		$this->name = $data['name'];
+//		$this->columns = $data['columns'];
+//		$this->indexes = $data['indexes'];
+//		$this->pk = $data['pk'];
+//
+//	}
 
 }

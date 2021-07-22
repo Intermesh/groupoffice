@@ -1,13 +1,11 @@
 go.PasswordPrompt = Ext.extend(go.Window, {
-
+	width: dp(400),
+	text: t('Provide your password.'),
+	title: t('Password required'),
+	modal: true,
+	layout: "fit",
+	maximized: false,
 	initComponent: function () {
-		
-		Ext.applyIf(this, {
-			text: t('Provide your password.'),
-			title: t('Password required'),
-			modal:true,
-			width: dp(400)
-		});
 		
 		this.formPanel = new Ext.FormPanel({
 			layout: 'form',
@@ -52,10 +50,11 @@ go.PasswordPrompt = Ext.extend(go.Window, {
 				this.formPanel
 			],
 			buttons: [{
-					text: t("Continue"),
-					handler: this.okPressed,
-					scope: this
-				}]
+				cls:"primary",
+				text: t("Continue"),
+				handler: this.okPressed,
+				scope: this
+			}]
 		});
 		
 		this.addEvents({

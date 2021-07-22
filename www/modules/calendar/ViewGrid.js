@@ -609,7 +609,7 @@ GO.grid.ViewGrid = Ext.extend(Ext.Panel, {
 		}
 
 		e.stopEvent();
-		this.contextMenu.setParticipants(event.participant_ids);
+		// this.contextMenu.setParticipants(event.participant_ids);
 		this.contextMenu.setEvent(event, this.view_id);
 		this.contextMenu.showAt(e.getXY());
 	},
@@ -759,7 +759,12 @@ GO.grid.ViewGrid = Ext.extend(Ext.Panel, {
 				}, this);
 
 				event.on('contextmenu', function(e, eventEl)
-				{										
+				{
+					eventEl = Ext.get(eventEl).findParent('div.x-viewGrid-event-container', 2, true);
+
+					this.selectEventElement(eventEl);
+					this.clickedEventId=eventEl.id;
+
 					var event = this.elementToEvent(this.clickedEventId);
 					this.showContextMenu(e, event);
 				}, this);

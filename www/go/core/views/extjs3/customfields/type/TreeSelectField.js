@@ -68,7 +68,7 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 								this.store.filter('enabled', true);
 							}else{
 
-								this.store.filter([{property: 'enabled', value: true}, {property: this.displayField, value: q}]);
+								this.store.filter([{property: 'enabled', value: true}, {property: this.displayField, anyMatch: true, value: q}]);
 							}
 							this.onLoad();
 					}else{
@@ -77,7 +77,7 @@ go.customfields.type.TreeSelectField = Ext.extend(Ext.Container, {
 					}
 				}
 			},
-
+			minChars: 1,
 			submit: false,
 			anchor: "100%",
 			xtype: 'gocombo',

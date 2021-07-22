@@ -240,8 +240,9 @@ class Message extends \Swift_Message{
 		$this->setBody($htmlBody, 'text/html','UTF-8');
 			
 		//add text version of the HTML body
-		$htmlToText = new \GO\Base\Util\Html2Text($htmlBody);
-		$part= $this->addPart($htmlToText->get_text(), 'text/plain','UTF-8');
+		$htmlToText = new \GO\Base\Util\Html2Text(str_replace('<div><br></div>', '<br>', $htmlBody));
+		$plainText = $htmlToText->get_text();
+		$part= $this->addPart($plainText, 'text/plain','UTF-8');
 		
 		
 		//Override qupted-prinatble encdoding with base64 because it uses much less memory on larger bodies. See also:
@@ -417,11 +418,13 @@ class Message extends \Swift_Message{
 
 	private function buildContentType($part) {
 		$mime_type = $part->ctype_primary.'/'.$part->ctype_secondary;
-		foreach($part->ctype_parameters as $name => $value) {
-			if($name == 'name') {
-				continue;
+		if(!empty($part->ctype_parameters)) {
+			foreach ($part->ctype_parameters as $name => $value) {
+				if ($name == 'name') {
+					continue;
+				}
+				$mime_type .= ';' . $name . '=' . $value;
 			}
-			$mime_type .= ';' . $name . '=' . $value;
 		}
 
 		return $mime_type;

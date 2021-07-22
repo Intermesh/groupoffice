@@ -61,6 +61,20 @@ go.data.EntityStoreProxy = Ext.extend(Ext.data.HttpProxy, {
 			}];
 			delete params.dir;
 		}
+
+		if(params.groupBy) {
+			if(!params.sort){
+				params.sort = [];
+			}
+
+			params.sort.unshift({
+				property: params.groupBy,
+				isAscending: params.groupDir == "ASC"
+			});
+
+			delete params.groupBy;
+			delete params.groupDir;
+		}
 		
 		var me = this;
 		var promise = this.entityStore.query(params);

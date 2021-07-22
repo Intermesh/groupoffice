@@ -188,6 +188,11 @@ class LogEntry extends AclOwnerEntity {
 		return array_flip(self::$actionMap)[$this->action];
 	}
 
+	/**
+	 * Entity name
+	 *
+	 * @return @string
+	 */
 	public function getEntity() {
 		return $this->entity;
 	}
@@ -204,6 +209,7 @@ class LogEntry extends AclOwnerEntity {
 		$this->entityId = $entity->id();
 		$this->removeAcl = $entity instanceof AclOwnerEntity || ($entity instanceof ActiveRecord && !$entity->IsJoinedAclField);
 		$this->description = $entity->title();
+		$this->cutPropertiesToColumnLength();
 		$this->setAclId($entity->findAclId());
 	}
 

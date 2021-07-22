@@ -56,7 +56,7 @@ class Disk implements CacheInterface {
 
 		if($persist) {
 			$file = $this->folder->getFile($key);
-			if($ttl) {
+			if(!$ttl) {
 				$data = $value;
 			} else{
 				$data = ['e' => time() + $ttl, "v" => $value];

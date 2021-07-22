@@ -113,7 +113,7 @@ go.AuthenticationManager = (function () {
 					}
 
 					if (result.accessToken) {
-						this.onAuthenticated(result);
+						this.onAuthenticated(result, username, password);
 					}
 				},
 				scope: this
@@ -192,7 +192,7 @@ go.AuthenticationManager = (function () {
 			this.loginPanel.render(document.body);
 		},
 
-		onAuthenticated: function (result) {
+		onAuthenticated: function (result, username, password) {
 			
 			go.User.setAccessToken(result.accessToken, go.AuthenticationManager.rememberLogin);
 
@@ -201,18 +201,47 @@ go.AuthenticationManager = (function () {
 				this.loginPanel = null;
 			}
 
-			var me = this;
 
-			return go.User.onLoad(result).then(function() {
-				me.fireEvent("authenticated", me, result);
+			return go.User.onLoad(result).then(() => {
 
 				if(go.User.theme != GO.settings.config.theme) {
 					go.reload();
 					return;
 				}
-			
-				GO.mainLayout.onAuthentication();
+
+				GO.mainLayout.onAuthentication(password).then(() => {
+					this.fireEvent("authenticated", this, result, username, password);
+				})
 			});		
+		},
+
+		/**
+		 * Password prompt
+		 *
+ 		 * @param title
+		 * @param message
+		 * @return {Promise}
+		 */
+		passwordPrompt : function(title, message) {
+			return new Promise((resolve, reject) =>
+			{
+				const passwordPrompt = new go.PasswordPrompt({
+					width: dp(450),
+					text: message,
+					title: title,
+					iconCls: 'ic-security',
+					listeners: {
+						'ok': function (password) {
+							resolve(password);
+						},
+						'cancel': function () {
+							reject();
+						},
+						scope: this
+					}
+				});
+				passwordPrompt.show();
+			});
 		}
 	});
 

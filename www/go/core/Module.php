@@ -7,6 +7,7 @@ use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Utils;
 use go\core\exception\NotFound;
 use go\core\fs\File;
+use go\core\fs\FileSystemObject;
 use go\core\fs\Folder;
 use go\core\model;
 use go\core\jmap\Entity;
@@ -101,12 +102,26 @@ abstract class Module extends Singleton {
 			return true;
 		}
 
-		if(!go()->getEnvironment()->hasIoncube()) {
+		if(!go()->getEnvironment()->hasIoncube() && static::sourceIsEncoded()) {
 			return false;
 		}
 
 		return License::has($license);
 		
+	}
+
+	private static function sourceIsEncoded() {
+
+		$isEncoded = go()->getCache()->get('source-is-encoded');
+
+		if($isEncoded === null) {
+			$isEncoded = ClassFinder::fileIsEncoded(new File(dirname(__DIR__) . '/modules/business/license/model/License.php'));
+			go()->getCache()->set('source-is-encoded', $isEncoded);
+		}
+
+		return $isEncoded;
+
+
 	}
 
 
@@ -133,7 +148,9 @@ abstract class Module extends Singleton {
 			$this->installDatabase();
 			go()->getDbConnection()->resumeTransactions();
 
-			go()->rebuildCache(true);
+			if(!Installer::isInstalling()) {
+				go()->rebuildCache(true);
+			}
 
 			go()->getDbConnection()->beginTransaction();
 		
@@ -214,8 +231,11 @@ abstract class Module extends Singleton {
 		if(!$model->save()) {
 			return false;
 		}
-		
-		go()->rebuildCache(true);
+
+		if(!Installer::isInstalling()) {
+			go()->rebuildCache(true);
+		}
+
 
 		if(!model\Module::delete(['name' => static::getName(), 'package' => static::getPackage()])) {
 			return false;

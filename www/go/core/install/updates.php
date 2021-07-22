@@ -875,9 +875,9 @@ $updates['202102111534'][] = "ALTER TABLE `go_templates` ADD COLUMN `filename` V
 $updates['202102111534'][] = "delete from go_state where user_id not in (select id from core_user);";
 
 $updates['202102111534'][] = "alter table go_state
-	add constraint go_state_core_user_id_fk
-		foreign key (user_id) references core_user (id)
-			on delete cascade;";
+			add constraint go_state_core_user_id_fk
+			foreign key (user_id) references core_user (id)
+				on delete cascade;";
 
 
 $updates['202102111534'][] = "alter table core_auth_token change `passedMethods` `passedAuthenticators` varchar(190) null;";
@@ -934,7 +934,17 @@ $updates['202105041513'][] = "delete from core_module where name='voippro' and p
 
 $updates['202105111132'][] = "ALTER TABLE `core_user` ADD COLUMN `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0 AFTER `homeDir`;";
 
-$udpates['202106021420'][] = "CREATE TABLE `core_permission` (
+
+$updates['202105111132'][] = "alter table core_auth_token
+	add platform varchar(190) null after userAgent;";
+
+$updates['202105111132'][] = "alter table core_auth_token
+	add browser varchar(190) null after platform;";
+
+$updates['202107010929'][] = "alter table core_auth_token modify userAgent varchar(190) null;";
+$updates['202107010929'][] = "alter table core_customfields_field modify relatedFieldCondition text default null;";
+
+$udpates['202107221420'][] = "CREATE TABLE `core_permission` (
   `moduleId` INT NOT NULL,
   `groupId` INT NOT NULL,
   `rights` BIGINT NOT NULL DEFAULT 0,
@@ -952,12 +962,12 @@ $udpates['202106021420'][] = "CREATE TABLE `core_permission` (
           ON UPDATE NO ACTION);";
 
 // migratie module acl permission to action permission
-$updates['202106091111'][] = "INSERT IGNORE INTO core_permission (groupId, rights, moduleId) SELECT ag.groupId, IF(ag.level > 10, 1,0), a.entityId FROM core_acl_group ag 
+$updates['202107221420'][] = "INSERT IGNORE INTO core_permission (groupId, rights, moduleId) SELECT ag.groupId, IF(ag.level > 10, 1,0), a.entityId FROM core_acl_group ag 
 join core_acl a on a.id = ag.aclId 
 join core_entity e on e.id = a.entityTypeId
 WHERE e.name = 'Module';";
 // projects2 has finance permissions
-$updates['202106091112'][] = "UPDATE core_permission p
+$updates['202107221420'][] = "UPDATE core_permission p
 join core_acl_group ag on ag.groupId = p.groupId
 join core_acl a on a.id = ag.aclId
 join core_module m on a.entityId = m.id

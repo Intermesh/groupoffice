@@ -1,6 +1,8 @@
 <?php
 namespace GO\Base;
 
+use go\core\Installer;
+
 /**
  * Group-Office
  * 
@@ -459,7 +461,9 @@ class Module extends Observable {
 		
 		// \GO::clearCache();
 		// Observable::cacheListeners();
-		go()->rebuildCache();
+		if(!Installer::isInstalling()) {
+			go()->rebuildCache(true);
+		}
 		
 		\GO::setIgnoreAclPermissions($oldIgnore);
 		

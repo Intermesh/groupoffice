@@ -65,76 +65,105 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 			this.doLayout();
 		}, this);
 
-		this.on("afterrender", function() {
-			//find entity panel
-			var form = this.findParentByType("form");
+		this.on("afterrender", this.onAfterRender, this);
 
-			this.formTabPanel = this.findParentByType('tabpanel');
+		go.customfields.FormFieldSet.superclass.initComponent.call(this);
+	},
 
-			if (!form) {
-				console.error("No go.form.EntityPanel found for filtering");
-				return;
-			}
+	onAfterRender: function() {
+		//find entity panel
+		var form = this.findParentByType("form");
+
+		this.formTabPanel = this.findParentByType('tabpanel');
+
+		if (!form) {
+			console.error("No go.form.EntityPanel found for filtering");
+			return;
+		}
+
+		var me = this;
+
+		//Add a beforeaction event listener that will send the custom field data JSON encoded.
+		//The old framework will use this to save custom fields.
+		if (!form.changeListenersAdded) {
+
+			form.changeListenersAdded = true;
 
 			if (form.getXType() == "entityform") {
-				form.on("load", function () {
-					this.filter(form.getValues());
-				}, this);
 
 				form.on("setvalues", function () {
 					this.filter(form.getValues());
+					form.isValid();
 				}, this);
-
-				this.filter(form.getValues());
 			} else {
 				//Legacy code
 
-				//Add a beforeaction event listener that will send the custom field data JSON encoded.
-				//The old framework will use this to save custom fields.
-				if (!form.legacyParamAdded) {
-					form.getForm().on("beforeaction", function (form, action) {
-						if (action.type !== "submit") {
-							return true;
-						}
-
-						var v = form.getFieldValues();
-						if (v.customFields) {
-							action.options.params = action.options.params || {};
-							action.options.params.customFieldsJSON = Ext.encode(v.customFields);
-						}
-
+				form.getForm().on("beforeaction", function (form, action) {
+					if (action.type !== "submit") {
 						return true;
-					});
-					form.legacyParamAdded = true;
-				}
+					}
+
+					var v = form.getFieldValues();
+					if (v.customFields) {
+						action.options.params = action.options.params || {};
+						action.options.params.customFieldsJSON = Ext.encode(v.customFields);
+					}
+
+					return true;
+				});
 
 				form.getForm().on("actioncomplete", function (f, action) {
 					if (action.type === "load") {
-						this.filter(f.getFieldValues());
 						f.isValid(); //needed for conditionally hidden
 					}
 				}, this);
+
 			}
 
-			/**
-			 * Related fields
-			 */
-			this.items.each(function (cnt) {
-				var f = form.getForm();
-				if(cnt.getXType() === 'container') {
-					cnt.items.each(function(field) {
-						field.on('change', function (field) {
-							f.isValid();
-						});
-						field.on('check', function (field, checked) {
-							f.isValid();
-						});
-					});
+			form.getForm().items.each( (field) => {
+				field.on('change', (field) => {
+					form.getForm().isValid();
+				});
+				field.on('check', (field, checked) => {
+					form.getForm().isValid();
+				});
+			});
+		}
+
+
+
+
+		if (form.getXType() == "entityform") {
+
+			form.getForm().items.each( (field) => {
+				field.on('change', (field) => {
+					this.filter(form.getValues());
+				});
+			});
+
+			form.on("setvalues", function () {
+				this.filter(form.getValues());
+			}, this);
+
+			this.filter(form.getValues());
+			form.isValid();
+
+		} else {
+			form.getForm().on("actioncomplete", function (f, action) {
+				if (action.type === "load") {
+					this.filter(f.getFieldValues());
 				}
 			}, this);
-		});
 
-		go.customfields.FormFieldSet.superclass.initComponent.call(this);
+			form.getForm().items.each( (field) => {
+				field.on('change', (field) => {
+					this.filter(form.getForm().getValues());
+				});
+			});
+		}
+
+
+
 	},
 
 	/**
@@ -162,7 +191,7 @@ go.customfields.FormFieldSet = Ext.extend(Ext.form.FieldSet, {
 		}		
 		this.setFilterVisible(true);
 	},
-	
+
 	setFilterVisible : function(v) {
 		//disable recursive so validators don't apply on hidden items
 		function setDisabled(ct, v) {

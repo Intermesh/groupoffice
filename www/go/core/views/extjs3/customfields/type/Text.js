@@ -78,17 +78,17 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 			if (customfield.type === 'Select') {
 				config.validate = function () {
 					this.checkRequiredCondition.call(this, customfield);
-					return go.customfields.type.TreeSelectField.prototype.validate.apply(this);
+					return go.customfields.type.TreeSelectField.prototype.validate.call(this);
 				}
 			} else if (customfield.type === 'MultiSelect') {
 				config.validate = function () {
 					this.checkRequiredCondition.call(this, customfield);
-					return go.form.Chips.prototype.validate.apply(this);
+					return go.form.Chips.prototype.validate.call(this);
 				}
 			} else {
-				config.validateValue = function () {
-					this.checkRequiredCondition.call(this, customfield, this);
-					return Ext.form.Field.prototype.validateValue.apply(this);
+				config.validateValue = function (value) {
+					this.checkRequiredCondition.call(this, customfield);
+					return Ext.form.Field.prototype.validateValue.call(this, value);
 				}
 			}
 		}
@@ -209,21 +209,19 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 	 */
 	checkRequiredCondition: function (customfield) {
 		this.requiredConditionMatches = false;
+
 		if (Ext.isEmpty(customfield.relatedFieldCondition)) {
 			return false;
 		}
 
-		// Debug code. Todo: remove when done
-		// console.log('----');
-		// console.log(customfield.name);
-
 		var strConditionString = this.getConditionString(customfield.relatedFieldCondition);
-		// console.log(strConditionString);
 
-		var func =  new Function(strConditionString);
-		this.requiredConditionMatches = func.call(this);
-
-		// console.log(this.requiredConditionMatches);
+		try {
+			var func = new Function(strConditionString);
+			this.requiredConditionMatches = func.call(this);
+		} catch(e) {
+			console.error("Required condition '" + customfield.relatedFieldCondition + "' failed with error: " + e);
+		}
 
 		var customFieldCmp = this;
 		if (customfield.conditionallyRequired) {
@@ -318,6 +316,10 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 		return {
 			name: "customFields." + field.databaseName,
 			type: this.getFieldType(),
+			mapping: function(obj) {
+				//required for customfields starting with numbers. It's no longer possible to create them but existing customers might have them.
+				return obj.customFields[field.databaseName];
+			},
 			customField: field,
 			customFieldType: this,
 			columnxtype: this.getColumnXType()

@@ -274,7 +274,7 @@ go.data.EntityStore = Ext.extend(Ext.util.Observable, {
 
 		me.getUpdatesPromise = me.getState().then(function(state){
 			
-			console.log("getUpdates", me.entity.name, state);
+			// console.log("getUpdates", me.entity.name, state);
 		
 			if(!state) {
 				console.info("No state yet so won't fetch updates");

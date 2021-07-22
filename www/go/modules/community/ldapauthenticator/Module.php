@@ -46,6 +46,20 @@ class Module extends core\Module implements DomainProvider {
 					return null;
 				},
 				'email' => 'mail',
+
+//				Example function to look for a preferred domain
+//				'email' => function($record) {
+//					// Look for email address with preferred domain
+//					foreach($record->mail as $email) {
+//						if(stristr($email, '@example.com')) {
+//							return $email;
+//						}
+//					}
+//
+//					//If not found return first.
+//					return $record->mail[0] ?? null;
+//				},
+
 				'recoveryEmail' => 'mail',
 				'displayName' => 'cn',
 				'firstName' => 'givenname',
