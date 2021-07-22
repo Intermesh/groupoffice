@@ -93,8 +93,8 @@ class EntityType implements \go\core\data\ArrayableInterface {
    * @return Module
    * @throws Exception
    */
-	public function getModule() {
-		return Module::findById($this->moduleId);
+	public function getModule($props = []) {
+		return Module::findById($this->moduleId, $props);
 	}
 
   /**

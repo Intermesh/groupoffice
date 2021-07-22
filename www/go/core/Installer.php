@@ -463,7 +463,7 @@ class Installer {
 		go()->rebuildCache();
 
 		echo "Registering all entities\n";		
-		$modules = model\Module::find()->where(['enabled' => true])->all();
+		$modules = model\Module::find(['id', 'name', 'package', 'version', 'enabled'])->where(['enabled' => true])->all();
 		foreach($modules as $module) {
 			if(isset($module->package) && $module->isAvailable()) {
 				$module->module()->registerEntities();
@@ -562,7 +562,7 @@ class Installer {
 	private function upgradeModules() {
 		$u = [];
 
-		$modules = model\Module::find()->all();		
+		$modules = model\Module::find(['id', 'name', 'package', 'version', 'enabled'])->all();
 
 		$modulesById = [];
 		/* @var $module model\Module */

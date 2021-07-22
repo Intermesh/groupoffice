@@ -376,7 +376,7 @@ class Module extends Entity {
 	 * @param bool $enabled Set to null for both enabled and disabled
 	 * @return self
 	 */
-	public static function findByName($package, $name, $enabled = true) {
+	public static function findByName($package, $name, $enabled = true, $props = []) {
 		if($package == "legacy") {
 			$package = null;
 		}
@@ -386,11 +386,13 @@ class Module extends Entity {
 			$mod = self::$modulesByName[$cache];
 		} else {
 
-			$query = static::find()->where(['package' => $package, 'name' => $name]);
+			$query = static::find($props)->where(['package' => $package, 'name' => $name]);
 
 			$mod = $query->single();
 
-			self::$modulesByName[$cache] = $mod;
+			if(empty($props)) {
+				self::$modulesByName[$cache] = $mod;
+			}
 		}
 
 		if(!$mod) {
@@ -412,7 +414,10 @@ class Module extends Entity {
 	 * @return bool
 	 */
 	public static function isInstalled($package, $name) {
-		return static::findByName($package, $name) != false;
+		if($package == "legacy") {
+			$package = null;
+		}
+		return static::find()->where(['package' => $package, 'name' => $name])->selectSingleValue('id')->single() != false;
 	}
 	
 	/**

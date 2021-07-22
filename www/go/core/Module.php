@@ -239,7 +239,7 @@ abstract class Module extends Singleton {
 			return true;
 		}
 		
-		$moduleModel = $this->getModel();
+		$moduleModel = $this->getModel(['id']);
 		if(!$moduleModel) {
 			throw new Exception("Module not installed " . static::class);
 		}
@@ -248,7 +248,7 @@ abstract class Module extends Singleton {
 			if(!$type) {
 				throw new Exception("Could not register entity type for module ". $this->getName() . " with name " . $entity::getClientName());
 			}
-			$typeModuleModel = $type->getModule();
+			$typeModuleModel = $type->getModule(['id']);
 			
 			if(!$typeModuleModel) {
 				throw new Exception("Could not register entity type for module ". $this->getName() . " with name " . $entity::getClientName() .' because existing type with ID = '.$type->getId().' had no module.' );
@@ -628,10 +628,10 @@ abstract class Module extends Singleton {
 	 * 
 	 * @return model\Module
 	 */
-	public function getModel() {
+	public function getModel($props = []) {
 
 		if(!$this->model) {
-			$this->model = model\Module::findByName($this->getPackage(), $this->getName(), null);
+			$this->model = model\Module::findByName($this->getPackage(), $this->getName(), null, $props);
 		}
 
 		return $this->model;
