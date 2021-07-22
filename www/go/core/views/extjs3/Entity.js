@@ -106,7 +106,7 @@ Ext.apply(go.Entity.prototype, {
 	 * @return Object
 	 */
 	findRelation : function(path) {
-		parts = path.split("."),last = parts.pop(), current = this.relations;
+		let parts = path.split("."), last = parts.pop(), current = this.relations;
 
 		parts.forEach(function(p) {
 			if(!current[p]) {

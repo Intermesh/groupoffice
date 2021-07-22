@@ -1,3 +1,5 @@
+@use "sass:math";
+
 :root {
   --c-primary: #{map-get($vars, c-primary)};
   --c-primary-tp: #{map-get($vars, c-primary-tp)};
@@ -1187,7 +1189,7 @@ tr.go-grid-row {
 		  display: block;
 		  content: "";
 		  width: 100%;
-		  padding-top: (9 / 16) * 100%;
+		  padding-top: math.div(9 , 16) * 100%;
 		}
 	}
 		
@@ -1461,9 +1463,12 @@ table[id^="comments-ext"] b {
 	line-height: 1.4em;
 	white-space: nowrap;
 
-	.x-panel-body {
-		padding: dp(8);
-		border: 1px solid color($fg, 'line');
+
+}
+
+.go-text-dialog {
+	.x-window-body {
+		padding: dp(16);
 		background-color: color($bg, 'card');
 	}
 }
@@ -2208,8 +2213,9 @@ table[id^="comments-ext"] b {
 	display: inline-block;
 	@extend .x-btn;
 	min-height: dp(32);
-	line-height: dp(24);
-	padding: 2px dp(8);
+	line-height: dp(28);
+	padding: dp(2) dp(8);
+	margin: 0;
 
 	&:hover, &:focus {
 		transition: all 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
@@ -2321,6 +2327,35 @@ table[id^="comments-ext"] b {
 	*[disabled] {
 		opacity: 0.65;
 		cursor: not-allowed;
+	}
+
+	.mask-message{
+		display: none;
+		position: absolute;
+		height: dp(56);
+		width: dp(200);
+		top: 50%;
+		left: 50%;
+		margin-top: dp(-24);
+		margin-left: dp(-100);
+		background-color: white;
+		border: 1px solid color($fg, 'line');
+		text-align: center;
+		padding: dp(16);
+		border-radius: 4px;
+	}
+
+	.mask {
+		>*:not(.mask-message) {
+			visibility: hidden;
+		}
+		position: relative;
+		background-color: color($bg, 'background');
+		pointer-events: none;
+		.mask-message {
+			display: block;
+		}
+
 	}
 }
 
@@ -2442,4 +2477,10 @@ body.go-compact {
 
 #startMenu .x-menu-item-icon {
 	height: dp(26);
+}
+
+.x-form {
+	p {
+		@extend %font-caption;
+	}
 }

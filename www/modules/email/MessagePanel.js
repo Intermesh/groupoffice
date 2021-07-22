@@ -697,6 +697,7 @@ GO.email.MessagePanel = Ext.extend(Ext.Panel, {
 
 	openAttachment :  function(e, target)
 	{
+
 		if(target.id.substr(0,this.attachmentsId.length)==this.attachmentsId)
 		{
 			var attachment_no = target.id.substr(this.attachmentsId.length+1);

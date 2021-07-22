@@ -104,7 +104,7 @@ abstract class AclEntity extends Entity {
 			if(in_array($id, $result['changed']) || in_array($id, $result['removed'])) {
 				continue;
 			}
-			
+
 			if(in_array($aclId, $currentAclIds)) {
 				$result['changed'][] = $id;
 			} else
@@ -114,7 +114,7 @@ abstract class AclEntity extends Entity {
 
 			$i++;
 
-			if($i == $maxChanges) {				
+			if($i == $maxChanges) {
 				break;
 			}
 			

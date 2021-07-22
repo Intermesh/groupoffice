@@ -139,3 +139,7 @@ table.x-calGrid-headings-table {
 .go-main-tab-panel .x-tab-strip > li {
   border:1px solid transparent;
 }
+
+//html editor icons in outline set:
+.x-edit-forecolor:before, img.x-edit-forecolor + span::before {content: 'color_lens';}
+.x-edit-backcolor:before, img.x-edit-backcolor + span::before {content: 'format_paint';}

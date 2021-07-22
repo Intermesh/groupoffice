@@ -1267,6 +1267,8 @@ GO.email.EmailClient = Ext.extend(Ext.Panel, {
 });
 
 GO.mainLayout.onReady(function(){
+
+	let countEmailShown;
 	//GO.email.Composer = new GO.email.EmailComposer();
 
 	//contextmenu when an e-mail address is clicked
@@ -1298,14 +1300,14 @@ GO.mainLayout.onReady(function(){
 			}
 		}
 
-		if((!data.email_status.has_new && this.countEmailShown)
+		if((!data.email_status.has_new && countEmailShown)
 			|| data.email_status.total_unseen <= 0
-			|| (this.countEmailShown && this.countEmailShown >= data.email_status.total_unseen)){
+			|| (countEmailShown && countEmailShown >= data.email_status.total_unseen)){
 
-			this.countEmailShown = data.email_status.total_unseen;
+			countEmailShown = data.email_status.total_unseen;
 			return;
 		}
-		this.countEmailShown = data.email_status.total_unseen;
+		countEmailShown = data.email_status.total_unseen;
 		var title = t("New email"),
 			text = t("You have %d unread email(s)").replace('%d', data.email_status.total_unseen);
 
@@ -1408,7 +1410,7 @@ GO.email.saveAttachment = function(attachment,panel)
 
 
 GO.email.openAttachment = function(attachment, panel, forceDownload)
-	{
+{
 		if(!panel)
 			return false;
 
@@ -1529,6 +1531,10 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 					}
 
 				default:
+					if(Ext.isSafari) {
+						//must be opened before any async processes happen
+						go.util.getDownloadTargetWindow();
+					}
 
 					if(go.Modules.isAvailable('legacy', 'files')) {
 						return GO.files.openEmailAttachment(attachment, panel, false);

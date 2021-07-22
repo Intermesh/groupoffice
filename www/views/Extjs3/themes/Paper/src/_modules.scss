@@ -94,6 +94,14 @@
 	@extend %font-body2;
 }
 
+i.icon.em-priority_high {
+	color: #bb0000;
+}
+
+i.icon.em-low_priority {
+	color: #00ccff;
+}
+
 
 .x-tree-node .ml-folder-unseen a .em-folder-status { // badge
 	@extend %badge;

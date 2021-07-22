@@ -13,9 +13,12 @@ use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\orm\Relation;
 use go\core\util\DateTime as GoDateTime;
+use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Spreadsheet as PhpSpreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Style\Font;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Row;
 use PhpOffice\PhpSpreadsheet\Worksheet\RowIterator;
 use Sabre\VObject\Property\VCard\DateTime;
@@ -578,7 +581,13 @@ class Spreadsheet extends AbstractConverter {
 			$cellIterator->setIterateOnlyExistingCells(FALSE); // This loops through all cells,
 			$cells = [];
 			foreach ($cellIterator as $cell) {
-				$cells[] = (string) $cell->getValue();
+				if(\PhpOffice\PhpSpreadsheet\Shared\Date::isDateTime($cell)) {
+					$v = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($cell->getValue());
+				} else{
+					$v = $cell->getValue();
+				}
+
+				$cells[] = $v;
 			}
 			return $cells;
 		} else{
@@ -715,6 +724,7 @@ class Spreadsheet extends AbstractConverter {
 					$item = $this->convertRecordToProperties($record, $map, $c['properties'] ?? []);
 					if($item) {
 						$v[$propName] = $item;
+						$hasCsvData = true;
 					}
 				}
 			}else {

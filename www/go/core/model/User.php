@@ -15,13 +15,17 @@ use go\core\auth\Method;
 use go\core\auth\Password;
 use go\core\auth\PrimaryAuthenticator;
 use go\core\convert\UserSpreadsheet;
+use go\core\customfield\Date;
 use go\core\db\Criteria;
+use go\core\ErrorHandler;
 use go\core\mail\Message;
+use go\core\mail\Util;
 use go\core\orm\Query;
 use go\core\exception\Forbidden;
 use go\core\jmap\Entity;
 use go\core\orm\CustomFieldsTrait;
 use go\core\util\DateTime;
+use go\core\util\Geolocation;
 use go\core\validate\ErrorCode;
 use GO\Files\Model\Folder;
 use go\modules\community\addressbook\model\AddressBook;
@@ -53,6 +57,8 @@ class User extends Entity {
 	 * @param User $user Can be null
 	 */
 	const EVENT_BADLOGIN = 'badlogin';
+
+	const USERNAME_REGEX = '/[A-Za-z0-9_\-\.@]+/';
 	
 	public $validatePassword = true;
 
@@ -465,7 +471,14 @@ class User extends Entity {
 		if(!isset($this->homeDir)) {
 			$this->homeDir = "users/" . $this->username;
 		}
-		
+
+		if($this->isModified(['username'])) {
+
+			if(!preg_match(self::USERNAME_REGEX, $this->username)) {
+				$this->setValidationError('username', ErrorCode::MALFORMED, go()->t("You have invalid characters in the username") . " (a-z, 0-9, -, _, ., @).");
+			}
+		}
+
 		if($this->isModified('groups')) {	
 			
 			
@@ -506,10 +519,16 @@ class User extends Entity {
 		}
 
 		if($this->isModified(['email'])) {
-			$id = \go\core\model\User::find()->selectSingleValue('id')->where(['email' => $this->email])->single();
-			
-			if($id && $id != $this->id){
-				$this->setValidationError('email', ErrorCode::UNIQUE, 'The e-mail address must be unique in the system');
+
+			if(!Util::validateEmail($this->email)) {
+				$this->setValidationError('email', ErrorCode::MALFORMED);
+			} else {
+
+				$id = \go\core\model\User::find()->selectSingleValue('id')->where(['email' => $this->email])->single();
+
+				if ($id && $id != $this->id) {
+					$this->setValidationError('email', ErrorCode::UNIQUE, 'The e-mail address must be unique in the system');
+				}
 			}
 		}
 
@@ -707,6 +726,10 @@ class User extends Entity {
 		}
 
 		$this->changeHomeDir();
+
+		if(!$this->saveAuthorizedClients()) {
+			return false;
+		}
 
 		return true;		
 	}
@@ -1053,4 +1076,61 @@ class User extends Entity {
 			return $this->theme;
 		}
 	}
+
+	/**
+	 * Get authorized clients with ['remoteIpAddress', 'platform', 'browser']
+	 * @return array[]
+	 * @throws Exception
+	 */
+	public function getAuthorizedClients() {
+		$clients =  go()->getDbConnection()
+			->select("remoteIpAddress, platform, browser")
+			->distinct()
+			->from('core_auth_token')
+			->where('userId', '=', $this->id)
+			->andWhere('expiresAt', '>', new DateTime())
+			->all();
+
+//		foreach($clients as &$client) {
+//			try {
+//				$geo = Geolocation::locate($client['remoteIpAddress']);
+//				$client['countryCode'] = $geo['countryCode'];
+//			} catch(\Exception $e) {
+//				ErrorHandler::logException($e);
+//				$client['countryCode'] = null;
+//			}
+//		}
+
+		return $clients;
+	}
+
+	private $authorizedClients;
+
+	public function setAuthorizedClients($clients) {
+		$this->authorizedClients = $clients;
+	}
+
+	private function saveAuthorizedClients() {
+		if(!isset($this->authorizedClients)) {
+			return true;
+		}
+
+		$query = (new Query)
+			->where('userId', '=', $this->id)
+			->andWhere('expiresAt', '>', new DateTime());
+
+		if(!empty($this->authorizedClients)) {
+			$c = new Criteria();
+			foreach ($this->authorizedClients as $client) {
+				unset($client['countryCode']);
+				$c->andWhereNot($client);
+			}
+
+			$query->andWhere($c);
+		}
+
+		return Token::delete($query);
+	}
+
+
 }

@@ -174,7 +174,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 					xtype: 'tbsearch'
 				},
 				this.addButton = new Ext.Button({
-					//disabled: true,
 					iconCls: 'ic-add',
 					cls: "primary",
 					tooltip: t('Add'),
@@ -209,10 +208,9 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				}),
 				{
 					iconCls: 'ic-more-vert',
-					menu: [{
+					menu: [this.importButton = new Ext.menu.Item({
 							iconCls: 'ic-cloud-upload',
 							text: t("Import"),
-							disabled: !go.Modules.isAvailable("community","addressbook",go.permissionLevels.manage) && go.Modules.get("community", "addressbook").settings.restrictExportToAdmins,
 							handler: function() {
 								go.util.importFile(
 												'Contact', 
@@ -376,8 +374,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 												});
 							},
 							scope: this
-						}, {
-							disabled: !go.Modules.isAvailable("community","addressbook",50,go.User) && go.Modules.get("community", "addressbook").settings.restrictExportToAdmins,
+						}), this.exportButton = new Ext.menu.Item({
 							iconCls: 'ic-cloud-download',
 							text: t("Export"),
 							menu: [
@@ -441,7 +438,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 								}
 
 							]							
-						},
+						}),
 						"-",
 
 						{
@@ -568,6 +565,12 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 
 	setAddressBookId: function (addressBookId) {
 		this.addButton.setDisabled(false);
+
+		var defaultDisabled = !go.Modules.isAvailable("community","addressbook",go.permissionLevels.manage) &&
+			go.Modules.get("community", "addressbook").settings.restrictExportToAdmins;
+
+		this.importButton.setDisabled(false); // Only export is restricted to the restrictExportToAdmins setting!
+		this.exportButton.setDisabled(defaultDisabled);
 		if (addressBookId) {
 			this.addAddressBookId = addressBookId;
 			
@@ -575,20 +578,28 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				addressBookId: addressBookId
 			});
 			
-		} else
-		{
+		} else {
 			this.grid.store.setFilter("addressbooks", null);
 			
 			var firstAbNode = this.addressBookTree.getRootNode().childNodes[1];
 			if (firstAbNode) {
 				this.addAddressBookId = go.User.addressBookSettings && go.User.addressBookSettings.defaultAddressBookId ? go.User.addressBookSettings.defaultAddressBookId : firstAbNode.attributes.data.id;
-			} else
-			{
+			} else {
 				this.addButton.setDisabled(true);
 			}
 		}
-		
-		this.grid.store.load();
+		var me = this;
+		this.grid.store.load().then(function (result) {
+			if (addressBookId) {
+				go.Db.store('AddressBook').single(addressBookId).then(function (ab) {
+					if (ab.permissionLevel < go.permissionLevels.write) {
+						me.addButton.setDisabled(true);
+						me.importButton.setDisabled(true);
+						me.exportButton.setDisabled(true);
+					}
+				});
+			}
+		});
 	},
 
 	setGroupId: function (groupId, addressBookId) {

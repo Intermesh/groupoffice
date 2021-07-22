@@ -38,7 +38,8 @@
     "steverhoades/oauth2-openid-connect-server": "1.2.0",
     "phpoffice/phpspreadsheet": "^1.15",
     "lcobucci/jwt": "3.3.3",
-    "firebase/php-jwt": "^5.2"
+    "firebase/php-jwt": "^5.2",
+    "donatj/phpuseragentparser": "^1.4"
   },
   "license": "AGPL",
   "authors": [

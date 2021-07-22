@@ -29,7 +29,8 @@ GO.form.PlainField = Ext.extend(Ext.form.Field, {
 		tag: 'div',
 		cls: 'x-form-plainfield'
 	},
-	
+
+	//Doesn't send value by default!
 	submit: false,
 
 	// private
@@ -92,8 +93,12 @@ GO.form.PlainField = Ext.extend(Ext.form.Field, {
 		
 		this.value = v;
 		if(this.rendered){
-			this.el.update(v);
+			this.el.update(this.renderer(v));
 		}
+	},
+
+	renderer : function(v) {
+		return v;
 	}
 
 });

@@ -190,6 +190,10 @@ go.form.Chips = Ext.extend(Ext.Container, {
 		if(!values) {
 			values = this.map ? {} : [];
 		}
+
+		if(this.comboBox) {
+			this.comboBox.clearInvalid();
+		}
 		
 		if(this.entityStore) {	
 			var ids = this.map ? Object.keys(values) : values;
@@ -232,15 +236,13 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	},
 	markInvalid: function (msg) {		
 		if(this.comboBox) {
-			this.comboBox.getEl().addClass('x-form-invalid');
+			this.comboBox.markInvalid(msg);
 		}
-		Ext.form.MessageTargets.qtip.mark(	this.comboBox, msg);
 	},
 	clearInvalid: function () {
 		if(this.comboBox) {
-			this.comboBox.getEl().removeClass('x-form-invalid');
+			this.comboBox.clearInvalid();
 		}
-		Ext.form.MessageTargets.qtip.clear(this.comboBox);
 	},
 	createComboBox: function () {
 		if(this.store) {
@@ -306,6 +308,10 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	
 	validate: function () {
 
+		if(this.disabled) {
+			return true;
+		}
+
 		if(!this.allowBlank && go.util.empty(this.getValue())) {
 			this.markInvalid(Ext.form.TextField.prototype.blankText);
 			return false;
@@ -314,7 +320,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	},
 
 	isValid: function (preventMark) {
-		return this.allowBlank || !go.util.empty(this.getValue());
+		return this.disabled || this.allowBlank || !go.util.empty(this.getValue());
 	}
 
 });

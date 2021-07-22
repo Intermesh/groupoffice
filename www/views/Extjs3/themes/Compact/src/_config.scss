@@ -1,3 +1,5 @@
+@use "sass:math";
+
 @function color($color, $hue: 500, $contrast: 0) {
   @if $contrast == 1 {
     @return map-get(map-get($color, contrast), $hue);
@@ -92,7 +94,7 @@ $density: 110;
 $font-scale: 1.1;
 
 @function dp($width) {
-  @return (($width * $density) / 160) *1px;
+  @return math.div(($width * $density) , 160) *1px;
 }
 @function sp($size) {
   @return ceil(dp($size) * $font-scale);

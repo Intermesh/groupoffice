@@ -10,7 +10,7 @@
  */
 
 /**
- * Exeption thrown on database errors
+ * Exception thrown on database errors
  *
  * @package GO.Exception
  * @copyright Copyright Intermesh
@@ -20,8 +20,9 @@
 
 namespace GO\Base\Exception;
 
+use Exception;
 
-class Database extends \Exception
+class Database extends Exception
 {
 
 	public function __construct($message,$code=0,$errorInfo=null) {
@@ -31,4 +32,3 @@ class Database extends \Exception
 		parent::__construct($message);
 	}
 }
-?>

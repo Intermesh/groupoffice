@@ -333,7 +333,21 @@ go.util =  (function () {
 		},
 
 		viewFile : function(url) {
-			window.open(url);
+			const win = this.getDownloadTargetWindow();
+			win.focus();
+
+			if(Ext.isSafari && window.navigator.standalone) {
+				url = "filewrap.php?url=" + encodeURIComponent(url);
+			}
+			win.location.replace(url);
+
+		},
+
+		getDownloadTargetWindow : function() {
+			if(!this.downloadTarget || this.downloadTarget.closed || this.downloadTarget.location != "about:blank") {
+				this.downloadTarget = window.open("about:blank", "_blank");
+			}
+			return this.downloadTarget;
 		},
 
 		/**
@@ -342,13 +356,18 @@ go.util =  (function () {
 		 * @param {string} url
 		 */
 		downloadFile: function(url) {
-			if(window.navigator.standalone) {
+			if(Ext.isSafari && window.navigator.standalone) {
 				//somehow this is the only way a download works on a web application on the iphone.
-				var win = window.open( "about:blank", "_system");
+				const win = this.getDownloadTargetWindow();
 				win.focus();
-				win.location = url;
+				win.location = "filewrap.php?url=" + encodeURIComponent(url);
+
 			} else
 			{
+				// for safari :(
+				if(go.util.downloadTarget)
+					go.util.downloadTarget.close();
+
 				// document.location.href = url; //This causes connection errors with SSE or other simulanous XHR requests
 				if(!downloadFrame) {
 					// downloadFrame = document.createElement('iframe');

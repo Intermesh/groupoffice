@@ -82,6 +82,21 @@ class Connection {
 		return $this->pdo;
 	}
 
+	private $database;
+
+	/**
+	 * Get the database instance
+	 *
+	 * @return Database
+	 */
+	public function getDatabase() {
+		if(!isset($this->database)) {
+			$this->database = new Database($this);
+		}
+
+		return $this->database;
+	}
+
 	/**
 	 * Close the database connection. Beware that all active PDO statements must be set to null too
 	 * in the current scope.

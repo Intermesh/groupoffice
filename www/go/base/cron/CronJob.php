@@ -335,7 +335,7 @@ class CronJob extends \GO\Base\Db\ActiveRecord {
 				
 				$cronFile->run($this);
 				$this->error=null;	
-			}catch(\Exception $e){
+			}catch(\Throwable $e){
 				GO::debug("EXCEPTION: ".(string) $e);
 				$failed=true;
 				
