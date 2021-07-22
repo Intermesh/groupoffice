@@ -45,7 +45,7 @@ try {
 		echo "<h2>". go()->t("Upgrade Group-Office") ."</h2><p>";
 		echo "Please <b>BACKUP</b> your database and files before proceeding. Your database is going to be upgraded and all caches will be cleared.<br />This operation can only be undone by restoring a backup.<br />";
 		
-		echo 'More details about this upgrade can be found in the <a target="_blank" href="https://github.com/Intermesh/groupoffice/blob/' . go()->getMajorVersion()  . '.x/CHANGELOG.md">change log</a>.<br /><br />';
+		echo 'More details about this upgrade can be found in the <a target="_blank" href="https://github.com/Intermesh/groupoffice/blob/master/CHANGELOG.md">change log</a>.<br /><br />';
 
 		echo "Note: You can also upgrade on the command line by running (replace www-data with the user of your webserver): <br />
 

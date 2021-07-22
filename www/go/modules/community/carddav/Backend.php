@@ -153,7 +153,7 @@ class Backend extends AbstractBackend {
 		$contacts = Contact::find()
 						->join('core_blob', 'b', 'b.id = c.vcardBlobId', 'LEFT')
 						->where(['addressBookId' => $addressbookId])
-						->andWhere('c.vcardBlobId IS NULL OR b.modifiedAt < c.modifiedAt')
+						->andWhere('(c.vcardBlobId IS NULL OR b.modifiedAt < c.modifiedAt)')
 						->execute();
 		
 		if(!$contacts->rowCount()) {

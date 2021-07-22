@@ -424,16 +424,25 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		this.startMenu = new Ext.menu.Menu({
 			id: 'startMenu',
-			hideOnClick: true
+			enableScrolling: false
 		});
 
-		if(GO.util.isMobileOrTablet()) {
-			this.startMenu.on("show", function() {
-				this.startMenu.setPosition(0,0);
-				this.startMenu.setWidth(Ext.getBody().getWidth());
-				this.startMenu.setHeight(Ext.getBody().getHeight());
-			}, this);
-		}
+		this.startMenu.on('render', () => {
+			this.startMenu.getEl().on('click', (e) => {
+				var t = this.startMenu.findTargetItem(e);
+				if(!t){
+					this.startMenu.hide();
+				}
+			});
+		});
+
+		// if(GO.util.isMobileOrTablet()) {
+		// 	this.startMenu.on("show", function() {
+		// 		this.startMenu.setPosition(0,0);
+		// 		this.startMenu.setWidth(Ext.getBody().getWidth());
+		// 		this.startMenu.setHeight(Ext.getBody().getHeight());
+		// 	}, this);
+		// }
 
 		if (allPanels.length == 0) {
 			items = new Ext.Panel({

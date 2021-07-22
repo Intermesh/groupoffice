@@ -308,6 +308,10 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	
 	validate: function () {
 
+		if(this.disabled) {
+			return true;
+		}
+
 		if(!this.allowBlank && go.util.empty(this.getValue())) {
 			this.markInvalid(Ext.form.TextField.prototype.blankText);
 			return false;
@@ -316,7 +320,7 @@ go.form.Chips = Ext.extend(Ext.Container, {
 	},
 
 	isValid: function (preventMark) {
-		return this.allowBlank || !go.util.empty(this.getValue());
+		return this.disabled || this.allowBlank || !go.util.empty(this.getValue());
 	}
 
 });

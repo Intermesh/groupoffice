@@ -68,7 +68,7 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 		if(!json) {
 			return [];
 		}
-		html = ['<table style="width:100%;border-spacing: 3px"><tr><th>'+t('Name')+'</th><th>'+t('Old')+'</th><th>'+t('New')+'</th></tr>'];
+		html = ['<table class="display-panel" style="table-layout: fixed;word-wrap:break-word;"><tr class="line"><th>'+t('Name')+'</th><th>'+t('Old')+'</th><th>'+t('New')+'</th></tr>'];
 		for(var key in json) {
 			html.push('<tr><td>'+key+':</td><td>'+this.renderJsonValue(json[key][1]).join('<br>')+
 				'</td><td>'+this.renderJsonValue(json[key][0]).join('<br>')+'</td></tr>');
@@ -94,27 +94,42 @@ Ext.define('go.modules.community.history.LogEntryGrid',{
 		}
 
 		var target = this.view.getCell(rowIndex, colIndex),
-			html = '';
+			html = "<p>" + t("Date") + ": " + go.util.Format.dateTime(rec.data.createdAt) + "</p>";
+
+		html += "<h4>" + t("Changes") + "</h4>";
 
 		switch(rec.data.action) {
-			case 'update': html = this.renderOldNew(json).join('');
+			case 'update': html += this.renderOldNew(json).join('');
 				break;
 			case 'create':
-			case 'delete': html = this.renderJson(json).join('<br>');
+			case 'delete': html += this.renderJson(json).join('<br>');
 				break;
-			case 'login': html = rec.data.createdAt;
+			case 'login': html += rec.data.createdAt;
 				break;
 		}
 
-		var tt = new Ext.menu.Menu({
-			//target: target,
-			//title: rec.data.description,
-			width:500,
-			html: '<div style="padding:7px"><h5>'+rec.data.description+'</h5>'+html+'</div>' ,
-			autoHide: false
-			//closable: true
+		const win = new go.Window({
+			cls: "go-text-dialog",
+			closable: true,
+			minimizable: true,
+			title: rec.data.description,
+			html: html,
+			autoScroll: true,
+			width: dp(500),
+			height: dp(500)
+
 		});
-		tt.show(target);
+		win.show();
+
+		// var tt = new Ext.menu.Menu({
+		// 	//target: target,
+		// 	//title: rec.data.description,
+		// 	width:500,
+		// 	html: '<div style="padding:7px;max-height:400px;overflow-y:scroll;"><h5>'+rec.data.description+'</h5>'+html+'</div>' ,
+		// 	autoHide: false
+		// 	//closable: true
+		// });
+		// tt.show(target);
 	},
 
 	initComponent: function() {
