@@ -110,7 +110,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 		$c = self::getCache();	
 		
 		if(!isset($c['name'][$clientName])) {
-			$module = Module::findByClass($className);
+			$module = Module::findByClass($className, ['id']);
 		
 			if(!$module) {
 				throw new Exception("No module found for ". $className);
@@ -137,7 +137,7 @@ class EntityType implements \go\core\data\ArrayableInterface {
 
 		if(go()->getDebugger()->enabled) {
 			//do extra check if entity type belongs to the module
-			$module = Module::findByClass($className);
+			$module = Module::findByClass($className, ['id']);
 			if($c['models'][$c['name'][$clientName]]->moduleId != $module->id) {
 				throw new Exception("Entity $className conflicts with : " .$c['models'][$c['name'][$clientName]]->getClassName() .". Please return unique client name with getClientName()");
 			}

@@ -944,7 +944,7 @@ $updates['202105111132'][] = "alter table core_auth_token
 $updates['202107010929'][] = "alter table core_auth_token modify userAgent varchar(190) null;";
 $updates['202107010929'][] = "alter table core_customfields_field modify relatedFieldCondition text default null;";
 
-$udpates['202107221420'][] = "CREATE TABLE `core_permission` (
+$updates['202107221420'][] = "CREATE TABLE `core_permission` (
   `moduleId` INT NOT NULL,
   `groupId` INT NOT NULL,
   `rights` BIGINT NOT NULL DEFAULT 0,
