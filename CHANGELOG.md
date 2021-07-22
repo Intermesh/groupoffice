@@ -1,3 +1,6 @@
+22-07-2021 6.4.241
+- Projects: Fixed upgrade error in projects where pr2_settings doesn't exist
+
 19-07-2021 6.4.240
 - Billing: Fixed filter 'Books' in project reports
 - MultiInstance: Fixed compatibility issue with MySQL 8+
