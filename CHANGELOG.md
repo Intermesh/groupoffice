@@ -1,3 +1,5 @@
+- Core: When displaying full date then use leading zero's
+
 20-07-2021 6.5.70
 - History: render issue in changes
 
