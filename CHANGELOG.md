@@ -6,7 +6,11 @@ Tasks: Completely rewritten module
 Core: Set alternative lost password URL
 Core: Alert system to notify users about comments, assigned tasks etc.
 Core: Made "Remember me" more secure by using a special token. (See https://stackoverflow.com/a/244907)
+Core: New module chooser menu
+Core: System Settings -> Modules redesigned and searchable.
 ----
+
+
 - Core: When displaying full date then use leading zero's
 - Google Authenticator: Options to force setup or a countdown timer before you can choose to set it up later.
 

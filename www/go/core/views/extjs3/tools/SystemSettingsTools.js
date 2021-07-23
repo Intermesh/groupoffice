@@ -10,7 +10,7 @@ Ext.ux.IFrameComponent = Ext.extend(Ext.BoxComponent, {
 });
  
 go.tools.SystemSettingsTools = Ext.extend(Ext.Panel,{
-	
+	itemId: "tools", //makes it routable
 	iconCls: 'ic-build',
 	
 	initComponent: function() {

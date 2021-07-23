@@ -1,6 +1,7 @@
 go.customfields.SystemSettingsPanel = Ext.extend(go.grid.GridPanel, {
 	iconCls: 'ic-storage',
 	title: t("Custom fields"),
+	itemId: "customfields", //makes it routable
 	initComponent: function () {
 		
 		var data = go.Entities.getAll().map(function(e) {			

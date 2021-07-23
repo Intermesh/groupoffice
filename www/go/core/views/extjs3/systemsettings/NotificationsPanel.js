@@ -2,6 +2,7 @@ go.systemsettings.NotificationsPanel = Ext.extend(go.systemsettings.Panel, {
 	initComponent: function () {
 		
 		Ext.apply(this, {
+			itemId: "notifications", //makes it routable
 			title: t('Notifications'),
 			autoScroll: true,
 			iconCls: 'ic-notifications',

@@ -5,7 +5,9 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 	paging: false,
 	clicksToEdit: 1,
 	loadMask: true,
-	bodyCssClass: 'x-view-tiles go-module-tile',
+	itemId: "modules", //makes it routable
+	cls: 'go-modules',
+	// bodyCssClass: 'x-view-tiles go-module-tile',
 	title: t('Modules'),
 
 	autoScroll:true,
@@ -21,11 +23,25 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 			url: GO.url("modules/module/store"),
 			fields:['name', 'package', 'localizedPackage', 'localizedName',  'description', 'id', 'sort_order', 'admin_menu', 'aclId', 'icon', 'enabled', 'warning','author', 'buyEnabled','not_installable', 'isRefactored','installed'],
 			remoteSort: false,
-			idProperty: 'name',
-			sortInfo: {
-				field: 'name',
-				direction: 'ASC'
-			}
+			idProperty: 'name'
+
+		});
+
+		this.store.on('beforeload', () => {
+			this.getEl().mask(t("Loading..."));
+		});
+
+		this.store.on('load', () => {
+
+			this.store.multiSort([
+				{field: 'localizedPackage', direction: 'ASC'},
+				{field: 'name', direction: 'ASC'}
+			]);
+
+			this.getEl().unmask();
+		});
+		this.store.on('exception', () => {
+			this.getEl().unmask();
 		});
 
 		this.tbar = [{
@@ -113,11 +129,27 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 
 		this.removeAll();
 
+		let lastPackage = null;
+
 		store.each(function(r){
 			var hasEditPermission = r.get("permissionLevel") < go.permissionLevels.manage;
 			var isInstalled = r.data.id != null;
 
-			this.add({
+			if(r.data.localizedPackage != lastPackage) {
+				this.add({
+					xtype: "box",
+					autoEl: "h3",
+					html: r.data.localizedPackage
+				});
+				lastPackage = r.data.localizedPackage;
+
+				this.packageContainer = this.add({
+					xtype: 'container',
+					cls: 'x-view-tiles go-module-tile'
+				})
+			}
+
+			this.packageContainer.add({
 				xtype:'container',
 				cls: 'tile',
 				listeners: {
@@ -130,27 +162,28 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 						// });
 					}
 				},
-				items:[{
-					xtype:'box',
-					cls: 'corner',
-					autoEl:{tag: 'span'},
-					html: r.data.localizedPackage
-				},{
-					xtype:'numberfield',
-					allowBlank: false,
-					disabled: !isInstalled,
-					decimals:0,
-					fieldLabel: t('Sort order'),
-					value: r.data.sort_order,
-					record: r,
-					listeners:{
-						change: function(btn, newValue) {
-							btn.record.set("sort_order", newValue);
-							this.submitRecord(btn.record);
-						},
-						scope:this
-					}
-				},
+				items:[
+				// 	{
+				// 	xtype:'box',
+				// 	cls: 'corner',
+				// 	autoEl:{tag: 'span'},
+				// 	html: r.data.localizedPackage
+				// },{
+				// 	xtype:'numberfield',
+				// 	allowBlank: false,
+				// 	disabled: !isInstalled,
+				// 	decimals:0,
+				// 	fieldLabel: t('Sort order'),
+				// 	value: r.data.sort_order,
+				// 	record: r,
+				// 	listeners:{
+				// 		change: function(btn, newValue) {
+				// 			btn.record.set("sort_order", newValue);
+				// 			this.submitRecord(btn.record);
+				// 		},
+				// 		scope:this
+				// 	}
+				// },
 					{
 						xtype:'box',
 						cls: 'thumb',

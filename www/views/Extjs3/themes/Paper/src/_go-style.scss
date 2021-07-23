@@ -2531,6 +2531,13 @@ body.go-compact {
 	}
 }
 
+.go-modules {
+	h3 {
+		margin: dp(24) dp(16) dp(16);
+		@include var(color, c-primary);
+	}
+}
+
 #startMenu .x-menu-item-icon {
 	height: dp(26);
 }

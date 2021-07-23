@@ -14,6 +14,7 @@
 
 go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
 	iconCls: 'ic-group',
+	itemId: "groups", //makes it routable
 	initComponent: function () {
 		this.title = t("Groups");
 		this.store = new go.data.Store({
