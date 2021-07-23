@@ -333,33 +333,22 @@ go.util =  (function () {
 		},
 
 		viewFile : function(url) {
-			const win = this.getDownloadTargetWindow();
-
-			if(!win) {
-				Ext.Msg.alert(t("Could not open a window. Please allow popup windows in your browser."))
-				return;
-			}
-			win.focus();
 
 			if(Ext.isSafari && window.navigator.standalone) {
 				url = "filewrap.php?url=" + encodeURIComponent(url);
 			}
-			win.location.replace(url);
 
-		},
+			const win = window.open(url);
 
-		getDownloadTargetWindow : function() {
-			try {
-				if (!this.downloadTarget || this.downloadTarget.closed || this.downloadTarget.location.href != "about:blank") {
-					this.downloadTarget = window.open("about:blank", "_blank");
-				}
-			} catch(e) {
-				// for firefox complaining about Uncaught DOMException: Permission denied to access property Symbol.toPrimitive on cross-origin object
-				// even though it is the same origin !?
-				this.downloadTarget = window.open("about:blank", "_blank");
+			if(!win) {
+				Ext.Msg.alert(t("Error"), t("Could not open a window. Please allow popup windows in your browser."))
+				return;
 			}
-			return this.downloadTarget;
+			win.focus();
+
 		},
+
+
 
 		/**
 		 * Download an URL
@@ -369,15 +358,18 @@ go.util =  (function () {
 		downloadFile: function(url) {
 			if(Ext.isSafari && window.navigator.standalone) {
 				//somehow this is the only way a download works on a web application on the iphone.
-				const win = this.getDownloadTargetWindow();
+				const win = window.open("filewrap.php?url=" + encodeURIComponent(url));
 				win.focus();
-				win.location = "filewrap.php?url=" + encodeURIComponent(url);
+
 
 			} else
 			{
 				// for safari :(
 				if(go.util.downloadTarget)
 					go.util.downloadTarget.close();
+
+				// const win = this.getDownloadTargetWindow();
+				// win.location = url;
 
 				// document.location.href = url; //This causes connection errors with SSE or other simulanous XHR requests
 				if(!downloadFrame) {
@@ -390,7 +382,7 @@ go.util =  (function () {
 					downloadFrame.toggleAttribute("download");
 
 				}
-				//downloadFrame.src = url;
+				// downloadFrame.src = url;
 				downloadFrame.href = url;
 				downloadFrame.click();
 			}
