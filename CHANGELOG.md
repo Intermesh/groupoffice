@@ -1,4 +1,5 @@
 - Core: When displaying full date then use leading zero's
+- Google Authenticator: Options to force setup or a countdown timer before you can choose to set it up later.
 
 20-07-2021 6.5.70
 - History: render issue in changes
