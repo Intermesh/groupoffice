@@ -11,6 +11,9 @@ Core: System Settings -> Modules redesigned and searchable.
 ----
 
 
+23-07-2021 6.5.72
+- Email: Fixed attachment downloading in firefox when opening a second one.
+
 23-07-2021 6.5.71
 - Email: Fixed attachment downloading in firefox when opening a second one.
 - Core: When displaying full date then use leading zero's

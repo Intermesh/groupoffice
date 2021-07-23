@@ -1533,7 +1533,7 @@ GO.email.openAttachment = function(attachment, panel, forceDownload)
 				default:
 					// if(Ext.isSafari) {
 						//must be opened before any async processes happen
-						go.util.getDownloadTargetWindow();
+					//	go.util.getDownloadTargetWindow();
 					// }
 
 					if(go.Modules.isAvailable('legacy', 'files')) {
