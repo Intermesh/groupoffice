@@ -15,7 +15,9 @@ GO.mainLayout.on('authenticated', (mainLayout, user, password) => {
 		return;
 	}
 
-	go.modules.community.googleauthenticator.enable(user, password);
+	const s = go.Modules.get("community", "googleauthenticator").settings;
+
+	go.modules.community.googleauthenticator.enable(user, password, s.countDown, s.block);
 
 });
 
@@ -26,7 +28,7 @@ go.modules.community.googleauthenticator.isEnforced = (user) => {
 	return enforceForGroupId && user.groups.indexOf(enforceForGroupId) > -1;
 }
 
-go.modules.community.googleauthenticator.enable = (user, password) => {
+go.modules.community.googleauthenticator.enable = (user, password, countDown, block) => {
 
 	function requestSecret (user, currentPassword){
 
@@ -41,7 +43,10 @@ go.modules.community.googleauthenticator.enable = (user, password) => {
 		Ext.getBody().mask(t("Loading..."));
 		return go.Db.store("User").save(data, user.id)
 			.then((user) => {
-				const enableDialog = new go.modules.community.googleauthenticator.EnableAuthenticatorDialog();
+				const enableDialog = new go.modules.community.googleauthenticator.EnableAuthenticatorDialog({
+					block: block,
+					countDown: countDown
+				});
 				enableDialog.load(user.id).show();
 			})
 			.catch((error) => {
@@ -51,7 +56,7 @@ go.modules.community.googleauthenticator.enable = (user, password) => {
 				}
 
 				// When the password is not correct, call itself again to try again
-				return go.modules.community.googleauthenticator.enable(user);
+				return go.modules.community.googleauthenticator.enable(user, null, countDown, block);
 			}).finally(() => {
 				Ext.getBody().unmask();
 			})

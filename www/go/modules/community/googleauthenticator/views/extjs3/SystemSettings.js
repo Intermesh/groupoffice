@@ -24,6 +24,29 @@ go.modules.community.googleauthenticator.AuthenticatorSystemSettingsFieldset = E
 				xtype: "groupcomboreset",
 				name: "googleauthenticator.enforceForGroupId",
 				value: go.Modules.get("community", "googleauthenticator").settings.enforceForGroupId
+			}),
+
+			this.blockField = new Ext.form.Checkbox({
+				submit: false,
+				xtype: "checkbox",
+				boxLabel: t("Block Group-Office usage until setup is done"),
+				name: "block",
+				checked: go.Modules.get("community", "googleauthenticator").settings.block,
+				listeners: {
+					check: (cb, checked) => {
+						this.countDown.setDisabled(checked);
+					}
+				}
+			}),
+			this.countDown = new go.form.NumberField({
+				submit: false,
+				disabled: go.Modules.get("community", "googleauthenticator").settings.block,
+				xtype: "numberfield",
+				decimals: 0,
+				name: "countDown",
+				value: go.Modules.get("community", "googleauthenticator").settings.countDown,
+				fieldLabel: t("Count down"),
+				hint: t("Count down this number of seconds until the user can cancel the setup")
 			})
 		];
 
@@ -37,7 +60,13 @@ go.modules.community.googleauthenticator.AuthenticatorSystemSettingsFieldset = E
 
 				const mod = go.Modules.get("community", "googleauthenticator");
 
-				go.Db.store("Module").save({settings: {enforceForGroupId: this.enforceForGroup.getValue()}}, mod.id).then(() => {
+				go.Db.store("Module").save({
+					settings: {
+						enforceForGroupId: this.enforceForGroup.getValue(),
+						block: this.blockField.getValue(),
+						countDown: this.countDown.getValue()
+					}
+					}, mod.id).then(() => {
 					panel.gaOnSubmit.call(panel, cb, scope);
 				})
 			};

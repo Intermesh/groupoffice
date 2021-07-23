@@ -7,6 +7,11 @@ Core: Set alternative lost password URL
 Core: Alert system to notify users about comments, assigned tasks etc.
 Core: Made "Remember me" more secure by using a special token. (See https://stackoverflow.com/a/244907)
 ----
+- Core: When displaying full date then use leading zero's
+- Google Authenticator: Options to force setup or a countdown timer before you can choose to set it up later.
+
+20-07-2021 6.5.70
+- History: render issue in changes
 
 20-07-2021 6.5.69
 - Calendar: fixed render bug categories combo

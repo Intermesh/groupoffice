@@ -283,8 +283,9 @@
 			}
 
 			v = this.dateToUserTZ(v);
-			
-			return Ext.util.Format.date(v, GO.settings.date_format + " " + GO.settings.time_format);
+
+			// When displaying full date then use leading zero's replace G with H.
+			return Ext.util.Format.date(v, GO.settings.date_format + " " + GO.settings.time_format.replace("g","h").replace("G", "H"));
 		},
 
 		shortDateTimeHTML: function(v) {
