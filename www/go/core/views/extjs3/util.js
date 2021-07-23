@@ -334,6 +334,11 @@ go.util =  (function () {
 
 		viewFile : function(url) {
 			const win = this.getDownloadTargetWindow();
+
+			if(!win) {
+				Ext.Msg.alert(t("Could not open a window. Please allow popup windows in your browser."))
+				return;
+			}
 			win.focus();
 
 			if(Ext.isSafari && window.navigator.standalone) {
@@ -344,7 +349,13 @@ go.util =  (function () {
 		},
 
 		getDownloadTargetWindow : function() {
-			if(!this.downloadTarget || this.downloadTarget.closed || this.downloadTarget.location != "about:blank") {
+			try {
+				if (!this.downloadTarget || this.downloadTarget.closed || this.downloadTarget.location.href != "about:blank") {
+					this.downloadTarget = window.open("about:blank", "_blank");
+				}
+			} catch(e) {
+				// for firefox complaining about Uncaught DOMException: Permission denied to access property Symbol.toPrimitive on cross-origin object
+				// even though it is the same origin !?
 				this.downloadTarget = window.open("about:blank", "_blank");
 			}
 			return this.downloadTarget;
