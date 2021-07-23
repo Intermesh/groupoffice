@@ -1,3 +1,5 @@
+23-07-2021 6.5.71
+- Email: Fixed attachment downloading in firefox when opening a second one.
 - Core: When displaying full date then use leading zero's
 - Google Authenticator: Options to force setup or a countdown timer before you can choose to set it up later.
 
