@@ -187,7 +187,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 					{
 						xtype:'box',
 						cls: 'thumb',
-						style: 'background-image:url(' + go.Jmap.downloadUrl('core/moduleIcon/'+(r.data.package || "legacy")+'/'+r.data.name) + ')',
+						style: 'background-image:url(' + go.Jmap.downloadUrl('core/moduleIcon/'+(r.data.package || "legacy")+'/'+r.data.name) + '&mtime='+go.User.session.cacheClearedAt+')',
 					}, {
 						xtype: 'box',
 						cls: 'text',

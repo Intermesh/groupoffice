@@ -473,7 +473,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				moduleName: allPanels[i].moduleName,
 				text: allPanels[i].title,
 				//iconCls: 'go-menu-icon-' + allPanels[i].moduleName,
-				iconStyle: "background-position: center middle; background-image: url("+go.Jmap.downloadUrl('core/moduleIcon/' + (panel.package || "legacy") + "/" + allPanels[i].moduleName)+")",
+				iconStyle: "background-position: center middle; background-image: url("+go.Jmap.downloadUrl('core/moduleIcon/' + (panel.package || "legacy") + "/" + allPanels[i].moduleName)+"&mtime="+go.User.session.cacheClearedAt+")",
 				//icon: ,
 				handler: function (item, e) {
 					this.openModule(item.moduleName);

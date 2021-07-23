@@ -18,7 +18,7 @@ go.modules.community.multi_instance.AllowedModulesPanel = Ext.extend(go.grid.Gri
 				width: dp(500),
 				renderer: function(name, cell, record) {
 					return '<div class="mo-title" ' +
-						'style="background-image:url(' + go.Jmap.downloadUrl('core/moduleIcon/'+(record.data.package || "legacy")+'/'+record.data.module) + ')">'
+						'style="background-image:url(' + go.Jmap.downloadUrl('core/moduleIcon/'+(record.data.package || "legacy")+'/'+record.data.module) + "&mtime="+go.User.session.cacheClearedAt+  ')">'
 						+ record.data.title +'</div>';
 				}
 			}

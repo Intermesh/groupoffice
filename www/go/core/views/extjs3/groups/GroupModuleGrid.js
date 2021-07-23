@@ -110,7 +110,7 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 					menuDisabled: true,
           hideable: false,
           renderer: function(name, cell, record) {
-            return '<div class="mo-title" style="background-image:url(' + go.Jmap.downloadUrl('core/moduleIcon/'+(record.data.package || "legacy")+'/'+record.data.name)+ ')">' + name +'</div>';
+            return '<div class="mo-title" style="background-image:url(' + go.Jmap.downloadUrl('core/moduleIcon/'+(record.data.package || "legacy")+'/'+record.data.name)+'&mtime='+go.User.session.cacheClearedAt+ ')">' + name +'</div>';
           }
           
 				},{
