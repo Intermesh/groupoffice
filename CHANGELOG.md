@@ -1,3 +1,6 @@
+6.5.73
+- Studio: disable setting autoexpand fields that are hidden by default.
+
 23-07-2021 6.5.72
 - Email: Fixed attachment downloading in firefox when opening a second one.
 
