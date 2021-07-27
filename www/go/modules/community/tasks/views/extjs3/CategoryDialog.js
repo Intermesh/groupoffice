@@ -1,11 +1,12 @@
 go.modules.community.tasks.CategoryDialog = Ext.extend(go.form.Dialog, {
-	title: t("Categories", "tasks"),
+	title: t("Category", "tasks"),
 	entityStore: "TaskCategory",
 	titleField: "name",
-	width: dp(800),
-	height: dp(600),
+	resizable: false,
+	width: dp(400),
+	autoHeight: true,
 	initFormItems: function () {
-		return [{
+		var items = [{
 				xtype: 'fieldset',
 				items: [
 					{
@@ -14,8 +15,26 @@ go.modules.community.tasks.CategoryDialog = Ext.extend(go.form.Dialog, {
 						fieldLabel: t("Name"),
 						anchor: '100%',
 						allowBlank: false
-					}]
+					},
+					]
 			}
 		];
+		if(GO.settings.has_admin_permission)
+		{
+			this.ownerIdField = new Ext.form.Hidden({name:'ownerId',value:go.User.id, listeners:{
+				'setvalue': (me, val) => {  this.checkbox.setValue(!val) }
+			}});
+			this.checkbox = new Ext.form.Checkbox({
+				xtype:'xcheckbox',
+				boxLabel:t("Global category", "tasks"),
+				hideLabel:true,
+				submit:false,
+				anchor: '100%',
+				listeners: {scope:this,'check': function(me, checked) { this.ownerIdField.setValue(checked ? null : go.User.id) }}
+			});
+
+			items[0].items.push(this.checkbox,this.ownerIdField);
+		}
+		return items;
 	}
 });

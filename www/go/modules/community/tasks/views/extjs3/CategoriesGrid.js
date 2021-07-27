@@ -5,7 +5,8 @@ go.modules.community.tasks.CategoriesGrid = Ext.extend(go.NavGrid, {
 		Ext.apply(this, {
 			store: new go.data.Store({
 				fields: ['id', 'name'],
-				entityStore: "TaskCategory"
+				entityStore: "TaskCategory",
+				filters: {ownerId:{ownerId: go.User.id}}
 			}),
 			menuItems: [
 				{

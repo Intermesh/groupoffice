@@ -116,4 +116,8 @@ $updates['202106181401'][] = "alter table tasks_user_settings
 $updates['202107051416'][] = "create index tasks_task_progress_index
 	on tasks_task (progress);";
 
+$updates['202107251024'][] = "ALTER TABLE `tasks_category` DROP FOREIGN KEY `tasks_category_ibfk_1`;";
+$updates['202107251024'][] = "ALTER TABLE `tasks_category` CHANGE COLUMN `createdBy` `ownerId` INT(11) NULL ;";
+$updates['202107251024'][] = "ALTER TABLE `tasks_category` ADD CONSTRAINT `tasks_category_ibfk_1` FOREIGN KEY (`ownerId`) REFERENCES `core_user` (`id`);";
+
 
