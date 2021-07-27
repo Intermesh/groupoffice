@@ -167,6 +167,9 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 					{
 						xtype: "chips",
 						entityStore: "TaskCategory",
+						comboStoreConfig: {
+							filters: {ownerId: {ownerId:go.User.id}}
+						},
 						displayField: "name",
 						valueField: 'id',
 						name: "categories",

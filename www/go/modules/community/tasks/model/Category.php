@@ -6,6 +6,7 @@
  */
 namespace go\modules\community\tasks\model;
 						
+use go\core\db\Criteria;
 use go\core\jmap\Entity;
 
 /**
@@ -19,16 +20,38 @@ class Category extends Entity {
 	/** @var string */
 	public $name;
 
-	/** @var int */
-	public $createdBy;
+	/** @var int could be NULL for global categories */
+	public $ownerId;
 
 	protected static function defineMapping() {
 		return parent::defineMapping()
 			->addTable("tasks_category", "category");
 	}
 
+	public function internalValidate()
+	{
+		if($this->isNew() && !$this->isModified('ownerId')) {
+			$this->ownerId = go()->getUserId();
+		}
+		if ($this->ownerId !== go()->getUserId() && !\go\core\model\Module::findByName('community', 'tasks')->hasPermissionLevel(50))
+			$this->setValidationError('ownerId', go()->t("You need manage permission to create global categories"));
+		return parent::internalValidate();
+	}
+
 	public static function getClientName() {
 		return "TaskCategory";
+	}
+
+	protected static function textFilterColumns() {
+		return ['name'];
+	}
+
+	protected static function defineFilters()
+	{
+		return parent::defineFilters()
+			->add('ownerId', function(Criteria $criteria, $value) {
+				$criteria->where('ownerId', '=', $value)->orWhere('ownerId', 'IS', null);
+			});
 	}
 
 }

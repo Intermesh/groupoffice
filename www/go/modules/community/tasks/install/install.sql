@@ -140,11 +140,11 @@ COLLATE = utf8mb4_unicode_ci;
 CREATE TABLE IF NOT EXISTS `tasks_category` (
   `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
-  `createdBy` INT(11) NOT NULL,
+  `ownerId` INT(11) NULL,
   PRIMARY KEY (`id`),
-  INDEX `user_id` (`createdBy` ASC),
+  INDEX `user_id` (`ownerId` ASC),
   CONSTRAINT `tasks_category_ibfk_1`
-    FOREIGN KEY (`createdBy`)
+    FOREIGN KEY (`ownerId`)
     REFERENCES `core_user` (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4

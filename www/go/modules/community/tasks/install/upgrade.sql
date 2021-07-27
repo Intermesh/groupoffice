@@ -140,7 +140,7 @@ COLLATE = utf8mb4_unicode_ci;
 CREATE TABLE IF NOT EXISTS `tasks_category` (
   `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
-  `createdBy` INT(11) NOT NULL,
+  `createdBy` INT(11) NULL,
   PRIMARY KEY (`id`),
   INDEX `user_id` (`createdBy` ASC),
   CONSTRAINT `tasks_category_ibfk_1`
@@ -286,11 +286,11 @@ INSERT INTO tasks_portlet_tasklist (`createdBy`, `tasklistId`)
 INSERT INTO tasks_tasklist (`id`, `role`, `name`, `createdBy`, `aclId`, `filesFolderId`, `version`)
     SELECT id, '1', `name`, user_id, acl_id, files_folder_id, version FROM ta_tasklists;
 INSERT INTO tasks_category (`id`, `name`, `createdBy`)
-    SELECT id, `name`, user_id FROM ta_categories;
-INSERT INTO tasks_task (id,uid,tasklistId,createdBy, createdAt, modifiedAt, modifiedBy, `start`, due, progress, progressUpdated,
+    SELECT id, `name`, IF(user_id = 0, NULL, user_id) FROM ta_categories;
+INSERT INTO tasks_task (id,uid,tasklistId,createdBy,responsibleUserId, createdAt, modifiedAt, modifiedBy, `start`, due, progress, progressUpdated,
                         title, description, filesFolderId, priority, percentComplete)
-    SELECT id, uuid, tasklist_id, user_id, from_unixtime(ctime), from_unixtime(mtime), muser_id, from_unixtime(start_time), from_unixtime(due_time), IF(completion_time, 3, 1) as progress,
-           IF(completion_time, from_unixtime(completion_time), null), `name`, description, files_folder_id, priority, percentage_complete FROM ta_tasks;
+    SELECT t.id, uuid, tasklist_id, t.user_id,l.user_id, from_unixtime(t.ctime), from_unixtime(t.mtime), t.muser_id, from_unixtime(start_time), from_unixtime(due_time), IF(completion_time, 3, 1) as progress,
+           IF(completion_time, from_unixtime(completion_time), null), t.`name`, description, t.files_folder_id, priority, percentage_complete FROM ta_tasks t JOIN ta_tasklists l ON tasklist_id = l.id;
 INSERT INTO tasks_task_category (taskId,categoryId)
     SELECT id,category_id FROM ta_tasks;
 INSERT INTO tasks_alert (taskId, userId, `when`)
