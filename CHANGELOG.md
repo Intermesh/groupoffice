@@ -1,3 +1,5 @@
+- Core: 0.00 was always displayed in number fields
+
 22-07-2021 6.4.241
 - Projects: Fixed upgrade error in projects where pr2_settings doesn't exist
 
