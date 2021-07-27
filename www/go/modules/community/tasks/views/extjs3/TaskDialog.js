@@ -180,6 +180,7 @@ go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 						//allowBlank : false,
 						fieldLabel : t("Description"),
 						grow: true
+
 					},
 					this.tasklistCombo = new go.modules.community.tasks.TasklistCombo(),
 					new go.modules.community.tasks.AlertFields()
