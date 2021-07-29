@@ -34,7 +34,7 @@ go.modules.community.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(
 				},				scope: this
 			}));
 
-			console.warn (this.setupLaterButton);
+			this.countDown = parseInt(this.countDown);
 
 			if(this.countDown) {
 				let countDown = this.countDown;
