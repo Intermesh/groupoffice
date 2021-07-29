@@ -296,11 +296,13 @@ class Field extends AclItemEntity {
 		} catch(Exception $e) {
 			go()->warn($e);
 
-			if($this->isNew()) {
-				static::delete($this->primaryKeyValues());				
-			}
-
 			go()->getDbConnection()->resumeTransactions();
+
+			if($this->isNew()) {
+				//call parent so that field is not deleted from the table when for example
+				//a duplicate column has been entered.
+				parent::internalDelete(self::normalizeDeleteQuery($this->primaryKeyValues()));
+			}
 
 			$this->setValidationError('id', ErrorCode::GENERAL, $e->getMessage());
 			
