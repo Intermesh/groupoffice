@@ -296,7 +296,7 @@ class Field extends AclItemEntity {
 		} catch(Exception $e) {
 			go()->warn($e);
 
-			go()->getDbConnection()->resumeTransactions();
+
 
 			if($this->isNew()) {
 				//call parent so that field is not deleted from the table when for example
@@ -304,7 +304,9 @@ class Field extends AclItemEntity {
 				parent::internalDelete(self::normalizeDeleteQuery($this->primaryKeyValues()));
 			}
 
-			$this->setValidationError('id', ErrorCode::GENERAL, $e->getMessage());
+			go()->getDbConnection()->resumeTransactions();
+
+			$this->setValidationError('databaseName', ErrorCode::GENERAL, $e->getMessage());
 			
 			return false;
 		} 
