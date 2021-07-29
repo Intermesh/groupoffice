@@ -1,3 +1,6 @@
+- Googleauthenticator: Fix negative countdown
+- Email: Fixed HTML code in grid when from tries to spoof email
+
 23-07-2021 6.5.72
 - Email: Fixed attachment downloading in firefox when opening a second one.
 
