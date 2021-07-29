@@ -1,4 +1,5 @@
 - Core: 0.00 was always displayed in number fields
+- Core: Fixed custom field column delete when creating a new column with a name that already existed.
 
 22-07-2021 6.4.241
 - Projects: Fixed upgrade error in projects where pr2_settings doesn't exist
