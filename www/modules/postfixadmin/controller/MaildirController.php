@@ -9,14 +9,17 @@ use go\core\db\Query;
 class MaildirController extends \GO\Base\Controller\AbstractController {
 
 	private $mailboxRoot = "/var/mail/vhosts/";
-	private $trashRoot = "/var/trash/";
+	private $trashRoot;
 	
-	public function actionCleanup() {
+	public function actionCleanup($mailboxRoot = '/var/mail/vhosts/') {
 		if(!$this->isCli()) {
 			echo "Try running script from the CLI \n";
 			echo "Usage: php groupofficecli.php -r=postfixadmin/maildir/cleanup";
 			return;
 		}
+
+		$this->mailboxRoot = rtrim($mailboxRoot, '/') . '/';
+		$this->trashRoot = $this->mailboxRoot . '_trash_/';
 			
 		// create the trash folder
 		if (!is_dir($this->trashRoot)) {

@@ -281,7 +281,7 @@ go.modules.community.addressbook.ContactDetail = Ext.extend(go.detail.Panel, {
 					}],
 					onLoad: function (detailView) {						
 						this.setVisible(!!detailView.data.notes);
-						this.items.first().setText('<div style="white-space: pre-wrap">' + Ext.util.Format.htmlEncode(detailView.data.notes) + "</div>");
+						this.items.first().setText(go.util.textToHtml(detailView.data.notes) );
 					}
 				}
 			]
