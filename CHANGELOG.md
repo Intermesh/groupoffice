@@ -1,3 +1,4 @@
+- Timeregistrations: do not copy income_id upon cloning a time entry
 - Core: 0.00 was always displayed in number fields
 - Core: Fixed custom field column delete when creating a new column with a name that already existed.
 
