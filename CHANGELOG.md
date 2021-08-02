@@ -1,4 +1,5 @@
 6.5.73
+- Timeregistration: Do not clone invoice_id upon cloning a time entry
 - Studio: disable setting autoexpand fields that are hidden by default.
 - Googleauthenticator: Fix negative countdown
 - Email: Fixed HTML code in grid when from tries to spoof email
