@@ -875,9 +875,9 @@ $updates['202102111534'][] = "ALTER TABLE `go_templates` ADD COLUMN `filename` V
 $updates['202102111534'][] = "delete from go_state where user_id not in (select id from core_user);";
 
 $updates['202102111534'][] = "alter table go_state
-	add constraint go_state_core_user_id_fk
-		foreign key (user_id) references core_user (id)
-			on delete cascade;";
+			add constraint go_state_core_user_id_fk
+			foreign key (user_id) references core_user (id)
+				on delete cascade;";
 
 
 $updates['202102111534'][] = "alter table core_auth_token change `passedMethods` `passedAuthenticators` varchar(190) null;";
@@ -940,3 +940,6 @@ $updates['202105111132'][] = "alter table core_auth_token
 
 $updates['202105111132'][] = "alter table core_auth_token
 	add browser varchar(190) null after platform;";
+
+$updates['202107010929'][] = "alter table core_auth_token modify userAgent varchar(190) null;";
+$updates['202107010929'][] = "alter table core_customfields_field modify relatedFieldCondition text default null;";

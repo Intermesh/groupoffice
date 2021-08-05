@@ -19,7 +19,7 @@ $font-weight-l: 100;
 }
 
 %font-caption { //Used as labels and grid headers
-	font-size: sp(12);
+	font-size: sp(14);
 	font-weight: $font-weight-r;
 	color: color($fg, 'secondary-text');
 }

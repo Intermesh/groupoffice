@@ -152,7 +152,7 @@ go.Modules.register("community", "addressbook", {
 				multiple: true
 			},  {
 				name: 'jobTitle',
-				title: t("Job title"),
+				title: t("Job title") + "/" +  t("LOB"),
 				type: "string",
 				multiple: true
 			},  {
@@ -428,6 +428,21 @@ go.modules.community.addressbook.importVcf = function(config) {
 			});
 		});
 }
+
+go.modules.community.addressbook.renderName = function(contact) {
+	const sortBy = go.User.addressBookSettings.sortBy;
+	let name;
+	if(!contact.isOrganization && sortBy == 'lastName' && !go.util.empty(contact.lastName)) {
+		name = contact.lastName + ', ' + contact.firstName;
+		if(!go.util.empty(contact.middleName)) {
+			name += " " + contact.middleName;
+		}
+	} else{
+		name = contact.name;
+	}
+
+	return name;
+};
 
 Ext.onReady(function () {
 	if (!go.modules.business || !go.modules.business.newsletters) {

@@ -40,7 +40,7 @@ CREATE TABLE `core_auth_token` (
   `expiresAt` datetime DEFAULT NULL,
   `lastActiveAt` datetime NOT NULL,
   `remoteIpAddress` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  `userAgent` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `userAgent` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   platform varchar(190) null,
   browser varchar(190) null,
   `passedAuthenticators` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL
@@ -105,7 +105,7 @@ CREATE TABLE `core_customfields_field` (
   `type` varchar(100) NOT NULL DEFAULT 'Text',
   `sortOrder` int(11) NOT NULL DEFAULT 0,
   `required` tinyint(1) NOT NULL DEFAULT 0,
-  `relatedFieldCondition` varchar(190) NOT NULL DEFAULT '',
+  `relatedFieldCondition` TEXT DEFAULT NULL,
   `conditionallyHidden` BOOLEAN NOT NULL DEFAULT FALSE,
   `conditionallyRequired` BOOLEAN NOT NULL DEFAULT FALSE,
   `hint` varchar(190) DEFAULT NULL,

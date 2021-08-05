@@ -257,9 +257,13 @@ go.Jmap = {
 						}]
 					});
 				});
-
-
 			},false);
+
+			window.addEventListener('beforeunload', () => {
+				console.log("Closing SSE")
+				source.close();
+			});
+
 		}
 		catch(e) {
 			console.error("Failed to start Server Sent Events. Perhaps the API URL in the system settings is invalid?", e);

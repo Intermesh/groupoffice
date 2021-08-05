@@ -2,7 +2,6 @@
 
 namespace go\core\model;
 
-use go\core\model\Acl;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Criteria;
 use go\core\exception\Forbidden;
@@ -236,7 +235,7 @@ class Group extends AclOwnerEntity {
 		}
 		$user = User::findById($userId, ['username']);
 		if(!$user) {
-			throw new \Exeption("Invalid userId given");
+			throw new \Exception("Invalid userId given");
 		}
 		$personalGroup = new Group();
 		$personalGroup->name = $user->username;

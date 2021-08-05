@@ -1,3 +1,65 @@
+6.5.73
+- Timeregistration: Do not clone invoice_id upon cloning a time entry
+- Studio: disable setting autoexpand fields that are hidden by default.
+- Googleauthenticator: Fix negative countdown
+- Email: Fixed HTML code in grid when from tries to spoof email
+
+23-07-2021 6.5.72
+- Email: Fixed attachment downloading in firefox when opening a second one.
+
+23-07-2021 6.5.71
+- Email: Fixed attachment downloading in firefox when opening a second one.
+- Core: When displaying full date then use leading zero's
+- Google Authenticator: Options to force setup or a countdown timer before you can choose to set it up later.
+
+20-07-2021 6.5.70
+- History: render issue in changes
+
+20-07-2021 6.5.69
+- Calendar: fixed render bug categories combo
+- Address book: Missing first name and sort combo by last name when showing by last name
+- Projects: Update statement could halt upgrade
+- Core: Fixed rendering of double scrollbars on safari when using custom fields in dialogs.
+
+19-07-2021 6.5.68
+- Email: fixed attachments opening in the same window
+- Studio: Bugfix - use default Spreadsheet converter class for code generation
+- Core: custom field of type date was rendered with time in the grid
+- Address book: Lines rendered incorrectly in grid when sorting on last name
+- Address book: Also show contact with last name first in custom field
+- Projects2: Fixed activity type being always mandatory when booking time from projet
+- Address book: [Event Link Description] Error when adding a description to a link (creating an event) #716
+- Calendar: Fixed [Event - Participants] Issue with "Time is not applicable" #717
+- Calendar: Fixed [Appointment Recurrence] Recurrence is changed to "Forever" after any modification #714
+- Calendar: Fixed right click in view
+- Core: Fixed duplicate entities
+
+19-07-2021 6.5.67
+- Notes: Fixed notes encrypt module error when saving notes
+- Core: Fixed "required" on Multiselect field
+- Projects2: fix for missing pr2_standard_tasks table in upgrade
+- Address book: Fixed name fields showing on organizations
+
+12-07-2021 6.5.66
+- Projects2: fix for missing pr2_standard_tasks table in upgrade
+
+12-07-2021 6.5.65
+- Email: added confirm message when saving an email without a subject (instead of sending)
+- Core: Session could be wrongfully destroyed if token not in cache
+- Core: Fixed problem with custom field tabs conditions
+- Projects: Fixed missing columns in time tracking export
+
+12-07-2021 6.5.64
+- History: fixed error message when address book not configured;
+- Multisite: Fixed compatibility issue with MySQL 8
+- Core: Fixed invalid install sql for older mysql servers
+
+08-07-2021 6.5.63
+- Google authenticator: New feature to enforce setup for a user group
+- Timeregistration: Fixed several render errors minutes > seconds
+- Email: Download attachments on iphone fixed
+- Core: Workaround Safari not starting bug: https://bugs.webkit.org/show_bug.cgi?id=226547
+
 28-06-2021 6.5.62
 - Projects2: Fixed duplicate entity name in log
 - Projects2: Display subproject totals if configured in template config
@@ -196,6 +258,22 @@
 
 
 
+
+- Core: 0.00 was always displayed in number fields
+- Core: Fixed custom field column delete when creating a new column with a name that already existed.
+
+22-07-2021 6.4.241
+- Projects: Fixed upgrade error in projects where pr2_settings doesn't exist
+
+19-07-2021 6.4.240
+- Billing: Fixed filter 'Books' in project reports
+- MultiInstance: Fixed compatibility issue with MySQL 8+
+- Core: Check invalid characters in username.
+
+06-07-2021 6.4.239
+- Timeregistration: Fixed time tracking sums
+- Projects: fixed this.filter() is undefined error
+- Calendar / core: Fixed setting reminders for all attendees
 
 28-06-2021 6.4.238
 - Core: fixed required condition in custom fields with != in the condition and updates when form fields change

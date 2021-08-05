@@ -14,7 +14,7 @@ const INSTALL_NEW = 0;
 const INSTALL_UPGRADE = 1;
 const INSTALL_NONE = 2;
 
-$installDb = INSTALL_NEW;
+$installDb = INSTALL_UPGRADE;
 
 $autoLoader = require(__DIR__ . "/../www/vendor/autoload.php");
 $autoLoader->add('go\\', __DIR__);
@@ -81,6 +81,7 @@ try {
 				Module::install($moduleController->name());
 			}
 		}
+		go()->rebuildCache();
 		GO::$ignoreAclPermissions = false;
 
 		echo "Installing demo data\n";

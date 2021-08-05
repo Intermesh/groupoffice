@@ -29,6 +29,7 @@
 namespace GO\Base;
 
 
+use go\core\ErrorHandler;
 use go\core\model\Token;
 
 class Session extends Observable{
@@ -70,9 +71,7 @@ class Session extends Observable{
 				]);
 			}
 
-			if(Util\Http::isHttps()) {
-				ini_set('session.cookie_secure',1);
-			}
+			ini_set('session.cookie_secure', Util\Http::isHttps());
 
 
 			if(isset($_REQUEST['GOSID'])){
@@ -100,9 +99,10 @@ class Session extends Observable{
 			$this->values['security_token']=Util\StringHelper::randomPassword(20,'a-z,A-Z,1-9');				
 		}
 
-		// if access token from new JMAP API connected to this session was detroyed then destroy this session too!
+		// if access token from new JMAP API connected to this session was destroyed then destroy this session too!
 		// this is set in go/core/model/Token.php
-		if(!empty($this->values['accessToken']) && !go()->getCache()->get('token-' . $this->values['accessToken'])) {
+		if(!empty($this->values['accessToken']) && !go()->getCache()->get('token-' . $this->values['accessToken']) && !Token::find()->where('accessToken' , '=', $this->values['accessToken'])->single()) {
+			ErrorHandler::log("Destroying session because access token '" . $this->values['accessToken'] . "' not found");
 			$this->values = [];
 		}
 	}

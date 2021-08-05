@@ -1,4 +1,4 @@
-go.googleauthenticator.GoogleauthenticatorPanel = Ext.extend(go.login.BaseLoginPanel, {
+go.modules.community.googleauthenticator.GoogleauthenticatorPanel = Ext.extend(go.login.BaseLoginPanel, {
 
 	initComponent: function () {
 
@@ -36,11 +36,31 @@ go.googleauthenticator.GoogleauthenticatorPanel = Ext.extend(go.login.BaseLoginP
 				this.nextButton = new Ext.Button({
 					type: "submit",
 					text: t("Next"),
+					cls: "primary",
 					handler: this.submit,
 					scope: this
 				})
 			]
 		});
+
+		if(navigator.clipboard && navigator.clipboard.readText) {
+			panel.add({
+				cls:"right accent",
+				style: "margin-right: " + dp(16) + "px",
+					xtype: "button",
+					text: t("Paste"),
+					handler: function() {
+						navigator.clipboard.readText().then((clipText) => {
+							this.secretField.setValue(clipText);
+						}).catch((reason) => {
+							console.error(reason);
+							Ext.MessageBox.alert(t("Sorry"), t("Reading from your clipboard isn't allowed"));
+						});
+				},
+				scope: this
+
+			})
+		}
 
 		Ext.apply(this, {
 			layout: "fit",
@@ -49,7 +69,7 @@ go.googleauthenticator.GoogleauthenticatorPanel = Ext.extend(go.login.BaseLoginP
 			]
 		});
 
-		go.googleauthenticator.GoogleauthenticatorPanel.superclass.initComponent.call(this);
+		go.modules.community.googleauthenticator.GoogleauthenticatorPanel.superclass.initComponent.call(this);
 	},
 	setErrors: function (errors) {
 		for (var key in errors) {
@@ -69,4 +89,4 @@ go.googleauthenticator.GoogleauthenticatorPanel = Ext.extend(go.login.BaseLoginP
 	}
 });
 
-go.AuthenticationManager.register('googleauthenticator', new go.googleauthenticator.GoogleauthenticatorPanel());
+go.AuthenticationManager.register('googleauthenticator', new go.modules.community.googleauthenticator.GoogleauthenticatorPanel());

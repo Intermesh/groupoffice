@@ -215,10 +215,13 @@ go.customfields.type.Text = Ext.extend(Ext.util.Observable, {
 		}
 
 		var strConditionString = this.getConditionString(customfield.relatedFieldCondition);
-		// console.log(strConditionString);
 
-		var func =  new Function(strConditionString);
-		this.requiredConditionMatches = func.call(this);
+		try {
+			var func = new Function(strConditionString);
+			this.requiredConditionMatches = func.call(this);
+		} catch(e) {
+			console.error("Required condition '" + customfield.relatedFieldCondition + "' failed with error: " + e);
+		}
 
 		var customFieldCmp = this;
 		if (customfield.conditionallyRequired) {

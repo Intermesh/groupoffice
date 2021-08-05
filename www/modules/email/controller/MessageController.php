@@ -371,9 +371,6 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 				$to = $record['to'];
 				$record['to'] = $record['from'];
 				$record['from'] = $to;
-			}else
-			{
-				$record = $this->checkPersonalField($record, $message);
 			}
 
 			if(empty($record['subject']))
@@ -401,16 +398,7 @@ Settings -> Accounts -> Double click account -> Folders.", "email");
 		return $response;
 	}
 	
-	private function checkPersonalField($record, $message) {
-		
-		$from = $message->from->getAddress();
-						
-		if(\GO\Base\Util\Validate::email(($record['from'])) && strtolower($record['from']) != strtolower($from['email'])) {
-			$record['from'] = '<div style="color: #ff0000">' .$from['email'].'</div>';
-		}
-		
-		return $record;
-	}
+
 
 	/**
 	 * Add a flag to one or multiple messages

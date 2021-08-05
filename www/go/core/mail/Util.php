@@ -6,7 +6,7 @@ class Util {
 	/**
 	 * Allow any char @ any char
 	 */
-	const EMAIL_REGEX = "/^[^@]*@[^@]*$/";
+	const EMAIL_REGEX = "/^[^@\s]*@[^@\s]*$/";
 	
 	/**
 	 * Check if given email address is formatted correctly.

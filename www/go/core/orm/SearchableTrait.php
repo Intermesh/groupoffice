@@ -247,16 +247,11 @@ trait SearchableTrait {
 			return false;
 		}
 
+		go()->debug("Deleted " . $delSearchStmt->rowCount() ." search results");
+
 		if(!Link::delete((new Query)
 			->where(['fromEntityTypeId' => static::entityType()->getId()])
 			->andWhere('fromId', 'IN', $query)
-		)) {
-			return false;
-		}
-
-		if(!Link::delete((new Query)
-			->where(['toEntityTypeId' => static::entityType()->getId()])
-			->andWhere('toId', 'IN', $query)
 		)) {
 			return false;
 		}

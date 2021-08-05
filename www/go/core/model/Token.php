@@ -164,16 +164,16 @@ class Token extends Entity {
 
 		if(isset($_SERVER['HTTP_USER_AGENT'])) {
 			$this->userAgent = $_SERVER['HTTP_USER_AGENT'];
+
+			$ua_info = \donatj\UserAgent\parse_user_agent();
+
+			$this->platform = $ua_info['platform'];
+			$this->browser = $ua_info['browser'];
+
 		}else if(Environment::get()->isCli()) {
-			$this->userAgent = 'cli';
-		} else {
-			$this->userAgent = 'Unknown';
+			$this->userAgent = 'CLI';
 		}
 
-		$ua_info = \donatj\UserAgent\parse_user_agent();
-
-		$this->platform = $ua_info['platform'];
-		$this->browser = $ua_info['browser'];
 	}
 	
 	private static function generateToken(){
@@ -313,10 +313,8 @@ class Token extends Entity {
       //Avoid session id in url's to prevent session hijacking.
       ini_set('session.use_only_cookies',1);
 
-      if(\go\core\http\Request::get()->isHttps()) {
-        ini_set('session.cookie_secure',1);
-      }
-    
+      ini_set('session.cookie_secure',\go\core\http\Request::get()->isHttps());
+   
 			session_name('groupoffice');
       session_start();
     }

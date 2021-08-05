@@ -1,69 +1,95 @@
 go.browserStorage = {
 	dbName: "go",
 	enabled: true,
+
+	/**
+	 * Workaround safari / webkit bug:
+	 *
+	 *  https://bugs.webkit.org/show_bug.cgi?id=226547
+	 * @return {*|Promise}
+	 */
+	idbReady: function (){
+		const isSafari = /Safari\//.test(navigator.userAgent) &&
+			!/Chrom(e|ium)\//.test(navigator.userAgent);
+		// No point putting other browsers through this mess.
+		if(!isSafari){
+			return Promise.resolve();
+		}
+		let intervalId;
+		return new Promise((resolve) => {
+			const tryIdb = () => {
+				indexedDB.databases().finally(resolve)
+			};
+
+			intervalId = setInterval(tryIdb, 100);
+			tryIdb();
+		}).finally(() => clearInterval(intervalId));
+	},
 	connect : function(version) {
 		var me = this;
 		if(!me.conn) {
-			 me.conn = new Promise(function(resolve, reject) {		
+			 me.conn = this.idbReady().then(() => {
+			 	return new Promise(function(resolve, reject) {
+					 var	openreq = version ? indexedDB.open(me.dbName, version) : indexedDB.open(me.dbName); //IE11 required the if/else
+					 openreq.onerror = function() {
+						 me.enabled = false;
+						 console.warn("Disabling browser storage in indexedDB because browser doesn't support it.")
+						 reject(openreq.error);
+					 };
+					 openreq.onsuccess = function() {
 
-					var	openreq = version ? indexedDB.open(me.dbName, version) : indexedDB.open(me.dbName); //IE11 required the if/else
-					openreq.onerror = function() {
-						me.enabled = false;
-						console.warn("Disabling browser storage in indexedDB because browser doesn't support it.")
-						reject(openreq.error);
-					};
-					openreq.onsuccess = function() {
-						
-						if(me.upgradeNeeded(openreq.result)) {
-							var newVersion = openreq.result.version + 1;
-							console.warn("IndexedDB Upgrade needed. Bumping version to " + (newVersion));
-							openreq.result.close();
-							me.conn = null;
+						 if(me.upgradeNeeded(openreq.result)) {
+							 var newVersion = openreq.result.version + 1;
+							 console.warn("IndexedDB Upgrade needed. Bumping version to " + (newVersion));
+							 openreq.result.close();
+							 me.conn = null;
 
-					 		me.connect(newVersion).then(function() {
-                resolve(openreq.result); 
-              }).catch(function(error) {
-              	console.error("Upgrade failed. Deleting database and disabling storage.");
-								me.enabled = true;
-								me.deleteDatabase();
-								me.enabled = false;
-								reject(error);
-							});
-						}
-												
-						openreq.result.onversionchange = function(e) {
-							console.warn("Version change");
-							openreq.result.close();
-							me.conn = null;
-						}
-						resolve(openreq.result); 
-					}
-		
-				openreq.onblocked = function() {
-					console.warn("IndexedDB upgrade blocked");
-		
-					reject("blocked");
-				}
-		
-				openreq.onupgradeneeded = function(e) {
-					var upgradeDb = e.target.result;
+							 me.connect(newVersion).then(function() {
+								 resolve(openreq.result);
+							 }).catch(function(error) {
+								 console.error("Upgrade failed. Deleting database and disabling storage.");
+								 me.enabled = true;
+								 me.deleteDatabase();
+								 me.enabled = false;
+								 reject(error);
+							 });
+						 }
 
-					var e = go.Entities.getAllInstalled();
-					for(var n in  e) {
-						var name = e[n].name;
-						
-						if(!upgradeDb.objectStoreNames.contains(name)) {							
-							upgradeDb.createObjectStore(name);					
-						}
+						 openreq.result.onversionchange = function(e) {
+							 console.warn("Version change");
+							 openreq.result.close();
+							 me.conn = null;
+						 }
+						 resolve(openreq.result);
+					 }
 
-						if(!upgradeDb.objectStoreNames.contains(name + "-meta")) {							
-							upgradeDb.createObjectStore(name + "-meta");			
-						}
-          }
-          
-          // upgradeDb.createObjectStore("test_6");
-				};
-      });			
+					 openreq.onblocked = function() {
+						 console.warn("IndexedDB upgrade blocked");
+
+						 reject("blocked");
+					 }
+
+					 openreq.onupgradeneeded = function(e) {
+						 var upgradeDb = e.target.result;
+
+						 var e = go.Entities.getAllInstalled();
+						 for(var n in  e) {
+							 var name = e[n].name;
+
+							 if(!upgradeDb.objectStoreNames.contains(name)) {
+								 upgradeDb.createObjectStore(name);
+							 }
+
+							 if(!upgradeDb.objectStoreNames.contains(name + "-meta")) {
+								 upgradeDb.createObjectStore(name + "-meta");
+							 }
+						 }
+
+						 // upgradeDb.createObjectStore("test_6");
+					 };
+				 });
+			 });
+
     } 
     
     return me.conn;
