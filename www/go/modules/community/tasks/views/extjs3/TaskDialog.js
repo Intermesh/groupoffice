@@ -1,8 +1,8 @@
 go.modules.community.tasks.TaskDialog = Ext.extend(go.form.Dialog, {
 	title: t("Task"),
 	entityStore: "Task",
-	width: dp(580),
-	height: dp(480),
+	width: dp(800),
+	height: dp(600),
 	modal: false,
 
 	// onLoad: function (values) {

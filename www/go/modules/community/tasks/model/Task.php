@@ -332,7 +332,7 @@ class Task extends AclItemEntity {
 		}
 
 		if(isset($this->projectId) && $this->hasConflicts()) {
-			$this->setValidationError('start', ErrorCode::CONFLICT, 'this task is in confilict with other tatks');
+			$this->setValidationError('start', ErrorCode::CONFLICT, 'this task is in conflict with other tasks');
 		}
 
 		return parent::internalValidate();
@@ -563,7 +563,7 @@ class Task extends AclItemEntity {
 	/**
 	 * Try to find conflicting tasks.
 	 *
-	 * A task is considered onflicting when it has a start date and user id and there are other tasks with the same
+	 * A task is considered conflicting when it has a start date and user id and there are other tasks with the same
 	 * responsible userId and start date which are part of a project task list.
 	 *
 	 * @return bool
@@ -577,7 +577,7 @@ class Task extends AclItemEntity {
 		$c = new Criteria();
 		$c->andWhere('task.start', '=', $this->start)
 			->andWhere("task.responsibleUserId", '=', $this->responsibleUserId);
-		if(!$this->isNew()) {
+		if(!empty($this->id)) {
 			$c->andWhere('task.id', '!=', $this->id);
 		}
 		$tasks = self::find(['id','start', 'estimatedDuration','startTime'])
