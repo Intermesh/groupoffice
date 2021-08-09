@@ -1,3 +1,4 @@
+- Core: Fixed install script custom field 
 - Projects: Display supplier name in expanse budget grid 
 - Timeregistrations: do not copy income_id upon cloning a time entry
 - Core: 0.00 was always displayed in number fields
