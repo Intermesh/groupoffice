@@ -120,4 +120,4 @@ $updates['202107251024'][] = "ALTER TABLE `tasks_category` DROP FOREIGN KEY `tas
 $updates['202107251024'][] = "ALTER TABLE `tasks_category` CHANGE COLUMN `createdBy` `ownerId` INT(11) NULL ;";
 $updates['202107251024'][] = "ALTER TABLE `tasks_category` ADD CONSTRAINT `tasks_category_ibfk_1` FOREIGN KEY (`ownerId`) REFERENCES `core_user` (`id`);";
 
-
+$updates['202108101005'][] = "ALTER TABLE `tasks_task` ADD COLUMN IF NOT EXISTS `location` TEXT NULL;";

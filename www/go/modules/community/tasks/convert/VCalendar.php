@@ -96,6 +96,7 @@ class VCalendar extends AbstractConverter {
 			$vtodo->add('DUE', $task->due, ['VALUE' => 'DATE']);
 		}
 		$vtodo->DESCRIPTION = $task->description;
+		$vtodo->LOCATION = $task->location;
 
 		if(!empty($task->categories) && is_array($task->categories)) {
 			$vtodo->CATEGORIES = go()->getDbConnection()->select("name")
@@ -260,6 +261,7 @@ class VCalendar extends AbstractConverter {
 	BEGIN:VALARM
 	ACTION:DISPLAY
 	DESCRIPTION:Reminder
+	LOCATION:wherever
 	TRIGGER;VALUE=DATE-TIME:19760401T005545Z
 	UID:35D25525-F9DE-4E38-A777-C75AFB7D8940
 	X-APPLE-PROXIMITY:ARRIVE
@@ -317,6 +319,7 @@ class VCalendar extends AbstractConverter {
 			"due" => $todo->DUE,
 			"title" => (string) $todo->SUMMARY,
 			"description" => (string) $todo->DESCRIPTION,
+			"location" => (string) $todo->LOCATION,
 			"priority" => $this->importPriority($todo),
 			"categories" => $categoryIds,
 			"vcalendarBlobId" => $blob->id,

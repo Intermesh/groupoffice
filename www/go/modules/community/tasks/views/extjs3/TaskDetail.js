@@ -31,6 +31,10 @@ go.modules.community.tasks.TaskDetail = Ext.extend(go.detail.Panel, {
 				<tpl if="!GO.util.empty(description)"><p class="s12 pad">\
 					<label>'+t('Description')+'</label>\
 					<span>{[go.util.textToHtml(values.description)]}</span>\
+				</p></tpl>\
+				<tpl if="!GO.util.empty(location)"><p class="s12 pad">\
+					<label>'+t('Location')+'</label>\
+					<span>{[go.util.textToHtml(values.location)]}</span>\
 				</p></tpl>',{
 					rruleToText: function(rrule) {
 						var fieldDummy = new go.form.RecurrenceField();

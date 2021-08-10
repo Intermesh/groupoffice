@@ -52,8 +52,8 @@ class Task extends AclItemEntity {
 	/** @var int used for the kanban groups */
 	public $groupId;
 
-  /** @var int */
-  public $projectId ;
+	/** @var int */
+	public $projectId ;
 
 	/** @var int */
 	public $createdBy;
@@ -67,20 +67,20 @@ class Task extends AclItemEntity {
 	/** @var int */
 	public $modifiedBy;
 
-  /** @var int */
-  public $filesFolderId;
+	/** @var int */
+	public $filesFolderId;
 
-  /** @var DateTime due date (when this should be finished) */
-  public $due;
+	/** @var DateTime due date (when this should be finished) */
+	public $due;
 
 	/** @var DateTime local date when this task will be started */
 	public $start;
 
 	/** @var int Duration Estimated duration in seconds the task takes to complete. */
-  public $estimatedDuration;
+	public $estimatedDuration;
 
-  /** @var int Progress Defines the progress of this task */
-  protected $progress = Progress::NeedsAction;
+	/** @var int Progress Defines the progress of this task */
+	protected $progress = Progress::NeedsAction;
 
 	/** @var DateTime When the "progress" of either the task or a specific participant was last updated. */
 	public $progressUpdated;
@@ -90,6 +90,9 @@ class Task extends AclItemEntity {
 
 	/** @var string */
 	public $description;
+
+	/** @var string */
+	public $location;
 
 	//public $keywords; // only in jmap
 
