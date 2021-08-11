@@ -2014,7 +2014,6 @@ table[id^="comments-ext"] b {
 	em {
 		cursor:pointer;
 		display: block;
-		padding: 3.5px;
 		border: 0;
 		float: left;
 		width:dp(32);
@@ -2023,8 +2022,17 @@ table[id^="comments-ext"] b {
 		font-size:22px;
 	}
 }
+.comments-container {
+	min-height: dp(150);
+	> div {
+		max-height: dp(744);
+		min-height: dp(32);
+	}
+}
 .new-message {
+	margin: dp(8);
 	border: 1px solid color($fg,'line');// rgba(black, 0.12);
+	min-height: dp(32);
 	border-radius: dp(16);
 	overflow:hidden;
 		.x-panel-body {
