@@ -47,5 +47,6 @@ return [
 	"Continue task" => 'Taak voortzetten',
 	'Nothing to save' => 'Niets om op te slaan',
 	'No changes have been made' => 'Er zijn geen veranderingen aangebracht.',
-	'Duration' => 'Duur'
+	'Duration' => 'Duur',
+	'This task already has booked hours or progress' => 'Op deze taak zijn reeds uren of voortgang geboekt',
 ];
