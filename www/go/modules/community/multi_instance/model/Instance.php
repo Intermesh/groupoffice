@@ -558,6 +558,15 @@ class Instance extends Entity {
 		
 		return $data['accessToken'];	
 	}
+
+	/**
+	 * Check if the installation was performed.
+	 *
+	 * @return bool
+	 */
+	public function isInstalled() {
+		return $this->getInstanceDbConnection()->getDatabase()->hasTable('core_module');
+	}
 	
 	private function getInstanceDbData(){
 		try {

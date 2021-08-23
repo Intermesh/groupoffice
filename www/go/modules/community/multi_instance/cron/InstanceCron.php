@@ -11,6 +11,10 @@ class InstanceCron extends CronJob {
 		//multiple versions of GO.v It passes ?exec=1 to make it run on the command line.
 		$c = new \go\core\http\Client();
 		foreach(\go\modules\community\multi_instance\model\Instance::find() as $instance) {
+			if(!$instance->isInstalled()) {
+				go()->debug("NOT INSTALLED: ". $instance->hostname);
+				continue;
+			}
 			go()->debug("Running cron for ". $instance->getConfigFile()->getPath());
 
 			$result = $c->get("http://" . $instance->hostname . '/cron.php?exec=1');
