@@ -11,6 +11,12 @@ Core: System Settings -> Modules redesigned and searchable.
 ----
 
 
+6.5.73
+- Timeregistration: Do not clone invoice_id upon cloning a time entry
+- Studio: disable setting autoexpand fields that are hidden by default.
+- Googleauthenticator: Fix negative countdown
+- Email: Fixed HTML code in grid when from tries to spoof email
+
 23-07-2021 6.5.72
 - Email: Fixed attachment downloading in firefox when opening a second one.
 
@@ -266,6 +272,20 @@ Core: System Settings -> Modules redesigned and searchable.
 
 
 
+- Email: strpos() error when deleting folders with disabled Trash folder
+- Tickets: Enable disabling using of alternative URL
+- Tickets: Settings dialog bigger in order to display 'Show external page button'
+- Core: Fixed install script custom field
+- Projects: Display supplier name in expanse budget grid
+- Timeregistrations: do not copy income_id upon cloning a time entry
+- Core: 0.00 was always displayed in number fields
+- Core: Fixed custom field column delete when creating a new column with a name that already existed.
+
+22-07-2021 6.4.241
+- Projects: Fixed upgrade error in projects where pr2_settings doesn't exist
+
+19-07-2021 6.4.240
+- Billing: Fixed filter 'Books' in project reports
 - MultiInstance: Fixed compatibility issue with MySQL 8+
 - Core: Check invalid characters in username.
 

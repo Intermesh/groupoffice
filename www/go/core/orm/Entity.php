@@ -409,6 +409,31 @@ abstract class Entity extends Property {
 	// }
 
 	/**
+	 * Normalize a query value passed to delete()
+	 *
+	 * @param $query
+	 * @return Query
+	 * @throws Exception
+	 */
+	protected static function normalizeDeleteQuery($query) {
+
+		if($query instanceof Entity) {
+			$query = $query->primaryKeyValues();
+		}
+
+		$query = Query::normalize($query);
+		//Set select for overrides.
+		$primaryTable = static::getMapping()->getPrimaryTable();
+
+		$query->selectSingleValue( '`' . $primaryTable->getAlias() . '`.`id`')
+			->from($primaryTable->getName(), $primaryTable->getAlias());
+
+		return $query;
+	}
+
+
+
+	/**
 	 * Delete the entity
 	 *
 	 * @param Query|Entity $query The query argument that selects the entities to delete. The query is also populated with "select id from `primary_table`".
@@ -424,15 +449,7 @@ abstract class Entity extends Property {
 	 */
 	public static final function delete($query) {
 
-		if($query instanceof Entity) {
-			$query = $query->primaryKeyValues();
-		}
-
-		$query = Query::normalize($query);
-		//Set select for overrides.
-		$primaryTable = static::getMapping()->getPrimaryTable();
-		$query->selectSingleValue( '`' . $primaryTable->getAlias() . '`.`id`')->from($primaryTable->getName(), $primaryTable->getAlias());
-
+		$query = self::normalizeDeleteQuery($query);
 
 		App::get()->getDbConnection()->beginTransaction();
 

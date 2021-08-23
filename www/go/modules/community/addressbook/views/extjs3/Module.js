@@ -153,7 +153,7 @@ go.Modules.register("community", "addressbook", {
 				multiple: true
 			},  {
 				name: 'jobTitle',
-				title: t("Job title"),
+				title: t("Job title") + "/" +  t("LOB"),
 				type: "string",
 				multiple: true
 			},  {

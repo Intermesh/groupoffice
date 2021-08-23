@@ -439,14 +439,26 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 		GO.email.messagesGrid.store.load();
 	},
 
-	renderNorthMessageRow : function(value, p, record){
+	renderNorthMessageRow : function(value, metaData, record){
+
+		if( Ext.form.VTypes.email(record.data.from) && record.data.from != record.data.sender) {
+			metaData.css = 'danger';
+
+			value += " &lt;" + record.data.sender + "&gt;";
+		}
+
 		if(record.data['seen']=='0')
 			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-unseen-mail">{0}</div>', value);
 		else
 			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-seen-mail">{0}</div>', value);
 	},
 
-	renderMessageSmallRes : function(value, p, record){
+	renderMessageSmallRes : function(value, metaData, record){
+
+		if( Ext.form.VTypes.email(record.data.from) && record.data.from != record.data.email) {
+			metaData.css = 'danger';
+			value += " &lt;" + record.data.sender + "&gt;";
+		}
 
 		if(record.data['seen']=='0')
 		{
@@ -467,9 +479,14 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 		return qtipTemplate;
 	},
 
-	renderMessage : function(value, p, record){
+	renderMessage : function(value, metaData, record){
 		
 		var deletedCls = record.data.deleted ? 'ml-deleted' : '';
+
+		if( Ext.form.VTypes.email(record.data.from) && record.data.from != record.data.email) {
+			metaData.css = 'danger';
+			value += " &lt;" + record.data.sender + "&gt;";
+		}
 		
 		if(record.data['seen']=='0'){
 			return String.format('<div id="sbj_'+record.data['uid']+'" '+this.createQtipTemplate(record)+' class="ml-unseen-from '+deletedCls+'">{0}</div><div class="ml-unseen-subject '+deletedCls+'">{1}</div>', value, record.data['subject']);
