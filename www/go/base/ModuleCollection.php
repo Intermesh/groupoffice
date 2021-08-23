@@ -283,8 +283,8 @@ class ModuleCollection extends Model\ModelCollection{
 		$stmt = $this->model->find($findParams);
 		$modules = array();
 		while($module = $stmt->fetch()){
-			if($module->isAvailable())
-				$modules[]=$module;
+			if(static::isAllowed($module->name, $module->package) && $module->isAvailable())
+				$modules[] = $module;
 		}
 		
 		\GO::cache()->set($cacheKey, $modules);
