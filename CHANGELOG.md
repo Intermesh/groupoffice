@@ -1,3 +1,4 @@
+- Email: strpos() error when deleting folders with disabled Trash folder
 - Tickets: Enable disabling using of alternative URL
 - Tickets: Settings dialog bigger in order to display 'Show external page button'
 - Core: Fixed install script custom field 
