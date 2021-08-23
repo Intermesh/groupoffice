@@ -1,4 +1,4 @@
-6.5.73
+23-08-2021 6.5.73
 - Timeregistration: Do not clone invoice_id upon cloning a time entry
 - Studio: disable setting autoexpand fields that are hidden by default.
 - Googleauthenticator: Fix negative countdown
