@@ -259,6 +259,12 @@
 
 
 
+- Email: strpos() error when deleting folders with disabled Trash folder
+- Tickets: Enable disabling using of alternative URL
+- Tickets: Settings dialog bigger in order to display 'Show external page button'
+- Core: Fixed install script custom field
+- Projects: Display supplier name in expanse budget grid
+- Timeregistrations: do not copy income_id upon cloning a time entry
 - Core: 0.00 was always displayed in number fields
 - Core: Fixed custom field column delete when creating a new column with a name that already existed.
 

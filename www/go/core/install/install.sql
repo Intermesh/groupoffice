@@ -113,7 +113,7 @@ CREATE TABLE `core_customfields_field` (
   `unique_values` tinyint(1) NOT NULL DEFAULT 0,
   `prefix` varchar(32) NOT NULL DEFAULT '',
   `suffix` varchar(32) NOT NULL DEFAULT '',
-  `options` text DEFAULT NULL,
+  `options` TEXT DEFAULT NULL,
   `hiddenInGrid` BOOLEAN NOT NULL DEFAULT TRUE,
   `filterable` BOOLEAN NOT NULL DEFAULT FALSE
 ) ENGINE=InnoDB;
@@ -206,7 +206,7 @@ CREATE TABLE `core_search` (
 CREATE TABLE `core_setting` (
   `moduleId` int(11) NOT NULL,
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `value` text COLLATE utf8mb4_unicode_ci DEFAULT NULL
+  `value` TEXT COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE `core_user` (
