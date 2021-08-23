@@ -4,6 +4,7 @@
 - Googleauthenticator: Fix negative countdown
 - Email: Fixed HTML code in grid when from tries to spoof email
 - Tickets: Incorrect subject in message to admin when modified by another user
+- Email: Fixed email alias being red even when it's the same as the sender address
 
 23-07-2021 6.5.72
 - Email: Fixed attachment downloading in firefox when opening a second one.
