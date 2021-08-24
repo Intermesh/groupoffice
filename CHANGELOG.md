@@ -16,6 +16,8 @@ Core: System Settings -> Modules redesigned and searchable.
 - Studio: disable setting autoexpand fields that are hidden by default.
 - Googleauthenticator: Fix negative countdown
 - Email: Fixed HTML code in grid when from tries to spoof email
+- Projects2: Total of incomes will be equal to search results
+- Contact customfield has option to allow/disallow adding new contacts from the dropdown
 - Tickets: Incorrect subject in message to admin when modified by another user
 - Email: Fixed email alias being red even when it's the same as the sender address
 
