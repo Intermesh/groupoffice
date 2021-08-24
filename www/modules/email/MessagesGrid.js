@@ -455,7 +455,7 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 
 	renderMessageSmallRes : function(value, metaData, record){
 
-		if( Ext.form.VTypes.email(record.data.from) && record.data.from != record.data.email) {
+		if( Ext.form.VTypes.email(record.data.from) && record.data.from != record.data.sender) {
 			metaData.css = 'danger';
 			value += " &lt;" + record.data.sender + "&gt;";
 		}
