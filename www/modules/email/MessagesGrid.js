@@ -45,7 +45,7 @@ GO.email.MessagesGrid = function(config){
 			hidden:true,
 			sortable:false
 		},{
-			header: t("Message", "email"),
+			header: t("From", "email"),
 			dataIndex: 'from',
 			renderer:{ 
 				fn: this.renderMessage,
