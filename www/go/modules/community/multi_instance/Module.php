@@ -75,6 +75,10 @@ class Module extends \go\core\Module {
 		$failed = 0;
 
 		foreach(Instance::find() as $instance) {
+			if(!$instance->isInstalled()) {
+				echo "Skipping not installed instance: " . $instance->hostname ."\n";
+				continue;
+			}
 			echo "Upgrading instance: " . $instance->hostname . ": ";
 			flush();
 			$success = $instance->upgrade();
