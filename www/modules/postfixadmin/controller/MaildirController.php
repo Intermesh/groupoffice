@@ -33,8 +33,12 @@ class MaildirController extends \GO\Base\Controller\AbstractController {
 		
 		foreach ($root->getFolders() as $domainFolder) {
 
+			if($domainFolder->getName() == "_trash_") {
+				continue;
+			}
+
 			foreach($domainFolder->getFolders() as $homeFolder) {
-				$homedir = $homeFolder->getRelativePath($root);
+				$homedir = $homeFolder->getRelativePath($root) . "/";
 				$existsInDatabase = (new Query())
 					->selectSingleValue("id")
 					->from("pa_mailboxes")
@@ -51,15 +55,19 @@ class MaildirController extends \GO\Base\Controller\AbstractController {
 						$mailboxTrashFolder = $trashFolder->getFolder($homedir . "-" . date("Y-m-d h:i:sa"));
 					}
 
-					echo "TRASH: " . $homedir ." -> " . $mailboxTrashFolder . "\n";
-
 					if(!$dryRun) {
 						echo "TRASH: " . $homedir ." -> " . $mailboxTrashFolder . "\n";
 						$homeFolder->move($mailboxTrashFolder);
 					} else {
 						echo "TRASH (Dry run): " . $homedir . " -> " . $mailboxTrashFolder . "\n";
 					}
+				}
+			}
 
+			if($domainFolder->isEmpty()) {
+				echo "TRASH: " . $domainFolder->getRelativePath($root) ."\n";
+				if(!$dryRun) {
+					$domainFolder->delete();
 				}
 			}
 
