@@ -137,7 +137,7 @@ GO.Checker = Ext.extend(Ext.util.Observable, {
 
 			}, this);
 
-			go.Notifier.notificationArea.doLayout();
+			this.reminders.doLayout();
 
 		},this);
 

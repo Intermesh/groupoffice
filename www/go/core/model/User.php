@@ -430,6 +430,13 @@ class User extends Entity {
 	}
 	
 	protected function internalValidate() {
+
+		if($this->isModified(['username'])) {
+			$regex = '/^[A-Za-z0-9_\-\.\@]*$/';
+			if(!preg_match($regex, $this->username)) {
+				$this->setValidationError('username', ErrorCode::MALFORMED, go()->t("You have invalid characters in the username") . " (a-z, 0-9, -, _, ., @).");
+			}
+		}
 		
 		if($this->isModified('groups')) {	
 			

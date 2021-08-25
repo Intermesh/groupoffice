@@ -112,7 +112,7 @@ GO.form.NumberField = Ext.extend(Ext.form.TextField, {
 	setValue : function(v) {
 		GO.form.NumberField.superclass.setValue.call(this, v);
 		
-		if(!this.serverFormats) {			
+		if(!this.serverFormats && v != null) {
 			v = v * this.multiplier;
 			var formatted = GO.util.numberFormat(v, this.decimalPrecision);
 			this.setRawValue(formatted);
