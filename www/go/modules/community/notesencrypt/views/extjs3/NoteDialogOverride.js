@@ -112,7 +112,7 @@ Ext.onReady(function() {
 
 				if(contentField.getRawValue().indexOf('<img') > -1) {
 					Ext.MessageBox.alert(t("Error"), t("Sorry, you can't use images in encrypted notes"));
-					return false;
+					return Promise.reject(t("Sorry, you can't use images in encrypted notes"));
 				}
 
 				var passfield = this.passwordField.getValue();
@@ -124,7 +124,7 @@ Ext.onReady(function() {
 				} else {
 					var plaintext = contentField.getRawValue(), password = this.passwordField.getValue();
 
-					go.modules.community.notes.aesGcmEncrypt(plaintext, password).then(function(text){
+					return go.modules.community.notes.aesGcmEncrypt(plaintext, password).then(function(text){
 
 						this.formPanel.values.content = "{ENCRYPTED}" + text;
 						if(!go.modules.community.notes.decrypted || !go.modules.community.notes.decrypted[this.currentId]) {
@@ -133,8 +133,7 @@ Ext.onReady(function() {
 
 						var me = this;
 
-						go.modules.community.notes.NoteDialog.superclass.submit.call(this).then(function() {
-							debugger;
+						return go.modules.community.notes.NoteDialog.superclass.submit.call(this).then(function() {
 							go.modules.community.notes.decrypted[me.currentId] = {};
 							go.modules.community.notes.decrypted[me.currentId].content = plaintext;
 							go.modules.community.notes.decrypted[me.currentId].password = password;
@@ -143,7 +142,7 @@ Ext.onReady(function() {
 				}
 
 			} else {
-				go.modules.community.notes.NoteDialog.superclass.submit.call(this);
+				return go.modules.community.notes.NoteDialog.superclass.submit.call(this);
 			}
 		}
 	});
