@@ -1,0 +1,52 @@
+body, p, span, div {
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: sp(16);
+	color: color($fg, 'text');
+	font-weight: $font-weight-r;
+	line-height: dp(24);
+	background-color: white;
+}
+
+h1 { @extend %font-display1;}
+h2 { @extend %font-headline;}
+h3 { @extend %font-title;}
+h4 { @extend %font-subheading;}
+h5 { @extend %font-subheading-dense;}
+h6 { @extend %font-data-head;}
+
+code {
+	border: 1px solid color($fg, 'line');
+	background-color: color($bg, 'background');
+	padding: dp(8);
+	margin: dp(16) 0;
+	display: block;
+	font-family: "Courier New",Courier,monospace;
+	color: color($fg, 'base');
+	border-radius: dp(4);
+}
+
+p {
+	margin: 0;
+}
+
+ul{
+	display: block;
+	list-style-type: disc;
+	list-style-position: outside;
+	margin: 0;
+	padding: 0 0 0 2em;
+}
+
+ol {
+	display: block;
+	list-style-type: decimal;
+	list-style-position: outside;
+	margin: 0;
+	padding: 0 0 0 2em;
+	> ol {
+		list-style-type: lower-alpha;
+		> ol {
+			list-style-type: lower-roman;
+		}
+	}
+}

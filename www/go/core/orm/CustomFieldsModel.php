@@ -266,6 +266,13 @@ class CustomFieldsModel implements ArrayableInterface, \ArrayAccess, \JsonSerial
 		return true;
 	}
 
+	public function getAsText() {
+		$this->internalGetCustomFields();
+		$text = clone $this;
+		$text->returnAsText(true);
+		return $text;
+	}
+
 	public function toArray($properties = null) {
 		$fn = $this->returnAsText ? 'dbToText' : 'dbToApi';
 		$record = $this->internalGetCustomFields();

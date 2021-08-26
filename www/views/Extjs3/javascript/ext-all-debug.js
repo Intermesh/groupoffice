@@ -44448,14 +44448,14 @@ Ext.form.HtmlEditor = Ext.extend(Ext.form.Field, {
         
         try{
             var dbody = this.getEditorBody(),
-                ss = this.el.getStyles('font-size', 'font-family', 'background-image', 'background-repeat', 'background-color', 'color'),
+                //ss = this.el.getStyles('font-size', 'font-family', 'background-image', 'background-repeat', 'background-color', 'color'),
                 doc,
                 fn;
 
-            ss['background-attachment'] = 'fixed'; 
+            //ss['background-attachment'] = 'fixed';
             dbody.bgProperties = 'fixed'; 
 
-            Ext.DomHelper.applyStyles(dbody, ss);
+            //Ext.DomHelper.applyStyles(dbody, ss);
 
             doc = this.getDoc();
 
