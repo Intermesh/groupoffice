@@ -1,6 +1,7 @@
 - Studio: Initial config had "id" for autoExpandColumn instead of "showID".
 - Core: Custom fields can be rendered as text in templates with entity.customFields.asText.foo
 - Postfixadmin: fixed cleanup script of deleted mailboxes
+- Email: Fixed red messages in sent items
 
 23-08-2021 6.5.73
 - Timeregistration: Do not clone invoice_id upon cloning a time entry
