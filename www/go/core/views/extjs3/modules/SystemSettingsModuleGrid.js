@@ -219,7 +219,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 							record: r,
 							handler: function(btn) {
 								var record = btn.record;
-								this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);
+								this.showPermissions(record.data.name, record.data.package, record.data.aclId);
 							},
 							scope: this
 						}, {
@@ -246,7 +246,8 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 
 	},
 
-	showPermissions: function(moduleId, name, acl_id) {
+	showPermissions: function(moduleId, pkg, acl_id) {
+		let name = t('name', moduleId, pkg);
 		if (!this.permissionsWin) {
 			this.permissionsWin = new go.modules.PermissionsWindow();
 			this.permissionsWin.on('hide', function() {
@@ -254,11 +255,12 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 				// set the permissions, module by module.
 				if (this.installedModules && this.installedModules.length) {
 					var r = this.installedModules.shift();
-					this.permissionsWin.show(r.id, r.name, r.acl_id);
+					debugger;
+					this.permissionsWin.show(r.id,r.package, r.name, r.acl_id);
 				}
 			}, this);
 		}
-		this.permissionsWin.show(moduleId, name, acl_id);
+		this.permissionsWin.show(moduleId, pkg, name, acl_id);
 	},
 
 	enableModule: function(record) {
@@ -282,7 +284,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 					record.set('id', result.id);
 					record.set("enabled", record.data.enabled);
 					if (record.data.enabled) {
-						this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);
+						this.showPermissions(record.data.name, record.data.package, record.data.aclId);
 						//this.store.load();
 					}
 				}
@@ -338,7 +340,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 				if(success){
 					if(record.data.enabled && record.isModified("enabled")) {
 						// record.set('aclId', response['created'][record.data.id].aclId);
-						this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);
+						this.showPermissions(record.data.name, record.data.package, record.data.aclId);
 						this.store.load();
 					}
 					record.commit();
@@ -363,7 +365,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 						record.set('enabled', true);
 						record.set('id', response['list'][0].id);
 						record.set('aclId', response['list'][0].aclId);
-						this.showPermissions(record.data.name, t(record.data.name, record.data.name), record.data.aclId);
+						this.showPermissions(record.data.name, record.data.package, record.data.aclId);
 						record.commit();
 					} else
 					{
