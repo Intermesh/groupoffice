@@ -441,7 +441,7 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 
 	renderNorthMessageRow : function(value, metaData, record){
 
-		if( Ext.form.VTypes.email(record.data.from) && record.data.from != record.data.sender) {
+		if( this.isSpoofed(record)) {
 			metaData.css = 'danger';
 
 			value += " &lt;" + record.data.sender + "&gt;";
@@ -455,7 +455,7 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 
 	renderMessageSmallRes : function(value, metaData, record){
 
-		if( Ext.form.VTypes.email(record.data.from) && record.data.from != record.data.sender) {
+		if( this.isSpoofed(record)) {
 			metaData.css = 'danger';
 			value += " &lt;" + record.data.sender + "&gt;";
 		}
@@ -479,11 +479,19 @@ Ext.extend(GO.email.MessagesGrid, go.grid.GridPanel,{
 		return qtipTemplate;
 	},
 
+	isSpoofed: function(record) {
+		if(record.store.reader.jsonData.sent || record.store.reader.jsonData.drafts) {
+			return false;
+		}
+
+		return Ext.form.VTypes.email(record.data.from) && record.data.from != record.data.sender;
+	},
+
 	renderMessage : function(value, metaData, record){
-		
+
 		var deletedCls = record.data.deleted ? 'ml-deleted' : '';
 
-		if( Ext.form.VTypes.email(record.data.from) && record.data.from != record.data.sender) {
+		if( this.isSpoofed(record)) {
 			metaData.css = 'danger';
 			value += " &lt;" + record.data.sender + "&gt;";
 		}
