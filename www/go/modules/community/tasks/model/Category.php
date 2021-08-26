@@ -8,6 +8,7 @@ namespace go\modules\community\tasks\model;
 						
 use go\core\db\Criteria;
 use go\core\jmap\Entity;
+use go\core\model\Acl;
 
 /**
  * Category model
@@ -26,6 +27,10 @@ class Category extends Entity {
 	protected static function defineMapping() {
 		return parent::defineMapping()
 			->addTable("tasks_category", "category");
+	}
+
+	public function getPermissionLevel() {
+		return ($this->ownerId === go()->getUserId() || \go\core\model\Module::findByName('community', 'tasks')->hasPermissionLevel(50)) ?  Acl::LEVEL_MANAGE : 0; // validate will make sure global categories aren't changed if no permission
 	}
 
 	public function internalValidate()
