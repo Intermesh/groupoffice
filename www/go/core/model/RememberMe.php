@@ -3,6 +3,7 @@ namespace go\core\model;
 
 use DateInterval;
 use go\core\Environment;
+use go\core\exception\RememberMeTheft;
 use go\core\http\Request;
 use go\core\http\Response;
 use go\core\orm\exception\SaveException;
@@ -208,8 +209,12 @@ class RememberMe extends Entity {
 			return false;
 		}
 
-		if(!password_verify($cookieParts[1], $rememberMe->token)) {
-			throw new \Exception("Theft!");
+		if(true || !password_verify($cookieParts[1], $rememberMe->token)) {
+			// clear logins
+			Token::delete(['userId' => $rememberMe->userId]);
+			RememberMe::delete(['userId' => $rememberMe->userId]);
+			self::unsetCookie();
+			throw new RememberMeTheft();
 		}
 
 		$rememberMe->setNewToken();

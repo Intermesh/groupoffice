@@ -114,6 +114,19 @@ try {
 
 	GO::router()->runController();
 
+} catch(\go\core\exception\RememberMeTheft $e) {
+	$tp = \go\core\webclient\Extjs3::get()->getThemePath();
+	require($tp .'pageHeader.php');
+	?>
+	<section>
+			<fieldset>
+				<h1><?= go()->t("Security warning"); ?></h1>
+				<p><?= go()->t("It looks like someone might have had unauthorized access to your account. You have been logged out everywhere. Please reset your password immediately."); ?></p>
+				<a class="button primary right" href="<?= \go\core\webclient\Extjs3::get()->getBaseUrl(); ?>"><?= go()->t('Continue'); ?></a>
+			</fieldset>
+	</section>
+	<?php
+	require($tp .'pageFooter.php');
 } catch(Error $e) {
   errorHander($e);  
 } catch(Exception $e) {
