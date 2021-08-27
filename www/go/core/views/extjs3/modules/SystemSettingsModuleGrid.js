@@ -59,6 +59,15 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 				window.open('https://www.group-office.com/shop/');
 			},
 			scope: this
+		},{
+			text:t('System') + ' ' +t('Permissions'),
+			iconCls: 'ic-group',
+			handler: function() {
+				const corePermissionDlg = new go.modules.GroupRights();
+				go.Db.store('Module').single(1).then((core) =>
+					corePermissionDlg.show(core, ['mayViewUsers', 'mayChangeUsers', 'mayViewGroups', 'mayChangeGroups', 'mayViewCustomFields', 'mayChangeCustomFields'])
+				)
+			}
 		},this.trialButton = new Ext.Button({
 			iconCls: 'ic-settings',
 			text: t("30 day trial license", "modules"),
