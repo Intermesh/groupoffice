@@ -125,7 +125,7 @@ class AddressBook extends \go\core\acl\model\AclOwnerEntity {
 		}
 			
 		if(!isset($user->addressBookSettings)) {
-			$user->addressBookSettings = new \go\modules\community\addressbook\model\UserSettings();
+			$user->addressBookSettings = new \go\modules\community\addressbook\model\UserSettings($user);
 		}
 		
 		if(!empty($user->addressBookSettings->defaultAddressBookId)) {

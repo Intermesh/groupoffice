@@ -499,7 +499,7 @@ class Migrate63to64 {
 			$contact->gender = $r['sex'];
 
 			if (!empty($r['birthday'])) {
-				$contact->dates[] = (new Date())
+				$contact->dates[] = (new Date($contact))
 								->setValues([
 						'type' => Date::TYPE_BIRTHDAY,
 						'date' => DateTime::createFromFormat('Y-m-d', $r['birthday'])
@@ -507,7 +507,7 @@ class Migrate63to64 {
 			}
 
 			if ($r['action_date'] > 0) {
-				$contact->dates[] = (new Date())
+				$contact->dates[] = (new Date($contact))
 								->setValues([
 						'type' => "action",
 						'date' => DateTime::createFromFormat('U', $r['action_date'])
@@ -515,7 +515,7 @@ class Migrate63to64 {
 			}
 
 			if (!empty($r['email'])) {
-				$contact->emailAddresses[] = (new EmailAddress())
+				$contact->emailAddresses[] = (new EmailAddress($contact))
 								->setValues([
 						'type' => EmailAddress::TYPE_WORK,
 						'email' => $r['email']
@@ -523,14 +523,14 @@ class Migrate63to64 {
 			}
 
 			if (!empty($r['email2'])) {
-				$contact->emailAddresses[] = (new EmailAddress())
+				$contact->emailAddresses[] = (new EmailAddress($contact))
 								->setValues([
 						'type' => EmailAddress::TYPE_WORK,
 						'email' => $r['email2']
 				]);
 			}
 			if (!empty($r['email3'])) {
-				$contact->emailAddresses[] = (new EmailAddress())
+				$contact->emailAddresses[] = (new EmailAddress($contact))
 								->setValues([
 						'type' => EmailAddress::TYPE_WORK,
 						'email' => $r['email3']
@@ -543,7 +543,7 @@ class Migrate63to64 {
 			$contact->jobTitle = $r['function'];
 
 			if (!empty($r['home_phone'])) {
-				$contact->phoneNumbers[] = (new PhoneNumber())
+				$contact->phoneNumbers[] = (new PhoneNumber($contact))
 								->setValues([
 						'type' => PhoneNumber::TYPE_HOME,
 						'number' => $r['home_phone']
@@ -551,7 +551,7 @@ class Migrate63to64 {
 			}
 
 			if (!empty($r['work_phone'])) {
-				$contact->phoneNumbers[] = (new PhoneNumber())
+				$contact->phoneNumbers[] = (new PhoneNumber($contact))
 								->setValues([
 						'type' => PhoneNumber::TYPE_WORK,
 						'number' => $r['work_phone']
@@ -559,7 +559,7 @@ class Migrate63to64 {
 			}
 
 			if (!empty($r['fax'])) {
-				$contact->phoneNumbers[] = (new PhoneNumber())
+				$contact->phoneNumbers[] = (new PhoneNumber($contact))
 								->setValues([
 						'type' => PhoneNumber::TYPE_FAX,
 						'number' => $r['fax']
@@ -567,7 +567,7 @@ class Migrate63to64 {
 			}
 
 			if (!empty($r['work_fax'])) {
-				$contact->phoneNumbers[] = (new PhoneNumber())
+				$contact->phoneNumbers[] = (new PhoneNumber($contact))
 								->setValues([
 						'type' => PhoneNumber::TYPE_FAX,
 						'number' => $r['work_fax']
@@ -575,7 +575,7 @@ class Migrate63to64 {
 			}
 
 			if (!empty($r['cellular'])) {
-				$contact->phoneNumbers[] = (new PhoneNumber())
+				$contact->phoneNumbers[] = (new PhoneNumber($contact))
 								->setValues([
 						'type' => PhoneNumber::TYPE_MOBILE,
 						'number' => $r['cellular']
@@ -583,7 +583,7 @@ class Migrate63to64 {
 			}
 
 			if (!empty($r['cellular2'])) {
-				$contact->phoneNumbers[] = (new PhoneNumber())
+				$contact->phoneNumbers[] = (new PhoneNumber($contact))
 								->setValues([
 						'type' => PhoneNumber::TYPE_MOBILE,
 						'number' => $r['cellular2']
@@ -591,7 +591,7 @@ class Migrate63to64 {
 			}
 
 			if (!empty($r['homepage'])) {
-				$contact->urls[] = (new Url())
+				$contact->urls[] = (new Url($contact))
 								->setValues([
 						'type' => Url::TYPE_HOMEPAGE,
 						'url' => $r['homepage']
@@ -599,7 +599,7 @@ class Migrate63to64 {
 			}
 
 			if (!empty($r['url_facebook'])) {
-				$contact->urls[] = (new Url())
+				$contact->urls[] = (new Url($contact))
 								->setValues([
 						'type' => Url::TYPE_FACEBOOK,
 						'url' => $r['url_facebook']
@@ -607,7 +607,7 @@ class Migrate63to64 {
 			}
 
 			if (!empty($r['url_linkedin'])) {
-				$contact->urls[] = (new Url())
+				$contact->urls[] = (new Url($contact))
 								->setValues([
 						'type' => Url::TYPE_LINKEDIN,
 						'url' => $r['url_linkedin']
@@ -615,7 +615,7 @@ class Migrate63to64 {
 			}
 
 			if (!empty($r['url_twitter'])) {
-				$contact->urls[] = (new Url())
+				$contact->urls[] = (new Url($contact))
 								->setValues([
 						'type' => Url::TYPE_TWITTER,
 						'url' => $r['url_twitter']
@@ -623,7 +623,7 @@ class Migrate63to64 {
 			}
 
 			if (!empty($r['skype_name'])) {
-				$contact->urls[] = (new Url())
+				$contact->urls[] = (new Url($contact))
 								->setValues([
 						'type' => "skype",
 						'url' => $r['skype_name']
@@ -631,7 +631,7 @@ class Migrate63to64 {
 			}
 
 
-			$address = new Address();
+			$address = new Address($contact);
 			if(!empty($r['country']) && \go\core\validate\CountryCode::validate(strtoupper($r['country'])))
 				$address->countryCode = strtoupper($r['country']);
 
@@ -749,7 +749,7 @@ class Migrate63to64 {
 			}
 
 			if (!empty($r['email'])) {
-				$contact->emailAddresses[] = (new EmailAddress())
+				$contact->emailAddresses[] = (new EmailAddress($contact))
 								->setValues([
 						'type' => EmailAddress::TYPE_WORK,
 						'email' => $r['email']
@@ -757,7 +757,7 @@ class Migrate63to64 {
 			}
 
 			if (!empty($r['invoice_email'])) {
-				$contact->emailAddresses[] = (new EmailAddress())
+				$contact->emailAddresses[] = (new EmailAddress($contact))
 								->setValues([
 						'type' => EmailAddress::TYPE_BILLING,
 						'email' => $r['invoice_email']
@@ -766,7 +766,7 @@ class Migrate63to64 {
 
 
 			if (!empty($r['phone'])) {
-				$contact->phoneNumbers[] = (new PhoneNumber())
+				$contact->phoneNumbers[] = (new PhoneNumber($contact))
 								->setValues([
 						'type' => PhoneNumber::TYPE_WORK,
 						'number' => $r['phone']
@@ -774,7 +774,7 @@ class Migrate63to64 {
 			}
 
 			if (!empty($r['fax'])) {
-				$contact->phoneNumbers[] = (new PhoneNumber())
+				$contact->phoneNumbers[] = (new PhoneNumber($contact))
 								->setValues([
 						'type' => PhoneNumber::TYPE_FAX,
 						'number' => $r['fax']
@@ -783,7 +783,7 @@ class Migrate63to64 {
 
 
 			if (!empty($r['homepage'])) {
-				$contact->urls[] = (new Url())
+				$contact->urls[] = (new Url($contact))
 								->setValues([
 						'type' => Url::TYPE_HOMEPAGE,
 						'url' => $r['homepage']
@@ -792,7 +792,7 @@ class Migrate63to64 {
 
 
 
-			$address = new Address();
+			$address = new Address($contact);
 
 			if(!empty($r['country']) && \go\core\validate\CountryCode::validate(strtoupper($r['country'])))
 				$address->countryCode = strtoupper($r['country']);
@@ -824,7 +824,7 @@ class Migrate63to64 {
 				$contact->addresses[] = $address;
 			}
 
-			$address = new Address();
+			$address = new Address($contact);
 
 			if(!empty($r['country']) && \go\core\validate\CountryCode::validate(strtoupper($r['post_country'])))
 				$address->countryCode = strtoupper($r['post_country']);

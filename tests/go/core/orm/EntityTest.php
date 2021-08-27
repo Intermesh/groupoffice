@@ -32,17 +32,17 @@ class EntityTest extends TestCase {
 		$entity->createdAt = new DateTime();
 
 		//Directly access by offset
-		$entity->hasMany[0] = new AHasMany();
+		$entity->hasMany[0] = new AHasMany($entity);
 		$entity->hasMany[0]->propOfHasManyA = "string 5";
 		
 
-		$aHasMany = new AHasMany();
+		$aHasMany = new AHasMany($entity);
 		$aHasMany->propOfHasManyA = "string 3";
 		//No offset
 		$entity->hasMany[] = $aHasMany;
 
 		
-		$entity->hasOne = new AHasOne();
+		$entity->hasOne = new AHasOne($entity);
 		$entity->hasOne->propA = "string 4";
 		
 		
@@ -280,7 +280,7 @@ class EntityTest extends TestCase {
 		$a = new B();
 		$a->propA = "string 1";
 		$a->propB = "string 2";
-		$a->dynamic = new \go\modules\community\test\model\ADynamic();
+		$a->dynamic = new \go\modules\community\test\model\ADynamic($a);
 		$a->dynamic->propA = "123";
 		$a->propD = "string 3";
 		$success = $a->save();

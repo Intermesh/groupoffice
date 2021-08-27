@@ -31,14 +31,21 @@ class Query extends DbQuery {
    * @param string $cls The Entity class name
    * @param array $fetchProperties The entity properties to fetch
    * @param bool $readOnly Entity's will be read only. This improves performance.
+   * @param Property|null $owner When finding relations the owner or parent Entity / Property is passed so the children can access it.
    * @return $this
    */
-	public function setModel($cls, $fetchProperties = [], $readOnly = false, $ownerEntity = null) {
+	public function setModel(string $cls, array $fetchProperties = [], bool $readOnly, $owner = null) {
 		$this->model = $cls;
 		$this->fetchProperties = $fetchProperties;
 		$this->readOnly = $readOnly;
 
-		return $this->fetchMode(PDO::FETCH_CLASS, $this->model, [false, $this->fetchProperties, $this->readOnly, $ownerEntity]);
+		$args = [false, $this->fetchProperties, $this->readOnly];
+
+		if(isset($owner)) {
+			array_unshift($args, $owner);
+		}
+
+		return $this->fetchMode(PDO::FETCH_CLASS, $this->model, $args);
 	}
 	
 	/**

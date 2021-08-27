@@ -1085,3 +1085,7 @@ join core_acl a on a.id = ag.aclId
 join core_module m on a.entityId = m.id
 SET rights = IF(ag.level=10,0,IF(ag.level=40,1,3))
 WHERE a.entityId = p.moduleId AND  m.name = 'projects2';";
+
+
+$updates['202108271613'][] = "alter table core_module drop foreign key acl;";
+$updates['202108271613'][] = "alter table core_module drop column aclId;";

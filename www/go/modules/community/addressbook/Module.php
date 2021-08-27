@@ -169,14 +169,14 @@ class Module extends core\Module {
 
 			$count = $faker->numberBetween(0, 3);
 			for($i = 0; $i < $count; $i++) {
-				$company->phoneNumbers[$i] = (new PhoneNumber())->setValues(['number' => $faker->phoneNumber, 'type' => PhoneNumber::TYPE_MOBILE]);
+				$company->phoneNumbers[$i] = (new PhoneNumber($company))->setValues(['number' => $faker->phoneNumber, 'type' => PhoneNumber::TYPE_MOBILE]);
 			}
 			$count = $faker->numberBetween(0, 3);
 			for($i = 0; $i < $count; $i++) {
-				$company->emailAddresses[$i] = (new EmailAddress())->setValues(['email' => $faker->email, 'type' => EmailAddress::TYPE_HOME]);
+				$company->emailAddresses[$i] = (new EmailAddress($company))->setValues(['email' => $faker->email, 'type' => EmailAddress::TYPE_HOME]);
 			}
 
-			$company->addresses[0] = $a = new Address();
+			$company->addresses[0] = $a = new Address($company);
 
 			$a->street = $faker->streetName;
 			$a->street2 = $faker->streetAddress;
@@ -208,7 +208,7 @@ class Module extends core\Module {
 				$contact->emailAddresses[$i] = (new EmailAddress())->setValues(['email' => $faker->email, 'type' => EmailAddress::TYPE_HOME]);
 			}
 
-			$contact->addresses[0] = $a = new Address();
+			$contact->addresses[0] = $a = new Address($contact);
 
 			$a->street = $faker->streetName;
 			$a->street2 = $faker->streetAddress;

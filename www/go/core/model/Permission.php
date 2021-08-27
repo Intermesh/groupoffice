@@ -21,13 +21,13 @@ class Permission extends Property {
 	}
 
 	public function hasRight($name){
-		$types = $this->ownerEntity->module()->getRights();
+		$types = $this->owner->module()->getRights();
 		return !!($this->rights & $types[$name]);
 	}
 
 	// int to [name => bool]
 	public function getRights(){
-		$types = $this->ownerEntity->module()->getRights();
+		$types = $this->owner->module()->getRights();
 		$rights = [];
 		foreach($types as $name => $bit){
 			if($this->rights & $bit) {
@@ -39,7 +39,7 @@ class Permission extends Property {
 
 	// [name => bool] to int
 	public function setRights($rights){
-		$types = $this->ownerEntity->module()->getRights();
+		$types = $this->owner->module()->getRights();
 		$this->rights = 0; // need to post all active rights this way
 		foreach($rights as $name => $isTrue){
 			if(!isset($types[$name])) continue; // do not set invalid permissions
