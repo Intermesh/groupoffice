@@ -585,7 +585,9 @@ abstract class Entity extends Property {
    * @throws Exception
    */
 	public function findAclId() {
+
 		return null;
+//
 //		$moduleId = static::entityType()->getModuleId();
 //
 //		return Module::findById($moduleId)->findAclId();
