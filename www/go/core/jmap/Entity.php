@@ -3,14 +3,12 @@
 namespace go\core\jmap;
 
 use Exception;
-use go\core\Installer;
-use go\core\fs\File;
+use go\core\model\Alert;
 use go\core\model\Module;
 use go\core\orm\Property;
 use go\core\orm\Query;
 use go\core\jmap\exception\CannotCalculateChanges;
 use go\core\orm\Entity as OrmEntity;
-use go\core\util\StringUtil;
 use PDO;
 use go\core\orm\EntityType;
 use go\core\acl\model\AclOwnerEntity;
@@ -329,7 +327,7 @@ abstract class Entity  extends OrmEntity {
   }
 
   /**
-   * Delete's the entitiy. Implements change logging for sync.
+   * Delete's the entiyy. Implements change logging for sync.
    *
    * @param Query $query The query to select entities in the delete statement
    * @return boolean
@@ -491,7 +489,7 @@ abstract class Entity  extends OrmEntity {
 							->single();
 
 			if(!$change) {			
-				throw new CannotCalculateChanges("Can't calculate changes for state: ". $sinceState);
+				throw new CannotCalculateChanges("Can't calculate changes for '" . $entityType->getName() . "' with state: ". $sinceState .' ('.$states[0]['modSeq'].')');
 			}
 		}	
 		
@@ -684,4 +682,55 @@ abstract class Entity  extends OrmEntity {
 
 		return $arr;
 	}
+
+	/**
+	 * Create an alert for this entity
+	 *
+	 * @param \DateTimeInterface $triggerAt
+	 * @param string $tag A unique tag for this entity and user. It will replace existing ones.
+	 * @param int $userId The user this alert is for. Defaults to current user.
+	 * @return \go\core\model\Alert
+	 * @throws Exception
+	 */
+	public function createAlert(\DateTimeInterface $triggerAt,
+	                            $tag,
+	                            $userId = null) {
+		$alert = new \go\core\model\Alert();
+
+		$alert->triggerAt = $triggerAt;
+		$alert->userId = $userId ?? go()->getAuthState()->getUserId();
+		$alert->entityId =  $this->id;
+		$alert->entityTypeId = static::entityType()->getId();
+		$alert->tag = $tag;
+
+		return $alert;
+	}
+
+	/**
+	 * Delete an alert
+	 *
+	 * @param string $tag A unique tag for this entity and user. It will replace existing ones.
+	 * @param int $userId The user this alert is for. Defaults to current user.
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function deleteAlert($tag, $userId = null) {
+		return Alert::delete([
+			'entityTypeId' => self::entityType()->getId(),
+			'entityId' => $this->id,
+			'tag' => $tag,
+			'userId' => $userId ?? go()->getAuthState()->getUserId()
+		]);
+	}
+
+	/**
+	 * Called when reminders are deleted / dismissed
+	 *
+	 *
+	 * @param Alert[] $alerts
+	 */
+	public static function dismissAlerts(array $alerts) {
+
+	}
+
 }

@@ -86,6 +86,15 @@ class ModuleController extends AbstractJsonController{
 			if($module instanceof \go\core\Module) {
 
 				$model = \go\core\model\Module::findByName($module->getPackage(), $module->getName(), null);
+				if(isset($params['isInstalled']) && $params['isInstalled'] == 'true' && !$model) {
+					continue;
+				}
+				if(isset($params['isInstalled']) && $params['isInstalled'] == 'false' && !empty($model)) {
+					continue;
+				}
+				if(!empty($params['query']) && stripos($module->getName(),$params['query'])===false && stripos($module->getDescription(), $params['query'])===false) {
+					continue;
+				}
 
 				$availableModules[ucfirst($module->getPackage()) . $module->getName()] = array(
 					'id' => $model ? $model->id : null,
@@ -110,9 +119,18 @@ class ModuleController extends AbstractJsonController{
 			{
 				
 				$model = GO::modules()->isInstalled($module->name(), false);
-				
-				$availableModules[$module->package().$module->name()] = array(					
-						'id' => $model ? $model->id : null,
+				if(isset($params['isInstalled']) && $params['isInstalled'] == 'true' && !$model) {
+					continue;
+				}
+				if(isset($params['isInstalled']) && $params['isInstalled'] == 'false' && $model) {
+					continue;
+				}
+				if(!empty($params['query']) && stripos($module->localizedName(),$params['query'])===false && stripos($module->description(), $params['query'])===false) {
+					continue;
+				}
+
+				$availableModules[$module->package().$module->name()] = array(
+					'id' => $model ? $model->id : null,
 					'name'=>$module->name(),
 					'localizedName' => $module->localizedName(),
 					'author'=>$module->author(),
@@ -127,13 +145,13 @@ class ModuleController extends AbstractJsonController{
 					'enabled'=>$model && $model->enabled,
 					'not_installable'=> !$module->isInstallable(),
 					'sort_order' => ($model && $model->sort_order)?$model->sort_order:''
-			);
+				);
 			}
 		}
 		
-		ksort($availableModules);		
-		
-		
+		ksort($availableModules);
+
+
 		$response['has_license']=go()->getSettings()->license != null || GO::config()->product_name!='GroupOffice';
 						
 		$response['results']=array_values($availableModules);		
@@ -325,7 +343,7 @@ class ModuleController extends AbstractJsonController{
 	
 	public static function checkDefaultModelCallback($user, $models){		
 		foreach ($models as $model){
-			$model->getDefault($user);		
+			$model->getDefault($user);
 		}
 	}
 	
@@ -335,16 +353,16 @@ class ModuleController extends AbstractJsonController{
 		$response = array();
 		
 		if($id && GO::request()->isPost()){
-			
+
 			$postData = GO::request()->post['module'];
-			
+
 			$module = Module::model()->findByPk($postData['id']);
-			
+
 			if($module){
-				
+
 				// For now only set the sort_order, other attributes can be added later.
 				$module->sort_order = $postData['sort_order'];
-				
+
 				if($module->save()){
 					$response['success'] = true;
 				} else {
@@ -377,4 +395,3 @@ class ModuleController extends AbstractJsonController{
 //	}
 
 }
-

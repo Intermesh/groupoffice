@@ -226,7 +226,7 @@ class Mapping {
 	 *
 	 * @param string $name
 	 * @param string $propertyName
-	 * @param array $keys	 *
+	 * @param array $keys
 	 * @param array $options pass ['orderBy' => 'sortOrder'] to save the sort order in this int column. This property can
 	 *   be a protected property because the client does not need to know of it's existence.
 	 *
@@ -286,6 +286,36 @@ class Mapping {
 	 */
 	public function getRelations() {
 		return $this->relations;
+	}
+
+	private function hasUserTable() {
+		foreach($this->tables as $table) {
+			if($table->isUserTable) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * When the model has a map or array property that depends on the user table. For example
+	 * a task alert with key id => taskId and userId=>userId.
+	 *
+	 * @return boolean
+	 */
+	public function hasUserTableRelation() {
+
+		if(!$this->hasUserTable()) {
+			return false;
+		}
+
+		foreach($this->getRelations() as $relation) {
+			if(is_a($relation->entityName, UserProperty::class, true)){
+				return true;
+			}
+		}
+
+		return false;
 	}
 	
 	/**

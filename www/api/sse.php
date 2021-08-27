@@ -25,7 +25,7 @@ if(!App::get()->setAuthState(new State())->getAuthState()->isAuthenticated()) {
 @session_write_close();
 
 //Check availability
-if(!go()->getConfig()['sseEnabled'] || (function_exists("xdebug_is_debugger_active") && xdebug_is_debugger_active())) {
+if(!go()->getConfig()['sseEnabled']) {
 	// Service Unavailable
 	http_response_code(503);
 	echo "Server Sent Events not available";
@@ -42,5 +42,13 @@ header('Cache-Control: no-cache');
 header('Connection: keep-alive');
 header('X-Accel-Buffering: no');
 
+
+try {
 // Client may specify 'types' and a 'ping' interval
-(new PushDispatcher($_GET['types']))->start($_GET['ping'] ?? 10);
+	(new PushDispatcher($_GET['types']))->start($_GET['ping'] ?? 10);
+} catch(Exception $e) {
+	echo "event: error\n";
+	echo 'data: ' . $e->getMessage(). "\n\n";
+
+	\go\core\ErrorHandler::logException($e);
+}

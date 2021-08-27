@@ -99,15 +99,14 @@ class Router {
 			$method = $parts[3];
 		}
 
-
 		if (!class_exists($controllerCls)) {
-			throw new NotFound("Route: " . $path . " ( ".$controllerCls.")  not found.");
+			throw new NotFound("Route: " . $path . " (Class ".$controllerCls.")  not found.");
 		}	
 
 		$ctrl = new $controllerCls;
 		
 		if (!method_exists($ctrl, $method)) {
-			throw new Exception("Method '" .  $method . "' doesn't exist in controller '" . $controllerCls . "'");
+			throw new NotFound("Route: " . $path . " (Method ".$controllerCls."::".$method.")  not found.");
 		}
 		
 		$this->callMethod($ctrl, $method, $args);

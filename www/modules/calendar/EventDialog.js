@@ -666,6 +666,8 @@ Ext.extend(GO.calendar.EventDialog, Ext.util.Observable, {
 		var eD = this.endDate.getValue();
 		var sD = this.startDate.getValue();
 
+		if(!sD) return;
+
 		if (sD > eD) {
 			this.endDate.setValue(sD);
 		}

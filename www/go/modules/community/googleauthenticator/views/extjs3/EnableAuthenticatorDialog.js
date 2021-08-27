@@ -6,9 +6,13 @@ go.modules.community.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(
 	width: 400,
 	height: 600,
 	showCustomfields:false,
+	closable: false,
+	maximizable: false,
+	block : false,
+	countDown: 0,
 	initComponent: function () {
 
-		go.modules.community.googleauthenticator.EnableAuthenticatorDialog.superclass.initComponent.call(this);		
+		go.modules.community.googleauthenticator.EnableAuthenticatorDialog.superclass.initComponent.call(this);
 
 		this.formPanel.on('beforesubmit', (pnl,values) => {
 			values.googleauthenticator.secret = this.secretField.getValue();
@@ -17,6 +21,47 @@ go.modules.community.googleauthenticator.EnableAuthenticatorDialog = Ext.extend(
 	focus: function () {		
 		this.verifyField.focus();
 	},
+
+	initButtons : function() {
+		go.modules.community.googleauthenticator.EnableAuthenticatorDialog.superclass.initButtons.call(this);
+
+		if(!this.block) {
+			this.buttons.splice(0,0, this.setupLaterButton = new Ext.Button({
+				disabled: this.countDown > 0,
+				text: t("Setup later"),
+				handler: function() {
+					this.close();
+				},				scope: this
+			}));
+
+			this.countDown = parseInt(this.countDown);
+
+			if(this.countDown) {
+				let countDown = this.countDown;
+
+				this.setupLaterButton.setText(t("Setup later") + " (" + countDown-- + ")");
+
+				const interval = setInterval(() => {
+					let text = t("Setup later") + " (" + countDown-- + ")"
+					if(countDown == -1) {
+						text = t("Setup later");
+						this.setupLaterButton.setDisabled(false);
+						clearInterval(interval);
+					}
+					this.setupLaterButton.setText(text);
+				}, 1000);
+			}
+		}
+
+	},
+
+	actionComplete : function() {
+		go.modules.community.googleauthenticator.EnableAuthenticatorDialog.superclass.actionComplete.call(this);
+		if(this.setupLaterButton) {
+			this.setupLaterButton.setDisabled(this.countDown > 0);
+		}
+	},
+
 	initFormItems: function () {
 		
 		this.QRcomponent = new go.QRCodeComponent({

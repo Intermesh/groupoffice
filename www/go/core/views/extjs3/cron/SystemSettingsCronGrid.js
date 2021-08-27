@@ -15,7 +15,7 @@ go.cron.SystemSettingsCronGrid = Ext.extend(GO.grid.GridPanel,{
 	changed : false,
 	iconCls: 'ic-schedule',
 	stateId: 'system-settings-cron-grid',
-	
+	itemId: "cron", //makes it routable
 	initComponent : function(){
 		
 		this.title = t("Manage system tasks", "cron");	

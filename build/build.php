@@ -46,9 +46,9 @@ class Builder
 {
     public $test = false;
 
-	private $majorVersion = "6.5";
+	private $majorVersion = "6.6";
 
-	private $gitBranch = 'master';
+	private $gitBranch = 'tasks';
 
 	/**
 	 *
@@ -75,7 +75,7 @@ class Builder
 	private $variants = [
 	        [
 		        "archiveSuffix" => "",
-			    "name" => "sixfive",
+			    "name" => "sixsix",
 			    "encoderOptions" => "-71 --allow-reflection-all"
 		    ]
 	];
@@ -150,9 +150,9 @@ class Builder
             $this->buildDebianPackage();
 
             if(!$this->test) {
-	            $this->createGithubRelease();
+//	            $this->createGithubRelease();
 	            $this->addToDebianRepository();
-	            $this->sendTarToSF();
+//	            $this->sendTarToSF();
             }
 
 
@@ -211,7 +211,7 @@ class Builder
 
 		cd($this->buildDir);
 		run("tar czf " . $this->packageName . ".tar.gz " . $this->packageName);
-		echo "Created " . $this->packageName . ".tar.gz\n";
+		echo "Created " . $this->buildDir . '/'. $this->packageName . ".tar.gz\n";
 	}
 
 	private function encode()
@@ -301,7 +301,7 @@ class Builder
 		$r = $client->api('repo')->releases();
 
 		if (!isset($this->githubRelease)) {
-			$this->githubRelease = $r->create($this->github['USERNAME'], $this->github['REPOSITORY'], array('tag_name' => $tagName, 'target_commitish' => $this->gitBranch, 'body' => 'Use the ' . $this->packageName . '.tar.gz file for installations. It contains all the code, libraries and compiled code. For installation instructions read: https://groupoffice.readthedocs.io/en/latest/install/install.html'));
+			$this->githubRelease = $r->create($this->github['USERNAME'], $this->github['REPOSITORY'], array('tag_name' => $tagName, 'name'=> $tagName, 'target_commitish' => $this->gitBranch, 'body' => 'Use the ' . $this->packageName . '.tar.gz file for installations. It contains all the code, libraries and compiled code. For installation instructions read: https://groupoffice.readthedocs.io/en/latest/install/install.html'));
 		}
 
 		$asset = $r->assets()->create(

@@ -2,13 +2,21 @@ go.Modules.register("core", 'core', {
 	title: t("Core"),
 	entities: [
 		{
-			name: 'Group',
+			name: 'Alert',
 			relations: {
-				users: {store: "User", fk: "users"},
-				user: {store: "User", fk:'isUserGroupFor'}
+				user: {store: "UserDisplay", fk:'userId'}
 			}
 		},
-		'User', 
+		{
+			name: 'Group',
+			relations: {
+				users: {store: "UserDisplay", fk: "users"},
+				user: {store: "UserDisplay", fk:'isUserGroupFor'}
+			}
+		},
+
+		'User',
+		'UserDisplay',
 		'Field', 
 		{
 			name: 'FieldSet', 

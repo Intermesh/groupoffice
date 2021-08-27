@@ -13,6 +13,8 @@ go.grid.GridTrait = {
 	 */
 	scrollLoader: true,
 
+	showMoreLoader: false,
+
 	multiSelectToolbarEnabled: true,
 
 	moveDirection: 'up',
@@ -35,7 +37,7 @@ go.grid.GridTrait = {
 		
 		this.initHeaderMenu();
 
-		if(this.scrollLoader) {
+		if(this.scrollLoader && !this.showMoreLoader) {
 			Ext.applyIf(this, go.panels.ScrollLoader);
 			this.initScrollLoader();
 		}
@@ -65,12 +67,74 @@ go.grid.GridTrait = {
 		if(this.getView().actionConfig) {
 
 			this.on('viewready', function(){
-				this.getView().actionBtn.on('click', function(btn) {
-					this.getSelectionModel().selectRow(btn.rowIndex);
-				}, this);
+				// this.getView().actionBtn.on('click', function(btn) {
+				// 	//this.getSelectionModel().selectRow(btn.rowIndex);
+				// }, this);
+
+				// this.on('rowclick', (grid, rowIndex, e) => {
+				// 	this.getView().showActionButton(rowIndex);
+				// });
+
+				this.on('rowcontextmenu', (grid, rowIndex, e) => {
+					e.preventDefault();
+					this.getSelectionModel().selectRow(rowIndex);
+					this.getView().showActionButton(rowIndex).showMenu();
+				});
 			}, this, {single: true});
 		}
+
+		if(this.autoHeight && this.maxHeight) {
+			this.store.on("load" , ()  => {
+				this.getView().scroller.setStyle({
+
+					overflow: 'auto',
+					position: 'initial',
+					"max-height": this.maxHeight + "px"
+				});
+			});
+		}
+
+
 	},
+
+	initShowMore : function() {
+		if(!this.showMoreLoader) {
+			return;
+		}
+
+		this.autoHeight = true;
+
+		this.bbar = new Ext.Toolbar({
+			cls:'go-bbar-load-more',
+			items: [
+				this.loadMoreButton = new Ext.Button({
+					hidden: true,
+					text: t("Show more..."),
+					handler: () => {
+
+						let o = this.store.lastOptions ? GO.util.clone(this.store.lastOptions) : {};
+						o.add = true;
+						o.params = o.params || {};
+
+						o.params.position = o.params.position || 0;
+						o.params.position += (o.params.limit || this.loadMorePageSize);
+						o.params.limit = this.loadMorePageSize;
+						o.paging = true;
+
+						this.store.load(o);
+					}
+				})
+		]
+		});
+
+		this.store.baseParams.calculateHasMore = true;
+		this.store.baseParams.limit = this.loadMorePageSize;
+		this.store.on('load', (s) => {
+			this.loadMoreButton.setVisible(s.hasMore);
+		});
+	},
+	loadMorePageSize: 20,
+
 
 	initMultiSelectToolbar : function() {
 
@@ -181,12 +245,14 @@ go.grid.GridTrait = {
 	
 	//Always enforce room for scrollbar so last column in resizable because of our custom header button.
 	initScrollOffset : function() {
-		
-		if(this.autoHeight || this.getView().scrollOffset === 0) {
+
+		const scrollOffset = Ext.getScrollBarWidth();
+
+		if((this.autoHeight && !this.maxHeight) || this.getView().scrollOffset === 0) {
 			return;
 		}
 		
-		this.getView().scrollOffset = Ext.getScrollBarWidth();
+		this.getView().scrollOffset = scrollOffset;
 		
 	},
 	
@@ -403,7 +469,7 @@ go.grid.GridTrait = {
 			column = cm.getColumnAt(i);
 			if (column.hideable !== false) {
 				item = new Ext.menu.CheckItem({
-					 text: cm.getOrgColumnHeader(i),
+					 text: cm.getOrgColumnHeader(i) + "",
 					 itemId: "col-" + cm.getColumnId(i),
 					 checked: !cm.isHidden(i),
 					 hideOnClick: false,

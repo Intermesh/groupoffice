@@ -1,7 +1,7 @@
 go.detail.CreateModifyPanel = Ext.extend(Ext.Panel, {
 	title: t("Info"),
 	collapsible: true,
-	entityStore: "User",
+	entityStore: "UserDisplay",
 	cUserId: null,
 	mUserId: null,
 	tpl: new Ext.XTemplate('<div class="s6 pad"><div class="icons">\
@@ -52,8 +52,8 @@ go.detail.CreateModifyPanel = Ext.extend(Ext.Panel, {
 		},this);	
 	},
 	
-	onChanges : function(store, added, changed) {		
-		if(added[this.cUserId] || changed[this.cUserId] || added[this.mUserId] || changed[this.mUserId]) {		
+	onChanges : function(store, added, changed) {
+		if(changed.indexOf(this.cUserId) > -1 || changed.indexOf(this.mUserId) > -1) {
 			this.update(this.ownerCt.data); 
 		}
 	}	

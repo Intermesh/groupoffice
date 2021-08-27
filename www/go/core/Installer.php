@@ -4,32 +4,24 @@ namespace go\core;
 
 use Exception;
 use GO;
-use go\core\App;
 use go\core\auth\Password;
 use go\core\auth\TemporaryState;
-use go\core\cache\Disk;
 use go\core\cache\None;
 use go\core\db\Query;
 use go\core\db\Table;
 use go\core\db\Utils;
-use go\core\Environment;
 use go\core\event\Listeners;
 use go\core\fs\File;
 use go\core\jmap;
 use go\core\model;
 use go\core\model\Group;
 use go\core\model\User;
-use go\core\model\UserGroup;
-use go\core\Module;
 use go\core\orm\Entity;
-use go\core\orm\Filters;
 use go\core\util\ClassFinder;
 use go\core\util\Lock;
 use PDOException;
-use go\modules\community\ldapauthenticator\Module as GoModule;
 use go\core\model\Module as GoCoreModule;
 use GO\Base\Db\ActiveRecord;
-use go\core\orm\EntityType;
 use go\core\model\Acl;
 
 class Installer {
@@ -443,6 +435,8 @@ class Installer {
 
 		ActiveRecord::$log_enabled = false;
 
+		$database = go()->getDatabase();
+		$database->setUtf8();
 		
 		go()->getDbConnection()->delete("core_entity", ['name' => 'GO\\Projects\\Model\\Project'])->execute();
 
@@ -658,6 +652,7 @@ class Installer {
 						} catch (PDOException $e) {
 
 							if (
+								$e->getCode() == '23000' ||
 								$e->getCode() == '42000' ||
 								$e->getCode() == '42S21' || //duplicate col
 								$e->getCode() == '42S01' || //table exists
@@ -719,6 +714,11 @@ class Installer {
 		}
 
 		return true;//!$aModuleWasUpgradedToNewBackend;
+	}
+
+	private function setDefaultCollation() {
+		$sql = "ALTER DATABASE `".go()->getConfig()['db_name']."` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+		go()->getDbConnection()->exec($sql);
 	}
 
 	public static function fixCollations() {

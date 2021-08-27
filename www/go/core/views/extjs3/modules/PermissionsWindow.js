@@ -52,7 +52,7 @@ go.modules.PermissionsWindow = Ext.extend(GO.Window,{
 		
 		go.modules.PermissionsWindow.superclass.initComponent.call(this);
 	},
-	show: function(moduleId,pkg, name, acl_id) {
+	show: function(moduleId, pkg, name, acl_id) {
 		this.module_id=moduleId;
 		this.pkg = pkg;
 		

@@ -17,6 +17,9 @@ use go\core\fs\Blob;
  */
 class Message extends \Swift_Message {
 
+	/**
+	 * @var Mailer
+	 */
 	private $mailer;
 
 	public function __construct(Mailer $mailer) {
@@ -59,6 +62,13 @@ class Message extends \Swift_Message {
 	public function addBlob(Blob $blob) {
 		$this->attach(Attachment::fromBlob($blob)->setFilename($blob->name));
 		return $this;
+	}
+
+	/**
+	 * @return Mailer
+	 */
+	public function getMailer() {
+		return $this->mailer;
 	}
 
 }

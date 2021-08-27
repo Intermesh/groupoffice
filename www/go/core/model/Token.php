@@ -4,9 +4,11 @@ namespace go\core\model;
 use DateInterval;
 use go\core\auth\BaseAuthenticator;
 use go\core\auth\SecondaryAuthenticator;
+use go\core\cron\GarbageCollection;
 use go\core\Environment;
 use go\core\auth\Method;
 use go\core\http\Request;
+use go\core\http\Response;
 use go\core\orm\Query;
 use go\core\orm\Entity;
 use go\core\util\DateTime;
@@ -94,7 +96,7 @@ class Token extends Entity {
 	 * 
 	 * @link http://php.net/manual/en/dateinterval.construct.php
 	 */
-	const LIFETIME = 'P7D';
+	const LIFETIME = 'PT30M';
 	
 	/**
 	 * A date interval for the login lifetime of a token
@@ -126,7 +128,7 @@ class Token extends Entity {
 	}
 
 	public function activity() {
-		if($this->lastActiveAt < new \DateTime("-5 mins")) {
+		if($this->lastActiveAt < new \DateTime("-1 mins")) {
 			$this->lastActiveAt = new \DateTime();
 
 			//also refresh token
@@ -134,7 +136,13 @@ class Token extends Entity {
 				$this->setExpiryDate();
 			}
 			$this->internalSave();
+
+			go()->getCache()->set('token-' . $this->accessToken, $this);
+
+			return true;
 		}
+
+		return false;
 	}
 	
 	/**
@@ -417,6 +425,13 @@ class Token extends Entity {
 		return $response;
 	}
 
+	/**
+	 * Called by GarbageCollection cron job
+	 *
+	 * @see GarbageCollection
+	 * @return bool
+	 * @throws \Exception
+	 */
 	public static function collectGarbage() {
 		return static::delete(
 			(new Query)
@@ -428,6 +443,14 @@ class Token extends Entity {
 	{
 		foreach(self::find()->mergeWith($query)->selectSingleValue('accessToken') as $accessToken) {
 			go()->getCache()->delete('token-' . $accessToken);
+
+			Response::get()->setCookie('accessToken', "", [
+				'expires' => time() - 3600,
+				"path" => "/",
+				"samesite" => "Lax",
+				"domain" => Request::get()->getHost()
+			]);
+
 		}
 
 		return parent::internalDelete($query);
@@ -455,14 +478,26 @@ class Token extends Entity {
 
 	/**
 	 * Destroys all tokens except
+	 *
 	 * @return bool
 	 * @throws \Exception
 	 */
 	public static function logoutEveryoneButAdmins() {
 		$admins = (new Query)->select('userId')->from('core_user_group')->where('groupId', '=', Group::ID_ADMINS);
-		return self::delete((new Query)
+		$q = (new Query)
 			->where('expiresAt', '!=', null)
-			->where('userId', 'NOT IN ', $admins));
+			->where('userId', 'NOT IN ', $admins);
+
+		return self::delete($q) && RememberMe::delete($q);
+	}
+
+	public function setCookie() {
+		Response::get()->setCookie('accessToken', $this->accessToken, [
+			'expires' => 0,
+			"path" => "/",
+			"samesite" => "Lax",
+			"domain" => Request::get()->getHost()
+		]);
 	}
 	
 }

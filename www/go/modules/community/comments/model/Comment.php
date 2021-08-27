@@ -1,9 +1,11 @@
 <?php
 namespace go\modules\community\comments\model;
 
+use GO\Base\Exception\Save;
 use go\core\acl\model\AclItemEntity;
 use go\core\fs\Blob;
 use go\core\model\Acl;
+use go\core\orm\exception\SaveException;
 use go\core\model\Search;
 use go\core\orm\Query;
 use go\core\jmap\Entity;
@@ -71,14 +73,16 @@ class Comment extends AclItemEntity {
 	 *
 	 * @param mixed $entity "note", Entity $note or Entitytype instance
 	 * @throws \Exception
+	 *
+	 * @return self
 	 */
 	public function setEntity($entity) {
 
-		if($entity instanceof Entity) {
+		if($entity instanceof Entity || $entity instanceof ActiveRecord) {
 			$this->entityTypeId = $entity->entityType()->getId();
 			$this->entity = $entity->entityType()->getName();
 			$this->entityId = $entity->id;
-			return;
+			return $this;
 		}
 		
 		if(!($entity instanceof EntityType)) {
@@ -86,6 +90,8 @@ class Comment extends AclItemEntity {
 		}	
 		$this->entity = $entity->getName();
 		$this->entityTypeId = $entity->getId();
+
+		return $this;
 	}
 	
 	protected static function defineFilters() {
@@ -126,6 +132,61 @@ class Comment extends AclItemEntity {
 		}
 	}
 
+	protected function getAclEntity()
+	{
+		return $this->findEntity();
+	}
+
+	/**
+	 * @param $entity
+	 * @param array $properties
+	 * @return Query|Comment[]
+	 * @throws \Exception
+	 */
+	public static function findFor($entity, $properties = []) {
+		$entityTypeId = $entity->entityType()->getId();
+		$entityId = $entity->id;
+
+		return self::find($properties)->where(['entityTypeId' => $entityTypeId, 'entityId' => $entityId]);
+	}
+
+	/**
+	 * Get the permission level of the current user
+	 *
+	 * @return int
+	 */
+	public function getPermissionLevel() {
+
+		if(go()->getAuthState()->isAdmin()) {
+			return Acl::LEVEL_MANAGE;
+		}
+
+		if($this->isNew()) {
+			return $this->findEntity()->getPermissionLevel() ? Acl::LEVEL_WRITE : false;
+		}
+
+		if($this->createdBy == go()->getAuthState()->getUserId()) {
+			return Acl::LEVEL_MANAGE;
+		}
+
+		return $this->findEntity()->hasPermissionLevel(Acl::LEVEL_READ) ? Acl::LEVEL_WRITE : false;
+
+	}
+	
+	/**
+	 * Applies conditions to the query so that only entities with the given permission level are fetched.
+	 * 
+	 * @param Query $query
+	 * @param int $level
+	 * @param int $userId Leave to null for the current user
+	 * @return Query $query;
+	 */
+	public static function applyAclToQuery(Query $query, $level = Acl::LEVEL_READ, $userId = null, $groups = null) {
+		
+		return $query;
+	}
+	
+
 	protected function internalValidate()
 	{
 		if($this->isModified(['text']) && StringUtil::detectXSS($this->text)) {
@@ -140,8 +201,45 @@ class Comment extends AclItemEntity {
 
 	protected function internalSave()
 	{
+
+		if($this->isNew()) {
+			$this->createAlerts();
+		}
 		$this->images = Blob::parseFromHtml($this->text);
 		return parent::internalSave();
+	}
+
+	private function createAlerts() {
+		$entity = $this->findEntity();
+		$aclId = $entity->findAclId();
+		if(!$aclId) {
+			return;
+		}
+
+		$excerpt = StringUtil::cutString(strip_tags($this->text), 50);
+
+		$userIds = go()->getDbConnection()->selectSingleValue('userId')
+			->from('core_user_group', 'ug')
+			->join('core_acl_group', 'ag', 'ag.groupId = ug.groupId')
+			->where('ag.aclId', '=', $aclId);
+
+		foreach($userIds as $userId) {
+
+			if($userId == go()->getAuthState()->getUserId()) {
+				continue;
+			}
+
+			$alert = $entity->createAlert(new DateTime(), 'comment', $userId)
+				->setData([
+					'type' => 'comment',
+					'createdBy' => go()->getAuthState()->getUserId(),
+					'excerpt' => $excerpt
+				]);
+
+			if(!$alert->save()) {
+				throw new SaveException($alert);
+			}
+		}
 	}
 
 	public function title()
@@ -164,5 +262,30 @@ class Comment extends AclItemEntity {
 	protected static function aclEntityKeys()
 	{
 		return ['entityId' => 'entityId', 'entityTypeId' => 'entityTypeId'];
+	}
+
+
+	/**
+	 * Copy comments from one entity to another.
+	 *
+	 * @param Entity|ActiveRecord $from
+	 * @param Entity|ActiveRecord  $to
+	 * @return bool
+	 * @throws SaveException
+	 */
+	public static function copyTo($from, $to) {
+		go()->getDbConnection()->beginTransaction();
+		try {
+			foreach (Comment::findFor($from) as $comment) {
+				if (!$comment->copy()->setEntity($to)->save()) {
+					throw new SaveException();
+				}
+			}
+		} catch(\Exception $e) {
+			go()->getDbConnection()->rollBack();
+			throw $e;
+		}
+
+		return go()->getDbConnection()->commit();
 	}
 }

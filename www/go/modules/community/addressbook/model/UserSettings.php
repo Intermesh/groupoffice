@@ -7,6 +7,7 @@ use go\core\orm\Property;
 use go\modules\community\addressbook\model\Settings as AddresBookModuleSettings;
 use go\core\model;
 use go\core\model\Acl;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class UserSettings extends Property {
 
@@ -23,6 +24,19 @@ class UserSettings extends Property {
 	 * @var int
 	 */
 	protected $defaultAddressBookId;
+
+
+	/**
+	 * @var string
+	 */
+	public $startIn;
+
+	/**
+	 * Last selected item
+	 * @var int
+	 */
+	public $lastAddressBookId;
+
 
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable("addressbook_user_settings", "abs");
@@ -60,9 +74,12 @@ class UserSettings extends Property {
 		
 	}
 
-	public function setDefaultAddressBookId($id) {
+	public function setDefaultAddressBookId($id)
+	{
 		$this->defaultAddressBookId = $id;
 	}
+
+
 
 	public function getSortBy() {
 		return User::findById($this->userId, ['sort_name'])->sort_name == 'first_name' ? 'name' : 'lastName';

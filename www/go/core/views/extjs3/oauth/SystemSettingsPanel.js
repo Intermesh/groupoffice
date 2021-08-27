@@ -1,5 +1,6 @@
 go.oauth.SystemSettingsPanel = Ext.extend(Ext.Panel, {
 	iconCls: 'ic-vpn-key',
+	itemId: "oauth2", //makes it routable
 	layout: "border",
 	initComponent: function () {
 		this.title = t("Oauth 2.0");

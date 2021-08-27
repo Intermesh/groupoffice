@@ -6,6 +6,11 @@ go.Modules = (function () {
 		this.registered = {};
 	}, Ext.util.Observable, {
 
+		/**
+		 * Contains all registered modules including those the user has no permissions for.
+		 *
+		 * @var {Object}
+		 */
 		registered: null,
 
 		/**
@@ -135,6 +140,17 @@ go.Modules = (function () {
 		},
 
 		/**
+		 * Check if a module is installed
+		 *
+		 * @param package
+		 * @param name
+		 * @return {boolean}
+		 */
+		isInstalled: function (package, name) {
+			return this.getConfig(package, name) !== false;
+		},
+
+		/**
 		 * Get module entity
 		 * 
 		 * @param {string} package
@@ -157,15 +173,6 @@ go.Modules = (function () {
 			}
 
 			return false;
-		},
-
-		/**
-		 * Get all entities including those the current user has no permission for.
-		 * 
-		 * @returns {Module[]}
-		 */
-		getAll: function () {
-			return this.entities;
 		},
 
 		/**
@@ -230,8 +237,9 @@ go.Modules = (function () {
 								
 									//todo panel is only constructed to grab config.title/id
 									var m = new config.mainPanel[i]();
-									//todo GO.moduleManager is deprecated									
-									GO.moduleManager._addModule(config.mainPanel[i].prototype.id, config.mainPanel[i], {title:m.title, package: mod.package}, config.subMenuConfig);
+									console.error("DO SOMETHING ABOUT THIS HORRIBLE THING HERE :)");
+									//todo GO.moduleManager is deprecated
+									GO.moduleManager._addModule(config.mainPanel[i].prototype.id, config.mainPanel[i], {title:config.mainPanel[i].prototype.title, package: mod.package}, config.subMenuConfig);
 								}
 							} else {
 								config.panelConfig.package = mod.package;
@@ -255,16 +263,18 @@ go.Modules = (function () {
 				return;
 			}
 
-			for(var id in changed){
+			changed.forEach((id) => {
 
-				var index = this.entities.findIndex(function(e) {
+				const index = this.entities.findIndex(function(e) {
 					return e.id == id;
 				});
 
-				if(index>-1) {
-					this.entities[index] = changed[id];
+				if(index > -1) {
+					entityStore.single(id).then((module) => {
+						this.entities[index] = module;
+					});
 				}
-			}
+			})
 		},
 		
 		addPanel : function(panels) {

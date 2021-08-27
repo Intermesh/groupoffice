@@ -52,7 +52,7 @@ class Search extends EntityController {
 							->orWhere('displayName', 'LIKE', '%' . $q . '%')
 						);
 		}
-
+		$query->andWhere('enabled', '=', 1);
 
 
 

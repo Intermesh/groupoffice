@@ -16,6 +16,7 @@
 
 go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
 	iconCls: 'ic-account-box',
+	itemId: "users", //makes it routable
 
 	initColumns: function(fields, columns) {
 		return {fields:fields, columns:columns};

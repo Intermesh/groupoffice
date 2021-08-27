@@ -21,7 +21,7 @@ go.grid.GridPanel = Ext.extend(Ext.grid.GridPanel, {
 		
 		Ext.applyIf(this, go.grid.GridTrait);
 		this.initCustomFields();
-		
+		this.initShowMore();
 		go.grid.GridPanel.superclass.initComponent.call(this);	
 		
 		this.initGridTrait();		

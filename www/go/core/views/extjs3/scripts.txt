@@ -60,19 +60,21 @@ form/Chips.js
 form/RecurrenceFieldset.js
 form/KeyValueEditorGrid.js
 form/DateRangeField.js
+form/RecurrenceField.js
 form/SelectField.js
 
 modules/ModulePanel.js
 
 SearchField.js
 NavMenu.js
+NavGrid.js
 Notifier.js
 
 toolbar/SearchButton.js
 toolbar/TitleItem.js
 
 layout/ResponsiveLayout.js
-
+layout/FitWidthLayout.js
 
 AuthenticationManager.js
 ActivityWatcher.js
@@ -288,3 +290,5 @@ chart/PieChart.js
 
 
 license/LicenseDialog.js
+
+Alert.js

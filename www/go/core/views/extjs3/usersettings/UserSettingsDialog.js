@@ -89,7 +89,6 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			width:dp(1100),
 			height:dp(800),
 			layout:'responsive',
-			closeAction:'hide',
 			items: [
 				this.navMenu,
 				this.formPanel
@@ -152,11 +151,33 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 		
 		// When the form is loaded, reset the 'modified' state to NOT modified.
 		this.formPanel.getForm().trackResetOnLoad  = true;
+
+
+		go.Db.store("User").on("changes", (store, added, changed, destroyed) => {
+			if(changed.indexOf(this.currentUserId) > -1) {
+				this.load(this.currentUserId);
+			}
+		});
 	},
 	
 	loadModulePanels : function() {
-    
-		var available = go.Modules.getAvailable(), pnl,pnlCls, config, i, i1, l, l2;
+
+		if(this.modulePanelsLoaded) {
+			return;
+		}
+
+		//always add profile
+		const addressBookModuleInstalled = go.Modules.isInstalled("community", "addressbook");
+		if(addressBookModuleInstalled) {
+			this._addPanelCmp(new go.modules.community.addressbook.SettingsProfilePanel({
+				header: false,
+				loaded: false,
+				submitted: false
+			}));
+		}
+
+		const available = go.Modules.getAvailable();
+		let pnl,pnlCls, config, i, i1, l, l2;
 		for(i = 0, l = available.length; i < l; i++) {
 			config = go.Modules.getConfig(available[i].package, available[i].name);
 			
@@ -167,11 +188,19 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 			for(i1 = 0, l2 = config.userSettingsPanels.length; i1 < l2; i1++) {
 				pnlCls = eval(config.userSettingsPanels[i1]);
 				pnl = new pnlCls({header: false, loaded: false, submitted: false});
-				if((pnl.adminOnly && go.User.isAdmin) || (!pnl.adminOnly && go.Modules.isAvailable(available[i].package, available[i].name, go.permissionLevels.read, this.user))) {
+
+				if(addressBookModuleInstalled && pnl instanceof go.modules.community.addressbook.SettingsProfilePanel) {
+					continue;
+				}
+
+				if((pnl.adminOnly && go.User.isAdmin) || (!pnl.adminOnly && go.Modules.isAvailable(available[i].package, available[i].name, go.permissionLevels.read, this.user)))
+				{
 					this._addPanelCmp(pnl);
 				}
 			}
 		}
+
+		this.modulePanelsLoaded = true;
 
 		this.doLayout();
 	},
@@ -193,18 +222,19 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 	 * 
 	 */
 	submit : function(){
-		
 		// loop through child panels and call onSubmitStart function if available
 		var valid = true;
 		this.tabPanel.items.each(function(tab) {
 			if(tab.onValidate){
 				if(!tab.onValidate()) {
+					console.debug("Invalid form tab:", tab);
 					valid = false;					
 				}
 			}
 		},this);
 		
 		if (!valid || !this.formPanel.getForm().isValid()) {
+			console.debug("UserSettings form invalid");
 			return;
 		}
 		

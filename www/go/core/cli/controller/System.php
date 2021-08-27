@@ -8,9 +8,12 @@ use go\core\db\Table;
 use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
 use go\core\fs\File;
+use go\core\jmap\Entity;
 use go\core\model\CronJobSchedule;
 use go\core\event\Listeners;
 use go\core\model\Module;
+use Faker;
+
 
 use function GO;
 
@@ -21,7 +24,9 @@ class System extends Controller {
 	const EVENT_CLEANUP = 'cleanup';
 
 	/**
-	 * docker-compose exec --user www-data groupoffice-master php /usr/local/share/groupoffice/cli.php core/System/runCron --module=ldapauthenticatior --package=community --name=Sync
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=ldapauthenticatior --package=community --name=Sync
+	 *
+	 * docker-compose exec --user www-data groupoffice ./www/cli.php core/System/runCron --module=contracts --package=business --name=CreateInvoices
 	 */
 	public function runCron($name, $module = "core", $package = "core") {
 
@@ -162,6 +167,32 @@ class System extends Controller {
 		}
 
 		return $unknown;
+	}
+
+	public function demo() {
+
+		$faker = Faker\Factory::create();
+
+		Entity::$trackChanges = false;
+		\go\modules\community\history\Module::$enabled = false;
+		//go()->getDebugger()->enabled = false;
+
+		$modules = Module::find();
+
+		foreach($modules as $module) {
+			if(!$module->isAvailable()) {
+				continue;
+			}
+			echo "Creating demo for module ". ($module->package ?? "legacy") . "/" .$module->name ."\n";
+			$module->module()->demo($faker);
+
+			echo "\n\nDone\n\n";
+		}
+
+		// for resyncing
+		go()->rebuildCache();
+
+		echo "\n\nAll done!\n\n";
 	}
 
 

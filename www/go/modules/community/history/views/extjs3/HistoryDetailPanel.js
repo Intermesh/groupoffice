@@ -1,39 +1,17 @@
 Ext.define('go.modules.community.history.HistoryDetailPanel',{
-	extend: Ext.Panel,
+	extend: go.modules.community.history.LogEntryGrid,
 
 	entityId:null,
 	entity:null,
-	height: dp(400),
+
+	autoHeight: true,
+	maxHeight: dp(300),//gridtrait implements this.
 
 	title: t("History"),
-	//
-	/// Collapsilbe was turn off because of height recaculation issues in HtmlEditor
-	//
 	collapsible: true,
-	animCollapse: false, //htmleditor doesn't work with animCollapse
 
-	hideMode: "offsets", //required for htmleditor
-	collapseFirst:false,
-	layout:'fit',
-	titleCollapse: true,
 	stateId: "history-detail",
-	initComponent: function () {
 
-		this.store = new go.data.Store({
-			fields: [{name:'createdAt',type:'date'},'id','action','changes','createdBy', 'description',{name: 'creator', type: "relation"}],
-			baseParams: {sort: [{property: "createdAt", isAscending:false}]},
-			entityStore: "LogEntry"
-		});
-
-		this.items = [
-			this.logGrid = new go.modules.community.history.LogEntryGrid({
-				//region:'center',
-				store: this.store
-			})
-		];
-
-		go.modules.community.history.HistoryDetailPanel.superclass.initComponent.call(this);
-	},
 
 	onLoad: function (dv) {
 		var id = dv.model_id ? dv.model_id : dv.currentId; //model_id is from old display panel

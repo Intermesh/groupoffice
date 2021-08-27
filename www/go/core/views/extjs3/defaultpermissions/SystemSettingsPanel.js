@@ -2,6 +2,7 @@ go.defaultpermissions.SystemSettingsPanel = Ext.extend(Ext.Panel, {
 	iconCls: 'ic-share',
 	layout: "border",
 	title: t("Default permissions"),
+	itemId: "defaultpermissions", //makes it routable
 	initComponent: function () {
 		
 		this.items = [

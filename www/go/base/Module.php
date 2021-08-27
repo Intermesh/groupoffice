@@ -713,4 +713,12 @@ class Module extends Observable {
 	 */
 	public static function submitSettings($settingsController, &$params, &$response, $user){		
 	}
+
+	/**
+	 * Generate data for demo purposes
+	 */
+	public function demo() {
+
+	}
+
 }

@@ -5,6 +5,8 @@ use go\core\webclient\Extjs3;
 $webclient = Extjs3::get();
 $lang = go()->getLanguage()->getIsoCode();
 $themeUrl = $webclient->getThemeUrl();
+$viewUrl = $webclient->getRelativeUrl() . 'views/Extjs3';
+
 $goTitle = basename(dirname($_SERVER['PHP_SELF'])) == 'install' ? go()->t("Installation") : go()->getSettings()->title;
 ?>
 <!DOCTYPE html>
@@ -32,8 +34,13 @@ $goTitle = basename(dirname($_SERVER['PHP_SELF'])) == 'install' ? go()->t("Insta
 	?>
 	<link href="<?= $themeUrl;?>style.css?v=<?=$cssMtime ?>" media="print, (min-device-width:1201px)" type="text/css" rel="stylesheet" />
 	<link rel="stylesheet" type="text/css" media="screen and (max-device-width:1200px)" href="<?= $themeUrl; ?>style-mobile.css?v=<?=$cssMtime;?>" />
-
     <?php
+    if (!\go\core\Installer::isInstalling()) {
+
+    ?>
+        <link href="<?= $viewUrl; ?>/css.php?theme=<?=\GO::view()->getTheme()->getName(); ?>&v=<?=$webclient->getCSSFile(\GO::view()->getTheme()->getName())->getModifiedAt()->format("U"); ?>" type="text/css" rel="stylesheet" />
+    <?php
+    }
     if(!empty(go()->getConfig()['custom_css_url'])) {
         echo '<link href="'. GO::config()->custom_css_url.'" type="text/css" rel="stylesheet" />';
     }

@@ -1,8 +1,14 @@
 
 go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 	module: null,
+	key: null,
 	viewConfig: {
 		emptyText: 	'<p>' +t("No items to display") + '</p>'
+	},
+
+	setKey: function(key) {
+		this.key = key,
+		this.store.setFilter("module", {module: this.module, key: this.key});
 	},
 
 	initComponent: function () {
@@ -53,7 +59,7 @@ go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 					iconCls: 'ic-add',
 					handler: function() {
 						var dlg = new go.emailtemplate.TemplateDialog();
-						dlg.setValues({module: this.module}).show();
+						dlg.setValues({module: this.module, key: this.key}).show();
 					},
 					scope: this
 			}],
@@ -62,7 +68,7 @@ go.emailtemplate.GridPanel = Ext.extend(go.grid.GridPanel, {
 				fields: ['id', 'name', 'language'],
 				entityStore: "EmailTemplate",
 				filters: {
-					module: {module: this.module}
+					module: {module: this.module, key: this.key}
 				}	
 			}),
 			autoHeight: true,

@@ -113,7 +113,7 @@ CREATE TABLE `core_customfields_field` (
   `unique_values` tinyint(1) NOT NULL DEFAULT 0,
   `prefix` varchar(32) NOT NULL DEFAULT '',
   `suffix` varchar(32) NOT NULL DEFAULT '',
-  `options` text DEFAULT NULL,
+  `options` TEXT DEFAULT NULL,
   `hiddenInGrid` BOOLEAN NOT NULL DEFAULT TRUE,
   `filterable` BOOLEAN NOT NULL DEFAULT FALSE
 ) ENGINE=InnoDB;
@@ -206,7 +206,7 @@ CREATE TABLE `core_search` (
 CREATE TABLE `core_setting` (
   `moduleId` int(11) NOT NULL,
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `value` text COLLATE utf8mb4_unicode_ci DEFAULT NULL
+  `value` TEXT COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE `core_user` (
@@ -838,6 +838,8 @@ CREATE TABLE `core_email_template` (
   `id` int(11) NOT NULL,
   `moduleId` int(11) NOT NULL,
   `aclId` int(11) NOT NULL,
+  `key` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL,
+  `language` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'en',
   `name` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL,
   `subject` varchar(190) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `body` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL
@@ -984,14 +986,18 @@ ALTER TABLE `core_oauth_client`
 ALTER TABLE `core_oauth_access_token`
   ADD CONSTRAINT `core_oauth_access_token_ibfk_2` FOREIGN KEY (`userIdentifier`) REFERENCES `core_user` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `core_oauth_access_token_ibfk_3` FOREIGN KEY (`clientId`) REFERENCES `core_oauth_client` (`id`) ON DELETE CASCADE;
+
+
+
 CREATE TABLE `core_alert` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `entityTypeId` INT NOT NULL,
   `entityId` INT NOT NULL,
   `userId` INT NOT NULL,
   `triggerAt` DATETIME NOT NULL,
-  `alertId` INT NOT NULL,
+    tag varchar(50) null,
   `recurrenceId` VARCHAR(32) NULL DEFAULT NULL,
+  `data` text null,
   PRIMARY KEY (`id`),
   INDEX `dk_alert_entityType_idx` (`entityTypeId` ASC),
   INDEX `fk_alert_user_idx` (`userId` ASC),
@@ -1003,10 +1009,11 @@ CREATE TABLE `core_alert` (
   CONSTRAINT `fk_alert_user`
     FOREIGN KEY (`userId`)
     REFERENCES `core_user` (`id`)
-    ON DELETE RESTRICT
+    ON DELETE cascade
     ON UPDATE NO ACTION);
 
-
+create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
+    on core_alert (entityTypeId, entityId, tag, userId);
 
 CREATE TABLE `core_pdf_block` (
   `id` bigint(20) UNSIGNED NOT NULL,
@@ -1110,6 +1117,28 @@ alter table go_state
         foreign key (user_id) references core_user (id)
             on delete cascade;
 
+
+create table core_auth_remember_me
+(
+    id int auto_increment,
+    token varchar(190) collate ascii_bin null,
+    series varchar(190) collate ascii_bin null,
+    userId int not null,
+    expiresAt datetime null,
+    `remoteIpAddress` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `userAgent` varchar(190) NOT NULL,
+  platform varchar(190) null,
+  browser varchar(190) null,
+    constraint core_auth_remember_me_pk
+        primary key (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+create index core_auth_remember_me_series_index
+    on core_auth_remember_me (series);
+
+alter table core_auth_remember_me
+    add constraint core_auth_remember_me_core_user_id_fk
+        foreign key (userId) references core_user (id);
 CREATE TABLE `core_permission` (
   `moduleId` INT NOT NULL,
   `groupId` INT NOT NULL,

@@ -59,27 +59,7 @@ class CaldavModule extends \GO\Base\Module {
 
 		}		
 	}
-	
-	public static function saveTask(\GO\Tasks\Model\Task $task, $davTask, $data = null) {
-	
-		if(!$davTask) {		
-			$davTask = new DavTask();
-			$davTask->id = $task->id;	
-			$davTask->mtime = $task->mtime;
-			$davTask->tasklistId = $task->tasklist_id;
-			$davTask->data = isset($data) ? $data : $task->toICS();
-			$davTask->uri = $task->getUri();
-		} else {			
-			$davTask->data = isset($data) ? $data : $task->toICS();			
-			$davTask->mtime = $task->mtime;
-		}
-		
-		if(!$davTask->save()){
-			return false;
-		}			
 
-		return $davTask;
-	}
 	
 	public static function deleteEvent(\GO\Calendar\Model\Event $event){
 		$davEvent = Model\DavEvent::model()->findByPk($event->id);
@@ -88,14 +68,7 @@ class CaldavModule extends \GO\Base\Module {
 		$davEvent->calendarId = $event->calendar_id;
 		$davEvent->delete();
 	}
-	
-	public static function deleteTask(\GO\Tasks\Model\Task $task){
-		$davTask = Model\DavTask::model()->findByPk($task->id);
-		if(!$davTask)
-			return;
-		$davTask->tasklistId = $task->tasklist_id;
-		$davTask->delete();
-	}
+
 	
 	/**
 	 * Event to VObject data

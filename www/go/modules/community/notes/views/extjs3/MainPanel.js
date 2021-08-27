@@ -25,12 +25,12 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		this.createNoteGrid();
 
 		this.sidePanel = new Ext.Panel({
-			layout: 'border',
+			layout: 'fitwidth',
+			bodyStyle: 'overflow-y: auto',
 			width: dp(300),
 			cls: 'go-sidenav',
 			region: "west",
 			split: true,
-			autoScroll: true,			
 			items: [
 				this.createNoteBookGrid(),
 				this.createFilterPanel()
@@ -77,22 +77,26 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	
 	runModule : function() {
 		//load note books and select the first
-		this.noteBookGrid.getStore().load({
-			callback: function (store) {
-				var index = this.noteBookGrid.store.indexOfId(go.User.notesSettings.defaultNoteBookId);
-				if(index == -1) {
-					index = 0;
-				}
+		this.setDefaultSelection();
+		this.noteBookGrid.getStore().load();
+		this.noteGrid.getStore().load();
+	},
 
-				this.noteBookGrid.getSelectionModel().selectRow(index);
-			},
-			scope: this
-		});
+	setDefaultSelection : function() {
+		let selectedListIds = [];
+		if(go.User.notesSettings.rememberLastItems && go.User.notesSettings.lastNoteBookIds) {
+			selectedListIds = go.User.notesSettings.lastNoteBookIds;
+		}
+		if(!selectedListIds.length && go.User.notesSettings.defaultNoteBookId) {
+			selectedListIds.push(go.User.notesSettings.defaultNoteBookId);
+		}
+
+		this.noteBookGrid.setDefaultSelection(selectedListIds);
+		this.checkCreateNoteBook();
 	},
 
 	createFilterPanel: function () {
-		
-		
+
 		return new Ext.Panel({
 			region: "center",
 			minHeight: dp(200),
@@ -128,11 +132,10 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 	createNoteBookGrid : function() {
 		this.noteBookGrid = new go.modules.community.notes.NoteBookGrid({
 			region: "north",
-			height: dp(400),
-			minHeight: dp(200),
+			filterName: "noteBookId",
+			filteredStore: this.noteGrid.store,
+			showMoreLoader: true,
 
-			split: true,
-			stateId: "notes-note-book-grid",
 			tbar: [{
 					xtype: 'tbtitle',
 					text: t('Notebooks')
@@ -167,7 +170,7 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 			}
 		});
 
-		this.noteBookGrid.getSelectionModel().on('selectionchange', this.onNoteBookSelectionChange, this, {buffer: 1}); //add buffer because it clears selection first
+		this.noteBookGrid.on('selectionchange', this.onNoteBookSelectionChange, this);
 
 		return this.noteBookGrid;
 	},
@@ -300,23 +303,36 @@ go.modules.community.notes.MainPanel = Ext.extend(go.modules.ModulePanel, {
 		return this.noteGrid;
 	
 	},
-	
-	onNoteBookSelectionChange : function (sm) {
-		var ids = [];
+
+	checkCreateNoteBook: function() {
 
 		this.addNoteBookId = false;
 
-		Ext.each(sm.getSelections(), function (r) {
-			ids.push(r.id);
-			if (!this.addNoteBookId && r.get('permissionLevel') >= go.permissionLevels.write) {
-				this.addNoteBookId = r.id;
-			}
-		}, this);
+		go.Db.store("NoteBook").get(this.noteBookGrid.getSelectedIds()).then((result) => {
 
-		this.addButton.setDisabled(!this.addNoteBookId);
-		
-		this.noteGrid.store.setFilter("notebooks", {noteBookId: ids});;
-		this.noteGrid.store.load();
+			result.entities.forEach((notebook) => {
+				if (!this.addNoteBookId && notebook.permissionLevel >= go.permissionLevels.write) {
+					this.addNoteBookId = notebook.id;
+				}
+			});
+
+			this.addButton.setDisabled(!this.addNoteBookId);
+		});
+	},
+	
+	onNoteBookSelectionChange : function (ids, sm) {
+
+		this.checkCreateNoteBook();
+
+		if(go.User.notesSettings.rememberLastItems && go.User.notesSettings.lastNoteBookIds.join(",") != ids.join(",")) {
+
+			go.Db.store("User").save({
+				notesSettings: {
+					lastNoteBookIds: ids
+				}
+			}, go.User.id);
+		}
+
 	},
 	
 	onNoteGridDblClick : function (grid, rowIndex, e) {

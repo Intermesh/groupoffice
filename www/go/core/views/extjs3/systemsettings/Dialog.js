@@ -164,8 +164,11 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 			}
 			
 			for(i1 = 0, l2 = config.systemSettingsPanels.length; i1 < l2; i1++) {
-				pnl = eval(config.systemSettingsPanels[i1]);				
-				this.addPanel(pnl);
+				pnl = eval(config.systemSettingsPanels[i1]);
+
+				this.addPanel(pnl, null, null, pnl.prototype.itemId ? null : {
+					itemId: available[i].package + "-" + available[i].name
+				});
 			}
 		}
 	},
@@ -234,14 +237,15 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	 * @param int position
 	 * @param boolean passwordProtected
 	 */
-	addPanel : function(panelClass, position,cls){
+	addPanel : function(panelClass, position,cls, cfg){
 
-		
-		var cfg = {
+		cfg = cfg || {};
+
+		Ext.applyIf(cfg, {
 			header: false,
 			loaded:false,
 			submitted:false
-		};
+		});
 		
 		var pnl = new panelClass(cfg);
 		

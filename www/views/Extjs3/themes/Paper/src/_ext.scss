@@ -446,6 +446,7 @@
 		opacity: 0;
 		+ .x-form-cb-label::before {
 			@extend %checkbox;
+			margin-right: dp(12);
 		}
 		&:checked + .x-form-cb-label::before {
 			content: 'check_box';
@@ -692,7 +693,7 @@
 
 	&.small {
 		transform: scale(.8);
-		margin-top: dp(-4);
+		transform-origin: center center;
 	}
 
 	@extend %font-button;
@@ -738,7 +739,7 @@
 		button.x-btn-text {
 			color:white;
 		}
-		&.x-btn-focus, &.x-btn-over {
+		&:focus, &:hover {
 			@extend .z4;
 			//button.x-btn-text {
 			//	color: $cPrimary;
@@ -775,7 +776,7 @@
 		@include var('background-color', c-secondary);
 		color: white;
 
-		&.x-btn-focus, &.x-btn-over {
+		&:focus, &:hover {
 			transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
 			@include var(background-color, c-accent);
 		}
@@ -785,13 +786,22 @@
 		@include var('background-color', c-accent);
 		color: white;
 
-		&.x-btn-focus, &.x-btn-over {
+		&:focus, &:hover {
 			transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
 			@include var(background-color, c-primary);
 		}
 	}
+
+	&.primary-icon {
+		@include var('color', c-secondary);
+	}
+
+	&.accent-icon {
+		@include var('color', c-accent);
+	}
+
 	&.danger {
-		&.x-btn-focus, &.x-btn-over {
+		&:focus, &:hover{
 			@include var(background-color, c-primary-tp);
 		}
 		//.x-btn-text {
@@ -799,7 +809,7 @@
 		//}
 	}
 
-	&.x-btn-focus, &.x-btn-over {
+	&:focus, &:hover {
 		transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
 		@include var(background-color, c-primary-tp);
 	}
@@ -1274,7 +1284,7 @@
 	&-row {
 		border:0;
 		border-bottom:1px solid color($fg, 'divider');
-		&-over {
+		&:hover {
 			background-color:$cHover;
 		}
 		&-selected {
@@ -1733,7 +1743,7 @@ td.grid-hd-group-cell {
 	&-node {
 		@extend %font-body1;
 		
-		.x-tree-node-over {background-color: $cHover;}
+		.x-tree-node-el:hover {background-color: $cHover;}
 		.x-tree-selected {background-color: $cSelected;}
 		
 		&-indent span {
@@ -2147,6 +2157,12 @@ a.x-menu-group-item .x-menu-item-text:before{
 	padding: dp(8) dp(16) 0;
 }
 
+.x-combo-list-group {
+	@extend %font-caption;
+	@include var(color, c-primary);
+	padding: dp(16) dp(8) dp(8) dp(8);
+}
+
 
 //.x-date-menu, .x-color-menu{
 //	background-color: #fff !important;
@@ -2388,8 +2404,39 @@ $menuScrollerSize : dp(4);
 	position:relative;
 	width:dp(32);
 	height:dp(32);
+	border-radius: $borderRadius;
+
+	&.primary {
+		@include var('background-color', c-secondary);
+		color: white;
+
+		&:hover {
+			transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+			@include var(background-color, c-accent);
+		}
+	}
+
+	&.accent {
+		@include var('background-color', c-accent);
+		color: white;
+
+		&:hover {
+			transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+			@include var(background-color, c-primary);
+		}
+	}
+
+	&.primary-icon {
+		@include var('color', c-secondary);
+	}
+
+	&.accent-icon {
+		@include var('color', c-accent);
+	}
+
 	&:hover {
-		@include var(color, c-primary);
+		transition: background-color,color 195ms linear,color 195ms linear, box-shadow 195ms $curve-standard;
+		@include var(background-color, c-primary-tp);
 	}
 //	border-radius: 50%;
 //	transition: background 250ms linear;

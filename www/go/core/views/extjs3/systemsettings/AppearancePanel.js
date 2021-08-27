@@ -3,6 +3,7 @@ go.systemsettings.AppearancePanel = Ext.extend(go.systemsettings.Panel, {
 		var me = this;
 		Ext.apply(this, {
 			title: t('Appearance'),
+			itemId: "appearance", //makes it routable
 			autoScroll: true,
 			iconCls: 'ic-palette',
 			items: [{

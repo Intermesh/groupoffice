@@ -126,7 +126,8 @@ $tools : (
  add: add,
  delete: delete,
  home: home,
- dismiss: delete_sweep
+ dismiss: delete_sweep,
+				menu: more_vert
 );
 .icon {@extend %icon;}
 
@@ -147,7 +148,6 @@ define icons with:
 	content: "description"
 }
 */
-
 
 .x-tool::before, .ux-row-action-item {
 	@extend %icon;
@@ -252,7 +252,7 @@ $btn-icon : (
 	x-edit-subscript: title,
 	x-edit-superscript: functions,
 	'go-edit-insertimage button': insert_photo,
-	//new 
+	//new
 );
 
 
@@ -340,7 +340,7 @@ $filetype: (
 		background-position: dp(8) dp(8);
 		background-image:url(#{$resourcePath}img/filetype/unknown.svg);
 		background-repeat: no-repeat;
-		white-space: nowrap;		
+		white-space: nowrap;
 		line-height: dp(24);
 		padding: dp(8) dp(16) dp(8) dp(40);
 		display: inline-block;

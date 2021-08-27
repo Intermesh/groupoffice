@@ -57,7 +57,7 @@ go.groups.GroupUserGrid = Ext.extend(go.grid.GridPanel, {
 					field: 'displayName',
 					direction: 'ASC'
 				},
-				entityStore: "User"
+				entityStore: "UserDisplay"
 			});
 
 		Ext.apply(this, {		

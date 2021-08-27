@@ -296,8 +296,8 @@ class QueryBuilder {
 		$r['sql'] = "(\n" . $r['sql'];
 		
 		foreach($unions as $q) {
-			$u = $this->internalBuildSelect($q, "\t");
-			$r['sql'] .=  "\n) UNION (\n" . $u['sql'];
+			$u = $this->internalBuildSelect($q, $prefix . "\t");
+			$r['sql'] .=  $prefix . "\n) UNION (\n" . $u['sql'];
 			$r['params'] = array_merge($r['params'], $u['params']);
 		}
 		
@@ -321,14 +321,23 @@ class QueryBuilder {
 		
 	}
 	
-	protected function internalBuildSelect(Query $query, $prefix = '') {
+	protected function internalBuildSelect(Query $query, $prefix = '')
+	{
 		$this->reset();
-		$this->setTableName($query->getFrom());		
-		$this->tableAlias = $query->getTableAlias();
+
 		$this->query = $query;
 		$this->buildBindParameters = $query->getBindParameters();
+		$this->tableAlias = $query->getTableAlias();
 
-		$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName, $this->conn);
+		$from = $query->getFrom();
+		if ($from instanceof Query)  {
+			$fromSql = "FROM " . $this->buildSubQuery($from, $prefix);
+		} else
+		{
+			$this->setTableName($from);
+			$this->aliasMap[$this->tableAlias] = Table::getInstance($this->tableName, $this->conn);
+			$fromSql = "FROM `" . $this->tableName . '`';
+		}
 
 		$joins = "";
 		foreach ($this->query->getJoins() as $join) {
@@ -336,7 +345,7 @@ class QueryBuilder {
 		}
 
 		$select = $prefix . $this->buildSelectFields();
-		$select .= "\n" . $prefix . "FROM `" . $this->tableName . '`';
+		$select .= "\n" . $prefix . $fromSql;
 		
 		if(isset($this->tableAlias) && $this->tableAlias != $this->tableName) {
 			$select .= ' `' . $this->tableAlias . "`";

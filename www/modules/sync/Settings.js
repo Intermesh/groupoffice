@@ -69,6 +69,8 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 
 				this['panel'+name] = new GO.base.model.multiselect.panel({
 
+					border: true,
+					style: "margin: " + dp(16) + "px",
 					autoLoadStore: false,
 					deleteDefaultCol: 'default_'+id,
 					deleteSelected : this.checkDefaultSelected,
@@ -116,13 +118,18 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 				displayField: "name",
 				entityStore: "NoteBook",
 				hideLabel: true,
-				title: t("Notebooks", "community", "notes"),
 				extraColumns: [defaultCol],
 				extraFields: [{name: "isDefault", type: "boolean"}],
 				plugins: [defaultCol]
 			});
 			
-			this.items.push(this.noteBookSelect);
+			this.items.push({
+				xtype: "panel",
+				border: true,
+				style: "margin: " + dp(16) + "px",
+				items: [this.noteBookSelect],
+				title: t("Notebooks", "community", "notes")
+			});
 		}
 		
 		if(go.Modules.isAvailable("community", "addressbook"))
@@ -139,26 +146,51 @@ GO.sync.SettingsPanel = Ext.extend(Ext.Panel,{
 				displayField: "name",
 				entityStore: "AddressBook",
 				hideLabel: true,
-				title: t("Address books", "community", "addressbook"),
 				extraColumns: [defaultCol],
 				extraFields: [{name: "isDefault", type: "boolean"}],
 				plugins: [defaultCol]
 			});
 			
-			this.items.push(this.addressBookSelect);
+			this.items.push({
+				xtype: "panel",
+				border: true,
+				style: "margin: " + dp(16) + "px",
+				items: [this.addressBookSelect],
+				title: t("Address books", "community", "addressbook"),
+			});
+		}
+
+		if(go.Modules.isAvailable("community", "tasks"))
+		{
+			var defaultCol = new GO.grid.RadioColumn({
+				header: t("Default", "sync"),
+				dataIndex: 'isDefault',
+				width: dp(104)
+			});
+
+			this.tasklistSelect = new go.form.multiselect.Field({
+				name: "syncSettings.tasklists",
+				idField: "tasklistId",
+				displayField: "name",
+				entityStore: "Tasklist",
+				hideLabel: true,
+				extraColumns: [defaultCol],
+				extraFields: [{name: "isDefault", type: "boolean"}],
+				plugins: [defaultCol]
+			});
+
+			this.items.push({
+				xtype: "panel",
+				border: true,
+				style: "margin: " + dp(16) + "px",
+				items: [this.tasklistSelect],
+				title: t("Tasklists", "community", "tasks"),
+			});
 		}
 	
 		this.on('show',function(){
-			if(this.panelAddressbook)
-				this.panelAddressbook.store.load();
-
-			if(this.panelTasklist)
-				this.panelTasklist.store.load();
-		
 			if(this.panelCalendar)
 				this.panelCalendar.store.load();
-
-
 		},this);
 		
 		GO.sync.SettingsPanel.superclass.initComponent.call(this);

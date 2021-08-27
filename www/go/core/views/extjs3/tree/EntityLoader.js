@@ -37,11 +37,6 @@ go.tree.EntityLoader = Ext.extend(Ext.tree.TreeLoader, {
 				throw "Invalid 'entityStore' property given to component"; 
 			}
 		}
-//		this.entityStore.on('changes',this.onChanges, this);		
-//
-//		this.on('beforedestroy', function() {
-//			this.entityStore.un('changes', this.onChanges, this);
-//		}, this);
 	},	
 	
 	
@@ -98,12 +93,13 @@ go.tree.EntityLoader = Ext.extend(Ext.tree.TreeLoader, {
 		
 		this.result = this.entityStore.query(params, function (response) {
 			this.entityStore.get(response.ids, function (entities) {
-				var response = {
+				const result = {
 					argument: {callback: callback, node: options.node, scope: scope},
-					responseData: entities.map(this.convertEntityToNode, this)
+					responseData: entities.map(this.convertEntityToNode, this),
+					queryResponse: response
 				};
 				
-				this.handleResponse(response);
+				this.handleResponse(result);
 				
 				this.loading = false;
 			},this);

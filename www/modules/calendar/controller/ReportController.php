@@ -102,10 +102,10 @@ class ReportController extends \GO\Base\Controller\AbstractJsonController {
 			$calendar = \GO\Calendar\Model\Calendar::model()->findByPk($id);
 			$events = $calendar->getEventsForPeriod($start, $end);
 
-			if(!empty($calendar->tasklist)) {
-				$tasklistId = $calendar->tasklist->id;
-				$report->tasks = \GO\Tasks\Model\Task::model()->findByDate($date,$tasklistId)->fetchAll();
-			}
+//			if(!empty($calendar->tasklist)) {
+//				$tasklistId = $calendar->tasklist->id;
+//				$report->tasks = \GO\Tasks\Model\Task::model()->findByDate($date,$tasklistId)->fetchAll();
+//			}
 			
 			$report->setEvents($events);
 			$report->render($date);

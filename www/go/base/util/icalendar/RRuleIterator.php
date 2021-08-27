@@ -848,6 +848,7 @@ class RRuleIterator implements Iterator {
 				}
 
         foreach ($rrule as $key => $value) {
+            $key = strtoupper($key);
             switch ($key) {
 
                 case 'FREQ' :
@@ -860,7 +861,9 @@ class RRuleIterator implements Iterator {
                     }
                     $this->frequency = $value;
                     break;
-
+                case 'REPEATFOREVER' :
+                case 'REPEATCOUNT' :
+                break;
                 case 'UNTIL' :
                     $this->until = DateTimeParser::parse($value, $this->startDate->getTimezone());
 
@@ -876,7 +879,6 @@ class RRuleIterator implements Iterator {
                         $this->until = $this->startDate;
                     }
                     break;
-
                 case 'INTERVAL' :
                     // No break
 

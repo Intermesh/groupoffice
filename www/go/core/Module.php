@@ -3,6 +3,7 @@
 namespace go\core;
 
 use Exception;
+use Faker\Generator;
 use go\core\acl\model\AclOwnerEntity;
 use go\core\db\Utils;
 use go\core\exception\NotFound;
@@ -719,4 +720,10 @@ abstract class Module extends Singleton {
 		return static::getPackage() . '/' . static::getName();
 	}
 
+	/**
+	 * Generate data for demo purposes
+	 */
+	public function demo(Generator $faker) {
+
+	}
 }

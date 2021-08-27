@@ -17,6 +17,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			tooltip: t('Add'),
 			iconCls: 'ic-add',
 			region:"west",
+			style: 'max-width: 32px',
 			menu: {
 				items:[
 
@@ -44,6 +45,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 			growMin: dp(32),
 			//enableColors: false,
 			enableFont: false,
+			headingsMenu: false,
 			enableFontSize: false,
 			enableAlignments: false,
 			enableSourceEdit: false,
@@ -78,7 +80,11 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 				this.submit().then(function () {
 					this.reset(); // otherwise it will update the second time
 					this.textField.setHeight(this.minComposerHeight);
+
+					this.onSync()
 					this.textField.syncValue();
+					this.ownerCt.doLayout();
+					this.doLayout();
 				}.bind(this));
 			},
 			scope: this
@@ -92,8 +98,8 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 				defaults: {
 					anchor: "100%"
 				},
-				// align: "stretch",
-				// flex: 1,
+				 // align: "stretch",
+				 // flex: 1,
 
 				items: [
 					this.commentBox = new Ext.Container({
@@ -114,7 +120,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 		
 		this.textField.on('afterrender', function() {
 			this.store.load();
-			this.grow();
+			this.onSync();
 		}, this);
 		
 		
@@ -123,26 +129,24 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 	},
 
 	onSync : function(me) {
-		var composer = this;
-
-		setTimeout(function() {
-			composer.grow();
+		setTimeout(() => {
+			this.setHeight(this.commentBox.getHeight() + this.chips.getHeight() + this.attachmentBox.getHeight());
 		}, 0);
 	},
 	
-	grow: function(){
+	//grow: function(){
 
-		this.setHeight(this.commentBox.getHeight() + this.chips.getHeight() + this.attachmentBox.getHeight());
+		//this.setHeight(this.commentBox.getHeight() + this.chips.getHeight() + this.attachmentBox.getHeight());
 		// var totalHeight = this.commentBox.getHeight() + this.chips.getHeight() + this.attachmentBox.getHeight();
 		// this.setHeight(totalHeight);
 		// this.middleBox.setHeight(this.getHeight() + 4);
-		var headerHeight = this.ownerCt.header ? dp(48) : 0;
+		//var headerHeight = this.ownerCt.header ? dp(48) : 0;
 		// console.log(this.ownerCt.commentsContainer.getEl().dom.scrollHeight, this.getHeight(), headerHeight);
-		var h = Math.min(this.ownerCt.growMaxHeight, this.ownerCt.commentsContainer.getEl().dom.scrollHeight + this.getHeight() + headerHeight + dp(8));
-		this.ownerCt.setHeight(h);
-		this.ownerCt.doLayout();
-		this.ownerCt.scrollDown();
-	},
+		// var h = Math.min(this.ownerCt.growMaxHeight, this.ownerCt.commentsContainer.getEl().dom.scrollHeight + this.getHeight() + headerHeight + dp(8));
+		// this.ownerCt.setHeight(h);
+		// this.ownerCt.doLayout();
+		// this.ownerCt.scrollDown();
+	//},
 	
 	initEntity : function(entityId,entity, section) {
 		this.setValues({
@@ -164,7 +168,7 @@ go.modules.comments.Composer = Ext.extend(go.form.EntityPanel, {
 					this.chips.dataView.store.add([me.record]);
 					//this.loadLabels(); //redraw
 					this.doLayout();
-					this.grow();
+					this.onSync();
 				},
 				scope:this
 			});

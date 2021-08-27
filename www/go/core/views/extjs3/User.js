@@ -2,9 +2,6 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 	loaded : false,
 	accessToken: go.util.Cookies.get('accessToken'),
 	authenticate: function(cb, scope) {
-		if(!this.accessToken) {
-			return;
-		}
 		return this.load();
 	},
 
@@ -36,9 +33,9 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 		this.capabilities = go.Jmap.capabilities = session.capabilities;
 		this.session = session;
 
-    this.apiUrl = session.apiUrl;
-    this.downloadUrl = session.downloadUrl;
-    this.uploadUrl = session.uploadUrl;
+	    this.apiUrl = session.apiUrl;
+	    this.downloadUrl = session.downloadUrl;
+	    this.uploadUrl = session.uploadUrl;
 		this.pageUrl = session.pageUrl;
 		this.eventSourceUrl = session.eventSourceUrl;		
 		this.loaded = true;
@@ -120,7 +117,7 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 
 	loadLegacyModules : function() {
 			GO.settings.modules = {};
-			var modules = go.Modules.getAll();
+			var modules = go.Modules.getAvailable();
 			for(var id in modules) {
 				var m = modules[id];
 
@@ -145,8 +142,10 @@ go.User = new (Ext.extend(Ext.util.Observable, {
 // Update go.User when it's edited
 Ext.onReady(function(){
 	go.Db.store("User").on("changes", function(store, added, changed, deleted){
-		if(changed[go.User.id]) {
-			Ext.apply(go.User, changed[go.User.id]);
+		if(changed.indexOf(go.User.id) > -1) {
+			store.single(go.User.id).then((user) => {
+				Ext.apply(go.User, user);
+			});
 		}
 	});
 })

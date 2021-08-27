@@ -27,7 +27,7 @@ Ext.override(Ext.data.Connection, {
 GO.util.density = GO.util.isMobileOrTablet() ? 160 : 140;
 function dp(size) {
 	return ((size * GO.util.density) / 160);
-};
+}
 /*
  *When upgrading extjs don't forget to check htmleditor overrides in E-mail composer
  */
@@ -86,8 +86,8 @@ function dp(size) {
 		 * Fires when items are added, changed or destroyed in the entitystore.
 		 * 
 		 * @param {go.data.EntityStore} entityStore
-		 * @param {Object[]} added
-		 * @param {Object[]} changed
+		 * @param {int[]} added
+		 * @param {int[]} changed
 		 * @param {int[]} destroyed
 		 * @returns {void}
 		 */
@@ -1065,10 +1065,50 @@ Ext.override(Ext.Panel, {
 	initComponent : function() {
 		
 		if(GO.util.isMobileOrTablet()) {
-			this.split = false;			
+			if(this.split) {
+				this.split = false;
+				this.cls = this.cls || "";
+				this.cls += ' go-mobile-split';
+			}
 		}
 		
 		this.panelInitComponent.call(this);
+
+		this.toolsMenu();
+	},
+
+
+
+	toolsMenu : function() {
+
+		if(!this.tools) {
+			return;
+		}
+
+		this.toolsMenus = {};
+
+		this.tools.forEach((tool) => {
+
+			if (tool.menu) {
+
+				tool.handler = function(event, toolEl, panel) {
+					if (!panel.toolsMenus[tool.id]) {
+						panel.toolsMenus[tool.id] = new Ext.menu.Menu({
+							items: tool.menu
+						})
+					}
+					panel.toolsMenus[tool.id].ownerCt = panel;
+					panel.toolsMenus[tool.id].show(toolEl, 'tl-bl?');
+				}
+			}
+		});
+
+
+		this.on('destroy', () => {
+			for(let id in this.toolsMenus) {
+				this.toolsMenus[id].destroy();
+			}
+		});
 	},
 	
 	stateEvents: ['collapse', 'expand'],

@@ -10,7 +10,7 @@ go.users.UserGrid = Ext.extend(go.grid.GridPanel, {
 					'email'
 				],
 				baseParams: {filter: {}},
-				entityStore: "User"
+				entityStore: "UserDisplay"
 			}),
 
 			columns: [

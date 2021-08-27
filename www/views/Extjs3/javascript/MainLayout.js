@@ -104,6 +104,9 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					go.Router.check();
 				})
 			} else {
+
+
+
 				me.fireEvent("boot", me); // In the router there is an event attached.
 
 				go.Router.check();
@@ -421,16 +424,25 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		this.startMenu = new Ext.menu.Menu({
 			id: 'startMenu',
-			hideOnClick: true
+			enableScrolling: false
 		});
 
-		if(GO.util.isMobileOrTablet()) {
-			this.startMenu.on("show", function() {
-				this.startMenu.setPosition(0,0);
-				this.startMenu.setWidth(Ext.getBody().getWidth());
-				this.startMenu.setHeight(Ext.getBody().getHeight());
-			}, this);
-		}
+		this.startMenu.on('render', () => {
+			this.startMenu.getEl().on('click', (e) => {
+				var t = this.startMenu.findTargetItem(e);
+				if(!t){
+					this.startMenu.hide();
+				}
+			});
+		});
+
+		// if(GO.util.isMobileOrTablet()) {
+		// 	this.startMenu.on("show", function() {
+		// 		this.startMenu.setPosition(0,0);
+		// 		this.startMenu.setWidth(Ext.getBody().getWidth());
+		// 		this.startMenu.setHeight(Ext.getBody().getHeight());
+		// 	}, this);
+		// }
 
 		if (allPanels.length == 0) {
 			items = new Ext.Panel({
@@ -461,7 +473,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 				moduleName: allPanels[i].moduleName,
 				text: allPanels[i].title,
 				//iconCls: 'go-menu-icon-' + allPanels[i].moduleName,
-				iconStyle: "background-position: center middle; background-image: url("+go.Jmap.downloadUrl('core/moduleIcon/' + (panel.package || "legacy") + "/" + allPanels[i].moduleName)+")",
+				iconStyle: "background-position: center middle; background-image: url("+go.Jmap.downloadUrl('core/moduleIcon/' + (panel.package || "legacy") + "/" + allPanels[i].moduleName)+"&mtime="+go.User.session.cacheClearedAt+")",
 				//icon: ,
 				handler: function (item, e) {
 					this.openModule(item.moduleName);
@@ -715,10 +727,10 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		this.welcome();
 
-		// Start in 10s to give the browser some time to boot other requests.
+		// Start in 5s to give the browser some time to boot other requests.
 		setTimeout(function() {
 			go.Jmap.sse();
-		},10000);
+		},5000);
 		
 	},
 	

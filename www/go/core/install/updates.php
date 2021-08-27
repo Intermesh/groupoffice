@@ -24,7 +24,7 @@ $updates["201803161130"][] = function() {
 		echo "No config.php found. Skipping conversion\n";
 		return;
 	}
-	
+
 
 	$globalConfig = [];
 	if (file_exists('/etc/groupoffice/globalconfig.inc.php')) {
@@ -253,7 +253,7 @@ $updates['201811020837'][] = "";
 $updates['201811020837'][] = function() {
 	foreach(GO\Customfields\Model\Field::model()->find(GO\Base\Db\FindParams::newInstance()->ignoreAcl()) as $field) {
 		if(preg_match("/[^a-z0-9A-Z_]+/", $field->databaseName)) {
-				
+
 			$field->databaseName = $stripped = preg_replace('/[^a-z0-9A-Z_]+/', '_', $field->databaseName);
 			$i = 1;
 			$tableName = $field->category->customfieldsTableName();
@@ -386,25 +386,25 @@ $updates['201902141322'][] = "CREATE TABLE IF NOT EXISTS `go_templates` (
 
 
 $updates['201902141322'][] = function() {
-	
+
 	$duplicates = go()->getDbConnection()->selectSingleValue('name')->from('core_group')->groupBy(["name"])->having('count(*) > 1');
 	$count = -1;
-	foreach($duplicates as $name) {		
+	foreach($duplicates as $name) {
 		foreach(go()->getDbConnection()->select("id, name")->from('core_group')->where('name', '=', $name) as $record) {
 			$count++;
 			if($count > 0) {
 				go()->getDbConnection()->update('core_group', ['name' => $record['name'] .' '.$count], ['id'=>$record['id']])->execute();
 			}
-		}		
+		}
 	}
-	
-	go()->getDbConnection()->exec("ALTER TABLE `core_group` ADD UNIQUE(`name`);");	
+
+	go()->getDbConnection()->exec("ALTER TABLE `core_group` ADD UNIQUE(`name`);");
 };
 
 
-$updates['201902141322'][] = function() {	
+$updates['201902141322'][] = function() {
 	$m = new \go\core\install\MigrateCustomFields63to64();
-	$m->migrateEntity("User");	
+	$m->migrateEntity("User");
 };
 
 $updates['201902141322'][] = "delete from core_setting where moduleId = 0;";
@@ -449,7 +449,7 @@ $updates['201903151726'][] = "ALTER TABLE `core_entity_filter`
 $updates['201903151726'][] = "ALTER TABLE `core_entity_filter`
   ADD CONSTRAINT `core_entity_filter_ibfk_1` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`),
 	ADD CONSTRAINT `core_entity_filter_ibfk_2` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;";
-	
+
 $updates['201901251344'][] = function() {
 	go()->getDbConnection()->query("ALTER TABLE `core_search` CHANGE `keywords` `keywords` VARCHAR(192) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '';");
 	go()->getDbConnection()->query("ALTER TABLE `core_search` ADD INDEX(`keywords`);");
@@ -542,10 +542,10 @@ $updates['201905101208'][] = "ALTER TABLE `core_email_template_attachment`
 $updates['201905201227'][] = "ALTER TABLE `core_acl` ADD `entityTypeId` INT NULL DEFAULT NULL AFTER `modifiedAt`, ADD `entityId` INT NULL DEFAULT NULL AFTER `entityTypeId`;";
 $dupates['201905201227'][] = "ALTER TABLE `core_acl` ADD FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;";
 $updates['201905201227'][] = function() {
- 
+
   $cf = new ClassFinder();
   $classes = $cf->findByParent(AclOwnerEntity::class);
-  
+
   $mods = GO::modules()->getAll();
   foreach($mods as $m) {
     if($m->package == null && $m->isAvailable()) {
@@ -554,7 +554,7 @@ $updates['201905201227'][] = function() {
   }
 
 
-  foreach($classes as $cls) {    
+  foreach($classes as $cls) {
 
     if($cls === Search::class || $cls === SearchCacheRecord::class) {
       continue;
@@ -574,18 +574,18 @@ $updates['201905201227'][] = function() {
         continue;
       }
       $type = $cls::entityType();
-      $table = $cls::model()->tableName();     
+      $table = $cls::model()->tableName();
     }
 
     $stmt = go()->getDbConnection()->update(
-      'core_acl', 
+      'core_acl',
       [
-        'acl.entityTypeId' => $type->getId(), 
+        'acl.entityTypeId' => $type->getId(),
         'acl.entityId' => new Expression('entity.id')],
       (new Query())
         ->tableAlias('acl')
         ->join($table, 'entity', 'entity.'.$colName.' = acl.id'));
-  
+
    if(!$stmt->execute()) {
      throw new \Exception("Could not update ACL");
    }
@@ -613,7 +613,7 @@ $updates['201906211622'][] = function() {
 
 $updates['201908300937'][] = function() {
   //Ensure all custom fields are correcty created in the databaase
-  
+
   foreach(Field::find() as $field) {
     echo "Checking custom field " . $field->id ."\n";
     try {
@@ -934,7 +934,6 @@ $updates['202105041513'][] = "delete from core_module where name='voippro' and p
 
 $updates['202105111132'][] = "ALTER TABLE `core_user` ADD COLUMN `confirmOnMove` TINYINT(1) NOT NULL DEFAULT 0 AFTER `homeDir`;";
 
-
 $updates['202105111132'][] = "alter table core_auth_token
 	add platform varchar(190) null after userAgent;";
 
@@ -943,6 +942,119 @@ $updates['202105111132'][] = "alter table core_auth_token
 
 $updates['202107010929'][] = "alter table core_auth_token modify userAgent varchar(190) null;";
 $updates['202107010929'][] = "alter table core_customfields_field modify relatedFieldCondition text default null;";
+
+
+
+
+
+
+
+
+
+// MASTER UPDATES
+
+$updates['202107010929'][] = "alter table core_alert
+	add data text null;";
+
+$updates['202107010929'][] = "CREATE TABLE `core_pdf_block` (
+`id` bigint(20) UNSIGNED NOT NULL,
+  `pdfTemplateId` bigint(20) UNSIGNED NOT NULL,
+  `x` int(11) DEFAULT NULL,
+  `y` int(11) DEFAULT NULL,
+  `width` int(11) DEFAULT NULL,
+  `height` int(11) DEFAULT NULL,
+  `align` enum('L','C','R','J') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'L',
+  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+$updates['202107010929'][] = "CREATE TABLE `core_pdf_template` (
+`id` bigint(20) UNSIGNED NOT NULL,
+  `moduleId` int(11) NOT NULL,
+  `key` varchar(20) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
+  `language` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'en',
+  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `stationaryBlobId` binary(40) DEFAULT NULL,
+  `landscape` tinyint(1) NOT NULL DEFAULT 0,
+  `pageSize` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'A4',
+  `measureUnit` enum('mm','pt','cm','in') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'mm',
+  `marginTop` decimal(19,4) NOT NULL DEFAULT 10.0000,
+  `marginRight` decimal(19,4) NOT NULL DEFAULT 10.0000,
+  `marginBottom` decimal(19,4) NOT NULL DEFAULT 10.0000,
+  `marginLeft` decimal(19,4) NOT NULL DEFAULT 10.0000
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+$updates['202107010929'][] = "ALTER TABLE `core_pdf_block`
+  ADD PRIMARY KEY (`id`) USING BTREE,
+  ADD KEY `pdfTemplateId` (`pdfTemplateId`);";
+
+$updates['202107010929'][] = "ALTER TABLE `core_pdf_template`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `moduleId` (`moduleId`),
+  ADD KEY `stationaryBlobId` (`stationaryBlobId`);";
+
+$updates['202107010929'][] = "ALTER TABLE `core_pdf_block`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;";
+
+$updates['202107010929'][] = "ALTER TABLE `core_pdf_template`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;";
+
+$updates['202107010929'][] = "ALTER TABLE `core_pdf_block`
+  ADD CONSTRAINT `core_pdf_block_ibfk_1` FOREIGN KEY (`pdfTemplateId`) REFERENCES `core_pdf_template` (`id`) ON DELETE CASCADE;";
+
+$updates['202107010929'][] = "ALTER TABLE `core_pdf_template`
+  ADD CONSTRAINT `core_pdf_template_ibfk_1` FOREIGN KEY (`moduleId`) REFERENCES `core_module` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `core_pdf_template_ibfk_2` FOREIGN KEY (`stationaryBlobId`) REFERENCES `core_blob` (`id`);";
+
+
+$updates['202107010929'][] = "ALTER TABLE `core_email_template` ADD `key` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NULL DEFAULT NULL AFTER `aclId`, ADD `language` VARCHAR(20) CHARACTER SET ascii COLLATE ascii_bin NOT NULL DEFAULT 'en' AFTER `key`;";
+
+
+$updates['202107010929'][] = "alter table core_alert change alertId tag varchar(50) null;";
+$updates['202107010929'][] = "create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
+	on core_alert (entityTypeId, entityId, tag, userId);
+";
+
+
+
+$updates['202107010929'][] = "create table core_auth_remember_me
+(
+	id int auto_increment,
+    token varchar(190) collate ascii_bin null,
+    series varchar(190) collate ascii_bin null,
+    userId int not null,
+    expiresAt datetime null,
+    constraint core_auth_remember_me_pk
+        primary key (id)
+);";
+
+$updates['202107010929'][] = "create index core_auth_remember_me_series_index
+    on core_auth_remember_me (series);";
+
+$updates['202107010929'][] = "alter table core_auth_remember_me
+    add constraint core_auth_remember_me_core_user_id_fk
+        foreign key (userId) references core_user (id);";
+
+$updates['202107010929'][] = "alter table core_auth_remember_me
+    add `remoteIpAddress` varchar(100) CHARACTER SET ascii COLLATE ascii_bin NOT NULL;";
+
+$updates['202107010929'][] = "alter table core_auth_remember_me
+    add `userAgent` varchar(190) COLLATE utf8mb4_unicode_ci NOT NULL";
+
+$updates['202107010929'][] = "alter table core_auth_remember_me
+	add platform varchar(190) COLLATE utf8mb4_unicode_ci null after userAgent;";
+
+$updates['202107010929'][] = "alter table core_auth_remember_me
+	add browser varchar(190) COLLATE utf8mb4_unicode_ci null after platform;";
+
+
+$updates['202107160929'][] = "alter table core_alert drop foreign key fk_alert_user;";
+
+$updates['202107160929'][] = "alter table core_alert
+	add constraint fk_alert_user
+		foreign key (userId) references core_user (id)
+			on delete cascade;";
+
 
 $updates['202107221420'][] = "CREATE TABLE `core_permission` (
   `moduleId` INT NOT NULL,

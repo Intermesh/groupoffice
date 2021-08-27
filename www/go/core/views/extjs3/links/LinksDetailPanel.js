@@ -44,37 +44,7 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 		});
 		
 		
-		var tpl = new Ext.XTemplate('<div class="icons"><tpl for=".">\
-				<p data-id="{id}" class="s12">\
-				<tpl if="xindex === 1">\
-					<i class="label ' + this.link.iconCls + '" ext:qtip="{toEntity}"></i>\
-				</tpl>\
-				<tpl for="to">\
-					<a>{name}</a>\
-					<small class="go-top-right" title="{[go.util.Format.dateTime(values.modifiedAt)]}" style="cursor:pointer">{[go.util.Format.userDateTime(values.modifiedAt)]}</small>\
-					<label>{description}</label>\
-				</tpl>\
-				{[this.getLinkDescription(values)]}\
-				<a class="right show-on-hover"><i class="icon">more_vert</i></a>\
-			</p>\
-		</tpl>\
-		{[this.printMore(values)]}\
-		</div>', {			
-			getLinkDescription: function(values) {
-				if(values.description && values.description.length > 0) {
-					return '<small>'+values.description+'</small>';
-				}
-				return "";
-			},
-			printMore : function(values) {
-				if(store.hasMore) {
-					return "<a class=\"show-more\">" + t("Show more...") + "</a>";
-				} else
-				{
-					return "";
-				}
-			}
-		});
+		var tpl = this.getTemplate();
 		
 		
 		Ext.apply(this, {
@@ -141,6 +111,41 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 		go.links.DetailPanel.superclass.initComponent.call(this);
 	},
 
+	getTemplate: function() {
+		const store = this.store;
+		return new Ext.XTemplate('<div class="icons"><tpl for=".">\
+				<p data-id="{id}" class="s12">\
+				<tpl if="xindex === 1">\
+					<i class="label ' + this.link.iconCls + '" ext:qtip="{toEntity}"></i>\
+				</tpl>\
+				<tpl for="to">\
+					<a>{name}</a>\
+					<small class="go-top-right" title="{[go.util.Format.dateTime(values.modifiedAt)]}" style="cursor:pointer">{[go.util.Format.userDateTime(values.modifiedAt)]}</small>\
+					<label>{description}</label>\
+				</tpl>\
+				{[this.getLinkDescription(values)]}\
+				<a class="right show-on-hover"><i class="icon">more_vert</i></a>\
+			</p>\
+		</tpl>\
+		{[this.printMore(values)]}\
+		</div>', {
+			getLinkDescription: function(values) {
+				if(values.description && values.description.length > 0) {
+					return '<small>'+values.description+'</small>';
+				}
+				return "";
+			},
+			printMore : function(values) {
+				if(store.hasMore) {
+					return "<a class=\"show-more\">" + t("Show more...") + "</a>";
+				} else
+				{
+					return "";
+				}
+			}
+		});
+	},
+
 	showLinkMoreMenu: function (node, e, record) {
 		if (!this.linkMoreMenu) {
 			this.linkMoreMenu = new Ext.menu.Menu({
@@ -156,9 +161,9 @@ go.links.DetailPanel = Ext.extend(Ext.Panel, {
 				}, {
 					itemId: "delete",
 					iconCls: "ic-delete",
-					text: t("Delete"),
+					text: t("Unlink"),
 					handler: function () {
-						Ext.MessageBox.confirm(t("Delete"), t("Are you sure you want to delete this item?"), function (btn) {
+						Ext.MessageBox.confirm(t("Delete"), t("Are you sure you want to unlink this item?"), function (btn) {
 							if (btn == "yes") {
 								go.Db.store("Link").set({
 									destroy: [this.linkMoreMenu.record.id]

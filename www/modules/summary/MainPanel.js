@@ -36,31 +36,27 @@
  	for(var i=0,l=state.length;i<l;i++) {
  		this.activePortlets.push(state[i].id);
  	}
- 	
- 	
- 	this.columns = [/*{
-				columnWidth:.33,
-	      style:'padding:10px 0 10px 10px',
-	      border:false
-	  	},*/
-	  	{
-			columnWidth:.5,
-			mobile: {
-				columnWidth: 1,
-			},
-			style:'padding:10px 0 10px 10px',
-			border:false
-	  	},
-	  	{
-			columnWidth:.5,
-			mobile: {
-				columnWidth: 1,
-			},
-			style:'padding:10px 10px 10px 10px',
-			border:false
-	  	}];
 
-	//var portletsPerCol = Math.ceil(this.activePortlets.length/this.columns.length);
+	 this.columns = [
+		 {
+			 columnWidth: .5,
+			 mobile: {
+				 columnWidth: 1,
+			 },
+			 style: 'padding:10px 0 10px 10px',
+			 border: false
+		 },
+		 {
+			 columnWidth: .5,
+			 mobile: {
+				 columnWidth: 1,
+			 },
+			 style: 'padding:10px 10px 10px 10px',
+			 border: false
+		 }
+	 ];
+
+	 //var portletsPerCol = Math.ceil(this.activePortlets.length/this.columns.length);
 
  // var portletsInCol=0;
  // var colIndex=0;

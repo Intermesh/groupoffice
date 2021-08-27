@@ -2,9 +2,6 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 	entityId:null, 
 	entity:null,
 	section: null,
-	height: dp(150),
-
-	growMaxHeight: dp(800),
 	title: t("Comments"),
 	//
 	/// Collapsilbe was turn off because of height recaculation issues in HtmlEditor
@@ -14,8 +11,9 @@ go.modules.comments.CommentsDetailPanel = Ext.extend(Ext.Panel, {
 
 	hideMode: "offsets", //required for htmleditor
 	collapseFirst:false,
-	layout:'border',	
 	titleCollapse: true,
+	bodyCssClass: 'comments-container',
+	autoHeight: true,
 	stateId: "comments-detail",
 	initComponent: function () {
 

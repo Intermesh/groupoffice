@@ -106,5 +106,8 @@ $lang = GO::language()->getLanguage(); ?>
 <!--	<div id="scripts-container">-->
 <!--		-->
 <!--	</div>-->
+    <script type="text/javascript">
+		 GO.util.density = GO.util.isMobileOrTablet() ? 160 :  <?= isset($density) ? $density : 140?>;
+    </script>
 </body>
 </html>

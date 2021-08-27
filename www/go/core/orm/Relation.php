@@ -94,6 +94,9 @@ class Relation {
    * @throws Exception
    */
 	public function setEntityName ($entityName) {
+		if(!class_exists($entityName)) {
+			throw new Exception($entityName . ' class not found');
+		}
 		if(!is_subclass_of($entityName, Property::class, true)) {
 			throw new Exception($entityName . ' must extend '. Property::class);
 		}

@@ -41,6 +41,19 @@ function output($data = [], $status = 200, $statusMsg = null) {
 	exit();
 }
 
+function finishLogin(Token $token) {
+	$authState = new State();
+	$authState->setToken($token);
+	go()->setAuthState($authState);
+	$response = $authState->getSession();
+
+	$response['accessToken'] = $token->accessToken;
+
+	$token->setCookie();
+
+	output($response, 201, "Authentication is complete, access token created.");
+}
+
 
 try {
 //Create the app with the config.php file
@@ -95,7 +108,22 @@ try {
 				if ($token && $token->isAuthenticated()) {
 					$token->refresh();
 				}
-			} else if (isset($data['loginToken'])) {
+			} else if(isset($data['rememberMeToken'])) {
+				// Process remember me persistent cookie. This is not used by the browser. The browser verifies the remember me token in index.php with a cookie.
+				// The assistant uses this method.
+				if(($rememberMe = \go\core\model\RememberMe::verify($data['rememberMeToken']))) {
+					$rememberMe->setCookie();
+
+					$token = new Token();
+					$token->userId = $rememberMe->userId;
+					$token->setAuthenticated();
+					$token->setCookie();
+
+					finishLogin($token);
+				} else {
+					output(["error" => "Invalid remember me token"], 400, "Invalid remember me token");
+				}
+			} elseif (isset($data['loginToken'])) {
 				$token = Token::find()->where(['loginToken' => $data['loginToken']])->single();
 			} else {
 
@@ -146,24 +174,16 @@ try {
 			}
 
 			if ($token->isAuthenticated()) {
-				$authState = new State();
-				$authState->setToken($token);
-				go()->setAuthState($authState);
-				$response = $authState->getSession();
+				if(!empty($data['rememberLogin'])) {
+					$rememberMe = new \go\core\model\RememberMe();
+					$rememberMe->userId = $token->userId;
+					if(!$rememberMe->save()) {
+						throw new \go\core\orm\exception\SaveException($rememberMe);
+					}
+					$rememberMe->setCookie();
+				}
 
-				$response['accessToken'] = $token->accessToken;
-
-				//Server side cookie worked better on safari. Client side cookies were removed on reboot.
-				$expires = !empty($data['rememberLogin']) ? strtotime("+1 year") : 0;
-
-				Response::get()->setCookie('accessToken', $token->accessToken, [
-					'expires' => $expires,
-					"path" => "/",
-					"samesite" => "Lax",
-					"domain" => Request::get()->getHost()
-				]);
-
-				output($response, 201, "Authentication is complete, access token created.");
+				finishLogin($token);
 			}
 
 			$response = [

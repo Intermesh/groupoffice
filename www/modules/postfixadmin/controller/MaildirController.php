@@ -5,69 +5,72 @@ namespace GO\Postfixadmin\Controller;
 
 use DirectoryIterator;
 use go\core\db\Query;
+use go\core\fs\Folder;
 
 class MaildirController extends \GO\Base\Controller\AbstractController {
 
 	private $mailboxRoot = "/var/mail/vhosts/";
-	private $trashRoot = "/var/trash/";
+	private $trashRoot;
 	
-	public function actionCleanup() {
+	public function actionCleanup($mailboxRoot = '/var/mail/vhosts/', $dryRun = 1) {
 		if(!$this->isCli()) {
 			echo "Try running script from the CLI \n";
 			echo "Usage: php groupofficecli.php -r=postfixadmin/maildir/cleanup";
 			return;
 		}
+
+		$this->mailboxRoot = rtrim($mailboxRoot, '/') . '/';
+		$this->trashRoot = $this->mailboxRoot . '_trash_/';
 			
 		// create the trash folder
 		if (!is_dir($this->trashRoot)) {
 			mkdir($this->trashRoot, 0777, true);
 		}
 
-		$dirs = new DirectoryIterator($this->mailboxRoot);
+		$trashFolder = new Folder($this->trashRoot);
+
+		$root = new Folder($this->mailboxRoot);
 		
-		foreach ($dirs as $dir) {
-			if(!$dir->isDot() && $dir->isDir()) {
-				$dirName = $dir->getFileName();
+		foreach ($root->getFolders() as $domainFolder) {
 
-				if(!is_dir($this->trashRoot . $dirName)) {
-					mkdir($this->trashRoot . $dirName, 0777, true);
-				}
+			if($domainFolder->getName() == "_trash_") {
+				continue;
+			}
 
-			$subDirs = new DirectoryIterator($this->mailboxRoot . $dirName);
-				foreach($subDirs as $subdir) {
-					if(!$subdir->isDot() && $subdir->isDir()) {
-						$subDirName = $subdir->getFilename();
-						$homeDir = $dirName . "/" . $subDirName . "/";
-						$result = (new Query())
-						->selectSingleValue("id")							
-						->from("pa_mailboxes")
-						->where(['homedir' => $homeDir])
-						->single();
+			foreach($domainFolder->getFolders() as $homeFolder) {
+				$homedir = $homeFolder->getRelativePath($root) . "/";
+				$existsInDatabase = (new Query())
+					->selectSingleValue("id")
+					->from("pa_mailboxes")
+					->where(['homedir' => $homedir])
+					->single();
 
-						// mailbox was found on file system but not in database.
-						if(!$result) {
-							$mailDirs = new DirectoryIterator($this->mailboxRoot . $homeDir);
-							foreach($mailDirs as $mailDir) {
-								if(!$mailDir->isDot() && $mailDir->isDir()) {
-									if($mailDir == "Maildir" || $mailDir == "cur") {
-										echo "Maildir found in : " . $subDirName . "\n";
-										echo "Moving directory \n";
+				if($existsInDatabase) {
+					echo "EXISTS: " . $homedir ."\n";
+				} else {
 
-										if(!is_dir($this->trashRoot . "/" . $homeDir)) {
-											rename($this->mailboxRoot . $homeDir, $this->trashRoot . "/" . $homeDir);
-										} else {
-											$dateAndTime = date("Y-m-d h:i:sa");
-											echo $this->trashRoot . "/" . $homeDir . $dateAndTime;
-											rename($this->mailboxRoot . $homeDir, $this->trashRoot . "/" . $dirName . "/" . $subDirName . $dateAndTime);
-										}
-										
-									}
-								}
-							}
-						} 
+					$mailboxTrashFolder = $trashFolder->getFolder($homedir);
+
+					if($mailboxTrashFolder->exists()) {
+						$mailboxTrashFolder = $trashFolder->getFolder($homedir . "-" . date("Y-m-d h:i:sa"));
+					}
+
+					if(!$dryRun) {
+						echo "TRASH: " . $homedir ." -> " . $mailboxTrashFolder . "\n";
+						$homeFolder->move($mailboxTrashFolder);
+					} else {
+						echo "TRASH (Dry run): " . $homedir . " -> " . $mailboxTrashFolder . "\n";
 					}
 				}
 			}
+
+			if($domainFolder->isEmpty()) {
+				echo "TRASH: " . $domainFolder->getRelativePath($root) ."\n";
+				if(!$dryRun) {
+					$domainFolder->delete();
+				}
+			}
+
 		}
 		
 	}

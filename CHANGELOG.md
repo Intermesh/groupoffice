@@ -1,3 +1,40 @@
+
+
+6.6
+
+Tasks: Completely rewritten module
+Core: Set alternative lost password URL
+Core: Alert system to notify users about comments, assigned tasks etc.
+Core: Made "Remember me" more secure by using a special token. (See https://stackoverflow.com/a/244907)
+Core: New module chooser menu
+Core: System Settings -> Modules redesigned and searchable.
+----
+
+
+- Studio: Initial config had "id" for autoExpandColumn instead of "showID".
+- Core: Custom fields can be rendered as text in templates with entity.customFields.asText.foo
+- Postfixadmin: fixed cleanup script of deleted mailboxes
+- Email: Fixed red messages in sent items
+- Core: Fixed html editor styles in Compact theme
+
+23-08-2021 6.5.73
+- Timeregistration: Do not clone invoice_id upon cloning a time entry
+- Studio: disable setting autoexpand fields that are hidden by default.
+- Googleauthenticator: Fix negative countdown
+- Email: Fixed HTML code in grid when from tries to spoof email
+- Projects2: Total of incomes will be equal to search results
+- Contact customfield has option to allow/disallow adding new contacts from the dropdown
+- Tickets: Incorrect subject in message to admin when modified by another user
+- Email: Fixed email alias being red even when it's the same as the sender address
+
+23-07-2021 6.5.72
+- Email: Fixed attachment downloading in firefox when opening a second one.
+
+23-07-2021 6.5.71
+- Email: Fixed attachment downloading in firefox when opening a second one.
+- Core: When displaying full date then use leading zero's
+- Google Authenticator: Options to force setup or a countdown timer before you can choose to set it up later.
+
 20-07-2021 6.5.70
 - History: render issue in changes
 
@@ -245,6 +282,20 @@
 
 
 
+- Email: strpos() error when deleting folders with disabled Trash folder
+- Tickets: Enable disabling using of alternative URL
+- Tickets: Settings dialog bigger in order to display 'Show external page button'
+- Core: Fixed install script custom field
+- Projects: Display supplier name in expanse budget grid
+- Timeregistrations: do not copy income_id upon cloning a time entry
+- Core: 0.00 was always displayed in number fields
+- Core: Fixed custom field column delete when creating a new column with a name that already existed.
+
+22-07-2021 6.4.241
+- Projects: Fixed upgrade error in projects where pr2_settings doesn't exist
+
+19-07-2021 6.4.240
+- Billing: Fixed filter 'Books' in project reports
 - MultiInstance: Fixed compatibility issue with MySQL 8+
 - Core: Check invalid characters in username.
 

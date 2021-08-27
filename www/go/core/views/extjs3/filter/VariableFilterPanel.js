@@ -172,7 +172,7 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 		var cls;
 
 		try {
-			cls = go.filter.variabletypes[filter.type] || eval(filter.type);
+			cls = go.filter.variabletypes[filter.type] || (Ext.ComponentMgr.types[filter.type] ? Ext.ComponentMgr.types[filter.type] : eval(filter.type));
 		}catch(e) {
 			console.error(e);
 			return false;
@@ -184,6 +184,7 @@ go.filter.VariableFilterPanel = Ext.extend(Ext.Panel, {
 
 		Ext.apply(filter.typeConfig, {
 			anchor: '100%',
+			allowBlank: true,
 			filter: filter,
 			name: filter.name,
 			collapseOnSelect: false,

@@ -58,7 +58,7 @@
 go.data.Store = Ext.extend(Ext.data.JsonStore, {
 
 	/**
-	 * WIll autodestroy if the component it belongs too is detroyted
+	 * WIll autodestroy if the component it belongs too is destroyed
 	 *
 	 * WARNING: the component is responsible for handling this, If you have a custom component you must destroy it yourself.
 	 */

@@ -979,39 +979,7 @@ class MaintenanceController extends AbstractController {
 				}
 			}
 		}
-		
-		if(\GO::modules()->isInstalled("tasks")){
-			echo "\n\nProcessing tasks\n";
-			flush();
-			
-			$stmt = \GO\Tasks\Model\Tasklist::model()->find();
-			while($tasklist = $stmt->fetch()){
-				$eventStmt = $tasklist->tasks();
-				
-				if(!$eventStmt->rowCount()){
-					echo "Removing ".$tasklist->name."\n";
-					$tasklist->delete();
-					flush();
-				}
-			}
-		}
-		
-		
-		if(\GO::modules()->isInstalled("notes")){
-			echo "\n\nProcessing notes\n";
-			flush();
-			
-			$stmt = \GO\Notes\Model\Category::model()->find();
-			while($cat = $stmt->fetch()){
-				$eventStmt = $cat->notes();
-				
-				if(!$eventStmt->rowCount()){
-					echo "Removing ".$cat->name."\n";
-					$cat->delete();
-					flush();
-				}
-			}
-		}
+
 		
 	}	
 	

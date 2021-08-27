@@ -21,7 +21,8 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 			region: "west",
 			split: true,
 			// autoScroll: true,
-			layout: "border",
+			layout: "fitwidth",
+			bodyStyle: 'overflow-y: auto',
 			items: [
 				this.createAddressBookTree(),
 				this.createFilterPanel()
@@ -31,7 +32,7 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		this.contactDetail = new go.modules.community.addressbook.ContactDetail({
 			region: "east",
 			split: true,
-			width: dp(500),
+
 			tbar: [
 				//add a back button for small screens
 				{
@@ -69,10 +70,6 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 		this.addressBookTree = new go.modules.community.addressbook.AddressBookTree({
 			region:  "north",
 			split: true,
-			containerScroll: true,
-			autoScroll: true,
-			height: dp(300),
-			minHeight: dp(200),
 			enableDrop: true,
 			ddGroup: "addressbook",
 			ddAppendOnly: true,
@@ -101,14 +98,68 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 					},
 					scope: this
 
-				}]
+				}],
+
+			bbar: new Ext.Toolbar({
+				cls: 'go-bbar-load-more',
+				items:[
+					'',
+					this.loadMoreButton = new Ext.Button({
+						hidden: true,
+						text: t("Show more..."),
+						handler: () => {
+
+
+							const loader = this.addressBookTree.getLoader();
+
+							loader.clearOnLoad = false;
+							loader.position += loader.pageSize;
+
+							loader.load(this.addressBookTree.getRootNode(), (node) => {
+								loader.clearOnLoad = true;
+							});
+
+
+							// let o = this.store.lastOptions ? GO.util.clone(this.store.lastOptions) : {};
+							// o.add = true;
+							// o.params = o.params || {};
+							//
+							// o.params.position = o.params.position || 0;
+							// o.params.position += (o.params.limit || this.loadMorePageSize);
+							// o.params.limit = this.loadMorePageSize;
+							// o.paging = true;
+							//
+							// this.store.load(o);
+						}
+					})
+				]
+			})
+		});
+
+		this.addressBookTree.getLoader().on('load', (loader, node, response) => {
+			console.warn(response);
+
+			this.loadMoreButton.setVisible(response.queryResponse.hasMore);
 		});
 		
 		
-		//because the root node is not visible it will auto expand on render.
+		//because the root node is not visible it will auto expand on render. This depends on the user address book settings
 		this.addressBookTree.getRootNode().on('expand', function (node) {
-			//when expand is done we'll select the first node. This will trigger a selection change. which will load the grid below.
-			this.addressBookTree.getSelectionModel().select(node.firstChild);
+			var abSettings = go.User.addressBookSettings, abNode = null;
+			if (abSettings.startIn == "allcontacts") {
+				//when expand is done we'll select the first node. This will trigger a selection change. which will load the grid below.
+				this.addressBookTree.getSelectionModel().select(node.firstChild);
+			} else if (abSettings.startIn == "starred") {
+				abNode = node.findChild('id', 'starred');
+			} else if (abSettings.startIn == "remember" && abSettings.lastAddressBookId > 0) {
+				abNode = node.findChild('id', 'AddressBook-' + abSettings.lastAddressBookId);
+			} else {
+				abNode = node.findChild('id', 'AddressBook-' + abSettings.defaultAddressBookId);
+			}
+			if (abNode) {
+				this.addressBookTree.getSelectionModel().select(abNode);
+			}
+
 		}, this);
 
 		//load the grid on selection change.
@@ -127,9 +178,18 @@ go.modules.community.addressbook.MainPanel = Ext.extend(go.modules.ModulePanel, 
 				this.grid.store.setFilter("starred", {starred: true});
 				this.setAddressBookId(null);
 			} else if (node.attributes.entity.name === "AddressBook") {
-				this.setAddressBookId(node.attributes.data.id);
-			} else
-			{
+				var addressBookId = node.attributes.data.id, abSettings = go.User.addressBookSettings;
+				this.setAddressBookId(addressBookId);
+				if(abSettings.startIn == "remember" && abSettings.lastAddressBookId != addressBookId) {
+					var update = {};
+					update[go.User.id] = {'addressBookSettings': {
+						lastAddressBookId:addressBookId
+					}};
+					go.Db.store("User").set({
+						'update': update
+					});
+				}
+			} else {
 				this.setGroupId(node.attributes.data.id, node.attributes.data.addressBookId);
 			}
 		}, this);

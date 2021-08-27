@@ -92,19 +92,21 @@ abstract class EntityController extends Controller {
 		
 		/* @var $query Query */
 
-		$sort = $this->transformSort($params['sort']);		
-
-		if(!empty($query->getGroupBy())) {
-			//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)		
-			$keys = $cls::getPrimaryKey();
-			foreach($keys as $key) {
-				if(!isset($sort[$key])) {
-					$sort[$key] = 'ASC';
-				}
-			}
-		}
+		$sort = $this->transformSort($params['sort']);
 		
 		$cls::sort($query, $sort);
+
+		if(!empty($query->getGroupBy())) {
+			//always add primary key for a stable sort. (https://dba.stackexchange.com/questions/22609/mysql-group-by-and-order-by-giving-inconsistent-results)
+			$keys = $cls::getPrimaryKey();
+			$pkSort = [];
+			foreach($keys as $key) {
+				if(!isset($sort[$key])) {
+					$pkSort[$key] = 'ASC';
+				}
+			}
+			$query->orderBy($pkSort, true);
+		}
 
 		$query->select($cls::getPrimaryKey(true)); //only select primary key
 
@@ -200,17 +202,19 @@ abstract class EntityController extends Controller {
 		
 		$p = $this->paramsQuery($params);
 		$idsQuery = $this->getQueryQuery($p);
-		$idsQuery->fetchMode(PDO::FETCH_NUM);
+		$idsQuery->fetchMode(PDO::FETCH_COLUMN, 0);
 		
 		$ids = [];		
 
 		try {
-			foreach ($idsQuery as $record) {
-				if (!isset($count)) {
-					$count = count($record);
-				}
-				$ids[] = $count ? $record[0] : implode('-', $record);
-			}
+//			foreach ($idsQuery as $record) {
+//				if (!isset($count)) {
+//					$count = count($record);
+//				}
+//				$ids[] = $count ? $record[0] : implode('-', $record);
+//			}
+
+			$ids = $idsQuery->all();
 
 			if($p['calculateHasMore'] && count($ids) > $params['limit']) {
 				$hasMore = !!array_pop($ids);
@@ -293,12 +297,10 @@ abstract class EntityController extends Controller {
 		$transformed = [];
 
 		foreach ($sort as $s) {
-			if(is_array($s) && isset($s['property'])) {
-				$transformed[$s['property']] = (isset($s['isAscending']) && $s['isAscending']===false) ? 'DESC' : 'ASC';
-			} else { // for backward compatibility
-				$parts = explode(' ', $s);
-				$transformed[$parts[0]] = $parts[1] ?? 'ASC';
+			if(!isset($s['property'])) {
+				throw new Exception("'sort' parameter is invalid.");
 			}
+			$transformed[$s['property']] = (isset($s['isAscending']) && $s['isAscending']===false) ? 'DESC' : 'ASC';
 		}
 		
 		return $transformed;		
@@ -743,7 +745,7 @@ abstract class EntityController extends Controller {
 				continue;
 			}
 
-			$doDestroy[] = $id;
+			$doDestroy[] = $entity->id();
 		}
 		$cls = $this->entityClass();
 

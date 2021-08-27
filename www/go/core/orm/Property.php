@@ -12,10 +12,13 @@ use go\core\db\Statement;
 use go\core\db\Utils;
 use go\core\event\EventEmitterTrait;
 use go\core\fs\Blob;
+use go\core\model\Alert as CoreAlert;
+use go\core\model\User;
 use go\core\util\DateTime;
 use go\core\util\StringUtil;
 use go\core\validate\ErrorCode;
 use go\core\validate\ValidationTrait;
+use go\modules\community\tasks\model\Task;
 use PDO;
 use PDOException;
 use ReflectionClass;
@@ -359,6 +362,10 @@ abstract class Property extends Model {
 				$query->andWhere($field . '= :'.$field);
 			}
 
+			if(is_a($relation->entityName, UserProperty::class, true)){
+				$query->andWhere('userId', '=', go()->getAuthState()->getUserId() ?? null);
+			}
+
 			if(!empty($relation->orderBy)) {
 				$query->orderBy([$relation->orderBy => 'ASC']);
 			}
@@ -531,7 +538,10 @@ abstract class Property extends Model {
    * @return string eg. "1" or with multiple keys: "1-2"
    * @throws Exception
    */
-	public function id() {		
+	public function id() {
+		if(property_exists($this, 'id')) {
+			return $this->id;
+		}
 		$keys = $this->primaryKeyValues();
 		if(empty($keys)) {
 			return false;
@@ -752,18 +762,27 @@ abstract class Property extends Model {
 	 * @throws Exception
 	 */
 	protected static function internalFindById($id, array $properties = [], $readOnly = false) {
-		$tables = static::getMapping()->getTables();
-		$primaryTable = array_shift($tables);
-		$keys = $primaryTable->getPrimaryKey();
-		
 		$query = static::internalFind($properties, $readOnly);
-		
-		//Used count check here because a customer managed to get negative ID's in the database.
-		$ids = count($keys) == 1 ? [$id] : explode('-', $id);
-		$keys = array_combine($keys, $ids);
+		$keys = static::idToPrimaryKeys($id);
 		$query->where($keys);
 		
 		return $query->single();
+	}
+
+	/**
+	 * Changes the string key "1-2" into ['primaryKey1' => 1', 'primaryKey2' => '2]
+	 *
+	 * @param string $id eg. "1-2"
+	 * @return array eg. ['primaryKey1' => 1', 'primaryKey2' => '2]
+	 * @throws Exception
+	 */
+	public static function idToPrimaryKeys($id) {
+		$primaryTable = static::getMapping()->getPrimaryTable();
+
+		//Used count check here because a customer managed to get negative ID's in the database.
+		$keys = $primaryTable->getPrimaryKey();
+		$ids = count($keys) == 1 ? [$id] : explode('-', $id);
+		return array_combine($keys, $ids);
 	}
 
   /**
@@ -909,7 +928,16 @@ abstract class Property extends Model {
 	 * Get all the modified properties with their new and old values.
 	 * 
 	 * Only database columns and relations are tracked. Not the getters and setters.
-	 * 
+	 *
+	 * @example getting removed id's from array properry
+	 *
+	 * ```
+	 * foreach($modified[1] as $model) {
+			if(!in_array($model, $modified[0])) {
+				CoreAlert::delete(['entityTypeId' => Task::entityType()->getId(), 'tag' => $model->id]);
+			}
+	  }
+	 * ```
 	 * @param array|string $properties If given only these properties will be checked for modifications.
 	 * @return array ["propName" => [newval, oldval]]
 	 */
@@ -1496,19 +1524,25 @@ abstract class Property extends Model {
 		}
 		
 		$this->{$relation->name} = [];
-		foreach ($models as $newProp) {
-			
+		foreach ($models as $mapKey => $newProp) {
+
 			if($newProp === null) {
 				//deleted model
 				continue;
 			}
-			
+
 			//Check for invalid input
 			if(!($newProp instanceof Property)) {
 				throw new Exception("Invalid value given for '". $relation->name ."'. Should be a GO\Orm\Property");
 			}
-			
+
 			$this->applyRelationKeys($relation, $newProp);
+
+			// This wen't bad when creating new map values with "ext-gen1" as key.
+//			foreach ($this->mapKeyToValues($mapKey, $relation) as $propName => $value) {
+//				$newProp->$propName = $value;
+//			}
+
 			if (!$newProp->internalSave()) {
 				$this->relatedValidationErrors = $newProp->getValidationErrors();
 				return false;
@@ -1517,8 +1551,8 @@ abstract class Property extends Model {
 			$this->savedPropertyRelations[] = $newProp;
 			$this->relatedValidationErrorIndex++;
 			
-			$key = $this->buildMapKey($newProp, $relation);
-			$this->{$relation->name}[$key] = $newProp;
+			//$key = $this->buildMapKey($newProp, $relation);
+			$this->{$relation->name}[$mapKey] = $newProp;
 		}
 
 		//If the array is empty then set it to null because an empty array will be converted to an array in JSON while a map should be an object.
@@ -1629,14 +1663,13 @@ abstract class Property extends Model {
 		// }
 		
 		try {
-			if ($recordIsNew) {				
-				
-				
+			if ($recordIsNew) {
+
 				foreach($table->getConstantValues() as $colName => $value) {
 					$modifiedForTable[$colName] = $value;
 				}
 
-				if(empty($modifiedForTable)) {
+				if(empty($modifiedForTable) && (!$table->isUserTable || !static::getMapping()->hasUserTableRelation())) {
 					//if there's no primary key we might get here.
 					return true;
 				}
@@ -1647,7 +1680,7 @@ abstract class Property extends Model {
 					$modifiedForTable[$to] = $this->{$from};
 				}
 
-				if($table->isUserTable) {
+				if($table->isUserTable || $this instanceof UserProperty) {
 					$modifiedForTable["userId"] = go()->getUserId();
 				}
 
@@ -1727,6 +1760,9 @@ abstract class Property extends Model {
 	 * @param MappedTable $table
 	 */
 	private function rollBackAutoIncrement(MappedTable $table) {
+		if(!$this->recordIsNew($table)) {
+			return;
+		}
 		$aiCol = $table->getAutoIncrementColumn();
 
 		if ($aiCol) {
@@ -1822,9 +1858,11 @@ abstract class Property extends Model {
 		$stmt = go()->getDbConnection()->delete($primaryTable->getName(), $query);
 		if(!$stmt->execute()) {			
 			return false;
-		}	
+		}
 
-		if(count($blobIds)) {			
+		go()->debug("Deleted " . $stmt->rowCount() ." models of type " .static::class);
+
+		if(count($blobIds)) {
 			$blobs = Blob::find()->where('id', '=', $blobIds);
 			foreach($blobs as $blob) {
 				$blob->setStaleIfUnused();
@@ -2250,6 +2288,44 @@ abstract class Property extends Model {
 		return $v;
 	}
 
+	/**
+	 * By the default the primary key of the first mapped table is used.
+	 * If you're composing a complex model or extended model you might need to override this
+	 * to allow a key from multiple tables.
+	 *
+	 * @example
+	 * ```
+	 *
+	 * protected static function defineMapping()
+	 * {
+	 * 	return parent::defineMapping()
+	 * 		->addTable("business_finance_contact_business", "biz", ["c.id" => "biz.contactId"])
+	 * 		->setQuery((new Query())
+	 * 		->select('min(doc.expiresAt) AS expiresAt', true)
+	 * 		->join(
+	 * 		"business_finance_document",
+	 * 		"doc",
+	 * 		"doc.organizationId = c.id AND doc.businessId = biz.businessId AND doc.type = '". FinanceDocument::TYPE_SALES_INVOICE ."'",
+	 * 		"INNER")
+	 * 		->groupBy(['c.id'])
+	 * 	  );
+	 * 	}
+	 *
+	 * 	protected static function definePrimaryKey()
+	 * 	{
+	 * 	  return ['id', 'businessId'];
+	 * 	}
+	 *
+	 * ```
+	 * @return string[]
+	 * @throws Exception
+	 */
+	protected static function definePrimaryKey() {
+		$tables = static::getMapping()->getTables();
+		$primaryTable = array_shift($tables);
+		return $primaryTable->getPrimaryKey();
+	}
+
   /**
    * Get the primary key column names.
    *
@@ -2259,16 +2335,18 @@ abstract class Property extends Model {
    * @return string[]
    * @throws Exception
    */
-	public static function getPrimaryKey($withTableAlias = false) {
-		$tables = static::getMapping()->getTables();
-		$primaryTable = array_shift($tables);
-		$keys = $primaryTable->getPrimaryKey();
+	public static final function getPrimaryKey($withTableAlias = false) {
+
+		$keys = static::definePrimaryKey();
+
 		if(!$withTableAlias) {
 			return $keys;
 		}
+
 		$keysWithAlias = [];
 		foreach($keys as $key) {
-			$keysWithAlias[] = $primaryTable->getAlias() . '.' . $key;
+			$alias = static::getMapping()->getColumn($key)->table->getAlias();
+			$keysWithAlias[] = $alias . '.' . $key;
 		}
 		return $keysWithAlias;
 	}

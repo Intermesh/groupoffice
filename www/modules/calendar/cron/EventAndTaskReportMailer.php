@@ -205,26 +205,26 @@ class eventAndTaskPdf extends \GO\Base\Util\Pdf {
 	 * @return \GO\Tasks\Model\Task[]
 	 */
 	private function _getTasks($user){	
-		$defaultTasklist = \GO\Tasks\Model\Tasklist::model()->getDefault($user);
-		
-		$todayStart = strtotime('today');
-		$todayEnd = strtotime('tomorrow');
-		
-		if($defaultTasklist){
-			$findParams = \GO\Base\Db\FindParams::newInstance()
-			->select()
-			->order(array('start_time','name'),array('ASC','ASC'))
-			->criteria(\GO\Base\Db\FindCriteria::newInstance()
-					->addCondition('tasklist_id', $defaultTasklist->id)
-					->addCondition('start_time', $todayStart,'>=')
-					->addCondition('start_time', $todayEnd,'<')
-			);
-			$tasks = \GO\Tasks\Model\Task::model()->find($findParams);
-			
-			return $tasks->fetchAll();
-		} else {
+//		$defaultTasklist = \GO\Tasks\Model\Tasklist::model()->getDefault($user);
+//
+//		$todayStart = strtotime('today');
+//		$todayEnd = strtotime('tomorrow');
+//
+//		if($defaultTasklist){
+//			$findParams = \GO\Base\Db\FindParams::newInstance()
+//			->select()
+//			->order(array('start_time','name'),array('ASC','ASC'))
+//			->criteria(\GO\Base\Db\FindCriteria::newInstance()
+//					->addCondition('tasklist_id', $defaultTasklist->id)
+//					->addCondition('start_time', $todayStart,'>=')
+//					->addCondition('start_time', $todayEnd,'<')
+//			);
+//			$tasks = \GO\Tasks\Model\Task::model()->find($findParams);
+//
+//			return $tasks->fetchAll();
+//		} else {
 			return array();
-		}
+//		}
 	}
 	
 	/**

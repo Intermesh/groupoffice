@@ -45,6 +45,7 @@ use GO;
 use go\core\db\Query;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
+use go\core\model\Alert;
 use go\core\model\Link;
 use go\core\model\User;
 use go\core\orm\SearchableTrait;
@@ -1312,8 +1313,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 
 		if(empty($params['fields']))
 			$params['fields']=$this->getDefaultFindSelectFields(isset($params['limit']) && $params['limit']==1);
-		else
-			go()->debug($params['fields']);
+//		else
+//			go()->debug($params['fields']);
 
 
 		$fields = $params['fields'].' ';
@@ -5572,5 +5573,55 @@ abstract class ActiveRecord extends \GO\Base\Model{
 		$cls = static::class;
 		return substr($cls, strrpos($cls, '\\') + 1);
 	}
-	
+
+
+	/**
+	 * Create an alert for this entity
+	 *
+	 * @param \DateTimeInterface $triggerAt
+	 * @param string $tag A unique tag for this entity and user. It will replace existing ones.
+	 * @param int $userId The user this alert is for. Defaults to current user.
+	 * @return \go\core\model\Alert
+	 * @throws Exception
+	 */
+	public function createAlert(\DateTimeInterface $triggerAt,
+	                            $tag,
+	                            $userId = null) {
+		$alert = new \go\core\model\Alert();
+
+		$alert->triggerAt = $triggerAt;
+		$alert->userId = $userId ?? go()->getAuthState()->getUserId();
+		$alert->entityId =  $this->id;
+		$alert->setEntity(static::entityType()->getName());
+		$alert->tag = $tag;
+
+		return $alert;
+	}
+
+	/**
+	 * Delete an alert
+	 *
+	 * @param string $tag A unique tag for this entity and user. It will replace existing ones.
+	 * @param int $userId The user this alert is for. Defaults to current user.
+	 * @return bool
+	 * @throws Exception
+	 */
+	public function deleteAlert($tag, $userId = null) {
+		return Alert::delete([
+			'entityTypeId' => self::entityType()->getId(),
+			'entityId' => $this->id,
+			'tag' => $tag,
+			'userId' => $userId ?? go()->getAuthState()->getUserId()
+		]);
+	}
+
+	/**
+	 * Called when reminders are deleted / dismissed
+	 *
+	 *
+	 * @param Alert[] $alerts
+	 */
+	public static function dismissAlerts(array $alerts) {
+
+	}
 }

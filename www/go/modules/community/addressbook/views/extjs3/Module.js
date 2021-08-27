@@ -33,8 +33,9 @@ go.Modules.register("community", "addressbook", {
 		 */
 		relations: {
 			organizations: {store: "Contact", fk: "organizationIds"},
-			creator: {store: "User", fk: "createdBy"},
-			modifier: {store: "User", fk: "createdBy"},
+			creator: {store: "UserDisplay", fk: "createdBy"},
+			// modifier: {store: "UserDisplay", fk: "createdBy"},
+			modifier: {store: "UserDisplay", fk: "modifiedBy"},
 			addressbook: {store: "AddressBook", fk: "addressBookId"},
 			test: {store: "AddressBook", fk: "testId"}
 		},
@@ -152,7 +153,7 @@ go.Modules.register("community", "addressbook", {
 				multiple: true
 			},  {
 				name: 'jobTitle',
-				title: t("Job title"),
+				title: t("Job title") + "/" +  t("LOB"),
 				type: "string",
 				multiple: true
 			},  {

@@ -1009,6 +1009,7 @@ function whereis($cmd)
 {
 	if(strtoupper(substr(PHP_OS, 0, 3)) != 'WIN')
 	{
+		$return = null;
 		exec('whereis '.$cmd, $return);
 
 		if(isset($return[0]))

@@ -1,4 +1,5 @@
 go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
+	itemId: "authentication", //makes it routable
 	initComponent: function () {
 		this.domainCombo = GO.SystemSettingsDomainCombo = new go.login.DomainCombo({
 			fieldLabel: t("Default domain"),
@@ -32,6 +33,13 @@ go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
 							decimals: 0,
 							value: 0,
 							width: dp(72)
+						},
+						{
+							xtype:"textfield",
+							fieldLabel: t("Lost password URL"),
+							hint: t("You can set an URL to handle lost passwords in an alternative way"),
+							name: "lostPasswordURL",
+							anchor: "100%"
 						}
 					]
 			},

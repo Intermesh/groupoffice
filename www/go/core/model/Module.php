@@ -272,9 +272,9 @@ class Module extends Entity {
 		}
 		
 		if(!$module) {
-			throw new Exception("Module not found for ".$className);
-			
+			throw new Exception("Module not found for " . $className);
 		}
+
 		return $module;
 	}
 	
@@ -441,7 +441,8 @@ class Module extends Entity {
 	 * Returns all module entities with info
 	 * @return EntityType[]
 	 */
-	public function getEntities() {		
+	public function getEntities() :array
+	{
 		$es = [];
 
 		foreach(core\orm\EntityType::findAll((new core\orm\Query)->where(['moduleId' => $this->id])) as $e) {

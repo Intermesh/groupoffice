@@ -157,9 +157,9 @@ go.data.StoreTrait = {
 			return;
 		}
 
-		for(var id in changed) {
-			if(this.proxy.watchRelations[entityStore.entity.name].indexOf(changed[id].id) > -1) {
-				var o = go.util.clone(this.lastOptions);
+		changed.forEach((id) => {
+			if(this.proxy.watchRelations[entityStore.entity.name].indexOf(id) > -1) {
+				const o = go.util.clone(this.lastOptions);
 				o.params = o.params || {};
 				o.params.position = 0;
 				o.add = false;
@@ -168,23 +168,25 @@ go.data.StoreTrait = {
 					o.params.limit = this.lastOptions.params.position + (this.lastOptions.limit || this.baseParams.limit || 20);
 				}
 
-				var me = this;
-				this.load(o).then(function() {
-					me.fireEvent("changes", me);
+				this.load(o).then(() => {
+					this.fireEvent("changes", this);
 				});
 				return;
 			}
-		}		
+		});
 	},
 
 	onChanges : function(entityStore, added, changed, destroyed) {
+
+		// console.info(entityStore.entity.name, added, changed, destroyed);
+
 		if(!this.loaded || this.loading || !this.lastOptions) {
 			return;
 		}		
 
-		if(Object.keys(added).length || Object.keys(changed).length) {
+		if(added.length || changed.length) {
 			//we must reload because we don't know how to sort partial data.
-			var o = go.util.clone(this.lastOptions);
+			const o = go.util.clone(this.lastOptions);
 			o.params = o.params || {};
 			o.params.position = 0;
 			o.add = false;
@@ -193,19 +195,18 @@ go.data.StoreTrait = {
 				o.params.limit = this.lastOptions.params.position + (this.lastOptions.limit || this.baseParams.limit || 20);
 			}
 
-			var me = this;
-			this.load(o).then(function() {
-				me.fireEvent("changes", me);
+			this.load(o).then(() => {
+				this.fireEvent("changes", this);
 			})
 			return;
 		}
-		
-		for(var i = 0, l = destroyed.length; i < l; i++) {
-			var record = this.getById(destroyed[i]);
+
+		destroyed.forEach((id) =>{
+			const record = this.getById(id);
 			if(record) {
 				this.remove(record);
 			}
-		}
+		});
 
 		this.fireEvent("changes", this);
 	},

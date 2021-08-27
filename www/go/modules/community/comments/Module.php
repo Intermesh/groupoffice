@@ -1,14 +1,14 @@
 <?php
 namespace go\modules\community\comments;
 
+use GO\Base\Db\ActiveRecord;
 use go\core;
 use go\core\cron\GarbageCollection;
 use go\core\jmap\Entity;
-use go\core\orm\EntityType;
-use go\core\orm\Query;
-use GO\Base\Db\ActiveRecord;
+use Faker;
 use go\core\model\Group;
 use go\core\model\Module as GoModule;
+use go\modules\community\comments\model\Comment;
 
 class Module extends core\Module {	
 
@@ -62,5 +62,41 @@ class Module extends core\Module {
 //
 //			go()->debug("Deleted ". $stmt->rowCount() . " comments for $cls");
 //		}
+	}
+
+	/**
+	 * Create some demo comments
+	 *
+	 * @param Faker\Generator $faker
+	 * @param Entity|ActiveRecord $entity
+	 * @throws \Exception
+	 */
+	public static function demoComments(Faker\Generator $faker, $entity) {
+
+		gc_collect_cycles();
+
+		$faker = Faker\Factory::create();
+
+		$users = core\model\User::find(['id'])->limit(10)->all();
+
+		$userCount = count($users) - 1;
+
+		$commentCount = $faker->numberBetween(1, 5);
+
+		$date = $faker->dateTimeBetween("-2 years", "-" . $commentCount . "days");
+
+		for($i = 0; $i < $commentCount; $i++) {
+			$user = $users[$faker->numberBetween(0, $userCount)];
+
+			$comment = new Comment();
+			$comment->setEntity($entity);
+			$comment->text = nl2br($faker->realtext);
+			$comment->createdBy = $user->id;
+			$comment->date = $date;
+
+			$date = $date->add(new \DateInterval("P1D"));
+
+			$comment->save();
+		}
 	}
 }

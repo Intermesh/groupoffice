@@ -22,7 +22,7 @@ go.groups.GroupMemberWindow = Ext.extend(go.Window, {
           field: 'displayName',
           direction: 'ASC'
         },
-        entityStore: "User"
+        entityStore: "UserDisplay"
       }),
 
       tbar: [

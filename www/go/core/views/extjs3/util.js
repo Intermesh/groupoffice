@@ -364,13 +364,6 @@ go.util =  (function () {
 
 			} else
 			{
-				// for safari :(
-				if(go.util.downloadTarget)
-					go.util.downloadTarget.close();
-
-				// const win = this.getDownloadTargetWindow();
-				// win.location = url;
-
 				// document.location.href = url; //This causes connection errors with SSE or other simulanous XHR requests
 				if(!downloadFrame) {
 					// downloadFrame = document.createElement('iframe');

@@ -3,28 +3,29 @@
 namespace go\core {
 
 use Exception;
-use GO;
 use GO\Base\Observable;
 use go\core\auth\State as AuthState;
 use go\core\cache\CacheInterface;
-	use go\core\cache\Memcached;
-	use go\core\db\Connection;
+use go\core\db\Connection;
 use go\core\db\Database;
 use go\core\db\Query;
 use go\core\db\Table;
 use go\core\event\EventEmitterTrait;
 use go\core\event\Listeners;
 use go\core\exception\ConfigurationException;
-	use go\core\fs\Blob;
+use go\core\fs\Blob;
+	use go\core\fs\File;
 	use go\core\fs\Folder;
 use go\core\jmap\Request;
 use go\core\jmap\State;
 use go\core\mail\Mailer;
+	use go\core\model\User;
 	use go\core\orm\Property;
-	use go\core\util\ArrayObject;
-	use go\core\util\ArrayUtil;
-	use go\core\webclient\Extjs3;
+use go\core\util\ArrayObject;
+use go\core\webclient\Extjs3;
 use go\core\model\Settings;
+use Faker;
+
 use const GO_CONFIG_FILE;
 
 	/**
@@ -806,6 +807,32 @@ use const GO_CONFIG_FILE;
 			}
 
 			$blob->output(true);
+		}
+
+
+		public function demo(Faker\Generator $faker) {
+
+return;
+
+			for($i = 0; $i < 10; $i++) {
+				echo ".";
+				$user = new User();
+//				$blob = Blob::fromTmp(new File($faker->image(null, 640, 480, 'people')));
+//				$blob->save();
+//				$user->avatarId = $blob->id;
+				$user->username = $faker->username;
+				$user->displayName = $faker->name;
+				$user->email = $user->recoveryEmail = $user->username . '@' . $faker->domainName;
+				$user->setPassword($faker->password);
+
+				if(!$user->save()) {
+					var_dump($user->getValidationErrors());
+					exit();
+				}
+
+				// Generates tasklists, notebooks etc.
+				$user->toArray();
+			}
 		}
 	}
 

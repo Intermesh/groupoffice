@@ -81,45 +81,47 @@ Ext.define('go.grid.GridView', {
 		}
 	},
 
-	onRowOver : function(e, target) {
-		var row = this.findRowIndex(target);
+	onRowSelect : function(row) {
 
-		if (row !== false) {
-			this.addRowClass(row, this.rowOverCls);
+			this.addRowClass(row, this.selectedRowClass);
 
 			this.showActionButton(row);
-		}
+
 	},
 
 	initActionButton : function() {
 		if(this.actionConfig) {
 			this.actionBtn = new Ext.Button({
+				menuAlign: 'tr-br?',
 				iconCls: this.actionConfig.iconCls || 'ic-more-vert',
 				cls: "primary",
 				style: "position:absolute; z-index: 99999999; left: -9999999; top: -9999999",
 				renderTo: this.el,
-				handler: this.actionConfig.handler,
+				handler:  (btn, e) => {
+
+					if(this.actionConfig.handler) {
+						this.actionConfig.handler.call(this.actionConfig.scope || this, btn, e);
+					}
+				},
 				scope: this.actionConfig.scope,
 				menu: this.actionConfig.menu
 			});
-			this.scroller.dom.addEventListener("scroll", () => {
-				this.actionBtn.hide()
-				if(this.actionBtn.menu) {
-					this.actionBtn.menu.hide();
-				}
-			});
+			// this.scroller.dom.addEventListener("scroll", () => {
+			// 	this.actionBtn.hide()
+			// 	if(this.actionBtn.menu) {
+			// 		this.actionBtn.menu.hide();
+			// 	}
+			// });
 		}
 	},
 
 	showActionButton : function(rowIndex) {
+
   	if(!this.actionBtn) {
   		return;
 		}
 
 		this.actionBtn.show();
-  	if(this.actionBtn.menu) {
-			this.actionBtn.menu.hide();
-		}
 
   	var rowEl = Ext.get(this.getRow(rowIndex));
 
@@ -137,18 +139,33 @@ Ext.define('go.grid.GridView', {
 		if(this.actionBtn.menu) {
 			this.actionBtn.menu.rowIndex = rowIndex;
 		}
-	},
 
-
-	onRowOut : function(e, target) {
-		var row = this.findRowIndex(target);
-
-		if (row !== false && !e.within(this.getRow(row), true)) {
-			this.removeRowClass(row, this.rowOverCls);
-
+		if(GO.util.isMobileOrTablet()) {
+			this.actionBtn.showMenu();
+		} else
+		{
+			if(this.actionBtn.menu) {
+				this.actionBtn.menu.hide();
+			}
 		}
 
+		return this.actionBtn;
 	},
+
+
+	// onRowOut : function(e, target) {
+	// 	var row = this.findRowIndex(target);
+	//
+	// 	if (row !== false && !e.within(this.getRow(row), true)) {
+	// 		this.removeRowClass(row, this.rowOverCls);
+	//
+	// 	}
+	//
+	// 	if(this.actionBtn && !e.within(this.actionBtn.el, true)) {
+	// 		this.actionBtn.hide();
+	// 	}
+	//
+	// },
 
 	destroy : function() {
 		this.callParent(arguments);
