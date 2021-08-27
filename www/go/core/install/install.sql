@@ -1018,10 +1018,10 @@ create unique index core_alert_entityTypeId_entityId_tag_userId_uindex
 CREATE TABLE `core_pdf_block` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `pdfTemplateId` bigint(20) UNSIGNED NOT NULL,
-  `x` int(11) NOT NULL,
-  `y` int(11) NOT NULL,
-  `width` int(11) NOT NULL,
-  `height` int(11) NOT NULL,
+  `x` int(11)  NULL,
+  `y` int(11)  NULL,
+  `width` int(11)  NULL,
+  `height` int(11)  NULL,
   `align` enum('L','C','R','J') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'L',
   `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'text'
@@ -1030,6 +1030,7 @@ CREATE TABLE `core_pdf_block` (
 CREATE TABLE `core_pdf_template` (
   `id` bigint(20) UNSIGNED NOT NULL,
   `moduleId` int(11) NOT NULL,
+  `key` varchar(20) default null,
   `language` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'en',
   `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `stationaryBlobId` binary(40) DEFAULT NULL,
@@ -1044,11 +1045,11 @@ CREATE TABLE `core_pdf_template` (
 
 
 ALTER TABLE `core_pdf_block`
-  ADD UNIQUE KEY `id` (`id`),
+  ADD PRIMARY KEY `id` (`id`),
   ADD KEY `pdfTemplateId` (`pdfTemplateId`);
 
 ALTER TABLE `core_pdf_template`
-  ADD UNIQUE KEY `id` (`id`),
+  ADD PRIMARY KEY `id` (`id`),
   ADD KEY `moduleId` (`moduleId`),
   ADD KEY `stationaryBlobId` (`stationaryBlobId`);
 

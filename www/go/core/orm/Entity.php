@@ -252,7 +252,7 @@ abstract class Entity extends Property {
 		foreach($ids as $id) {
 			$idParts = explode('-', $id);
 			if(count($idParts) != $keyCount) {
-				throw new Exception("Given id is invalid (" . $id . ")");
+				throw new Exception("Given id is invalid (" . $id . "). Key must have " . $keyCount ." parts concatenated with a '-'.");
 			}
 			for($i = 0; $i < $keyCount; $i++) {			
 				$idArr[$i][] = $idParts[$i];

@@ -1054,3 +1054,18 @@ $updates['202107160929'][] = "alter table core_alert
 	add constraint fk_alert_user
 		foreign key (userId) references core_user (id)
 			on delete cascade;";
+
+
+
+
+
+$updates['202108271038'][] = "alter table core_pdf_block modify x int null;";
+
+$updates['202108271038'][] = "alter table core_pdf_block modify y int null;";
+
+$updates['202108271038'][] = "alter table core_pdf_block modify width int null;";
+
+$updates['202108271038'][] = "alter table core_pdf_block modify height int null;";
+
+$updates['202108271038'][] = "alter table core_pdf_template
+	add `key` varchar(20) default null null after moduleId;";
