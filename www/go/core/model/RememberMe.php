@@ -209,7 +209,7 @@ class RememberMe extends Entity {
 			return false;
 		}
 
-		if(true || !password_verify($cookieParts[1], $rememberMe->token)) {
+		if(!password_verify($cookieParts[1], $rememberMe->token)) {
 			// clear logins
 			Token::delete(['userId' => $rememberMe->userId]);
 			RememberMe::delete(['userId' => $rememberMe->userId]);
