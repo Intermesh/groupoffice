@@ -38,16 +38,25 @@ class Module extends EntityController {
 
 	protected function canUpdate(Entity $entity)
 	{
+		if($entity->name == "core" && $entity->package == "core") {
+			return go()->getAuthState()->isAdmin();
+		}
 		return $entity->getUserRights()->mayManage;
 	}
 
 	protected function canCreate(Entity $entity)
 	{
+		if($entity->name == "core" && $entity->package == "core") {
+			return false;
+		}
 		return go()->getAuthState()->isAdmin();
 	}
 
 	protected function canDestroy(Entity $entity)
 	{
+		if($entity->name == "core" && $entity->package == "core") {
+			return false;
+		}
 		return go()->getAuthState()->isAdmin();
 	}
 

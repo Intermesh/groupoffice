@@ -147,6 +147,9 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 					if (record.data.permissions[me.groupId]) { // when loaded
 						const rights = record.data.permissions[me.groupId].rights;
 						for (var r in rights) {
+							if(r == 'mayRead') {
+								continue;
+							}
 							if (rights[r])
 								permissions.push(t(r, record.json.name, record.json.package));
 						}
