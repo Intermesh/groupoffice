@@ -432,6 +432,7 @@ abstract class Property extends Model {
 	 */
 	private function watchProperties() {
 
+
 		$cacheKey = 'watch-props-' . static::class;
 
 		$ret = App::get()->getCache()->get($cacheKey);
@@ -449,6 +450,9 @@ abstract class Property extends Model {
 			}
 		}
 
+		$exclude = ['isNew', 'oldProps', 'fetchProperties', 'selectedProperties', 'owner'];
+		$p = array_diff($p, $exclude);
+
 		App::get()->getCache()->set($cacheKey, $p);
 
 		return array_unique($p);
@@ -461,7 +465,9 @@ abstract class Property extends Model {
 	private function trackModifications() {
 		foreach ($this->watchProperties() as $propName) {
 			$v = $this->$propName;
-			$this->oldProps[$propName] = is_object($v) ? clone $v : $v;
+
+			//if value is a property then don't copy since we will use ->isModified() to track
+			$this->oldProps[$propName] = ($v instanceof self ) ? null : $v;
 		}
 	}
 
@@ -982,7 +988,6 @@ abstract class Property extends Model {
 		$modified = [];
 
 		foreach($properties as $key) {
-			if($key === 'owner') continue;
 
 			$oldValue = $this->oldProps[$key] ?? null;
 			
