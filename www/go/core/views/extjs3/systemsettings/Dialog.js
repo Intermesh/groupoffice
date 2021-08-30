@@ -122,11 +122,11 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 			this.addPanel(go.defaultpermissions.SystemSettingsPanel);
 		}
 		let c = go.User.capabilities['go:core:core'] || {};
-		if(c.mayViewCustomFields)
+		if(c.mayChangeCustomFields)
 			this.addPanel(go.customfields.SystemSettingsPanel);
-		if(c.mayViewUsers)
+		if(c.mayChangeUsers)
 			this.addPanel(go.users.SystemSettingsUserGrid);
-		if(c.mayViewGroups)
+		if(c.mayChangeGroups)
 			this.addPanel(go.groups.SystemSettingsGroupGrid);
 		if(go.User.isAdmin) {
 			this.addPanel(go.modules.SystemSettingsModuleGrid);

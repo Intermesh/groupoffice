@@ -6,11 +6,8 @@ return array (
 	// Permission labels
 	'mayManage' => 'Manage',
 	'mayChangeUsers' => 'Change users',
-	'mayViewUsers' => 'View users',
-	'mayViewGroups' => 'View groups',
 	'mayChangeGroups' => 'Change groups',
 	'mayChangeCustomFields' => 'Change custom fields',
-	'mayViewCustomFields' => 'View custom fields',
 	'mayChangeWelcomeMsg' => 'Change welcome message',
 
   'shortDays' => 

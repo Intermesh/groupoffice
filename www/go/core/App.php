@@ -105,11 +105,8 @@ use const GO_CONFIG_FILE;
 		 */
 		protected function rights() {
 			return [
-				'mayViewUsers',
 				'mayChangeUsers',
-				'mayViewGroups',
 				'mayChangeGroups',
-				'mayViewCustomFields',
 				'mayChangeCustomFields'
 			];
 		}

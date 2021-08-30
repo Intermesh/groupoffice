@@ -65,7 +65,7 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 			handler: function() {
 				const corePermissionDlg = new go.modules.GroupRights();
 				go.Db.store('Module').single(1).then((core) =>
-					corePermissionDlg.show(core, ['mayViewUsers', 'mayChangeUsers', 'mayViewGroups', 'mayChangeGroups', 'mayViewCustomFields', 'mayChangeCustomFields'])
+					corePermissionDlg.show(core, ['mayChangeUsers', 'mayChangeGroups', 'mayChangeCustomFields'])
 				)
 			}
 		},this.trialButton = new Ext.Button({
