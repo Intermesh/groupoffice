@@ -74,7 +74,7 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 					name: 'selected',
 					type: {
 						convert: function (v, data) {
-							return !!(data.permissions && data.permissions[3]);
+							return !!(data.permissions && data.permissions[me.groupId]);
 						}
 					},
 					sortType: function (checked) {
@@ -139,8 +139,8 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 					if (!me.showLevels) {
 						return "";
 					}
-					if (!record.data.permissions) {
-						return t('Unavailable');
+					if (!record.data.permissions || !record.data.selected) {
+						return "-";
 					}
 					meta.style = "position:relative";
 					let result, permissions = [];
@@ -210,16 +210,21 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 	},
 
 	onCheckChange: function (record, value) {
+		// console.log(record);
 		var oldValue = record.data.permissions;
+		if(!oldValue) {
+			oldValue = {};
+		}
 		if (value) {
-			// change old value
-			record.set('permissions', oldValue);
-			this.value[record.data.id] = record.data.level;
+			if(!oldValue[this.groupId]) {
+				oldValue[this.groupId] = {rights: {}};
+			}
 		} else {
 			// remove me from old value
-			record.set('permissions', oldValue);
-			this.value[record.data.id] = null;
+			delete oldValue[this.groupId];
 		}
+
+		record.set('permissions', oldValue);
 
 		this._isDirty = true;
 	},
@@ -239,9 +244,9 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 	},
 
 	afterEdit: function (e) {
-		this.value = this.value || {};
-		this.value[e.record.id] = {permissions: e.value};
-		console.log(e.value);
+		// this.value = this.value || {};
+		// this.value[e.record.id] = {permissions: e.value};
+		// console.log(e.value);
 		//this.value[e.record.id] = e.record.data.level;
 		this._isDirty = true;
 	},
@@ -316,8 +321,9 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 	},
 
 	setValue: function (groups) {
+		console.log(groups);
 		this._isDirty = false;
-		this.value = groups || {};
+		//this.value = groups || {};
 		this.store.load().catch(function () {
 		}); //ignore failed load becuase onBeforeStoreLoad can return false
 	},
@@ -358,7 +364,12 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 	},
 
 	getValue: function () {
-		return this.value;
+		let v = {};
+		this.store.getModifiedRecords().forEach((r) => {
+			v[r.id] = {permissions: r.data.permissions};
+		});
+
+		return v;
 	},
 
 	markInvalid: function (msg) {
