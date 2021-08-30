@@ -21,13 +21,23 @@ class User extends EntityController {
 
 	protected function canUpdate(Entity $entity) {
 		
-		if(!go()->getAuthState()->isAdmin()) {
+		if(!$this->rights->mayChangeUsers) {
 			if($entity->isModified('groups')) {
 				return false;
 			}
 		}
 		
 		return parent::canUpdate($entity);
+	}
+
+	protected function canDestroy(Entity $entity)
+	{
+		return $this->rights->mayChangeUsers;
+	}
+
+	protected function canCreate(Entity $entity)
+	{
+		return $this->rights->mayChangeUsers;
 	}
 	
 	/**

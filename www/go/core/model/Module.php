@@ -24,22 +24,13 @@ class Module extends Entity {
 		if(\GO::user()->isAdmin())
 			return 50;
 
-		$userId = go()->getAuthState()->getUserId();
-		$moduleId = $this->id;
+		$rights = $this->getUserRights();
 
-		$groupedRights = "SELECT BIT_OR(rights) as rights FROM core_permission WHERE groupId IN (SELECT groupId from core_user_group WHERE userId = ".$userId.") AND moduleId = ".$moduleId.";";
-
-		$rights = \go()->getDbConnection()->query($groupedRights)->fetch(\PDO::FETCH_COLUMN);
-		if($rights < 1) {
-			return 10;
-		}
-		if($this->name == 'project2' && $rights == 1) { // a single exception for this compat method
+		if($this->name == 'project2' && $rights->mayFinance) { // a single exception for this compat method
 			return 40;
 		}
-		if($rights >= 1) { // we only have mayManage for old modules
-			return 50;
-		}
-		return 0;
+
+		return !empty($rights->mayManage) ? 50 : 10;
 	}
 
 	protected function canCreate()
@@ -115,9 +106,6 @@ class Module extends Entity {
 		return true;
 	}
 
-	public function package(){
-		return self::PACKAGE_COMMUNITY;
-	}
 	
 	private function nextSortOrder() {
 		$query = new Query();			
@@ -138,6 +126,43 @@ class Module extends Entity {
 	protected static function defineMapping() {
 		return parent::defineMapping()->addTable('core_module', 'm')
 			->addMap('permissions', Permission::class, ['id'=>'moduleId']);
+	}
+
+	public function getUserRights() {
+
+		if(go()->getAuthState()->isAdmin()) {
+			$rights = ["mayRead" => true];
+			foreach($this->module()->getRights() as $name => $bit){
+				$rights[$name] = true;
+			}
+			return (object) $rights;
+		}
+
+		$r = go()->getDbConnection()->selectSingleValue("MAX(rights)")
+			->from("core_permission")
+			->where('moduleId', '=', $this->id)
+			->where("groupId", "IN",
+				go()->getDbConnection()
+					->select("groupId")
+					->from("core_user_group")
+					->where(['userId' => go()->getAuthState()->getUserId()])
+			)->single();
+
+		if($r === null) {
+			$rights = ["mayRead" => false];
+			foreach($this->module()->getRights() as $name => $bit){
+				$rights[$name] = false;
+			}
+			return (object) $rights;
+		}
+
+		$r = decbin($r);
+
+		$rights = ["mayRead" => true];
+		foreach($this->module()->getRights() as $name => $bit){
+			$rights[$name] = !!($r & $bit);
+		}
+		return (object) $rights;
 	}
 
 	protected static function defineFilters() {

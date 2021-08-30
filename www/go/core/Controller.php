@@ -21,21 +21,28 @@ abstract class Controller {
       throw new Exception(401, "Unauthorized");
 		}
 
-		if(!$this->getModulePermissionLevel()) {
-			$mod = Module::findByClass(static::class, ['name', 'package']);
-			throw new Exception(403, str_replace('{module}', $mod->package . "/" . $mod->name, go()->t("Forbidden, you don't have access to module '{module}'.")));
-		}
+    $this->rights = $this->getClassRights();
+
+    if(!$this->checkModulePermissions()) {
+	    $mod = Module::findByClass(static::class, ['name', 'package']);
+	    throw new Exception(403, str_replace('{module}', $mod->package . "/" . $mod->name, go()->t("Forbidden, you don't have access to module '{module}'.")));
+    }
+
 	}
 
+	protected $rights;
 
-	private $modulePermissionLevel;
+	protected function checkModulePermissions() {
+		return $this->rights->mayRead;
+	}
+
 
 	/**
 	 * Get the permission level of the module this controller belongs to.
 	 * 
 	 * @return int
 	 */
-	protected function getModulePermissionLevel() {
-		return go()->getAuthState()->getClassPermissionLevel(static::class);
+	protected function getClassRights() {
+		return go()->getAuthState()->getClassRights(static::class);
 	}
 }

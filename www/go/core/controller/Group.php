@@ -13,15 +13,19 @@ class Group extends EntityController {
 	
 	protected function canUpdate(Entity $entity) {
 		
-		if(!go()->getAuthState()->isAdmin()) {
-			if($entity->isModified('groups')) {
-				return false;
-			}
-		}
-		
-		return parent::canUpdate($entity);
+		return $this->rights->mayChangeGroups;
 	}
-	
+
+	protected function canDestroy(Entity $entity)
+	{
+		return $this->rights->mayChangeGroups;
+	}
+
+	protected function canCreate(Entity $entity)
+	{
+		return $this->rights->mayChangeGroups;
+	}
+
 	/**
 	 * The class name of the entity this controller is for.
 	 * 

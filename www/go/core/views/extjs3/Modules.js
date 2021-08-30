@@ -75,7 +75,7 @@ go.Modules = (function () {
 		 * 
 		 * @param {string} package
 		 * @param {string} name
-		 * @param {int} Required permission level
+		 * @param {int} @deprecated Required permission level
 		 * @param {User} User entity
 		 * @returns {boolean}
 		 */

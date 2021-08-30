@@ -292,8 +292,8 @@ class State extends AbstractState {
 	 * 
 	 * @return int
 	 */
-	public function getClassPermissionLevel($cls) {
-		return $this->getToken()->getClassPermissionLevel($cls);
+	public function getClassRights($cls) {
+		return $this->getToken()->getClassRights($cls);
 	}
 
 }

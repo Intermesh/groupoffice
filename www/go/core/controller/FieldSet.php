@@ -4,11 +4,26 @@ namespace go\core\controller;
 
 use go\core\customfield\Base;
 use go\core\fs\Blob;
+use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\core\model;
 
 class FieldSet extends EntityController {
 
+	protected function canUpdate(Entity $entity)
+	{
+		return $this->rights->mayChangeCustomFields;
+	}
+
+	protected function canDestroy(Entity $entity)
+	{
+		return $this->rights->mayChangeCustomFields;
+	}
+
+	protected function canCreate(Entity $entity)
+	{
+		return $this->rights->mayChangeCustomFields;
+	}
 	/**
 	 * The class name of the entity this controller is for.
 	 * 

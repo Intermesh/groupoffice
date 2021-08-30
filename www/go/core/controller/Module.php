@@ -3,10 +3,12 @@
 namespace go\core\controller;
 
 use go\core\exception\NotFound;
+use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\core\jmap\exception\InvalidArguments;
 use go\core\jmap\Response;
 use go\core\model;
+use go\core\orm\Query;
 
 
 class Module extends EntityController {
@@ -19,16 +21,44 @@ class Module extends EntityController {
 	protected function entityClass() {
 		return model\Module::class;
 	}
-	
-		
+
+	private function filterPermissions(Query $query) {
+
+		if(go()->getAuthState()->isAdmin()) {
+			return $query;
+		}
+
+		$query->join("core_permission", "p" , "p.moduleId = m.id")
+			->join("core_user_group", "ug", "ug.groupId = p.groupId AND ug.userId = :userId")
+			->bind(':userId', go()->getAuthState()->getUserId())
+			->groupBy(['m.id']);
+
+		return $query;
+	}
+
+	protected function canUpdate(Entity $entity)
+	{
+		return $entity->getUserRights()->mayManage;
+	}
+
+	protected function canCreate(Entity $entity)
+	{
+		return go()->getAuthState()->isAdmin();
+	}
+
+	protected function canDestroy(Entity $entity)
+	{
+		return go()->getAuthState()->isAdmin();
+	}
+
 	protected function getQueryQuery($params)
 	{
-		return parent::getQueryQuery($params)->orderBy(['sort_order' => 'ASC']);
+		return $this->filterPermissions(parent::getQueryQuery($params))->orderBy(['sort_order' => 'ASC']);
 	}
 
 	protected function getGetQuery($params)
 	{
-		return parent::getGetQuery($params)->orderBy(['sort_order' => 'ASC']);
+		return $this->filterPermissions(parent::getGetQuery($params))->orderBy(['sort_order' => 'ASC']);
 	}
 
 	public function installLicensed(){

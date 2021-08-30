@@ -28,7 +28,7 @@ class Permission extends Property {
 	// int to [name => bool]
 	public function getRights(){
 		$types = $this->owner->module()->getRights();
-		$rights = [];
+		$rights = ['mayRead' => true];
 		foreach($types as $name => $bit){
 			if($this->rights & $bit) {
 				$rights[$name] = true;

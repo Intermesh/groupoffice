@@ -83,8 +83,8 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 			]
 		});
 
-		if(go.User.isAdmin)
-			Ext.apply(this, {buttons:[this.saveButton]});
+
+		Ext.apply(this, {buttons:[this.saveButton]});
 
 
 		this.tools = [{
@@ -149,8 +149,12 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	
 	loadModulePanels : function() {
 		var available = go.Modules.getAvailable(), config, pnl, i, i1, sepAdded = false;
-		
+
 		for(i = 0, l = available.length; i < l; i++) {
+
+			if(!available[i].userRights.mayManage) {
+				continue;
+			}
 			
 			config = go.Modules.getConfig(available[i].package, available[i].name);
 			
