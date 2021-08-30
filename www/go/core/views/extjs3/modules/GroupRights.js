@@ -59,6 +59,7 @@ go.modules.GroupRights = Ext.extend(go.Window, {
 			}],
 			layout: 'fit',
 			items: [this.gridfield = new go.form.GridField({
+				autoExpandColumn: "groupName",
 				hideHeaders: false,
 				autoHeight: false,
 				cls: '',
@@ -109,6 +110,7 @@ go.modules.GroupRights = Ext.extend(go.Window, {
 				header: t('Group'),
 				dataIndex: 'groupId',
 				align:'left',
+				id: 'groupName',
 				renderer: function(v, m, r) {
 					return '<i class="icon">' + (r.data.isUserGroupFor ? 'person' : 'people') + '</i>&nbsp;&nbsp;' + r.data.groupName;
 				}
@@ -125,6 +127,7 @@ go.modules.GroupRights = Ext.extend(go.Window, {
 		for(let prop of rights) {
 			fields.push({name: prop, mapping: 'rights.'+prop});
 			cols.push({
+				id: prop,
 				header: t(prop, this.module.name, this.module.package),
 				dataIndex: prop,
 			})

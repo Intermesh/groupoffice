@@ -473,7 +473,6 @@ class Installer {
 		$module  = GoCoreModule::findByName("core", "core");
 		if(!isset($module->permisions[Group::ID_EVERYONE])) {
 			$everyone = new model\Permission($module);
-			$everyone->groupId = Group::ID_EVERYONE;
 			$module->permissions[Group::ID_EVERYONE] = $everyone;
 			$module->save();
 		}
