@@ -1,3 +1,5 @@
+- Core: Fixed php 7.0 compatibility issue
+
 26-08-2021 6.4.242
 - Email: strpos() error when deleting folders with disabled Trash folder
 - Tickets: Enable disabling using of alternative URL
