@@ -140,6 +140,17 @@ abstract class Module extends Singleton {
 
 		try{
 
+			$model = new model\Module();
+			$model->name = static::getName();
+			$model->package = static::getPackage();
+			$model->version = $this->getUpdateCount();
+			$model->checkDepencencies = false;
+
+			if(!$this->beforeInstall($model)) {
+				go()->warn(static::class .'::beforeInstall returned false');
+				return false;
+			}
+
 			go()->getDbConnection()->pauseTransactions();
 
 			self::installDependencies($this);
@@ -154,12 +165,6 @@ abstract class Module extends Singleton {
 			}
 
 			go()->getDbConnection()->beginTransaction();
-		
-			$model = new model\Module();
-			$model->name = static::getName();
-			$model->package = static::getPackage();
-			$model->version = $this->getUpdateCount();
-			$model->checkDepencencies = false;
 
 			if(!$model->save()) {
 				$this->rollBack();
@@ -325,6 +330,17 @@ abstract class Module extends Singleton {
 	 * @return bool
 	 */
 	protected function afterInstall(model\Module $model) {
+		return true;
+	}
+
+	/**
+	 * Override to implement installation routines after the database has been
+	 * created. Share the module with group "Internal" for example.
+	 *
+	 * @param model\Module $model
+	 * @return bool
+	 */
+	protected function beforeInstall(model\Module $model) {
 		return true;
 	}
 	

@@ -1540,9 +1540,11 @@ abstract class Property extends Model {
 			$this->applyRelationKeys($relation, $newProp);
 
 			// This wen't bad when creating new map values with "ext-gen1" as key.
-//			foreach ($this->mapKeyToValues($mapKey, $relation) as $propName => $value) {
-//				$newProp->$propName = $value;
-//			}
+			foreach ($this->mapKeyToValues($mapKey, $relation) as $propName => $value) {
+				if(empty($newProp->$propName)) {
+					$newProp->$propName = $value;
+				}
+			}
 
 			if (!$newProp->internalSave()) {
 				$this->relatedValidationErrors = $newProp->getValidationErrors();
@@ -2188,13 +2190,16 @@ abstract class Property extends Model {
 
 					$this->$propName[$id] = $this->internalNormalizeRelation($relation, $patch);
 
-					if (is_bool($patch)) {
+					//Why?
+//					if (is_bool($patch)) {
 						// if($relation->type == Relation::TYPE_MAP) {
 						//Only change key to values when using booleans. Key can also be made up by the client.
 						foreach ($this->mapKeyToValues($id, $relation) as $key => $value) {
-							$this->$propName[$id]->$key = $value;
+							if(empty($this->$propName[$id]->$key)) {
+								$this->$propName[$id]->$key = $value;
+							}
 						}
-					}
+//					}
 				}
 			}
 		}

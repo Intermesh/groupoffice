@@ -18,6 +18,7 @@ class Module extends Entity {
 	public $admin_menu;
 	public $version;
 	public $enabled;
+	public $permissions = [];
 
 	// for backwards compatibility
 	public function getPermissionLevel() {

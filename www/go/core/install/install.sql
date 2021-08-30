@@ -523,8 +523,7 @@ ALTER TABLE `core_link`
 
 ALTER TABLE `core_module`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `name` (`name`),
-  ADD KEY `aclId` (`aclId`);
+  ADD UNIQUE KEY `name` (`name`);
 
 ALTER TABLE `core_search`
   ADD PRIMARY KEY (`id`),
@@ -735,8 +734,6 @@ ALTER TABLE `core_link`
   ADD CONSTRAINT `fromEntity` FOREIGN KEY (`fromEntityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `toEntity` FOREIGN KEY (`toEntityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `core_module`
-  ADD CONSTRAINT `acl` FOREIGN KEY (`aclId`) REFERENCES `core_acl` (`id`);
 
 ALTER TABLE `core_search`
   ADD CONSTRAINT `core_search_ibfk_1` FOREIGN KEY (`entityTypeId`) REFERENCES `core_entity` (`id`) ON DELETE CASCADE;

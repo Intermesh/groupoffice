@@ -23,6 +23,7 @@ use PDOException;
 use go\core\model\Module as GoCoreModule;
 use GO\Base\Db\ActiveRecord;
 use go\core\model\Acl;
+use PHPUnit\Framework\ExpectationFailedException;
 
 class Installer {
 	
@@ -145,7 +146,9 @@ class Installer {
 
 		foreach ($installModules as $installModule) {
 			if(!$installModule->isInstalled()) {
-				$installModule->install();
+				if(!$installModule->install()) {
+					throw new Exception("Failed to install module " .get_class($installModule));
+				}
 			}
 		}
 
@@ -205,12 +208,14 @@ class Installer {
 		$module->name = 'core';
 		$module->package = 'core';
 		$module->version = App::get()->getUpdateCount();
+
+		//Share core with everyone
+		$module->permissions[Group::ID_EVERYONE] = (new model\Permission($module))
+			->setRights(['mayRead' => true]);
 		if(!$module->save()) {
 			throw new \Exception("Could not save core module: " . var_export($module->getValidationErrors(), true));
 		}
 
-		//Share core with everyone
-		$module->findAcl()->addGroup(Group::ID_EVERYONE)->save();
 
 		$this->createGarbageCollection();
 
