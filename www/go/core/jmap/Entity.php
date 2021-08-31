@@ -149,6 +149,11 @@ abstract class Entity  extends OrmEntity {
 	 * @throws \GO\Base\Exception\AccessDenied
 	 */
 	private function checkFilesFolder($force = false) {
+
+		if(!Module::isInstalled('legacy', 'files')) {
+			return true;
+		}
+
 		if(!self::$checkFilesFolder || empty($this->filesFolderId)) {
 			return true;
 		}
