@@ -373,6 +373,9 @@ class Module extends Entity {
 	 * @return string[] static list of available rights
 	 */
 	public function getRights() {
+		if(!$this->isAvailable()) {
+			return [];
+		}
 		$module = $this->module();
 		return array_keys($module->getRights());
 	}
