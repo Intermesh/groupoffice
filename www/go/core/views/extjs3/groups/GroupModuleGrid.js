@@ -21,6 +21,9 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 			this.value = {};
 		}
 
+
+		var me = this;
+
 		var checkColumn = new GO.grid.CheckColumn({
 			width: dp(64),
 			dataIndex: 'selected',
@@ -31,12 +34,11 @@ go.groups.GroupModuleGrid = Ext.extend(go.grid.EditorGridPanel, {
 				change: this.onCheckChange,
 				scope: this
 			},
-			isDisabled: function (record) {
-				return record.data.package === "core";
+			isDisabled: (record) => {
+				return record.data.package === "core" && this.groupId == 2;
 			}
 		});
 
-		var me = this;
 
 		this.store = new go.data.Store({
 			sortInfo: {
