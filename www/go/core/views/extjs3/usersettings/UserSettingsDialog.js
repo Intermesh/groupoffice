@@ -319,6 +319,16 @@ go.usersettings.UserSettingsDialog = Ext.extend(go.Window, {
 							field.markInvalid(response.notUpdated[id].validationErrors[name].description);
 						}
 					}
+
+					switch(response.notUpdated[id].type) {
+						case 'forbidden':
+							GO.errorDialog.show(t("Permission denied"));
+							break;
+
+						default:
+							GO.errorDialog.show(t("Sorry, an error occurred") +": " + response.notUpdated[id].type);
+							break;
+					}
 				}
 				
 				this.actionComplete();
