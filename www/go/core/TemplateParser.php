@@ -268,7 +268,7 @@ class TemplateParser {
 		
 		$count = count($openMatches);
 		if($count != count($closeMatches)) {
-			throw new Exception("Open and close tags don't match");
+			throw new Exception("Invalid template open and close tags of [if] and/or [each] don't match");
 		}
 		
 		$tags = [];		
