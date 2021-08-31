@@ -333,7 +333,7 @@ class Folder extends \GO\Base\Db\ActiveRecord {
 		if($this->parent_id==0 && $this->acl_id==0){
 			//top level folders are readonly to everyone.
 			$this->readonly=1;
-			$this->acl_id=\GO::modules()->files->acl_id;
+			$this->acl_id = Acl::getReadOnlyAclId();
 		}
 		return parent::validate();
 	}

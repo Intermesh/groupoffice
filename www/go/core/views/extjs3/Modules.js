@@ -75,7 +75,7 @@ go.Modules = (function () {
 		 * 
 		 * @param {string} package
 		 * @param {string} name
-		 * @param {int} Required permission level
+		 * @param {int} @deprecated Required permission level
 		 * @param {User} User entity
 		 * @returns {boolean}
 		 */
@@ -104,8 +104,16 @@ go.Modules = (function () {
 			}
 
 			//if a user is given we must check the groups			
-			for(let groupId in module.acl) {
-				if(module.acl[groupId] >= permissionLevel && user.groups.indexOf(parseInt(groupId)) != -1) {
+			for(let groupId in module.permissions) {
+				const p = module.permissions[groupId];
+				let allow;
+				if(permissionLevel > go.permissionLevels.read) {
+					allow = p.right.mayManage;
+				} else
+				{
+					allow = true;
+				}
+				if(allow && user.groups.indexOf(parseInt(groupId)) != -1) {
 					return true;
 				}
 			}

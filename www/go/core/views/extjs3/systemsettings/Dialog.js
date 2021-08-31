@@ -80,11 +80,11 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 			items: [
 				this.selectMenu,
 				this.tabPanel
-			],
-			buttons:[
-				this.saveButton
 			]
 		});
+
+
+		Ext.apply(this, {buttons:[this.saveButton]});
 
 
 		this.tools = [{
@@ -113,20 +113,27 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 			'submitStart' : true,
 			'submitComplete' : true
 		});
-		
-		this.addPanel(go.systemsettings.GeneralPanel);
-		this.addPanel(go.systemsettings.AppearancePanel);
-		this.addPanel(go.systemsettings.NotificationsPanel);
-		this.addPanel(go.systemsettings.AuthenticationPanel);
-		this.addPanel(go.defaultpermissions.SystemSettingsPanel);
-		this.addPanel(go.customfields.SystemSettingsPanel);
-		this.addPanel(go.users.SystemSettingsUserGrid);
-		this.addPanel(go.groups.SystemSettingsGroupGrid);
-		this.addPanel(go.modules.SystemSettingsModuleGrid);
-		this.addPanel(go.tools.SystemSettingsTools);
-		this.addPanel(go.oauth.SystemSettingsPanel);
-		this.addPanel(go.cron.SystemSettingsCronGrid, null, 'divider');
 
+		if(go.User.isAdmin) {
+			this.addPanel(go.systemsettings.GeneralPanel);
+			this.addPanel(go.systemsettings.AppearancePanel);
+			this.addPanel(go.systemsettings.NotificationsPanel);
+			this.addPanel(go.systemsettings.AuthenticationPanel);
+			this.addPanel(go.defaultpermissions.SystemSettingsPanel);
+		}
+		let c = go.User.capabilities['go:core:core'] || {};
+		if(c.mayChangeCustomFields)
+			this.addPanel(go.customfields.SystemSettingsPanel);
+		if(c.mayChangeUsers)
+			this.addPanel(go.users.SystemSettingsUserGrid);
+		if(c.mayChangeGroups)
+			this.addPanel(go.groups.SystemSettingsGroupGrid);
+		if(go.User.isAdmin) {
+			this.addPanel(go.modules.SystemSettingsModuleGrid);
+			this.addPanel(go.tools.SystemSettingsTools);
+			this.addPanel(go.oauth.SystemSettingsPanel);
+			this.addPanel(go.cron.SystemSettingsCronGrid, null, 'divider');
+		}
 
 		this.loadModulePanels();
 		
@@ -142,8 +149,12 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 	
 	loadModulePanels : function() {
 		var available = go.Modules.getAvailable(), config, pnl, i, i1, sepAdded = false;
-		
+
 		for(i = 0, l = available.length; i < l; i++) {
+
+			if(!available[i].userRights.mayManage) {
+				continue;
+			}
 			
 			config = go.Modules.getConfig(available[i].package, available[i].name);
 			

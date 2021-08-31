@@ -140,6 +140,17 @@ abstract class Module extends Singleton {
 
 		try{
 
+			$model = new model\Module();
+			$model->name = static::getName();
+			$model->package = static::getPackage();
+			$model->version = $this->getUpdateCount();
+			$model->checkDepencencies = false;
+
+			if(!$this->beforeInstall($model)) {
+				go()->warn(static::class .'::beforeInstall returned false');
+				return false;
+			}
+
 			go()->getDbConnection()->pauseTransactions();
 
 			self::installDependencies($this);
@@ -154,12 +165,6 @@ abstract class Module extends Singleton {
 			}
 
 			go()->getDbConnection()->beginTransaction();
-		
-			$model = new model\Module();
-			$model->name = static::getName();
-			$model->package = static::getPackage();
-			$model->version = $this->getUpdateCount();
-			$model->checkDepencencies = false;
 
 			if(!$model->save()) {
 				$this->rollBack();
@@ -260,7 +265,7 @@ abstract class Module extends Singleton {
 			return true;
 		}
 		
-		$moduleModel = $this->getModel();
+		$moduleModel = $this->getModel(['id']);
 		if(!$moduleModel) {
 			throw new Exception("Module not installed " . static::class);
 		}
@@ -269,7 +274,7 @@ abstract class Module extends Singleton {
 			if(!$type) {
 				throw new Exception("Could not register entity type for module ". $this->getName() . " with name " . $entity::getClientName());
 			}
-			$typeModuleModel = $type->getModule();
+			$typeModuleModel = $type->getModule(['id']);
 			
 			if(!$typeModuleModel) {
 				throw new Exception("Could not register entity type for module ". $this->getName() . " with name " . $entity::getClientName() .' because existing type with ID = '.$type->getId().' had no module.' );
@@ -325,6 +330,17 @@ abstract class Module extends Singleton {
 	 * @return bool
 	 */
 	protected function afterInstall(model\Module $model) {
+		return true;
+	}
+
+	/**
+	 * Override to implement installation routines after the database has been
+	 * created. Share the module with group "Internal" for example.
+	 *
+	 * @param model\Module $model
+	 * @return bool
+	 */
+	protected function beforeInstall(model\Module $model) {
 		return true;
 	}
 	
@@ -391,6 +407,24 @@ abstract class Module extends Singleton {
 	 */
 	abstract function getAuthor();
 
+	/**
+	 * The names of the properties that can be set as permission. The value will be a label (to be translated by client)
+	 * When this is not overriden there are no extra permissions. Groups van still be added
+	 * @return array name => label
+	 */
+	public function getRights() {
+		$types = $this->rights();
+		$result = [];
+		foreach($types as $i => $name) {
+			$result[$name] = pow(2, $i);
+		}
+		return $result;
+	}
+
+	// default backwards compatible
+	protected function rights() {
+		return ['mayManage'];
+	}
 	/**
 	 * Get dependent modules.
 	 * 
@@ -631,10 +665,10 @@ abstract class Module extends Singleton {
 	 * 
 	 * @return model\Module
 	 */
-	public function getModel() {
+	public function getModel($props = []) {
 
 		if(!$this->model) {
-			$this->model = model\Module::findByName($this->getPackage(), $this->getName(), null);
+			$this->model = model\Module::findByName($this->getPackage(), $this->getName(), null, $props);
 		}
 
 		return $this->model;

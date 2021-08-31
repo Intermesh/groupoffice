@@ -129,7 +129,7 @@ class Group extends AclOwnerEntity {
 			return false;
 		}
 		
-		$this->saveModules();
+//		$this->saveModules();
 
 		if(!$this->isNew()) {
 			return true;
@@ -180,50 +180,50 @@ class Group extends AclOwnerEntity {
 	}
 
 
-	public function getModules() {
-		$modules = [];
+//	public function getModules() {
+//		$modules = [];
+//
+//		$mods = Module::find()
+//							->select('id,level')
+//							->fetchMode(\PDO::FETCH_ASSOC)
+//							->join('core_acl_group', 'acl_g', 'acl_g.aclId=m.aclId')
+//							->where(['acl_g.groupId' => $this->id])
+//							->all();
+//
+//		if(empty($mods)) {
+//			//return null because an empty array is serialzed as [] instead of {}
+//			return null;
+//		}
+//
+//		foreach($mods as $m) {
+//			$modules[$m['id']] = $m['level'];
+//		}
+//
+//		return $modules;
+//	}
+//
+//	private $setModules;
+//
+//	public function setModules($modules) {
+//		$this->setModules = $modules;
+//	}
 
-		$mods = Module::find()
-							->select('id,level')
-							->fetchMode(\PDO::FETCH_ASSOC)
-							->join('core_acl_group', 'acl_g', 'acl_g.aclId=m.aclId')
-							->where(['acl_g.groupId' => $this->id])
-							->all();
-
-		if(empty($mods)) {
-			//return null because an empty array is serialzed as [] instead of {}
-			return null;
-		}
-
-		foreach($mods as $m) {
-			$modules[$m['id']] = $m['level'];
-		}
-
-		return $modules;
-	}
-
-	private $setModules;
-
-	public function setModules($modules) {
-		$this->setModules = $modules;
-	}
-
-	private function saveModules() {
-		if(!isset($this->setModules)) {
-			return true;
-		}
-
-		foreach($this->setModules as $moduleId => $level) {
-			$module = Module::findById($moduleId);
-			if(!$module) {
-				throw new \Exception("Module with ID " . $moduleId . " not found");
-			}
-			$module->setAcl([
-				$this->id => $level
-			]);
-			$module->save();
-		}
-	}
+//	private function saveModules() {
+//		if(!isset($this->setModules)) {
+//			return true;
+//		}
+//
+//		foreach($this->setModules as $moduleId => $level) {
+//			$module = Module::findById($moduleId);
+//			if(!$module) {
+//				throw new \Exception("Module with ID " . $moduleId . " not found");
+//			}
+//			$module->setAcl([
+//				$this->id => $level
+//			]);
+//			$module->save();
+//		}
+//	}
 
 	public static function findPersonalGroupID($userId) {
 		$groupId = Group::find()

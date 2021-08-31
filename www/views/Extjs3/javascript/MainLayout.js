@@ -376,12 +376,11 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	
 	addDefaultRoutes : function() {
 		var me = this;
+		var c = go.User.capabilities['go:core:core'] || {};
+		go.Router.add(/systemsettings\/?([a-z0-9-_]*)?/i, function(tabId) {
+			me.openSystemSettings().setActiveItem(tabId);
+		});
 
-		if(go.User.isAdmin) {
-			go.Router.add(/systemsettings\/?([a-z0-9-_]*)?/i, function(tabId) {		
-				me.openSystemSettings().setActiveItem(tabId);
-			});
-		}
 
 		//Add these default routes on boot so they are added as last options for sure.
 		//
@@ -689,7 +688,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 
 		if(go.User.isAdmin) {
 
-			if(go.Modules.get("core", "core").settings.readOnlyKeys.indexOf('license') == -1) {
+			if (go.Modules.get("core", "core").settings.readOnlyKeys.indexOf('license') == -1) {
 				this.userMenuLink.menu.insert(6, {
 					iconCls: 'ic-app-registration',
 					text: t("Register"),
@@ -700,7 +699,14 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 					scope: this
 				});
 			}
+		}
+		var c = go.User.capabilities['go:core:core'] || {};
 
+		this.systemSettingsWindow = new go.systemsettings.Dialog({
+			closeAction: "hide"
+		});
+
+		if(this.systemSettingsWindow.tabPanel.items.getCount()) {
 			this.userMenuLink.menu.insert(3, {
 				text: t("System settings"),
 				iconCls: 'ic-settings',
@@ -736,9 +742,7 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 	openSystemSettings : function() {
 
 		GO.viewport.items.each(function(i){i.hide()});
-		this.systemSettingsWindow = new go.systemsettings.Dialog({
-			closeAction: "hide"
-		});
+
 
 		this.systemSettingsWindow.show();
 
@@ -760,9 +764,8 @@ Ext.extend(GO.MainLayout, Ext.util.Observable, {
 						}
 					}, coreMod.id);
 
-					go.systemsettingsDialog = new go.systemsettings.Dialog();
-					go.systemsettingsDialog.show();
-				});
+						this.systemsettingsDialog.show();
+				}, this);
 			}
 
 			if(!coreMod.settings.licenseDenied && !coreMod.settings.license) {

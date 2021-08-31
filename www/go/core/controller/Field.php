@@ -2,12 +2,28 @@
 
 namespace go\core\controller;
 
+use go\core\jmap\Entity;
 use go\core\jmap\EntityController;
 use go\core\model;
 
 
 class Field extends EntityController {
-	
+
+	protected function canUpdate(Entity $entity)
+	{
+		return $this->rights->mayChangeCustomFields;
+	}
+
+	protected function canDestroy(Entity $entity)
+	{
+		return $this->rights->mayChangeCustomFields;
+	}
+
+	protected function canCreate(Entity $entity)
+	{
+		return $this->rights->mayChangeCustomFields;
+	}
+
 	/**
 	 * The class name of the entity this controller is for.
 	 * 

@@ -46,6 +46,25 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	{	
 		return parent::model($className);
 	}
+
+	public function getPermissionLevel() {
+		if(\GO::user()->isAdmin())
+			return 50;
+
+		$userId =\GO::user()->id;
+		$moduleId = $this->id;
+
+		$groupedRights = "SELECT BIT_OR(rights) as rights FROM core_permission WHERE groupId IN (SELECT groupId from core_user_group WHERE userId = ".$userId.") AND moduleId = ".$moduleId.";";
+
+		$rights = \go()->getDbConnection()->query($groupedRights)->fetch(\PDO::FETCH_COLUMN);
+		if($rights < 1) {
+			return 10;
+		}
+		if($rights == 1) { // we only have mayManage for old modules
+			return 50;
+		}
+		return 0;
+	}
 	
 	protected function nextSortOrder() {
 		$query = new \go\core\db\Query();			
@@ -103,9 +122,6 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		return $module;
 	}
 
-	public function aclField() {
-		return 'aclId';
-	}
 
 	public function tableName() {
 		return 'core_module';
@@ -192,8 +208,10 @@ class Module extends \GO\Base\Db\ActiveRecord {
 	
 	protected function afterSave($wasNew) {
 		
-		if(!$this->admin_menu && $wasNew)
-			$this->acl->addGroup(\GO::config()->group_internal);
+		if(!$this->admin_menu && $wasNew) {
+			go()->getDbConnection()->insert('core_permission', ['moduleId' => $this->id, 'groupId' => \go\core\model\Group::ID_INTERNAL])->execute();
+		}
+
 		
 		if($wasNew){			
 			if($this->moduleManager)
@@ -216,26 +234,23 @@ class Module extends \GO\Base\Db\ActiveRecord {
 				}
 			}
 		}
+
+		$users = User::model()->find(
+			(new \GO\Base\Db\FindParams())
+				->join('core_user_group', 'u.id = ug.userId', 'ug')
+				->join('core_permission', 'p.groupId = ug.groupId', 'ug')
+				->getCriteria()->addRawCondition('p.moduleId = '.$this->id)
+			);
 		
-		$this->acl->getAuthorizedUsers(
-						$this->aclId, 
-						Acl::READ_PERMISSION, 
-						function($user, $models){		
-							foreach ($models as $model)
-								$model->getDefault($user);		
-						}, array($models));
+
+		foreach($users as $user) {
+			foreach ($models as $model) {
+				$model->getDefault($user);
+			}
+		}
 	}
 	
-	/**
-	 * @deprecated since 6.3
-	 * Added to be backwards compatible
-	 * 
-	 * @return ACL ID
-	 */
-	public function getAcl_id(){
-		return $this->aclId;
-	}
-	
+
 	protected function beforeDelete() {
 		
 		

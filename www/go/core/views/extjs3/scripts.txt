@@ -176,6 +176,7 @@ cron/SystemSettingsCronGrid.js
 
 tools/SystemSettingsTools.js
 
+groups/ModulePermissionCombo.js
 groups/SystemSettingsGroupGrid.js
 groups/GroupDialog.js
 groups/GroupUserGrid.js
@@ -244,6 +245,7 @@ search/SearchField.js
 
 modules/SystemSettingsModuleGrid.js
 modules/PermissionsWindow.js
+modules/GroupRights.js
 
 
 filter/Conditions.js

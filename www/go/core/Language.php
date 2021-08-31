@@ -311,7 +311,7 @@ class Language {
 	 */
 	private function findLangOverride($lang, $package, $module) {
 
-		if(Installer::isInstalling()) {
+		if(Installer::isInProgress()) {
 			return false;
 		}
 		$admin = User::findById(1, ['homeDir']);

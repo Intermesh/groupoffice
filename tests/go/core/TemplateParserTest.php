@@ -29,7 +29,7 @@ class TemplateParserTest extends \PHPUnit\Framework\TestCase
 		$contact1->firstName = "John";
 		$contact1->lastName = "Doe";
 
-		$contact1->addresses[0] = $a = new Address();
+		$contact1->addresses[0] = $a = new Address($contact1);
 
 		$a->type = Address::TYPE_POSTAL;
 		$a->street =	"Street";

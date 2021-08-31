@@ -95,6 +95,19 @@ abstract class Entity extends Property {
 	const EVENT_SORT = "sort";
 
 	/**
+	 * Constructor
+	 *
+	 * @param boolean $isNew Indicates if this model is saved to the database.
+	 * @param string[] $fetchProperties The properties that were fetched by find. If empty then all properties are fetched
+	 * @param bool $readOnly Entities can be fetched readonly to improve performance
+	 * @throws Exception
+	 */
+	public function __construct($isNew = true, $fetchProperties = [], $readOnly = false)
+	{
+		parent::__construct(null, $isNew, $fetchProperties, $readOnly);
+	}
+
+	/**
 	 * Find entities
 	 *
 	 * Returns a query object that's also directly iterable:
@@ -585,9 +598,12 @@ abstract class Entity extends Property {
    * @throws Exception
    */
 	public function findAclId() {
-		$moduleId = static::entityType()->getModuleId();
-		
-		return Module::findById($moduleId)->findAclId();
+
+		return null;
+//
+//		$moduleId = static::entityType()->getModuleId();
+//
+//		return Module::findById($moduleId)->findAclId();
 	}
 
 
@@ -819,7 +835,6 @@ abstract class Entity extends Property {
    * @return Query
    * @throws Exception
    */
-
 	public static function filter(Query $query, array $filter) {
 		static::getFilters()->apply($query, $filter);
 		return $query;

@@ -1054,3 +1054,38 @@ $updates['202107160929'][] = "alter table core_alert
 	add constraint fk_alert_user
 		foreign key (userId) references core_user (id)
 			on delete cascade;";
+
+
+$updates['202107221420'][] = "CREATE TABLE `core_permission` (
+  `moduleId` INT NOT NULL,
+  `groupId` INT NOT NULL,
+  `rights` BIGINT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`moduleId`, `groupId`),
+  INDEX `fk_permission_group_idx` (`groupId` ASC),
+  CONSTRAINT `fk_permission_module`
+      FOREIGN KEY (`moduleId`)
+          REFERENCES `core_module` (`id`)
+          ON DELETE CASCADE
+          ON UPDATE NO ACTION,
+  CONSTRAINT `fk_permission_group`
+      FOREIGN KEY (`groupId`)
+          REFERENCES `core_group` (`id`)
+          ON DELETE CASCADE
+          ON UPDATE NO ACTION);";
+
+// migratie module acl permission to action permission
+$updates['202107221420'][] = "INSERT IGNORE INTO core_permission (groupId, rights, moduleId) SELECT ag.groupId, IF(ag.level > 10, 1,0), a.entityId FROM core_acl_group ag 
+join core_acl a on a.id = ag.aclId 
+join core_entity e on e.id = a.entityTypeId
+WHERE e.name = 'Module';";
+// projects2 has finance permissions
+$updates['202107221420'][] = "UPDATE core_permission p
+join core_acl_group ag on ag.groupId = p.groupId
+join core_acl a on a.id = ag.aclId
+join core_module m on a.entityId = m.id
+SET rights = IF(ag.level=10,0,IF(ag.level=40,1,3))
+WHERE a.entityId = p.moduleId AND  m.name = 'projects2';";
+
+
+$updates['202108271613'][] = "alter table core_module drop foreign key acl;";
+$updates['202108271613'][] = "alter table core_module drop column aclId;";

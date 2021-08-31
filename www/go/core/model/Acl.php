@@ -182,7 +182,7 @@ class Acl extends Entity {
 			return $this;
 		}
 
-		$this->groups[] = (new AclGroup())
+		$this->groups[] = (new AclGroup($this))
 								->setValues([
 										'groupId' => $groupId, 
 										'level' => $level

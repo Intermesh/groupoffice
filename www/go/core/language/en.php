@@ -3,6 +3,13 @@ return array (
   'name' => 'Group-Office Core',
   'description' => 'Contains basic functions for Group-Office to function properly.',
   'product_name' => '{product_name}',
+	// Permission labels
+	'mayManage' => 'Manage',
+	'mayChangeUsers' => 'Change users',
+	'mayChangeGroups' => 'Change groups',
+	'mayChangeCustomFields' => 'Change custom fields',
+	'mayChangeWelcomeMsg' => 'Change welcome message',
+
   'shortDays' => 
   array (
     0 => 'Sun',

@@ -1,15 +1,17 @@
 go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 
-	autoHeight: true,
+
 	viewConfig: {
 		scrollOffset: 0,
 		emptyText: t("Empty"),
 		deferEmptyText: false
 	},
+
+	mapKey: false, // when set property is a map with this value as key
 	
 	cls: 'go-grid3-form-field',
 	hideHeaders: true,
-	clicksToEdit: 1,
+	clicksToEdit: 'auto',
 	initComponent: function () {
 
 
@@ -25,9 +27,7 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 			handler: function () {
 				// access the Record constructor through the grid's store
 				var Record = this.getStore().recordType;
-				var p = new Record({
-
-				});
+				var p = new Record({});
 				this.stopEditing();
 				this.getStore().add(p);
 				this.startEditing(this.getStore().getCount() - 1, 0);
@@ -36,7 +36,12 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 		})];
 
 		go.form.GridField.superclass.initComponent.call(this);
-		
+
+		//this.colModel.columns.push(actions);
+		this.on('reconfigure', function(me,store,colModel) {
+			colModel.columns.push(actions);
+		},this);
+
 		if(this.hint) {
 			this.on("added", function(grid, ownerCt, index){
 				ownerCt.insert(index + 1, {
@@ -76,8 +81,10 @@ go.form.GridField = Ext.extend(Ext.grid.EditorGridPanel, {
 
 		this._isDirty = false; //todo this is not right but works for our use case
 
-		var data = {};
-		data[this.store.root] = records;
+		var data = {[this.store.root]: []};
+		if(records) {
+			data[this.store.root] = this.mapKey ? Object.values(records) : records;
+		}
 		this.store.loadData(data);
 	},
 

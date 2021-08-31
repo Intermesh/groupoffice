@@ -900,8 +900,9 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public function findAclId() {
 		if (!$this->aclField()) {
-			$moduleName = $this->getModule();
-			return \GO::modules()->{$moduleName}->aclId;
+			return null;
+//			$moduleName = $this->getModule();
+//			return \GO::modules()->{$moduleName}->aclId;
 		}
 
 		//removed caching of _acl_id because the relation is cached already and when the relation changes the wrong acl_id is returned,
