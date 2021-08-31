@@ -196,24 +196,35 @@ go.Modules = (function () {
 
 		//will be called after login
 		init: function () {
-			var me = this;
-			
-			go.Db.store("Module").on("changes", this.onModuleChanges, this);
 
-			return go.Db.store("Module").all().then(function(entities) {
-				me.entities = entities;
-				var promises = [];
+			const store = go.Db.store("Module");
 
-				for (var id in me.entities) {
+			store.on("changes", this.onModuleChanges, this);
+
+			return store.query({
+				filter: {enabled: true}
+			}).then((response) => {
+
+				return store.get(response.ids).then((result) => {
+					return result.entities
+				});
+
+			}).then((entities) => {
+
+				this.entities = entities;
+				const promises = [];
+				let id, mod, pkg, config,initModulePromise;
+
+				for (id in this.entities) {
 					
-					var mod = me.entities[id];
+					mod = this.entities[id];
 					
-					// for (name in me.registered[package]) {	
-						var pkg = mod.package || "legacy";
-						if(!me.registered[pkg]) {
+					// for (name in this.registered[package]) {	
+						pkg = mod.package || "legacy";
+						if(!this.registered[pkg]) {
 							continue;
 						}
-						var config = me.registered[pkg][mod.name];
+						config = this.registered[pkg][mod.name];
 						if(!config){
 							continue;
 						}
@@ -225,7 +236,7 @@ go.Modules = (function () {
 						if (config.initModule){
 							go.Translate.setModule(mod.package, mod.name);
 
-							var initModulePromise = config.initModule.call(me);
+							initModulePromise = config.initModule.call(this);
 							if(initModulePromise) {
 								promises.push(initModulePromise);
 							}
@@ -233,12 +244,12 @@ go.Modules = (function () {
 
 						if (config.mainPanel) {
 							if(Ext.isArray(config.mainPanel)) {
-								for(var i = 0; i < config.mainPanel.length; i++) {
+								for(let i = 0; i < config.mainPanel.length; i++) {
 								
-									//todo panel is only constructed to grab config.title/id
-									var m = new config.mainPanel[i]();
-									console.error("DO SOMETHING ABOUT THIS HORRIBLE THING HERE :)");
-									//todo GO.moduleManager is deprecated
+									// //todo panel is only constructed to grab config.title/id
+									// moduleMainPanel = new config.mainPanel[i]();
+									// console.error("DO SOMETHING ABOUT THIS HORRIBLE THING HERE :)");
+									// //todo GO.moduleManager is deprecated
 									GO.moduleManager._addModule(config.mainPanel[i].prototype.id, config.mainPanel[i], {title:config.mainPanel[i].prototype.title, package: mod.package}, config.subMenuConfig);
 								}
 							} else {
@@ -250,8 +261,8 @@ go.Modules = (function () {
 					// }
 				}
 
-				return Promise.all(promises).then(function() {
-					return me.entities;
+				return Promise.all(promises).then(() => {
+					return this.entities;
 				});
 			});
 
