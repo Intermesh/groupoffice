@@ -7,6 +7,7 @@ use Exception;
 use GO\Base\Db\ActiveRecord;
 use go\core\App;
 use go\core\db\Query;
+use go\core\ErrorHandler;
 use go\core\model\Module;
 use go\core\jmap;
 use go\core\model\Acl;
@@ -119,8 +120,14 @@ class EntityType implements \go\core\data\ArrayableInterface {
 			$record = [];
 			$record['moduleId'] = isset($module) ? $module->id : null;
 			$record['name'] = self::classNameToShortName($className);
-            $record['clientName'] = $clientName;
-			App::get()->getDbConnection()->insert('core_entity', $record)->execute();
+			$record['clientName'] = $clientName;
+			try {
+				App::get()->getDbConnection()->insert('core_entity', $record)->execute();
+			} catch(\PDOException $e) {
+				ErrorHandler::log("Failed to register new entity type for class '$className'.");
+				go()->debug($c);
+				throw $e;
+			}
 			$record['id'] = App::get()->getDbConnection()->getPDO()->lastInsertId();
 
 			go()->getCache()->delete('entity-types');

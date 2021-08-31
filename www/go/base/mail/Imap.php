@@ -2293,6 +2293,12 @@ class Imap extends ImapBodyStruct {
 			return $this->_uudecode($uid, $part_no, $peek, $fp);
 		}
 
+
+//		if(strtolower($encoding) == 'base64') {
+//			$part = $this->get_message_part($uid, $part_no, $encoding, $peek);
+//			//return base64_decode($part);
+//		}
+
 		$str = '';
 		$this->get_message_part_start($uid, $part_no, $peek);
 
@@ -2303,7 +2309,7 @@ class Imap extends ImapBodyStruct {
 
 			switch (strtolower($encoding)) {
 				case 'base64':
-					$line = trim($leftOver.$line);
+					$line = trim($leftOver).trim($line);
 					$leftOver = "";
 
 					if(strlen($line) % 4 == 0){
