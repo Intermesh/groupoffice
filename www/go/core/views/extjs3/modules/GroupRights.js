@@ -21,12 +21,13 @@ go.modules.GroupRights = Ext.extend(go.Window, {
 		this.items = [this.formPanel = new Ext.FormPanel({
 			tbar: [{
 				xtype: 'gocombo',
-				editable: false,
+				editable: true,
 				displayField: 'name',
 				valueField: 'id',
 				width: 500,
 				triggerAction: 'all',
 				listWidth: 500,
+				pageSize: 50,
 				store: {
 					xtype: 'gostore',
 					fields: ['id', 'name', 'isUserGroupFor'],
