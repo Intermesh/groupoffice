@@ -38,7 +38,7 @@ class Extjs3 {
 		$cacheFile = go()->getDataFolder()->getFile('clientscripts/' . $theme . '/style.css');
 		$debug = go()->getDebugger()->enabled && $cacheFile->exists();
 		if ($debug || !$cacheFile->exists()) {
-			$modules = Module::getInstalled();
+			$modules = Module::getInstalled(['id', 'name', 'package']);
 			$css = "";
 			$modifiedAt = null;
 			foreach ($modules as $module) {

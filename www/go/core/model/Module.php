@@ -334,8 +334,8 @@ class Module extends Entity {
 	 * Get all installed and available modules.
 	 * @return self[]
 	 */
-	public static function getInstalled() {
-		$modules = Module::find()->where(['enabled' => true])->all();
+	public static function getInstalled($properties = []) {
+		$modules = Module::find($properties)->where(['enabled' => true])->all();
 		
 		$available = [];
 		foreach($modules as $module) {
