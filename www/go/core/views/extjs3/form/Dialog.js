@@ -63,7 +63,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 			type: "submit",
 			handler: function() {
 				this.submit().catch((error) => {
-					console.error(error);
+					GO.errorDialog.show(error.message);
 				});
 			},
 			scope: this
@@ -105,7 +105,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 					text: t("Save"),
 					handler: function() {
 						this.submit().catch(function(error) {
-							console.error(error);
+							GO.errorDialog.show(error.message);
 						});
 					},
 					scope: this
@@ -414,8 +414,9 @@ go.form.Dialog = Ext.extend(go.Window, {
 			return serverId;
 
 		}).catch(function(error) {
+
 			const firstError = me.showFirstInvalidField();
-			return Promise.reject(firstError);
+			return Promise.reject(firstError ? {message: firstError} : error);
 		}).finally(function() {
 			me.actionComplete();
 		})
@@ -438,7 +439,7 @@ go.form.Dialog = Ext.extend(go.Window, {
 			// 		console.warn(f);
 			// 	}
 			// });
-			return;
+			return false;
 		}
 
 
