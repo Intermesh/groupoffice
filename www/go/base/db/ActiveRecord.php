@@ -45,6 +45,7 @@ use GO;
 use go\core\db\Query;
 use go\core\ErrorHandler;
 use go\core\http\Exception;
+use go\core\model\Acl;
 use go\core\model\Alert;
 use go\core\model\Link;
 use go\core\model\User;
@@ -900,7 +901,8 @@ abstract class ActiveRecord extends \GO\Base\Model{
 	 */
 	public function findAclId() {
 		if (!$this->aclField()) {
-			return null;
+			//TODO: Is this right?
+			return Acl::getReadOnlyAclId();
 //			$moduleName = $this->getModule();
 //			return \GO::modules()->{$moduleName}->aclId;
 		}
