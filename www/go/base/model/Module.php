@@ -63,6 +63,10 @@ class Module extends \GO\Base\Db\ActiveRecord {
 		if($rights == 1) { // we only have mayManage for old modules
 			return 50;
 		}
+
+		if($this->name == 'projects2' && $rights == 3) { // a single exception for this compat method
+			return 40;
+		}
 		return 0;
 	}
 	

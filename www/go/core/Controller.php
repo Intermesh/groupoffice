@@ -25,7 +25,7 @@ abstract class Controller {
 
     if(!$this->checkModulePermissions()) {
 	    $mod = Module::findByClass(static::class, ['name', 'package']);
-	    throw new Exception(403, str_replace('{module}', $mod->package . "/" . $mod->name, go()->t("Forbidden, you don't have access to module '{module}'.")));
+	    throw new Exception(403, str_replace('{module}', ($mod->package ?? "legacy") . "/" . $mod->name, go()->t("Forbidden, you don't have access to module '{module}'.")));
     }
 
 	}

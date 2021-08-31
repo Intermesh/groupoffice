@@ -27,7 +27,7 @@ class Module extends Entity {
 
 		$rights = $this->getUserRights();
 
-		if($this->name == 'project2' && $rights->mayFinance) { // a single exception for this compat method
+		if($this->name == 'projects2' && $rights->mayFinance) { // a single exception for this compat method
 			return 40;
 		}
 
