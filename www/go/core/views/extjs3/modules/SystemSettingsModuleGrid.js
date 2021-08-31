@@ -437,129 +437,44 @@ go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
 		return JSON;
 	},
 
-	// deleteModule: function(record) {
-	// 	Ext.MessageBox.confirm(t("Delete"), t("All data will be lost! Are you sure you want to delete module '{item}'?").replace('{item}', record.data.name), function(cmd) {
-	// 		console.log(cmd);
-	// 		if(cmd != 'yes') {
-	// 			return;
-	// 		}
-	//
-	// 		if(record.data.isRefactored) {
-	//
-	// 			go.Jmap.request({
-	// 				method: "Module/uninstall",
-	// 				params: {
-	// 					name: record.data.name,
-	// 					package: record.data.package
-	// 				},
-	// 				callback: function() {
-	// 					record.set('enabled', false);
-	// 					record.set('id', null);
-	// 					record.commit();
-	// 				},
-	// 				scope: this
-	// 			});
-	// 		}else
-	// 		{
-	// 			GO.request({
-	// 				url: "modules/module/delete",
-	// 				params: {
-	// 					id: record.data.id
-	// 				},
-	// 				callback: function(){
-	// 					record.set('enabled', false);
-	// 					record.set('id', null);
-	// 					record.commit();
-	// 				},
-	// 				scope: this
-	// 			});
-	// 		}
-	//
-	// 	}, this);
+	deleteModule: function(record) {
+		Ext.MessageBox.confirm(t("Delete"), t("All data will be lost! Are you sure you want to delete module '{item}'?").replace('{item}', record.data.name), function (cmd) {
+			console.log(cmd);
+			if (cmd != 'yes') {
+				return;
+			}
 
-	showMoreMenu : function(record, e) {
-		if(!this.moreMenu) {
-			this.moreMenu = new Ext.menu.Menu({
-				items: [
-					{
-					// 	itemId: "editz",
-					// 	iconCls: 'ic-share',
-					// 	text: t("Permissions"),
-					// 	handler: function() {
-					// 		var record =this.moreMenu.record;
-					//
-					// 	},
-					// 	scope: this
-					// },{
-						itemId: "edit",
-						iconCls: 'ic-share',
-						text: t("Permissions"),
-						handler: function() {
-							const r = this.moreMenu.record;
-							if(r.data.rights) {
-								this.showRights(r.data.id, r.data.rights);
-							}
-						},
-						scope: this
-					}, "-", {
-						itemId: "delete",
-						iconCls: 'ic-delete',
-						text: t("Delete"),
-						handler: function() {
+			if (record.data.isRefactored) {
 
-							var record =this.moreMenu.record;
+				go.Jmap.request({
+					method: "Module/uninstall",
+					params: {
+						name: record.data.name,
+						package: record.data.package
+					},
+					callback: function () {
+						record.set('enabled', false);
+						record.set('id', null);
+						record.commit();
+					},
+					scope: this
+				});
+			} else {
+				GO.request({
+					url: "modules/module/delete",
+					params: {
+						id: record.data.id
+					},
+					callback: function () {
+						record.set('enabled', false);
+						record.set('id', null);
+						record.commit();
+					},
+					scope: this
+				});
+			}
 
-							Ext.MessageBox.confirm(t("Delete"), t("All data will be lost! Are you sure you want to delete module '{item}'?").replace('{item}', record.data.name), function(cmd) {
-								console.log(cmd);
-								if(cmd != 'yes') {
-									return;
-								}
+		}, this);
 
-								if(record.data.isRefactored) {
-
-									go.Jmap.request({
-										method: "Module/uninstall",
-										params: {
-											name: record.data.name,
-											package: record.data.package
-										},
-										callback: function() {
-											record.set('enabled', false);
-											record.set('id', null);
-											record.commit();
-										},
-										scope: this
-									});
-								}else
-								{
-									GO.request({
-										url: "modules/module/delete",
-										params: {
-											id: record.data.id
-										},
-										callback: function(){
-											record.set('enabled', false);
-											record.set('id', null);
-											record.commit();
-										},
-										scope: this
-									});
-								}
-
-							}, this);
-
-						},
-						scope: this
-					}
-				]
-			});
-		}
-
-		this.moreMenu.getComponent("edit").setDisabled(record.get("permissionLevel") < go.permissionLevels.manage);
-		this.moreMenu.getComponent("delete").setDisabled(record.get("permissionLevel") < go.permissionLevels.manage);
-
-		this.moreMenu.record = record;
-
-		this.moreMenu.showAt(e.getXY());
 	}
 });
