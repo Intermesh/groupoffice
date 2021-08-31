@@ -53,9 +53,6 @@ go.groups.GroupDialog = Ext.extend(go.form.Dialog, {
 					}]
 			},
 			this.groupUserGrid = new go.groups.GroupUserGrid({
-				//anchor: '100% -' + dp(64),
-				submit: false, //handled in onSubmit
-
 				region: "center",
 				hideLabel: true,
 				value: []
