@@ -1,4 +1,7 @@
 go.systemsettings.AuthenticationPanel = Ext.extend(go.systemsettings.Panel, {
+	hasPermission: function() {
+		return go.User.isAdmin;
+	},
 	itemId: "authentication", //makes it routable
 	initComponent: function () {
 		this.domainCombo = GO.SystemSettingsDomainCombo = new go.login.DomainCombo({

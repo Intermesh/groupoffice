@@ -1,4 +1,7 @@
 go.systemsettings.AuthAllowGroupGrid = Ext.extend(go.grid.EditorGridPanel, {
+  hasPermission: function() {
+    return go.User.isAdmin;
+  },
   autoHeight: true,
   initComponent: function () {
 

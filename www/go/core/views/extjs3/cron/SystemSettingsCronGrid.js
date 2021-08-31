@@ -12,6 +12,9 @@
  */
 
 go.cron.SystemSettingsCronGrid = Ext.extend(GO.grid.GridPanel,{
+	hasPermission: function() {
+		return go.User.isAdmin;
+	},
 	changed : false,
 	iconCls: 'ic-schedule',
 	stateId: 'system-settings-cron-grid',

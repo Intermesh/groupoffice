@@ -13,6 +13,10 @@
  */
 
 go.groups.SystemSettingsGroupGrid = Ext.extend(go.grid.GridPanel, {
+	hasPermission: function() {
+		const module = go.Modules.get(this.package, this.module);
+		return module.userRights.mayChangeGroups;
+	},
 	iconCls: 'ic-group',
 	itemId: "groups", //makes it routable
 	initComponent: function () {

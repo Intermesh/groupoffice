@@ -15,6 +15,10 @@
  */
 
 go.users.SystemSettingsUserGrid = Ext.extend(go.grid.GridPanel, {
+	hasPermission: function() {
+		const module = go.Modules.get(this.package, this.module);
+		return module.userRights.mayChangeUsers;
+	},
 	iconCls: 'ic-account-box',
 	itemId: "users", //makes it routable
 

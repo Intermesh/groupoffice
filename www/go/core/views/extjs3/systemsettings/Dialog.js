@@ -152,9 +152,9 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 
 		for(i = 0, l = available.length; i < l; i++) {
 
-			if(!available[i].userRights.mayManage) {
-				continue;
-			}
+			// if(!available[i].userRights.mayManage) {
+			// 	continue;
+			// }
 			
 			config = go.Modules.getConfig(available[i].package, available[i].name);
 			
@@ -252,6 +252,14 @@ go.systemsettings.Dialog = Ext.extend(go.Window, {
 		});
 		
 		var pnl = new panelClass(cfg);
+
+		if(!pnl.hasPermission) {
+			console.warn("System setting panel " + pnl.title + " does not extend 'go.systemsettings.Panel'");
+		} else {
+			if (!pnl.hasPermission()) {
+				return;
+			}
+		}
 		
 		var menuRec = new Ext.data.Record({
 			itemId: pnl.itemId,

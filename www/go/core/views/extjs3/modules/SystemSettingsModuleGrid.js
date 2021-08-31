@@ -1,4 +1,7 @@
-go.modules.SystemSettingsModuleGrid = Ext.extend(Ext.Panel, {
+go.modules.SystemSettingsModuleGrid = Ext.extend(go.systemsettings.Panel, {
+	hasPermission: function() {
+		return go.User.isAdmin;
+	},
 	iconCls: 'ic-extension',
 	autoExpandColumn: 'name',
 	//layout: 'fit',
