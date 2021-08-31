@@ -131,6 +131,10 @@ class Module extends Entity {
 
 	public function getUserRights() {
 
+		if(!$this->isAvailable()) {
+			return ['mayRead' => go()->getAuthState()->isAdmin()];
+		}
+
 		if(go()->getAuthState()->isAdmin()) {
 			$rights = ["mayRead" => true];
 			foreach($this->module()->getRights() as $name => $bit){
@@ -160,9 +164,11 @@ class Module extends Entity {
 		$r = decbin($r);
 
 		$rights = ["mayRead" => true];
-		foreach($this->module()->getRights() as $name => $bit){
+
+		foreach ($this->module()->getRights() as $name => $bit) {
 			$rights[$name] = !!($r & $bit);
 		}
+
 		return (object) $rights;
 	}
 
