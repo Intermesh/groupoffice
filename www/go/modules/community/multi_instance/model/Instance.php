@@ -569,7 +569,12 @@ class Instance extends Entity {
 	 * @return bool
 	 */
 	public function isInstalled() {
-		return $this->getInstanceDbConnection()->getDatabase()->hasTable('core_module');
+		try {
+			return $this->getInstanceDbConnection()->getDatabase()->hasTable('core_module');
+		} catch(Exception $e) {
+			ErrorHandler::logException($e);
+			return false;
+		}
 	}
 	
 	private function getInstanceDbData(){
