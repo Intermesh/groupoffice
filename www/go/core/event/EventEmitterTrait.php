@@ -55,7 +55,7 @@ trait EventEmitterTrait {
 	 * @param mixed $args Multiple extra arguments to be passed to the listener functions.
 	 * @return boolean
 	 */
-	public static function fireEvent($event, &...$args){
+	public static function fireEvent($event, ...$args){
 		
 		if(EventEmitterTrait::$disableEvents) {
 			return true;
